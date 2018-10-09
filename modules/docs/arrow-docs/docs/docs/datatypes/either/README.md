@@ -43,13 +43,13 @@ upon the first error. For more information, see the `Validated` vs `Either` sect
 
 By convention the right hand side of an `Either` is used to hold successful values.
 
-{: data-executable='true'}
+{: data-executable='true' theme='arrow'}
 ```kotlin:ank
 val right: Either<String, Int> = Either.Right(5)
 right
 ```
 
-{: data-executable='true'}
+{: data-executable='true' theme='arrow'}
 ```kotlin:ank
 import arrow.*
 import arrow.core.*

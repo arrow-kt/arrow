@@ -9782,7 +9782,7 @@ return CodeMirror$1;
 "use strict";
 
 
-var isValue = __webpack_require__(6);
+var isValue = __webpack_require__(7);
 
 module.exports = function (value) {
 	if (!isValue(value)) throw new TypeError("Cannot use null or undefined");
@@ -9912,32 +9912,6 @@ function toSpaceCase(string) {
 
 /***/ }),
 /* 6 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _undefined = __webpack_require__(19)(); // Support ES3 engines
-
-module.exports = function (val) {
- return (val !== _undefined) && (val !== null);
-};
-
-
-/***/ }),
-/* 7 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-module.exports = __webpack_require__(22)()
-	? Object.setPrototypeOf
-	: __webpack_require__(23);
-
-
-/***/ }),
-/* 8 */
 /***/ (function(module, exports) {
 
 /*
@@ -10016,6 +9990,32 @@ function toComment(sourceMap) {
 
 	return '/*# ' + data + ' */';
 }
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _undefined = __webpack_require__(19)(); // Support ES3 engines
+
+module.exports = function (val) {
+ return (val !== _undefined) && (val !== null);
+};
+
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+module.exports = __webpack_require__(22)()
+	? Object.setPrototypeOf
+	: __webpack_require__(23);
 
 
 /***/ }),
@@ -10981,7 +10981,7 @@ __webpack_require__(57);
 "use strict";
 
 
-var isValue = __webpack_require__(6);
+var isValue = __webpack_require__(7);
 
 var forEach = Array.prototype.forEach, create = Object.create;
 
@@ -11735,6 +11735,7 @@ var lib_default = /*#__PURE__*/__webpack_require__.n(to_case_lib);
 var THEMES = {
   DARCULA: "darcula",
   IDEA: "idea",
+  ARROW: "arrow",
   DEFAULT: "default"
 };
 /**
@@ -12808,7 +12809,6 @@ var executable_fragment_ExecutableFragment = function (_ExecutableCodeTempla) {
       var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
       var textarea = this.nodes[0].getElementsByTagName('textarea')[0];
-      // const readOnly = options.highlightOnly && options.highlightOnly === true;
       var readOnly = !options.executable;
       var codemirrorOptions = {
         readOnly: readOnly,
@@ -12824,8 +12824,6 @@ var executable_fragment_ExecutableFragment = function (_ExecutableCodeTempla) {
         foldGutter: true,
         gutters: [SELECTORS.ERROR_AND_WARNING_GUTTER, SELECTORS.FOLD_GUTTER]
       };
-
-      console.log('codemirrorOptions', codemirrorOptions);
 
       // Workaround to allow copy code in read-only mode
       // Taken from https://github.com/codemirror/CodeMirror/issues/2568#issuecomment-308137063
@@ -13031,7 +13029,6 @@ var ATTRIBUTES = {
   HIDDEN_DEPENDENCY: 'hidden-dependency',
   INDENT: 'indent',
   EXECUTABLE: 'data-executable',
-  HIGHLIGHT_ONLY: 'data-highlight-only',
   STYLE: 'style',
   FROM: 'from',
   TO: 'to',
@@ -13093,10 +13090,9 @@ var executable_code_ExecutableCode = function () {
     var cfg = cjs_default()(src_config, config);
 
     // no run code in none kotlin mode
-    // if (mode !== MODES.KOTLIN) {
-    //   highlightOnly = true;
-    //   executable = false;
-    // }
+    if (mode !== MODES.KOTLIN) {
+      executable = false;
+    }
 
     targetNode.style.display = 'none';
     targetNode.setAttribute(INITED_ATTRIBUTE_NAME, 'true');
@@ -13186,6 +13182,8 @@ var executable_code_ExecutableCode = function () {
           return THEMES.DARCULA;
         case THEMES.IDEA:
           return THEMES.IDEA;
+        case THEMES.ARROW:
+          return THEMES.ARROW;
         default:
           return THEMES.DEFAULT;
       }
@@ -13311,7 +13309,7 @@ var executable_code_ExecutableCode = function () {
 
 /* harmony default export */ var executable_code = (executable_code_ExecutableCode);
 // EXTERNAL MODULE: ./node_modules/debounce/index.js
-var debounce = __webpack_require__(138);
+var debounce = __webpack_require__(139);
 var debounce_default = /*#__PURE__*/__webpack_require__.n(debounce);
 
 // CONCATENATED MODULE: ./src/discourse-preview-panel-handler.js
@@ -17768,7 +17766,7 @@ CodeMirror.defineMIME('application/x-sh', 'shell');
 
 var clear          = __webpack_require__(14)
   , eIndexOf       = __webpack_require__(20)
-  , setPrototypeOf = __webpack_require__(7)
+  , setPrototypeOf = __webpack_require__(8)
   , callable       = __webpack_require__(2)
   , d              = __webpack_require__(4)
   , ee             = __webpack_require__(25)
@@ -17951,7 +17949,7 @@ module.exports = function (value) {
 "use strict";
 
 
-var isValue = __webpack_require__(6);
+var isValue = __webpack_require__(7);
 
 var map = { function: true, object: true };
 
@@ -18097,7 +18095,7 @@ module.exports = function () {
 "use strict";
 
 
-var isValue = __webpack_require__(6);
+var isValue = __webpack_require__(7);
 
 var keys = Object.keys;
 
@@ -18337,7 +18335,7 @@ module.exports = function (x) {
 
 
 var isArguments = __webpack_require__(9)
-  , isValue     = __webpack_require__(6)
+  , isValue     = __webpack_require__(7)
   , isString    = __webpack_require__(10);
 
 var iteratorSymbol = __webpack_require__(3).iterator
@@ -18381,7 +18379,7 @@ module.exports = function (obj) {
 "use strict";
 
 
-var setPrototypeOf = __webpack_require__(7)
+var setPrototypeOf = __webpack_require__(8)
   , contains       = __webpack_require__(16)
   , d              = __webpack_require__(4)
   , Symbol         = __webpack_require__(3)
@@ -18519,7 +18517,7 @@ var iteratorSymbol = __webpack_require__(3).iterator
   , toPosInt       = __webpack_require__(21)
   , callable       = __webpack_require__(2)
   , validValue     = __webpack_require__(1)
-  , isValue        = __webpack_require__(6)
+  , isValue        = __webpack_require__(7)
   , isString       = __webpack_require__(10)
   , isArray        = Array.isArray
   , call           = Function.prototype.call
@@ -18724,7 +18722,7 @@ module.exports = function (method, defVal) {
 
 
 
-var setPrototypeOf = __webpack_require__(7)
+var setPrototypeOf = __webpack_require__(8)
   , d              = __webpack_require__(4)
   , Symbol         = __webpack_require__(3)
   , Iterator       = __webpack_require__(11);
@@ -18767,7 +18765,7 @@ defineProperty(StringIterator.prototype, Symbol.toStringTag, d("c", "String Iter
 "use strict";
 
 
-var setPrototypeOf    = __webpack_require__(7)
+var setPrototypeOf    = __webpack_require__(8)
   , contains          = __webpack_require__(16)
   , d                 = __webpack_require__(4)
   , Iterator          = __webpack_require__(11)
@@ -22161,7 +22159,7 @@ if(false) {
 /* 112 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(8)(undefined);
+exports = module.exports = __webpack_require__(6)(undefined);
 // imports
 
 
@@ -22275,7 +22273,7 @@ module.exports = function (css) {
 
 var clear          = __webpack_require__(14)
   , eIndexOf       = __webpack_require__(20)
-  , setPrototypeOf = __webpack_require__(7)
+  , setPrototypeOf = __webpack_require__(8)
   , callable       = __webpack_require__(2)
   , validValue     = __webpack_require__(1)
   , d              = __webpack_require__(4)
@@ -22384,7 +22382,7 @@ Object.defineProperty(MapPoly.prototype, Symbol.toStringTag, d('c', 'Map'));
 "use strict";
 
 
-var setPrototypeOf    = __webpack_require__(7)
+var setPrototypeOf    = __webpack_require__(8)
   , d                 = __webpack_require__(4)
   , Iterator          = __webpack_require__(11)
   , toStringTagSymbol = __webpack_require__(3).toStringTag
@@ -22521,15 +22519,16 @@ if(false) {
 /* 121 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(8)(undefined);
+exports = module.exports = __webpack_require__(6)(undefined);
 // imports
 exports.i(__webpack_require__(122), "");
 exports.i(__webpack_require__(123), "");
 exports.i(__webpack_require__(124), "");
 exports.i(__webpack_require__(125), "");
+exports.i(__webpack_require__(126), "");
 
 // module
-exports.push([module.i, "/**\n Darcula theme variables\n */\n/**\n WebTeam UI colors\n */\n.executable-fragment-wrapper {\n  margin-bottom: 20px;\n  position: relative; }\n\n.executable-fragment {\n  border: 1px solid #eaeaec; }\n\n.hidden-dependency {\n  display: none; }\n\n.executable-fragment.darcula {\n  background-color: #313336; }\n\n.CodeMirror {\n  height: auto;\n  font-size: 12px; }\n  .CodeMirror pre {\n    line-height: 16.8px;\n    margin-bottom: 0 !important; }\n  .CodeMirror .CodeMirror-overlayscroll-horizontal div, .CodeMirror .CodeMirror-overlayscroll-vertical div {\n    display: none; }\n  .CodeMirror:hover .CodeMirror-overlayscroll-horizontal div, .CodeMirror:hover .CodeMirror-overlayscroll-vertical div {\n    display: block;\n    background: #afb1b3; }\n\n.CodeMirror-lines {\n  padding: 0;\n  margin: 12px 0; }\n\n.CodeMirror-gutter {\n  height: auto; }\n\n.CodeMirror {\n  line-height: 1.4;\n  font-family: menlo, consolas, monospace;\n  font-size: 12px; }\n\n.CodeMirror-linenumber {\n  min-width: 0;\n  text-align: center; }\n\n.CodeMirror-linebackground.unmodifiable-line {\n  background-color: #eaeaec; }\n\n.CodeMirror-linebackground.unmodifiable-line-dark {\n  background-color: #3c3f43; }\n\n.markPlaceholder {\n  border-top: 1px solid #167dff;\n  border-bottom: 1px solid #167dff; }\n\n.markPlaceholder-start {\n  border-left: 1px solid #167dff; }\n\n.markPlaceholder-end {\n  border-right: 1px solid #167dff; }\n\n.run-button {\n  position: absolute;\n  z-index: 10;\n  right: 5px;\n  top: 5px;\n  height: 20px;\n  width: 16px;\n  cursor: pointer;\n  background: url(" + __webpack_require__(126) + ");\n  background-size: cover;\n  background-repeat: no-repeat; }\n  .run-button._disabled {\n    cursor: default;\n    opacity: 0.5; }\n\n.loader {\n  position: relative;\n  width: 15px;\n  height: 15px;\n  margin: 0 auto;\n  border-radius: 50%;\n  text-indent: -9999em;\n  color: #161616;\n  font-size: 8px;\n  opacity: .7;\n  animation: loader 1s infinite ease-in-out;\n  animation-delay: 0.16s; }\n\n.loader.darcula {\n  opacity: 1;\n  color: #696969; }\n\n.loader::before {\n  left: -3.5em;\n  animation-delay: 0s;\n  position: absolute;\n  width: 15px;\n  border-radius: 50%;\n  height: 15px;\n  content: '';\n  animation: loader 1s infinite ease-in-out; }\n\n.loader::after {\n  left: 3.5em;\n  animation-delay: 0.32s;\n  position: absolute;\n  border-radius: 50%;\n  width: 15px;\n  height: 15px;\n  content: '';\n  animation: loader 1s infinite ease-in-out; }\n\n@keyframes loader {\n  100% {\n    box-shadow: 0 2.5em 0 -1.3em; }\n  80% {\n    box-shadow: 0 2.5em 0 -1.3em; }\n  0% {\n    box-shadow: 0 2.5em 0 -1.3em; }\n  40% {\n    box-shadow: 0 2.5em 0 0; } }\n\n.cm__ERROR {\n  color: #ec5424 !important; }\n\n.errors-and-warnings-gutter {\n  width: 16px; }\n\n.ERRORgutter {\n  height: 13px;\n  width: 13px;\n  margin-top: 2px;\n  margin-left: 2px;\n  background: url(\"https://try.kotlinlang.org/static/images/icons_all_sprite.svg\") no-repeat -150px -500px; }\n\n.WARNINGgutter {\n  height: 13px;\n  width: 13px;\n  margin-top: 2px;\n  margin-left: 2px;\n  background: url(\"https://try.kotlinlang.org/static/images/icons_all_sprite.svg\") no-repeat -150px -600px; }\n\n.cm__red_wavy_line {\n  background: url(http://try.kotlinlang.org/static/images/wavyline-red.gif) repeat-x 100% 100% !important;\n  padding-bottom: 2px; }\n\n.cm__green_wavy_line {\n  background: url(http://try.kotlinlang.org/static/images/wavyline-green.gif) repeat-x 100% 100% !important;\n  padding-bottom: 2px; }\n\n.output-wrapper {\n  border-top: 1px solid #eaeaec;\n  min-height: 60px;\n  font-size: 14px;\n  background-color: white; }\n\n.output-wrapper.darcula {\n  background-color: #313336;\n  border-top: 1px solid grey;\n  color: #afb1b3; }\n\n.code-output {\n  white-space: pre-wrap;\n  font-family: \"Liberation Mono\", Consolas, Menlo, Courier, monospace;\n  overflow: auto;\n  padding-left: 10px;\n  padding-top: 15px; }\n\n.standard-output.darcula {\n  color: #afb1b3; }\n\n.error-output {\n  white-space: pre-wrap;\n  color: #ec5424;\n  min-height: 1.4em;\n  margin: 0;\n  vertical-align: top; }\n\n.error-output.darcula {\n  color: #ec5424; }\n\n.standard-output {\n  white-space: pre;\n  color: #000;\n  min-height: 1.4em;\n  margin: 0;\n  vertical-align: top; }\n\n.test-output {\n  white-space: pre;\n  color: #4dbb5f;\n  min-height: 1.4em;\n  vertical-align: top;\n  margin-left: 20px; }\n\n.console-close {\n  position: absolute;\n  right: 1px;\n  margin-top: 1px;\n  width: 16px;\n  height: 16px;\n  background: #afb1b3 url(" + __webpack_require__(30) + "); }\n\n.console-close.darcula {\n  background: url(" + __webpack_require__(30) + "); }\n\n.console-close:hover {\n  background-color: #696969; }\n\n.console-close.darcula:hover {\n  background-color: #ec5424; }\n\n.test-fail {\n  color: #ec5424;\n  min-height: 1.4em;\n  margin-left: 20px;\n  vertical-align: top; }\n\n.test-fail.darcula {\n  color: #ec5424; }\n\n.console-icon {\n  margin-top: 2px;\n  width: 15px;\n  height: 15px;\n  position: absolute; }\n\n.console-icon.attention {\n  background-image: url(" + __webpack_require__(127) + "); }\n\n.console-icon.ok {\n  background-image: url(" + __webpack_require__(128) + "); }\n\n.console-icon.fail {\n  background-image: url(" + __webpack_require__(129) + "); }\n\n.test-time {\n  float: right;\n  font-size: 10px;\n  color: #afb1b3;\n  margin-right: 20px;\n  margin-top: -14px; }\n\n.stacktrace-element {\n  margin-left: 20px; }\n\n.CodeMirror-foldgutter {\n  position: absolute;\n  width: 100%; }\n\n.CodeMirror-foldgutter-folded {\n  width: 100%;\n  background: white; }\n\n.fold-button {\n  position: absolute;\n  height: 19px;\n  width: 31px;\n  top: 0;\n  left: 50%;\n  transform: translate(-50%, -50%);\n  z-index: 10;\n  cursor: pointer;\n  background: transparent url(" + __webpack_require__(130) + ") no-repeat; }\n  .fold-button._hover {\n    background-image: url(" + __webpack_require__(131) + "); }\n\n.fold-button.darcula {\n  background: url(" + __webpack_require__(132) + ") no-repeat; }\n  .fold-button.darcula._hover {\n    background-image: url(" + __webpack_require__(133) + "); }\n\n._unfolded .fold-button {\n  background-image: url(" + __webpack_require__(134) + "); }\n  ._unfolded .fold-button._hover {\n    background-image: url(" + __webpack_require__(135) + "); }\n\n._unfolded .fold-button.darcula {\n  background: url(" + __webpack_require__(136) + ") no-repeat; }\n  ._unfolded .fold-button.darcula._hover {\n    background-image: url(" + __webpack_require__(137) + "); }\n\n.code-area {\n  position: relative; }\n\n.compiler-info {\n  position: absolute;\n  right: 0;\n  font-size: 10px;\n  color: #afb1b3; }\n  .compiler-info span {\n    margin-left: 15px; }\n\n.CodeMirror-hints {\n  padding-left: 0 !important;\n  border: 1px solid #afb1b3;\n  border-radius: 4px;\n  position: absolute;\n  background-color: #f7f7f7;\n  overflow-y: hidden;\n  z-index: 10;\n  max-height: 20em;\n  box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.2); }\n\n.CodeMirror-hint {\n  white-space: pre;\n  cursor: pointer;\n  border-radius: 0;\n  margin: 0;\n  padding-right: 0 !important;\n  line-height: 18px; }\n\nli.CodeMirror-hint-active {\n  background-color: #d8d8d8;\n  color: #000000; }\n\n.CodeMirror-hint .name {\n  float: left; }\n\n.CodeMirror-hint .tail {\n  float: right;\n  padding-left: 20px;\n  margin-right: 5px; }\n\n.CodeMirror-hint .icon {\n  margin-top: 1px;\n  margin-left: 2px;\n  height: 16px;\n  width: 16px;\n  float: left;\n  margin-right: 10px; }\n\n.icon {\n  background: url(\"https://try.kotlinlang.org/static/images/icons_all_sprite.svg\"); }\n\n.icon.class {\n  background: url(\"https://try.kotlinlang.org/static/images/completion_class.svg\"); }\n\n.icon.package {\n  background: url(\"https://try.kotlinlang.org/static/images/completion_package.svg\"); }\n\n.icon.method {\n  background: url(\"https://try.kotlinlang.org/static/images/completion_method.svg\"); }\n\n.icon.genericValue {\n  background: url(\"https://try.kotlinlang.org/static/images/completion_generic.svg\"); }\n\n.icon.property {\n  background: url(\"https://try.kotlinlang.org/static/images/completion_property.svg\"); }\n", ""]);
+exports.push([module.i, "/**\n Darcula theme variables\n */\n/**\n WebTeam UI colors\n */\n.executable-fragment-wrapper {\n  margin-bottom: 20px;\n  position: relative; }\n\n.executable-fragment {\n  border: 1px solid #eaeaec; }\n\n.hidden-dependency {\n  display: none; }\n\n.executable-fragment.darcula {\n  background-color: #313336; }\n\n.CodeMirror {\n  height: auto;\n  font-size: 12px; }\n  .CodeMirror pre {\n    line-height: 16.8px;\n    margin-bottom: 0 !important; }\n  .CodeMirror .CodeMirror-overlayscroll-horizontal div, .CodeMirror .CodeMirror-overlayscroll-vertical div {\n    display: none; }\n  .CodeMirror:hover .CodeMirror-overlayscroll-horizontal div, .CodeMirror:hover .CodeMirror-overlayscroll-vertical div {\n    display: block;\n    background: #afb1b3; }\n\n.CodeMirror-lines {\n  padding: 0;\n  margin: 12px 0; }\n\n.CodeMirror-gutter {\n  height: auto; }\n\n.CodeMirror {\n  line-height: 1.4;\n  font-family: menlo, consolas, monospace;\n  font-size: 12px; }\n\n.CodeMirror-linenumber {\n  min-width: 0;\n  text-align: center; }\n\n.CodeMirror-linebackground.unmodifiable-line {\n  background-color: #eaeaec; }\n\n.CodeMirror-linebackground.unmodifiable-line-dark {\n  background-color: #3c3f43; }\n\n.markPlaceholder {\n  border-top: 1px solid #167dff;\n  border-bottom: 1px solid #167dff; }\n\n.markPlaceholder-start {\n  border-left: 1px solid #167dff; }\n\n.markPlaceholder-end {\n  border-right: 1px solid #167dff; }\n\n.run-button {\n  position: absolute;\n  z-index: 10;\n  right: 5px;\n  top: 5px;\n  height: 20px;\n  width: 16px;\n  cursor: pointer;\n  background: url(" + __webpack_require__(127) + ");\n  background-size: cover;\n  background-repeat: no-repeat; }\n  .run-button._disabled {\n    cursor: default;\n    opacity: 0.5; }\n\n.loader {\n  position: relative;\n  width: 15px;\n  height: 15px;\n  margin: 0 auto;\n  border-radius: 50%;\n  text-indent: -9999em;\n  color: #161616;\n  font-size: 8px;\n  opacity: .7;\n  animation: loader 1s infinite ease-in-out;\n  animation-delay: 0.16s; }\n\n.loader.darcula {\n  opacity: 1;\n  color: #696969; }\n\n.loader::before {\n  left: -3.5em;\n  animation-delay: 0s;\n  position: absolute;\n  width: 15px;\n  border-radius: 50%;\n  height: 15px;\n  content: '';\n  animation: loader 1s infinite ease-in-out; }\n\n.loader::after {\n  left: 3.5em;\n  animation-delay: 0.32s;\n  position: absolute;\n  border-radius: 50%;\n  width: 15px;\n  height: 15px;\n  content: '';\n  animation: loader 1s infinite ease-in-out; }\n\n@keyframes loader {\n  100% {\n    box-shadow: 0 2.5em 0 -1.3em; }\n  80% {\n    box-shadow: 0 2.5em 0 -1.3em; }\n  0% {\n    box-shadow: 0 2.5em 0 -1.3em; }\n  40% {\n    box-shadow: 0 2.5em 0 0; } }\n\n.cm__ERROR {\n  color: #ec5424 !important; }\n\n.errors-and-warnings-gutter {\n  width: 16px; }\n\n.ERRORgutter {\n  height: 13px;\n  width: 13px;\n  margin-top: 2px;\n  margin-left: 2px;\n  background: url(\"https://try.kotlinlang.org/static/images/icons_all_sprite.svg\") no-repeat -150px -500px; }\n\n.WARNINGgutter {\n  height: 13px;\n  width: 13px;\n  margin-top: 2px;\n  margin-left: 2px;\n  background: url(\"https://try.kotlinlang.org/static/images/icons_all_sprite.svg\") no-repeat -150px -600px; }\n\n.cm__red_wavy_line {\n  background: url(http://try.kotlinlang.org/static/images/wavyline-red.gif) repeat-x 100% 100% !important;\n  padding-bottom: 2px; }\n\n.cm__green_wavy_line {\n  background: url(http://try.kotlinlang.org/static/images/wavyline-green.gif) repeat-x 100% 100% !important;\n  padding-bottom: 2px; }\n\n.output-wrapper {\n  border-top: 1px solid #eaeaec;\n  min-height: 60px;\n  font-size: 14px;\n  background-color: white; }\n\n.output-wrapper.darcula {\n  background-color: #313336;\n  border-top: 1px solid grey;\n  color: #afb1b3; }\n\n.code-output {\n  white-space: pre-wrap;\n  font-family: \"Liberation Mono\", Consolas, Menlo, Courier, monospace;\n  overflow: auto;\n  padding-left: 10px;\n  padding-top: 15px; }\n\n.standard-output.darcula {\n  color: #afb1b3; }\n\n.error-output {\n  white-space: pre-wrap;\n  color: #ec5424;\n  min-height: 1.4em;\n  margin: 0;\n  vertical-align: top; }\n\n.error-output.darcula {\n  color: #ec5424; }\n\n.standard-output {\n  white-space: pre;\n  color: #000;\n  min-height: 1.4em;\n  margin: 0;\n  vertical-align: top; }\n\n.test-output {\n  white-space: pre;\n  color: #4dbb5f;\n  min-height: 1.4em;\n  vertical-align: top;\n  margin-left: 20px; }\n\n.console-close {\n  position: absolute;\n  right: 1px;\n  margin-top: 1px;\n  width: 16px;\n  height: 16px;\n  background: #afb1b3 url(" + __webpack_require__(30) + "); }\n\n.console-close.darcula {\n  background: url(" + __webpack_require__(30) + "); }\n\n.console-close:hover {\n  background-color: #696969; }\n\n.console-close.darcula:hover {\n  background-color: #ec5424; }\n\n.test-fail {\n  color: #ec5424;\n  min-height: 1.4em;\n  margin-left: 20px;\n  vertical-align: top; }\n\n.test-fail.darcula {\n  color: #ec5424; }\n\n.console-icon {\n  margin-top: 2px;\n  width: 15px;\n  height: 15px;\n  position: absolute; }\n\n.console-icon.attention {\n  background-image: url(" + __webpack_require__(128) + "); }\n\n.console-icon.ok {\n  background-image: url(" + __webpack_require__(129) + "); }\n\n.console-icon.fail {\n  background-image: url(" + __webpack_require__(130) + "); }\n\n.test-time {\n  float: right;\n  font-size: 10px;\n  color: #afb1b3;\n  margin-right: 20px;\n  margin-top: -14px; }\n\n.stacktrace-element {\n  margin-left: 20px; }\n\n.CodeMirror-foldgutter {\n  position: absolute;\n  width: 100%; }\n\n.CodeMirror-foldgutter-folded {\n  width: 100%;\n  background: white; }\n\n.fold-button {\n  position: absolute;\n  height: 19px;\n  width: 31px;\n  top: 0;\n  left: 50%;\n  transform: translate(-50%, -50%);\n  z-index: 10;\n  cursor: pointer;\n  background: transparent url(" + __webpack_require__(131) + ") no-repeat; }\n  .fold-button._hover {\n    background-image: url(" + __webpack_require__(132) + "); }\n\n.fold-button.darcula {\n  background: url(" + __webpack_require__(133) + ") no-repeat; }\n  .fold-button.darcula._hover {\n    background-image: url(" + __webpack_require__(134) + "); }\n\n._unfolded .fold-button {\n  background-image: url(" + __webpack_require__(135) + "); }\n  ._unfolded .fold-button._hover {\n    background-image: url(" + __webpack_require__(136) + "); }\n\n._unfolded .fold-button.darcula {\n  background: url(" + __webpack_require__(137) + ") no-repeat; }\n  ._unfolded .fold-button.darcula._hover {\n    background-image: url(" + __webpack_require__(138) + "); }\n\n.code-area {\n  position: relative; }\n\n.compiler-info {\n  position: absolute;\n  right: 0;\n  font-size: 10px;\n  color: #afb1b3; }\n  .compiler-info span {\n    margin-left: 15px; }\n\n.CodeMirror-hints {\n  padding-left: 0 !important;\n  border: 1px solid #afb1b3;\n  border-radius: 4px;\n  position: absolute;\n  background-color: #f7f7f7;\n  overflow-y: hidden;\n  z-index: 10;\n  max-height: 20em;\n  box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.2); }\n\n.CodeMirror-hint {\n  white-space: pre;\n  cursor: pointer;\n  border-radius: 0;\n  margin: 0;\n  padding-right: 0 !important;\n  line-height: 18px; }\n\nli.CodeMirror-hint-active {\n  background-color: #d8d8d8;\n  color: #000000; }\n\n.CodeMirror-hint .name {\n  float: left; }\n\n.CodeMirror-hint .tail {\n  float: right;\n  padding-left: 20px;\n  margin-right: 5px; }\n\n.CodeMirror-hint .icon {\n  margin-top: 1px;\n  margin-left: 2px;\n  height: 16px;\n  width: 16px;\n  float: left;\n  margin-right: 10px; }\n\n.icon {\n  background: url(\"https://try.kotlinlang.org/static/images/icons_all_sprite.svg\"); }\n\n.icon.class {\n  background: url(\"https://try.kotlinlang.org/static/images/completion_class.svg\"); }\n\n.icon.package {\n  background: url(\"https://try.kotlinlang.org/static/images/completion_package.svg\"); }\n\n.icon.method {\n  background: url(\"https://try.kotlinlang.org/static/images/completion_method.svg\"); }\n\n.icon.genericValue {\n  background: url(\"https://try.kotlinlang.org/static/images/completion_generic.svg\"); }\n\n.icon.property {\n  background: url(\"https://try.kotlinlang.org/static/images/completion_property.svg\"); }\n", ""]);
 
 // exports
 
@@ -22538,7 +22537,7 @@ exports.push([module.i, "/**\n Darcula theme variables\n */\n/**\n WebTeam UI co
 /* 122 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(8)(undefined);
+exports = module.exports = __webpack_require__(6)(undefined);
 // imports
 
 
@@ -22552,7 +22551,7 @@ exports.push([module.i, "/* BASICS */\n\n.CodeMirror {\n  /* Set height, width, 
 /* 123 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(8)(undefined);
+exports = module.exports = __webpack_require__(6)(undefined);
 // imports
 
 
@@ -22566,7 +22565,7 @@ exports.push([module.i, "/**\n    Name:       IDEA default theme\n    From Intel
 /* 124 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(8)(undefined);
+exports = module.exports = __webpack_require__(6)(undefined);
 // imports
 
 
@@ -22580,7 +22579,21 @@ exports.push([module.i, "/**\n    Name:       IntelliJ IDEA darcula theme\n    F
 /* 125 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(8)(undefined);
+exports = module.exports = __webpack_require__(6)(undefined);
+// imports
+
+
+// module
+exports.push([module.i, "/**\n    Name: Arrow code highlighting theme\n    Author: Juan Valencia Calvellido and Arrow team\n */\n\n.cm-s-arrow span.cm-meta { color: #ec7b75; }\n.cm-s-arrow span.cm-number { color: #986801; }\n.cm-s-arrow span.cm-keyword { line-height: 1em; font-weight: bold; color: #4172dd; }\n.cm-s-arrow span.cm-atom { font-weight: bold; color: #193E88; }\n.cm-s-arrow span.cm-def { color: #193E88; }\n.cm-s-arrow span.cm-variable { color: #222; }\n.cm-s-arrow span.cm-variable-2 { color: #05c1fd; }\n.cm-s-arrow span.cm-variable-3, .cm-s-arrow span.cm-type { color: #f28b2d; }\n.cm-s-arrow span.cm-property { color: #383a42; }\n.cm-s-arrow span.cm-operator { color: #383a42; }\n.cm-s-arrow span.cm-comment { color: #a0a1a7; }\n.cm-s-arrow span.cm-string { color: #50a14f; }\n.cm-s-arrow span.cm-string-2 { color: #50a14f; }\n.cm-s-arrow span.cm-qualifier { color: #555; }\n.cm-s-arrow span.cm-error { color: #fb2046; }\n.cm-s-arrow span.cm-attribute { color: #05c1fd; }\n.cm-s-arrow span.cm-tag { color: #193E88; }\n.cm-s-arrow span.cm-link { color: #05c1fd; }\n.cm-s-arrow .CodeMirror-activeline-background { background: #fffae3; }\n\n.cm-s-arrow span.cm-builtin { color: #5848f4; }\n.cm-s-arrow span.cm-bracket { color: #cc7; }\n.cm-s-arrow  {\n  color: #383a42;\n  font-family: Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;\n}\n\n\n.cm-s-arrow .CodeMirror-matchingbracket {\n  outline: 1px solid rgba(0, 0, 0, 0.1);\n  color: #961f8c !important;\n}\n\n.CodeMirror-hints.arrow {\n  background-color: #ebf3fd !important;\n  color: #616569;\n  font-family: Menlo, Monaco, Consolas, 'Courier New', monospace;\n}\n\n.CodeMirror-hints.arrow .CodeMirror-hint-active {\n  background-color: #a2b8c9 !important;\n  color: #5c6065 !important;\n}\n", ""]);
+
+// exports
+
+
+/***/ }),
+/* 126 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(6)(undefined);
 // imports
 
 
@@ -22591,79 +22604,79 @@ exports.push([module.i, ".CodeMirror-simplescroll-horizontal div, .CodeMirror-si
 
 
 /***/ }),
-/* 126 */
+/* 127 */
 /***/ (function(module, exports) {
 
 module.exports = "\"data:image/svg+xml,%3C?xml version='1.0' encoding='utf-8'?%3E %3C!-- Generator: Adobe Illustrator 21.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0) --%3E %3Csvg version='1.1' id='Layer_1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' viewBox='0 0 16.996 20.999' enable-background='new 0 0 16.996 20.999' xml:space='preserve'%3E %3Cpolygon fill='%2338B058' points='16.996,10.499 0,20.999 0,0 '/%3E %3C/svg%3E\""
 
 /***/ }),
-/* 127 */
+/* 128 */
 /***/ (function(module, exports) {
 
 module.exports = "\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E %3Ctitle%3Eicons_all_sprite%3C/title%3E %3Cg id='Layer_4' data-name='Layer 4'%3E %3Cg%3E %3Ccircle cx='8' cy='8' r='6' fill='%23e05219' opacity='0.9' style='isolation: isolate'/%3E %3Cpath d='M8.99609,4.98828V6.48193a.4905.4905,0,0,1-.00976.09619L8.28174,9H7.71045L7.00586,6.57812A.44233.44233,0,0,1,7,6.521V5c0-.26465,0-.99023.47559-.99023h1.041C9,4.00977,8.99609,4.72363,8.99609,4.98828Zm-.10547,5.9329L8.42627,10.31a.47056.47056,0,0,0-.37354-.18943H7.94092a.47078.47078,0,0,0-.374.18943l-.46435.61117A.52557.52557,0,0,0,7,11.22882v.28184A.49088.49088,0,0,0,7.47607,12h1.041a.49312.49312,0,0,0,.479-.50638l.00049-.25447A.52333.52333,0,0,0,8.89062,10.92118Z' fill='%23fff'/%3E %3C/g%3E %3C/g%3E %3C/svg%3E\""
 
 /***/ }),
-/* 128 */
+/* 129 */
 /***/ (function(module, exports) {
 
 module.exports = "\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E %3Ctitle%3Eicons_all_sprite%3C/title%3E %3Cg id='Layer_4' data-name='Layer 4'%3E %3Ccircle cx='8' cy='8' r='7' fill='%234ca01f' opacity='0.9' style='isolation: isolate'/%3E %3Cpolygon points='12.808 6.205 11.5 5.025 7.486 9.625 4.346 6.077 3.125 7.182 7.5 12 12.808 6.205' fill='%23fff'/%3E %3C/g%3E %3C/svg%3E\""
 
 /***/ }),
-/* 129 */
+/* 130 */
 /***/ (function(module, exports) {
 
 module.exports = "\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E %3Ctitle%3Eicons_all_sprite%3C/title%3E %3Cg id='Layer_4' data-name='Layer 4'%3E %3Cg style='isolation: isolate'%3E %3Ccircle cx='7.5' cy='7.5' r='6.5' fill='%23e05219'/%3E %3C/g%3E %3Cpolygon points='10.328 9.621 8.207 7.5 10.328 5.379 9.621 4.672 7.5 6.793 5.379 4.672 4.672 5.379 6.793 7.5 4.672 9.621 5.379 10.328 7.5 8.207 9.621 10.328 10.328 9.621' fill='%23fff'/%3E %3C/g%3E %3C/svg%3E\""
 
 /***/ }),
-/* 130 */
+/* 131 */
 /***/ (function(module, exports) {
 
 module.exports = "\"data:image/svg+xml,%3C!-- Generator: Adobe Illustrator 21.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0) --%3E %3Csvg version='1.1' id='Layer_1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' viewBox='0 0 31 19' enable-background='new 0 0 31 19' xml:space='preserve'%3E %3Cg%3E %3Cpath fill='%23FFFFFF' d='M21.5,19h-12C4.253,19,0,14.747,0,9.5v0C0,4.253,4.253,0,9.5,0h12C26.747,0,31,4.253,31,9.5v0 C31,14.747,26.747,19,21.5,19z' /%3E %3Cpath class='data-fill' fill='%23d4d4d4' d='M21.5,1C26.187,1,30,4.813,30,9.5c0,4.687-3.813,8.5-8.5,8.5h-12C4.813,18,1,14.187,1,9.5 C1,4.813,4.813,1,9.5,1H21.5 M21.5,0h-12C4.253,0,0,4.253,0,9.5v0C0,14.747,4.253,19,9.5,19h12c5.247,0,9.5-4.253,9.5-9.5v0 C31,4.253,26.747,0,21.5,0L21.5,0z' /%3E %3C/g%3E %3Cg%3E %3Cg%3E %3Crect x='10' y='9' fill='%23FFFFFF' width='11' height='1' /%3E %3Cpolygon class='data-fill' fill='%23d4d4d4' points='21,9 10,9 10,10 21,10 21,9 ' /%3E %3C/g%3E %3Cg%3E %3Crect x='10' y='9' transform='matrix(-1.836970e-16 1 -1 -1.836970e-16 25 -6)' fill='%23FFFFFF' width='11' height='1' /%3E %3Cpolygon class='data-fill' fill='%23d4d4d4' points='16,4 15,4 15,15 16,15 16,4 ' /%3E %3C/g%3E %3C/g%3E %3C/svg%3E\""
 
 /***/ }),
-/* 131 */
+/* 132 */
 /***/ (function(module, exports) {
 
 module.exports = "\"data:image/svg+xml,%3C!-- Generator: Adobe Illustrator 21.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0) --%3E %3Csvg version='1.1' id='Layer_1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' viewBox='0 0 31 19' enable-background='new 0 0 31 19' xml:space='preserve'%3E %3Cg%3E %3Cpath fill='%23FFFFFF' d='M21.5,19h-12C4.253,19,0,14.747,0,9.5v0C0,4.253,4.253,0,9.5,0h12C26.747,0,31,4.253,31,9.5v0 C31,14.747,26.747,19,21.5,19z' /%3E %3Cpath class='data-fill' fill='%23f68322' d='M21.5,1C26.187,1,30,4.813,30,9.5c0,4.687-3.813,8.5-8.5,8.5h-12C4.813,18,1,14.187,1,9.5 C1,4.813,4.813,1,9.5,1H21.5 M21.5,0h-12C4.253,0,0,4.253,0,9.5v0C0,14.747,4.253,19,9.5,19h12c5.247,0,9.5-4.253,9.5-9.5v0 C31,4.253,26.747,0,21.5,0L21.5,0z' /%3E %3C/g%3E %3Cg%3E %3Cg%3E %3Crect x='10' y='9' fill='%23FFFFFF' width='11' height='1' /%3E %3Cpolygon class='data-fill' fill='%23f68322' points='21,9 10,9 10,10 21,10 21,9 ' /%3E %3C/g%3E %3Cg%3E %3Crect x='10' y='9' transform='matrix(-1.836970e-16 1 -1 -1.836970e-16 25 -6)' fill='%23FFFFFF' width='11' height='1' /%3E %3Cpolygon class='data-fill' fill='%23f68322' points='16,4 15,4 15,15 16,15 16,4 ' /%3E %3C/g%3E %3C/g%3E %3C/svg%3E\""
 
 /***/ }),
-/* 132 */
+/* 133 */
 /***/ (function(module, exports) {
 
 module.exports = "\"data:image/svg+xml,%3C?xml version='1.0' encoding='utf-8'?%3E %3C!-- Generator: Adobe Illustrator 21.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0) --%3E %3Csvg version='1.1' id='Layer_1' xmlns='http://www.w3.org/2000/svg' x='0px' y='0px' viewBox='0 0 31 19' enable-background='new 0 0 31 19' xml:space='preserve'%3E %3Cg%3E %3Cpath fill='%232B2B2B' d='M21.5,19h-12C4.253,19,0,14.747,0,9.5v0C0,4.253,4.253,0,9.5,0h12C26.747,0,31,4.253,31,9.5v0 C31,14.747,26.747,19,21.5,19z'/%3E %3Cpath class='data-fill' fill='%23ffffff' d='M21.5,1C26.187,1,30,4.813,30,9.5c0,4.687-3.813,8.5-8.5,8.5h-12C4.813,18,1,14.187,1,9.5 C1,4.813,4.813,1,9.5,1H21.5 M21.5,0h-12C4.253,0,0,4.253,0,9.5v0C0,14.747,4.253,19,9.5,19h12c5.247,0,9.5-4.253,9.5-9.5v0 C31,4.253,26.747,0,21.5,0L21.5,0z'/%3E %3C/g%3E %3Cg%3E %3Cg%3E %3Crect x='10' y='9' fill='%23EAEAEC' width='11' height='1'/%3E %3Cpolygon class='data-fill' fill='%23EAEAEC' points='21,9 10,9 10,10 21,10 21,9 '/%3E %3C/g%3E %3Cg%3E %3Crect x='10' y='9' transform='matrix(-1.836970e-16 1 -1 -1.836970e-16 25 -6)' fill='%23EAEAEC' width='11' height='1'/%3E %3Cpolygon class='data-fill' fill='%23EAEAEC' points='16,4 15,4 15,15 16,15 16,4 '/%3E %3C/g%3E %3C/g%3E %3C/svg%3E\""
 
 /***/ }),
-/* 133 */
+/* 134 */
 /***/ (function(module, exports) {
 
 module.exports = "\"data:image/svg+xml,%3C!-- Generator: Adobe Illustrator 21.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0) --%3E %3Csvg version='1.1' id='Layer_1' xmlns='http://www.w3.org/2000/svg' x='0px' y='0px' viewBox='0 0 31 19' enable-background='new 0 0 31 19' xml:space='preserve'%3E %3Cg%3E %3Cpath fill='%232B2B2B' d='M21.5,19h-12C4.253,19,0,14.747,0,9.5v0C0,4.253,4.253,0,9.5,0h12C26.747,0,31,4.253,31,9.5v0 C31,14.747,26.747,19,21.5,19z' /%3E %3Cpath class='data-fill' fill='%23f68322' d='M21.5,1C26.187,1,30,4.813,30,9.5c0,4.687-3.813,8.5-8.5,8.5h-12C4.813,18,1,14.187,1,9.5 C1,4.813,4.813,1,9.5,1H21.5 M21.5,0h-12C4.253,0,0,4.253,0,9.5v0C0,14.747,4.253,19,9.5,19h12c5.247,0,9.5-4.253,9.5-9.5v0 C31,4.253,26.747,0,21.5,0L21.5,0z' /%3E %3C/g%3E %3Cg%3E %3Cg%3E %3Crect x='10' y='9' fill='%23EAEAEC' width='11' height='1' /%3E %3Cpolygon class='data-fill' fill='%23f68322' points='21,9 10,9 10,10 21,10 21,9 ' /%3E %3C/g%3E %3Cg%3E %3Crect x='10' y='9' transform='matrix(-1.836970e-16 1 -1 -1.836970e-16 25 -6)' fill='%23EAEAEC' width='11' height='1' /%3E %3Cpolygon class='data-fill' fill='%23f68322' points='16,4 15,4 15,15 16,15 16,4 ' /%3E %3C/g%3E %3C/g%3E %3C/svg%3E\""
 
 /***/ }),
-/* 134 */
+/* 135 */
 /***/ (function(module, exports) {
 
 module.exports = "\"data:image/svg+xml,%3C!-- Generator: Adobe Illustrator 21.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0) --%3E %3Csvg version='1.1' id='Layer_1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' viewBox='0 0 31 19' enable-background='new 0 0 31 19' xml:space='preserve'%3E %3Cg%3E %3Cpath fill='%23FFFFFF' d='M21.5,19h-12C4.253,19,0,14.747,0,9.5v0C0,4.253,4.253,0,9.5,0h12C26.747,0,31,4.253,31,9.5v0 C31,14.747,26.747,19,21.5,19z' /%3E %3Cpath class='data-fill' fill='%23d4d4d4' d='M21.5,1C26.187,1,30,4.813,30,9.5c0,4.687-3.813,8.5-8.5,8.5h-12C4.813,18,1,14.187,1,9.5 C1,4.813,4.813,1,9.5,1H21.5 M21.5,0h-12C4.253,0,0,4.253,0,9.5v0C0,14.747,4.253,19,9.5,19h12c5.247,0,9.5-4.253,9.5-9.5v0 C31,4.253,26.747,0,21.5,0L21.5,0z' /%3E %3C/g%3E %3Cg%3E %3Cg%3E %3Crect x='10' y='9' transform='matrix(0.7071 0.7071 -0.7071 0.7071 11.2574 -8.1777)' fill='%23FFFFFF' width='11' height='1' /%3E %3Cpolygon class='data-fill' fill='%23d4d4d4' points='11.964,5.257 11.257,5.964 19.036,13.743 19.743,13.036 11.964,5.257 ' /%3E %3C/g%3E %3Cg%3E %3Crect x='10' y='9' transform='matrix(-0.7071 0.7071 -0.7071 -0.7071 33.1777 5.2574)' fill='%23FFFFFF' width='11' height='1' /%3E %3Cpolygon class='data-fill' fill='%23d4d4d4' points='19.036,5.257 11.257,13.036 11.964,13.743 19.743,5.964 19.036,5.257 ' /%3E %3C/g%3E %3C/g%3E %3C/svg%3E\""
 
 /***/ }),
-/* 135 */
+/* 136 */
 /***/ (function(module, exports) {
 
 module.exports = "\"data:image/svg+xml,%3C!-- Generator: Adobe Illustrator 21.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0) --%3E %3Csvg version='1.1' id='Layer_1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' viewBox='0 0 31 19' enable-background='new 0 0 31 19' xml:space='preserve'%3E %3Cg%3E %3Cpath fill='%23FFFFFF' d='M21.5,19h-12C4.253,19,0,14.747,0,9.5v0C0,4.253,4.253,0,9.5,0h12C26.747,0,31,4.253,31,9.5v0 C31,14.747,26.747,19,21.5,19z' /%3E %3Cpath class='data-fill' fill='%23f68322' d='M21.5,1C26.187,1,30,4.813,30,9.5c0,4.687-3.813,8.5-8.5,8.5h-12C4.813,18,1,14.187,1,9.5 C1,4.813,4.813,1,9.5,1H21.5 M21.5,0h-12C4.253,0,0,4.253,0,9.5v0C0,14.747,4.253,19,9.5,19h12c5.247,0,9.5-4.253,9.5-9.5v0 C31,4.253,26.747,0,21.5,0L21.5,0z' /%3E %3C/g%3E %3Cg%3E %3Cg%3E %3Crect x='10' y='9' transform='matrix(0.7071 0.7071 -0.7071 0.7071 11.2574 -8.1777)' fill='%23FFFFFF' width='11' height='1' /%3E %3Cpolygon class='data-fill' fill='%23f68322' points='11.964,5.257 11.257,5.964 19.036,13.743 19.743,13.036 11.964,5.257 ' /%3E %3C/g%3E %3Cg%3E %3Crect x='10' y='9' transform='matrix(-0.7071 0.7071 -0.7071 -0.7071 33.1777 5.2574)' fill='%23FFFFFF' width='11' height='1' /%3E %3Cpolygon class='data-fill' fill='%23f68322' points='19.036,5.257 11.257,13.036 11.964,13.743 19.743,5.964 19.036,5.257 ' /%3E %3C/g%3E %3C/g%3E %3C/svg%3E\""
 
 /***/ }),
-/* 136 */
+/* 137 */
 /***/ (function(module, exports) {
 
 module.exports = "\"data:image/svg+xml,%3C?xml version='1.0' encoding='utf-8'?%3E %3C!-- Generator: Adobe Illustrator 21.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0) --%3E %3Csvg version='1.1' id='Layer_1' xmlns='http://www.w3.org/2000/svg' x='0px' y='0px' viewBox='0 0 31 19' enable-background='new 0 0 31 19' xml:space='preserve'%3E %3Cg%3E %3Cpath fill='%232B2B2B' d='M21.5,19h-12C4.253,19,0,14.747,0,9.5v0C0,4.253,4.253,0,9.5,0h12C26.747,0,31,4.253,31,9.5v0 C31,14.747,26.747,19,21.5,19z'/%3E %3Cpath class='data-fill' fill='%23EAEAEC' d='M21.5,1C26.187,1,30,4.813,30,9.5c0,4.687-3.813,8.5-8.5,8.5h-12C4.813,18,1,14.187,1,9.5 C1,4.813,4.813,1,9.5,1H21.5 M21.5,0h-12C4.253,0,0,4.253,0,9.5v0C0,14.747,4.253,19,9.5,19h12c5.247,0,9.5-4.253,9.5-9.5v0 C31,4.253,26.747,0,21.5,0L21.5,0z'/%3E %3C/g%3E %3Cg%3E %3Cg%3E %3Crect x='10' y='9' transform='matrix(0.7071 0.7071 -0.7071 0.7071 11.2574 -8.1777)' fill='%23FFFFFF' width='11' height='1'/%3E %3Cpolygon class='data-fill' fill='%23EAEAEC' points='11.964,5.257 11.257,5.964 19.036,13.743 19.743,13.036 11.964,5.257 '/%3E %3C/g%3E %3Cg%3E %3Crect x='10' y='9' transform='matrix(-0.7071 0.7071 -0.7071 -0.7071 33.1777 5.2574)' fill='%23FFFFFF' width='11' height='1'/%3E %3Cpolygon class='data-fill' fill='%23EAEAEC' points='19.036,5.257 11.257,13.036 11.964,13.743 19.743,5.964 19.036,5.257 '/%3E %3C/g%3E %3C/g%3E %3C/svg%3E\""
 
 /***/ }),
-/* 137 */
+/* 138 */
 /***/ (function(module, exports) {
 
 module.exports = "\"data:image/svg+xml,%3C!-- Generator: Adobe Illustrator 21.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0) --%3E %3Csvg version='1.1' id='Layer_1' xmlns='http://www.w3.org/2000/svg' x='0px' y='0px' viewBox='0 0 31 19' enable-background='new 0 0 31 19' xml:space='preserve'%3E %3Cg%3E %3Cpath fill='%232B2B2B' d='M21.5,19h-12C4.253,19,0,14.747,0,9.5v0C0,4.253,4.253,0,9.5,0h12C26.747,0,31,4.253,31,9.5v0 C31,14.747,26.747,19,21.5,19z' /%3E %3Cpath class='data-fill' fill='%23f68322' d='M21.5,1C26.187,1,30,4.813,30,9.5c0,4.687-3.813,8.5-8.5,8.5h-12C4.813,18,1,14.187,1,9.5 C1,4.813,4.813,1,9.5,1H21.5 M21.5,0h-12C4.253,0,0,4.253,0,9.5v0C0,14.747,4.253,19,9.5,19h12c5.247,0,9.5-4.253,9.5-9.5v0 C31,4.253,26.747,0,21.5,0L21.5,0z' /%3E %3C/g%3E %3Cg%3E %3Cg%3E %3Crect x='10' y='9' transform='matrix(0.7071 0.7071 -0.7071 0.7071 11.2574 -8.1777)' fill='%23FFFFFF' width='11' height='1' /%3E %3Cpolygon class='data-fill' fill='%23f68322' points='11.964,5.257 11.257,5.964 19.036,13.743 19.743,13.036 11.964,5.257 ' /%3E %3C/g%3E %3Cg%3E %3Crect x='10' y='9' transform='matrix(-0.7071 0.7071 -0.7071 -0.7071 33.1777 5.2574)' fill='%23FFFFFF' width='11' height='1' /%3E %3Cpolygon class='data-fill' fill='%23f68322' points='19.036,5.257 11.257,13.036 11.964,13.743 19.743,5.964 19.036,5.257 ' /%3E %3C/g%3E %3C/g%3E %3C/svg%3E\""
 
 /***/ }),
-/* 138 */
+/* 139 */
 /***/ (function(module, exports) {
 
 /**
