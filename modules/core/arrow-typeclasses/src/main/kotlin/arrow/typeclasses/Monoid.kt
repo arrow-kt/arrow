@@ -1,6 +1,10 @@
 package arrow.typeclasses
 
-interface Monoid<A> : Semigroup<A> {
+class ForMonoid private constructor() { companion object }
+typealias MonoidOf<A> = arrow.Kind<ForMonoid, A>
+inline fun <A> MonoidOf<A>.fix(): Monoid<A> = this as Monoid<A>
+
+interface Monoid<A> : Semigroup<A>, MonoidOf<A> {
   /**
    * A zero value for this A
    */
@@ -17,4 +21,5 @@ interface Monoid<A> : Semigroup<A> {
    */
   fun combineAll(vararg elems: A): A = elems.asList().combineAll()
 
+  companion object
 }

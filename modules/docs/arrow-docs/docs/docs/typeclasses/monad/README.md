@@ -28,6 +28,7 @@ Because `Kind<F, B>` cannot be created until `A` is unwrapped, it means that one
 ```kotlin:ank
 import arrow.core.*
 import arrow.instances.*
+import arrow.effects.*
 
 Some(1).flatMap { a ->
   Some(a + 1)
@@ -92,6 +93,18 @@ ForOption extensions {
 }
 ```
 
+#### effectM
+
+Executes two elements sequentially and ignores the result of the second. This is useful for effects like logging.
+
+```kotlin:ank
+fun logValue(i: Int): IO<Unit> = IO { /* println(i) */ }
+
+ForIO extensions {
+  IO.just(1).effectM(::logValue).fix().unsafeRunSync()
+}
+```
+
 #### forEffect/forEffectEval
 
 Executes sequentially two elements that are independent from one another, ignoring the value of the second one.
@@ -136,4 +149,4 @@ The following data types in Arrow provide instances that adhere to the `Monad` t
 - [Mono]({{ '/docs/integrations/reactor' | relative_url }})
 - [IO]({{ '/docs/effects/io' | relative_url }})
 
-[monad_law_source]: https://github.com/arrow-kt/arrow/blob/master/arrow-test/src/main/kotlin/arrow/laws/MonadLaws.kt
+[monad_law_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-test/src/main/kotlin/arrow/test/laws/MonadLaws.kt

@@ -5,15 +5,28 @@ import arrow.Kind2
 import arrow.core.*
 import arrow.instance
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.Contravariant
 import arrow.typeclasses.Category
+import arrow.typeclasses.Conested
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.Profunctor
+import arrow.typeclasses.conest
+import arrow.typeclasses.counnest
 
 @instance(Function1::class)
 interface Function1FunctorInstance<I> : Functor<Function1PartialOf<I>> {
   override fun <A, B> Kind<Function1PartialOf<I>, A>.map(f: (A) -> B): Function1<I, B> =
     fix().map(f)
+}
+
+@instance(Function1::class)
+interface Function1ContravariantInstance<O> : Contravariant<Conested<ForFunction1, O>> {
+  override fun <A, B> Kind<Conested<ForFunction1, O>, A>.contramap(f: (B) -> A): Kind<Conested<ForFunction1, O>, B> =
+    counnest().fix().contramap(f).conest()
+
+  fun <A, B> Function1Of<A, O>.contramapC(f: (B) -> A): Function1Of<B, O> =
+    conest().contramap(f).counnest()
 }
 
 @instance(Function1::class)

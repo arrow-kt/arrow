@@ -107,7 +107,7 @@ object MonadLaws {
       }.equalUnderTheLaw(just(num + 2), EQ)
     }
 
-  fun <F> arrow.typeclasses.Monad<F>.stackSafeTestProgram(n: kotlin.Int, stopAt: kotlin.Int): Free<F, Int> = bindingStackSafe {
+  fun <F> Monad<F>.stackSafeTestProgram(n: Int, stopAt: Int): Free<F, Int> = bindingStackSafe {
     val v = this.just(n + 1).bind()
     val r = if (v < stopAt) stackSafeTestProgram(v, stopAt).bind() else this.just(v).bind()
     r

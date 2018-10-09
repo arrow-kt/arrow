@@ -3,10 +3,7 @@ package arrow.effects
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
-import arrow.effects.typeclasses.Async
-import arrow.effects.typeclasses.Effect
-import arrow.effects.typeclasses.MonadDefer
-import arrow.effects.typeclasses.Proc
+import arrow.effects.typeclasses.*
 import arrow.instance
 import arrow.typeclasses.*
 import io.reactivex.BackpressureStrategy
@@ -123,7 +120,13 @@ interface FlowableKEffectInstance :
     fix().runAsync(cb)
 }
 
-object FlowableKContext : FlowableKEffectInstance, FlowableKTraverseInstance {
+@instance(FlowableK::class)
+interface FlowableKConcurrentEffectInstance : FlowableKEffectInstance, ConcurrentEffect<ForFlowableK> {
+  override fun <A> Kind<ForFlowableK, A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> FlowableKOf<Unit>): FlowableK<Disposable> =
+    fix().runAsyncCancellable(cb)
+}
+
+object FlowableKContext : FlowableKConcurrentEffectInstance, FlowableKTraverseInstance {
   override fun <A, B> FlowableKOf<A>.map(f: (A) -> B): FlowableK<B> =
     fix().map(f)
 }
