@@ -1,12 +1,13 @@
 package arrow.integrations.retrofit.adapter
 
 import arrow.effects.IO
+import arrow.integrations.retrofit.adapter.retrofit.retrofit
 import arrow.test.UnitSpec
 import com.google.common.reflect.TypeToken
 import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.shouldBe
-import io.kotlintest.shouldThrow
-import io.kotlintest.specs.StringSpec
+import io.kotlintest.matchers.shouldBe
+import io.kotlintest.matchers.shouldThrow
+import okhttp3.HttpUrl
 import org.junit.runner.RunWith
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -15,11 +16,7 @@ private val NO_ANNOTATIONS = emptyArray<Annotation>()
 
 @RunWith(KTestJUnitRunner::class)
 class Async2CallAdapterFactoryTest : UnitSpec() {
-  private val retrofit = Retrofit.Builder()
-    .baseUrl("http://localhost:1")
-    .addConverterFactory(GsonConverterFactory.create())
-    .addCallAdapterFactory(Async2CallAdapterFactory.create())
-    .build()
+  private val retrofit = retrofit(HttpUrl.parse("http://localhost:1")!!)
 
   private val factory = Async2CallAdapterFactory.create()
 
