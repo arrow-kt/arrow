@@ -14,12 +14,11 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 private val NO_ANNOTATIONS = emptyArray<Annotation>()
 
+private val retrofit = retrofit(HttpUrl.parse("http://localhost:1")!!)
+private val factory = Async2CallAdapterFactory.create()
+
 @RunWith(KTestJUnitRunner::class)
 class Async2CallAdapterFactoryTest : UnitSpec() {
-  private val retrofit = retrofit(HttpUrl.parse("http://localhost:1")!!)
-
-  private val factory = Async2CallAdapterFactory.create()
-
   init {
     "Non Async Class should return null" {
       factory.get(object : TypeToken<List<String>>() {}.type, NO_ANNOTATIONS, retrofit) shouldBe null
