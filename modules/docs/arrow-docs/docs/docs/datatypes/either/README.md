@@ -43,22 +43,13 @@ upon the first error. For more information, see the `Validated` vs `Either` sect
 
 By convention the right hand side of an `Either` is used to hold successful values.
 
-{: data-executable='true' theme='arrow'}
 ```kotlin:ank
 val right: Either<String, Int> = Either.Right(5)
 right
 ```
 
-{: data-executable='true' theme='arrow'}
 ```kotlin:ank
-import arrow.*
-import arrow.core.*
-
-fun main(args: Array<String>) {
-//sampleStart
 val left: Either<String, Int> = Either.Left("Something went wrong")
-//sampleEnd
-println(left)
 left
 }
 ```
@@ -81,7 +72,7 @@ left.flatMap{Either.Right(it + 1)}
 
 ## Using Either instead of exceptions
 
-As a running example, we will have a series of functions that will: 
+As a running example, we will have a series of functions that will:
 
 * Parse a string into an integer
 * Calculate the reciprocal
@@ -266,12 +257,12 @@ Another operation is `fold`. This operation will extract the value from the Eith
 
 ```kotlin:ank
 val x : Either<Int, Int> = 7.right()
-x.fold({ 1 }, { it + 3 }) 
+x.fold({ 1 }, { it + 3 })
 ```
 
 ```kotlin:ank
 val y : Either<Int, Int> = 7.left()
-y.fold({ 1 }, { it + 3 }) 
+y.fold({ 1 }, { it + 3 })
 ```
 
 The `getOrHandle()` operation allows the transformation of an `Either.Left` value to a `Either.Right` using
@@ -290,7 +281,7 @@ val httpStatusCode = r.getOrHandle {
 } // 400
 ```
 
-The ```leftIfNull``` operation transforms a null `Either.Right` value to the specified ```Either.Left``` value. 
+The ```leftIfNull``` operation transforms a null `Either.Right` value to the specified ```Either.Left``` value.
 If the value is non-null, the value wrapped into a non-nullable ```Either.Right``` is returned (very useful to
 skip null-check further down the call chain).
 If the operation is called on an ```Either.Left```, the same ```Either.Left``` is returned.
@@ -333,8 +324,8 @@ null.rightIfNotNull { "left" }
 
 ```kotlin:ank
 import arrow.instances.*
- 
-ForEither<Int>() extensions { 
+
+ForEither<Int>() extensions {
    Right(1).map {it + 1}
 }
 ```
@@ -344,7 +335,7 @@ ForEither<Int>() extensions {
  Computing over independent values
 
 ```kotlin:ank
-ForEither<Int>() extensions { 
+ForEither<Int>() extensions {
   tupled(Either.Right(1), Either.Right("a"), Either.Right(2.0))
 }
 ```
