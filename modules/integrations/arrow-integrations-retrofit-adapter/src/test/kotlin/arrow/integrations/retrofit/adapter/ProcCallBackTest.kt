@@ -19,18 +19,15 @@ import org.junit.runner.RunWith
 class ProcCallBackTest : UnitSpec() {
   private val server = MockWebServer().apply {
     enqueue(MockResponse().setBody("{\"response\":  \"hello, world!\"}").setResponseCode(200))
-    enqueue(MockResponse().setBody("{\"response\":  \"hello, world!\"}").setResponseCode(200))
-    enqueue(MockResponse().setBody("{\"response\":  \"hello, world!\"}").setResponseCode(200))
     start()
   }
 
   private val baseUrl: HttpUrl = server.url("/")
 
   init {
-
     "should be able to parse answer with ForIO" {
       val result = createApiClientTest(baseUrl)
-        .test()
+        .testCallK()
         .async(IO.async())
         .fix()
         .unsafeRunSync()
@@ -40,7 +37,7 @@ class ProcCallBackTest : UnitSpec() {
 
     "should be able to parse answer with ForObservableK" {
       createApiClientTest(baseUrl)
-        .test()
+        .testCallK()
         .defer(ObservableK.monadDefer())
         .fix()
         .observable
@@ -54,6 +51,12 @@ class ProcCallBackTest : UnitSpec() {
         .unsafeRunSync()
 
       assertEquals(result, ResponseMock("hello, world!"))
+    }
+
+    "should be able to run a POST with UNIT as response" {
+      createApiClientTest(baseUrl)
+        .testIOResponsePost()
+        .unsafeRunSync()
     }
   }
 }

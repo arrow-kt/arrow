@@ -9,7 +9,7 @@ import java.lang.reflect.Type
 class Async2CallAdapterFactory : CallAdapter.Factory() {
 
   companion object {
-    fun create() = Async2CallAdapterFactory()
+    fun create(): Async2CallAdapterFactory = Async2CallAdapterFactory()
   }
 
   override fun get(returnType: Type, annotations: Array<Annotation>, retrofit: Retrofit): CallAdapter<*, *>? {
