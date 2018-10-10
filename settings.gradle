@@ -58,6 +58,7 @@ include {
             _ 'effects-rx2'
             _ 'effects-kotlinx-coroutines'
             _ 'effects-reactor'
+            _ 'effects-data'
         }
 
         folder('recursion-schemes') {
