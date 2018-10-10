@@ -261,7 +261,7 @@ You can define `fun Kind<ForOption, A>.fix()` and `fun Kind<ForListK, A>.fix()` 
 If it can't it means there's an ambiguity you should fix!
 
 The function `fix()` is already defined for all datatypes in Λrrow, alongside a typealias for its `Kind<F, A>` specialization done by suffixing the type with Of, as in `ListKOf<A>` or `OptionOf<A>`. If you're creating your own datatype that's also a type constructor and would like to create all these helper types and functions,
-you can do so simply by annotating it as `@higerkind` and the Λrrow's [annotation processor](https://github.com/arrow-kt/arrow#additional-setup) will create them for you.
+you can do so simply by annotating it as `@higherkind` and the Λrrow's [annotation processor](https://github.com/arrow-kt/arrow#additional-setup) will create them for you.
 
 ```kotlin
 @higherkind
@@ -274,7 +274,7 @@ data class ListK<A>(val list: List<A>): ListKOf<A>
 // fun ListKOf<A>.fix() = this as ListK<A>
 ```
 
-Note that the annotation `@higerkind` will also generate the integration typealiases required by [KindedJ]({{ '/docs/integrations/kindedj' | relative_url }}) as long as the datatype is invariant. You can read more about sharing Higher Kinds and type constructors across JVM libraries in [KindedJ's README](https://github.com/KindedJ/KindedJ#rationale).
+Note that the annotation `@higherkind` will also generate the integration typealiases required by [KindedJ]({{ '/docs/integrations/kindedj' | relative_url }}) as long as the datatype is invariant. You can read more about sharing Higher Kinds and type constructors across JVM libraries in [KindedJ's README](https://github.com/KindedJ/KindedJ#rationale).
 
 #### Using Higher Kinds with typeclasses
 
