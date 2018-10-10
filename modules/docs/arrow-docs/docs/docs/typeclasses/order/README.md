@@ -33,6 +33,12 @@ import arrow.instances.*
 Int.order().run { 1.compare(2) }
 ```
 
+Additionaly, `Order` overloads operators `>`, `<`, `<=` and `>=` following the kotlin `compareTo` convention for every type for each an exists an `Order` instance.
+
+```kotlin:ank
+Int.order().run { 1 > 2 }
+```  
+
 #### F#lte / F#lt
 
 Lesser than or equal to defines total order in a set, it compares two elements and returns true if they're equal or the first is lesser than the second.
