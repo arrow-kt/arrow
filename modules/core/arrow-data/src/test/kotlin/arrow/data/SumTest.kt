@@ -3,6 +3,9 @@ package arrow.data
 import arrow.Kind
 import arrow.core.*
 import arrow.instances.ForSum
+import arrow.instances.syntax.id.comonad.comonad
+import arrow.instances.syntax.id.functor.functor
+import arrow.instances.syntax.sum.comonad.comonad
 import arrow.test.UnitSpec
 import arrow.test.laws.ComonadLaws
 import arrow.typeclasses.Eq
@@ -20,7 +23,7 @@ class SumTest : UnitSpec() {
       a.fix().extract(Id.comonad(), Id.comonad()) == b.fix().extract(Id.comonad(), Id.comonad())
     }
 
-    ForSum<ForId, ForId>(Id.comonad(), Id.comonad()) extensions {
+    ForSum(Id.comonad(), Id.comonad()) extensions {
       testLaws(
         ComonadLaws.laws(Sum.comonad(Id.comonad(), Id.comonad()), cf, EQ)
       )

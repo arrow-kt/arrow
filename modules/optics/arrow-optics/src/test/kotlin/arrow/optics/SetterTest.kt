@@ -1,6 +1,7 @@
 package arrow.optics
 
 import arrow.core.*
+import arrow.instances.syntax.option.functor.functor
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genOption

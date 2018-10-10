@@ -1,6 +1,13 @@
 package arrow.dagger.instances
 
 import arrow.data.*
+import arrow.instances.syntax.sequencek.applicative.applicative
+import arrow.instances.syntax.sequencek.foldable.foldable
+import arrow.instances.syntax.sequencek.functor.functor
+import arrow.instances.syntax.sequencek.monad.monad
+import arrow.instances.syntax.sequencek.monoidK.monoidK
+import arrow.instances.syntax.sequencek.semigroupK.semigroupK
+import arrow.instances.syntax.sequencek.traverse.traverse
 import arrow.typeclasses.*
 import dagger.Module
 import dagger.Provides

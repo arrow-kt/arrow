@@ -5,10 +5,12 @@ import arrow.core.Id
 import arrow.core.IdOf
 import arrow.core.Tuple2
 import arrow.core.Tuple2Of
-import arrow.core.applicative
-import arrow.core.comonad
 import arrow.core.fix
 import arrow.instances.ForDay
+import arrow.instances.syntax.day.applicative.applicative
+import arrow.instances.syntax.day.comonad.comonad
+import arrow.instances.syntax.id.applicative.applicative
+import arrow.instances.syntax.id.comonad.comonad
 import arrow.test.UnitSpec
 import arrow.test.laws.ApplicativeLaws
 import arrow.test.laws.ComonadLaws

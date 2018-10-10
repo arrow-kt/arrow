@@ -5,6 +5,13 @@ import arrow.Kind2
 import arrow.core.*
 import arrow.instances.*
 import arrow.instances.eq
+import arrow.instances.syntax.either.applicative.applicative
+import arrow.instances.syntax.either.bifunctor.bifunctor
+import arrow.instances.syntax.either.eq.eq
+import arrow.instances.syntax.either.monoid.monoid
+import arrow.instances.syntax.either.semigroup.semigroup
+import arrow.instances.syntax.either.semigroupK.semigroupK
+import arrow.instances.syntax.either.show.show
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq

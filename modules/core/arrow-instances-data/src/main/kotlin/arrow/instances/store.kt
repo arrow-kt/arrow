@@ -8,7 +8,7 @@ import arrow.instance
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Functor
 
-@instance(Store::class)
+@instance
 interface StoreComonadInstance<S> : Comonad<StorePartialOf<S>> {
   override fun <A, B> Kind<StorePartialOf<S>, A>.coflatMap(f: (Kind<StorePartialOf<S>, A>) -> B): Store<S, B> =
       fix().coflatMap(f)
@@ -20,7 +20,7 @@ interface StoreComonadInstance<S> : Comonad<StorePartialOf<S>> {
       fix().map(f)
 }
 
-@instance(Store::class)
+@instance
 interface StoreFunctorInstance<S> : Functor<StorePartialOf<S>> {
   override fun <A, B> Kind<StorePartialOf<S>, A>.map(f: (A) -> B): Store<S, B> =
       fix().map(f)

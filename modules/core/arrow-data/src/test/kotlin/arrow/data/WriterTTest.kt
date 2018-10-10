@@ -4,6 +4,16 @@ import arrow.Kind
 import arrow.core.*
 import arrow.instances.ForWriterT
 import arrow.instances.monoid
+import arrow.instances.syntax.listk.monad.monad
+import arrow.instances.syntax.listk.monoidK.monoidK
+import arrow.instances.syntax.nonemptylist.monad.monad
+import arrow.instances.syntax.option.monad.monad
+import arrow.instances.syntax.writert.applicative.applicative
+import arrow.instances.syntax.writert.monad.monad
+import arrow.instances.syntax.writert.monoidK.monoidK
+import arrow.mtl.instances.syntax.option.monadFilter.monadFilter
+import arrow.mtl.instances.syntax.writert.monadFilter.monadFilter
+import arrow.mtl.instances.syntax.writert.monadWriter.monadWriter
 import arrow.test.UnitSpec
 import arrow.test.generators.genIntSmall
 import arrow.test.generators.genTuple

@@ -3,7 +3,7 @@ package arrow.instances
 import arrow.common.messager.log
 import arrow.common.messager.logW
 import arrow.common.utils.*
-import arrow.extension
+import arrow.instance
 import arrow.meta.ast.*
 import arrow.meta.decoder.TypeDecoder
 import arrow.meta.encoder.instances.TypeEncoder
@@ -20,16 +20,17 @@ import javax.lang.model.element.ElementKind
 import javax.lang.model.element.TypeElement
 
 @AutoService(Processor::class)
-class InstanceProcessor : MetaProcessor<extension, Type>(annotations = listOf(extension::class)), TypeEncoder, TypeDecoder {
+class InstanceProcessor : MetaProcessor<instance, Type>(annotations = listOf(instance::class)), TypeEncoder, TypeDecoder {
   override fun transform(annotatedElement: AnnotatedElement): FileSpec.Builder =
     when (annotatedElement) {
       is AnnotatedElement.Interface -> {
+        logW("Processing: ${annotatedElement.typeElement.simpleName}")
         try {
           val info = annotatedElement.typeElement.typeClassInstance(this@InstanceProcessor)
-          log("[${info?.instance?.name?.simpleName}] : Generating [${info?.typeClass?.name?.simpleName}] extensions for [${info?.dataType?.name?.simpleName}]")
+          log("[${info?.instance?.name?.simpleName}] : Generating [${info?.typeClass?.name?.simpleName}] extensions for [${info?.projectedCompanion}]")
           val fileSpec = info?.let {
             FileSpec.builder(
-              "${annotatedElement.type.packageName.value}.syntax.${info.dataType.name.downKind().simpleName.decapitalize()}.${info.typeClass.name.simpleName.decapitalize()}",
+              "${annotatedElement.type.packageName.value}.syntax.${info.projectedCompanion.simpleName.substringAfterLast(".").toLowerCase()}.${info.typeClass.name.simpleName.decapitalize()}",
               annotatedElement.type.name.simpleName
             )
           }
@@ -60,7 +61,7 @@ class InstanceProcessor : MetaProcessor<extension, Type>(annotations = listOf(ex
 //
 
   private fun notAnInstanceError(): Nothing =
-    knownError("@extension is only allowed on `interface` extending another interface of at least one type argument (type class) as first declaration in the extension list")
+    knownError("@instance is only allowed on `interface` extending another interface of at least one type argument (type class) as first declaration in the instance list")
 
   fun MetaProcessorUtils.TypeClassInstance.genCompanionFactory(): Func {
     val target = when (projectedCompanion) {
@@ -92,7 +93,12 @@ class InstanceProcessor : MetaProcessor<extension, Type>(annotations = listOf(ex
       .allFunctions
       .asSequence()
       .filter { extensionSet.contains(it.jvmMethodSignature) }
-      .distinctBy { it.name + it.parameters.filterNot { it.type is TypeName.TypeVariable }.map { p -> p.type.simpleName } }
+      .filterNot { it.receiverType?.simpleName == "MonadContinuation" }
+      .distinctBy { func ->
+        func.name + func.parameters.asSequence()
+          .filterNot { it.type is TypeName.TypeVariable }
+          .map { p -> p.type.simpleName }.toList()
+      }
       .map { it.removeConstrains() }
       .map { f ->
         val func = f.removeDummyArgs().downKindReturnType()
@@ -184,10 +190,10 @@ class LegacyInstanceProcessor : AbstractProcessor() {
       val superTypes: List<ClassOrPackageDataWrapper.Class> =
         processor.supertypes(proto, typeTable, emptyList()).map { it as ClassOrPackageDataWrapper.Class }
       val typeClass = if (superTypes.isEmpty()) {
-        knownError("@extension `${proto.fullName}` needs to extend a type class (interface with one type parameter) as it's first interface in the `extends` declaration")
+        knownError("@instance `${proto.fullName}` needs to extend a type class (interface with one type parameter) as it's first interface in the `extends` declaration")
       } else superTypes[0]
       val dataType: ClassOrPackageDataWrapper.Class = if (typeClass.typeParameters.isEmpty()) {
-        knownError("@extension `${proto.fullName}` needs to extend a type class (interface with one type parameter) as it's first interface in the `extends` declaration")
+        knownError("@instance `${proto.fullName}` needs to extend a type class (interface with one type parameter) as it's first interface in the `extends` declaration")
       } else {
         val name = proto.classProto.getSupertype(0).extractFullName(proto)
         val target = findNestedType(name)

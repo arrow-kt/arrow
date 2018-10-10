@@ -9,7 +9,15 @@ import arrow.test.concurrency.SideEffect
 import arrow.test.laws.ComonadLaws
 import arrow.typeclasses.Eq
 import arrow.core.FunctionK
-import arrow.free.instances.ForCofree
+import arrow.free.instances.*
+import arrow.instances.syntax.eval.applicative.applicative
+import arrow.instances.syntax.eval.functor.functor
+import arrow.instances.syntax.eval.monad.monad
+import arrow.instances.syntax.id.functor.functor
+import arrow.instances.syntax.listk.functor.functor
+import arrow.instances.syntax.option.functor.functor
+import arrow.instances.syntax.option.traverse.traverse
+import arrow.instances.syntax.optiont.monad.monad
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import org.junit.runner.RunWith

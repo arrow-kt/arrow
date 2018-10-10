@@ -2,6 +2,9 @@ package arrow.data
 
 import arrow.Kind2
 import arrow.instances.*
+import arrow.instances.syntax.mapk.eq.eq
+import arrow.instances.syntax.mapk.monoid.monoid
+import arrow.instances.syntax.mapk.show.show
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq

@@ -4,7 +4,7 @@ import arrow.Kind
 import arrow.instance
 import arrow.typeclasses.*
 
-@instance(Monoid::class)
+@instance
 interface MonoidInvariantInstance<A> : Invariant<ForMonoid> {
     override fun <A, B> Kind<ForMonoid, A>.imap(f: (A) -> B, g: (B) -> A): Monoid<B> =
         object : Monoid<B> {

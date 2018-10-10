@@ -1,5 +1,8 @@
 package arrow.data
 
+import arrow.instances.syntax.listk.applicative.applicative
+import arrow.instances.syntax.listk.eq.eq
+import arrow.instances.syntax.listk.show.show
 import arrow.mtl.instances.extensions
 import arrow.test.UnitSpec
 import arrow.test.laws.*

@@ -3,10 +3,10 @@ package arrow.ap.objects.renzu
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.extension
+import arrow.instance
 import arrow.typeclasses.Semigroup
 
-@extension
+@instance
 interface OptionSemigroupInstance<A> : Semigroup<Option<A>> {
 
   fun SG(): Semigroup<A>

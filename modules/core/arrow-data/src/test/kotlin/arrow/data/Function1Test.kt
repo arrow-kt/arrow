@@ -1,20 +1,23 @@
 package arrow.data
 
+import arrow.Kind
+import arrow.core.ForFunction1
 import arrow.core.Function1
 import arrow.core.Function1Of
-import arrow.core.category
 import arrow.core.invoke
-import arrow.core.profunctor
-import arrow.Kind
-import arrow.core.*
 import arrow.instances.ForFunction1
-import arrow.syntax.function.forwardCompose
+import arrow.instances.syntax.function1.category.category
+import arrow.instances.syntax.function1.contravariant.contravariant
+import arrow.instances.syntax.function1.profunctor.profunctor
 import arrow.test.UnitSpec
-import arrow.test.laws.ContravariantLaws
 import arrow.test.laws.CategoryLaws
+import arrow.test.laws.ContravariantLaws
 import arrow.test.laws.MonadLaws
 import arrow.test.laws.ProfunctorLaws
-import arrow.typeclasses.*
+import arrow.typeclasses.Conested
+import arrow.typeclasses.Eq
+import arrow.typeclasses.conest
+import arrow.typeclasses.counnest
 import io.kotlintest.KTestJUnitRunner
 import org.junit.runner.RunWith
 

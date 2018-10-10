@@ -2,6 +2,10 @@ package arrow.data
 
 import arrow.core.*
 import arrow.instances.*
+import arrow.instances.syntax.`try`.eq.eq
+import arrow.instances.syntax.`try`.monoid.monoid
+import arrow.instances.syntax.`try`.semigroup.semigroup
+import arrow.instances.syntax.`try`.show.show
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
@@ -18,7 +22,7 @@ class TryTest : UnitSpec() {
 
   init {
 
-    val EQ = Try.eq(Eq { a, b -> a::class == b::class }, Int.eq())
+    val EQ = Try.eq(Eq<Any> { a, b -> a::class == b::class }, Eq.any())
 
     ForTry extensions {
       testLaws(

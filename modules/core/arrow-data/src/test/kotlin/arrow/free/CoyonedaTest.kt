@@ -2,6 +2,8 @@ package arrow.free
 
 import arrow.core.*
 import arrow.free.instances.ForCoyoneda
+import arrow.instances.syntax.id.functor.functor
+import arrow.instances.syntax.option.functor.functor
 import arrow.test.UnitSpec
 import arrow.test.laws.FunctorLaws
 import arrow.typeclasses.Eq

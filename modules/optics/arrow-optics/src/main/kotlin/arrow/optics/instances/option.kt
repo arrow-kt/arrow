@@ -2,7 +2,7 @@ package arrow.optics.instances
 
 import arrow.Kind
 import arrow.core.Option
-import arrow.extension
+import arrow.instance
 import arrow.instances.syntax.option.traverse.traverse
 import arrow.optics.Traversal
 import arrow.optics.typeclasses.Each
@@ -23,7 +23,7 @@ fun <A> Option.Companion.traversal(): Traversal<Option<A>, A> = object : Travers
 /**
  * [Each] instance definition for [Option].
  */
-@extension
+@instance
 interface OptionEachInstance<A> : Each<Option<A>, A> {
   override fun each(): Traversal<Option<A>, A> =
     Option.traversal()

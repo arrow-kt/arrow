@@ -3,6 +3,9 @@ package arrow.data
 import arrow.Kind
 import arrow.core.*
 import arrow.instances.ForKleisli
+import arrow.instances.syntax.`try`.monadError.monadError
+import arrow.instances.syntax.id.monad.monad
+import arrow.instances.syntax.kleisli.contravariant.contravariant
 import arrow.test.UnitSpec
 import arrow.test.laws.ContravariantLaws
 import arrow.test.laws.MonadErrorLaws

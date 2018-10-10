@@ -2,6 +2,9 @@ package arrow.data
 
 import arrow.core.*
 import arrow.instances.extensions
+import arrow.instances.syntax.id.eq.eq
+import arrow.instances.syntax.id.show.show
+import arrow.instances.syntax.id.traverse.traverse
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq

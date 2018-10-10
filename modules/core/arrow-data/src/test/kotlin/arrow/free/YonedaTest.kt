@@ -3,8 +3,8 @@ package arrow.free
 import arrow.core.ForId
 import arrow.core.Id
 import arrow.core.fix
-import arrow.core.functor
 import arrow.free.instances.ForYoneda
+import arrow.instances.syntax.id.functor.functor
 import arrow.test.UnitSpec
 import arrow.test.laws.FunctorLaws
 import arrow.typeclasses.Eq

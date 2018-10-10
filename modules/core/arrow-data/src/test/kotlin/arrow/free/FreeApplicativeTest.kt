@@ -3,12 +3,15 @@ package arrow.free
 import arrow.Kind
 import arrow.core.*
 import arrow.data.NonEmptyList
-import arrow.data.applicative
 import arrow.data.fix
 import arrow.free.instances.ForFreeApplicative
 import arrow.free.instances.FreeApplicativeApplicativeInstance
 import arrow.free.instances.FreeApplicativeEq
-import arrow.free.instances.eq
+import arrow.free.instances.syntax.freeapplicative.eq.eq
+import arrow.instances.syntax.id.applicative.applicative
+import arrow.instances.syntax.id.monad.monad
+import arrow.instances.syntax.nonemptylist.applicative.applicative
+import arrow.instances.syntax.option.applicative.applicative
 import arrow.test.UnitSpec
 import arrow.test.laws.ApplicativeLaws
 import arrow.test.laws.EqLaws
@@ -40,7 +43,7 @@ class FreeApplicativeTest : UnitSpec() {
 
   init {
 
-    val EQ: FreeApplicativeEq<OpsAp.F, ForId, Int> = FreeApplicative.eq(idApInterpreter, Id.monad())
+    val EQ: FreeApplicativeEq<OpsAp.F, ForId, Int> = FreeApplicative.eq(Id.monad(), idApInterpreter)
 
     ForFreeApplicative<OpsAp.F>() extensions {
       testLaws(

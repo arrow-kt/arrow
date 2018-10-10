@@ -2,7 +2,9 @@ package arrow.optics.instances
 
 import arrow.core.*
 import arrow.data.ListK
-import arrow.data.eq
+import arrow.instances.syntax.listk.eq.eq
+import arrow.instances.syntax.option.eq.eq
+import arrow.optics.instances.syntax.option.each.each
 import arrow.test.UnitSpec
 import arrow.test.generators.*
 import arrow.test.laws.TraversalLaws

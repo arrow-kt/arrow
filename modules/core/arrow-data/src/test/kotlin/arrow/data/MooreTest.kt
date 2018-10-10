@@ -2,6 +2,7 @@ package arrow.data
 
 import arrow.core.Id
 import arrow.instances.ForMoore
+import arrow.instances.syntax.moore.comonad.comonad
 import arrow.test.UnitSpec
 import arrow.test.laws.ComonadLaws
 import arrow.typeclasses.Eq

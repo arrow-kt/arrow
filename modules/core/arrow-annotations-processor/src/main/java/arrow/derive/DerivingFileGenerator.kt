@@ -220,7 +220,7 @@ class DerivingFileGenerator(
 ) {
 
   /**
-   * Main entry point for deriving extension generation
+   * Main entry point for deriving instance generation
    */
   fun generate() {
     annotatedList.forEachIndexed { _, c ->

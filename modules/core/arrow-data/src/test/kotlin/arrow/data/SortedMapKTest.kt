@@ -4,6 +4,7 @@ import arrow.Kind2
 import arrow.instances.IntMonoidInstance
 import arrow.instances.ForSortedMapK
 import arrow.instances.monoid
+import arrow.instances.show
 import arrow.test.UnitSpec
 import arrow.test.laws.MonoidLaws
 import arrow.test.laws.SemigroupLaws

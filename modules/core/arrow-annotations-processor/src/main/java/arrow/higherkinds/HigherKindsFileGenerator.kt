@@ -37,7 +37,7 @@ class HigherKindsFileGenerator(
   private val higherKinds: List<HigherKind> = annotatedList.map { HigherKind(it.classOrPackageProto.`package`, it) }
 
   /**
-   * Main entry point for higher kinds extension generation
+   * Main entry point for higher kinds instance generation
    */
   fun generate() {
     higherKinds.forEachIndexed { _, hk ->

@@ -561,14 +561,26 @@ interface MetaProcessorUtils : ProcessorUtils {
     return TypeName.Classy(simpleName, rawTypeName, PackageName(pckg))
   }
 
-  private fun String.downKind(): Tuple2<String, String> {
-    val classy = asClassy()
-    val unAppliedName =
-      if (classy.simpleName.startsWith("For")) classy.simpleName.drop("For".length)
-      else classy.simpleName
-    return if (unAppliedName.endsWith("PartialOf")) Tuple2(classy.pckg.value, unAppliedName.substringBeforeLast("PartialOf"))
-    else Tuple2(classy.pckg.value, unAppliedName)
-  }
+  private fun String.downKind(): Tuple2<String, String> =
+    run {
+      val classy = asClassy()
+      val kindedClassy = when {
+        classy.fqName == "arrow.Kind" -> {
+          val result = substringAfter("arrow.Kind<").substringBefore(",").asClassy()
+          if (result.fqName == "arrow.typeclasses.ForConst") result
+          else classy
+        }
+        else -> classy
+      }
+      val unAppliedName =
+        if (kindedClassy.simpleName.startsWith("For")) kindedClassy.simpleName.drop("For".length)
+        else kindedClassy.simpleName
+      when {
+        unAppliedName.endsWith("PartialOf") -> Tuple2(kindedClassy.pckg.value, unAppliedName.substringBeforeLast("PartialOf"))
+        unAppliedName.endsWith("Of") -> Tuple2(kindedClassy.pckg.value, unAppliedName.substringBeforeLast("Of"))
+        else -> Tuple2(kindedClassy.pckg.value, unAppliedName)
+      }
+    }
 
   val Code.Companion.TODO: Code
     get() = Code("return TODO()")
@@ -579,13 +591,44 @@ interface MetaProcessorUtils : ProcessorUtils {
     }
 
   fun TypeName.ParameterizedType.isKinded(): Boolean =
-    rawType.fqName == "arrow.Kind" && typeArguments.size == 2 && (typeArguments[0] !is TypeName.TypeVariable)
+    typeArguments.isNotEmpty() &&
+      !typeArguments[0].simpleName.startsWith("Conested") &&
+      rawType.fqName == "arrow.Kind" &&
+      typeArguments.size == 2 &&
+      (typeArguments[0] !is TypeName.TypeVariable)
+
+  fun TypeName.TypeVariable.nestedTypeVariables(): List<TypeName> =
+    listOf(this)
+
+  fun TypeName.WildcardType.nestedTypeVariables(): List<TypeName> =
+    upperBounds.flatMap { it.nestedTypeVariables() }
+
+  fun TypeName.ParameterizedType.nestedTypeVariables(): List<TypeName> =
+    typeArguments.flatMap { it.nestedTypeVariables() }
+
+  fun TypeName.Classy.nestedTypeVariables(): List<TypeName> =
+    emptyList()
+
+  fun TypeName.nestedTypeVariables(): List<TypeName> =
+    when (this) {
+      is TypeName.TypeVariable -> nestedTypeVariables()
+      is TypeName.WildcardType -> nestedTypeVariables()
+      is TypeName.ParameterizedType -> nestedTypeVariables()
+      is TypeName.Classy -> nestedTypeVariables()
+    }
 
   fun TypeName.ParameterizedType.downKind(): TypeName.ParameterizedType =
     if (isKinded()) {
       val witness = typeArguments[0].downKind()
       val tail = when (witness) {
         is TypeName.ParameterizedType -> typeArguments.drop(1) + witness.typeArguments
+        is TypeName.WildcardType -> {
+          if (witness.name == "arrow.typeclasses.Const") {
+            val head = typeArguments[0]
+            val missingTypeArgs = typeArguments.drop(1)
+            head.nestedTypeVariables() + missingTypeArgs
+          } else typeArguments.drop(1)
+        }
         else -> typeArguments.drop(1)
       }.map { it.downKind() }
       val fullName = when (witness) {
@@ -697,6 +740,27 @@ interface MetaProcessorUtils : ProcessorUtils {
       useSiteTarget = null
     )
 
+  fun TypeName.projectedCompanion(): TypeName {
+    val dataTypeDownKinded = downKind()
+    return when {
+      this is TypeName.TypeVariable &&
+        (dataTypeDownKinded.simpleName == "arrow.Kind" ||
+          dataTypeDownKinded.simpleName == "arrow.typeclasses.Conested") -> {
+        simpleName
+          .substringAfterLast("arrow.Kind<")
+          .substringAfterLast("arrow.typeclasses.Conested<")
+          .substringBefore(",")
+          .substringBefore("<")
+          .downKind().let { (pckg, simpleName) ->
+            TypeName.Classy.from(pckg, simpleName)
+          }
+      }
+      dataTypeDownKinded is TypeName.Classy ->
+        dataTypeDownKinded.copy(simpleName = simpleName.substringAfterLast("."))
+      else -> dataTypeDownKinded
+    }
+  }
+
   fun TypeElement.typeClassInstance(typeEncoder: MetaEncoder<Type>): TypeClassInstance? {
     val superInterfaces = superInterfaces()
     val instance = asMetaType(typeEncoder)
@@ -705,18 +769,9 @@ interface MetaProcessorUtils : ProcessorUtils {
       val typeClass = typeClassTypeName.asType(typeEncoder)
       if (typeClass != null && typeClassTypeName is TypeName.ParameterizedType && typeClassTypeName.typeArguments.isNotEmpty()) {
         val dataTypeName = typeClassTypeName.typeArguments[0]
+        //profunctor and other cases are parametric to Kind2 values or Conested
+        val projectedCompanion = dataTypeName.projectedCompanion()
         val dataTypeDownKinded = dataTypeName.downKind()
-        //profunctor cases are parametric to Kind2 values
-        val projectedCompanion =
-          if (dataTypeName is TypeName.TypeVariable && dataTypeDownKinded.simpleName == "arrow.Kind")
-            dataTypeName.simpleName
-              .substringAfter("<").substringBefore(",")
-              .downKind().let { (pckg, simpleName) ->
-                TypeName.Classy.from(pckg, simpleName)
-              }
-          else if (dataTypeDownKinded is TypeName.Classy) {
-            dataTypeDownKinded
-          } else dataTypeDownKinded
         val dataType = dataTypeDownKinded.asType(typeEncoder)
         if (dataType != null && dataTypeDownKinded is TypeName.TypeVariable) TypeClassInstance(
           instance = instance,

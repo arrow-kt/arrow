@@ -8,7 +8,7 @@ import arrow.instance
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Functor
 
-@instance(Sum::class)
+@instance
 interface ComonadSumInstance<F, G> : Comonad<SumPartialOf<F, G>> {
 
   fun CF(): Comonad<F>
@@ -25,7 +25,7 @@ interface ComonadSumInstance<F, G> : Comonad<SumPartialOf<F, G>> {
       fix().map(CF(), CG(), f)
 }
 
-@instance(Sum::class)
+@instance
 interface FunctorSumInstance<F, G> : Functor<SumPartialOf<F, G>> {
 
   fun FF(): Functor<F>

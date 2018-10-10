@@ -5,23 +5,23 @@ import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Tuple2
 import arrow.data.*
-import arrow.extension
+import arrow.instance
 import arrow.typeclasses.*
 import arrow.data.combineK as sequenceCombineK
 
-@extension
+@instance
 interface SequenceKSemigroupInstance<A> : Semigroup<SequenceK<A>> {
   override fun SequenceK<A>.combine(b: SequenceK<A>): SequenceK<A> = (this.sequence + b.sequence).k()
 }
 
-@extension
+@instance
 interface SequenceKMonoidInstance<A> : Monoid<SequenceK<A>> {
   override fun SequenceK<A>.combine(b: SequenceK<A>): SequenceK<A> = (this.sequence + b.sequence).k()
 
   override fun empty(): SequenceK<A> = emptySequence<A>().k()
 }
 
-@extension
+@instance
 interface SequenceKEqInstance<A> : Eq<SequenceK<A>> {
 
   fun EQ(): Eq<A>
@@ -33,19 +33,19 @@ interface SequenceKEqInstance<A> : Eq<SequenceK<A>> {
 
 }
 
-@extension
+@instance
 interface SequenceKShowInstance<A> : Show<SequenceK<A>> {
   override fun SequenceK<A>.show(): String =
     toString()
 }
 
-@extension
+@instance
 interface SequenceKFunctorInstance : Functor<ForSequenceK> {
   override fun <A, B> Kind<ForSequenceK, A>.map(f: (A) -> B): SequenceK<B> =
     fix().map(f)
 }
 
-@extension
+@instance
 interface SequenceKApplicativeInstance : Applicative<ForSequenceK> {
   override fun <A, B> Kind<ForSequenceK, A>.ap(ff: Kind<ForSequenceK, (A) -> B>): SequenceK<B> =
     fix().ap(ff)
@@ -60,7 +60,7 @@ interface SequenceKApplicativeInstance : Applicative<ForSequenceK> {
     SequenceK.just(a)
 }
 
-@extension
+@instance
 interface SequenceKMonadInstance : Monad<ForSequenceK> {
   override fun <A, B> Kind<ForSequenceK, A>.ap(ff: Kind<ForSequenceK, (A) -> B>): SequenceK<B> =
     fix().ap(ff)
@@ -81,7 +81,7 @@ interface SequenceKMonadInstance : Monad<ForSequenceK> {
     SequenceK.just(a)
 }
 
-@extension
+@instance
 interface SequenceKFoldableInstance : Foldable<ForSequenceK> {
   override fun <A, B> Kind<ForSequenceK, A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
@@ -90,7 +90,7 @@ interface SequenceKFoldableInstance : Foldable<ForSequenceK> {
     fix().foldRight(lb, f)
 }
 
-@extension
+@instance
 interface SequenceKTraverseInstance : Traverse<ForSequenceK> {
   override fun <A, B> Kind<ForSequenceK, A>.map(f: (A) -> B): SequenceK<B> =
     fix().map(f)
@@ -105,13 +105,13 @@ interface SequenceKTraverseInstance : Traverse<ForSequenceK> {
     fix().foldRight(lb, f)
 }
 
-@extension
+@instance
 interface SequenceKSemigroupKInstance : SemigroupK<ForSequenceK> {
   override fun <A> Kind<ForSequenceK, A>.combineK(y: Kind<ForSequenceK, A>): SequenceK<A> =
     fix().sequenceCombineK(y)
 }
 
-@extension
+@instance
 interface SequenceKMonoidKInstance : MonoidK<ForSequenceK> {
   override fun <A> empty(): SequenceK<A> =
     SequenceK.empty()

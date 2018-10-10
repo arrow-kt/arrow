@@ -10,7 +10,7 @@ import arrow.typeclasses.Applicative
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Functor
 
-@instance(Day::class)
+@instance
 interface ComonadDayInstance<F, G> : Comonad<DayPartialOf<F, G>> {
   fun CF(): Comonad<F>
 
@@ -26,14 +26,14 @@ interface ComonadDayInstance<F, G> : Comonad<DayPartialOf<F, G>> {
     fix().mapLazy(f)
 }
 
-@instance(Day::class)
+@instance
 interface FunctorDayInstance<F, G> : Functor<DayPartialOf<F, G>> {
 
   override fun <A, B> DayOf<F, G, A>.map(f: (A) -> B): Day<F, G, B> =
     fix().mapLazy(f)
 }
 
-@instance(Day::class)
+@instance
 interface ApplicativeDayInstance<F, G> : Applicative<DayPartialOf<F, G>> {
   fun AF(): Applicative<F>
 

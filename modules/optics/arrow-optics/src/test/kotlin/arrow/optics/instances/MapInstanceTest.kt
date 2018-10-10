@@ -4,6 +4,13 @@ import arrow.core.*
 import arrow.data.*
 import arrow.instances.monoid
 import arrow.instances.semigroup
+import arrow.instances.syntax.listk.eq.eq
+import arrow.instances.syntax.option.eq.eq
+import arrow.instances.syntax.option.monoid.monoid
+import arrow.optics.instances.syntax.mapk.at.at
+import arrow.optics.instances.syntax.mapk.each.each
+import arrow.optics.instances.syntax.mapk.filterIndex.filterIndex
+import arrow.optics.instances.syntax.mapk.index.index
 import arrow.optics.typeclasses.FilterIndex
 import arrow.test.UnitSpec
 import arrow.test.generators.*

@@ -1,6 +1,14 @@
 package arrow.dagger.effects.instances.coroutines
 
 import arrow.effects.*
+import arrow.effects.syntax.deferredk.applicative.applicative
+import arrow.effects.syntax.deferredk.applicativeError.applicativeError
+import arrow.effects.syntax.deferredk.async.async
+import arrow.effects.syntax.deferredk.effect.effect
+import arrow.effects.syntax.deferredk.functor.functor
+import arrow.effects.syntax.deferredk.monad.monad
+import arrow.effects.syntax.deferredk.monadDefer.monadDefer
+import arrow.effects.syntax.deferredk.monadError.monadError
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Effect
 import arrow.effects.typeclasses.MonadDefer

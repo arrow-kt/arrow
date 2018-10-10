@@ -3,6 +3,12 @@ package arrow.optics.instances
 import arrow.core.*
 import arrow.data.*
 import arrow.instances.eq
+import arrow.instances.syntax.listk.eq.eq
+import arrow.instances.syntax.option.eq.eq
+import arrow.instances.syntax.sequencek.eq.eq
+import arrow.optics.instances.syntax.sequencek.each.each
+import arrow.optics.instances.syntax.sequencek.filterIndex.filterIndex
+import arrow.optics.instances.syntax.sequencek.index.index
 import arrow.optics.typeclasses.FilterIndex
 import arrow.test.UnitSpec
 import arrow.test.generators.*

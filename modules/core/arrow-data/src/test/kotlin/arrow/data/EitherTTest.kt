@@ -2,6 +2,9 @@ package arrow.data
 
 import arrow.core.*
 import arrow.instances.*
+import arrow.instances.syntax.id.monad.monad
+import arrow.instances.syntax.id.traverse.traverse
+import arrow.instances.syntax.option.functor.functor
 import arrow.test.UnitSpec
 import arrow.test.laws.MonadErrorLaws
 import arrow.test.laws.SemigroupKLaws

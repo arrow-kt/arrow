@@ -2,15 +2,14 @@ package arrow.instances
 
 import arrow.Kind
 import arrow.core.Eval
-import arrow.core.fix
 import arrow.data.Coproduct
 import arrow.data.CoproductOf
 import arrow.data.CoproductPartialOf
 import arrow.data.fix
-import arrow.extension
+import arrow.instance
 import arrow.typeclasses.*
 
-@extension
+@instance
 interface CoproductFunctorInstance<F, G> : Functor<CoproductPartialOf<F, G>> {
 
   fun FF(): Functor<F>
@@ -20,7 +19,7 @@ interface CoproductFunctorInstance<F, G> : Functor<CoproductPartialOf<F, G>> {
   override fun <A, B> Kind<CoproductPartialOf<F, G>, A>.map(f: (A) -> B): Coproduct<F, G, B> = fix().map(FF(), FG(), f)
 }
 
-@extension
+@instance
 interface CoproductContravariantInstance<F, G> : Contravariant<CoproductPartialOf<F, G>> {
 
   fun CF(): Contravariant<F>
@@ -31,7 +30,7 @@ interface CoproductContravariantInstance<F, G> : Contravariant<CoproductPartialO
     fix().contramap(CF(), CG(), f)
 }
 
-@extension
+@instance
 interface CoproductComonadInstance<F, G> : Comonad<CoproductPartialOf<F, G>> {
 
   fun CF(): Comonad<F>
@@ -46,7 +45,7 @@ interface CoproductComonadInstance<F, G> : Comonad<CoproductPartialOf<F, G>> {
 
 }
 
-@extension
+@instance
 interface CoproductFoldableInstance<F, G> : Foldable<CoproductPartialOf<F, G>> {
 
   fun FF(): Foldable<F>
@@ -61,7 +60,7 @@ interface CoproductFoldableInstance<F, G> : Foldable<CoproductPartialOf<F, G>> {
 
 }
 
-@extension
+@instance
 interface CoproductTraverseInstance<F, G> : Traverse<CoproductPartialOf<F, G>> {
 
   fun TF(): Traverse<F>

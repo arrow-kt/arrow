@@ -1,8 +1,8 @@
 package arrow.optics
 
 import arrow.data.SetK
-import arrow.data.monoid
 import arrow.core.SetInstances
+import arrow.instances.syntax.setk.monoid.monoid
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genSetK

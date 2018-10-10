@@ -5,7 +5,7 @@ import arrow.core.*
 import arrow.data.ListK
 import arrow.higherkind
 import arrow.instances.monoid
-import arrow.instances.syntax.listK.monoid.monoid
+import arrow.instances.syntax.listk.monoid.monoid
 import arrow.typeclasses.Const
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Monoid

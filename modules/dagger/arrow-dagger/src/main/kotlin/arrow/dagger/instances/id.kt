@@ -1,6 +1,11 @@
 package arrow.dagger.instances
 
 import arrow.core.*
+import arrow.instances.syntax.id.applicative.applicative
+import arrow.instances.syntax.id.bimonad.bimonad
+import arrow.instances.syntax.id.comonad.comonad
+import arrow.instances.syntax.id.functor.functor
+import arrow.instances.syntax.id.monad.monad
 import arrow.typeclasses.*
 import dagger.Module
 import dagger.Provides

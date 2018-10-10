@@ -4,23 +4,30 @@ import arrow.Kind
 import arrow.data.Kleisli
 import arrow.data.KleisliPartialOf
 import arrow.data.fix
-import arrow.extension
+import arrow.instance
 import arrow.instances.KleisliMonadErrorInstance
 import arrow.instances.KleisliMonadInstance
 import arrow.mtl.typeclasses.MonadReader
+import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 
-@extension
-interface KleisliMonadReaderInstance<F, D> : KleisliMonadInstance<F, D>, MonadReader<KleisliPartialOf<F, D>, D> {
+@instance
+interface KleisliMonadReaderInstance<F, D> : MonadReader<KleisliPartialOf<F, D>, D>, KleisliMonadInstance<F, D> {
 
-  override fun ask(): Kleisli<F, D, D> = Kleisli { FF().just(it) }
+  override fun MF(): Monad<F>
+
+  override fun ask(): Kleisli<F, D, D> = Kleisli { MF().just(it) }
 
   override fun <A> Kind<KleisliPartialOf<F, D>, A>.local(f: (D) -> D): Kleisli<F, D, A> = fix().local(f)
 
 }
 
 class KleisliMtlContext<F, D, E>(val MF: MonadError<F, E>) : KleisliMonadReaderInstance<F, D>, KleisliMonadErrorInstance<F, D, E> {
-  override fun FF(): MonadError<F, E> = MF
+
+  override fun MF(): Monad<F> = MF
+
+  override fun ME(): MonadError<F, E> = MF
+
 }
 
 class KleisliMtlContextPartiallyApplied<F, D, E>(val MF: MonadError<F, E>) {

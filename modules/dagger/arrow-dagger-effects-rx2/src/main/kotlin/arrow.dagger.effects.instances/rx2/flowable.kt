@@ -1,6 +1,14 @@
 package arrow.dagger.effects.instances.rx2
 
 import arrow.effects.*
+import arrow.effects.syntax.flowablek.applicative.applicative
+import arrow.effects.syntax.flowablek.applicativeError.applicativeError
+import arrow.effects.syntax.flowablek.async.async
+import arrow.effects.syntax.flowablek.effect.effect
+import arrow.effects.syntax.flowablek.functor.functor
+import arrow.effects.syntax.flowablek.monad.monad
+import arrow.effects.syntax.flowablek.monadDefer.monadDefer
+import arrow.effects.syntax.flowablek.monadError.monadError
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Effect
 import arrow.effects.typeclasses.MonadDefer

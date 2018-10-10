@@ -3,7 +3,7 @@ package arrow.optics.instances
 import arrow.Kind
 import arrow.core.*
 import arrow.data.*
-import arrow.extension
+import arrow.instance
 import arrow.optics.Optional
 import arrow.optics.POptional
 import arrow.optics.Traversal
@@ -26,7 +26,7 @@ fun <A> SequenceK.Companion.traversal(): Traversal<SequenceK<A>, A> = object : T
 /**
  * [Each] instance definition for [SequenceK].
  */
-@extension
+@instance
 interface SequenceKEachInstance<A> : Each<SequenceK<A>, A> {
   override fun each(): Traversal<SequenceK<A>, A> =
     SequenceK.traversal()
@@ -35,7 +35,7 @@ interface SequenceKEachInstance<A> : Each<SequenceK<A>, A> {
 /**
  * [FilterIndex] instance definition for [SequenceK].
  */
-@extension
+@instance
 interface SequenceKFilterIndexInstance<A> : FilterIndex<SequenceK<A>, Int, A> {
   override fun filter(p: (Int) -> Boolean): Traversal<SequenceK<A>, A> = object : Traversal<SequenceK<A>, A> {
     override fun <F> modifyF(FA: Applicative<F>, s: SequenceK<A>, f: (A) -> Kind<F, A>): Kind<F, SequenceK<A>> = FA.run {
@@ -49,7 +49,7 @@ interface SequenceKFilterIndexInstance<A> : FilterIndex<SequenceK<A>, Int, A> {
 /**
  * [Index] instance definition for [SequenceK].
  */
-@extension
+@instance
 interface SequenceKIndexInstance<A> : Index<SequenceK<A>, Int, A> {
   override fun index(i: Int): Optional<SequenceK<A>, A> = POptional(
     getOrModify = { it.elementAtOrNull(i)?.right() ?: it.left() },

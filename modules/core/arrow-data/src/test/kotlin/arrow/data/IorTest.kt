@@ -8,6 +8,11 @@ import arrow.data.Ior.Right
 import arrow.instances.ForIor
 import arrow.instances.eq
 import arrow.instances.semigroup
+import arrow.instances.syntax.ior.bifunctor.bifunctor
+import arrow.instances.syntax.ior.eq.eq
+import arrow.instances.syntax.ior.monad.monad
+import arrow.instances.syntax.ior.show.show
+import arrow.instances.syntax.ior.traverse.traverse
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq

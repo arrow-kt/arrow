@@ -6,13 +6,13 @@ import arrow.data.OptionT
 import arrow.data.OptionTOf
 import arrow.data.OptionTPartialOf
 import arrow.data.fix
-import arrow.extension
+import arrow.instance
 import arrow.instances.syntax.option.applicative.applicative
 import arrow.instances.syntax.option.foldable.foldable
 import arrow.instances.syntax.option.traverse.traverse
 import arrow.typeclasses.*
 
-@extension
+@instance
 interface OptionTFunctorInstance<F> : Functor<OptionTPartialOf<F>> {
 
   fun FF(): Functor<F>
@@ -21,7 +21,7 @@ interface OptionTFunctorInstance<F> : Functor<OptionTPartialOf<F>> {
 
 }
 
-@extension
+@instance
 interface OptionTApplicativeInstance<F> : Applicative<OptionTPartialOf<F>>, OptionTFunctorInstance<F> {
 
   fun MF(): Monad<F>
@@ -36,7 +36,7 @@ interface OptionTApplicativeInstance<F> : Applicative<OptionTPartialOf<F>>, Opti
     fix().ap(MF(), ff)
 }
 
-@extension
+@instance
 interface OptionTMonadInstance<F> : Monad<OptionTPartialOf<F>>, OptionTApplicativeInstance<F> {
 
   override fun MF(): Monad<F>
@@ -68,7 +68,7 @@ fun <F, G, A, B> OptionTOf<F, A>.traverse(FF: Traverse<F>, GA: Applicative<G>, f
 fun <F, G, A> OptionTOf<F, Kind<G, A>>.sequence(FF: Traverse<F>, GA: Applicative<G>): Kind<G, OptionT<F, A>> =
   traverse(FF, GA, ::identity)
 
-@extension
+@instance
 interface OptionTFoldableInstance<F> : Foldable<OptionTPartialOf<F>> {
 
   fun FFF(): Foldable<F>
@@ -81,7 +81,7 @@ interface OptionTFoldableInstance<F> : Foldable<OptionTPartialOf<F>> {
 
 }
 
-@extension
+@instance
 interface OptionTTraverseInstance<F> : Traverse<OptionTPartialOf<F>>, OptionTFoldableInstance<F> {
 
   fun FFT(): Traverse<F>
@@ -93,7 +93,7 @@ interface OptionTTraverseInstance<F> : Traverse<OptionTPartialOf<F>>, OptionTFol
 
 }
 
-@extension
+@instance
 interface OptionTSemigroupKInstance<F> : SemigroupK<OptionTPartialOf<F>> {
 
   fun MF(): Monad<F>
@@ -101,7 +101,7 @@ interface OptionTSemigroupKInstance<F> : SemigroupK<OptionTPartialOf<F>> {
   override fun <A> Kind<OptionTPartialOf<F>, A>.combineK(y: Kind<OptionTPartialOf<F>, A>): OptionT<F, A> = fix().orElse(MF(), { y.fix() })
 }
 
-@extension
+@instance
 interface OptionTMonoidKInstance<F> : MonoidK<OptionTPartialOf<F>>, OptionTSemigroupKInstance<F> {
 
   override fun MF(): Monad<F>

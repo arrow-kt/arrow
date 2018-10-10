@@ -179,7 +179,7 @@ class InstanceFileGenerator(
   private val instances: List<Instance> = annotatedList.map { Instance(it.dataType.`package`, it) }
 
   /**
-   * Main entry point for deriving extension generation
+   * Main entry point for deriving instance generation
    */
   fun generate() {
     instances.forEach {
@@ -274,7 +274,7 @@ class InstanceFileGenerator(
          |""".trimMargin()
       }
     } catch (iob: Throwable) {
-      i.target.processor.logW("skipped extension for fm: ${fm.name}")
+      i.target.processor.logW("skipped instance for fm: ${fm.name}")
       ""
     }
   })

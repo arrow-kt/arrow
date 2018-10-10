@@ -1,6 +1,16 @@
 package arrow.dagger.effects.instances
 
 import arrow.effects.*
+import arrow.effects.io.instances.IOMonoidInstance
+import arrow.effects.io.instances.IOSemigroupInstance
+import arrow.effects.io.instances.syntax.io.applicative.applicative
+import arrow.effects.io.instances.syntax.io.applicativeError.applicativeError
+import arrow.effects.io.instances.syntax.io.async.async
+import arrow.effects.io.instances.syntax.io.effect.effect
+import arrow.effects.io.instances.syntax.io.functor.functor
+import arrow.effects.io.instances.syntax.io.monad.monad
+import arrow.effects.io.instances.syntax.io.monadDefer.monadDefer
+import arrow.effects.io.instances.syntax.io.monadError.monadError
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Effect
 import arrow.effects.typeclasses.MonadDefer

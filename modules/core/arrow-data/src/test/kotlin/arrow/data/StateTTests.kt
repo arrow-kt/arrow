@@ -3,10 +3,17 @@ package arrow.data
 import arrow.Kind
 import arrow.core.ForTry
 import arrow.core.Try
-import arrow.core.monad
-import arrow.core.monadError
+import arrow.instances.syntax.`try`.monad.monad
+import arrow.instances.syntax.`try`.monadError.monadError
+import arrow.instances.syntax.listk.monad.monad
+import arrow.instances.syntax.listk.semigroupK.semigroupK
+import arrow.instances.syntax.statet.applicative.applicative
+import arrow.instances.syntax.statet.semigroupK.semigroupK
 import arrow.mtl.instances.ForStateT
 import arrow.mtl.instances.StateTMonadStateInstance
+import arrow.mtl.instances.syntax.listk.monadCombine.monadCombine
+import arrow.mtl.instances.syntax.statet.monadCombine.monadCombine
+import arrow.mtl.instances.syntax.statet.monadState.monadState
 import arrow.test.UnitSpec
 import arrow.test.laws.MonadCombineLaws
 import arrow.test.laws.MonadStateLaws
@@ -41,7 +48,7 @@ class StateTTests : UnitSpec() {
           StateT.semigroupK<ForListK, Int>(ListK.monad(), ListK.semigroupK()),
           StateT.applicative<ForListK, Int>(ListK.monad()),
           EQ_LIST),
-        MonadCombineLaws.laws(StateT.monadCombine<ForListK, Int>(ListK.monadCombine(), ListK.semigroupK(), ListK.monadCombine()),
+        MonadCombineLaws.laws(StateT.monadCombine<ForListK, Int>(ListK.monadCombine()),
           { StateT.lift(ListK.monad(), ListK.just(it)) },
           { StateT.lift(ListK.monad(), ListK.just({ s: Int -> s * 2 })) },
           EQ_LIST)

@@ -3,7 +3,7 @@ package arrow.instances
 import arrow.Kind
 import arrow.Kind2
 import arrow.core.*
-import arrow.extension
+import arrow.instance
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Contravariant
 import arrow.typeclasses.Category
@@ -14,13 +14,13 @@ import arrow.typeclasses.Profunctor
 import arrow.typeclasses.conest
 import arrow.typeclasses.counnest
 
-@extension
+@instance
 interface Function1FunctorInstance<I> : Functor<Function1PartialOf<I>> {
   override fun <A, B> Kind<Function1PartialOf<I>, A>.map(f: (A) -> B): Function1<I, B> =
     fix().map(f)
 }
 
-@extension
+@instance
 interface Function1ContravariantInstance<O> : Contravariant<Conested<ForFunction1, O>> {
   override fun <A, B> Kind<Conested<ForFunction1, O>, A>.contramap(f: (B) -> A): Kind<Conested<ForFunction1, O>, B> =
     counnest().fix().contramap(f).conest()
@@ -29,13 +29,13 @@ interface Function1ContravariantInstance<O> : Contravariant<Conested<ForFunction
     conest().contramap(f).counnest()
 }
 
-@extension
+@instance
 interface Function1ProfunctorInstance : Profunctor<ForFunction1> {
   override fun <A, B, C, D> Kind<Function1PartialOf<A>, B>.dimap(fl: (C) -> A, fr: (B) -> D): Function1<C, D> =
     (fr compose fix().f compose fl).k()
 }
 
-@extension
+@instance
 interface Function1ApplicativeInstance<I> : Applicative<Function1PartialOf<I>>, Function1FunctorInstance<I> {
 
   override fun <A> just(a: A): Function1<I, A> =
@@ -48,7 +48,7 @@ interface Function1ApplicativeInstance<I> : Applicative<Function1PartialOf<I>>, 
     fix().ap(ff)
 }
 
-@extension
+@instance
 interface Function1MonadInstance<I> : Monad<Function1PartialOf<I>>, Function1ApplicativeInstance<I> {
 
   override fun <A, B> Kind<Function1PartialOf<I>, A>.map(f: (A) -> B): Function1<I, B> =
@@ -64,13 +64,12 @@ interface Function1MonadInstance<I> : Monad<Function1PartialOf<I>>, Function1App
     Function1.tailRecM(a, f)
 }
 
-@extension
+@instance
 interface Function1CategoryInstance : Category<ForFunction1> {
   override fun <A> id(): Kind2<ForFunction1, A, A> = Function1.id()
 
   override fun <A, B, C> Kind2<ForFunction1, B, C>.compose(arr: Kind2<ForFunction1, A, B>): Kind2<ForFunction1, A, C> = fix().compose(arr.fix())
 }
-
 
 class Function1Context<A> : Function1MonadInstance<A>
 

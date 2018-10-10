@@ -2,6 +2,10 @@ package arrow.data
 
 import arrow.core.*
 import arrow.instances.*
+import arrow.instances.syntax.validated.applicative.applicative
+import arrow.instances.syntax.validated.eq.eq
+import arrow.instances.syntax.validated.semigroupK.semigroupK
+import arrow.instances.syntax.validated.show.show
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
