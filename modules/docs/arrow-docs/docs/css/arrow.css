@@ -830,8 +830,17 @@ table {
 p code, ul code {
   background: #fff;
   font-family: "monoidregular", monospace;
-  padding: 0 8px;
-  font-size: 0.8125rem;
+  font-size: 0.8rem;
+  border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -o-border-radius: 3px; }
+
+.CodeMirror {
+  background: #fff !important;
+  font-family: "monoidregular", monospace !important;
+  font-size: 0.8rem !important;
   border-radius: 3px;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
@@ -839,10 +848,10 @@ p code, ul code {
   -o-border-radius: 3px; }
 
 .hljs {
-  padding: 24px;
+  padding: 12px 0 12px 16px;
   background: #fff;
   font-family: "monoidregular", monospace;
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   box-shadow: rgba(25, 62, 136, 0.1) 0 0 20px; }
 
 .hljs {
