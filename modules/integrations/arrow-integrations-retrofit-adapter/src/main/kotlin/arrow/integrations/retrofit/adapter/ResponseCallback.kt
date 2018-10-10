@@ -8,18 +8,9 @@ import retrofit2.Callback
 import retrofit2.HttpException
 import retrofit2.Response
 
-class ResponseCallback<R>(private val proc: (Either<Throwable, R>) -> Unit) : Callback<R> {
+class ResponseCallback<R>(private val proc: (Either<Throwable, Response<R>>) -> Unit) : Callback<R> {
   override fun onResponse(call: Call<R>, response: Response<R>) {
-    if (response.isSuccessful) {
-      val body = response.body()
-      if (body != null) {
-        proc(body.right())
-      } else {
-        proc(IllegalStateException("The request returned a null body").left())
-      }
-    } else {
-      proc(HttpException(response).left())
-    }
+    proc(response.right())
   }
 
   override fun onFailure(call: Call<R>, throwable: Throwable) {

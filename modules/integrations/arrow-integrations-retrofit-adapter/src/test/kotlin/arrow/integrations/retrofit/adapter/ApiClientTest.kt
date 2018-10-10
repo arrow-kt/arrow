@@ -12,10 +12,10 @@ interface ApiClientTest {
   fun testCallK(): CallK<ResponseMock>
 
   @GET("testCallKResponse")
-  fun testCallKResponse(): CallK<Response<ResponseMock>>
+  fun testCallKResponse(): CallK<ResponseMock>
 
   @GET("testIO")
-  fun testIO(): IO<ResponseMock>
+  fun testIO(): IO<Response<ResponseMock>>
 
   @GET("testIOResponse")
   fun testIOResponse(): IO<Response<ResponseMock>>
