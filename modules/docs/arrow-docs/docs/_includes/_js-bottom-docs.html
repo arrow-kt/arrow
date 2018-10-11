@@ -1,5 +1,12 @@
 <!-- Jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<!-- Code snippets -->
+<script src="{{ '/js/playground.min.js' | relative_url }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  KotlinPlayground('[class^="language-kotlin"]');
+});
+</script>
 <!-- Highlight -->
 <script src="{{ '/js/highlight.pack.js' | relative_url }}"></script>
 <script>
@@ -20,6 +27,5 @@ hljs.configure({
   ((window.gitter = {}).chat = {}).options = {
     room: 'arrow-kt/Lobby'
   };
-
 </script>
 <script src="https://sidecar.gitter.im/dist/sidecar.v1.js" async defer></script>
