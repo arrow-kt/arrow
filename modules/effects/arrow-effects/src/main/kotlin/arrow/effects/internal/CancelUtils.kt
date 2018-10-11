@@ -4,7 +4,6 @@ import arrow.effects.ForIO
 import arrow.effects.IO
 import arrow.effects.IOFrame
 import arrow.effects.fix
-import com.sun.tools.javac.util.ListBuffer
 
 /**
  * utilities for dealing with cancelable thunks.
@@ -34,18 +33,16 @@ internal object CancelUtils {
    */
   private class CancelAllFrame(val cursor: Iterator<CancelToken<ForIO>>) : IOFrame<Unit, IO<Unit>> {
 
-    private val errors = ListBuffer<Throwable>()
+    private var errors = listOf<Throwable>()
 
     fun loop(): CancelToken<ForIO> =
       if (cursor.hasNext()) {
         cursor.next().fix().flatMap(this)
       } else {
-        errors.toList().let { errorsList ->
-          when (errors.toList()) {
-            ListBuffer<Throwable>() -> IO.unit
-            else -> // first :: rest
-              IO.raiseError(IOPlatform.composeErrors(errorsList.first(), errorsList.tail))
-          }
+        when (errors) {
+          listOf<Throwable>() -> IO.unit
+          else -> // first :: rest
+            IO.raiseError(IOPlatform.composeErrors(errors.first(), errors.drop(1)))
         }
       }
 

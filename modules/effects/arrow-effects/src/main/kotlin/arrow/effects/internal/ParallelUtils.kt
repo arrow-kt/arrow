@@ -1,18 +1,28 @@
 package arrow.effects.internal
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Tuple2
+import arrow.core.Tuple3
+import arrow.core.left
+import arrow.core.right
+import arrow.core.toT
 import arrow.effects.typeclasses.ConcurrentEffect
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.Effect
 import arrow.effects.typeclasses.Proc
-import kotlin.coroutines.*
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.startCoroutine
+import kotlin.coroutines.suspendCoroutine
 import arrow.core.Continuation as AContinuation
 
 /* See parMap3 */
 internal fun <F, A, B, C> Effect<F>.parMap2(ctx: CoroutineContext, ioA: Kind<F, A>, ioB: Kind<F, B>, f: (A, B) -> C,
   /* start is used because this has to start inside the coroutine. Using Future won't work */
-                                            start: (Kind<F, Unit>) -> Unit): Proc<C> = { cc ->
+                                            start: (Kind<F, Unit>) -> Unit): Proc<C> = { _, cc ->
   val a: suspend () -> Either<A, B> = {
     suspendCoroutine { ca: Continuation<Either<A, B>> ->
       start(ioA.map { it.left() }.runAsync {
@@ -38,7 +48,7 @@ internal fun <F, A, B, C> Effect<F>.parMap2(ctx: CoroutineContext, ioA: Kind<F, 
  * Thus, we need to provide solutions for even and uneven amounts of IOs for all to be started at the same depth. */
 internal fun <F, A, B, C, D> Effect<F>.parMap3(ctx: CoroutineContext, ioA: Kind<F, A>, ioB: Kind<F, B>, ioC: Kind<F, C>, f: (A, B, C) -> D,
   /* start is used because this has to start inside the coroutine. Using Future won't work */
-                                               start: (Kind<F, Unit>) -> Unit): Proc<D> = { cc ->
+                                               start: (Kind<F, Unit>) -> Unit): Proc<D> = { _, cc ->
   val a: suspend () -> Treither<A, B, C> = {
     suspendCoroutine { ca: Continuation<Treither<A, B, C>> ->
       start(ioA.map { Treither.Left<A, B, C>(it) }.runAsync {
@@ -70,7 +80,7 @@ internal fun <F, A, B, C, D> Effect<F>.parMap3(ctx: CoroutineContext, ioA: Kind<
 fun <F, A, B, C> ConcurrentEffect<F>.parMapCancellable2(
   ctx: CoroutineContext, ioA: Kind<F, A>, ioB: Kind<F, B>, f: (A, B) -> C,
   /* start is used because this has to start inside the coroutine. Using Future won't work */
-  start: (Kind<F, Disposable>) -> Unit): Proc<C> = { cc ->
+  start: (Kind<F, Disposable>) -> Unit): Proc<C> = { _, cc ->
   val a: suspend () -> Either<A, B> = {
     suspendCoroutine { ca: Continuation<Either<A, B>> ->
       start(ioA.map { it.left() }.runAsyncCancellable {
@@ -93,7 +103,7 @@ fun <F, A, B, C> ConcurrentEffect<F>.parMapCancellable2(
 /* See parMap3 */
 fun <F, A, B, C, D> ConcurrentEffect<F>.parMapCancellable3(ctx: CoroutineContext, ioA: Kind<F, A>, ioB: Kind<F, B>, ioC: Kind<F, C>, f: (A, B, C) -> D,
   /* start is used because this has to start inside the coroutine. Using Future won't work */
-                                                           start: (Kind<F, Disposable>) -> Unit): Proc<D> = { cc ->
+                                                           start: (Kind<F, Disposable>) -> Unit): Proc<D> = { _, cc ->
   val a: suspend () -> Treither<A, B, C> = {
     suspendCoroutine { ca: Continuation<Treither<A, B, C>> ->
       start(ioA.map { Treither.Left<A, B, C>(it) }.runAsyncCancellable {
