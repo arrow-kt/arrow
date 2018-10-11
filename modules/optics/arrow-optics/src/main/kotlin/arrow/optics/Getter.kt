@@ -1,6 +1,8 @@
 package arrow.optics
 
 import arrow.core.*
+import arrow.data.Reader
+import arrow.data.map
 import arrow.higherkind
 import arrow.typeclasses.Monoid
 
@@ -58,6 +60,18 @@ interface Getter<S, A> : GetterOf<S, A> {
   infix fun <C> zip(other: Getter<S, C>): Getter<S, Tuple2<A, C>> = Getter { s ->
     get(s) toT other.get(s)
   }
+
+  /**
+   * Find the focus [A] if it satisfies the predicate [p].
+   */
+  fun find(s: S, p: (A) -> Boolean): Option<A> = get(s).let { b ->
+    if (p(b)) Some(b) else None
+  }
+
+  /**
+   * Check if the focus [A] satisfies the predicate [p].
+   */
+  fun exist(s: S, p: (A) -> Boolean): Boolean = p(get(s))
 
   /**
    * Create a product of the [Getter] and a type [C]
@@ -122,16 +136,21 @@ interface Getter<S, A> : GetterOf<S, A> {
     override fun <R> foldMap(M: Monoid<R>, s: S, f: (A) -> R): R = f(get(s))
   }
 
-}
+  /**
+   * Extracts the value viewed through the [get] function.
+   */
+  fun ask(): Reader<S, A> = Reader(::get)
 
-/**
- * Find if the focus satisfies the predicate.
- */
-inline fun <S, A> Getter<S, A>.find(s: S, crossinline p: (A) -> Boolean): Option<A> = get(s).let { b ->
-  if (p(b)) Some(b) else None
-}
+  /**
+   * Transforms a [Getter] into a [Reader]. Alias for [ask].
+   */
+  fun toReader(): Reader<S, A> = ask()
 
-/**
- * Check if the focus satisfies the predicate
- */
-inline fun <S, A> Getter<S, A>.exist(s: S, crossinline p: (A) -> Boolean): Boolean = p(get(s))
+  /**
+   * Extracts the value viewed through the [get] and applies [f] to it.
+   *
+   * @param f function to apply to the focus.
+   */
+  fun <B> asks(f: (A) -> B): Reader<S, B> = ask().map(f)
+
+}
