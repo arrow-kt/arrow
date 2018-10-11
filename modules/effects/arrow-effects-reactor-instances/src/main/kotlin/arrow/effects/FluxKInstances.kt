@@ -6,17 +6,17 @@ import arrow.core.Eval
 import arrow.effects.syntax.fluxk.monad.monad
 import arrow.effects.syntax.fluxk.monadError.monadError
 import arrow.effects.typeclasses.*
-import arrow.instance
+import arrow.extension
 import arrow.typeclasses.*
 import kotlin.coroutines.experimental.CoroutineContext
 
-@instance
+@extension
 interface FluxKFunctorInstance : Functor<ForFluxK> {
   override fun <A, B> Kind<ForFluxK, A>.map(f: (A) -> B): FluxK<B> =
     fix().map(f)
 }
 
-@instance
+@extension
 interface FluxKApplicativeInstance : Applicative<ForFluxK> {
   override fun <A> just(a: A): FluxK<A> =
     FluxK.just(a)
@@ -28,7 +28,7 @@ interface FluxKApplicativeInstance : Applicative<ForFluxK> {
     fix().map(f)
 }
 
-@instance
+@extension
 interface FluxKMonadInstance : Monad<ForFluxK> {
   override fun <A, B> FluxKOf<A>.ap(ff: FluxKOf<(A) -> B>): FluxK<B> =
     fix().ap(ff)
@@ -46,7 +46,7 @@ interface FluxKMonadInstance : Monad<ForFluxK> {
     FluxK.just(a)
 }
 
-@instance
+@extension
 interface FluxKFoldableInstance : Foldable<ForFluxK> {
   override fun <A, B> Kind<ForFluxK, A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
@@ -55,7 +55,7 @@ interface FluxKFoldableInstance : Foldable<ForFluxK> {
     fix().foldRight(lb, f)
 }
 
-@instance
+@extension
 interface FluxKTraverseInstance : Traverse<ForFluxK> {
   override fun <A, B> Kind<ForFluxK, A>.map(f: (A) -> B): FluxK<B> =
     fix().map(f)
@@ -70,7 +70,7 @@ interface FluxKTraverseInstance : Traverse<ForFluxK> {
     fix().foldRight(lb, f)
 }
 
-@instance
+@extension
 interface FluxKApplicativeErrorInstance :
   ApplicativeError<ForFluxK, Throwable>,
   FluxKApplicativeInstance {
@@ -81,7 +81,7 @@ interface FluxKApplicativeErrorInstance :
     fix().handleErrorWith { f(it).fix() }
 }
 
-@instance
+@extension
 interface FluxKMonadErrorInstance :
   MonadError<ForFluxK, Throwable>,
   FluxKMonadInstance {
@@ -92,7 +92,7 @@ interface FluxKMonadErrorInstance :
     fix().handleErrorWith { f(it).fix() }
 }
 
-@instance
+@extension
 interface FluxKMonadDeferInstance :
   MonadDefer<ForFluxK>,
   FluxKMonadErrorInstance {
@@ -100,7 +100,7 @@ interface FluxKMonadDeferInstance :
     FluxK.defer(fa)
 }
 
-@instance
+@extension
 interface FluxKAsyncInstance :
   Async<ForFluxK>,
   FluxKMonadDeferInstance {
@@ -111,7 +111,7 @@ interface FluxKAsyncInstance :
     fix().continueOn(ctx)
 }
 
-@instance
+@extension
 interface FluxKEffectInstance :
   Effect<ForFluxK>,
   FluxKAsyncInstance {
@@ -119,7 +119,7 @@ interface FluxKEffectInstance :
     fix().runAsync(cb)
 }
 
-@instance
+@extension
 interface FluxKConcurrentEffectInstance :
   ConcurrentEffect<ForFluxK>,
   FluxKEffectInstance {

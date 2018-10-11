@@ -3,7 +3,7 @@ package arrow.instances
 import arrow.Kind
 import arrow.core.*
 import arrow.data.*
-import arrow.instance
+import arrow.extension
 import arrow.instances.syntax.id.applicative.applicative
 import arrow.instances.syntax.id.functor.functor
 import arrow.instances.syntax.id.monad.monad
@@ -12,7 +12,7 @@ import arrow.instances.syntax.kleisli.functor.functor
 import arrow.instances.syntax.kleisli.monad.monad
 import arrow.typeclasses.*
 
-@instance
+@extension
 interface KleisliFunctorInstance<F, D> : Functor<KleisliPartialOf<F, D>> {
 
   fun FF(): Functor<F>
@@ -20,7 +20,7 @@ interface KleisliFunctorInstance<F, D> : Functor<KleisliPartialOf<F, D>> {
   override fun <A, B> Kind<KleisliPartialOf<F, D>, A>.map(f: (A) -> B): Kleisli<F, D, B> = fix().map(FF(), f)
 }
 
-@instance
+@extension
 interface KleisliContravariant<F, D> : Contravariant<Conested<Kind<ForKleisli, F>, D>> {
   override fun <A, B> Kind<Conested<Kind<ForKleisli, F>, D>, A>.contramap(f: (B) -> A): Kind<Conested<Kind<ForKleisli, F>, D>, B> =
     counnest().fix().local(f).conest()
@@ -29,7 +29,7 @@ interface KleisliContravariant<F, D> : Contravariant<Conested<Kind<ForKleisli, F
     conest().contramap(f).counnest()
 }
 
-@instance
+@extension
 interface KleisliApplicativeInstance<F, D> : Applicative<KleisliPartialOf<F, D>>, KleisliFunctorInstance<F, D> {
 
   fun AF(): Applicative<F>
@@ -48,7 +48,7 @@ interface KleisliApplicativeInstance<F, D> : Applicative<KleisliPartialOf<F, D>>
     Kleisli({ AF().run { fix().run(it).product(fb.fix().run(it)) } })
 }
 
-@instance
+@extension
 interface KleisliMonadInstance<F, D> : Monad<KleisliPartialOf<F, D>>, KleisliApplicativeInstance<F, D> {
 
   fun MF(): Monad<F>
@@ -69,7 +69,7 @@ interface KleisliMonadInstance<F, D> : Monad<KleisliPartialOf<F, D>>, KleisliApp
 
 }
 
-@instance
+@extension
 interface KleisliApplicativeErrorInstance<F, D, E> : ApplicativeError<KleisliPartialOf<F, D>, E>, KleisliApplicativeInstance<F, D> {
 
   fun AE(): ApplicativeError<F, E>
@@ -84,7 +84,7 @@ interface KleisliApplicativeErrorInstance<F, D, E> : ApplicativeError<KleisliPar
 
 }
 
-@instance
+@extension
 interface KleisliMonadErrorInstance<F, D, E> : MonadError<KleisliPartialOf<F, D>, E>, KleisliApplicativeErrorInstance<F, D, E>, KleisliMonadInstance<F, D> {
 
   fun ME(): MonadError<F, E>

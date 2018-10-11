@@ -4,7 +4,7 @@ import arrow.Kind
 import arrow.core.toT
 import arrow.data.StateT
 import arrow.data.StateTPartialOf
-import arrow.instance
+import arrow.extension
 import arrow.instances.StateTMonadErrorInstance
 import arrow.instances.StateTMonadInstance
 import arrow.instances.StateTSemigroupKInstance
@@ -14,7 +14,7 @@ import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.SemigroupK
 
-@instance
+@extension
 interface StateTMonadStateInstance<F, S> : MonadState<StateTPartialOf<F, S>, S>, StateTMonadInstance<F, S> {
 
   override fun MF(): Monad<F>
@@ -25,7 +25,7 @@ interface StateTMonadStateInstance<F, S> : MonadState<StateTPartialOf<F, S>, S>,
 
 }
 
-@instance
+@extension
 interface StateTMonadCombineInstance<F, S> : MonadCombine<StateTPartialOf<F, S>>, StateTMonadInstance<F, S>, StateTSemigroupKInstance<F, S> {
 
   fun MC(): MonadCombine<F>

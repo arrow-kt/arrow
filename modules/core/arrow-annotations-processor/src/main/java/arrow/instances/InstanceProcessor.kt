@@ -3,7 +3,7 @@ package arrow.instances
 import arrow.common.messager.log
 import arrow.common.messager.logW
 import arrow.common.utils.*
-import arrow.instance
+import arrow.extension
 import arrow.meta.ast.*
 import arrow.meta.decoder.TypeDecoder
 import arrow.meta.encoder.instances.TypeEncoder
@@ -20,7 +20,7 @@ import javax.lang.model.element.ElementKind
 import javax.lang.model.element.TypeElement
 
 @AutoService(Processor::class)
-class InstanceProcessor : MetaProcessor<instance, Type>(annotations = listOf(instance::class)), TypeEncoder, TypeDecoder {
+class InstanceProcessor : MetaProcessor<extension, Type>(annotations = listOf(extension::class)), TypeEncoder, TypeDecoder {
   override fun transform(annotatedElement: AnnotatedElement): FileSpec.Builder =
     when (annotatedElement) {
       is AnnotatedElement.Interface -> {

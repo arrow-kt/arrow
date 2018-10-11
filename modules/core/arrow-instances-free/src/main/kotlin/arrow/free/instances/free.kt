@@ -4,7 +4,7 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.FunctionK
 import arrow.free.*
-import arrow.instance
+import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Functor
@@ -13,14 +13,14 @@ import arrow.free.ap as freeAp
 import arrow.free.flatMap as freeFlatMap
 import arrow.free.map as freeMap
 
-@instance
+@extension
 interface FreeFunctorInstance<S> : Functor<FreePartialOf<S>> {
 
   override fun <A, B> Kind<FreePartialOf<S>, A>.map(f: (A) -> B): Free<S, B> =
     fix().freeMap(f)
 }
 
-@instance
+@extension
 interface FreeApplicativeInstance<S> : Applicative<FreePartialOf<S>>, FreeFunctorInstance<S> {
 
   override fun <A> just(a: A): Free<S, A> = Free.just(a)
@@ -32,7 +32,7 @@ interface FreeApplicativeInstance<S> : Applicative<FreePartialOf<S>>, FreeFuncto
     fix().freeAp(ff)
 }
 
-@instance
+@extension
 interface FreeMonadInstance<S> : Monad<FreePartialOf<S>>, FreeApplicativeInstance<S> {
 
   override fun <A, B> Kind<FreePartialOf<S>, A>.map(f: (A) -> B): Free<S, B> =
@@ -52,7 +52,7 @@ interface FreeMonadInstance<S> : Monad<FreePartialOf<S>>, FreeApplicativeInstanc
   }
 }
 
-@instance
+@extension
 interface FreeEq<F, G, A> : Eq<Kind<FreePartialOf<F>, A>> {
 
   fun MG(): Monad<G>

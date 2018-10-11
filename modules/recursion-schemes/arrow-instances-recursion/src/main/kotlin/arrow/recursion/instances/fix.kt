@@ -2,7 +2,7 @@ package arrow.recursion.instances
 
 import arrow.Kind
 import arrow.core.Eval
-import arrow.instance
+import arrow.extension
 import arrow.recursion.data.Fix
 import arrow.recursion.data.ForFix
 import arrow.recursion.data.fix
@@ -11,7 +11,7 @@ import arrow.recursion.typeclasses.Birecursive
 import arrow.recursion.typeclasses.Corecursive
 import arrow.recursion.typeclasses.Recursive
 
-@instance
+@extension
 interface FixBirecursiveInstance : Birecursive<ForFix> {
   override fun <F> Functor<F>.projectT(tf: Kind<ForFix, F>) =
     tf.fix().unfix.map { it.value() }
@@ -20,8 +20,8 @@ interface FixBirecursiveInstance : Birecursive<ForFix> {
     Eval.later { Fix(tf) }
 }
 
-@instance
+@extension
 interface FixRecursiveInstance : Recursive<ForFix>, FixBirecursiveInstance
 
-@instance
+@extension
 interface FixCorecursiveInstance : Corecursive<ForFix>, FixBirecursiveInstance

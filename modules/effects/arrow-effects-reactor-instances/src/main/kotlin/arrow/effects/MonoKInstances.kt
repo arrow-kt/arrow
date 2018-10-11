@@ -3,17 +3,17 @@ package arrow.effects
 import arrow.Kind
 import arrow.core.Either
 import arrow.effects.typeclasses.*
-import arrow.instance
+import arrow.extension
 import arrow.typeclasses.*
 import kotlin.coroutines.experimental.CoroutineContext
 
-@instance
+@extension
 interface MonoKFunctorInstance : Functor<ForMonoK> {
   override fun <A, B> Kind<ForMonoK, A>.map(f: (A) -> B): MonoK<B> =
     fix().map(f)
 }
 
-@instance
+@extension
 interface MonoKApplicativeInstance : Applicative<ForMonoK> {
   override fun <A, B> MonoKOf<A>.ap(ff: MonoKOf<(A) -> B>): MonoK<B> =
     fix().ap(ff)
@@ -25,7 +25,7 @@ interface MonoKApplicativeInstance : Applicative<ForMonoK> {
     MonoK.just(a)
 }
 
-@instance
+@extension
 interface MonoKMonadInstance : Monad<ForMonoK> {
   override fun <A, B> MonoKOf<A>.ap(ff: MonoKOf<(A) -> B>): MonoK<B> =
     fix().ap(ff)
@@ -43,7 +43,7 @@ interface MonoKMonadInstance : Monad<ForMonoK> {
     MonoK.just(a)
 }
 
-@instance
+@extension
 interface MonoKApplicativeErrorInstance :
   ApplicativeError<ForMonoK, Throwable>,
   MonoKApplicativeInstance {
@@ -54,7 +54,7 @@ interface MonoKApplicativeErrorInstance :
     fix().handleErrorWith { f(it).fix() }
 }
 
-@instance
+@extension
 interface MonoKMonadErrorInstance :
   MonadError<ForMonoK, Throwable>,
   MonoKMonadInstance {
@@ -65,7 +65,7 @@ interface MonoKMonadErrorInstance :
     fix().handleErrorWith { f(it).fix() }
 }
 
-@instance
+@extension
 interface MonoKMonadDeferInstance :
   MonadDefer<ForMonoK>,
   MonoKMonadErrorInstance {
@@ -73,7 +73,7 @@ interface MonoKMonadDeferInstance :
     MonoK.defer(fa)
 }
 
-@instance
+@extension
 interface MonoKAsyncInstance :
   Async<ForMonoK>,
   MonoKMonadDeferInstance {
@@ -84,7 +84,7 @@ interface MonoKAsyncInstance :
     fix().continueOn(ctx)
 }
 
-@instance
+@extension
 interface MonoKEffectInstance :
   Effect<ForMonoK>,
   MonoKAsyncInstance {
@@ -92,7 +92,7 @@ interface MonoKEffectInstance :
     fix().runAsync(cb)
 }
 
-@instance
+@extension
 interface MonoKConcurrentEffectInstance :
   ConcurrentEffect<ForMonoK>,
   MonoKEffectInstance {

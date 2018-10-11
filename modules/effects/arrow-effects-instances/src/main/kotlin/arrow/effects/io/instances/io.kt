@@ -4,19 +4,19 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.effects.*
 import arrow.effects.typeclasses.*
-import arrow.instance
+import arrow.extension
 import arrow.typeclasses.*
 import kotlin.coroutines.experimental.CoroutineContext
 import arrow.effects.ap as ioAp
 import arrow.effects.handleErrorWith as ioHandleErrorWith
 
-@instance
+@extension
 interface IOFunctorInstance : Functor<ForIO> {
   override fun <A, B> Kind<ForIO, A>.map(f: (A) -> B): IO<B> =
     fix().map(f)
 }
 
-@instance
+@extension
 interface IOApplicativeInstance : Applicative<ForIO> {
   override fun <A, B> Kind<ForIO, A>.map(f: (A) -> B): IO<B> =
     fix().map(f)
@@ -28,7 +28,7 @@ interface IOApplicativeInstance : Applicative<ForIO> {
     fix().ioAp(ff)
 }
 
-@instance
+@extension
 interface IOMonadInstance : Monad<ForIO> {
   override fun <A, B> Kind<ForIO, A>.flatMap(f: (A) -> Kind<ForIO, B>): IO<B> =
     fix().flatMap(f)
@@ -43,7 +43,7 @@ interface IOMonadInstance : Monad<ForIO> {
     IO.just(a)
 }
 
-@instance
+@extension
 interface IOApplicativeErrorInstance : ApplicativeError<ForIO, Throwable>, IOApplicativeInstance {
   override fun <A> Kind<ForIO, A>.attempt(): IO<Either<Throwable, A>> =
     fix().attempt()
@@ -55,7 +55,7 @@ interface IOApplicativeErrorInstance : ApplicativeError<ForIO, Throwable>, IOApp
     IO.raiseError(e)
 }
 
-@instance
+@extension
 interface IOMonadErrorInstance : MonadError<ForIO, Throwable>, IOMonadInstance {
   override fun <A> Kind<ForIO, A>.attempt(): IO<Either<Throwable, A>> =
     fix().attempt()
@@ -67,7 +67,7 @@ interface IOMonadErrorInstance : MonadError<ForIO, Throwable>, IOMonadInstance {
     IO.raiseError(e)
 }
 
-@instance
+@extension
 interface IOMonadDeferInstance : MonadDefer<ForIO>, IOMonadErrorInstance {
   override fun <A> defer(fa: () -> IOOf<A>): IO<A> =
     IO.defer(fa)
@@ -75,7 +75,7 @@ interface IOMonadDeferInstance : MonadDefer<ForIO>, IOMonadErrorInstance {
   override fun lazy(): IO<Unit> = IO.lazy
 }
 
-@instance
+@extension
 interface IOAsyncInstance : Async<ForIO>, IOMonadDeferInstance {
   override fun <A> async(fa: Proc<A>): IO<A> =
     IO.async(fa)
@@ -87,13 +87,13 @@ interface IOAsyncInstance : Async<ForIO>, IOMonadDeferInstance {
     IO.invoke(f)
 }
 
-@instance
+@extension
 interface IOEffectInstance : Effect<ForIO>, IOAsyncInstance {
   override fun <A> Kind<ForIO, A>.runAsync(cb: (Either<Throwable, A>) -> Kind<ForIO, Unit>): IO<Unit> =
     fix().runAsync(cb)
 }
 
-@instance
+@extension
 interface IOConcurrentEffectInstance : ConcurrentEffect<ForIO>, IOEffectInstance {
   override fun <A> Kind<ForIO, A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> Kind<ForIO, Unit>): IO<Disposable> =
     fix().runAsyncCancellable(OnCancel.ThrowCancellationException, cb)
@@ -107,7 +107,7 @@ interface IOSemigroupInstance<A> : Semigroup<IO<A>> {
     flatMap { a1: A -> b.map { a2: A -> SG().run { a1.combine(a2) } } }
 }
 
-@instance
+@extension
 interface IOMonoidInstance<A> : Monoid<IO<A>>, IOSemigroupInstance<A> {
 
   override fun SG(): Semigroup<A> = SM()

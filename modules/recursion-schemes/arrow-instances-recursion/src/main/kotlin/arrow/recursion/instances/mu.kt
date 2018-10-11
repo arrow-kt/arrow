@@ -3,7 +3,7 @@ package arrow.recursion.instances
 import arrow.Kind
 import arrow.core.Eval
 import arrow.core.Eval.Now
-import arrow.instance
+import arrow.extension
 import arrow.typeclasses.Functor
 import arrow.recursion.Algebra
 import arrow.recursion.data.ForMu
@@ -14,7 +14,7 @@ import arrow.recursion.typeclasses.Birecursive
 import arrow.recursion.typeclasses.Corecursive
 import arrow.recursion.typeclasses.Recursive
 
-@instance
+@extension
 interface MuBirecursiveInstance : Birecursive<ForMu> {
   override fun <F> Functor<F>.embedT(tf: Kind<F, Eval<Kind<ForMu, F>>>): Eval<Mu<F>> =
     Eval.now(object : Mu<F>() {
@@ -29,8 +29,8 @@ interface MuBirecursiveInstance : Birecursive<ForMu> {
     tf.fix().unMu(alg).value()
 }
 
-@instance
+@extension
 interface MuRecursiveInstance : Recursive<ForMu>, MuBirecursiveInstance
 
-@instance
+@extension
 interface MuCorecursiveInstance : Corecursive<ForMu>, MuBirecursiveInstance

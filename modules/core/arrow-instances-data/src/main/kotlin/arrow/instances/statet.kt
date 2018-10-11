@@ -3,14 +3,14 @@ package arrow.instances
 import arrow.Kind
 import arrow.core.*
 import arrow.data.*
-import arrow.instance
+import arrow.extension
 import arrow.instances.syntax.id.monad.monad
 import arrow.instances.syntax.statet.applicative.applicative
 import arrow.instances.syntax.statet.functor.functor
 import arrow.instances.syntax.statet.monad.monad
 import arrow.typeclasses.*
 
-@instance
+@extension
 interface StateTFunctorInstance<F, S> : Functor<StateTPartialOf<F, S>> {
 
   fun FF(): Functor<F>
@@ -20,7 +20,7 @@ interface StateTFunctorInstance<F, S> : Functor<StateTPartialOf<F, S>> {
 
 }
 
-@instance
+@extension
 interface StateTApplicativeInstance<F, S> : Applicative<StateTPartialOf<F, S>>, StateTFunctorInstance<F, S> {
 
   fun MF(): Monad<F>
@@ -41,7 +41,7 @@ interface StateTApplicativeInstance<F, S> : Applicative<StateTPartialOf<F, S>>, 
 
 }
 
-@instance
+@extension
 interface StateTMonadInstance<F, S> : Monad<StateTPartialOf<F, S>>, StateTApplicativeInstance<F, S> {
 
   override fun MF(): Monad<F>
@@ -60,7 +60,7 @@ interface StateTMonadInstance<F, S> : Monad<StateTPartialOf<F, S>>, StateTApplic
 
 }
 
-@instance
+@extension
 interface StateTSemigroupKInstance<F, S> : SemigroupK<StateTPartialOf<F, S>> {
 
   fun FF(): Monad<F>
@@ -72,7 +72,7 @@ interface StateTSemigroupKInstance<F, S> : SemigroupK<StateTPartialOf<F, S>> {
 
 }
 
-@instance
+@extension
 interface StateTApplicativeErrorInstance<F, S, E> : ApplicativeError<StateTPartialOf<F, S>, E>, StateTApplicativeInstance<F, S> {
 
   fun ME(): MonadError<F, E>
@@ -87,7 +87,7 @@ interface StateTApplicativeErrorInstance<F, S, E> : ApplicativeError<StateTParti
     StateT(ME().just({ s -> ME().run { runM(ME(), s).handleErrorWith({ e -> f(e).runM(ME(), s) }) } }))
 }
 
-@instance
+@extension
 interface StateTMonadErrorInstance<F, S, E> : MonadError<StateTPartialOf<F, S>, E>, StateTApplicativeErrorInstance<F, S, E>, StateTMonadInstance<F, S> {
 
   override fun MF(): Monad<F> = ME()

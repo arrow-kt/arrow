@@ -3,23 +3,23 @@ package arrow.instances
 import arrow.Kind
 import arrow.core.Eval
 import arrow.data.*
-import arrow.instance
+import arrow.extension
 import arrow.typeclasses.*
 import arrow.data.combineK as setCombineK
 import kotlin.collections.plus as setPlus
 
-@instance
+@extension
 interface SetKSemigroupInstance<A> : Semigroup<SetK<A>> {
   override fun SetK<A>.combine(b: SetK<A>): SetK<A> =
     (this.setPlus(b)).k()
 }
 
-@instance
+@extension
 interface SetKMonoidInstance<A> : Monoid<SetK<A>>, SetKSemigroupInstance<A> {
   override fun empty(): SetK<A> = emptySet<A>().k()
 }
 
-@instance
+@extension
 interface SetKEqInstance<A> : Eq<SetK<A>> {
 
   fun EQ(): Eq<A>
@@ -34,13 +34,13 @@ interface SetKEqInstance<A> : Eq<SetK<A>> {
 
 }
 
-@instance
+@extension
 interface SetKShowInstance<A> : Show<SetK<A>> {
   override fun SetK<A>.show(): String =
     toString()
 }
 
-@instance
+@extension
 interface SetKFoldableInstance : Foldable<ForSetK> {
   override fun <A, B> Kind<ForSetK, A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
@@ -52,13 +52,13 @@ interface SetKFoldableInstance : Foldable<ForSetK> {
     fix().isEmpty()
 }
 
-@instance
+@extension
 interface SetKSemigroupKInstance : SemigroupK<ForSetK> {
   override fun <A> Kind<ForSetK, A>.combineK(y: Kind<ForSetK, A>): SetK<A> =
     fix().setCombineK(y)
 }
 
-@instance
+@extension
 interface SetKMonoidKInstance : MonoidK<ForSetK> {
   override fun <A> empty(): SetK<A> =
     SetK.empty()

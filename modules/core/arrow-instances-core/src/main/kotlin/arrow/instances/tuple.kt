@@ -5,20 +5,20 @@ import arrow.Kind2
 import arrow.core.*
 import arrow.core.Either.Left
 import arrow.core.Either.Right
-import arrow.instance
+import arrow.extension
 import arrow.typeclasses.*
 import arrow.instances.traverse as tuple2Traverse
 
 //TODO this should be user driven allowing consumers to generate the tuple arities on demand to avoid cluttering arrow dependents with unused code
 //TODO @arities(fromTupleN = 2, toTupleN = 22 | fromHListN = 1, toHListN = 22)
 
-@instance
+@extension
 interface Tuple2FunctorInstance<F> : Functor<Tuple2PartialOf<F>> {
   override fun <A, B> Kind<Tuple2PartialOf<F>, A>.map(f: (A) -> B) =
     fix().map(f)
 }
 
-@instance
+@extension
 interface Tuple2ApplicativeInstance<F> : Applicative<Tuple2PartialOf<F>>, Tuple2FunctorInstance<F> {
   fun MF(): Monoid<F>
 
@@ -32,7 +32,7 @@ interface Tuple2ApplicativeInstance<F> : Applicative<Tuple2PartialOf<F>>, Tuple2
     MF().empty() toT a
 }
 
-@instance
+@extension
 interface Tuple2MonadInstance<F> : Monad<Tuple2PartialOf<F>>, Tuple2ApplicativeInstance<F> {
 
   override fun MF(): Monoid<F>
@@ -55,7 +55,7 @@ interface Tuple2MonadInstance<F> : Monad<Tuple2PartialOf<F>>, Tuple2ApplicativeI
   }
 }
 
-@instance
+@extension
 interface Tuple2BifunctorInstance : Bifunctor<ForTuple2> {
   override fun <A, B, C, D> Kind2<ForTuple2, A, B>.bimap(
     fl: (A) -> C,
@@ -63,7 +63,7 @@ interface Tuple2BifunctorInstance : Bifunctor<ForTuple2> {
   ) = fix().bimap(fl, fr)
 }
 
-@instance
+@extension
 interface Tuple2ComonadInstance<F> : Comonad<Tuple2PartialOf<F>>, Tuple2FunctorInstance<F> {
   override fun <A, B> Kind<Tuple2PartialOf<F>, A>.coflatMap(f: (Kind<Tuple2PartialOf<F>, A>) -> B) =
     fix().coflatMap(f)
@@ -72,7 +72,7 @@ interface Tuple2ComonadInstance<F> : Comonad<Tuple2PartialOf<F>>, Tuple2FunctorI
     fix().extract()
 }
 
-@instance
+@extension
 interface Tuple2FoldableInstance<F> : Foldable<Tuple2PartialOf<F>> {
   override fun <A, B> Kind<Tuple2PartialOf<F>, A>.foldLeft(b: B, f: (B, A) -> B) =
     fix().foldL(b, f)
@@ -88,14 +88,14 @@ fun <F, G, A, B> Tuple2Of<F, A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G, B
 fun <F, G, A> Tuple2Of<F, Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, Tuple2<F, A>> =
   fix().tuple2Traverse(GA, ::identity)
 
-@instance
+@extension
 interface Tuple2TraverseInstance<F> : Traverse<Tuple2PartialOf<F>>, Tuple2FoldableInstance<F> {
 
   override fun <G, A, B> Tuple2Of<F, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Tuple2<F, B>> =
     tuple2Traverse(AP, f)
 }
 
-@instance
+@extension
 interface Tuple2MonoidInstance<A, B> : Monoid<Tuple2<A, B>> {
 
   fun MA(): Monoid<A>
@@ -111,7 +111,7 @@ interface Tuple2MonoidInstance<A, B> : Monoid<Tuple2<A, B>> {
   }
 }
 
-@instance
+@extension
 interface Tuple2EqInstance<A, B> : Eq<Tuple2<A, B>> {
 
   fun EQA(): Eq<A>
@@ -122,13 +122,13 @@ interface Tuple2EqInstance<A, B> : Eq<Tuple2<A, B>> {
     EQA().run { a.eqv(b.a) && EQB().run { this@eqv.b.eqv(b.b) } }
 }
 
-@instance
+@extension
 interface Tuple2ShowInstance<A, B> : Show<Tuple2<A, B>> {
   override fun Tuple2<A, B>.show(): String =
     toString()
 }
 
-@instance
+@extension
 interface Tuple3EqInstance<A, B, C> : Eq<Tuple3<A, B, C>> {
 
   fun EQA(): Eq<A>
@@ -143,13 +143,13 @@ interface Tuple3EqInstance<A, B, C> : Eq<Tuple3<A, B, C>> {
       && EQC().run { c.eqv(b.c) }
 }
 
-@instance
+@extension
 interface Tuple3ShowInstance<A, B, C> : Show<Tuple3<A, B, C>> {
   override fun Tuple3<A, B, C>.show(): String =
     toString()
 }
 
-@instance
+@extension
 interface Tuple4EqInstance<A, B, C, D> : Eq<Tuple4<A, B, C, D>> {
 
   fun EQA(): Eq<A>
@@ -167,13 +167,13 @@ interface Tuple4EqInstance<A, B, C, D> : Eq<Tuple4<A, B, C, D>> {
       && EQD().run { d.eqv(b.d) }
 }
 
-@instance
+@extension
 interface Tuple4ShowInstance<A, B, C, D> : Show<Tuple4<A, B, C, D>> {
   override fun Tuple4<A, B, C, D>.show(): String =
     toString()
 }
 
-@instance
+@extension
 interface Tuple5EqInstance<A, B, C, D, E> : Eq<Tuple5<A, B, C, D, E>> {
 
   fun EQA(): Eq<A>
@@ -195,13 +195,13 @@ interface Tuple5EqInstance<A, B, C, D, E> : Eq<Tuple5<A, B, C, D, E>> {
 
 }
 
-@instance
+@extension
 interface Tuple5ShowInstance<A, B, C, D, E> : Show<Tuple5<A, B, C, D, E>> {
   override fun Tuple5<A, B, C, D, E>.show(): String =
     toString()
 }
 
-@instance
+@extension
 interface Tuple6EqInstance<A, B, C, D, E, F> : Eq<Tuple6<A, B, C, D, E, F>> {
 
   fun EQA(): Eq<A>
@@ -226,13 +226,13 @@ interface Tuple6EqInstance<A, B, C, D, E, F> : Eq<Tuple6<A, B, C, D, E, F>> {
 
 }
 
-@instance
+@extension
 interface Tuple6ShowInstance<A, B, C, D, E, F> : Show<Tuple6<A, B, C, D, E, F>> {
   override fun Tuple6<A, B, C, D, E, F>.show(): String =
     toString()
 }
 
-@instance
+@extension
 interface Tuple7EqInstance<A, B, C, D, E, F, G> : Eq<Tuple7<A, B, C, D, E, F, G>> {
 
   fun EQA(): Eq<A>
@@ -260,13 +260,13 @@ interface Tuple7EqInstance<A, B, C, D, E, F, G> : Eq<Tuple7<A, B, C, D, E, F, G>
 
 }
 
-@instance
+@extension
 interface Tuple7ShowInstance<A, B, C, D, E, F, G> : Show<Tuple7<A, B, C, D, E, F, G>> {
   override fun Tuple7<A, B, C, D, E, F, G>.show(): String =
     toString()
 }
 
-@instance
+@extension
 interface Tuple8EqInstance<A, B, C, D, E, F, G, H> : Eq<Tuple8<A, B, C, D, E, F, G, H>> {
 
   fun EQA(): Eq<A>
@@ -297,13 +297,13 @@ interface Tuple8EqInstance<A, B, C, D, E, F, G, H> : Eq<Tuple8<A, B, C, D, E, F,
 
 }
 
-@instance
+@extension
 interface Tuple8ShowInstance<A, B, C, D, E, F, G, H> : Show<Tuple8<A, B, C, D, E, F, G, H>> {
   override fun Tuple8<A, B, C, D, E, F, G, H>.show(): String =
     toString()
 }
 
-@instance
+@extension
 interface Tuple9EqInstance<A, B, C, D, E, F, G, H, I> : Eq<Tuple9<A, B, C, D, E, F, G, H, I>> {
 
   fun EQA(): Eq<A>
@@ -337,13 +337,13 @@ interface Tuple9EqInstance<A, B, C, D, E, F, G, H, I> : Eq<Tuple9<A, B, C, D, E,
 
 }
 
-@instance
+@extension
 interface Tuple9ShowInstance<A, B, C, D, E, F, G, H, I> : Show<Tuple9<A, B, C, D, E, F, G, H, I>> {
   override fun Tuple9<A, B, C, D, E, F, G, H, I>.show(): String =
     toString()
 }
 
-@instance
+@extension
 interface Tuple10EqInstance<A, B, C, D, E, F, G, H, I, J> : Eq<Tuple10<A, B, C, D, E, F, G, H, I, J>> {
 
   fun EQA(): Eq<A>
@@ -380,7 +380,7 @@ interface Tuple10EqInstance<A, B, C, D, E, F, G, H, I, J> : Eq<Tuple10<A, B, C, 
 
 }
 
-@instance
+@extension
 interface Tuple10ShowInstance<A, B, C, D, E, F, G, H, I, J> : Show<Tuple10<A, B, C, D, E, F, G, H, I, J>> {
   override fun Tuple10<A, B, C, D, E, F, G, H, I, J>.show(): String =
     toString()

@@ -2,14 +2,14 @@ package arrow.mtl.instances
 
 import arrow.Kind
 import arrow.core.*
-import arrow.instance
+import arrow.extension
 import arrow.mtl.typeclasses.MonadFilter
 import arrow.mtl.typeclasses.TraverseFilter
 import arrow.typeclasses.Applicative
 import arrow.instances.traverse as optionTraverse
 import arrow.instances.traverseFilter as optionTraverseFilter
 
-@instance
+@extension
 interface OptionTraverseFilterInstance : TraverseFilter<ForOption> {
   override fun <A> Kind<ForOption, A>.filter(f: (A) -> Boolean): Option<A> =
     fix().filter(f)
@@ -42,7 +42,7 @@ interface OptionTraverseFilterInstance : TraverseFilter<ForOption> {
     fix().nonEmpty()
 }
 
-@instance
+@extension
 interface OptionMonadFilterInstance : MonadFilter<ForOption> {
   override fun <A> empty(): Option<A> =
     Option.empty()

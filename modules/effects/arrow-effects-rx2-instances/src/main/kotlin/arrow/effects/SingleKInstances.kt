@@ -3,17 +3,17 @@ package arrow.effects
 import arrow.Kind
 import arrow.core.Either
 import arrow.effects.typeclasses.*
-import arrow.instance
+import arrow.extension
 import arrow.typeclasses.*
 import kotlin.coroutines.experimental.CoroutineContext
 
-@instance
+@extension
 interface SingleKFunctorInstance : Functor<ForSingleK> {
   override fun <A, B> Kind<ForSingleK, A>.map(f: (A) -> B): SingleK<B> =
     fix().map(f)
 }
 
-@instance
+@extension
 interface SingleKApplicativeInstance : Applicative<ForSingleK> {
   override fun <A, B> SingleKOf<A>.ap(ff: SingleKOf<(A) -> B>): SingleK<B> =
     fix().ap(ff)
@@ -25,7 +25,7 @@ interface SingleKApplicativeInstance : Applicative<ForSingleK> {
     SingleK.just(a)
 }
 
-@instance
+@extension
 interface SingleKMonadInstance : Monad<ForSingleK> {
   override fun <A, B> SingleKOf<A>.ap(ff: SingleKOf<(A) -> B>): SingleK<B> =
     fix().ap(ff)
@@ -43,7 +43,7 @@ interface SingleKMonadInstance : Monad<ForSingleK> {
     SingleK.just(a)
 }
 
-@instance
+@extension
 interface SingleKApplicativeErrorInstance :
   ApplicativeError<ForSingleK, Throwable>,
   SingleKApplicativeInstance {
@@ -54,7 +54,7 @@ interface SingleKApplicativeErrorInstance :
     fix().handleErrorWith { f(it).fix() }
 }
 
-@instance
+@extension
 interface SingleKMonadErrorInstance :
   MonadError<ForSingleK, Throwable>,
   SingleKMonadInstance {
@@ -65,7 +65,7 @@ interface SingleKMonadErrorInstance :
     fix().handleErrorWith { f(it).fix() }
 }
 
-@instance
+@extension
 interface SingleKMonadDeferInstance :
   MonadDefer<ForSingleK>,
   SingleKMonadErrorInstance {
@@ -73,7 +73,7 @@ interface SingleKMonadDeferInstance :
     SingleK.defer(fa)
 }
 
-@instance
+@extension
 interface SingleKAsyncInstance :
   Async<ForSingleK>,
   SingleKMonadDeferInstance {
@@ -84,7 +84,7 @@ interface SingleKAsyncInstance :
     fix().continueOn(ctx)
 }
 
-@instance
+@extension
 interface SingleKEffectInstance :
   Effect<ForSingleK>,
   SingleKAsyncInstance {
@@ -92,7 +92,7 @@ interface SingleKEffectInstance :
     fix().runAsync(cb)
 }
 
-@instance
+@extension
 interface SingleKConcurrentEffectInstance : ConcurrentEffect<ForSingleK>, SingleKEffectInstance {
   override fun <A> Kind<ForSingleK, A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> SingleKOf<Unit>): SingleK<Disposable> =
     fix().runAsyncCancellable(cb)

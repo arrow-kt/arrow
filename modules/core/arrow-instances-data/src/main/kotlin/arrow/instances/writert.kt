@@ -7,17 +7,17 @@ import arrow.data.WriterT
 import arrow.data.WriterTOf
 import arrow.data.WriterTPartialOf
 import arrow.data.fix
-import arrow.instance
+import arrow.extension
 import arrow.typeclasses.*
 
-@instance
+@extension
 interface WriterTFunctorInstance<F, W> : Functor<WriterTPartialOf<F, W>> {
   fun FF(): Functor<F>
 
   override fun <A, B> Kind<WriterTPartialOf<F, W>, A>.map(f: (A) -> B): WriterT<F, W, B> = fix().map(FF()) { f(it) }
 }
 
-@instance
+@extension
 interface WriterTApplicativeInstance<F, W> : Applicative<WriterTPartialOf<F, W>>, WriterTFunctorInstance<F, W> {
 
   fun MF(): Monad<F>
@@ -36,7 +36,7 @@ interface WriterTApplicativeInstance<F, W> : Applicative<WriterTPartialOf<F, W>>
     fix().map(FF()) { f(it) }
 }
 
-@instance
+@extension
 interface WriterTMonadInstance<F, W> : Monad<WriterTPartialOf<F, W>>, WriterTApplicativeInstance<F, W> {
 
   override fun MF(): Monad<F>
@@ -56,7 +56,7 @@ interface WriterTMonadInstance<F, W> : Monad<WriterTPartialOf<F, W>>, WriterTApp
     fix().ap(MF(), MM(), ff)
 }
 
-@instance
+@extension
 interface WriterTSemigroupKInstance<F, W> : SemigroupK<WriterTPartialOf<F, W>> {
 
   fun SS(): SemigroupK<F>
@@ -65,7 +65,7 @@ interface WriterTSemigroupKInstance<F, W> : SemigroupK<WriterTPartialOf<F, W>> {
     fix().combineK(SS(), y)
 }
 
-@instance
+@extension
 interface WriterTMonoidKInstance<F, W> : MonoidK<WriterTPartialOf<F, W>>, WriterTSemigroupKInstance<F, W> {
 
   fun MF(): MonoidK<F>

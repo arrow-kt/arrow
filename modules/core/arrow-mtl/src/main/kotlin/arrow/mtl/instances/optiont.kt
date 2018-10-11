@@ -6,7 +6,7 @@ import arrow.data.OptionT
 import arrow.data.OptionTPartialOf
 import arrow.data.fix
 import arrow.data.mapFilter
-import arrow.instance
+import arrow.extension
 import arrow.instances.OptionTFunctorInstance
 import arrow.instances.OptionTMonadInstance
 import arrow.instances.OptionTMonoidKInstance
@@ -17,7 +17,7 @@ import arrow.mtl.typeclasses.FunctorFilter
 import arrow.mtl.typeclasses.TraverseFilter
 import arrow.typeclasses.*
 
-@instance
+@extension
 interface OptionTFunctorFilterInstance<F> : FunctorFilter<OptionTPartialOf<F>>, OptionTFunctorInstance<F> {
 
   override fun FF(): Functor<F>
@@ -26,7 +26,7 @@ interface OptionTFunctorFilterInstance<F> : FunctorFilter<OptionTPartialOf<F>>, 
     fix().mapFilter(FF(), f)
 }
 
-@instance
+@extension
 interface OptionTTraverseFilterInstance<F> :
   TraverseFilter<OptionTPartialOf<F>>,
   OptionTTraverseInstance<F> {

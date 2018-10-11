@@ -2,13 +2,13 @@ package arrow.mtl.instances
 
 import arrow.Kind
 import arrow.core.Option
-import arrow.instance
+import arrow.extension
 import arrow.instances.ConstApplicativeInstance
 import arrow.instances.ConstTraverseInstance
 import arrow.mtl.typeclasses.TraverseFilter
 import arrow.typeclasses.*
 
-@instance
+@extension
 interface ConstTraverseFilterInstance<X> : TraverseFilter<ConstPartialOf<X>>, ConstTraverseInstance<X> {
 
   override fun <T, U> Kind<ConstPartialOf<X>, T>.map(f: (T) -> U): Const<X, U> = fix().retag()

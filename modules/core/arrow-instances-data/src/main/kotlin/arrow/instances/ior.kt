@@ -5,21 +5,21 @@ import arrow.Kind2
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.data.*
-import arrow.instance
+import arrow.extension
 import arrow.typeclasses.*
 
-@instance
+@extension
 interface IorFunctorInstance<L> : Functor<IorPartialOf<L>> {
   override fun <A, B> Kind<IorPartialOf<L>, A>.map(f: (A) -> B): Ior<L, B> = fix().map(f)
 }
 
-@instance
+@extension
 interface IorBifunctorInstance : Bifunctor<ForIor> {
   override fun <A, B, C, D> Kind2<ForIor, A, B>.bimap(fl: (A) -> C, fr: (B) -> D): Kind2<ForIor, C, D> =
     fix().bimap(fl, fr)
 }
 
-@instance
+@extension
 interface IorApplicativeInstance<L> : Applicative<IorPartialOf<L>>, IorFunctorInstance<L> {
 
   fun SL(): Semigroup<L>
@@ -32,7 +32,7 @@ interface IorApplicativeInstance<L> : Applicative<IorPartialOf<L>>, IorFunctorIn
     fix().ap(SL(), ff)
 }
 
-@instance
+@extension
 interface IorMonadInstance<L> : Monad<IorPartialOf<L>>, IorApplicativeInstance<L> {
 
   override fun SL(): Semigroup<L>
@@ -50,7 +50,7 @@ interface IorMonadInstance<L> : Monad<IorPartialOf<L>>, IorApplicativeInstance<L
 
 }
 
-@instance
+@extension
 interface IorFoldableInstance<L> : Foldable<IorPartialOf<L>> {
 
   override fun <B, C> Kind<IorPartialOf<L>, B>.foldLeft(b: C, f: (C, B) -> C): C = fix().foldLeft(b, f)
@@ -60,7 +60,7 @@ interface IorFoldableInstance<L> : Foldable<IorPartialOf<L>> {
 
 }
 
-@instance
+@extension
 interface IorTraverseInstance<L> : Traverse<IorPartialOf<L>>, IorFoldableInstance<L> {
 
   override fun <G, B, C> IorOf<L, B>.traverse(AP: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, Ior<L, C>> =
@@ -68,7 +68,7 @@ interface IorTraverseInstance<L> : Traverse<IorPartialOf<L>>, IorFoldableInstanc
 
 }
 
-@instance
+@extension
 interface IorEqInstance<L, R> : Eq<Ior<L, R>> {
 
   fun EQL(): Eq<L>
@@ -95,7 +95,7 @@ interface IorEqInstance<L, R> : Eq<Ior<L, R>> {
   }
 }
 
-@instance
+@extension
 interface IorShowInstance<L, R> : Show<Ior<L, R>> {
   override fun Ior<L, R>.show(): String =
     toString()

@@ -7,17 +7,17 @@ import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Effect
 import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
-import arrow.instance
+import arrow.extension
 import arrow.typeclasses.*
 import kotlin.coroutines.experimental.CoroutineContext
 
-@instance
+@extension
 interface MaybeKFunctorInstance : Functor<ForMaybeK> {
   override fun <A, B> Kind<ForMaybeK, A>.map(f: (A) -> B): MaybeK<B> =
     fix().map(f)
 }
 
-@instance
+@extension
 interface MaybeKApplicativeInstance : Applicative<ForMaybeK> {
   override fun <A, B> MaybeKOf<A>.ap(ff: MaybeKOf<(A) -> B>): MaybeK<B> =
     fix().ap(ff)
@@ -29,7 +29,7 @@ interface MaybeKApplicativeInstance : Applicative<ForMaybeK> {
     MaybeK.just(a)
 }
 
-@instance
+@extension
 interface MaybeKMonadInstance : Monad<ForMaybeK> {
   override fun <A, B> MaybeKOf<A>.ap(ff: MaybeKOf<(A) -> B>): MaybeK<B> =
     fix().ap(ff)
@@ -47,7 +47,7 @@ interface MaybeKMonadInstance : Monad<ForMaybeK> {
     MaybeK.just(a)
 }
 
-@instance
+@extension
 interface MaybeKFoldableInstance : Foldable<ForMaybeK> {
 
   override fun <A, B> Kind<ForMaybeK, A>.foldLeft(b: B, f: (B, A) -> B): B =
@@ -69,7 +69,7 @@ interface MaybeKFoldableInstance : Foldable<ForMaybeK> {
     fix().nonEmpty()
 }
 
-@instance
+@extension
 interface MaybeKApplicativeErrorInstance :
   ApplicativeError<ForMaybeK, Throwable>,
   MaybeKApplicativeInstance {
@@ -80,7 +80,7 @@ interface MaybeKApplicativeErrorInstance :
     fix().handleErrorWith { f(it).fix() }
 }
 
-@instance
+@extension
 interface MaybeKMonadErrorInstance :
   MonadError<ForMaybeK, Throwable>,
   MaybeKMonadInstance {
@@ -91,7 +91,7 @@ interface MaybeKMonadErrorInstance :
     fix().handleErrorWith { f(it).fix() }
 }
 
-@instance
+@extension
 interface MaybeKMonadDeferInstance :
   MonadDefer<ForMaybeK>,
   MaybeKMonadErrorInstance {
@@ -99,7 +99,7 @@ interface MaybeKMonadDeferInstance :
     MaybeK.defer(fa)
 }
 
-@instance
+@extension
 interface MaybeKAsyncInstance :
   Async<ForMaybeK>,
   MaybeKMonadDeferInstance {
@@ -110,7 +110,7 @@ interface MaybeKAsyncInstance :
     fix().continueOn(ctx)
 }
 
-@instance
+@extension
 interface MaybeKEffectInstance :
   Effect<ForMaybeK>,
   MaybeKAsyncInstance {

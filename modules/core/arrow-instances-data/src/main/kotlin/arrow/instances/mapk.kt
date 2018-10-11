@@ -3,16 +3,16 @@ package arrow.instances
 import arrow.Kind
 import arrow.core.Eval
 import arrow.data.*
-import arrow.instance
+import arrow.extension
 import arrow.instances.syntax.setk.eq.eq
 import arrow.typeclasses.*
 
-@instance
+@extension
 interface MapKFunctorInstance<K> : Functor<MapKPartialOf<K>> {
   override fun <A, B> Kind<MapKPartialOf<K>, A>.map(f: (A) -> B): MapK<K, B> = fix().map(f)
 }
 
-@instance
+@extension
 interface MapKFoldableInstance<K> : Foldable<MapKPartialOf<K>> {
 
   override fun <A, B> Kind<MapKPartialOf<K>, A>.foldLeft(b: B, f: (B, A) -> B): B = fix().foldLeft(b, f)
@@ -21,14 +21,14 @@ interface MapKFoldableInstance<K> : Foldable<MapKPartialOf<K>> {
     fix().foldRight(lb, f)
 }
 
-@instance
+@extension
 interface MapKTraverseInstance<K> : Traverse<MapKPartialOf<K>>, MapKFoldableInstance<K> {
 
   override fun <G, A, B> MapKOf<K, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, MapKOf<K, B>> =
     fix().traverse(AP, f)
 }
 
-@instance
+@extension
 interface MapKSemigroupInstance<K, A> : Semigroup<MapK<K, A>> {
 
   fun SG(): Semigroup<A>
@@ -40,7 +40,7 @@ interface MapKSemigroupInstance<K, A> : Semigroup<MapK<K, A>> {
 
 }
 
-@instance
+@extension
 interface MapKMonoidInstance<K, A> : Monoid<MapK<K, A>>, MapKSemigroupInstance<K, A> {
 
   override fun SG(): Semigroup<A>
@@ -48,7 +48,7 @@ interface MapKMonoidInstance<K, A> : Monoid<MapK<K, A>>, MapKSemigroupInstance<K
   override fun empty(): MapK<K, A> = emptyMap<K, A>().k()
 }
 
-@instance
+@extension
 interface MapKEqInstance<K, A> : Eq<MapK<K, A>> {
 
   fun EQK(): Eq<K>
@@ -66,7 +66,7 @@ interface MapKEqInstance<K, A> : Eq<MapK<K, A>> {
 
 }
 
-@instance
+@extension
 interface MapKShowInstance<K, A> : Show<MapK<K, A>> {
   override fun MapK<K, A>.show(): String =
     toString()

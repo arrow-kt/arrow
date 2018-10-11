@@ -9,18 +9,18 @@ import arrow.effects.syntax.flowablek.monad.monad
 import arrow.effects.syntax.flowablek.monadDefer.monadDefer
 import arrow.effects.syntax.flowablek.monadError.monadError
 import arrow.effects.typeclasses.*
-import arrow.instance
+import arrow.extension
 import arrow.typeclasses.*
 import io.reactivex.BackpressureStrategy
 import kotlin.coroutines.experimental.CoroutineContext
 
-@instance
+@extension
 interface FlowableKFunctorInstance : Functor<ForFlowableK> {
   override fun <A, B> Kind<ForFlowableK, A>.map(f: (A) -> B): FlowableK<B> =
     fix().map(f)
 }
 
-@instance
+@extension
 interface FlowableKApplicativeInstance : Applicative<ForFlowableK> {
   override fun <A, B> FlowableKOf<A>.ap(ff: FlowableKOf<(A) -> B>): FlowableK<B> =
     fix().ap(ff)
@@ -32,7 +32,7 @@ interface FlowableKApplicativeInstance : Applicative<ForFlowableK> {
     FlowableK.just(a)
 }
 
-@instance
+@extension
 interface FlowableKMonadInstance : Monad<ForFlowableK> {
   override fun <A, B> FlowableKOf<A>.ap(ff: FlowableKOf<(A) -> B>): FlowableK<B> =
     fix().ap(ff)
@@ -50,7 +50,7 @@ interface FlowableKMonadInstance : Monad<ForFlowableK> {
     FlowableK.just(a)
 }
 
-@instance
+@extension
 interface FlowableKFoldableInstance : Foldable<ForFlowableK> {
   override fun <A, B> Kind<ForFlowableK, A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
@@ -59,7 +59,7 @@ interface FlowableKFoldableInstance : Foldable<ForFlowableK> {
     fix().foldRight(lb, f)
 }
 
-@instance
+@extension
 interface FlowableKTraverseInstance : Traverse<ForFlowableK> {
   override fun <A, B> Kind<ForFlowableK, A>.map(f: (A) -> B): FlowableK<B> =
     fix().map(f)
@@ -74,7 +74,7 @@ interface FlowableKTraverseInstance : Traverse<ForFlowableK> {
     fix().foldRight(lb, f)
 }
 
-@instance
+@extension
 interface FlowableKApplicativeErrorInstance :
   ApplicativeError<ForFlowableK, Throwable>,
   FlowableKApplicativeInstance {
@@ -85,7 +85,7 @@ interface FlowableKApplicativeErrorInstance :
     fix().handleErrorWith { f(it).fix() }
 }
 
-@instance
+@extension
 interface FlowableKMonadErrorInstance :
   MonadError<ForFlowableK, Throwable>,
   FlowableKMonadInstance {
@@ -96,7 +96,7 @@ interface FlowableKMonadErrorInstance :
     fix().handleErrorWith { f(it).fix() }
 }
 
-@instance
+@extension
 interface FlowableKMonadDeferInstance :
   MonadDefer<ForFlowableK>,
   FlowableKMonadErrorInstance {
@@ -106,7 +106,7 @@ interface FlowableKMonadDeferInstance :
   fun BS(): BackpressureStrategy = BackpressureStrategy.BUFFER
 }
 
-@instance
+@extension
 interface FlowableKAsyncInstance :
   Async<ForFlowableK>,
   FlowableKMonadDeferInstance {
@@ -117,7 +117,7 @@ interface FlowableKAsyncInstance :
     fix().continueOn(ctx)
 }
 
-@instance
+@extension
 interface FlowableKEffectInstance :
   Effect<ForFlowableK>,
   FlowableKAsyncInstance {
@@ -125,7 +125,7 @@ interface FlowableKEffectInstance :
     fix().runAsync(cb)
 }
 
-@instance
+@extension
 interface FlowableKConcurrentEffectInstance : ConcurrentEffect<ForFlowableK>, FlowableKEffectInstance {
   override fun <A> Kind<ForFlowableK, A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> FlowableKOf<Unit>): FlowableK<Disposable> =
     fix().runAsyncCancellable(cb)

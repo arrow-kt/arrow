@@ -3,7 +3,7 @@ package arrow.recursion.instances
 import arrow.Kind
 import arrow.core.Eval
 import arrow.core.Eval.Now
-import arrow.instance
+import arrow.extension
 import arrow.typeclasses.Functor
 import arrow.recursion.Coalgebra
 import arrow.recursion.data.ForNu
@@ -13,7 +13,7 @@ import arrow.recursion.typeclasses.Birecursive
 import arrow.recursion.typeclasses.Corecursive
 import arrow.recursion.typeclasses.Recursive
 
-@instance
+@extension
 interface NuBirecursiveInstance : Birecursive<ForNu> {
   override fun <F> Functor<F>.projectT(tf: Kind<ForNu, F>): Kind<F, Nu<F>> {
     val fix = tf.fix()
@@ -28,8 +28,8 @@ interface NuBirecursiveInstance : Birecursive<ForNu> {
     Nu(a, coalg)
 }
 
-@instance
+@extension
 interface NuRecursiveInstance : Recursive<ForNu>, NuBirecursiveInstance
 
-@instance
+@extension
 interface NuCorecursiveInstance : Corecursive<ForNu>, NuBirecursiveInstance

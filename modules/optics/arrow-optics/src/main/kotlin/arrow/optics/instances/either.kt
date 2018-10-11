@@ -3,7 +3,7 @@ package arrow.optics.instances
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.fix
-import arrow.instance
+import arrow.extension
 import arrow.instances.syntax.either.traverse.traverse
 import arrow.optics.Traversal
 import arrow.optics.typeclasses.Each
@@ -24,7 +24,7 @@ fun <L, R> Either.Companion.traversal(): Traversal<Either<L, R>, R> = object : T
 /**
  * [Each] instance for [Either] that has focus in each [Either.Right].
  */
-@instance
+@extension
 interface EitherEachInstance<L, R> : Each<Either<L, R>, R> {
   override fun each(): Traversal<Either<L, R>, R> =
     Either.traversal()

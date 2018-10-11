@@ -4,11 +4,11 @@ import arrow.Kind
 import arrow.core.Function1
 import arrow.core.Function1PartialOf
 import arrow.core.fix
-import arrow.instance
+import arrow.extension
 import arrow.instances.Function1MonadInstance
 import arrow.mtl.typeclasses.MonadReader
 
-@instance
+@extension
 interface Function1MonadReaderInstance<I> : MonadReader<Function1PartialOf<I>, I>, Function1MonadInstance<I> {
 
   override fun ask(): Function1<I, I> = Function1.ask()

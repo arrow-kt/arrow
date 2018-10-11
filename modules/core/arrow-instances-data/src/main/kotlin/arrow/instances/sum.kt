@@ -4,11 +4,11 @@ import arrow.Kind
 import arrow.data.Sum
 import arrow.data.SumPartialOf
 import arrow.data.fix
-import arrow.instance
+import arrow.extension
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Functor
 
-@instance
+@extension
 interface ComonadSumInstance<F, G> : Comonad<SumPartialOf<F, G>> {
 
   fun CF(): Comonad<F>
@@ -25,7 +25,7 @@ interface ComonadSumInstance<F, G> : Comonad<SumPartialOf<F, G>> {
       fix().map(CF(), CG(), f)
 }
 
-@instance
+@extension
 interface FunctorSumInstance<F, G> : Functor<SumPartialOf<F, G>> {
 
   fun FF(): Functor<F>

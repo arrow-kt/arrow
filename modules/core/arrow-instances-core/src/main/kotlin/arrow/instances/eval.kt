@@ -2,16 +2,16 @@ package arrow.instances
 
 import arrow.Kind
 import arrow.core.*
-import arrow.instance
+import arrow.extension
 import arrow.typeclasses.*
 
-@instance
+@extension
 interface EvalFunctorInstance : Functor<ForEval> {
   override fun <A, B> Kind<ForEval, A>.map(f: (A) -> B): Eval<B> =
     fix().map(f)
 }
 
-@instance
+@extension
 interface EvalApplicativeInstance : Applicative<ForEval> {
   override fun <A, B> Kind<ForEval, A>.ap(ff: Kind<ForEval, (A) -> B>): Eval<B> =
     fix().ap(ff)
@@ -23,7 +23,7 @@ interface EvalApplicativeInstance : Applicative<ForEval> {
     Eval.just(a)
 }
 
-@instance
+@extension
 interface EvalMonadInstance : Monad<ForEval> {
   override fun <A, B> Kind<ForEval, A>.ap(ff: Kind<ForEval, (A) -> B>): Eval<B> =
     fix().ap(ff)
@@ -41,7 +41,7 @@ interface EvalMonadInstance : Monad<ForEval> {
     Eval.just(a)
 }
 
-@instance
+@extension
 interface EvalComonadInstance : Comonad<ForEval> {
   override fun <A, B> Kind<ForEval, A>.coflatMap(f: (Kind<ForEval, A>) -> B): Eval<B> =
     fix().coflatMap(f)
@@ -53,7 +53,7 @@ interface EvalComonadInstance : Comonad<ForEval> {
     fix().map(f)
 }
 
-@instance
+@extension
 interface EvalBimonadInstance : Bimonad<ForEval> {
   override fun <A, B> Kind<ForEval, A>.ap(ff: Kind<ForEval, (A) -> B>): Eval<B> =
     fix().ap(ff)
