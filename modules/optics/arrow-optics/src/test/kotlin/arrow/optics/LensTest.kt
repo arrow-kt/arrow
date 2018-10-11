@@ -1,9 +1,7 @@
 package arrow.optics
 
 import arrow.core.*
-import arrow.data.ListK
-import arrow.data.eq
-import arrow.data.k
+import arrow.data.*
 import arrow.instances.monoid
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
@@ -186,11 +184,42 @@ class LensTest : UnitSpec() {
     }
 
     "Creating a second pair with a type should result in the value target" {
-      val first = tokenLens.second<Int>()
+      val second = tokenLens.second<Int>()
       forAll(Gen.int(), TokenGen) { int: Int, token: Token ->
-        first.get(int toT token) == int toT token.value
+        second.get(int toT token) == int toT token.value
       }
     }
+
+    "Asking for the focus in a Reader" {
+      forAll(TokenGen) { token: Token ->
+        tokenLens.ask().runId(token) == token.value
+      }
+    }
+
+    "toReader is an alias for ask" {
+      forAll(TokenGen) { token: Token ->
+        tokenLens.ask().runId(token) == tokenLens.toReader().runId(token)
+      }
+    }
+
+    "Asks with f is the same as applying f to the focus of the lens" {
+      forAll(TokenGen, genFunctionAToB<String, String>(Gen.string())) { token, f ->
+        tokenLens.asks(f).runId(token) == f(token.value)
+      }
+    }
+
   }
 
+}
+
+fun main(args: Array<String>) {
+
+  val reader: Reader<NonEmptyList<String>, String> = NonEmptyList.head<String>().asGetter().ask()
+
+  reader
+    .map(String::toUpperCase)
+    .runId(NonEmptyList("Hello", "World", "Viewed", "With", "Optics"))
+
+  NonEmptyList.head<String>().asGetter().asks(String::toUpperCase)
+    .runId(NonEmptyList("Hello", "World", "Viewed", "With", "Optics"))
 }
