@@ -7,6 +7,7 @@ import arrow.core.Left
 import arrow.core.Right
 import arrow.core.identity
 import arrow.effects.CoroutineContextRx2Scheduler.asScheduler
+import arrow.effects.internal.IOConnection
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.Proc
@@ -102,7 +103,7 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
 
     fun <A> runAsync(fa: Proc<A>): ObservableK<A> =
       Observable.create { emitter: ObservableEmitter<A> ->
-        fa { either: Either<Throwable, A> ->
+        fa(IOConnection()) { either: Either<Throwable, A> ->
           either.fold({
             emitter.onError(it)
           }, {

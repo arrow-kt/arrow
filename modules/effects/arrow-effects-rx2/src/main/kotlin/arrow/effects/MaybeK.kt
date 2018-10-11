@@ -2,6 +2,7 @@ package arrow.effects
 
 import arrow.core.*
 import arrow.effects.CoroutineContextRx2Scheduler.asScheduler
+import arrow.effects.internal.IOConnection
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
@@ -84,7 +85,7 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
 
     fun <A> async(fa: Proc<A>): MaybeK<A> =
       Maybe.create { emitter: MaybeEmitter<A> ->
-        fa { either: Either<Throwable, A> ->
+        fa(IOConnection()) { either: Either<Throwable, A> ->
           either.fold({
             emitter.onError(it)
           }, {

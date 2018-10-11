@@ -7,6 +7,7 @@ import arrow.core.Left
 import arrow.core.Right
 import arrow.core.identity
 import arrow.effects.CoroutineContextReactorScheduler.asScheduler
+import arrow.effects.internal.IOConnection
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.Proc
@@ -103,7 +104,7 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
 
     fun <A> runAsync(fa: Proc<A>): FluxK<A> =
       Flux.create { emitter: FluxSink<A> ->
-        fa { either: Either<Throwable, A> ->
+        fa(IOConnection()) { either: Either<Throwable, A> ->
           either.fold({
             emitter.error(it)
           }, {

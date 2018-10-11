@@ -6,6 +6,7 @@ import arrow.core.Right
 import arrow.core.Try
 import arrow.core.andThen
 import arrow.core.identity
+import arrow.effects.internal.IOConnection
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.Proc
