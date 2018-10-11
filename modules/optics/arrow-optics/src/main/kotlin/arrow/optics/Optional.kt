@@ -2,6 +2,8 @@ package arrow.optics
 
 import arrow.Kind
 import arrow.core.*
+import arrow.data.State
+import arrow.data.map
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Monoid
@@ -263,4 +265,57 @@ interface POptional<S, T, A, B> : POptionalOf<S, T, A, B> {
    * Check if there is no focus or the target satisfies the predicate [p]
    */
   fun all(s: S, p: (A) -> Boolean): Boolean = getOption(s).fold({ true }, p)
+
+  /**
+   * Extracts the focus [A] viewed through the [POptional].
+   */
+  fun extract(): State<S, Option<A>> = State { s -> Tuple2(s, getOption(s)) }
+
+  /**
+   * Transforms a [POptional] into a [State].
+   * Alias for [extract].
+   */
+  fun toState(): State<S, Option<A>> = extract()
+
+  /**
+   * Extracts the focus [A] viewed through the [POptional] and applies [f] to it.
+   */
+  fun <C> extracts(f: (A) -> C): State<S, Option<C>> = extract().map { it.map(f) }
+
 }
+
+/**
+ * Modify the focus [A] viewed through the [Optional] and returns its *new* value.
+ */
+fun <S, A> Optional<S, A>.mod(f: (A) -> A): State<S, Option<A>> =
+  modo(f).map { it.map(f) }
+
+/**
+ * Modify the focus [A] viewed through the [Optional] and returns its *old* value.
+ */
+fun <S, A> Optional<S, A>.modo(f: (A) -> A): State<S, Option<A>> =
+  State { s -> Tuple2(modify(s, f), getOption(s)) }
+
+/**
+ * Modify the focus [A] viewed through the [Optional] and ignores both values.
+ */
+fun <S, A> Optional<S, A>.mod_(f: (A) -> A): State<S, Unit> =
+  State { s -> Tuple2(modify(s, f), kotlin.Unit) }
+
+/**
+ * Set the focus [A] viewed through the [Optional] and returns its *new* value.
+ */
+fun <S, A> Optional<S, A>.assign(a: A): State<S, Option<A>> =
+  mod { _ -> a }
+
+/**
+ * Set the value focus [A] through the [Optional] and returns its *old* value.
+ */
+fun <S, A> Optional<S, A>.assigno(a: A): State<S, Option<A>> =
+  modo { _ -> a }
+
+/**
+ * Set the focus [A] viewed through the [Optional] and ignores both values.
+ */
+fun <S, A> Optional<S, A>.assign_(a: A): State<S, Unit> =
+  mod_ { _ -> a }

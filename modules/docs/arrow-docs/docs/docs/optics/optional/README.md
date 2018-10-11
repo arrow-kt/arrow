@@ -64,6 +64,38 @@ val liftedF = ListK.head<Int>().liftF(Try.applicative()) { head ->
 liftedF(listOf(1, 3, 6).k())
 ```
 
+There are also some convenience methods to make working with [State]({{ '/docs/datatypes/state' | relative_url }}) easier.
+This can make working with nested structures in stateful computations significantly more elegant.
+
+For following domain we can easily create stateful computation with almost no boilerplate.
+
+```kotlin:ank
+data class HealthPack(val amountLeft: Int)
+object OutOfPacks
+data class Inventory(val item: Either<OutOfPacks, HealthPack>)
+
+val healthPack: Optional<Inventory, HealthPack> = Optional(
+  getOrModify = { player -> player.item.fold({ player.left() }, { it.right() }) },
+  set = { healthPack -> { player -> player.copy(item = healthPack.right()) } }
+)
+
+val inv = Inventory(HealthPack(50).right())
+
+val inspect = healthPack.extract()
+inspect.run(inv)
+```
+```kotlin:ank
+inspect.run(Inventory(OutOfPacks.left()))
+```
+```kotlin:ank
+val useHealthPack = healthPack.mod { it.copy(amountLeft = it.amountLeft - 50) }
+useHealthPack.run(inv)
+```
+```kotlin:ank
+val pickUpNew = healthPack.assign_(HealthPack(100))
+pickUpNew.run(inv)
+```
+
 An `Optional` instance can be manually constructed from any default or custom `Iso`, `Lens` or `Prism` instance by calling their `asOptional()` or by creating a custom `Optional` instance as shown above.
 
 ### Composition
