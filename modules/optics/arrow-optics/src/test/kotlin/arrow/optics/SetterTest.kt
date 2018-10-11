@@ -1,6 +1,7 @@
 package arrow.optics
 
 import arrow.core.*
+import arrow.data.*
 import arrow.instances.option.functor.functor
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
@@ -59,5 +60,24 @@ class SetterTest : UnitSpec() {
         tokenSetter.modify(token) { value } == tokenSetter.lift { value }(token)
       }
     }
+
+    "mod_ f should be as modify f within State and returning Unit" {
+      forAll(TokenGen, genFunctionAToB<String, String>(Gen.string())) { token, f ->
+        tokenSetter.mod_(f).run(token) ==
+          State { token: Token ->
+            tokenSetter.modify(token, f) toT Unit
+          }.run(token)
+      }
+    }
+
+    "assign_ f should be as modify f within State and returning Unit" {
+      forAll(TokenGen, Gen.string()) { token, string ->
+        tokenSetter.assign_(string).run(token) ==
+          State { token: Token ->
+            tokenSetter.set(token, string) toT Unit
+          }.run(token)
+      }
+    }
+
   }
 }

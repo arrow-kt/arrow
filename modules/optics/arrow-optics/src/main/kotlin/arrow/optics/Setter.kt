@@ -2,6 +2,8 @@ package arrow.optics
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.core.Tuple2
+import arrow.data.State
 import arrow.higherkind
 import arrow.typeclasses.Functor
 
@@ -74,6 +76,11 @@ interface PSetter<S, T, A, B> : PSetterOf<S, T, A, B> {
   }
 
   /**
+   * Lift a function [f]: `(A) -> B to the context of `S`: `(S) -> T`
+   */
+  fun lift(f: (A) -> B): (S) -> T = { s -> modify(s) { f(it) } }
+
+  /**
    * Join two [PSetter] with the same target
    */
   infix fun <U, V> choice(other: PSetter<U, V, A, B>): PSetter<Either<S, U>, Either<T, V>, A, B> = PSetter { f ->
@@ -130,8 +137,13 @@ interface PSetter<S, T, A, B> : PSetterOf<S, T, A, B> {
 }
 
 /**
- * Lift a function [f]: `(A) -> B to the context of `S`: `(S) -> T`
+ * Modify the focus [A] referenced through the [Setter].
  */
-inline fun <S, T, A, B> PSetter<S, T, A, B>.lift(crossinline f: (A) -> B): (S) -> T = { s ->
-  modify(s) { f(it) }
-}
+fun <S, A> Setter<S, A>.mod_(f: (A) -> A): State<S, Unit> =
+  State { s -> Tuple2(modify(s, f), Unit) }
+
+/**
+ * Set the focus [A] referenced through the [Setter].
+ */
+fun <S, A> Setter<S, A>.assign_(a: A): State<S, Unit> =
+  mod_{ _ -> a }

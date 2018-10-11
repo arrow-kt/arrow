@@ -267,7 +267,7 @@ class LensTest : UnitSpec() {
       }
     }
 
-    "modo f should be same as modify f within State and returning old state" {
+    "assigno f should be same as modify f within State and returning old state" {
       forAll(TokenGen, Gen.string()) { token, string ->
         tokenLens.assigno(string).run(token) ==
           State { token: Token ->
@@ -276,7 +276,7 @@ class LensTest : UnitSpec() {
       }
     }
 
-    "mod_ f should be as modify f within State and returning Unit" {
+    "assign_ f should be as modify f within State and returning Unit" {
       forAll(TokenGen, Gen.string()) { token, string ->
         tokenLens.assign_(string).run(token) ==
           State { token: Token ->
