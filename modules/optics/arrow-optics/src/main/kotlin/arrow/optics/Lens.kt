@@ -2,8 +2,7 @@ package arrow.optics
 
 import arrow.Kind
 import arrow.core.*
-import arrow.data.Reader
-import arrow.data.map
+import arrow.data.*
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Functor
@@ -246,3 +245,57 @@ interface PLens<S, T, A, B> : PLensOf<S, T, A, B> {
   fun <C> asks(f: (A) -> C): Reader<S, C> = ask().map(f)
 
 }
+
+/**
+ * Extracts the focus [A] viewed through the [Plens].
+ */
+fun extract(): State<S, A> = State { s -> Tuple2(s, get(s)) }
+
+/**
+ * Transforms a [PLens] into a [State].
+ * Alias for [extract].
+ */
+fun toState(): State<S, A> = extract()
+
+/**
+ * Extracts the focus [A] viewed through the [Plens] and applies [f] to it.
+ */
+fun <C> extracts(f: (A) -> C): State<S, C> = extract().map(f)
+
+}
+
+/**
+ * Modify the focus [A] viewed through the [Lens] and returns its *new* value.
+ */
+fun <S, A> Lens<S, A>.mod(f: (A) -> A): State<S, A> = State { s ->
+  val b = f(get(s))
+  Tuple2(set(s, b), b)
+}
+
+/**
+ * Modify the focus [A] viewed through the [Lens] and returns its *old* value.
+ */
+fun <S, A> Lens<S, A>.modo(f: (A) -> A): State<S, A> = State { s ->
+  Tuple2(modify(s, f), get(s))
+}
+
+/**
+ * Modify the focus [A] viewed through the [Lens] and ignores both values.
+ */
+fun <S, A> Lens<S, A>.mod_(f: (A) -> A): State<S, Unit> =
+  State { s -> Tuple2(modify(s, f), Unit) }
+
+/**
+ * Set the focus [A] viewed through the [Lens] and returns its *new* value.
+ */
+fun <S, A> Lens<S, A>.assign(a: A): State<S, A> = mod { _ -> a }
+
+/**
+ * Set the value focus [A] through the [Lens] and returns its *old* value.
+ */
+fun <S, A> Lens<S, A>.assigno(a: A): State<S, A> = modo { _ -> a }
+
+/**
+ * Set the focus [A] viewed through the [Lens] and ignores both values.
+ */
+fun <S, A> Lens<S, A>.assign_(a: A): State<S, Unit> = mod_ { _ -> a }
