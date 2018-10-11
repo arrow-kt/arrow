@@ -12,6 +12,8 @@ import arrow.effects.OnCancel.Companion.CancellationException
 import arrow.effects.OnCancel.Silent
 import arrow.effects.OnCancel.ThrowCancellationException
 import arrow.effects.internal.IOBracket
+import arrow.effects.internal.IOCancel
+import arrow.effects.internal.IOConnection
 import arrow.effects.internal.Platform.maxStackDepthSize
 import arrow.effects.internal.Platform.onceOnly
 import arrow.effects.internal.Platform.unsafeResync
@@ -43,10 +45,10 @@ sealed class IO<out A> : IOOf<A> {
     fun <A> defer(f: () -> IOOf<A>): IO<A> = Suspend(f)
 
     fun <A> async(k: Proc<A>): IO<A> =
-      Async { ff: (Either<Throwable, A>) -> Unit ->
+      Async { conn, ff: (Either<Throwable, A>) -> Unit ->
         onceOnly(ff).let { callback: (Either<Throwable, A>) -> Unit ->
           try {
-            k(callback)
+            k(conn, callback)
           } catch (throwable: Throwable) {
             callback(Left(throwable))
           }
@@ -98,7 +100,7 @@ sealed class IO<out A> : IOOf<A> {
     IORunLoop.start(this, cb, null)
 
   fun runAsyncCancellable(onCancel: OnCancel = Silent, cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Disposable> =
-    IO.async { ccb ->
+    IO.async { conn, ccb ->
       var cancelled = false
       val cancel = { cancelled = true }
       val isCancelled = { cancelled }
@@ -123,6 +125,13 @@ sealed class IO<out A> : IOOf<A> {
   fun unsafeRunTimed(limit: Duration): Option<A> = IORunLoop.step(this).unsafeRunTimedTotal(limit)
 
   internal abstract fun unsafeRunTimedTotal(limit: Duration): Option<A>
+
+  /**
+   * Makes the source `IO` uninterruptible such that a [[Fiber.cancel]]
+   * signal has no effect.
+   */
+  fun uncancelable(): IO<A> = IOCancel.uncancelable(this)
+
 
   fun <B> bracket(use: (A) -> IO<B>, release: (A) -> IO<Unit>): IO<B> =
     bracketCase(use) { a, _ -> release(a) }
@@ -175,6 +184,13 @@ sealed class IO<out A> : IOOf<A> {
     // If a ContinueOn follows another ContinueOn, execute only the latest
     override fun continueOn(ctx: CoroutineContext): IO<A> = ContinueOn(cont, ctx)
 
+    override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
+  }
+
+  internal data class ContextSwitch<A>(
+    val source: IO<A>,
+    val modify: (IOConnection) -> IOConnection,
+    val restore: (A, Throwable, IOConnection, IOConnection) -> IOConnection) : IO<A>() {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
   }
 

@@ -13,4 +13,9 @@ internal object IOPlatform {
     rest.forEach { if (it != first) first.addSuppressed(it) }
     return first
   }
+
+  fun composeErrors(first: Throwable, vararg rest: Throwable): Throwable {
+    rest.forEach { if (it != first) first.addSuppressed(it) }
+    return first
+  }
 }
