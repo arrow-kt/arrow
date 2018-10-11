@@ -23,13 +23,9 @@ class KleisliTest: UnitSpec() {
 
     val IO_DEFER = IO.monadDefer()
 
-    val EQ_OPTION = Option.eq(Eq.any())
-
     fun <A> EQ(): Eq<Kind<KleisliPartialOf<ForIO, Unit>, A>> {
         return Eq {a, b ->
-            EQ_OPTION.run {
-                a.fix().run(Unit).fix().attempt().unsafeRunTimed(60.seconds).eqv(b.fix().run(Unit).fix().attempt().unsafeRunTimed(60.seconds))
-            }
+            a.fix().run(Unit).fix().attempt().unsafeRunTimed(60.seconds) == b.fix().run(Unit).fix().attempt().unsafeRunTimed(60.seconds)
         }
     }
 
