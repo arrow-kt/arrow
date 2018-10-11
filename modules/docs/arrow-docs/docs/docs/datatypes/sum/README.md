@@ -8,7 +8,7 @@ permalink: /docs/datatypes/sum
 
 > The sum of two Comonads is also a Comonad.
 
-A Sum is a data structure which holds two [`Comonads`]({{ /docs/typeclasses/comonad | relative_url }}) and a flag for selecting which one is "active".
+A Sum is a data structure which holds two [`Comonads`]({{ '/docs/typeclasses/comonad' | relative_url }}) and a flag for selecting which one is "active".
 
 A common pattern used when building user interfaces is showing two tabs and allow the user to change between them. We can achieve this behavior with Sum.
 
