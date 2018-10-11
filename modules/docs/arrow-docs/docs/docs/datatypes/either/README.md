@@ -51,7 +51,6 @@ right
 ```kotlin:ank
 val left: Either<String, Int> = Either.Left("Something went wrong")
 left
-}
 ```
 Because `Either` is right-biased, it is possible to define a Monad instance for it.
 
