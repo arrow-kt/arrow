@@ -211,15 +211,3 @@ class LensTest : UnitSpec() {
   }
 
 }
-
-fun main(args: Array<String>) {
-
-  val reader: Reader<NonEmptyList<String>, String> = NonEmptyList.head<String>().asGetter().ask()
-
-  reader
-    .map(String::toUpperCase)
-    .runId(NonEmptyList("Hello", "World", "Viewed", "With", "Optics"))
-
-  NonEmptyList.head<String>().asGetter().asks(String::toUpperCase)
-    .runId(NonEmptyList("Hello", "World", "Viewed", "With", "Optics"))
-}
