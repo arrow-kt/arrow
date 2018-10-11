@@ -1,7 +1,7 @@
 ---
 layout: docs
 title: Sum
-permalink: /docs/datatypes/sum
+permalink: /docs/datatypes/sum/
 ---
 
 ## Sum

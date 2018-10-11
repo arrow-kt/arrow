@@ -1,7 +1,7 @@
 ---
 layout: docs
 title: Day
-permalink: /docs/datatypes/day
+permalink: /docs/datatypes/day/
 ---
 
 ## Day
