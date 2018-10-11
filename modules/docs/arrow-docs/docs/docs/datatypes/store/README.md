@@ -1,5 +1,5 @@
 ---
-layout: docs
+layout: Docs
 title: Store
 permalink: /docs/datatypes/store
 ---
