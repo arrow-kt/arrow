@@ -1,6 +1,5 @@
 package arrow.integrations.retrofit.adapter
 
-import arrow.effects.IO
 import retrofit2.CallAdapter
 import retrofit2.Retrofit
 import java.lang.reflect.ParameterizedType
@@ -23,10 +22,10 @@ class Async2CallAdapterFactory : CallAdapter.Factory() {
 
     val effectType = CallAdapter.Factory.getParameterUpperBound(0, returnType)
 
-    return when (rawType) {
-      IO::class.java -> IO2CallAdapter<Type>(effectType)
-      CallK::class.java -> CallKind2CallAdapter<Type>(effectType)
-      else -> null
+    return if (rawType == CallK::class.java) {
+      CallKind2CallAdapter<Type>(effectType)
+    } else {
+      null
     }
   }
 }
@@ -35,4 +34,3 @@ private fun parseTypeName(type: Type) =
   type.typeName
     .split(".")
     .last()
-

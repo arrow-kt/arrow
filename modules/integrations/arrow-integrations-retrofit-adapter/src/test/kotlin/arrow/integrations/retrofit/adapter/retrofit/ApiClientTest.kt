@@ -1,8 +1,7 @@
-package arrow.integrations.retrofit.adapter
+package arrow.integrations.retrofit.adapter.retrofit
 
-import arrow.effects.IO
+import arrow.integrations.retrofit.adapter.CallK
 import arrow.integrations.retrofit.adapter.mock.ResponseMock
-import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.POST
 
@@ -14,13 +13,7 @@ interface ApiClientTest {
   @GET("testCallKResponse")
   fun testCallKResponse(): CallK<ResponseMock>
 
-  @GET("testIO")
-  fun testIO(): IO<Response<ResponseMock>>
-
-  @GET("testIOResponse")
-  fun testIOResponse(): IO<Response<ResponseMock>>
-
   @POST("testIOResponsePOST")
-  fun testIOResponsePost(): IO<Unit>
+  fun testIOResponsePost(): CallK<Unit>
 
 }

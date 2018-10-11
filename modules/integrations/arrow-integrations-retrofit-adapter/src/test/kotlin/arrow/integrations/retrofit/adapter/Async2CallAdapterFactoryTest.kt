@@ -9,8 +9,6 @@ import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldThrow
 import okhttp3.HttpUrl
 import org.junit.runner.RunWith
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 private val NO_ANNOTATIONS = emptyArray<Annotation>()
 
@@ -20,7 +18,7 @@ private val factory = Async2CallAdapterFactory.create()
 @RunWith(KTestJUnitRunner::class)
 class Async2CallAdapterFactoryTest : UnitSpec() {
   init {
-    "Non Async Class should return null" {
+    "Non CallK Class should return null" {
       factory.get(object : TypeToken<List<String>>() {}.type, NO_ANNOTATIONS, retrofit) shouldBe null
     }
 
@@ -36,9 +34,7 @@ class Async2CallAdapterFactoryTest : UnitSpec() {
       exceptionIO.message shouldBe "Return type must be parameterized as IO<Foo> or IO<out Foo>"
     }
 
-    "Should work for all types" {
-      factory.get(object : TypeToken<IO<String>>() {}.type, NO_ANNOTATIONS, retrofit)!!
-        .responseType() shouldBe String::class.java
+    "Should work for CallK types" {
       factory.get(object : TypeToken<CallK<String>>() {}.type, NO_ANNOTATIONS, retrofit)!!
         .responseType() shouldBe String::class.java
     }

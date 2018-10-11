@@ -10,6 +10,7 @@ import arrow.effects.async
 import arrow.effects.fix
 import arrow.effects.monadDefer
 import arrow.integrations.retrofit.adapter.mock.ResponseMock
+import arrow.integrations.retrofit.adapter.retrofit.ApiClientTest
 import arrow.integrations.retrofit.adapter.retrofit.retrofit
 import arrow.test.UnitSpec
 import io.kotlintest.KTestJUnitRunner
@@ -60,22 +61,11 @@ class ProcCallBackTest : UnitSpec() {
       }
     }
 
-    "should be able to parse answer with IO" {
-      createApiClientTest(baseUrl)
-        .testIO()
-        .unsafeRunSync()
-        .unwrapBody(Either.applicativeError())
-        .fix()
-        .fold({ throwable ->
-          fail("The requested terminated with an exception. Message: ${throwable.message}")
-        }, { responseMock ->
-          assertEquals(ResponseMock("hello, world!"), responseMock)
-        })
-    }
-
     "should be able to run a POST with UNIT as response" {
       createApiClientTest(baseUrl)
         .testIOResponsePost()
+        .async(IO.async())
+        .fix()
         .unsafeRunSync()
     }
   }

@@ -3,10 +3,8 @@ package arrow.integrations.retrofit.adapter
 import arrow.Kind
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.MonadDefer
-import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.MonadError
 import retrofit2.Call
-import retrofit2.HttpException
 import retrofit2.Response
 
 data class CallK<R>(val call: Call<R>) {
@@ -27,10 +25,3 @@ data class CallK<R>(val call: Call<R>) {
       }
     }
 }
-
-//private fun <R> handleResponse(response: Response<R>) =
-//  if (response.isSuccessful) {
-//    response.body() ?: throw IllegalStateException("The request returned a null body")
-//  } else {
-//    throw HttpException(response)
-//  }

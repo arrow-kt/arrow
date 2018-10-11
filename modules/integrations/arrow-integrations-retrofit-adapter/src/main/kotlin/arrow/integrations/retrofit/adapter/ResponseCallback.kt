@@ -5,7 +5,6 @@ import arrow.core.left
 import arrow.core.right
 import retrofit2.Call
 import retrofit2.Callback
-import retrofit2.HttpException
 import retrofit2.Response
 
 class ResponseCallback<R>(private val proc: (Either<Throwable, Response<R>>) -> Unit) : Callback<R> {
