@@ -53,6 +53,7 @@ Arrow optics also provides a number of predefined `Traversal` optics.
 
 ```kotlin:ank
 import arrow.instances.*
+import arrow.optics.instances.*
 
 Tuple2.traversal<String>().combineAll(String.monoid(), "Hello, " toT "World!")
 ```

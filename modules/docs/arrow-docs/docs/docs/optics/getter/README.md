@@ -78,8 +78,8 @@ takeMedpack.run(player)
 Unlike a regular `get` function a `Getter` composes. Similar to a `Lens` we can compose `Getter`s to create telescopes and zoom into nested structures.
 
 ```kotlin:ank
-val firstBar: Getter<NonEmptyList<Foo>, Int> = NonEmptyList.head<Foo>() compose barGetter
-firstBar.get(Foo(5).nel())
+val firstBar: Getter<NonEmptyList<Player>, Int> = NonEmptyList.head<Player>() compose healthGetter
+firstBar.get(Player(5).nel())
 ```
 
 `Getter` can be composed with `Getter`, `Iso`, `Lens` and `Fold` and the composition results in the following optics.

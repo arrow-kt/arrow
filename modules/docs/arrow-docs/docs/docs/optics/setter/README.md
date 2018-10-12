@@ -41,8 +41,8 @@ data class Player(val health: Int)
 
 val playerSetter: Setter<Player, Int> = Setter { f: (Int) -> Int ->
     { player: Player ->
-        val fValue = f(player.value)
-        player.copy(health = fValue)
+        val fHealth= f(player.health)
+        player.copy(health = fHealth)
     }
 }
 ```
@@ -66,8 +66,8 @@ takeDamage.run(Player(75))
 ```
 
 ```kotlin:ank
-val restoreHealth = playerLens.assign_(100)
-playerSetter.run(Player(75))
+val restoreHealth = playerSetter.assign_(100)
+restoreHealth.run(Player(75))
 ```
 
 ## Composition
