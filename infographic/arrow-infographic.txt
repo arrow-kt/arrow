@@ -11,6 +11,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 [<typeclasses>ApplicativeError]<-[<instances>ApplicativeError Instances|IOApplicativeErrorInstance|DeferredKApplicativeErrorInstance|FluxKApplicativeErrorInstance|MonoKApplicativeErrorInstance|FlowableKApplicativeErrorInstance|MaybeKApplicativeErrorInstance|ObservableKApplicativeErrorInstance|SingleKApplicativeErrorInstance]
 [<typeclasses>ApplicativeError]<-[<typeclasses>MonadError]
 [<typeclasses>Applicative]<-[<instances>Applicative Instances|IOApplicativeInstance|DeferredKApplicativeInstance|FluxKApplicativeInstance|MonoKApplicativeInstance|FlowableKApplicativeInstance|MaybeKApplicativeInstance|ObservableKApplicativeInstance|SingleKApplicativeInstance]
@@ -19,6 +20,8 @@
 >>>>>>> add reactor MonoK bracket instance
 =======
 >>>>>>> remove attempt from Bracket
+=======
+>>>>>>> update infographic
 [<typeclasses>Alternative]<-[<typeclasses>MonadCombine]
 [<typeclasses>ApplicativeError]<-[<instances>ApplicativeError Instances|IOApplicativeErrorInstance|EitherApplicativeErrorInstance|OptionApplicativeErrorInstance|TryApplicativeErrorInstance|KleisliApplicativeErrorInstance|StateTApplicativeErrorInstance|ValidatedApplicativeErrorInstance|DeferredKApplicativeErrorInstance|FlowableKApplicativeErrorInstance|MaybeKApplicativeErrorInstance|ObservableKApplicativeErrorInstance|SingleKApplicativeErrorInstance|FluxKApplicativeErrorInstance|MonoKApplicativeErrorInstance]
 [<typeclasses>ApplicativeError]<-[<typeclasses>MonadError]
@@ -53,8 +56,6 @@
 [<typeclasses>Contravariant]<-[<instances>Contravariant Instances|ConstContravariant|Function1ContravariantInstance|CokleisliContravariantInstance|CoproductContravariantInstance|KleisliContravariant]
 [<typeclasses>Corecursive]<-[<instances>Corecursive Instances|FixCorecursiveInstance|MuCorecursiveInstance|NuCorecursiveInstance]
 [<typeclasses>Corecursive]<-[<typeclasses>Birecursive]
-<<<<<<< HEAD
-<<<<<<< HEAD
 [<typeclasses>Each]<-[<instances>Each Instances|EitherEachInstance|ListKEachInstance|MapKEachInstance|NonEmptyListEachInstance|OptionEachInstance|SequenceKEachInstance|TryEachInstance]
 [<typeclasses>Effect]<-[<instances>Effect Instances|IOEffectInstance|DeferredKConcurrentEffectInstance|FlowableKConcurrentEffectInstance|ObservableKConcurrentEffectInstance|SingleKConcurrentEffectInstance|FluxKConcurrentEffectInstance|MonoKConcurrentEffectInstance|IOConcurrentEffectInstance]
 >>>>>>> moar updates
@@ -106,6 +107,7 @@
 [<typeclasses>TraverseFilter]<-[<instances>TraverseFilter Instances|ConstTraverseFilterInstance|OptionTTraverseFilterInstance|OptionTraverseFilterInstance]
 [<typeclasses>Traverse]<-[<instances>Traverse Instances|ConstTraverseInstance|EitherTraverseInstance|IdTraverseInstance|OptionTraverseInstance|TryTraverseInstance|Tuple2TraverseInstance|CoproductTraverseInstance|IorTraverseInstance|ListKTraverseInstance|MapKTraverseInstance|NonEmptyListTraverseInstance|OptionTTraverseInstance|SequenceKTraverseInstance|SortedMapKTraverseInstance|ValidatedTraverseInstance|FlowableKTraverseInstance|ObservableKTraverseInstance|FluxKTraverseInstance]
 [<typeclasses>Traverse]<-[<typeclasses>TraverseFilter]
+<<<<<<< HEAD
 [<typeclasses>Functor]<-[<instances>Functor Instances|IOFunctorInstance|ConstFunctorInstance|EitherFunctorInstance|EvalFunctorInstance|Function0FunctorInstance|Function1FunctorInstance|IdFunctorInstance|OptionFunctorInstance|TryFunctorInstance|Tuple2FunctorInstance|CoproductFunctorInstance|IorFunctorInstance|KleisliFunctorInstance|ListKFunctorInstance|MapKFunctorInstance|NonEmptyListFunctorInstance|OptionTFunctorInstance|SequenceKFunctorInstance|SortedMapKFunctorInstance|StateTFunctorInstance|ValidatedFunctorInstance|WriterTFunctorInstance|DeferredKFunctorInstance|FlowableKFunctorInstance|MaybeKFunctorInstance|ObservableKFunctorInstance|SingleKFunctorInstance|FluxKFunctorInstance|MonoKFunctorInstance|CofreeFunctorInstance|CoyonedaFunctorInstance|FreeApplicativeFunctorInstance|FreeFunctorInstance|YonedaFunctorInstance|IntListPatternFunctorInstance]
 <<<<<<< HEAD
 >>>>>>> moar updates
@@ -240,3 +242,6 @@
 [<typeclasses>Functor]<-[<instances>Functor Instances|IOFunctorInstance|ConstFunctorInstance|EitherFunctorInstance|EvalFunctorInstance|Function0FunctorInstance|Function1FunctorInstance|IdFunctorInstance|OptionFunctorInstance|TryFunctorInstance|Tuple2FunctorInstance|CoproductFunctorInstance|IorFunctorInstance|KleisliFunctorInstance|ListKFunctorInstance|MapKFunctorInstance|NonEmptyListFunctorInstance|OptionTFunctorInstance|SequenceKFunctorInstance|SortedMapKFunctorInstance|StateTFunctorInstance|ValidatedFunctorInstance|WriterTFunctorInstance|DeferredKFunctorInstance|FlowableKFunctorInstance|MaybeKFunctorInstance|ObservableKFunctorInstance|SingleKFunctorInstance|FluxKFunctorInstance|MonoKFunctorInstance|CofreeFunctorInstance|CoyonedaFunctorInstance|FreeApplicativeFunctorInstance|FreeFunctorInstance|YonedaFunctorInstance|IntListPatternFunctorInstance]
 >>>>>>> fix more compile time errors
 >>>>>>> fix more compile time errors
+=======
+[<typeclasses>Functor]<-[<instances>Functor Instances|IOFunctorInstance|ConstFunctorInstance|EitherFunctorInstance|EvalFunctorInstance|Function0FunctorInstance|Function1FunctorInstance|IdFunctorInstance|OptionFunctorInstance|TryFunctorInstance|Tuple2FunctorInstance|CoproductFunctorInstance|IorFunctorInstance|KleisliFunctorInstance|ListKFunctorInstance|MapKFunctorInstance|NonEmptyListFunctorInstance|OptionTFunctorInstance|SequenceKFunctorInstance|SortedMapKFunctorInstance|StateTFunctorInstance|ValidatedFunctorInstance|WriterTFunctorInstance|DeferredKFunctorInstance|FlowableKFunctorInstance|MaybeKFunctorInstance|ObservableKFunctorInstance|SingleKFunctorInstance|FluxKFunctorInstance|MonoKFunctorInstance|CofreeFunctorInstance|CoyonedaFunctorInstance|FreeApplicativeFunctorInstance|FreeFunctorInstance|YonedaFunctorInstance|IntListPatternFunctorInstance]
+>>>>>>> update infographic
