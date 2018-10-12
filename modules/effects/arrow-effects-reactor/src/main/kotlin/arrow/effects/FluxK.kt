@@ -37,7 +37,7 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
   fun <B> bracketCase(use: (A) -> FluxKOf<B>, release: (A, ExitCase<Throwable>) -> FluxKOf<Unit>): FluxK<B> =
     flatMap { a ->
       use(a).fix().flux
-        .doOnNext { release(a, ExitCase.Completed) }
+        .doOnComplete { release(a, ExitCase.Completed) }
         .doOnError { release(a, ExitCase.Error(it)) }
         .k()
     }
