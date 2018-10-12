@@ -140,6 +140,84 @@ class TraversalTest : UnitSpec() {
           size(ints.k()) == ints.size
         }
       }
+
+      "Extract should extract the focus from the state" {
+        forAll(genListK(Gen.int())) { ints ->
+          extract().run(ints) ==
+            State { iis: ListK<Int> ->
+              iis toT getAll(iis)
+            }.run(ints)
+        }
+      }
+
+      "toState should be an alias to extract" {
+        forAll(genListK(Gen.int())) { ints ->
+          toState().run(ints) == extract().run(ints)
+        }
+      }
+
+      "Extracts with f should be same as extract and map" {
+        forAll(genListK(Gen.int()), genFunctionAToB<Int, String>(Gen.string())) { ints, f ->
+          extracts(f).run(ints) == extract().map { it.map(f) }.run(ints)
+        }
+      }
+
+      "mod f should be same modify f within State and returning new state" {
+        forAll(genListK(Gen.int()), genFunctionAToB<Int, Int>(Gen.int())) { ints, f ->
+          mod(f).run(ints) ==
+            State<ListK<Int>, ListK<Int>> { iis: ListK<Int> ->
+              modify(iis, f)
+                .let { it.fix() toT getAll(it) }
+            }.run(ints)
+        }
+      }
+
+      "modo f should be same as modify f within State and returning old state" {
+        forAll(genListK(Gen.int()), genFunctionAToB<Int, Int>(Gen.int())) { ints, f ->
+          modo(f).run(ints) ==
+            State { iis: ListK<Int> ->
+              modify(iis, f).fix() toT getAll(iis)
+            }.run(ints)
+        }
+      }
+
+      "mod_ f should be as modify f within State and returning Unit" {
+        forAll(genListK(Gen.int()), genFunctionAToB<Int, Int>(Gen.int())) { ints, f ->
+          mod_(f).run(ints) ==
+            State { iis: ListK<Int> ->
+              modify(iis, f).fix() toT Unit
+            }.run(ints)
+        }
+      }
+
+      "assign a should be same set a within State and returning new value" {
+        forAll(genListK(Gen.int()), Gen.int()) { ints, i ->
+          assign(i).run(ints) ==
+            State { iis: ListK<Int> ->
+              set(iis, i)
+                .let { it.fix() toT getAll(it) }
+            }.run(ints)
+        }
+      }
+
+      "assigno f should be same as modify f within State and returning old state" {
+        forAll(genListK(Gen.int()), Gen.int()) { ints, i ->
+          assigno(i).run(ints) ==
+            State { iis: ListK<Int> ->
+              set(iis, i).fix() toT getAll(iis)
+            }.run(ints)
+        }
+      }
+
+      "assign_ f should be as modify f within State and returning Unit" {
+        forAll(genListK(Gen.int()), Gen.int()) { ints, i ->
+          assign_(i).run(ints) ==
+            State { iis: ListK<Int> ->
+              set(iis, i).fix() toT Unit
+            }.run(ints)
+        }
+      }
+
     }
 
   }

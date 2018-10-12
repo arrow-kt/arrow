@@ -60,6 +60,24 @@ Tuple2.traversal<String>().combineAll(String.monoid(), "Hello, " toT "World!")
 Tuple10.traversal<Int>().getAll(Tuple10(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
 ```
 
+There are also some convenience methods to make working with [State]({{ '/docs/datatypes/state' | relative_url }}) easier.
+This can make working with nested structures in stateful computations significantly more elegant.
+
+```kotlin:ank
+data class Enemy(val health: Int)
+val battlefield = listOf(Enemy(70), Enemy(80), Enemy(65)).k()
+
+val dropBomb = ListK.traversal<Enemy>().mod { it.copy(health = it.health - 50) }
+
+dropBomb.run(battlefield)
+```
+
+```kotlin:ank
+val finishingMove = ListK.traversal<Enemy>().assign(Enemy(0))
+
+finishingMove.run(battlefield)
+```
+
 ## Composition
 
 Composing `Traversal` can be used for accessing and modifying foci in nested structures.

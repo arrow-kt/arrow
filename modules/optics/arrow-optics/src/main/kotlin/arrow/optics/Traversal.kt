@@ -339,4 +339,58 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
    * Check if forall targets satisfy the predicate
    */
   fun forall(s: S, p: (A) -> Boolean): Boolean = foldMap(s, p, AndMonoid)
+
+  /**
+   * Extracts the focus [A] viewed through the [PTraversal].
+   */
+  fun extract(): State<S, ListK<A>> = State { s -> Tuple2(s, getAll(s)) }
+
+  /**
+   * Transforms a [PTraversal] into a [State].
+   * Alias for [extract].
+   */
+  fun toState(): State<S, ListK<A>> = extract()
+
+  /**
+   * Extracts the focus [A] viewed through the [PTraversal] and applies [f] to it.
+   */
+  fun <C> extracts(f: (A) -> C): State<S, ListK<C>> =
+    extract().map { it.map(f) }
+
 }
+
+/**
+ * Modify the focus [A] viewed through the [Traversal] and returns its *new* value.
+ */
+fun <S, A> Traversal<S, A>.mod(f: (A) -> A): State<S, ListK<A>> =
+  modo(f).map { it.map(f) }
+
+/**
+ * Modify the focus [A] viewed through the [Traversal] and returns its *old* value.
+ */
+fun <S, A> Traversal<S, A>.modo(f: (A) -> A): State<S, ListK<A>> =
+  arrow.data.State { s -> Tuple2(modify(s, f), getAll(s)) }
+
+/**
+ * Modify the focus [A] viewed through the [Traversal] and ignores both values
+ */
+fun <S, A> Traversal<S, A>.mod_(f: (A) -> A): State<S, Unit> =
+  State { s -> Tuple2(modify(s, f), kotlin.Unit) }
+
+/**
+ * Set the focus [A] viewed through the [Traversal] and returns its *new* value.
+ */
+fun <S, A> Traversal<S, A>.assign(a: A): State<S, ListK<A>> =
+  mod { _ -> a }
+
+/**
+ * Set the focus [A] viewed through the [Traversal] and returns its *old* value.
+ */
+fun <S, A> Traversal<S, A>.assigno(a: A): State<S, ListK<A>> =
+  modo { _ -> a }
+
+/**
+ * Set the focus [A] viewed through the [Traversal] and ignores both values.
+ */
+fun <S, A> Traversal<S, A>.assign_(a: A): State<S, Unit> =
+  mod_ { _ -> a }
