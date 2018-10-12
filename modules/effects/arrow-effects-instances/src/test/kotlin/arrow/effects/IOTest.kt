@@ -40,7 +40,7 @@ class IOTest : UnitSpec() {
   }
 
   init {
-    testLaws(AsyncLaws.laws(IO.async(), { IO.just(it) }, EQ(), EQ()))
+    testLaws(AsyncLaws.laws(IO.async(), EQ(), EQ()))
 
     "should defer evaluation until run" {
       var run = false

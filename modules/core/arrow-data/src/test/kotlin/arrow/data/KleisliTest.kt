@@ -49,8 +49,7 @@ class KleisliTest : UnitSpec() {
       ContravariantLaws.laws(Kleisli.contravariant(), { Kleisli { x: Int -> Try.just(x) }.conest() }, ConestTryEQ()),
       MonadErrorLaws.laws(Kleisli.monadError<ForTry, Int, Throwable>(Try.monadError()), EQ(), EQ()),
       BracketLaws.laws(
-        Kleisli.bracket(IO.bracket()),
-        { Kleisli { x: Int -> IO.just(x) } },
+        Kleisli.bracket<ForIO, Int, Throwable>(IO.bracket()),
         EQBracket(),
         EQBracketError(),
         EQBracket())

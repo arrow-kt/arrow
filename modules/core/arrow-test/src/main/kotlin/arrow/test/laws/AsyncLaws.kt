@@ -13,12 +13,12 @@ import io.kotlintest.properties.forAll
 import kotlinx.coroutines.newSingleThreadContext
 
 object AsyncLaws {
+
   fun <F> laws(AC: Async<F>,
-               cf: (Int) -> Kind<F, Int>,
                EQ: Eq<Kind<F, Int>>,
                EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>,
                EQERR: Eq<Kind<F, Int>> = EQ): List<Law> =
-    MonadDeferLaws.laws(AC, cf, EQERR, EQ_EITHER) + listOf(
+    MonadDeferLaws.laws(AC, EQERR, EQ_EITHER) + listOf(
       Law("Async Laws: success equivalence") { AC.asyncSuccess(EQ) },
       Law("Async Laws: error equivalence") { AC.asyncError(EQERR) },
       Law("Async Laws: continueOn jumps threads") { AC.continueOn(EQ) },

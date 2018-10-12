@@ -45,27 +45,27 @@ class FlowableKTests : UnitSpec() {
 
   init {
 
-    testLaws(AsyncLaws.laws(FlowableK.async(), { FlowableK.just(it) }, EQ(), EQ()))
+    testLaws(AsyncLaws.laws(FlowableK.async(), EQ(), EQ()))
     // FIXME(paco) #691
     //testLaws(AsyncLaws.laws(FlowableK.async(), EQ(), EQ()))
     //testLaws(AsyncLaws.laws(FlowableK.async(), EQ(), EQ()))
 
-    testLaws(AsyncLaws.laws(FlowableK.asyncDrop(), { FlowableK.just(it) }, EQ(), EQ()))
+    testLaws(AsyncLaws.laws(FlowableK.asyncDrop(), EQ(), EQ()))
     // FIXME(paco) #691
     //testLaws(AsyncLaws.laws(FlowableK.asyncDrop(), EQ(), EQ()))
     //testLaws(AsyncLaws.laws(FlowableK.asyncDrop(), EQ(), EQ()))
 
-    testLaws(AsyncLaws.laws(FlowableK.asyncError(), { FlowableK.just(it) }, EQ(), EQ()))
+    testLaws(AsyncLaws.laws(FlowableK.asyncError(), EQ(), EQ()))
     // FIXME(paco) #691
     //testLaws(AsyncLaws.laws(FlowableK.asyncError(), EQ(), EQ()))
     //testLaws(AsyncLaws.laws(FlowableK.asyncError(), EQ(), EQ()))
 
-    testLaws(AsyncLaws.laws(FlowableK.asyncLatest(), { FlowableK.just(it) }, EQ(), EQ()))
+    testLaws(AsyncLaws.laws(FlowableK.asyncLatest(), EQ(), EQ()))
     // FIXME(paco) #691
     //testLaws(AsyncLaws.laws(FlowableK.asyncLatest(), EQ(), EQ()))
     //testLaws(AsyncLaws.laws(FlowableK.asyncLatest(), EQ(), EQ()))
 
-    testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), { FlowableK.just(it) }, EQ(), EQ()))
+    testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), EQ(), EQ()))
     // FIXME(paco) #691
     //testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), EQ(), EQ()))
     //testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), EQ(), EQ()))

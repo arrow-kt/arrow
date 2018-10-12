@@ -18,8 +18,8 @@ import kotlinx.coroutines.newSingleThreadContext
 
 object MonadDeferLaws {
 
-  fun <F> laws(SC: MonadDefer<F>, cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>, EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>): List<Law> =
-    BracketLaws.laws(SC, cf, EQ, EQ_EITHER, EQ) + listOf(
+  fun <F> laws(SC: MonadDefer<F>, EQ: Eq<Kind<F, Int>>, EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>): List<Law> =
+    BracketLaws.laws(SC, EQ, EQ_EITHER, EQ) + listOf(
       Law("Sync bind: binding blocks") { SC.asyncBind(EQ) },
       Law("Sync bind: binding failure") { SC.asyncBindError(EQ) },
       Law("Sync bind: unsafe binding") { SC.asyncBindUnsafe(EQ) },
