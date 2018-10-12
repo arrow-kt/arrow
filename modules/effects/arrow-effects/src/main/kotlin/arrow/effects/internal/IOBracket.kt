@@ -160,7 +160,7 @@ internal object IOBracket {
 
   private val makeUncancelable: (IOConnection) -> IOConnection = { IOConnection.uncancelable }
 
-  private val disableUncancelableAndPop: (Any, Throwable, IOConnection, IOConnection) -> IOConnection =
+  private val disableUncancelableAndPop: (Any?, Throwable?, IOConnection, IOConnection) -> IOConnection =
     { _, _, old, _ ->
       old.pop()
       old

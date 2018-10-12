@@ -253,6 +253,20 @@ internal object IORunLoop {
           bFirst = currentIO as BindF
           currentIO = currentIO.source
         }
+        is IO.ContextSwitch -> {
+          val next = currentIO.source
+          val modify = currentIO.modify
+          val restore = currentIO.restore
+
+          val old = conn ?: IOConnection()
+          conn = modify(old)
+          currentIO = next
+          if (conn != old) {
+            rcb?.contextSwitch(conn)
+            if (restore != null)
+              currentIO = IO.Bind(next, RestoreContext(old, restore))
+          }
+        }
         null -> {
           currentIO = IO.RaiseError(NullPointerException("Looping on null IO"))
         }
@@ -335,6 +349,10 @@ internal object IORunLoop {
     private var bFirst: BindF? = null
     private var bRest: CallStack? = null
 
+    fun contextSwitch(conn: IOConnection): Unit {
+      this.conn = conn
+    }
+
     fun prepare(bFirst: BindF?, bRest: CallStack?): Unit {
       canCall = true
       this.bFirst = bFirst
@@ -378,4 +396,16 @@ internal object IORunLoop {
 
       func.startCoroutine(normalResume)
     }
+
+  private class RestoreContext(
+    val old: IOConnection,
+    val restore: (Any?, Throwable?, IOConnection, IOConnection) -> IOConnection) : IOFrame<Any?, IO<Any?>> {
+
+    override fun invoke(a: Any?): IO<Any?> = IO.ContextSwitch(IO.Pure(a), { current -> restore(a, null, old, current) }, null)
+
+    override fun recover(e: Throwable): IO<Any> =
+      IO.ContextSwitch(IO.RaiseError(e), { current ->
+        restore(null, e, old, current)
+      }, null)
+  }
 }

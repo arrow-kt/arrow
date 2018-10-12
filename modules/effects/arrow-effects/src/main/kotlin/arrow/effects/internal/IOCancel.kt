@@ -9,6 +9,6 @@ object IOCancel {
 
   /** Internal reusable reference. */
   private val makeUncancelable: (IOConnection) -> IOConnection = { IOConnection.uncancelable }
-  private fun <A> disableUncancelable(): (A, Throwable, IOConnection, IOConnection) -> IOConnection =
+  private fun <A> disableUncancelable(): (A, Throwable?, IOConnection, IOConnection) -> IOConnection =
     { _, _, old, _ -> old }
 }
