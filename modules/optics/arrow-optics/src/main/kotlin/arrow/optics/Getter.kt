@@ -155,7 +155,7 @@ interface Getter<S, A> : GetterOf<S, A> {
   /**
    * Extracts the focus [A] viewed through the [Getter].
    */
-  fun extract(): State<S, A> =  State { s -> Tuple2(s, get(s)) }
+  fun extract(): State<S, A> = State { s -> Tuple2(s, get(s)) }
 
   /**
    * Transforms a [Getter] into a [State].

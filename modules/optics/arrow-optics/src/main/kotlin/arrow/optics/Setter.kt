@@ -146,4 +146,4 @@ fun <S, A> Setter<S, A>.mod_(f: (A) -> A): State<S, Unit> =
  * Set the focus [A] referenced through the [Setter].
  */
 fun <S, A> Setter<S, A>.assign_(a: A): State<S, Unit> =
-  mod_{ _ -> a }
+  mod_ { _ -> a }
