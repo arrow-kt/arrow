@@ -145,11 +145,7 @@ fun <K, V> Tuple2<K, V>.toPair() : Pair<K, V> = Pair(this.a, this.b)
 fun <K, V> Pair<K, V>.toTuple2() : Tuple2<K, V> = Tuple2(this.first, this.second)
 
 public fun <K, V> mapOf(vararg tuples: Tuple2<K, V>): Map<K, V> =
-  if (tuples.isNotEmpty()) {
-    tuples.toMap(LinkedHashMap(mapCapacity(tuples.size)))
-  } else  {
-    emptyMap()
-  }
+  if (tuples.isNotEmpty()) tuples.toMap(LinkedHashMap(mapCapacity(tuples.size))) else emptyMap()
 
 public fun <K, V> hashMapOf(vararg pairs: Pair<K, V>): HashMap<K, V> =
   HashMap<K, V>(mapCapacity(pairs.size)).apply { putAll(pairs) }
