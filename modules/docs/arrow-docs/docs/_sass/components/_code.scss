@@ -6,23 +6,17 @@ p, ul {
     code {
         background: #fff;
         font-family: $code-font-family;
-        font-size: 0.8rem;
+        padding: 0 $base-point-grid;
+        font-size: 0.8125rem;
         @include border-radius (3px);
     }
 }
 
-.CodeMirror {
-  background: #fff !important;
-  font-family: $code-font-family !important;
-  font-size: 0.8rem !important;
-  @include border-radius (3px);
-}
-
 .hljs {
-    padding: ($base-point-grid * 1.5) 0 ($base-point-grid * 1.5) ($base-point-grid * 2);
+    padding: ($base-point-grid * 3);
     background: $white;
     font-family: $code-font-family;
-    font-size: 0.8rem;
+    font-size: 0.875rem;
     box-shadow: $box-shadow-item;
 }
 
@@ -42,8 +36,4 @@ p, ul {
 .hljs-built_in,
 .hljs-class .hljs-title {
   color: #F28B2D;
-}
-
-.language-kotlin {
-  display: none;
 }
