@@ -11,16 +11,16 @@ import arrow.typeclasses.MonadError
 /**
  * Free Monad with Catch (and Interruption).
  *
- * [[FreeC]] provides mechanism for ensuring stack safety and capturing any exceptions that may arise during computation.
+ * [FreeC] provides mechanism for ensuring stack safety and capturing any exceptions that may arise during computation.
  *
- * Furthermore, it may capture Interruption of the evaluation, although [[FreeC]] itself does not have any
+ * Furthermore, it may capture Interruption of the evaluation, although [FreeC] itself does not have any
  * interruptible behaviour per se.
  *
- * Interruption cause may be captured in [[FreeC.Result.Interrupted]] and allows user to pass along any information relevant
+ * Interruption cause may be captured in [FreeC.Interrupted] and allows user to pass along any information relevant
  * to interpreter.
  *
- * Typically the [[FreeC]] user provides interpretation of FreeC in form of [[ViewL]] structure, that allows to step
- * FreeC via series of Results ([[Result.Pure]], [[Result.Fail]] and [[Result.Interrupted]]) and FreeC step ([[ViewL.View]])
+ * Typically the [FreeC] user provides interpretation of FreeC in form of [ViewL] structure through the [ViewL.fold] function,
+ * that allows to step FreeC via series of Results ([FreeC.Pure], [FreeC.Fail] and [FreeC.Interrupted]) and FreeC step ([ViewL.View]).
  */
 internal sealed class FreeC<F, out R> : FreeCOf<F, R> {
 
@@ -123,11 +123,11 @@ internal sealed class FreeC<F, out R> : FreeCOf<F, R> {
   }
 
   data class Pure<F, R>(val r: R) : FreeC<F, R>(), Result<R>, ViewL<F, R> {
-    override fun <G> translate(f: FunctionK<F, G>): FreeC<G, R> = f(this as Kind<F, R>) as FreeC<G, R>
+    override fun <G> translate(f: FunctionK<F, G>): FreeC<G, R> = this.asFreeC()
   }
 
   data class Fail<F, R>(val error: Throwable) : FreeC<F, R>(), Result<R>, ViewL<F, R> {
-    override fun <G> translate(f: FunctionK<F, G>): FreeC<G, R> = f(this as Kind<F, R>) as FreeC<G, R>
+    override fun <G> translate(f: FunctionK<F, G>): FreeC<G, R> = this.asFreeC()
   }
 
   /**
@@ -141,7 +141,7 @@ internal sealed class FreeC<F, out R> : FreeCOf<F, R> {
    *                      signalling of the errors may be deferred until the Interruption resumes.
    */
   data class Interrupted<F, R, X>(val context: X, val deferredError: Option<Throwable>) : FreeC<F, R>(), Result<R>, ViewL<F, R> {
-    override fun <G> translate(f: FunctionK<F, G>): FreeC<G, R> = f(this as Kind<F, R>) as FreeC<G, R>
+    override fun <G> translate(f: FunctionK<F, G>): FreeC<G, R> = this.asFreeC()
     override fun toString(): String = "FreeC.Interrupted($context, ${deferredError.map { it.message }})"
   }
 
