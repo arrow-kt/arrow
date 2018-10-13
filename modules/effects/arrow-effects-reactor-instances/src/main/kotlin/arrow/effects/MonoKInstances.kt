@@ -2,6 +2,7 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.effects.typeclasses.*
 import arrow.extension
 import arrow.typeclasses.*
@@ -102,5 +103,6 @@ interface MonoKConcurrentEffectInstance :
 
 object MonoKContext : MonoKConcurrentEffectInstance
 
+@Deprecated(ExtensionsDSLDeprecated)
 infix fun <A> ForMonoK.Companion.extensions(f: MonoKContext.() -> A): A =
   f(MonoKContext)

@@ -1,5 +1,6 @@
 /**
- * This file will be removed in the next release when arrow `shadow` is published and available to use arrow to build arrow
+ * This file will be removed in the next release when arrow `shadow` is published
+ * and available so we can build Arrow with the previous uber jar of Arrow
  */
 package arrow.meta
 

@@ -3,6 +3,7 @@ package arrow.instances
 import arrow.Kind
 import arrow.core.Eval
 import arrow.data.*
+import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.typeclasses.*
 import arrow.data.combineK as setCombineK
@@ -69,5 +70,6 @@ interface SetKMonoidKInstance : MonoidK<ForSetK> {
 
 object SetKContext : SetKFoldableInstance, SetKMonoidKInstance
 
+@Deprecated(ExtensionsDSLDeprecated)
 infix fun <A> ForSetK.Companion.extensions(f: SetKContext.() -> A): A =
   f(SetKContext)

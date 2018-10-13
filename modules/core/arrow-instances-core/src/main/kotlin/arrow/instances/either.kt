@@ -3,6 +3,7 @@ package arrow.instances
 import arrow.Kind
 import arrow.Kind2
 import arrow.core.*
+import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.typeclasses.*
 import arrow.core.ap as eitherAp
@@ -162,5 +163,6 @@ class EitherContextPartiallyApplied<L> {
     f(EitherContext())
 }
 
+@Deprecated(ExtensionsDSLDeprecated)
 fun <L> ForEither(): EitherContextPartiallyApplied<L> =
   EitherContextPartiallyApplied()

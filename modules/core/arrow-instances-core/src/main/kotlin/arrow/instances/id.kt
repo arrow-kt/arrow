@@ -2,6 +2,7 @@ package arrow.instances
 
 import arrow.Kind
 import arrow.core.*
+import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.typeclasses.*
 import arrow.instances.traverse as idTraverse
@@ -129,5 +130,6 @@ object IdContext : IdBimonadInstance, IdTraverseInstance {
     fix().map(f)
 }
 
+@Deprecated(ExtensionsDSLDeprecated)
 infix fun <L> ForId.Companion.extensions(f: IdContext.() -> L): L =
   f(IdContext)

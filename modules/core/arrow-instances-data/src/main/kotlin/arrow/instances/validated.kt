@@ -3,6 +3,7 @@ package arrow.instances
 import arrow.Kind
 import arrow.core.Eval
 import arrow.data.*
+import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.typeclasses.*
 import arrow.data.traverse as validatedTraverse
@@ -96,6 +97,7 @@ class ValidatedContext<L>(val SL: Semigroup<L>) : ValidatedApplicativeErrorInsta
 }
 
 class ValidatedContextPartiallyApplied<L>(val SL: Semigroup<L>) {
+  @Deprecated(ExtensionsDSLDeprecated)
   infix fun <A> extensions(f: ValidatedContext<L>.() -> A): A =
     f(ValidatedContext(SL))
 }

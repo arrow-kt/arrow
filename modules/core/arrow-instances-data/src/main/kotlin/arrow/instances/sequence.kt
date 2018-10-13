@@ -5,6 +5,7 @@ import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Tuple2
 import arrow.data.*
+import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.typeclasses.*
 import arrow.data.combineK as sequenceCombineK
@@ -125,5 +126,6 @@ object SequenceKContext : SequenceKMonadInstance, SequenceKTraverseInstance, Seq
     fix().map(f)
 }
 
+@Deprecated(ExtensionsDSLDeprecated)
 infix fun <A> ForSequenceK.Companion.extensions(f: SequenceKContext.() -> A): A =
   f(SequenceKContext)

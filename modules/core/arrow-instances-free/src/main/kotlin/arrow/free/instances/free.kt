@@ -3,6 +3,7 @@ package arrow.free.instances
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.FunctionK
+import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.free.*
 import arrow.extension
 import arrow.typeclasses.Applicative
@@ -66,6 +67,7 @@ interface FreeEq<F, G, A> : Eq<Kind<FreePartialOf<F>, A>> {
 class FreeContext<S> : FreeMonadInstance<S>
 
 class FreeContextPartiallyApplied<S> {
+  @Deprecated(ExtensionsDSLDeprecated)
   infix fun <A> extensions(f: FreeContext<S>.() -> A): A =
     f(FreeContext())
 }

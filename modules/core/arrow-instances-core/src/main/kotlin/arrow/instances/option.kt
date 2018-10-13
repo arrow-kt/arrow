@@ -2,6 +2,7 @@ package arrow.instances
 
 import arrow.Kind
 import arrow.core.*
+import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.typeclasses.*
 import arrow.instances.traverse as optionTraverse
@@ -169,5 +170,6 @@ object OptionContext : OptionMonadErrorInstance, OptionTraverseInstance {
     fix().map(f)
 }
 
+@Deprecated(ExtensionsDSLDeprecated)
 infix fun <A> ForOption.Companion.extensions(f: OptionContext.() -> A): A =
   f(OptionContext)

@@ -6,6 +6,7 @@ import arrow.data.EitherT
 import arrow.data.EitherTOf
 import arrow.data.EitherTPartialOf
 import arrow.data.fix
+import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.instances.syntax.either.foldable.foldable
 import arrow.instances.syntax.either.monad.monad
 import arrow.instances.syntax.either.traverse.traverse
@@ -161,6 +162,7 @@ class EitherTContext<F, E>(val MF: Monad<F>) : EitherTMonadErrorInstance<F, E>, 
 }
 
 class EitherTContextPartiallyApplied<F, E>(val MF: Monad<F>) {
+  @Deprecated(ExtensionsDSLDeprecated)
   infix fun <A> extensions(f: EitherTContext<F, E>.() -> A): A =
     f(EitherTContext(MF))
 }

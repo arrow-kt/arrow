@@ -3,6 +3,7 @@ package arrow.instances
 import arrow.Kind
 import arrow.core.*
 import arrow.core.Try.Failure
+import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.typeclasses.*
 import arrow.instances.traverse as tryTraverse
@@ -157,5 +158,6 @@ object TryContext : TryMonadErrorInstance, TryTraverseInstance {
     fix().map(f)
 }
 
+@Deprecated(ExtensionsDSLDeprecated)
 infix fun <A> ForTry.Companion.extensions(f: TryContext.() -> A): A =
   f(TryContext)

@@ -6,6 +6,7 @@ import arrow.data.WriterT
 import arrow.data.WriterTOf
 import arrow.data.WriterTPartialOf
 import arrow.data.fix
+import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.instances.WriterTMonadInstance
 import arrow.mtl.typeclasses.MonadFilter
@@ -54,6 +55,7 @@ class WriterTMtlContext<F, W>(val MF: Monad<F>, val MW: Monoid<W>) : WriterTMona
 }
 
 class WriterTMtlContextPartiallyApplied<F, W>(val MF: Monad<F>, val MW: Monoid<W>) {
+  @Deprecated(ExtensionsDSLDeprecated)
   infix fun <A> extensions(f: WriterTMtlContext<F, W>.() -> A): A =
     f(WriterTMtlContext(MF, MW))
 }

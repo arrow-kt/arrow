@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.data.Store
 import arrow.data.StorePartialOf
 import arrow.data.fix
+import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Functor
@@ -29,6 +30,7 @@ interface StoreFunctorInstance<S> : Functor<StorePartialOf<S>> {
 class StoreContext<S> : StoreComonadInstance<S>
 
 class StoreContextPartiallyApplied<S> {
+  @Deprecated(ExtensionsDSLDeprecated)
   infix fun <A> extensions(f: StoreContext<S>.() -> A): A =
       f(StoreContext())
 }

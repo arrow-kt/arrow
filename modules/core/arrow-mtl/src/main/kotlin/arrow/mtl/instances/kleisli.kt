@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.data.Kleisli
 import arrow.data.KleisliPartialOf
 import arrow.data.fix
+import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.instances.KleisliMonadErrorInstance
 import arrow.instances.KleisliMonadInstance
@@ -31,6 +32,7 @@ class KleisliMtlContext<F, D, E>(val MF: MonadError<F, E>) : KleisliMonadReaderI
 }
 
 class KleisliMtlContextPartiallyApplied<F, D, E>(val MF: MonadError<F, E>) {
+  @Deprecated(ExtensionsDSLDeprecated)
   infix fun <A> extensions(f: KleisliMtlContext<F, D, E>.() -> A): A =
     f(KleisliMtlContext(MF))
 }

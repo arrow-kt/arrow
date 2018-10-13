@@ -2,6 +2,7 @@ package arrow.free.instances
 
 import arrow.Kind
 import arrow.core.FunctionK
+import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.free.FreeApplicative
 import arrow.free.FreeApplicativePartialOf
 import arrow.free.fix
@@ -39,6 +40,7 @@ interface FreeApplicativeEq<F, G, A> : Eq<Kind<FreeApplicativePartialOf<F>, A>> 
 class FreeApplicativeContext<S> : FreeApplicativeApplicativeInstance<S>
 
 class FreeApplicativeContextPartiallyApplied<S> {
+  @Deprecated(ExtensionsDSLDeprecated)
   infix fun <A> extensions(f: FreeApplicativeContext<S>.() -> A): A =
     f(FreeApplicativeContext())
 }

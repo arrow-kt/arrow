@@ -1,5 +1,6 @@
 package arrow.instances
 
+import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.typeclasses.*
 
 interface StringSemigroupInstance : Semigroup<String> {
@@ -40,6 +41,7 @@ fun String.Companion.order(): Order<String> =
 object StringContext : StringShowInstance, StringOrderInstance, StringMonoidInstance
 
 object ForString {
+  @Deprecated(ExtensionsDSLDeprecated)
   infix fun <L> extensions(f: StringContext.() -> L): L =
     f(StringContext)
 }

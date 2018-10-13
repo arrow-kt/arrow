@@ -7,6 +7,7 @@ import arrow.data.WriterT
 import arrow.data.WriterTOf
 import arrow.data.WriterTPartialOf
 import arrow.data.fix
+import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.typeclasses.*
 
@@ -82,6 +83,7 @@ class WriterTContext<F, W>(val MF: Monad<F>, val MW: Monoid<W>) : WriterTMonadIn
 }
 
 class WriterTContextPartiallyApplied<F, W>(val MF: Monad<F>, val MW: Monoid<W>) {
+  @Deprecated(ExtensionsDSLDeprecated)
   infix fun <A> extensions(f: WriterTContext<F, W>.() -> A): A =
     f(WriterTContext(MF, MW))
 }

@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.data.Sum
 import arrow.data.SumPartialOf
 import arrow.data.fix
+import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Functor
@@ -42,6 +43,7 @@ class SumContext<F, G>(val CF: Comonad<F>, val CG: Comonad<G>) : ComonadSumInsta
 }
 
 class SumContextPartiallyApplied<F, G>(val CF: Comonad<F>, val CG: Comonad<G>) {
+  @Deprecated(ExtensionsDSLDeprecated)
   infix fun <A> extensions(f: SumContext<F, G>.() -> A): A =
       f(SumContext(CF, CG))
 }

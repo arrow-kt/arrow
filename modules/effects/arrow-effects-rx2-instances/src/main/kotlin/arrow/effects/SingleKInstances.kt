@@ -2,6 +2,7 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.effects.typeclasses.*
 import arrow.extension
 import arrow.typeclasses.*
@@ -100,5 +101,6 @@ interface SingleKConcurrentEffectInstance : ConcurrentEffect<ForSingleK>, Single
 
 object SingleKContext : SingleKConcurrentEffectInstance
 
+@Deprecated(ExtensionsDSLDeprecated)
 infix fun <A> ForSingleK.Companion.extensions(f: SingleKContext.() -> A): A =
   f(SingleKContext)

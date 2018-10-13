@@ -3,6 +3,7 @@ package arrow.effects
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.effects.syntax.fluxk.monad.monad
 import arrow.effects.syntax.fluxk.monadError.monadError
 import arrow.effects.typeclasses.*
@@ -156,5 +157,6 @@ object FluxKContext : FluxKConcurrentEffectInstance, FluxKTraverseInstance {
     fix().map(f)
 }
 
+@Deprecated(ExtensionsDSLDeprecated)
 infix fun <A> ForFluxK.Companion.extensions(f: FluxKContext.() -> A): A =
   f(FluxKContext)

@@ -3,6 +3,7 @@ package arrow.instances
 import arrow.Kind
 import arrow.core.Eval
 import arrow.data.*
+import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.instances.syntax.setk.eq.eq
 import arrow.typeclasses.*
@@ -75,6 +76,7 @@ interface MapKShowInstance<K, A> : Show<MapK<K, A>> {
 class MapKContext<L> : MapKTraverseInstance<L>
 
 class MapKContextPartiallyApplied<L> {
+  @Deprecated(ExtensionsDSLDeprecated)
   infix fun <A> extensions(f: MapKContext<L>.() -> A): A =
     f(MapKContext())
 }

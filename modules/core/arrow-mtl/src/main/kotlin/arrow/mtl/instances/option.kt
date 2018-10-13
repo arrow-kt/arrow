@@ -2,6 +2,7 @@ package arrow.mtl.instances
 
 import arrow.Kind
 import arrow.core.*
+import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.mtl.typeclasses.MonadFilter
 import arrow.mtl.typeclasses.TraverseFilter
@@ -77,5 +78,6 @@ object OptionMtlContext : OptionMonadFilterInstance, OptionTraverseFilterInstanc
     fix().map(f)
 }
 
+@Deprecated(ExtensionsDSLDeprecated)
 infix fun <A> ForOption.Companion.extensions(f: OptionMtlContext.() -> A): A =
   f(OptionMtlContext)

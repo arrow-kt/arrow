@@ -5,6 +5,7 @@ import arrow.Kind2
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.data.*
+import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.typeclasses.*
 
@@ -110,6 +111,7 @@ class IorContext<L>(val SL: Semigroup<L>) : IorMonadInstance<L>, IorTraverseInst
 }
 
 class IorContextPartiallyApplied<L>(val SL: Semigroup<L>) {
+  @Deprecated(ExtensionsDSLDeprecated)
   infix fun <A> extensions(f: IorContext<L>.() -> A): A =
     f(IorContext(SL))
 }

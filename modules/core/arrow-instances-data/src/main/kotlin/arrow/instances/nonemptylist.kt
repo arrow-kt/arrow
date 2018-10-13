@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.data.*
+import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.typeclasses.*
 import arrow.data.combineK as nelCombineK
@@ -148,5 +149,6 @@ object NonEmptyListContext : NonEmptyListBimonadInstance, NonEmptyListTraverseIn
     fix().map(f)
 }
 
+@Deprecated(ExtensionsDSLDeprecated)
 infix fun <A> ForNonEmptyList.Companion.extensions(f: NonEmptyListContext.() -> A): A =
   f(NonEmptyListContext)

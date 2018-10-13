@@ -3,6 +3,7 @@ package arrow.instances
 import arrow.Kind
 import arrow.core.*
 import arrow.data.*
+import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.instances.syntax.id.monad.monad
 import arrow.instances.syntax.statet.applicative.applicative
@@ -118,6 +119,7 @@ class StateTContext<F, S, E>(val ME: MonadError<F, E>) : StateTMonadErrorInstanc
 }
 
 class StateTContextPartiallyApplied<F, S, E>(val ME: MonadError<F, E>) {
+  @Deprecated(ExtensionsDSLDeprecated)
   infix fun <A> extensions(f: StateTContext<F, S, E>.() -> A): A =
     f(StateTContext(ME))
 }
@@ -130,6 +132,7 @@ class StateTMonadContext<S> : StateTMonadInstance<ForId, S> {
 }
 
 class StateContextPartiallyApplied<S>() {
+  @Deprecated(ExtensionsDSLDeprecated)
   infix fun <A> extensions(f: StateTMonadContext<S>.() -> A): A =
     f(StateTMonadContext())
 }

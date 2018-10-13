@@ -3,6 +3,7 @@ package arrow.instances
 import arrow.Kind
 import arrow.core.*
 import arrow.data.*
+import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.typeclasses.*
 import arrow.data.combineK as listCombineK
@@ -129,6 +130,7 @@ object ListKContext : ListKMonadInstance, ListKTraverseInstance, ListKMonoidKIns
     fix().map(f)
 }
 
+@Deprecated(ExtensionsDSLDeprecated)
 infix fun <A> ForListK.Companion.extensions(f: ListKContext.() -> A): A =
   f(ListKContext)
 

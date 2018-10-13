@@ -2,6 +2,7 @@ package arrow.effects.io.instances
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.effects.*
 import arrow.effects.typeclasses.*
 import arrow.extension
@@ -122,5 +123,6 @@ interface IOMonoidInstance<A> : Monoid<IO<A>>, IOSemigroupInstance<A> {
 
 object IOContext : IOConcurrentEffectInstance
 
+@Deprecated(ExtensionsDSLDeprecated)
 infix fun <A> ForIO.Companion.extensions(f: IOContext.() -> A): A =
   f(IOContext)

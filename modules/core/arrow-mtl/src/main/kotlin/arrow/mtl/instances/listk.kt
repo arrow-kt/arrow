@@ -5,6 +5,7 @@ import arrow.core.Either
 import arrow.core.Option
 import arrow.core.Tuple2
 import arrow.data.*
+import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.instances.ListKMonoidKInstance
 import arrow.instances.ListKTraverseInstance
@@ -90,5 +91,6 @@ object ListKMtlContext : ListKMonadCombineInstance, ListKTraverseInstance, ListK
     fix().map(f)
 }
 
+@Deprecated(ExtensionsDSLDeprecated)
 infix fun <A> ForListK.Companion.extensions(f: ListKMtlContext.() -> A): A =
   f(ListKMtlContext)

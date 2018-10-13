@@ -3,6 +3,7 @@ package arrow.instances
 import arrow.Kind
 import arrow.core.Eval
 import arrow.data.*
+import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.typeclasses.*
 
 interface SortedMapKFunctorInstance<A : Comparable<A>> : Functor<SortedMapKPartialOf<A>> {
@@ -67,6 +68,7 @@ fun <A : Comparable<A>, B> SortedMapK.Companion.show(): SortedMapKShowInstance<A
 class SortedMapKContext<K : Comparable<K>> : SortedMapKTraverseInstance<K>
 
 class SortedMapKContextPartiallyApplied<K : Comparable<K>> {
+  @Deprecated(ExtensionsDSLDeprecated)
   infix fun <A> extensions(f: SortedMapKContext<K>.() -> A): A =
     f(SortedMapKContext())
 }

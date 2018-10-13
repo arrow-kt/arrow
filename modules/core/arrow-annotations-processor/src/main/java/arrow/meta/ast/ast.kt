@@ -1,8 +1,5 @@
 package arrow.meta.ast
 
-import arrow.optics.optics
-
-@optics
 data class Code(val value : String) {
   override fun toString(): String = value
   companion object {
@@ -10,32 +7,27 @@ data class Code(val value : String) {
   }
 }
 
-@optics
 sealed class Tree {
   companion object
 }
 
-@optics
 data class PackageName(
   val value: String) : Tree() {
   companion object
 }
 
-@optics
 data class TypeAlias(
   val name: String,
   val value: TypeName) : Tree() {
   companion object
 }
 
-@optics
 data class Import(
   val qualifiedName: String,
   val alias: String? = null) : Tree() {
   companion object
 }
 
-@optics
 data class File(
   val fileName: String,
   val packageName: PackageName? = null,
@@ -45,12 +37,10 @@ data class File(
   companion object
 }
 
-@optics
 sealed class TypeName : Tree() {
 
   abstract val simpleName: String
 
-  @optics
   data class TypeVariable(
     val name: String,
     val bounds: List<TypeName> = emptyList(),
@@ -65,7 +55,6 @@ sealed class TypeName : Tree() {
     companion object
   }
 
-  @optics
   data class WildcardType(
     val name: String,
     val upperBounds: List<TypeName>,
@@ -79,7 +68,6 @@ sealed class TypeName : Tree() {
     companion object
   }
 
-  @optics
   data class ParameterizedType(
     val name: String,
     val enclosingType: TypeName? = null,
@@ -94,7 +82,6 @@ sealed class TypeName : Tree() {
     companion object
   }
 
-  @optics
   data class Classy(
     override val simpleName: String,
     val fqName: String,
@@ -120,7 +107,6 @@ sealed class TypeName : Tree() {
   }
 }
 
-@optics
 sealed class UseSiteTarget {
   object File : UseSiteTarget()
   object Property : UseSiteTarget()
@@ -134,7 +120,6 @@ sealed class UseSiteTarget {
   companion object
 }
 
-@optics
 data class Parameter(
   val name: String,
   val type: TypeName,
@@ -144,7 +129,6 @@ data class Parameter(
   companion object
 }
 
-@optics
 data class Annotation(
   val type: TypeName,
   val members: List<Code>,
@@ -152,7 +136,6 @@ data class Annotation(
   companion object
 }
 
-@optics
 data class Property(
   val name: String,
   val type: TypeName,
@@ -170,7 +153,6 @@ data class Property(
   companion object
 }
 
-@optics
 data class Func(
   val name: String,
   val kdoc: Code? = null,
@@ -219,7 +201,6 @@ sealed class Modifier {
   companion object
 }
 
-@optics
 data class Type(
   val packageName: PackageName,
   val name: TypeName,

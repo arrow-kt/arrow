@@ -1,6 +1,7 @@
 package arrow.free.instances
 
 import arrow.*
+import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.free.*
 import arrow.typeclasses.Functor
 
@@ -12,6 +13,7 @@ interface CoyonedaFunctorInstance<F, G> : Functor<CoyonedaPartialOf<F, G>> {
 class CoyonedaContext<F, G> : CoyonedaFunctorInstance<F, G>
 
 class CoyonedaContextPartiallyApplied<F, G> {
+  @Deprecated(ExtensionsDSLDeprecated)
   infix fun <A> extensions(f: CoyonedaContext<F, G>.() -> A): A =
     f(CoyonedaContext())
 }

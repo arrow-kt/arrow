@@ -2,6 +2,7 @@ package arrow.instances
 
 import arrow.Kind
 import arrow.core.Eval
+import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.typeclasses.*
 import arrow.typeclasses.ap as constAp
@@ -106,5 +107,6 @@ class ConstContextPartiallyApplied<L>(val MA: Monoid<L>) {
     f(ConstContext(MA))
 }
 
+@Deprecated(ExtensionsDSLDeprecated)
 fun <L> ForConst(MA: Monoid<L>): ConstContextPartiallyApplied<L> =
   ConstContextPartiallyApplied(MA)

@@ -3,6 +3,7 @@ package arrow.effects
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Effect
 import arrow.effects.typeclasses.MonadDefer
@@ -120,5 +121,6 @@ interface MaybeKEffectInstance :
 
 object MaybeKContext : MaybeKEffectInstance
 
+@Deprecated(ExtensionsDSLDeprecated)
 infix fun <A> ForMaybeK.Companion.extensions(f: MaybeKContext.() -> A): A =
   f(MaybeKContext)

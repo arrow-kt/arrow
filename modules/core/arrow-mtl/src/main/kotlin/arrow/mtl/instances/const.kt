@@ -2,6 +2,7 @@ package arrow.mtl.instances
 
 import arrow.Kind
 import arrow.core.Option
+import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.instances.ConstApplicativeInstance
 import arrow.instances.ConstTraverseInstance
@@ -25,6 +26,7 @@ class ConstMtlContext<A>(val MA: Monoid<A>) : ConstApplicativeInstance<A>, Const
 }
 
 class ConstMtlContextPartiallyApplied<L>(val MA: Monoid<L>) {
+  @Deprecated(ExtensionsDSLDeprecated)
   infix fun <A> extensions(f: ConstMtlContext<L>.() -> A): A =
     f(ConstMtlContext(MA))
 }

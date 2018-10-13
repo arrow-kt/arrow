@@ -3,6 +3,7 @@ package arrow.effects
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.effects.syntax.flowablek.async.async
 import arrow.effects.syntax.flowablek.effect.effect
 import arrow.effects.syntax.flowablek.monad.monad
@@ -214,5 +215,6 @@ object FlowableKContext : FlowableKConcurrentEffectInstance, FlowableKTraverseIn
     fix().map(f)
 }
 
+@Deprecated(ExtensionsDSLDeprecated)
 infix fun <A> ForFlowableK.Companion.extensions(f: FlowableKContext.() -> A): A =
   f(FlowableKContext)

@@ -1,6 +1,7 @@
 package arrow.free.instances
 
 import arrow.*
+import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.free.*
 import arrow.typeclasses.Functor
 
@@ -12,6 +13,7 @@ interface YonedaFunctorInstance<U> : Functor<YonedaPartialOf<U>> {
 class YonedaContext<U> : YonedaFunctorInstance<U>
 
 class YonedaContextPartiallyApplied<U> {
+  @Deprecated(ExtensionsDSLDeprecated)
   infix fun <A> extensions(f: YonedaContext<U>.() -> A): A =
     f(YonedaContext())
 }

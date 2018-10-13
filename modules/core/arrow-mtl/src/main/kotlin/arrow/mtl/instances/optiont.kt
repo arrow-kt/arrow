@@ -6,6 +6,7 @@ import arrow.data.OptionT
 import arrow.data.OptionTPartialOf
 import arrow.data.fix
 import arrow.data.mapFilter
+import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.instances.OptionTFunctorInstance
 import arrow.instances.OptionTMonadInstance
@@ -58,6 +59,7 @@ class OptionTMtlContext<F>(val MF: Monad<F>, val TF: TraverseFilter<F>) : Option
 }
 
 class OptionTMtlContextPartiallyApplied<F>(val MF: Monad<F>, val TF: TraverseFilter<F>) {
+  @Deprecated(ExtensionsDSLDeprecated)
   infix fun <A> extensions(f: OptionTMtlContext<F>.() -> A): A =
     f(OptionTMtlContext(MF, TF))
 }

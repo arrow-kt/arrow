@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.toT
 import arrow.data.StateT
 import arrow.data.StateTPartialOf
+import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.instances.StateTMonadErrorInstance
 import arrow.instances.StateTMonadInstance
@@ -52,6 +53,7 @@ class StateTMtlContext<F, S, E>(val ME: MonadError<F, E>) : StateTMonadStateInst
 }
 
 class StateTMtlContextPartiallyApplied<F, S, E>(val ME: MonadError<F, E>) {
+  @Deprecated(ExtensionsDSLDeprecated)
   infix fun <A> extensions(f: StateTMtlContext<F, S, E>.() -> A): A =
     f(StateTMtlContext(ME))
 }

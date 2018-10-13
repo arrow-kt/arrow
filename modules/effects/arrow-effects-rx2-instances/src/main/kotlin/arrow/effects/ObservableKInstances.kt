@@ -3,6 +3,7 @@ package arrow.effects
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.effects.syntax.observablek.monad.monad
 import arrow.effects.syntax.observablek.monadError.monadError
 import arrow.effects.typeclasses.*
@@ -154,5 +155,6 @@ object ObservableKContext : ObservableKConcurrentEffectInstance, ObservableKTrav
     fix().map(f)
 }
 
+@Deprecated(ExtensionsDSLDeprecated)
 infix fun <A> ForObservableK.Companion.extensions(f: ObservableKContext.() -> A): A =
   f(ObservableKContext)

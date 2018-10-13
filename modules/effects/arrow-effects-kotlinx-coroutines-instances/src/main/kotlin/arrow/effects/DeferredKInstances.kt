@@ -2,6 +2,7 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.effects.syntax.deferredk.applicative.applicative
 import arrow.effects.typeclasses.*
 import arrow.extension
@@ -103,5 +104,6 @@ interface DeferredKConcurrentEffectInstance : ConcurrentEffect<ForDeferredK>, De
 
 object DeferredKContext : DeferredKConcurrentEffectInstance
 
+@Deprecated(ExtensionsDSLDeprecated)
 infix fun <A> ForDeferredK.Companion.extensions(f: DeferredKContext.() -> A): A =
   f(DeferredKContext)

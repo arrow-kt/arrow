@@ -2,6 +2,7 @@ package arrow.instances
 
 import arrow.Kind
 import arrow.core.*
+import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.typeclasses.*
 
@@ -79,5 +80,6 @@ interface EvalBimonadInstance : Bimonad<ForEval> {
 
 object EvalContext : EvalBimonadInstance
 
+@Deprecated(ExtensionsDSLDeprecated)
 infix fun <L> ForEval.Companion.extensions(f: EvalContext.() -> L): L =
   f(EvalContext)

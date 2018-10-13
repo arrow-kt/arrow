@@ -3,6 +3,7 @@ package arrow.instances
 import arrow.Kind
 import arrow.core.*
 import arrow.data.*
+import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.instances.syntax.id.applicative.applicative
 import arrow.instances.syntax.id.functor.functor
@@ -117,6 +118,7 @@ class ReaderContext<D> : KleisliMonadInstance<ForId, D> {
 }
 
 class ReaderContextPartiallyApplied<L> {
+  @Deprecated(ExtensionsDSLDeprecated)
   inline fun <A> extensions(f: ReaderContext<L>.() -> A): A =
     f(ReaderContext())
 }
@@ -129,6 +131,7 @@ class KleisliContext<F, D, E>(val ME: MonadError<F, E>) : KleisliMonadErrorInsta
 }
 
 class KleisliContextPartiallyApplied<F, D, E>(val MF: MonadError<F, E>) {
+  @Deprecated(ExtensionsDSLDeprecated)
   infix fun <A> extensions(f: KleisliContext<F, D, E>.() -> A): A =
     f(KleisliContext(MF))
 }

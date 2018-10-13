@@ -6,6 +6,7 @@ import arrow.data.Coproduct
 import arrow.data.CoproductOf
 import arrow.data.CoproductPartialOf
 import arrow.data.fix
+import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.typeclasses.*
 
@@ -83,6 +84,7 @@ class CoproductContext<F, G>(val TF: Traverse<F>, val TG: Traverse<G>) : Coprodu
 }
 
 class CoproductContextPartiallyApplied<F, G>(val TF: Traverse<F>, val TG: Traverse<G>) {
+  @Deprecated(ExtensionsDSLDeprecated)
   infix fun <A> extensions(f: CoproductContext<F, G>.() -> A): A =
     f(CoproductContext(TF, TG))
 }
