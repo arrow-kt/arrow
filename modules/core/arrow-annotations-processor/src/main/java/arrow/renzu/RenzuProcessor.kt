@@ -19,10 +19,14 @@ class RenzuProcessor(val isolateForTests: Boolean = false) : AbstractProcessor()
 
   override fun getSupportedAnnotationTypes(): Set<String> = setOf(instanceAnnotationClass.canonicalName)
 
+  override fun onProcess(annotations: Set<TypeElement>, roundEnv: RoundEnvironment) {
+    //TODO Rewire based on arrow-meta after 0.8.0 (impl below)
+  }
+
   /**
    * Processor entry point
    */
-  override fun onProcess(annotations: Set<TypeElement>, roundEnv: RoundEnvironment) {
+  fun onProcessTODO(annotations: Set<TypeElement>, roundEnv: RoundEnvironment) {
     annotatedList += roundEnv
       .getElementsAnnotatedWith(instanceAnnotationClass)
       .map { element ->
