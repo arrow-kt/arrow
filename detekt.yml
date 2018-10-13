@@ -17,6 +17,8 @@ potential-bugs:
 
 exceptions:
   active: true
+  CatchException:
+    active: false
 
 empty:
   active: true

@@ -64,7 +64,6 @@ allprojects {
         maven { url "http://dl.bintray.com/arrow-kt/arrow-kt" }
         maven { url "https://dl.bintray.com/jetbrains/markdown/" }
         maven { url 'https://jitpack.io' }
-        maven { url "https://oss.jfrog.org/artifactory/oss-snapshot-local" }
     }
 }
 

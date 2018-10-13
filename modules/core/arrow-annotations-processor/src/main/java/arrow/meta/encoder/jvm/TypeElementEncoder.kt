@@ -2,6 +2,7 @@ package arrow.meta.encoder.jvm
 
 import arrow.common.utils.ClassOrPackageDataWrapper
 import arrow.common.utils.ProcessorUtils
+import arrow.meta.Either
 import arrow.meta.ast.*
 import arrow.meta.ast.Annotation
 import com.squareup.kotlinpoet.AnnotationSpec
@@ -15,10 +16,6 @@ import me.eugeniomarletti.kotlin.metadata.jvm.getJvmMethodSignature
 import me.eugeniomarletti.kotlin.metadata.jvm.jvmPropertySignature
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.TypeTable
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.hasReceiver
-import shadow.core.Either
-import shadow.core.None
-import shadow.core.Some
-import shadow.core.Try
 import javax.lang.model.element.*
 import javax.lang.model.element.Modifier
 import javax.lang.model.type.NoType
@@ -271,8 +268,8 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
       }
     else emptyList()
 
-  fun getTypeElement(name: String, elements: Elements): shadow.core.Option<TypeElement> =
-    Try { elements.getTypeElement(name) }.fold({ None }) { el -> if (el == null) None else Some(el) }
+  fun getTypeElement(name: String, elements: Elements): TypeElement? =
+    try { elements.getTypeElement(name) } catch (e: Exception) { null }
 
   fun TypeElement.asMetaType(): Type? =
     type().fold({ null }, { it })

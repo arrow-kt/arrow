@@ -99,10 +99,10 @@ interface JvmMetaApiImpl : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDeco
 
   override tailrec fun TypeName.asType(): Type? =
     when (this) {
-      is TypeName.TypeVariable -> getTypeElement(name, elementUtils).map { it.asMetaType() }.orNull()
+      is TypeName.TypeVariable -> getTypeElement(name, elementUtils)?.asMetaType()
       is TypeName.WildcardType -> null
       is TypeName.ParameterizedType -> rawType.asType()
-      is TypeName.Classy -> getTypeElement(fqName, elementUtils).map { it.asMetaType() }.orNull()
+      is TypeName.Classy -> getTypeElement(fqName, elementUtils)?.asMetaType()
     }
 
   override val Code.Companion.TODO: Code

@@ -12,7 +12,6 @@ dependencies {
     compile 'com.github.aballano:MnemoniK:1.0.0'
     compileOnly 'com.google.auto.service:auto-service:1.0-rc4'
     kapt 'com.google.auto.service:auto-service:1.0-rc4'
-    compile 'io.arrow-kt:arrow-shadow:0.7.4-SNAPSHOT'
 
     //To generate stubs for data classes
     kaptTest 'com.google.auto.service:auto-service:1.0-rc4'
