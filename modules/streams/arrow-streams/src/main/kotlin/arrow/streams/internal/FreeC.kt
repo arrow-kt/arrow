@@ -1,15 +1,12 @@
 package arrow.streams.internal
 
 import arrow.Kind
-import arrow.core.Either
-import arrow.core.FunctionK
-import arrow.core.Option
+import arrow.core.*
 import arrow.effects.ExitCase
 import arrow.higherkind
 import arrow.streams.CompositeFailure
 import arrow.streams.internal.FreeC.Result
-import arrow.streams.internal.ViewL.FreeCOf
-
+import arrow.typeclasses.MonadError
 
 /**
  * Free Monad with Catch (and Interruption).
@@ -25,11 +22,9 @@ import arrow.streams.internal.ViewL.FreeCOf
  * Typically the [[FreeC]] user provides interpretation of FreeC in form of [[ViewL]] structure, that allows to step
  * FreeC via series of Results ([[Result.Pure]], [[Result.Fail]] and [[Result.Interrupted]]) and FreeC step ([[ViewL.View]])
  */
-@higherkind
 internal sealed class FreeC<F, out R> : FreeCOf<F, R> {
 
   fun <R2> flatMap(f: (R) -> FreeC<F, R2>): FreeC<F, R2> = FreeC.Bind(this) { r: FreeC.Result<R> ->
-    //if (r is FreeC.Pure<F, X>) //Cannot check for instance of erassed type??? Is working in arrow.free
     r.fold(
       pure = {
         catchNonFatal({
@@ -57,15 +52,29 @@ internal sealed class FreeC<F, out R> : FreeCOf<F, R> {
     )
   }
 
-  open fun <G> translate(f: FunctionK<F, G>): FreeC<G, R> = TODO("""/*FreeC.suspend {
-    viewL match {
-      case ViewL.View(fx, k) =>
-      Bind(Eval(fx).translate(f), (e: Result[Any]) => k(e).translate(f))
-      case r @ Result.Pure(_)           => r.asFreeC[G]
-      case r @ Result.Fail(_)           => r.asFreeC[G]
-      case r @ Result.Interrupted(_, _) => r.asFreeC[G]
-    }
-  }*/""")
+  fun asHandler(e: Throwable): FreeC<F, R> = ViewL(this.fix()).fold(
+    pure = { FreeC.Fail(e) },
+    fail = { FreeC.Fail(CompositeFailure(it.error, e)) },
+    interrupted = {
+      FreeC.Interrupted(
+        it.context,
+        it.deferredError.map { t -> CompositeFailure(e, t) }.orElse { e.some() }
+      )
+    },
+    view = { it.next(FreeC.Fail<F, Any?>(e)) }
+  )
+
+  val viewL: ViewL<F, R>
+    get() = ViewL(this)
+
+  open fun <G> translate(f: FunctionK<F, G>): FreeC<G, R> = FreeC.suspend() {
+    viewL.fold(
+      view = { Bind(Eval(it.step).translate(f)) { e -> it.next(e).translate(f) } },
+      pure = { it.asFreeC<G>() },
+      fail = { it.asFreeC() },
+      interrupted = { it.asFreeC() }
+    )
+  }
 
   companion object {
 
@@ -180,81 +189,89 @@ internal fun <F, R> FreeCOf<F, R>.recoverWith(f: (Throwable) -> FreeCOf<F, R>): 
 
 internal interface ViewL<F, out R> {
   companion object {
+
     /** unrolled view of FreeC `bind` structure **/
     internal data class View<F, X, R>(val step: Kind<F, X>, val next: (FreeC.Result<X>) -> FreeC<F, R>) : ViewL<F, R>
 
-    /*
-    if(free is FreeC.Eval) {
-        View(free.fr, FreeC.pureContinuation())
-      } else if (free is FreeC.Bind<F, Any?, R>) {
+    operator fun <F, R> invoke(free: FreeC<F, R>): ViewL<F, R> = mk(free)
 
-      }
-     */
-
-    //  @tailrec
-    //  private def mk[F[_], R](free: FreeC[F, R]): ViewL[F, R] =
-    //  free match {
-    //    case Eval(fx) => View(fx, pureContinuation[F, R])
-    //    case b: FreeC.Bind[F, y, R] =>
-    //    b.fx match {
-    //      case Result(r)  => mk(b.f(r))
-    //      case Eval(fr)   => ViewL.View(fr, b.f)
-    //      case Bind(w, g) => mk(Bind(w, (e: Result[Any]) => Bind(g(e), b.f)))
-    //    }
-    //    case r @ Result.Pure(_)           => r
-    //    case r @ Result.Fail(_)           => r
-    //    case r @ Result.Interrupted(_, _) => r
-    //  }
-    fun <F, R> mk(free: FreeC<F, R>): ViewL<F, R> {
+    private tailrec fun <F, R> mk(free: FreeC<F, R>): ViewL<F, R> {
       return if (free is FreeC.Eval) View(free.fr, FreeC.pureContinuation())
       else if (free is FreeC.Bind<F, *, R>) {
         if (free.fx is FreeC.Pure || free.fx is FreeC.Fail || free.fx is FreeC.Interrupted<F, *, *>) {
           val f = free.f as (Result<R>) -> FreeC<F, R>
           val x = free.fx as Result<R>
           mk(f(x))
-        }
-        else if (free.fx is FreeC.Eval<*, *>) {
+        } else if (free.fx is FreeC.Eval<*, *>) {
           val f = free.f as (Result<R>) -> FreeC<F, R>
           val x = free.fx.fr as Kind<F, R>
           View(x, f)
-        }
-        else if (free.fx is FreeC.Bind<*, *, *>) {
+        } else if (free.fx is FreeC.Bind<*, *, *>) {
           val fx = free.fx as FreeC.Bind<F, R, R>
           val f = free.f as (Result<R>) -> FreeC<F, R>
           mk(FreeC.Bind(fx) { e: FreeC.Result<R> -> FreeC.Bind(f(e), fx.f) })
-        }
-        else throw RuntimeException("Unreachable BOOM!")
-      }
-      else if (free is FreeC.Pure) free
+        } else throw RuntimeException("Unreachable BOOM!")
+      } else if (free is FreeC.Pure) free
       else if (free is FreeC.Fail) free as ViewL<F, R>
       else if (free is FreeC.Interrupted<F, R, *>) free as FreeC.Interrupted<F, R, R>
       else throw RuntimeException("Unreachable BOOM!")
     }
 
   }
+}
 
-  /**
-   * Utils
-   */
-  internal typealias FreeCOf<F, R> = arrow.Kind2<ForFreeC, F, R>
-
-  internal typealias FreeCPartialOf<F> = arrow.Kind<ForFreeC, F>
-
-  @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
-  internal inline fun <F, R> FreeCOf<F, R>.fix(): FreeC<F, R> = this as FreeC<F, R>
-
-  internal open class ForFreeC internal constructor() {
-    companion object
+/* InvariantOps */
+// None indicates the FreeC was interrupted
+internal fun <F, R> FreeCOf<F, R>.run(ME: MonadError<F, Throwable>): Kind<F, Option<R>> = fix().viewL.fold(
+  pure = { ME.just(Some(it.r)) },
+  fail = { ME.raiseError(it.error) },
+  interrupted = { it.deferredError.fold({ ME.just(None) }, { e -> ME.raiseError(e) }) },
+  view = { view ->
+    ME.run {
+      view.step.attempt().flatMap { e ->
+        val next = view.next
+        val result: Result<Any?> = Result.fromEither(e)
+        next(result).run(ME)
+      }
+    }
   }
+)
 
-  //Wacky emulated sealed trait... :/
-  internal inline fun <R, A> FreeC.Result<R>.fold(
-    pure: (FreeC.Pure<Any?, R>) -> A,
-    fail: (FreeC.Fail<Any?, R>) -> A,
-    interrupted: (FreeC.Interrupted<Any?, R, Any?>) -> A
-  ): A = when (this) {
-    is FreeC.Pure<*, *> -> pure(this as FreeC.Pure<Any?, R>)
-    is FreeC.Fail<*, *> -> fail(this as FreeC.Fail<Any?, R>)
-    is FreeC.Interrupted<*, *, *> -> interrupted(this as FreeC.Interrupted<Any?, R, Any?>)
-    else -> throw AssertionError("Unreachable") //Emulated sealed trait
-  }
+/**
+ * Utils
+ */
+internal typealias FreeCOf<F, R> = arrow.Kind2<ForFreeC, F, R>
+
+internal typealias FreeCPartialOf<F> = arrow.Kind<ForFreeC, F>
+
+@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+internal inline fun <F, R> FreeCOf<F, R>.fix(): FreeC<F, R> = this as FreeC<F, R>
+
+internal open class ForFreeC internal constructor() {
+  companion object
+}
+
+//Wacky emulated sealed trait... :/
+internal inline fun <R, A> FreeC.Result<R>.fold(
+  pure: (FreeC.Pure<Any?, R>) -> A,
+  fail: (FreeC.Fail<Any?, R>) -> A,
+  interrupted: (FreeC.Interrupted<Any?, R, Any?>) -> A
+): A = when (this) {
+  is FreeC.Pure<*, R> -> pure(this as FreeC.Pure<Any?, R>)
+  is FreeC.Fail<*, R> -> fail(this as FreeC.Fail<Any?, R>)
+  is FreeC.Interrupted<*, *, *> -> interrupted(this as FreeC.Interrupted<Any?, R, Any?>)
+  else -> throw AssertionError("Unreachable")
+}
+
+internal inline fun <F, R, A> ViewL<F, R>.fold(
+  pure: (FreeC.Pure<F, R>) -> A,
+  fail: (FreeC.Fail<F, R>) -> A,
+  interrupted: (FreeC.Interrupted<F, R, Any?>) -> A,
+  view: (ViewL.Companion.View<F, Any?, R>) -> A
+): A = when(this) {
+  is FreeC.Pure -> pure(this)
+  is FreeC.Fail -> fail(this)
+  is FreeC.Interrupted<F, R, *> -> interrupted(this as FreeC.Interrupted<F, R, Any?>)
+  is ViewL.Companion.View<F, *, R> -> view(this as ViewL.Companion.View<F, Any?, R>)
+  else -> throw RuntimeException("Unreachable BOOM!")
+}
