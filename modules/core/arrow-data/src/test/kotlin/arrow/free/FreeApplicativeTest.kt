@@ -4,9 +4,9 @@ import arrow.Kind
 import arrow.core.*
 import arrow.data.NonEmptyList
 import arrow.data.fix
-import arrow.free.instances.ForFreeApplicative
 import arrow.free.instances.FreeApplicativeApplicativeInstance
 import arrow.free.instances.FreeApplicativeEq
+import arrow.free.instances.syntax.freeapplicative.applicative.applicative
 import arrow.free.instances.syntax.freeapplicative.eq.eq
 import arrow.instances.syntax.id.applicative.applicative
 import arrow.instances.syntax.id.monad.monad
@@ -45,13 +45,11 @@ class FreeApplicativeTest : UnitSpec() {
 
     val EQ: FreeApplicativeEq<OpsAp.F, ForId, Int> = FreeApplicative.eq(Id.monad(), idApInterpreter)
 
-    ForFreeApplicative<OpsAp.F>() extensions {
-      testLaws(
-        EqLaws.laws(EQ) { OpsAp.value(it) },
-        ApplicativeLaws.laws(OpsAp, EQ),
-        ApplicativeLaws.laws(this, EQ)
-      )
-    }
+    testLaws(
+      EqLaws.laws(EQ) { OpsAp.value(it) },
+      ApplicativeLaws.laws(OpsAp, EQ),
+      ApplicativeLaws.laws(FreeApplicative.applicative(), EQ)
+    )
 
     "Can interpret an ADT as FreeApplicative operations" {
       val result: Tuple3<Int, Int, Int> = Tuple3(1, 7, -1)

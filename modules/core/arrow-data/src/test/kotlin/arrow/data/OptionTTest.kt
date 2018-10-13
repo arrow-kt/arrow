@@ -1,11 +1,19 @@
 package arrow.data
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
 import arrow.instances.syntax.nonemptylist.monad.monad
 import arrow.instances.syntax.option.monad.monad
-import arrow.mtl.instances.ForOptionT
+import arrow.instances.syntax.option.semigroup.semigroup
+import arrow.instances.syntax.optiont.applicative.applicative
+import arrow.instances.syntax.optiont.monad.monad
+import arrow.instances.syntax.optiont.monoidK.monoidK
+import arrow.instances.syntax.optiont.semigroupK.semigroupK
 import arrow.mtl.instances.syntax.option.traverseFilter.traverseFilter
+import arrow.mtl.instances.syntax.optiont.functorFilter.functorFilter
+import arrow.mtl.instances.syntax.optiont.traverseFilter.traverseFilter
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
@@ -29,34 +37,30 @@ class OptionTTest : UnitSpec() {
 
   init {
 
-    ForOptionT(Option.monad(), Option.traverseFilter()) extensions {
+    testLaws(
+      MonadLaws.laws(OptionT.monad(Option.monad()), Eq.any()),
+      SemigroupKLaws.laws(
+        OptionT.semigroupK(Option.monad()),
+        OptionT.applicative(Option.monad()),
+        EQ()),
 
-      testLaws(
-        MonadLaws.laws(this, Eq.any()),
-        SemigroupKLaws.laws(
-          this,
-          this,
-          EQ()),
+      MonoidKLaws.laws(
+        OptionT.monoidK(Option.monad()),
+        OptionT.applicative(Option.monad()),
+        EQ()),
 
-        MonoidKLaws.laws(
-          this,
-          this,
-          EQ()),
+      FunctorFilterLaws.laws(
+        OptionT.functorFilter(Option.monad()),
+        { OptionT(Some(Some(it))) },
+        EQ()),
 
-        FunctorFilterLaws.laws(
-          this,
-          { OptionT(Some(Some(it))) },
-          EQ()),
-
-        TraverseFilterLaws.laws(
-          this,
-          this,
-          { OptionT(Some(Some(it))) },
-          EQ(),
-          EQ_NESTED())
-      )
-
-    }
+      TraverseFilterLaws.laws(
+        OptionT.traverseFilter(Option.traverseFilter()),
+        OptionT.applicative(Option.monad()),
+        { OptionT(Some(Some(it))) },
+        EQ(),
+        EQ_NESTED())
+    )
 
     "toLeft for Some should build a correct EitherT" {
       forAll { a: Int, b: String ->

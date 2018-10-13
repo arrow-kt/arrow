@@ -21,6 +21,7 @@ fun String.asKotlin(): String =
     }
     .replace("kotlin.Integer", "kotlin.Int")
     .replace("Integer", "Int")
+    .replace("java.lang.String", "kotlin.String")
 
 internal fun String.asClassy(): TypeName.Classy {
   val seed = toString().asKotlin()

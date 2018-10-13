@@ -1,13 +1,13 @@
 package arrow.instances
 
-import arrow.deprecation.ExtensionsDSLDeprecated
-import arrow.extension
 import arrow.typeclasses.*
 
-@extension
 interface StringSemigroupInstance : Semigroup<String> {
   override fun String.combine(b: String): String = "${this}$b"
 }
+
+fun String.Companion.semigroup(): Semigroup<String> =
+  object : StringSemigroupInstance {}
 
 interface StringMonoidInstance : Monoid<String>, StringSemigroupInstance {
   override fun empty(): String = ""
@@ -40,7 +40,6 @@ fun String.Companion.order(): Order<String> =
 object StringContext : StringShowInstance, StringOrderInstance, StringMonoidInstance
 
 object ForString {
-  @Deprecated(ExtensionsDSLDeprecated)
   infix fun <L> extensions(f: StringContext.() -> L): L =
     f(StringContext)
 }

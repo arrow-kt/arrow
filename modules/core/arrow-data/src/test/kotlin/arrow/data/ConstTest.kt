@@ -1,9 +1,11 @@
 package arrow.data
 
 import arrow.instances.monoid
+import arrow.instances.syntax.const.applicative.applicative
 import arrow.instances.syntax.const.eq.eq
 import arrow.instances.syntax.const.show.show
 import arrow.mtl.instances.*
+import arrow.mtl.instances.syntax.const.traverseFilter.traverseFilter
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.*
@@ -13,10 +15,10 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class ConstTest : UnitSpec() {
   init {
-    ForConst(Int.monoid()) extensions {
+    Int.monoid().run {
       testLaws(
-        TraverseFilterLaws.laws(this, this, { Const(it) }, Eq.any()),
-        ApplicativeLaws.laws(this, Eq.any()),
+        TraverseFilterLaws.laws(Const.traverseFilter(), Const.applicative(this), { Const(it) }, Eq.any()),
+        ApplicativeLaws.laws(Const.applicative(this), Eq.any()),
         EqLaws.laws(Const.eq<Int, Int>(Eq.any())) { Const(it) },
         ShowLaws.laws(Const.show(), Const.eq<Int, Int>(Eq.any())) { Const(it) }
       )

@@ -1,6 +1,5 @@
 package arrow.data
 
-import arrow.instances.ForStore
 import arrow.instances.syntax.store.comonad.comonad
 import arrow.test.UnitSpec
 import arrow.test.laws.ComonadLaws
@@ -21,11 +20,9 @@ class StoreTest : UnitSpec() {
         this.fix().extract() == b.fix().extract()
     }
 
-    ForStore<Int>() extensions {
-      testLaws(
-        ComonadLaws.laws(Store.comonad(), intStore, EQ)
-      )
-    }
+    testLaws(
+      ComonadLaws.laws(Store.comonad(), intStore, EQ)
+    )
 
     val greetingStore = { name: String -> Store(name) { "Hi $it!" } }
 

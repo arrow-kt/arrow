@@ -1,8 +1,9 @@
 package arrow.data
 
 import arrow.Kind
-import arrow.core.*
-import arrow.instances.ForSum
+import arrow.core.ForId
+import arrow.core.Id
+import arrow.core.fix
 import arrow.instances.syntax.id.comonad.comonad
 import arrow.instances.syntax.id.functor.functor
 import arrow.instances.syntax.sum.comonad.comonad
@@ -23,11 +24,9 @@ class SumTest : UnitSpec() {
       a.fix().extract(Id.comonad(), Id.comonad()) == b.fix().extract(Id.comonad(), Id.comonad())
     }
 
-    ForSum(Id.comonad(), Id.comonad()) extensions {
-      testLaws(
-        ComonadLaws.laws(Sum.comonad(Id.comonad(), Id.comonad()), cf, EQ)
-      )
-    }
+    testLaws(
+      ComonadLaws.laws(Sum.comonad(Id.comonad(), Id.comonad()), cf, EQ)
+    )
 
     val abSum = Sum.left(Id.just("A"), Id.just("B"))
 

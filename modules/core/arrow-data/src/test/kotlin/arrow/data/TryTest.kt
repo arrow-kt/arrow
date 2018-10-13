@@ -1,11 +1,17 @@
 package arrow.data
 
 import arrow.core.*
-import arrow.instances.*
+import arrow.instances.combine
+import arrow.instances.monoid
+import arrow.instances.semigroup
+import arrow.instances.syntax.`try`.applicative.map
 import arrow.instances.syntax.`try`.eq.eq
+import arrow.instances.syntax.`try`.functor.functor
+import arrow.instances.syntax.`try`.monadError.monadError
 import arrow.instances.syntax.`try`.monoid.monoid
 import arrow.instances.syntax.`try`.semigroup.semigroup
 import arrow.instances.syntax.`try`.show.show
+import arrow.instances.syntax.`try`.traverse.traverse
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
@@ -24,16 +30,14 @@ class TryTest : UnitSpec() {
 
     val EQ = Try.eq(Eq<Any> { a, b -> a::class == b::class }, Eq.any())
 
-    ForTry extensions {
-      testLaws(
-        SemigroupLaws.laws(Try.semigroup(Int.semigroup()), Try.just(1), Try.just(2), Try.just(3), EQ),
-        MonoidLaws.laws(Try.monoid(MO = Int.monoid()), Try.just(1), EQ),
-        EqLaws.laws(EQ) { Try.just(it) },
-        ShowLaws.laws(Try.show(), EQ) { Try.just(it) },
-        MonadErrorLaws.laws(this, Eq.any(), Eq.any()),
-        TraverseLaws.laws(this, this, ::Success, Eq.any())
-      )
-    }
+    testLaws(
+      SemigroupLaws.laws(Try.semigroup(Int.semigroup()), Try.just(1), Try.just(2), Try.just(3), EQ),
+      MonoidLaws.laws(Try.monoid(MO = Int.monoid()), Try.just(1), EQ),
+      EqLaws.laws(EQ) { Try.just(it) },
+      ShowLaws.laws(Try.show(), EQ) { Try.just(it) },
+      MonadErrorLaws.laws(Try.monadError(), Eq.any(), Eq.any()),
+      TraverseLaws.laws(Try.traverse(), Try.functor(), ::Success, Eq.any())
+    )
 
     "empty should return a Success of the empty of the inner type" {
       forAll { a: String ->
@@ -154,35 +158,29 @@ class TryTest : UnitSpec() {
     }
 
     "Cartesian builder should build products over homogeneous Try" {
-      ForTry extensions {
-        map(
-          Success("11th"),
-          Success("Doctor"),
-          Success("Who")
-        ) { (a, b, c) -> "$a $b $c" } shouldBe Success("11th Doctor Who")
-      }
+      map(
+        Success("11th"),
+        Success("Doctor"),
+        Success("Who")
+      ) { (a, b, c) -> "$a $b $c" } shouldBe Success("11th Doctor Who")
     }
 
     "Cartesian builder should build products over heterogeneous Try" {
-      ForTry extensions {
-        map(
-          Success(13),
-          Success("Doctor"),
-          Success(false)
-        ) { (a, b, c) -> "${a}th $b is $c" } shouldBe Success("13th Doctor is false")
-      }
+      map(
+        Success(13),
+        Success("Doctor"),
+        Success(false)
+      ) { (a, b, c) -> "${a}th $b is $c" } shouldBe Success("13th Doctor is false")
     }
 
     data class DoctorNotFoundException(val msg: String) : Exception()
 
     "Cartesian builder should build products over Failure Try" {
-      ForTry extensions {
-        map(
-          Success(13),
-          Failure(DoctorNotFoundException("13th Doctor is coming!")),
-          Success("Who")
-        ) { (a, b, c) -> "${a}th $b is $c" } shouldBe Failure(DoctorNotFoundException("13th Doctor is coming!"))
-      }
+      map(
+        Success(13),
+        Failure(DoctorNotFoundException("13th Doctor is coming!")),
+        Success("Who")
+      ) { (a, b, c) -> "${a}th $b is $c" } shouldBe Failure(DoctorNotFoundException("13th Doctor is coming!"))
     }
 
     "show" {

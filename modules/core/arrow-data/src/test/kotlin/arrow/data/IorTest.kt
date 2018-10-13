@@ -5,9 +5,8 @@ import arrow.core.Either
 import arrow.core.None
 import arrow.core.Some
 import arrow.data.Ior.Right
-import arrow.instances.ForIor
-import arrow.instances.eq
 import arrow.instances.semigroup
+import arrow.instances.syntax.ior.applicative.applicative
 import arrow.instances.syntax.ior.bifunctor.bifunctor
 import arrow.instances.syntax.ior.eq.eq
 import arrow.instances.syntax.ior.monad.monad
@@ -35,15 +34,13 @@ class IorTest : UnitSpec() {
       a.fix() == b.fix()
     }
 
-    ForIor(Int.semigroup()) extensions {
-      testLaws(
-        BifunctorLaws.laws(Ior.bifunctor(), { Ior.Both(it, it) }, EQ2),
-        EqLaws.laws(EQ) { Right(it) },
-        ShowLaws.laws(Ior.show(), EQ) { Right(it) },
-        MonadLaws.laws(this, Eq.any()),
-        TraverseLaws.laws(Ior.traverse(), this, ::Right, Eq.any())
-      )
-    }
+    testLaws(
+      BifunctorLaws.laws(Ior.bifunctor(), { Ior.Both(it, it) }, EQ2),
+      EqLaws.laws(EQ) { Right(it) },
+      ShowLaws.laws(Ior.show(), EQ) { Right(it) },
+      MonadLaws.laws(Ior.monad(Int.semigroup()), Eq.any()),
+      TraverseLaws.laws(Ior.traverse(), Ior.applicative(Int.semigroup()), ::Right, Eq.any())
+    )
 
     "bimap() should allow modify both value" {
       forAll { a: Int, b: String ->

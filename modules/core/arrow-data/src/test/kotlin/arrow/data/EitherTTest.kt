@@ -2,6 +2,7 @@ package arrow.data
 
 import arrow.core.*
 import arrow.instances.*
+import arrow.instances.syntax.either.monadError.monadError
 import arrow.instances.syntax.id.monad.monad
 import arrow.instances.syntax.id.traverse.traverse
 import arrow.instances.syntax.option.functor.functor
@@ -18,17 +19,14 @@ import org.junit.runner.RunWith
 class EitherTTest : UnitSpec() {
   init {
 
-    ForEitherT<ForId, Throwable>(Id.monad()) extensions {
-
       testLaws(
-        MonadErrorLaws.laws(this, Eq.any(), Eq.any()),
+        MonadErrorLaws.laws(Either.monadError(), Eq.any(), Eq.any()),
         TraverseLaws.laws(EitherT.traverse<ForId, Int>(Id.traverse()), EitherT.applicative<ForId, Int>(Id.monad()), { EitherT(Id(Right(it))) }, Eq.any()),
         SemigroupKLaws.laws<EitherTPartialOf<ForId, Int>>(
           EitherT.semigroupK(Id.monad()),
           EitherT.applicative(Id.monad()),
           Eq.any())
       )
-    }
 
     "mapLeft should alter left instance only" {
       forAll { i: Int, j: Int ->

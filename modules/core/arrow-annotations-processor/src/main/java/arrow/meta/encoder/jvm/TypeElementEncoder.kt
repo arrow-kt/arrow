@@ -51,11 +51,12 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
     metaApi().run {
       val encodingResult: Either<EncodingError, Type> =
         elementUtils.getPackageOf(this@type).let { pckg ->
+          val pckgName = pckg.qualifiedName.toString().asKotlin()
           when (kind) {
-            ElementKind.INTERFACE -> Either.Right(Type(PackageName(pckg.qualifiedName.toString()), asType().asTypeName().toMeta(), Type.Kind.Interface))
+            ElementKind.INTERFACE -> Either.Right(Type(PackageName(pckgName), asType().asTypeName().toMeta(), Type.Kind.Interface))
             ElementKind.CLASS -> {
               val typeElement = this@type as TypeElement
-              val classBuilder = Type(PackageName(pckg.qualifiedName.toString()), asType().asTypeName().toMeta(), Type.Kind.Class)
+              val classBuilder = Type(PackageName(pckgName), asType().asTypeName().toMeta(), Type.Kind.Class)
               val declaredConstructorSignatures = meta.constructorList.map { it.getJvmConstructorSignature(meta.nameResolver, meta.classProto.typeTable) }
               val constructors = ElementFilter.constructorsIn(elementUtils.getAllMembers(this@type)).filter {
                 declaredConstructorSignatures.contains(it.jvmMethodSignature)

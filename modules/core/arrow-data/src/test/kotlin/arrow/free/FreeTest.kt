@@ -3,10 +3,10 @@ package arrow.free
 import arrow.core.*
 import arrow.data.NonEmptyList
 import arrow.data.fix
-import arrow.free.instances.ForFree
 import arrow.free.instances.FreeEq
 import arrow.free.instances.FreeMonadInstance
 import arrow.free.instances.syntax.free.eq.eq
+import arrow.free.instances.syntax.free.monad.monad
 import arrow.higherkind
 import arrow.instances.syntax.id.monad.monad
 import arrow.instances.syntax.nonemptylist.monad.monad
@@ -54,13 +54,11 @@ class FreeTest : UnitSpec() {
 
     val EQ: FreeEq<ForOps, ForId, Int> = Free.eq(IdMonad, idInterpreter)
 
-    ForFree<ForOps>() extensions {
-      testLaws(
-        EqLaws.laws(EQ) { Ops.value(it) },
-        MonadLaws.laws(Ops, EQ),
-        MonadLaws.laws(this, EQ)
-      )
-    }
+    testLaws(
+      EqLaws.laws(EQ) { Ops.value(it) },
+      MonadLaws.laws(Ops, EQ),
+      MonadLaws.laws(Free.monad(), EQ)
+    )
 
     "Can interpret an ADT as Free operations" {
       program.foldMap(optionInterpreter, Option.monad()).fix() shouldBe Some(-30)

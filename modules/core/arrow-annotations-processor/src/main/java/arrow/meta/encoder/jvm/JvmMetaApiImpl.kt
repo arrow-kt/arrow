@@ -97,9 +97,13 @@ interface JvmMetaApiImpl : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDeco
   override fun Func.defaultDummyArgValues(): Func =
     copy(parameters = parameters.map { it.defaultDummyArgValue() })
 
+  fun String.resolveKotlinPrimitive(): String =
+    if (this.startsWith("kotlin.")) replace("kotlin.", "java.lang.")
+    else this
+
   override tailrec fun TypeName.asType(): Type? =
     when (this) {
-      is TypeName.TypeVariable -> getTypeElement(name, elementUtils)?.asMetaType()
+      is TypeName.TypeVariable -> getTypeElement(name.resolveKotlinPrimitive(), elementUtils)?.asMetaType()
       is TypeName.WildcardType -> null
       is TypeName.ParameterizedType -> rawType.asType()
       is TypeName.Classy -> getTypeElement(fqName, elementUtils)?.asMetaType()

@@ -2,10 +2,10 @@ package arrow.data
 
 import arrow.Kind
 import arrow.core.*
-import arrow.instances.ForKleisli
 import arrow.instances.syntax.`try`.monadError.monadError
 import arrow.instances.syntax.id.monad.monad
 import arrow.instances.syntax.kleisli.contravariant.contravariant
+import arrow.instances.syntax.kleisli.monadError.monadError
 import arrow.test.UnitSpec
 import arrow.test.laws.ContravariantLaws
 import arrow.test.laws.MonadErrorLaws
@@ -28,13 +28,10 @@ class KleisliTest : UnitSpec() {
   }
 
   init {
-
-    ForKleisli<ForTry, Int, Throwable>(Try.monadError()) extensions {
-      testLaws(
-        ContravariantLaws.laws(Kleisli.contravariant(), { Kleisli { x: Int -> Try.just(x) }.conest() }, ConestEQ()),
-        MonadErrorLaws.laws(this, EQ(), EQ())
-      )
-    }
+    testLaws(
+      ContravariantLaws.laws(Kleisli.contravariant(), { Kleisli { x: Int -> Try.just(x) }.conest() }, ConestEQ()),
+      MonadErrorLaws.laws(Kleisli.monadError<ForTry, Int, Throwable>(Try.monadError()), EQ(), EQ())
+    )
 
     "andThen should continue sequence" {
       val kleisli: Kleisli<ForId, Int, Int> = Kleisli { a: Int -> Id(a) }
