@@ -5,10 +5,8 @@ import arrow.common.messager.logW
 import arrow.common.utils.*
 import arrow.extension
 import arrow.meta.ast.*
-import arrow.meta.decoder.TypeDecoder
-import arrow.meta.encoder.instances.TypeEncoder
+import arrow.meta.encoder.TypeClassInstance
 import arrow.meta.processor.MetaProcessor
-import arrow.meta.processor.MetaProcessorUtils
 import com.google.auto.service.AutoService
 import com.squareup.kotlinpoet.FileSpec
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.TypeTable
@@ -20,13 +18,13 @@ import javax.lang.model.element.ElementKind
 import javax.lang.model.element.TypeElement
 
 @AutoService(Processor::class)
-class InstanceProcessor : MetaProcessor<extension, Type>(annotations = listOf(extension::class)), TypeEncoder, TypeDecoder {
+class InstanceProcessor : MetaProcessor<extension, Type>(annotations = listOf(extension::class)) {
   override fun transform(annotatedElement: AnnotatedElement): FileSpec.Builder =
     when (annotatedElement) {
       is AnnotatedElement.Interface -> {
         logW("Processing: ${annotatedElement.typeElement.simpleName}")
         try {
-          val info = annotatedElement.typeElement.typeClassInstance(this@InstanceProcessor)
+          val info = annotatedElement.typeElement.typeClassInstance()
           log("[${info?.instance?.name?.simpleName}] : Generating [${info?.typeClass?.name?.simpleName}] extensions for [${info?.projectedCompanion}]")
           val fileSpec = info?.let {
             FileSpec.builder(
@@ -63,7 +61,7 @@ class InstanceProcessor : MetaProcessor<extension, Type>(annotations = listOf(ex
   private fun notAnInstanceError(): Nothing =
     knownError("@instance is only allowed on `interface` extending another interface of at least one type argument (type class) as first declaration in the instance list")
 
-  fun MetaProcessorUtils.TypeClassInstance.genCompanionFactory(): Func {
+  fun TypeClassInstance.genCompanionFactory(): Func {
     val target = when (projectedCompanion) {
       is TypeName.Classy -> projectedCompanion.companion()
       else -> TypeName.Classy(
@@ -87,7 +85,7 @@ class InstanceProcessor : MetaProcessor<extension, Type>(annotations = listOf(ex
     )
   }
 
-  fun MetaProcessorUtils.TypeClassInstance.genDataTypeExtensions(): List<Func> {
+  fun TypeClassInstance.genDataTypeExtensions(): List<Func> {
     val extensionSet = typeClass.declaredFunctions.map { it.jvmMethodSignature }
     return instance
       .allFunctions
@@ -167,7 +165,7 @@ class LegacyInstanceProcessor : AbstractProcessor() {
 
     if (roundEnv.processingOver()) {
       val generatedDir = File(this.generatedDir!!, instanceAnnotationClass.simpleName).also { it.mkdirs() }
-      InstanceFileGenerator(generatedDir, annotatedList).generate()
+      InstanceFileGenerator(generatedDir, annotatedList, this).generate()
     }
   }
 
@@ -188,7 +186,7 @@ class LegacyInstanceProcessor : AbstractProcessor() {
       val proto: ClassOrPackageDataWrapper.Class = processor.getClassOrPackageDataWrapper(element) as ClassOrPackageDataWrapper.Class
       val typeTable = TypeTable(proto.classProto.typeTable)
       val superTypes: List<ClassOrPackageDataWrapper.Class> =
-        processor.supertypes(proto, typeTable, emptyList()).map { it as ClassOrPackageDataWrapper.Class }
+        processor.supertypes(proto, typeTable, processor, emptyList()).map { it as ClassOrPackageDataWrapper.Class }
       val typeClass = if (superTypes.isEmpty()) {
         knownError("@instance `${proto.fullName}` needs to extend a type class (interface with one type parameter) as it's first interface in the `extends` declaration")
       } else superTypes[0]

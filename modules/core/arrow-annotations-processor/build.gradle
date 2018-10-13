@@ -12,8 +12,7 @@ dependencies {
     compile 'com.github.aballano:MnemoniK:1.0.0'
     compileOnly 'com.google.auto.service:auto-service:1.0-rc4'
     kapt 'com.google.auto.service:auto-service:1.0-rc4'
-    compile project(path: ':arrow-shadow', configuration: 'shadow')
-    compile files('../../shadow/arrow-shadow/build/libs/arrow-shadow-0.7.4-SNAPSHOT-all.jar')
+    compile 'io.arrow-kt:arrow-shadow:0.7.4-SNAPSHOT'
 
     //To generate stubs for data classes
     kaptTest 'com.google.auto.service:auto-service:1.0-rc4'

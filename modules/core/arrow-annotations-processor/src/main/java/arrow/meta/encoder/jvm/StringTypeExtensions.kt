@@ -1,0 +1,53 @@
+package arrow.meta.encoder.jvm
+
+import arrow.common.utils.removeBackticks
+import arrow.meta.ast.PackageName
+import arrow.meta.ast.TypeName
+import shadow.core.Tuple2
+
+internal fun String.removeVariance(): String =
+  replace("out ", "").replace("in ", "")
+
+fun String.asKotlin(): String =
+  removeBackticks()
+    .replace("/", ".")
+    .replace("kotlin.jvm.functions", "kotlin")
+    .replace("java.util.Collection", "kotlin.collections.Collection")
+    .replace("java.lang.Throwable", "kotlin.Throwable").let {
+      if (it == "java.lang") it.replace("java.lang", "kotlin")
+      else it
+    }.let {
+      if (it == "java.util") it.replace("java.util", "kotlin.collections")
+      else it
+    }
+    .replace("kotlin.Integer", "kotlin.Int")
+    .replace("Integer", "Int")
+
+internal fun String.asClassy(): TypeName.Classy {
+  val seed = toString().asKotlin()
+  val rawTypeName = seed.substringBefore("<")
+  val pckg = if (rawTypeName.contains(".")) rawTypeName.substringBeforeLast(".") else ""
+  val simpleName = rawTypeName.substringAfterLast(".")
+  return TypeName.Classy(simpleName, rawTypeName, PackageName(pckg))
+}
+
+internal fun String.downKind(): Tuple2<String, String> =
+  run {
+    val classy = asClassy()
+    val kindedClassy = when {
+      classy.fqName == "arrow.Kind" -> {
+        val result = substringAfter("arrow.Kind<").substringBefore(",").asClassy()
+        if (result.fqName == "arrow.typeclasses.ForConst") result
+        else classy
+      }
+      else -> classy
+    }
+    val unAppliedName =
+      if (kindedClassy.simpleName.startsWith("For")) kindedClassy.simpleName.drop("For".length)
+      else kindedClassy.simpleName
+    when {
+      unAppliedName.endsWith("PartialOf") -> Tuple2(kindedClassy.pckg.value, unAppliedName.substringBeforeLast("PartialOf"))
+      unAppliedName.endsWith("Of") -> Tuple2(kindedClassy.pckg.value, unAppliedName.substringBeforeLast("Of"))
+      else -> Tuple2(kindedClassy.pckg.value, unAppliedName)
+    }
+  }

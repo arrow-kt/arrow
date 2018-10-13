@@ -19,7 +19,8 @@ data class FunctionMapping(
 
 data class Instance(
   val `package`: Package,
-  val target: AnnotatedInstance
+  val target: AnnotatedInstance,
+  val processorUtils: ProcessorUtils
 ) {
   val name = target.instance.simpleName
 
@@ -143,7 +144,7 @@ data class Instance(
     val paramType = target.processor.getClassOrPackageDataWrapper(rt) as ClassOrPackageDataWrapper.Class
     val paramTypeName = paramType.nameResolver.getString(paramType.classProto.fqName)
     val typeTable = TypeTable(paramType.classProto.typeTable)
-    val superTypes = target.processor.supertypes(paramType, typeTable, emptyList()).map {
+    val superTypes = target.processor.supertypes(paramType, typeTable, processorUtils, emptyList()).map {
       val t = it as ClassOrPackageDataWrapper.Class
       t.nameResolver.getString(t.classProto.fqName)
     }
@@ -173,10 +174,11 @@ data class Instance(
 
 class InstanceFileGenerator(
   private val generatedDir: File,
-  private val annotatedList: List<AnnotatedInstance>
+  private val annotatedList: List<AnnotatedInstance>,
+  private val processorUtils: ProcessorUtils
 ) {
 
-  private val instances: List<Instance> = annotatedList.map { Instance(it.dataType.`package`, it) }
+  private val instances: List<Instance> = annotatedList.map { Instance(it.dataType.`package`, it, processorUtils) }
 
   /**
    * Main entry point for deriving instance generation

@@ -83,32 +83,6 @@ interface ProcessorUtils : KotlinMetadataUtils {
     }
   }
 
-  fun supertypes(
-    current: ClassOrPackageDataWrapper.Class,
-    typeTable: TypeTable,
-    acc: List<ClassOrPackageDataWrapper>): List<ClassOrPackageDataWrapper> {
-    val interfaces = current.classProto.supertypes(typeTable).map {
-      it.extractFullName(current)
-    }.filter {
-      it != "`kotlin`.`Any`"
-    }
-    return when {
-      interfaces.isEmpty() -> acc
-      else -> {
-        interfaces.flatMap { i ->
-          try {
-            val className = i.removeBackticks().substringBefore("<")
-            val typeClassElement = elementUtils.getTypeElement(className)
-            val parentInterface = getClassOrPackageDataWrapper(typeClassElement)
-            val newAcc = acc + parentInterface
-            supertypes(parentInterface as ClassOrPackageDataWrapper.Class, typeTable, newAcc)
-          } catch (_: Throwable) {
-            emptyList<ClassOrPackageDataWrapper>()
-          }
-        }
-      }
-    }
-  }
 }
 
 fun String.removeBackticks() = replace("`", "")

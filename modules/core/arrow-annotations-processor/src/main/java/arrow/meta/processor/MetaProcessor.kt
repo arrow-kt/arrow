@@ -1,11 +1,16 @@
 package arrow.meta.processor
 
+import aballano.kotlinmemoization.memoize
 import arrow.common.utils.AbstractProcessor
+import arrow.common.utils.ClassOrPackageDataWrapper
+import arrow.common.utils.ProcessorUtils
 import arrow.common.utils.knownError
 import arrow.meta.ast.Tree
 import arrow.meta.ast.Type
-import arrow.meta.encoder.MetaEncoder
+import arrow.meta.ast.TypeName
+import arrow.meta.encoder.jvm.JvmMetaApiImpl
 import com.squareup.kotlinpoet.FileSpec
+import me.eugeniomarletti.kotlin.metadata.KotlinMetadataUtils
 import java.io.File
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion
@@ -15,11 +20,24 @@ import kotlin.reflect.KClass
 
 abstract class MetaProcessor<A : Annotation, B : Tree>(
   private val annotations: List<KClass<A>>
-) : AbstractProcessor(), MetaEncoder<B> {
+) : AbstractProcessor(), JvmMetaApiImpl {
+
+  override fun processorUtils(): ProcessorUtils = this
+
+  override fun kotlinMetadataUtils(): KotlinMetadataUtils = this
 
   override fun getSupportedSourceVersion(): SourceVersion = SourceVersion.latestSupported()
 
   override fun getSupportedAnnotationTypes(): Set<String> = annotations.map { it.java.canonicalName }.toSet()
+
+  override val typeNameDownKind: (typeName: TypeName) -> TypeName =
+    ::typeNameDownKindImpl.memoize()
+
+  override val typeElementToMeta: (classElement: TypeElement) -> ClassOrPackageDataWrapper =
+    ::getClassOrPackageDataWrapper.memoize()
+
+  override val typeNameToMeta: (typeName: com.squareup.kotlinpoet.TypeName) -> TypeName =
+    ::typeNameToMetaImpl.memoize()
 
   sealed class AnnotatedElement {
     data class Interface(val typeElement: TypeElement, val type: Type) : AnnotatedElement()
@@ -42,9 +60,8 @@ abstract class MetaProcessor<A : Annotation, B : Tree>(
           //          try {
           val result = when (element.kind) {
             ElementKind.INTERFACE, ElementKind.CLASS -> {
-              val typeEncoder = this as MetaEncoder<Type>
               val typeElement = element as TypeElement
-              val encodingResult = typeEncoder.encode(typeElement)
+              val encodingResult = typeElement.type()
               encodingResult.fold({ knownError(it.toString()) }, {
                 transform(
                   if (element.kind.isInterface)
