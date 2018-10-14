@@ -3,7 +3,6 @@ package arrow.streams.internal
 import arrow.Kind
 import arrow.core.*
 import arrow.effects.ExitCase
-import arrow.higherkind
 import arrow.streams.CompositeFailure
 import arrow.streams.internal.FreeC.Result
 import arrow.typeclasses.MonadError
@@ -27,11 +26,11 @@ internal sealed class FreeC<F, out R> : FreeCOf<F, R> {
   fun <R2> flatMap(f: (R) -> FreeCOf<F, R2>): FreeC<F, R2> = FreeC.Bind(this) { r: FreeC.Result<R> ->
     r.fold(
       pure = {
-        catchNonFatal({
+        try {
           f(it.r)
-        }, { t ->
-          FreeC.Fail(t)
-        })
+        } catch (t: Throwable) {
+          FreeC.Fail<F, R2>(t)
+        }
       },
       fail = { FreeC.Fail(it.error) },
       interrupted = { FreeC.Interrupted(it.context, it.deferredError) }
@@ -41,11 +40,11 @@ internal sealed class FreeC<F, out R> : FreeCOf<F, R> {
   fun <R2> map(f: (R) -> R2): FreeC<F, R2> = Bind(this) { r ->
     r.fold<R, FreeC<F, R2>>(
       pure = {
-        catchNonFatal({
+        try {
           FreeC.Pure(f(it.r))
-        }, { t ->
+        } catch (t: Throwable) {
           FreeC.Fail(t)
-        })
+        }
       },
       fail = { FreeC.Fail(it.error) },
       interrupted = { FreeC.Interrupted(it.context, it.deferredError) }
@@ -67,7 +66,7 @@ internal sealed class FreeC<F, out R> : FreeCOf<F, R> {
   val viewL: ViewL<F, R>
     get() = ViewL(this)
 
-  open fun <G> translate(f: FunctionK<F, G>): FreeC<G, R> = FreeC.suspend() {
+  open fun <G> translate(f: FunctionK<F, G>): FreeC<G, R> = FreeC.defer() {
     viewL.fold(
       view = { Bind(Eval(it.step).translate(f)) { e -> it.next(e).translate(f) } },
       pure = { it.asFreeC<G>() },
@@ -89,10 +88,13 @@ internal sealed class FreeC<F, out R> : FreeCOf<F, R> {
     fun <F, A, X> interrupted(interruptContext: X, failure: Option<Throwable>): FreeC<F, A> =
       FreeC.Interrupted(interruptContext, failure)
 
-    fun <F, R> suspend(fr: () -> FreeCOf<F, R>): FreeC<F, R> =
+    fun <F, R> defer(fr: () -> FreeCOf<F, R>): FreeC<F, R> =
       FreeC.Pure<F, Unit>(Unit).flatMap { _ -> fr() }
 
     fun <F, R> pureContinuation(): (Result<R>) -> FreeC<F, R> = { it.asFreeC() }
+
+    fun <F, A, B> tailRecM(a: A, f: (A) -> FreeC<F, Either<A, B>>): FreeC<F, B> =
+      f(a).flatMap { it.fold({ l -> tailRecM(l, f) }, { r -> FreeC.pure(r) }) }
 
   }
 
@@ -159,33 +161,42 @@ internal sealed class FreeC<F, out R> : FreeCOf<F, R> {
 
 }
 
+internal fun <F, A, B> FreeCOf<F, A>.ap(ff: Kind<FreeCPartialOf<F>, (A) -> B>): Kind<FreeCPartialOf<F>, B> =
+  ff.fix().flatMap { f ->
+    this@ap.fix().map(f)
+  }
+
 internal fun <F, R, R2> FreeCOf<F, R>.transformWith(f: (FreeC.Result<R>) -> FreeC<F, R2>): FreeC<F, R2> = FreeC.Bind(this.fix()) { r ->
-  catchNonFatal({
+  try {
     f(r)
-  }, { t ->
-    FreeC.Fail(t)
-  })
+  } catch (t: Throwable) {
+    FreeC.Fail<F, R2>(t)
+  }
 }
 
 internal fun <F, R> FreeCOf<F, R>.handleErrorWith(h: (Throwable) -> FreeCOf<F, R>): FreeC<F, R> = FreeC.Bind(this.fix()) { r ->
   r.fold(
     fail = { t ->
-      catchNonFatal({
+      try {
         h(t.error)
-      }, { tt ->
-        FreeC.Fail(tt) //Shouldn't this be a CompositeFailure??? https://github.com/functional-streams-for-scala/fs2/blob/7146253402a32181ebbece60a9745de0756bb3c1/core/shared/src/main/scala/fs2/internal/FreeC.scala#L57
-      })
+      }
+      //Should this be a CompositeFailure?
+      // https://github.com/functional-streams-for-scala/fs2/blob/7146253402a32181ebbece60a9745de0756bb3c1/core/shared/src/main/scala/fs2/internal/FreeC.scala#L57
+      catch (tt: Throwable) {
+        FreeC.Fail<F, R>(tt)
+      }
     },
     pure = { it.asFreeC() },
     interrupted = { it.asFreeC() })
 }
 
 internal fun <F, R> FreeCOf<F, R>.recoverWith(f: (Throwable) -> FreeCOf<F, R>): FreeC<F, R> = when (this) {
-  is FreeC.Fail -> try {
-    f(error).fix()
-  } catch (t: Throwable) {
-    FreeC.raiseError<F, R>(CompositeFailure(error, t))
-  }
+  is FreeC.Fail ->
+    try {
+      f(error).fix()
+    } catch (t: Throwable) {
+      FreeC.raiseError<F, R>(CompositeFailure(error, t))
+    }
   else -> this.fix()
 }
 
@@ -213,7 +224,7 @@ internal interface ViewL<F, out R> {
           is FreeC.Bind<F, *, *> -> {
             val w = fx.fx
             val g = fx.f as (Result<Any?>) -> FreeC<F, R>
-            mk(FreeC.Bind(w)  { e: FreeC.Result<Any?> -> FreeC.Bind(g(e), f) })
+            mk(FreeC.Bind(w) { e: FreeC.Result<Any?> -> FreeC.Bind(g(e), f) })
           }
         }
       }

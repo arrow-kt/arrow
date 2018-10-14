@@ -2,24 +2,15 @@ package arrow.streams.internal
 
 import arrow.Kind
 import arrow.core.*
-import arrow.effects.typeclasses.MonadDefer
-import arrow.instances.eq
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
-import arrow.test.generators.genOption
 import arrow.test.generators.genThrowable
 import arrow.test.laws.*
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Eq
-import arrow.typeclasses.MonadError
 import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.forAll
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import io.kotlintest.properties.map
 import org.junit.runner.RunWith
-import java.lang.RuntimeException
 
 @RunWith(KTestJUnitRunner::class)
 class FreeCTest : UnitSpec() {
@@ -32,36 +23,36 @@ class FreeCTest : UnitSpec() {
       f = { FreeC.pure(it) }
     ))
 
-//    testLaws(ApplicativeLaws.laws(
-//      A = object : FreeCApplicative<ForTry> {},
-//      EQ = Eq { a, b -> a.run(Try.monadError()) == b.run(Try.monadError()) }
-//    ))
-//
-//    testLaws(MonadLaws.laws(
-//      M = object : FreeCMonad<ForTry> {},
-//      EQ = Eq { a, b -> a.run(Try.monadError()) == b.run(Try.monadError()) }
-//    ))
-//
-//    testLaws(MonadErrorLaws.laws(
-//      M = object : FreeCMonadError<ForTry> {},
-//      EQ = Eq { a, b -> a.run(Try.monadError()) == b.run(Try.monadError()) },
-//      EQERR = Eq { a, b -> a.run(Try.monadError()) == b.run(Try.monadError()) },
-//      EQ_EITHER = Eq { a, b -> a.run(Try.monadError()) == b.run(Try.monadError()) }
-//    ))
-//
-//    testLaws(ApplicativeErrorLaws.laws(
-//      AE = object : FreeCApplicativeError<ForTry> {},
-//      EQ = Eq { a, b -> a.run(Try.monadError()) == b.run(Try.monadError()) },
-//      EQERR = Eq { a, b -> a.run(Try.monadError()) == b.run(Try.monadError()) },
-//      EQ_EITHER = Eq { a, b -> a.run(Try.monadError()) == b.run(Try.monadError()) }
-//    ))
-//
-//    testLaws(MonadDeferLaws.laws(
-//      SC = object : FreeCMonadDefer<ForTry> { },
-//      EQ = Eq { a, b -> a.run(Try.monadError()) == b.run(Try.monadError()) },
-//      EQERR = Eq { a, b -> a.run(Try.monadError()) == b.run(Try.monadError()) },
-//      EQ_EITHER = Eq { a, b -> a.run(Try.monadError()) == b.run(Try.monadError()) }
-//    ))
+    testLaws(ApplicativeLaws.laws(
+      A = FreeC.applicative<ForTry>(),
+      EQ = Eq { a, b -> a.run(Try.monadError()) == b.run(Try.monadError()) }
+    ))
+
+    testLaws(MonadLaws.laws(
+      M = FreeC.monad<ForTry>(),
+      EQ = Eq { a, b -> a.run(Try.monadError()) == b.run(Try.monadError()) }
+    ))
+
+    testLaws(MonadErrorLaws.laws(
+      M = FreeC.monadError<ForTry>(),
+      EQ = Eq { a, b -> a.run(Try.monadError()) == b.run(Try.monadError()) },
+      EQERR = Eq { a, b -> a.run(Try.monadError()) == b.run(Try.monadError()) },
+      EQ_EITHER = Eq { a, b -> a.run(Try.monadError()) == b.run(Try.monadError()) }
+    ))
+
+    testLaws(ApplicativeErrorLaws.laws(
+      AE = FreeC.applicativeError<ForTry>(),
+      EQ = Eq { a, b -> a.run(Try.monadError()) == b.run(Try.monadError()) },
+      EQERR = Eq { a, b -> a.run(Try.monadError()) == b.run(Try.monadError()) },
+      EQ_EITHER = Eq { a, b -> a.run(Try.monadError()) == b.run(Try.monadError()) }
+    ))
+
+    testLaws(MonadDeferLaws.laws(
+      SC = FreeC.monadDefer<ForTry>(),
+      EQ = Eq { a, b -> a.run(Try.monadError()) == b.run(Try.monadError()) },
+      EQERR = Eq { a, b -> a.run(Try.monadError()) == b.run(Try.monadError()) },
+      EQ_EITHER = Eq { a, b -> a.run(Try.monadError()) == b.run(Try.monadError()) }
+    ))
 
     "Running a pure value" {
       forAll(Gen.string()) { s ->
@@ -105,7 +96,7 @@ class FreeCTest : UnitSpec() {
 
     "Running an suspended value"{
       forAll(Gen.string()) { s ->
-        FreeC.suspend() { FreeC.pure<EitherPartialOf<Throwable>, String>(s) }
+        FreeC.defer() { FreeC.pure<EitherPartialOf<Throwable>, String>(s) }
           .run(Either.monadError()) == Right(Some(s))
       }
     }
