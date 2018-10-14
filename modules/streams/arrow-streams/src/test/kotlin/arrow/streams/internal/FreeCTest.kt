@@ -174,7 +174,7 @@ class FreeCTest : UnitSpec() {
   }
 }
 
-object EitherToTry : FunctionK<EitherPartialOf<Throwable>, ForTry> {
+internal object EitherToTry : FunctionK<EitherPartialOf<Throwable>, ForTry> {
   override fun <A> invoke(fa: Kind<EitherPartialOf<Throwable>, A>): Kind<ForTry, A> =
     fa.fix().fold({ Try.Failure(it) }, { Try.Success(it) })
 }

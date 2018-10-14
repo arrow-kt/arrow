@@ -107,6 +107,7 @@ internal sealed class FreeC<F, out R> : FreeCOf<F, R> {
 
   internal interface Result<out R> {
 
+    @Suppress("UNCHECKED_CAST")
     fun <F> asFreeC(): FreeC<F, R> = this as FreeC<F, R>
 
     fun asExitCase(): ExitCase<Throwable> = this.fold(
@@ -169,14 +170,23 @@ internal sealed class FreeC<F, out R> : FreeCOf<F, R> {
   override fun toString(): String = "FreeC(...) : toString is not stack-safe"
 }
 
+/**
+ * Transform both the context [F] and value [A].
+ */
 internal fun <F, G, A, B> FreeCOf<F, A>.transform(f: (A) -> B, fs: FunctionK<F, G>): FreeC<G, B> =
   this.fix().map(f).translate(fs)
 
+/**
+ * Given a function [ff] in the context of [FreeC], applies the function.
+ */
 internal fun <F, A, B> FreeCOf<F, A>.ap(ff: Kind<FreeCPartialOf<F>, (A) -> B>): Kind<FreeCPartialOf<F>, B> =
   ff.fix().flatMap { f ->
     this@ap.fix().map(f)
   }
 
+/**
+ * Transform [FreeC] while being able to inspect the [Result] type.
+ */
 internal fun <F, R, R2> FreeCOf<F, R>.transformWith(f: (FreeC.Result<R>) -> FreeC<F, R2>): FreeC<F, R2> = FreeC.Bind(this.fix()) { r ->
   try {
     f(r)
@@ -185,6 +195,9 @@ internal fun <F, R, R2> FreeCOf<F, R>.transformWith(f: (FreeC.Result<R>) -> Free
   }
 }
 
+/**
+ * Handle any error, potentially recovering from it, by mapping it to a [FreeCOf] value by [h].
+ */
 internal fun <F, R> FreeCOf<F, R>.handleErrorWith(h: (Throwable) -> FreeCOf<F, R>): FreeC<F, R> = FreeC.Bind(this.fix()) { r ->
   r.fold(
     fail = { t ->
@@ -201,28 +214,23 @@ internal fun <F, R> FreeCOf<F, R>.handleErrorWith(h: (Throwable) -> FreeCOf<F, R
     interrupted = { it.asFreeC() })
 }
 
-internal fun <F, R> FreeCOf<F, R>.recoverWith(f: (Throwable) -> FreeCOf<F, R>): FreeC<F, R> = when (this) {
-  is FreeC.Fail ->
-    try {
-      f(error).fix()
-    } catch (t: Throwable) {
-      FreeC.raiseError<F, R>(CompositeFailure(error, t))
-    }
-  else -> this.fix()
-}
+internal fun <F, A> A.freeC(): FreeC<F, A> = FreeC.pure(this)
 
 internal interface ViewL<F, out R> {
   companion object {
 
-    /** unrolled view of FreeC `bind` structure **/
+    /**
+     * Unrolled view of FreeC `bind` structure
+     */
     internal data class View<F, X, R>(val step: Kind<F, X>, val next: (FreeC.Result<X>) -> FreeC<F, R>) : ViewL<F, R>
 
     operator fun <F, R> invoke(free: FreeC<F, R>): ViewL<F, R> = mk(free)
 
+    @Suppress("UNCHECKED_CAST")
     private tailrec fun <F, R> mk(free: FreeC<F, R>): ViewL<F, R> = when (free) {
       is FreeC.Eval -> View(free.fr, FreeC.pureContinuation())
-      is FreeC.Pure -> free as ViewL<F, R>
-      is FreeC.Fail -> free as ViewL<F, R>
+      is FreeC.Pure -> free
+      is FreeC.Fail -> free
       is FreeC.Interrupted<F, R, *> -> free as FreeC.Interrupted<F, R, Any?>
       is FreeC.Bind<F, *, R> -> {
         val fx: FreeC<F, Any?> = free.fx
@@ -245,10 +253,11 @@ internal interface ViewL<F, out R> {
 
 }
 
-internal fun <F, A> A.freeC(): FreeC<F, A> = FreeC.pure(this)
-
-/* InvariantOps */
-// None indicates the FreeC was interrupted
+/**
+ * Runs a [FreeC] structure with [MonadError] in context of [F].
+ *
+ * @return [None] indicates that the [FreeC] was [FreeC.Interrupted].
+ */
 internal fun <F, R> FreeCOf<F, R>.run(ME: MonadError<F, Throwable>): Kind<F, Option<R>> = fix().viewL.fold(
   pure = { ME.just(Some(it.r)) },
   fail = { ME.raiseError(it.error) },
@@ -264,21 +273,18 @@ internal fun <F, R> FreeCOf<F, R>.run(ME: MonadError<F, Throwable>): Kind<F, Opt
   }
 )
 
-/**
- * Utils
- */
+
+/**  @higherkind doesn't respect access modifier **/
 internal typealias FreeCOf<F, R> = arrow.Kind2<ForFreeC, F, R>
-
 internal typealias FreeCPartialOf<F> = arrow.Kind<ForFreeC, F>
-
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
 internal inline fun <F, R> FreeCOf<F, R>.fix(): FreeC<F, R> = this as FreeC<F, R>
-
 internal open class ForFreeC internal constructor() {
   companion object
 }
 
 //Wacky emulated sealed trait... :/
+@Suppress("UNCHECKED_CAST")
 internal inline fun <R, A> FreeC.Result<R>.fold(
   pure: (FreeC.Pure<Any?, R>) -> A,
   fail: (FreeC.Fail<Any?, R>) -> A,
@@ -290,6 +296,21 @@ internal inline fun <R, A> FreeC.Result<R>.fold(
   else -> throw AssertionError("Unreachable")
 }
 
+/**
+ * Applies the given function [f] if this is a [FreeC.Fail], otherwise returns itself.
+ * This is like [flatMap] for the error-side.
+ */
+internal fun <R> FreeC.Result<R>.recoverWith(f: (Throwable) -> Result<R>): Result<R> = when (this) {
+  is FreeC.Fail<*, R> ->
+    try {
+      f(error)
+    } catch (t: Throwable) {
+      Result.raiseError<R>(CompositeFailure(error, t))
+    }
+  else -> this
+}
+
+@Suppress("UNCHECKED_CAST")
 internal inline fun <F, R, A> ViewL<F, R>.fold(
   pure: (FreeC.Pure<F, R>) -> A,
   fail: (FreeC.Fail<F, R>) -> A,
