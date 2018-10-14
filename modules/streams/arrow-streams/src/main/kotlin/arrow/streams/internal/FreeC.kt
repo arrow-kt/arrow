@@ -274,9 +274,12 @@ internal fun <F, R> FreeCOf<F, R>.run(ME: MonadError<F, Throwable>): Kind<F, Opt
 
 /**  @higherkind doesn't respect access modifier **/
 internal typealias FreeCOf<F, R> = arrow.Kind2<ForFreeC, F, R>
+
 internal typealias FreeCPartialOf<F> = arrow.Kind<ForFreeC, F>
+
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
 internal inline fun <F, R> FreeCOf<F, R>.fix(): FreeC<F, R> = this as FreeC<F, R>
+
 internal open class ForFreeC internal constructor() {
   companion object
 }
@@ -321,3 +324,22 @@ internal inline fun <F, R, A> ViewL<F, R>.fold(
   is ViewL.Companion.View<F, *, R> -> view(this as ViewL.Companion.View<F, Any?, R>)
   else -> throw RuntimeException("Unreachable BOOM!")
 }
+
+internal fun <F, A, B> FreeCOf<F, A>.bracketCase(use: (A) -> FreeC<F, B>, release: (A, ExitCase<Throwable>) -> FreeC<F, Unit>): FreeC<F, B> =
+  fix().flatMap { a ->
+    val used: FreeC<F, B> = try {
+      use(a)
+    } catch (t: Throwable) {
+      FreeC.Fail(t)
+    }
+    used.transformWith { result ->
+      release(a, result.asExitCase()).transformWith<F, Unit, B> { r2 ->
+        when (r2) {
+          is FreeC.Fail<*, *> -> result.recoverWith { t ->
+            FreeC.Fail<F, B>(CompositeFailure(t, r2.error))
+          }.asFreeC()
+          else -> result.asFreeC()
+        }
+      }
+    }
+  }
