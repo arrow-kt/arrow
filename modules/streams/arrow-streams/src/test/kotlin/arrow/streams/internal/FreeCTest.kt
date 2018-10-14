@@ -82,7 +82,7 @@ class FreeCTest : UnitSpec() {
 
     "Running an Eval value" {
       forAll(Gen.string()) { s ->
-        FreeC.eval(s.right())
+        FreeC.liftF(s.right())
           .run(Either.monadError()) == Right(Some(s))
       }
     }
@@ -155,9 +155,9 @@ class FreeCTest : UnitSpec() {
       }
     }
 
-    "translate eval value"{
+    "translate liftF value"{
       forAll(Gen.string()) { s ->
-        FreeC.eval<EitherPartialOf<Throwable>, String>(s.right())
+        FreeC.liftF<EitherPartialOf<Throwable>, String>(s.right())
           .translate(EitherToTry)
           .run(Try.monadError()) == Success(Some(s))
       }

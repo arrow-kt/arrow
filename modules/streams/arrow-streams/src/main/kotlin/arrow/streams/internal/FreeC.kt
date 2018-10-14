@@ -66,7 +66,7 @@ internal sealed class FreeC<F, out R> : FreeCOf<F, R> {
   val viewL: ViewL<F, R>
     get() = ViewL(this)
 
-  open fun <G> translate(f: FunctionK<F, G>): FreeC<G, R> = FreeC.defer() {
+  open fun <G> translate(f: FunctionK<F, G>): FreeC<G, R> = FreeC.defer {
     viewL.fold(
       view = { Bind(Eval(it.step).translate(f)) { e -> it.next(e).translate(f) } },
       pure = { it.asFreeC<G>() },
@@ -81,7 +81,7 @@ internal sealed class FreeC<F, out R> : FreeCOf<F, R> {
 
     fun <F, R> pure(r: R): FreeC<F, R> = FreeC.Pure(r)
 
-    fun <F, A> eval(f: Kind<F, A>): FreeC<F, A> = Eval(f)
+    fun <F, A> liftF(f: Kind<F, A>): FreeC<F, A> = Eval(f)
 
     fun <F, R> raiseError(error: Throwable): FreeC<F, R> = FreeC.Fail(error)
 
@@ -95,6 +95,13 @@ internal sealed class FreeC<F, out R> : FreeCOf<F, R> {
 
     fun <F, A, B> tailRecM(a: A, f: (A) -> FreeC<F, Either<A, B>>): FreeC<F, B> =
       f(a).flatMap { it.fold({ l -> tailRecM(l, f) }, { r -> FreeC.pure(r) }) }
+
+    fun <F> functionKF(): FunctionK<F, FreeCPartialOf<F>> =
+      object : FunctionK<F, FreeCPartialOf<F>> {
+        override fun <A> invoke(fa: Kind<F, A>): FreeC<F, A> =
+          liftF(fa)
+      }
+
 
   }
 
@@ -159,7 +166,11 @@ internal sealed class FreeC<F, out R> : FreeCOf<F, R> {
 
   data class Bind<F, X, R>(val fx: FreeC<F, X>, val f: (Result<X>) -> FreeCOf<F, R>) : FreeC<F, R>()
 
+  override fun toString(): String = "FreeC(...) : toString is not stack-safe"
 }
+
+internal fun <F, G, A, B> FreeCOf<F, A>.transform(f: (A) -> B, fs: FunctionK<F, G>): FreeC<G, B> =
+  this.fix().map(f).translate(fs)
 
 internal fun <F, A, B> FreeCOf<F, A>.ap(ff: Kind<FreeCPartialOf<F>, (A) -> B>): Kind<FreeCPartialOf<F>, B> =
   ff.fix().flatMap { f ->
@@ -233,6 +244,8 @@ internal interface ViewL<F, out R> {
   }
 
 }
+
+internal fun <F, A> A.freeC(): FreeC<F, A> = FreeC.pure(this)
 
 /* InvariantOps */
 // None indicates the FreeC was interrupted
