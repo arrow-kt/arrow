@@ -102,7 +102,6 @@ internal sealed class FreeC<F, out R> : FreeCOf<F, R> {
           liftF(fa)
       }
 
-
   }
 
   internal interface Result<out R> {
@@ -273,7 +272,6 @@ internal fun <F, R> FreeCOf<F, R>.run(ME: MonadError<F, Throwable>): Kind<F, Opt
   }
 )
 
-
 /**  @higherkind doesn't respect access modifier **/
 internal typealias FreeCOf<F, R> = arrow.Kind2<ForFreeC, F, R>
 internal typealias FreeCPartialOf<F> = arrow.Kind<ForFreeC, F>
@@ -284,7 +282,7 @@ internal open class ForFreeC internal constructor() {
 }
 
 //Wacky emulated sealed trait... :/
-@Suppress("UNCHECKED_CAST")
+@Suppress("UNCHECKED_CAST", "ThrowRuntimeException")
 internal inline fun <R, A> FreeC.Result<R>.fold(
   pure: (FreeC.Pure<Any?, R>) -> A,
   fail: (FreeC.Fail<Any?, R>) -> A,
@@ -310,7 +308,7 @@ internal fun <R> FreeC.Result<R>.recoverWith(f: (Throwable) -> Result<R>): Resul
   else -> this
 }
 
-@Suppress("UNCHECKED_CAST")
+@Suppress("UNCHECKED_CAST", "ThrowRuntimeException")
 internal inline fun <F, R, A> ViewL<F, R>.fold(
   pure: (FreeC.Pure<F, R>) -> A,
   fail: (FreeC.Fail<F, R>) -> A,
