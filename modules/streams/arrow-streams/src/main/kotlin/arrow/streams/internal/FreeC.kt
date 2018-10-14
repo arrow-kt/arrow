@@ -24,7 +24,7 @@ import arrow.typeclasses.MonadError
  */
 internal sealed class FreeC<F, out R> : FreeCOf<F, R> {
 
-  fun <R2> flatMap(f: (R) -> FreeC<F, R2>): FreeC<F, R2> = FreeC.Bind(this) { r: FreeC.Result<R> ->
+  fun <R2> flatMap(f: (R) -> FreeCOf<F, R2>): FreeC<F, R2> = FreeC.Bind(this) { r: FreeC.Result<R> ->
     r.fold(
       pure = {
         catchNonFatal({
@@ -78,6 +78,8 @@ internal sealed class FreeC<F, out R> : FreeCOf<F, R> {
 
   companion object {
 
+    fun <F> unit(): FreeC<F, Unit> = FreeC.pure(Unit)
+
     fun <F, R> pure(r: R): FreeC<F, R> = FreeC.Pure(r)
 
     fun <F, A> eval(f: Kind<F, A>): FreeC<F, A> = Eval(f)
@@ -87,7 +89,7 @@ internal sealed class FreeC<F, out R> : FreeCOf<F, R> {
     fun <F, A, X> interrupted(interruptContext: X, failure: Option<Throwable>): FreeC<F, A> =
       FreeC.Interrupted(interruptContext, failure)
 
-    fun <F, R> suspend(fr: () -> FreeC<F, R>): FreeC<F, R> =
+    fun <F, R> suspend(fr: () -> FreeCOf<F, R>): FreeC<F, R> =
       FreeC.Pure<F, Unit>(Unit).flatMap { _ -> fr() }
 
     fun <F, R> pureContinuation(): (Result<R>) -> FreeC<F, R> = { it.asFreeC() }
@@ -153,7 +155,7 @@ internal sealed class FreeC<F, out R> : FreeCOf<F, R> {
     }
   }
 
-  data class Bind<F, X, R>(val fx: FreeC<F, X>, val f: (Result<X>) -> FreeC<F, R>) : FreeC<F, R>()
+  data class Bind<F, X, R>(val fx: FreeC<F, X>, val f: (Result<X>) -> FreeCOf<F, R>) : FreeC<F, R>()
 
 }
 
@@ -165,7 +167,7 @@ internal fun <F, R, R2> FreeCOf<F, R>.transformWith(f: (FreeC.Result<R>) -> Free
   })
 }
 
-internal fun <F, R> FreeCOf<F, R>.handleErrorWith(h: (Throwable) -> FreeC<F, R>): FreeC<F, R> = FreeC.Bind(this.fix()) { r ->
+internal fun <F, R> FreeCOf<F, R>.handleErrorWith(h: (Throwable) -> FreeCOf<F, R>): FreeC<F, R> = FreeC.Bind(this.fix()) { r ->
   r.fold(
     fail = { t ->
       catchNonFatal({
@@ -195,29 +197,30 @@ internal interface ViewL<F, out R> {
 
     operator fun <F, R> invoke(free: FreeC<F, R>): ViewL<F, R> = mk(free)
 
-    private tailrec fun <F, R> mk(free: FreeC<F, R>): ViewL<F, R> {
-      return if (free is FreeC.Eval) View(free.fr, FreeC.pureContinuation())
-      else if (free is FreeC.Bind<F, *, R>) {
-        if (free.fx is FreeC.Pure || free.fx is FreeC.Fail || free.fx is FreeC.Interrupted<F, *, *>) {
-          val f = free.f as (Result<R>) -> FreeC<F, R>
-          val x = free.fx as Result<R>
-          mk(f(x))
-        } else if (free.fx is FreeC.Eval<*, *>) {
-          val f = free.f as (Result<R>) -> FreeC<F, R>
-          val x = free.fx.fr as Kind<F, R>
-          View(x, f)
-        } else if (free.fx is FreeC.Bind<*, *, *>) {
-          val fx = free.fx as FreeC.Bind<F, R, R>
-          val f = free.f as (Result<R>) -> FreeC<F, R>
-          mk(FreeC.Bind(fx) { e: FreeC.Result<R> -> FreeC.Bind(f(e), fx.f) })
-        } else throw RuntimeException("Unreachable BOOM!")
-      } else if (free is FreeC.Pure) free
-      else if (free is FreeC.Fail) free as ViewL<F, R>
-      else if (free is FreeC.Interrupted<F, R, *>) free as FreeC.Interrupted<F, R, R>
-      else throw RuntimeException("Unreachable BOOM!")
+    private tailrec fun <F, R> mk(free: FreeC<F, R>): ViewL<F, R> = when (free) {
+      is FreeC.Eval -> View(free.fr, FreeC.pureContinuation())
+      is FreeC.Pure -> free as ViewL<F, R>
+      is FreeC.Fail -> free as ViewL<F, R>
+      is FreeC.Interrupted<F, R, *> -> free as FreeC.Interrupted<F, R, Any?>
+      is FreeC.Bind<F, *, R> -> {
+        val fx: FreeC<F, Any?> = free.fx
+        val f = free.f as (Result<R>) -> FreeC<F, R>
+        when (fx) {
+          is FreeC.Pure -> mk(f(fx as Result<R>))
+          is FreeC.Fail -> mk(f(fx as Result<R>))
+          is FreeC.Interrupted<F, *, *> -> mk(f(fx as Result<R>))
+          is FreeC.Eval -> View(fx.fr as Kind<F, R>, f)
+          is FreeC.Bind<F, *, *> -> {
+            val w = fx.fx
+            val g = fx.f as (Result<Any?>) -> FreeC<F, R>
+            mk(FreeC.Bind(w)  { e: FreeC.Result<Any?> -> FreeC.Bind(g(e), f) })
+          }
+        }
+      }
     }
 
   }
+
 }
 
 /* InvariantOps */
@@ -268,7 +271,7 @@ internal inline fun <F, R, A> ViewL<F, R>.fold(
   fail: (FreeC.Fail<F, R>) -> A,
   interrupted: (FreeC.Interrupted<F, R, Any?>) -> A,
   view: (ViewL.Companion.View<F, Any?, R>) -> A
-): A = when(this) {
+): A = when (this) {
   is FreeC.Pure -> pure(this)
   is FreeC.Fail -> fail(this)
   is FreeC.Interrupted<F, R, *> -> interrupted(this as FreeC.Interrupted<F, R, Any?>)
