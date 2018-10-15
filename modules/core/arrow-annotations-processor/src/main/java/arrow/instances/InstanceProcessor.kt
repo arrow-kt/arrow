@@ -18,7 +18,7 @@ import javax.lang.model.element.ElementKind
 import javax.lang.model.element.TypeElement
 
 @AutoService(Processor::class)
-class InstanceProcessor : MetaProcessor<extension, Type>(annotations = listOf(extension::class)) {
+class InstanceProcessor : MetaProcessor<extension>(extension::class) {
   override fun transform(annotatedElement: AnnotatedElement): FileSpec.Builder =
     when (annotatedElement) {
       is AnnotatedElement.Interface -> {

@@ -5,10 +5,10 @@ import arrow.common.utils.AbstractProcessor
 import arrow.common.utils.ClassOrPackageDataWrapper
 import arrow.common.utils.ProcessorUtils
 import arrow.common.utils.knownError
-import arrow.meta.ast.Tree
 import arrow.meta.ast.Type
 import arrow.meta.ast.TypeName
 import arrow.meta.encoder.jvm.JvmMetaApi
+import arrow.meta.processor.MetaProcessor.AnnotatedElement
 import com.squareup.kotlinpoet.FileSpec
 import me.eugeniomarletti.kotlin.metadata.KotlinMetadataUtils
 import java.io.File
@@ -18,9 +18,19 @@ import javax.lang.model.element.ElementKind
 import javax.lang.model.element.TypeElement
 import kotlin.reflect.KClass
 
-abstract class MetaProcessor<A : Annotation, B : Tree>(
-  private val annotations: List<KClass<A>>
-) : AbstractProcessor(), JvmMetaApi {
+/**
+ * The Meta Processor provides access to the Meta Api and is meant to be extended by concrete processors.
+ * It performs processing automatically provided the concrete processor implements:
+ *
+ * override fun transform(annotatedElement: AnnotatedElement): FileSpec.Builder
+ *
+ * [AnnotatedElement] provides already reified `Type` instances from the Arrow meta AST
+ * that attempts to unify as much info as possible from the annotated Kotlin code.
+ *
+ * The Current [JvmMetaApi] impl includes support for extracting information with a blend
+ * of Kotlin Poet, TypeElement java api's and the Kotlin Metadata Library.
+ */
+abstract class MetaProcessor<A : Annotation>(private val annotation: KClass<A>) : AbstractProcessor(), JvmMetaApi {
 
   override fun processorUtils(): ProcessorUtils = this
 
@@ -28,7 +38,7 @@ abstract class MetaProcessor<A : Annotation, B : Tree>(
 
   override fun getSupportedSourceVersion(): SourceVersion = SourceVersion.latestSupported()
 
-  override fun getSupportedAnnotationTypes(): Set<String> = annotations.map { it.java.canonicalName }.toSet()
+  override fun getSupportedAnnotationTypes(): Set<String> = setOf(annotation.java.canonicalName)
 
   override val typeNameDownKind: (typeName: TypeName) -> TypeName =
     ::typeNameDownKindImpl.memoize()
@@ -53,7 +63,6 @@ abstract class MetaProcessor<A : Annotation, B : Tree>(
    */
   @Suppress("UNCHECKED_CAST")
   override fun onProcess(annotations: Set<TypeElement>, roundEnv: RoundEnvironment) {
-    this.annotations.forEach { annotation ->
       transformList += roundEnv
         .getElementsAnnotatedWith(annotation.java)
         .flatMap { element ->
@@ -83,7 +92,6 @@ abstract class MetaProcessor<A : Annotation, B : Tree>(
         val generatedDir = File(this.generatedDir!!, annotation.java.simpleName).also { it.mkdirs() }
         transformList.forEach { it.writeTo(generatedDir) }
       }
-    }
   }
 
 }
