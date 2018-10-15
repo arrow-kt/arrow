@@ -20,7 +20,7 @@ Since the allocation of mutable state is not referentially transparent this side
 ```kotlin:ank:silent
 import arrow.effects.*
 
-val ioRef: IO<Ref<ForIO, Int>> = Ref.of(1, IO.monadDefer())
+val ioRef: IO<Ref<ForIO, Int>> = Ref.of(1, IO.monadDefer()).fix()
 ```
 
 In case you want the side-effect to execute immediately and return the `Ref` instance you can use the `unsafe` function.
@@ -56,6 +56,8 @@ ioRef.flatMap { ref ->
 }.unsafeRunSync()
 ```
 ```kotlin:ank
+import arrow.core.toT
+
 ioRef.flatMap { ref ->
   ref.getAndSet(5).fix().flatMap { old ->
     ref.get().fix().map { new -> old toT new }
