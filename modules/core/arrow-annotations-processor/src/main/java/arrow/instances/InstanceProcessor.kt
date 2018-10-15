@@ -33,7 +33,16 @@ class InstanceProcessor : MetaProcessor<extension, Type>(annotations = listOf(ex
             )
           }
           if (fileSpec != null) {
-            val functions = info.genDataTypeExtensions() + listOf(info.genCompanionFactory())
+            val wrappedType = info.dataType.kindWrapper()
+            val wrappedExtensions = if (wrappedType != null) {
+              info
+                .genDataTypeExtensions(wrappedType)
+                .map { it.addExtraDummyArg() }
+                .filter { ext ->
+                  ext.name !in info.dataType.allFunctions.map { it.name }
+                }
+            } else emptyList()
+            val functions = wrappedExtensions + info.genDataTypeExtensions() + listOf(info.genCompanionFactory())
             functions.fold(fileSpec) { spec, func ->
               spec.addFunction(func.lyrics().toBuilder()
                 .build())
@@ -76,16 +85,11 @@ class InstanceProcessor : MetaProcessor<extension, Type>(annotations = listOf(ex
       receiverType = target,
       typeVariables = instance.typeVariables.map { it.removeConstrains() },
       returnType = instance.name,
-      body = Code {
-        """|return object : ${+instance.name} {
-             |  ${requiredAbstractFunctions.code()}
-             |}
-          """
-      }
+      body = Code { "return object : ${+instance.name} { ${requiredAbstractFunctions.code()} }" }
     )
   }
 
-  fun TypeClassInstance.genDataTypeExtensions(): List<Func> {
+  fun TypeClassInstance.genDataTypeExtensions(wrappedType: Pair<TypeName, TypeName.ParameterizedType>? = null): List<Func> {
     val extensionSet = typeClass.declaredFunctions.map { it.jvmMethodSignature }
     return instance
       .allFunctions
@@ -99,7 +103,7 @@ class InstanceProcessor : MetaProcessor<extension, Type>(annotations = listOf(ex
       }
       .map { it.removeConstrains() }
       .map { f ->
-        val func = f.removeDummyArgs().downKindReturnType()
+        val func = f.removeDummyArgs().downKindReturnType().wrap(wrappedType)
         val dummyArgsCount = f.countDummyArgs()
         val allArgs = func.parameters + requiredParameters
         val typeVariables = (func.typeVariables + instance.typeVariables)
@@ -115,22 +119,35 @@ class InstanceProcessor : MetaProcessor<extension, Type>(annotations = listOf(ex
               SuppressAnnotation(
                 """"UNCHECKED_CAST"""",
                 """"USELESS_CAST"""",
-                """"EXTENSION_SHADOWED_BY_MEMBER""""
+                """"EXTENSION_SHADOWED_BY_MEMBER"""",
+                """"UNUSED_PARAMETER""""
               )
             ),
             parameters = allArgs,
             body = Code {
               val receiverType = func.receiverType
+              val wrappedArgs =
+                if (wrappedType != null) {
+                  func.parameters.code {
+                    if (it.type.rawName == wrappedType.second.rawName) Code("${dataType.name.rawName}(${it.name})")
+                    else Code(it.name)
+                  }
+                } else func.parameters.codeNames()
               if (receiverType != null) {
+                val impl = if (wrappedType != null && receiverType.rawName == wrappedType.second.rawName) {
+                  "${dataType.name.rawName}(this@${+func.name}).${+func.name}${+func.typeVariables}($wrappedArgs) as ${+func.returnType}"
+                } else {
+                  "${+func.name}${+func.typeVariables}($wrappedArgs) as ${+func.returnType}"
+                }
                 """|return ${+projectedCompanion}.${typeClass.name.simpleName.decapitalize()}${+instance.typeVariables}(${requiredParameters.code { +it.name }}).run {
-                     |  ${+func.name}${+func.typeVariables}(${func.parameters.codeNames()}) as ${+func.returnType}
+                     |  $impl
                      |}
                      |
                    """
               } else {
                 """|return ${+projectedCompanion}
                      |   .${typeClass.name.simpleName.decapitalize()}${+instance.typeVariables}(${requiredParameters.code { +it.name }})
-                     |   .${+func.name}${+func.typeVariables}(${func.parameters.codeNames()}) as ${+func.returnType}
+                     |   .${+func.name}${+func.typeVariables}($wrappedArgs) as ${+func.returnType}
                      |
                    """
               }

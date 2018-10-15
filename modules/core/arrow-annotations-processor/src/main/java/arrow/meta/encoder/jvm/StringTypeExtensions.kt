@@ -11,6 +11,9 @@ fun String.asKotlin(): String =
   removeBackticks()
     .replace("/", ".")
     .replace("kotlin.jvm.functions", "kotlin")
+    .replace("java.util.List", "kotlin.collections.List")
+    .replace("java.util.Set", "kotlin.collections.Set")
+    .replace("java.util.Map", "kotlin.collections.Map")
     .replace("java.util.Collection", "kotlin.collections.Collection")
     .replace("java.lang.Throwable", "kotlin.Throwable").let {
       if (it == "java.lang") it.replace("java.lang", "kotlin")

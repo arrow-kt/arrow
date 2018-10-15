@@ -8,7 +8,7 @@ import arrow.common.utils.knownError
 import arrow.meta.ast.Tree
 import arrow.meta.ast.Type
 import arrow.meta.ast.TypeName
-import arrow.meta.encoder.jvm.JvmMetaApiImpl
+import arrow.meta.encoder.jvm.JvmMetaApi
 import com.squareup.kotlinpoet.FileSpec
 import me.eugeniomarletti.kotlin.metadata.KotlinMetadataUtils
 import java.io.File
@@ -20,7 +20,7 @@ import kotlin.reflect.KClass
 
 abstract class MetaProcessor<A : Annotation, B : Tree>(
   private val annotations: List<KClass<A>>
-) : AbstractProcessor(), JvmMetaApiImpl {
+) : AbstractProcessor(), JvmMetaApi {
 
   override fun processorUtils(): ProcessorUtils = this
 

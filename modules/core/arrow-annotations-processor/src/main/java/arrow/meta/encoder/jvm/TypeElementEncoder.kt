@@ -16,6 +16,7 @@ import me.eugeniomarletti.kotlin.metadata.jvm.getJvmMethodSignature
 import me.eugeniomarletti.kotlin.metadata.jvm.jvmPropertySignature
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.TypeTable
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.hasReceiver
+import java.lang.IllegalArgumentException
 import javax.lang.model.element.*
 import javax.lang.model.element.Modifier
 import javax.lang.model.type.NoType
@@ -53,10 +54,10 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
         elementUtils.getPackageOf(this@type).let { pckg ->
           val pckgName = pckg.qualifiedName.toString().asKotlin()
           when (kind) {
-            ElementKind.INTERFACE -> Either.Right(Type(PackageName(pckgName), asType().asTypeName().toMeta(), Type.Kind.Interface))
+            ElementKind.INTERFACE -> Either.Right(Type(PackageName(pckgName), asType().asTypeName().toMeta(), Type.Shape.Interface))
             ElementKind.CLASS -> {
               val typeElement = this@type as TypeElement
-              val classBuilder = Type(PackageName(pckgName), asType().asTypeName().toMeta(), Type.Kind.Class)
+              val classBuilder = Type(PackageName(pckgName), asType().asTypeName().toMeta(), Type.Shape.Class)
               val declaredConstructorSignatures = meta.constructorList.map { it.getJvmConstructorSignature(meta.nameResolver, meta.classProto.typeTable) }
               val constructors = ElementFilter.constructorsIn(elementUtils.getAllMembers(this@type)).filter {
                 declaredConstructorSignatures.contains(it.jvmMethodSignature)
@@ -152,33 +153,41 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
           declaredElement,
           *declaredElement.typeParameters.map { it.asType() }.toTypedArray()
         )
-        allMembers.asSequence().filterNot {
+        val filteredMembers = allMembers.asSequence().filterNot {
           it.modifiers.containsAll(listOf(Modifier.PRIVATE, Modifier.FINAL))
         }.filterNot {
-          it.modifiers.containsAll(listOf(Modifier.PUBLIC, Modifier.FINAL))
-        }.map { member ->
+          it.modifiers.containsAll(listOf(Modifier.PUBLIC, Modifier.FINAL, Modifier.NATIVE))
+        }
+        val members = filteredMembers.mapNotNull { member ->
           val templateFunction = allFunctions.find { (proto, function) ->
             function.getJvmMethodSignature(proto.nameResolver, proto.classProto.typeTable) == member.jvmMethodSignature
           }
-          val function = FunSpec.overriding(
-            member,
-            declaredType,
-            processorUtils().typeUtils
-          ).build().toMeta(member)
-          val result =
-            if (templateFunction != null && templateFunction.second.modality != null) {
-              val fMod = function.copy(
-                modifiers = function.modifiers + listOfNotNull(templateFunction.second.modality?.toMeta())
-              )
-              if (templateFunction.second.hasReceiverType()) {
-                val receiverTypeName = fMod.parameters[0].type.asKotlin()
-                val functionWithReceiver = fMod.copy(receiverType = receiverTypeName)
-                val arguments = functionWithReceiver.parameters.drop(1)
-                functionWithReceiver.copy(parameters = arguments)
-              } else fMod
-            } else function
-          result
+          try {
+            val function = FunSpec.overriding(
+              member,
+              declaredType,
+              processorUtils().typeUtils
+            ).build().toMeta(member)
+            val result =
+              if (templateFunction != null && templateFunction.second.modality != null) {
+                val fMod = function.copy(
+                  modifiers = function.modifiers + listOfNotNull(templateFunction.second.modality?.toMeta())
+                )
+                if (templateFunction.second.hasReceiverType()) {
+                  val receiverTypeName = fMod.parameters[0].type.asKotlin()
+                  val functionWithReceiver = fMod.copy(receiverType = receiverTypeName)
+                  val arguments = functionWithReceiver.parameters.drop(1)
+                  functionWithReceiver.copy(parameters = arguments)
+                } else fMod
+              } else function
+            result
+          } catch (e: IllegalArgumentException) {
+            //logW("Can't override: ${declaredElement.simpleName} :: $member")
+            //some public final functions can't be seen as overridden
+            templateFunction?.second?.toMeta(templateFunction.first, member)
+          }
         }.toList()
+        members
       }
     }
 

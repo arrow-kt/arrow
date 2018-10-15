@@ -1,14 +1,15 @@
 package arrow.meta.encoder.jvm
 
 import arrow.common.utils.*
-import arrow.meta.ast.Modifier
-import arrow.meta.ast.PackageName
-import arrow.meta.ast.TypeName
+import arrow.meta.ast.*
 import me.eugeniomarletti.kotlin.metadata.escapedClassName
+import me.eugeniomarletti.kotlin.metadata.jvm.jvmMethodSignature
+import me.eugeniomarletti.kotlin.metadata.modality
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.NameResolver
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.TypeTable
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.supertypes
+import javax.lang.model.element.ExecutableElement
 
 interface KotlinMetatadataEncoder {
 
@@ -138,5 +139,37 @@ interface KotlinMetatadataEncoder {
     val nullability = if (nullable) "?" else ""
     return name + arguments + nullability
   }
+
+  fun ProtoBuf.ValueParameter.toMeta(owner: ClassOrPackageDataWrapper.Class): Parameter =
+    Parameter(
+      name = owner.nameResolver.getString(name),
+      type = type.asTypeName(owner)
+    )
+
+  fun ProtoBuf.TypeParameter.Variance.toMeta(): Modifier =
+    when (this) {
+      ProtoBuf.TypeParameter.Variance.IN -> Modifier.InVariance
+      ProtoBuf.TypeParameter.Variance.OUT -> Modifier.OutVariance
+      ProtoBuf.TypeParameter.Variance.INV -> Modifier.InVariance
+    }
+
+  fun ProtoBuf.TypeParameter.toMeta(owner: ClassOrPackageDataWrapper.Class): TypeName.TypeVariable =
+    TypeName.TypeVariable(
+      name = owner.nameResolver.getString(name),
+      bounds = upperBoundList.map { it.asTypeName(owner) },
+      variance = if (hasVariance()) variance.toMeta() else null,
+      reified = if (hasReified()) reified else false
+    )
+
+  fun ProtoBuf.Function.toMeta(owner: ClassOrPackageDataWrapper.Class, executableElement: ExecutableElement): Func =
+    Func(
+      name = owner.nameResolver.getString(name),
+      parameters = valueParameterList.map { it.toMeta(owner) },
+      receiverType = if (receiverType != null) receiverType.asTypeName(owner) else null,
+      returnType = returnType.asTypeName(owner),
+      typeVariables = typeParameterList.map { it.toMeta(owner) },
+      modifiers = listOf(modality?.asModifier()).requireNoNulls(),
+      jvmMethodSignature = jvmMethodSignature.toString()
+    )
 
 }

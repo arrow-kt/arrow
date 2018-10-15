@@ -1,14 +1,18 @@
+/**
+ * The arrow AST represents already reified immutable values of the trees
+ * a compiler may see over types and their members
+ */
 package arrow.meta.ast
+
+sealed class Tree {
+  companion object
+}
 
 data class Code(val value : String) {
   override fun toString(): String = value
   companion object {
     val empty = Code("")
   }
-}
-
-sealed class Tree {
-  companion object
 }
 
 data class PackageName(
@@ -28,18 +32,10 @@ data class Import(
   companion object
 }
 
-data class File(
-  val fileName: String,
-  val packageName: PackageName? = null,
-  val imports: List<Import> = emptyList(),
-  val types: List<Type> = emptyList(),
-  val functions : List<Func> = emptyList()) {
-  companion object
-}
-
 sealed class TypeName : Tree() {
 
   abstract val simpleName: String
+  abstract val rawName: String
 
   data class TypeVariable(
     val name: String,
@@ -51,6 +47,9 @@ sealed class TypeName : Tree() {
 
     override val simpleName: String
       get() = name
+
+    override val rawName: String
+      get() = name.substringBefore("<")
 
     companion object
   }
@@ -65,6 +64,9 @@ sealed class TypeName : Tree() {
     override val simpleName: String
       get() = name
 
+    override val rawName: String
+      get() = name.substringBefore("<")
+
     companion object
   }
 
@@ -75,6 +77,9 @@ sealed class TypeName : Tree() {
     val typeArguments: List<TypeName> = emptyList(),
     val nullable: Boolean = false,
     val annotations: List<Annotation> = emptyList()) : TypeName() {
+
+    override val rawName: String
+      get() = name.substringBefore("<")
 
     override val simpleName: String
       get() = rawType.simpleName
@@ -88,6 +93,9 @@ sealed class TypeName : Tree() {
     val pckg: PackageName,
     val nullable: Boolean = false,
     val annotations: List<Annotation> = emptyList()) : TypeName() {
+
+    override val rawName: String
+      get() = fqName
 
     fun companion(): Classy =
       copy(
@@ -204,7 +212,7 @@ sealed class Modifier {
 data class Type(
   val packageName: PackageName,
   val name: TypeName,
-  val kind: Type.Kind,
+  val kind: Type.Shape,
   val kdoc: Code? = null,
   val modifiers: List<Modifier> = emptyList(),
   val primaryConstructor: Func? = null,
@@ -220,10 +228,10 @@ data class Type(
   val allFunctions: List<Func> = emptyList(),
   val types: List<Type> = emptyList()) : Tree() {
 
-  sealed class Kind {
-    object Class : Kind()
-    object Interface: Kind()
-    object Object: Kind()
+  sealed class Shape {
+    object Class : Shape()
+    object Interface: Shape()
+    object Object: Shape()
     companion object
   }
 

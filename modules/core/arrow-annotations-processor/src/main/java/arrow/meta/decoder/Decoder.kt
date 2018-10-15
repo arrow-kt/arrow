@@ -5,10 +5,16 @@ import arrow.meta.ast.Annotation
 import arrow.meta.ast.TypeName
 import com.squareup.kotlinpoet.*
 
+/**
+ * Provides ways to go from a [Tree] to [Code] for the purposes of code gen and reporting
+ */
 interface MetaDecoder<in A : Tree> {
   fun decode(tree: A): Code
 }
 
+/**
+ * Type decoder that leverages Kotlin Poet to organize imports and output formatted code
+ */
 interface TypeDecoder : MetaDecoder<Type> {
 
   override fun decode(tree: Type): Code =
@@ -17,9 +23,9 @@ interface TypeDecoder : MetaDecoder<Type> {
   fun Type.lyrics(): TypeSpec {
     val className = name.toString()
     val builder = when (kind) {
-      Type.Kind.Class -> TypeSpec.classBuilder(className)
-      Type.Kind.Interface -> TypeSpec.interfaceBuilder(className)
-      Type.Kind.Object -> TypeSpec.objectBuilder(className)
+      Type.Shape.Class -> TypeSpec.classBuilder(className)
+      Type.Shape.Interface -> TypeSpec.interfaceBuilder(className)
+      Type.Shape.Object -> TypeSpec.objectBuilder(className)
     }
     val enumConstantBuilder = enumConstants.keys.fold(builder) { b, key ->
       val typeSpec = enumConstants[key]?.lyrics()
