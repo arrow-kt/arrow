@@ -74,7 +74,6 @@ interface MetaApi {
   fun TypeName.ParameterizedType.nestedTypeVariables(): List<TypeName>
   fun TypeName.Classy.nestedTypeVariables(): List<TypeName>
 
-
   /**
    * Normalizes potentially rogue types coming from Java introspection into their Kotlin counterpart.
    * ex: `java.lang.Integer -> Kotlin.Int`
