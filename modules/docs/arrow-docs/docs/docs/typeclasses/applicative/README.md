@@ -125,9 +125,15 @@ The following datatypes in Arrow provide instances that adhere to the `Applicati
 - [NonEmptyList]({{ '/docs/datatypes/nonemptylist' | relative_url }})
 - [Id]({{ '/docs/datatypes/id' | relative_url }})
 - [Function0]({{ '/docs/datatypes/function0' | relative_url }})
+- [Observable]({{ '/docs/integrations/rx2' | relative_url }})
+- [Flowable]({{ '/docs/integrations/rx2' | relative_url }})
+- [Deferred]({{ '/docs/integrations/kotlinxcoroutines' | relative_url }})
+- [Flux]({{ '/docs/integrations/reactor' | relative_url }})
+- [Mono]({{ '/docs/integrations/reactor' | relative_url }})
+- [IO]({{ '/docs/effects/io' | relative_url }})
 
 Additionally all instances of [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) and their MTL variants implement the `Applicative` typeclass directly
 since they are all subtypes of `Applicative`.
 
-[applicative_source]: https://github.com/arrow-kt/arrow/blob/master/arrow-data/src/main/kotlin/arrow/typeclasses/Applicative.kt
-[applicative_law_source]: https://github.com/arrow-kt/arrow/blob/master/arrow-test/src/main/kotlin/arrow/laws/ApplicativeLaws.kt
+[applicative_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-typeclasses/src/main/kotlin/arrow/typeclasses/Applicative.kt
+[applicative_law_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-test/src/main/kotlin/arrow/test/laws/ApplicativeLaws.kt

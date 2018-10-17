@@ -1,6 +1,7 @@
 package arrow.instances
 
 import arrow.Kind
+import arrow.Kind2
 import arrow.core.*
 import arrow.instance
 import arrow.typeclasses.*
@@ -25,6 +26,21 @@ interface Function1MonoidInstance<I, O> : Function1SemigroupInstance<I, O>, Mono
 interface Function1FunctorInstance<I> : Functor<Function1PartialOf<I>> {
   override fun <A, B> Kind<Function1PartialOf<I>, A>.map(f: (A) -> B): Function1<I, B> =
     fix().map(f)
+}
+
+@instance(Function1::class)
+interface Function1ContravariantInstance<O> : Contravariant<Conested<ForFunction1, O>> {
+  override fun <A, B> Kind<Conested<ForFunction1, O>, A>.contramap(f: (B) -> A): Kind<Conested<ForFunction1, O>, B> =
+    counnest().fix().contramap(f).conest()
+
+  fun <A, B> Function1Of<A, O>.contramapC(f: (B) -> A): Function1Of<B, O> =
+    conest().contramap(f).counnest()
+}
+
+@instance(Function1::class)
+interface Function1ProfunctorInstance : Profunctor<ForFunction1> {
+  override fun <A, B, C, D> Kind<Function1PartialOf<A>, B>.dimap(fl: (C) -> A, fr: (B) -> D): Function1<C, D> =
+    (fr compose fix().f compose fl).k()
 }
 
 @instance(Function1::class)
@@ -66,3 +82,9 @@ class Function1ContextPartiallyApplied<L> {
 fun <L> ForFunction1(): Function1ContextPartiallyApplied<L> =
   Function1ContextPartiallyApplied()
 
+@instance(Function1::class)
+interface Function1CategoryInstance : Category<ForFunction1> {
+  override fun <A> id(): Kind2<ForFunction1, A, A> = Function1.id()
+
+  override fun <A, B, C> Kind2<ForFunction1, B, C>.compose(arr: Kind2<ForFunction1, A, B>): Kind2<ForFunction1, A, C> = fix().compose(arr.fix())
+}

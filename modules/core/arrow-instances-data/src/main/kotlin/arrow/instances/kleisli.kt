@@ -15,11 +15,20 @@ interface KleisliFunctorInstance<F, D> : Functor<KleisliPartialOf<F, D>> {
 }
 
 @instance(Kleisli::class)
+interface KleisliContravariant<F, D> : Contravariant<Conested<Kind<ForKleisli, F>, D>> {
+  override fun <A, B> Kind<Conested<Kind<ForKleisli, F>, D>, A>.contramap(f: (B) -> A): Kind<Conested<Kind<ForKleisli, F>, D>, B> =
+      counnest().fix().local(f).conest()
+
+  fun <A, B> KleisliOf<F, A, D>.contramapC(f: (B) -> A): KleisliOf<F, B, D> =
+      conest().contramap(f).counnest()
+}
+
+@instance(Kleisli::class)
 interface KleisliApplicativeInstance<F, D> : KleisliFunctorInstance<F, D>, Applicative<KleisliPartialOf<F, D>> {
 
   override fun FF(): Applicative<F>
 
-  override fun <A> just(a: A): Kleisli<F, D, A> = Kleisli({ FF().just(a) })
+  override fun <A> just(a: A): Kleisli<F, D, A> = Kleisli { FF().just(a) }
 
   override fun <A, B> Kind<KleisliPartialOf<F, D>, A>.map(f: (A) -> B): Kleisli<F, D, B> =
     fix().map(FF(), f)
@@ -28,7 +37,7 @@ interface KleisliApplicativeInstance<F, D> : KleisliFunctorInstance<F, D>, Appli
     fix().ap(FF(), ff)
 
   override fun <A, B> Kind<KleisliPartialOf<F, D>, A>.product(fb: Kind<KleisliPartialOf<F, D>, B>): Kleisli<F, D, Tuple2<A, B>> =
-    Kleisli({ FF().run { fix().run(it).product(fb.fix().run(it)) } })
+    Kleisli { FF().run { fix().run(it).product(fb.fix().run(it)) } }
 }
 
 @instance(Kleisli::class)

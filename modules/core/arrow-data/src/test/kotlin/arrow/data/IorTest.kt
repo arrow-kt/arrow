@@ -1,16 +1,15 @@
 package arrow.data
 
+import arrow.Kind2
 import arrow.core.Either
 import arrow.core.None
 import arrow.core.Some
 import arrow.data.Ior.Right
 import arrow.instances.ForIor
+import arrow.instances.eq
 import arrow.instances.semigroup
 import arrow.test.UnitSpec
-import arrow.test.laws.EqLaws
-import arrow.test.laws.MonadLaws
-import arrow.test.laws.ShowLaws
-import arrow.test.laws.TraverseLaws
+import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monad
 import io.kotlintest.KTestJUnitRunner
@@ -27,9 +26,14 @@ class IorTest : UnitSpec() {
 
     val EQ = Ior.eq(Eq.any(), Eq.any())
 
+    val EQ2: Eq<Kind2<ForIor, Int, Int>> = Eq { a, b ->
+      a.fix() == b.fix()
+    }
+
     ForIor(Int.semigroup()) extensions {
       testLaws(
-        EqLaws.laws(EQ, { Right(it) }),
+        BifunctorLaws.laws(Ior.bifunctor(), { Ior.Both(it, it) }, EQ2),
+        EqLaws.laws(EQ) { Right(it) },
         ShowLaws.laws(Ior.show(), EQ) { Right(it) },
         MonadLaws.laws(this, Eq.any()),
         TraverseLaws.laws(Ior.traverse(), this, ::Right, Eq.any())
@@ -126,7 +130,7 @@ class IorTest : UnitSpec() {
 
     "Ior.monad.flatMap should combine left values" {
       val ior1 = Ior.Both(3, "Hello, world!")
-      val iorResult = intIorMonad.run { ior1.flatMap({ Ior.Left<Int, String>(7) }) }
+      val iorResult = intIorMonad.run { ior1.flatMap { Ior.Left<Int, String>(7) } }
       iorResult shouldBe Ior.Left<Int, String>(10)
     }
 

@@ -1,20 +1,10 @@
 package arrow.instances
 
 import arrow.Kind
+import arrow.Kind2
 import arrow.core.*
 import arrow.instance
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.ApplicativeError
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Foldable
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadError
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Semigroup
-import arrow.typeclasses.SemigroupK
-import arrow.typeclasses.Show
-import arrow.typeclasses.Traverse
+import arrow.typeclasses.*
 import arrow.core.ap as eitherAp
 import arrow.core.combineK as eitherCombineK
 import arrow.core.flatMap as eitherFlatMap
@@ -58,6 +48,12 @@ interface EitherMonoidInstance<L, R> : EitherSemigroupInstance<L, R>, Monoid<Eit
 @instance(Either::class)
 interface EitherFunctorInstance<L> : Functor<EitherPartialOf<L>> {
   override fun <A, B> Kind<EitherPartialOf<L>, A>.map(f: (A) -> B): Either<L, B> = fix().map(f)
+}
+
+@instance(Either::class)
+interface EitherBifunctorInstance : Bifunctor<ForEither> {
+  override fun <A, B, C, D> Kind2<ForEither, A, B>.bimap(fl: (A) -> C, fr: (B) -> D): Kind2<ForEither, C, D> =
+    fix().bimap(fl, fr)
 }
 
 @instance(Either::class)
@@ -113,9 +109,8 @@ interface EitherFoldableInstance<L> : Foldable<EitherPartialOf<L>> {
     fix().foldRight(lb, f)
 }
 
-fun <G, A, B, C> EitherOf<A, B>.traverse(GA: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, Either<A, C>> = GA.run {
-  fix().fold({ just(Either.Left(it)) }, { f(it).map({ Either.Right(it) }) })
-}
+fun <G, A, B, C> EitherOf<A, B>.traverse(GA: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, Either<A, C>> =
+  fix().fold({ GA.just(Either.Left(it)) }, { GA.run { f(it).map { Either.Right(it) } } })
 
 @instance(Either::class)
 interface EitherTraverseInstance<L> : EitherFoldableInstance<L>, Traverse<EitherPartialOf<L>> {

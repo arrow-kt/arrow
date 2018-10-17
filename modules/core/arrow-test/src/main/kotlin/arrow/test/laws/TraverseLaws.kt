@@ -37,30 +37,30 @@ object TraverseLaws {
 
   inline fun <F> laws(TF: Traverse<F>, FF: Functor<F>, noinline cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): List<Law> =
     FoldableLaws.laws(TF, cf, Eq.any()) + FunctorLaws.laws(FF, cf, EQ) + listOf(
-      Law("Traverse Laws: Identity", { TF.identityTraverse(FF, cf, EQ) }),
-      Law("Traverse Laws: Sequential composition", { TF.sequentialComposition(cf, EQ) }),
-      Law("Traverse Laws: Parallel composition", { TF.parallelComposition(cf, EQ) }),
-      Law("Traverse Laws: FoldMap derived", { TF.foldMapDerived(cf) })
+      Law("Traverse Laws: Identity") { TF.identityTraverse(FF, cf, EQ) },
+      Law("Traverse Laws: Sequential composition") { TF.sequentialComposition(cf, EQ) },
+      Law("Traverse Laws: Parallel composition") { TF.parallelComposition(cf, EQ) },
+      Law("Traverse Laws: FoldMap derived") { TF.foldMapDerived(cf) }
     )
 
   fun <F> Traverse<F>.identityTraverse(FF: Functor<F>, cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>) = Id.applicative().run {
-    forAll(genFunctionAToB<Int, Kind<ForId, Int>>(genConstructor(genIntSmall(), ::Id)), genConstructor(genIntSmall(), cf), { f: (Int) -> Kind<ForId, Int>, fa: Kind<F, Int> ->
+    forAll(genFunctionAToB<Int, Kind<ForId, Int>>(genConstructor(genIntSmall(), ::Id)), genConstructor(genIntSmall(), cf)) { f: (Int) -> Kind<ForId, Int>, fa: Kind<F, Int> ->
       fa.traverse(this, f).value().equalUnderTheLaw(FF.run { fa.map(f).map { it.value() } }, EQ)
-    })
+    }
   }
 
   fun <F> Traverse<F>.sequentialComposition(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>) = Id.applicative().run {
-    forAll(genFunctionAToB<Int, Kind<ForId, Int>>(genConstructor(genIntSmall(), ::Id)), genFunctionAToB<Int, Kind<ForId, Int>>(genConstructor(genIntSmall(), ::Id)), genConstructor(genIntSmall(), cf), { f: (Int) -> Kind<ForId, Int>, g: (Int) -> Kind<ForId, Int>, fha: Kind<F, Int> ->
+    forAll(genFunctionAToB<Int, Kind<ForId, Int>>(genConstructor(genIntSmall(), ::Id)), genFunctionAToB<Int, Kind<ForId, Int>>(genConstructor(genIntSmall(), ::Id)), genConstructor(genIntSmall(), cf)) { f: (Int) -> Kind<ForId, Int>, g: (Int) -> Kind<ForId, Int>, fha: Kind<F, Int> ->
 
       val fa = fha.traverse(this, f).fix()
-      val composed = fa.map({ it.traverse(this, g) }).value.value()
-      val expected = fha.traverse(ComposedApplicative(this, this), { a: Int -> f(a).map(g).nest() }).unnest().value().value()
+      val composed = fa.map { it.traverse(this, g) }.value.value()
+      val expected = fha.traverse(ComposedApplicative(this, this)) { a: Int -> f(a).map(g).nest() }.unnest().value().value()
       composed.equalUnderTheLaw(expected, EQ)
-    })
+    }
   }
 
   fun <F> Traverse<F>.parallelComposition(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>) =
-    forAll(genFunctionAToB<Int, Kind<ForId, Int>>(genConstructor(genIntSmall(), ::Id)), genFunctionAToB<Int, Kind<ForId, Int>>(genConstructor(genIntSmall(), ::Id)), genConstructor(genIntSmall(), cf), { f: (Int) -> Kind<ForId, Int>, g: (Int) -> Kind<ForId, Int>, fha: Kind<F, Int> ->
+    forAll(genFunctionAToB<Int, Kind<ForId, Int>>(genConstructor(genIntSmall(), ::Id)), genFunctionAToB<Int, Kind<ForId, Int>>(genConstructor(genIntSmall(), ::Id)), genConstructor(genIntSmall(), cf)) { f: (Int) -> Kind<ForId, Int>, g: (Int) -> Kind<ForId, Int>, fha: Kind<F, Int> ->
       val TIA = object : Applicative<TIF> {
         override fun <A> just(a: A): Kind<TIF, A> =
           TIC(Id(a) toT Id(a))
@@ -79,16 +79,16 @@ object TraverseLaws {
         }
       }
 
-      val seen: TI<Kind<F, Int>> = fha.traverse(TIA, { TIC(f(it) toT g(it)) }).fix().ti
+      val seen: TI<Kind<F, Int>> = fha.traverse(TIA) { TIC(f(it) toT g(it)) }.fix().ti
       val expected: TI<Kind<F, Int>> = TIC(fha.traverse(Id.applicative(), f) toT fha.traverse(Id.applicative(), g)).ti
 
       seen.equalUnderTheLaw(expected, TIEQ)
-    })
+    }
 
   fun <F> Traverse<F>.foldMapDerived(cf: (Int) -> Kind<F, Int>) =
-    forAll(genFunctionAToB<Int, Int>(genIntSmall()), genConstructor(genIntSmall(), cf), { f: (Int) -> Int, fa: Kind<F, Int> ->
-      val traversed = fa.traverse(Const.applicative(Int.monoid()), { a -> f(a).const() }).value()
+    forAll(genFunctionAToB<Int, Int>(genIntSmall()), genConstructor(genIntSmall(), cf)) { f: (Int) -> Int, fa: Kind<F, Int> ->
+      val traversed = fa.traverse(Const.applicative(Int.monoid())) { a -> f(a).const() }.value()
       val mapped = fa.foldMap(Int.monoid(), f)
       mapped.equalUnderTheLaw(traversed, Eq.any())
-    })
+    }
 }

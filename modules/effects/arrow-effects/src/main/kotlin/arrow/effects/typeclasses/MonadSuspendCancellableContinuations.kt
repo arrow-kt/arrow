@@ -37,14 +37,14 @@ open class MonadDeferCancellableContinuation<F, A>(SC: MonadDefer<F>, override v
 
   override suspend fun <B> bind(m: () -> Kind<F, B>): B = suspendCoroutineOrReturn { c ->
     val labelHere = c.stateStack // save the whole coroutine stack labels
-    returnedMonad = m().flatMap({ x: B ->
+    returnedMonad = m().flatMap { x: B ->
       c.stateStack = labelHere
       if (cancelled.get()) {
         throw BindingCancellationException()
       }
       c.resume(x)
       returnedMonad
-    })
+    }
     COROUTINE_SUSPENDED
   }
 
@@ -56,24 +56,24 @@ open class MonadDeferCancellableContinuation<F, A>(SC: MonadDefer<F>, override v
       } catch (t: Throwable) {
         ME.raiseError<B>(t)
       }
-      datatype.flatMap({ xx: B ->
+      datatype.flatMap { xx: B ->
         c.stateStack = labelHere
         if (cancelled.get()) {
           throw BindingCancellationException()
         }
         c.resume(xx)
         returnedMonad
-      })
+      }
     }
     val completion = bindingInContextContinuation(context)
-    returnedMonad = just(Unit).flatMap({
+    returnedMonad = just(Unit).flatMap {
       monadCreation.startCoroutine(completion)
       val error = completion.await()
       if (error != null) {
         throw error
       }
       returnedMonad
-    })
+    }
     COROUTINE_SUSPENDED
   }
 }

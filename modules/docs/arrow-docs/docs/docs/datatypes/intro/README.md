@@ -126,6 +126,14 @@ TODO
 
 - [`Coreader`]
 
+- [`Store`]({{ '/docs/datatypes/store/' | relative_url }}) - a datatype which holds an initial state and a function for extracting a representation of it.
+
+- [`Moore`]({{ '/docs/datatypes/moore/' | relative_url }}) - a datatype which holds an initial state and can move to new states only when an event of a specific type is dispatched.
+
+- [`Sum`]({{ '/docs/datatypes/sum/' | relative_url }}) - a datatype which holds two comonads and a flag for indicating which one is active. Both sides evolve at the same time.
+
+- [`Day`]({{ '/docs/datatypes/day/' | relative_url }}) - a datatype which holds two comonads which evolve independently.
+
 #### Effects
 
 All effects are different implementations of the same abstraction: lazy execution of code that can move to other threads and cause exceptions.

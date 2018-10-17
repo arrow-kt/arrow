@@ -37,7 +37,7 @@ data class ListK<out A>(val list: List<A>) : ListKOf<A>, List<A> by list {
     }.fix()
 
   fun <B> mapFilter(f: (A) -> Option<B>): ListK<B> =
-    flatMap({ a -> f(a).fold({ empty<B>() }, { just(it) }) })
+    flatMap { a -> f(a).fold({ empty<B>() }, { just(it) }) }
 
   companion object {
 

@@ -21,6 +21,17 @@ interface CoproductFunctorInstance<F, G> : Functor<CoproductPartialOf<F, G>> {
 }
 
 @instance(Coproduct::class)
+interface CoproductContravariantInstance<F, G> : Contravariant<CoproductPartialOf<F, G>> {
+
+  fun CF(): Contravariant<F>
+
+  fun CG(): Contravariant<G>
+
+  override fun <A, B> Kind<CoproductPartialOf<F, G>, A>.contramap(f: (B) -> A): Coproduct<F, G, B> =
+    fix().contramap(CF(), CG(), f)
+}
+
+@instance(Coproduct::class)
 interface CoproductComonadInstance<F, G> : Comonad<CoproductPartialOf<F, G>> {
 
   fun CF(): Comonad<F>

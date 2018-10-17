@@ -8,8 +8,21 @@ import arrow.typeclasses.ap as constAp
 import arrow.typeclasses.combine as combineAp
 
 @instance(Const::class)
+interface ConstInvariant<A> : Invariant<ConstPartialOf<A>> {
+  override fun <T, U> Kind<ConstPartialOf<A>, T>.imap(f: (T) -> U, g: (U) -> T): Const<A, U> =
+      fix().retag()
+}
+
+@instance(Const::class)
+interface ConstContravariant<A> : Contravariant<ConstPartialOf<A>> {
+  override fun <T, U> Kind<ConstPartialOf<A>, T>.contramap(f: (U) -> T): Const<A, U> =
+      fix().retag()
+}
+
+@instance(Const::class)
 interface ConstFunctorInstance<A> : Functor<ConstPartialOf<A>> {
-  override fun <T, U> Kind<ConstPartialOf<A>, T>.map(f: (T) -> U): Const<A, U> = fix().retag()
+  override fun <T, U> Kind<ConstPartialOf<A>, T>.map(f: (T) -> U): Const<A, U> =
+    fix().retag()
 }
 
 @instance(Const::class)

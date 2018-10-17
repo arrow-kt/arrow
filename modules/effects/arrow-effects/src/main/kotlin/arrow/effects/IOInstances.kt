@@ -2,10 +2,7 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.core.Either
-import arrow.effects.typeclasses.Async
-import arrow.effects.typeclasses.Effect
-import arrow.effects.typeclasses.MonadDefer
-import arrow.effects.typeclasses.Proc
+import arrow.effects.typeclasses.*
 import arrow.instance
 import arrow.typeclasses.*
 import kotlin.coroutines.experimental.CoroutineContext
@@ -85,14 +82,20 @@ interface IOAsyncInstance : IOMonadDeferInstance, Async<ForIO> {
   override fun <A> IOOf<A>.continueOn(ctx: CoroutineContext): Kind<ForIO, A> =
     fix().continueOn(ctx)
 
-  override fun <A> invoke(fa: () -> A): IO<A> =
-    IO.invoke(fa)
+  override fun <A> invoke(f: () -> A): IO<A> =
+    IO.invoke(f)
 }
 
 @instance(IO::class)
 interface IOEffectInstance : IOAsyncInstance, Effect<ForIO> {
   override fun <A> Kind<ForIO, A>.runAsync(cb: (Either<Throwable, A>) -> Kind<ForIO, Unit>): IO<Unit> =
     fix().runAsync(cb)
+}
+
+@instance(IO::class)
+interface IOConcurrentEffectInstance : IOEffectInstance, ConcurrentEffect<ForIO> {
+  override fun <A> Kind<ForIO, A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> Kind<ForIO, Unit>): IO<Disposable> =
+    fix().runAsyncCancellable(OnCancel.ThrowCancellationException, cb)
 }
 
 @instance(IO::class)
@@ -115,7 +118,7 @@ interface IOSemigroupInstance<A> : Semigroup<Kind<ForIO, A>> {
     fix().flatMap { a1: A -> b.fix().map { a2: A -> SG().run { a1.combine(a2) } } }
 }
 
-object IOContext : IOEffectInstance
+object IOContext : IOConcurrentEffectInstance
 
 infix fun <A> ForIO.Companion.extensions(f: IOContext.() -> A): A =
   f(IOContext)

@@ -2,13 +2,24 @@ package arrow.effects
 
 import arrow.core.*
 import arrow.core.Either.Left
+import arrow.effects.OnCancel.Companion.CancellationException
+import arrow.effects.OnCancel.Silent
+import arrow.effects.OnCancel.ThrowCancellationException
 import arrow.effects.internal.Platform.maxStackDepthSize
 import arrow.effects.internal.Platform.onceOnly
 import arrow.effects.internal.Platform.unsafeResync
+import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.Duration
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import kotlin.coroutines.experimental.CoroutineContext
+
+enum class OnCancel { ThrowCancellationException, Silent;
+
+  companion object {
+    val CancellationException = arrow.effects.data.internal.IOCancellationException
+  }
+}
 
 @higherkind
 sealed class IO<out A> : IOOf<A> {
@@ -18,8 +29,6 @@ sealed class IO<out A> : IOOf<A> {
     fun <A> just(a: A): IO<A> = Pure(a)
 
     fun <A> raiseError(e: Throwable): IO<A> = RaiseError(e)
-
-    internal fun <A, B> mapDefault(t: IOOf<A>, f: (A) -> B): IO<B> = Map(t, f, 0)
 
     operator fun <A> invoke(f: () -> A): IO<A> = defer { Pure(f()) }
 
@@ -35,6 +44,9 @@ sealed class IO<out A> : IOOf<A> {
           }
         }
       }
+
+    operator fun <A> invoke(ctx: CoroutineContext, f: () -> A): IO<A> =
+      IO.unit.continueOn(ctx).flatMap { invoke(f) }
 
     val unit: IO<Unit> =
       just(Unit)
@@ -55,14 +67,17 @@ sealed class IO<out A> : IOOf<A> {
           is Either.Right -> IO.just(it.b)
         }
       }
+
+    /* For parMap, look into IOParallel */
   }
 
-  abstract fun <B> map(f: (A) -> B): IO<B>
+  open fun <B> map(f: (A) -> B): IO<B> =
+    Map(this, f, 0)
 
-  fun <B> flatMap(f: (A) -> IOOf<B>): IO<B> =
-    Bind(this, { f(it).fix() })
+  open fun <B> flatMap(f: (A) -> IOOf<B>): IO<B> =
+    Bind(this) { f(it).fix() }
 
-  fun continueOn(ctx: CoroutineContext): IO<A> =
+  open fun continueOn(ctx: CoroutineContext): IO<A> =
     ContinueOn(this, ctx)
 
   fun attempt(): IO<Either<Throwable, A>> =
@@ -72,7 +87,26 @@ sealed class IO<out A> : IOOf<A> {
     IO { unsafeRunAsync(cb.andThen { it.fix().unsafeRunAsync { } }) }
 
   fun unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit =
-    IORunLoop.start(this, cb)
+    IORunLoop.start(this, cb, null)
+
+  fun runAsyncCancellable(onCancel: OnCancel = Silent, cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Disposable> =
+    IO.async { ccb ->
+      var cancelled = false
+      val cancel = { cancelled = true }
+      val isCancelled = { cancelled }
+      val onCancelCb =
+        when (onCancel) {
+          ThrowCancellationException ->
+            cb andThen { it.fix().unsafeRunAsync { } }
+          Silent ->
+            { either -> either.fold({ if (!cancelled || it != CancellationException) cb(either) }, { cb(either) }) }
+        }
+      ccb(cancel.right())
+      IORunLoop.start(this, onCancelCb, isCancelled)
+    }
+
+  fun unsafeRunAsyncCancellable(onCancel: OnCancel = Silent, cb: (Either<Throwable, A>) -> Unit): Disposable =
+    runAsyncCancellable(onCancel, cb andThen { it.liftIO() }).unsafeRunSync()
 
   fun unsafeRunSync(): A =
     unsafeRunTimed(Duration.INFINITE)
@@ -83,43 +117,44 @@ sealed class IO<out A> : IOOf<A> {
   internal abstract fun unsafeRunTimedTotal(limit: Duration): Option<A>
 
   internal data class Pure<out A>(val a: A) : IO<A>() {
-    override fun <B> map(f: (A) -> B): IO<B> = mapDefault(this, f)
+    // Pure can be replaced by its value
+    override fun <B> map(f: (A) -> B): IO<B> = Suspend { Pure(f(a)) }
+
+    // Pure can be replaced by its value
+    override fun <B> flatMap(f: (A) -> IOOf<B>): IO<B> = Suspend { f(a).fix() }
 
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = Some(a)
   }
 
   internal data class RaiseError(val exception: Throwable) : IO<Nothing>() {
+    // Errors short-circuit
     override fun <B> map(f: (Nothing) -> B): IO<B> = this
+
+    // Errors short-circuit
+    override fun <B> flatMap(f: (Nothing) -> IOOf<B>): IO<B> = this
 
     override fun unsafeRunTimedTotal(limit: Duration): Option<Nothing> = throw exception
   }
 
   internal data class Delay<out A>(val thunk: () -> A) : IO<A>() {
-    override fun <B> map(f: (A) -> B): IO<B> = mapDefault(this, f)
-
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
   }
 
   internal data class Suspend<out A>(val thunk: () -> IOOf<A>) : IO<A>() {
-    override fun <B> map(f: (A) -> B): IO<B> = mapDefault(this, f)
-
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
   }
 
   internal data class Async<out A>(val cont: Proc<A>) : IO<A>() {
-    override fun <B> map(f: (A) -> B): IO<B> = mapDefault(this, f)
-
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = unsafeResync(this, limit)
   }
 
   internal data class Bind<E, out A>(val cont: IO<E>, val g: (E) -> IO<A>) : IO<A>() {
-    override fun <B> map(f: (A) -> B): IO<B> = mapDefault(this, f)
-
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
   }
 
   internal data class ContinueOn<A>(val cont: IO<A>, val cc: CoroutineContext) : IO<A>() {
-    override fun <B> map(f: (A) -> B): IO<B> = mapDefault(this, f)
+    // If a ContinueOn follows another ContinueOn, execute only the latest
+    override fun continueOn(ctx: CoroutineContext): IO<A> = ContinueOn(cont, ctx)
 
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
   }
@@ -138,9 +173,9 @@ sealed class IO<out A> : IOOf<A> {
 }
 
 fun <A, B> IOOf<A>.ap(ff: IOOf<(A) -> B>): IO<B> =
-  fix().flatMap { a -> ff.fix().map({ it(a) }) }
+  fix().flatMap { a -> ff.fix().map { it(a) } }
 
 fun <A> IOOf<A>.handleErrorWith(f: (Throwable) -> IOOf<A>): IO<A> =
-  IO.Bind(this.fix(), IOFrame.errorHandler(f))
+  IO.Bind(fix(), IOFrame.errorHandler(f))
 
-fun <A> A.liftIO(): IO<A> = IO.just(this)
+inline fun <A> A.liftIO(): IO<A> = IO.just(this)

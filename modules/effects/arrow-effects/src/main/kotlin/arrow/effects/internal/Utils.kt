@@ -4,11 +4,14 @@ import arrow.core.Either
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.effects.typeclasses.Duration
 import arrow.effects.IO
+import arrow.effects.typeclasses.Duration
 import java.util.*
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.locks.AbstractQueuedSynchronizer
+
+typealias JavaCancellationException = java.util.concurrent.CancellationException
 
 object Platform {
 
@@ -40,6 +43,16 @@ object Platform {
     }
   }
 
+  inline fun onceOnly(crossinline f: () -> Unit): () -> Unit {
+    val wasCalled = AtomicBoolean(false)
+
+    return {
+      if (!wasCalled.getAndSet(true)) {
+        f()
+      }
+    }
+  }
+
   fun <A> unsafeResync(ioa: IO<A>, limit: Duration): Option<A> {
     val latch = OneShotLatch()
     var ref: Either<Throwable, A>? = null
@@ -61,6 +74,26 @@ object Platform {
       is Either.Left -> throw eitherRef.a
       is Either.Right -> Some(eitherRef.b)
     }
+  }
+}
+
+internal class FutureN<A>(count: Int = 1) {
+  private val latch = CountDownLatch(count)
+  private var ref: MutableList<A> = mutableListOf()
+
+  fun unsafeGet(): List<A> {
+    latch.await()
+    return ref.toList()
+  }
+
+  fun get(limit: Duration): List<A> {
+    latch.await(limit.amount, limit.timeUnit)
+    return ref.toList()
+  }
+
+  fun set(value: A) = synchronized(this) {
+    ref.add(value)
+    latch.countDown()
   }
 }
 

@@ -3,9 +3,12 @@ package arrow.typeclasses
 import arrow.Kind
 import arrow.core.Tuple2
 
-interface Functor<F> {
+interface Functor<F> : Invariant<F> {
 
   fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B>
+
+  override fun <A, B> Kind<F, A>.imap(f: (A) -> B, g: (B) -> A): Kind<F, B> =
+    map(f)
 
   fun <A, B> lift(f: (A) -> B): (Kind<F, A>) -> Kind<F, B> =
     { fa: Kind<F, A> ->

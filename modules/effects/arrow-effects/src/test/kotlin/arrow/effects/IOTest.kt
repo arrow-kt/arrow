@@ -2,6 +2,7 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.core.*
+import arrow.effects.data.internal.IOCancellationException
 import arrow.effects.typeclasses.milliseconds
 import arrow.effects.typeclasses.seconds
 import arrow.test.UnitSpec
@@ -13,6 +14,7 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldEqual
+import kotlinx.coroutines.experimental.newSingleThreadContext
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -211,7 +213,7 @@ class IOTest : UnitSpec() {
     with(IO.monad()) {
 
       "should map values correctly on success" {
-        val run = IO.just(1).map() { it + 1 }.unsafeRunSync()
+        val run = IO.just(1).map { it + 1 }.unsafeRunSync()
 
         val expected = 2
 
@@ -240,6 +242,124 @@ class IOTest : UnitSpec() {
       val never = IO.async<Int> { }
       val result = never.unsafeRunTimed(100.milliseconds)
       result shouldBe None
+    }
+
+    "parallel execution makes all IOs start at the same time" {
+      val order = mutableListOf<Long>()
+
+      fun makePar(num: Long) =
+        IO(newSingleThreadContext("$num")) {
+          // Sleep according to my number
+          Thread.sleep(num * 20)
+        }.map {
+          // Add myself to order list
+          order.add(num)
+          num
+        }
+
+      val result =
+        IO.parallelMapN(newSingleThreadContext("all"),
+          makePar(6), makePar(3), makePar(2), makePar(4), makePar(1), makePar(5))
+        { six, tree, two, four, one, five -> listOf(six, tree, two, four, one, five) }
+          .unsafeRunSync()
+
+      result shouldBe listOf(6L, 3, 2, 4, 1, 5)
+      order.toList() shouldBe listOf(1L, 2, 3, 4, 5, 6)
+    }
+
+    "parallel execution preserves order for synchronous IOs" {
+      val order = mutableListOf<Long>()
+
+      fun IO<Long>.order() =
+        map {
+          order.add(it)
+          it
+        }
+
+      fun makePar(num: Long) =
+        IO(newSingleThreadContext("$num")) {
+          // Sleep according to my number
+          Thread.sleep(num * 20)
+          num
+        }.order()
+
+      val result =
+        IO.parallelMapN(newSingleThreadContext("all"),
+          makePar(6), IO.just(1L).order(), makePar(4), IO.defer { IO.just(2L) }.order(), makePar(5), IO { 3L }.order())
+        { six, tree, two, four, one, five -> listOf(six, tree, two, four, one, five) }
+          .unsafeRunSync()
+
+      result shouldBe listOf(6L, 1, 4, 2, 5, 3)
+      order.toList() shouldBe listOf(1L, 2, 3, 4, 5, 6)
+    }
+
+    "parallel mapping is done in the expected CoroutineContext" {
+      fun makePar(num: Long) =
+        IO(newSingleThreadContext("$num")) {
+          // Sleep according to my number
+          Thread.sleep(num * 20)
+          num
+        }
+
+      val result =
+        IO.parallelMapN(newSingleThreadContext("all"),
+          makePar(6), IO.just(1L), makePar(4), IO.defer { IO.just(2L) }, makePar(5), IO { 3L })
+        { _, _, _, _, _, _ ->
+          Thread.currentThread().name
+        }.unsafeRunSync()
+
+      result shouldBe "all"
+    }
+
+    "parallel IO#defer, IO#suspend and IO#async are run in the expected CoroutineContext" {
+      val result =
+        IO.parallelMapN(newSingleThreadContext("here"),
+          IO { Thread.currentThread().name },
+          IO.defer { IO.just(Thread.currentThread().name) },
+          IO.async<String> { it(Thread.currentThread().name.right()) },
+          ::Tuple3)
+          .unsafeRunSync()
+
+      result shouldBe Tuple3("here", "here", "here")
+    }
+
+    "unsafeRunAsyncCancellable should cancel correctly" {
+      IO.async { cb: (Either<Throwable, Int>) -> Unit ->
+        val cancel =
+          IO(newSingleThreadContext("RunThread")) { }
+            .flatMap { IO.async<Int> { Thread.sleep(500); it(1.right()) } }
+            .unsafeRunAsyncCancellable(OnCancel.Silent) {
+              cb(it)
+            }
+        IO(newSingleThreadContext("CancelThread")) { }
+          .unsafeRunAsync { cancel() }
+      }.unsafeRunTimed(2.seconds) shouldBe None
+    }
+
+    "unsafeRunAsyncCancellable should throw the appropriate exception" {
+      IO.async<Throwable> { cb ->
+        val cancel =
+          IO(newSingleThreadContext("RunThread")) { }
+            .flatMap { IO.async<Int> { Thread.sleep(500); it(1.right()) } }
+            .unsafeRunAsyncCancellable(OnCancel.ThrowCancellationException) {
+              it.fold({ t -> cb(t.right()) }, { _ -> })
+            }
+        IO(newSingleThreadContext("CancelThread")) { }
+          .unsafeRunAsync { cancel() }
+      }.unsafeRunTimed(2.seconds) shouldBe Some(IOCancellationException)
+    }
+
+    "unsafeRunAsyncCancellable can cancel even for infinite asyncs" {
+      IO.async { cb: (Either<Throwable, Int>) -> Unit ->
+        val cancel =
+          IO(newSingleThreadContext("RunThread")) { }
+            .flatMap { IO.async<Int> { Thread.sleep(5000); } }
+            .unsafeRunAsyncCancellable(OnCancel.ThrowCancellationException) {
+              cb(it)
+            }
+        IO(newSingleThreadContext("CancelThread")) { Thread.sleep(500); }
+          .unsafeRunAsync { cancel() }
+      }.unsafeRunTimed(2.seconds) shouldBe None
     }
 
     "IO.binding should for comprehend over IO" {
