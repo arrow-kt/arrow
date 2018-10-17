@@ -3,7 +3,7 @@ package arrow.effects
 import arrow.Kind
 import arrow.core.Either
 import arrow.deprecation.ExtensionsDSLDeprecated
-import arrow.effects.syntax.deferredk.applicative.applicative
+import arrow.effects.deferredk.applicative.applicative
 import arrow.effects.typeclasses.*
 import arrow.extension
 import arrow.typeclasses.*

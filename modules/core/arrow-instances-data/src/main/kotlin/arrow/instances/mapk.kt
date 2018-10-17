@@ -5,7 +5,7 @@ import arrow.core.Eval
 import arrow.data.*
 import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
-import arrow.instances.syntax.setk.eq.eq
+import arrow.instances.setk.eq.eq
 import arrow.typeclasses.*
 
 @extension

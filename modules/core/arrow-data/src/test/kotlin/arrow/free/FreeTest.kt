@@ -5,12 +5,12 @@ import arrow.data.NonEmptyList
 import arrow.data.fix
 import arrow.free.instances.FreeEq
 import arrow.free.instances.FreeMonadInstance
-import arrow.free.instances.syntax.free.eq.eq
-import arrow.free.instances.syntax.free.monad.monad
+import arrow.free.instances.free.eq.eq
+import arrow.free.instances.free.monad.monad
 import arrow.higherkind
-import arrow.instances.syntax.id.monad.monad
-import arrow.instances.syntax.nonemptylist.monad.monad
-import arrow.instances.syntax.option.monad.monad
+import arrow.instances.id.monad.monad
+import arrow.instances.nonemptylist.monad.monad
+import arrow.instances.option.monad.monad
 import arrow.test.UnitSpec
 import arrow.test.laws.EqLaws
 import arrow.test.laws.MonadLaws

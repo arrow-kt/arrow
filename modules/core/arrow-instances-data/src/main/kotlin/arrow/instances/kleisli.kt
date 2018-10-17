@@ -5,12 +5,12 @@ import arrow.core.*
 import arrow.data.*
 import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
-import arrow.instances.syntax.id.applicative.applicative
-import arrow.instances.syntax.id.functor.functor
-import arrow.instances.syntax.id.monad.monad
-import arrow.instances.syntax.kleisli.applicative.applicative
-import arrow.instances.syntax.kleisli.functor.functor
-import arrow.instances.syntax.kleisli.monad.monad
+import arrow.instances.id.applicative.applicative
+import arrow.instances.id.functor.functor
+import arrow.instances.id.monad.monad
+import arrow.instances.kleisli.applicative.applicative
+import arrow.instances.kleisli.functor.functor
+import arrow.instances.kleisli.monad.monad
 import arrow.typeclasses.*
 
 @extension

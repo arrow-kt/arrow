@@ -2,10 +2,10 @@ package arrow.data
 
 import arrow.Kind
 import arrow.core.*
-import arrow.instances.syntax.`try`.monadError.monadError
-import arrow.instances.syntax.id.monad.monad
-import arrow.instances.syntax.kleisli.contravariant.contravariant
-import arrow.instances.syntax.kleisli.monadError.monadError
+import arrow.instances.`try`.monadError.monadError
+import arrow.instances.id.monad.monad
+import arrow.instances.kleisli.contravariant.contravariant
+import arrow.instances.kleisli.monadError.monadError
 import arrow.test.UnitSpec
 import arrow.test.laws.ContravariantLaws
 import arrow.test.laws.MonadErrorLaws

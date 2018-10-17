@@ -1,9 +1,9 @@
 package arrow.effects
 
-import arrow.effects.syntax.fluxk.async.async
-import arrow.effects.syntax.fluxk.foldable.foldable
-import arrow.effects.syntax.fluxk.functor.functor
-import arrow.effects.syntax.fluxk.traverse.traverse
+import arrow.effects.fluxk.async.async
+import arrow.effects.fluxk.foldable.foldable
+import arrow.effects.fluxk.functor.functor
+import arrow.effects.fluxk.traverse.traverse
 import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
 import arrow.test.laws.FoldableLaws

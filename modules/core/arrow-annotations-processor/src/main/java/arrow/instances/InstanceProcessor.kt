@@ -28,7 +28,7 @@ class InstanceProcessor : MetaProcessor<extension>(extension::class) {
           log("[${info?.instance?.name?.simpleName}] : Generating [${info?.typeClass?.name?.simpleName}] extensions for [${info?.projectedCompanion}]")
           val fileSpec = info?.let {
             FileSpec.builder(
-              "${annotatedElement.type.packageName.value}.syntax.${info.projectedCompanion.simpleName.substringAfterLast(".").toLowerCase()}.${info.typeClass.name.simpleName.decapitalize()}",
+              "${annotatedElement.type.packageName.value}.${info.projectedCompanion.simpleName.substringAfterLast(".").toLowerCase()}.${info.typeClass.name.simpleName.decapitalize()}",
               annotatedElement.type.name.simpleName
             )
           }

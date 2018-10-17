@@ -7,7 +7,7 @@ import arrow.core.fix
 import arrow.data.Invalid
 import arrow.data.Valid
 import arrow.data.Validated
-import arrow.instances.syntax.either.applicative.applicative
+import arrow.instances.either.applicative.applicative
 import arrow.test.UnitSpec
 import arrow.test.generators.*
 import arrow.test.laws.IsoLaws

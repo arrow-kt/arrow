@@ -3,11 +3,11 @@ package arrow.optics.instances
 import arrow.core.Option
 import arrow.data.ListK
 import arrow.data.NonEmptyList
-import arrow.instances.syntax.listk.eq.eq
-import arrow.instances.syntax.option.eq.eq
-import arrow.optics.instances.syntax.nonemptylist.each.each
-import arrow.optics.instances.syntax.nonemptylist.filterIndex.filterIndex
-import arrow.optics.instances.syntax.nonemptylist.index.index
+import arrow.instances.listk.eq.eq
+import arrow.instances.option.eq.eq
+import arrow.optics.instances.nonemptylist.each.each
+import arrow.optics.instances.nonemptylist.filterIndex.filterIndex
+import arrow.optics.instances.nonemptylist.index.index
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genNonEmptyList

@@ -12,8 +12,8 @@ import arrow.instances.OptionTFunctorInstance
 import arrow.instances.OptionTMonadInstance
 import arrow.instances.OptionTMonoidKInstance
 import arrow.instances.OptionTTraverseInstance
-import arrow.instances.syntax.option.applicative.applicative
-import arrow.mtl.instances.syntax.option.traverseFilter.traverseFilter
+import arrow.instances.option.applicative.applicative
+import arrow.mtl.instances.option.traverseFilter.traverseFilter
 import arrow.mtl.typeclasses.FunctorFilter
 import arrow.mtl.typeclasses.TraverseFilter
 import arrow.typeclasses.*

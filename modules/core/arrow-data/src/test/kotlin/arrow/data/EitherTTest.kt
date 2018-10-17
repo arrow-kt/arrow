@@ -2,10 +2,10 @@ package arrow.data
 
 import arrow.core.*
 import arrow.instances.*
-import arrow.instances.syntax.either.monadError.monadError
-import arrow.instances.syntax.id.monad.monad
-import arrow.instances.syntax.id.traverse.traverse
-import arrow.instances.syntax.option.functor.functor
+import arrow.instances.either.monadError.monadError
+import arrow.instances.id.monad.monad
+import arrow.instances.id.traverse.traverse
+import arrow.instances.option.functor.functor
 import arrow.test.UnitSpec
 import arrow.test.laws.MonadErrorLaws
 import arrow.test.laws.SemigroupKLaws

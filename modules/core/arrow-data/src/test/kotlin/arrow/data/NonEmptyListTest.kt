@@ -1,13 +1,13 @@
 package arrow.data
 
 import arrow.instances.eq
-import arrow.instances.syntax.nonemptylist.applicative.applicative
-import arrow.instances.syntax.nonemptylist.comonad.comonad
-import arrow.instances.syntax.nonemptylist.eq.eq
-import arrow.instances.syntax.nonemptylist.monad.monad
-import arrow.instances.syntax.nonemptylist.semigroupK.semigroupK
-import arrow.instances.syntax.nonemptylist.show.show
-import arrow.instances.syntax.nonemptylist.traverse.traverse
+import arrow.instances.nonemptylist.applicative.applicative
+import arrow.instances.nonemptylist.comonad.comonad
+import arrow.instances.nonemptylist.eq.eq
+import arrow.instances.nonemptylist.monad.monad
+import arrow.instances.nonemptylist.semigroupK.semigroupK
+import arrow.instances.nonemptylist.show.show
+import arrow.instances.nonemptylist.traverse.traverse
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq

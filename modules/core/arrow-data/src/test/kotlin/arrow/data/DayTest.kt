@@ -1,10 +1,10 @@
 package arrow.data
 
 import arrow.core.*
-import arrow.instances.syntax.day.applicative.applicative
-import arrow.instances.syntax.day.comonad.comonad
-import arrow.instances.syntax.id.applicative.applicative
-import arrow.instances.syntax.id.comonad.comonad
+import arrow.instances.day.applicative.applicative
+import arrow.instances.day.comonad.comonad
+import arrow.instances.id.applicative.applicative
+import arrow.instances.id.comonad.comonad
 import arrow.test.UnitSpec
 import arrow.test.laws.ApplicativeLaws
 import arrow.test.laws.ComonadLaws

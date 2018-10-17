@@ -1,7 +1,7 @@
 package arrow.effects
 
-import arrow.effects.syntax.monok.async.async
-import arrow.effects.syntax.monok.monadError.monadError
+import arrow.effects.monok.async.async
+import arrow.effects.monok.monadError.monadError
 import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
 import arrow.typeclasses.Eq

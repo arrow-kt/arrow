@@ -4,8 +4,8 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.deprecation.ExtensionsDSLDeprecated
-import arrow.effects.syntax.fluxk.monad.monad
-import arrow.effects.syntax.fluxk.monadError.monadError
+import arrow.effects.fluxk.monad.monad
+import arrow.effects.fluxk.monadError.monadError
 import arrow.effects.typeclasses.*
 import arrow.extension
 import arrow.typeclasses.*

@@ -5,10 +5,10 @@ import arrow.core.*
 import arrow.data.*
 import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
-import arrow.instances.syntax.id.monad.monad
-import arrow.instances.syntax.statet.applicative.applicative
-import arrow.instances.syntax.statet.functor.functor
-import arrow.instances.syntax.statet.monad.monad
+import arrow.instances.id.monad.monad
+import arrow.instances.statet.applicative.applicative
+import arrow.instances.statet.functor.functor
+import arrow.instances.statet.monad.monad
 import arrow.typeclasses.*
 
 @extension

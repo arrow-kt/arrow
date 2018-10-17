@@ -7,9 +7,9 @@ import arrow.core.toT
 import arrow.data.ListK
 import arrow.data.k
 import arrow.instances.monoid
-import arrow.instances.syntax.listk.eq.eq
-import arrow.instances.syntax.option.eq.eq
-import arrow.instances.syntax.option.functor.functor
+import arrow.instances.listk.eq.eq
+import arrow.instances.option.eq.eq
+import arrow.instances.option.functor.functor
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.laws.*

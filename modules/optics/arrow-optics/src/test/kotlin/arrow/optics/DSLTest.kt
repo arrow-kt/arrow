@@ -4,9 +4,9 @@ import arrow.core.*
 import arrow.data.*
 import arrow.optics.dsl.*
 import arrow.optics.instances.*
-import arrow.optics.instances.syntax.listk.index.index
-import arrow.optics.instances.syntax.mapk.at.at
-import arrow.optics.instances.syntax.mapk.each.each
+import arrow.optics.instances.listk.index.index
+import arrow.optics.instances.mapk.at.at
+import arrow.optics.instances.mapk.each.each
 import arrow.test.*
 
 import io.kotlintest.matchers.shouldBe

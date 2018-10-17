@@ -4,8 +4,8 @@ import arrow.Kind
 import arrow.core.*
 import arrow.core.Eval.Now
 import arrow.instances.extensions
-import arrow.instances.syntax.eval.comonad.comonad
-import arrow.instances.syntax.eval.monad.monad
+import arrow.instances.eval.comonad.comonad
+import arrow.instances.eval.monad.monad
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.laws.ComonadLaws

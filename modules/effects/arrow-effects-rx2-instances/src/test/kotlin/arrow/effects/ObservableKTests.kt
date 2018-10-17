@@ -1,9 +1,9 @@
 package arrow.effects
 
-import arrow.effects.syntax.observablek.async.async
-import arrow.effects.syntax.observablek.foldable.foldable
-import arrow.effects.syntax.observablek.functor.functor
-import arrow.effects.syntax.observablek.traverse.traverse
+import arrow.effects.observablek.async.async
+import arrow.effects.observablek.foldable.foldable
+import arrow.effects.observablek.functor.functor
+import arrow.effects.observablek.traverse.traverse
 import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
 import arrow.test.laws.FoldableLaws

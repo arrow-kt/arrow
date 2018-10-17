@@ -1,12 +1,12 @@
 package arrow.data
 
 import arrow.core.Id
-import arrow.instances.syntax.id.applicative.applicative
-import arrow.instances.syntax.id.comonad.comonad
-import arrow.instances.syntax.id.eq.eq
-import arrow.instances.syntax.id.monad.monad
-import arrow.instances.syntax.id.show.show
-import arrow.instances.syntax.id.traverse.traverse
+import arrow.instances.id.applicative.applicative
+import arrow.instances.id.comonad.comonad
+import arrow.instances.id.eq.eq
+import arrow.instances.id.monad.monad
+import arrow.instances.id.show.show
+import arrow.instances.id.traverse.traverse
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq

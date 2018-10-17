@@ -3,11 +3,11 @@ package arrow.data
 import arrow.Kind2
 import arrow.instances.eq
 import arrow.instances.semigroup
-import arrow.instances.syntax.mapk.eq.eq
-import arrow.instances.syntax.mapk.functor.functor
-import arrow.instances.syntax.mapk.monoid.monoid
-import arrow.instances.syntax.mapk.show.show
-import arrow.instances.syntax.mapk.traverse.traverse
+import arrow.instances.mapk.eq.eq
+import arrow.instances.mapk.functor.functor
+import arrow.instances.mapk.monoid.monoid
+import arrow.instances.mapk.show.show
+import arrow.instances.mapk.traverse.traverse
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq

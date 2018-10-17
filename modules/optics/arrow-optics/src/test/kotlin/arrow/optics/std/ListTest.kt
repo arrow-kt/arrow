@@ -3,9 +3,9 @@ package arrow.optics
 import arrow.core.ListInstances
 import arrow.core.Option
 import arrow.data.*
-import arrow.instances.syntax.listk.monoid.monoid
-import arrow.instances.syntax.nonemptylist.semigroup.semigroup
-import arrow.instances.syntax.option.monoid.monoid
+import arrow.instances.listk.monoid.monoid
+import arrow.instances.nonemptylist.semigroup.semigroup
+import arrow.instances.option.monoid.monoid
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genNonEmptyList

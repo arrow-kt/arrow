@@ -1,12 +1,12 @@
 package arrow.data
 
-import arrow.instances.syntax.listk.applicative.applicative
-import arrow.instances.syntax.listk.eq.eq
-import arrow.instances.syntax.listk.monoidK.monoidK
-import arrow.instances.syntax.listk.semigroupK.semigroupK
-import arrow.instances.syntax.listk.show.show
-import arrow.instances.syntax.listk.traverse.traverse
-import arrow.mtl.instances.syntax.listk.monadCombine.monadCombine
+import arrow.instances.listk.applicative.applicative
+import arrow.instances.listk.eq.eq
+import arrow.instances.listk.monoidK.monoidK
+import arrow.instances.listk.semigroupK.semigroupK
+import arrow.instances.listk.show.show
+import arrow.instances.listk.traverse.traverse
+import arrow.mtl.instances.listk.monadCombine.monadCombine
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq

@@ -1,7 +1,7 @@
 package arrow.data
 
 import arrow.core.*
-import arrow.instances.syntax.id.comonad.comonad
+import arrow.instances.id.comonad.comonad
 import arrow.test.UnitSpec
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe

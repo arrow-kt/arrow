@@ -5,7 +5,7 @@ import arrow.data.ForListK
 import arrow.data.ListK
 import arrow.data.k
 import arrow.instances.monoid
-import arrow.instances.syntax.listk.foldable.foldable
+import arrow.instances.listk.foldable.foldable
 import arrow.test.UnitSpec
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen

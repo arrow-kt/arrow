@@ -1,14 +1,14 @@
 package arrow.effects
 
-import arrow.effects.syntax.maybek.applicative.applicative
-import arrow.effects.syntax.maybek.applicativeError.applicativeError
-import arrow.effects.syntax.maybek.async.async
-import arrow.effects.syntax.maybek.effect.effect
-import arrow.effects.syntax.maybek.foldable.foldable
-import arrow.effects.syntax.maybek.functor.functor
-import arrow.effects.syntax.maybek.monad.monad
-import arrow.effects.syntax.maybek.monadDefer.monadDefer
-import arrow.effects.syntax.maybek.monadError.monadError
+import arrow.effects.maybek.applicative.applicative
+import arrow.effects.maybek.applicativeError.applicativeError
+import arrow.effects.maybek.async.async
+import arrow.effects.maybek.effect.effect
+import arrow.effects.maybek.foldable.foldable
+import arrow.effects.maybek.functor.functor
+import arrow.effects.maybek.monad.monad
+import arrow.effects.maybek.monadDefer.monadDefer
+import arrow.effects.maybek.monadError.monadError
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq

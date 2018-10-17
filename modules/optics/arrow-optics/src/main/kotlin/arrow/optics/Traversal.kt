@@ -5,9 +5,9 @@ import arrow.core.*
 import arrow.data.*
 import arrow.higherkind
 import arrow.instances.monoid
-import arrow.instances.syntax.const.applicative.applicative
-import arrow.instances.syntax.id.applicative.applicative
-import arrow.instances.syntax.listk.monoid.monoid
+import arrow.instances.const.applicative.applicative
+import arrow.instances.id.applicative.applicative
+import arrow.instances.listk.monoid.monoid
 import arrow.typeclasses.*
 
 /**

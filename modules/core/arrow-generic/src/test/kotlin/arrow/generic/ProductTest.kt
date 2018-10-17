@@ -2,9 +2,9 @@ package arrow.generic
 
 import arrow.Kind
 import arrow.core.*
-import arrow.instances.syntax.`try`.applicative.applicative
-import arrow.instances.syntax.option.applicative.applicative
-import arrow.instances.syntax.option.monoid.monoid
+import arrow.instances.`try`.applicative.applicative
+import arrow.instances.option.applicative.applicative
+import arrow.instances.option.monoid.monoid
 import arrow.product
 import arrow.test.UnitSpec
 import arrow.test.laws.EqLaws

@@ -4,9 +4,9 @@ import arrow.Kind
 import arrow.core.ForId
 import arrow.core.Id
 import arrow.core.fix
-import arrow.instances.syntax.id.comonad.comonad
-import arrow.instances.syntax.id.functor.functor
-import arrow.instances.syntax.sum.comonad.comonad
+import arrow.instances.id.comonad.comonad
+import arrow.instances.id.functor.functor
+import arrow.instances.sum.comonad.comonad
 import arrow.test.UnitSpec
 import arrow.test.laws.ComonadLaws
 import arrow.typeclasses.Eq

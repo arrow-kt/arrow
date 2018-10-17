@@ -4,9 +4,9 @@ import arrow.core.*
 import arrow.data.ListK
 import arrow.data.k
 import arrow.instances.monoid
-import arrow.instances.syntax.`try`.applicative.applicative
-import arrow.instances.syntax.listk.eq.eq
-import arrow.instances.syntax.option.eq.eq
+import arrow.instances.`try`.applicative.applicative
+import arrow.instances.listk.eq.eq
+import arrow.instances.option.eq.eq
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genTry

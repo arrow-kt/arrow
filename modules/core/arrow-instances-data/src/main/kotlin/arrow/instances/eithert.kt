@@ -7,9 +7,9 @@ import arrow.data.EitherTOf
 import arrow.data.EitherTPartialOf
 import arrow.data.fix
 import arrow.deprecation.ExtensionsDSLDeprecated
-import arrow.instances.syntax.either.foldable.foldable
-import arrow.instances.syntax.either.monad.monad
-import arrow.instances.syntax.either.traverse.traverse
+import arrow.instances.either.foldable.foldable
+import arrow.instances.either.monad.monad
+import arrow.instances.either.traverse.traverse
 import arrow.typeclasses.*
 
 interface EitherTFunctorInstance<F, L> : Functor<EitherTPartialOf<F, L>> {

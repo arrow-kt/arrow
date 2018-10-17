@@ -4,7 +4,7 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.fix
 import arrow.extension
-import arrow.instances.syntax.either.traverse.traverse
+import arrow.instances.either.traverse.traverse
 import arrow.optics.Traversal
 import arrow.optics.typeclasses.Each
 import arrow.typeclasses.Applicative

@@ -2,12 +2,12 @@ package arrow.data
 
 import arrow.Kind
 import arrow.instances.eq
-import arrow.instances.syntax.sequencek.applicative.applicative
-import arrow.instances.syntax.sequencek.eq.eq
-import arrow.instances.syntax.sequencek.monad.monad
-import arrow.instances.syntax.sequencek.monoid.monoid
-import arrow.instances.syntax.sequencek.monoidK.monoidK
-import arrow.instances.syntax.sequencek.traverse.traverse
+import arrow.instances.sequencek.applicative.applicative
+import arrow.instances.sequencek.eq.eq
+import arrow.instances.sequencek.monad.monad
+import arrow.instances.sequencek.monoid.monoid
+import arrow.instances.sequencek.monoidK.monoidK
+import arrow.instances.sequencek.traverse.traverse
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq

@@ -6,7 +6,7 @@ import arrow.core.ForEval
 import arrow.core.fix
 import arrow.higherkind
 import arrow.core.FunctionK
-import arrow.instances.syntax.eval.applicative.applicative
+import arrow.instances.eval.applicative.applicative
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.Traverse

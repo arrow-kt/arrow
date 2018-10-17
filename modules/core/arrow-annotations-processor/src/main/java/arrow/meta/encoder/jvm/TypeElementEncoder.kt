@@ -5,7 +5,6 @@ import arrow.common.utils.ProcessorUtils
 import arrow.meta.Either
 import arrow.meta.ast.*
 import arrow.meta.ast.Annotation
-import arrow.meta.encoder.MetaApi
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.asTypeName
@@ -15,12 +14,10 @@ import me.eugeniomarletti.kotlin.metadata.jvm.getJvmConstructorSignature
 import me.eugeniomarletti.kotlin.metadata.jvm.getJvmFieldSignature
 import me.eugeniomarletti.kotlin.metadata.jvm.getJvmMethodSignature
 import me.eugeniomarletti.kotlin.metadata.jvm.jvmPropertySignature
-import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.TypeTable
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.hasReceiver
 import javax.lang.model.element.*
 import javax.lang.model.element.Modifier
-import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.NoType
 import javax.lang.model.util.ElementFilter
 import javax.lang.model.util.Elements

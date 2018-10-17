@@ -1,6 +1,6 @@
 package arrow.data
 
-import arrow.instances.syntax.store.comonad.comonad
+import arrow.instances.store.comonad.comonad
 import arrow.test.UnitSpec
 import arrow.test.laws.ComonadLaws
 import arrow.typeclasses.Eq

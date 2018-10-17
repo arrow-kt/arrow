@@ -6,7 +6,7 @@ import arrow.data.fix
 import arrow.data.k
 import arrow.free.Free
 import arrow.free.map
-import arrow.instances.syntax.listk.traverse.traverse
+import arrow.instances.listk.traverse.traverse
 import arrow.typeclasses.Traverse
 import arrow.typeclasses.binding
 import org.intellij.markdown.ast.ASTNode

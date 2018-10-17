@@ -8,8 +8,8 @@ import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genIntSmall
 import io.kotlintest.properties.forAll
 import arrow.instances.*
-import arrow.instances.syntax.const.applicative.applicative
-import arrow.instances.syntax.id.applicative.applicative
+import arrow.instances.const.applicative.applicative
+import arrow.instances.id.applicative.applicative
 
 typealias TI<A> = Tuple2<IdOf<A>, IdOf<A>>
 

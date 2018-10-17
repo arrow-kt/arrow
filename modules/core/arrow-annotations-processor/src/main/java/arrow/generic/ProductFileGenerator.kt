@@ -168,8 +168,8 @@ class ProductFileGenerator(
             |import arrow.typeclasses.*
             |import arrow.core.*
             |import arrow.instances.*
-            |import arrow.instances.syntax.option.monoid.monoid
-            |import arrow.instances.syntax.option.semigroup.semigroup
+            |import arrow.instances.option.monoid.monoid
+            |import arrow.instances.option.semigroup.semigroup
             |
             |${semigroupExtensions(product)}
             |

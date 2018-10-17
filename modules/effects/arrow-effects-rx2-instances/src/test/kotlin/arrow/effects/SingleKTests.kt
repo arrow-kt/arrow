@@ -1,13 +1,13 @@
 package arrow.effects
 
-import arrow.effects.syntax.singlek.applicative.applicative
-import arrow.effects.syntax.singlek.applicativeError.applicativeError
-import arrow.effects.syntax.singlek.async.async
-import arrow.effects.syntax.singlek.effect.effect
-import arrow.effects.syntax.singlek.functor.functor
-import arrow.effects.syntax.singlek.monad.monad
-import arrow.effects.syntax.singlek.monadDefer.monadDefer
-import arrow.effects.syntax.singlek.monadError.monadError
+import arrow.effects.singlek.applicative.applicative
+import arrow.effects.singlek.applicativeError.applicativeError
+import arrow.effects.singlek.async.async
+import arrow.effects.singlek.effect.effect
+import arrow.effects.singlek.functor.functor
+import arrow.effects.singlek.monad.monad
+import arrow.effects.singlek.monadDefer.monadDefer
+import arrow.effects.singlek.monadError.monadError
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq

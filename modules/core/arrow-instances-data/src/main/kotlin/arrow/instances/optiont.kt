@@ -8,9 +8,9 @@ import arrow.data.OptionTPartialOf
 import arrow.data.fix
 import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
-import arrow.instances.syntax.option.applicative.applicative
-import arrow.instances.syntax.option.foldable.foldable
-import arrow.instances.syntax.option.traverse.traverse
+import arrow.instances.option.applicative.applicative
+import arrow.instances.option.foldable.foldable
+import arrow.instances.option.traverse.traverse
 import arrow.typeclasses.*
 
 @extension

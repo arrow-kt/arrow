@@ -1,7 +1,7 @@
 package arrow.recursion
 
 import arrow.recursion.data.Mu
-import arrow.recursion.instances.syntax.mu.birecursive.birecursive
+import arrow.recursion.instances.mu.birecursive.birecursive
 import arrow.test.UnitSpec
 import arrow.test.laws.BirecursiveLaws
 

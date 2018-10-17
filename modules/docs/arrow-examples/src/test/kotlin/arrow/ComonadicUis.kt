@@ -5,8 +5,8 @@ import arrow.data.Day
 import arrow.data.ForStore
 import arrow.data.Store
 import arrow.data.Sum
-import arrow.instances.syntax.id.comonad.comonad
-import arrow.instances.syntax.store.comonad.comonad
+import arrow.instances.id.comonad.comonad
+import arrow.instances.store.comonad.comonad
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.specs.FreeSpec
 

@@ -1,7 +1,7 @@
 package arrow.data
 
 import arrow.core.Id
-import arrow.instances.syntax.moore.comonad.comonad
+import arrow.instances.moore.comonad.comonad
 import arrow.test.UnitSpec
 import arrow.test.laws.ComonadLaws
 import arrow.typeclasses.Eq

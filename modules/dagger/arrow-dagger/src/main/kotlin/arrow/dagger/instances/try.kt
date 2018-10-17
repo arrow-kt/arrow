@@ -1,12 +1,12 @@
 package arrow.dagger.instances
 
 import arrow.core.*
-import arrow.instances.syntax.`try`.applicative.applicative
-import arrow.instances.syntax.`try`.foldable.foldable
-import arrow.instances.syntax.`try`.functor.functor
-import arrow.instances.syntax.`try`.monad.monad
-import arrow.instances.syntax.`try`.monadError.monadError
-import arrow.instances.syntax.`try`.traverse.traverse
+import arrow.instances.`try`.applicative.applicative
+import arrow.instances.`try`.foldable.foldable
+import arrow.instances.`try`.functor.functor
+import arrow.instances.`try`.monad.monad
+import arrow.instances.`try`.monadError.monadError
+import arrow.instances.`try`.traverse.traverse
 import arrow.typeclasses.*
 import dagger.Module
 import dagger.Provides

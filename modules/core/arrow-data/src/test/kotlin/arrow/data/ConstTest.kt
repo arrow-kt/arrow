@@ -1,11 +1,11 @@
 package arrow.data
 
 import arrow.instances.monoid
-import arrow.instances.syntax.const.applicative.applicative
-import arrow.instances.syntax.const.eq.eq
-import arrow.instances.syntax.const.show.show
+import arrow.instances.const.applicative.applicative
+import arrow.instances.const.eq.eq
+import arrow.instances.const.show.show
 import arrow.mtl.instances.*
-import arrow.mtl.instances.syntax.const.traverseFilter.traverseFilter
+import arrow.mtl.instances.const.traverseFilter.traverseFilter
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.*

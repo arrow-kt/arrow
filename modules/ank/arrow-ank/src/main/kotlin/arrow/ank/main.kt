@@ -6,7 +6,7 @@ import arrow.core.Either
 import arrow.core.fix
 import arrow.data.ListK
 import arrow.free.fix
-import arrow.instances.syntax.either.monadError.monadError
+import arrow.instances.either.monadError.monadError
 import java.io.File
 
 typealias Target<A> = Either<Throwable, A>

@@ -1,14 +1,14 @@
 package arrow.dagger.instances
 
 import arrow.data.*
-import arrow.instances.syntax.nonemptylist.applicative.applicative
-import arrow.instances.syntax.nonemptylist.bimonad.bimonad
-import arrow.instances.syntax.nonemptylist.comonad.comonad
-import arrow.instances.syntax.nonemptylist.foldable.foldable
-import arrow.instances.syntax.nonemptylist.functor.functor
-import arrow.instances.syntax.nonemptylist.monad.monad
-import arrow.instances.syntax.nonemptylist.semigroupK.semigroupK
-import arrow.instances.syntax.nonemptylist.traverse.traverse
+import arrow.instances.nonemptylist.applicative.applicative
+import arrow.instances.nonemptylist.bimonad.bimonad
+import arrow.instances.nonemptylist.comonad.comonad
+import arrow.instances.nonemptylist.foldable.foldable
+import arrow.instances.nonemptylist.functor.functor
+import arrow.instances.nonemptylist.monad.monad
+import arrow.instances.nonemptylist.semigroupK.semigroupK
+import arrow.instances.nonemptylist.traverse.traverse
 import arrow.typeclasses.*
 import dagger.Module
 import dagger.Provides

@@ -5,7 +5,7 @@ import arrow.core.Eval
 import arrow.core.Id
 import arrow.core.value
 import arrow.instances.monoid
-import arrow.instances.syntax.id.monad.monad
+import arrow.instances.id.monad.monad
 import arrow.test.concurrency.SideEffect
 import arrow.test.generators.genConstructor
 import arrow.test.generators.genFunctionAToB

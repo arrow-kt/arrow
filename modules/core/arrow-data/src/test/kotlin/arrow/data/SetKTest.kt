@@ -1,11 +1,11 @@
 package arrow.data
 
 import arrow.instances.eq
-import arrow.instances.syntax.setk.eq.eq
-import arrow.instances.syntax.setk.foldable.foldable
-import arrow.instances.syntax.setk.monoidK.monoidK
-import arrow.instances.syntax.setk.semigroupK.semigroupK
-import arrow.instances.syntax.setk.show.show
+import arrow.instances.setk.eq.eq
+import arrow.instances.setk.foldable.foldable
+import arrow.instances.setk.monoidK.monoidK
+import arrow.instances.setk.semigroupK.semigroupK
+import arrow.instances.setk.show.show
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
