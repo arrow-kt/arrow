@@ -89,5 +89,10 @@ include {
         shadow {
             _ 'shadow'
         }
+
+        ank {
+            _ 'ank'
+            _ 'ank-gradle'
+        }
     }
 }

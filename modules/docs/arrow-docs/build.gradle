@@ -2,11 +2,12 @@ apply plugin: 'ank-gradle-plugin'
 apply plugin: 'org.ajoberstar.git-publish'
 
 dependencies {
-    compile('io.arrow-kt:ank-core:0.7.1') {
-        exclude group: 'io.arrow-kt', module: 'arrow-core'
-        exclude group: 'io.arrow-kt', module: 'arrow-instances-core'
-        exclude group: 'io.arrow-kt', module: 'arrow-free'
-    }
+//    compile('io.arrow-kt:ank-core:0.7.1') {
+//        exclude group: 'io.arrow-kt', module: 'arrow-core'
+//        exclude group: 'io.arrow-kt', module: 'arrow-instances-core'
+//        exclude group: 'io.arrow-kt', module: 'arrow-free'
+//    }
+    compile project(':arrow-ank')
     compile project(':arrow-data')
     compile project(':arrow-core')
     compile project(':arrow-instances-data')
