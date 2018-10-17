@@ -847,7 +847,8 @@ p code, ul code {
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   -ms-border-radius: 3px;
-  -o-border-radius: 3px; }
+  -o-border-radius: 3px;
+  z-index: 0; }
 
 .hljs {
   display: block;

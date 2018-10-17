@@ -18,6 +18,7 @@ p, ul {
   font-family: $code-font-family !important;
   font-size: 0.8rem !important;
   @include border-radius (3px);
+  z-index: 0;
 }
 
 .hljs {
