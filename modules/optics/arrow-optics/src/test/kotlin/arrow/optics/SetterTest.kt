@@ -61,9 +61,9 @@ class SetterTest : UnitSpec() {
       }
     }
 
-    "mod_ f should be as modify f within State and returning Unit" {
+    "update_ f should be as modify f within State and returning Unit" {
       forAll(TokenGen, genFunctionAToB<String, String>(Gen.string())) { token, f ->
-        tokenSetter.mod_(f).run(token) ==
+        tokenSetter.update_(f).run(token) ==
           State { token: Token ->
             tokenSetter.modify(token, f) toT Unit
           }.run(token)

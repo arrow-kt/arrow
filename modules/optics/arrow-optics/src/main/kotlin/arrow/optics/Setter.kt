@@ -137,13 +137,13 @@ interface PSetter<S, T, A, B> : PSetterOf<S, T, A, B> {
 }
 
 /**
- * Modify the focus [A] referenced through the [Setter].
+ * Update the focus [A] referenced through the [Setter].
  */
-fun <S, A> Setter<S, A>.mod_(f: (A) -> A): State<S, Unit> =
+fun <S, A> Setter<S, A>.update_(f: (A) -> A): State<S, Unit> =
   State { s -> Tuple2(modify(s, f), Unit) }
 
 /**
  * Set the focus [A] referenced through the [Setter].
  */
 fun <S, A> Setter<S, A>.assign_(a: A): State<S, Unit> =
-  mod_ { _ -> a }
+  update_ { _ -> a }
