@@ -71,7 +71,7 @@ inspectHealth.run(player)
 ```
 
 ```kotlin:ank
-val takeDamage = playerLens.mod { it - 15 }
+val takeDamage = playerLens.update { it - 15 }
 takeDamage.run(player)
 ```
 

@@ -61,7 +61,7 @@ This can make working with nested structures in stateful computations significan
 ```kotlin:ank
 import arrow.data.*
 
-val takeDamage = playerSetter.mod_ { it - 15 }
+val takeDamage = playerSetter.update_ { it - 15 }
 takeDamage.run(Player(75))
 ```
 

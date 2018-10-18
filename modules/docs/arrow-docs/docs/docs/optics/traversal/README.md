@@ -68,7 +68,7 @@ This can make working with nested structures in stateful computations significan
 data class Enemy(val health: Int)
 val battlefield = listOf(Enemy(70), Enemy(80), Enemy(65)).k()
 
-val dropBomb = ListK.traversal<Enemy>().mod { it.copy(health = it.health - 50) }
+val dropBomb = ListK.traversal<Enemy>().update { it.copy(health = it.health - 50) }
 
 dropBomb.run(battlefield)
 ```
