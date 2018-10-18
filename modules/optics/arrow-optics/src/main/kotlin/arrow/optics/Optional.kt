@@ -278,44 +278,44 @@ interface POptional<S, T, A, B> : POptionalOf<S, T, A, B> {
   fun toState(): State<S, Option<A>> = extract()
 
   /**
-   * Extracts the focus [A] viewed through the [POptional] and applies [f] to it.
+   * Extract and map the focus [A] viewed through the [POptional] and applies [f] to it.
    */
-  fun <C> extracts(f: (A) -> C): State<S, Option<C>> = extract().map { it.map(f) }
+  fun <C> extractMap(f: (A) -> C): State<S, Option<C>> = extract().map { it.map(f) }
 
 }
 
 /**
- * Modify the focus [A] viewed through the [Optional] and returns its *new* value.
+ * Update the focus [A] viewed through the [Optional] and returns its *new* value.
  */
-fun <S, A> Optional<S, A>.mod(f: (A) -> A): State<S, Option<A>> =
-  modo(f).map { it.map(f) }
+fun <S, A> Optional<S, A>.update(f: (A) -> A): State<S, Option<A>> =
+  updateOld(f).map { it.map(f) }
 
 /**
- * Modify the focus [A] viewed through the [Optional] and returns its *old* value.
+ * Update the focus [A] viewed through the [Optional] and returns its *old* value.
  */
-fun <S, A> Optional<S, A>.modo(f: (A) -> A): State<S, Option<A>> =
+fun <S, A> Optional<S, A>.updateOld(f: (A) -> A): State<S, Option<A>> =
   State { s -> Tuple2(modify(s, f), getOption(s)) }
 
 /**
- * Modify the focus [A] viewed through the [Optional] and ignores both values.
+ * Update the focus [A] viewed through the [Optional] and ignores both values.
  */
-fun <S, A> Optional<S, A>.mod_(f: (A) -> A): State<S, Unit> =
+fun <S, A> Optional<S, A>.update_(f: (A) -> A): State<S, Unit> =
   State { s -> Tuple2(modify(s, f), kotlin.Unit) }
 
 /**
- * Set the focus [A] viewed through the [Optional] and returns its *new* value.
+ * Assign the focus [A] viewed through the [Optional] and returns its *new* value.
  */
 fun <S, A> Optional<S, A>.assign(a: A): State<S, Option<A>> =
-  mod { _ -> a }
+  update { _ -> a }
 
 /**
- * Set the value focus [A] through the [Optional] and returns its *old* value.
+ * Assign the value focus [A] through the [Optional] and returns its *old* value.
  */
-fun <S, A> Optional<S, A>.assigno(a: A): State<S, Option<A>> =
-  modo { _ -> a }
+fun <S, A> Optional<S, A>.assignOld(a: A): State<S, Option<A>> =
+  updateOld { _ -> a }
 
 /**
- * Set the focus [A] viewed through the [Optional] and ignores both values.
+ * Assign the focus [A] viewed through the [Optional] and ignores both values.
  */
 fun <S, A> Optional<S, A>.assign_(a: A): State<S, Unit> =
-  mod_ { _ -> a }
+  update_ { _ -> a }

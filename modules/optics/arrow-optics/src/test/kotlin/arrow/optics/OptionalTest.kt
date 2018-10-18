@@ -219,15 +219,15 @@ class OptionalTest : UnitSpec() {
       }
     }
 
-    "Extracts with f should be same as extract and map" {
+    "extractMap with f should be same as extract and map" {
       forAll(genTry(Gen.int()), genFunctionAToB<Int, Int>(Gen.int())) { x, f ->
-        successInt.extracts(f).run(x) == successInt.extract().map { it.map(f) }.run(x)
+        successInt.extractMap(f).run(x) == successInt.extract().map { it.map(f) }.run(x)
       }
     }
 
-    "mod f should be same modify f within State and returning new state" {
+    "update f should be same modify f within State and returning new state" {
       forAll(genTry(Gen.int()), genFunctionAToB<Int, Int>(Gen.int())) { x, f ->
-        successInt.mod(f).run(x) ==
+        successInt.update(f).run(x) ==
           State { xx: Try<Int> ->
             successInt.modify(xx, f)
               .let { it toT successInt.getOption(it) }
@@ -235,18 +235,18 @@ class OptionalTest : UnitSpec() {
       }
     }
 
-    "modo f should be same as modify f within State and returning old state" {
+    "updateOld f should be same as modify f within State and returning old state" {
       forAll(genTry(Gen.int()), genFunctionAToB<Int, Int>(Gen.int())) { x, f ->
-        successInt.modo(f).run(x) ==
+        successInt.updateOld(f).run(x) ==
           State { xx: Try<Int> ->
             successInt.modify(xx, f) toT successInt.getOption(xx)
           }.run(x)
       }
     }
 
-    "mod_ f should be as modify f within State and returning Unit" {
+    "update_ f should be as modify f within State and returning Unit" {
       forAll(genTry(Gen.int()), genFunctionAToB<Int, Int>(Gen.int())) { x, f ->
-        successInt.mod_(f).run(x) ==
+        successInt.update_(f).run(x) ==
           State { xx: Try<Int> ->
             successInt.modify(xx, f) toT Unit
           }.run(x)
@@ -263,16 +263,16 @@ class OptionalTest : UnitSpec() {
       }
     }
 
-    "modo f should be same as modify f within State and returning old state" {
+    "assignOld f should be same as modify f within State and returning old state" {
       forAll(genTry(Gen.int()), Gen.int()) { x, i ->
-        successInt.assigno(i).run(x) ==
+        successInt.assignOld(i).run(x) ==
           State { xx: Try<Int> ->
             successInt.set(xx, i) toT successInt.getOption(xx)
           }.run(x)
       }
     }
 
-    "mod_ f should be as modify f within State and returning Unit" {
+    "assign_ f should be as modify f within State and returning Unit" {
       forAll(genTry(Gen.int()), Gen.int()) { x, i ->
         successInt.assign_(i).run(x) ==
           State { xx: Try<Int> ->
