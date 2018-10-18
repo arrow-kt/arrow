@@ -1,13 +1,11 @@
 <!-- Jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<!-- Arrow playground -->
+<script src="{{ '/js/playground.min.js' | relative_url }}" data-selector="[class^='language-kotlin']"></script>
 <!-- Highlight -->
 <script src="{{ '/js/highlight.pack.js' | relative_url }}"></script>
 <script>
-hljs.configure({
-    languages:['kotlin']
-    });
-    hljs.initHighlighting();
-
+  hljs.initHighlighting();
 </script>
 <!-- Touch gesture support -->
 <script src="{{ '/js/hammer.min.js' | relative_url }}"></script>
