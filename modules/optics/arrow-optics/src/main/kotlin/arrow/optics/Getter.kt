@@ -164,8 +164,8 @@ interface Getter<S, A> : GetterOf<S, A> {
   fun toState(): State<S, A> = extract()
 
   /**
-   * Extracts the focus [A] viewed through the [Getter] and applies [f] to it.
+   * Extract and map the focus [A] viewed through the [Getter] and applies [f] to it.
    */
-  fun <B> extracts(f: (A) -> B): State<S, B> = extract().map(f)
+  fun <B> extractMap(f: (A) -> B): State<S, B> = extract().map(f)
 
 }
