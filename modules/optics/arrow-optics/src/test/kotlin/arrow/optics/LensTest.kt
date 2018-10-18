@@ -225,13 +225,13 @@ class LensTest : UnitSpec() {
 
     "Extracts with f should be same as extract and map" {
       forAll(TokenGen, genFunctionAToB<String, String>(Gen.string())) { token, f ->
-        tokenLens.extracts(f).run(token) == tokenLens.extract().map(f).run(token)
+        tokenLens.extractMap(f).run(token) == tokenLens.extract().map(f).run(token)
       }
     }
 
-    "mod f should be same modify f within State and returning new state" {
+    "update f should be same modify f within State and returning new state" {
       forAll(TokenGen, genFunctionAToB<String, String>(Gen.string())) { token, f ->
-        tokenLens.mod(f).run(token) ==
+        tokenLens.update(f).run(token) ==
           State { token: Token ->
             tokenLens.modify(token, f)
               .let { it toT it.value }
@@ -239,18 +239,18 @@ class LensTest : UnitSpec() {
       }
     }
 
-    "modo f should be same as modify f within State and returning old state" {
+    "updateOld f should be same as modify f within State and returning old state" {
       forAll(TokenGen, genFunctionAToB<String, String>(Gen.string())) { token, f ->
-        tokenLens.modo(f).run(token) ==
+        tokenLens.updateOld(f).run(token) ==
           State { token: Token ->
             tokenLens.modify(token, f) toT tokenLens.get(token)
           }.run(token)
       }
     }
 
-    "mod_ f should be as modify f within State and returning Unit" {
+    "update_ f should be as modify f within State and returning Unit" {
       forAll(TokenGen, genFunctionAToB<String, String>(Gen.string())) { token, f ->
-        tokenLens.mod_(f).run(token) ==
+        tokenLens.update_(f).run(token) ==
           State { token: Token ->
             tokenLens.modify(token, f) toT Unit
           }.run(token)
@@ -267,9 +267,9 @@ class LensTest : UnitSpec() {
       }
     }
 
-    "assigno f should be same as modify f within State and returning old state" {
+    "assignOld f should be same as modify f within State and returning old state" {
       forAll(TokenGen, Gen.string()) { token, string ->
-        tokenLens.assigno(string).run(token) ==
+        tokenLens.assignOld(string).run(token) ==
           State { token: Token ->
             tokenLens.set(token, string) toT tokenLens.get(token)
           }.run(token)
