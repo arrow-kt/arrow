@@ -4,7 +4,6 @@ import arrow.core.Option
 import arrow.core.toOption
 import arrow.core.toT
 import arrow.data.*
-import arrow.instances.IntMonoidInstance
 import arrow.instances.monoid
 import arrow.instances.listk.eq.eq
 import arrow.instances.listk.traverse.traverse
@@ -158,13 +157,13 @@ class TraversalTest : UnitSpec() {
 
       "Extracts with f should be same as extract and map" {
         forAll(genListK(Gen.int()), genFunctionAToB<Int, String>(Gen.string())) { ints, f ->
-          extracts(f).run(ints) == extract().map { it.map(f) }.run(ints)
+          extractMap(f).run(ints) == extract().map { it.map(f) }.run(ints)
         }
       }
 
-      "mod f should be same modify f within State and returning new state" {
+      "update f should be same modify f within State and returning new state" {
         forAll(genListK(Gen.int()), genFunctionAToB<Int, Int>(Gen.int())) { ints, f ->
-          mod(f).run(ints) ==
+          update(f).run(ints) ==
             State<ListK<Int>, ListK<Int>> { iis: ListK<Int> ->
               modify(iis, f)
                 .let { it.fix() toT getAll(it) }
@@ -172,18 +171,18 @@ class TraversalTest : UnitSpec() {
         }
       }
 
-      "modo f should be same as modify f within State and returning old state" {
+      "updateOld f should be same as modify f within State and returning old state" {
         forAll(genListK(Gen.int()), genFunctionAToB<Int, Int>(Gen.int())) { ints, f ->
-          modo(f).run(ints) ==
+          updateOld(f).run(ints) ==
             State { iis: ListK<Int> ->
               modify(iis, f).fix() toT getAll(iis)
             }.run(ints)
         }
       }
 
-      "mod_ f should be as modify f within State and returning Unit" {
+      "update_ f should be as modify f within State and returning Unit" {
         forAll(genListK(Gen.int()), genFunctionAToB<Int, Int>(Gen.int())) { ints, f ->
-          mod_(f).run(ints) ==
+          update_(f).run(ints) ==
             State { iis: ListK<Int> ->
               modify(iis, f).fix() toT Unit
             }.run(ints)
@@ -200,9 +199,9 @@ class TraversalTest : UnitSpec() {
         }
       }
 
-      "assigno f should be same as modify f within State and returning old state" {
+      "assignOld f should be same as modify f within State and returning old state" {
         forAll(genListK(Gen.int()), Gen.int()) { ints, i ->
-          assigno(i).run(ints) ==
+          assignOld(i).run(ints) ==
             State { iis: ListK<Int> ->
               set(iis, i).fix() toT getAll(iis)
             }.run(ints)
