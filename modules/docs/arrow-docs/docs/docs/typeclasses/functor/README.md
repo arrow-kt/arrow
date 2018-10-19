@@ -40,10 +40,14 @@ Option(1).map { it * 2 }
 Both `Try` and `Option` include ready to use `Functor` instances:
 
 ```kotlin:ank
+import arrow.instances.option.functor.*
+
 val optionFunctor = Option.functor()
 ```
 
 ```kotlin:ank
+import arrow.instances.`try`.functor.*
+
 val tryFunctor = Try.functor()
 ```
 

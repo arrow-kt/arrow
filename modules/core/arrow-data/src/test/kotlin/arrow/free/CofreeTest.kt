@@ -4,12 +4,19 @@ import arrow.Kind
 import arrow.core.*
 import arrow.data.*
 import arrow.free.Cofree.Companion.unfold
+import arrow.free.instances.cofree.comonad.comonad
+import arrow.instances.eval.applicative.applicative
+import arrow.instances.eval.functor.functor
+import arrow.instances.eval.monad.monad
+import arrow.instances.id.functor.functor
+import arrow.instances.listk.functor.functor
+import arrow.instances.option.functor.functor
+import arrow.instances.option.traverse.traverse
+import arrow.instances.optiont.monad.monad
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.laws.ComonadLaws
 import arrow.typeclasses.Eq
-import arrow.core.FunctionK
-import arrow.free.instances.ForCofree
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import org.junit.runner.RunWith
@@ -19,17 +26,15 @@ class CofreeTest : UnitSpec() {
 
   init {
 
-    ForCofree<ForOption>() extensions {
-      testLaws(ComonadLaws.laws(this, {
-        val sideEffect = SideEffect()
-        unfold(Option.functor(), sideEffect.counter) {
-          sideEffect.increment()
-          if (it % 2 == 0) None else Some(it + 1)
-        }
-      }, Eq { a, b ->
-        a.fix().run().fix() == b.fix().run().fix()
-      }))
-    }
+    testLaws(ComonadLaws.laws(Cofree.comonad(), {
+      val sideEffect = SideEffect()
+      unfold(Option.functor(), sideEffect.counter) {
+        sideEffect.increment()
+        if (it % 2 == 0) None else Some(it + 1)
+      }
+    }, Eq { a, b ->
+      a.fix().run().fix() == b.fix().run().fix()
+    }))
 
     "tailForced should evaluate and return" {
       val sideEffect = SideEffect()

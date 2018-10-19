@@ -44,6 +44,7 @@ Example:
 ```kotlin:ank
 import arrow.core.*
 import arrow.instances.*
+import arrow.instances.function1.profunctor.*
 
 val fab: Function1<Double, Double> = { x: Double -> x * 3 }.k()
 val f: (Int) -> Double = { x -> x.toDouble() / 2 }  

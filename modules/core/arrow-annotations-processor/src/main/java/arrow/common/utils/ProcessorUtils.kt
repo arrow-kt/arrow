@@ -1,5 +1,6 @@
 package arrow.common.utils
 
+import arrow.meta.encoder.jvm.asKotlin
 import me.eugeniomarletti.kotlin.metadata.*
 import me.eugeniomarletti.kotlin.metadata.jvm.getJvmMethodSignature
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf
@@ -53,8 +54,11 @@ interface ProcessorUtils : KotlinMetadataUtils {
   }
 
   fun getClassOrPackageDataWrapper(classElement: TypeElement): ClassOrPackageDataWrapper {
-    val metadata = classElement.kotlinMetadata
-      ?: knownError("Arrow's annotations can only be used on Kotlin classes. Not valid for $classElement")
+    val metadata = (
+      if (classElement.kotlinMetadata == null)
+        elementUtils.getTypeElement(classElement.qualifiedName.toString().asKotlin()).kotlinMetadata
+      else classElement.kotlinMetadata
+      ) ?: knownError("Arrow's annotations can only be used on Kotlin classes. Not valid for $classElement")
 
     return metadata.asClassOrPackageDataWrapper(classElement)
       ?: knownError("Arrow's annotation can't be used on $classElement")
@@ -83,37 +87,12 @@ interface ProcessorUtils : KotlinMetadataUtils {
     }
   }
 
-  fun recurseTypeclassInterfaces(
-    current: ClassOrPackageDataWrapper.Class,
-    typeTable: TypeTable,
-    acc: List<ClassOrPackageDataWrapper>): List<ClassOrPackageDataWrapper> {
-    val interfaces = current.classProto.supertypes(typeTable).map {
-      it.extractFullName(current)
-    }.filter {
-      it != "`kotlin`.`Any`"
-    }
-    return when {
-      interfaces.isEmpty() -> acc
-      else -> {
-        interfaces.flatMap { i ->
-          try {
-            val className = i.removeBackticks().substringBefore("<")
-            val typeClassElement = elementUtils.getTypeElement(className)
-            val parentInterface = getClassOrPackageDataWrapper(typeClassElement)
-            val newAcc = acc + parentInterface
-            recurseTypeclassInterfaces(parentInterface as ClassOrPackageDataWrapper.Class, typeTable, newAcc)
-          } catch (_: Throwable) {
-            emptyList<ClassOrPackageDataWrapper>()
-          }
-        }
-      }
-    }
-  }
 }
 
-fun String.removeBackticks() = this.replace("`", "")
+fun String.removeBackticks() = replace("`", "")
 
-fun knownError(message: String, element: Element? = null): Nothing = throw KnownException(message, element)
+fun knownError(message: String, element: Element? = null): Nothing =
+  throw KnownException(message, element)
 
 val ProtoBuf.Class.Kind.isCompanionOrObject
   get() = when (this) {

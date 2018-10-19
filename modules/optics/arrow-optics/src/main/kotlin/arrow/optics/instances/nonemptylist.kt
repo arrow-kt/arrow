@@ -3,8 +3,7 @@ package arrow.optics.instances
 import arrow.Kind
 import arrow.core.*
 import arrow.data.*
-import arrow.data.NonEmptyList.Companion.fromListUnsafe
-import arrow.instance
+import arrow.extension
 import arrow.optics.Optional
 import arrow.optics.POptional
 import arrow.optics.Traversal
@@ -27,7 +26,7 @@ fun <A> NonEmptyList.Companion.traversal(): Traversal<NonEmptyList<A>, A> = obje
 /**
  * [Each] instance definition for [NonEmptyList].
  */
-@instance(NonEmptyList::class)
+@extension
 interface NonEmptyListEachInstance<A> : Each<NonEmptyList<A>, A> {
   override fun each(): Traversal<NonEmptyList<A>, A> =
     NonEmptyList.traversal()
@@ -36,7 +35,7 @@ interface NonEmptyListEachInstance<A> : Each<NonEmptyList<A>, A> {
 /**
  * [FilterIndex] instance definition for [NonEmptyList].
  */
-@instance(NonEmptyList::class)
+@extension
 interface NonEmptyListFilterIndexInstance<A> : FilterIndex<NonEmptyList<A>, Int, A> {
   override fun filter(p: (Int) -> Boolean): Traversal<NonEmptyList<A>, A> = object : Traversal<NonEmptyList<A>, A> {
     override fun <F> modifyF(FA: Applicative<F>, s: NonEmptyList<A>, f: (A) -> Kind<F, A>): Kind<F, NonEmptyList<A>> =
@@ -49,7 +48,7 @@ interface NonEmptyListFilterIndexInstance<A> : FilterIndex<NonEmptyList<A>, Int,
 /**
  * [Index] instance definition for [NonEmptyList].
  */
-@instance(NonEmptyList::class)
+@extension
 interface NonEmptyListIndexInstance<A> : Index<NonEmptyList<A>, Int, A> {
   override fun index(i: Int): Optional<NonEmptyList<A>, A> = POptional(
     getOrModify = { l -> l.all.getOrNull(i)?.right() ?: l.left() },

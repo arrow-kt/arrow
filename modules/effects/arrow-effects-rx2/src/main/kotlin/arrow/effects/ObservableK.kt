@@ -97,30 +97,6 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
         is Either.Right -> Observable.just(either.b).k()
       }
     }
-
-    fun monadFlat(): ObservableKMonadInstance = monad()
-
-    fun monadConcat(): ObservableKMonadInstance = object : ObservableKMonadInstance {
-      override fun <A, B> Kind<ForObservableK, A>.flatMap(f: (A) -> Kind<ForObservableK, B>): ObservableK<B> =
-        fix().concatMap { f(it).fix() }
-    }
-
-    fun monadSwitch(): ObservableKMonadInstance = object : ObservableKMonadErrorInstance {
-      override fun <A, B> Kind<ForObservableK, A>.flatMap(f: (A) -> Kind<ForObservableK, B>): ObservableK<B> =
-        fix().switchMap { f(it).fix() }
-    }
-
-    fun monadErrorFlat(): ObservableKMonadErrorInstance = monadError()
-
-    fun monadErrorConcat(): ObservableKMonadErrorInstance = object : ObservableKMonadErrorInstance {
-      override fun <A, B> Kind<ForObservableK, A>.flatMap(f: (A) -> Kind<ForObservableK, B>): ObservableK<B> =
-        fix().concatMap { f(it).fix() }
-    }
-
-    fun monadErrorSwitch(): ObservableKMonadErrorInstance = object : ObservableKMonadErrorInstance {
-      override fun <A, B> Kind<ForObservableK, A>.flatMap(f: (A) -> Kind<ForObservableK, B>): ObservableK<B> =
-        fix().switchMap { f(it).fix() }
-    }
   }
 }
 

@@ -40,12 +40,14 @@ ForInt extensions { 1.combine(2) }
 
 ```kotlin:ank   
 import arrow.data.*
+import arrow.instances.listk.semigroup.*
 
 ListK.semigroup<Int>().run { listOf(1, 2, 3).k().combine(listOf(4, 5, 6).k()) }
 ```
 
 ```kotlin:ank
 import arrow.core.*
+import arrow.instances.option.monoid.*
 
 Option.monoid<Int>(Int.semigroup()).run { Option(1).combine(Option(2)) }
 ```

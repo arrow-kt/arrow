@@ -1,11 +1,9 @@
 package arrow.effects
 
-import arrow.Kind
 import arrow.core.*
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
-import arrow.typeclasses.Traverse
 import kotlinx.coroutines.experimental.*
 import kotlin.coroutines.experimental.CoroutineContext
 
@@ -131,6 +129,3 @@ fun <A> DeferredKOf<A>.unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit 
 
 suspend fun <A> DeferredKOf<A>.await(): A = this.fix().await()
 
-suspend fun <F, A> Kind<F, DeferredKOf<A>>.awaitAll(T: Traverse<F>): Kind<F, A> = T.run {
-  this@awaitAll.sequence(DeferredK.applicative()).await()
-}

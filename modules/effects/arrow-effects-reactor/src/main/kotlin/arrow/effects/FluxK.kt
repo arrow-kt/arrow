@@ -98,29 +98,6 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
       }
     }
 
-    fun monadFlat(): FluxKMonadInstance = monad()
-
-    fun monadConcat(): FluxKMonadInstance = object : FluxKMonadInstance {
-      override fun <A, B> Kind<ForFluxK, A>.flatMap(f: (A) -> Kind<ForFluxK, B>): FluxK<B> =
-        fix().concatMap { f(it).fix() }
-    }
-
-    fun monadSwitch(): FluxKMonadInstance = object : FluxKMonadErrorInstance {
-      override fun <A, B> Kind<ForFluxK, A>.flatMap(f: (A) -> Kind<ForFluxK, B>): FluxK<B> =
-        fix().switchMap { f(it).fix() }
-    }
-
-    fun monadErrorFlat(): FluxKMonadErrorInstance = monadError()
-
-    fun monadErrorConcat(): FluxKMonadErrorInstance = object : FluxKMonadErrorInstance {
-      override fun <A, B> Kind<ForFluxK, A>.flatMap(f: (A) -> Kind<ForFluxK, B>): FluxK<B> =
-        fix().concatMap { f(it).fix() }
-    }
-
-    fun monadErrorSwitch(): FluxKMonadErrorInstance = object : FluxKMonadErrorInstance {
-      override fun <A, B> Kind<ForFluxK, A>.flatMap(f: (A) -> Kind<ForFluxK, B>): FluxK<B> =
-        fix().switchMap { f(it).fix() }
-    }
   }
 }
 

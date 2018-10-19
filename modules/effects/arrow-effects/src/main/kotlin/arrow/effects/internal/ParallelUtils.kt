@@ -69,9 +69,10 @@ internal fun <F, A, B, C, D> Effect<F>.parMap3(ctx: CoroutineContext, ioA: Kind<
 }
 
 /* See parMap3 */
-internal fun <F, A, B, C> ConcurrentEffect<F>.parMapCancellable2(ctx: CoroutineContext, ioA: Kind<F, A>, ioB: Kind<F, B>, f: (A, B) -> C,
+fun <F, A, B, C> ConcurrentEffect<F>.parMapCancellable2(
+  ctx: CoroutineContext, ioA: Kind<F, A>, ioB: Kind<F, B>, f: (A, B) -> C,
   /* start is used because this has to start inside the coroutine. Using Future won't work */
-                                                                 start: (Kind<F, Disposable>) -> Unit): Proc<C> = { cc ->
+  start: (Kind<F, Disposable>) -> Unit): Proc<C> = { cc ->
   val a: suspend () -> Either<A, B> = {
     suspendCoroutine { ca: Continuation<Either<A, B>> ->
       start(ioA.map { it.left() }.runAsyncCancellable {
@@ -92,9 +93,9 @@ internal fun <F, A, B, C> ConcurrentEffect<F>.parMapCancellable2(ctx: CoroutineC
 }
 
 /* See parMap3 */
-internal fun <F, A, B, C, D> ConcurrentEffect<F>.parMapCancellable3(ctx: CoroutineContext, ioA: Kind<F, A>, ioB: Kind<F, B>, ioC: Kind<F, C>, f: (A, B, C) -> D,
+fun <F, A, B, C, D> ConcurrentEffect<F>.parMapCancellable3(ctx: CoroutineContext, ioA: Kind<F, A>, ioB: Kind<F, B>, ioC: Kind<F, C>, f: (A, B, C) -> D,
   /* start is used because this has to start inside the coroutine. Using Future won't work */
-                                                                    start: (Kind<F, Disposable>) -> Unit): Proc<D> = { cc ->
+                                                           start: (Kind<F, Disposable>) -> Unit): Proc<D> = { cc ->
   val a: suspend () -> Treither<A, B, C> = {
     suspendCoroutine { ca: Continuation<Treither<A, B, C>> ->
       start(ioA.map { Treither.Left<A, B, C>(it) }.runAsyncCancellable {
