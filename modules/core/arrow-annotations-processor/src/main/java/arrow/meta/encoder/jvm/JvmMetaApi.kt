@@ -71,6 +71,14 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
   }
 
   /**
+   * @see [MetaApi.prependExtraDummyArg]
+   */
+  override fun Func.prependExtraDummyArg(): Func {
+    val dummyArg: Parameter = Parameter("arg${parameters.size + 1}", TypeName.Unit).defaultDummyArgValue()
+    return copy(parameters = listOf(dummyArg) + parameters)
+  }
+
+  /**
    * @see [MetaApi.removeDummyArgs]
    */
   override fun Func.removeDummyArgs(): Func =
@@ -310,7 +318,7 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
     if (isKinded()) {
       val witness = typeArguments[0].downKind()
       val tail = when (witness) {
-        is TypeName.ParameterizedType -> typeArguments.drop(1) + witness.typeArguments
+        is TypeName.ParameterizedType -> witness.typeArguments + typeArguments.drop(1)
         is TypeName.WildcardType -> {
           if (witness.name == "arrow.typeclasses.Const") {
             val head = typeArguments[0]
@@ -415,6 +423,18 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
    */
   override fun TypeName.Classy.asKotlin(): TypeName.Classy =
     copy(simpleName = simpleName.asKotlin(), fqName = fqName.asKotlin(), pckg = PackageName(pckg.value.asKotlin()))
+
+  /**
+   * @see [MetaApi.asPlatform]
+   */
+  override fun TypeName.Classy.asPlatform(): TypeName.Classy =
+    fqName.asPlatform().let {
+      copy(
+        simpleName = simpleName.asPlatform(),
+        fqName = it,
+        pckg = PackageName(it.substringBeforeLast("."))
+      )
+    }
 
   /**
    * @see [MetaApi.requiredAbstractFunctions]

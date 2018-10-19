@@ -30,18 +30,21 @@ A constructor function. It lifts an exception into the computational context of 
 ```kotlin:ank
 import arrow.*
 import arrow.core.*
+import arrow.instances.either.applicativeError.*
 
 Either.applicativeError<Throwable>().raiseError<Int>(RuntimeException("Paco"))
 ```
 
 ```kotlin:ank
 import arrow.data.*
+import arrow.instances.`try`.applicativeError.*
 
 Try.applicativeError().raiseError<Int>(RuntimeException("Paco"))
 ```
 
 ```kotlin:ank
 import arrow.effects.*
+import arrow.effects.instances.io.applicativeError.*
 
 IO.applicativeError().raiseError<Int>(RuntimeException("Paco"))
 ```
@@ -53,17 +56,17 @@ This method requires a function that creates a new datatype from an error, `(E) 
 If [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) has `flatMap` to allow mapping the value inside a *successful* datatype into a new datatype, you can think of `handleErrorWith` as a way that allows you to map the value of a *failed datatype into a new datatype.
 
 ```kotlin:ank
-val AE_EITHER = Either.applicativeError<Throwable>()
+val eitherAE = Either.applicativeError<Throwable>()
 
 val success: Either<Throwable, Int> = Either.Right(1)
 
-AE_EITHER.run { success.handleErrorWith { t -> Either.Right(0) } }
+success.handleErrorWith { t -> Either.Right(0) }
 ```
 
 ```kotlin:ank
 val failure: Either<Throwable, Int> = Either.Left(RuntimeException("Boom!"))
 
-AE_EITHER.run { failure.handleErrorWith { t -> Either.Right(0) } }
+failure.handleErrorWith { t -> Either.Right(0) }
 ```
 
 #### Kind<F, A>#handleError
@@ -71,11 +74,11 @@ AE_EITHER.run { failure.handleErrorWith { t -> Either.Right(0) } }
 Similar to `handleErrorWith`, except the function can return any regular value. This value will be wrapped and used as a return.
 
 ```kotlin:ank
-AE_EITHER.run { success.handleError { t -> 0 } }
+success.handleError { t -> 0 }
 ```
 
 ```kotlin:ank
-AE_EITHER.run { failure.handleError { t -> 0 } }
+failure.handleError { t -> 0 }
 ```
 
 #### Kind<F, A>#attempt
@@ -83,15 +86,11 @@ AE_EITHER.run { failure.handleError { t -> 0 } }
 Maps the current content of the datatype to an [`Either<E, A>`]({{ '/docs/datatypes/either' | relative_url }}), recovering from any previous error state.
 
 ```kotlin:ank
-val AE_TRY = Try.applicativeError()
+Try { "3".toInt() }.attempt()
 ```
 
 ```kotlin:ank
-AE_TRY.run { Try { "3".toInt() }.attempt() }
-```
-
-```kotlin:ank
-AE_TRY.run { Try { "nope".toInt() }.attempt() }
+Try { "nope".toInt() }.attempt()
 ```
 
 #### fromEither
@@ -99,11 +98,11 @@ AE_TRY.run { Try { "nope".toInt() }.attempt() }
 Constructor function from an [`Either<E, A>`]({{ '/docs/datatypes/either' | relative_url }}) to the current datatype.
 
 ```kotlin:ank
-AE_TRY.fromEither(Either.Right(1))
+eitherAE.fromEither(Either.Right(1))
 ```
 
 ```kotlin:ank
-AE_TRY.fromEither(Either.Left(RuntimeException("Boom")))
+eitherAE.fromEither(Either.Left(RuntimeException("Boom")))
 ```
 
 #### catch
@@ -112,11 +111,11 @@ Constructor function. It takes two function parameters. The first is a generator
 `catch()` runs the generator function to generate a success datatype, and if it throws an exception it uses the error mapping function to create a new failure datatype.
 
 ```kotlin:ank
-AE_EITHER.catch({ 1 } ,::identity)
+eitherAE.catch({ 1 } ,::identity)
 ```
 
 ```kotlin:ank
-AE_EITHER.catch({ throw RuntimeException("Boom") } ,::identity)
+eitherAE.catch({ throw RuntimeException("Boom") } ,::identity)
 ```
 
 ### Laws

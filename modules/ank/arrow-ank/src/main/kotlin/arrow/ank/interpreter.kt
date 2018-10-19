@@ -6,7 +6,6 @@ import arrow.data.ListK
 import arrow.data.fix
 import arrow.data.k
 import arrow.typeclasses.MonadError
-import com.github.born2snipe.cli.ProgressBarPrinter
 import org.intellij.markdown.MarkdownElementTypes.CODE_FENCE
 import org.intellij.markdown.ast.ASTNode
 import org.intellij.markdown.ast.accept
@@ -111,26 +110,28 @@ fun extractCodeImpl(source: String, tree: ASTNode): ListK<Snippet> {
   return sb.k()
 }
 
+private fun repeat(s: String, n: Int): String {
+  val builder = StringBuilder()
+  for (i in 0 until n)
+    builder.append(s)
+  return builder.toString()
+}
+
 fun compileCodeImpl(snippets: Map<File, ListK<Snippet>>, classpath: ListK<String>): ListK<CompiledMarkdown> {
   println(colored(ANSI_PURPLE, AnkHeader))
   val sortedSnippets = snippets.toList()
   val result = sortedSnippets.mapIndexed { n, (file, codeBlocks) ->
-    val pb = ProgressBarPrinter(if (codeBlocks.isEmpty()) 1 else codeBlocks.size)
-    pb.setBarCharacter(colored(ANSI_PURPLE, "\u25A0"))
-    pb.setBarSize(40)
-    pb.setEmptyCharacter("\u25A0")
-    pb.println("${file.parentFile.name}/${file.name} [${n + 1} of ${snippets.size}]")
-
-    if (codeBlocks.isEmpty()) pb.step()
-
+    val progress: Int = if (snippets.isNotEmpty()) ((n + 1) * 100 / snippets.size) else 100
     val classLoader = URLClassLoader(classpath.map { URL(it) }.fix().list.toTypedArray())
     val seManager = ScriptEngineManager(classLoader)
     val engineCache: Map<String, ScriptEngine> =
       codeBlocks.list
+        .asSequence()
         .distinctBy { it.lang }
         .map {
           it.lang to seManager.getEngineByExtension(extensionMappings.getOrDefault(it.lang, "kts"))
         }
+        .toList()
         .toMap()
     val evaledSnippets: ListK<Snippet> = codeBlocks.mapIndexed { _, snippet ->
       val result: Any? = Try {
@@ -144,11 +145,9 @@ fun compileCodeImpl(snippets: Map<File, ListK<Snippet>>, classpath: ListK<String
             msg = colored(ANSI_RED, "ΛNK compilation failed [ ${file.parentFile.name}/${file.name} ]"))
         }
         val result = engine.eval(snippet.code)
-        pb.step()
         result
       }.fold({
-        println("\n\n")
-        println(colored(ANSI_RED, "ΛNK compilation failed [ ${file.parentFile.name}/${file.name} ]"))
+        println(colored(ANSI_RED, "[$progress%] ✗ ${file.parentFile.name}/${file.name} [${n + 1} of ${snippets.size}]"))
         throw CompilationException(file, snippet, it, msg = "\n" + """
                     |
                     |```
@@ -164,6 +163,8 @@ fun compileCodeImpl(snippets: Map<File, ListK<Snippet>>, classpath: ListK<String
         snippet.copy(result = resultString)
       }
     }.k()
+    val message = "[$progress%] ✔ ${file.parentFile.name}/${file.name} [${n + 1} of ${snippets.size}]"
+    println(colored(ANSI_GREEN, message))
     CompiledMarkdown(file, evaledSnippets)
   }.k()
   return result

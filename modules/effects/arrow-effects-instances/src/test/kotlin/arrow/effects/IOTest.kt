@@ -3,10 +3,11 @@ package arrow.effects
 import arrow.Kind
 import arrow.core.*
 import arrow.effects.data.internal.IOCancellationException
-import arrow.effects.io.instances.io.async.async
-import arrow.effects.io.instances.io.monad.monad
+import arrow.effects.instances.io.async.async
+import arrow.effects.instances.io.monad.monad
 import arrow.effects.typeclasses.milliseconds
 import arrow.effects.typeclasses.seconds
+import arrow.instances.either.applicativeError.applicativeError
 import arrow.instances.option.eq.eq
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect

@@ -19,6 +19,7 @@ beginner
 import arrow.data.*
 import arrow.optics.*
 import arrow.optics.typeclasses.*
+import arrow.instances.listk.traverse.*
 
 val each: Each<ListKOf<Int>, Int> = Each.fromTraverse(ListK.traverse())
 

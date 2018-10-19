@@ -24,6 +24,8 @@ import arrow.*
 import arrow.optics.*
 import arrow.core.*
 import arrow.data.*
+import arrow.instances.listk.traverse.*
+import arrow.instances.`try`.applicative.*
 
 val listTraversal: Traversal<ListKOf<Int>, Int> = Traversal.fromTraversable(ListK.traverse())
 

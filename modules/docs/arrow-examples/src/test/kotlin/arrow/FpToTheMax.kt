@@ -3,7 +3,7 @@ package arrow
 import arrow.core.*
 import arrow.data.*
 import arrow.effects.*
-import arrow.effects.io.instances.io.monadDefer.monadDefer
+import arrow.effects.instances.io.monadDefer.monadDefer
 import arrow.effects.typeclasses.MonadDefer
 import arrow.instances.id.monad.monad
 import arrow.instances.statet.monad.monad

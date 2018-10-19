@@ -21,7 +21,7 @@ interface TypeDecoder : MetaDecoder<Type> {
     Code(tree.lyrics().toString())
 
   fun Type.lyrics(): TypeSpec {
-    val className = name.toString()
+    val className = (name as TypeName.Classy).lyrics()
     val builder = when (kind) {
       Type.Shape.Class -> TypeSpec.classBuilder(className)
       Type.Shape.Interface -> TypeSpec.interfaceBuilder(className)

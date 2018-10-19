@@ -54,7 +54,7 @@ abstract class MetaProcessor<A : Annotation>(private val annotation: KClass<A>) 
     data class Class(val typeElement: TypeElement, val type: Type) : AnnotatedElement()
   }
 
-  abstract fun transform(annotatedElement: AnnotatedElement): FileSpec.Builder
+  abstract fun transform(annotatedElement: AnnotatedElement): List<FileSpec.Builder>
 
   private val transformList = mutableListOf<FileSpec>()
 
@@ -86,7 +86,7 @@ abstract class MetaProcessor<A : Annotation>(private val annotation: KClass<A>) 
             }
             else -> knownError("Unsupported meta annotation: $annotation over ${element.kind.name} ")
           }
-          listOf(result.build())
+          result.map { it.build() }
         }
       if (roundEnv.processingOver()) {
         val generatedDir = File(this.generatedDir!!, annotation.java.simpleName).also { it.mkdirs() }

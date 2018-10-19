@@ -19,64 +19,79 @@ import javax.lang.model.element.TypeElement
 
 @AutoService(Processor::class)
 class InstanceProcessor : MetaProcessor<extension>(extension::class) {
-  override fun transform(annotatedElement: AnnotatedElement): FileSpec.Builder =
+  override fun transform(annotatedElement: AnnotatedElement): List<FileSpec.Builder> =
     when (annotatedElement) {
       is AnnotatedElement.Interface -> {
         logW("Processing: ${annotatedElement.typeElement.simpleName}")
-        try {
-          val info = annotatedElement.typeElement.typeClassInstance()
-          log("[${info?.instance?.name?.simpleName}] : Generating [${info?.typeClass?.name?.simpleName}] extensions for [${info?.projectedCompanion}]")
-          val fileSpec = info?.let {
-            FileSpec.builder(
-              "${annotatedElement.type.packageName.value}.${info.projectedCompanion.simpleName.substringAfterLast(".").toLowerCase()}.${info.typeClass.name.simpleName.decapitalize()}",
-              annotatedElement.type.name.simpleName
-            )
-          }
-          if (fileSpec != null) {
-            val wrappedType = info.dataType.kindWrapper()
-            val wrappedExtensions = if (wrappedType != null) {
-              info
-                .genDataTypeExtensions(wrappedType)
-                .map { it.addExtraDummyArg() }
-                .filter { ext ->
-                  ext.name !in info.dataType.allFunctions.map { it.name }
-                }
-            } else emptyList()
-            val functions = wrappedExtensions + info.genDataTypeExtensions() + listOf(info.genCompanionFactory())
-            functions.fold(fileSpec) { spec, func ->
-              spec.addFunction(func.lyrics().toBuilder()
-                .build())
-            }
-          } else FileSpec.builder(
-            annotatedElement.type.packageName.value,
-            annotatedElement.type.name.simpleName
-          )
-        } catch (e: StackOverflowError) {
-          logW("stack overflow in: ${annotatedElement.type}" )
+        val info = annotatedElement.typeElement.typeClassInstance()
+        log("[${info?.instance?.name?.simpleName}] : Generating [${info?.typeClass?.name?.simpleName}] extensions for [${info?.projectedCompanion}]")
+        val fileSpec = info?.let {
           FileSpec.builder(
-            annotatedElement.type.packageName.value,
+            "${annotatedElement.type.packageName.value}.${info.projectedCompanion.simpleName.substringAfterLast(".").toLowerCase()}.${info.typeClass.name.simpleName.decapitalize()}",
             annotatedElement.type.name.simpleName
           )
         }
+        if (fileSpec != null) {
+          val wrappedType = info.dataType.kindWrapper()
+          val wrappedExtensions = if (wrappedType != null) {
+            val wrappedTypeElement = elementUtils.getTypeElement(wrappedType.second.rawType.asPlatform().fqName)
+            val wrappedTypeFunctions =
+              try {
+                elementUtils.getAllMembers(wrappedTypeElement).map { it.simpleName.toString() }
+              } catch (e: Exception) {
+                emptyList<String>()
+              }
+            info
+              .genDataTypeExtensions(wrappedType)
+              .asSequence()
+              .filter { ext ->
+                ext.name !in wrappedTypeFunctions
+              }
+              .toList()
+          } else emptyList()
+          val functions = info.genDataTypeExtensions() + listOf(info.genCompanionFactory(info.dataType.name))
+          val mainFileSpec: FileSpec.Builder = functions.fold(fileSpec) { spec, func ->
+            spec.addFunction(func.lyrics().toBuilder().build())
+          }
+          val wrappedFileSpec = if (wrappedType != null && wrappedExtensions.isNotEmpty()) {
+            val wrappedFileBuilder = FileSpec.builder(
+              "${annotatedElement.type.packageName.value}.${wrappedType.second.rawType.simpleName.substringAfterLast(".").toLowerCase()}.${info.typeClass.name.simpleName.decapitalize()}",
+              annotatedElement.type.name.simpleName
+            )
+            val wrappedFunctionSpec = wrappedExtensions.fold(wrappedFileBuilder) { spec, func ->
+              spec.addFunction(func.lyrics().toBuilder().build())
+            }
+            val wrappedSimpleName = wrappedType.second.rawType.simpleName
+            val wrappedPackage = PackageName("${info.instance.packageName.value}.${wrappedSimpleName.toLowerCase()}")
+            wrappedFunctionSpec.addType(
+              Type(
+                name = TypeName.Classy(
+                  wrappedSimpleName,
+                  "${wrappedPackage.value}.${wrappedSimpleName.toLowerCase()}",
+                  PackageName("${info.instance.packageName.value}.${info.typeClass.name.simpleName.decapitalize()}.${wrappedSimpleName.toLowerCase()}")
+                ),
+                kind = Type.Shape.Object,
+                packageName = annotatedElement.type.packageName,
+                declaredFunctions = listOf(info.genCompanionFactory(wrappedType.second.rawType).copy(receiverType = null))
+              ).lyrics()
+            )
+          } else null
+          listOfNotNull(mainFileSpec, wrappedFileSpec)
+        } else emptyList()
       }
       else -> notAnInstanceError()
     }
 
-  //  override fun transform(annotatedElement: AnnotatedElement): FileSpec.Builder =
-
-//
-//
-
   private fun notAnInstanceError(): Nothing =
     knownError("@instance is only allowed on `interface` extending another interface of at least one type argument (type class) as first declaration in the instance list")
 
-  fun TypeClassInstance.genCompanionFactory(): Func {
+  fun TypeClassInstance.genCompanionFactory(targetType: TypeName): Func {
     val target = when (projectedCompanion) {
       is TypeName.Classy -> projectedCompanion.companion()
       else -> TypeName.Classy(
         simpleName = "Companion",
-        fqName = "${dataType.packageName.value}.Companion",
-        pckg = PackageName(dataType.packageName.value + "." + dataType.name.downKind().simpleName)
+        fqName = "${targetType.rawName}.Companion",
+        pckg = PackageName(targetType.rawName.substringBeforeLast(".") + "." + targetType.downKind().simpleName)
       )
     }
     return Func(
@@ -106,7 +121,7 @@ class InstanceProcessor : MetaProcessor<extension>(extension::class) {
         val func = f.removeDummyArgs().downKindReturnType().wrap(wrappedType)
         val dummyArgsCount = f.countDummyArgs()
         val allArgs = func.parameters + requiredParameters
-        val typeVariables = (func.typeVariables + instance.typeVariables)
+        val typeVariables = (instance.typeVariables + func.typeVariables)
           .asSequence()
           .map { it.removeConstrains() }
           .distinctBy { it.name }
@@ -133,21 +148,36 @@ class InstanceProcessor : MetaProcessor<extension>(extension::class) {
                     else Code(it.name)
                   }
                 } else func.parameters.codeNames()
+              //Const is a special case because it uses a phantom type arg and the Kotlin compiler chooses to
+              //recursively call the extension if you ascribe the call types
+              val typeVars =
+                if (instance.name.simpleName == "ConstFunctorInstance") emptyList()
+                else func.typeVariables
+              val companionOrFactory =
+                if (wrappedType != null) {
+                  val wrappedSimpleName = wrappedType.second.rawType.simpleName
+                  val wrappedPackage = PackageName("${instance.packageName.value}.${wrappedSimpleName.toLowerCase()}")
+                  TypeName.Classy(
+                    wrappedSimpleName,
+                    "${wrappedPackage.value}.${wrappedSimpleName.toLowerCase()}",
+                    PackageName("${instance.packageName.value}.${wrappedSimpleName.toLowerCase()}.${typeClass.name.simpleName.decapitalize()}")
+                  )
+                } else projectedCompanion
               if (receiverType != null) {
                 val impl = if (wrappedType != null && receiverType.rawName == wrappedType.second.rawName) {
                   "${dataType.name.rawName}(this@${+func.name}).${+func.name}${+func.typeVariables}($wrappedArgs) as ${+func.returnType}"
                 } else {
-                  "${+func.name}${+func.typeVariables}($wrappedArgs) as ${+func.returnType}"
+                  "this@${+func.name}.${+func.name}${+typeVars}($wrappedArgs) as ${+func.returnType}"
                 }
-                """|return ${+projectedCompanion}.${typeClass.name.simpleName.decapitalize()}${+instance.typeVariables}(${requiredParameters.code { +it.name }}).run {
+                """|return ${+companionOrFactory}.${typeClass.name.simpleName.decapitalize()}${+instance.typeVariables}(${requiredParameters.code { +it.name }}).run {
                      |  $impl
                      |}
                      |
                    """
               } else {
-                """|return ${+projectedCompanion}
+                """|return ${+companionOrFactory}
                      |   .${typeClass.name.simpleName.decapitalize()}${+instance.typeVariables}(${requiredParameters.code { +it.name }})
-                     |   .${+func.name}${+func.typeVariables}($wrappedArgs) as ${+func.returnType}
+                     |   .${+func.name}${+typeVars}($wrappedArgs) as ${+func.returnType}
                      |
                    """
               }

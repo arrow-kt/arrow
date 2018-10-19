@@ -85,6 +85,7 @@ Let's see a minimal example.
 import arrow.*
 import arrow.effects.*
 import arrow.typeclasses.*
+import arrow.effects.instances.io.monad.*
 
 IO.monad().binding {
   1

@@ -7,6 +7,11 @@ import arrow.meta.ast.TypeName
 internal fun String.removeVariance(): String =
   replace("out ", "").replace("in ", "")
 
+fun String.asPlatform(): String =
+  removeBackticks()
+    .replaceFirst("kotlin.collections.", "java.util.")
+    .replaceFirst("kotlin.", "java.lang.")
+
 fun String.asKotlin(): String =
   removeBackticks()
     .replace("/", ".")
