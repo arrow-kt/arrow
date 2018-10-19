@@ -1,7 +1,7 @@
 ---
 layout: docs
 title: Moore
-permalink: /docs/datatypes/moore
+permalink: /docs/datatypes/moore/
 ---
 
 ## Moore
