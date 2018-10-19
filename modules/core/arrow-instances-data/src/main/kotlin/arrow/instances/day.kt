@@ -5,12 +5,13 @@ import arrow.data.Day
 import arrow.data.DayOf
 import arrow.data.DayPartialOf
 import arrow.data.fix
-import arrow.instance
+import arrow.deprecation.ExtensionsDSLDeprecated
+import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Functor
 
-@instance(Day::class)
+@extension
 interface ComonadDayInstance<F, G> : Comonad<DayPartialOf<F, G>> {
   fun CF(): Comonad<F>
 
@@ -26,14 +27,14 @@ interface ComonadDayInstance<F, G> : Comonad<DayPartialOf<F, G>> {
     fix().mapLazy(f)
 }
 
-@instance(Day::class)
+@extension
 interface FunctorDayInstance<F, G> : Functor<DayPartialOf<F, G>> {
 
   override fun <A, B> DayOf<F, G, A>.map(f: (A) -> B): Day<F, G, B> =
     fix().mapLazy(f)
 }
 
-@instance(Day::class)
+@extension
 interface ApplicativeDayInstance<F, G> : Applicative<DayPartialOf<F, G>> {
   fun AF(): Applicative<F>
 
@@ -61,6 +62,7 @@ class DayContext<F, G>(val AF: Applicative<F>, val AG: Applicative<G>, val CF: C
 }
 
 class DayContextPartiallyApplied<F, G>(val AF: Applicative<F>, val AG: Applicative<G>, val CF: Comonad<F>, val CG: Comonad<G>) {
+  @Deprecated(ExtensionsDSLDeprecated)
   infix fun <A> extensions(f: DayContext<F, G>.() -> A): A =
     f(DayContext(AF, AG, CF, CG))
 }

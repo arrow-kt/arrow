@@ -4,6 +4,8 @@ import arrow.*
 import arrow.data.*
 import arrow.typeclasses.*
 import arrow.optics.*
+import arrow.optics.instances.listk.filterIndex.filterIndex
+import arrow.optics.instances.listk.index.index
 import arrow.optics.typeclasses.*
 
 /**

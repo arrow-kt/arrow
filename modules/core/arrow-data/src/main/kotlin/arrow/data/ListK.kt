@@ -5,6 +5,17 @@ import arrow.core.*
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 
+/**
+ * A wrapper data type also considered by the @extension mechanisms to forward type class
+ * instance methods into both the wrapper and the wrapped data type. Ex. List<A>#foldMap(M: Monoid<A>)
+ *
+ * A data type is considered a wrapper if
+ * - It contains a single constructor with one parameter whose type is a type constructor with one type parameter
+ * - It's a sub type of the type it wraps
+ *
+ * The type class @extension mechanism will project then all syntax generated for the Wrapper also into the Wrapped
+ * type constructor as extension functions.
+ */
 @higherkind
 data class ListK<out A>(val list: List<A>) : ListKOf<A>, List<A> by list {
 

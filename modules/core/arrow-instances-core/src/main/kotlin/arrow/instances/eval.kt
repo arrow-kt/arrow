@@ -2,16 +2,17 @@ package arrow.instances
 
 import arrow.Kind
 import arrow.core.*
-import arrow.instance
+import arrow.deprecation.ExtensionsDSLDeprecated
+import arrow.extension
 import arrow.typeclasses.*
 
-@instance(Eval::class)
+@extension
 interface EvalFunctorInstance : Functor<ForEval> {
   override fun <A, B> Kind<ForEval, A>.map(f: (A) -> B): Eval<B> =
     fix().map(f)
 }
 
-@instance(Eval::class)
+@extension
 interface EvalApplicativeInstance : Applicative<ForEval> {
   override fun <A, B> Kind<ForEval, A>.ap(ff: Kind<ForEval, (A) -> B>): Eval<B> =
     fix().ap(ff)
@@ -23,7 +24,7 @@ interface EvalApplicativeInstance : Applicative<ForEval> {
     Eval.just(a)
 }
 
-@instance(Eval::class)
+@extension
 interface EvalMonadInstance : Monad<ForEval> {
   override fun <A, B> Kind<ForEval, A>.ap(ff: Kind<ForEval, (A) -> B>): Eval<B> =
     fix().ap(ff)
@@ -41,7 +42,7 @@ interface EvalMonadInstance : Monad<ForEval> {
     Eval.just(a)
 }
 
-@instance(Eval::class)
+@extension
 interface EvalComonadInstance : Comonad<ForEval> {
   override fun <A, B> Kind<ForEval, A>.coflatMap(f: (Kind<ForEval, A>) -> B): Eval<B> =
     fix().coflatMap(f)
@@ -53,7 +54,7 @@ interface EvalComonadInstance : Comonad<ForEval> {
     fix().map(f)
 }
 
-@instance(Eval::class)
+@extension
 interface EvalBimonadInstance : Bimonad<ForEval> {
   override fun <A, B> Kind<ForEval, A>.ap(ff: Kind<ForEval, (A) -> B>): Eval<B> =
     fix().ap(ff)
@@ -79,5 +80,6 @@ interface EvalBimonadInstance : Bimonad<ForEval> {
 
 object EvalContext : EvalBimonadInstance
 
+@Deprecated(ExtensionsDSLDeprecated)
 infix fun <L> ForEval.Companion.extensions(f: EvalContext.() -> L): L =
   f(EvalContext)

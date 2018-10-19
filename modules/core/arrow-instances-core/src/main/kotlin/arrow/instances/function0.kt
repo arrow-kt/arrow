@@ -2,16 +2,17 @@ package arrow.instances
 
 import arrow.Kind
 import arrow.core.*
-import arrow.instance
+import arrow.deprecation.ExtensionsDSLDeprecated
+import arrow.extension
 import arrow.typeclasses.*
 
-@instance(Function0::class)
+@extension
 interface Function0FunctorInstance : Functor<ForFunction0> {
   override fun <A, B> Kind<ForFunction0, A>.map(f: (A) -> B): Function0<B> =
     fix().map(f)
 }
 
-@instance(Function0::class)
+@extension
 interface Function0ApplicativeInstance : Applicative<ForFunction0> {
   override fun <A, B> Kind<ForFunction0, A>.ap(ff: Kind<ForFunction0, (A) -> B>): Function0<B> =
     fix().ap(ff)
@@ -23,7 +24,7 @@ interface Function0ApplicativeInstance : Applicative<ForFunction0> {
     Function0.just(a)
 }
 
-@instance(Function0::class)
+@extension
 interface Function0MonadInstance : Monad<ForFunction0> {
   override fun <A, B> Kind<ForFunction0, A>.ap(ff: Kind<ForFunction0, (A) -> B>): Function0<B> =
     fix().ap(ff)
@@ -41,7 +42,7 @@ interface Function0MonadInstance : Monad<ForFunction0> {
     Function0.just(a)
 }
 
-@instance(Function0::class)
+@extension
 interface Function0ComonadInstance : Comonad<ForFunction0> {
   override fun <A, B> Kind<ForFunction0, A>.coflatMap(f: (Kind<ForFunction0, A>) -> B): Function0<B> =
     fix().coflatMap(f)
@@ -53,7 +54,7 @@ interface Function0ComonadInstance : Comonad<ForFunction0> {
     fix().map(f)
 }
 
-@instance(Function0::class)
+@extension
 interface Function0BimonadInstance : Bimonad<ForFunction0> {
   override fun <A, B> Kind<ForFunction0, A>.ap(ff: Kind<ForFunction0, (A) -> B>): Function0<B> =
     fix().ap(ff)
@@ -79,5 +80,6 @@ interface Function0BimonadInstance : Bimonad<ForFunction0> {
 
 object Function0Context : Function0BimonadInstance
 
+@Deprecated(ExtensionsDSLDeprecated)
 infix fun <L> ForFunction0.Companion.extensions(f: Function0Context.() -> L): L =
   f(Function0Context)

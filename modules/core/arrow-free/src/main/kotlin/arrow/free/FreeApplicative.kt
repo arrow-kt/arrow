@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.higherkind
 import arrow.typeclasses.*
 import arrow.core.FunctionK
+import arrow.instances.const.applicative.applicative
 
 inline fun <F, G, A> FreeApplicativeOf<F, A>.foldMapK(f: FunctionK<F, G>, GA: Applicative<G>): Kind<G, A> =
   (this as FreeApplicative<F, A>).foldMap(f, GA)

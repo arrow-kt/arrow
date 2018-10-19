@@ -5,6 +5,9 @@ import arrow.core.*
 import arrow.data.*
 import arrow.higherkind
 import arrow.instances.monoid
+import arrow.instances.const.applicative.applicative
+import arrow.instances.id.applicative.applicative
+import arrow.instances.listk.monoid.monoid
 import arrow.typeclasses.*
 
 /**
@@ -188,7 +191,7 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
    * Map each target to a Monoid and combine the results
    */
   fun <R> foldMap(M: Monoid<R>, s: S, f: (A) -> R): R =
-    modifyF(Const.applicative(M, Unit), s) { b -> Const(f(b)) }.value()
+    modifyF(Const.applicative(M), s) { b -> Const(f(b)) }.value()
 
   /**
    * Fold using the given [Monoid] instance.

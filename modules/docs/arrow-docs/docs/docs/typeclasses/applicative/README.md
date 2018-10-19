@@ -35,6 +35,8 @@ This more or less illustrate the common use case of performing several independe
 The typeclass features several methods related to Applicative Builders that allow you to easily combine all the independent operations into one result.
 
 ```kotlin:ank
+import arrow.instances.option.applicative.*
+
 data class Profile(val name: String, val phone: Int, val address: List<String>)
 
 val r: Option<Tuple3<String, Int, List<String>>> = Option.applicative().tupled(profileService(), phoneService(), addressService()).fix()

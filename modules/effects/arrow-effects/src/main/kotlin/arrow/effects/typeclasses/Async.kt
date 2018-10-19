@@ -15,7 +15,10 @@ interface Async<F> : MonadDefer<F> {
   fun <A> Kind<F, A>.continueOn(ctx: CoroutineContext): Kind<F, A>
 
   operator fun <A> invoke(ctx: CoroutineContext, f: () -> A): Kind<F, A> =
-    just(Unit).continueOn(ctx).flatMap { invoke(f) }
+    lazy().continueOn(ctx).flatMap { invoke(f) }
+
+  fun <A> defer(ctx: CoroutineContext, f: () -> Kind<F, A>): Kind<F, A> =
+    lazy().continueOn(ctx).flatMap { defer(f) }
 
   suspend fun <A> MonadContinuation<F, A>.continueOn(ctx: CoroutineContext): Unit =
     just(Unit).continueOn(ctx).bind()

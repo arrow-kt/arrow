@@ -3,7 +3,10 @@ package arrow
 import arrow.core.*
 import arrow.data.*
 import arrow.effects.*
+import arrow.effects.instances.io.monadDefer.monadDefer
 import arrow.effects.typeclasses.MonadDefer
+import arrow.instances.id.monad.monad
+import arrow.instances.statet.monad.monad
 import arrow.typeclasses.Monad
 import arrow.typeclasses.binding
 import java.util.Random

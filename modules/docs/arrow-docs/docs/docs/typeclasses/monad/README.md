@@ -98,11 +98,11 @@ ForOption extensions {
 Executes two elements sequentially and ignores the result of the second. This is useful for effects like logging.
 
 ```kotlin:ank
+import arrow.effects.instances.io.monad.*
+
 fun logValue(i: Int): IO<Unit> = IO { /* println(i) */ }
 
-ForIO extensions {
-  IO.just(1).effectM(::logValue).fix().unsafeRunSync()
-}
+IO.just(1).effectM(::logValue).fix().unsafeRunSync()
 ```
 
 #### forEffect/forEffectEval
@@ -111,9 +111,9 @@ Executes sequentially two elements that are independent from one another, ignori
 The [`Eval`]({{ '/docs/datatypes/eval' | relative_url }}) variant allows you to pass lazily calculated values.
 
 ```kotlin:ank
-ForOption extensions {
-  Some(1).forEffect(Some(2))
-}
+import arrow.instances.option.monad.*
+
+Some(1).forEffect(Some(2))
 ```
 
 ### Laws
