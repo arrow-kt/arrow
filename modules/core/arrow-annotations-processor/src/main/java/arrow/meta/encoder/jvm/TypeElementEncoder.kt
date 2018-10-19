@@ -80,7 +80,7 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
           declaredFunctions = typeElement.declaredFunctions(typeElement),
           properties = typeElement.properties(),
           types = typeElement.sealedSubClassNames().mapNotNull {
-            if (it is TypeName.Classy && it.simpleName == "Companion") null else it.asType()
+            if (it is TypeName.Classy && it.simpleName == "Companion") null else it.type
           }
         )
       }

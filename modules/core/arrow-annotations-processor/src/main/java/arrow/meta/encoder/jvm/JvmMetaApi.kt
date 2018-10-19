@@ -113,10 +113,10 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
     )
 
   /**
-   * @see [MetaApi.downKind]
+   * @see [MetaApi.getDownKind]
    */
   override fun Parameter.downKind(): Parameter =
-    copy(type = type.downKind())
+    copy(type = type.downKind)
 
   /**
    * @see [MetaApi.defaultDummyArgValue]
@@ -137,17 +137,17 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
    * @see [MetaApi.downKindReceiver]
    */
   override fun Func.downKindReceiver(): Func =
-    copy(receiverType = receiverType?.downKind())
+    copy(receiverType = receiverType?.downKind)
 
   /**
    * @see [MetaApi.downKindReturnType]
    */
   override fun Func.downKindReturnType(): Func =
-    copy(returnType = returnType?.downKind())
+    copy(returnType = returnType?.downKind)
 
   /**
    * Applies replacement on a type recursively changing it's wrapper type for it's wrapped type
-   * and [MetaApi.downKind] as needed
+   * and [MetaApi.getDownKind] as needed
    * ex: Kind<ForSetK, A> -> Set<A>
    */
   fun TypeName.TypeVariable.wrap(wrapped: Pair<TypeName, TypeName.ParameterizedType>): TypeName.TypeVariable =
@@ -161,7 +161,7 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
 
   /**
    * Applies replacement on a type recursively changing it's wrapper type for it's wrapped type
-   * and [MetaApi.downKind] as needed
+   * and [MetaApi.getDownKind] as needed
    * ex: Kind<ForSetK, A> -> Set<A>
    */
   fun TypeName.WildcardType.wrap(wrapped: Pair<TypeName, TypeName.ParameterizedType>): TypeName.WildcardType =
@@ -176,7 +176,7 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
 
   /**
    * Applies replacement on a type recursively changing it's wrapper type for it's wrapped type
-   * and [MetaApi.downKind] as needed
+   * and [MetaApi.getDownKind] as needed
    * ex: Kind<ForSetK, A> -> Set<A>
    */
   fun TypeName.ParameterizedType.wrap(wrapped: Pair<TypeName, TypeName.ParameterizedType>): TypeName.ParameterizedType =
@@ -192,7 +192,7 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
 
   /**
    * Applies replacement on a type recursively changing it's wrapper type for it's wrapped type
-   * and [MetaApi.downKind] as needed
+   * and [MetaApi.getDownKind] as needed
    * ex: Kind<ForSetK, A> -> Set<A>
    */
   fun TypeName.Classy.wrap(wrapped: Pair<TypeName, TypeName.ParameterizedType>): TypeName.Classy =
@@ -203,7 +203,7 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
 
   /**
    * Applies replacement on a type recursively changing it's wrapper type for it's wrapped type
-   * and [MetaApi.downKind] as needed
+   * and [MetaApi.getDownKind] as needed
    * ex: Kind<ForSetK, A> -> Set<A>
    */
   fun TypeName.wrap(wrapped: Pair<TypeName, TypeName.ParameterizedType>): TypeName =
@@ -217,13 +217,13 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
   /**
    * Applies replacement on all types of this function recursively changing wrapper types for their wrapped type
    * over all three receiver, parameters and return type.
-   * and [MetaApi.downKind] as needed
+   * and [MetaApi.getDownKind] as needed
    */
   fun Func.wrap(wrappedType: Pair<TypeName, TypeName.ParameterizedType>? = null): Func =
     wrappedType?.let { wrapped ->
-      val receiverType = receiverType?.downKind()?.wrap(wrapped)
-      val parameters = parameters.map { it.copy(type = it.type.downKind().wrap(wrapped)) }
-      val returnType = returnType?.downKind()?.wrap(wrapped)
+      val receiverType = receiverType?.downKind?.wrap(wrapped)
+      val parameters = parameters.map { it.copy(type = it.type.downKind.wrap(wrapped)) }
+      val returnType = returnType?.downKind?.wrap(wrapped)
       copy(
         receiverType = receiverType,
         parameters = parameters,
@@ -242,13 +242,13 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
     else this
 
   /**
-   * @see [MetaApi.asType]
+   * @see [MetaApi.getAsType]
    */
-  override tailrec fun TypeName.asType(): Type? =
-    when (this) {
+  override val TypeName.type: Type?
+    get() = when (this) {
       is TypeName.TypeVariable -> getTypeElement(name.resolveKotlinPrimitive(), elementUtils)?.asMetaType()
       is TypeName.WildcardType -> null
-      is TypeName.ParameterizedType -> rawType.asType()
+      is TypeName.ParameterizedType -> rawType.type
       is TypeName.Classy -> getTypeElement(fqName, elementUtils)?.asMetaType()
     }
 
@@ -259,75 +259,75 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
     get() = Code("return TODO()")
 
   /**
-   * @see [MetaApi.downKind]
+   * @see [MetaApi.getDownKind]
    */
-  override fun TypeName.TypeVariable.downKind(): TypeName.TypeVariable =
-    name.downKind().let { (pckg, unPrefixedName) ->
+  override val TypeName.TypeVariable.downKind: TypeName.TypeVariable
+    get() = name.downKind().let { (pckg, unPrefixedName) ->
       if (pckg.isBlank()) this else copy(name = "$pckg.$unPrefixedName")
     }
 
   /**
-   * @see [MetaApi.isKinded]
+   * @see [MetaApi.getKinded]
    */
-  override fun TypeName.ParameterizedType.isKinded(): Boolean =
-    typeArguments.isNotEmpty() &&
+  override val TypeName.ParameterizedType.kinded: Boolean
+    get() = typeArguments.isNotEmpty() &&
       !typeArguments[0].simpleName.startsWith("Conested") &&
       rawType.fqName == "arrow.Kind" &&
       typeArguments.size == 2 &&
       (typeArguments[0] !is TypeName.TypeVariable)
 
   /**
-   * @see [MetaApi.nestedTypeVariables]
+   * @see [MetaApi.getNestedTypeVariables]
    */
-  override fun TypeName.TypeVariable.nestedTypeVariables(): List<TypeName> =
-    listOf(this)
+  override val TypeName.TypeVariable.nestedTypeVariables: List<TypeName>
+    get() = listOf(this)
 
   /**
-   * @see [MetaApi.nestedTypeVariables]
+   * @see [MetaApi.getNestedTypeVariables]
    */
-  override fun TypeName.WildcardType.nestedTypeVariables(): List<TypeName> =
-    upperBounds.flatMap { it.nestedTypeVariables() }
+  override val TypeName.WildcardType.nestedTypeVariables: List<TypeName>
+    get() = upperBounds.flatMap { it.nestedTypeVariables }
 
   /**
-   * @see [MetaApi.nestedTypeVariables]
+   * @see [MetaApi.getNestedTypeVariables]
    */
-  override fun TypeName.ParameterizedType.nestedTypeVariables(): List<TypeName> =
-    typeArguments.flatMap { it.nestedTypeVariables() }
+  override val TypeName.ParameterizedType.nestedTypeVariables: List<TypeName>
+    get() = typeArguments.flatMap { it.nestedTypeVariables }
 
   /**
-   * @see [MetaApi.nestedTypeVariables]
+   * @see [MetaApi.getNestedTypeVariables]
    */
-  override fun TypeName.Classy.nestedTypeVariables(): List<TypeName> =
-    emptyList()
+  override val TypeName.Classy.nestedTypeVariables: List<TypeName>
+    get() = emptyList()
 
   /**
-   * @see [MetaApi.nestedTypeVariables]
+   * @see [MetaApi.getNestedTypeVariables]
    */
-  override fun TypeName.nestedTypeVariables(): List<TypeName> =
-    when (this) {
-      is TypeName.TypeVariable -> nestedTypeVariables()
-      is TypeName.WildcardType -> nestedTypeVariables()
-      is TypeName.ParameterizedType -> nestedTypeVariables()
-      is TypeName.Classy -> nestedTypeVariables()
+  override val TypeName.nestedTypeVariables: List<TypeName>
+    get() = when (this) {
+      is TypeName.TypeVariable -> nestedTypeVariables
+      is TypeName.WildcardType -> nestedTypeVariables
+      is TypeName.ParameterizedType -> nestedTypeVariables
+      is TypeName.Classy -> nestedTypeVariables
     }
 
   /**
-   * @see [MetaApi.downKind]
+   * @see [MetaApi.getDownKind]
    */
-  override fun TypeName.ParameterizedType.downKind(): TypeName.ParameterizedType =
-    if (isKinded()) {
-      val witness = typeArguments[0].downKind()
+  override val TypeName.ParameterizedType.downKind: TypeName.ParameterizedType
+    get() = if (kinded) {
+      val witness = typeArguments[0].downKind
       val tail = when (witness) {
         is TypeName.ParameterizedType -> witness.typeArguments + typeArguments.drop(1)
         is TypeName.WildcardType -> {
           if (witness.name == "arrow.typeclasses.Const") {
             val head = typeArguments[0]
             val missingTypeArgs = typeArguments.drop(1)
-            head.nestedTypeVariables() + missingTypeArgs
+            head.nestedTypeVariables + missingTypeArgs
           } else typeArguments.drop(1)
         }
         else -> typeArguments.drop(1)
-      }.map { it.downKind() }
+      }.map { it.downKind }
       val fullName = when (witness) {
         is TypeName.TypeVariable -> witness.name
         is TypeName.WildcardType -> witness.name
@@ -344,10 +344,10 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
     modifiers.contains(modifier)
 
   /**
-   * @see [MetaApi.downKind]
+   * @see [MetaApi.getDownKind]
    */
-  override fun TypeName.WildcardType.downKind(): TypeName.WildcardType =
-    if (upperBounds.isNotEmpty() &&
+  override val TypeName.WildcardType.downKind: TypeName.WildcardType
+    get() = if (upperBounds.isNotEmpty() &&
       (upperBounds.find {
         name.matches("arrow.Kind<(\\w?), (\\w?)>".toRegex()) ||
           name.matches("arrow.Kind<arrow.Kind<(\\w?), (\\w?)>, (\\w?)>".toRegex())
@@ -357,33 +357,33 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
       name.downKind().let { (pckg, unPrefixedName) ->
         copy(
           name = "$pckg.$unPrefixedName",
-          lowerBounds = lowerBounds.map { it.downKind() },
-          upperBounds = upperBounds.map { it.downKind() }
+          lowerBounds = lowerBounds.map { it.downKind },
+          upperBounds = upperBounds.map { it.downKind }
         )
       }
     }
 
   /**
-   * @see [MetaApi.downKind]
+   * @see [MetaApi.getDownKind]
    */
-  override fun TypeName.Classy.downKind(): TypeName.Classy =
-    fqName.downKind().let { (pckg, unPrefixedName) ->
+  override val TypeName.Classy.downKind: TypeName.Classy
+    get() = fqName.downKind().let { (pckg, unPrefixedName) ->
       copy(simpleName = unPrefixedName, fqName = "$pckg.$unPrefixedName")
     }
 
   fun typeNameDownKindImpl(typeName: TypeName): TypeName =
     when (typeName) {
-      is TypeName.TypeVariable -> typeName.downKind().asKotlin()
-      is TypeName.WildcardType -> typeName.downKind().asKotlin()
-      is TypeName.ParameterizedType -> typeName.downKind().asKotlin()
-      is TypeName.Classy -> typeName.downKind().asKotlin()
+      is TypeName.TypeVariable -> typeName.downKind.asKotlin()
+      is TypeName.WildcardType -> typeName.downKind.asKotlin()
+      is TypeName.ParameterizedType -> typeName.downKind.asKotlin()
+      is TypeName.Classy -> typeName.downKind.asKotlin()
     }
 
   /**
-   * @see [MetaApi.downKind]
+   * @see [MetaApi.getDownKind]
    */
-  override fun TypeName.downKind(): TypeName =
-    typeNameDownKind(this)
+  override val TypeName.downKind: TypeName
+    get() = typeNameDownKind(this)
 
   /**
    * @see [MetaApi.asKotlin]
@@ -490,37 +490,36 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
     )
 
   /**
-   * @see [MetaApi.projectedCompanion]
+   * @see [MetaApi.getProjectedCompanion]
    */
-  override fun TypeName.projectedCompanion(): TypeName {
-    val dataTypeDownKinded = downKind()
-    return when {
-      this is TypeName.TypeVariable &&
-        (dataTypeDownKinded.simpleName == "arrow.Kind" ||
-          dataTypeDownKinded.simpleName == "arrow.typeclasses.Conested") -> {
-        simpleName
-          .substringAfterLast("arrow.Kind<")
-          .substringAfterLast("arrow.typeclasses.Conested<")
-          .substringBefore(",")
-          .substringBefore("<")
-          .downKind().let { (pckg, simpleName) ->
-            TypeName.Classy.from(pckg, simpleName)
-          }
+  override val TypeName.projectedCompanion: TypeName
+    get() {
+      val dataTypeDownKinded = downKind
+      return when {
+        this is TypeName.TypeVariable &&
+          (dataTypeDownKinded.simpleName == "arrow.Kind" ||
+            dataTypeDownKinded.simpleName == "arrow.typeclasses.Conested") -> {
+          simpleName
+            .substringAfterLast("arrow.Kind<")
+            .substringAfterLast("arrow.typeclasses.Conested<")
+            .substringBefore(",")
+            .substringBefore("<")
+            .downKind().let { (pckg, simpleName) ->
+              TypeName.Classy.from(pckg, simpleName)
+            }
+        }
+        dataTypeDownKinded is TypeName.Classy ->
+          dataTypeDownKinded.copy(simpleName = simpleName.substringAfterLast("."))
+        else -> dataTypeDownKinded
       }
-      dataTypeDownKinded is TypeName.Classy ->
-        dataTypeDownKinded.copy(simpleName = simpleName.substringAfterLast("."))
-      else -> dataTypeDownKinded
     }
-  }
 
   /**
    * Returns a Pair matching a type as wrapper and the type it wraps
    * ex: SetK<A> to Set<A>
    */
-  fun Type.kindWrapper(): Pair<TypeName, TypeName.ParameterizedType>? =
-    // At this time extension generation for wrapper is only supported for wrappers with a single type argument
-    // because of the complexity of down-kind wrappers of multiple type args such as cases like Kind<ForMapK,
-    if (primaryConstructor?.parameters?.size == 1 && typeVariables.size == 1) {
+  val Type.kindWrapper: Pair<TypeName, TypeName.ParameterizedType>?
+    get() = if (primaryConstructor?.parameters?.size == 1 && typeVariables.size == 1) {
       val wrappedType = primaryConstructor.parameters[0].type.asKotlin()
       when (wrappedType) {
         is TypeName.ParameterizedType -> {
@@ -547,14 +546,14 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
     return when {
       instance != null && superInterfaces.isNotEmpty() -> {
         val typeClassTypeName = superInterfaces[0]
-        val typeClass = typeClassTypeName.asType()
+        val typeClass = typeClassTypeName.type
         when {
           typeClass != null && typeClassTypeName is TypeName.ParameterizedType && typeClassTypeName.typeArguments.isNotEmpty() -> {
             val dataTypeName = typeClassTypeName.typeArguments[0]
             //profunctor and other cases are parametric to Kind2 values or Conested
-            val projectedCompanion = dataTypeName.projectedCompanion()
-            val dataTypeDownKinded = dataTypeName.downKind()
-            val dataType = dataTypeDownKinded.asType()
+            val projectedCompanion = dataTypeName.projectedCompanion
+            val dataTypeDownKinded = dataTypeName.downKind
+            val dataType = dataTypeDownKinded.type
             when {
               dataType != null && dataTypeDownKinded is TypeName.TypeVariable -> TypeClassInstance(
                 instance = instance,

@@ -41,7 +41,7 @@ interface MetaApi {
   /**
    * Obtains type information for a class or interface given a TypeName
    */
-  tailrec fun TypeName.asType(): Type?
+  val TypeName.type: Type?
 
   /**
    * Determine if this [TypeName.ParameterizedType] is in kinded position.
@@ -53,26 +53,26 @@ interface MetaApi {
    * 2. The type has two type arguments.
    * 3. The first type argument is a type variable.
    */
-  fun TypeName.ParameterizedType.isKinded(): Boolean
+  val TypeName.ParameterizedType.kinded: Boolean
 
   /**
    * Performs a type application transforming a type in kinded position into it's concrete counterpart:
    * ex: `Kind<ForIO, A> -> IO<A>`
    */
-  fun TypeName.downKind(): TypeName
-  fun TypeName.TypeVariable.downKind(): TypeName.TypeVariable
-  fun TypeName.ParameterizedType.downKind(): TypeName.ParameterizedType
-  fun TypeName.WildcardType.downKind(): TypeName.WildcardType
-  fun TypeName.Classy.downKind(): TypeName.Classy
+  val TypeName.downKind: TypeName
+  val TypeName.TypeVariable.downKind: TypeName.TypeVariable
+  val TypeName.ParameterizedType.downKind: TypeName.ParameterizedType
+  val TypeName.WildcardType.downKind: TypeName.WildcardType
+  val TypeName.Classy.downKind: TypeName.Classy
 
   /**
    * Recursively gathers all the nested [TypeName.TypeVariable] inside a [TypeName]
    */
-  fun TypeName.nestedTypeVariables(): List<TypeName>
-  fun TypeName.TypeVariable.nestedTypeVariables(): List<TypeName>
-  fun TypeName.WildcardType.nestedTypeVariables(): List<TypeName>
-  fun TypeName.ParameterizedType.nestedTypeVariables(): List<TypeName>
-  fun TypeName.Classy.nestedTypeVariables(): List<TypeName>
+  val TypeName.nestedTypeVariables: List<TypeName>
+  val TypeName.TypeVariable.nestedTypeVariables: List<TypeName>
+  val TypeName.WildcardType.nestedTypeVariables: List<TypeName>
+  val TypeName.ParameterizedType.nestedTypeVariables: List<TypeName>
+  val TypeName.Classy.nestedTypeVariables: List<TypeName>
 
   /**
    * Normalizes potentially rogue types coming from Java introspection into their Kotlin counterpart.
@@ -95,7 +95,7 @@ interface MetaApi {
    * Returns a suitable companion for this type considering it's kinded or conested position.
    * This is frequently use to project extensions or other static instances as needed via codegen
    */
-  fun TypeName.projectedCompanion(): TypeName
+  val TypeName.projectedCompanion: TypeName
 
   /**
    * Returns a type name given a `KClass`
