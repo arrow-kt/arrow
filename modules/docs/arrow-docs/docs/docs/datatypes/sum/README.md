@@ -16,6 +16,7 @@ For creating a Sum we need two comonadic datatypes which `extract` result type i
 
 ```kotlin:ank
 import arrow.data.*
+import arrow.instances.store.comonad.*
 
 val counterStore = Store(0) { "Counter value: $it" }
 val nameStore = Store("Cotel") { "Hey $it!" }

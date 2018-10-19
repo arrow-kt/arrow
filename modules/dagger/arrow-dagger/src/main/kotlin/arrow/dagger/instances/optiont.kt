@@ -39,10 +39,12 @@ class DaggerOptionTFunctorInstance<F> @Inject constructor(val FF: Functor<F>) : 
 
 class DaggerOptionTApplicativeInstance<F> @Inject constructor(val FF: Monad<F>) : OptionTApplicativeInstance<F> {
   override fun FF(): Monad<F> = FF
+  override fun MF(): Monad<F> = FF
 }
 
 class DaggerOptionTMonadInstance<F> @Inject constructor(val FF: Monad<F>) : OptionTMonadInstance<F> {
   override fun FF(): Monad<F> = FF
+  override fun MF(): Monad<F> = FF
 }
 
 class DaggerOptionTFoldableInstance<F> @Inject constructor(val FFF: Foldable<F>) : OptionTFoldableInstance<F> {
@@ -51,12 +53,13 @@ class DaggerOptionTFoldableInstance<F> @Inject constructor(val FFF: Foldable<F>)
 
 class DaggerOptionTTraverseInstance<F> @Inject constructor(val FFF: Traverse<F>) : OptionTTraverseInstance<F> {
   override fun FFF(): Traverse<F> = FFF
+  override fun FFT(): Traverse<F> = FFF
 }
 
 class DaggerOptionTSemigroupKInstance<F> @Inject constructor(val FF: Monad<F>) : OptionTSemigroupKInstance<F> {
-  override fun FF(): Monad<F> = FF
+  override fun MF(): Monad<F> = FF
 }
 
 class DaggerOptionTMonoidKInstance<F> @Inject constructor(val FF: Monad<F>) : OptionTMonoidKInstance<F> {
-  override fun FF(): Monad<F> = FF
+  override fun MF(): Monad<F> = FF
 }

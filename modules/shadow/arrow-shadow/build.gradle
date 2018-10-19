@@ -15,18 +15,8 @@ ext {
 }
 
 dependencies {
-    compile "io.arrow-kt:arrow-core:$metaArrowVersion"
-    compile "io.arrow-kt:arrow-syntax:$metaArrowVersion"
-    compile "io.arrow-kt:arrow-typeclasses:$metaArrowVersion"
-    compile "io.arrow-kt:arrow-data:$metaArrowVersion"
-    compile "io.arrow-kt:arrow-instances-core:$metaArrowVersion"
-    compile "io.arrow-kt:arrow-instances-data:$metaArrowVersion"
-    compile "io.arrow-kt:arrow-free:$metaArrowVersion"
-    compile "io.arrow-kt:arrow-mtl:$metaArrowVersion"
     compile "io.arrow-kt:arrow-effects:$metaArrowVersion"
     compile "io.arrow-kt:arrow-optics:$metaArrowVersion"
-    compile "io.arrow-kt:arrow-generic:$metaArrowVersion"
-    compile "io.arrow-kt:arrow-recursion:$metaArrowVersion"
 }
 
 shadowJar {
@@ -37,6 +27,15 @@ shadowJar {
         exclude(dependency { it.moduleGroup == 'org.intellij' })
         exclude(dependency { it.moduleGroup == 'org.jetbrains' })
     }
+}
+
+shadowJar.doLast {
+    copyJarToBin
+}
+
+task copyJarToBin(type: Copy) {
+    from shadowJar.outputs.files // shortcut for createJar.outputs.files
+    into "libs"
 }
 
 artifacts {

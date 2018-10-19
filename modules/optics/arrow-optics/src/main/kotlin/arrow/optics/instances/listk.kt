@@ -3,7 +3,7 @@ package arrow.optics.instances
 import arrow.Kind
 import arrow.core.*
 import arrow.data.*
-import arrow.instance
+import arrow.extension
 import arrow.optics.Optional
 import arrow.optics.POptional
 import arrow.optics.Traversal
@@ -26,7 +26,7 @@ fun <A> ListK.Companion.traversal(): Traversal<ListK<A>, A> = object : Traversal
 /**
  * [Each] instance definition for [ListK].
  */
-@instance(ListK::class)
+@extension
 interface ListKEachInstance<A> : Each<ListK<A>, A> {
   override fun each(): Traversal<ListK<A>, A> =
     ListK.traversal()
@@ -35,7 +35,7 @@ interface ListKEachInstance<A> : Each<ListK<A>, A> {
 /**
  * [FilterIndex] instance definition for [ListK].
  */
-@instance(ListK::class)
+@extension
 interface ListKFilterIndexInstance<A> : FilterIndex<ListK<A>, Int, A> {
   override fun filter(p: (Int) -> Boolean): Traversal<ListK<A>, A> = object : Traversal<ListK<A>, A> {
     override fun <F> modifyF(FA: Applicative<F>, s: ListK<A>, f: (A) -> Kind<F, A>): Kind<F, ListK<A>> = FA.run {
@@ -49,7 +49,7 @@ interface ListKFilterIndexInstance<A> : FilterIndex<ListK<A>, Int, A> {
 /**
  * [Index] instance definition for [ListK].
  */
-@instance(ListK::class)
+@extension
 interface ListKIndexInstance<A> : Index<ListK<A>, Int, A> {
   override fun index(i: Int): Optional<ListK<A>, A> = POptional(
     getOrModify = { it.getOrNull(i)?.right() ?: it.left() },

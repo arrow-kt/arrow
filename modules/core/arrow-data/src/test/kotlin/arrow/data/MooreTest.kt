@@ -1,7 +1,7 @@
 package arrow.data
 
 import arrow.core.Id
-import arrow.instances.ForMoore
+import arrow.instances.moore.comonad.comonad
 import arrow.test.UnitSpec
 import arrow.test.laws.ComonadLaws
 import arrow.typeclasses.Eq
@@ -21,11 +21,9 @@ class MooreTest : UnitSpec() {
       a.fix().extract() == b.fix().extract()
     }
 
-    ForMoore<Int>() extensions {
-      testLaws(
-        ComonadLaws.laws(Moore.comonad(), intMoore, EQ)
-      )
-    }
+    testLaws(
+      ComonadLaws.laws(Moore.comonad(), intMoore, EQ)
+    )
 
     fun handleRoute(route: String): Moore<String, Id<String>> = when (route) {
       "About" -> Moore(Id("About"), ::handleRoute)

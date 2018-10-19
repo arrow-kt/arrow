@@ -1,5 +1,6 @@
 package arrow.instances
 
+import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.typeclasses.*
 
 //////////
@@ -43,6 +44,7 @@ fun Byte.Companion.monoid(): Monoid<Byte> =
 object ByteContext : ByteShowInstance, ByteOrderInstance, ByteMonoidInstance
 
 object ForByte {
+  @Deprecated(ExtensionsDSLDeprecated)
   infix fun <L> extensions(f: ByteContext.() -> L): L =
     f(ByteContext)
 }
@@ -89,6 +91,8 @@ fun Double.Companion.monoid(): Monoid<Double> =
 object DoubleContext : DoubleShowInstance, DoubleOrderInstance, DoubleMonoidInstance
 
 object ForDouble {
+  @Deprecated(ExtensionsDSLDeprecated)
+
   infix fun <L> extensions(f: DoubleContext.() -> L): L =
     f(DoubleContext)
 }
@@ -134,6 +138,7 @@ fun Int.Companion.monoid(): Monoid<Int> =
 object IntContext : IntShowInstance, IntOrderInstance, IntMonoidInstance
 
 object ForInt {
+  @Deprecated(ExtensionsDSLDeprecated)
   infix fun <L> extensions(f: IntContext.() -> L): L =
     f(IntContext)
 }
@@ -180,6 +185,7 @@ fun Long.Companion.monoid(): Monoid<Long> =
 object LongContext : LongShowInstance, LongOrderInstance, LongMonoidInstance
 
 object ForLong {
+  @Deprecated(ExtensionsDSLDeprecated)
   infix fun <L> extensions(f: LongContext.() -> L): L =
     f(LongContext)
 }
@@ -226,6 +232,7 @@ fun Short.Companion.monoid(): Monoid<Short> =
 object ShortContext : ShortShowInstance, ShortOrderInstance, ShortMonoidInstance
 
 object ForShort {
+  @Deprecated(ExtensionsDSLDeprecated)
   infix fun <L> extensions(f: ShortContext.() -> L): L =
     f(ShortContext)
 }
@@ -272,6 +279,7 @@ fun Float.Companion.monoid(): Monoid<Float> =
 object FloatContext : FloatShowInstance, FloatOrderInstance, FloatMonoidInstance
 
 object ForFloat {
+  @Deprecated(ExtensionsDSLDeprecated)
   infix fun <L> extensions(f: FloatContext.() -> L): L =
     f(FloatContext)
 }

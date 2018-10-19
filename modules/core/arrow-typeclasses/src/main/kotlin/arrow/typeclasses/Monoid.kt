@@ -19,7 +19,7 @@ interface Monoid<A> : Semigroup<A>, MonoidOf<A> {
   /**
    * Combine an array of [A] values.
    */
-  fun combineAll(vararg elems: A): A = elems.asList().combineAll()
+  fun combineAll(elems: List<A>): A = elems.combineAll()
 
   companion object
 }

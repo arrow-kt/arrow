@@ -57,7 +57,7 @@ class DerivingProcessor : AbstractProcessor() {
     val typeclassSuperTypes = typeClasses.map { tc ->
       val typeClassWrapper = tc as ClassOrPackageDataWrapper.Class
       val typeTable = TypeTable(typeClassWrapper.classProto.typeTable)
-      val superTypes = recurseTypeclassInterfaces(typeClassWrapper, typeTable, emptyList())
+      val superTypes = supertypes(typeClassWrapper, typeTable, this, emptyList())
       typeClassWrapper to superTypes
     }.toMap()
     val className = proto.nameResolver.getString(proto.classProto.fqName).replace("/", ".")

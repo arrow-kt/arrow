@@ -38,7 +38,8 @@ sealed class ClassOrPackageDataWrapper {
     override val functionList: List<Function> get() = classProto.functionList
     override val propertyList: List<Property> get() = classProto.propertyList
     override val typeParameters: List<TypeParameter> = classProto.typeParameterList
-    override fun getTypeParameter(typeParameterIndex: Int): TypeParameter? = classProto.getTypeParameter(typeParameterIndex)
+    override fun getTypeParameter(typeParameterIndex: Int): TypeParameter? =
+      classProto.typeParameterList.getOrNull(typeParameterIndex)
   }
 }
 

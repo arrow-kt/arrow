@@ -42,6 +42,7 @@ include {
             _ 'core'
             _ 'data'
             _ 'free'
+            _ 'instances-free'
             _ 'instances-core'
             _ 'instances-data'
             _ 'generic'
@@ -55,9 +56,13 @@ include {
 
         effects {
             _ 'effects'
+            _ 'effects-instances'
             _ 'effects-rx2'
+            _ 'effects-rx2-instances'
             _ 'effects-kotlinx-coroutines'
+            _ 'effects-kotlinx-coroutines-instances'
             _ 'effects-reactor'
+            _ 'effects-reactor-instances'
         }
 
         integrations {
@@ -66,6 +71,7 @@ include {
 
         folder('recursion-schemes') {
             _ 'recursion'
+            _ 'instances-recursion'
         }
 
         docs {
@@ -86,6 +92,11 @@ include {
 
         shadow {
             _ 'shadow'
+        }
+
+        ank {
+            _ 'ank'
+            _ 'ank-gradle'
         }
     }
 }

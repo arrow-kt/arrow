@@ -1,6 +1,8 @@
 package arrow.test.laws
 
 import arrow.core.*
+import arrow.instances.const.applicative.applicative
+import arrow.instances.id.applicative.applicative
 import arrow.typeclasses.*
 import arrow.optics.Optional
 import arrow.typeclasses.Eq

@@ -146,7 +146,7 @@ Transforming the inner contents
 
 ```kotlin:ank
 import arrow.typeclasses.*
-import arrow.instances.*
+import arrow.instances.option.functor.*
 
 Option.functor().run {
   Some(1).map { it + 1 }
@@ -158,9 +158,9 @@ Option.functor().run {
 Computing over independent values
 
 ```kotlin:ank
-ForOption extensions {
-  tupled(Some(1), Some("Hello"), Some(20.0))
-}
+import arrow.instances.option.applicative.*
+
+tupled(Some(1), Some("Hello"), Some(20.0))
 ```
 
 [`Monad`]({{ '/docs/typeclasses/monad/' | relative_url }})

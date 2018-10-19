@@ -4,6 +4,8 @@ import arrow.Kind
 import arrow.core.*
 import arrow.core.Eval.Now
 import arrow.instances.extensions
+import arrow.instances.eval.comonad.comonad
+import arrow.instances.eval.monad.monad
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.laws.ComonadLaws
@@ -24,12 +26,10 @@ class EvalTest : UnitSpec() {
 
   init {
 
-    ForEval extensions {
       testLaws(
-        MonadLaws.laws(this, EQ),
-        ComonadLaws.laws(this, ::Now, EQ)
+        MonadLaws.laws(Eval.monad(), EQ),
+        ComonadLaws.laws(Eval.comonad(), ::Now, EQ)
       )
-    }
 
     "should map wrapped value" {
       val sideEffect = SideEffect()
