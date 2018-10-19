@@ -14,17 +14,3 @@ data class CallK<R>(val call: Call<R>) {
 
   fun <F> catch(monadError: MonadError<F, Throwable>): Kind<F, Response<R>> = call.runSyncCatch(monadError)
 }
-
-fun <F, A> Call<A>.runInAsyncContext(AC: Async<F>): Kind<F, Response<A>> =
-  AC.async { callback ->
-    enqueue(ResponseCallback(callback))
-  }
-
-fun <F, A> Call<A>.runSyncDeferred(defer: MonadDefer<F>): Kind<F, Response<A>> = defer { execute() }
-
-fun <F, A> Call<A>.runSyncCatch(monadError: MonadError<F, Throwable>): Kind<F, Response<A>> =
-  monadError.run {
-    catch {
-      execute()
-    }
-  }
