@@ -9,8 +9,8 @@ import java.io.File
 import javax.lang.model.element.Name
 
 data class Instance(val target: AnnotatedInstance) {
-  val name: Name = target.classElement.simpleName
-  val arrowModule: String = target.classOrPackageProto.`package`.substringAfterLast(".")
+  val name: Name = target.instance.simpleName
+  val arrowModule: String = target.dataTypeInstance.`package`.substringAfterLast(".")
 }
 
 data class TypeClass(val processor: RenzuProcessor, val simpleName: String, val classWrapper: ClassOrPackageDataWrapper.Class) {
@@ -73,7 +73,7 @@ class RenzuGenerator(
   private fun normalizeTypeclassTree(instances: List<Instance>)
     : Map<TypeClass, Pair<Instances, Set<ParentTypeClass>>> =
     instances.fold(mapOf()) { acc, instance ->
-      parentTypeClasses(processor, instance.target.classOrPackageProto).fold(acc) { acc2, typeclass ->
+      parentTypeClasses(processor, instance.target.dataTypeInstance).fold(acc) { acc2, typeclass ->
         val parentTypeClasses = parentTypeClasses(processor, typeclass.classWrapper)
 
         val value = acc2[typeclass]

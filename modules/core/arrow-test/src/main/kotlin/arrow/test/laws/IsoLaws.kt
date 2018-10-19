@@ -1,6 +1,8 @@
 package arrow.test.laws
 
 import arrow.core.*
+import arrow.instances.const.applicative.applicative
+import arrow.instances.id.functor.functor
 import arrow.typeclasses.*
 import arrow.optics.Iso
 import io.kotlintest.properties.Gen

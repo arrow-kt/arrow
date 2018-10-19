@@ -60,10 +60,10 @@ fun <A : Comparable<A>, B> SortedMap<A, B>.k(): SortedMapK<A, B> = SortedMapK(th
 
 fun <A : Comparable<A>, B> Option<Tuple2<A, B>>.k(): SortedMapK<A, B> = this.fold(
   { sortedMapOf<A, B>().k() },
-  { mapEntry -> sortedMapOf<A, B>(mapEntry.a to mapEntry.b).k() }
+  { mapEntry -> sortedMapOf(mapEntry.a to mapEntry.b).k() }
 )
 
-inline fun <K : Comparable<K>, V, G> SortedMapKOf<K, Kind<G, V>>.sequence(GA: Applicative<G>): Kind<G, SortedMapK<K, V>> =
+fun <K : Comparable<K>, V, G> SortedMapKOf<K, Kind<G, V>>.sequence(GA: Applicative<G>): Kind<G, SortedMapK<K, V>> =
   fix().traverse(GA, ::identity)
 
 fun <A : Comparable<A>, B> List<Map.Entry<A, B>>.k(): SortedMapK<A, B> =

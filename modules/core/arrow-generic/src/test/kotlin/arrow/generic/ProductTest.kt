@@ -2,6 +2,9 @@ package arrow.generic
 
 import arrow.Kind
 import arrow.core.*
+import arrow.instances.`try`.applicative.applicative
+import arrow.instances.option.applicative.applicative
+import arrow.instances.option.monoid.monoid
 import arrow.product
 import arrow.test.UnitSpec
 import arrow.test.laws.EqLaws
@@ -104,7 +107,7 @@ class ProductTest : UnitSpec() {
           a.combine(b) == Person(
             a.name + b.name,
             a.age + b.age,
-            Option.monoid(this).combineAll(a.related, b.related)
+            Option.monoid(this).combineAll(listOf(a.related, b.related))
           )
         }
       }
@@ -115,7 +118,7 @@ class ProductTest : UnitSpec() {
         a + b == Person(
           a.name + b.name,
           a.age + b.age,
-          Option.monoid(Person.monoid()).combineAll(a.related, b.related)
+          Option.monoid(Person.monoid()).combineAll(listOf(a.related, b.related))
         )
       }
     }
