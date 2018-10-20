@@ -6,7 +6,7 @@ import arrow.core.Try
 import arrow.core.monad
 import arrow.core.monadError
 import arrow.mtl.instances.ForStateT
-import arrow.mtl.instances.StateTMonadStateInstance
+import arrow.mtl.typeclasses.MonadState
 import arrow.test.UnitSpec
 import arrow.test.laws.MonadCombineLaws
 import arrow.test.laws.MonadStateLaws
@@ -18,7 +18,7 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class StateTTests : UnitSpec() {
 
-  val M: StateTMonadStateInstance<ForTry, Int> = StateT.monadState(Try.monad())
+  val M: MonadState<StateTPartialOf<ForTry, Int>, Int> = StateT.monadState(Try.monad())
 
   val EQ: Eq<StateTOf<ForTry, Int, Int>> = Eq { a, b ->
     a.runM(Try.monad(), 1) == b.runM(Try.monad(), 1)
@@ -38,7 +38,7 @@ class StateTTests : UnitSpec() {
       testLaws(
         MonadStateLaws.laws(M, EQ, EQ_UNIT),
         SemigroupKLaws.laws(
-          StateT.semigroupK<ForListK, Int>(ListK.monad(), ListK.semigroupK()),
+          StateT.semigroupK<ForListK, Int, Int>(ListK.monad(), ListK.semigroupK()),
           StateT.applicative<ForListK, Int>(ListK.monad()),
           EQ_LIST),
         MonadCombineLaws.laws(StateT.monadCombine<ForListK, Int>(ListK.monadCombine(), ListK.semigroupK(), ListK.monadCombine()),

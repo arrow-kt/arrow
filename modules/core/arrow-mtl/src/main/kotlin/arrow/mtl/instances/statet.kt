@@ -2,29 +2,29 @@ package arrow.mtl.instances
 
 import arrow.Kind
 import arrow.core.toT
+import arrow.data.IndexedStateT
+import arrow.data.IndexedStateTPartialOf
 import arrow.data.StateT
 import arrow.data.StateTPartialOf
 import arrow.instance
-import arrow.instances.StateTMonadErrorInstance
-import arrow.instances.StateTMonadInstance
-import arrow.instances.StateTSemigroupKInstance
+import arrow.instances.*
 import arrow.mtl.typeclasses.MonadCombine
 import arrow.mtl.typeclasses.MonadState
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.SemigroupK
 
-@instance(StateT::class)
-interface StateTMonadStateInstance<F, S> : StateTMonadInstance<F, S>, MonadState<StateTPartialOf<F, S>, S> {
+@instance(IndexedStateT::class)
+interface IndexedStateTMonadStateInstance<F, S> : IndexedStateTMonadInstance<F, S>, MonadState<IndexedStateTPartialOf<F, S, S>, S> {
 
-  override fun get(): StateT<F, S, S> = StateT.get(FF())
+  override fun get(): IndexedStateT<F, S, S, S> = IndexedStateT.get(FF())
 
-  override fun set(s: S): StateT<F, S, Unit> = StateT.set(FF(), s)
+  override fun set(s: S): IndexedStateT<F, S, S, Unit> = IndexedStateT.set(FF(), s)
 
 }
 
-@instance(StateT::class)
-interface StateTMonadCombineInstance<F, S> : MonadCombine<StateTPartialOf<F, S>>, StateTMonadInstance<F, S>, StateTSemigroupKInstance<F, S> {
+@instance(IndexedStateT::class)
+interface IndexedStateTMonadCombineInstance<F, S> : MonadCombine<IndexedStateTPartialOf<F, S, S>>, IndexedStateTMonadInstance<F, S>, IndexedStateTSemigroupKInstance<F, S, S> {
 
   fun MC(): MonadCombine<F>
 
@@ -39,7 +39,7 @@ interface StateTMonadCombineInstance<F, S> : MonadCombine<StateTPartialOf<F, S>>
   }
 }
 
-class StateTMtlContext<F, S, E>(val ME: MonadError<F, E>) : StateTMonadStateInstance<F, S>, StateTMonadErrorInstance<F, S, E> {
+class StateTMtlContext<F, S, E>(val ME: MonadError<F, E>) : IndexedStateTMonadStateInstance<F, S>, IndexedStateTMonadErrorInstance<F, S, E> {
   override fun FF(): MonadError<F, E> = ME
 }
 
