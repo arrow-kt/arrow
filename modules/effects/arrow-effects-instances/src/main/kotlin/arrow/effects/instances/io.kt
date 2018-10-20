@@ -7,7 +7,7 @@ import arrow.effects.*
 import arrow.effects.typeclasses.*
 import arrow.extension
 import arrow.typeclasses.*
-import kotlin.coroutines.experimental.CoroutineContext
+import kotlin.coroutines.CoroutineContext
 import arrow.effects.ap as ioAp
 import arrow.effects.handleErrorWith as ioHandleErrorWith
 

@@ -9,7 +9,7 @@ import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import reactor.core.publisher.Mono
 import reactor.core.publisher.MonoSink
-import kotlin.coroutines.experimental.CoroutineContext
+import kotlin.coroutines.CoroutineContext
 
 fun <A> Mono<A>.k(): MonoK<A> = MonoK(this)
 

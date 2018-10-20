@@ -1,8 +1,8 @@
 package arrow.typeclasses
 
-import kotlin.coroutines.experimental.CoroutineContext
-import kotlin.coroutines.experimental.EmptyCoroutineContext
-import kotlin.coroutines.experimental.RestrictsSuspension
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.coroutines.RestrictsSuspension
 
 @RestrictsSuspension
 @Suppress("DELEGATED_MEMBER_HIDES_SUPERTYPE_OVERRIDE")

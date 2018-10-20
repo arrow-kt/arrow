@@ -10,8 +10,8 @@ import arrow.test.generators.genIntSmall
 import arrow.test.generators.genThrowable
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.forAll
-import kotlinx.coroutines.experimental.CommonPool
-import kotlinx.coroutines.experimental.newSingleThreadContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.newSingleThreadContext
 
 object MonadDeferLaws {
   fun <F> laws(SC: MonadDefer<F>, EQ: Eq<Kind<F, Int>>, EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>, EQERR: Eq<Kind<F, Int>> = EQ): List<Law> =
@@ -37,7 +37,7 @@ object MonadDeferLaws {
         val c = bindDefer { b + z }
         c
       }
-      bound.equalUnderTheLaw(just<Int>(x + y + z), EQ)
+      bound.equalUnderTheLaw(just(x + y + z), EQ)
     }
 
   fun <F> MonadDefer<F>.asyncBindError(EQ: Eq<Kind<F, Int>>): Unit =
@@ -108,9 +108,9 @@ object MonadDeferLaws {
     forFew(5, genIntSmall()) { num: Int ->
       val sideEffect = SideEffect()
       val (binding, dispose) = bindingCancellable {
-        val a = bindIn(CommonPool) { Thread.sleep(500); num }
+        val a = bindIn(Dispatchers.Default) { Thread.sleep(500); num }
         sideEffect.increment()
-        val b = bindIn(CommonPool) { a + 1 }
+        val b = bindIn(Dispatchers.Default) { a + 1 }
         val c = just(b + 1).bind()
         c
       }
@@ -122,9 +122,9 @@ object MonadDeferLaws {
     forFew(5, genIntSmall()) { num: Int ->
       val sideEffect = SideEffect()
       val (binding, dispose) = bindingCancellable {
-        val a = bindIn(CommonPool) { num }
+        val a = bindIn(Dispatchers.Default) { num }
         sideEffect.increment()
-        val b = bindIn(CommonPool) { Thread.sleep(500); sideEffect.increment(); a + 1 }
+        val b = bindIn(Dispatchers.Default) { Thread.sleep(500); sideEffect.increment(); a + 1 }
         b
       }
       Try { Thread.sleep(250); dispose() }.recover { throw it }

@@ -1,11 +1,12 @@
 package arrow.typeclasses
 
 import arrow.Kind
+import arrow.core.Continuation
 import arrow.core.identity
 import java.io.Serializable
-import kotlin.coroutines.experimental.*
-import kotlin.coroutines.experimental.intrinsics.COROUTINE_SUSPENDED
-import kotlin.coroutines.experimental.intrinsics.suspendCoroutineOrReturn
+import kotlin.coroutines.*
+import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
+import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 
 /**
  * The dual of monads, used to extract values from F
@@ -23,6 +24,9 @@ interface Comonad<F> : Functor<F> {
 @RestrictsSuspension
 open class ComonadContinuation<F, A : Any>(CM: Comonad<F>, override val context: CoroutineContext = EmptyCoroutineContext) : Serializable, Continuation<A>, Comonad<F> by CM {
 
+  override fun resumeWith(result: Result<A>): Unit =
+    result.fold({ returnedMonad = it }, { throw it })
+
   override fun resume(value: A) {
     returnedMonad = value
   }
@@ -35,7 +39,7 @@ open class ComonadContinuation<F, A : Any>(CM: Comonad<F>, override val context:
 
   suspend fun <B> Kind<F, B>.fix(): B = extract { this }
 
-  suspend fun <B> extract(m: () -> Kind<F, B>): B = suspendCoroutineOrReturn { c ->
+  suspend fun <B> extract(m: () -> Kind<F, B>): B = suspendCoroutineUninterceptedOrReturn { c ->
     val labelHere = c.stateStack // save the whole coroutine stack labels
     returnedMonad = m().coflatMap { x: Kind<F, B> ->
       c.stateStack = labelHere

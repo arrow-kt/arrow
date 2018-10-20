@@ -12,7 +12,7 @@ import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.Duration
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
-import kotlin.coroutines.experimental.CoroutineContext
+import kotlin.coroutines.CoroutineContext
 
 enum class OnCancel { ThrowCancellationException, Silent;
 

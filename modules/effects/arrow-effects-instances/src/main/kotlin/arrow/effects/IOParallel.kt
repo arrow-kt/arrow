@@ -8,7 +8,7 @@ import arrow.effects.instances.io.concurrentEffect.concurrentEffect
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.Duration
 import java.util.concurrent.CountDownLatch
-import kotlin.coroutines.experimental.CoroutineContext
+import kotlin.coroutines.CoroutineContext
 
 internal class FutureN<A>(count: Int = 1) {
   private val latch = CountDownLatch(count)
