@@ -47,7 +47,10 @@ interface Foldable<F> {
       }
     }
 
-  fun <A, B> Kind<F, A>.reduceRightToOption(f: (A) -> B, g: (A, Eval<B>) -> Eval<B>): Eval<Option<B>> =
+  fun <A, B> Kind<F, A>.reduceRightToOption(
+    f: (A) -> B,
+    g: (A, Eval<B>) -> Eval<B>
+  ): Eval<Option<B>> =
     foldRight(Eval.Now(Option.empty())) { a, lb ->
       lb.flatMap { option ->
         when (option) {
@@ -106,7 +109,8 @@ interface Foldable<F> {
    *
    * Similar to traverse except it operates on F<G<A>> values, so no additional functions are needed.
    */
-  fun <G, A> Kind<F, Kind<G, A>>.sequence_(ag: Applicative<G>): Kind<G, Unit> = traverse_(ag, ::identity)
+  fun <G, A> Kind<F, Kind<G, A>>.sequence_(ag: Applicative<G>): Kind<G, Unit> =
+    traverse_(ag, ::identity)
 
   /**
    * Find the first element matching the predicate, if one exists.
@@ -157,9 +161,11 @@ interface Foldable<F> {
    *
    * Similar to foldM, but using a Monoid<B>.
    */
-  fun <G, A, B, TC> Kind<F, A>.foldMapM(tc: TC, f: (A) -> Kind<G, B>): Kind<G, B>
-    where TC : Monad<G>, TC : Monoid<B> = tc.run {
-    foldM(tc, tc.empty()) { b, a -> f(a).map { b.combine(it) } }
+  fun <G, A, B, MA, MO> Kind<F, A>.foldMapM(ma: MA, mo: MO, f: (A) -> Kind<G, B>): Kind<G, B>
+      where MA : Monad<G>, MO : Monoid<B> = ma.run {
+    mo.run {
+      foldM(ma, mo.empty()) { b, a -> f(a).map { b.combine(it) } }
+    }
   }
 
   /**
@@ -185,10 +191,11 @@ interface Foldable<F> {
       }.fix().swap().toOption()
 
   companion object {
-    fun <A, B> iterateRight(it: Iterator<A>, lb: Eval<B>): (f: (A, Eval<B>) -> Eval<B>) -> Eval<B> = { f: (A, Eval<B>) -> Eval<B> ->
-      fun loop(): Eval<B> =
-        Eval.defer { if (it.hasNext()) f(it.next(), loop()) else lb }
-      loop()
-    }
+    fun <A, B> iterateRight(it: Iterator<A>, lb: Eval<B>): (f: (A, Eval<B>) -> Eval<B>) -> Eval<B> =
+      { f: (A, Eval<B>) -> Eval<B> ->
+        fun loop(): Eval<B> =
+          Eval.defer { if (it.hasNext()) f(it.next(), loop()) else lb }
+        loop()
+      }
   }
 }
