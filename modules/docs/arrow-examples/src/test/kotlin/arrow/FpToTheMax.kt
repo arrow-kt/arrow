@@ -40,7 +40,7 @@ class MonadAndConsoleRandom<F>(M: Monad<F>, C: Console<F>, R: FRandom<F>) : Mona
 data class TestData(val input: List<String>, val output: List<String>, val nums: List<Int>) {
     fun putStrLn(s: String): Tuple2<TestData, Unit> = copy(output = output.plus(s)) toT Unit
     fun getStrLn(): Tuple2<TestData, String> = copy(input = input.drop(1)) toT input[0]
-    fun nextInt(upper: Int): Tuple2<TestData, Int> = copy(nums = nums.drop(1)) toT nums[0]
+    fun nextInt(@Suppress("UNUSED_PARAMETER") upper: Int): Tuple2<TestData, Int> = copy(nums = nums.drop(1)) toT nums[0]
 }
 
 

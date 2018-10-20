@@ -10,12 +10,12 @@ import io.kotlintest.properties.forAll
 
 object MonoidKLaws {
 
-  inline fun <F> laws(SGK: MonoidK<F>, AP: Applicative<F>, EQ: Eq<Kind<F, Int>>): List<Law> =
+  fun <F> laws(SGK: MonoidK<F>, AP: Applicative<F>, EQ: Eq<Kind<F, Int>>): List<Law> =
     SemigroupKLaws.laws(SGK, AP, EQ) + listOf(
       Law("MonoidK Laws: Left identity") { SGK.monoidKLeftIdentity(AP::just, EQ) },
       Law("MonoidK Laws: Right identity") { SGK.monoidKRightIdentity(AP::just, EQ) })
 
-  inline fun <F> laws(SGK: MonoidK<F>, noinline f: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): List<Law> =
+  fun <F> laws(SGK: MonoidK<F>, f: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): List<Law> =
     SemigroupKLaws.laws(SGK, f, EQ) + listOf(
       Law("MonoidK Laws: Left identity") { SGK.monoidKLeftIdentity(f, EQ) },
       Law("MonoidK Laws: Right identity") { SGK.monoidKRightIdentity(f, EQ) })

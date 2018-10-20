@@ -16,6 +16,7 @@ fun <A> Flux<A>.k(): FluxK<A> = FluxK(this)
 fun <A> FluxKOf<A>.value(): Flux<A> =
   this.fix().flux
 
+@Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 @higherkind
 data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
   fun <B> map(f: (A) -> B): FluxK<B> =
@@ -101,5 +102,5 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
   }
 }
 
-inline fun <A, G> FluxKOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, FluxK<A>> =
+fun <A, G> FluxKOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, FluxK<A>> =
   fix().traverse(GA, ::identity)

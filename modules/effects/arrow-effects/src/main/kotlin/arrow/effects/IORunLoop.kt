@@ -119,7 +119,7 @@ internal object IORunLoop {
     } while (true)
   }
 
-  private inline fun <A> sanitizedCurrentIO(currentIO: Current?, unboxed: Any?): IO<A> =
+  private fun <A> sanitizedCurrentIO(currentIO: Current?, unboxed: Any?): IO<A> =
     (currentIO ?: IO.Pure(unboxed)) as IO<A>
 
   private fun <A> suspendInAsync(

@@ -100,5 +100,5 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
   }
 }
 
-inline fun <A, G> ObservableKOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, ObservableK<A>> =
+fun <A, G> ObservableKOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, ObservableK<A>> =
   fix().traverse(GA, ::identity)

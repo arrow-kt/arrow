@@ -13,8 +13,10 @@ data class Const<A, out T>(val value: A) : ConstOf<A, T> {
   @Suppress("UNCHECKED_CAST")
   fun <U> retag(): Const<A, U> = this as Const<A, U>
 
+  @Suppress("UNUSED_PARAMETER")
   fun <G, U> traverse(GA: Applicative<G>, f: (T) -> Kind<G, U>): Kind<G, Const<A, U>> = GA.just(retag())
 
+  @Suppress("UNUSED_PARAMETER")
   fun <G, U> traverseFilter(GA: Applicative<G>, f: (T) -> Kind<G, Option<U>>): Kind<G, Const<A, U>> = GA.just(retag())
 
   companion object {
