@@ -352,8 +352,11 @@ internal object IORunLoop {
       val normalResume: Continuation<Unit> = object : Continuation<Unit> {
         override val context: CoroutineContext = currentCC
 
-        override fun resumeWith(result: Result<Unit>) {
-          result.fold({ Unit }, { this@asyncCallback(Either.left(it)) })
+        override fun resume(value: Unit) {
+        }
+
+        override fun resumeWithException(exception: Throwable) {
+          this@asyncCallback(Either.left(exception))
         }
 
       }

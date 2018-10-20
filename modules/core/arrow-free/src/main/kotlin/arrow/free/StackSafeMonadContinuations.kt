@@ -12,8 +12,12 @@ import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 open class StackSafeMonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineContext = EmptyCoroutineContext) :
   Continuation<Free<F, A>>, Monad<F> by M {
 
-  override fun resumeWith(result: Result<Free<F, A>>) {
-    result.fold({ returnedMonad = it }, { throw it })
+  override fun resume(value: Free<F, A>) {
+    returnedMonad = value
+  }
+
+  override fun resumeWithException(exception: Throwable) {
+    throw exception
   }
 
   protected lateinit var returnedMonad: Free<F, A>
@@ -28,7 +32,7 @@ open class StackSafeMonadContinuation<F, A>(M: Monad<F>, override val context: C
     val labelHere = c.stateStack // save the whole coroutine stack labels
     returnedMonad = m().flatMap { z ->
       c.stateStack = labelHere
-      c.resumeWith(SuccessOrFailure.success(z))
+      c.resumeWith(Result.success(z))
       returnedMonad
     }
     COROUTINE_SUSPENDED

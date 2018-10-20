@@ -15,8 +15,13 @@ interface BindingInContextContinuation<in T> : Continuation<T> {
 open class MonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineContext = EmptyCoroutineContext) :
   Continuation<Kind<F, A>>, Monad<F> by M {
 
-  override fun resumeWith(result: Result<Kind<F, A>>) =
-    result.fold({ returnedMonad = it }, { throw it })
+  override fun resume(value: Kind<F, A>) {
+    returnedMonad = value
+  }
+
+  override fun resumeWithException(exception: Throwable) {
+    throw exception
+  }
 
   protected fun bindingInContextContinuation(context: CoroutineContext): BindingInContextContinuation<Kind<F, A>> =
     object : BindingInContextContinuation<Kind<F, A>> {
@@ -28,14 +33,16 @@ open class MonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineC
 
       override val context: CoroutineContext = context
 
-      override fun resumeWith(result: Result<Kind<F, A>>) =
-        result.fold({
-          returnedMonad = it
-          latch.countDown()
-        }, {
-          error = it
-          latch.countDown()
-        })
+      override fun resume(value: Kind<F, A>) {
+        returnedMonad = value
+        latch.countDown()
+      }
+
+      override fun resumeWithException(exception: Throwable) {
+        error = null
+        latch.countDown()
+      }
+
     }
 
   protected lateinit var returnedMonad: Kind<F, A>

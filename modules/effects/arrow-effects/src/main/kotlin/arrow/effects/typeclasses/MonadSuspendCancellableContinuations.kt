@@ -43,7 +43,7 @@ open class MonadDeferCancellableContinuation<F, A>(SC: MonadDefer<F>, override v
       if (cancelled.get()) {
         throw BindingCancellationException()
       }
-      c.resumeWith(SuccessOrFailure.success(x))
+      c.resumeWith(Result.success(x))
       returnedMonad
     }
     COROUTINE_SUSPENDED
@@ -62,7 +62,7 @@ open class MonadDeferCancellableContinuation<F, A>(SC: MonadDefer<F>, override v
         if (cancelled.get()) {
           throw BindingCancellationException()
         }
-        c.resumeWith(SuccessOrFailure.success(xx))
+        c.resumeWith(Result.success(xx))
         returnedMonad
       }
     }

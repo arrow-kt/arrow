@@ -27,6 +27,14 @@ open class ComonadContinuation<F, A : Any>(CM: Comonad<F>, override val context:
   override fun resumeWith(result: Result<A>): Unit =
     result.fold({ returnedMonad = it }, { throw it })
 
+  override fun resume(value: A) {
+    returnedMonad = value
+  }
+
+  override fun resumeWithException(exception: Throwable) {
+    throw exception
+  }
+
   internal lateinit var returnedMonad: A
 
   suspend fun <B> Kind<F, B>.fix(): B = extract { this }
