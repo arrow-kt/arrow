@@ -5,9 +5,9 @@ import arrow.core.Left
 import arrow.core.Right
 import arrow.effects.internal.Platform.ArrayStack
 import arrow.effects.typeclasses.Proc
-import kotlin.coroutines.experimental.Continuation
-import kotlin.coroutines.experimental.CoroutineContext
-import kotlin.coroutines.experimental.startCoroutine
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.startCoroutine
 
 private typealias Current = IOOf<Any?>
 private typealias BindF = (Any?) -> IO<Any?>
@@ -352,11 +352,10 @@ internal object IORunLoop {
       val normalResume: Continuation<Unit> = object : Continuation<Unit> {
         override val context: CoroutineContext = currentCC
 
-        override fun resume(value: Unit) {}
-
-        override fun resumeWithException(exception: Throwable) {
-          this@asyncCallback(Either.left(exception))
+        override fun resumeWith(result: Result<Unit>) {
+          result.fold({ Unit }, { this@asyncCallback(Either.left(it)) })
         }
+
       }
 
       func.startCoroutine(normalResume)

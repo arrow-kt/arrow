@@ -23,9 +23,9 @@ import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import kotlinx.coroutines.experimental.CoroutineStart
-import kotlinx.coroutines.experimental.Unconfined
-import kotlinx.coroutines.experimental.runBlocking
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Dispatchers.Unconfined
+import kotlinx.coroutines.runBlocking
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)

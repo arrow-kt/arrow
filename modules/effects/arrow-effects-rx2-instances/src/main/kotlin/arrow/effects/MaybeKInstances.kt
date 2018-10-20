@@ -10,7 +10,7 @@ import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
 import arrow.extension
 import arrow.typeclasses.*
-import kotlin.coroutines.experimental.CoroutineContext
+import kotlin.coroutines.CoroutineContext
 
 @extension
 interface MaybeKFunctorInstance : Functor<ForMaybeK> {

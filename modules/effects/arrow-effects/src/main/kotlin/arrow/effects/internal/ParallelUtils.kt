@@ -6,10 +6,7 @@ import arrow.effects.typeclasses.ConcurrentEffect
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.Effect
 import arrow.effects.typeclasses.Proc
-import kotlin.coroutines.experimental.Continuation
-import kotlin.coroutines.experimental.CoroutineContext
-import kotlin.coroutines.experimental.startCoroutine
-import kotlin.coroutines.experimental.suspendCoroutine
+import kotlin.coroutines.*
 
 /* See parMap3 */
 internal fun <F, A, B, C> Effect<F>.parMap2(ctx: CoroutineContext, ioA: Kind<F, A>, ioB: Kind<F, B>, f: (A, B) -> C,
@@ -129,25 +126,25 @@ private fun <A, B, C> parContinuation(ctx: CoroutineContext, f: (A, B) -> C, cc:
 
     var intermediate: Tuple2<A?, B?> = null toT null
 
-    override fun resume(value: Either<A, B>) =
-      synchronized(this) {
-        val resA = intermediate.a
-        val resB = intermediate.b
-        value.fold({ a ->
-          intermediate = a toT resB
-          if (resB != null) {
-            cc.resume(f(a, resB))
-          }
-        }, { b ->
-          intermediate = resA toT b
-          if (resA != null) {
-            cc.resume(f(resA, b))
-          }
-        })
-      }
+    override fun resumeWith(result: Result<Either<A, B>>) {
+      result.fold({ value ->
+        synchronized(this) {
+          val resA = intermediate.a
+          val resB = intermediate.b
+          value.fold({ a ->
+            intermediate = a toT resB
+            if (resB != null) {
+              cc.resume(f(a, resB))
+            }
+          }, { b ->
+            intermediate = resA toT b
+            if (resA != null) {
+              cc.resume(f(resA, b))
+            }
+          })
+        }
+      }, { cc.resumeWithException(it) })
 
-    override fun resumeWithException(exception: Throwable) {
-      cc.resumeWithException(exception)
     }
   }
 
@@ -157,31 +154,30 @@ private fun <A, B, C, D> triContinuation(ctx: CoroutineContext, f: (A, B, C) -> 
 
     var intermediate: Tuple3<A?, B?, C?> = Tuple3(null, null, null)
 
-    override fun resume(value: Treither<A, B, C>) =
-      synchronized(this) {
-        val resA = intermediate.a
-        val resB = intermediate.b
-        val resC = intermediate.c
-        value.fold({ a ->
-          intermediate = Tuple3(a, resB, resC)
-          if (resB != null && resC != null) {
-            cc.resume(f(a, resB, resC))
-          }
-        }, { b ->
-          intermediate = Tuple3(resA, b, resC)
-          if (resA != null && resC != null) {
-            cc.resume(f(resA, b, resC))
-          }
-        }, { c ->
-          intermediate = Tuple3(resA, resB, c)
-          if (resA != null && resB != null) {
-            cc.resume(f(resA, resB, c))
-          }
-        })
-      }
-
-    override fun resumeWithException(exception: Throwable) {
-      cc.resumeWithException(exception)
+    override fun resumeWith(result: Result<Treither<A, B, C>>) {
+      result.fold({ value ->
+        synchronized(this) {
+          val resA = intermediate.a
+          val resB = intermediate.b
+          val resC = intermediate.c
+          value.fold({ a ->
+            intermediate = Tuple3(a, resB, resC)
+            if (resB != null && resC != null) {
+              cc.resume(f(a, resB, resC))
+            }
+          }, { b ->
+            intermediate = Tuple3(resA, b, resC)
+            if (resA != null && resC != null) {
+              cc.resume(f(resA, b, resC))
+            }
+          }, { c ->
+            intermediate = Tuple3(resA, resB, c)
+            if (resA != null && resB != null) {
+              cc.resume(f(resA, resB, c))
+            }
+          })
+        }
+      }, { cc.resumeWithException(it) })
     }
   }
 
@@ -208,11 +204,8 @@ private fun <A> asyncIOContinuation(ctx: CoroutineContext, cc: (Either<Throwable
   object : Continuation<A> {
     override val context: CoroutineContext = ctx
 
-    override fun resume(value: A) {
-      cc(value.right())
-    }
-
-    override fun resumeWithException(exception: Throwable) {
-      cc(exception.left())
+    override fun resumeWith(result: Result<A>) {
+      result.fold({ cc(it.right()) }, { cc(it.left()) })
     }
   }
+

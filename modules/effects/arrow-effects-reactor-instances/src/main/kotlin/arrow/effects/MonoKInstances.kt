@@ -6,7 +6,7 @@ import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.effects.typeclasses.*
 import arrow.extension
 import arrow.typeclasses.*
-import kotlin.coroutines.experimental.CoroutineContext
+import kotlin.coroutines.CoroutineContext
 
 @extension
 interface MonoKFunctorInstance : Functor<ForMonoK> {

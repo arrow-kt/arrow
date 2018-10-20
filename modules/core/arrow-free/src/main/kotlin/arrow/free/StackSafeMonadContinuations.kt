@@ -3,20 +3,16 @@ package arrow.free
 import arrow.Kind
 import arrow.typeclasses.Monad
 import arrow.typeclasses.stateStack
-import kotlin.coroutines.experimental.*
-import kotlin.coroutines.experimental.intrinsics.COROUTINE_SUSPENDED
-import kotlin.coroutines.experimental.intrinsics.suspendCoroutineOrReturn
+import kotlin.coroutines.*
+import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
+import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 
 @RestrictsSuspension
 open class StackSafeMonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineContext = EmptyCoroutineContext) :
   Continuation<Free<F, A>>, Monad<F> by M {
 
-  override fun resume(value: Free<F, A>) {
-    returnedMonad = value
-  }
-
-  override fun resumeWithException(exception: Throwable) {
-    throw exception
+  override fun resumeWith(result: Result<Free<F, A>>) {
+    result.fold({ returnedMonad = it }, { throw it })
   }
 
   protected lateinit var returnedMonad: Free<F, A>
@@ -27,7 +23,7 @@ open class StackSafeMonadContinuation<F, A>(M: Monad<F>, override val context: C
 
   suspend fun <B> Free<F, B>.bind(): B = bind { this }
 
-  suspend fun <B> bind(m: () -> Free<F, B>): B = suspendCoroutineOrReturn { c ->
+  suspend fun <B> bind(m: () -> Free<F, B>): B = suspendCoroutineUninterceptedOrReturn { c ->
     val labelHere = c.stateStack // save the whole coroutine stack labels
     returnedMonad = m().flatMap { z ->
       c.stateStack = labelHere

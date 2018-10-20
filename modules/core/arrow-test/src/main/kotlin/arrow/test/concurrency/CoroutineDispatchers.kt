@@ -1,7 +1,7 @@
 package arrow.test.concurrency
 
-import kotlinx.coroutines.experimental.CoroutineDispatcher
-import kotlinx.coroutines.experimental.asCoroutineDispatcher
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.asCoroutineDispatcher
 import java.util.concurrent.LinkedBlockingDeque
 import java.util.concurrent.ThreadFactory
 import java.util.concurrent.ThreadPoolExecutor

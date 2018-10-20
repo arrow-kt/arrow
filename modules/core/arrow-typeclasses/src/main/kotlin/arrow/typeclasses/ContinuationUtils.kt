@@ -1,6 +1,6 @@
 package arrow.typeclasses
 
-import kotlin.coroutines.experimental.Continuation
+import kotlin.coroutines.Continuation
 
 private val coroutineImplClass by lazy { Class.forName("kotlin.coroutines.experimental.jvm.internal.CoroutineImpl") }
 

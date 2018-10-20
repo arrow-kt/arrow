@@ -2,9 +2,9 @@ package arrow.effects
 
 import reactor.core.Disposable
 import reactor.core.scheduler.Scheduler
-import kotlin.coroutines.experimental.Continuation
-import kotlin.coroutines.experimental.CoroutineContext
-import kotlin.coroutines.experimental.startCoroutine
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.startCoroutine
 
 object CoroutineContextReactorScheduler {
   private interface NonCancellableContinuation : Continuation<Unit>, Disposable
@@ -51,12 +51,10 @@ object CoroutineContextReactorScheduler {
 
               override val context: CoroutineContext = context
 
-              override fun resume(value: Unit) {
+              override fun resumeWith(result: Result<Unit>) {
+                result.fold({ Unit }, { throw it })
               }
 
-              override fun resumeWithException(exception: Throwable) {
-                throw exception
-              }
             }
         }
     }

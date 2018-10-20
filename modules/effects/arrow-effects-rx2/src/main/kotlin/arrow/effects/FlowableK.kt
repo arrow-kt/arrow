@@ -10,7 +10,7 @@ import arrow.typeclasses.Applicative
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.FlowableEmitter
-import kotlin.coroutines.experimental.CoroutineContext
+import kotlin.coroutines.CoroutineContext
 
 fun <A> Flowable<A>.k(): FlowableK<A> = FlowableK(this)
 

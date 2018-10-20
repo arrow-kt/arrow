@@ -4,9 +4,9 @@ import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
 import io.reactivex.internal.disposables.EmptyDisposable
 import java.util.concurrent.TimeUnit
-import kotlin.coroutines.experimental.Continuation
-import kotlin.coroutines.experimental.CoroutineContext
-import kotlin.coroutines.experimental.startCoroutine
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.startCoroutine
 
 object CoroutineContextRx2Scheduler {
   private interface NonCancellableContinuation : Continuation<Unit>, Disposable
@@ -44,12 +44,10 @@ object CoroutineContextRx2Scheduler {
 
               override val context: CoroutineContext = context
 
-              override fun resume(value: Unit) {
+              override fun resumeWith(result: Result<Unit>) {
+                result.fold({ Unit }, { throw it })
               }
 
-              override fun resumeWithException(exception: Throwable) {
-                throw exception
-              }
             }
         }
     }

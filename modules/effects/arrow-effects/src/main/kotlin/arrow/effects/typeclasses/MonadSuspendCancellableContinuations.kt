@@ -7,12 +7,13 @@ import arrow.typeclasses.MonadErrorContinuation
 import arrow.typeclasses.bindingCatch
 import arrow.typeclasses.stateStack
 import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.coroutines.experimental.CoroutineContext
-import kotlin.coroutines.experimental.EmptyCoroutineContext
-import kotlin.coroutines.experimental.RestrictsSuspension
-import kotlin.coroutines.experimental.intrinsics.COROUTINE_SUSPENDED
-import kotlin.coroutines.experimental.intrinsics.suspendCoroutineOrReturn
-import kotlin.coroutines.experimental.startCoroutine
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.coroutines.RestrictsSuspension
+import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
+import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
+import kotlin.coroutines.startCoroutine
+import kotlin.coroutines.resume
 
 typealias Disposable = () -> Unit
 
@@ -36,7 +37,7 @@ open class MonadDeferCancellableContinuation<F, A>(SC: MonadDefer<F>, override v
   suspend fun <B> bindDeferUnsafe(f: () -> Either<Throwable, B>): B =
     deferUnsafe(f).bind()
 
-  override suspend fun <B> bind(m: () -> Kind<F, B>): B = suspendCoroutineOrReturn { c ->
+  override suspend fun <B> bind(m: () -> Kind<F, B>): B = suspendCoroutineUninterceptedOrReturn { c ->
     val labelHere = c.stateStack // save the whole coroutine stack labels
     returnedMonad = m().flatMap { x: B ->
       c.stateStack = labelHere
@@ -49,7 +50,7 @@ open class MonadDeferCancellableContinuation<F, A>(SC: MonadDefer<F>, override v
     COROUTINE_SUSPENDED
   }
 
-  override suspend fun <B> bindIn(context: CoroutineContext, m: () -> B): B = suspendCoroutineOrReturn { c ->
+  override suspend fun <B> bindIn(context: CoroutineContext, m: () -> B): B = suspendCoroutineUninterceptedOrReturn { c ->
     val labelHere = c.stateStack // save the whole coroutine stack labels
     val monadCreation: suspend () -> Kind<F, A> = {
       val datatype = try {

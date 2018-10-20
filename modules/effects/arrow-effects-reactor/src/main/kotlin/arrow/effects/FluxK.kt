@@ -9,7 +9,7 @@ import arrow.higherkind
 import arrow.typeclasses.Applicative
 import reactor.core.publisher.Flux
 import reactor.core.publisher.FluxSink
-import kotlin.coroutines.experimental.CoroutineContext
+import kotlin.coroutines.CoroutineContext
 
 fun <A> Flux<A>.k(): FluxK<A> = FluxK(this)
 

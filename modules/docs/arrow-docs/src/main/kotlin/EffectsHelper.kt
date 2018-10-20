@@ -1,5 +1,5 @@
 package arrow.effects
 
-import kotlinx.coroutines.experimental.Unconfined
+import kotlinx.coroutines.Dispatchers.Unconfined
 
 val UI = Unconfined

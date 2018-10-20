@@ -11,7 +11,7 @@ import arrow.typeclasses.Eq
 import arrow.typeclasses.binding
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import kotlinx.coroutines.experimental.newSingleThreadContext
+import kotlinx.coroutines.newSingleThreadContext
 
 object AsyncLaws {
   fun <F> laws(AC: Async<F>, EQ: Eq<Kind<F, Int>>, EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>, EQERR: Eq<Kind<F, Int>> = EQ): List<Law> =
