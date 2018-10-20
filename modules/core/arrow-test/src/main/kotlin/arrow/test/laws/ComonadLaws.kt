@@ -12,7 +12,7 @@ import io.kotlintest.properties.forAll
 
 object ComonadLaws {
 
-  inline fun <F> laws(CM: Comonad<F>, noinline cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): List<Law> =
+  fun <F> laws(CM: Comonad<F>, cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): List<Law> =
     FunctorLaws.laws(CM, cf, EQ) + listOf(
       Law("Comonad Laws: duplicate then extract is identity") { CM.duplicateThenExtractIsId(cf, EQ) },
       Law("Comonad Laws: duplicate then map into extract is identity") { CM.duplicateThenMapExtractIsId(cf, EQ) },

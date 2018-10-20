@@ -11,7 +11,7 @@ import io.kotlintest.properties.forAll
 
 object MonadWriterLaws {
 
-  inline fun <F, W> laws(MF: Monad<F>,
+  fun <F, W> laws(MF: Monad<F>,
                          MW: MonadWriter<F, W>,
                          MOW: Monoid<W>,
                          genW: Gen<W>,

@@ -13,5 +13,6 @@ interface Contravariant<F> : Invariant<F> {
     override fun <A, B> Kind<F, A>.imap(f: (A) -> B, g: (B) -> A): Kind<F, B> =
         contramap(g)
 
+    @Suppress("UNCHECKED_CAST")
     fun <A, B : A> Kind<F, A>.narrow(): Kind<F, B> = this as Kind<F, B>
 }

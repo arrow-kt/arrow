@@ -178,4 +178,4 @@ fun <A, B> IOOf<A>.ap(ff: IOOf<(A) -> B>): IO<B> =
 fun <A> IOOf<A>.handleErrorWith(f: (Throwable) -> IOOf<A>): IO<A> =
   IO.Bind(fix(), IOFrame.errorHandler(f))
 
-inline fun <A> A.liftIO(): IO<A> = IO.just(this)
+fun <A> A.liftIO(): IO<A> = IO.just(this)

@@ -7,6 +7,7 @@ class Partial<T>
 
 private val CACHED = Partial<Any>()
 
+@Suppress("UNCHECKED_CAST")
 private fun <T> partial(): Partial<T> = CACHED as Partial<T>
 
 operator @Suppress("UNUSED_PARAMETER")

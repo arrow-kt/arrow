@@ -17,6 +17,7 @@ import kotlin.coroutines.experimental.startCoroutine
 typealias Disposable = () -> Unit
 
 @RestrictsSuspension
+@Suppress("DELEGATED_MEMBER_HIDES_SUPERTYPE_OVERRIDE")
 open class MonadDeferCancellableContinuation<F, A>(SC: MonadDefer<F>, override val context: CoroutineContext = EmptyCoroutineContext) :
   MonadErrorContinuation<F, A>(SC), MonadDefer<F> by SC {
 

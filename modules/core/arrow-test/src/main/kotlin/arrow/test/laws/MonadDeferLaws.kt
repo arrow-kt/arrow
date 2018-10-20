@@ -14,7 +14,7 @@ import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.newSingleThreadContext
 
 object MonadDeferLaws {
-  inline fun <F> laws(SC: MonadDefer<F>, EQ: Eq<Kind<F, Int>>, EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>, EQERR: Eq<Kind<F, Int>> = EQ): List<Law> =
+  fun <F> laws(SC: MonadDefer<F>, EQ: Eq<Kind<F, Int>>, EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>, EQERR: Eq<Kind<F, Int>> = EQ): List<Law> =
     MonadErrorLaws.laws(SC, EQERR, EQ_EITHER, EQ) + listOf(
       Law("Sync bind: binding blocks") { SC.asyncBind(EQ) },
       Law("Sync bind: binding failure") { SC.asyncBindError(EQERR) },
@@ -31,7 +31,7 @@ object MonadDeferLaws {
 
   fun <F> MonadDefer<F>.asyncBind(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(genIntSmall(), genIntSmall(), genIntSmall()) { x: Int, y: Int, z: Int ->
-      val (bound, dispose) = bindingCancellable {
+      val (bound, _) = bindingCancellable {
         val a = bindDefer { x }
         val b = bindDefer { a + y }
         val c = bindDefer { b + z }
@@ -42,15 +42,15 @@ object MonadDeferLaws {
 
   fun <F> MonadDefer<F>.asyncBindError(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(genThrowable()) { e: Throwable ->
-      val (bound: Kind<F, Int>, cancel) = bindingCancellable<F, Int> {
+      val (bound: Kind<F, Int>, _) = bindingCancellable<F, Int> {
         bindDefer { throw e }
       }
-      bound.equalUnderTheLaw(raiseError<Int>(e), EQ)
+      bound.equalUnderTheLaw(raiseError(e), EQ)
     }
 
   fun <F> MonadDefer<F>.asyncBindUnsafe(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(genIntSmall(), genIntSmall(), genIntSmall()) { x: Int, y: Int, z: Int ->
-      val (bound, dispose) = bindingCancellable {
+      val (bound, _) = bindingCancellable {
         val a = bindDeferUnsafe { Right(x) }
         val b = bindDeferUnsafe { Right(a + y) }
         val c = bindDeferUnsafe { Right(b + z) }
@@ -61,19 +61,19 @@ object MonadDeferLaws {
 
   fun <F> MonadDefer<F>.asyncBindUnsafeError(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(genThrowable()) { e: Throwable ->
-      val (bound: Kind<F, Int>, dispose) = bindingCancellable<F, Int> {
+      val (bound: Kind<F, Int>, _) = bindingCancellable<F, Int> {
         bindDeferUnsafe { Left(e) }
       }
-      bound.equalUnderTheLaw(raiseError<Int>(e), EQ)
+      bound.equalUnderTheLaw(raiseError(e), EQ)
     }
 
   fun <F> MonadDefer<F>.asyncParallelBind(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(genIntSmall(), genIntSmall(), genIntSmall()) { x: Int, y: Int, z: Int ->
-      val (bound, dispose) = bindingCancellable {
+      val (bound, _) = bindingCancellable {
         val value = bind { tupled(invoke { x }, invoke { y }, invoke { z }) }
         value.a + value.b + value.c
       }
-      bound.equalUnderTheLaw(just<Int>(x + y + z), EQ)
+      bound.equalUnderTheLaw(just(x + y + z), EQ)
     }
 
   fun <F> MonadDefer<F>.asyncCancellationBefore(EQ: Eq<Kind<F, Int>>): Unit =
@@ -132,11 +132,11 @@ object MonadDeferLaws {
         && sideEffect.counter == 0
     }
 
+  @Suppress("UNREACHABLE_CODE")
   fun <F> MonadDefer<F>.inContextErrorThrow(EQ: Eq<Kind<F, Int>>): Unit =
     forFew(5, genThrowable()) { throwable: Throwable ->
       bindingCancellable {
-        val a: Int = bindIn(newSingleThreadContext("1")) { throw throwable }
-        a
+        bindIn(newSingleThreadContext("1")) { throw throwable }
       }.a.equalUnderTheLaw(raiseError(throwable), EQ)
     }
 
