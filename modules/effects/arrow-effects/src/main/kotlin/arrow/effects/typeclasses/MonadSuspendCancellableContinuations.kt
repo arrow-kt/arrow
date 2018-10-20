@@ -13,7 +13,6 @@ import kotlin.coroutines.RestrictsSuspension
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.startCoroutine
-import kotlin.coroutines.resume
 
 typealias Disposable = () -> Unit
 
@@ -44,7 +43,7 @@ open class MonadDeferCancellableContinuation<F, A>(SC: MonadDefer<F>, override v
       if (cancelled.get()) {
         throw BindingCancellationException()
       }
-      c.resume(x)
+      c.resumeWith(SuccessOrFailure.success(x))
       returnedMonad
     }
     COROUTINE_SUSPENDED
@@ -63,7 +62,7 @@ open class MonadDeferCancellableContinuation<F, A>(SC: MonadDefer<F>, override v
         if (cancelled.get()) {
           throw BindingCancellationException()
         }
-        c.resume(xx)
+        c.resumeWith(SuccessOrFailure.success(xx))
         returnedMonad
       }
     }

@@ -1,6 +1,7 @@
 package arrow.free
 
 import arrow.Kind
+import arrow.core.Continuation
 import arrow.typeclasses.Monad
 import arrow.typeclasses.stateStack
 import kotlin.coroutines.*
@@ -27,7 +28,7 @@ open class StackSafeMonadContinuation<F, A>(M: Monad<F>, override val context: C
     val labelHere = c.stateStack // save the whole coroutine stack labels
     returnedMonad = m().flatMap { z ->
       c.stateStack = labelHere
-      c.resume(z)
+      c.resumeWith(SuccessOrFailure.success(z))
       returnedMonad
     }
     COROUTINE_SUSPENDED

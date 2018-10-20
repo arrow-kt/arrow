@@ -24,7 +24,7 @@ import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Dispatchers.Unconfined
+import kotlinx.coroutines.Unconfined
 import kotlinx.coroutines.runBlocking
 import org.junit.runner.RunWith
 

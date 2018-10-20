@@ -10,7 +10,7 @@ import arrow.test.generators.genIntSmall
 import arrow.test.generators.genThrowable
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.forAll
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CommonPool
 import kotlinx.coroutines.newSingleThreadContext
 
 object MonadDeferLaws {

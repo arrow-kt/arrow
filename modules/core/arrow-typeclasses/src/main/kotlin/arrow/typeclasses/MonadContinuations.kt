@@ -1,11 +1,11 @@
 package arrow.typeclasses
 
 import arrow.Kind
+import arrow.core.Continuation
 import java.util.concurrent.CountDownLatch
 import kotlin.coroutines.*
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
-import kotlin.coroutines.resume
 
 interface BindingInContextContinuation<in T> : Continuation<T> {
   fun await(): Throwable?

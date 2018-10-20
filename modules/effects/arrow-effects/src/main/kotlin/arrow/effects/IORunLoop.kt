@@ -5,7 +5,7 @@ import arrow.core.Left
 import arrow.core.Right
 import arrow.effects.internal.Platform.ArrayStack
 import arrow.effects.typeclasses.Proc
-import kotlin.coroutines.Continuation
+import arrow.core.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine
 

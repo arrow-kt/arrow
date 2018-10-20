@@ -1,10 +1,10 @@
 package arrow.effects
 
+import arrow.core.Continuation
 import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
 import io.reactivex.internal.disposables.EmptyDisposable
 import java.util.concurrent.TimeUnit
-import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine
 
@@ -44,10 +44,12 @@ object CoroutineContextRx2Scheduler {
 
               override val context: CoroutineContext = context
 
-              override fun resumeWith(result: Result<Unit>) {
-                result.fold({ Unit }, { throw it })
+              override fun resume(value: Unit) {
               }
 
+              override fun resumeWithException(exception: Throwable) {
+                throw exception
+              }
             }
         }
     }
