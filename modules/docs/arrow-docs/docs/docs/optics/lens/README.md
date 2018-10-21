@@ -60,6 +60,23 @@ val liftF: (Foo) -> OptionOf<Foo> = fooLens.liftF(Option.functor()) { (it + 1).s
 liftF(foo)
 ```
 
+There are also some convenience methods to make working with [Reader]({{ '/docs/datatypes/reader' | relative_url }}) easier.
+
+```kotlin:ank
+import arrow.data.*
+
+val reader: Reader<Foo, Int> = fooLens.ask()
+
+reader
+  .map(Int::inc)
+  .runId(Foo(5))
+```
+
+```kotlin:ank
+fooLens.asks(Int::inc)
+  .runId(Foo(5))
+```
+
 ### Composition
 
 By composing lenses we can create a telescope that allows us to focus in on nested structures.
