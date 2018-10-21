@@ -5,7 +5,7 @@ import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Tuple2
 import arrow.core.identity
-import kotlin.coroutines.experimental.startCoroutine
+import kotlin.coroutines.startCoroutine
 
 interface Monad<F> : Applicative<F> {
 

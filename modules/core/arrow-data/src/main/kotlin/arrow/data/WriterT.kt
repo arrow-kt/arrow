@@ -8,7 +8,7 @@ import arrow.higherkind
 import arrow.typeclasses.*
 
 @Suppress("UNCHECKED_CAST")
-inline fun <F, W, A> WriterTOf<F, W, A>.value(): Kind<F, Tuple2<W, A>> = this.fix().value
+fun <F, W, A> WriterTOf<F, W, A>.value(): Kind<F, Tuple2<W, A>> = this.fix().value
 
 @higherkind
 data class WriterT<F, W, A>(val value: Kind<F, Tuple2<W, A>>) : WriterTOf<F, W, A>, WriterTKindedJ<F, W, A> {

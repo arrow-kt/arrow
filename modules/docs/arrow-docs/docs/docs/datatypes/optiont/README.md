@@ -179,6 +179,7 @@ We can now lift any value to a `OptionT<F, A>` which looks like this:
 
 ```kotlin:ank
 import arrow.data.*
+import arrow.effects.observablek.applicative.*
 
 val optTVal = OptionT.just<ForObservableK, Int>(ObservableK.applicative(), 1)
 optTVal

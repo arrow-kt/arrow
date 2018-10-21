@@ -2,6 +2,9 @@ package arrow.free
 
 import arrow.core.*
 import arrow.free.instances.ForCoyoneda
+import arrow.free.instances.coyoneda.functor.functor
+import arrow.instances.id.functor.functor
+import arrow.instances.option.functor.functor
 import arrow.test.UnitSpec
 import arrow.test.laws.FunctorLaws
 import arrow.typeclasses.Eq
@@ -18,9 +21,7 @@ class CoyonedaTest : UnitSpec() {
 
   init {
 
-    ForCoyoneda<ForId, Int>() extensions {
-      testLaws(FunctorLaws.laws(this, { Coyoneda(Id(0)) { it } }, EQ))
-    }
+      testLaws(FunctorLaws.laws(Coyoneda.functor(), { _ -> Coyoneda(Id(0)) { it } }, EQ))
 
     "map should be stack-safe" {
       val loops = 10000

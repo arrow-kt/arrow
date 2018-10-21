@@ -28,8 +28,8 @@ object BifunctorLaws {
             genFunctionAToB<Int, Int>(Gen.int()),
             genFunctionAToB<Int, Int>(Gen.int()),
             genFunctionAToB<Int, Int>(Gen.int())
-        ) { fa: Kind2<F, Int, Int>, f, g, x, y ->
-            fa.bimap(f, g).bimap(x, y).equalUnderTheLaw(fa.bimap(f andThen x, g andThen y), EQ)
+        ) { fa: Kind2<F, Int, Int>, ff, g, x, y ->
+            fa.bimap(ff, g).bimap(x, y).equalUnderTheLaw(fa.bimap(ff andThen x, g andThen y), EQ)
         }
 
 }

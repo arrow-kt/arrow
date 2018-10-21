@@ -50,6 +50,7 @@ We can also `modify` and `lift` the focus of a `Lens` using a `Functor`
 ```kotlin:ank
 import arrow.*
 import arrow.core.*
+import arrow.instances.option.functor.*
 
 fooLens.modifyF(Option.functor(), foo) { it.some() }.fix()
 ```

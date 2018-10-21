@@ -3,12 +3,12 @@ package arrow.optics
 import arrow.core.*
 import arrow.data.*
 import arrow.instances.monoid
+import arrow.instances.listk.eq.eq
+import arrow.instances.option.eq.eq
+import arrow.instances.option.functor.functor
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
-import arrow.test.laws.LensLaws
-import arrow.test.laws.OptionalLaws
-import arrow.test.laws.SetterLaws
-import arrow.test.laws.TraversalLaws
+import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen

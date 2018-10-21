@@ -4,6 +4,8 @@ import arrow.Kind
 import arrow.core.*
 import arrow.core.Eval.Now
 import arrow.instances.extensions
+import arrow.instances.eval.comonad.comonad
+import arrow.instances.eval.monad.monad
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.laws.ComonadLaws
@@ -24,12 +26,10 @@ class EvalTest : UnitSpec() {
 
   init {
 
-    ForEval extensions {
       testLaws(
-        MonadLaws.laws(this, EQ),
-        ComonadLaws.laws(this, ::Now, EQ)
+        MonadLaws.laws(Eval.monad(), EQ),
+        ComonadLaws.laws(Eval.comonad(), ::Now, EQ)
       )
-    }
 
     "should map wrapped value" {
       val sideEffect = SideEffect()
@@ -176,7 +176,10 @@ class EvalTest : UnitSpec() {
           } else {
             val o = os[i]
             when (o) {
-              is O.Defer -> Eval.defer { step(i + 1, leaf, cbs) }
+              is O.Defer -> Eval.defer {
+                @Suppress("NON_TAIL_RECURSIVE_CALL")
+                step(i + 1, leaf, cbs)
+              }
               is O.Memoize -> step(i + 1, leaf, cbs.also { it.add(0) { e: Eval<Int> -> e.memoize() } })
               is O.Map -> step(i + 1, leaf, cbs.also { it.add(0) { e: Eval<Int> -> e.map(o.f) } })
               is O.FlatMap -> step(i + 1, leaf, cbs.also { it.add(0) { e: Eval<Int> -> e.flatMap(o.f) } })

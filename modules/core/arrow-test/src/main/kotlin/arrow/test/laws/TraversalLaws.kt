@@ -12,7 +12,7 @@ import io.kotlintest.properties.forAll
 
 object TraversalLaws {
 
-  inline fun <A, B : Any> laws(traversal: Traversal<A, B>, aGen: Gen<A>, bGen: Gen<B>, funcGen: Gen<(B) -> B>, EQA: Eq<A>, EQOptionB: Eq<Option<B>>, EQListB: Eq<ListK<B>>) = listOf(
+  fun <A, B : Any> laws(traversal: Traversal<A, B>, aGen: Gen<A>, bGen: Gen<B>, funcGen: Gen<(B) -> B>, EQA: Eq<A>, EQOptionB: Eq<Option<B>>, EQListB: Eq<ListK<B>>) = listOf(
     Law("Traversal law: head option") { traversal.headOption(aGen, EQOptionB) },
     Law("Traversal law: modify get all") { traversal.modifyGetAll(aGen, funcGen, EQListB) },
     Law("Traversal law: set is idempotent") { traversal.setIdempotent(aGen, bGen, EQA) },

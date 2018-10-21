@@ -1,11 +1,12 @@
 package arrow.optics.instances
 
-import arrow.core.*
+import arrow.core.Option
 import arrow.data.ListK
-import arrow.data.eq
-import arrow.optics.typeclasses.FilterIndex
+import arrow.instances.listk.eq.eq
+import arrow.instances.option.eq.eq
 import arrow.test.UnitSpec
-import arrow.test.generators.*
+import arrow.test.generators.genChars
+import arrow.test.generators.genFunctionAToB
 import arrow.test.laws.OptionalLaws
 import arrow.test.laws.TraversalLaws
 import arrow.typeclasses.Eq
