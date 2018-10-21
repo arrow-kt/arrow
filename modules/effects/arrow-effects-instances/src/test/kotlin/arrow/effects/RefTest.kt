@@ -1,5 +1,6 @@
 package arrow.effects
 
+import arrow.effects.instances.io.monadDefer.monadDefer
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.typeclasses.binding

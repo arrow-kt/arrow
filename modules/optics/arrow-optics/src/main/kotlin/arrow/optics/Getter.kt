@@ -1,8 +1,7 @@
 package arrow.optics
 
 import arrow.core.*
-import arrow.data.Reader
-import arrow.data.map
+import arrow.data.*
 import arrow.higherkind
 import arrow.typeclasses.Monoid
 
@@ -152,5 +151,21 @@ interface Getter<S, A> : GetterOf<S, A> {
    * @param f function to apply to the focus.
    */
   fun <B> asks(f: (A) -> B): Reader<S, B> = ask().map(f)
+
+  /**
+   * Extracts the focus [A] viewed through the [Getter].
+   */
+  fun extract(): State<S, A> = State { s -> Tuple2(s, get(s)) }
+
+  /**
+   * Transforms a [Getter] into a [State].
+   * Alias for [extract].
+   */
+  fun toState(): State<S, A> = extract()
+
+  /**
+   * Extract and map the focus [A] viewed through the [Getter] and applies [f] to it.
+   */
+  fun <B> extractMap(f: (A) -> B): State<S, B> = extract().map(f)
 
 }
