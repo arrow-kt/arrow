@@ -42,7 +42,22 @@ import arrow.optics.instances.*
 
 val headGetter: Getter<NonEmptyList<String>, String> = NonEmptyList.head<String>().asGetter()
 val tupleGetter: Getter<Tuple2<String, Int>, String> = Tuple2.first<String, Int>().asGetter()
-``` 
+```
+
+`Getter` also has some convenience methods to make working with [Reader]({{ '/docs/datatypes/reader' | relative_url }}) easier.
+
+```kotlin:ank
+val reader: Reader<NonEmptyList<String>, String> = NonEmptyList.head<String>().asGetter().ask()
+
+reader
+  .map(String::toUpperCase)
+  .runId(NonEmptyList("Hello", "World", "Viewed", "With", "Optics"))
+```
+
+```kotlin:ank
+NonEmptyList.head<String>().asGetter().asks(String::decapitalize)
+  .runId(NonEmptyList("Hello", "World", "Viewed", "With", "Optics"))
+```
 
 ## Composition
 

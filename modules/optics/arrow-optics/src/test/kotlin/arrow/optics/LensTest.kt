@@ -1,18 +1,14 @@
 package arrow.optics
 
 import arrow.core.*
-import arrow.data.ListK
-import arrow.data.k
+import arrow.data.*
 import arrow.instances.monoid
 import arrow.instances.listk.eq.eq
 import arrow.instances.option.eq.eq
 import arrow.instances.option.functor.functor
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
-import arrow.test.laws.LensLaws
-import arrow.test.laws.OptionalLaws
-import arrow.test.laws.SetterLaws
-import arrow.test.laws.TraversalLaws
+import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
@@ -188,11 +184,30 @@ class LensTest : UnitSpec() {
     }
 
     "Creating a second pair with a type should result in the value target" {
-      val first = tokenLens.second<Int>()
+      val second = tokenLens.second<Int>()
       forAll(Gen.int(), TokenGen) { int: Int, token: Token ->
-        first.get(int toT token) == int toT token.value
+        second.get(int toT token) == int toT token.value
       }
     }
+
+    "Asking for the focus in a Reader" {
+      forAll(TokenGen) { token: Token ->
+        tokenLens.ask().runId(token) == token.value
+      }
+    }
+
+    "toReader is an alias for ask" {
+      forAll(TokenGen) { token: Token ->
+        tokenLens.ask().runId(token) == tokenLens.toReader().runId(token)
+      }
+    }
+
+    "Asks with f is the same as applying f to the focus of the lens" {
+      forAll(TokenGen, genFunctionAToB<String, String>(Gen.string())) { token, f ->
+        tokenLens.asks(f).runId(token) == f(token.value)
+      }
+    }
+
   }
 
 }
