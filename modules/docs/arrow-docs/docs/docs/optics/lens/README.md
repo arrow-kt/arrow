@@ -14,7 +14,7 @@ A `Lens` (aka functional reference) is an optic that can focus into a structure 
 
 Lenses can be seen as a pair of functions, a getter and a setter. A `Lens<S, A>` represents a getter: `get: (S) -> A` and `setter: (A) -> (S) -> S` where `S` is called the source of the `Lens` and `A` is called the focus or target of the `Lens`.
 
-Given a simple structure `Foo` we can create a `Lens<Foo, Int>` to get, set or modify its value.
+Given a simple structure `Player` we can create a `Lens<Player, Int>` to get, set or modify its value.
 
 ```kotlin:ank
 import arrow.optics.*
@@ -60,6 +60,23 @@ val liftF: (Player) -> OptionOf<Player> = playerLens.liftF(Option.functor()) { (
 liftF(player)
 ```
 
+There are also some convenience methods to make working with [Reader]({{ '/docs/datatypes/reader' | relative_url }}) easier.
+
+```kotlin:ank
+import arrow.data.*
+
+val reader: Reader<Player, Int> = playerLens.ask()
+
+reader
+  .map(Int::inc)
+  .runId(Player(50))
+```
+
+```kotlin:ank
+playerLens.asks(Int::inc)
+  .runId(Player(50))
+```
+
 There are also some convenience methods to make working with [State]({{ '/docs/datatypes/state' | relative_url }}) easier.
 This can make working with nested structures in stateful computations significantly more elegant.
 
@@ -78,23 +95,6 @@ takeDamage.run(player)
 ```kotlin:ank
 val restoreHealth = playerLens.assign(100)
 restoreHealth.run(player)
-```
-
-There are also some convenience methods to make working with [Reader]({{ '/docs/datatypes/reader' | relative_url }}) easier.
-
-```kotlin:ank
-import arrow.data.*
-
-val reader: Reader<Foo, Int> = fooLens.ask()
-
-reader
-  .map(Int::inc)
-  .runId(Foo(5))
-```
-
-```kotlin:ank
-fooLens.asks(Int::inc)
-  .runId(Foo(5))
 ```
 
 ### Composition
