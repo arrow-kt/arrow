@@ -176,7 +176,10 @@ class EvalTest : UnitSpec() {
           } else {
             val o = os[i]
             when (o) {
-              is O.Defer -> Eval.defer { step(i + 1, leaf, cbs) }
+              is O.Defer -> Eval.defer {
+                @Suppress("NON_TAIL_RECURSIVE_CALL")
+                step(i + 1, leaf, cbs)
+              }
               is O.Memoize -> step(i + 1, leaf, cbs.also { it.add(0) { e: Eval<Int> -> e.memoize() } })
               is O.Map -> step(i + 1, leaf, cbs.also { it.add(0) { e: Eval<Int> -> e.map(o.f) } })
               is O.FlatMap -> step(i + 1, leaf, cbs.also { it.add(0) { e: Eval<Int> -> e.flatMap(o.f) } })

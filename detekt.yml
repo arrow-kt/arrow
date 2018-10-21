@@ -36,7 +36,7 @@ complexity:
     threshold: 300
     active: false
   ComplexMethod:
-    threshold: 10
+    threshold: 20
   NestedBlockDepth:
     threshold: 5
   TooManyFunctions:

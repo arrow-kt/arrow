@@ -9,7 +9,7 @@ import arrow.effects.observablek.monadError.monadError
 import arrow.effects.typeclasses.*
 import arrow.extension
 import arrow.typeclasses.*
-import kotlin.coroutines.experimental.CoroutineContext
+import kotlin.coroutines.CoroutineContext
 
 @extension
 interface ObservableKFunctorInstance : Functor<ForObservableK> {

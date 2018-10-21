@@ -6,6 +6,7 @@ import arrow.typeclasses.Applicative
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 
+@Suppress("DEPRECATION", "UNUSED_PARAMETER")
 @deriving(Functor::class, Applicative::class, Monad::class)
 data class Deriving<A>(val value: A) : DerivingOf<A> {
   fun <B> map(f: (A) -> B): Deriving<B> = TODO()

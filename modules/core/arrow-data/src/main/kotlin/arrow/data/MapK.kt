@@ -59,7 +59,7 @@ fun <K, A> Option<Tuple2<K, A>>.k(): MapK<K, A> =
     is None -> emptyMap<K, A>().k()
   }
 
-inline fun <K, V, G> MapKOf<K, Kind<G, V>>.sequence(GA: Applicative<G>): Kind<G, MapK<K, V>> =
+fun <K, V, G> MapKOf<K, Kind<G, V>>.sequence(GA: Applicative<G>): Kind<G, MapK<K, V>> =
   fix().traverse(GA, ::identity)
 
 fun <K, A> List<Map.Entry<K, A>>.k(): MapK<K, A> = this.map { it.key to it.value }.toMap().k()

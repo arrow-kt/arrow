@@ -6,7 +6,7 @@ import io.kotlintest.properties.forAll
 
 object EqLaws {
 
-  inline fun <F> laws(EQ: Eq<F>, noinline cf: (Int) -> F): List<Law> =
+  fun <F> laws(EQ: Eq<F>, cf: (Int) -> F): List<Law> =
     listOf(
       Law("Eq Laws: reflexivity") { EQ.reflexivityEquality(cf) },
       Law("Eq Laws: commutativity") { EQ.commutativeEquality(cf) },

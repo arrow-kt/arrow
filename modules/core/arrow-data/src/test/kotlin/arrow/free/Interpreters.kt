@@ -27,6 +27,7 @@ val optionToList: FunctionK<ForOption, ForListK> = object : FunctionK<ForOption,
     fa.fix().fold({ listOf<A>().k() }, { listOf(it).k() })
 }
 
+@Suppress("UNCHECKED_CAST")
 val optionInterpreter: FunctionK<ForOps, ForOption> = object : FunctionK<ForOps, ForOption> {
   override fun <A> invoke(fa: Kind<ForOps, A>): Option<A> {
     val op = fa.fix()
@@ -37,6 +38,8 @@ val optionInterpreter: FunctionK<ForOps, ForOption> = object : FunctionK<ForOps,
     } as Option<A>
   }
 }
+
+@Suppress("UNCHECKED_CAST")
 val optionApInterpreter: FunctionK<OpsAp.F, ForOption> = object : FunctionK<OpsAp.F, ForOption> {
   override fun <A> invoke(fa: Kind<OpsAp.F, A>): Option<A> {
     val op = fa.fix()
@@ -47,6 +50,8 @@ val optionApInterpreter: FunctionK<OpsAp.F, ForOption> = object : FunctionK<OpsA
     } as Option<A>
   }
 }
+
+@Suppress("UNCHECKED_CAST")
 val nonEmptyListInterpreter: FunctionK<ForOps, ForNonEmptyList> = object : FunctionK<ForOps, ForNonEmptyList> {
   override fun <A> invoke(fa: Kind<ForOps, A>): NonEmptyList<A> {
     val op = fa.fix()
@@ -57,6 +62,8 @@ val nonEmptyListInterpreter: FunctionK<ForOps, ForNonEmptyList> = object : Funct
     } as NonEmptyList<A>
   }
 }
+
+@Suppress("UNCHECKED_CAST")
 val nonEmptyListApInterpreter: FunctionK<OpsAp.F, ForNonEmptyList> = object : FunctionK<OpsAp.F, ForNonEmptyList> {
   override fun <A> invoke(fa: Kind<OpsAp.F, A>): NonEmptyList<A> {
     val op = fa.fix()
@@ -67,6 +74,8 @@ val nonEmptyListApInterpreter: FunctionK<OpsAp.F, ForNonEmptyList> = object : Fu
     } as NonEmptyList<A>
   }
 }
+
+@Suppress("UNCHECKED_CAST")
 val idInterpreter: FunctionK<ForOps, ForId> = object : FunctionK<ForOps, ForId> {
   override fun <A> invoke(fa: Kind<ForOps, A>): Id<A> {
     val op = fa.fix()
@@ -77,6 +86,8 @@ val idInterpreter: FunctionK<ForOps, ForId> = object : FunctionK<ForOps, ForId> 
     } as Id<A>
   }
 }
+
+@Suppress("UNCHECKED_CAST")
 val idApInterpreter: FunctionK<OpsAp.F, ForId> = object : FunctionK<OpsAp.F, ForId> {
   override fun <A> invoke(fa: Kind<OpsAp.F, A>): Id<A> {
     val op = fa.fix()

@@ -27,7 +27,7 @@ fun ank(source: File, target: File, compilerArgs: ListK<String>) =
     val compilationResults = compileCode(allSnippets.mapIndexed { n, s -> files.list[n] to s }.toMap(), compilerArgs).bind()
     val replacedResults: ListK<String> = compilationResults.map { c -> replaceAnkToLang(c) }.k().sequence().bind().fix()
     val resultingFiles: ListK<File> = generateFiles(files, replacedResults).bind()
-    yields(resultingFiles)
+    resultingFiles
   }
 
 fun <A> ListK<Free<ForAnkOps, A>>.sequence(T: Traverse<ForListK> = ListK.traverse()): Free<ForAnkOps, ListK<A>> =
