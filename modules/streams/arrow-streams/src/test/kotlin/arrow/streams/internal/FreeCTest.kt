@@ -17,36 +17,6 @@ class FreeCTest : UnitSpec() {
 
   init {
 
-    testLaws(FunctorLaws.laws(
-      FF = FreeC.functor<ForTry>(),
-      EQ = Eq { a, b -> a.run(Try.monadError()) == b.run(Try.monadError()) },
-      f = { FreeC.pure(it) }
-    ))
-
-    testLaws(ApplicativeLaws.laws(
-      A = FreeC.applicative<ForTry>(),
-      EQ = Eq { a, b -> a.run(Try.monadError()) == b.run(Try.monadError()) }
-    ))
-
-    testLaws(MonadLaws.laws(
-      M = FreeC.monad<ForTry>(),
-      EQ = Eq { a, b -> a.run(Try.monadError()) == b.run(Try.monadError()) }
-    ))
-
-    testLaws(MonadErrorLaws.laws(
-      M = FreeC.monadError<ForTry>(),
-      EQ = Eq { a, b -> a.run(Try.monadError()) == b.run(Try.monadError()) },
-      EQERR = Eq { a, b -> a.run(Try.monadError()) == b.run(Try.monadError()) },
-      EQ_EITHER = Eq { a, b -> a.run(Try.monadError()) == b.run(Try.monadError()) }
-    ))
-
-    testLaws(ApplicativeErrorLaws.laws(
-      AE = FreeC.applicativeError<ForTry>(),
-      EQ = Eq { a, b -> a.run(Try.monadError()) == b.run(Try.monadError()) },
-      EQERR = Eq { a, b -> a.run(Try.monadError()) == b.run(Try.monadError()) },
-      EQ_EITHER = Eq { a, b -> a.run(Try.monadError()) == b.run(Try.monadError()) }
-    ))
-
     testLaws(MonadDeferLaws.laws(
       SC = FreeC.monadDefer<ForTry>(),
       EQ = Eq { a, b -> a.run(Try.monadError()) == b.run(Try.monadError()) },
@@ -94,9 +64,9 @@ class FreeCTest : UnitSpec() {
       }
     }
 
-    "Running an suspended value"{
+    "Running a suspended value"{
       forAll(Gen.string()) { s ->
-        FreeC.defer() { FreeC.pure<EitherPartialOf<Throwable>, String>(s) }
+        FreeC.defer { FreeC.pure<EitherPartialOf<Throwable>, String>(s) }
           .run(Either.monadError()) == Right(Some(s))
       }
     }
