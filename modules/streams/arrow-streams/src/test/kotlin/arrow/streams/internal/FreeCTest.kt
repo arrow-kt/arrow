@@ -2,12 +2,15 @@ package arrow.streams.internal
 
 import arrow.Kind
 import arrow.core.*
+import arrow.instances.`try`.monadError.monadError
+import arrow.instances.either.monadError.monadError
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genThrowable
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
@@ -40,7 +43,7 @@ class FreeCTest : UnitSpec() {
 
     "Running a interrupted value without errors" {
       FreeC.interrupted<EitherPartialOf<Throwable>, String, Token>(Token(), None)
-        .run(Either.monadError()) == Right(None)
+        .run(Either.monadError()) shouldBe  Right(None)
     }
 
     "Running a interrupted value with errors" {
@@ -114,7 +117,7 @@ class FreeCTest : UnitSpec() {
     "Running a interrupted value without errors" {
       FreeC.interrupted<EitherPartialOf<Throwable>, String, Token>(Token(), None)
         .translate(EitherToTry)
-        .run(Try.monadError()) == Success(None)
+        .run(Try.monadError()) shouldBe  Success(None)
     }
 
     "Running a interrupted value with errors" {
