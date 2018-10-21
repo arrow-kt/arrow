@@ -2,6 +2,8 @@ package arrow.optics
 
 import arrow.Kind
 import arrow.core.*
+import arrow.data.Reader
+import arrow.data.map
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Functor
@@ -225,5 +227,22 @@ interface PLens<S, T, A, B> : PLensOf<S, T, A, B> {
    * Verify if the focus of a [PLens] satisfies the predicate
    */
   fun exist(s: S, p: (A) -> Boolean): Boolean = p(get(s))
+
+  /**
+   * Extracts the value viewed through the [get] function.
+   */
+  fun ask(): Reader<S, A> = Reader(::get)
+
+  /**
+   * Transforms a [PLens] into a [Reader]. Alias for [ask].
+   */
+  fun toReader(): Reader<S, A> = ask()
+
+  /**
+   * Extracts the value viewed through the [get] and applies [f] to it.
+   *
+   * @param f function to apply to the focus.
+   */
+  fun <C> asks(f: (A) -> C): Reader<S, C> = ask().map(f)
 
 }
