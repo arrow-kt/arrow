@@ -137,7 +137,6 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
 
   fun TypeElement.allFunctions(declaredElement: TypeElement): List<Func> =
     processorUtils().run {
-      metaApi().run {
         val superTypes = supertypes(
           declaredElement.meta,
           TypeTable(declaredElement.meta.classProto.typeTable),
@@ -173,7 +172,7 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
                   modifiers = function.modifiers + listOfNotNull(templateFunction.second.modality?.toMeta())
                 )
                 if (templateFunction.second.hasReceiverType()) {
-                  val receiverTypeName = fMod.parameters[0].type.asKotlin()
+                  val receiverTypeName = metaApi().run { fMod.parameters[0].type.asKotlin() }
                   val functionWithReceiver = fMod.copy(receiverType = receiverTypeName)
                   val arguments = functionWithReceiver.parameters.drop(1)
                   functionWithReceiver.copy(parameters = arguments)
@@ -187,7 +186,6 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
           }
         }.toList()
         members
-      }
     }
 
   fun TypeElement.superInterfaces(): List<TypeName> =
