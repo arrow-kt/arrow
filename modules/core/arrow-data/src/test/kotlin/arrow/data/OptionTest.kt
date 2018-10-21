@@ -1,15 +1,8 @@
 package arrow.data
 
-import arrow.Kind
 import arrow.core.*
 import arrow.instances.eq
 import arrow.instances.monoid
-import arrow.instances.option.applicative.applicative
-import arrow.instances.option.eq.eq
-import arrow.instances.option.monoid.monoid
-import arrow.instances.option.show.show
-import arrow.mtl.instances.option.monadFilter.monadFilter
-import arrow.mtl.instances.option.traverseFilter.traverseFilter
 import arrow.syntax.collections.firstOption
 import arrow.test.UnitSpec
 import arrow.test.generators.genOption
@@ -29,21 +22,6 @@ class OptionTest : UnitSpec() {
   val none: Option<String> = Option.empty()
 
   init {
-
-    @Suppress("UNUSED_VARIABLE")
-    val EQ_EITHER: Eq<Kind<ForOption, Either<Unit, Int>>> = Eq { a, b ->
-      a.fix().fold(
-        { b.fix().fold({ true }, { false }) },
-        { eitherA: Either<Unit, Int> ->
-          b.fix().fold(
-            { false },
-            { eitherB: Either<Unit, Int> ->
-              eitherA.fold(
-                { eitherB.fold({ true /* Ignore the error kind */ }, { false }) },
-                { ia -> eitherB.fold({ false }, { ia == it }) })
-            })
-        })
-    }
 
     testLaws(
       EqLaws.laws(Option.eq(Int.eq())) { genOption(Gen.int()).generate() },

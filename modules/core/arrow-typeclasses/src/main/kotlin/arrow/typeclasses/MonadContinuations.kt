@@ -39,7 +39,7 @@ open class MonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineC
       }
 
       override fun resumeWithException(exception: Throwable) {
-        error = null
+        error = exception
         latch.countDown()
       }
 
