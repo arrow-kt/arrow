@@ -6,7 +6,7 @@ import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import io.reactivex.Maybe
 import io.reactivex.MaybeEmitter
-import kotlin.coroutines.experimental.CoroutineContext
+import kotlin.coroutines.CoroutineContext
 
 fun <A> Maybe<A>.k(): MaybeK<A> = MaybeK(this)
 

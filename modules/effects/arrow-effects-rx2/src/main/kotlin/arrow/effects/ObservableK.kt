@@ -9,7 +9,7 @@ import arrow.higherkind
 import arrow.typeclasses.Applicative
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
-import kotlin.coroutines.experimental.CoroutineContext
+import kotlin.coroutines.CoroutineContext
 
 fun <A> Observable<A>.k(): ObservableK<A> = ObservableK(this)
 
@@ -100,5 +100,5 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
   }
 }
 
-inline fun <A, G> ObservableKOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, ObservableK<A>> =
+fun <A, G> ObservableKOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, ObservableK<A>> =
   fix().traverse(GA, ::identity)

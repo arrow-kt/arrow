@@ -51,12 +51,6 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
     is Left -> ifLeft(a)
   }
 
-  @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("getOrElse { ifLeft }"))
-  fun get(): B = when (this) {
-    is Right -> b
-    is Left -> throw NoSuchElementException("Disjunction.Left")
-  }
-
   fun <C> foldLeft(initial: C, rightOperation: (C, B) -> C): C =
     fix().let { either ->
       when (either) {
@@ -155,7 +149,7 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
       get() = false
 
     companion object {
-      inline operator fun <A> invoke(a: A): Either<A, Nothing> = Left(a)
+      operator fun <A> invoke(a: A): Either<A, Nothing> = Left(a)
     }
   }
 
@@ -170,7 +164,7 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
       get() = true
 
     companion object {
-      inline operator fun <B> invoke(b: B): Either<Nothing, B> = Right(b)
+      operator fun <B> invoke(b: B): Either<Nothing, B> = Right(b)
     }
   }
 
@@ -237,7 +231,7 @@ inline fun <B> EitherOf<*, B>.getOrElse(default: () -> B): B =
  * Left(12).orNull()  // Result: null
  * ```
  */
-inline fun <B> EitherOf<*, B>.orNull(): B? =
+fun <B> EitherOf<*, B>.orNull(): B? =
   getOrElse { null }
 
 /**
@@ -314,13 +308,6 @@ fun <A, B> EitherOf<A, B>.combineK(y: EitherOf<A, B>): Either<A, B> =
     is Either.Left -> y.fix()
     else -> fix()
   }
-
-@Deprecated(DeprecatedAmbiguity, ReplaceWith("Try { body }.toEither()"))
-inline fun <T> eitherTry(body: () -> T): Either<Throwable, T> = try {
-  Right(body())
-} catch (t: Throwable) {
-  Left(t)
-}
 
 fun <A> A.left(): Either<A, Nothing> = Either.Left(this)
 
