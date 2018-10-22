@@ -21,7 +21,7 @@ fun <F, R> Response<R>.unwrapBody(apError: ApplicativeError<F, Throwable>): Kind
     apError.raiseError(HttpException(this))
   }
 
-fun <F, A> Call<A>.runInAsyncContext(AC: Async<F>): Kind<F, Response<A>> =
+fun <F, A> Call<A>.runAsync(AC: Async<F>): Kind<F, Response<A>> =
   AC.async { callback ->
     enqueue(ResponseCallback(callback))
   }

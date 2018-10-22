@@ -8,7 +8,7 @@ import retrofit2.Call
 import retrofit2.Response
 
 data class CallK<R>(val call: Call<R>) {
-  fun <F> async(AC: Async<F>): Kind<F, Response<R>> = call.runInAsyncContext(AC)
+  fun <F> async(AC: Async<F>): Kind<F, Response<R>> = call.runAsync(AC)
 
   fun <F> defer(defer: MonadDefer<F>): Kind<F, Response<R>> = call.runSyncDeferred(defer)
 
