@@ -32,8 +32,8 @@ object ProfunctorLaws {
             genFunctionAToB<Int, Int>(Gen.int()),
             genFunctionAToB<Int, Int>(Gen.int()),
             genFunctionAToB<Int, Int>(Gen.int())
-        ) { fa: Kind2<F, Int, Int>, f, g, x, y ->
-            fa.dimap(f, g).dimap(x, y).equalUnderTheLaw(fa.dimap(x andThen f, g andThen y), EQ)
+        ) { fa: Kind2<F, Int, Int>, ff, g, x, y ->
+            fa.dimap(ff, g).dimap(x, y).equalUnderTheLaw(fa.dimap(x andThen ff, g andThen y), EQ)
         }
 
     fun <F> Profunctor<F>.lMapIdentity(f: (Int) -> Kind2<F, Int, Int>, EQ: Eq<Kind2<F, Int, Int>>): Unit =
@@ -51,8 +51,8 @@ object ProfunctorLaws {
             genDoubleConstructor(Gen.int(), f),
             genFunctionAToB<Int, Int>(Gen.int()),
             genFunctionAToB<Int, Int>(Gen.int())
-        ) { fa: Kind2<F, Int, Int>, f, g ->
-            fa.lmap(g).lmap(f).equalUnderTheLaw(fa.lmap(f andThen g), EQ)
+        ) { fa: Kind2<F, Int, Int>, ff, g ->
+            fa.lmap(g).lmap(ff).equalUnderTheLaw(fa.lmap(ff andThen g), EQ)
         }
 
     fun <F> Profunctor<F>.rMapComposition(f: (Int) -> Kind2<F, Int, Int>, EQ: Eq<Kind2<F, Int, Int>>): Unit =
@@ -60,7 +60,7 @@ object ProfunctorLaws {
             genDoubleConstructor(Gen.int(), f),
             genFunctionAToB<Int, Int>(Gen.int()),
             genFunctionAToB<Int, Int>(Gen.int())
-        ) { fa: Kind2<F, Int, Int>, f, g ->
-            fa.lmap(f).lmap(g).equalUnderTheLaw(fa.lmap(f andThen g), EQ)
+        ) { fa: Kind2<F, Int, Int>, ff, g ->
+            fa.lmap(ff).lmap(g).equalUnderTheLaw(fa.lmap(ff andThen g), EQ)
         }
 }

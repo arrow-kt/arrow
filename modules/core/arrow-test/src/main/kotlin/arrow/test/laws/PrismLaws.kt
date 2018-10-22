@@ -11,7 +11,7 @@ import io.kotlintest.properties.forAll
 
 object PrismLaws {
 
-  inline fun <A, B> laws(prism: Prism<A, B>, aGen: Gen<A>, bGen: Gen<B>, funcGen: Gen<(B) -> B>, EQA: Eq<A>, EQOptionB: Eq<Option<B>>): List<Law> = listOf(
+  fun <A, B> laws(prism: Prism<A, B>, aGen: Gen<A>, bGen: Gen<B>, funcGen: Gen<(B) -> B>, EQA: Eq<A>, EQOptionB: Eq<Option<B>>): List<Law> = listOf(
     Law("Prism law: partial round trip one way") { prism.partialRoundTripOneWay(aGen, EQA) },
     Law("Prism law: round trip other way") { prism.roundTripOtherWay(bGen, EQOptionB) },
     Law("Prism law: modify identity") { prism.modifyIdentity(aGen, EQA) },

@@ -1,0 +1,40 @@
+#.instances: fill=#B9F6CA visual=class italic bold dashed
+#.typeclasses: fill=#64B5F6 visual=database bold
+#arrowSize: 1
+#bendSize: 0.3
+#fill: #64B5F6
+#font: Menlo
+#fontSize: 10
+#lineWidth: 2
+#padding: 8
+#zoom: 1
+[<typeclasses>ApplicativeError]<-[<instances>ApplicativeError Instances|IOApplicativeErrorInstance|DeferredKApplicativeErrorInstance|FluxKApplicativeErrorInstance|MonoKApplicativeErrorInstance|FlowableKApplicativeErrorInstance|MaybeKApplicativeErrorInstance|ObservableKApplicativeErrorInstance|SingleKApplicativeErrorInstance]
+[<typeclasses>ApplicativeError]<-[<typeclasses>MonadError]
+[<typeclasses>Applicative]<-[<instances>Applicative Instances|IOApplicativeInstance|DeferredKApplicativeInstance|FluxKApplicativeInstance|MonoKApplicativeInstance|FlowableKApplicativeInstance|MaybeKApplicativeInstance|ObservableKApplicativeInstance|SingleKApplicativeInstance]
+[<typeclasses>Applicative]<-[<typeclasses>ApplicativeError]
+[<typeclasses>Applicative]<-[<typeclasses>Monad]
+[<typeclasses>Async]<-[<instances>Async Instances|IOAsyncInstance|DeferredKAsyncInstance|FluxKAsyncInstance|MonoKAsyncInstance|FlowableKAsyncInstance|MaybeKAsyncInstance|ObservableKAsyncInstance|SingleKAsyncInstance]
+[<typeclasses>Async]<-[<typeclasses>Effect]
+[<typeclasses>At]<-[<instances>At Instances|MapKAtInstance|SetKAtInstance]
+[<typeclasses>ConcurrentEffect]<-[<instances>ConcurrentEffect Instances|IOConcurrentEffectInstance|DeferredKConcurrentEffectInstance|FluxKConcurrentEffectInstance|MonoKConcurrentEffectInstance|FlowableKConcurrentEffectInstance|ObservableKConcurrentEffectInstance|SingleKConcurrentEffectInstance]
+[<typeclasses>Each]<-[<instances>Each Instances|EitherEachInstance|ListKEachInstance|MapKEachInstance|NonEmptyListEachInstance|OptionEachInstance|SequenceKEachInstance|TryEachInstance]
+[<typeclasses>Effect]<-[<instances>Effect Instances|IOEffectInstance|DeferredKConcurrentEffectInstance|FluxKConcurrentEffectInstance|MonoKConcurrentEffectInstance|FlowableKConcurrentEffectInstance|ObservableKConcurrentEffectInstance|SingleKConcurrentEffectInstance]
+[<typeclasses>Effect]<-[<typeclasses>ConcurrentEffect]
+[<typeclasses>FilterIndex]<-[<instances>FilterIndex Instances|ListKFilterIndexInstance|MapKFilterIndexInstance|NonEmptyListFilterIndexInstance|SequenceKFilterIndexInstance]
+[<typeclasses>Foldable]<-[<instances>Foldable Instances|FluxKFoldableInstance|FlowableKFoldableInstance|MaybeKFoldableInstance|ObservableKFoldableInstance]
+[<typeclasses>Foldable]<-[<typeclasses>Traverse]
+[<typeclasses>Functor]<-[<typeclasses>Applicative]
+[<typeclasses>Functor]<-[<typeclasses>Traverse]
+[<typeclasses>Index]<-[<instances>Index Instances|ListKIndexInstance|MapKIndexInstance|NonEmptyListIndexInstance|SequenceKIndexInstance]
+[<typeclasses>Invariant]<-[<typeclasses>Functor]
+[<typeclasses>MonadDefer]<-[<instances>MonadDefer Instances|IOMonadDeferInstance|DeferredKMonadDeferInstance|FluxKMonadDeferInstance|MonoKMonadDeferInstance|FlowableKMonadDeferInstance|MaybeKMonadDeferInstance|ObservableKMonadDeferInstance|SingleKMonadDeferInstance]
+[<typeclasses>MonadDefer]<-[<typeclasses>Async]
+[<typeclasses>MonadError]<-[<instances>MonadError Instances|IOMonadErrorInstance|DeferredKMonadErrorInstance|FluxKMonadErrorInstance|MonoKMonadErrorInstance|FlowableKMonadErrorInstance|MaybeKMonadErrorInstance|ObservableKMonadErrorInstance|SingleKMonadErrorInstance]
+[<typeclasses>MonadError]<-[<typeclasses>MonadDefer]
+[<typeclasses>Monad]<-[<instances>Monad Instances|IOMonadInstance|DeferredKMonadInstance|FluxKMonadInstance|MonoKMonadInstance|FlowableKMonadInstance|MaybeKMonadInstance|ObservableKMonadInstance|SingleKMonadInstance]
+[<typeclasses>Monad]<-[<typeclasses>MonadError]
+[<typeclasses>Monoid]<-[<instances>Monoid Instances|IOMonoidInstance]
+[<typeclasses>Semigroup]<-[<instances>Semigroup Instances|IOMonoidInstance|IOSemigroupInstance]
+[<typeclasses>Semigroup]<-[<typeclasses>Monoid]
+[<typeclasses>Traverse]<-[<instances>Traverse Instances|FluxKTraverseInstance|FlowableKTraverseInstance|ObservableKTraverseInstance]
+[<typeclasses>Functor]<-[<instances>Functor Instances|IOFunctorInstance|DeferredKFunctorInstance|FluxKFunctorInstance|MonoKFunctorInstance|FlowableKFunctorInstance|MaybeKFunctorInstance|ObservableKFunctorInstance|SingleKFunctorInstance|IntListPatternFunctorInstance]

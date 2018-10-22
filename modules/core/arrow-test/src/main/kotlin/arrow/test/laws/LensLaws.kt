@@ -10,7 +10,7 @@ import io.kotlintest.properties.forAll
 
 object LensLaws {
 
-  inline fun <A, B> laws(lens: Lens<A, B>, aGen: Gen<A>, bGen: Gen<B>, funcGen: Gen<(B) -> B>, EQA: Eq<A>, EQB: Eq<B>, MB: Monoid<B>) =
+  fun <A, B> laws(lens: Lens<A, B>, aGen: Gen<A>, bGen: Gen<B>, funcGen: Gen<(B) -> B>, EQA: Eq<A>, EQB: Eq<B>, MB: Monoid<B>) =
     listOf(
       Law("Lens law: get set") { lens.lensGetSet(aGen, EQA) },
       Law("Lens law: set get") { lens.lensSetGet(aGen, bGen, EQB) },

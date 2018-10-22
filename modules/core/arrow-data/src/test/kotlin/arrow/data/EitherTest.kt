@@ -45,7 +45,7 @@ class EitherTest : UnitSpec() {
       )
 
     "empty should return a Right of the empty of the inner type" {
-      forAll { a: String ->
+      forAll { _: String ->
         Right(String.monoid().run { empty() }) == Either.monoid(String.monoid(), String.monoid()).run { empty() }
       }
     }
@@ -79,8 +79,7 @@ class EitherTest : UnitSpec() {
 
     "orNull should return value" {
       forAll { a: Int ->
-          Either.Right(a).orNull() == a
-          && Either.Left(a).orNull() == null
+        Either.Right(a).orNull() == a
       }
 
     }

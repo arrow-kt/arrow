@@ -1,10 +1,8 @@
 package arrow.typeclasses
 
-import kotlin.coroutines.experimental.Continuation
+import kotlin.coroutines.Continuation
 
-private val coroutineImplClass by lazy { Class.forName("kotlin.coroutines.experimental.jvm.internal.CoroutineImpl") }
-
-private val labelField by lazy { coroutineImplClass.getDeclaredField("label").apply { isAccessible = true } }
+private val coroutineImplClass by lazy { Class.forName("kotlin.coroutines.jvm.internal.BaseContinuationImpl") }
 
 private val completionField by lazy { coroutineImplClass.getDeclaredField("completion").apply { isAccessible = true } }
 
@@ -15,7 +13,7 @@ private var <T> Continuation<T>.completion: Continuation<*>?
 var <T> Continuation<T>.stateStack: List<Map<String, *>>
   get() {
     if (!coroutineImplClass.isInstance(this)) return emptyList()
-    val resultForThis = (this.javaClass.declaredFields + labelField)
+    val resultForThis = (this.javaClass.declaredFields)
       .associate { it.isAccessible = true; it.name to it.get(this@stateStack) }
       .let(::listOf)
     val resultForCompletion = completion?.stateStack
@@ -24,7 +22,7 @@ var <T> Continuation<T>.stateStack: List<Map<String, *>>
   set(value) {
     if (!coroutineImplClass.isInstance(this)) return
     val mapForThis = value.first()
-    (this.javaClass.declaredFields + labelField).forEach {
+    (this.javaClass.declaredFields).forEach {
       if (it.name in mapForThis) {
         it.isAccessible = true
         val fieldValue = mapForThis[it.name]

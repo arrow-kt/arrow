@@ -11,7 +11,7 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
 object InvariantLaws {
-    inline fun <F> laws(IF: Invariant<F>, noinline cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): List<Law> =
+    fun <F> laws(IF: Invariant<F>, cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): List<Law> =
         listOf(
             Law("Invariant Laws: Invariant Identity") { IF.identity(cf, EQ) },
             Law("Invariant Laws: Invariant Composition") { IF.composition(cf, EQ) }
