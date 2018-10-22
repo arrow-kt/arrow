@@ -7,7 +7,7 @@ import io.kotlintest.properties.forAll
 
 object ShowLaws {
 
-  inline fun <F> laws(S: Show<F>, EQ: Eq<F>, noinline cf: (Int) -> F): List<Law> =
+  fun <F> laws(S: Show<F>, EQ: Eq<F>, cf: (Int) -> F): List<Law> =
     EqLaws.laws(EQ, cf) + listOf(
       Law("Show Laws: equality") { S.equalShow(EQ, cf) }
     )

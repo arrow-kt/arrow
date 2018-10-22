@@ -32,6 +32,7 @@ class DaggerIndexedStateTFunctorInstance<F, L> @Inject constructor(val FF: Funct
 
 class DaggerIndexedStateTApplicativeInstance<F, L> @Inject constructor(val MF: Monad<F>) : IndexedStateTApplicativeInstance<F, L> {
   override fun FF(): Monad<F> = MF
+  override fun MF(): Monad<F> = MF
 }
 
 class DaggerIndexedStateTMonadInstance<F, L> @Inject constructor(val MF: Monad<F>) : IndexedStateTMonadInstance<F, L> {
@@ -40,4 +41,5 @@ class DaggerIndexedStateTMonadInstance<F, L> @Inject constructor(val MF: Monad<F
 
 class DaggerIndexedStateTMonadErrorInstance<F, L> @Inject constructor(val MF: MonadError<F, L>) : IndexedStateTMonadErrorInstance<F, L, L> {
   override fun FF(): MonadError<F, L> = MF
+  override fun MF(): MonadError<F, L> = MF
 }

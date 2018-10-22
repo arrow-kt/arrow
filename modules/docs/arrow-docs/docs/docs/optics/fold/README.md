@@ -29,6 +29,8 @@ fun <T> nullableFold(): Fold<T?, T> = object : Fold<T?, T> {
 Or you can get a `Fold` from any existing `Foldable`.
 
 ```kotlin:ank:silent
+import arrow.instances.nonemptylist.foldable.*
+
 val nonEmptyIntFold: Fold<NonEmptyListOf<Int>, Int> = Fold.fromFoldable(NonEmptyList.foldable())
 ```
 

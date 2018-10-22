@@ -13,7 +13,7 @@ class NumberMonoidTest : UnitSpec() {
     "should semigroup with the instance passed" {
       "int" {
         forAll { value: Int ->
-          val seen = ForInt extensions { value.combine(value) }
+          val seen = Int.monoid().run { value.combine(value) }
           val expected = value + value
 
           expected == seen
@@ -22,7 +22,7 @@ class NumberMonoidTest : UnitSpec() {
 
       "float" {
         forAll { value: Float ->
-          val seen = ForFloat extensions { value.combine(value) }
+          val seen = Float.monoid().run { value.combine(value) }
           val expected = value + value
 
           expected == seen
@@ -31,7 +31,7 @@ class NumberMonoidTest : UnitSpec() {
 
       "double" {
         forAll { value: Double ->
-          val seen = ForDouble extensions { value.combine(value) }
+          val seen = Double.monoid().run { value.combine(value) }
           val expected = value + value
 
           expected == seen
@@ -41,7 +41,7 @@ class NumberMonoidTest : UnitSpec() {
       "long" {
 
         forAll { value: Long ->
-          val seen = ForLong extensions  { value.combine(value) }
+          val seen = Long.monoid().run  { value.combine(value) }
           val expected = value + value
 
           expected == seen
@@ -50,7 +50,7 @@ class NumberMonoidTest : UnitSpec() {
 
       "short" {
         forAll { value: Short ->
-          val seen = ForShort extensions  { value.combine(value) }
+          val seen = Short.monoid().run  { value.combine(value) }
           val expected = (value + value).toShort()
 
           expected == seen
@@ -59,7 +59,7 @@ class NumberMonoidTest : UnitSpec() {
 
       "byte" {
         forAll { value: Byte ->
-          val seen = ForByte extensions { value.combine(value) }
+          val seen = Byte.monoid().run { value.combine(value) }
           val expected = (value + value).toByte()
 
           expected == seen

@@ -288,16 +288,20 @@ Typeclasses allows us to code focusing on the behaviors and not the datatypes th
 Arrow provides the following `MonadError` instances for `Option`, `Try` and `Either`
 
 ```kotlin:ank
-import arrow.typeclasses.*
+import arrow.instances.option.monadError.*
 
 Option.monadError()
 ```
 
 ```kotlin:ank
+import arrow.instances.`try`.monadError.*
+
 Try.monadError()
 ```
 
 ```kotlin:ank
+import arrow.instances.either.monadError.*
+
 Either.monadError<NukeException>()
 ```
 

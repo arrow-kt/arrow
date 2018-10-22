@@ -127,7 +127,7 @@ class IndexedStateT<F, SA, SB, A>(
      * @param AF [Applicative] for the context [F].
      * @param a current value of the state.
      */
-    fun <F, S, A> pure(AF: Applicative<F>, a: A): IndexedStateT<F, S, S, A> = IndexedStateT(AF.just({ s: S -> AF.just(Tuple2(s, a)) }))
+    fun <F, S, A> just(AF: Applicative<F>, a: A): IndexedStateT<F, S, S, A> = IndexedStateT(AF.just({ s: S -> AF.just(Tuple2(s, a)) }))
 
     /**
      * Tail recursive function that keeps calling [f]  until [arrow.core.Either.Right] is returned.

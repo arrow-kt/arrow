@@ -196,6 +196,8 @@ fun <F, A> Functor<F>.ana(a: A, coalg: Coalgebra<F, A>): Fix<F>
 We can use them to rewrite our `multiply` and `downFrom` functions.
 
 ```kotlin:ank
+import arrow.recursion.instances.fix.recursive.*
+
 // We extract these functions out for later use
 val multiply: Algebra<ForIntListPattern, Eval<Int>> = { l ->
   val list = l.fix()

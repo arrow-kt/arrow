@@ -1,6 +1,7 @@
 package arrow.common.utils
 
 import arrow.common.messager.logE
+import arrow.meta.encoder.jvm.KotlinMetatadataEncoder
 import me.eugeniomarletti.kotlin.processing.KotlinAbstractProcessor
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.element.Element
@@ -12,9 +13,9 @@ class KnownException(message: String, val element: Element?) : RuntimeException(
   operator fun component2() = element
 }
 
-abstract class AbstractProcessor : KotlinAbstractProcessor(), ProcessorUtils {
+abstract class AbstractProcessor : KotlinAbstractProcessor(), ProcessorUtils, KotlinMetatadataEncoder {
 
-  override final fun process(annotations: Set<TypeElement>, roundEnv: RoundEnvironment): Boolean {
+  final override fun process(annotations: Set<TypeElement>, roundEnv: RoundEnvironment): Boolean {
     if (!roundEnv.errorRaised()) {
       try {
         onProcess(annotations, roundEnv)
@@ -26,4 +27,5 @@ abstract class AbstractProcessor : KotlinAbstractProcessor(), ProcessorUtils {
   }
 
   protected abstract fun onProcess(annotations: Set<TypeElement>, roundEnv: RoundEnvironment)
+
 }

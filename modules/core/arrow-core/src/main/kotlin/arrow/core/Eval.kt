@@ -78,11 +78,12 @@ sealed class Eval<out A> : EvalOf<A> {
       }
 
     //Enforce tailrec call to collapse inside compute loop
-    private inline fun <A> collapse1(fa: Eval<A>): Eval<A> = collapse(fa)
+    private fun <A> collapse1(fa: Eval<A>): Eval<A> = collapse(fa)
 
+    @Suppress("UNCHECKED_CAST")
     private fun <A> evaluate(e: Eval<A>): A = run {
       var curr: Eval<Any?> = e
-      var fs: MutableList<(Any?) -> Eval<Any?>> = mutableListOf()
+      val fs: MutableList<(Any?) -> Eval<Any?>> = mutableListOf()
 
       fun addToMemo(m: Memoize<Any?>): (Any?) -> Eval<Any?> = {
         m.result = Some(it)
@@ -159,7 +160,7 @@ sealed class Eval<out A> : EvalOf<A> {
 
   fun <B> ap(ff: EvalOf<(A) -> B>): Eval<B> = ff.fix().flatMap { f -> map(f) }.fix()
 
-  @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
+  @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE", "UNCHECKED_CAST")
   fun <B> flatMap(f: (A) -> EvalOf<B>): Eval<B> =
     when (this) {
       is FlatMap<A> -> object : FlatMap<B>() {

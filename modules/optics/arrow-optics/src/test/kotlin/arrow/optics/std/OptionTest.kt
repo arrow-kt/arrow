@@ -3,6 +3,8 @@ package arrow.optics
 import arrow.core.*
 import arrow.instances.IntMonoidInstance
 import arrow.instances.monoid
+import arrow.instances.either.applicative.applicative
+import arrow.instances.option.monoid.monoid
 import arrow.test.UnitSpec
 import arrow.test.generators.genEither
 import arrow.test.generators.genFunctionAToB

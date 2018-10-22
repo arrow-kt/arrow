@@ -4,11 +4,12 @@ import arrow.Kind
 import arrow.data.Moore
 import arrow.data.MoorePartialOf
 import arrow.data.fix
-import arrow.instance
+import arrow.deprecation.ExtensionsDSLDeprecated
+import arrow.extension
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Functor
 
-@instance(Moore::class)
+@extension
 interface MooreComonadInstance<V> : Comonad<MoorePartialOf<V>> {
   override fun <A, B> Kind<MoorePartialOf<V>, A>.coflatMap(f: (Kind<MoorePartialOf<V>, A>) -> B): Moore<V, B> =
       fix().coflatMap(f)
@@ -20,7 +21,7 @@ interface MooreComonadInstance<V> : Comonad<MoorePartialOf<V>> {
       fix().map(f)
 }
 
-@instance(Moore::class)
+@extension
 interface MooreFunctorInstance<V> : Functor<MoorePartialOf<V>> {
   override fun <A, B> Kind<MoorePartialOf<V>, A>.map(f: (A) -> B): Moore<V, B> =
       fix().map(f)
@@ -29,6 +30,7 @@ interface MooreFunctorInstance<V> : Functor<MoorePartialOf<V>> {
 class MooreContext<S> : MooreComonadInstance<S>
 
 class MooreContextPartiallyApplied<S> {
+  @Deprecated(ExtensionsDSLDeprecated)
   infix fun <A> extensions(f: MooreContext<S>.() -> A): A =
       f(MooreContext())
 }

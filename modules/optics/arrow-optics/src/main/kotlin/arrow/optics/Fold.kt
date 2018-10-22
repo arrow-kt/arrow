@@ -3,9 +3,9 @@ package arrow.optics
 import arrow.Kind
 import arrow.core.*
 import arrow.data.ListK
-import arrow.data.monoid
 import arrow.higherkind
 import arrow.instances.monoid
+import arrow.instances.listk.monoid.monoid
 import arrow.typeclasses.Const
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Monoid

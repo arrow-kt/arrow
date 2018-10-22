@@ -44,7 +44,7 @@ typealias StateT<F, S, A> = IndexedStateT<F, S, S, A>
  * @param runF the stateful function to wrap with [State].
  */
 @Suppress("FunctionName")
-fun <F, S, A> StateT(runF: StateTFunOf<F, S, A>,  @Suppress("UNUSED_PARAMETER") dummy: Unit = Unit): StateT<F, S, A> = IndexedStateT(runF)
+fun <F, S, A> StateT(runF: StateTFunOf<F, S, A>, @Suppress("UNUSED_PARAMETER") dummy: Unit = Unit): StateT<F, S, A> = IndexedStateT(runF)
 
 /**
  * Constructor for State.

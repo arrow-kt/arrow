@@ -1,7 +1,17 @@
 package arrow.data
 
 import arrow.core.*
-import arrow.instances.*
+import arrow.instances.`try`.applicative.map
+import arrow.instances.`try`.eq.eq
+import arrow.instances.`try`.functor.functor
+import arrow.instances.`try`.monadError.monadError
+import arrow.instances.`try`.monoid.monoid
+import arrow.instances.`try`.semigroup.semigroup
+import arrow.instances.`try`.show.show
+import arrow.instances.`try`.traverse.traverse
+import arrow.instances.combine
+import arrow.instances.monoid
+import arrow.instances.semigroup
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
@@ -18,23 +28,19 @@ class TryTest : UnitSpec() {
 
   init {
 
-    val EQ = Try.eq(Eq { a, b -> a::class == b::class }, Int.eq())
+    val EQ = Try.eq(Eq<Any> { a, b -> a::class == b::class }, Eq.any())
 
-    ForTry extensions {
-      testLaws(
-        SemigroupLaws.laws(Try.semigroup(Int.semigroup()), Try.just(1), Try.just(2), Try.just(3), EQ),
-        MonoidLaws.laws(Try.monoid(MO = Int.monoid()), Try.just(1), EQ),
-        EqLaws.laws(EQ) { Try.just(it) },
-        ShowLaws.laws(Try.show(), EQ) { Try.just(it) },
-        MonadErrorLaws.laws(this, Eq.any(), Eq.any()),
-        TraverseLaws.laws(this, this, ::Success, Eq.any())
-      )
-    }
+    testLaws(
+      SemigroupLaws.laws(Try.semigroup(Int.semigroup()), Try.just(1), Try.just(2), Try.just(3), EQ),
+      MonoidLaws.laws(Try.monoid(MO = Int.monoid()), Try.just(1), EQ),
+      EqLaws.laws(EQ) { Try.just(it) },
+      ShowLaws.laws(Try.show(), EQ) { Try.just(it) },
+      MonadErrorLaws.laws(Try.monadError(), Eq.any(), Eq.any()),
+      TraverseLaws.laws(Try.traverse(), Try.functor(), ::Success, Eq.any())
+    )
 
     "empty should return a Success of the empty of the inner type" {
-      forAll { a: String ->
-        Success(String.monoid().run { empty() }) == Try.monoid(String.monoid()).run { empty() }
-      }
+      Success(String.monoid().run { empty() }) shouldBe Try.monoid(String.monoid()).run { empty() }
     }
 
     "combine two Successes should return a Success of the combine of the inners" {
@@ -141,44 +147,32 @@ class TryTest : UnitSpec() {
       Failure(Exception()).toEither { "myDomainError" } shouldBe "myDomainError".left()
     }
 
-    "transform applies left function for Success" {
-      Success(1).transform({ Success(2) }, { Success(3) }) shouldBe Success(2)
-    }
-
-    "transform applies right function for Failure" {
-      Failure(Exception()).transform({ Success(2) }, { Success(3) }) shouldBe Success(3)
-    }
-
     "Cartesian builder should build products over homogeneous Try" {
-      ForTry extensions {
-        map(
-          Success("11th"),
-          Success("Doctor"),
-          Success("Who")
-        ) { (a, b, c) -> "$a $b $c" } shouldBe Success("11th Doctor Who")
-      }
+      map(
+        Success("11th"),
+        Success("Doctor"),
+        Success("Who")
+      ) { (a, b, c) -> "$a $b $c" } shouldBe Success("11th Doctor Who")
     }
 
     "Cartesian builder should build products over heterogeneous Try" {
-      ForTry extensions {
-        map(
-          Success(13),
-          Success("Doctor"),
-          Success(false)
-        ) { (a, b, c) -> "${a}th $b is $c" } shouldBe Success("13th Doctor is false")
-      }
+      map(
+        Success(13),
+        Success("Doctor"),
+        Success(false)
+      ) { (a, b, c) -> "${a}th $b is $c" } shouldBe Success("13th Doctor is false")
     }
 
     data class DoctorNotFoundException(val msg: String) : Exception()
 
     "Cartesian builder should build products over Failure Try" {
-      ForTry extensions {
-        map(
-          Success(13),
-          Failure(DoctorNotFoundException("13th Doctor is coming!")),
-          Success("Who")
-        ) { (a, b, c) -> "${a}th $b is $c" } shouldBe Failure(DoctorNotFoundException("13th Doctor is coming!"))
-      }
+      map(
+        Success(13),
+        Failure(DoctorNotFoundException("13th Doctor is coming!")),
+        Success("Who")
+      ) { (a, b, @Suppress("UNUSED_DESTRUCTURED_PARAMETER_ENTRY") c) ->
+        @Suppress("UNREACHABLE_CODE") "${a}th $b is $c"
+      } shouldBe Failure(DoctorNotFoundException("13th Doctor is coming!"))
     }
 
     "show" {
@@ -191,99 +185,23 @@ class TryTest : UnitSpec() {
       }
     }
 
-    "get" {
-      10 shouldBe success()
-      try {
-        failure()
-        fail("")
-      } catch (e: Exception) {
-        (e is NumberFormatException) shouldBe true
-      }
-    }
-
     "getOrElse" {
       success.getOrElse { 5 } shouldBe 10
       failure.getOrElse { 5 } shouldBe 5
     }
 
     "orElse" {
-      success.orElse { Success(5) }.get() shouldBe 10
-      failure.orElse { Success(5) }.get() shouldBe 5
-    }
-
-    "`foreach with side effect (applied on Success)`" {
-      var wasInside = false
-      success.foreach { wasInside = true }
-      wasInside shouldBe true
-    }
-
-    "`foreach with side effect (applied on Failure)`" {
-      var wasInside = false
-      failure.foreach { wasInside = true }
-      wasInside shouldBe false
-    }
-
-    "`foreach with exception thrown inside (applied on Success)`" {
-      try {
-        success.foreach { throw RuntimeException("thrown inside") }
-      } catch (e: Throwable) {
-        e.message shouldBe "thrown inside"
-      }
-    }
-
-    "`foreach with exception thrown inside (applied on Failure)`" {
-      failure.foreach { throw RuntimeException("thrown inside") }
-      // and no exception should be thrown
-    }
-
-    "`onEach with side effect (applied on Success)`" {
-      var wasInside = false
-      success.onEach { wasInside = true }
-      wasInside shouldBe true
-    }
-
-    "`onEach with side effect (applied on Failure)`" {
-      var wasInside = false
-      failure.onEach { wasInside = true }
-      wasInside shouldBe false
-    }
-
-    "`onEach with exception thrown inside (applied on Success)`" {
-      try {
-        success.onEach { throw RuntimeException("thrown inside") }.get()
-      } catch (e: Throwable) {
-        e.message shouldBe "thrown inside"
-      }
-    }
-
-    "`onEach with exception thrown inside (applied on Failure)`" {
-      try {
-        failure.onEach { throw RuntimeException("thrown inside") }.get()
-      } catch (e: Throwable) {
-        e.javaClass shouldBe NumberFormatException::class.java
-      }
-    }
-
-    "`onEach with change of carried value (applied on Success)`" {
-      val result = success.onEach { it * 2 }.get()
-      result shouldBe 10
-    }
-
-    "`onEach with change of carried value (applied on Failure)`" {
-      try {
-        failure.onEach { it * 2 }.get()
-      } catch (e: Throwable) {
-        e.javaClass shouldBe NumberFormatException::class.java
-      }
+      success.orElse { Success(5) } shouldBe Success(10)
+      failure.orElse { Success(5) } shouldBe Success(5)
     }
 
     "flatMap" {
-      success.flatMap { Success(it * 2) }.get() shouldBe 20
+      success.flatMap { Success(it * 2) } shouldBe Success(20)
       (failure.flatMap { Success(it * 2) }.isFailure()) shouldBe true
     }
 
     "map" {
-      success.map { it * 2 }.get() shouldBe 20
+      success.map { it * 2 } shouldBe Success(20)
       (failure.map { it * 2 }.isFailure()) shouldBe true
     }
 
@@ -298,36 +216,9 @@ class TryTest : UnitSpec() {
       (failure.filter { it > 5 }.isSuccess()) shouldBe false
     }
 
-    "rescue" {
-      success.rescue { Success(5) }.get() shouldBe 10
-      failure.rescue { Success(5) }.get() shouldBe 5
-    }
-
-    "handle" {
-      success.handle { 5 }.get() shouldBe 10
-      failure.handle { 5 }.get() shouldBe 5
-    }
-
-    "onSuccessAndOnFailure" {
-      success.onSuccess { it shouldBe 10 }
-        .onFailure { fail("") }
-      failure.onSuccess { fail("") }
-        .onFailure { }
-    }
-
     "toOption" {
       (success.toOption().isDefined()) shouldBe true
       (failure.toOption().isEmpty()) shouldBe true
-    }
-
-    "failed" {
-      success.failed().onSuccess { (it is UnsupportedOperationException) shouldBe true }
-      failure.failed().onSuccess { (it is NumberFormatException) shouldBe true }
-    }
-
-    "transform" {
-      success.transform({ Try { it.toString() } }) { Try { "NaN" } }.get() shouldBe "10"
-      failure.transform({ Try { it.toString() } }) { Try { "NaN" } }.get() shouldBe "NaN"
     }
 
     "success" {

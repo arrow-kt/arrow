@@ -89,7 +89,7 @@ fun State() = StateApi
 
 object StateApi {
 
-  fun <S, T> just(t: T): State<S, T> = StateT.pure(IdBimonad, t)
+  fun <S, T> just(t: T): State<S, T> = StateT.just(IdBimonad, t)
 
   /**
    * Return input without modifying it.

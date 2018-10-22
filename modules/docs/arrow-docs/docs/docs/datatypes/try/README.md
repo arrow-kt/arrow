@@ -128,14 +128,6 @@ lotteryTry.fold(
     { it.filter { it.toIntOrNull() != null } })
 ```
 
-Or, as we have with `recoverWith`, we can use a version of `fold` which allows us to handle both cases with functions that return a new instance of `Try`, `transform`:
-
-```kotlin:ank
-lotteryTry.transform(
-    { Try { it.map { it.toInt() } } },
-    { Try.just(emptyList<Int>()) })
-```
-
 When using Try, it is a common scenario to convert the returned `Try<Throwable, DomainObject>` instance to `Either<DomainError, DomainObject>`. One can use `toEither`, and than call `mapLeft` to achieve this goal:
 
 ```kotlin

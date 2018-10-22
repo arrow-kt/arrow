@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package arrow.derive
 
 import arrow.deriving

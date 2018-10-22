@@ -17,6 +17,8 @@ potential-bugs:
 
 exceptions:
   active: true
+  CatchException:
+    active: false
 
 empty:
   active: true
@@ -32,8 +34,9 @@ complexity:
     active: false
   LargeClass:
     threshold: 300
+    active: false
   ComplexMethod:
-    threshold: 10
+    threshold: 20
   NestedBlockDepth:
     threshold: 5
   TooManyFunctions:

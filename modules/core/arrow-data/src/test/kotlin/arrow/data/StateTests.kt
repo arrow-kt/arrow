@@ -22,9 +22,6 @@ class StateTests : UnitSpec() {
     }
 
     "addOne.map(n -> n).run(1) should return same Pair(2, 1)" {
-      ForOption extensions {
-
-      }
       addOne.map { n -> n }.run(1) shouldBe Tuple2(2, 1)
     }
 

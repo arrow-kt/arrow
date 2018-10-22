@@ -322,11 +322,9 @@ null.rightIfNotNull { "left" }
  Transforming the inner contents
 
 ```kotlin:ank
-import arrow.instances.*
+import arrow.instances.either.functor.*
  
-ForEither<Int>() extensions { 
-   Right(1).map {it + 1}
-}
+Right(1).map {it + 1}
 ```
 
  [`Applicative`]({{ '/docs/typeclasses/applicative/' | relative_url }})
@@ -334,9 +332,9 @@ ForEither<Int>() extensions {
  Computing over independent values
 
 ```kotlin:ank
-ForEither<Int>() extensions { 
-  tupled(Either.Right(1), Either.Right("a"), Either.Right(2.0))
-}
+import arrow.instances.either.applicative.*
+  
+tupled(Either.Right(1), Either.Right("a"), Either.Right(2.0))
 ```
 
  [`Monad`]({{ '/docs/typeclasses/monad/' | relative_url }})
@@ -344,13 +342,13 @@ ForEither<Int>() extensions {
  Computing over dependent values ignoring absence
 
 ```kotlin
-ForEither<Int>() extensions {
- binding {
-    val a = Either.Right(1).bind()
-    val b = Either.Right(1 + a).bind()
-    val c = Either.Right(1 + b).bind()
-    a + b + c
- }
+import arrow.instances.either.monad.*
+
+Either.monad().binding {
+  val a = Either.Right(1).bind()
+  val b = Either.Right(1 + a).bind()
+  val c = Either.Right(1 + b).bind()
+  a + b + c
 }
 // Right(6)
 ```

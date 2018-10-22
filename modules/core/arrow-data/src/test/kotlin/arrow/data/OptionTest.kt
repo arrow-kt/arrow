@@ -4,15 +4,18 @@ import arrow.Kind
 import arrow.core.*
 import arrow.instances.eq
 import arrow.instances.monoid
-import arrow.mtl.instances.extensions
+import arrow.instances.option.applicative.applicative
+import arrow.instances.option.eq.eq
+import arrow.instances.option.monoid.monoid
+import arrow.instances.option.show.show
+import arrow.mtl.instances.option.monadFilter.monadFilter
+import arrow.mtl.instances.option.traverseFilter.traverseFilter
 import arrow.syntax.collections.firstOption
-import arrow.syntax.collections.option
 import arrow.test.UnitSpec
 import arrow.test.generators.genOption
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.properties.Gen
@@ -27,6 +30,7 @@ class OptionTest : UnitSpec() {
 
   init {
 
+    @Suppress("UNUSED_VARIABLE")
     val EQ_EITHER: Eq<Kind<ForOption, Either<Unit, Int>>> = Eq { a, b ->
       a.fix().fold(
         { b.fix().fold({ true }, { false }) },
@@ -41,16 +45,14 @@ class OptionTest : UnitSpec() {
         })
     }
 
-    ForOption extensions {
-      testLaws(
-        EqLaws.laws(Option.eq(Int.eq())) { genOption(Gen.int()).generate() },
-        ShowLaws.laws(Option.show(), Option.eq(Int.eq())) { Some(it) },
-        MonoidLaws.laws(Option.monoid(Int.monoid()), Some(1), Option.eq(Int.eq())),
-        //testLaws(MonadErrorLaws.laws(monadError<ForOption, Unit>(), Eq.any(), EQ_EITHER)) TODO reenable once the MonadErrorLaws are parametric to `E`
-        TraverseFilterLaws.laws(this, this, ::Some, Eq.any()),
-        MonadFilterLaws.laws(this, ::Some, Eq.any())
-      )
-    }
+    testLaws(
+      EqLaws.laws(Option.eq(Int.eq())) { genOption(Gen.int()).generate() },
+      ShowLaws.laws(Option.show(), Option.eq(Int.eq())) { Some(it) },
+      MonoidLaws.laws(Option.monoid(Int.monoid()), Some(1), Option.eq(Int.eq())),
+      //testLaws(MonadErrorLaws.laws(monadError<ForOption, Unit>(), Eq.any(), EQ_EITHER)) TODO reenable once the MonadErrorLaws are parametric to `E`
+      TraverseFilterLaws.laws(Option.traverseFilter(), Option.applicative(), ::Some, Eq.any()),
+      MonadFilterLaws.laws(Option.monadFilter(), ::Some, Eq.any())
+    )
 
     "fromNullable should work for both null and non-null values of nullable types" {
       forAll { a: Int? ->
@@ -65,25 +67,6 @@ class OptionTest : UnitSpec() {
       Option.fromNullable(a) shouldBe None
     }
 
-    "option" {
-
-      val option = some
-      when (option) {
-        is Some<String> -> {
-          option.get() shouldBe "kotlin"
-        }
-        is None -> fail("")
-      }
-
-      val otherOption = none
-
-      when (otherOption) {
-        is Some<String> -> fail("")
-        is None -> otherOption shouldBe None
-      }
-
-    }
-
     "getOrElse" {
       some.getOrElse { "java" } shouldBe "kotlin"
       none.getOrElse { "java" } shouldBe "java"
@@ -95,7 +78,7 @@ class OptionTest : UnitSpec() {
     }
 
     "map" {
-      some.map(String::toUpperCase).get() shouldBe "KOTLIN"
+      some.map(String::toUpperCase) shouldBe Some("KOTLIN")
       none.map(String::toUpperCase) shouldBe None
     }
 
@@ -105,18 +88,18 @@ class OptionTest : UnitSpec() {
     }
 
     "flatMap" {
-      some.flatMap { Some(it.toUpperCase()) }.get() shouldBe "KOTLIN"
+      some.flatMap { Some(it.toUpperCase()) } shouldBe Some("KOTLIN")
       none.flatMap { Some(it.toUpperCase()) } shouldBe None
     }
 
     "filter" {
       some.filter { it == "java" } shouldBe None
       none.filter { it == "java" } shouldBe None
-      some.filter { it.startsWith('k') }.get() shouldBe "kotlin"
+      some.filter { it.startsWith('k') } shouldBe Some("kotlin")
     }
 
     "filterNot" {
-      some.filterNot { it == "java" }.get() shouldBe "kotlin"
+      some.filterNot { it == "java" } shouldBe Some("kotlin")
       none.filterNot { it == "java" } shouldBe None
       some.filterNot { it.startsWith('k') } shouldBe None
     }
@@ -133,32 +116,14 @@ class OptionTest : UnitSpec() {
       none.forall { it.startsWith('k') } shouldBe true
     }
 
-    "forEach" {
-      some.forEach {
-        it shouldBe "kotlin"
-      }
-
-      none.forEach {
-        fail("")
-      }
-
-    }
-
     "orElse" {
-      some.orElse { Some("java") }.get() shouldBe "kotlin"
-      none.orElse { Some("java") }.get() shouldBe "java"
+      some.orElse { Some("java") } shouldBe Some("kotlin")
+      none.orElse { Some("java") } shouldBe Some("java")
     }
 
     "toList" {
       some.toList() shouldBe listOf("kotlin")
       none.toList() shouldBe listOf<String>()
-    }
-
-    "getAsOption" {
-      val map = mapOf(1 to "uno", 2 to "dos", 4 to null)
-      map.option[1] shouldBe Some("uno")
-      map.option[3] shouldBe None
-      map.option[4] shouldBe None
     }
 
     "firstOption" {

@@ -6,7 +6,8 @@ import arrow.data.IndexedStateT
 import arrow.data.IndexedStateTPartialOf
 import arrow.data.StateT
 import arrow.data.StateTPartialOf
-import arrow.instance
+import arrow.deprecation.ExtensionsDSLDeprecated
+import arrow.extension
 import arrow.instances.*
 import arrow.mtl.typeclasses.MonadCombine
 import arrow.mtl.typeclasses.MonadState
@@ -14,8 +15,10 @@ import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.SemigroupK
 
-@instance(IndexedStateT::class)
-interface IndexedStateTMonadStateInstance<F, S> : IndexedStateTMonadInstance<F, S>, MonadState<IndexedStateTPartialOf<F, S, S>, S> {
+@extension
+interface IndexedStateTMonadStateInstance<F, S> : MonadState<IndexedStateTPartialOf<F, S, S>, S> , IndexedStateTMonadInstance<F, S> {
+
+  override fun FF(): Monad<F>
 
   override fun get(): IndexedStateT<F, S, S, S> = IndexedStateT.get(FF())
 
@@ -23,10 +26,12 @@ interface IndexedStateTMonadStateInstance<F, S> : IndexedStateTMonadInstance<F, 
 
 }
 
-@instance(IndexedStateT::class)
+@extension
 interface IndexedStateTMonadCombineInstance<F, S> : MonadCombine<IndexedStateTPartialOf<F, S, S>>, IndexedStateTMonadInstance<F, S>, IndexedStateTSemigroupKInstance<F, S, S> {
 
   fun MC(): MonadCombine<F>
+
+  override fun MF(): Monad<F> = MC()
 
   override fun FF(): Monad<F> = MC()
 
@@ -40,10 +45,15 @@ interface IndexedStateTMonadCombineInstance<F, S> : MonadCombine<IndexedStateTPa
 }
 
 class StateTMtlContext<F, S, E>(val ME: MonadError<F, E>) : IndexedStateTMonadStateInstance<F, S>, IndexedStateTMonadErrorInstance<F, S, E> {
+
+  override fun MF(): Monad<F> = ME
+
   override fun FF(): MonadError<F, E> = ME
+
 }
 
 class StateTMtlContextPartiallyApplied<F, S, E>(val ME: MonadError<F, E>) {
+  @Deprecated(ExtensionsDSLDeprecated)
   infix fun <A> extensions(f: StateTMtlContext<F, S, E>.() -> A): A =
     f(StateTMtlContext(ME))
 }
