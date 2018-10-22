@@ -1,6 +1,8 @@
 package arrow.test.laws
 
 import arrow.core.*
+import arrow.instances.const.applicative.applicative
+import arrow.instances.id.applicative.applicative
 import arrow.typeclasses.*
 import arrow.optics.Prism
 import arrow.optics.modify
@@ -9,7 +11,7 @@ import io.kotlintest.properties.forAll
 
 object PrismLaws {
 
-  inline fun <A, B> laws(prism: Prism<A, B>, aGen: Gen<A>, bGen: Gen<B>, funcGen: Gen<(B) -> B>, EQA: Eq<A>, EQOptionB: Eq<Option<B>>): List<Law> = listOf(
+  fun <A, B> laws(prism: Prism<A, B>, aGen: Gen<A>, bGen: Gen<B>, funcGen: Gen<(B) -> B>, EQA: Eq<A>, EQOptionB: Eq<Option<B>>): List<Law> = listOf(
     Law("Prism law: partial round trip one way") { prism.partialRoundTripOneWay(aGen, EQA) },
     Law("Prism law: round trip other way") { prism.roundTripOtherWay(bGen, EQOptionB) },
     Law("Prism law: modify identity") { prism.modifyIdentity(aGen, EQA) },

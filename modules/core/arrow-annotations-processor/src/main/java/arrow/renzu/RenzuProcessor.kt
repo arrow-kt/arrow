@@ -1,17 +1,11 @@
 package arrow.renzu
 
 import arrow.common.utils.AbstractProcessor
-import arrow.common.utils.ClassOrPackageDataWrapper
-import arrow.common.utils.knownError
-import arrow.instances.AnnotatedInstance
-import arrow.instances.instanceAnnotationClass
-import arrow.instances.instanceAnnotationName
+import arrow.instances.*
 import com.google.auto.service.AutoService
-import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.TypeTable
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.SourceVersion
-import javax.lang.model.element.ElementKind
 import javax.lang.model.element.TypeElement
 
 @AutoService(Processor::class)
@@ -23,38 +17,25 @@ class RenzuProcessor(val isolateForTests: Boolean = false) : AbstractProcessor()
 
   override fun getSupportedAnnotationTypes(): Set<String> = setOf(instanceAnnotationClass.canonicalName)
 
+  override fun onProcess(annotations: Set<TypeElement>, roundEnv: RoundEnvironment) {
+    //TODO Rewire based on arrow-meta after 0.8.0 (impl below)
+  }
+
   /**
    * Processor entry point
    */
-  override fun onProcess(annotations: Set<TypeElement>, roundEnv: RoundEnvironment) {
-    annotatedList += roundEnv
-      .getElementsAnnotatedWith(instanceAnnotationClass)
-      .map { element ->
-        when (element.kind) {
-          ElementKind.INTERFACE -> processClass(element as TypeElement)
-          else -> knownError("$instanceAnnotationName can only be used on interfaces")
-        }
-      }
-
-    if (roundEnv.processingOver()) {
-      RenzuGenerator(this, annotatedList, isolateForTests).generate()
-    }
-  }
-
-  private fun processClass(element: TypeElement): AnnotatedInstance {
-    val proto: ClassOrPackageDataWrapper.Class = getClassOrPackageDataWrapper(element) as ClassOrPackageDataWrapper.Class
-    val dataType = element.annotationMirrors.flatMap { am ->
-      am.elementValues.entries.filter {
-        "target" == it.key.simpleName.toString()
-      }.map {
-        val targetName = it.value.toString().replace(".class", "")
-        val targetElement = elementUtils.getTypeElement(targetName)
-        getClassOrPackageDataWrapper(targetElement) as ClassOrPackageDataWrapper.Class
-      }
-    }
-    val typeTable = TypeTable(proto.classProto.typeTable)
-    val superTypes: List<ClassOrPackageDataWrapper.Class> =
-      recurseTypeclassInterfaces(proto, typeTable, emptyList()).map { it as ClassOrPackageDataWrapper.Class }
-    return AnnotatedInstance(element, proto, superTypes, this, dataType[0])
-  }
+//  fun onProcessTODO(annotations: Set<TypeElement>, roundEnv: RoundEnvironment) {
+//    annotatedList += roundEnv
+//      .getElementsAnnotatedWith(instanceAnnotationClass)
+//      .map { element ->
+//        when (element.kind) {
+//          ElementKind.INTERFACE -> LegacyInstanceProcessor.processClass(this, element as TypeElement)
+//          else -> knownError("$instanceAnnotationName can only be used on interfaces")
+//        }
+//      }
+//
+//    if (roundEnv.processingOver()) {
+//      RenzuGenerator(this, annotatedList, isolateForTests).generate()
+//    }
+//  }
 }

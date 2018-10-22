@@ -1,9 +1,10 @@
 package arrow.data
 
 import arrow.Kind2
-import arrow.instances.IntMonoidInstance
-import arrow.instances.ForSortedMapK
+import arrow.instances.functor
 import arrow.instances.monoid
+import arrow.instances.show
+import arrow.instances.traverse
 import arrow.test.UnitSpec
 import arrow.test.laws.MonoidLaws
 import arrow.test.laws.SemigroupLaws
@@ -23,21 +24,19 @@ class SortedMapKTest : UnitSpec() {
 
   init {
 
-    ForSortedMapK<String>() extensions {
-      testLaws(
-        ShowLaws.laws(SortedMapK.show(), EQ) { sortedMapOf("key" to 1).k() },
-        MonoidLaws.laws(SortedMapK.monoid<String, Int>(Int.monoid()), sortedMapOf("key" to 1).k(), EQ),
-        SemigroupLaws.laws(SortedMapK.monoid<String, Int>(Int.monoid()),
-          sortedMapOf("key" to 1).k(),
-          sortedMapOf("key" to 2).k(),
-          sortedMapOf("key" to 3).k(),
-          EQ),
-        TraverseLaws.laws(
-          this,
-          this,
-          { a: Int -> sortedMapOf("key" to a).k() },
-          EQ))
-    }
+    testLaws(
+      ShowLaws.laws(SortedMapK.show(), EQ) { sortedMapOf("key" to 1).k() },
+      MonoidLaws.laws(SortedMapK.monoid<String, Int>(Int.monoid()), sortedMapOf("key" to 1).k(), EQ),
+      SemigroupLaws.laws(SortedMapK.monoid<String, Int>(Int.monoid()),
+        sortedMapOf("key" to 1).k(),
+        sortedMapOf("key" to 2).k(),
+        sortedMapOf("key" to 3).k(),
+        EQ),
+      TraverseLaws.laws(
+        SortedMapK.traverse<String>(),
+        SortedMapK.functor<String>(),
+        { a: Int -> sortedMapOf("key" to a).k() },
+        EQ))
 
   }
 

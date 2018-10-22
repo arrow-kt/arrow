@@ -8,7 +8,7 @@ import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Monad
 
-inline fun <M, S, A> FreeOf<S, A>.foldMapK(f: FunctionK<S, M>, MM: Monad<M>): Kind<M, A> =
+fun <M, S, A> FreeOf<S, A>.foldMapK(f: FunctionK<S, M>, MM: Monad<M>): Kind<M, A> =
   (this as Free<S, A>).foldMap(f, MM)
 
 @higherkind

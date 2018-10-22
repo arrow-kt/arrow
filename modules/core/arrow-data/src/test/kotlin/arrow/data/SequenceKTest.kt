@@ -1,9 +1,13 @@
 package arrow.data
 
 import arrow.Kind
-import arrow.instances.IntEqInstance
 import arrow.instances.eq
-import arrow.instances.extensions
+import arrow.instances.sequencek.applicative.applicative
+import arrow.instances.sequencek.eq.eq
+import arrow.instances.sequencek.monad.monad
+import arrow.instances.sequencek.monoid.monoid
+import arrow.instances.sequencek.monoidK.monoidK
+import arrow.instances.sequencek.traverse.traverse
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
@@ -28,15 +32,13 @@ class SequenceKTest : UnitSpec() {
         toList().toString()
     }
 
-    ForSequenceK extensions {
-      testLaws(
-        EqLaws.laws(SequenceK.eq(Int.eq())) { sequenceOf(it).k() },
-        ShowLaws.laws(show, eq) { sequenceOf(it).k() },
-        MonadLaws.laws(this, eq),
-        MonoidKLaws.laws(this, this, eq),
-        MonoidLaws.laws(SequenceK.monoid(), Gen.list(Gen.int()).map{it.asSequence()}.generate().k(), eq),
-        TraverseLaws.laws(this, this, { n: Int -> SequenceK(sequenceOf(n)) }, eq)
-      )
-    }
+    testLaws(
+      EqLaws.laws(SequenceK.eq(Int.eq())) { sequenceOf(it).k() },
+      ShowLaws.laws(show, eq) { sequenceOf(it).k() },
+      MonadLaws.laws(SequenceK.monad(), eq),
+      MonoidKLaws.laws(SequenceK.monoidK(), SequenceK.applicative(), eq),
+      MonoidLaws.laws(SequenceK.monoid(), Gen.list(Gen.int()).map { it.asSequence() }.generate().k(), eq),
+      TraverseLaws.laws(SequenceK.traverse(), SequenceK.applicative(), { n: Int -> SequenceK(sequenceOf(n)) }, eq)
+    )
   }
 }

@@ -13,7 +13,7 @@ import io.kotlintest.properties.forAll
 
 object FunctorLaws {
 
-  inline fun <F> laws(AP: Applicative<F>, EQ: Eq<Kind<F, Int>>): List<Law> =
+  fun <F> laws(AP: Applicative<F>, EQ: Eq<Kind<F, Int>>): List<Law> =
     InvariantLaws.laws(AP, AP::just, EQ) + listOf(
       Law("Functor Laws: Covariant Identity") { AP.covariantIdentity(AP::just, EQ) },
       Law("Functor Laws: Covariant Composition") { AP.covariantComposition(AP::just, EQ) }

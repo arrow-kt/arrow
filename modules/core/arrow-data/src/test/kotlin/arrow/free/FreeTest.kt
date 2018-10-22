@@ -1,11 +1,16 @@
 package arrow.free
 
-import arrow.Kind
 import arrow.core.*
 import arrow.data.NonEmptyList
 import arrow.data.fix
-import arrow.data.monad
-import arrow.free.instances.*
+import arrow.free.instances.FreeEq
+import arrow.free.instances.FreeMonadInstance
+import arrow.free.instances.free.eq.eq
+import arrow.free.instances.free.monad.monad
+import arrow.higherkind
+import arrow.instances.id.monad.monad
+import arrow.instances.nonemptylist.monad.monad
+import arrow.instances.option.monad.monad
 import arrow.test.UnitSpec
 import arrow.test.laws.EqLaws
 import arrow.test.laws.MonadLaws
@@ -14,22 +19,19 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import org.junit.runner.RunWith
 
-sealed class Ops<out A> : Kind<Ops.F, A> {
-
-  class F private constructor()
+@higherkind
+sealed class Ops<out A> : OpsOf<A> {
 
   data class Value(val a: Int) : Ops<Int>()
   data class Add(val a: Int, val y: Int) : Ops<Int>()
   data class Subtract(val a: Int, val y: Int) : Ops<Int>()
 
-  companion object : FreeMonadInstance<F> {
-    fun value(n: Int): Free<F, Int> = Free.liftF(Value(n))
-    fun add(n: Int, y: Int): Free<F, Int> = Free.liftF(Add(n, y))
-    fun subtract(n: Int, y: Int): Free<F, Int> = Free.liftF(Subtract(n, y))
+  companion object : FreeMonadInstance<ForOps> {
+    fun value(n: Int): Free<ForOps, Int> = Free.liftF(Value(n))
+    fun add(n: Int, y: Int): Free<ForOps, Int> = Free.liftF(Add(n, y))
+    fun subtract(n: Int, y: Int): Free<ForOps, Int> = Free.liftF(Subtract(n, y))
   }
 }
-
-fun <A> Kind<Ops.F, A>.fix(): Ops<A> = this as Ops<A>
 
 @RunWith(KTestJUnitRunner::class)
 class FreeTest : UnitSpec() {
@@ -40,7 +42,7 @@ class FreeTest : UnitSpec() {
     subtracted
   }.fix()
 
-  private fun stackSafeTestProgram(n: Int, stopAt: Int): Free<Ops.F, Int> = Ops.binding {
+  private fun stackSafeTestProgram(n: Int, stopAt: Int): Free<ForOps, Int> = Ops.binding {
     val v = Ops.add(n, 1).bind()
     val r = bind { if (v < stopAt) stackSafeTestProgram(v, stopAt) else Free.just(v) }
     r
@@ -50,15 +52,13 @@ class FreeTest : UnitSpec() {
 
     val IdMonad = Id.monad()
 
-    val EQ: FreeEq<Ops.F, ForId, Int> = Free.eq(idInterpreter, IdMonad)
+    val EQ: FreeEq<ForOps, ForId, Int> = Free.eq(IdMonad, idInterpreter)
 
-    ForFree<Ops.F>() extensions {
-      testLaws(
-        EqLaws.laws(EQ) { Ops.value(it) },
-        MonadLaws.laws(Ops, EQ),
-        MonadLaws.laws(this, EQ)
-      )
-    }
+    testLaws(
+      EqLaws.laws(EQ) { Ops.value(it) },
+      MonadLaws.laws(Ops, EQ),
+      MonadLaws.laws(Free.monad(), EQ)
+    )
 
     "Can interpret an ADT as Free operations" {
       program.foldMap(optionInterpreter, Option.monad()).fix() shouldBe Some(-30)

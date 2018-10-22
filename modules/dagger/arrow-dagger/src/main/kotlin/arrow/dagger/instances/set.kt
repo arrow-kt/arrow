@@ -4,6 +4,9 @@ import arrow.data.*
 import arrow.instances.SetKEqInstance
 import arrow.instances.SetKMonoidInstance
 import arrow.instances.SetKSemigroupInstance
+import arrow.instances.setk.foldable.foldable
+import arrow.instances.setk.monoidK.monoidK
+import arrow.instances.setk.semigroupK.semigroupK
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.MonoidK

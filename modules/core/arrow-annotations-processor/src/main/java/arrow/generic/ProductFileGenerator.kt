@@ -161,12 +161,15 @@ class ProductFileGenerator(
                 |  ${product.sourceSimpleName}EqInstance.defaultInstance
                 |""".trimMargin()
 
+  //TODO instance imports are hardcoded
   private fun processElement(product: AnnotatedGeneric): Pair<AnnotatedGeneric, String> = product to """
             |package ${product.classData.`package`.escapedClassName}
             |
             |import arrow.typeclasses.*
             |import arrow.core.*
             |import arrow.instances.*
+            |import arrow.instances.option.monoid.monoid
+            |import arrow.instances.option.semigroup.semigroup
             |
             |${semigroupExtensions(product)}
             |
@@ -234,7 +237,7 @@ class ProductFileGenerator(
 
   private fun classConstructorFromHList(sourceClassName: String, propertiesSize: Int): String =
     (0 until propertiesSize).joinToString(prefix = "$sourceClassName(", postfix = ")", transform = {
-      "this." + (0 until it).fold("") { acc, n ->
+      "this." + (0 until it).fold("") { acc, _ ->
         acc + "tail."
       } + "head"
     })

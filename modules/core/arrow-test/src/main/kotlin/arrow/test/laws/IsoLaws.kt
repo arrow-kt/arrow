@@ -1,6 +1,8 @@
 package arrow.test.laws
 
 import arrow.core.*
+import arrow.instances.const.applicative.applicative
+import arrow.instances.id.functor.functor
 import arrow.typeclasses.*
 import arrow.optics.Iso
 import io.kotlintest.properties.Gen
@@ -8,7 +10,7 @@ import io.kotlintest.properties.forAll
 
 object IsoLaws {
 
-  inline fun <A, B> laws(iso: Iso<A, B>, aGen: Gen<A>, bGen: Gen<B>, funcGen: Gen<(B) -> B>, EQA: Eq<A>, EQB: Eq<B>, bMonoid: Monoid<B>): List<Law> =
+  fun <A, B> laws(iso: Iso<A, B>, aGen: Gen<A>, bGen: Gen<B>, funcGen: Gen<(B) -> B>, EQA: Eq<A>, EQB: Eq<B>, bMonoid: Monoid<B>): List<Law> =
     listOf(
       Law("Iso Law: round trip one way") { iso.roundTripOneWay(aGen, EQA) },
       Law("Iso Law: round trip other way") { iso.roundTripOtherWay(bGen, EQB) },

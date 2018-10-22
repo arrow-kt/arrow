@@ -9,7 +9,7 @@ import arrow.higherkind
 import arrow.typeclasses.Applicative
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
-import kotlin.coroutines.experimental.CoroutineContext
+import kotlin.coroutines.CoroutineContext
 
 fun <A> Observable<A>.k(): ObservableK<A> = ObservableK(this)
 
@@ -97,32 +97,8 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
         is Either.Right -> Observable.just(either.b).k()
       }
     }
-
-    fun monadFlat(): ObservableKMonadInstance = monad()
-
-    fun monadConcat(): ObservableKMonadInstance = object : ObservableKMonadInstance {
-      override fun <A, B> Kind<ForObservableK, A>.flatMap(f: (A) -> Kind<ForObservableK, B>): ObservableK<B> =
-        fix().concatMap { f(it).fix() }
-    }
-
-    fun monadSwitch(): ObservableKMonadInstance = object : ObservableKMonadErrorInstance {
-      override fun <A, B> Kind<ForObservableK, A>.flatMap(f: (A) -> Kind<ForObservableK, B>): ObservableK<B> =
-        fix().switchMap { f(it).fix() }
-    }
-
-    fun monadErrorFlat(): ObservableKMonadErrorInstance = monadError()
-
-    fun monadErrorConcat(): ObservableKMonadErrorInstance = object : ObservableKMonadErrorInstance {
-      override fun <A, B> Kind<ForObservableK, A>.flatMap(f: (A) -> Kind<ForObservableK, B>): ObservableK<B> =
-        fix().concatMap { f(it).fix() }
-    }
-
-    fun monadErrorSwitch(): ObservableKMonadErrorInstance = object : ObservableKMonadErrorInstance {
-      override fun <A, B> Kind<ForObservableK, A>.flatMap(f: (A) -> Kind<ForObservableK, B>): ObservableK<B> =
-        fix().switchMap { f(it).fix() }
-    }
   }
 }
 
-inline fun <A, G> ObservableKOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, ObservableK<A>> =
+fun <A, G> ObservableKOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, ObservableK<A>> =
   fix().traverse(GA, ::identity)
