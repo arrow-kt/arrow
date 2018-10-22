@@ -1,14 +1,14 @@
 package arrow.integrations.retrofit.adapter
 
 import arrow.core.Either
-import arrow.core.applicativeError
 import arrow.core.fix
 import arrow.effects.IO
 import arrow.effects.ObservableK
-import arrow.effects.applicativeError
-import arrow.effects.async
 import arrow.effects.fix
-import arrow.effects.monadDefer
+import arrow.effects.instances.io.async.async
+import arrow.effects.observablek.applicativeError.applicativeError
+import arrow.effects.observablek.monadDefer.monadDefer
+import arrow.instances.either.applicativeError.applicativeError
 import arrow.integrations.retrofit.adapter.mock.ResponseMock
 import arrow.integrations.retrofit.adapter.retrofit.ApiClientTest
 import arrow.integrations.retrofit.adapter.retrofit.retrofit
