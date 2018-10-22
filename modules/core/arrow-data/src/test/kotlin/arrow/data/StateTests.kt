@@ -1,9 +1,9 @@
 package arrow.data
 
-import arrow.core.Id
+import arrow.core.ForOption
 import arrow.core.Tuple2
-import arrow.core.functor
 import arrow.core.toT
+import arrow.instances.extensions
 import arrow.test.UnitSpec
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
@@ -22,11 +22,14 @@ class StateTests : UnitSpec() {
     }
 
     "addOne.map(n -> n).run(1) should return same Pair(2, 1)" {
-      addOne.map(Id.functor(), { n -> n }).run(1) shouldBe Tuple2(2, 1)
+      ForOption extensions {
+
+      }
+      addOne.map { n -> n }.run(1) shouldBe Tuple2(2, 1)
     }
 
     "addOne.map(n -> n.toString).run(1) should return same Pair(2, \"1\")" {
-      addOne.map(Id.functor(), Int::toString).run(1) shouldBe Tuple2(2, "1")
+      addOne.map(Int::toString).run(1) shouldBe Tuple2(2, "1")
     }
 
     "addOne.runS(1) should return 2" {

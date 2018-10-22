@@ -94,42 +94,45 @@ fun <F, S, E> arrow.data.IndexedStateT.Companion.monadError(FF: arrow.typeclasse
     override fun FF(): arrow.typeclasses.MonadError<F, E> = FF
   }
 
-//
-///**
-// * Alias for[StateT.Companion.applicative]
-// */
-//fun <S> StateApi.applicative(): Applicative<StateTPartialOf<ForId, S>> = StateT.applicative<ForId, S>(Id.monad())
-//
-///**
-// * Alias for [StateT.Companion.functor]
-// */
-//fun <S> StateApi.functor(): Functor<StateTPartialOf<ForId, S>> = StateT.functor<ForId, S>(Id.monad())
-//
-///**
-// * Alias for [StateT.Companion.monad]
-// */
-//fun <S> StateApi.monad(): Monad<StateTPartialOf<ForId, S>> = StateT.monad<ForId, S>(Id.monad())
-//
-//class StateTContext<F, S, E>(val ME: MonadError<F, E>) : StateTMonadErrorInstance<F, S, E> {
-//  override fun FF(): MonadError<F, E> = ME
-//}
-//
-//class StateTContextPartiallyApplied<F, S, E>(val ME: MonadError<F, E>) {
-//  infix fun <A> extensions(f: StateTContext<F, S, E>.() -> A): A =
-//    f(StateTContext(ME))
-//}
-//
-//fun <F, S, E> ForStateT(ME: MonadError<F, E>): StateTContextPartiallyApplied<F, S, E> =
-//  StateTContextPartiallyApplied(ME)
-//
-//class StateTMonadContext<S> : StateTMonadInstance<ForId, S> {
-//  override fun FF(): Monad<ForId> = Id.monad()
-//}
-//
-//class StateContextPartiallyApplied<S>() {
-//  infix fun <A> extensions(f: StateTMonadContext<S>.() -> A): A =
-//    f(StateTMonadContext())
-//}
-//
-//fun <S> ForState(): StateContextPartiallyApplied<S> =
-//  StateContextPartiallyApplied()
+
+/**
+ * Alias for[StateT.Companion.applicative]
+ */
+fun <S> StateApi.applicative(): Applicative<StateTPartialOf<ForId, S>> = StateT.applicative<ForId, S>(Id.monad())
+
+/**
+ * Alias for [StateT.Companion.functor]
+ */
+fun <S> StateApi.functor(): Functor<StateTPartialOf<ForId, S>> = StateT.functor<ForId, S>(Id.monad())
+
+/**
+ * Alias for [StateT.Companion.monad]
+ */
+fun <S> StateApi.monad(): Monad<StateTPartialOf<ForId, S>> = StateT.monad<ForId, S>(Id.monad())
+
+class IndexedStateTContext<F, S, E>(val ME: MonadError<F, E>) : IndexedStateTMonadErrorInstance<F, S, E> {
+  override fun FF(): MonadError<F, E> = ME
+}
+
+class IndexedStateTContextPartiallyApplied<F, S, E>(val ME: MonadError<F, E>) {
+  infix fun <A> extensions(f: IndexedStateTContext<F, S, E>.() -> A): A =
+    f(IndexedStateTContext(ME))
+}
+
+fun <F, S, E> ForIndexedStateT(ME: MonadError<F, E>): IndexedStateTContextPartiallyApplied<F, S, E> =
+  IndexedStateTContextPartiallyApplied(ME)
+
+fun <F, S, E> ForStateT(ME: MonadError<F, E>): IndexedStateTContextPartiallyApplied<F, S, E> =
+  IndexedStateTContextPartiallyApplied(ME)
+
+class StateTMonadContext<S> : IndexedStateTMonadInstance<ForId, S> {
+  override fun FF(): Monad<ForId> = Id.monad()
+}
+
+class StateContextPartiallyApplied<S> {
+  infix fun <A> extensions(f: StateTMonadContext<S>.() -> A): A =
+    f(StateTMonadContext())
+}
+
+fun <S> ForState(): StateContextPartiallyApplied<S> =
+  StateContextPartiallyApplied()

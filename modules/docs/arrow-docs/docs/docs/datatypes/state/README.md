@@ -18,7 +18,6 @@ intermediate
 Let's build a simple Stack using Arrow's NonEmptyList and Option:
 
 ```kotlin:ank:silent
-import arrow.*
 import arrow.core.*
 import arrow.data.*
 
@@ -28,8 +27,6 @@ typealias Stack = Option<Nel<String>>
 Now we only need the push and pop methods, as follows:
 
 ```kotlin:ank:silent
-import arrow.*
-
 fun pop(stack: Stack) = stack.fold({
     None toT None
 }, {
@@ -70,8 +67,6 @@ Our `pop` function takes a `Stack` and returns an updated `Stack` and a `String`
 Let's write a new version of `pop` and `push` using `State`:
 
 ```kotlin:ank:silent
-import arrow.*
-
 fun pop() = State<Stack, Option<String>> { stack ->
     stack.fold({
         None toT None
@@ -96,7 +91,7 @@ import arrow.typeclasses.*
 import arrow.instances.*
 
 fun stackOperations() = ForState<Stack>() extensions {
-  binding {
+  binding<StatePartialOf<Stack>, Option<String>> {
     val a = push("a").bind()
     val b = pop().bind()
     val c = pop().bind()

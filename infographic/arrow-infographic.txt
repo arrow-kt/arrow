@@ -41,7 +41,7 @@
 [<typeclasses>Functor]<-[<typeclasses>Comonad]
 [<typeclasses>Functor]<-[<typeclasses>FunctorFilter]
 [<typeclasses>Functor]<-[<typeclasses>Traverse]
-[<typeclasses>Index]<-[<instances>Index Instances|ListKIndexInstance|MapKIndexInstance|NonEmptyListIndexInstance|SequenceKIndexInstance]
+[<typeclasses>Index]<-[<instances>Index Instances|ListKIndexInstance|MapKIndexInstance|NonEmptyListIndexInstance|SequenceKIndexInstance|ListKFilterIndexInstance|MapKFilterIndexInstance|NonEmptyListFilterIndexInstance|SequenceKFilterIndexInstance]
 [<typeclasses>Invariant]<-[<instances>Invariant Instances|ConstInvariant|MonoidInvariantInstance]
 [<typeclasses>Invariant]<-[<typeclasses>Contravariant]
 [<typeclasses>Invariant]<-[<typeclasses>Functor]

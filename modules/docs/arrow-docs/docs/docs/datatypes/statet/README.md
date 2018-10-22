@@ -133,7 +133,7 @@ import arrow.instances.*
 
 fun stackOperationsS2() = 
  ForStateT<EitherPartialOf<StackError>, Stack, StackError>(Either.monadError<StackError>()) extensions {
-  binding {
+  binding<StateTPartialOf<EitherPartialOf<StackError>, Stack>, String> {
     pushS("a").bind()
     popS().bind()
     val string = popS().bind()

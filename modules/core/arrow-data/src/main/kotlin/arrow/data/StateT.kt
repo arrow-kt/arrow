@@ -1,5 +1,7 @@
 package arrow.data
 
+import arrow.typeclasses.Applicative
+
 /**
  * Alias that represent stateful computation of the form `(S) -> Tuple2<S, A>` with a result in certain context `F`.
  */
@@ -34,3 +36,22 @@ typealias StateTPartialOf<F, S> = IndexedStateTPartialOf<F, S, S>
  * @param A current value of computation.
  */
 typealias StateT<F, S, A> = IndexedStateT<F, S, S, A>
+
+/**
+ * Constructor for State.
+ * StateT<F, S, A> is an alias for IndexedStateT<F, S, S, A>
+ *
+ * @param runF the stateful function to wrap with [State].
+ */
+@Suppress("FunctionName")
+fun <F, S, A> StateT(runF: StateTFunOf<F, S, A>,  @Suppress("UNUSED_PARAMETER") dummy: Unit = Unit): StateT<F, S, A> = IndexedStateT(runF)
+
+/**
+ * Constructor for State.
+ * StateT<F, S, A> is an alias for IndexedStateT<F, S, S, A>
+ *
+ * @param AF applicative instance for context [F].
+ * @param run the stateful function to wrap with [State].
+ */
+@Suppress("FunctionName")
+fun <F, S, A> StateT(AF: Applicative<F>, run: StateTFun<F, S, A>): StateT<F, S, A> = IndexedStateT(AF.just(run))
