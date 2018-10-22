@@ -59,7 +59,7 @@ interface PSetter<S, T, A, B> : PSetterOf<S, T, A, B> {
      * Invoke operator overload to create a [PSetter] of type `S` with target `A`.
      * Can also be used to construct [Setter]
      */
-    operator fun <S, T, A, B> invoke(modify: (S, ((A) -> B)) ->T): PSetter<S, T, A, B> = object : PSetter<S, T, A, B> {
+    operator fun <S, T, A, B> invoke(modify: (S, ((A) -> B)) -> T): PSetter<S, T, A, B> = object : PSetter<S, T, A, B> {
       override fun modify(s: S, f: (A) -> B): T = modify(s, f)
 
       override fun set(s: S, b: B): T = modify(s) { b }
