@@ -8,7 +8,6 @@ import arrow.effects.IOFrame
 import arrow.effects.IORunLoop
 import arrow.effects.fix
 import arrow.effects.internal.IOPlatform.composeErrors
-import arrow.effects.monad
 import arrow.effects.typeclasses.ExitCase
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -137,10 +136,8 @@ internal object IOBracket {
     // Unregistering cancel token, otherwise we can have a memory leak;
     // N.B. conn.pop() happens after the evaluation of `release`, because
     // otherwise we might have a conflict with the auto-cancellation logic
-    override fun recover(e: Throwable): IO<B> = IO.monad().run {
-      IO.ContextSwitch(applyRelease(ExitCase.Error(e)), makeUncancelable, disableUncancelableAndPop)
-        .flatMap(ReleaseRecover(e))
-    }
+    override fun recover(e: Throwable): IO<B> = IO.ContextSwitch(applyRelease(ExitCase.Error(e)), makeUncancelable, disableUncancelableAndPop)
+      .flatMap(ReleaseRecover(e))
 
     override operator fun invoke(b: B): IO<B> =
     // Unregistering cancel token, otherwise we can have a memory leak
