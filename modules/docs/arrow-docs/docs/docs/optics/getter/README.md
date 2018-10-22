@@ -18,11 +18,11 @@ Creating a `Getter` can be done by referencing a property of a data classes or b
 import arrow.optics.*
 import arrow.*
 
-data class Foo(val bar: Int)
+data class Player(val health: Int)
 
-val barGetter = Getter(Foo::bar)
-
-barGetter.get(Foo(5))
+val healthGetter = Getter(Player::health)
+val player = Player(75)
+healthGetter.get(player)
 ```
 ```kotlin:ank
 import arrow.data.*
@@ -42,7 +42,7 @@ import arrow.optics.instances.*
 
 val headGetter: Getter<NonEmptyList<String>, String> = NonEmptyList.head<String>().asGetter()
 val tupleGetter: Getter<Tuple2<String, Int>, String> = Tuple2.first<String, Int>().asGetter()
-```
+``` 
 
 `Getter` also has some convenience methods to make working with [Reader]({{ '/docs/datatypes/reader' | relative_url }}) easier.
 
@@ -59,13 +59,27 @@ NonEmptyList.head<String>().asGetter().asks(String::decapitalize)
   .runId(NonEmptyList("Hello", "World", "Viewed", "With", "Optics"))
 ```
 
+There are also some convenience methods to make working with [State]({{ '/docs/datatypes/state' | relative_url }}) easier.
+
+```kotlin:ank
+import arrow.data.*
+
+val inspectHealth = healthGetter.extract()
+inspectHealth.run(player)
+```
+
+```kotlin:ank
+val takeMedpack = healthGetter.extractMap { it + 25 }
+takeMedpack.run(player)
+```
+
 ## Composition
 
 Unlike a regular `get` function a `Getter` composes. Similar to a `Lens` we can compose `Getter`s to create telescopes and zoom into nested structures.
 
 ```kotlin:ank
-val firstBar: Getter<NonEmptyList<Foo>, Int> = NonEmptyList.head<Foo>() compose barGetter
-firstBar.get(Foo(5).nel())
+val firstBar: Getter<NonEmptyList<Player>, Int> = NonEmptyList.head<Player>() compose healthGetter
+firstBar.get(Player(5).nel())
 ```
 
 `Getter` can be composed with `Getter`, `Iso`, `Lens` and `Fold` and the composition results in the following optics.
