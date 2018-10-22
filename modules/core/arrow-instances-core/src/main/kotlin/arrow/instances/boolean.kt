@@ -1,6 +1,5 @@
 package arrow.instances
 
-import arrow.core.DeprecatedAmbiguity
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Show
 
