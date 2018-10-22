@@ -140,7 +140,7 @@ interface POptional<S, T, A, B> : POptionalOf<S, T, A, B> {
   fun <C> first(): POptional<Tuple2<S, C>, Tuple2<T, C>, Tuple2<A, C>, Tuple2<B, C>> =
     POptional(
       { (s, c) -> getOrModify(s).bimap({ it toT c }, { it toT c }) },
-      {  (s, c2), (b, c) -> setOption(s, b).fold({ set(s, b) toT c2 }, { it toT c }) }
+      { (s, c2), (b, c) -> setOption(s, b).fold({ set(s, b) toT c2 }, { it toT c }) }
     )
 
   /**
@@ -217,7 +217,7 @@ interface POptional<S, T, A, B> : POptionalOf<S, T, A, B> {
   /**
    * View a [POptional] as a [PSetter]
    */
-  fun asSetter(): PSetter<S, T, A, B> = PSetter { f -> { s -> modify(s, f) } }
+  fun asSetter(): PSetter<S, T, A, B> = PSetter { s, f -> modify(s, f) }
 
   /**
    * View a [POptional] as a [Fold]

@@ -187,7 +187,7 @@ interface PLens<S, T, A, B> : PLensOf<S, T, A, B> {
   /**
    * View a [PLens] as a [PSetter]
    */
-  fun asSetter(): PSetter<S, T, A, B> = PSetter { f -> { s -> modify(s, f) } }
+  fun asSetter(): PSetter<S, T, A, B> = PSetter { s, f -> modify(s, f) }
 
   /**
    * View a [PLens] as a [Fold]

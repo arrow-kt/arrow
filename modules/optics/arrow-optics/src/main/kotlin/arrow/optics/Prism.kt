@@ -199,7 +199,7 @@ interface PPrism<S, T, A, B> : PPrismOf<S, T, A, B> {
   /**
    * View a [PPrism] as a [PSetter]
    */
-  fun asSetter(): PSetter<S, T, A, B> = PSetter { f -> { s -> modify(s, f) } }
+  fun asSetter(): PSetter<S, T, A, B> = PSetter { s, f -> modify(s, f) }
 
   /**
    * View a [PPrism] as a [Fold]

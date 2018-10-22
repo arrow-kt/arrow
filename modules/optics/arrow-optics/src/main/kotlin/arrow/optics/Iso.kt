@@ -238,7 +238,7 @@ interface PIso<S, T, A, B> : PIsoOf<S, T, A, B> {
   /**
    * View a [PIso] as a [PSetter]
    */
-  fun asSetter(): PSetter<S, T, A, B> = PSetter { f -> { s -> modify(s, f) } }
+  fun asSetter(): PSetter<S, T, A, B> = PSetter { s, f -> modify(s, f) }
 
   /**
    * View a [PIso] as a [Fold]
