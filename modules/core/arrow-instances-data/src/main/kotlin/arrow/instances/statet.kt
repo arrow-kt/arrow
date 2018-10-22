@@ -16,7 +16,7 @@ interface IndexedStateTFunctorInstance<F, S> : Functor<IndexedStateTPartialOf<F,
   fun FF(): Functor<F>
 
   override fun <A, B> Kind<IndexedStateTPartialOf<F, S, S>, A>.map(f: (A) -> B): Kind<IndexedStateTPartialOf<F, S, S>, B> =
-    this.fix().map(FF(), f)
+    fix().map(FF(), f)
 
 }
 
@@ -31,10 +31,10 @@ interface IndexedStateTApplicativeInstance<F, S> : Applicative<IndexedStateTPart
     IndexedStateT.just(MF(), a)
 
   override fun <A, B> Kind<IndexedStateTPartialOf<F, S, S>, A>.ap(ff: Kind<IndexedStateTPartialOf<F, S, S>, (A) -> B>): Kind<IndexedStateTPartialOf<F, S, S>, B> =
-    this.fix().ap(MF(), ff)
+    fix().ap(MF(), ff)
 
   override fun <A, B> Kind<IndexedStateTPartialOf<F, S, S>, A>.map(f: (A) -> B): Kind<IndexedStateTPartialOf<F, S, S>, B> =
-    this.fix().map(MF(), f)
+    fix().map(MF(), f)
 
 }
 
@@ -44,13 +44,13 @@ interface IndexedStateTMonadInstance<F, S> : Monad<IndexedStateTPartialOf<F, S, 
   override fun FF(): Monad<F>
 
   override fun <A, B> Kind<IndexedStateTPartialOf<F, S, S>, A>.flatMap(f: (A) -> Kind<IndexedStateTPartialOf<F, S, S>, B>): Kind<IndexedStateTPartialOf<F, S, S>, B> =
-    this.fix().flatMap(FF(), f)
+    fix().flatMap(FF(), f)
 
   override fun <A, B> tailRecM(a: A, f: (A) -> Kind<IndexedStateTPartialOf<F, S, S>, Either<A, B>>): Kind<IndexedStateTPartialOf<F, S, S>, B> =
     IndexedStateT.tailRecM(FF(), a, f)
 
   override fun <A, B> Kind<IndexedStateTPartialOf<F, S, S>, A>.map(f: (A) -> B): Kind<IndexedStateTPartialOf<F, S, S>, B> =
-    this.fix().map(FF(), f)
+    fix().map(FF(), f)
 
   override fun <A> just(a: A): Kind<IndexedStateTPartialOf<F, S, S>, A> =
     IndexedStateT.just(FF(), a)
@@ -65,7 +65,7 @@ interface IndexedStateTSemigroupKInstance<F, SA, SB> : SemigroupK<IndexedStateTP
   fun SS(): SemigroupK<F>
 
   override fun <A> Kind<IndexedStateTPartialOf<F, SA, SB>, A>.combineK(y: Kind<IndexedStateTPartialOf<F, SA, SB>, A>): Kind<IndexedStateTPartialOf<F, SA, SB>, A> =
-      this.fix().combineK(y, MF(), SS())
+      fix().combineK(y, MF(), SS())
 
 }
 
@@ -91,10 +91,10 @@ interface IndexedStateTMonadErrorInstance<F, S, E> : MonadError<IndexedStateTPar
   override fun <A> just(a: A): Kind<IndexedStateTPartialOf<F, S, S>, A> = IndexedStateT.just(FF(), a)
 
   override fun <A, B> Kind<IndexedStateTPartialOf<F, S, S>, A>.ap(ff: Kind<IndexedStateTPartialOf<F, S, S>, (A) -> B>): Kind<IndexedStateTPartialOf<F, S, S>, B> =
-    this.fix().ap(FF(), ff)
+    fix().ap(FF(), ff)
 
   override fun <A, B> Kind<IndexedStateTPartialOf<F, S, S>, A>.map(f: (A) -> B): Kind<IndexedStateTPartialOf<F, S, S>, B> =
-    this.fix().map(FF(), f)
+    fix().map(FF(), f)
 
 }
 
@@ -103,6 +103,8 @@ fun <F, S, E> arrow.data.IndexedStateT.Companion.monadError(FF: arrow.typeclasse
     override fun FF(): arrow.typeclasses.MonadError<F, E> = FF
     override fun MF(): Monad<F> = FF
   }
+
+
 
 /**
  * Alias for[StateT.Companion.applicative]

@@ -81,42 +81,13 @@ fun <S, A> StateT<ForId, S, A>.runA(initial: S): A = run(initial).b
  */
 fun <S, A> StateT<ForId, S, A>.runS(initial: S): S = run(initial).a
 
+typealias StateApi = IndexedStateApi
+
 /**
  * Alias for StateId to make working with `StateT<ForId, S, A>` more elegant.
  */
 @Suppress("FunctionName")
 fun State() = StateApi
-
-object StateApi {
-
-  fun <S, T> just(t: T): State<S, T> = StateT.just(IdBimonad, t)
-
-  /**
-   * Return input without modifying it.
-   */
-  fun <S> get(): State<S, S> = StateT.get(IdBimonad)
-
-  /**
-   * Inspect a value of the state [S] with [f] `(S) -> T` without modifying the state.
-   *
-   * @param f the function applied to inspect [T] from [S].
-   */
-  fun <S, T> inspect(f: (S) -> T): State<S, T> = StateT.inspect(IdBimonad, f)
-
-  /**
-   * Modify the state with [f] `(S) -> S` and return [Unit].
-   *
-   * @param f the modify function to apply.
-   */
-  fun <S> modify(f: (S) -> S): State<S, Unit> = StateT.modify(IdBimonad, f)
-
-  /**
-   * Set the state to [s] and return [Unit].
-   *
-   * @param s value to set.
-   */
-  fun <S> set(s: S): State<S, Unit> = StateT.set(IdBimonad, s)
-}
 
 fun <R, S, T> List<T>.stateTraverse(f: (T) -> State<S, R>): State<S, List<R>> = foldRight(StateApi.just(emptyList())) { i: T, accumulator: State<S, List<R>> ->
   f(i).map(accumulator, ({ head: R, tail: List<R> ->
