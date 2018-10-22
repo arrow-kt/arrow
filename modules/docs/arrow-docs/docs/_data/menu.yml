@@ -247,6 +247,9 @@ options:
       - title: Effect
         url: /docs/effects/effect/
 
+      - title: Ref
+        url: /docs/effects/ref/
+
   - title: Optics
 
     nested_options:
