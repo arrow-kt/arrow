@@ -71,6 +71,6 @@ interface MapKFilterIndexInstance<K, V> : FilterIndex<MapK<K, V>, K, V> {
 interface MapKIndexInstance<K, V> : Index<MapK<K, V>, K, V> {
   override fun index(i: K): Optional<MapK<K, V>, V> = POptional(
     getOrModify = { it[i]?.right() ?: it.left() },
-    set = { v -> { m -> m.mapValues { (k, vv) -> if (k == i) v else vv }.k() } }
+    set = { m, v -> m.mapValues { (k, vv) -> if (k == i) v else vv }.k() }
   )
 }

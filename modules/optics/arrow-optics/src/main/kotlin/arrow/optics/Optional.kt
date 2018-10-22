@@ -56,24 +56,24 @@ interface POptional<S, T, A, B> : POptionalOf<S, T, A, B> {
      */
     fun <S> codiagonal(): Optional<Either<S, S>, S> = Optional(
       { it.fold({ Either.Right(it) }, { Either.Right(it) }) },
-      { a -> { aa -> aa.bimap({ a }, { a }) } }
+      { aa, a -> aa.bimap({ a }, { a }) }
     )
 
     /**
      * Invoke operator overload to create a [POptional] of type `S` with focus `A`.
      * Can also be used to construct [Optional]
      */
-    operator fun <S, T, A, B> invoke(getOrModify: (S) -> Either<T, A>, set: (B) -> (S) -> T): POptional<S, T, A, B> = object : POptional<S, T, A, B> {
+    operator fun <S, T, A, B> invoke(getOrModify: (S) -> Either<T, A>, set: (S, B) -> T): POptional<S, T, A, B> = object : POptional<S, T, A, B> {
       override fun getOrModify(s: S): Either<T, A> = getOrModify(s)
 
-      override fun set(s: S, b: B): T = set(b)(s)
+      override fun set(s: S, b: B): T = set(s, b)
     }
 
     /**
      * Invoke operator overload to create a [POptional] of type `S` with focus `A`.
      * Can also be used to construct [Optional]
      */
-    operator fun <S, A> invoke(partialFunction: PartialFunction<S, A>, set: (A) -> (S) -> S): Optional<S, A> = Optional(
+    operator fun <S, A> invoke(partialFunction: PartialFunction<S, A>, set: (S, A) -> S): Optional<S, A> = Optional(
       getOrModify = { s -> partialFunction.lift()(s).fold({ Either.Left(s) }, { Either.Right(it) }) },
       set = set
     )
@@ -83,7 +83,7 @@ interface POptional<S, T, A, B> : POptionalOf<S, T, A, B> {
      */
     fun <A, B> void(): Optional<A, B> = Optional(
       { Either.Left(it) },
-      { _ -> ::identity }
+      { s, _ -> s }
     )
 
   }
@@ -131,7 +131,7 @@ interface POptional<S, T, A, B> : POptionalOf<S, T, A, B> {
   infix fun <S1, T1> choice(other: POptional<S1, T1, A, B>): POptional<Either<S, S1>, Either<T, T1>, A, B> =
     POptional(
       { ss -> ss.fold({ getOrModify(it).bimap({ Either.Left(it) }, ::identity) }, { other.getOrModify(it).bimap({ Either.Right(it) }, ::identity) }) },
-      { b -> { it.bimap({ s -> this.set(s, b) }, { s -> other.set(s, b) }) } }
+      { s, b -> s.bimap({ ss -> this.set(ss, b) }, { ss -> other.set(ss, b) }) }
     )
 
   /**
@@ -140,7 +140,7 @@ interface POptional<S, T, A, B> : POptionalOf<S, T, A, B> {
   fun <C> first(): POptional<Tuple2<S, C>, Tuple2<T, C>, Tuple2<A, C>, Tuple2<B, C>> =
     POptional(
       { (s, c) -> getOrModify(s).bimap({ it toT c }, { it toT c }) },
-      { (b, c) -> { (s, c2) -> setOption(s, b).fold({ set(s, b) toT c2 }, { it toT c }) } }
+      {  (s, c2), (b, c) -> setOption(s, b).fold({ set(s, b) toT c2 }, { it toT c }) }
     )
 
   /**
@@ -149,7 +149,7 @@ interface POptional<S, T, A, B> : POptionalOf<S, T, A, B> {
   fun <C> second(): POptional<Tuple2<C, S>, Tuple2<C, T>, Tuple2<C, A>, Tuple2<C, B>> =
     POptional(
       { (c, s) -> getOrModify(s).bimap({ c toT it }, { c toT it }) },
-      { (c, b) -> { (c2, s) -> setOption(s, b).fold({ c2 toT set(s, b) }, { c toT it }) } }
+      { (c2, s), (c, b) -> setOption(s, b).fold({ c2 toT set(s, b) }, { c toT it }) }
     )
 
   /**
@@ -157,7 +157,7 @@ interface POptional<S, T, A, B> : POptionalOf<S, T, A, B> {
    */
   infix fun <C, D> compose(other: POptional<A, B, C, D>): POptional<S, T, C, D> = POptional(
     { s -> getOrModify(s).flatMap { a -> other.getOrModify(a).bimap({ set(s, it) }, ::identity) } },
-    { d -> { s -> modify(s) { a -> other.set(a, d) } } }
+    { s, d -> modify(s) { a -> other.set(a, d) } }
   )
 
   /**

@@ -232,7 +232,7 @@ interface PIso<S, T, A, B> : PIsoOf<S, T, A, B> {
    */
   fun asOptional(): POptional<S, T, A, B> = POptional(
     { s -> Either.Right(get(s)) },
-    { b -> { _ -> set(b) } }
+    { _, b -> set(b) }
   )
 
   /**

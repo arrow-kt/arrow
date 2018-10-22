@@ -181,7 +181,7 @@ interface PLens<S, T, A, B> : PLensOf<S, T, A, B> {
    */
   fun asOptional(): POptional<S, T, A, B> = POptional(
     { s -> Either.Right(get(s)) },
-    { b -> { s -> set(s, b) } }
+    { s, b -> set(s, b) }
   )
 
   /**

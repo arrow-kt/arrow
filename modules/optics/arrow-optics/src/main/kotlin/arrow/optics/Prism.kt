@@ -194,7 +194,7 @@ interface PPrism<S, T, A, B> : PPrismOf<S, T, A, B> {
    */
   fun asOptional(): POptional<S, T, A, B> = POptional(
     this::getOrModify
-  ) { b -> { s -> set(s, b) } }
+  ) { s, b -> set(s, b) }
 
   /**
    * View a [PPrism] as a [PSetter]
