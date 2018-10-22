@@ -19,6 +19,7 @@ Since the allocation of mutable state is not referentially transparent this side
 
 ```kotlin:ank:silent
 import arrow.effects.*
+import arrow.effects.instances.io.monadDefer.monadDefer
 
 val ioRef: IO<Ref<ForIO, Int>> = Ref.of(1, IO.monadDefer()).fix()
 ```
