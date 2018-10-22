@@ -18,14 +18,12 @@ fun <K, V> MapInstances.at(): At<Map<K, V>, K, Option<V>> = MapAtInstance()
 interface MapAtInstance<K, V> : At<Map<K, V>, K, Option<V>> {
   override fun at(i: K): Lens<Map<K, V>, Option<V>> = PLens(
     get = { it.getOption(i) },
-    set = { optV ->
-      { map ->
-        optV.fold({
-          (map - i)
-        }, {
-          (map + (i to it))
-        })
-      }
+    set = { map, optV ->
+      optV.fold({
+        (map - i)
+      }, {
+        (map + (i to it))
+      })
     }
   )
 

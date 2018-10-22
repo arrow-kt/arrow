@@ -50,17 +50,17 @@ interface PLens<S, T, A, B> : PLensOf<S, T, A, B> {
      */
     fun <S> codiagonal(): Lens<Either<S, S>, S> = Lens(
       get = { it.fold(::identity, ::identity) },
-      set = { a -> { it.bimap({ a }, { a }) } }
+      set = { s, b -> s.bimap({ b }, { b }) }
     )
 
     /**
      * Invoke operator overload to create a [PLens] of type `S` with target `A`.
      * Can also be used to construct [Lens]
      */
-    operator fun <S, T, A, B> invoke(get: (S) -> A, set: (B) -> (S) -> T) = object : PLens<S, T, A, B> {
+    operator fun <S, T, A, B> invoke(get: (S) -> A, set: (S, B) -> T) = object : PLens<S, T, A, B> {
       override fun get(s: S): A = get(s)
 
-      override fun set(s: S, b: B): T = set(b)(s)
+      override fun set(s: S, b: B): T = set(s, b)
     }
   }
 
@@ -81,7 +81,7 @@ interface PLens<S, T, A, B> : PLensOf<S, T, A, B> {
    */
   infix fun <S1, T1> choice(other: PLens<S1, T1, A, B>): PLens<Either<S, S1>, Either<T, T1>, A, B> = PLens(
     { ss -> ss.fold(this::get, other::get) },
-    { b -> { ss -> ss.bimap({ s -> set(s, b) }, { s -> other.set(s, b) }) } }
+    { ss, b -> ss.bimap({ s -> set(s, b) }, { s -> other.set(s, b) }) }
   )
 
   /**
@@ -90,7 +90,7 @@ interface PLens<S, T, A, B> : PLensOf<S, T, A, B> {
   infix fun <S1, T1, A1, B1> split(other: PLens<S1, T1, A1, B1>): PLens<Tuple2<S, S1>, Tuple2<T, T1>, Tuple2<A, A1>, Tuple2<B, B1>> =
     PLens(
       { (s, c) -> get(s) toT other.get(c) },
-      { (b, b1) -> { (s, s1) -> set(s, b) toT other.set(s1, b1) } }
+      { (s, s1), (b, b1) -> set(s, b) toT other.set(s1, b1) }
     )
 
   /**
@@ -98,7 +98,7 @@ interface PLens<S, T, A, B> : PLensOf<S, T, A, B> {
    */
   fun <C> first(): PLens<Tuple2<S, C>, Tuple2<T, C>, Tuple2<A, C>, Tuple2<B, C>> = PLens(
     { (s, c) -> get(s) toT c },
-    { (b, c) -> { (s, _) -> set(s, b) toT c } }
+    { (s, _) , (b, c) -> set(s, b) toT c }
   )
 
   /**
@@ -106,7 +106,7 @@ interface PLens<S, T, A, B> : PLensOf<S, T, A, B> {
    */
   fun <C> second(): PLens<Tuple2<C, S>, Tuple2<C, T>, Tuple2<C, A>, Tuple2<C, B>> = PLens(
     { (c, s) -> c toT get(s) },
-    { (c, b) -> { (_, s) -> c toT set(s, b) } }
+    { (_, s) , (c, b) -> c toT set(s, b) }
   )
 
   /**
@@ -114,7 +114,7 @@ interface PLens<S, T, A, B> : PLensOf<S, T, A, B> {
    */
   infix fun <C, D> compose(l: PLens<A, B, C, D>): PLens<S, T, C, D> = Lens(
     { a -> l.get(get(a)) },
-    { c -> { s -> set(s, l.set(get(s), c)) } }
+    { s, c -> set(s, l.set(get(s), c)) }
   )
 
   /**

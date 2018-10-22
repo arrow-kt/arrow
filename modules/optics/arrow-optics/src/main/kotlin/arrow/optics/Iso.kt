@@ -220,7 +220,7 @@ interface PIso<S, T, A, B> : PIsoOf<S, T, A, B> {
   /**
    * View a [PIso] as a [PLens]
    */
-  fun asLens(): PLens<S, T, A, B> = PLens(this::get) { b -> { _ -> set(b) } }
+  fun asLens(): PLens<S, T, A, B> = PLens(this::get) { _, b -> set(b) }
 
   /**
    * View a [PIso] as a [Getter]

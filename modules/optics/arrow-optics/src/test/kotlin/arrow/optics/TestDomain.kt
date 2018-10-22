@@ -34,7 +34,7 @@ val stringPrism: Prism<String, List<Char>> = Prism(
 
 internal val tokenLens: Lens<Token, String> = Lens(
   { token: Token -> token.value },
-  { value: String -> { token: Token -> token.copy(value = value) } }
+  { token: Token, value: String -> token.copy(value = value) }
 )
 
 internal val tokenIso: Iso<Token, String> = Iso(
@@ -76,7 +76,7 @@ internal val tokenGetter: Getter<Token, String> = Getter(Token::value)
 
 internal val userLens: Lens<User, Token> = Lens(
   { user: User -> user.token },
-  { token: Token -> { user: User -> user.copy(token = token) } }
+  { user: User, token: Token -> user.copy(token = token) }
 )
 
 internal val optionalHead: Optional<List<Int>, Int> = Optional(
