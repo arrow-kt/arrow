@@ -83,10 +83,6 @@ class FunctionSyntaxTest : UnitSpec() {
       //same type as sum2ints,
       curried.uncurried()(2, 4) shouldBe 6
       sum2ints(2, 4) shouldBe 6
-
-      val sum3ints: (Int, Int, Int) -> Int = { x, y, _ -> x + y }
-      val f: (Int) -> (Int) -> (Int) -> Int = sum3ints.curried()
-      (f.uncurried() is (Int, Int, Int) -> Int) shouldBe true
     }
 
     "memoize" {

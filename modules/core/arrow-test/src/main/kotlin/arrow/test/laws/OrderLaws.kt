@@ -7,7 +7,7 @@ import io.kotlintest.properties.forAll
 
 object OrderLaws {
 
-  inline fun <F> laws(O: Order<F>, fGen: Gen<F>, funcGen: Gen<(F) -> F>): List<Law> =
+  fun <F> laws(O: Order<F>, fGen: Gen<F>, funcGen: Gen<(F) -> F>): List<Law> =
     EqLaws.laws(O) { fGen.generate() } + listOf(
       Law("Order law: reflexivity equality") { O.reflexitivityEq(fGen) },
       Law("Order law: symmetry equality") { O.symmetryEq(fGen) },

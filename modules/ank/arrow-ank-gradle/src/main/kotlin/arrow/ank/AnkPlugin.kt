@@ -11,6 +11,7 @@ class AnkPlugin : Plugin<Project> {
     private const val TASK_NAME = "runAnk"
   }
 
+  @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
   override fun apply(target: Project) {
     val extension = AnkExtension()
     target.extensions.add(EXTENSION_NAME, extension)

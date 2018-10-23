@@ -190,7 +190,7 @@ fun <G, E, A, B> ValidatedOf<E, A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G
 fun <G, E, A> ValidatedOf<E, Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, Validated<E, A>> =
   fix().traverse(GA, ::identity)
 
-inline fun <E, A> ValidatedOf<E, A>.combine(SE: Semigroup<E>,
+fun <E, A> ValidatedOf<E, A>.combine(SE: Semigroup<E>,
                                             SA: Semigroup<A>,
                                             y: ValidatedOf<E, A>): Validated<E, A> =
   y.fix().let { that ->

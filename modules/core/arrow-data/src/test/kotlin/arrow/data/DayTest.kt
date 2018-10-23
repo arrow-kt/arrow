@@ -44,42 +44,42 @@ class DayTest : UnitSpec() {
 
 
     "Day coflatmap should transform result type" {
-      val day = day.coflatMap(Id.comonad(), Id.comonad()) { it: DayOf<ForId, ForId, Tuple2Of<Int, Int>> ->
+      val d = day.coflatMap(Id.comonad(), Id.comonad()) { it: DayOf<ForId, ForId, Tuple2Of<Int, Int>> ->
         val (left, right) = it.fix().extract(Id.comonad(), Id.comonad()).fix()
         compareSides(left, right)
       }
 
-      day.extract(Id.comonad(), Id.comonad()) shouldBe "Both sides are equal"
+      d.extract(Id.comonad(), Id.comonad()) shouldBe "Both sides are equal"
 
     }
 
 
     "Day map should transform result type" {
-      val day = day.map {
+      val d = day.map {
         val (left, right) = it
         compareSides(left, right)
       }
 
-      day.extract(Id.comonad(), Id.comonad()) shouldBe "Both sides are equal"
+      d.extract(Id.comonad(), Id.comonad()) shouldBe "Both sides are equal"
     }
 
     "Day coflatMapLazy should transform result type" {
-      val day = day.coflatMapLazy(Id.comonad(), Id.comonad()) { it: DayOf<ForId, ForId, Tuple2Of<Int, Int>> ->
+      val d = day.coflatMapLazy(Id.comonad(), Id.comonad()) { it: DayOf<ForId, ForId, Tuple2Of<Int, Int>> ->
         val (left, right) = it.fix().extract(Id.comonad(), Id.comonad()).fix()
         compareSides(left, right)
       }
 
-      day.extract(Id.comonad(), Id.comonad()) shouldBe "Both sides are equal"
+      d.extract(Id.comonad(), Id.comonad()) shouldBe "Both sides are equal"
 
     }
 
     "Day mapLazy should transform result type" {
-      val day = day.mapLazy {
+      val d = day.mapLazy {
         val (left, right) = it
         compareSides(left, right)
       }
 
-      day.extract(Id.comonad(), Id.comonad()) shouldBe "Both sides are equal"
+      d.extract(Id.comonad(), Id.comonad()) shouldBe "Both sides are equal"
     }
 
   }

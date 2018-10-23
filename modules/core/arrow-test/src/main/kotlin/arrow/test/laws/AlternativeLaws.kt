@@ -11,9 +11,9 @@ import io.kotlintest.properties.forAll
 
 object AlternativeLaws {
 
-  inline fun <F> laws(AF: Alternative<F>,
-                      noinline cf: (Int) -> Kind<F, Int>,
-                      noinline cff: (Int) -> Kind<F, (Int) -> Int>,
+  fun <F> laws(AF: Alternative<F>,
+                      cf: (Int) -> Kind<F, Int>,
+                      cff: (Int) -> Kind<F, (Int) -> Int>,
                       EQ: Eq<Kind<F, Int>>): List<Law> =
     ApplicativeLaws.laws(AF, EQ) + MonoidKLaws.laws(AF, AF, EQ) + listOf(
       Law("Alternative Laws: Right Absorption") { AF.alternativeRightAbsorption(cff, EQ) },

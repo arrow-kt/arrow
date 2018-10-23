@@ -12,7 +12,7 @@ import io.kotlintest.properties.forAll
 
 object MonadErrorLaws {
 
-  inline fun <F> laws(M: MonadError<F, Throwable>, EQERR: Eq<Kind<F, Int>>, EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>, EQ: Eq<Kind<F, Int>> = EQERR): List<Law> =
+  fun <F> laws(M: MonadError<F, Throwable>, EQERR: Eq<Kind<F, Int>>, EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>, EQ: Eq<Kind<F, Int>> = EQERR): List<Law> =
     MonadLaws.laws(M, EQ) + ApplicativeErrorLaws.laws(M, EQERR, EQ_EITHER, EQ) + listOf(
       Law("Monad Error Laws: left zero") { M.monadErrorLeftZero(EQERR) },
       Law("Monad Error Laws: ensure consistency") { M.monadErrorEnsureConsistency(EQERR) }

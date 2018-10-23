@@ -16,7 +16,7 @@ import io.kotlintest.properties.forAll
 
 object ApplicativeErrorLaws {
 
-  inline fun <F> laws(AE: ApplicativeError<F, Throwable>, EQERR: Eq<Kind<F, Int>>, EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>, EQ: Eq<Kind<F, Int>> = EQERR): List<Law> =
+  fun <F> laws(AE: ApplicativeError<F, Throwable>, EQERR: Eq<Kind<F, Int>>, EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>, EQ: Eq<Kind<F, Int>> = EQERR): List<Law> =
     ApplicativeLaws.laws(AE, EQ) + listOf(
       Law("Applicative Error Laws: handle") { AE.applicativeErrorHandle(EQERR) },
       Law("Applicative Error Laws: handle with for error") { AE.applicativeErrorHandleWith(EQERR) },
