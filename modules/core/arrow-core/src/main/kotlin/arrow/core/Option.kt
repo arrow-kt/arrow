@@ -200,13 +200,13 @@ fun <A> A.some(): Option<A> = Some(this)
 
 fun <A> none(): Option<A> = None
 
-fun <T> Iterable<T>.singleOrNone(): Option<T> = this.singleOrNull().toOption()
-
-inline fun <T> Iterable<T>.singleOrNone(predicate: (T) -> Boolean): Option<T> = this.singleOrNull(predicate).toOption()
-
 fun <T> Iterable<T>.firstOrNone(): Option<T> = this.firstOrNull().toOption()
 
 inline fun <T> Iterable<T>.firstOrNone(predicate: (T) -> Boolean): Option<T> = this.firstOrNull(predicate).toOption()
+
+fun <T> Iterable<T>.singleOrNone(): Option<T> = this.singleOrNull().toOption()
+
+inline fun <T> Iterable<T>.singleOrNone(predicate: (T) -> Boolean): Option<T> = this.singleOrNull(predicate).toOption()
 
 fun <T> Iterable<T>.lastOrNone(): Option<T> = this.lastOrNull().toOption()
 

@@ -138,6 +138,29 @@ val nullableValue: String? = "Hello"
 nullableValue.toOption()
 ```
 
+Some Iterable extensions were added, so you can maintain a friendly API syntax while avoiding null handling (`firstOrNull()`)
+
+```
+val myList: List<Int> = listOf(1,2,3,4)
+myList.firstOrNone { it == 4 }
+// Some(4)
+myList.firstOrNone { it == 5 }
+// None
+```
+
+Sample usage
+
+```
+fun foo() {
+    val foxMap = mapOf(1 to "The", 2 to "Quick", 3 to "Brown", 4 to "Fox")
+
+    val ugly = foxMap.entries.firstOrNull { it.key == 5 }?.value.let { it?.toCharArray() }.toOption()
+    val pretty = foxMap.entries.firstOrNone { it.key == 5 }.map { it.value.toCharArray() }
+    
+    //Do something with pretty Option
+}
+```
+
 Arrow contains `Option` instances for many useful typeclasses that allows you to use and transform optional values
 
 [`Functor`]({{ '/docs/typeclasses/functor/' | relative_url }})
