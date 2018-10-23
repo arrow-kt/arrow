@@ -6,9 +6,9 @@ import arrow.data.Kleisli
 import arrow.data.KleisliPartialOf
 import arrow.data.fix
 import arrow.effects.typeclasses.MonadDefer
-import arrow.instance
+import arrow.extension
 
-@instance(Kleisli::class)
+@extension
 interface KleisliMonadDeferInstance<F, D> : MonadDefer<KleisliPartialOf<F, D>> {
 
     fun DF(): MonadDefer<F>
