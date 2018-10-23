@@ -161,7 +161,7 @@ fun <K, V> Iterable<Tuple2<K, V>>.toMap(): Map<K, V> {
 fun <K, V> Array<out Tuple2<K, V>>.toMap(): Map<K, V> = when (size) {
   0 -> emptyMap()
   1 -> mapOf(this[0])
-  else -> toMap(LinkedHashMap<K, V>(mapCapacity(size)))
+  else -> toMap(LinkedHashMap(mapCapacity(size)))
 }
 
 fun <K, V> Sequence<Tuple2<K, V>>.toMap(): Map<K, V> = toMap(LinkedHashMap()).optimizeReadOnlyMap()
