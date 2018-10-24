@@ -138,14 +138,18 @@ val nullableValue: String? = "Hello"
 nullableValue.toOption()
 ```
 
-Some Iterable extensions were added, so you can maintain a friendly API syntax while avoiding null handling (`firstOrNull()`)
+Some Iterable extensions are available, so you can maintain a friendly API syntax while avoiding null handling (`firstOrNull()`)
 
-```
+```kotlin:ank:silent
 val myList: List<Int> = listOf(1,2,3,4)
+```
+
+```kotlin:ank
 myList.firstOrNone { it == 4 }
-// Some(4)
+```
+
+```kotlin:ank
 myList.firstOrNone { it == 5 }
-// None
 ```
 
 Sample usage
