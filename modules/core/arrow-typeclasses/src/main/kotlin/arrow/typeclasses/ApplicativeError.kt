@@ -26,7 +26,7 @@ interface ApplicativeError<F, E> : Applicative<F> {
   fun <A> fromEither(fab: Either<E, A>): Kind<F, A> =
     fab.fold({ raiseError<A>(it) }, { just(it) })
 
-  fun <A> catch(f: () -> A, recover: (Throwable) -> E): Kind<F, A> =
+  fun <A> catch(recover: (Throwable) -> E, f: () -> A): Kind<F, A> =
     try {
       just(f())
     } catch (t: Throwable) {
@@ -34,5 +34,5 @@ interface ApplicativeError<F, E> : Applicative<F> {
     }
 
   fun <A> ApplicativeError<F, Throwable>.catch(f: () -> A): Kind<F, A> =
-    catch(f, ::identity)
+    catch(::identity, f)
 }
