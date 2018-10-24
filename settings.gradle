@@ -65,6 +65,10 @@ include {
             _ 'effects-reactor-instances'
         }
 
+        integrations {
+            _ 'integrations-retrofit-adapter'
+        }
+
         folder('recursion-schemes') {
             _ 'recursion'
             _ 'instances-recursion'
