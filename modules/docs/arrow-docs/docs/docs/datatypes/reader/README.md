@@ -176,7 +176,7 @@ content
 
 ## Monad Comprehension
 
-Instread of just chaining functions, we can just use monad comprehension with `Reader` as well.
+Instead of just chaining functions, we can just use monad comprehension with `Reader` as well.
 
 There is another that we haven't talked about yet, which is the `ask` function. It is the function that pipe environment into the result of the `Reader` which will be useful in this context.
 
