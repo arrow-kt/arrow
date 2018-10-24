@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package com.pacoworks.typeclasses.basics.solved
 
 import arrow.Kind
