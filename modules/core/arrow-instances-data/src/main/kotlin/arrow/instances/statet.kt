@@ -104,8 +104,6 @@ fun <F, S, E> arrow.data.IndexedStateT.Companion.monadError(FF: arrow.typeclasse
     override fun MF(): Monad<F> = FF
   }
 
-
-
 /**
  * Alias for[StateT.Companion.applicative]
  */

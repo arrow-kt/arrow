@@ -40,7 +40,6 @@ typealias IndexedState<SA, SB, A> = IndexedStateT<ForId, SA, SB, A>
 fun <SA, SB, A> IndexedState(run: (SA) -> Tuple2<SB, A>): IndexedState<SA, SB, A> =
   IndexedStateT(Id(run.andThen { Id(it) }))
 
-
 /**
  * Syntax for constructing a `StateT<ForId, S, A>` from a function `(S) -> Tuple2<S, A>`
  */
