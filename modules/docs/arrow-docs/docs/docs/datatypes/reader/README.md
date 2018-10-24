@@ -23,7 +23,7 @@ val content: Reader<String, String> = Reader().lift { "{ content: \"$it\" }" }
 
 Right now, we just lift 3 functions into `Reader`s.
 
-You can also use `.reader()` extenstion function instead of `Reader().lift`
+You can also use `.reader()` extension function instead of `Reader().lift`
 
 ```kotlin:ank
 import arrow.data.reader
