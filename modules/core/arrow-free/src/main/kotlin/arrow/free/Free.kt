@@ -2,13 +2,13 @@ package arrow.free
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.core.FunctionK
 import arrow.core.identity
 import arrow.higherkind
 import arrow.typeclasses.Applicative
-import arrow.core.FunctionK
 import arrow.typeclasses.Monad
 
-inline fun <M, S, A> FreeOf<S, A>.foldMapK(f: FunctionK<S, M>, MM: Monad<M>): Kind<M, A> =
+fun <M, S, A> FreeOf<S, A>.foldMapK(f: FunctionK<S, M>, MM: Monad<M>): Kind<M, A> =
   (this as Free<S, A>).foldMap(f, MM)
 
 @higherkind
@@ -51,7 +51,7 @@ sealed class Free<S, out A> : FreeOf<S, A> {
 
   data class FlatMapped<S, out A, C>(val c: Free<S, C>, val fm: (C) -> Free<S, A>) : Free<S, A>() {
     override fun <O, B> transform(f: (A) -> B, fs: FunctionK<S, O>): Free<O, B> =
-      FlatMapped(c.transform(::identity, fs), { c.flatMap { fm(it) }.transform(f, fs) })
+      FlatMapped(c.transform(::identity, fs)) { c.flatMap { fm(it) }.transform(f, fs) }
   }
 
   override fun toString(): String = "Free(...) : toString is not stack-safe"
@@ -79,20 +79,20 @@ tailrec fun <S, A> Free<S, A>.step(): Free<S, A> =
   }
 
 @Suppress("UNCHECKED_CAST")
-fun <M, S, A> Free<S, A>.foldMap(f: FunctionK<S, M>, MM: Monad<M>): Kind<M, A> = MM.run {
-  tailRecM(this@foldMap) {
+fun <M, S, A> Free<S, A>.foldMap(f: FunctionK<S, M>, MM: Monad<M>): Kind<M, A> =
+  MM.tailRecM(this@foldMap) {
     val x = it.step()
     when (x) {
-      is Free.Pure<S, A> -> just(Either.Right(x.a))
-      is Free.Suspend<S, A> -> f(x.a).map({ Either.Right(it) })
+      is Free.Pure<S, A> -> MM.just(Either.Right(x.a))
+      is Free.Suspend<S, A> -> MM.run { f(x.a).map { Either.Right(it) } }
       is Free.FlatMapped<S, A, *> -> {
         val g = (x.fm as (A) -> Free<S, A>)
         val c = x.c as Free<S, A>
-        c.foldMap(f, MM).map({ cc -> Either.Left(g(cc)) })
+        val folded = c.foldMap(f, MM)
+        MM.run { folded.map { cc -> Either.Left(g(cc)) } }
       }
     }
   }
-}
 
 fun <S, A> A.free(): Free<S, A> = Free.just<S, A>(this)
 

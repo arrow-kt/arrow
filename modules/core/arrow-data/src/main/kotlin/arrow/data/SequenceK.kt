@@ -29,11 +29,10 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
     return Eval.defer { loop(this.fix()) }
   }
 
-  fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, SequenceK<B>> = GA.run {
-    foldRight(Eval.always { just(emptySequence<B>().k()) }) { a, eval ->
-      f(a).map2Eval(eval) { (sequenceOf(it.a) + it.b).k() }
+  fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, SequenceK<B>> =
+    foldRight(Eval.always { GA.just(emptySequence<B>().k()) }) { a, eval ->
+      GA.run { f(a).map2Eval(eval) { (sequenceOf(it.a) + it.b).k() } }
     }.value()
-  }
 
   fun <B, Z> map2(fb: SequenceKOf<B>, f: (Tuple2<A, B>) -> Z): SequenceK<Z> =
     this.fix().flatMap { a ->
@@ -56,11 +55,11 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
         if (!(v.toList().isEmpty())) {
           val head: Either<A, B> = v.first()
           when (head) {
-            is Either.Right<A, B> -> {
+            is Either.Right -> {
               buf += head.b
               go(buf, f, v.drop(1).k())
             }
-            is Either.Left<A, B> -> {
+            is Either.Left -> {
               if (v.count() == 1)
                 go(buf, f, (f(head.a).fix()).k())
               else
@@ -80,7 +79,7 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
 
 fun <A> SequenceKOf<A>.combineK(y: SequenceKOf<A>): SequenceK<A> = (fix().sequence + y.fix().sequence).k()
 
-inline fun <A, G> SequenceKOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, SequenceK<A>> =
+fun <A, G> SequenceKOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, SequenceK<A>> =
   fix().traverse(GA, ::identity)
 
 fun <A> Sequence<A>.k(): SequenceK<A> = SequenceK(this)

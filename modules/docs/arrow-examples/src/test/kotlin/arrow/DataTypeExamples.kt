@@ -2,6 +2,10 @@ package arrow
 
 import arrow.Problem.*
 import arrow.core.*
+import arrow.instances.`try`.applicative.applicative
+import arrow.instances.`try`.functor.functor
+import arrow.instances.option.applicative.applicative
+import arrow.instances.option.monad.monad
 import arrow.typeclasses.binding
 import io.kotlintest.matchers.Matcher
 import io.kotlintest.matchers.Result
@@ -130,7 +134,7 @@ class DataTypeExamples : FreeSpec() { init {
 
     "Functor" {
       // Transforming the value, if the computation is a success:
-      val actual = Try.functor().run { Try { "3".toInt() }.map({ it + 1 }) }
+      val actual = Try.functor().run { Try { "3".toInt() }.map { it + 1 } }
       actual shouldBe Try.Success(4)
     }
 

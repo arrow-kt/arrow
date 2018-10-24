@@ -85,11 +85,11 @@ fun <K, V> MapInstances.filterIndex(): FilterIndex<Map<K, V>, K, V> = MapFilterI
 interface MapFilterIndexInstance<K, V> : FilterIndex<Map<K, V>, K, V> {
   override fun filter(p: Predicate<K>) = object : Traversal<Map<K, V>, V> {
     override fun <F> modifyF(FA: Applicative<F>, s: Map<K, V>, f: (V) -> Kind<F, V>): Kind<F, Map<K, V>> = FA.run {
-      s.toList().k().traverse(FA, { (k, v) ->
+      s.toList().k().traverse(FA) { (k, v) ->
         (if (p(k)) f(v) else just(v)).map {
           k to it
         }
-      }).map { it.toMap() }
+      }.map { it.toMap() }
     }
   }
 
@@ -110,7 +110,7 @@ fun <K, V> MapInstances.index(): Index<Map<K, V>, K, V> = MapIndexInstance()
  */
 interface MapIndexInstance<K, V> : Index<Map<K, V>, K, V> {
   override fun index(i: K): Optional<Map<K, V>, V> = POptional(
-    getOrModify = { it[i]?.let(::Right) ?: it.let(::Left) },
+    getOrModify = { it[i]?.right() ?: it.left() },
     set = { v -> { m -> m.mapValues { (k, vv) -> if (k == i) v else vv } } }
   )
 

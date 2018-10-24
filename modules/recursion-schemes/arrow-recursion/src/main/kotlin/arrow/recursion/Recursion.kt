@@ -21,12 +21,11 @@ typealias Coalgebra<F, A> = (A) -> Kind<F, A>
 /**
  * The composition of cata and ana.
  */
-fun <F, A, B> hylo(
-  FF: Functor<F>,
+fun <F, A, B> Functor<F>.hylo(
   alg: Algebra<F, Eval<B>>,
   coalg: Coalgebra<F, A>,
   a: A
-): B = FF.run {
+): B {
   fun h(a: A): Eval<B> = alg(coalg(a).map { Eval.defer { h(it) } })
   return h(a).value()
 }

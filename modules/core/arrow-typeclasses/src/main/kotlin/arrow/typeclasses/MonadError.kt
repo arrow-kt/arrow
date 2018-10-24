@@ -1,15 +1,15 @@
 package arrow.typeclasses
 
 import arrow.Kind
-import kotlin.coroutines.experimental.startCoroutine
+import kotlin.coroutines.startCoroutine
 
 interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F> {
 
   fun <A> Kind<F, A>.ensure(error: () -> E, predicate: (A) -> Boolean): Kind<F, A> =
-    this.flatMap({
+    this.flatMap {
       if (predicate(it)) just(it)
       else raiseError(error())
-    })
+    }
 
 }
 

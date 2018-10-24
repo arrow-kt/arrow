@@ -102,7 +102,7 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
   /**
    * Apply a function to a Valid value, returning a new Valid value
    */
-  fun <B> map(f: (A) -> B): Validated<E, B> = bimap(::identity, { f(it) })
+  fun <B> map(f: (A) -> B): Validated<E, B> = bimap(::identity) { f(it) }
 
   /**
    * Apply a function to an Invalid value, returning a new Invalid value.
@@ -129,7 +129,13 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
  * Return the Valid value, or the default if Invalid
  */
 fun <E, B> ValidatedOf<E, B>.getOrElse(default: () -> B): B =
-  fix().fold({ default() }, ::identity)
+    fix().fold({ default() }, ::identity)
+
+/**
+ * Return the Valid value, or null if Invalid
+ */
+fun <E, B> ValidatedOf<E, B>.orNull(): B? =
+  getOrElse { null }
 
 /**
  * Return the Valid value, or the result of f if Invalid
@@ -171,7 +177,7 @@ fun <E, A> ValidatedOf<E, A>.orElse(default: () -> Validated<E, A>): Validated<E
 fun <E, A, B> ValidatedOf<E, A>.ap(SE: Semigroup<E>, f: Validated<E, (A) -> B>): Validated<E, B> =
   fix().fold(
     { e -> f.fold({ Invalid(SE.run { it.combine(e) }) }, { Invalid(e) }) },
-    { a -> f.fold(::Invalid, { Valid(it(a)) }) }
+    { a -> f.fold(::Invalid) { Valid(it(a)) } }
   )
 
 fun <E, A> ValidatedOf<E, A>.handleLeftWith(f: (E) -> ValidatedOf<E, A>): Validated<E, A> =
@@ -184,7 +190,7 @@ fun <G, E, A, B> ValidatedOf<E, A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G
 fun <G, E, A> ValidatedOf<E, Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, Validated<E, A>> =
   fix().traverse(GA, ::identity)
 
-inline fun <E, A> ValidatedOf<E, A>.combine(SE: Semigroup<E>,
+fun <E, A> ValidatedOf<E, A>.combine(SE: Semigroup<E>,
                                             SA: Semigroup<A>,
                                             y: ValidatedOf<E, A>): Validated<E, A> =
   y.fix().let { that ->

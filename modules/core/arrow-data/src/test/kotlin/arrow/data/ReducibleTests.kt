@@ -6,6 +6,7 @@ import arrow.instances.IntSemigroupInstance
 import arrow.instances.LongMonoidInstance
 import arrow.instances.monoid
 import arrow.instances.semigroup
+import arrow.instances.listk.foldable.foldable
 import arrow.test.UnitSpec
 import arrow.test.laws.ReducibleLaws
 import arrow.typeclasses.Eq
@@ -45,15 +46,15 @@ class ReducibleTests : UnitSpec() {
           val tail = (2 to 10).toList()
           val total = 1 + tail.sum()
           val nel = NonEmptyList(1, tail)
-          nel.reduceLeft({ a, b -> a + b }) shouldBe total
-          nel.reduceRight({ x, ly -> ly.map({ x + it }) }).value() shouldBe (total)
+          nel.reduceLeft { a, b -> a + b } shouldBe total
+          nel.reduceRight { x, ly -> ly.map { x + it } }.value() shouldBe (total)
           nel.reduce(this) shouldBe total
 
           // more basic checks
           val names = NonEmptyList.of("Aaron", "Betty", "Calvin", "Deirdra")
-          val totalLength = names.all.map({ it.length }).sum()
+          val totalLength = names.all.map { it.length }.sum()
           names.reduceLeftTo({ it.length }, { sum, s -> s.length + sum }) shouldBe totalLength
-          names.reduceMap(this, { it.length }) shouldBe totalLength
+          names.reduceMap(this) { it.length } shouldBe totalLength
         }
       }
     }

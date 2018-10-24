@@ -19,7 +19,7 @@ typealias IsoPartialOf<S> = Kind<ForIso, S>
 typealias IsoKindedJ<S, A> = PIsoKindedJ<S, S, A, A>
 
 /**
- * An [Iso] is a loss less invertible optic that defines an isomorphism between a type `S` and `A`.
+ * An [Iso] is a loss less invertible optic that defines an isomorphism between a type [S] and [A]
  * i.e. a data class and its properties represented by TupleN
  *
  * A (polymorphic) [PIso] is useful when setting or modifying a value for a constructed type
@@ -220,7 +220,7 @@ interface PIso<S, T, A, B> : PIsoOf<S, T, A, B> {
   /**
    * View a [PIso] as a [PLens]
    */
-  fun asLens(): PLens<S, T, A, B> = PLens(this::get, { b -> { _ -> set(b) } })
+  fun asLens(): PLens<S, T, A, B> = PLens(this::get) { b -> { _ -> set(b) } }
 
   /**
    * View a [PIso] as a [Getter]

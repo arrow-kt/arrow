@@ -28,26 +28,32 @@ It lifts an exception into the computational context of a type constructor.
 import arrow.*
 import arrow.core.*
 import arrow.instances.*
+import arrow.instances.either.applicativeError.*
 
-ForEither<Throwable>() extensions { 
-  raiseError<Int>(RuntimeException("Paco"))
-}
+val eitherResult: Either<Throwable, Int> = 
+  RuntimeException("BOOM!").raiseError()
+
+eitherResult
 ```
 
 ```kotlin:ank
 import arrow.data.*
+import arrow.instances.`try`.applicativeError.*
 
-ForTry extensions { 
-  raiseError<Int>(RuntimeException("Paco"))
-}
+val tryResult: Try<Int> = 
+  RuntimeException("BOOM!").raiseError()
+
+tryResult
 ```
 
 ```kotlin:ank
 import arrow.effects.*
+import arrow.effects.instances.io.applicativeError.*
 
-ForIO extensions { 
-  raiseError<Int>(RuntimeException("Paco"))
-}
+val ioResult: IO<Int> = 
+  RuntimeException("BOOM!").raiseError()
+  
+ioResult.attempt().unsafeRunSync()
 ```
 
 #### Kind<F, A>.ensure
@@ -55,15 +61,13 @@ ForIO extensions {
 Tests a predicate against the object, and if it fails it executes a function to create an error.
 
 ```kotlin:ank
-ForEither<Throwable>() extensions {
-  Either.Right(1).ensure({ RuntimeException("Failed predicate") }, { it > 0 }) 
-}
+import arrow.instances.either.monadError.*
+
+Either.Right(1).ensure({ RuntimeException("Failed predicate") }, { it > 0 }) 
 ```
 
 ```kotlin:ank
-ForEither<Throwable>() extensions {
-  Either.Right(1).ensure({ RuntimeException("Failed predicate") }, { it < 0 }) 
-}
+Either.Right(1).ensure({ RuntimeException("Failed predicate") }, { it < 0 }) 
 ```
 
 ### Comprehensions

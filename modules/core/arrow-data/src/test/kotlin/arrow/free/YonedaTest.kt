@@ -3,8 +3,8 @@ package arrow.free
 import arrow.core.ForId
 import arrow.core.Id
 import arrow.core.fix
-import arrow.core.functor
-import arrow.free.instances.ForYoneda
+import arrow.free.instances.yoneda.functor.functor
+import arrow.instances.id.functor.functor
 import arrow.test.UnitSpec
 import arrow.test.laws.FunctorLaws
 import arrow.typeclasses.Eq
@@ -21,9 +21,7 @@ class YonedaTest : UnitSpec() {
 
   init {
 
-    ForYoneda<ForId>() extensions {
-      testLaws(FunctorLaws.laws(this, { Yoneda(Id(it), Id.functor()) }, EQ))
-    }
+    testLaws(FunctorLaws.laws(Yoneda.functor(), { Yoneda(Id(it), Id.functor()) }, EQ))
 
     "toCoyoneda should convert to an equivalent Coyoneda" {
       forAll { x: Int ->

@@ -5,7 +5,10 @@ package arrow.syntax.function
  */
 class Partial<T>
 
-fun <T> partial(): Partial<T> = Partial()
+private val CACHED = Partial<Any>()
+
+@Suppress("UNCHECKED_CAST")
+private fun <T> partial(): Partial<T> = CACHED as Partial<T>
 
 operator @Suppress("UNUSED_PARAMETER")
 fun <P1, P2, R> ((P1, P2) -> R).invoke(p1: P1, partial2: Partial<P2> = partial()): (P2) -> R = { p2: P2 -> this(p1, p2) }

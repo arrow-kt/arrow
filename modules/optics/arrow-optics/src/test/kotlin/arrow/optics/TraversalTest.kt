@@ -1,12 +1,13 @@
 package arrow.optics
 
 import arrow.core.Option
-import arrow.core.eq
 import arrow.core.toOption
 import arrow.core.toT
 import arrow.data.*
-import arrow.instances.IntMonoidInstance
 import arrow.instances.monoid
+import arrow.instances.listk.eq.eq
+import arrow.instances.listk.traverse.traverse
+import arrow.instances.option.eq.eq
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genListK
@@ -110,34 +111,112 @@ class TraversalTest : UnitSpec() {
     with(listKTraverse) {
 
       "Getting all targets of a traversal" {
-        forAll(Gen.list(Gen.int()), { ints ->
+        forAll(Gen.list(Gen.int())) { ints ->
           getAll(ints.k()) == ints.k()
-        })
+        }
       }
 
       "Folding all the values of a traversal" {
-        forAll(Gen.list(Gen.int()), { ints ->
+        forAll(Gen.list(Gen.int())) { ints ->
           fold(Int.monoid(), ints.k()) == ints.sum()
-        })
+        }
       }
 
       "Combining all the values of a traversal" {
-        forAll(Gen.list(Gen.int()), { ints ->
+        forAll(Gen.list(Gen.int())) { ints ->
           combineAll(Int.monoid(), ints.k()) == ints.sum()
-        })
+        }
       }
 
       "Finding an number larger than 10" {
-        forAll(Gen.list(Gen.choose(-100, 100)), { ints ->
+        forAll(Gen.list(Gen.choose(-100, 100))) { ints ->
           find(ints.k()) { it > 10 } == Option.fromNullable(ints.firstOrNull { it > 10 })
-        })
+        }
       }
 
       "Get the length from a traversal" {
-        forAll(Gen.list(Gen.int()), { ints ->
+        forAll(Gen.list(Gen.int())) { ints ->
           size(ints.k()) == ints.size
-        })
+        }
       }
+
+      "Extract should extract the focus from the state" {
+        forAll(genListK(Gen.int())) { ints ->
+          extract().run(ints) ==
+            State { iis: ListK<Int> ->
+              iis toT getAll(iis)
+            }.run(ints)
+        }
+      }
+
+      "toState should be an alias to extract" {
+        forAll(genListK(Gen.int())) { ints ->
+          toState().run(ints) == extract().run(ints)
+        }
+      }
+
+      "Extracts with f should be same as extract and map" {
+        forAll(genListK(Gen.int()), genFunctionAToB<Int, String>(Gen.string())) { ints, f ->
+          extractMap(f).run(ints) == extract().map { it.map(f) }.run(ints)
+        }
+      }
+
+      "update f should be same modify f within State and returning new state" {
+        forAll(genListK(Gen.int()), genFunctionAToB<Int, Int>(Gen.int())) { ints, f ->
+          update(f).run(ints) ==
+            State<ListK<Int>, ListK<Int>> { iis: ListK<Int> ->
+              modify(iis, f)
+                .let { it.fix() toT getAll(it) }
+            }.run(ints)
+        }
+      }
+
+      "updateOld f should be same as modify f within State and returning old state" {
+        forAll(genListK(Gen.int()), genFunctionAToB<Int, Int>(Gen.int())) { ints, f ->
+          updateOld(f).run(ints) ==
+            State { iis: ListK<Int> ->
+              modify(iis, f).fix() toT getAll(iis)
+            }.run(ints)
+        }
+      }
+
+      "update_ f should be as modify f within State and returning Unit" {
+        forAll(genListK(Gen.int()), genFunctionAToB<Int, Int>(Gen.int())) { ints, f ->
+          update_(f).run(ints) ==
+            State { iis: ListK<Int> ->
+              modify(iis, f).fix() toT Unit
+            }.run(ints)
+        }
+      }
+
+      "assign a should be same set a within State and returning new value" {
+        forAll(genListK(Gen.int()), Gen.int()) { ints, i ->
+          assign(i).run(ints) ==
+            State { iis: ListK<Int> ->
+              set(iis, i)
+                .let { it.fix() toT getAll(it) }
+            }.run(ints)
+        }
+      }
+
+      "assignOld f should be same as modify f within State and returning old state" {
+        forAll(genListK(Gen.int()), Gen.int()) { ints, i ->
+          assignOld(i).run(ints) ==
+            State { iis: ListK<Int> ->
+              set(iis, i).fix() toT getAll(iis)
+            }.run(ints)
+        }
+      }
+
+      "assign_ f should be as modify f within State and returning Unit" {
+        forAll(genListK(Gen.int()), Gen.int()) { ints, i ->
+          assign_(i).run(ints) ==
+            State { iis: ListK<Int> ->
+              set(iis, i).fix() toT Unit
+            }.run(ints)
+        }
+      }
+
     }
 
   }

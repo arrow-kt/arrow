@@ -1,6 +1,8 @@
 package arrow.optics
 
 import arrow.core.*
+import arrow.data.*
+import arrow.instances.option.functor.functor
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genOption
@@ -47,16 +49,35 @@ class SetterTest : UnitSpec() {
       val token = Token(oldValue)
       val user = User(token)
 
-      forAll({ value: String ->
-        joinedSetter.set(token.let(::Left), value).swap().getOrElse { Token("Wrong value") }.value ==
-          joinedSetter.set(user.let(::Right), value).getOrElse { User(Token("Wrong value")) }.token.value
-      })
+      forAll { value: String ->
+        joinedSetter.set(token.left(), value).swap().getOrElse { Token("Wrong value") }.value ==
+          joinedSetter.set(user.right(), value).getOrElse { User(Token("Wrong value")) }.token.value
+      }
     }
 
     "Lifting a function should yield the same result as direct modify" {
-      forAll(TokenGen, Gen.string(), { token, value ->
+      forAll(TokenGen, Gen.string()) { token, value ->
         tokenSetter.modify(token) { value } == tokenSetter.lift { value }(token)
-      })
+      }
     }
+
+    "update_ f should be as modify f within State and returning Unit" {
+      forAll(TokenGen, genFunctionAToB<String, String>(Gen.string())) { token, f ->
+        tokenSetter.update_(f).run(token) ==
+          State { token: Token ->
+            tokenSetter.modify(token, f) toT Unit
+          }.run(token)
+      }
+    }
+
+    "assign_ f should be as modify f within State and returning Unit" {
+      forAll(TokenGen, Gen.string()) { token, string ->
+        tokenSetter.assign_(string).run(token) ==
+          State { token: Token ->
+            tokenSetter.set(token, string) toT Unit
+          }.run(token)
+      }
+    }
+
   }
 }

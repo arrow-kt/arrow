@@ -1,8 +1,10 @@
 package arrow.test.generators
 
 import arrow.Kind
+import arrow.Kind2
 import arrow.core.*
 import arrow.data.*
+import arrow.instances.option.functor.functor
 import arrow.recursion.Algebra
 import arrow.recursion.Coalgebra
 import arrow.recursion.typeclasses.Corecursive
@@ -41,6 +43,12 @@ fun genThrowable(): Gen<Throwable> = object : Gen<Throwable> {
 inline fun <F, A> genConstructor(valueGen: Gen<A>, crossinline cf: (A) -> Kind<F, A>): Gen<Kind<F, A>> =
   object : Gen<Kind<F, A>> {
     override fun generate(): Kind<F, A> =
+      cf(valueGen.generate())
+  }
+
+inline fun <F, A> genDoubleConstructor(valueGen: Gen<A>, crossinline cf: (A) -> Kind2<F, A, A>): Gen<Kind2<F, A, A>> =
+  object : Gen<Kind2<F, A, A>> {
+    override fun generate(): Kind2<F, A, A> =
       cf(valueGen.generate())
   }
 
@@ -135,7 +143,7 @@ inline fun <reified E, reified A> genValidated(genE: Gen<E>, genA: Gen<A>): Gen<
 
 inline fun <reified A> genTry(genA: Gen<A>, genThrowable: Gen<Throwable> = genThrowable()): Gen<Try<A>> = Gen.create {
   genEither(genThrowable, genA).generate().fold(
-    { throwable -> Failure<A>(throwable) },
+    { throwable -> Failure(throwable) },
     { a -> Success(a) }
   )
 }
@@ -185,10 +193,8 @@ fun fromGNatAlgebra() = Algebra<NatPattern, Eval<Int>> {
   it.fix().fold({ Eval.Zero }, { it.map { it + 1 } })
 }
 
-inline fun <reified T> Int.toGNat(CT: Corecursive<T>): GNat<T> = CT.run {
-  ana(Option.functor(), toGNatCoalgebra())
-}
+inline fun <reified T> Corecursive<T>.toGNat(i: Int): GNat<T> =
+  Option.functor().ana(i, toGNatCoalgebra())
 
-inline fun <reified T> GNat<T>.toInt(RT: Recursive<T>): Int = RT.run {
-  cata(Option.functor(), fromGNatAlgebra())
-}
+inline fun <reified T> Recursive<T>.toInt(i: GNat<T>): Int =
+  Option.functor().cata(i, fromGNatAlgebra())

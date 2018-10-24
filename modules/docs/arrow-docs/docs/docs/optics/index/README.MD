@@ -19,8 +19,9 @@ We can use that `Optional` to safely operate on that focus `S` i.e. operating on
 ```kotlin:ank
 import arrow.data.*
 import arrow.optics.typeclasses.*
+import arrow.optics.instances.listk.index.*
 
-val thirdListItemOptional = Index.index(ListK.index<String>(), 3)
+val thirdListItemOptional = ListK.index<String>().index(3)
 
 thirdListItemOptional.set(listOf("0", "1", "2", "3").k(), "newValue")
 ```

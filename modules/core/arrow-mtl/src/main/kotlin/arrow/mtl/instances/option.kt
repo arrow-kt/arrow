@@ -2,28 +2,29 @@ package arrow.mtl.instances
 
 import arrow.Kind
 import arrow.core.*
-import arrow.instance
+import arrow.deprecation.ExtensionsDSLDeprecated
+import arrow.extension
 import arrow.mtl.typeclasses.MonadFilter
 import arrow.mtl.typeclasses.TraverseFilter
 import arrow.typeclasses.Applicative
 import arrow.instances.traverse as optionTraverse
 import arrow.instances.traverseFilter as optionTraverseFilter
 
-@instance(Option::class)
+@extension
 interface OptionTraverseFilterInstance : TraverseFilter<ForOption> {
   override fun <A> Kind<ForOption, A>.filter(f: (A) -> Boolean): Option<A> =
     fix().filter(f)
 
-  override fun <G, A, B> Kind<ForOption, A>.traverseFilter(AP: Applicative<G>, f: (A) -> Kind<G, Option<B>>): arrow.Kind<G, Option<B>> =
+  override fun <G, A, B> Kind<ForOption, A>.traverseFilter(AP: Applicative<G>, f: (A) -> Kind<G, Option<B>>): Kind<G, Option<B>> =
     optionTraverseFilter(AP, f)
 
   override fun <A, B> Kind<ForOption, A>.map(f: (A) -> B): Option<B> =
     fix().map(f)
 
-  override fun <G, A, B> Kind<ForOption, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): arrow.Kind<G, Option<B>> =
+  override fun <G, A, B> Kind<ForOption, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Option<B>> =
     optionTraverse(AP, f)
 
-  override fun <A> Kind<ForOption, A>.exists(p: (A) -> Boolean): kotlin.Boolean =
+  override fun <A> Kind<ForOption, A>.exists(p: (A) -> Boolean): Boolean =
     fix().exists(p)
 
   override fun <A, B> Kind<ForOption, A>.foldLeft(b: B, f: (B, A) -> B): B =
@@ -32,17 +33,17 @@ interface OptionTraverseFilterInstance : TraverseFilter<ForOption> {
   override fun <A, B> Kind<ForOption, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
     fix().foldRight(lb, f)
 
-  override fun <A> OptionOf<A>.forAll(p: (A) -> Boolean): kotlin.Boolean =
+  override fun <A> OptionOf<A>.forAll(p: (A) -> Boolean): Boolean =
     fix().forall(p)
 
-  override fun <A> Kind<ForOption, A>.isEmpty(): kotlin.Boolean =
+  override fun <A> Kind<ForOption, A>.isEmpty(): Boolean =
     fix().isEmpty()
 
-  override fun <A> Kind<ForOption, A>.nonEmpty(): kotlin.Boolean =
+  override fun <A> Kind<ForOption, A>.nonEmpty(): Boolean =
     fix().nonEmpty()
 }
 
-@instance(Option::class)
+@extension
 interface OptionMonadFilterInstance : MonadFilter<ForOption> {
   override fun <A> empty(): Option<A> =
     Option.empty()
@@ -71,11 +72,12 @@ object OptionMtlContext : OptionMonadFilterInstance, OptionTraverseFilterInstanc
     fix().filter(f)
 
   override fun <A, B> Kind<ForOption, A>.mapFilter(f: (A) -> Option<B>): Option<B> =
-    this.flatMap({ a -> f(a).fold({ empty<B>() }, { just(it) }) })
+    flatMap { a -> f(a).fold({ empty<B>() }, { just(it) }) }
 
   override fun <A, B> Kind<ForOption, A>.map(f: (A) -> B): Option<B> =
     fix().map(f)
 }
 
+@Deprecated(ExtensionsDSLDeprecated)
 infix fun <A> ForOption.Companion.extensions(f: OptionMtlContext.() -> A): A =
   f(OptionMtlContext)

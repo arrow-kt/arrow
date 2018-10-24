@@ -4,9 +4,6 @@ import arrow.Kind
 import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.higherkind
-import arrow.legacy.Disjunction
-import arrow.legacy.LeftProjection
-import arrow.legacy.RightProjection
 
 /**
  * Port of https://github.com/scala/scala/blob/v2.12.1/src/library/scala/util/Either.scala
@@ -49,19 +46,13 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
    * @param ifRight the function to apply if this is a [Right]
    * @return the results of applying the function
    */
-  inline fun <C> fold(crossinline ifLeft: (A) -> C, crossinline ifRight: (B) -> C): C = when (this) {
-    is Right<A, B> -> ifRight(b)
-    is Left<A, B> -> ifLeft(a)
-  }
-
-  @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("getOrElse { ifLeft }"))
-  fun get(): B = when (this) {
-    is Right -> b
-    is Left -> throw NoSuchElementException("Disjunction.Left")
+  inline fun <C> fold(ifLeft: (A) -> C, ifRight: (B) -> C): C = when (this) {
+    is Right -> ifRight(b)
+    is Left -> ifLeft(a)
   }
 
   fun <C> foldLeft(initial: C, rightOperation: (C, B) -> C): C =
-    this.fix().let { either ->
+    fix().let { either ->
       when (either) {
         is Right -> rightOperation(initial, either.b)
         is Left -> initial
@@ -69,18 +60,12 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
     }
 
   fun <C> foldRight(initial: Eval<C>, rightOperation: (B, Eval<C>) -> Eval<C>): Eval<C> =
-    this.fix().let { either ->
+    fix().let { either ->
       when (either) {
         is Right -> rightOperation(either.b, initial)
         is Left -> initial
       }
     }
-
-  @Deprecated("arrow.data.Either is right biased. This method will be removed in future releases")
-  fun toDisjunction(): Disjunction<A, B> = when (this) {
-    is Right -> Disjunction.Right(b)
-    is Left -> Disjunction.Left(a)
-  }
 
   /**
    * If this is a `Left`, then return the left value in `Right` or vice versa.
@@ -103,11 +88,8 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
    * ```
    */
   @Suppress("UNCHECKED_CAST")
-  inline fun <C> map(crossinline f: (B) -> C): Either<A, C> =
-      when (this) {
-        is Right -> Right(f(b))
-        is Left -> this as Left<A, Nothing>
-      }
+  inline fun <C> map(f: (B) -> C): Either<A, C> =
+    flatMap { Right(f(it)) }
 
   /**
    * The given function is applied if this is a `Left`.
@@ -118,13 +100,13 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
    * Left(12).mapLeft { "flower" }  // Result: Left("flower)
    * ```
    */
-  inline fun <C> mapLeft(crossinline f: (A) -> C): Either<C, B> =
+  inline fun <C> mapLeft(f: (A) -> C): Either<C, B> =
     fold({ Left(f(it)) }, { Right(it) })
 
   /**
    * Map over Left and Right of this Either
    */
-  inline fun <C, D> bimap(crossinline leftOperation: (A) -> C, crossinline rightOperation: (B) -> D): Either<C, D> =
+  inline fun <C, D> bimap(leftOperation: (A) -> C, rightOperation: (B) -> D): Either<C, D> =
     fold({ Left(leftOperation(it)) }, { Right(rightOperation(it)) })
 
   /**
@@ -140,7 +122,7 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
    * left.exists { it > 10 }      // Result: false
    * ```
    */
-  inline fun exists(crossinline predicate: (B) -> Boolean): Boolean =
+  fun exists(predicate: (B) -> Boolean): Boolean =
     fold({ false }, { predicate(it) })
 
   /**
@@ -156,24 +138,18 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
   fun toOption(): Option<B> =
     fold({ None }, { Some(it) })
 
-  @Deprecated("arrow.data.Either is right biased. This method will be removed in future releases")
-  fun left(): LeftProjection<A, B> = LeftProjection(this)
-
-  @Deprecated("arrow.data.Either is right biased. This method will be removed in future releases")
-  fun right(): RightProjection<A, B> = RightProjection(this)
-
   /**
    * The left side of the disjoint union, as opposed to the [Right] side.
    */
   @Suppress("DataClassPrivateConstructor")
-  data class Left<out A, out B> @PublishedApi internal constructor(val a: A) : Either<A, B>() {
+  data class Left<out A> @PublishedApi internal constructor(val a: A) : Either<A, Nothing>() {
     override val isLeft
       get() = true
     override val isRight
       get() = false
 
     companion object {
-      inline operator fun <A> invoke(a: A): Either<A, Nothing> = Left(a)
+      operator fun <A> invoke(a: A): Either<A, Nothing> = Left(a)
     }
   }
 
@@ -181,14 +157,14 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
    * The right side of the disjoint union, as opposed to the [Left] side.
    */
   @Suppress("DataClassPrivateConstructor")
-  data class Right<out A, out B> @PublishedApi internal constructor(val b: B) : Either<A, B>() {
+  data class Right<out B> @PublishedApi internal constructor(val b: B) : Either<Nothing, B>() {
     override val isLeft
       get() = false
     override val isRight
       get() = true
 
     companion object {
-      inline operator fun <B> invoke(b: B): Either<Nothing, B> = Right(b)
+      operator fun <B> invoke(b: B): Either<Nothing, B> = Right(b)
     }
   }
 
@@ -201,12 +177,12 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
     tailrec fun <L, A, B> tailRecM(a: A, f: (A) -> Kind<EitherPartialOf<L>, Either<A, B>>): Either<L, B> {
       val ev: Either<L, Either<A, B>> = f(a).fix()
       return when (ev) {
-        is Left<L, Either<A, B>> -> Left(ev.a)
-        is Right<L, Either<A, B>> -> {
+        is Left -> Left(ev.a)
+        is Right -> {
           val b: Either<A, B> = ev.b
           when (b) {
-            is Left<A, B> -> tailRecM(b.a, f)
-            is Right<A, B> -> Right(b.b)
+            is Left -> tailRecM(b.a, f)
+            is Right -> Right(b.b)
           }
         }
       }
@@ -226,12 +202,11 @@ fun <R> Right(right: R): Either<Nothing, R> = Either.right(right)
  *
  * @param f The function to bind across [Either.Right].
  */
-@Suppress("UNCHECKED_CAST")
-fun <A, B, C> EitherOf<A, B>.flatMap(f: (B) -> Either<A, C>): Either<A, C> =
+inline fun <A, B, C> EitherOf<A, B>.flatMap(f: (B) -> Either<A, C>): Either<A, C> =
   fix().let {
     when (it) {
       is Right -> f(it.b)
-      is Left -> it as Left<A, Nothing>
+      is Left -> it
     }
   }
 
@@ -244,8 +219,20 @@ fun <A, B, C> EitherOf<A, B>.flatMap(f: (B) -> Either<A, C>): Either<A, C> =
  * Left(12).getOrElse(17)  // Result: 17
  * ```
  */
-inline fun <B> EitherOf<*, B>.getOrElse(crossinline default: () -> B): B =
+inline fun <B> EitherOf<*, B>.getOrElse(default: () -> B): B =
   fix().fold({ default() }, ::identity)
+
+/**
+ * Returns the value from this [Either.Right] or null if this is a [Either.Left].
+ *
+ * Example:
+ * ```
+ * Right(12).orNull() // Result: 12
+ * Left(12).orNull()  // Result: null
+ * ```
+ */
+fun <B> EitherOf<*, B>.orNull(): B? =
+  getOrElse { null }
 
 /**
  * Returns the value from this [Either.Right] or allows clients to transform [Either.Left] to [Either.Right] while providing access to
@@ -257,7 +244,7 @@ inline fun <B> EitherOf<*, B>.getOrElse(crossinline default: () -> B): B =
  * Left(12).getOrHandle { it + 5 } // Result: 17
  * ```
  */
-inline fun <A, B> EitherOf<A, B>.getOrHandle(crossinline default: (A) -> B): B =
+inline fun <A, B> EitherOf<A, B>.getOrHandle(default: (A) -> B): B =
   fix().fold({ default(it) }, ::identity)
 
 /**
@@ -276,8 +263,25 @@ inline fun <A, B> EitherOf<A, B>.getOrHandle(crossinline default: (A) -> B): B =
  * left.filterOrElse({ it > 10 }, { -1 })      // Result: Left(12)
  * ```
  */
-inline fun <A, B> EitherOf<A, B>.filterOrElse(crossinline predicate: (B) -> Boolean, crossinline default: () -> A): Either<A, B> =
-  fix().fold({ Left(it) }, { if (predicate(it)) Right(it) else Left(default()) })
+inline fun <A, B> EitherOf<A, B>.filterOrElse(predicate: (B) -> Boolean, default: () -> A): Either<A, B> =
+  flatMap { if (predicate(it)) Right(it) else Left(default()) }
+
+/**
+ * * Returns [Either.Right] with the existing value of [Either.Right] if this is an [Either.Right] with a non-null value.
+ * The returned Either.Right type is not nullable.
+ * * Returns `Left(default())` if this is an [Either.Right] and the existing value is null
+ * * Returns [Either.Left] with the existing value of [Either.Left] if this is an [Either.Left].
+ *
+ * Example:
+ * ```
+ * Right(12).leftIfNull({ -1 })   // Result: Right(12)
+ * Right(null).leftIfNull({ -1 }) // Result: Left(-1)
+ *
+ * Left(12).leftIfNull({ -1 })    // Result: Left(12)
+ * ```
+ */
+inline fun <A, B> EitherOf<A, B?>.leftIfNull(crossinline default: () -> A): Either<A, B> =
+  fix().flatMap { it.rightIfNotNull { default() } }
 
 /**
  * Returns `true` if this is a [Either.Right] and its value is equal to `elem` (as determined by `==`),
@@ -302,16 +306,24 @@ fun <A, B, C> EitherOf<A, B>.ap(ff: EitherOf<A, (B) -> C>): Either<A, C> =
 fun <A, B> EitherOf<A, B>.combineK(y: EitherOf<A, B>): Either<A, B> =
   when (this) {
     is Either.Left -> y.fix()
-    else -> this.fix()
+    else -> fix()
   }
-
-@Deprecated(DeprecatedAmbiguity, ReplaceWith("Try { body }.toEither()"))
-inline fun <T> eitherTry(body: () -> T): Either<Throwable, T> = try {
-  Right(body())
-} catch (t: Throwable) {
-  Left(t)
-}
 
 fun <A> A.left(): Either<A, Nothing> = Either.Left(this)
 
 fun <A> A.right(): Either<Nothing, A> = Either.Right(this)
+
+/**
+ * Returns [Either.Right] if the value of type B is not null, otherwise the specified A value wrapped into an
+ * [Either.Left].
+ *
+ * Example:
+ * ```
+ * "value".rightIfNotNull { "left" } // Right(b="value")
+ * null.rightIfNotNull { "left" }    // Left(a="left")
+ * ```
+ */
+fun <A, B> B?.rightIfNotNull(default: () -> A): Either<A, B> = when (this) {
+  null -> Either.Left(default())
+  else -> Either.Right(this)
+}

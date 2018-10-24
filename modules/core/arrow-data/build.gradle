@@ -11,9 +11,9 @@ dependencies {
     testCompile project(':arrow-instances-data')
     testCompile project(':arrow-test')
     testCompile project(':arrow-free')
+    testCompile project(':arrow-instances-free')
     testCompile project(':arrow-mtl')
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
-apply from: rootProject.file('gradle/generated-kotlin-sources.gradle')
 apply plugin: 'kotlin-kapt'

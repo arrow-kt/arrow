@@ -3,10 +3,15 @@ package arrow.instances
 import arrow.Kind
 import arrow.core.*
 import arrow.data.*
-import arrow.instance
+import arrow.deprecation.ExtensionsDSLDeprecated
+import arrow.extension
+import arrow.instances.id.monad.monad
+import arrow.instances.statet.applicative.applicative
+import arrow.instances.statet.functor.functor
+import arrow.instances.statet.monad.monad
 import arrow.typeclasses.*
 
-@instance(StateT::class)
+@extension
 interface StateTFunctorInstance<F, S> : Functor<StateTPartialOf<F, S>> {
 
   fun FF(): Functor<F>
@@ -16,43 +21,47 @@ interface StateTFunctorInstance<F, S> : Functor<StateTPartialOf<F, S>> {
 
 }
 
-@instance(StateT::class)
-interface StateTApplicativeInstance<F, S> : StateTFunctorInstance<F, S>, Applicative<StateTPartialOf<F, S>> {
+@extension
+interface StateTApplicativeInstance<F, S> : Applicative<StateTPartialOf<F, S>>, StateTFunctorInstance<F, S> {
 
-  override fun FF(): Monad<F>
+  fun MF(): Monad<F>
+
+  override fun FF(): Functor<F> = MF()
 
   override fun <A, B> Kind<StateTPartialOf<F, S>, A>.map(f: (A) -> B): StateT<F, S, B> =
-    fix().map(FF(), f)
+    fix().map(MF(), f)
 
   override fun <A> just(a: A): StateT<F, S, A> =
-    StateT(FF().just({ s: S -> FF().just(Tuple2(s, a)) }))
+    StateT(MF().just({ s: S -> MF().just(Tuple2(s, a)) }))
 
   override fun <A, B> Kind<StateTPartialOf<F, S>, A>.ap(ff: Kind<StateTPartialOf<F, S>, (A) -> B>): StateT<F, S, B> =
-    fix().ap(FF(), ff)
+    fix().ap(MF(), ff)
 
   override fun <A, B> Kind<StateTPartialOf<F, S>, A>.product(fb: Kind<StateTPartialOf<F, S>, B>): StateT<F, S, Tuple2<A, B>> =
-    fix().product(FF(), fb.fix())
+    fix().product(MF(), fb.fix())
 
 }
 
-@instance(StateT::class)
-interface StateTMonadInstance<F, S> : StateTApplicativeInstance<F, S>, Monad<StateTPartialOf<F, S>> {
+@extension
+interface StateTMonadInstance<F, S> : Monad<StateTPartialOf<F, S>>, StateTApplicativeInstance<F, S> {
+
+  override fun MF(): Monad<F>
 
   override fun <A, B> Kind<StateTPartialOf<F, S>, A>.map(f: (A) -> B): StateT<F, S, B> =
-    fix().map(FF(), f)
+    fix().map(MF(), f)
 
   override fun <A, B> Kind<StateTPartialOf<F, S>, A>.flatMap(f: (A) -> Kind<StateTPartialOf<F, S>, B>): StateT<F, S, B> =
-    fix().flatMap(FF(), f)
+    fix().flatMap(MF(), f)
 
   override fun <A, B> tailRecM(a: A, f: (A) -> StateTOf<F, S, Either<A, B>>): StateT<F, S, B> =
-    StateT.tailRecM(FF(), a, f)
+    StateT.tailRecM(MF(), a, f)
 
   override fun <A, B> Kind<StateTPartialOf<F, S>, A>.ap(ff: Kind<StateTPartialOf<F, S>, (A) -> B>): StateT<F, S, B> =
-    ff.fix().map2(FF(), fix(), { f, a -> f(a) })
+    ff.fix().map2(MF(), fix(), { f, a -> f(a) })
 
 }
 
-@instance(StateT::class)
+@extension
 interface StateTSemigroupKInstance<F, S> : SemigroupK<StateTPartialOf<F, S>> {
 
   fun FF(): Monad<F>
@@ -64,39 +73,53 @@ interface StateTSemigroupKInstance<F, S> : SemigroupK<StateTPartialOf<F, S>> {
 
 }
 
-@instance(StateT::class)
-interface StateTApplicativeErrorInstance<F, S, E> : StateTApplicativeInstance<F, S>, ApplicativeError<StateTPartialOf<F, S>, E> {
-  override fun FF(): MonadError<F, E>
+@extension
+interface StateTApplicativeErrorInstance<F, S, E> : ApplicativeError<StateTPartialOf<F, S>, E>, StateTApplicativeInstance<F, S> {
 
-  override fun <A> raiseError(e: E): Kind<StateTPartialOf<F, S>, A> = StateT.lift(FF(), FF().raiseError(e))
+  fun ME(): MonadError<F, E>
+
+  override fun FF(): Functor<F> = ME()
+
+  override fun MF(): Monad<F> = ME()
+
+  override fun <A> raiseError(e: E): Kind<StateTPartialOf<F, S>, A> = StateT.lift(ME(), ME().raiseError(e))
 
   override fun <A> Kind<StateTPartialOf<F, S>, A>.handleErrorWith(f: (E) -> Kind<StateTPartialOf<F, S>, A>): StateT<F, S, A> =
-    StateT(FF().just({ s -> FF().run { runM(FF(), s).handleErrorWith({ e -> f(e).runM(FF(), s) }) } }))
+    StateT(ME().just({ s -> ME().run { runM(ME(), s).handleErrorWith({ e -> f(e).runM(ME(), s) }) } }))
 }
 
-@instance(StateT::class)
-interface StateTMonadErrorInstance<F, S, E> : StateTApplicativeErrorInstance<F, S, E>, StateTMonadInstance<F, S>, MonadError<StateTPartialOf<F, S>, E>
+@extension
+interface StateTMonadErrorInstance<F, S, E> : MonadError<StateTPartialOf<F, S>, E>, StateTApplicativeErrorInstance<F, S, E>, StateTMonadInstance<F, S> {
+
+  override fun MF(): Monad<F> = ME()
+
+  override fun ME(): MonadError<F, E>
+
+}
 
 /**
  * Alias for[StateT.Companion.applicative]
  */
-fun <S> StateApi.applicative(): Applicative<StateTPartialOf<ForId, S>> = StateT.applicative<ForId, S>(Id.monad())
+fun <S> StateApi.applicative(): Applicative<StateTPartialOf<ForId, S>> = StateT.applicative(Id.monad())
 
 /**
  * Alias for [StateT.Companion.functor]
  */
-fun <S> StateApi.functor(): Functor<StateTPartialOf<ForId, S>> = StateT.functor<ForId, S>(Id.monad())
+fun <S> StateApi.functor(): Functor<StateTPartialOf<ForId, S>> = StateT.functor(Id.monad())
 
 /**
  * Alias for [StateT.Companion.monad]
  */
-fun <S> StateApi.monad(): Monad<StateTPartialOf<ForId, S>> = StateT.monad<ForId, S>(Id.monad())
+fun <S> StateApi.monad(): Monad<StateTPartialOf<ForId, S>> = StateT.monad(Id.monad())
 
 class StateTContext<F, S, E>(val ME: MonadError<F, E>) : StateTMonadErrorInstance<F, S, E> {
-  override fun FF(): MonadError<F, E> = ME
+  override fun MF(): Monad<F> = ME()
+
+  override fun ME(): MonadError<F, E> = ME
 }
 
 class StateTContextPartiallyApplied<F, S, E>(val ME: MonadError<F, E>) {
+  @Deprecated(ExtensionsDSLDeprecated)
   infix fun <A> extensions(f: StateTContext<F, S, E>.() -> A): A =
     f(StateTContext(ME))
 }
@@ -105,10 +128,11 @@ fun <F, S, E> ForStateT(ME: MonadError<F, E>): StateTContextPartiallyApplied<F, 
   StateTContextPartiallyApplied(ME)
 
 class StateTMonadContext<S> : StateTMonadInstance<ForId, S> {
-  override fun FF(): Monad<ForId> = Id.monad()
+  override fun MF(): Monad<ForId> = Id.monad()
 }
 
 class StateContextPartiallyApplied<S>() {
+  @Deprecated(ExtensionsDSLDeprecated)
   infix fun <A> extensions(f: StateTMonadContext<S>.() -> A): A =
     f(StateTMonadContext())
 }

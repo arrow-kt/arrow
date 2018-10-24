@@ -5,10 +5,7 @@ import arrow.core.Either
 import arrow.core.Tuple2
 import arrow.core.identity
 import arrow.higherkind
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadError
+import arrow.typeclasses.*
 
 /**
  * Alias that represents an arrow from [D] to a monadic value `Kind<F, A>`
@@ -64,9 +61,9 @@ class Kleisli<F, D, A>(val run: KleisliFun<F, D, A>) : KleisliOf<F, D, A>, Kleis
    * @param MF [Monad] for the context [F].
    */
   fun <B> zip(MF: Monad<F>, o: Kleisli<F, D, B>): Kleisli<F, D, Tuple2<A, B>> =
-    flatMap(MF, { a ->
-      o.map(MF, { b -> Tuple2(a, b) })
-    })
+    flatMap(MF) { a ->
+      o.map(MF) { b -> Tuple2(a, b) }
+    }
 
   /**
    * Compose this arrow with another function to transform the input of the arrow.
@@ -99,16 +96,16 @@ class Kleisli<F, D, A>(val run: KleisliFun<F, D, A>) : KleisliOf<F, D, A>, Kleis
    * @param fb the new end of the arrow.
    * @param MF [Monad] for the context [F].
    */
-  fun <B> andThen(MF: Monad<F>, fb: Kind<F, B>): Kleisli<F, D, B> = andThen(MF, { fb })
+  fun <B> andThen(MF: Monad<F>, fb: Kind<F, B>): Kleisli<F, D, B> = andThen(MF) { fb }
 
   /**
-   * Handle error within context of [F] given a [MonadError] is defined for [F].
+   * Handle error within context of [F] given a [ApplicativeError] is defined for [F].
    *
    * @param f function to handle error.
-   * @param ME [MonadError] for the context [F].
+   * @param AE [ApplicativeError] for the context [F].
    */
-  fun <E> handleErrorWith(ME: MonadError<F, E>, f: (E) -> KleisliOf<F, D, A>): Kleisli<F, D, A> = Kleisli {
-    ME.run { run(it).handleErrorWith({ e: E -> f(e).fix().run(it) }) }
+  fun <E> handleErrorWith(AE: ApplicativeError<F, E>, f: (E) -> KleisliOf<F, D, A>): Kleisli<F, D, A> = Kleisli {
+    AE.run { run(it).handleErrorWith({ e: E -> f(e).fix().run(it) }) }
   }
 
   companion object {
@@ -128,7 +125,7 @@ class Kleisli<F, D, A>(val run: KleisliFun<F, D, A>) : KleisliOf<F, D, A>, Kleis
      * @param MF [Monad] for the context [F].
      */
     fun <F, D, A, B> tailRecM(MF: Monad<F>, a: A, f: (A) -> KleisliOf<F, D, Either<A, B>>): Kleisli<F, D, B> =
-      Kleisli { b -> MF.tailRecM(a, { f(it).fix().run(b) }) }
+      Kleisli { b -> MF.tailRecM(a) { f(it).fix().run(b) } }
 
     /**
      * Create an arrow for a value of [A].
@@ -136,20 +133,20 @@ class Kleisli<F, D, A>(val run: KleisliFun<F, D, A>) : KleisliOf<F, D, A>, Kleis
      * @param x value of [A].
      * @param AF [Applicative] for context [F].
      */
-    inline fun <F, D, A> just(AF: Applicative<F>, x: A): Kleisli<F, D, A> = Kleisli { _ -> AF.just(x) }
+    fun <F, D, A> just(AF: Applicative<F>, x: A): Kleisli<F, D, A> = Kleisli { _ -> AF.just(x) }
 
     /**
      * Ask an arrow from [D] to [D].
      *
      * @param AF [Applicative] for context [F].
      */
-    inline fun <F, D> ask(AF: Applicative<F>): Kleisli<F, D, D> = Kleisli { AF.just(it) }
+    fun <F, D> ask(AF: Applicative<F>): Kleisli<F, D, D> = Kleisli { AF.just(it) }
 
     /**
      * Raise an error [E].
-     * @param ME [MonadError] for context [F].
+     * @param AE [ApplicativeError] for context [F].
      */
-    fun <F, D, E, A> raiseError(ME: MonadError<F, E>, e: E): Kleisli<F, D, A> = Kleisli { ME.raiseError(e) }
+    fun <F, D, E, A> raiseError(AE: ApplicativeError<F, E>, e: E): Kleisli<F, D, A> = Kleisli { AE.raiseError(e) }
 
   }
 }

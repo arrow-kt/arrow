@@ -1,7 +1,7 @@
 package arrow.test.laws
 
 import arrow.core.Option
-import arrow.core.functor
+import arrow.instances.option.functor.functor
 import arrow.recursion.hylo
 import arrow.recursion.typeclasses.Birecursive
 import arrow.test.generators.fromGNatAlgebra
@@ -14,11 +14,11 @@ object BirecursiveLaws {
     CorecursiveLaws.laws(BT) + RecursiveLaws.laws(BT, BT) + listOf(
       Law("Birecursive Laws: ana . cata == hylo") {
         forAll(Gen.choose(0, 1000)) {
-          val composed = it
-            .ana(Option.functor(), toGNatCoalgebra())
-            .cata(Option.functor(), fromGNatAlgebra())
-          val hylo = hylo(Option.functor(), fromGNatAlgebra(), toGNatCoalgebra(), it)
-          hylo == composed
+          Option.functor().run {
+            val composed = cata(ana(it, toGNatCoalgebra()), fromGNatAlgebra())
+            val hylo = hylo(fromGNatAlgebra(), toGNatCoalgebra(), it)
+            hylo == composed
+          }
         }
       }
     )

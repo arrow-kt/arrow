@@ -43,9 +43,9 @@ data class MapK<K, out A>(val map: Map<K, A>) : MapKOf<K, A>, Map<K, A> by map {
     this.map.foldLeft(b) { m, (k, v) -> f(m.k(), Tuple2(k, v)) }.k()
 
   fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, MapK<K, B>> = GA.run {
-    (Foldable.iterateRight(map.iterator(), Eval.always { just(emptyMap<K, B>().k()) }))({ kv, lbuf ->
+    (Foldable.iterateRight(map.iterator(), Eval.always { just(emptyMap<K, B>().k()) })) { kv, lbuf ->
       f(kv.value).map2Eval(lbuf) { (mapOf(kv.key to it.a).k() + it.b).k() }
-    }).value()
+    }.value()
   }
 
   companion object
@@ -59,7 +59,7 @@ fun <K, A> Option<Tuple2<K, A>>.k(): MapK<K, A> =
     is None -> emptyMap<K, A>().k()
   }
 
-inline fun <K, V, G> MapKOf<K, Kind<G, V>>.sequence(GA: Applicative<G>): Kind<G, MapK<K, V>> =
+fun <K, V, G> MapKOf<K, Kind<G, V>>.sequence(GA: Applicative<G>): Kind<G, MapK<K, V>> =
   fix().traverse(GA, ::identity)
 
 fun <K, A> List<Map.Entry<K, A>>.k(): MapK<K, A> = this.map { it.key to it.value }.toMap().k()

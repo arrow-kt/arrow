@@ -1,12 +1,13 @@
 package arrow.data
 
 import arrow.instances.monoid
+import arrow.instances.const.applicative.applicative
+import arrow.instances.const.eq.eq
+import arrow.instances.const.show.show
 import arrow.mtl.instances.*
+import arrow.mtl.instances.const.traverseFilter.traverseFilter
 import arrow.test.UnitSpec
-import arrow.test.laws.ApplicativeLaws
-import arrow.test.laws.EqLaws
-import arrow.test.laws.ShowLaws
-import arrow.test.laws.TraverseFilterLaws
+import arrow.test.laws.*
 import arrow.typeclasses.*
 import io.kotlintest.KTestJUnitRunner
 import org.junit.runner.RunWith
@@ -14,12 +15,12 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class ConstTest : UnitSpec() {
   init {
-    ForConst(Int.monoid()) extensions {
+    Int.monoid().run {
       testLaws(
-        TraverseFilterLaws.laws(this, this, { Const(it) }, Eq.any()),
-        ApplicativeLaws.laws(this, Eq.any()),
-        EqLaws.laws(Const.eq<Int, Int>(Eq.any()), { Const(it) }),
-        ShowLaws.laws(Const.show(), Const.eq<Int, Int>(Eq.any()), { Const(it) })
+        TraverseFilterLaws.laws(Const.traverseFilter(), Const.applicative(this), { Const(it) }, Eq.any()),
+        ApplicativeLaws.laws(Const.applicative(this), Eq.any()),
+        EqLaws.laws(Const.eq<Int, Int>(Eq.any())) { Const(it) },
+        ShowLaws.laws(Const.show(), Const.eq<Int, Int>(Eq.any())) { Const(it) }
       )
     }
   }

@@ -22,8 +22,9 @@ A `MapK<Int, String>` can be indexed by its keys `Int` but not for every index a
 import arrow.core.*
 import arrow.data.*
 import arrow.optics.typeclasses.*
+import arrow.optics.instances.mapk.at.*
 
-val mapAt = At.at(MapK.at<Int, String>(), 2)
+val mapAt = MapK.at<Int, String>().at(2)
 
 val map = mapOf(
             1 to "one",

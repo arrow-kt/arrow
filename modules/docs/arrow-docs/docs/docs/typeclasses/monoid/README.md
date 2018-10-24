@@ -39,6 +39,7 @@ ForString extensions {
 
 ```kotlin:ank
 import arrow.core.*
+import arrow.instances.option.monoid.*
 
 Option.monoid(Int.monoid()).run { listOf<Option<Int>>(Some(1), Some(1)).combineAll() }
 ```

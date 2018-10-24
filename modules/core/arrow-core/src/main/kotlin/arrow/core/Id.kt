@@ -15,7 +15,7 @@ data class Id<out A>(val value: A) : IdOf<A> {
 
   fun <B> foldRight(initial: Eval<B>, operation: (A, Eval<B>) -> Eval<B>): Eval<B> = operation(this.fix().value, initial)
 
-  fun <B> coflatMap(f: (IdOf<A>) -> B): Id<B> = this.fix().map({ f(this) })
+  fun <B> coflatMap(f: (IdOf<A>) -> B): Id<B> = this.fix().map { f(this) }
 
   fun extract(): A = this.fix().value
 
@@ -26,8 +26,8 @@ data class Id<out A>(val value: A) : IdOf<A> {
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> IdOf<Either<A, B>>): Id<B> {
       val x: Either<A, B> = f(a).fix().value
       return when (x) {
-        is Either.Left<A, B> -> tailRecM(x.a, f)
-        is Either.Right<A, B> -> Id(x.b)
+        is Either.Left -> tailRecM(x.a, f)
+        is Either.Right -> Id(x.b)
       }
     }
 

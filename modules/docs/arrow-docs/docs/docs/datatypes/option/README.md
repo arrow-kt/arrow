@@ -52,6 +52,13 @@ value1.getOrElse { "No value" }
 value2.getOrElse { "No value" }
 ```
 
+Creating a `Option<T>` of a `T?`. Useful for working with values that can be nullable:
+
+```kotlin:ank
+val myString: String? = "Nullable string"
+val option: Option<String> = Option.fromNullable(myString)
+```
+
 Checking whether option has value:
 
 ```kotlin:ank
@@ -121,6 +128,16 @@ Arrow also adds syntax to all datatypes so you can easily lift them into the con
 none<String>()
 ```
 
+```kotlin:ank
+val nullableValue: String? = null
+nullableValue.toOption()
+```
+
+```kotlin:ank
+val nullableValue: String? = "Hello"
+nullableValue.toOption()
+```
+
 Arrow contains `Option` instances for many useful typeclasses that allows you to use and transform optional values
 
 [`Functor`]({{ '/docs/typeclasses/functor/' | relative_url }})
@@ -129,9 +146,9 @@ Transforming the inner contents
 
 ```kotlin:ank
 import arrow.typeclasses.*
-import arrow.instances.*
+import arrow.instances.option.functor.*
 
-ForOption extensions {
+Option.functor().run {
   Some(1).map { it + 1 }
 }
 ```
@@ -141,9 +158,9 @@ ForOption extensions {
 Computing over independent values
 
 ```kotlin:ank
-ForOption extensions {
-  tupled(Some(1), Some("Hello"), Some(20.0))
-}
+import arrow.instances.option.applicative.*
+
+tupled(Some(1), Some("Hello"), Some(20.0))
 ```
 
 [`Monad`]({{ '/docs/typeclasses/monad/' | relative_url }})

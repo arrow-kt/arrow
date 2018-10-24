@@ -280,6 +280,40 @@ val httpStatusCode = r.getOrHandle {
 } // 400
 ```
 
+The ```leftIfNull``` operation transforms a null `Either.Right` value to the specified ```Either.Left``` value. 
+If the value is non-null, the value wrapped into a non-nullable ```Either.Right``` is returned (very useful to
+skip null-check further down the call chain).
+If the operation is called on an ```Either.Left```, the same ```Either.Left``` is returned.
+
+See the examples below:
+
+```kotlin:ank
+Right(12).leftIfNull({ -1 })
+```
+
+```kotlin:ank
+Right(null).leftIfNull({ -1 })
+```
+
+```kotlin:ank
+ Left(12).leftIfNull({ -1 })
+```
+
+Another useful operation when working with null is `rightIfNotNull`.
+If the value is null it will be transformed to the specified `Either.Left` and if its not null the type will
+be wrapped to `Either.Right`.
+
+Example:
+
+```kotlin:ank
+"value".rightIfNotNull { "left" }
+```
+
+```kotlin:ank
+null.rightIfNotNull { "left" }
+```
+
+
  Arrow contains `Either` instances for many useful typeclasses that allows you to use and transform right values.
  Both Option and Try don't require a type parameter with the following functions, but it is specifically used for Either.Left
 
@@ -288,11 +322,9 @@ val httpStatusCode = r.getOrHandle {
  Transforming the inner contents
 
 ```kotlin:ank
-import arrow.instances.*
+import arrow.instances.either.functor.*
  
-ForEither<Int>() extensions { 
-   Right(1).map {it + 1}
-}
+Right(1).map {it + 1}
 ```
 
  [`Applicative`]({{ '/docs/typeclasses/applicative/' | relative_url }})
@@ -300,9 +332,9 @@ ForEither<Int>() extensions {
  Computing over independent values
 
 ```kotlin:ank
-ForEither<Int>() extensions { 
-  tupled(Either.Right(1), Either.Right("a"), Either.Right(2.0))
-}
+import arrow.instances.either.applicative.*
+  
+tupled(Either.Right(1), Either.Right("a"), Either.Right(2.0))
 ```
 
  [`Monad`]({{ '/docs/typeclasses/monad/' | relative_url }})
@@ -310,13 +342,13 @@ ForEither<Int>() extensions {
  Computing over dependent values ignoring absence
 
 ```kotlin
-ForEither<Int>() extensions {
- binding {
-    val a = Either.Right(1).bind()
-    val b = Either.Right(1 + a).bind()
-    val c = Either.Right(1 + b).bind()
-    a + b + c
- }
+import arrow.instances.either.monad.*
+
+Either.monad().binding {
+  val a = Either.Right(1).bind()
+  val b = Either.Right(1 + a).bind()
+  val c = Either.Right(1 + b).bind()
+  a + b + c
 }
 // Right(6)
 ```
@@ -329,6 +361,7 @@ ForEither<Int>() extensions {
 * [ApplicativeError]({{ '/docs/typeclasses/applicativeerror' | relative_url }})
 * [Foldable]({{ '/docs/typeclasses/foldable' | relative_url }})
 * [Functor]({{ '/docs/typeclasses/functor' | relative_url }})
+* [Bifunctor]({{ '/docs/typeclasses/bifunctor' | relative_url }})
 * [Monad]({{ '/docs/typeclasses/monad' | relative_url }})
 * [MonadError]({{ '/docs/typeclasses/monaderror' | relative_url }})
 * [SemigroupK]({{ '/docs/typeclasses/semigroupk' | relative_url }})

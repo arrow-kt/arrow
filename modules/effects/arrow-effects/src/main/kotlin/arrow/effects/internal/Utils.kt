@@ -4,11 +4,13 @@ import arrow.core.Either
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.effects.typeclasses.Duration
 import arrow.effects.IO
+import arrow.effects.typeclasses.Duration
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.locks.AbstractQueuedSynchronizer
+
+typealias JavaCancellationException = java.util.concurrent.CancellationException
 
 object Platform {
 
@@ -36,6 +38,16 @@ object Platform {
     return { a ->
       if (!wasCalled.getAndSet(true)) {
         f(a)
+      }
+    }
+  }
+
+  inline fun onceOnly(crossinline f: () -> Unit): () -> Unit {
+    val wasCalled = AtomicBoolean(false)
+
+    return {
+      if (!wasCalled.getAndSet(true)) {
+        f()
       }
     }
   }

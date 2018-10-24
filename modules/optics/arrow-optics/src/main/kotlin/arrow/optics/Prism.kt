@@ -87,9 +87,8 @@ interface PPrism<S, T, A, B> : PPrismOf<S, T, A, B> {
    */
   fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> = FA.run {
     getOrModify(s).fold(
-      ::just,
-      { f(it).map(::reverseGet) }
-    )
+      ::just
+    ) { f(it).map(::reverseGet) }
   }
 
   /**
@@ -98,9 +97,8 @@ interface PPrism<S, T, A, B> : PPrismOf<S, T, A, B> {
   fun <F> liftF(FA: Applicative<F>, f: (A) -> Kind<F, B>): (S) -> Kind<F, T> = FA.run {
     { s ->
       getOrModify(s).fold(
-        ::just,
-        { f(it).map(::reverseGet) }
-      )
+        ::just
+      ) { f(it).map(::reverseGet) }
     }
   }
 
@@ -204,9 +202,8 @@ interface PPrism<S, T, A, B> : PPrismOf<S, T, A, B> {
    * View a [PPrism] as an [POptional]
    */
   fun asOptional(): POptional<S, T, A, B> = POptional(
-    this::getOrModify,
-    { b -> { s -> set(s, b) } }
-  )
+    this::getOrModify
+  ) { b -> { s -> set(s, b) } }
 
   /**
    * View a [PPrism] as a [PSetter]
@@ -226,9 +223,8 @@ interface PPrism<S, T, A, B> : PPrismOf<S, T, A, B> {
   fun asTraversal(): PTraversal<S, T, A, B> = object : PTraversal<S, T, A, B> {
     override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> = FA.run {
       getOrModify(s).fold(
-        ::just,
-        { f(it).map(this@PPrism::reverseGet) }
-      )
+        ::just
+      ) { f(it).map(this@PPrism::reverseGet) }
     }
   }
 }
@@ -236,12 +232,12 @@ interface PPrism<S, T, A, B> : PPrismOf<S, T, A, B> {
 /**
  * Modify the focus of a [PPrism] with a function
  */
-inline fun <S, T, A, B> PPrism<S, T, A, B>.modify(s: S, crossinline f: (A) -> B): T = getOrModify(s).fold(::identity, { a -> reverseGet(f(a)) })
+inline fun <S, T, A, B> PPrism<S, T, A, B>.modify(s: S, crossinline f: (A) -> B): T = getOrModify(s).fold(::identity) { a -> reverseGet(f(a)) }
 
 /**
  * Lift a function [f]: `(A) -> B to the context of `S`: `(S) -> T`
  */
-inline fun <S, T, A, B> PPrism<S, T, A, B>.lift(crossinline f: (A) -> B): (S) -> T = { s -> getOrModify(s).fold(::identity, { a -> reverseGet(f(a)) }) }
+inline fun <S, T, A, B> PPrism<S, T, A, B>.lift(crossinline f: (A) -> B): (S) -> T = { s -> getOrModify(s).fold(::identity) { a -> reverseGet(f(a)) } }
 
 /**
  * Modify the focus of a [PPrism] with a function
@@ -275,8 +271,8 @@ fun <S, T, A, B, C> PPrism<S, T, A, B>.left(): PPrism<Either<S, C>, Either<T, C>
   { it.fold({ a -> getOrModify(a).bimap({ Either.Left(it) }, { Either.Left(it) }) }, { c -> Either.Right(Either.Right(c)) }) },
   {
     when (it) {
-      is Either.Left<B, C> -> Either.Left(reverseGet(it.a))
-      is Either.Right<B, C> -> Either.Right(it.b)
+      is Either.Left -> Either.Left(reverseGet(it.a))
+      is Either.Right -> Either.Right(it.b)
     }
   }
 )

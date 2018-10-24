@@ -1,7 +1,15 @@
 package arrow.data
 
 import arrow.core.*
-import arrow.instances.*
+import arrow.instances.eq
+import arrow.instances.monoid
+import arrow.instances.semigroup
+import arrow.instances.validated.applicative.applicative
+import arrow.instances.validated.eq.eq
+import arrow.instances.validated.functor.functor
+import arrow.instances.validated.semigroupK.semigroupK
+import arrow.instances.validated.show.show
+import arrow.instances.validated.traverse.traverse
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
@@ -22,18 +30,16 @@ class ValidatedTest : UnitSpec() {
 
     val VAL_SGK = Validated.semigroupK(String.semigroup())
 
-    ForValidated(String.semigroup()) extensions {
-      testLaws(
-        EqLaws.laws(EQ) { Valid(it) },
-        ShowLaws.laws(Validated.show(), EQ) { Valid(it) },
-        ApplicativeLaws.laws(this, Eq.any()),
-        TraverseLaws.laws(this, this, ::Valid, Eq.any()),
-        SemigroupKLaws.laws(
-          this,
-          this,
-          Eq.any())
-      )
-    }
+    testLaws(
+      EqLaws.laws(EQ) { Valid(it) },
+      ShowLaws.laws(Validated.show(), EQ) { Valid(it) },
+      ApplicativeLaws.laws(Validated.applicative(String.semigroup()), Eq.any()),
+      TraverseLaws.laws(Validated.traverse(), Validated.functor(), ::Valid, Eq.any()),
+      SemigroupKLaws.laws(
+        Validated.semigroupK(String.semigroup()),
+        Validated.applicative(String.semigroup()),
+        Eq.any())
+    )
 
 
     "fold should call function on Invalid" {
@@ -76,6 +82,12 @@ class ValidatedTest : UnitSpec() {
     "getOrElse should return value if is Valid or default in otherwise" {
       Valid(13).getOrElse { fail("None should not be called") } shouldBe 13
       Invalid(13).getOrElse { "defaultValue" } shouldBe "defaultValue"
+    }
+
+    "orNull should return value if is Valid or null otherwise" {
+      Valid(13).orNull() shouldBe 13
+      val invalid: Validated<Int, Int> = Invalid(13)
+      invalid.orNull() shouldBe null
     }
 
     "valueOr should return value if is Valid or the the result of f in otherwise" {
@@ -125,9 +137,9 @@ class ValidatedTest : UnitSpec() {
     val plusIntSemigroup: Semigroup<Int> = Int.semigroup()
 
     "findValid should return the first Valid value or combine or Invalid values in otherwise" {
-      Valid(10).findValid(plusIntSemigroup, { fail("None should not be called") }) shouldBe Valid(10)
-      Invalid(10).findValid(plusIntSemigroup, { Valid(5) }) shouldBe Valid(5)
-      Invalid(10).findValid(plusIntSemigroup, { Invalid(5) }) shouldBe Invalid(15)
+      Valid(10).findValid(plusIntSemigroup) { fail("None should not be called") } shouldBe Valid(10)
+      Invalid(10).findValid(plusIntSemigroup) { Valid(5) } shouldBe Valid(5)
+      Invalid(10).findValid(plusIntSemigroup) { Invalid(5) } shouldBe Invalid(15)
     }
 
     "ap should return Valid(f(a)) if both are Valid" {
@@ -177,24 +189,24 @@ class ValidatedTest : UnitSpec() {
         map(
           Valid("11th"),
           Valid("Doctor"),
-          Valid("Who"),
-          { (a, b, c) -> "$a $b $c" }) shouldBe Valid("11th Doctor Who")
+          Valid("Who")
+        ) { (a, b, c) -> "$a $b $c" } shouldBe Valid("11th Doctor Who")
       }
 
       "Cartesian builder should build products over heterogeneous Validated" {
         map(
           Valid(13),
           Valid("Doctor"),
-          Valid(false),
-          { (a, b, c) -> "${a}th $b is $c" }) shouldBe Valid("13th Doctor is false")
+          Valid(false)
+        ) { (a, b, c) -> "${a}th $b is $c" } shouldBe Valid("13th Doctor is false")
       }
 
       "Cartesian builder should build products over Invalid Validated" {
         map(
           Invalid("fail1"),
           Invalid("fail2"),
-          Valid("Who"),
-          { "success!" }) shouldBe Invalid("fail1fail2")
+          Valid("Who")
+        ) { "success!" } shouldBe Invalid("fail1fail2")
       }
     }
 

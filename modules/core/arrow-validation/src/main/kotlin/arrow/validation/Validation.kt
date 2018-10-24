@@ -1,6 +1,10 @@
 package arrow.validation
 
 import arrow.core.Either
+import arrow.core.identity
+
+private fun <A, B> Either<A, B>.get(): B =
+  fold({ throw NoSuchElementException("Either.get on a Left value") }, ::identity)
 
 class Validation<out E : Any>(vararg disjunctionSequence: Either<E, *>) {
 

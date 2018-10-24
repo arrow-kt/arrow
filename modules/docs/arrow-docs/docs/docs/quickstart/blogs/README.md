@@ -8,21 +8,23 @@ permalink: /docs/quickstart/blogs/
 
 A selection of external links to some of the content created by maintainers and users.
 
+### State of the functional ecosystem in Kotlin: Mid 2018 checkup
+
+This talk focuses on the day-to-day problems Arrow solves, from small ideas to big concepts.
+
+It includes an overview of all the modules available, and some of the 3rd party libraries made by the community.
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/q_1xPYQLyaU?rel=0" frameborder="0" allowfullscreen></iframe>
+
+Conference for Kotliners, Budapest, Jun '18 - version 0.7.2
+
 ### Functional Programming in Kotlin with Arrow
 
-A rundown of all the features included in the library.
+A rundown of all the features included in the library, focusing on implementation details.
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/IL5XzaCMKpQ?rel=0" frameborder="0" allowfullscreen></iframe>
 
 Lambda World, Cadiz, Nov '17 - version 0.3.11
-
-### Kotlin for the Pragmatic Functionalist
-
-An introduction to Arrow and the enhancements it brings to Kotlin's standard library.
-
-<iframe width="560" height="315" src="https://www.youtube.com/embed/s9oMED6ZikQ?rel=0" frameborder="0" allowfullscreen></iframe>
-
-KotlinConf, San Francisco, Nov '17 - version 0.3.11
 
 ### Architectures Using Functional Programming Concepts
 
@@ -48,6 +50,14 @@ KotlinConf, San Francisco, Nov '17 - version 0.3.11
  
  Mobilization 7, Łódź, Oct '17 - version 0.3.11
  
+### Kotlin for the Pragmatic Functionalist
+
+An introduction to Arrow and the enhancements it brings to Kotlin's standard library.
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/s9oMED6ZikQ?rel=0" frameborder="0" allowfullscreen></iframe>
+
+KotlinConf, San Francisco, Nov '17 - version 0.3.11
+ 
 ### It's all about morphisms
  
 [@uberto](https://github.com/uberto) gives a gentle introduction to Category Theory for programmers used to OOP but interested in Functional Programming. No Haskell knowledge required. We will explain main concepts behind functional programming with many diagrams and simple metaphors and examples. Some code will clarify how to translate these ideas in programs.
@@ -63,6 +73,29 @@ Voxxed Days, Vienna, Mar '18 - version 0.6.1
 <iframe width="560" height="315" src="https://www.youtube.com/embed/tM2wEI-e80E" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
 
 Kotlin Meetup, Sydney, Mar '18 - version 0.6.1
+
+### Functional Programming in Kotlin with Arrow by Emmanuel Nhan
+[@nhanmanu](https://twitter.com/nhanmanu) introduces Kotlin and how it is a good fit for functional programming. The talk goes through some interesting features of Kotlin, then show how to use them to enter the world of Higher Kinds and Typeclasses. In the last part, we explore some Arrow capabilities & built-in syntax, using validation as an example. 
+
+<iframe src="//www.slideshare.net/slideshow/embed_code/key/eOPu1UXHZrloFf" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/EmmanuelNhan/functional-programming-in-kotlin-with-arrow-sunnytech-2018" title="Functional programming in kotlin with Arrow [Sunnytech 2018]" target="_blank">Functional programming in kotlin with Arrow [Sunnytech 2018]</a> </strong> de <strong><a href="//www.slideshare.net/EmmanuelNhan" target="_blank">Emmanuel Nhan</a></strong> </div>
+
+Sunny Tech, Montpellier, June '18 - version 0.7.2
+
+### Higher Kinded Types in a Lower Kinded Language by Jacob Bass
+
+It's hard coming back down to the earth of a JVM based language after spending time with Haskell and OCaml. This talk will discuss functional programming in Kotlin with the Arrow library, how the abstractions it provides can improve your code, and how this magic that provides higher-kinded types works under the hood.
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/ERM0mBPNLHc" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
+
+Yow! Lambda Jam, Sydney, Australia, June '18 - version 0.7
+
+### Arrow and Functional Programming for Kotlin Developers
+
+A beginner level introduction to Functional Programming for Kotlin and/or Android Developers or developers with OOP background.
+ 
+<iframe width="560" height="315" src="https://www.youtube.com/embed/qYgilPqMOp0" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
+ 
+DroidJam India, Bangalore, India, July '18 - version 0.7.2
 
 ### Functional Programming in Kotlin
 
@@ -99,18 +132,21 @@ Sept '17 - version 0.3.11
 
 [Functional Programming with Arrow](https://speakerdeck.com/heyitsmohit/functional-programming-with-arrow)
 
-Kotlin Brooklyn Meetup, Jan ’18 - version 0.6.1
+Kotlin Brooklyn Meetup, Jan '18 - version 0.6.1
 
 ### Android Functional Validation
 
 [@dcampogiani](https://github.com/dcampogiani) explores some data types in Arrow and uses them to validate a form on Android.
+
+Video in Italian
+<iframe src="https://player.vimeo.com/video/279931528" width="560" height="315" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
 
 * [Introduction](http://danielecampogiani.com/blog/2018/02/android-functional-validation-1-intro/)
 * [Option](http://danielecampogiani.com/blog/2018/02/android-functional-validation-2-option/)
 * [Either](http://danielecampogiani.com/blog/2018/02/android-functional-validation-3-either/)
 * [Validated](http://danielecampogiani.com/blog/2018/02/android-functional-validation-4-validated/)
 
-April ’18 - version 0.7
+April '18 - version 0.7
 
 ### 1/n - How do I ... in FP : Validation
 
@@ -118,4 +154,14 @@ April ’18 - version 0.7
 
 [1/n - How do I ... in FP : Validation](https://www.enhan.eu/how-to-in-fp/)
 
-April ’18 - version 0.7
+April '18 - version 0.7
+
+### Arrow 101 — Building an Android app using Functional Programming
+
+[Leandro Ferreira](https://twitter.com/mLeandroBF) presents how to build a simple app using Arrow and how to implement solutions with Semigroups.
+
+[Arrow 101 — Building an Android app using Functional Programming](https://medium.com/@lehen01/arrow-101-building-an-android-app-using-functional-programming-fe959675d96d)
+
+[Arrow 101 — Modelling a real world problem with Semigroups](https://medium.com/@lehen01/arrow-101-modelling-a-real-world-problem-with-semigroups-d8f22cdf54c)
+
+June '18 - version 0.7

@@ -24,28 +24,53 @@ branching in code with [`Either`]({{ '/docs/datatypes/either' | relative_url }})
 catching exceptions with [`Try`]({{ '/docs/datatypes/try' | relative_url }}),
 or interacting with the platform the program runs in using [`IO`]({{ '/docs/effects/io' | relative_url }}).
 
+Some of these patterns are implemented using a mix of `sealed` classes where each inheritor is a `data` class.
+For example, the internal representation of an `Option` is a `sealed` class with two `data` classes `Some<A>(val a: A)` and `None`,
+and `Ior` is a `sealed` class with three `data` class inheritors, `Left(val a: A)`, `Right(val b: B)`, and `Both(val a: A, val b: B)`.
+
+Datatypes that express patterns like deferred evaluation can do it by nesting themselves with every operation they chain. One example is `IO`.
+
+```kotlin:ank
+import arrow.effects.*
+
+IO { 0 }
+ .continueOn(UI)
+ .flatMap { IO { it * 2 } }
+ .map { it + 1 }
+```
+
 You can read more about all the [datatypes]({{ '/docs/datatypes/intro' | relative_url }}) that Arrow provides in its [section of the docs]({{ '/docs/datatypes/intro' | relative_url }}).
  
 ### Typeclasses
 
-Typeclasses define a set of functions associated to one type.
-This behavior is checked by a test suite called the "laws" for that typeclass.
+Typeclasses are interface abstractions that define a set of extension functions associated to one type.
+These extension functions are canonical and consistent across languages and libraries;
+and they have inherent mathematical properties that are testable, such as commutativity or associativity.
 
-You can use typeclasses as a DSL to add new free functionality to an existing type
-or treat them as an abstraction placeholder for any one type that can implement the typeclass.
-
-Examples of these behaviors are: comparability ([`Eq`]({{ '/docs/typeclasses/eq' | relative_url }})),
+Examples of behaviours abstracted by typeclasses are: comparability ([`Eq`]({{ '/docs/typeclasses/eq' | relative_url }})),
 composability ([`Monoid`]({{ '/docs/typeclasses/monoid' | relative_url }})),
 its contents can be mapped from one type to another ([`Functor`]({{ '/docs/typeclasses/functor' | relative_url }})),
 or error recovery ([`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }})).
 
+Typeclasses have two main uses:
+
+* Add new functionality to types. For example, if I know how to compare two objects I can add a new extension function to check for inequality.
+Or if I know how to aggregate objects together, I can add an extension function for `List` that aggregates all of its elements.
+The number of extra extension functions that you get per typeclass can be from one in `Eq` to 17 (!) in `Foldable`.
+
+* Abstracting over behavior. Like any other interface, you can use them in your functions and classes as a way of talking about the capabilities of the implementation,
+without exposing the details. This way you can create APIs that work the same for `Option`, `Try`, or `Observable`.
+
 You can read more about all the [typeclasses]({{ '/docs/typeclasses/intro' | relative_url }}) that Arrow provides in its [section of the docs]({{ '/docs/typeclasses/intro' | relative_url }}).
 
-One example, the typeclass `Eq` parametrized to `F` defines equality between two objects of type `F`:
+Let's dive in one example. The typeclass `Eq` parametrized to `F` defines equality between two objects of type `F`:
 
 ```kotlin
 interface Eq<F> {
   fun F.eqv(b: F): Boolean
+
+  fun F.neqv(b: F): Boolean =
+    !eqv(b)
 }
 ```
 
@@ -69,6 +94,9 @@ import arrow.core.*
 import arrow.data.*
 import arrow.instances.*
 import arrow.typeclasses.*
+import arrow.instances.option.functor.*
+import arrow.instances.either.monadError.*
+import arrow.instances.listk.traverse.*
 ```
 
 ```kotlin:ank
@@ -80,6 +108,8 @@ Option.functor()
 ```
 
 ```kotlin:ank
+import arrow.instances.mapk.semigroup.*
+
 MapK.semigroup<String, Int>(Int.semigroup())
 ```
 
@@ -91,9 +121,9 @@ Either.monadError<Throwable>()
 ListK.traverse()
 ```
 
-If you're defining your own instances and would like for them to be discoverable in their corresponding datatypes' companion object, you can generate it by annotating them as `@instance`, and Arrow's [annotation processor](https://github.com/arrow-kt/arrow#additional-setup) will create the extension functions for you.
+If you're defining your own instances and would like for them to be discoverable in their corresponding datatypes' companion object, you can generate it by annotating them as `@extension`, and Arrow's [annotation processor](https://github.com/arrow-kt/arrow#additional-setup) will create the extension functions for you.
 
-NOTE: If you'd like to use `@instance` for transitive typeclasses, like a `Show<List<A>>` that requires a function returning a `Show<A>`, you'll need for the function providing the transitive typeclass to have 0 parameters, and for any new typeclass defined outside Arrow to be on a package named `typeclass`. This will make the transitive typeclass a parameter of the extension function. This is a *temporary* limitation of the processor to be fixed because we don't have an annotation or type marker for what's a typeclass and what's not.
+NOTE: If you'd like to use `@extension` for transitive typeclasses, like a `Show<List<A>>` that requires a function returning a `Show<A>`, you'll need for the function providing the transitive typeclass to have 0 parameters. This will make the transitive typeclass a parameter of the extension function.
 
 
 ### Syntax
@@ -236,7 +266,7 @@ You can define `fun Kind<ForOption, A>.fix()` and `fun Kind<ForListK, A>.fix()` 
 If it can't it means there's an ambiguity you should fix!
 
 The function `fix()` is already defined for all datatypes in Λrrow, alongside a typealias for its `Kind<F, A>` specialization done by suffixing the type with Of, as in `ListKOf<A>` or `OptionOf<A>`. If you're creating your own datatype that's also a type constructor and would like to create all these helper types and functions,
-you can do so simply by annotating it as `@higerkind` and the Λrrow's [annotation processor](https://github.com/arrow-kt/arrow#additional-setup) will create them for you.
+you can do so simply by annotating it as `@higherkind` and the Λrrow's [annotation processor](https://github.com/arrow-kt/arrow#additional-setup) will create them for you.
 
 ```kotlin
 @higherkind
@@ -249,7 +279,7 @@ data class ListK<A>(val list: List<A>): ListKOf<A>
 // fun ListKOf<A>.fix() = this as ListK<A>
 ```
 
-Note that the annotation `@higerkind` will also generate the integration typealiases required by [KindedJ]({{ '/docs/integrations/kindedj' | relative_url }}) as long as the datatype is invariant. You can read more about sharing Higher Kinds and type constructors across JVM libraries in [KindedJ's README](https://github.com/KindedJ/KindedJ#rationale).
+Note that the annotation `@higherkind` will also generate the integration typealiases required by [KindedJ]({{ '/docs/integrations/kindedj' | relative_url }}) as long as the datatype is invariant. You can read more about sharing Higher Kinds and type constructors across JVM libraries in [KindedJ's README](https://github.com/KindedJ/KindedJ#rationale).
 
 #### Using Higher Kinds with typeclasses
 
@@ -268,7 +298,7 @@ See how the class is parametrized on the container `F`, and the function is para
 Let's define an instance of `Functor` for the datatype `ListK`, our own wrapper for lists.
 
 ```kotlin
-@instance
+@extension
 interface ListKFunctorInstance : Functor<ForListK> {
   override fun <A, B> Kind<F, A>.map(f: (A) -> B): ListK<B> {
     val list: ListK<A> = this.fix()
@@ -277,15 +307,18 @@ interface ListKFunctorInstance : Functor<ForListK> {
 }
 ```
 
-This interface extends `Functor` for the value `F` of `ListK`. We use an annotation processor `@instance` to generate an object out of an interface with all the default methods already defined, and to add an extension function to get it into the companion object of the datatype.
+This interface extends `Functor` for the value `F` of `ListK`. We use an annotation processor `@extension` to generate an object out of an interface with all the default methods already defined, and to add an extension function to get it into the companion object of the datatype.
+The `@extension` processor also projects all type class declared functions into the data type that it's extending as extensions functions.
+These extensions functions may be imported a la carte when working with concrete data types. 
 
 ```kotlin
-@instance
+@extension
 interface ListKFunctorInstance : Functor<ForListK>
 ```
 
 ```kotlin:ank
 // Somewhere else in the codebase
+import arrow.instances.listk.functor.*
 ListK.functor()
 ```
 

@@ -1,12 +1,12 @@
 package arrow.effects
 
 import arrow.core.*
-import arrow.effects.CoroutineContextScheduler.asScheduler
+import arrow.effects.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import io.reactivex.Maybe
 import io.reactivex.MaybeEmitter
-import kotlin.coroutines.experimental.CoroutineContext
+import kotlin.coroutines.CoroutineContext
 
 fun <A> Maybe<A>.k(): MaybeK<A> = MaybeK(this)
 
@@ -65,7 +65,7 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
       Maybe.defer { fa().value() }.k()
 
     fun <A> async(fa: Proc<A>): MaybeK<A> =
-      Maybe.create({ emitter: MaybeEmitter<A> ->
+      Maybe.create { emitter: MaybeEmitter<A> ->
         fa { either: Either<Throwable, A> ->
           either.fold({
             emitter.onError(it)
@@ -74,7 +74,7 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
           })
 
         }
-      }).k()
+      }.k()
 
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> MaybeKOf<Either<A, B>>): MaybeK<B> {
       val either = f(a).fix().value().blockingGet()

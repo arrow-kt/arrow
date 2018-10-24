@@ -3,6 +3,12 @@ package arrow.optics.instances
 import arrow.core.*
 import arrow.data.*
 import arrow.instances.eq
+import arrow.instances.listk.eq.eq
+import arrow.instances.option.eq.eq
+import arrow.instances.sequencek.eq.eq
+import arrow.optics.instances.sequencek.each.each
+import arrow.optics.instances.sequencek.filterIndex.filterIndex
+import arrow.optics.instances.sequencek.index.index
 import arrow.optics.typeclasses.FilterIndex
 import arrow.test.UnitSpec
 import arrow.test.generators.*
@@ -29,7 +35,7 @@ class SequenceKInstanceTest : UnitSpec() {
     ))
 
     testLaws(TraversalLaws.laws(
-      traversal = FilterIndex.filterIndex(SequenceK.filterIndex()) { true },
+      traversal = SequenceK.filterIndex<String>().filter { true },
       aGen = genSequenceK(Gen.string()),
       bGen = Gen.string(),
       funcGen = genFunctionAToB(Gen.string()),

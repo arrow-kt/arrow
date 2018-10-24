@@ -2,12 +2,40 @@ package arrow.instances
 
 import arrow.Kind
 import arrow.core.*
-import arrow.instance
+import arrow.core.Try.Failure
+import arrow.deprecation.ExtensionsDSLDeprecated
+import arrow.extension
 import arrow.typeclasses.*
 import arrow.instances.traverse as tryTraverse
 
-@instance(Try::class)
-interface TryApplicativeErrorInstance : TryApplicativeInstance, ApplicativeError<ForTry, Throwable> {
+fun <A> Try<A>.combine(SG: Semigroup<A>, b: Try<A>): Try<A> =
+  when (this) {
+    is Success<A> -> when (b) {
+      is Success<A> -> Success(SG.run { value.combine(b.value) })
+      is Failure -> this
+    }
+    is Failure -> b
+  }
+
+@extension
+interface TrySemigroupInstance<A> : Semigroup<Try<A>> {
+
+  fun SG(): Semigroup<A>
+
+  override fun Try<A>.combine(b: Try<A>): Try<A> = fix().combine(SG(), b)
+}
+
+@extension
+interface TryMonoidInstance<A> : Monoid<Try<A>>, TrySemigroupInstance<A> {
+  fun MO(): Monoid<A>
+
+  override fun SG(): Semigroup<A> = MO()
+
+  override fun empty(): Try<A> = Success(MO().empty())
+}
+
+@extension
+interface TryApplicativeErrorInstance : ApplicativeError<ForTry, Throwable>, TryApplicativeInstance {
 
   override fun <A> raiseError(e: Throwable): Try<A> =
     Failure(e)
@@ -17,8 +45,8 @@ interface TryApplicativeErrorInstance : TryApplicativeInstance, ApplicativeError
 
 }
 
-@instance(Try::class)
-interface TryMonadErrorInstance : TryMonadInstance, MonadError<ForTry, Throwable> {
+@extension
+interface TryMonadErrorInstance : MonadError<ForTry, Throwable>, TryMonadInstance {
   override fun <A> raiseError(e: Throwable): Try<A> =
     Failure(e)
 
@@ -26,7 +54,7 @@ interface TryMonadErrorInstance : TryMonadInstance, MonadError<ForTry, Throwable
     fix().recoverWith { f(it).fix() }
 }
 
-@instance(Try::class)
+@extension
 interface TryEqInstance<A> : Eq<Try<A>> {
 
   fun EQA(): Eq<A>
@@ -46,19 +74,19 @@ interface TryEqInstance<A> : Eq<Try<A>> {
 
 }
 
-@instance(Try::class)
+@extension
 interface TryShowInstance<A> : Show<Try<A>> {
   override fun Try<A>.show(): String =
     toString()
 }
 
-@instance(Try::class)
+@extension
 interface TryFunctorInstance : Functor<ForTry> {
   override fun <A, B> Kind<ForTry, A>.map(f: (A) -> B): Try<B> =
     fix().map(f)
 }
 
-@instance(Try::class)
+@extension
 interface TryApplicativeInstance : Applicative<ForTry> {
   override fun <A, B> Kind<ForTry, A>.ap(ff: Kind<ForTry, (A) -> B>): Try<B> =
     fix().ap(ff)
@@ -70,7 +98,7 @@ interface TryApplicativeInstance : Applicative<ForTry> {
     Try.just(a)
 }
 
-@instance(Try::class)
+@extension
 interface TryMonadInstance : Monad<ForTry> {
   override fun <A, B> Kind<ForTry, A>.ap(ff: Kind<ForTry, (A) -> B>): Try<B> =
     fix().ap(ff)
@@ -88,7 +116,7 @@ interface TryMonadInstance : Monad<ForTry> {
     Try.just(a)
 }
 
-@instance(Try::class)
+@extension
 interface TryFoldableInstance : Foldable<ForTry> {
   override fun <A> TryOf<A>.exists(p: (A) -> Boolean): Boolean =
     fix().exists(p)
@@ -101,13 +129,13 @@ interface TryFoldableInstance : Foldable<ForTry> {
 }
 
 fun <A, B, G> TryOf<A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Try<B>> = GA.run {
-  fix().fold({ just(Try.raise(it)) }, { f(it).map({ Try.just(it) }) })
+  fix().fold({ just(Try.raise(it)) }, { f(it).map { Try.just(it) } })
 }
 
 fun <A, G> TryOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, Try<A>> =
   tryTraverse(GA, ::identity)
 
-@instance(Try::class)
+@extension
 interface TryTraverseInstance : Traverse<ForTry> {
   override fun <A, B> TryOf<A>.map(f: (A) -> B): Try<B> =
     fix().map(f)
@@ -130,5 +158,6 @@ object TryContext : TryMonadErrorInstance, TryTraverseInstance {
     fix().map(f)
 }
 
+@Deprecated(ExtensionsDSLDeprecated)
 infix fun <A> ForTry.Companion.extensions(f: TryContext.() -> A): A =
   f(TryContext)

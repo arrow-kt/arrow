@@ -3,14 +3,14 @@ package arrow.mtl.typeclasses
 import arrow.Kind
 import arrow.core.Option
 import arrow.typeclasses.Monad
-import kotlin.coroutines.experimental.startCoroutine
+import kotlin.coroutines.startCoroutine
 
 interface MonadFilter<F> : Monad<F>, FunctorFilter<F> {
 
   fun <A> empty(): Kind<F, A>
 
   override fun <A, B> Kind<F, A>.mapFilter(f: (A) -> Option<B>): Kind<F, B> =
-    this.flatMap({ a -> f(a).fold({ empty<B>() }, { just(it) }) })
+    this.flatMap { a -> f(a).fold({ empty<B>() }, { just(it) }) }
 }
 
 /**

@@ -1,8 +1,32 @@
+
+apply plugin: 'idea'
+
+idea {
+    module {
+        sourceDirs += files(
+                'build/generated/source/kapt/main',
+                'build/generated/source/kapt/debug',
+                'build/generated/source/kapt/release',
+                'build/generated/source/kaptKotlin/main',
+                'build/generated/source/kaptKotlin/debug',
+                'build/generated/source/kaptKotlin/release',
+                'build/tmp/kapt/main/kotlinGenerated')
+        generatedSourceDirs += files(
+                'build/generated/source/kapt/main',
+                'build/generated/source/kapt/debug',
+                'build/generated/source/kapt/release',
+                'build/generated/source/kaptKotlin/main',
+                'build/generated/source/kaptKotlin/debug',
+                'build/generated/source/kaptKotlin/release',
+                'build/tmp/kapt/main/kotlinGenerated')
+    }
+}
+
 dependencies {
-    compile project(':arrow-data')
-    compile project(':arrow-effects')
-    compile project(':arrow-effects-rx2')
-    compile project(':arrow-effects-kotlinx-coroutines')
+    compile project(':arrow-instances-data')
+    compile project(':arrow-effects-instances')
+    compile project(':arrow-effects-rx2-instances')
+    compile project(':arrow-effects-kotlinx-coroutines-instances')
     compile project(':arrow-optics')
 
     kapt project(':arrow-annotations-processor')
@@ -16,5 +40,4 @@ dependencies {
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
 }
 
-apply from: rootProject.file('gradle/generated-kotlin-sources.gradle')
 apply plugin: 'kotlin-kapt'

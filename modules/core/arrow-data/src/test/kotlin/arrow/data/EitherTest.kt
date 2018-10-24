@@ -1,9 +1,19 @@
 package arrow.data
 
 import arrow.Kind
+import arrow.Kind2
 import arrow.core.*
 import arrow.instances.*
 import arrow.instances.eq
+import arrow.instances.either.applicative.applicative
+import arrow.instances.either.bifunctor.bifunctor
+import arrow.instances.either.eq.eq
+import arrow.instances.either.monadError.monadError
+import arrow.instances.either.monoid.monoid
+import arrow.instances.either.semigroup.semigroup
+import arrow.instances.either.semigroupK.semigroupK
+import arrow.instances.either.show.show
+import arrow.instances.either.traverse.traverse
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
@@ -17,24 +27,59 @@ class EitherTest : UnitSpec() {
     a.fix() == b.fix()
   }
 
+  val EQ2: Eq<Kind2<ForEither, Int, Int>> = Eq { a, b ->
+    a.fix() == b.fix()
+  }
+
   init {
 
-    ForEither<Throwable>() extensions {
-
       testLaws(
-        EqLaws.laws(Either.eq(String.eq(), Int.eq()), { Right(it) }),
-        ShowLaws.laws(Either.show(), Either.eq(String.eq(), Int.eq()), { Right(it) }),
-        MonadErrorLaws.laws(this, Eq.any(), Eq.any()),
-        TraverseLaws.laws(this, this, { Right(it) }, Eq.any()),
+        BifunctorLaws.laws(Either.bifunctor(), { Right(it) }, EQ2),
+        SemigroupLaws.laws(Either.semigroup(String.semigroup(), String.semigroup()), Either.right("1"), Either.right("2"), Either.right("3"), Either.eq(String.eq(), String.eq())),
+        MonoidLaws.laws(Either.monoid(MOL=String.monoid(), MOR = Int.monoid()), Either.right(1), Either.eq(String.eq(), Int.eq())),
+        EqLaws.laws(Either.eq(String.eq(), Int.eq())) { Right(it) },
+        ShowLaws.laws(Either.show(), Either.eq(String.eq(), Int.eq())) { Right(it) },
+        MonadErrorLaws.laws(Either.monadError(), Eq.any(), Eq.any()),
+        TraverseLaws.laws(Either.traverse(), Either.applicative(), { Right(it) }, Eq.any()),
         SemigroupKLaws.laws(Either.semigroupK(), Either.applicative(), EQ)
       )
 
+    "empty should return a Right of the empty of the inner type" {
+      forAll { _: String ->
+        Right(String.monoid().run { empty() }) == Either.monoid(String.monoid(), String.monoid()).run { empty() }
+      }
+    }
+
+    "combine two rights should return a right of the combine of the inners" {
+      forAll { a: String, b: String ->
+        String.monoid().run { Either.right(a.combine(b)) } == Either.right(a).combine(String.monoid(), String.monoid(), Either.right(b))
+      }
+    }
+
+    "combine two lefts should return a left of the combine of the inners" {
+      forAll { a: String, b: String ->
+        String.monoid().run { Either.left(a.combine(b)) } == Either.left(a).combine(String.monoid(), String.monoid(), Either.left(b))
+      }
+    }
+
+    "combine a right and a left should return left" {
+      forAll { a: String, b: String ->
+        Either.left(a) == Either.left(a).combine(String.monoid(), String.monoid(), Either.right(b))
+        Either.left(a) == Either.right(b).combine(String.monoid(), String.monoid(), Either.left(a))
+      }
     }
 
     "getOrElse should return value" {
       forAll { a: Int, b: Int ->
         Right(a).getOrElse { b } == a
           && Left(a).getOrElse { b } == b
+      }
+
+    }
+
+    "orNull should return value" {
+      forAll { a: Int ->
+        Either.Right(a).orNull() == a
       }
 
     }
@@ -47,7 +92,7 @@ class EitherTest : UnitSpec() {
 
     }
 
-    "filterOrElse should filters value" {
+    "filterOrElse should filter values" {
       forAll { a: Int, b: Int ->
         val left: Either<Int, Int> = Left(a)
 
@@ -55,6 +100,21 @@ class EitherTest : UnitSpec() {
           && Right(a).filterOrElse({ it > a + 1 }, { b }) == Left(b)
           && left.filterOrElse({ it > a - 1 }, { b }) == Left(a)
           && left.filterOrElse({ it > a + 1 }, { b }) == Left(a)
+      }
+    }
+
+    "leftIfNull should return Left if Right value is null of if Either is Left" {
+      forAll { a: Int, b: Int ->
+        Right(a).leftIfNull { b }  == Right(a)
+          && Right( null ).leftIfNull { b }  == Left(b)
+        && Left(a).leftIfNull { b } == Left(a)
+      }
+    }
+
+    "rightIfNotNull should return Left if value is null or Right of value when not null" {
+      forAll { a: Int, b: Int ->
+        null.rightIfNotNull { b } == Left(b)
+          && a.rightIfNotNull { b } == Right(a)
       }
     }
 

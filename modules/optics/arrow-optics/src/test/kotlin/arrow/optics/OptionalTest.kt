@@ -1,14 +1,13 @@
 package arrow.optics
 
 import arrow.core.*
-import arrow.data.ListK
-import arrow.data.eq
-import arrow.data.k
+import arrow.data.*
 import arrow.instances.monoid
+import arrow.instances.`try`.applicative.applicative
+import arrow.instances.listk.eq.eq
+import arrow.instances.option.eq.eq
 import arrow.test.UnitSpec
-import arrow.test.generators.genFunctionAToB
-import arrow.test.generators.genTry
-import arrow.test.generators.genTuple
+import arrow.test.generators.*
 import arrow.test.laws.OptionalLaws
 import arrow.test.laws.SetterLaws
 import arrow.test.laws.TraversalLaws
@@ -140,67 +139,146 @@ class OptionalTest : UnitSpec() {
     }
 
     "void should always " {
-      forAll({ string: String ->
+      forAll { string: String ->
         Optional.void<String, Int>().getOption(string) == None
-      })
+      }
     }
 
     "void should always return source when setting target" {
-      forAll({ int: Int, string: String ->
+      forAll { int: Int, string: String ->
         Optional.void<String, Int>().set(string, int) == string
-      })
+      }
     }
 
     "Checking if there is no target" {
-      forAll(Gen.list(Gen.int()), { list ->
+      forAll(Gen.list(Gen.int())) { list ->
         optionalHead.nonEmpty(list) == list.isNotEmpty()
-      })
+      }
     }
 
     "Lift should be consistent with modify" {
-      forAll(Gen.list(Gen.int()), { list ->
+      forAll(Gen.list(Gen.int())) { list ->
         val f = { i: Int -> i + 5 }
         optionalHead.lift(f)(list) == optionalHead.modify(list, f)
-      })
+      }
     }
 
     "LiftF should be consistent with modifyF" {
-      forAll(Gen.list(Gen.int()), genTry(Gen.int()), { list, tryInt ->
+      forAll(Gen.list(Gen.int()), genTry(Gen.int())) { list, tryInt ->
         val f = { _: Int -> tryInt }
         optionalHead.liftF(Try.applicative(), f)(list) == optionalHead.modifyF(Try.applicative(), list, f)
-      })
+      }
     }
 
     "Checking if a target exists" {
-      forAll(Gen.list(Gen.int()), { list ->
+      forAll(Gen.list(Gen.int())) { list ->
         optionalHead.isEmpty(list) == list.isEmpty()
-      })
+      }
     }
 
     "Finding a target using a predicate should be wrapped in the correct option result" {
-      forAll(Gen.list(Gen.int()), Gen.bool(), { list, predicate ->
+      forAll(Gen.list(Gen.int()), Gen.bool()) { list, predicate ->
         optionalHead.find(list) { predicate }.fold({ false }, { true }) == predicate
-      })
+      }
     }
 
     "Checking existence predicate over the target should result in same result as predicate" {
-      forAll(Gen.list(Gen.int()), Gen.bool(), { list, predicate ->
+      forAll(Gen.list(Gen.int()), Gen.bool()) { list, predicate ->
         optionalHead.exists(list) { predicate } == predicate
-      })
+      }
     }
 
     "Checking satisfaction of predicate over the target should result in opposite result as predicate" {
-      forAll(Gen.list(Gen.int()), Gen.bool(), { list, predicate ->
+      forAll(Gen.list(Gen.int()), Gen.bool()) { list, predicate ->
         optionalHead.all(list) { predicate } == predicate
-      })
+      }
     }
 
     "Joining two optionals together with same target should yield same result" {
       val joinedOptional = optionalHead.choice(defaultHead)
 
-      forAll(Gen.int(), { int ->
+      forAll(Gen.int()) { int ->
         joinedOptional.getOption(Left(listOf(int))) == joinedOptional.getOption(Right(int))
-      })
+      }
+    }
+
+    val successInt = Try.success<Int>().asOptional()
+
+    "Extract should extract the focus from the state" {
+      forAll(genTry(Gen.int())) { x ->
+        successInt.extract().run(x) ==
+          State { x: Try<Int> ->
+            x toT successInt.getOption(x)
+          }.run(x)
+      }
+    }
+
+    "toState should be an alias to extract" {
+      forAll(genTry(Gen.int())) { x ->
+        successInt.toState().run(x) == successInt.extract().run(x)
+      }
+    }
+
+    "extractMap with f should be same as extract and map" {
+      forAll(genTry(Gen.int()), genFunctionAToB<Int, Int>(Gen.int())) { x, f ->
+        successInt.extractMap(f).run(x) == successInt.extract().map { it.map(f) }.run(x)
+      }
+    }
+
+    "update f should be same modify f within State and returning new state" {
+      forAll(genTry(Gen.int()), genFunctionAToB<Int, Int>(Gen.int())) { x, f ->
+        successInt.update(f).run(x) ==
+          State { xx: Try<Int> ->
+            successInt.modify(xx, f)
+              .let { it toT successInt.getOption(it) }
+          }.run(x)
+      }
+    }
+
+    "updateOld f should be same as modify f within State and returning old state" {
+      forAll(genTry(Gen.int()), genFunctionAToB<Int, Int>(Gen.int())) { x, f ->
+        successInt.updateOld(f).run(x) ==
+          State { xx: Try<Int> ->
+            successInt.modify(xx, f) toT successInt.getOption(xx)
+          }.run(x)
+      }
+    }
+
+    "update_ f should be as modify f within State and returning Unit" {
+      forAll(genTry(Gen.int()), genFunctionAToB<Int, Int>(Gen.int())) { x, f ->
+        successInt.update_(f).run(x) ==
+          State { xx: Try<Int> ->
+            successInt.modify(xx, f) toT Unit
+          }.run(x)
+      }
+    }
+
+    "assign a should be same set a within State and returning new value" {
+      forAll(genTry(Gen.int()), Gen.int()) { x, i ->
+        successInt.assign(i).run(x) ==
+          State { xx: Try<Int> ->
+            successInt.set(xx, i)
+              .let { it toT successInt.getOption(it) }
+          }.run(x)
+      }
+    }
+
+    "assignOld f should be same as modify f within State and returning old state" {
+      forAll(genTry(Gen.int()), Gen.int()) { x, i ->
+        successInt.assignOld(i).run(x) ==
+          State { xx: Try<Int> ->
+            successInt.set(xx, i) toT successInt.getOption(xx)
+          }.run(x)
+      }
+    }
+
+    "assign_ f should be as modify f within State and returning Unit" {
+      forAll(genTry(Gen.int()), Gen.int()) { x, i ->
+        successInt.assign_(i).run(x) ==
+          State { xx: Try<Int> ->
+            successInt.set(xx, i) toT Unit
+          }.run(x)
+      }
     }
 
   }

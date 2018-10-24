@@ -2,13 +2,14 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.core.*
+import arrow.effects.CoroutineContextRx2Scheduler.asScheduler
+import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
-import kotlin.coroutines.experimental.CoroutineContext
-import arrow.effects.CoroutineContextScheduler.asScheduler
+import kotlin.coroutines.CoroutineContext
 
 fun <A> Observable<A>.k(): ObservableK<A> = ObservableK(this)
 
@@ -43,11 +44,10 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
     return Eval.defer { loop(this) }
   }
 
-  fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, ObservableK<B>> = GA.run {
+  fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, ObservableK<B>> =
     foldRight(Eval.always { GA.just(Observable.empty<B>().k()) }) { a, eval ->
-      f(a).map2Eval(eval) { Observable.concat(Observable.just<B>(it.a), it.b.observable).k() }
+      GA.run { f(a).map2Eval(eval) { Observable.concat(Observable.just<B>(it.a), it.b.observable).k() } }
     }.value()
-  }
 
   fun handleErrorWith(function: (Throwable) -> ObservableK<A>): ObservableK<A> =
     this.fix().observable.onErrorResumeNext { t: Throwable -> function(t).observable }.k()
@@ -56,7 +56,14 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
     observable.observeOn(ctx.asScheduler()).k()
 
   fun runAsync(cb: (Either<Throwable, A>) -> ObservableKOf<Unit>): ObservableK<Unit> =
-    observable.flatMap { cb(Right(it)).value() }.onErrorResumeNext(io.reactivex.functions.Function { cb(Left(it)).value() }).k()
+    observable.flatMap { cb(Right(it)).value() }.onErrorResumeNext { t: Throwable -> cb(Left(t)).value() }.k()
+
+  fun runAsyncCancellable(cb: (Either<Throwable, A>) -> ObservableKOf<Unit>): ObservableK<Disposable> =
+    Observable.fromCallable {
+      val disposable: io.reactivex.disposables.Disposable = runAsync(cb).value().subscribe()
+      val dispose: () -> Unit = { disposable.dispose() }
+      dispose
+    }.k()
 
   companion object {
     fun <A> just(a: A): ObservableK<A> =
@@ -90,32 +97,8 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
         is Either.Right -> Observable.just(either.b).k()
       }
     }
-
-    fun monadFlat(): ObservableKMonadInstance = monad()
-
-    fun monadConcat(): ObservableKMonadInstance = object : ObservableKMonadInstance {
-      override fun <A, B> Kind<ForObservableK, A>.flatMap(f: (A) -> Kind<ForObservableK, B>): ObservableK<B> =
-        fix().concatMap { f(it).fix() }
-    }
-
-    fun monadSwitch(): ObservableKMonadInstance = object : ObservableKMonadErrorInstance {
-      override fun <A, B> Kind<ForObservableK, A>.flatMap(f: (A) -> Kind<ForObservableK, B>): ObservableK<B> =
-        fix().switchMap { f(it).fix() }
-    }
-
-    fun monadErrorFlat(): ObservableKMonadErrorInstance = monadError()
-
-    fun monadErrorConcat(): ObservableKMonadErrorInstance = object : ObservableKMonadErrorInstance {
-      override fun <A, B> Kind<ForObservableK, A>.flatMap(f: (A) -> Kind<ForObservableK, B>): ObservableK<B> =
-        fix().concatMap { f(it).fix() }
-    }
-
-    fun monadErrorSwitch(): ObservableKMonadErrorInstance = object : ObservableKMonadErrorInstance {
-      override fun <A, B> Kind<ForObservableK, A>.flatMap(f: (A) -> Kind<ForObservableK, B>): ObservableK<B> =
-        fix().switchMap { f(it).fix() }
-    }
   }
 }
 
-inline fun <A, G> ObservableKOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, ObservableK<A>> =
+fun <A, G> ObservableKOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, ObservableK<A>> =
   fix().traverse(GA, ::identity)

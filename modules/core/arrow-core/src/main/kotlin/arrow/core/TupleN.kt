@@ -1,11 +1,15 @@
 package arrow.core
 
 import arrow.*
+import java.util.*
 
 @higherkind
 data class Tuple2<out A, out B>(val a: A, val b: B) : Tuple2Of<A, B> {
   fun <C> map(f: (B) -> C) =
     a toT f(b)
+
+  fun <C, D> bimap(fl: (A) -> C, fr: (B) -> D) =
+    fl(a) toT fr(b)
 
   fun <C> ap(f: Tuple2Of<*, (B) -> C>) =
     map(f.fix().b)
@@ -132,4 +136,96 @@ data class Tuple22<out A, out B, out C, out D, out E, out F, out G, out H, out I
   companion object
 }
 
+private const val INT_MAX_POWER_OF_TWO: Int = Int.MAX_VALUE / 2 + 1
+
 infix fun <A, B> A.toT(b: B): Tuple2<A, B> = Tuple2(this, b)
+
+fun <K, V> Tuple2<K, V>.toPair() : Pair<K, V> = Pair(this.a, this.b)
+
+fun <K, V> Pair<K, V>.toTuple2() : Tuple2<K, V> = Tuple2(this.first, this.second)
+
+fun <K, V> mapOf(vararg tuples: Tuple2<K, V>): Map<K, V> =
+  if (tuples.isNotEmpty()) tuples.toMap(LinkedHashMap(mapCapacity(tuples.size))) else emptyMap()
+
+fun <K, V> Iterable<Tuple2<K, V>>.toMap(): Map<K, V> {
+  if (this is Collection) {
+    return when (size) {
+      0 -> emptyMap()
+      1 -> mapOf(if (this is List) this[0] else iterator().next())
+      else -> toMap(LinkedHashMap(mapCapacity(size)))
+    }
+  }
+  return toMap(LinkedHashMap()).optimizeReadOnlyMap()
+}
+
+fun <K, V> Array<out Tuple2<K, V>>.toMap(): Map<K, V> = when (size) {
+  0 -> emptyMap()
+  1 -> mapOf(this[0])
+  else -> toMap(LinkedHashMap(mapCapacity(size)))
+}
+
+fun <K, V> Sequence<Tuple2<K, V>>.toMap(): Map<K, V> = toMap(LinkedHashMap()).optimizeReadOnlyMap()
+
+fun <K, V> mapOf(pair: Tuple2<K, V>): Map<K, V> = Collections.singletonMap(pair.a, pair.b)
+
+internal fun <K, V, M : MutableMap<in K, in V>> Iterable<Tuple2<K, V>>.toMap(destination: M): M =
+  destination.apply { putAll(this@toMap) }
+
+internal fun <K, V, M : MutableMap<in K, in V>> Array<out Tuple2<K, V>>.toMap(destination: M): M =
+  destination.apply { putAll(this@toMap) }
+
+internal fun <K, V, M : MutableMap<in K, in V>> Sequence<Tuple2<K, V>>.toMap(destination: M): M =
+  destination.apply { putAll(this@toMap) }
+
+internal fun <K, V> MutableMap<in K, in V>.putAll(tuples: Iterable<Tuple2<K, V>>) {
+  for ((key, value) in tuples) {
+    put(key, value)
+  }
+}
+
+internal fun <K, V> MutableMap<in K, in V>.putAll(tuples: Array<out Tuple2<K, V>>) {
+  for ((key, value) in tuples) {
+    put(key, value)
+  }
+}
+
+internal fun <K, V> MutableMap<in K, in V>.putAll(tuples: Sequence<Tuple2<K, V>>) {
+  for ((key, value) in tuples) {
+    put(key, value)
+  }
+}
+
+operator fun <K, V> Map<out K, V>.plus(tuple: Tuple2<K, V>): Map<K, V> =
+  if (this.isEmpty()) mapOf(tuple) else LinkedHashMap(this).apply { put(tuple.a, tuple.b) }
+
+operator fun <K, V> Map<out K, V>.plus(tuples: Iterable<Tuple2<K, V>>): Map<K, V> =
+  if (this.isEmpty()) tuples.toMap() else LinkedHashMap(this).apply { putAll(tuples) }
+
+operator fun <K, V> Map<out K, V>.plus(tuples: Array<out Tuple2<K, V>>): Map<K, V> =
+  if (this.isEmpty()) tuples.toMap() else LinkedHashMap(this).apply { putAll(tuples) }
+
+operator fun <K, V> Map<out K, V>.plus(tuples: Sequence<Tuple2<K, V>>): Map<K, V> =
+  LinkedHashMap(this).apply { putAll(tuples) }.optimizeReadOnlyMap()
+
+inline fun <K, V> Map.Entry<K, V>.toTuple2(): Tuple2<K, V> = Tuple2(key, value)
+
+internal fun mapCapacity(expectedSize: Int): Int =
+  when {
+    expectedSize < 3 -> expectedSize + 1
+    expectedSize < INT_MAX_POWER_OF_TWO -> expectedSize + expectedSize / 3
+    else -> Int.MAX_VALUE
+  }
+
+// do not expose for now @PublishedApi
+internal fun <K, V> Map<K, V>.optimizeReadOnlyMap() =
+  when (size) {
+    0 -> emptyMap()
+    1 -> this.toSingletonMap()
+    else -> this
+  }
+
+// creates a singleton copy of map
+internal fun <K, V> Map<out K, V>.toSingletonMap(): Map<K, V> =
+  with(entries.iterator().next()) {
+    Collections.singletonMap(key, value)
+  }

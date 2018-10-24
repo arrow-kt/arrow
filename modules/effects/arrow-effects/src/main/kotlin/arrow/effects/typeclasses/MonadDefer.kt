@@ -6,16 +6,16 @@ import arrow.core.Tuple2
 import arrow.core.toT
 import arrow.effects.data.internal.BindingCancellationException
 import arrow.typeclasses.MonadError
-import kotlin.coroutines.experimental.startCoroutine
+import kotlin.coroutines.startCoroutine
 
 /** The context required to defer evaluating a safe computation. **/
 interface MonadDefer<F> : MonadError<F, Throwable> {
   fun <A> defer(fa: () -> Kind<F, A>): Kind<F, A>
 
-  operator fun <A> invoke(fa: () -> A): Kind<F, A> =
+  operator fun <A> invoke(f: () -> A): Kind<F, A> =
     defer {
       try {
-        just(fa())
+        just(f())
       } catch (t: Throwable) {
         raiseError<A>(t)
       }

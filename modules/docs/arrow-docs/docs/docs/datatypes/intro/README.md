@@ -126,6 +126,14 @@ TODO
 
 - [`Coreader`]
 
+- [`Store`]({{ '/docs/datatypes/store/' | relative_url }}) - a datatype which holds an initial state and a function for extracting a representation of it.
+
+- [`Moore`]({{ '/docs/datatypes/moore/' | relative_url }}) - a datatype which holds an initial state and can move to new states only when an event of a specific type is dispatched.
+
+- [`Sum`]({{ '/docs/datatypes/sum/' | relative_url }}) - a datatype which holds two comonads and a flag for indicating which one is active. Both sides evolve at the same time.
+
+- [`Day`]({{ '/docs/datatypes/day/' | relative_url }}) - a datatype which holds two comonads which evolve independently.
+
 #### Effects
 
 All effects are different implementations of the same abstraction: lazy execution of code that can move to other threads and cause exceptions.
@@ -150,3 +158,13 @@ They are more general than the other datatypes as they combine the abstractions 
 - [`Yoneda`]({{ '/docs/free/yoneda/' | relative_url }})
 
 - [`Coyoneda`]({{ '/docs/free/coyoneda/' | relative_url }})
+
+#### Recursion schemes
+
+Recursion schemes are an abstraction for structured recursion that ensure runtime safety and provide powerful abstractions for recursive datatypes.
+
+- [`Fix`]({{ 'docs/recursion/fix' | relative_url }}) - Models birecursion
+
+- [`Mu`]({{ 'docs/recursion/mu' | relative_url }}) - Models recursion
+
+- [`Nu`]({{ 'docs/recursion/nu' | relative_url }}) - Models corecursion

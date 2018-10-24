@@ -28,8 +28,14 @@ options:
       - title: Dependency Injection
         url: /docs/patterns/dependency_injection/
 
+      - title: The Monad Tutorial
+        url: /docs/patterns/monads/
+
       - title: Monad Comprehensions
         url: /docs/patterns/monad_comprehensions/
+
+      - title: Polymorphic Programs
+        url: /docs/patterns/polymorphic_programs/
 
       - title: Free Algebras
         url: /docs/patterns/free_algebras/
@@ -91,6 +97,18 @@ options:
 
       - title: StateT
         url: /docs/datatypes/statet/
+
+      - title: Store
+        url: /docs/datatypes/store/
+
+      - title: Moore
+        url: /docs/datatypes/moore/
+
+      - title: Sum
+        url: /docs/datatypes/sum/
+        
+      - title: Day
+        url: /docs/datatypes/day/
 
       - title: WriterT
         url: /docs/datatypes/writert/
@@ -195,6 +213,12 @@ options:
       - title: Bimonad
         url: /docs/typeclasses/bimonad/
 
+      - title: Bifunctor
+        url: /docs/typeclasses/bifunctor
+
+      - title: Profunctor
+        url: /docs/typeclasses/profunctor
+
       - title: SemigroupK
         url: /docs/typeclasses/semigroupk/
 
@@ -222,6 +246,9 @@ options:
 
       - title: Effect
         url: /docs/effects/effect/
+
+      - title: Ref
+        url: /docs/effects/ref/
 
   - title: Optics
 
@@ -269,6 +296,9 @@ options:
   - title: Generic
     nested_options:
 
+          - title: Coproduct
+            url: /docs/generic/coproduct
+
           - title: Product
             url: /docs/generic/product/
 
@@ -311,14 +341,26 @@ options:
 
     nested_options:
 
-      - title: Corecursive
-        url: /docs/recursion/corecursive/
+      - title: Intro
+        url: /docs/recursion/intro/
 
       - title: Recursive
         url: /docs/recursion/recursive/
 
+      - title: Corecursive
+        url: /docs/recursion/corecursive/
+
       - title: Birecursive
         url: /docs/recursion/birecursive/
+
+      - title: Mu
+        url: /docs/recursion/mu/
+
+      - title: Nu
+        url: /docs/recursion/nu/
+
+      - title: Fix
+        url: /docs/recursion/fix/
 
   - title: Legal
 
