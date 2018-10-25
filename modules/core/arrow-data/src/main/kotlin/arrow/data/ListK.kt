@@ -4,7 +4,6 @@ import arrow.Kind
 import arrow.core.*
 import arrow.higherkind
 import arrow.typeclasses.Applicative
-import arrow.typeclasses.fix
 
 /**
  * A wrapper data type also considered by the @extension mechanisms to forward type class
