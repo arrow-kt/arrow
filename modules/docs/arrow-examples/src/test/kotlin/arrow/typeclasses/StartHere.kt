@@ -3,8 +3,8 @@ package arrow.typeclasses
 import arrow.core.Try
 import arrow.core.recoverWith
 
-// This code is better followed with Paco's talk
-// Video TBD
+// This code is explained in "Simple dependency management in Kotlin"
+// Video: https://skillsmatter.com/skillscasts/12907-simple-dependency-management-in-kotlin
 
 // TODAY'S EXAMPLE
 //
