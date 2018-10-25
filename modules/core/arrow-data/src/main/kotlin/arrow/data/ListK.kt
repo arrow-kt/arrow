@@ -19,11 +19,11 @@ import arrow.typeclasses.Applicative
 @higherkind
 data class ListK<out A>(val list: List<A>) : ListKOf<A>, List<A> by list {
 
-  fun <B> flatMap(f: (A) -> ListKOf<B>): ListK<B> = this.list.flatMap { f(it).fix().list }.k()
+  fun <B> flatMap(f: (A) -> ListKOf<B>): ListK<B> = list.flatMap { f(it).fix().list }.k()
 
-  fun <B> map(f: (A) -> B): ListK<B> = this.list.map(f).k()
+  fun <B> map(f: (A) -> B): ListK<B> = list.map(f).k()
 
-  fun <B> foldLeft(b: B, f: (B, A) -> B): B = this.fold(b, f)
+  fun <B> foldLeft(b: B, f: (B, A) -> B): B = fold(b, f)
 
   fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
     fun loop(fa_p: ListK<A>): Eval<B> = when {
@@ -41,7 +41,7 @@ data class ListK<out A>(val list: List<A>) : ListKOf<A>, List<A> by list {
     }.value()
 
   fun <B, Z> map2(fb: ListKOf<B>, f: (Tuple2<A, B>) -> Z): ListK<Z> =
-    this.flatMap { a ->
+    flatMap { a ->
       fb.fix().map { b ->
         f(Tuple2(a, b))
       }
