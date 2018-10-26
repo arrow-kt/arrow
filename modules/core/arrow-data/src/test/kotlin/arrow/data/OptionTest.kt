@@ -1,5 +1,6 @@
 package arrow.data
 
+import arrow.Kind
 import arrow.core.*
 import arrow.instances.eq
 import arrow.instances.monoid
