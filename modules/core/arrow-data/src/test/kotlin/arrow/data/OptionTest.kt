@@ -3,11 +3,11 @@ package arrow.data
 import arrow.core.*
 import arrow.instances.eq
 import arrow.instances.monoid
-import arrow.instances.option.applicative.applicative	
-import arrow.instances.option.eq.eq	
-import arrow.instances.option.monoid.monoid	
-import arrow.instances.option.show.show	
-import arrow.mtl.instances.option.monadFilter.monadFilter	
+import arrow.instances.option.applicative.applicative
+import arrow.instances.option.eq.eq
+import arrow.instances.option.monoid.monoid
+import arrow.instances.option.show.show
+import arrow.mtl.instances.option.monadFilter.monadFilter
 import arrow.mtl.instances.option.traverseFilter.traverseFilter
 import arrow.syntax.collections.firstOption
 import arrow.test.UnitSpec
