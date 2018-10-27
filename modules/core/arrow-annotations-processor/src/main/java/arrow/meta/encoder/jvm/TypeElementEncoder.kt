@@ -137,57 +137,55 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
 
   fun TypeElement.allFunctions(declaredElement: TypeElement): List<Func> =
     processorUtils().run {
-      metaApi().run {
-        val superTypes = supertypes(
-          declaredElement.meta,
-          TypeTable(declaredElement.meta.classProto.typeTable),
-          processorUtils(),
-          emptyList()
-        ).filterIsInstance(ClassOrPackageDataWrapper.Class::class.java)
-        val declaredFunctions = declaredElement.meta.functionList.map { meta to it }
-        val inheritedFunctions = superTypes.flatMap { s -> s.functionList.map { s to it } }
-        val allFunctions = declaredFunctions + inheritedFunctions
-        val allMembers = ElementFilter.methodsIn(processorUtils().elementUtils.getAllMembers(declaredElement))
-        val declaredType = processorUtils().typeUtils.getDeclaredType(
-          declaredElement,
-          *declaredElement.typeParameters.map { it.asType() }.toTypedArray()
-        )
-        val filteredMembers = allMembers.asSequence().filterNot {
-          it.modifiers.containsAll(listOf(Modifier.PRIVATE, Modifier.FINAL))
-        }.filterNot {
-          it.modifiers.containsAll(listOf(Modifier.PUBLIC, Modifier.FINAL, Modifier.NATIVE))
-        }
-        val members = filteredMembers.mapNotNull { member ->
-          val templateFunction = allFunctions.find { (proto, function) ->
-            function.getJvmMethodSignature(proto.nameResolver, proto.classProto.typeTable) == member.jvmMethodSignature
-          }
-          try {
-            val function = FunSpec.overriding(
-              member,
-              declaredType,
-              processorUtils().typeUtils
-            ).build().toMeta(member)
-            val result =
-              if (templateFunction != null && templateFunction.second.modality != null) {
-                val fMod = function.copy(
-                  modifiers = function.modifiers + listOfNotNull(templateFunction.second.modality?.toMeta())
-                )
-                if (templateFunction.second.hasReceiverType()) {
-                  val receiverTypeName = fMod.parameters[0].type.asKotlin()
-                  val functionWithReceiver = fMod.copy(receiverType = receiverTypeName)
-                  val arguments = functionWithReceiver.parameters.drop(1)
-                  functionWithReceiver.copy(parameters = arguments)
-                } else fMod
-              } else function
-            result
-          } catch (e: IllegalArgumentException) {
-            //logW("Can't override: ${declaredElement.simpleName} :: $member")
-            //some public final functions can't be seen as overridden
-            templateFunction?.second?.toMeta(templateFunction.first, member)
-          }
-        }.toList()
-        members
+      val superTypes = supertypes(
+        declaredElement.meta,
+        TypeTable(declaredElement.meta.classProto.typeTable),
+        processorUtils(),
+        emptyList()
+      ).filterIsInstance(ClassOrPackageDataWrapper.Class::class.java)
+      val declaredFunctions = declaredElement.meta.functionList.map { meta to it }
+      val inheritedFunctions = superTypes.flatMap { s -> s.functionList.map { s to it } }
+      val allFunctions = declaredFunctions + inheritedFunctions
+      val allMembers = ElementFilter.methodsIn(processorUtils().elementUtils.getAllMembers(declaredElement))
+      val declaredType = processorUtils().typeUtils.getDeclaredType(
+        declaredElement,
+        *declaredElement.typeParameters.map { it.asType() }.toTypedArray()
+      )
+      val filteredMembers = allMembers.asSequence().filterNot {
+        it.modifiers.containsAll(listOf(Modifier.PRIVATE, Modifier.FINAL))
+      }.filterNot {
+        it.modifiers.containsAll(listOf(Modifier.PUBLIC, Modifier.FINAL, Modifier.NATIVE))
       }
+      val members = filteredMembers.mapNotNull { member ->
+        val templateFunction = allFunctions.find { (proto, function) ->
+          function.getJvmMethodSignature(proto.nameResolver, proto.classProto.typeTable) == member.jvmMethodSignature
+        }
+        try {
+          val function = FunSpec.overriding(
+            member,
+            declaredType,
+            processorUtils().typeUtils
+          ).build().toMeta(member)
+          val result =
+            if (templateFunction != null && templateFunction.second.modality != null) {
+              val fMod = function.copy(
+                modifiers = function.modifiers + listOfNotNull(templateFunction.second.modality?.toMeta())
+              )
+              if (templateFunction.second.hasReceiverType()) {
+                val receiverTypeName = metaApi().run { fMod.parameters[0].type.asKotlin() }
+                val functionWithReceiver = fMod.copy(receiverType = receiverTypeName)
+                val arguments = functionWithReceiver.parameters.drop(1)
+                functionWithReceiver.copy(parameters = arguments)
+              } else fMod
+            } else function
+          result
+        } catch (e: IllegalArgumentException) {
+          //logW("Can't override: ${declaredElement.simpleName} :: $member")
+          //some public final functions can't be seen as overridden
+          templateFunction?.second?.toMeta(templateFunction.first, member)
+        }
+      }.toList()
+      members
     }
 
   fun TypeElement.superInterfaces(): List<TypeName> =

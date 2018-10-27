@@ -111,11 +111,11 @@ Constructor function. It takes two function parameters. The first is a generator
 `catch()` runs the generator function to generate a success datatype, and if it throws an exception it uses the error mapping function to create a new failure datatype.
 
 ```kotlin:ank
-eitherAE.catch({ 1 } ,::identity)
+eitherAE.catch(::identity) { 1 }
 ```
 
 ```kotlin:ank
-eitherAE.catch({ throw RuntimeException("Boom") } ,::identity)
+eitherAE.catch(::identity) { throw RuntimeException("Boom") }
 ```
 
 ### Laws
