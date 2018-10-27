@@ -9,9 +9,9 @@ permalink: /docs/integrations/retrofit/
 {:.advanced}
 advanced
 
-Arrow contains a integration module for Retrofit so you can have a Arrow integration in your endpoints definition.
+Arrow contains a integration module for Retrofit so you can use any synchronous or asynchronous datatype of your choice, like Try, ObservableK, IO or DeferredK.
 
-Define your endpoints and define for CallK as the return Type:
+Define your endpoints and define for `CallK` as the return Type:
 
 ```kotlin
 interface ApiClientTest {
@@ -28,13 +28,13 @@ interface ApiClientTest {
 }
 ```
 
-You can use CallK to have Async/MonadDefer/MonadError intances as your data wrapper.
+You can use `CallK` to have [`Async`]({{ '/docs/effects/async' | relative_url }}), [`MonadDefer`]({{ '/docs/effects/monaddefer' | relative_url }}) and [`MonadError`]({{ '/docs/effects/monaderror' | relative_url }}) intances as your data wrapper.
 
 ```kotlin
 ### Using CallK with IO
 createApiClientTest(baseUrl)
         .testCallK() //CallK
-        .async(IO.async()) //Kind<F, Response<ResponseMock>>
+        .async(IO.async()) //Kind<ForIO, Response<ResponseMock>>
         .fix() //IO<Response<ResponseMock>>
 ```
 
@@ -42,13 +42,13 @@ createApiClientTest(baseUrl)
 ### Using CallK with ObservableK
 createApiClientTest(baseUrl)
           .testCallK() //CallK
-          .async(ObservableK.async()) //Kind<F, Response<ResponseMock>>
+          .async(ObservableK.async()) //Kind<ForObservableK, Response<ResponseMock>>
           .fix() //ObservableK<Response<ResponseMock>>
 ```
 
 ### Handling `Response` with Arrow
 
-Arrow provides a extension function for Response to handle it with Typeclasses. With `unwrapBody` you can extract the body to any kind of ApplicativeError.
+Arrow provides a extension function for Response<A> to handle it with Typeclasses. With `unwrapBody` you can extract the body to any kind of ApplicativeError.
 
 ```kotlin
 val ioResponse: IO<Response<ResponseMock>>
@@ -64,7 +64,7 @@ ioResponse.unsafeRunSync() //Response<ResponseMock>
 
 ### Using only extensions functions
 
-It is possible to use extension functions for Retrofit Call so the code for the definition of the endpoints doesn't have to change.
+It is possible to use extension functions for Retrofit's `Call` so the code for the definition of the endpoints doesn't have to change.
 
 ```kotlin
     val call : Call<Response<String>>
