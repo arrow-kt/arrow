@@ -33,17 +33,17 @@ You can use `CallK` to have [`Async`]({{ '/docs/effects/async' | relative_url }}
 ```kotlin
 ### Using CallK with IO
 createApiClientTest(baseUrl)
-        .testCallK() //CallK
-        .async(IO.async()) //Kind<ForIO, Response<ResponseMock>>
-        .fix() //IO<Response<ResponseMock>>
+        .testCallK() // CallK
+        .async(IO.async()) // Kind<ForIO, Response<ResponseMock>>
+        .fix() // IO<Response<ResponseMock>>
 ```
 
 ```kotlin
 ### Using CallK with ObservableK
 createApiClientTest(baseUrl)
-          .testCallK() //CallK
-          .async(ObservableK.async()) //Kind<ForObservableK, Response<ResponseMock>>
-          .fix() //ObservableK<Response<ResponseMock>>
+          .testCallK() // CallK
+          .async(ObservableK.async()) // Kind<ForObservableK, Response<ResponseMock>>
+          .fix() // ObservableK<Response<ResponseMock>>
 ```
 
 ### Handling `Response` with Arrow
@@ -53,12 +53,12 @@ Arrow provides a extension function for Response<A> to handle it with Typeclasse
 ```kotlin
 val ioResponse: IO<Response<ResponseMock>>
 ioResponse.unsafeRunSync() //Response<ResponseMock>
-            .unwrapBody(Either.applicativeError()) //Either<Throwable, ResponseMock>
+            .unwrapBody(Either.applicativeError()) // Either<Throwable, ResponseMock>
             .fix()
             .fold({ throwable ->
-              //Ops!
+              // Ops!
             }, {
-              //Handle information
+              // Handle information
             })
 ```
 
@@ -68,12 +68,12 @@ It is possible to use extension functions for Retrofit's `Call` so the code for 
 
 ```kotlin
     val call : Call<Response<String>>
-    call.runAsync(IO.async()) // Kind<F, Response<String>>
-          .fix() //IO<Response<String>>
-          .unwrapBody(Either.applicativeError()) //Either<Throwable, ResponseMock>
+    call.runAsync(IO.async()) // Kind<ForIO, Response<String>>
+          .fix() // IO<Response<String>>
+          .unwrapBody(Either.applicativeError()) // Either<Throwable, ResponseMock>
           .fix()
           .fold({ throwable ->
-            //Ops!
+            // Ops!
           }, {
             //Handle information
           })    		    
