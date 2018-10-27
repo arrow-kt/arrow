@@ -48,7 +48,7 @@ createApiClientTest(baseUrl)
 
 ### Handling `Response` with Arrow
 
-Arrow provides a extension function for Response<A> to handle it with Typeclasses. With `unwrapBody` you can extract the body to any kind of ApplicativeError.
+Arrow provides a extension function for `Response<A>` to handle it with Typeclasses. With `unwrapBody` you can extract the body to any kind of ApplicativeError.
 
 ```kotlin
 val ioResponse: IO<Response<ResponseMock>>
