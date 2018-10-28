@@ -14,6 +14,9 @@ Note: This section keeps on growing! Keep an eye on it from time to time.
 This document is meant to be an introduction to Functional Programming for people from all backgrounds.
 We'll go through some of the key concepts and then dive into their implementation and use in real world cases.
 
+Some similar documents, focused on explaining general concepts rather than Arrow's versions,
+can be found for examples [in JavaScript](https://github.com/hemanth/functional-programming-jargon) and [in Scala](https://gist.github.com/jdegoes/97459c0045f373f4eaf126998d8f65dc).
+
 ### Datatypes
 
 A datatype is a class that encapsulates one reusable coding pattern.
