@@ -93,16 +93,30 @@ Try { "3".toInt() }.attempt()
 Try { "nope".toInt() }.attempt()
 ```
 
-#### fromEither
+#### fromEither/fromTry/fromOption
 
-Constructor function from an [`Either<E, A>`]({{ '/docs/datatypes/either' | relative_url }}) to the current datatype.
+Constructor function from an [`Either<E, A>`]({{ '/docs/datatypes/either' | relative_url }}), [`Option<A>`]({{ '/docs/datatypes/option' | relative_url }}), or [`Try<A>`]({{ '/docs/datatypes/try' | relative_url }}) to the current datatype.
+
+While `fromOption()` requires creating a new error value.
 
 ```kotlin:ank
-eitherAE.fromEither(Either.Right(1))
+Either.applicativeError<Throwable>().run { Some(1).fromOption { RuntimeException("Boom") } }
+```
+
+In the case of `fromTry()` it is required converting from `Throwable` to the type of the error.
+
+```kotlin:ank
+Either.applicativeError<String>().run { Try { RuntimeException("Boom") }.fromTry { it.message!! } }
+```
+
+In the case of `fromEither()` it is required converting from the error type of the `Either<EE, A>` to the type of the ApplicativeError<F, E>.
+
+```kotlin:ank
+IO.applicativeError().run { Either.Right(1).fromEither { it } }
 ```
 
 ```kotlin:ank
-eitherAE.fromEither(Either.Left(RuntimeException("Boom")))
+IO.applicativeError().run { Either.Left(RuntimeException("Boom")).fromEither { it } }
 ```
 
 #### catch
