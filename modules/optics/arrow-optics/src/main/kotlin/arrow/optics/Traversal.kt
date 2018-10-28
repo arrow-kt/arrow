@@ -355,7 +355,7 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
    * Extract and map the focus [A] viewed through the [PTraversal] and applies [f] to it.
    */
   fun <C> extractMap(f: (A) -> C): State<S, ListK<C>> =
-    extract().map { it.map(f) }
+    extract().map { it.mapK(f) }
 
 }
 
@@ -363,7 +363,7 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
  * Update the focus [A] viewed through the [Traversal] and returns its *new* value.
  */
 fun <S, A> Traversal<S, A>.update(f: (A) -> A): State<S, ListK<A>> =
-  updateOld(f).map { it.map(f) }
+  updateOld(f).map { it.mapK(f) }
 
 /**
  * Update the focus [A] viewed through the [Traversal] and returns its *old* value.

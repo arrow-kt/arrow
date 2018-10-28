@@ -157,7 +157,7 @@ class TraversalTest : UnitSpec() {
 
       "Extracts with f should be same as extract and map" {
         forAll(genListK(Gen.int()), genFunctionAToB<Int, String>(Gen.string())) { ints, f ->
-          extractMap(f).run(ints) == extract().map { it.map(f) }.run(ints)
+          extractMap(f).run(ints) == extract().map { it.mapK(f) }.run(ints)
         }
       }
 

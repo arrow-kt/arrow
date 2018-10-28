@@ -32,7 +32,7 @@ interface ListKMonadCombineInstance : MonadCombine<ForListK> {
     ListK.tailRecM(a, f)
 
   override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B> =
-    fix().map(f)
+    fix().mapK(f)
 
   override fun <A, B, Z> Kind<ForListK, A>.map2(fb: Kind<ForListK, B>, f: (Tuple2<A, B>) -> Z): ListK<Z> =
     fix().map2(fb, f)
@@ -50,7 +50,7 @@ interface ListKFunctorFilterInstance : FunctorFilter<ForListK> {
     fix().mapFilter(f)
 
   override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B> =
-    fix().map(f)
+    fix().mapK(f)
 }
 
 @extension
@@ -71,7 +71,7 @@ interface ListKMonadFilterInstance : MonadFilter<ForListK> {
     ListK.tailRecM(a, f)
 
   override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B> =
-    fix().map(f)
+    fix().mapK(f)
 
   override fun <A, B, Z> Kind<ForListK, A>.map2(fb: Kind<ForListK, B>, f: (Tuple2<A, B>) -> Z): ListK<Z> =
     fix().map2(fb, f)
@@ -88,7 +88,7 @@ object ListKMtlContext : ListKMonadCombineInstance, ListKTraverseInstance, ListK
     fix().listCombineK(y)
 
   override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B> =
-    fix().map(f)
+    fix().mapK(f)
 }
 
 @Deprecated(ExtensionsDSLDeprecated)

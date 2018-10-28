@@ -41,7 +41,7 @@ interface ListKShowInstance<A> : Show<ListKOf<A>> {
 @extension
 interface ListKFunctorInstance : Functor<ForListK> {
   override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B> =
-    fix().map(f)
+    fix().mapK(f)
 }
 
 @extension
@@ -50,7 +50,7 @@ interface ListKApplicativeInstance : Applicative<ForListK> {
     fix().ap(ff)
 
   override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B> =
-    fix().map(f)
+    fix().mapK(f)
 
   override fun <A, B, Z> Kind<ForListK, A>.map2(fb: Kind<ForListK, B>, f: (Tuple2<A, B>) -> Z): ListK<Z> =
     fix().map2(fb, f)
@@ -71,7 +71,7 @@ interface ListKMonadInstance : Monad<ForListK> {
     ListK.tailRecM(a, f)
 
   override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B> =
-    fix().map(f)
+    fix().mapK(f)
 
   override fun <A, B, Z> Kind<ForListK, A>.map2(fb: Kind<ForListK, B>, f: (Tuple2<A, B>) -> Z): ListK<Z> =
     fix().map2(fb, f)
@@ -95,7 +95,7 @@ interface ListKFoldableInstance : Foldable<ForListK> {
 @extension
 interface ListKTraverseInstance : Traverse<ForListK> {
   override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B> =
-    fix().map(f)
+    fix().mapK(f)
 
   override fun <G, A, B> Kind<ForListK, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, ListK<B>> =
     fix().traverse(AP, f)
@@ -127,7 +127,7 @@ interface ListKMonoidKInstance : MonoidK<ForListK> {
 
 object ListKContext : ListKMonadInstance, ListKTraverseInstance, ListKMonoidKInstance {
   override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B> =
-    fix().map(f)
+    fix().mapK(f)
 }
 
 @Deprecated(ExtensionsDSLDeprecated)

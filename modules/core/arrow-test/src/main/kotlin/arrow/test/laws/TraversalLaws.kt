@@ -5,6 +5,7 @@ import arrow.core.compose
 import arrow.core.identity
 import arrow.core.toOption
 import arrow.data.ListK
+import arrow.data.mapK
 import arrow.optics.Traversal
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
@@ -29,7 +30,7 @@ object TraversalLaws {
   fun <A, B> Traversal<A, B>.modifyGetAll(aGen: Gen<A>, funcGen: Gen<(B) -> B>, EQListB: Eq<ListK<B>>): Unit =
     forAll(aGen, funcGen) { a, f ->
       getAll(modify(a, f))
-        .equalUnderTheLaw(getAll(a).map(f), EQListB)
+        .equalUnderTheLaw(getAll(a).mapK(f), EQListB)
     }
 
   fun <A, B> Traversal<A, B>.setIdempotent(aGen: Gen<A>, bGen: Gen<B>, EQA: Eq<A>): Unit =

@@ -5,6 +5,7 @@ import arrow.core.*
 import arrow.data.ListK
 import arrow.data.fix
 import arrow.data.k
+import arrow.data.mapK
 import arrow.typeclasses.MonadError
 import org.intellij.markdown.MarkdownElementTypes.CODE_FENCE
 import org.intellij.markdown.ast.ASTNode
@@ -122,7 +123,7 @@ fun compileCodeImpl(snippets: Map<File, ListK<Snippet>>, classpath: ListK<String
   val sortedSnippets = snippets.toList()
   val result = sortedSnippets.mapIndexed { n, (file, codeBlocks) ->
     val progress: Int = if (snippets.isNotEmpty()) ((n + 1) * 100 / snippets.size) else 100
-    val classLoader = URLClassLoader(classpath.map { URL(it) }.fix().list.toTypedArray())
+    val classLoader = URLClassLoader(classpath.mapK { URL(it) }.fix().list.toTypedArray())
     val seManager = ScriptEngineManager(classLoader)
     val engineCache: Map<String, ScriptEngine> =
       codeBlocks.list

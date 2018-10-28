@@ -17,12 +17,12 @@ import arrow.typeclasses.Applicative
  * type constructor as extension functions.
  */
 @higherkind
-data class ListK<out A>(val list: List<A>) : ListKOf<A>, List<A> by list {
+data class ListK<out A>(val list: List<A>) : ListKOf<A>, IterableHolder<A>, List<A> by list {
+
+  override fun getWrappedIterable(): Iterable<A> = list
 
   fun <B> flatMap(f: (A) -> ListKOf<B>): ListK<B> = list.flatMap { f(it).fix().list }.k()
-
-  fun <B> map(f: (A) -> B): ListK<B> = list.map(f).k()
-
+  
   fun <B> foldLeft(b: B, f: (B, A) -> B): B = fold(b, f)
 
   fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
@@ -33,7 +33,7 @@ data class ListK<out A>(val list: List<A>) : ListKOf<A>, List<A> by list {
     return Eval.defer { loop(this) }
   }
 
-  fun <B> ap(ff: ListKOf<(A) -> B>): ListK<B> = ff.fix().flatMap { f -> map(f) }
+  fun <B> ap(ff: ListKOf<(A) -> B>): ListK<B> = ff.fix().flatMap { f -> mapK(f) }
 
   fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, ListK<B>> =
     foldRight(Eval.always { GA.just(emptyList<B>().k()) }) { a, eval ->
@@ -42,7 +42,7 @@ data class ListK<out A>(val list: List<A>) : ListKOf<A>, List<A> by list {
 
   fun <B, Z> map2(fb: ListKOf<B>, f: (Tuple2<A, B>) -> Z): ListK<Z> =
     flatMap { a ->
-      fb.fix().map { b ->
+      fb.fix().mapK { b ->
         f(Tuple2(a, b))
       }
     }

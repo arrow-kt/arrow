@@ -4,6 +4,7 @@ import arrow.data.ForListK
 import arrow.data.ListK
 import arrow.data.fix
 import arrow.data.k
+import arrow.data.mapK
 import arrow.free.Free
 import arrow.free.map
 import arrow.instances.listk.traverse.traverse
@@ -19,13 +20,13 @@ fun ank(source: File, target: File, compilerArgs: ListK<String>) =
   AnkOps.binding {
     val targetDirectory: File = createTarget(source, target).bind()
     val files: ListK<File> = getFileCandidates(targetDirectory).bind()
-    val filesContents: ListK<String> = files.map(::readFile).k().sequence().bind().fix()
-    val parsedMarkDowns: ListK<ASTNode> = filesContents.map(::parseMarkdown).k().sequence().bind().fix()
+    val filesContents: ListK<String> = files.mapK(::readFile).k().sequence().bind().fix()
+    val parsedMarkDowns: ListK<ASTNode> = filesContents.mapK(::parseMarkdown).k().sequence().bind().fix()
     val allSnippets: ListK<ListK<Snippet>> = parsedMarkDowns.mapIndexed { n, tree ->
       extractCode(filesContents.list[n], tree)
     }.k().sequence().bind().fix()
     val compilationResults = compileCode(allSnippets.mapIndexed { n, s -> files.list[n] to s }.toMap(), compilerArgs).bind()
-    val replacedResults: ListK<String> = compilationResults.map { c -> replaceAnkToLang(c) }.k().sequence().bind().fix()
+    val replacedResults: ListK<String> = compilationResults.mapK { c -> replaceAnkToLang(c) }.k().sequence().bind().fix()
     val resultingFiles: ListK<File> = generateFiles(files, replacedResults).bind()
     resultingFiles
   }
