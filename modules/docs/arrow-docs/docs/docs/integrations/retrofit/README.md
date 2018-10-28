@@ -30,16 +30,18 @@ interface ApiClientTest {
 
 You can use `CallK` to have [`Async`]({{ '/docs/effects/async' | relative_url }}), [`MonadDefer`]({{ '/docs/effects/monaddefer' | relative_url }}) and [`MonadError`]({{ '/docs/effects/monaderror' | relative_url }}) intances as your data wrapper.
 
+### Using CallK with `IO`
+
 ```kotlin
-### Using CallK with IO
 createApiClientTest(baseUrl)
         .testCallK() // CallK
         .async(IO.async()) // Kind<ForIO, Response<ResponseMock>>
         .fix() // IO<Response<ResponseMock>>
 ```
 
+### Using CallK with `ObservableK`
+
 ```kotlin
-### Using CallK with ObservableK
 createApiClientTest(baseUrl)
           .testCallK() // CallK
           .async(ObservableK.async()) // Kind<ForObservableK, Response<ResponseMock>>
@@ -75,7 +77,7 @@ It is possible to use extension functions for Retrofit's `Call` so the code for 
           .fold({ throwable ->
             // Ops!
           }, {
-            //Handle information
+            // Handle information
           })    		    
 ```
 
