@@ -14,6 +14,8 @@ interface Bifunctor<F> {
     override val F: Bifunctor<F> = this@Bifunctor
   }
 
+  fun <X> leftFunctor(): Functor<Conested<F, X>> = CocomposedFunctor(this@Bifunctor)
+
   fun <AA, B, A : AA> Kind2<F, A, B>.leftWiden(): Kind2<F, AA, B> = this
 }
 

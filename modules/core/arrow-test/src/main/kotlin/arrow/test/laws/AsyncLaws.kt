@@ -11,11 +11,11 @@ import arrow.typeclasses.Eq
 import arrow.typeclasses.binding
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import kotlinx.coroutines.experimental.newSingleThreadContext
+import kotlinx.coroutines.newSingleThreadContext
 
 object AsyncLaws {
-  inline fun <F> laws(AC: Async<F>, EQ: Eq<Kind<F, Int>>, EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>, EQERR: Eq<Kind<F, Int>> = EQ): List<Law> =
-    MonadSuspendLaws.laws(AC, EQERR, EQ_EITHER, EQ) + listOf(
+  fun <F> laws(AC: Async<F>, EQ: Eq<Kind<F, Int>>, EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>, EQERR: Eq<Kind<F, Int>> = EQ): List<Law> =
+    MonadDeferLaws.laws(AC, EQERR, EQ_EITHER, EQ) + listOf(
       Law("Async Laws: success equivalence") { AC.asyncSuccess(EQ) },
       Law("Async Laws: error equivalence") { AC.asyncError(EQERR) },
       Law("Async Laws: continueOn jumps threads") { AC.continueOn(EQ) },

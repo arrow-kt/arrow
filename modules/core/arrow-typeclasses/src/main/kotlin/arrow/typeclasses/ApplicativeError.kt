@@ -1,7 +1,10 @@
 package arrow.typeclasses
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Left
+import arrow.core.Right
+import arrow.core.identity
 
 interface ApplicativeError<F, E> : Applicative<F> {
 
@@ -37,5 +40,5 @@ interface ApplicativeError<F, E> : Applicative<F> {
     }
 
   fun <A> ApplicativeError<F, Throwable>.catch(f: () -> A): Kind<F, A> =
-    catch(f, ::identity)
+    catch(::identity, f)
 }

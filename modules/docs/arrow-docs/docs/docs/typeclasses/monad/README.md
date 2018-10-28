@@ -28,6 +28,7 @@ Because `Kind<F, B>` cannot be created until `A` is unwrapped, it means that one
 ```kotlin:ank
 import arrow.core.*
 import arrow.instances.*
+import arrow.effects.*
 
 Some(1).flatMap { a ->
   Some(a + 1)
@@ -92,15 +93,27 @@ ForOption extensions {
 }
 ```
 
+#### effectM
+
+Executes two elements sequentially and ignores the result of the second. This is useful for effects like logging.
+
+```kotlin:ank
+import arrow.effects.instances.io.monad.*
+
+fun logValue(i: Int): IO<Unit> = IO { /* println(i) */ }
+
+IO.just(1).effectM(::logValue).fix().unsafeRunSync()
+```
+
 #### forEffect/forEffectEval
 
 Executes sequentially two elements that are independent from one another, ignoring the value of the second one.
 The [`Eval`]({{ '/docs/datatypes/eval' | relative_url }}) variant allows you to pass lazily calculated values.
 
 ```kotlin:ank
-ForOption extensions {
-  Some(1).forEffect(Some(2))
-}
+import arrow.instances.option.monad.*
+
+Some(1).forEffect(Some(2))
 ```
 
 ### Laws
@@ -136,4 +149,4 @@ The following data types in Arrow provide instances that adhere to the `Monad` t
 - [Mono]({{ '/docs/integrations/reactor' | relative_url }})
 - [IO]({{ '/docs/effects/io' | relative_url }})
 
-[monad_law_source]: https://github.com/arrow-kt/arrow/blob/master/arrow-test/src/main/kotlin/arrow/laws/MonadLaws.kt
+[monad_law_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-test/src/main/kotlin/arrow/test/laws/MonadLaws.kt

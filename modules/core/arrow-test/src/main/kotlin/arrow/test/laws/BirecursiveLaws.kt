@@ -1,7 +1,7 @@
 package arrow.test.laws
 
 import arrow.core.Option
-import arrow.core.functor
+import arrow.instances.option.functor.functor
 import arrow.recursion.hylo
 import arrow.recursion.typeclasses.Birecursive
 import arrow.test.generators.fromGNatAlgebra

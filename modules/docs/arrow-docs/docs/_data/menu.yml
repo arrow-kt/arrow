@@ -98,6 +98,18 @@ options:
       - title: StateT
         url: /docs/datatypes/statet/
 
+      - title: Store
+        url: /docs/datatypes/store/
+
+      - title: Moore
+        url: /docs/datatypes/moore/
+
+      - title: Sum
+        url: /docs/datatypes/sum/
+        
+      - title: Day
+        url: /docs/datatypes/day/
+
       - title: WriterT
         url: /docs/datatypes/writert/
 
@@ -235,6 +247,9 @@ options:
       - title: Effect
         url: /docs/effects/effect/
 
+      - title: Ref
+        url: /docs/effects/ref/
+
   - title: Optics
 
     nested_options:
@@ -280,6 +295,9 @@ options:
 
   - title: Generic
     nested_options:
+
+          - title: Coproduct
+            url: /docs/generic/coproduct
 
           - title: Product
             url: /docs/generic/product/

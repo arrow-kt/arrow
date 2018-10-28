@@ -2,6 +2,11 @@ package arrow.optics.instances
 
 import arrow.core.*
 import arrow.data.*
+import arrow.instances.listk.eq.eq
+import arrow.instances.option.eq.eq
+import arrow.optics.instances.listk.each.each
+import arrow.optics.instances.listk.filterIndex.filterIndex
+import arrow.optics.instances.listk.index.index
 import arrow.optics.typeclasses.FilterIndex
 import arrow.test.UnitSpec
 import arrow.test.generators.*

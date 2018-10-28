@@ -7,7 +7,7 @@ import io.kotlintest.properties.forAll
 
 object OrderLaws {
 
-  inline fun <F> laws(O: Order<F>, fGen: Gen<F>, funcGen: Gen<(F) -> F>): List<Law> =
+  fun <F> laws(O: Order<F>, fGen: Gen<F>, funcGen: Gen<(F) -> F>): List<Law> =
     EqLaws.laws(O) { fGen.generate() } + listOf(
       Law("Order law: reflexivity equality") { O.reflexitivityEq(fGen) },
       Law("Order law: symmetry equality") { O.symmetryEq(fGen) },
@@ -22,7 +22,8 @@ object OrderLaws {
       Law("Order law: totality order") { O.totalityOrder(fGen) },
       Law("Order law: compare order") { O.compareOrder(fGen) },
       Law("Order law: min order") { O.minOrder(fGen) },
-      Law("Order law: max order") { O.maxOrder(fGen) }
+      Law("Order law: max order") { O.maxOrder(fGen) },
+      Law("Order law: operator compareTo delegates to compare order") { O.operatorCompareToOrder(fGen) }
     )
 
   fun <F> Order<F>.reflexitivityEq(fGen: Gen<F>) =
@@ -102,5 +103,10 @@ object OrderLaws {
       if (c < 0) m == y
       else if (c == 0) (m == x) && (m == y)
       else m == x
+    }
+
+  fun <F> Order<F>.operatorCompareToOrder(fGen: Gen<F>): Unit =
+    forAll(fGen, fGen) { x, y ->
+      x.compare(y) == x.compareTo(y)
     }
 }

@@ -1,10 +1,10 @@
 package arrow.optics.instances
 
 import arrow.data.SetK
-import arrow.data.at
-import arrow.data.eq
 import arrow.instances.eq
+import arrow.instances.setk.eq.eq
 import arrow.optics.AndMonoid
+import arrow.optics.instances.setk.at.at
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genSetK

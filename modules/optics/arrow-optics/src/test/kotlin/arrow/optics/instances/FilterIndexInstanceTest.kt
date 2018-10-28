@@ -1,10 +1,18 @@
 package arrow.optics.instances
 
 import arrow.core.Option
-import arrow.core.eq
-import arrow.data.*
+import arrow.data.ListK
+import arrow.data.MapK
+import arrow.data.NonEmptyList
+import arrow.data.SequenceK
 import arrow.instances.eq
-import arrow.optics.typeclasses.FilterIndex
+import arrow.instances.listk.eq.eq
+import arrow.instances.option.eq.eq
+import arrow.instances.sequencek.eq.eq
+import arrow.optics.instances.listk.filterIndex.filterIndex
+import arrow.optics.instances.mapk.filterIndex.filterIndex
+import arrow.optics.instances.nonemptylist.filterIndex.filterIndex
+import arrow.optics.instances.sequencek.filterIndex.filterIndex
 import arrow.test.UnitSpec
 import arrow.test.generators.*
 import arrow.test.laws.TraversalLaws

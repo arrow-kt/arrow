@@ -27,8 +27,9 @@ val optionToList: FunctionK<ForOption, ForListK> = object : FunctionK<ForOption,
     fa.fix().fold({ listOf<A>().k() }, { listOf(it).k() })
 }
 
-val optionInterpreter: FunctionK<Ops.F, ForOption> = object : FunctionK<Ops.F, ForOption> {
-  override fun <A> invoke(fa: Kind<Ops.F, A>): Option<A> {
+@Suppress("UNCHECKED_CAST")
+val optionInterpreter: FunctionK<ForOps, ForOption> = object : FunctionK<ForOps, ForOption> {
+  override fun <A> invoke(fa: Kind<ForOps, A>): Option<A> {
     val op = fa.fix()
     return when (op) {
       is Ops.Add -> Some(op.a + op.y)
@@ -37,6 +38,8 @@ val optionInterpreter: FunctionK<Ops.F, ForOption> = object : FunctionK<Ops.F, F
     } as Option<A>
   }
 }
+
+@Suppress("UNCHECKED_CAST")
 val optionApInterpreter: FunctionK<OpsAp.F, ForOption> = object : FunctionK<OpsAp.F, ForOption> {
   override fun <A> invoke(fa: Kind<OpsAp.F, A>): Option<A> {
     val op = fa.fix()
@@ -47,8 +50,10 @@ val optionApInterpreter: FunctionK<OpsAp.F, ForOption> = object : FunctionK<OpsA
     } as Option<A>
   }
 }
-val nonEmptyListInterpreter: FunctionK<Ops.F, ForNonEmptyList> = object : FunctionK<Ops.F, ForNonEmptyList> {
-  override fun <A> invoke(fa: Kind<Ops.F, A>): NonEmptyList<A> {
+
+@Suppress("UNCHECKED_CAST")
+val nonEmptyListInterpreter: FunctionK<ForOps, ForNonEmptyList> = object : FunctionK<ForOps, ForNonEmptyList> {
+  override fun <A> invoke(fa: Kind<ForOps, A>): NonEmptyList<A> {
     val op = fa.fix()
     return when (op) {
       is Ops.Add -> NonEmptyList.of(op.a + op.y)
@@ -57,6 +62,8 @@ val nonEmptyListInterpreter: FunctionK<Ops.F, ForNonEmptyList> = object : Functi
     } as NonEmptyList<A>
   }
 }
+
+@Suppress("UNCHECKED_CAST")
 val nonEmptyListApInterpreter: FunctionK<OpsAp.F, ForNonEmptyList> = object : FunctionK<OpsAp.F, ForNonEmptyList> {
   override fun <A> invoke(fa: Kind<OpsAp.F, A>): NonEmptyList<A> {
     val op = fa.fix()
@@ -67,8 +74,10 @@ val nonEmptyListApInterpreter: FunctionK<OpsAp.F, ForNonEmptyList> = object : Fu
     } as NonEmptyList<A>
   }
 }
-val idInterpreter: FunctionK<Ops.F, ForId> = object : FunctionK<Ops.F, ForId> {
-  override fun <A> invoke(fa: Kind<Ops.F, A>): Id<A> {
+
+@Suppress("UNCHECKED_CAST")
+val idInterpreter: FunctionK<ForOps, ForId> = object : FunctionK<ForOps, ForId> {
+  override fun <A> invoke(fa: Kind<ForOps, A>): Id<A> {
     val op = fa.fix()
     return when (op) {
       is Ops.Add -> Id(op.a + op.y)
@@ -77,6 +86,8 @@ val idInterpreter: FunctionK<Ops.F, ForId> = object : FunctionK<Ops.F, ForId> {
     } as Id<A>
   }
 }
+
+@Suppress("UNCHECKED_CAST")
 val idApInterpreter: FunctionK<OpsAp.F, ForId> = object : FunctionK<OpsAp.F, ForId> {
   override fun <A> invoke(fa: Kind<OpsAp.F, A>): Id<A> {
     val op = fa.fix()

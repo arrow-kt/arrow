@@ -23,10 +23,10 @@ idea {
 }
 
 dependencies {
-    compile project(':arrow-data')
-    compile project(':arrow-effects')
-    compile project(':arrow-effects-rx2')
-    compile project(':arrow-effects-kotlinx-coroutines')
+    compile project(':arrow-instances-data')
+    compile project(':arrow-effects-instances')
+    compile project(':arrow-effects-rx2-instances')
+    compile project(':arrow-effects-kotlinx-coroutines-instances')
     compile project(':arrow-optics')
 
     kapt project(':arrow-annotations-processor')

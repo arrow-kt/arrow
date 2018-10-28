@@ -14,4 +14,4 @@ fun <T> List<T>.destructured(): Pair<T, List<T>> = first() to tail()
 
 fun <T> List<T>.firstOption(): Option<T> = firstOrNull().toOption()
 
-fun <T> List<Option<T>>.flatten(): List<T> = filter { it.isDefined() }.map { it.get() }
+fun <T> List<Option<T>>.flatten(): List<T> = flatMap { it.fold(::emptyList, ::listOf) }

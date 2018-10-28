@@ -23,6 +23,7 @@ You can get a `Setter` for any existing `Functor`.
 import arrow.*
 import arrow.optics.*
 import arrow.data.*
+import arrow.instances.listk.functor.*
 
 val setter: Setter<ListKOf<Int>, Int> = Setter.fromFunctor(ListK.functor())
 setter.set(listOf(1, 2, 3, 4).k(), 5)
@@ -33,25 +34,40 @@ setter.modify(listOf(1, 2, 3, 4).k()) { int -> int + 1 }
 
 To create your own `Setter` you need to define how to apply `(A) -> B` to `S`.
 
-A `Setter<Foo, String>` can set and modify the value of `Foo`. So we need to define how to apply a function `(String) -> String` to `Foo`.
+A `Setter<Player, Int>` can set and modify the value of `Player`. So we need to define how to apply a function `(Int) -> Int` to `Player`.
 
 ```kotlin:ank
-data class Foo(val value: String)
+data class Player(val health: Int)
 
-val fooSetter: Setter<Foo, String> = Setter { f: (String) -> String ->
-    { foo: Foo ->
-        val fValue = f(foo.value)
-        foo.copy(value = fValue)
+val playerSetter: Setter<Player, Int> = Setter { f: (Int) -> Int ->
+    { player: Player ->
+        val fHealth= f(player.health)
+        player.copy(health = fHealth)
     }
 }
 ```
 ```kotlin:ank
-val uppercase: (String) -> String = String::toUpperCase
-fooSetter.modify(Foo("foo"), uppercase)
+val increment: (Int) -> Int = Int::inc
+playerSetter.modify(Player(75), increment)
 ```
 ```kotlin:ank
-val lift = fooSetter.lift(uppercase)
-lift(Foo("foo"))
+val lift = playerSetter.lift(increment)
+lift(Player(75))
+```
+
+There are also some convenience methods to make working with [State]({{ '/docs/datatypes/state' | relative_url }}) easier.
+This can make working with nested structures in stateful computations significantly more elegant.
+
+```kotlin:ank
+import arrow.data.*
+
+val takeDamage = playerSetter.update_ { it - 15 }
+takeDamage.run(Player(75))
+```
+
+```kotlin:ank
+val restoreHealth = playerSetter.assign_(100)
+restoreHealth.run(Player(75))
 ```
 
 ## Composition
@@ -59,16 +75,16 @@ lift(Foo("foo"))
 Unlike a regular `set` function a `Setter` composes. Similar to a [`Lens`](/docs/optics/lens) we can compose `Setter`s to focus into nested structures and set or modify a value.
 
 ```kotlin:ank
-data class Bar(val foo: Foo)
+data class Bar(val player: Player)
 
-val barSetter: Setter<Bar, Foo> = Setter { modifyFoo ->
+val barSetter: Setter<Bar, Player> = Setter { modifyPlayer ->
     { bar ->
-        val modifiedFoo = modifyFoo(bar.foo)
-        bar.copy(foo = modifiedFoo)
+        val modifiedPlayer = modifyPlayer(bar.player)
+        bar.copy(player = modifiedPlayer)
     }
 }
 
-(barSetter compose fooSetter).modify(Bar(Foo("some value")), String::toUpperCase)
+(barSetter compose playerSetter).modify(Bar(Player(75)), Int::inc)
 ```
 
 `Setter` can be composed with all optics but `Getter` and `Fold`. It results in the following optics.

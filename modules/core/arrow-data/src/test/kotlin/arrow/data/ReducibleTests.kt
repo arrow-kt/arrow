@@ -6,6 +6,7 @@ import arrow.instances.IntSemigroupInstance
 import arrow.instances.LongMonoidInstance
 import arrow.instances.monoid
 import arrow.instances.semigroup
+import arrow.instances.listk.foldable.foldable
 import arrow.test.UnitSpec
 import arrow.test.laws.ReducibleLaws
 import arrow.typeclasses.Eq

@@ -26,6 +26,7 @@ import arrow.*
 import arrow.core.*
 import arrow.mtl.typeclasses.*
 import arrow.mtl.instances.*
+import arrow.mtl.instances.option.monadFilter.*
 
 ForOption extensions { 
   bindingFilter {
@@ -40,6 +41,7 @@ ForOption extensions {
 
 ```kotlin:ank
 import arrow.data.*
+import arrow.mtl.instances.listk.monadFilter.*
 
 ForListK extensions { 
  bindingFilter {

@@ -75,6 +75,8 @@ lifted(NetworkResult.Failure)
 We can also modify or lift functions using `Functors`
 
 ```kotlin:ank
+import arrow.instances.option.applicative.*
+
 networkSuccessPrism.modifyF(Option.applicative(), networkResult) { success ->
     success.some()
 }

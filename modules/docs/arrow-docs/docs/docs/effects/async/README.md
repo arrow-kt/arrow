@@ -19,6 +19,7 @@ Examples of that can run code asynchronously are typically datatypes that can su
 import arrow.*
 import arrow.core.*
 import arrow.effects.*
+import arrow.effects.instances.io.async.*
 
 IO.async()
   .async { callback: (Either<Throwable, Int>) -> Unit ->
@@ -95,7 +96,23 @@ IO.async().run {
   // In current thread
   invoke(CommonPool) {
     // In CommonPool
-    request(createUserFromId(123))
+    requestSync(createUserFromId(123))
+  }
+}
+```
+
+#### defer with CoroutineContext
+
+Similar to `MonadDefer`'s `defer`, this constructor it takes a single function returning a `Kind<F, A>` and the `CoroutineContext` it has to be run on.
+
+```kotlin
+IO.async().run {
+  // In current thread
+  defer(CommonPool) {
+    // In CommonPool
+    async { cb ->
+      requestAsync(createUserFromId(123), cb)
+    }
   }
 }
 ```

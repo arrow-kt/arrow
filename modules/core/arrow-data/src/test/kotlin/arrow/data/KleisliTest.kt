@@ -1,10 +1,18 @@
 package arrow.data
 
+import arrow.Kind
 import arrow.core.*
-import arrow.instances.ForKleisli
+import arrow.instances.`try`.monadError.monadError
+import arrow.instances.id.monad.monad
+import arrow.instances.kleisli.contravariant.contravariant
+import arrow.instances.kleisli.monadError.monadError
 import arrow.test.UnitSpec
+import arrow.test.laws.ContravariantLaws
 import arrow.test.laws.MonadErrorLaws
+import arrow.typeclasses.Conested
 import arrow.typeclasses.Eq
+import arrow.typeclasses.conest
+import arrow.typeclasses.counnest
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import org.junit.runner.RunWith
@@ -15,11 +23,15 @@ class KleisliTest : UnitSpec() {
     a.fix().run(1) == b.fix().run(1)
   }
 
-  init {
+  private fun <A> ConestEQ(): Eq<Kind<Conested<Kind<ForKleisli, ForTry>, A>, Int>> = Eq { a, b ->
+    a.counnest().fix().run(1) == b.counnest().fix().run(1)
+  }
 
-    ForKleisli<ForTry, Int, Throwable>(Try.monadError()) extensions {
-      testLaws(MonadErrorLaws.laws(this, EQ(), EQ()))
-    }
+  init {
+    testLaws(
+      ContravariantLaws.laws(Kleisli.contravariant(), { Kleisli { x: Int -> Try.just(x) }.conest() }, ConestEQ()),
+      MonadErrorLaws.laws(Kleisli.monadError<ForTry, Int, Throwable>(Try.monadError()), EQ(), EQ())
+    )
 
     "andThen should continue sequence" {
       val kleisli: Kleisli<ForId, Int, Int> = Kleisli { a: Int -> Id(a) }

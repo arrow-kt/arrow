@@ -128,12 +128,35 @@ lotteryTry.fold(
     { it.filter { it.toIntOrNull() != null } })
 ```
 
-Or, as we have with `recoverWith`, we can use a version of `fold` which allows us to handle both cases with functions that return a new instance of `Try`, `transform`:
+When using Try, it is a common scenario to convert the returned `Try<Throwable, DomainObject>` instance to `Either<DomainError, DomainObject>`. One can use `toEither`, and than call `mapLeft` to achieve this goal:
 
-```kotlin:ank
-lotteryTry.transform(
-    { Try { it.map { it.toInt() } } },
-    { Try.just(emptyList<Int>()) })
+```kotlin
+sealed class DomainError(val message: String, val cause: Throwable) {
+    class GeneralError(message: String, cause: Throwable) : DomainError(message, cause)
+    class NoConnectionError(message: String, cause: Throwable) : DomainError(message, cause)
+    class AuthorizationError(message: String, cause: Throwable) : DomainError(message, cause)
+}
+
+Try {
+    getLotteryNumbersFromCloud()
+}.toEither()
+    .mapLeft { 
+        DomainError.NoConnectionError("Failed to fetch lottery numbers from cloud", it)
+    }
+// Left(a=DomainError$NoConnectionError@3ada9e37)
+```
+
+As the codebase grows, it is easy to recognize, that this pattern reoccurs everywhere when `Try` to `Either` conversion is being used.
+
+To help this problem, `Try` has a convenient `toEither` implementation, which takes an `onLeft: (Throwable) -> B` parameter. If the result of the conversion from `Try` to `Either` fails, the supplied `onLeft` argument is called to supply domain specific value for the left (error) branch. Using this version, the code can be simplified to the one below:
+
+```kotlin
+Try {
+    getLotteryNumbersFromCloud()
+}.toEither {
+    DomainError.NoConnectionError("Failed to fetch lottery numbers from cloud", it)
+}
+// Left(a=DomainError$NoConnectionError@574caa3f)
 ```
 
 Lastly, Arrow contains `Try` instances for many useful typeclasses that allows you to use and transform fallibale values:

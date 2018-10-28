@@ -11,7 +11,7 @@ import io.kotlintest.properties.forAll
 
 object ApplicativeLaws {
 
-  inline fun <F> laws(A: Applicative<F>, EQ: Eq<Kind<F, Int>>): List<Law> =
+  fun <F> laws(A: Applicative<F>, EQ: Eq<Kind<F, Int>>): List<Law> =
     FunctorLaws.laws(A, EQ) + listOf(
       Law("Applicative Laws: ap identity") { A.apIdentity(EQ) },
       Law("Applicative Laws: homomorphism") { A.homomorphism(EQ) },
