@@ -19,11 +19,11 @@ interface KotlinMetatadataEncoder {
     processorUtils: ProcessorUtils,
     acc: List<ClassOrPackageDataWrapper>): List<ClassOrPackageDataWrapper> =
     processorUtils.run {
-    val interfaces = current.classProto.supertypes(typeTable).map {
+    val interfaces = current.classProto.supertypes(typeTable).asSequence().map {
       it.extractFullName(current)
     }.filter {
       it != "`kotlin`.`Any`"
-    }
+    }.toList()
     when {
       interfaces.isEmpty() -> acc
       else -> {
