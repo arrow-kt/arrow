@@ -12,9 +12,9 @@ You can find documentation in `modules/docs/arrow-docs/docs/docs`
 Documentation is being built by [ΛNK](https://github.com/arrow-kt/ank) which gives an ability to verify and interpret code snippets in the documentation. For example:
 
 
-    ```kotlin:ank
-    1 + 1
-    ```
+```kotlin:ank
+1 + 1
+```
 
 results in
 
@@ -26,7 +26,7 @@ results in
 To build the documentation, in the root of the project, run 
 
 ```
-$ ./gradlew clean :arrow-docs:clean :arrow-docs:runAnk
+$ ./gradlew clean :arrow-docs:runAnk
 ```
 
 The artifact will reside in `modules/docs/arrow-docs/build/site`. The artifact ΛNK produces could be served as a website by [jekyll](https://jekyllrb.com/), a static site generator.
