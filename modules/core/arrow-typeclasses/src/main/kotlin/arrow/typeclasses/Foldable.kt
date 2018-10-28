@@ -162,10 +162,8 @@ interface Foldable<F> {
    * Similar to foldM, but using a Monoid<B>.
    */
   fun <G, A, B, MA, MO> Kind<F, A>.foldMapM(ma: MA, mo: MO, f: (A) -> Kind<G, B>): Kind<G, B>
-      where MA : Monad<G>, MO : Monoid<B> = ma.run {
-    mo.run {
-      foldM(ma, mo.empty()) { b, a -> f(a).map { b.combine(it) } }
-    }
+    where MA : Monad<G>, MO : Monoid<B> = ma.run {
+    foldM(ma, mo.empty()) { b, a -> f(a).map { mo.run { b.combine(it) } } }
   }
 
   /**

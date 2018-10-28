@@ -30,21 +30,6 @@ class OptionTest : UnitSpec() {
 
   init {
 
-    @Suppress("UNUSED_VARIABLE")
-    val EQ_EITHER: Eq<Kind<ForOption, Either<Unit, Int>>> = Eq { a, b ->
-      a.fix().fold(
-        { b.fix().fold({ true }, { false }) },
-        { eitherA: Either<Unit, Int> ->
-          b.fix().fold(
-            { false },
-            { eitherB: Either<Unit, Int> ->
-              eitherA.fold(
-                { eitherB.fold({ true /* Ignore the error kind */ }, { false }) },
-                { ia -> eitherB.fold({ false }, { ia == it }) })
-            })
-        })
-    }
-
     testLaws(
       EqLaws.laws(Option.eq(Int.eq())) { genOption(Gen.int()).generate() },
       ShowLaws.laws(Option.show(), Option.eq(Int.eq())) { Some(it) },

@@ -19,21 +19,21 @@ import arrow.typeclasses.Applicative
 @higherkind
 data class ListK<out A>(val list: List<A>) : ListKOf<A>, List<A> by list {
 
-  fun <B> flatMap(f: (A) -> ListKOf<B>): ListK<B> = this.fix().list.flatMap { f(it).fix().list }.k()
+  fun <B> flatMap(f: (A) -> ListKOf<B>): ListK<B> = list.flatMap { f(it).fix().list }.k()
 
-  fun <B> map(f: (A) -> B): ListK<B> = this.fix().list.map(f).k()
+  fun <B> map(f: (A) -> B): ListK<B> = list.map(f).k()
 
-  fun <B> foldLeft(b: B, f: (B, A) -> B): B = this.fix().fold(b, f)
+  fun <B> foldLeft(b: B, f: (B, A) -> B): B = fold(b, f)
 
   fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
     fun loop(fa_p: ListK<A>): Eval<B> = when {
       fa_p.list.isEmpty() -> lb
       else -> f(fa_p.fix().list.first(), Eval.defer { loop(fa_p.list.drop(1).k()) })
     }
-    return Eval.defer { loop(this.fix()) }
+    return Eval.defer { loop(this) }
   }
 
-  fun <B> ap(ff: ListKOf<(A) -> B>): ListK<B> = ff.fix().flatMap { f -> map(f) }.fix()
+  fun <B> ap(ff: ListKOf<(A) -> B>): ListK<B> = ff.fix().flatMap { f -> map(f) }
 
   fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, ListK<B>> =
     foldRight(Eval.always { GA.just(emptyList<B>().k()) }) { a, eval ->
@@ -41,11 +41,11 @@ data class ListK<out A>(val list: List<A>) : ListKOf<A>, List<A> by list {
     }.value()
 
   fun <B, Z> map2(fb: ListKOf<B>, f: (Tuple2<A, B>) -> Z): ListK<Z> =
-    this.fix().flatMap { a ->
+    flatMap { a ->
       fb.fix().map { b ->
         f(Tuple2(a, b))
       }
-    }.fix()
+    }
 
   fun <B> mapFilter(f: (A) -> Option<B>): ListK<B> =
     flatMap { a -> f(a).fold({ empty<B>() }, { just(it) }) }
