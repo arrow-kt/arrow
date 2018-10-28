@@ -1,10 +1,7 @@
 package arrow.typeclasses
 
 import arrow.Kind
-import arrow.core.Either
-import arrow.core.Left
-import arrow.core.Right
-import arrow.core.identity
+import arrow.core.*
 
 interface ApplicativeError<F, E> : Applicative<F> {
 
@@ -15,13 +12,13 @@ interface ApplicativeError<F, E> : Applicative<F> {
   fun <A> E.raiseError(dummy: Unit = Unit): Kind<F, A> =
     raiseError(this)
 
-  fun <A> OptionOf<A>.lift(f: () -> E): Kind<F, A> =
+  fun <A> OptionOf<A>.fromOption(f: () -> E): Kind<F, A> =
     fix().fold({ raiseError<A>(f()) }, { just(it) })
 
-  fun <A> EitherOf<E, A>.lift(): Kind<F, A> =
-    fix().fold({ raiseError<A>(it) }, { just(it) })
+  fun <A, EE> Either<EE, A>.fromEither(f: (EE) -> E): Kind<F, A> =
+    fix().fold({ raiseError<A>(f(it)) }, { just(it) })
 
-  fun <A> TryOf<A>.lift(f: (Throwable) -> E): Kind<F, A> =
+  fun <A> TryOf<A>.fromTry(f: (Throwable) -> E): Kind<F, A> =
     fix().fold({ raiseError<A>(f(it)) }, { just(it) })
 
   fun <A> Kind<F, A>.handleError(f: (E) -> A): Kind<F, A> =
@@ -32,7 +29,7 @@ interface ApplicativeError<F, E> : Applicative<F> {
       just(Left(it))
     }
 
-  fun <A> catch(f: () -> A, recover: (Throwable) -> E): Kind<F, A> =
+  fun <A> catch(recover: (Throwable) -> E, f: () -> A): Kind<F, A> =
     try {
       just(f())
     } catch (t: Throwable) {

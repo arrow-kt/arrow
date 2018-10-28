@@ -54,7 +54,7 @@ object ApplicativeErrorLaws {
 
   fun <F> ApplicativeError<F, Throwable>.applicativeErrorAttemptFromEitherConsistentWithPure(EQ: Eq<Kind<F, Either<Throwable, Int>>>): Unit =
     forAll(genEither(genThrowable(), Gen.int())) { either: Either<Throwable, Int> ->
-      either.lift().attempt().equalUnderTheLaw(just(either), EQ)
+      either.fromEither { it }.attempt().equalUnderTheLaw(just(either), EQ)
     }
 
   fun <F> ApplicativeError<F, Throwable>.applicativeErrorCatch(EQ: Eq<Kind<F, Int>>): Unit =
