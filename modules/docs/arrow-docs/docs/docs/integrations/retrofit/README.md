@@ -36,7 +36,7 @@ It is possible to use extension functions for Retrofit's `Call` so the code for 
 
 ### Using the wrapper `CallK`
 
-Use `Async2CallAdapterFactory.create()` to register your adapter with `Retrofit`. Afterwards, you can start defining your endpoints using `CallK` as the return type:
+Use `CallKindAdapterFactory.create()` to register the Arrow adapter with `Retrofit`. Afterwards, you can start defining your endpoints using `CallK` as the return type:
 
 ```kotlin
 interface ApiClientTest {
