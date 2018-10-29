@@ -43,7 +43,7 @@ interface SequenceKShowInstance<A> : Show<SequenceK<A>> {
 @extension
 interface SequenceKFunctorInstance : Functor<ForSequenceK> {
   override fun <A, B> Kind<ForSequenceK, A>.map(f: (A) -> B): SequenceK<B> =
-    fix().map(f)
+    fix().mapK(f)
 }
 
 @extension
@@ -52,7 +52,7 @@ interface SequenceKApplicativeInstance : Applicative<ForSequenceK> {
     fix().ap(ff)
 
   override fun <A, B> Kind<ForSequenceK, A>.map(f: (A) -> B): SequenceK<B> =
-    fix().map(f)
+    fix().mapK(f)
 
   override fun <A, B, Z> Kind<ForSequenceK, A>.map2(fb: Kind<ForSequenceK, B>, f: (Tuple2<A, B>) -> Z): SequenceK<Z> =
     fix().map2(fb, f)
@@ -73,7 +73,7 @@ interface SequenceKMonadInstance : Monad<ForSequenceK> {
     SequenceK.tailRecM(a, f)
 
   override fun <A, B> Kind<ForSequenceK, A>.map(f: (A) -> B): SequenceK<B> =
-    fix().map(f)
+    fix().mapK(f)
 
   override fun <A, B, Z> Kind<ForSequenceK, A>.map2(fb: Kind<ForSequenceK, B>, f: (Tuple2<A, B>) -> Z): SequenceK<Z> =
     fix().map2(fb, f)
@@ -94,7 +94,7 @@ interface SequenceKFoldableInstance : Foldable<ForSequenceK> {
 @extension
 interface SequenceKTraverseInstance : Traverse<ForSequenceK> {
   override fun <A, B> Kind<ForSequenceK, A>.map(f: (A) -> B): SequenceK<B> =
-    fix().map(f)
+    fix().mapK(f)
 
   override fun <G, A, B> Kind<ForSequenceK, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, SequenceK<B>> =
     fix().traverse(AP, f)
@@ -123,7 +123,7 @@ interface SequenceKMonoidKInstance : MonoidK<ForSequenceK> {
 
 object SequenceKContext : SequenceKMonadInstance, SequenceKTraverseInstance, SequenceKMonoidKInstance {
   override fun <A, B> Kind<ForSequenceK, A>.map(f: (A) -> B): SequenceK<B> =
-    fix().map(f)
+    fix().mapK(f)
 }
 
 @Deprecated(ExtensionsDSLDeprecated)

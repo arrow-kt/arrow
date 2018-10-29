@@ -15,7 +15,7 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
 
   fun <B> flatMap(f: (A) -> SequenceKOf<B>): SequenceK<B> = this.fix().sequence.flatMap { f(it).fix().sequence }.k()
 
-  fun <B> ap(ff: SequenceKOf<(A) -> B>): SequenceK<B> = ff.fix().flatMap { f -> map(f) }.fix()
+  fun <B> ap(ff: SequenceKOf<(A) -> B>): SequenceK<B> = ff.fix().flatMap { f -> mapK(f) }.fix()
 
   fun <B> map(f: (A) -> B): SequenceK<B> = this.fix().sequence.map(f).k()
 
@@ -36,7 +36,7 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
 
   fun <B, Z> map2(fb: SequenceKOf<B>, f: (Tuple2<A, B>) -> Z): SequenceK<Z> =
     this.fix().flatMap { a ->
-      fb.fix().map { b ->
+      fb.fix().mapK { b ->
         f(Tuple2(a, b))
       }
     }.fix()
