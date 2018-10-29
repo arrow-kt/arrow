@@ -17,10 +17,8 @@ import arrow.typeclasses.Applicative
  * type constructor as extension functions.
  */
 @higherkind
-data class ListK<out A>(val list: List<A>) : ListKOf<A>, IterableHolder<A>, List<A> by list {
-
-  override fun getWrappedIterable(): Iterable<A> = list
-
+data class ListK<out A>(val list: List<A>) : ListKOf<A>, List<A> by list {
+  
   fun <B> flatMap(f: (A) -> ListKOf<B>): ListK<B> = list.flatMap { f(it).fix().list }.k()
   
   fun <B> foldLeft(b: B, f: (B, A) -> B): B = fold(b, f)
