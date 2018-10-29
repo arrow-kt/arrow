@@ -64,7 +64,7 @@ createApiClientTest(baseUrl)
   .fix() // IO<Response<ResponseMock>>
 ```
 
-### Using CallK with `ObservableK`
+### Using `CallK` with `ObservableK`
 
 ```kotlin
 createApiClientTest(baseUrl)
@@ -73,7 +73,7 @@ createApiClientTest(baseUrl)
   .fix() // ObservableK<Response<ResponseMock>>
 ```
 
-### Using CallK with `DeferredK`
+### Using `CallK` with `DeferredK`
 
 ```kotlin
 createApiClientTest(baseUrl)
@@ -84,7 +84,7 @@ createApiClientTest(baseUrl)
 
 ### Handling `Response` with Arrow
 
-Arrow provides a extension function for `Response<A>` to handle it with Typeclasses. With `unwrapBody` you can extract the body to any kind of ApplicativeError.
+Arrow provides a extension function for `Response<A>` to handle it with Typeclasses. With `unwrapBody` you can extract the body to any [`ApplicativeError<F, Throwable>`]({{ '/docs/effects/applicativeerror' | relative_url }}).
 
 ```kotlin
 val ioResponse: IO<Response<ResponseMock>>
