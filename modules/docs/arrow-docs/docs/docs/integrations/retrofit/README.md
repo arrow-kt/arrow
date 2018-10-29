@@ -84,7 +84,7 @@ createApiClientTest(baseUrl)
 
 ### Handling `Response` with Arrow
 
-Arrow provides a extension function for `Response<A>` to handle it with Typeclasses. With `unwrapBody` you can extract the body to any [`ApplicativeError<F, Throwable>`]({{ '/docs/effects/applicativeerror' | relative_url }}).
+Arrow provides the extension function `unwrapBody()` for `Response<A>` to handle it using [`ApplicativeError<F, Throwable>`]({{ '/docs/effects/applicativeerror' | relative_url }}). It wraps any failed response into an `HttpException`, and a missing body with `IllegalStateException`.
 
 ```kotlin
 val ioResponse: IO<Response<ResponseMock>>
