@@ -17,20 +17,20 @@ Arrow contains a integration module for Retrofit so you can use any synchronous 
 It is possible to use extension functions for Retrofit's `Call` so the code for the definition of the endpoints doesn't have to change.
 
 ```kotlin
-  val call : Call<Response<String>>
-  call.runAsync(IO.async()) // Kind<ForIO, Response<String>>
+val call : Call<Response<String>>
+call.runAsync(IO.async()) // Kind<ForIO, Response<String>>
     .fix() // IO<Response<String>> 		    
 ```
 
 ```kotlin
-  val call : Call<Response<String>>
-  call.runSyncDeferred(IO.monadDefer()) // Kind<ForIO, Response<String>>
+val call : Call<Response<String>>
+call.runSyncDeferred(IO.monadDefer()) // Kind<ForIO, Response<String>>
     .fix() // IO<Response<String>> 		    
 ```
 
 ```kotlin
-  val call : Call<Response<String>>
-  call.runSyncCatch(IO.monadError()) // Kind<ForIO, Response<String>>
+val call : Call<Response<String>>
+call.runSyncCatch(IO.monadError()) // Kind<ForIO, Response<String>>
     .fix() // IO<Response<String>> 		    
 ```
 
@@ -59,18 +59,27 @@ You can use `CallK` to have [`Async`]({{ '/docs/effects/async' | relative_url }}
 
 ```kotlin
 createApiClientTest(baseUrl)
-        .testCallK() // CallK
-        .async(IO.async()) // Kind<ForIO, Response<ResponseMock>>
-        .fix() // IO<Response<ResponseMock>>
+  .testCallK() // CallK
+  .async(IO.async()) // Kind<ForIO, Response<ResponseMock>>
+  .fix() // IO<Response<ResponseMock>>
 ```
 
 ### Using CallK with `ObservableK`
 
 ```kotlin
 createApiClientTest(baseUrl)
-          .testCallK() // CallK
-          .async(ObservableK.async()) // Kind<ForObservableK, Response<ResponseMock>>
-          .fix() // ObservableK<Response<ResponseMock>>
+  .testCallK() // CallK
+  .async(ObservableK.async()) // Kind<ForObservableK, Response<ResponseMock>>
+  .fix() // ObservableK<Response<ResponseMock>>
+```
+
+### Using CallK with `DeferredK`
+
+```kotlin
+createApiClientTest(baseUrl)
+  .testCallK() // CallK
+  .async(DeferredK.async()) // Kind<ForDeferredK, Response<ResponseMock>>
+  .fix() // DeferredK<Response<ResponseMock>>
 ```
 
 ### Handling `Response` with Arrow
@@ -79,14 +88,15 @@ Arrow provides a extension function for `Response<A>` to handle it with Typeclas
 
 ```kotlin
 val ioResponse: IO<Response<ResponseMock>>
-ioResponse.unsafeRunSync() //Response<ResponseMock>
-            .unwrapBody(Either.applicativeError()) // Either<Throwable, ResponseMock>
-            .fix()
-            .fold({ throwable ->
-              // Ops!
-            }, {
-              // Handle information
-            })
+ioResponse
+  .unsafeRunSync() //Response<ResponseMock>
+  .unwrapBody(Either.applicativeError()) // Either<Throwable, ResponseMock>
+  .fix()
+  .fold({ throwable ->
+    // Oops!
+  }, {
+    // Handle information
+  })
 ```
 
 ## Available Instances
