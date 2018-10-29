@@ -11,7 +11,7 @@ data class SetK<out A>(val set: Set<A>) : SetKOf<A>, Set<A> by set {
   fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
     fun loop(fa_p: SetK<A>): Eval<B> = when {
       fa_p.set.isEmpty() -> lb
-      else -> f(fa_p.set.first(), Eval.defer { loop(fa_p.set.drop(1).toSet().k()) })
+      else -> f(fa_p.set.first(), Eval.defer { loop(fa_p.set.asSequence().drop(1).toSet().k()) })
     }
     return Eval.defer { loop(this) }
   }
