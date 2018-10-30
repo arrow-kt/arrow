@@ -9,14 +9,14 @@ permalink: /docs/typeclasses/foldable/
 {:.intermediate}
 intermediate
 
-The Typeclass `Foldable` provide us the ability of, given a type `F<A>`, fold their values `<A>`.
+The Typeclass `Foldable` provide us the ability of, given a type `Kind<F, A>`, fold their values `<A>`.
 
 `Foldable<F>` is implemented in terms of two basic methods:
 
-- `foldLeft(fa, b)(f)` eagerly folds `fa` from left-to-right.
-- `foldRight(fa, b)(f)` lazily folds `fa` from right-to-left.
+- `fa.foldLeft(init, f)` eagerly folds `fa` from left-to-right.
+- `fa.foldRight(init, f)` lazily folds `fa` from right-to-left.
 
-Beyond these it provides many other useful methods related to folding over `F<A>` values.
+Beyond these it provides many other useful methods related to folding over `Kind<F, A>` values.
 
 For the following examples we are going to use some common imports 
 
@@ -42,99 +42,99 @@ val strList: ListK<String> = listOf("a", "b", "c").k()
 Left associative fold on `F` using the provided function.
 
 ```kotlin:ank:silent
-fun <F> foldLeft(strKind: Kind<F, String>, FO: Foldable<F>): String =
-  with(FO) {
+fun <F> concatenateStringFromLeft(strKind: Kind<F, String>, FO: Foldable<F>): String =
+  FO.run {
     strKind.foldLeft("str: ") { base: String, value: String -> base + value }
   }
 ```
 
 ```kotlin:ank
-foldLeft(maybeStr, Option.foldable())
+concatenateStringFromLeft(maybeStr, Option.foldable())
 ```
 
 ```kotlin:ank
-foldLeft(None, Option.foldable())
+concatenateStringFromLeft(None, Option.foldable())
 ```
 
 ```kotlin:ank
-foldLeft(strList, ListK.foldable())
+concatenateStringFromLeft(strList, ListK.foldable())
 ```
 
 ### FoldRight
 Right associative lazy fold on `F` using the provided function.
 
-This method evaluates `lb` lazily, and returns a lazy value.
+This method evaluates `lb` lazily, and returns a lazy value to support laziness in a stack-safe way avoiding StackOverflows.
 
 For more detailed information about how this method works see the documentation for [`Eval<A>`]({{ '/docs/datatypes/eval' | relative_url }}).
 
 ```kotlin:ank:silent
-fun <F> foldRight(strKind: Kind<F, String>, FO: Foldable<F>): String =
-  with(FO) {
+fun <F> concatenateStringFromRight(strKind: Kind<F, String>, FO: Foldable<F>): String =
+  FO.run {
     strKind.foldRight(Eval.now("str: ")) { value: String, base: Eval<String> -> base.map { it + value } }
       .value()
   }
 ```
 
 ```kotlin:ank
-foldRight(maybeStr, Option.foldable())
+concatenateStringFromRight(maybeStr, Option.foldable())
 ```
 
 ```kotlin:ank
-foldRight(None, Option.foldable())
+concatenateStringFromRight(None, Option.foldable())
 ```
 
 ```kotlin:ank
-foldRight(strList, ListK.foldable())
+concatenateStringFromRight(strList, ListK.foldable())
 ```
 
 ### Fold
 Fold implemented using the given `Monoid<A>` instance.
 
 ```kotlin:ank:silent
-fun <F> fold(strKind: Kind<F, String>, FO: Foldable<F>): String =
-  with(FO) {
+fun <F> concatenateString(strKind: Kind<F, String>, FO: Foldable<F>): String =
+  FO.run {
     "str: " + strKind.fold(String.monoid())
   }
 ```
 
 ```kotlin:ank
-fold(maybeStr, Option.foldable())
+concatenateString(maybeStr, Option.foldable())
 ```
 
 ```kotlin:ank
-fold(None, Option.foldable())
+concatenateString(None, Option.foldable())
 ```
 
 ```kotlin:ank
-fold(strList, ListK.foldable())
+concatenateString(strList, ListK.foldable())
 ```
 
 Besides we have `combineAll` which is an alias for fold.
 
 ```kotlin:ank:silent
-fun <F> combineAll(strKind: Kind<F, String>, FO: Foldable<F>): String =
-  with(FO) {
+fun <F> combineAllString(strKind: Kind<F, String>, FO: Foldable<F>): String =
+  FO.run {
     "str: " + strKind.combineAll(String.monoid())
   }
 ```
 
 ```kotlin:ank
-combineAll(maybeStr, Option.foldable())
+combineAllString(maybeStr, Option.foldable())
 ```
 
 ```kotlin:ank
-combineAll(None, Option.foldable())
+combineAllString(None, Option.foldable())
 ```
 
 ```kotlin:ank
-combineAll(strList, ListK.foldable())
+combineAllString(strList, ListK.foldable())
 ```
 
 ### ReduceLeftToOption
 
 ```kotlin:ank:silent
 fun <F> reduceLeftToOption(strKind: Kind<F, String>, FO: Foldable<F>): Option<Int> =
-  with(FO) {
+  FO.run {
     strKind.reduceLeftToOption({ it.length }) { base: Int, value: String -> base + value.length }
   }
 ```
@@ -155,7 +155,7 @@ reduceLeftToOption(strList, ListK.foldable())
 
 ```kotlin:ank:silent
 fun <F> reduceRightToOption(strKind: Kind<F, String>, FO: Foldable<F>): Option<Int> =
-  with(FO) {
+  FO.run {
     strKind.reduceRightToOption({ it.length }) { value: String, base: Eval<Int> -> base.map { it + value.length } }
       .value()
   }
@@ -181,22 +181,22 @@ Return None if the structure is empty, otherwise the result of combining the cum
 of the f operation over all of the elements.
 
 ```kotlin:ank:silent
-fun <F> reduceLeftOption(strKind: Kind<F, String>, FO: Foldable<F>): Option<String> =
-  with(FO) {
+fun <F> getLengthFromLeft(strKind: Kind<F, String>, FO: Foldable<F>): Option<String> =
+  FO.run {
     strKind.reduceLeftOption { base: String, value: String -> base + value }
   }
 ```
 
 ```kotlin:ank
-reduceLeftOption(maybeStr, Option.foldable())
+getLengthFromLeft(maybeStr, Option.foldable())
 ```
 
 ```kotlin:ank
-reduceLeftOption(None, Option.foldable())
+getLengthFromLeft(None, Option.foldable())
 ```
 
 ```kotlin:ank
-reduceLeftOption(strList, ListK.foldable())
+getLengthFromLeft(strList, ListK.foldable())
 ```
 
 ### ReduceRightOption
@@ -207,45 +207,45 @@ Return None if the structure is empty, otherwise the result of combining the cum
 result of the f operation over the A elements.
 
 ```kotlin:ank:silent
-fun <F> reduceRightOption(strKind: Kind<F, String>, FO: Foldable<F>): Option<String> =
-  with(FO) {
+fun <F> getLengthFromRight(strKind: Kind<F, String>, FO: Foldable<F>): Option<String> =
+  FO.run {
     strKind.reduceRightOption { value: String, base: Eval<String> -> base.map { it + value } }
       .value()
   }
 ```
 
 ```kotlin:ank
-reduceRightOption(maybeStr, Option.foldable())
+getLengthFromRight(maybeStr, Option.foldable())
 ```
 
 ```kotlin:ank
-reduceRightOption(None, Option.foldable())
+getLengthFromRight(None, Option.foldable())
 ```
 
 ```kotlin:ank
-reduceRightOption(strList, ListK.foldable())
+getLengthFromRight(strList, ListK.foldable())
 ```
 
 ### FoldMap
 Fold implemented by mapping A values into B and then combining them using the given `Monoid<B>` instance.
 
 ```kotlin:ank:silent
-fun <F> foldMap(strKind: Kind<F, String>, FO: Foldable<F>): Int =
-  with(FO) {
+fun <F> getLenght(strKind: Kind<F, String>, FO: Foldable<F>): Int =
+  FO.run {
     strKind.foldMap(Int.monoid()) { it.length }
   }
 ```
 
 ```kotlin:ank
-foldMap(maybeStr, Option.foldable())
+getLenght(maybeStr, Option.foldable())
 ```
 
 ```kotlin:ank
-foldMap(None, Option.foldable())
+getLenght(None, Option.foldable())
 ```
 
 ```kotlin:ank
-foldMap(strList, ListK.foldable())
+getLenght(strList, ListK.foldable())
 ```
   
 ### Traverse 
@@ -258,7 +258,7 @@ not otherwise needed.
 import arrow.instances.either.applicative.applicative
 
 fun <F> traverse(strKind: Kind<F, String>, FO: Foldable<F>): Either<Int,Unit> =
-  with(FO) {
+  FO.run {
     strKind.traverse_(Either.applicative<Int>()) { Right(it.length) }
   }.fix()
 ```
@@ -282,7 +282,7 @@ Similar to traverse except it operates on `F<G<A>>` values, so no additional fun
 import arrow.instances.option.applicative.applicative
 
 fun <F> sequence(strKind: Kind<F, Kind<ForOption, String>>, FO: Foldable<F>):Option<Unit> =
-  with(FO) {
+  FO.run {
     strKind.sequence_(Option.applicative())
   }.fix()
   
@@ -311,22 +311,22 @@ sequence(strOptList, ListK.foldable())
 Find the first element matching the predicate, if one exists.
 
 ```kotlin:ank:silent
-fun <F> find(strKind: Kind<F, String>, FO: Foldable<F>): Option<String> =
-  with(FO) {
+fun <F> getIfNotBlank(strKind: Kind<F, String>, FO: Foldable<F>): Option<String> =
+  FO.run {
     strKind.find { it.isNotBlank() }
   }
 ```
 
 ```kotlin:ank
-find(maybeStr, Option.foldable())
+getIfNotBlank(maybeStr, Option.foldable())
 ```
 
 ```kotlin:ank
-find(None, Option.foldable())
+getIfNotBlank(None, Option.foldable())
 ```
 
 ```kotlin:ank
-find(strList, ListK.foldable())
+getIfNotBlank(strList, ListK.foldable())
 ```
 
 ### Exists
@@ -335,22 +335,22 @@ Check whether at least one element satisfies the predicate.
 If there are no elements, the result is false.
 
 ```kotlin:ank:silent
-fun <F> exists(strKind: Kind<F, String>, FO: Foldable<F>): Boolean =
-  with(FO) {
+fun <F> containsNotBlank(strKind: Kind<F, String>, FO: Foldable<F>): Boolean =
+  FO.run {
     strKind.exists { it.isNotBlank() }
   }
 ```
 
 ```kotlin:ank
-exists(maybeStr, Option.foldable())
+containsNotBlank(maybeStr, Option.foldable())
 ```
 
 ```kotlin:ank
-exists(None, Option.foldable())
+containsNotBlank(None, Option.foldable())
 ```
 
 ```kotlin:ank
-exists(strList, ListK.foldable())
+containsNotBlank(strList, ListK.foldable())
 ```
 
 ### ForAll
@@ -359,66 +359,66 @@ Check whether all elements satisfy the predicate.
 If there are no elements, the result is true.
 
 ```kotlin:ank:silent
-fun <F> forAll(strKind: Kind<F, String>, FO: Foldable<F>): Boolean =
-  with(FO) {
+fun <F> isNotBlank(strKind: Kind<F, String>, FO: Foldable<F>): Boolean =
+  FO.run {
     strKind.forAll { it.isNotBlank() }
   }
 ```
 
 ```kotlin:ank
-forAll(maybeStr, Option.foldable())
+isNotBlank(maybeStr, Option.foldable())
 ```
 
 ```kotlin:ank
-forAll(None, Option.foldable())
+isNotBlank(None, Option.foldable())
 ```
 
 ```kotlin:ank
-forAll(strList, ListK.foldable())
+isNotBlank(strList, ListK.foldable())
 ```
 
 ### IsEmpty
 Returns true if there are no elements. Otherwise false.
 
 ```kotlin:ank:silent
-fun <F> isEmpty(strKind: Kind<F, String>, FO: Foldable<F>): Boolean =
-  with(FO) {
+fun <F> isFoldableEmpty(strKind: Kind<F, String>, FO: Foldable<F>): Boolean =
+  FO.run {
     strKind.isEmpty()
   }
 ```
 
 ```kotlin:ank
-isEmpty(maybeStr, Option.foldable())
+isFoldableEmpty(maybeStr, Option.foldable())
 ```
 
 ```kotlin:ank
-isEmpty(None, Option.foldable())
+isFoldableEmpty(None, Option.foldable())
 ```
 
 ```kotlin:ank
-isEmpty(strList, ListK.foldable())
+isFoldableEmpty(strList, ListK.foldable())
 ```
 
 ### NonEmpty
 Returns true if there is at least one element. Otherwise false.
 
 ```kotlin:ank:silent
-fun <F> nonEmpty(strKind: Kind<F, String>, FO: Foldable<F>): Boolean =
-  with(FO) {
+fun <F> foldableNonEmpty(strKind: Kind<F, String>, FO: Foldable<F>): Boolean =
+  FO.run {
     strKind.nonEmpty()
   }
 ```
 
 ```kotlin:ank
-nonEmpty(maybeStr, Option.foldable())
+foldableNonEmpty(maybeStr, Option.foldable())
 ```
 
 ```kotlin:ank
-nonEmpty(None, Option.foldable())
+foldableNonEmpty(None, Option.foldable())
 ```
 
 ```kotlin:ank
-nonEmpty(strList, ListK.foldable())
+foldableNonEmpty(strList, ListK.foldable())
 ```
 
 ### Size
@@ -430,22 +430,22 @@ This is overriden in structures that have more efficient size implementations
 Note: will not terminate for infinite-sized collections.
 
 ```kotlin:ank:silent
-fun <F> size(strKind: Kind<F, String>, FO: Foldable<F>): Long =
-  with(FO) {
+fun <F> foldableSize(strKind: Kind<F, String>, FO: Foldable<F>): Long =
+  FO.run {
     strKind.size(Long.monoid())
   }
 ```
 
 ```kotlin:ank
-size(maybeStr, Option.foldable())
+foldableSize(maybeStr, Option.foldable())
 ```
 
 ```kotlin:ank
-size(None, Option.foldable())
+foldableSize(None, Option.foldable())
 ```
 
 ```kotlin:ank
-size(strList, ListK.foldable())
+foldableSize(strList, ListK.foldable())
 ```
 
 ### FoldMapM
@@ -456,22 +456,22 @@ Similar to `foldM`, but using a `Monoid<B>`.
 ```kotlin:ank:silent
 import arrow.instances.option.monad.monad
 
-fun <F> foldMapM(strKind: Kind<F, String>, FO: Foldable<F>): Option<Int> =
-  with(FO) {
+fun <F> getLengthWithMonoid(strKind: Kind<F, String>, FO: Foldable<F>): Option<Int> =
+  FO.run {
        strKind.foldMapM(Option.monad(), Int.monoid()) { Some(it.length) }
   }.fix()
 ```
 
 ```kotlin:ank
-foldMapM(maybeStr, Option.foldable())
+getLengthWithMonoid(maybeStr, Option.foldable())
 ```
 
 ```kotlin:ank
-foldMapM(None, Option.foldable())
+getLengthWithMonoid(None, Option.foldable())
 ```
 
 ```kotlin:ank
-foldMapM(strList, ListK.foldable())
+getLengthWithMonoid(strList, ListK.foldable())
 ```
 
 ### FoldM
@@ -484,8 +484,8 @@ entirety of the structure), depending on the `G` result produced at a given step
 ```kotlin:ank:silent
 import arrow.instances.either.monad.monad
 
-fun <F> foldM(strKind: Kind<F, String>, FO: Foldable<F>): Either<String,String> =
-  with(FO) {
+fun <F> maybeConcatenateString(strKind: Kind<F, String>, FO: Foldable<F>): Either<String,String> =
+  FO.run {
     strKind.foldM(
       Either.monad<String>(),
       "str: "
@@ -494,15 +494,15 @@ fun <F> foldM(strKind: Kind<F, String>, FO: Foldable<F>): Either<String,String> 
 ```
 
 ```kotlin:ank
-foldM(maybeStr, Option.foldable())
+maybeConcatenateString(maybeStr, Option.foldable())
 ```
 
 ```kotlin:ank
-foldM(None, Option.foldable())
+maybeConcatenateString(None, Option.foldable())
 ```
 
 ```kotlin:ank
-foldM(strList, ListK.foldable())
+maybeConcatenateString(strList, ListK.foldable())
 ```
 
 ### Get
@@ -521,6 +521,8 @@ val rightStr = Either.right("abc") as Either<String, String>
 
 foldableGet(rightStr)
 ```
+
+ - TODO. Meanwhile you can find a short description in the [intro to typeclasses]({{ '/docs/typeclasses/intro/' | relative_url }}).
 
 ### Data Types
 
