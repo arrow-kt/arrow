@@ -20,10 +20,12 @@ import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class CoproductTest : UnitSpec() {
+
     init {
+
         "Coproducts should be generated up to 22" {
-            var two: Coproduct2<Unit, Unit>? = null
-            var twentytwo: Coproduct22<Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit>? = null
+            class Proof2(f: Coproduct2<Unit, Unit>) { val x = f }
+            class Proof22(f: Coproduct22<Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit>) { val x = f }
         }
 
         "select should return None if value isn't correct type" {

@@ -12,7 +12,7 @@ import arrow.typeclasses.Eq
 import io.kotlintest.properties.forAll
 
 object BifoldableLaws {
-  inline fun <F> laws(BF: Bifoldable<F>, noinline cf: (Int) -> Kind2<F, Int, Int>, EQ: Eq<Int>): List<Law> =
+  fun <F> laws(BF: Bifoldable<F>, cf: (Int) -> Kind2<F, Int, Int>, EQ: Eq<Int>): List<Law> =
     listOf(
       Law("Bifoldable Laws: Left bifold consistent with BifoldMap") { BF.bifoldLeftConsistentWithBifoldMap(cf, EQ) },
       Law("Bifoldable Laws: Right bifold consistent with BifoldMap") { BF.bifoldRightConsistentWithBifoldMap(cf, EQ) }

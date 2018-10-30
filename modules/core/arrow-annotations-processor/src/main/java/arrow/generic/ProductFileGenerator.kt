@@ -237,7 +237,7 @@ class ProductFileGenerator(
 
   private fun classConstructorFromHList(sourceClassName: String, propertiesSize: Int): String =
     (0 until propertiesSize).joinToString(prefix = "$sourceClassName(", postfix = ")", transform = {
-      "this." + (0 until it).fold("") { acc, n ->
+      "this." + (0 until it).fold("") { acc, _ ->
         acc + "tail."
       } + "head"
     })

@@ -98,7 +98,7 @@ class MaybeKTests : UnitSpec() {
       }.value()
 
       val test: TestObserver<Long> = value.doOnSubscribe { subscription ->
-        Maybe.timer(1, TimeUnit.SECONDS).subscribe { a ->
+        Maybe.timer(1, TimeUnit.SECONDS).subscribe { _ ->
           subscription.dispose()
         }
       }.test()
