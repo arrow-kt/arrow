@@ -11,7 +11,10 @@ import arrow.test.laws.AsyncLaws
 import arrow.test.laws.FoldableLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
+import arrow.typeclasses.binding
+import arrow.typeclasses.bindingCatch
 import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.matchers.shouldNotBe
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.CoreMatchers.startsWith
