@@ -3,6 +3,7 @@ package arrow.effects
 import arrow.Kind
 import arrow.core.Either
 import arrow.deprecation.ExtensionsDSLDeprecated
+import arrow.effects.deferredk.applicative.applicative
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Bracket
 import arrow.effects.typeclasses.ConcurrentEffect
@@ -81,7 +82,7 @@ interface DeferredKMonadErrorInstance : MonadError<ForDeferredK, Throwable>, Def
 }
 
 @extension
-interface DeferredKBracketInstance : DeferredKMonadErrorInstance, Bracket<ForDeferredK, Throwable> {
+interface DeferredKBracketInstance : Bracket<ForDeferredK, Throwable>, DeferredKMonadErrorInstance {
   override fun <A, B> Kind<ForDeferredK, A>.bracketCase(
     use: (A) -> Kind<ForDeferredK, B>,
     release: (A, ExitCase<Throwable>) -> Kind<ForDeferredK, Unit>): DeferredK<B> =
@@ -89,7 +90,7 @@ interface DeferredKBracketInstance : DeferredKMonadErrorInstance, Bracket<ForDef
 }
 
 @extension
-interface DeferredKMonadDeferInstance : DeferredKBracketInstance, MonadDefer<ForDeferredK> {
+interface DeferredKMonadDeferInstance : MonadDefer<ForDeferredK>, DeferredKBracketInstance {
   override fun <A> defer(fa: () -> DeferredKOf<A>): DeferredK<A> =
     DeferredK.defer(fa = fa)
 }

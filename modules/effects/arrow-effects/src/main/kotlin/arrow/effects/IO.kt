@@ -100,7 +100,7 @@ sealed class IO<out A> : IOOf<A> {
     IORunLoop.start(this, cb, null)
 
   fun runAsyncCancellable(onCancel: OnCancel = Silent, cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Disposable> =
-    IO.async { conn, ccb ->
+    IO.async { _, ccb ->
       var cancelled = false
       val cancel = { cancelled = true }
       val isCancelled = { cancelled }

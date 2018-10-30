@@ -7,7 +7,6 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.Tuple3
-import arrow.core.eq
 import arrow.core.right
 import arrow.effects.data.internal.IOCancellationException
 import arrow.effects.instances.io.async.async
