@@ -9,7 +9,7 @@ permalink: /docs/typeclasses/foldable/
 {:.intermediate}
 intermediate
 
-The Typeclass `Foldable` provide us the ability of, given a type `Kind<F, A>`, fold their values `<A>`.
+The Typeclass `Foldable` provide us the ability of, given a type `Kind<F, A>`, aggregates their values `<A>`.
 
 `Foldable<F>` is implemented in terms of two basic methods:
 
