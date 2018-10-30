@@ -1,6 +1,7 @@
 package arrow.data
 
 import arrow.instances.monoid
+import arrow.instances.monoid.invariant.invariant
 import arrow.test.UnitSpec
 import arrow.test.laws.InvariantLaws
 import arrow.typeclasses.*

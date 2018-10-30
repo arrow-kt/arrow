@@ -5,22 +5,23 @@ import arrow.Kind2
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.data.*
-import arrow.instance
+import arrow.deprecation.ExtensionsDSLDeprecated
+import arrow.extension
 import arrow.typeclasses.*
 
-@instance(Ior::class)
+@extension
 interface IorFunctorInstance<L> : Functor<IorPartialOf<L>> {
   override fun <A, B> Kind<IorPartialOf<L>, A>.map(f: (A) -> B): Ior<L, B> = fix().map(f)
 }
 
-@instance(Ior::class)
+@extension
 interface IorBifunctorInstance : Bifunctor<ForIor> {
   override fun <A, B, C, D> Kind2<ForIor, A, B>.bimap(fl: (A) -> C, fr: (B) -> D): Kind2<ForIor, C, D> =
     fix().bimap(fl, fr)
 }
 
-@instance(Ior::class)
-interface IorApplicativeInstance<L> : IorFunctorInstance<L>, Applicative<IorPartialOf<L>> {
+@extension
+interface IorApplicativeInstance<L> : Applicative<IorPartialOf<L>>, IorFunctorInstance<L> {
 
   fun SL(): Semigroup<L>
 
@@ -32,8 +33,10 @@ interface IorApplicativeInstance<L> : IorFunctorInstance<L>, Applicative<IorPart
     fix().ap(SL(), ff)
 }
 
-@instance(Ior::class)
-interface IorMonadInstance<L> : IorApplicativeInstance<L>, Monad<IorPartialOf<L>> {
+@extension
+interface IorMonadInstance<L> : Monad<IorPartialOf<L>>, IorApplicativeInstance<L> {
+
+  override fun SL(): Semigroup<L>
 
   override fun <A, B> Kind<IorPartialOf<L>, A>.map(f: (A) -> B): Ior<L, B> = fix().map(f)
 
@@ -48,7 +51,7 @@ interface IorMonadInstance<L> : IorApplicativeInstance<L>, Monad<IorPartialOf<L>
 
 }
 
-@instance(Ior::class)
+@extension
 interface IorFoldableInstance<L> : Foldable<IorPartialOf<L>> {
 
   override fun <B, C> Kind<IorPartialOf<L>, B>.foldLeft(b: C, f: (C, B) -> C): C = fix().foldLeft(b, f)
@@ -58,15 +61,15 @@ interface IorFoldableInstance<L> : Foldable<IorPartialOf<L>> {
 
 }
 
-@instance(Ior::class)
-interface IorTraverseInstance<L> : IorFoldableInstance<L>, Traverse<IorPartialOf<L>> {
+@extension
+interface IorTraverseInstance<L> : Traverse<IorPartialOf<L>>, IorFoldableInstance<L> {
 
   override fun <G, B, C> IorOf<L, B>.traverse(AP: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, Ior<L, C>> =
     fix().traverse(AP, f)
 
 }
 
-@instance(Ior::class)
+@extension
 interface IorEqInstance<L, R> : Eq<Ior<L, R>> {
 
   fun EQL(): Eq<L>
@@ -93,7 +96,7 @@ interface IorEqInstance<L, R> : Eq<Ior<L, R>> {
   }
 }
 
-@instance(Ior::class)
+@extension
 interface IorShowInstance<L, R> : Show<Ior<L, R>> {
   override fun Ior<L, R>.show(): String =
     toString()
@@ -108,6 +111,7 @@ class IorContext<L>(val SL: Semigroup<L>) : IorMonadInstance<L>, IorTraverseInst
 }
 
 class IorContextPartiallyApplied<L>(val SL: Semigroup<L>) {
+  @Deprecated(ExtensionsDSLDeprecated)
   infix fun <A> extensions(f: IorContext<L>.() -> A): A =
     f(IorContext(SL))
 }

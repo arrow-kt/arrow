@@ -3,9 +3,9 @@ package arrow.test.laws
 import arrow.Kind
 import arrow.core.Eval
 import arrow.core.Id
-import arrow.core.monad
 import arrow.core.value
 import arrow.instances.monoid
+import arrow.instances.id.monad.monad
 import arrow.test.concurrency.SideEffect
 import arrow.test.generators.genConstructor
 import arrow.test.generators.genFunctionAToB
@@ -17,7 +17,7 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
 object FoldableLaws {
-  inline fun <F> laws(FF: Foldable<F>, noinline cf: (Int) -> Kind<F, Int>, EQ: Eq<Int>): List<Law> =
+  fun <F> laws(FF: Foldable<F>, cf: (Int) -> Kind<F, Int>, EQ: Eq<Int>): List<Law> =
     listOf(
       Law("Foldable Laws: Left fold consistent with foldMap") { FF.leftFoldConsistentWithFoldMap(cf, EQ) },
       Law("Foldable Laws: Right fold consistent with foldMap") { FF.rightFoldConsistentWithFoldMap(cf, EQ) },

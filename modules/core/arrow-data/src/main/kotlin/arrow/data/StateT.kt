@@ -42,7 +42,7 @@ class StateT<F, S, A>(
 
   companion object {
 
-    inline fun <F, S, T> just(MF: Monad<F>, t: T): StateT<F, S, T> =
+    fun <F, S, T> just(MF: Monad<F>, t: T): StateT<F, S, T> =
       StateT(MF) { s -> MF.just(s toT t) }
 
     /**
@@ -51,7 +51,7 @@ class StateT<F, S, A>(
      * @param MF [Monad] for the context [F].
      * @param run the stateful function to wrap with [StateT].
      */
-    inline operator fun <F, S, A> invoke(MF: Monad<F>, noinline run: StateTFun<F, S, A>): StateT<F, S, A> = MF.run {
+    operator fun <F, S, A> invoke(MF: Monad<F>, run: StateTFun<F, S, A>): StateT<F, S, A> = MF.run {
       StateT(just(run))
     }
 
@@ -307,11 +307,11 @@ class StateT<F, S, A>(
  *
  * @param MF [Monad] for the context [F].
  */
-inline fun <F, S, A> StateTFunOf<F, S, A>.stateT(MF: Monad<F>): StateT<F, S, A> = StateT(this)
+fun <F, S, A> StateTFunOf<F, S, A>.stateT(): StateT<F, S, A> = StateT(this)
 
 /**
  * Wrap the function with [StateT].
  *
  * @param MF [Monad] for the context [F].
  */
-inline fun <F, S, A> StateTFun<F, S, A>.stateT(MF: Monad<F>): StateT<F, S, A> = StateT(MF, this)
+fun <F, S, A> StateTFun<F, S, A>.stateT(MF: Monad<F>): StateT<F, S, A> = StateT(MF, this)

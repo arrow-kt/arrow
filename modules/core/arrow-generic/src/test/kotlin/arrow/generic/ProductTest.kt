@@ -2,6 +2,9 @@ package arrow.generic
 
 import arrow.Kind
 import arrow.core.*
+import arrow.instances.`try`.applicative.applicative
+import arrow.instances.option.applicative.applicative
+import arrow.instances.option.monoid.monoid
 import arrow.product
 import arrow.test.UnitSpec
 import arrow.test.laws.EqLaws
@@ -9,6 +12,7 @@ import arrow.test.laws.MonoidLaws
 import arrow.test.laws.SemigroupLaws
 import arrow.typeclasses.Applicative
 import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
@@ -104,7 +108,7 @@ class ProductTest : UnitSpec() {
           a.combine(b) == Person(
             a.name + b.name,
             a.age + b.age,
-            Option.monoid(this).combineAll(a.related, b.related)
+            Option.monoid(this).combineAll(listOf(a.related, b.related))
           )
         }
       }
@@ -115,39 +119,33 @@ class ProductTest : UnitSpec() {
         a + b == Person(
           a.name + b.name,
           a.age + b.age,
-          Option.monoid(Person.monoid()).combineAll(a.related, b.related)
+          Option.monoid(Person.monoid()).combineAll(listOf(a.related, b.related))
         )
       }
     }
 
     "Monoid empty" {
-      forAll(personGen(), personGen()) { a, b ->
-        Person.monoid().empty() == Person("", 0, None)
-      }
+      Person.monoid().empty() shouldBe Person("", 0, None)
     }
 
     "Monoid empty syntax" {
-      forAll(personGen(), personGen()) { a, b ->
-        emptyPerson() == Person("", 0, None)
-      }
+      emptyPerson() shouldBe  Person("", 0, None)
     }
 
-    with(Gen) {
-      testLaws(
-        EqLaws.laws(Person.eq()) { personGen().generate().copy(age = it) },
-        SemigroupLaws.laws(
-          Person.semigroup(),
-          personGen().generate(),
-          personGen().generate(),
-          personGen().generate(),
-          Person.eq()
-        ),
-        MonoidLaws.laws(
-          Person.monoid(),
-          personGen().generate(),
-          Person.eq()
-        )
+    testLaws(
+      EqLaws.laws(Person.eq()) { personGen().generate().copy(age = it) },
+      SemigroupLaws.laws(
+        Person.semigroup(),
+        personGen().generate(),
+        personGen().generate(),
+        personGen().generate(),
+        Person.eq()
+      ),
+      MonoidLaws.laws(
+        Person.monoid(),
+        personGen().generate(),
+        Person.eq()
       )
-    }
+    )
   }
 }

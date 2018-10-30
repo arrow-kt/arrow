@@ -76,6 +76,7 @@ The DSL also has special support for [Each]({{ '/docs/optics/each' | relative_ur
 
 ```kotlin:ank
 import arrow.data.*
+import arrow.optics.instances.listk.each.*
 
 val jane = Employee("Jane Doe", Company("Kategory", Address("Functional city", Street(42, "lambda street"))))
 val employees = Employees(listOf(john, jane).k())
@@ -102,6 +103,8 @@ ListK.each<Employee>().run {
 Here we focus into the value of a given key in `MapK`.
 
 ```kotlin:ank
+import arrow.optics.instances.mapk.at.*
+
 val db = Db(mapOf(
   1 to "one",
   2 to "two",
@@ -126,6 +129,8 @@ i.e. a `List<Employee>` by its index position or a `Map<K, V>` by its keys `K`.
 
 
 ```kotlin:ank
+import arrow.optics.instances.listk.index.*
+
 val updatedJohn = Employees.employees.index(ListK.index(), 0).company.address.street.name.modify(employees, String::capitalize)
 updatedJohn
 ```

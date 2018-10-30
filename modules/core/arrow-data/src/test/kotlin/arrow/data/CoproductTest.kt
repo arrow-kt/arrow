@@ -2,6 +2,12 @@ package arrow.data
 
 import arrow.Kind3
 import arrow.core.*
+import arrow.instances.coproduct.comonad.comonad
+import arrow.instances.coproduct.functor.functor
+import arrow.instances.coproduct.traverse.traverse
+import arrow.instances.id.comonad.comonad
+import arrow.instances.id.functor.functor
+import arrow.instances.id.traverse.traverse
 import arrow.test.UnitSpec
 import arrow.test.laws.ComonadLaws
 import arrow.test.laws.TraverseLaws

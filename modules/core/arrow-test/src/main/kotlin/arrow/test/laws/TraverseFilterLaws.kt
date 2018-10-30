@@ -15,7 +15,7 @@ import io.kotlintest.properties.forAll
 object TraverseFilterLaws {
 
   //FIXME(paco): TraverseLaws cannot receive AP::just due to a crash caused by the inliner. Check in TraverseLaws why.
-  inline fun <F> laws(TF: TraverseFilter<F>, GA: Applicative<F>, noinline cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>, EQ_NESTED: Eq<Kind<F, Kind<F, Int>>> = Eq.any()): List<Law> =
+  fun <F> laws(TF: TraverseFilter<F>, GA: Applicative<F>, cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>, EQ_NESTED: Eq<Kind<F, Kind<F, Int>>> = Eq.any()): List<Law> =
     TraverseLaws.laws(TF, GA, cf, EQ) + listOf(
       Law("TraverseFilter Laws: Identity") { TF.identityTraverseFilter(GA, EQ_NESTED) },
       Law("TraverseFilter Laws: filterA consistent with TraverseFilter") { TF.filterAconsistentWithTraverseFilter(GA, EQ_NESTED) }

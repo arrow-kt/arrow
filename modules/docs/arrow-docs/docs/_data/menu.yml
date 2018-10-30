@@ -106,7 +106,7 @@ options:
 
       - title: Sum
         url: /docs/datatypes/sum/
-        
+
       - title: Day
         url: /docs/datatypes/day/
 
@@ -247,6 +247,9 @@ options:
       - title: Effect
         url: /docs/effects/effect/
 
+      - title: Ref
+        url: /docs/effects/ref/
+
   - title: Optics
 
     nested_options:
@@ -311,6 +314,9 @@ options:
 
       - title: kotlinx.coroutines
         url: /docs/integrations/kotlinxcoroutines/
+
+      - title: Retrofit
+        url: /docs/integrations/retrofit/
 
       - title: KindedJ
         url: /docs/integrations/kindedj/

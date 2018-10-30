@@ -14,6 +14,9 @@ Note: This section keeps on growing! Keep an eye on it from time to time.
 This document is meant to be an introduction to Functional Programming for people from all backgrounds.
 We'll go through some of the key concepts and then dive into their implementation and use in real world cases.
 
+Some similar documents, focused on explaining general concepts rather than Arrow's versions,
+can be found for examples [in JavaScript](https://github.com/hemanth/functional-programming-jargon) and [in Scala](https://gist.github.com/jdegoes/97459c0045f373f4eaf126998d8f65dc).
+
 ### Datatypes
 
 A datatype is a class that encapsulates one reusable coding pattern.
@@ -94,6 +97,9 @@ import arrow.core.*
 import arrow.data.*
 import arrow.instances.*
 import arrow.typeclasses.*
+import arrow.instances.option.functor.*
+import arrow.instances.either.monadError.*
+import arrow.instances.listk.traverse.*
 ```
 
 ```kotlin:ank
@@ -105,6 +111,8 @@ Option.functor()
 ```
 
 ```kotlin:ank
+import arrow.instances.mapk.semigroup.*
+
 MapK.semigroup<String, Int>(Int.semigroup())
 ```
 
@@ -116,9 +124,9 @@ Either.monadError<Throwable>()
 ListK.traverse()
 ```
 
-If you're defining your own instances and would like for them to be discoverable in their corresponding datatypes' companion object, you can generate it by annotating them as `@instance`, and Arrow's [annotation processor](https://github.com/arrow-kt/arrow#additional-setup) will create the extension functions for you.
+If you're defining your own instances and would like for them to be discoverable in their corresponding datatypes' companion object, you can generate it by annotating them as `@extension`, and Arrow's [annotation processor](https://github.com/arrow-kt/arrow#additional-setup) will create the extension functions for you.
 
-NOTE: If you'd like to use `@instance` for transitive typeclasses, like a `Show<List<A>>` that requires a function returning a `Show<A>`, you'll need for the function providing the transitive typeclass to have 0 parameters, and for any new typeclass defined outside Arrow to be on a package named `typeclass`. This will make the transitive typeclass a parameter of the extension function. This is a *temporary* limitation of the processor to be fixed because we don't have an annotation or type marker for what's a typeclass and what's not.
+NOTE: If you'd like to use `@extension` for transitive typeclasses, like a `Show<List<A>>` that requires a function returning a `Show<A>`, you'll need for the function providing the transitive typeclass to have 0 parameters. This will make the transitive typeclass a parameter of the extension function.
 
 
 ### Syntax
@@ -293,7 +301,7 @@ See how the class is parametrized on the container `F`, and the function is para
 Let's define an instance of `Functor` for the datatype `ListK`, our own wrapper for lists.
 
 ```kotlin
-@instance(ListK::class)
+@extension
 interface ListKFunctorInstance : Functor<ForListK> {
   override fun <A, B> Kind<F, A>.map(f: (A) -> B): ListK<B> {
     val list: ListK<A> = this.fix()
@@ -302,15 +310,18 @@ interface ListKFunctorInstance : Functor<ForListK> {
 }
 ```
 
-This interface extends `Functor` for the value `F` of `ListK`. We use an annotation processor `@instance` to generate an object out of an interface with all the default methods already defined, and to add an extension function to get it into the companion object of the datatype.
+This interface extends `Functor` for the value `F` of `ListK`. We use an annotation processor `@extension` to generate an object out of an interface with all the default methods already defined, and to add an extension function to get it into the companion object of the datatype.
+The `@extension` processor also projects all type class declared functions into the data type that it's extending as extensions functions.
+These extensions functions may be imported a la carte when working with concrete data types. 
 
 ```kotlin
-@instance(ListK::class)
+@extension
 interface ListKFunctorInstance : Functor<ForListK>
 ```
 
 ```kotlin:ank
 // Somewhere else in the codebase
+import arrow.instances.listk.functor.*
 ListK.functor()
 ```
 

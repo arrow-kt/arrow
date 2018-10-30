@@ -2,14 +2,15 @@ package arrow.mtl.instances
 
 import arrow.Kind
 import arrow.core.*
-import arrow.instance
+import arrow.deprecation.ExtensionsDSLDeprecated
+import arrow.extension
 import arrow.mtl.typeclasses.MonadFilter
 import arrow.mtl.typeclasses.TraverseFilter
 import arrow.typeclasses.Applicative
 import arrow.instances.traverse as optionTraverse
 import arrow.instances.traverseFilter as optionTraverseFilter
 
-@instance(Option::class)
+@extension
 interface OptionTraverseFilterInstance : TraverseFilter<ForOption> {
   override fun <A> Kind<ForOption, A>.filter(f: (A) -> Boolean): Option<A> =
     fix().filter(f)
@@ -42,7 +43,7 @@ interface OptionTraverseFilterInstance : TraverseFilter<ForOption> {
     fix().nonEmpty()
 }
 
-@instance(Option::class)
+@extension
 interface OptionMonadFilterInstance : MonadFilter<ForOption> {
   override fun <A> empty(): Option<A> =
     Option.empty()
@@ -77,5 +78,6 @@ object OptionMtlContext : OptionMonadFilterInstance, OptionTraverseFilterInstanc
     fix().map(f)
 }
 
+@Deprecated(ExtensionsDSLDeprecated)
 infix fun <A> ForOption.Companion.extensions(f: OptionMtlContext.() -> A): A =
   f(OptionMtlContext)

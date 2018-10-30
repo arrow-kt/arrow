@@ -80,8 +80,6 @@ class NonEmptyList<out A> private constructor(
     return true
   }
 
-  fun show(): String = all.joinToString()
-
   override fun hashCode(): Int = all.hashCode()
 
   override fun toString(): String = "NonEmptyList(all=$all)"
@@ -124,7 +122,7 @@ class NonEmptyList<out A> private constructor(
 
 fun <A> A.nel(): NonEmptyList<A> = NonEmptyList.of(this)
 
-inline fun <A, G> NonEmptyListOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, NonEmptyList<A>> =
+fun <A, G> NonEmptyListOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, NonEmptyList<A>> =
   fix().traverse(GA, ::identity)
 
 fun <A> NonEmptyListOf<A>.combineK(y: NonEmptyListOf<A>): NonEmptyList<A> = fix().plus(y.fix())
