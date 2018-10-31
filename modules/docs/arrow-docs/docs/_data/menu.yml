@@ -106,7 +106,7 @@ options:
 
       - title: Sum
         url: /docs/datatypes/sum/
-        
+
       - title: Day
         url: /docs/datatypes/day/
 
@@ -314,6 +314,9 @@ options:
 
       - title: kotlinx.coroutines
         url: /docs/integrations/kotlinxcoroutines/
+
+      - title: Retrofit
+        url: /docs/integrations/retrofit/
 
       - title: KindedJ
         url: /docs/integrations/kindedj/
