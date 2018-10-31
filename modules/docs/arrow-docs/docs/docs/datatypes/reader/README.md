@@ -9,21 +9,21 @@ permalink: /docs/datatypes/reader/
 {:.intermediate}
 intermediate
 
-Reader is a datatype that represents computation that can read values from shared environment.
+Reader is a datatype that represents computation that can inject values from a shared environment.
 
-We can use `Reader().lift` to create `Reader` instance.
+We can use `Reader().lift()` to create a `Reader` instance.
 
 ```kotlin:ank
 import arrow.data.Reader
 
 val container: Reader<String, String> = Reader().lift { "{ container: $it }" }
-val subContainer: Reader<String, String> = Reader().lift { "{ subContainer: $it" }
+val subContainer: Reader<String, String> = Reader().lift { "{ subContainer: $it }" }
 val content: Reader<String, String> = Reader().lift { "{ content: \"$it\" }" }
 ```
 
 Right now, we just lift 3 functions into `Reader`s.
 
-You can also use `.reader()` extension function instead of `Reader().lift`
+You can also use `.reader()` extension function instead of `Reader().lift()`
 
 ```kotlin:ank
 import arrow.data.reader
@@ -53,7 +53,7 @@ content
 
 ```
 
-When you `run` it, you are providing the actual environment to the reader chain, you can see that the result you get will be wrapped in `Id`. You can `.value()` to get the actual value out or use `runId` instead.
+When you `run` it, you are providing the actual value of the environment to the reader chain, you can see that the result you get will be wrapped in `Id`. You can call `.value()` to get the actual value out or use `runId` instead.
 
 
 ```kotlin:ank
@@ -107,13 +107,13 @@ import arrow.core.functor
 content
     .andThen(subContainer)
     .andThen(container)
-    .map(Id.functor()) { it.replace(":", " =>")}
+    .map(Id.functor()) { it.replace(":", " =>") }
     .runId("world")
 
 ```
 
 #### FlatMap
-`flatMap` is similar to `map` except that the function in the transformation is returning `Reader` which means you have access to both result of reader that calls `flatMap` and the environment.
+`flatMap` is similar to `map` except that the function in the transformation is returning `Reader` which means you have access to both result of the reader that calls `flatMap` and the environment.
 
 ```kotlin:ank
 import arrow.core.monad
@@ -158,7 +158,6 @@ content
     .andThen(container)
     .andThen(Reader().just("I DON'T CARE"))
     .runId("world")
-
 ```
 
 Note that the `just` function returns a `Reader` with a specified value.
@@ -171,7 +170,6 @@ content
     .andThen(container)
     .andThen { it.replace(":", " =>") }
     .runId("world")
-
 ```
 
 ## Monad Comprehension
