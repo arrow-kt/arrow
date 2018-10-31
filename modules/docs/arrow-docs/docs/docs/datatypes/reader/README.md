@@ -69,6 +69,15 @@ content
 
 ## Functions
 
+#### Ask
+The `ask` function. It is the function that pipe environment into the result of the `Reader`.
+
+```kotlin:ank
+content
+    .flatMap { Reader().ask<String>() }
+    .runId("world")
+```
+
 #### Local
 This function allows doing a transformation of the environment before it is being executed.
 
@@ -175,8 +184,6 @@ content
 ## Monad Comprehension
 
 Instead of just chaining functions, we can just use monad comprehension with `Reader` as well.
-
-There is another that we haven't talked about yet, which is the `ask` function. It is the function that pipe environment into the result of the `Reader` which will be useful in this context.
 
 ```
 val hello = Reader().monad<String>().binding {
