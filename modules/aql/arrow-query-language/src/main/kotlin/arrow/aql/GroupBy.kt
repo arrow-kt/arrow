@@ -3,7 +3,6 @@ package arrow.aql
 import arrow.core.*
 import arrow.data.ForListK
 import arrow.data.fix
-import arrow.data.k
 import arrow.data.mapOf
 import arrow.typeclasses.Foldable
 
@@ -26,6 +25,5 @@ interface GroupBy<F> {
     foldable().run {
       this@value.from.fix().firstOrNone().getOrElse { emptyMap() }
     }
-
 
 }

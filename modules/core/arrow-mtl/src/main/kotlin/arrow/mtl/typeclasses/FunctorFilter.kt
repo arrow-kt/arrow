@@ -2,8 +2,6 @@ package arrow.mtl.typeclasses
 
 import arrow.Kind
 import arrow.core.*
-import arrow.data.k
-import arrow.instances.statet.applicative.just
 import arrow.typeclasses.Functor
 
 interface FunctorFilter<F> : Functor<F> {

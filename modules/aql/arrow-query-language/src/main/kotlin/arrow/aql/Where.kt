@@ -2,7 +2,6 @@ package arrow.aql
 
 import arrow.core.None
 import arrow.core.some
-import arrow.core.toT
 import arrow.mtl.typeclasses.FunctorFilter
 
 interface Where<F> {

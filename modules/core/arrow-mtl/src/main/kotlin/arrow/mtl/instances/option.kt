@@ -11,7 +11,6 @@ import arrow.mtl.typeclasses.MonadCombine
 import arrow.mtl.typeclasses.MonadFilter
 import arrow.mtl.typeclasses.TraverseFilter
 import arrow.typeclasses.Applicative
-import arrow.data.combineK as optionCombineK
 import arrow.instances.traverse as optionTraverse
 import arrow.instances.traverseFilter as optionTraverseFilter
 

@@ -7,8 +7,6 @@ import arrow.data.NonEmptyList
 import arrow.data.fix
 import arrow.extension
 import arrow.mtl.typeclasses.FunctorFilter
-import arrow.data.combineK as listCombineK
-
 
 @extension
 interface NonEmptyListFunctorFilterInstance : FunctorFilter<ForNonEmptyList> {

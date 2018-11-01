@@ -3,7 +3,6 @@ package arrow.mtl.typeclasses
 import arrow.Kind
 import arrow.Kind2
 import arrow.core.Tuple2
-import arrow.core.curry
 import arrow.instances.statet.applicative.just
 import arrow.typeclasses.Alternative
 import arrow.typeclasses.Bifoldable
