@@ -47,3 +47,8 @@ interface ListSum : Sum<ForListK> {
 interface ListOrderBy : OrderBy<ForListK> {
   override fun foldable(): Foldable<ForListK> = ListK.foldable()
 }
+
+@extension
+interface ListUnion : Union<ForListK> {
+  override fun foldable(): Foldable<ForListK> = ListK.foldable()
+}

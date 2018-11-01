@@ -1,7 +1,6 @@
 package arrow.aql.tests
 
 import arrow.aql.Ord
-import arrow.aql.OrderBy
 import arrow.aql.instances.id.select.value
 import arrow.aql.instances.list.count.count
 import arrow.aql.instances.list.count.value
@@ -11,9 +10,11 @@ import arrow.aql.instances.list.orderBy.order
 import arrow.aql.instances.list.select.select
 import arrow.aql.instances.list.select.value
 import arrow.aql.instances.list.sum.sum
+import arrow.aql.instances.list.union.union
 import arrow.aql.instances.list.where.where
 import arrow.aql.instances.list.where.whereSelection
 import arrow.core.Id
+import arrow.core.toT
 import arrow.instances.order
 import arrow.test.UnitSpec
 import io.kotlintest.KTestJUnitRunner
@@ -63,6 +64,7 @@ class AQLTests : UnitSpec() {
 
     "AQL is able to `groupBy`" {
       data class Student(val name: String, val age: Int)
+
       val john = Student("John", 30)
       val jane = Student("Jane", 32)
       val jack = Student("Jack", 32)
@@ -73,9 +75,11 @@ class AQLTests : UnitSpec() {
     }
 
     data class Student(val name: String, val age: Int)
+
     val john = Student("John", 30)
     val jane = Student("Jane", 32)
     val jack = Student("Jack", 32)
+    val chris = Student("Chris", 40)
 
     "AQL is able to `groupBy`" {
       listOf(john, jane, jack)
@@ -122,6 +126,23 @@ class AQLTests : UnitSpec() {
         .groupBy { it.age }
         .order(Ord.Desc, Int.order())
         .value() shouldBe mapOf(32 to listOf(jane, jack))
+    }
+
+    "AQL is able to `union`" {
+      val queryA = listOf(
+        "customer" to john,
+        "customer" to jane
+      ).select { it }
+      val queryB = listOf(
+        "sales" to jack,
+        "sales" to chris
+      ).select { it }
+      queryA.union(queryB).value() shouldBe listOf(
+        "customer" to john,
+        "customer" to jane,
+        "sales" to jack,
+        "sales" to chris
+      )
     }
 
 //    "AQL is able to `select count` and `groupBy`" {
