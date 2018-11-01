@@ -98,5 +98,9 @@ include {
             _ 'ank'
             _ 'ank-gradle'
         }
+
+        aql {
+            _ 'query-language'
+        }
     }
 }

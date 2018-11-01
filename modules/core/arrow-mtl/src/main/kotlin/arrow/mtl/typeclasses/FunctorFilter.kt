@@ -2,6 +2,8 @@ package arrow.mtl.typeclasses
 
 import arrow.Kind
 import arrow.core.*
+import arrow.data.k
+import arrow.instances.statet.applicative.just
 import arrow.typeclasses.Functor
 
 interface FunctorFilter<F> : Functor<F> {
@@ -28,4 +30,5 @@ interface FunctorFilter<F> : Functor<F> {
    */
   fun <A> Kind<F, A>.filter(f: (A) -> Boolean): Kind<F, A> =
     mapFilter { a -> if (f(a)) Some(a) else None }
+
 }

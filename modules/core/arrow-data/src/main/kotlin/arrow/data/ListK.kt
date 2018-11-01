@@ -33,6 +33,13 @@ data class ListK<out A>(val list: List<A>) : ListKOf<A>, List<A> by list {
     return Eval.defer { loop(this) }
   }
 
+  override fun equals(other: Any?): Boolean =
+    when (other) {
+      is ListK<*> -> this.list == other.list
+      is List<*> -> this.list == other
+      else -> false
+    }
+
   fun <B> ap(ff: ListKOf<(A) -> B>): ListK<B> = ff.fix().flatMap { f -> map(f) }
 
   fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, ListK<B>> =
