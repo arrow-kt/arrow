@@ -129,9 +129,10 @@ interface MetaApi {
 
   /**
    * Removes all modifiers and annotations from this function and normalizes type variables upper bound
-   * constrains to not explicitly include implicit types such as `java.lang.Object`
+   * constrains to not explicitly include implicit types such as `java.lang.Object`.
+   * Preserves all modifiers [keepModifiers]
    */
-  fun Func.removeConstrains(): Func
+  fun Func.removeConstrains(keepModifiers : Set<Modifier> = emptySet()): Func
 
   /**
    * Performs a type application transforming all parameter types in this function

@@ -155,7 +155,7 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class) {
           .filterNot { it.type is TypeName.TypeVariable }
           .map { p -> p.type.simpleName }.toList()
       }
-      .map { it.removeConstrains() }
+      .map { it.removeConstrains(keepModifiers = setOf(Modifier.Infix)) }
       .map { f ->
         val func = f.removeDummyArgs().downKindReturnType().wrap(wrappedType)
         val dummyArgsCount = f.countDummyArgs()

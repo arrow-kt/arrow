@@ -93,9 +93,9 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
   /**
    * @see [MetaApi.removeConstrains]
    */
-  override fun Func.removeConstrains(): Func =
+  override fun Func.removeConstrains(keepModifiers : Set<Modifier>): Func =
     copy(
-      modifiers = emptyList(),
+      modifiers = modifiers.filterNot { it !in keepModifiers },
       annotations = emptyList(),
       receiverType = receiverType?.removeConstrains(),
       returnType = returnType?.removeConstrains(),

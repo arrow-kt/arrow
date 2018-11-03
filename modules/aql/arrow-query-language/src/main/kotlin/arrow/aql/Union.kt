@@ -1,6 +1,5 @@
 package arrow.aql
 
-import arrow.core.Tuple2
 import arrow.core.identity
 import arrow.data.ForListK
 import arrow.data.ListK
@@ -13,7 +12,7 @@ interface Union<F> {
 
   fun foldable(): Foldable<F>
 
-  fun <A, B, Z> Query<F, A, Z>.union(query: Query<F, B, Z>): Query<ForListK, Z, Z> =
+  infix fun <A, B, Z> Query<F, A, Z>.union(query: Query<F, B, Z>): Query<ForListK, Z, Z> =
     foldable().run {
       val la: ListK<Z> = from.foldMap(ListK.monoid()) { listOf(select(it)).k() }
       val lb: ListK<Z> = query.from.foldMap(ListK.monoid()) { listOf(query.select(it)).k() }

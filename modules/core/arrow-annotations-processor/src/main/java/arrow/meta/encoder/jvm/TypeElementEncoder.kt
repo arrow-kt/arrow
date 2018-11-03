@@ -169,7 +169,9 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
           val result =
             if (templateFunction != null && templateFunction.second.modality != null) {
               val fMod = function.copy(
-                modifiers = function.modifiers + listOfNotNull(templateFunction.second.modality?.toMeta())
+                modifiers = function.modifiers +
+                  listOfNotNull(templateFunction.second.modality?.toMeta()) +
+                  modifiersFromFlags(templateFunction.second.flags)
               )
               if (templateFunction.second.hasReceiverType()) {
                 val receiverTypeName = metaApi().run { fMod.parameters[0].type.asKotlin() }

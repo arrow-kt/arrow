@@ -7,53 +7,42 @@ import arrow.instances.id.applicative.just
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Order
 
-sealed class Ord {
-  object Asc : Ord()
-  object Desc : Ord()
+sealed class Ord<X> {
+  abstract val order: Order<X>
+  data class Asc<X>(override val order: Order<X>) : Ord<X>()
+  data class Desc<X>(override val order: Order<X>) : Ord<X>()
 }
 
 interface OrderBy<F> {
 
   fun foldable(): Foldable<F>
 
-  fun <A, Z : Comparable<Z>> Query<F, A, Z>.order(direction: Ord): Query<ForId, List<Z>, List<Z>> =
-    foldable().run {
-      val list = from.foldLeft(emptyList<Z>()) { list, a -> list + select(a) }
-      Query(
-        select = ::identity,
-        from = when (direction) {
-          Ord.Asc -> list.sorted()
-          Ord.Desc -> list.sortedDescending()
-        }.just()
-      )
-    }
-
-  private data class DelegatingComparator<A>(val order: Order<A>, val direction: Ord) : Comparator<A> {
-    override fun compare(a: A, other: A): Int = order.run {
-      val ord = a.compareTo(other)
-      when (direction) {
-        Ord.Asc -> ord
-        Ord.Desc -> -ord
+  private data class DelegatingComparator<A>(val ord: Ord<A>) : Comparator<A> {
+    override fun compare(a: A, other: A): Int = ord.order.run {
+      val comp = a.compareTo(other)
+      when (ord) {
+        is Ord.Asc<*> -> comp
+        is Ord.Desc<*> -> -comp
       }
     }
   }
 
-  fun <A, Z> Query<F, A, Z>.order(direction: Ord, order: Order<Z>, dummy: Unit = Unit): Query<ForId, List<Z>, List<Z>> =
+  infix fun <A, Z> Query<F, A, Z>.order(ord: Ord<Z>): Query<ForId, List<Z>, List<Z>> =
     foldable().run {
       Query(
         select = ::identity,
         from = from.foldLeft(emptyList<Z>()) { list, a ->
           list + select(a)
-        }.sortedWith(DelegatingComparator(order, direction)).just()
+        }.sortedWith(DelegatingComparator(ord)).just()
       )
     }
 
-  fun <X, Z> Query<ForId, Map<X, List<Z>>, Map<X, List<Z>>>.order(keyOrder: Ord, order: Order<X>): Query<ForId, Map<X, List<Z>>, Map<X, List<Z>>> {
+  infix fun <X, Z> Query<ForId, Map<X, List<Z>>, Map<X, List<Z>>>.orderMap(ord: Ord<X>): Query<ForId, Map<X, List<Z>>, Map<X, List<Z>>> {
     val sortedMap = from.value().toSortedMap(kotlin.Comparator { o1, o2 ->
-      val result = order.run { o1.compareTo(o2) }
-      when (keyOrder) {
-        Ord.Asc -> -result
-        Ord.Desc -> result
+      val result = ord.order.run { o1.compareTo(o2) }
+      when (ord) {
+        is Ord.Asc<*> -> -result
+        is Ord.Desc<*> -> result
       }
     })
     return Query(
