@@ -131,9 +131,9 @@ NOTE: If you'd like to use `@extension` for transitive typeclasses, like a `Show
 
 ### Syntax
 
-Starting in 0.8.0, the annotation `@extends` generates extension functions over the datatype they're declared for that are available at global scope.
+Starting in 0.8.0, the annotation `@extension` generates extension functions over the datatype they're declared for that are available at global scope.
 
-For example, if you implement `@extends interface Traverse<ForMyRBTree> { ... }`, you'll automatically get all the functions available in the `Traverse<F>` hierarchy, such as `tupleLeft`, `fproduct`, `sequence`, `find`, `forAll`...
+For example, if you implement `@extension interface Traverse<ForMyRBTree> { ... }`, you'll automatically get all the functions available in the `Traverse<F>` hierarchy, such as `tupleLeft`, `fproduct`, `sequence`, `find`, `forAll`...
 
 ```
 import my.lib.instances.myrbtree.foldable.*
