@@ -140,7 +140,9 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
   private fun Func.fixReceiverLiterals(meta: ClassOrPackageDataWrapper.Class, protoFun: ProtoBuf.Function): Func =
     copy(
       receiverType = receiverType?.fixReceiverLiterals(meta, protoFun.receiverType),
-      parameters = parameters.mapIndexed { n, p -> p.fixReceiverLiterals(meta, protoFun.valueParameterList[n]) },
+      parameters = if (parameters.size <= protoFun.valueParameterList.size)
+        parameters.mapIndexed { n, p -> p.fixReceiverLiterals(meta, protoFun.valueParameterList[n]) }
+      else parameters,
       returnType = returnType?.fixReceiverLiterals(meta, protoFun.returnType)
     )
 
@@ -152,31 +154,12 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
     protoType: ProtoBuf.Type
   ): TypeName =
     when (this) {
-      is TypeName.TypeVariable -> fixReceiverLiterals(meta, protoType)
-      is TypeName.WildcardType -> fixReceiverLiterals(meta, protoType)
-      is TypeName.FunctionLiteral -> fixReceiverLiterals(meta, protoType)
+      is TypeName.TypeVariable -> this
+      is TypeName.WildcardType -> this
+      is TypeName.FunctionLiteral -> this
       is TypeName.ParameterizedType -> fixReceiverLiterals(meta, protoType)
-      is TypeName.Classy -> fixReceiverLiterals(meta, protoType)
+      is TypeName.Classy -> this
     }
-
-  private fun TypeName.TypeVariable.fixReceiverLiterals(
-    meta: ClassOrPackageDataWrapper.Class,
-    protoType: ProtoBuf.Type
-  ): TypeName.TypeVariable =
-    this
-
-  private fun TypeName.WildcardType.fixReceiverLiterals(
-    meta: ClassOrPackageDataWrapper.Class,
-    protoType: ProtoBuf.Type
-  ): TypeName.WildcardType =
-    this
-
-  private fun TypeName.FunctionLiteral.fixReceiverLiterals(
-    meta: ClassOrPackageDataWrapper.Class,
-    protoType: ProtoBuf.Type
-  ): TypeName.FunctionLiteral =
-    this
-
 
   private fun TypeName.ParameterizedType.fixReceiverLiterals(
     meta: ClassOrPackageDataWrapper.Class,
@@ -195,9 +178,6 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
     else
       this
   }
-
-  private fun TypeName.Classy.fixReceiverLiterals(meta: ClassOrPackageDataWrapper.Class, protoType: ProtoBuf.Type): TypeName.Classy =
-    this
 
   fun TypeElement.allFunctions(declaredElement: TypeElement): List<Func> =
     processorUtils().run {

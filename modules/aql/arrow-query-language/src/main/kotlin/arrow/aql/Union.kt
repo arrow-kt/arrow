@@ -20,5 +20,4 @@ interface Union<F> {
       Query(select = ::identity, from = result)
     }
 
-
 }

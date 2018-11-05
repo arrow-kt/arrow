@@ -214,7 +214,6 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
       returnType = returnType.wrap(wrapped)
     )
 
-
   /**
    * Applies replacement on a type recursively changing it's wrapper type for it's wrapped type
    * and [MetaApi.getDownKind] as needed
@@ -238,7 +237,7 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
     wrappedType?.let { wrapped ->
       val receiverType = receiverType?.downKind?.wrap(wrapped)
       val parameters = parameters.map {
-        when(it.type) {
+        when (it.type) {
           is TypeName.FunctionLiteral -> it.copy(type = it.type.wrap(wrapped))
           else -> it.copy(type = it.type.downKind.wrap(wrapped))
         }
@@ -609,7 +608,6 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
       parameters = parameters.map { it.downKind },
       returnType = returnType.downKind
     )
-
 
   override val TypeName.FunctionLiteral.nestedTypeVariables: List<TypeName>
     get() = emptyList()

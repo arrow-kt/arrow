@@ -11,10 +11,11 @@ import arrow.typeclasses.Applicative
 import arrow.typeclasses.Functor
 
 @extension
-interface EvalFrom : From<ForEval> {
-  override fun applicative(): Applicative<ForEval> = Eval.applicative()
+interface EvalSelect : Select<ForEval> {
+  override fun functor(): Functor<ForEval> = Eval.functor()
 }
 
-@extension interface EvalSelect : Select<ForEval> {
-  override fun functor(): Functor<ForEval> = Eval.functor()
+@extension
+interface EvalFrom : From<ForEval> {
+  override fun applicative(): Applicative<ForEval> = Eval.applicative()
 }
