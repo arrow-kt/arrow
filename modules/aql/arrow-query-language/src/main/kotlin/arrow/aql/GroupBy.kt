@@ -10,7 +10,7 @@ interface GroupBy<F> {
 
   fun foldable(): Foldable<F>
 
-  infix fun <A, Z, X> Query<F, A, Z>.groupBy(group: (Z) -> X): Query<ForId, Map<X, List<Z>>, Map<X, List<Z>>> =
+  infix fun <A, Z, X> Query<F, A, Z>.groupBy(group: Z.() -> X): Query<ForId, Map<X, List<Z>>, Map<X, List<Z>>> =
     foldable().run {
       Query(select = ::identity, from =
       Id.just(from.foldLeft(emptyMap()) { map, a ->

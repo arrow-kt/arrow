@@ -1,6 +1,5 @@
 package arrow.aql
 
-import arrow.Kind
 import arrow.core.Tuple2
 import arrow.core.Tuple3
 import arrow.core.toT
@@ -19,9 +18,7 @@ interface From<F> {
   infix fun <A, B, Z, X> Query<F, A, Z>.join(query: Query<F, B, X>): Query<F, Tuple2<A, B>, Tuple2<Z, X>> =
     applicative().run {
       Query(
-        select = { t: Tuple2<A, B> ->
-          select(t.a) toT query.select(t.b)
-        },
+        select = { select(a) toT query.select(b) },
         from = from.product(query.from)
       )
     }

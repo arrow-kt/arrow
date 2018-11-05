@@ -35,6 +35,7 @@ interface MetaApi {
   fun TypeName.WildcardType.removeConstrains(): TypeName.WildcardType
   fun TypeName.ParameterizedType.removeConstrains(): TypeName.ParameterizedType
   fun TypeName.Classy.removeConstrains(): TypeName.Classy
+  fun TypeName.FunctionLiteral.removeConstrains(): TypeName.FunctionLiteral
   fun TypeName.removeConstrains(): TypeName
   fun TypeName.TypeVariable.removeConstrains(): TypeName.TypeVariable
 
@@ -61,6 +62,7 @@ interface MetaApi {
    */
   val TypeName.downKind: TypeName
   val TypeName.TypeVariable.downKind: TypeName.TypeVariable
+  val TypeName.FunctionLiteral.downKind: TypeName.FunctionLiteral
   val TypeName.ParameterizedType.downKind: TypeName.ParameterizedType
   val TypeName.WildcardType.downKind: TypeName.WildcardType
   val TypeName.Classy.downKind: TypeName.Classy
@@ -71,6 +73,7 @@ interface MetaApi {
   val TypeName.nestedTypeVariables: List<TypeName>
   val TypeName.TypeVariable.nestedTypeVariables: List<TypeName>
   val TypeName.WildcardType.nestedTypeVariables: List<TypeName>
+  val TypeName.FunctionLiteral.nestedTypeVariables: List<TypeName>
   val TypeName.ParameterizedType.nestedTypeVariables: List<TypeName>
   val TypeName.Classy.nestedTypeVariables: List<TypeName>
 
@@ -82,6 +85,7 @@ interface MetaApi {
   fun TypeName.asKotlin(): TypeName
   fun TypeName.TypeVariable.asKotlin(): TypeName.TypeVariable
   fun TypeName.ParameterizedType.asKotlin(): TypeName.ParameterizedType
+  fun TypeName.FunctionLiteral.asKotlin(): TypeName.FunctionLiteral
   fun TypeName.WildcardType.asKotlin(): TypeName.WildcardType
   fun TypeName.Classy.asKotlin(): TypeName.Classy
 

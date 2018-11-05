@@ -10,7 +10,7 @@ interface Sum<F> {
 
   fun foldable(): Foldable<F>
 
-  infix fun <A, Z> Query<F, A, Z>.sum(f: (A) -> Long): Query<ForListK, Long, Long> =
+  infix fun <A, Z> Query<F, A, Z>.sum(f: A.() -> Long): Query<ForListK, Long, Long> =
     foldable().run {
         Query(
           select = ::identity,

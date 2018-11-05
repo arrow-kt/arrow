@@ -174,6 +174,12 @@ interface TypeDecoder : MetaDecoder<Type> {
       className.parameterizedBy(*typeArguments.map { it.lyrics() }.toTypedArray())
     }
 
+  fun TypeName.FunctionLiteral.lyrics(): com.squareup.kotlinpoet.TypeName =
+    LambdaTypeName.get(
+      receiver = receiverType?.lyrics(),
+      parameters = *parameters.map { it.lyrics() }.toTypedArray(),
+      returnType = returnType.lyrics())
+
   fun TypeName.Classy.lyrics(): ClassName =
     ClassName(packageName = pckg.value, simpleName = simpleName)
 
@@ -183,6 +189,7 @@ interface TypeDecoder : MetaDecoder<Type> {
       is TypeName.WildcardType -> lyrics()
       is TypeName.ParameterizedType -> lyrics()
       is TypeName.Classy -> lyrics()
+      is TypeName.FunctionLiteral -> lyrics()
     }
 
   operator fun Code.Companion.invoke(f: () -> String): Code =
