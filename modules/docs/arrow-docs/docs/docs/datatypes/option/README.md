@@ -195,25 +195,21 @@ tupled(Some(1), Some("Hello"), Some(20.0))
 Computing over dependent values ignoring absence
 
 ```kotlin
-ForOption extensions {
-  binding {
-   val a = Some(1).bind()
-   val b = Some(1 + a).bind()
-   val c = Some(1 + b).bind()
-   a + b + c
-  }
+Option.monad().binding {
+  val a = Some(1).bind()
+  val b = Some(1 + a).bind()
+  val c = Some(1 + b).bind()
+  a + b + c
 }
 //Some(value=6)
 ```
 
 ```kotlin
-ForOption extensions {
-  binding {
-   val x = none<Int>().bind()
-   val y = Some(1 + x).bind()
-   val z = Some(1 + y).bind()
-   x + y + z
-  }
+Option.monad().binding {
+  val x = none<Int>().bind()
+  val y = Some(1 + x).bind()
+  val z = Some(1 + y).bind()
+  x + y + z
 }
 //None
 ```
