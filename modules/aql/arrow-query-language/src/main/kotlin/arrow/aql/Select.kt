@@ -1,6 +1,6 @@
 package arrow.aql
 
-import arrow.Kind
+import arrow.core.identity
 import arrow.typeclasses.Functor
 
 /**
@@ -20,6 +20,9 @@ interface Select<F> {
 
   infix fun <A, Z> Source<F, A>.select(f: Selection<A, Z>): Query<F, A, Z> =
     Query(f, this)
+
+  fun <A> Source<F, A>.selectAll(): Query<F, A, A> =
+    Query({this}, this)
 
   fun <A, Z> Query<F, A, Z>.value(): Source<F, Z> =
     functor().run { from.map(select) }

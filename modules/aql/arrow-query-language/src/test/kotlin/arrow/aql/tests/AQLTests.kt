@@ -16,6 +16,7 @@ import arrow.aql.instances.list.union.union
 import arrow.aql.instances.list.where.where
 import arrow.aql.instances.list.where.whereSelection
 import arrow.aql.instances.listk.select.select
+import arrow.aql.instances.listk.select.selectAll
 import arrow.core.Id
 import arrow.instances.order
 import arrow.test.UnitSpec
@@ -41,13 +42,13 @@ class AQLTests : UnitSpec() {
 
     "AQL is able to `select`, transform and filter data with `where`" {
       listOf(1, 2, 3).query {
-        select { this } where { this > 2 }
+        selectAll() where { this > 2 }
       }.value() shouldBe listOf(3)
     }
 
     "AQL is able to `select`, transform and filter data with `in`" {
       listOf(1, 2, 3).query {
-        select { this } where { this in listOf(3) }
+        selectAll() where { this in listOf(3) }
       }.value() shouldBe listOf(3)
     }
 
@@ -64,7 +65,7 @@ class AQLTests : UnitSpec() {
       val jane = Student("Jane", 32)
       val jack = Student("Jack", 32)
       listOf(john, jane, jack).query {
-        select { this } groupBy { age }
+        selectAll() groupBy { age }
       }.value() shouldBe Id(mapOf(30 to listOf(john), 32 to listOf(jane, jack)))
     }
 
@@ -77,13 +78,13 @@ class AQLTests : UnitSpec() {
 
     "AQL is able to `groupBy`" {
       listOf(john, jane, jack).query {
-        select { this } where { age > 30 } groupBy { age }
+        selectAll() where { age > 30 } groupBy { age }
       }.value() shouldBe mapOf(32 to listOf(jane, jack))
     }
 
     "AQL is able to `sum`" {
       listOf(john, jane, jack).query {
-        select { this } where { age > 30 } sum { age.toLong() }
+        selectAll() where { age > 30 } sum { age.toLong() }
       }.value() shouldBe 64L
     }
 
@@ -108,7 +109,7 @@ class AQLTests : UnitSpec() {
 
     "AQL is able to `groupBy` and then order `keys`"{
       listOf(john, jane, jack).query {
-        select { this } where { age > 30 } groupBy { age } orderMap Ord.Desc(Int.order())
+        selectAll() where { age > 30 } groupBy { age } orderMap Ord.Desc(Int.order())
       }.value() shouldBe mapOf(32 to listOf(jane, jack))
     }
 
