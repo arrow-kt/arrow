@@ -131,89 +131,16 @@ NOTE: If you'd like to use `@extension` for transitive typeclasses, like a `Show
 
 ### Syntax
 
-Arrow provides a `extensions` DSL making available in the scoped block all the functions and extensions defined in all instances for that datatype. Use the infix function `extensions` on an object, or function, with the name of the datatype prefixed by For-.
+Starting in 0.8.0, the annotation `@extends` generates extension functions over the datatype they're declared for that are available at global scope.
 
-```kotlin
-ForOption extensions {
-  binding {
-    val a = Option(1).bind()
-    val b = Option(a + 1).bind()
-    a + b
-  }.fix()
-}
-//Option(3)
+For example, if you implement `@extends interface Traverse<ForMyRBTree> { ... }`, you'll automatically get all the functions available in the `Traverse<F>` hierarchy, such as `tupleLeft`, `fproduct`, `sequence`, `find`, `forAll`...
+
 ```
+import my.lib.instances.myrbtree.foldable.*
+import my.lib.instances.myrbtree.functor.*
+import my.lib.instances.myrbtree.traverse.*
 
-```kotlin
-ForOption extensions {
-  map(Option(1), Option(2), Option(3), { (one, two, three) ->
-    one + two + three
-  })
-}
-//Option(6)
-```
-
-```kotlin
-ForOption extensions {
-  listOf(Option(1), Option(2), Option(3)).k().traverse(this, ::identity)
-}
-//Option(ListK(1, 2, 3))
-```
-
-```kotlin
-ForTry extensions {
-  binding {
-    val a = Try { 1 }.bind()
-    val b = Try { a + 1 }.bind()
-    a + b
-  }.fix()
-}
-//Success(3)
-```
-
-```kotlin
-ForTry extensions {
-  map(Try { 1 }, Try { 2 }, Try { 3 }, { (one, two, three) ->
-    one + two + three
-  })
-}
-//Success(6)
-```
-
-```kotlin
-ForEither<Throwable>() extensions {
-  listOf(just(1), just(2), just(3)).k().traverse(this, ::identity)
-}
-//Right<Throwable, ListK<Int>>(ListK(1,2,3))
-```
-
-If you defined your own instances over your own data types and wish to use a similar `extensions` DSL you can do so for both types with a single type argument such as `Option`:
-
-```kotlin:ank:silent
-object OptionContext : OptionMonadErrorInstance, OptionTraverseInstance {
-  override fun <A, B> Kind<ForOption, A>.map(f: (A) -> B): Option<B> =
-    fix().map(f)
-}
-
-infix fun <A> ForOption.Companion.extensions(f: OptionContext.() -> A): A =
-  f(OptionContext)
-```
-
-Or for types that require partial application of some of their type arguments such as `Either<L, R>` where `L` needs to be partially applied
-
-```kotlin:ank:silent
-class EitherContext<L> : EitherMonadErrorInstance<L>, EitherTraverseInstance<L> {
-  override fun <A, B> Kind<EitherPartialOf<L>, A>.map(f: (A) -> B): Either<L, B> =
-    fix().map(f)
-}
-
-class EitherContextPartiallyApplied<L> {
-  infix fun <A> extensions(f: EitherContext<L>.() -> A): A =
-    f(EitherContext())
-}
-
-fun <L> ForEither(): EitherContextPartiallyApplied<L> =
-  EitherContextPartiallyApplied()
+MyRBTree(Node(0)).map { it + 1 }.tupleLeft("Metadata").forAll { (metadata, value) -> value < metadata.length }
 ```
 
 ### Type constructors
