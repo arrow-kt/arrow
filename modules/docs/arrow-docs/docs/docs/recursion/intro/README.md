@@ -164,7 +164,7 @@ So why do this? We can now define a [Functor]({{ '/docs/typeclasses/functor' | r
 `IntListPattern`, allowing us to traverse into the structure.
 
 ```kotlin
-@instance(IntListPattern::class)
+@extends
 interface IntListPatternFunctorInstance : Functor<ForIntListPattern> {
   override fun <A, B> IntListPatternOf<A>.map(f: (A) -> B): IntListPatternOf<B> {
     val lp = fix()

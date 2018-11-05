@@ -83,7 +83,7 @@ A single implementation of a typeclass for a specific datatype or class.
 Because typeclasses require generic parameters each implementation is meant to be unique for that parameter.
 
 ```kotlin
-@instance(User::class)
+@extension
 interface UserEqInstance: Eq<User> {
   override fun User.eqv(b: User): Boolean = id == b.id
 }
@@ -291,7 +291,7 @@ fun <F> Applicative<F>.randomUserStructure(f: (Int) -> User): Kind<F, User> =
 Now lets create a simple example instance of `Applicative` where our `F` is `ListK`. This implementation of a `just` constructor is trivial for lists, as it just requires wrapping the value.
 
 ```kotlin
-@instance
+@extends
 interface ListKApplicativeInstance : Applicative<ForListK> {
   override fun <A> just(a: A): Kind<ForListK, A> = ListK(listOf(a))
 
