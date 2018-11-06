@@ -9,7 +9,7 @@ permalink: /docs/typeclasses/foldable/
 {:.intermediate}
 intermediate
 
-The Typeclass `Foldable` provide us the ability of, given a type `Kind<F, A>`, aggregates their values `<A>`.
+The Typeclass `Foldable` provide us the ability of, given a type `Kind<F, A>`, aggregates their values `A`.
 
 `Foldable<F>` is implemented in terms of two basic methods:
 
@@ -227,7 +227,7 @@ getLengthFromRight(strList, ListK.foldable())
 ```
 
 ### FoldMap
-Fold implemented by mapping A values into B and then combining them using the given `Monoid<B>` instance.
+Fold implemented by mapping `A` values into `B` and then combining them using the given `Monoid<B>` instance.
 
 ```kotlin:ank:silent
 fun <F> getLenght(strKind: Kind<F, String>, FO: Foldable<F>): Int =
@@ -248,10 +248,10 @@ getLenght(None, Option.foldable())
 getLenght(strList, ListK.foldable())
 ```
   
-### Traverse 
-A typed values will be mapped into `G<B>` by function `f` and combined using `Applicative#map2`.
+### Traverse_
+A typed values will be mapped into `Kind<G, B>` by function `f` and combined using `Applicative#map2`.
 
-This method is primarily useful when `G<_>` represents an action or effect, and the specific `A` aspect of `G<A>` is
+This method is primarily useful when `<_>` represents an action or effect, and the specific `A` aspect of `Kind<G, A>` is
 not otherwise needed.
 
 ```kotlin:ank:silent
@@ -275,8 +275,8 @@ traverse(None, Option.foldable())
 traverse(strList, ListK.foldable())
 ```
 
-### Sequence
-Similar to traverse except it operates on `F<G<A>>` values, so no additional functions are needed.
+### Sequence_
+Similar to `traverse_` except it operates on `Kind<F, Kind<G, A>>` values, so no additional functions are needed.
 
 ```kotlin:ank:silent
 import arrow.instances.option.applicative.applicative
@@ -424,9 +424,6 @@ foldableNonEmpty(strList, ListK.foldable())
 ### Size
 The size of this `Foldable`.
 
-This is overriden in structures that have more efficient size implementations
-(e.g. Vector, Set, Map).
-
 Note: will not terminate for infinite-sized collections.
 
 ```kotlin:ank:silent
@@ -449,7 +446,7 @@ foldableSize(strList, ListK.foldable())
 ```
 
 ### FoldMapM
-Monadic folding on `F` by mapping `A` values to `G<B>`, combining the `B` values using the given `Monoid<B>` instance.
+Monadic folding on `F` by mapping `A` values to `Kind<G, B>`, combining the `B` values using the given `Monoid<B>` instance.
 
 Similar to `foldM`, but using a `Monoid<B>`.
 
@@ -521,8 +518,6 @@ val rightStr = Either.right("abc") as Either<String, String>
 
 foldableGet(rightStr)
 ```
-
- - TODO. Meanwhile you can find a short description in the [intro to typeclasses]({{ '/docs/typeclasses/intro/' | relative_url }}).
 
 ### Data Types
 

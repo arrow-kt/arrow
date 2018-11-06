@@ -148,9 +148,6 @@ interface Foldable<F> {
   /**
    * The size of this Foldable.
    *
-   * This is overriden in structures that have more efficient size implementations
-   * (e.g. Vector, Set, Map).
-   *
    * Note: will not terminate for infinite-sized collections.
    */
   fun <A> Kind<F, A>.size(MN: Monoid<Long>): Long =
