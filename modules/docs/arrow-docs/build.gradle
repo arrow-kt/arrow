@@ -21,6 +21,7 @@ dependencies {
     compile project(':arrow-free')
     compile project(':arrow-typeclasses')
     compile project(':arrow-generic')
+    compile project(':arrow-query-language')
     kapt project(':arrow-annotations-processor')
     kaptTest project(':arrow-annotations-processor')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"

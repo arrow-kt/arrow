@@ -17,7 +17,12 @@ import arrow.aql.instances.list.where.where
 import arrow.aql.instances.list.where.whereSelection
 import arrow.aql.instances.listk.select.select
 import arrow.aql.instances.listk.select.selectAll
+import arrow.aql.instances.option.select.query
+import arrow.aql.instances.option.select.select
+import arrow.aql.instances.option.select.value
 import arrow.core.Id
+import arrow.core.Option
+import arrow.core.Some
 import arrow.instances.order
 import arrow.test.UnitSpec
 import io.kotlintest.KTestJUnitRunner
@@ -33,6 +38,12 @@ class AQLTests : UnitSpec() {
       listOf(1, 2, 3).query {
         select { this * 10 }
       }.value() shouldBe listOf(10, 20, 30)
+    }
+
+    "AQL is able to `select` Option" {
+      Option(1).query {
+        select { this * 10 }
+      }.value() shouldBe Some(10)
     }
 
     "AQL is able to `select count`" {
