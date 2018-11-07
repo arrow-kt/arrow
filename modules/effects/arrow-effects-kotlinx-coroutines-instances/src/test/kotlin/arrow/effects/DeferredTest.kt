@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.*
 import arrow.data.*
 import arrow.effects.deferredk.async.async
+import arrow.effects.deferredk.effect.runAsync
 import arrow.instances.`try`.functor.functor
 import arrow.instances.`try`.traverse.traverse
 import arrow.instances.listk.functor.functor
@@ -23,9 +24,7 @@ import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Unconfined
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -75,7 +74,7 @@ class DeferredKTest : UnitSpec() {
 
     "should return exceptions within main block with unsafeRunAsync" {
       val exception = MyException()
-      val ioa = DeferredK<Int>(Unconfined, CoroutineStart.DEFAULT) { throw exception }
+      val ioa = DeferredK<Int>(Dispatchers.Unconfined, CoroutineStart.DEFAULT) { throw exception }
       ioa.unsafeRunAsync { either ->
         either.fold({ it shouldBe exception }, { fail("") })
       }
@@ -84,7 +83,7 @@ class DeferredKTest : UnitSpec() {
     "should not catch exceptions within run block with unsafeRunAsync" {
       try {
         val exception = MyException()
-        val ioa = DeferredK<Int>(Unconfined, CoroutineStart.DEFAULT) { throw exception }
+        val ioa = DeferredK<Int>(Dispatchers.Unconfined, CoroutineStart.DEFAULT) { throw exception }
         ioa.unsafeRunAsync { either ->
           either.fold({ throw exception }, { fail("") })
         }
@@ -105,7 +104,7 @@ class DeferredKTest : UnitSpec() {
 
     "should complete when running a return value with runAsync" {
       val expected = 0
-      DeferredK(Unconfined, CoroutineStart.DEFAULT) { expected }.runAsync { either ->
+      DeferredK(Dispatchers.Unconfined, CoroutineStart.DEFAULT) { expected }.runAsync { either ->
         either.fold({ fail("") }, { DeferredK { it shouldBe expected } })
       }
     }
@@ -125,7 +124,7 @@ class DeferredKTest : UnitSpec() {
 
     "should return exceptions within main block with runAsync" {
       val exception = MyException()
-      val ioa = DeferredK<Int>(Unconfined, CoroutineStart.DEFAULT) { throw exception }
+      val ioa = DeferredK<Int>(Dispatchers.Unconfined, CoroutineStart.DEFAULT) { throw exception }
       ioa.runAsync { either ->
         either.fold({ DeferredK { it shouldBe exception } }, { fail("") })
       }
@@ -134,9 +133,9 @@ class DeferredKTest : UnitSpec() {
     "should catch exceptions within run block with runAsync" {
       try {
         val exception = MyException()
-        val ioa = DeferredK<Int>(Unconfined, CoroutineStart.DEFAULT) { throw exception }
+        val ioa = DeferredK<Int>(Dispatchers.Unconfined, CoroutineStart.DEFAULT) { throw exception }
         ioa.runAsync { either ->
-          either.fold({ throw it }, { fail("") })
+          either.fold({ println("Error from main block: $it"); throw it }, { fail("") })
         }.unsafeRunSync()
         fail("Should rethrow the exception")
       } catch (throwable: AssertionError) {
