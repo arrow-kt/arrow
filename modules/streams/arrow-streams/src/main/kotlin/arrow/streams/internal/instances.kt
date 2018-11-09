@@ -1,33 +1,30 @@
 package arrow.streams.internal
 
-import arrow.Kind
-import arrow.core.Either
-import arrow.effects.typeclasses.MonadDefer
+import arrow.*
+import arrow.core.*
+import arrow.effects.typeclasses.*
 import arrow.typeclasses.*
-import arrow.streams.internal.handleErrorWith as handleErrorW
 import arrow.streams.internal.ap as apply
+import arrow.streams.internal.handleErrorWith as handleErrorW
 
-internal fun <F> FreeC.Companion.functor(): Functor<FreeCPartialOf<F>> = object : FreeCFunctor<F> { }
-
-internal interface FreeCFunctor<F> : Functor<FreeCPartialOf<F>> {
+@extension
+interface FreeCFunctor<F> : Functor<FreeCPartialOf<F>> {
   override fun <A, B> Kind<FreeCPartialOf<F>, A>.map(f: (A) -> B): Kind<FreeCPartialOf<F>, B> =
     this.fix().map(f)
 }
 
-internal fun <F> FreeC.Companion.applicative(): Applicative<FreeCPartialOf<F>> = object : FreeCApplicative<F> { }
-
-internal interface FreeCApplicative<F> : Applicative<FreeCPartialOf<F>> {
+@extension
+interface FreeCApplicative<F> : Applicative<FreeCPartialOf<F>> {
   override fun <A> just(a: A): Kind<FreeCPartialOf<F>, A> =
-    FreeC.pure(a)
+    FreeC.just(a)
 
   override fun <A, B> Kind<FreeCPartialOf<F>, A>.ap(ff: Kind<FreeCPartialOf<F>, (A) -> B>): Kind<FreeCPartialOf<F>, B> =
     apply(ff)
 
 }
 
-internal fun <F> FreeC.Companion.monad(): Monad<FreeCPartialOf<F>> = object : FreeCMonad<F> { }
-
-internal interface FreeCMonad<F> : Monad<FreeCPartialOf<F>> {
+@extension
+interface FreeCMonad<F> : Monad<FreeCPartialOf<F>> {
   override fun <A, B> Kind<FreeCPartialOf<F>, A>.flatMap(f: (A) -> Kind<FreeCPartialOf<F>, B>): Kind<FreeCPartialOf<F>, B> =
     this.fix().flatMap(f)
 
@@ -35,12 +32,11 @@ internal interface FreeCMonad<F> : Monad<FreeCPartialOf<F>> {
     FreeC.tailRecM(a) { f(it).fix() }
 
   override fun <A> just(a: A): Kind<FreeCPartialOf<F>, A> =
-    FreeC.pure(a)
+    FreeC.just(a)
 }
 
-internal fun <F> FreeC.Companion.applicativeError(): ApplicativeError<FreeCPartialOf<F>, Throwable> = object : FreeCApplicativeError<F> { }
-
-internal interface FreeCApplicativeError<F> : ApplicativeError<FreeCPartialOf<F>, Throwable> {
+@extension
+interface FreeCApplicativeError<F> : ApplicativeError<FreeCPartialOf<F>, Throwable> {
   override fun <A> raiseError(e: Throwable): Kind<FreeCPartialOf<F>, A> =
     FreeC.raiseError(e)
 
@@ -48,16 +44,15 @@ internal interface FreeCApplicativeError<F> : ApplicativeError<FreeCPartialOf<F>
     handleErrorW(f)
 
   override fun <A> just(a: A): Kind<FreeCPartialOf<F>, A> =
-    FreeC.pure(a)
+    FreeC.just(a)
 
   override fun <A, B> Kind<FreeCPartialOf<F>, A>.ap(ff: Kind<FreeCPartialOf<F>, (A) -> B>): Kind<FreeCPartialOf<F>, B> =
     apply(ff)
 
 }
 
-internal fun <F> FreeC.Companion.monadError(): MonadError<FreeCPartialOf<F>, Throwable> = object : FreeCMonadError<F> { }
-
-internal interface FreeCMonadError<F> : MonadError<FreeCPartialOf<F>, Throwable> {
+@extension
+interface FreeCMonadError<F> : MonadError<FreeCPartialOf<F>, Throwable> {
   override fun <A> raiseError(e: Throwable): Kind<FreeCPartialOf<F>, A> =
     FreeC.raiseError(e)
 
@@ -65,7 +60,7 @@ internal interface FreeCMonadError<F> : MonadError<FreeCPartialOf<F>, Throwable>
     handleErrorW(f)
 
   override fun <A> just(a: A): Kind<FreeCPartialOf<F>, A> =
-    FreeC.pure(a)
+    FreeC.just(a)
 
   override fun <A, B> Kind<FreeCPartialOf<F>, A>.flatMap(f: (A) -> Kind<FreeCPartialOf<F>, B>): Kind<FreeCPartialOf<F>, B> =
     this.fix().flatMap(f)
@@ -75,9 +70,8 @@ internal interface FreeCMonadError<F> : MonadError<FreeCPartialOf<F>, Throwable>
 
 }
 
-internal fun <F> FreeC.Companion.monadDefer(): MonadDefer<FreeCPartialOf<F>> = object : FreeCMonadDefer<F> { }
-
-internal interface FreeCMonadDefer<F> : MonadDefer<FreeCPartialOf<F>> {
+@extension
+interface FreeCMonadDefer<F> : MonadDefer<FreeCPartialOf<F>> {
   override fun <A> defer(fa: () -> Kind<FreeCPartialOf<F>, A>): Kind<FreeCPartialOf<F>, A> =
     FreeC.defer(fa)
 
@@ -88,11 +82,25 @@ internal interface FreeCMonadDefer<F> : MonadDefer<FreeCPartialOf<F>> {
     handleErrorW(f)
 
   override fun <A> just(a: A): Kind<FreeCPartialOf<F>, A> =
-    FreeC.pure(a)
+    FreeC.just(a)
 
   override fun <A, B> Kind<FreeCPartialOf<F>, A>.flatMap(f: (A) -> Kind<FreeCPartialOf<F>, B>): Kind<FreeCPartialOf<F>, B> =
     this.fix().flatMap(f)
 
   override fun <A, B> tailRecM(a: A, f: (A) -> Kind<FreeCPartialOf<F>, Either<A, B>>): Kind<FreeCPartialOf<F>, B> =
     FreeC.tailRecM(a) { f(it).fix() }
+}
+
+@extension
+interface FreeCEq<F, G, A> : Eq<Kind<FreeCPartialOf<F>, A>> {
+
+  fun ME(): MonadError<G, Throwable>
+
+  fun FK(): FunctionK<F, G>
+
+  fun EQFA(): Eq<Kind<G, Option<A>>>
+
+  override fun Kind<FreeCPartialOf<F>, A>.eqv(b: Kind<FreeCPartialOf<F>, A>): Boolean = EQFA().run {
+    fix().foldMap(FK(), ME()).eqv(b.fix().foldMap(FK(), ME()))
+  }
 }

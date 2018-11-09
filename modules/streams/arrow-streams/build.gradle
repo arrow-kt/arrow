@@ -4,6 +4,7 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
     testCompile project(':arrow-test')
+    testCompile project(':arrow-effects-instances')
 
     compile project(':arrow-annotations')
     kapt project(':arrow-annotations-processor')
