@@ -13,6 +13,7 @@ beginner
 Whenever `true` is returned from an expression affecting one of the items in the data source the item is collected and included in the selection.
 
 `where` over `List`
+
 {: data-executable='true'}
 ```kotlin:ank
 import arrow.aql.instances.list.select.*
@@ -27,7 +28,7 @@ val jack = Student("Jack", 32)
 
 fun main(args: Array<String>) {
 //sampleStart
-val result: List<String> = 
+val result: List<String> =
   listOf(john, jane, jack).query {
     select { name } where { age > 20 }
   }.value()

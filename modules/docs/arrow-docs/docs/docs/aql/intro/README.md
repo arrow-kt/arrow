@@ -9,22 +9,23 @@ beginner
 
 ## The Λrrow Query Language
 
-The **Λ**rrow **Q**uery **L**anguage is a SQL inspired language that works over all data types from which you may want to select and transform data. 
+The **Λ**rrow **Q**uery **L**anguage is a SQL inspired language that works over all data types from which you may want to select and transform data.
 
-This includes heterogeneous use cases such as [selecting data from async computations](#), [transforming and filtering collections](#), [traversing and querying JSON trees](#) and much more. 
+This includes heterogeneous use cases such as [selecting data from async computations](#), [transforming and filtering collections](#), [traversing and querying JSON trees](#) and much more.
 
 The generality and level of abstractions of **AQL** comes from the fact that it relies on the [Core FP Type Classes] which model in a generic way using higher kinded types the rules of composition used when describing computation and data transformations such as folds, reductions, monad binding and in general most of the popular patterns used in Typed Functional Programming that operate over types of the shape `Kind<F, A>` meaning any type `F` that may contain a value of `A`.
 
 It's easier done than said. Observe how the same expression below is able to query different data types without changes in the language used to do so in a type safe and elegant fashion:
 
 `select` over `List`
+
 {: data-executable='true'}
 ```kotlin:ank
 import arrow.aql.instances.list.select.*
 import arrow.aql.instances.listk.select.select
 fun main(args: Array<String>) {
 //sampleStart
-val result: List<Int> = 
+val result: List<Int> =
   listOf(1, 2, 3).query {
     select { this + 1 }
   }.value()
@@ -34,6 +35,7 @@ println(result)
 ```
 
 `select` over `Option`
+
 {: data-executable='true'}
 ```kotlin:ank
 import arrow.core.Option
@@ -41,7 +43,7 @@ import arrow.aql.instances.option.select.*
 
 fun main(args: Array<String>) {
 //sampleStart
-val result: Option<Int> = 
+val result: Option<Int> =
   Option(1).query {
     select { this * 10 }
   }.value()
@@ -51,6 +53,7 @@ println(result)
 ```
 
 `select` over `Sequence`
+
 {: data-executable='true'}
 ```kotlin:ank
 import arrow.aql.instances.sequence.select.*
@@ -58,7 +61,7 @@ import arrow.aql.instances.sequencek.select.select
 
 fun main(args: Array<String>) {
 //sampleStart
-val result: List<Int> = 
+val result: List<Int> =
   sequenceOf(1, 2, 3, 4).query {
     select { this * 10 }
   }.value().toList()
@@ -67,12 +70,5 @@ val result: List<Int> =
 }
 ```
 
-This is possible because each one of the SQL like operations have a direct dependency to 
-the combinators we frequently use in the Functional Type Classes. In this case **Select** is a [Type Class]() which delegates selection to the [`Functor`]() instance that all `Option`, `List`, `Eval` and many other data types that can provide a `map` function are able to implement. 
-
-
-
-
-
-
-
+This is possible because each one of the SQL like operations have a direct dependency to
+the combinators we frequently use in the Functional Type Classes. In this case **Select** is a [Type Class]() which delegates selection to the [`Functor`]() instance that all `Option`, `List`, `Eval` and many other data types that can provide a `map` function are able to implement.

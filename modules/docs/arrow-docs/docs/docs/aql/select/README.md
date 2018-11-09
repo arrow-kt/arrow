@@ -9,16 +9,17 @@ beginner
 
 ## select
 
-`select` allows obtaining and transforming data from any data source containing `A` given a function `(A) -> B` where `A` denotes the input type and `B` the transformed type. 
+`select` allows obtaining and transforming data from any data source containing `A` given a function `(A) -> B` where `A` denotes the input type and `B` the transformed type.
 
 `select` over `List`
+
 {: data-executable='true'}
 ```kotlin:ank
 import arrow.aql.instances.list.select.*
 import arrow.aql.instances.listk.select.select
 fun main(args: Array<String>) {
 //sampleStart
-val result: List<Int> = 
+val result: List<Int> =
   listOf(1, 2, 3).query {
     select { this + 1 }
   }.value()
@@ -28,6 +29,7 @@ println(result)
 ```
 
 `select` over `Option`
+
 {: data-executable='true'}
 ```kotlin:ank
 import arrow.core.Option
@@ -35,7 +37,7 @@ import arrow.aql.instances.option.select.*
 
 fun main(args: Array<String>) {
 //sampleStart
-val result: Option<Int> = 
+val result: Option<Int> =
   Option(1).query {
     select { this * 10 }
   }.value()
@@ -45,6 +47,7 @@ println(result)
 ```
 
 `select` over `Sequence`
+
 {: data-executable='true'}
 ```kotlin:ank
 import arrow.aql.instances.sequence.select.*
@@ -52,7 +55,7 @@ import arrow.aql.instances.sequencek.select.select
 
 fun main(args: Array<String>) {
 //sampleStart
-val result: List<Int> = 
+val result: List<Int> =
   sequenceOf(1, 2, 3, 4).query {
     select { this * 10 }
   }.value().toList()
