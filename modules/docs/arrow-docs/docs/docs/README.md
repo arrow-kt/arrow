@@ -170,7 +170,7 @@ Add the dependencies that you want to use
 ## Enabling kapt
 
 Add to your pom.xml file the following repository:
-``
+```
 <repositories>
     <repository>
         <snapshots>
