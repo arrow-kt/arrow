@@ -1,6 +1,6 @@
 package arrow.integrations.retrofit.adapter.retrofit
 
-import arrow.integrations.retrofit.adapter.Async2CallAdapterFactory
+import arrow.integrations.retrofit.adapter.CallKindAdapterFactory
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -11,7 +11,7 @@ private fun provideOkHttpClient(): OkHttpClient =
 
 private fun configRetrofit(retrofitBuilder: Retrofit.Builder) =
   retrofitBuilder
-    .addCallAdapterFactory(Async2CallAdapterFactory.create())
+    .addCallAdapterFactory(CallKindAdapterFactory.create())
     .addConverterFactory(GsonConverterFactory.create())
     .client(provideOkHttpClient())
 

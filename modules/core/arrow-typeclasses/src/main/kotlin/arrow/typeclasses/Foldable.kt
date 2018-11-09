@@ -9,8 +9,8 @@ import arrow.core.Eval.Companion.always
  *
  * Foldable<F> is implemented in terms of two basic methods:
  *
- *  - `foldLeft(fa, b)(f)` eagerly folds `fa` from left-to-right.
- *  - `foldRight(fa, b)(f)` lazily folds `fa` from right-to-left.
+ * - `fa.foldLeft(init, f)` eagerly folds `fa` from left-to-right.
+ * - `fa.foldRight(init, f)` lazily folds `fa` from right-to-left.
  *
  * Beyond these it provides many other useful methods related to folding over F<A> values.
  */
@@ -147,9 +147,6 @@ interface Foldable<F> {
 
   /**
    * The size of this Foldable.
-   *
-   * This is overriden in structures that have more efficient size implementations
-   * (e.g. Vector, Set, Map).
    *
    * Note: will not terminate for infinite-sized collections.
    */
