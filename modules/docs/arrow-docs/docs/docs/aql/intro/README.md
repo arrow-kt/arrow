@@ -13,7 +13,8 @@ The **Λ**rrow **Q**uery **L**anguage is a SQL inspired language that works over
 
 This includes heterogeneous use cases such as [selecting data from async computations](#), [transforming and filtering collections](#), [traversing and querying JSON trees](#) and much more.
 
-The generality and level of abstractions of **AQL** comes from the fact that it relies on the [Core FP Type Classes] which model in a generic way using higher kinded types the rules of composition used when describing computation and data transformations such as folds, reductions, monad binding and in general most of the popular patterns used in Typed Functional Programming that operate over types of the shape `Kind<F, A>` meaning any type `F` that may contain a value of `A`.
+The generality and level of abstractions of **AQL** comes from the fact that it relies on the [Core FP Type Classes] which model in a generic way using higher kinded types the rules of composition used when describing computation and data transformations.
+ These transformations such as folds, reductions, monad binding and in general most of the popular patterns used in Typed Functional Programming are polymorphic and operate over types of the shape `Kind<F, A>`. That is _for all_ `F` that may contain a value of `A` provided it satisfies the typed constrains as expressed in the type classes behind each of the AQL combinators.
 
 It's easier done than said. Observe how the same expression below is able to query different data types without changes in the language used to do so in a type safe and elegant fashion:
 
