@@ -27,7 +27,7 @@ interface OrderBy<F> {
     }
   }
 
-  infix fun <A, Z> Query<F, A, Z>.order(ord: Ord<Z>): Query<ForId, List<Z>, List<Z>> =
+  infix fun <A, Z> Query<F, A, Z>.orderBy(ord: Ord<Z>): Query<ForId, List<Z>, List<Z>> =
     foldable().run {
       Query(
         select = ::identity,

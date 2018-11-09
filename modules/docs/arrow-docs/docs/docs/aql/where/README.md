@@ -41,3 +41,18 @@ println(result)
 intermediate
 
 `where` works with any data type that provides an instance of `FunctorFilter<F>` where `F` is the higher kinded representation of the data type. For example `ForOption` when targeting the `Option<A>` data type or `ForListK` when targeting the `List<A>` data type
+
+Learn more about the `AQL` combinators
+
+- [_select_](/docs/aql/select/)
+- [_from_](/docs/aql/from/)
+- [_where_](/docs/aql/where/)
+- [_groupBy_](/docs/aql/groupby/)
+- [_orderBy_](/docs/aql/orderby/)
+- [_sum_](/docs/aql/sum/)
+- [_union_](/docs/aql/union/)
+
+{:.advanced}
+advanced
+
+[Adapt AQL to your own _custom data types_](/docs/aql/custom/)

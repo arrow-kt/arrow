@@ -34,3 +34,18 @@ val result: List<Int> =
 println(result)
 }
 ```
+
+Learn more about the `AQL` combinators
+
+- [_select_](/docs/aql/select/)
+- [_from_](/docs/aql/from/)
+- [_where_](/docs/aql/where/)
+- [_groupBy_](/docs/aql/groupby/)
+- [_orderBy_](/docs/aql/orderby/)
+- [_sum_](/docs/aql/sum/)
+- [_union_](/docs/aql/union/)
+
+{:.advanced}
+advanced
+
+[Adapt AQL to your own _custom data types_](/docs/aql/custom/)

@@ -11,7 +11,7 @@ beginner
 
 `groupBy` allows grouping data from a data source into different keys resulting in a map of keys and values.
 
-`where` over `List`
+`groupBy` over `List`
 
 {:data-executable='true'}
 ```kotlin:ank
@@ -42,3 +42,18 @@ println(result)
 intermediate
 
 `grroupBy` works with any data type that provides an instance of `Foldable<F>` where `F` is the higher kinded representation of the data type. For example `ForOption` when targeting the `Option<A>` data type or `ForListK` when targeting the `List<A>` data type
+
+Learn more about the `AQL` combinators
+
+- [_select_](/docs/aql/select/)
+- [_from_](/docs/aql/from/)
+- [_where_](/docs/aql/where/)
+- [_groupBy_](/docs/aql/groupby/)
+- [_orderBy_](/docs/aql/orderby/)
+- [_sum_](/docs/aql/sum/)
+- [_union_](/docs/aql/union/)
+
+{:.advanced}
+advanced
+
+[Adapt AQL to your own _custom data types_](/docs/aql/custom/)

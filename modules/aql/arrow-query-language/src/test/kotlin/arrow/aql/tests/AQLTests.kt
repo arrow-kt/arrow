@@ -6,7 +6,7 @@ import arrow.aql.instances.list.count.count
 import arrow.aql.instances.list.count.value
 import arrow.aql.instances.list.from.join
 import arrow.aql.instances.list.groupBy.groupBy
-import arrow.aql.instances.list.orderBy.order
+import arrow.aql.instances.list.orderBy.orderBy
 import arrow.aql.instances.list.orderBy.orderMap
 import arrow.aql.instances.list.select.query
 import arrow.aql.instances.list.select.select
@@ -99,40 +99,27 @@ class AQLTests : UnitSpec() {
       }.value() shouldBe 64L
     }
 
-    "AQL is able to `order by Asc` simple selects" {
+    "AQL is able to `orderBy by Asc` simple selects" {
       listOf(1, 2, 3).query {
-        select { this * 10 } order Ord.Asc(Int.order())
+        select { this * 10 } orderBy Ord.Asc(Int.order())
       }.value() shouldBe listOf(10, 20, 30)
     }
 
-    "AQL is able to `order by Desc` simple selects" {
+    "AQL is able to `orderBy by Desc` simple selects" {
       listOf(1, 2, 3).query {
-        select { this * 10 } order Ord.Desc(Int.order())
+        select { this * 10 } orderBy Ord.Desc(Int.order())
       }.value() shouldBe listOf(30, 20, 10)
     }
 
-    "AQL is able to `order by Desc` simple selects with explicit instance" {
-      listOf(1, 2, 3).query {
-        select { this * 10 } order Ord.Desc(Int.order())
-      }.value() shouldBe listOf(30, 20, 10)
-    }
-
-
-    "AQL is able to `groupBy` and then order `keys`"{
+    "AQL is able to `groupBy` and then orderBy `keys`"{
       listOf(john, jane, jack).query {
         selectAll() where { age > 30 } groupBy { age } orderMap Ord.Desc(Int.order())
       }.value() shouldBe mapOf(32 to listOf(jane, jack))
     }
 
     "AQL is able to `union`" {
-      val queryA = listOf(
-        "customer" to john,
-        "customer" to jane
-      ).select { this }
-      val queryB = listOf(
-        "sales" to jack,
-        "sales" to chris
-      ).select { this }
+      val queryA = listOf("customer" to john, "customer" to jane).query { selectAll() }
+      val queryB = listOf("sales" to jack, "sales" to chris).query { selectAll() }
       queryA.union(queryB).value() shouldBe listOf(
         "customer" to john,
         "customer" to jane,

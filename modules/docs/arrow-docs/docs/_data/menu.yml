@@ -313,13 +313,16 @@ options:
         url: /docs/aql/groupby
 
       - title: orderBy
-        url: /docs/aql/groupby
+        url: /docs/aql/orderBy
 
       - title: sum
         url: /docs/aql/sum
 
       - title: union
         url: /docs/aql/union
+
+      - title: Custom Data Types
+        url: /docs/aql/custom
 
   - title: Generic
     nested_options:
