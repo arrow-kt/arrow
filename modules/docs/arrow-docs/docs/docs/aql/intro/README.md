@@ -13,13 +13,13 @@ The **Λ**rrow **Q**uery **L**anguage is a SQL inspired language that works over
 
 This includes heterogeneous use cases such as [selecting data from async computations](#), [transforming and filtering collections](#), [traversing and querying JSON trees](#) and much more. 
 
-The generality and level of abstractions of **AQL** comes from the fact that it relies on the [Core FP Type Classes] which model in a generic way using higher kinded types the rules of composition used when describing computation and data transformations such as folds, reductions, monad binding and in general most of the popular patterns used in Typed Functional Programming that operate over types of the shape `Kind<F, A>` meaning types of `F` that may contain a value of `A`.
+The generality and level of abstractions of **AQL** comes from the fact that it relies on the [Core FP Type Classes] which model in a generic way using higher kinded types the rules of composition used when describing computation and data transformations such as folds, reductions, monad binding and in general most of the popular patterns used in Typed Functional Programming that operate over types of the shape `Kind<F, A>` meaning any type `F` that may contain a value of `A`.
 
 It's easier done than said. Observe how the same expression below is able to query different data types without changes in the language used to do so in a type safe and elegant fashion:
 
 `select` over `List`
 {: data-executable='true'}
-```kotlin
+```kotlin:ank
 import arrow.aql.instances.list.select.*
 import arrow.aql.instances.listk.select.select
 fun main(args: Array<String>) {
@@ -35,7 +35,7 @@ println(result)
 
 `select` over `Option`
 {: data-executable='true'}
-```kotlin
+```kotlin:ank
 import arrow.core.Option
 import arrow.aql.instances.option.select.*
 
@@ -48,12 +48,11 @@ val result: Option<Int> =
 //sampleEnd
 println(result)
 }
-
 ```
 
 `select` over `Sequence`
 {: data-executable='true'}
-```kotlin
+```kotlin:ank
 import arrow.aql.instances.sequence.select.*
 import arrow.aql.instances.sequencek.select.select
 
