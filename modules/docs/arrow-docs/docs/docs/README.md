@@ -127,108 +127,105 @@ idea {
 Make sure to have the at least the latest version of JDK 1.8 installed.
 Add to your pom.xml file the following properties:
 ```
-    <properties>
-        <kotlin.version>1.3.0</kotlin.version>
-        <arrow.version>0.8.0</arrow.version>
-    </properties>
+<properties>
+    <kotlin.version>1.3.0</kotlin.version>
+    <arrow.version>0.8.0</arrow.version>
+</properties>
 ```
 
 Add the dependencies that you want to use
 ```
-        <dependency>
-            <groupId>io.arrow-kt</groupId>
-            <artifactId>arrow-core</artifactId>
-            <version>${arrow.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.arrow-kt</groupId>
-            <artifactId>arrow-syntax</artifactId>
-            <version>${arrow.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.arrow-kt</groupId>
-            <artifactId>arrow-typeclasses</artifactId>
-            <version>${arrow.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.arrow-kt</groupId>
-            <artifactId>arrow-data</artifactId>
-            <version>${arrow.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.arrow-kt</groupId>
-            <artifactId>arrow-instances-core</artifactId>
-            <version>${arrow.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.arrow-kt</groupId>
-            <artifactId>arrow-instances-data</artifactId>
-            <version>${arrow.version}</version>
-        </dependency>
+<dependency>
+    <groupId>io.arrow-kt</groupId>
+    <artifactId>arrow-core</artifactId>
+    <version>${arrow.version}</version>
+</dependency>
+<dependency>
+    <groupId>io.arrow-kt</groupId>
+    <artifactId>arrow-syntax</artifactId>
+    <version>${arrow.version}</version>
+</dependency>
+<dependency>
+    <groupId>io.arrow-kt</groupId>
+    <artifactId>arrow-typeclasses</artifactId>
+    <version>${arrow.version}</version>
+</dependency>
+<dependency>
+    <groupId>io.arrow-kt</groupId>
+    <artifactId>arrow-data</artifactId>
+    <version>${arrow.version}</version>
+</dependency>
+<dependency>
+    <groupId>io.arrow-kt</groupId>
+    <artifactId>arrow-instances-core</artifactId>
+    <version>${arrow.version}</version>
+</dependency>
+<dependency>
+    <groupId>io.arrow-kt</groupId>
+    <artifactId>arrow-instances-data</artifactId>
+    <version>${arrow.version}</version>
+</dependency>
 ```
 
 ## Enabling kapt
 
 Add to your pom.xml file the following repository:
 ``
-  <repositories>
-   <repository>
-      <snapshots>
-         <enabled>false</enabled>
-      </snapshots>
-      <id>jitpack</id>
-      <url>https://jitpack.io</url>
-   </repository>
- </repositories>
+<repositories>
+    <repository>
+        <snapshots>
+            <enabled>false</enabled>
+        </snapshots>
+        <id>jitpack</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
 ```
 
 Enable annotaton processing using kotlin plugin 
 ```
-            <plugin>
-                <groupId>org.jetbrains.kotlin</groupId>
-                <artifactId>kotlin-maven-plugin</artifactId>
-                <version>${kotlin.version}</version>
-                <executions>
-                    <execution>
-                        <id>kapt</id>
-                        <goals>
-                            <goal>kapt</goal>
-                        </goals>
-                        <configuration>
-                            <sourceDirs>
-                                <sourceDir>src/main/kotlin</sourceDir>
-                            </sourceDirs>
-                            <annotationProcessorPaths>
-                                <annotationProcessorPath>
-                                    <groupId>io.arrow-kt</groupId>
-                                    <artifactId>arrow-annotations-processor</artifactId>
-                                    <version>${arrow.version}</version>
-                                </annotationProcessorPath>
-                            </annotationProcessorPaths>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>compile</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                        <configuration>
-                            <sourceDirs>
-                                <sourceDir>src/main/kotlin</sourceDir>
-                            </sourceDirs>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>test-compile</id>
-                        <phase>test-compile</phase>
-                        <goals>
-                            <goal>test-compile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+<plugin>
+    <groupId>org.jetbrains.kotlin</groupId>
+    <artifactId>kotlin-maven-plugin</artifactId>
+    <version>${kotlin.version}</version>
+    <executions>
+        <execution>
+            <id>kapt</id>
+            <goals>
+                <goal>kapt</goal>
+            </goals>
+            <configuration>
+                <sourceDirs>
+                    <sourceDir>src/main/kotlin</sourceDir>
+                </sourceDirs>
+                <annotationProcessorPaths>
+                    <annotationProcessorPath>
+                        <groupId>io.arrow-kt</groupId>
+                        <artifactId>arrow-annotations-processor</artifactId>
+                        <version>${arrow.version}</version>
+                    </annotationProcessorPath>
+                </annotationProcessorPaths>
+            </configuration>
+        </execution>
+        <execution>
+            <id>compile</id>
+            <phase>compile</phase>
+            <goals>
+                <goal>compile</goal>
+            </goals>
+            <configuration>
+                <sourceDirs>
+                    <sourceDir>src/main/kotlin</sourceDir>
+                </sourceDirs>
+            </configuration>
+        </execution>
+        <execution>
+            <id>test-compile</id>
+            <phase>test-compile</phase>
+            <goals>
+                <goal>test-compile</goal>
+            </goals>
+        </execution>
+    </executions>
+</plugin>
 ```
-
-
-
