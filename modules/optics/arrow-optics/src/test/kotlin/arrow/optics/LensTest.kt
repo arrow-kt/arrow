@@ -208,6 +208,83 @@ class LensTest : UnitSpec() {
       }
     }
 
+    "Extract should extract the focus from the state" {
+      forAll(TokenGen) { token ->
+        tokenLens.extract().run(token) ==
+          State { token: Token ->
+            token toT tokenLens.get(token)
+          }.run(token)
+      }
+    }
+
+    "toState should be an alias to extract" {
+      forAll(TokenGen) { token ->
+        tokenLens.toState().run(token) == tokenLens.extract().run(token)
+      }
+    }
+
+    "Extracts with f should be same as extract and map" {
+      forAll(TokenGen, genFunctionAToB<String, String>(Gen.string())) { token, f ->
+        tokenLens.extractMap(f).run(token) == tokenLens.extract().map(f).run(token)
+      }
+    }
+
+    "update f should be same modify f within State and returning new state" {
+      forAll(TokenGen, genFunctionAToB<String, String>(Gen.string())) { token, f ->
+        tokenLens.update(f).run(token) ==
+          State { token: Token ->
+            tokenLens.modify(token, f)
+              .let { it toT it.value }
+          }.run(token)
+      }
+    }
+
+    "updateOld f should be same as modify f within State and returning old state" {
+      forAll(TokenGen, genFunctionAToB<String, String>(Gen.string())) { token, f ->
+        tokenLens.updateOld(f).run(token) ==
+          State { token: Token ->
+            tokenLens.modify(token, f) toT tokenLens.get(token)
+          }.run(token)
+      }
+    }
+
+    "update_ f should be as modify f within State and returning Unit" {
+      forAll(TokenGen, genFunctionAToB<String, String>(Gen.string())) { token, f ->
+        tokenLens.update_(f).run(token) ==
+          State { token: Token ->
+            tokenLens.modify(token, f) toT Unit
+          }.run(token)
+      }
+    }
+
+    "assign a should be same set a within State and returning new value" {
+      forAll(TokenGen, Gen.string()) { token, string ->
+        tokenLens.assign(string).run(token) ==
+          State { token: Token ->
+            tokenLens.set(token, string)
+              .let { it toT it.value }
+          }.run(token)
+      }
+    }
+
+    "assignOld f should be same as modify f within State and returning old state" {
+      forAll(TokenGen, Gen.string()) { token, string ->
+        tokenLens.assignOld(string).run(token) ==
+          State { token: Token ->
+            tokenLens.set(token, string) toT tokenLens.get(token)
+          }.run(token)
+      }
+    }
+
+    "assign_ f should be as modify f within State and returning Unit" {
+      forAll(TokenGen, Gen.string()) { token, string ->
+        tokenLens.assign_(string).run(token) ==
+          State { token: Token ->
+            tokenLens.set(token, string) toT Unit
+          }.run(token)
+      }
+    }
+
   }
 
 }

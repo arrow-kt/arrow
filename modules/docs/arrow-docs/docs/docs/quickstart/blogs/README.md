@@ -165,3 +165,11 @@ April '18 - version 0.7
 [Arrow 101 — Modelling a real world problem with Semigroups](https://medium.com/@lehen01/arrow-101-modelling-a-real-world-problem-with-semigroups-d8f22cdf54c)
 
 June '18 - version 0.7
+
+### Polyjokes — A polymorphic approach using Arrow
+
+[@dcampogiani](https://github.com/dcampogiani) is using a polymorphic approach to retrieve a random user and then a joke about him.
+
+[Polyjokes — A polymorphic approach using Arrow](https://github.com/dcampogiani/polyjokes)
+
+October '18 - version 0.7.3

@@ -9,8 +9,8 @@ import arrow.core.Eval.Companion.always
  *
  * Foldable<F> is implemented in terms of two basic methods:
  *
- *  - `foldLeft(fa, b)(f)` eagerly folds `fa` from left-to-right.
- *  - `foldRight(fa, b)(f)` lazily folds `fa` from right-to-left.
+ * - `fa.foldLeft(init, f)` eagerly folds `fa` from left-to-right.
+ * - `fa.foldRight(init, f)` lazily folds `fa` from right-to-left.
  *
  * Beyond these it provides many other useful methods related to folding over F<A> values.
  */
@@ -148,9 +148,6 @@ interface Foldable<F> {
   /**
    * The size of this Foldable.
    *
-   * This is overriden in structures that have more efficient size implementations
-   * (e.g. Vector, Set, Map).
-   *
    * Note: will not terminate for infinite-sized collections.
    */
   fun <A> Kind<F, A>.size(MN: Monoid<Long>): Long =
@@ -162,10 +159,8 @@ interface Foldable<F> {
    * Similar to foldM, but using a Monoid<B>.
    */
   fun <G, A, B, MA, MO> Kind<F, A>.foldMapM(ma: MA, mo: MO, f: (A) -> Kind<G, B>): Kind<G, B>
-      where MA : Monad<G>, MO : Monoid<B> = ma.run {
-    mo.run {
-      foldM(ma, mo.empty()) { b, a -> f(a).map { b.combine(it) } }
-    }
+    where MA : Monad<G>, MO : Monoid<B> = ma.run {
+    foldM(ma, mo.empty()) { b, a -> f(a).map { mo.run { b.combine(it) } } }
   }
 
   /**

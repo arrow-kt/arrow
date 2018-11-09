@@ -1,6 +1,6 @@
 package arrow.optics
 
-import arrow.core.Option
+import arrow.core.*
 
 @optics
 data class Pos(val x: Int, val y: Int) {
@@ -51,4 +51,13 @@ sealed class Shape {
     companion object
   }
 
+}
+
+@optics data class HealthPack(val amountLeft: Int) {
+  companion object
+}
+object OutOfPacks
+
+@optics data class Inventory(val item: Either<OutOfPacks, HealthPack>) {
+  companion object
 }
