@@ -32,8 +32,9 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
   fun <B> bracketCase(use: (A) -> MonoKOf<B>, release: (A, ExitCase<Throwable>) -> MonoKOf<Unit>): MonoK<B> =
     flatMap { a ->
       use(a).fix().mono
-        .doOnNext { release(a, ExitCase.Completed) }
         .doOnError { release(a, ExitCase.Error(it)) }
+        .doOnCancel { release(a, ExitCase.Cancelled) }
+        .doOnSuccess { release(a, ExitCase.Completed) }
         .k()
     }
 

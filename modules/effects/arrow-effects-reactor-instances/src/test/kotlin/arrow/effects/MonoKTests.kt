@@ -3,11 +3,13 @@ package arrow.effects
 import arrow.effects.monok.async.async
 import arrow.effects.monok.monadError.monadError
 import arrow.effects.monok.monadThrow.bindingCatch
+import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
+import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.CoreMatchers.startsWith
 import org.hamcrest.MatcherAssert.assertThat
@@ -108,6 +110,29 @@ class MonoKTest : UnitSpec() {
         .hasNotDroppedElements()
         .hasNotDroppedErrors()
     }
-  }
 
+    "Mono bracket cancellation should release resource with cancel exit status" {
+      lateinit var ec: ExitCase<Throwable>
+
+      val mono = Mono.just(0L)
+        .k()
+        .bracketCase(
+          use = { MonoK.just(it) },
+          release = { _, exitCase -> ec = exitCase; MonoK.just(Unit) }
+        )
+        .value()
+        .delayElement(Duration.ofSeconds(3))
+
+      val test = mono.doOnSubscribe { subscription ->
+        Mono.just(0L).delayElement(Duration.ofSeconds(1))
+          .subscribe { subscription.cancel() }
+      }.test()
+
+      test
+        .thenAwait(Duration.ofSeconds(5))
+        .then { assertThat(ec, `is`(ExitCase.Cancelled as ExitCase<Throwable>)) }
+        .thenCancel()
+        .verify()
+    }
+  }
 }
