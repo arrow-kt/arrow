@@ -85,8 +85,8 @@ sealed class IOConnection {
     override fun isCanceled(): Boolean = state.get() == null
 
     override fun push(token: CancelToken<ForIO>): Unit = state.get().let { list ->
-      when (state.get()) {
-        null, listOf<CancelToken<ForIO>>() -> token.fix().unsafeRunAsync { }
+      when (list) {
+        null -> token.fix().unsafeRunAsync { }
         else -> {
           val update = listOf(token) + list
           if (!state.compareAndSet(list, update)) push(token)
