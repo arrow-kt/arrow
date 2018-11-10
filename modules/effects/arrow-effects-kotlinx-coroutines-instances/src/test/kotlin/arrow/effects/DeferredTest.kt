@@ -1,8 +1,11 @@
 package arrow.effects
 
 import arrow.Kind
-import arrow.core.*
-import arrow.data.*
+import arrow.core.Option
+import arrow.core.Try
+import arrow.data.ListK
+import arrow.data.NonEmptyList
+import arrow.data.k
 import arrow.effects.deferredk.async.async
 import arrow.instances.`try`.functor.functor
 import arrow.instances.`try`.traverse.traverse
@@ -24,7 +27,7 @@ import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Unconfined
+import kotlinx.coroutines.Dispatchers.Unconfined
 import kotlinx.coroutines.runBlocking
 import org.junit.runner.RunWith
 
