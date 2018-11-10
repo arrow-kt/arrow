@@ -108,11 +108,6 @@ interface KleisliBracketInstance<F, R, E> : Bracket<KleisliPartialOf<F, R>, E>, 
 
   override fun FFF(): Bracket<F, E>
 
-  override fun <A, B> Kind<KleisliPartialOf<F, R>, A>.flatMap(f: (A) -> Kind<KleisliPartialOf<F, R>, B>): Kleisli<F, R, B> =
-    FFF().run {
-      this@flatMap.flatMap(f)
-    }
-
   override fun <A, B> Kind<KleisliPartialOf<F, R>, A>.bracketCase(
     use: (A) -> Kind<KleisliPartialOf<F, R>, B>,
     release: (A, ExitCase<E>) -> Kind<KleisliPartialOf<F, R>, Unit>

@@ -49,13 +49,13 @@ class KleisliTest : UnitSpec() {
   init {
 
     testLaws(
-      ContravariantLaws.laws(Kleisli.contravariant(), { Kleisli { x: Int -> Try.just(x) }.conest() }, ConestTryEQ()),
-      MonadErrorLaws.laws(Kleisli.monadError<ForTry, Int, Throwable>(Try.monadError()), EQ(), EQ()),
       BracketLaws.laws(
         Kleisli.bracket<ForIO, Int, Throwable>(IO.bracket()),
         EQBracket(),
         EQBracketError(),
-        EQBracket())
+        EQBracket()),
+      ContravariantLaws.laws(Kleisli.contravariant(), { Kleisli { x: Int -> Try.just(x) }.conest() }, ConestTryEQ()),
+      MonadErrorLaws.laws(Kleisli.monadError<ForTry, Int, Throwable>(Try.monadError()), EQ(), EQ())
     )
 
     "andThen should continue sequence" {
