@@ -7,7 +7,7 @@ import arrow.effects.IO
 import arrow.effects.IOFrame
 import arrow.effects.IORunLoop
 import arrow.effects.fix
-import arrow.effects.internal.IOPlatform.composeErrors
+import arrow.effects.internal.ErrorUtils.composeErrors
 import arrow.effects.typeclasses.ExitCase
 import java.util.concurrent.atomic.AtomicBoolean
 

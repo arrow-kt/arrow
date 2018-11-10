@@ -42,7 +42,7 @@ internal object CancelUtils {
         when (errors) {
           listOf<Throwable>() -> IO.unit
           else -> // first :: rest
-            IO.raiseError(IOPlatform.composeErrors(errors.first(), errors.drop(1)))
+            IO.raiseError(ErrorUtils.composeErrors(errors.first(), errors.drop(1)))
         }
       }
 

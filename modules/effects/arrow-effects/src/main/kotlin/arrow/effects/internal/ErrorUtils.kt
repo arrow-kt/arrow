@@ -1,6 +1,6 @@
 package arrow.effects.internal
 
-internal object IOPlatform {
+internal object ErrorUtils {
 
   /**
    * Composes multiple errors together, meant for those cases in which error suppression, due to a second error being
