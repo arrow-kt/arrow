@@ -7,7 +7,6 @@ import arrow.effects.deferredk.applicative.applicative
 import arrow.effects.typeclasses.*
 import arrow.extension
 import arrow.typeclasses.*
-import kotlinx.coroutines.GlobalScope
 import kotlin.coroutines.CoroutineContext
 import arrow.effects.handleErrorWith as deferredHandleErrorWith
 import arrow.effects.runAsync as deferredRunAsync
@@ -37,7 +36,7 @@ suspend fun <F, A> Kind<F, DeferredKOf<A>>.awaitAll(T: Traverse<F>): Kind<F, A> 
 @extension
 interface DeferredKMonadInstance : Monad<ForDeferredK> {
   override fun <A, B> Kind<ForDeferredK, A>.flatMap(f: (A) -> Kind<ForDeferredK, B>): DeferredK<B> =
-    fix().flatMap(f)
+    fix().flatMap(f = f)
 
   override fun <A, B> Kind<ForDeferredK, A>.map(f: (A) -> B): DeferredK<B> =
     fix().map(f)
@@ -82,7 +81,7 @@ interface DeferredKAsyncInstance : Async<ForDeferredK>, DeferredKMonadDeferInsta
     DeferredK.async(fa = fa)
 
   override fun <A> DeferredKOf<A>.continueOn(ctx: CoroutineContext): DeferredK<A> =
-    fix().continueOn(ctx)
+    fix().continueOn(ctx = ctx)
 
   override fun <A> invoke(f: () -> A): DeferredK<A> =
     DeferredK.invoke(f = f)
@@ -94,13 +93,13 @@ interface DeferredKAsyncInstance : Async<ForDeferredK>, DeferredKMonadDeferInsta
 @extension
 interface DeferredKEffectInstance : Effect<ForDeferredK>, DeferredKAsyncInstance {
   override fun <A> Kind<ForDeferredK, A>.runAsync(cb: (Either<Throwable, A>) -> DeferredKOf<Unit>): DeferredK<Unit> =
-    fix().deferredRunAsync(GlobalScope, cb)
+    fix().deferredRunAsync(cb = cb)
 }
 
 @extension
 interface DeferredKConcurrentEffectInstance : ConcurrentEffect<ForDeferredK>, DeferredKEffectInstance {
   override fun <A> Kind<ForDeferredK, A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> Kind<ForDeferredK, Unit>): Kind<ForDeferredK, Disposable> =
-    fix().runAsyncCancellable(GlobalScope, OnCancel.ThrowCancellationException, cb)
+    fix().runAsyncCancellable(onCancel = OnCancel.ThrowCancellationException, cb = cb)
 }
 
 object DeferredKContext : DeferredKConcurrentEffectInstance
