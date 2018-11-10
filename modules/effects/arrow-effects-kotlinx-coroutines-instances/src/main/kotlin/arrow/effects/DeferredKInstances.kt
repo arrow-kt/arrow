@@ -7,6 +7,7 @@ import arrow.effects.deferredk.applicative.applicative
 import arrow.effects.typeclasses.*
 import arrow.extension
 import arrow.typeclasses.*
+import kotlinx.coroutines.GlobalScope
 import kotlin.coroutines.CoroutineContext
 import arrow.effects.handleErrorWith as deferredHandleErrorWith
 import arrow.effects.runAsync as deferredRunAsync
@@ -93,13 +94,13 @@ interface DeferredKAsyncInstance : Async<ForDeferredK>, DeferredKMonadDeferInsta
 @extension
 interface DeferredKEffectInstance : Effect<ForDeferredK>, DeferredKAsyncInstance {
   override fun <A> Kind<ForDeferredK, A>.runAsync(cb: (Either<Throwable, A>) -> DeferredKOf<Unit>): DeferredK<Unit> =
-    fix().deferredRunAsync(cb)
+    fix().deferredRunAsync(GlobalScope, cb)
 }
 
 @extension
 interface DeferredKConcurrentEffectInstance : ConcurrentEffect<ForDeferredK>, DeferredKEffectInstance {
   override fun <A> Kind<ForDeferredK, A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> Kind<ForDeferredK, Unit>): Kind<ForDeferredK, Disposable> =
-    fix().runAsyncCancellable(OnCancel.ThrowCancellationException, cb)
+    fix().runAsyncCancellable(GlobalScope, OnCancel.ThrowCancellationException, cb)
 }
 
 object DeferredKContext : DeferredKConcurrentEffectInstance
