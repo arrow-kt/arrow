@@ -50,7 +50,7 @@ sealed class IOConnection {
 
   companion object {
 
-    operator fun invoke(): IOConnection = Impl()
+    operator fun invoke(): IOConnection = DefaultIOConnection()
 
     val uncancelable: IOConnection = Uncancelable
   }
@@ -70,7 +70,7 @@ sealed class IOConnection {
   /**
    * Default [[IOConnection]] implementation.
    */
-  private class Impl : IOConnection() {
+  private class DefaultIOConnection : IOConnection() {
     private val state = AtomicReference(emptyList<CancelToken<ForIO>>())
 
     override fun cancel(): CancelToken<ForIO> = IO.defer {
