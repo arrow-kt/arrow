@@ -179,7 +179,7 @@ fun <T> Option<T>.getOrElse(default: () -> T): T = fold({ default() }, ::identit
  *
  * @param alternative the default option if this is empty.
  */
-inline fun <A, B : A> OptionOf<B>.orElse(alternative: () -> Option<B>): Option<B> = if (fix().isEmpty()) alternative() else fix()
+inline fun <A> OptionOf<A>.orElse(alternative: () -> Option<A>): Option<A> = if (fix().isEmpty()) alternative() else fix()
 
 infix fun <T> OptionOf<T>.or(value: Option<T>): Option<T> = if (fix().isEmpty()) {
   value
