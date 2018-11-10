@@ -83,13 +83,13 @@ interface IOBracketInstance : Bracket<ForIO, Throwable>, IOMonadThrowInstance {
   override fun <A, B> Kind<ForIO, A>.bracketCase(use: (A) -> Kind<ForIO, B>, release: (A, ExitCase<Throwable>) -> Kind<ForIO, Unit>): IO<B> =
     fix().bracketCase({ a -> use(a).fix() }, { a, e -> release(a, e).fix() })
 
-  override fun <A, B> Kind<ForIO, A>.bracket(use: (A) -> Kind<ForIO, B>, release: (A) -> Kind<ForIO, Unit>): Kind<ForIO, B> =
+  override fun <A, B> Kind<ForIO, A>.bracket(use: (A) -> Kind<ForIO, B>, release: (A) -> Kind<ForIO, Unit>): IO<B> =
     fix().bracket({ a -> use(a).fix() }, { a -> release(a).fix() })
 
-  override fun <A> Kind<ForIO, A>.guarantee(finalizer: Kind<ForIO, Unit>): Kind<ForIO, A> =
+  override fun <A> Kind<ForIO, A>.guarantee(finalizer: Kind<ForIO, Unit>): IO<A> =
     fix().guarantee(finalizer.fix())
 
-  override fun <A> Kind<ForIO, A>.guaranteeCase(finalizer: (ExitCase<Throwable>) -> Kind<ForIO, Unit>): Kind<ForIO, A> =
+  override fun <A> Kind<ForIO, A>.guaranteeCase(finalizer: (ExitCase<Throwable>) -> Kind<ForIO, Unit>): IO<A> =
     fix().guaranteeCase { e -> finalizer(e).fix() }
 }
 
