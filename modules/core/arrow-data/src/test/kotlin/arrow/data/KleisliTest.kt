@@ -11,9 +11,9 @@ import arrow.effects.ForIO
 import arrow.effects.IO
 import arrow.effects.instances.io.applicativeError.attempt
 import arrow.effects.instances.io.bracket.bracket
+import arrow.effects.instances.kleisli.bracket.bracket
 import arrow.instances.`try`.monadError.monadError
 import arrow.instances.id.monad.monad
-import arrow.instances.kleisli.bracket.bracket
 import arrow.instances.kleisli.contravariant.contravariant
 import arrow.instances.kleisli.monadError.monadError
 import arrow.test.UnitSpec
