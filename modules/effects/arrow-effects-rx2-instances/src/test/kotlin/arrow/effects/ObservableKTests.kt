@@ -5,6 +5,7 @@ import arrow.effects.observablek.foldable.foldable
 import arrow.effects.observablek.functor.functor
 import arrow.effects.observablek.monadThrow.bindingCatch
 import arrow.effects.observablek.traverse.traverse
+import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
 import arrow.test.laws.FoldableLaws
@@ -15,6 +16,8 @@ import io.kotlintest.matchers.shouldNotBe
 import io.reactivex.Observable
 import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers
+import org.hamcrest.CoreMatchers.`is`
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.runner.RunWith
 import java.util.concurrent.TimeUnit
 
@@ -94,6 +97,28 @@ class ObservableKTest : UnitSpec() {
       test.awaitTerminalEvent(5, TimeUnit.SECONDS)
 
       test.assertNotTerminated().assertNotComplete().assertNoErrors().assertNoValues()
+    }
+
+    "ObservableK bracket cancellation should release resource with cancel exit status" {
+      lateinit var ec: ExitCase<Throwable>
+
+      val observable = Observable.just(0L)
+        .k()
+        .bracketCase(
+          use = { ObservableK.just(it) },
+          release = { _, exitCase -> ec = exitCase; ObservableK.just(Unit) }
+        )
+        .value()
+        .delay(3, TimeUnit.SECONDS)
+        .doOnSubscribe { subscription ->
+          Observable.just(0L).delay(1, TimeUnit.SECONDS)
+            .subscribe {
+              subscription.dispose()
+            }
+        }
+
+      observable.test().await(5, TimeUnit.SECONDS)
+      assertThat(ec, `is`(ExitCase.Cancelled as ExitCase<Throwable>))
     }
   }
 }

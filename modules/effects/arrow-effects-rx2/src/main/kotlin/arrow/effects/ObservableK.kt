@@ -15,7 +15,6 @@ import arrow.higherkind
 import arrow.typeclasses.Applicative
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
-import io.reactivex.functions.Action
 import kotlin.coroutines.CoroutineContext
 
 fun <A> Observable<A>.k(): ObservableK<A> = ObservableK(this)
@@ -37,8 +36,9 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
   fun <B> bracketCase(use: (A) -> ObservableKOf<B>, release: (A, ExitCase<Throwable>) -> ObservableKOf<Unit>): ObservableK<B> =
     flatMap { a ->
       use(a).fix().observable
-        .doOnComplete { release(a, ExitCase.Completed) }
         .doOnError { release(a, ExitCase.Error(it)) }
+        .doOnDispose { release(a, ExitCase.Cancelled) }
+        .doOnComplete { release(a, ExitCase.Completed) }
         .k()
     }
 
