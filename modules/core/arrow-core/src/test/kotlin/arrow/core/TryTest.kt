@@ -1,4 +1,4 @@
-package arrow.data
+package arrow.core
 
 import arrow.core.*
 import arrow.instances.`try`.applicative.map
