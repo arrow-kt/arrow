@@ -1,17 +1,13 @@
-package arrow.data
+package arrow.typeclasses
 
 import arrow.Kind
 import arrow.core.Tuple2
-import arrow.instances.IntSemigroupInstance
-import arrow.instances.LongMonoidInstance
+import arrow.data.*
 import arrow.instances.monoid
 import arrow.instances.semigroup
 import arrow.instances.listk.foldable.foldable
 import arrow.test.UnitSpec
 import arrow.test.laws.ReducibleLaws
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Foldable
-import arrow.typeclasses.NonEmptyReducible
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import org.junit.runner.RunWith
