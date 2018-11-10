@@ -37,8 +37,9 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
   fun <B> bracketCase(use: (A) -> FlowableKOf<B>, release: (A, ExitCase<Throwable>) -> FlowableKOf<Unit>): FlowableK<B> =
     flatMap { a ->
       use(a).fix().flowable
-        .doOnNext { release(a, ExitCase.Completed) }
         .doOnError { release(a, ExitCase.Error(it)) }
+        .doOnCancel { release(a, ExitCase.Cancelled) }
+        .doOnComplete { release(a, ExitCase.Completed) }
         .k()
     }
 
