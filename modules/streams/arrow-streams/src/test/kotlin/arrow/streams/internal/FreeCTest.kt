@@ -86,14 +86,12 @@ class FreeCTest : UnitSpec() {
       MonadDeferLaws.laws(
         SC = Ops,
         EQ = FreeC.eq(Either.monadError(), eitherInterpreter, Eq.any()),
-        EQ_EITHER = FreeC.eq(Either.monadError(), eitherInterpreter, Eq.any()),
-        EQERR = FreeC.eq(Either.monadError(), eitherInterpreter, Eq.any())
+        EQ_EITHER = FreeC.eq(Either.monadError(), eitherInterpreter, Eq.any())
       )
     )
     testLaws(MonadDeferLaws.laws(
       SC = FreeC.monadDefer(),
       EQ = FreeC.eq(Try.monadError(), FunctionK.id(), Eq.any()),
-      EQERR = FreeC.eq(Try.monadError(), FunctionK.id(), Eq.any()),
       EQ_EITHER = FreeC.eq(Try.monadError(), FunctionK.id(), Eq.any())
     ))
 
