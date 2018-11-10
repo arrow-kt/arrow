@@ -9,6 +9,7 @@ import arrow.core.Try
 import arrow.core.fix
 import arrow.effects.ForIO
 import arrow.effects.IO
+import arrow.effects.instances.io.applicativeError.attempt
 import arrow.effects.instances.io.bracket.bracket
 import arrow.instances.`try`.monadError.monadError
 import arrow.instances.id.monad.monad
@@ -39,11 +40,11 @@ class KleisliTest : UnitSpec() {
   }
 
   private fun EQBracket(): Eq<Kind<KleisliPartialOf<ForIO, Int>, Int>> = Eq { a, b ->
-    a.fix().run(1) == b.fix().run(1)
+    a.fix().run(1).attempt().unsafeRunSync() == b.fix().run(1).attempt().unsafeRunSync()
   }
 
   private fun EQBracketError(): Eq<Kind<KleisliPartialOf<ForIO, Int>, Either<Throwable, Int>>> = Eq { a, b ->
-    a.fix().run(1) == b.fix().run(1)
+    a.fix().run(1).attempt().unsafeRunSync() == b.fix().run(1).attempt().unsafeRunSync()
   }
 
   init {
