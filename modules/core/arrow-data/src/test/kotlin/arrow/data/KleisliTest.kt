@@ -7,11 +7,14 @@ import arrow.core.ForTry
 import arrow.core.Id
 import arrow.core.Try
 import arrow.core.fix
-import arrow.core.monad
-import arrow.core.monadError
 import arrow.effects.ForIO
 import arrow.effects.IO
-import arrow.effects.bracket
+import arrow.effects.instances.io.bracket.bracket
+import arrow.instances.`try`.monadError.monadError
+import arrow.instances.id.monad.monad
+import arrow.instances.kleisli.bracket.bracket
+import arrow.instances.kleisli.contravariant.contravariant
+import arrow.instances.kleisli.monadError.monadError
 import arrow.test.UnitSpec
 import arrow.test.laws.BracketLaws
 import arrow.test.laws.ContravariantLaws

@@ -6,7 +6,6 @@ import arrow.effects.singlek.async.async
 import arrow.effects.singlek.effect.effect
 import arrow.effects.singlek.functor.functor
 import arrow.effects.singlek.monad.monad
-import arrow.effects.singlek.monadDefer.monadDefer
 import arrow.effects.singlek.monadError.monadError
 import arrow.effects.singlek.monadThrow.bindingCatch
 import arrow.test.UnitSpec

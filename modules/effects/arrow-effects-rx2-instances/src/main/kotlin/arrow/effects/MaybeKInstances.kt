@@ -104,7 +104,7 @@ interface MaybeKBracketInstance : Bracket<ForMaybeK, Throwable>, MaybeKMonadThro
 }
 
 @extension
-interface MaybeKMonadDeferInstance : MonadDefer<ForMaybeK>, MaybeKBracketInstance{
+interface MaybeKMonadDeferInstance : MonadDefer<ForMaybeK>, MaybeKBracketInstance {
   override fun <A> defer(fa: () -> MaybeKOf<A>): MaybeK<A> =
     MaybeK.defer(fa)
 }

@@ -33,9 +33,6 @@ abstract class KleisliInstances<F, D, E> {
 
   @Provides
   fun kleisliMonadError(ev: DaggerKleisliMonadErrorInstance<F, D>): MonadError<KleisliPartialOf<F, D>, D> = ev
-
-  @Provides
-  fun kleisliBracket(ev: DaggerKleisliBracketInstance<F, D, E>): Bracket<KleisliPartialOf<F, D>, E> = ev
 }
 
 class DaggerKleisliFunctorInstance<F, L> @Inject constructor(val FF: Functor<F>) : KleisliFunctorInstance<F, L> {
@@ -52,8 +49,4 @@ class DaggerKleisliMonadInstance<F, L> @Inject constructor(val MF: Monad<F>) : K
 
 class DaggerKleisliMonadErrorInstance<F, L> @Inject constructor(val MF: MonadError<F, L>) : KleisliMonadErrorInstance<F, L, L> {
   override fun FFF(): MonadError<F, L> = MF
-}
-
-class DaggerKleisliBracketInstance<F, D, E> @Inject constructor(val BFE: Bracket<F, E>) : KleisliBracketInstance<F, D, E> {
-  override fun FFF(): Bracket<F, E> = BFE
 }
