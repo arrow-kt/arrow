@@ -109,7 +109,7 @@ fun <A> DeferredKOf<A>.runAsync(scope: CoroutineScope = GlobalScope, cb: (Either
 fun <A> DeferredKOf<A>.runAsyncCancellable(scope: CoroutineScope = GlobalScope, onCancel: OnCancel = OnCancel.Silent, cb: (Either<Throwable, A>) -> DeferredKOf<Unit>): DeferredK<Disposable> =
   scope.async(Dispatchers.Unconfined, CoroutineStart.DEFAULT) {
     forceExceptionPropagation()
-    val call = CompletableDeferred<Unit>(parent = runAsync(scope, cb))
+    val call = CompletableDeferred<Unit>(parent = runAsync(this, cb))
     val disposable: Disposable = {
       when (onCancel) {
         OnCancel.ThrowCancellationException -> call.completeExceptionally(OnCancel.CancellationException)
