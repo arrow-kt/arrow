@@ -7,7 +7,6 @@ import arrow.effects.instances.io.async.async
 import arrow.effects.instances.io.monad.monad
 import arrow.effects.typeclasses.milliseconds
 import arrow.effects.typeclasses.seconds
-import arrow.instances.either.applicativeError.applicativeError
 import arrow.instances.option.eq.eq
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
@@ -156,6 +155,7 @@ class IOTest : UnitSpec() {
         ioa.unsafeRunAsync { either ->
           either.fold({ throw exception }, { fail("") })
         }
+        fail("Should rethrow the exception")
       } catch (myException: MyException) {
         // Success
       } catch (throwable: Throwable) {
