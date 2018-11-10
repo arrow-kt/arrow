@@ -10,10 +10,15 @@ import kotlin.coroutines.CoroutineContext
 fun <A> Deferred<A>.k(): DeferredK<A> =
   DeferredK(this)
 
+fun <A> CoroutineScope.asyncK(ctx: CoroutineContext = Dispatchers.Default, start: CoroutineStart = CoroutineStart.LAZY, f: suspend CoroutineScope.() -> A): DeferredK<A> =
+  this.async(ctx, start, f).k()
+
 fun <A> DeferredKOf<A>.value(): Deferred<A> = this.fix().deferred
 
+fun <A> DeferredKOf<A>.scope(): CoroutineScope = this.fix().scope
+
 @higherkind
-data class DeferredK<out A>(val deferred: Deferred<A>) : DeferredKOf<A>, Deferred<A> by deferred {
+data class DeferredK<out A>(val deferred: Deferred<A>, val scope: CoroutineScope = GlobalScope) : DeferredKOf<A>, Deferred<A> by deferred {
 
   fun <B> map(f: (A) -> B): DeferredK<B> =
     flatMap { a: A -> just(f(a)) }
@@ -21,15 +26,15 @@ data class DeferredK<out A>(val deferred: Deferred<A>) : DeferredKOf<A>, Deferre
   fun <B> ap(fa: DeferredKOf<(A) -> B>): DeferredK<B> =
     flatMap { a -> fa.fix().map { ff -> ff(a) } }
 
-  fun <B> flatMap(scope: CoroutineScope = GlobalScope, f: (A) -> DeferredKOf<B>): DeferredK<B> =
-    scope.async(Dispatchers.Unconfined, CoroutineStart.LAZY) {
+  fun <B> flatMap(f: (A) -> DeferredKOf<B>): DeferredK<B> =
+    scope.asyncK(Dispatchers.Unconfined, CoroutineStart.LAZY) {
       f(await()).await()
-    }.k()
+    }
 
-  fun continueOn(scope: CoroutineScope = GlobalScope, ctx: CoroutineContext): DeferredK<A> =
-    scope.async(ctx, CoroutineStart.LAZY) {
+  fun continueOn(ctx: CoroutineContext): DeferredK<A> =
+    scope.asyncK(ctx, CoroutineStart.LAZY) {
       deferred.await()
-    }.k()
+    }
 
   companion object {
     fun unit(): DeferredK<Unit> =
@@ -39,13 +44,13 @@ data class DeferredK<out A>(val deferred: Deferred<A>) : DeferredKOf<A>, Deferre
       CompletableDeferred(a).k()
 
     fun <A> defer(scope: CoroutineScope = GlobalScope, ctx: CoroutineContext = Dispatchers.Default, start: CoroutineStart = CoroutineStart.LAZY, f: suspend () -> A): DeferredK<A> =
-      scope.async(ctx, start) { f() }.k()
+      scope.asyncK(ctx, start) { f() }
 
     fun <A> defer(scope: CoroutineScope = GlobalScope, ctx: CoroutineContext = Dispatchers.Default, start: CoroutineStart = CoroutineStart.LAZY, fa: () -> DeferredKOf<A>): DeferredK<A> =
-      scope.async(ctx, start) { fa().await() }.k()
+      scope.asyncK(ctx, start) { fa().await() }
 
     operator fun <A> invoke(scope: CoroutineScope = GlobalScope, ctx: CoroutineContext = Dispatchers.Default, start: CoroutineStart = CoroutineStart.DEFAULT, f: () -> A): DeferredK<A> =
-      scope.async(ctx, start) { f() }.k()
+      scope.asyncK(ctx, start) { f() }
 
     fun <A> failed(t: Throwable): DeferredK<A> =
       CompletableDeferred<A>().apply { completeExceptionally(t) }.k()
@@ -61,13 +66,13 @@ data class DeferredK<out A>(val deferred: Deferred<A>) : DeferredKOf<A>, Deferre
      * and its [CoroutineStart] is [CoroutineStart.DEFAULT].
      */
     fun <A> async(scope: CoroutineScope = GlobalScope, ctx: CoroutineContext = Dispatchers.Default, start: CoroutineStart = CoroutineStart.DEFAULT, fa: Proc<A>): DeferredK<A> =
-      scope.async(ctx, start) {
+      scope.asyncK(ctx, start) {
         CompletableDeferred<A>().apply {
           fa {
             it.fold(this::completeExceptionally, this::complete)
           }
         }.await()
-      }.k()
+      }
 
     fun <A, B> tailRecM(a: A, f: (A) -> DeferredKOf<Either<A, B>>): DeferredK<B> =
       f(a).value().let { initial: Deferred<Either<A, B>> ->
@@ -89,10 +94,10 @@ data class DeferredK<out A>(val deferred: Deferred<A>) : DeferredKOf<A>, Deferre
   }
 }
 
-fun <A> DeferredKOf<A>.handleErrorWith(scope: CoroutineScope = GlobalScope, f: (Throwable) -> DeferredK<A>): DeferredK<A> =
-  scope.async(Dispatchers.Unconfined, CoroutineStart.LAZY) {
+fun <A> DeferredKOf<A>.handleErrorWith(f: (Throwable) -> DeferredK<A>): DeferredK<A> =
+  scope().asyncK(Dispatchers.Unconfined, CoroutineStart.LAZY) {
     Try { await() }.fold({ f(it).await() }, ::identity)
-  }.k()
+  }
 
 fun <A> DeferredKOf<A>.unsafeAttemptSync(): Try<A> =
   Try { unsafeRunSync() }
@@ -100,16 +105,16 @@ fun <A> DeferredKOf<A>.unsafeAttemptSync(): Try<A> =
 fun <A> DeferredKOf<A>.unsafeRunSync(): A =
   runBlocking { await() }
 
-fun <A> DeferredKOf<A>.runAsync(scope: CoroutineScope = GlobalScope, cb: (Either<Throwable, A>) -> DeferredKOf<Unit>): DeferredK<Unit> =
-  scope.async(Dispatchers.Unconfined, CoroutineStart.DEFAULT) {
-    forceExceptionPropagation()
-    unsafeRunAsync(this, cb.andThen { it.unsafeRunAsync(this) { } })
-  }.k()
+fun <A> DeferredKOf<A>.runAsync(cb: (Either<Throwable, A>) -> DeferredKOf<Unit>): DeferredK<Unit> =
+  DeferredK.invoke(scope(), Dispatchers.Unconfined, CoroutineStart.DEFAULT) {
+    fix().forceExceptionPropagation()
+    unsafeRunAsync(cb.andThen { it.unsafeRunAsync { } })
+  }
 
-fun <A> DeferredKOf<A>.runAsyncCancellable(scope: CoroutineScope = GlobalScope, onCancel: OnCancel = OnCancel.Silent, cb: (Either<Throwable, A>) -> DeferredKOf<Unit>): DeferredK<Disposable> =
-  scope.async(Dispatchers.Unconfined, CoroutineStart.DEFAULT) {
-    forceExceptionPropagation()
-    val call = CompletableDeferred<Unit>(parent = runAsync(this, cb))
+fun <A> DeferredKOf<A>.runAsyncCancellable(onCancel: OnCancel = OnCancel.Silent, cb: (Either<Throwable, A>) -> DeferredKOf<Unit>): DeferredK<Disposable> =
+  DeferredK.invoke(scope(), Dispatchers.Unconfined, CoroutineStart.DEFAULT) {
+    fix().forceExceptionPropagation()
+    val call = CompletableDeferred<Unit>(parent = runAsync(cb))
     val disposable: Disposable = {
       when (onCancel) {
         OnCancel.ThrowCancellationException -> call.completeExceptionally(OnCancel.CancellationException)
@@ -117,15 +122,12 @@ fun <A> DeferredKOf<A>.runAsyncCancellable(scope: CoroutineScope = GlobalScope, 
       }
     }
     disposable
-  }.k()
+  }
 
-fun <A> DeferredKOf<A>.unsafeRunAsync(scope: CoroutineScope = GlobalScope, cb: (Either<Throwable, A>) -> Unit): Unit =
-  scope.async(Dispatchers.Unconfined, CoroutineStart.DEFAULT) {
+fun <A> DeferredKOf<A>.unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit =
+  scope().async(Dispatchers.Unconfined, CoroutineStart.DEFAULT) {
     Try { await() }.fold({ cb(Left(it)) }, { cb(Right(it)) })
   }.forceExceptionPropagation()
-
-private fun DeferredKOf<*>.forceExceptionPropagation(): Unit =
-  fix().deferred.forceExceptionPropagation()
 
 private fun Deferred<*>.forceExceptionPropagation(): Unit =
 // Deferred swallows all exceptions. How about no.
