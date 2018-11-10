@@ -153,6 +153,21 @@ class DeferredKTest : UnitSpec() {
       }
     }
 
+    "should catch exceptions within run block with runAsyncCancellable" {
+      try {
+        val exception = MyException()
+        val ioa = DeferredK<Int>(GlobalScope, Unconfined, CoroutineStart.DEFAULT) { throw exception }
+        ioa.runAsyncCancellable { either ->
+          either.fold({ throw it }, { fail("") })
+        }.unsafeRunSync()
+        fail("Should rethrow the exception")
+      } catch (throwable: AssertionError) {
+        fail("${throwable.message}")
+      } catch (throwable: Throwable) {
+        // Success
+      }
+    }
+
     "awaitAll called on a Traverse instance of Kind<F, DeferredK<T>> should return a Traverse instance of Kind<F, T>" {
       forAll(Gen.string(), Gen.list(Gen.string())) { x, xs ->
         runBlocking {
