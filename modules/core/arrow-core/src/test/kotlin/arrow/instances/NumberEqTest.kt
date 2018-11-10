@@ -1,4 +1,4 @@
-package arrow.typeclasses
+package arrow.instances
 
 import arrow.instances.*
 import arrow.test.UnitSpec
