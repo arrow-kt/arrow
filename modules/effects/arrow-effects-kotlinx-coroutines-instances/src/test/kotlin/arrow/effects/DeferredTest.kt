@@ -28,9 +28,12 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers.Unconfined
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.runner.RunWith
 
+@InternalCoroutinesApi
 @RunWith(KTestJUnitRunner::class)
 class DeferredKTest : UnitSpec() {
   fun <A> EQ(): Eq<Kind<ForDeferredK, A>> = Eq { a, b ->
@@ -78,7 +81,7 @@ class DeferredKTest : UnitSpec() {
 
     "should return exceptions within main block with unsafeRunAsync" {
       val exception = MyException()
-      val ioa = DeferredK<Int>(Unconfined, CoroutineStart.DEFAULT) { throw exception }
+      val ioa = DeferredK<Int>(GlobalScope, Unconfined, CoroutineStart.DEFAULT) { throw exception }
       ioa.unsafeRunAsync { either ->
         either.fold({ it shouldBe exception }, { fail("") })
       }
@@ -87,10 +90,11 @@ class DeferredKTest : UnitSpec() {
     "should not catch exceptions within run block with unsafeRunAsync" {
       try {
         val exception = MyException()
-        val ioa = DeferredK<Int>(Unconfined, CoroutineStart.DEFAULT) { throw exception }
+        val ioa = DeferredK<Int>(GlobalScope, Unconfined, CoroutineStart.DEFAULT) { throw exception }
         ioa.unsafeRunAsync { either ->
           either.fold({ throw exception }, { fail("") })
         }
+        fail("Should rethrow the exception")
       } catch (myException: MyException) {
         // Success
       } catch (throwable: Throwable) {
@@ -108,7 +112,7 @@ class DeferredKTest : UnitSpec() {
 
     "should complete when running a return value with runAsync" {
       val expected = 0
-      DeferredK(Unconfined, CoroutineStart.DEFAULT) { expected }.runAsync { either ->
+      DeferredK(GlobalScope, Unconfined, CoroutineStart.DEFAULT) { expected }.runAsync { either ->
         either.fold({ fail("") }, { DeferredK { it shouldBe expected } })
       }
     }
@@ -128,7 +132,7 @@ class DeferredKTest : UnitSpec() {
 
     "should return exceptions within main block with runAsync" {
       val exception = MyException()
-      val ioa = DeferredK<Int>(Unconfined, CoroutineStart.DEFAULT) { throw exception }
+      val ioa = DeferredK<Int>(GlobalScope, Unconfined, CoroutineStart.DEFAULT) { throw exception }
       ioa.runAsync { either ->
         either.fold({ DeferredK { it shouldBe exception } }, { fail("") })
       }
@@ -137,7 +141,7 @@ class DeferredKTest : UnitSpec() {
     "should catch exceptions within run block with runAsync" {
       try {
         val exception = MyException()
-        val ioa = DeferredK<Int>(Unconfined, CoroutineStart.DEFAULT) { throw exception }
+        val ioa = DeferredK<Int>(GlobalScope, Unconfined, CoroutineStart.DEFAULT) { throw exception }
         ioa.runAsync { either ->
           either.fold({ throw it }, { fail("") })
         }.unsafeRunSync()
@@ -153,9 +157,9 @@ class DeferredKTest : UnitSpec() {
       forAll(Gen.string(), Gen.list(Gen.string())) { x, xs ->
         runBlocking {
           checkAwaitAll(ListK.functor(), ListK.traverse(), xs.k()) &&
-          checkAwaitAll(NonEmptyList.functor(), NonEmptyList.traverse(), NonEmptyList(x, xs)) &&
-          checkAwaitAll(Option.functor(), Option.traverse(), Option.just(x)) &&
-          checkAwaitAll(Try.functor(), Try.traverse(), Try.just(x))
+            checkAwaitAll(NonEmptyList.functor(), NonEmptyList.traverse(), NonEmptyList(x, xs)) &&
+            checkAwaitAll(Option.functor(), Option.traverse(), Option.just(x)) &&
+            checkAwaitAll(Try.functor(), Try.traverse(), Try.just(x))
         }
       }
     }
