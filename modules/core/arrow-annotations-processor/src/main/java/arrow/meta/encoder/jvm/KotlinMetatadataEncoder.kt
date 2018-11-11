@@ -6,6 +6,7 @@ import me.eugeniomarletti.kotlin.metadata.escapedClassName
 import me.eugeniomarletti.kotlin.metadata.jvm.jvmMethodSignature
 import me.eugeniomarletti.kotlin.metadata.modality
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf
+import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.Flags
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.NameResolver
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.TypeTable
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.supertypes
@@ -19,28 +20,31 @@ interface KotlinMetatadataEncoder {
     processorUtils: ProcessorUtils,
     acc: List<ClassOrPackageDataWrapper>): List<ClassOrPackageDataWrapper> =
     processorUtils.run {
-    val interfaces = current.classProto.supertypes(typeTable).asSequence().map {
-      it.extractFullName(current)
-    }.filter {
-      it != "`kotlin`.`Any`"
-    }.toList()
-    when {
-      interfaces.isEmpty() -> acc
-      else -> {
-        interfaces.flatMap { i ->
-          try {
-            val className = i.removeBackticks().substringBefore("<")
-            val typeClassElement = processorUtils.elementUtils.getTypeElement(className)
-            val parentInterface = getClassOrPackageDataWrapper(typeClassElement)
-            val newAcc = acc + parentInterface
-            supertypes(parentInterface as ClassOrPackageDataWrapper.Class, typeTable, processorUtils, newAcc)
-          } catch (_: Throwable) {
-            emptyList<ClassOrPackageDataWrapper>()
+      val interfaces = current.classProto.supertypes(typeTable).asSequence().map {
+        it.extractFullName(current)
+      }.filter {
+        it != "`kotlin`.`Any`"
+      }.toList()
+      when {
+        interfaces.isEmpty() -> acc
+        else -> {
+          interfaces.flatMap { i ->
+            try {
+              val className = i.removeBackticks().substringBefore("<")
+              val typeClassElement = processorUtils.elementUtils.getTypeElement(className)
+              val parentInterface = getClassOrPackageDataWrapper(typeClassElement)
+              val newAcc = acc + parentInterface
+              supertypes(parentInterface as ClassOrPackageDataWrapper.Class, typeTable, processorUtils, newAcc)
+            } catch (_: Throwable) {
+              emptyList<ClassOrPackageDataWrapper>()
+            }
           }
         }
       }
     }
-  }
+
+  fun modifiersFromFlags(flags: Int): List<Modifier> =
+    supportedFlags.filter { it.first.get(flags) }.map { it.second }
 
   fun ProtoBuf.Visibility.asModifier(): Modifier? =
     when (this) {
@@ -173,3 +177,12 @@ interface KotlinMetatadataEncoder {
     )
 
 }
+
+private val supportedFlags: List<Pair<Flags.BooleanFlagField, Modifier>> =
+  listOf(
+    Flags.IS_INLINE to Modifier.Inline,
+    Flags.IS_INFIX to Modifier.Infix,
+    Flags.IS_OPERATOR to Modifier.Operator,
+    Flags.IS_SUSPEND to Modifier.Suspend,
+    Flags.IS_TAILREC to Modifier.Tailrec
+  )

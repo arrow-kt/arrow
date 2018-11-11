@@ -14,8 +14,10 @@ import me.eugeniomarletti.kotlin.metadata.jvm.getJvmConstructorSignature
 import me.eugeniomarletti.kotlin.metadata.jvm.getJvmFieldSignature
 import me.eugeniomarletti.kotlin.metadata.jvm.getJvmMethodSignature
 import me.eugeniomarletti.kotlin.metadata.jvm.jvmPropertySignature
+import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.TypeTable
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.hasReceiver
+import me.eugeniomarletti.kotlin.metadata.shadow.metadata.jvm.JvmProtoBuf
 import javax.lang.model.element.*
 import javax.lang.model.element.Modifier
 import javax.lang.model.type.NoType
@@ -135,6 +137,48 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
     }
   }
 
+  private fun Func.fixReceiverLiterals(meta: ClassOrPackageDataWrapper.Class, protoFun: ProtoBuf.Function): Func =
+    copy(
+      receiverType = receiverType?.fixReceiverLiterals(meta, protoFun.receiverType),
+      parameters = if (parameters.size <= protoFun.valueParameterList.size)
+        parameters.mapIndexed { n, p -> p.fixReceiverLiterals(meta, protoFun.valueParameterList[n]) }
+      else parameters,
+      returnType = returnType?.fixReceiverLiterals(meta, protoFun.returnType)
+    )
+
+  private fun Parameter.fixReceiverLiterals(meta: ClassOrPackageDataWrapper.Class, protoParam: ProtoBuf.ValueParameter): Parameter =
+    copy(type = type.fixReceiverLiterals(meta, protoParam.type))
+
+  private fun TypeName.fixReceiverLiterals(
+    meta: ClassOrPackageDataWrapper.Class,
+    protoType: ProtoBuf.Type
+  ): TypeName =
+    when (this) {
+      is TypeName.TypeVariable -> this
+      is TypeName.WildcardType -> this
+      is TypeName.FunctionLiteral -> this
+      is TypeName.ParameterizedType -> fixReceiverLiterals(meta, protoType)
+      is TypeName.Classy -> this
+    }
+
+  private fun TypeName.ParameterizedType.fixReceiverLiterals(
+    meta: ClassOrPackageDataWrapper.Class,
+    protoType: ProtoBuf.Type
+  ): TypeName {
+    val jvmTypeAnnotations: List<String> = protoType.getExtension(JvmProtoBuf.typeAnnotation).map {
+      meta.nameResolver.getString(it.id)
+    }
+    return if (
+      "kotlin/ExtensionFunctionType" in jvmTypeAnnotations && typeArguments.size >= 2)
+      TypeName.FunctionLiteral(
+        receiverType = typeArguments[0],
+        parameters = typeArguments.drop(1).dropLast(1),
+        returnType = typeArguments.lastOrNull() ?: TypeName.Unit
+      )
+    else
+      this
+  }
+
   fun TypeElement.allFunctions(declaredElement: TypeElement): List<Func> =
     processorUtils().run {
       val superTypes = supertypes(
@@ -169,14 +213,17 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
           val result =
             if (templateFunction != null && templateFunction.second.modality != null) {
               val fMod = function.copy(
-                modifiers = function.modifiers + listOfNotNull(templateFunction.second.modality?.toMeta())
+                modifiers = function.modifiers +
+                  listOfNotNull(templateFunction.second.modality?.toMeta()) +
+                  modifiersFromFlags(templateFunction.second.flags)
               )
               if (templateFunction.second.hasReceiverType()) {
                 val receiverTypeName = metaApi().run { fMod.parameters[0].type.asKotlin() }
                 val functionWithReceiver = fMod.copy(receiverType = receiverTypeName)
                 val arguments = functionWithReceiver.parameters.drop(1)
                 functionWithReceiver.copy(parameters = arguments)
-              } else fMod
+                  .fixReceiverLiterals(templateFunction.first, templateFunction.second)
+              } else fMod.fixReceiverLiterals(templateFunction.first, templateFunction.second)
             } else function
           result
         } catch (e: IllegalArgumentException) {
@@ -284,4 +331,5 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
 
   fun TypeElement.asMetaType(): Type? =
     type().fold({ null }, { it })
+
 }
