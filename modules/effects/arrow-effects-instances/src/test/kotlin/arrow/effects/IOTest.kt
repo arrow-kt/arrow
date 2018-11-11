@@ -97,7 +97,7 @@ class IOTest : UnitSpec() {
     }
 
     "should time out on unending unsafeRunTimed" {
-      val never = IO.async<Int> { _, _ -> Unit }
+      val never = IO.async<Int> { Unit }
       val start = System.currentTimeMillis()
       val received = never.unsafeRunTimed(100.milliseconds)
       val elapsed = System.currentTimeMillis() - start
@@ -249,7 +249,7 @@ class IOTest : UnitSpec() {
     }
 
     "unsafeRunTimed times out with None result" {
-      val never = IO.async<Int> { _, _ -> }
+      val never = IO.async<Int> {}
       val result = never.unsafeRunTimed(100.milliseconds)
       result shouldBe None
     }
@@ -326,7 +326,7 @@ class IOTest : UnitSpec() {
         IO.parallelMapN(newSingleThreadContext("here"),
           IO { Thread.currentThread().name },
           IO.defer { IO.just(Thread.currentThread().name) },
-          IO.async<String> { _, cb -> cb(Thread.currentThread().name.right()) },
+          IO.async<String> { cb -> cb(Thread.currentThread().name.right()) },
           ::Tuple3)
           .unsafeRunSync()
 
@@ -334,10 +334,10 @@ class IOTest : UnitSpec() {
     }
 
     "unsafeRunAsyncCancellable should cancel correctly" {
-      IO.async { _, cb: (Either<Throwable, Int>) -> Unit ->
+      IO.async { cb: (Either<Throwable, Int>) -> Unit ->
         val cancel =
           IO(newSingleThreadContext("RunThread")) { }
-            .flatMap { IO.async<Int> { _, cb -> Thread.sleep(500); cb(1.right()) } }
+            .flatMap { IO.async<Int> { cb -> Thread.sleep(500); cb(1.right()) } }
             .unsafeRunAsyncCancellable(OnCancel.Silent) {
               cb(it)
             }
@@ -347,10 +347,10 @@ class IOTest : UnitSpec() {
     }
 
     "unsafeRunAsyncCancellable should throw the appropriate exception" {
-      IO.async<Throwable> { _, cb ->
+      IO.async<Throwable> { cb ->
         val cancel =
           IO(newSingleThreadContext("RunThread")) { }
-            .flatMap { IO.async<Int> { _, cb -> Thread.sleep(500); cb(1.right()) } }
+            .flatMap { IO.async<Int> { cb -> Thread.sleep(500); cb(1.right()) } }
             .unsafeRunAsyncCancellable(OnCancel.ThrowCancellationException) {
               it.fold({ t -> cb(t.right()) }, { _ -> })
             }
@@ -360,10 +360,10 @@ class IOTest : UnitSpec() {
     }
 
     "unsafeRunAsyncCancellable can cancel even for infinite asyncs" {
-      IO.async { _, cb: (Either<Throwable, Int>) -> Unit ->
+      IO.async { cb: (Either<Throwable, Int>) -> Unit ->
         val cancel =
           IO(newSingleThreadContext("RunThread")) { }
-            .flatMap { IO.async<Int> { _, _ -> Thread.sleep(5000); } }
+            .flatMap { IO.async<Int> { _ -> Thread.sleep(5000); } }
             .unsafeRunAsyncCancellable(OnCancel.ThrowCancellationException) {
               cb(it)
             }
