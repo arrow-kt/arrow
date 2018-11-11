@@ -28,12 +28,10 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers.Unconfined
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.runBlocking
 import org.junit.runner.RunWith
 
-@ExperimentalCoroutinesApi
 @RunWith(KTestJUnitRunner::class)
 class DeferredKTest : UnitSpec() {
   fun <A> EQ(): Eq<Kind<ForDeferredK, A>> = Eq { a, b ->

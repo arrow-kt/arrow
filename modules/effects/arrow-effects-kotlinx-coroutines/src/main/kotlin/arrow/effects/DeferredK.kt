@@ -17,21 +17,15 @@ fun <A> DeferredKOf<A>.value(): Deferred<A> = this.fix().deferred
 
 fun <A> DeferredKOf<A>.scope(): CoroutineScope = this.fix().scope
 
-/**
- * If you also think requiring using @ExperimentalCoroutinesApi everywhere is a mistake talk to JetBrains.
- */
 @higherkind
 data class DeferredK<out A>(val deferred: Deferred<A>, val scope: CoroutineScope = GlobalScope) : DeferredKOf<A>, Deferred<A> by deferred {
 
-  @ExperimentalCoroutinesApi
   fun <B> map(f: (A) -> B): DeferredK<B> =
     flatMap { a: A -> just(f(a)) }
 
-  @ExperimentalCoroutinesApi
   fun <B> ap(fa: DeferredKOf<(A) -> B>): DeferredK<B> =
     flatMap { a -> fa.fix().map { ff -> ff(a) } }
 
-  @ExperimentalCoroutinesApi
   fun <B> flatMap(f: (A) -> DeferredKOf<B>): DeferredK<B> =
     scope.asyncK(Dispatchers.Unconfined, CoroutineStart.LAZY) {
       f(await()).await()
@@ -80,7 +74,6 @@ data class DeferredK<out A>(val deferred: Deferred<A>, val scope: CoroutineScope
         }.await()
       }
 
-    @ExperimentalCoroutinesApi
     fun <A, B> tailRecM(a: A, f: (A) -> DeferredKOf<Either<A, B>>): DeferredK<B> =
       f(a).value().let { initial: Deferred<Either<A, B>> ->
         var current: Deferred<Either<A, B>> = initial
@@ -101,7 +94,6 @@ data class DeferredK<out A>(val deferred: Deferred<A>, val scope: CoroutineScope
   }
 }
 
-@ExperimentalCoroutinesApi
 fun <A> DeferredKOf<A>.handleErrorWith(f: (Throwable) -> DeferredK<A>): DeferredK<A> =
   scope().asyncK(Dispatchers.Unconfined, CoroutineStart.LAZY) {
     Try { await() }.fold({ f(it).await() }, ::identity)
@@ -113,14 +105,12 @@ fun <A> DeferredKOf<A>.unsafeAttemptSync(): Try<A> =
 fun <A> DeferredKOf<A>.unsafeRunSync(): A =
   runBlocking { await() }
 
-@ExperimentalCoroutinesApi
 fun <A> DeferredKOf<A>.runAsync(cb: (Either<Throwable, A>) -> DeferredKOf<Unit>): DeferredK<Unit> =
   DeferredK.invoke(scope(), Dispatchers.Unconfined, CoroutineStart.DEFAULT) {
     fix().forceExceptionPropagation()
     unsafeRunAsync(cb.andThen { it.unsafeRunAsync { } })
   }
 
-@ExperimentalCoroutinesApi
 fun <A> DeferredKOf<A>.runAsyncCancellable(onCancel: OnCancel = OnCancel.Silent, cb: (Either<Throwable, A>) -> DeferredKOf<Unit>): DeferredK<Disposable> =
   DeferredK.invoke(scope(), Dispatchers.Unconfined, CoroutineStart.DEFAULT) {
     fix().forceExceptionPropagation()
@@ -134,7 +124,6 @@ fun <A> DeferredKOf<A>.runAsyncCancellable(onCancel: OnCancel = OnCancel.Silent,
     disposable
   }
 
-@ExperimentalCoroutinesApi
 fun <A> DeferredKOf<A>.unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit =
   scope().async(Dispatchers.Unconfined, CoroutineStart.DEFAULT) {
     Try { await() }.fold({ cb(Left(it)) }, { cb(Right(it)) })
