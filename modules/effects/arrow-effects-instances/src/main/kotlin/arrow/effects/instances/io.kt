@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.effects.*
+import arrow.effects.internal.IOConnection
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Bracket
 import arrow.effects.typeclasses.ConcurrentEffect

@@ -17,6 +17,7 @@ import arrow.effects.internal.IOConnection
 import arrow.effects.internal.Platform.maxStackDepthSize
 import arrow.effects.internal.Platform.onceOnly
 import arrow.effects.internal.Platform.unsafeResync
+import arrow.effects.internal.toDisposable
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.Duration
 import arrow.effects.typeclasses.ExitCase
@@ -101,17 +102,16 @@ sealed class IO<out A> : IOOf<A> {
 
   fun runAsyncCancellable(onCancel: OnCancel = Silent, cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Disposable> =
     IO.async { ccb ->
-      var cancelled = false
-      val cancel = { cancelled = true }
+      val conn = IOConnection()
       val onCancelCb =
         when (onCancel) {
           ThrowCancellationException ->
             cb andThen { it.fix().unsafeRunAsync { } }
           Silent ->
-            { either -> either.fold({ if (!cancelled || it != CancellationException) cb(either) }, { cb(either) }) }
+            { either -> either.fold({ if (!conn.isCanceled() || it != CancellationException) cb(either) }, { cb(either) }) }
         }
-      ccb(cancel.right())
-      IORunLoop.startCancelable(this, IOConnection(), onCancelCb)
+      ccb(conn.toDisposable().right())
+      IORunLoop.startCancelable(this, conn, onCancelCb)
     }
 
   fun unsafeRunAsyncCancellable(onCancel: OnCancel = Silent, cb: (Either<Throwable, A>) -> Unit): Disposable =

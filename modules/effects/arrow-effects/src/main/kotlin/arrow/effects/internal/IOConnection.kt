@@ -3,7 +3,14 @@ package arrow.effects.internal
 import arrow.effects.ForIO
 import arrow.effects.IO
 import arrow.effects.fix
+import arrow.effects.typeclasses.Disposable
 import java.util.concurrent.atomic.AtomicReference
+
+fun IOConnection.toDisposable(): Disposable = object : Disposable {
+  override fun invoke() {
+    this@toDisposable.cancel()
+  }
+}
 
 /**
  * Represents a composite of functions (meant for cancellation) that are stacked. cancel() is idempotent,
