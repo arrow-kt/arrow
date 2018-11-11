@@ -147,13 +147,13 @@ internal object IORunLoop {
 
   private fun loop(
     source: Current,
-    cancelable: IOConnection,
+    cancelable: IOConnection?,
     cb: (Either<Throwable, Any?>) -> Unit,
     rcbRef: RestartCallback?,
     bFirstRef: BindF?,
     bRestRef: CallStack?): Unit {
     var currentIO: Current? = source
-    var conn: IOConnection = cancelable
+    var conn: IOConnection? = cancelable
     var bFirst: BindF? = bFirstRef
     var bRest: CallStack? = bRestRef
     var rcb: RestartCallback? = rcbRef
@@ -163,7 +163,7 @@ internal object IORunLoop {
     var result: Any? = null
 
     do {
-      if (conn.isCanceled()) {
+      if (conn?.isCanceled() == true) {
         cb(Left(OnCancel.CancellationException))
         return
       }
@@ -201,6 +201,9 @@ internal object IORunLoop {
           }
         }
         is IO.Async -> {
+          if (conn == null) {
+            conn = IOConnection()
+          }
           if (rcb == null) {
             rcb = RestartCallback(conn, cb)
           }
@@ -249,7 +252,7 @@ internal object IORunLoop {
           val modify = currentIO.modify
           val restore = currentIO.restore
 
-          val old = conn
+          val old = conn ?: IOConnection()
           conn = modify(old)
           currentIO = next
           if (conn != old) {
