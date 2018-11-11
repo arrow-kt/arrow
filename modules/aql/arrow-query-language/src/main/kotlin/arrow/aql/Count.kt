@@ -20,8 +20,6 @@ interface Count<F> {
     }
 
   fun Query<ForListK, Long, Long>.value(): Long =
-    foldable().run {
-      this@value.from.fix().firstOrNone().getOrElse { 0L }
-    }
+    this@value.from.fix().firstOrNone().getOrElse { 0L }
 
 }
