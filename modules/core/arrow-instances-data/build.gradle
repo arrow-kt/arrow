@@ -3,7 +3,6 @@ dependencies {
     compile project(':arrow-annotations')
     compile project(':arrow-typeclasses')
     compile project(':arrow-data')
-    compile project(':arrow-effects')
     compile project(':arrow-instances-core')
     kapt project(':arrow-annotations-processor')
     kaptTest project(':arrow-annotations-processor')
