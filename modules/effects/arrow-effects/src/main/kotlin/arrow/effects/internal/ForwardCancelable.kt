@@ -10,8 +10,8 @@ import arrow.effects.internal.ForwardCancelable.Companion.State.Empty
 import java.util.concurrent.atomic.AtomicReference
 
 /**
- * A placeholder for a [[CancelToken]] that will be set at a later time, the equivalent of a
- * `Deferred[IO, CancelToken]`. Used in the implementation of `bracket`, see [[IOBracket]].
+ * A placeholder for a [CancelToken] that will be set at a later time, the equivalent of a
+ * `Deferred[IO, CancelToken]`. Used in the implementation of `bracket`, see [IOBracket].
  */
 class ForwardCancelable {
 
@@ -56,15 +56,15 @@ class ForwardCancelable {
   companion object {
 
     /**
-     * Models the internal state of [[ForwardCancelable]]:
+     * Models the internal state of [ForwardCancelable]:
      *
-     *  - on start, the state is [[Empty]] of `Nil`, aka [[init]]
+     *  - on start, the state is [Empty] of `Nil`, aka [init]
      *  - on `cancel`, if no token was assigned yet, then the state will
-     *    remain [[Empty]] with a non-nil `List[Callback]`
+     *    remain [Empty] with a non-nil `List[Callback]`
      *  - if a `CancelToken` is provided without `cancel` happening,
-     *    then the state transitions to [[Active]] mode
-     *  - on `cancel`, if the state was [[Active]], or if it was [[Empty]],
-     *    regardless, the state transitions to `Active(IO.unit)`, aka [[finished]]
+     *    then the state transitions to [Active] mode
+     *  - on `cancel`, if the state was [Active], or if it was [Empty],
+     *    regardless, the state transitions to `Active(IO.unit)`, aka [finished]
      */
     private sealed class State {
       data class Empty(val stack: List<(Either<Throwable, Unit>) -> Unit>) : State()

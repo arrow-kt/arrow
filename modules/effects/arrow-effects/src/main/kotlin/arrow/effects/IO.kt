@@ -127,7 +127,7 @@ sealed class IO<out A> : IOOf<A> {
   internal abstract fun unsafeRunTimedTotal(limit: Duration): Option<A>
 
   /**
-   * Makes the source `IO` uninterruptible such that a [[Fiber.cancel]]
+   * Makes the source `IO` uninterruptible such that a [Fiber.cancel]
    * signal has no effect.
    */
   fun uncancelable(): IO<A> = IOCancel.uncancelable(this)

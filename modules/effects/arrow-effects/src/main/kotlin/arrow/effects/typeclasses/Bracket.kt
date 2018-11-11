@@ -18,7 +18,7 @@ fun <E> Either<E, *>.toExitCase() =
   fold(::Error) { ExitCase.Completed }
 
 /**
- * Extension of MonadError exposing the [[bracket]] operation, a generalized abstracted pattern of safe resource
+ * Extension of MonadError exposing the [bracket] operation, a generalized abstracted pattern of safe resource
  * acquisition and release in the face of errors or interruption.
  *
  * @define The functions receiver here (Kind<F, A>) would stand for the "acquireParam", and stands for an action that
@@ -29,7 +29,7 @@ fun <E> Either<E, *>.toExitCase() =
 interface Bracket<F, E> : MonadError<F, E> {
 
   /**
-   * A generalized version of [[bracket]] which uses [[ExitCase]] to distinguish between different exit cases when
+   * A generalized version of [bracket] which uses [ExitCase] to distinguish between different exit cases when
    * releasing the acquired resource.
    *
    * @param release is the action supposed to release the allocated resource after `use` is done, by observing and
@@ -58,25 +58,25 @@ interface Bracket<F, E> : MonadError<F, E> {
    * Executes the given `finalizer` when the source is finished, either in success or in error, or if canceled.
    *
    * As best practice, it's not a good idea to release resources via `guaranteeCase` in polymorphic code.
-   * Prefer [[bracket]] for the acquisition and release of resources.
+   * Prefer [bracket] for the acquisition and release of resources.
    *
-   * @see [[guaranteeCase]] for the version that can discriminate between termination conditions
+   * @see [guaranteeCase] for the version that can discriminate between termination conditions
    *
-   * @see [[bracket]] for the more general operation
+   * @see [bracket] for the more general operation
    */
   fun <A> Kind<F, A>.guarantee(finalizer: Kind<F, Unit>): Kind<F, A> =
     bracket({ _ -> this }, { _ -> finalizer })
 
   /**
    * Executes the given `finalizer` when the source is finished, either in success or in error, or if canceled, allowing
-   * for differentiating between exit conditions. That's thanks to the [[ExitCase]] argument of the finalizer.
+   * for differentiating between exit conditions. That's thanks to the [ExitCase] argument of the finalizer.
    *
    * As best practice, it's not a good idea to release resources via `guaranteeCase` in polymorphic code.
-   * Prefer [[bracketCase]] for the acquisition and release of resources.
+   * Prefer [bracketCase] for the acquisition and release of resources.
    *
-   * @see [[guarantee]] for the simpler version
+   * @see [guarantee] for the simpler version
    *
-   * @see [[bracketCase]] for the more general operation
+   * @see [bracketCase] for the more general operation
    */
   fun <A> Kind<F, A>.guaranteeCase(finalizer: (ExitCase<E>) -> Kind<F, Unit>): Kind<F, A> =
     bracketCase({ _ -> this }, { _, e -> finalizer(e) })

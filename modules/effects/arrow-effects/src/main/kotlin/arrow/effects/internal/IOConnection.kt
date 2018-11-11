@@ -56,7 +56,7 @@ sealed class IOConnection {
   }
 
   /**
-   * Reusable [[IOConnection]] reference that cannot be canceled.
+   * Reusable [IOConnection] reference that cannot be canceled.
    */
   private object Uncancelable : IOConnection() {
     override fun cancel(): CancelToken<ForIO> = IO.unit
@@ -68,7 +68,7 @@ sealed class IOConnection {
   }
 
   /**
-   * Default [[IOConnection]] implementation.
+   * Default [IOConnection] implementation.
    */
   private class DefaultIOConnection : IOConnection() {
     private val state = AtomicReference(emptyList<CancelToken<ForIO>>())
