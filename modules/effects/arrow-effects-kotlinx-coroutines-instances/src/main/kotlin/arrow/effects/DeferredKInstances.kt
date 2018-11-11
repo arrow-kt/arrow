@@ -7,28 +7,24 @@ import arrow.effects.deferredk.applicative.applicative
 import arrow.effects.typeclasses.*
 import arrow.extension
 import arrow.typeclasses.*
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlin.coroutines.CoroutineContext
 import arrow.effects.handleErrorWith as deferredHandleErrorWith
 import arrow.effects.runAsync as deferredRunAsync
 
 @extension
 interface DeferredKFunctorInstance : Functor<ForDeferredK> {
-  @ExperimentalCoroutinesApi
   override fun <A, B> Kind<ForDeferredK, A>.map(f: (A) -> B): DeferredK<B> =
     fix().map(f)
 }
 
 @extension
 interface DeferredKApplicativeInstance : Applicative<ForDeferredK> {
-  @ExperimentalCoroutinesApi
   override fun <A, B> Kind<ForDeferredK, A>.map(f: (A) -> B): DeferredK<B> =
     fix().map(f)
 
   override fun <A> just(a: A): DeferredK<A> =
     DeferredK.just(a)
 
-  @ExperimentalCoroutinesApi
   override fun <A, B> DeferredKOf<A>.ap(ff: DeferredKOf<(A) -> B>): DeferredK<B> =
     fix().ap(ff)
 }
@@ -39,7 +35,6 @@ suspend fun <F, A> Kind<F, DeferredKOf<A>>.awaitAll(T: Traverse<F>): Kind<F, A> 
 
 @extension
 interface DeferredKMonadInstance : Monad<ForDeferredK> {
-  @ExperimentalCoroutinesApi
   override fun <A, B> Kind<ForDeferredK, A>.flatMap(f: (A) -> Kind<ForDeferredK, B>): DeferredK<B> =
     fix().flatMap(f = f)
 
@@ -61,7 +56,6 @@ interface DeferredKApplicativeErrorInstance : ApplicativeError<ForDeferredK, Thr
   override fun <A> raiseError(e: Throwable): DeferredK<A> =
     DeferredK.raiseError(e)
 
-  @ExperimentalCoroutinesApi
   override fun <A> DeferredKOf<A>.handleErrorWith(f: (Throwable) -> DeferredKOf<A>): DeferredK<A> =
     deferredHandleErrorWith { f(it).fix() }
 }
@@ -71,7 +65,6 @@ interface DeferredKMonadErrorInstance : MonadError<ForDeferredK, Throwable>, Def
   override fun <A> raiseError(e: Throwable): DeferredK<A> =
     DeferredK.raiseError(e)
 
-  @ExperimentalCoroutinesApi
   override fun <A> DeferredKOf<A>.handleErrorWith(f: (Throwable) -> DeferredKOf<A>): DeferredK<A> =
     deferredHandleErrorWith { f(it).fix() }
 }
@@ -99,14 +92,12 @@ interface DeferredKAsyncInstance : Async<ForDeferredK>, DeferredKMonadDeferInsta
 
 @extension
 interface DeferredKEffectInstance : Effect<ForDeferredK>, DeferredKAsyncInstance {
-  @ExperimentalCoroutinesApi
   override fun <A> Kind<ForDeferredK, A>.runAsync(cb: (Either<Throwable, A>) -> DeferredKOf<Unit>): DeferredK<Unit> =
     fix().deferredRunAsync(cb = cb)
 }
 
 @extension
 interface DeferredKConcurrentEffectInstance : ConcurrentEffect<ForDeferredK>, DeferredKEffectInstance {
-  @ExperimentalCoroutinesApi
   override fun <A> Kind<ForDeferredK, A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> Kind<ForDeferredK, Unit>): Kind<ForDeferredK, Disposable> =
     fix().runAsyncCancellable(onCancel = OnCancel.ThrowCancellationException, cb = cb)
 }
