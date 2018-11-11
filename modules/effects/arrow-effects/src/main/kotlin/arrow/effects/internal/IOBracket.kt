@@ -30,7 +30,7 @@ internal object IOBracket {
       if (!conn.isCanceled()) {
         // Note `acquire` is uncancelable due to usage of `IORunLoop.start`
         // (in other words it is disconnected from our IOConnection)
-        IORunLoop.start(acquire, BracketStart(use, release, conn, deferredRelease, cb), null)
+        IORunLoop.start(acquire, BracketStart(use, release, conn, deferredRelease, cb))
       } else {
         deferredRelease.complete(IO.unit)
       }
@@ -77,7 +77,7 @@ internal object IOBracket {
             deferredRelease.complete(frame.cancel)
 
             // Actual execution
-            IORunLoop.startCancelable(onNext(), conn, cb, null)
+            IORunLoop.startCancelable(onNext(), conn, cb)
           }
           is Either.Left -> cb(result)
         }
@@ -99,7 +99,7 @@ internal object IOBracket {
       // the connection was already cancelled — n.b. we don't need
       // to trigger `release` otherwise, because it already happened
       if (!conn.isCanceled()) {
-        IORunLoop.startCancelable(onNext, conn, cb, null)
+        IORunLoop.startCancelable(onNext, conn, cb)
       }
     }
 
