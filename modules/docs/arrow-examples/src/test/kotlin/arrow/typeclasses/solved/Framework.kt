@@ -75,7 +75,7 @@ interface NetworkOperationsAsync<F> : Async<F> {
   val network: NetworkModule
 
   fun Index.requestUser(): Kind<F, UserDto> =
-    async { _, callback ->
+    async { callback ->
       network.fetchAsync(this, mapOf("1" to "2"),
         { err -> callback(err.left()) },
         { value -> callback(value.right()) })
@@ -86,7 +86,7 @@ interface DaoOperationsAsync<F> : Async<F> {
   val dao: DaoDatabase
 
   fun Index.queryUser(): Kind<F, UserDao> =
-    async { _, callback ->
+    async { callback ->
       dao.queryAsync("SELECT * from Users where userId = $this",
         { err -> callback(err.left()) },
         { value -> callback(value.right()) })

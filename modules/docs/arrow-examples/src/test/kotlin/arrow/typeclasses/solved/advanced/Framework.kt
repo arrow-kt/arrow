@@ -26,13 +26,13 @@ interface DaoFetcher<D> {
 interface NetworkOperationsKAsync<F, N> : Async<F>, NetworkFetcher<N> {
 
   fun Index.requestUser(): Kind<F, UserDto> =
-    async { _, cb -> fetchAsync(this, kotlin.collections.mapOf("1" to "2"), { cb(it.left()) }, { cb(it.right()) }) }
+    async { cb -> fetchAsync(this, kotlin.collections.mapOf("1" to "2"), { cb(it.left()) }, { cb(it.right()) }) }
 }
 
 interface DaoOperationsKAsync<F, D> : Async<F>, DaoFetcher<D> {
 
   fun Index.queryUser(): Kind<F, UserDao> =
-    async { _, cb -> queryAsync("SELECT * from Users where userId = $this", { cb(it.left()) }, { cb(it.right()) }) }
+    async { cb -> queryAsync("SELECT * from Users where userId = $this", { cb(it.left()) }, { cb(it.right()) }) }
 }
 
 // Let's apply it to the Business Logic
