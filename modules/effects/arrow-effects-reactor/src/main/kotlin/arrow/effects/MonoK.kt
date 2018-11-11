@@ -78,7 +78,7 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
 
     fun <A> async(fa: Proc<A>): MonoK<A> =
       Mono.create { emitter: MonoSink<A> ->
-        fa(IOConnection()) { either: Either<Throwable, A> ->
+        fa { either: Either<Throwable, A> ->
           either.fold({
             emitter.error(it)
           }, {

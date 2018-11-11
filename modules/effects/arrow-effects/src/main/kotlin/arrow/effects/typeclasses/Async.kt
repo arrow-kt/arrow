@@ -2,12 +2,11 @@ package arrow.effects.typeclasses
 
 import arrow.Kind
 import arrow.core.Either
-import arrow.effects.internal.IOConnection
 import arrow.typeclasses.MonadContinuation
 import kotlin.coroutines.CoroutineContext
 
 /** An asynchronous computation that might fail. **/
-typealias Proc<A> = (IOConnection, (Either<Throwable, A>) -> Unit) -> Unit
+typealias Proc<A> = ((Either<Throwable, A>) -> Unit) -> Unit
 
 /** The context required to run an asynchronous computation that may fail. **/
 interface Async<F> : MonadDefer<F> {
@@ -25,5 +24,5 @@ interface Async<F> : MonadDefer<F> {
     just(Unit).continueOn(ctx).bind()
 
   fun <A> never(): Kind<F, A> =
-    async { _, _ -> }
+    async { }
 }

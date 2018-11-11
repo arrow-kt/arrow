@@ -28,7 +28,7 @@ internal object IORunLoop {
   fun <A> startCancelable(source: IO<A>, conn: IOConnection, cb: (Either<Throwable, A>) -> Unit, isCancelled: (() -> Boolean)?): Unit =
     loop(source, conn, cb as Callback, null, null, null, isCancelled)
 
-  fun <A> step(source: IO<A>): IO<A> {
+  fun <A> step(conn: IOConnection, source: IO<A>): IO<A> {
     var currentIO: Current? = source
     var bFirst: BindF? = null
     var bRest: CallStack? = null
@@ -68,7 +68,7 @@ internal object IORunLoop {
         }
         is IO.Async -> {
           // Return case for Async operations
-          return suspendInAsync(currentIO as IO<A>, bFirst, bRest, currentIO.cont)
+          return suspendInAsync(currentIO as IO<A>, bFirst, bRest, currentIO.k)
         }
         is IO.Bind<*, *> -> {
           if (bFirst != null) {
@@ -91,7 +91,7 @@ internal object IORunLoop {
 
           bFirst = { c: Any? -> IO.just(c) }
 
-          currentIO = IO.async { conn, cc ->
+          currentIO = IO.async { cc ->
             loop(localCont, conn, cc.asyncCallback(currentCC), null, null, null, null)
           }
         }
@@ -135,7 +135,7 @@ internal object IORunLoop {
     currentIO: IO<A>,
     bFirst: BindF?,
     bRest: CallStack?,
-    register: Proc<Any?>): IO<A> =
+    register: (IOConnection, (Either<Throwable, Any?>) -> Unit) -> Unit): IO<A> =
   // Hitting an async boundary means we have to stop, however
   // if we had previous `flatMap` operations then we need to resume
   // the loop with the collected stack
@@ -214,7 +214,7 @@ internal object IORunLoop {
           }
           rcb.prepare(bFirst, bRest)
           // Return case for Async operations
-          currentIO.cont(conn, rcb)
+          currentIO.k(conn, rcb)
           return
         }
         is IO.Bind<*, *> -> {
@@ -238,7 +238,7 @@ internal object IORunLoop {
 
           bFirst = { c: Any? -> IO.just(c) }
 
-          currentIO = IO.async { conn, cc ->
+          currentIO = IO.async { cc ->
             loop(localCont, conn, cc.asyncCallback(currentCC), null, null, null, isCancelled)
           }
 

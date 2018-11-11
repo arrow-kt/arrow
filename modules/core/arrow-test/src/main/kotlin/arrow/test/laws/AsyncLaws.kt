@@ -28,12 +28,12 @@ object AsyncLaws {
 
   fun <F> Async<F>.asyncSuccess(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.int()) { num: Int ->
-      async { _, ff: (Either<Throwable, Int>) -> Unit -> ff(Right(num)) }.equalUnderTheLaw(just(num), EQ)
+      async { ff: (Either<Throwable, Int>) -> Unit -> ff(Right(num)) }.equalUnderTheLaw(just(num), EQ)
     }
 
   fun <F> Async<F>.asyncError(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(genThrowable()) { e: Throwable ->
-      async { _, ff: (Either<Throwable, Int>) -> Unit -> ff(Left(e)) }.equalUnderTheLaw(raiseError(e), EQ)
+      async { ff: (Either<Throwable, Int>) -> Unit -> ff(Left(e)) }.equalUnderTheLaw(raiseError(e), EQ)
     }
 
   fun <F> Async<F>.continueOn(EQ: Eq<Kind<F, Int>>): Unit =

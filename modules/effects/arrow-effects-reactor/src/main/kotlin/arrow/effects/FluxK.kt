@@ -105,8 +105,8 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
 
     fun <A> runAsync(fa: Proc<A>): FluxK<A> =
       Flux.create { emitter: FluxSink<A> ->
-        fa(IOConnection()) { either: Either<Throwable, A> ->
-          either.fold({
+        fa { callback: Either<Throwable, A> ->
+          callback.fold({
             emitter.error(it)
           }, {
             emitter.next(it)

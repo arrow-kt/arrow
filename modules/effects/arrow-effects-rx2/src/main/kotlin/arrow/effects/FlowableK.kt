@@ -7,7 +7,6 @@ import arrow.core.Left
 import arrow.core.Right
 import arrow.core.identity
 import arrow.effects.CoroutineContextRx2Scheduler.asScheduler
-import arrow.effects.internal.IOConnection
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.Proc
@@ -105,7 +104,7 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
 
     fun <A> async(fa: Proc<A>, mode: BackpressureStrategy = BackpressureStrategy.BUFFER): FlowableK<A> =
       Flowable.create({ emitter: FlowableEmitter<A> ->
-        fa(IOConnection()) { either: Either<Throwable, A> ->
+        fa { either: Either<Throwable, A> ->
           either.fold({
             emitter.onError(it)
           }, {

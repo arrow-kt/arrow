@@ -4,7 +4,6 @@ import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
 import arrow.effects.CoroutineContextRx2Scheduler.asScheduler
-import arrow.effects.internal.IOConnection
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.Proc
@@ -77,7 +76,7 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
 
     fun <A> async(fa: Proc<A>): SingleK<A> =
       Single.create { emitter: SingleEmitter<A> ->
-        fa(IOConnection()) { either: Either<Throwable, A> ->
+        fa { either: Either<Throwable, A> ->
           either.fold({
             emitter.onError(it)
           }, {

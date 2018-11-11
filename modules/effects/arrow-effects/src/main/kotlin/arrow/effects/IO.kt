@@ -45,10 +45,10 @@ sealed class IO<out A> : IOOf<A> {
     fun <A> defer(f: () -> IOOf<A>): IO<A> = Suspend(f)
 
     fun <A> async(k: Proc<A>): IO<A> =
-      Async { conn, ff: (Either<Throwable, A>) -> Unit ->
+      Async { _: IOConnection, ff: (Either<Throwable, A>) -> Unit ->
         onceOnly(ff).let { callback: (Either<Throwable, A>) -> Unit ->
           try {
-            k(conn, callback)
+            k(callback)
           } catch (throwable: Throwable) {
             callback(Left(throwable))
           }
@@ -100,7 +100,7 @@ sealed class IO<out A> : IOOf<A> {
     IORunLoop.start(this, cb, null)
 
   fun runAsyncCancellable(onCancel: OnCancel = Silent, cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Disposable> =
-    IO.async { _, ccb ->
+    IO.async { ccb ->
       var cancelled = false
       val cancel = { cancelled = true }
       val isCancelled = { cancelled }
@@ -122,7 +122,7 @@ sealed class IO<out A> : IOOf<A> {
     unsafeRunTimed(Duration.INFINITE)
       .fold({ throw IllegalArgumentException("IO execution should yield a valid result") }, ::identity)
 
-  fun unsafeRunTimed(limit: Duration): Option<A> = IORunLoop.step(this).unsafeRunTimedTotal(limit)
+  fun unsafeRunTimed(limit: Duration): Option<A> = IORunLoop.step(IOConnection(), this).unsafeRunTimedTotal(limit)
 
   internal abstract fun unsafeRunTimedTotal(limit: Duration): Option<A>
 
@@ -172,7 +172,9 @@ sealed class IO<out A> : IOOf<A> {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
   }
 
-  internal data class Async<out A>(val cont: Proc<A>) : IO<A>() {
+  internal data class Async<out A>(
+    val k: (IOConnection, (Either<Throwable, A>) -> Unit) -> Unit
+  ) : IO<A>() {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = unsafeResync(this, limit)
   }
 

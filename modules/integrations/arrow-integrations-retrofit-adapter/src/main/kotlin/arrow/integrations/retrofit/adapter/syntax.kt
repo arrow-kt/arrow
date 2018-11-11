@@ -22,7 +22,7 @@ fun <F, R> Response<R>.unwrapBody(apError: ApplicativeError<F, Throwable>): Kind
   }
 
 fun <F, A> Call<A>.runAsync(AC: Async<F>): Kind<F, Response<A>> =
-  AC.async { _, callback ->
+  AC.async { callback ->
     enqueue(ResponseCallback(callback))
   }
 
