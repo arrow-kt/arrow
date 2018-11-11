@@ -132,7 +132,6 @@ sealed class IO<out A> : IOOf<A> {
    */
   fun uncancelable(): IO<A> = IOCancel.uncancelable(this)
 
-
   fun <B> bracket(use: (A) -> IO<B>, release: (A) -> IO<Unit>): IO<B> =
     bracketCase(use) { a, _ -> release(a) }
 

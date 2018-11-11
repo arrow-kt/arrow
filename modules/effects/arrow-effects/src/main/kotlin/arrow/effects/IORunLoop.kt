@@ -1,12 +1,11 @@
 package arrow.effects
 
+import arrow.core.Continuation
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
 import arrow.effects.internal.IOConnection
 import arrow.effects.internal.Platform.ArrayStack
-import arrow.effects.typeclasses.Proc
-import arrow.core.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine
 

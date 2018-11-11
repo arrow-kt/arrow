@@ -7,7 +7,6 @@ import arrow.core.Left
 import arrow.core.Right
 import arrow.core.identity
 import arrow.effects.CoroutineContextReactorScheduler.asScheduler
-import arrow.effects.internal.IOConnection
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.Proc

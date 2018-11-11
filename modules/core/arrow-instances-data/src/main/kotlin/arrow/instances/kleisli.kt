@@ -14,8 +14,6 @@ import arrow.data.ReaderApi
 import arrow.data.ReaderPartialOf
 import arrow.data.fix
 import arrow.deprecation.ExtensionsDSLDeprecated
-import arrow.effects.typeclasses.Bracket
-import arrow.effects.typeclasses.ExitCase
 import arrow.extension
 import arrow.instances.id.applicative.applicative
 import arrow.instances.id.functor.functor

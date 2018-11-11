@@ -7,7 +7,6 @@ import arrow.effects.IORunLoop
 import arrow.effects.fix
 import arrow.effects.internal.ForwardCancelable.Companion.State.Active
 import arrow.effects.internal.ForwardCancelable.Companion.State.Empty
-import java.lang.Exception
 import java.util.concurrent.atomic.AtomicReference
 
 /**
@@ -38,7 +37,7 @@ class ForwardCancelable {
   fun complete(value: CancelToken<ForIO>): Unit = state.get().let { current ->
     when (current) {
       is Active -> {
-        value.fix().unsafeRunAsync {  }
+        value.fix().unsafeRunAsync {}
         throw IllegalStateException(current.toString())
       }
       is Empty -> if (current == init) {
@@ -71,7 +70,6 @@ class ForwardCancelable {
       data class Empty(val stack: List<(Either<Throwable, Unit>) -> Unit>) : State()
       data class Active(val token: CancelToken<ForIO>) : State()
     }
-
 
     private val init: State = Empty(listOf())
     private val finished: State = Active(IO.unit)
