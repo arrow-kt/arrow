@@ -173,3 +173,9 @@ June '18 - version 0.7
 [Polyjokes — A polymorphic approach using Arrow](https://github.com/dcampogiani/polyjokes)
 
 October '18 - version 0.7.3
+
+### Arrow-kt Tiny Cards Flashcards
+
+[Arrow-kt Collection](https://tiny.cards/collections/W1aS1cV/arrow-kt) Data types, type classes, effects, optics, generic, free, recursion schemes
+
+DM Ersin on [Gitter](https://gitter.im/ersin-ertan) or [Slack](https://kotlinlang.slack.com/messages/D624ZNAF9/team/U619WRNJE/) if you have more concise/simpler definitions, can correct misinterpretations, or can help with a deck
