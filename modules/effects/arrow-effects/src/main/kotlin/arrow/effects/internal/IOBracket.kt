@@ -11,7 +11,7 @@ import arrow.effects.internal.ErrorUtils.composeErrors
 import arrow.effects.typeclasses.ExitCase
 import java.util.concurrent.atomic.AtomicBoolean
 
-typealias CancelToken<F> = Kind<F, Unit>
+internal typealias CancelToken<F> = Kind<F, Unit>
 
 internal object IOBracket {
 
