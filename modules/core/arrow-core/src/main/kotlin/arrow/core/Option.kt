@@ -66,6 +66,9 @@ sealed class Option<out A> : OptionOf<A> {
   inline fun <B> map(f: (A) -> B): Option<B> =
     flatMap { a -> Some(f(a)) }
 
+  fun <B> mapFilter(f: (A) -> Option<B>): Option<B> =
+    flatMap { a -> f(a).fold({ empty<B>() }, { just(it) }) }
+
   inline fun <R> fold(ifEmpty: () -> R, ifSome: (A) -> R): R = when (this) {
     is None -> ifEmpty()
     is Some<A> -> ifSome(t)

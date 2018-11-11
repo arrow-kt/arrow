@@ -8,8 +8,9 @@ sealed class Tree {
   companion object
 }
 
-data class Code(val value : String) {
+data class Code(val value: String) {
   override fun toString(): String = value
+
   companion object {
     val empty = Code("")
   }
@@ -70,6 +71,24 @@ sealed class TypeName : Tree() {
     companion object
   }
 
+  data class FunctionLiteral(
+    val receiverType: TypeName?,
+    val parameters: List<TypeName>,
+    val returnType: TypeName
+  ) : TypeName() {
+    override val simpleName: String
+      get() = if (receiverType != null)
+        "(${receiverType.simpleName}).(${parameters.joinToString(", ") {it.simpleName }}) -> ${returnType.simpleName}"
+    else
+        "(${parameters.joinToString(", ") {it.simpleName }}) -> ${returnType.simpleName}"
+
+    override val rawName: String
+      get() {
+        val arity = parameters.size + if (receiverType != null) 1 else 0
+        return "kotlin.Function$arity"
+      }
+  }
+
   data class ParameterizedType(
     val name: String,
     val enclosingType: TypeName? = null,
@@ -105,7 +124,7 @@ sealed class TypeName : Tree() {
       )
 
     companion object {
-      fun from(pck: String, simpleName: String) : Classy =
+      fun from(pck: String, simpleName: String): Classy =
         Classy(simpleName, "$pck.$simpleName", PackageName(pck))
     }
   }
@@ -205,7 +224,7 @@ sealed class Modifier {
   object Data : Modifier()
   object InVariance : Modifier()
   object OutVariance : Modifier()
-  object VarArg: Modifier()
+  object VarArg : Modifier()
   companion object
 }
 
@@ -230,8 +249,8 @@ data class Type(
 
   sealed class Shape {
     object Class : Shape()
-    object Interface: Shape()
-    object Object: Shape()
+    object Interface : Shape()
+    object Object : Shape()
     companion object
   }
 
