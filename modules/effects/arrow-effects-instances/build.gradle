@@ -1,7 +1,5 @@
 dependencies {
     compile project(':arrow-effects')
-    compile project(':arrow-data')
-    compile project(':arrow-instances-data')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     compile project(':arrow-annotations')
     kapt project(':arrow-annotations-processor')
