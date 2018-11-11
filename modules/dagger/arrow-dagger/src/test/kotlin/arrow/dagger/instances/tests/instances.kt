@@ -63,7 +63,7 @@ class LocalOptionTTInstances : OptionTInstances<ForOption>()
 class LocalFunction1Instances : Function1Instances<ForOption>()
 
 @Module
-class LocalKleisliInstances : KleisliInstances<ForOption, Unit, Unit>()
+class LocalKleisliInstances : KleisliInstances<ForOption, Unit>()
 
 @Module
 class LocalMapKInstances : MapKInstances<String>()

@@ -15,7 +15,7 @@ import dagger.Provides
 import javax.inject.Inject
 
 @Module
-abstract class KleisliInstances<F, D, E> {
+abstract class KleisliInstances<F, D> {
 
   @Provides
   fun kleisliFunctor(ev: DaggerKleisliFunctorInstance<F, D>): Functor<KleisliPartialOf<F, D>> = ev
