@@ -10,10 +10,15 @@ import kotlin.coroutines.CoroutineContext
 fun <A> Deferred<A>.k(): DeferredK<A> =
   DeferredK(this)
 
+fun <A> CoroutineScope.asyncK(ctx: CoroutineContext = Dispatchers.Default, start: CoroutineStart = CoroutineStart.LAZY, f: suspend CoroutineScope.() -> A): DeferredK<A> =
+  this.async(ctx, start, f).k()
+
 fun <A> DeferredKOf<A>.value(): Deferred<A> = this.fix().deferred
 
+fun <A> DeferredKOf<A>.scope(): CoroutineScope = this.fix().scope
+
 @higherkind
-data class DeferredK<out A>(val deferred: Deferred<A>) : DeferredKOf<A>, Deferred<A> by deferred {
+data class DeferredK<out A>(val deferred: Deferred<A>, val scope: CoroutineScope = GlobalScope) : DeferredKOf<A>, Deferred<A> by deferred {
 
   fun <B> map(f: (A) -> B): DeferredK<B> =
     flatMap { a: A -> just(f(a)) }
@@ -22,14 +27,14 @@ data class DeferredK<out A>(val deferred: Deferred<A>) : DeferredKOf<A>, Deferre
     flatMap { a -> fa.fix().map { ff -> ff(a) } }
 
   fun <B> flatMap(f: (A) -> DeferredKOf<B>): DeferredK<B> =
-    GlobalScope.async(Dispatchers.Unconfined, CoroutineStart.LAZY) {
+    scope.asyncK(Dispatchers.Unconfined, CoroutineStart.LAZY) {
       f(await()).await()
-    }.k()
+    }
 
   fun continueOn(ctx: CoroutineContext): DeferredK<A> =
-    GlobalScope.async(ctx, CoroutineStart.LAZY) {
+    scope.asyncK(ctx, CoroutineStart.LAZY) {
       deferred.await()
-    }.k()
+    }
 
   companion object {
     fun unit(): DeferredK<Unit> =
@@ -38,17 +43,17 @@ data class DeferredK<out A>(val deferred: Deferred<A>) : DeferredKOf<A>, Deferre
     fun <A> just(a: A): DeferredK<A> =
       CompletableDeferred(a).k()
 
-    fun <A> defer(ctx: CoroutineContext = Dispatchers.Default, start: CoroutineStart = CoroutineStart.LAZY, f: suspend () -> A): DeferredK<A> =
-      GlobalScope.async(ctx, start) { f() }.k()
+    fun <A> defer(scope: CoroutineScope = GlobalScope, ctx: CoroutineContext = Dispatchers.Default, start: CoroutineStart = CoroutineStart.LAZY, f: suspend () -> A): DeferredK<A> =
+      scope.asyncK(ctx, start) { f() }
 
-    fun <A> defer(ctx: CoroutineContext = Dispatchers.Default, start: CoroutineStart = CoroutineStart.LAZY, fa: () -> DeferredKOf<A>): DeferredK<A> =
-      GlobalScope.async(ctx, start) { fa().await() }.k()
+    fun <A> defer(scope: CoroutineScope = GlobalScope, ctx: CoroutineContext = Dispatchers.Default, start: CoroutineStart = CoroutineStart.LAZY, fa: () -> DeferredKOf<A>): DeferredK<A> =
+      scope.asyncK(ctx, start) { fa().await() }
 
-    operator fun <A> invoke(ctx: CoroutineContext = Dispatchers.Default, start: CoroutineStart = CoroutineStart.DEFAULT, f: () -> A): DeferredK<A> =
-      GlobalScope.async(ctx, start) { f() }.k()
+    operator fun <A> invoke(scope: CoroutineScope = GlobalScope, ctx: CoroutineContext = Dispatchers.Default, start: CoroutineStart = CoroutineStart.DEFAULT, f: () -> A): DeferredK<A> =
+      scope.asyncK(ctx, start) { f() }
 
     fun <A> failed(t: Throwable): DeferredK<A> =
-      CompletableDeferred<A>().apply { cancel(t) }.k()
+      CompletableDeferred<A>().apply { completeExceptionally(t) }.k()
 
     fun <A> raiseError(t: Throwable): DeferredK<A> =
       failed(t)
@@ -60,14 +65,14 @@ data class DeferredK<out A>(val deferred: Deferred<A>) : DeferredKOf<A>, Deferre
      * its [CoroutineContext] is set to [DefaultDispatcher]
      * and its [CoroutineStart] is [CoroutineStart.DEFAULT].
      */
-    fun <A> async(ctx: CoroutineContext = Dispatchers.Default, start: CoroutineStart = CoroutineStart.DEFAULT, fa: Proc<A>): DeferredK<A> =
-      GlobalScope.async(ctx, start) {
+    fun <A> async(scope: CoroutineScope = GlobalScope, ctx: CoroutineContext = Dispatchers.Default, start: CoroutineStart = CoroutineStart.DEFAULT, fa: Proc<A>): DeferredK<A> =
+      scope.asyncK(ctx, start) {
         CompletableDeferred<A>().apply {
           fa {
-            it.fold(this::cancel, this::complete)
+            it.fold(this::completeExceptionally, this::complete)
           }
         }.await()
-      }.k()
+      }
 
     fun <A, B> tailRecM(a: A, f: (A) -> DeferredKOf<Either<A, B>>): DeferredK<B> =
       f(a).value().let { initial: Deferred<Either<A, B>> ->
@@ -90,9 +95,9 @@ data class DeferredK<out A>(val deferred: Deferred<A>) : DeferredKOf<A>, Deferre
 }
 
 fun <A> DeferredKOf<A>.handleErrorWith(f: (Throwable) -> DeferredK<A>): DeferredK<A> =
-  GlobalScope.async(Dispatchers.Unconfined, CoroutineStart.LAZY) {
+  scope().asyncK(Dispatchers.Unconfined, CoroutineStart.LAZY) {
     Try { await() }.fold({ f(it).await() }, ::identity)
-  }.k()
+  }
 
 fun <A> DeferredKOf<A>.unsafeAttemptSync(): Try<A> =
   Try { unsafeRunSync() }
@@ -101,30 +106,33 @@ fun <A> DeferredKOf<A>.unsafeRunSync(): A =
   runBlocking { await() }
 
 fun <A> DeferredKOf<A>.runAsync(cb: (Either<Throwable, A>) -> DeferredKOf<Unit>): DeferredK<Unit> =
-  DeferredK(Dispatchers.Unconfined, CoroutineStart.DEFAULT) {
-    unsafeRunAsync(cb.andThen { })
+  DeferredK.invoke(scope(), Dispatchers.Unconfined, CoroutineStart.DEFAULT) {
+    fix().forceExceptionPropagation()
+    unsafeRunAsync(cb.andThen { it.unsafeRunAsync { } })
   }
 
 fun <A> DeferredKOf<A>.runAsyncCancellable(onCancel: OnCancel = OnCancel.Silent, cb: (Either<Throwable, A>) -> DeferredKOf<Unit>): DeferredK<Disposable> =
-  GlobalScope.async(Dispatchers.Unconfined, CoroutineStart.DEFAULT) {
-    val call = runAsync(cb)
+  DeferredK.invoke(scope(), Dispatchers.Unconfined, CoroutineStart.DEFAULT) {
+    fix().forceExceptionPropagation()
+    val call = CompletableDeferred<Unit>(parent = runAsync(cb))
     val disposable: Disposable = {
       when (onCancel) {
-        OnCancel.ThrowCancellationException -> call.cancel(OnCancel.CancellationException)
+        OnCancel.ThrowCancellationException -> call.completeExceptionally(OnCancel.CancellationException)
         OnCancel.Silent -> call.cancel()
       }
     }
     disposable
-  }.k()
+  }
 
 fun <A> DeferredKOf<A>.unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit =
-  GlobalScope.async(Dispatchers.Unconfined, CoroutineStart.DEFAULT) {
+  scope().async(Dispatchers.Unconfined, CoroutineStart.DEFAULT) {
     Try { await() }.fold({ cb(Left(it)) }, { cb(Right(it)) })
-  }.let {
-    // Deferred swallows all exceptions. How about no.
-    it.invokeOnCompletion { a: Throwable? ->
-      if (a != null) throw a
-    }
-  }
+  }.forceExceptionPropagation()
+
+private fun Deferred<*>.forceExceptionPropagation(): Unit =
+// Deferred swallows all exceptions. How about no.
+  invokeOnCompletion { a: Throwable? ->
+    if (a != null) throw a
+  }.let { }
 
 suspend fun <A> DeferredKOf<A>.await(): A = this.fix().await()
