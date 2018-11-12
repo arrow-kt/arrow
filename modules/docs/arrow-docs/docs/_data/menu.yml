@@ -281,6 +281,9 @@ options:
       - title: Traversal
         url: /docs/optics/traversal/
 
+      - title: Cons
+        url: /docs/optics/cons
+
       - title: At
         url: /docs/optics/at/
 
