@@ -42,7 +42,7 @@ interface NonEmptyListFilterIndexInstance<A> : FilterIndex<NonEmptyList<A>, Int,
       s.all.mapIndexed { index, a -> a toT index }
         .let(NonEmptyList.Companion::fromListUnsafe)
         .traverse(FA) { (a, j) -> if (p(j)) f(a) else FA.just(a) }
-    }
+  }
 }
 
 /**
@@ -52,12 +52,10 @@ interface NonEmptyListFilterIndexInstance<A> : FilterIndex<NonEmptyList<A>, Int,
 interface NonEmptyListIndexInstance<A> : Index<NonEmptyList<A>, Int, A> {
   override fun index(i: Int): Optional<NonEmptyList<A>, A> = POptional(
     getOrModify = { l -> l.all.getOrNull(i)?.right() ?: l.left() },
-    set = { a ->
-      { l ->
-        NonEmptyList.fromListUnsafe(
-          l.all.mapIndexed { index: Int, aa: A -> if (index == i) a else aa }
-        )
-      }
+    set = { l, a ->
+      NonEmptyList.fromListUnsafe(
+        l.all.mapIndexed { index: Int, aa: A -> if (index == i) a else aa }
+      )
     }
   )
 }
