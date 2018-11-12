@@ -1,14 +1,12 @@
-package arrow.data
+package arrow.typeclasses
 
 import arrow.instances.monoid
 import arrow.instances.const.applicative.applicative
 import arrow.instances.const.eq.eq
 import arrow.instances.const.show.show
-import arrow.mtl.instances.*
 import arrow.mtl.instances.const.traverseFilter.traverseFilter
 import arrow.test.UnitSpec
 import arrow.test.laws.*
-import arrow.typeclasses.*
 import io.kotlintest.KTestJUnitRunner
 import org.junit.runner.RunWith
 
