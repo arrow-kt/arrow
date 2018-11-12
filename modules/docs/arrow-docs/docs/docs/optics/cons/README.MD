@@ -14,15 +14,17 @@ beginner
 ### Example
 
 ```kotlin:ank
-import arrow.core.*
-import arrow.data.*
-import arrow.optics.typeclasses.*
+import arrow.optics.instances.list.cons.uncons
 
-val listCons = ListK.cons<Int>()
+listOf(1, 2, 3).uncons()
+```
+```kotlin:ank
+emptyList<Int>().uncons()
+```
+```kotlin:ank
+import arrow.optics.instances.list.cons.cons
 
-listCons.run {
-  listOf(1.2.3).k().uncons()
-}
+1.cons(listOf(2, 3))
 ```
 
 ### Instances
