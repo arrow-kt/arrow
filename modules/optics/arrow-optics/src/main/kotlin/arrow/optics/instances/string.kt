@@ -114,7 +114,7 @@ fun String.Companion.snoc(): Snoc<String, Char> = StringSnocInstance()
 interface StringSnocInstance : Snoc<String, Char> {
 
   override fun snoc(): Prism<String, Tuple2<String, Char>> = Prism(
-    getOrModify = { if(it.isNotEmpty()) Tuple2(it.dropLast(1), it.last()).right() else it.left()  },
+    getOrModify = { if (it.isNotEmpty()) Tuple2(it.dropLast(1), it.last()).right() else it.left() },
     reverseGet = { (i, l) -> i + l }
   )
 
