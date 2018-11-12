@@ -26,7 +26,7 @@ import arrow.optics.*
 
 val optionalHead: Optional<ListK<Int>, Int> = Optional(
     getOrModify = { list -> list.firstOrNull()?.right() ?: list.left() },
-    set = { int -> { list -> list.mapIndexed { index, value -> if (index == 0) int else value }.k() } }
+    set = { list, int -> list.mapIndexed { index, value -> if (index == 0) int else value }.k() }
 )
 ```
 
@@ -75,7 +75,7 @@ data class Participant(val name: String, val email: String?)
 
 val participantEmail: Optional<Participant, String> = Optional(
         getOrModify = { participant -> participant.email?.right() ?: participant.left() },
-        set = { email -> { participant -> participant.copy(email = email) } }
+        set = { participant, email -> participant.copy(email = email) }
 )
 
 val triedEmail: Optional<Try<Participant>, String> = Try.success<Participant>() compose participantEmail
