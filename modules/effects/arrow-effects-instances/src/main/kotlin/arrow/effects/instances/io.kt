@@ -4,15 +4,7 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.effects.*
-import arrow.effects.internal.IOConnection
-import arrow.effects.typeclasses.Async
-import arrow.effects.typeclasses.Bracket
-import arrow.effects.typeclasses.ConcurrentEffect
-import arrow.effects.typeclasses.Disposable
-import arrow.effects.typeclasses.Effect
-import arrow.effects.typeclasses.ExitCase
-import arrow.effects.typeclasses.MonadDefer
-import arrow.effects.typeclasses.Proc
+import arrow.effects.typeclasses.*
 import arrow.extension
 import arrow.typeclasses.*
 import kotlin.coroutines.CoroutineContext
@@ -105,7 +97,7 @@ interface IOMonadDeferInstance : MonadDefer<ForIO>, IOBracketInstance {
 @extension
 interface IOAsyncInstance : Async<ForIO>, IOMonadDeferInstance {
   override fun <A> async(fa: Proc<A>): IO<A> =
-    IO.async(fa)
+    IO.async(fa.toIOProc())
 
   override fun <A> IOOf<A>.continueOn(ctx: CoroutineContext): IO<A> =
     fix().continueOn(ctx)

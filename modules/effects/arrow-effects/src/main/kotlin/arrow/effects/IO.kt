@@ -1,13 +1,7 @@
 package arrow.effects
 
-import arrow.core.Either
+import arrow.core.*
 import arrow.core.Either.Left
-import arrow.core.Eval
-import arrow.core.Option
-import arrow.core.Some
-import arrow.core.andThen
-import arrow.core.identity
-import arrow.core.right
 import arrow.effects.OnCancel.Companion.CancellationException
 import arrow.effects.OnCancel.Silent
 import arrow.effects.OnCancel.ThrowCancellationException
@@ -32,6 +26,10 @@ enum class OnCancel { ThrowCancellationException, Silent;
   }
 }
 
+typealias IOProc<A> = (IOConnection, (Either<Throwable, A>) -> Unit) -> Unit
+
+fun <T> Proc<T>.toIOProc(): IOProc<T> = { _: IOConnection, proc -> this(proc) }
+
 @higherkind
 sealed class IO<out A> : IOOf<A> {
 
@@ -45,11 +43,11 @@ sealed class IO<out A> : IOOf<A> {
 
     fun <A> defer(f: () -> IOOf<A>): IO<A> = Suspend(f)
 
-    fun <A> async(k: Proc<A>): IO<A> =
-      Async { _: IOConnection, ff: (Either<Throwable, A>) -> Unit ->
+    fun <A> async(k: IOProc<A>): IO<A> =
+      Async { conn: IOConnection, ff: (Either<Throwable, A>) -> Unit ->
         onceOnly(ff).let { callback: (Either<Throwable, A>) -> Unit ->
           try {
-            k(callback)
+            k(conn, callback)
           } catch (throwable: Throwable) {
             callback(Left(throwable))
           }
@@ -101,8 +99,7 @@ sealed class IO<out A> : IOOf<A> {
     IORunLoop.start(this, cb)
 
   fun runAsyncCancellable(onCancel: OnCancel = Silent, cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Disposable> =
-    IO.async { ccb ->
-      val conn = IOConnection()
+    IO.async { conn, ccb ->
       val onCancelCb =
         when (onCancel) {
           ThrowCancellationException ->
@@ -121,7 +118,7 @@ sealed class IO<out A> : IOOf<A> {
     unsafeRunTimed(Duration.INFINITE)
       .fold({ throw IllegalArgumentException("IO execution should yield a valid result") }, ::identity)
 
-  fun unsafeRunTimed(limit: Duration): Option<A> = IORunLoop.step(IOConnection(), this).unsafeRunTimedTotal(limit)
+  fun unsafeRunTimed(limit: Duration): Option<A> = IORunLoop.step(this).unsafeRunTimedTotal(limit)
 
   internal abstract fun unsafeRunTimedTotal(limit: Duration): Option<A>
 

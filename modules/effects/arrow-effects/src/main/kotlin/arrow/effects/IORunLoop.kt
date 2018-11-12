@@ -27,7 +27,7 @@ internal object IORunLoop {
   fun <A> startCancelable(source: IO<A>, conn: IOConnection, cb: (Either<Throwable, A>) -> Unit): Unit =
     loop(source, conn, cb as Callback, null, null, null)
 
-  fun <A> step(conn: IOConnection, source: IO<A>): IO<A> {
+  fun <A> step(source: IO<A>): IO<A> {
     var currentIO: Current? = source
     var bFirst: BindF? = null
     var bRest: CallStack? = null
@@ -67,7 +67,7 @@ internal object IORunLoop {
         }
         is IO.Async -> {
           // Return case for Async operations
-          return suspendInAsync(currentIO as IO<A>, bFirst, bRest)
+          return suspendInAsync(currentIO as IO<A>, bFirst, bRest, currentIO.k)
         }
         is IO.Bind<*, *> -> {
           if (bFirst != null) {
@@ -90,7 +90,7 @@ internal object IORunLoop {
 
           bFirst = { c: Any? -> IO.just(c) }
 
-          currentIO = IO.async { cc ->
+          currentIO = IO.async { conn, cc ->
             loop(localCont, conn, cc.asyncCallback(currentCC), null, null, null)
           }
         }
@@ -133,27 +133,30 @@ internal object IORunLoop {
   private fun <A> suspendInAsync(
     currentIO: IO<A>,
     bFirst: BindF?,
-    bRest: CallStack?): IO<A> =
+    bRest: CallStack?,
+    register: IOProc<Any?>): IO<A> =
   // Hitting an async boundary means we have to stop, however
   // if we had previous `flatMap` operations then we need to resume
   // the loop with the collected stack
     when {
       bFirst != null || (bRest != null && bRest.isNotEmpty()) ->
         IO.Async { conn, cb ->
-          loop(currentIO, conn, cb as Callback, null, bFirst, bRest)
+          val rcb = RestartCallback(conn, cb as Callback)
+          rcb.prepare(bFirst, bRest)
+          register(conn, rcb)
         }
       else -> currentIO
     }
 
   private fun loop(
     source: Current,
-    cancelable: IOConnection?,
+    cancelable: IOConnection,
     cb: (Either<Throwable, Any?>) -> Unit,
     rcbRef: RestartCallback?,
     bFirstRef: BindF?,
     bRestRef: CallStack?): Unit {
     var currentIO: Current? = source
-    var conn: IOConnection? = cancelable
+    var conn: IOConnection = cancelable
     var bFirst: BindF? = bFirstRef
     var bRest: CallStack? = bRestRef
     var rcb: RestartCallback? = rcbRef
@@ -163,7 +166,7 @@ internal object IORunLoop {
     var result: Any? = null
 
     do {
-      if (conn?.isCanceled() == true) {
+      if (conn.isCanceled()) {
         cb(Left(OnCancel.CancellationException))
         return
       }
@@ -201,9 +204,6 @@ internal object IORunLoop {
           }
         }
         is IO.Async -> {
-          if (conn == null) {
-            conn = IOConnection()
-          }
           if (rcb == null) {
             rcb = RestartCallback(conn, cb)
           }
@@ -233,7 +233,7 @@ internal object IORunLoop {
 
           bFirst = { c: Any? -> IO.just(c) }
 
-          currentIO = IO.async { cc ->
+          currentIO = IO.async { TODO, cc ->
             loop(localCont, conn, cc.asyncCallback(currentCC), null, null, null)
           }
         }
@@ -252,7 +252,7 @@ internal object IORunLoop {
           val modify = currentIO.modify
           val restore = currentIO.restore
 
-          val old = conn ?: IOConnection()
+          val old = conn
           conn = modify(old)
           currentIO = next
           if (conn != old) {
