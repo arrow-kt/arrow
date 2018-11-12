@@ -51,6 +51,15 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
   fun runAsync(cb: (Either<Throwable, A>) -> MaybeKOf<Unit>): MaybeK<Unit> =
     maybe.flatMap { cb(Right(it)).value() }.onErrorResumeNext(io.reactivex.functions.Function { cb(Left(it)).value() }).k()
 
+  override fun equals(other: Any?): Boolean =
+    when (other) {
+      is MaybeK<*> -> this.maybe == other.maybe
+      is Maybe<*> -> this.maybe == other
+      else -> false
+    }
+
+  override fun hashCode(): Int = maybe.hashCode()
+
   companion object {
     fun <A> just(a: A): MaybeK<A> =
       Maybe.just(a).k()

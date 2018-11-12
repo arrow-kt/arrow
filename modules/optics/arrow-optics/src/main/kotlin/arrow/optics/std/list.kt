@@ -40,7 +40,7 @@ fun <A> ListK.Companion.toOptionNel(): Iso<List<A>, Option<NonEmptyList<A>>> = t
  */
 fun <A, B> ListInstances.toPListK(): PIso<List<A>, List<B>, ListK<A>, ListK<B>> = PIso(
   get = List<A>::k,
-  reverseGet = ListK<B>::list
+  reverseGet = ::identity
 )
 
 /**

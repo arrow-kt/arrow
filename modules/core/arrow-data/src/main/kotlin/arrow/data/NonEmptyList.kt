@@ -48,7 +48,7 @@ class NonEmptyList<out A> private constructor(
     f(fix().head).map2Eval(Eval.always {
       tail.k().traverse(AG, f)
     }) {
-      NonEmptyList(it.a, it.b.fix().list)
+      NonEmptyList(it.a, it.b.fix())
     }.value()
   }
 

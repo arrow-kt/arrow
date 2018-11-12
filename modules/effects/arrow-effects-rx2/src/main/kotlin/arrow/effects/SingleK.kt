@@ -43,6 +43,15 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
       dispose
     }.k()
 
+  override fun equals(other: Any?): Boolean =
+    when (other) {
+      is SingleK<*> -> this.single == other.single
+      is Single<*> -> this.single == other
+      else -> false
+    }
+
+  override fun hashCode(): Int = single.hashCode()
+
   companion object {
     fun <A> just(a: A): SingleK<A> =
       Single.just(a).k()
