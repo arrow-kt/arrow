@@ -114,7 +114,7 @@ fun String.Companion.cons(): Cons<String, Char> = StringConsInstance()
 interface StringConsInstance : Cons<String, Char> {
 
   override fun cons(): Prism<String, Tuple2<Char, String>> = Prism(
-    getOrModify = { if(it.isNotEmpty()) Tuple2(it.first(), it.drop(1)).right() else it.left()  },
+    getOrModify = { if (it.isNotEmpty()) Tuple2(it.first(), it.drop(1)).right() else it.left() },
     reverseGet = { (h, t) -> h + t }
   )
 
