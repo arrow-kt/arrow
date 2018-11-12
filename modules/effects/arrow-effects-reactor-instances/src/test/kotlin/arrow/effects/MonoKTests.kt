@@ -1,7 +1,6 @@
 package arrow.effects
 
 import arrow.effects.monok.async.async
-import arrow.effects.monok.monadError.monadError
 import arrow.effects.monok.monadThrow.bindingCatch
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
