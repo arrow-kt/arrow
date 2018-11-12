@@ -1,4 +1,4 @@
-package arrow.data
+package arrow.core
 
 import arrow.Kind
 import arrow.core.ForFunction1
