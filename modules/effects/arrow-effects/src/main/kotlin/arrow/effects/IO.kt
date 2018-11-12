@@ -99,7 +99,8 @@ sealed class IO<out A> : IOOf<A> {
     IORunLoop.start(this, cb)
 
   fun runAsyncCancellable(onCancel: OnCancel = Silent, cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Disposable> =
-    IO.async { conn, ccb ->
+    IO.async { _ /* The start of this execution is immediate and uncancellable */, ccb ->
+      val conn = IOConnection()
       val onCancelCb =
         when (onCancel) {
           ThrowCancellationException ->
