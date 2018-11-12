@@ -23,11 +23,7 @@ private fun processElement(ele: AnnotatedElement, foci: List<Focus>): String = f
   """
       |inline val ${ele.sourceClassName}.Companion.${focus.paramName}: $Optional<${ele.sourceClassName}, $targetClassName> inline get()= $Optional(
       |  getOrModify = $getOrModify,
-      |  set = { value: $targetClassName ->
-      |    { ${ele.sourceName}: ${ele.sourceClassName} ->
-      |      $set
-      |    }
-      |  }
+      |  set = { ${ele.sourceName}: ${ele.sourceClassName}, value: $targetClassName -> $set }
       |)
       |""".trimMargin()
 }

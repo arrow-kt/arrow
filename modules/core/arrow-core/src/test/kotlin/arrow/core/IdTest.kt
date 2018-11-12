@@ -1,4 +1,4 @@
-package arrow.data
+package arrow.core
 
 import arrow.core.Id
 import arrow.instances.id.applicative.applicative
