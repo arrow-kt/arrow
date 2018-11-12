@@ -9,14 +9,7 @@ import arrow.effects.flowablek.effect.effect
 import arrow.effects.flowablek.monad.monad
 import arrow.effects.flowablek.monadDefer.monadDefer
 import arrow.effects.flowablek.monadError.monadError
-import arrow.effects.typeclasses.Async
-import arrow.effects.typeclasses.Bracket
-import arrow.effects.typeclasses.ConcurrentEffect
-import arrow.effects.typeclasses.Disposable
-import arrow.effects.typeclasses.Effect
-import arrow.effects.typeclasses.ExitCase
-import arrow.effects.typeclasses.MonadDefer
-import arrow.effects.typeclasses.Proc
+import arrow.effects.typeclasses.*
 import arrow.extension
 import arrow.typeclasses.*
 import io.reactivex.BackpressureStrategy

@@ -1,12 +1,7 @@
 package arrow.data
 
 import arrow.Kind
-import arrow.core.Either
-import arrow.core.ForId
-import arrow.core.ForTry
-import arrow.core.Id
-import arrow.core.Try
-import arrow.core.fix
+import arrow.core.*
 import arrow.effects.ForIO
 import arrow.effects.IO
 import arrow.effects.instances.io.applicativeError.attempt

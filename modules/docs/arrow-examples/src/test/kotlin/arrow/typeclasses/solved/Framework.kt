@@ -7,13 +7,7 @@ import arrow.core.Try
 import arrow.core.left
 import arrow.core.right
 import arrow.effects.typeclasses.Async
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.ApplicativeError
-import arrow.typeclasses.DaoDatabase
-import arrow.typeclasses.Index
-import arrow.typeclasses.NetworkModule
-import arrow.typeclasses.UserDao
-import arrow.typeclasses.UserDto
+import arrow.typeclasses.*
 
 // Step 0 - extract interface
 

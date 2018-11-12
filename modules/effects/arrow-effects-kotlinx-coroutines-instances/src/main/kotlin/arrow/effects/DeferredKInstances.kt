@@ -4,21 +4,9 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.effects.deferredk.applicative.applicative
-import arrow.effects.typeclasses.Async
-import arrow.effects.typeclasses.Bracket
-import arrow.effects.typeclasses.ConcurrentEffect
-import arrow.effects.typeclasses.Disposable
-import arrow.effects.typeclasses.Effect
-import arrow.effects.typeclasses.ExitCase
-import arrow.effects.typeclasses.MonadDefer
-import arrow.effects.typeclasses.Proc
+import arrow.effects.typeclasses.*
 import arrow.extension
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.ApplicativeError
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadError
-import arrow.typeclasses.Traverse
+import arrow.typeclasses.*
 import kotlin.coroutines.CoroutineContext
 import arrow.effects.handleErrorWith as deferredHandleErrorWith
 import arrow.effects.runAsync as deferredRunAsync

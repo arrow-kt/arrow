@@ -1,10 +1,6 @@
 package arrow.effects
 
-import arrow.core.Either
-import arrow.core.Eval
-import arrow.core.Left
-import arrow.core.Predicate
-import arrow.core.Right
+import arrow.core.*
 import arrow.effects.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.Proc

@@ -1,18 +1,8 @@
 package arrow.instances
 
 import arrow.Kind
-import arrow.core.Either
-import arrow.core.ForId
-import arrow.core.Id
-import arrow.core.Tuple2
-import arrow.core.andThen
-import arrow.data.ForKleisli
-import arrow.data.Kleisli
-import arrow.data.KleisliOf
-import arrow.data.KleisliPartialOf
-import arrow.data.ReaderApi
-import arrow.data.ReaderPartialOf
-import arrow.data.fix
+import arrow.core.*
+import arrow.data.*
 import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.instances.id.applicative.applicative
@@ -21,15 +11,7 @@ import arrow.instances.id.monad.monad
 import arrow.instances.kleisli.applicative.applicative
 import arrow.instances.kleisli.functor.functor
 import arrow.instances.kleisli.monad.monad
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.ApplicativeError
-import arrow.typeclasses.Conested
-import arrow.typeclasses.Contravariant
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadError
-import arrow.typeclasses.conest
-import arrow.typeclasses.counnest
+import arrow.typeclasses.*
 
 @extension
 interface KleisliFunctorInstance<F, D> : Functor<KleisliPartialOf<F, D>> {

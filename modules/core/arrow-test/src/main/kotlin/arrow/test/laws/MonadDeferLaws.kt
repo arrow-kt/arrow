@@ -1,11 +1,7 @@
 package arrow.test.laws
 
 import arrow.Kind
-import arrow.core.Either
-import arrow.core.Left
-import arrow.core.Right
-import arrow.core.Try
-import arrow.core.recover
+import arrow.core.*
 import arrow.effects.data.internal.BindingCancellationException
 import arrow.effects.typeclasses.MonadDefer
 import arrow.test.concurrency.SideEffect
