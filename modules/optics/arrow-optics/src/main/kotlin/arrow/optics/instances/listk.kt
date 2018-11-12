@@ -4,12 +4,15 @@ import arrow.Kind
 import arrow.core.*
 import arrow.data.*
 import arrow.extension
+import arrow.instances.option.applicative.applicative
 import arrow.optics.Optional
 import arrow.optics.POptional
+import arrow.optics.Prism
 import arrow.optics.Traversal
 import arrow.optics.typeclasses.Each
 import arrow.optics.typeclasses.FilterIndex
 import arrow.optics.typeclasses.Index
+import arrow.optics.typeclasses.Snoc
 import arrow.typeclasses.Applicative
 
 /**
@@ -55,4 +58,22 @@ interface ListKIndexInstance<A> : Index<ListK<A>, Int, A> {
     getOrModify = { it.getOrNull(i)?.right() ?: it.left() },
     set = { a -> { l -> l.mapIndexed { index: Int, aa: A -> if (index == i) a else aa }.k() } }
   )
+}
+
+/**
+ * [Snoc] instance definition for [ListK].
+ */
+@extension
+interface ListKSnocInstance<A> : Snoc<ListK<A>, A> {
+
+  override fun snoc() = object : Prism<ListK<A>, Tuple2<ListK<A>, A>> {
+    override fun getOrModify(s: ListK<A>): Either<ListK<A>, Tuple2<ListK<A>, A>> =
+      Option.applicative().map(Try { s.dropLast(1).k() }.toOption(), s.lastOrNull().toOption(), ::identity)
+        .fix()
+        .toEither { s }
+
+    override fun reverseGet(b: Tuple2<ListK<A>, A>): ListK<A> =
+      ListK(b.a + b.b)
+  }
+
 }

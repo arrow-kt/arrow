@@ -4,12 +4,15 @@ import arrow.Kind
 import arrow.core.*
 import arrow.data.k
 import arrow.data.traverse
+import arrow.instances.option.applicative.applicative
 import arrow.optics.Optional
 import arrow.optics.POptional
+import arrow.optics.Prism
 import arrow.optics.Traversal
 import arrow.optics.typeclasses.Each
 import arrow.optics.typeclasses.FilterIndex
 import arrow.optics.typeclasses.Index
+import arrow.optics.typeclasses.Snoc
 import arrow.typeclasses.Applicative
 
 fun <A> ListInstances.traversal(): Traversal<List<A>, A> = ListTraversal()
@@ -91,4 +94,28 @@ interface ListIndexInstance<A> : Index<List<A>, Int, A> {
 
     operator fun <A> invoke() = object : ListIndexInstance<A> {}
   }
+}
+
+fun <A> ListInstances.snoc(): Snoc<List<A>, A> = ListSnocInstance()
+
+/**
+ * [Snoc] instance definition for [List].
+ */
+interface ListSnocInstance<A> : Snoc<List<A>, A> {
+
+  override fun snoc() = object : Prism<List<A>, Tuple2<List<A>, A>> {
+    override fun getOrModify(s: List<A>): Either<List<A>, Tuple2<List<A>, A>> =
+      Option.applicative().map(Try { s.dropLast(1) }.toOption(), s.lastOrNull().toOption(), ::identity)
+        .fix()
+        .toEither { s }
+
+    override fun reverseGet(b: Tuple2<List<A>, A>): List<A> =
+      b.a + b.b
+  }
+
+  companion object {
+
+    operator fun <A> invoke() = object : ListSnocInstance<A> {}
+  }
+
 }
