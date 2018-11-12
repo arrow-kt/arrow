@@ -138,6 +138,12 @@ Datatypes: [`Fix`]({{ '/docs/recursion/fix/' | relative_url }}), [`Mu`]({{ '/doc
 
 Typeclasses: [`Corecursive`]({{ '/docs/recursion/corecursive/' | relative_url }}), [`Recursive`]({{ '/docs/recursion/recursive/' | relative_url }}), [`Birecursive`]({{ '/docs/recursion/birecursive/' | relative_url }})
 
+### arrow-integration-retrofit-adapter
+{:.advanced}
+advanced
+
+The [adapter]({{ 'docs/integrations/retrofit/' | relative_url }}) is a library that adds integration with Retrofit, providing extensions functions and/or classes to work with Retrofit by encapsulating the responses in the chosen datatypes, through the use of typeclasses.
+
 ### arrow-free
 
 {:.advanced}
