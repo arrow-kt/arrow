@@ -18,14 +18,12 @@ fun <K, V> MapInstances.at(): At<Map<K, V>, K, Option<V>> = MapAtInstance()
 interface MapAtInstance<K, V> : At<Map<K, V>, K, Option<V>> {
   override fun at(i: K): Lens<Map<K, V>, Option<V>> = PLens(
     get = { it.getOption(i) },
-    set = { optV ->
-      { map ->
-        optV.fold({
-          (map - i)
-        }, {
-          (map + (i to it))
-        })
-      }
+    set = { map, optV ->
+      optV.fold({
+        (map - i)
+      }, {
+        (map + (i to it))
+      })
     }
   )
 
@@ -111,7 +109,7 @@ fun <K, V> MapInstances.index(): Index<Map<K, V>, K, V> = MapIndexInstance()
 interface MapIndexInstance<K, V> : Index<Map<K, V>, K, V> {
   override fun index(i: K): Optional<Map<K, V>, V> = POptional(
     getOrModify = { it[i]?.right() ?: it.left() },
-    set = { v -> { m -> m.mapValues { (k, vv) -> if (k == i) v else vv } } }
+    set = { m, v -> m.mapValues { (k, vv) -> if (k == i) v else vv } }
   )
 
   companion object {
