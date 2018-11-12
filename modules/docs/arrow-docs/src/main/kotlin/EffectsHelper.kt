@@ -2,7 +2,6 @@ package arrow.effects
 
 import arrow.effects.deferredk.monad.monad
 import arrow.effects.typeclasses.Fiber
-import arrow.typeclasses.binding
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlin.coroutines.CoroutineContext

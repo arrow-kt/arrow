@@ -18,7 +18,6 @@ Using `Fiber` we can verily easily describe parallel operations such as `paralle
 import arrow.effects.*
 import arrow.effects.deferredk.monad.monad
 import arrow.effects.typeclasses.Fiber
-import arrow.typeclasses.binding
 
 fun <A, B, C> parallelMap(first: DeferredK<A>,
                      second: DeferredK<B>,
