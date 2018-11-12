@@ -72,6 +72,7 @@ sealed class TypeName : Tree() {
   }
 
   data class FunctionLiteral(
+    val modifiers: List<Modifier> = emptyList(),
     val receiverType: TypeName?,
     val parameters: List<TypeName>,
     val returnType: TypeName

@@ -4,7 +4,6 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.effects.data.internal.BindingCancellationException
 import arrow.typeclasses.MonadErrorContinuation
-import arrow.typeclasses.bindingCatch
 import arrow.typeclasses.stateStack
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.CoroutineContext

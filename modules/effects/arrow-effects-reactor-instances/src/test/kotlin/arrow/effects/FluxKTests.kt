@@ -3,14 +3,14 @@ package arrow.effects
 import arrow.effects.fluxk.async.async
 import arrow.effects.fluxk.foldable.foldable
 import arrow.effects.fluxk.functor.functor
+import arrow.effects.fluxk.monad.binding
+import arrow.effects.fluxk.monadThrow.bindingCatch
 import arrow.effects.fluxk.traverse.traverse
 import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
 import arrow.test.laws.FoldableLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
-import arrow.typeclasses.binding
-import arrow.typeclasses.bindingCatch
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import org.hamcrest.CoreMatchers.not
@@ -60,7 +60,7 @@ class FluxKTest : UnitSpec() {
     )
 
     "Multi-thread Fluxes finish correctly" {
-      val value: Flux<Int> = FluxK.monadErrorFlat().bindingCatch {
+      val value: Flux<Int> = bindingCatch {
         val a = Flux.just(0).delayElements(Duration.ofSeconds(2)).k().bind()
         a
       }.value()
@@ -73,7 +73,7 @@ class FluxKTest : UnitSpec() {
     "Multi-thread Fluxes should run on their required threads" {
       val originalThread: Thread = Thread.currentThread()
       var threadRef: Thread? = null
-      val value: Flux<Long> = FluxK.monadErrorFlat().bindingCatch {
+      val value: Flux<Long> = bindingCatch {
         val a = Flux.just(0L)
             .delayElements(Duration.ofSeconds(2), Schedulers.newSingle("newThread"))
             .k()
@@ -97,7 +97,7 @@ class FluxKTest : UnitSpec() {
     }
 
     "Flux cancellation forces binding to cancel without completing too" {
-      val value: Flux<Long> = FluxK.monadErrorFlat().binding {
+      val value: Flux<Long> = binding {
         val a = Flux.just(0L).delayElements(Duration.ofSeconds(3)).k().bind()
         a
       }.value()

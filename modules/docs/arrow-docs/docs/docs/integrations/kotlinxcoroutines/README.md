@@ -170,8 +170,10 @@ Note that [`MonadDefer`]({{ '/docs/effects/monaddefer' | relative_url }}) provid
 Invoking this `Disposable` causes an `BindingCancellationException` in the chain which needs to be handled by the subscriber, similarly to what `Deferred` does.
 
 ```kotlin
+import arrow.effects.instances.defferred.monad.*
+
 val (deferred, unsafeCancel) =
-  DeferredK.monadDefer().bindingCancellable {
+  bindingCancellable {
     val userProfile = DeferredK { getUserProfile("123") }.bind()
     val friendProfiles = userProfile.friends().map { friend ->
         DeferredK { getProfile(friend.id) }.bind()

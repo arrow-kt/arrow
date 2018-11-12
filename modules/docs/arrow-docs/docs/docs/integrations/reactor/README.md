@@ -130,8 +130,10 @@ Note that [`MonadDefer`]({{ '/docs/effects/monaddefer' | relative_url }}) provid
 Invoking this `Disposable` causes an `BindingCancellationException` in the chain which needs to be handled by the subscriber, similarly to what `Deferred` does.
 
 ```kotlin
+import arrow.effects.instances.defferred.monad.*
+
 val (flux, disposable) =
-  FluxK.monadDefer().bindingCancellable {
+  bindingCancellable {
     val userProfile = Flux.create { getUserProfile("123") }
     val friendProfiles = userProfile.friends().map { friend ->
         bindDefer { getProfile(friend.id) }

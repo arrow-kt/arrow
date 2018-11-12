@@ -14,7 +14,6 @@ import arrow.instances.option.monad.monad
 import arrow.test.UnitSpec
 import arrow.test.laws.EqLaws
 import arrow.test.laws.MonadLaws
-import arrow.typeclasses.binding
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import org.junit.runner.RunWith

@@ -94,6 +94,9 @@ interface FluxKMonadErrorInstance :
 }
 
 @extension
+interface FluxKMonadThrowInstance : MonadThrow<ForFluxK>, FluxKMonadErrorInstance
+
+@extension
 interface FluxKMonadDeferInstance :
   MonadDefer<ForFluxK>,
   FluxKMonadErrorInstance {

@@ -2,7 +2,6 @@ package arrow.test.laws
 
 import arrow.Kind
 import arrow.mtl.typeclasses.MonadFilter
-import arrow.mtl.typeclasses.bindingFilter
 import arrow.test.generators.genApplicative
 import arrow.test.generators.genConstructor
 import arrow.test.generators.genFunctionAToB

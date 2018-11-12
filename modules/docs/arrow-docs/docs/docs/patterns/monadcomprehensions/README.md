@@ -87,7 +87,7 @@ import arrow.effects.*
 import arrow.typeclasses.*
 import arrow.effects.instances.io.monad.*
 
-IO.monad().binding {
+binding {
   1
 }.fix().unsafeRunSync()
 ```
@@ -96,7 +96,7 @@ Anything in the function inside `binding` can be imperative and sequential code 
 In the case of [`IO`]({{ '/docs/effects/io' | relative_url }}), it is immediately run blocking the current thread using `unsafeRunSync()`. Let's expand the example by adding a second operation:
 
 ```kotlin
-IO.monad().binding {
+binding {
   val a = IO.invoke { 1 }
   a + 1
 }.fix().unsafeRunSync()
@@ -109,14 +109,14 @@ This will block the current thread until the operation completes. What we want i
 For that we have two flavors of the function `bind()`, which is a function only available inside the function passed to `binding()`.
 
 ```kotlin:ank
-IO.monad().binding {
+binding {
   val a = IO.invoke { 1 }.bind()
   a + 1
 }.fix().unsafeRunSync()
 ```
 
 ```kotlin:ank
-IO.monad().binding {
+binding {
   val a = bind { IO.invoke { 1 } }
   a + 1
 }.fix().unsafeRunSync()
@@ -137,7 +137,7 @@ With this new style we can rewrite our original example of database fetching as:
 
 ```kotlin
 val university: IO<University> = 
-  IO.monad().binding {
+  binding {
     val student = getStudentFromDatabase("Bob Roxx").bind()
     val university = getUniversityFromDatabase(student.universityId).bind()
     val dean = getDeanFromDatabase(university.deanId).bind()
@@ -149,7 +149,7 @@ And you can still write your usual imperative code in the binding block, interle
 
 ```kotlin
 fun getNLines(path: FilePath, count: Int): IO<List<String>> = 
-  IO.monad().binding {
+  binding {
     val file = getFile(path).bind()
     val lines = file.readLines().bind()
     if (lines.length < count) {
@@ -171,7 +171,7 @@ Let's take a somewhat common mistake and expand on it:
 
 ```kotlin
 fun getLineLengthAverage(path: FilePath): IO<List<String>> = 
-  IO.monad().binding {
+  binding {
     val file = getFile(path).bind()
     val lines = file.readLines().bind()
     val count = lines.map { it.length }.foldLeft(0) { acc, lineLength -> acc + lineLength }
@@ -190,7 +190,7 @@ It also contains a version of comprehensions that automatically wraps exceptions
 
 ```kotlin
 fun getLineLengthAverage(path: FilePath): IO<List<String>> = 
-  IO.monadError().bindingCatch {
+  bindingCatch {
     val file = getFile(path).bind()
     val lines = file.readLines().bind()
     val count = lines.map { it.length }.foldLeft(0) { acc, lineLength -> acc + lineLength }
@@ -223,7 +223,7 @@ val ioThreadContext = newSingleThreadContext("IO")
 val computationThreadContext = newSingleThreadContext("Computation")
 
 fun getLineLengthAverage(path: FilePath): IO<List<String>> = 
-  IO.monadError().bindingCatch {
+  bindingCatch {
     
     // Implicitly wrap the result of a synchronous operation into IO.just() using bindIn
     val file = bindIn(ioThreadContext) { getFile(path) }    
