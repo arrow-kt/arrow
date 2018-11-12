@@ -55,6 +55,9 @@ interface TryMonadErrorInstance : MonadError<ForTry, Throwable>, TryMonadInstanc
 }
 
 @extension
+interface TryMonadThrowInstance : MonadThrow<ForTry>, TryMonadErrorInstance
+
+@extension
 interface TryEqInstance<A> : Eq<Try<A>> {
 
   fun EQA(): Eq<A>

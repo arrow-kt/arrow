@@ -138,7 +138,7 @@ ForNonEmptyList extensions {
 - `NonEmptyList` is __used to model lists that guarantee at least one element__
 - We can easily construct values of `NonEmptyList` with `NonEmptyList.of`
 - `foldLeft`, `map`, `flatMap` and others are used to compute over the internal contents of a `NonEmptyList` value.
-- `NonEmptyList.monad().binding { ... } Comprehensions` can be __used to imperatively compute__ over multiple `NonEmptyList` values in sequence.
+- `binding { ... } Comprehensions` can be __used to imperatively compute__ over multiple `NonEmptyList` values in sequence.
 - `NonEmptyList.applicative().map { ... }` can be used to compute over multiple `NonEmptyList` values preserving type information and __abstracting over arity__ with `map`
 
 ## Available Instances

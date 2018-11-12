@@ -8,7 +8,6 @@ import arrow.free.Free
 import arrow.free.map
 import arrow.instances.listk.traverse.traverse
 import arrow.typeclasses.Traverse
-import arrow.typeclasses.binding
 import org.intellij.markdown.ast.ASTNode
 import java.io.File
 

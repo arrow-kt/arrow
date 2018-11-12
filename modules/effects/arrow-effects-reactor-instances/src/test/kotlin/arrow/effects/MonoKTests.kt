@@ -2,10 +2,10 @@ package arrow.effects
 
 import arrow.effects.monok.async.async
 import arrow.effects.monok.monadError.monadError
+import arrow.effects.monok.monadThrow.bindingCatch
 import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
 import arrow.typeclasses.Eq
-import arrow.typeclasses.bindingCatch
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import org.hamcrest.CoreMatchers.not
@@ -52,7 +52,7 @@ class MonoKTest : UnitSpec() {
     )
 
     "Multi-thread Singles finish correctly" {
-      val value: Mono<Long> = MonoK.monadError().bindingCatch {
+      val value: Mono<Long> = bindingCatch {
         val a = Mono.just(0L).delayElement(Duration.ofSeconds(2)).k().bind()
         a
       }.value()
@@ -65,7 +65,7 @@ class MonoKTest : UnitSpec() {
     "Multi-thread Fluxes should run on their required threads" {
       val originalThread = Thread.currentThread()
       var threadRef: Thread? = null
-      val value: Mono<Long> = MonoK.monadError().bindingCatch {
+      val value: Mono<Long> = bindingCatch {
         val a = Mono.just(0L)
             .delayElement(Duration.ofSeconds(2), Schedulers.newSingle("newThread"))
             .k()
@@ -90,7 +90,7 @@ class MonoKTest : UnitSpec() {
 
 
     "Single dispose forces binding to cancel without completing too" {
-      val value: Mono<Long> = MonoK.monadError().bindingCatch {
+      val value: Mono<Long> = bindingCatch {
         val a = Mono.just(0L).delayElement(Duration.ofSeconds(3)).k().bind()
         a
       }.value()
