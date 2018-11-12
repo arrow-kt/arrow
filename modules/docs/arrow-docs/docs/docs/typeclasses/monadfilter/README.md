@@ -97,7 +97,7 @@ ForOption extensions {
 ```
 
 ```kotlin:ank
-ListK.monadFilter().bindingFilter {
+bindingFilter {
  val a = listOf(1).k().bind()
  val b = listOf(1).k().bindWithFilter { it == a } //continues
  a + b
@@ -107,7 +107,9 @@ ListK.monadFilter().bindingFilter {
 When `bindWithFilter` returns `false` the computation short circuits yielding the monad's empty value
 
 ```kotlin:ank
-Option.monadFilter().bindingFilter {
+import arrow.mtl.instances.option.monadFilter.*
+
+bindingFilter {
  val a = Option(0).bind()
  val b = Option(1).bindWithFilter { it == a } //short circuits because a is 0
  a + b
@@ -115,7 +117,9 @@ Option.monadFilter().bindingFilter {
 ```   
 
 ```kotlin:ank
-ListK.monadFilter().bindingFilter {
+import arrow.mtl.instances.listk.monadFilter.*
+
+bindingFilter {
  val a = listOf(0).k().bind()
  val b = listOf(1).k().bindWithFilter { it == a } //short circuits because a is 0
  a + b

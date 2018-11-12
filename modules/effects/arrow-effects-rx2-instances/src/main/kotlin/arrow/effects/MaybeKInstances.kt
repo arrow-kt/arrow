@@ -93,6 +93,9 @@ interface MaybeKMonadErrorInstance :
 }
 
 @extension
+interface MaybeKMonadThrowInstance : MonadThrow<ForMaybeK>, MaybeKMonadErrorInstance
+
+@extension
 interface MaybeKMonadDeferInstance :
   MonadDefer<ForMaybeK>,
   MaybeKMonadErrorInstance {

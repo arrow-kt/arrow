@@ -2,7 +2,7 @@
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core)
 [![Build Status](https://travis-ci.org/arrow-kt/arrow.svg?branch=master)](https://travis-ci.org/arrow-kt/arrow/)
-[![Kotlin version badge](https://img.shields.io/badge/kotlin-1.2.51-blue.svg)](http://kotlinlang.org/)
+[![Kotlin version badge](https://img.shields.io/badge/kotlin-1.3-blue.svg)](https://kotlinlang.org/docs/reference/whatsnew13.html)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 [![codecov](https://codecov.io/gh/arrow-kt/arrow/branch/master/graph/badge.svg)](https://codecov.io/gh/arrow-kt/arrow)
 
@@ -44,7 +44,7 @@ allprojects {
 Add the dependencies into the project's `build.gradle`
 
 ```groovy
-def arrow_version = "0.8.0"
+def arrow_version = "0.8.1"
 dependencies {
     compile "io.arrow-kt:arrow-core:$arrow_version"
     compile "io.arrow-kt:arrow-syntax:$arrow_version"
@@ -84,7 +84,7 @@ Add the dependencies into the project's `build.gradle`
 apply plugin: 'kotlin-kapt' //optional
 apply from: rootProject.file('gradle/generated-kotlin-sources.gradle') //only for Android projects
 
-def arrow_version = "0.8.0"
+def arrow_version = "0.8.1"
 dependencies {
     ...
     kapt    'io.arrow-kt:arrow-annotations-processor:$arrow_version' //optional

@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.*
 import arrow.effects.data.internal.IOCancellationException
 import arrow.effects.instances.io.async.async
+import arrow.effects.instances.io.monad.binding
 import arrow.effects.instances.io.monad.monad
 import arrow.effects.typeclasses.milliseconds
 import arrow.effects.typeclasses.seconds
@@ -12,7 +13,6 @@ import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.laws.AsyncLaws
 import arrow.typeclasses.Eq
-import arrow.typeclasses.binding
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
@@ -367,7 +367,7 @@ class IOTest : UnitSpec() {
     }
 
     "IO.binding should for comprehend over IO" {
-      val result = IO.monad().binding {
+      val result = binding {
         val x = IO.just(1).bind()
         val y = bind { IO { x + 1 } }
         y

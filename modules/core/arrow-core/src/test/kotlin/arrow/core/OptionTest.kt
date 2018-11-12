@@ -35,6 +35,7 @@ class OptionTest : UnitSpec() {
       ShowLaws.laws(Option.show(), Option.eq(Int.eq())) { Some(it) },
       MonoidLaws.laws(Option.monoid(Int.monoid()), Some(1), Option.eq(Int.eq())),
       //testLaws(MonadErrorLaws.laws(monadError<ForOption, Unit>(), Eq.any(), EQ_EITHER)) TODO reenable once the MonadErrorLaws are parametric to `E`
+      FunctorFilterLaws.laws(Option.traverseFilter(), {Option(it)}, Eq.any()),
       TraverseFilterLaws.laws(Option.traverseFilter(), Option.applicative(), ::Some, Eq.any()),
       MonadFilterLaws.laws(Option.monadFilter(), ::Some, Eq.any())
     )

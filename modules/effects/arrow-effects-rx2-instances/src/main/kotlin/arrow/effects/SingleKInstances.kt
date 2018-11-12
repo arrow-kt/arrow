@@ -67,6 +67,9 @@ interface SingleKMonadErrorInstance :
 }
 
 @extension
+interface SingleKMonadThrowInstance : MonadThrow<ForSingleK>, SingleKMonadErrorInstance
+
+@extension
 interface SingleKMonadDeferInstance :
   MonadDefer<ForSingleK>,
   SingleKMonadErrorInstance {

@@ -51,6 +51,7 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
       is TypeName.WildcardType -> removeConstrains()
       is TypeName.ParameterizedType -> removeConstrains()
       is TypeName.Classy -> removeConstrains()
+      is TypeName.FunctionLiteral -> removeConstrains()
     }
 
   /**
@@ -93,9 +94,9 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
   /**
    * @see [MetaApi.removeConstrains]
    */
-  override fun Func.removeConstrains(): Func =
+  override fun Func.removeConstrains(keepModifiers: Set<Modifier>): Func =
     copy(
-      modifiers = emptyList(),
+      modifiers = modifiers.filterNot { it !in keepModifiers },
       annotations = emptyList(),
       receiverType = receiverType?.removeConstrains(),
       returnType = returnType?.removeConstrains(),
@@ -206,12 +207,25 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
    * and [MetaApi.getDownKind] as needed
    * ex: Kind<ForSetK, A> -> Set<A>
    */
+  fun TypeName.FunctionLiteral.wrap(wrapped: Pair<TypeName, TypeName.ParameterizedType>): TypeName.FunctionLiteral =
+    copy(
+      receiverType = receiverType?.wrap(wrapped),
+      parameters = parameters.map { it.wrap(wrapped) },
+      returnType = returnType.wrap(wrapped)
+    )
+
+  /**
+   * Applies replacement on a type recursively changing it's wrapper type for it's wrapped type
+   * and [MetaApi.getDownKind] as needed
+   * ex: Kind<ForSetK, A> -> Set<A>
+   */
   fun TypeName.wrap(wrapped: Pair<TypeName, TypeName.ParameterizedType>): TypeName =
     when (this) {
       is TypeName.TypeVariable -> wrap(wrapped)
       is TypeName.WildcardType -> wrap(wrapped)
       is TypeName.ParameterizedType -> wrap(wrapped)
       is TypeName.Classy -> wrap(wrapped)
+      is TypeName.FunctionLiteral -> wrap(wrapped)
     }
 
   /**
@@ -222,7 +236,12 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
   fun Func.wrap(wrappedType: Pair<TypeName, TypeName.ParameterizedType>? = null): Func =
     wrappedType?.let { wrapped ->
       val receiverType = receiverType?.downKind?.wrap(wrapped)
-      val parameters = parameters.map { it.copy(type = it.type.downKind.wrap(wrapped)) }
+      val parameters = parameters.map {
+        when (it.type) {
+          is TypeName.FunctionLiteral -> it.copy(type = it.type.wrap(wrapped))
+          else -> it.copy(type = it.type.downKind.wrap(wrapped))
+        }
+      }
       val returnType = returnType?.downKind?.wrap(wrapped)
       copy(
         receiverType = receiverType,
@@ -250,6 +269,7 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
       is TypeName.WildcardType -> null
       is TypeName.ParameterizedType -> rawType.type
       is TypeName.Classy -> getTypeElement(fqName, elementUtils)?.asMetaType()
+      is TypeName.FunctionLiteral -> null
     }
 
   /**
@@ -309,6 +329,7 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
       is TypeName.WildcardType -> nestedTypeVariables
       is TypeName.ParameterizedType -> nestedTypeVariables
       is TypeName.Classy -> nestedTypeVariables
+      is TypeName.FunctionLiteral -> nestedTypeVariables
     }
 
   /**
@@ -333,6 +354,7 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
         is TypeName.WildcardType -> witness.name
         is TypeName.ParameterizedType -> witness.name
         is TypeName.Classy -> witness.fqName
+        is TypeName.FunctionLiteral -> witness.simpleName
       }
       copy(name = fullName, rawType = fullName.asClassy(), typeArguments = tail)
     } else this
@@ -355,7 +377,8 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
       this
     } else {
       name.downKind().let { (pckg, unPrefixedName) ->
-        copy(
+        if (pckg.isBlank()) this
+        else copy(
           name = "$pckg.$unPrefixedName",
           lowerBounds = lowerBounds.map { it.downKind },
           upperBounds = upperBounds.map { it.downKind }
@@ -377,6 +400,7 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
       is TypeName.WildcardType -> typeName.downKind.asKotlin()
       is TypeName.ParameterizedType -> typeName.downKind.asKotlin()
       is TypeName.Classy -> typeName.downKind.asKotlin()
+      is TypeName.FunctionLiteral -> typeName.downKind.asKotlin()
     }
 
   /**
@@ -394,6 +418,7 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
       is TypeName.WildcardType -> asKotlin()
       is TypeName.ParameterizedType -> asKotlin()
       is TypeName.Classy -> asKotlin()
+      is TypeName.FunctionLiteral -> asKotlin()
     }
 
   /**
@@ -574,4 +599,19 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
     }
   }
 
+  override fun TypeName.FunctionLiteral.removeConstrains(): TypeName.FunctionLiteral =
+    this
+
+  override val TypeName.FunctionLiteral.downKind: TypeName.FunctionLiteral
+    get() = copy(
+      receiverType = receiverType?.downKind,
+      parameters = parameters.map { it.downKind },
+      returnType = returnType.downKind
+    )
+
+  override val TypeName.FunctionLiteral.nestedTypeVariables: List<TypeName>
+    get() = emptyList()
+
+  override fun TypeName.FunctionLiteral.asKotlin(): TypeName.FunctionLiteral =
+    this
 }

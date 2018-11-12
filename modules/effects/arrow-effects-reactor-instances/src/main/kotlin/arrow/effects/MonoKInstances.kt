@@ -67,6 +67,9 @@ interface MonoKMonadErrorInstance :
 }
 
 @extension
+interface MonoKMonadThrowInstance : MonadThrow<ForMonoK>, MonoKMonadErrorInstance
+
+@extension
 interface MonoKMonadDeferInstance :
   MonadDefer<ForMonoK>,
   MonoKMonadErrorInstance {

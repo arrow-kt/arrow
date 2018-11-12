@@ -12,6 +12,7 @@ import arrow.instances.`try`.traverse.traverse
 import arrow.instances.combine
 import arrow.instances.monoid
 import arrow.instances.semigroup
+import arrow.mtl.instances.`try`.functorFilter.functorFilter
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
@@ -36,7 +37,8 @@ class TryTest : UnitSpec() {
       EqLaws.laws(EQ) { Try.just(it) },
       ShowLaws.laws(Try.show(), EQ) { Try.just(it) },
       MonadErrorLaws.laws(Try.monadError(), Eq.any(), Eq.any()),
-      TraverseLaws.laws(Try.traverse(), Try.functor(), ::Success, Eq.any())
+      TraverseLaws.laws(Try.traverse(), Try.functor(), ::Success, Eq.any()),
+      FunctorFilterLaws.laws(Try.functorFilter(), { Try.just(it) }, Eq.any())
     )
 
     "empty should return a Success of the empty of the inner type" {

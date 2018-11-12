@@ -5,8 +5,8 @@ import arrow.core.*
 import arrow.instances.`try`.applicative.applicative
 import arrow.instances.`try`.functor.functor
 import arrow.instances.option.applicative.applicative
+import arrow.instances.option.monad.binding
 import arrow.instances.option.monad.monad
-import arrow.typeclasses.binding
 import io.kotlintest.matchers.Matcher
 import io.kotlintest.matchers.Result
 import io.kotlintest.matchers.shouldBe
@@ -65,7 +65,7 @@ class DataTypeExamples : FreeSpec() { init {
 
     "Monad" {
       // Computing over dependent values ignoring absence
-      val six = Option.monad().binding {
+      val six = binding {
         val a = Option(1).bind()
         val b = Option(1 + a).bind()
         val c = Option(1 + b).bind()
@@ -73,7 +73,7 @@ class DataTypeExamples : FreeSpec() { init {
       }
       six shouldBe Some(6)
 
-      val none = Option.monad().binding {
+      val none = binding {
         val a = Option(1).bind()
         val b = noneValue.bind()
         val c = Option(1 + b).bind()

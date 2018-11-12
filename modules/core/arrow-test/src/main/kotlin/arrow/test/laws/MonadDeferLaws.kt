@@ -4,7 +4,6 @@ import arrow.Kind
 import arrow.core.*
 import arrow.effects.data.internal.BindingCancellationException
 import arrow.effects.typeclasses.MonadDefer
-import arrow.effects.typeclasses.bindingCancellable
 import arrow.test.concurrency.SideEffect
 import arrow.test.generators.genIntSmall
 import arrow.test.generators.genThrowable
@@ -42,7 +41,7 @@ object MonadDeferLaws {
 
   fun <F> MonadDefer<F>.asyncBindError(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(genThrowable()) { e: Throwable ->
-      val (bound: Kind<F, Int>, _) = bindingCancellable<F, Int> {
+      val (bound: Kind<F, Int>, _) = bindingCancellable<Int> {
         bindDefer { throw e }
       }
       bound.equalUnderTheLaw(raiseError(e), EQ)
@@ -61,7 +60,7 @@ object MonadDeferLaws {
 
   fun <F> MonadDefer<F>.asyncBindUnsafeError(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(genThrowable()) { e: Throwable ->
-      val (bound: Kind<F, Int>, _) = bindingCancellable<F, Int> {
+      val (bound: Kind<F, Int>, _) = bindingCancellable<Int> {
         bindDeferUnsafe { Left(e) }
       }
       bound.equalUnderTheLaw(raiseError(e), EQ)
