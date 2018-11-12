@@ -1,7 +1,10 @@
 dependencies {
     compile 'io.github.classgraph:classgraph:4.4.12'
+    compile project(':arrow-instances-core')
     compile project(':arrow-instances-data')
+    compile project(':arrow-effects-instances')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
+    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
     compile project(':arrow-annotations')
     kapt project(':arrow-annotations-processor')
     kaptTest project(':arrow-annotations-processor')
