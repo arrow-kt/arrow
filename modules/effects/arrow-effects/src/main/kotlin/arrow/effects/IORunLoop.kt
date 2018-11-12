@@ -358,7 +358,7 @@ internal object IORunLoop {
     }
 
     override operator fun invoke(either: Either<Throwable, Any?>): Unit {
-      if (canCall && !conn.isCanceled()) {
+      if (canCall) {
         canCall = false
         when (either) {
           is Either.Left -> loop(IO.RaiseError(either.a), conn, cb, this, bFirst, bRest)
