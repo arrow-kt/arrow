@@ -9,15 +9,13 @@ import kotlinx.coroutines.Dispatchers.Unconfined
 
 val UI = Unconfined
 
-fun <A> DeferredKOf<A>.startF(ctx: CoroutineContext = Dispatchers.Default): DeferredK<Fiber<ForDeferredK, A>> {
-  return this.fix().scope.run {
+fun <A> DeferredKOf<A>.startF(ctx: CoroutineContext = Dispatchers.Default): DeferredK<Fiber<ForDeferredK, A>> = this.fix().scope.run {
     val start = asyncK(ctx = ctx, start = CoroutineStart.DEFAULT) {
       this@startF.await()
     }
 
     DeferredK.just(Fiber(start, asyncK { start.cancel() }))
   }
-}
 
 fun DeferredK.Companion.sleep(milis: Long, scope: CoroutineScope = GlobalScope): DeferredK<Unit> =
   scope.asyncK {

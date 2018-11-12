@@ -1,7 +1,6 @@
 package arrow.effects.typeclasses
 
 import arrow.Kind
-import arrow.effects.IO
 
 /**
  * [Fiber] represents the pure result of an [Async] data type
