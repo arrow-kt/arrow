@@ -1,22 +1,13 @@
 package arrow.effects.internal
 
 import arrow.Kind
-import arrow.core.Either
-import arrow.core.Tuple2
-import arrow.core.Tuple3
-import arrow.core.left
-import arrow.core.right
-import arrow.core.toT
+import arrow.core.*
 import arrow.effects.typeclasses.ConcurrentEffect
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.Effect
 import arrow.effects.typeclasses.Proc
+import kotlin.coroutines.*
 import kotlin.coroutines.Continuation
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
-import kotlin.coroutines.startCoroutine
-import kotlin.coroutines.suspendCoroutine
 import arrow.core.Continuation as AContinuation
 
 /* See parMap3 */
