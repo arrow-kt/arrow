@@ -142,7 +142,7 @@ Typeclasses: [`Corecursive`]({{ '/docs/recursion/corecursive/' | relative_url }}
 {:.advanced}
 advanced
 
-The [adapter]({{ 'docs/integrations/retrofit/' | relative_url }}) is a library that adds integration with Retrofit, providing extensions functions and/or classes to work with Retrofit by encapsulating the responses in the chosen Monads.
+The [adapter]({{ 'docs/integrations/retrofit/' | relative_url }}) is a library that adds integration with Retrofit, providing extensions functions and/or classes to work with Retrofit by encapsulating the responses in the chosen datatypes, through the use of typeclasses.
 
 ### arrow-free
 
