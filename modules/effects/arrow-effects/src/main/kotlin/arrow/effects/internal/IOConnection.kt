@@ -6,11 +6,7 @@ import arrow.effects.fix
 import arrow.effects.typeclasses.Disposable
 import java.util.concurrent.atomic.AtomicReference
 
-fun IOConnection.toDisposable(): Disposable = object : Disposable {
-  override fun invoke() {
-    this@toDisposable.cancel()
-  }
-}
+fun IOConnection.toDisposable(): Disposable = { cancel().fix().unsafeRunSync() }
 
 /**
  * Represents a composite of functions (meant for cancellation) that are stacked. cancel() is idempotent,
@@ -82,8 +78,8 @@ sealed class IOConnection {
 
     override fun cancel(): CancelToken<ForIO> = IO.defer {
       state.getAndSet(null).let { list ->
-        when (list) {
-          null, listOf<CancelToken<ForIO>>() -> IO.unit
+        when {
+          list == null || list.isEmpty() -> IO.unit
           else -> CancelUtils.cancelAll(list.iterator())
         }
       }
