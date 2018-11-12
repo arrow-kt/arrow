@@ -69,6 +69,9 @@ interface IOMonadErrorInstance : MonadError<ForIO, Throwable>, IOMonadInstance {
 }
 
 @extension
+interface IOMonadThrowInstance : MonadThrow<ForIO>, IOMonadErrorInstance
+
+@extension
 interface IOMonadDeferInstance : MonadDefer<ForIO>, IOMonadErrorInstance {
   override fun <A> defer(fa: () -> IOOf<A>): IO<A> =
     IO.defer(fa)

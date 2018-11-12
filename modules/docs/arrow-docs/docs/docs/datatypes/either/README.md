@@ -344,7 +344,7 @@ tupled(Either.Right(1), Either.Right("a"), Either.Right(2.0))
 ```kotlin
 import arrow.instances.either.monad.*
 
-Either.monad().binding {
+binding {
   val a = Either.Right(1).bind()
   val b = Either.Right(1 + a).bind()
   val c = Either.Right(1 + b).bind()

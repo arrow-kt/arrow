@@ -71,7 +71,7 @@ import arrow.instances.*
 import arrow.instances.either.monad.*
 
 fun getCountryCode(maybePerson : Either<BizError, Person>): Either<BizError, String> =
-  Either.monad<BizError>().binding { 
+  binding<BizError, String> { 
     val person = maybePerson.bind()
     val address = person.address.toEither({ AddressNotFound(person.id) }).bind()
     val country = address.country.toEither({ CountryNotFound(address.id)}).bind()
@@ -164,7 +164,7 @@ Let's look at how a similar implementation would look like using monad comprehen
 import arrow.effects.observablek.monad.*
 
 fun getCountryCode(personId: Int): ObservableK<Either<BizError, String>> =
-  ObservableK.monad().binding {
+  binding {
     val person = findPerson(personId).bind()
     val address = person.fold (
       { it.left() },

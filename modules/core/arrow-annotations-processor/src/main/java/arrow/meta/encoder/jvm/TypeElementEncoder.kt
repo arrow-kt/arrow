@@ -23,6 +23,7 @@ import javax.lang.model.element.Modifier
 import javax.lang.model.type.NoType
 import javax.lang.model.util.ElementFilter
 import javax.lang.model.util.Elements
+import kotlin.coroutines.Continuation
 
 interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, ProcessorUtils {
 
@@ -137,7 +138,36 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
     }
   }
 
-  private fun Func.fixReceiverLiterals(meta: ClassOrPackageDataWrapper.Class, protoFun: ProtoBuf.Function): Func =
+  private fun TypeName.ParameterizedType.isSuspendedContinuation(): Boolean =
+    when {
+      rawType.fqName == Function2::class.qualifiedName && typeArguments.size == 3 -> {
+        val maybeContinuation = typeArguments[1]
+        when {
+          maybeContinuation is TypeName.WildcardType &&
+            maybeContinuation.lowerBounds.isNotEmpty() -> {
+            val lowerBoundsContinuation = maybeContinuation.lowerBounds[0]
+            lowerBoundsContinuation is TypeName.ParameterizedType &&
+              lowerBoundsContinuation.rawType.fqName == Continuation::class.qualifiedName
+          }
+          else -> false
+        }
+      }
+      else -> false
+    }
+
+  private fun TypeName.ParameterizedType.asSuspendedContinuation(): TypeName.FunctionLiteral =
+    TypeName.FunctionLiteral(
+      modifiers = listOf(arrow.meta.ast.Modifier.Suspend),
+      receiverType = typeArguments[0],
+      parameters = emptyList(),
+      returnType = (typeArguments[1] as? TypeName.WildcardType)?.let {
+        it.lowerBounds[0] as? TypeName.ParameterizedType
+      }?.let {
+        it.typeArguments[0]
+      } ?: TypeName.Unit
+    )
+
+  fun Func.fixReceiverLiterals(meta: ClassOrPackageDataWrapper.Class, protoFun: ProtoBuf.Function): Func =
     copy(
       receiverType = receiverType?.fixReceiverLiterals(meta, protoFun.receiverType),
       parameters = if (parameters.size <= protoFun.valueParameterList.size)
@@ -170,7 +200,8 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
     }
     return if (
       "kotlin/ExtensionFunctionType" in jvmTypeAnnotations && typeArguments.size >= 2)
-      TypeName.FunctionLiteral(
+      if (isSuspendedContinuation()) asSuspendedContinuation()
+      else TypeName.FunctionLiteral(
         receiverType = typeArguments[0],
         parameters = typeArguments.drop(1).dropLast(1),
         returnType = typeArguments.lastOrNull() ?: TypeName.Unit

@@ -8,7 +8,6 @@ import arrow.effects.typeclasses.Async
 import arrow.test.generators.genIntSmall
 import arrow.test.generators.genThrowable
 import arrow.typeclasses.Eq
-import arrow.typeclasses.binding
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kotlinx.coroutines.newSingleThreadContext

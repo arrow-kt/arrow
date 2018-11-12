@@ -3,13 +3,13 @@ package arrow.effects
 import arrow.effects.flowablek.async.async
 import arrow.effects.flowablek.foldable.foldable
 import arrow.effects.flowablek.functor.functor
+import arrow.effects.flowablek.monadThrow.bindingCatch
 import arrow.effects.flowablek.traverse.traverse
 import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
 import arrow.test.laws.FoldableLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
-import arrow.typeclasses.bindingCatch
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldNotBe
 import io.reactivex.Flowable
@@ -76,7 +76,7 @@ class FlowableKTests : UnitSpec() {
     )
 
     "Multi-thread Flowables finish correctly" {
-      val value: Flowable<Long> = FlowableK.monadErrorFlat().bindingCatch {
+      val value: Flowable<Long> = bindingCatch {
         val a = Flowable.timer(2, TimeUnit.SECONDS).k().bind()
         a
       }.value()
@@ -88,7 +88,7 @@ class FlowableKTests : UnitSpec() {
     "Multi-thread Observables should run on their required threads" {
       val originalThread: Thread = Thread.currentThread()
       var threadRef: Thread? = null
-      val value: Flowable<Long> = FlowableK.monadErrorFlat().bindingCatch {
+      val value: Flowable<Long> = bindingCatch {
         val a = Flowable.timer(2, TimeUnit.SECONDS, Schedulers.newThread()).k().bind()
         threadRef = Thread.currentThread()
         val b = Flowable.just(a).observeOn(Schedulers.newThread()).k().bind()
@@ -104,7 +104,7 @@ class FlowableKTests : UnitSpec() {
     }
 
     "Flowable cancellation forces binding to cancel without completing too" {
-      val value: Flowable<Long> = FlowableK.monadErrorFlat().bindingCatch {
+      val value: Flowable<Long> = bindingCatch {
         val a = Flowable.timer(3, TimeUnit.SECONDS).k().bind()
         a
       }.value()

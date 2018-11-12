@@ -94,6 +94,9 @@ interface ObservableKMonadErrorInstance :
 }
 
 @extension
+interface ObservableKMonadThrowInstance : MonadThrow<ForObservableK>, ObservableKMonadErrorInstance
+
+@extension
 interface ObservableKMonadDeferInstance :
   MonadDefer<ForObservableK>,
   ObservableKMonadErrorInstance {

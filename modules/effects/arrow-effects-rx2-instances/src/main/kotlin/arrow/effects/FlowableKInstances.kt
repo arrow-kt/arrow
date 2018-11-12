@@ -98,6 +98,9 @@ interface FlowableKMonadErrorInstance :
 }
 
 @extension
+interface FlowableKMonadThrowInstance : MonadThrow<ForFlowableK>, FlowableKMonadErrorInstance
+
+@extension
 interface FlowableKMonadDeferInstance :
   MonadDefer<ForFlowableK>,
   FlowableKMonadErrorInstance {
