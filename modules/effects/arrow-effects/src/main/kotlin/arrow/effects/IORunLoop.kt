@@ -233,8 +233,8 @@ internal object IORunLoop {
 
           bFirst = { c: Any? -> IO.just(c) }
 
-          currentIO = IO.async { TODO, cc ->
-            loop(localCont, conn, cc.asyncCallback(currentCC), null, null, null)
+          currentIO = IO.async { _, callback ->
+            loop(localCont, conn, callback.asyncCallback(currentCC), null, null, null)
           }
         }
         is IO.Map<*, *> -> {
