@@ -56,7 +56,7 @@ interface ListKFilterIndexInstance<A> : FilterIndex<ListK<A>, Int, A> {
 interface ListKIndexInstance<A> : Index<ListK<A>, Int, A> {
   override fun index(i: Int): Optional<ListK<A>, A> = POptional(
     getOrModify = { it.getOrNull(i)?.right() ?: it.left() },
-    set = { a -> { l -> l.mapIndexed { index: Int, aa: A -> if (index == i) a else aa }.k() } }
+    set = { l, a -> l.mapIndexed { index: Int, aa: A -> if (index == i) a else aa }.k() }
   )
 }
 
