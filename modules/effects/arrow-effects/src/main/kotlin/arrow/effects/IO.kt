@@ -168,9 +168,7 @@ sealed class IO<out A> : IOOf<A> {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
   }
 
-  internal data class Async<out A>(
-    val k: (IOConnection, (Either<Throwable, A>) -> Unit) -> Unit
-  ) : IO<A>() {
+  internal data class Async<out A>(val k: IOProc<A>) : IO<A>() {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = unsafeResync(this, limit)
   }
 
