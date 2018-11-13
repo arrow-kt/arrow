@@ -5,10 +5,10 @@ import arrow.core.Try
 import arrow.instances.TryMonadErrorInstance
 import arrow.reflect.*
 import arrow.test.UnitSpec
-import arrow.typeclasses.Functor
-import arrow.typeclasses.MonadError
+import arrow.typeclasses.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
+import io.kotlintest.matchers.shouldNot
 import org.junit.runner.RunWith
 
 object Bogus
@@ -19,7 +19,6 @@ class ReflectionTests : UnitSpec() {
   init {
 
     "The list of extensions for a bogus data type is empty" {
-      println(DataType(Bogus::class).extensions())
       DataType(Bogus::class).extensions().isEmpty() shouldBe true
     }
 
@@ -57,6 +56,12 @@ class ReflectionTests : UnitSpec() {
         TypeClass(MonadError::class),
         Instance(TryMonadErrorInstance::class)
       )) shouldBe true
+    }
+
+    "We can determine a known type class hierarchy" {
+      TypeClass(Monad::class).hierarchy() shouldBe listOf(
+        TypeClass(Applicative::class), TypeClass(Functor::class), TypeClass(Invariant::class)
+      )
     }
 
   }
