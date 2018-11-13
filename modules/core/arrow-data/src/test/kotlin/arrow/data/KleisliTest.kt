@@ -34,11 +34,11 @@ class KleisliTest : UnitSpec() {
     a.counnest().fix().run(1) == b.counnest().fix().run(1)
   }
 
-  private fun EQBracket(): Eq<Kind<KleisliPartialOf<ForIO, Int>, Int>> = Eq { a, b ->
+  private fun EQEither(): Eq<Kind<KleisliPartialOf<ForIO, Int>, Either<Throwable, Int>>> = Eq { a, b ->
     a.fix().run(1).attempt().unsafeRunSync() == b.fix().run(1).attempt().unsafeRunSync()
   }
 
-  private fun EQBracketError(): Eq<Kind<KleisliPartialOf<ForIO, Int>, Either<Throwable, Int>>> = Eq { a, b ->
+  private fun EQError(): Eq<Kind<KleisliPartialOf<ForIO, Int>, Int>> = Eq { a, b ->
     a.fix().run(1).attempt().unsafeRunSync() == b.fix().run(1).attempt().unsafeRunSync()
   }
 
@@ -46,10 +46,11 @@ class KleisliTest : UnitSpec() {
 
     testLaws(
       BracketLaws.laws(
-        Kleisli.bracket<ForIO, Int, Throwable>(IO.bracket()),
-        EQBracket(),
-        EQBracketError(),
-        EQBracket()),
+        BF = Kleisli.bracket<ForIO, Int, Throwable>(IO.bracket()),
+        EQ = EQError(),
+        EQ_EITHER = EQEither(),
+        EQERR = EQError()
+      ),
       ContravariantLaws.laws(Kleisli.contravariant(), { Kleisli { x: Int -> Try.just(x) }.conest() }, ConestTryEQ()),
       MonadErrorLaws.laws(Kleisli.monadError<ForTry, Int, Throwable>(Try.monadError()), EQ(), EQ())
     )
