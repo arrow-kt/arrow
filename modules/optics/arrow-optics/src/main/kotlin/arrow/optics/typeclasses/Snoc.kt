@@ -4,8 +4,8 @@ import arrow.core.*
 import arrow.optics.*
 
 /**
- * [Snoc] defines a [Prism] between a [S] and its [init] [S] and last element [A].
- * It provides a way to attach or detach elements on the right side of a structure.
+ * [Snoc] defines a [Prism] between a [S] and its [init] [S] and last element [A] and thus can be seen as the reverse of [Cons].
+ * It provides a way to attach or detach elements on the end side of a structure.
  *
  * @param [S] source of [Prism] and init of [Prism] target.
  * @param [A] last of [Prism] focus, [A] is supposed to be unique for a given [S].
@@ -44,5 +44,22 @@ interface Snoc<S, A> {
    */
   fun S.unsnoc(): Option<Tuple2<S, A>> =
     snoc().getOption(this)
+
+  companion object {
+
+    /**
+     * Lift an instance of [Snoc] using an [Iso].
+     */
+    fun <S, A, B> fromIso(SS: Snoc<A, B>, iso: Iso<S, A>): Snoc<S, B> = object : Snoc<S, B> {
+      override fun snoc(): Prism<S, Tuple2<S, B>> = iso compose SS.snoc() compose iso.reverse().first()
+    }
+
+    /**
+     * Construct a [Snoc] instance from a [Prism].
+     */
+    operator fun <S, A> invoke(prism: Prism<S, Tuple2<S, A>>): Snoc<S, A> = object : Snoc<S, A> {
+      override fun snoc(): Prism<S, Tuple2<S, A>> = prism
+    }
+  }
 
 }
