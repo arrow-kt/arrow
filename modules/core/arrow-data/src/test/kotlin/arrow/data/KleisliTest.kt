@@ -26,7 +26,7 @@ import org.junit.runner.RunWith
 @Suppress("TestFunctionName")
 @RunWith(KTestJUnitRunner::class)
 class KleisliTest : UnitSpec() {
-  private fun <A> EQ(): Eq<KleisliOf<ForTry, Int, A>> = Eq { a, b ->
+  private fun <A> TryEQ(): Eq<KleisliOf<ForTry, Int, A>> = Eq { a, b ->
     a.fix().run(1) == b.fix().run(1)
   }
 
@@ -34,11 +34,11 @@ class KleisliTest : UnitSpec() {
     a.counnest().fix().run(1) == b.counnest().fix().run(1)
   }
 
-  private fun EQEither(): Eq<Kind<KleisliPartialOf<ForIO, Int>, Either<Throwable, Int>>> = Eq { a, b ->
+  private fun IOEQ(): Eq<Kind<KleisliPartialOf<ForIO, Int>, Int>> = Eq { a, b ->
     a.fix().run(1).attempt().unsafeRunSync() == b.fix().run(1).attempt().unsafeRunSync()
   }
 
-  private fun EQError(): Eq<Kind<KleisliPartialOf<ForIO, Int>, Int>> = Eq { a, b ->
+  private fun IOEitherEQ(): Eq<Kind<KleisliPartialOf<ForIO, Int>, Either<Throwable, Int>>> = Eq { a, b ->
     a.fix().run(1).attempt().unsafeRunSync() == b.fix().run(1).attempt().unsafeRunSync()
   }
 
@@ -47,12 +47,12 @@ class KleisliTest : UnitSpec() {
     testLaws(
       BracketLaws.laws(
         BF = Kleisli.bracket<ForIO, Int, Throwable>(IO.bracket()),
-        EQ = EQError(),
-        EQ_EITHER = EQEither(),
-        EQERR = EQError()
+        EQ = IOEQ(),
+        EQ_EITHER = IOEitherEQ(),
+        EQERR = IOEQ()
       ),
       ContravariantLaws.laws(Kleisli.contravariant(), { Kleisli { x: Int -> Try.just(x) }.conest() }, ConestTryEQ()),
-      MonadErrorLaws.laws(Kleisli.monadError<ForTry, Int, Throwable>(Try.monadError()), EQ(), EQ())
+      MonadErrorLaws.laws(Kleisli.monadError<ForTry, Int, Throwable>(Try.monadError()), TryEQ(), TryEQ())
     )
 
     "andThen should continue sequence" {
