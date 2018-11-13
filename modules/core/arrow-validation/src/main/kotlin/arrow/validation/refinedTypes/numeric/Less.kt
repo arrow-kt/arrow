@@ -1,4 +1,4 @@
-package arrow.validation.refinedTypes
+package arrow.validation.refinedTypes.numeric
 
 import arrow.Kind
 import arrow.core.Either
@@ -32,7 +32,8 @@ interface Less<F, A : Number> : Refinement<F, A> {
 }
 
 @extension
-interface ValidatedLess<A : Number> : Less<ValidatedPartialOf<Nel<RefinedPredicateException>>, A> {
+interface ValidatedLess<A : Number> :
+  Less<ValidatedPartialOf<Nel<RefinedPredicateException>>, A> {
   override fun ORD(): Order<A>
   override fun max(): A
 
@@ -44,7 +45,8 @@ interface ValidatedLess<A : Number> : Less<ValidatedPartialOf<Nel<RefinedPredica
 }
 
 @extension
-interface EitherLess<A : Number> : Less<EitherPartialOf<Nel<RefinedPredicateException>>, A> {
+interface EitherLess<A : Number> :
+  Less<EitherPartialOf<Nel<RefinedPredicateException>>, A> {
   override fun ORD(): Order<A>
   override fun max(): A
 

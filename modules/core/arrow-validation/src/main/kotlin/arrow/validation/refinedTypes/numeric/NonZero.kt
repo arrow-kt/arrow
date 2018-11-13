@@ -1,4 +1,4 @@
-package arrow.validation.refinedTypes
+package arrow.validation.refinedTypes.numeric
 
 import arrow.Kind
 import arrow.core.Either
@@ -29,7 +29,8 @@ interface NonZero<F, A : Number> : Refinement<F, A> {
 }
 
 @extension
-interface ValidatedNonZero<A : Number> : NonZero<ValidatedPartialOf<Nel<RefinedPredicateException>>, A> {
+interface ValidatedNonZero<A : Number> :
+  NonZero<ValidatedPartialOf<Nel<RefinedPredicateException>>, A> {
   override fun applicativeError(): ApplicativeError<ValidatedPartialOf<Nel<RefinedPredicateException>>,
     Nel<RefinedPredicateException>> =
     Validated.applicativeError(Nel.semigroup())
@@ -38,7 +39,8 @@ interface ValidatedNonZero<A : Number> : NonZero<ValidatedPartialOf<Nel<RefinedP
 }
 
 @extension
-interface EitherNonZero<A : Number> : NonZero<EitherPartialOf<Nel<RefinedPredicateException>>, A> {
+interface EitherNonZero<A : Number> :
+  NonZero<EitherPartialOf<Nel<RefinedPredicateException>>, A> {
   override fun applicativeError(): ApplicativeError<EitherPartialOf<Nel<RefinedPredicateException>>,
     Nel<RefinedPredicateException>> =
     Either.applicativeError()

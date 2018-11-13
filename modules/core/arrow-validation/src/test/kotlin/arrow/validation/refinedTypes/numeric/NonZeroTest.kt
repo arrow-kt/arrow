@@ -1,7 +1,7 @@
-package arrow.validation.refinedTypes
+package arrow.validation.refinedTypes.numeric
 
 import arrow.test.UnitSpec
-import arrow.validation.refinedTypes.validated.nonZero.nonZero
+import arrow.validation.refinedTypes.numeric.validated.nonZero.nonZero
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.filter

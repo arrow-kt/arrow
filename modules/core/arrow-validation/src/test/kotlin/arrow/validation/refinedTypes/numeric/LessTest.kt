@@ -1,8 +1,8 @@
-package arrow.validation.refinedTypes
+package arrow.validation.refinedTypes.numeric
 
 import arrow.instances.order
 import arrow.test.UnitSpec
-import arrow.validation.refinedTypes.validated.less.less
+import arrow.validation.refinedTypes.numeric.validated.less.less
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.filter
