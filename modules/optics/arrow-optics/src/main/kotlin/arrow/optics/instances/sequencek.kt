@@ -53,6 +53,6 @@ interface SequenceKFilterIndexInstance<A> : FilterIndex<SequenceK<A>, Int, A> {
 interface SequenceKIndexInstance<A> : Index<SequenceK<A>, Int, A> {
   override fun index(i: Int): Optional<SequenceK<A>, A> = POptional(
     getOrModify = { it.elementAtOrNull(i)?.right() ?: it.left() },
-    set = { a -> { it.mapIndexed { index, aa -> if (index == i) a else aa }.k() } }
+    set = { s, a -> s.mapIndexed { index, aa -> if (index == i) a else aa }.k() }
   )
 }

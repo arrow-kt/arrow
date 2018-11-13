@@ -1,10 +1,9 @@
-package arrow.data
+package arrow.typeclasses
 
 import arrow.instances.monoid
 import arrow.instances.monoid.invariant.invariant
 import arrow.test.UnitSpec
 import arrow.test.laws.InvariantLaws
-import arrow.typeclasses.*
 import io.kotlintest.KTestJUnitRunner
 import org.junit.runner.RunWith
 

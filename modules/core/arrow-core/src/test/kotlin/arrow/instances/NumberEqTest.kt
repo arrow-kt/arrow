@@ -1,4 +1,4 @@
-package arrow.data
+package arrow.instances
 
 import arrow.instances.*
 import arrow.test.UnitSpec

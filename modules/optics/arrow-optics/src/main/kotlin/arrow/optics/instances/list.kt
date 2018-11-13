@@ -84,7 +84,7 @@ fun <A> ListInstances.index(): Index<List<A>, Int, A> = ListIndexInstance()
 interface ListIndexInstance<A> : Index<List<A>, Int, A> {
   override fun index(i: Int): Optional<List<A>, A> = POptional(
     getOrModify = { it.getOrNull(i)?.right() ?: it.left() },
-    set = { a -> { l -> l.mapIndexed { index: Int, aa: A -> if (index == i) a else aa } } }
+    set = { l, a -> l.mapIndexed { index: Int, aa: A -> if (index == i) a else aa } }
   )
 
   companion object {
