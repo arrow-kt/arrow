@@ -13,6 +13,7 @@ import java.io.File
 
 const val AnkBlock = ":ank"
 const val AnkSilentBlock = ":ank:silent"
+const val AnkReplaceBlock = ":ank:replace"
 
 fun ank(source: File, target: File, compilerArgs: ListK<String>) =
   AnkOps.binding {

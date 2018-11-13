@@ -141,18 +141,12 @@ ForNonEmptyList extensions {
 - `binding { ... } Comprehensions` can be __used to imperatively compute__ over multiple `NonEmptyList` values in sequence.
 - `NonEmptyList.applicative().map { ... }` can be used to compute over multiple `NonEmptyList` values preserving type information and __abstracting over arity__ with `map`
 
-## Available Instances
+### Supported type classes
 
-* [Show]({{ '/docs/typeclasses/show' | relative_url }})
-* [Eq]({{ '/docs/typeclasses/eq' | relative_url }})
-* [Applicative]({{ '/docs/typeclasses/applicative' | relative_url }})
-* [Bimonad]({{ '/docs/typeclasses/bimonad' | relative_url }})
-* [Comonad]({{ '/docs/typeclasses/comonad' | relative_url }})
-* [Foldable]({{ '/docs/typeclasses/foldable' | relative_url }})
-* [Functor]({{ '/docs/typeclasses/functor' | relative_url }})
-* [Monad]({{ '/docs/typeclasses/monad' | relative_url }})
-* [Semigroup]({{ '/docs/typeclasses/semigroup' | relative_url }})
-* [SemigroupK]({{ '/docs/typeclasses/semigroupk' | relative_url }})
-* [Traverse]({{ '/docs/typeclasses/traverse' | relative_url }})
-* [Index]({{ '/docs/optics/index' | relative_url }})
-* [FilterIndex]({{ '/docs/optics/filterindex' | relative_url }})
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.data.*
+import arrow.core.*
+
+DataType(NonEmptyList::class).tcMarkdownList()
+```

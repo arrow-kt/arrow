@@ -53,6 +53,15 @@ Learn more about the `AQL` combinators
 - [_sum_](/docs/aql/sum/)
 - [_union_](/docs/aql/union/)
 
+### Supported Data types
+
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.aql.*
+
+TypeClass(GroupBy::class).dtMarkdownList()
+```
+
 {:.advanced}
 advanced
 

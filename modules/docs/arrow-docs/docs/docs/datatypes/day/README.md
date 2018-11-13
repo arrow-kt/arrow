@@ -26,8 +26,12 @@ val day = Day(Id.just("Hello"), Id.just(0), renderHtml)
 day.extract(Id.comonad(), Id.comonad())
 ```
 
-## Available Instances
+### Supported type classes
 
-* [Comonad]({{ '/docs/typeclasses/comonad' | relative_url }})
-* [Functor]({{ '/docs/typeclasses/functor' | relative_url }})
-* [Applicative]({{ '/docs/typeclasses/applicative' | relative_url }})
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.data.*
+import arrow.core.*
+
+DataType(Day::class).tcMarkdownList()
+```

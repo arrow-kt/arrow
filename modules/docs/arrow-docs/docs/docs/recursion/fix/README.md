@@ -25,8 +25,11 @@ If Mu is `A` and Nu is `A?`, then fix is `A!`. Fix provides no information about
 or not a datatype is infinite, and is generally less safe that Mu or Nu. However, due
 to its simplicity, both Recursive and Corecursive instances for fix are very fast.
 
-## Avaliable Instances:
+### Supported Type Classes
 
-- [Recursive]({{ '/docs/recursion/recursive' | relative_url }})
-- [Corecursive]({{ '/docs/recursion/recursive' | relative_url }})
-- [Birecursive]({{ '/docs/recursion/recursive' | relative_url }})
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.recursion.data.*
+
+DataType(Fix::class).tcMarkdownList()
+```
