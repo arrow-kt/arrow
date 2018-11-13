@@ -1,6 +1,5 @@
-package arrow.data
+package arrow.instances
 
-import arrow.instances.*
 import arrow.test.UnitSpec
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.forAll

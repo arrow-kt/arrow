@@ -15,11 +15,7 @@ private fun processElement(ele: AnnotatedElement, foci: List<Focus>): String = f
   """
   |inline val ${ele.sourceClassName}.Companion.${focus.lensParamName()}: $Lens<${ele.sourceClassName}, ${focus.className}> inline get()= $Lens(
   |  get = { ${ele.sourceName}: ${ele.sourceClassName} -> ${ele.sourceName}.${focus.paramName.plusIfNotBlank(prefix = "`", postfix = "`")} },
-  |  set = { value: ${focus.className} ->
-  |    { ${ele.sourceName}: ${ele.sourceClassName} ->
-  |      ${ele.sourceName}.copy(${focus.paramName.plusIfNotBlank(prefix = "`", postfix = "`")} = value)
-  |    }
-  |  }
+  |  set = { ${ele.sourceName}: ${ele.sourceClassName}, value: ${focus.className} -> ${ele.sourceName}.copy(${focus.paramName.plusIfNotBlank(prefix = "`", postfix = "`")} = value) }
   |)
   |""".trimMargin()
 }

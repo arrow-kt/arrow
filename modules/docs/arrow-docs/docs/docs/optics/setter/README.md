@@ -39,11 +39,9 @@ A `Setter<Player, Int>` can set and modify the value of `Player`. So we need to 
 ```kotlin:ank
 data class Player(val health: Int)
 
-val playerSetter: Setter<Player, Int> = Setter { f: (Int) -> Int ->
-    { player: Player ->
-        val fHealth= f(player.health)
-        player.copy(health = fHealth)
-    }
+val playerSetter: Setter<Player, Int> = Setter { player: Player, f: (Int) -> Int ->
+  val fHealth= f(player.health)
+  player.copy(health = fHealth)
 }
 ```
 ```kotlin:ank
@@ -77,11 +75,9 @@ Unlike a regular `set` function a `Setter` composes. Similar to a [`Lens`](/docs
 ```kotlin:ank
 data class Bar(val player: Player)
 
-val barSetter: Setter<Bar, Player> = Setter { modifyPlayer ->
-    { bar ->
-        val modifiedPlayer = modifyPlayer(bar.player)
-        bar.copy(player = modifiedPlayer)
-    }
+val barSetter: Setter<Bar, Player> = Setter { bar, modifyPlayer ->
+  val modifiedPlayer = modifyPlayer(bar.player)
+  bar.copy(player = modifiedPlayer)
 }
 
 (barSetter compose playerSetter).modify(Bar(Player(75)), Int::inc)
