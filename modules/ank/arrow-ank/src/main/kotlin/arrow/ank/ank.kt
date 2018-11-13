@@ -22,9 +22,9 @@ fun ank(source: File, target: File, compilerArgs: ListK<String>) =
     val filesContents: ListK<String> = files.map(::readFile).k().sequence().bind().fix()
     val parsedMarkDowns: ListK<ASTNode> = filesContents.map(::parseMarkdown).k().sequence().bind().fix()
     val allSnippets: ListK<ListK<Snippet>> = parsedMarkDowns.mapIndexed { n, tree ->
-      extractCode(filesContents.list[n], tree)
+      extractCode(filesContents[n], tree)
     }.k().sequence().bind().fix()
-    val compilationResults = compileCode(allSnippets.mapIndexed { n, s -> files.list[n] to s }.toMap(), compilerArgs).bind()
+    val compilationResults = compileCode(allSnippets.mapIndexed { n, s -> files[n] to s }.toMap(), compilerArgs).bind()
     val replacedResults: ListK<String> = compilationResults.map { c -> replaceAnkToLang(c) }.k().sequence().bind().fix()
     val resultingFiles: ListK<File> = generateFiles(files, replacedResults).bind()
     resultingFiles

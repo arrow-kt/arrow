@@ -20,12 +20,6 @@ import arrow.data.*
 listOf(1, 2, 3).k()
 ```
 
-and unwrapped with the field `list`.
-
-```kotlin:ank
-listOf(1, 2, 3).k().list
-```
-
 For most use cases you will never use `ListK` directly but `List` directly with the extension functions that Arrow projects over it.
 
 ListK implements operators from many useful typeclasses.

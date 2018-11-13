@@ -66,6 +66,15 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
       Flux.just(dispose)
     }.k()
 
+  override fun equals(other: Any?): Boolean =
+    when (other) {
+      is FluxK<*> -> this.flux == other.flux
+      is Flux<*> -> this.flux == other
+      else -> false
+    }
+
+  override fun hashCode(): Int = flux.hashCode()
+
   companion object {
     fun <A> just(a: A): FluxK<A> =
       Flux.just(a).k()
