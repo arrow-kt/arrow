@@ -65,6 +65,15 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
       dispose
     }.k()
 
+  override fun equals(other: Any?): Boolean =
+    when (other) {
+      is ObservableK<*> -> this.observable == other.observable
+      is Observable<*> -> this.observable == other
+      else -> false
+    }
+
+  override fun hashCode(): Int = observable.hashCode()
+
   companion object {
     fun <A> just(a: A): ObservableK<A> =
       Observable.just(a).k()

@@ -122,10 +122,10 @@ fun compileCodeImpl(snippets: Map<File, ListK<Snippet>>, classpath: ListK<String
   val sortedSnippets = snippets.toList()
   val result = sortedSnippets.mapIndexed { n, (file, codeBlocks) ->
     val progress: Int = if (snippets.isNotEmpty()) ((n + 1) * 100 / snippets.size) else 100
-    val classLoader = URLClassLoader(classpath.map { URL(it) }.fix().list.toTypedArray())
+    val classLoader = URLClassLoader(classpath.map { URL(it) }.fix().toTypedArray())
     val seManager = ScriptEngineManager(classLoader)
     val engineCache: Map<String, ScriptEngine> =
-      codeBlocks.list
+      codeBlocks
         .asSequence()
         .distinctBy { it.lang }
         .map {
@@ -181,7 +181,7 @@ fun replaceAnkToLangImpl(compiledMarkdown: CompiledMarkdown): String =
 fun generateFilesImpl(candidates: ListK<File>, newContents: ListK<String>): ListK<File> =
   ListK(candidates.mapIndexed { n, file ->
     file.printWriter().use {
-      it.print(newContents.list[n])
+      it.print(newContents[n])
     }
     file
   })
