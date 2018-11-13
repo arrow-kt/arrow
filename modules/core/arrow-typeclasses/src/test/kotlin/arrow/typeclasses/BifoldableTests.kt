@@ -1,13 +1,9 @@
-package arrow.data
+package arrow.typeclasses
 
 import arrow.Kind2
 import arrow.core.*
 import arrow.test.UnitSpec
 import arrow.test.laws.BifoldableLaws
-import arrow.typeclasses.Bifoldable
-import arrow.typeclasses.Eq
-import arrow.typeclasses.binest
-import arrow.typeclasses.compose
 import io.kotlintest.KTestJUnitRunner
 import org.junit.runner.RunWith
 
