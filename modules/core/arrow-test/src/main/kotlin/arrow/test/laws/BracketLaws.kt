@@ -12,10 +12,12 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
 object BracketLaws {
-  inline fun <F> laws(BF: Bracket<F, Throwable>,
-                      EQ: Eq<Kind<F, Int>>,
-                      EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>,
-                      EQERR: Eq<Kind<F, Int>> = EQ): List<Law> =
+  fun <F> laws(
+    BF: Bracket<F, Throwable>,
+    EQ: Eq<Kind<F, Int>>,
+    EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>,
+    EQERR: Eq<Kind<F, Int>> = EQ
+  ): List<Law> =
     MonadErrorLaws.laws(BF, EQERR, EQ_EITHER, EQ) + listOf(
       Law("Bracket: bracketCase with just Unit is eqv to Map") { BF.bracketCaseWithJustUnitEqvMap(EQ) },
       Law("Bracket: bracketCase with just Unit is uncancelable") { BF.bracketCaseWithJustUnitIsUncancelable(EQ) },

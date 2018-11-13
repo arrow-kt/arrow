@@ -81,19 +81,21 @@ class FreeCTest : UnitSpec() {
     val EQ: Eq<Kind<FreeCPartialOf<ForOps>, Int>> = FreeC.eq(Either.monadError(), eitherInterpreter, Eq.any())
 
     testLaws(
-      EqLaws.laws(EQ) { Ops.value(it) }
-      ,
+      EqLaws.laws(EQ) { Ops.value(it) },
       MonadDeferLaws.laws(
         SC = Ops,
         EQ = FreeC.eq(Either.monadError(), eitherInterpreter, Eq.any()),
-        EQ_EITHER = FreeC.eq(Either.monadError(), eitherInterpreter, Eq.any())
+        EQ_EITHER = FreeC.eq(Either.monadError(), eitherInterpreter, Eq.any()),
+        EQERR = FreeC.eq(Either.monadError(), eitherInterpreter, Eq.any())
       )
     )
-    testLaws(MonadDeferLaws.laws(
-      SC = FreeC.monadDefer(),
-      EQ = FreeC.eq(Try.monadError(), FunctionK.id(), Eq.any()),
-      EQ_EITHER = FreeC.eq(Try.monadError(), FunctionK.id(), Eq.any())
-    ))
+    testLaws(
+      MonadDeferLaws.laws(
+        SC = FreeC.monadDefer(),
+        EQ = FreeC.eq(Try.monadError(), FunctionK.id(), Eq.any()),
+        EQ_EITHER = FreeC.eq(Try.monadError(), FunctionK.id(), Eq.any()),
+        EQERR = FreeC.eq(Try.monadError(), FunctionK.id(), Eq.any())
+      ))
 
     "Can interpret an ADT as Free operations" {
       program.foldMap(eitherInterpreter, Either.monadError()).fix() shouldBe Right(Some(-30))
