@@ -82,12 +82,14 @@ For a full list of other useful combinators available in `Profunctor` see the [S
 
 Arrow provides [`ProfunctorLaws`][profunctor_laws_source]{:target="_blank"} in the form of test cases for internal verification of lawful instances and third party apps creating their own Profunctor instances.
 
-### Data Types
+### Data types
 
-The following datatypes in Arrow provide instances that adhere to the `Profunctor` typeclass.
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.typeclasses.Profunctor
 
-- [Function1]({{ '/docs/datatypes/function1' | relative_url }})
-- [Cokleisli]({{ '/docs/datatypes/cokleisli' | relative_url }})
+TypeClass(Profunctor::class).dtMarkdownList()
+```
 
 [profunctor_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-typeclasses/src/main/kotlin/arrow/typeclasses/Profunctor.kt
 [profunctor_laws_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-test/src/main/kotlin/arrow/test/laws/ProfunctorLaws.kt

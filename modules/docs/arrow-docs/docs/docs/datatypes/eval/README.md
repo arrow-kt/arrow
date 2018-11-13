@@ -70,13 +70,15 @@ fun odd(n: Int): Eval<Boolean> =
 odd(100000).value()
 ```
 
-## Available Instances
+### Supported type classes
 
-* [Applicative]({{ '/docs/typeclasses/applicative' | relative_url }})
-* [Bimonad]({{ '/docs/typeclasses/bimonad' | relative_url }})
-* [Comonad]({{ '/docs/typeclasses/comonad' | relative_url }})
-* [Functor]({{ '/docs/typeclasses/functor' | relative_url }})
-* [Monad]({{ '/docs/typeclasses/monad' | relative_url }})
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.data.*
+import arrow.core.*
+
+DataType(Eval::class).tcMarkdownList()
+```
 
 ## Credits
 

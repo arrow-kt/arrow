@@ -86,11 +86,12 @@ data class CompiledMarkdown(val origin: File, val snippets: ListK<Snippet>)
 data class Snippet(
   val fence: String,
   val lang: String,
-  val silent: Boolean,
   val startOffset: Int,
   val endOffset: Int,
   val code: String,
-  val result: Option<String> = None)
+  val result: Option<String> = None,
+  val isSilent: Boolean = fence.startsWith("```$lang$AnkSilentBlock"),
+  val isReplace: Boolean = fence.startsWith("```$lang$AnkReplaceBlock"))
 
 fun extractCodeImpl(source: String, tree: ASTNode): ListK<Snippet> {
   val sb = mutableListOf<Snippet>()
@@ -101,7 +102,7 @@ fun extractCodeImpl(source: String, tree: ASTNode): ListK<Snippet> {
         val lang = fence.takeWhile { it != ':' }.toString().replace("```", "")
         if (fence.startsWith("```$lang$AnkBlock")) {
           val code = fence.split("\n").drop(1).dropLast(1).joinToString("\n")
-          sb.add(Snippet(fence.toString(), lang, fence.startsWith("```$lang$AnkSilentBlock"), node.startOffset, node.endOffset, code))
+          sb.add(Snippet(fence.toString(), lang, node.startOffset, node.endOffset, code))
         }
       }
       super.visitNode(node)
@@ -156,10 +157,11 @@ fun compileCodeImpl(snippets: Map<File, ListK<Snippet>>, classpath: ListK<String
                     |${colored(ANSI_RED, it.localizedMessage)}
                     """.trimMargin())
       }, { it })
-      if (snippet.silent) {
+      if (snippet.isSilent) {
         snippet
       } else {
-        val resultString: Option<String> = Option.fromNullable(result).fold({ None }, { Some("// $it") })
+        val resultString: Option<String> = Option.fromNullable(result).fold({ None }, {
+          if (snippet.isReplace) Some("$it") else Some("// $it") })
         snippet.copy(result = resultString)
       }
     }.k()
@@ -174,7 +176,10 @@ fun replaceAnkToLangImpl(compiledMarkdown: CompiledMarkdown): String =
   compiledMarkdown.snippets.fold(compiledMarkdown.origin.readText()) { content, snippet ->
     snippet.result.fold(
       { content.replace(snippet.fence, "```${snippet.lang}\n" + snippet.code + "\n```") },
-      { content.replace(snippet.fence, "```${snippet.lang}\n" + snippet.code + "\n" + it + "\n```") }
+      {
+        if (snippet.isReplace) content.replace(snippet.fence, it)
+        else content.replace(snippet.fence, "```${snippet.lang}\n" + snippet.code + "\n" + it + "\n```")
+      }
     )
   }
 

@@ -313,7 +313,7 @@ options:
         url: /docs/aql/groupby
 
       - title: orderBy
-        url: /docs/aql/orderBy
+        url: /docs/aql/orderby
 
       - title: sum
         url: /docs/aql/sum
