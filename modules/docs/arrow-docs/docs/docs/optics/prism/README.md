@@ -42,17 +42,6 @@ val networkSuccessPrism: Prism<NetworkResult, NetworkResult.Success> = Prism(
 
 As is clear from above `Prism` definition it gathers two concepts: pattern matching and constructor.
 
-Since sealed classes enforce a certain relationship we can omit the `reverseGet` parameter to create a `Prism` for them. 
-
-```kotlin:ank:silent
-val networkSuccessPrism2: Prism<NetworkResult, NetworkResult.Success> = Prism { networkResult ->
-    when (networkResult) {
-        is NetworkResult.Success -> networkResult.right()
-        else -> networkResult.left()
-    }
-}
-```
-
 Like mentioned we can now operate on `NetworkResult` as if it were `Success`
 
 ```kotlin:ank
