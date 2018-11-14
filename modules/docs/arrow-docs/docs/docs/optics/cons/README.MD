@@ -45,12 +45,11 @@ listOf(1, 2, 3).uncons()
 emptyList<Int>().uncons()
 ```
 
-### Instances
-
-The following datatypes in Arrow provide instances that adhere to the `Cons` typeclass.
+### Data types
 
 ```kotlin:ank:replace
 import arrow.reflect.*
 import arrow.optics.typeclasses.*
+
 TypeClass(Cons::class).dtMarkdownList()
 ```

@@ -1,10 +1,7 @@
 package arrow.optics.instances
 
 import arrow.Kind
-import arrow.core.ListInstances
-import arrow.core.left
-import arrow.core.right
-import arrow.core.toT
+import arrow.core.*
 import arrow.data.k
 import arrow.optics.*
 import arrow.optics.typeclasses.Cons
