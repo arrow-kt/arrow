@@ -13,6 +13,7 @@ import arrow.typeclasses.Reducible
 import io.kotlintest.properties.forAll
 
 object ReducibleLaws {
+
   fun <F> laws(RF: Reducible<F>, cf: (Int) -> Kind<F, Int>, EQ: Eq<Int>, EQOptionInt: Eq<Option<Int>>, EQLong: Eq<Long>): List<Law> =
     FoldableLaws.laws(RF, cf, EQ) + listOf(
       Law("Reducible Laws: reduceLeftTo consistent with reduceMap") { RF.reduceLeftToConsistentWithReduceMap(cf, EQ) },

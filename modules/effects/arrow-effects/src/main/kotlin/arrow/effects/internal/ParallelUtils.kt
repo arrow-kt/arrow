@@ -7,6 +7,7 @@ import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.Effect
 import arrow.effects.typeclasses.Proc
 import kotlin.coroutines.*
+import kotlin.coroutines.Continuation
 import arrow.core.Continuation as AContinuation
 
 /* See parMap3 */

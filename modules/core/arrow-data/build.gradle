@@ -11,6 +11,7 @@ dependencies {
     testCompile project(':arrow-instances-data')
     testCompile project(':arrow-test')
     testCompile project(':arrow-mtl')
+    testCompile project(':arrow-data-instances-effects')
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

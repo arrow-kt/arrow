@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.*
 import arrow.effects.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
+import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import arrow.typeclasses.Applicative
@@ -26,6 +27,15 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
 
   fun <B> flatMap(f: (A) -> ObservableKOf<B>): ObservableK<B> =
     observable.flatMap { f(it).fix().observable }.k()
+
+  fun <B> bracketCase(use: (A) -> ObservableKOf<B>, release: (A, ExitCase<Throwable>) -> ObservableKOf<Unit>): ObservableK<B> =
+    flatMap { a ->
+      use(a).fix().observable
+        .doOnError { release(a, ExitCase.Error(it)) }
+        .doOnDispose { release(a, ExitCase.Cancelled) }
+        .doOnComplete { release(a, ExitCase.Completed) }
+        .k()
+    }
 
   fun <B> concatMap(f: (A) -> ObservableKOf<B>): ObservableK<B> =
     observable.concatMap { f(it).fix().observable }.k()
