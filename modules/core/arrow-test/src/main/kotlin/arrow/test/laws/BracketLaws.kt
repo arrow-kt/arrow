@@ -12,6 +12,7 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
 object BracketLaws {
+
   fun <F> laws(
     BF: Bracket<F, Throwable>,
     EQ: Eq<Kind<F, Int>>,

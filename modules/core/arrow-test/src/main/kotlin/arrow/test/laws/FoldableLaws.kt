@@ -17,6 +17,7 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
 object FoldableLaws {
+
   fun <F> laws(FF: Foldable<F>, cf: (Int) -> Kind<F, Int>, EQ: Eq<Int>): List<Law> =
     listOf(
       Law("Foldable Laws: Left fold consistent with foldMap") { FF.leftFoldConsistentWithFoldMap(cf, EQ) },

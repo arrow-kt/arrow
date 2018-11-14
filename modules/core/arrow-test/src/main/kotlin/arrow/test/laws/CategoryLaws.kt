@@ -8,6 +8,7 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
 object CategoryLaws {
+
   fun <F> laws(C: Category<F>, f: (Int) -> Kind2<F, Int, Int>, EQ: Eq<Kind2<F, Int, Int>>): List<Law> =
     listOf(
       Law("Category Laws: right identity") { C.rightIdentity(f, EQ) },
