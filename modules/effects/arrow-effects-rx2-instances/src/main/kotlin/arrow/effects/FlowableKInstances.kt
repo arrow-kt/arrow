@@ -102,7 +102,7 @@ interface FlowableKMonadThrowInstance : MonadThrow<ForFlowableK>, FlowableKMonad
 
 @extension
 interface FlowableKBracketInstance : Bracket<ForFlowableK, Throwable>, FlowableKMonadThrowInstance {
-  override fun <A, B> Kind<ForFlowableK, A>.bracketCase(use: (A) -> Kind<ForFlowableK, B>, release: (A, ExitCase<Throwable>) -> Kind<ForFlowableK, Unit>): FlowableK<B> =
+  override fun <A, B> Kind<ForFlowableK, A>.bracketCase(release: (A, ExitCase<Throwable>) -> Kind<ForFlowableK, Unit>, use: (A) -> Kind<ForFlowableK, B>): FlowableK<B> =
     fix().bracketCase({ use(it) }, { a, e -> release(a, e) })
 }
 

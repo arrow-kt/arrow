@@ -71,7 +71,7 @@ interface MonoKMonadThrowInstance : MonadThrow<ForMonoK>, MonoKMonadErrorInstanc
 
 @extension
 interface MonoKBracketInstance : Bracket<ForMonoK, Throwable>, MonoKMonadThrowInstance {
-  override fun <A, B> Kind<ForMonoK, A>.bracketCase(use: (A) -> Kind<ForMonoK, B>, release: (A, ExitCase<Throwable>) -> Kind<ForMonoK, Unit>): MonoK<B> =
+  override fun <A, B> Kind<ForMonoK, A>.bracketCase(release: (A, ExitCase<Throwable>) -> Kind<ForMonoK, Unit>, use: (A) -> Kind<ForMonoK, B>): MonoK<B> =
     fix().bracketCase({ use(it) }, { a, e -> release(a, e) })
 }
 

@@ -35,7 +35,7 @@ interface Bracket<F, E> : MonadError<F, E> {
    * @param release is the action supposed to release the allocated resource after `use` is done, by observing and
    * acting on its exit condition.
    */
-  fun <A, B> Kind<F, A>.bracketCase(use: (A) -> Kind<F, B>, release: (A, ExitCase<E>) -> Kind<F, Unit>): Kind<F, B>
+  fun <A, B> Kind<F, A>.bracketCase(release: (A, ExitCase<E>) -> Kind<F, Unit>, use: (A) -> Kind<F, B>): Kind<F, B>
 
   /**
    * Meant for specifying tasks with safe resource acquisition and release in the face of errors and interruption.
@@ -45,14 +45,14 @@ interface Bracket<F, E> : MonadError<F, E> {
    * @param release is the action that's supposed to release the allocated resource after `use` is done, irregardless
    * of its exit condition.
    */
-  fun <A, B> Kind<F, A>.bracket(use: (A) -> Kind<F, B>, release: (A) -> Kind<F, Unit>): Kind<F, B> =
-    bracketCase(use) { a, _ -> release(a) }
+  fun <A, B> Kind<F, A>.bracket(release: (A) -> Kind<F, Unit>, use: (A) -> Kind<F, B>): Kind<F, B> =
+    bracketCase({ a, _ -> release(a) }, use)
 
   /**
    * Meant for ensuring a given task continues execution even when interrupted.
    */
   fun <A> Kind<F, A>.uncancelable(): Kind<F, A> =
-    bracket({ just(it) }, { just<Unit>(Unit) })
+    bracket({ just<Unit>(Unit) }, { just(it) })
 
   /**
    * Executes the given `finalizer` when the source is finished, either in success or in error, or if canceled.
@@ -65,7 +65,7 @@ interface Bracket<F, E> : MonadError<F, E> {
    * @see [bracket] for the more general operation
    */
   fun <A> Kind<F, A>.guarantee(finalizer: Kind<F, Unit>): Kind<F, A> =
-    bracket({ _ -> this }, { _ -> finalizer })
+    bracket({ finalizer }, { this })
 
   /**
    * Executes the given `finalizer` when the source is finished, either in success or in error, or if canceled, allowing
@@ -79,5 +79,5 @@ interface Bracket<F, E> : MonadError<F, E> {
    * @see [bracketCase] for the more general operation
    */
   fun <A> Kind<F, A>.guaranteeCase(finalizer: (ExitCase<E>) -> Kind<F, Unit>): Kind<F, A> =
-    bracketCase({ _ -> this }, { _, e -> finalizer(e) })
+    bracketCase({ _, e -> finalizer(e) }, { this })
 }

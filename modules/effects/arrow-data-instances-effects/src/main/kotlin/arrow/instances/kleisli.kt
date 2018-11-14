@@ -18,16 +18,16 @@ interface KleisliBracketInstance<F, R, E> : Bracket<KleisliPartialOf<F, R>, E>, 
   override fun ME(): MonadError<F, E> = BF()
 
   override fun <A, B> Kind<KleisliPartialOf<F, R>, A>.bracketCase(
-    use: (A) -> Kind<KleisliPartialOf<F, R>, B>,
-    release: (A, ExitCase<E>) -> Kind<KleisliPartialOf<F, R>, Unit>
+    release: (A, ExitCase<E>) -> Kind<KleisliPartialOf<F, R>, Unit>,
+    use: (A) -> Kind<KleisliPartialOf<F, R>, B>
   ): Kleisli<F, R, B> =
     BF().run {
       Kleisli { r ->
-        this@bracketCase.fix().run(r).bracketCase({ a ->
-          use(a).fix().run(r)
-        }, { a, br ->
+        this@bracketCase.fix().run(r).bracketCase({ a, br ->
           release(a, br).fix().run(r)
-        })
+        }) { a ->
+          use(a).fix().run(r)
+        }
       }
     }
 

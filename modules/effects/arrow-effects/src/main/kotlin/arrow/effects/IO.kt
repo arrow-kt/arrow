@@ -129,11 +129,11 @@ sealed class IO<out A> : IOOf<A> {
    */
   fun uncancelable(): IO<A> = IOCancel.uncancelable(this)
 
-  fun <B> bracket(use: (A) -> IO<B>, release: (A) -> IO<Unit>): IO<B> =
-    bracketCase(use) { a, _ -> release(a) }
+  fun <B> bracket(release: (A) -> IO<Unit>, use: (A) -> IO<B>): IO<B> =
+    bracketCase({ a, _ -> release(a) }, use)
 
-  fun <B> bracketCase(use: (A) -> IO<B>, release: (A, ExitCase<Throwable>) -> IO<Unit>): IO<B> =
-    IOBracket(this, use, release)
+  fun <B> bracketCase(release: (A, ExitCase<Throwable>) -> IO<Unit>, use: (A) -> IO<B>): IO<B> =
+    IOBracket(this, release, use)
 
   fun guarantee(finalizer: IO<Unit>): IO<A> = guaranteeCase { finalizer }
 

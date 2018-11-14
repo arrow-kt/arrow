@@ -14,7 +14,7 @@ internal object IOBracket {
   /**
    * Implementation for `IO.bracketCase`.
    */
-  operator fun <A, B> invoke(acquire: IO<A>, use: (A) -> IO<B>, release: (A, ExitCase<Throwable>) -> IO<Unit>): IO<B> =
+  operator fun <A, B> invoke(acquire: IO<A>, release: (A, ExitCase<Throwable>) -> IO<Unit>, use: (A) -> IO<B>): IO<B> =
     IO.Async { conn, cb ->
       // Placeholder for the future finalizer
       val deferredRelease = ForwardCancelable()

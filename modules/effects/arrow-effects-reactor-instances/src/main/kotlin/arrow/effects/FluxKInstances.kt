@@ -98,7 +98,7 @@ interface FluxKMonadThrowInstance : MonadThrow<ForFluxK>, FluxKMonadErrorInstanc
 
 @extension
 interface FluxKBracketInstance : Bracket<ForFluxK, Throwable>, FluxKMonadThrowInstance {
-  override fun <A, B> Kind<ForFluxK, A>.bracketCase(use: (A) -> Kind<ForFluxK, B>, release: (A, ExitCase<Throwable>) -> Kind<ForFluxK, Unit>): FluxK<B> =
+  override fun <A, B> Kind<ForFluxK, A>.bracketCase(release: (A, ExitCase<Throwable>) -> Kind<ForFluxK, Unit>, use: (A) -> Kind<ForFluxK, B>): FluxK<B> =
     fix().bracketCase({ use(it) }, { a, e -> release(a, e) })
 }
 

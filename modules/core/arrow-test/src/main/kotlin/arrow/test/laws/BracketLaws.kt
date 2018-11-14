@@ -51,7 +51,7 @@ object BracketLaws {
   fun <F> Bracket<F, Throwable>.bracketIsDerivedFromBracketCase(
     EQ: Eq<Kind<F, Int>>): Unit =
     forAll(genApplicative(Gen.int(), this)) { fa: Kind<F, Int> ->
-      fa.bracket(release = { _ -> just(Unit) }, use = { just(it) }).equalUnderTheLaw(fa.bracketCase(release = { _, _ -> just(Unit) }, use = { just(it) }), EQ)
+      fa.bracket(release = { just(Unit) }, use = { just(it) }).equalUnderTheLaw(fa.bracketCase(release = { _, _ -> just(Unit) }, use = { just(it) }), EQ)
     }
 
   fun <F> Bracket<F, Throwable>.uncancelablePreventsCanceledCase(
@@ -68,20 +68,20 @@ object BracketLaws {
     release: (Int) -> Kind<F, Unit>,
     EQ: Eq<Kind<F, Int>>): Unit =
     forAll(genApplicative(Gen.int(), this)) { fa: Kind<F, Int> ->
-      fa.uncancelable().bracket({ just(it) }) { a -> release(a).uncancelable() }.equalUnderTheLaw(fa.bracket({ just(it) }, release), EQ)
+      fa.uncancelable().bracket({ a -> release(a).uncancelable() }) { just(it) }.equalUnderTheLaw(fa.bracket(release) { just(it) }, EQ)
     }
 
   fun <F> Bracket<F, Throwable>.guaranteeIsDerivedFromBracket(
     finalizer: Kind<F, Unit>,
     EQ: Eq<Kind<F, Int>>): Unit =
     forAll(genApplicative(Gen.int(), this)) { fa: Kind<F, Int> ->
-      fa.guarantee(finalizer).equalUnderTheLaw(just(Unit).bracket({ fa }, { finalizer }), EQ)
+      fa.guarantee(finalizer).equalUnderTheLaw(just(Unit).bracket({ finalizer }) { fa }, EQ)
     }
 
   fun <F> Bracket<F, Throwable>.guaranteeCaseIsDerivedFromBracketCase(
     finalizer: (ExitCase<Throwable>) -> Kind<F, Unit>,
     EQ: Eq<Kind<F, Int>>): Unit =
     forAll(genApplicative(Gen.int(), this)) { fa: Kind<F, Int> ->
-      fa.guaranteeCase(finalizer).equalUnderTheLaw(just(Unit).bracketCase({ fa }, { _, e -> finalizer(e) }), EQ)
+      fa.guaranteeCase(finalizer).equalUnderTheLaw(just(Unit).bracketCase({ _, e -> finalizer(e) }) { fa }, EQ)
     }
 }

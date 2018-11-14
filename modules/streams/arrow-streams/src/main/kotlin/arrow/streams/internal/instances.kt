@@ -73,7 +73,7 @@ interface FreeCMonadError<F> : MonadError<FreeCPartialOf<F>, Throwable> {
 
 @extension
 interface FreeCBracket<F> : Bracket<FreeCPartialOf<F>, Throwable>, FreeCMonadError<F> {
-  override fun <A, B> Kind<FreeCPartialOf<F>, A>.bracketCase(use: (A) -> Kind<FreeCPartialOf<F>, B>, release: (A, ExitCase<Throwable>) -> Kind<FreeCPartialOf<F>, Unit>): Kind<FreeCPartialOf<F>, B> =
+  override fun <A, B> Kind<FreeCPartialOf<F>, A>.bracketCase(release: (A, ExitCase<Throwable>) -> Kind<FreeCPartialOf<F>, Unit>, use: (A) -> Kind<FreeCPartialOf<F>, B>): Kind<FreeCPartialOf<F>, B> =
     bracketC(use, release)
 }
 
