@@ -53,5 +53,8 @@ See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | rela
 
 The following datatypes in Arrow provide instances that adhere to the `At` typeclass.
 
-- [SetK]({{ '/docs/datatypes/setk' | relative_url }})
-- [MapK]({{ '/docs/datatypes/mapk' | relative_url }})
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.optics.typeclasses.*
+TypeClass(At::class).dtMarkdownList()
+```

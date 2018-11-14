@@ -49,5 +49,8 @@ emptyList<Int>().uncons()
 
 The following datatypes in Arrow provide instances that adhere to the `Cons` typeclass.
 
-- [ListK]({{ '/docs/datatypes/listk' | relative_url }})
-- [String]
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.optics.typeclasses.*
+TypeClass(Cons::class).dtMarkdownList()
+```

@@ -43,8 +43,8 @@ See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | rela
 
 The following datatypes in Arrow provide instances that adhere to the `Each` typeclass.
 
-- [MapK]({{ '/docs/datatypes/mapk' | relative_url }})
-- [ListK]({{ '/docs/datatypes/listk' | relative_url }})
-- [Option]({{ '/docs/datatypes/option' | relative_url }})
-- [Try]({{ '/docs/datatypes/try' | relative_url }})
-- [Either]({{ '/docs/datatypes/either' | relative_url }})
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.optics.typeclasses.*
+TypeClass(Each::class).dtMarkdownList()
+```

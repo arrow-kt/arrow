@@ -45,8 +45,8 @@ See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | rela
 
 The following datatypes in Arrow provide instances that adhere to the `Index` typeclass.
 
-- [String]
-- [NonEmptyList]({{ '/docs/datatypes/nonemptylist' | relative_url }})
-- [ListK]({{ '/docs/datatypes/listk' | relative_url }})
-- [SequenceK]({{ '/docs/datatypes/sequencek' | relative_url }})
-- [MapK]({{ '/docs/datatypes/mapk' | relative_url }})
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.optics.typeclasses.*
+TypeClass(Index::class).dtMarkdownList()
+```
