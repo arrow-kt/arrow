@@ -15,16 +15,18 @@ import arrow.typeclasses.MonadError
 @extension
 interface KleisliMonadReaderInstance<F, D> : MonadReader<KleisliPartialOf<F, D>, D>, KleisliMonadInstance<F, D> {
 
-  override fun FFF(): Monad<F>
+  override fun MF(): Monad<F>
 
-  override fun ask(): Kleisli<F, D, D> = Kleisli { FFF().just(it) }
+  override fun ask(): Kleisli<F, D, D> = Kleisli { MF().just(it) }
 
   override fun <A> Kind<KleisliPartialOf<F, D>, A>.local(f: (D) -> D): Kleisli<F, D, A> = fix().local(f)
-
 }
 
 class KleisliMtlContext<F, D, E>(val MF: MonadError<F, E>) : KleisliMonadReaderInstance<F, D>, KleisliMonadErrorInstance<F, D, E> {
-  override fun FFF(): MonadError<F, E> = MF
+
+  override fun MF(): Monad<F> = MF
+
+  override fun ME(): MonadError<F, E> = MF
 }
 
 class KleisliMtlContextPartiallyApplied<F, D, E>(val MF: MonadError<F, E>) {

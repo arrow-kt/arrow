@@ -30,17 +30,17 @@ abstract class KleisliInstances<F, D> {
 }
 
 class DaggerKleisliFunctorInstance<F, L> @Inject constructor(val FF: Functor<F>) : KleisliFunctorInstance<F, L> {
-  override fun FFF(): Functor<F> = FF
+  override fun FF(): Functor<F> = FF
 }
 
 class DaggerKleisliApplicativeInstance<F, L> @Inject constructor(val AF: Applicative<F>) : KleisliApplicativeInstance<F, L> {
-  override fun FFF(): Applicative<F> = AF
+  override fun AF(): Applicative<F> = AF
 }
 
 class DaggerKleisliMonadInstance<F, L> @Inject constructor(val MF: Monad<F>) : KleisliMonadInstance<F, L> {
-  override fun FFF(): Monad<F> = MF
+  override fun MF(): Monad<F> = MF
 }
 
 class DaggerKleisliMonadErrorInstance<F, L> @Inject constructor(val MF: MonadError<F, L>) : KleisliMonadErrorInstance<F, L, L> {
-  override fun FFF(): MonadError<F, L> = MF
+  override fun ME(): MonadError<F, L> = MF
 }

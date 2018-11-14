@@ -16,9 +16,9 @@ import arrow.typeclasses.*
 @extension
 interface KleisliFunctorInstance<F, D> : Functor<KleisliPartialOf<F, D>> {
 
-  fun FFF(): Functor<F>
+  fun FF(): Functor<F>
 
-  override fun <A, B> Kind<KleisliPartialOf<F, D>, A>.map(f: (A) -> B): Kleisli<F, D, B> = fix().map(FFF(), f)
+  override fun <A, B> Kind<KleisliPartialOf<F, D>, A>.map(f: (A) -> B): Kleisli<F, D, B> = fix().map(FF(), f)
 }
 
 @extension
@@ -33,54 +33,66 @@ interface KleisliContravariant<F, D> : Contravariant<Conested<Kind<ForKleisli, F
 @extension
 interface KleisliApplicativeInstance<F, D> : Applicative<KleisliPartialOf<F, D>>, KleisliFunctorInstance<F, D> {
 
-  override fun FFF(): Applicative<F>
+  fun AF(): Applicative<F>
 
-  override fun <A> just(a: A): Kleisli<F, D, A> = Kleisli { FFF().just(a) }
+  override fun FF(): Functor<F> = AF()
+
+  override fun <A> just(a: A): Kleisli<F, D, A> = Kleisli { AF().just(a) }
 
   override fun <A, B> Kind<KleisliPartialOf<F, D>, A>.map(f: (A) -> B): Kleisli<F, D, B> =
-    fix().map(FFF(), f)
+    fix().map(AF(), f)
 
   override fun <A, B> Kind<KleisliPartialOf<F, D>, A>.ap(ff: Kind<KleisliPartialOf<F, D>, (A) -> B>): Kleisli<F, D, B> =
-    fix().ap(FFF(), ff)
+    fix().ap(AF(), ff)
 
   override fun <A, B> Kind<KleisliPartialOf<F, D>, A>.product(fb: Kind<KleisliPartialOf<F, D>, B>): Kleisli<F, D, Tuple2<A, B>> =
-    Kleisli { FFF().run { fix().run(it).product(fb.fix().run(it)) } }
+    Kleisli { AF().run { fix().run(it).product(fb.fix().run(it)) } }
 }
 
 @extension
 interface KleisliMonadInstance<F, D> : Monad<KleisliPartialOf<F, D>>, KleisliApplicativeInstance<F, D> {
 
-  override fun FFF(): Monad<F>
+  fun MF(): Monad<F>
+
+  override fun AF(): Applicative<F> = MF()
 
   override fun <A, B> Kind<KleisliPartialOf<F, D>, A>.map(f: (A) -> B): Kleisli<F, D, B> =
-    fix().map(FFF(), f)
+    fix().map(MF(), f)
 
   override fun <A, B> Kind<KleisliPartialOf<F, D>, A>.flatMap(f: (A) -> Kind<KleisliPartialOf<F, D>, B>): Kleisli<F, D, B> =
-    fix().flatMap(FFF(), f.andThen { it.fix() })
+    fix().flatMap(MF(), f.andThen { it.fix() })
 
   override fun <A, B> Kind<KleisliPartialOf<F, D>, A>.ap(ff: Kind<KleisliPartialOf<F, D>, (A) -> B>): Kleisli<F, D, B> =
-    fix().ap(FFF(), ff)
+    fix().ap(MF(), ff)
 
   override fun <A, B> tailRecM(a: A, f: (A) -> KleisliOf<F, D, Either<A, B>>): Kleisli<F, D, B> =
-    Kleisli.tailRecM(FFF(), a, f)
+    Kleisli.tailRecM(MF(), a, f)
 }
 
 @extension
 interface KleisliApplicativeErrorInstance<F, D, E> : ApplicativeError<KleisliPartialOf<F, D>, E>, KleisliApplicativeInstance<F, D> {
 
-  override fun FFF(): ApplicativeError<F, E>
+  fun AE(): ApplicativeError<F, E>
+
+  override fun AF(): Applicative<F> = AE()
 
   override fun <A> Kind<KleisliPartialOf<F, D>, A>.handleErrorWith(f: (E) -> Kind<KleisliPartialOf<F, D>, A>): Kleisli<F, D, A> =
-    fix().handleErrorWith(FFF(), f)
+    fix().handleErrorWith(AE(), f)
 
   override fun <A> raiseError(e: E): Kleisli<F, D, A> =
-    Kleisli.raiseError(FFF(), e)
+    Kleisli.raiseError(AE(), e)
 }
 
 @extension
 interface KleisliMonadErrorInstance<F, D, E> : MonadError<KleisliPartialOf<F, D>, E>, KleisliApplicativeErrorInstance<F, D, E>, KleisliMonadInstance<F, D> {
 
-  override fun FFF(): MonadError<F, E>
+  fun ME(): MonadError<F, E>
+
+  override fun MF(): Monad<F> = ME()
+
+  override fun AE(): ApplicativeError<F, E> = ME()
+
+  override fun AF(): Applicative<F> = ME()
 }
 
 /**
@@ -99,7 +111,7 @@ fun <D> ReaderApi.applicative(): Applicative<ReaderPartialOf<D>> = Kleisli.appli
 fun <D> ReaderApi.monad(): Monad<ReaderPartialOf<D>> = Kleisli.monad(Id.monad())
 
 class ReaderContext<D> : KleisliMonadInstance<ForId, D> {
-  override fun FFF(): Monad<ForId> = Id.monad()
+  override fun MF(): Monad<ForId> = Id.monad()
 }
 
 class ReaderContextPartiallyApplied<L> {
@@ -112,7 +124,7 @@ fun <D> Reader(): ReaderContextPartiallyApplied<D> =
   ReaderContextPartiallyApplied()
 
 class KleisliContext<F, D, E>(val ME: MonadError<F, E>) : KleisliMonadErrorInstance<F, D, E> {
-  override fun FFF(): MonadError<F, E> = ME
+  override fun ME(): MonadError<F, E> = ME
 }
 
 class KleisliContextPartiallyApplied<F, D, E>(val MF: MonadError<F, E>) {

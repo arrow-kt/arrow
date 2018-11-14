@@ -8,17 +8,20 @@ import arrow.effects.typeclasses.Bracket
 import arrow.effects.typeclasses.ExitCase
 import arrow.extension
 import arrow.instances.KleisliMonadErrorInstance
+import arrow.typeclasses.MonadError
 
 @extension
 interface KleisliBracketInstance<F, R, E> : Bracket<KleisliPartialOf<F, R>, E>, KleisliMonadErrorInstance<F, R, E> {
 
-  override fun FFF(): Bracket<F, E>
+  fun BF(): Bracket<F, E>
+
+  override fun ME(): MonadError<F, E> = BF()
 
   override fun <A, B> Kind<KleisliPartialOf<F, R>, A>.bracketCase(
     use: (A) -> Kind<KleisliPartialOf<F, R>, B>,
     release: (A, ExitCase<E>) -> Kind<KleisliPartialOf<F, R>, Unit>
   ): Kleisli<F, R, B> =
-    FFF().run {
+    BF().run {
       Kleisli { r ->
         this@bracketCase.fix().run(r).bracketCase({ a ->
           use(a).fix().run(r)
@@ -29,5 +32,5 @@ interface KleisliBracketInstance<F, R, E> : Bracket<KleisliPartialOf<F, R>, E>, 
     }
 
   override fun <A> Kind<KleisliPartialOf<F, R>, A>.uncancelable(): Kleisli<F, R, A> =
-    Kleisli { r -> FFF().run { this@uncancelable.fix().run(r).uncancelable() } }
+    Kleisli { r -> BF().run { this@uncancelable.fix().run(r).uncancelable() } }
 }
