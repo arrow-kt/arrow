@@ -49,12 +49,11 @@ You may create instances of `At` for your own datatypes which you will be able t
 
 See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }}) to provide your own `At` instances for custom datatypes.
 
-### Instances
-
-The following datatypes in Arrow provide instances that adhere to the `At` typeclass.
+### Data types
 
 ```kotlin:ank:replace
 import arrow.reflect.*
 import arrow.optics.typeclasses.*
+
 TypeClass(At::class).dtMarkdownList()
 ```

@@ -41,12 +41,11 @@ You may create instances of `Index` for your own datatypes which you will be abl
 
 See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }}) to provide your own `Index` instances for custom datatypes.
 
-### Instances
-
-The following datatypes in Arrow provide instances that adhere to the `Index` typeclass.
+### Data types
 
 ```kotlin:ank:replace
 import arrow.reflect.*
 import arrow.optics.typeclasses.*
+
 TypeClass(Index::class).dtMarkdownList()
 ```

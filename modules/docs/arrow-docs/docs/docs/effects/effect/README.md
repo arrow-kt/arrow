@@ -16,13 +16,11 @@ If you want to use callbacks or running suspended datatypes, then `Effect` is th
 
 TODO. Meanwhile you can find a short description in the [intro to typeclasses]({{ '/docs/typeclasses/intro/' | relative_url }}).
 
-### Data Types
+### Data types
 
-The following data types in Arrow provide instances that adhere to the `Async` type class.
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.effects.typeclasses.*
 
-- [IO]({{ '/docs/effects/io' | relative_url }})
-- [ObservableK]({{ '/docs/integrations/rx2' | relative_url }})
-- [FlowableK]({{ '/docs/integrations/rx2' | relative_url }})
-- [DeferredK]({{ '/docs/integrations/kotlinxcoroutines/' | relative_url }})
-- [FluxK]({{ '/docs/integrations/reactor' | relative_url }})
-- [MonoK]({{ '/docs/integrations/reactor' | relative_url }})
+TypeClass(Effect::class).dtMarkdownList()
+```

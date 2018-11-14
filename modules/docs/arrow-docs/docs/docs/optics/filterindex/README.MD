@@ -45,12 +45,11 @@ ListK.filterIndex<Int>().filter { index -> index % 2 == 0 }
             .getAll(listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9).k())
 ```
 
-### Instances
-
-The following datatypes in Arrow provide instances that adhere to the `FilterIndex` typeclass.
+### Data types
 
 ```kotlin:ank:replace
 import arrow.reflect.*
 import arrow.optics.typeclasses.*
+
 TypeClass(FilterIndex::class).dtMarkdownList()
 ```

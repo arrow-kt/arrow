@@ -126,27 +126,15 @@ Arrow already provides `Monad` instances for most common datatypes both in Arrow
 
 See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }}) to provide your own `Monad` instances for custom datatypes.
 
-### Data Types
+### Data types
 
 The following data types in Arrow provide instances that adhere to the `Monad` type class.
 
-- [Kleisli]({{ '/docs/datatypes/kleisli' | relative_url }})
-- [NonEmptyList]({{ '/docs/datatypes/nonemptylist' | relative_url }})
-- [Option]({{ '/docs/datatypes/option' | relative_url }})
-- [OptionT]({{ '/docs/datatypes/optiont' | relative_url }})
-- [SequenceK]({{ '/docs/datatypes/sequencek' | relative_url }})
-- [State]({{ '/docs/datatypes/state' | relative_url }})
-- [StateT]({{ '/docs/datatypes/statet' | relative_url }})
-- [Try]({{ '/docs/datatypes/try' | relative_url }})
-- [Either]({{ '/docs/datatypes/either' | relative_url }})
-- [EitherT]({{ '/docs/datatypes/eithert' | relative_url }})
-- [Eval]({{ '/docs/datatypes/eval' | relative_url }})
-- [Id]({{ '/docs/datatypes/id' | relative_url }})
-- [Observable]({{ '/docs/integrations/rx2' | relative_url }})
-- [Flowable]({{ '/docs/integrations/rx2' | relative_url }})
-- [Deferred]({{ '/docs/integrations/kotlinxcoroutines' | relative_url }})
-- [Flux]({{ '/docs/integrations/reactor' | relative_url }})
-- [Mono]({{ '/docs/integrations/reactor' | relative_url }})
-- [IO]({{ '/docs/effects/io' | relative_url }})
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.typeclasses.Monad
+
+TypeClass(Monad::class).dtMarkdownList()
+```
 
 [monad_law_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-test/src/main/kotlin/arrow/test/laws/MonadLaws.kt

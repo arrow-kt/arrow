@@ -181,15 +181,11 @@ disposable()
 // Boom! caused by BindingCancellationException
 ```
 
-## Available Instances
+### Supported Type Classes
 
-* [Applicative]({{ '/docs/typeclasses/applicative' | relative_url }})
-* [ApplicativeError]({{ '/docs/typeclasses/applicativeerror' | relative_url }})
-* [Functor]({{ '/docs/typeclasses/functor' | relative_url }})
-* [Monad]({{ '/docs/typeclasses/monad' | relative_url }})
-* [MonadError]({{ '/docs/typeclasses/monaderror' | relative_url }})
-* [MonadDefer]({{ '/docs/effects/monaddefer' | relative_url }})
-* [Async]({{ '/docs/effects/async' | relative_url }})
-* [Effect]({{ '/docs/effects/effect' | relative_url }})
-* [Foldable]({{ '/docs/typeclasses/foldable' | relative_url }})
-* [Traverse]({{ '/docs/typeclasses/traverse' | relative_url }})
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.effects.*
+
+DataType(ObservableK::class).tcMarkdownList()
+```

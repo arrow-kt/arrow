@@ -66,6 +66,15 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
       dispose
     }.k()
 
+  override fun equals(other: Any?): Boolean =
+    when (other) {
+      is FlowableK<*> -> this.flowable == other.flowable
+      is Flowable<*> -> this.flowable == other
+      else -> false
+    }
+
+  override fun hashCode(): Int = flowable.hashCode()
+
   companion object {
     fun <A> just(a: A): FlowableK<A> =
       Flowable.just(a).k()

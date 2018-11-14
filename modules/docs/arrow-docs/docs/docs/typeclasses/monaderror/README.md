@@ -82,15 +82,9 @@ Arrow provides `MonadErrorLaws` in the form of test cases for internal verificat
 
 ### Data types
 
-The following datatypes in Arrow provide instances that adhere to the `MonadError` typeclass.
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.typeclasses.MonadError
 
-- [Try]({{ '/docs/datatypes/try' | relative_url }})
-- [Either]({{ '/docs/datatypes/either' | relative_url }})
-- [Kleisli]({{ '/docs/datatypes/kleisli' | relative_url }})
-- [Option]({{ '/docs/datatypes/option' | relative_url }})
-- [EitherT]({{ '/docs/datatypes/eithert' | relative_url }})
-- [StateT]({{ '/docs/datatypes/statet' | relative_url }})
-- [IO]({{ '/docs/effects/io' | relative_url }})
-- [ObservableK]({{ '/docs/integrations/rx2' | relative_url }})
-- [FlowableK]({{ '/docs/integrations/rx2' | relative_url }})
-- [DeferredK]({{ '/docs/integrations/kotlinxcoroutines/' | relative_url }})
+TypeClass(MonadError::class).dtMarkdownList()
+```

@@ -43,6 +43,15 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
       dispose
     }.k()
 
+  override fun equals(other: Any?): Boolean =
+    when (other) {
+      is MonoK<*> -> this.mono == other.mono
+      is Mono<*> -> this.mono == other
+      else -> false
+    }
+
+  override fun hashCode(): Int = mono.hashCode()
+
   companion object {
     fun <A> just(a: A): MonoK<A> =
       Mono.just(a).k()

@@ -137,15 +137,15 @@ Ior.Both("Warning", 41).toValidated()
 Ior.Both("Warning", 41).toOption()
 ```
 
-## Available Instances
+### Supported type classes
 
-* [Show]({{ '/docs/typeclasses/show' | relative_url }})
-* [Eq]({{ '/docs/typeclasses/eq' | relative_url }})
-* [Foldable]({{ '/docs/typeclasses/foldable' | relative_url }})
-* [Functor]({{ '/docs/typeclasses/functor' | relative_url }})
-* [Bifunctor]({{ '/docs/typeclasses/bifunctor' | relative_url }})
-* [Traverse]({{ '/docs/typeclasses/traverse' | relative_url }})
-* [TraverseFilter]({{ '/docs/typeclasses/traversefilter' | relative_url }})
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.data.*
+import arrow.core.*
+
+DataType(Ior::class).tcMarkdownList()
+```
 
 ## Credits
 
