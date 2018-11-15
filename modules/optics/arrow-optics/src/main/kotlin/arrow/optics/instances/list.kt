@@ -1,14 +1,10 @@
 package arrow.optics.instances
 
 import arrow.Kind
-import arrow.core.ListInstances
-import arrow.core.left
-import arrow.core.right
-import arrow.core.toT
+import arrow.core.*
 import arrow.data.k
-import arrow.optics.Optional
-import arrow.optics.POptional
-import arrow.optics.Traversal
+import arrow.optics.*
+import arrow.optics.typeclasses.Cons
 import arrow.optics.typeclasses.Each
 import arrow.optics.typeclasses.FilterIndex
 import arrow.optics.typeclasses.Index
@@ -92,5 +88,22 @@ interface ListIndexInstance<A> : Index<List<A>, Int, A> {
   companion object {
 
     operator fun <A> invoke() = object : ListIndexInstance<A> {}
+  }
+}
+
+fun <A> ListInstances.cons(): Cons<List<A>, A> = ListConsInstance()
+
+/**
+ * [Cons] instance definition for [List].
+ */
+interface ListConsInstance<A> : Cons<List<A>, A> {
+  override fun cons(): Prism<List<A>, Tuple2<A, List<A>>> = PPrism(
+    getOrModify = { list -> list.firstOrNull()?.let { Tuple2(it, list.drop(1)) }?.right() ?: list.left() },
+    reverseGet = { (a, aas) -> listOf(a) + aas }
+  )
+
+  companion object {
+
+    operator fun <A> invoke() = object : ListConsInstance<A> {}
   }
 }

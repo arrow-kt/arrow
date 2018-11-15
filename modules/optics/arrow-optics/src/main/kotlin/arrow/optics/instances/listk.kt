@@ -4,9 +4,8 @@ import arrow.Kind
 import arrow.core.*
 import arrow.data.*
 import arrow.extension
-import arrow.optics.Optional
-import arrow.optics.POptional
-import arrow.optics.Traversal
+import arrow.optics.*
+import arrow.optics.typeclasses.Cons
 import arrow.optics.typeclasses.Each
 import arrow.optics.typeclasses.FilterIndex
 import arrow.optics.typeclasses.Index
@@ -54,5 +53,16 @@ interface ListKIndexInstance<A> : Index<ListK<A>, Int, A> {
   override fun index(i: Int): Optional<ListK<A>, A> = POptional(
     getOrModify = { it.getOrNull(i)?.right() ?: it.left() },
     set = { l, a -> l.mapIndexed { index: Int, aa: A -> if (index == i) a else aa }.k() }
+  )
+}
+
+/**
+ * [Cons] instance definition for [ListK].
+ */
+@extension
+interface ListKConsInstance<A> : Cons<ListK<A>, A> {
+  override fun cons(): Prism<ListK<A>, Tuple2<A, ListK<A>>> = PPrism(
+    getOrModify = { list -> list.firstOrNull()?.let { Tuple2(it, list.drop(1).k()) }?.right() ?: list.left() },
+    reverseGet = { (a, aas) -> ListK(listOf(a) + aas) }
   )
 }

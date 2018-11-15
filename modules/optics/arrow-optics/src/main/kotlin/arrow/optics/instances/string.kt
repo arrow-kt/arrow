@@ -1,6 +1,9 @@
 package arrow.optics.instances
 
 import arrow.*
+import arrow.core.Tuple2
+import arrow.core.left
+import arrow.core.right
 import arrow.data.*
 import arrow.typeclasses.*
 import arrow.optics.*
@@ -99,6 +102,29 @@ interface StringIndexInstance : Index<String, Int, Char> {
      * @return [Index] instance for [String]
      */
     operator fun invoke(): Index<String, Int, Char> = object : StringIndexInstance {}
+  }
+
+}
+
+/**
+ * [String]'s [Cons] instance
+ */
+fun String.Companion.cons(): Cons<String, Char> = StringConsInstance()
+
+interface StringConsInstance : Cons<String, Char> {
+
+  override fun cons(): Prism<String, Tuple2<Char, String>> = Prism(
+    getOrModify = { if (it.isNotEmpty()) Tuple2(it.first(), it.drop(1)).right() else it.left() },
+    reverseGet = { (h, t) -> h + t }
+  )
+
+  companion object {
+    /**
+     * Operator overload to instantiate typeclass instance.
+     *
+     * @return [Cons] instance for [String]
+     */
+    operator fun invoke(): Cons<String, Char> = object : StringConsInstance {}
   }
 
 }

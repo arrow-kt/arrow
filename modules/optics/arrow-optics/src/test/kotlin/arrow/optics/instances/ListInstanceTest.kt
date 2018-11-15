@@ -2,8 +2,11 @@ package arrow.optics.instances
 
 import arrow.core.*
 import arrow.data.*
+import arrow.instances.eq
 import arrow.instances.listk.eq.eq
 import arrow.instances.option.eq.eq
+import arrow.instances.tuple2.eq.eq
+import arrow.optics.instances.listk.cons.cons
 import arrow.optics.instances.listk.each.each
 import arrow.optics.instances.listk.filterIndex.filterIndex
 import arrow.optics.instances.listk.index.index
@@ -11,6 +14,7 @@ import arrow.optics.typeclasses.FilterIndex
 import arrow.test.UnitSpec
 import arrow.test.generators.*
 import arrow.test.laws.OptionalLaws
+import arrow.test.laws.PrismLaws
 import arrow.test.laws.TraversalLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
@@ -78,6 +82,15 @@ class ListInstanceTest : UnitSpec() {
       funcGen = genFunctionAToB(Gen.string()),
       EQOptionB = Eq.any(),
       EQA = Eq.any()
+    ))
+
+    testLaws(PrismLaws.laws(
+      prism = ListK.cons<Int>().cons(),
+      aGen = genListK(Gen.int()),
+      bGen = genTuple(Gen.int(), genListK(Gen.int())),
+      funcGen = genFunctionAToB(genTuple(Gen.int(), genListK(Gen.int()))),
+      EQA = ListK.eq(Int.eq()),
+      EQOptionB = Option.eq(Tuple2.eq(Int.eq(), ListK.eq(Int.eq())))
     ))
 
   }
