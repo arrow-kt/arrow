@@ -1,6 +1,7 @@
 package arrow.effects.typeclasses
 
 import arrow.Kind
+import arrow.effects.internal.CancelToken
 
 /**
  * [Fiber] represents the pure result of an [Async] data type
@@ -23,10 +24,10 @@ interface Fiber<F, A> {
    *
    * @returns a task that trigger the cancellation upon evaluation.
    */
-  val cancel: Kind<F, Unit>
+  val cancel: CancelToken<F>
 
   operator fun component1(): Kind<F, A> = join
-  operator fun component2(): Kind<F, Unit> = cancel
+  operator fun component2(): CancelToken<F> = cancel
 
   companion object {
 
@@ -36,9 +37,9 @@ interface Fiber<F, A> {
      * @param join task that will trigger the cancellation.
      * @param cancel task that will await for the completion of the underlying fiber.
      */
-    operator fun <F, A> invoke(join: Kind<F, A>, cancel: Kind<F, Unit>): Fiber<F, A> = object : Fiber<F, A> {
-      override val cancel: Kind<F, Unit> = cancel
+    operator fun <F, A> invoke(join: Kind<F, A>, cancel: CancelToken<F>): Fiber<F, A> = object : Fiber<F, A> {
       override val join: Kind<F, A> = join
+      override val cancel: CancelToken<F> = cancel
       override fun toString(): String = "Fiber(join= $join, cancel= $cancel)"
     }
   }
