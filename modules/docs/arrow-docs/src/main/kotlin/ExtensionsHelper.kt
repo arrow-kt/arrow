@@ -3,7 +3,6 @@ package arrow.reflect
 import arrow.aql.Box
 import kotlin.reflect.KClass
 import kotlin.reflect.full.declaredFunctions
-import kotlin.reflect.full.extensionReceiverParameter
 
 private val lineSeparator: String = "\n" //System.getProperty("line.separator")
 

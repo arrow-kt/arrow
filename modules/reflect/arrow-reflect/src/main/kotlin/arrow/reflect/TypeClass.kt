@@ -1,14 +1,7 @@
 package arrow.reflect
 
 import arrow.Kind
-import arrow.core.Tuple2
-import arrow.core.toT
-import io.github.classgraph.TypeSignature
 import kotlin.reflect.KClass
-import kotlin.reflect.KFunction
-import kotlin.reflect.KType
-import kotlin.reflect.full.declaredFunctions
-import kotlin.reflect.full.extensionReceiverParameter
 import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.full.superclasses
 

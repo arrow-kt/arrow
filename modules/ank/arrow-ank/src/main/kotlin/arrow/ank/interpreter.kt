@@ -5,7 +5,6 @@ import arrow.core.*
 import arrow.data.ListK
 import arrow.data.fix
 import arrow.data.k
-import arrow.instances.option.monad.followedBy
 import arrow.instances.option.monad.forEffect
 import arrow.typeclasses.MonadError
 import org.intellij.markdown.MarkdownElementTypes.CODE_FENCE
@@ -18,8 +17,6 @@ import org.intellij.markdown.parser.MarkdownParser
 import java.io.File
 import java.net.URL
 import java.net.URLClassLoader
-import java.nio.file.Files
-import java.nio.file.Path
 import javax.script.ScriptEngine
 import javax.script.ScriptEngineManager
 
