@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.*
 import arrow.data.*
 import arrow.extension
+import arrow.instances.option.applicative.applicative
 import arrow.optics.*
 import arrow.optics.typeclasses.Cons
 import arrow.optics.typeclasses.Each
