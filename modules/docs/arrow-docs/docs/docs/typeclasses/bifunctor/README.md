@@ -64,13 +64,14 @@ For a full list of other useful combinators available in `Bifunctor` see the [So
 
 Arrow provides [`BifunctorLaws`][bifunctor_laws_source]{:target="_blank"} in the form of test cases for internal verification of lawful instances and third party apps creating their own Bifunctor instances.
 
-### Data Types
+### Data types
 
-The following datatypes in Arrow provide instances that adhere to the `Bifunctor` typeclass.
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.typeclasses.Bifunctor
 
-- [Either]({{ '/docs/datatypes/either' | relative_url }})
-- [Ior]({{ '/docs/datatypes/ior' | relative_url }})
-- `Tuple2`
+TypeClass(Bifunctor::class).dtMarkdownList()
+```
 
 [bifunctor_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-typeclasses/src/main/kotlin/arrow/typeclasses/Bifunctor.kt
 [bifunctor_laws_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-test/src/main/kotlin/arrow/test/laws/BifunctorLaws.kt

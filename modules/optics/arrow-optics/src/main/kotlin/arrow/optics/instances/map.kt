@@ -44,7 +44,7 @@ fun <K, V> MapInstances.traversal(): Traversal<Map<K, V>, V> = MapTraversal()
  */
 interface MapTraversal<K, V> : Traversal<Map<K, V>, V> {
   override fun <F> modifyF(FA: Applicative<F>, s: Map<K, V>, f: (V) -> Kind<F, V>): Kind<F, Map<K, V>> = FA.run {
-    s.k().traverse(FA, f).map { it.map }
+    s.k().traverse(FA, f)
   }
 
   companion object {

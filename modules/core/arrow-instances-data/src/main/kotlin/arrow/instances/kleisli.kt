@@ -46,7 +46,7 @@ interface KleisliApplicativeInstance<F, D> : Applicative<KleisliPartialOf<F, D>>
     fix().ap(AF(), ff)
 
   override fun <A, B> Kind<KleisliPartialOf<F, D>, A>.product(fb: Kind<KleisliPartialOf<F, D>, B>): Kleisli<F, D, Tuple2<A, B>> =
-    Kleisli({ AF().run { fix().run(it).product(fb.fix().run(it)) } })
+    Kleisli { AF().run { fix().run(it).product(fb.fix().run(it)) } }
 }
 
 @extension
@@ -67,7 +67,6 @@ interface KleisliMonadInstance<F, D> : Monad<KleisliPartialOf<F, D>>, KleisliApp
 
   override fun <A, B> tailRecM(a: A, f: (A) -> KleisliOf<F, D, Either<A, B>>): Kleisli<F, D, B> =
     Kleisli.tailRecM(MF(), a, f)
-
 }
 
 @extension
@@ -82,7 +81,6 @@ interface KleisliApplicativeErrorInstance<F, D, E> : ApplicativeError<KleisliPar
 
   override fun <A> raiseError(e: E): Kleisli<F, D, A> =
     Kleisli.raiseError(AE(), e)
-
 }
 
 @extension
@@ -95,7 +93,6 @@ interface KleisliMonadErrorInstance<F, D, E> : MonadError<KleisliPartialOf<F, D>
   override fun AE(): ApplicativeError<F, E> = ME()
 
   override fun AF(): Applicative<F> = ME()
-
 }
 
 /**

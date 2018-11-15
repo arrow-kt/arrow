@@ -1,7 +1,10 @@
 package arrow.optics.instances
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.ListInstances
+import arrow.core.left
+import arrow.core.right
+import arrow.core.toT
 import arrow.data.k
 import arrow.data.traverse
 import arrow.instances.option.applicative.applicative
@@ -23,7 +26,7 @@ fun <A> ListInstances.traversal(): Traversal<List<A>, A> = ListTraversal()
 interface ListTraversal<A> : Traversal<List<A>, A> {
 
   override fun <F> modifyF(FA: Applicative<F>, s: List<A>, f: (A) -> Kind<F, A>): Kind<F, List<A>> = FA.run {
-    s.k().traverse(FA, f).map { it.list }
+    s.k().traverse(FA, f)
   }
 
   companion object {
@@ -65,7 +68,7 @@ interface ListFilterIndexInstance<A> : FilterIndex<List<A>, Int, A> {
     override fun <F> modifyF(FA: Applicative<F>, s: List<A>, f: (A) -> Kind<F, A>): Kind<F, List<A>> = FA.run {
       s.mapIndexed { index, a -> a toT index }.k().traverse(FA) { (a, j) ->
         if (p(j)) f(a) else just(a)
-      }.map { it.list }
+      }
     }
   }
 

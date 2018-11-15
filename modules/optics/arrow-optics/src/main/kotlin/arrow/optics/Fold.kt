@@ -146,7 +146,7 @@ interface Fold<S, A> : FoldOf<S, A> {
   infix fun <C> compose(other: Optional<A, C>): Fold<S, C> = compose(other.asFold())
 
   /**
-   * Compose a [[Fold]] with a [Prism]
+   * Compose a [Fold] with a [Prism]
    */
   infix fun <C> compose(other: Prism<A, C>): Fold<S, C> = compose(other.asFold())
 

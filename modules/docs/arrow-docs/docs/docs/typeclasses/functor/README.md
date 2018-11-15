@@ -100,31 +100,14 @@ as demonstrated in the [example](#example) above.
 
 See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }})
 
-### Data Types
+### Data types
 
-The following datatypes in Arrow provide instances that adhere to the `Functor` typeclass.
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.typeclasses.Functor
 
-- [Cofree]({{ '/docs/free/cofree' | relative_url }})
-- [Coproduct]({{ '/docs/datatypes/coproduct' | relative_url }})  
-- [Coyoneda]({{ '/docs/free/coyoneda' | relative_url }})
-- [Either]({{ '/docs/datatypes/either' | relative_url }})
-- [EitherT]({{ '/docs/datatypes/eithert' | relative_url }})
-- [FreeApplicative]({{ '/docs/free/freeapplicative' | relative_url }})
-- [Function1]({{ '/docs/datatypes/function1' | relative_url }})
-- [Ior]({{ '/docs/datatypes/ior' | relative_url }})
-- [Kleisli]({{ '/docs/datatypes/kleisli' | relative_url }})
-- [OptionT]({{ '/docs/datatypes/optiont' | relative_url }})
-- [StateT]({{ '/docs/datatypes/statet' | relative_url }})
-- [Validated]({{ '/docs/datatypes/validated' | relative_url }})
-- [WriterT]({{ '/docs/datatypes/writert' | relative_url }})
-- [Yoneda]({{ '/docs/free/yoneda' | relative_url }})
-- [Const]({{ '/docs/datatypes/const' | relative_url }})
-- [Try]({{ '/docs/datatypes/try' | relative_url }})
-- [Eval]({{ '/docs/datatypes/eval' | relative_url }})
-- [IO]({{ '/docs/effects/io' | relative_url }})
-- [NonEmptyList]({{ '/docs/datatypes/nonemptylist' | relative_url }})
-- [Id]({{ '/docs/datatypes/id' | relative_url }})
-- [Function0]({{ '/docs/datatypes/function0' | relative_url }})
+TypeClass(Functor::class).dtMarkdownList()
+```
 
 Additionally all instances of [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}), [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) and their MTL variants implement the `Functor` typeclass directly
 since they are all subtypes of `Functor`

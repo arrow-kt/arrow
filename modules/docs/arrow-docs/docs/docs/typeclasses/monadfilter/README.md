@@ -126,8 +126,11 @@ bindingFilter {
 }
 ```
 
-### Data Types
+### Data types
 
-The following data types in Arrow provide instances that adhere to the `MonadFilter` type class.
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.mtl.typeclasses.MonadFilter
 
-- [Option]({{ '/docs/datatypes/option' | relative_url }})
+TypeClass(MonadFilter::class).dtMarkdownList()
+```
