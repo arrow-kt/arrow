@@ -4,12 +4,13 @@ import arrow.Kind
 import arrow.core.*
 import arrow.data.*
 import arrow.extension
-import arrow.optics.Optional
-import arrow.optics.POptional
-import arrow.optics.Traversal
+import arrow.instances.option.applicative.applicative
+import arrow.optics.*
+import arrow.optics.typeclasses.Cons
 import arrow.optics.typeclasses.Each
 import arrow.optics.typeclasses.FilterIndex
 import arrow.optics.typeclasses.Index
+import arrow.optics.typeclasses.Snoc
 import arrow.typeclasses.Applicative
 
 /**
@@ -55,4 +56,33 @@ interface ListKIndexInstance<A> : Index<ListK<A>, Int, A> {
     getOrModify = { it.getOrNull(i)?.right() ?: it.left() },
     set = { l, a -> l.mapIndexed { index: Int, aa: A -> if (index == i) a else aa }.k() }
   )
+}
+
+/**
+ * [Cons] instance definition for [ListK].
+ */
+@extension
+interface ListKConsInstance<A> : Cons<ListK<A>, A> {
+  override fun cons(): Prism<ListK<A>, Tuple2<A, ListK<A>>> = PPrism(
+    getOrModify = { list -> list.firstOrNull()?.let { Tuple2(it, list.drop(1).k()) }?.right() ?: list.left() },
+    reverseGet = { (a, aas) -> ListK(listOf(a) + aas) }
+  )
+}
+
+/**
+ * [Snoc] instance definition for [ListK].
+ */
+@extension
+interface ListKSnocInstance<A> : Snoc<ListK<A>, A> {
+
+  override fun snoc() = object : Prism<ListK<A>, Tuple2<ListK<A>, A>> {
+    override fun getOrModify(s: ListK<A>): Either<ListK<A>, Tuple2<ListK<A>, A>> =
+      Option.applicative().map(Try { s.dropLast(1).k() }.toOption(), s.lastOrNull().toOption(), ::identity)
+        .fix()
+        .toEither { s }
+
+    override fun reverseGet(b: Tuple2<ListK<A>, A>): ListK<A> =
+      ListK(b.a + b.b)
+  }
+
 }

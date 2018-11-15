@@ -2,6 +2,7 @@ package arrow.effects
 
 import arrow.core.*
 import arrow.effects.typeclasses.Disposable
+import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import kotlinx.coroutines.*
@@ -30,6 +31,16 @@ data class DeferredK<out A>(private val deferred: Deferred<A>, val scope: Corout
   fun <B> flatMap(f: (A) -> DeferredKOf<B>): DeferredK<B> =
     scope.asyncK(Dispatchers.Unconfined, CoroutineStart.LAZY) {
       f(await()).await()
+    }
+
+  fun <B> bracketCase(use: (A) -> DeferredK<B>, release: (A, ExitCase<Throwable>) -> DeferredK<Unit>): DeferredK<B> =
+    flatMap { a ->
+      try {
+        use(a).also { release(a, ExitCase.Completed) }
+      } catch (e: Exception) {
+        release(a, ExitCase.Error(e))
+        DeferredK.failed<B>(e)
+      }
     }
 
   fun continueOn(ctx: CoroutineContext): DeferredK<A> =
