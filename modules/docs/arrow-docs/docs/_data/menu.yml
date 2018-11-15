@@ -106,7 +106,7 @@ options:
         url: /docs/datatypes/basic/
 
       - title: Option
-        url: /docs/datatypes/option/
+        url: /docs/arrow/core/option/
 
       - title: Either
         url: /docs/datatypes/either/

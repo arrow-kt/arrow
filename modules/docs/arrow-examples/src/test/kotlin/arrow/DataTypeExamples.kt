@@ -17,7 +17,7 @@ import kotlin.reflect.KClass
 class DataTypeExamples : FreeSpec() { init {
 
   /**
-   * Option http://arrow-kt.io/docs/datatypes/option/
+   * Option http://arrow-kt.io/docs/arrow/core/option/
    ***/
   "Option: Some or None?" - {
     val someValue: Option<Int> = Some(42)

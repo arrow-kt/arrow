@@ -121,7 +121,7 @@ Arrow provide proper datatypes and typeclasses to represent exceptional cases.
 
 ### Option
 
-We use [`Option`](/docs/datatypes/option) to model the potential absence of a value
+We use [`Option`](/docs/arrow/core/option) to model the potential absence of a value
 
 When using `Option` our previous example may look like:
 
@@ -134,7 +134,7 @@ fun aim(): Option<Target> = None
 fun launch(target: Target, nuke: Nuke): Option<Impacted> = Some(Impacted)
 ```
 
-It's easy to work with [`Option`](/docs/datatypes/option) if your lang supports [Monad Comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) or special syntax for them.
+It's easy to work with [`Option`](/docs/arrow/core/option) if your lang supports [Monad Comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) or special syntax for them.
 Arrow provides [monadic comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }})  for all datatypes for which a [`Monad`](/docs/typeclasses/monad) instance exists built atop coroutines.
 
 ```kotlin

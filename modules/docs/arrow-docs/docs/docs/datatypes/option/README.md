@@ -1,7 +1,10 @@
 ---
 layout: docs
 title: Option
-permalink: /docs/datatypes/option/
+permalink: /docs/arrow/core/option/
+redirect_from:
+  - /docs/datatypes/option
+
 video: 5SFTbphderE
 ---
 

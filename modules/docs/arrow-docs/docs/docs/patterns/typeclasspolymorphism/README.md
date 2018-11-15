@@ -264,7 +264,7 @@ and both are [**Typeclasses**]({{ '/docs/typeclasses/intro' | relative_url }}).
 **Typeclasses define behaviors (contracts)**. They're basically encoded as interfaces that work over a generic argument, 
 as in [`Monad<F>`]({{ '/docs/typeclasses/monad' | relative_url }}) , [`Functor<F>`]({{ '/docs/typeclasses/functor' | relative_url }}) 
 and many more. That `F` is the data type. So we will be able to pass types like [`Either`]({{ '/docs/datatypes/either' | relative_url }})
-, [`Option`]({{ '/docs/datatypes/option' | relative_url }}), [`IO`]({{ '/docs/effects/io' | relative_url }}), [`Observable`]({{ '/docs/integrations/rx2' | relative_url }}), 
+, [`Option`]({{ '/docs/arrow/core/option' | relative_url }}), [`IO`]({{ '/docs/effects/io' | relative_url }}), [`Observable`]({{ '/docs/integrations/rx2' | relative_url }}), 
 [`Flowable`]({{ '/docs/integrations/rx2' | relative_url }}) and many more for it.
 
 Don't worry if you don't know about some of them yet. Data types like `Either`, `Option` or `IO` are particular from 
@@ -309,8 +309,8 @@ class LocalDataSource<F>(A: ApplicativeError<F, Throwable>) :
 The in memory map remains the same, but the function does a couple things probably new to you:
 
 * It tries to load the `Tasks` from the local cache, and since that returns a nullable (because the `Tasks` could not be 
-found), we are going to model that using an [`Option`]({{ '/docs/datatypes/option' | relative_url }}). In case you're not 
-aware of how [`Option`]({{ '/docs/datatypes/option' | relative_url }}) works, it models presence vs absence of a value. A 
+found), we are going to model that using an [`Option`]({{ '/docs/arrow/core/option' | relative_url }}). In case you're not 
+aware of how [`Option`]({{ '/docs/arrow/core/option' | relative_url }}) works, it models presence vs absence of a value. A 
 value that is wrapped inside of it.
 
 * After getting our optional value, we `fold` over it. Folding is just equivalent to a when statement over the optional 

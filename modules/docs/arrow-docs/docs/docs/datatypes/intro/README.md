@@ -47,7 +47,7 @@ so they are always required.
 
 - [`Id`]({{ '/docs/datatypes/id/' | relative_url }}) - a simple wrapper without any behavior, used mostly for testing
 
-- [`Option`]({{ '/docs/datatypes/option/' | relative_url }}) - absence of a value, or failure to construct a correct value
+- [`Option`]({{ '/docs/arrow/core/option/' | relative_url }}) - absence of a value, or failure to construct a correct value
 
 - [`Either`]({{ '/docs/datatypes/either/' | relative_url }}) - an if/else branch in execution
 

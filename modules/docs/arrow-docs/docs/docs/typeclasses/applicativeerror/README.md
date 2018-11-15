@@ -95,7 +95,7 @@ Try { "nope".toInt() }.attempt()
 
 #### fromEither/fromTry/fromOption
 
-Constructor function from an [`Either<E, A>`]({{ '/docs/datatypes/either' | relative_url }}), [`Option<A>`]({{ '/docs/datatypes/option' | relative_url }}), or [`Try<A>`]({{ '/docs/datatypes/try' | relative_url }}) to the current datatype.
+Constructor function from an [`Either<E, A>`]({{ '/docs/datatypes/either' | relative_url }}), [`Option<A>`]({{ '/docs/arrow/core/option' | relative_url }}), or [`Try<A>`]({{ '/docs/datatypes/try' | relative_url }}) to the current datatype.
 
 While `fromOption()` requires creating a new error value.
 
