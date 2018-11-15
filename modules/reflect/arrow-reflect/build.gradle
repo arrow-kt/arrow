@@ -3,6 +3,7 @@ dependencies {
     compile project(':arrow-instances-core')
     compile project(':arrow-instances-data')
     compile project(':arrow-effects-instances')
+    compile project(':arrow-syntax')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     compile "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
     compile project(':arrow-annotations')

@@ -1,6 +1,9 @@
 package arrow.reflect
 
+import arrow.aql.Box
 import kotlin.reflect.KClass
+import kotlin.reflect.full.declaredFunctions
+import kotlin.reflect.full.extensionReceiverParameter
 
 private val lineSeparator: String = "\n" //System.getProperty("line.separator")
 
@@ -26,17 +29,18 @@ fun DataType.tcMarkdownList(): String =
  */
 fun TypeClass.dtMarkdownList(): String =
   "| Module | Data types |$lineSeparator" +
-  supportedDataTypes()
-    .asSequence()
-    .groupBy { it.kclass.java.canonicalName.substringBeforeLast(".") }
-    .toSortedMap()
-    .map { entry ->
-      "|__${entry.key}__|" +
-        entry.value.joinToString(
-          separator = ", ",
-          transform = DataType::docsMarkdownLink
-        ) + "|"
-    }.joinToString(lineSeparator)
+    supportedDataTypes()
+      .asSequence()
+      .filterNot { it.kclass == Box::class }
+      .groupBy { it.kclass.java.canonicalName.substringBeforeLast(".") }
+      .toSortedMap()
+      .map { entry ->
+        "|__${entry.key}__|" +
+          entry.value.joinToString(
+            separator = ", ",
+            transform = DataType::docsMarkdownLink
+          ) + "|"
+      }.joinToString(lineSeparator)
 
 fun TypeClass.docsMarkdownLink(): String =
   kclass.docsMarkdownLink()
@@ -44,24 +48,15 @@ fun TypeClass.docsMarkdownLink(): String =
 fun DataType.docsMarkdownLink(): String =
   kclass.docsMarkdownLink()
 
-fun <A: Any> KClass<A>.docsMarkdownLink(): String =
+fun <A : Any> KClass<A>.docsMarkdownLink(): String =
   "[$simpleName]({{ '/docs/${qualifiedName?.toLowerCase()?.replace(".", "/")}' | relative_url }})"
-
-fun TypeClass.hierarchyGraphScript(): String =
-  """
-    <script>
-        ${hierarchyGraph()}
-        var canvas = document.getElementById('${classInfo.simpleName}-hierarchy-canvas');
-        nomnoml.draw(canvas, graph);
-    </script>
-  """.trimIndent()
 
 fun TypeClass.hierarchyGraph(): String =
   """
     |#font: monoidregular
     |#arrowSize: 1
     |#bendSize: 0.3
-    |#direction: right
+    |#direction: down
     |#gutter: 5
     |#edgeMargin: 0
     |#edges: rounded
@@ -72,7 +67,7 @@ fun TypeClass.hierarchyGraph(): String =
     |#padding: 8
     |#spacing: 40
     |#stroke: #485C8A
-    |#title: ${classInfo.simpleName}
+    |#title: ${kclass.simpleName}
     |#zoom: 1
     |#.typeclass: fill=#FFFFFF visual=class bold
     |${nomnomlMethods()}
@@ -80,18 +75,19 @@ fun TypeClass.hierarchyGraph(): String =
   """.trimMargin()
 
 fun TypeClass.nomnomlMethods(): String =
-  "[<typeclass>${classInfo.simpleName}|${declaredMethodNamesAndTypes().joinToString("|"){ "${it.a}: ${it.b.joinToString(" -> ")}" }}]"
+  "[<typeclass>${kclass.simpleName}|${kclass.declaredFunctions.groupBy { it.name }.toList().joinToString("|") {
+    if (it.second.size > 1) "${it.first}(${it.second.size})"
+    else it.first
+  }}]"
 
 fun TypeClass.nomnomlBlock(): String =
-  "[<typeclass>${classInfo.simpleName}]"
+  "[<typeclass>${kclass.simpleName}]"
 
-fun TypeClass.nomnomlExtends(other: TypeClass): String =
-  "${other.nomnomlBlock()}<-${nomnomlBlock()}"
+fun Extends.nomnomlExtends(): String =
+  "${b.nomnomlBlock()}<-${a.nomnomlBlock()}"
 
 fun TypeClass.nomnomlHierarchy(): String =
-  (listOf(this) + hierarchy())
-    .zipWithNext(TypeClass::nomnomlExtends)
-    .joinToString(lineSeparator)
+  hierarchy().joinToString(lineSeparator, transform = Extends::nomnomlExtends)
 
 fun TypeClass.nomnomlExtensions(): String =
-  "${nomnomlBlock()}<-[${classInfo.simpleName} @extension|${extensions().joinToString("|") { it.instance.kclass.java.simpleName }}]"
+  "${nomnomlBlock()}<-[${kclass.simpleName} @extension|${extensions().joinToString("|") { it.instance.kclass.java.simpleName }}]"

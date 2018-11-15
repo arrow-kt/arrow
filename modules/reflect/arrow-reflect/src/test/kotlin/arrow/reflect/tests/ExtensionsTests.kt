@@ -3,6 +3,7 @@ package arrow.reflect.tests
 import arrow.core.Option
 import arrow.core.Try
 import arrow.instances.TryMonadErrorInstance
+import arrow.mtl.typeclasses.MonadCombine
 import arrow.reflect.*
 import arrow.test.UnitSpec
 import arrow.typeclasses.*
@@ -59,8 +60,8 @@ class ReflectionTests : UnitSpec() {
     }
 
     "We can determine a known type class hierarchy" {
-      TypeClass(Monad::class).hierarchy() shouldBe listOf(
-        TypeClass(Applicative::class), TypeClass(Functor::class), TypeClass(Invariant::class)
+      TypeClass(Functor::class).hierarchy() shouldBe listOf(
+        TypeClass(Functor::class).extends(TypeClass(Invariant::class))
       )
     }
 

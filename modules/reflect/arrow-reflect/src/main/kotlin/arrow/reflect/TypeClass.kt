@@ -1,12 +1,16 @@
 package arrow.reflect
 
+import arrow.Kind
 import arrow.core.Tuple2
 import arrow.core.toT
-import arrow.extension
-import io.github.classgraph.ClassGraph
-import io.github.classgraph.ClassInfo
 import io.github.classgraph.TypeSignature
 import kotlin.reflect.KClass
+import kotlin.reflect.KFunction
+import kotlin.reflect.KType
+import kotlin.reflect.full.declaredFunctions
+import kotlin.reflect.full.extensionReceiverParameter
+import kotlin.reflect.full.isSubclassOf
+import kotlin.reflect.full.superclasses
 
 /**
  * A type class such as arrow.typeclasses.Functor
@@ -19,33 +23,23 @@ data class TypeClass(val kclass: KClass<*>)
 fun TypeClass.extensions(): List<TypeClassExtension> =
   classPathExtensions.filter { it.typeClass == this }
 
+private fun TypeClass.declaredSuperInterfaces(): List<TypeClass> =
+  kclass.superclasses
+    .filterNot { Any::class == it || Kind::class == it }
+    .map(::TypeClass)
 
-val TypeClass.classInfo: ClassInfo
-  get() = ClassGraph()
-    .enableClassInfo()
-    .enableAnnotationInfo()
-    .enableExternalClasses()
-    .enableMethodInfo()
-    .scan().use {
-      it.getClassInfo(kclass.java.canonicalName)
-    }
+data class Extends(val a: TypeClass, val b: TypeClass)
 
-fun TypeClass.hierarchy(): List<TypeClass> =
-  classInfo.interfaces.map { TypeClass(Class.forName(it.name).kotlin) }
+fun TypeClass.extends(other: TypeClass): Extends? =
+  if (kclass.isSubclassOf(other.kclass) && this != other)
+    Extends(this, other)
+  else null
 
-fun TypeClass.declaredMethodNamesAndTypes(): List<Tuple2<String, List<String>>> =
-  classInfo.declaredMethodInfo.map {
-    it.name toT it.parameterInfo.map { p ->
-      p.typeSignatureOrTypeDescriptor.simplifiedToString()
-    } + it.typeSignature.resultType.simplifiedToString()
-  }
-
-private fun TypeSignature.simplifiedToString(): String =
-  toString()
-    .replace("? extends ", "")
-    .replace("? super ", "")
-    .replace("java.lang.", "")
-    .replace("(.*?).(\\w*?)<".toRegex(), "$2<")
+fun TypeClass.hierarchy(): List<Extends> {
+  val superInterfaces: List<TypeClass> = declaredSuperInterfaces()
+  val localExtensions: List<Extends> = superInterfaces.mapNotNull { this.extends(it) }
+  return (localExtensions + superInterfaces.flatMap(TypeClass::hierarchy)).distinct()
+}
 
 /**
  * @return a list of [DataType] that provide instances for the [TypeClass]
