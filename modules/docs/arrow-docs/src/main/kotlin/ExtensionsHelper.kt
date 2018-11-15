@@ -4,7 +4,7 @@ import arrow.aql.Box
 import kotlin.reflect.KClass
 import kotlin.reflect.full.declaredFunctions
 
-private val lineSeparator: String = "\n" //System.getProperty("line.separator")
+private val lineSeparator: String = System.getProperty("line.separator")
 
 /**
  * @return a list of [TypeClass] supported by this [DataType]
