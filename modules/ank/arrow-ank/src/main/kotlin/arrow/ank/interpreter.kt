@@ -5,6 +5,8 @@ import arrow.core.*
 import arrow.data.ListK
 import arrow.data.fix
 import arrow.data.k
+import arrow.instances.option.monad.followedBy
+import arrow.instances.option.monad.forEffect
 import arrow.typeclasses.MonadError
 import org.intellij.markdown.MarkdownElementTypes.CODE_FENCE
 import org.intellij.markdown.ast.ASTNode
@@ -16,6 +18,8 @@ import org.intellij.markdown.parser.MarkdownParser
 import java.io.File
 import java.net.URL
 import java.net.URLClassLoader
+import java.nio.file.Files
+import java.nio.file.Path
 import javax.script.ScriptEngine
 import javax.script.ScriptEngineManager
 
@@ -91,7 +95,8 @@ data class Snippet(
   val code: String,
   val result: Option<String> = None,
   val isSilent: Boolean = fence.startsWith("```$lang$AnkSilentBlock"),
-  val isReplace: Boolean = fence.startsWith("```$lang$AnkReplaceBlock"))
+  val isReplace: Boolean = fence.startsWith("```$lang$AnkReplaceBlock"),
+  val isOutFile: Boolean = fence.startsWith("```$lang$AnkOutFileBlock"))
 
 fun extractCodeImpl(source: String, tree: ASTNode): ListK<Snippet> {
   val sb = mutableListOf<Snippet>()
@@ -161,7 +166,12 @@ fun compileCodeImpl(snippets: Map<File, ListK<Snippet>>, classpath: ListK<String
         snippet
       } else {
         val resultString: Option<String> = Option.fromNullable(result).fold({ None }, {
-          if (snippet.isReplace) Some("$it") else Some("// $it") })
+          when {
+            snippet.isReplace -> Some("$it")
+            snippet.isOutFile -> Some("").forEffect(Some(snippet.writeToOutFile(file.parentFile, result.toString())))
+            else -> Some("// $it")
+          }
+        })
         snippet.copy(result = resultString)
       }
     }.k()
@@ -172,13 +182,23 @@ fun compileCodeImpl(snippets: Map<File, ListK<Snippet>>, classpath: ListK<String
   return result
 }
 
+private fun Snippet.writeToOutFile(parent: File, result: String): Unit {
+  val fileName = fence.lines()[0].substringAfter("(").substringBefore(")")
+  val file = File(parent, fileName)
+  file.writeText(result)
+  println(colored(ANSI_GREEN, "[outFile] ✔ emitted : $file"))
+}
+
 fun replaceAnkToLangImpl(compiledMarkdown: CompiledMarkdown): String =
   compiledMarkdown.snippets.fold(compiledMarkdown.origin.readText()) { content, snippet ->
     snippet.result.fold(
       { content.replace(snippet.fence, "```${snippet.lang}\n" + snippet.code + "\n```") },
       {
-        if (snippet.isReplace) content.replace(snippet.fence, it)
-        else content.replace(snippet.fence, "```${snippet.lang}\n" + snippet.code + "\n" + it + "\n```")
+        when {
+          snippet.isReplace -> content.replace(snippet.fence, it)
+          snippet.isOutFile -> content.replace(snippet.fence, "")
+          else -> content.replace(snippet.fence, "```${snippet.lang}\n" + snippet.code + "\n" + it + "\n```")
+        }
       }
     )
   }
