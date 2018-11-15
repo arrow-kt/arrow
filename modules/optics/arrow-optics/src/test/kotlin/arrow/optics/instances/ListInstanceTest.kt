@@ -10,6 +10,7 @@ import arrow.optics.instances.listk.cons.cons
 import arrow.optics.instances.listk.each.each
 import arrow.optics.instances.listk.filterIndex.filterIndex
 import arrow.optics.instances.listk.index.index
+import arrow.optics.instances.listk.snoc.snoc
 import arrow.optics.typeclasses.FilterIndex
 import arrow.test.UnitSpec
 import arrow.test.generators.*
@@ -91,6 +92,15 @@ class ListInstanceTest : UnitSpec() {
       funcGen = genFunctionAToB(genTuple(Gen.int(), genListK(Gen.int()))),
       EQA = ListK.eq(Int.eq()),
       EQOptionB = Option.eq(Tuple2.eq(Int.eq(), ListK.eq(Int.eq())))
+    ))
+
+    testLaws(PrismLaws.laws(
+      prism = ListK.snoc<Int>().snoc(),
+      aGen = genListK(Gen.int()),
+      bGen = genTuple(genListK(Gen.int()), Gen.int()),
+      funcGen = genFunctionAToB(genTuple(genListK(Gen.int()), Gen.int())),
+      EQA = ListK.eq(Int.eq()),
+      EQOptionB = Option.eq(Tuple2.eq(ListK.eq(Int.eq()), Int.eq()))
     ))
 
   }

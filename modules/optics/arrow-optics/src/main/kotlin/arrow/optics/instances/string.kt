@@ -128,3 +128,27 @@ interface StringConsInstance : Cons<String, Char> {
   }
 
 }
+
+/**
+ * [String]'s [Snoc] instance
+ */
+fun String.Companion.snoc(): Snoc<String, Char> = StringSnocInstance()
+
+interface StringSnocInstance : Snoc<String, Char> {
+
+  override fun snoc(): Prism<String, Tuple2<String, Char>> = Prism(
+    getOrModify = { if (it.isNotEmpty()) Tuple2(it.dropLast(1), it.last()).right() else it.left() },
+    reverseGet = { (i, l) -> i + l }
+  )
+
+  companion object {
+    /**
+     * Operator overload to instantiate typeclass instance.
+     *
+     * @return [Cons] instance for [String]
+     */
+    operator fun invoke(): Snoc<String, Char> = object : StringSnocInstance {}
+  }
+
+}
+

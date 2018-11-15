@@ -284,6 +284,9 @@ options:
       - title: Cons
         url: /docs/optics/cons
 
+      - title: Snoc
+        url: /docs/optics/snoc/
+
       - title: At
         url: /docs/optics/at/
 

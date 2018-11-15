@@ -7,9 +7,13 @@ import arrow.instances.eq
 import arrow.instances.listk.eq.eq
 import arrow.instances.option.eq.eq
 import arrow.instances.tuple2.eq.eq
+import arrow.optics.instances.listk.snoc.snoc
+import arrow.instances.tuple2.eq.eq
 import arrow.test.UnitSpec
 import arrow.test.generators.genChars
 import arrow.test.generators.genFunctionAToB
+import arrow.test.generators.genListK
+import arrow.test.generators.genTuple
 import arrow.test.generators.genTuple
 import arrow.test.laws.OptionalLaws
 import arrow.test.laws.PrismLaws
@@ -60,6 +64,15 @@ class StringInstanceTest : UnitSpec() {
       funcGen = genFunctionAToB(genTuple(genChars(), Gen.string())),
       EQA = String.eq(),
       EQOptionB = Option.eq(Tuple2.eq(Char.eq(), String.eq()))
+    ))
+
+    testLaws(PrismLaws.laws(
+      prism = String.snoc().snoc(),
+      aGen = Gen.string(),
+      bGen = genTuple(Gen.string(), genChars()),
+      funcGen = genFunctionAToB(genTuple(Gen.string(), genChars())),
+      EQA = String.eq(),
+      EQOptionB = Option.eq(Tuple2.eq(String.eq(), Char.eq()))
     ))
 
   }
