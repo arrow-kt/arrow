@@ -10,6 +10,7 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
 object ProfunctorLaws {
+
     fun <F> laws(PF: Profunctor<F>, f: (Int) -> Kind2<F, Int, Int>, EQ: Eq<Kind2<F, Int, Int>>): List<Law> =
         listOf(
             Law("Profunctor Laws: Identity") { PF.identity(f, EQ) },

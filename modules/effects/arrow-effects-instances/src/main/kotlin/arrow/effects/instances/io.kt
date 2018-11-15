@@ -72,7 +72,22 @@ interface IOMonadErrorInstance : MonadError<ForIO, Throwable>, IOMonadInstance {
 interface IOMonadThrowInstance : MonadThrow<ForIO>, IOMonadErrorInstance
 
 @extension
-interface IOMonadDeferInstance : MonadDefer<ForIO>, IOMonadErrorInstance {
+interface IOBracketInstance : Bracket<ForIO, Throwable>, IOMonadThrowInstance {
+  override fun <A, B> Kind<ForIO, A>.bracketCase(release: (A, ExitCase<Throwable>) -> Kind<ForIO, Unit>, use: (A) -> Kind<ForIO, B>): IO<B> =
+    fix().bracketCase({ a, e -> release(a, e).fix() }, { a -> use(a).fix() })
+
+  override fun <A, B> Kind<ForIO, A>.bracket(release: (A) -> Kind<ForIO, Unit>, use: (A) -> Kind<ForIO, B>): IO<B> =
+    fix().bracket({ a -> release(a).fix() }, { a -> use(a).fix() })
+
+  override fun <A> Kind<ForIO, A>.guarantee(finalizer: Kind<ForIO, Unit>): IO<A> =
+    fix().guarantee(finalizer.fix())
+
+  override fun <A> Kind<ForIO, A>.guaranteeCase(finalizer: (ExitCase<Throwable>) -> Kind<ForIO, Unit>): IO<A> =
+    fix().guaranteeCase { e -> finalizer(e).fix() }
+}
+
+@extension
+interface IOMonadDeferInstance : MonadDefer<ForIO>, IOBracketInstance {
   override fun <A> defer(fa: () -> IOOf<A>): IO<A> =
     IO.defer(fa)
 
@@ -82,7 +97,7 @@ interface IOMonadDeferInstance : MonadDefer<ForIO>, IOMonadErrorInstance {
 @extension
 interface IOAsyncInstance : Async<ForIO>, IOMonadDeferInstance {
   override fun <A> async(fa: Proc<A>): IO<A> =
-    IO.async(fa)
+    IO.async(fa.toIOProc())
 
   override fun <A> IOOf<A>.continueOn(ctx: CoroutineContext): IO<A> =
     fix().continueOn(ctx)
