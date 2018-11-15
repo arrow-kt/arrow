@@ -3,6 +3,8 @@ package arrow.optics.typeclasses
 import arrow.core.*
 import arrow.optics.*
 
+typealias Conj<S, A> = Snoc<S, A>
+
 /**
  * [Snoc] defines a [Prism] between a [S] and its [init] [S] and last element [A] and thus can be seen as the reverse of [Cons].
  * It provides a way to attach or detach elements on the end side of a structure.
