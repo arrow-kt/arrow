@@ -1,21 +1,13 @@
 package arrow.optics.instances
 
 import arrow.Kind
-import arrow.core.ListInstances
-import arrow.core.left
-import arrow.core.right
-import arrow.core.toT
+import arrow.core.*
+import arrow.data.fix
 import arrow.data.k
-import arrow.data.traverse
+import arrow.instances.list.traverse.traverse
 import arrow.instances.option.applicative.applicative
-import arrow.optics.Optional
-import arrow.optics.POptional
-import arrow.optics.Prism
-import arrow.optics.Traversal
-import arrow.optics.typeclasses.Each
-import arrow.optics.typeclasses.FilterIndex
-import arrow.optics.typeclasses.Index
-import arrow.optics.typeclasses.Snoc
+import arrow.optics.*
+import arrow.optics.typeclasses.*
 import arrow.typeclasses.Applicative
 
 fun <A> ListInstances.traversal(): Traversal<List<A>, A> = ListTraversal()
@@ -25,9 +17,8 @@ fun <A> ListInstances.traversal(): Traversal<List<A>, A> = ListTraversal()
  */
 interface ListTraversal<A> : Traversal<List<A>, A> {
 
-  override fun <F> modifyF(FA: Applicative<F>, s: List<A>, f: (A) -> Kind<F, A>): Kind<F, List<A>> = FA.run {
+  override fun <F> modifyF(FA: Applicative<F>, s: List<A>, f: (A) -> Kind<F, A>): Kind<F, List<A>> =
     s.k().traverse(FA, f)
-  }
 
   companion object {
     /**
@@ -65,12 +56,11 @@ fun <A> ListInstances.filterIndex(): FilterIndex<List<A>, Int, A> = ListFilterIn
  */
 interface ListFilterIndexInstance<A> : FilterIndex<List<A>, Int, A> {
   override fun filter(p: (Int) -> Boolean): Traversal<List<A>, A> = object : Traversal<List<A>, A> {
-    override fun <F> modifyF(FA: Applicative<F>, s: List<A>, f: (A) -> Kind<F, A>): Kind<F, List<A>> = FA.run {
+    override fun <F> modifyF(FA: Applicative<F>, s: List<A>, f: (A) -> Kind<F, A>): Kind<F, List<A>> =
       s.mapIndexed { index, a -> a toT index }.k().traverse(FA) { (a, j) ->
-        if (p(j)) f(a) else just(a)
+        if (p(j)) f(a) else FA.just(a)
       }
     }
-  }
 
   companion object {
     /**

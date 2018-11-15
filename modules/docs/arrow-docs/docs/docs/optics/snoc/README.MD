@@ -45,9 +45,11 @@ listOf(1, 2, 3).unsnoc()
 emptyList<Int>().unsnoc()
 ```
 
-### Instances
+### Data types
 
-The following datatypes in Arrow provide instances that adhere to the `Snoc` typeclass.
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.optics.typeclasses.*
 
-- [ListK]({{ '/docs/datatypes/listk' | relative_url }})
-- [String]
+TypeClass(Snoc::class).dtMarkdownList()
+```
