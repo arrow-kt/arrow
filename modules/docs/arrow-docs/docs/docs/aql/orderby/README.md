@@ -33,6 +33,7 @@ println(result)
 ```
 
 `orderMap` over `List`
+
 {:data-executable='true'}
 ```kotlin:ank
 import arrow.aql.instances.list.select.*
