@@ -12,6 +12,7 @@ beginner
 `orderBy` and `orderMap` allows ordering selected data based on the actual data type `Order<A>` implementation. Data may be requested to be ordered ascending or descending. Ordering should be explicitly set as `Ord.Asc` for ascending order or `Ord.Desc` for descending order.
 
 `orderBy` over `List`
+
 {:data-executable='true'}
 ```kotlin:ank
 import arrow.aql.instances.list.select.*
