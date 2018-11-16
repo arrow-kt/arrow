@@ -33,7 +33,7 @@ interface Promise<F, A> {
 }
 
 class CancellablePromise<F, A> internal constructor(private val AS: Async<F>,
-                                                    private val state: AtomicReference<State<A>>): Promise<F, A> {
+                                                    private val state: AtomicReference<State<A>>) : Promise<F, A> {
 
   override val get: Kind<F, A> = AS.async { k: (Either<Throwable, A>) -> Unit ->
     tailrec fun loop(): Unit {
