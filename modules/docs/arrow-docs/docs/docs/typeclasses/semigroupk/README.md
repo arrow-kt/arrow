@@ -9,14 +9,25 @@ permalink: /docs/typeclasses/semigroupk/
 TODO. Meanwhile you can find a short description in the [intro to typeclasses]({{ '/docs/typeclasses/intro/' | relative_url }}).
 
 
-### Data Types
+### Data types
 
-The following data types in Arrow provide instances that adhere to the `SemigroupK` type class.
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.typeclasses.SemigroupK
 
-- [OptionT]({{ '/docs/datatypes/optiont' | relative_url }})
-- [SequenceK]({{ '/docs/datatypes/sequencek' | relative_url }})
-- [SetK]({{ '/docs/datatypes/setk' | relative_url }})
-- [Validated]({{ '/docs/datatypes/validated' | relative_url }})
-- [Either]({{ '/docs/datatypes/either' | relative_url }})
-- [EitherT]({{ '/docs/datatypes/eithert' | relative_url }})
-- [NonEmptyList]({{ '/docs/datatypes/nonemptylist' | relative_url }})
+TypeClass(SemigroupK::class).dtMarkdownList()
+```
+
+### Hierarchy
+
+<canvas id="hierarchy-diagram"></canvas>
+<script>
+  drawNomNomlDiagram('hierarchy-diagram', 'diagram.nomnol')
+</script>
+
+```kotlin:ank:outFile(diagram.nomnol)
+import arrow.reflect.*
+import arrow.typeclasses.SemigroupK
+
+TypeClass(SemigroupK::class).hierarchyGraph()
+```

@@ -46,7 +46,12 @@ routerMoore
     .extract()
 ```
 
-## Available Instances
+### Supported type classes
 
-* [Comonad]({{ '/docs/typeclasses/comonad' | relative_url }})
-* [Functor]({{ '/docs/typeclasses/functor' | relative_url }})
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.data.*
+import arrow.core.*
+
+DataType(Moore::class).tcMarkdownList()
+```

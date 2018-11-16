@@ -9,10 +9,10 @@ import arrow.effects.maybek.functor.functor
 import arrow.effects.maybek.monad.monad
 import arrow.effects.maybek.monadDefer.monadDefer
 import arrow.effects.maybek.monadError.monadError
+import arrow.effects.maybek.monadThrow.bindingCatch
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
-import arrow.typeclasses.bindingCatch
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
@@ -61,7 +61,7 @@ class MaybeKTests : UnitSpec() {
     )
 
     "Multi-thread Maybes finish correctly" {
-      val value: Maybe<Long> = MaybeK.monadError().bindingCatch {
+      val value: Maybe<Long> = bindingCatch {
         val a = Maybe.timer(2, TimeUnit.SECONDS).k().bind()
         a
       }.value()
@@ -75,7 +75,7 @@ class MaybeKTests : UnitSpec() {
       val originalThread: Thread = Thread.currentThread()
       var threadRef: Thread? = null
 
-      val value: Maybe<Long> = MaybeK.monadError().bindingCatch {
+      val value: Maybe<Long> = bindingCatch {
         val a = Maybe.timer(2, TimeUnit.SECONDS, Schedulers.newThread()).k().bind()
         threadRef = Thread.currentThread()
         val b = Maybe.just(a).observeOn(Schedulers.newThread()).k().bind()
@@ -92,7 +92,7 @@ class MaybeKTests : UnitSpec() {
     }
 
     "Maybe dispose forces binding to cancel without completing too" {
-      val value: Maybe<Long> = MaybeK.monadError().bindingCatch {
+      val value: Maybe<Long> = bindingCatch {
         val a = Maybe.timer(3, TimeUnit.SECONDS).k().bind()
         a
       }.value()

@@ -4,7 +4,6 @@ import arrow.Kind
 import arrow.core.*
 import arrow.effects.data.internal.BindingCancellationException
 import arrow.effects.typeclasses.MonadDefer
-import arrow.effects.typeclasses.bindingCancellable
 import arrow.test.concurrency.SideEffect
 import arrow.test.generators.genIntSmall
 import arrow.test.generators.genThrowable
@@ -14,8 +13,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.newSingleThreadContext
 
 object MonadDeferLaws {
-  fun <F> laws(SC: MonadDefer<F>, EQ: Eq<Kind<F, Int>>, EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>, EQERR: Eq<Kind<F, Int>> = EQ): List<Law> =
-    MonadErrorLaws.laws(SC, EQERR, EQ_EITHER, EQ) + listOf(
+
+  fun <F> laws(
+    SC: MonadDefer<F>,
+    EQ: Eq<Kind<F, Int>>,
+    EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>,
+    EQERR: Eq<Kind<F, Int>> = EQ
+  ): List<Law> =
+    BracketLaws.laws(SC, EQ, EQ_EITHER, EQERR) + listOf(
       Law("Sync bind: binding blocks") { SC.asyncBind(EQ) },
       Law("Sync bind: binding failure") { SC.asyncBindError(EQERR) },
       Law("Sync bind: unsafe binding") { SC.asyncBindUnsafe(EQ) },
@@ -42,7 +47,7 @@ object MonadDeferLaws {
 
   fun <F> MonadDefer<F>.asyncBindError(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(genThrowable()) { e: Throwable ->
-      val (bound: Kind<F, Int>, _) = bindingCancellable<F, Int> {
+      val (bound: Kind<F, Int>, _) = bindingCancellable<Int> {
         bindDefer { throw e }
       }
       bound.equalUnderTheLaw(raiseError(e), EQ)
@@ -61,7 +66,7 @@ object MonadDeferLaws {
 
   fun <F> MonadDefer<F>.asyncBindUnsafeError(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(genThrowable()) { e: Throwable ->
-      val (bound: Kind<F, Int>, _) = bindingCancellable<F, Int> {
+      val (bound: Kind<F, Int>, _) = bindingCancellable<Int> {
         bindDeferUnsafe { Left(e) }
       }
       bound.equalUnderTheLaw(raiseError(e), EQ)

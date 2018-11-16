@@ -57,6 +57,7 @@ include {
         effects {
             _ 'effects'
             _ 'effects-instances'
+            _ 'data-instances-effects'
             _ 'effects-rx2'
             _ 'effects-rx2-instances'
             _ 'effects-kotlinx-coroutines'
@@ -101,6 +102,14 @@ include {
         ank {
             _ 'ank'
             _ 'ank-gradle'
+        }
+
+        aql {
+            _ 'query-language'
+        }
+
+        reflect {
+            _ 'reflect'
         }
     }
 }

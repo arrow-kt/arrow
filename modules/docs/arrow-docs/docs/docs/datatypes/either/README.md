@@ -344,7 +344,7 @@ tupled(Either.Right(1), Either.Right("a"), Either.Right(2.0))
 ```kotlin
 import arrow.instances.either.monad.*
 
-Either.monad().binding {
+binding {
   val a = Either.Right(1).bind()
   val b = Either.Right(1 + a).bind()
   val c = Either.Right(1 + b).bind()
@@ -353,18 +353,12 @@ Either.monad().binding {
 // Right(6)
 ```
 
-## Available Instances
+### Supported type classes
 
-* [Show]({{ '/docs/typeclasses/show' | relative_url }})
-* [Eq]({{ '/docs/typeclasses/eq' | relative_url }})
-* [Applicative]({{ '/docs/typeclasses/applicative' | relative_url }})
-* [ApplicativeError]({{ '/docs/typeclasses/applicativeerror' | relative_url }})
-* [Foldable]({{ '/docs/typeclasses/foldable' | relative_url }})
-* [Functor]({{ '/docs/typeclasses/functor' | relative_url }})
-* [Bifunctor]({{ '/docs/typeclasses/bifunctor' | relative_url }})
-* [Monad]({{ '/docs/typeclasses/monad' | relative_url }})
-* [MonadError]({{ '/docs/typeclasses/monaderror' | relative_url }})
-* [SemigroupK]({{ '/docs/typeclasses/semigroupk' | relative_url }})
-* [Traverse]({{ '/docs/typeclasses/traverse' | relative_url }})
-* [TraverseFilter]({{ '/docs/typeclasses/traversefilter' | relative_url }})
-* [Each]({{ '/docs/optics/each' | relative_url }})
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.data.*
+import arrow.core.*
+
+DataType(Either::class).tcMarkdownList()
+```

@@ -87,3 +87,12 @@ firstBar.get(Player(5).nel())
 |   | Iso | Lens | Prism |Optional | Getter | Setter | Fold | Traversal |
 | --- | --- | --- | --- |--- | --- | --- | --- | --- |
 | Getter | Getter | Getter | X | X | Getter | X | Fold | X |
+
+### Supported Type Classes
+
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.optics.*
+
+DataType(Getter::class).tcMarkdownList()
+```

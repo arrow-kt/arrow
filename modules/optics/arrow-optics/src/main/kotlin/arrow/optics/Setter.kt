@@ -53,14 +53,14 @@ interface PSetter<S, T, A, B> : PSetterOf<S, T, A, B> {
     /**
      * [PSetter] that takes either S or S and strips the choice of S.
      */
-    fun <S> codiagonal(): Setter<Either<S, S>, S> = Setter { f -> { aa -> aa.bimap(f, f) } }
+    fun <S> codiagonal(): Setter<Either<S, S>, S> = Setter { aa, f -> aa.bimap(f, f) }
 
     /**
      * Invoke operator overload to create a [PSetter] of type `S` with target `A`.
      * Can also be used to construct [Setter]
      */
-    operator fun <S, T, A, B> invoke(modify: ((A) -> B) -> (S) -> T): PSetter<S, T, A, B> = object : PSetter<S, T, A, B> {
-      override fun modify(s: S, f: (A) -> B): T = modify(f)(s)
+    operator fun <S, T, A, B> invoke(modify: (S, ((A) -> B)) -> T): PSetter<S, T, A, B> = object : PSetter<S, T, A, B> {
+      override fun modify(s: S, f: (A) -> B): T = modify(s, f)
 
       override fun set(s: S, b: B): T = modify(s) { b }
     }
@@ -69,9 +69,7 @@ interface PSetter<S, T, A, B> : PSetterOf<S, T, A, B> {
      * Create a [PSetter] from a [arrow.Functor]
      */
     fun <F, A, B> fromFunctor(FF: Functor<F>): PSetter<Kind<F, A>, Kind<F, B>, A, B> = FF.run {
-      PSetter { f ->
-        { fs: Kind<F, A> -> fs.map(f) }
-      }
+      PSetter { fs: Kind<F, A>, f -> fs.map(f) }
     }
   }
 
@@ -83,15 +81,15 @@ interface PSetter<S, T, A, B> : PSetterOf<S, T, A, B> {
   /**
    * Join two [PSetter] with the same target
    */
-  infix fun <U, V> choice(other: PSetter<U, V, A, B>): PSetter<Either<S, U>, Either<T, V>, A, B> = PSetter { f ->
-    { su -> su.bimap({ s -> modify(s, f) }, { u -> other.modify(u, f) }) }
+  infix fun <U, V> choice(other: PSetter<U, V, A, B>): PSetter<Either<S, U>, Either<T, V>, A, B> = PSetter { su, f ->
+    su.bimap({ s -> modify(s, f) }, { u -> other.modify(u, f) })
   }
 
   /**
    * Compose a [PSetter] with a [PSetter]
    */
-  infix fun <C, D> compose(other: PSetter<A, B, C, D>): PSetter<S, T, C, D> = PSetter { fb ->
-    { s -> modify(s) { a -> other.modify(a, fb) } }
+  infix fun <C, D> compose(other: PSetter<A, B, C, D>): PSetter<S, T, C, D> = PSetter { s, fb ->
+    modify(s) { a -> other.modify(a, fb) }
   }
 
   /**

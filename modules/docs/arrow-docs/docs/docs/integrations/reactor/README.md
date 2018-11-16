@@ -130,8 +130,10 @@ Note that [`MonadDefer`]({{ '/docs/effects/monaddefer' | relative_url }}) provid
 Invoking this `Disposable` causes an `BindingCancellationException` in the chain which needs to be handled by the subscriber, similarly to what `Deferred` does.
 
 ```kotlin
+import arrow.effects.instances.defferred.monad.*
+
 val (flux, disposable) =
-  FluxK.monadDefer().bindingCancellable {
+  bindingCancellable {
     val userProfile = Flux.create { getUserProfile("123") }
     val friendProfiles = userProfile.friends().map { friend ->
         bindDefer { getProfile(friend.id) }
@@ -146,15 +148,11 @@ disposable()
 // Boom! caused by BindingCancellationException
 ```
 
-## Available Instances
+### Supported Type Classes
 
-* [Applicative]({{ '/docs/typeclasses/applicative' | relative_url }})
-* [ApplicativeError]({{ '/docs/typeclasses/applicativeerror' | relative_url }})
-* [Functor]({{ '/docs/typeclasses/functor' | relative_url }})
-* [Monad]({{ '/docs/typeclasses/monad' | relative_url }})
-* [MonadError]({{ '/docs/typeclasses/monaderror' | relative_url }})
-* [MonadDefer]({{ '/docs/effects/monaddefer' | relative_url }})
-* [Async]({{ '/docs/effects/async' | relative_url }})
-* [Effect]({{ '/docs/effects/effect' | relative_url }})
-* [Foldable]({{ '/docs/typeclasses/foldable' | relative_url }})
-* [Traverse]({{ '/docs/typeclasses/traverse' | relative_url }})
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.effects.*
+
+DataType(FluxK::class).tcMarkdownList()
+```

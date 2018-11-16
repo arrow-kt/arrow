@@ -55,15 +55,6 @@ interface PPrism<S, T, A, B> : PPrismOf<S, T, A, B> {
     }
 
     /**
-     * Invoke operator overload to create a [PPrism] of type `S` with a focus `A` where `A` is a subtype of `S`
-     * Can also be used to construct [Prism]
-     */
-    operator fun <S, A : S> invoke(getOrModify: (S) -> Either<S, A>): Prism<S, A> = Prism(
-      getOrModify = getOrModify,
-      reverseGet = ::identity
-    )
-
-    /**
      * Invoke operator overload to create a [PPrism] of type `S` with focus `A` with a [PartialFunction]
      * Can also be used to construct [Prism]
      */
@@ -203,12 +194,12 @@ interface PPrism<S, T, A, B> : PPrismOf<S, T, A, B> {
    */
   fun asOptional(): POptional<S, T, A, B> = POptional(
     this::getOrModify
-  ) { b -> { s -> set(s, b) } }
+  ) { s, b -> set(s, b) }
 
   /**
    * View a [PPrism] as a [PSetter]
    */
-  fun asSetter(): PSetter<S, T, A, B> = PSetter { f -> { s -> modify(s, f) } }
+  fun asSetter(): PSetter<S, T, A, B> = PSetter { s, f -> modify(s, f) }
 
   /**
    * View a [PPrism] as a [Fold]
@@ -283,4 +274,13 @@ fun <S, T, A, B, C> PPrism<S, T, A, B>.left(): PPrism<Either<S, C>, Either<T, C>
 fun <S, T, A, B, C> PPrism<S, T, A, B>.right(): PPrism<Either<C, S>, Either<C, T>, Either<C, A>, Either<C, B>> = Prism(
   { it.fold({ c -> Either.Right(Either.Left(c)) }, { s -> getOrModify(s).bimap({ Either.Right(it) }, { Either.Right(it) }) }) },
   { it.map(this::reverseGet) }
+)
+
+/**
+ * Invoke operator overload to create a [PPrism] of type `S` with a focus `A` where `A` is a subtype of `S`
+ * Can also be used to construct [Prism]
+ */
+operator fun <S, A> PPrism.Companion.invoke(getOption: (S) -> Option<A>, reverseGet: (A) -> S): Prism<S, A> = Prism(
+  getOrModify = { getOption(it).toEither { it } },
+  reverseGet = { reverseGet(it) }
 )

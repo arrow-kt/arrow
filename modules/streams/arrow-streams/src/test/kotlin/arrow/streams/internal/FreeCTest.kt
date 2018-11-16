@@ -5,24 +5,18 @@ import arrow.core.*
 import arrow.effects.ForIO
 import arrow.effects.IO
 import arrow.effects.fix
-import arrow.effects.instances.io.applicativeError.attempt
 import arrow.effects.instances.io.monadError.monadError
-import arrow.effects.typeclasses.seconds
 import arrow.higherkind
 import arrow.instances.`try`.monadError.monadError
 import arrow.instances.either.monadError.monadError
-import arrow.instances.function1.category.id
-import arrow.instances.option.eq.eq
-import arrow.streams.internal.freec.applicativeError.attempt
 import arrow.streams.internal.freec.eq.eq
-import arrow.streams.internal.freec.eq.eqv
-import arrow.streams.internal.freec.functor.imap
 import arrow.streams.internal.freec.monadDefer.monadDefer
 import arrow.test.UnitSpec
-import arrow.test.generators.*
-import arrow.test.laws.*
+import arrow.test.generators.genFunctionAToB
+import arrow.test.generators.genThrowable
+import arrow.test.laws.EqLaws
+import arrow.test.laws.MonadDeferLaws
 import arrow.typeclasses.Eq
-import arrow.typeclasses.binding
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.Gen
@@ -87,8 +81,7 @@ class FreeCTest : UnitSpec() {
     val EQ: Eq<Kind<FreeCPartialOf<ForOps>, Int>> = FreeC.eq(Either.monadError(), eitherInterpreter, Eq.any())
 
     testLaws(
-      EqLaws.laws(EQ) { Ops.value(it) }
-      ,
+      EqLaws.laws(EQ) { Ops.value(it) },
       MonadDeferLaws.laws(
         SC = Ops,
         EQ = FreeC.eq(Either.monadError(), eitherInterpreter, Eq.any()),
@@ -96,12 +89,13 @@ class FreeCTest : UnitSpec() {
         EQERR = FreeC.eq(Either.monadError(), eitherInterpreter, Eq.any())
       )
     )
-    testLaws(MonadDeferLaws.laws(
-      SC = FreeC.monadDefer(),
-      EQ = FreeC.eq(Try.monadError(), FunctionK.id(), Eq.any()),
-      EQERR = FreeC.eq(Try.monadError(), FunctionK.id(), Eq.any()),
-      EQ_EITHER = FreeC.eq(Try.monadError(), FunctionK.id(), Eq.any())
-    ))
+    testLaws(
+      MonadDeferLaws.laws(
+        SC = FreeC.monadDefer(),
+        EQ = FreeC.eq(Try.monadError(), FunctionK.id(), Eq.any()),
+        EQ_EITHER = FreeC.eq(Try.monadError(), FunctionK.id(), Eq.any()),
+        EQERR = FreeC.eq(Try.monadError(), FunctionK.id(), Eq.any())
+      ))
 
     "Can interpret an ADT as Free operations" {
       program.foldMap(eitherInterpreter, Either.monadError()).fix() shouldBe Right(Some(-30))
