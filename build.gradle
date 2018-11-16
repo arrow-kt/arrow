@@ -59,7 +59,7 @@ allprojects {
     dokka {
         outputFormat = 'jekyll'
         outputDirectory = project.rootDir.absolutePath + 
-                "/modules/docs/arrow-docs/build/apidocs"
+                "/modules/docs/arrow-docs/docs/docs/apidocs"
     }
 
     clean.doFirst {
