@@ -74,8 +74,8 @@ Note that the result is still an `IO.Async` operation, which means it's still de
 
 We've mentioned that `Bracket` is agnostic of whether the `use` lambda is computed synchronously or asynchronously. 
 That's because it's able to run over any data type `F` that can support synchronous and asynchronous 
-computations, like [`IO`]({{ '/docs/effects/io' | relative_url }}), [`Observable`]({{ '/docs/effects/io' | relative_url }}) 
-or [`Deferred`.]({{ '/docs/effects/io' | relative_url }}). 
+computations, like [`IO`]({{ '/docs/effects/io' | relative_url }}), [`Observable`]({{ '/docs/integrations/rx2' | relative_url }}) 
+or [`Deferred`]({{ '/docs/integrations/kotlinxcoroutines' | relative_url }}). 
 
 It basically targets what in Functional Programming is known as a "Higher Kind".
 
