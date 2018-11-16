@@ -7,21 +7,35 @@ import arrow.core.Right
 import arrow.effects.typeclasses.Async
 import java.util.concurrent.atomic.AtomicReference
 
-/**
- * Needs to be build with `Concurrent`, if `F` is cancellable than `get` becomes unsafe..
- */
-class Promise<F, A> private constructor(private val AS: Async<F>,
-                                        private val state: AtomicReference<State<A>>) {
+interface Promise<F, A> {
+
+  /**
+   * Retrieves the value of the promise,
+   * suspending the fiber running the action until the result is available.
+   */
+  val get: Kind<F, A>
+
+  /**
+   * Completes the promise with the specified value.
+   */
+  fun complete(a: A): Kind<F, Boolean>
+
+  /**
+   * Completes the promise with the specified value.
+   */
+  fun error(throwable: Throwable): Kind<F, Boolean>
 
   companion object {
-    fun <F, A> unsafe(AS: Async<F>): Promise<F, A> = Promise(AS, AtomicReference(State.Pending(emptyList())))
-    fun <F, A> make(AS: Async<F>): Kind<F, Promise<F, A>> = AS { unsafe<F, A>(AS) }
+    fun <F, A> unsafeCancellable(AS: Async<F>): Promise<F, A> = CancellablePromise(AS, AtomicReference(CancellablePromise.State.Pending(emptyList())))
+    fun <F, A> uncancelable(AS: Async<F>): Kind<F, Promise<F, A>> = AS { unsafeCancellable<F, A>(AS) }
   }
-  /**
-   * Retrieves the value of the promise, suspending the fiber running the action
-   * until the result is available.
-   */
-  val get: Kind<F, A> = AS.async { k: (Either<Throwable, A>) -> Unit ->
+
+}
+
+class CancellablePromise<F, A> internal constructor(private val AS: Async<F>,
+                                                    private val state: AtomicReference<State<A>>): Promise<F, A> {
+
+  override val get: Kind<F, A> = AS.async { k: (Either<Throwable, A>) -> Unit ->
     tailrec fun loop(): Unit {
       val st = state.get()
       when (st) {
@@ -44,10 +58,8 @@ class Promise<F, A> private constructor(private val AS: Async<F>,
     calculateNewState()
     loop()
   }
-  /**
-   * Completes the promise with the specified value.
-   */
-  fun complete(a: A): Kind<F, Boolean> {
+
+  override fun complete(a: A): Kind<F, Boolean> {
     tailrec fun calculateNewState(): Unit {
       val oldState = state.get()
       val newState = when (oldState) {
@@ -64,10 +76,8 @@ class Promise<F, A> private constructor(private val AS: Async<F>,
       is State.Error -> AS.just(false)
     }
   }
-  /**
-   * Completes the promise with the specified value.
-   */
-  fun error(throwable: Throwable): Kind<F, Boolean> = state.get().let {
+
+  override fun error(throwable: Throwable): Kind<F, Boolean> = state.get().let {
     tailrec fun calculateNewState(): Unit {
       val oldState = state.get()
       val newState = when (oldState) {
@@ -80,13 +90,13 @@ class Promise<F, A> private constructor(private val AS: Async<F>,
 
     val oldState = state.get()
     return when (oldState) {
-      is State.Pending -> calculateNewState().let { _ -> AS.just(true) }
+      is State.Pending -> calculateNewState().let { AS.just(true) }
       is State.Done -> AS.just(false)
       is State.Error -> AS.just(false)
     }
   }
 
-  sealed class State<out A> {
+  internal sealed class State<out A> {
     data class Pending<A>(val joiners: List<(Either<Throwable, A>) -> Unit>) : State<A>()
     data class Done<A>(val value: A) : State<A>()
     data class Error<A>(val throwable: Throwable) : State<A>()
