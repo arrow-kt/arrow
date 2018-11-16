@@ -69,10 +69,25 @@ Option.monoid<Int>(Int.semigroup()).run {
 Contents partially adapted from [Scala Exercises Cat's Semigroup Tutorial](https://www.scala-exercises.org/cats/semigroup)
 
 
-### Data Types
+### Data types
 
-The following data types in Arrow provide instances that adhere to the `Semigroup` type class.
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.typeclasses.Semigroup
 
-- [NonEmptyList]({{ '/docs/datatypes/nonemptylist' | relative_url }})
-- [SequenceK]({{ '/docs/datatypes/sequencek' | relative_url }})
-- [SetK]({{ '/docs/datatypes/setk' | relative_url }})
+TypeClass(Semigroup::class).dtMarkdownList()
+```
+
+### Hierarchy
+
+<canvas id="hierarchy-diagram"></canvas>
+<script>
+  drawNomNomlDiagram('hierarchy-diagram', 'diagram.nomnol')
+</script>
+
+```kotlin:ank:outFile(diagram.nomnol)
+import arrow.reflect.*
+import arrow.typeclasses.Semigroup
+
+TypeClass(Semigroup::class).hierarchyGraph()
+```

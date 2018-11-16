@@ -33,4 +33,10 @@ data class Id<out A>(val value: A) : IdOf<A> {
 
     fun <A> just(a: A): Id<A> = Id(a)
   }
+
+  override fun equals(other: Any?): Boolean =
+    when (other) {
+      is Id<*> -> other.value == value
+      else -> other == value
+    }
 }

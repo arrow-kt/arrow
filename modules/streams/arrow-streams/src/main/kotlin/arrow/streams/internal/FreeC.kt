@@ -2,7 +2,7 @@ package arrow.streams.internal
 
 import arrow.Kind
 import arrow.core.*
-import arrow.effects.ExitCase
+import arrow.effects.typeclasses.ExitCase
 import arrow.streams.CompositeFailure
 import arrow.streams.internal.FreeC.Result
 import arrow.typeclasses.MonadError
@@ -328,10 +328,10 @@ fun <R> FreeC.Result<R>.recoverWith(f: (Throwable) -> Result<R>): Result<R> = wh
   else -> this
 }
 
-fun <F, A, B> FreeCOf<F, A>.bracketCase(use: (A) -> FreeC<F, B>, release: (A, ExitCase<Throwable>) -> FreeC<F, Unit>): FreeC<F, B> =
+fun <F, A, B> FreeCOf<F, A>.bracketCase(use: (A) -> FreeCOf<F, B>, release: (A, ExitCase<Throwable>) -> FreeCOf<F, Unit>): FreeC<F, B> =
   fix().flatMap { a ->
     val used: FreeC<F, B> = try {
-      use(a)
+      use(a).fix()
     } catch (t: Throwable) {
       FreeC.Fail(t)
     }

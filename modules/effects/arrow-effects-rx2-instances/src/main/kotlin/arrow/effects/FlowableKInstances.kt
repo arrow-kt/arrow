@@ -98,9 +98,16 @@ interface FlowableKMonadErrorInstance :
 }
 
 @extension
-interface FlowableKMonadDeferInstance :
-  MonadDefer<ForFlowableK>,
-  FlowableKMonadErrorInstance {
+interface FlowableKMonadThrowInstance : MonadThrow<ForFlowableK>, FlowableKMonadErrorInstance
+
+@extension
+interface FlowableKBracketInstance : Bracket<ForFlowableK, Throwable>, FlowableKMonadThrowInstance {
+  override fun <A, B> Kind<ForFlowableK, A>.bracketCase(release: (A, ExitCase<Throwable>) -> Kind<ForFlowableK, Unit>, use: (A) -> Kind<ForFlowableK, B>): FlowableK<B> =
+    fix().bracketCase({ use(it) }, { a, e -> release(a, e) })
+}
+
+@extension
+interface FlowableKMonadDeferInstance : MonadDefer<ForFlowableK>, FlowableKBracketInstance {
   override fun <A> defer(fa: () -> FlowableKOf<A>): FlowableK<A> =
     FlowableK.defer(fa)
 

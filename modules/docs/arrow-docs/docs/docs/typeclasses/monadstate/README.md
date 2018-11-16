@@ -12,9 +12,25 @@ advanced
 TODO. Meanwhile you can find a short description in the [intro to typeclasses]({{ '/docs/typeclasses/intro/' | relative_url }}).
 
 
-### Data Types
+### Data types
 
-The following data types in Arrow provide instances that adhere to the `MonadState` type class.
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.mtl.typeclasses.MonadState
 
-- [State]({{ '/docs/datatypes/state' | relative_url }})
-- [StateT]({{ '/docs/datatypes/statet' | relative_url }})
+TypeClass(MonadState::class).dtMarkdownList()
+```
+
+### Hierarchy
+
+<canvas id="hierarchy-diagram"></canvas>
+<script>
+  drawNomNomlDiagram('hierarchy-diagram', 'diagram.nomnol')
+</script>
+
+```kotlin:ank:outFile(diagram.nomnol)
+import arrow.reflect.*
+import arrow.mtl.typeclasses.MonadState
+
+TypeClass(MonadState::class).hierarchyGraph()
+```

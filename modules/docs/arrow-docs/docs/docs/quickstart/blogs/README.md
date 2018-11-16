@@ -179,3 +179,9 @@ October '18 - version 0.7.3
 [Arrow-kt Collection](https://tiny.cards/collections/W1aS1cV/arrow-kt) Data types, type classes, effects, optics, generic, free, recursion schemes
 
 DM Ersin on [Gitter](https://gitter.im/ersin-ertan) or [Slack](https://kotlinlang.slack.com/messages/D624ZNAF9/team/U619WRNJE/) if you have more concise/simpler definitions, can correct misinterpretations, or can help with a deck
+
+### Functional Hangman Game written with Arrow
+
+[Functional Hangman](https://lordraydenmk.github.io/2018/functional-hangman-in-kotlin-with-arrow/) game - console application written with Arrow. Uses the `IO<A>` monad to push side effects to the edge of the system.
+
+November '18 - version 0.8.1

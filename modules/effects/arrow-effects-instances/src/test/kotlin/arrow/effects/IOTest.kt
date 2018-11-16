@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.*
 import arrow.effects.data.internal.IOCancellationException
 import arrow.effects.instances.io.async.async
+import arrow.effects.instances.io.monad.binding
 import arrow.effects.instances.io.monad.monad
 import arrow.effects.typeclasses.milliseconds
 import arrow.effects.typeclasses.seconds
@@ -12,7 +13,6 @@ import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.laws.AsyncLaws
 import arrow.typeclasses.Eq
-import arrow.typeclasses.binding
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
@@ -91,7 +91,7 @@ class IOTest : UnitSpec() {
     }
 
     "should time out on unending unsafeRunTimed" {
-      val never = IO.async<Int> { Unit }
+      val never = IO.async().never<Int>().fix()
       val start = System.currentTimeMillis()
       val received = never.unsafeRunTimed(100.milliseconds)
       val elapsed = System.currentTimeMillis() - start
@@ -243,7 +243,7 @@ class IOTest : UnitSpec() {
     }
 
     "unsafeRunTimed times out with None result" {
-      val never = IO.async<Int> { }
+      val never = IO.async().never<Unit>().fix()
       val result = never.unsafeRunTimed(100.milliseconds)
       result shouldBe None
     }
@@ -320,7 +320,7 @@ class IOTest : UnitSpec() {
         IO.parallelMapN(newSingleThreadContext("here"),
           IO { Thread.currentThread().name },
           IO.defer { IO.just(Thread.currentThread().name) },
-          IO.async<String> { it(Thread.currentThread().name.right()) },
+          IO.async<String> { TODO, cb -> cb(Thread.currentThread().name.right()) },
           ::Tuple3)
           .unsafeRunSync()
 
@@ -328,10 +328,10 @@ class IOTest : UnitSpec() {
     }
 
     "unsafeRunAsyncCancellable should cancel correctly" {
-      IO.async { cb: (Either<Throwable, Int>) -> Unit ->
+      IO.async { TODO, cb: (Either<Throwable, Int>) -> Unit ->
         val cancel =
           IO(newSingleThreadContext("RunThread")) { }
-            .flatMap { IO.async<Int> { Thread.sleep(500); it(1.right()) } }
+            .flatMap { IO.async<Int> { TODO, cb -> Thread.sleep(500); cb(1.right()) } }
             .unsafeRunAsyncCancellable(OnCancel.Silent) {
               cb(it)
             }
@@ -341,10 +341,10 @@ class IOTest : UnitSpec() {
     }
 
     "unsafeRunAsyncCancellable should throw the appropriate exception" {
-      IO.async<Throwable> { cb ->
+      IO.async<Throwable> { TODO, cb ->
         val cancel =
           IO(newSingleThreadContext("RunThread")) { }
-            .flatMap { IO.async<Int> { Thread.sleep(500); it(1.right()) } }
+            .flatMap { IO.async<Int> { TODO, cb -> Thread.sleep(500); cb(1.right()) } }
             .unsafeRunAsyncCancellable(OnCancel.ThrowCancellationException) {
               it.fold({ t -> cb(t.right()) }, { _ -> })
             }
@@ -354,10 +354,10 @@ class IOTest : UnitSpec() {
     }
 
     "unsafeRunAsyncCancellable can cancel even for infinite asyncs" {
-      IO.async { cb: (Either<Throwable, Int>) -> Unit ->
+      IO.async { TODO, cb: (Either<Throwable, Int>) -> Unit ->
         val cancel =
           IO(newSingleThreadContext("RunThread")) { }
-            .flatMap { IO.async<Int> { Thread.sleep(5000); } }
+            .flatMap { IO.async<Int> { TODO, _ -> Thread.sleep(5000); } }
             .unsafeRunAsyncCancellable(OnCancel.ThrowCancellationException) {
               cb(it)
             }
@@ -367,7 +367,7 @@ class IOTest : UnitSpec() {
     }
 
     "IO.binding should for comprehend over IO" {
-      val result = IO.monad().binding {
+      val result = binding {
         val x = IO.just(1).bind()
         val y = bind { IO { x + 1 } }
         y

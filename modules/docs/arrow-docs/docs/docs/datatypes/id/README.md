@@ -29,15 +29,12 @@ val id: Id<Int> = Id.just(3)
 id.map{it + 3}
 ```
 
-## Available Instances
+### Supported type classes
 
-* [Show]({{ '/docs/typeclasses/show' | relative_url }})
-* [Eq]({{ '/docs/typeclasses/eq' | relative_url }})
-* [Applicative]({{ '/docs/typeclasses/applicative' | relative_url }})
-* [Bimonad]({{ '/docs/typeclasses/bimonad' | relative_url }})
-* [Comonad]({{ '/docs/typeclasses/comonad' | relative_url }})
-* [Foldable]({{ '/docs/typeclasses/foldable' | relative_url }})
-* [Functor]({{ '/docs/typeclasses/functor' | relative_url }})
-* [Monad]({{ '/docs/typeclasses/monad' | relative_url }})
-* [Traverse]({{ '/docs/typeclasses/traverse' | relative_url }})
-* [TraverseFilter]({{ '/docs/typeclasses/traversefilter' | relative_url }})
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.data.*
+import arrow.core.*
+
+DataType(Id::class).tcMarkdownList()
+```

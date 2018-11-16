@@ -36,7 +36,7 @@ class NonEmptyListTest : UnitSpec() {
       EQA = Eq.any(),
       EQB = Eq.any(),
       MB = object : Monoid<List<String>> {
-        override fun empty(): List<String> = ListK.empty<String>().list
+        override fun empty(): List<String> = emptyList()
         override fun List<String>.combine(b: List<String>): List<String> = this + b
       }
     ))

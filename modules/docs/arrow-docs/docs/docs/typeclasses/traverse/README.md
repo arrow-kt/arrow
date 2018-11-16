@@ -263,17 +263,25 @@ val listOfAsyncResults = listOfUsers.map { u -> saveProfile(u)}
 listOfAsyncResults.sequence_(DeferredK.applicative())
 ```
 
-### Data Types
+### Data types
 
-The following data types in Arrow provide instances that adhere to the `Traverse` type class.
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.typeclasses.Traverse
 
-- [Either]({{ '/docs/datatypes/either' | relative_url }})
-- [EitherT]({{ '/docs/datatypes/eithert' | relative_url }})
-- [Id]({{ '/docs/datatypes/id' | relative_url }})
-- [Ior]({{ '/docs/datatypes/ior' | relative_url }})
-- [NonEmptyList]({{ '/docs/datatypes/nonemptylist' | relative_url }})
-- [Option]({{ '/docs/datatypes/option' | relative_url }})
-- [OptionT]({{ '/docs/datatypes/optiont' | relative_url }})
-- [SequenceK]({{ '/docs/datatypes/sequencek' | relative_url }})
-- [Try]({{ '/docs/datatypes/try' | relative_url }})
-- [Validated]({{ '/docs/datatypes/validated' | relative_url }})
+TypeClass(Traverse::class).dtMarkdownList()
+```
+
+### Hierarchy
+
+<canvas id="hierarchy-diagram"></canvas>
+<script>
+  drawNomNomlDiagram('hierarchy-diagram', 'diagram.nomnol')
+</script>
+
+```kotlin:ank:outFile(diagram.nomnol)
+import arrow.reflect.*
+import arrow.typeclasses.Traverse
+
+TypeClass(Traverse::class).hierarchyGraph()
+```

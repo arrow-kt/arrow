@@ -17,7 +17,7 @@ import arrow.typeclasses.Applicative
  * type constructor as extension functions.
  */
 @higherkind
-data class ListK<out A>(val list: List<A>) : ListKOf<A>, List<A> by list {
+data class ListK<out A>(private val list: List<A>) : ListKOf<A>, List<A> by list {
 
   fun <B> flatMap(f: (A) -> ListKOf<B>): ListK<B> = list.flatMap { f(it).fix().list }.k()
 
@@ -32,6 +32,13 @@ data class ListK<out A>(val list: List<A>) : ListKOf<A>, List<A> by list {
     }
     return Eval.defer { loop(this) }
   }
+
+  override fun equals(other: Any?): Boolean =
+    when (other) {
+      is ListK<*> -> this.list == other.list
+      is List<*> -> this.list == other
+      else -> false
+    }
 
   fun <B> ap(ff: ListKOf<(A) -> B>): ListK<B> = ff.fix().flatMap { f -> map(f) }
 
@@ -49,6 +56,8 @@ data class ListK<out A>(val list: List<A>) : ListKOf<A>, List<A> by list {
 
   fun <B> mapFilter(f: (A) -> Option<B>): ListK<B> =
     flatMap { a -> f(a).fold({ empty<B>() }, { just(it) }) }
+
+  override fun hashCode(): Int = list.hashCode()
 
   companion object {
 
@@ -83,9 +92,6 @@ data class ListK<out A>(val list: List<A>) : ListKOf<A>, List<A> by list {
 }
 
 fun <A> ListKOf<A>.combineK(y: ListKOf<A>): ListK<A> =
-  (fix().list + y.fix().list).k()
-
-fun <A, G> ListKOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, ListK<A>> =
-  fix().traverse(GA, ::identity)
+  (fix() + y.fix()).k()
 
 fun <A> List<A>.k(): ListK<A> = ListK(this)

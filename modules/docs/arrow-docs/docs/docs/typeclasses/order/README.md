@@ -102,3 +102,26 @@ Order { a: Int, b: Int -> b - a }.run {
 ```
 
 See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }}) to provide your own `Order` instances for custom datatypes.
+
+### Data types
+
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.typeclasses.Order
+
+TypeClass(Order::class).dtMarkdownList()
+```
+
+### Hierarchy
+
+<canvas id="hierarchy-diagram"></canvas>
+<script>
+  drawNomNomlDiagram('hierarchy-diagram', 'diagram.nomnol')
+</script>
+
+```kotlin:ank:outFile(diagram.nomnol)
+import arrow.reflect.*
+import arrow.typeclasses.Order
+
+TypeClass(Order::class).hierarchyGraph()
+```

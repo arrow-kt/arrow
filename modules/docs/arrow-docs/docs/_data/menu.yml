@@ -281,6 +281,12 @@ options:
       - title: Traversal
         url: /docs/optics/traversal/
 
+      - title: Cons
+        url: /docs/optics/cons
+
+      - title: Snoc
+        url: /docs/optics/snoc/
+
       - title: At
         url: /docs/optics/at/
 
@@ -292,6 +298,37 @@ options:
 
       - title: Each
         url: /docs/optics/each/
+
+  - title: Λrrow Query Language
+
+    nested_options:
+
+      - title: Λrrow Query Language
+        url: /docs/aql/intro
+
+      - title: select
+        url: /docs/aql/select
+
+      - title: from
+        url: /docs/aql/from
+
+      - title: where
+        url: /docs/aql/where
+
+      - title: groupBy
+        url: /docs/aql/groupby
+
+      - title: orderBy
+        url: /docs/aql/orderby
+
+      - title: sum
+        url: /docs/aql/sum
+
+      - title: union
+        url: /docs/aql/union
+
+      - title: Custom Data Types
+        url: /docs/aql/custom
 
   - title: Generic
     nested_options:

@@ -71,7 +71,7 @@ import arrow.instances.*
 import arrow.instances.either.monad.*
 
 fun getCountryCode(maybePerson : Either<BizError, Person>): Either<BizError, String> =
-  Either.monad<BizError>().binding { 
+  binding<BizError, String> { 
     val person = maybePerson.bind()
     val address = person.address.toEither({ AddressNotFound(person.id) }).bind()
     val country = address.country.toEither({ CountryNotFound(address.id)}).bind()
@@ -164,7 +164,7 @@ Let's look at how a similar implementation would look like using monad comprehen
 import arrow.effects.observablek.monad.*
 
 fun getCountryCode(personId: Int): ObservableK<Either<BizError, String>> =
-  ObservableK.monad().binding {
+  binding {
     val person = findPerson(personId).bind()
     val address = person.fold (
       { it.left() },
@@ -239,17 +239,15 @@ import arrow.instances.option.functor.*
 EitherT(Option(3.left())).mapLeft(Option.functor(), {it + 1})
 ```
 
-## Available Instances
+### Supported type classes
 
-* [Applicative]({{ '/docs/typeclasses/applicative' | relative_url }})
-* [ApplicativeError]({{ '/docs/typeclasses/applicativeerror' | relative_url }})
-* [Foldable]({{ '/docs/typeclasses/foldable' | relative_url }})
-* [Functor]({{ '/docs/typeclasses/functor' | relative_url }})
-* [Monad]({{ '/docs/typeclasses/monad' | relative_url }})
-* [MonadError]({{ '/docs/typeclasses/monaderror' | relative_url }})
-* [SemigroupK]({{ '/docs/typeclasses/semigroupk' | relative_url }})
-* [Traverse]({{ '/docs/typeclasses/traverse' | relative_url }})
-* [TraverseFilter]({{ '/docs/typeclasses/traversefilter' | relative_url }})
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.data.*
+import arrow.core.*
+
+DataType(EitherT::class).tcMarkdownList()
+```
 
 Take a look at the [`OptionT` docs]({{ '/docs/datatypes/optiont' | relative_url }}) for an alternative version of this content with the `OptionT` monad transformer
 

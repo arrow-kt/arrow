@@ -1,0 +1,19 @@
+dependencies {
+    compile 'io.github.classgraph:classgraph:4.4.12'
+    compile project(':arrow-instances-core')
+    compile project(':arrow-instances-data')
+    compile project(':arrow-effects-instances')
+    compile project(':arrow-syntax')
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
+    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
+    compile project(':arrow-annotations')
+    kapt project(':arrow-annotations-processor')
+    kaptTest project(':arrow-annotations-processor')
+    compileOnly project(':arrow-annotations-processor')
+    testCompileOnly project(':arrow-annotations-processor')
+    testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
+    testCompile project(':arrow-test')
+}
+
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
+apply plugin: 'kotlin-kapt'
