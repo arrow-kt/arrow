@@ -118,5 +118,19 @@ TypeClass(Applicative::class).dtMarkdownList()
 Additionally all instances of [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) and their MTL variants implement the `Applicative` typeclass directly
 since they are all subtypes of `Applicative`.
 
+### Hierarchy
+
+<canvas id="hierarchy-diagram"></canvas>
+<script>
+  drawNomNomlDiagram('hierarchy-diagram', 'diagram.nomnol')
+</script>
+
+```kotlin:ank:outFile(diagram.nomnol)
+import arrow.reflect.*
+import arrow.typeclasses.Applicative
+
+TypeClass(Applicative::class).hierarchyGraph()
+```
+
 [applicative_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-typeclasses/src/main/kotlin/arrow/typeclasses/Applicative.kt
 [applicative_law_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-test/src/main/kotlin/arrow/test/laws/ApplicativeLaws.kt

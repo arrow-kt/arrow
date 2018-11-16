@@ -527,3 +527,17 @@ import arrow.typeclasses.Foldable
 
 TypeClass(Foldable::class).dtMarkdownList()
 ```
+
+### Hierarchy
+
+<canvas id="hierarchy-diagram"></canvas>
+<script>
+  drawNomNomlDiagram('hierarchy-diagram', 'diagram.nomnol')
+</script>
+
+```kotlin:ank:outFile(diagram.nomnol)
+import arrow.reflect.*
+import arrow.typeclasses.Foldable
+
+TypeClass(Foldable::class).hierarchyGraph()
+```

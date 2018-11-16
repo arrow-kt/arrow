@@ -21,3 +21,17 @@ import arrow.typeclasses.Bimonad
 
 TypeClass(Bimonad::class).dtMarkdownList()
 ```
+
+### Hierarchy
+
+<canvas id="hierarchy-diagram"></canvas>
+<script>
+  drawNomNomlDiagram('hierarchy-diagram', 'diagram.nomnol')
+</script>
+
+```kotlin:ank:outFile(diagram.nomnol)
+import arrow.reflect.*
+import arrow.typeclasses.Bimonad
+
+TypeClass(Bimonad::class).hierarchyGraph()
+```

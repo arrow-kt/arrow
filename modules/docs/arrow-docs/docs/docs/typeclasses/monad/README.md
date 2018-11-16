@@ -137,4 +137,19 @@ import arrow.typeclasses.Monad
 TypeClass(Monad::class).dtMarkdownList()
 ```
 
+### Hierarchy
+
+<canvas id="hierarchy-diagram" style="margin-top:120px"></canvas>
+
+<script>
+  drawNomNomlDiagram('hierarchy-diagram', 'monad.nomnol')
+</script>
+
+```kotlin:ank:outFile(monad.nomnol)
+import arrow.reflect.*
+import arrow.typeclasses.Monad
+
+TypeClass(Monad::class).hierarchyGraph()
+```
+
 [monad_law_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-test/src/main/kotlin/arrow/test/laws/MonadLaws.kt

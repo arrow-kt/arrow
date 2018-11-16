@@ -73,5 +73,19 @@ import arrow.typeclasses.Bifunctor
 TypeClass(Bifunctor::class).dtMarkdownList()
 ```
 
+### Hierarchy
+
+<canvas id="hierarchy-diagram"></canvas>
+<script>
+  drawNomNomlDiagram('hierarchy-diagram', 'diagram.nomnol')
+</script>
+
+```kotlin:ank:outFile(diagram.nomnol)
+import arrow.reflect.*
+import arrow.typeclasses.Bifunctor
+
+TypeClass(Bifunctor::class).hierarchyGraph()
+```
+
 [bifunctor_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-typeclasses/src/main/kotlin/arrow/typeclasses/Bifunctor.kt
 [bifunctor_laws_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-test/src/main/kotlin/arrow/test/laws/BifunctorLaws.kt
