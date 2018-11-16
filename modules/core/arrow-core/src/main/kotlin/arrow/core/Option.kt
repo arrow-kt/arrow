@@ -11,6 +11,16 @@ sealed class Option<out A> : OptionOf<A> {
 
   companion object {
 
+    /**
+     * Lifts an [A] value from the environment to [Option]
+     *
+     * {: data-executable='true'}
+     *
+     * ```kotlin:ank
+     * import arrow.core.Option
+     * Option.just(1)
+     * ```
+     */
     fun <A> just(a: A): Option<A> = Some(a)
 
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> OptionOf<Either<A, B>>): Option<B> {

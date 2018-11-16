@@ -25,9 +25,10 @@ buildscript {
         daggerVersion = '2.17'
         kotlinxCoroutinesVersion = '1.0.0'
         kotlinxCollectionsImmutableVersion = '0.1'
-        kotlinPoetVersion='1.0.0-RC1'
-        projectReactorVersion='3.1.8.RELEASE'
-        rxJavaVersion='2.2.1'
+        kotlinPoetVersion = '1.0.0-RC1'
+        projectReactorVersion = '3.1.8.RELEASE'
+        rxJavaVersion = '2.2.1'
+        dokka_version = '0.9.17'
     }
 
     repositories {
@@ -45,6 +46,7 @@ buildscript {
         classpath 'io.arrow-kt:ank-gradle-plugin:0.7.1'
         classpath 'org.ajoberstar:gradle-git-publish:1.0.1'
         classpath "net.rdrei.android.buildtimetracker:gradle-plugin:0.11.1"
+        classpath "org.jetbrains.dokka:dokka-gradle-plugin:$dokka_version"
     }
 }
 
@@ -52,6 +54,13 @@ apply from: 'detekt.gradle.kts'
 
 allprojects {
     apply plugin: 'base'
+    apply plugin: 'org.jetbrains.dokka'
+
+    dokka {
+        outputFormat = 'jekyll'
+        outputDirectory = project.rootDir.absolutePath + 
+                "/modules/docs/arrow-docs/build/apidocs"
+    }
 
     clean.doFirst {
         delete "${rootDir}/infographic/arrow-infographic.txt"
