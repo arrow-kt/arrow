@@ -1,15 +1,18 @@
 package arrow.effects
 
 import arrow.Kind
-import arrow.core.Either
+import arrow.core.*
 import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.effects.deferredk.applicative.applicative
 import arrow.effects.typeclasses.*
 import arrow.extension
 import arrow.typeclasses.*
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Deferred
 import kotlin.coroutines.CoroutineContext
 import arrow.effects.handleErrorWith as deferredHandleErrorWith
 import arrow.effects.runAsync as deferredRunAsync
+import arrow.effects.startF as deferredstartF
 
 @extension
 interface DeferredKFunctorInstance : Functor<ForDeferredK> {
@@ -99,14 +102,25 @@ interface DeferredKAsyncInstance : Async<ForDeferredK>, DeferredKMonadDeferInsta
     DeferredK.invoke(ctx = ctx, f = { f() })
 }
 
-@extension
-interface DeferredKEffectInstance : Effect<ForDeferredK>, DeferredKAsyncInstance {
-  override fun <A> DeferredKOf<A>.runAsync(cb: (Either<Throwable, A>) -> DeferredKOf<Unit>): DeferredK<Unit> =
-    deferredRunAsync(cb = cb)
+interface DeferredKConcurrentInstance : Concurrent<ForDeferredK>, DeferredKAsyncInstance {
+
+  override fun <A> Kind<ForDeferredK, A>.startF(): DeferredK<Fiber<ForDeferredK, A>> =
+    deferredstartF()
+
+  override fun <A, B> racePair(lh: Kind<ForDeferredK, A>,
+                               rh: Kind<ForDeferredK, B>): Kind<ForDeferredK, Either<Tuple2<A, Fiber<ForDeferredK, B>>, Tuple2<Fiber<ForDeferredK, A>, B>>> =
+    DeferredK.racePair(lh, rh)
+
 }
 
 @extension
-interface DeferredKConcurrentEffectInstance : ConcurrentEffect<ForDeferredK>, DeferredKEffectInstance {
+interface DeferredKEffectInstance : Effect<ForDeferredK>, DeferredKAsyncInstance {
+  override fun <A> Kind<ForDeferredK, A>.runAsync(cb: (Either<Throwable, A>) -> DeferredKOf<Unit>): DeferredK<Unit> =
+    fix().deferredRunAsync(cb = cb)
+}
+
+@extension
+interface DeferredKConcurrentEffectInstance : ConcurrentEffect<ForDeferredK>, DeferredKEffectInstance, DeferredKConcurrentInstance {
   override fun <A> DeferredKOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> Kind<ForDeferredK, Unit>): DeferredK<Disposable> =
     fix().runAsyncCancellable(onCancel = OnCancel.ThrowCancellationException, cb = cb)
 }

@@ -13,11 +13,11 @@ interface Concurrent<F> : Async<F> {
   fun <A, B> racePair(lh: Kind<F, A>, rh: Kind<F, B>): Kind<F, Either<Tuple2<A, Fiber<F, B>>, Tuple2<Fiber<F, A>, B>>>
 
   fun <A, B> race(lh: Kind<F, A>, rh: Kind<F, B>): Kind<F, Either<A, B>> =
-    racePair(lh, rh).map {
-      it.fold({ (a, _) ->
-        a.left()
-      }, { (_, b) ->
-        b.right()
+    racePair(lh, rh).flatMap {
+      it.fold({ (a, b) ->
+        b.cancel.map { a.left() }
+      }, { (a, b) ->
+        a.cancel.map { b.right() }
       })
     }
 

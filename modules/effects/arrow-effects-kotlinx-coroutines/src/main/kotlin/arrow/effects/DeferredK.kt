@@ -1,5 +1,6 @@
 package arrow.effects
 
+import arrow.Kind
 import arrow.core.*
 import arrow.effects.DeferredK.Generated.ConnectedGenerated
 import arrow.effects.DeferredK.Generated.DefaultGenerated
@@ -7,6 +8,8 @@ import arrow.effects.internal.Platform
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.MonadDefer
+import arrow.effects.typeclasses.Fiber
+import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import kotlinx.coroutines.*
 import kotlinx.coroutines.selects.SelectClause0
@@ -684,6 +687,22 @@ sealed class DeferredK<A>(
           result
         }
       }
+
+    fun <A, B> racePair(lh: DeferredKOf<A>,
+                        rh: DeferredKOf<B>): DeferredK<Either<Tuple2<A, Fiber<ForDeferredK, B>>, Tuple2<Fiber<ForDeferredK, A>, B>>> =
+      lh.startF().flatMap { fiberA ->
+        rh.startF().flatMap { fiberB ->
+          DeferredK.async<Either<Tuple2<A, Fiber<ForDeferredK, B>>, Tuple2<Fiber<ForDeferredK, A>, B>>> { conn, cb ->
+            fiberA.join.fix().invokeOnCompletion { error ->
+              error?.let { cb(it.left()) } ?: cb((fiberA.join.fix().getCompleted() toT fiberB).left().right())
+            }
+            fiberB.join.fix().invokeOnCompletion { error ->
+              error?.let { cb(it.left()) } ?: cb((fiberA toT fiberB.join.fix().getCompleted()).right().right())
+            }
+          }
+        }
+      }
+
   }
 
   override val children: Sequence<Job>
@@ -765,6 +784,12 @@ fun <A> DeferredKOf<A>.handleErrorWith(f: (Throwable) -> DeferredKOf<A>): Deferr
       f(e).await()
     }
   }
+}
+
+fun <A> DeferredKOf<A>.startF(): DeferredK<Fiber<ForDeferredK, A>> {
+  val join = scope().asyncK(start = CoroutineStart.DEFAULT) { await() }
+  val cancel = DeferredK(start = CoroutineStart.LAZY) { join.cancel() }
+  return DeferredK.just(Fiber(join, cancel))
 }
 
 /**

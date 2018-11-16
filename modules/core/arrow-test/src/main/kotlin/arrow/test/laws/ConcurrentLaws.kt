@@ -40,7 +40,6 @@ object ConcurrentLaws {
       Law("Concurrent Laws: action concurrent with pure value is just action") { CF.actionConcurrentWithPureValueIsJustAction(EQ) }
     )
 
-
   fun <F> Concurrent<F>.startJoinIsIdentity(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.int()) { i ->
       val fa = just(i)
