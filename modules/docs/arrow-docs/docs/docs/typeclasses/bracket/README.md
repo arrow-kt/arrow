@@ -68,7 +68,83 @@ openFile("data.json").bracket(release = { closeFile(it) }) { file ->
 This would ensure the file gets closed right after completing the `use` operation, which would be `fileToString(file)` 
 here. If that operation throws an error, the file would also be closed.
 
-Note that the result is still an `IO.Async` operation, which means it's still deferred (not executed yet). 
+Note that the result is still an `IO.Async` operation, which means it's still deferred (not executed yet).
+
+### Polymorphic example
+
+We've mentioned that `Bracket` is agnostic of whether the `use` lambda is computed synchronously or asynchronously. 
+That's because it's able to run over any data type `F` that can support synchronous and asynchronous 
+computations, like [`IO`]({{ '/docs/effects/io' | relative_url }}), [`Observable`]({{ '/docs/effects/io' | relative_url }}) 
+or [`Deferred`.]({{ '/docs/effects/io' | relative_url }}). 
+
+It basically targets what in Functional Programming is known as a "Higher Kind".
+
+There's a complete [section about this pattern]({{ '/docs/patterns/polymorphic_programs' | relative_url }}) in the 
+docs.
+
+Let's learn more about how `Bracket` can support this pattern as a Type class with a basic example showcasing this high level of abstraction technique.
+
+```kotlin:ank
+import arrow.Kind
+import arrow.effects.typeclasses.Bracket
+
+class File(url: String) {
+  fun open(): File = this
+  fun close(): Unit {}
+  override fun toString(): String = "This file contains some interesting content!"
+}
+
+class Program<F>(BF: Bracket<F, Throwable>) : Bracket<F, Throwable> by BF {
+
+  fun openFile(uri: String): Kind<F, File> = just(File(uri).open())
+
+  fun closeFile(file: File): Kind<F, Unit> = just(file.close())
+
+  fun fileToString(file: File): Kind<F, String> = just(file.toString())
+}
+``` 
+
+This is basically the same program from previous examples, but defined over any `F` data type that there is an instance 
+of `Bracket` for. In other words, this program is constrained by the capabilities that `Bracket` can provide. 
+
+We are also fixing the error type from `Bracket<F, E>` to be `Throwable`.
+
+Let's run the program for the three mentioned data types as an example of polymorphism now.
+
+```kotlin:ank
+import arrow.effects.DeferredK
+import arrow.effects.IO
+import arrow.effects.ObservableK
+import arrow.effects.deferredk.bracket.bracket
+import arrow.effects.instances.io.bracket.bracket
+import arrow.effects.observablek.bracket.bracket
+
+val ioProgram = Program(IO.bracket())
+with (ioProgram) {
+  openFile("data.json").bracket({ closeFile(it) }) { file ->
+    fileToString(file)
+  }
+}
+
+val observableProgram = Program(ObservableK.bracket())
+with (observableProgram) {
+  openFile("data.json").bracket({ closeFile(it) }) { file ->
+    fileToString(file)
+  }
+}
+
+val deferredProgram = Program(DeferredK.bracket())
+with (deferredProgram) {
+  openFile("data.json").bracket({ closeFile(it) }) { file ->
+    fileToString(file)
+  }
+}
+``` 
+
+Note that we're running the exact same program passing in three different data types. All of them can provide an 
+instance of `Bracket`, which means that they can support asynchronous and synchronous computations.
+
+This is the style you'd usually use in a Functional Program.
 
 ### Combinators
 
