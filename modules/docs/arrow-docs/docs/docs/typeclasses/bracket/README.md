@@ -60,9 +60,9 @@ process look like this:
 ```kotlin:ank
 import arrow.effects.IO
 
-openFile("data.json").bracket(release = { closeFile(it) }) { file ->
-    fileToString(file)
-}
+openFile("data.json").bracket(
+    release = { file -> closeFile(file) },
+    use = { file -> fileToString(file) })
 ``` 
 
 This would ensure the file gets closed right after completing the `use` operation, which would be `fileToString(file)` 
@@ -121,23 +121,23 @@ import arrow.effects.observablek.bracket.bracket
 
 val ioProgram = Program(IO.bracket())
 with (ioProgram) {
-  openFile("data.json").bracket({ closeFile(it) }) { file ->
-    fileToString(file)
-  }
+  openFile("data.json").bracket(
+    release = { file -> closeFile(file) },
+    use = { file -> fileToString(file) })
 }
 
 val observableProgram = Program(ObservableK.bracket())
 with (observableProgram) {
-  openFile("data.json").bracket({ closeFile(it) }) { file ->
-    fileToString(file)
-  }
+  openFile("data.json").bracket(
+    release = { file -> closeFile(file) },
+    use = { file -> fileToString(file) })
 }
 
 val deferredProgram = Program(DeferredK.bracket())
 with (deferredProgram) {
-  openFile("data.json").bracket({ closeFile(it) }) { file ->
-    fileToString(file)
-  }
+  openFile("data.json").bracket(
+    release = { file -> closeFile(file) },
+    use = { file -> fileToString(file) })
 }
 ``` 
 
@@ -157,9 +157,9 @@ Requires passing `release` and `use` lambdas. It ensures acquiring, using and re
 ```kotlin:ank
 import arrow.effects.IO
 
-openFile("data.json").bracket(release = { closeFile(it) }) { file ->
-    fileToString(file)
-}
+openFile("data.json").bracket(
+  release = { file -> closeFile(file) },
+  use = { file -> fileToString(file) })
 ```
 
 #### Kind<F, A>#bracketCase
