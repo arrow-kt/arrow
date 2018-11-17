@@ -29,7 +29,7 @@ Let's say we want to work with a file. Let's use a mock `File` API to avoid mess
 
 These methods would allow to open a File, close it and also read it's content as a string.
 
-```kotlin:ank
+```kotlin:ank:silent
 import arrow.effects.IO
 
 /**
@@ -57,12 +57,31 @@ Read the [`IO`]({{ '/docs/effects/io' | relative_url }}) docs for more context o
 Now, let's say we want to open a file, do some work with it, and then close it. With `Bracket`, we could make that 
 process look like this:
 
+{: data-executable='true'}
+
 ```kotlin:ank
 import arrow.effects.IO
 
-openFile("data.json").bracket(
+class File(url: String) {
+    fun open(): File = this
+    fun close(): Unit {}
+    override fun toString(): String = "This file contains some interesting content!"
+}
+
+fun openFile(uri: String): IO<File> = IO { File(uri).open() }
+
+fun closeFile(file: File): IO<Unit> = IO { file.close() }
+
+fun fileToString(file: File): IO<String> = IO { file.toString() }
+
+fun main(args: Array<String>) {
+//sampleStart
+val safeComputation = openFile("data.json").bracket(
     release = { file -> closeFile(file) },
     use = { file -> fileToString(file) })
+//sampleEnd
+println(safeComputation)
+}
 ``` 
 
 This would ensure the file gets closed right after completing the `use` operation, which would be `fileToString(file)` 
@@ -84,7 +103,7 @@ docs.
 
 Let's learn more about how `Bracket` can support this pattern as a Type class with a basic example showcasing this high level of abstraction technique.
 
-```kotlin:ank
+```kotlin:ank:silent
 import arrow.Kind
 import arrow.effects.typeclasses.Bracket
 
@@ -111,33 +130,120 @@ We are also fixing the error type from `Bracket<F, E>` to be `Throwable`.
 
 Let's run the program for the three mentioned data types as an example of polymorphism now.
 
+We can run the program for `IO`:
+
+{: data-executable='true'}
+
+```kotlin:ank
+import arrow.effects.IO
+import arrow.effects.instances.io.bracket.bracket
+import arrow.Kind
+import arrow.effects.typeclasses.Bracket
+
+class File(url: String) {
+  fun open(): File = this
+  fun close(): Unit {}
+  override fun toString(): String = "This file contains some interesting content!"
+}
+
+class Program<F>(BF: Bracket<F, Throwable>) : Bracket<F, Throwable> by BF {
+
+  fun openFile(uri: String): Kind<F, File> = just(File(uri).open())
+
+  fun closeFile(file: File): Kind<F, Unit> = just(file.close())
+
+  fun fileToString(file: File): Kind<F, String> = just(file.toString())
+}
+
+fun main(args: Array<String>) {
+//sampleStart
+val ioProgram = Program(IO.bracket())
+
+val safeComputation = with (ioProgram) {
+  openFile("data.json").bracket(
+    release = { file -> closeFile(file) },
+    use = { file -> fileToString(file) })
+}
+//sampleEnd
+println(safeComputation)
+}
+```
+
+Let's now run the same exact program also for `ObservableK`:
+
+{: data-executable='true'}
+
+```kotlin:ank
+import arrow.effects.ObservableK
+import arrow.effects.observablek.bracket.bracket
+import arrow.Kind
+import arrow.effects.typeclasses.Bracket
+
+class File(url: String) {
+  fun open(): File = this
+  fun close(): Unit {}
+  override fun toString(): String = "This file contains some interesting content!"
+}
+
+class Program<F>(BF: Bracket<F, Throwable>) : Bracket<F, Throwable> by BF {
+
+  fun openFile(uri: String): Kind<F, File> = just(File(uri).open())
+
+  fun closeFile(file: File): Kind<F, Unit> = just(file.close())
+
+  fun fileToString(file: File): Kind<F, String> = just(file.toString())
+}
+
+fun main(args: Array<String>) {
+//sampleStart
+val observableProgram = Program(ObservableK.bracket())
+
+val safeComputation = with (observableProgram) {
+  openFile("data.json").bracket(
+    release = { file -> closeFile(file) },
+    use = { file -> fileToString(file) })
+}
+//sampleEnd
+println(safeComputation)
+}
+```
+
+And finally over `DeferredK`
+
+{: data-executable='true'}
+
 ```kotlin:ank
 import arrow.effects.DeferredK
-import arrow.effects.IO
-import arrow.effects.ObservableK
 import arrow.effects.deferredk.bracket.bracket
-import arrow.effects.instances.io.bracket.bracket
-import arrow.effects.observablek.bracket.bracket
+import arrow.Kind
+import arrow.effects.typeclasses.Bracket
 
-val ioProgram = Program(IO.bracket())
-with (ioProgram) {
-  openFile("data.json").bracket(
-    release = { file -> closeFile(file) },
-    use = { file -> fileToString(file) })
+class File(url: String) {
+  fun open(): File = this
+  fun close(): Unit {}
+  override fun toString(): String = "This file contains some interesting content!"
 }
 
-val observableProgram = Program(ObservableK.bracket())
-with (observableProgram) {
-  openFile("data.json").bracket(
-    release = { file -> closeFile(file) },
-    use = { file -> fileToString(file) })
+class Program<F>(BF: Bracket<F, Throwable>) : Bracket<F, Throwable> by BF {
+
+  fun openFile(uri: String): Kind<F, File> = just(File(uri).open())
+
+  fun closeFile(file: File): Kind<F, Unit> = just(file.close())
+
+  fun fileToString(file: File): Kind<F, String> = just(file.toString())
 }
 
+fun main(args: Array<String>) {
+//sampleStart
 val deferredProgram = Program(DeferredK.bracket())
-with (deferredProgram) {
+
+val safeComputation= with (deferredProgram) {
   openFile("data.json").bracket(
     release = { file -> closeFile(file) },
     use = { file -> fileToString(file) })
+}
+//sampleEnd
+println(safeComputation)
 }
 ``` 
 
@@ -154,12 +260,31 @@ Requires passing `release` and `use` lambdas. It ensures acquiring, using and re
 
 `fun <A, B> Kind<F, A>.bracket(release: (A) -> Kind<F, Unit>, use: (A) -> Kind<F, B>): Kind<F, B>`
 
+{: data-executable='true'}
+
 ```kotlin:ank
 import arrow.effects.IO
 
-openFile("data.json").bracket(
+class File(url: String) {
+    fun open(): File = this
+    fun close(): Unit {}
+    override fun toString(): String = "This file contains some interesting content!"
+}
+
+fun openFile(uri: String): IO<File> = IO { File(uri).open() }
+
+fun closeFile(file: File): IO<Unit> = IO { file.close() }
+
+fun fileToString(file: File): IO<String> = IO { file.toString() }
+
+fun main(args: Array<String>) {
+//sampleStart
+val safeComputation = openFile("data.json").bracket(
   release = { file -> closeFile(file) },
   use = { file -> fileToString(file) })
+//sampleEnd
+println(safeComputation)
+}
 ```
 
 #### Kind<F, A>#bracketCase
@@ -172,11 +297,27 @@ Requires passing `release` and `use` lambdas. It ensures acquiring, using and re
 
 `fun <A, B> Kind<F, A>.bracketCase(release: (A, ExitCase<Throwable>) -> Kind<F, Unit>, use: (A) -> Kind<F, B>): Kind<F, B>`
 
+{: data-executable='true'}
+
 ```kotlin:ank
 import arrow.effects.IO
 import arrow.effects.typeclasses.ExitCase
 
-openFile("data.json").bracketCase(
+class File(url: String) {
+    fun open(): File = this
+    fun close(): Unit {}
+    override fun toString(): String = "This file contains some interesting content!"
+}
+
+fun openFile(uri: String): IO<File> = IO { File(uri).open() }
+
+fun closeFile(file: File): IO<Unit> = IO { file.close() }
+
+fun fileToString(file: File): IO<String> = IO { file.toString() }
+
+fun main(args: Array<String>) {
+//sampleStart
+val safeComputation = openFile("data.json").bracketCase(
     release = { file, exitCase ->
       when (exitCase) {
         is ExitCase.Completed -> { /* do something */ }
@@ -188,6 +329,9 @@ openFile("data.json").bracketCase(
     use = { file ->
       fileToString(file)
     })
+//sampleEnd
+println(safeComputation)
+}
 ```
 
 #### Other combinators
