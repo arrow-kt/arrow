@@ -208,7 +208,7 @@ println(safeComputation)
 }
 ```
 
-And finally over `DeferredK`
+And finally over `DeferredK`:
 
 {: data-executable='true'}
 
