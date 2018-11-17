@@ -192,6 +192,9 @@ options:
       - title: MonadError
         url: /docs/typeclasses/monaderror/
 
+      - title: Bracket
+        url: /docs/typeclasses/bracket/
+
       - title: MonadFilter
         url: /docs/typeclasses/monadfilter/
 
