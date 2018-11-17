@@ -2,6 +2,7 @@ package arrow.effects
 
 import arrow.core.*
 import arrow.effects.typeclasses.Disposable
+import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import kotlinx.coroutines.*
@@ -13,12 +14,13 @@ fun <A> Deferred<A>.k(): DeferredK<A> =
 fun <A> CoroutineScope.asyncK(ctx: CoroutineContext = Dispatchers.Default, start: CoroutineStart = CoroutineStart.LAZY, f: suspend CoroutineScope.() -> A): DeferredK<A> =
   this.async(ctx, start, f).k()
 
-fun <A> DeferredKOf<A>.value(): Deferred<A> = this.fix().deferred
+fun <A> DeferredKOf<A>.value(): Deferred<A> = this.fix()
 
 fun <A> DeferredKOf<A>.scope(): CoroutineScope = this.fix().scope
 
 @higherkind
-data class DeferredK<out A>(val deferred: Deferred<A>, val scope: CoroutineScope = GlobalScope) : DeferredKOf<A>, Deferred<A> by deferred {
+@ExperimentalCoroutinesApi
+data class DeferredK<out A>(private val deferred: Deferred<A>, val scope: CoroutineScope = GlobalScope) : DeferredKOf<A>, Deferred<A> by deferred {
 
   fun <B> map(f: (A) -> B): DeferredK<B> =
     flatMap { a: A -> just(f(a)) }
@@ -31,10 +33,29 @@ data class DeferredK<out A>(val deferred: Deferred<A>, val scope: CoroutineScope
       f(await()).await()
     }
 
+  fun <B> bracketCase(use: (A) -> DeferredK<B>, release: (A, ExitCase<Throwable>) -> DeferredK<Unit>): DeferredK<B> =
+    flatMap { a ->
+      try {
+        use(a).also { release(a, ExitCase.Completed) }
+      } catch (e: Exception) {
+        release(a, ExitCase.Error(e))
+        DeferredK.failed<B>(e)
+      }
+    }
+
   fun continueOn(ctx: CoroutineContext): DeferredK<A> =
     scope.asyncK(ctx, CoroutineStart.LAZY) {
       deferred.await()
     }
+
+  override fun equals(other: Any?): Boolean =
+    when (other) {
+      is DeferredK<*> -> this.deferred == other.deferred
+      is Deferred<*> -> this.deferred == other
+      else -> false
+    }
+
+  override fun hashCode(): Int = deferred.hashCode()
 
   companion object {
     fun unit(): DeferredK<Unit> =

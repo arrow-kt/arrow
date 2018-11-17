@@ -39,7 +39,7 @@ class RemoteDataSource : DataSource {
     mapOf(User(UserId("user2")) to listOf(Task("Remote Task assigned to user2")))
 
   override fun allTasksByUser(user: User): IO<List<Task>> =
-    IO.async { cb ->
+    IO.async { _, cb ->
       //allows you to take values from callbacks and place them back in the context of `F`
       Option.fromNullable(internetStorage[user]).fold(
         { cb(UserNotInRemoteStorage(user).left()) },

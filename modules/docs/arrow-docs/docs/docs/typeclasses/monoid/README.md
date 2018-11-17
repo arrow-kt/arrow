@@ -92,9 +92,25 @@ ForListK extensions {
 ```
 
 
-### Data Types
+### Data types
 
-The following data types in Arrow provide instances that adhere to the `Monoid` type class.
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.typeclasses.Monoid
 
-- [SequenceK]({{ '/docs/datatypes/sequencek' | relative_url }})
-- [SetK]({{ '/docs/datatypes/setk' | relative_url }})
+TypeClass(Monoid::class).dtMarkdownList()
+```
+
+### Hierarchy
+
+<canvas id="hierarchy-diagram"></canvas>
+<script>
+  drawNomNomlDiagram('hierarchy-diagram', 'diagram.nomnol')
+</script>
+
+```kotlin:ank:outFile(diagram.nomnol)
+import arrow.reflect.*
+import arrow.typeclasses.Monoid
+
+TypeClass(Monoid::class).hierarchyGraph()
+```

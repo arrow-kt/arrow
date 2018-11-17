@@ -50,9 +50,14 @@ val upperCaseStore = store.map { it: String -> it.toUpperCase() }
 upperCaseStore.extract()
 ```
 
-## Available Instances
+### Supported type classes
 
-* [Comonad]({{ '/docs/typeclasses/comonad' | relative_url }})
-* [Functor]({{ '/docs/typeclasses/functor' | relative_url }})
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.data.*
+import arrow.core.*
+
+DataType(Store::class).tcMarkdownList()
+```
 
 

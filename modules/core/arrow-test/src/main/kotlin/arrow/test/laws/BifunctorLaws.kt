@@ -10,6 +10,7 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
 object BifunctorLaws {
+
     fun <F> laws(BF: Bifunctor<F>, f: (Int) -> Kind2<F, Int, Int>, EQ: Eq<Kind2<F, Int, Int>>): List<Law> =
         listOf(
             Law("Bifunctor Laws: Identity") { BF.identity(f, EQ) },

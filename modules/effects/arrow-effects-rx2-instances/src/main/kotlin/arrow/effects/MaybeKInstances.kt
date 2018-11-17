@@ -4,10 +4,7 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.deprecation.ExtensionsDSLDeprecated
-import arrow.effects.typeclasses.Async
-import arrow.effects.typeclasses.Effect
-import arrow.effects.typeclasses.MonadDefer
-import arrow.effects.typeclasses.Proc
+import arrow.effects.typeclasses.*
 import arrow.extension
 import arrow.typeclasses.*
 import kotlin.coroutines.CoroutineContext
@@ -96,17 +93,19 @@ interface MaybeKMonadErrorInstance :
 interface MaybeKMonadThrowInstance : MonadThrow<ForMaybeK>, MaybeKMonadErrorInstance
 
 @extension
-interface MaybeKMonadDeferInstance :
-  MonadDefer<ForMaybeK>,
-  MaybeKMonadErrorInstance {
+interface MaybeKBracketInstance : Bracket<ForMaybeK, Throwable>, MaybeKMonadThrowInstance {
+  override fun <A, B> Kind<ForMaybeK, A>.bracketCase(release: (A, ExitCase<Throwable>) -> Kind<ForMaybeK, Unit>, use: (A) -> Kind<ForMaybeK, B>): MaybeK<B> =
+    fix().bracketCase({ use(it) }, { a, e -> release(a, e) })
+}
+
+@extension
+interface MaybeKMonadDeferInstance : MonadDefer<ForMaybeK>, MaybeKBracketInstance {
   override fun <A> defer(fa: () -> MaybeKOf<A>): MaybeK<A> =
     MaybeK.defer(fa)
 }
 
 @extension
-interface MaybeKAsyncInstance :
-  Async<ForMaybeK>,
-  MaybeKMonadDeferInstance {
+interface MaybeKAsyncInstance : Async<ForMaybeK>, MaybeKMonadDeferInstance {
   override fun <A> async(fa: Proc<A>): MaybeK<A> =
     MaybeK.async(fa)
 

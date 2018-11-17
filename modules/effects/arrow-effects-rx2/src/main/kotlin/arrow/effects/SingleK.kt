@@ -5,6 +5,7 @@ import arrow.core.Left
 import arrow.core.Right
 import arrow.effects.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
+import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import io.reactivex.Single
@@ -27,6 +28,14 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
   fun <B> flatMap(f: (A) -> SingleKOf<B>): SingleK<B> =
     single.flatMap { f(it).fix().single }.k()
 
+  fun <B> bracketCase(use: (A) -> SingleKOf<B>, release: (A, ExitCase<Throwable>) -> SingleKOf<Unit>): SingleK<B> =
+    flatMap { a ->
+      use(a).fix().single
+        .doOnSuccess { release(a, ExitCase.Completed) }
+        .doOnError { release(a, ExitCase.Error(it)) }
+        .k()
+    }
+
   fun handleErrorWith(function: (Throwable) -> SingleK<A>): SingleK<A> =
     single.onErrorResumeNext { t: Throwable -> function(t).single }.k()
 
@@ -42,6 +51,15 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
       val dispose: () -> Unit = { disposable.dispose() }
       dispose
     }.k()
+
+  override fun equals(other: Any?): Boolean =
+    when (other) {
+      is SingleK<*> -> this.single == other.single
+      is Single<*> -> this.single == other
+      else -> false
+    }
+
+  override fun hashCode(): Int = single.hashCode()
 
   companion object {
     fun <A> just(a: A): SingleK<A> =

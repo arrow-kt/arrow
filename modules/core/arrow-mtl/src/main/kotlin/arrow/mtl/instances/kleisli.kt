@@ -20,7 +20,6 @@ interface KleisliMonadReaderInstance<F, D> : MonadReader<KleisliPartialOf<F, D>,
   override fun ask(): Kleisli<F, D, D> = Kleisli { MF().just(it) }
 
   override fun <A> Kind<KleisliPartialOf<F, D>, A>.local(f: (D) -> D): Kleisli<F, D, A> = fix().local(f)
-
 }
 
 class KleisliMtlContext<F, D, E>(val MF: MonadError<F, E>) : KleisliMonadReaderInstance<F, D>, KleisliMonadErrorInstance<F, D, E> {
@@ -28,7 +27,6 @@ class KleisliMtlContext<F, D, E>(val MF: MonadError<F, E>) : KleisliMonadReaderI
   override fun MF(): Monad<F> = MF
 
   override fun ME(): MonadError<F, E> = MF
-
 }
 
 class KleisliMtlContextPartiallyApplied<F, D, E>(val MF: MonadError<F, E>) {

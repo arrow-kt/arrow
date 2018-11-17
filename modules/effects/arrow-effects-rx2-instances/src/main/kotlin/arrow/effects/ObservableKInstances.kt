@@ -7,6 +7,14 @@ import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.effects.observablek.monad.monad
 import arrow.effects.observablek.monadError.monadError
 import arrow.effects.typeclasses.*
+import arrow.effects.typeclasses.Async
+import arrow.effects.typeclasses.Bracket
+import arrow.effects.typeclasses.ConcurrentEffect
+import arrow.effects.typeclasses.Disposable
+import arrow.effects.typeclasses.Effect
+import arrow.effects.typeclasses.ExitCase
+import arrow.effects.typeclasses.MonadDefer
+import arrow.effects.typeclasses.Proc
 import arrow.extension
 import arrow.typeclasses.*
 import kotlin.coroutines.CoroutineContext
@@ -97,17 +105,19 @@ interface ObservableKMonadErrorInstance :
 interface ObservableKMonadThrowInstance : MonadThrow<ForObservableK>, ObservableKMonadErrorInstance
 
 @extension
-interface ObservableKMonadDeferInstance :
-  MonadDefer<ForObservableK>,
-  ObservableKMonadErrorInstance {
+interface ObservableKBracketInstance : Bracket<ForObservableK, Throwable>, ObservableKMonadThrowInstance {
+  override fun <A, B> Kind<ForObservableK, A>.bracketCase(release: (A, ExitCase<Throwable>) -> Kind<ForObservableK, Unit>, use: (A) -> Kind<ForObservableK, B>): ObservableK<B> =
+    fix().bracketCase({ use(it) }, { a, e -> release(a, e) })
+}
+
+@extension
+interface ObservableKMonadDeferInstance : MonadDefer<ForObservableK>, ObservableKBracketInstance {
   override fun <A> defer(fa: () -> ObservableKOf<A>): ObservableK<A> =
     ObservableK.defer(fa)
 }
 
 @extension
-interface ObservableKAsyncInstance :
-  Async<ForObservableK>,
-  ObservableKMonadDeferInstance {
+interface ObservableKAsyncInstance : Async<ForObservableK>, ObservableKMonadDeferInstance {
   override fun <A> async(fa: Proc<A>): ObservableK<A> =
     ObservableK.runAsync(fa)
 
@@ -116,9 +126,7 @@ interface ObservableKAsyncInstance :
 }
 
 @extension
-interface ObservableKEffectInstance :
-  Effect<ForObservableK>,
-  ObservableKAsyncInstance {
+interface ObservableKEffectInstance : Effect<ForObservableK>, ObservableKAsyncInstance {
   override fun <A> ObservableKOf<A>.runAsync(cb: (Either<Throwable, A>) -> ObservableKOf<Unit>): ObservableK<Unit> =
     fix().runAsync(cb)
 }

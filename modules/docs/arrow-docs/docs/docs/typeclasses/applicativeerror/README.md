@@ -217,17 +217,25 @@ Rules failFast {
 }
 ```
 
-### Data Types
+### Data types
 
-The following datatypes in Arrow provide instances that adhere to the `ApplicativeError` typeclass.
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.typeclasses.ApplicativeError
 
-- [Try]({{ '/docs/datatypes/try' | relative_url }})
-- [Either]({{ '/docs/datatypes/either' | relative_url }})
-- [Kleisli]({{ '/docs/datatypes/kleisli' | relative_url }})
-- [Option]({{ '/docs/datatypes/option' | relative_url }})
-- [EitherT]({{ '/docs/datatypes/eithert' | relative_url }})
-- [StateT]({{ '/docs/datatypes/statet' | relative_url }})
-- [IO]({{ '/docs/effects/io' | relative_url }})
-- [ObservableK]({{ '/docs/integrations/rx2' | relative_url }})
-- [FlowableK]({{ '/docs/integrations/rx2' | relative_url }})
-- [DeferredK]({{ '/docs/integrations/kotlinxcoroutines/' | relative_url }})
+TypeClass(ApplicativeError::class).dtMarkdownList()
+```
+
+### Hierarchy
+
+<canvas id="hierarchy-diagram"></canvas>
+<script>
+  drawNomNomlDiagram('hierarchy-diagram', 'diagram.nomnol')
+</script>
+
+```kotlin:ank:outFile(diagram.nomnol)
+import arrow.reflect.*
+import arrow.typeclasses.ApplicativeError
+
+TypeClass(ApplicativeError::class).hierarchyGraph()
+```

@@ -94,7 +94,7 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
   fun <EE, B> withEither(f: (Either<E, A>) -> Either<EE, B>): Validated<EE, B> = fromEither(f(toEither()))
 
   /**
-   * Validated is a [[functor.Bifunctor]], this method applies one of the
+   * Validated is a [functor.Bifunctor], this method applies one of the
    * given functions.
    */
   fun <EE, AA> bimap(fe: (E) -> EE, fa: (A) -> AA): Validated<EE, AA> = fold({ Invalid(fe(it)) }, { Valid(fa(it)) })
@@ -145,7 +145,7 @@ fun <E, B> ValidatedOf<E, B>.valueOr(f: (E) -> B): B =
 
 /**
  * If `this` is valid return `this`, otherwise if `that` is valid return `that`, otherwise combine the failures.
- * This is similar to [[orElse]] except that here failures are accumulated.
+ * This is similar to [orElse] except that here failures are accumulated.
  */
 fun <E, A> ValidatedOf<E, A>.findValid(SE: Semigroup<E>, that: () -> Validated<E, A>): Validated<E, A> =
   fix().fold(
@@ -161,7 +161,7 @@ fun <E, A> ValidatedOf<E, A>.findValid(SE: Semigroup<E>, that: () -> Validated<E
 
 /**
  * Return this if it is Valid, or else fall back to the given default.
- * The functionality is similar to that of [[findValid]] except for failure accumulation,
+ * The functionality is similar to that of [findValid] except for failure accumulation,
  * where here only the error on the right is preserved and the error on the left is ignored.
  */
 fun <E, A> ValidatedOf<E, A>.orElse(default: () -> Validated<E, A>): Validated<E, A> =

@@ -11,7 +11,7 @@ import arrow.core.ListInstances
  */
 fun <A> ListK.Companion.head(): Optional<List<A>, A> = Optional(
   partialFunction = case(List<A>::isNotEmpty toT List<A>::first),
-  set = { newHead -> { list -> list.mapIndexed { index, value -> if (index == 0) newHead else value } } }
+  set = { list, newHead -> list.mapIndexed { index, value -> if (index == 0) newHead else value } }
 )
 
 /**
@@ -19,7 +19,7 @@ fun <A> ListK.Companion.head(): Optional<List<A>, A> = Optional(
  */
 fun <A> ListK.Companion.tail(): Optional<List<A>, List<A>> = Optional(
   partialFunction = case(List<A>::isNotEmpty toT { list: List<A> -> list.drop(1) }),
-  set = { newTail -> { list -> (list.firstOrNull()?.let(::listOf) ?: emptyList()) + newTail } }
+  set = { list, newTail -> (list.firstOrNull()?.let(::listOf) ?: emptyList()) + newTail }
 )
 
 /**
@@ -40,7 +40,7 @@ fun <A> ListK.Companion.toOptionNel(): Iso<List<A>, Option<NonEmptyList<A>>> = t
  */
 fun <A, B> ListInstances.toPListK(): PIso<List<A>, List<B>, ListK<A>, ListK<B>> = PIso(
   get = List<A>::k,
-  reverseGet = ListK<B>::list
+  reverseGet = ::identity
 )
 
 /**

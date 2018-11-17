@@ -7,7 +7,7 @@ import arrow.core.*
  */
 fun <A, B, R> Tuple2.Companion.pFirst(): PLens<Tuple2<A, B>, Tuple2<R, B>, A, R> = PLens(
   get = { it.a },
-  set = { r -> { (_, b) -> r toT b } }
+  set = { (_, b), r -> r toT b }
 )
 
 /**
@@ -20,7 +20,7 @@ fun <A, B> Tuple2.Companion.first(): Lens<Tuple2<A, B>, A> = pFirst()
  */
 fun <A, B, R> Tuple2.Companion.pSecond(): PLens<Tuple2<A, B>, Tuple2<A, R>, B, R> = PLens(
   get = { it.b },
-  set = { r -> { (a, _) -> a toT r } }
+  set = { (a, _), r -> a toT r }
 )
 
 /**
@@ -47,7 +47,7 @@ fun <A> Tuple2.Companion.traversal(): Traversal<Tuple2<A, A>, A> = pTraversal()
  */
 fun <A, B, C, R> Tuple3.Companion.pFirst(): PLens<Tuple3<A, B, C>, Tuple3<R, B, C>, A, R> = PLens(
   get = { it.a },
-  set = { r -> { (_, b, c) -> Tuple3(r, b, c) } }
+  set = { (_, b, c), r -> Tuple3(r, b, c) }
 )
 
 /**
@@ -60,7 +60,7 @@ fun <A, B, C> Tuple3.Companion.first(): Lens<Tuple3<A, B, C>, A> = pFirst()
  */
 fun <A, B, C, R> Tuple3.Companion.pSecond(): PLens<Tuple3<A, B, C>, Tuple3<A, R, C>, B, R> = PLens(
   get = { it.b },
-  set = { r -> { (a, _, c) -> Tuple3(a, r, c) } }
+  set = { (a, _, c), r -> Tuple3(a, r, c) }
 )
 
 /**
@@ -73,7 +73,7 @@ fun <A, B, C> Tuple3.Companion.second(): Lens<Tuple3<A, B, C>, B> = pSecond()
  */
 fun <A, B, C, R> Tuple3.Companion.pThird(): PLens<Tuple3<A, B, C>, Tuple3<A, B, R>, C, R> = PLens(
   get = { it.c },
-  set = { r -> { (a, b, _) -> Tuple3(a, b, r) } }
+  set = { (a, b, _), r -> Tuple3(a, b, r) }
 )
 
 /**

@@ -6,6 +6,7 @@ import arrow.effects.typeclasses.*
 import arrow.typeclasses.*
 import arrow.streams.internal.ap as apply
 import arrow.streams.internal.handleErrorWith as handleErrorW
+import arrow.streams.internal.bracketCase as bracketC
 
 @extension
 interface FreeCFunctor<F> : Functor<FreeCPartialOf<F>> {
@@ -71,24 +72,15 @@ interface FreeCMonadError<F> : MonadError<FreeCPartialOf<F>, Throwable> {
 }
 
 @extension
-interface FreeCMonadDefer<F> : MonadDefer<FreeCPartialOf<F>> {
+interface FreeCBracket<F> : Bracket<FreeCPartialOf<F>, Throwable>, FreeCMonadError<F> {
+  override fun <A, B> Kind<FreeCPartialOf<F>, A>.bracketCase(release: (A, ExitCase<Throwable>) -> Kind<FreeCPartialOf<F>, Unit>, use: (A) -> Kind<FreeCPartialOf<F>, B>): Kind<FreeCPartialOf<F>, B> =
+    bracketC(use, release)
+}
+
+@extension
+interface FreeCMonadDefer<F> : MonadDefer<FreeCPartialOf<F>>, FreeCBracket<F> {
   override fun <A> defer(fa: () -> Kind<FreeCPartialOf<F>, A>): Kind<FreeCPartialOf<F>, A> =
     FreeC.defer(fa)
-
-  override fun <A> raiseError(e: Throwable): Kind<FreeCPartialOf<F>, A> =
-    FreeC.raiseError(e)
-
-  override fun <A> Kind<FreeCPartialOf<F>, A>.handleErrorWith(f: (Throwable) -> Kind<FreeCPartialOf<F>, A>): Kind<FreeCPartialOf<F>, A> =
-    handleErrorW(f)
-
-  override fun <A> just(a: A): Kind<FreeCPartialOf<F>, A> =
-    FreeC.just(a)
-
-  override fun <A, B> Kind<FreeCPartialOf<F>, A>.flatMap(f: (A) -> Kind<FreeCPartialOf<F>, B>): Kind<FreeCPartialOf<F>, B> =
-    this.fix().flatMap(f)
-
-  override fun <A, B> tailRecM(a: A, f: (A) -> Kind<FreeCPartialOf<F>, Either<A, B>>): Kind<FreeCPartialOf<F>, B> =
-    FreeC.tailRecM(a) { f(it).fix() }
 }
 
 @extension
