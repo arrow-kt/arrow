@@ -18,17 +18,19 @@ interface Promise<F, A> {
   /**
    * Completes the promise with the specified value.
    */
-  fun complete(a: A): Kind<F, Boolean>
+  fun complete(a: A): Kind<F, Unit>
 
   /**
    * Completes the promise with the specified value.
    */
-  fun error(throwable: Throwable): Kind<F, Boolean>
+  fun error(throwable: Throwable): Kind<F, Unit>
 
   companion object {
     fun <F, A> unsafeCancellable(AS: Async<F>): Promise<F, A> = CancellablePromise(AS, AtomicReference(CancellablePromise.State.Pending(emptyList())))
     fun <F, A> uncancelable(AS: Async<F>): Kind<F, Promise<F, A>> = AS { unsafeCancellable<F, A>(AS) }
   }
+
+  object AlreadyFulfilled: Throwable(message = "Promise was already fulfilled")
 
 }
 
@@ -40,7 +42,7 @@ class CancellablePromise<F, A> internal constructor(private val AS: Async<F>,
       val st = state.get()
       when (st) {
         is State.Pending<A> -> loop()
-        is State.Done -> k(Right(st.value))
+        is State.Fulfilled -> k(Right(st.value))
         is State.Error -> k(Left(st.throwable))
       }
     }
@@ -49,7 +51,7 @@ class CancellablePromise<F, A> internal constructor(private val AS: Async<F>,
       val oldState = state.get()
       val newState = when (oldState) {
         is State.Pending<A> -> State.Pending(oldState.joiners + k)
-        is State.Done -> oldState
+        is State.Fulfilled -> oldState
         is State.Error -> oldState
       }
       return if (state.compareAndSet(oldState, newState)) Unit else calculateNewState()
@@ -59,46 +61,35 @@ class CancellablePromise<F, A> internal constructor(private val AS: Async<F>,
     loop()
   }
 
-  override fun complete(a: A): Kind<F, Boolean> {
+  override fun complete(a: A): Kind<F, Unit> {
     tailrec fun calculateNewState(): Unit {
       val oldState = state.get()
       val newState = when (oldState) {
-        is State.Pending<A> -> State.Done(a)
-        is State.Done -> oldState
+        is State.Pending<A> -> State.Fulfilled(a)
+        is State.Fulfilled -> oldState
         is State.Error -> oldState
       }
       return if (state.compareAndSet(oldState, newState)) Unit else calculateNewState()
     }
     val oldState = state.get()
     return when (oldState) {
-      is State.Pending -> calculateNewState().let { AS.just(true) }
-      is State.Done -> AS.just(false)
-      is State.Error -> AS.just(false)
+      is State.Pending -> calculateNewState().let { AS.just(Unit) }
+      is State.Fulfilled -> AS.raiseError(Promise.AlreadyFulfilled)
+      is State.Error -> AS.raiseError(Promise.AlreadyFulfilled)
     }
   }
 
-  override fun error(throwable: Throwable): Kind<F, Boolean> = state.get().let {
-    tailrec fun calculateNewState(): Unit {
-      val oldState = state.get()
-      val newState = when (oldState) {
-        is State.Pending<A> -> State.Error(throwable)
-        is State.Done -> oldState
-        is State.Error -> oldState
-      }
-      return if (state.compareAndSet(oldState, newState)) Unit else calculateNewState()
-    }
-
-    val oldState = state.get()
-    return when (oldState) {
-      is State.Pending -> calculateNewState().let { AS.just(true) }
-      is State.Done -> AS.just(false)
-      is State.Error -> AS.just(false)
+  override fun error(throwable: Throwable): Kind<F, Unit> = state.get().let { oldState ->
+    when (oldState) {
+      is State.Pending -> AS.raiseError(throwable)
+      is State.Fulfilled -> AS.raiseError(Promise.AlreadyFulfilled)
+      is State.Error -> AS.raiseError(Promise.AlreadyFulfilled)
     }
   }
 
   internal sealed class State<out A> {
     data class Pending<A>(val joiners: List<(Either<Throwable, A>) -> Unit>) : State<A>()
-    data class Done<A>(val value: A) : State<A>()
+    data class Fulfilled<A>(val value: A) : State<A>()
     data class Error<A>(val throwable: Throwable) : State<A>()
   }
 

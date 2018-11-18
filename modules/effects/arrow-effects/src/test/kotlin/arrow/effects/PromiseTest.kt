@@ -17,6 +17,7 @@ import arrow.instances.either.eq.eq
 import arrow.instances.eq
 import arrow.instances.option.eq.eq
 import arrow.test.UnitSpec
+import arrow.test.generators.genThrowable
 import arrow.test.laws.equalUnderTheLaw
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
@@ -48,17 +49,37 @@ class PromiseTest : UnitSpec() {
       }
     }
 
-    "complete is only successful once" {
+    "complete twice results in AlreadyFulfilled" {
       forAll(Gen.int(), Gen.int()) { a, b ->
         binding {
           val p = promise<Int>().bind()
           p.complete(a).bind()
-          val succ = p.complete(b).bind()
-          val aa = p.get.bind()
-          a.equalUnderTheLaw(aa, Int.eq()) && !succ
-        }.unsafeRunSync()
+          p.complete(b).bind()
+          p.get.bind()
+        }.equalUnderTheLaw(IO.raiseError(Promise.AlreadyFulfilled), EQ)
       }
     }
+
+    "error after completion results in AlreadyFulfilled" {
+      forAll(Gen.int(), genThrowable()) { i, t ->
+        binding {
+          val p = promise<Int>().bind()
+          p.complete(i).bind()
+          p.error(t).bind()
+          p.get.bind()
+        }.equalUnderTheLaw(IO.raiseError(Promise.AlreadyFulfilled), EQ)
+      }
+    }
+
+    "error" {
+      val error = RuntimeException("Boom")
+      promise<Int>().flatMap { p ->
+        p.error(error).flatMap {
+          p.get
+        }
+      }.equalUnderTheLaw(IO.raiseError(error), EQ)
+    }
+
 
   }
 
