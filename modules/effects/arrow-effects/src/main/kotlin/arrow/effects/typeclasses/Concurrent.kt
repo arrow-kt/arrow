@@ -21,7 +21,6 @@ interface Concurrent<F> : Async<F> {
       })
     }
 
-
   //TODO blocked by Async#asyncF (https://github.com/arrow-kt/arrow/issues/1124)
   //fun <A> cancelable(cb: ((Either<Throwable, A>) -> Unit) -> Kind<F, Unit>): Kind<F, A> =
 }

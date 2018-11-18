@@ -1,6 +1,5 @@
 package arrow.effects
 
-import arrow.Kind
 import arrow.core.*
 import arrow.effects.DeferredK.Generated.ConnectedGenerated
 import arrow.effects.DeferredK.Generated.DefaultGenerated

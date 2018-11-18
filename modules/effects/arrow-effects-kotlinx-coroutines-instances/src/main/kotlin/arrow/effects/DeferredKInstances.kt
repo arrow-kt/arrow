@@ -7,8 +7,6 @@ import arrow.effects.deferredk.applicative.applicative
 import arrow.effects.typeclasses.*
 import arrow.extension
 import arrow.typeclasses.*
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Deferred
 import kotlin.coroutines.CoroutineContext
 import arrow.effects.handleErrorWith as deferredHandleErrorWith
 import arrow.effects.runAsync as deferredRunAsync
