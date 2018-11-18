@@ -9,11 +9,11 @@ permalink: /docs/typeclasses/traverse/
 {:.intermediate}
 intermediate
 
-`Traverse`, also known as `Traversable` is a Typeclass used to perform traversals over an structure with an effect.
+`Traverse` is a type class also known as `Traversable` and is used to perform traversals over an structure with an effect.
 
 We will see some of the use cases for Traverse. Let's start by looking for an example where the side effects are modeled as data types. Side effects in functional programming are changes outside of the scope of the function, for example, performing some IO operation, modifying global variables, etc...
 
-In Kotlin with Arrow, these aforementioned data types can be modeled as `Option` for missing values, `Either` and `Validated` for things that could either provide a right result or give an error, and `IO`, `Async` for asynchronous computations.
+In Kotlin with Arrow, these aforementioned data types can be modeled as [Option]({{ 'docs/datatypes/option' | relative_url }}) for missing values, [Either]({{ 'docs/datatypes/either' | relative_url }}) and [Validated]({{ 'docs/datatypes/validated' | relative_url }}) for thinfgs that could either provide a valid result or give an error, and [IO]({{ 'docs/effects/io' | relative_url }}), [Async]({{ 'docs/effects/async' | relative_url }}) for asynchronous computations.
 
 
 Let's show some examples that will need the following imports.
@@ -25,7 +25,7 @@ import arrow.data.*
 import arrow.effects.*
 import arrow.effects.deferredk.applicative.applicative
 import arrow.instances.either.applicative.applicative
-import arrow.instances.either.applicativeError.applicativeError
+import arrow.instances.either.applicativeError.catch
 import java.lang.NumberFormatException
 import arrow.instances.list.applicative.*
 import arrow.instances.list.foldable.sequence_
@@ -50,14 +50,14 @@ data class Profile(val id: String)
 data class User(val id: String, val name: String)
 ```
 
-`parseInt`: is a function that will try to convert an `String` parameter `s` to an `Int`, it if succeeds it will return the number inside the `Some`. If it fails, it will return `None`.
+`parseInt`: is a function that will try to convert an `String` parameter `s` to an `Int`, it if succeeds it will return the number inside `Some`. If it fails, it will return `None`.
 
- `validateLogin`: This function can be something that could either fail or be a sauccessful operation when validating login credentials */
+ `validateLogin`: This function can be something that could either fail or be a successful operation when validating login credentials */
 
 `userInfo`: This function could be something that could return a Profile asynchronously.
 
 ```kotlin:ank:silent
-interface OurSideEffectsFunctions {
+interface SideEffectingFunctions {
     fun parseInt(s: String): Option<Int> =
             Try { s.toInt() }.fold(ifFailure = { None }, ifSuccess = { v -> Some(v) })
 
@@ -69,28 +69,28 @@ interface OurSideEffectsFunctions {
 
 As we can see, every function above only takes as parameter the argument to perform its operation on.
 
-The next objects are just for mocking and simulate results of a side effect performed by an external system so we can see the output of our examples.
+This is just a mock implementation of the previous interface, where we simulate results of a side effect performed by an external system. We'll make good use of it later.
 
 ```kotlin:ank:silent
-object ValidEffects : OurSideEffectsFunctions {
+object ValidEffects : SideEffectingFunctions {
 
     override fun validateLogin(cred: Credential): Either<SecurityError, Unit> {
         return Either.right(Unit)
     }
 
     override fun userInfo(user: User): DeferredK<Profile> {
-        return DeferredK.async { Profile(id = user.id) }
+        return DeferredK.async { Profile(id = user.id) }  // assuming profile details successfully fetched
     }
 
-    fun savingProfiles(): DeferredK<Unit>  = GlobalScope.async(Dispatchers.Default, CoroutineStart.LAZY){Unit}.k()
+    fun savingProfiles(): DeferredK<Unit>  = GlobalScope.async(Dispatchers.Default, CoroutineStart.LAZY){Unit}.k() // assuming saving profiles successfully
 
 }
 ```
 
-We just defined results for our functions when everything went "right", the next object is also just for simulating the result when something goes "wrong".
+We just defined results for our functions for the happy case, or in other words, when everything went "right". The next mock for our `SideEffectingFunctions` simulates the result when something goes "wrong".
 
 ```kotlin:ank:silent
-object ErrorEffects : OurSideEffectsFunctions {
+object ErrorEffects : SideEffectingFunctions {
 
     override fun validateLogin(cred: Credential): Either<SecurityError, Unit> {
         return Either.left(SecurityError.RuntimeSecurityError("Invalid credentials"))
@@ -102,15 +102,7 @@ object ErrorEffects : OurSideEffectsFunctions {
 }
 ```
 
-If you want to run these examples you can run them inside a main body.
-
-```kotlin:ank:silent
-fun main(args: Array<String>) {
-
-}
-```
-
-If we need to extract the information for a List of Users we can create a function that composes with the function defined previously `userInfo`.
+If we need to extract the profile information for a List of Users we can create a function that reuses the `userInfo` function defined previously.
 
 ```kotlin:ank
 fun profilesFor(users: List<User>): List<DeferredK<Profile>> = users.map { u -> ValidEffects.userInfo(u) }
@@ -127,19 +119,19 @@ interface Traverse<F> : Functor<F>, Foldable<F> {
   fun <G, A, B> Kind<F, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Kind<F, B>>
 }
 
-For our example, F would be `List` (the initial container), G would be the data type representing the side effect: `Option`, `Either` or `DeferredK`.
+For our example, F would be `List` (the initial container), G would be the data type representing the side effect: [Option]({{ 'docs/datatypes/option' | relative_url }}), [Either]({{ 'docs/datatypes/either' | relative_url }}) or `DeferredK`.
 
 So, if we have a `List<User>` (the ones we want to obtain their profiles) and a function `User -> DeferredK<Profile>`, with traverse we can transform and instead of obtaining a `List<DeferredK, Profile>` it can aggregate all the results to obtain a single `DeferredK<List,Profile>`.
 
 In this case, `traverse` can go over the collection, apply the function and aggregate the resulting values (with side effects) in a `List`.
 
-Basically, `F` is some sort of context which may contain a value. We are using List in the example, but there are `Traverse` implementations for `Option`, `Either` or `Validated`.
+Basically, `F` is some sort of context which may contain a value. We are using `List` in the example, but there are `Traverse` implementations for [Option]({{ 'docs/datatypes/option' | relative_url }}), [Either]({{ 'docs/datatypes/either' | relative_url }}) or [Validated]({{ 'docs/datatypes/validated' | relative_url }}).
 
-Let's see another example further clarifying this.
+Let's see another example for further clarification.
 
 ```kotlin:ank
 fun parseIntEither(s: String): Either<NumberFormatException, Int> =
-  Either.applicativeError<NumberFormatException>().catch(
+  catch(
     { NumberFormatException("Error converting $s to Int") },
     { s.toInt() }
   ).fix()
@@ -148,8 +140,6 @@ fun parseIntValidated(s: String): ValidatedNel<NumberFormatException, Int> =
   Validated.fromEither(parseIntEither(s)).toValidatedNel()
 ```
 
-We can use these two functions to traverse a collection containing strings, converting them to integers and accumulating the errors with Either or Validated.
-
 Example of what these functions do:
 
 ```kotlin:ank
@@ -157,7 +147,8 @@ parseIntEither("1")
 parseIntEither("jimmy")
 ```
 
-Examples of going through a list with `map` and with `traverse` for `Either`:
+We can use these two functions to traverse a collection containing strings, converting them to integers and accumulating the errors with Either or Validated.
+Examples of going through a list with `map` and with `traverse` for [Either]({{ 'docs/datatypes/either' | relative_url }}):
 
 ```kotlin:ank
 val listOfValidNumbers = listOf("1", "2", "3")
@@ -174,7 +165,7 @@ listOfInvalidNumbers.traverse(
 ) { element -> parseIntEither(element) }
 ```
 
-Examples of going through the list with `traverse` for `Validated`:
+Examples of going through the list with `traverse` for [Validated]({{ 'docs/datatypes/validated' | relative_url }}):
 
 ```kotlin:ank
 listOfValidNumbers.traverse(
@@ -184,16 +175,16 @@ listOfInvalidNumbers.traverse(
   ValidatedNel.applicative(Nel.semigroup<NumberFormatException>())) { element -> parseIntValidated(element)}
 ```
 
-Let's explain what's going on here when traversing a `list` with `Validated`.
-We are using an `Applicative` instance of `ValidatedNel`, and for that we need to provide a "proof" that the non-empty-list (Nel) is a `SemiGroup`.
-The `Applicative` typeclass instance for `ValidatedNel` allows to run independent computations. And the `SemiGroup` typeclass instance allows us to combine elements of the same type, in this case, it helps `ValidatedNel` with the task of accumulating the errors.
+Let's explain what's going on here when traversing a `list` with [Validated]({{ 'docs/datatypes/validated' | relative_url }}).
+We are using an `Applicative` instance of `ValidatedNel`, and for that we need to provide a "proof" that the non-empty-list (Nel) is a [Semigroup]({{ 'docs/typeclasses/semigroup' | relative_url }}).
+The `Applicative` typeclass instance for `ValidatedNel` allows to run independent computations. And the [Semigroup]({{ 'docs/typeclasses/semigroup' | relative_url }}) typeclass instance allows us to combine elements of the same type, in this case, it helps `ValidatedNel` with the task of accumulating the errors.
 
 If you want to see other example, you could visit: https://www.enhan.eu/how-to-in-fp/
 
 
-## Sequence
+## sequence
 
-When we want to traverse a collection that each of its elements already contains an effect, for example, List<Option<A>>, we may want to convert it to Option<List<A>> to work easily with the elements. To do that we could traverse the list applying the identity function.
+When we want to traverse a collection that each of its elements already contains an effect, for example, `List<Option<A>>`, we may want to convert it to `Option<List<A>>` to work easily with the elements. To do that we could traverse the list applying the `::identity` transformation function to each one of the elements.
 
 ```kotlin:ank
 val listofOptionalNumbers: List<Option<Int>> = listOf(Option(1), Option(2), Option(3))
@@ -201,13 +192,13 @@ val listofOptionalNumbers: List<Option<Int>> = listOf(Option(1), Option(2), Opti
 listofOptionalNumbers.traverse(Option.applicative(), ::identity)
 ```
 
-The equivalent to do a traverse applying identity is using sequence.
+**The equivalent to do a traverse applying identity is using `sequence`.**
 
 ```kotlin:ank
 val sequenceOptions = listofOptionalNumbers.sequence(Option.applicative())
 ```
 
-We could also use sequence on a list of Either.
+We could also use sequence on a list of `Either`.
 
 ```kotlin:ank
 val listOfEither: List<Either<NumberFormatException, Int>> = listOfValidNumbers.map { s -> parseIntEither(s) }
@@ -217,9 +208,9 @@ listOfEither.sequence(Either.applicative<NumberFormatException>())
 
 ## traverse_ and sequence_
 
-Another usage for sequence is when we are traversing a list of data to which we apply some effectful function and we do not care about the returned values.
+Another usage for `sequence` is when we are traversing a list of data to which we apply some effectful function and we do not care about the returned values.
 
-Continuing with our first example, imagine a function saveProfile that perform a side effect, saving a profile in a database, and returning Unit asynchronously.
+Continuing with our first example, imagine a function `saveProfile` that perform a side effect, saving a profile in a database, and returning `Unit` asynchronously.
 
 ```kotlin:ank
 fun saveProfile(user: User): DeferredK<Unit> = ValidEffects.savingProfiles()
