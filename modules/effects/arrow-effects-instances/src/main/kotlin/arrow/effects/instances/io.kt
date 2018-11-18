@@ -102,7 +102,7 @@ interface IOAsyncInstance : Async<ForIO>, IOMonadDeferInstance {
   override fun <A> IOOf<A>.continueOn(ctx: CoroutineContext): IO<A> =
     fix().continueOn(ctx)
 
-  override fun <A> invoke(f: () -> A): IO<A> =
+  override fun <A> delay(f: () -> A): IO<A> =
     IO.invoke(f)
 }
 
