@@ -1,5 +1,7 @@
 package arrow.ank
 
+import arrow.core.Tuple2
+import arrow.core.toT
 import arrow.data.ForListK
 import arrow.data.ListK
 import arrow.data.fix
@@ -21,9 +23,11 @@ fun ank(source: File, target: File, compilerArgs: ListK<String>) =
     val targetDirectory: File = createTarget(source, target).bind()
     val files: ListK<File> = getFileCandidates(targetDirectory).bind()
     val filesContents: ListK<String> = files.map(::readFile).k().sequence().bind().fix()
-    val parsedMarkDowns: ListK<ASTNode> = filesContents.map(::parseMarkdown).k().sequence().bind().fix()
+    val preProcessedMacros: ListK<String> = filesContents.mapIndexed { n, content ->
+        preProcessMacros(files[n] toT content) }.k().sequence().bind().fix()
+    val parsedMarkDowns: ListK<ASTNode> = preProcessedMacros.map(::parseMarkdown).k().sequence().bind().fix()
     val allSnippets: ListK<ListK<Snippet>> = parsedMarkDowns.mapIndexed { n, tree ->
-      extractCode(filesContents[n], tree)
+      extractCode(preProcessedMacros[n], tree)
     }.k().sequence().bind().fix()
     val compilationResults = compileCode(allSnippets.mapIndexed { n, s -> files[n] to s }.toMap(), compilerArgs).bind()
     val replacedResults: ListK<String> = compilationResults.map { c -> replaceAnkToLang(c) }.k().sequence().bind().fix()

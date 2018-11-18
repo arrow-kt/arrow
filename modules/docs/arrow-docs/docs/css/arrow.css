@@ -830,7 +830,7 @@ table {
 p code, ul code {
   background: #fff;
   font-family: "monoidregular", monospace;
-  padding: 0 8px;
+  padding: 0; /*8px*/
   font-size: 0.8125rem;
   font-size: 0.8rem;
   border-radius: 3px;

@@ -54,13 +54,6 @@ apply from: 'detekt.gradle.kts'
 
 allprojects {
     apply plugin: 'base'
-    apply plugin: 'org.jetbrains.dokka'
-
-    dokka {
-        outputFormat = 'jekyll'
-        outputDirectory = project.rootDir.absolutePath + 
-                "/modules/docs/arrow-docs/docs/docs/apidocs"
-    }
 
     clean.doFirst {
         delete "${rootDir}/infographic/arrow-infographic.txt"
@@ -83,11 +76,41 @@ subprojects { project ->
 
     apply plugin: 'kotlin'
     apply plugin: 'jacoco'
+    apply plugin: 'org.jetbrains.dokka'
 
     archivesBaseName = POM_ARTIFACT_ID
 
     jacoco {
         toolVersion '0.8.2'
+    }
+
+    dokka {
+        outputFormat = 'jekyll'
+        outputDirectory = project.rootDir.absolutePath +
+                "/modules/docs/arrow-docs/docs/docs/apidocs"
+        //classpath = configurations.runtime
+        // Specifies the location of the project source code on the Web.
+        // If provided, Dokka generates "source" links for each declaration.
+        // Repeat for multiple mappings
+        linkMapping {
+            // Source directory
+            dir = "src/main/kotlin"
+
+            // URL showing where the source code can be accessed through the web browser
+            url = "https://github.com/arrow-kt/arrow/blob/master/${relativeProjectPath('src/main/kotlin')}"
+
+            // Suffix which is used to append the line number to the URL. Use #L for GitHub
+            suffix = "#L"
+        }
+
+//        externalDocumentationLink {
+//             //Root URL of the generated documentation to link with. The trailing slash is required!
+//             //TODO This fails trying to get the package list
+//             url = new URL("https://arrow-kt.io/docs/docs/apidocs/")
+//
+//             //If package-list file located in non-standard location
+//             packageListUrl = new URL("file://${project.rootDir.absolutePath}/modules/docs/arrow-docs/docs/docs/apidocs/${project.name}/package-list")
+//        }
     }
 
     task codeCoverageReport(type: JacocoReport) {

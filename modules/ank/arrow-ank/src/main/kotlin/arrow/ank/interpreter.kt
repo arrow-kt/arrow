@@ -34,6 +34,7 @@ inline fun <reified F> MonadError<F, Throwable>.ankMonadErrorInterpreter(): Func
         is AnkOps.CreateTarget -> catch { createTargetImpl(op.source, op.target) }
         is AnkOps.GetFileCandidates -> catch { getFileCandidatesImpl(op.target) }
         is AnkOps.ReadFile -> catch { readFileImpl(op.source) }
+        is AnkOps.PreProcessMacros -> catch { preProcessMacrosImpl(op.source) }
         is AnkOps.ParseMarkdown -> catch { parseMarkDownImpl(op.markdown) }
         is AnkOps.ExtractCode -> catch { extractCodeImpl(op.source, op.tree) }
         is AnkOps.CompileCode -> catch { compileCodeImpl(op.snippets, op.compilerArgs) }
@@ -84,6 +85,9 @@ data class CompilationException(
 
 data class CompiledMarkdown(val origin: File, val snippets: ListK<Snippet>)
 
+private fun String.removeSpaces(): String =
+  replace(" ", "")
+
 data class Snippet(
   val fence: String,
   val lang: String,
@@ -91,9 +95,9 @@ data class Snippet(
   val endOffset: Int,
   val code: String,
   val result: Option<String> = None,
-  val isSilent: Boolean = fence.startsWith("```$lang$AnkSilentBlock"),
-  val isReplace: Boolean = fence.startsWith("```$lang$AnkReplaceBlock"),
-  val isOutFile: Boolean = fence.startsWith("```$lang$AnkOutFileBlock"))
+  val isSilent: Boolean = fence.contains(AnkSilentBlock),
+  val isReplace: Boolean = fence.contains(AnkReplaceBlock),
+  val isOutFile: Boolean = fence.contains(AnkOutFileBlock))
 
 fun extractCodeImpl(source: String, tree: ASTNode): ListK<Snippet> {
   val sb = mutableListOf<Snippet>()
@@ -113,12 +117,65 @@ fun extractCodeImpl(source: String, tree: ASTNode): ListK<Snippet> {
   return sb.k()
 }
 
-private fun repeat(s: String, n: Int): String {
-  val builder = StringBuilder()
-  for (i in 0 until n)
-    builder.append(s)
-  return builder.toString()
+val ankMacroRegex: Regex = "ank_macro_hierarchy\\((.*?)\\)".toRegex()
+
+fun preProcessMacrosImpl(source: Tuple2<File, String>): String {
+  val matches: List<MatchResult> = ankMacroRegex.findAll(source.b).toList()
+  val result: String = when {
+    matches.isEmpty() -> source.b
+    else -> {
+      val classes: List<String> = matches.map { it.groupValues[1] }
+      val cleanedSource = ankMacroRegex.replace(source.b) { "" }
+      cleanedSource +
+        "\n\n\n## Type Class Hierarchy\n\n" +
+        generateMixedHierarchyDiagramCode(classes).joinToString("\n")
+    }
+
+  }
+  val originalFile = source.a
+  originalFile.writeText(result)
+  return result
 }
+
+//TODO Try by overriding dokka settings for packages so it does not create it's markdown package file, then for regular type classes pages we only check the first result with the comment but remove them all regardless
+private fun generateMixedHierarchyDiagramCode(classes: List<String>): List<String> {
+  val packageName = classes.firstOrNull()?.substringBeforeLast(".")
+  //careful meta-meta-programming ahead
+  val hierarchyGraphsJoined =
+    "listOf(" + classes
+      .map { "TypeClass($it::class)" }
+      .joinToString(", ") + ").mixedHierarchyGraph()"
+
+  return listOf(
+    """
+      |<canvas id="$packageName-hierarchy-diagram"></canvas>
+      |<script>
+      |  drawNomNomlDiagram('$packageName-hierarchy-diagram', '$packageName-diagram.nomnol')
+      |</script>
+    """.trimMargin(),
+    """
+      |```kotlin:ank:outFile($packageName-diagram.nomnol)
+      |import arrow.reflect.*
+      |$hierarchyGraphsJoined
+      |```
+      |""".trimMargin())
+}
+
+
+private fun generateHierarchyDiagramCode(fqClassName: String): List<String> =
+  listOf(
+    """
+      |<canvas id="hierarchy-diagram"></canvas>
+      |<script>
+      |  drawNomNomlDiagram('hierarchy-diagram', 'diagram.nomnol')
+      |</script>
+    """.trimMargin(),
+    """
+      |```kotlin:ank:outFile(diagram.nomnol)
+      |import arrow.reflect.*
+      |TypeClass($fqClassName::class).hierarchyGraph()
+      |```
+      |""".trimMargin())
 
 fun compileCodeImpl(snippets: Map<File, ListK<Snippet>>, classpath: ListK<String>): ListK<CompiledMarkdown> {
   println(colored(ANSI_PURPLE, AnkHeader))

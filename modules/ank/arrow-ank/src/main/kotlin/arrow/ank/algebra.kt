@@ -2,6 +2,7 @@ package arrow.ank
 
 import arrow.Kind
 import arrow.core.FunctionK
+import arrow.core.Tuple2
 import arrow.data.ListK
 import arrow.free.Free
 import arrow.free.foldMap
@@ -16,6 +17,7 @@ sealed class AnkOps<A> : AnkOpsOf<A> {
   data class CreateTarget(val source: File, val target: File) : AnkOps<File>()
   data class GetFileCandidates(val target: File) : AnkOps<ListK<File>>()
   data class ReadFile(val source: File) : AnkOps<String>()
+  data class PreProcessMacros(val source: Tuple2<File, String>) : AnkOps<String>()
   data class ParseMarkdown(val markdown: String) : AnkOps<ASTNode>()
   data class ExtractCode(val source: String, val tree: ASTNode) : AnkOps<ListK<Snippet>>()
   data class CompileCode(val snippets: Map<File, ListK<Snippet>>, val compilerArgs: ListK<String>) : AnkOps<ListK<CompiledMarkdown>>()
@@ -32,6 +34,9 @@ fun getFileCandidates(target: File): Free<ForAnkOps, ListK<File>> =
 
 fun readFile(source: File): Free<ForAnkOps, String> =
   Free.liftF(AnkOps.ReadFile(source))
+
+fun preProcessMacros(source: Tuple2<File, String>): Free<ForAnkOps, String> =
+  Free.liftF(AnkOps.PreProcessMacros(source))
 
 fun parseMarkdown(markdown: String): Free<ForAnkOps, ASTNode> =
   Free.liftF(AnkOps.ParseMarkdown(markdown))

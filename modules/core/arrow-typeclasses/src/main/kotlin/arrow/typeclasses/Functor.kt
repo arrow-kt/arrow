@@ -15,11 +15,11 @@ interface Functor<F> : Invariant<F> {
       fa.map(f)
     }
 
-  fun <A> Kind<F, A>.void(): Kind<F, Unit> = map { _ -> Unit }
+  fun <A> Kind<F, A>.void(): Kind<F, Unit> = map { Unit }
 
   fun <A, B> Kind<F, A>.fproduct(f: (A) -> B): Kind<F, Tuple2<A, B>> = map { a -> Tuple2(a, f(a)) }
 
-  fun <A, B> Kind<F, A>.`as`(b: B): Kind<F, B> = map { _ -> b }
+  fun <A, B> Kind<F, A>.`as`(b: B): Kind<F, B> = map { b }
 
   fun <A, B> Kind<F, A>.tupleLeft(b: B): Kind<F, Tuple2<B, A>> = map { a -> Tuple2(b, a) }
 
