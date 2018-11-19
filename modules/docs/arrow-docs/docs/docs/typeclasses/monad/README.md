@@ -137,8 +137,6 @@ import arrow.typeclasses.Monad
 TypeClass(Monad::class).dtMarkdownList()
 ```
 
-### Hierarchy
-
 <canvas id="hierarchy-diagram" style="margin-top:120px"></canvas>
 
 <script>

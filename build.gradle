@@ -88,6 +88,8 @@ subprojects { project ->
         outputFormat = 'jekyll'
         outputDirectory = project.rootDir.absolutePath +
                 "/modules/docs/arrow-docs/docs/docs/apidocs"
+
+        includes = ['README.md']
         //classpath = configurations.runtime
         // Specifies the location of the project source code on the Web.
         // If provided, Dokka generates "source" links for each declaration.

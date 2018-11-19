@@ -161,7 +161,6 @@ private fun generateMixedHierarchyDiagramCode(classes: List<String>): List<Strin
       |""".trimMargin())
 }
 
-
 private fun generateHierarchyDiagramCode(fqClassName: String): List<String> =
   listOf(
     """

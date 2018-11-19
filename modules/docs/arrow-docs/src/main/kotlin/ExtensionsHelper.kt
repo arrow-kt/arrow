@@ -115,6 +115,7 @@ fun List<TypeClass>.mixedHierarchyGraph(): String {
     |#stroke: #485C8A
     |#zoom: 1
     |#.typeclass: fill=#FFFFFF visual=class bold
+    |#.selected: fill=#61A8FF visual=class bold
     |${nomnomlMixedHierarchyGraph()}
   """.trimMargin()
 }
