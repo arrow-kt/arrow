@@ -39,7 +39,7 @@ class OptionTest : UnitSpec() {
       FunctorFilterLaws.laws(Option.traverseFilter(), {Option(it)}, Eq.any()),
       TraverseFilterLaws.laws(Option.traverseFilter(), Option.applicative(), ::Some, Eq.any()),
       MonadFilterLaws.laws(Option.monadFilter(), ::Some, Eq.any()),
-      HashLaws.laws(Option.hash(Int.hash()), Option.eq(Int.eq())) { genOption(Gen.int()).generate() }
+      HashLaws.laws(Option.hash(Int.hash()), Option.eq(Int.eq())) { it.some() }
     )
 
     "fromNullable should work for both null and non-null values of nullable types" {
