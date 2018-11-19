@@ -15,6 +15,19 @@ interface Hash<in F> : Eq<F> {
    *
    * @receiver The object to hash
    * @returns an int representing the object hash
+   *
+   * {: data-executable='true'}
+   *
+   * ```kotlin:ank
+   * import arrow.aql.instances.*
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val result = String.hash().run { "MyString".hash() }
+   *   //sampleEnd
+   *   println(result)
+   * }
+   *  ```
    */
   fun F.hash(): Int
 

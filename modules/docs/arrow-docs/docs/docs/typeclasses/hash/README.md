@@ -9,8 +9,10 @@ permalink: /docs/typeclasses/hash/
 {:.beginner}
 beginner
 
-The `Hash` typeclass abstracts the ability to compute the hash of any object.
-It can be considered the typeclass equivalent of Java's `Object#hashcode` and Kotlin's `Any#hashCode`.
+The `Hash` typeclass abstracts the ability to compute the hash of any object.  
+It can be considered the typeclass equivalent of Java's `Object#hashcode` and Kotlin's `Any#hashCode`.  
+
+A hash function is a mapping of arbitrary data (`F`) to an output set of fixed size (`Int`). The result, a hash value, is most commonly used in collections like HashTable as a lookup value.
 
 {: data-executable='true'}
 ```kotlin:ank
@@ -19,9 +21,7 @@ import arrow.instances.*
 fun main(args: Array<String>) {
   //sampleStart
   // Enable the extension functions inside Hash using run
-  val result = String.hash().run {
-    "1".hash()
-  }
+  val result = String.hash().run { "1".hash() }
   //sampleEnd
   println(result)
 }
@@ -37,6 +37,8 @@ Computes a hash of an instance of `F`.
 
 {: data-executable='true'}
 ```kotlin:ank
+import arrow.instances.*
+
 fun main(args: Array<String>) {
   //sampleStart
   // Enable the extension functions inside Hash using run
@@ -60,11 +62,11 @@ Hash has a constructor to create a `Hash` instance from any function `(F) -> Int
 ```kotlin:ank
 import arrow.typeclasses.Hash
 
+data class User(val id: String, val name: String)
+val user = User("MyId", "MyName")
+
 fun main(args: Array<String>) {
   //sampleStart
-  data class User(val id: String, val name: String)
-  val user = User("MyId", "MyName")
-  
   // This is fine
   val result = Hash.any().run { user.hash() }
   //sampleEnd
@@ -74,11 +76,13 @@ fun main(args: Array<String>) {
 
 {: data-executable='true'}
 ```kotlin:ank
+import arrow.typeclasses.Hash
+
+data class User(val id: String, val name: String)
+val user = User("MyId", "MyName")
+
 fun main(args: Array<String>) {
-  //sampleStart
-  data class User(val id: String, val name: String)
-  val user = User("MyId", "MyName")
-  
+  //sampleStart  
   // This might be better because id usually is a unique value in itself
   val userHash = Hash<User> { u -> u.id.hashCode() }
   val result = userHash.run { user.hash() }
@@ -90,6 +94,8 @@ fun main(args: Array<String>) {
 {: data-executable='true'}
 ```kotlin:ank
 import arrow.core.*
+import arrow.typeclasses.Hash
+
 fun main(args: Array<String>) {
   //sampleStart
   // This will return false because it's not evaluated for hashing
@@ -101,6 +107,8 @@ fun main(args: Array<String>) {
 
 {: data-executable='true'}
 ```kotlin:ank
+import arrow.typeclasses.Hash
+
 fun main(args: Array<String>) {
   //sampleStart
   // using invoke constructor
@@ -117,6 +125,7 @@ See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | rela
 
 ```kotlin:ank:replace
 import arrow.reflect.*
+import arrow.typeclasses.Hash
 TypeClass(Hash::class).dtMarkdownList()
 ```
 
@@ -128,6 +137,7 @@ TypeClass(Hash::class).dtMarkdownList()
 </script>
 
 ```kotlin:ank:outFile(diagram.nomnol)
+import arrow.typeclasses.Hash
 TypeClass(Hash::class).hierarchyGraph()
 ```
 
