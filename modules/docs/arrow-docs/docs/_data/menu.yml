@@ -47,10 +47,10 @@ options:
         url: /docs/apidocs/arrow-effects-rx2-instances/
 
       - title: Effects Reactor
-        url: /docs/apidocs/arrow-effects-rx2/
+        url: /docs/apidocs/arrow-effects-reactor/
 
       - title: Effects Reactor Extensions
-        url: /docs/apidocs/arrow-effects-rx2-instances/
+        url: /docs/apidocs/arrow-effects-reactor-instances/
 
       - title: Streams
         url: /docs/apidocs/arrow-streams/
