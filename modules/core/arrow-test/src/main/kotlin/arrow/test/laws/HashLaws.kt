@@ -6,9 +6,9 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
 object HashLaws {
+
   fun <F> laws(HF: Hash<F>, EQ: Eq<F>, cf: (Int) -> F): List<Law> =
-    EqLaws.laws(EQ, cf) +
-    listOf(
+    EqLaws.laws(EQ, cf) + listOf(
       Law("Hash Laws: Equality implies equal hash") { equalHash(HF, EQ, cf) },
       Law("Hash Laws: Multiple calls to hash should result in the same hash") { equalHashM(HF, cf) }
     )

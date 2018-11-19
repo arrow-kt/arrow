@@ -51,6 +51,11 @@ val user = User("MyId", "MyName")
 
 // This is fine
 Hash.any().run { user.hash() }
+```
+
+```kotlin:ank
+data class User(val id: String, val name: String)
+val user = User("MyId", "MyName")
 
 // This might be better because id usually is a unique value in itself
 val userHash = Hash<User> { u -> u.id.hashCode() }
@@ -59,15 +64,12 @@ userHash.run { user.hash() }
 
 ```kotlin:ank
 import arrow.core.*
-import arrow.typeclasses.Hash
 
 // This will fail because it's not evaluated for hashing
 Hash.any().run { Eval.later { 1 }.hash() == Eval.later { 1 }.hash() }
 ```
 
 ```kotlin:ank
-import arrow.typeclasses.Hash
-
 // using invoke constructor
 val stringHash = Hash<String> { a -> a.hashCode() }
 ```
@@ -78,7 +80,6 @@ See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | rela
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.typeclasses.Hash
 
 TypeClass(Hash::class).dtMarkdownList()
 ```
@@ -91,9 +92,6 @@ TypeClass(Hash::class).dtMarkdownList()
 </script>
 
 ```kotlin:ank:outFile(diagram.nomnol)
-import arrow.reflect.*
-import arrow.typeclasses.Hash
-
 TypeClass(Hash::class).hierarchyGraph()
 ```
 
