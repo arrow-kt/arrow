@@ -25,7 +25,6 @@ class ListKTest : UnitSpec() {
     val EQ: Eq<ListKOf<Int>> = ListK.eq(Eq.any())
 
     testLaws(
-      EqLaws.laws(EQ) { listOf(it).k() },
       ShowLaws.laws(ListK.show(), EQ) { listOf(it).k() },
       SemigroupKLaws.laws(ListK.semigroupK(), applicative, Eq.any()),
       MonoidKLaws.laws(ListK.monoidK(), applicative, Eq.any()),

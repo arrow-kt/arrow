@@ -35,7 +35,6 @@ class SequenceKTest : UnitSpec() {
     }
 
     testLaws(
-      EqLaws.laws(SequenceK.eq(Int.eq())) { sequenceOf(it).k() },
       ShowLaws.laws(show, eq) { sequenceOf(it).k() },
       MonadLaws.laws(SequenceK.monad(), eq),
       MonoidKLaws.laws(SequenceK.monoidK(), SequenceK.applicative(), eq),

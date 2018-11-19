@@ -40,7 +40,6 @@ class EitherTest : UnitSpec() {
         BifunctorLaws.laws(Either.bifunctor(), { Right(it) }, EQ2),
         SemigroupLaws.laws(Either.semigroup(String.semigroup(), String.semigroup()), Either.right("1"), Either.right("2"), Either.right("3"), Either.eq(String.eq(), String.eq())),
         MonoidLaws.laws(Either.monoid(MOL=String.monoid(), MOR = Int.monoid()), Either.right(1), Either.eq(String.eq(), Int.eq())),
-        EqLaws.laws(Either.eq(String.eq(), Int.eq())) { Right(it) },
         ShowLaws.laws(Either.show(), Either.eq(String.eq(), Int.eq())) { Right(it) },
         MonadErrorLaws.laws(Either.monadError(), Eq.any(), Eq.any()),
         TraverseLaws.laws(Either.traverse(), Either.applicative(), { Right(it) }, Eq.any()),

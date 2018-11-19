@@ -24,7 +24,6 @@ class NonEmptyListTest : UnitSpec() {
 
     val EQ = NonEmptyList.eq(Int.eq())
     testLaws(
-      EqLaws.laws(EQ) { it.nel() },
       ShowLaws.laws(NonEmptyList.show(), EQ) { it.nel() },
       MonadLaws.laws(NonEmptyList.monad(), Eq.any()),
       SemigroupKLaws.laws(

@@ -33,7 +33,6 @@ class TryTest : UnitSpec() {
     testLaws(
       SemigroupLaws.laws(Try.semigroup(Int.semigroup()), Try.just(1), Try.just(2), Try.just(3), EQ),
       MonoidLaws.laws(Try.monoid(MO = Int.monoid()), Try.just(1), EQ),
-      EqLaws.laws(EQ) { Try.just(it) },
       ShowLaws.laws(Try.show(), EQ) { Try.just(it) },
       MonadErrorLaws.laws(Try.monadError(), Eq.any(), Eq.any()),
       TraverseLaws.laws(Try.traverse(), Try.functor(), ::Success, Eq.any()),

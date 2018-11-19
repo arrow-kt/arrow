@@ -11,7 +11,6 @@ import org.junit.runner.RunWith
 class StringInstancesTest : UnitSpec() {
   init {
     testLaws(
-      EqLaws.laws(String.eq()) { it.toString() },
       ShowLaws.laws(String.show(), String.eq()) { it.toString() },
       HashLaws.laws(String.hash(), String.eq()) { it.toString() }
     )

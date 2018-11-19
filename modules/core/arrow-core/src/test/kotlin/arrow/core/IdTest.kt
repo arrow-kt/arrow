@@ -20,7 +20,6 @@ import org.junit.runner.RunWith
 class IdTest : UnitSpec() {
   init {
     testLaws(
-      EqLaws.laws(Id.eq(Eq.any())) { Id(it) },
       ShowLaws.laws(Id.show(), Eq.any()) { Id(it) },
       MonadLaws.laws(Id.monad(), Eq.any()),
       TraverseLaws.laws(Id.traverse(), Id.applicative(), ::Id, Eq.any()),

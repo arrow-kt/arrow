@@ -28,7 +28,6 @@ class MapKTest : UnitSpec() {
     val EQ_TC = MapK.eq(String.eq(), Int.eq())
 
     testLaws(
-      EqLaws.laws(EQ_TC) { mapOf(it.toString() to it).k() },
       ShowLaws.laws(MapK.show(), EQ_TC) { mapOf(it.toString() to it).k() },
       TraverseLaws.laws(MapK.traverse(), MapK.functor(), { a: Int -> mapOf("key" to a).k() }, EQ),
       MonoidLaws.laws(MapK.monoid<String, Int>(Int.semigroup()), mapOf("key" to 1).k(), EQ),

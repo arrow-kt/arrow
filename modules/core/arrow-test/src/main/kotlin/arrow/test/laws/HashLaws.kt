@@ -7,6 +7,7 @@ import io.kotlintest.properties.forAll
 
 object HashLaws {
   fun <F> laws(HF: Hash<F>, EQ: Eq<F>, cf: (Int) -> F): List<Law> =
+    EqLaws.laws(EQ, cf) +
     listOf(
       Law("Hash Laws: Equality implies equal hash") { equalHash(HF, EQ, cf) },
       Law("Hash Laws: Multiple calls to hash should result in the same hash") { equalHashM(HF, cf) }
@@ -19,7 +20,7 @@ object HashLaws {
       EQ.run { a.eqv(b) } && HF.run { a.hash() == b.hash() }
     }
   }
-  
+
   fun <F> equalHashM(HF: Hash<F>, cf: (Int) -> F): Unit {
     forAll(Gen.int()) { f ->
       val a = cf(f)

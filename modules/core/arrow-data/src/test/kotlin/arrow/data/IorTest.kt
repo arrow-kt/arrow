@@ -40,7 +40,6 @@ class IorTest : UnitSpec() {
 
     testLaws(
       BifunctorLaws.laws(Ior.bifunctor(), { Ior.Both(it, it) }, EQ2),
-      EqLaws.laws(EQ) { Right(it) },
       ShowLaws.laws(Ior.show(), EQ) { Right(it) },
       MonadLaws.laws(Ior.monad(Int.semigroup()), Eq.any()),
       TraverseLaws.laws(Ior.traverse(), Ior.applicative(Int.semigroup()), ::Right, Eq.any()),
