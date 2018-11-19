@@ -108,7 +108,7 @@ interface Ref<F, A> {
     }
 
     /**
-     * Like [invoke] but returns the newly allocated ref directly instead of wrapping it in [MonadDefer.invoke].
+     * Like [of] but returns the newly allocated ref directly instead of wrapping it in [MonadDefer.invoke].
      * This method is considered unsafe because it is not referentially transparent -- it allocates mutable state.
      *
      * @see [invoke]
