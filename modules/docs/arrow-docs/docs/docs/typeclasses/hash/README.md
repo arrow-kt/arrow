@@ -54,9 +54,6 @@ Hash.any().run { user.hash() }
 ```
 
 ```kotlin:ank
-data class User(val id: String, val name: String)
-val user = User("MyId", "MyName")
-
 // This might be better because id usually is a unique value in itself
 val userHash = Hash<User> { u -> u.id.hashCode() }
 userHash.run { user.hash() }
