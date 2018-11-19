@@ -19,7 +19,9 @@ interface Promise<F, A> {
    * Get the promised value.
    * Suspending the fiber running the action until the result is available.
    *
-   * ```kotlin
+   * {: data-executable='true'}
+   *
+   * ```kotlin:ank
    * import arrow.effects.*
    * import arrow.effects.instances.io.async.async
    * import arrow.effects.instances.io.monad.flatMap
@@ -44,7 +46,9 @@ interface Promise<F, A> {
    *
    * Results in an [Promise.AlreadyFulfilled] within [F] if the promise is already fulfilled.
    *
-   * ```kotlin
+   * {: data-executable='true'}
+   *
+   * ```kotlin:ank
    * import arrow.effects.*
    * import arrow.effects.instances.io.async.async
    * import arrow.effects.instances.io.monad.flatMap
@@ -71,7 +75,9 @@ interface Promise<F, A> {
    *
    * Results in an [Promise.AlreadyFulfilled] within [F] if the promise is already fulfilled.
    *
-   * ```kotlin
+   * {: data-executable='true'}
+   *
+   * ```kotlin:ank
    * import arrow.effects.*
    * import arrow.effects.instances.io.async.async
    * import arrow.effects.instances.io.monad.flatMap
@@ -97,7 +103,9 @@ interface Promise<F, A> {
      * Creates an empty `Promise` from on [Async] instance for [F].
      * Does not support cancellation of [get] operation.
      *
-     * ```kotlin
+     * {: data-executable='true'}
+     *
+     * ```kotlin:ank
      * import arrow.effects.*
      * import arrow.effects.instances.io.async.async
      *
@@ -111,7 +119,9 @@ interface Promise<F, A> {
      * Does not support cancellation of [get] operation.
      * This method is considered unsafe because it is not referentially transparent -- it allocates mutable state.
      *
-     * ```kotlin
+     * {: data-executable='true'}
+     *
+     * ```kotlin:ank
      * import arrow.effects.*
      * import arrow.effects.instances.io.async.async
      *

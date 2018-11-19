@@ -34,7 +34,6 @@ val unsafePromise: Promise<ForIO, Int> = Promise.unsafeCancellable(IO.async())
 ### Get
 
 Get the promised value, suspending the fiber running the action until the result is available.
-This suspending the fiber running the action until the result is available.
 
 ```kotlin:ank:silent
 import arrow.effects.instances.io.monad.flatMap
