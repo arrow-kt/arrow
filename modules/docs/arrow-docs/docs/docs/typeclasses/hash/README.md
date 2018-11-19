@@ -38,11 +38,11 @@ Computes a hash of an instance of `F`.
 {: data-executable='true'}
 ```kotlin:ank
 fun main(args: Array<String>) {
- //sampleStart
- // Enable the extension functions inside Hash using run
- val result = String.hash().run { "MyString".hash() }
- //sampleEnd
- println(result)
+  //sampleStart
+  // Enable the extension functions inside Hash using run
+  val result = String.hash().run { "MyString".hash() }
+  //sampleEnd
+  println(result)
 }
 ```
 
@@ -60,15 +60,15 @@ Hash has a constructor to create a `Hash` instance from any function `(F) -> Int
 ```kotlin:ank
 import arrow.typeclasses.Hash
 
-data class User(val id: String, val name: String)
-val user = User("MyId", "MyName")
 fun main(args: Array<String>) {
- //sampleStart
- 
- // This is fine
- val result = Hash.any().run { user.hash() }
- //sampleEnd
- println(result)
+  //sampleStart
+  data class User(val id: String, val name: String)
+  val user = User("MyId", "MyName")
+  
+  // This is fine
+  val result = Hash.any().run { user.hash() }
+  //sampleEnd
+  println(result)
 }
 ```
 
@@ -76,6 +76,9 @@ fun main(args: Array<String>) {
 ```kotlin:ank
 fun main(args: Array<String>) {
   //sampleStart
+  data class User(val id: String, val name: String)
+  val user = User("MyId", "MyName")
+  
   // This might be better because id usually is a unique value in itself
   val userHash = Hash<User> { u -> u.id.hashCode() }
   val result = userHash.run { user.hash() }
@@ -114,7 +117,6 @@ See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | rela
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-
 TypeClass(Hash::class).dtMarkdownList()
 ```
 
