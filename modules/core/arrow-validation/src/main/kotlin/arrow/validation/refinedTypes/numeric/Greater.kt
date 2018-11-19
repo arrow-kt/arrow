@@ -15,25 +15,24 @@ import arrow.typeclasses.Order
 import arrow.validation.RefinedPredicateException
 import arrow.validation.Refinement
 
-interface Less<F, A : Number> : Refinement<F, A> {
+interface Greater<F, A : Number> : Refinement<F, A> {
 
   fun ORD(): Order<A>
-  fun max(): A
+  fun min(): A
 
-  override fun A.refinement(): Boolean = ORD().run { lt(max()) }
+  override fun A.refinement(): Boolean = ORD().run { gt(min()) }
 
-  fun A.less(): Kind<F, A> = refine(this)
+  fun A.greater(): Kind<F, A> = refine(this)
 
-  fun <B> A.less(f: (A) -> B): Kind<F, B> = refine(this, f)
+  fun <B> A.greater(f: (A) -> B): Kind<F, B> = refine(this, f)
 
-  override fun invalidValueMsg(a: A): String = "$a must be less ${max()}"
+  override fun invalidValueMsg(a: A): String = "$a must be greater than ${min()}"
 }
 
 @extension
-interface ValidatedLess<A : Number> :
-  Less<ValidatedPartialOf<Nel<RefinedPredicateException>>, A> {
+interface ValidatedGreater<A : Number> : Greater<ValidatedPartialOf<Nel<RefinedPredicateException>>, A> {
   override fun ORD(): Order<A>
-  override fun max(): A
+  override fun min(): A
 
   override fun applicativeError(): ApplicativeError<ValidatedPartialOf<Nel<RefinedPredicateException>>,
     Nel<RefinedPredicateException>> =
@@ -41,10 +40,9 @@ interface ValidatedLess<A : Number> :
 }
 
 @extension
-interface EitherLess<A : Number> :
-  Less<EitherPartialOf<Nel<RefinedPredicateException>>, A> {
+interface EitherGreater<A : Number> : Greater<EitherPartialOf<Nel<RefinedPredicateException>>, A> {
   override fun ORD(): Order<A>
-  override fun max(): A
+  override fun min(): A
 
   override fun applicativeError(): ApplicativeError<EitherPartialOf<Nel<RefinedPredicateException>>,
     Nel<RefinedPredicateException>> =

@@ -10,7 +10,7 @@ import arrow.test.UnitSpec
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Order
 import arrow.validation.RefinedPredicateException
-import arrow.validation.refinedTypes.numeric.validated.greaterEqual.greaterEqual
+import arrow.validation.refinedTypes.numeric.validated.lessEqual.lessEqual
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.filter
@@ -18,15 +18,14 @@ import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
-class GreaterEqualTest : UnitSpec() {
+class LessEqualTest : UnitSpec() {
   init {
 
-    val min = 100
-    val LESS = { max: Int ->
-      object : Less<ValidatedPartialOf<Nel<RefinedPredicateException>>, Int> {
+    val max = 100
+    val GREATER = { max: Int ->
+      object : Greater<ValidatedPartialOf<Nel<RefinedPredicateException>>, Int> {
         override fun ORD(): Order<Int> = Int.order()
-
-        override fun max(): Int = max
+        override fun min(): Int = max
 
         override fun applicativeError(): ApplicativeError<ValidatedPartialOf<Nel<RefinedPredicateException>>,
           Nel<RefinedPredicateException>> =
@@ -34,20 +33,21 @@ class GreaterEqualTest : UnitSpec() {
       }
     }
 
-    "Can create GreaterEqual for every number greater or equal than min defined by instance" {
-      forAll(GreaterEqualGen(min)) { x: Int ->
-        x.greaterEqual(LESS(min)).isValid
+    "Can create LessEqual for every number less or equal than min defined by instance" {
+      forAll(LessEqualGen(max)) { x: Int ->
+        x.lessEqual(GREATER(max)).isValid
       }
     }
 
-    "Can not create GreaterEqual for any number lesser than min defined by instance" {
-      forAll(LessTest.LessThanGen(min)) { x: Int ->
-        x.greaterEqual(LESS(min)).isInvalid
+    "Can not create LessEqual for any number greater than min defined by instance" {
+      forAll(GreaterTest.GreaterGen(max)) { x: Int ->
+        x.lessEqual(GREATER(max)).isInvalid
       }
     }
+
   }
 
-  class GreaterEqualGen(private val min: Int) : Gen<Int> {
-    override fun generate(): Int = Gen.int().filter { it >= min }.generate()
+  class LessEqualGen(private val max: Int) : Gen<Int> {
+    override fun generate(): Int = Gen.int().filter { it <= max }.generate()
   }
 }

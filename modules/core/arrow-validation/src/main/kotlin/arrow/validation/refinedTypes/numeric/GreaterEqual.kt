@@ -15,8 +15,8 @@ import arrow.validation.RefinedPredicateException
 import arrow.validation.Refinement
 import arrow.validation.refinedTypes.bool.Not
 
-interface GreaterEqual<F, A : Number> : Not<F, A, Less<F, A>> {
-  override fun REF(): Refinement<F, A>
+interface GreaterEqual<F, A : Number> : Not<F, A> {
+  override fun REF(): Less<F, A>
 
   override fun applicativeError(): ApplicativeError<F, Nel<RefinedPredicateException>>
 
