@@ -28,21 +28,7 @@ import arrow.data.MapKPartialOf
 import arrow.data.OptionTPartialOf
 import arrow.data.SortedMapKPartialOf
 import arrow.data.StateTPartialOf
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.ApplicativeError
-import arrow.typeclasses.Bimonad
-import arrow.typeclasses.Comonad
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Foldable
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadError
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.MonoidK
-import arrow.typeclasses.Order
-import arrow.typeclasses.Semigroup
-import arrow.typeclasses.SemigroupK
-import arrow.typeclasses.Traverse
+import arrow.typeclasses.*
 import dagger.Component
 import dagger.Module
 import javax.inject.Singleton
@@ -163,26 +149,32 @@ interface Runtime {
   fun byteMonoid(): Monoid<Byte>
   fun byteOrder(): Order<Byte>
   fun byteEq(): Eq<@JvmSuppressWildcards Byte>
+  fun byteHash(): Hash<Byte>
   fun doubleSemigroup(): Semigroup<Double>
   fun doubleMonoid(): Monoid<Double>
   fun doubleOrder(): Order<Double>
   fun doubleEq(): Eq<@JvmSuppressWildcards Double>
+  fun doubleHash(): Hash<Double>
   fun intSemigroup(): Semigroup<Int>
   fun intMonoid(): Monoid<Int>
   fun intOrder(): Order<Int>
   fun intEq(): Eq<@JvmSuppressWildcards Int>
+  fun intHash(): Hash<Int>
   fun longSemigroup(): Semigroup<Long>
   fun longMonoid(): Monoid<Long>
   fun longOrder(): Order<Long>
   fun longEq(): Eq<@JvmSuppressWildcards Long>
+  fun longHash(): Hash<Long>
   fun shortSemigroup(): Semigroup<Short>
   fun shortMonoid(): Monoid<Short>
   fun shortOrder(): Order<Short>
   fun shortEq(): Eq<@JvmSuppressWildcards Short>
+  fun shortHash(): Hash<Short>
   fun floatSemigroup(): Semigroup<Float>
   fun floatMonoid(): Monoid<Float>
   fun floatOrder(): Order<Float>
   fun floatEq(): Eq<@JvmSuppressWildcards Float>
+  fun floatHash(): Hash<Float>
   fun optionFunctor(): Functor<ForOption>
   fun optionApplicative(): Applicative<ForOption>
   fun optionMonad(): Monad<ForOption>

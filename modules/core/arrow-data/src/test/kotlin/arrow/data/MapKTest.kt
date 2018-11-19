@@ -2,9 +2,11 @@ package arrow.data
 
 import arrow.Kind2
 import arrow.instances.eq
+import arrow.instances.hash
 import arrow.instances.semigroup
 import arrow.instances.mapk.eq.eq
 import arrow.instances.mapk.functor.functor
+import arrow.instances.mapk.hash.hash
 import arrow.instances.mapk.monoid.monoid
 import arrow.instances.mapk.show.show
 import arrow.instances.mapk.traverse.traverse
@@ -34,7 +36,8 @@ class MapKTest : UnitSpec() {
         mapOf("key" to 1).k(),
         mapOf("key" to 2).k(),
         mapOf("key" to 3).k(),
-        EQ)
+        EQ),
+      HashLaws.laws(MapK.hash(String.hash(), Int.hash()), EQ_TC) { mapOf("key" to it).k() }
     )
   }
 }

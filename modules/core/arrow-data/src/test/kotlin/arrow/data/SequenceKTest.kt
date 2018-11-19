@@ -2,8 +2,10 @@ package arrow.data
 
 import arrow.Kind
 import arrow.instances.eq
+import arrow.instances.hash
 import arrow.instances.sequencek.applicative.applicative
 import arrow.instances.sequencek.eq.eq
+import arrow.instances.sequencek.hash.hash
 import arrow.instances.sequencek.monad.monad
 import arrow.instances.sequencek.monoid.monoid
 import arrow.instances.sequencek.monoidK.monoidK
@@ -38,7 +40,8 @@ class SequenceKTest : UnitSpec() {
       MonadLaws.laws(SequenceK.monad(), eq),
       MonoidKLaws.laws(SequenceK.monoidK(), SequenceK.applicative(), eq),
       MonoidLaws.laws(SequenceK.monoid(), Gen.list(Gen.int()).map { it.asSequence() }.generate().k(), eq),
-      TraverseLaws.laws(SequenceK.traverse(), SequenceK.applicative(), { n: Int -> SequenceK(sequenceOf(n)) }, eq)
+      TraverseLaws.laws(SequenceK.traverse(), SequenceK.applicative(), { n: Int -> SequenceK(sequenceOf(n)) }, eq),
+      HashLaws.laws(SequenceK.hash(Int.hash()), SequenceK.eq(Int.eq())) { sequenceOf(it).k() }
     )
   }
 }

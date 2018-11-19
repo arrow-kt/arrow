@@ -26,6 +26,13 @@ interface ByteShowInstance : Show<Byte> {
   override fun Byte.show(): String = toString()
 }
 
+interface ByteHashInstance : Hash<Byte>, ByteEqInstance {
+  override fun Byte.hash(): Int = hashCode()
+}
+
+fun Byte.Companion.hash(): Hash<Byte> =
+  object : ByteHashInstance {}
+
 fun Byte.Companion.show(): Show<Byte> =
   object : ByteShowInstance {}
 
@@ -72,6 +79,13 @@ interface DoubleEqInstance : Eq<Double> {
 interface DoubleShowInstance : Show<Double> {
   override fun Double.show(): String = toString()
 }
+
+interface DoubleHashInstance : Hash<Double>, DoubleEqInstance {
+  override fun Double.hash(): Int = hashCode()
+}
+
+fun Double.Companion.hash(): Hash<Double> =
+  object : DoubleHashInstance {}
 
 fun Double.Companion.show(): Show<Double> =
   object : DoubleShowInstance {}
@@ -120,6 +134,13 @@ interface IntOrderInstance : Order<Int> {
   override fun Int.compare(b: Int): Int = compareTo(b)
 }
 
+interface IntHashInstance : Hash<Int>, IntEqInstance {
+  override fun Int.hash(): Int = hashCode()
+}
+
+fun Int.Companion.hash(): Hash<Int> =
+  object : IntHashInstance {}
+
 fun Int.Companion.show(): Show<Int> =
   object : IntShowInstance {}
 
@@ -166,6 +187,13 @@ interface LongEqInstance : Eq<Long> {
 interface LongShowInstance : Show<Long> {
   override fun Long.show(): String = toString()
 }
+
+interface LongHashInstance : Hash<Long>, LongEqInstance {
+  override fun Long.hash(): Int = hashCode()
+}
+
+fun Long.Companion.hash(): Hash<Long> =
+  object : LongHashInstance {}
 
 fun Long.Companion.show(): Show<Long> =
   object : LongShowInstance {}
@@ -214,6 +242,13 @@ interface ShortShowInstance : Show<Short> {
   override fun Short.show(): String = toString()
 }
 
+interface ShortHashInstance : Hash<Short>, ShortEqInstance {
+  override fun Short.hash(): Int = hashCode()
+}
+
+fun Short.Companion.hash(): Hash<Short> =
+  object : ShortHashInstance {}
+
 fun Short.Companion.show(): Show<Short> =
   object : ShortShowInstance {}
 
@@ -260,6 +295,13 @@ interface FloatEqInstance : Eq<Float> {
 interface FloatShowInstance : Show<Float> {
   override fun Float.show(): String = toString()
 }
+
+interface FloatHashInstance : Hash<Float>, FloatEqInstance {
+  override fun Float.hash(): Int = hashCode()
+}
+
+fun Float.Companion.hash(): Hash<Float> =
+  object : FloatHashInstance {}
 
 fun Float.Companion.show(): Show<Float> =
   object : FloatShowInstance {}

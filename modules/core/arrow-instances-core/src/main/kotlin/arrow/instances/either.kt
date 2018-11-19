@@ -5,6 +5,7 @@ import arrow.Kind2
 import arrow.core.*
 import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
+import arrow.instances.either.eq.eq
 import arrow.typeclasses.*
 import arrow.core.ap as eitherAp
 import arrow.core.combineK as eitherCombineK
@@ -151,6 +152,23 @@ interface EitherEqInstance<in L, in R> : Eq<Either<L, R>> {
 interface EitherShowInstance<L, R> : Show<Either<L, R>> {
   override fun Either<L, R>.show(): String =
     toString()
+}
+
+@extension
+interface EitherHashInstance<L, R> : Hash<Either<L, R>>, EitherEqInstance<L, R> {
+
+  fun HL(): Hash<L>
+  fun HR(): Hash<R>
+
+  override fun EQL(): Eq<L> = HL()
+
+  override fun EQR(): Eq<R> = HR()
+
+  override fun Either<L, R>.hash(): Int = fold({
+    HL().run { it.hash() }
+  }, {
+    HR().run { it.hash() }
+  })
 }
 
 class EitherContext<L> : EitherMonadErrorInstance<L>, EitherTraverseInstance<L>, EitherSemigroupKInstance<L> {

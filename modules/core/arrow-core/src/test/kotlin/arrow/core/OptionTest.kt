@@ -3,9 +3,11 @@ package arrow.core
 import arrow.Kind
 import arrow.core.*
 import arrow.instances.eq
+import arrow.instances.hash
 import arrow.instances.monoid
 import arrow.instances.option.applicative.applicative
 import arrow.instances.option.eq.eq
+import arrow.instances.option.hash.hash
 import arrow.instances.option.monoid.monoid
 import arrow.instances.option.show.show
 import arrow.mtl.instances.option.monadFilter.monadFilter
@@ -37,7 +39,8 @@ class OptionTest : UnitSpec() {
       //testLaws(MonadErrorLaws.laws(monadError<ForOption, Unit>(), Eq.any(), EQ_EITHER)) TODO reenable once the MonadErrorLaws are parametric to `E`
       FunctorFilterLaws.laws(Option.traverseFilter(), {Option(it)}, Eq.any()),
       TraverseFilterLaws.laws(Option.traverseFilter(), Option.applicative(), ::Some, Eq.any()),
-      MonadFilterLaws.laws(Option.monadFilter(), ::Some, Eq.any())
+      MonadFilterLaws.laws(Option.monadFilter(), ::Some, Eq.any()),
+      HashLaws.laws(Option.hash(Int.hash()), Option.eq(Int.eq())) { Some(it) }
     )
 
     "fromNullable should work for both null and non-null values of nullable types" {

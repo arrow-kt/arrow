@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.*
 import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
+import arrow.instances.id.eq.eq
 import arrow.typeclasses.*
 import arrow.instances.traverse as idTraverse
 
@@ -123,6 +124,16 @@ interface IdTraverseInstance : Traverse<ForId> {
 
   override fun <A, B> arrow.Kind<arrow.core.ForId, A>.foldRight(lb: arrow.core.Eval<B>, f: (A, arrow.core.Eval<B>) -> arrow.core.Eval<B>): Eval<B> =
     fix().foldRight(lb, f)
+}
+
+@extension
+interface IdHashInstance<A> : Hash<Id<A>>, IdEqInstance<A> {
+
+  fun HA(): Hash<A>
+
+  override fun EQ(): Eq<A> = HA()
+
+  override fun Id<A>.hash(): Int = HA().run { value.hash() }
 }
 
 object IdContext : IdBimonadInstance, IdTraverseInstance {

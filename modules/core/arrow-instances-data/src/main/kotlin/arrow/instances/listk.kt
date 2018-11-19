@@ -5,7 +5,9 @@ import arrow.core.*
 import arrow.data.*
 import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
+import arrow.instances.listk.foldable.foldLeft
 import arrow.typeclasses.*
+import java.util.*
 import arrow.data.combineK as listCombineK
 import kotlin.collections.plus as listPlus
 
@@ -123,6 +125,18 @@ interface ListKMonoidKInstance : MonoidK<ForListK> {
 
   override fun <A> Kind<ForListK, A>.combineK(y: Kind<ForListK, A>): ListK<A> =
     fix().listCombineK(y)
+}
+
+@extension
+interface ListKHashInstance<A>: Hash<ListKOf<A>>, ListKEqInstance<A> {
+
+  fun HA(): Hash<A>
+
+  override fun EQ(): Eq<A> = HA()
+
+  override fun ListKOf<A>.hash(): Int = foldLeft(1) { hash, a ->
+    31 * hash + HA().run { a.hash() }
+  }
 }
 
 object ListKContext : ListKMonadInstance, ListKTraverseInstance, ListKMonoidKInstance {
