@@ -4,7 +4,6 @@ import arrow.Kind
 import arrow.core.*
 import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
-import arrow.instances.id.eq.eq
 import arrow.typeclasses.*
 import arrow.instances.traverse as idTraverse
 

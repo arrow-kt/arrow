@@ -128,7 +128,7 @@ interface ListKMonoidKInstance : MonoidK<ForListK> {
 }
 
 @extension
-interface ListKHashInstance<A>: Hash<ListKOf<A>>, ListKEqInstance<A> {
+interface ListKHashInstance<A> : Hash<ListKOf<A>>, ListKEqInstance<A> {
 
   fun HA(): Hash<A>
 
