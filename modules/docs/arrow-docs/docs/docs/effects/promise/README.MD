@@ -18,6 +18,9 @@ A promise can easily be made by calling `cancellable`.
 Since the allocation of mutable state is not referentially transparent this side-effect is contained within `F`.
 
 ```kotlin:ank:silent
+import arrow.effects.*
+import arrow.effects.instances.io.async.async
+
 val promise: IO<Promise<ForIO, Int>> =
   Promise.uncancelable<ForIO, Int>(IO.async()).fix()
 ```
@@ -34,6 +37,8 @@ Get the promised value, suspending the fiber running the action until the result
 This suspending the fiber running the action until the result is available.
 
 ```kotlin
+import arrow.effects.instances.io.monad.flatMap
+
 promise.flatMap { p ->
   p.get
 }.unsafeRunSync() //never ends because `get` keeps waiting for p to be fulfilled.
