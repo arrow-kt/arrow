@@ -12,7 +12,6 @@ import arrow.instances.nonemptylist.semigroup.semigroup
 import arrow.instances.validated.applicativeError.applicativeError
 import arrow.typeclasses.ApplicativeError
 import arrow.validation.RefinedPredicateException
-import arrow.validation.Refinement
 import arrow.validation.refinedTypes.bool.Not
 
 interface GreaterEqual<F, A : Number> : Not<F, A> {

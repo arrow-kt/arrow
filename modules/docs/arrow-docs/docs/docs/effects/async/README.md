@@ -139,13 +139,25 @@ For example, IO has unsafeRunTimed that runs never() safely.
 
 Arrow provides `AsyncLaws` in the form of test cases for internal verification of lawful instances and third party apps creating their own `Async` instances.
 
-### Data Types
+### Data types
 
-The following data types in Arrow provide instances that adhere to the `Async` type class.
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.effects.typeclasses.*
 
-- [IO]({{ '/docs/effects/io' | relative_url }})
-- [ObservableK]({{ '/docs/integrations/rx2' | relative_url }})
-- [FlowableK]({{ '/docs/integrations/rx2' | relative_url }})
-- [DeferredK]({{ '/docs/integrations/kotlinxcoroutines/' | relative_url }})
-- [FluxK]({{ '/docs/integrations/reactor' | relative_url }})
-- [MonoK]({{ '/docs/integrations/reactor' | relative_url }})
+TypeClass(Async::class).dtMarkdownList()
+```
+
+### Hierarchy
+
+<canvas id="hierarchy-diagram"></canvas>
+<script>
+  drawNomNomlDiagram('hierarchy-diagram', 'diagram.nomnol')
+</script>
+
+```kotlin:ank:outFile(diagram.nomnol)
+import arrow.reflect.*
+import arrow.effects.typeclasses.*
+
+TypeClass(Async::class).hierarchyGraph()
+```

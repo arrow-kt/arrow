@@ -82,14 +82,24 @@ interface Eq<F> {
 A single implementation of a typeclass for a specific datatype or class.
 Because typeclasses require generic parameters each implementation is meant to be unique for that parameter.
 
+For example, given a class like this:
+
 ```kotlin
-@instance(User::class)
+data class User(val id: Int) {
+  companion object
+}
+```
+
+We can declare that instances of this class can be equated based on their `id` property, and therefore that `User` itself is an instance of the `Eq` typeclass:
+
+```kotlin
+@extension
 interface UserEqInstance: Eq<User> {
   override fun User.eqv(b: User): Boolean = id == b.id
 }
 ```
 
-All typeclass instances provided Arrow can be found in the companion object of the type they're defined for, including platform types like String or Int.
+Note that classes must have companion objects for this to work. All typeclass instances provided by Arrow can be found in the companion object of the type they're defined for, including platform types like String or Int.
 
 ```kotlin:ank:silent
 import arrow.*

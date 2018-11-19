@@ -27,8 +27,11 @@ Mu guarantees that a datatype will be finite, and should be used for any algorit
 that will only work on finite data (for example `sum`). Due to it being a direct encoding
 of cata, Mu also has a very fast Recursive instance.
 
-## Avaliable Instances:
+### Supported Type Classes
 
-- [Recursive]({{ '/docs/recursion/recursive' | relative_url }})
-- [Corecursive]({{ '/docs/recursion/recursive' | relative_url }})
-- [Birecursive]({{ '/docs/recursion/recursive' | relative_url }})
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.recursion.data.*
+
+DataType(Mu::class).tcMarkdownList()
+```

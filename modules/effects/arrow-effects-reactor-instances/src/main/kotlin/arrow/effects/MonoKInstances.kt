@@ -70,9 +70,15 @@ interface MonoKMonadErrorInstance :
 interface MonoKMonadThrowInstance : MonadThrow<ForMonoK>, MonoKMonadErrorInstance
 
 @extension
+interface MonoKBracketInstance : Bracket<ForMonoK, Throwable>, MonoKMonadThrowInstance {
+  override fun <A, B> Kind<ForMonoK, A>.bracketCase(release: (A, ExitCase<Throwable>) -> Kind<ForMonoK, Unit>, use: (A) -> Kind<ForMonoK, B>): MonoK<B> =
+    fix().bracketCase({ use(it) }, { a, e -> release(a, e) })
+}
+
+@extension
 interface MonoKMonadDeferInstance :
-  MonadDefer<ForMonoK>,
-  MonoKMonadErrorInstance {
+  MonoKBracketInstance,
+  MonadDefer<ForMonoK> {
   override fun <A> defer(fa: () -> MonoKOf<A>): MonoK<A> =
     MonoK.defer(fa)
 }

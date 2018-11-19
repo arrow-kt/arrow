@@ -41,7 +41,7 @@ println(result)
 {:.intermediate}
 intermediate
 
-`grroupBy` works with any data type that provides an instance of `Foldable<F>` where `F` is the higher kinded representation of the data type. For example `ForOption` when targeting the `Option<A>` data type or `ForListK` when targeting the `List<A>` data type
+`groupBy` works with any data type that provides an instance of `Foldable<F>` where `F` is the higher kinded representation of the data type. For example `ForOption` when targeting the `Option<A>` data type or `ForListK` when targeting the `List<A>` data type
 
 Learn more about the `AQL` combinators
 
@@ -52,6 +52,15 @@ Learn more about the `AQL` combinators
 - [_orderBy_](/docs/aql/orderby/)
 - [_sum_](/docs/aql/sum/)
 - [_union_](/docs/aql/union/)
+
+### Supported Data types
+
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.aql.*
+
+TypeClass(GroupBy::class).dtMarkdownList()
+```
 
 {:.advanced}
 advanced

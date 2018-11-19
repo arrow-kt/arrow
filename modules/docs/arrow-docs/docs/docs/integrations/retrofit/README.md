@@ -99,8 +99,3 @@ ioResponse
   })
 ```
 
-## Available Instances
-* [MonadError]({{ '/docs/typeclasses/monaderror' | relative_url }})
-* [MonadDefer]({{ '/docs/effects/monaddefer' | relative_url }})
-* [Async]({{ '/docs/effects/async' | relative_url }})
-* [Effect]({{ '/docs/effects/effect' | relative_url }})

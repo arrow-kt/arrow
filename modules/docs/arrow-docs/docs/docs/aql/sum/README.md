@@ -12,6 +12,7 @@ beginner
 `sum` adds up all the values of a selected numeric property and returns the total sum as a `Long`
 
 `sum` over `List`
+
 {:data-executable='true'}
 ```kotlin:ank
 import arrow.aql.instances.list.select.*
@@ -51,6 +52,15 @@ Learn more about the `AQL` combinators
 - [_orderBy_](/docs/aql/orderby/)
 - [_sum_](/docs/aql/sum/)
 - [_union_](/docs/aql/union/)
+
+### Supported Data types
+
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.aql.*
+
+TypeClass(Sum::class).dtMarkdownList()
+```
 
 {:.advanced}
 advanced

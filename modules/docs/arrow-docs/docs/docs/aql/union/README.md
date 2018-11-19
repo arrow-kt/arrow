@@ -12,6 +12,7 @@ beginner
 `union` joins the result of selecting different queries into a single result.
 
 `union` over `List`
+
 {:data-executable='true'}
 ```kotlin:ank
 import arrow.aql.instances.list.select.*
@@ -49,6 +50,15 @@ Learn more about the `AQL` combinators
 - [_orderBy_](/docs/aql/orderby/)
 - [_sum_](/docs/aql/sum/)
 - [_union_](/docs/aql/union/)
+
+### Supported Data types
+
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.aql.*
+
+TypeClass(Union::class).dtMarkdownList()
+```
 
 {:.advanced}
 advanced
