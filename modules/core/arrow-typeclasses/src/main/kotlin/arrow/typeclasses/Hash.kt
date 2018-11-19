@@ -19,7 +19,7 @@ interface Hash<in F> : Eq<F> {
    * {: data-executable='true'}
    *
    * ```kotlin:ank
-   * import arrow.aql.instances.*
+   * import arrow.instances.*
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
@@ -38,6 +38,19 @@ interface Hash<in F> : Eq<F> {
      *
      * @param hashF function that computes a hash for any object of type [F]
      * @returns an instance of [Hash] that is defined by the hashF function
+     *
+     * {: data-executable='true'}
+     *
+     * ```kotlin:ank
+     * import arrow.typeclasses.Hash
+     *
+     * fun main(args: Array<String>) {
+     *   //sampleStart
+     *   val result = Hash<String> { s: String -> s.hashCode() }.run { "MyString".hash() }
+     *   //sampleEnd
+     *   println(result)
+     * }
+     *  ```
      */
     inline operator fun <F> invoke(crossinline hashF: (F) -> Int): Hash<F> = object : Hash<F> {
       override fun F.hash(): Int = hashF(this)
@@ -49,6 +62,17 @@ interface Hash<in F> : Eq<F> {
      * Retrieve an instance of [Hash] where the hash function delegates to kotlin's `Any?.hashCode()` function
      *
      * @returns an instance of [Hash] that always delegates to kotlin's native hashCode functionality
+     *
+     * ```kotlin:ank
+     * import arrow.typeclasses.Hash
+     *
+     * fun main(args: Array<String>) {
+     *   //sampleStart
+     *   val result = Hash.any().run { 1.5.hash() }
+     *   //sampleEnd
+     *   println(result)
+     * }
+     *  ```
      */
     fun any(): Hash<Any?> = HashAny
 
