@@ -5,6 +5,9 @@ import arrow.core.*
 import arrow.effects.typeclasses.Async
 import arrow.typeclasses.ApplicativeError
 
+/**
+ * A counting [Semaphore]
+ */
 interface Semaphore<F> {
 
   val available: Kind<F, Long>
@@ -45,25 +48,23 @@ private typealias State<F> = Either<List<Tuple2<Long, Promise<F, Unit>>>, Long>
 private fun <F> assertNonNegative(n: Long, AE: ApplicativeError<F, Throwable>): Kind<F, Unit> =
   if (n < 0) AE.raiseError(IllegalArgumentException("n must be nonnegative, was: $n")) else AE.just(Unit)
 
-internal class AsyncSemaphore<F>(private val state: Ref<F, State<F>>, private val AS: Async<F>) : Semaphore<F>, Async<F> by AS {
-
-  private val mkGate: Kind<F, Promise<F, Unit>> = Promise.uncancelable(AS)
-  private fun awaitGate(entry: Tuple2<Long, Promise<F, Unit>>): Kind<F, Unit> = entry.b.get
+internal class AsyncSemaphore<F>(private val state: Ref<F, State<F>>,
+                                 private val AS: Async<F>) : Semaphore<F>, Async<F> by AS {
 
   override val available: Kind<F, Long>
-    get() = state.get().map { eith ->
-      eith.fold({ 0L }, ::identity)
+    get() = state.get.map { state ->
+      state.fold({ 0L }, ::identity)
     }
 
   override val count: Kind<F, Long>
-    get() = state.get().map { eith ->
-      eith.fold({ it.map { (a, _) -> a }.sum().unaryMinus() }, ::identity)
+    get() = state.get.map { state ->
+      state.fold({ it.map { (a, _) -> a }.sum().unaryMinus() }, ::identity)
     }
 
   override fun acquireN(n: Long): Kind<F, Unit> =
     assertNonNegative(n, AS).flatMap {
       if (n == 0L) just(Unit)
-      else mkGate.flatMap { gate ->
+      else Promise.uncancelable<F, Unit>(AS).flatMap { gate ->
         state.modify { old ->
           val u = old.fold({ waiting ->
             Left(waiting + listOf(n toT gate))
@@ -72,11 +73,11 @@ internal class AsyncSemaphore<F>(private val state: Ref<F, State<F>>, private va
             else Left(listOf((n - m) toT gate))
           })
 
-          u toT u
-        }.flatMap { eith ->
-          eith.fold({ waiting ->
+          Tuple2(u, u)
+        }.flatMap { u ->
+          u.fold({ waiting ->
             val entry = waiting.lastOrNone().getOrElse { throw RuntimeException("Semaphore has empty waiting queue rather than 0 count") }
-            awaitGate(entry)
+            entry.b.get
           }, {
             just(Unit)
           })
