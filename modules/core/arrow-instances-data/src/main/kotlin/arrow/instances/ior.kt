@@ -102,6 +102,23 @@ interface IorShowInstance<L, R> : Show<Ior<L, R>> {
     toString()
 }
 
+@extension
+interface IorHashInstance<L, R> : Hash<Ior<L, R>>, IorEqInstance<L, R> {
+
+  fun HL(): Hash<L>
+  fun HR(): Hash<R>
+
+  override fun EQL(): Eq<L> = HL()
+
+  override fun EQR(): Eq<R> = HR()
+
+  override fun Ior<L, R>.hash(): Int = when (this) {
+    is Ior.Left -> HL().run { value.hash() }
+    is Ior.Right -> HR().run { value.hash() }
+    is Ior.Both -> 31 * HL().run { leftValue.hash() } + HR().run { rightValue.hash() }
+  }
+}
+
 class IorContext<L>(val SL: Semigroup<L>) : IorMonadInstance<L>, IorTraverseInstance<L> {
 
   override fun SL(): Semigroup<L> = SL
