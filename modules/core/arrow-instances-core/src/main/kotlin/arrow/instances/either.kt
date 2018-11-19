@@ -153,6 +153,23 @@ interface EitherShowInstance<L, R> : Show<Either<L, R>> {
     toString()
 }
 
+@extension
+interface EitherHashInstance<L, R> : Hash<Either<L, R>>, EitherEqInstance<L, R> {
+
+  fun HL(): Hash<L>
+  fun HR(): Hash<R>
+
+  override fun EQL(): Eq<L> = HL()
+
+  override fun EQR(): Eq<R> = HR()
+
+  override fun Either<L, R>.hash(): Int = fold({
+    HL().run { it.hash() }
+  }, {
+    HR().run { it.hash() }
+  })
+}
+
 class EitherContext<L> : EitherMonadErrorInstance<L>, EitherTraverseInstance<L>, EitherSemigroupKInstance<L> {
   override fun <A, B> Kind<EitherPartialOf<L>, A>.map(f: (A) -> B): Either<L, B> =
     fix().map(f)
