@@ -27,7 +27,7 @@ open class MonadDeferCancellableContinuation<F, A>(SC: MonadDefer<F>, override v
   override fun returnedMonad(): Kind<F, A> = returnedMonad
 
   suspend fun <B> bindDefer(f: () -> B): B =
-    invoke(f).bind()
+    delay(f).bind()
 
   suspend fun <B> bindDeferIn(context: CoroutineContext, f: () -> B): B =
     defer { bindingCatch { bindIn(context, f) } }.bind()
