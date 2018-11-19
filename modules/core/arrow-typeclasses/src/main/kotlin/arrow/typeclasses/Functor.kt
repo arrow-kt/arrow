@@ -3,6 +3,9 @@ package arrow.typeclasses
 import arrow.Kind
 import arrow.core.Tuple2
 
+/**
+ * ank_macro_hierarchy(arrow.typeclasses.Functor)
+ */
 interface Functor<F> : Invariant<F> {
 
   fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B>
