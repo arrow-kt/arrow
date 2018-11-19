@@ -1,9 +1,11 @@
 package arrow.data
 
 import arrow.instances.eq
+import arrow.instances.hash
 import arrow.instances.nonemptylist.applicative.applicative
 import arrow.instances.nonemptylist.comonad.comonad
 import arrow.instances.nonemptylist.eq.eq
+import arrow.instances.nonemptylist.hash.hash
 import arrow.instances.nonemptylist.monad.monad
 import arrow.instances.nonemptylist.semigroup.semigroup
 import arrow.instances.nonemptylist.semigroupK.semigroupK
@@ -22,7 +24,6 @@ class NonEmptyListTest : UnitSpec() {
 
     val EQ = NonEmptyList.eq(Int.eq())
     testLaws(
-      EqLaws.laws(EQ) { it.nel() },
       ShowLaws.laws(NonEmptyList.show(), EQ) { it.nel() },
       MonadLaws.laws(NonEmptyList.monad(), Eq.any()),
       SemigroupKLaws.laws(
@@ -31,7 +32,8 @@ class NonEmptyListTest : UnitSpec() {
         Eq.any()),
       ComonadLaws.laws(NonEmptyList.comonad(), { NonEmptyList.of(it) }, Eq.any()),
       TraverseLaws.laws(NonEmptyList.traverse(), NonEmptyList.applicative(), { n: Int -> NonEmptyList.of(n) }, Eq.any()),
-      SemigroupLaws.laws(NonEmptyList.semigroup(), Nel(1, 2, 3), Nel(3, 4, 5), Nel(6, 7, 8), NonEmptyList.eq(Int.eq()))
+      SemigroupLaws.laws(NonEmptyList.semigroup(), Nel(1, 2, 3), Nel(3, 4, 5), Nel(6, 7, 8), NonEmptyList.eq(Int.eq())),
+      HashLaws.laws(NonEmptyList.hash(Int.hash()), EQ) { Nel.of(it) }
     )
   }
 }

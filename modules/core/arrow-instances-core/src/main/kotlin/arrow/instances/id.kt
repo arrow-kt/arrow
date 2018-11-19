@@ -125,6 +125,16 @@ interface IdTraverseInstance : Traverse<ForId> {
     fix().foldRight(lb, f)
 }
 
+@extension
+interface IdHashInstance<A> : Hash<Id<A>>, IdEqInstance<A> {
+
+  fun HA(): Hash<A>
+
+  override fun EQ(): Eq<A> = HA()
+
+  override fun Id<A>.hash(): Int = HA().run { value.hash() }
+}
+
 object IdContext : IdBimonadInstance, IdTraverseInstance {
   override fun <A, B> Kind<ForId, A>.map(f: (A) -> B): Id<B> =
     fix().map(f)
