@@ -4,8 +4,6 @@ import arrow.Kind
 import arrow.core.*
 import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
-import arrow.instances.option.eq.eq
-import arrow.instances.option.hash.hash
 import arrow.typeclasses.*
 import arrow.instances.traverse as optionTraverse
 
