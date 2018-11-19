@@ -17,7 +17,7 @@ interface MonoidK<F> : SemigroupK<F> {
 
   override fun <A> algebra(): Monoid<Kind<F, A>> = object : Monoid<Kind<F, A>> {
 
-    override fun empty(): Kind<F, A> = empty()
+    override fun empty(): Kind<F, A> = this@MonoidK.empty()
 
     override fun Kind<F, A>.combine(b: Kind<F, A>): Kind<F, A> = this.combineK(b)
   }
