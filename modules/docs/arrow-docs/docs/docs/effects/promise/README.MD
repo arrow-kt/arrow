@@ -36,18 +36,19 @@ val unsafePromise: Promise<ForIO, Int> = Promise.unsafeCancellable(IO.async())
 Get the promised value, suspending the fiber running the action until the result is available.
 This suspending the fiber running the action until the result is available.
 
-```kotlin
+```kotlin:ank:silent
 import arrow.effects.instances.io.monad.flatMap
 
 promise.flatMap { p ->
   p.get
-}.unsafeRunSync() //never ends because `get` keeps waiting for p to be fulfilled.
+} //never ends because `get` keeps waiting for p to be fulfilled.
 ```
 
 ```kotlin:ank
 promise.flatMap { p ->
-  p.complete(1)
-  p.get
+  p.complete(1).flatMap {
+    p.get
+  }
 }.unsafeRunSync()
 ```
 
@@ -57,15 +58,17 @@ Fulfills the promise with a value. A promise cannot be fulfilled twice, so doing
 
 ```kotlin:ank
 promise.flatMap { p ->
-  p.complete(2)
-  p.get
+  p.complete(2).flatMap {
+    p.get
+  }
 }.unsafeRunSync()
 ```
 
 ```kotlin:ank
 promise.flatMap { p ->
-  p.complete(1)
-  p.complete(2)
+  p.complete(1).flatMap {
+    p.complete(2)
+  }
 }
   .attempt()
   .unsafeRunSync()
@@ -85,8 +88,9 @@ promise.flatMap { p ->
 
 ```kotlin:ank
 promise.flatMap { p ->
-  p.complete(1)
-  p.error(RuntimeException("Break promise"))
+  p.complete(1).flatMap {
+    p.error(RuntimeException("Break promise"))
+  }
 }
   .attempt()
   .unsafeRunSync()
