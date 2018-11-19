@@ -234,6 +234,9 @@ options:
       - title: Alternative
         url: /docs/typeclasses/alternative/
 
+      - title: Hash
+        url: /docs/typeclasses/hash
+
   - title: Effects
 
     nested_options:
