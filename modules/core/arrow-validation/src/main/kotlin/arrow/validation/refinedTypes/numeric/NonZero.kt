@@ -14,9 +14,11 @@ import arrow.typeclasses.ApplicativeError
 import arrow.validation.RefinedPredicateException
 import arrow.validation.Refinement
 
+internal fun <A : Number> isNonZero(a: A): Boolean = a != 0
+
 interface NonZero<F, A : Number> : Refinement<F, A> {
 
-  override fun A.refinement(): Boolean = this != 0
+  override fun A.refinement(): Boolean = isNonZero(this)
 
   fun A.nonZero(): Kind<F, A> = refine(this)
 

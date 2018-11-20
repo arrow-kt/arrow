@@ -14,28 +14,25 @@ import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Order
 import arrow.validation.RefinedPredicateException
 import arrow.validation.Refinement
-import arrow.validation.refinedTypes.bool.Not
 
-internal fun <A : Number> isLessEqualThan(ORD: Order<A>, a: A, max: A): Boolean =
-  ORD.run { a.lte(max) }
+internal fun <A : Number> isNonPositive(ORD: Order<A>, a: A): Boolean =
+  ORD.run { a.lt(Zero.value()) }
 
-interface LessEqual<F, A : Number> : Refinement<F, A> {
+interface Negative<F, A : Number> : Refinement<F, A> {
   fun ORD(): Order<A>
-  fun max(): A
 
-  override fun A.refinement(): Boolean = isLessEqualThan(ORD(), this, max())
+  override fun A.refinement(): Boolean = isNonPositive(ORD(), this)
 
-  override fun invalidValueMsg(a: A): String = "$a must be less or equal than ${max()}"
+  fun A.negative(): Kind<F, A> = refine(this)
 
-  fun A.lessEqual(): Kind<F, A> = refine(this)
+  fun <B> A.negative(f: (A) -> B): Kind<F, B> = refine(this, f)
 
-  fun <B> A.lessEqual(f: (A) -> B): Kind<F, B> = refine(this, f)
+  override fun invalidValueMsg(a: A): String = "$a must be less than 0"
 }
 
 @extension
-interface ValidatedLessEqual<A : Number> : LessEqual<ValidatedPartialOf<Nel<RefinedPredicateException>>, A> {
+interface ValidatedNegative<A : Number> : Negative<ValidatedPartialOf<Nel<RefinedPredicateException>>, A> {
   override fun ORD(): Order<A>
-  override fun max(): A
 
   override fun applicativeError(): ApplicativeError<ValidatedPartialOf<Nel<RefinedPredicateException>>,
     Nel<RefinedPredicateException>> =
@@ -43,9 +40,8 @@ interface ValidatedLessEqual<A : Number> : LessEqual<ValidatedPartialOf<Nel<Refi
 }
 
 @extension
-interface EitherLessEqual<A : Number> : LessEqual<EitherPartialOf<Nel<RefinedPredicateException>>, A> {
+interface EitherNegative<A : Number> : Negative<EitherPartialOf<Nel<RefinedPredicateException>>, A> {
   override fun ORD(): Order<A>
-  override fun max(): A
 
   override fun applicativeError(): ApplicativeError<EitherPartialOf<Nel<RefinedPredicateException>>,
     Nel<RefinedPredicateException>> =

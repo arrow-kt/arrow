@@ -13,14 +13,17 @@ import arrow.instances.validated.applicativeError.applicativeError
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Order
 import arrow.validation.RefinedPredicateException
-import arrow.validation.refinedTypes.bool.Not
+import arrow.validation.Refinement
 
-interface GreaterEqual<F, A : Number> : Not<F, A> {
+internal fun <A : Number> isGreaterEqualThan(ORD: Order<A>, a: A, min: A): Boolean =
+  ORD.run { a.gte(min) }
+
+interface GreaterEqual<F, A : Number> : Refinement<F, A> {
 
   fun ORD(): Order<A>
   fun min(): A
 
-  override fun A.refinement(): Boolean = ORD().run { gte(min()) }
+  override fun A.refinement(): Boolean = isGreaterEqualThan(ORD(), this, min())
 
   override fun invalidValueMsg(a: A): String = "$a must be greater or equal than ${min()}"
 

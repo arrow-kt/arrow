@@ -15,12 +15,15 @@ import arrow.typeclasses.Order
 import arrow.validation.RefinedPredicateException
 import arrow.validation.Refinement
 
+internal fun <A : Number> isGreaterThan(ORD: Order<A>, a: A, min: A): Boolean =
+  ORD.run { a.gt(min) }
+
 interface Greater<F, A : Number> : Refinement<F, A> {
 
   fun ORD(): Order<A>
   fun min(): A
 
-  override fun A.refinement(): Boolean = ORD().run { gt(min()) }
+  override fun A.refinement(): Boolean = isGreaterThan(ORD(), this, min())
 
   fun A.greater(): Kind<F, A> = refine(this)
 
