@@ -58,7 +58,7 @@ import arrow.effects.instances.io.monad.flatMap
 
 fun main(args: Array<String>) {
 //sampleStart
-promise.flatMap { p ->
+Promise.uncancelable<ForIO, Int>(IO.async()).flatMap { p ->
   p.get
 } //never ends because `get` keeps waiting for p to be fulfilled.
 //sampleEnd
@@ -73,7 +73,7 @@ import arrow.effects.instances.io.monad.flatMap
 
 fun main(args: Array<String>) {
 //sampleStart
-val result = promise.flatMap { p ->
+val result = Promise.uncancelable<ForIO, Int>(IO.async()).flatMap { p ->
   p.complete(1).flatMap {
     p.get
   }
@@ -95,7 +95,7 @@ import arrow.effects.instances.io.monad.flatMap
 
 fun main(args: Array<String>) {
 //sampleStart
-val result = promise.flatMap { p ->
+val result = Promise.uncancelable<ForIO, Int>(IO.async()).flatMap { p ->
   p.complete(2).flatMap {
     p.get
   }
@@ -113,7 +113,7 @@ import arrow.effects.instances.io.monad.flatMap
 
 fun main(args: Array<String>) {
 //sampleStart
-val result = promise.flatMap { p ->
+val result = Promise.uncancelable<ForIO, Int>(IO.async()).flatMap { p ->
   p.complete(1).flatMap {
     p.complete(2)
   }
@@ -137,7 +137,7 @@ import arrow.effects.instances.io.monad.flatMap
 
 fun main(args: Array<String>) {
 //sampleStart
-val result = promise.flatMap { p ->
+val result = Promise.uncancelable<ForIO, Int>(IO.async()).flatMap { p ->
   p.error(RuntimeException("Break promise"))
 }
   .attempt()
@@ -155,7 +155,7 @@ import arrow.effects.instances.io.monad.flatMap
 
 fun main(args: Array<String>) {
 //sampleStart
-val result = promise.flatMap { p ->
+val result = Promise.uncancelable<ForIO, Int>(IO.async()).flatMap { p ->
   p.complete(1).flatMap {
     p.error(RuntimeException("Break promise"))
   }
