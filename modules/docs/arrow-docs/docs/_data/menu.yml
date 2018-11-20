@@ -253,6 +253,9 @@ options:
       - title: Effect
         url: /docs/effects/effect/
 
+      - title: Promise
+        url: /docs/effects/promise/
+
       - title: Ref
         url: /docs/effects/ref/
 
