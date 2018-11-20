@@ -75,7 +75,7 @@ object MonadDeferLaws {
   fun <F> MonadDefer<F>.asyncParallelBind(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(genIntSmall(), genIntSmall(), genIntSmall()) { x: Int, y: Int, z: Int ->
       val (bound, _) = bindingCancellable {
-        val value = bind { tupled(invoke { x }, invoke { y }, invoke { z }) }
+        val value = bind { tupled(delay { x }, delay { y }, delay { z }) }
         value.a + value.b + value.c
       }
       bound.equalUnderTheLaw(just(x + y + z), EQ)

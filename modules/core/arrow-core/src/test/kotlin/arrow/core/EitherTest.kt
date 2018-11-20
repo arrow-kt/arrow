@@ -8,6 +8,7 @@ import arrow.instances.eq
 import arrow.instances.either.applicative.applicative
 import arrow.instances.either.bifunctor.bifunctor
 import arrow.instances.either.eq.eq
+import arrow.instances.either.hash.hash
 import arrow.instances.either.monadError.monadError
 import arrow.instances.either.monoid.monoid
 import arrow.instances.either.semigroup.semigroup
@@ -17,7 +18,9 @@ import arrow.instances.either.traverse.traverse
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
+import arrow.typeclasses.Hash
 import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
 
@@ -37,11 +40,11 @@ class EitherTest : UnitSpec() {
         BifunctorLaws.laws(Either.bifunctor(), { Right(it) }, EQ2),
         SemigroupLaws.laws(Either.semigroup(String.semigroup(), String.semigroup()), Either.right("1"), Either.right("2"), Either.right("3"), Either.eq(String.eq(), String.eq())),
         MonoidLaws.laws(Either.monoid(MOL=String.monoid(), MOR = Int.monoid()), Either.right(1), Either.eq(String.eq(), Int.eq())),
-        EqLaws.laws(Either.eq(String.eq(), Int.eq())) { Right(it) },
         ShowLaws.laws(Either.show(), Either.eq(String.eq(), Int.eq())) { Right(it) },
         MonadErrorLaws.laws(Either.monadError(), Eq.any(), Eq.any()),
         TraverseLaws.laws(Either.traverse(), Either.applicative(), { Right(it) }, Eq.any()),
-        SemigroupKLaws.laws(Either.semigroupK(), Either.applicative(), EQ)
+        SemigroupKLaws.laws(Either.semigroupK(), Either.applicative(), EQ),
+        HashLaws.laws(Either.hash(Hash.any(), Int.hash()), EQ2) { Right(it) }
       )
 
     "empty should return a Right of the empty of the inner type" {

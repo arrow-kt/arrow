@@ -12,6 +12,7 @@ beginner
 `union` joins the result of selecting different queries into a single result.
 
 `union` over `List`
+
 {:data-executable='true'}
 ```kotlin:ank
 import arrow.aql.instances.list.select.*

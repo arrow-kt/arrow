@@ -7,7 +7,9 @@ import arrow.data.fix
 import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.typeclasses.Comonad
+import arrow.typeclasses.Eq
 import arrow.typeclasses.Functor
+import arrow.typeclasses.Hash
 
 @extension
 interface ComonadSumInstance<F, G> : Comonad<SumPartialOf<F, G>> {
@@ -35,6 +37,27 @@ interface FunctorSumInstance<F, G> : Functor<SumPartialOf<F, G>> {
 
   override fun <A, B> Kind<SumPartialOf<F, G>, A>.map(f: (A) -> B): Sum<F, G, B> =
       fix().map(FF(), FG(), f)
+}
+
+@extension
+interface EqSumInstance<F, G, A> : Eq<Sum<F, G, A>> {
+  fun EQF(): Eq<Kind<F, A>>
+  fun EQG(): Eq<Kind<G, A>>
+
+  override fun Sum<F, G, A>.eqv(b: Sum<F, G, A>): Boolean =
+    EQF().run { left.eqv(b.left) } &&
+      EQG().run { right.eqv(b.right) }
+}
+
+@extension
+interface HashSumInstance<F, G, A> : Hash<Sum<F, G, A>>, EqSumInstance<F, G, A> {
+  fun HF(): Hash<Kind<F, A>>
+  fun HG(): Hash<Kind<G, A>>
+
+  override fun EQF(): Eq<Kind<F, A>> = HF()
+  override fun EQG(): Eq<Kind<G, A>> = HG()
+
+  override fun Sum<F, G, A>.hash(): Int = 31 * HF().run { left.hash() } + HG().run { right.hash() }
 }
 
 class SumContext<F, G>(val CF: Comonad<F>, val CG: Comonad<G>) : ComonadSumInstance<F, G> {

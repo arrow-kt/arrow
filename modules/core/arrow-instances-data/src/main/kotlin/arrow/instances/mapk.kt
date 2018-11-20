@@ -5,7 +5,9 @@ import arrow.core.Eval
 import arrow.data.*
 import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
+import arrow.instances.mapk.foldable.fold
 import arrow.instances.setk.eq.eq
+import arrow.instances.setk.hash.hash
 import arrow.typeclasses.*
 
 @extension
@@ -71,6 +73,21 @@ interface MapKEqInstance<K, A> : Eq<MapK<K, A>> {
 interface MapKShowInstance<K, A> : Show<MapK<K, A>> {
   override fun MapK<K, A>.show(): String =
     toString()
+}
+
+@extension
+interface MapKHashInstance<K, A> : Hash<MapK<K, A>>, MapKEqInstance<K, A> {
+  fun HK(): Hash<K>
+  fun HA(): Hash<A>
+
+  override fun EQK(): Eq<K> = HK()
+  override fun EQA(): Eq<A> = HA()
+
+  // Somewhat mirrors HashMap.Node.hashCode in that the combinator there between key and value is xor
+  override fun MapK<K, A>.hash(): Int =
+    SetK.hash(HK()).run { keys.k().hash() } xor foldLeft(1) { hash, a ->
+      31 * hash + HA().run { a.hash() }
+    }
 }
 
 class MapKContext<L> : MapKTraverseInstance<L>

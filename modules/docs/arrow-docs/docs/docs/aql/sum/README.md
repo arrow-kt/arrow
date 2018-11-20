@@ -12,6 +12,7 @@ beginner
 `sum` adds up all the values of a selected numeric property and returns the total sum as a `Long`
 
 `sum` over `List`
+
 {:data-executable='true'}
 ```kotlin:ank
 import arrow.aql.instances.list.select.*

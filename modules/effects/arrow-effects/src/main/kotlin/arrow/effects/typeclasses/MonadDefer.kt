@@ -15,6 +15,17 @@ interface MonadDefer<F> : MonadThrow<F>, Bracket<F, Throwable> {
 
   fun <A> defer(fa: () -> Kind<F, A>): Kind<F, A>
 
+  fun <A> delay(f: () -> A): Kind<F, A> =
+    defer {
+      try {
+        just(f())
+      } catch (t: Throwable) {
+        raiseError<A>(t)
+      }
+    }
+
+  @Deprecated("Use delay instead",
+          ReplaceWith("delay(f)", "arrow.effects.typeclasses.MonadDefer"))
   operator fun <A> invoke(f: () -> A): Kind<F, A> =
     defer {
       try {
@@ -24,7 +35,7 @@ interface MonadDefer<F> : MonadThrow<F>, Bracket<F, Throwable> {
       }
     }
 
-  fun lazy(): Kind<F, Unit> = invoke { }
+  fun lazy(): Kind<F, Unit> = delay { }
 
   fun <A> deferUnsafe(f: () -> Either<Throwable, A>): Kind<F, A> =
     defer { f().fold({ raiseError<A>(it) }, { just(it) }) }
