@@ -2,9 +2,11 @@ package arrow.data
 
 import arrow.Kind2
 import arrow.instances.eq
+import arrow.instances.hash
 import arrow.instances.semigroup
 import arrow.instances.mapk.eq.eq
 import arrow.instances.mapk.functor.functor
+import arrow.instances.mapk.hash.hash
 import arrow.instances.mapk.monoid.monoid
 import arrow.instances.mapk.show.show
 import arrow.instances.mapk.traverse.traverse
@@ -26,7 +28,6 @@ class MapKTest : UnitSpec() {
     val EQ_TC = MapK.eq(String.eq(), Int.eq())
 
     testLaws(
-      EqLaws.laws(EQ_TC) { mapOf(it.toString() to it).k() },
       ShowLaws.laws(MapK.show(), EQ_TC) { mapOf(it.toString() to it).k() },
       TraverseLaws.laws(MapK.traverse(), MapK.functor(), { a: Int -> mapOf("key" to a).k() }, EQ),
       MonoidLaws.laws(MapK.monoid<String, Int>(Int.semigroup()), mapOf("key" to 1).k(), EQ),
@@ -34,7 +35,8 @@ class MapKTest : UnitSpec() {
         mapOf("key" to 1).k(),
         mapOf("key" to 2).k(),
         mapOf("key" to 3).k(),
-        EQ)
+        EQ),
+      HashLaws.laws(MapK.hash(String.hash(), Int.hash()), EQ_TC) { mapOf("key" to it).k() }
     )
   }
 }

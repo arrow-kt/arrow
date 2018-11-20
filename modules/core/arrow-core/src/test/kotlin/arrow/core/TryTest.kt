@@ -1,21 +1,20 @@
 package arrow.core
 
-import arrow.core.*
+import arrow.instances.*
 import arrow.instances.`try`.applicative.map
 import arrow.instances.`try`.eq.eq
 import arrow.instances.`try`.functor.functor
+import arrow.instances.`try`.hash.hash
 import arrow.instances.`try`.monadError.monadError
 import arrow.instances.`try`.monoid.monoid
 import arrow.instances.`try`.semigroup.semigroup
 import arrow.instances.`try`.show.show
 import arrow.instances.`try`.traverse.traverse
-import arrow.instances.combine
-import arrow.instances.monoid
-import arrow.instances.semigroup
 import arrow.mtl.instances.`try`.functorFilter.functorFilter
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
+import arrow.typeclasses.Hash
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.*
 import io.kotlintest.properties.forAll
@@ -34,11 +33,11 @@ class TryTest : UnitSpec() {
     testLaws(
       SemigroupLaws.laws(Try.semigroup(Int.semigroup()), Try.just(1), Try.just(2), Try.just(3), EQ),
       MonoidLaws.laws(Try.monoid(MO = Int.monoid()), Try.just(1), EQ),
-      EqLaws.laws(EQ) { Try.just(it) },
       ShowLaws.laws(Try.show(), EQ) { Try.just(it) },
       MonadErrorLaws.laws(Try.monadError(), Eq.any(), Eq.any()),
       TraverseLaws.laws(Try.traverse(), Try.functor(), ::Success, Eq.any()),
-      FunctorFilterLaws.laws(Try.functorFilter(), { Try.just(it) }, Eq.any())
+      FunctorFilterLaws.laws(Try.functorFilter(), { Try.just(it) }, Eq.any()),
+      HashLaws.laws(Try.hash(Int.hash(), Hash.any()), Try.eq(Int.eq(), Eq.any())) { Try.just(it) }
     )
 
     "empty should return a Success of the empty of the inner type" {

@@ -150,6 +150,9 @@ options:
       - title: Eq
         url: /docs/typeclasses/eq/
 
+      - title: Hash
+        url: /docs/typeclasses/hash
+
       - title: Order
         url: /docs/typeclasses/order/
 
@@ -191,6 +194,9 @@ options:
 
       - title: MonadError
         url: /docs/typeclasses/monaderror/
+
+      - title: Bracket
+        url: /docs/typeclasses/bracket/
 
       - title: MonadFilter
         url: /docs/typeclasses/monadfilter/

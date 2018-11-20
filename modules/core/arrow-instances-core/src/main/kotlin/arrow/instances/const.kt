@@ -95,6 +95,15 @@ interface ConstShowInstance<A, T> : Show<Const<A, T>> {
     toString()
 }
 
+@extension
+interface ConstHashInstance<A, T> : Hash<Const<A, T>>, ConstEqInstance<A, T> {
+  fun HA(): Hash<A>
+
+  override fun EQ(): Eq<A> = HA()
+
+  override fun Const<A, T>.hash(): Int = HA().run { value.hash() }
+}
+
 class ConstContext<A>(val MA: Monoid<A>) : ConstApplicativeInstance<A>, ConstTraverseInstance<A> {
   override fun MA(): Monoid<A> = MA
 

@@ -89,6 +89,21 @@ interface ValidatedShowInstance<L, R> : Show<Validated<L, R>> {
     toString()
 }
 
+@extension
+interface ValidatedHashInstance<L, R> : Hash<Validated<L, R>>, ValidatedEqInstance<L, R> {
+  fun HL(): Hash<L>
+  fun HR(): Hash<R>
+
+  override fun EQL(): Eq<L> = HL()
+  override fun EQR(): Eq<R> = HR()
+
+  override fun Validated<L, R>.hash(): Int = fold({
+    HL().run { it.hash() }
+  }, {
+    HR().run { it.hash() }
+  })
+}
+
 class ValidatedContext<L>(val SL: Semigroup<L>) : ValidatedApplicativeErrorInstance<L>, ValidatedTraverseInstance<L>, ValidatedSemigroupKInstance<L> {
   override fun SE(): Semigroup<L> = SL
 

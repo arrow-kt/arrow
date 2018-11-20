@@ -1,7 +1,10 @@
 package arrow.data
 
+import arrow.instances.eq
+import arrow.instances.hash
 import arrow.instances.listk.applicative.applicative
 import arrow.instances.listk.eq.eq
+import arrow.instances.listk.hash.hash
 import arrow.instances.listk.monoidK.monoidK
 import arrow.instances.listk.semigroupK.semigroupK
 import arrow.instances.listk.show.show
@@ -22,7 +25,6 @@ class ListKTest : UnitSpec() {
     val EQ: Eq<ListKOf<Int>> = ListK.eq(Eq.any())
 
     testLaws(
-      EqLaws.laws(EQ) { listOf(it).k() },
       ShowLaws.laws(ListK.show(), EQ) { listOf(it).k() },
       SemigroupKLaws.laws(ListK.semigroupK(), applicative, Eq.any()),
       MonoidKLaws.laws(ListK.monoidK(), applicative, Eq.any()),
@@ -30,7 +32,8 @@ class ListKTest : UnitSpec() {
       MonadCombineLaws.laws(ListK.monadCombine(),
         { n -> ListK(listOf(n)) },
         { n -> ListK(listOf({ s: Int -> n * s })) },
-        EQ)
+        EQ),
+      HashLaws.laws(ListK.hash(Int.hash()), ListK.eq(Int.eq())) { listOf(it).k() }
     )
 
   }
