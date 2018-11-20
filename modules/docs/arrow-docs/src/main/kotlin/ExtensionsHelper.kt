@@ -96,26 +96,23 @@ fun List<TypeClass>.nomnomlMixedHierarchyGraph(): String =
     .distinct()
     .joinToString(lineSeparator, transform = Extends::nomnomlExtends)
 
-fun List<TypeClass>.mixedHierarchyGraph(): String {
-  println("mixedHierarchyGraph: $this")
-  return """
-    |#font: monoidregular
-    |#arrowSize: 1
-    |#bendSize: 0.3
-    |#direction: down
-    |#gutter: 5
-    |#edgeMargin: 0
-    |#edges: rounded
-    |#fillArrows: false
-    |#fontSize: 10
-    |#leading: 1.25
-    |#lineWidth: 1
-    |#padding: 8
-    |#spacing: 40
-    |#stroke: #485C8A
-    |#zoom: 1
-    |#.typeclass: fill=#FFFFFF visual=class bold
-    |#.selected: fill=#61A8FF visual=class bold
-    |${nomnomlMixedHierarchyGraph()}
-  """.trimMargin()
-}
+fun List<TypeClass>.mixedHierarchyGraph(): String = """
+  |#font: monoidregular
+  |#arrowSize: 1
+  |#bendSize: 0.3
+  |#direction: down
+  |#gutter: 5
+  |#edgeMargin: 0
+  |#edges: rounded
+  |#fillArrows: false
+  |#fontSize: 10
+  |#leading: 1.25
+  |#lineWidth: 1
+  |#padding: 8
+  |#spacing: 40
+  |#stroke: #485C8A
+  |#zoom: 1
+  |#.typeclass: fill=#FFFFFF visual=class bold
+  |#.selected: fill=#61A8FF visual=class bold
+  |${nomnomlMixedHierarchyGraph()}
+""".trimMargin()

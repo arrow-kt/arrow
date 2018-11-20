@@ -228,7 +228,7 @@ fun compileCodeImpl(snippets: Map<File, ListK<Snippet>>, classpath: ListK<String
         snippet.copy(result = resultString)
       }
     }.k()
-    if (progress % 5 == 0) { //report every 5%
+    if (snippets.size < 1000 || progress % 25 == 0) { //report every 25%
       val message = "[$progress%] [${n + 1} of ${snippets.size}]"
       println(colored(ANSI_GREEN, message))
     }

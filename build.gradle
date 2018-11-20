@@ -90,8 +90,8 @@ subprojects { project ->
                 "/modules/docs/arrow-docs/docs/docs/apidocs"
 
         includes = ['README.md']
-        reportNotDocumented = false
-        
+        reportUndocumented = false
+
         // Specifies the location of the project source code on the Web.
         // If provided, Dokka generates "source" links for each declaration.
         // Repeat for multiple mappings
