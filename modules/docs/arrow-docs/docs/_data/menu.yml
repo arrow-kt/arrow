@@ -109,7 +109,7 @@ options:
         url: /docs/arrow/core/option/
 
       - title: Either
-        url: /docs/datatypes/either/
+        url: /docs/arrow/core/either/
 
       - title: Try
         url: /docs/datatypes/try/

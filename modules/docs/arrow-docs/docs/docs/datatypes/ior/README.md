@@ -10,7 +10,7 @@ permalink: /docs/datatypes/ior/
 beginner
 
 `Ior` represents an inclusive-or relationship between two data types.
-This makes it very similar to the [`Either`](/docs/datatypes/either) data type, which represents an "exclusive-or" relationship.
+This makes it very similar to the [`Either`](/docs/arrow/core/either) data type, which represents an "exclusive-or" relationship.
 An `Ior<A, B>` (also written as `A Ior B`) can contain either an `A`, a `B`, or both.
 Another similarity to `Either` is that `Ior` is right-biased,
 which means that the `map` and `flatMap` functions will work on the right side of the `Ior`, in our case the `B` value.

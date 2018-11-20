@@ -49,7 +49,7 @@ so they are always required.
 
 - [`Option`]({{ '/docs/arrow/core/option/' | relative_url }}) - absence of a value, or failure to construct a correct value
 
-- [`Either`]({{ '/docs/datatypes/either/' | relative_url }}) - an if/else branch in execution
+- [`Either`]({{ '/docs/arrow/core/either/' | relative_url }}) - an if/else branch in execution
 
 - [`Eval`]({{ '/docs/datatypes/eval/' | relative_url }}) - lazy evaluation of functions with stack safety and memoization
 

@@ -91,7 +91,7 @@ lazyResult
 #### deferUnsafe
 
 Takes as a parameter a function that returns `Either<Throwable, A>`.
-The left side of the [`Either`]({{ '/docs/datatypes/either' | relative_url }}) represents an error in the execution.
+The left side of the [`Either`]({{ '/docs/arrow/core/either' | relative_url }}) represents an error in the execution.
 This function is assumed to never throw any internal exceptions.
 
 ```kotlin

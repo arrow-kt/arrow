@@ -226,7 +226,7 @@ We should redefine our functions to express that their result is not just a `Nuk
 
 ### Either
 
-When dealing with a known alternate path we model return types as [`Either`]({{ '/docs/datatypes/either' | relative_url }})
+When dealing with a known alternate path we model return types as [`Either`]({{ '/docs/arrow/core/either' | relative_url }})
 Either represents the presence of either a `Left` value or a `Right` value.
 By convention most functional programing libraries choose `Left` as the exceptional case and `Right` as the success value.
 

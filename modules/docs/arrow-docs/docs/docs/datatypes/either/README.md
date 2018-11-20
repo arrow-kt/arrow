@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: Either
-permalink: /docs/datatypes/either/
+permalink: /docs/arrow/core/either/
+redirect_from:
+  - /docs/datatypes/either
 video: q6HpChSq-xc
 ---
 

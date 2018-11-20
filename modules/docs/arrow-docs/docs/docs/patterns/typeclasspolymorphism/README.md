@@ -263,7 +263,7 @@ and both are [**Typeclasses**]({{ '/docs/typeclasses/intro' | relative_url }}).
 
 **Typeclasses define behaviors (contracts)**. They're basically encoded as interfaces that work over a generic argument, 
 as in [`Monad<F>`]({{ '/docs/typeclasses/monad' | relative_url }}) , [`Functor<F>`]({{ '/docs/typeclasses/functor' | relative_url }}) 
-and many more. That `F` is the data type. So we will be able to pass types like [`Either`]({{ '/docs/datatypes/either' | relative_url }})
+and many more. That `F` is the data type. So we will be able to pass types like [`Either`]({{ '/docs/arrow/core/either' | relative_url }})
 , [`Option`]({{ '/docs/arrow/core/option' | relative_url }}), [`IO`]({{ '/docs/effects/io' | relative_url }}), [`Observable`]({{ '/docs/integrations/rx2' | relative_url }}), 
 [`Flowable`]({{ '/docs/integrations/rx2' | relative_url }}) and many more for it.
 
@@ -648,7 +648,7 @@ Left(a=UserNotInRemoteStorage(user=User(userId=UserId(value=unknown user))))
 ```
 
 [`IO`]({{ '/docs/effects/io' | relative_url }}) is a bit special. It returns the errors / successful results using 
-[`Either<L,R>`]({{ '/docs/datatypes/either' | relative_url }}) (which is another data type). By convention, the "left" 
+[`Either<L,R>`]({{ '/docs/arrow/core/either' | relative_url }}) (which is another data type). By convention, the "left" 
 side of an either (`L`) stores the errors, and the right side (`R`) stores the successful data. That's why successful 
 results are printed as `Right(...)` and the failing one is printed as `Left(...)`.
 

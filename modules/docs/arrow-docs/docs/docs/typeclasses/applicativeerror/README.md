@@ -17,7 +17,7 @@ like for example a sealed class UserNotFoundReason that contains 3 inheritors.
 
 Some of the datatypes Λrrow provides can have these error types already fixed.
 That's the case of [`Try<A>`]({{ '/docs/datatypes/try' | relative_url }}), which has its error type fixed to `Throwable`.
-Other datatypes like [`Either<E, A>`]({{ '/docs/datatypes/either' | relative_url }}) allow for the user to apply their error type of choice.
+Other datatypes like [`Either<E, A>`]({{ '/docs/arrow/core/either' | relative_url }}) allow for the user to apply their error type of choice.
 
 ### Main Combinators
 
@@ -83,7 +83,7 @@ failure.handleError { t -> 0 }
 
 #### Kind<F, A>#attempt
 
-Maps the current content of the datatype to an [`Either<E, A>`]({{ '/docs/datatypes/either' | relative_url }}), recovering from any previous error state.
+Maps the current content of the datatype to an [`Either<E, A>`]({{ '/docs/arrow/core/either' | relative_url }}), recovering from any previous error state.
 
 ```kotlin:ank
 Try { "3".toInt() }.attempt()
@@ -95,7 +95,7 @@ Try { "nope".toInt() }.attempt()
 
 #### fromEither/fromTry/fromOption
 
-Constructor function from an [`Either<E, A>`]({{ '/docs/datatypes/either' | relative_url }}), [`Option<A>`]({{ '/docs/arrow/core/option' | relative_url }}), or [`Try<A>`]({{ '/docs/datatypes/try' | relative_url }}) to the current datatype.
+Constructor function from an [`Either<E, A>`]({{ '/docs/arrow/core/either' | relative_url }}), [`Option<A>`]({{ '/docs/arrow/core/option' | relative_url }}), or [`Try<A>`]({{ '/docs/datatypes/try' | relative_url }}) to the current datatype.
 
 While `fromOption()` requires creating a new error value.
 

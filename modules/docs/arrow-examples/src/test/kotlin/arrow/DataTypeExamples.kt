@@ -150,7 +150,7 @@ class DataTypeExamples : FreeSpec() { init {
     }
   }
 
-  // Either http://arrow.io/docs/datatypes/either/
+  // Either http://arrow.io/docs/arrow/core/either/
   "Either left or right" - {
     fun parse(s: String): ProblemOrInt = Try { Right(s.toInt()) }.getOrElse { Left(invalidInt) }
     fun reciprocal(i: Int): Either<Problem, Double> = when (i) {
