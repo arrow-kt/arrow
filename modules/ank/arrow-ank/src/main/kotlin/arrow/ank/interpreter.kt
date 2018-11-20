@@ -1,12 +1,9 @@
 package arrow.ank
 
-import arrow.Kind
 import arrow.core.*
 import arrow.data.ListK
-import arrow.data.fix
 import arrow.data.k
 import arrow.instances.option.monad.forEffect
-import arrow.typeclasses.MonadError
 import org.intellij.markdown.MarkdownElementTypes.CODE_FENCE
 import org.intellij.markdown.ast.ASTNode
 import org.intellij.markdown.ast.accept
