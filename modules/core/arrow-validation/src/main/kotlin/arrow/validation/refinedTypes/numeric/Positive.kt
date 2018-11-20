@@ -15,23 +15,23 @@ import arrow.typeclasses.Order
 import arrow.validation.RefinedPredicateException
 import arrow.validation.Refinement
 
-internal fun <A : Number> isNegative(ORD: Order<A>, a: A): Boolean =
-  ORD.run { a.lt(Zero.value()) }
+internal fun <A : Number> isPositive(ORD: Order<A>, a: A): Boolean =
+  ORD.run { a.gt(Zero.value()) }
 
-interface Negative<F, A : Number> : Refinement<F, A> {
+interface Positive<F, A : Number> : Refinement<F, A> {
   fun ORD(): Order<A>
 
-  override fun A.refinement(): Boolean = isNegative(ORD(), this)
+  override fun A.refinement(): Boolean = isPositive(ORD(), this)
 
-  fun A.negative(): Kind<F, A> = refine(this)
+  fun A.positive(): Kind<F, A> = refine(this)
 
-  fun <B> A.negative(f: (A) -> B): Kind<F, B> = refine(this, f)
+  fun <B> A.positive(f: (A) -> B): Kind<F, B> = refine(this, f)
 
-  override fun invalidValueMsg(a: A): String = "$a must be less than 0"
+  override fun invalidValueMsg(a: A): String = "$a must be greater than 0"
 }
 
 @extension
-interface ValidatedNegative<A : Number> : Negative<ValidatedPartialOf<Nel<RefinedPredicateException>>, A> {
+interface ValidatedPositive<A : Number> : Positive<ValidatedPartialOf<Nel<RefinedPredicateException>>, A> {
   override fun ORD(): Order<A>
 
   override fun applicativeError(): ApplicativeError<ValidatedPartialOf<Nel<RefinedPredicateException>>,
@@ -40,7 +40,7 @@ interface ValidatedNegative<A : Number> : Negative<ValidatedPartialOf<Nel<Refine
 }
 
 @extension
-interface EitherNegative<A : Number> : Negative<EitherPartialOf<Nel<RefinedPredicateException>>, A> {
+interface EitherPositive<A : Number> : Positive<EitherPartialOf<Nel<RefinedPredicateException>>, A> {
   override fun ORD(): Order<A>
 
   override fun applicativeError(): ApplicativeError<EitherPartialOf<Nel<RefinedPredicateException>>,
