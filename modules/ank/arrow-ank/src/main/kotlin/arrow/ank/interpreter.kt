@@ -239,7 +239,6 @@ private fun Snippet.writeToOutFile(parent: File, result: String): Unit {
   val fileName = fence.lines()[0].substringAfter("(").substringBefore(")")
   val file = File(parent, fileName)
   file.writeText(result)
-  println(colored(ANSI_GREEN, "[outFile] ✔ emitted : $file"))
 }
 
 fun replaceAnkToLangImpl(compiledMarkdown: CompiledMarkdown): String =

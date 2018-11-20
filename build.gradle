@@ -90,7 +90,8 @@ subprojects { project ->
                 "/modules/docs/arrow-docs/docs/docs/apidocs"
 
         includes = ['README.md']
-        //classpath = configurations.runtime
+        reportNotDocumented = false
+        
         // Specifies the location of the project source code on the Web.
         // If provided, Dokka generates "source" links for each declaration.
         // Repeat for multiple mappings
@@ -105,14 +106,6 @@ subprojects { project ->
             suffix = "#L"
         }
 
-//        externalDocumentationLink {
-//             //Root URL of the generated documentation to link with. The trailing slash is required!
-//             //TODO This fails trying to get the package list
-//             url = new URL("https://arrow-kt.io/docs/docs/apidocs/")
-//
-//             //If package-list file located in non-standard location
-//             packageListUrl = new URL("file://${project.rootDir.absolutePath}/modules/docs/arrow-docs/docs/docs/apidocs/${project.name}/package-list")
-//        }
     }
 
     task codeCoverageReport(type: JacocoReport) {
