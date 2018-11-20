@@ -139,6 +139,17 @@ interface NonEmptyListSemigroupKInstance : SemigroupK<ForNonEmptyList> {
     fix().nelCombineK(y)
 }
 
+@extension
+interface NonEmptyListHashInstance<A> : Hash<NonEmptyList<A>>, NonEmptyListEqInstance<A> {
+  fun HA(): Hash<A>
+
+  override fun EQ(): Eq<A> = HA()
+
+  override fun NonEmptyList<A>.hash(): Int = foldLeft(1) { hash, a ->
+    31 * hash + HA().run { a.hash() }
+  }
+}
+
 fun <F, A> Reducible<F>.toNonEmptyList(fa: Kind<F, A>): NonEmptyList<A> =
   fa.reduceRightTo({ a -> NonEmptyList.of(a) }, { a, lnel ->
     lnel.map { nonEmptyList -> NonEmptyList(a, listOf(nonEmptyList.head) + nonEmptyList.tail) }

@@ -1,6 +1,7 @@
 package arrow.instances
 
 import arrow.Kind
+import arrow.core.Either
 import arrow.core.Eval
 import arrow.data.Coproduct
 import arrow.data.CoproductOf
@@ -8,6 +9,8 @@ import arrow.data.CoproductPartialOf
 import arrow.data.fix
 import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
+import arrow.instances.either.eq.eq
+import arrow.instances.either.hash.hash
 import arrow.typeclasses.*
 
 @extension
@@ -76,6 +79,25 @@ interface CoproductTraverseInstance<F, G> : Traverse<CoproductPartialOf<F, G>> {
 
   override fun <A, B> Kind<CoproductPartialOf<F, G>, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
     fix().foldRight(lb, f, TF(), TG())
+}
+
+@extension
+interface CoproductEqInstance<F, G, A> : Eq<Coproduct<F, G, A>> {
+  fun EQF(): Eq<Kind<F, A>>
+  fun EQG(): Eq<Kind<G, A>>
+
+  override fun Coproduct<F, G, A>.eqv(b: Coproduct<F, G, A>): Boolean = Either.eq(EQF(), EQG()).run { run.eqv(b.run) }
+}
+
+@extension
+interface CoproductHashInstance<F, G, A> : Hash<Coproduct<F, G, A>>, CoproductEqInstance<F, G, A> {
+  fun HF(): Hash<Kind<F, A>>
+  fun HG(): Hash<Kind<G, A>>
+
+  override fun EQF(): Eq<Kind<F, A>> = HF()
+  override fun EQG(): Eq<Kind<G, A>> = HG()
+
+  override fun Coproduct<F, G, A>.hash(): Int = Either.hash(HF(), HG()).run { run.hash() }
 }
 
 class CoproductContext<F, G>(val TF: Traverse<F>, val TG: Traverse<G>) : CoproductTraverseInstance<F, G> {

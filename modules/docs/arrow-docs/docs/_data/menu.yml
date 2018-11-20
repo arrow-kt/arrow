@@ -150,6 +150,9 @@ options:
       - title: Eq
         url: /docs/typeclasses/eq/
 
+      - title: Hash
+        url: /docs/typeclasses/hash
+
       - title: Order
         url: /docs/typeclasses/order/
 

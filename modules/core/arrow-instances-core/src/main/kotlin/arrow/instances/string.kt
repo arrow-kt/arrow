@@ -37,6 +37,13 @@ interface StringOrderInstance : Order<String> {
 fun String.Companion.order(): Order<String> =
   object : StringOrderInstance {}
 
+interface StringHashInstance : Hash<String>, StringEqInstance {
+  override fun String.hash(): Int = hashCode()
+}
+
+fun String.Companion.hash(): Hash<String> =
+  object : StringHashInstance {}
+
 object StringContext : StringShowInstance, StringOrderInstance, StringMonoidInstance
 
 object ForString {
