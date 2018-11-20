@@ -228,8 +228,10 @@ fun compileCodeImpl(snippets: Map<File, ListK<Snippet>>, classpath: ListK<String
         snippet.copy(result = resultString)
       }
     }.k()
-    val message = "[$progress%] ✔ ${file.parentFile.name}/${file.name} [${n + 1} of ${snippets.size}]"
-    println(colored(ANSI_GREEN, message))
+    if (progress % 5 == 0) { //report every 5%
+      val message = "[$progress%] [${n + 1} of ${snippets.size}]"
+      println(colored(ANSI_GREEN, message))
+    }
     CompiledMarkdown(file, evaledSnippets)
   }.k()
   return result
