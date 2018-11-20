@@ -7,6 +7,11 @@ import arrow.core.identity
 interface Bifunctor<F> {
   fun <A, B, C, D> Kind2<F, A, B>.bimap(fl: (A) -> C, fr: (B) -> D): Kind2<F, C, D>
 
+  fun <A, B, C, D> lift(fl: (A) -> C, fr: (B) -> D): (Kind2<F, A, B>) -> Kind2<F, C, D> =
+    { kind2 ->
+      kind2.bimap(fl, fr)
+    }
+
   fun <A, B, C> Kind2<F, A, B>.mapLeft(f: (A) -> C): Kind2<F, C, B> =
     bimap(f, ::identity)
 
