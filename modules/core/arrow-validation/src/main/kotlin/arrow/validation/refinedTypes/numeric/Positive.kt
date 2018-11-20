@@ -16,7 +16,7 @@ import arrow.validation.RefinedPredicateException
 import arrow.validation.Refinement
 
 internal fun <A : Number> isPositive(ORD: Order<A>, a: A): Boolean =
-  ORD.run { a.gt(Zero.value()) }
+  ORD.run { a.gt(zero()) }
 
 interface Positive<F, A : Number> : Refinement<F, A> {
   fun ORD(): Order<A>

@@ -2,6 +2,7 @@ package arrow.validation.refinedTypes.numeric
 
 import arrow.instances.order
 import arrow.test.UnitSpec
+import arrow.validation.refinedTypes.numeric.validated.positive.positive
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith

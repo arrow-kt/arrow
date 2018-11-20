@@ -1,4 +1,4 @@
-package arrow.validation.refinedTypes.numeric
+package arrow.validation.refinedTypes.string
 
 import arrow.Kind
 import arrow.core.Either
@@ -11,38 +11,28 @@ import arrow.instances.either.applicativeError.applicativeError
 import arrow.instances.nonemptylist.semigroup.semigroup
 import arrow.instances.validated.applicativeError.applicativeError
 import arrow.typeclasses.ApplicativeError
-import arrow.typeclasses.Order
 import arrow.validation.RefinedPredicateException
 import arrow.validation.Refinement
 
-internal fun <A : Number> isNegative(ORD: Order<A>, a: A): Boolean =
-  ORD.run { a.lt(zero()) }
+interface NonEmptyString<F> : Refinement<F, String> {
+  override fun String.refinement(): Boolean = this.isNotEmpty()
 
-interface Negative<F, A : Number> : Refinement<F, A> {
-  fun ORD(): Order<A>
+  fun String.nonEmptyString(): Kind<F, String> = refine(this)
 
-  override fun A.refinement(): Boolean = isNegative(ORD(), this)
+  fun <A> String.nonEmptyString(f: (String) -> A): Kind<F, A> = refine(this, f)
 
-  fun A.negative(): Kind<F, A> = refine(this)
-
-  fun <B> A.negative(f: (A) -> B): Kind<F, B> = refine(this, f)
-
-  override fun invalidValueMsg(a: A): String = "$a must be less than 0"
+  override fun invalidValueMsg(a: String): String = "\"$a\" must not be empty"
 }
 
 @extension
-interface ValidatedNegative<A : Number> : Negative<ValidatedPartialOf<Nel<RefinedPredicateException>>, A> {
-  override fun ORD(): Order<A>
-
+interface ValidatedNonEmptyString : NonEmptyString<ValidatedPartialOf<Nel<RefinedPredicateException>>> {
   override fun applicativeError(): ApplicativeError<ValidatedPartialOf<Nel<RefinedPredicateException>>,
     Nel<RefinedPredicateException>> =
     Validated.applicativeError(Nel.semigroup())
 }
 
 @extension
-interface EitherNegative<A : Number> : Negative<EitherPartialOf<Nel<RefinedPredicateException>>, A> {
-  override fun ORD(): Order<A>
-
+interface EitherNonEmptyString : NonEmptyString<EitherPartialOf<Nel<RefinedPredicateException>>> {
   override fun applicativeError(): ApplicativeError<EitherPartialOf<Nel<RefinedPredicateException>>,
     Nel<RefinedPredicateException>> =
     Either.applicativeError()

@@ -2,6 +2,4 @@
 
 package arrow.validation.refinedTypes.numeric
 
-object Zero {
-  fun <A : Number> value(): A = 0 as A
-}
+fun <A : Number> zero(): A = 0 as A
