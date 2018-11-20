@@ -145,6 +145,10 @@ They are more general than the other datatypes as they combine the abstractions 
 
 - [`Observable`]({{ '/docs/integrations/rx2/' | relative_url }})
 
+- [`Promise`]({{ '/docs/effects/promise/' | relative_url }})
+
+- [`Ref`]({{ '/docs/effects/ref/' | relative_url }})
+
 #### Free
 
 [Free]({{ '/docs/patterns/free_algebras/' | relative_url }}) is a general abstraction to represent [Domain Specific Languages]({{ '/docs/patterns/free_algebras/' | relative_url }}) that can be interpreted using Effects.

@@ -80,7 +80,6 @@ class PromiseTest : UnitSpec() {
       }.equalUnderTheLaw(IO.raiseError(error), EQ)
     }
 
-
   }
 
 }

@@ -17,80 +17,152 @@ A `Promise` guarantees (promises) `A` at some point in the future within the con
 A promise can easily be made by calling `cancellable`.
 Since the allocation of mutable state is not referentially transparent this side-effect is contained within `F`.
 
-```kotlin:ank:silent
+{: data-executable='true'}
+```kotlin:ank
 import arrow.effects.*
 import arrow.effects.instances.io.async.async
 
+fun main(args: Array<String>) {
+//sampleStart
 val promise: IO<Promise<ForIO, Int>> =
   Promise.uncancelable<ForIO, Int>(IO.async()).fix()
+//sampleEnd
+println(promise)
+}
 ```
 
 In case you want the side-effect to execute immediately and return the `Ref` instance you can use the `unsafe` function.
 
-```kotlin:ank:silent
+{: data-executable='true'}
+```kotlin:ank
+import arrow.effects.*
+import arrow.effects.instances.io.async.async
+
+fun main(args: Array<String>) {
+//sampleStart
 val unsafePromise: Promise<ForIO, Int> = Promise.unsafeCancellable(IO.async())
+//sampleEnd
+println(unsafePromise)
+}
 ```
 
 ### Get
 
 Get the promised value, suspending the fiber running the action until the result is available.
 
-```kotlin:ank:silent
+{: data-executable='true'}
+```kotlin:ank
+import arrow.effects.*
+import arrow.effects.instances.io.async.async
 import arrow.effects.instances.io.monad.flatMap
 
+fun main(args: Array<String>) {
+//sampleStart
 promise.flatMap { p ->
   p.get
 } //never ends because `get` keeps waiting for p to be fulfilled.
+//sampleEnd
+}
 ```
 
+{: data-executable='true'}
 ```kotlin:ank
-promise.flatMap { p ->
+import arrow.effects.*
+import arrow.effects.instances.io.async.async
+import arrow.effects.instances.io.monad.flatMap
+
+fun main(args: Array<String>) {
+//sampleStart
+val result = promise.flatMap { p ->
   p.complete(1).flatMap {
     p.get
   }
 }.unsafeRunSync()
+//sampleEnd
+println(result)
+}
 ```
 
 ### Complete
 
 Fulfills the promise with a value. A promise cannot be fulfilled twice, so doing so results in an error.
 
+{: data-executable='true'}
 ```kotlin:ank
-promise.flatMap { p ->
+import arrow.effects.*
+import arrow.effects.instances.io.async.async
+import arrow.effects.instances.io.monad.flatMap
+
+fun main(args: Array<String>) {
+//sampleStart
+val result = promise.flatMap { p ->
   p.complete(2).flatMap {
     p.get
   }
 }.unsafeRunSync()
+//sampleEnd
+println(result)
+}
 ```
 
+{: data-executable='true'}
 ```kotlin:ank
-promise.flatMap { p ->
+import arrow.effects.*
+import arrow.effects.instances.io.async.async
+import arrow.effects.instances.io.monad.flatMap
+
+fun main(args: Array<String>) {
+//sampleStart
+val result = promise.flatMap { p ->
   p.complete(1).flatMap {
     p.complete(2)
   }
 }
   .attempt()
   .unsafeRunSync()
+//sampleEnd
+println(result)
+}
 ```
 
 ### Error
 
 Breaks the promise with an exception. A promise cannot be broken twice, so doing so will result in an error.
 
+{: data-executable='true'}
 ```kotlin:ank
-promise.flatMap { p ->
+import arrow.effects.*
+import arrow.effects.instances.io.async.async
+import arrow.effects.instances.io.monad.flatMap
+
+fun main(args: Array<String>) {
+//sampleStart
+val result = promise.flatMap { p ->
   p.error(RuntimeException("Break promise"))
 }
   .attempt()
   .unsafeRunSync()
+//sampleEnd
+println(result)
+}
 ```
 
+{: data-executable='true'}
 ```kotlin:ank
-promise.flatMap { p ->
+import arrow.effects.*
+import arrow.effects.instances.io.async.async
+import arrow.effects.instances.io.monad.flatMap
+
+fun main(args: Array<String>) {
+//sampleStart
+val result = promise.flatMap { p ->
   p.complete(1).flatMap {
     p.error(RuntimeException("Break promise"))
   }
 }
   .attempt()
   .unsafeRunSync()
+//sampleEnd
+println(result)
+}
 ```
