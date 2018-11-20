@@ -180,6 +180,20 @@ interface OptionTraverseInstance : Traverse<ForOption> {
     fix().nonEmpty()
 }
 
+@extension
+interface OptionHashInstance<A> : Hash<Option<A>>, OptionEqInstance<A> {
+
+  fun HA(): Hash<A>
+
+  override fun EQ(): Eq<A> = HA()
+
+  override fun Option<A>.hash(): Int = fold({
+    None.hashCode()
+  }, {
+    HA().run { it.hash() }
+  })
+}
+
 object OptionContext : OptionMonadErrorInstance, OptionTraverseInstance {
   override fun <A, B> Kind<ForOption, A>.map(f: (A) -> B): Option<B> =
     fix().map(f)

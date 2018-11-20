@@ -121,6 +121,17 @@ interface SequenceKMonoidKInstance : MonoidK<ForSequenceK> {
     fix().sequenceCombineK(y)
 }
 
+@extension
+interface SequenceKHashInstance<A> : Hash<SequenceK<A>>, SequenceKEqInstance<A> {
+  fun HA(): Hash<A>
+
+  override fun EQ(): Eq<A> = HA()
+
+  override fun SequenceK<A>.hash(): Int = foldLeft(1) { hash, a ->
+    31 * hash + HA().run { a.hash() }
+  }
+}
+
 object SequenceKContext : SequenceKMonadInstance, SequenceKTraverseInstance, SequenceKMonoidKInstance {
   override fun <A, B> Kind<ForSequenceK, A>.map(f: (A) -> B): SequenceK<B> =
     fix().map(f)

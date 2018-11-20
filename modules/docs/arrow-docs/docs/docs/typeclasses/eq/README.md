@@ -87,7 +87,7 @@ import arrow.typeclasses.Eq
 TypeClass(Eq::class).dtMarkdownList()
 ```
 
-Additionally all instances of [`Order`]({{ '/docs/typeclasses/order' | relative_url }}) and their MTL variants implement the `Eq` typeclass directly since they are all subtypes of `Eq`
+Additionally all instances of [`Order`]({{ '/docs/typeclasses/order' | relative_url }}), [`Hash`]({{ '/docs/typeclasses/hash' | relative_url }}) and their MTL variants implement the `Eq` typeclass directly since they are all subtypes of `Eq`
 
 ### Hierarchy
 
