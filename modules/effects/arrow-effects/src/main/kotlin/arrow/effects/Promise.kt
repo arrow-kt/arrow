@@ -126,7 +126,7 @@ interface Promise<F, A> {
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
-     *   val promise: IOOf<Promise<ForIO, Int>> = Promise.cancellable(IO.async())
+     *   val promise: IOOf<Promise<ForIO, Int>> = Promise.uncancelable(IO.async())
      *   //sampleEnd
      * }
      * ```
