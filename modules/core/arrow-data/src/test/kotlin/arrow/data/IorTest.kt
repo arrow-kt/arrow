@@ -5,16 +5,20 @@ import arrow.core.Either
 import arrow.core.None
 import arrow.core.Some
 import arrow.data.Ior.Right
+import arrow.instances.eq
+import arrow.instances.hash
 import arrow.instances.semigroup
 import arrow.instances.ior.applicative.applicative
 import arrow.instances.ior.bifunctor.bifunctor
 import arrow.instances.ior.eq.eq
+import arrow.instances.ior.hash.hash
 import arrow.instances.ior.monad.monad
 import arrow.instances.ior.show.show
 import arrow.instances.ior.traverse.traverse
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
+import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
@@ -36,10 +40,10 @@ class IorTest : UnitSpec() {
 
     testLaws(
       BifunctorLaws.laws(Ior.bifunctor(), { Ior.Both(it, it) }, EQ2),
-      EqLaws.laws(EQ) { Right(it) },
       ShowLaws.laws(Ior.show(), EQ) { Right(it) },
       MonadLaws.laws(Ior.monad(Int.semigroup()), Eq.any()),
-      TraverseLaws.laws(Ior.traverse(), Ior.applicative(Int.semigroup()), ::Right, Eq.any())
+      TraverseLaws.laws(Ior.traverse(), Ior.applicative(Int.semigroup()), ::Right, Eq.any()),
+      HashLaws.laws(Ior.hash(Hash.any(), Int.hash()), Ior.eq(Eq.any(), Int.eq())) { Right(it) }
     )
 
     "bimap() should allow modify both value" {

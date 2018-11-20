@@ -156,6 +156,23 @@ interface TryTraverseInstance : Traverse<ForTry> {
     fix().foldRight(lb, f)
 }
 
+@extension
+interface TryHashInstance<A> : Hash<Try<A>>, TryEqInstance<A> {
+
+  fun HA(): Hash<A>
+  fun HT(): Hash<Throwable>
+
+  override fun EQA(): Eq<A> = HA()
+
+  override fun EQT(): Eq<Throwable> = HT()
+
+  override fun Try<A>.hash(): Int = fold({
+    HT().run { it.hash() }
+  }, {
+    HA().run { it.hash() }
+  })
+}
+
 object TryContext : TryMonadErrorInstance, TryTraverseInstance {
   override fun <A, B> Kind<ForTry, A>.map(f: (A) -> B): Try<B> =
     fix().map(f)
