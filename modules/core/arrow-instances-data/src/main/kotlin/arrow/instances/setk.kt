@@ -68,6 +68,17 @@ interface SetKMonoidKInstance : MonoidK<ForSetK> {
     fix().setCombineK(y)
 }
 
+@extension
+interface SetKHashInstance<A> : Hash<SetK<A>>, SetKEqInstance<A> {
+  fun HA(): Hash<A>
+
+  override fun EQ(): Eq<A> = HA()
+
+  override fun SetK<A>.hash(): Int = foldLeft(1) { hash, a ->
+    31 * hash + HA().run { a.hash() }
+  }
+}
+
 object SetKContext : SetKFoldableInstance, SetKMonoidKInstance
 
 @Deprecated(ExtensionsDSLDeprecated)
