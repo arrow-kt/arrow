@@ -18,7 +18,7 @@ interface Hash<in F> : Eq<F> {
    *
    * {: data-executable='true'}
    *
-   * ```kotlin
+   * ```kotlin:ank
    * import arrow.instances.*
    *
    * fun main(args: Array<String>) {

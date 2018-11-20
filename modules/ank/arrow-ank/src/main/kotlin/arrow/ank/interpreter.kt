@@ -25,25 +25,6 @@ val extensionMappings = mapOf(
   "kotlin" to "kts"
 )
 
-@Suppress("UNCHECKED_CAST")
-inline fun <reified F> MonadError<F, Throwable>.ankMonadErrorInterpreter(): FunctionK<ForAnkOps, F> =
-  object : FunctionK<ForAnkOps, F> {
-    override fun <A> invoke(fa: Kind<ForAnkOps, A>): Kind<F, A> {
-      val op = fa.fix()
-      return when (op) {
-        is AnkOps.CreateTarget -> catch { createTargetImpl(op.source, op.target) }
-        is AnkOps.GetFileCandidates -> catch { getFileCandidatesImpl(op.target) }
-        is AnkOps.ReadFile -> catch { readFileImpl(op.source) }
-        is AnkOps.PreProcessMacros -> catch { preProcessMacrosImpl(op.source) }
-        is AnkOps.ParseMarkdown -> catch { parseMarkDownImpl(op.markdown) }
-        is AnkOps.ExtractCode -> catch { extractCodeImpl(op.source, op.tree) }
-        is AnkOps.CompileCode -> catch { compileCodeImpl(op.snippets, op.compilerArgs) }
-        is AnkOps.ReplaceAnkToLang -> catch { replaceAnkToLangImpl(op.compilationResults) }
-        is AnkOps.GenerateFiles -> catch { generateFilesImpl(op.candidates, op.newContents) }
-      } as Kind<F, A>
-    }
-  }
-
 val SupportedMarkdownExtensions: Set<String> = setOf(
   "markdown",
   "mdown",
@@ -176,12 +157,11 @@ private fun generateHierarchyDiagramCode(fqClassName: String): List<String> =
       |```
       |""".trimMargin())
 
-fun compileCodeImpl(snippets: Map<File, ListK<Snippet>>, classpath: ListK<String>): ListK<CompiledMarkdown> {
-  println(colored(ANSI_PURPLE, AnkHeader))
+fun compileCodeImpl(snippets: Map<File, List<Snippet>>, classpath: List<String>): ListK<CompiledMarkdown> {
   val sortedSnippets = snippets.toList()
   val result = sortedSnippets.mapIndexed { n, (file, codeBlocks) ->
     val progress: Int = if (snippets.isNotEmpty()) ((n + 1) * 100 / snippets.size) else 100
-    val classLoader = URLClassLoader(classpath.map { URL(it) }.fix().toTypedArray())
+    val classLoader = URLClassLoader(classpath.map { URL(it) }.toTypedArray())
     val seManager = ScriptEngineManager(classLoader)
     val engineCache: Map<String, ScriptEngine> =
       codeBlocks
@@ -228,10 +208,6 @@ fun compileCodeImpl(snippets: Map<File, ListK<Snippet>>, classpath: ListK<String
         snippet.copy(result = resultString)
       }
     }.k()
-    if (snippets.size < 1000 || progress % 25 == 0) { //report every 25%
-      val message = "[$progress%] [${n + 1} of ${snippets.size}]"
-      println(colored(ANSI_GREEN, message))
-    }
     CompiledMarkdown(file, evaledSnippets)
   }.k()
   return result
@@ -257,10 +233,9 @@ fun replaceAnkToLangImpl(compiledMarkdown: CompiledMarkdown): String =
     )
   }
 
-fun generateFilesImpl(candidates: ListK<File>, newContents: ListK<String>): ListK<File> =
-  ListK(candidates.mapIndexed { n, file ->
-    file.printWriter().use {
-      it.print(newContents[n])
-    }
-    file
-  })
+fun generateFileImpl(file: File, contents: String): File {
+  file.printWriter().use {
+    it.print(contents)
+  }
+  return file
+}
