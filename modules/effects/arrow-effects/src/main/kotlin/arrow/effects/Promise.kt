@@ -26,17 +26,21 @@ interface Promise<F, A> {
    * import arrow.effects.instances.io.async.async
    * import arrow.effects.instances.io.monad.flatMap
    *
-   * val promise = Promise.uncancelable<ForIO, Int>(IO.async())
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val promise = Promise.uncancelable<ForIO, Int>(IO.async())
    *
-   * promise.flatMap { p ->
-   *   p.get
-   * } == IO.never()
-   *
-   * promise.flatMap { p ->
-   *   p.complete(1).flatMap {
+   *   promise.flatMap { p ->
    *     p.get
-   *   }
-   * } == IO.just(1)
+   *   }.unsafeRunTimed(3.seconds) == IO.never().unsafeRunTimed(3.seconds)
+   *
+   *   promise.flatMap { p ->
+   *     p.complete(1).flatMap {
+   *       p.get
+   *     }
+   *   }.unsafeRunSync() == IO.just(1).unsafeRunSync()
+   *   //sampleEnd
+   * }
    * ```
    */
   val get: Kind<F, A>
@@ -53,19 +57,24 @@ interface Promise<F, A> {
    * import arrow.effects.instances.io.async.async
    * import arrow.effects.instances.io.monad.flatMap
    *
-   * val promise = Promise.uncancelable<ForIO, Int>(IO.async())
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val promise = Promise.uncancelable<ForIO, Int>(IO.async())
    *
-   * promise.flatMap { p ->
-   *   p.complete(1).flatMap {
-   *     p.get
-   *   }
-   * } == IO.just(1)
+   *   promise.flatMap { p ->
+   *     p.complete(1).flatMap {
+   *       p.get
+   *     }
+   *   }.unsafeRunSync() == IO.just(1).unsafeRunSync()
    *
-   * promise.flatMap { p ->
-   *   p.complete(1).flatMap {
-   *     p.complete(2)
-   *   }
-   * } == IO.raiseError(Promise.AlreadyFulfilled)
+   *   promise.flatMap { p ->
+   *     p.complete(1).flatMap {
+   *       p.complete(2)
+   *     }
+   *   }.attempt().unsafeRunSync() ==
+   *     IO.raiseError(Promise.AlreadyFulfilled).attempt().unsafeRunSync()
+   *   //sampleEnd
+   * }
    * ```
    */
   fun complete(a: A): Kind<F, Unit>
@@ -82,17 +91,23 @@ interface Promise<F, A> {
    * import arrow.effects.instances.io.async.async
    * import arrow.effects.instances.io.monad.flatMap
    *
-   * val promise = Promise.uncancelable<ForIO, Int>(IO.async())
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val promise = Promise.uncancelable<ForIO, Int>(IO.async())
    *
-   * promise.flatMap { p ->
-   *   p.error(RuntimeException("Boom"))
-   * } == IO.raiseError(RuntimeException("Boom"))
-   *
-   * promise.flatMap { p ->
-   *   p.complete(1).flatMap {
+   *   promise.flatMap { p ->
    *     p.error(RuntimeException("Boom"))
-   *   }
-   * } == IO.raiseError(Promise.AlreadyFulfilled)
+   *   }.attempt().unsafeRunSync() ==
+   *     IO.raiseError(RuntimeException("Boom")).attempt().unsafeRunSync()
+   *
+   *   promise.flatMap { p ->
+   *     p.complete(1).flatMap {
+   *       p.error(RuntimeException("Boom"))
+   *     }
+   *   }.attempt().unsafeRunSync() ==
+   *     IO.raiseError(Promise.AlreadyFulfilled).attempt().unsafeRunSync()
+   *   //sampleEnd
+   * }
    * ```
    */
   fun error(throwable: Throwable): Kind<F, Unit>
@@ -109,7 +124,11 @@ interface Promise<F, A> {
      * import arrow.effects.*
      * import arrow.effects.instances.io.async.async
      *
-     * val promise: IOOf<Promise<ForIO, Int>> = Promise.cancellable(IO.async())
+     * fun main(args: Array<String>) {
+     *   //sampleStart
+     *   val promise: IOOf<Promise<ForIO, Int>> = Promise.cancellable(IO.async())
+     *   //sampleEnd
+     * }
      * ```
      */
     fun <F, A> uncancelable(AS: Async<F>): Kind<F, Promise<F, A>> = AS { unsafeCancellable<F, A>(AS) }
@@ -125,7 +144,11 @@ interface Promise<F, A> {
      * import arrow.effects.*
      * import arrow.effects.instances.io.async.async
      *
-     * val unsafePromise: Promise<ForIO, Int> = Promise.unsafeCancellable(IO.async())
+     * fun main(args: Array<String>) {
+     *   //sampleStart
+     *   val unsafePromise: Promise<ForIO, Int> = Promise.unsafeCancellable(IO.async())
+     *   //sampleEnd
+     * }
      * ```
      */
     fun <F, A> unsafeCancellable(AS: Async<F>): Promise<F, A> = CancellablePromise(AS, AtomicReference(CancellablePromise.State.Pending(emptyList())))
