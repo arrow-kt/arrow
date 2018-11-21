@@ -78,16 +78,4 @@ import arrow.typeclasses.Semigroup
 TypeClass(Semigroup::class).dtMarkdownList()
 ```
 
-### Hierarchy
-
-<canvas id="hierarchy-diagram"></canvas>
-<script>
-  drawNomNomlDiagram('hierarchy-diagram', 'diagram.nomnol')
-</script>
-
-```kotlin:ank:outFile(diagram.nomnol)
-import arrow.reflect.*
-import arrow.typeclasses.Semigroup
-
-TypeClass(Semigroup::class).hierarchyGraph()
-```
+ank_macro_hierarchy(arrow.typeclasses.Semigroup)

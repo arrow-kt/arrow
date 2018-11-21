@@ -3,6 +3,9 @@ package arrow.mtl.typeclasses
 import arrow.Kind
 import arrow.typeclasses.Monad
 
+/**
+ * ank_macro_hierarchy(arrow.mtl.typeclasses.MonadReader)
+ */
 interface MonadReader<F, D> : Monad<F> {
   /** Get the environment */
   fun ask(): Kind<F, D>

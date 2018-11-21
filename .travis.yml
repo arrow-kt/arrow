@@ -7,7 +7,7 @@ jdk:
 
 script:
   - ./gradlew clean build
-  - ./gradlew :arrow-docs:runAnk
+  - ./gradlew dokka :arrow-docs:runAnk
  
 after_success:
   - ./gradlew codeCoverageReport

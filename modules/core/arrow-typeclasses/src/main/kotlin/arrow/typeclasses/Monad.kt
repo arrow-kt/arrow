@@ -7,6 +7,9 @@ import arrow.core.Tuple2
 import arrow.core.identity
 import kotlin.coroutines.startCoroutine
 
+/**
+ * ank_macro_hierarchy(arrow.typeclasses.Monad)
+ */
 interface Monad<F> : Applicative<F> {
 
   fun <A, B> Kind<F, A>.flatMap(f: (A) -> Kind<F, B>): Kind<F, B>

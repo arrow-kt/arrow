@@ -89,16 +89,4 @@ TypeClass(Eq::class).dtMarkdownList()
 
 Additionally all instances of [`Order`]({{ '/docs/typeclasses/order' | relative_url }}), [`Hash`]({{ '/docs/typeclasses/hash' | relative_url }}) and their MTL variants implement the `Eq` typeclass directly since they are all subtypes of `Eq`
 
-### Hierarchy
-
-<canvas id="hierarchy-diagram"></canvas>
-<script>
-  drawNomNomlDiagram('hierarchy-diagram', 'diagram.nomnol')
-</script>
-
-```kotlin:ank:outFile(diagram.nomnol)
-import arrow.reflect.*
-import arrow.typeclasses.Eq
-
-TypeClass(Eq::class).hierarchyGraph()
-```
+ank_macro_hierarchy(arrow.typeclasses.Eq)
