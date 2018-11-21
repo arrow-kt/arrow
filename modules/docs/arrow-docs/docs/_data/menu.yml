@@ -133,7 +133,7 @@ options:
         url: /docs/arrow/data/mapk/
 
       - title: SortedMapK
-        url: /docs/datatypes/sortedmapk/
+        url: /docs/arrow/data/sortedmapk/
 
       - title: Ior
         url: /docs/datatypes/ior/
