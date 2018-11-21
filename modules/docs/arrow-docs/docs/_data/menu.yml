@@ -115,7 +115,7 @@ options:
         url: /docs/arrow/core/try/
 
       - title: Validated
-        url: /docs/datatypes/validated/
+        url: /docs/arrow/data/validated/
 
       - title: NonEmptyList
         url: /docs/datatypes/nonemptylist/

@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: Validated
-permalink: /docs/datatypes/validated/
+permalink: /docs/arrow/data/validated/
+redirect_from:
+  - /docs/datatypes/validated
 video: ONwoUsHBJHg
 ---
 
