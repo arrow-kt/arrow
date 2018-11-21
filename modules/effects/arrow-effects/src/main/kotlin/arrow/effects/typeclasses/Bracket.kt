@@ -18,6 +18,8 @@ fun <E> Either<E, *>.toExitCase() =
   fold(::Error) { ExitCase.Completed }
 
 /**
+ * ank_macro_hierarchy(arrow.effects.typeclasses.Bracket)
+ *
  * Extension of MonadError exposing the [bracket] operation, a generalized abstracted pattern of safe resource
  * acquisition and release in the face of errors or interruption.
  *
@@ -34,6 +36,41 @@ interface Bracket<F, E> : MonadError<F, E> {
    *
    * @param release is the action supposed to release the allocated resource after `use` is done, by observing and
    * acting on its exit condition.
+   *
+   * {: data-executable='true'}
+   *
+   * ```kotlin:ank
+   * import arrow.effects.IO
+   * import arrow.effects.typeclasses.ExitCase
+   *
+   * class File(url: String) {
+   *   fun open(): File = this
+   *   fun close(): Unit {}
+   *   override fun toString(): String = "This file contains some interesting content!"
+   * }
+   *
+   * fun openFile(uri: String): IO<File> = IO { File(uri).open() }
+   * fun closeFile(file: File): IO<Unit> = IO { file.close() }
+   * fun fileToString(file: File): IO<String> = IO { file.toString() }
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val safeComputation = openFile("data.json").bracketCase(
+   *     release = { file, exitCase ->
+   *       when (exitCase) {
+   *         is ExitCase.Completed -> { /* do something */ }
+   *         is ExitCase.Cancelled -> { /* do something */ }
+   *         is ExitCase.Error -> { /* do something */ }
+   *       }
+   *       closeFile(file)
+   *    },
+   *    use = { file -> fileToString(file) }
+   *  )
+   *  //sampleEnd
+   *  println(safeComputation)
+   *  }
+   *  ```
+   *
    */
   fun <A, B> Kind<F, A>.bracketCase(release: (A, ExitCase<E>) -> Kind<F, Unit>, use: (A) -> Kind<F, B>): Kind<F, B>
 
@@ -44,6 +81,33 @@ interface Bracket<F, E> : MonadError<F, E> {
    *
    * @param release is the action that's supposed to release the allocated resource after `use` is done, irregardless
    * of its exit condition.
+   *
+   * {: data-executable='true'}
+   *
+   * ```kotlin:ank
+   * import arrow.effects.IO
+   *
+   * class File(url: String) {
+   *   fun open(): File = this
+   *   fun close(): Unit {}
+   *   override fun toString(): String = "This file contains some interesting content!"
+   * }
+   *
+   * fun openFile(uri: String): IO<File> = IO { File(uri).open() }
+   * fun closeFile(file: File): IO<Unit> = IO { file.close() }
+   * fun fileToString(file: File): IO<String> = IO { file.toString() }
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val safeComputation = openFile("data.json").bracket(
+   *     release = { file -> closeFile(file) },
+   *     use = { file -> fileToString(file) }
+   *   )
+   *   //sampleEnd
+   *   println(safeComputation)
+   * }
+   * ```
+   *
    */
   fun <A, B> Kind<F, A>.bracket(release: (A) -> Kind<F, Unit>, use: (A) -> Kind<F, B>): Kind<F, B> =
     bracketCase({ a, _ -> release(a) }, use)
@@ -77,6 +141,7 @@ interface Bracket<F, E> : MonadError<F, E> {
    * @see [guarantee] for the simpler version
    *
    * @see [bracketCase] for the more general operation
+   *
    */
   fun <A> Kind<F, A>.guaranteeCase(finalizer: (ExitCase<E>) -> Kind<F, Unit>): Kind<F, A> =
     bracketCase({ _, e -> finalizer(e) }, { this })

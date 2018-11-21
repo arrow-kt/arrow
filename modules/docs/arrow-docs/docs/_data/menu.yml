@@ -15,6 +15,61 @@ options:
       - title: Projects & Examples
         url: /docs/quickstart/projects/
 
+  - title: API Docs
+
+    nested_options:
+
+      - title: Type Classes
+        url: /docs/apidocs/arrow-typeclasses/
+
+      - title: Core Data Types
+        url: /docs/apidocs/arrow-core/
+
+      - title: Core Extensions
+        url: /docs/apidocs/arrow-instances-core/
+
+      - title: Effects
+        url: /docs/apidocs/arrow-effects/
+
+      - title: Effects Extensions
+        url: /docs/apidocs/arrow-effects/
+
+      - title: Effects Coroutines
+        url: /docs/apidocs/arrow-effects-kotlinx-coroutines/
+
+      - title: Effects Coroutines Extensions
+        url: /docs/apidocs/arrow-effects-kotlinx-coroutines-instances/
+
+      - title: Effects Rx2
+        url: /docs/apidocs/arrow-effects-rx2/
+
+      - title: Effects Rx2 Extensions
+        url: /docs/apidocs/arrow-effects-rx2-instances/
+
+      - title: Effects Reactor
+        url: /docs/apidocs/arrow-effects-reactor/
+
+      - title: Effects Reactor Extensions
+        url: /docs/apidocs/arrow-effects-reactor-instances/
+
+      - title: Streams
+        url: /docs/apidocs/arrow-streams/
+
+      - title: MTL
+        url: /docs/apidocs/arrow-mtl/
+
+      - title: Optics
+        url: /docs/apidocs/arrow-optics/
+
+      - title: Recursion
+        url: /docs/apidocs/arrow-recursion/
+
+      - title: Generic
+        url: /docs/apidocs/arrow-generic/
+
+      - title: Free
+        url: /docs/apidocs/arrow-free/
+
   - title: Patterns
 
     nested_options:

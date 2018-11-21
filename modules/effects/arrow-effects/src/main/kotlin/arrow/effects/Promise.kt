@@ -23,6 +23,7 @@ interface Promise<F, A> {
    *
    * ```kotlin:ank
    * import arrow.effects.*
+   * import arrow.effects.typeclasses.*
    * import arrow.effects.instances.io.async.async
    * import arrow.effects.instances.io.monad.flatMap
    *
@@ -32,7 +33,7 @@ interface Promise<F, A> {
    *
    *   promise.flatMap { p ->
    *     p.get
-   *   }.unsafeRunTimed(3.seconds) == IO.never().unsafeRunTimed(3.seconds)
+   *   }.unsafeRunTimed(3.seconds) == IO.never.unsafeRunTimed(3.seconds)
    *
    *   promise.flatMap { p ->
    *     p.complete(1).flatMap {
@@ -72,7 +73,7 @@ interface Promise<F, A> {
    *       p.complete(2)
    *     }
    *   }.attempt().unsafeRunSync() ==
-   *     IO.raiseError(Promise.AlreadyFulfilled).attempt().unsafeRunSync()
+   *     IO.raiseError<Int>(Promise.AlreadyFulfilled).attempt().unsafeRunSync()
    *   //sampleEnd
    * }
    * ```
@@ -98,14 +99,14 @@ interface Promise<F, A> {
    *   promise.flatMap { p ->
    *     p.error(RuntimeException("Boom"))
    *   }.attempt().unsafeRunSync() ==
-   *     IO.raiseError(RuntimeException("Boom")).attempt().unsafeRunSync()
+   *     IO.raiseError<Int>(RuntimeException("Boom")).attempt().unsafeRunSync()
    *
    *   promise.flatMap { p ->
    *     p.complete(1).flatMap {
    *       p.error(RuntimeException("Boom"))
    *     }
    *   }.attempt().unsafeRunSync() ==
-   *     IO.raiseError(Promise.AlreadyFulfilled).attempt().unsafeRunSync()
+   *     IO.raiseError<Int>(Promise.AlreadyFulfilled).attempt().unsafeRunSync()
    *   //sampleEnd
    * }
    * ```
@@ -126,7 +127,7 @@ interface Promise<F, A> {
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
-     *   val promise: IOOf<Promise<ForIO, Int>> = Promise.cancellable(IO.async())
+     *   val promise: IOOf<Promise<ForIO, Int>> = Promise.uncancelable(IO.async())
      *   //sampleEnd
      * }
      * ```

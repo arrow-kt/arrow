@@ -3,6 +3,8 @@ package arrow.optics.typeclasses
 import arrow.optics.*
 
 /**
+ * ank_macro_hierarchy(arrow.optics.typeclasses.Index)
+ *
  * [Index] provides an [Optional] for a structure [S] to focus in an optional [A] at a given index [I].
  *
  * @param S source of [Optional]
