@@ -45,7 +45,7 @@ object MonadDeferLaws {
       Law("Sync laws: propagate error through bind") { SC.propagateErrorsThroughBind(EQERR) },
       Law("Sync laws: defer suspens evaluation") { SC.deferSuspendsEvaluation(EQ) },
       Law("Sync laws: delay suspends evaluation") { SC.delaySuspendsEvaluation(EQ) },
-      Law("Sync laws: bind suspends evaluation") { SC.bindSuspendsEvaluation(EQ) },
+      Law("Sync laws: flatMap suspends evaluation") { SC.flatMapSuspendsEvaluation(EQ) },
       Law("Sync laws: map suspends evaluation") { SC.mapSuspendsEvaluation(EQ) }
     )
 
@@ -105,7 +105,7 @@ object MonadDeferLaws {
     df.equalUnderTheLaw(just(1), EQ) shouldBe true
   }
 
-  fun <F> MonadDefer<F>.bindSuspendsEvaluation(EQ: Eq<Kind<F, Int>>): Unit {
+  fun <F> MonadDefer<F>.flatMapSuspendsEvaluation(EQ: Eq<Kind<F, Int>>): Unit {
     val sideEffect = SideEffect(counter = 0)
     val df = just(0).flatMap { sideEffect.increment(); just(sideEffect.counter) }
 
