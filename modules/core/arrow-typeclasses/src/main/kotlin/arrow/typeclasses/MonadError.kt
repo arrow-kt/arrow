@@ -3,6 +3,9 @@ package arrow.typeclasses
 import arrow.Kind
 import kotlin.coroutines.startCoroutine
 
+/**
+ * ank_macro_hierarchy(arrow.typeclasses.MonadError)
+ */
 interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F> {
 
   fun <A> Kind<F, A>.ensure(error: () -> E, predicate: (A) -> Boolean): Kind<F, A> =

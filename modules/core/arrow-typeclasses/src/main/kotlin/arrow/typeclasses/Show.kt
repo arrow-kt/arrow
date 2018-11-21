@@ -1,6 +1,8 @@
 package arrow.typeclasses
 
 /**
+ * ank_macro_hierarchy(arrow.typeclasses.Show)
+ *
  * A type class used to get a textual representation for an instance of type [A] in a type safe way.
  *
  */

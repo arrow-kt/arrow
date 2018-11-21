@@ -362,19 +362,7 @@ import arrow.effects.typeclasses.Bracket
 TypeClass(Bracket::class).dtMarkdownList()
 ```
 
-### Hierarchy
-
-<canvas id="hierarchy-diagram"></canvas>
-<script>
-  drawNomNomlDiagram('hierarchy-diagram', 'diagram.nomnol')
-</script>
-
-```kotlin:ank:outFile(diagram.nomnol)
-import arrow.reflect.*
-import arrow.effects.typeclasses.Bracket
-
-TypeClass(Bracket::class).hierarchyGraph()
-```
+ank_macro_hierarchy(arrow.effects.typeclasses.Bracket)
 
 [bracket_source]: https://github.com/arrow-kt/arrow/blob/master/modules/effects/arrow-effects/src/main/kotlin/arrow/effects/typeclasses/Bracket.kt
 [bracket_laws_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-test/src/main/kotlin/arrow/test/laws/BracketLaws.kt

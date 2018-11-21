@@ -27,7 +27,7 @@ interface Hash<in F> : Eq<F> {
    *   //sampleEnd
    *   println(result)
    * }
-   *  ```
+   * ```
    */
   fun F.hash(): Int
 

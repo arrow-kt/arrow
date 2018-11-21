@@ -7,6 +7,8 @@ import arrow.core.value
 import arrow.typeclasses.internal.IdBimonad
 
 /**
+ * ank_macro_hierarchy(arrow.typeclasses.Traverse)
+ *
  * Traverse, also known as Traversable. Traversal over a structure with an effect.
  */
 interface Traverse<F> : Functor<F>, Foldable<F> {

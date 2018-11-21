@@ -12,6 +12,8 @@ import arrow.optics.Setter
 import arrow.optics.Traversal
 
 /**
+ * ank_macro_hierarchy(arrow.optics.typeclasses.At)
+ *
  * [At] provides a [Lens] for a structure [S] to focus in [A] at a given index [I].
  *
  * @param S source of [Lens]

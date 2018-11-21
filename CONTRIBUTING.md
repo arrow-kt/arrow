@@ -26,7 +26,7 @@ results in
 To build the documentation, in the root of the project, run 
 
 ```
-$ ./gradlew clean :arrow-docs:runAnk
+$ ./gradlew clean dokka :arrow-docs:runAnk
 ```
 
 The artifact will reside in `modules/docs/arrow-docs/build/site`. The artifact ΛNK produces could be served as a website by [jekyll](https://jekyllrb.com/), a static site generator.
