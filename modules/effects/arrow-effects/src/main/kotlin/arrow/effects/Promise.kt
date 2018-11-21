@@ -23,6 +23,7 @@ interface Promise<F, A> {
    *
    * ```kotlin:ank
    * import arrow.effects.*
+   * import arrow.effects.typeclasses.*
    * import arrow.effects.instances.io.async.async
    * import arrow.effects.instances.io.monad.flatMap
    *
@@ -32,7 +33,7 @@ interface Promise<F, A> {
    *
    *   promise.flatMap { p ->
    *     p.get
-   *   }.unsafeRunTimed(3.seconds) == IO.never().unsafeRunTimed(3.seconds)
+   *   }.unsafeRunTimed(3.seconds) == IO.never.unsafeRunTimed(3.seconds)
    *
    *   promise.flatMap { p ->
    *     p.complete(1).flatMap {
