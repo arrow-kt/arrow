@@ -134,14 +134,13 @@ object MonadDeferLaws {
     val sideEffect = SideEffect()
     val df = delay { sideEffect.increment(); sideEffect.counter }
 
-    df.flatMap { df }.flatMap { df }.equalUnderTheLaw(just(3), EQ)
+    df.flatMap { df }.flatMap { df }.equalUnderTheLaw(just(3), EQ) shouldBe true
   }
 
   fun <F> MonadDefer<F>.stackSafetyOverRepeatedLeftBinds(iterations: Int = 5000, EQ: Eq<Kind<F, Int>>): Unit {
     (0..iterations).toList().k().foldLeft(just(0)) { def, x ->
       def.flatMap { just(x) }
-    }
-      .equalUnderTheLaw(just(iterations), EQ) shouldBe true
+    }.equalUnderTheLaw(just(iterations), EQ) shouldBe true
   }
 
   fun <F> MonadDefer<F>.stackSafetyOverRepeatedRightBinds(iterations: Int = 5000, EQ: Eq<Kind<F, Int>>): Unit {
