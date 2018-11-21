@@ -91,7 +91,7 @@ These types wrap over some of Kotlin's collections and functions to give them ca
 
 - [`ListK`]({{ '/docs/arrow/data/listk/' | relative_url }})
 
-- [`SequenceK`]({{ '/docs/datatypes/sequencek/' | relative_url }})
+- [`SequenceK`]({{ '/docs/arrow/data/sequencek/' | relative_url }})
 
 - [`SetK`]({{ '/docs/datatypes/setk/' | relative_url }})
 
