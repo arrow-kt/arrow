@@ -46,7 +46,8 @@ object MonadDeferLaws {
       Law("Sync laws: defer suspens evaluation") { SC.deferSuspendsEvaluation(EQ) },
       Law("Sync laws: delay suspends evaluation") { SC.delaySuspendsEvaluation(EQ) },
       Law("Sync laws: flatMap suspends evaluation") { SC.flatMapSuspendsEvaluation(EQ) },
-      Law("Sync laws: map suspends evaluation") { SC.mapSuspendsEvaluation(EQ) }
+      Law("Sync laws: map suspends evaluation") { SC.mapSuspendsEvaluation(EQ) },
+      Law("Sync laws: Repeated evaluation not memoized") { SC.repeatedSyncEvaluationNotMemoized(EQ) }
     )
 
   fun <F> MonadDefer<F>.delayConstantEqualsPure(EQ: Eq<Kind<F, Int>>): Unit {
@@ -123,6 +124,13 @@ object MonadDeferLaws {
 
     sideEffect.counter shouldBe 0
     df.equalUnderTheLaw(just(1), EQ) shouldBe true
+  }
+
+  fun <F> MonadDefer<F>.repeatedSyncEvaluationNotMemoized(EQ: Eq<Kind<F, Int>>): Unit {
+    val sideEffect = SideEffect()
+    val df = delay { sideEffect.increment(); sideEffect.counter }
+
+    df.flatMap { df }.flatMap { df }.equalUnderTheLaw(just(3), EQ)
   }
 
   fun <F> MonadDefer<F>.asyncBind(EQ: Eq<Kind<F, Int>>): Unit =
