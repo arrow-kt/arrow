@@ -64,16 +64,4 @@ import arrow.typeclasses.Show
 TypeClass(Show::class).dtMarkdownList()
 ```
 
-### Hierarchy
-
-<canvas id="hierarchy-diagram"></canvas>
-<script>
-  drawNomNomlDiagram('hierarchy-diagram', 'diagram.nomnol')
-</script>
-
-```kotlin:ank:outFile(diagram.nomnol)
-import arrow.reflect.*
-import arrow.typeclasses.Show
-
-TypeClass(Show::class).hierarchyGraph()
-```
+ank_macro_hierarchy(arrow.typeclasses.Show)

@@ -226,16 +226,4 @@ import arrow.typeclasses.ApplicativeError
 TypeClass(ApplicativeError::class).dtMarkdownList()
 ```
 
-### Hierarchy
-
-<canvas id="hierarchy-diagram"></canvas>
-<script>
-  drawNomNomlDiagram('hierarchy-diagram', 'diagram.nomnol')
-</script>
-
-```kotlin:ank:outFile(diagram.nomnol)
-import arrow.reflect.*
-import arrow.typeclasses.ApplicativeError
-
-TypeClass(ApplicativeError::class).hierarchyGraph()
-```
+ank_macro_hierarchy(arrow.typeclasses.ApplicativeError)

@@ -8,7 +8,11 @@ import kotlin.coroutines.CoroutineContext
 /** An asynchronous computation that might fail. **/
 typealias Proc<A> = ((Either<Throwable, A>) -> Unit) -> Unit
 
-/** The context required to run an asynchronous computation that may fail. **/
+/**
+ * ank_macro_hierarchy(arrow.effects.typeclasses.Async)
+ *
+ * The context required to run an asynchronous computation that may fail.
+ **/
 interface Async<F> : MonadDefer<F> {
   fun <A> async(fa: Proc<A>): Kind<F, A>
 

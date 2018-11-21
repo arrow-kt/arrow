@@ -11,6 +11,8 @@ import arrow.optics.Traversal
 import arrow.typeclasses.Traverse
 
 /**
+ * ank_macro_hierarchy(arrow.optics.typeclasses.Each)
+ *
  * [Each] provides a [Traversal] that can focus into a structure [S] to see all its foci [A]
  *
  * @param S source of the [Traversal]

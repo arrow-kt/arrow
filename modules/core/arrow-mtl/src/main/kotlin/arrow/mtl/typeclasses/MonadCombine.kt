@@ -9,7 +9,7 @@ import arrow.typeclasses.Bifoldable
 import arrow.typeclasses.Foldable
 
 /**
- * The combination of a Monad with a MonoidK
+ * ank_macro_hierarchy(arrow.mtl.typeclasses.MonadCombine)
  */
 interface MonadCombine<F> : MonadFilter<F>, Alternative<F> {
 

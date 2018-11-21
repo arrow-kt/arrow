@@ -5,6 +5,8 @@ import arrow.Kind2
 import arrow.core.identity
 
 /**
+ * ank_macro_hierarchy(arrow.typeclasses.Bifunctor)
+ *
  * [Bifunctor] has the same properties of [Functor], but acting onto two types, instead of one.
  *
  * It can be used to map both of its inside types.
@@ -13,17 +15,17 @@ interface Bifunctor<F> {
   /**
    * Maps both types of Kind2.
    *
-   * ```kotlin:ank
    * {: data-executable='true'}
    *
+   * ```kotlin:ank
    * import arrow.core.Tuple2
    *
-   * fun main() {
+   * fun main(args: Array<String>) {
    *   //sampleStart
    *   val tuple = Tuple2(2, 2).bimap({ num -> num * 2 }, { num -> num + 5})
+   *   //sampleEnd
    *   println("First value: ${tuple.a}")
    *   println("Second value: ${tuple.b}")
-   *   //sampleEnd
    * }
    * ```
    */
@@ -31,21 +33,22 @@ interface Bifunctor<F> {
 
   /**
    * Lifts two functions to the Bifunctor type.
-   * ```kotlin:ank
+   *
    * {: data-executable='true'}
    *
-   * import arrow.core.Tuple2
-   * import arrow.instances.tuple2.bifunctor.bifunctor
+   * ```kotlin:ank
+   * import arrow.core.*
+   * import arrow.instances.tuple2.bifunctor.lift
    *
    * val sumFive : (Int) -> Int = { it + 5 }
    * val sumTwo : (Int) -> Int = { it + 2 }
    *
-   * fun main() {
+   * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val tuple : Tuple2<Int, Int> = Tuple2.bifunctor().lift(sumFive, sumTwo).invoke(Tuple2(2, 2))
+   *   val tuple : Tuple2<Int, Int> = lift(sumFive, sumTwo)(Tuple2(2, 2)).fix()
+   *   //sampleEnd
    *   println("First value: ${tuple.a}")
    *   println("Second value: ${tuple.b}")
-   *   //sampleEnd
    * }
    *
    * ```
@@ -58,17 +61,18 @@ interface Bifunctor<F> {
   /**
    * Map the left side type of Kind2
    *
-   * ```kotlin:ank
    * {: data-executable='true'}
    *
+   * ```kotlin:ank
    * import arrow.core.Tuple2
+   * import arrow.instances.tuple2.bifunctor.mapLeft
    *
-   * fun main() {
+   * fun main(args: Array<String>) {
    *   //sampleStart
    *   val tuple = Tuple2(2, 2).mapLeft { num -> num * 2 }
+   *   //sampleEnd
    *   println("First value: ${tuple.a}")
    *   println("Second value: ${tuple.b}")
-   *   //sampleEnd
    * }
    * ```
    *
