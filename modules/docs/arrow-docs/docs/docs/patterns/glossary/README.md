@@ -231,7 +231,7 @@ fun <L> ForEither(): EitherContextPartiallyApplied<L> =
 > NOTE: This approach to type constructors will be simplified if [KEEP-87](https://github.com/Kotlin/KEEP/pull/87) is approved. Go vote!
 
 A type constructor is any class or interface that has at least one generic parameter. For example,
-[`ListK<A>`]({{ '/docs/datatypes/listk' | relative_url }}) or [`Option<A>`]({{ '/docs/arrow/core/option' | relative_url }}).
+[`ListK<A>`]({{ '/docs/arrow/data/listk' | relative_url }}) or [`Option<A>`]({{ '/docs/arrow/core/option' | relative_url }}).
 They're called constructors because they're similar to a factory function where the parameter is `A`, except type constructors work only for types.
 So, we could say that after applying the parameter `Int` to the type constructor `ListK<A>` it returns a `ListK<Int>`.
 As `ListK<Int>` isn't parametrized in any generic value it is not considered a type constructor anymore, just a regular type.

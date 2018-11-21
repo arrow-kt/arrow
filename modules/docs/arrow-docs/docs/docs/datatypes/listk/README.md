@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: ListK
-permalink: /docs/datatypes/listk/
+permalink: /docs/arrow/data/listk/
+redirect_from:
+  - /docs/datatypes/listk
 ---
 
 ## ListK

@@ -121,7 +121,7 @@ options:
         url: /docs/arrow/data/nonemptylist/
 
       - title: ListK
-        url: /docs/datatypes/listk/
+        url: /docs/arrow/data/listk/
 
       - title: SequenceK
         url: /docs/datatypes/sequencek/
