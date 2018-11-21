@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: SetK
-permalink: /docs/datatypes/setk/
+permalink: /docs/arrow/data/setk/
+redirect_from:
+  - /docs/datatypes/setk
 video: xtnyCqeLI_4
 ---
 

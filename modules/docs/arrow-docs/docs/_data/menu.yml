@@ -127,7 +127,7 @@ options:
         url: /docs/arrow/data/sequencek/
 
       - title: SetK
-        url: /docs/datatypes/setk/
+        url: /docs/arrow/data/setk/
 
       - title: MapK
         url: /docs/datatypes/mapk/
