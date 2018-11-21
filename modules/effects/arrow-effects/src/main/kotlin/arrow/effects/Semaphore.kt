@@ -254,8 +254,9 @@ internal class AsyncSemaphore<F>(private val state: Ref<F, State<F>>,
           Tuple2(u, u)
         }.flatMap { u ->
           u.fold({ waiting ->
-            val entry = waiting.lastOrNone().getOrElse { throw RuntimeException("Semaphore has empty waiting queue rather than 0 count") }
-            entry.b.get
+            waiting.lastOrNone()
+              .map { (_, promise) -> promise.get }
+              .getOrElse { raiseError(RuntimeException("Semaphore has empty waiting queue rather than 0 count")) }
           }, {
             just(Unit)
           })
