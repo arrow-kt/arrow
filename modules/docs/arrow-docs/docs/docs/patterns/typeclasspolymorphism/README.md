@@ -611,7 +611,7 @@ object test {
 }
 ```
 
-This one wraps the result into [`Try`]({{ '/docs/datatypes/try' | relative_url }}) (which can be `Success` or `Failure`).
+This one wraps the result into [`Try`]({{ '/docs/arrow/core/try' | relative_url }}) (which can be `Success` or `Failure`).
 
 ```
 Success(value=[Task(value=LocalTask assigned to user1)])

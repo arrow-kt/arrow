@@ -71,7 +71,7 @@ Data contains the bulk of the datatypes provided by Arrow. We can separate them 
 
 ##### Error handling
 
-- [`Try`]({{ '/docs/datatypes/try/' | relative_url }}) - returns the result of executing a block of code that can fail and throw exceptions
+- [`Try`]({{ '/docs/arrow/core/try/' | relative_url }}) - returns the result of executing a block of code that can fail and throw exceptions
 
 - [`Validated`]({{ '/docs/datatypes/validated/' | relative_url }}) - returns the result of aggregating multiple calculations that can fail, and it also aggregates the errors
 

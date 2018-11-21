@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: Try
-permalink: /docs/datatypes/try/
+permalink: /docs/arrow/core/try/
+redirect_from:
+  - /docs/datatypes/try
 video: XavztYVMUqI
 ---
 

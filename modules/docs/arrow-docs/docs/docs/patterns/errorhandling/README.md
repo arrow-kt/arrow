@@ -163,7 +163,7 @@ In the next example we are going to use `Try` to deal with potentially thrown ex
 
 ### Try
 
-We use [`Try`]({{ '/docs/datatypes/try' | relative_url }}) when we want to be defensive about a computation that may fail with a runtime exception
+We use [`Try`]({{ '/docs/arrow/core/try' | relative_url }}) when we want to be defensive about a computation that may fail with a runtime exception
 
 How would our example look like implemented with `Try`?
 

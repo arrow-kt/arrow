@@ -112,7 +112,7 @@ options:
         url: /docs/arrow/core/either/
 
       - title: Try
-        url: /docs/datatypes/try/
+        url: /docs/arrow/core/try/
 
       - title: Validated
         url: /docs/datatypes/validated/
