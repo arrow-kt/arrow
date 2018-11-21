@@ -61,7 +61,7 @@ Data contains the bulk of the datatypes provided by Arrow. We can separate them 
 
 ##### General use
 
-- [`NonEmptyList`]({{ '/docs/datatypes/nonemptylist/' | relative_url }}) - a homogeneous list that has at least 1 value
+- [`NonEmptyList`]({{ '/docs/arrow/data/nonemptylist/' | relative_url }}) - a homogeneous list that has at least 1 value
 
 - [`Ior`]({{ '/docs/datatypes/ior/' | relative_url }}) - a branch in execution for three possible paths: one, two, or both
 

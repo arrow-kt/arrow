@@ -118,7 +118,7 @@ options:
         url: /docs/arrow/data/validated/
 
       - title: NonEmptyList
-        url: /docs/datatypes/nonemptylist/
+        url: /docs/arrow/data/nonemptylist/
 
       - title: ListK
         url: /docs/datatypes/listk/
