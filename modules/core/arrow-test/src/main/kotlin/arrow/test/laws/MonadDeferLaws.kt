@@ -45,11 +45,7 @@ object MonadDeferLaws {
       Law("Sync laws: propagate error through bind") { SC.propagateErrorsThroughBind(EQERR) },
       Law("Sync laws: delay suspends evaluation") { SC.delaySuspendsEvaluation(EQ) },
       Law("Sync laws: bind suspends evaluation") { SC.bindSuspendsEvaluation(EQ) },
-      Law("Sync laws: map suspends evaluation") { SC.mapSuspendsEvaluation(EQ) },
-      Law("Sync laws: stack safety over repeated left binds") { SC.stackSafetyOverRepeatedLeftBinds(5000, EQ) },
-      Law("Sync laws: stack safety over repeated right binds") { SC.stackSafetyOverRepeatedRightBinds(5000, EQ) },
-      Law("Sync laws: stack safety over repeated attempts") { SC.stackSafetyOverRepeatedAttempts(5000, EQ) },
-      Law("Sync laws: stack safety over repeated maps") { SC.stackSafetyOnRepeatedMaps(5000, EQ) }
+      Law("Sync laws: map suspends evaluation") { SC.mapSuspendsEvaluation(EQ) }
     )
 
   fun <F> MonadDefer<F>.delayConstantEqualsPure(EQ: Eq<Kind<F, Int>>): Unit {
@@ -110,30 +106,6 @@ object MonadDeferLaws {
 
     sideEffect.counter shouldBe 0
     df.equalUnderTheLaw(just(1), EQ) shouldBe true
-  }
-
-  fun <F> MonadDefer<F>.stackSafetyOverRepeatedLeftBinds(iterations: Int = 5000, EQ: Eq<Kind<F, Int>>): Unit {
-    (0..iterations).toList().k().foldLeft(just(0)) { def, x ->
-      def.flatMap { just(x); }
-    }.equalUnderTheLaw(just(iterations), EQ) shouldBe true
-  }
-
-  fun <F> MonadDefer<F>.stackSafetyOverRepeatedRightBinds(iterations: Int = 5000, EQ: Eq<Kind<F, Int>>): Unit {
-    (0..iterations).toList().foldRight(just(iterations)) { x, def ->
-      lazy().flatMap { def }
-    }.equalUnderTheLaw(just(iterations), EQ) shouldBe true
-  }
-
-  fun <F> MonadDefer<F>.stackSafetyOverRepeatedAttempts(iterations: Int = 5000, EQ: Eq<Kind<F, Int>>): Unit {
-    (0..iterations).toList().foldLeft(just(0)) { def, x ->
-      def.attempt().map { x }
-    }.equalUnderTheLaw(just(iterations), EQ) shouldBe true
-  }
-
-  fun <F> MonadDefer<F>.stackSafetyOnRepeatedMaps(iterations: Int = 5000, EQ: Eq<Kind<F, Int>>): Unit {
-    (0..iterations).toList().foldLeft(just(0)) { def, x ->
-      def.map { x }
-    }.equalUnderTheLaw(just(iterations), EQ) shouldBe true
   }
 
   fun <F> MonadDefer<F>.asyncBind(EQ: Eq<Kind<F, Int>>): Unit =
