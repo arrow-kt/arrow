@@ -84,6 +84,7 @@ subprojects { project ->
         toolVersion '0.8.2'
     }
 
+    //dokka log spam `Can't find node by signature` comes from https://github.com/Kotlin/dokka/issues/269
     dokka {
         outputFormat = 'jekyll'
         outputDirectory = project.rootDir.absolutePath +
