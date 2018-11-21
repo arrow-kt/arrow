@@ -6,37 +6,215 @@ import arrow.effects.typeclasses.Async
 import arrow.typeclasses.ApplicativeError
 
 /**
- * A counting [Semaphore]
+ * A counting [Semaphore] is used to control access to a resource in a concurrent system.
+ * It keeps track of the count of available resources.
  */
 interface Semaphore<F> {
 
+  /**
+   * Get a snapshot of the currently available permits, always non negative/
+   *
+   * {: data-executable='true'}
+   *
+   * ```kotlin:ank
+   * import arrow.effects.*
+   * import arrow.effects.instances.io.async.async
+   * import arrow.effects.instances.io.monad.flatMap
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val semaphore = Semaphore.uncancelable<ForIO>(5, IO.async())
+   *
+   *   val result = semaphore.flatMap { s ->
+   *     s.available
+   *   }
+   *   //sampleEnd
+   *   println(result)
+   * }
+   **/
   val available: Kind<F, Long>
 
+  /**
+   * Get a snapshot of the current count, may be negative.
+   * The count is current available permits minus the outstanding acquires.
+   *
+   * {: data-executable='true'}
+   *
+   * ```kotlin:ank
+   * import arrow.effects.*
+   * import arrow.effects.instances.io.async.async
+   * import arrow.effects.instances.io.monad.flatMap
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val semaphore = Semaphore.uncancelable<ForIO>(5, IO.async())
+   *
+   *   val result = semaphore.flatMap { s ->
+   *     s.count
+   *   }
+   *   //sampleEnd
+   *   println(result)
+   * }
+   **/
   val count: Kind<F, Long>
 
+  /**
+   * Acquires [n] resources
+   * Suspending the fiber running the action until the resources are available.
+   *
+   * {: data-executable='true'}
+   *
+   * ```kotlin:ank
+   * import arrow.effects.*
+   * import arrow.effects.instances.io.async.async
+   * import arrow.effects.instances.io.monad.flatMap
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val semaphore = Semaphore.uncancelable<ForIO>(5, IO.async())
+   *
+   *   semaphore.flatMap { s ->
+   *     s.acquireN(6)
+   *   }.unsafeRunTimed(3.seconds) == IO.never().unsafeRunTimed(3.seconds)
+   *
+   *   semaphore.flatMap { s ->
+   *     s.acquireN(5).flatMap. {
+   *       s.available
+   *     }
+   *   }.unsafeRunSync() == 0
+   *   //sampleEnd
+   * }
+   * ```
+   */
   fun acquireN(n: Long): Kind<F, Unit>
 
+  /**
+   * Acquire a resource
+   * Suspending the fiber running the action until the resource is available.
+   *
+   * @see acquireN
+   */
   val acquire: Kind<F, Unit>
     get() = acquireN(1)
 
+  /**
+   * Try to acquires [n] resources and get an immediate response as [Boolean].
+   *
+   * {: data-executable='true'}
+   *
+   * ```kotlin:ank
+   * import arrow.effects.*
+   * import arrow.effects.instances.io.async.async
+   * import arrow.effects.instances.io.monad.flatMap
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val semaphore = Semaphore.uncancelable<ForIO>(5, IO.async())
+   *
+   *   semaphore.flatMap { s ->
+   *     s.tryAcquireN(6)
+   *   }.unsafeRunSync() == false
+   *
+   *   semaphore.flatMap { s ->
+   *     s.tryAcquireN(5)
+   *   }.unsafeRunSync() == true
+   *   //sampleEnd
+   * }
+   * ```
+   */
   fun tryAcquireN(n: Long): Kind<F, Boolean>
 
+  /**
+   * Try to acquire a resource  and get an immediate response as [Boolean].
+   *
+   * @see tryAcquireN
+   */
   val tryAcquire: Kind<F, Boolean>
     get() = tryAcquireN(1)
 
+  /**
+   * Release [n] resources
+   *
+   * {: data-executable='true'}
+   *
+   * ```kotlin:ank
+   * import arrow.effects.*
+   * import arrow.effects.instances.io.async.async
+   * import arrow.effects.instances.io.monad.flatMap
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val semaphore = Semaphore.uncancelable<ForIO>(5, IO.async())
+   *
+   *   semaphore.flatMap { s ->
+   *     s.acquireN(5).flatMap {
+   *       s.releaseN(3).flatMap {
+   *         s.available
+   *       }
+   *     }
+   *   }.unsafeRunSync() == 3L
+   *   //sampleEnd
+   * }
+   * ```
+   */
   fun releaseN(n: Long): Kind<F, Unit>
 
+  /**
+   * Release a resources
+   *
+   * @see releaseN
+   */
   val release: Kind<F, Unit>
     get() = releaseN(1)
 
+  /**
+   * Runs the supplied effect that acquires a permit, and then releases the permit.
+   *
+   * {: data-executable='true'}
+   *
+   * ```kotlin:ank
+   * import arrow.effects.*
+   * import arrow.effects.instances.io.async.async
+   * import arrow.effects.instances.io.monad.flatMap
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val semaphore = Semaphore.uncancelable<ForIO>(5, IO.async())
+   *
+   *   val result = semaphore.flatMap { s ->
+   *     s.withPermit(IO { "Use controlled resource" })
+   *   }.unsafeRunSync()
+   *   //sampleEnd
+   *   println(result)
+   * }
+   * ```
+   */
   fun <A> withPermit(t: Kind<F, A>): Kind<F, A>
 
   companion object {
+
+    /**
+     * Construct a [Semaphore] initialized with [n] available permits.
+     * Since it's based on [Async] it's constrained with an uncancelable [acquire] operation.
+     *
+     * {: data-executable='true'}
+     *
+     * ```kotlin:ank
+     * import arrow.effects.*
+     * import arrow.effects.instances.io.async.async
+     *
+     * fun main(args: Array<String>) {
+     *   //sampleStart
+     *   val semaphore = Semaphore.uncancelable<ForIO>(5, IO.async())
+     *   //sampleEnd
+     * }
+     */
     fun <F> uncancelable(n: Long, AS: Async<F>): Kind<F, Semaphore<F>> = AS.run {
       assertNonNegative(n, AS).flatMap {
         Ref.of<F, State<F>>(Right(n), AS).map { ref -> AsyncSemaphore(ref, AS) }
       }
     }
+
   }
 
 }
