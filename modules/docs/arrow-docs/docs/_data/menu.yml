@@ -130,7 +130,7 @@ options:
         url: /docs/arrow/data/setk/
 
       - title: MapK
-        url: /docs/datatypes/mapk/
+        url: /docs/arrow/data/mapk/
 
       - title: SortedMapK
         url: /docs/datatypes/sortedmapk/
