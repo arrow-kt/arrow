@@ -25,9 +25,10 @@ buildscript {
         daggerVersion = '2.17'
         kotlinxCoroutinesVersion = '1.0.0'
         kotlinxCollectionsImmutableVersion = '0.1'
-        kotlinPoetVersion='1.0.0-RC1'
-        projectReactorVersion='3.1.8.RELEASE'
-        rxJavaVersion='2.2.1'
+        kotlinPoetVersion = '1.0.0-RC1'
+        projectReactorVersion = '3.1.8.RELEASE'
+        rxJavaVersion = '2.2.1'
+        dokka_version = '0.9.17'
     }
 
     repositories {
@@ -45,6 +46,7 @@ buildscript {
         classpath 'io.arrow-kt:ank-gradle-plugin:0.7.1'
         classpath 'org.ajoberstar:gradle-git-publish:1.0.1'
         classpath "net.rdrei.android.buildtimetracker:gradle-plugin:0.11.1"
+        classpath "org.jetbrains.dokka:dokka-gradle-plugin:$dokka_version"
     }
 }
 
@@ -74,11 +76,37 @@ subprojects { project ->
 
     apply plugin: 'kotlin'
     apply plugin: 'jacoco'
+    apply plugin: 'org.jetbrains.dokka'
 
     archivesBaseName = POM_ARTIFACT_ID
 
     jacoco {
         toolVersion '0.8.2'
+    }
+
+    //dokka log spam `Can't find node by signature` comes from https://github.com/Kotlin/dokka/issues/269
+    dokka {
+        outputFormat = 'jekyll'
+        outputDirectory = project.rootDir.absolutePath +
+                "/modules/docs/arrow-docs/docs/docs/apidocs"
+
+        includes = ['README.md']
+        reportUndocumented = false
+
+        // Specifies the location of the project source code on the Web.
+        // If provided, Dokka generates "source" links for each declaration.
+        // Repeat for multiple mappings
+        linkMapping {
+            // Source directory
+            dir = "src/main/kotlin"
+
+            // URL showing where the source code can be accessed through the web browser
+            url = "https://github.com/arrow-kt/arrow/blob/master/${relativeProjectPath('src/main/kotlin')}"
+
+            // Suffix which is used to append the line number to the URL. Use #L for GitHub
+            suffix = "#L"
+        }
+
     }
 
     task codeCoverageReport(type: JacocoReport) {

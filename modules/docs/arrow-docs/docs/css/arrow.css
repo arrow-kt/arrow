@@ -830,7 +830,7 @@ table {
 p code, ul code {
   background: #fff;
   font-family: "monoidregular", monospace;
-  padding: 0 8px;
+  padding: 0; /*8px leaving this constrain makes the dokka exported markdown to have weird distances between <code> declarations*/
   font-size: 0.8125rem;
   font-size: 0.8rem;
   border-radius: 3px;

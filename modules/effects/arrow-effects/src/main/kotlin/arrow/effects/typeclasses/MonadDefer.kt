@@ -9,8 +9,11 @@ import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
 import kotlin.coroutines.startCoroutine
 
-/** The context required to defer evaluating a safe computation. **/
-
+/**
+ * ank_macro_hierarchy(arrow.effects.typeclasses.MonadDefer)
+ *
+ * The context required to defer evaluating a safe computation.
+ **/
 interface MonadDefer<F> : MonadThrow<F>, Bracket<F, Throwable> {
 
   fun <A> defer(fa: () -> Kind<F, A>): Kind<F, A>

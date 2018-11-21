@@ -5,6 +5,9 @@ import arrow.core.Option
 import arrow.typeclasses.Monad
 import kotlin.coroutines.startCoroutine
 
+/**
+ * ank_macro_hierarchy(arrow.mtl.typeclasses.MonadFilter)
+ */
 interface MonadFilter<F> : Monad<F>, FunctorFilter<F> {
 
   fun <A> empty(): Kind<F, A>

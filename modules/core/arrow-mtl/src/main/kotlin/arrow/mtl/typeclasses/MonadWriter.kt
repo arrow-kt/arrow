@@ -4,7 +4,10 @@ import arrow.Kind
 import arrow.core.Tuple2
 import arrow.typeclasses.Monad
 
-/** A monad that support monoidal accumulation (e.g. logging List<String>) */
+/**
+ * ank_macro_hierarchy(arrow.mtl.typeclasses.MonadWriter)
+ * A monad that support monoidal accumulation (e.g. logging List of String)
+ */
 interface MonadWriter<F, W> : Monad<F> {
 
   /** Lift a writer action into the effect */

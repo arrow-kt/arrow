@@ -20,6 +20,9 @@ out/
 .gradle/
 build/
 
+# dokka + ank apidocs merge to sources
+apidocs/
+
 # Local configuration file (sdk path, etc)
 local.properties
 
