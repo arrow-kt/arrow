@@ -78,10 +78,10 @@ interface Semaphore<F> {
    *   } //Never ends since is uncancelable
    *
    *   semaphore.flatMap { s ->
-   *     s.acquireN(5).flatMap. {
+   *     s.acquireN(5).flatMap {
    *       s.available
    *     }
-   *   }.unsafeRunSync() == 0
+   *   }.unsafeRunSync() == 0L
    *   //sampleEnd
    * }
    * ```
