@@ -187,7 +187,7 @@ options:
         url: /docs/arrow/core/function0/
 
       - title: Function1
-        url: /docs/datatypes/function1/
+        url: /docs/arrow/core/function1/
 
       - title: Const
         url: /docs/datatypes/const/

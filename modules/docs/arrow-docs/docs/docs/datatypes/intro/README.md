@@ -101,7 +101,7 @@ These types wrap over some of Kotlin's collections and functions to give them ca
 
 - [`Function0`]({{ '/docs/arrow/core/function0/' | relative_url }})
 
-- [`Function1`]({{ '/docs/datatypes/function1/' | relative_url }})
+- [`Function1`]({{ '/docs/arrow/core/function1/' | relative_url }})
 
 ##### Transformers
 
