@@ -45,7 +45,7 @@ We will list all the datatypes available in arrow by the module they belong to, 
 Core contains the datatypes that are also used by the public API of several [typeclasses]({{ '/docs/patterns/glossary/' | relative_url }}),
 so they are always required.
 
-- [`Id`]({{ '/docs/datatypes/id/' | relative_url }}) - a simple wrapper without any behavior, used mostly for testing
+- [`Id`]({{ '/docs/arrow/core/id/' | relative_url }}) - a simple wrapper without any behavior, used mostly for testing
 
 - [`Option`]({{ '/docs/arrow/core/option/' | relative_url }}) - absence of a value, or failure to construct a correct value
 
