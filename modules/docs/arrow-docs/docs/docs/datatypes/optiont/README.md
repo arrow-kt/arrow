@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: OptionT
-permalink: /docs/datatypes/optiont/
+permalink: /docs/arrow/data/optiont/
+redirect_from:
+  - /docs/datatypes/optiont
 video: EWfxL9yBUJo
 ---
 

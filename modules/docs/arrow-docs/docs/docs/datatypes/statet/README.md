@@ -163,4 +163,4 @@ import arrow.core.*
 DataType(StateT::class).tcMarkdownList()
 ```
 
-Take a look at the [`EitherT` docs]({{ '/docs/datatypes/eithert' | relative_url }}) or [`OptionT` docs]({{ '/docs/datatypes/optiont' | relative_url }}) for an alternative version monad transformer for achieving different goals.
+Take a look at the [`EitherT` docs]({{ '/docs/arrow/data/eithert' | relative_url }}) or [`OptionT` docs]({{ '/docs/arrow/data/optiont' | relative_url }}) for an alternative version monad transformer for achieving different goals.

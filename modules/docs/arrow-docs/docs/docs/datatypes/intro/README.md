@@ -107,7 +107,7 @@ These types wrap over some of Kotlin's collections and functions to give them ca
 
 A transformer is a special kind of datatype that allows combining two datatypes to give one of them the abstractions of another
 
-- [`OptionT`]({{ '/docs/datatypes/optiont/' | relative_url }}) - gives the datatype wrapped the properties of `Option`
+- [`OptionT`]({{ '/docs/arrow/data/optiont/' | relative_url }}) - gives the datatype wrapped the properties of `Option`
 
 - [`EitherT`]({{ '/docs/datatypes/eithert/' | relative_url }}) - gives the datatype wrapped the properties of `Either`
 

@@ -249,7 +249,7 @@ import arrow.core.*
 DataType(EitherT::class).tcMarkdownList()
 ```
 
-Take a look at the [`OptionT` docs]({{ '/docs/datatypes/optiont' | relative_url }}) for an alternative version of this content with the `OptionT` monad transformer
+Take a look at the [`OptionT` docs]({{ '/docs/arrow/data/optiont' | relative_url }}) for an alternative version of this content with the `OptionT` monad transformer
 
 ## Credits
 
