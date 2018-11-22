@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: Moore
-permalink: /docs/datatypes/moore/
+permalink: /docs/arrow/data/moore/
+redirect_from:
+  - /docs/datatypes/moore
 ---
 
 ## Moore

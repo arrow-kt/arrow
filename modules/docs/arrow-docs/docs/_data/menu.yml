@@ -157,7 +157,7 @@ options:
         url: /docs/arrow/data/store/
 
       - title: Moore
-        url: /docs/datatypes/moore/
+        url: /docs/arrow/data/moore/
 
       - title: Sum
         url: /docs/datatypes/sum/

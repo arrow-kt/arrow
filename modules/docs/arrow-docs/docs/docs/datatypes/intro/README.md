@@ -128,7 +128,7 @@ TODO
 
 - [`Store`]({{ '/docs/arrow/data/store/' | relative_url }}) - a datatype which holds an initial state and a function for extracting a representation of it.
 
-- [`Moore`]({{ '/docs/datatypes/moore/' | relative_url }}) - a datatype which holds an initial state and can move to new states only when an event of a specific type is dispatched.
+- [`Moore`]({{ '/docs/arrow/data/moore/' | relative_url }}) - a datatype which holds an initial state and can move to new states only when an event of a specific type is dispatched.
 
 - [`Sum`]({{ '/docs/datatypes/sum/' | relative_url }}) - a datatype which holds two comonads and a flag for indicating which one is active. Both sides evolve at the same time.
 
