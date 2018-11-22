@@ -145,7 +145,7 @@ options:
         url: /docs/arrow/data/reader/
 
       - title: Kleisli
-        url: /docs/datatypes/kleisli/
+        url: /docs/arrow/data/kleisli/
 
       - title: State
         url: /docs/datatypes/state/

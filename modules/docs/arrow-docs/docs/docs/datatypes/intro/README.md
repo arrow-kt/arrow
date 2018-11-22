@@ -77,7 +77,7 @@ Data contains the bulk of the datatypes provided by Arrow. We can separate them 
 
 ##### Reader/Writer/State
 
-- [`Kleisli`]({{ '/docs/datatypes/kleisli/' | relative_url }}) - similar to Dependency Injection and Inversion of Control, it represents a calculation with a dependency on an external context
+- [`Kleisli`]({{ '/docs/arrow/data/kleisli/' | relative_url }}) - similar to Dependency Injection and Inversion of Control, it represents a calculation with a dependency on an external context
 
 - [`Reader`]({{ '/docs/arrow/data/reader/' | relative_url }}) - same as kleisli but operating over the `Id` datatype
 
@@ -111,7 +111,7 @@ A transformer is a special kind of datatype that allows combining two datatypes 
 
 - [`EitherT`]({{ '/docs/datatypes/eithert/' | relative_url }}) - gives the datatype wrapped the properties of `Either`
 
-- [`ReaderT`]({{ '/docs/datatypes/kleisli/' | relative_url }}) - gives the datatype wrapped the properties of `Reader`
+- [`ReaderT`]({{ '/docs/arrow/data/kleisli/' | relative_url }}) - gives the datatype wrapped the properties of `Reader`
 
 - [`WriterT`]({{ '/docs/datatypes/writert/' | relative_url }}) - gives the datatype wrapped the properties of `Writer`
 
