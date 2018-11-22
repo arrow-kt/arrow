@@ -75,7 +75,7 @@ interface Semaphore<F> {
    *
    *   semaphore.flatMap { s ->
    *     s.acquireN(6)
-   *   }.unsafeRunTimed(3.seconds) == IO.never().unsafeRunTimed(3.seconds)
+   *   } //Never ends since is uncancelable
    *
    *   semaphore.flatMap { s ->
    *     s.acquireN(5).flatMap. {
@@ -210,7 +210,7 @@ interface Semaphore<F> {
      * }
      */
     fun <F> uncancelable(n: Long, AS: Async<F>): Kind<F, Semaphore<F>> = AS.run {
-      assertNonNegative(n, AS).flatMap {
+      assertNonNegative(n).flatMap {
         Ref.of<F, State<F>>(Right(n), AS).map { ref -> AsyncSemaphore(ref, AS) }
       }
     }
@@ -221,13 +221,16 @@ interface Semaphore<F> {
 
 // A semaphore is either empty, and there are number of outstanding acquires (Left)
 // or it is non-empty, and there are n permits available (Right)
-private typealias State<F> = Either<List<Tuple2<Long, Promise<F, Unit>>>, Long>
+private typealias State<F> = Either<AcquiredPermits<F>, Long>
+private typealias AcquiredPermits<F> = List<Tuple2<Long, Promise<F, Unit>>>
 
-private fun <F> assertNonNegative(n: Long, AE: ApplicativeError<F, Throwable>): Kind<F, Unit> =
-  if (n < 0) AE.raiseError(IllegalArgumentException("n must be nonnegative, was: $n")) else AE.just(Unit)
+private fun <F> ApplicativeError<F, Throwable>.assertNonNegative(n: Long): Kind<F, Unit> =
+  if (n < 0) raiseError(IllegalArgumentException("n must be nonnegative, was: $n")) else just(Unit)
 
 internal class AsyncSemaphore<F>(private val state: Ref<F, State<F>>,
                                  private val AS: Async<F>) : Semaphore<F>, Async<F> by AS {
+
+  private val promise = Promise.uncancelable<F, Unit>(AS)
 
   override val available: Kind<F, Long>
     get() = state.get.map { state ->
@@ -240,15 +243,15 @@ internal class AsyncSemaphore<F>(private val state: Ref<F, State<F>>,
     }
 
   override fun acquireN(n: Long): Kind<F, Unit> =
-    assertNonNegative(n, AS).flatMap {
+    assertNonNegative(n).flatMap {
       if (n == 0L) just(Unit)
-      else Promise.uncancelable<F, Unit>(AS).flatMap { gate ->
+      else promise.flatMap { p ->
         state.modify { old ->
           val u = old.fold({ waiting ->
-            Left(waiting + listOf(n toT gate))
+            Left(waiting + listOf(n toT p))
           }, { m ->
             if (n <= m) Right(m - n)
-            else Left(listOf((n - m) toT gate))
+            else Left(listOf((n - m) toT p))
           })
 
           Tuple2(u, u)
@@ -265,10 +268,10 @@ internal class AsyncSemaphore<F>(private val state: Ref<F, State<F>>,
     }
 
   override fun tryAcquireN(n: Long): Kind<F, Boolean> =
-    assertNonNegative(n, AS).flatMap { _ ->
+    assertNonNegative(n).flatMap {
       if (n == 0L) AS.just(true)
       else state.modify { old ->
-        val u = old.fold({ Left(it) }, { m ->
+        val u = old.fold({ waiting -> Left(waiting) }, { m ->
           if (m >= n) Right(m - n) else Right(m)
         })
 
@@ -283,24 +286,21 @@ internal class AsyncSemaphore<F>(private val state: Ref<F, State<F>>,
     }
 
   override fun releaseN(n: Long): Kind<F, Unit> =
-    assertNonNegative(n, AS).flatMap {
+    assertNonNegative(n).flatMap {
       if (n == 0L) just(Unit)
       else state.modify { old ->
-        val u = old.fold({ waiting ->
-          var m = n
-          var waiting2 = waiting
-          while (waiting2.isNotEmpty() && m > 0) {
-            val (k, gate) = waiting2.first()
-            if (k > m) {
-              waiting2 = listOf(Tuple2(k - m, gate)) + waiting2.drop(1)
-              m = 0
+        val u = old.fold({ waiting: AcquiredPermits<F> ->
+          tailrec fun loop(m: Long, waiting2: AcquiredPermits<F>): State<F> =
+            if (waiting2.isNotEmpty() && m > 0) {
+              val (k, gate) = waiting2.first()
+              if (k > m) loop(0, listOf(Tuple2(k - m, gate)) + waiting2.drop(1))
+              else loop(m - k, waiting2.drop(1))
             } else {
-              m -= k
-              waiting2 = waiting2.drop(1)
+              if (waiting2.isNotEmpty()) Left(waiting2)
+              else Right(m)
             }
-          }
-          if (waiting2.isNotEmpty()) Left(waiting2)
-          else Right(m)
+
+          loop(n, waiting)
         }, { m ->
           Right(m + n)
         })
@@ -308,14 +308,12 @@ internal class AsyncSemaphore<F>(private val state: Ref<F, State<F>>,
         Tuple2(u, Tuple2(old, u))
       }.flatMap { (previous, now) ->
         previous.fold({ waiting ->
-          val newSize = now.fold({ it.size }, { 0 })
+          val newSize = now.fold({ newWaiting -> newWaiting.size }, { 0 })
           val released = waiting.size - newSize
-          waiting.take(released).foldRight(just(Unit)) { hd, tl -> open(hd.b).flatMap { tl } }
+          waiting.take(released).foldRight(just(Unit)) { (_, promise), tl -> promise.complete(Unit).flatMap { tl } }
         }, { just(Unit) })
       }
     }
-
-  private fun open(gate: Promise<F, Unit>): Kind<F, Unit> = gate.complete(Unit)
 
   override fun <A> withPermit(t: Kind<F, A>): Kind<F, A> =
     acquire.bracket({ release }, { t })
