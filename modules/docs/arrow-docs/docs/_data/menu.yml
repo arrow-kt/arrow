@@ -169,7 +169,7 @@ options:
         url: /docs/arrow/data/writert/
 
       - title: Trampoline
-        url: /docs/datatypes/trampoline/
+        url: /docs/arrow/free/trampoline/
 
       - title: Coproduct
         url: /docs/datatypes/coproduct/
