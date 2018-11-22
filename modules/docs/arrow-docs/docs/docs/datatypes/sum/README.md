@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: Sum
-permalink: /docs/datatypes/sum/
+permalink: /docs/arrow/data/sum/
+redirect_from:
+  - /docs/datatypes/sum
 ---
 
 ## Sum

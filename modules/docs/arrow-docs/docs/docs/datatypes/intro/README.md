@@ -130,7 +130,7 @@ TODO
 
 - [`Moore`]({{ '/docs/arrow/data/moore/' | relative_url }}) - a datatype which holds an initial state and can move to new states only when an event of a specific type is dispatched.
 
-- [`Sum`]({{ '/docs/datatypes/sum/' | relative_url }}) - a datatype which holds two comonads and a flag for indicating which one is active. Both sides evolve at the same time.
+- [`Sum`]({{ '/docs/arrow/data/moore/' | relative_url }}) - a datatype which holds two comonads and a flag for indicating which one is active. Both sides evolve at the same time.
 
 - [`Day`]({{ '/docs/datatypes/day/' | relative_url }}) - a datatype which holds two comonads which evolve independently.
 
