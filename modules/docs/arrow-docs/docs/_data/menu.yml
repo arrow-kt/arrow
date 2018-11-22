@@ -172,7 +172,7 @@ options:
         url: /docs/arrow/free/trampoline/
 
       - title: Coproduct
-        url: /docs/datatypes/coproduct/
+        url: /docs/arrow/data/coproduct/
 
       - title: Eval
         url: /docs/datatypes/eval/
