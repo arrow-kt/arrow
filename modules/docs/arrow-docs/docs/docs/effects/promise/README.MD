@@ -14,7 +14,7 @@ A `Promise` guarantees (promises) `A` at some point in the future within the con
 
 ## Constructing a Promise
 
-A promise can easily be made by calling `cancellable`.
+A promise can easily be made by calling `uncancelable`.
 Since the allocation of mutable state is not referentially transparent this side-effect is contained within `F`.
 
 {: data-executable='true'}
@@ -31,7 +31,7 @@ println(promise)
 }
 ```
 
-In case you want the side-effect to execute immediately and return the `Ref` instance you can use the `unsafe` function.
+In case you want the side-effect to execute immediately and return the `Promise` instance you can use the `unsafeUncancelable` function.
 
 {: data-executable='true'}
 ```kotlin:ank
@@ -40,7 +40,7 @@ import arrow.effects.instances.io.async.async
 
 fun main(args: Array<String>) {
 //sampleStart
-val unsafePromise: Promise<ForIO, Int> = Promise.unsafeCancellable(IO.async())
+val unsafePromise: Promise<ForIO, Int> = Promise.unsafeUncancelable(IO.async())
 //sampleEnd
 println(unsafePromise)
 }
