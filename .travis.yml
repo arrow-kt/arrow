@@ -8,16 +8,18 @@ jdk:
 script:
   - ./gradlew clean build
   - ./gradlew dokka :arrow-docs:runAnk
- 
+
 after_success:
   - ./gradlew codeCoverageReport
   - bash <(curl -s https://codecov.io/bash)
   - ./deploy-scripts/deploy.sh
 
 deploy:
-  provider: pages
+  provider: s3
+  access_key_id: $S3_ACCESS_KEY_ID
+  secret_access_key: $S3_SECRET_ACCESS_KEY
+  bucket: $S3_BUCKET
   skip_cleanup: true
-  github_token: $GITHUB_TOKEN
   local_dir: modules/docs/arrow-docs/build/site
   on:
     branch: master
