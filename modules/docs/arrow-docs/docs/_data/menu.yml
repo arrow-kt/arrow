@@ -190,7 +190,7 @@ options:
         url: /docs/arrow/core/function1/
 
       - title: Const
-        url: /docs/datatypes/const/
+        url: /docs/arrow/typeclasses/const/
 
   - title: Type Classes
 

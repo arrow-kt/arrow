@@ -65,7 +65,7 @@ Data contains the bulk of the datatypes provided by Arrow. We can separate them 
 
 - [`Ior`]({{ '/docs/arrow/data/ior/' | relative_url }}) - a branch in execution for three possible paths: one, two, or both
 
-- [`Const`]({{ '/docs/datatypes/const/' | relative_url }}) - tags a value with a "phantom generic" that's never instantiated, and it can be used for example to represents units or state
+- [`Const`]({{ '/docs/arrow/typeclasses/const/' | relative_url }}) - tags a value with a "phantom generic" that's never instantiated, and it can be used for example to represents units or state
 
 - [`Coproduct`]({{ '/docs/arrow/data/coproduct/' | relative_url }}) - constructs a new composed type from two datatypes, allowing to contain and operate on either one of them
 
