@@ -175,7 +175,7 @@ options:
         url: /docs/arrow/data/coproduct/
 
       - title: Eval
-        url: /docs/datatypes/eval/
+        url: /docs/arrow/core/eval/
 
       - title: OptionT
         url: /docs/datatypes/optiont/

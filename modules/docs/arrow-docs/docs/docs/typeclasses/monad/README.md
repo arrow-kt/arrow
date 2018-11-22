@@ -85,7 +85,7 @@ ForOption extensions {
 #### followedBy/followedByEval
 
 Executes sequentially two elements that are independent from one another.
-The [`Eval`]({{ '/docs/datatypes/eval' | relative_url }}) variant allows you to pass lazily calculated values.
+The [`Eval`]({{ '/docs/arrow/core/eval' | relative_url }}) variant allows you to pass lazily calculated values.
 
 ```kotlin:ank
 ForOption extensions {
@@ -108,7 +108,7 @@ IO.just(1).effectM(::logValue).fix().unsafeRunSync()
 #### forEffect/forEffectEval
 
 Executes sequentially two elements that are independent from one another, ignoring the value of the second one.
-The [`Eval`]({{ '/docs/datatypes/eval' | relative_url }}) variant allows you to pass lazily calculated values.
+The [`Eval`]({{ '/docs/arrow/core/eval' | relative_url }}) variant allows you to pass lazily calculated values.
 
 ```kotlin:ank
 import arrow.instances.option.monad.*
