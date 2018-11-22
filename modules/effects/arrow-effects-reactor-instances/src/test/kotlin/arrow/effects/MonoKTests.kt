@@ -7,6 +7,7 @@ import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.Spec
 import io.kotlintest.matchers.shouldNotBe
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.not
@@ -47,9 +48,14 @@ class MonoKTest : UnitSpec() {
       }
   }
 
+  override fun interceptSpec(context: Spec, spec: () -> Unit) {
+    println("MonoK: Skipping sync laws for stack safety because they are not supported. See https://github.com/reactor/reactor-core/issues/1441")
+    super.interceptSpec(context, spec)
+  }
+
   init {
     testLaws(
-      AsyncLaws.laws(MonoK.async(), EQ(), EQ())
+      AsyncLaws.laws(MonoK.async(), EQ(), EQ(), testStackSafety = false)
     )
 
     "Multi-thread Singles finish correctly" {

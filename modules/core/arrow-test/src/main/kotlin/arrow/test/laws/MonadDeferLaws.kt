@@ -23,7 +23,8 @@ object MonadDeferLaws {
     SC: MonadDefer<F>,
     EQ: Eq<Kind<F, Int>>,
     EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>,
-    EQERR: Eq<Kind<F, Int>> = EQ
+    EQERR: Eq<Kind<F, Int>> = EQ,
+    testStackSafety: Boolean = true
   ): List<Law> =
     BracketLaws.laws(SC, EQ, EQ_EITHER, EQERR) + listOf(
       Law("Sync bind: binding blocks") { SC.asyncBind(EQ) },
@@ -47,12 +48,17 @@ object MonadDeferLaws {
       Law("Sync laws: delay suspends evaluation") { SC.delaySuspendsEvaluation(EQ) },
       Law("Sync laws: flatMap suspends evaluation") { SC.flatMapSuspendsEvaluation(EQ) },
       Law("Sync laws: map suspends evaluation") { SC.mapSuspendsEvaluation(EQ) },
-      Law("Sync laws: Repeated evaluation not memoized") { SC.repeatedSyncEvaluationNotMemoized(EQ) },
-      Law("Sync laws: stack safety over repeated left binds") { SC.stackSafetyOverRepeatedLeftBinds(5000, EQ) },
-      Law("Sync laws: stack safety over repeated right binds") { SC.stackSafetyOverRepeatedRightBinds(5000, EQ) },
-      Law("Sync laws: stack safety over repeated attempts") { SC.stackSafetyOverRepeatedAttempts(5000, EQ) },
-      Law("Sync laws: stack safety over repeated maps") { SC.stackSafetyOnRepeatedMaps(5000, EQ) }
-    )
+      Law("Sync laws: Repeated evaluation not memoized") { SC.repeatedSyncEvaluationNotMemoized(EQ) }
+    ) + if (testStackSafety) {
+      listOf(
+        Law("Sync laws: stack safety over repeated left binds") { SC.stackSafetyOverRepeatedLeftBinds(5000, EQ) },
+        Law("Sync laws: stack safety over repeated right binds") { SC.stackSafetyOverRepeatedRightBinds(5000, EQ) },
+        Law("Sync laws: stack safety over repeated attempts") { SC.stackSafetyOverRepeatedAttempts(5000, EQ) },
+        Law("Sync laws: stack safety over repeated maps") { SC.stackSafetyOnRepeatedMaps(5000, EQ) }
+      )
+    } else {
+      emptyList()
+    }
 
   fun <F> MonadDefer<F>.delayConstantEqualsPure(EQ: Eq<Kind<F, Int>>): Unit {
     forAll(genIntSmall()) { x ->
