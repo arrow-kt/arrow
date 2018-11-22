@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: Store
-permalink: /docs/datatypes/store/
+permalink: /docs/arrow/data/store/
+redirect_from:
+  - /docs/datatypes/store
 ---
 
 ## Store

@@ -154,7 +154,7 @@ options:
         url: /docs/arrow/data/statet/
 
       - title: Store
-        url: /docs/datatypes/store/
+        url: /docs/arrow/data/store/
 
       - title: Moore
         url: /docs/datatypes/moore/

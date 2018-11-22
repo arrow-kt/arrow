@@ -126,7 +126,7 @@ TODO
 
 - [`Coreader`]
 
-- [`Store`]({{ '/docs/datatypes/store/' | relative_url }}) - a datatype which holds an initial state and a function for extracting a representation of it.
+- [`Store`]({{ '/docs/arrow/data/store/' | relative_url }}) - a datatype which holds an initial state and a function for extracting a representation of it.
 
 - [`Moore`]({{ '/docs/datatypes/moore/' | relative_url }}) - a datatype which holds an initial state and can move to new states only when an event of a specific type is dispatched.
 
