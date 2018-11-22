@@ -77,7 +77,7 @@ interface Eq<F> {
 }
 ```
 
-### Instances
+### Instances and Extensions Interfaces
 
 A single implementation of a typeclass for a specific datatype or class.
 Because typeclasses require generic parameters each implementation is meant to be unique for that parameter.
