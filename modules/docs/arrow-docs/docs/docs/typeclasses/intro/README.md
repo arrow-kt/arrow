@@ -180,7 +180,7 @@ The Monad Template Library module gives more specialized version of existing typ
 
 - [`MonadReader`]({{ '/docs/typeclasses/monadwriter/' | relative_url }}) - can implement the capabilities of the datatype [`Reader`]({{ '/docs/arrow/data/reader/' | relative_url }})
 
-- [`MonadWriter`]({{ '/docs/typeclasses/monadwriter/' | relative_url }}) - can implement the capabilities of the datatype [`Writer`]({{ '/docs/datatypes/writert/' | relative_url }})
+- [`MonadWriter`]({{ '/docs/typeclasses/monadwriter/' | relative_url }}) - can implement the capabilities of the datatype [`Writer`]({{ '/docs/arrow/data/writert/' | relative_url }})
 
 - [`MonadState`]({{ '/docs/typeclasses/monadstate/' | relative_url }}) - can implement the capabilities of the datatype [`State`]({{ '/docs/datatypes/state/' | relative_url }})
 

@@ -81,7 +81,7 @@ Data contains the bulk of the datatypes provided by Arrow. We can separate them 
 
 - [`Reader`]({{ '/docs/arrow/data/reader/' | relative_url }}) - same as kleisli but operating over the `Id` datatype
 
-- [`Writer`]({{ '/docs/datatypes/writert/' | relative_url }}) - represents calculations that carry over one extra aggregated value, generally a logger or reporter
+- [`Writer`]({{ '/docs/arrow/data/writert/' | relative_url }}) - represents calculations that carry over one extra aggregated value, generally a logger or reporter
 
 - [`State`]({{ '/docs/arrow/data/state/' | relative_url }}) - represents a stateful calculation with a carried value that can be read from or modified, like a combination of reader and writer
 
@@ -113,7 +113,7 @@ A transformer is a special kind of datatype that allows combining two datatypes 
 
 - [`ReaderT`]({{ '/docs/arrow/data/kleisli/' | relative_url }}) - gives the datatype wrapped the properties of `Reader`
 
-- [`WriterT`]({{ '/docs/datatypes/writert/' | relative_url }}) - gives the datatype wrapped the properties of `Writer`
+- [`WriterT`]({{ '/docs/arrow/data/writert/' | relative_url }}) - gives the datatype wrapped the properties of `Writer`
 
 - [`StateT`]({{ '/docs/arrow/data/statet/' | relative_url }}) - gives the datatype wrapped the properties of `State`
 

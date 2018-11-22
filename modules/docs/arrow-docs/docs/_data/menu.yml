@@ -166,7 +166,7 @@ options:
         url: /docs/arrow/data/day/
 
       - title: WriterT
-        url: /docs/datatypes/writert/
+        url: /docs/arrow/data/writert/
 
       - title: Trampoline
         url: /docs/datatypes/trampoline/
