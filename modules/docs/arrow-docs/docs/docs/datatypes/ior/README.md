@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: Ior
-permalink: /docs/datatypes/ior/
+permalink: /docs/arrow/data/ior/
+redirect_from:
+  - /docs/datatypes/ior
 ---
 
 ## Ior

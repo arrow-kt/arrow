@@ -63,7 +63,7 @@ Data contains the bulk of the datatypes provided by Arrow. We can separate them 
 
 - [`NonEmptyList`]({{ '/docs/arrow/data/nonemptylist/' | relative_url }}) - a homogeneous list that has at least 1 value
 
-- [`Ior`]({{ '/docs/datatypes/ior/' | relative_url }}) - a branch in execution for three possible paths: one, two, or both
+- [`Ior`]({{ '/docs/arrow/data/ior/' | relative_url }}) - a branch in execution for three possible paths: one, two, or both
 
 - [`Const`]({{ '/docs/datatypes/const/' | relative_url }}) - tags a value with a "phantom generic" that's never instantiated, and it can be used for example to represents units or state
 

@@ -136,7 +136,7 @@ options:
         url: /docs/arrow/data/sortedmapk/
 
       - title: Ior
-        url: /docs/datatypes/ior/
+        url: /docs/arrow/data/ior/
 
       - title: Id
         url: /docs/datatypes/id/
