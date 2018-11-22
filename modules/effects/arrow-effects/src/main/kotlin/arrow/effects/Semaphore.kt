@@ -211,7 +211,7 @@ interface Semaphore<F> {
      */
     fun <F> uncancelable(n: Long, AS: Async<F>): Kind<F, Semaphore<F>> = AS.run {
       assertNonNegative(n).flatMap {
-        Ref.of<F, State<F>>(Right(n), AS).map { ref -> AsyncSemaphore(ref, AS) }
+        Ref.of<F, State<F>>(Right(n), AS).map { ref -> UncancelableSemaphore(ref, AS) }
       }
     }
 
@@ -227,8 +227,8 @@ private typealias AcquiredPermits<F> = List<Tuple2<Long, Promise<F, Unit>>>
 private fun <F> ApplicativeError<F, Throwable>.assertNonNegative(n: Long): Kind<F, Unit> =
   if (n < 0) raiseError(IllegalArgumentException("n must be nonnegative, was: $n")) else just(Unit)
 
-internal class AsyncSemaphore<F>(private val state: Ref<F, State<F>>,
-                                 private val AS: Async<F>) : Semaphore<F>, Async<F> by AS {
+internal class UncancelableSemaphore<F>(private val state: Ref<F, State<F>>,
+                                        private val AS: Async<F>) : Semaphore<F>, Async<F> by AS {
 
   private val promise = Promise.uncancelable<F, Unit>(AS)
 

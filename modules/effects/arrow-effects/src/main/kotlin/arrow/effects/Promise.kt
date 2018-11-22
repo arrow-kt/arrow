@@ -33,7 +33,7 @@ interface Promise<F, A> {
    *
    *   promise.flatMap { p ->
    *     p.get
-   *   }.unsafeRunTimed(3.seconds) == IO.never.unsafeRunTimed(3.seconds)
+   *   }  //Never ends since is uncancelable
    *
    *   promise.flatMap { p ->
    *     p.complete(1).flatMap {
@@ -132,7 +132,7 @@ interface Promise<F, A> {
      * }
      * ```
      */
-    fun <F, A> uncancelable(AS: Async<F>): Kind<F, Promise<F, A>> = AS { unsafeCancellable<F, A>(AS) }
+    fun <F, A> uncancelable(AS: Async<F>): Kind<F, Promise<F, A>> = AS { unsafeUncancelable<F, A>(AS) }
 
     /**
      * Creates an empty `Promise` from on [Async] instance for [F].
@@ -147,12 +147,12 @@ interface Promise<F, A> {
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
-     *   val unsafePromise: Promise<ForIO, Int> = Promise.unsafeCancellable(IO.async())
+     *   val unsafePromise: Promise<ForIO, Int> = Promise.unsafeUncancelable(IO.async())
      *   //sampleEnd
      * }
      * ```
      */
-    fun <F, A> unsafeCancellable(AS: Async<F>): Promise<F, A> = CancellablePromise(AS, AtomicReference(CancellablePromise.State.Pending(emptyList())))
+    fun <F, A> unsafeUncancelable(AS: Async<F>): Promise<F, A> = UncancelablePromise(AS, AtomicReference(UncancelablePromise.State.Pending(emptyList())))
 
   }
 
@@ -160,8 +160,8 @@ interface Promise<F, A> {
 
 }
 
-internal class CancellablePromise<F, A> constructor(private val AS: Async<F>,
-                                                    private val state: AtomicReference<State<A>>) : Promise<F, A> {
+internal class UncancelablePromise<F, A> constructor(private val AS: Async<F>,
+                                                     private val state: AtomicReference<State<A>>) : Promise<F, A> {
 
   override val get: Kind<F, A> = AS.async { k: (Either<Throwable, A>) -> Unit ->
     tailrec fun loop(): Unit {
