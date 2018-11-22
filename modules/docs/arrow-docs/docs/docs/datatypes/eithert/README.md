@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: EitherT
-permalink: /docs/datatypes/eithert/
+permalink: /docs/arrow/data/eithert/
+redirect_from:
+  - /docs/datatypes/eithert
 video: 1h4X8CrMjVs
 ---
 

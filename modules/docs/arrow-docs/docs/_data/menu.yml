@@ -181,7 +181,7 @@ options:
         url: /docs/arrow/data/optiont/
 
       - title: EitherT
-        url: /docs/datatypes/eithert/
+        url: /docs/arrow/data/eithert/
 
       - title: Function0
         url: /docs/datatypes/function0/

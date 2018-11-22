@@ -109,7 +109,7 @@ A transformer is a special kind of datatype that allows combining two datatypes 
 
 - [`OptionT`]({{ '/docs/arrow/data/optiont/' | relative_url }}) - gives the datatype wrapped the properties of `Option`
 
-- [`EitherT`]({{ '/docs/datatypes/eithert/' | relative_url }}) - gives the datatype wrapped the properties of `Either`
+- [`EitherT`]({{ '/docs/arrow/data/eithert/' | relative_url }}) - gives the datatype wrapped the properties of `Either`
 
 - [`ReaderT`]({{ '/docs/arrow/data/kleisli/' | relative_url }}) - gives the datatype wrapped the properties of `Reader`
 
