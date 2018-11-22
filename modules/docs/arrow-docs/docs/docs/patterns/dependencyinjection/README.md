@@ -4,7 +4,7 @@ title: Dependency Injection
 permalink: /docs/patterns/dependency_injection/
 ---
 
-If you would like to know about using the [`Reader`]({{ '/docs/datatypes/reader' | relative_url }}) datatype instead, visit [this article](https://medium.com/@JorgeCastilloPr/kotlin-dependency-injection-with-the-reader-monad-7d52f94a482e) by [Jorge Castillo](https://github.com/JorgeCastilloPrz).
+If you would like to know about using the [`Reader`]({{ '/docs/arrow/data/reader' | relative_url }}) datatype instead, visit [this article](https://medium.com/@JorgeCastilloPr/kotlin-dependency-injection-with-the-reader-monad-7d52f94a482e) by [Jorge Castillo](https://github.com/JorgeCastilloPrz).
 
 ## Dependency Injection using the `Typeclassless` technique
 

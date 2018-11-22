@@ -142,7 +142,7 @@ options:
         url: /docs/arrow/core/id/
 
       - title: Reader
-        url: /docs/datatypes/reader/
+        url: /docs/arrow/data/reader/
 
       - title: Kleisli
         url: /docs/datatypes/kleisli/
