@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: Day
-permalink: /docs/datatypes/day/
+permalink: /docs/arrow/data/day/
+redirect_from:
+  - /docs/datatypes/day
 ---
 
 ## Day
