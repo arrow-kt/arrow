@@ -87,7 +87,7 @@ subject.value()
 
 The library provides instances of [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) and [`MonadDefer`]({{ '/docs/effects/monaddefer' | relative_url }}).
 
-[`MonadDefer`]({{ '/docs/effects/async' | relative_url }}) allows you to generify over datatypes that can run asynchronous code. You can use it with `ObservableK`, `FlowableK` or `SingleK`.
+[`Async`]({{ '/docs/effects/async' | relative_url }}) allows you to generify over datatypes that can run asynchronous code. You can use it with `ObservableK`, `FlowableK` or `SingleK`.
 
 ```kotlin
 fun <F> getSongUrlAsync(MS: MonadDefer<F>) =
@@ -183,7 +183,7 @@ disposable()
 
 ### Stack safety
 
-While [`MonadDefer`]({{ '/docs/effects/async' | relative_url }}) usually guarantees stack safety, this does not apply for the rx2 wrapper types. 
+While [`MonadDefer`]({{ '/docs/effects/monaddefer' | relative_url }}) usually guarantees stack safety, this does not apply for the rx2 wrapper types. 
 This is a limitation on rx2's side. See the corresponding github [issue]({{ 'https://github.com/ReactiveX/RxJava/issues/6322' }}).
 
 To overcome this limitation and run code in a stack safe way, one can make use of `bindingStackSafe` which is provided for every instance of [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) when you have `arrow-free` included.
