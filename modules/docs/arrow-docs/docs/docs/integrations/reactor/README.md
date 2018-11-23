@@ -173,7 +173,7 @@ fun main() {
     (1..50000).fold(just(0)) { acc: Kind<ForMonoK, Int>, x: Int ->
       just(acc.bind() + 1)
     }.bind()
-  }.run(MonoK.monad()).attempt()
+  }.run(MonoK.monad())
   //sampleEnd
   println(result.fix().mono.block()!!)
 }
@@ -181,6 +181,7 @@ fun main() {
 
 ```kotlin:ank
 import arrow.core.Try
+
 // This will result in a stack overflow
 Try {
   MonoK.monad().binding {

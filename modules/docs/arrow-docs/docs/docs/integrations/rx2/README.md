@@ -206,7 +206,7 @@ fun main() {
     (1..50000).fold(just(0)) { acc: Kind<ForFlowableK, Int>, x: Int ->
       just(acc.bind() + 1)
     }.bind()
-  }.run(FlowableK.monad()).attempt()
+  }.run(FlowableK.monad())
   //sampleEnd
   println(result.fix().flowable.blockingFirst()!!)
 }
@@ -215,6 +215,7 @@ fun main() {
 ```kotlin:ank
 import arrow.core.Try
 // This will result in a stack overflow
+
 Try {
   FlowableK.monad().binding {
     (1..50000).fold(just(0)) { acc: Kind<ForFlowableK, Int>, x: Int ->
