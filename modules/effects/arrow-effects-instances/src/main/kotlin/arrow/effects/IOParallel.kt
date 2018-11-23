@@ -2,6 +2,7 @@ package arrow.effects
 
 import arrow.core.*
 import arrow.effects.instances.io.concurrentEffect.concurrentEffect
+import arrow.effects.instances.io.monad.flatMap
 import arrow.effects.internal.Platform.onceOnly
 import arrow.effects.internal.parMapCancellable2
 import arrow.effects.internal.parMapCancellable3
@@ -30,7 +31,7 @@ internal class FutureN<A>(count: Int = 1) {
   }
 }
 
-fun <A, B, C> IO.Companion.parallelMapN(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, f: (A, B) -> C): IO<C> {
+fun <A, B, C> IO.Companion.parallelMapN(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<B>, f: (A, B) -> C): IO<C> {
   val cancel: FutureN<Disposable> = FutureN(2)
 
   val cbf: FutureN<(Either<Throwable, C>) -> Unit> = FutureN()
@@ -53,7 +54,7 @@ fun <A, B, C> IO.Companion.parallelMapN(ctx: CoroutineContext, ioA: IO<A>, ioB: 
   }
 }
 
-fun <A, B, C, D> IO.Companion.parallelMapN(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, ioC: IO<C>, f: (A, B, C) -> D): IO<D> {
+fun <A, B, C, D> IO.Companion.parallelMapN(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<B>, ioC: IOOf<C>, f: (A, B, C) -> D): IO<D> {
   val cancel: FutureN<Disposable> = FutureN(3)
 
   val cbf: FutureN<(Either<Throwable, D>) -> Unit> = FutureN()
@@ -76,51 +77,51 @@ fun <A, B, C, D> IO.Companion.parallelMapN(ctx: CoroutineContext, ioA: IO<A>, io
   }
 }
 
-fun <A, B, C, D, E> IO.Companion.parallelMapN(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, ioC: IO<C>, ioD: IO<D>, f: (A, B, C, D) -> E): IO<E> =
+fun <A, B, C, D, E> IO.Companion.parallelMapN(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<B>, ioC: IOOf<C>, ioD: IOOf<D>, f: (A, B, C, D) -> E): IO<E> =
   parallelMapN(ctx,
     parallelMapN(ctx, ioA, ioB, ::Tuple2),
     parallelMapN(ctx, ioC, ioD, ::Tuple2)
   ) { ab, cd -> f(ab.a, ab.b, cd.a, cd.b) }
 
-fun <A, B, C, D, E, F> IO.Companion.parallelMapN(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, ioC: IO<C>, ioD: IO<D>, ioE: IO<E>, f: (A, B, C, D, E) -> F): IO<F> =
+fun <A, B, C, D, E, F> IO.Companion.parallelMapN(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<B>, ioC: IOOf<C>, ioD: IOOf<D>, ioE: IOOf<E>, f: (A, B, C, D, E) -> F): IO<F> =
   parallelMapN(ctx,
     parallelMapN(ctx, ioA, ioB, ioC, ::Tuple3),
     parallelMapN(ctx, ioD, ioE, ::Tuple2)
   ) { abc, de -> f(abc.a, abc.b, abc.c, de.a, de.b) }
 
-fun <A, B, C, D, E, F, G> IO.Companion.parallelMapN(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, ioC: IO<C>, ioD: IO<D>, ioE: IO<E>, ioF: IO<F>, f: (A, B, C, D, E, F) -> G): IO<G> =
+fun <A, B, C, D, E, F, G> IO.Companion.parallelMapN(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<B>, ioC: IOOf<C>, ioD: IOOf<D>, ioE: IOOf<E>, ioF: IOOf<F>, f: (A, B, C, D, E, F) -> G): IO<G> =
   parallelMapN(ctx,
     parallelMapN(ctx, ioA, ioB, ioC, ::Tuple3),
     parallelMapN(ctx, ioD, ioE, ioF, ::Tuple3)
   ) { abc, def -> f(abc.a, abc.b, abc.c, def.a, def.b, def.c) }
 
-fun <A, B, C, D, E, F, G, H> IO.Companion.parallelMapN(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, ioC: IO<C>, ioD: IO<D>, ioE: IO<E>, ioF: IO<F>, ioG: IO<G>, f: (A, B, C, D, E, F, G) -> H): IO<H> =
+fun <A, B, C, D, E, F, G, H> IO.Companion.parallelMapN(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<B>, ioC: IOOf<C>, ioD: IOOf<D>, ioE: IOOf<E>, ioF: IOOf<F>, ioG: IOOf<G>, f: (A, B, C, D, E, F, G) -> H): IO<H> =
   parallelMapN(ctx,
     parallelMapN(ctx, ioA, ioB, ioC, ::Tuple3),
     parallelMapN(ctx, ioD, ioE, ::Tuple2),
     parallelMapN(ctx, ioF, ioG, ::Tuple2)
   ) { abc, de, fg -> f(abc.a, abc.b, abc.c, de.a, de.b, fg.a, fg.b) }
 
-fun <A, B, C, D, E, F, G, H, I> IO.Companion.parallelMapN(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, ioC: IO<C>, ioD: IO<D>, ioE: IO<E>, ioF: IO<F>, ioG: IO<G>, ioH: IO<H>, f: (A, B, C, D, E, F, G, H) -> I): IO<I> =
+fun <A, B, C, D, E, F, G, H, I> IO.Companion.parallelMapN(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<B>, ioC: IOOf<C>, ioD: IOOf<D>, ioE: IOOf<E>, ioF: IOOf<F>, ioG: IOOf<G>, ioH: IOOf<H>, f: (A, B, C, D, E, F, G, H) -> I): IO<I> =
   parallelMapN(ctx,
     parallelMapN(ctx, ioA, ioB, ioC, ::Tuple3),
     parallelMapN(ctx, ioD, ioE, ioF, ::Tuple3),
     parallelMapN(ctx, ioG, ioH, ::Tuple2)
   ) { abc, def, gh -> f(abc.a, abc.b, abc.c, def.a, def.b, def.c, gh.a, gh.b) }
 
-fun <A, B, C, D, E, F, G, H, I, J> IO.Companion.parallelMapN(ctx: CoroutineContext, ioA: IO<A>, ioB: IO<B>, ioC: IO<C>, ioD: IO<D>, ioE: IO<E>, ioF: IO<F>, ioG: IO<G>, ioH: IO<H>, ioI: IO<I>, f: (A, B, C, D, E, F, G, H, I) -> J): IO<J> =
+fun <A, B, C, D, E, F, G, H, I, J> IO.Companion.parallelMapN(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<B>, ioC: IOOf<C>, ioD: IOOf<D>, ioE: IOOf<E>, ioF: IOOf<F>, ioG: IOOf<G>, ioH: IOOf<H>, ioI: IOOf<I>, f: (A, B, C, D, E, F, G, H, I) -> J): IO<J> =
   parallelMapN(ctx,
     parallelMapN(ctx, ioA, ioB, ioC, ::Tuple3),
     parallelMapN(ctx, ioD, ioE, ioF, ::Tuple3),
     parallelMapN(ctx, ioG, ioH, ioI, ::Tuple3)
   ) { abc, def, ghi -> f(abc.a, abc.b, abc.c, def.a, def.b, def.c, ghi.a, ghi.b, ghi.c) }
 
-fun <A, B> IO.Companion.raceN(ctx: CoroutineContext, a: IO<A>, b: IO<B>): IO<Either<A, B>> {
+fun <A, B> IO.Companion.raceN(ctx: CoroutineContext, a: IOOf<A>, b: IOOf<B>): IO<Either<A, B>> {
   val cancel: FutureN<Disposable> = FutureN(2)
 
   val cbf: FutureN<(Either<Throwable, Either<A, B>>) -> Unit> = FutureN()
 
-  val complete = onceOnly { result: Either<Throwable, Either<A, B>> ->
+  val complete: (Either<Throwable, Either<A, B>>) -> Unit = onceOnly { result: Either<Throwable, Either<A, B>> ->
     cancel.unsafeGet().forEach { it() }
     cbf.unsafeGet().forEach { it(result) }
   }
@@ -141,7 +142,7 @@ fun <A, B> IO.Companion.raceN(ctx: CoroutineContext, a: IO<A>, b: IO<B>): IO<Eit
   }
 }
 
-fun <A, B, C> IO.Companion.raceN(ctx: CoroutineContext, a: IO<A>, b: IO<B>, c: IO<C>): IO<Either<A, Either<B, C>>> {
+fun <A, B, C> IO.Companion.raceN(ctx: CoroutineContext, a: IOOf<A>, b: IOOf<B>, c: IOOf<C>): IO<Either<A, Either<B, C>>> {
   val cancel: FutureN<Disposable> = FutureN(3)
 
   val cbf: FutureN<(Either<Throwable, Either<A, Either<B, C>>>) -> Unit> = FutureN()
@@ -168,33 +169,33 @@ fun <A, B, C> IO.Companion.raceN(ctx: CoroutineContext, a: IO<A>, b: IO<B>, c: I
   }
 }
 
-fun <A, B, C, D> IO.Companion.raceN(ctx: CoroutineContext, a: IO<A>, b: IO<B>, c: IO<C>, d: IO<D>): IO<Either<Either<A, B>, Either<C, D>>> =
+fun <A, B, C, D> IO.Companion.raceN(ctx: CoroutineContext, a: IOOf<A>, b: IOOf<B>, c: IOOf<C>, d: IOOf<D>): IO<Either<Either<A, B>, Either<C, D>>> =
   raceN(ctx,
     raceN(ctx, a, b),
     raceN(ctx, c, d)
   )
 
-fun <A, B, C, D, E> IO.Companion.raceN(ctx: CoroutineContext, a: IO<A>, b: IO<B>, c: IO<C>, d: IO<D>, e: IO<E>): IO<Either<Either<A, Either<B, C>>, Either<D, E>>> =
+fun <A, B, C, D, E> IO.Companion.raceN(ctx: CoroutineContext, a: IOOf<A>, b: IOOf<B>, c: IOOf<C>, d: IOOf<D>, e: IOOf<E>): IO<Either<Either<A, Either<B, C>>, Either<D, E>>> =
   raceN(ctx,
     raceN(ctx, a, b, c),
     raceN(ctx, d, e)
   )
 
-fun <A, B, C, D, E, F> IO.Companion.raceN(ctx: CoroutineContext, a: IO<A>, b: IO<B>, c: IO<C>, d: IO<D>, e: IO<E>, f: IO<F>): IO<Either<Either<A, B>, Either<Either<C, D>, Either<E, F>>>> =
+fun <A, B, C, D, E, F> IO.Companion.raceN(ctx: CoroutineContext, a: IOOf<A>, b: IOOf<B>, c: IOOf<C>, d: IOOf<D>, e: IOOf<E>, f: IOOf<F>): IO<Either<Either<A, B>, Either<Either<C, D>, Either<E, F>>>> =
   raceN(ctx,
     raceN(ctx, a, b),
     raceN(ctx, c, d),
     raceN(ctx, e, f)
   )
 
-fun <A, B, C, D, E, F, G> IO.Companion.raceN(ctx: CoroutineContext, a: IO<A>, b: IO<B>, c: IO<C>, d: IO<D>, e: IO<E>, f: IO<F>, g: IO<G>): IO<Either<Either<A, Either<B, C>>, Either<Either<D, E>, Either<F, G>>>> =
+fun <A, B, C, D, E, F, G> IO.Companion.raceN(ctx: CoroutineContext, a: IOOf<A>, b: IOOf<B>, c: IOOf<C>, d: IOOf<D>, e: IOOf<E>, f: IOOf<F>, g: IOOf<G>): IO<Either<Either<A, Either<B, C>>, Either<Either<D, E>, Either<F, G>>>> =
   raceN(ctx,
     raceN(ctx, a, b, c),
     raceN(ctx, d, e),
     raceN(ctx, f, g)
   )
 
-fun <A, B, C, D, E, F, G, H> IO.Companion.raceN(ctx: CoroutineContext, a: IO<A>, b: IO<B>, c: IO<C>, d: IO<D>, e: IO<E>, f: IO<F>, g: IO<G>, h: IO<H>): IO<Either<Either<Either<A, B>, Either<C, D>>, Either<Either<E, F>, Either<G, H>>>> =
+fun <A, B, C, D, E, F, G, H> IO.Companion.raceN(ctx: CoroutineContext, a: IOOf<A>, b: IOOf<B>, c: IOOf<C>, d: IOOf<D>, e: IOOf<E>, f: IOOf<F>, g: IOOf<G>, h: IOOf<H>): IO<Either<Either<Either<A, B>, Either<C, D>>, Either<Either<E, F>, Either<G, H>>>> =
   raceN(ctx,
     raceN(ctx, a, b),
     raceN(ctx, c, d),
@@ -202,7 +203,7 @@ fun <A, B, C, D, E, F, G, H> IO.Companion.raceN(ctx: CoroutineContext, a: IO<A>,
     raceN(ctx, g, h)
   )
 
-fun <A, B, C, D, E, F, G, H, I> IO.Companion.raceN(ctx: CoroutineContext, a: IO<A>, b: IO<B>, c: IO<C>, d: IO<D>, e: IO<E>, f: IO<F>, g: IO<G>, h: IO<H>, i: IO<I>): IO<Either<Either<Either<A, Either<B, C>>, Either<D, E>>, Either<Either<F, G>, Either<H, I>>>> =
+fun <A, B, C, D, E, F, G, H, I> IO.Companion.raceN(ctx: CoroutineContext, a: IOOf<A>, b: IOOf<B>, c: IOOf<C>, d: IOOf<D>, e: IOOf<E>, f: IOOf<F>, g: IOOf<G>, h: IOOf<H>, i: IOOf<I>): IO<Either<Either<Either<A, Either<B, C>>, Either<D, E>>, Either<Either<F, G>, Either<H, I>>>> =
   raceN(ctx,
     raceN(ctx, a, b, c),
     raceN(ctx, d, e),

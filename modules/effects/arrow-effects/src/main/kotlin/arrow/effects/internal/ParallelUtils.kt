@@ -2,10 +2,7 @@ package arrow.effects.internal
 
 import arrow.Kind
 import arrow.core.*
-import arrow.effects.typeclasses.ConcurrentEffect
-import arrow.effects.typeclasses.Disposable
-import arrow.effects.typeclasses.Effect
-import arrow.effects.typeclasses.Proc
+import arrow.effects.typeclasses.*
 import kotlin.coroutines.*
 import kotlin.coroutines.Continuation
 import arrow.core.Continuation as AContinuation
@@ -220,4 +217,3 @@ internal fun <A> asyncIOContinuation(ctx: CoroutineContext, cc: (Either<Throwabl
     }
 
   }
-

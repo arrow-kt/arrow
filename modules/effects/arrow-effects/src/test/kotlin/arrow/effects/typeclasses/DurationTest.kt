@@ -1,4 +1,4 @@
-package arrow.effects.data
+package arrow.effects.typeclasses
 
 import arrow.effects.typeclasses.Duration
 import arrow.test.UnitSpec

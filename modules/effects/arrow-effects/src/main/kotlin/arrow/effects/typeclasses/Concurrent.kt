@@ -5,15 +5,16 @@ import arrow.core.Either
 import arrow.core.Tuple2
 import arrow.core.left
 import arrow.core.right
+import kotlin.coroutines.CoroutineContext
 
 interface Concurrent<F> : Async<F> {
 
-  fun <A> Kind<F, A>.startF(): Kind<F, Fiber<F, A>>
+  fun <A> Kind<F, A>.startF(ctx: CoroutineContext): Kind<F, Fiber<F, A>>
 
-  fun <A, B> racePair(lh: Kind<F, A>, rh: Kind<F, B>): Kind<F, Either<Tuple2<A, Fiber<F, B>>, Tuple2<Fiber<F, A>, B>>>
+  fun <A, B> racePair(ctx: CoroutineContext, lh: Kind<F, A>, rh: Kind<F, B>): Kind<F, Either<Tuple2<A, Fiber<F, B>>, Tuple2<Fiber<F, A>, B>>>
 
-  fun <A, B> race(lh: Kind<F, A>, rh: Kind<F, B>): Kind<F, Either<A, B>> =
-    racePair(lh, rh).flatMap {
+  fun <A, B> race(ctx: CoroutineContext, lh: Kind<F, A>, rh: Kind<F, B>): Kind<F, Either<A, B>> =
+    racePair(ctx, lh, rh).flatMap {
       it.fold({ (a, b) ->
         b.cancel.map { a.left() }
       }, { (a, b) ->

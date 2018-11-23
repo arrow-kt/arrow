@@ -102,12 +102,13 @@ interface DeferredKAsyncInstance : Async<ForDeferredK>, DeferredKMonadDeferInsta
 
 interface DeferredKConcurrentInstance : Concurrent<ForDeferredK>, DeferredKAsyncInstance {
 
-  override fun <A> Kind<ForDeferredK, A>.startF(): DeferredK<Fiber<ForDeferredK, A>> =
-    deferredstartF()
+  override fun <A> Kind<ForDeferredK, A>.startF(ctx: CoroutineContext): DeferredK<Fiber<ForDeferredK, A>> =
+    deferredstartF(ctx)
 
-  override fun <A, B> racePair(lh: Kind<ForDeferredK, A>,
+  override fun <A, B> racePair(ctx: CoroutineContext,
+                               lh: Kind<ForDeferredK, A>,
                                rh: Kind<ForDeferredK, B>): Kind<ForDeferredK, Either<Tuple2<A, Fiber<ForDeferredK, B>>, Tuple2<Fiber<ForDeferredK, A>, B>>> =
-    DeferredK.racePair(lh, rh)
+    DeferredK.racePair(ctx, lh, rh)
 
 }
 
