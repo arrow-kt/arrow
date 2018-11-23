@@ -48,8 +48,16 @@ KotlinConf, San Francisco, Nov '17 - version 0.3.11
  
 <iframe width="560" height="315" src="https://www.youtube.com/embed/qGef3sFAIxU" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
  
- Mobilization 7, Łódź, Oct '17 - version 0.3.11
+Mobilization 7, Łódź, Oct '17 - version 0.3.11
  
+### Simple Dependency Management in Kotlin
+
+In this talk we introduce the concepts of Dependency Management as a language feature, typeclasses, and a live demo of [KEEP-87](https://github.com/Kotlin/KEEP/pull/87).
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/CR5h2Wq1yPE" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
+
+AndroidTO, Toronto, Nov '18 - version 0.8.0
+
 ### Kotlin for the Pragmatic Functionalist
 
 An introduction to Arrow and the enhancements it brings to Kotlin's standard library.
