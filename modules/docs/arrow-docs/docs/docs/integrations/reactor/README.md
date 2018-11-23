@@ -148,6 +148,49 @@ disposable()
 // Boom! caused by BindingCancellationException
 ```
 
+### Stack safety
+
+While [`MonadDefer`]({{ '/docs/effects/async' | relative_url }}) usually guarantees stack safety, this does not apply for the reactor wrapper types. 
+This is a limitation on reactor's side. See the corresponding github [issue]({{ 'https://github.com/reactor/reactor-core/issues/1441' }}).
+
+To overcome this limitation and run code in a stack safe way, one can make use of `bindingStackSafe` which is provided for every instance of [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) when you have `arrow-free` included.
+
+{: data-executable='true'}
+```kotlin:ank
+import arrow.Kind
+import arrow.effects.MonoK
+import arrow.effects.ForMonoK
+import arrow.effects.fix
+import arrow.effects.monok.monad.monad
+import arrow.effects.monok.applicativeError.attempt
+import arrow.free.bindingStackSafe
+import arrow.free.run
+
+fun main() {
+  //sampleStart
+  // This will not result in a stack overflow
+  val result = MonoK.monad().bindingStackSafe {
+    (1..50000).fold(just(0)) { acc: Kind<ForMonoK, Int>, x: Int ->
+      just(acc.bind() + 1)
+    }.bind()
+  }.run(MonoK.monad()).attempt()
+  //sampleEnd
+  println(result.fix().mono.block()!!)
+}
+```
+
+```kotlin:ank
+import arrow.core.Try
+// This will result in a stack overflow
+Try {
+  MonoK.monad().binding {
+    (1..50000).fold(just(0)) { acc: Kind<ForMonoK, Int>, x: Int ->
+      just(acc.bind() + 1)
+    }.bind()
+  }.fix().mono.block()
+}
+```
+
 ### Supported Type Classes
 
 ```kotlin:ank:replace

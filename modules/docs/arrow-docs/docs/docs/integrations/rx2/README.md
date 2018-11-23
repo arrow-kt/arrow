@@ -181,6 +181,49 @@ disposable()
 // Boom! caused by BindingCancellationException
 ```
 
+### Stack safety
+
+While [`MonadDefer`]({{ '/docs/effects/async' | relative_url }}) usually guarantees stack safety, this does not apply for the rx2 wrapper types. 
+This is a limitation on rx2's side. See the corresponding github [issue]({{ 'https://github.com/ReactiveX/RxJava/issues/6322' }}).
+
+To overcome this limitation and run code in a stack safe way, one can make use of `bindingStackSafe` which is provided for every instance of [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) when you have `arrow-free` included.
+
+{: data-executable='true'}
+```kotlin:ank
+import arrow.Kind
+import arrow.effects.FlowableK
+import arrow.effects.ForFlowableK
+import arrow.effects.fix
+import arrow.effects.flowablek.monad.monad
+import arrow.effects.flowablek.applicativeError.attempt
+import arrow.free.bindingStackSafe
+import arrow.free.run
+
+fun main() {
+  //sampleStart
+  // This will not result in a stack overflow
+  val result = FlowableK.monad().bindingStackSafe {
+    (1..50000).fold(just(0)) { acc: Kind<ForFlowableK, Int>, x: Int ->
+      just(acc.bind() + 1)
+    }.bind()
+  }.run(FlowableK.monad()).attempt()
+  //sampleEnd
+  println(result.fix().flowable.blockingFirst()!!)
+}
+```
+
+```kotlin:ank
+import arrow.core.Try
+// This will result in a stack overflow
+Try {
+  FlowableK.monad().binding {
+    (1..50000).fold(just(0)) { acc: Kind<ForFlowableK, Int>, x: Int ->
+      just(acc.bind() + 1)
+    }.bind()
+  }.fix().flowable.blockingFirst()
+}
+```
+
 ### Supported Type Classes
 
 ```kotlin:ank:replace
