@@ -55,6 +55,9 @@ interface TryMonadErrorInstance : MonadError<ForTry, Throwable>, TryMonadInstanc
 }
 
 @extension
+interface TryMonadThrowInstance : MonadThrow<ForTry>, TryMonadErrorInstance
+
+@extension
 interface TryEqInstance<A> : Eq<Try<A>> {
 
   fun EQA(): Eq<A>
@@ -151,6 +154,23 @@ interface TryTraverseInstance : Traverse<ForTry> {
 
   override fun <A, B> Kind<ForTry, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
     fix().foldRight(lb, f)
+}
+
+@extension
+interface TryHashInstance<A> : Hash<Try<A>>, TryEqInstance<A> {
+
+  fun HA(): Hash<A>
+  fun HT(): Hash<Throwable>
+
+  override fun EQA(): Eq<A> = HA()
+
+  override fun EQT(): Eq<Throwable> = HT()
+
+  override fun Try<A>.hash(): Int = fold({
+    HT().run { it.hash() }
+  }, {
+    HA().run { it.hash() }
+  })
 }
 
 object TryContext : TryMonadErrorInstance, TryTraverseInstance {

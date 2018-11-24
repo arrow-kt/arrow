@@ -12,7 +12,6 @@ import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genIntSmall
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monad
-import arrow.typeclasses.binding
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kotlinx.coroutines.newSingleThreadContext

@@ -3,7 +3,6 @@ package arrow.effects
 import arrow.effects.instances.io.monadDefer.monadDefer
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
-import arrow.typeclasses.binding
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -18,7 +17,7 @@ class RefTest : UnitSpec() {
         forAll(Gen.int(), Gen.int()) { a, b ->
           Ref.of(a, IO.monadDefer()).flatMap { ref ->
             ref.set(b).flatMap { _ ->
-              ref.get().map { get ->
+              ref.get.map { get ->
                 get == b
               }
             }
@@ -30,7 +29,7 @@ class RefTest : UnitSpec() {
         forAll(Gen.int(), Gen.int()) { a, b ->
           Ref.of(a, this).flatMap { ref ->
             ref.getAndSet(b).flatMap { old ->
-              ref.get().map { new ->
+              ref.get.map { new ->
                 old == a && new == b
               }
             }
@@ -40,8 +39,8 @@ class RefTest : UnitSpec() {
 
       "consistent set update" {
         forAll(Gen.int(), Gen.int()) { a, b ->
-          val set = Ref.of(a, this).flatMap { ref -> ref.set(b).flatMap { _ -> ref.get() } }
-          val update = Ref.of(a, this).flatMap { ref -> ref.update { _ -> b }.flatMap { _ -> ref.get() } }
+          val set = Ref.of(a, this).flatMap { ref -> ref.set(b).flatMap { _ -> ref.get } }
+          val update = Ref.of(a, this).flatMap { ref -> ref.update { _ -> b }.flatMap { _ -> ref.get } }
 
           set.flatMap { setA ->
             update.map { updateA ->
@@ -55,7 +54,7 @@ class RefTest : UnitSpec() {
         forAll(Gen.int()) { a ->
           Ref.of(a, this).flatMap { ref ->
             ref.access().map { (a, _) -> a }.flatMap { _ ->
-              ref.get().map { get ->
+              ref.get.map { get ->
                 get == a
               }
             }
@@ -78,7 +77,7 @@ class RefTest : UnitSpec() {
             val ref = Ref.of(a, this@with).bind()
             val (_, setter) = ref.access().bind()
             val success = setter(b).bind()
-            val result = ref.get().bind()
+            val result = ref.get.bind()
             success && result == b
           }.fix().unsafeRunSync()
         }
@@ -91,7 +90,7 @@ class RefTest : UnitSpec() {
             val (_, setter) = ref.access().bind()
             ref.set(b).bind()
             val success = setter(c).bind()
-            val result = ref.get().bind()
+            val result = ref.get.bind()
             !success && result == b
           }.fix().unsafeRunSync()
         }
@@ -105,7 +104,7 @@ class RefTest : UnitSpec() {
             val cond1 = setter(b).bind()
             ref.set(c).bind()
             val cond2 = setter(d).bind()
-            val result = ref.get().bind()
+            val result = ref.get.bind()
             cond1 && !cond2 && result == c
           }.fix().unsafeRunSync()
         }
@@ -115,7 +114,7 @@ class RefTest : UnitSpec() {
         forAll(Gen.int(), genFunctionAToB<Int, Int>(Gen.int())) { a, f ->
           Ref.of(a, this).flatMap { ref ->
             ref.tryUpdate(f).flatMap {
-              ref.get().map { newA ->
+              ref.get.map { newA ->
                 newA == f(a)
               }
             }

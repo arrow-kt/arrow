@@ -14,6 +14,9 @@ Note: This section keeps on growing! Keep an eye on it from time to time.
 This document is meant to be an introduction to Functional Programming for people from all backgrounds.
 We'll go through some of the key concepts and then dive into their implementation and use in real world cases.
 
+Some similar documents, focused on explaining general concepts rather than Arrow's versions,
+can be found for examples [in JavaScript](https://github.com/hemanth/functional-programming-jargon) and [in Scala](https://gist.github.com/jdegoes/97459c0045f373f4eaf126998d8f65dc).
+
 ### Datatypes
 
 A datatype is a class that encapsulates one reusable coding pattern.
@@ -74,19 +77,29 @@ interface Eq<F> {
 }
 ```
 
-### Instances
+### Instances and Extensions Interfaces
 
 A single implementation of a typeclass for a specific datatype or class.
 Because typeclasses require generic parameters each implementation is meant to be unique for that parameter.
 
+For example, given a class like this:
+
 ```kotlin
-@instance(User::class)
+data class User(val id: Int) {
+  companion object
+}
+```
+
+We can declare that instances of this class can be equated based on their `id` property, and therefore that `User` itself is an instance of the `Eq` typeclass:
+
+```kotlin
+@extension
 interface UserEqInstance: Eq<User> {
   override fun User.eqv(b: User): Boolean = id == b.id
 }
 ```
 
-All typeclass instances provided Arrow can be found in the companion object of the type they're defined for, including platform types like String or Int.
+Note that classes must have companion objects for this to work. All typeclass instances provided by Arrow can be found in the companion object of the type they're defined for, including platform types like String or Int.
 
 ```kotlin:ank:silent
 import arrow.*
@@ -260,7 +273,7 @@ This function by convention is called `fix()`, as in, fixing a type from somethi
 fun Kind<ForListK, A>.fix() = this as ListK<A>
 ```
 
-This way we have can to convert from `ListK<A>` to `Kind<ForListK, A>` via simple subclassing and from `Kind<ForListK, A>` to `ListK<A>` using the function `fix()`.
+This way we can convert from `ListK<A>` to `Kind<ForListK, A>` via simple subclassing and from `Kind<ForListK, A>` to `ListK<A>` using the function `fix()`.
 Being able to define extension functions that work for partially applied generics is a feature from Kotlin that's not available in Java.
 You can define `fun Kind<ForOption, A>.fix()` and `fun Kind<ForListK, A>.fix()` and the compiler can smartly decide which one you're trying to use.
 If it can't it means there's an ambiguity you should fix!

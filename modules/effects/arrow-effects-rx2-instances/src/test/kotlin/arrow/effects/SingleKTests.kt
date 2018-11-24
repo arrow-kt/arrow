@@ -6,13 +6,13 @@ import arrow.effects.singlek.async.async
 import arrow.effects.singlek.effect.effect
 import arrow.effects.singlek.functor.functor
 import arrow.effects.singlek.monad.monad
-import arrow.effects.singlek.monadDefer.monadDefer
 import arrow.effects.singlek.monadError.monadError
+import arrow.effects.singlek.monadThrow.bindingCatch
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
-import arrow.typeclasses.bindingCatch
 import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.Spec
 import io.kotlintest.matchers.shouldNotBe
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
@@ -45,6 +45,11 @@ class SingleKTests : UnitSpec() {
 
   }
 
+  override fun interceptSpec(context: Spec, spec: () -> Unit) {
+    println("SingleK: Skipping sync laws for stack safety because they are not supported. See https://github.com/ReactiveX/RxJava/issues/6322")
+    super.interceptSpec(context, spec)
+  }
+
   init {
     testLaws(
       FunctorLaws.laws(SingleK.functor(), { SingleK.just(it) }, EQ()),
@@ -52,13 +57,12 @@ class SingleKTests : UnitSpec() {
       MonadLaws.laws(SingleK.monad(), EQ()),
       MonadErrorLaws.laws(SingleK.monadError(), EQ(), EQ(), EQ()),
       ApplicativeErrorLaws.laws(SingleK.applicativeError(), EQ(), EQ(), EQ()),
-      MonadDeferLaws.laws(SingleK.monadDefer(), EQ(), EQ(), EQ()),
-      AsyncLaws.laws(SingleK.async(), EQ(), EQ(), EQ()),
-      AsyncLaws.laws(SingleK.effect(), EQ(), EQ(), EQ())
+      AsyncLaws.laws(SingleK.async(), EQ(), EQ(), EQ(), testStackSafety = false),
+      AsyncLaws.laws(SingleK.effect(), EQ(), EQ(), EQ(), testStackSafety = false)
     )
 
     "Multi-thread Singles finish correctly" {
-      val value: Single<Long> = SingleK.monadError().bindingCatch {
+      val value: Single<Long> = bindingCatch {
         val a = Single.timer(2, TimeUnit.SECONDS).k().bind()
         a
       }.value()
@@ -72,7 +76,7 @@ class SingleKTests : UnitSpec() {
       val originalThread: Thread = Thread.currentThread()
       var threadRef: Thread? = null
 
-      val value: Single<Long> = SingleK.monadError().bindingCatch {
+      val value: Single<Long> = bindingCatch {
         val a = Single.timer(2, TimeUnit.SECONDS, Schedulers.newThread()).k().bind()
         threadRef = Thread.currentThread()
         val b = Single.just(a).observeOn(Schedulers.newThread()).k().bind()
@@ -89,7 +93,7 @@ class SingleKTests : UnitSpec() {
     }
 
     "Single dispose forces binding to cancel without completing too" {
-      val value: Single<Long> = SingleK.monadError().bindingCatch {
+      val value: Single<Long> = bindingCatch {
         val a = Single.timer(3, TimeUnit.SECONDS).k().bind()
         a
       }.value()

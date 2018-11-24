@@ -14,13 +14,16 @@ import me.eugeniomarletti.kotlin.metadata.jvm.getJvmConstructorSignature
 import me.eugeniomarletti.kotlin.metadata.jvm.getJvmFieldSignature
 import me.eugeniomarletti.kotlin.metadata.jvm.getJvmMethodSignature
 import me.eugeniomarletti.kotlin.metadata.jvm.jvmPropertySignature
+import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.TypeTable
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.hasReceiver
+import me.eugeniomarletti.kotlin.metadata.shadow.metadata.jvm.JvmProtoBuf
 import javax.lang.model.element.*
 import javax.lang.model.element.Modifier
 import javax.lang.model.type.NoType
 import javax.lang.model.util.ElementFilter
 import javax.lang.model.util.Elements
+import kotlin.coroutines.Continuation
 
 interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, ProcessorUtils {
 
@@ -135,59 +138,132 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
     }
   }
 
+  private fun TypeName.ParameterizedType.isSuspendedContinuation(): Boolean =
+    when {
+      rawType.fqName == Function2::class.qualifiedName && typeArguments.size == 3 -> {
+        val maybeContinuation = typeArguments[1]
+        when {
+          maybeContinuation is TypeName.WildcardType &&
+            maybeContinuation.lowerBounds.isNotEmpty() -> {
+            val lowerBoundsContinuation = maybeContinuation.lowerBounds[0]
+            lowerBoundsContinuation is TypeName.ParameterizedType &&
+              lowerBoundsContinuation.rawType.fqName == Continuation::class.qualifiedName
+          }
+          else -> false
+        }
+      }
+      else -> false
+    }
+
+  private fun TypeName.ParameterizedType.asSuspendedContinuation(): TypeName.FunctionLiteral =
+    TypeName.FunctionLiteral(
+      modifiers = listOf(arrow.meta.ast.Modifier.Suspend),
+      receiverType = typeArguments[0],
+      parameters = emptyList(),
+      returnType = (typeArguments[1] as? TypeName.WildcardType)?.let {
+        it.lowerBounds[0] as? TypeName.ParameterizedType
+      }?.let {
+        it.typeArguments[0]
+      } ?: TypeName.Unit
+    )
+
+  fun Func.fixReceiverLiterals(meta: ClassOrPackageDataWrapper.Class, protoFun: ProtoBuf.Function): Func =
+    copy(
+      receiverType = receiverType?.fixReceiverLiterals(meta, protoFun.receiverType),
+      parameters = if (parameters.size <= protoFun.valueParameterList.size)
+        parameters.mapIndexed { n, p -> p.fixReceiverLiterals(meta, protoFun.valueParameterList[n]) }
+      else parameters,
+      returnType = returnType?.fixReceiverLiterals(meta, protoFun.returnType)
+    )
+
+  private fun Parameter.fixReceiverLiterals(meta: ClassOrPackageDataWrapper.Class, protoParam: ProtoBuf.ValueParameter): Parameter =
+    copy(type = type.fixReceiverLiterals(meta, protoParam.type))
+
+  private fun TypeName.fixReceiverLiterals(
+    meta: ClassOrPackageDataWrapper.Class,
+    protoType: ProtoBuf.Type
+  ): TypeName =
+    when (this) {
+      is TypeName.TypeVariable -> this
+      is TypeName.WildcardType -> this
+      is TypeName.FunctionLiteral -> this
+      is TypeName.ParameterizedType -> fixReceiverLiterals(meta, protoType)
+      is TypeName.Classy -> this
+    }
+
+  private fun TypeName.ParameterizedType.fixReceiverLiterals(
+    meta: ClassOrPackageDataWrapper.Class,
+    protoType: ProtoBuf.Type
+  ): TypeName {
+    val jvmTypeAnnotations: List<String> = protoType.getExtension(JvmProtoBuf.typeAnnotation).map {
+      meta.nameResolver.getString(it.id)
+    }
+    return if (
+      "kotlin/ExtensionFunctionType" in jvmTypeAnnotations && typeArguments.size >= 2)
+      if (isSuspendedContinuation()) asSuspendedContinuation()
+      else TypeName.FunctionLiteral(
+        receiverType = typeArguments[0],
+        parameters = typeArguments.drop(1).dropLast(1),
+        returnType = typeArguments.lastOrNull() ?: TypeName.Unit
+      )
+    else
+      this
+  }
+
   fun TypeElement.allFunctions(declaredElement: TypeElement): List<Func> =
     processorUtils().run {
-      metaApi().run {
-        val superTypes = supertypes(
-          declaredElement.meta,
-          TypeTable(declaredElement.meta.classProto.typeTable),
-          processorUtils(),
-          emptyList()
-        ).filterIsInstance(ClassOrPackageDataWrapper.Class::class.java)
-        val declaredFunctions = declaredElement.meta.functionList.map { meta to it }
-        val inheritedFunctions = superTypes.flatMap { s -> s.functionList.map { s to it } }
-        val allFunctions = declaredFunctions + inheritedFunctions
-        val allMembers = ElementFilter.methodsIn(processorUtils().elementUtils.getAllMembers(declaredElement))
-        val declaredType = processorUtils().typeUtils.getDeclaredType(
-          declaredElement,
-          *declaredElement.typeParameters.map { it.asType() }.toTypedArray()
-        )
-        val filteredMembers = allMembers.asSequence().filterNot {
-          it.modifiers.containsAll(listOf(Modifier.PRIVATE, Modifier.FINAL))
-        }.filterNot {
-          it.modifiers.containsAll(listOf(Modifier.PUBLIC, Modifier.FINAL, Modifier.NATIVE))
-        }
-        val members = filteredMembers.mapNotNull { member ->
-          val templateFunction = allFunctions.find { (proto, function) ->
-            function.getJvmMethodSignature(proto.nameResolver, proto.classProto.typeTable) == member.jvmMethodSignature
-          }
-          try {
-            val function = FunSpec.overriding(
-              member,
-              declaredType,
-              processorUtils().typeUtils
-            ).build().toMeta(member)
-            val result =
-              if (templateFunction != null && templateFunction.second.modality != null) {
-                val fMod = function.copy(
-                  modifiers = function.modifiers + listOfNotNull(templateFunction.second.modality?.toMeta())
-                )
-                if (templateFunction.second.hasReceiverType()) {
-                  val receiverTypeName = fMod.parameters[0].type.asKotlin()
-                  val functionWithReceiver = fMod.copy(receiverType = receiverTypeName)
-                  val arguments = functionWithReceiver.parameters.drop(1)
-                  functionWithReceiver.copy(parameters = arguments)
-                } else fMod
-              } else function
-            result
-          } catch (e: IllegalArgumentException) {
-            //logW("Can't override: ${declaredElement.simpleName} :: $member")
-            //some public final functions can't be seen as overridden
-            templateFunction?.second?.toMeta(templateFunction.first, member)
-          }
-        }.toList()
-        members
+      val superTypes = supertypes(
+        declaredElement.meta,
+        TypeTable(declaredElement.meta.classProto.typeTable),
+        processorUtils(),
+        emptyList()
+      ).filterIsInstance(ClassOrPackageDataWrapper.Class::class.java)
+      val declaredFunctions = declaredElement.meta.functionList.map { meta to it }
+      val inheritedFunctions = superTypes.flatMap { s -> s.functionList.map { s to it } }
+      val allFunctions = declaredFunctions + inheritedFunctions
+      val allMembers = ElementFilter.methodsIn(processorUtils().elementUtils.getAllMembers(declaredElement))
+      val declaredType = processorUtils().typeUtils.getDeclaredType(
+        declaredElement,
+        *declaredElement.typeParameters.map { it.asType() }.toTypedArray()
+      )
+      val filteredMembers = allMembers.asSequence().filterNot {
+        it.modifiers.containsAll(listOf(Modifier.PRIVATE, Modifier.FINAL))
+      }.filterNot {
+        it.modifiers.containsAll(listOf(Modifier.PUBLIC, Modifier.FINAL, Modifier.NATIVE))
       }
+      val members = filteredMembers.mapNotNull { member ->
+        val templateFunction = allFunctions.find { (proto, function) ->
+          function.getJvmMethodSignature(proto.nameResolver, proto.classProto.typeTable) == member.jvmMethodSignature
+        }
+        try {
+          val function = FunSpec.overriding(
+            member,
+            declaredType,
+            processorUtils().typeUtils
+          ).build().toMeta(member)
+          val result =
+            if (templateFunction != null && templateFunction.second.modality != null) {
+              val fMod = function.copy(
+                modifiers = function.modifiers +
+                  listOfNotNull(templateFunction.second.modality?.toMeta()) +
+                  modifiersFromFlags(templateFunction.second.flags)
+              )
+              if (templateFunction.second.hasReceiverType()) {
+                val receiverTypeName = metaApi().run { fMod.parameters[0].type.asKotlin() }
+                val functionWithReceiver = fMod.copy(receiverType = receiverTypeName)
+                val arguments = functionWithReceiver.parameters.drop(1)
+                functionWithReceiver.copy(parameters = arguments)
+                  .fixReceiverLiterals(templateFunction.first, templateFunction.second)
+              } else fMod.fixReceiverLiterals(templateFunction.first, templateFunction.second)
+            } else function
+          result
+        } catch (e: IllegalArgumentException) {
+          //logW("Can't override: ${declaredElement.simpleName} :: $member")
+          //some public final functions can't be seen as overridden
+          templateFunction?.second?.toMeta(templateFunction.first, member)
+        }
+      }.toList()
+      members
     }
 
   fun TypeElement.superInterfaces(): List<TypeName> =
@@ -286,4 +362,5 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
 
   fun TypeElement.asMetaType(): Type? =
     type().fold({ null }, { it })
+
 }

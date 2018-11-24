@@ -7,6 +7,7 @@ import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.Effect
 import arrow.effects.typeclasses.Proc
 import kotlin.coroutines.*
+import kotlin.coroutines.Continuation
 import arrow.core.Continuation as AContinuation
 
 /* See parMap3 */
@@ -16,14 +17,14 @@ internal fun <F, A, B, C> Effect<F>.parMap2(ctx: CoroutineContext, ioA: Kind<F, 
   val a: suspend () -> Either<A, B> = {
     suspendCoroutine { ca: Continuation<Either<A, B>> ->
       start(ioA.map { it.left() }.runAsync {
-        it.fold({ invoke { ca.resumeWith(Result.failure(it)) } }, { invoke { ca.resumeWith(Result.success(it)) } })
+        it.fold({ delay { ca.resumeWith(Result.failure(it)) } }, { delay { ca.resumeWith(Result.success(it)) } })
       })
     }
   }
   val b: suspend () -> Either<A, B> = {
     suspendCoroutine { ca: Continuation<Either<A, B>> ->
       start(ioB.map { it.right() }.runAsync {
-        it.fold({ invoke { ca.resumeWith(Result.failure(it)) } }, { invoke { ca.resumeWith(Result.success(it)) } })
+        it.fold({ delay { ca.resumeWith(Result.failure(it)) } }, { delay { ca.resumeWith(Result.success(it)) } })
       })
     }
   }
@@ -42,21 +43,21 @@ internal fun <F, A, B, C, D> Effect<F>.parMap3(ctx: CoroutineContext, ioA: Kind<
   val a: suspend () -> Treither<A, B, C> = {
     suspendCoroutine { ca: Continuation<Treither<A, B, C>> ->
       start(ioA.map { Treither.Left<A, B, C>(it) }.runAsync {
-        it.fold({ invoke { ca.resumeWith(Result.failure(it)) } }, { invoke { ca.resumeWith(Result.success(it)) } })
+        it.fold({ delay { ca.resumeWith(Result.failure(it)) } }, { delay { ca.resumeWith(Result.success(it)) } })
       })
     }
   }
   val b: suspend () -> Treither<A, B, C> = {
     suspendCoroutine { ca: Continuation<Treither<A, B, C>> ->
       start(ioB.map { Treither.Middle<A, B, C>(it) }.runAsync {
-        it.fold({ invoke { ca.resumeWith(Result.failure(it)) } }, { invoke { ca.resumeWith(Result.success(it)) } })
+        it.fold({ delay { ca.resumeWith(Result.failure(it)) } }, { delay { ca.resumeWith(Result.success(it)) } })
       })
     }
   }
   val c: suspend () -> Treither<A, B, C> = {
     suspendCoroutine { ca: Continuation<Treither<A, B, C>> ->
       start(ioC.map { Treither.Right<A, B, C>(it) }.runAsync {
-        it.fold({ invoke { ca.resumeWith(Result.failure(it)) } }, { invoke { ca.resumeWith(Result.success(it)) } })
+        it.fold({ delay { ca.resumeWith(Result.failure(it)) } }, { delay { ca.resumeWith(Result.success(it)) } })
       })
     }
   }
@@ -74,14 +75,14 @@ fun <F, A, B, C> ConcurrentEffect<F>.parMapCancellable2(
   val a: suspend () -> Either<A, B> = {
     suspendCoroutine { ca: Continuation<Either<A, B>> ->
       start(ioA.map { it.left() }.runAsyncCancellable {
-        it.fold({ invoke { ca.resumeWithException(it) } }, { invoke { ca.resume(it) } })
+        it.fold({ delay { ca.resumeWithException(it) } }, { delay { ca.resume(it) } })
       })
     }
   }
   val b: suspend () -> Either<A, B> = {
     suspendCoroutine { ca: Continuation<Either<A, B>> ->
       start(ioB.map { it.right() }.runAsyncCancellable {
-        it.fold({ invoke { ca.resumeWithException(it) } }, { invoke { ca.resume(it) } })
+        it.fold({ delay { ca.resumeWithException(it) } }, { delay { ca.resume(it) } })
       })
     }
   }
@@ -97,21 +98,21 @@ fun <F, A, B, C, D> ConcurrentEffect<F>.parMapCancellable3(ctx: CoroutineContext
   val a: suspend () -> Treither<A, B, C> = {
     suspendCoroutine { ca: Continuation<Treither<A, B, C>> ->
       start(ioA.map { Treither.Left<A, B, C>(it) }.runAsyncCancellable {
-        it.fold({ invoke { ca.resumeWithException(it) } }, { invoke { ca.resume(it) } })
+        it.fold({ delay { ca.resumeWithException(it) } }, { delay { ca.resume(it) } })
       })
     }
   }
   val b: suspend () -> Treither<A, B, C> = {
     suspendCoroutine { ca: Continuation<Treither<A, B, C>> ->
       start(ioB.map { Treither.Middle<A, B, C>(it) }.runAsyncCancellable {
-        it.fold({ invoke { ca.resumeWithException(it) } }, { invoke { ca.resume(it) } })
+        it.fold({ delay { ca.resumeWithException(it) } }, { delay { ca.resume(it) } })
       })
     }
   }
   val c: suspend () -> Treither<A, B, C> = {
     suspendCoroutine { ca: Continuation<Treither<A, B, C>> ->
       start(ioC.map { Treither.Right<A, B, C>(it) }.runAsyncCancellable {
-        it.fold({ invoke { ca.resumeWithException(it) } }, { invoke { ca.resume(it) } })
+        it.fold({ delay { ca.resumeWithException(it) } }, { delay { ca.resume(it) } })
       })
     }
   }

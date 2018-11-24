@@ -17,10 +17,13 @@ dependencies {
     compile project(':arrow-effects-kotlinx-coroutines-instances')
     compile project(':arrow-optics')
     compile project(':arrow-instances-recursion')
+    compile project(':arrow-integrations-retrofit-adapter')
     compile project(':arrow-mtl')
     compile project(':arrow-free')
     compile project(':arrow-typeclasses')
     compile project(':arrow-generic')
+    compile project(':arrow-query-language')
+    compile project(":arrow-reflect")
     kapt project(':arrow-annotations-processor')
     kaptTest project(':arrow-annotations-processor')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"

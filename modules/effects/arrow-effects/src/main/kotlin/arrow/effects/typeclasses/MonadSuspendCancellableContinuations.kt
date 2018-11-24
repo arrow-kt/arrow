@@ -4,7 +4,6 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.effects.data.internal.BindingCancellationException
 import arrow.typeclasses.MonadErrorContinuation
-import arrow.typeclasses.bindingCatch
 import arrow.typeclasses.stateStack
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.CoroutineContext
@@ -28,7 +27,7 @@ open class MonadDeferCancellableContinuation<F, A>(SC: MonadDefer<F>, override v
   override fun returnedMonad(): Kind<F, A> = returnedMonad
 
   suspend fun <B> bindDefer(f: () -> B): B =
-    invoke(f).bind()
+    delay(f).bind()
 
   suspend fun <B> bindDeferIn(context: CoroutineContext, f: () -> B): B =
     defer { bindingCatch { bindIn(context, f) } }.bind()

@@ -6,6 +6,9 @@ import arrow.Kind
 import arrow.core.*
 import java.math.BigDecimal
 
+/**
+ * ank_macro_hierarchy(arrow.typeclasses.Applicative)
+ */
 interface Applicative<F> : Functor<F> {
 
   fun <A> just(a: A): Kind<F, A>

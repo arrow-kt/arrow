@@ -7,17 +7,24 @@ jdk:
 
 script:
   - ./gradlew clean build
-  - ./gradlew :arrow-docs:runAnk
- 
+  - ./gradlew dokka :arrow-docs:runAnk
+
 after_success:
   - ./gradlew codeCoverageReport
   - bash <(curl -s https://codecov.io/bash)
   - ./deploy-scripts/deploy.sh
 
+before_deploy:
+  - rvm use 2.5.3 --install --fuzzy
+  - gem install jekyll -v 3.7.4
+  - jekyll build -s modules/docs/arrow-docs/build/site/ -d modules/docs/arrow-docs/build/_site
+
 deploy:
-  provider: pages
+  provider: s3
+  access_key_id: $S3_ACCESS_KEY_ID
+  secret_access_key: $S3_SECRET_ACCESS_KEY
+  bucket: $S3_BUCKET
   skip_cleanup: true
-  github_token: $GITHUB_TOKEN
-  local_dir: modules/docs/arrow-docs/build/site
+  local_dir: modules/docs/arrow-docs/build/_site
   on:
     branch: master

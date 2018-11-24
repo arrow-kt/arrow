@@ -9,11 +9,12 @@ import arrow.effects.maybek.functor.functor
 import arrow.effects.maybek.monad.monad
 import arrow.effects.maybek.monadDefer.monadDefer
 import arrow.effects.maybek.monadError.monadError
+import arrow.effects.maybek.monadThrow.bindingCatch
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
-import arrow.typeclasses.bindingCatch
 import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.Spec
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import io.reactivex.Maybe
@@ -47,6 +48,11 @@ class MaybeKTests : UnitSpec() {
 
   }
 
+  override fun interceptSpec(context: Spec, spec: () -> Unit) {
+    println("MaybeK: Skipping sync laws for stack safety because they are not supported. See https://github.com/ReactiveX/RxJava/issues/6322")
+    super.interceptSpec(context, spec)
+  }
+
   init {
     testLaws(
       FunctorLaws.laws(MaybeK.functor(), { MaybeK.just(it) }, EQ()),
@@ -55,13 +61,13 @@ class MaybeKTests : UnitSpec() {
       FoldableLaws.laws(MaybeK.foldable(), { MaybeK.just(it) }, Eq.any()),
       MonadErrorLaws.laws(MaybeK.monadError(), EQ(), EQ(), EQ()),
       ApplicativeErrorLaws.laws(MaybeK.applicativeError(), EQ(), EQ(), EQ()),
-      MonadDeferLaws.laws(MaybeK.monadDefer(), EQ(), EQ(), EQ()),
-      AsyncLaws.laws(MaybeK.async(), EQ(), EQ(), EQ()),
-      AsyncLaws.laws(MaybeK.effect(), EQ(), EQ(), EQ())
+      MonadDeferLaws.laws(MaybeK.monadDefer(), EQ(), EQ(), EQ(), testStackSafety = false),
+      AsyncLaws.laws(MaybeK.async(), EQ(), EQ(), EQ(), testStackSafety = false),
+      AsyncLaws.laws(MaybeK.effect(), EQ(), EQ(), EQ(), testStackSafety = false)
     )
 
     "Multi-thread Maybes finish correctly" {
-      val value: Maybe<Long> = MaybeK.monadError().bindingCatch {
+      val value: Maybe<Long> = bindingCatch {
         val a = Maybe.timer(2, TimeUnit.SECONDS).k().bind()
         a
       }.value()
@@ -75,7 +81,7 @@ class MaybeKTests : UnitSpec() {
       val originalThread: Thread = Thread.currentThread()
       var threadRef: Thread? = null
 
-      val value: Maybe<Long> = MaybeK.monadError().bindingCatch {
+      val value: Maybe<Long> = bindingCatch {
         val a = Maybe.timer(2, TimeUnit.SECONDS, Schedulers.newThread()).k().bind()
         threadRef = Thread.currentThread()
         val b = Maybe.just(a).observeOn(Schedulers.newThread()).k().bind()
@@ -92,7 +98,7 @@ class MaybeKTests : UnitSpec() {
     }
 
     "Maybe dispose forces binding to cancel without completing too" {
-      val value: Maybe<Long> = MaybeK.monadError().bindingCatch {
+      val value: Maybe<Long> = bindingCatch {
         val a = Maybe.timer(3, TimeUnit.SECONDS).k().bind()
         a
       }.value()

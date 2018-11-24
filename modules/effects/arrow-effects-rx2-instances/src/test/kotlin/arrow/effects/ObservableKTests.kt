@@ -3,18 +3,22 @@ package arrow.effects
 import arrow.effects.observablek.async.async
 import arrow.effects.observablek.foldable.foldable
 import arrow.effects.observablek.functor.functor
+import arrow.effects.observablek.monadThrow.bindingCatch
 import arrow.effects.observablek.traverse.traverse
+import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
 import arrow.test.laws.FoldableLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
-import arrow.typeclasses.bindingCatch
 import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.Spec
 import io.kotlintest.matchers.shouldNotBe
 import io.reactivex.Observable
 import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers
+import org.hamcrest.CoreMatchers.`is`
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.runner.RunWith
 import java.util.concurrent.TimeUnit
 
@@ -44,9 +48,13 @@ class ObservableKTest : UnitSpec() {
       }
   }
 
-  init {
+  override fun interceptSpec(context: Spec, spec: () -> Unit) {
+    println("ObservableK: Skipping sync laws for stack safety because they are not supported. See https://github.com/ReactiveX/RxJava/issues/6322")
+    super.interceptSpec(context, spec)
+  }
 
-    testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ()))
+  init {
+    testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ(), testStackSafety = false))
     // FIXME(paco) #691
     //testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ()))
     //testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ()))
@@ -57,7 +65,7 @@ class ObservableKTest : UnitSpec() {
     )
 
     "Multi-thread Observables finish correctly" {
-      val value: Observable<Long> = ObservableK.monadErrorFlat().bindingCatch {
+      val value: Observable<Long> = bindingCatch {
         val a = Observable.timer(2, TimeUnit.SECONDS).k().bind()
         a
       }.value()
@@ -70,7 +78,7 @@ class ObservableKTest : UnitSpec() {
     "Multi-thread Observables should run on their required threads" {
       val originalThread: Thread = Thread.currentThread()
       var threadRef: Thread? = null
-      val value: Observable<Long> = ObservableK.monadErrorFlat().bindingCatch {
+      val value: Observable<Long> = bindingCatch {
         val a = Observable.timer(2, TimeUnit.SECONDS, Schedulers.newThread()).k().bind()
         threadRef = Thread.currentThread()
         val b = Observable.just(a).observeOn(Schedulers.io()).k().bind()
@@ -86,7 +94,7 @@ class ObservableKTest : UnitSpec() {
     }
 
     "Observable cancellation forces binding to cancel without completing too" {
-      val value: Observable<Long> = ObservableK.monadErrorFlat().bindingCatch {
+      val value: Observable<Long> = bindingCatch {
         val a = Observable.timer(3, TimeUnit.SECONDS).k().bind()
         a
       }.value()
@@ -94,6 +102,28 @@ class ObservableKTest : UnitSpec() {
       test.awaitTerminalEvent(5, TimeUnit.SECONDS)
 
       test.assertNotTerminated().assertNotComplete().assertNoErrors().assertNoValues()
+    }
+
+    "ObservableK bracket cancellation should release resource with cancel exit status" {
+      lateinit var ec: ExitCase<Throwable>
+
+      val observable = Observable.just(0L)
+        .k()
+        .bracketCase(
+          use = { ObservableK.just(it) },
+          release = { _, exitCase -> ec = exitCase; ObservableK.just(Unit) }
+        )
+        .value()
+        .delay(3, TimeUnit.SECONDS)
+        .doOnSubscribe { subscription ->
+          Observable.just(0L).delay(1, TimeUnit.SECONDS)
+            .subscribe {
+              subscription.dispose()
+            }
+        }
+
+      observable.test().await(5, TimeUnit.SECONDS)
+      assertThat(ec, `is`(ExitCase.Cancelled as ExitCase<Throwable>))
     }
   }
 }

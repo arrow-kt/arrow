@@ -127,6 +127,21 @@ interface OptionFoldableInstance : Foldable<ForOption> {
     fix().nonEmpty()
 }
 
+@extension
+interface OptionSemigroupKInstance : SemigroupK<ForOption> {
+  override fun <A> Kind<ForOption, A>.combineK(y: Kind<ForOption, A>): Option<A> =
+    orElse { y.fix() }
+}
+
+@extension
+interface OptionMonoidKInstance : MonoidK<ForOption> {
+  override fun <A> empty(): Option<A> =
+    Option.empty()
+
+  override fun <A> Kind<ForOption, A>.combineK(y: Kind<ForOption, A>): Option<A> =
+    orElse { y.fix() }
+}
+
 fun <A, G, B> OptionOf<A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Option<B>> = GA.run {
   fix().fold({ just(None) }, { f(it).map { Some(it) } })
 }
@@ -163,6 +178,20 @@ interface OptionTraverseInstance : Traverse<ForOption> {
 
   override fun <A> Kind<ForOption, A>.nonEmpty(): Boolean =
     fix().nonEmpty()
+}
+
+@extension
+interface OptionHashInstance<A> : Hash<Option<A>>, OptionEqInstance<A> {
+
+  fun HA(): Hash<A>
+
+  override fun EQ(): Eq<A> = HA()
+
+  override fun Option<A>.hash(): Int = fold({
+    None.hashCode()
+  }, {
+    HA().run { it.hash() }
+  })
 }
 
 object OptionContext : OptionMonadErrorInstance, OptionTraverseInstance {

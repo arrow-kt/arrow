@@ -93,16 +93,30 @@ Try { "3".toInt() }.attempt()
 Try { "nope".toInt() }.attempt()
 ```
 
-#### fromEither
+#### fromEither/fromTry/fromOption
 
-Constructor function from an [`Either<E, A>`]({{ '/docs/datatypes/either' | relative_url }}) to the current datatype.
+Constructor function from an [`Either<E, A>`]({{ '/docs/datatypes/either' | relative_url }}), [`Option<A>`]({{ '/docs/datatypes/option' | relative_url }}), or [`Try<A>`]({{ '/docs/datatypes/try' | relative_url }}) to the current datatype.
+
+While `fromOption()` requires creating a new error value.
 
 ```kotlin:ank
-eitherAE.fromEither(Either.Right(1))
+Either.applicativeError<Throwable>().run { Some(1).fromOption { RuntimeException("Boom") } }
+```
+
+In the case of `fromTry()` it is required converting from `Throwable` to the type of the error.
+
+```kotlin:ank
+Either.applicativeError<String>().run { Try { RuntimeException("Boom") }.fromTry { it.message!! } }
+```
+
+In the case of `fromEither()` it is required converting from the error type of the `Either<EE, A>` to the type of the ApplicativeError<F, E>.
+
+```kotlin:ank
+IO.applicativeError().run { Either.Right(1).fromEither { it } }
 ```
 
 ```kotlin:ank
-eitherAE.fromEither(Either.Left(RuntimeException("Boom")))
+IO.applicativeError().run { Either.Left(RuntimeException("Boom")).fromEither { it } }
 ```
 
 #### catch
@@ -111,11 +125,11 @@ Constructor function. It takes two function parameters. The first is a generator
 `catch()` runs the generator function to generate a success datatype, and if it throws an exception it uses the error mapping function to create a new failure datatype.
 
 ```kotlin:ank
-eitherAE.catch({ 1 } ,::identity)
+eitherAE.catch(::identity) { 1 }
 ```
 
 ```kotlin:ank
-eitherAE.catch({ throw RuntimeException("Boom") } ,::identity)
+eitherAE.catch(::identity) { throw RuntimeException("Boom") }
 ```
 
 ### Laws
@@ -203,17 +217,13 @@ Rules failFast {
 }
 ```
 
-### Data Types
+### Data types
 
-The following datatypes in Arrow provide instances that adhere to the `ApplicativeError` typeclass.
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.typeclasses.ApplicativeError
 
-- [Try]({{ '/docs/datatypes/try' | relative_url }})
-- [Either]({{ '/docs/datatypes/either' | relative_url }})
-- [Kleisli]({{ '/docs/datatypes/kleisli' | relative_url }})
-- [Option]({{ '/docs/datatypes/option' | relative_url }})
-- [EitherT]({{ '/docs/datatypes/eithert' | relative_url }})
-- [StateT]({{ '/docs/datatypes/statet' | relative_url }})
-- [IO]({{ '/docs/effects/io' | relative_url }})
-- [ObservableK]({{ '/docs/integrations/rx2' | relative_url }})
-- [FlowableK]({{ '/docs/integrations/rx2' | relative_url }})
-- [DeferredK]({{ '/docs/integrations/kotlinxcoroutines/' | relative_url }})
+TypeClass(ApplicativeError::class).dtMarkdownList()
+```
+
+ank_macro_hierarchy(arrow.typeclasses.ApplicativeError)

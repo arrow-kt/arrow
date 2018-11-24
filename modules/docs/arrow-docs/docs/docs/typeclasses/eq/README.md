@@ -78,27 +78,15 @@ val intEq = Eq<Int> { a, b -> a == b }
 
 See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }}) to provide your own `Eq` instances for custom datatypes.
 
-### Data Types
+### Data types
 
-Most of the datatypes in Arrow that are not related to functions provide instances of the `Eq` typeclass.
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.typeclasses.Eq
 
-- [Id]({{ '/docs/datatypes/id/' | relative_url }})
-- [Option]({{ '/docs/datatypes/option/' | relative_url }})
-- [Either]({{ '/docs/datatypes/either/' | relative_url }})
-- [Eval]({{ '/docs/datatypes/eval/' | relative_url }})
-- `TupleN`
-- [NonEmptyList]({{ '/docs/datatypes/nonemptylist/' | relative_url }})
-- [Ior]({{ '/docs/datatypes/ior/' | relative_url }})
-- [Const]({{ '/docs/datatypes/const/' | relative_url }})
-- [Coproduct]({{ '/docs/datatypes/coproduct/' | relative_url }})
-- [Try]({{ '/docs/datatypes/try/' | relative_url }})
-- [Validated]({{ '/docs/datatypes/validated/' | relative_url }})
-- [Free]({{ '/docs/free/free' | relative_url }})
-- [FreeApplicative]({{ '/docs/free/freeapplicative' | relative_url }})
-- [ListK]({{ '/docs/datatypes/listk/' | relative_url }})
-- [SequenceK]({{ '/docs/datatypes/sequencek/' | relative_url }})
-- [SetK]({{ '/docs/datatypes/setk/' | relative_url }})
-- [MapK]({{ '/docs/datatypes/mapk/' | relative_url }})
-- [SortedMapK]({{ '/docs/datatypes/sortedmapk/' | relative_url }})
+TypeClass(Eq::class).dtMarkdownList()
+```
 
-Additionally all instances of [`Order`]({{ '/docs/typeclasses/order' | relative_url }}) and their MTL variants implement the `Eq` typeclass directly since they are all subtypes of `Eq`
+Additionally all instances of [`Order`]({{ '/docs/typeclasses/order' | relative_url }}), [`Hash`]({{ '/docs/typeclasses/hash' | relative_url }}) and their MTL variants implement the `Eq` typeclass directly since they are all subtypes of `Eq`
+
+ank_macro_hierarchy(arrow.typeclasses.Eq)

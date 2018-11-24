@@ -67,6 +67,9 @@ sealed class Try<out A> : TryOf<A> {
   fun filter(p: Predicate<A>): Try<A> =
     flatMap { if (p(it)) Success(it) else Failure(TryException.PredicateException("Predicate does not hold for $it")) }
 
+  fun <B> mapFilter(f: (A) -> Option<B>): Try<B> =
+    flatMap { a -> f(a).fold({ Failure(TryException.PredicateException("Predicate does not hold")) }, { Try.just(it) }) }
+
   /**
    * Inverts this `Try`. If this is a `Failure`, returns its exception wrapped in a `Success`.
    * If this is a `Success`, returns a `Failure` containing an `UnsupportedOperationException`.

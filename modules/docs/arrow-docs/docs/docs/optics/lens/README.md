@@ -23,7 +23,7 @@ data class Player(val health: Int)
 
 val playerLens: Lens<Player, Int> = Lens(
     get = { player -> player.health },
-    set = { value -> { player -> player.copy(health = value) } }
+    set = { player, value -> player.copy(health = value) }
 )
 
 val player = Player(70)
@@ -137,22 +137,22 @@ What we actually wanted to do here is the following: focus into employee's compa
 ```kotlin
 val employeeCompany: Lens<Employee, Company> = Lens(
         get = { it.company },
-        set = { company -> { employee -> employee.copy(company = company) } }
+        set = { employee, company -> employee.copy(company = company) }
 )
 
 val companyAddress: Lens<Company, Address> = Lens(
         get = { it.address },
-        set = { address -> { company -> company.copy(address = address) } }
+        set = { company, address -> company.copy(address = address) }
 )
 
 val addressStrees: Lens<Address, Street> = Lens(
         get = { it.street },
-        set = { street -> { address -> address.copy(street = street) } }
+        set = { address, street -> address.copy(street = street) }
 )
 
 val streetName: Lens<Street, String> = Lens(
         get = { it.name },
-        set = { name -> { street -> street.copy(name = name) } }
+        set = { street, name -> street.copy(name = name) }
 )
 
 val employeeStreetName: Lens<Employee, String> = employeeCompany compose companyAddress compose addressStrees compose streetName
@@ -191,7 +191,7 @@ When dealing with polymorphic product types we can also have polymorphic lenses 
 ```kotlin
 fun <A, B, R> tuple2(): PLens<Tuple2<A, B>, Tuple2<R, B>, A, R> = PLens(
         { it.a },
-        { r -> { ab -> r toT ab.b } }
+        { ab, r -> r toT ab.b }
 )
 
 pFirstTuple2<Int, String, String>().set(5 toT "World", "Hello, ")

@@ -48,8 +48,16 @@ KotlinConf, San Francisco, Nov '17 - version 0.3.11
  
 <iframe width="560" height="315" src="https://www.youtube.com/embed/qGef3sFAIxU" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
  
- Mobilization 7, Łódź, Oct '17 - version 0.3.11
+Mobilization 7, Łódź, Oct '17 - version 0.3.11
  
+### Simple Dependency Management in Kotlin
+
+In this talk we introduce the concepts of Dependency Management as a language feature, typeclasses, and a live demo of [KEEP-87](https://github.com/Kotlin/KEEP/pull/87).
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/CR5h2Wq1yPE" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
+
+AndroidTO, Toronto, Nov '18 - version 0.8.0
+
 ### Kotlin for the Pragmatic Functionalist
 
 An introduction to Arrow and the enhancements it brings to Kotlin's standard library.
@@ -165,3 +173,23 @@ April '18 - version 0.7
 [Arrow 101 — Modelling a real world problem with Semigroups](https://medium.com/@lehen01/arrow-101-modelling-a-real-world-problem-with-semigroups-d8f22cdf54c)
 
 June '18 - version 0.7
+
+### Polyjokes — A polymorphic approach using Arrow
+
+[@dcampogiani](https://github.com/dcampogiani) is using a polymorphic approach to retrieve a random user and then a joke about him.
+
+[Polyjokes — A polymorphic approach using Arrow](https://github.com/dcampogiani/polyjokes)
+
+October '18 - version 0.7.3
+
+### Arrow-kt Tiny Cards Flashcards
+
+[Arrow-kt Collection](https://tiny.cards/collections/W1aS1cV/arrow-kt) Data types, type classes, effects, optics, generic, free, recursion schemes
+
+DM Ersin on [Gitter](https://gitter.im/ersin-ertan) or [Slack](https://kotlinlang.slack.com/messages/D624ZNAF9/team/U619WRNJE/) if you have more concise/simpler definitions, can correct misinterpretations, or can help with a deck
+
+### Functional Hangman Game written with Arrow
+
+[Functional Hangman](https://lordraydenmk.github.io/2018/functional-hangman-in-kotlin-with-arrow/) game - console application written with Arrow. Uses the `IO<A>` monad to push side effects to the edge of the system.
+
+November '18 - version 0.8.1

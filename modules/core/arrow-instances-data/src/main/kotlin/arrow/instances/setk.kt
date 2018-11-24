@@ -26,7 +26,7 @@ interface SetKEqInstance<A> : Eq<SetK<A>> {
   fun EQ(): Eq<A>
 
   override fun SetK<A>.eqv(b: SetK<A>): Boolean =
-    if (size == b.size) set.map { aa ->
+    if (size == b.size) map { aa ->
       b.find { bb -> EQ().run { aa.eqv(bb) } } != null
     }.fold(true) { acc, bool ->
       acc && bool
@@ -66,6 +66,17 @@ interface SetKMonoidKInstance : MonoidK<ForSetK> {
 
   override fun <A> Kind<ForSetK, A>.combineK(y: Kind<ForSetK, A>): SetK<A> =
     fix().setCombineK(y)
+}
+
+@extension
+interface SetKHashInstance<A> : Hash<SetK<A>>, SetKEqInstance<A> {
+  fun HA(): Hash<A>
+
+  override fun EQ(): Eq<A> = HA()
+
+  override fun SetK<A>.hash(): Int = foldLeft(1) { hash, a ->
+    31 * hash + HA().run { a.hash() }
+  }
 }
 
 object SetKContext : SetKFoldableInstance, SetKMonoidKInstance

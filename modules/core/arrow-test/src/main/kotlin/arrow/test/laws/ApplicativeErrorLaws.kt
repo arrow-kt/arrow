@@ -23,7 +23,7 @@ object ApplicativeErrorLaws {
       Law("Applicative Error Laws: handle with for success") { AE.applicativeErrorHandleWithPure(EQERR) },
       Law("Applicative Error Laws: attempt for error") { AE.applicativeErrorAttemptError(EQ_EITHER) },
       Law("Applicative Error Laws: attempt for success") { AE.applicativeErrorAttemptSuccess(EQ_EITHER) },
-      Law("Applicative Error Laws: attempt fromEither consistent with pure") { AE.applicativeErrorAttemptFromEitherConsistentWithPure(EQ_EITHER) },
+      Law("Applicative Error Laws: attempt lift from Either consistent with pure") { AE.applicativeErrorAttemptFromEitherConsistentWithPure(EQ_EITHER) },
       Law("Applicative Error Laws: catch captures errors") { AE.applicativeErrorCatch(EQERR) }
     )
 
@@ -54,7 +54,7 @@ object ApplicativeErrorLaws {
 
   fun <F> ApplicativeError<F, Throwable>.applicativeErrorAttemptFromEitherConsistentWithPure(EQ: Eq<Kind<F, Either<Throwable, Int>>>): Unit =
     forAll(genEither(genThrowable(), Gen.int())) { either: Either<Throwable, Int> ->
-      fromEither(either).attempt().equalUnderTheLaw(just(either), EQ)
+      either.fromEither { it }.attempt().equalUnderTheLaw(just(either), EQ)
     }
 
   fun <F> ApplicativeError<F, Throwable>.applicativeErrorCatch(EQ: Eq<Kind<F, Int>>): Unit =

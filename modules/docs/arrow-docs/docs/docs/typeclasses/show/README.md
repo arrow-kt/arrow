@@ -55,16 +55,13 @@ val personShow = Show<Person> { "Hello $firstName $lastName" }
 See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }}) to provide your own `Show` instances for custom datatypes.
 
 
-### Data Types
+### Data types
 
-The following data types in Arrow provide instances that adhere to the `Show` type class.
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.typeclasses.Show
 
-- [Either]({{ '/docs/datatypes/either' | relative_url }})
-- [Id]({{ '/docs/datatypes/id' | relative_url }})
-- [Ior]({{ '/docs/datatypes/ior' | relative_url }})
-- [NonEmptyList]({{ '/docs/datatypes/nonemptylist' | relative_url }})
-- [Option]({{ '/docs/datatypes/option' | relative_url }})
-- [SequenceK]({{ '/docs/datatypes/sequencek' | relative_url }})
-- [SetK]({{ '/docs/datatypes/setk' | relative_url }})
-- [Try]({{ '/docs/datatypes/try' | relative_url }})
-- [Validated]({{ '/docs/datatypes/validated' | relative_url }})
+TypeClass(Show::class).dtMarkdownList()
+```
+
+ank_macro_hierarchy(arrow.typeclasses.Show)

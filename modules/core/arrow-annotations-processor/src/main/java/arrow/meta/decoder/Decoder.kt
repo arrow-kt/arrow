@@ -160,6 +160,7 @@ interface TypeDecoder : MetaDecoder<Type> {
 
   fun TypeName.WildcardType.lyrics(): com.squareup.kotlinpoet.TypeName =
     when {
+      name == "*" -> WildcardTypeName.STAR
       lowerBounds.isNotEmpty() -> lowerBounds[0].lyrics()
       upperBounds.isNotEmpty() -> upperBounds[0].lyrics()
       else -> WildcardTypeName.STAR
@@ -174,6 +175,17 @@ interface TypeDecoder : MetaDecoder<Type> {
       className.parameterizedBy(*typeArguments.map { it.lyrics() }.toTypedArray())
     }
 
+  fun TypeName.FunctionLiteral.lyrics(): com.squareup.kotlinpoet.TypeName {
+    val lambdaName = LambdaTypeName.get(
+      receiver = receiverType?.lyrics(),
+      parameters = *parameters.map { it.lyrics() }.toTypedArray(),
+      returnType = returnType.lyrics())
+    return if (modifiers.contains(Modifier.Suspend))
+      lambdaName.asSuspending()
+    else
+      lambdaName
+  }
+
   fun TypeName.Classy.lyrics(): ClassName =
     ClassName(packageName = pckg.value, simpleName = simpleName)
 
@@ -183,6 +195,7 @@ interface TypeDecoder : MetaDecoder<Type> {
       is TypeName.WildcardType -> lyrics()
       is TypeName.ParameterizedType -> lyrics()
       is TypeName.Classy -> lyrics()
+      is TypeName.FunctionLiteral -> lyrics()
     }
 
   operator fun Code.Companion.invoke(f: () -> String): Code =

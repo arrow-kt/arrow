@@ -12,10 +12,13 @@ intermediate
 TODO. Meanwhile you can find a short description in the [intro to typeclasses]({{ '/docs/typeclasses/intro/' | relative_url }}).
 
 
-### Data Types
+### Data types
 
-The following data types in Arrow provide instances that adhere to the `MonoidK` type class.
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.typeclasses.MonoidK
 
-- [OptionT]({{ '/docs/datatypes/optiont' | relative_url }})
-- [SequenceK]({{ '/docs/datatypes/sequencek' | relative_url }})
-- [SetK]({{ '/docs/datatypes/setk' | relative_url }})
+TypeClass(MonoidK::class).dtMarkdownList()
+```
+
+ank_macro_hierarchy(arrow.typeclasses.MonoidK)

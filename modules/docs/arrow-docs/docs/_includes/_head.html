@@ -31,6 +31,12 @@
     <!-- Arrow main css -->
     <link rel="stylesheet" type="text/css" href="{{ '/css/arrow.css' | relative_url }}">
 
+    <!-- Diagrams support -->
+    <script src="{{ '/js/dagre.min.js' | relative_url }}"></script>
+    <script src="{{ '/js/lodash.min.js' | relative_url }}"></script>
+    <script src="{{ '/js/nomnoml.js' | relative_url }}"></script>
+    <script src="{{ '/js/diagrams.js' | relative_url }}"></script>
+
     {% if jekyll.environment == 'production' and site.data.commons.google_analytics %}
     {% include _google-analytics.html %}
     {% endif %}

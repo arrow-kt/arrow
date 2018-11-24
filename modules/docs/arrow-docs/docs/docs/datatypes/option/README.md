@@ -138,6 +138,33 @@ val nullableValue: String? = "Hello"
 nullableValue.toOption()
 ```
 
+Some Iterable extensions are available, so you can maintain a friendly API syntax while avoiding null handling (`firstOrNull()`)
+
+```kotlin:ank:silent
+val myList: List<Int> = listOf(1,2,3,4)
+```
+
+```kotlin:ank
+myList.firstOrNone { it == 4 }
+```
+
+```kotlin:ank
+myList.firstOrNone { it == 5 }
+```
+
+Sample usage
+
+```
+fun foo() {
+    val foxMap = mapOf(1 to "The", 2 to "Quick", 3 to "Brown", 4 to "Fox")
+
+    val ugly = foxMap.entries.firstOrNull { it.key == 5 }?.value.let { it?.toCharArray() }.toOption()
+    val pretty = foxMap.entries.firstOrNone { it.key == 5 }.map { it.value.toCharArray() }
+    
+    //Do something with pretty Option
+}
+```
+
 Arrow contains `Option` instances for many useful typeclasses that allows you to use and transform optional values
 
 [`Functor`]({{ '/docs/typeclasses/functor/' | relative_url }})
@@ -191,20 +218,15 @@ ForOption extensions {
 //None
 ```
 
-## Available Instances:
+### Supported type classes
 
-* [Show]({{ '/docs/typeclasses/show' | relative_url }})
-* [Eq]({{ '/docs/typeclasses/eq' | relative_url }})
-* [Applicative]({{ '/docs/typeclasses/applicative' | relative_url }})
-* [ApplicativeError]({{ '/docs/typeclasses/applicativeerror' | relative_url }})
-* [Foldable]({{ '/docs/typeclasses/foldable' | relative_url }})
-* [Functor]({{ '/docs/typeclasses/functor' | relative_url }})
-* [Monad]({{ '/docs/typeclasses/monad' | relative_url }})
-* [MonadError]({{ '/docs/typeclasses/monaderror' | relative_url }})
-* [MonadFilter]({{ '/docs/typeclasses/monadfilter' | relative_url }})
-* [Traverse]({{ '/docs/typeclasses/traverse' | relative_url }})
-* [TraverseFilter]({{ '/docs/typeclasses/traversefilter' | relative_url }})
-* [Each]({{ '/docs/optics/each' | relative_url }})
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.data.*
+import arrow.core.*
+
+DataType(Option::class).tcMarkdownList()
+```
 
 ## Credits
 

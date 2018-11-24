@@ -57,6 +57,7 @@ include {
         effects {
             _ 'effects'
             _ 'effects-instances'
+            _ 'data-instances-effects'
             _ 'effects-rx2'
             _ 'effects-rx2-instances'
             _ 'effects-kotlinx-coroutines'
@@ -64,6 +65,10 @@ include {
             _ 'effects-reactor'
             _ 'effects-data'
             _ 'effects-reactor-instances'
+        }
+
+        integrations {
+            _ 'integrations-retrofit-adapter'
         }
 
         folder('recursion-schemes') {
@@ -90,10 +95,22 @@ include {
         shadow {
             _ 'shadow'
         }
+        
+        streams {
+            _ 'streams'
+        }
 
         ank {
             _ 'ank'
             _ 'ank-gradle'
+        }
+
+        aql {
+            _ 'query-language'
+        }
+
+        reflect {
+            _ 'reflect'
         }
     }
 }

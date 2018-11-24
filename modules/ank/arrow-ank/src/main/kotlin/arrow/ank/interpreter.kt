@@ -1,11 +1,9 @@
 package arrow.ank
 
-import arrow.Kind
 import arrow.core.*
 import arrow.data.ListK
-import arrow.data.fix
 import arrow.data.k
-import arrow.typeclasses.MonadError
+import arrow.instances.option.monad.forEffect
 import org.intellij.markdown.MarkdownElementTypes.CODE_FENCE
 import org.intellij.markdown.ast.ASTNode
 import org.intellij.markdown.ast.accept
@@ -23,24 +21,6 @@ val extensionMappings = mapOf(
   "java" to "java",
   "kotlin" to "kts"
 )
-
-@Suppress("UNCHECKED_CAST")
-inline fun <reified F> MonadError<F, Throwable>.ankMonadErrorInterpreter(): FunctionK<ForAnkOps, F> =
-  object : FunctionK<ForAnkOps, F> {
-    override fun <A> invoke(fa: Kind<ForAnkOps, A>): Kind<F, A> {
-      val op = fa.fix()
-      return when (op) {
-        is AnkOps.CreateTarget -> catch { createTargetImpl(op.source, op.target) }
-        is AnkOps.GetFileCandidates -> catch { getFileCandidatesImpl(op.target) }
-        is AnkOps.ReadFile -> catch { readFileImpl(op.source) }
-        is AnkOps.ParseMarkdown -> catch { parseMarkDownImpl(op.markdown) }
-        is AnkOps.ExtractCode -> catch { extractCodeImpl(op.source, op.tree) }
-        is AnkOps.CompileCode -> catch { compileCodeImpl(op.snippets, op.compilerArgs) }
-        is AnkOps.ReplaceAnkToLang -> catch { replaceAnkToLangImpl(op.compilationResults) }
-        is AnkOps.GenerateFiles -> catch { generateFilesImpl(op.candidates, op.newContents) }
-      } as Kind<F, A>
-    }
-  }
 
 val SupportedMarkdownExtensions: Set<String> = setOf(
   "markdown",
@@ -83,14 +63,19 @@ data class CompilationException(
 
 data class CompiledMarkdown(val origin: File, val snippets: ListK<Snippet>)
 
+private fun String.removeSpaces(): String =
+  replace(" ", "")
+
 data class Snippet(
   val fence: String,
   val lang: String,
-  val silent: Boolean,
   val startOffset: Int,
   val endOffset: Int,
   val code: String,
-  val result: Option<String> = None)
+  val result: Option<String> = None,
+  val isSilent: Boolean = fence.contains(AnkSilentBlock),
+  val isReplace: Boolean = fence.contains(AnkReplaceBlock),
+  val isOutFile: Boolean = fence.contains(AnkOutFileBlock))
 
 fun extractCodeImpl(source: String, tree: ASTNode): ListK<Snippet> {
   val sb = mutableListOf<Snippet>()
@@ -101,7 +86,7 @@ fun extractCodeImpl(source: String, tree: ASTNode): ListK<Snippet> {
         val lang = fence.takeWhile { it != ':' }.toString().replace("```", "")
         if (fence.startsWith("```$lang$AnkBlock")) {
           val code = fence.split("\n").drop(1).dropLast(1).joinToString("\n")
-          sb.add(Snippet(fence.toString(), lang, fence.startsWith("```$lang$AnkSilentBlock"), node.startOffset, node.endOffset, code))
+          sb.add(Snippet(fence.toString(), lang, node.startOffset, node.endOffset, code))
         }
       }
       super.visitNode(node)
@@ -110,22 +95,73 @@ fun extractCodeImpl(source: String, tree: ASTNode): ListK<Snippet> {
   return sb.k()
 }
 
-private fun repeat(s: String, n: Int): String {
-  val builder = StringBuilder()
-  for (i in 0 until n)
-    builder.append(s)
-  return builder.toString()
+val ankMacroRegex: Regex = "ank_macro_hierarchy\\((.*?)\\)".toRegex()
+
+fun preProcessMacrosImpl(source: Tuple2<File, String>): String {
+  val matches: List<MatchResult> = ankMacroRegex.findAll(source.b).toList()
+  val result: String = when {
+    matches.isEmpty() -> source.b
+    else -> {
+      val classes: List<String> = matches.map { it.groupValues[1] }
+      val cleanedSource = ankMacroRegex.replace(source.b) { "" }
+      cleanedSource +
+        "\n\n\n## Type Class Hierarchy\n\n" +
+        generateMixedHierarchyDiagramCode(classes).joinToString("\n")
+    }
+
+  }
+  val originalFile = source.a
+  originalFile.writeText(result)
+  return result
 }
 
-fun compileCodeImpl(snippets: Map<File, ListK<Snippet>>, classpath: ListK<String>): ListK<CompiledMarkdown> {
-  println(colored(ANSI_PURPLE, AnkHeader))
+//TODO Try by overriding dokka settings for packages so it does not create it's markdown package file, then for regular type classes pages we only check the first result with the comment but remove them all regardless
+private fun generateMixedHierarchyDiagramCode(classes: List<String>): List<String> {
+  val packageName = classes.firstOrNull()?.substringBeforeLast(".")
+  //careful meta-meta-programming ahead
+  val hierarchyGraphsJoined =
+    "listOf(" + classes
+      .map { "TypeClass($it::class)" }
+      .joinToString(", ") + ").mixedHierarchyGraph()"
+
+  return listOf(
+    """
+      |<canvas id="$packageName-hierarchy-diagram"></canvas>
+      |<script>
+      |  drawNomNomlDiagram('$packageName-hierarchy-diagram', '$packageName-diagram.nomnol')
+      |</script>
+    """.trimMargin(),
+    """
+      |```kotlin:ank:outFile($packageName-diagram.nomnol)
+      |import arrow.reflect.*
+      |$hierarchyGraphsJoined
+      |```
+      |""".trimMargin())
+}
+
+private fun generateHierarchyDiagramCode(fqClassName: String): List<String> =
+  listOf(
+    """
+      |<canvas id="hierarchy-diagram"></canvas>
+      |<script>
+      |  drawNomNomlDiagram('hierarchy-diagram', 'diagram.nomnol')
+      |</script>
+    """.trimMargin(),
+    """
+      |```kotlin:ank:outFile(diagram.nomnol)
+      |import arrow.reflect.*
+      |TypeClass($fqClassName::class).hierarchyGraph()
+      |```
+      |""".trimMargin())
+
+fun compileCodeImpl(snippets: Map<File, List<Snippet>>, classpath: List<String>): ListK<CompiledMarkdown> {
   val sortedSnippets = snippets.toList()
   val result = sortedSnippets.mapIndexed { n, (file, codeBlocks) ->
     val progress: Int = if (snippets.isNotEmpty()) ((n + 1) * 100 / snippets.size) else 100
-    val classLoader = URLClassLoader(classpath.map { URL(it) }.fix().list.toTypedArray())
+    val classLoader = URLClassLoader(classpath.map { URL(it) }.toTypedArray())
     val seManager = ScriptEngineManager(classLoader)
     val engineCache: Map<String, ScriptEngine> =
-      codeBlocks.list
+      codeBlocks
         .asSequence()
         .distinctBy { it.lang }
         .map {
@@ -156,32 +192,47 @@ fun compileCodeImpl(snippets: Map<File, ListK<Snippet>>, classpath: ListK<String
                     |${colored(ANSI_RED, it.localizedMessage)}
                     """.trimMargin())
       }, { it })
-      if (snippet.silent) {
+      if (snippet.isSilent) {
         snippet
       } else {
-        val resultString: Option<String> = Option.fromNullable(result).fold({ None }, { Some("// $it") })
+        val resultString: Option<String> = Option.fromNullable(result).fold({ None }, {
+          when {
+            snippet.isReplace -> Some("$it")
+            snippet.isOutFile -> Some("").forEffect(Some(snippet.writeToOutFile(file.parentFile, result.toString())))
+            else -> Some("// $it")
+          }
+        })
         snippet.copy(result = resultString)
       }
     }.k()
-    val message = "[$progress%] ✔ ${file.parentFile.name}/${file.name} [${n + 1} of ${snippets.size}]"
-    println(colored(ANSI_GREEN, message))
     CompiledMarkdown(file, evaledSnippets)
   }.k()
   return result
+}
+
+private fun Snippet.writeToOutFile(parent: File, result: String): Unit {
+  val fileName = fence.lines()[0].substringAfter("(").substringBefore(")")
+  val file = File(parent, fileName)
+  file.writeText(result)
 }
 
 fun replaceAnkToLangImpl(compiledMarkdown: CompiledMarkdown): String =
   compiledMarkdown.snippets.fold(compiledMarkdown.origin.readText()) { content, snippet ->
     snippet.result.fold(
       { content.replace(snippet.fence, "```${snippet.lang}\n" + snippet.code + "\n```") },
-      { content.replace(snippet.fence, "```${snippet.lang}\n" + snippet.code + "\n" + it + "\n```") }
+      {
+        when {
+          snippet.isReplace -> content.replace(snippet.fence, it)
+          snippet.isOutFile -> content.replace(snippet.fence, "")
+          else -> content.replace(snippet.fence, "```${snippet.lang}\n" + snippet.code + "\n" + it + "\n```")
+        }
+      }
     )
   }
 
-fun generateFilesImpl(candidates: ListK<File>, newContents: ListK<String>): ListK<File> =
-  ListK(candidates.mapIndexed { n, file ->
-    file.printWriter().use {
-      it.print(newContents.list[n])
-    }
-    file
-  })
+fun generateFileImpl(file: File, contents: String): File {
+  file.printWriter().use {
+    it.print(contents)
+  }
+  return file
+}

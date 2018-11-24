@@ -20,7 +20,7 @@ interface Ref<F, A> {
    * Obtains the current value.
    * Since [Ref] is always guaranteed to have a value, the returned action completes immediately after being bound.
    */
-  fun get(): Kind<F, A>
+  val get: Kind<F, A>
 
   /**
    * Sets the current value to [a].
@@ -103,12 +103,12 @@ interface Ref<F, A> {
     /**
      * Creates an asynchronous, concurrent mutable reference initialized to the supplied value.
      */
-    fun <F, A> of(a: A, MD: MonadDefer<F>): Kind<F, Ref<F, A>> = MD {
+    fun <F, A> of(a: A, MD: MonadDefer<F>): Kind<F, Ref<F, A>> = MD.delay {
       unsafe(a, MD)
     }
 
     /**
-     * Like [invoke] but returns the newly allocated ref directly instead of wrapping it in [MonadDefer.invoke].
+     * Like [of] but returns the newly allocated ref directly instead of wrapping it in [MonadDefer.invoke].
      * This method is considered unsafe because it is not referentially transparent -- it allocates mutable state.
      *
      * @see [invoke]
@@ -120,35 +120,36 @@ interface Ref<F, A> {
      */
     private class MonadDeferRef<F, A>(private val ar: AtomicReference<A>, private val MD: MonadDefer<F>) : Ref<F, A> {
 
-      override fun get(): Kind<F, A> = MD {
-        ar.get()
-      }
+      override val get: Kind<F, A>
+        get() = MD.delay {
+          ar.get()
+        }
 
-      override fun set(a: A): Kind<F, Unit> = MD {
+      override fun set(a: A): Kind<F, Unit> = MD.delay {
         ar.set(a)
       }
 
-      override fun getAndSet(a: A): Kind<F, A> = MD {
+      override fun getAndSet(a: A): Kind<F, A> = MD.delay {
         ar.getAndSet(a)
       }
 
       override fun setAndGet(a: A): Kind<F, A> = MD.run {
-        set(a).flatMap { get() }
+        set(a).flatMap { get }
       }
 
-      override fun getAndUpdate(f: (A) -> A): Kind<F, A> = MD {
+      override fun getAndUpdate(f: (A) -> A): Kind<F, A> = MD.delay {
         ar.getAndUpdate(f)
       }
 
-      override fun updateAndGet(f: (A) -> A): Kind<F, A> = MD {
+      override fun updateAndGet(f: (A) -> A): Kind<F, A> = MD.delay {
         ar.updateAndGet(f)
       }
 
-      override fun access(): Kind<F, Tuple2<A, (A) -> Kind<F, Boolean>>> = MD {
+      override fun access(): Kind<F, Tuple2<A, (A) -> Kind<F, Boolean>>> = MD.delay {
         val snapshot = ar.get()
         val hasBeenCalled = AtomicBoolean(false)
         val setter = { a: A ->
-          MD { hasBeenCalled.compareAndSet(false, true) && ar.compareAndSet(snapshot, a) }
+          MD.delay { hasBeenCalled.compareAndSet(false, true) && ar.compareAndSet(snapshot, a) }
         }
         Tuple2(snapshot, setter)
       }
@@ -157,7 +158,7 @@ interface Ref<F, A> {
         tryModify { a -> Tuple2(f(a), Unit) }.map(Option<Unit>::isDefined)
       }
 
-      override fun <B> tryModify(f: (A) -> Tuple2<A, B>): Kind<F, Option<B>> = MD {
+      override fun <B> tryModify(f: (A) -> Tuple2<A, B>): Kind<F, Option<B>> = MD.delay {
         val a = ar.get()
         val (u, b) = f(a)
         if (ar.compareAndSet(a, u)) Some(b)
@@ -174,7 +175,7 @@ interface Ref<F, A> {
           return if (!ar.compareAndSet(a, u)) go() else b
         }
 
-        return MD(::go)
+        return MD.delay(::go)
       }
 
     }
