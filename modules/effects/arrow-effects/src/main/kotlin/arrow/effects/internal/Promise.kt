@@ -100,4 +100,3 @@ internal class UnsafePromise<A> : Promise<ForId, A> {
   }
 
 }
-
