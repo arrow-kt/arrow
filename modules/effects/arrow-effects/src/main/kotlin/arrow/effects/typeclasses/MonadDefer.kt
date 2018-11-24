@@ -27,6 +27,8 @@ interface MonadDefer<F> : MonadThrow<F>, Bracket<F, Throwable> {
       }
     }
 
+  fun <A> delay(fa: Kind<F, A>): Kind<F, A> = defer { fa }
+
   @Deprecated("Use delay instead",
           ReplaceWith("delay(f)", "arrow.effects.typeclasses.MonadDefer"))
   operator fun <A> invoke(f: () -> A): Kind<F, A> =

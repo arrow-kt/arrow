@@ -13,6 +13,8 @@ import arrow.test.laws.FoldableLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.Spec
+import io.kotlintest.TestCaseContext
 import io.kotlintest.matchers.shouldNotBe
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.not
@@ -53,10 +55,15 @@ class FluxKTest : UnitSpec() {
       }
   }
 
+  override fun interceptSpec(context: Spec, spec: () -> Unit) {
+    println("FluxK: Skipping sync laws for stack safety because they are not supported. See https://github.com/reactor/reactor-core/issues/1441")
+    super.interceptSpec(context, spec)
+  }
+
   init {
 
     testLaws(
-      AsyncLaws.laws(FluxK.async(), EQ(), EQ()),
+      AsyncLaws.laws(FluxK.async(), EQ(), EQ(), testStackSafety = false),
       FoldableLaws.laws(FluxK.foldable(), { FluxK.just(it) }, Eq.any()),
       TraverseLaws.laws(FluxK.traverse(), FluxK.functor(), { FluxK.just(it) }, EQ())
     )

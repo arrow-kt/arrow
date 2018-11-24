@@ -12,6 +12,7 @@ import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.Spec
 import io.kotlintest.matchers.shouldNotBe
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
@@ -44,6 +45,11 @@ class SingleKTests : UnitSpec() {
 
   }
 
+  override fun interceptSpec(context: Spec, spec: () -> Unit) {
+    println("SingleK: Skipping sync laws for stack safety because they are not supported. See https://github.com/ReactiveX/RxJava/issues/6322")
+    super.interceptSpec(context, spec)
+  }
+
   init {
     testLaws(
       FunctorLaws.laws(SingleK.functor(), { SingleK.just(it) }, EQ()),
@@ -51,8 +57,8 @@ class SingleKTests : UnitSpec() {
       MonadLaws.laws(SingleK.monad(), EQ()),
       MonadErrorLaws.laws(SingleK.monadError(), EQ(), EQ(), EQ()),
       ApplicativeErrorLaws.laws(SingleK.applicativeError(), EQ(), EQ(), EQ()),
-      AsyncLaws.laws(SingleK.async(), EQ(), EQ(), EQ()),
-      AsyncLaws.laws(SingleK.effect(), EQ(), EQ(), EQ())
+      AsyncLaws.laws(SingleK.async(), EQ(), EQ(), EQ(), testStackSafety = false),
+      AsyncLaws.laws(SingleK.effect(), EQ(), EQ(), EQ(), testStackSafety = false)
     )
 
     "Multi-thread Singles finish correctly" {
