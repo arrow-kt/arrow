@@ -1,9 +1,7 @@
 package arrow.effects
 
 import arrow.Kind
-import arrow.core.Either
-import arrow.core.Option
-import arrow.core.toT
+import arrow.core.*
 import arrow.effects.instances.io.applicative.applicative
 import arrow.effects.instances.io.async.async
 import arrow.effects.instances.io.async.continueOn
@@ -29,8 +27,8 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class PromiseTest : UnitSpec() {
 
-  val EQ: Eq<Kind<ForIO, Int>> = Eq { a, b ->
-    Option.eq(Either.eq(Eq.any(), Int.eq())).run {
+  fun <A> EQ(): Eq<Kind<ForIO, A>> = Eq { a, b ->
+    Option.eq(Either.eq(Eq.any(), Eq.any())).run {
       a.fix().attempt().unsafeRunTimed(60.seconds).eqv(b.fix().attempt().unsafeRunTimed(60.seconds))
     }
   }
@@ -39,13 +37,31 @@ class PromiseTest : UnitSpec() {
 
   init {
 
+    "tryGet before completing" {
+      forAll(Gen.int()) { i ->
+        promise<Int>().flatMap { p ->
+          p.tryGet
+        }.equalUnderTheLaw(IO.just(None), EQ())
+      }
+    }
+
+    "tryGet after completing" {
+      forAll(Gen.int()) { i ->
+        promise<Int>().flatMap { p ->
+          p.complete(i).flatMap {
+            p.tryGet
+          }
+        }.equalUnderTheLaw(IO.just(Some(i)), EQ())
+      }
+    }
+
     "complete" {
       forAll(Gen.int()) { i ->
         promise<Int>().flatMap { p ->
           p.complete(i).flatMap {
             p.get
           }
-        }.equalUnderTheLaw(IO.just(i), EQ)
+        }.equalUnderTheLaw(IO.just(i), EQ())
       }
     }
 
@@ -56,18 +72,26 @@ class PromiseTest : UnitSpec() {
           p.complete(a).bind()
           p.complete(b).bind()
           p.get.bind()
-        }.equalUnderTheLaw(IO.raiseError(Promise.AlreadyFulfilled), EQ)
+        }.equalUnderTheLaw(IO.raiseError(Promise.AlreadyFulfilled), EQ())
       }
     }
 
-    "error after completion results in AlreadyFulfilled" {
-      forAll(Gen.int(), genThrowable()) { i, t ->
+    "tryComplete" {
+      forAll(Gen.int()) { i ->
         binding {
           val p = promise<Int>().bind()
-          p.complete(i).bind()
-          p.error(t).bind()
-          p.get.bind()
-        }.equalUnderTheLaw(IO.raiseError(Promise.AlreadyFulfilled), EQ)
+          p.tryComplete(i).bind() toT p.get.bind()
+        }.equalUnderTheLaw(IO.just(true toT i), EQ())
+      }
+    }
+
+    "tryComplete returns false if already complete" {
+      forAll(Gen.int(), Gen.int()) { a, b ->
+        binding {
+          val p = promise<Int>().bind()
+          p.complete(a).bind()
+          p.tryComplete(b).bind() toT p.get.bind()
+        }.equalUnderTheLaw(IO.just(false toT a), EQ())
       }
     }
 
@@ -77,7 +101,37 @@ class PromiseTest : UnitSpec() {
         p.error(error).flatMap {
           p.get
         }
-      }.equalUnderTheLaw(IO.raiseError(error), EQ)
+      }.equalUnderTheLaw(IO.raiseError(error), EQ())
+    }
+
+    "error after completion results in AlreadyFulfilled" {
+      forAll(Gen.int(), genThrowable()) { i, t ->
+        binding {
+          val p = promise<Int>().bind()
+          p.complete(i).bind()
+          p.error(t).bind()
+          p.get.bind()
+        }.equalUnderTheLaw(IO.raiseError(Promise.AlreadyFulfilled), EQ())
+      }
+    }
+
+    "tryError returns false if already completed" {
+      forAll(Gen.int(), genThrowable()) { i, t ->
+        binding {
+          val p = promise<Int>().bind()
+          p.complete(i).bind()
+          p.tryError(t).bind() toT p.get.bind()
+        }.equalUnderTheLaw(IO.just(false toT i), EQ())
+      }
+    }
+
+    "tryError" {
+      forAll(genThrowable()) { t ->
+        binding {
+          val p = promise<Int>().bind()
+          p.tryError(t).bind()
+        }.equalUnderTheLaw(IO.raiseError(t), EQ())
+      }
     }
 
   }
