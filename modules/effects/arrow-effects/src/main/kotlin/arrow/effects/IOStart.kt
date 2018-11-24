@@ -16,9 +16,8 @@ import kotlin.coroutines.startCoroutine
 import kotlin.coroutines.suspendCoroutine
 
 fun <A> IOOf<A>.startF(ctx: CoroutineContext): Kind<ForIO, Fiber<ForIO, A>> = IO.async { ioConnection: IOConnection, cb ->
-  val conn = IOConnection()
-  conn.push(ioConnection.cancel())
   val promise = Promise<A>()
+  val conn = IOConnection()
 
   val a: suspend () -> A = {
     suspendCoroutine { ca: Continuation<A> ->
