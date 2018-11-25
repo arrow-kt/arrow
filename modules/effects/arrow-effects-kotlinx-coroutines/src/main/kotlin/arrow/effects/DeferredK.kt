@@ -78,7 +78,7 @@ sealed class DeferredK<A>(
         use(a).also { release(a, ExitCase.Completed) }
       } catch (e: Exception) {
         release(a, ExitCase.Error(e))
-        DeferredK.failed<B>(e)
+        DeferredK.raiseError<B>(e)
       }
     }
 
