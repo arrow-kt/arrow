@@ -8,6 +8,8 @@ import arrow.recursion.Coalgebra
 import arrow.recursion.hylo
 
 /**
+ * ank_macro_hierarchy(arrow.recursion.typeclasses.Recursive)
+ *
  * Typeclass for types that can be generically folded with algebras.
  */
 interface Recursive<T> {

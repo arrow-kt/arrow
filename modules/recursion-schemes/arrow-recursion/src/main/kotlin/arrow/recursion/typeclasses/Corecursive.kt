@@ -8,6 +8,8 @@ import arrow.recursion.Coalgebra
 import arrow.recursion.hylo
 
 /**
+ * ank_macro_hierarchy(arrow.recursion.typeclasses.Corecursive)
+ *
  * Typeclass for types that can be generically unfolded with coalgebras.
  */
 interface Corecursive<T> {

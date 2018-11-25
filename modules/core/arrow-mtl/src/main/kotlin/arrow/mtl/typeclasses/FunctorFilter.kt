@@ -4,6 +4,12 @@ import arrow.Kind
 import arrow.core.*
 import arrow.typeclasses.Functor
 
+/**
+ * ank_macro_hierarchy(arrow.mtl.typeclasses.FunctorFilter)
+ *
+ * A Functor with the ability to [mapFilter].
+ * Enables [collect] based on [PartialFunction] predicates.
+ */
 interface FunctorFilter<F> : Functor<F> {
 
   /**
