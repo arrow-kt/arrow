@@ -165,13 +165,13 @@ fun <A> DeferredKOf<A>.unsafeRunSync(): A =
   runBlocking { await() }
 
 fun <A> DeferredKOf<A>.runAsync(cb: (Either<Throwable, A>) -> DeferredKOf<Unit>): DeferredK<Unit> =
-  DeferredK.invoke(fix().scope(), Dispatchers.Unconfined, CoroutineStart.DEFAULT) {
+  DeferredK.invoke(scope(), Dispatchers.Unconfined, CoroutineStart.DEFAULT) {
     fix().forceExceptionPropagation()
     unsafeRunAsync(cb.andThen { it.unsafeRunAsync { } })
   }
 
 fun <A> DeferredKOf<A>.runAsyncCancellable(onCancel: OnCancel = OnCancel.Silent, cb: (Either<Throwable, A>) -> DeferredKOf<Unit>): DeferredK<Disposable> =
-  DeferredK.invoke(fix().scope(), Dispatchers.Unconfined, CoroutineStart.DEFAULT) {
+  DeferredK.invoke(scope(), Dispatchers.Unconfined, CoroutineStart.DEFAULT) {
     fix().forceExceptionPropagation()
     val call = CompletableDeferred<Unit>(parent = runAsync(cb))
     val disposable: Disposable = {
@@ -184,7 +184,7 @@ fun <A> DeferredKOf<A>.runAsyncCancellable(onCancel: OnCancel = OnCancel.Silent,
   }
 
 fun <A> DeferredKOf<A>.unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit =
-  fix().scope().async(Dispatchers.Unconfined, CoroutineStart.DEFAULT) {
+  scope().async(Dispatchers.Unconfined, CoroutineStart.DEFAULT) {
     Try { await() }.fold({ cb(Left(it)) }, { cb(Right(it)) })
   }.forceExceptionPropagation()
 
