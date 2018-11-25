@@ -112,9 +112,6 @@ sealed class DeferredK<A>(
       Generated(ctx, start, scope, f)
 
     fun <A> raiseError(t: Throwable): DeferredK<A> =
-      failed(t)
-
-    fun <A> failed(t: Throwable): DeferredK<A> =
       CompletableDeferred<A>().apply { completeExceptionally(t) }.k()
 
     /**
