@@ -105,9 +105,6 @@ sealed class DeferredK<A>(
 
     fun <A> just(a: A): DeferredK<A> = CompletableDeferred(a).k()
 
-    fun <A> defer(scope: CoroutineScope = GlobalScope, ctx: CoroutineContext = Dispatchers.Default, start: CoroutineStart = CoroutineStart.LAZY, f: suspend () -> A): DeferredK<A> =
-      Generated(ctx, start, scope, f)
-
     fun <A> defer(scope: CoroutineScope = GlobalScope, ctx: CoroutineContext = Dispatchers.Default, start: CoroutineStart = CoroutineStart.LAZY, fa: () -> DeferredKOf<A>): DeferredK<A> =
       Generated(ctx, start, scope) { fa().await() }
 
