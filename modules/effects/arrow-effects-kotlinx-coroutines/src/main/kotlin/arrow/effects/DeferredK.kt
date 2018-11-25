@@ -82,14 +82,14 @@ fun <A> DeferredKOf<A>.scope(): CoroutineScope = this.fix().scope
 @higherkind
 @ExperimentalCoroutinesApi
 sealed class DeferredK<A>(
-  val scope: CoroutineScope = GlobalScope,
-  val memoized: Deferred<A>
+  open val scope: CoroutineScope = GlobalScope,
+  open val memoized: Deferred<A>
 ) : DeferredKOf<A>, Deferred<A> by memoized {
 
   /**
    * Pure wrapper for already constructed [Deferred] instances. Created solely by `Deferred.k()` extension method
    */
-  internal class Wrapped<A>(scope: CoroutineScope = GlobalScope, memoized: Deferred<A>) : DeferredK<A>(scope = scope, memoized = memoized)
+  internal data class Wrapped<A>(override val scope: CoroutineScope = GlobalScope, override val memoized: Deferred<A>) : DeferredK<A>(scope = scope, memoized = memoized)
 
   /**
    * Represents a [DeferredK] that can generate an instance of [Deferred] on every await
@@ -99,10 +99,10 @@ sealed class DeferredK<A>(
    *  only when creating all deferred instances inside DeferredK or using DeferredK's methods
    *  one can guarantee not having memoization
    */
-  internal class Generated<A>(
+  internal data class Generated<A>(
     val ctx: CoroutineContext = Dispatchers.Default,
     val coroutineStart: CoroutineStart = CoroutineStart.LAZY,
-    scope: CoroutineScope = GlobalScope,
+    override val scope: CoroutineScope = GlobalScope,
     val generator: suspend () -> A
   ) : DeferredK<A>(scope, scope.async(ctx, coroutineStart) { generator() }) {
 
