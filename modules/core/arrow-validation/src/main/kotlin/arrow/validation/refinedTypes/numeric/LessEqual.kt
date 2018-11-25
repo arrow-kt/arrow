@@ -14,7 +14,6 @@ import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Order
 import arrow.validation.RefinedPredicateException
 import arrow.validation.Refinement
-import arrow.validation.refinedTypes.bool.Not
 
 internal fun <A : Number> isLessEqualThan(ORD: Order<A>, a: A, max: A): Boolean =
   ORD.run { a.lte(max) }
