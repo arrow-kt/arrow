@@ -254,7 +254,7 @@ options:
         url: /docs/typeclasses/bracket/
 
       - title: MonadFilter
-        url: /docs/typeclasses/monadfilter/
+        url: /docs/arrow/mtl/typeclasses/monadfilter/
 
       - title: MonadReader
         url: /docs/typeclasses/monadreader/
