@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: MonadState
-permalink: /docs/typeclasses/monadstate/
+permalink: /docs/arrow/mtl/typeclasses/monadstate/
+redirect_from:
+  - /docs/typeclasses/monadstate/
 ---
 
 ## MonadState

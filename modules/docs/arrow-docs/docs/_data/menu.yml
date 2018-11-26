@@ -263,7 +263,7 @@ options:
         url: /docs/arrow/mtl/typeclasses/monadwriter/
 
       - title: MonadState
-        url: /docs/typeclasses/monadstate/
+        url: /docs/arrow/mtl/typeclasses/monadstate
 
       - title: MonadCombine
         url: /docs/typeclasses/monadcombine/
