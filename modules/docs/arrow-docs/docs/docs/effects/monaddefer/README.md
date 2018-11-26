@@ -27,7 +27,7 @@ later.unsafeRunAsync { }
 
 ### Main Combinators
 
-All the new combinators added by `MonadDefer` are constructors. `MonadDefer` also includes all combinators present in [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}).
+All the new combinators added by `MonadDefer` are constructors. `MonadDefer` also includes all combinators present in [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}).
 
 #### invoke
 

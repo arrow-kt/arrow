@@ -53,7 +53,7 @@ and they have inherent mathematical properties that are testable, such as commut
 Examples of behaviours abstracted by typeclasses are: comparability ([`Eq`]({{ '/docs/arrow/typeclasses/eq' | relative_url }})),
 composability ([`Monoid`]({{ '/docs/arrow/typeclasses/monoid' | relative_url }})),
 its contents can be mapped from one type to another ([`Functor`]({{ '/docs/arrow/typeclasses/functor' | relative_url }})),
-or error recovery ([`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }})).
+or error recovery ([`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }})).
 
 Typeclasses have two main uses:
 

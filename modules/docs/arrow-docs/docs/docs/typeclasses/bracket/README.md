@@ -15,7 +15,7 @@ The `Bracket` Type class abstracts the ability to safely **acquire**, **use**, a
 Essentially, it could be considered the functional programming equivalent to the well known imperative 
 `try/catch/finally` structure.
 
-`Bracket` extends [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}).
+`Bracket` extends [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}).
 
 It ensures that the acquired resource is released at the end after using it, **even if the using action throws an error**. 
 That ensures that no errors are swallowed.

@@ -136,7 +136,7 @@ We will list them by their hierarchy.
 
 - [`Monad`]({{ '/docs/typeclasses/monad/' | relative_url }}) - sequential execution
 
-- [`MonadError`]({{ '/docs/typeclasses/monaderror/' | relative_url }}) - recover from errors in sequential execution
+- [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror/' | relative_url }}) - recover from errors in sequential execution
 
 - [`Comonad`]({{ '/docs/typeclasses/comonad/' | relative_url }}) - can extract values from it
 

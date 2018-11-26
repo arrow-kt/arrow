@@ -184,8 +184,8 @@ What would happen if the file contains 0 lines? The chain throws ArithmeticExcep
 This exception goes uncaught and finalizes the program with a crash. Knowing this it is obvious we can do better.
 
 Our next approach can do automatic wrapping of unexpected exceptions to return them inside the operation sequence.
-For this purpose, the typeclass [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) was created.
-[`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) allows us to raise and recover from errors.
+For this purpose, the typeclass [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}) was created.
+[`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}) allows us to raise and recover from errors.
 It also contains a version of comprehensions that automatically wraps exceptions, called `bindingCatch`.
 
 ```kotlin
@@ -202,7 +202,7 @@ fun getLineLengthAverage(path: FilePath): IO<List<String>> =
 With a small change we get handling of exceptions even within the binding block.
 This wrapping works the same way as if we raised an error as the return from `getFile()` or `readLines()`, short-circuiting and stopping the sequence early.
 
-Note that while most data types include an instance of [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}), [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) is somewhat less common.
+Note that while most data types include an instance of [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}), [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}) is somewhat less common.
 
 ### What about those threads?
 

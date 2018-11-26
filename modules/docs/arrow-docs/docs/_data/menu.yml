@@ -248,7 +248,7 @@ options:
         url: /docs/typeclasses/monad/
 
       - title: MonadError
-        url: /docs/typeclasses/monaderror/
+        url: /docs/arrow/typeclasses/monaderror/
 
       - title: Bracket
         url: /docs/typeclasses/bracket/

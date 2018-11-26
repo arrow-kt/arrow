@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: MonadError
-permalink: /docs/typeclasses/monaderror/
+permalink: /docs/arrow/typeclasses/monaderror/
+redirect_from:
+  - /docs/typeclasses/monaderror
 ---
 
 ## MonadError
