@@ -132,7 +132,7 @@ We will list them by their hierarchy.
 
 - [`Applicative`]({{ '/docs/arrow/typeclasses/applicative/' | relative_url }}) - independent execution
 
-- [`ApplicativeError`]({{ '/docs/typeclasses/applicativeerror/' | relative_url }}) - recover from errors in independent execution
+- [`ApplicativeError`]({{ '/docs/arrow/typeclasses/applicativeerror/' | relative_url }}) - recover from errors in independent execution
 
 - [`Monad`]({{ '/docs/typeclasses/monad/' | relative_url }}) - sequential execution
 

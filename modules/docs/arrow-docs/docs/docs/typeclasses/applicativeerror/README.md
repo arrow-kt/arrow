@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: ApplicativeError
-permalink: /docs/typeclasses/applicativeerror/
+permalink: /docs/arrow/typeclasses/applicativeerror/
+redirect_from:
+  - /docs/typeclasses/applicativeerror
 ---
 
 ## ApplicativeError

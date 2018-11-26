@@ -141,7 +141,7 @@ ForDeferredK extensions {
  // Failure(ArithmeticException("/ by zero"))
 ```
 
-Several recovery methods are provided, which you can find in the documentation for [`ApplicativeError`]({{ '/docs/typeclasses/applicativeerror' | relative_url }}).
+Several recovery methods are provided, which you can find in the documentation for [`ApplicativeError`]({{ '/docs/arrow/typeclasses/applicativeerror' | relative_url }}).
 The most common ones are `handleError` and `handleErrorWith`.
 
 The former allows you to return a single value from a faulty block
