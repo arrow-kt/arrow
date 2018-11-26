@@ -150,7 +150,7 @@ We will list them by their hierarchy.
 
 - [`Foldable`]({{ '/docs/arrow/typeclasses/foldable/' | relative_url }}) - has a structure from which a value can be computed from visiting each element
 
-- [`Bifoldable`]({{ '/docs/typeclasses/bifoldable/' | relative_url }}) - same as foldable, but for structures with more than one possible type, like either
+- [`Bifoldable`]({{ '/docs/arrow/typeclasses/bifoldable/' | relative_url }}) - same as foldable, but for structures with more than one possible type, like either
 
 - [`Reducible`]({{ '/docs/typeclasses/reducible/' | relative_url }}) - structures that can be combined to a summary value
 

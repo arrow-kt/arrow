@@ -221,7 +221,7 @@ options:
         url: /docs/arrow/typeclasses/foldable/
 
       - title: Bifoldable
-        url: /docs/typeclasses/bifoldable/
+        url: /docs/arrow/typeclasses/bifoldable/
 
       - title: Traverse
         url: /docs/typeclasses/traverse/
