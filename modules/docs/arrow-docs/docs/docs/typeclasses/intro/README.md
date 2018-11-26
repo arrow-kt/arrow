@@ -140,7 +140,7 @@ We will list them by their hierarchy.
 
 - [`Comonad`]({{ '/docs/arrow/typeclasses/comonad/' | relative_url }}) - can extract values from it
 
-- [`Bimonad`]({{ '/docs/typeclasses/bimonad/' | relative_url }}) - both monad and comonad
+- [`Bimonad`]({{ '/docs/arrow/typeclasses/bimonad/' | relative_url }}) - both monad and comonad
 
 - [`Bifunctor`]({{ '/docs/typeclasses/bifunctor' | relative_url }}) - same as functor but for two values in the container
 

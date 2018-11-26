@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: Bimonad
-permalink: /docs/typeclasses/bimonad/
+permalink: /docs/arrow/typeclasses/bimonad/
+redirect_from:
+  - /docs/typeclasses/bimonad
 ---
 
 ## Bimonad

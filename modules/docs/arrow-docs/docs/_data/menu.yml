@@ -272,7 +272,7 @@ options:
         url: /docs/arrow/typeclasses/comonad/
 
       - title: Bimonad
-        url: /docs/typeclasses/bimonad/
+        url: /docs/arrow/typeclasses/bimonad/
 
       - title: Bifunctor
         url: /docs/typeclasses/bifunctor
