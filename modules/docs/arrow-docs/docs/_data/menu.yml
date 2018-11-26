@@ -266,7 +266,7 @@ options:
         url: /docs/arrow/mtl/typeclasses/monadstate
 
       - title: MonadCombine
-        url: /docs/typeclasses/monadcombine/
+        url: /docs/arrow/mtl/typeclasses/monadcombine/
 
       - title: Comonad
         url: /docs/typeclasses/comonad/
