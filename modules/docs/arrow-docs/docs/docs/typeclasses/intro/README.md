@@ -102,7 +102,7 @@ We will list them by their hierarchy.
 
 - [`Inject`]({{ '/docs/typeclasses/inject/' | relative_url }}) - transformation between datatypes
 
-- [`Alternative`]({{ '/docs/typeclasses/alternative/' | relative_url }}) - has an structure that contains either of two values
+- [`Alternative`]({{ '/docs/arrow/typeclasses/alternative/' | relative_url }}) - has an structure that contains either of two values
 
 ##### Show
 

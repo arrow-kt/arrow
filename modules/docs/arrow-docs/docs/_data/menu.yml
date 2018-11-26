@@ -290,7 +290,7 @@ options:
         url: /docs/typeclasses/inject/
 
       - title: Alternative
-        url: /docs/typeclasses/alternative/
+        url: /docs/arrow/typeclasses/alternative/
 
   - title: Effects
 
