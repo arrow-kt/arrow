@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: Monad
-permalink: /docs/typeclasses/monad/
+permalink: /docs/arrow/typeclasses/monad/
+redirect_from:
+  - /docs/typeclasses/monad
 ---
 
 ## Monad

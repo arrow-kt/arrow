@@ -193,7 +193,7 @@ import arrow.instances.option.applicative.*
 tupled(Some(1), Some("Hello"), Some(20.0))
 ```
 
-[`Monad`]({{ '/docs/typeclasses/monad/' | relative_url }})
+[`Monad`]({{ '/docs/arrow/typeclasses/monad/' | relative_url }})
 
 Computing over dependent values ignoring absence
 

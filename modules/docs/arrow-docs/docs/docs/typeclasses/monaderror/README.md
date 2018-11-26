@@ -19,7 +19,7 @@ These errors can come in the form of `Throwable`, `Exception`, or any other type
 
 ### Main Combinators
 
-`MonadError` inherits all the combinators available in [`ApplicativeError`]({{ '/docs/arrow/typeclasses/applicativeerror' | relative_url }}) and [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}). It also adds one of its own.
+`MonadError` inherits all the combinators available in [`ApplicativeError`]({{ '/docs/arrow/typeclasses/applicativeerror' | relative_url }}) and [`Monad`]({{ '/docs/arrow/typeclasses/monad' | relative_url }}). It also adds one of its own.
 
 #### raiseError
 

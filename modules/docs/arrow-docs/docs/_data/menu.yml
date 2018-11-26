@@ -245,7 +245,7 @@ options:
         url: /docs/arrow/typeclasses/applicativeerror/
 
       - title: Monad
-        url: /docs/typeclasses/monad/
+        url: /docs/arrow/typeclasses/monad/
 
       - title: MonadError
         url: /docs/arrow/typeclasses/monaderror/

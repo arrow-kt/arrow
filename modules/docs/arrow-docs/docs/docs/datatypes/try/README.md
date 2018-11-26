@@ -186,7 +186,7 @@ ForTry extensions {
 }
 ```
 
-[`Monad`]({{ '/docs/typeclasses/monad/' | relative_url }})
+[`Monad`]({{ '/docs/arrow/typeclasses/monad/' | relative_url }})
 
 Computing over dependent values ignoring failure:
 

@@ -13,7 +13,7 @@ intermediate
 
 This doc has been adapted from Mikhail Shilkov's blog entry [`Monads explained in C# (again)`](https://mikhail.io/2018/07/monads-explained-in-csharp-again/). It attempts to explain the rationale behind Monads, providing simple examples and how they relate to standard library constructs.
 
-If you're just interested in the API, head down to the [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) typeclass page.
+If you're just interested in the API, head down to the [`Monad`]({{ '/docs/arrow/typeclasses/monad' | relative_url }}) typeclass page.
 
 ### Intro
 

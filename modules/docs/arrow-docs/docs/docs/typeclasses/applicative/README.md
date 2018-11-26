@@ -117,7 +117,7 @@ import arrow.typeclasses.Applicative
 TypeClass(Applicative::class).dtMarkdownList()
 ```
 
-Additionally all instances of [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) and their MTL variants implement the `Applicative` typeclass directly
+Additionally all instances of [`Monad`]({{ '/docs/arrow/typeclasses/monad' | relative_url }}) and their MTL variants implement the `Applicative` typeclass directly
 since they are all subtypes of `Applicative`.
 
 ank_macro_hierarchy(arrow.typeclasses.Applicative)
