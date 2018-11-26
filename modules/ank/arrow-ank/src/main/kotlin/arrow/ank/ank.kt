@@ -11,7 +11,6 @@ fun <F> ank(source: Path, target: Path, compilerArgs: List<String>, ankOps: AnkO
     printConsole(colored(ANSI_PURPLE, AnkHeader)).bind()
 
     val path = createTargetDirectory(source, target).bind()
-      .fold({ MF().raiseError<Path>(it).bind() }, { it })
 
     val candidates = getCandidatePaths(path).bind()
       .fold({ MF().raiseError<Nel<Path>>(Exception("No matching files found")).bind() }, { it })
@@ -27,23 +26,19 @@ fun <F> ank(source: Path, target: Path, compilerArgs: List<String>, ankOps: AnkO
           }
 
           val content = readFile(p).bind()
-            .fold({ MF().raiseError<String>(Exception("Failed to load file $p")).bind() }, { it })
 
           val preProcessed = preProcessMacros(p toT content)
 
           val parsedMarkdown = parseMarkdown(preProcessed).bind()
-            .fold({ MF().raiseError<ASTNode>(Exception("Failed to parse markdown in file $p")).bind() }, { it })
 
           val snippets = extractCode(preProcessed, parsedMarkdown).bind()
             .fold({ return@binding generated }, { it })
 
           val compiledResult = compileCode(p toT snippets, compilerArgs).bind()
-            .fold({ MF().raiseError<Nel<Snippet>>(it).bind() }, { it })
 
           val result = replaceAnkToLang(preProcessed, compiledResult)
 
           generateFile(p, result).bind()
-            .fold({ MF().raiseError<Unit>(it).bind() }, { })
 
           generated + snippets.foldLeft(1) { a, s -> if (s.isOutFile) a + 1 else a }
         }
