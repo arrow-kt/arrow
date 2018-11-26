@@ -206,7 +206,7 @@ options:
         url: /docs/arrow/typeclasses/eq/
 
       - title: Hash
-        url: /docs/typeclasses/hash
+        url: /docs/arrow/typeclasses/hash
 
       - title: Order
         url: /docs/typeclasses/order/

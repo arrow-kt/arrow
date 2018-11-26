@@ -114,7 +114,7 @@ We will list them by their hierarchy.
 
 - [`Order`]({{ '/docs/typeclasses/order/' | relative_url }}) -  determine whether one object precedes another
 
-- [`Hash`]({{ '/docs/typeclasses/hash' | relative_url }}) - compute hash of an object
+- [`Hash`]({{ '/docs/arrow/typeclasses/hash' | relative_url }}) - compute hash of an object
 
 ##### Semigroup
 
