@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: MonoidK
-permalink: /docs/typeclasses/monoidk/
+permalink: /docs/arrow/typeclasses/monoidk/
+redirect_from:
+  - /docs/typeclasses/monoidk
 ---
 
 ## MonoidK

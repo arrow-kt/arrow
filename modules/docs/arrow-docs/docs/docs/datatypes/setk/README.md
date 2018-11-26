@@ -52,7 +52,7 @@ numbers
 evenNumbers.combineK(integers).combineK(oddNumbers)
 ```
 
-[`Monoid`](/docs/arrow/typeclasses/monoid/) and [`MonoidK`](/docs/typeclasses/monoidk/):
+[`Monoid`](/docs/arrow/typeclasses/monoid/) and [`MonoidK`](/docs/arrow/typeclasses/monoidk/):
 ```kotlin:ank
 numbers.combineK(SetK.empty()) 
 ```

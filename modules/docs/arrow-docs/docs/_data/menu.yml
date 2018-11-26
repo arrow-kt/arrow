@@ -284,7 +284,7 @@ options:
         url: /docs/arrow/typeclasses/semigroupk/
 
       - title: MonoidK
-        url: /docs/typeclasses/monoidk/
+        url: /docs/arrow/typeclasses/monoidk/
 
       - title: Inject
         url: /docs/typeclasses/inject/
