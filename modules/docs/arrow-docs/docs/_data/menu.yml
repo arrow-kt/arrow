@@ -227,7 +227,7 @@ options:
         url: /docs/arrow/typeclasses/traverse/
 
       - title: Reducible
-        url: /docs/typeclasses/reducible/
+        url: /docs/arrow/typeclasses/reducible/
 
       - title: TraverseFilter
         url: /docs/typeclasses/traversefilter/
