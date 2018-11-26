@@ -218,7 +218,7 @@ options:
         url: /docs/arrow/typeclasses/monoid/
 
       - title: Foldable
-        url: /docs/typeclasses/foldable/
+        url: /docs/arrow/typeclasses/foldable/
 
       - title: Bifoldable
         url: /docs/typeclasses/bifoldable/

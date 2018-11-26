@@ -65,7 +65,7 @@ val requests = listOf(Some(Math.random()), andAnother(), andAnother())
 requests.sequence(Option.applicative())
 ```
 
-If you want to aggregate the elements of a list into any other value you can use `foldLeft` and `foldRight` from [`Foldable`](/docs/typeclasses/foldable).
+If you want to aggregate the elements of a list into any other value you can use `foldLeft` and `foldRight` from [`Foldable`](/docs/arrow/typeclasses/foldable).
 
 Folding a list into a new value, `String` in this case, starting with an initial value and a combine function:
 

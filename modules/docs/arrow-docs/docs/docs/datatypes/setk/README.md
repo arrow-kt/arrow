@@ -57,7 +57,7 @@ evenNumbers.combineK(integers).combineK(oddNumbers)
 numbers.combineK(SetK.empty()) 
 ```
 
-[`Foldable`](/docs/typeclasses/foldable/):
+[`Foldable`](/docs/arrow/typeclasses/foldable/):
 ```kotlin:ank
 numbers.foldLeft(0) {sum, number -> sum + (number * number)}
 ```

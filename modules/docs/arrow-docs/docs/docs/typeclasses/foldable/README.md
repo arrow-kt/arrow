@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: Foldable
-permalink: /docs/typeclasses/foldable/
+permalink: /docs/arrow/typeclasses/foldable/
+redirect_from:
+  - /docs/typeclasses/foldable
 ---
 
 ## Foldable
