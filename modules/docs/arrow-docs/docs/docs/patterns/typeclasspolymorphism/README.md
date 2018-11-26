@@ -258,7 +258,7 @@ class LocalDataSource<F>(A: ApplicativeError<F, Throwable>) : DataSource<F>, App
 }
 ```
 
-[`ApplicativeError`]({{ '/docs/typeclasses/applicativeerror' | relative_url }}) extends from [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}), 
+[`ApplicativeError`]({{ '/docs/typeclasses/applicativeerror' | relative_url }}) extends from [`Applicative`]({{ '/docs/arrow/typeclasses/applicative' | relative_url }}), 
 and both are [**Typeclasses**]({{ '/docs/typeclasses/intro' | relative_url }}).
 
 **Typeclasses define behaviors (contracts)**. They're basically encoded as interfaces that work over a generic argument, 
@@ -274,10 +274,10 @@ So, back to our two problems:
 
 * **Wrapping a successful value into an instance of `Kind<F, List<Task>>`**
 
-We can rely on a typeclass for this: [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}). Since [`ApplicativeError`]({{ '/docs/typeclasses/applicativeerror' | relative_url }}) 
+We can rely on a typeclass for this: [`Applicative`]({{ '/docs/arrow/typeclasses/applicative' | relative_url }}). Since [`ApplicativeError`]({{ '/docs/typeclasses/applicativeerror' | relative_url }}) 
 extends from it, we can delegate to it. We're delegating our class on it, so we can use its features out of the box.
 
-[`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}) provides the `just(a)` function. `just(a)` **wraps 
+[`Applicative`]({{ '/docs/arrow/typeclasses/applicative' | relative_url }}) provides the `just(a)` function. `just(a)` **wraps 
 a value into the context of any Higher Kind**. So If we have an `Applicative<F>`, it could call `just(a)` to wrap the 
 value into the container `F`, regardless of which one is it. Let's say it's `Observable`, we'll have an 
 `Applicative<Observable>`, which will know how to wrap `a` into an `Observable` like `Observable.just(a)`.

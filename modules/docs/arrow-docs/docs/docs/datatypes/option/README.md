@@ -183,7 +183,7 @@ Option.functor().run {
 }
 ```
 
-[`Applicative`]({{ '/docs/typeclasses/applicative/' | relative_url }})
+[`Applicative`]({{ '/docs/arrow/typeclasses/applicative/' | relative_url }})
 
 Computing over independent values
 

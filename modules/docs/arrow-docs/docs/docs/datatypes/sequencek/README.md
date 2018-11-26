@@ -40,7 +40,7 @@ val fibonacci = generateSequence(0 to 1) { it.second to it.first + it.second }.m
 fibonacci.map { it * 2 }.takeWhile { it < 10 }.toList()
 ```
 
-[`Applicative`](/docs/typeclasses/applicative/)
+[`Applicative`](/docs/arrow/typeclasses/applicative/)
 
 Applying a sequence of functions to a sequence:
 ```kotlin:ank

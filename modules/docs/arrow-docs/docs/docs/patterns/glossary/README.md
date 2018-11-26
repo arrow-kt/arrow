@@ -352,7 +352,7 @@ return list.map(f)
 
 Higher kinds are also used to model functions that require for a datatype to implement a typeclass. This way you can create functions that abstract behavior (defined by a typeclass) and allow callers to define which datatype they'd like to apply it to.
 
-Let's use the typeclass [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}), that contains the constructor function `just()`.
+Let's use the typeclass [`Applicative`]({{ '/docs/arrow/typeclasses/applicative' | relative_url }}), that contains the constructor function `just()`.
 
 ```kotlin
 interface Applicative<F>: Functor<F> {
@@ -382,7 +382,7 @@ interface ListKApplicativeInstance : Applicative<ForListK> {
 }
 ```
 
-And now we can show how this function `randomUserStructure()` can be used for any datatype that implements [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}). As the function returns a value `Kind<F, User>` the caller is responsible of calling `fix()` to downcast it to the expected value.
+And now we can show how this function `randomUserStructure()` can be used for any datatype that implements [`Applicative`]({{ '/docs/arrow/typeclasses/applicative' | relative_url }}). As the function returns a value `Kind<F, User>` the caller is responsible of calling `fix()` to downcast it to the expected value.
 
 ```kotlin
 val list = ListK.applicative().randomUserStructure(::User).fix()
@@ -399,7 +399,7 @@ val either = Either.applicative<Unit>().randomUserStructure(::User).fix()
 //Right(User(221))
 ```
 
-Passing the instance in every function call seems like a burden. So, because `randomUserStructure` is an extension function for [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}) we can omit the implicit parameter as long as we are within the scope of an Applicative instance. You can use the standard functions `with` and `run` for this.
+Passing the instance in every function call seems like a burden. So, because `randomUserStructure` is an extension function for [`Applicative`]({{ '/docs/arrow/typeclasses/applicative' | relative_url }}) we can omit the implicit parameter as long as we are within the scope of an Applicative instance. You can use the standard functions `with` and `run` for this.
 
 ```kotlin
 with (ListK.applicative()) {

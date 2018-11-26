@@ -130,7 +130,7 @@ We will list them by their hierarchy.
 
 - [`Functor`]({{ '/docs/arrow/typeclasses/functor/' | relative_url }}) - its contents can be mapped
 
-- [`Applicative`]({{ '/docs/typeclasses/applicative/' | relative_url }}) - independent execution
+- [`Applicative`]({{ '/docs/arrow/typeclasses/applicative/' | relative_url }}) - independent execution
 
 - [`ApplicativeError`]({{ '/docs/typeclasses/applicativeerror/' | relative_url }}) - recover from errors in independent execution
 

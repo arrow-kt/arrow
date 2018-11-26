@@ -73,7 +73,7 @@ Folding a list into a new value, `String` in this case, starting with an initial
 listOf('a', 'b', 'c', 'd', 'e').k().foldLeft("-> ") { x, y -> x + y }
 ```
 
-Or you can apply a list of transformations using `ap` from [`Applicative`](/docs/typeclasses/applicative/).
+Or you can apply a list of transformations using `ap` from [`Applicative`](/docs/arrow/typeclasses/applicative/).
 
 ```kotlin:ank
 import arrow.instances.*

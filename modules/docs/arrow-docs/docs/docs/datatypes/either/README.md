@@ -329,7 +329,7 @@ import arrow.instances.either.functor.*
 Right(1).map {it + 1}
 ```
 
- [`Applicative`]({{ '/docs/typeclasses/applicative/' | relative_url }})
+ [`Applicative`]({{ '/docs/arrow/typeclasses/applicative/' | relative_url }})
 
  Computing over independent values
 

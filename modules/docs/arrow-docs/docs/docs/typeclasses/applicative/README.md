@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: Applicative
-permalink: /docs/typeclasses/applicative/
+permalink: /docs/arrow/typeclasses/applicative/
+redirect_from:
+  - /docs/typeclasses/applicative
 ---
 
 ## Applicative

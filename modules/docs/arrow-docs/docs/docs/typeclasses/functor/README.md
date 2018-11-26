@@ -111,7 +111,7 @@ import arrow.typeclasses.Functor
 TypeClass(Functor::class).dtMarkdownList()
 ```
 
-Additionally all instances of [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}), [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) and their MTL variants implement the `Functor` typeclass directly
+Additionally all instances of [`Applicative`]({{ '/docs/arrow/typeclasses/applicative' | relative_url }}), [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) and their MTL variants implement the `Functor` typeclass directly
 since they are all subtypes of `Functor`
 
 ank_macro_hierarchy(arrow.typeclasses.Functor)

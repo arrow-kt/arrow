@@ -21,7 +21,7 @@ Other datatypes like [`Either<E, A>`]({{ '/docs/arrow/core/either' | relative_ur
 
 ### Main Combinators
 
-`ApplicativeError` inherits all the combinators available in [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}). It also adds several of its own.
+`ApplicativeError` inherits all the combinators available in [`Applicative`]({{ '/docs/arrow/typeclasses/applicative' | relative_url }}). It also adds several of its own.
 
 #### raiseError
 

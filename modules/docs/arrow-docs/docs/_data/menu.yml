@@ -239,7 +239,7 @@ options:
         url: /docs/arrow/mtl/typeclasses/functorfilter/
 
       - title: Applicative
-        url: /docs/typeclasses/applicative/
+        url: /docs/arrow/typeclasses/applicative/
 
       - title: ApplicativeError
         url: /docs/typeclasses/applicativeerror/
