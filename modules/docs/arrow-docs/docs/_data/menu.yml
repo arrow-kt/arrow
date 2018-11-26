@@ -251,7 +251,7 @@ options:
         url: /docs/arrow/typeclasses/monaderror/
 
       - title: Bracket
-        url: /docs/typeclasses/bracket/
+        url: /docs/arrow/effects/typeclasses/bracket/
 
       - title: MonadFilter
         url: /docs/arrow/mtl/typeclasses/monadfilter/

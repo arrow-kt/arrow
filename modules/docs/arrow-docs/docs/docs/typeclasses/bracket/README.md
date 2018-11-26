@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: Bracket
-permalink: /docs/typeclasses/bracket/
+permalink: /docs/arrow/effects/typeclasses/bracket/
+redirect_from:
+  - /docs/typeclasses/bracket
 video: EUqg3fSahhk
 ---
 
