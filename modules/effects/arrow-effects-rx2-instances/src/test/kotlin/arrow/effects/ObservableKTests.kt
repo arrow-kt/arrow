@@ -12,6 +12,7 @@ import arrow.test.laws.FoldableLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.Spec
 import io.kotlintest.matchers.shouldNotBe
 import io.reactivex.Observable
 import io.reactivex.observers.TestObserver
@@ -47,9 +48,13 @@ class ObservableKTest : UnitSpec() {
       }
   }
 
-  init {
+  override fun interceptSpec(context: Spec, spec: () -> Unit) {
+    println("ObservableK: Skipping sync laws for stack safety because they are not supported. See https://github.com/ReactiveX/RxJava/issues/6322")
+    super.interceptSpec(context, spec)
+  }
 
-    testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ()))
+  init {
+    testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ(), testStackSafety = false))
     // FIXME(paco) #691
     //testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ()))
     //testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ()))

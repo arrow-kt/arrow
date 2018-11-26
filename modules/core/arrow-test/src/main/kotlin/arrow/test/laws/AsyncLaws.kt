@@ -18,9 +18,10 @@ object AsyncLaws {
     AC: Async<F>,
     EQ: Eq<Kind<F, Int>>,
     EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>,
-    EQERR: Eq<Kind<F, Int>> = EQ
+    EQERR: Eq<Kind<F, Int>> = EQ,
+    testStackSafety: Boolean = true
   ): List<Law> =
-    MonadDeferLaws.laws(AC, EQERR, EQ_EITHER) + listOf(
+    MonadDeferLaws.laws(AC, EQERR, EQ_EITHER, testStackSafety = testStackSafety) + listOf(
       Law("Async Laws: success equivalence") { AC.asyncSuccess(EQ) },
       Law("Async Laws: error equivalence") { AC.asyncError(EQERR) },
       Law("Async Laws: continueOn jumps threads") { AC.continueOn(EQ) },

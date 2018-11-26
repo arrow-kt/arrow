@@ -70,7 +70,7 @@ data class DeferredK<out A>(private val deferred: Deferred<A>, val scope: Corout
     fun <A> defer(scope: CoroutineScope = GlobalScope, ctx: CoroutineContext = Dispatchers.Default, start: CoroutineStart = CoroutineStart.LAZY, fa: () -> DeferredKOf<A>): DeferredK<A> =
       scope.asyncK(ctx, start) { fa().await() }
 
-    operator fun <A> invoke(scope: CoroutineScope = GlobalScope, ctx: CoroutineContext = Dispatchers.Default, start: CoroutineStart = CoroutineStart.DEFAULT, f: () -> A): DeferredK<A> =
+    operator fun <A> invoke(scope: CoroutineScope = GlobalScope, ctx: CoroutineContext = Dispatchers.Default, start: CoroutineStart = CoroutineStart.LAZY, f: () -> A): DeferredK<A> =
       scope.asyncK(ctx, start) { f() }
 
     fun <A> failed(t: Throwable): DeferredK<A> =
@@ -86,7 +86,7 @@ data class DeferredK<out A>(private val deferred: Deferred<A>, val scope: Corout
      * its [CoroutineContext] is set to [DefaultDispatcher]
      * and its [CoroutineStart] is [CoroutineStart.DEFAULT].
      */
-    fun <A> async(scope: CoroutineScope = GlobalScope, ctx: CoroutineContext = Dispatchers.Default, start: CoroutineStart = CoroutineStart.DEFAULT, fa: Proc<A>): DeferredK<A> =
+    fun <A> async(scope: CoroutineScope = GlobalScope, ctx: CoroutineContext = Dispatchers.Default, start: CoroutineStart = CoroutineStart.LAZY, fa: Proc<A>): DeferredK<A> =
       scope.asyncK(ctx, start) {
         CompletableDeferred<A>().apply {
           fa {
