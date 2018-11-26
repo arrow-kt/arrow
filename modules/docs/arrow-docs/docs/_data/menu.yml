@@ -200,7 +200,7 @@ options:
         url: /docs/typeclasses/intro/
 
       - title: Show
-        url: /docs/typeclasses/show/
+        url: /docs/arrow/typeclasses/show/
 
       - title: Eq
         url: /docs/typeclasses/eq/

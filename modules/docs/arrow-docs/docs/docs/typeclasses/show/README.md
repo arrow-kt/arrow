@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: Show
-permalink: /docs/typeclasses/show/
+permalink: /docs/arrow/typeclasses/show/
+redirect_from:
+  - /docs/typeclasses/show
 ---
 
 ## Show

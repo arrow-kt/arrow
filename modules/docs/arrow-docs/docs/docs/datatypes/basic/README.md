@@ -14,7 +14,7 @@ These instances are available in the module `arrow-instances`.
 
 ### Numbers
 
-- [`Show`]({{ '/docs/typeclasses/show/' | relative_url }})
+- [`Show`]({{ '/docs/arrow/typeclasses/show/' | relative_url }})
 
 - [`Eq`]({{ '/docs/typeclasses/eq/' | relative_url }})
 
@@ -26,7 +26,7 @@ These instances are available in the module `arrow-instances`.
 
 ### String
 
-- [`Show`]({{ '/docs/typeclasses/show/' | relative_url }})
+- [`Show`]({{ '/docs/arrow/typeclasses/show/' | relative_url }})
 
 - [`Eq`]({{ '/docs/typeclasses/eq/' | relative_url }})
 
@@ -44,13 +44,13 @@ These instances are available in the module `arrow-instances`.
 
 Note that because Boolean doesn't have a companion object you'll find these in `BooleanInstances`.
 
-- [`Show`]({{ '/docs/typeclasses/show/' | relative_url }})
+- [`Show`]({{ '/docs/arrow/typeclasses/show/' | relative_url }})
 
 - [`Eq`]({{ '/docs/typeclasses/eq/' | relative_url }})
 
 ### Char
 
-- [`Show`]({{ '/docs/typeclasses/show/' | relative_url }})
+- [`Show`]({{ '/docs/arrow/typeclasses/show/' | relative_url }})
 
 - [`Eq`]({{ '/docs/typeclasses/eq/' | relative_url }})
 

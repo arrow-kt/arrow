@@ -106,7 +106,7 @@ We will list them by their hierarchy.
 
 ##### Show
 
-- [`Show`]({{ '/docs/typeclasses/show/' | relative_url }}) - literal representation of an object
+- [`Show`]({{ '/docs/arrow/typeclasses/show/' | relative_url }}) - literal representation of an object
 
 ##### Eq
 
