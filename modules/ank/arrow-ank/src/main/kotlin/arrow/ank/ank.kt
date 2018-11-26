@@ -20,7 +20,8 @@ fun <F> ank(source: Path, target: Path, compilerArgs: List<String>, ankOps: AnkO
       acc.flatMap { generated ->
         MF().binding {
           // ignore first one, then output on every 100 or every fifth when below 1000
-          if (curr != 0 && (curr % 100 == 0 || (candidates.size < 1000 && curr % 5 == 0))) {
+          val printAnkProgress = (curr % 100 == 0 || (candidates.size < 1000 && curr % 5 == 0))
+          if (curr != 0 && printAnkProgress) {
             val message = "Ank: Processed ~> [$curr of ${candidates.size}]"
             printConsole(colored(ANSI_GREEN, message)).bind()
           }
