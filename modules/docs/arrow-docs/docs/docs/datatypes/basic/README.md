@@ -16,7 +16,7 @@ These instances are available in the module `arrow-instances`.
 
 - [`Show`]({{ '/docs/arrow/typeclasses/show/' | relative_url }})
 
-- [`Eq`]({{ '/docs/typeclasses/eq/' | relative_url }})
+- [`Eq`]({{ '/docs/arrow/typeclasses/eq/' | relative_url }})
 
 - [`Order`]({{ '/docs/typeclasses/order/' | relative_url }})
 
@@ -28,7 +28,7 @@ These instances are available in the module `arrow-instances`.
 
 - [`Show`]({{ '/docs/arrow/typeclasses/show/' | relative_url }})
 
-- [`Eq`]({{ '/docs/typeclasses/eq/' | relative_url }})
+- [`Eq`]({{ '/docs/arrow/typeclasses/eq/' | relative_url }})
 
 - [`Order`]({{ '/docs/typeclasses/order/' | relative_url }})
 
@@ -46,12 +46,12 @@ Note that because Boolean doesn't have a companion object you'll find these in `
 
 - [`Show`]({{ '/docs/arrow/typeclasses/show/' | relative_url }})
 
-- [`Eq`]({{ '/docs/typeclasses/eq/' | relative_url }})
+- [`Eq`]({{ '/docs/arrow/typeclasses/eq/' | relative_url }})
 
 ### Char
 
 - [`Show`]({{ '/docs/arrow/typeclasses/show/' | relative_url }})
 
-- [`Eq`]({{ '/docs/typeclasses/eq/' | relative_url }})
+- [`Eq`]({{ '/docs/arrow/typeclasses/eq/' | relative_url }})
 
 - [`Order`]({{ '/docs/typeclasses/order/' | relative_url }})

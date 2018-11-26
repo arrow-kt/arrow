@@ -203,7 +203,7 @@ options:
         url: /docs/arrow/typeclasses/show/
 
       - title: Eq
-        url: /docs/typeclasses/eq/
+        url: /docs/arrow/typeclasses/eq/
 
       - title: Hash
         url: /docs/typeclasses/hash

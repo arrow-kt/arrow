@@ -110,7 +110,7 @@ We will list them by their hierarchy.
 
 ##### Eq
 
-- [`Eq`]({{ '/docs/typeclasses/eq/' | relative_url }}) - structural equality between two objects
+- [`Eq`]({{ '/docs/arrow/typeclasses/eq/' | relative_url }}) - structural equality between two objects
 
 - [`Order`]({{ '/docs/typeclasses/order/' | relative_url }}) -  determine whether one object precedes another
 

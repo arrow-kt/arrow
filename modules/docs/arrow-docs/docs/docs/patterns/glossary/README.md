@@ -50,7 +50,7 @@ Typeclasses are interface abstractions that define a set of extension functions 
 These extension functions are canonical and consistent across languages and libraries;
 and they have inherent mathematical properties that are testable, such as commutativity or associativity.
 
-Examples of behaviours abstracted by typeclasses are: comparability ([`Eq`]({{ '/docs/typeclasses/eq' | relative_url }})),
+Examples of behaviours abstracted by typeclasses are: comparability ([`Eq`]({{ '/docs/arrow/typeclasses/eq' | relative_url }})),
 composability ([`Monoid`]({{ '/docs/typeclasses/monoid' | relative_url }})),
 its contents can be mapped from one type to another ([`Functor`]({{ '/docs/typeclasses/functor' | relative_url }})),
 or error recovery ([`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }})).
