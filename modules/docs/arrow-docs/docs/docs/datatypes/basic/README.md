@@ -22,7 +22,7 @@ These instances are available in the module `arrow-instances`.
 
 - [`Semigroup`]({{ '/docs/arrow/typeclasses/semigroup/' | relative_url }})
 
-- [`Monoid`]({{ '/docs/typeclasses/monoid/' | relative_url }})
+- [`Monoid`]({{ '/docs/arrow/typeclasses/monoid/' | relative_url }})
 
 ### String
 
@@ -34,7 +34,7 @@ These instances are available in the module `arrow-instances`.
 
 - [`Semigroup`]({{ '/docs/arrow/typeclasses/semigroup/' | relative_url }})
 
-- [`Monoid`]({{ '/docs/typeclasses/monoid/' | relative_url }})
+- [`Monoid`]({{ '/docs/arrow/typeclasses/monoid/' | relative_url }})
 
 - [`FilterIndex`]({{ '/docs/optics/filterindex/' | relative_url }})
 
