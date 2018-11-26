@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: Profunctor
-permalink: /docs/typeclasses/profunctor/
+permalink: /docs/arrow/typeclasses/profunctor/
+redirect_from:
+  - /docs/typeclasses/profunctor
 ---
 
 ## Profunctor

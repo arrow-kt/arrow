@@ -144,7 +144,7 @@ We will list them by their hierarchy.
 
 - [`Bifunctor`]({{ '/docs/arrow/typeclasses/bifunctor' | relative_url }}) - same as functor but for two values in the container
 
-- [`Profunctor`]({{ '/docs/typeclasses/profunctor' | relative_url }}) - function composition inside a context
+- [`Profunctor`]({{ '/docs/arrow/typeclasses/profunctor' | relative_url }}) - function composition inside a context
 
 ##### Foldable
 

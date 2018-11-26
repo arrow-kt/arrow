@@ -278,7 +278,7 @@ options:
         url: /docs/arrow/typeclasses/bifunctor
 
       - title: Profunctor
-        url: /docs/typeclasses/profunctor
+        url: /docs/arrow/typeclasses/profunctor
 
       - title: SemigroupK
         url: /docs/typeclasses/semigroupk/
