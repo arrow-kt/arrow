@@ -230,7 +230,7 @@ options:
         url: /docs/arrow/typeclasses/reducible/
 
       - title: TraverseFilter
-        url: /docs/typeclasses/traversefilter/
+        url: /docs/arrow/mtl/typeclasses/traversefilter/
 
       - title: Functor
         url: /docs/typeclasses/functor/

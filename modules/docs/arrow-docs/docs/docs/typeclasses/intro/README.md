@@ -174,7 +174,7 @@ The Monad Template Library module gives more specialized version of existing typ
 
 - [`MonadFilter`]({{ '/docs/typeclasses/monadfilter/' | relative_url }}) - can sequentially execute values that pass a predicate
 
-- [`TraverseFilter`]({{ '/docs/typeclasses/traversefilter/' | relative_url }}) - can traverse values that pass a predicate
+- [`TraverseFilter`]({{ '/docs/arrow/mtl/typeclasses/traversefilter/' | relative_url }}) - can traverse values that pass a predicate
 
 - [`MonadCombine`]({{ '/docs/typeclasses/monadcombine/' | relative_url }}) - has a structure that can be combined and split for several datatypes
 
