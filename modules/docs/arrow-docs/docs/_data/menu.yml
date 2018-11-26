@@ -212,7 +212,7 @@ options:
         url: /docs/arrow/typeclasses/order/
 
       - title: Semigroup
-        url: /docs/typeclasses/semigroup/
+        url: /docs/arrow/typeclasses/semigroup/
 
       - title: Monoid
         url: /docs/typeclasses/monoid/

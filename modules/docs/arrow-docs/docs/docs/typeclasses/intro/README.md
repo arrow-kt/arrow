@@ -118,7 +118,7 @@ We will list them by their hierarchy.
 
 ##### Semigroup
 
-- [`Semigroup`]({{ '/docs/typeclasses/semigroup/' | relative_url }}) - can combine two objects together
+- [`Semigroup`]({{ '/docs/arrow/typeclasses/semigroup/' | relative_url }}) - can combine two objects together
 
 - [`SemigroupK`]({{ '/docs/typeclasses/semigroupk/' | relative_url }}) - can combine two datatypes together
 

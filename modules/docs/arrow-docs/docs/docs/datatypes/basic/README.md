@@ -20,7 +20,7 @@ These instances are available in the module `arrow-instances`.
 
 - [`Order`]({{ '/docs/arrow/typeclasses/order/' | relative_url }})
 
-- [`Semigroup`]({{ '/docs/typeclasses/semigroup/' | relative_url }})
+- [`Semigroup`]({{ '/docs/arrow/typeclasses/semigroup/' | relative_url }})
 
 - [`Monoid`]({{ '/docs/typeclasses/monoid/' | relative_url }})
 
@@ -32,7 +32,7 @@ These instances are available in the module `arrow-instances`.
 
 - [`Order`]({{ '/docs/arrow/typeclasses/order/' | relative_url }})
 
-- [`Semigroup`]({{ '/docs/typeclasses/semigroup/' | relative_url }})
+- [`Semigroup`]({{ '/docs/arrow/typeclasses/semigroup/' | relative_url }})
 
 - [`Monoid`]({{ '/docs/typeclasses/monoid/' | relative_url }})
 
