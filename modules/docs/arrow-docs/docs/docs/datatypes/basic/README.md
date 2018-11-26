@@ -18,7 +18,7 @@ These instances are available in the module `arrow-instances`.
 
 - [`Eq`]({{ '/docs/arrow/typeclasses/eq/' | relative_url }})
 
-- [`Order`]({{ '/docs/typeclasses/order/' | relative_url }})
+- [`Order`]({{ '/docs/arrow/typeclasses/order/' | relative_url }})
 
 - [`Semigroup`]({{ '/docs/typeclasses/semigroup/' | relative_url }})
 
@@ -30,7 +30,7 @@ These instances are available in the module `arrow-instances`.
 
 - [`Eq`]({{ '/docs/arrow/typeclasses/eq/' | relative_url }})
 
-- [`Order`]({{ '/docs/typeclasses/order/' | relative_url }})
+- [`Order`]({{ '/docs/arrow/typeclasses/order/' | relative_url }})
 
 - [`Semigroup`]({{ '/docs/typeclasses/semigroup/' | relative_url }})
 
@@ -54,4 +54,4 @@ Note that because Boolean doesn't have a companion object you'll find these in `
 
 - [`Eq`]({{ '/docs/arrow/typeclasses/eq/' | relative_url }})
 
-- [`Order`]({{ '/docs/typeclasses/order/' | relative_url }})
+- [`Order`]({{ '/docs/arrow/typeclasses/order/' | relative_url }})

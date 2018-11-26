@@ -209,7 +209,7 @@ options:
         url: /docs/arrow/typeclasses/hash
 
       - title: Order
-        url: /docs/typeclasses/order/
+        url: /docs/arrow/typeclasses/order/
 
       - title: Semigroup
         url: /docs/typeclasses/semigroup/

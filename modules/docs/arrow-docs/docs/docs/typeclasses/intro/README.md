@@ -112,7 +112,7 @@ We will list them by their hierarchy.
 
 - [`Eq`]({{ '/docs/arrow/typeclasses/eq/' | relative_url }}) - structural equality between two objects
 
-- [`Order`]({{ '/docs/typeclasses/order/' | relative_url }}) -  determine whether one object precedes another
+- [`Order`]({{ '/docs/arrow/typeclasses/order/' | relative_url }}) -  determine whether one object precedes another
 
 - [`Hash`]({{ '/docs/arrow/typeclasses/hash' | relative_url }}) - compute hash of an object
 
