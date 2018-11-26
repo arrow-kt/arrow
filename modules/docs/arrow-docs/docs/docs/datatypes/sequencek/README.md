@@ -22,7 +22,7 @@ import arrow.data.*
 sequenceOf(1, 2, 3).k()
 ```
 
-SequenceK derives many useful typeclasses. For instance, it has a [`SemigroupK`](/docs/typeclasses/semigroupk/) instance.
+SequenceK derives many useful typeclasses. For instance, it has a [`SemigroupK`](/docs/arrow/typeclasses/semigroupk/) instance.
 
 ```kotlin:ank
 val hello = sequenceOf('h', 'e', 'l', 'l', 'o').k()

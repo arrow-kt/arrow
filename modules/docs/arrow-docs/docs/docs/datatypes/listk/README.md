@@ -28,7 +28,7 @@ ListK implements operators from many useful typeclasses.
 
 The @extension type class processor expands all type class combinators that `ListK` provides automatically over `List`
 
-For instance, it has `combineK` from the [`SemigroupK`](/docs/typeclasses/semigroupk/) typeclass.
+For instance, it has `combineK` from the [`SemigroupK`](/docs/arrow/typeclasses/semigroupk/) typeclass.
 
 It can be used to cheaply combine two lists:
 

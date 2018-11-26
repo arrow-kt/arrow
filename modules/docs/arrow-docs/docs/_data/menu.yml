@@ -281,7 +281,7 @@ options:
         url: /docs/arrow/typeclasses/profunctor
 
       - title: SemigroupK
-        url: /docs/typeclasses/semigroupk/
+        url: /docs/arrow/typeclasses/semigroupk/
 
       - title: MonoidK
         url: /docs/typeclasses/monoidk/

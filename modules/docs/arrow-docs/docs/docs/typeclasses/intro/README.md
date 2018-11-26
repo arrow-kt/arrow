@@ -120,7 +120,7 @@ We will list them by their hierarchy.
 
 - [`Semigroup`]({{ '/docs/arrow/typeclasses/semigroup/' | relative_url }}) - can combine two objects together
 
-- [`SemigroupK`]({{ '/docs/typeclasses/semigroupk/' | relative_url }}) - can combine two datatypes together
+- [`SemigroupK`]({{ '/docs/arrow/typeclasses/semigroupk/' | relative_url }}) - can combine two datatypes together
 
 - [`Monoid`]({{ '/docs/arrow/typeclasses/monoid/' | relative_url }}) - combinable objects have an empty value
 

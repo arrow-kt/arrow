@@ -42,7 +42,7 @@ val integers = setOf(-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5).k()
 ```
 SetK derives the following typeclasses:
 
-[`Semigroup`](/docs/arrow/typeclasses/semigroup/) and [`SemigroupK`](/docs/typeclasses/semigroupk/):
+[`Semigroup`](/docs/arrow/typeclasses/semigroup/) and [`SemigroupK`](/docs/arrow/typeclasses/semigroupk/):
 
 ```kotlin:ank
 val numbers = oddNumbers.combineK(evenNumbers.combineK(integers))
