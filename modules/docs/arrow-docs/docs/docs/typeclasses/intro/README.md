@@ -128,7 +128,7 @@ We will list them by their hierarchy.
 
 ##### Functor
 
-- [`Functor`]({{ '/docs/typeclasses/functor/' | relative_url }}) - its contents can be mapped
+- [`Functor`]({{ '/docs/arrow/typeclasses/functor/' | relative_url }}) - its contents can be mapped
 
 - [`Applicative`]({{ '/docs/typeclasses/applicative/' | relative_url }}) - independent execution
 

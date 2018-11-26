@@ -32,7 +32,7 @@ val world = sequenceOf('w', 'o', 'r', 'l', 'd').k()
 hello.combineK(commaSpace.combineK(world)).toList() == hello.combineK(commaSpace).combineK(world).toList()
 ```
 
-[`Functor`](/docs/typeclasses/functor/)
+[`Functor`](/docs/arrow/typeclasses/functor/)
 
 Transforming a sequence:
 ```kotlin:ank

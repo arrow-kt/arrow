@@ -52,7 +52,7 @@ and they have inherent mathematical properties that are testable, such as commut
 
 Examples of behaviours abstracted by typeclasses are: comparability ([`Eq`]({{ '/docs/arrow/typeclasses/eq' | relative_url }})),
 composability ([`Monoid`]({{ '/docs/arrow/typeclasses/monoid' | relative_url }})),
-its contents can be mapped from one type to another ([`Functor`]({{ '/docs/typeclasses/functor' | relative_url }})),
+its contents can be mapped from one type to another ([`Functor`]({{ '/docs/arrow/typeclasses/functor' | relative_url }})),
 or error recovery ([`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }})).
 
 Typeclasses have two main uses:
@@ -298,7 +298,7 @@ Note that the annotation `@higherkind` will also generate the integration typeal
 
 Now that we have a way of representing generic constructors for any type, we can write typeclasses that are parametrised for containers.
 
-Let's take as an example a typeclass that specifies how to map the contents of any container `F`. This typeclass that comes from computer science is called a [`Functor`]({{ '/docs/typeclasses/functor' | relative_url }}).
+Let's take as an example a typeclass that specifies how to map the contents of any container `F`. This typeclass that comes from computer science is called a [`Functor`]({{ '/docs/arrow/typeclasses/functor' | relative_url }}).
 
 ```kotlin
 interface Functor<F> {

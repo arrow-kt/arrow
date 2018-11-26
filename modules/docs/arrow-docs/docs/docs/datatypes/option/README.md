@@ -170,7 +170,7 @@ fun foo() {
 
 Arrow contains `Option` instances for many useful typeclasses that allows you to use and transform optional values
 
-[`Functor`]({{ '/docs/typeclasses/functor/' | relative_url }})
+[`Functor`]({{ '/docs/arrow/typeclasses/functor/' | relative_url }})
 
 Transforming the inner contents
 

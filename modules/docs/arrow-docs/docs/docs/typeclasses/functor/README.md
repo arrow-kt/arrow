@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: Functor
-permalink: /docs/typeclasses/functor/
+permalink: /docs/arrow/typeclasses/functor/
+redirect_from:
+  - /docs/typeclasses/functor
 video: EUqg3fSahhk
 ---
 

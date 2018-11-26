@@ -262,7 +262,7 @@ class LocalDataSource<F>(A: ApplicativeError<F, Throwable>) : DataSource<F>, App
 and both are [**Typeclasses**]({{ '/docs/typeclasses/intro' | relative_url }}).
 
 **Typeclasses define behaviors (contracts)**. They're basically encoded as interfaces that work over a generic argument, 
-as in [`Monad<F>`]({{ '/docs/typeclasses/monad' | relative_url }}) , [`Functor<F>`]({{ '/docs/typeclasses/functor' | relative_url }}) 
+as in [`Monad<F>`]({{ '/docs/typeclasses/monad' | relative_url }}) , [`Functor<F>`]({{ '/docs/arrow/typeclasses/functor' | relative_url }}) 
 and many more. That `F` is the data type. So we will be able to pass types like [`Either`]({{ '/docs/arrow/core/either' | relative_url }})
 , [`Option`]({{ '/docs/arrow/core/option' | relative_url }}), [`IO`]({{ '/docs/effects/io' | relative_url }}), [`Observable`]({{ '/docs/integrations/rx2' | relative_url }}), 
 [`Flowable`]({{ '/docs/integrations/rx2' | relative_url }}) and many more for it.

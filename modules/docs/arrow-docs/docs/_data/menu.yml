@@ -233,7 +233,7 @@ options:
         url: /docs/arrow/mtl/typeclasses/traversefilter/
 
       - title: Functor
-        url: /docs/typeclasses/functor/
+        url: /docs/arrow/typeclasses/functor/
 
       - title: FunctorFilter
         url: /docs/typeclasses/functorfilter/

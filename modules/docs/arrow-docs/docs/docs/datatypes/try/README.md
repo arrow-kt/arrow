@@ -163,7 +163,7 @@ Try {
 
 Lastly, Arrow contains `Try` instances for many useful typeclasses that allows you to use and transform fallibale values:
 
-[`Functor`]({{ '/docs/typeclasses/functor/' | relative_url }})
+[`Functor`]({{ '/docs/arrow/typeclasses/functor/' | relative_url }})
 
 Transforming the value, if the computation is a success:
 
