@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: Comonad
-permalink: /docs/typeclasses/comonad/
+permalink: /docs/arrow/typeclasses/comonad/
+redirect_from:
+  - /docs/typeclasses/comonad
 ---
 
 ## Comonad
