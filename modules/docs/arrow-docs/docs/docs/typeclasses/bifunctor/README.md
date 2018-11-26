@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: Bifunctor
-permalink: /docs/typeclasses/bifunctor/
+permalink: /docs/arrow/typeclasses/bifunctor/
+redirect_from:
+  - /docs/typeclasses/bifunctor
 ---
 
 ## Bifunctor

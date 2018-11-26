@@ -275,7 +275,7 @@ options:
         url: /docs/arrow/typeclasses/bimonad/
 
       - title: Bifunctor
-        url: /docs/typeclasses/bifunctor
+        url: /docs/arrow/typeclasses/bifunctor
 
       - title: Profunctor
         url: /docs/typeclasses/profunctor

@@ -11,7 +11,7 @@ intermediate
 
 Before reading this typeclass we recommend you to understand [Contravariance](https://typeclasses.com/contravariance) first. But for making things easier we will consider `Contravariance` as the ability to _flip composition_.
 
-`Profunctors` are [`Bifunctors`]({{ '/docs/typeclasses/bifunctor' | relative_url }}) that are contravariant in their first argument and covariant in the second one.
+`Profunctors` are [`Bifunctors`]({{ '/docs/arrow/typeclasses/bifunctor' | relative_url }}) that are contravariant in their first argument and covariant in the second one.
 
 The core operation of the `Profunctor` typeclass is `dimap` (as `bimap` was already taken for `Bifunctor`).
 
