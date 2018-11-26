@@ -170,7 +170,7 @@ Effects provides a hierarchy of typeclasses for lazy and asynchronous execution.
 
 The Monad Template Library module gives more specialized version of existing typeclasses
 
-- [`FunctorFilter`]({{ '/docs/typeclasses/functorfilter/' | relative_url }}) - can map values that pass a predicate
+- [`FunctorFilter`]({{ '/docs/arrow/mtl/typeclasses/functorfilter/' | relative_url }}) - can map values that pass a predicate
 
 - [`MonadFilter`]({{ '/docs/typeclasses/monadfilter/' | relative_url }}) - can sequentially execute values that pass a predicate
 

@@ -236,7 +236,7 @@ options:
         url: /docs/arrow/typeclasses/functor/
 
       - title: FunctorFilter
-        url: /docs/typeclasses/functorfilter/
+        url: /docs/arrow/mtl/typeclasses/functorfilter/
 
       - title: Applicative
         url: /docs/typeclasses/applicative/
