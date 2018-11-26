@@ -260,7 +260,7 @@ options:
         url: /docs/arrow/mtl/typeclasses/monadreader/
 
       - title: MonadWriter
-        url: /docs/typeclasses/monadwriter/
+        url: /docs/arrow/mtl/typeclasses/monadwriter/
 
       - title: MonadState
         url: /docs/typeclasses/monadstate/
