@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: MonadReader
-permalink: /docs/typeclasses/monadreader/
+permalink: /docs/arrow/mtl/typeclasses/monadreader/
+redirect_from:
+  - /docs/typeclasses/monadreader
 ---
 
 ## MonadReader

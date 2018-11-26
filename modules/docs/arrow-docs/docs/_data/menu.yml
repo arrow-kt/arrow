@@ -257,7 +257,7 @@ options:
         url: /docs/arrow/mtl/typeclasses/monadfilter/
 
       - title: MonadReader
-        url: /docs/typeclasses/monadreader/
+        url: /docs/arrow/mtl/typeclasses/monadreader/
 
       - title: MonadWriter
         url: /docs/typeclasses/monadwriter/
