@@ -47,11 +47,8 @@ object MonadDeferLaws {
       Law("Sync laws: defer suspens evaluation") { SC.deferSuspendsEvaluation(EQ) },
       Law("Sync laws: delay suspends evaluation") { SC.delaySuspendsEvaluation(EQ) },
       Law("Sync laws: flatMap suspends evaluation") { SC.flatMapSuspendsEvaluation(EQ) },
-      Law("Sync laws: map suspends evaluation") { SC.mapSuspendsEvaluation(EQ) }
-      /*
-      FIXME: https://github.com/arrow-kt/arrow/issues/1156 - DeferredK fails this because coroutines only run once and then memoize results
+      Law("Sync laws: map suspends evaluation") { SC.mapSuspendsEvaluation(EQ) },
       Law("Sync laws: Repeated evaluation not memoized") { SC.repeatedSyncEvaluationNotMemoized(EQ) }
-      */
     ) + if (testStackSafety) {
       listOf(
         Law("Sync laws: stack safety over repeated left binds") { SC.stackSafetyOverRepeatedLeftBinds(5000, EQ) },
