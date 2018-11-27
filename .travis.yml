@@ -7,6 +7,7 @@ jdk:
 
 stages:
 - run-ank
+- coverage-report
 - deploy
 - deploy-docs
 
@@ -26,12 +27,16 @@ jobs:
     # redirecting outputs to files to avoid exceeding travis' logs limit
     - ./gradlew clean build > build.log
     - ./gradlew dokka :arrow-docs:runAnk > run_ank.log
-    - aws s3 sync modules/docs/arrow-docs/build/site s3://$S3_BUCKET/site > aws_sync_dokka.log
-  - stage: deploy
     if: branch = master AND type != pull_request
+    - aws s3 sync modules/docs/arrow-docs/build/site s3://$S3_BUCKET/site > aws_sync_dokka.log
+  - stage: coverage-report
+    if: branch = master
     script:
     - ./gradlew codeCoverageReport
     - bash <(curl -s https://codecov.io/bash)
+  - stage: deploy
+    if: branch = master AND type != pull_request
+    script:
     - ./deploy-scripts/deploy.sh
   - stage: deploy-docs
     if: branch = master AND type != pull_request
