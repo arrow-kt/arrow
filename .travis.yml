@@ -36,6 +36,7 @@ jobs:
    - ./gradlew clean build > build.log
    - ./gradlew dokka :arrow-docs:runAnk > run_ank.log
    - aws s3 sync modules/docs/arrow-docs/build/site s3://$S3_BUCKET/site > aws_sync_dokka.log
+  - stage: coverage-report
     if: branch = master
     script:
     - ./gradlew codeCoverageReport
