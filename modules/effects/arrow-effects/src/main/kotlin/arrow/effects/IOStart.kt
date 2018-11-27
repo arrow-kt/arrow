@@ -1,22 +1,15 @@
 package arrow.effects
 
 import arrow.Kind
-import arrow.core.Either
-import arrow.core.flatMap
-import arrow.core.left
-import arrow.core.right
-import arrow.effects.internal.IOConnection
-import arrow.effects.internal.Promise
-import arrow.effects.internal.asyncIOContinuation
-import arrow.effects.internal.toDisposable
+import arrow.core.*
+import arrow.effects.IO.Companion.just
+import arrow.effects.internal.*
 import arrow.effects.typeclasses.Fiber
+import kotlin.coroutines.*
 import kotlin.coroutines.Continuation
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.startCoroutine
-import kotlin.coroutines.suspendCoroutine
 
 fun <A> IOOf<A>.startF(ctx: CoroutineContext): Kind<ForIO, Fiber<ForIO, A>> = IO.async { ioConnection: IOConnection, cb ->
-  val promise = Promise<A>()
+  val promise = Promise.unsafe<A>()
   val conn = IOConnection()
 
   val a: suspend () -> A = {
@@ -34,8 +27,19 @@ fun <A> IOOf<A>.startF(ctx: CoroutineContext): Kind<ForIO, Fiber<ForIO, A>> = IO
   a.startCoroutine(asyncIOContinuation(ctx) { either ->
     either.fold(
       { cb(it.left()) },
-      promise::complete)
+      promise::complete
+    )
   })
 
-  cb(Fiber(IO(promise::get), ioConnection.cancel()).right())
+  val join: IO<A> = IO.defer {
+    try {
+      just(promise.get.value())
+    } catch (t: Throwable) {
+      IO.raiseError<A>(t)
+    }
+  }
+
+  val cancel = ioConnection.cancel()
+
+  cb(Fiber(join, cancel).right())
 }
