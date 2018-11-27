@@ -6,7 +6,9 @@ jdk:
 - oraclejdk8
 
 stages:
-- run-ank
+- build-and-dokka
+- build-and-dokka-transfer
+- coverage-report
 - deploy
 - deploy-docs
 
@@ -22,12 +24,18 @@ before_install:
 jobs:
   include:
   - stage: build-and-dokka
-    script:
-    # redirecting outputs to files to avoid exceeding travis' logs limit
-    - ./gradlew clean build > build.log
-    - ./gradlew dokka :arrow-docs:runAnk > run_ank.log
-    - aws s3 sync modules/docs/arrow-docs/build/site s3://$S3_BUCKET/site > aws_sync_dokka.log
-  - stage: coverage-report
+   script:
+   if: branch != master OR type = pull_request
+   # redirecting outputs to files to avoid exceeding travis' logs limit
+   - ./gradlew clean build > build.log
+   - ./gradlew dokka :arrow-docs:runAnk > run_ank.log
+  - stage: build-and-dokka-transfer
+   script:
+   if: branch = master AND type != pull_request
+   # redirecting outputs to files to avoid exceeding travis' logs limit
+   - ./gradlew clean build > build.log
+   - ./gradlew dokka :arrow-docs:runAnk > run_ank.log
+   - aws s3 sync modules/docs/arrow-docs/build/site s3://$S3_BUCKET/site > aws_sync_dokka.log
     if: branch = master
     script:
     - ./gradlew codeCoverageReport
