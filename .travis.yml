@@ -3,28 +3,52 @@ sudo: required
 dist: trusty
 
 jdk:
-  - oraclejdk8
+- oraclejdk8
 
-script:
-  - ./gradlew clean build
-  - ./gradlew dokka :arrow-docs:runAnk
+stages:
+- name: build-and-dokka
+  if: branch != master OR type = pull_request
+- name: build-and-dokka-transfer
+  if: branch = master AND type != pull_request
+- name: coverage-report
+  if: branch = master
+- name: deploy
+  if: branch = master AND type != pull_request
+- name: deploy-docs
+  if: branch = master AND type != pull_request
 
-after_success:
-  - ./gradlew codeCoverageReport
-  - bash <(curl -s https://codecov.io/bash)
-  - ./deploy-scripts/deploy.sh
+env:
+ global:
+ # include $HOME/.local/bin for `aws`
+ - PATH=$HOME/.local/bin:$PATH
 
-before_deploy:
-  - rvm use 2.5.3 --install --fuzzy
-  - gem install jekyll -v 3.7.4
-  - jekyll build -s modules/docs/arrow-docs/build/site/ -d modules/docs/arrow-docs/build/_site
+before_install:
+- pip install --user awscli
+- mkdir -p ~/site
 
-deploy:
-  provider: s3
-  access_key_id: $S3_ACCESS_KEY_ID
-  secret_access_key: $S3_SECRET_ACCESS_KEY
-  bucket: $S3_BUCKET
-  skip_cleanup: true
-  local_dir: modules/docs/arrow-docs/build/_site
-  on:
-    branch: master
+jobs:
+ include:
+ - stage: build-and-dokka
+   script:
+   # redirecting outputs to files to avoid exceeding travis' logs limit
+   - ./gradlew clean build > build.log
+   - ./gradlew dokka :arrow-docs:runAnk > run_ank.log
+ - stage: build-and-dokka-transfer
+   script:
+   - ./gradlew clean build > build.log
+   - ./gradlew dokka :arrow-docs:runAnk > run_ank.log
+   - aws s3 sync modules/docs/arrow-docs/build/site s3://$S3_BUCKET/site > aws_sync_dokka.log
+ - stage: coverage-report
+   script:
+   - ./gradlew codeCoverageReport
+   - bash <(curl -s https://codecov.io/bash)
+ - stage: deploy
+   script:
+   - ./deploy-scripts/deploy.sh
+ - stage: deploy-docs
+   script:
+   - rvm use 2.5.3 --install --fuzzy
+   - gem install jekyll -v 3.7.4
+   - aws s3 sync s3://$S3_BUCKET/site ~/site > aws_sync_jekyll.log
+   - jekyll build -s ~/site -d ~/_site
+   - aws s3 sync ~/_site s3://$S3_BUCKET > aws_sync_site.log
