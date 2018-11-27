@@ -18,6 +18,7 @@ env:
 before_install:
 - pip install --user awscli
 - mkdir -p ~/site
+- echo $TRAVIS_PULL_REQUEST
 
 jobs:
   include:
