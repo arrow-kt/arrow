@@ -1,33 +1,33 @@
 package arrow.ank
 
+import arrow.Kind
+import arrow.core.Option
 import arrow.core.Tuple2
+import arrow.data.Nel
+import arrow.typeclasses.MonadThrow
 import org.intellij.markdown.ast.ASTNode
-import java.io.File
+import java.nio.file.Path
 
-fun createTarget(source: File, target: File): File =
-  createTargetImpl(source, target)
+interface AnkOps<F> {
+  fun MF(): MonadThrow<F>
 
-fun getFileCandidates(target: File): List<File> =
-  getFileCandidatesImpl(target)
+  fun createTargetDirectory(source: Path, target: Path): Kind<F, Path>
 
-fun readFile(source: File): String =
-  readFileImpl(source)
+  fun getCandidatePaths(root: Path): Kind<F, Option<Nel<Path>>>
 
-fun preProcessMacros(source: Tuple2<File, String>): String =
-  preProcessMacrosImpl(source)
+  fun readFile(path: Path): Kind<F, String>
 
-fun parseMarkdown(markdown: String): ASTNode =
-  parseMarkDownImpl(markdown)
+  fun preProcessMacros(pathAndContent: Tuple2<Path, String>): String
 
-fun extractCode(source: String, tree: ASTNode): List<Snippet> =
-  extractCodeImpl(source, tree)
+  fun parseMarkdown(markdown: String): Kind<F, ASTNode>
 
-fun compileCode(snippets: Map<File, List<Snippet>>, compilerArgs: List<String>): List<CompiledMarkdown> =
-  compileCodeImpl(snippets, compilerArgs)
+  fun extractCode(content: String, ast: ASTNode): Kind<F, Option<Nel<Snippet>>>
 
-fun replaceAnkToLang(compilationResults: CompiledMarkdown): String =
-  replaceAnkToLangImpl(compilationResults)
+  fun compileCode(snippets: Tuple2<Path, Nel<Snippet>>, compilerArgs: List<String>): Kind<F, Nel<Snippet>>
 
-fun generateFile(candidate: File, newContents: String): File =
-  generateFileImpl(candidate, newContents)
+  fun replaceAnkToLang(content: String, compiledSnippets: Nel<Snippet>): String
 
+  fun generateFile(path: Path, newContent: String): Kind<F, Unit>
+
+  fun printConsole(msg: String): Kind<F, Unit>
+}
