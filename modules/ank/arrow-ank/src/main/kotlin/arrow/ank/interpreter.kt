@@ -143,7 +143,7 @@ fun <F> monadDeferInterpreter(MF: MonadDefer<F>): AnkOps<F> = object : AnkOps<F>
           }.fold({
             // raise error and print to console
             defer {
-              println(colored(ANSI_RED, "[$1%] ✗ ${snippets.a} [${i + 1} of ${snippets.b.size}]"))
+              println(colored(ANSI_RED, "[${(i + 1) * 100 / snippets.b.size}%] ✗ ${snippets.a} [${i + 1} of ${snippets.b.size}]"))
               raiseError<Snippet>(
                 CompilationException(snippets.a, snip, it, msg = "\n" + """
                     |
