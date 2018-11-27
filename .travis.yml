@@ -29,15 +29,15 @@ before_install:
 jobs:
   include:
   - stage: build-and-dokka
-   script:
-   # redirecting outputs to files to avoid exceeding travis' logs limit
-   - ./gradlew clean build > build.log
-   - ./gradlew dokka :arrow-docs:runAnk > run_ank.log
+    script:
+    # redirecting outputs to files to avoid exceeding travis' logs limit
+    - ./gradlew clean build > build.log
+    - ./gradlew dokka :arrow-docs:runAnk > run_ank.log
   - stage: build-and-dokka-transfer
-   script:
-   - ./gradlew clean build > build.log
-   - ./gradlew dokka :arrow-docs:runAnk > run_ank.log
-   - aws s3 sync modules/docs/arrow-docs/build/site s3://$S3_BUCKET/site > aws_sync_dokka.log
+    script:
+    - ./gradlew clean build > build.log
+    - ./gradlew dokka :arrow-docs:runAnk > run_ank.log
+    - aws s3 sync modules/docs/arrow-docs/build/site s3://$S3_BUCKET/site > aws_sync_dokka.log
   - stage: coverage-report
     script:
     - ./gradlew codeCoverageReport
