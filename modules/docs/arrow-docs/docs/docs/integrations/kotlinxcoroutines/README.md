@@ -189,6 +189,147 @@ unsafeCancel()
 // Boom! caused by BindingCancellationException
 ```
 
+### Memoization and retrying instances of DeferredK
+
+In accordance to `MonadDefer`, which `DeferredK` provides an instance for, `DeferredK` can be retried/repeated without memoization.
+This is in contrast to `Deferred` which will complete once and yield the same result on every await.
+To properly make this work however some basic rules have to be followed:
+- Wrapped `DeferredK` created with `deferred.k()` cannot be rerun. This is a limitation of coroutines itself.
+- Every method used when working with `DeferredK` must always create new instances of `Deferred`. If you have your own `Deferred` from some other point in code it will not be rerun.
+
+Below are some examples on what these two rules mean:
+
+This cannot be rerun due to being a direct wrapper of `Deferred` created with `.k()`.
+
+{: data-executable='true'}
+```kotlin:ank
+import arrow.effects.k
+import arrow.effects.unsafeRunSync
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+
+fun main() {
+  //sampleStart
+  var counter = 0
+  val deferred = GlobalScope.async { 
+    ++counter
+  }.k()
+  //sampleEnd
+  
+  println(deferred.unsafeRunSync())
+  println(deferred.unsafeRunSync())
+}
+```
+
+This will rerun only the deferred, because other cannot be rerun.
+
+{: data-executable='true'}
+```kotlin:ank
+import arrow.effects.k
+import arrow.effects.DeferredK
+import arrow.effects.unsafeRunSync
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+
+fun main() {
+  //sampleStart
+  var counter = 0
+  val other = GlobalScope.async {
+    // Some heavy computation
+    counter++
+  }.k()
+  
+  val deferred = DeferredK {
+    println("I am being run")
+    other.await() * 2
+  }
+  //sampleEnd
+  
+  println(deferred.unsafeRunSync())
+  println(deferred.unsafeRunSync())
+}
+```
+
+This will rerun both the invoke method and flatMap correctly.
+
+{: data-executable='true'}
+```kotlin:ank
+import arrow.effects.DeferredK
+import arrow.effects.unsafeRunSync
+
+fun main() {
+  //sampleStart
+  var counter = 0
+  val deferred = DeferredK {
+    ++counter
+  }.flatMap {
+    println("Console side effects!")
+    DeferredK.just(it * it)
+  }
+  //sampleEnd
+  
+  println(deferred.unsafeRunSync())
+  println(deferred.unsafeRunSync())
+}
+```
+
+This will also rerun properly due to the deferred being created in the invoke constructor of `DeferredK`.
+
+{: data-executable='true'}
+```kotlin:ank
+import arrow.effects.DeferredK
+import arrow.effects.unsafeRunSync
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+
+fun main() {
+  //sampleStart
+  var counter = 0
+  val deferred = DeferredK {
+    GlobalScope.async { ++counter }.await()
+    counter *= counter
+    counter
+  }
+  //sampleEnd
+  
+  println(deferred.unsafeRunSync())
+  println(deferred.unsafeRunSync())
+}
+```
+
+Same example but using a suspend function instead
+
+{: data-executable='true'}
+```kotlin:ank
+import arrow.effects.DeferredK
+import arrow.effects.unsafeRunSync
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+
+fun main() {
+  //sampleStart
+  var counter = 0
+  
+  suspend fun countUp() {
+    counter++
+  }
+  
+  val deferred = DeferredK {
+    countUp()
+    
+    counter *= counter
+    counter
+  }
+  //sampleEnd
+  
+  println(deferred.unsafeRunSync())
+  println(deferred.unsafeRunSync())
+}
+```
+
+So as a general rule. Don't mix `Deferred` with `DeferredK` if you want to be able to rerun it.
+And if you absolutely have to then try to create the `Deferred` inside the `DeferredK`, that will also work. 
+Instead of awaiting a `Deferred<A>` it may also be a good idea to use `suspend () -> A` inside `DeferredK` instead. That function is also guaranteed to rerun.
 
 ### Supported Type Classes
 
