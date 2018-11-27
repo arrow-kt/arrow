@@ -1,12 +1,9 @@
 package arrow.effects.internal
 
 import arrow.effects.ForIO
-import arrow.effects.IO
-import arrow.effects.fix
 import arrow.effects.typeclasses.Async
 import arrow.typeclasses.Applicative
 import java.util.concurrent.atomic.AtomicReference
-import javax.tools.Diagnostic
 
 /**
  * Represents a composite of functions (meant for cancellation) that are stacked. cancel() is idempotent,
@@ -53,7 +50,7 @@ sealed class KindConnection<F> {
 
   companion object {
 
-    operator fun <F> invoke(): KindConnection<F> = DefaultIOConnection()
+    operator fun <F> invoke(AS: Async<F>): KindConnection<F> = DefaultKindConnection(AS)
 
     fun <F> uncancelable(FA: Applicative<F>): KindConnection<F> = Uncancelable(FA)
   }
@@ -73,7 +70,7 @@ sealed class KindConnection<F> {
   /**
    * Default [IOConnection] implementation.
    */
-  private class DefaultIOConnection<F>(val AS: Async<F>) : KindConnection<F>() {
+  private class DefaultKindConnection<F>(val AS: Async<F>) : KindConnection<F>() {
     private val state = AtomicReference(emptyList<CancelToken<F>>())
 
     override fun cancel(): CancelToken<F> = AS.defer {
