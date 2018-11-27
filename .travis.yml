@@ -18,7 +18,6 @@ env:
 before_install:
 - pip install --user awscli
 - mkdir -p ~/site
-- echo $TRAVIS_PULL_REQUEST
 
 jobs:
   include:
@@ -29,13 +28,13 @@ jobs:
     - ./gradlew dokka :arrow-docs:runAnk > run_ank.log
     - aws s3 sync modules/docs/arrow-docs/build/site s3://$S3_BUCKET/site > aws_sync_dokka.log
   - stage: deploy
-    if: branch = master
+    if: branch = master AND type != pull_request
     script:
     - ./gradlew codeCoverageReport
     - bash <(curl -s https://codecov.io/bash)
     - ./deploy-scripts/deploy.sh
   - stage: deploy-docs
-    if: branch = master
+    if: branch = master AND type != pull_request
     script:
     - rvm use 2.5.3 --install --fuzzy
     - gem install jekyll -v 3.7.4
