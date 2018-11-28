@@ -2,7 +2,6 @@ package arrow.effects
 
 import arrow.core.*
 import arrow.effects.instances.io.concurrentEffect.concurrentEffect
-import arrow.effects.instances.io.monad.flatMap
 import arrow.effects.internal.Platform.onceOnly
 import arrow.effects.internal.parMapCancellable2
 import arrow.effects.internal.parMapCancellable3
@@ -115,98 +114,3 @@ fun <A, B, C, D, E, F, G, H, I, J> IO.Companion.parallelMapN(ctx: CoroutineConte
     parallelMapN(ctx, ioD, ioE, ioF, ::Tuple3),
     parallelMapN(ctx, ioG, ioH, ioI, ::Tuple3)
   ) { abc, def, ghi -> f(abc.a, abc.b, abc.c, def.a, def.b, def.c, ghi.a, ghi.b, ghi.c) }
-
-fun <A, B> IO.Companion.raceN(ctx: CoroutineContext, a: IOOf<A>, b: IOOf<B>): IO<Either<A, B>> {
-  val cancel: FutureN<Disposable> = FutureN(2)
-
-  val cbf: FutureN<(Either<Throwable, Either<A, B>>) -> Unit> = FutureN()
-
-  val complete: (Either<Throwable, Either<A, B>>) -> Unit = onceOnly { result: Either<Throwable, Either<A, B>> ->
-    cancel.unsafeGet().forEach { it() }
-    cbf.unsafeGet().forEach { it(result) }
-  }
-
-  return IO.async { TODO, cb: (Either<Throwable, Either<A, B>>) -> Unit ->
-    cbf.set(cb)
-    IO.async(IO.concurrentEffect().parMapCancellable2(ctx,
-      a.flatMap { IO { complete(it.left().right()) } },
-      b.flatMap { IO { complete(it.right().right()) } },
-      ::Tuple2)
-    { io -> io.fix().unsafeRunAsync { eith -> eith.fold({ cb(it.left()) }, { cancel.set(it) }) } }.toIOProc()
-    ).unsafeRunAsync { it.fold({ complete(it.left()) }, { /* should never happen */ }) }
-  }.handleErrorWith {
-    if (it == OnCancel.CancellationException) {
-      complete(it.left())
-    }
-    raiseError(it)
-  }
-}
-
-fun <A, B, C> IO.Companion.raceN(ctx: CoroutineContext, a: IOOf<A>, b: IOOf<B>, c: IOOf<C>): IO<Either<A, Either<B, C>>> {
-  val cancel: FutureN<Disposable> = FutureN(3)
-
-  val cbf: FutureN<(Either<Throwable, Either<A, Either<B, C>>>) -> Unit> = FutureN()
-
-  val complete = onceOnly { result: Either<Throwable, Either<A, Either<B, C>>> ->
-    cancel.unsafeGet().forEach { it() }
-    cbf.unsafeGet().forEach { it(result) }
-  }
-
-  return IO.async { TODO, cb: (Either<Throwable, Either<A, Either<B, C>>>) -> Unit ->
-    cbf.set(cb)
-    IO.async(IO.concurrentEffect().parMapCancellable3(ctx,
-      a.flatMap { IO { complete(it.left().right()) } },
-      b.flatMap { IO { complete(it.left().right().right()) } },
-      c.flatMap { IO { complete(it.right().right().right()) } },
-      ::Tuple3)
-    { it.fix().unsafeRunAsync { it.fold({ cb(it.left()) }, { cancel.set(it) }) } }.toIOProc()
-    ).unsafeRunAsync { it.fold({ complete(it.left()) }, { /* should never happen */ }) }
-  }.handleErrorWith {
-    if (it == OnCancel.CancellationException) {
-      complete(it.left())
-    }
-    raiseError(it)
-  }
-}
-
-fun <A, B, C, D> IO.Companion.raceN(ctx: CoroutineContext, a: IOOf<A>, b: IOOf<B>, c: IOOf<C>, d: IOOf<D>): IO<Either<Either<A, B>, Either<C, D>>> =
-  raceN(ctx,
-    raceN(ctx, a, b),
-    raceN(ctx, c, d)
-  )
-
-fun <A, B, C, D, E> IO.Companion.raceN(ctx: CoroutineContext, a: IOOf<A>, b: IOOf<B>, c: IOOf<C>, d: IOOf<D>, e: IOOf<E>): IO<Either<Either<A, Either<B, C>>, Either<D, E>>> =
-  raceN(ctx,
-    raceN(ctx, a, b, c),
-    raceN(ctx, d, e)
-  )
-
-fun <A, B, C, D, E, F> IO.Companion.raceN(ctx: CoroutineContext, a: IOOf<A>, b: IOOf<B>, c: IOOf<C>, d: IOOf<D>, e: IOOf<E>, f: IOOf<F>): IO<Either<Either<A, B>, Either<Either<C, D>, Either<E, F>>>> =
-  raceN(ctx,
-    raceN(ctx, a, b),
-    raceN(ctx, c, d),
-    raceN(ctx, e, f)
-  )
-
-fun <A, B, C, D, E, F, G> IO.Companion.raceN(ctx: CoroutineContext, a: IOOf<A>, b: IOOf<B>, c: IOOf<C>, d: IOOf<D>, e: IOOf<E>, f: IOOf<F>, g: IOOf<G>): IO<Either<Either<A, Either<B, C>>, Either<Either<D, E>, Either<F, G>>>> =
-  raceN(ctx,
-    raceN(ctx, a, b, c),
-    raceN(ctx, d, e),
-    raceN(ctx, f, g)
-  )
-
-fun <A, B, C, D, E, F, G, H> IO.Companion.raceN(ctx: CoroutineContext, a: IOOf<A>, b: IOOf<B>, c: IOOf<C>, d: IOOf<D>, e: IOOf<E>, f: IOOf<F>, g: IOOf<G>, h: IOOf<H>): IO<Either<Either<Either<A, B>, Either<C, D>>, Either<Either<E, F>, Either<G, H>>>> =
-  raceN(ctx,
-    raceN(ctx, a, b),
-    raceN(ctx, c, d),
-    raceN(ctx, e, f),
-    raceN(ctx, g, h)
-  )
-
-fun <A, B, C, D, E, F, G, H, I> IO.Companion.raceN(ctx: CoroutineContext, a: IOOf<A>, b: IOOf<B>, c: IOOf<C>, d: IOOf<D>, e: IOOf<E>, f: IOOf<F>, g: IOOf<G>, h: IOOf<H>, i: IOOf<I>): IO<Either<Either<Either<A, Either<B, C>>, Either<D, E>>, Either<Either<F, G>, Either<H, I>>>> =
-  raceN(ctx,
-    raceN(ctx, a, b, c),
-    raceN(ctx, d, e),
-    raceN(ctx, f, g),
-    raceN(ctx, h, i)
-  )

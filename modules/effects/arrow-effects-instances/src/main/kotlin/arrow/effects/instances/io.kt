@@ -125,9 +125,6 @@ interface IOConcurrentInstance : Concurrent<ForIO>, IOAsyncInstance {
   override fun <A, B> racePair(ctx: CoroutineContext, lh: Kind<ForIO, A>, rh: Kind<ForIO, B>): Kind<ForIO, Either<Tuple2<A, Fiber<ForIO, B>>, Tuple2<Fiber<ForIO, A>, B>>> =
     IO.racePair(ctx, lh, rh)
 
-  override fun <A, B> race(ctx: CoroutineContext, lh: Kind<ForIO, A>, rh: Kind<ForIO, B>): Kind<ForIO, Either<A, B>> =
-    IO.raceN(ctx, lh, rh)
-
 }
 
 @extension

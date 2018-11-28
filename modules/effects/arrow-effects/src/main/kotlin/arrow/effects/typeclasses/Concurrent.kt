@@ -1,20 +1,20 @@
 package arrow.effects.typeclasses
 
 import arrow.Kind
-import arrow.core.Either
-import arrow.core.Tuple2
-import arrow.core.left
-import arrow.core.right
+import arrow.core.*
 import kotlin.coroutines.CoroutineContext
 
 interface Concurrent<F> : Async<F> {
 
   fun <A> Kind<F, A>.startF(ctx: CoroutineContext): Kind<F, Fiber<F, A>>
 
-  fun <A, B> racePair(ctx: CoroutineContext, lh: Kind<F, A>, rh: Kind<F, B>): Kind<F, Either<Tuple2<A, Fiber<F, B>>, Tuple2<Fiber<F, A>, B>>>
+  fun <A, B> racePair(ctx: CoroutineContext, fa: Kind<F, A>, fb: Kind<F, B>): Kind<F, Either<Tuple2<A, Fiber<F, B>>, Tuple2<Fiber<F, A>, B>>>
 
-  fun <A, B> race(ctx: CoroutineContext, lh: Kind<F, A>, rh: Kind<F, B>): Kind<F, Either<A, B>> =
-    racePair(ctx, lh, rh).flatMap {
+  //TODO blocked by Async#asyncF (https://github.com/arrow-kt/arrow/issues/1124)
+  //fun <A> cancelable(cb: ((Either<Throwable, A>) -> Unit) -> Kind<F, Unit>): Kind<F, A> =
+
+  fun <A, B> raceN(ctx: CoroutineContext, fa: Kind<F, A>, fb: Kind<F, B>): Kind<F, Either<A, B>> =
+    racePair(ctx, fa, fb).flatMap {
       it.fold({ (a, b) ->
         b.cancel.map { a.left() }
       }, { (a, b) ->
@@ -22,72 +22,61 @@ interface Concurrent<F> : Async<F> {
       })
     }
 
-  //TODO blocked by Async#asyncF (https://github.com/arrow-kt/arrow/issues/1124)
-  //fun <A> cancelable(cb: ((Either<Throwable, A>) -> Unit) -> Kind<F, Unit>): Kind<F, A> =
+  fun <A, B, C> raceN(ctx: CoroutineContext, fa: Kind<F, A>, fb: Kind<F, B>, fc: Kind<F, C>): Kind<F, Either<A, Either<B, C>>> =
+    racePair(ctx, fa, racePair(ctx, fb, fc)).flatMap {
+      it.fold({ (a, b) ->
+        b.cancel.map { a.left() }
+      }, { (a, b) ->
+        a.cancel.flatMap {
+          b.fold({ (b, c) ->
+            c.cancel.map { b.left().right() }
+          }, { (b, c) ->
+            b.cancel.map { c.right().right() }
+          })
+        }
+      })
+    }
 
-//  fun <A, B, C> parallelMapN(ctx: CoroutineContext, fa: Kind<F, A>, fb: Kind<F, B>, f: (A, B) -> C): Kind<F, C> =
-//    fa.startF(ctx).flatMap { (joinA, _) ->
-//      fb.startF(ctx).flatMap { (joinB, _) ->
-//        joinA.flatMap { a ->
-//          joinB.map { b ->
-//            f(a, b)
-//          }
-//        }
-//      }
-//    }
-//
-//  fun <A, B, C, D> parallelMapN(ctx: CoroutineContext, fa: Kind<F, A>, fb: Kind<F, B>, fc: Kind<F, C>, f: (A, B, C) -> D): Kind<F, D> =
-//    fa.startF(ctx).flatMap { (joinA, _) ->
-//      fb.startF(ctx).flatMap { (joinB, _) ->
-//        fc.startF(ctx).flatMap { (joinC, _) ->
-//          joinA.flatMap { a ->
-//            joinB.flatMap { b ->
-//              joinC.map { c ->
-//                f(a, b, c)
-//              }
-//            }
-//          }
-//        }
-//      }
-//    }
-//
-//  fun <A, B, C, D, E> parallelMapN(ctx: CoroutineContext, fa: Kind<F, A>, fb: Kind<F, B>, fc: Kind<F, C>, fd: Kind<F, D>, f: (A, B, C, D) -> E): Kind<F, E> =
-//    parallelMapN(ctx,
-//      parallelMapN(ctx, fa, fb, ::Tuple2),
-//      parallelMapN(ctx, fc, fd, ::Tuple2)
-//    ) { (a, b), (c, d) -> f(a, b, c, d) }
-//
-//  fun <A, B, C, D, E, G> parallelMapN(ctx: CoroutineContext, fa: Kind<F, A>, fb: Kind<F, B>, fc: Kind<F, C>, fd: Kind<F, D>, fe: Kind<F, E>, f: (A, B, C, D, E) -> G): Kind<F, G> =
-//    parallelMapN(ctx,
-//      parallelMapN(ctx, fa, fb, fc, ::Tuple3),
-//      parallelMapN(ctx, fd, fe, ::Tuple2)
-//    ) { (a, b, c), (d, e) -> f(a, b, c, d, e) }
-//
-//    fun <A, B, C, D, E, G, H> parallelMapN(ctx: CoroutineContext, fa: Kind<F, A>, fb: Kind<F, B>, fc: Kind<F, C>, fd: Kind<F, D>, fe: Kind<F, E>, fg: Kind<F, G>, f: (A, B, C, D, E, G) -> H): Kind<F, H> =
-//    parallelMapN(ctx,
-//      parallelMapN(ctx, fa, fb, fc, ::Tuple3),
-//      parallelMapN(ctx, fd, fe, fg, ::Tuple3)
-//    ) { (a, b, c), (d, e, g) -> f(a, b, c, d, e, g) }
-//
-//  fun <A, B, C, D, E, G, H, I> parallelMapN(ctx: CoroutineContext, fa: Kind<F, A>, fb: Kind<F, B>, fc: Kind<F, C>, fd: Kind<F, D>, fe: Kind<F, E>, fg: Kind<F, G>, fh: Kind<F, H>, f: (A, B, C, D, E, G, H) -> I): Kind<F, I> =
-//    parallelMapN(ctx,
-//      parallelMapN(ctx, fa, fb, fc, ::Tuple3),
-//      parallelMapN(ctx, fd, fe, ::Tuple2),
-//      parallelMapN(ctx, fg, fh, ::Tuple2)
-//    ) { (a, b, c), (d, e), (g, h) -> f(a, b, c, d, e, g, h) }
-//
-//  fun <A, B, C, D, E, G, H, I, J> parallelMapN(ctx: CoroutineContext, fa: Kind<F, A>, fb: Kind<F, B>, fc: Kind<F, C>, fd: Kind<F, D>, fe: Kind<F, E>, fg: Kind<F, G>, fh: Kind<F, H>, fi: Kind<F, I>, f: (A, B, C, D, E, G, H, I) -> J): Kind<F, J> =
-//    parallelMapN(ctx,
-//      parallelMapN(ctx, fa, fb, fc, ::Tuple3),
-//      parallelMapN(ctx, fd, fe, fg, ::Tuple3),
-//      parallelMapN(ctx, fh, fi, ::Tuple2)
-//    ) { (a, b, c), (d, e, g), (h, i) -> f(a, b, c, d, e, g, h, i) }
-//
-//  fun <A, B, C, D, E, G, H, I, J, K> parallelMapN(ctx: CoroutineContext, fa: Kind<F, A>, fb: Kind<F, B>, fc: Kind<F, C>, fd: Kind<F, D>, fe: Kind<F, E>, fg: Kind<F, G>, fh: Kind<F, H>, fi: Kind<F, I>, fj: Kind<F, J>, f: (A, B, C, D, E, G, H, I, J) -> K): Kind<F, K> =
-//    parallelMapN(ctx,
-//      parallelMapN(ctx, fa, fb, fc, ::Tuple3),
-//      parallelMapN(ctx, fd, fe, fg, ::Tuple3),
-//      parallelMapN(ctx, fh, fi, fj, ::Tuple3)
-//    ) { (a, b, c), (d, e, g), (h, i, j) -> f(a, b, c, d, e, g, h, i, j) }
+  fun <A, B, C, D> raceN(ctx: CoroutineContext, a: Kind<F, A>, b: Kind<F, B>, c: Kind<F, C>, d: Kind<F, D>): Kind<F, Either<Either<A, B>, Either<C, D>>> =
+    raceN(ctx,
+      raceN(ctx, a, b),
+      raceN(ctx, c, d)
+    )
+
+  fun <A, B, C, D, E> raceN(ctx: CoroutineContext, a: Kind<F, A>, b: Kind<F, B>, c: Kind<F, C>, d: Kind<F, D>, e: Kind<F, E>): Kind<F, Either<Either<A, Either<B, C>>, Either<D, E>>> =
+    raceN(ctx,
+      raceN(ctx, a, b, c),
+      raceN(ctx, d, e)
+    )
+
+  fun <A, B, C, D, E, G> raceN(ctx: CoroutineContext, a: Kind<F, A>, b: Kind<F, B>, c: Kind<F, C>, d: Kind<F, D>, e: Kind<F, E>, g: Kind<F, G>): Kind<F, Either<Either<A, B>, Either<Either<C, D>, Either<E, G>>>> =
+    raceN(ctx,
+      raceN(ctx, a, b),
+      raceN(ctx, c, d),
+      raceN(ctx, e, g)
+    )
+
+  fun <A, B, C, D, E, G, H> raceN(ctx: CoroutineContext, a: Kind<F, A>, b: Kind<F, B>, c: Kind<F, C>, d: Kind<F, D>, e: Kind<F, E>, g: Kind<F, G>, h: Kind<F, H>): Kind<F, Either<Either<A, Either<B, C>>, Either<Either<D, E>, Either<G, H>>>> =
+    raceN(ctx,
+      raceN(ctx, a, b, c),
+      raceN(ctx, d, e),
+      raceN(ctx, g, h)
+    )
+
+  fun <A, B, C, D, E, G, H, I> raceN(ctx: CoroutineContext, a: Kind<F, A>, b: Kind<F, B>, c: Kind<F, C>, d: Kind<F, D>, e: Kind<F, E>, g: Kind<F, G>, h: Kind<F, H>, i: Kind<F, I>): Kind<F, Either<Either<Either<A, B>, Either<C, D>>, Either<Either<E, G>, Either<H, I>>>> =
+    raceN(ctx,
+      raceN(ctx, a, b),
+      raceN(ctx, c, d),
+      raceN(ctx, e, g),
+      raceN(ctx, h, i)
+    )
+
+  fun <A, B, C, D, E, G, H, I, J> raceN(ctx: CoroutineContext, a: Kind<F, A>, b: Kind<F, B>, c: Kind<F, C>, d: Kind<F, D>, e: Kind<F, E>, g: Kind<F, G>, h: Kind<F, H>, i: Kind<F, I>, j: Kind<F, J>): Kind<F, Either<Either<Either<A, Either<B, C>>, Either<D, E>>, Either<Either<G, H>, Either<I, J>>>> =
+    raceN(ctx,
+      raceN(ctx, a, b, c),
+      raceN(ctx, d, e),
+      raceN(ctx, g, h),
+      raceN(ctx, i, j)
+    )
 
 }
