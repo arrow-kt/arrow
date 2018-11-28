@@ -15,7 +15,7 @@ interface Promise<F, A> {
 
   /**
    * Get the promised value.
-   * Suspending the fiber running the action until the result is available.
+   * Suspending the Fiber running the action until the result is available.
    *
    * {: data-executable='true'}
    *

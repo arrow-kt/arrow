@@ -3,7 +3,6 @@ package arrow.streams.internal
 import arrow.Kind
 import arrow.core.*
 import arrow.effects.typeclasses.ExitCase
-import arrow.streams.CompositeFailure
 import arrow.streams.internal.FreeC.Result
 import arrow.typeclasses.MonadError
 
@@ -69,10 +68,10 @@ sealed class FreeC<F, out R> : FreeCOf<F, R> {
   @Suppress("UNCHECKED_CAST", "ThrowRuntimeException")
   fun asHandler(e: Throwable): FreeC<F, R> = when (val view = ViewL(this.fix())) {
     is FreeC.Pure -> FreeC.Fail(e)
-    is FreeC.Fail -> FreeC.Fail(CompositeFailure(view.error, e))
+    is FreeC.Fail -> FreeC.Fail(arrow.streams.CompositeFailure(view.error, e))
     is FreeC.Interrupted<F, R, *> -> FreeC.Interrupted(
       view.context,
-      view.deferredError.map { t -> CompositeFailure(e, t) }.orElse { e.some() }
+      view.deferredError.map { t -> arrow.streams.CompositeFailure(e, t) }.orElse { e.some() }
     )
     is ViewL.Companion.View<F, *, R> -> (view as ViewL.Companion.View<F, Any?, R>).next(FreeC.Fail<F, Any?>(e))
     else -> throw AssertionError("Unreachable BOOM!")
@@ -323,7 +322,7 @@ fun <R> FreeC.Result<R>.recoverWith(f: (Throwable) -> Result<R>): Result<R> = wh
     try {
       f(error)
     } catch (t: Throwable) {
-      Result.raiseError<R>(CompositeFailure(error, t))
+      Result.raiseError<R>(arrow.streams.CompositeFailure(error, t))
     }
   else -> this
 }
@@ -339,7 +338,7 @@ fun <F, A, B> FreeCOf<F, A>.bracketCase(use: (A) -> FreeCOf<F, B>, release: (A, 
       release(a, result.asExitCase()).transformWith<F, Unit, B> { r2 ->
         when (r2) {
           is FreeC.Fail<*, *> -> result.recoverWith { t ->
-            FreeC.Fail<F, B>(CompositeFailure(t, r2.error))
+            FreeC.Fail<F, B>(arrow.streams.CompositeFailure(t, r2.error))
           }.asFreeC()
           else -> result.asFreeC()
         }

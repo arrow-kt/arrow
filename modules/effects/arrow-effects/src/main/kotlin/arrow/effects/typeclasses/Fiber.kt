@@ -7,20 +7,20 @@ import arrow.effects.CancelToken
  * [Fiber] represents the pure result of an [Async] data type
  * being started concurrently and that can be either joined or canceled.
  *
- * You can think of fibers as being lightweight threads, a fiber being a
+ * You can think of fibers as being lightweight threads, a Fiber being a
  * concurrency primitive for doing cooperative multi-tasking.
  */
 interface Fiber<F, A> {
 
   /**
    * Returns a new task that will await for the completion of the
-   * underlying fiber, (asynchronously) blocking the current run-loop
+   * underlying Fiber, (asynchronously) blocking the current run-loop
    * until that result is available.
    */
   val join: Kind<F, A>
 
   /**
-   * Triggers the cancellation of the fiber.
+   * Triggers the cancellation of the Fiber.
    *
    * @returns a task that trigger the cancellation upon evaluation.
    */
@@ -35,7 +35,7 @@ interface Fiber<F, A> {
      * [Fiber] constructor.
      *
      * @param join task that will trigger the cancellation.
-     * @param cancel task that will await for the completion of the underlying fiber.
+     * @param cancel task that will await for the completion of the underlying Fiber.
      */
     operator fun <F, A> invoke(join: Kind<F, A>, cancel: CancelToken<F>): Fiber<F, A> = object : Fiber<F, A> {
       override val join: Kind<F, A> = join

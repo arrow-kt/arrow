@@ -57,7 +57,7 @@ internal class UnsafePromise<A> : Promise<ForId, A> {
 
   override fun tryError(throwable: Throwable): Id<Boolean> = state.get().let { oldState ->
     when (oldState) {
-      is State.Pending -> throw  throwable
+      is State.Pending -> throw throwable
       is State.Full -> Id(false)
       is State.Error -> Id(false)
     }

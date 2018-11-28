@@ -696,8 +696,8 @@ sealed class DeferredK<A>(
             fiberA.join.fix().invokeOnCompletion { error ->
               error?.let { cb(it.left()) } ?: cb((fiberA.join.fix().getCompleted() toT fiberB).left().right())
             }
-            fiberB.join.fix().invokeOnCompletion { error ->
-              error?.let { cb(it.left()) } ?: cb((fiberA toT fiberB.join.fix().getCompleted()).right().right())
+            fiberB.join.unsafeRunAsync { eith ->
+              cb(eith.map { (fiberA toT it).right() })
             }
           }
         }

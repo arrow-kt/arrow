@@ -25,7 +25,7 @@ internal fun <F, A, B, C> Effect<F>.parMap2(ctx: CoroutineContext, ioA: Kind<F, 
       })
     }
   }
-  val parCont = parContinuation(ctx, f, asyncIOContinuation(ctx, cc))
+  val parCont = parContinuation(ctx, f, asyncContinuation(ctx, cc))
   a.startCoroutine(parCont)
   b.startCoroutine(parCont)
 }
@@ -58,7 +58,7 @@ internal fun <F, A, B, C, D> Effect<F>.parMap3(ctx: CoroutineContext, ioA: Kind<
       })
     }
   }
-  val triCont = triContinuation(ctx, f, asyncIOContinuation(ctx, cc))
+  val triCont = triContinuation(ctx, f, asyncContinuation(ctx, cc))
   a.startCoroutine(triCont)
   b.startCoroutine(triCont)
   c.startCoroutine(triCont)
@@ -83,7 +83,7 @@ fun <F, A, B, C> ConcurrentEffect<F>.parMapCancellable2(
       })
     }
   }
-  val parCont = parContinuation(ctx, f, asyncIOContinuation(ctx, cc))
+  val parCont = parContinuation(ctx, f, asyncContinuation(ctx, cc))
   a.startCoroutine(parCont)
   b.startCoroutine(parCont)
 }
@@ -113,7 +113,7 @@ fun <F, A, B, C, D> ConcurrentEffect<F>.parMapCancellable3(ctx: CoroutineContext
       })
     }
   }
-  val triCont = triContinuation(ctx, f, asyncIOContinuation(ctx, cc))
+  val triCont = triContinuation(ctx, f, asyncContinuation(ctx, cc))
   a.startCoroutine(triCont)
   b.startCoroutine(triCont)
   c.startCoroutine(triCont)
@@ -204,7 +204,11 @@ private sealed class Treither<out A, out B, out C> {
   abstract fun <D> fold(fa: (A) -> D, fb: (B) -> D, fc: (C) -> D): D
 }
 
-internal fun <A> asyncIOContinuation(ctx: CoroutineContext, cc: (Either<Throwable, A>) -> Unit): AContinuation<A> =
+/**
+ * [arrow.core.Continuation] to run coroutine on `ctx` and link result to callback [cc].
+ * Use [asyncContinuation] to run suspended functions within a context `ctx` and pass the result to [cc].
+ */
+internal fun <A> asyncContinuation(ctx: CoroutineContext, cc: (Either<Throwable, A>) -> Unit): AContinuation<A> =
   object : AContinuation<A> {
     override val context: CoroutineContext = ctx
 

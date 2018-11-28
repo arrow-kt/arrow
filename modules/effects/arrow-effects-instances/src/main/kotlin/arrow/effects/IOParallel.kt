@@ -132,7 +132,7 @@ fun <A, B> IO.Companion.raceN(ctx: CoroutineContext, a: IOOf<A>, b: IOOf<B>): IO
       a.flatMap { IO { complete(it.left().right()) } },
       b.flatMap { IO { complete(it.right().right()) } },
       ::Tuple2)
-    { it.fix().unsafeRunAsync { it.fold({ cb(it.left()) }, { cancel.set(it) }) } }.toIOProc()
+    { io -> io.fix().unsafeRunAsync { eith -> eith.fold({ cb(it.left()) }, { cancel.set(it) }) } }.toIOProc()
     ).unsafeRunAsync { it.fold({ complete(it.left()) }, { /* should never happen */ }) }
   }.handleErrorWith {
     if (it == OnCancel.CancellationException) {

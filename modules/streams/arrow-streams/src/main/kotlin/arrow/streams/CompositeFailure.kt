@@ -4,6 +4,7 @@ import arrow.core.*
 import arrow.data.Nel
 import arrow.data.NonEmptyList
 
+//TODO if Nel moves to core we can move this to arrow.effects
 /** Represents multiple (>1) exceptions were thrown. */
 data class CompositeFailure(
   val head: Throwable,

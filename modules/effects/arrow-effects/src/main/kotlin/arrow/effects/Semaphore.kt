@@ -60,7 +60,7 @@ interface Semaphore<F> {
 
   /**
    * Acquires [n] resources
-   * Suspending the fiber running the action until the resources are available.
+   * Suspending the Fiber running the action until the resources are available.
    *
    * {: data-executable='true'}
    *
@@ -90,7 +90,7 @@ interface Semaphore<F> {
 
   /**
    * Acquire a resource
-   * Suspending the fiber running the action until the resource is available.
+   * Suspending the Fiber running the action until the resource is available.
    *
    * @see acquireN
    */

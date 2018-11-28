@@ -1,15 +1,24 @@
 package arrow.effects
 
-import arrow.Kind
 import arrow.core.*
-import arrow.effects.IO.Companion.just
 import arrow.effects.internal.*
 import arrow.effects.typeclasses.Fiber
 import kotlin.coroutines.*
 import kotlin.coroutines.Continuation
 
-fun <A> IOOf<A>.startF(ctx: CoroutineContext): Kind<ForIO, Fiber<ForIO, A>> = IO.async { ioConnection: IOConnection, cb ->
-  val promise = Promise.unsafe<A>()
+/**
+ * Create a new [IO] that executes the receiver [IO].
+ *
+ * @receiver [IO] to execute on [ctx] within a new suspended [IO].
+ * @param ctx [CoroutineContext] to execute the source [IO] on.
+ * @return [IO] with suspended execution of source [IO] on context [ctx].
+ */
+fun <A> IOOf<A>.startF(ctx: CoroutineContext): IO<Fiber<ForIO, A>> {
+
+  val promise = Promise.unsafe<Either<Throwable, A>>()
+
+  // A new IOConnection, because its cancellation is now decoupled from our current one.
+  // We use this [IOConnection] to start [IORunLoop] and cancel the [Fiber].
   val conn = IOConnection()
 
   val a: suspend () -> A = {
@@ -24,22 +33,12 @@ fun <A> IOOf<A>.startF(ctx: CoroutineContext): Kind<ForIO, Fiber<ForIO, A>> = IO
     }
   }
 
-  a.startCoroutine(asyncIOContinuation(ctx) { either ->
+  a.startCoroutine(asyncContinuation(ctx) { either ->
     either.fold(
-      { cb(it.left()) },
-      promise::complete
+      { promise.complete(it.left()) },
+      { promise.complete(it.right()) }
     )
   })
 
-  val join: IO<A> = IO.defer {
-    try {
-      just(promise.get.value())
-    } catch (t: Throwable) {
-      IO.raiseError<A>(t)
-    }
-  }
-
-  val cancel = ioConnection.cancel()
-
-  cb(Fiber(join, cancel).right())
+  return IO.just(Fiber(promise, conn))
 }
