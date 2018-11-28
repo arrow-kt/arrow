@@ -18,6 +18,9 @@ import arrow.validation.Refinement
 internal fun <A : Number> isGreaterEqualThan(ORD: Order<A>, a: A, min: A): Boolean =
   ORD.run { a.gte(min) }
 
+/**
+ * `GreaterEqual` defines a subset of Numbers which are greater or equal than [min]
+ */
 interface GreaterEqual<F, A : Number> : Refinement<F, A> {
 
   fun ORD(): Order<A>
@@ -27,6 +30,31 @@ interface GreaterEqual<F, A : Number> : Refinement<F, A> {
 
   override fun invalidValueMsg(a: A): String = "$a must be greater or equal than ${min()}"
 
+  /**
+   * Commented method or class
+   *
+   * {: data-executable='true'}
+   *
+   * ```kotlin:ank
+   * import arrow.validation.refinedTypes.numeric.*
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val min = 400
+   *
+   *   val x = 100
+   *   val y = 300
+   *   val z = 200
+   *
+   *   val xyResult = (x + y).greaterEqual(Int.order(), min)
+   *   val xzResult = (x + z).greaterEqual(Int.order(), min)
+   *  //sampleEnd
+   *
+   *  println(xyResult.isValid)
+   *  println(xzResult.isValid)
+   *  }
+   *  ```
+   */
   fun A.greaterEqual(): Kind<F, A> = refine(this)
 
   fun <B> A.greaterEqual(f: (A) -> B): Kind<F, B> = refine(this, f)

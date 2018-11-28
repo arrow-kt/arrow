@@ -14,11 +14,31 @@ import arrow.typeclasses.ApplicativeError
 import arrow.validation.RefinedPredicateException
 import arrow.validation.Refinement
 
+/**
+ * `NonEmpty<A>` defines a subtype of `A`s which are non empty.
+ */
 interface NonEmpty<F, A> : Refinement<F, A> {
   fun empty(): A
 
   override fun A.refinement(): Boolean = this != empty()
 
+  /**
+   * Commented method or class
+   *
+   * {: data-executable='true'}
+   *
+   * ```kotlin:ank
+   * import arrow.validation.refinedTypes.generic.*
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val result = listOf(1, 2, 3).nonEmpty(emptyList())
+   *  //sampleEnd
+   *
+   *  println(result.isValid)
+   *  }
+   *  ```
+   */
   fun A.nonEmpty(): Kind<F, A> = refine(this)
 
   fun <B> A.nonEmpty(f: (A) -> B): Kind<F, B> = refine(this, f)

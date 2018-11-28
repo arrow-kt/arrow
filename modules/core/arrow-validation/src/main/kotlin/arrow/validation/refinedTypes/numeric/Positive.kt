@@ -18,11 +18,31 @@ import arrow.validation.Refinement
 internal fun <A : Number> isPositive(ORD: Order<A>, a: A): Boolean =
   ORD.run { a.gt(zero()) }
 
+/**
+ * `Positive` defines a subset of all numbers which are positive (this is x > 0)
+ */
 interface Positive<F, A : Number> : Refinement<F, A> {
   fun ORD(): Order<A>
 
   override fun A.refinement(): Boolean = isPositive(ORD(), this)
 
+  /**
+   * Commented method or class
+   *
+   * {: data-executable='true'}
+   *
+   * ```kotlin:ank
+   * import arrow.validation.refinedTypes.numeric.*
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val result = 23.positive(Int.order())
+   *  //sampleEnd
+   *
+   *  println(result.isValid)
+   *  }
+   *  ```
+   */
   fun A.positive(): Kind<F, A> = refine(this)
 
   fun <B> A.positive(f: (A) -> B): Kind<F, B> = refine(this, f)
