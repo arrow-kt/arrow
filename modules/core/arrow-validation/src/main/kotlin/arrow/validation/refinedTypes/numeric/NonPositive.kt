@@ -15,11 +15,32 @@ import arrow.typeclasses.Order
 import arrow.validation.RefinedPredicateException
 import arrow.validation.Refinement
 
+/**
+ * `NonPositive` defines a subset of all numbers which are non positive
+ * (this is x <= 0)
+ */
 interface NonPositive<F, A : Number> : Refinement<F, A> {
   fun ORD(): Order<A>
 
   override fun A.refinement(): Boolean = !isPositive(ORD(), this)
 
+  /**
+   * Commented method or class
+   *
+   * {: data-executable='true'}
+   *
+   * ```kotlin:ank
+   * import arrow.validation.refinedTypes.numeric.*
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val x = 0.nonPositive(Int.order())
+   *  //sampleEnd
+   *
+   *  println(result.isValid)
+   *  }
+   *  ```
+   */
   fun A.nonPositive(): Kind<F, A> = refine(this)
 
   fun <B> A.nonPositive(f: (A) -> B): Kind<F, B> = refine(this, f)

@@ -18,6 +18,9 @@ import arrow.validation.Refinement
 internal fun <A: Number> isLessThan(ORD: Order<A>, a: A, max: A): Boolean =
   ORD.run { a.lt(max) }
 
+/**
+ * `Less` defines a subset of Numbers which are less than [max]
+ */
 interface Less<F, A : Number> : Refinement<F, A> {
 
   fun ORD(): Order<A>
@@ -25,6 +28,31 @@ interface Less<F, A : Number> : Refinement<F, A> {
 
   override fun A.refinement(): Boolean = isLessThan(ORD(), this, max())
 
+  /**
+   * Commented method or class
+   *
+   * {: data-executable='true'}
+   *
+   * ```kotlin:ank
+   * import arrow.validation.refinedTypes.numeric.*
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val max = 350
+   *
+   *   val x = 100
+   *   val y = 300
+   *   val z = 200
+   *
+   *   val xyResult = (x + y).less(Int.order(), max)
+   *   val xzResult = (x + z).less(Int.order(), max)
+   *  //sampleEnd
+   *
+   *  println(xyResult.isValid)
+   *  println(xzResult.isValid)
+   *  }
+   *  ```
+   */
   fun A.less(): Kind<F, A> = refine(this)
 
   fun <B> A.less(f: (A) -> B): Kind<F, B> = refine(this, f)

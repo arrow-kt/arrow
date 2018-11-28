@@ -16,10 +16,30 @@ import arrow.validation.Refinement
 
 internal fun <A : Number> isNonZero(a: A): Boolean = a != 0
 
+/**
+ * `NonZero` defines a subset of Numbers which are not 0
+ */
 interface NonZero<F, A : Number> : Refinement<F, A> {
 
   override fun A.refinement(): Boolean = isNonZero(this)
 
+  /**
+   * Commented method or class
+   *
+   * {: data-executable='true'}
+   *
+   * ```kotlin:ank
+   * import arrow.validation.refinedTypes.numeric.*
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val result = 0.nonZero()
+   *  //sampleEnd
+   *
+   *  println(result.isValid)
+   *  }
+   *  ```
+   */
   fun A.nonZero(): Kind<F, A> = refine(this)
 
   fun <B> A.nonZero(f: A.() -> B): Kind<F, B> = refine(this, f)
