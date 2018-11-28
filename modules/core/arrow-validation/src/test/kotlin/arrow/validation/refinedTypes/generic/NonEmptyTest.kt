@@ -1,7 +1,7 @@
-package arrow.validation.refinedTypes.string
+package arrow.validation.refinedTypes.generic
 
 import arrow.test.UnitSpec
-import arrow.validation.refinedTypes.string.validated.nonEmptyString.nonEmptyString
+import arrow.validation.refinedTypes.generic.validated.nonEmpty.nonEmpty
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.filter
@@ -9,16 +9,16 @@ import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
-class NonEmptyStringTest : UnitSpec() {
+class NonEmptyTest : UnitSpec() {
   init {
-    "Should create NonEmptyString for every string with length > 0" {
+    "Should create NonEmpty for every string with length > 0" {
       forAll(NonEmptyStringGen()) { s: String ->
-        s.nonEmptyString().isValid
+        s.nonEmpty("").isValid
       }
     }
 
-    "Should not create NonEmptyString for empty strings" {
-      "".nonEmptyString().isInvalid
+    "Should not create NonEmpty for empty strings" {
+      "".nonEmpty("").isInvalid
     }
   }
 

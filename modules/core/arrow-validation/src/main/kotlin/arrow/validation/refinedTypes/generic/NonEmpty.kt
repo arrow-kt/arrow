@@ -1,4 +1,4 @@
-package arrow.validation.refinedTypes.string
+package arrow.validation.refinedTypes.generic
 
 import arrow.Kind
 import arrow.core.Either
@@ -14,25 +14,31 @@ import arrow.typeclasses.ApplicativeError
 import arrow.validation.RefinedPredicateException
 import arrow.validation.Refinement
 
-interface NonEmptyString<F> : Refinement<F, String> {
-  override fun String.refinement(): Boolean = this.isNotEmpty()
+interface NonEmpty<F, A> : Refinement<F, A> {
+  fun empty(): A
 
-  fun String.nonEmptyString(): Kind<F, String> = refine(this)
+  override fun A.refinement(): Boolean = this != empty()
 
-  fun <A> String.nonEmptyString(f: (String) -> A): Kind<F, A> = refine(this, f)
+  fun A.nonEmpty(): Kind<F, A> = refine(this)
 
-  override fun invalidValueMsg(a: String): String = "\"$a\" must not be empty"
+  fun <B> A.nonEmpty(f: (A) -> B): Kind<F, B> = refine(this, f)
+
+  override fun invalidValueMsg(a: A): String = "$a must not be empty"
 }
 
 @extension
-interface ValidatedNonEmptyString : NonEmptyString<ValidatedPartialOf<Nel<RefinedPredicateException>>> {
+interface ValidatedNonEmpty<A> : NonEmpty<ValidatedPartialOf<Nel<RefinedPredicateException>>, A> {
+  override fun empty(): A
+
   override fun applicativeError(): ApplicativeError<ValidatedPartialOf<Nel<RefinedPredicateException>>,
     Nel<RefinedPredicateException>> =
     Validated.applicativeError(Nel.semigroup())
 }
 
 @extension
-interface EitherNonEmptyString : NonEmptyString<EitherPartialOf<Nel<RefinedPredicateException>>> {
+interface EitherNonEmpty<A> : NonEmpty<EitherPartialOf<Nel<RefinedPredicateException>>, A> {
+  override fun empty(): A
+
   override fun applicativeError(): ApplicativeError<EitherPartialOf<Nel<RefinedPredicateException>>,
     Nel<RefinedPredicateException>> =
     Either.applicativeError()
