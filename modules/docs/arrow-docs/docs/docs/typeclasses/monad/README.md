@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: Monad
-permalink: /docs/typeclasses/monad/
+permalink: /docs/arrow/typeclasses/monad/
+redirect_from:
+  - /docs/typeclasses/monad
 ---
 
 ## Monad
@@ -16,7 +18,7 @@ head to [The Monad Tutorial]({{ '/docs/patterns/monads' | relative_url }}).
 
 ### Main Combinators
 
-`Monad` includes all combinators present in [`Applicative`]({{ '/docs/typeclasses/applicative/' | relative_url }}).
+`Monad` includes all combinators present in [`Applicative`]({{ '/docs/arrow/typeclasses/applicative/' | relative_url }}).
 
 #### Kind<F, A>#flatMap
 
@@ -85,7 +87,7 @@ ForOption extensions {
 #### followedBy/followedByEval
 
 Executes sequentially two elements that are independent from one another.
-The [`Eval`]({{ '/docs/datatypes/eval' | relative_url }}) variant allows you to pass lazily calculated values.
+The [`Eval`]({{ '/docs/arrow/core/eval' | relative_url }}) variant allows you to pass lazily calculated values.
 
 ```kotlin:ank
 ForOption extensions {
@@ -108,7 +110,7 @@ IO.just(1).effectM(::logValue).fix().unsafeRunSync()
 #### forEffect/forEffectEval
 
 Executes sequentially two elements that are independent from one another, ignoring the value of the second one.
-The [`Eval`]({{ '/docs/datatypes/eval' | relative_url }}) variant allows you to pass lazily calculated values.
+The [`Eval`]({{ '/docs/arrow/core/eval' | relative_url }}) variant allows you to pass lazily calculated values.
 
 ```kotlin:ank
 import arrow.instances.option.monad.*

@@ -48,7 +48,7 @@ jobs:
  - stage: deploy-docs
    script:
    - rvm use 2.5.3 --install --fuzzy
-   - gem install jekyll -v 3.7.4
+   - bundle install --path vendor/bundle
    - aws s3 sync s3://$S3_BUCKET/site ~/site > aws_sync_jekyll.log
-   - jekyll build -s ~/site -d ~/_site
+   - bundle exec jekyll build -s ~/site -d ~/_site
    - aws s3 sync ~/_site s3://$S3_BUCKET > aws_sync_site.log

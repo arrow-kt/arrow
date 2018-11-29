@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: FunctorFilter
-permalink: /docs/typeclasses/functorfilter/
+permalink: /docs/arrow/mtl/typeclasses/functorfilter/
+redirect_from:
+  - /docs/typeclasses/functorfilter
 ---
 
 ## FunctorFilter

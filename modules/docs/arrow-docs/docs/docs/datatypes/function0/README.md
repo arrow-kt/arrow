@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: Function0
-permalink: /docs/datatypes/function0/
+permalink: /docs/arrow/core/function0/
+redirect_from:
+  - /docs/datatypes/function0
 ---
 
 ## Function0

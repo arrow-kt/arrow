@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: Alternative
-permalink: /docs/typeclasses/alternative/
+permalink: /docs/arrow/typeclasses/alternative/
+redirect_from:
+  - /docs/typeclasses/alternative
 ---
 
 ## Alternative

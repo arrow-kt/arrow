@@ -106,91 +106,91 @@ options:
         url: /docs/datatypes/basic/
 
       - title: Option
-        url: /docs/datatypes/option/
+        url: /docs/arrow/core/option/
 
       - title: Either
-        url: /docs/datatypes/either/
+        url: /docs/arrow/core/either/
 
       - title: Try
-        url: /docs/datatypes/try/
+        url: /docs/arrow/core/try/
 
       - title: Validated
-        url: /docs/datatypes/validated/
+        url: /docs/arrow/data/validated/
 
       - title: NonEmptyList
-        url: /docs/datatypes/nonemptylist/
+        url: /docs/arrow/data/nonemptylist/
 
       - title: ListK
-        url: /docs/datatypes/listk/
+        url: /docs/arrow/data/listk/
 
       - title: SequenceK
-        url: /docs/datatypes/sequencek/
+        url: /docs/arrow/data/sequencek/
 
       - title: SetK
-        url: /docs/datatypes/setk/
+        url: /docs/arrow/data/setk/
 
       - title: MapK
-        url: /docs/datatypes/mapk/
+        url: /docs/arrow/data/mapk/
 
       - title: SortedMapK
-        url: /docs/datatypes/sortedmapk/
+        url: /docs/arrow/data/sortedmapk/
 
       - title: Ior
-        url: /docs/datatypes/ior/
+        url: /docs/arrow/data/ior/
 
       - title: Id
-        url: /docs/datatypes/id/
+        url: /docs/arrow/core/id/
 
       - title: Reader
-        url: /docs/datatypes/reader/
+        url: /docs/arrow/data/reader/
 
       - title: Kleisli
-        url: /docs/datatypes/kleisli/
+        url: /docs/arrow/data/kleisli/
 
       - title: State
-        url: /docs/datatypes/state/
+        url: /docs/arrow/data/state/
 
       - title: StateT
-        url: /docs/datatypes/statet/
+        url: /docs/arrow/data/statet/
 
       - title: Store
-        url: /docs/datatypes/store/
+        url: /docs/arrow/data/store/
 
       - title: Moore
-        url: /docs/datatypes/moore/
+        url: /docs/arrow/data/moore/
 
       - title: Sum
-        url: /docs/datatypes/sum/
+        url: /docs/arrow/data/moore/
 
       - title: Day
-        url: /docs/datatypes/day/
+        url: /docs/arrow/data/day/
 
       - title: WriterT
-        url: /docs/datatypes/writert/
+        url: /docs/arrow/data/writert/
 
       - title: Trampoline
-        url: /docs/datatypes/trampoline/
+        url: /docs/arrow/free/trampoline/
 
       - title: Coproduct
-        url: /docs/datatypes/coproduct/
+        url: /docs/arrow/data/coproduct/
 
       - title: Eval
-        url: /docs/datatypes/eval/
+        url: /docs/arrow/core/eval/
 
       - title: OptionT
-        url: /docs/datatypes/optiont/
+        url: /docs/arrow/data/optiont/
 
       - title: EitherT
-        url: /docs/datatypes/eithert/
+        url: /docs/arrow/data/eithert/
 
       - title: Function0
-        url: /docs/datatypes/function0/
+        url: /docs/arrow/core/function0/
 
       - title: Function1
-        url: /docs/datatypes/function1/
+        url: /docs/arrow/core/function1/
 
       - title: Const
-        url: /docs/datatypes/const/
+        url: /docs/arrow/typeclasses/const/
 
   - title: Type Classes
 
@@ -200,97 +200,97 @@ options:
         url: /docs/typeclasses/intro/
 
       - title: Show
-        url: /docs/typeclasses/show/
+        url: /docs/arrow/typeclasses/show/
 
       - title: Eq
-        url: /docs/typeclasses/eq/
+        url: /docs/arrow/typeclasses/eq/
 
       - title: Hash
-        url: /docs/typeclasses/hash
+        url: /docs/arrow/typeclasses/hash
 
       - title: Order
-        url: /docs/typeclasses/order/
+        url: /docs/arrow/typeclasses/order/
 
       - title: Semigroup
-        url: /docs/typeclasses/semigroup/
+        url: /docs/arrow/typeclasses/semigroup/
 
       - title: Monoid
-        url: /docs/typeclasses/monoid/
+        url: /docs/arrow/typeclasses/monoid/
 
       - title: Foldable
-        url: /docs/typeclasses/foldable/
+        url: /docs/arrow/typeclasses/foldable/
 
       - title: Bifoldable
-        url: /docs/typeclasses/bifoldable/
+        url: /docs/arrow/typeclasses/bifoldable/
 
       - title: Traverse
-        url: /docs/typeclasses/traverse/
+        url: /docs/arrow/typeclasses/traverse/
 
       - title: Reducible
-        url: /docs/typeclasses/reducible/
+        url: /docs/arrow/typeclasses/reducible/
 
       - title: TraverseFilter
-        url: /docs/typeclasses/traversefilter/
+        url: /docs/arrow/mtl/typeclasses/traversefilter/
 
       - title: Functor
-        url: /docs/typeclasses/functor/
+        url: /docs/arrow/typeclasses/functor/
 
       - title: FunctorFilter
-        url: /docs/typeclasses/functorfilter/
+        url: /docs/arrow/mtl/typeclasses/functorfilter/
 
       - title: Applicative
-        url: /docs/typeclasses/applicative/
+        url: /docs/arrow/typeclasses/applicative/
 
       - title: ApplicativeError
-        url: /docs/typeclasses/applicativeerror/
+        url: /docs/arrow/typeclasses/applicativeerror/
 
       - title: Monad
-        url: /docs/typeclasses/monad/
+        url: /docs/arrow/typeclasses/monad/
 
       - title: MonadError
-        url: /docs/typeclasses/monaderror/
+        url: /docs/arrow/typeclasses/monaderror/
 
       - title: Bracket
-        url: /docs/typeclasses/bracket/
+        url: /docs/arrow/effects/typeclasses/bracket/
 
       - title: MonadFilter
-        url: /docs/typeclasses/monadfilter/
+        url: /docs/arrow/mtl/typeclasses/monadfilter/
 
       - title: MonadReader
-        url: /docs/typeclasses/monadreader/
+        url: /docs/arrow/mtl/typeclasses/monadreader/
 
       - title: MonadWriter
-        url: /docs/typeclasses/monadwriter/
+        url: /docs/arrow/mtl/typeclasses/monadwriter/
 
       - title: MonadState
-        url: /docs/typeclasses/monadstate/
+        url: /docs/arrow/mtl/typeclasses/monadstate
 
       - title: MonadCombine
-        url: /docs/typeclasses/monadcombine/
+        url: /docs/arrow/mtl/typeclasses/monadcombine/
 
       - title: Comonad
-        url: /docs/typeclasses/comonad/
+        url: /docs/arrow/typeclasses/comonad/
 
       - title: Bimonad
-        url: /docs/typeclasses/bimonad/
+        url: /docs/arrow/typeclasses/bimonad/
 
       - title: Bifunctor
-        url: /docs/typeclasses/bifunctor
+        url: /docs/arrow/typeclasses/bifunctor
 
       - title: Profunctor
-        url: /docs/typeclasses/profunctor
+        url: /docs/arrow/typeclasses/profunctor
 
       - title: SemigroupK
-        url: /docs/typeclasses/semigroupk/
+        url: /docs/arrow/typeclasses/semigroupk/
 
       - title: MonoidK
-        url: /docs/typeclasses/monoidk/
+        url: /docs/arrow/typeclasses/monoidk/
 
       - title: Inject
         url: /docs/typeclasses/inject/
 
       - title: Alternative
-        url: /docs/typeclasses/alternative/
+        url: /docs/arrow/typeclasses/alternative/
 
   - title: Effects
 
