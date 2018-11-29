@@ -23,7 +23,7 @@ results in
 // 2
 ```
 
-To build the documentation, in the root of the project, run 
+To build the documentation, in the root of the project, run
 
 ```
 $ ./gradlew clean dokka :arrow-docs:runAnk
@@ -35,13 +35,13 @@ In order to setup a local version of the documentation in your machine, you will
 
 ```
 $ gem install bundler
-$ bundle install --gemfile=modules/docs/arrow-docs/Gemfile
-```
-
-After all the dependencies are installed, you can preview the documentation by serving the artifact produced by ΛNK.
-
-```
 $ cd modules/docs/arrow-docs/
+$ bundle install --path vendor/bundle
+```
+
+After the dependencies are installed, you can preview the documentation by serving the artifact produced by ΛNK.
+
+```
 $ bundle exec jekyll serve --source build/site/
 ```
 
