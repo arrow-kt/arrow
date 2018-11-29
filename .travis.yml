@@ -47,8 +47,8 @@ jobs:
    - ./deploy-scripts/deploy.sh
  - stage: deploy-docs
    script:
-   - rvm use 2.5.3 --install --fuzzy
-   - bundle install --path vendor/bundle
    - aws s3 sync s3://$S3_BUCKET/site ~/site > aws_sync_jekyll.log
+   - rvm use 2.5.3 --install --fuzzy
+   - bundle install --gemfile modules/docs/arrow-docs/Gemfile --path vendor/bundle   
    - bundle exec jekyll build -s ~/site -d ~/_site
    - aws s3 sync ~/_site s3://$S3_BUCKET > aws_sync_site.log
