@@ -52,6 +52,10 @@ data class EitherT<F, A, B>(val value: Kind<F, Either<A, B>>) : EitherTOf<F, A, 
 
     fun <F, A, B> fromEither(AP: Applicative<F>, value: Either<A, B>): EitherT<F, A, B> =
       EitherT(AP.just(value))
+
+    fun <F, A, B> liftF(FF: Functor<F>, fa: Kind<F, B>): EitherT<F, A, B> = FF.run {
+      EitherT(fa.map { Right(it) })
+    }
   }
 
   inline fun <C> fold(FF: Functor<F>, crossinline l: (A) -> C, crossinline r: (B) -> C): Kind<F, C> = FF.run {
@@ -67,11 +71,8 @@ data class EitherT<F, A, B>(val value: Kind<F, Either<A, B>>) : EitherTOf<F, A, 
 
   fun <C> cata(FF: Functor<F>, l: (A) -> C, r: (B) -> C): Kind<F, C> = fold(FF, l, r)
 
-  fun <C> liftF(FF: Functor<F>, fa: Kind<F, C>): EitherT<F, A, C> = FF.run {
-    EitherT(fa.map { Right(it) })
-  }
-
-  fun <C> semiflatMap(MF: Monad<F>, f: (B) -> Kind<F, C>): EitherT<F, A, C> = flatMap(MF) { liftF(MF, f(it)) }
+  fun <C> semiflatMap(MF: Monad<F>, f: (B) -> Kind<F, C>): EitherT<F, A, C> =
+    flatMap(MF) { EitherT.liftF<F, A, C>(MF, f(it)) }
 
   fun <C> map(FF: Functor<F>, f: (B) -> C): EitherT<F, A, C> = FF.run {
     EitherT(value.map { it.map(f) })
