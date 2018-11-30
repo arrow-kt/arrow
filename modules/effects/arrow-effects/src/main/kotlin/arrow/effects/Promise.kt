@@ -243,7 +243,7 @@ interface Promise<F, A> {
      * }
      * ```
      */
-    fun <F, A> unsafeUncancelable(AS: Async<F>): Promise<F, A> = UncancelablePromise(AtomicReference(UncancelablePromise.State.Pending(emptyList())), AS)
+    fun <F, A> unsafeUncancelable(AS: Async<F>): Promise<F, A> = UncancelablePromise(AS)
 
   }
 
@@ -251,24 +251,26 @@ interface Promise<F, A> {
 
 }
 
-internal class UncancelablePromise<F, A>(private val state: AtomicReference<State<A>>, AS: Async<F>) : Promise<F, A>, Async<F> by AS {
+internal class UncancelablePromise<F, A>(AS: Async<F>) : Promise<F, A>, Async<F> by AS {
+
+  private val state: AtomicReference<PromiseState<A>> = AtomicReference(PromiseState.Pending(emptyList()))
 
   override val get: Kind<F, A> = async { k: (Either<Throwable, A>) -> Unit ->
     tailrec fun loop(): Unit {
       val st = state.get()
       when (st) {
-        is State.Pending<A> -> loop()
-        is State.Full -> k(Right(st.value))
-        is State.Error -> k(Left(st.throwable))
+        is PromiseState.Pending<A> -> loop()
+        is PromiseState.Full -> k(Right(st.value))
+        is PromiseState.Error -> k(Left(st.throwable))
       }
     }
 
     tailrec fun calculateNewState(): Unit {
       val oldState = state.get()
       val newState = when (oldState) {
-        is State.Pending<A> -> State.Pending(oldState.joiners + k)
-        is State.Full -> oldState
-        is State.Error -> oldState
+        is PromiseState.Pending<A> -> PromiseState.Pending(oldState.joiners + k)
+        is PromiseState.Full -> oldState
+        is PromiseState.Error -> oldState
       }
       return if (state.compareAndSet(oldState, newState)) Unit else calculateNewState()
     }
@@ -281,9 +283,9 @@ internal class UncancelablePromise<F, A>(private val state: AtomicReference<Stat
     get() {
       val oldState = state.get()
       return when (oldState) {
-        is State.Full -> just(Some(oldState.value))
-        is State.Pending<A> -> just(None)
-        is State.Error -> just(None)
+        is PromiseState.Full -> just(Some(oldState.value))
+        is PromiseState.Pending<A> -> just(None)
+        is PromiseState.Error -> just(None)
       }
     }
 
@@ -296,9 +298,9 @@ internal class UncancelablePromise<F, A>(private val state: AtomicReference<Stat
     tailrec fun calculateNewState(): Unit {
       val oldState = state.get()
       val newState = when (oldState) {
-        is State.Pending<A> -> State.Full(a)
-        is State.Full -> oldState
-        is State.Error -> oldState
+        is PromiseState.Pending<A> -> PromiseState.Full(a)
+        is PromiseState.Full -> oldState
+        is PromiseState.Error -> oldState
       }
 
       if (state.compareAndSet(oldState, newState)) Unit else calculateNewState()
@@ -306,12 +308,12 @@ internal class UncancelablePromise<F, A>(private val state: AtomicReference<Stat
 
     val oldState = state.get()
     when (oldState) {
-      is State.Pending -> {
+      is PromiseState.Pending -> {
         calculateNewState()
         just(true)
       }
-      is State.Full -> just(false)
-      is State.Error -> just(false)
+      is PromiseState.Full -> just(false)
+      is PromiseState.Error -> just(false)
     }
   }
 
@@ -322,16 +324,16 @@ internal class UncancelablePromise<F, A>(private val state: AtomicReference<Stat
 
   override fun tryError(throwable: Throwable): Kind<F, Boolean> = state.get().let { oldState ->
     when (oldState) {
-      is State.Pending -> raiseError(throwable)
-      is State.Full -> just(false)
-      is State.Error -> just(false)
+      is PromiseState.Pending -> raiseError(throwable)
+      is PromiseState.Full -> just(false)
+      is PromiseState.Error -> just(false)
     }
   }
 
-  internal sealed class State<out A> {
-    data class Pending<A>(val joiners: List<(Either<Throwable, A>) -> Unit>) : State<A>()
-    data class Full<A>(val value: A) : State<A>()
-    data class Error<A>(val throwable: Throwable) : State<A>()
-  }
+}
 
+internal sealed class PromiseState<out A> {
+  data class Pending<A>(val joiners: List<(Either<Throwable, A>) -> Unit>) : PromiseState<A>()
+  data class Full<A>(val value: A) : PromiseState<A>()
+  data class Error<A>(val throwable: Throwable) : PromiseState<A>()
 }

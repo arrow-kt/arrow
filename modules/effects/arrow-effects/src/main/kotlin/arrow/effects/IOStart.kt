@@ -13,7 +13,7 @@ import kotlin.coroutines.Continuation
  * @param ctx [CoroutineContext] to execute the source [IO] on.
  * @return [IO] with suspended execution of source [IO] on context [ctx].
  */
-fun <A> IOOf<A>.startF(ctx: CoroutineContext): IO<Fiber<ForIO, A>> {
+fun <A> IOOf<A>.startF(ctx: CoroutineContext): IO<Fiber<ForIO, A>> = IO.defer {
 
   val promise = Promise.unsafe<Either<Throwable, A>>()
 
@@ -40,5 +40,5 @@ fun <A> IOOf<A>.startF(ctx: CoroutineContext): IO<Fiber<ForIO, A>> {
     )
   })
 
-  return IO.just(Fiber(promise, conn))
+  IO.just(Fiber(promise, conn))
 }
