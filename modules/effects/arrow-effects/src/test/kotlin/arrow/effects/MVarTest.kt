@@ -33,12 +33,12 @@ class MVarTest : UnitSpec() {
       forAll(Gen.int(), Gen.int()) { a, b ->
         val task = binding {
           val av = mvar.empty<Int>().bind()
-          val isEmpty = av.isEmpty().bind()
+          val isEmpty = av.isEmpty.bind()
           av.put(a).bind()
-          val isNotEmpty = av.isNotEmpty().bind()
-          val r1 = av.take().bind()
+          val isNotEmpty = av.isNotEmpty.bind()
+          val r1 = av.take.bind()
           av.put(b).bind()
-          val r2 = av.take().bind()
+          val r2 = av.take.bind()
           Tuple4(isEmpty, isNotEmpty, r1, r2)
         }
 
@@ -50,14 +50,14 @@ class MVarTest : UnitSpec() {
       forAll(Gen.int(), Gen.int(), Gen.int()) { a, b, c ->
         val task = binding {
           val av = mvar.empty<Int>().bind()
-          val isEmpty = av.isEmpty().bind()
+          val isEmpty = av.isEmpty.bind()
           val p1 = av.tryPut(a).bind()
           val p2 = av.tryPut(b).bind()
-          val isNotEmpty = av.isNotEmpty().bind()
-          val r1 = av.tryTake().bind()
-          val r2 = av.tryTake().bind()
+          val isNotEmpty = av.isNotEmpty.bind()
+          val r1 = av.tryTake.bind()
+          val r2 = av.tryTake.bind()
           av.put(c).bind()
-          val r3 = av.take().bind()
+          val r3 = av.take.bind()
           Tuple7(isEmpty, p1, p2, isNotEmpty, r1, r2, r3)
         }
 
@@ -69,11 +69,10 @@ class MVarTest : UnitSpec() {
       forAll(Gen.int(), Gen.int()) { a, b ->
         val task = binding {
           val av = mvar.of(a).bind()
-          val isNotEmpty = av.isNotEmpty().bind()
-          val r1 = av.take().bind()
+          val isNotEmpty = av.isNotEmpty.bind()
+          val r1 = av.take.bind()
           av.put(b).bind()
-          val r2 = av.take().bind()
-
+          val r2 = av.take.bind()
           Tuple3(isNotEmpty, r1, r2)
         }
 
@@ -85,8 +84,8 @@ class MVarTest : UnitSpec() {
       forAll(Gen.int()) { i ->
         val task = binding {
           val av = mvar.of(i).bind()
-          val read = av.read().bind()
-          val take = av.take().bind()
+          val read = av.read.bind()
+          val take = av.take.bind()
           read toT take
         }
 
