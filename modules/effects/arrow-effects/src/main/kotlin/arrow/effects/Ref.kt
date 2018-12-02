@@ -20,7 +20,7 @@ interface Ref<F, A> {
    * Obtains the current value.
    * Since [Ref] is always guaranteed to have a value, the returned action completes immediately after being bound.
    */
-  val get: Kind<F, A>
+  fun get(): Kind<F, A>
 
   /**
    * Sets the current value to [a].
@@ -120,10 +120,9 @@ interface Ref<F, A> {
      */
     private class MonadDeferRef<F, A>(private val ar: AtomicReference<A>, private val MD: MonadDefer<F>) : Ref<F, A> {
 
-      override val get: Kind<F, A>
-        get() = MD.delay {
-          ar.get()
-        }
+      override fun get(): Kind<F, A> = MD.delay {
+        ar.get()
+      }
 
       override fun set(a: A): Kind<F, Unit> = MD.delay {
         ar.set(a)
@@ -134,7 +133,7 @@ interface Ref<F, A> {
       }
 
       override fun setAndGet(a: A): Kind<F, A> = MD.run {
-        set(a).flatMap { get }
+        set(a).flatMap { get() }
       }
 
       override fun getAndUpdate(f: (A) -> A): Kind<F, A> = MD.delay {

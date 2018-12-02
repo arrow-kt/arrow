@@ -28,17 +28,17 @@ interface MVar<F, A> {
    * val mvar = MVar(IO.async())
    *
    * mvar.empty<Int>().flatMap { v ->
-   *   v.isEmpty
+   *   v.isEmpty()
    * }.unsafeRunSync() == true
    *
    * mvar.of(10).flatMap { v ->
-   *   v.isEmpty
+   *   v.isEmpty()
    * }.unsafeRunSync() == false
    * //sampleEnd
    * }
    *```
    */
-  val isEmpty: Kind<F, Boolean>
+  fun isEmpty(): Kind<F, Boolean>
 
   /**
    * Returns true if there no elements. Otherwise false.
@@ -54,17 +54,17 @@ interface MVar<F, A> {
    * val mvar = MVar(IO.async())
    *
    * mvar.of(10).flatMap { v ->
-   *   v.isNotEmpty
+   *   v.isNotEmpty()
    * }.unsafeRunSync() == true
    *
    * mvar.empty<Int>().flatMap { v ->
-   *   v.isNotEmpty
+   *   v.isNotEmpty()
    * }.unsafeRunSync() == false
    * //sampleEnd
    * }
    *```
    */
-  val isNotEmpty: Kind<F, Boolean>
+  fun isNotEmpty(): Kind<F, Boolean>
 
   /**
    * Puts [A] in the [MVar] if it is empty,
@@ -82,7 +82,7 @@ interface MVar<F, A> {
    *
    * mvar.empty<Int>().flatMap { v ->
    *   v.put(5).flatMap {
-   *     v.take
+   *     v.take()
    *   }
    * }.unsafeRunSync() == 5
    * //sampleEnd
@@ -132,17 +132,17 @@ interface MVar<F, A> {
    * val mvar = MVar(IO.async())
    *
    * mvar.of(5).flatMap { v ->
-   * v.take
+   * v.take()
    * }.unsafeRunSync() == 5
    *
    * mvar.empty<Int>().flatMap { v ->
-   * v.take
+   * v.take()
    * } //Never ends
    * //sampleEnd
    * }
    *```
    */
-  val take: Kind<F, A>
+  fun take(): Kind<F, A>
 
   /**
    * Try to take the value of [MVar], returns result as an [Option].
@@ -159,17 +159,17 @@ interface MVar<F, A> {
    * val mvar = MVar(IO.async())
    *
    * mvar.of(5).flatMap { v ->
-   *   v.tryTake
+   *   v.tryTake()
    * }.unsafeRunSync() == Some(5)
    *
    * mvar.empty<Int>().flatMap { v ->
-   *   v.tryTake
+   *   v.tryTake()
    * }.unsafeRunSync() == None
    * //sampleEnd
    * }
    *```
    */
-  val tryTake: Kind<F, Option<A>>
+  fun tryTake(): Kind<F, Option<A>>
 
   /**
    * Tries reading the current value, or blocks until there is a value available.
@@ -186,25 +186,25 @@ interface MVar<F, A> {
    * val mvar = MVar(IO.async())
    *
    * mvar.of(5).flatMap { v ->
-   *   v.read
+   *   v.read()
    * }.unsafeRunSync() == 5
    *
    * mvar.of(5).flatMap { v ->
-   *   v.read.flatMap { value ->
-   *     v.isNotEmpty.map { isNotEmpty ->
+   *   v.read().flatMap { value ->
+   *     v.isNotEmpty().map { isNotEmpty ->
    *       value toT isNotEmpty
    *     }
    *   }
    * }.unsafeRunSync() == 5 toT true
    *
    * mvar.empty<Int>().flatMap { v ->
-   *   v.read
+   *   v.read()
    * } //Never ends
    * //sampleEnd
    * }
    *```
    */
-  val read: Kind<F, A>
+  fun read(): Kind<F, A>
 
   companion object {
 

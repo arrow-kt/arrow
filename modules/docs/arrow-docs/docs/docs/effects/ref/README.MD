@@ -48,7 +48,7 @@ Most operators found on `AtomicReference` can also be found on `Ref` within the 
 
 ```kotlin:ank
 ioRef.flatMap { ref ->
-  ref.get
+  ref.get()
 }.unsafeRunSync()
 ```
 ```kotlin:ank
@@ -63,7 +63,7 @@ import arrow.effects.instances.io.monad.map
 
 ioRef.flatMap { ref ->
   ref.getAndSet(5).flatMap { old ->
-    ref.get.map { new -> old toT new }
+    ref.get().map { new -> old toT new }
   }
 }.unsafeRunSync()
 ```

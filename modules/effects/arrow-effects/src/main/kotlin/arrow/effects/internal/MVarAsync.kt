@@ -22,25 +22,24 @@ internal class MVarAsync<F, A> private constructor(initial: State<A>, AS: Async<
     unsafePut1(a, cb)
   }
 
-  override val take: Kind<F, A>
-    get() = async(this::unsafeTake)
+  override fun take(): Kind<F, A> =
+    async(::unsafeTake)
 
-  override val tryTake: Kind<F, Option<A>>
-    get() = async(this::unsafeTake1)
+  override fun tryTake(): Kind<F, Option<A>> =
+    async(::unsafeTake1)
 
-  override val read: Kind<F, A>
-    get() = async(::unsafeRead)
+  override fun read(): Kind<F, A> =
+    async(::unsafeRead)
 
-  override val isEmpty: Kind<F, Boolean>
-    get() = delay {
-      when (stateRef.get()) {
-        is State.WaitForPut -> true
-        is State.WaitForTake -> false
-      }
+  override fun isEmpty(): Kind<F, Boolean> = delay {
+    when (stateRef.get()) {
+      is State.WaitForPut -> true
+      is State.WaitForTake -> false
     }
+  }
 
-  override val isNotEmpty: Kind<F, Boolean>
-    get() = isEmpty.map { !it }
+  override fun isNotEmpty(): Kind<F, Boolean> =
+    isEmpty().map { !it }
 
   private tailrec fun unsafePut1(a: A, onPut: Listener<Boolean>): Unit =
     when (val current = stateRef.get()) {
