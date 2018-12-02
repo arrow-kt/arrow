@@ -15,7 +15,7 @@ class RefTest : UnitSpec() {
     with(IO.monadDefer()) {
       "set get" {
         forAll(Gen.int(), Gen.int()) { a, b ->
-          Ref.of(a, arrow.effects.IO.monadDefer()).flatMap { ref ->
+          Ref.of(a, IO.monadDefer()).flatMap { ref ->
             ref.set(b).flatMap { _ ->
               ref.get().map { get ->
                 get == b

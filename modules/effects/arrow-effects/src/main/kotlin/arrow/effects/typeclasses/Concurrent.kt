@@ -2,7 +2,6 @@ package arrow.effects.typeclasses
 
 import arrow.Kind
 import arrow.core.*
-import arrow.effects.ForIO
 import kotlin.coroutines.CoroutineContext
 
 interface Concurrent<F> : Async<F> {
