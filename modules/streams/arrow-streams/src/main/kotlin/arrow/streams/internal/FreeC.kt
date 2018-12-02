@@ -3,6 +3,7 @@ package arrow.streams.internal
 import arrow.Kind
 import arrow.core.*
 import arrow.effects.typeclasses.ExitCase
+import arrow.streams.CompositeFailure
 import arrow.streams.internal.FreeC.Result
 import arrow.typeclasses.MonadError
 
@@ -68,10 +69,10 @@ sealed class FreeC<F, out R> : FreeCOf<F, R> {
   @Suppress("UNCHECKED_CAST", "ThrowRuntimeException")
   fun asHandler(e: Throwable): FreeC<F, R> = when (val view = ViewL(this.fix())) {
     is FreeC.Pure -> FreeC.Fail(e)
-    is FreeC.Fail -> FreeC.Fail(arrow.streams.CompositeFailure(view.error, e))
+    is FreeC.Fail -> FreeC.Fail(CompositeFailure(view.error, e))
     is FreeC.Interrupted<F, R, *> -> FreeC.Interrupted(
       view.context,
-      view.deferredError.map { t -> arrow.streams.CompositeFailure(e, t) }.orElse { e.some() }
+      view.deferredError.map { t -> CompositeFailure(e, t) }.orElse { e.some() }
     )
     is ViewL.Companion.View<F, *, R> -> (view as ViewL.Companion.View<F, Any?, R>).next(FreeC.Fail<F, Any?>(e))
     else -> throw AssertionError("Unreachable BOOM!")

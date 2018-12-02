@@ -14,20 +14,20 @@ interface Fiber<F, A> {
 
   /**
    * Returns a new task that will await for the completion of the
-   * underlying Fiber, (asynchronously) blocking the current run-loop
+   * underlying [Fiber], (asynchronously) blocking the current run-loop
    * until that result is available.
    */
-  val join: Kind<F, A>
+  fun join(): Kind<F, A>
 
   /**
-   * Triggers the cancellation of the Fiber.
+   * Triggers the cancellation of the [Fiber].
    *
    * @returns a task that trigger the cancellation upon evaluation.
    */
-  val cancel: CancelToken<F>
+  fun cancel(): CancelToken<F>
 
-  operator fun component1(): Kind<F, A> = join
-  operator fun component2(): CancelToken<F> = cancel
+  operator fun component1(): Kind<F, A> = join()
+  operator fun component2(): CancelToken<F> = cancel()
 
   companion object {
 
@@ -38,9 +38,9 @@ interface Fiber<F, A> {
      * @param cancel task that will await for the completion of the underlying Fiber.
      */
     operator fun <F, A> invoke(join: Kind<F, A>, cancel: CancelToken<F>): Fiber<F, A> = object : Fiber<F, A> {
-      override val join: Kind<F, A> = join
-      override val cancel: CancelToken<F> = cancel
-      override fun toString(): String = "Fiber(join= $join, cancel= $cancel)"
+      override fun join(): Kind<F, A> = join
+      override fun cancel(): CancelToken<F> = cancel
+      override fun toString(): String = "Fiber(join= ${join()}, cancel= ${cancel()})"
     }
   }
 

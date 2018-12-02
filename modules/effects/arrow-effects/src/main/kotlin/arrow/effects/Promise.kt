@@ -256,27 +256,27 @@ internal class UncancelablePromise<F, A>(AS: Async<F>) : Promise<F, A>, Async<F>
   private val state: AtomicReference<PromiseState<A>> = AtomicReference(PromiseState.Pending(emptyList()))
 
   override val get: Kind<F, A> = async { k: (Either<Throwable, A>) -> Unit ->
-    tailrec fun loop(): Unit {
-      val st = state.get()
-      when (st) {
-        is PromiseState.Pending<A> -> loop()
-        is PromiseState.Full -> k(Right(st.value))
-        is PromiseState.Error -> k(Left(st.throwable))
-      }
-    }
+    calculateNewGetState(k)
+    loop(k)
+  }
 
-    tailrec fun calculateNewState(): Unit {
-      val oldState = state.get()
-      val newState = when (oldState) {
-        is PromiseState.Pending<A> -> PromiseState.Pending(oldState.joiners + k)
-        is PromiseState.Full -> oldState
-        is PromiseState.Error -> oldState
-      }
-      return if (state.compareAndSet(oldState, newState)) Unit else calculateNewState()
+  private tailrec fun loop(k: (Either<Throwable, A>) -> Unit): Unit {
+    val st = state.get()
+    when (st) {
+      is PromiseState.Pending<A> -> loop(k)
+      is PromiseState.Full -> k(Right(st.value))
+      is PromiseState.Error -> k(Left(st.throwable))
     }
+  }
 
-    calculateNewState()
-    loop()
+  private tailrec fun calculateNewGetState(k: (Either<Throwable, A>) -> Unit): Unit {
+    val oldState = state.get()
+    val newState = when (oldState) {
+      is PromiseState.Pending<A> -> PromiseState.Pending(oldState.joiners + k)
+      is PromiseState.Full -> oldState
+      is PromiseState.Error -> oldState
+    }
+    return if (state.compareAndSet(oldState, newState)) Unit else calculateNewGetState(k)
   }
 
   override val tryGet: Kind<F, Option<A>>
@@ -295,26 +295,26 @@ internal class UncancelablePromise<F, A>(AS: Async<F>) : Promise<F, A>, Async<F>
     }
 
   override fun tryComplete(a: A): Kind<F, Boolean> = defer {
-    tailrec fun calculateNewState(): Unit {
-      val oldState = state.get()
-      val newState = when (oldState) {
-        is PromiseState.Pending<A> -> PromiseState.Full(a)
-        is PromiseState.Full -> oldState
-        is PromiseState.Error -> oldState
-      }
-
-      if (state.compareAndSet(oldState, newState)) Unit else calculateNewState()
-    }
-
     val oldState = state.get()
     when (oldState) {
       is PromiseState.Pending -> {
-        calculateNewState()
+        calculateNewTryCompleteState(a)
         just(true)
       }
       is PromiseState.Full -> just(false)
       is PromiseState.Error -> just(false)
     }
+  }
+
+  private tailrec fun calculateNewTryCompleteState(a: A): Unit {
+    val oldState = state.get()
+    val newState = when (oldState) {
+      is PromiseState.Pending<A> -> PromiseState.Full(a)
+      is PromiseState.Full -> oldState
+      is PromiseState.Error -> oldState
+    }
+
+    if (state.compareAndSet(oldState, newState)) Unit else calculateNewTryCompleteState(a)
   }
 
   override fun error(throwable: Throwable): Kind<F, Unit> =

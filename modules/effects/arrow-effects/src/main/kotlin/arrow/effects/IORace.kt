@@ -11,9 +11,7 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine
 import kotlin.coroutines.suspendCoroutine
 
-typealias Pair<A, B> = Either<Tuple2<A, Fiber<ForIO, B>>, Tuple2<Fiber<ForIO, A>, B>>
-
-fun <A, B> IO.Companion.racePair(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<B>): IO<Pair<A, B>> =
+fun <A, B> IO.Companion.racePair(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<B>): IO<Either<Tuple2<A, Fiber<ForIO, B>>, Tuple2<Fiber<ForIO, A>, B>>> =
   IO.async { conn, cb ->
     val active = AtomicBoolean(true)
 
@@ -29,7 +27,7 @@ fun <A, B> IO.Companion.racePair(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<
 
     val a: suspend () -> A = {
       suspendCoroutine { ca: Continuation<A> ->
-        IORunLoop.startCancelable(ioA.fix(), connA) { either: Either<Throwable, A> ->
+        IORunLoop.startCancelable(ioA, connA) { either: Either<Throwable, A> ->
           either.fold({ error ->
             ca.resumeWith(Result.failure(error))
           }, { a ->
@@ -41,7 +39,7 @@ fun <A, B> IO.Companion.racePair(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<
 
     val b: suspend () -> B = {
       suspendCoroutine { ca: Continuation<B> ->
-        IORunLoop.startCancelable(ioB.fix(), connB) { either: Either<Throwable, B> ->
+        IORunLoop.startCancelable(ioB, connB) { either: Either<Throwable, B> ->
           either.fold({ error ->
             ca.resumeWith(Result.failure(error))
           }, { b ->

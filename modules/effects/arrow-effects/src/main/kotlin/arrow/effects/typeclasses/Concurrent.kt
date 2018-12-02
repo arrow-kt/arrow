@@ -2,6 +2,7 @@ package arrow.effects.typeclasses
 
 import arrow.Kind
 import arrow.core.*
+import arrow.effects.ForIO
 import kotlin.coroutines.CoroutineContext
 
 interface Concurrent<F> : Async<F> {
@@ -16,22 +17,22 @@ interface Concurrent<F> : Async<F> {
   fun <A, B> raceN(ctx: CoroutineContext, fa: Kind<F, A>, fb: Kind<F, B>): Kind<F, Either<A, B>> =
     racePair(ctx, fa, fb).flatMap {
       it.fold({ (a, b) ->
-        b.cancel.map { a.left() }
+        b.cancel().map { a.left() }
       }, { (a, b) ->
-        a.cancel.map { b.right() }
+        a.cancel().map { b.right() }
       })
     }
 
   fun <A, B, C> raceN(ctx: CoroutineContext, fa: Kind<F, A>, fb: Kind<F, B>, fc: Kind<F, C>): Kind<F, Either<A, Either<B, C>>> =
     racePair(ctx, fa, racePair(ctx, fb, fc)).flatMap {
       it.fold({ (a, b) ->
-        b.cancel.map { a.left() }
+        b.cancel().map { a.left() }
       }, { (a, b) ->
-        a.cancel.flatMap {
+        a.cancel().flatMap {
           b.fold({ (b, c) ->
-            c.cancel.map { b.left().right() }
+            c.cancel().map { b.left().right() }
           }, { (b, c) ->
-            b.cancel.map { c.right().right() }
+            b.cancel().map { c.right().right() }
           })
         }
       })

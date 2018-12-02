@@ -7,7 +7,7 @@ import kotlin.coroutines.*
 import kotlin.coroutines.Continuation
 
 /**
- * Create a new [IO] that executes the receiver [IO].
+ * Create a new [IO] that upon execution starts the receiver [IO] within a [Fiber].
  *
  * @receiver [IO] to execute on [ctx] within a new suspended [IO].
  * @param ctx [CoroutineContext] to execute the source [IO] on.
@@ -23,7 +23,7 @@ fun <A> IOOf<A>.startF(ctx: CoroutineContext): IO<Fiber<ForIO, A>> = IO.defer {
 
   val a: suspend () -> A = {
     suspendCoroutine { ca: Continuation<A> ->
-      IORunLoop.startCancelable(this.fix(), conn) { either: Either<Throwable, A> ->
+      IORunLoop.startCancelable(this, conn) { either: Either<Throwable, A> ->
         either.fold({ error ->
           ca.resumeWith(Result.failure(error))
         }, { a ->

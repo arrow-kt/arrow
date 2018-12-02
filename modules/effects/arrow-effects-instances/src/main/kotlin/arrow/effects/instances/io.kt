@@ -119,10 +119,10 @@ interface IOAsyncInstance : Async<ForIO>, IOMonadDeferInstance {
 }
 
 interface IOConcurrentInstance : Concurrent<ForIO>, IOAsyncInstance {
-  override fun <A> Kind<ForIO, A>.startF(ctx: CoroutineContext): Kind<ForIO, Fiber<ForIO, A>> =
+  override fun <A> Kind<ForIO, A>.startF(ctx: CoroutineContext): IO<Fiber<ForIO, A>> =
     ioStart(ctx)
 
-  override fun <A, B> racePair(ctx: CoroutineContext, lh: Kind<ForIO, A>, rh: Kind<ForIO, B>): Kind<ForIO, Either<Tuple2<A, Fiber<ForIO, B>>, Tuple2<Fiber<ForIO, A>, B>>> =
+  override fun <A, B> racePair(ctx: CoroutineContext, lh: Kind<ForIO, A>, rh: Kind<ForIO, B>): IO<Either<Tuple2<A, Fiber<ForIO, B>>, Tuple2<Fiber<ForIO, A>, B>>> =
     IO.racePair(ctx, lh, rh)
 
 }

@@ -23,7 +23,7 @@ class ForwardCancelable {
         is Active -> {
           state.lazySet(finished) // GC purposes
           // TODO this runs in an immediate execution context in cats-effect
-          IORunLoop.startCancelable(current.token.fix(), conn, cb)
+          IORunLoop.startCancelable(current.token, conn, cb)
         }
       }
     }
