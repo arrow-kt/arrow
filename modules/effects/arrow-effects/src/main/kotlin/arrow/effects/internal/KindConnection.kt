@@ -1,7 +1,6 @@
 package arrow.effects.internal
 
-import arrow.effects.ForIO
-import arrow.effects.typeclasses.Async
+import arrow.effects.typeclasses.MonadDefer
 import arrow.typeclasses.Applicative
 import java.util.concurrent.atomic.AtomicReference
 
@@ -22,19 +21,21 @@ sealed class KindConnection<F> {
   abstract fun isCanceled(): Boolean
 
   /**
-   * Pushes a cancelable reference on the stack, to be popped or canceled later in FIFO order.
+   * Pushes a function meant to cancel and cleanup resources.
+   * These functions are kept inside a stack, and executed in FIFO order on cancellation.
    */
   abstract fun push(token: CancelToken<F>): Unit
 
   /**
-   * Pushes a pair of IOConnection on the stack, which on cancellation will get trampolined. This is useful in
-   * IO.race for example, because combining a whole collection of IO tasks, two by two, can lead to building a
+   * Pushes a pair of KindConnection on the stack, which on cancellation will get trampolined. This is useful in
+   * race for example, because combining a whole collection of tasks, two by two, can lead to building a
    * cancelable that's stack unsafe.
    */
   abstract fun pushPair(lh: KindConnection<F>, rh: KindConnection<F>): Unit
 
   /**
-   * Removes a cancelable reference from the stack in FIFO order.
+   * Pops a cancelable reference from the FIFO stack of references for this connection.
+   * A cancelable reference is meant to cancel and cleanup resources.
    *
    * @return the cancelable reference that was removed.
    */
@@ -50,7 +51,7 @@ sealed class KindConnection<F> {
 
   companion object {
 
-    operator fun <F> invoke(AS: Async<F>): KindConnection<F> = DefaultKindConnection(AS)
+    operator fun <F> invoke(MD: MonadDefer<F>): KindConnection<F> = DefaultKindConnection(MD)
 
     fun <F> uncancelable(FA: Applicative<F>): KindConnection<F> = Uncancelable(FA)
   }
@@ -58,11 +59,11 @@ sealed class KindConnection<F> {
   /**
    * Reusable [IOConnection] reference that cannot be canceled.
    */
-  private class Uncancelable<F>(val FA: Applicative<F>) : KindConnection<F>() {
-    override fun cancel(): CancelToken<F> = FA.just(Unit)
+  private class Uncancelable<F>(FA: Applicative<F>) : KindConnection<F>(), Applicative<F> by FA {
+    override fun cancel(): CancelToken<F> = just(Unit)
     override fun isCanceled(): Boolean = false
     override fun push(token: CancelToken<F>) = Unit
-    override fun pop(): CancelToken<F> = FA.just(Unit)
+    override fun pop(): CancelToken<F> = just(Unit)
     override fun tryReactivate(): Boolean = true
     override fun pushPair(lh: KindConnection<F>, rh: KindConnection<F>): Unit = Unit
   }
@@ -70,69 +71,47 @@ sealed class KindConnection<F> {
   /**
    * Default [IOConnection] implementation.
    */
-  private class DefaultKindConnection<F>(val AS: Async<F>) : KindConnection<F>() {
+  private class DefaultKindConnection<F>(MD: MonadDefer<F>) : KindConnection<F>(), MonadDefer<F> by MD {
     private val state = AtomicReference(emptyList<CancelToken<F>>())
 
-    override fun cancel(): CancelToken<F> = AS.defer {
+    override fun cancel(): CancelToken<F> = defer {
       state.getAndSet(null).let { list ->
         when {
-          list == null || list.isEmpty() -> AS.just(Unit)
-          else -> CancelUtils2.cancelAll(list.iterator(), AS)
+          list == null || list.isEmpty() -> just(Unit)
+          else -> cancelAll(list.iterator())
         }
       }
     }
 
     override fun isCanceled(): Boolean = state.get() == null
 
-    override fun push(token: CancelToken<F>): Unit = state.get().let { list ->
-      when (list) {
-//        null -> token.fix().unsafeRunAsync { } TODO("Can this ever occur??? & why do we need to run on push???")
-        else -> {
-          val update = listOf(token) + list
-          if (!state.compareAndSet(list, update)) push(token)
-        }
-      }
+    override tailrec fun push(token: CancelToken<F>): Unit = when (val list = state.get()) {
+      null -> if (!state.compareAndSet(list, listOf(token))) push(token) else Unit
+      else -> if (!state.compareAndSet(list, listOf(token) + list)) push(token) else Unit
     }
 
     override fun pushPair(lh: KindConnection<F>, rh: KindConnection<F>): Unit =
-      push(CancelUtils2.cancelAll(listOf(lh.cancel(), rh.cancel()).iterator(), AS))
+      push(cancelAll(listOf(lh.cancel(), rh.cancel()).iterator()))
 
-    override fun pop(): CancelToken<F> = state.get().let { current ->
-      when (current) {
-        null, listOf<CancelToken<ForIO>>() -> AS.just(Unit)
-        else -> // current @ (x::xs)
-          if (!state.compareAndSet(current, current.drop(1))) pop()
-          else current.first()
+    override tailrec fun pop(): CancelToken<F> {
+      val list = state.get()
+      return when {
+        list == null || list.isEmpty() -> just(Unit)
+        else -> if (!state.compareAndSet(list, list.drop(1))) pop()
+        else list.first()
       }
     }
 
     override fun tryReactivate(): Boolean =
       state.compareAndSet(null, emptyList())
-  }
-}
 
-internal object CancelUtils2 {
+    private fun cancelAll(cursor: Iterator<CancelToken<F>>): CancelToken<F> {
+      fun loop(): CancelToken<F> = if (cursor.hasNext()) cursor.next().flatMap { loop() }
+      else just(Unit)
 
-  fun <F> cancelAll(cursor: Iterator<CancelToken<F>>, AS: Async<F>): CancelToken<F> =
-    if (!cursor.hasNext()) AS.just(Unit)
-    else AS.defer {
-      val frame = CancelAllFrame2(cursor, AS)
-      frame.loop()
+      return if (cursor.hasNext()) defer { cursor.next().flatMap { loop() } }
+      else just(Unit)
     }
-
-  /**
-   * Optimization for cancelAll
-   */
-  private class CancelAllFrame2<F>(val cursor: Iterator<CancelToken<F>>, AS: Async<F>) : Async<F> by AS {
-
-    private var errors = listOf<Throwable>()
-
-    fun loop(): CancelToken<F> =
-      if (cursor.hasNext()) cursor.next().flatMap { loop() }
-      else when (errors) {
-        emptyList<Throwable>() -> just(Unit)
-        else -> raiseError(ErrorUtils.composeErrors(errors.first(), errors.drop(1)))
-      }
 
   }
 

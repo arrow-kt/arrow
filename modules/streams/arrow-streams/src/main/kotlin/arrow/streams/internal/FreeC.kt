@@ -323,7 +323,7 @@ fun <R> FreeC.Result<R>.recoverWith(f: (Throwable) -> Result<R>): Result<R> = wh
     try {
       f(error)
     } catch (t: Throwable) {
-      Result.raiseError<R>(arrow.streams.CompositeFailure(error, t))
+      Result.raiseError<R>(CompositeFailure(error, t))
     }
   else -> this
 }
@@ -339,7 +339,7 @@ fun <F, A, B> FreeCOf<F, A>.bracketCase(use: (A) -> FreeCOf<F, B>, release: (A, 
       release(a, result.asExitCase()).transformWith<F, Unit, B> { r2 ->
         when (r2) {
           is FreeC.Fail<*, *> -> result.recoverWith { t ->
-            FreeC.Fail<F, B>(arrow.streams.CompositeFailure(t, r2.error))
+            FreeC.Fail<F, B>(CompositeFailure(t, r2.error))
           }.asFreeC()
           else -> result.asFreeC()
         }
