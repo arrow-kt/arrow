@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: Coproduct
-permalink: /docs/datatypes/coproduct/
+permalink: /docs/arrow/data/coproduct/
+redirect_from:
+  - /docs/datatypes/coproduct
 ---
 
 ## Coproduct

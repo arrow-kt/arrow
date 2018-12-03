@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: Store
-permalink: /docs/datatypes/store/
+permalink: /docs/arrow/data/store/
+redirect_from:
+  - /docs/datatypes/store
 ---
 
 ## Store
@@ -14,7 +16,7 @@ intermediate
 
 If we think in a component oriented fashion when building user interfaces, this datatype is the most basic unit. 
 
-This structure is also a [`Comonad`]({{ '/docs/typeclasses/comonad' | relative_url }}) because it represents a lazy unfolding of all possible states of our user interface.
+This structure is also a [`Comonad`]({{ '/docs/arrow/typeclasses/comonad' | relative_url }}) because it represents a lazy unfolding of all possible states of our user interface.
 
 ```kotlin:ank
 import arrow.data.*

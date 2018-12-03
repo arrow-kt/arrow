@@ -249,7 +249,7 @@ import arrow.effects.*
 
 ## Common operators
 
-IO implements all the operators common to all instances of [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}). Those include `map`, `flatMap`, and `handleErrorWith`.
+IO implements all the operators common to all instances of [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}). Those include `map`, `flatMap`, and `handleErrorWith`.
 
 
 ### Supported Type Classes

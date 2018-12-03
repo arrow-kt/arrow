@@ -227,7 +227,7 @@ Bunch of new things? Don't be scared, let's go **step by step**.
 This `DataSource` keeps the generic `F` since it implements `DataSource<F>` . We wanna be able to pass that type from 
 the outside, all the way down.
 
-Now, forget about that probably unfamiliar [`ApplicativeError`]({{ '/docs/typeclasses/applicativeerror' | relative_url }}) 
+Now, forget about that probably unfamiliar [`ApplicativeError`]({{ '/docs/arrow/typeclasses/applicativeerror' | relative_url }}) 
 thing on the constructor, and focus on the `allTasksByUser()` function, just for now. We'll get back to that.
 
 ```kotlin
@@ -249,7 +249,7 @@ And for both things we must return: `Kind<F, List<Task>>`.
 In other words: there's a type **we still don't know anything about: `F`** and we need a way to return an error wrapped 
 into it, and also a way to construct an instance of it wrapping a successful value. Sounds impossible?. 
 
-Let's go back to the class declaration and find that [`ApplicativeError`]({{ '/docs/typeclasses/applicativeerror' | relative_url }}) 
+Let's go back to the class declaration and find that [`ApplicativeError`]({{ '/docs/arrow/typeclasses/applicativeerror' | relative_url }}) 
 being passed on construction and then used as a delegate for the class (`by A`).
 
 ```kotlin
@@ -258,13 +258,13 @@ class LocalDataSource<F>(A: ApplicativeError<F, Throwable>) : DataSource<F>, App
 }
 ```
 
-[`ApplicativeError`]({{ '/docs/typeclasses/applicativeerror' | relative_url }}) extends from [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}), 
+[`ApplicativeError`]({{ '/docs/arrow/typeclasses/applicativeerror' | relative_url }}) extends from [`Applicative`]({{ '/docs/arrow/typeclasses/applicative' | relative_url }}), 
 and both are [**Typeclasses**]({{ '/docs/typeclasses/intro' | relative_url }}).
 
 **Typeclasses define behaviors (contracts)**. They're basically encoded as interfaces that work over a generic argument, 
-as in [`Monad<F>`]({{ '/docs/typeclasses/monad' | relative_url }}) , [`Functor<F>`]({{ '/docs/typeclasses/functor' | relative_url }}) 
-and many more. That `F` is the data type. So we will be able to pass types like [`Either`]({{ '/docs/datatypes/either' | relative_url }})
-, [`Option`]({{ '/docs/datatypes/option' | relative_url }}), [`IO`]({{ '/docs/effects/io' | relative_url }}), [`Observable`]({{ '/docs/integrations/rx2' | relative_url }}), 
+as in [`Monad<F>`]({{ '/docs/arrow/typeclasses/monad' | relative_url }}) , [`Functor<F>`]({{ '/docs/arrow/typeclasses/functor' | relative_url }}) 
+and many more. That `F` is the data type. So we will be able to pass types like [`Either`]({{ '/docs/arrow/core/either' | relative_url }})
+, [`Option`]({{ '/docs/arrow/core/option' | relative_url }}), [`IO`]({{ '/docs/effects/io' | relative_url }}), [`Observable`]({{ '/docs/integrations/rx2' | relative_url }}), 
 [`Flowable`]({{ '/docs/integrations/rx2' | relative_url }}) and many more for it.
 
 Don't worry if you don't know about some of them yet. Data types like `Either`, `Option` or `IO` are particular from 
@@ -274,17 +274,17 @@ So, back to our two problems:
 
 * **Wrapping a successful value into an instance of `Kind<F, List<Task>>`**
 
-We can rely on a typeclass for this: [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}). Since [`ApplicativeError`]({{ '/docs/typeclasses/applicativeerror' | relative_url }}) 
+We can rely on a typeclass for this: [`Applicative`]({{ '/docs/arrow/typeclasses/applicative' | relative_url }}). Since [`ApplicativeError`]({{ '/docs/arrow/typeclasses/applicativeerror' | relative_url }}) 
 extends from it, we can delegate to it. We're delegating our class on it, so we can use its features out of the box.
 
-[`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}) provides the `just(a)` function. `just(a)` **wraps 
+[`Applicative`]({{ '/docs/arrow/typeclasses/applicative' | relative_url }}) provides the `just(a)` function. `just(a)` **wraps 
 a value into the context of any Higher Kind**. So If we have an `Applicative<F>`, it could call `just(a)` to wrap the 
 value into the container `F`, regardless of which one is it. Let's say it's `Observable`, we'll have an 
 `Applicative<Observable>`, which will know how to wrap `a` into an `Observable` like `Observable.just(a)`.
 
 * **Wrapping an error into an instance of `Kind<F, List<Task>>`**
 
-We can use [`ApplicativeError`]({{ '/docs/typeclasses/applicativeerror' | relative_url }}) for that. It brings the 
+We can use [`ApplicativeError`]({{ '/docs/arrow/typeclasses/applicativeerror' | relative_url }}) for that. It brings the 
 function `raiseError(e)` into scope. `raiseError(e)` basically wraps an error into the `F` container. For the 
 `Observable` example, raising the error would end up doing something like `Observable.error<A>(t)`, where `t` is a 
 `Throwable`, since we're declaring our error type when we declare the typeclass as `ApplicativeError<F, Throwable>`.
@@ -309,14 +309,14 @@ class LocalDataSource<F>(A: ApplicativeError<F, Throwable>) :
 The in memory map remains the same, but the function does a couple things probably new to you:
 
 * It tries to load the `Tasks` from the local cache, and since that returns a nullable (because the `Tasks` could not be 
-found), we are going to model that using an [`Option`]({{ '/docs/datatypes/option' | relative_url }}). In case you're not 
-aware of how [`Option`]({{ '/docs/datatypes/option' | relative_url }}) works, it models presence vs absence of a value. A 
+found), we are going to model that using an [`Option`]({{ '/docs/arrow/core/option' | relative_url }}). In case you're not 
+aware of how [`Option`]({{ '/docs/arrow/core/option' | relative_url }}) works, it models presence vs absence of a value. A 
 value that is wrapped inside of it.
 
 * After getting our optional value, we `fold` over it. Folding is just equivalent to a when statement over the optional 
 value. When it's **absent**, it wraps an error into the `F` data type (first lambda passed in). And when it's 
 **present** it constructs an instance of the `F` data type wrapping it (second lambda). For both cases, it uses the 
-[`ApplicativeError`]({{ '/docs/typeclasses/applicativeerror' | relative_url }}) features mentioned before: 
+[`ApplicativeError`]({{ '/docs/arrow/typeclasses/applicativeerror' | relative_url }}) features mentioned before: 
 `raiseError()` and `just()`.
 
 With this, we've basically abstracted away our data source implementation so it doesn't know about which container it's 
@@ -339,7 +339,7 @@ class RemoteDataSource<F>(A: Async<F>) : DataSource<F>, Async<F> by A {
 }
 ```
 
-This time there's a subtle difference: Instead of delegating into an instance of [`ApplicativeError`]({{ '/docs/typeclasses/applicativeerror' | relative_url }}) 
+This time there's a subtle difference: Instead of delegating into an instance of [`ApplicativeError`]({{ '/docs/arrow/typeclasses/applicativeerror' | relative_url }}) 
 as before, we'll use a different typeclass: [`Async`]({{ '/docs/effects/async/' | relative_url }}).
 
 That's because of the asynchronous nature of a network call. We want to code it in an asynchronous way, so we'll 
@@ -393,7 +393,7 @@ class TaskRepository<F>(
 }
 ```
 
-[`ApplicativeError<F, Throwable>`]({{ '/docs/typeclasses/applicativeerror/' | relative_url }}) is back! It also brings 
+[`ApplicativeError<F, Throwable>`]({{ '/docs/arrow/typeclasses/applicativeerror/' | relative_url }}) is back! It also brings 
 an extension function into scope called `handleErrorWith()` that works over any Higher Kind receiver.
 
 It's encoded like:
@@ -434,7 +434,7 @@ class Module<F>(A: Async<F>) {
 
 The only difference is that now it's abstracted away and depends on `F`, which stays polymorphic. I've intentionally 
 obviated this before to avoid noise, but [`Async`]({{ '/docs/effects/async/' | relative_url }}) ultimately extends 
-from [`ApplicativeError`]({{ '/docs/typeclasses/applicativeerror/' | relative_url }}), so we can use an instance of it 
+from [`ApplicativeError`]({{ '/docs/arrow/typeclasses/applicativeerror/' | relative_url }}), so we can use an instance of it 
 to solve the concerns we have at all the nested levels, and pass it all the way down as you can see on the module.
 
 ### Testing polymorphism
@@ -611,7 +611,7 @@ object test {
 }
 ```
 
-This one wraps the result into [`Try`]({{ '/docs/datatypes/try' | relative_url }}) (which can be `Success` or `Failure`).
+This one wraps the result into [`Try`]({{ '/docs/arrow/core/try' | relative_url }}) (which can be `Success` or `Failure`).
 
 ```
 Success(value=[Task(value=LocalTask assigned to user1)])
@@ -648,7 +648,7 @@ Left(a=UserNotInRemoteStorage(user=User(userId=UserId(value=unknown user))))
 ```
 
 [`IO`]({{ '/docs/effects/io' | relative_url }}) is a bit special. It returns the errors / successful results using 
-[`Either<L,R>`]({{ '/docs/datatypes/either' | relative_url }}) (which is another data type). By convention, the "left" 
+[`Either<L,R>`]({{ '/docs/arrow/core/either' | relative_url }}) (which is another data type). By convention, the "left" 
 side of an either (`L`) stores the errors, and the right side (`R`) stores the successful data. That's why successful 
 results are printed as `Right(...)` and the failing one is printed as `Left(...)`.
 

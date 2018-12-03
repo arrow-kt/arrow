@@ -160,7 +160,7 @@ import arrow.recursion.data.*
 typealias IntFixList = Fix<ForIntListPattern>
 ```
 
-So why do this? We can now define a [Functor]({{ '/docs/typeclasses/functor' | relative_url }}) instance for 
+So why do this? We can now define a [Functor]({{ '/docs/arrow/typeclasses/functor' | relative_url }}) instance for 
 `IntListPattern`, allowing us to traverse into the structure.
 
 ```kotlin

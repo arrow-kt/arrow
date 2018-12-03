@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: Try
-permalink: /docs/datatypes/try/
+permalink: /docs/arrow/core/try/
+redirect_from:
+  - /docs/datatypes/try
 video: XavztYVMUqI
 ---
 
@@ -161,7 +163,7 @@ Try {
 
 Lastly, Arrow contains `Try` instances for many useful typeclasses that allows you to use and transform fallibale values:
 
-[`Functor`]({{ '/docs/typeclasses/functor/' | relative_url }})
+[`Functor`]({{ '/docs/arrow/typeclasses/functor/' | relative_url }})
 
 Transforming the value, if the computation is a success:
 
@@ -174,7 +176,7 @@ ForTry extensions {
 }
 ```
 
-[`Applicative`]({{ '/docs/typeclasses/applicative/' | relative_url }})
+[`Applicative`]({{ '/docs/arrow/typeclasses/applicative/' | relative_url }})
 
 Computing over independent values:
 
@@ -184,7 +186,7 @@ ForTry extensions {
 }
 ```
 
-[`Monad`]({{ '/docs/typeclasses/monad/' | relative_url }})
+[`Monad`]({{ '/docs/arrow/typeclasses/monad/' | relative_url }})
 
 Computing over dependent values ignoring failure:
 

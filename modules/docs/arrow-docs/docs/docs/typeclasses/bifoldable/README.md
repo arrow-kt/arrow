@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: Bifoldable
-permalink: /docs/typeclasses/bifoldable/
+permalink: /docs/arrow/typeclasses/bifoldable/
+redirect_from:
+  - /docs/typeclasses/bifoldable
 ---
 
 ## Bifoldable

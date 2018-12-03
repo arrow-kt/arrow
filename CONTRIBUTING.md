@@ -23,7 +23,7 @@ results in
 // 2
 ```
 
-To build the documentation, in the root of the project, run 
+To build the documentation, in the root of the project, run
 
 ```
 $ ./gradlew clean dokka :arrow-docs:runAnk
@@ -31,16 +31,18 @@ $ ./gradlew clean dokka :arrow-docs:runAnk
 
 The artifact will reside in `modules/docs/arrow-docs/build/site`. The artifact ΛNK produces could be served as a website by [jekyll](https://jekyllrb.com/), a static site generator.
 
-Jekyll is written in ruby, so you need ruby [gem](https://rubygems.org/pages/download) to install it.
+In order to setup a local version of the documentation in your machine, you will have to install [gem](https://rubygems.org/pages/download) as Jekyll is written in ruby. Afterwards, install [bundler](https://bundler.io/) to manage the project dependencies.
 
 ```
-$ gem install jekyll
+$ gem install bundler
+$ cd modules/docs/arrow-docs/
+$ bundle install --path vendor/bundle
 ```
 
-Now you have jekyll, then you can preview the documentation by serving the artifact produced by ΛNK.
+After the dependencies are installed, you can preview the documentation by serving the artifact produced by ΛNK.
 
 ```
-$ jekyll serve --source modules/docs/arrow-docs/build/site/
+$ bundle exec jekyll serve --source build/site/
 ```
 
 By default, the documentation will now be available at [http://127.0.0.1:4000](http://127.0.0.1:4000).

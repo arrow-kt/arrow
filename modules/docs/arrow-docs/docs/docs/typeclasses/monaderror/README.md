@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: MonadError
-permalink: /docs/typeclasses/monaderror/
+permalink: /docs/arrow/typeclasses/monaderror/
+redirect_from:
+  - /docs/typeclasses/monaderror
 ---
 
 ## MonadError
@@ -13,15 +15,15 @@ MonadError is the typeclass used to explicitly represent errors during sequentia
 It is parametrized to an error type `E`, which means the datatype has at least a "success" and a "failure" version.
 These errors can come in the form of `Throwable`, `Exception`, or any other type hierarchy of the user's choice.
 
-`MonadError` extends from [`ApplicativeError`]({{ '/docs/typeclasses/applicativeerror' | relative_url }}), which is already used to represent errors in independent computations. This way all the methods [`ApplicativeError`]({{ '/docs/typeclasses/applicativeerror' | relative_url }}) provides to handle recovery from errors are also available in `MonadError`.
+`MonadError` extends from [`ApplicativeError`]({{ '/docs/arrow/typeclasses/applicativeerror' | relative_url }}), which is already used to represent errors in independent computations. This way all the methods [`ApplicativeError`]({{ '/docs/arrow/typeclasses/applicativeerror' | relative_url }}) provides to handle recovery from errors are also available in `MonadError`.
 
 ### Main Combinators
 
-`MonadError` inherits all the combinators available in [`ApplicativeError`]({{ '/docs/typeclasses/applicativeerror' | relative_url }}) and [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}). It also adds one of its own.
+`MonadError` inherits all the combinators available in [`ApplicativeError`]({{ '/docs/arrow/typeclasses/applicativeerror' | relative_url }}) and [`Monad`]({{ '/docs/arrow/typeclasses/monad' | relative_url }}). It also adds one of its own.
 
 #### raiseError
 
-Inherited from [`ApplicativeError`]({{ '/docs/typeclasses/applicativeerror' | relative_url }}). A constructor function.
+Inherited from [`ApplicativeError`]({{ '/docs/arrow/typeclasses/applicativeerror' | relative_url }}). A constructor function.
 It lifts an exception into the computational context of a type constructor.
 
 ```kotlin:ank

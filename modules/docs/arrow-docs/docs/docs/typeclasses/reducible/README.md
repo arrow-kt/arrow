@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: Reducible
-permalink: /docs/typeclasses/reducible/
+permalink: /docs/arrow/typeclasses/reducible/
+redirect_from:
+  - /docs/typeclasses/reducible
 ---
 
 ## Reducible

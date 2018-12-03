@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: Either
-permalink: /docs/datatypes/either/
+permalink: /docs/arrow/core/either/
+redirect_from:
+  - /docs/datatypes/either
 video: q6HpChSq-xc
 ---
 
@@ -317,7 +319,7 @@ null.rightIfNotNull { "left" }
  Arrow contains `Either` instances for many useful typeclasses that allows you to use and transform right values.
  Both Option and Try don't require a type parameter with the following functions, but it is specifically used for Either.Left
 
- [`Functor`]({{ '/docs/typeclasses/functor/' | relative_url }})
+ [`Functor`]({{ '/docs/arrow/typeclasses/functor/' | relative_url }})
 
  Transforming the inner contents
 
@@ -327,7 +329,7 @@ import arrow.instances.either.functor.*
 Right(1).map {it + 1}
 ```
 
- [`Applicative`]({{ '/docs/typeclasses/applicative/' | relative_url }})
+ [`Applicative`]({{ '/docs/arrow/typeclasses/applicative/' | relative_url }})
 
  Computing over independent values
 
@@ -337,7 +339,7 @@ import arrow.instances.either.applicative.*
 tupled(Either.Right(1), Either.Right("a"), Either.Right(2.0))
 ```
 
- [`Monad`]({{ '/docs/typeclasses/monad/' | relative_url }})
+ [`Monad`]({{ '/docs/arrow/typeclasses/monad/' | relative_url }})
 
  Computing over dependent values ignoring absence
 

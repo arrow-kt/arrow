@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: SemigroupK
-permalink: /docs/typeclasses/semigroupk/
+permalink: /docs/arrow/typeclasses/semigroupk/
+redirect_from:
+  - /docs/typeclasses/semigroupk
 ---
 
 ## SemigroupK

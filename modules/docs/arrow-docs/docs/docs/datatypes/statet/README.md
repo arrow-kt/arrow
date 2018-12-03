@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: StateT
-permalink: /docs/datatypes/statet/
+permalink: /docs/arrow/data/statet/
+redirect_from:
+  - /docs/datatypes/statet
 video: 1MJBXKaq0Hc
 ---
 
@@ -20,7 +22,7 @@ Because [monads don't compose](http://tonymorris.github.io/blog/posts/monads-do-
 
 In the most basic of scenarios, we'll only be dealing with one monad at a time making our lives nice and easy. However, it's not uncommon to get into scenarios where some function calls will return `Either<Error, A>`, and others will return `State<S, A>`.
 
-So let's rewrite the example of [`State` docs]({{ '/docs/datatypes/state' | relative_url }}), but instead of representing the `Stack` as an optional `NonEmptyList` let's represent it as a `List`.
+So let's rewrite the example of [`State` docs]({{ '/docs/arrow/data/state' | relative_url }}), but instead of representing the `Stack` as an optional `NonEmptyList` let's represent it as a `List`.
 
 ```kotlin:ank:silent
 import arrow.*
@@ -161,4 +163,4 @@ import arrow.core.*
 DataType(StateT::class).tcMarkdownList()
 ```
 
-Take a look at the [`EitherT` docs]({{ '/docs/datatypes/eithert' | relative_url }}) or [`OptionT` docs]({{ '/docs/datatypes/optiont' | relative_url }}) for an alternative version monad transformer for achieving different goals.
+Take a look at the [`EitherT` docs]({{ '/docs/arrow/data/eithert' | relative_url }}) or [`OptionT` docs]({{ '/docs/arrow/data/optiont' | relative_url }}) for an alternative version monad transformer for achieving different goals.

@@ -4,7 +4,7 @@ title: Dependency Injection
 permalink: /docs/patterns/dependency_injection/
 ---
 
-If you would like to know about using the [`Reader`]({{ '/docs/datatypes/reader' | relative_url }}) datatype instead, visit [this article](https://medium.com/@JorgeCastilloPr/kotlin-dependency-injection-with-the-reader-monad-7d52f94a482e) by [Jorge Castillo](https://github.com/JorgeCastilloPrz).
+If you would like to know about using the [`Reader`]({{ '/docs/arrow/data/reader' | relative_url }}) datatype instead, visit [this article](https://medium.com/@JorgeCastilloPr/kotlin-dependency-injection-with-the-reader-monad-7d52f94a482e) by [Jorge Castillo](https://github.com/JorgeCastilloPrz).
 
 ## Dependency Injection using the `Typeclassless` technique
 
@@ -13,7 +13,7 @@ intermediate
 
 Arrow allows abstracting polymorphic code that operates over the evidence of having an instance of a [typeclass]({{ '/docs/typeclasses/intro' | relative_url }}) available.
 This enables programs that are not coupled to specific datatype implementations.
-The technique demonstrated below to write polymorphic code is available for all other typeclasses besides [`Functor`]({{ '/docs/typeclasses/functor' | relative_url }}).
+The technique demonstrated below to write polymorphic code is available for all other typeclasses besides [`Functor`]({{ '/docs/arrow/typeclasses/functor' | relative_url }}).
 
 ```kotlin
 fun <F> multiplyBy2(FT: Functor<F>, fa: Kind<F, Int>): Kind<F, Int> =
@@ -26,7 +26,7 @@ multiplyBy2(Try.functor(), Try.just(1))
 // Success(2)
 ```
 
-In the example above we've defined a function that can operate over any data type for which a [`Functor`]({{ '/docs/typeclasses/functor' | relative_url }}) instance is available.
+In the example above we've defined a function that can operate over any data type for which a [`Functor`]({{ '/docs/arrow/typeclasses/functor' | relative_url }}) instance is available.
 And then we applied `multiplyBy2` to two different datatypes for which Functor instances exist.
 This technique applied to other Typeclasses allows users to describe entire programs in terms of behaviors typeclasses removing
 dependencies to concrete data types and how they operate.

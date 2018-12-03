@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: Id
-permalink: /docs/datatypes/id/
+permalink: /docs/arrow/core/id/
+redirect_from:
+  - /docs/datatypes/id
 video: DBvVd1pfLMo
 ---
 

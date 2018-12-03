@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: MonadWriter
-permalink: /docs/typeclasses/monadwriter/
+permalink: /docs/arrow/mtl/typeclasses/monadwriter/
+redirect_from:
+  - /docs/typeclasses/monadwriter
 ---
 
 ## MonadWriter

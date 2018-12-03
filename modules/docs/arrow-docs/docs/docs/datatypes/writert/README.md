@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: WriterT
-permalink: /docs/datatypes/writert/
+permalink: /docs/arrow/data/writert/
+redirect_from:
+  - /docs/datatypes/writert
 ---
 
 ## WriterT
