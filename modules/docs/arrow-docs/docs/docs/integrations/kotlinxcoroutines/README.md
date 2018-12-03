@@ -32,7 +32,7 @@ Does it look familiar? Yes! It's the same as our [comprehensions]({{ '/docs/patt
 
 Unlike [RxJava]({{ '/docs/integrations/rx2' | relative_url }}), `Deferred` doesn't come with a natural set of operations for error handling and recovery,
 requiring users to use imperative try/catch blocks.
-Luckily, Arrow comes with its own set of error handling functions in its integration with [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}).
+Luckily, Arrow comes with its own set of error handling functions in its integration with [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}).
 
 See this faulty block
 ```kotlin
@@ -118,7 +118,7 @@ It is also posible to `await()` on the wrapper like you would on `Deferred`, but
 
 ### Error handling & recovery
 
-[`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) can be used to start a [Monad Comprehension]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) using the method `bindingCatch`, with all its benefits.
+[`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}) can be used to start a [Monad Comprehension]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) using the method `bindingCatch`, with all its benefits.
 These benefits include capturing all exceptions that happen inside the block.
 
 ```kotlin
@@ -141,7 +141,7 @@ ForDeferredK extensions {
  // Failure(ArithmeticException("/ by zero"))
 ```
 
-Several recovery methods are provided, which you can find in the documentation for [`ApplicativeError`]({{ '/docs/typeclasses/applicativeerror' | relative_url }}).
+Several recovery methods are provided, which you can find in the documentation for [`ApplicativeError`]({{ '/docs/arrow/typeclasses/applicativeerror' | relative_url }}).
 The most common ones are `handleError` and `handleErrorWith`.
 
 The former allows you to return a single value from a faulty block

@@ -10,7 +10,7 @@ import arrow.core.Tuple2
  * [Order] is a subtype of [Eq] and defines [eqv] in terms of [compare].
  *
  * @see [Eq]
- * @see <a href="http://arrow-kt.io/docs/typeclasses/order/">Order documentation</a>
+ * @see <a href="http://arrow-kt.io/docs/arrow/typeclasses/order/">Order documentation</a>
  */
 interface Order<F> : Eq<F> {
 

@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: Order
-permalink: /docs/typeclasses/order/
+permalink: /docs/arrow/typeclasses/order/
+redirect_from:
+  - /docs/typeclasses/order
 ---
 
 ## Order

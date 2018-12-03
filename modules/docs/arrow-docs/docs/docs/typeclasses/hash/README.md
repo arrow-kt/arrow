@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: Hash
-permalink: /docs/typeclasses/hash/
+permalink: /docs/arrow/typeclasses/hash/
+redirect_from:
+  - /docs/typeclasses/hash
 ---
 
 ## Hash

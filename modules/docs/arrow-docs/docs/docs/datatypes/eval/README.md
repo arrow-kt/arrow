@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: Eval
-permalink: /docs/datatypes/eval/
+permalink: /docs/arrow/core/eval/
+redirect_from:
+  - /docs/datatypes/eval
 video: FcaaTJhCEcw
 ---
 

@@ -44,7 +44,7 @@ val headGetter: Getter<NonEmptyList<String>, String> = NonEmptyList.head<String>
 val tupleGetter: Getter<Tuple2<String, Int>, String> = Tuple2.first<String, Int>().asGetter()
 ``` 
 
-`Getter` also has some convenience methods to make working with [Reader]({{ '/docs/datatypes/reader' | relative_url }}) easier.
+`Getter` also has some convenience methods to make working with [Reader]({{ '/docs/arrow/data/reader' | relative_url }}) easier.
 
 ```kotlin:ank
 val reader: Reader<NonEmptyList<String>, String> = NonEmptyList.head<String>().asGetter().ask()
@@ -59,7 +59,7 @@ NonEmptyList.head<String>().asGetter().asks(String::decapitalize)
   .runId(NonEmptyList("Hello", "World", "Viewed", "With", "Optics"))
 ```
 
-There are also some convenience methods to make working with [State]({{ '/docs/datatypes/state' | relative_url }}) easier.
+There are also some convenience methods to make working with [State]({{ '/docs/arrow/data/state' | relative_url }}) easier.
 
 ```kotlin:ank
 import arrow.data.*

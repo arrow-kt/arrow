@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: Profunctor
-permalink: /docs/typeclasses/profunctor/
+permalink: /docs/arrow/typeclasses/profunctor/
+redirect_from:
+  - /docs/typeclasses/profunctor
 ---
 
 ## Profunctor
@@ -11,7 +13,7 @@ intermediate
 
 Before reading this typeclass we recommend you to understand [Contravariance](https://typeclasses.com/contravariance) first. But for making things easier we will consider `Contravariance` as the ability to _flip composition_.
 
-`Profunctors` are [`Bifunctors`]({{ '/docs/typeclasses/bifunctor' | relative_url }}) that are contravariant in their first argument and covariant in the second one.
+`Profunctors` are [`Bifunctors`]({{ '/docs/arrow/typeclasses/bifunctor' | relative_url }}) that are contravariant in their first argument and covariant in the second one.
 
 The core operation of the `Profunctor` typeclass is `dimap` (as `bimap` was already taken for `Bifunctor`).
 
@@ -35,7 +37,7 @@ val g = sum2 andThen str
 f(4) == g(4) 
 ```
 
-Functions are a binary type constructor of an input type and an output type. It is implemented in [`Function1`]({{ '/docs/datatypes/function1' | relative_url }}).
+Functions are a binary type constructor of an input type and an output type. It is implemented in [`Function1`]({{ '/docs/arrow/core/function1' | relative_url }}).
 
 So, if we have a function `(A) -> B` and a `Profunctor` instance for it, we can make the following transformation with `dimap`: `((C) -> A) -> ((A) -> B) -> ((B) -> D)`.
 

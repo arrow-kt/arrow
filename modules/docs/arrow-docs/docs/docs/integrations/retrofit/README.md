@@ -9,7 +9,7 @@ permalink: /docs/integrations/retrofit/
 {:.advanced}
 advanced
 
-Arrow contains a integration module for Retrofit so you can use any synchronous or asynchronous datatype of your choice, like [`Try`]({{ '/docs/datatypes/try' | relative_url }}), [`ObservableK`]({{ '/docs/integrations/rx2' | relative_url }}), [`IO`]({{ '/docs/effects/io' | relative_url }}) or [`DeferredK`]({{ '/docs/integrations/kotlinxcoroutines' | relative_url }}).
+Arrow contains a integration module for Retrofit so you can use any synchronous or asynchronous datatype of your choice, like [`Try`]({{ '/docs/arrow/core/try' | relative_url }}), [`ObservableK`]({{ '/docs/integrations/rx2' | relative_url }}), [`IO`]({{ '/docs/effects/io' | relative_url }}) or [`DeferredK`]({{ '/docs/integrations/kotlinxcoroutines' | relative_url }}).
 
 
 ### Using `Call` directly with extensions functions

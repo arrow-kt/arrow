@@ -13,7 +13,7 @@ intermediate
 
 This doc has been adapted from Mikhail Shilkov's blog entry [`Monads explained in C# (again)`](https://mikhail.io/2018/07/monads-explained-in-csharp-again/). It attempts to explain the rationale behind Monads, providing simple examples and how they relate to standard library constructs.
 
-If you're just interested in the API, head down to the [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) typeclass page.
+If you're just interested in the API, head down to the [`Monad`]({{ '/docs/arrow/typeclasses/monad' | relative_url }}) typeclass page.
 
 ### Intro
 
@@ -401,7 +401,7 @@ Keep going and let's have a look at several sample implementations of Monad patt
 
 My first example was with nullable `?`. The full pattern containing either 0 or 1 instance of some type is called Option (it maybe has a value, or maybe not).
 
-Option is another approach to dealing with "no value" value, alternative to the concept of null. You can read more about [`Option`]({{ '/docs/datatypes/option' | relative_url }}) to see how Arrow implemented it.
+Option is another approach to dealing with "no value" value, alternative to the concept of null. You can read more about [`Option`]({{ '/docs/arrow/core/option' | relative_url }}) to see how Arrow implemented it.
 
 When null is not allowed, any API contract gets more explicit: either you return type `T` and it's always going to be filled, or you return `Option<T>`.
 The client will see that Option type is used, so it will be forced to handle the case of absent value.

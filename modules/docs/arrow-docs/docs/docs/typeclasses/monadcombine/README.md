@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: MonadCombine
-permalink: /docs/typeclasses/monadcombine/
+permalink: /docs/arrow/mtl/typeclasses/monadcombine/
+redirect_from:
+  - /docs/typeclasses/monadcombine
 ---
 
 ## MonadCombine

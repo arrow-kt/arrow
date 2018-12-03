@@ -46,11 +46,11 @@ although you may find it in other languages referred as `andThen`, `then`, `bind
 It takes as a parameter one function to be called after the current operation completes, and that function has to return another value to continue the operation with.
 With knowledge of `flatMap` we can write sequential expressions that are ran asynchronously, even over multiple threads.
 
-The [typeclass]({{ '/docs/typeclasses/intro' | relative_url }}) interface that abstracts sequenced execution of code via `flatMap` is called a [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}),
+The [typeclass]({{ '/docs/typeclasses/intro' | relative_url }}) interface that abstracts sequenced execution of code via `flatMap` is called a [`Monad`]({{ '/docs/arrow/typeclasses/monad' | relative_url }}),
 for which we also have a [tutorial]({{ '/docs/patterns/monads' | relative_url }}).
 
-Implementations of [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) are available for internal types like `Try` and also integrations like [RxJava 2]({{ '/docs/integrations/rx2' | relative_url }}) and [kotlinx.coroutines]({{ '/docs/integrations/kotlinxcoroutines' | relative_url }}).
-Let's see one example using a [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) called [`IO`]({{ '/docs/effects/io' | relative_url }}), where we fetch from a database the information about the dean of university some student attends:
+Implementations of [`Monad`]({{ '/docs/arrow/typeclasses/monad' | relative_url }}) are available for internal types like `Try` and also integrations like [RxJava 2]({{ '/docs/integrations/rx2' | relative_url }}) and [kotlinx.coroutines]({{ '/docs/integrations/kotlinxcoroutines' | relative_url }}).
+Let's see one example using a [`Monad`]({{ '/docs/arrow/typeclasses/monad' | relative_url }}) called [`IO`]({{ '/docs/effects/io' | relative_url }}), where we fetch from a database the information about the dean of university some student attends:
 
 ```kotlin
 val university: IO<University> = 
@@ -72,12 +72,12 @@ Computer science can bring us a construct to get the best of both styles.
 
 This feature is known with multiple names: async/await, coroutines, do notation, for comprehensions...each version contains certain unique points but all derive from the same principles.
 In Kotlin, coroutines (introduced in version 1.1 of the language) make the compiler capable of rewriting seemingly synchronous code intro asynchronous sequences.
-Arrow uses this capability of the compiler to bring you coroutines-like notation to all instances of the [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) typeclass.
+Arrow uses this capability of the compiler to bring you coroutines-like notation to all instances of the [`Monad`]({{ '/docs/arrow/typeclasses/monad' | relative_url }}) typeclass.
 
 This means that comprehensions are available for `Option`, `Try`, `List`, `Reader`, `Observable`, `Flux` or `IO` all the same.
 In the following examples we'll use `IO` as it's a simple concurrency primitive with straightforward behavior.
 
-Every instance of [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) contains a method `binding` that receives a suspended function as a parameter.
+Every instance of [`Monad`]({{ '/docs/arrow/typeclasses/monad' | relative_url }}) contains a method `binding` that receives a suspended function as a parameter.
 This functions must return the last element of the sequence of operations.
 Let's see a minimal example.
 
@@ -164,7 +164,7 @@ While this looks like a great improvement to manually raise errors sometimes you
 
 ### Error propagation in comprehensions
 
-While [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) represents sequential code, it doesn't account for an existing execution flow pattern: exceptions.
+While [`Monad`]({{ '/docs/arrow/typeclasses/monad' | relative_url }}) represents sequential code, it doesn't account for an existing execution flow pattern: exceptions.
 Exceptions work like old goto that can happen at any point during execution and stop the current block to jump to a catch block.
 
 Let's take a somewhat common mistake and expand on it:
@@ -184,8 +184,8 @@ What would happen if the file contains 0 lines? The chain throws ArithmeticExcep
 This exception goes uncaught and finalizes the program with a crash. Knowing this it is obvious we can do better.
 
 Our next approach can do automatic wrapping of unexpected exceptions to return them inside the operation sequence.
-For this purpose, the typeclass [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) was created.
-[`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) allows us to raise and recover from errors.
+For this purpose, the typeclass [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}) was created.
+[`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}) allows us to raise and recover from errors.
 It also contains a version of comprehensions that automatically wraps exceptions, called `bindingCatch`.
 
 ```kotlin
@@ -202,7 +202,7 @@ fun getLineLengthAverage(path: FilePath): IO<List<String>> =
 With a small change we get handling of exceptions even within the binding block.
 This wrapping works the same way as if we raised an error as the return from `getFile()` or `readLines()`, short-circuiting and stopping the sequence early.
 
-Note that while most data types include an instance of [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}), [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) is somewhat less common.
+Note that while most data types include an instance of [`Monad`]({{ '/docs/arrow/typeclasses/monad' | relative_url }}), [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}) is somewhat less common.
 
 ### What about those threads?
 

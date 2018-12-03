@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: Const
-permalink: /docs/datatypes/const/
+permalink: /docs/arrow/typeclasses/const/
+redirect_from:
+  - /docs/datatypes/const
 ---
 
 ## Const

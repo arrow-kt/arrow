@@ -21,7 +21,7 @@ compile 'io.arrow-kt:arrow-generic:$arrow_version'
 
 #### Coproduct
 
-Coproducts represent a sealed hierarchy of types where only one of the specified set of types exist every time. Conceptually, it's very similar to the stdlib `sealed` class, or to [Either]({{ '/docs/datatypes/either' | relative_url }}) if we move on to Arrow data types. [Either]({{ '/docs/datatypes/either' | relative_url }}) supports one of two values, an `Either<A, B>` has to contain an instance of `A` or `B`. We can extrapolate that concept to `N` number of types. So a `Coproduct5<A, B, C, D, E>` has to contain an instance of `A`, `B`, `C`, `D`, or `E`. For example, perhaps there's a search function for a Car Dealer app that can show `Dealership`s, `Car`s and `SalesPerson`s in a list, we could model that list of results as `List<Coproduct3<Dealership, Car, SalesPerson>`. The result would contain a list of heterogeneous elements but each element is one of `Dealership`, `Car` or `SalesPerson` and our UI can render the list elements based on those types.
+Coproducts represent a sealed hierarchy of types where only one of the specified set of types exist every time. Conceptually, it's very similar to the stdlib `sealed` class, or to [Either]({{ '/docs/arrow/core/either' | relative_url }}) if we move on to Arrow data types. [Either]({{ '/docs/arrow/core/either' | relative_url }}) supports one of two values, an `Either<A, B>` has to contain an instance of `A` or `B`. We can extrapolate that concept to `N` number of types. So a `Coproduct5<A, B, C, D, E>` has to contain an instance of `A`, `B`, `C`, `D`, or `E`. For example, perhaps there's a search function for a Car Dealer app that can show `Dealership`s, `Car`s and `SalesPerson`s in a list, we could model that list of results as `List<Coproduct3<Dealership, Car, SalesPerson>`. The result would contain a list of heterogeneous elements but each element is one of `Dealership`, `Car` or `SalesPerson` and our UI can render the list elements based on those types.
 
 ```kotlin:ank
 import arrow.generic.*
@@ -74,7 +74,7 @@ import arrow.generic.coproduct3.coproductOf
 
 ##### cop
 
-You might be saying "That's great and all but passing in values as parameters is so Java, I want something more Kotlin!". Well look no further, just like [Either]({{ '/docs/datatypes/either' | relative_url }})'s `left()` and `right()` extension methods, Coproducts can be created with an extension method on any type:
+You might be saying "That's great and all but passing in values as parameters is so Java, I want something more Kotlin!". Well look no further, just like [Either]({{ '/docs/arrow/core/either' | relative_url }})'s `left()` and `right()` extension methods, Coproducts can be created with an extension method on any type:
 
 ```kotlin:ank
 import arrow.generic.*

@@ -33,7 +33,7 @@ interface NonZero<F, A : Number> : Refinement<F, A> {
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val x = 0.nonZero()
+   *   val result = 0.nonZero()
    *  //sampleEnd
    *
    *  println(result.isValid)
