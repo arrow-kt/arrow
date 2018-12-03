@@ -8,12 +8,12 @@ import arrow.higherkind
 import arrow.typeclasses.*
 
 /**
- * Alias that represents an arrow from [D] to a monadic value `Kind<F, A>`
+ * Alias that represents a function from [D] to a monadic value `Kind<F, A>`
  */
 typealias KleisliFun<F, D, A> = (D) -> Kind<F, A>
 
 /**
- * [Kleisli] represents an arrow from [D] to a monadic value `Kind<F, A>`.
+ * [Kleisli] represents a function parameter from [D] to a value `Kind<F, A>`.
  *
  * @param F the context of the result.
  * @param D the dependency or environment we depend on.
