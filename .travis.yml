@@ -21,6 +21,7 @@ env:
  global:
  # include $HOME/.local/bin for `aws`
  - PATH=$HOME/.local/bin:$PATH
+ - JAVA_OPTS="-Xms512m -Xmx1024m"
 
 before_install:
 - pip install --user awscli
@@ -31,12 +32,12 @@ jobs:
  - stage: build-and-dokka
    script:
    # redirecting outputs to files to avoid exceeding travis' logs limit
-   - ./gradlew clean build > build.log
-   - ./gradlew dokka :arrow-docs:runAnk > run_ank.log
+   - ./gradlew clean build
+   - ./gradlew dokka :arrow-docs:runAnk
  - stage: build-and-dokka-transfer
    script:
-   - ./gradlew clean build > build.log
-   - ./gradlew dokka :arrow-docs:runAnk > run_ank.log
+   - ./gradlew clean build
+   - ./gradlew dokka :arrow-docs:runAnk
    - aws s3 sync modules/docs/arrow-docs/build/site s3://$S3_BUCKET/site > aws_sync_dokka.log
  - stage: coverage-report
    script:
@@ -49,6 +50,6 @@ jobs:
    script:
    - aws s3 sync s3://$S3_BUCKET/site ~/site > aws_sync_jekyll.log
    - rvm use 2.5.3 --install --fuzzy
-   - bundle install --gemfile modules/docs/arrow-docs/Gemfile --path vendor/bundle   
-   - bundle exec jekyll build -s ~/site -d ~/_site
+   - bundle install --gemfile modules/docs/arrow-docs/Gemfile --path vendor/bundle
+   - travis_wait 10 BUNDLE_GEMFILE=modules/docs/arrow-docs/Gemfile bundle exec jekyll build -s ~/site -d ~/_site
    - aws s3 sync ~/_site s3://$S3_BUCKET > aws_sync_site.log
