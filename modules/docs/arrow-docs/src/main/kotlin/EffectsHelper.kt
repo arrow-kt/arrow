@@ -29,8 +29,8 @@ fun <A, B, C> parMap(first: DeferredK<A>,
     val fiberOne: Fiber<ForDeferredK, A> = first.startF(IO).bind()
     val fiberTwo: Fiber<ForDeferredK, B> = second.startF(IO).bind()
 
-    val one: A = fiberOne.join.bind()
-    val two: B = fiberTwo.join.bind()
+    val one: A = fiberOne.join().bind()
+    val two: B = fiberTwo.join().bind()
     f(one, two)
   }.fix()
 

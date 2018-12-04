@@ -2,12 +2,37 @@ package arrow.effects
 
 import arrow.core.*
 import arrow.effects.internal.*
+import arrow.effects.typeclasses.Duration
 import arrow.effects.typeclasses.Fiber
+import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledExecutorService
+import java.util.concurrent.ThreadFactory
+import java.util.concurrent.TimeUnit
 import kotlin.coroutines.*
 import kotlin.coroutines.Continuation
 
 /**
- * Create a new [IO] that upon execution starts the receiver [IO] within a [Fiber].
+ * Create a new [IO] that upon execution starts the receiver [IO] within a [Fiber] on [ctx].
+ *
+ * {: data-executable='true'}
+ *
+ * ```kotlin:ank
+ * import arrow.effects.*
+ * import arrow.effects.instances.io.async.async
+ * import arrow.effects.instances.io.monad.binding
+ * import kotlinx.coroutines.Dispatchers
+ *
+ * fun main(args: Array<String>) {
+ *   //sampleStart
+ *   binding {
+ *     val promise = Promise.uncancelable<ForIO, Int>(IO.async()).bind()
+ *     val fiber = promise.get.startF(Dispatchers.Default).bind()
+ *     promise.complete(1).bind()
+ *     fiber.join().bind()
+ *   }.unsafeRunSync() == 1
+ *   //sampleEnd
+ * }
+ * ```
  *
  * @receiver [IO] to execute on [ctx] within a new suspended [IO].
  * @param ctx [CoroutineContext] to execute the source [IO] on.

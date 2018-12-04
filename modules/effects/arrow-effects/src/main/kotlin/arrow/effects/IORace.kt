@@ -11,6 +11,43 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine
 import kotlin.coroutines.suspendCoroutine
 
+/**
+ * Race two tasks concurrently within a new [IO].
+ * Race results in a winner and the other, yet to finish task running in a [Fiber].
+ *
+ * {: data-executable='true'}
+ *
+ * ```kotlin:ank
+ * import arrow.effects.*
+ * import arrow.effects.instances.io.async.async
+ * import arrow.effects.instances.io.concurrent.racePair
+ * import arrow.effects.instances.io.monad.binding
+ * import arrow.effects.typeclasses.Fiber
+ * import kotlinx.coroutines.Dispatchers
+ * import java.lang.RuntimeException
+ *
+ * fun main(args: Array<String>) {
+ *   //sampleStart
+ *   binding {
+ *     val promise = Promise.uncancelable<ForIO, Int>(IO.async()).bind()
+ *     val eitherGetOrUnit = racePair(Dispatchers.Default, promise.get, IO.unit).bind()
+ *     eitherGetOrUnit.fold(
+ *       { IO.raiseError<Int>(RuntimeException("Promise.get cannot win before complete")) },
+ *       { (a: Fiber<ForIO, Int>, _) -> promise.complete(1).flatMap { a.join() } }
+ *     ).bind()
+ *   }.unsafeRunSync() == 1
+ *   //sampleEnd
+ * }
+ * ```
+ *
+ * @param ctx [CoroutineContext] to execute the source [IO] on.
+ * @param ioA task to participate in the race
+ * @param ioB task to participate in the race
+ * @return [IO] either [Left] with product of the winner's result [ioA] and still running task [ioB],
+ *   or [Right] with product of running task [ioA] and the winner's result [ioB].
+ *
+ * @see raceN for a simpler version that cancels loser.
+ */
 fun <A, B> IO.Companion.racePair(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<B>): IO<Either<Tuple2<A, Fiber<ForIO, B>>, Tuple2<Fiber<ForIO, A>, B>>> =
   IO.async { conn, cb ->
     val active = AtomicBoolean(true)
