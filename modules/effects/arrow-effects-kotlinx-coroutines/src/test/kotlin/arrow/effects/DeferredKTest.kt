@@ -10,7 +10,7 @@ import arrow.core.Try
 import arrow.data.ListK
 import arrow.data.NonEmptyList
 import arrow.data.k
-import arrow.effects.deferredk.concurrent.concurrent
+import arrow.effects.deferredk.async.async
 import arrow.instances.`try`.functor.functor
 import arrow.instances.`try`.traverse.traverse
 import arrow.instances.option.functor.functor
@@ -50,7 +50,7 @@ class DeferredKTest : UnitSpec() {
   }
 
   init {
-    testLaws(ConcurrentLaws.laws(DeferredK.concurrent(), EQ(), EQ(), EQ()))
+    testLaws(AsyncLaws.laws(DeferredK.async(), EQ(), EQ()))
 
     "DeferredK is awaitable" {
       forAll(genIntSmall(), genIntSmall(), genIntSmall()) { x: Int, y: Int, z: Int ->
@@ -233,11 +233,11 @@ class DeferredKTest : UnitSpec() {
       Promise.uncancelable<ForDeferredK, Unit>(DeferredK.async())
         .flatMap { latch ->
           DeferredK {
-            val d =
-              DeferredK.async<Unit> { _, _ -> }
+            val d = DeferredK.async<Unit> { _, _ -> }
                 .apply { invokeOnCompletion { e -> if (e is CancellationException) latch.complete(Unit).unsafeRunAsync { } } }
             d.start()
-            d.cancelAndJoin()
+            d.cancel()
+            d.join()
           }.flatMap { latch.get }
         }.unsafeRunSync() shouldBe Unit
     }

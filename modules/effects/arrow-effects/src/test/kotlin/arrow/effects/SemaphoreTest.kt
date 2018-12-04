@@ -38,7 +38,7 @@ class SemaphoreTest : UnitSpec() {
     "acquire n synchronously" {
       val n = 20L
       semaphore(n).flatMap { s ->
-        (0 until n).toList().traverse(IO.applicative()) { s.acquire }.flatMap {
+        (0 until n).toList().traverse(IO.applicative()) { s.acquire() }.flatMap {
           s.available()
         }
       }.equalUnderTheLaw(IO.just(0L), EQ(Long.eq()))
@@ -47,7 +47,7 @@ class SemaphoreTest : UnitSpec() {
     "tryAcquire with available permits" {
       val n = 20
       semaphore(20).flatMap { s ->
-        (0 until n).toList().traverse(IO.applicative()) { s.acquire }.flatMap {
+        (0 until n).toList().traverse(IO.applicative()) { s.acquire() }.flatMap {
           s.tryAcquire()
         }
       }.equalUnderTheLaw(IO.just(true), EQ(Boolean.eq()))
@@ -56,7 +56,7 @@ class SemaphoreTest : UnitSpec() {
     "tryAcquire with no available permits" {
       val n = 20
       semaphore(20).flatMap { s ->
-        (0 until n).toList().traverse(IO.applicative()) { s.acquire }.flatMap {
+        (0 until n).toList().traverse(IO.applicative()) { s.acquire() }.flatMap {
           s.tryAcquire()
         }
       }.equalUnderTheLaw(IO.just(false), EQ(Boolean.eq()))

@@ -3,7 +3,6 @@ package arrow.effects.typeclasses
 import arrow.Kind
 import arrow.core.*
 import arrow.effects.Fiber
-import arrow.effects.IO
 import kotlin.coroutines.CoroutineContext
 
 /**

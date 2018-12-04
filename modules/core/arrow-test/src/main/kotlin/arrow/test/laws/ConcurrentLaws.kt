@@ -3,16 +3,19 @@ package arrow.test.laws
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.identity
+import arrow.effects.MVar
 import arrow.effects.Promise
 import arrow.effects.Semaphore
 import arrow.effects.typeclasses.Concurrent
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.generators.genEither
 import arrow.test.generators.genThrowable
+import arrow.test.laws.ConcurrentLaws.releaseIsNotCancelable
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kotlinx.coroutines.Dispatchers
+import java.lang.RuntimeException
 import kotlin.coroutines.CoroutineContext
 
 object ConcurrentLaws {
@@ -32,15 +35,15 @@ object ConcurrentLaws {
       Law("Concurrent Laws: start cancel is unit") { CF.startCancelIsUnit(EQ_UNIT, ctx) },
       Law("Concurrent Laws: uncancelable mirrors source") { CF.uncancelableMirrorsSource(EQ) },
 //      Law("Concurrent Laws: uncancelable prevents cancelation") { CF.uncancelablePreventsCancelation(EQ) },
-//      Law("Concurrent Laws: acquire is not cancelable") { CF.acquireIsNotCancelable(EQ) },
-//      Law("Concurrent Laws: release is not cancelable") { CF.releaseIsNotCancelable(EQ) },
+      Law("Concurrent Laws: acquire is not cancelable") { CF.acquireIsNotCancelable(EQ, ctx) },
+      Law("Concurrent Laws: release is not cancelable") { CF.releaseIsNotCancelable(EQ, ctx) },
       Law("Concurrent Laws: race mirrors left winner") { CF.raceMirrorsLeftWinner(EQ, ctx) },
       Law("Concurrent Laws: race mirrors right winner") { CF.raceMirrorsRightWinner(EQ, ctx) },
       Law("Concurrent Laws: race cancels loser") { CF.raceCancelsLoser(EQ, ctx) },
       Law("Concurrent Laws: race cancels both") { CF.raceCancelsBoth(EQ, ctx) },
       Law("Concurrent Laws: race pair mirrors left winner") { CF.racePairMirrorsLeftWinner(EQ, ctx) },
       Law("Concurrent Laws: race pair mirrors right winner") { CF.racePairMirrorsRightWinner(EQ, ctx) },
-//      Law("Concurrent Laws: race pair cancels loser") { CF.racePairCancelsLoser(EQ) },
+      Law("Concurrent Laws: race pair cancels loser") { CF.racePairCancelsLoser(EQ, ctx) },
       Law("Concurrent Laws: race pair can join left") { CF.racePairCanJoinLeft(EQ, ctx) },
       Law("Concurrent Laws: race pair can join right") { CF.racePairCanJoinRight(EQ, ctx) },
       Law("Concurrent Laws: race pair can join both") { CF.racePairCancelsBoth(EQ, ctx) },
@@ -98,6 +101,36 @@ object ConcurrentLaws {
       just(i).uncancelable().equalUnderTheLaw(just(i), EQ)
     }
 
+  fun <F> Concurrent<F>.acquireIsNotCancelable(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
+    forAll(Gen.int(), Gen.int()) { a, b ->
+      binding {
+        val mvar = MVar.uncancelableOf(a, this@acquireIsNotCancelable).bind()
+        val p = Promise.uncancelable<F, Unit>(this@acquireIsNotCancelable).bind()
+        val task = p.complete(Unit).flatMap { mvar.put(b) }.bracket(use = { never<Int>()}, release = { just(Unit) })
+        val fiber = task.startF(ctx).bind()
+        p.get.bind()
+        fiber.cancel().startF(ctx).bind()
+        continueOn(ctx)
+        mvar.take().bind()
+        mvar.take().bind()
+      }.equalUnderTheLaw(just(b), EQ)
+    }
+
+  fun <F> Concurrent<F>.releaseIsNotCancelable(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
+    forAll(Gen.int(), Gen.int()) { a, b ->
+      binding {
+        val mvar = MVar.uncancelableOf(a, this@releaseIsNotCancelable).bind()
+        val p = Promise.uncancelable<F, Unit>(this@releaseIsNotCancelable).bind()
+        val task = p.complete(Unit).bracket(use= { never<Int>() }, release = { mvar.put(b) })
+        val fiber = task.startF(ctx).bind()
+        p.get.bind()
+        fiber.cancel().startF(ctx).bind()
+        continueOn(ctx)
+        mvar.take().bind()
+        mvar.take().bind()
+      }.equalUnderTheLaw(just(b), EQ)
+    }
+
   fun <F> Concurrent<F>.raceMirrorsLeftWinner(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext): Unit =
     forAll(Gen.int()) { i ->
       val fa = just(i)
@@ -119,8 +152,8 @@ object ConcurrentLaws {
       binding {
         val s = Semaphore.uncancelable(0L, this@raceCancelsLoser).bind()
         val promise = Promise.uncancelable<F, Int>(this@raceCancelsLoser).bind()
-        val winner = s.acquire.flatMap { async<String> { cb -> cb(eith) } }
-        val loser = s.release.bracket(use = { never<Int>() }, release = { promise.complete(i) })
+        val winner = s.acquire().flatMap { async<String> { cb -> cb(eith) } }
+        val loser = s.release().bracket(use = { never<Int>() }, release = { promise.complete(i) })
         val race =
           if (leftWins) raceN(ctx, winner, loser)
           else raceN(ctx, loser, winner)
@@ -136,8 +169,8 @@ object ConcurrentLaws {
         val pa = Promise.uncancelable<F, Int>(this@raceCancelsBoth).bind()
         val pb = Promise.uncancelable<F, Int>(this@raceCancelsBoth).bind()
 
-        val loserA = ss.release.bracket(use = { never<String>() }, release = { pa.complete(a) })
-        val loserB = ss.release.bracket(use = { never<Int>() }, release = { pb.complete(b) })
+        val loserA = ss.release().bracket(use = { never<String>() }, release = { pa.complete(a) })
+        val loserB = ss.release().bracket(use = { never<Int>() }, release = { pb.complete(b) })
 
         val race = raceN(ctx, loserA, loserB).startF(ctx).bind()
         ss.acquireN(2L).flatMap { race.cancel() }.bind()
@@ -172,6 +205,34 @@ object ConcurrentLaws {
       received.equalUnderTheLaw(raceN(ctx, never, fa).map { it.fold(::identity, ::identity) }, EQ)
     }
 
+  fun <F> Concurrent<F>.racePairCancelsLoser(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
+    forAll(genEither(genThrowable(), Gen.string()), Gen.bool(), Gen.int()) { eith, leftWinner, i ->
+      val received = binding {
+        val s = Semaphore.uncancelable(0L, this@racePairCancelsLoser).bind()
+        val p = Promise.uncancelable<F, Int>(this@racePairCancelsLoser).bind()
+        val winner = s.acquire().flatMap { async<String> { cb -> cb(eith) } }
+        val loser = s.release().bracket(release = { p.complete(i) }, use = { never<String>() })
+        val race = if (leftWinner) racePair(ctx, winner, loser)
+        else racePair(ctx, loser, winner)
+
+        race.attempt()
+          .flatMap { attempt ->
+            attempt.fold(
+              { p.get },
+              {
+                it.fold(
+                  { (_, fiberB) -> fiberB.cancel().startF(ctx).flatMap { p.get } },
+                  { (fiberA, _) -> fiberA.cancel().startF(ctx).flatMap { p.get } }
+                )
+              }
+            )
+          }.bind()
+
+      }
+
+      received.equalUnderTheLaw(just(i), EQ)
+    }
+
   fun <F> Concurrent<F>.racePairCanJoinLeft(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
     forAll(Gen.int()) { i ->
       Promise.uncancelable<F, Int>(this@racePairCanJoinLeft).flatMap { p ->
@@ -190,7 +251,7 @@ object ConcurrentLaws {
         racePair(ctx, just(Unit), p.get).flatMap { eith ->
           eith.fold(
             { (_, fiber) -> p.complete(i).flatMap { fiber.join() } },
-            { (_, unit) ->  just(unit) }
+            { (_, unit) -> just(unit) }
           )
         }
       }.equalUnderTheLaw(just(i), EQ)
@@ -201,12 +262,12 @@ object ConcurrentLaws {
       binding {
         val s = Semaphore.uncancelable(0L, this@racePairCancelsBoth).bind()
         val pa = Promise.uncancelable<F, Int>(this@racePairCancelsBoth).bind()
-        val loserA: Kind<F, Int> = s.release.bracket(use= { never<Int>() }, release = { pa.complete(a) })
+        val loserA: Kind<F, Int> = s.release().bracket(use = { never<Int>() }, release = { pa.complete(a) })
         val pb = Promise.uncancelable<F, Int>(this@racePairCancelsBoth).bind()
-        val loserB: Kind<F, Int> = s.release.bracket(use = { never<Int>() }, release = { pb.complete(b) })
+        val loserB: Kind<F, Int> = s.release().bracket(use = { never<Int>() }, release = { pb.complete(b) })
         val race = racePair(ctx, loserA, loserB).startF(ctx).bind()
         s.acquireN(2L).flatMap { race.cancel() }.bind()
-         pa.get.bind() + pb.get.bind()
+        pa.get.bind() + pb.get.bind()
       }.equalUnderTheLaw(just(a + b), EQ)
     }
 

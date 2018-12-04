@@ -94,8 +94,8 @@ interface Semaphore<F> {
    *
    * @see acquireN
    */
-  val acquire: Kind<F, Unit>
-    get() = acquireN(1)
+  fun acquire(): Kind<F, Unit> =
+    acquireN(1)
 
   /**
    * Try to acquires [n] resources and get an immediate response as [Boolean].
@@ -317,6 +317,6 @@ internal class UncancelableSemaphore<F>(private val state: Ref<F, State<F>>,
     }
 
   override fun <A> withPermit(t: Kind<F, A>): Kind<F, A> =
-    acquire.bracket({ release() }, { t })
+    acquire().bracket({ release() }, { t })
 
 }

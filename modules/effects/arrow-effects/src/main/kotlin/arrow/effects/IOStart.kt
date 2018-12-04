@@ -2,12 +2,7 @@ package arrow.effects
 
 import arrow.core.*
 import arrow.effects.internal.*
-import arrow.effects.typeclasses.Duration
 import arrow.effects.typeclasses.Fiber
-import java.util.concurrent.Executors
-import java.util.concurrent.ScheduledExecutorService
-import java.util.concurrent.ThreadFactory
-import java.util.concurrent.TimeUnit
 import kotlin.coroutines.*
 import kotlin.coroutines.Continuation
 

@@ -3,7 +3,6 @@ package arrow.effects
 import arrow.Kind
 import arrow.core.*
 import arrow.effects.typeclasses.Async
-import arrow.effects.typeclasses.Concurrent
 import java.util.concurrent.atomic.AtomicReference
 
 /**
