@@ -29,6 +29,8 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
 
   fun processorUtils(): ProcessorUtils
 
+  fun Element.kDoc(): String?
+
   val typeElementToMeta: (classElement: TypeElement) -> ClassOrPackageDataWrapper
 
   val TypeElement.meta: ClassOrPackageDataWrapper.Class
@@ -75,6 +77,7 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
       encodingResult.map {
         val typeElement = this@type as TypeElement
         it.copy(
+          kdoc = typeElement.kDoc()?.let(::Code),
           annotations = typeElement.annotations(),
           modifiers = typeElement.modifiers(),
           typeVariables = typeElement.typeVariables(),
@@ -212,6 +215,8 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
 
   fun TypeElement.allFunctions(declaredElement: TypeElement): List<Func> =
     processorUtils().run {
+      val comment = processingEnv.elementUtils.getDocComment(declaredElement)
+      println("Comment declaredElement: $comment")
       val superTypes = supertypes(
         declaredElement.meta,
         TypeTable(declaredElement.meta.classProto.typeTable),
@@ -240,7 +245,10 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
             member,
             declaredType,
             processorUtils().typeUtils
-          ).build().toMeta(member)
+          ).build().toMeta(member).let {
+            it.copy(kdoc = member.kDoc()?.let(::Code))
+          }
+
           val result =
             if (templateFunction != null && templateFunction.second.modality != null) {
               val fMod = function.copy(

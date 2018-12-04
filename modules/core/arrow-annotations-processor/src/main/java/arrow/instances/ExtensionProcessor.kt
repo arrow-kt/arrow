@@ -1,10 +1,11 @@
 package arrow.instances
 
 import arrow.common.messager.log
-import arrow.common.utils.*
+import arrow.common.utils.knownError
 import arrow.extension
 import arrow.meta.ast.*
 import arrow.meta.encoder.TypeClassInstance
+import arrow.meta.encoder.jvm.quote
 import arrow.meta.processor.MetaProcessor
 import com.google.auto.service.AutoService
 import com.squareup.kotlinpoet.FileSpec
@@ -124,6 +125,41 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class) {
   private fun notAnInstanceError(): Nothing =
     knownError("@instance is only allowed on `interface` extending another interface of at least one type argument (type class) as first declaration in the instance list")
 
+  private fun Code.eval(info: TypeClassInstance): Code {
+    val packageName = PackageName(info.instance.packageName.value +
+      "." + info.projectedCompanion.simpleName.substringAfterLast(".").toLowerCase() +
+      "." + info.typeClass.name.simpleName.decapitalize())
+    val extensionFactoryTypeArgs =
+      if (info.dataType.typeVariables.size < 2) ""
+      else info.dataType.typeVariables.dropLast(1).joinToString(
+        separator = ", ",
+        prefix = "<",
+        postfix = ">",
+        transform = {
+          "Int"
+        }
+      )
+    val extensionFactory =
+      "${info.dataType.name.simpleName}.${info.typeClass.name.simpleName.decapitalize()}$extensionFactoryTypeArgs()"
+    return copy(
+      value = value
+        .replace(
+          "_imports_",
+          """|import ${info.dataType.name.rawName}
+             |import ${packageName.value.quote()}.*
+             |""".trimMargin()
+        )
+        .replace(
+          "_extensionFactory_",
+          extensionFactory
+        )
+        .replace(
+          "_dataType_",
+          info.dataType.name.simpleName
+        )
+    )
+  }
+
   fun TypeClassInstance.genCompanionFactory(targetType: TypeName): Func {
     val target = when (projectedCompanion) {
       is TypeName.Classy -> projectedCompanion.companion()
@@ -134,6 +170,7 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class) {
       )
     }
     return Func(
+      kdoc = this.typeClass.kdoc?.eval(this),
       name = typeClass.name.simpleName.decapitalize(),
       parameters = requiredParameters,
       receiverType = target,

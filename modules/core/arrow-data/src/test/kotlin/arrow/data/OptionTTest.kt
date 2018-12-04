@@ -1,16 +1,16 @@
 package arrow.data
 
 import arrow.Kind
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.Some
+import arrow.core.*
+import arrow.instances.list.traverse.sequence
 import arrow.instances.nonemptylist.monad.monad
+import arrow.instances.option.applicative.applicative
 import arrow.instances.option.monad.monad
-import arrow.instances.option.semigroup.semigroup
 import arrow.instances.optiont.applicative.applicative
 import arrow.instances.optiont.monad.monad
 import arrow.instances.optiont.monoidK.monoidK
 import arrow.instances.optiont.semigroupK.semigroupK
+import arrow.mtl.instances.list.functorFilter.flattenOption
 import arrow.mtl.instances.option.traverseFilter.traverseFilter
 import arrow.mtl.instances.optiont.functorFilter.functorFilter
 import arrow.mtl.instances.optiont.traverseFilter.traverseFilter
@@ -34,6 +34,11 @@ class OptionTTest : UnitSpec() {
   }
 
   val NELM: Monad<ForNonEmptyList> = NonEmptyList.monad()
+
+  val original: List<Option<Int>> = listOf(1.some(), none(), 2.some())
+
+  fun <A> List<Option<A>>.flatten(): List<A> =
+    flattenOption()
 
   init {
 

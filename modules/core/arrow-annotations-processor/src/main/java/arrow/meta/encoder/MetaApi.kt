@@ -15,6 +15,37 @@ data class TypeClassInstance(
   val projectedCompanion: TypeName
 )
 
+val KotlinReservedKeywords = setOf(
+  "package",
+  "as",
+  "typealias",
+  "class",
+  "this",
+  "super",
+  "val",
+  "var",
+  "fun",
+  "for",
+  "null",
+  "true",
+  "false",
+  "is",
+  "in",
+  "throw",
+  "return",
+  "break",
+  "continue",
+  "object",
+  "if",
+  "try",
+  "else",
+  "while",
+  "do",
+  "when",
+  "interface",
+  "typeof"
+)
+
 /**
  * Arrow-Meta provides a hydrated AST representing Kotlin Code.
  * The current implementation relies on TypeElement, KotlinMetadata library and Kotlin Poet

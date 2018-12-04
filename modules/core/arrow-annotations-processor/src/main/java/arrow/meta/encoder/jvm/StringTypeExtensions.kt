@@ -3,6 +3,7 @@ package arrow.meta.encoder.jvm
 import arrow.common.utils.removeBackticks
 import arrow.meta.ast.PackageName
 import arrow.meta.ast.TypeName
+import arrow.meta.encoder.KotlinReservedKeywords
 
 internal fun String.removeVariance(): String =
   replace("out ", "").replace("in ", "")
@@ -59,4 +60,10 @@ internal fun String.downKind(): Pair<String, String> =
       unAppliedName.endsWith("Of") -> Pair(kindedClassy.pckg.value, unAppliedName.substringBeforeLast("Of"))
       else -> Pair(kindedClassy.pckg.value, unAppliedName)
     }
+  }
+
+fun String.quote(): String =
+  split(".").joinToString(".") {
+    if (KotlinReservedKeywords.contains(it)) "`$it`"
+    else it
   }
