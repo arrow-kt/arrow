@@ -1,29 +1,20 @@
 package arrow.effects
 
-import arrow.Kind
 import arrow.core.*
 import arrow.effects.instances.io.async.async
 import arrow.effects.instances.io.monad.binding
 import arrow.effects.instances.io.monad.flatMap
 import arrow.effects.typeclasses.seconds
-import arrow.instances.either.eq.eq
-import arrow.instances.option.eq.eq
 import arrow.test.UnitSpec
 import arrow.test.laws.equalUnderTheLaw
-import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
+import kotlinx.coroutines.Dispatchers
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class MVarTest : UnitSpec() {
-
-  fun <A> EQ(): Eq<Kind<ForIO, A>> = Eq { a, b ->
-    arrow.core.Option.eq(arrow.core.Either.eq(Eq.any(), Eq.any())).run {
-      a.fix().attempt().unsafeRunTimed(60.seconds).eqv(b.fix().attempt().unsafeRunTimed(60.seconds))
-    }
-  }
 
   val mvar = MVar(IO.async())
 
@@ -31,7 +22,7 @@ class MVarTest : UnitSpec() {
 
     "empty; put; isNotEmpty; take; put; take" {
       forAll(Gen.int(), Gen.int()) { a, b ->
-        val task = binding {
+        binding {
           val av = mvar.empty<Int>().bind()
           val isEmpty = av.isEmpty().bind()
           av.put(a).bind()
@@ -40,15 +31,13 @@ class MVarTest : UnitSpec() {
           av.put(b).bind()
           val r2 = av.take().bind()
           Tuple4(isEmpty, isNotEmpty, r1, r2)
-        }
-
-        task.equalUnderTheLaw(IO.just(Tuple4(true, true, a, b)), EQ())
+        }.equalUnderTheLaw(IO.just(Tuple4(true, true, a, b)), EQ())
       }
     }
 
     "empty; tryPut; tryPut; isNotEmpty; tryTake; tryTake; put; take" {
       forAll(Gen.int(), Gen.int(), Gen.int()) { a, b, c ->
-        val task = binding {
+        binding {
           val av = mvar.empty<Int>().bind()
           val isEmpty = av.isEmpty().bind()
           val p1 = av.tryPut(a).bind()
@@ -59,15 +48,70 @@ class MVarTest : UnitSpec() {
           av.put(c).bind()
           val r3 = av.take().bind()
           Tuple7(isEmpty, p1, p2, isNotEmpty, r1, r2, r3)
-        }
-
-        task.equalUnderTheLaw(IO.just(Tuple7(true, true, false, true, Some(a), None, c)), EQ())
+        }.equalUnderTheLaw(IO.just(Tuple7(true, true, false, true, Some(a), None, c)), EQ())
       }
+    }
+
+    "empty; take; put; take; put" {
+        binding {
+          val av = mvar.empty<Int>().bind()
+
+          val f1 = av.take().startF(Dispatchers.Default).bind()
+          av.put(10).bind()
+
+          val f2 = av.take().startF(Dispatchers.Default).bind()
+          av.put(20).bind()
+
+          val aa = f1.join().bind()
+          val bb = f2.join().bind()
+
+          setOf(aa, bb)
+        }.equalUnderTheLaw(IO.just(setOf(10, 20)), EQ(timeout = 1.seconds))
+    }
+
+    "empty; put; put; put; take; take; take" {
+        binding {
+          val av = mvar.empty<Int>().bind()
+
+          val f1 = av.put(10).startF(Dispatchers.Default).bind()
+          val f2 = av.put(20).startF(Dispatchers.Default).bind()
+          val f3 = av.put(30).startF(Dispatchers.Default).bind()
+
+          val aa = av.take().bind()
+          val bb = av.take().bind()
+          val cc = av.take().bind()
+
+          f1.join().bind()
+          f2.join().bind()
+          f3.join().bind()
+
+          setOf(aa, bb, cc)
+        }.equalUnderTheLaw(IO.just(setOf(10, 20, 30)), EQ(timeout = 1.seconds))
+    }
+
+    "empty; take; take; take; put; put; put" {
+      binding {
+        val av = mvar.empty<Int>().bind()
+
+        val f1 = av.take().startF(Dispatchers.Default).bind()
+        val f2 = av.take().startF(Dispatchers.Default).bind()
+        val f3 = av.take().startF(Dispatchers.Default).bind()
+
+        av.put(10).bind()
+        av.put(20).bind()
+        av.put(30).bind()
+
+        val aa = f1.join().bind()
+        val bb = f2.join().bind()
+        val cc = f3.join().bind()
+
+        setOf(aa, bb, cc)
+      }.equalUnderTheLaw(IO.just(setOf(10, 20, 30)), EQ(timeout = 1.seconds))
     }
 
     "initial; isNotEmpty; take; put; take" {
       forAll(Gen.int(), Gen.int()) { a, b ->
-        val task = binding {
+        binding {
           val av = mvar.of(a).bind()
           val isNotEmpty = av.isNotEmpty().bind()
           val r1 = av.take().bind()
@@ -75,22 +119,18 @@ class MVarTest : UnitSpec() {
           val r2 = av.take().bind()
 
           Tuple3(isNotEmpty, r1, r2)
-        }
-
-        task.equalUnderTheLaw(IO.just(Tuple3(true, a, b)), EQ())
+        }.equalUnderTheLaw(IO.just(Tuple3(true, a, b)), EQ())
       }
     }
 
     "initial; read; take" {
       forAll(Gen.int()) { i ->
-        val task = binding {
+        binding {
           val av = mvar.of(i).bind()
           val read = av.read().bind()
           val take = av.take().bind()
           read toT take
-        }
-
-        task.equalUnderTheLaw(IO.just(i toT i), EQ())
+        }.equalUnderTheLaw(IO.just(i toT i), EQ())
       }
     }
 
