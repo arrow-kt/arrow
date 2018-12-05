@@ -13,10 +13,12 @@ import arrow.instances.eithert.traverse.traverse
 import arrow.effects.fix
 import arrow.effects.instances.eithert.monadDefer.monadDefer
 import arrow.effects.instances.io.applicativeError.attempt
+import arrow.effects.instances.io.async.async
 import arrow.effects.instances.io.monadDefer.monadDefer
 import arrow.effects.typeclasses.seconds
 import arrow.instances.*
 import arrow.instances.either.monadError.monadError
+import arrow.instances.eithert.async.async
 import arrow.instances.eithert.monadDefer.monadDefer
 import arrow.instances.id.monad.monad
 import arrow.instances.id.traverse.traverse
@@ -27,6 +29,7 @@ import arrow.test.laws.MonadDeferLaws
 import arrow.test.laws.MonadErrorLaws
 import arrow.test.laws.SemigroupKLaws
 import arrow.test.laws.TraverseLaws
+import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.forAll
@@ -42,7 +45,7 @@ class EitherTTest : UnitSpec() {
   init {
 
     testLaws(
-      MonadDeferLaws.laws(EitherT.monadDefer(IO.monadDefer()), EQ(), EQ()),
+      AsyncLaws.laws(EitherT.async(IO.async()), EQ(), EQ()),
       TraverseLaws.laws(EitherT.traverse<ForId, Int>(Id.traverse()), EitherT.applicative<ForId, Int>(Id.monad()), { EitherT(Id(Right(it))) }, Eq.any()),
       SemigroupKLaws.laws<EitherTPartialOf<ForId, Int>>(
         EitherT.semigroupK(Id.monad()),
