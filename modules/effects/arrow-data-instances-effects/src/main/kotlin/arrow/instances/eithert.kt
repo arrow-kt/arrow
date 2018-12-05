@@ -3,19 +3,15 @@ package arrow.instances
 import arrow.core.*
 import arrow.data.*
 import arrow.effects.Ref
-import arrow.effects.typeclasses.Bracket
-import arrow.effects.typeclasses.ExitCase
-import arrow.effects.typeclasses.MonadDefer
+import arrow.effects.typeclasses.*
 import arrow.extension
-import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
+import kotlin.coroutines.CoroutineContext
 
 @extension
 interface EitherTBracketInstance<F> : Bracket<EitherTPartialOf<F, Throwable>, Throwable>, EitherTMonadErrorInstance<F, Throwable> {
 
   fun MDF(): MonadDefer<F>
-
-  override fun FF(): Functor<F> = MDF()
 
   override fun MF(): Monad<F> = MDF()
 
@@ -63,15 +59,32 @@ interface EitherTBracketInstance<F> : Bracket<EitherTPartialOf<F, Throwable>, Th
 }
 
 @extension
-interface EitherTMonadDeferInstance<F> : MonadDefer<EitherTPartialOf<F, Throwable>>, EitherTBracketInstance<F>  {
-
-  override fun MDF(): MonadDefer<F>
-
-  override fun FF(): Functor<F> = MDF()
-
-  override fun MF(): Monad<F> = MDF()
+interface EitherTMonadDeferInstance<F> : MonadDefer<EitherTPartialOf<F, Throwable>>, EitherTBracketInstance<F> {
 
   override fun <A> defer(fa: () -> EitherTOf<F, Throwable, A>): EitherT<F, Throwable, A> =
     EitherT(MDF().defer { fa().value() })
+
+}
+
+@extension
+interface EitherTAsyncInstance<F> : Async<EitherTPartialOf<F, Throwable>>, EitherTMonadDeferInstance<F> {
+
+  fun ASF(): Async<F>
+
+  override fun MDF(): MonadDefer<F> = ASF()
+
+  override fun <A> async(fa: Proc<A>): EitherT<F, Throwable, A> = ASF().run {
+    EitherT.liftF(this, async(fa))
+  }
+
+  override fun <A> asyncF(k: ProcF<EitherTPartialOf<F, Throwable>, A>): EitherT<F, Throwable, A> = ASF().run {
+    EitherT.liftF(this, asyncF { cb: (Either<Throwable, A>) -> Unit ->
+      k(cb).value().map { Unit }
+    })
+  }
+
+  override fun <A> EitherTOf<F, Throwable, A>.continueOn(ctx: CoroutineContext): EitherT<F, Throwable, A> = ASF().run {
+    EitherT(value().continueOn(ctx))
+  }
 
 }

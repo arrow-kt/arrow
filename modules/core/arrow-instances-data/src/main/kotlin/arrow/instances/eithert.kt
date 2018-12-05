@@ -23,6 +23,8 @@ interface EitherTApplicativeInstance<F, L> : Applicative<EitherTPartialOf<F, L>>
 
   fun MF(): Monad<F>
 
+  override fun FF(): Functor<F> = MF()
+
   override fun <A> just(a: A): EitherT<F, L, A> = EitherT.just(MF(), a)
 
   override fun <A, B> Kind<EitherTPartialOf<F, L>, A>.map(f: (A) -> B): EitherT<F, L, B> = fix().map(MF()) { f(it) }
