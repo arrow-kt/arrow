@@ -99,6 +99,10 @@ interface IOAsyncInstance : Async<ForIO>, IOMonadDeferInstance {
   override fun <A> async(fa: Proc<A>): IO<A> =
     IO.async(fa.toIOProc())
 
+  override fun <A> asyncF(k: ProcF<ForIO, A>): Kind<ForIO, A> {
+    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+  }
+
   override fun <A> IOOf<A>.continueOn(ctx: CoroutineContext): IO<A> =
     fix().continueOn(ctx)
 

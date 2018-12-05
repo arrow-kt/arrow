@@ -1,63 +1,77 @@
 package arrow.instances
 
-import arrow.Kind
 import arrow.core.*
-import arrow.data.EitherT
-import arrow.data.EitherTPartialOf
-import arrow.data.fix
-import arrow.data.value
+import arrow.data.*
 import arrow.effects.Ref
+import arrow.effects.typeclasses.Bracket
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.MonadDefer
+import arrow.extension
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
 
-interface EitherTMonadDeferInstance<F, L> : MonadDefer<EitherTPartialOf<F, L>> {
+@extension
+interface EitherTBracketInstance<F> : Bracket<EitherTPartialOf<F, Throwable>, Throwable>, EitherTMonadErrorInstance<F, Throwable> {
 
   fun MDF(): MonadDefer<F>
 
-  override fun <A> just(a: A): EitherT<F, L, A> =
-    EitherT.just(MDF(), a)
+  override fun FF(): Functor<F> = MDF()
 
-  override fun <A> Kind<EitherTPartialOf<F, L>, A>.handleErrorWith(f: (Throwable) -> Kind<EitherTPartialOf<F, L>, A>): EitherT<F, L, A> =
-    MDF().run {
-      EitherT(value().handleErrorWith(f.andThen { it.value() }))
-    }
+  override fun MF(): Monad<F> = MDF()
 
-  override fun <A> raiseError(e: Throwable): EitherT<F, L, A> =
-    EitherT.liftF(MDF(), MDF().raiseError(e))
+  override fun <A, B> EitherTOf<F, Throwable, A>.bracketCase(
+    release: (A, ExitCase<Throwable>) -> EitherTOf<F, Throwable, Unit>,
+    use: (A) -> EitherTOf<F, Throwable, B>): EitherTOf<F, Throwable, B> =
 
-  override fun <A, B> Kind<EitherTPartialOf<F, L>, A>.bracketCase(
-    release: (A, ExitCase<L>) -> Kind<EitherTPartialOf<F, L>, Unit>,
-    use: (A) -> Kind<EitherTPartialOf<F, L>, B>
-  ): EitherT<F, L, B> =
-    EitherT.liftF<F, L, Ref<F, Option<L>>>(MDF(), Ref.of<F, Option<L>>(None, MDF())).flatMap(MDF()) { ref ->
-      EitherT(value().bracketCase<Either<L, A>, Either<L, B>>(
-        use = { a: A ->
-          when (a) {
-            is Either.Right<*> -> use((a as Either.Right<A>).b).value()
-            else -> MDF().just(a as Either.Left<B>)
-          }
-        },
-        release = { a: A, exitCase: ExitCase<L> ->
-          when {
-            a is Either.Left<*> -> MDF().just(Unit) //Nothing to release
-            a is Either.Right<*> && exitCase is ExitCase.Completed ->
-              release((a as Either.Right<A>).b, ExitCase.Completed).value().flatMap {
-                when (it) {
-                  is Either.Left<*> -> ref.set(Some((it as Either.Left<L>).a))
-                  else -> MDF().just(Unit)
+    EitherT.liftF<F, Throwable, Ref<F, Option<Throwable>>>(MDF(), Ref.of(None, MDF())).flatMap(MDF()) { ref ->
+      EitherT(
+        MDF().run {
+          value().bracketCase(use = { eith ->
+            when (eith) {
+              is Either.Right -> use(eith.b).value()
+              is Either.Left -> just(eith)
+            }
+          }, release = { eith, exitCase ->
+            when (eith) {
+              is Either.Right -> when (exitCase) {
+                is ExitCase.Completed -> {
+                  release(eith.b, ExitCase.Completed).value().flatMap {
+                    it.fold(
+                      { l -> ref.set(Some(l)) },
+                      { just(Unit) }
+                    )
+                  }
                 }
+                else -> release(eith.b, exitCase).value().void()
               }
-            else -> release((a as Either.Right<A>).b, exitCase).value().void()
+              is Either.Left -> just(Unit)
+            }
+          }).flatMap { eith ->
+            when (eith) {
+              is Either.Right -> ref.get().map {
+                it.fold(
+                  { eith },
+                  { throwable -> throwable.left() })
+              }
+              is Either.Left -> just(eith)
+            }
           }
         }
-      ).flatMap<Either<L, B>> {
-        case r @ Right(_) => ref.get.map(_.fold(r: Either[L, B])(Either.left[L, B]))
-        case l @ Left(_) => F.pure(l)
-      })
+      )
     }
+
 }
 
-fun <F, L> EitherT.Companion.monadDefer(FF: MonadDefer<F>): MonadDefer<EitherTPartialOf<F, L>> =
-  object : EitherTMonadDeferInstance<F, L> {
-    override fun MDF(): MonadDefer<F> = FF
-  }
+@extension
+interface EitherTMonadDeferInstance<F> : MonadDefer<EitherTPartialOf<F, Throwable>>, EitherTBracketInstance<F>  {
+
+  override fun MDF(): MonadDefer<F>
+
+  override fun FF(): Functor<F> = MDF()
+
+  override fun MF(): Monad<F> = MDF()
+
+  override fun <A> defer(fa: () -> EitherTOf<F, Throwable, A>): EitherT<F, Throwable, A> =
+    EitherT(MDF().defer { fa().value() })
+
+}
