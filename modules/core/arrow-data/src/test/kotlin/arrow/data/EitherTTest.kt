@@ -4,15 +4,14 @@ import arrow.Kind
 import arrow.core.*
 import arrow.effects.ForIO
 import arrow.effects.IO
-import arrow.effects.fix
 import arrow.effects.instances.io.applicativeError.attempt
 import arrow.effects.instances.io.async.async
-import arrow.effects.instances.io.monadDefer.monadDefer
 import arrow.effects.typeclasses.seconds
 import arrow.instances.*
-import arrow.instances.either.monadError.monadError
+import arrow.instances.eithert.applicative.applicative
 import arrow.instances.eithert.async.async
-import arrow.instances.eithert.monadDefer.monadDefer
+import arrow.instances.eithert.functor.functor
+import arrow.instances.id.functor.functor
 import arrow.instances.id.monad.monad
 import arrow.instances.id.traverse.traverse
 import arrow.instances.option.functor.functor
@@ -33,7 +32,7 @@ class EitherTTest : UnitSpec() {
 
     testLaws(
       AsyncLaws.laws(EitherT.async(IO.async()), EQ(), EQ()),
-      TraverseLaws.laws(EitherT.traverse<ForId, Int>(Id.traverse()), EitherT.applicative<ForId, Int>(Id.monad()), { EitherT(Id(Right(it))) }, Eq.any()),
+      TraverseLaws.laws(EitherT.traverse<ForId, Int>(Id.traverse()), EitherT.functor<ForId, Int>(Id.functor()), { EitherT(Id(Right(it))) }, Eq.any()),
       SemigroupKLaws.laws<EitherTPartialOf<ForId, Int>>(
         EitherT.semigroupK(Id.monad()),
         EitherT.applicative(Id.monad()),

@@ -1,7 +1,6 @@
 package arrow.effects.instances
 
 import arrow.Kind
-import arrow.core.Either
 import arrow.data.*
 import arrow.effects.typeclasses.*
 import arrow.extension
@@ -59,7 +58,6 @@ interface KleisliAsyncInstance<F, R> : Async<KleisliPartialOf<F, R>>, KleisliMon
 
   override fun <A> asyncF(k: ProcF<KleisliPartialOf<F, R>, A>): Kleisli<F, R, A> =
     Kleisli { r -> ASF().asyncF { cb -> k(cb).run(r) } }
-
 
   override fun <A> KleisliOf<F, R, A>.continueOn(ctx: CoroutineContext): Kleisli<F, R, A> = ASF().run {
     Kleisli { r -> run(r).continueOn(ctx) }

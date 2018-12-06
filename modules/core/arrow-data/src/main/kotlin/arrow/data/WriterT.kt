@@ -67,6 +67,11 @@ data class WriterT<F, W, A>(val value: Kind<F, Tuple2<W, A>>) : WriterTOf<F, W, 
           }
         }
       })
+
+    fun <F, W, A> liftF(fa: Kind<F, A>, MM: Monoid<W>, AF: Applicative<F>): WriterT<F, W, A> = AF.run {
+      WriterT(fa.map { a -> Tuple2(MM.empty(), a) })
+    }
+
   }
 
   fun tell(MF: Monad<F>, SG: Semigroup<W>, w: W): WriterT<F, W, A> = mapAcc(MF) { SG.run { it.combine(w) } }
@@ -95,8 +100,10 @@ data class WriterT<F, W, A>(val value: Kind<F, Tuple2<W, A>>) : WriterTOf<F, W, 
 
   fun swap(MF: Monad<F>): WriterT<F, A, W> = transform(MF) { it.b toT it.a }
 
-  fun <B> ap(MF: Monad<F>, SG: Semigroup<W>, ff: WriterTOf<F, W, (A) -> B>): WriterT<F, W, B> =
-    ff.fix().flatMap(MF, SG) { map(MF, it) }
+  fun <B> ap(AF: Applicative<F>, SG: Semigroup<W>, ff: WriterTOf<F, W, (A) -> B>): WriterT<F, W, B> =
+    WriterT(AF.map(ff.fix().value, value) { (a, b) ->
+      Tuple2(SG.run { a.a.combine(b.a) }, a.b(b.b))
+    })
 
   fun <B> flatMap(MF: Monad<F>, SG: Semigroup<W>, f: (A) -> WriterT<F, W, B>): WriterT<F, W, B> = MF.run {
     WriterT(value.flatMap { value -> f(value.b).value.map { SG.run { it.a.combine(value.a) } toT it.b } })

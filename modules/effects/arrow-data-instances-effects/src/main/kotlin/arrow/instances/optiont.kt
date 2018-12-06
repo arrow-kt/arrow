@@ -1,9 +1,7 @@
 package arrow.instances
 
-import arrow.Kind
 import arrow.core.Either
 import arrow.core.None
-import arrow.core.Some
 import arrow.data.*
 import arrow.effects.Ref
 import arrow.effects.typeclasses.*

@@ -23,7 +23,7 @@ interface Async<F> : MonadDefer<F> {
    * in function is injected with a side-effectful callback for signaling the final result of an asynchronous process.
    * Its returned result needs to be a pure `F[Unit]` that gets evaluated by the runtime.
    */
-  fun <A> asyncF(k: ProcF<F, A>): Kind<F, A>
+  fun <A> asyncF(k: ProcF<F, A>): Kind<F, A> = TODO()
 
   fun <A> Kind<F, A>.continueOn(ctx: CoroutineContext): Kind<F, A>
 

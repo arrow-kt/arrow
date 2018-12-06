@@ -15,35 +15,37 @@ interface OptionTFunctorInstance<F> : Functor<OptionTPartialOf<F>> {
 
   fun FF(): Functor<F>
 
-  override fun <A, B> Kind<OptionTPartialOf<F>, A>.map(f: (A) -> B): OptionT<F, B> = fix().map(FF(), f)
+  override fun <A, B> OptionTOf<F, A>.map(f: (A) -> B): OptionT<F, B> = fix().map(FF(), f)
 
 }
 
 @extension
 interface OptionTApplicativeInstance<F> : Applicative<OptionTPartialOf<F>>, OptionTFunctorInstance<F> {
 
-  fun MF(): Monad<F>
+  fun AF(): Applicative<F>
 
-  override fun FF(): Functor<F> = MF()
+  override fun FF(): Functor<F> = AF()
 
-  override fun <A> just(a: A): OptionT<F, A> = OptionT(MF().just(Option(a)))
+  override fun <A> just(a: A): OptionT<F, A> = OptionT(AF().just(Option(a)))
 
-  override fun <A, B> Kind<OptionTPartialOf<F>, A>.map(f: (A) -> B): OptionT<F, B> = fix().map(FF(), f)
+  override fun <A, B> OptionTOf<F, A>.map(f: (A) -> B): OptionT<F, B> = fix().map(AF(), f)
 
-  override fun <A, B> Kind<OptionTPartialOf<F>, A>.ap(ff: Kind<OptionTPartialOf<F>, (A) -> B>): OptionT<F, B> =
-    fix().ap(MF(), ff)
+  override fun <A, B> OptionTOf<F, A>.ap(ff: OptionTOf<F, (A) -> B>): OptionT<F, B> =
+    fix().ap(AF(), ff)
 }
 
 @extension
 interface OptionTMonadInstance<F> : Monad<OptionTPartialOf<F>>, OptionTApplicativeInstance<F> {
 
-  override fun MF(): Monad<F>
+  fun MF(): Monad<F>
 
-  override fun <A, B> Kind<OptionTPartialOf<F>, A>.map(f: (A) -> B): OptionT<F, B> = fix().map(FF(), f)
+  override fun AF(): Applicative<F> = MF()
 
-  override fun <A, B> Kind<OptionTPartialOf<F>, A>.flatMap(f: (A) -> Kind<OptionTPartialOf<F>, B>): OptionT<F, B> = fix().flatMap(MF(), { f(it).fix() })
+  override fun <A, B> OptionTOf<F, A>.map(f: (A) -> B): OptionT<F, B> = fix().map(FF(), f)
 
-  override fun <A, B> Kind<OptionTPartialOf<F>, A>.ap(ff: Kind<OptionTPartialOf<F>, (A) -> B>): OptionT<F, B> =
+  override fun <A, B> OptionTOf<F, A>.flatMap(f: (A) -> OptionTOf<F, B>): OptionT<F, B> = fix().flatMap(MF()) { f(it).fix() }
+
+  override fun <A, B> OptionTOf<F, A>.ap(ff: OptionTOf<F, (A) -> B>): OptionT<F, B> =
     fix().ap(MF(), ff)
 
   override fun <A, B> tailRecM(a: A, f: (A) -> OptionTOf<F, Either<A, B>>): OptionT<F, B> =
@@ -54,14 +56,14 @@ interface OptionTMonadInstance<F> : Monad<OptionTPartialOf<F>>, OptionTApplicati
 @extension
 interface OptionTApplicativeErrorInstance<F, E> : ApplicativeError<OptionTPartialOf<F>, E>, OptionTApplicativeInstance<F> {
 
-  fun ME(): MonadError<F, E>
+  fun AE(): ApplicativeError<F, E>
 
-  override fun MF(): Monad<F> = ME()
+  override fun AF(): Applicative<F> = AE()
 
   override fun <A> raiseError(e: E): OptionT<F, A> =
-    OptionT(ME().raiseError(e))
+    OptionT(AE().raiseError(e))
 
-  override fun <A> OptionTOf<F, A>.handleErrorWith(f: (E) -> OptionTOf<F, A>): OptionT<F, A> = ME().run {
+  override fun <A> OptionTOf<F, A>.handleErrorWith(f: (E) -> OptionTOf<F, A>): OptionT<F, A> = AE().run {
     OptionT(value().handleErrorWith { f(it).value() })
   }
 
@@ -69,7 +71,12 @@ interface OptionTApplicativeErrorInstance<F, E> : ApplicativeError<OptionTPartia
 
 @extension
 interface OptionTMonadError<F, E> : MonadError<OptionTPartialOf<F>, E>, OptionTMonadInstance<F>, OptionTApplicativeErrorInstance<F, E> {
-  override fun ME(): MonadError<F, E>
+
+  fun ME(): MonadError<F, E>
+
+  override fun AF(): Applicative<F> = ME()
+
+  override fun AE(): ApplicativeError<F, E> = ME()
 
   override fun MF(): Monad<F> = ME()
 }
@@ -99,10 +106,10 @@ interface OptionTFoldableInstance<F> : Foldable<OptionTPartialOf<F>> {
 
   fun FFF(): Foldable<F>
 
-  override fun <A, B> Kind<OptionTPartialOf<F>, A>.foldLeft(b: B, f: (B, A) -> B): B =
+  override fun <A, B> OptionTOf<F, A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(FFF(), b, f)
 
-  override fun <A, B> Kind<OptionTPartialOf<F>, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+  override fun <A, B> OptionTOf<F, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
     fix().foldRight(FFF(), lb, f)
 
 }
@@ -114,7 +121,7 @@ interface OptionTTraverseInstance<F> : Traverse<OptionTPartialOf<F>>, OptionTFol
 
   override fun FFF(): Foldable<F> = FFT()
 
-  override fun <G, A, B> Kind<OptionTPartialOf<F>, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, OptionT<F, B>> =
+  override fun <G, A, B> OptionTOf<F, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, OptionT<F, B>> =
     fix().traverse(FFT(), AP, f)
 
 }
@@ -124,7 +131,7 @@ interface OptionTSemigroupKInstance<F> : SemigroupK<OptionTPartialOf<F>> {
 
   fun MF(): Monad<F>
 
-  override fun <A> Kind<OptionTPartialOf<F>, A>.combineK(y: Kind<OptionTPartialOf<F>, A>): OptionT<F, A> = fix().orElse(MF(), { y.fix() })
+  override fun <A> OptionTOf<F, A>.combineK(y: OptionTOf<F, A>): OptionT<F, A> = fix().orElse(MF(), { y.fix() })
 }
 
 @extension
@@ -139,7 +146,7 @@ class OptionTContext<F>(val MF: Monad<F>) : OptionTMonadInstance<F>, OptionTMono
 
   override fun MF(): Monad<F> = MF
 
-  override fun <A, B> Kind<OptionTPartialOf<F>, A>.map(f: (A) -> B): OptionT<F, B> =
+  override fun <A, B> OptionTOf<F, A>.map(f: (A) -> B): OptionT<F, B> =
     fix().map(f)
 }
 

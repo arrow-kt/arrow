@@ -6,6 +6,7 @@ import arrow.effects.Ref
 import arrow.effects.typeclasses.*
 import arrow.extension
 import arrow.instances.either.monad.flatten
+import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Monad
 import kotlin.coroutines.CoroutineContext
 
@@ -16,9 +17,11 @@ interface EitherTBracketInstance<F> : Bracket<EitherTPartialOf<F, Throwable>, Th
 
   override fun MF(): Monad<F> = MDF()
 
+  override fun AE(): ApplicativeError<F, Throwable> = MDF()
+
   override fun <A, B> EitherTOf<F, Throwable, A>.bracketCase(
     release: (A, ExitCase<Throwable>) -> EitherTOf<F, Throwable, Unit>,
-    use: (A) -> EitherTOf<F, Throwable, B>): EitherTOf<F, Throwable, B> =
+    use: (A) -> EitherTOf<F, Throwable, B>): EitherT<F, Throwable, B> =
 
     EitherT.liftF<F, Throwable, Ref<F, Option<Throwable>>>(MDF(), Ref.of(None, MDF())).flatMap(MDF()) { ref ->
       EitherT(

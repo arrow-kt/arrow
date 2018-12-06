@@ -1,15 +1,17 @@
 package arrow.data
 
 import arrow.Kind
-import arrow.core.ForOption
-import arrow.core.Option
-import arrow.core.Tuple2
-import arrow.core.fix
+import arrow.core.*
+import arrow.effects.ForIO
+import arrow.effects.IO
+import arrow.effects.instances.io.applicativeError.attempt
+import arrow.effects.instances.io.async.async
 import arrow.instances.monoid
 import arrow.instances.listk.monad.monad
 import arrow.instances.listk.monoidK.monoidK
 import arrow.instances.option.monad.monad
 import arrow.instances.writert.applicative.applicative
+import arrow.instances.writert.async.async
 import arrow.instances.writert.monad.monad
 import arrow.instances.writert.monoidK.monoidK
 import arrow.mtl.instances.option.monadFilter.monadFilter
@@ -18,20 +20,26 @@ import arrow.mtl.instances.writert.monadWriter.monadWriter
 import arrow.test.UnitSpec
 import arrow.test.generators.genIntSmall
 import arrow.test.generators.genTuple
-import arrow.test.laws.MonadFilterLaws
-import arrow.test.laws.MonadLaws
-import arrow.test.laws.MonadWriterLaws
-import arrow.test.laws.MonoidKLaws
+import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class WriterTTest : UnitSpec() {
+
+  private fun IOEQ(): Eq<Kind<WriterTPartialOf<ForIO, Int>, Int>> = Eq { a, b ->
+    a.value().attempt().unsafeRunSync() == b.value().attempt().unsafeRunSync()
+  }
+
+  private fun IOEitherEQ(): Eq<Kind<WriterTPartialOf<ForIO, Int>, Either<Throwable, Int>>> = Eq { a, b ->
+    a.value().attempt().unsafeRunSync() == b.value().attempt().unsafeRunSync()
+  }
+
   init {
 
     testLaws(
-      MonadLaws.laws(WriterT.monad(Option.monad(), Int.monoid()), Eq.any()),
+      AsyncLaws.laws(WriterT.async(IO.async(), Int.monoid()), IOEQ(), IOEitherEQ()),
       MonoidKLaws.laws(
         WriterT.monoidK<ForListK, Int>(ListK.monoidK()),
         WriterT.applicative(ListK.monad(), Int.monoid()),
