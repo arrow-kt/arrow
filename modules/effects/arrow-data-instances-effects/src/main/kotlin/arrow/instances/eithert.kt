@@ -9,6 +9,7 @@ import arrow.instances.EitherTMonadThrowInstance
 import arrow.instances.either.monad.flatten
 import arrow.instances.eithert.monad.flatMap
 import arrow.typeclasses.ApplicativeError
+import arrow.instances.either.monad.flatten
 import arrow.typeclasses.Monad
 import arrow.undocumented
 import kotlin.coroutines.CoroutineContext
@@ -67,6 +68,8 @@ interface EitherTBracketInstance<F> : Bracket<EitherTPartialOf<F, Throwable>, Th
 @extension
 @undocumented
 interface EitherTMonadDeferInstance<F> : MonadDefer<EitherTPartialOf<F, Throwable>>, EitherTBracketInstance<F> {
+
+  override fun MDF(): MonadDefer<F>
 
   override fun <A> defer(fa: () -> EitherTOf<F, Throwable, A>): EitherT<F, Throwable, A> =
     EitherT(MDF().defer { fa().value() })

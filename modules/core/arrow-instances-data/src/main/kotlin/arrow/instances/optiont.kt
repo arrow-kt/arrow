@@ -88,7 +88,7 @@ interface OptionTMonadThrow<F> : MonadThrow<OptionTPartialOf<F>>, OptionTMonadEr
   override fun ME(): MonadError<F, Throwable>
 }
 
-fun <F, A, B> OptionTOf<F, A>.foldLeft(FF: Foldable<F>, b: B, f: (B, A) -> B): B = FF.compose(Option.foldable()).foldLC(value(), b, f)
+fun <F, A, B> OptionTOf<F, A>.foldLeft(FF: Foldable<F>, b: B, f: (B, A) -> B): B = FF.compose(Option.foldable()).foldLC(fix().value(), b, f)
 
 fun <F, A, B> OptionTOf<F, A>.foldRight(FF: Foldable<F>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> = FF.compose(Option.foldable()).run {
   value().foldRC(lb, f)
@@ -149,7 +149,7 @@ class OptionTContext<F>(val MF: Monad<F>) : OptionTMonadInstance<F>, OptionTMono
   override fun MF(): Monad<F> = MF
 
   override fun <A, B> OptionTOf<F, A>.map(f: (A) -> B): OptionT<F, B> =
-    fix().map(f)
+    fix().map(MF(), f)
 }
 
 class OptionTContextPartiallyApplied<F>(val MF: Monad<F>) {

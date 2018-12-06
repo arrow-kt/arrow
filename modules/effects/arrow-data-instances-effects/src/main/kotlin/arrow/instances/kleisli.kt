@@ -1,6 +1,7 @@
 package arrow.effects.instances
 
 import arrow.Kind
+import arrow.core.Either
 import arrow.data.*
 import arrow.effects.typeclasses.*
 import arrow.extension
@@ -20,15 +21,16 @@ interface KleisliBracketInstance<F, R, E> : Bracket<KleisliPartialOf<F, R>, E>, 
   override fun <A, B> Kind<KleisliPartialOf<F, R>, A>.bracketCase(
     release: (A, ExitCase<E>) -> Kind<KleisliPartialOf<F, R>, Unit>,
     use: (A) -> Kind<KleisliPartialOf<F, R>, B>
-  ): Kleisli<F, R, B> = BF().run {
-    Kleisli { r ->
-      this@bracketCase.run(r).bracketCase({ a, br ->
-        release(a, br).run(r)
-      }) { a ->
-        use(a).run(r)
+  ): Kleisli<F, R, B> =
+    BF().run {
+      Kleisli { r ->
+        this@bracketCase.run(r).bracketCase({ a, br ->
+          release(a, br).run(r)
+        }) { a ->
+          use(a).run(r)
+        }
       }
     }
-  }
 
   override fun <A> Kind<KleisliPartialOf<F, R>, A>.uncancelable(): Kleisli<F, R, A> =
     Kleisli { r -> BF().run { this@uncancelable.run(r).uncancelable() } }
@@ -55,6 +57,10 @@ internal interface KleisliAsyncInstance<F, R> : Async<KleisliPartialOf<F, R>>, K
 
   override fun <A> async(fa: Proc<A>): Kleisli<F, R, A> =
     Kleisli.liftF(ASF().async(fa))
+
+  override fun <A> asyncF(k: ProcF<KleisliPartialOf<F, R>, A>): Kleisli<F, R, A> =
+    Kleisli { r -> ASF().asyncF { cb -> k(cb).run(r) } }
+
 
   override fun <A> KleisliOf<F, R, A>.continueOn(ctx: CoroutineContext): Kleisli<F, R, A> = ASF().run {
     Kleisli { r -> run(r).continueOn(ctx) }
