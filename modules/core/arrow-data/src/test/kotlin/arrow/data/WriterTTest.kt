@@ -8,10 +8,12 @@ import arrow.effects.instances.io.applicativeError.attempt
 import arrow.effects.instances.io.async.async
 import arrow.effects.instances.writert.async.async
 import arrow.instances.*
+import arrow.instances.monoid
 import arrow.instances.listk.monad.monad
 import arrow.instances.listk.monoidK.monoidK
 import arrow.instances.option.monad.monad
 import arrow.instances.writert.applicative.applicative
+import arrow.instances.writert.async.async
 import arrow.instances.writert.monad.monad
 import arrow.instances.writert.monoidK.monoidK
 import arrow.mtl.instances.option.monadFilter.monadFilter
@@ -40,7 +42,6 @@ class WriterTTest : UnitSpec() {
 
     testLaws(
       AsyncLaws.laws(WriterT.async(IO.async(), Int.monoid()), IOEQ(), IOEitherEQ()),
-
       MonoidKLaws.laws(
         WriterT.  monoidK<ForListK, Int>(ListK.monoidK()),
         WriterT.applicative(ListK.monad(), Int.monoid()),

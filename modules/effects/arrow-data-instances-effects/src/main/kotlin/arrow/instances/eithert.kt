@@ -10,6 +10,7 @@ import arrow.instances.either.monad.flatten
 import arrow.instances.eithert.monad.flatMap
 import arrow.typeclasses.ApplicativeError
 import arrow.instances.either.monad.flatten
+import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Monad
 import arrow.undocumented
 import kotlin.coroutines.CoroutineContext

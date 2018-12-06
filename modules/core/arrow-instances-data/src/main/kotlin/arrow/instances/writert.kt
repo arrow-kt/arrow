@@ -6,6 +6,7 @@ import arrow.core.toT
 import arrow.data.*
 import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
+import arrow.instances.writert.monad.flatMap
 import arrow.typeclasses.*
 import arrow.undocumented
 
@@ -65,9 +66,9 @@ interface WriterTApplicativeError<F, W, E> : ApplicativeError<WriterTPartialOf<F
 
   fun AE(): ApplicativeError<F, E>
 
-  override fun MM(): Monoid<W>
+  override fun AF(): Applicative<F>
 
-  override fun AF(): Applicative<F> = AE()
+  override fun MM(): Monoid<W>
 
   override fun <A> raiseError(e: E): WriterT<F, W, A> =
     WriterT(AE().raiseError(e))

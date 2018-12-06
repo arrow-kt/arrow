@@ -91,7 +91,7 @@ interface Async<F> : MonadDefer<F> {
    *
    * @see async for a simpler, non suspending version.
    */
-  fun <A> asyncF(k: ProcF<F, A>): Kind<F, A>
+  fun <A> asyncF(k: ProcF<F, A>): Kind<F, A> = TODO()
 
   /**
    * Continue the evaluation on provided [CoroutineContext]
