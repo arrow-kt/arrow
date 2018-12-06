@@ -41,6 +41,10 @@ data class OptionT<F, A>(val value: Kind<F, Option<A>>) : OptionTOf<F, A>, Optio
         }
       })
 
+    fun <F, A> liftF(FF: Functor<F>, fa: Kind<F, A>): OptionT<F, A> = FF.run {
+      OptionT(fa.map { Some(it) })
+    }
+
   }
 
   inline fun <B> fold(FF: Functor<F>, crossinline default: () -> B, crossinline f: (A) -> B): Kind<F, B> = FF.run {

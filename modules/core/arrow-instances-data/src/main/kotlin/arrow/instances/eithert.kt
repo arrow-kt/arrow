@@ -7,6 +7,7 @@ import arrow.data.EitherTOf
 import arrow.data.EitherTPartialOf
 import arrow.data.fix
 import arrow.deprecation.ExtensionsDSLDeprecated
+import arrow.extension
 import arrow.instances.either.foldable.foldable
 import arrow.instances.either.monad.monad
 import arrow.instances.either.traverse.traverse
@@ -35,6 +36,8 @@ interface EitherTApplicativeInstance<F, L> : Applicative<EitherTPartialOf<F, L>>
 
 interface EitherTMonadInstance<F, L> : Monad<EitherTPartialOf<F, L>>, EitherTApplicativeInstance<F, L> {
 
+  override fun MF(): Monad<F>
+
   override fun <A, B> Kind<EitherTPartialOf<F, L>, A>.map(f: (A) -> B): EitherT<F, L, B> = fix().map(MF()) { f(it) }
 
   override fun <A, B> Kind<EitherTPartialOf<F, L>, A>.ap(ff: Kind<EitherTPartialOf<F, L>, (A) -> B>): EitherT<F, L, B> =
@@ -48,6 +51,8 @@ interface EitherTMonadInstance<F, L> : Monad<EitherTPartialOf<F, L>>, EitherTApp
 
 interface EitherTApplicativeErrorInstance<F, L> : ApplicativeError<EitherTPartialOf<F, L>, L>, EitherTApplicativeInstance<F, L> {
 
+  override fun MF(): Monad<F>
+
   override fun <A> Kind<EitherTPartialOf<F, L>, A>.handleErrorWith(f: (L) -> Kind<EitherTPartialOf<F, L>, A>): EitherT<F, L, A> = MF().run {
     EitherT(fix().value.flatMap {
       when (it) {
@@ -60,7 +65,15 @@ interface EitherTApplicativeErrorInstance<F, L> : ApplicativeError<EitherTPartia
   override fun <A> raiseError(e: L): EitherT<F, L, A> = EitherT(MF().just(Left(e)))
 }
 
-interface EitherTMonadErrorInstance<F, L> : MonadError<EitherTPartialOf<F, L>, L>, EitherTApplicativeErrorInstance<F, L>, EitherTMonadInstance<F, L>
+@extension
+interface EitherTMonadErrorInstance<F, L> : MonadError<EitherTPartialOf<F, L>, L>, EitherTApplicativeErrorInstance<F, L>, EitherTMonadInstance<F, L>{
+  override fun MF(): Monad<F>
+}
+
+@extension
+interface EitherTMonadThrowInstance<F> : MonadThrow<EitherTPartialOf<F, Throwable>>, EitherTMonadErrorInstance<F, Throwable> {
+  override fun MF(): Monad<F>
+}
 
 interface EitherTFoldableInstance<F, L> : Foldable<EitherTPartialOf<F, L>> {
 

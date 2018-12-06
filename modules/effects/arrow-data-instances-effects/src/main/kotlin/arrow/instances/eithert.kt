@@ -5,11 +5,12 @@ import arrow.data.*
 import arrow.effects.Ref
 import arrow.effects.typeclasses.*
 import arrow.extension
+import arrow.instances.either.monad.flatten
 import arrow.typeclasses.Monad
 import kotlin.coroutines.CoroutineContext
 
 @extension
-interface EitherTBracketInstance<F> : Bracket<EitherTPartialOf<F, Throwable>, Throwable>, EitherTMonadErrorInstance<F, Throwable> {
+interface EitherTBracketInstance<F> : Bracket<EitherTPartialOf<F, Throwable>, Throwable>, EitherTMonadThrowInstance<F> {
 
   fun MDF(): MonadDefer<F>
 
@@ -61,6 +62,8 @@ interface EitherTBracketInstance<F> : Bracket<EitherTPartialOf<F, Throwable>, Th
 @extension
 interface EitherTMonadDeferInstance<F> : MonadDefer<EitherTPartialOf<F, Throwable>>, EitherTBracketInstance<F> {
 
+  override fun MDF(): MonadDefer<F>
+
   override fun <A> defer(fa: () -> EitherTOf<F, Throwable, A>): EitherT<F, Throwable, A> =
     EitherT(MDF().defer { fa().value() })
 
@@ -85,6 +88,38 @@ interface EitherTAsyncInstance<F> : Async<EitherTPartialOf<F, Throwable>>, Eithe
 
   override fun <A> EitherTOf<F, Throwable, A>.continueOn(ctx: CoroutineContext): EitherT<F, Throwable, A> = ASF().run {
     EitherT(value().continueOn(ctx))
+  }
+
+}
+
+@extension
+interface EitherTEffectInstance<F> : Effect<EitherTPartialOf<F, Throwable>>, EitherTAsyncInstance<F> {
+
+  fun EFF(): Effect<F>
+
+  override fun ASF(): Async<F> = EFF()
+
+  override fun <A> EitherTOf<F, Throwable, A>.runAsync(cb: (Either<Throwable, A>) -> EitherTOf<F, Throwable, Unit>): EitherT<F, Throwable, Unit> = EFF().run {
+    EitherT(value().runAsync { a ->
+      cb(a.flatten())
+      just(Unit)
+    }.attempt())
+  }
+
+}
+
+@extension
+interface EitherTConcurrentEffectInstance<F> : ConcurrentEffect<EitherTPartialOf<F, Throwable>>, EitherTEffectInstance<F> {
+
+  fun CEFF(): ConcurrentEffect<F>
+
+  override fun EFF(): Effect<F> = CEFF()
+
+  override fun <A> EitherTOf<F, Throwable, A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> EitherTOf<F, Throwable, Unit>): EitherT<F, Throwable, Disposable> = CEFF().run {
+    EitherT(value().runAsyncCancellable { a ->
+      cb(a.flatten())
+      just(Unit)
+    }.attempt())
   }
 
 }

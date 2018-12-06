@@ -12,6 +12,8 @@ import arrow.typeclasses.*
  */
 typealias KleisliFun<F, D, A> = (D) -> Kind<F, A>
 
+fun <F, D, A> KleisliOf<F, D, A>.run(d: D): Kind<F, A> = fix().run(d)
+
 /**
  * [Kleisli] represents an arrow from [D] to a monadic value `Kind<F, A>`.
  *
@@ -30,7 +32,7 @@ class Kleisli<F, D, A>(val run: KleisliFun<F, D, A>) : KleisliOf<F, D, A>, Kleis
    * @param AF [Applicative] for the context [F].
    */
   fun <B> ap(AF: Applicative<F>, ff: KleisliOf<F, D, (A) -> B>): Kleisli<F, D, B> =
-    AF.run { Kleisli { run(it).ap(ff.fix().run(it)) } }
+    AF.run { Kleisli { run(it).ap(ff.run(it)) } }
 
   /**
    * Map the end of the arrow [A] to [B] given a function [f].
@@ -105,7 +107,7 @@ class Kleisli<F, D, A>(val run: KleisliFun<F, D, A>) : KleisliOf<F, D, A>, Kleis
    * @param AE [ApplicativeError] for the context [F].
    */
   fun <E> handleErrorWith(AE: ApplicativeError<F, E>, f: (E) -> KleisliOf<F, D, A>): Kleisli<F, D, A> = Kleisli {
-    AE.run { run(it).handleErrorWith({ e: E -> f(e).fix().run(it) }) }
+    AE.run { run(it).handleErrorWith { e: E -> f(e).run(it) } }
   }
 
   companion object {
@@ -125,7 +127,7 @@ class Kleisli<F, D, A>(val run: KleisliFun<F, D, A>) : KleisliOf<F, D, A>, Kleis
      * @param MF [Monad] for the context [F].
      */
     fun <F, D, A, B> tailRecM(MF: Monad<F>, a: A, f: (A) -> KleisliOf<F, D, Either<A, B>>): Kleisli<F, D, B> =
-      Kleisli { b -> MF.tailRecM(a) { f(it).fix().run(b) } }
+      Kleisli { b -> MF.tailRecM(a) { f(it).run(b) } }
 
     /**
      * Create an arrow for a value of [A].
@@ -147,6 +149,13 @@ class Kleisli<F, D, A>(val run: KleisliFun<F, D, A>) : KleisliOf<F, D, A>, Kleis
      * @param AE [ApplicativeError] for context [F].
      */
     fun <F, D, E, A> raiseError(AE: ApplicativeError<F, E>, e: E): Kleisli<F, D, A> = Kleisli { AE.raiseError(e) }
+
+    /**
+     * Lift a value of context [F] into the [Kleisli].
+     *
+     * @param fa [Kind] of [A] in context [F].
+     */
+    fun <F, D, A> liftF(fa: Kind<F, A>): Kleisli<F, D, A> = Kleisli { fa }
 
   }
 }

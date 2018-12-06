@@ -2,10 +2,7 @@ package arrow.instances
 
 import arrow.Kind
 import arrow.core.*
-import arrow.data.OptionT
-import arrow.data.OptionTOf
-import arrow.data.OptionTPartialOf
-import arrow.data.fix
+import arrow.data.*
 import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.instances.option.applicative.applicative
@@ -52,6 +49,34 @@ interface OptionTMonadInstance<F> : Monad<OptionTPartialOf<F>>, OptionTApplicati
   override fun <A, B> tailRecM(a: A, f: (A) -> OptionTOf<F, Either<A, B>>): OptionT<F, B> =
     OptionT.tailRecM(MF(), a, f)
 
+}
+
+@extension
+interface OptionTApplicativeErrorInstance<F, E> : ApplicativeError<OptionTPartialOf<F>, E>, OptionTApplicativeInstance<F> {
+
+  fun ME(): MonadError<F, E>
+
+  override fun MF(): Monad<F> = ME()
+
+  override fun <A> raiseError(e: E): OptionT<F, A> =
+    OptionT(ME().raiseError(e))
+
+  override fun <A> OptionTOf<F, A>.handleErrorWith(f: (E) -> OptionTOf<F, A>): OptionT<F, A> = ME().run {
+    OptionT(value().handleErrorWith { f(it).value() })
+  }
+
+}
+
+@extension
+interface OptionTMonadError<F, E> : MonadError<OptionTPartialOf<F>, E>, OptionTMonadInstance<F>, OptionTApplicativeErrorInstance<F, E> {
+  override fun ME(): MonadError<F, E>
+
+  override fun MF(): Monad<F> = ME()
+}
+
+@extension
+interface OptionTMonadThrow<F> : MonadThrow<OptionTPartialOf<F>>, OptionTMonadError<F, Throwable> {
+  override fun ME(): MonadError<F, Throwable>
 }
 
 fun <F, A, B> OptionTOf<F, A>.foldLeft(FF: Foldable<F>, b: B, f: (B, A) -> B): B = FF.compose(Option.foldable()).foldLC(fix().value, b, f)
