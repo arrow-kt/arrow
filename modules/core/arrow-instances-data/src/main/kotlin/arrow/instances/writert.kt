@@ -1,10 +1,11 @@
 package arrow.instances
 
 import arrow.Kind
-import arrow.core.Either
-import arrow.core.Tuple2
-import arrow.core.toT
+import arrow.core.*
 import arrow.data.WriterT
+import arrow.data.WriterTOf
+import arrow.data.WriterTPartialOf
+import arrow.data.fix
 import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.typeclasses.*
