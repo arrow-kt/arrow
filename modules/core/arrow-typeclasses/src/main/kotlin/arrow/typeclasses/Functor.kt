@@ -85,7 +85,7 @@ interface Functor<F> : Invariant<F> {
    * fun main(args: Array<String>) {
    *   val result =
    *   //sampleStart
-   *   _just_.map { it + 1 }
+   *   1._just_.map { it + 1 }
    *   //sampleEnd
    *   println(result)
    * }
@@ -96,14 +96,11 @@ interface Functor<F> : Invariant<F> {
   override fun <A, B> Kind<F, A>.imap(f: (A) -> B, g: (B) -> A): Kind<F, B> =
     map(f)
 
-  fun <A, B> lift(f: (A) -> B): (Kind<F, A>) -> Kind<F, B> =
-    { fa: Kind<F, A> ->
-      fa.map(f)
-    }
-
   /**
-   * Discards the [A] value inside [F] signaling this container may be pointing to a noop
-   * or an effect whose return value is deliberately ignored. The singleton value [Unit] serves as signal.
+   * Lifts a function `A -> B` to the [F] structure returning a polymorphic function
+   * that can be applied over all [F] values in the shape of Kind<F, A>
+   *
+   * `A -> B -> Kind<F, A> -> Kind<F, B>`
    *
    * ```kotlin:ank:playground:extension
    * _imports_
@@ -112,21 +109,135 @@ interface Functor<F> : Invariant<F> {
    * fun main(args: Array<String>) {
    *   val result =
    *   //sampleStart
-   *   _just_.void()
+   *   _lift_({ n: Int -> n * 10 })(1._just_)
    *   //sampleEnd
    *   println(result)
    * }
    * ```
    */
-  fun <A> Kind<F, A>.void(): Kind<F, Unit> = map { Unit }
+  fun <A, B> lift(f: (A) -> B): (Kind<F, A>) -> Kind<F, B> =
+    { fa: Kind<F, A> -> fa.map(f) }
 
+  /**
+   * Discards the [A] value inside [F] signaling this container may be pointing to a noop
+   * or an effect whose return value is deliberately ignored. The singleton value [Unit] serves as signal.
+   *
+   * Kind<F, A> -> Kind<F, Unit>
+   *
+   * ```kotlin:ank:playground:extension
+   * _imports_
+   * _imports_applicative_
+   *
+   * fun main(args: Array<String>) {
+   *   val result =
+   *   //sampleStart
+   *   1._just_.unit()
+   *   //sampleEnd
+   *   println(result)
+   * }
+   * ```
+   */
+  fun <A> Kind<F, A>.unit(): Kind<F, Unit> = map { Unit }
+
+  /**
+   * Applies [f] to an [A] inside [F] and returns the [F] structure with a tuple of the [A] value and the
+   * computed [B] value as result of applying [f]
+   *
+   * Kind<F, A> -> Kind<F, Tuple2<A, B>>
+   *
+   * ```kotlin:ank:playground:extension
+   * _imports_
+   * _imports_applicative_
+   *
+   * fun main(args: Array<String>) {
+   *   val result =
+   *   //sampleStart
+   *   1._just_.fproduct { it * 10 }
+   *   //sampleEnd
+   *   println(result)
+   * }
+   * ```
+   */
   fun <A, B> Kind<F, A>.fproduct(f: (A) -> B): Kind<F, Tuple2<A, B>> = map { a -> Tuple2(a, f(a)) }
 
+  /**
+   * Replaces [A] inside [F] with [B] resulting in a Kind<F, B>
+   *
+   * Kind<F, A> -> Kind<F, B>
+   *
+   * ```kotlin:ank:playground:extension
+   * _imports_
+   * _imports_applicative_
+   *
+   * fun main(args: Array<String>) {
+   *   val result =
+   *   //sampleStart
+   *   1._just_.`as`("some string")
+   *   //sampleEnd
+   *   println(result)
+   * }
+   * ```
+   */
   fun <A, B> Kind<F, A>.`as`(b: B): Kind<F, B> = map { b }
 
+  /**
+   * Pairs [B] with [A] returning a Kind<F, Tuple2<B, A>>
+   *
+   * Kind<F, A> -> Kind<F, Tuple2<B, A>>
+   *
+   * ```kotlin:ank:playground:extension
+   * _imports_
+   * _imports_applicative_
+   *
+   * fun main(args: Array<String>) {
+   *   val result =
+   *   //sampleStart
+   *   1._just_.tupleLeft("some string")
+   *   //sampleEnd
+   *   println(result)
+   * }
+   * ```
+   */
   fun <A, B> Kind<F, A>.tupleLeft(b: B): Kind<F, Tuple2<B, A>> = map { a -> Tuple2(b, a) }
 
+  /**
+   * Pairs [A] with [B] returning a Kind<F, Tuple2<A, B>>
+   *
+   * Kind<F, A> -> Kind<F, Tuple2<A, B>>
+   *
+   * ```kotlin:ank:playground:extension
+   * _imports_
+   * _imports_applicative_
+   *
+   * fun main(args: Array<String>) {
+   *   val result =
+   *   //sampleStart
+   *   1._just_.tupleRight("some string")
+   *   //sampleEnd
+   *   println(result)
+   * }
+   * ```
+   */
   fun <A, B> Kind<F, A>.tupleRight(b: B): Kind<F, Tuple2<A, B>> = map { a -> Tuple2(a, b) }
 
+  /**
+   * Given [A] is a sub type of [B], re-type this value from Kind<F, A> to Kind<F, B>
+   *
+   * Kind<F, A> -> Kind<F, B>
+   *
+   * ```kotlin:ank:playground:extension
+   * _imports_
+   * _imports_applicative_
+   * import arrow.Kind
+   *
+   * fun main(args: Array<String>) {
+   *   val result: Kind<*, CharSequence> =
+   *   //sampleStart
+   *   1._just_.map { it.toString() }.widen()
+   *   //sampleEnd
+   *   println(result)
+   * }
+   * ```
+   */
   fun <B, A : B> Kind<F, A>.widen(): Kind<F, B> = this
 }

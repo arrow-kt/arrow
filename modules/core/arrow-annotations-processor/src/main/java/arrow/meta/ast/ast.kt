@@ -4,8 +4,6 @@
  */
 package arrow.meta.ast
 
-import arrow.meta.encoder.TypeClassInstance
-
 sealed class Tree {
   companion object
 }

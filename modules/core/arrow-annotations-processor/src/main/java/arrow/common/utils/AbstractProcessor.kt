@@ -1,29 +1,18 @@
 package arrow.common.utils
 
 import arrow.common.messager.logE
-import arrow.common.messager.logW
 import arrow.documented
 import arrow.meta.encoder.jvm.KotlinMetatadataEncoder
 import me.eugeniomarletti.kotlin.processing.KotlinAbstractProcessor
 import java.io.File
 import java.io.IOException
-import java.io.OutputStreamWriter
 import java.nio.file.Files
 import java.nio.file.Files.createFile
-import java.nio.file.Files.delete
-import java.nio.file.Path
-import java.nio.file.Paths
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.element.Element
 import javax.lang.model.element.ElementKind
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.TypeElement
-import javax.tools.FileObject
-import javax.tools.JavaFileManager
-import javax.tools.StandardLocation
-import javax.annotation.processing.Filer
-
-
 
 class KnownException(message: String, val element: Element?) : RuntimeException(message) {
   override val message: String get() = super.message as String
@@ -64,8 +53,7 @@ abstract class AbstractProcessor : KotlinAbstractProcessor(), ProcessorUtils, Ko
     }
   }
 
-  private fun Element.locationName(): String {
-    return when (kind) {
+  private fun Element.locationName(): String = when (kind) {
       ElementKind.CLASS -> (this as TypeElement).qualifiedName.toString()
       ElementKind.INTERFACE -> (this as TypeElement).qualifiedName.toString()
       ElementKind.METHOD -> (this as ExecutableElement).let {
@@ -73,9 +61,8 @@ abstract class AbstractProcessor : KotlinAbstractProcessor(), ProcessorUtils, Ko
         val functionName = it.simpleName.toString()
         "$name.$functionName"
       }
-      else -> throw RuntimeException("Unsupported @documented $kind")
+      else -> knownError("Unsupported @documented $kind")
     }
-  }
 
   private fun processDocs(roundEnv: RoundEnvironment): Unit =
     roundEnv
@@ -84,7 +71,6 @@ abstract class AbstractProcessor : KotlinAbstractProcessor(), ProcessorUtils, Ko
         processElementDoc(it)
         it.enclosedElements.forEach(::processElementDoc)
       }
-
 
   final override fun process(annotations: Set<TypeElement>, roundEnv: RoundEnvironment): Boolean {
     if (!roundEnv.errorRaised()) {

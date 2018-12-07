@@ -128,78 +128,98 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class) {
   private fun TypeClassInstance.applicativeRequiresMonoid(): Boolean =
     listOf("Const", "Tuple").find { it in dataType.name.simpleName } != null
 
-  private fun Code.eval(info: TypeClassInstance): Code {
-    val packageName = PackageName(info.instance.packageName.value +
-      "." + info.projectedCompanion.simpleName.substringAfterLast(".").toLowerCase() +
-      "." + info.typeClass.name.simpleName.decapitalize())
-    val applicativePackageName = PackageName(info.instance.packageName.value +
-      "." + info.projectedCompanion.simpleName.substringAfterLast(".").toLowerCase() +
-      ".applicative")
-    val intInstancesPackage =
-      if (info.applicativeRequiresMonoid()) "import arrow.instances.monoid"
-      else ""
-    val invocationTypeArgs =
-      if (info.dataType.typeVariables.size < 2) ""
-      else info.dataType.typeVariables.dropLast(1).joinToString(
-        separator = ", ",
-        prefix = "<",
-        postfix = ">",
-        transform = {
-          "Int"
-        }
-      )
-    val justTypeArgs =
-      if (info.applicativeRequiresMonoid()) ""
-      else info.dataType.typeVariables.joinToString(
-        separator = ", ",
-        prefix = "<",
-        postfix = ">",
-        transform = { "Int" }
-      )
-    val justArgs =
-      when {
-        info.applicativeRequiresMonoid() -> "Int.monoid()"
-        info.requiredAbstractFunctions.isEmpty() -> ""
-        else -> info.requiredAbstractFunctions
-          .joinToString(", ") {
-            val factory = it.returnType?.simpleName?.decapitalize()?.substringBefore("<") ?: ""
-            "Int.$factory()"
+  private fun Code.eval(info: TypeClassInstance): Code =
+    if (info.instance.annotations.find { it.type.rawName == "arrow.undocumented" } != null) Code("")
+    else {
+      val packageName = PackageName(info.instance.packageName.value +
+        "." + info.projectedCompanion.simpleName.substringAfterLast(".").toLowerCase() +
+        "." + info.typeClass.name.simpleName.decapitalize())
+      val applicativePackageName = PackageName(info.instance.packageName.value +
+        "." + info.projectedCompanion.simpleName.substringAfterLast(".").toLowerCase() +
+        ".applicative")
+      val intInstancesPackage =
+        if (info.applicativeRequiresMonoid()) "import arrow.instances.monoid"
+        else ""
+      val invocationTypeArgs =
+        if (info.dataType.typeVariables.size < 2) ""
+        else info.dataType.typeVariables.dropLast(1).joinToString(
+          separator = ", ",
+          prefix = "<",
+          postfix = ">",
+          transform = {
+            "Int"
           }
-      }
-    val extensionFactory =
-      "${info.dataType.name.simpleName}.${info.typeClass.name.simpleName.decapitalize()}$invocationTypeArgs()"
-    return copy(
-      value = value
-        .replace("```(.*?):extension".toRegex()) {
-          val snippetDeclaration = it.groupValues[1]
-          "```$snippetDeclaration"
-        }
-        .replace(
-          "_imports_applicative_",
-          """|import ${applicativePackageName.value.quote()}.*
-             |""".trimMargin()
         )
-        .replace(
-          "_imports_",
-          """|import ${info.dataType.name.rawName}
+      val justTypeArgs =
+        if (info.applicativeRequiresMonoid()) ""
+        else info.dataType.typeVariables.joinToString(
+          separator = ", ",
+          prefix = "<",
+          postfix = ">",
+          transform = { "Int" }
+        )
+      val justArgs =
+        when {
+          info.applicativeRequiresMonoid() -> "Int.monoid()"
+          info.requiredAbstractFunctions.isEmpty() -> ""
+          else -> info.requiredAbstractFunctions
+            .joinToString(", ") {
+              val factory = it.returnType?.simpleName?.decapitalize()?.substringBefore("<") ?: ""
+              "Int.$factory()"
+            }
+        }
+      val funcTypeArgs =
+        when {
+          info.dataType.typeVariables.size == 1 -> ""
+          info.dataType.name.simpleName == "Const" -> "<Int, Int>"
+          else -> (listOf("Int") + info.dataType.typeVariables).joinToString(
+            separator = ", ",
+            prefix = "<",
+            postfix = ">",
+            transform = { "Int" }
+          )
+        }
+
+      val extensionFactory =
+        "${info.dataType.name.simpleName}.${info.typeClass.name.simpleName.decapitalize()}$invocationTypeArgs()"
+      copy(
+        value = value
+          .replace("```(.*?):extension".toRegex()) {
+            val snippetDeclaration = it.groupValues[1]
+            "```$snippetDeclaration"
+          }
+          .replace(
+            "_imports_applicative_",
+            """|import ${applicativePackageName.value.quote()}.*
+             |""".trimMargin()
+          )
+          .replace(
+            "_imports_",
+            """|import ${info.dataType.name.rawName.substringBeforeLast(".")}.*
              |import ${packageName.value.quote()}.*
              |$intInstancesPackage
              |""".trimMargin()
-        )
-        .replace(
-          "_extensionFactory_",
-          extensionFactory
-        )
-        .replace(
-          "_dataType_",
-          info.dataType.name.simpleName
-        )
-        .replace("_(.*)_".toRegex()) {
-          val function = it.groupValues[1]
-          "1.$function$justTypeArgs($justArgs)"
-        }
-    )
-  }
+          )
+          .replace(
+            "_extensionFactory_",
+            extensionFactory
+          )
+          .replace(
+            "_dataType_",
+            info.dataType.name.simpleName
+          )
+          .replace("_just_".toRegex()) {
+            "just$justTypeArgs($justArgs)"
+          }
+          .replace("_(.*?)_\\((.*?)\\)".toRegex()) {
+            val function = it.groupValues[1]
+            val args =
+              if (justArgs.isBlank() || info.applicativeRequiresMonoid()) it.groupValues[2]
+              else justArgs + ", " + it.groupValues[2]
+            "$function$funcTypeArgs($args)"
+          }
+      )
+    }
 
   fun TypeClassInstance.genCompanionFactory(targetType: TypeName): Func {
     val target = when (projectedCompanion) {
@@ -238,11 +258,7 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class) {
         val func = f.removeDummyArgs().downKindReturnType().wrap(wrappedType)
         val dummyArgsCount = f.countDummyArgs()
         val allArgs = func.parameters + requiredParameters
-        val typeVariables = (instance.typeVariables + func.typeVariables)
-          .asSequence()
-          .map { it.removeConstrains() }
-          .distinctBy { it.name }
-          .toList()
+        val typeVariables = extensionTypeVariables(func)
         func
           .copy(
             kdoc = func.kdoc?.eval(this),
@@ -289,6 +305,12 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class) {
       .toList()
 
   }
+
+  private fun TypeClassInstance.extensionTypeVariables(func: Func): List<TypeName.TypeVariable> = (instance.typeVariables + func.typeVariables)
+      .asSequence()
+      .map { it.removeConstrains() }
+      .distinctBy { it.name }
+      .toList()
 
   private fun TypeClassInstance.staticExtensionImpl(
     companionOrFactory: TypeName,

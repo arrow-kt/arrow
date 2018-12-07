@@ -18,7 +18,6 @@ import javax.lang.model.element.ElementKind
 import javax.lang.model.element.TypeElement
 import kotlin.reflect.KClass
 
-
 /**
  * The Meta Processor provides access to the Meta Api and is meant to be extended by concrete processors.
  * It performs processing automatically provided the concrete processor implements:
