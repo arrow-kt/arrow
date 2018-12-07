@@ -9,9 +9,59 @@ import arrow.instances.id.applicative.applicative
 import arrow.instances.id.functor.functor
 import arrow.instances.id.monad.monad
 import arrow.instances.kleisli.applicative.applicative
+import arrow.instances.kleisli.contravariant.contramap
 import arrow.instances.kleisli.functor.functor
 import arrow.instances.kleisli.monad.monad
 import arrow.typeclasses.*
+
+@extension
+interface KleisliCoContravariantInstance<F, D> : Contravariant<Conested<Kind<ForKleisli, F>, D>> {
+
+  override fun <A, B> Kind<Conested<Kind<ForKleisli, F>, D>, A>.contramap(f: (B) -> A): Kind<Conested<Kind<ForKleisli, F>, D>, B> =
+    counnest().fix().local(f).conest()
+
+  fun <A, B> KleisliOf<F, A, D>.contramapC(f: (B) -> A): KleisliOf<F, B, D> =
+    conest().contramap(f).counnest()
+}
+
+@extension
+interface KleisliContravariantInstance<F, D> : Contravariant<KleisliPartialOf<F, D>> {
+
+  fun CF(): Contravariant<F>
+
+  override fun <A, B> Kind<KleisliPartialOf<F, D>, A>.contramap(f: (B) -> A): Kind<KleisliPartialOf<F, D>, B> =
+    Kleisli { d -> CF().run { fix().run(d).contramap(f) } }
+}
+
+@extension
+interface KleisliDivideInstance<F, D> : Divide<KleisliPartialOf<F, D>>, KleisliContravariantInstance<F, D> {
+
+  fun DF(): Divide<F>
+  override fun CF(): Contravariant<F> = DF()
+
+  override fun <A, B, Z> divide(fa: Kind<KleisliPartialOf<F, D>, A>, fb: Kind<KleisliPartialOf<F, D>, B>, f: (Z) -> Tuple2<A, B>): Kind<KleisliPartialOf<F, D>, Z> =
+    Kleisli { d -> DF().divide(fa.fix().run(d), fb.fix().run(d), f) }
+}
+
+@extension
+interface KleisliDivisibleInstance<F, D> : Divisible<KleisliPartialOf<F, D>>, KleisliDivideInstance<F, D> {
+
+  fun DFF(): Divisible<F>
+  override fun DF(): Divide<F> = DFF()
+
+  override fun <A> conquer(): Kind<KleisliPartialOf<F, D>, A> =
+    Kleisli { DFF().conquer() }
+}
+
+@extension
+interface KleisliDecidableInstance<F, D> : Decidable<KleisliPartialOf<F, D>>, KleisliDivisibleInstance<F, D> {
+
+  fun DFFF(): Decidable<F>
+  override fun DFF(): Divisible<F> = DFFF()
+
+  override fun <A, B, Z> choose(fa: Kind<KleisliPartialOf<F, D>, A>, fb: Kind<KleisliPartialOf<F, D>, B>, f: (Z) -> Either<A, B>): Kind<KleisliPartialOf<F, D>, Z> =
+    Kleisli { d -> DFFF().choose(fa.fix().run(d), fb.fix().run(d), f) }
+}
 
 @extension
 interface KleisliFunctorInstance<F, D> : Functor<KleisliPartialOf<F, D>> {
@@ -19,15 +69,6 @@ interface KleisliFunctorInstance<F, D> : Functor<KleisliPartialOf<F, D>> {
   fun FF(): Functor<F>
 
   override fun <A, B> Kind<KleisliPartialOf<F, D>, A>.map(f: (A) -> B): Kleisli<F, D, B> = fix().map(FF(), f)
-}
-
-@extension
-interface KleisliContravariant<F, D> : Contravariant<Conested<Kind<ForKleisli, F>, D>> {
-  override fun <A, B> Kind<Conested<Kind<ForKleisli, F>, D>, A>.contramap(f: (B) -> A): Kind<Conested<Kind<ForKleisli, F>, D>, B> =
-    counnest().fix().local(f).conest()
-
-  fun <A, B> KleisliOf<F, A, D>.contramapC(f: (B) -> A): KleisliOf<F, B, D> =
-    conest().contramap(f).counnest()
 }
 
 @extension

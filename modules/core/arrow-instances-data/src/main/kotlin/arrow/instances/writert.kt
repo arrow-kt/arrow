@@ -1,8 +1,7 @@
 package arrow.instances
 
 import arrow.Kind
-import arrow.core.Either
-import arrow.core.toT
+import arrow.core.*
 import arrow.data.WriterT
 import arrow.data.WriterTOf
 import arrow.data.WriterTPartialOf
@@ -10,6 +9,59 @@ import arrow.data.fix
 import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.typeclasses.*
+
+@extension
+interface WriterTContravariantInstance<F, W> : Contravariant<WriterTPartialOf<F, W>> {
+  fun CF(): Contravariant<F>
+
+  override fun <A, B> Kind<WriterTPartialOf<F, W>, A>.contramap(f: (B) -> A): Kind<WriterTPartialOf<F, W>, B> =
+    WriterT(
+      CF().run {
+        fix().value.contramap<Tuple2<W, A>, Tuple2<W, B>> { (w, b) ->
+          w toT f(b)
+        }
+      }
+    )
+}
+
+@extension
+interface WriterTDivideInstance<F, W> : Divide<WriterTPartialOf<F, W>>, WriterTContravariantInstance<F, W> {
+  override fun CF(): Divide<F>
+
+  override fun <A, B, Z> divide(fa: Kind<WriterTPartialOf<F, W>, A>, fb: Kind<WriterTPartialOf<F, W>, B>, f: (Z) -> Tuple2<A, B>): Kind<WriterTPartialOf<F, W>, Z> =
+    WriterT(
+      CF().divide(fa.fix().value, fb.fix().value) { (w, z) ->
+        val (a, b) = f(z)
+        (w toT a) toT (w toT b)
+      }
+    )
+}
+
+@extension
+interface WriterTDivisibleInstance<F, W> : Divisible<WriterTPartialOf<F, W>>, WriterTDivideInstance<F, W> {
+  override fun CF(): Divisible<F>
+
+  override fun <A> conquer(): Kind<WriterTPartialOf<F, W>, A> =
+    WriterT(
+      CF().conquer()
+    )
+}
+
+@extension
+interface WriterTDecidableInstance<F, W> : Decidable<WriterTPartialOf<F, W>>, WriterTDivisibleInstance<F, W> {
+  override fun CF(): Decidable<F>
+
+  override fun <A, B, Z> choose(fa: Kind<WriterTPartialOf<F, W>, A>, fb: Kind<WriterTPartialOf<F, W>, B>, f: (Z) -> Either<A, B>): Kind<WriterTPartialOf<F, W>, Z> =
+    WriterT(
+      CF().choose(fa.fix().value, fb.fix().value) {  (w, z) ->
+        f(z).fold({ a ->
+          (w toT a).left()
+        }, { b ->
+          (w toT b).right()
+        })
+      }
+    )
+}
 
 @extension
 interface WriterTFunctorInstance<F, W> : Functor<WriterTPartialOf<F, W>> {

@@ -7,11 +7,76 @@ import arrow.data.EitherTOf
 import arrow.data.EitherTPartialOf
 import arrow.data.fix
 import arrow.deprecation.ExtensionsDSLDeprecated
+import arrow.extension
 import arrow.instances.either.foldable.foldable
 import arrow.instances.either.monad.monad
 import arrow.instances.either.traverse.traverse
 import arrow.typeclasses.*
 
+@extension
+interface EitherTContravariantInstance<F, L> : Contravariant<EitherTPartialOf<F, L>> {
+
+  fun CF(): Contravariant<F>
+
+  override fun <A, B> Kind<EitherTPartialOf<F, L>, A>.contramap(f: (B) -> A): Kind<EitherTPartialOf<F, L>, B> =
+    EitherT(
+      CF().run { CF().run { fix().value.contramap<Either<L, A>, Either<L, B>> { it.map(f) } } }
+    )
+}
+
+@extension
+interface EitherTDivideInstance<F, L> : Divide<EitherTPartialOf<F, L>>, EitherTContravariantInstance<F, L> {
+
+  fun DF(): Divide<F>
+
+  override fun CF(): Contravariant<F> = DF()
+
+  override fun <A, B, Z> divide(fa: Kind<EitherTPartialOf<F, L>, A>, fb: Kind<EitherTPartialOf<F, L>, B>, f: (Z) -> Tuple2<A, B>): Kind<EitherTPartialOf<F, L>, Z> =
+    EitherT(
+      DF().divide(fa.fix().value, fb.fix().value) { either ->
+        either.fold({ it.left() toT it.left() }, {
+          val (a, b) = f(it)
+          a.right() toT b.right()
+        })
+      }
+    )
+}
+
+@extension
+interface EitherTDivisibleInstance<F, L> : Divisible<EitherTPartialOf<F, L>>, EitherTDivideInstance<F, L> {
+
+  fun DFF(): Divisible<F>
+  override fun DF(): Divide<F> = DFF()
+
+  override fun <A> conquer(): Kind<EitherTPartialOf<F, L>, A> =
+    EitherT(
+      DFF().conquer()
+    )
+}
+
+@extension
+interface EitherTDecidableInstance<F, L> : Decidable<EitherTPartialOf<F, L>>, EitherTDivisibleInstance<F, L> {
+
+  fun DFFF(): Decidable<F>
+  override fun DFF(): Divisible<F> = DFFF()
+
+  override fun <A, B, Z> choose(fa: Kind<EitherTPartialOf<F, L>, A>, fb: Kind<EitherTPartialOf<F, L>, B>, f: (Z) -> Either<A, B>): Kind<EitherTPartialOf<F, L>, Z> =
+    EitherT(
+      DFFF().choose(fa.fix().value, fb.fix().value) { either ->
+        either.map(f).fold({ left ->
+          left.left().left()
+        }, { e ->
+          e.fold({ a ->
+            a.right().left()
+          }, { b ->
+            b.right().right()
+          })
+        })
+      }
+    )
+}
+
+@extension
 interface EitherTFunctorInstance<F, L> : Functor<EitherTPartialOf<F, L>> {
 
   fun FF(): Functor<F>

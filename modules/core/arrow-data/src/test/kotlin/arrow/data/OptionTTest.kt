@@ -4,10 +4,12 @@ import arrow.Kind
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
+import arrow.instances.const.divisible.divisible
+import arrow.instances.monoid
 import arrow.instances.nonemptylist.monad.monad
 import arrow.instances.option.monad.monad
-import arrow.instances.option.semigroup.semigroup
 import arrow.instances.optiont.applicative.applicative
+import arrow.instances.optiont.divisible.divisible
 import arrow.instances.optiont.monad.monad
 import arrow.instances.optiont.monoidK.monoidK
 import arrow.instances.optiont.semigroupK.semigroupK
@@ -16,8 +18,7 @@ import arrow.mtl.instances.optiont.functorFilter.functorFilter
 import arrow.mtl.instances.optiont.traverseFilter.traverseFilter
 import arrow.test.UnitSpec
 import arrow.test.laws.*
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Monad
+import arrow.typeclasses.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
@@ -38,6 +39,13 @@ class OptionTTest : UnitSpec() {
   init {
 
     testLaws(
+      DivisibleLaws.laws(
+        OptionT.divisible(Const.divisible(Int.monoid())),
+        { i -> OptionT(Const(i)) },
+        Eq { a: Kind<OptionTPartialOf<ConstPartialOf<Int>>, Int>, b ->
+          a.fix().value.fix().value == b.fix().value.fix().value
+        }
+      ),
       MonadLaws.laws(OptionT.monad(Option.monad()), Eq.any()),
       SemigroupKLaws.laws(
         OptionT.semigroupK(Option.monad()),

@@ -1,15 +1,63 @@
 package arrow.instances
 
 import arrow.Kind
+import arrow.core.Either
+import arrow.core.Tuple2
 import arrow.data.Sum
 import arrow.data.SumPartialOf
 import arrow.data.fix
 import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
-import arrow.typeclasses.Comonad
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Hash
+import arrow.typeclasses.*
+
+@extension
+interface ContravariantSumInstance<F, G> : Contravariant<SumPartialOf<F, G>> {
+  fun CF(): Contravariant<F>
+  fun CG(): Contravariant<G>
+
+  override fun <A, B> Kind<SumPartialOf<F, G>, A>.contramap(f: (B) -> A): Kind<SumPartialOf<F, G>, B> =
+    Sum(
+      CF().run { fix().left.contramap(f) },
+      CG().run { fix().right.contramap(f) },
+      fix().side
+    )
+}
+
+@extension
+interface DivideSumInstance<F, G> : Divide<SumPartialOf<F, G>>, ContravariantSumInstance<F, G> {
+  override fun CF(): Divide<F>
+  override fun CG(): Divide<G>
+
+  override fun <A, B, Z> divide(fa: Kind<SumPartialOf<F, G>, A>, fb: Kind<SumPartialOf<F, G>, B>, f: (Z) -> Tuple2<A, B>): Kind<SumPartialOf<F, G>, Z> =
+    Sum(
+      CF().divide(fa.fix().left, fb.fix().left, f),
+      CG().divide(fa.fix().right, fb.fix().right, f)
+    )
+}
+
+@extension
+interface DivisibleSumInstance<F, G> : Divisible<SumPartialOf<F, G>>, DivideSumInstance<F, G> {
+  override fun CF(): Divisible<F>
+  override fun CG(): Divisible<G>
+
+  override fun <A> conquer(): Kind<SumPartialOf<F, G>, A> =
+    Sum(
+      CF().conquer(),
+      CG().conquer()
+    )
+}
+
+@extension
+interface DecidableSumInstance<F, G> : Decidable<SumPartialOf<F, G>>, DivisibleSumInstance<F, G> {
+  override fun CF(): Decidable<F>
+  override fun CG(): Decidable<G>
+
+  override fun <A, B, Z> choose(fa: Kind<SumPartialOf<F, G>, A>, fb: Kind<SumPartialOf<F, G>, B>, f: (Z) -> Either<A, B>): Kind<SumPartialOf<F, G>, Z> =
+    Sum(
+      CF().choose(fa.fix().left, fb.fix().left, f),
+      CG().choose(fa.fix().right, fb.fix().right, f)
+    )
+}
 
 @extension
 interface ComonadSumInstance<F, G> : Comonad<SumPartialOf<F, G>> {

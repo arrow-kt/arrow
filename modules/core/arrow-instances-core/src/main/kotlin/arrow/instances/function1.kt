@@ -5,15 +5,7 @@ import arrow.Kind2
 import arrow.core.*
 import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Contravariant
-import arrow.typeclasses.Category
-import arrow.typeclasses.Conested
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
-import arrow.typeclasses.Profunctor
-import arrow.typeclasses.conest
-import arrow.typeclasses.counnest
+import arrow.typeclasses.*
 
 @extension
 interface Function1FunctorInstance<I> : Functor<Function1PartialOf<I>> {
@@ -28,6 +20,55 @@ interface Function1ContravariantInstance<O> : Contravariant<Conested<ForFunction
 
   fun <A, B> Function1Of<A, O>.contramapC(f: (B) -> A): Function1Of<B, O> =
     conest().contramap(f).counnest()
+}
+
+@extension
+interface Function1DivideInstance<O> : Divide<Conested<ForFunction1, O>>, Function1ContravariantInstance<O> {
+  fun MO(): Monoid<O>
+
+  override fun <A, B, Z> divide(fa: Kind<Conested<ForFunction1, O>, A>, fb: Kind<Conested<ForFunction1, O>, B>, f: (Z) -> Tuple2<A, B>): Kind<Conested<ForFunction1, O>, Z> =
+    Function1<Z, O> { z ->
+      val (a, b) = f(z)
+      MO().run {
+        fa.counnest()(a) +
+          fb.counnest()(b)
+      }
+    }.conest()
+
+  fun <A, B, Z> divideC(fa: Kind<Function1PartialOf<A>, O>, fb: Kind<Function1PartialOf<B>, O>, f: (Z) -> Tuple2<A, B>): Kind<Function1PartialOf<Z>, O> =
+    divide(fa.conest(), fb.conest(), f).counnest()
+}
+
+@extension
+interface Function1DivisibleInstance<O> : Divisible<Conested<ForFunction1, O>>, Function1DivideInstance<O> {
+
+  fun MOO(): Monoid<O>
+  override fun MO(): Monoid<O> = MOO()
+
+  override fun <A> conquer(): Kind<Conested<ForFunction1, O>, A> =
+    Function1<A, O> { MO().empty() }.conest()
+
+  fun <A> conquerC(): Kind<Function1PartialOf<A>, O> =
+    conquer<A>().counnest()
+}
+
+@extension
+interface Function1DecidableInstance<O> : Decidable<Conested<ForFunction1, O>>, Function1DivisibleInstance<O> {
+
+  fun MOOO(): Monoid<O>
+  override fun MOO(): Monoid<O> = MOOO()
+
+  override fun <A, B, Z> choose(fa: Kind<Conested<ForFunction1, O>, A>, fb: Kind<Conested<ForFunction1, O>, B>, f: (Z) -> Either<A, B>): Kind<Conested<ForFunction1, O>, Z> =
+    Function1<Z, O> { z ->
+      f(z).fold({ a ->
+        fa.counnest()(a)
+      }, { b ->
+        fb.counnest()(b)
+      })
+    }.conest()
+
+  fun <A, B, Z> chooseC(fa: Kind<Function1PartialOf<A>, O>, fb: Kind<Function1PartialOf<B>, O>, f: (Z) -> Either<A, B>): Kind<Function1PartialOf<Z>, O> =
+    choose(fa.conest(), fb.conest(), f).counnest().fix()
 }
 
 @extension

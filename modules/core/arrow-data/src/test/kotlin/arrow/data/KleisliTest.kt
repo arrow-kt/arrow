@@ -8,17 +8,18 @@ import arrow.effects.instances.io.applicativeError.attempt
 import arrow.effects.instances.io.bracket.bracket
 import arrow.effects.instances.kleisli.bracket.bracket
 import arrow.instances.`try`.monadError.monadError
+import arrow.instances.const.divisible.divisible
 import arrow.instances.id.monad.monad
 import arrow.instances.kleisli.contravariant.contravariant
+import arrow.instances.kleisli.divisible.divisible
 import arrow.instances.kleisli.monadError.monadError
+import arrow.instances.monoid
 import arrow.test.UnitSpec
 import arrow.test.laws.BracketLaws
 import arrow.test.laws.ContravariantLaws
+import arrow.test.laws.DivisibleLaws
 import arrow.test.laws.MonadErrorLaws
-import arrow.typeclasses.Conested
-import arrow.typeclasses.Eq
-import arrow.typeclasses.conest
-import arrow.typeclasses.counnest
+import arrow.typeclasses.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import org.junit.runner.RunWith
@@ -45,6 +46,13 @@ class KleisliTest : UnitSpec() {
   init {
 
     testLaws(
+      DivisibleLaws.laws(
+        Kleisli.divisible<ConstPartialOf<Int>, Int>(Const.divisible(Int.monoid())),
+        { i -> Kleisli { Const(i) } },
+        Eq { a: Kind<KleisliPartialOf<ConstPartialOf<Int>, Int>, Int>, b ->
+          a.fix().run(1).fix().value == b.fix().run(1).fix().value
+        }
+      ),
       BracketLaws.laws(
         BF = Kleisli.bracket<ForIO, Int, Throwable>(IO.bracket()),
         EQ = IOEQ(),

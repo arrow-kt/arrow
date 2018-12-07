@@ -12,6 +12,65 @@ import arrow.instances.statet.monad.monad
 import arrow.typeclasses.*
 
 @extension
+interface StateTContravariantInstance<F, S> : Contravariant<StateTPartialOf<F, S>> {
+
+  fun CF(): Contravariant<F>
+
+  fun MF(): Monad<F>
+
+  override fun <A, B> Kind<StateTPartialOf<F, S>, A>.contramap(f: (B) -> A): Kind<StateTPartialOf<F, S>, B> =
+    StateT(MF()) { s ->
+      CF().run {
+        runM(MF(), s).contramap { (s, b) ->
+          s toT f(b)
+        }
+      }
+    }
+}
+
+@extension
+interface StateTDivideInstance<F, S> : Divide<StateTPartialOf<F, S>>, StateTContravariantInstance<F, S> {
+
+  override fun CF(): Divide<F>
+
+  override fun MF(): Monad<F>
+
+  override fun <A, B, Z> divide(fa: Kind<StateTPartialOf<F, S>, A>, fb: Kind<StateTPartialOf<F, S>, B>, f: (Z) -> Tuple2<A, B>): Kind<StateTPartialOf<F, S>, Z> =
+    StateT(MF()) { s ->
+      CF().divide(fa.runM(MF(), s), fb.runM(MF(), s)) { (s, z) ->
+        val (a, b) = f(z)
+        (s toT a) toT (s toT b)
+      }
+    }
+}
+
+@extension
+interface StateTDivisibleInstance<F, S> : Divisible<StateTPartialOf<F, S>>, StateTDivideInstance<F, S> {
+  override fun CF(): Divisible<F>
+  override fun MF(): Monad<F>
+
+  override fun <A> conquer(): Kind<StateTPartialOf<F, S>, A> =
+    StateT(MF()) { CF().conquer() }
+}
+
+@extension
+interface StateTDecidableInstante<F, S> : Decidable<StateTPartialOf<F, S>>, StateTDivisibleInstance<F, S> {
+  override fun CF(): Decidable<F>
+  override fun MF(): Monad<F>
+
+  override fun <A, B, Z> choose(fa: Kind<StateTPartialOf<F, S>, A>, fb: Kind<StateTPartialOf<F, S>, B>, f: (Z) -> Either<A, B>): Kind<StateTPartialOf<F, S>, Z> =
+    StateT(MF()) { s ->
+      CF().choose(fa.runM(MF(), s), fb.runM(MF(), s)) { (s, z) ->
+        f(z).fold({ a ->
+          (s toT a).left()
+        }, { b ->
+          (s toT b).right()
+        })
+      }
+    }
+}
+
+@extension
 interface StateTFunctorInstance<F, S> : Functor<StateTPartialOf<F, S>> {
 
   fun FF(): Functor<F>

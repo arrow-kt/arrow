@@ -1,19 +1,13 @@
 package arrow.core
 
 import arrow.Kind
-import arrow.core.ForFunction1
-import arrow.core.Function1
-import arrow.core.Function1Of
-import arrow.core.invoke
 import arrow.instances.function1.category.category
-import arrow.instances.function1.contravariant.contravariant
+import arrow.instances.function1.divisible.divisible
 import arrow.instances.function1.monad.monad
 import arrow.instances.function1.profunctor.profunctor
+import arrow.instances.monoid
 import arrow.test.UnitSpec
-import arrow.test.laws.CategoryLaws
-import arrow.test.laws.ContravariantLaws
-import arrow.test.laws.MonadLaws
-import arrow.test.laws.ProfunctorLaws
+import arrow.test.laws.*
 import arrow.typeclasses.Conested
 import arrow.typeclasses.Eq
 import arrow.typeclasses.conest
@@ -33,7 +27,7 @@ class Function1Test : UnitSpec() {
 
   init {
     testLaws(
-      ContravariantLaws.laws(Function1.contravariant(), { Function1.just<Int, Int>(it).conest() }, ConestedEQ),
+      DivisibleLaws.laws(Function1.divisible(Int.monoid()), { Function1.just<Int, Int>(it).conest() }, ConestedEQ),
       ProfunctorLaws.laws(Function1.profunctor(), { Function1.just(it) }, EQ),
       MonadLaws.laws(Function1.monad(), EQ),
       CategoryLaws.laws(Function1.category(), { Function1.just(it) }, EQ)

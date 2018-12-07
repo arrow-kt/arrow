@@ -1,15 +1,14 @@
 package arrow.data
 
 import arrow.Kind
-import arrow.core.ForOption
-import arrow.core.Option
-import arrow.core.Tuple2
-import arrow.core.fix
+import arrow.core.*
+import arrow.instances.const.divisible.divisible
 import arrow.instances.monoid
 import arrow.instances.listk.monad.monad
 import arrow.instances.listk.monoidK.monoidK
 import arrow.instances.option.monad.monad
 import arrow.instances.writert.applicative.applicative
+import arrow.instances.writert.divisible.divisible
 import arrow.instances.writert.monad.monad
 import arrow.instances.writert.monoidK.monoidK
 import arrow.mtl.instances.option.monadFilter.monadFilter
@@ -18,11 +17,8 @@ import arrow.mtl.instances.writert.monadWriter.monadWriter
 import arrow.test.UnitSpec
 import arrow.test.generators.genIntSmall
 import arrow.test.generators.genTuple
-import arrow.test.laws.MonadFilterLaws
-import arrow.test.laws.MonadLaws
-import arrow.test.laws.MonadWriterLaws
-import arrow.test.laws.MonoidKLaws
-import arrow.typeclasses.Eq
+import arrow.test.laws.*
+import arrow.typeclasses.*
 import io.kotlintest.KTestJUnitRunner
 import org.junit.runner.RunWith
 
@@ -31,6 +27,13 @@ class WriterTTest : UnitSpec() {
   init {
 
     testLaws(
+      DivisibleLaws.laws(
+        WriterT.divisible<ConstPartialOf<Int>, Int>(Const.divisible(Int.monoid())),
+        { i -> WriterT(Const(i)) },
+        Eq { a, b ->
+          a.value().value() == b.value().value()
+        }
+      ),
       MonadLaws.laws(WriterT.monad(Option.monad(), Int.monoid()), Eq.any()),
       MonoidKLaws.laws(
         WriterT.monoidK<ForListK, Int>(ListK.monoidK()),
