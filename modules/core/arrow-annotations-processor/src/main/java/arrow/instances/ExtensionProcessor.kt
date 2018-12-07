@@ -125,11 +125,20 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class) {
   private fun notAnInstanceError(): Nothing =
     knownError("@instance is only allowed on `interface` extending another interface of at least one type argument (type class) as first declaration in the instance list")
 
+  private fun TypeClassInstance.applicativeRequiresMonoid(): Boolean =
+    listOf("Const", "Tuple").find { it in dataType.name.simpleName } != null
+
   private fun Code.eval(info: TypeClassInstance): Code {
     val packageName = PackageName(info.instance.packageName.value +
       "." + info.projectedCompanion.simpleName.substringAfterLast(".").toLowerCase() +
       "." + info.typeClass.name.simpleName.decapitalize())
-    val extensionFactoryTypeArgs =
+    val applicativePackageName = PackageName(info.instance.packageName.value +
+      "." + info.projectedCompanion.simpleName.substringAfterLast(".").toLowerCase() +
+      ".applicative")
+    val intInstancesPackage =
+      if (info.applicativeRequiresMonoid()) "import arrow.instances.monoid"
+      else ""
+    val invocationTypeArgs =
       if (info.dataType.typeVariables.size < 2) ""
       else info.dataType.typeVariables.dropLast(1).joinToString(
         separator = ", ",
@@ -139,14 +148,42 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class) {
           "Int"
         }
       )
+    val justTypeArgs =
+      if (info.applicativeRequiresMonoid()) ""
+      else info.dataType.typeVariables.joinToString(
+        separator = ", ",
+        prefix = "<",
+        postfix = ">",
+        transform = { "Int" }
+      )
+    val justArgs =
+      when {
+        info.applicativeRequiresMonoid() -> "Int.monoid()"
+        info.requiredAbstractFunctions.isEmpty() -> ""
+        else -> info.requiredAbstractFunctions
+          .joinToString(", ") {
+            val factory = it.returnType?.simpleName?.decapitalize()?.substringBefore("<") ?: ""
+            "Int.$factory()"
+          }
+      }
     val extensionFactory =
-      "${info.dataType.name.simpleName}.${info.typeClass.name.simpleName.decapitalize()}$extensionFactoryTypeArgs()"
+      "${info.dataType.name.simpleName}.${info.typeClass.name.simpleName.decapitalize()}$invocationTypeArgs()"
     return copy(
       value = value
+        .replace("```(.*?):extension".toRegex()) {
+          val snippetDeclaration = it.groupValues[1]
+          "```$snippetDeclaration"
+        }
+        .replace(
+          "_imports_applicative_",
+          """|import ${applicativePackageName.value.quote()}.*
+             |""".trimMargin()
+        )
         .replace(
           "_imports_",
           """|import ${info.dataType.name.rawName}
              |import ${packageName.value.quote()}.*
+             |$intInstancesPackage
              |""".trimMargin()
         )
         .replace(
@@ -157,6 +194,10 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class) {
           "_dataType_",
           info.dataType.name.simpleName
         )
+        .replace("_(.*)_".toRegex()) {
+          val function = it.groupValues[1]
+          "1.$function$justTypeArgs($justArgs)"
+        }
     )
   }
 
@@ -170,7 +211,7 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class) {
       )
     }
     return Func(
-      kdoc = this.typeClass.kdoc?.eval(this),
+      kdoc = typeClass.kdoc?.eval(this),
       name = typeClass.name.simpleName.decapitalize(),
       parameters = requiredParameters,
       receiverType = target,
@@ -204,6 +245,7 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class) {
           .toList()
         func
           .copy(
+            kdoc = func.kdoc?.eval(this),
             modifiers =
             when {
               allArgs.size > 1 -> emptyList()

@@ -12,9 +12,7 @@ import arrow.documented
  * [Option], [NonEmptyList], [List] and many other data types that include a `map` function with the shape
  * `fun F<A>.map(f: (A) -> B): F<B>` where `F` refers to any type constructor whose contents can be transformed.
  *
- * {: data-executable='true'}
- *
- * ```kotlin:ank
+ * ```kotlin:ank:playground:extension
  * _imports_
  *
  * fun main(args: Array<String>) {
@@ -25,23 +23,69 @@ import arrow.documented
  *   println(result)
  * }
  * ```
+ *
+ * The `Functor` typeclass abstracts the ability to `map` over the computational context of a type constructor.
+ * Examples of type constructors that can implement instances of the Functor typeclass include `Option`, `NonEmptyList`,
+ * `List` and many other datatypes that include a `map` function with the shape `fun F<A>.map(f: (A) -> B): F<B>` where `F`
+ * refers to `Option`, `List` or any other type constructor whose contents can be transformed.
+ *
+ * ### Example
+ *
+ * Oftentimes we find ourselves in situations where we need to transform the contents of some datatype. `Functor#map` allows
+ * us to safely compute over values under the assumption that they'll be there returning the transformation encapsulated in the same context.
+ *
+ * Consider both `Option` and `Try`:
+ *
+ * `Option<A>` allows us to model absence and has two possible states, `Some(a: A)` if the value is not absent and `None` to represent an empty case.
+ * In a similar fashion `Try<A>` may have two possible cases `Success(a: A)` for computations that succeed and `Failure(e: Throwable)` if they fail
+ * with an exception.
+ *
+ * Both `Try` and `Option` are examples of data types that can be computed over transforming their inner results.
+ *
+ * ```kotlin:ank:playground
+ * import arrow.*
+ * import arrow.core.*
+ * import arrow.data.*
+ *
+ * fun main(args: Array<String>) {
+ *   val result =
+ *   //sampleStart
+ *   Try { "1".toInt() }.map { it * 2 }
+ *   //sampleEnd
+ *   println(result)
+ * }
+ * ```
+ *
+ * ```kotlin:ank:playground
+ * import arrow.*
+ * import arrow.core.*
+ * import arrow.data.*
+ *
+ * fun main(args: Array<String>) {
+ *   val result =
+ *   //sampleStart
+ *   Option(1).map { it * 2 }
+ *   //sampleEnd
+ *   println(result)
+ * }
+ * ```
+ *
  */
 @documented
 interface Functor<F> : Invariant<F> {
 
   /**
-   * documented map
-   * second line doc
+   * Transform the [F] wrapped value [A] into [B] preserving the [F] structure
+   * Kind<F, A> -> Kind<F, B>
    *
-   * {: data-executable='true'}
-   *
-   * ```kotlin:ank
-   * import arrow.core.*
+   * ```kotlin:ank:playground:extension
+   * _imports_
+   * _imports_applicative_
    *
    * fun main(args: Array<String>) {
    *   val result =
    *   //sampleStart
-   *   Option(1)
+   *   _just_.map { it + 1 }
    *   //sampleEnd
    *   println(result)
    * }
@@ -57,6 +101,23 @@ interface Functor<F> : Invariant<F> {
       fa.map(f)
     }
 
+  /**
+   * Discards the [A] value inside [F] signaling this container may be pointing to a noop
+   * or an effect whose return value is deliberately ignored. The singleton value [Unit] serves as signal.
+   *
+   * ```kotlin:ank:playground:extension
+   * _imports_
+   * _imports_applicative_
+   *
+   * fun main(args: Array<String>) {
+   *   val result =
+   *   //sampleStart
+   *   _just_.void()
+   *   //sampleEnd
+   *   println(result)
+   * }
+   * ```
+   */
   fun <A> Kind<F, A>.void(): Kind<F, Unit> = map { Unit }
 
   fun <A, B> Kind<F, A>.fproduct(f: (A) -> B): Kind<F, Tuple2<A, B>> = map { a -> Tuple2(a, f(a)) }
