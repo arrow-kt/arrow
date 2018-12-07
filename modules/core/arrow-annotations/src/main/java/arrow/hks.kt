@@ -1,7 +1,7 @@
 package arrow
 
 /**
- * Kind<F, A> represents a generic F<A> in a way that's allowed by Kotlin.
+ * `Kind<F, A>` represents a generic `F<A>` in a way that's allowed by Kotlin.
  * To revert it back to its original form use the extension function `fix()`.
  *
  * ```kotlin
