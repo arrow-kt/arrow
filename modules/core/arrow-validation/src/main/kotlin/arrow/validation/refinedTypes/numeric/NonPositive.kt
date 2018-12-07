@@ -30,7 +30,8 @@ interface NonPositive<F, A : Number> : Refinement<F, A> {
    * {: data-executable='true'}
    *
    * ```kotlin:ank
-   * import arrow.validation.refinedTypes.numeric.*
+   * import arrow.instances.order
+   * import arrow.validation.refinedTypes.numeric.either.nonPositive.nonPositive
    *
    * fun main(args: Array<String>) {
    *   //sampleStart

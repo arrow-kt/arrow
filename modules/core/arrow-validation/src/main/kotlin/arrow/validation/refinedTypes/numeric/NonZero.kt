@@ -29,7 +29,7 @@ interface NonZero<F, A : Number> : Refinement<F, A> {
    * {: data-executable='true'}
    *
    * ```kotlin:ank
-   * import arrow.validation.refinedTypes.numeric.*
+   * import arrow.validation.refinedTypes.numeric.validated.nonZero.nonZero
    *
    * fun main(args: Array<String>) {
    *   //sampleStart

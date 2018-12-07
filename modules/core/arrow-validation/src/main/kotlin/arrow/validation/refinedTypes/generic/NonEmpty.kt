@@ -28,7 +28,7 @@ interface NonEmpty<F, A> : Refinement<F, A> {
    * {: data-executable='true'}
    *
    * ```kotlin:ank
-   * import arrow.validation.refinedTypes.generic.*
+   * import arrow.validation.refinedTypes.generic.validated.nonEmpty.nonEmpty
    *
    * fun main(args: Array<String>) {
    *   //sampleStart

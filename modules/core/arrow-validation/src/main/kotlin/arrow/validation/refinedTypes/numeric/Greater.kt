@@ -34,7 +34,8 @@ interface Greater<F, A : Number> : Refinement<F, A> {
    * {: data-executable='true'}
    *
    * ```kotlin:ank
-   * import arrow.validation.refinedTypes.numeric.*
+   * import arrow.instances.order
+   * import arrow.validation.refinedTypes.numeric.validated.greater.greater
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
