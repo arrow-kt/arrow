@@ -1,11 +1,10 @@
 package arrow.instances
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Tuple2
+import arrow.core.toT
 import arrow.data.WriterT
-import arrow.data.WriterTOf
-import arrow.data.WriterTPartialOf
-import arrow.data.fix
 import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.typeclasses.*
@@ -53,7 +52,7 @@ interface WriterTDecidableInstance<F, W> : Decidable<WriterTPartialOf<F, W>>, Wr
 
   override fun <A, B, Z> choose(fa: Kind<WriterTPartialOf<F, W>, A>, fb: Kind<WriterTPartialOf<F, W>, B>, f: (Z) -> Either<A, B>): Kind<WriterTPartialOf<F, W>, Z> =
     WriterT(
-      CF().choose(fa.fix().value, fb.fix().value) {  (w, z) ->
+      CF().choose(fa.fix().value, fb.fix().value) { (w, z) ->
         f(z).fold({ a ->
           (w toT a).left()
         }, { b ->
