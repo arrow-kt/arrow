@@ -1,5 +1,14 @@
 package arrow
 
+/**
+ * `Kind<F, A>` represents a generic `F<A>` in a way that's allowed by Kotlin.
+ * To revert it back to its original form use the extension function `fix()`.
+ *
+ * ```kotlin
+ * val a: Kind<ForIO, List<User>> = someGenericFunction()
+ * val fixedA: IO<List<User>> = a.fix()
+ * ```
+ */
 interface Kind<out F, out A>
 typealias Kind2<F, A, B> = Kind<Kind<F, A>, B>
 typealias Kind3<F, A, B, C> = Kind<Kind2<F, A, B>, C>
