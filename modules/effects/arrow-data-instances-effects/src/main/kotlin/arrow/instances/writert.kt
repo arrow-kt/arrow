@@ -3,10 +3,15 @@ package arrow.effects.instances
 import arrow.Kind
 import arrow.core.*
 import arrow.data.*
-import arrow.effects.Ref
 import arrow.effects.typeclasses.*
 import arrow.extension
 import arrow.instances.WriterTMonadThrow
+import arrow.core.Either
+import arrow.core.Tuple2
+import arrow.core.compose
+import arrow.data.*
+import arrow.effects.Ref
+import arrow.effects.typeclasses.*
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.Monoid
 import arrow.undocumented

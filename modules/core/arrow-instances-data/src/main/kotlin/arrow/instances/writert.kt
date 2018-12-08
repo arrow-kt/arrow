@@ -62,13 +62,14 @@ interface WriterTMonadInstance<F, W> : Monad<WriterTPartialOf<F, W>>, WriterTApp
 }
 
 @extension
+@undocumented
 interface WriterTApplicativeError<F, W, E> : ApplicativeError<WriterTPartialOf<F, W>, E>, WriterTApplicativeInstance<F, W> {
 
   fun AE(): ApplicativeError<F, E>
 
-  override fun AF(): Applicative<F>
-
   override fun MM(): Monoid<W>
+
+  override fun AF(): Applicative<F> = AE()
 
   override fun <A> raiseError(e: E): WriterT<F, W, A> =
     WriterT(AE().raiseError(e))
@@ -80,6 +81,7 @@ interface WriterTApplicativeError<F, W, E> : ApplicativeError<WriterTPartialOf<F
 }
 
 @extension
+@undocumented
 interface WriterTMonadError<F, W, E> : MonadError<WriterTPartialOf<F, W>, E>, WriterTApplicativeError<F, W, E>, WriterTMonadInstance<F, W> {
 
   fun ME(): MonadError<F, E>
@@ -95,12 +97,14 @@ interface WriterTMonadError<F, W, E> : MonadError<WriterTPartialOf<F, W>, E>, Wr
 }
 
 @extension
+@undocumented
 interface WriterTMonadThrow<F, W> : MonadThrow<WriterTPartialOf<F, W>>, WriterTMonadError<F, W, Throwable> {
   override fun ME(): MonadError<F, Throwable>
   override fun MM(): Monoid<W>
 }
 
 @extension
+@undocumented
 interface WriterTSemigroupKInstance<F, W> : SemigroupK<WriterTPartialOf<F, W>> {
 
   fun SS(): SemigroupK<F>
@@ -110,6 +114,7 @@ interface WriterTSemigroupKInstance<F, W> : SemigroupK<WriterTPartialOf<F, W>> {
 }
 
 @extension
+@undocumented
 interface WriterTMonoidKInstance<F, W> : MonoidK<WriterTPartialOf<F, W>>, WriterTSemigroupKInstance<F, W> {
 
   fun MF(): MonoidK<F>

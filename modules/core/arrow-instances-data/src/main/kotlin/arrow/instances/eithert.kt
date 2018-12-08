@@ -11,7 +11,6 @@ import arrow.instances.either.traverse.traverse
 import arrow.instances.validated.applicativeError.raiseError
 import arrow.typeclasses.*
 
-@extension
 interface EitherTFunctorInstance<F, L> : Functor<EitherTPartialOf<F, L>> {
 
   fun FF(): Functor<F>
@@ -20,7 +19,6 @@ interface EitherTFunctorInstance<F, L> : Functor<EitherTPartialOf<F, L>> {
     fix().map(FF(), f)
 }
 
-@extension
 interface EitherTApplicativeInstance<F, L> : Applicative<EitherTPartialOf<F, L>>, EitherTFunctorInstance<F, L> {
 
   fun AF(): Applicative<F>
@@ -37,7 +35,6 @@ interface EitherTApplicativeInstance<F, L> : Applicative<EitherTPartialOf<F, L>>
     fix().ap(AF(), ff)
 }
 
-@extension
 interface EitherTMonadInstance<F, L> : Monad<EitherTPartialOf<F, L>>, EitherTApplicativeInstance<F, L> {
 
   fun MF(): Monad<F>
@@ -57,7 +54,6 @@ interface EitherTMonadInstance<F, L> : Monad<EitherTPartialOf<F, L>>, EitherTApp
     EitherT.tailRecM(MF(), a, f)
 }
 
-@extension
 interface EitherTApplicativeErrorInstance<F, L> : ApplicativeError<EitherTPartialOf<F, L>, L>, EitherTApplicativeInstance<F, L> {
 
   fun AE(): ApplicativeError<F, L>
@@ -81,13 +77,11 @@ interface EitherTMonadErrorInstance<F, L> : MonadError<EitherTPartialOf<F, L>, L
   override fun AF(): Applicative<F> = MF()
 }
 
-@extension
 interface EitherTMonadThrowInstance<F> : MonadThrow<EitherTPartialOf<F, Throwable>>, EitherTMonadErrorInstance<F, Throwable> {
   override fun MF(): Monad<F>
   override fun AE(): ApplicativeError<F, Throwable>
 }
 
-@extension
 interface EitherTFoldableInstance<F, L> : Foldable<EitherTPartialOf<F, L>> {
 
   fun FFF(): Foldable<F>
@@ -99,7 +93,6 @@ interface EitherTFoldableInstance<F, L> : Foldable<EitherTPartialOf<F, L>> {
     fix().foldRight(FFF(), lb, f)
 }
 
-@extension
 interface EitherTTraverseInstance<F, L> : Traverse<EitherTPartialOf<F, L>>, EitherTFunctorInstance<F, L>, EitherTFoldableInstance<F, L> {
 
   fun TF(): Traverse<F>
@@ -139,6 +132,19 @@ fun <F, A, B, G, C> EitherTOf<F, A, B>.traverse(FF: Traverse<F>, GA: Applicative
 fun <F, G, A, B> EitherTOf<F, A, Kind<G, B>>.sequence(FF: Traverse<F>, GA: Applicative<G>): Kind<G, EitherT<F, A, B>> =
   traverse(FF, GA, ::identity)
 
+fun <F, L> EitherT.Companion.functor(FF: Functor<F>): Functor<EitherTPartialOf<F, L>> =
+  object : EitherTFunctorInstance<F, L> {
+    override fun FF(): Functor<F> = FF
+
+  }
+
+fun <F, L> EitherT.Companion.applicative(AF: Applicative<F>): Applicative<EitherTPartialOf<F, L>> =
+  object : EitherTApplicativeInstance<F, L> {
+    override fun FF(): Functor<F> = AF
+
+    override fun AF(): Applicative<F> = AF
+  }
+
 fun <F, L> EitherT.Companion.applicativeError(MF: Monad<F>): ApplicativeError<EitherTPartialOf<F, L>, L> =
   object : ApplicativeError<EitherTPartialOf<F, L>, L>, EitherTApplicativeInstance<F, L> {
 
@@ -149,6 +155,13 @@ fun <F, L> EitherT.Companion.applicativeError(MF: Monad<F>): ApplicativeError<Ei
 
     override fun <A> EitherTOf<F, L, A>.handleErrorWith(f: (L) -> EitherTOf<F, L, A>): EitherT<F, L, A> =
       handleErrorWith(this, f, MF)
+  }
+
+fun <F, L> EitherT.Companion.monad(MF: Monad<F>): Monad<EitherTPartialOf<F, L>> =
+  object : EitherTMonadInstance<F, L> {
+    override fun FF(): Functor<F> = MF
+
+    override fun MF(): Monad<F> = MF
   }
 
 fun <F, L> EitherT.Companion.monadError(MF: Monad<F>): MonadError<EitherTPartialOf<F, L>, L> =

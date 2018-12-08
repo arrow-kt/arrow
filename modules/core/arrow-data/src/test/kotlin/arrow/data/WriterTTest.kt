@@ -9,11 +9,11 @@ import arrow.effects.instances.io.async.async
 import arrow.effects.instances.writert.async.async
 import arrow.instances.*
 import arrow.instances.monoid
+import arrow.instances.*
 import arrow.instances.listk.monad.monad
 import arrow.instances.listk.monoidK.monoidK
 import arrow.instances.option.monad.monad
 import arrow.instances.writert.applicative.applicative
-import arrow.instances.writert.async.async
 import arrow.instances.writert.monad.monad
 import arrow.instances.writert.monoidK.monoidK
 import arrow.mtl.instances.option.monadFilter.monadFilter
@@ -41,16 +41,14 @@ class WriterTTest : UnitSpec() {
   init {
 
     testLaws(
-      AsyncLaws.laws(WriterT.async(IO.async(), Int.monoid()), IOEQ(), IOEitherEQ()),
-      MonoidKLaws.laws(
-        WriterT.  monoidK<ForListK, Int>(ListK.monoidK()),
-        WriterT.applicative(ListK.monad(), Int.monoid()),
-        Eq { a, b ->
-          a.value() == b.value()
-        }),
+      AsyncLaws.laws<WriterTPartialOf<ForIO, Int>>(WriterT.async(IO.async(), Int.monoid()), IOEQ(), IOEitherEQ()),
+      MonoidKLaws.laws<WriterTPartialOf<ForListK, Int>>(
+        WriterT.monoidK<ForListK, Int>(ListK.monoidK()),
+        WriterT.applicative<ForListK, Int>(ListK.monad(), Int.monoid()),
+        Eq { a, b -> a.value() == b.value() }),
 
-      MonadWriterLaws.laws(WriterT.monad(Option.monad(), Int.monoid()),
-        WriterT.monadWriter(Option.monad(), Int.monoid()),
+      MonadWriterLaws.laws<WriterTPartialOf<ForOption, Int>, Int>(WriterT.monad(Option.monad(), Int.monoid()),
+        WriterT.monadWriter<ForOption, Int>(Option.monad(), Int.monoid()),
         Int.monoid(),
         genIntSmall(),
         genTuple(genIntSmall(), genIntSmall()),
@@ -68,8 +66,9 @@ class WriterTTest : UnitSpec() {
         }
       ),
 
-      MonadFilterLaws.laws(WriterT.monadFilter(Option.monadFilter(), Int.monoid()),
-        { WriterT(Option(Tuple2(it, it))) },
+      MonadFilterLaws.laws<WriterTPartialOf<ForOption, Int>>(
+        WriterT.monadFilter<ForOption, Int>(Option.monadFilter(), Int.monoid()),
+        { WriterT<ForOption, Int, Int>(Option(Tuple2(it, it))) },
         object : Eq<Kind<WriterTPartialOf<ForOption, Int>, Int>> {
           override fun Kind<WriterTPartialOf<ForOption, Int>, Int>.eqv(b: Kind<WriterTPartialOf<ForOption, Int>, Int>): Boolean =
             value().fix().let { optionA: Option<Tuple2<Int, Int>> ->

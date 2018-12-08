@@ -8,7 +8,6 @@ import arrow.extension
 import arrow.instances.EitherTMonadThrowInstance
 import arrow.instances.either.monad.flatten
 import arrow.instances.eithert.monad.flatMap
-import arrow.typeclasses.ApplicativeError
 import arrow.instances.either.monad.flatten
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Monad
