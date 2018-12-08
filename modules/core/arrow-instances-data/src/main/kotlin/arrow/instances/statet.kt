@@ -4,14 +4,9 @@ import arrow.Kind
 import arrow.core.*
 import arrow.data.*
 import arrow.deprecation.ExtensionsDSLDeprecated
-import arrow.extension
 import arrow.instances.id.monad.monad
-import arrow.instances.statet.applicative.applicative
-import arrow.instances.statet.functor.functor
-import arrow.instances.statet.monad.monad
 import arrow.typeclasses.*
 
-@extension
 interface StateTFunctorInstance<F, S> : Functor<StateTPartialOf<F, S>> {
 
   fun FF(): Functor<F>
@@ -21,7 +16,10 @@ interface StateTFunctorInstance<F, S> : Functor<StateTPartialOf<F, S>> {
 
 }
 
-@extension
+fun <F, S> StateT.Companion.functor(FF: Functor<F>): Functor<StateTPartialOf<F, S>> = object : StateTFunctorInstance<F, S> {
+  override fun FF(): Functor<F> = FF
+}
+
 interface StateTApplicativeInstance<F, S> : Applicative<StateTPartialOf<F, S>>, StateTFunctorInstance<F, S> {
 
   fun MF(): Monad<F>
@@ -42,7 +40,10 @@ interface StateTApplicativeInstance<F, S> : Applicative<StateTPartialOf<F, S>>, 
 
 }
 
-@extension
+fun <F, S> StateT.Companion.applicative(MF: Monad<F>): Applicative<StateTPartialOf<F, S>> = object : StateTApplicativeInstance<F, S> {
+  override fun MF(): Monad<F> = MF
+}
+
 interface StateTMonadInstance<F, S> : Monad<StateTPartialOf<F, S>>, StateTApplicativeInstance<F, S> {
 
   override fun MF(): Monad<F>
@@ -61,7 +62,10 @@ interface StateTMonadInstance<F, S> : Monad<StateTPartialOf<F, S>>, StateTApplic
 
 }
 
-@extension
+fun <F, S> StateT.Companion.monad(MF: Monad<F>): Monad<StateTPartialOf<F, S>> = object : StateTMonadInstance<F, S> {
+  override fun MF(): Monad<F> = MF
+}
+
 interface StateTSemigroupKInstance<F, S> : SemigroupK<StateTPartialOf<F, S>> {
 
   fun FF(): Monad<F>
@@ -73,7 +77,12 @@ interface StateTSemigroupKInstance<F, S> : SemigroupK<StateTPartialOf<F, S>> {
 
 }
 
-@extension
+fun <F, S> StateT.Companion.semigroupK(FF: Monad<F>, SS: SemigroupK<F>): SemigroupK<StateTPartialOf<F, S>> = object : StateTSemigroupKInstance<F, S> {
+  override fun FF(): Monad<F> = FF
+
+  override fun SS(): SemigroupK<F> = SS
+}
+
 interface StateTApplicativeErrorInstance<F, S, E> : ApplicativeError<StateTPartialOf<F, S>, E>, StateTApplicativeInstance<F, S> {
 
   fun ME(): MonadError<F, E>
@@ -82,19 +91,39 @@ interface StateTApplicativeErrorInstance<F, S, E> : ApplicativeError<StateTParti
 
   override fun MF(): Monad<F> = ME()
 
-  override fun <A> raiseError(e: E): Kind<StateTPartialOf<F, S>, A> = StateT.lift(ME(), ME().raiseError(e))
+  override fun <A> raiseError(e: E): Kind<StateTPartialOf<F, S>, A> = StateT.liftF(ME(), ME().raiseError(e))
 
   override fun <A> Kind<StateTPartialOf<F, S>, A>.handleErrorWith(f: (E) -> Kind<StateTPartialOf<F, S>, A>): StateT<F, S, A> =
-    StateT(ME().just({ s -> ME().run { runM(ME(), s).handleErrorWith({ e -> f(e).runM(ME(), s) }) } }))
+    ME().run {
+      State(this) { s ->
+        runM(this, s).handleErrorWith { e ->
+          f(e).runM(this, s)
+        }
+      }
+    }
+
 }
 
-@extension
+fun <F, S, E> StateT.Companion.applicativeError(ME: MonadError<F, E>): ApplicativeError<StateTPartialOf<F, S>, E> = object : StateTApplicativeErrorInstance<F, S, E> {
+  override fun ME(): MonadError<F, E> = ME
+}
+
 interface StateTMonadErrorInstance<F, S, E> : MonadError<StateTPartialOf<F, S>, E>, StateTApplicativeErrorInstance<F, S, E>, StateTMonadInstance<F, S> {
 
   override fun MF(): Monad<F> = ME()
 
   override fun ME(): MonadError<F, E>
 
+}
+
+fun <F, S, E> StateT.Companion.monadError(ME: MonadError<F, E>): MonadError<StateTPartialOf<F, S>, E> = object : StateTMonadErrorInstance<F, S, E> {
+  override fun ME(): MonadError<F, E> = ME
+}
+
+interface StateTMonadThrowInstance<F, S> : MonadThrow<StateTPartialOf<F, S>>, StateTMonadErrorInstance<F, S, Throwable>
+
+fun <F, S> StateT.Companion.monadThrow(ME: MonadError<F, Throwable>): MonadThrow<StateTPartialOf<F, S>> = object : StateTMonadThrowInstance<F, S> {
+  override fun ME(): MonadError<F, Throwable> = ME
 }
 
 /**

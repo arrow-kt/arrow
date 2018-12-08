@@ -42,16 +42,16 @@ class StateT<F, S, A>(
 
   companion object {
 
-    fun <F, S, T> just(MF: Monad<F>, t: T): StateT<F, S, T> =
-      StateT(MF) { s -> MF.just(s toT t) }
+    fun <F, S, T> just(AF: Applicative<F>, t: T): StateT<F, S, T> =
+      StateT(AF) { s -> AF.just(s toT t) }
 
     /**
      * Constructor to create `StateT<F, S, A>` given a [StateTFun].
      *
-     * @param MF [Monad] for the context [F].
+     * @param AF [Applicative] for the context [F].
      * @param run the stateful function to wrap with [StateT].
      */
-    operator fun <F, S, A> invoke(MF: Monad<F>, run: StateTFun<F, S, A>): StateT<F, S, A> = MF.run {
+    operator fun <F, S, A> invoke(AF: Applicative<F>, run: StateTFun<F, S, A>): StateT<F, S, A> = AF.run {
       StateT(just(run))
     }
 
@@ -63,12 +63,12 @@ class StateT<F, S, A>(
     fun <F, S, A> invokeF(runF: StateTFunOf<F, S, A>): StateT<F, S, A> = StateT(runF)
 
     /**
-     * Lift a value of type `A` into `StateT<F, S, A>`.
+     * Lift a value of type `Kind<F, A>` into `StateT<F, S, A>`.
      *
-     * @param MF [Monad] for the context [F].
-     * @param fa the value to lift.
+     * @param AF [Applicative] for the context [F].
+     * @param fa the value to liftF.
      */
-    fun <F, S, A> lift(MF: Monad<F>, fa: Kind<F, A>): StateT<F, S, A> = MF.run {
+    fun <F, S, A> liftF(AF: Applicative<F>, fa: Kind<F, A>): StateT<F, S, A> = AF.run {
       StateT(just({ s -> fa.map { a -> Tuple2(s, a) } }))
     }
 
@@ -201,7 +201,7 @@ class StateT<F, S, A>(
    * @param MF [Monad] for the context [F].
    */
   fun <B> ap(MF: Monad<F>, ff: StateTOf<F, S, (A) -> B>): StateT<F, S, B> =
-    ff.fix().map2(MF, this) { f, a -> f(a) }
+    ff.fix().map2(MF, this) { f: (A) -> B, a: A -> f(a) }
 
   /**
    * Create a product of the value types of [StateT].

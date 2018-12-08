@@ -47,7 +47,7 @@ class DaggerOptionTMonadInstance<F> @Inject constructor(val FF: Monad<F>) : Opti
   override fun MF(): Monad<F> = FF
 }
 
-class DaggerOptionTApplicativeErrorInstance<F, E> @Inject constructor(val AE:  ApplicativeError<F, E> ) : OptionTApplicativeErrorInstance<F, E> {
+class DaggerOptionTApplicativeErrorInstance<F, E> @Inject constructor(val AE: ApplicativeError<F, E> ) : OptionTApplicativeErrorInstance<F, E> {
   override fun FF(): Functor<F> = AE
   override fun AF(): Applicative<F> = AE
   override fun AE(): ApplicativeError<F, E> = AE
