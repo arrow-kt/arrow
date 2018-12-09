@@ -7,6 +7,10 @@ import arrow.typeclasses.Applicative
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 
+@Deprecated(message = "The value property is now directly accessible on the kinded version",
+  replaceWith = ReplaceWith(expression = "value"))
+fun <F, A> OptionTOf<F, A>.value() = value
+
 val <F, A> OptionTOf<F, A>.value: Kind<F, Option<A>> get() = this.fix().value
 
 /**

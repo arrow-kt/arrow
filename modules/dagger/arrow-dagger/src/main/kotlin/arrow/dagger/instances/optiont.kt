@@ -37,9 +37,9 @@ class DaggerOptionTFunctorInstance<F> @Inject constructor(val FF: Functor<F>) : 
   override fun FF(): Functor<F> = FF
 }
 
-class DaggerOptionTApplicativeInstance<F> @Inject constructor(val FF: Monad<F>) : OptionTApplicativeInstance<F> {
-  override fun FF(): Monad<F> = FF
-  override fun MF(): Monad<F> = FF
+class DaggerOptionTApplicativeInstance<F> @Inject constructor(val AF: Applicative<F>) : OptionTApplicativeInstance<F> {
+  override fun FF(): Functor<F> = AF
+  override fun AF(): Applicative<F> = AF
 }
 
 class DaggerOptionTMonadInstance<F> @Inject constructor(val FF: Monad<F>) : OptionTMonadInstance<F> {

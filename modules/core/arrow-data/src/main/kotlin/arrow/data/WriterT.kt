@@ -7,6 +7,10 @@ import arrow.core.toT
 import arrow.higherkind
 import arrow.typeclasses.*
 
+@Deprecated(message = "The value property is now directly accessible on the kinded version",
+  replaceWith = ReplaceWith(expression = "value"))
+fun <F, W, A> WriterTOf<F, W, A>.value() = value
+
 val <F, W, A> WriterTOf<F, W, A>.value: Kind<F, Tuple2<W, A>>
   get() = this.fix().value
 
