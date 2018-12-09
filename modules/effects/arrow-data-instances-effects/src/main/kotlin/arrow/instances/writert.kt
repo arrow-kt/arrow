@@ -1,4 +1,4 @@
-package arrow.instances
+package arrow.effects.instances
 
 import arrow.Kind
 import arrow.core.*
@@ -6,6 +6,7 @@ import arrow.data.*
 import arrow.effects.Ref
 import arrow.effects.typeclasses.*
 import arrow.extension
+import arrow.instances.WriterTMonadThrow
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.Monoid
 import kotlin.coroutines.CoroutineContext
@@ -24,10 +25,10 @@ interface WriterTBrackInstance<F, W> : Bracket<WriterTPartialOf<F, W>, Throwable
     use: (A) -> WriterTOf<F, W, B>): WriterT<F, W, B> = MM().run {
     MD().run {
       WriterT(Ref.of(empty(), this).flatMap { ref ->
-        value.bracketCase(use = { wa ->
-          WriterT(wa.just()).flatMap(use).value
+        value().bracketCase(use = { wa ->
+          WriterT(wa.just()).flatMap(use).value()
         }, release = { wa, exitCase ->
-          val r = release(wa.b, exitCase).value
+          val r = release(wa.b, exitCase).value()
           when (exitCase) {
             is ExitCase.Completed -> r.flatMap { (l, _) -> ref.set(l) }
             else -> r.void()
@@ -49,7 +50,7 @@ interface WriterTMonadDeferInstance<F, W> : MonadDefer<WriterTPartialOf<F, W>>, 
   override fun MM(): Monoid<W>
 
   override fun <A> defer(fa: () -> Kind<WriterTPartialOf<F, W>, A>): Kind<WriterTPartialOf<F, W>, A> =
-    WriterT(MD().defer { fa().value })
+    WriterT(MD().defer { fa().value() })
 
 }
 
@@ -67,7 +68,7 @@ interface WriterTAsyncInstance<F, W> : Async<WriterTPartialOf<F, W>>, WriterTMon
   }
 
   override fun <A> WriterTOf<F, W, A>.continueOn(ctx: CoroutineContext): WriterT<F, W, A> = AS().run {
-    WriterT(value.continueOn(ctx))
+    WriterT(value().continueOn(ctx))
   }
 
 }
@@ -82,9 +83,9 @@ interface WriterTEffectInstance<F, W> : Effect<WriterTPartialOf<F, W>>, WriterTA
   override fun AS(): Async<F> = EFF()
 
   override fun <A> WriterTOf<F, W, A>.runAsync(cb: (Either<Throwable, A>) -> WriterTOf<F, W, Unit>): WriterT<F, W, Unit> = EFF().run {
-    WriterT.liftF(value.runAsync { r ->
+    WriterT.liftF(value().runAsync { r ->
       val f = cb.compose { a: Either<Throwable, Tuple2<W, A>> -> a.map(Tuple2<W, A>::b) }
-      f(r).value.void()
+      f(r).value().void()
     }, MM(), this)
   }
 
@@ -100,9 +101,9 @@ interface WriterTConcurrentEffectInstance<F, W> : ConcurrentEffect<WriterTPartia
   override fun EFF(): Effect<F> = CEFF()
 
   override fun <A> WriterTOf<F, W, A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> WriterTOf<F, W, Unit>): WriterT<F, W, Disposable> = CEFF().run {
-    WriterT.liftF(value.runAsyncCancellable { r: Either<Throwable, Tuple2<W, A>> ->
+    WriterT.liftF(value().runAsyncCancellable { r: Either<Throwable, Tuple2<W, A>> ->
       val f = cb.compose { rr: Either<Throwable, Tuple2<W, A>> -> rr.map(Tuple2<W, A>::b) }
-      f(r).value.void()
+      f(r).value().void()
     }, MM(), this)
   }
 

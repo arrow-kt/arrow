@@ -7,15 +7,10 @@ import arrow.core.toT
 import arrow.higherkind
 import arrow.typeclasses.*
 
-@Deprecated(message = "The value property is now directly accessible on the kinded version",
-  replaceWith = ReplaceWith(expression = "value"))
-fun <F, W, A> WriterTOf<F, W, A>.value() = value
-
-val <F, W, A> WriterTOf<F, W, A>.value: Kind<F, Tuple2<W, A>>
-  get() = this.fix().value
+fun <F, W, A> WriterTOf<F, W, A>.value(): Kind<F, Tuple2<W, A>> = this.fix().value()
 
 @higherkind
-data class WriterT<F, W, A>(val value: Kind<F, Tuple2<W, A>>) : WriterTOf<F, W, A>, WriterTKindedJ<F, W, A> {
+data class WriterT<F, W, A>(private val value: Kind<F, Tuple2<W, A>>) : WriterTOf<F, W, A>, WriterTKindedJ<F, W, A> {
 
   companion object {
 
@@ -66,7 +61,7 @@ data class WriterT<F, W, A>(val value: Kind<F, Tuple2<W, A>>) : WriterTOf<F, W, 
 
     fun <F, W, A, B> tailRecM(MF: Monad<F>, a: A, f: (A) -> WriterTOf<F, W, Either<A, B>>): WriterT<F, W, B> =
       WriterT(MF.tailRecM(a) {
-        val value = f(it).fix().value
+        val value = f(it).value()
         MF.run {
           value.map { (a, right) ->
             when (right) {
@@ -82,6 +77,8 @@ data class WriterT<F, W, A>(val value: Kind<F, Tuple2<W, A>>) : WriterTOf<F, W, 
     }
 
   }
+
+  fun value(): Kind<F, Tuple2<W, A>> = value
 
   fun tell(MF: Monad<F>, SG: Semigroup<W>, w: W): WriterT<F, W, A> =
     mapAcc(MF) { SG.run { it.combine(w) } }
@@ -115,12 +112,12 @@ data class WriterT<F, W, A>(val value: Kind<F, Tuple2<W, A>>) : WriterTOf<F, W, 
     transform(MF) { it.b toT it.a }
 
   fun <B> ap(AF: Applicative<F>, SG: Semigroup<W>, ff: WriterTOf<F, W, (A) -> B>): WriterT<F, W, B> =
-    WriterT(AF.map(ff.fix().value, value) { (a, b) ->
+    WriterT(AF.map(ff.value(), value) { (a, b) ->
       Tuple2(SG.run { a.a.combine(b.a) }, a.b(b.b))
     })
 
   fun <B> flatMap(MF: Monad<F>, SG: Semigroup<W>, f: (A) -> WriterTOf<F, W, B>): WriterT<F, W, B> = MF.run {
-    WriterT(value.flatMap { value -> f(value.b).value.map { SG.run { it.a.combine(value.a) } toT it.b } })
+    WriterT(value.flatMap { value -> f(value.b).value().map { SG.run { it.a.combine(value.a) } toT it.b } })
   }
 
   fun <B, U> transform(MF: Monad<F>, f: (Tuple2<W, A>) -> Tuple2<U, B>): WriterT<F, U, B> = MF.run {
@@ -137,7 +134,7 @@ data class WriterT<F, W, A>(val value: Kind<F, Tuple2<W, A>>) : WriterTOf<F, W, 
     transform(MF) { f(it.b) }
 
   fun combineK(SF: SemigroupK<F>, y: WriterTOf<F, W, A>): WriterT<F, W, A> = SF.run {
-    WriterT(value.combineK(y.fix().value))
+    WriterT(value.combineK(y.value()))
   }
 
 }

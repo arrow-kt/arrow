@@ -4,11 +4,10 @@ import arrow.Kind
 import arrow.core.*
 import arrow.effects.ForIO
 import arrow.effects.IO
+import arrow.effects.instances.eithert.async.async
 import arrow.effects.instances.io.applicativeError.attempt
 import arrow.effects.instances.io.async.async
-import arrow.instances.either.monadError.monadError
 import arrow.instances.eithert.applicative.applicative
-import arrow.instances.eithert.async.async
 import arrow.instances.eithert.semigroupK.semigroupK
 import arrow.instances.eithert.traverse.traverse
 import arrow.instances.id.monad.monad
@@ -16,7 +15,6 @@ import arrow.instances.id.traverse.traverse
 import arrow.instances.option.functor.functor
 import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
-import arrow.test.laws.MonadErrorLaws
 import arrow.test.laws.SemigroupKLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
@@ -28,11 +26,11 @@ import org.junit.runner.RunWith
 class EitherTTest : UnitSpec() {
 
   private fun IOEQ(): Eq<Kind<EitherTPartialOf<ForIO, Throwable>, Int>> = Eq { a, b ->
-    a.value.attempt().unsafeRunSync() == b.value.attempt().unsafeRunSync()
+    a.value().attempt().unsafeRunSync() == b.value().attempt().unsafeRunSync()
   }
 
   private fun IOEitherEQ(): Eq<Kind<EitherTPartialOf<ForIO, Throwable>, Either<Throwable, Int>>> = Eq { a, b ->
-    a.value.attempt().unsafeRunSync() == b.value.attempt().unsafeRunSync()
+    a.value().attempt().unsafeRunSync() == b.value().attempt().unsafeRunSync()
   }
 
   init {

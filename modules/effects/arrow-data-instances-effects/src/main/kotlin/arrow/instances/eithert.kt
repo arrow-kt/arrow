@@ -1,10 +1,11 @@
-package arrow.instances
+package arrow.effects.instances
 
 import arrow.core.*
 import arrow.data.*
 import arrow.effects.Ref
 import arrow.effects.typeclasses.*
 import arrow.extension
+import arrow.instances.EitherTMonadThrowInstance
 import arrow.instances.either.monad.flatten
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Monad
@@ -26,23 +27,23 @@ interface EitherTBracketInstance<F> : Bracket<EitherTPartialOf<F, Throwable>, Th
     EitherT.liftF<F, Throwable, Ref<F, Option<Throwable>>>(MDF(), Ref.of(None, MDF())).flatMap(MDF()) { ref ->
       EitherT(
         MDF().run {
-          value.bracketCase(use = { eith ->
+          value().bracketCase(use = { eith ->
             when (eith) {
-              is Either.Right -> use(eith.b).value
+              is Either.Right -> use(eith.b).value()
               is Either.Left -> just(eith)
             }
           }, release = { eith, exitCase ->
             when (eith) {
               is Either.Right -> when (exitCase) {
                 is ExitCase.Completed -> {
-                  release(eith.b, ExitCase.Completed).value.flatMap {
+                  release(eith.b, ExitCase.Completed).value().flatMap {
                     it.fold(
                       { l -> ref.set(Some(l)) },
                       { just(Unit) }
                     )
                   }
                 }
-                else -> release(eith.b, exitCase).value.void()
+                else -> release(eith.b, exitCase).value().void()
               }
               is Either.Left -> just(Unit)
             }
@@ -68,7 +69,7 @@ interface EitherTMonadDeferInstance<F> : MonadDefer<EitherTPartialOf<F, Throwabl
   override fun MDF(): MonadDefer<F>
 
   override fun <A> defer(fa: () -> EitherTOf<F, Throwable, A>): EitherT<F, Throwable, A> =
-    EitherT(MDF().defer { fa().value })
+    EitherT(MDF().defer { fa().value() })
 
 }
 
@@ -84,7 +85,7 @@ interface EitherTAsyncInstance<F> : Async<EitherTPartialOf<F, Throwable>>, Eithe
   }
 
   override fun <A> EitherTOf<F, Throwable, A>.continueOn(ctx: CoroutineContext): EitherT<F, Throwable, A> = ASF().run {
-    EitherT(value.continueOn(ctx))
+    EitherT(value().continueOn(ctx))
   }
 
 }
@@ -97,9 +98,9 @@ interface EitherTEffectInstance<F> : Effect<EitherTPartialOf<F, Throwable>>, Eit
   override fun ASF(): Async<F> = EFF()
 
   override fun <A> EitherTOf<F, Throwable, A>.runAsync(cb: (Either<Throwable, A>) -> EitherTOf<F, Throwable, Unit>): EitherT<F, Throwable, Unit> = EFF().run {
-    EitherT(value.runAsync { a ->
+    EitherT(value().runAsync { a ->
       cb(a.flatten())
-        .value
+        .value()
         .void()
     }.attempt())
   }
@@ -114,9 +115,9 @@ interface EitherTConcurrentEffectInstance<F> : ConcurrentEffect<EitherTPartialOf
   override fun EFF(): Effect<F> = CEFF()
 
   override fun <A> EitherTOf<F, Throwable, A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> EitherTOf<F, Throwable, Unit>): EitherT<F, Throwable, Disposable> = CEFF().run {
-    EitherT(value.runAsyncCancellable { a ->
+    EitherT(value().runAsyncCancellable { a ->
       cb(a.flatten())
-        .value
+        .value()
         .void()
     }.attempt())
   }

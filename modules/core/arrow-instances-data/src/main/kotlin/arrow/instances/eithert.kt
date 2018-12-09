@@ -65,7 +65,7 @@ interface EitherTApplicativeErrorInstance<F, L> : ApplicativeError<EitherTPartia
   override fun AF(): Applicative<F> = AE()
 
   override fun <A> EitherTOf<F, L, A>.handleErrorWith(f: (L) -> EitherTOf<F, L, A>): EitherT<F, L, A> = AE().run {
-    EitherT(value.handleErrorWith { l -> f(l).value })
+    EitherT(value().handleErrorWith { l -> f(l).value() })
   }
 
   override fun <A> raiseError(e: L): EitherT<F, L, A> = AE().run {
@@ -130,14 +130,14 @@ interface EitherTSemigroupKInstance<F, L> : SemigroupK<EitherTPartialOf<F, L>> {
 }
 
 fun <F, A, B, C> EitherTOf<F, A, B>.foldLeft(FF: Foldable<F>, b: C, f: (C, B) -> C): C =
-  FF.compose(Either.foldable<A>()).foldLC(value, b, f)
+  FF.compose(Either.foldable<A>()).foldLC(value(), b, f)
 
 fun <F, A, B, C> EitherTOf<F, A, B>.foldRight(FF: Foldable<F>, lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> = FF.compose(Either.foldable<A>()).run {
-  value.foldRC(lb, f)
+  value().foldRC(lb, f)
 }
 
 fun <F, A, B, G, C> EitherTOf<F, A, B>.traverse(FF: Traverse<F>, GA: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, EitherT<F, A, C>> {
-  val fa: Kind<G, Kind<Nested<F, EitherPartialOf<A>>, C>> = ComposedTraverse(FF, Either.traverse(), Either.monad<A>()).run { value.traverseC(f, GA) }
+  val fa: Kind<G, Kind<Nested<F, EitherPartialOf<A>>, C>> = ComposedTraverse(FF, Either.traverse(), Either.monad<A>()).run { value().traverseC(f, GA) }
   val mapper: (Kind<Nested<F, EitherPartialOf<A>>, C>) -> EitherT<F, A, C> = { nested -> EitherT(FF.run { nested.unnest().map { it.fix() } }) }
   return GA.run { fa.map(mapper) }
 }

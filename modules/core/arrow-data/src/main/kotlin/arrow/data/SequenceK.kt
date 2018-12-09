@@ -13,20 +13,20 @@ fun <A> SequenceKOf<A>.toList(): List<A> = this.fix().sequence.toList()
 @higherkind
 data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequence<A> by sequence {
 
-  fun <B> flatMap(f: (A) -> SequenceKOf<B>): SequenceK<B> = this.fix().sequence.flatMap { f(it).fix().sequence }.k()
+  fun <B> flatMap(f: (A) -> SequenceKOf<B>): SequenceK<B> = sequence.flatMap { f(it).fix().sequence }.k()
 
-  fun <B> ap(ff: SequenceKOf<(A) -> B>): SequenceK<B> = ff.fix().flatMap { f -> map(f) }.fix()
+  fun <B> ap(ff: SequenceKOf<(A) -> B>): SequenceK<B> = ff.fix().flatMap { f -> map(f) }
 
-  fun <B> map(f: (A) -> B): SequenceK<B> = this.fix().sequence.map(f).k()
+  fun <B> map(f: (A) -> B): SequenceK<B> = sequence.map(f).k()
 
-  fun <B> foldLeft(b: B, f: (B, A) -> B): B = this.fix().fold(b, f)
+  fun <B> foldLeft(b: B, f: (B, A) -> B): B = fold(b, f)
 
   fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
     fun loop(fa_p: SequenceK<A>): Eval<B> = when {
       fa_p.sequence.none() -> lb
       else -> f(fa_p.first(), Eval.defer { loop(fa_p.drop(1).k()) })
     }
-    return Eval.defer { loop(this.fix()) }
+    return Eval.defer { loop(this) }
   }
 
   fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, SequenceK<B>> =
@@ -35,11 +35,11 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
     }.value()
 
   fun <B, Z> map2(fb: SequenceKOf<B>, f: (Tuple2<A, B>) -> Z): SequenceK<Z> =
-    this.fix().flatMap { a ->
+    flatMap { a ->
       fb.fix().map { b ->
         f(Tuple2(a, b))
       }
-    }.fix()
+    }
 
   companion object {
 
@@ -47,10 +47,10 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
 
     fun <A> empty(): SequenceK<A> = emptySequence<A>().k()
 
-    fun <A, B> tailRecM(a: A, f: (A) -> Kind<ForSequenceK, Either<A, B>>): SequenceK<B> {
+    fun <A, B> tailRecM(a: A, f: (A) -> SequenceKOf<Either<A, B>>): SequenceK<B> {
       tailrec fun <A, B> go(
         buf: MutableList<B>,
-        f: (A) -> Kind<ForSequenceK, Either<A, B>>,
+        f: (A) -> SequenceKOf<Either<A, B>>,
         v: SequenceK<Either<A, B>>) {
         if (!(v.toList().isEmpty())) {
           val head: Either<A, B> = v.first()

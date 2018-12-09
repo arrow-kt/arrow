@@ -9,12 +9,10 @@ import arrow.effects.ForIO
 import arrow.effects.IO
 import arrow.effects.instances.io.applicativeError.attempt
 import arrow.effects.instances.io.async.async
+import arrow.effects.instances.optiont.async.async
 import arrow.instances.nonemptylist.monad.monad
 import arrow.instances.option.monad.monad
-import arrow.instances.option.semigroup.semigroup
 import arrow.instances.optiont.applicative.applicative
-import arrow.instances.optiont.async.async
-import arrow.instances.optiont.monad.monad
 import arrow.instances.optiont.monoidK.monoidK
 import arrow.instances.optiont.semigroupK.semigroupK
 import arrow.mtl.instances.option.traverseFilter.traverseFilter
@@ -32,19 +30,19 @@ import org.junit.runner.RunWith
 class OptionTTest : UnitSpec() {
 
   fun <A> EQ(): Eq<Kind<OptionTPartialOf<A>, Int>> = Eq { a, b ->
-    a.value == b.value
+    a.value() == b.value()
   }
 
   fun <A> EQ_NESTED(): Eq<Kind<OptionTPartialOf<A>, Kind<OptionTPartialOf<A>, Int>>> = Eq { a, b ->
-    a.value == b.value
+    a.value() == b.value()
   }
 
   private fun IOEQ(): Eq<Kind<OptionTPartialOf<ForIO>, Int>> = Eq { a, b ->
-    a.value.attempt().unsafeRunSync() == b.value.attempt().unsafeRunSync()
+    a.value().attempt().unsafeRunSync() == b.value().attempt().unsafeRunSync()
   }
 
   private fun IOEitherEQ(): Eq<Kind<OptionTPartialOf<ForIO>, Either<Throwable, Int>>> = Eq { a, b ->
-    a.value.attempt().unsafeRunSync() == b.value.attempt().unsafeRunSync()
+    a.value().attempt().unsafeRunSync() == b.value().attempt().unsafeRunSync()
   }
 
   val NELM: Monad<ForNonEmptyList> = NonEmptyList.monad()

@@ -10,12 +10,7 @@ import arrow.typeclasses.Applicative
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 
-@Deprecated(message = "The value property is now directly accessible on the kinded version",
-  replaceWith = ReplaceWith(expression = "value"))
-fun <F, A, B> EitherTOf<F, A, B>.value() = value
-
-val <F, A, B> EitherTOf<F, A, B>.value
-  get() = fix().value
+fun <F, A, B> EitherTOf<F, A, B>.value(): Kind<F, Either<A, B>> = fix().value()
 
 /**
  * [EitherT]`<F, A, B>` is a light wrapper on an `F<`[Either]`<A, B>>` with some
@@ -24,7 +19,7 @@ val <F, A, B> EitherTOf<F, A, B>.value
  * It may also be said that [EitherT] is a monad transformer for [Either].
  */
 @higherkind
-data class EitherT<F, A, B>(val value: Kind<F, Either<A, B>>) : EitherTOf<F, A, B>, EitherTKindedJ<F, A, B> {
+data class EitherT<F, A, B>(private val value: Kind<F, Either<A, B>>) : EitherTOf<F, A, B>, EitherTKindedJ<F, A, B> {
 
   companion object {
 
@@ -36,7 +31,7 @@ data class EitherT<F, A, B>(val value: Kind<F, Either<A, B>>) : EitherTOf<F, A, 
 
     fun <F, L, A, B> tailRecM(MF: Monad<F>, a: A, f: (A) -> EitherTOf<F, L, Either<A, B>>): EitherT<F, L, B> =
       EitherT(MF.tailRecM(a) {
-        val value = f(it).value
+        val value = f(it).value()
         MF.run {
           value.map { recursionControl ->
             when (recursionControl) {
@@ -68,12 +63,14 @@ data class EitherT<F, A, B>(val value: Kind<F, Either<A, B>>) : EitherTOf<F, A, 
 
   }
 
+  fun value(): Kind<F, Either<A, B>> = value
+
   inline fun <C> fold(FF: Functor<F>, crossinline l: (A) -> C, crossinline r: (B) -> C): Kind<F, C> = FF.run {
-    value.map { either -> either.fold(l, r) }
+    value().map { either -> either.fold(l, r) }
   }
 
   fun <C> flatMap(MF: Monad<F>, f: (B) -> EitherTOf<F, A, C>): EitherT<F, A, C> =
-    flatMapF(MF) { it -> f(it).value }
+    flatMapF(MF) { it -> f(it).value() }
 
   fun <C> flatMapF(MF: Monad<F>, f: (B) -> Kind<F, Either<A, C>>): EitherT<F, A, C> = MF.run {
     EitherT(value.flatMap { either -> either.fold({ MF.just(Left(it)) }, { f(it) }) })
@@ -115,14 +112,14 @@ data class EitherT<F, A, B>(val value: Kind<F, Either<A, B>>) : EitherTOf<F, A, 
   fun combineK(MF: Monad<F>, y: EitherTOf<F, A, B>): EitherT<F, A, B> = MF.run {
     EitherT(value.flatMap {
       when (it) {
-        is Either.Left -> y.value
+        is Either.Left -> y.value()
         is Either.Right -> just(it)
       }
     })
   }
 
   fun <C> ap(AF: Applicative<F>, ff: EitherTOf<F, A, (B) -> C>): EitherT<F, A, C> =
-    EitherT(AF.map(ff.value, value) { (a, b) ->
+    EitherT(AF.map(ff.value(), value) { (a, b) ->
       b.flatMap { bb ->
         a.map { f -> f(bb) }
       }

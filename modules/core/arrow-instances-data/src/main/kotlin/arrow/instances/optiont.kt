@@ -66,7 +66,7 @@ interface OptionTApplicativeErrorInstance<F, E> : ApplicativeError<OptionTPartia
     OptionT(AE().raiseError(e))
 
   override fun <A> OptionTOf<F, A>.handleErrorWith(f: (E) -> OptionTOf<F, A>): OptionT<F, A> = AE().run {
-    OptionT(value.handleErrorWith { f(it).value })
+    OptionT(value().handleErrorWith { f(it).value() })
   }
 
 }
@@ -88,14 +88,14 @@ interface OptionTMonadThrow<F> : MonadThrow<OptionTPartialOf<F>>, OptionTMonadEr
   override fun ME(): MonadError<F, Throwable>
 }
 
-fun <F, A, B> OptionTOf<F, A>.foldLeft(FF: Foldable<F>, b: B, f: (B, A) -> B): B = FF.compose(Option.foldable()).foldLC(fix().value, b, f)
+fun <F, A, B> OptionTOf<F, A>.foldLeft(FF: Foldable<F>, b: B, f: (B, A) -> B): B = FF.compose(Option.foldable()).foldLC(value(), b, f)
 
 fun <F, A, B> OptionTOf<F, A>.foldRight(FF: Foldable<F>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> = FF.compose(Option.foldable()).run {
-  value.foldRC(lb, f)
+  value().foldRC(lb, f)
 }
 
 fun <F, G, A, B> OptionTOf<F, A>.traverse(FF: Traverse<F>, GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, OptionT<F, B>> {
-  val fa = ComposedTraverse(FF, Option.traverse(), Option.applicative()).run { value.traverseC(f, GA) }
+  val fa = ComposedTraverse(FF, Option.traverse(), Option.applicative()).run { value().traverseC(f, GA) }
   val mapper: (Kind<Nested<F, ForOption>, B>) -> OptionT<F, B> = { OptionT(FF.run { it.unnest().map { it.fix() } }) }
   return GA.run { fa.map(mapper) }
 }

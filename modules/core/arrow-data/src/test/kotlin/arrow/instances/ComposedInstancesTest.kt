@@ -42,12 +42,12 @@ class ComposedInstancesTest : UnitSpec() {
 
     val EQ_OPTIONT_ID_NEL: Eq<NestedType<OptionTPartialOf<ForId>, OptionTPartialOf<ForNonEmptyList>, Int>> =
       Eq { a, b ->
-        a.unnest().value.value().fold(
-          { b.unnest().value.value().isEmpty() },
+        a.unnest().value().value().fold(
+          { b.unnest().value().value().isEmpty() },
           { optionA: OptionTNel ->
-            b.unnest().value.value().fix().fold(
+            b.unnest().value().value().fix().fold(
               { false },
-              { it.value == optionA.value })
+              { it.value() == optionA.value() })
           })
       }
 

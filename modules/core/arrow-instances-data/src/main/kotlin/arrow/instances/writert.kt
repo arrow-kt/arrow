@@ -69,7 +69,7 @@ interface WriterTApplicativeError<F, W, E> : ApplicativeError<WriterTPartialOf<F
     WriterT(AE().raiseError(e))
 
   override fun <A> WriterTOf<F, W, A>.handleErrorWith(f: (E) -> WriterTOf<F, W, A>): WriterT<F, W, A> = AE().run {
-    WriterT(value.handleErrorWith { e -> f(e).value })
+    WriterT(value().handleErrorWith { e -> f(e).value() })
   }
 
 }
