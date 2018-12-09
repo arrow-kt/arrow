@@ -15,10 +15,6 @@ interface WriterTFunctorInstance<F, W> : Functor<WriterTPartialOf<F, W>> {
   override fun <A, B> WriterTOf<F, W, A>.map(f: (A) -> B): WriterT<F, W, B> = fix().map(FF()) { f(it) }
 }
 
-//fun <F, W> WriterT.Companion.functor(FF: Functor<F>): Functor<WriterTPartialOf<F, W>> = object : WriterTFunctorInstance<F, W> {
-//  override fun FF(): Functor<F> = FF
-//}
-
 @extension
 interface WriterTApplicativeInstance<F, W> : Applicative<WriterTPartialOf<F, W>>, WriterTFunctorInstance<F, W> {
 
@@ -37,11 +33,6 @@ interface WriterTApplicativeInstance<F, W> : Applicative<WriterTPartialOf<F, W>>
   override fun <A, B> WriterTOf<F, W, A>.map(f: (A) -> B): WriterT<F, W, B> =
     fix().map(AF()) { f(it) }
 }
-
-//fun <F, W> WriterT.Companion.applicative(AF: Applicative<F>, MM: Monoid<W>): Applicative<WriterTPartialOf<F, W>> = object : WriterTApplicativeInstance<F, W> {
-//  override fun AF(): Applicative<F> = AF
-//  override fun MM(): Monoid<W> = MM
-//}
 
 @extension
 interface WriterTMonadInstance<F, W> : Monad<WriterTPartialOf<F, W>>, WriterTApplicativeInstance<F, W> {
@@ -65,11 +56,6 @@ interface WriterTMonadInstance<F, W> : Monad<WriterTPartialOf<F, W>>, WriterTApp
     fix().ap(MF(), MM(), ff)
 }
 
-//fun <F, W> WriterT.Companion.monad(MF: Monad<F>, MM: Monoid<W>): Monad<WriterTPartialOf<F, W>> = object : WriterTMonadInstance<F, W> {
-//  override fun MF(): Monad<F> = MF
-//  override fun MM(): Monoid<W> = MM
-//}
-
 @extension
 interface WriterTApplicativeError<F, W, E> : ApplicativeError<WriterTPartialOf<F, W>, E>, WriterTApplicativeInstance<F, W> {
 
@@ -88,11 +74,6 @@ interface WriterTApplicativeError<F, W, E> : ApplicativeError<WriterTPartialOf<F
 
 }
 
-//fun <F, W, E> WriterT.Companion.applicativeError(AE: ApplicativeError<F, E>, MM: Monoid<W>): ApplicativeError<WriterTPartialOf<F, W>, E> = object : WriterTApplicativeError<F, W, E> {
-//  override fun AE(): ApplicativeError<F, E> = AE
-//  override fun MM(): Monoid<W> = MM
-//}
-
 @extension
 interface WriterTMonadError<F, W, E> : MonadError<WriterTPartialOf<F, W>, E>, WriterTApplicativeError<F, W, E>, WriterTMonadInstance<F, W> {
 
@@ -108,21 +89,11 @@ interface WriterTMonadError<F, W, E> : MonadError<WriterTPartialOf<F, W>, E>, Wr
 
 }
 
-//fun <F, W, E> WriterT.Companion.monadError(ME: MonadError<F, E>, MM: Monoid<W>): MonadError<WriterTPartialOf<F, W>, E> = object : WriterTMonadError<F, W, E> {
-//  override fun ME(): MonadError<F, E> = ME
-//  override fun MM(): Monoid<W> = MM
-//}
-
 @extension
 interface WriterTMonadThrow<F, W> : MonadThrow<WriterTPartialOf<F, W>>, WriterTMonadError<F, W, Throwable> {
   override fun ME(): MonadError<F, Throwable>
   override fun MM(): Monoid<W>
 }
-
-//fun <F, W> WriterT.Companion.monadThrow(ME: MonadError<F, Throwable>, MM: Monoid<W>): MonadThrow<WriterTPartialOf<F, W>> = object : WriterTMonadThrow<F, W> {
-//  override fun ME(): MonadError<F, Throwable> = ME
-//  override fun MM(): Monoid<W> = MM
-//}
 
 @extension
 interface WriterTSemigroupKInstance<F, W> : SemigroupK<WriterTPartialOf<F, W>> {
@@ -133,10 +104,6 @@ interface WriterTSemigroupKInstance<F, W> : SemigroupK<WriterTPartialOf<F, W>> {
     fix().combineK(SS(), y)
 }
 
-//fun <F, W> WriterT.Companion.sempigroupK(SS: SemigroupK<F>): SemigroupK<WriterTPartialOf<F, W>> = object : WriterTSemigroupKInstance<F, W> {
-//  override fun SS(): SemigroupK<F> = SS
-//}
-
 @extension
 interface WriterTMonoidKInstance<F, W> : MonoidK<WriterTPartialOf<F, W>>, WriterTSemigroupKInstance<F, W> {
 
@@ -146,10 +113,6 @@ interface WriterTMonoidKInstance<F, W> : MonoidK<WriterTPartialOf<F, W>>, Writer
 
   override fun <A> empty(): WriterT<F, W, A> = WriterT(MF().empty())
 }
-
-//fun <F, W> WriterT.Companion.monoidK(MF: MonoidK<F>): MonoidK<WriterTPartialOf<F, W>> = object : WriterTMonoidKInstance<F, W> {
-//  override fun MF(): MonoidK<F> = MF
-//}
 
 class WriterTContext<F, W>(val MF: Monad<F>, val MW: Monoid<W>) : WriterTMonadInstance<F, W> {
   override fun FF(): Functor<F> = MF
