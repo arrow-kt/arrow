@@ -5,14 +5,14 @@ import arrow.core.*
 import arrow.effects.ForIO
 import arrow.effects.IO
 import arrow.effects.instances.io.applicativeError.attempt
-import arrow.effects.instances.io.async.async
-import arrow.effects.instances.kleisli.async.async
+import arrow.effects.instances.io.bracket.bracket
+import arrow.effects.instances.kleisli.bracket.bracket
 import arrow.instances.`try`.monadError.monadError
 import arrow.instances.id.monad.monad
 import arrow.instances.kleisli.contravariant.contravariant
 import arrow.instances.kleisli.monadError.monadError
 import arrow.test.UnitSpec
-import arrow.test.laws.AsyncLaws
+import arrow.test.laws.BracketLaws
 import arrow.test.laws.ContravariantLaws
 import arrow.test.laws.MonadErrorLaws
 import arrow.typeclasses.Conested
@@ -45,10 +45,11 @@ class KleisliTest : UnitSpec() {
   init {
 
     testLaws(
-      AsyncLaws.laws(
-        Kleisli.async<ForIO, Int>(IO.async()),
+      BracketLaws.laws(
+        BF = Kleisli.bracket<ForIO, Int, Throwable>(IO.bracket()),
         EQ = IOEQ(),
-        EQ_EITHER = IOEitherEQ()
+        EQ_EITHER = IOEitherEQ(),
+        EQERR = IOEQ()
       ),
       ContravariantLaws.laws(Kleisli.contravariant(), { Kleisli { x: Int -> Try.just(x) }.conest() }, ConestTryEQ()),
       MonadErrorLaws.laws(Kleisli.monadError<ForTry, Int, Throwable>(Try.monadError()), TryEQ(), TryEQ())
