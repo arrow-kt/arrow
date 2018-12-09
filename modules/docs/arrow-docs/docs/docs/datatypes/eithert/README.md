@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: EitherT
-permalink: /docs/datatypes/eithert/
+permalink: /docs/arrow/data/eithert/
+redirect_from:
+  - /docs/datatypes/eithert
 video: 1h4X8CrMjVs
 ---
 
@@ -208,7 +210,7 @@ eitherTVal
 And back to the `ObservableK<Either<BizError, A>>` running the transformer
 
 ```kotlin:ank
-eitherTVal.fix().value
+eitherTVal.value()
 ```
 
 So how would our function look if we implemented it with the EitherT monad transformer?
@@ -224,7 +226,7 @@ fun getCountryCode(personId: Int): ObservableK<Either<BizError, String>> =
     )).bind()
     val country = EitherT(findCountry(address.id)).bind()
     country.code
-  }.value()
+  }.value().fix()
 ```
 
 Here we no longer have to deal with the `Left` cases, and the binding to the values on the left side are already the underlying values we want to focus on instead of the potential biz error values. We have automatically `flatMapped` through the `ObservableK` and `Either` in a single expression reducing the boilerplate and encoding the effects concerns in the type signatures.
@@ -249,7 +251,7 @@ import arrow.core.*
 DataType(EitherT::class).tcMarkdownList()
 ```
 
-Take a look at the [`OptionT` docs]({{ '/docs/datatypes/optiont' | relative_url }}) for an alternative version of this content with the `OptionT` monad transformer
+Take a look at the [`OptionT` docs]({{ '/docs/arrow/data/optiont' | relative_url }}) for an alternative version of this content with the `OptionT` monad transformer
 
 ## Credits
 

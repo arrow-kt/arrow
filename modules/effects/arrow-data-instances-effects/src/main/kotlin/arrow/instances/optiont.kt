@@ -1,11 +1,11 @@
-package arrow.instances
+package arrow.effects.instances
 
-import arrow.core.Either
 import arrow.core.None
 import arrow.data.*
 import arrow.effects.Ref
 import arrow.effects.typeclasses.*
 import arrow.extension
+import arrow.instances.OptionTMonadError
 import arrow.typeclasses.MonadError
 import kotlin.coroutines.CoroutineContext
 
@@ -38,7 +38,7 @@ interface OptionTBracketInstance<F> : Bracket<OptionTPartialOf<F>, Throwable>, O
       }).flatMap { option ->
         option.fold(
           { just(None) },
-          { ref.get().map { b -> if (b) None else option } }
+          { ref.get.map { b -> if (b) None else option } }
         )
       }
     })
@@ -65,12 +65,6 @@ interface OptionTAsyncInstance<F> : Async<OptionTPartialOf<F>>, OptionTMonadDefe
 
   override fun <A> async(fa: Proc<A>): OptionT<F, A> = AS().run {
     OptionT.liftF(this, async(fa))
-  }
-
-  override fun <A> asyncF(k: ProcF<OptionTPartialOf<F>, A>): OptionT<F, A> = AS().run {
-    OptionT.liftF(this, asyncF { cb: (Either<Throwable, A>) -> Unit ->
-      k(cb).value().map { Unit }
-    })
   }
 
   override fun <A> OptionTOf<F, A>.continueOn(ctx: CoroutineContext): OptionT<F, A> = AS().run {

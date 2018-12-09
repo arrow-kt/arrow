@@ -50,10 +50,10 @@ class DaggerEitherTMonadInstance<F, L> @Inject constructor(val MF: Monad<F>) : E
   override fun MF(): Monad<F> = MF
 }
 
-class DaggerEitherTMonadErrorInstance<F, L> @Inject constructor(val MF: MonadError<F, L>) : EitherTMonadErrorInstance<F, L> {
-  override fun AE(): ApplicativeError<F, L> = MF
-  override fun FF(): Functor<F> = MF
-  override fun MF(): Monad<F> = MF
+class DaggerEitherTMonadErrorInstance<F, L> @Inject constructor(val ME: MonadError<F, L>) : EitherTMonadErrorInstance<F, L> {
+  override fun FF(): Functor<F> = ME
+  override fun MF(): Monad<F> = ME
+  override fun AE(): ApplicativeError<F, L> = ME
 }
 
 class DaggerEitherTFoldableInstance<F, L> @Inject constructor(val FFF: Foldable<F>) : EitherTFoldableInstance<F, L> {

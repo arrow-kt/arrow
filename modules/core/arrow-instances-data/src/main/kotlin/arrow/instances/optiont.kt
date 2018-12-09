@@ -8,6 +8,8 @@ import arrow.extension
 import arrow.instances.option.applicative.applicative
 import arrow.instances.option.foldable.foldable
 import arrow.instances.option.traverse.traverse
+import arrow.instances.optiont.applicative.ap
+import arrow.instances.optiont.monad.ap
 import arrow.typeclasses.*
 
 @extension
@@ -86,14 +88,14 @@ interface OptionTMonadThrow<F> : MonadThrow<OptionTPartialOf<F>>, OptionTMonadEr
   override fun ME(): MonadError<F, Throwable>
 }
 
-fun <F, A, B> OptionTOf<F, A>.foldLeft(FF: Foldable<F>, b: B, f: (B, A) -> B): B = FF.compose(Option.foldable()).foldLC(fix().value, b, f)
+fun <F, A, B> OptionTOf<F, A>.foldLeft(FF: Foldable<F>, b: B, f: (B, A) -> B): B = FF.compose(Option.foldable()).foldLC(value(), b, f)
 
 fun <F, A, B> OptionTOf<F, A>.foldRight(FF: Foldable<F>, lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> = FF.compose(Option.foldable()).run {
-  fix().value.foldRC(lb, f)
+  value().foldRC(lb, f)
 }
 
 fun <F, G, A, B> OptionTOf<F, A>.traverse(FF: Traverse<F>, GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, OptionT<F, B>> {
-  val fa = ComposedTraverse(FF, Option.traverse(), Option.applicative()).run { fix().value.traverseC(f, GA) }
+  val fa = ComposedTraverse(FF, Option.traverse(), Option.applicative()).run { value().traverseC(f, GA) }
   val mapper: (Kind<Nested<F, ForOption>, B>) -> OptionT<F, B> = { OptionT(FF.run { it.unnest().map { it.fix() } }) }
   return GA.run { fa.map(mapper) }
 }

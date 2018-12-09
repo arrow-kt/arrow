@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: Semigroup
-permalink: /docs/typeclasses/semigroup/
+permalink: /docs/arrow/typeclasses/semigroup/
+redirect_from:
+  - /docs/typeclasses/semigroup
 ---
 
 ## Semigroup

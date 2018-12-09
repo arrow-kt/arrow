@@ -231,12 +231,12 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
   /**
    * Find the first target or [Option.None] if no targets
    */
-  fun headOption(s: S): Option<A> = foldMap(firstOptionMonoid<A>(), s) { b -> Const(Some(b)) }.value
+  fun headOption(s: S): Option<A> = foldMap(firstOptionMonoid<A>(), s) { b -> Const(Some(b)) }.value()
 
   /**
    * Find the first target or [Option.None] if no targets
    */
-  fun lastOption(s: S): Option<A> = foldMap(lastOptionMonoid<A>(), s) { b -> Const(Some(b)) }.value
+  fun lastOption(s: S): Option<A> = foldMap(lastOptionMonoid<A>(), s) { b -> Const(Some(b)) }.value()
 
   fun <U, V> choice(other: PTraversal<U, V, A, B>): PTraversal<Either<S, U>, Either<T, V>, A, B> = object : PTraversal<Either<S, U>, Either<T, V>, A, B> {
     override fun <F> modifyF(FA: Applicative<F>, s: Either<S, U>, f: (A) -> Kind<F, B>): Kind<F, Either<T, V>> = FA.run {
@@ -315,7 +315,7 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
   fun find(s: S, p: (A) -> Boolean): Option<A> = foldMap(firstOptionMonoid<A>(), s) { a ->
     if (p(a)) Const(Some(a))
     else Const(None)
-  }.value
+  }.value()
 
   /**
    * Map each target to a Monoid and combine the results

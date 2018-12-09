@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: TraverseFilter
-permalink: /docs/typeclasses/traversefilter/
+permalink: /docs/arrow/mtl/typeclasses/traversefilter/
+redirect_from:
+  - /docs/typeclasses/traversefilter
 ---
 
 ## TraverseFilter

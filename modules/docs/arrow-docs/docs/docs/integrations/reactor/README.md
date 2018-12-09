@@ -57,9 +57,9 @@ mono.value()
 
 ### Observable comprehensions
 
-The library provides instances of [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) and [`MonadDefer`]({{ '/docs/effects/monaddefer' | relative_url }}).
+The library provides instances of [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}) and [`MonadDefer`]({{ '/docs/effects/monaddefer' | relative_url }}).
 
-[`MonadDefer`]({{ '/docs/effects/async' | relative_url }}) allows you to generify over datatypes that can run asynchronous code. You can use it with `FluxK` or `MonoK`.
+[`Async`]({{ '/docs/effects/async' | relative_url }}) allows you to generify over datatypes that can run asynchronous code. You can use it with `FluxK` or `MonoK`.
 
 ```kotlin
 fun <F> getSongUrlAsync(MS: MonadDefer<F>) =
@@ -69,7 +69,7 @@ val songFlux: FluxKOf<Url> = getSongUrlAsync(FluxK.monadDefer())
 val songMono: MonoKOf<Url> = getSongUrlAsync(MonoK.monadDefer())
 ```
 
-[`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}) can be used to start a [Monad Comprehension]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) using the method `bindingCatch`, with all its benefits.
+[`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}) can be used to start a [Monad Comprehension]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) using the method `bindingCatch`, with all its benefits.
 
 Let's take an example and convert it to a comprehension. We'll create an observable that loads a song from a remote location, and then reports the current play % every 100 milliseconds until the percentage reaches 100%:
 
@@ -146,6 +146,50 @@ flux.value()
     
 disposable()
 // Boom! caused by BindingCancellationException
+```
+
+### Stack safety
+
+While [`MonadDefer`]({{ '/docs/effects/monaddefer' | relative_url }}) usually guarantees stack safety, this does not apply for the reactor wrapper types. 
+This is a limitation on reactor's side. See the corresponding github [issue]({{ 'https://github.com/reactor/reactor-core/issues/1441' }}).
+
+To overcome this limitation and run code in a stack safe way, one can make use of `bindingStackSafe` which is provided for every instance of [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) when you have `arrow-free` included.
+
+{: data-executable='true'}
+```kotlin:ank
+import arrow.Kind
+import arrow.effects.MonoK
+import arrow.effects.ForMonoK
+import arrow.effects.fix
+import arrow.effects.monok.monad.monad
+import arrow.effects.monok.applicativeError.attempt
+import arrow.free.bindingStackSafe
+import arrow.free.run
+
+fun main() {
+  //sampleStart
+  // This will not result in a stack overflow
+  val result = MonoK.monad().bindingStackSafe {
+    (1..50000).fold(just(0)) { acc: Kind<ForMonoK, Int>, x: Int ->
+      just(acc.bind() + 1)
+    }.bind()
+  }.run(MonoK.monad())
+  //sampleEnd
+  println(result.fix().mono.block()!!)
+}
+```
+
+```kotlin:ank
+import arrow.core.Try
+
+// This will result in a stack overflow
+Try {
+  MonoK.monad().binding {
+    (1..50000).fold(just(0)) { acc: Kind<ForMonoK, Int>, x: Int ->
+      just(acc.bind() + 1)
+    }.bind()
+  }.fix().mono.block()
+}
 ```
 
 ### Supported Type Classes

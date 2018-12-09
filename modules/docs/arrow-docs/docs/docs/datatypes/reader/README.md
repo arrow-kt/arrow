@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: Reader
-permalink: /docs/datatypes/reader/
+permalink: /docs/arrow/data/reader/
+redirect_from:
+  - /docs/datatypes/reader
 ---
 
 ## Reader 

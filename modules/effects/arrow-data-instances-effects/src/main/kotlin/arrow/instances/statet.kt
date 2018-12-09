@@ -1,4 +1,4 @@
-package arrow.instances
+package arrow.effects.instances
 
 import arrow.core.None
 import arrow.core.Option
@@ -7,9 +7,12 @@ import arrow.core.getOrElse
 import arrow.data.*
 import arrow.effects.Ref
 import arrow.effects.typeclasses.*
+import arrow.extension
+import arrow.instances.StateTMonadThrowInstance
 import arrow.typeclasses.MonadError
 import kotlin.coroutines.CoroutineContext
 
+@extension
 interface StateTBracketInstance<F, S> : Bracket<StateTPartialOf<F, S>, Throwable>, StateTMonadThrowInstance<F, S> {
 
   fun MD(): MonadDefer<F>
@@ -26,27 +29,24 @@ interface StateTBracketInstance<F, S> : Bracket<StateTPartialOf<F, S>, Throwable
           use(a).runM(this, s).flatMap { sa ->
             ref.set(Some(sa.a)).map { sa }
           }
-        }, release = { (s, a), exitCase ->
+        }, release = { (s0, a), exitCase ->
           when (exitCase) {
             is ExitCase.Completed ->
-              ref.get().map { it.getOrElse { s } }.flatMap { s ->
-                release(a, ExitCase.Completed).fix().runS(this, s).flatMap { s ->
-                  ref.set(Some(s))
+              ref.get.map { it.getOrElse { s0 } }.flatMap { s1 ->
+                release(a, ExitCase.Completed).fix().runS(this, s1).flatMap { s2 ->
+                  ref.set(Some(s2))
                 }
               }
-            else -> release(a, exitCase).runM(this, s).void()
+            else -> release(a, exitCase).runM(this, s0).void()
           }
-        }).flatMap { (s, b) -> ref.get().map { it.getOrElse { s } }.tupleRight(b) }
+        }).flatMap { (s, b) -> ref.get.map { it.getOrElse { s } }.tupleRight(b) }
       }
     }
   }
 
 }
 
-fun <F, S> StateT.Companion.bracket(MD: MonadDefer<F>): Bracket<StateTPartialOf<F, S>, Throwable> = object : StateTBracketInstance<F, S> {
-  override fun MD(): MonadDefer<F> = MD
-}
-
+@extension
 interface StateTMonadDeferInstance<F, S> : MonadDefer<StateTPartialOf<F, S>>, StateTBracketInstance<F, S> {
 
   override fun MD(): MonadDefer<F>
@@ -57,10 +57,7 @@ interface StateTMonadDeferInstance<F, S> : MonadDefer<StateTPartialOf<F, S>>, St
 
 }
 
-fun <F, S> StateT.Companion.monadDefer(MD: MonadDefer<F>): MonadDefer<StateTPartialOf<F, S>> = object : StateTMonadDeferInstance<F, S> {
-  override fun MD(): MonadDefer<F> = MD
-}
-
+@extension
 interface StateTAsyncInstane<F, S> : Async<StateTPartialOf<F, S>>, StateTMonadDeferInstance<F, S> {
 
   fun AS(): Async<F>
@@ -75,8 +72,4 @@ interface StateTAsyncInstane<F, S> : Async<StateTPartialOf<F, S>>, StateTMonadDe
     StateT(this) { s -> runM(this, s).continueOn(ctx) }
   }
 
-}
-
-fun <F, S> StateT.Companion.async(AS: Async<F>): Async<StateTPartialOf<F, S>> = object : StateTAsyncInstane<F, S> {
-  override fun AS(): Async<F> = AS
 }

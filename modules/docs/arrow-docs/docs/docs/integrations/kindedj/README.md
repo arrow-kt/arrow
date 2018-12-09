@@ -57,7 +57,7 @@ val idj2: io.kindedj.Hk<ForIdJ, A> = id.fromArrow()
 Using the conversion layer we're capable of using an intermediate representation of any Arrow datatype generically by converting it into a `io.kindedj.Hk2<ForConvert, F, A>`,
 where F is the [original representation of the container]({{ '/docs/patterns/glossary' | relative_url }}). Note that the typealias `io.kindedj.Hk2` is only available in Kotlin.
 
-Let's see an example using our type [`Id`]({{ '/docs/datatypes/id' | relative_url }}):
+Let's see an example using our type [`Id`]({{ '/docs/arrow/core/id' | relative_url }}):
 
 ```kotlin
 data class IdK<out A>(val a: A)

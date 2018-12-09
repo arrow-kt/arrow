@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: SortedMapK
-permalink: /docs/datatypes/sortedmapk/
+permalink: /docs/arrow/data/sortedmapk/
+redirect_from:
+  - /docs/datatypes/sortedmapk
 ---
 
 ## SortedMapK

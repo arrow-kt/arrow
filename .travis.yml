@@ -3,21 +3,54 @@ sudo: required
 dist: trusty
 
 jdk:
-  - oraclejdk8
+- oraclejdk8
 
-script:
-  - ./gradlew clean build
-  - ./gradlew dokka :arrow-docs:runAnk
- 
-after_success:
-  - ./gradlew codeCoverageReport
-  - bash <(curl -s https://codecov.io/bash)
-  - ./deploy-scripts/deploy.sh
+stages:
+- name: build-and-dokka
+  if: branch != master OR type = pull_request
+- name: build-and-dokka-transfer
+  if: branch = master AND type != pull_request
+- name: coverage-report
+  if: branch = master
+- name: deploy
+  if: branch = master AND type != pull_request
+- name: deploy-docs
+  if: branch = master AND type != pull_request
 
-deploy:
-  provider: pages
-  skip_cleanup: true
-  github_token: $GITHUB_TOKEN
-  local_dir: modules/docs/arrow-docs/build/site
-  on:
-    branch: master
+env:
+ global:
+ # include $HOME/.local/bin for `aws`
+ - PATH=$HOME/.local/bin:$PATH
+ - JAVA_OPTS="-Xms512m -Xmx1024m"
+
+before_install:
+- pip install --user awscli
+- mkdir -p ~/site
+
+jobs:
+ include:
+ - stage: build-and-dokka
+   script:
+   # redirecting outputs to files to avoid exceeding travis' logs limit
+   - ./gradlew clean build
+   - ./gradlew dokka :arrow-docs:runAnk
+ - stage: build-and-dokka-transfer
+   script:
+   - ./gradlew clean build
+   - ./gradlew dokka :arrow-docs:runAnk
+   - aws s3 sync modules/docs/arrow-docs/build/site s3://$S3_BUCKET/site > aws_sync_dokka.log
+ - stage: coverage-report
+   script:
+   - ./gradlew codeCoverageReport
+   - bash <(curl -s https://codecov.io/bash)
+ - stage: deploy
+   script:
+   - ./deploy-scripts/deploy.sh
+ - stage: deploy-docs
+   script:
+   - aws s3 sync s3://$S3_BUCKET/site ~/site > aws_sync_jekyll.log
+   - rvm use 2.5.3 --install --fuzzy
+   - bundle install --gemfile modules/docs/arrow-docs/Gemfile --path vendor/bundle
+   - export BUNDLE_GEMFILE=modules/docs/arrow-docs/Gemfile
+   - travis_wait 10 bundle exec jekyll build -s ~/site -d ~/_site
+   - aws s3 sync ~/_site s3://$S3_BUCKET > aws_sync_site.log

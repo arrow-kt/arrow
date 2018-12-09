@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: Eq
-permalink: /docs/typeclasses/eq/
+permalink: /docs/arrow/typeclasses/eq/
+redirect_from:
+  - /docs/typeclasses/eq
 ---
 
 ## Eq
@@ -87,6 +89,6 @@ import arrow.typeclasses.Eq
 TypeClass(Eq::class).dtMarkdownList()
 ```
 
-Additionally all instances of [`Order`]({{ '/docs/typeclasses/order' | relative_url }}), [`Hash`]({{ '/docs/typeclasses/hash' | relative_url }}) and their MTL variants implement the `Eq` typeclass directly since they are all subtypes of `Eq`
+Additionally all instances of [`Order`]({{ '/docs/arrow/typeclasses/order' | relative_url }}), [`Hash`]({{ '/docs/arrow/typeclasses/hash' | relative_url }}) and their MTL variants implement the `Eq` typeclass directly since they are all subtypes of `Eq`
 
 ank_macro_hierarchy(arrow.typeclasses.Eq)

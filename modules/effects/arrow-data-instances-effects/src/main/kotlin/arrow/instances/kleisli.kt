@@ -33,8 +33,8 @@ interface KleisliBracketInstance<F, R, E> : Bracket<KleisliPartialOf<F, R>, E>, 
     Kleisli { r -> BF().run { this@uncancelable.run(r).uncancelable() } }
 }
 
-@extension
-interface KleisliMonadDeferInstance<F, R> : MonadDefer<KleisliPartialOf<F, R>>, KleisliBracketInstance<F, R, Throwable> {
+//TODO fix stack safety issue. AsyncLaws#stack safety over repeated attempts fails.
+internal interface KleisliMonadDeferInstance<F, R> : MonadDefer<KleisliPartialOf<F, R>>, KleisliBracketInstance<F, R, Throwable> {
 
   fun MDF(): MonadDefer<F>
 
@@ -46,8 +46,7 @@ interface KleisliMonadDeferInstance<F, R> : MonadDefer<KleisliPartialOf<F, R>>, 
 
 }
 
-@extension
-interface KleisliAsyncInstance<F, R> : Async<KleisliPartialOf<F, R>>, KleisliMonadDeferInstance<F, R> {
+internal interface KleisliAsyncInstance<F, R> : Async<KleisliPartialOf<F, R>>, KleisliMonadDeferInstance<F, R> {
 
   fun ASF(): Async<F>
 
@@ -55,9 +54,6 @@ interface KleisliAsyncInstance<F, R> : Async<KleisliPartialOf<F, R>>, KleisliMon
 
   override fun <A> async(fa: Proc<A>): Kleisli<F, R, A> =
     Kleisli.liftF(ASF().async(fa))
-
-  override fun <A> asyncF(k: ProcF<KleisliPartialOf<F, R>, A>): Kleisli<F, R, A> =
-    Kleisli { r -> ASF().asyncF { cb -> k(cb).run(r) } }
 
   override fun <A> KleisliOf<F, R, A>.continueOn(ctx: CoroutineContext): Kleisli<F, R, A> = ASF().run {
     Kleisli { r -> run(r).continueOn(ctx) }

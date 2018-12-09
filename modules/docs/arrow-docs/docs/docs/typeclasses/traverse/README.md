@@ -1,7 +1,9 @@
 ---
 layout: docs
 title: Traverse
-permalink: /docs/typeclasses/traverse/
+permalink: /docs/arrow/typeclasses/traverse/
+redirect_from:
+  - /docs/typeclasses/traverse
 ---
 
 ## Traverse
