@@ -1,5 +1,6 @@
 package arrow.meta.encoder.jvm
 
+import arrow.common.messager.logW
 import arrow.common.utils.removeBackticks
 import arrow.meta.ast.PackageName
 import arrow.meta.ast.TypeName
@@ -41,7 +42,58 @@ internal fun String.asClassy(): TypeName.Classy {
   return TypeName.Classy(simpleName, rawTypeName, PackageName(pckg))
 }
 
-internal fun String.downKind(): Pair<String, String> =
+private val kindRegex: Regex =
+  "arrow.Kind<(.*), (.*)>".toRegex()
+
+fun String.downKParts(): List<String> =
+  when (val matchResult = kindRegex.find(this)) {
+    null -> listOf(this)
+    else -> {
+      val witness = matchResult.groupValues[1]
+      val value = matchResult.groupValues[2]
+      witness.downKParts() + value.downKParts()
+    }
+  }
+
+data class DownKindReduction(
+  val pckg: String,
+  val name: String,
+  val addtitionalTypeArgs: List<String> = emptyList()
+)
+
+internal fun String.downKind(api: JvmMetaApi): DownKindReduction {
+  val dkOld = downKindOld()
+  val parts = downKParts()
+  return if (parts.isEmpty()) {
+    val pckg =
+      if (this.contains(".")) this.substringBeforeLast(".")
+      else ""
+    DownKindReduction(pckg, this)
+  } else {
+    val dataType = parts[0]
+    val pckg =
+      if (dataType.contains(".")) dataType.substringBeforeLast(".")
+      else ""
+    val simpleName = dataType.substringAfterLast(".").substringBefore("<")
+    val unAppliedName =
+      if (simpleName.startsWith("For")) simpleName.drop("For".length)
+      else simpleName
+    when {
+      unAppliedName.endsWith("PartialOf") ->
+        DownKindReduction(pckg, unAppliedName.substringBeforeLast("PartialOf"), parts.drop(1))
+      unAppliedName.endsWith("Of") ->
+        DownKindReduction(pckg, unAppliedName.substringBeforeLast("Of"), parts.drop(1))
+      else -> {
+        if (unAppliedName == "StateT") {
+          api.logW(unAppliedName + ", parts: " + parts)
+        }
+        DownKindReduction(pckg, unAppliedName, parts.drop(1))
+      }
+    }
+  }
+}
+
+internal fun String.downKindOld(): Pair<String, String> =
   run {
     val classy = asClassy()
     val kindedClassy = when {

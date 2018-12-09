@@ -92,11 +92,11 @@ interface MetaApi {
    * ex: `Kind<ForIO, A> -> IO<A>`
    */
   val TypeName.downKind: TypeName
-  val TypeName.TypeVariable.downKind: TypeName.TypeVariable
-  val TypeName.FunctionLiteral.downKind: TypeName.FunctionLiteral
-  val TypeName.ParameterizedType.downKind: TypeName.ParameterizedType
-  val TypeName.WildcardType.downKind: TypeName.WildcardType
-  val TypeName.Classy.downKind: TypeName.Classy
+  val TypeName.TypeVariable.downKind: TypeName
+  val TypeName.FunctionLiteral.downKind: TypeName
+  val TypeName.ParameterizedType.downKind: TypeName
+  val TypeName.WildcardType.downKind: TypeName
+  val TypeName.Classy.downKind: TypeName
 
   /**
    * Recursively gathers all the nested [TypeName.TypeVariable] inside a [TypeName]

@@ -281,9 +281,17 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
   /**
    * @see [MetaApi.getDownKind]
    */
-  override val TypeName.TypeVariable.downKind: TypeName.TypeVariable
-    get() = name.downKind().let { (pckg, unPrefixedName) ->
-      if (pckg.isBlank()) this else copy(name = "$pckg.$unPrefixedName")
+  override val TypeName.TypeVariable.downKind: TypeName
+    get() = name.downKind(this@JvmMetaApi).let { (pckg, unPrefixedName, extraArgs) ->
+      if (pckg.isBlank()) this
+      else {
+        if (extraArgs.isEmpty()) copy(name = "$pckg.$unPrefixedName")
+        else TypeName.ParameterizedType(
+          name = "$pckg.$unPrefixedName",
+          typeArguments = extraArgs.map { TypeName.TypeVariable(it) },
+          rawType = TypeName.Classy(unPrefixedName, "$pckg.$unPrefixedName", PackageName(pckg))
+        )
+      }
     }
 
   /**
@@ -368,7 +376,7 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
   /**
    * @see [MetaApi.getDownKind]
    */
-  override val TypeName.WildcardType.downKind: TypeName.WildcardType
+  override val TypeName.WildcardType.downKind: TypeName
     get() = if (upperBounds.isNotEmpty() &&
       (upperBounds.find {
         name.matches("arrow.Kind<(\\w?), (\\w?)>".toRegex()) ||
@@ -376,22 +384,34 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
       } != null)) {
       this
     } else {
-      name.downKind().let { (pckg, unPrefixedName) ->
-        if (pckg.isBlank()) this
-        else copy(
-          name = "$pckg.$unPrefixedName",
-          lowerBounds = lowerBounds.map { it.downKind },
-          upperBounds = upperBounds.map { it.downKind }
-        )
+      name.downKind(this@JvmMetaApi).let { (pckg, unPrefixedName, extraArgs) ->
+        when {
+          pckg.isBlank() -> this
+          extraArgs.isEmpty() -> copy(
+            name = "$pckg.$unPrefixedName",
+            lowerBounds = lowerBounds.map { it.downKind },
+            upperBounds = upperBounds.map { it.downKind }
+          )
+          else -> TypeName.ParameterizedType(
+            name = "$pckg.$unPrefixedName",
+            typeArguments = extraArgs.map { TypeName.TypeVariable(it) },
+            rawType = TypeName.Classy(unPrefixedName, "$pckg.$unPrefixedName", PackageName(pckg))
+          )
+        }
       }
     }
 
   /**
    * @see [MetaApi.getDownKind]
    */
-  override val TypeName.Classy.downKind: TypeName.Classy
-    get() = fqName.downKind().let { (pckg, unPrefixedName) ->
-      copy(simpleName = unPrefixedName, fqName = "$pckg.$unPrefixedName")
+  override val TypeName.Classy.downKind: TypeName
+    get() = fqName.downKind(this@JvmMetaApi).let { (pckg, unPrefixedName, extraArgs) ->
+      if (extraArgs.isEmpty()) copy(simpleName = unPrefixedName, fqName = "$pckg.$unPrefixedName")
+      else TypeName.ParameterizedType(
+        name = "$pckg.$unPrefixedName",
+        typeArguments = extraArgs.map { TypeName.TypeVariable(it) },
+        rawType = TypeName.Classy(unPrefixedName, "$pckg.$unPrefixedName", PackageName(pckg))
+      )
     }
 
   fun typeNameDownKindImpl(typeName: TypeName): TypeName =
@@ -529,7 +549,7 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
             .substringAfterLast("arrow.typeclasses.Conested<")
             .substringBefore(",")
             .substringBefore("<")
-            .downKind().let { (pckg, simpleName) ->
+            .downKind(this@JvmMetaApi).let { (pckg, simpleName) ->
               TypeName.Classy.from(pckg, simpleName)
             }
         }
