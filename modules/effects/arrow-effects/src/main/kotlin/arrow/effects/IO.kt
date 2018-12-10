@@ -48,6 +48,7 @@ sealed class IO<out A> : IOOf<A> {
       Async { conn: IOConnection, ff: (Either<Throwable, A>) -> Unit ->
         val conn2 = IOConnection()
         conn.push(conn2.cancel())
+
         onceOnly(conn, ff).let { callback: (Either<Throwable, A>) -> Unit ->
           val fa = try {
             k(conn2, callback)

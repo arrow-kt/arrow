@@ -118,6 +118,7 @@ interface IOAsyncInstance : Async<ForIO>, IOMonadDeferInstance {
     fix().continueOn(ctx)
 }
 
+@extension
 interface IOConcurrentInstance : Concurrent<ForIO>, IOAsyncInstance {
   override fun <A> Kind<ForIO, A>.startF(ctx: CoroutineContext): IO<Fiber<ForIO, A>> =
     ioStart(ctx)
@@ -129,7 +130,7 @@ interface IOConcurrentInstance : Concurrent<ForIO>, IOAsyncInstance {
 
 @extension
 interface IOEffectInstance : Effect<ForIO>, IOAsyncInstance {
-  override fun <A> Kind<ForIO, A>.runAsync(cb: (Either<Throwable, A>) -> Kind<ForIO, Unit>): IO<Unit> =
+  override fun <A> IOOf<A>.runAsync(cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Unit> =
     fix().runAsync(cb)
 }
 
@@ -139,6 +140,7 @@ interface IOConcurrentEffectInstance : ConcurrentEffect<ForIO>, IOEffectInstance
     fix().runAsyncCancellable(OnCancel.ThrowCancellationException, cb)
 }
 
+@extension
 interface IOSemigroupInstance<A> : Semigroup<IO<A>> {
 
   fun SG(): Semigroup<A>
