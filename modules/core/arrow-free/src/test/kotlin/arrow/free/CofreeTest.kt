@@ -145,9 +145,9 @@ class CofreeTest : UnitSpec() {
           override fun <A> invoke(fa: Kind<ForEval, A>): Kind<EvalOptionF, A> =
             OptionT(fa.fix().map { Some(it) })
         }
-        val cataHundred = cataM(OptionT.monad(Eval.monad()), Option.traverse(), inclusion, folder).fix().value.fix().value()
+        val cataHundred = cataM(OptionT.monad(Eval.monad()), Option.traverse(), inclusion, folder).value().value()
         val newCof = Cofree(Option.functor(), 2001, Eval.now(Some(startTwoThousand)))
-        val cataHundredOne = newCof.cataM(OptionT.monad(Eval.monad()), Option.traverse(), inclusion, folder).fix().value.fix().value()
+        val cataHundredOne = newCof.cataM(OptionT.monad(Eval.monad()), Option.traverse(), inclusion, folder).value().value()
 
         cataHundred shouldBe Some(NonEmptyList.fromListUnsafe((0..2000).toList()))
         cataHundredOne shouldBe None

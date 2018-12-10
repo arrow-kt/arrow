@@ -110,7 +110,7 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
       }.k()
 
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> ObservableKOf<Either<A, B>>): ObservableK<B> {
-      val either = f(a).fix().value().blockingFirst()
+      val either = f(a).value().blockingFirst()
       return when (either) {
         is Either.Left -> tailRecM(either.a, f)
         is Either.Right -> Observable.just(either.b).k()

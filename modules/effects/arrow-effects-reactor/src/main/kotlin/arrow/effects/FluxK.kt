@@ -111,7 +111,7 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
       }.k()
 
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> FluxKOf<Either<A, B>>): FluxK<B> {
-      val either = f(a).fix().value().blockFirst()
+      val either = f(a).value().blockFirst()
       return when (either) {
         is Either.Left -> tailRecM(either.a, f)
         is Either.Right -> Flux.just(either.b).k()

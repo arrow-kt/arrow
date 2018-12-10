@@ -2,6 +2,8 @@ package arrow.core
 
 import arrow.higherkind
 
+fun <A> EvalOf<A>.value(): A = this.fix().value()
+
 /**
  * Eval is a monad which controls evaluation of a value or a computation that produces a value.
  *

@@ -12,6 +12,7 @@ dependencies {
     compile project(':arrow-core')
     compile project(':arrow-instances-data')
     compile project(':arrow-effects-instances')
+    compile project(':arrow-data-instances-effects')
     compile project(':arrow-effects-rx2-instances')
     compile project(':arrow-effects-reactor-instances')
     compile project(':arrow-effects-kotlinx-coroutines-instances')

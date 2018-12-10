@@ -10,19 +10,19 @@ import arrow.typeclasses.combine as combineAp
 
 @extension
 interface ConstInvariant<A> : Invariant<ConstPartialOf<A>> {
-  override fun <T, U> Kind<ConstPartialOf<A>, T>.imap(f: (T) -> U, g: (U) -> T): Const<A, U> =
+  override fun <T, U> ConstOf<A, T>.imap(f: (T) -> U, g: (U) -> T): Const<A, U> =
     fix().retag()
 }
 
 @extension
 interface ConstContravariant<A> : Contravariant<ConstPartialOf<A>> {
-  override fun <T, U> Kind<ConstPartialOf<A>, T>.contramap(f: (U) -> T): Const<A, U> =
+  override fun <T, U> ConstOf<A, T>.contramap(f: (U) -> T): Const<A, U> =
     fix().retag()
 }
 
 @extension
 interface ConstFunctorInstance<A> : Functor<ConstPartialOf<A>> {
-  override fun <T, U> Kind<ConstPartialOf<A>, T>.map(f: (T) -> U): Const<A, U> =
+  override fun <T, U> ConstOf<A, T>.map(f: (T) -> U): Const<A, U> =
     fix().retag()
 }
 
@@ -31,23 +31,23 @@ interface ConstApplicativeInstance<A> : Applicative<ConstPartialOf<A>> {
 
   fun MA(): Monoid<A>
 
-  override fun <T, U> Kind<ConstPartialOf<A>, T>.map(f: (T) -> U): Const<A, U> = fix().retag()
+  override fun <T, U> ConstOf<A, T>.map(f: (T) -> U): Const<A, U> = fix().retag()
 
   override fun <T> just(a: T): Const<A, T> = object : ConstMonoidInstance<A, T> {
     override fun SA(): Semigroup<A> = MA()
     override fun MA(): Monoid<A> = this@ConstApplicativeInstance.MA()
   }.empty().fix()
 
-  override fun <T, U> Kind<ConstPartialOf<A>, T>.ap(ff: Kind<ConstPartialOf<A>, (T) -> U>): Const<A, U> =
+  override fun <T, U> ConstOf<A, T>.ap(ff: ConstOf<A, (T) -> U>): Const<A, U> =
     constAp(MA(), ff)
 }
 
 @extension
 interface ConstFoldableInstance<A> : Foldable<ConstPartialOf<A>> {
 
-  override fun <T, U> Kind<ConstPartialOf<A>, T>.foldLeft(b: U, f: (U, T) -> U): U = b
+  override fun <T, U> ConstOf<A, T>.foldLeft(b: U, f: (U, T) -> U): U = b
 
-  override fun <T, U> Kind<ConstPartialOf<A>, T>.foldRight(lb: Eval<U>, f: (T, Eval<U>) -> Eval<U>): Eval<U> = lb
+  override fun <T, U> ConstOf<A, T>.foldRight(lb: Eval<U>, f: (T, Eval<U>) -> Eval<U>): Eval<U> = lb
 
 }
 
@@ -86,7 +86,7 @@ interface ConstEqInstance<A, T> : Eq<Const<A, T>> {
   fun EQ(): Eq<A>
 
   override fun Const<A, T>.eqv(b: Const<A, T>): Boolean =
-    EQ().run { value.eqv(b.value) }
+    EQ().run { value().eqv(b.value()) }
 }
 
 @extension
@@ -101,13 +101,13 @@ interface ConstHashInstance<A, T> : Hash<Const<A, T>>, ConstEqInstance<A, T> {
 
   override fun EQ(): Eq<A> = HA()
 
-  override fun Const<A, T>.hash(): Int = HA().run { value.hash() }
+  override fun Const<A, T>.hash(): Int = HA().run { value().hash() }
 }
 
 class ConstContext<A>(val MA: Monoid<A>) : ConstApplicativeInstance<A>, ConstTraverseInstance<A> {
   override fun MA(): Monoid<A> = MA
 
-  override fun <T, U> Kind<ConstPartialOf<A>, T>.map(f: (T) -> U): Const<A, U> =
+  override fun <T, U> ConstOf<A, T>.map(f: (T) -> U): Const<A, U> =
     fix().map(f)
 }
 

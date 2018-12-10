@@ -1,8 +1,15 @@
 package arrow.data
 
 import arrow.Kind
+import arrow.core.Either
 import arrow.core.ForTry
 import arrow.core.Try
+import arrow.effects.ForIO
+import arrow.effects.IO
+import arrow.effects.instances.io.applicativeError.attempt
+import arrow.effects.instances.io.async.async
+import arrow.effects.instances.io.monad.monad
+import arrow.effects.instances.statet.async.async
 import arrow.instances.`try`.monad.monad
 import arrow.instances.listk.monad.monad
 import arrow.instances.listk.semigroupK.semigroupK
@@ -13,6 +20,7 @@ import arrow.mtl.instances.listk.monadCombine.monadCombine
 import arrow.mtl.instances.statet.monadCombine.monadCombine
 import arrow.mtl.instances.statet.monadState.monadState
 import arrow.test.UnitSpec
+import arrow.test.laws.AsyncLaws
 import arrow.test.laws.MonadCombineLaws
 import arrow.test.laws.MonadStateLaws
 import arrow.test.laws.SemigroupKLaws
@@ -37,17 +45,26 @@ class StateTTests : UnitSpec() {
     a.runM(ListK.monad(), 1) == b.runM(ListK.monad(), 1)
   }
 
+  private fun IOEQ(): Eq<StateTOf<ForIO, Int, Int>> = Eq { a, b ->
+    a.runM(IO.monad(), 1).attempt().unsafeRunSync() == b.runM(IO.monad(), 1).attempt().unsafeRunSync()
+  }
+
+  private fun IOEitherEQ(): Eq<StateTOf<ForIO, Int, Either<Throwable, Int>>> = Eq { a, b ->
+    a.runM(IO.monad(), 1).attempt().unsafeRunSync() == b.runM(IO.monad(), 1).attempt().unsafeRunSync()
+  }
+
   init {
 
     testLaws(
       MonadStateLaws.laws(M, EQ, EQ_UNIT),
+      AsyncLaws.laws<StateTPartialOf<ForIO, Int>>(StateT.async(IO.async()), IOEQ(), IOEitherEQ()),
       SemigroupKLaws.laws(
         StateT.semigroupK<ForListK, Int>(ListK.monad(), ListK.semigroupK()),
         StateT.applicative<ForListK, Int>(ListK.monad()),
         EQ_LIST),
       MonadCombineLaws.laws(StateT.monadCombine<ForListK, Int>(ListK.monadCombine()),
-        { StateT.lift(ListK.monad(), ListK.just(it)) },
-        { StateT.lift(ListK.monad(), ListK.just({ s: Int -> s * 2 })) },
+        { StateT.liftF(ListK.monad(), ListK.just(it)) },
+        { StateT.liftF(ListK.monad(), ListK.just({ s: Int -> s * 2 })) },
         EQ_LIST)
     )
   }
