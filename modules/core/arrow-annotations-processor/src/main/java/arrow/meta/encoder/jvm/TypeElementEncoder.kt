@@ -215,7 +215,6 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
 
   fun TypeElement.allFunctions(declaredElement: TypeElement): List<Func> =
     processorUtils().run {
-      val comment = processingEnv.elementUtils.getDocComment(declaredElement)
       val superTypes = supertypes(
         declaredElement.meta,
         TypeTable(declaredElement.meta.classProto.typeTable),
