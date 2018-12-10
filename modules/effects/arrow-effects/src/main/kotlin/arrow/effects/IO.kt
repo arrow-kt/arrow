@@ -1,5 +1,6 @@
 package arrow.effects
 
+import arrow.Kind
 import arrow.core.*
 import arrow.core.Either.Left
 import arrow.effects.OnCancel.Companion.CancellationException
@@ -12,10 +13,7 @@ import arrow.effects.internal.Platform.maxStackDepthSize
 import arrow.effects.internal.Platform.onceOnly
 import arrow.effects.internal.Platform.unsafeResync
 import arrow.effects.internal.toDisposable
-import arrow.effects.typeclasses.Disposable
-import arrow.effects.typeclasses.Duration
-import arrow.effects.typeclasses.ExitCase
-import arrow.effects.typeclasses.Proc
+import arrow.effects.typeclasses.*
 import arrow.higherkind
 import kotlin.coroutines.CoroutineContext
 
@@ -27,8 +25,10 @@ enum class OnCancel { ThrowCancellationException, Silent;
 }
 
 typealias IOProc<A> = (IOConnection, (Either<Throwable, A>) -> Unit) -> Unit
+typealias IOProcF<A> = (IOConnection, (Either<Throwable, A>) -> Unit) -> Kind<ForIO, Unit>
 
-fun <T> Proc<T>.toIOProc(): IOProc<T> = { _: IOConnection, proc -> this(proc) }
+fun <A> Proc<A>.toIOProc(): IOProc<A> = { _: IOConnection, proc -> this(proc) }
+fun <A> ProcF<ForIO, A>.toIOProcF(): IOProcF<A> = { _: IOConnection, proc -> this(proc) }
 
 @higherkind
 sealed class IO<out A> : IOOf<A> {
@@ -51,6 +51,22 @@ sealed class IO<out A> : IOOf<A> {
           } catch (throwable: Throwable) {
             callback(Left(throwable))
           }
+        }
+      }
+
+    fun <A> asyncF(k: IOProcF<A>): IO<A> =
+      Async { conn: IOConnection, ff: (Either<Throwable, A>) -> Unit ->
+        val conn2 = IOConnection()
+        conn.push(conn2.cancel())
+
+        onceOnly(conn, ff).let { callback: (Either<Throwable, A>) -> Unit ->
+          val fa = try {
+            k(conn2, callback)
+          } catch (t: Throwable) {
+            IO { callback(Left(t)) }
+          }
+
+          IORunLoop.startCancelable(fa, conn2) { Unit }
         }
       }
 
@@ -130,15 +146,15 @@ sealed class IO<out A> : IOOf<A> {
    */
   fun uncancelable(): IO<A> = IOCancel.uncancelable(this)
 
-  fun <B> bracket(release: (A) -> IO<Unit>, use: (A) -> IO<B>): IO<B> =
+  fun <B> bracket(release: (A) -> IOOf<Unit>, use: (A) -> IOOf<B>): IO<B> =
     bracketCase({ a, _ -> release(a) }, use)
 
-  fun <B> bracketCase(release: (A, ExitCase<Throwable>) -> IO<Unit>, use: (A) -> IO<B>): IO<B> =
+  fun <B> bracketCase(release: (A, ExitCase<Throwable>) -> IOOf<Unit>, use: (A) -> IOOf<B>): IO<B> =
     IOBracket(this, release, use)
 
-  fun guarantee(finalizer: IO<Unit>): IO<A> = guaranteeCase { finalizer }
+  fun guarantee(finalizer: IOOf<Unit>): IO<A> = guaranteeCase { finalizer }
 
-  fun guaranteeCase(finalizer: (ExitCase<Throwable>) -> IO<Unit>): IO<A> =
+  fun guaranteeCase(finalizer: (ExitCase<Throwable>) -> IOOf<Unit>): IO<A> =
     IOBracket.guaranteeCase(this, finalizer)
 
   internal data class Pure<out A>(val a: A) : IO<A>() {

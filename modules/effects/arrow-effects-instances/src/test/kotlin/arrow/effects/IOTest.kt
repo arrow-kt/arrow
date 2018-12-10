@@ -1,8 +1,8 @@
 package arrow.effects
 
-import arrow.Kind
 import arrow.core.*
 import arrow.effects.data.internal.IOCancellationException
+import arrow.effects.instances.io.applicativeError.attempt
 import arrow.effects.instances.io.async.async
 import arrow.effects.instances.io.monad.binding
 import arrow.effects.instances.io.monad.monad
@@ -22,12 +22,11 @@ import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
 class IOTest : UnitSpec() {
-  val EQ_OPTION = Option.eq(Eq.any())
 
-  fun <A> EQ(): Eq<Kind<ForIO, A>> {
+  fun <A> EQ(): Eq<IOOf<A>> {
     return Eq { a, b ->
-      EQ_OPTION.run {
-        a.fix().attempt().unsafeRunTimed(60.seconds).eqv(b.fix().attempt().unsafeRunTimed(60.seconds))
+      Option.eq(Eq.any()).run {
+        a.attempt().unsafeRunTimed(1.seconds).eqv(b.attempt().unsafeRunTimed(1.seconds))
       }
     }
   }

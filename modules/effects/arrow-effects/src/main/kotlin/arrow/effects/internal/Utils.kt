@@ -42,12 +42,13 @@ object Platform {
     }
   }
 
-  inline fun onceOnly(crossinline f: () -> Unit): () -> Unit {
+  inline fun <A> onceOnly(conn: IOConnection, crossinline f: (A) -> Unit): (A) -> Unit {
     val wasCalled = AtomicBoolean(false)
 
-    return {
+    return { a ->
       if (!wasCalled.getAndSet(true)) {
-        f()
+        conn.pop()
+        f(a)
       }
     }
   }

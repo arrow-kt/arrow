@@ -14,7 +14,7 @@ internal object IOBracket {
   /**
    * Implementation for `IO.bracketCase`.
    */
-  operator fun <A, B> invoke(acquire: IO<A>, release: (A, ExitCase<Throwable>) -> IO<Unit>, use: (A) -> IO<B>): IO<B> =
+  operator fun <A, B> invoke(acquire: IOOf<A>, release: (A, ExitCase<Throwable>) -> IOOf<Unit>, use: (A) -> IOOf<B>): IO<B> =
     IO.Async { conn, cb ->
       // Placeholder for the future finalizer
       val deferredRelease = ForwardCancelable()
@@ -34,8 +34,8 @@ internal object IOBracket {
 
   // Internals of `IO.bracketCase`.
   private class BracketStart<A, B>(
-    val use: (A) -> IO<B>,
-    val release: (A, ExitCase<Throwable>) -> IO<Unit>,
+    val use: (A) -> IOOf<B>,
+    val release: (A, ExitCase<Throwable>) -> IOOf<Unit>,
     val conn: IOConnection,
     val deferredRelease: ForwardCancelable,
     val cb: (Either<Throwable, B>) -> Unit) : (Either<Throwable, A>) -> Unit, Runnable {
@@ -67,7 +67,7 @@ internal object IOBracket {
               } catch (nonFatal: Exception) {
                 IO.raiseError<B>(nonFatal)
               }
-              fb.flatMap(frame)
+              fb.fix().flatMap(frame)
             }
             // Registering our cancelable token ensures that in case cancellation is detected, release gets called
             deferredRelease.complete(frame.cancel)
@@ -81,7 +81,7 @@ internal object IOBracket {
     }
   }
 
-  fun <A> guaranteeCase(source: IO<A>, release: (ExitCase<Throwable>) -> IO<Unit>): IO<A> =
+  fun <A> guaranteeCase(source: IO<A>, release: (ExitCase<Throwable>) -> IOOf<Unit>): IO<A> =
     IO.Async { conn, cb ->
       // TODO on cats-effect all this block is run using an immediate ExecutionContext for stack safety.
 
@@ -99,14 +99,14 @@ internal object IOBracket {
       }
     }
 
-  private class BracketReleaseFrame<A, B>(val a: A, val releaseFn: (A, ExitCase<Throwable>) -> IO<Unit>) :
+  private class BracketReleaseFrame<A, B>(val a: A, val releaseFn: (A, ExitCase<Throwable>) -> IOOf<Unit>) :
     BaseReleaseFrame<A, B>() {
 
     override fun release(c: ExitCase<Throwable>): CancelToken<ForIO> =
       releaseFn(a, c)
   }
 
-  private class EnsureReleaseFrame<A>(val releaseFn: (ExitCase<Throwable>) -> IO<Unit>) : BaseReleaseFrame<Unit, A>() {
+  private class EnsureReleaseFrame<A>(val releaseFn: (ExitCase<Throwable>) -> IOOf<Unit>) : BaseReleaseFrame<Unit, A>() {
 
     override fun release(c: ExitCase<Throwable>): CancelToken<ForIO> = releaseFn(c)
   }

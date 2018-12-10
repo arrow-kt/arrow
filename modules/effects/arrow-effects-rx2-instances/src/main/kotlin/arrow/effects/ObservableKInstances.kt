@@ -21,7 +21,7 @@ import kotlin.coroutines.CoroutineContext
 
 @extension
 interface ObservableKFunctorInstance : Functor<ForObservableK> {
-  override fun <A, B> Kind<ForObservableK, A>.map(f: (A) -> B): ObservableK<B> =
+  override fun <A, B> ObservableKOf<A>.map(f: (A) -> B): ObservableK<B> =
     fix().map(f)
 }
 
@@ -30,7 +30,7 @@ interface ObservableKApplicativeInstance : Applicative<ForObservableK> {
   override fun <A, B> ObservableKOf<A>.ap(ff: ObservableKOf<(A) -> B>): ObservableK<B> =
     fix().ap(ff)
 
-  override fun <A, B> Kind<ForObservableK, A>.map(f: (A) -> B): ObservableK<B> =
+  override fun <A, B> ObservableKOf<A>.map(f: (A) -> B): ObservableK<B> =
     fix().map(f)
 
   override fun <A> just(a: A): ObservableK<A> =
@@ -42,13 +42,13 @@ interface ObservableKMonadInstance : Monad<ForObservableK> {
   override fun <A, B> ObservableKOf<A>.ap(ff: ObservableKOf<(A) -> B>): ObservableK<B> =
     fix().ap(ff)
 
-  override fun <A, B> Kind<ForObservableK, A>.flatMap(f: (A) -> Kind<ForObservableK, B>): ObservableK<B> =
+  override fun <A, B> ObservableKOf<A>.flatMap(f: (A) -> ObservableKOf<B>): ObservableK<B> =
     fix().flatMap(f)
 
-  override fun <A, B> Kind<ForObservableK, A>.map(f: (A) -> B): ObservableK<B> =
+  override fun <A, B> ObservableKOf<A>.map(f: (A) -> B): ObservableK<B> =
     fix().map(f)
 
-  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, ObservableKOf<arrow.core.Either<A, B>>>): ObservableK<B> =
+  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, ObservableKOf<Either<A, B>>>): ObservableK<B> =
     ObservableK.tailRecM(a, f)
 
   override fun <A> just(a: A): ObservableK<A> =
@@ -57,25 +57,25 @@ interface ObservableKMonadInstance : Monad<ForObservableK> {
 
 @extension
 interface ObservableKFoldableInstance : Foldable<ForObservableK> {
-  override fun <A, B> Kind<ForObservableK, A>.foldLeft(b: B, f: (B, A) -> B): B =
+  override fun <A, B> ObservableKOf<A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
 
-  override fun <A, B> Kind<ForObservableK, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): arrow.core.Eval<B> =
+  override fun <A, B> ObservableKOf<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): arrow.core.Eval<B> =
     fix().foldRight(lb, f)
 }
 
 @extension
 interface ObservableKTraverseInstance : Traverse<ForObservableK> {
-  override fun <A, B> Kind<ForObservableK, A>.map(f: (A) -> B): ObservableK<B> =
+  override fun <A, B> ObservableKOf<A>.map(f: (A) -> B): ObservableK<B> =
     fix().map(f)
 
   override fun <G, A, B> ObservableKOf<A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, ObservableK<B>> =
     fix().traverse(AP, f)
 
-  override fun <A, B> Kind<ForObservableK, A>.foldLeft(b: B, f: (B, A) -> B): B =
+  override fun <A, B> ObservableKOf<A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
 
-  override fun <A, B> Kind<ForObservableK, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): arrow.core.Eval<B> =
+  override fun <A, B> ObservableKOf<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): arrow.core.Eval<B> =
     fix().foldRight(lb, f)
 }
 
@@ -106,7 +106,7 @@ interface ObservableKMonadThrowInstance : MonadThrow<ForObservableK>, Observable
 
 @extension
 interface ObservableKBracketInstance : Bracket<ForObservableK, Throwable>, ObservableKMonadThrowInstance {
-  override fun <A, B> Kind<ForObservableK, A>.bracketCase(release: (A, ExitCase<Throwable>) -> Kind<ForObservableK, Unit>, use: (A) -> Kind<ForObservableK, B>): ObservableK<B> =
+  override fun <A, B> ObservableKOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> ObservableKOf<Unit>, use: (A) -> ObservableKOf<B>): ObservableK<B> =
     fix().bracketCase({ use(it) }, { a, e -> release(a, e) })
 }
 
@@ -133,36 +133,36 @@ interface ObservableKEffectInstance : Effect<ForObservableK>, ObservableKAsyncIn
 
 @extension
 interface ObservableKConcurrentEffectInstance : ConcurrentEffect<ForObservableK>, ObservableKEffectInstance {
-  override fun <A> Kind<ForObservableK, A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> ObservableKOf<Unit>): ObservableK<Disposable> =
+  override fun <A> ObservableKOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> ObservableKOf<Unit>): ObservableK<Disposable> =
     fix().runAsyncCancellable(cb)
 }
 
 fun ObservableK.Companion.monadFlat(): ObservableKMonadInstance = monad()
 
 fun ObservableK.Companion.monadConcat(): ObservableKMonadInstance = object : ObservableKMonadInstance {
-  override fun <A, B> Kind<ForObservableK, A>.flatMap(f: (A) -> Kind<ForObservableK, B>): ObservableK<B> =
+  override fun <A, B> ObservableKOf<A>.flatMap(f: (A) -> ObservableKOf<B>): ObservableK<B> =
     fix().concatMap { f(it).fix() }
 }
 
 fun ObservableK.Companion.monadSwitch(): ObservableKMonadInstance = object : ObservableKMonadErrorInstance {
-  override fun <A, B> Kind<ForObservableK, A>.flatMap(f: (A) -> Kind<ForObservableK, B>): ObservableK<B> =
+  override fun <A, B> ObservableKOf<A>.flatMap(f: (A) -> ObservableKOf<B>): ObservableK<B> =
     fix().switchMap { f(it).fix() }
 }
 
 fun ObservableK.Companion.monadErrorFlat(): ObservableKMonadErrorInstance = monadError()
 
 fun ObservableK.Companion.monadErrorConcat(): ObservableKMonadErrorInstance = object : ObservableKMonadErrorInstance {
-  override fun <A, B> Kind<ForObservableK, A>.flatMap(f: (A) -> Kind<ForObservableK, B>): ObservableK<B> =
+  override fun <A, B> ObservableKOf<A>.flatMap(f: (A) -> ObservableKOf<B>): ObservableK<B> =
     fix().concatMap { f(it).fix() }
 }
 
 fun ObservableK.Companion.monadErrorSwitch(): ObservableKMonadErrorInstance = object : ObservableKMonadErrorInstance {
-  override fun <A, B> Kind<ForObservableK, A>.flatMap(f: (A) -> Kind<ForObservableK, B>): ObservableK<B> =
+  override fun <A, B> ObservableKOf<A>.flatMap(f: (A) -> ObservableKOf<B>): ObservableK<B> =
     fix().switchMap { f(it).fix() }
 }
 
 object ObservableKContext : ObservableKConcurrentEffectInstance, ObservableKTraverseInstance {
-  override fun <A, B> Kind<ForObservableK, A>.map(f: (A) -> B): ObservableK<B> =
+  override fun <A, B> ObservableKOf<A>.map(f: (A) -> B): ObservableK<B> =
     fix().map(f)
 }
 
