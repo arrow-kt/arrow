@@ -85,7 +85,7 @@ interface Functor<F> : Invariant<F> {
    * fun main(args: Array<String>) {
    *   val result =
    *   //sampleStart
-   *   1._just_.map { it + 1 }
+   *   "Hello"._just_()._map_({ "$it World" })
    *   //sampleEnd
    *   println(result)
    * }
@@ -109,7 +109,7 @@ interface Functor<F> : Invariant<F> {
    * fun main(args: Array<String>) {
    *   val result =
    *   //sampleStart
-   *   _lift_({ n: Int -> n * 10 })(1._just_)
+   *   _lift_({ s: CharSequence -> "$s World" })("Hello"._just_())
    *   //sampleEnd
    *   println(result)
    * }
@@ -131,7 +131,7 @@ interface Functor<F> : Invariant<F> {
    * fun main(args: Array<String>) {
    *   val result =
    *   //sampleStart
-   *   1._just_.unit()
+   *   "Hello World"._just_()._unit_()
    *   //sampleEnd
    *   println(result)
    * }
@@ -152,7 +152,7 @@ interface Functor<F> : Invariant<F> {
    * fun main(args: Array<String>) {
    *   val result =
    *   //sampleStart
-   *   1._just_.fproduct { it * 10 }
+   *   "Hello"._just_()._fproduct_({ "$it World" })
    *   //sampleEnd
    *   println(result)
    * }
@@ -172,7 +172,7 @@ interface Functor<F> : Invariant<F> {
    * fun main(args: Array<String>) {
    *   val result =
    *   //sampleStart
-   *   1._just_.`as`("some string")
+   *   "Hello World"._just_()._`as`_("...")
    *   //sampleEnd
    *   println(result)
    * }
@@ -192,7 +192,7 @@ interface Functor<F> : Invariant<F> {
    * fun main(args: Array<String>) {
    *   val result =
    *   //sampleStart
-   *   1._just_.tupleLeft("some string")
+   *   "Hello"._just_()._tupleLeft_("World")
    *   //sampleEnd
    *   println(result)
    * }
@@ -212,7 +212,7 @@ interface Functor<F> : Invariant<F> {
    * fun main(args: Array<String>) {
    *   val result =
    *   //sampleStart
-   *   1._just_.tupleRight("some string")
+   *   "Hello"._just_()._tupleRight_("World")
    *   //sampleEnd
    *   println(result)
    * }
@@ -233,7 +233,7 @@ interface Functor<F> : Invariant<F> {
    * fun main(args: Array<String>) {
    *   val result: Kind<*, CharSequence> =
    *   //sampleStart
-   *   1._just_.map { it.toString() }.widen()
+   *   "Hello"._just_()._map_({ "$it World" })._widen_(<>)
    *   //sampleEnd
    *   println(result)
    * }

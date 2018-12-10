@@ -8,8 +8,10 @@ import arrow.data.*
 import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.typeclasses.*
+import arrow.undocumented
 
 @extension
+@undocumented
 interface IorFunctorInstance<L> : Functor<IorPartialOf<L>> {
   override fun <A, B> Kind<IorPartialOf<L>, A>.map(f: (A) -> B): Ior<L, B> = fix().map(f)
 }

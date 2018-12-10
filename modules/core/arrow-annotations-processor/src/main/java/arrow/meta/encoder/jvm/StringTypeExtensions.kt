@@ -43,14 +43,14 @@ internal fun String.asClassy(): TypeName.Classy {
 }
 
 private val kindRegex: Regex =
-  "arrow.Kind<(.*), (.*)>".toRegex()
+  "(arrow\\.Kind|arrow\\.typeclasses\\.Conested)<(.*), (.*)>".toRegex()
 
 fun String.downKParts(): List<String> =
   when (val matchResult = kindRegex.find(this)) {
     null -> listOf(this)
     else -> {
-      val witness = matchResult.groupValues[1]
-      val value = matchResult.groupValues[2]
+      val witness = matchResult.groupValues[2]
+      val value = matchResult.groupValues[3]
       witness.downKParts() + value.downKParts()
     }
   }

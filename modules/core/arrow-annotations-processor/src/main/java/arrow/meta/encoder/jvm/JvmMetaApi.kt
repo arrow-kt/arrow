@@ -542,8 +542,8 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
       val dataTypeDownKinded = downKind
       return when {
         this is TypeName.TypeVariable &&
-          (dataTypeDownKinded.simpleName == "arrow.Kind" ||
-            dataTypeDownKinded.simpleName == "arrow.typeclasses.Conested") -> {
+          (dataTypeDownKinded.simpleName.startsWith("arrow.Kind") ||
+            dataTypeDownKinded.simpleName.startsWith("arrow.typeclasses.Conested")) -> {
           simpleName
             .substringAfterLast("arrow.Kind<")
             .substringAfterLast("arrow.typeclasses.Conested<")
@@ -600,14 +600,16 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
             val dataTypeDownKinded = dataTypeName.downKind
             val dataType = dataTypeDownKinded.type
             when {
-              dataType != null && dataTypeDownKinded is TypeName.TypeVariable -> TypeClassInstance(
+              dataType != null -> TypeClassInstance(
                 instance = instance,
                 dataType = dataType,
                 typeClass = typeClass,
                 instanceTypeElement = this@typeClassInstance,
-                dataTypeTypeElement = elementUtils.getTypeElement(dataTypeDownKinded.name),
-                typeClassTypeElement = elementUtils.getTypeElement(typeClassTypeName.rawType.fqName),
-                projectedCompanion = projectedCompanion
+                dataTypeTypeElement = elementUtils.getTypeElement(dataTypeDownKinded.rawName),
+                typeClassTypeElement = elementUtils.getTypeElement(typeClassTypeName.rawName),
+                projectedCompanion =
+                if (projectedCompanion is TypeName.ParameterizedType) projectedCompanion.rawType
+                else projectedCompanion
               )
               else -> null
             }

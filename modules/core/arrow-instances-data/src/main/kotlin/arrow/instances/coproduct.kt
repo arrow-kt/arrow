@@ -12,8 +12,10 @@ import arrow.extension
 import arrow.instances.either.eq.eq
 import arrow.instances.either.hash.hash
 import arrow.typeclasses.*
+import arrow.undocumented
 
 @extension
+@undocumented
 interface CoproductFunctorInstance<F, G> : Functor<CoproductPartialOf<F, G>> {
 
   fun FF(): Functor<F>
@@ -24,6 +26,7 @@ interface CoproductFunctorInstance<F, G> : Functor<CoproductPartialOf<F, G>> {
 }
 
 @extension
+@undocumented
 interface CoproductContravariantInstance<F, G> : Contravariant<CoproductPartialOf<F, G>> {
 
   fun CF(): Contravariant<F>
@@ -35,6 +38,7 @@ interface CoproductContravariantInstance<F, G> : Contravariant<CoproductPartialO
 }
 
 @extension
+@undocumented
 interface CoproductComonadInstance<F, G> : Comonad<CoproductPartialOf<F, G>> {
 
   fun CF(): Comonad<F>
@@ -50,6 +54,7 @@ interface CoproductComonadInstance<F, G> : Comonad<CoproductPartialOf<F, G>> {
 }
 
 @extension
+@undocumented
 interface CoproductFoldableInstance<F, G> : Foldable<CoproductPartialOf<F, G>> {
 
   fun FF(): Foldable<F>
@@ -65,6 +70,7 @@ interface CoproductFoldableInstance<F, G> : Foldable<CoproductPartialOf<F, G>> {
 }
 
 @extension
+@undocumented
 interface CoproductTraverseInstance<F, G> : Traverse<CoproductPartialOf<F, G>> {
 
   fun TF(): Traverse<F>
@@ -82,6 +88,7 @@ interface CoproductTraverseInstance<F, G> : Traverse<CoproductPartialOf<F, G>> {
 }
 
 @extension
+@undocumented
 interface CoproductEqInstance<F, G, A> : Eq<Coproduct<F, G, A>> {
   fun EQF(): Eq<Kind<F, A>>
   fun EQG(): Eq<Kind<G, A>>
@@ -90,6 +97,7 @@ interface CoproductEqInstance<F, G, A> : Eq<Coproduct<F, G, A>> {
 }
 
 @extension
+@undocumented
 interface CoproductHashInstance<F, G, A> : Hash<Coproduct<F, G, A>>, CoproductEqInstance<F, G, A> {
   fun HF(): Hash<Kind<F, A>>
   fun HG(): Hash<Kind<G, A>>

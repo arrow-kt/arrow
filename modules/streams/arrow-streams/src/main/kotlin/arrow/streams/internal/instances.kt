@@ -9,12 +9,14 @@ import arrow.streams.internal.handleErrorWith as handleErrorW
 import arrow.streams.internal.bracketCase as bracketC
 
 @extension
+@undocumented
 interface FreeCFunctor<F> : Functor<FreeCPartialOf<F>> {
   override fun <A, B> Kind<FreeCPartialOf<F>, A>.map(f: (A) -> B): Kind<FreeCPartialOf<F>, B> =
     this.fix().map(f)
 }
 
 @extension
+@undocumented
 interface FreeCApplicative<F> : Applicative<FreeCPartialOf<F>> {
   override fun <A> just(a: A): Kind<FreeCPartialOf<F>, A> =
     FreeC.just(a)
@@ -25,6 +27,7 @@ interface FreeCApplicative<F> : Applicative<FreeCPartialOf<F>> {
 }
 
 @extension
+@undocumented
 interface FreeCMonad<F> : Monad<FreeCPartialOf<F>> {
   override fun <A, B> Kind<FreeCPartialOf<F>, A>.flatMap(f: (A) -> Kind<FreeCPartialOf<F>, B>): Kind<FreeCPartialOf<F>, B> =
     this.fix().flatMap(f)
@@ -37,6 +40,7 @@ interface FreeCMonad<F> : Monad<FreeCPartialOf<F>> {
 }
 
 @extension
+@undocumented
 interface FreeCApplicativeError<F> : ApplicativeError<FreeCPartialOf<F>, Throwable> {
   override fun <A> raiseError(e: Throwable): Kind<FreeCPartialOf<F>, A> =
     FreeC.raiseError(e)
@@ -53,6 +57,7 @@ interface FreeCApplicativeError<F> : ApplicativeError<FreeCPartialOf<F>, Throwab
 }
 
 @extension
+@undocumented
 interface FreeCMonadError<F> : MonadError<FreeCPartialOf<F>, Throwable> {
   override fun <A> raiseError(e: Throwable): Kind<FreeCPartialOf<F>, A> =
     FreeC.raiseError(e)
@@ -72,18 +77,21 @@ interface FreeCMonadError<F> : MonadError<FreeCPartialOf<F>, Throwable> {
 }
 
 @extension
+@undocumented
 interface FreeCBracket<F> : Bracket<FreeCPartialOf<F>, Throwable>, FreeCMonadError<F> {
   override fun <A, B> Kind<FreeCPartialOf<F>, A>.bracketCase(release: (A, ExitCase<Throwable>) -> Kind<FreeCPartialOf<F>, Unit>, use: (A) -> Kind<FreeCPartialOf<F>, B>): Kind<FreeCPartialOf<F>, B> =
     bracketC(use, release)
 }
 
 @extension
+@undocumented
 interface FreeCMonadDefer<F> : MonadDefer<FreeCPartialOf<F>>, FreeCBracket<F> {
   override fun <A> defer(fa: () -> Kind<FreeCPartialOf<F>, A>): Kind<FreeCPartialOf<F>, A> =
     FreeC.defer(fa)
 }
 
 @extension
+@undocumented
 interface FreeCEq<F, G, A> : Eq<Kind<FreeCPartialOf<F>, A>> {
 
   fun ME(): MonadError<G, Throwable>
