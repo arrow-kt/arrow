@@ -216,7 +216,6 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
   fun TypeElement.allFunctions(declaredElement: TypeElement): List<Func> =
     processorUtils().run {
       val comment = processingEnv.elementUtils.getDocComment(declaredElement)
-      println("Comment declaredElement: $comment")
       val superTypes = supertypes(
         declaredElement.meta,
         TypeTable(declaredElement.meta.classProto.typeTable),
@@ -266,7 +265,6 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
             } else function
           result
         } catch (e: IllegalArgumentException) {
-          //logW("Can't override: ${declaredElement.simpleName} :: $member")
           //some public final functions can't be seen as overridden
           templateFunction?.second?.toMeta(templateFunction.first, member)
         }

@@ -62,7 +62,6 @@ data class DownKindReduction(
 )
 
 internal fun String.downKind(api: JvmMetaApi): DownKindReduction {
-  val dkOld = downKindOld()
   val parts = downKParts()
   return if (parts.isEmpty()) {
     val pckg =
@@ -84,35 +83,11 @@ internal fun String.downKind(api: JvmMetaApi): DownKindReduction {
       unAppliedName.endsWith("Of") ->
         DownKindReduction(pckg, unAppliedName.substringBeforeLast("Of"), parts.drop(1))
       else -> {
-        if (unAppliedName == "StateT") {
-          api.logW(unAppliedName + ", parts: " + parts)
-        }
         DownKindReduction(pckg, unAppliedName, parts.drop(1))
       }
     }
   }
 }
-
-internal fun String.downKindOld(): Pair<String, String> =
-  run {
-    val classy = asClassy()
-    val kindedClassy = when {
-      classy.fqName == "arrow.Kind" -> {
-        val result = substringAfter("arrow.Kind<").substringBefore(",").asClassy()
-        if (result.fqName == "arrow.typeclasses.ForConst") result
-        else classy
-      }
-      else -> classy
-    }
-    val unAppliedName =
-      if (kindedClassy.simpleName.startsWith("For")) kindedClassy.simpleName.drop("For".length)
-      else kindedClassy.simpleName
-    when {
-      unAppliedName.endsWith("PartialOf") -> Pair(kindedClassy.pckg.value, unAppliedName.substringBeforeLast("PartialOf"))
-      unAppliedName.endsWith("Of") -> Pair(kindedClassy.pckg.value, unAppliedName.substringBeforeLast("Of"))
-      else -> Pair(kindedClassy.pckg.value, unAppliedName)
-    }
-  }
 
 fun String.quote(): String =
   split(".").joinToString(".") {
