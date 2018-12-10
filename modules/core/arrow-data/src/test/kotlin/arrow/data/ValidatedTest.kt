@@ -2,9 +2,7 @@ package arrow.data
 
 import arrow.core.*
 import arrow.instances.eq
-import arrow.instances.list.traverse.sequence
 import arrow.instances.monoid
-import arrow.instances.nonemptylist.semigroup.semigroup
 import arrow.instances.semigroup
 import arrow.instances.validated.applicative.applicative
 import arrow.instances.validated.eq.eq
@@ -276,27 +274,3 @@ private fun map(list: List<Validated<NonEmptyList<NetworkCorruptedField>, Field>
     Invalid(NonEmptyList.fromListUnsafe(errorList))
   }
 }
-
-import arrow.core.*
-import arrow.instances.list.traverse.sequence
-import arrow.instances.nonemptylist.semigroup.semigroup
-import arrow.instances.validated.applicative.applicative
-
-val mixedList: List<Validated<Nel<NetworkCorruptedField>, Field>> =
-  listOf(NetworkCorruptedField("1").invalidNel(), Field("a").validNel(), NetworkCorruptedField("2").invalidNel(), Field("a").validNel())
-
-val allInvalids: List<Validated<Nel<NetworkCorruptedField>, Field>> =
-  listOf(NetworkCorruptedField("1").invalidNel(), NetworkCorruptedField("2").invalidNel())
-
-val allValids: List<Validated<Nel<NetworkCorruptedField>, Field>> =
-  listOf(Field("a").validNel(), Field("b").validNel())
-
-fun validateList(list: List<Validated<Nel<NetworkCorruptedField>, Field>>): Validated<Nel<NetworkCorruptedField>, List<Field>> =
-  list.sequence(Validated.applicative(Nel.semigroup<NetworkCorruptedField>())).fix().map { it.fix() }
-
-fun main(args: Array<String>) {
-  println(validateList(mixedList)) //Invalid(e=NonEmptyList(all=[NetworkCorruptedField(msg=1), NetworkCorruptedField(msg=2)]))
-  println(validateList(allInvalids)) //Invalid(e=NonEmptyList(all=[NetworkCorruptedField(msg=1), NetworkCorruptedField(msg=2)]))
-  println(validateList(allValids)) //Valid(a=ListK(list=[Field(msg=a), Field(msg=b)]))
-}
-
