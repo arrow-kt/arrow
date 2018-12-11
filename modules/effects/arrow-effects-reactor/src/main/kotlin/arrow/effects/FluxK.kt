@@ -31,11 +31,13 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
 
   fun <B> bracketCase(use: (A) -> FluxKOf<B>, release: (A, ExitCase<Throwable>) -> FluxKOf<Unit>): FluxK<B> =
     flatMap { a ->
-      use(a).value()
-        .doOnError { release(a, ExitCase.Error(it)) }
-        .doOnCancel { release(a, ExitCase.Cancelled) }
-        .doOnComplete { release(a, ExitCase.Completed) }
-        .k()
+      use(a).fix().flatMap { b ->
+        release(a, ExitCase.Completed)
+          .fix().map { b }
+      }.handleErrorWith { e ->
+        release(a, ExitCase.Error(e))
+          .fix().flatMap { FluxK.raiseError<B>(e) }
+      }
     }
 
   fun <B> concatMap(f: (A) -> FluxKOf<B>): FluxK<B> =

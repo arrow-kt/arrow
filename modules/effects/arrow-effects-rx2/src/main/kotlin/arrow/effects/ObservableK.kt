@@ -30,11 +30,13 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
 
   fun <B> bracketCase(use: (A) -> ObservableKOf<B>, release: (A, ExitCase<Throwable>) -> ObservableKOf<Unit>): ObservableK<B> =
     flatMap { a ->
-      use(a).fix().observable
-        .doOnError { release(a, ExitCase.Error(it)) }
-        .doOnDispose { release(a, ExitCase.Cancelled) }
-        .doOnComplete { release(a, ExitCase.Completed) }
-        .k()
+      use(a).fix().flatMap { b ->
+        release(a, ExitCase.Completed)
+          .fix().map { b }
+      }.handleErrorWith { e ->
+        release(a, ExitCase.Error(e))
+          .fix().flatMap { ObservableK.raiseError<B>(e) }
+      }
     }
 
   fun <B> concatMap(f: (A) -> ObservableKOf<B>): ObservableK<B> =

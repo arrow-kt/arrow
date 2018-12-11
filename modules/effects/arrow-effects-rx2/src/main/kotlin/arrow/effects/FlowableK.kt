@@ -35,11 +35,13 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
 
   fun <B> bracketCase(use: (A) -> FlowableKOf<B>, release: (A, ExitCase<Throwable>) -> FlowableKOf<Unit>): FlowableK<B> =
     flatMap { a ->
-      use(a).fix().flowable
-        .doOnError { release(a, ExitCase.Error(it)) }
-        .doOnCancel { release(a, ExitCase.Cancelled) }
-        .doOnComplete { release(a, ExitCase.Completed) }
-        .k()
+      use(a).fix().flatMap { b ->
+        release(a, ExitCase.Completed)
+          .fix().map { b }
+      }.handleErrorWith { e ->
+        release(a, ExitCase.Error(e))
+          .fix().flatMap { FlowableK.raiseError<B>(e) }
+      }
     }
 
   fun <B> concatMap(f: (A) -> FlowableKOf<B>): FlowableK<B> =
