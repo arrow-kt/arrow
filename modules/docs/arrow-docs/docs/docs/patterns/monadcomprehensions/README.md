@@ -71,7 +71,7 @@ Computer science can bring us a construct to get the best of both styles.
 ### Comprehensions over coroutines
 
 This feature is known with multiple names: async/await, coroutines, do notation, for comprehensions...each version contains certain unique points but all derive from the same principles.
-In Kotlin, coroutines (introduced in version 1.1 of the language) make the compiler capable of rewriting seemingly synchronous code intro asynchronous sequences.
+In Kotlin, coroutines (introduced in version 1.1 of the language) make the compiler capable of rewriting seemingly synchronous code into asynchronous sequences.
 Arrow uses this capability of the compiler to bring you coroutines-like notation to all instances of the [`Monad`]({{ '/docs/arrow/typeclasses/monad' | relative_url }}) typeclass.
 
 This means that comprehensions are available for `Option`, `Try`, `List`, `Reader`, `Observable`, `Flux` or `IO` all the same.
