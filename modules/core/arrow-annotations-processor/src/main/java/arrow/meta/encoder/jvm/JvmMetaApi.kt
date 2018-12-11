@@ -282,7 +282,7 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
    * @see [MetaApi.getDownKind]
    */
   override val TypeName.TypeVariable.downKind: TypeName
-    get() = name.downKind(this@JvmMetaApi).let { (pckg, unPrefixedName, extraArgs) ->
+    get() = name.downKind().let { (pckg, unPrefixedName, extraArgs) ->
       if (pckg.isBlank()) this
       else {
         if (extraArgs.isEmpty()) copy(name = "$pckg.$unPrefixedName")
@@ -384,7 +384,7 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
       } != null)) {
       this
     } else {
-      name.downKind(this@JvmMetaApi).let { (pckg, unPrefixedName, extraArgs) ->
+      name.downKind().let { (pckg, unPrefixedName, extraArgs) ->
         when {
           pckg.isBlank() -> this
           extraArgs.isEmpty() -> copy(
@@ -405,7 +405,7 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
    * @see [MetaApi.getDownKind]
    */
   override val TypeName.Classy.downKind: TypeName
-    get() = fqName.downKind(this@JvmMetaApi).let { (pckg, unPrefixedName, extraArgs) ->
+    get() = fqName.downKind().let { (pckg, unPrefixedName, extraArgs) ->
       if (extraArgs.isEmpty()) copy(simpleName = unPrefixedName, fqName = "$pckg.$unPrefixedName")
       else TypeName.ParameterizedType(
         name = "$pckg.$unPrefixedName",
@@ -549,7 +549,7 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
             .substringAfterLast("arrow.typeclasses.Conested<")
             .substringBefore(",")
             .substringBefore("<")
-            .downKind(this@JvmMetaApi).let { (pckg, simpleName) ->
+            .downKind().let { (pckg, simpleName) ->
               TypeName.Classy.from(pckg, simpleName)
             }
         }
@@ -594,7 +594,11 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
         val typeClass = typeClassTypeName.type
         when {
           typeClass != null && typeClassTypeName is TypeName.ParameterizedType && typeClassTypeName.typeArguments.isNotEmpty() -> {
-            val dataTypeName = typeClassTypeName.typeArguments[0]
+            val dataTypeTypeArg = typeClassTypeName.typeArguments[0]
+            val dataTypeName =
+              if (dataTypeTypeArg is TypeName.TypeVariable && dataTypeTypeArg.name.contains("PartialOf<"))
+                TypeName.TypeVariable(dataTypeTypeArg.name.substringBefore("PartialOf<"))
+              else dataTypeTypeArg
             //profunctor and other cases are parametric to Kind2 values or Conested
             val projectedCompanion = dataTypeName.projectedCompanion
             val dataTypeDownKinded = dataTypeName.downKind

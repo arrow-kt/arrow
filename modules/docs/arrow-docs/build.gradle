@@ -43,14 +43,6 @@ task printcp {
     }
 }
 
-task removeApiDocs(type: Delete) {
-    delete "${project(":arrow-docs").projectDir}/docs/docs/apidocs"
-}
-
-clean {
-    dependsOn ":arrow-docs:removeApiDocs"
-}
-
 ank {
     source = file("${projectDir}/docs")
     target = file("${projectDir}/build/site")

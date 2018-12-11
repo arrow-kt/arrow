@@ -1,6 +1,5 @@
 package arrow.meta.encoder.jvm
 
-import arrow.common.messager.logW
 import arrow.common.utils.removeBackticks
 import arrow.meta.ast.PackageName
 import arrow.meta.ast.TypeName
@@ -58,14 +57,14 @@ fun String.downKParts(): List<String> =
 data class DownKindReduction(
   val pckg: String,
   val name: String,
-  val addtitionalTypeArgs: List<String> = emptyList()
+  val additionalTypeArgs: List<String> = emptyList()
 )
 
-internal fun String.downKind(api: JvmMetaApi): DownKindReduction {
+internal fun String.downKind(): DownKindReduction {
   val parts = downKParts()
   return if (parts.isEmpty()) {
     val pckg =
-      if (this.contains(".")) this.substringBeforeLast(".")
+      if (this.contains(".")) this.substringBefore("<").substringBeforeLast(".")
       else ""
     DownKindReduction(pckg, this)
   } else {
