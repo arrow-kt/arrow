@@ -3,7 +3,7 @@ layout: docs
 title: Eq
 permalink: /docs/arrow/typeclasses/eq/
 redirect_from:
-  - /docs/typeclasses/eq
+  - /docs/typeclasses/eq/
 ---
 
 ## Eq

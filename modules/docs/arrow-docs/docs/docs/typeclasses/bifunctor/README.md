@@ -3,7 +3,7 @@ layout: docs
 title: Bifunctor
 permalink: /docs/arrow/typeclasses/bifunctor/
 redirect_from:
-  - /docs/typeclasses/bifunctor
+  - /docs/typeclasses/bifunctor/
 ---
 
 ## Bifunctor

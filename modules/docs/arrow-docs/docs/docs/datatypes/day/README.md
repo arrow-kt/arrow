@@ -3,7 +3,7 @@ layout: docs
 title: Day
 permalink: /docs/arrow/data/day/
 redirect_from:
-  - /docs/datatypes/day
+  - /docs/datatypes/day/
 ---
 
 ## Day

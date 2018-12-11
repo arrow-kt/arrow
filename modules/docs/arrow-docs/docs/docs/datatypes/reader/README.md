@@ -3,10 +3,10 @@ layout: docs
 title: Reader
 permalink: /docs/arrow/data/reader/
 redirect_from:
-  - /docs/datatypes/reader
+  - /docs/datatypes/reader/
 ---
 
-## Reader 
+## Reader
 
 {:.intermediate}
 intermediate

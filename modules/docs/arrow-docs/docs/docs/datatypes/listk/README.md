@@ -3,7 +3,7 @@ layout: docs
 title: ListK
 permalink: /docs/arrow/data/listk/
 redirect_from:
-  - /docs/datatypes/listk
+  - /docs/datatypes/listk/
 ---
 
 ## ListK

@@ -3,7 +3,7 @@ layout: docs
 title: SortedMapK
 permalink: /docs/arrow/data/sortedmapk/
 redirect_from:
-  - /docs/datatypes/sortedmapk
+  - /docs/datatypes/sortedmapk/
 ---
 
 ## SortedMapK

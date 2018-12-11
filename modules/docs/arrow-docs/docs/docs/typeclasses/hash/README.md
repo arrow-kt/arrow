@@ -3,7 +3,7 @@ layout: docs
 title: Hash
 permalink: /docs/arrow/typeclasses/hash/
 redirect_from:
-  - /docs/typeclasses/hash
+  - /docs/typeclasses/hash/
 ---
 
 ## Hash

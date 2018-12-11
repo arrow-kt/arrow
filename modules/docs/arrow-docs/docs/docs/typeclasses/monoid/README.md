@@ -3,7 +3,7 @@ layout: docs
 title: Monoid
 permalink: /docs/arrow/typeclasses/monoid/
 redirect_from:
-  - /docs/typeclasses/monoid
+  - /docs/typeclasses/monoid/
 ---
 
 ## Monoid
@@ -28,14 +28,14 @@ import arrow.*
 import arrow.instances.*
 import arrow.typeclasses.*
 
-ForString extensions { 
+ForString extensions {
   empty()
 }
 ```
 
 ```kotlin:ank
-ForString extensions { 
-  listOf<String>("Λ", "R", "R", "O", "W").combineAll() 
+ForString extensions {
+  listOf<String>("Λ", "R", "R", "O", "W").combineAll()
 }
 ```
 
@@ -53,14 +53,14 @@ This is also true if we define our own instances. As an example, let's use `Fold
 ```kotlin:ank
 import arrow.data.*
 
-ForListK extensions { 
-  listOf(1, 2, 3, 4, 5).k().foldMap(Int.monoid(), ::identity) 
+ForListK extensions {
+  listOf(1, 2, 3, 4, 5).k().foldMap(Int.monoid(), ::identity)
 }
 ```
 
 ```kotlin:ank
-ForListK extensions { 
-  listOf(1, 2, 3, 4, 5).k().foldMap(String.monoid(), { it.toString() }) 
+ForListK extensions {
+  listOf(1, 2, 3, 4, 5).k().foldMap(String.monoid(), { it.toString() })
 }
 ```
 

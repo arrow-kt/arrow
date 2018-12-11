@@ -3,7 +3,7 @@ layout: docs
 title: Bimonad
 permalink: /docs/arrow/typeclasses/bimonad/
 redirect_from:
-  - /docs/typeclasses/bimonad
+  - /docs/typeclasses/bimonad/
 ---
 
 ## Bimonad

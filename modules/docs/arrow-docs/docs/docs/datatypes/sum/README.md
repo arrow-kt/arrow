@@ -3,7 +3,7 @@ layout: docs
 title: Sum
 permalink: /docs/arrow/data/sum/
 redirect_from:
-  - /docs/datatypes/sum
+  - /docs/datatypes/sum/
 ---
 
 ## Sum

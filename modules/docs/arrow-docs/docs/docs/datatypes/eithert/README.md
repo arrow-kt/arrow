@@ -3,7 +3,7 @@ layout: docs
 title: EitherT
 permalink: /docs/arrow/data/eithert/
 redirect_from:
-  - /docs/datatypes/eithert
+  - /docs/datatypes/eithert/
 video: 1h4X8CrMjVs
 ---
 
@@ -73,7 +73,7 @@ import arrow.instances.*
 import arrow.instances.either.monad.*
 
 fun getCountryCode(maybePerson : Either<BizError, Person>): Either<BizError, String> =
-  binding<BizError, String> { 
+  binding<BizError, String> {
     val person = maybePerson.bind()
     val address = person.address.toEither({ AddressNotFound(person.id) }).bind()
     val country = address.country.toEither({ CountryNotFound(address.id)}).bind()
@@ -219,7 +219,7 @@ So how would our function look if we implemented it with the EitherT monad trans
 import arrow.instances.eithert.monad.*
 
 fun getCountryCode(personId: Int): ObservableK<Either<BizError, String>> =
-  EitherT.monad<ForObservableK, BizError>(ObservableK.monad()).binding { 
+  EitherT.monad<ForObservableK, BizError>(ObservableK.monad()).binding {
     val person = EitherT(findPerson(personId)).bind()
     val address = EitherT(ObservableK.just(
       person.address.toEither { AddressNotFound(personId) }

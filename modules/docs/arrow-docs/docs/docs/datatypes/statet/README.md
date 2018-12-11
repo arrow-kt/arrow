@@ -3,7 +3,7 @@ layout: docs
 title: StateT
 permalink: /docs/arrow/data/statet/
 redirect_from:
-  - /docs/datatypes/statet
+  - /docs/datatypes/statet/
 video: 1MJBXKaq0Hc
 ---
 
@@ -136,7 +136,7 @@ import arrow.typeclasses.*
 import arrow.instances.*
 import arrow.instances.either.monadError.*
 
-fun stackOperationsS2() = 
+fun stackOperationsS2() =
  ForStateT<EitherPartialOf<StackError>, Stack, StackError>(Either.monadError<StackError>()) extensions {
   binding {
     pushS("a").bind()

@@ -3,7 +3,7 @@ layout: docs
 title: Show
 permalink: /docs/arrow/typeclasses/show/
 redirect_from:
-  - /docs/typeclasses/show
+  - /docs/typeclasses/show/
 ---
 
 ## Show

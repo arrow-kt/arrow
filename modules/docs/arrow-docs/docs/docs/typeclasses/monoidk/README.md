@@ -3,7 +3,7 @@ layout: docs
 title: MonoidK
 permalink: /docs/arrow/typeclasses/monoidk/
 redirect_from:
-  - /docs/typeclasses/monoidk
+  - /docs/typeclasses/monoidk/
 ---
 
 ## MonoidK

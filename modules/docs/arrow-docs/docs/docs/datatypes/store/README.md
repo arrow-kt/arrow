@@ -3,7 +3,7 @@ layout: docs
 title: Store
 permalink: /docs/arrow/data/store/
 redirect_from:
-  - /docs/datatypes/store
+  - /docs/datatypes/store/
 ---
 
 ## Store
@@ -14,7 +14,7 @@ intermediate
 
 `Store` is a data structure that holds a state and a function for extracting a representation of it.
 
-If we think in a component oriented fashion when building user interfaces, this datatype is the most basic unit. 
+If we think in a component oriented fashion when building user interfaces, this datatype is the most basic unit.
 
 This structure is also a [`Comonad`]({{ '/docs/arrow/typeclasses/comonad' | relative_url }}) because it represents a lazy unfolding of all possible states of our user interface.
 
@@ -22,8 +22,8 @@ This structure is also a [`Comonad`]({{ '/docs/arrow/typeclasses/comonad' | rela
 import arrow.data.*
 
 val store = Store(0) { "The current value is: $it" }
-store.extract() 
-``` 
+store.extract()
+```
 
 If we want to change the initial state of the store we have a `move` method:
 
@@ -48,7 +48,7 @@ tupleStore.extract()
 And as a `Comonad` is also a `Functor` we have `map` which allows us to transform the state representation:
 
 ```kotlin:ank
-val upperCaseStore = store.map { it: String -> it.toUpperCase() } 
+val upperCaseStore = store.map { it: String -> it.toUpperCase() }
 upperCaseStore.extract()
 ```
 
@@ -61,5 +61,3 @@ import arrow.core.*
 
 DataType(Store::class).tcMarkdownList()
 ```
-
-

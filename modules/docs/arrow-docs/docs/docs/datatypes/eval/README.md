@@ -3,7 +3,7 @@ layout: docs
 title: Eval
 permalink: /docs/arrow/core/eval/
 redirect_from:
-  - /docs/datatypes/eval
+  - /docs/datatypes/eval/
 video: FcaaTJhCEcw
 ---
 

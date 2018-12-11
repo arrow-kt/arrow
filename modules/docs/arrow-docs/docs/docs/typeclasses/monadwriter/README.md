@@ -3,7 +3,7 @@ layout: docs
 title: MonadWriter
 permalink: /docs/arrow/mtl/typeclasses/monadwriter/
 redirect_from:
-  - /docs/typeclasses/monadwriter
+  - /docs/typeclasses/monadwriter/
 ---
 
 ## MonadWriter

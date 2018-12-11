@@ -3,7 +3,7 @@ layout: docs
 title: Validated
 permalink: /docs/arrow/data/validated/
 redirect_from:
-  - /docs/datatypes/validated
+  - /docs/datatypes/validated/
 video: ONwoUsHBJHg
 ---
 
@@ -258,10 +258,10 @@ sealed class Rules<F>(A: ApplicativeError<F, Nel<ValidationError>>) : Applicativ
 
   object ErrorAccumulationStrategy :
     Rules<ValidatedPartialOf<Nel<ValidationError>>>(Validated.applicativeError(NonEmptyList.semigroup()))
-  
+
   object FailFastStrategy :
     Rules<EitherPartialOf<Nel<ValidationError>>>(Either.applicativeError())
-  
+
   companion object {
     infix fun <A> failFast(f: FailFastStrategy.() -> A): A = f(FailFastStrategy)
     infix fun <A> accumulateErrors(f: ErrorAccumulationStrategy.() -> A): A = f(ErrorAccumulationStrategy)
@@ -291,7 +291,7 @@ Rules accumulateErrors {
 Rules failFast {
   listOf(
     FormField("Invalid Email Domain Label", "nowhere.com"),
-    FormField("Too Long Email Label", "nowheretoolong${(0..251).map { "g" }}"), //this fails fast 
+    FormField("Too Long Email Label", "nowheretoolong${(0..251).map { "g" }}"), //this fails fast
     FormField("Valid Email Label", "getlost@nowhere.com")
   ).map { it.validateEmail() }
 }

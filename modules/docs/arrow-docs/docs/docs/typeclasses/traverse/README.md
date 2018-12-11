@@ -3,7 +3,7 @@ layout: docs
 title: Traverse
 permalink: /docs/arrow/typeclasses/traverse/
 redirect_from:
-  - /docs/typeclasses/traverse
+  - /docs/typeclasses/traverse/
 ---
 
 ## Traverse

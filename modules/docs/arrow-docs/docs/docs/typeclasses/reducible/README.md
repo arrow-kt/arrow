@@ -3,7 +3,7 @@ layout: docs
 title: Reducible
 permalink: /docs/arrow/typeclasses/reducible/
 redirect_from:
-  - /docs/typeclasses/reducible
+  - /docs/typeclasses/reducible/
 ---
 
 ## Reducible

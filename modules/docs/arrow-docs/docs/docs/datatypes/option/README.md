@@ -3,7 +3,7 @@ layout: docs
 title: Option
 permalink: /docs/arrow/core/option/
 redirect_from:
-  - /docs/datatypes/option
+  - /docs/datatypes/option/
 
 video: 5SFTbphderE
 ---
@@ -163,7 +163,7 @@ fun foo() {
 
     val ugly = foxMap.entries.firstOrNull { it.key == 5 }?.value.let { it?.toCharArray() }.toOption()
     val pretty = foxMap.entries.firstOrNone { it.key == 5 }.map { it.value.toCharArray() }
-    
+
     //Do something with pretty Option
 }
 ```

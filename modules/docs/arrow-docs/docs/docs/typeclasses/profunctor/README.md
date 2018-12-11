@@ -3,7 +3,7 @@ layout: docs
 title: Profunctor
 permalink: /docs/arrow/typeclasses/profunctor/
 redirect_from:
-  - /docs/typeclasses/profunctor
+  - /docs/typeclasses/profunctor/
 ---
 
 ## Profunctor
@@ -34,7 +34,7 @@ val str: (Int) -> String = { x -> x.toString() }
 
 val f = str compose sum2
 val g = sum2 andThen str
-f(4) == g(4) 
+f(4) == g(4)
 ```
 
 Functions are a binary type constructor of an input type and an output type. It is implemented in [`Function1`]({{ '/docs/arrow/core/function1' | relative_url }}).
@@ -50,9 +50,9 @@ import arrow.instances.function1.profunctor.*
 
 val fab: Function1<Double, Double> = { x: Double -> x * 3 }.k()
 val f: (Int) -> Double = { x -> x.toDouble() / 2 }  
-val g: (Double) -> String = { x -> "Result: $x" } 
+val g: (Double) -> String = { x -> "Result: $x" }
 
-val h = Function1.profunctor().run { fab.dimap(f, g) } 
+val h = Function1.profunctor().run { fab.dimap(f, g) }
 h(4)
 ```
 
@@ -73,7 +73,7 @@ val fl: (String) -> Int = { x -> x.toInt() }
 val fr: (Int) -> List<Int> = { x -> List(x) { x } }
 
 val g: Function1<String, List<Int>> = Function1.profunctor().run { f.dimap(fl, fr) }
-g("6") 
+g("6")
 ```
 
 #### Other combinators

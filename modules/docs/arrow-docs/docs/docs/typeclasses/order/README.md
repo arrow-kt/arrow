@@ -3,7 +3,7 @@ layout: docs
 title: Order
 permalink: /docs/arrow/typeclasses/order/
 redirect_from:
-  - /docs/typeclasses/order
+  - /docs/typeclasses/order/
 ---
 
 ## Order
@@ -47,8 +47,8 @@ Lesser than or equal to defines total order in a set, it compares two elements a
 It is the opposite of `gte`.
 
 ```kotlin:ank
-ForInt extensions { 
-  1.lte(2) 
+ForInt extensions {
+  1.lte(2)
 }
 ```
 
@@ -58,8 +58,8 @@ Greater than or equal compares two elements and returns true if they're equal or
 It is the opposite of `lte`.
 
 ```kotlin:ank
-ForInt extensions { 
-  1.gte(2) 
+ForInt extensions {
+  1.gte(2)
 }
 ```
 
@@ -68,13 +68,13 @@ ForInt extensions {
 Compares two elements and respectively returns the maximum or minimum in respect to their order.
 
 ```kotlin:ank
-ForInt extensions { 
-  1.min(2) 
+ForInt extensions {
+  1.min(2)
 }
 ```
 ```kotlin:ank
-ForInt extensions { 
-  1.max(2) 
+ForInt extensions {
+  1.max(2)
 }
 ```
 
@@ -83,8 +83,8 @@ ForInt extensions {
 Sorts the elements in a `Tuple2`
 
 ```kotlin:ank
-ForInt extensions { 
-  1.sort(2) 
+ForInt extensions {
+  1.sort(2)
 }
 ```
 

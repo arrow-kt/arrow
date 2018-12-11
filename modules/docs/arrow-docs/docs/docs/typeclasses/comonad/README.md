@@ -3,7 +3,7 @@ layout: docs
 title: Comonad
 permalink: /docs/arrow/typeclasses/comonad/
 redirect_from:
-  - /docs/typeclasses/comonad
+  - /docs/typeclasses/comonad/
 ---
 
 ## Comonad

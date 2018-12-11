@@ -3,7 +3,7 @@ layout: docs
 title: MonadReader
 permalink: /docs/arrow/mtl/typeclasses/monadreader/
 redirect_from:
-  - /docs/typeclasses/monadreader
+  - /docs/typeclasses/monadreader/
 ---
 
 ## MonadReader

@@ -3,7 +3,7 @@ layout: docs
 title: SetK
 permalink: /docs/arrow/data/setk/
 redirect_from:
-  - /docs/datatypes/setk
+  - /docs/datatypes/setk/
 video: xtnyCqeLI_4
 ---
 
@@ -54,7 +54,7 @@ evenNumbers.combineK(integers).combineK(oddNumbers)
 
 [`Monoid`](/docs/arrow/typeclasses/monoid/) and [`MonoidK`](/docs/arrow/typeclasses/monoidk/):
 ```kotlin:ank
-numbers.combineK(SetK.empty()) 
+numbers.combineK(SetK.empty())
 ```
 
 [`Foldable`](/docs/arrow/typeclasses/foldable/):

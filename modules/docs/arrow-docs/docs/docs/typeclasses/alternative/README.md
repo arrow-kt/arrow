@@ -3,7 +3,7 @@ layout: docs
 title: Alternative
 permalink: /docs/arrow/typeclasses/alternative/
 redirect_from:
-  - /docs/typeclasses/alternative
+  - /docs/typeclasses/alternative/
 ---
 
 ## Alternative

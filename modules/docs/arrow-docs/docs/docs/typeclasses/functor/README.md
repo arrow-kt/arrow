@@ -3,7 +3,7 @@ layout: docs
 title: Functor
 permalink: /docs/arrow/typeclasses/functor/
 redirect_from:
-  - /docs/typeclasses/functor
+  - /docs/typeclasses/functor/
 video: EUqg3fSahhk
 ---
 

@@ -3,7 +3,7 @@ layout: docs
 title: Try
 permalink: /docs/arrow/core/try/
 redirect_from:
-  - /docs/datatypes/try
+  - /docs/datatypes/try/
 video: XavztYVMUqI
 ---
 
@@ -142,7 +142,7 @@ sealed class DomainError(val message: String, val cause: Throwable) {
 Try {
     getLotteryNumbersFromCloud()
 }.toEither()
-    .mapLeft { 
+    .mapLeft {
         DomainError.NoConnectionError("Failed to fetch lottery numbers from cloud", it)
     }
 // Left(a=DomainError$NoConnectionError@3ada9e37)
@@ -172,7 +172,7 @@ import arrow.typeclasses.*
 import arrow.instances.*
 
 ForTry extensions {
-  Try { "3".toInt() }.map { it + 1} 
+  Try { "3".toInt() }.map { it + 1}
 }
 ```
 
@@ -209,7 +209,7 @@ ForTry extensions {
     val c = Try { "5".toInt() }.bind()
 
     a + b + c
-  } 
+  }
 }
 // Failure(exception=java.lang.NumberFormatException: For input string: "none")
 ```
@@ -217,13 +217,13 @@ ForTry extensions {
 Computing over dependent values that are automatically lifted to the context of `Try`:
 
 ```kotlin
-ForTry extensions { 
+ForTry extensions {
   bindingCatch {
     val a = "none".toInt()
     val b = "4".toInt()
     val c = "5".toInt()
     a + b + c
-  } 
+  }
 }
 // Failure(exception=java.lang.NumberFormatException: For input string: "none")
 ```

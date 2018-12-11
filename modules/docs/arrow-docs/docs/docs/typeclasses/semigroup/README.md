@@ -3,7 +3,7 @@ layout: docs
 title: Semigroup
 permalink: /docs/arrow/typeclasses/semigroup/
 redirect_from:
-  - /docs/typeclasses/semigroup
+  - /docs/typeclasses/semigroup/
 ---
 
 ## Semigroup

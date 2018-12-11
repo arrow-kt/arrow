@@ -3,7 +3,7 @@ layout: docs
 title: MapK
 permalink: /docs/arrow/data/mapk/
 redirect_from:
-  - /docs/datatypes/mapk
+  - /docs/datatypes/mapk/
 ---
 
 ## MapK

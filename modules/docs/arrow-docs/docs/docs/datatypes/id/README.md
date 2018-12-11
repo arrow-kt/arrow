@@ -3,7 +3,7 @@ layout: docs
 title: Id
 permalink: /docs/arrow/core/id/
 redirect_from:
-  - /docs/datatypes/id
+  - /docs/datatypes/id/
 video: DBvVd1pfLMo
 ---
 

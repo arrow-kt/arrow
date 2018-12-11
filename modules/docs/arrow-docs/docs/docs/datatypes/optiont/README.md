@@ -3,7 +3,7 @@ layout: docs
 title: OptionT
 permalink: /docs/arrow/data/optiont/
 redirect_from:
-  - /docs/datatypes/optiont
+  - /docs/datatypes/optiont/
 video: EWfxL9yBUJo
 ---
 
@@ -204,7 +204,7 @@ So how would our function look if we implemented it with the OptionT monad trans
 
 ```kotlin
 fun getCountryCode(personId: Int): ObservableK<Option<String>> =
-  ForOptionT(ObservableK.monad()) extensions { 
+  ForOptionT(ObservableK.monad()) extensions {
    binding {
     val person = OptionT(findPerson(personId)).bind()
     val address = OptionT(ObservableK.just(person.address)).bind()

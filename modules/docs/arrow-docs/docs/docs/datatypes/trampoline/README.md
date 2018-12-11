@@ -3,7 +3,7 @@ layout: docs
 title: Trampoline
 permalink: /docs/arrow/free/trampoline/
 redirect_from:
-  - /docs/datatypes/trampoline
+  - /docs/datatypes/trampoline/
 ---
 
 ## Trampoline

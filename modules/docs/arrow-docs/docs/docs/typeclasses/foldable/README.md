@@ -3,7 +3,7 @@ layout: docs
 title: Foldable
 permalink: /docs/arrow/typeclasses/foldable/
 redirect_from:
-  - /docs/typeclasses/foldable
+  - /docs/typeclasses/foldable/
 ---
 
 ## Foldable
@@ -20,7 +20,7 @@ The Typeclass `Foldable` provide us the ability of, given a type `Kind<F, A>`, a
 
 Beyond these it provides many other useful methods related to folding over `Kind<F, A>` values.
 
-For the following examples we are going to use some common imports 
+For the following examples we are going to use some common imports
 
 ```kotlin:ank:silent
 import arrow.Kind
@@ -32,7 +32,7 @@ import arrow.instances.listk.foldable.foldable
 import arrow.instances.option.foldable.foldable
 import arrow.typeclasses.Foldable
 ```
- 
+
 and the same two variables to see the different behaviors of `Foldable`:
 
 ```kotlin:ank:silent
@@ -249,7 +249,7 @@ getLenght(None, Option.foldable())
 ```kotlin:ank
 getLenght(strList, ListK.foldable())
 ```
-  
+
 ### Traverse_
 A typed values will be mapped into `Kind<G, B>` by function `f` and combined using `Applicative#map2`.
 
@@ -287,7 +287,7 @@ fun <F> sequence(strKind: Kind<F, Kind<ForOption, String>>, FO: Foldable<F>):Opt
   FO.run {
     strKind.sequence_(Option.applicative())
   }.fix()
-  
+
 val maybeStrOpt = Some("abc".some())
 val strNoneList = listOf("a".some(), None, "c".some()).k()
 val strOptList = listOf("a".some(), "b".some(), "c".some()).k()

@@ -3,7 +3,7 @@ layout: docs
 title: Moore
 permalink: /docs/arrow/data/moore/
 redirect_from:
-  - /docs/datatypes/moore
+  - /docs/datatypes/moore/
 ---
 
 ## Moore

@@ -3,7 +3,7 @@ layout: docs
 title: Bifoldable
 permalink: /docs/arrow/typeclasses/bifoldable/
 redirect_from:
-  - /docs/typeclasses/bifoldable
+  - /docs/typeclasses/bifoldable/
 ---
 
 ## Bifoldable

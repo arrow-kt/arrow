@@ -3,7 +3,7 @@ layout: docs
 title: Monad
 permalink: /docs/arrow/typeclasses/monad/
 redirect_from:
-  - /docs/typeclasses/monad
+  - /docs/typeclasses/monad/
 ---
 
 ## Monad

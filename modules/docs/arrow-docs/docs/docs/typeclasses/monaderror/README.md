@@ -3,7 +3,7 @@ layout: docs
 title: MonadError
 permalink: /docs/arrow/typeclasses/monaderror/
 redirect_from:
-  - /docs/typeclasses/monaderror
+  - /docs/typeclasses/monaderror/
 ---
 
 ## MonadError
@@ -32,7 +32,7 @@ import arrow.core.*
 import arrow.instances.*
 import arrow.instances.either.applicativeError.*
 
-val eitherResult: Either<Throwable, Int> = 
+val eitherResult: Either<Throwable, Int> =
   RuntimeException("BOOM!").raiseError()
 
 eitherResult
@@ -42,7 +42,7 @@ eitherResult
 import arrow.data.*
 import arrow.instances.`try`.applicativeError.*
 
-val tryResult: Try<Int> = 
+val tryResult: Try<Int> =
   RuntimeException("BOOM!").raiseError()
 
 tryResult
@@ -52,9 +52,9 @@ tryResult
 import arrow.effects.*
 import arrow.effects.instances.io.applicativeError.*
 
-val ioResult: IO<Int> = 
+val ioResult: IO<Int> =
   RuntimeException("BOOM!").raiseError()
-  
+
 ioResult.attempt().unsafeRunSync()
 ```
 
@@ -65,11 +65,11 @@ Tests a predicate against the object, and if it fails it executes a function to 
 ```kotlin:ank
 import arrow.instances.either.monadError.*
 
-Either.Right(1).ensure({ RuntimeException("Failed predicate") }, { it > 0 }) 
+Either.Right(1).ensure({ RuntimeException("Failed predicate") }, { it > 0 })
 ```
 
 ```kotlin:ank
-Either.Right(1).ensure({ RuntimeException("Failed predicate") }, { it < 0 }) 
+Either.Right(1).ensure({ RuntimeException("Failed predicate") }, { it < 0 })
 ```
 
 ### Comprehensions

@@ -3,7 +3,7 @@ layout: docs
 title: SequenceK
 permalink: /docs/arrow/data/sequencek/
 redirect_from:
-  - /docs/datatypes/sequencek
+  - /docs/datatypes/sequencek/
 ---
 
 ## SequenceK
@@ -48,7 +48,7 @@ import arrow.instances.*
 ForSequenceK extensions {
   sequenceOf(1, 2, 3).k()
     .ap(sequenceOf({ x: Int -> x + 1}, { x: Int -> x * 2}).k())
-    .toList() 
+    .toList()
 }
 ```
 
@@ -60,7 +60,7 @@ import arrow.typeclasses.*
 val positive = generateSequence(1) { it + 1 }.k() // sequence of positive numbers
 val positiveEven = positive.filter { it % 2 == 0 }.k()
 
-ForSequenceK extensions { 
+ForSequenceK extensions {
   binding {
    val p = positive.bind()
    val pe = positiveEven.bind()

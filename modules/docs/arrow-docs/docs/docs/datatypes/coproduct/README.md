@@ -3,7 +3,7 @@ layout: docs
 title: Coproduct
 permalink: /docs/arrow/data/coproduct/
 redirect_from:
-  - /docs/datatypes/coproduct
+  - /docs/datatypes/coproduct/
 ---
 
 ## Coproduct

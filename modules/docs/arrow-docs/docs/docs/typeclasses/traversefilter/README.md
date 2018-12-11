@@ -3,7 +3,7 @@ layout: docs
 title: TraverseFilter
 permalink: /docs/arrow/mtl/typeclasses/traversefilter/
 redirect_from:
-  - /docs/typeclasses/traversefilter
+  - /docs/typeclasses/traversefilter/
 ---
 
 ## TraverseFilter

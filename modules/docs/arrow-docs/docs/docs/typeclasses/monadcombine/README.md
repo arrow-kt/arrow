@@ -3,7 +3,7 @@ layout: docs
 title: MonadCombine
 permalink: /docs/arrow/mtl/typeclasses/monadcombine/
 redirect_from:
-  - /docs/typeclasses/monadcombine
+  - /docs/typeclasses/monadcombine/
 ---
 
 ## MonadCombine

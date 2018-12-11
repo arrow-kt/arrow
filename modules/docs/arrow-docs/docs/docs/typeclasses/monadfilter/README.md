@@ -3,7 +3,7 @@ layout: docs
 title: MonadFilter
 permalink: /docs/arrow/mtl/typeclasses/monadfilter/
 redirect_from:
-  - /docs/typeclasses/monadfilter
+  - /docs/typeclasses/monadfilter/
 ---
 
 ## MonadFilter
@@ -30,7 +30,7 @@ import arrow.mtl.typeclasses.*
 import arrow.mtl.instances.*
 import arrow.mtl.instances.option.monadFilter.*
 
-ForOption extensions { 
+ForOption extensions {
   bindingFilter {
      val a = Option(1).bind()
      val b = Option(1).bind()
@@ -45,7 +45,7 @@ ForOption extensions {
 import arrow.data.*
 import arrow.mtl.instances.listk.monadFilter.*
 
-ForListK extensions { 
+ForListK extensions {
  bindingFilter {
      val a = listOf(1).k().bind()
      val b = listOf(1).k().bind()
@@ -89,7 +89,7 @@ Binding over `MonadFilter` instances with `bindingFilter` brings into scope the 
 When `bindWithFilter` is satisfied the computation continues
 
 ```kotlin:ank
-ForOption extensions { 
+ForOption extensions {
  bindingFilter {
      val a = Option(1).bind()
      val b = Option(1).bindWithFilter { it == a } //continues

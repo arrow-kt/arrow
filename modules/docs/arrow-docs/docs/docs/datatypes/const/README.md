@@ -3,7 +3,7 @@ layout: docs
 title: Const
 permalink: /docs/arrow/typeclasses/const/
 redirect_from:
-  - /docs/datatypes/const
+  - /docs/datatypes/const/
 ---
 
 ## Const

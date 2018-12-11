@@ -3,7 +3,7 @@ layout: docs
 title: Applicative
 permalink: /docs/arrow/typeclasses/applicative/
 redirect_from:
-  - /docs/typeclasses/applicative
+  - /docs/typeclasses/applicative/
 ---
 
 ## Applicative

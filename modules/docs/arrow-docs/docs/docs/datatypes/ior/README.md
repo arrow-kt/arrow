@@ -3,7 +3,7 @@ layout: docs
 title: Ior
 permalink: /docs/arrow/data/ior/
 redirect_from:
-  - /docs/datatypes/ior
+  - /docs/datatypes/ior/
 ---
 
 ## Ior

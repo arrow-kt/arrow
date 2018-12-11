@@ -3,7 +3,7 @@ layout: docs
 title: FunctorFilter
 permalink: /docs/arrow/mtl/typeclasses/functorfilter/
 redirect_from:
-  - /docs/typeclasses/functorfilter
+  - /docs/typeclasses/functorfilter/
 ---
 
 ## FunctorFilter
