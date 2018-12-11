@@ -27,10 +27,13 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
 
   fun <B> bracketCase(use: (A) -> MaybeKOf<B>, release: (A, ExitCase<Throwable>) -> MaybeKOf<Unit>): MaybeK<B> =
     flatMap { a ->
-      use(a).fix().maybe
-        .doOnSuccess { release(a, ExitCase.Completed) }
-        .doOnError { release(a, ExitCase.Error(it)) }
-        .k()
+      use(a).fix().flatMap { b ->
+        release(a, ExitCase.Completed)
+          .fix().map { b }
+      }.handleErrorWith { e ->
+        release(a, ExitCase.Error(e))
+          .fix().flatMap { MaybeK.raiseError<B>(e) }
+      }
     }
 
   fun <B> fold(ifEmpty: () -> B, ifSome: (A) -> B): B = maybe.blockingGet().let {

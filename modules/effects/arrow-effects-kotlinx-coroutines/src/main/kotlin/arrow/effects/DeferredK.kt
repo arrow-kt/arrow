@@ -295,12 +295,16 @@ sealed class DeferredK<A>(
    */
   fun <B> bracketCase(use: (A) -> DeferredK<B>, release: (A, ExitCase<Throwable>) -> DeferredK<Unit>): DeferredK<B> =
     flatMap { a ->
-      try {
-        use(a).also { release(a, ExitCase.Completed) }
-      } catch (e: Exception) {
-        release(a, ExitCase.Error(e))
-        DeferredK.raiseError<B>(e)
-      }
+      use(a)
+        .flatMap { b ->
+          release(a, ExitCase.Completed).map { b }
+        }.handleErrorWith { e ->
+          when (e) {
+            //TODO investigate how cancellation works / how to trigger this case for kotlinx.coroutines.Deferred.
+            is CancellationException -> release(a, ExitCase.Cancelled)
+            else -> release(a, ExitCase.Error(e))
+          }.flatMap { DeferredK.raiseError<B>(e) }
+        }
     }
 
   /**

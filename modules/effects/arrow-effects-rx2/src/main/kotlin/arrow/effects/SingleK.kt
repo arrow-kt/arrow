@@ -30,10 +30,13 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
 
   fun <B> bracketCase(use: (A) -> SingleKOf<B>, release: (A, ExitCase<Throwable>) -> SingleKOf<Unit>): SingleK<B> =
     flatMap { a ->
-      use(a).fix().single
-        .doOnSuccess { release(a, ExitCase.Completed) }
-        .doOnError { release(a, ExitCase.Error(it)) }
-        .k()
+      use(a).fix().flatMap { b ->
+        release(a, ExitCase.Completed)
+          .fix().map { b }
+      }.handleErrorWith { e ->
+        release(a, ExitCase.Error(e))
+          .fix().flatMap { SingleK.raiseError<B>(e) }
+      }
     }
 
   fun handleErrorWith(function: (Throwable) -> SingleK<A>): SingleK<A> =
