@@ -31,7 +31,8 @@ object BracketLaws {
       Law("Bracket: acquire and release are uncancelable") { BF.acquireAndReleaseAreUncancelable({ BF.just(Unit) }, EQ) },
       Law("Bracket: guarantee is derived from bracket") { BF.guaranteeIsDerivedFromBracket(BF.just(Unit), EQ) },
       Law("Bracket: guaranteeCase is derived from bracketCase") { BF.guaranteeCaseIsDerivedFromBracketCase({ BF.just(Unit) }, EQ) },
-      Law("Bracket: bracket propagates transformer effects") { BF.bracketPropagatesTransformerEffects(EQ) }
+      Law("Bracket: bracket propagates transformer effects") { BF.bracketPropagatesTransformerEffects(EQ) },
+      Law("Bracket: bracket must run release task") { BF.bracketMustRunReleaseTask(EQ) }
     )
 
   fun <F> Bracket<F, Throwable>.bracketCaseWithJustUnitEqvMap(EQ: Eq<Kind<F, Int>>): Unit =
@@ -90,8 +91,8 @@ object BracketLaws {
     }
 
   fun <F> Bracket<F, Throwable>.bracketPropagatesTransformerEffects(EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(Gen.string().map(::just),
-      genFunctionAToB<String, Kind<F, Int>>(Gen.int().map(::just)),
+    forAll(genApplicative(Gen.string(), this),
+      genFunctionAToB<String, Kind<F, Int>>(genApplicative(Gen.int(), this)),
       genFunctionAToB<String, Kind<F, Unit>>(Gen.create { just(Unit) })) { acquire, use, release ->
       acquire.bracket(use = use, release = release).equalUnderTheLaw(
         acquire.flatMap { a -> use(a).flatMap { b -> release(a).map { b } } }
