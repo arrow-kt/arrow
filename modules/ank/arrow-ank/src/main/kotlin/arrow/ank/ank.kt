@@ -29,7 +29,7 @@ fun Long.humanBytes(): String {
 }
 
 fun <F> ank(source: Path, target: Path, compilerArgs: List<String>, ankOps: AnkOps<F>): Kind<F, Int> = with(ankOps) {
-  MF().binding {
+  MF().bindingCatch {
     printConsole(colored(ANSI_PURPLE, AnkHeader)).bind()
     val heapSize = Runtime.getRuntime().totalMemory()
     val heapMaxSize = Runtime.getRuntime().maxMemory()
@@ -37,14 +37,13 @@ fun <F> ank(source: Path, target: Path, compilerArgs: List<String>, ankOps: AnkO
     println("Starting ank with Heap Size: ${heapSize.humanBytes()}, Max Heap Size: ${heapMaxSize.humanBytes()}")
     printConsole("")
     val path = profile("createTargetDirectory", createTargetDirectory(source, target)).bind()
-
     val candidates = profile("getCandidatePaths", getCandidatePaths(path)).bind()
-      .fold({ MF().raiseError<Nel<Path>>(Exception("No matching files found")).bind() }, { it })
+      .fold({ raiseError<Nel<Path>>(Exception("No matching files found")).bind() }, { it })
 
     val generated = candidates.all.foldIndexed(MF().just(0)) { curr, acc, p ->
       acc.flatMap { generated ->
         MF().binding {
-          if (curr % 1000 == 0) System.gc() // hint force GC every 1000 files
+          if (curr % 100 == 0) System.gc() // hint force GC every 1000 files
           // ignore first one, then output on every 100 or every fifth when below 1000
           val printAnkProgress = (curr % 100 == 0 || (candidates.size < 1000 && curr % 5 == 0))
           if (curr != 0 && printAnkProgress) {
