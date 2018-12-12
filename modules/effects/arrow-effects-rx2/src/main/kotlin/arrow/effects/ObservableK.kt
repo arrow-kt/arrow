@@ -40,7 +40,8 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
    *
    * {: data-executable='true'}
    * ```kotlin:ank
-   * import arrow.effects.ObservableK
+   * import io.reactivex.Observable
+   * import arrow.effects.*
    * import arrow.effects.typeclasses.ExitCase
    *
    * class File(url: String) {
@@ -50,8 +51,8 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
    *     Observable.just("This", "file", "contains", "some", "interesting", "content!").k()
    * }
    *
-   * fun openFile(uri: String): IO<File> = ObservableK { File(uri).open() }
-   * fun closeFile(file: File): IO<Unit> = ObservableK { file.close() }
+   * fun openFile(uri: String): ObservableK<File> = ObservableK { File(uri).open() }
+   * fun closeFile(file: File): ObservableK<Unit> = ObservableK { file.close() }
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
@@ -63,12 +64,12 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
    *         is ExitCase.Error -> { /* do something */ }
    *       }
    *       closeFile(file)
-   *    },
-   *    use = { file -> fileToString(file) }
-   *  )
-   *  //sampleEnd
-   *  println(safeComputation)
-   *  }
+   *     },
+   *     use = { file -> file.content() }
+   *   )
+   *   //sampleEnd
+   *   println(safeComputation)
+   * }
    *  ```
    */
   fun <B> bracketCase(use: (A) -> ObservableKOf<B>, release: (A, ExitCase<Throwable>) -> ObservableKOf<Unit>): ObservableK<B> =
