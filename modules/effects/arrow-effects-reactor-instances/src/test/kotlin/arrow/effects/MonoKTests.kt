@@ -8,8 +8,8 @@ import arrow.test.laws.AsyncLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.Spec
+import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
-import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.CoreMatchers.startsWith
 import org.hamcrest.MatcherAssert.assertThat
@@ -18,6 +18,8 @@ import reactor.core.publisher.Mono
 import reactor.core.scheduler.Schedulers
 import reactor.test.test
 import java.time.Duration
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 @RunWith(KTestJUnitRunner::class)
 class MonoKTest : UnitSpec() {
@@ -58,7 +60,7 @@ class MonoKTest : UnitSpec() {
       AsyncLaws.laws(MonoK.async(), EQ(), EQ(), testStackSafety = false)
     )
 
-    "Multi-thread Singles finish correctly" {
+    "Multi-thread Monos finish correctly" {
       val value: Mono<Long> = bindingCatch {
         val a = Mono.just(0L).delayElement(Duration.ofSeconds(2)).k().bind()
         a
@@ -69,7 +71,7 @@ class MonoKTest : UnitSpec() {
         .verifyComplete()
     }
 
-    "Multi-thread Fluxes should run on their required threads" {
+    "Multi-thread Monos should run on their required threads" {
       val originalThread = Thread.currentThread()
       var threadRef: Thread? = null
       val value: Mono<Long> = bindingCatch {
@@ -96,7 +98,7 @@ class MonoKTest : UnitSpec() {
     }
 
 
-    "Single dispose forces binding to cancel without completing too" {
+    "mono dispose forces binding to cancel without completing too" {
       val value: Mono<Long> = bindingCatch {
         val a = Mono.just(0L).delayElement(Duration.ofSeconds(3)).k().bind()
         a
@@ -116,28 +118,26 @@ class MonoKTest : UnitSpec() {
         .hasNotDroppedErrors()
     }
 
-    "Mono bracket cancellation should release resource with cancel exit status" {
+    "MonoK bracket cancellation should release resource with cancel exit status" {
       lateinit var ec: ExitCase<Throwable>
+      val countDownLatch = CountDownLatch(1)
 
-      val mono = Mono.just(0L)
-        .k()
+      MonoK.just(Unit)
         .bracketCase(
-          use = { MonoK.just(it) },
-          release = { _, exitCase -> ec = exitCase; MonoK.just(Unit) }
+          use = { MonoK.async<Nothing> { } },
+          release = { _, exitCase ->
+            MonoK {
+              ec = exitCase
+              countDownLatch.countDown()
+            }
+          }
         )
         .value()
-        .delayElement(Duration.ofSeconds(3))
+        .subscribe()
+        .dispose()
 
-      val test = mono.doOnSubscribe { subscription ->
-        Mono.just(0L).delayElement(Duration.ofSeconds(1))
-          .subscribe { subscription.cancel() }
-      }.test()
-
-      test
-        .thenAwait(Duration.ofSeconds(5))
-        .then { assertThat(ec, `is`(ExitCase.Cancelled as ExitCase<Throwable>)) }
-        .thenCancel()
-        .verify()
+      countDownLatch.await(100, TimeUnit.MILLISECONDS)
+      ec shouldBe ExitCase.Cancelled
     }
   }
 }
