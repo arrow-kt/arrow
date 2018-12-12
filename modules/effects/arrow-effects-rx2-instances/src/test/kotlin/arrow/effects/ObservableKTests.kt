@@ -110,7 +110,7 @@ class ObservableKTest : UnitSpec() {
 
       ObservableK.just(Unit)
         .bracketCase(
-          use = { Observable.timer(1, TimeUnit.SECONDS).k() },
+          use = { ObservableK.async<Nothing> {  } },
           release = { _, exitCase ->
             ObservableK {
               ec = exitCase

@@ -118,7 +118,7 @@ class SingleKTests : UnitSpec() {
 
       SingleK.just(Unit)
         .bracketCase(
-          use = { Single.timer(1, TimeUnit.SECONDS).k() },
+          use = { SingleK.async<Nothing> { } },
           release = { _, exitCase ->
             SingleK {
               ec = exitCase
@@ -131,7 +131,6 @@ class SingleKTests : UnitSpec() {
         .dispose()
 
       countDownLatch.await(100, TimeUnit.MILLISECONDS)
-
       ec shouldBe ExitCase.Cancelled
     }
 

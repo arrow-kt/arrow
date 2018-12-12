@@ -129,9 +129,10 @@ class FlowableKTests : UnitSpec() {
     "FlowableK bracket cancellation should release resource with cancel exit status" {
       lateinit var ec: ExitCase<Throwable>
       val countDownLatch = CountDownLatch(1)
+
       FlowableK.just(Unit)
         .bracketCase(
-          use = { Flowable.timer(1, TimeUnit.SECONDS).k() },
+          use = { FlowableK.async<Nothing>({ }) },
           release = { _, exitCase ->
             FlowableK {
               ec = exitCase
@@ -142,7 +143,8 @@ class FlowableKTests : UnitSpec() {
         .value()
         .subscribe()
         .dispose()
-      countDownLatch.await()
+
+      countDownLatch.await(100, TimeUnit.MILLISECONDS)
       ec shouldBe ExitCase.Cancelled
     }
   }

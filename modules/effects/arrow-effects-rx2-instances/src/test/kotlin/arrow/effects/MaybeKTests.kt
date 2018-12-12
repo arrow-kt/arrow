@@ -132,7 +132,7 @@ class MaybeKTests : UnitSpec() {
       val countDownLatch = CountDownLatch(1)
       MaybeK.just(Unit)
         .bracketCase(
-          use = { Maybe.timer(1, TimeUnit.SECONDS).k() },
+          use = { MaybeK.async<Nothing> {  } },
           release = { _, exitCase ->
             MaybeK {
               ec = exitCase
@@ -144,7 +144,7 @@ class MaybeKTests : UnitSpec() {
         .subscribe()
         .dispose()
 
-      countDownLatch.await()
+      countDownLatch.await(100, TimeUnit.MILLISECONDS)
       ec shouldBe ExitCase.Cancelled
     }
 

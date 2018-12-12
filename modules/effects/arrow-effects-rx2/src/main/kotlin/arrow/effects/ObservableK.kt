@@ -97,7 +97,7 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
     fun <A> defer(fa: () -> ObservableKOf<A>): ObservableK<A> =
       Observable.defer { fa().value() }.k()
 
-    fun <A> runAsync(fa: Proc<A>): ObservableK<A> =
+    fun <A> async(fa: Proc<A>): ObservableK<A> =
       Observable.create { emitter: ObservableEmitter<A> ->
         fa { either: Either<Throwable, A> ->
           either.fold({
