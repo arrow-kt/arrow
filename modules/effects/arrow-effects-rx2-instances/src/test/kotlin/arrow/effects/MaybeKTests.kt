@@ -10,6 +10,7 @@ import arrow.effects.maybek.monad.monad
 import arrow.effects.maybek.monadDefer.monadDefer
 import arrow.effects.maybek.monadError.monadError
 import arrow.effects.maybek.monadThrow.bindingCatch
+import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
@@ -21,6 +22,7 @@ import io.reactivex.Maybe
 import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers
 import org.junit.runner.RunWith
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 @RunWith(KTestJUnitRunner::class)
@@ -124,5 +126,28 @@ class MaybeKTests : UnitSpec() {
       val foldedToSome = maybe.fold({ false }, { true })
       foldedToSome shouldBe true
     }
+
+    "MaybeK bracket cancellation should release resource with cancel exit status" {
+      lateinit var ec: ExitCase<Throwable>
+      val countDownLatch = CountDownLatch(1)
+      MaybeK.just(Unit)
+        .bracketCase(
+          use = { Maybe.timer(1, TimeUnit.SECONDS).k() },
+          release = { _, exitCase ->
+            MaybeK {
+              ec = exitCase
+              countDownLatch.countDown()
+            }
+          }
+        )
+        .value()
+        .subscribe()
+        .dispose()
+
+      countDownLatch.await()
+      ec shouldBe ExitCase.Cancelled
+    }
+
   }
+
 }
