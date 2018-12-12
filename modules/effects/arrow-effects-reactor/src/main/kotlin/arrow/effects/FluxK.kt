@@ -31,13 +31,20 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
 
   fun <B> bracketCase(use: (A) -> FluxKOf<B>, release: (A, ExitCase<Throwable>) -> FluxKOf<Unit>): FluxK<B> =
     flatMap { a ->
-      use(a).fix().flatMap { b ->
-        release(a, ExitCase.Completed)
-          .fix().map { b }
-      }.handleErrorWith { e ->
-        release(a, ExitCase.Error(e))
-          .fix().flatMap { FluxK.raiseError<B>(e) }
-      }
+      Flux.create<B> { sink ->
+        use(a).fix()
+          .flatMap { b ->
+            release(a, ExitCase.Completed)
+              .fix().map { b }
+          }.handleErrorWith { e ->
+            release(a, ExitCase.Error(e))
+              .fix().flatMap { FluxK.raiseError<B>(e) }
+          }.flux.subscribe({ b -> sink.next(b) }, sink::error, sink::complete, { subscription ->
+          sink.onCancel(subscription::cancel)
+          sink.onRequest(subscription::request)
+        })
+        sink.onDispose { release(a, ExitCase.Cancelled).fix().flux.subscribe({}, sink::error, {}) }
+      }.k()
     }
 
   fun <B> concatMap(f: (A) -> FluxKOf<B>): FluxK<B> =
@@ -100,7 +107,7 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
     fun <A> defer(fa: () -> FluxKOf<A>): FluxK<A> =
       Flux.defer { fa().value() }.k()
 
-    fun <A> runAsync(fa: Proc<A>): FluxK<A> =
+    fun <A> async(fa: Proc<A>): FluxK<A> =
       Flux.create { emitter: FluxSink<A> ->
         fa { callback: Either<Throwable, A> ->
           callback.fold({
