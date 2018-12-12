@@ -1,7 +1,6 @@
 package arrow.effects
 
 import arrow.effects.flowablek.async.async
-import arrow.effects.flowablek.bracket.bracketCase
 import arrow.effects.flowablek.foldable.foldable
 import arrow.effects.flowablek.functor.functor
 import arrow.effects.flowablek.monadThrow.bindingCatch
@@ -14,13 +13,13 @@ import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.Spec
+import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subscribers.TestSubscriber
-import org.hamcrest.CoreMatchers.`is`
-import org.hamcrest.MatcherAssert.assertThat
 import org.junit.runner.RunWith
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 @RunWith(KTestJUnitRunner::class)
@@ -129,31 +128,22 @@ class FlowableKTests : UnitSpec() {
 
     "FlowableK bracket cancellation should release resource with cancel exit status" {
       lateinit var ec: ExitCase<Throwable>
-
-      val flowable = Flowable.just(0L)
-        .k()
+      val countDownLatch = CountDownLatch(1)
+      FlowableK.just(Unit)
         .bracketCase(
-          use = {
-            Flowable.timer(1, TimeUnit.SECONDS).doOnSubscribe { subscription -> //use is going to wait for 1 sec
-              Flowable.timer(100, TimeUnit.MILLISECONDS)                        //immediately cancel it
-                .subscribe { subscription.cancel() }
-            }.k()
-          },
-          release = { _, exitCase -> FlowableK { ec = exitCase } } //Since use got cancelled, ExitCase.Cancelled should be assigned here to ec
+          use = { Flowable.timer(1, TimeUnit.SECONDS).k() },
+          release = { _, exitCase ->
+            FlowableK {
+              ec = exitCase
+              countDownLatch.countDown()
+            }
+          }
         )
-        .map { ec } //(Since use is a single value, release must be executed before map!) ????????????
         .value()
-//        .delay(3, TimeUnit.SECONDS) //cancel occurs here, so release occurs too late because use is single value
-//        .doOnSubscribe { subscription ->
-//          Flowable.timer(1, TimeUnit.SECONDS)
-//            .subscribe {
-//              subscription.cancel()
-//            }
-//        }
-        .test().assertValue(ExitCase.Cancelled)
-
-//      flowable.test().await(5, TimeUnit.SECONDS)
-//      assertThat(ec, `is`(ExitCase.Cancelled as ExitCase<Throwable>))
+        .subscribe()
+        .dispose()
+      countDownLatch.await()
+      ec shouldBe ExitCase.Cancelled
     }
   }
 }
