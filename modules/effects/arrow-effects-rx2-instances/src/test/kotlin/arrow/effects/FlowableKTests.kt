@@ -1,6 +1,7 @@
 package arrow.effects
 
 import arrow.effects.flowablek.async.async
+import arrow.effects.flowablek.bracket.bracketCase
 import arrow.effects.flowablek.foldable.foldable
 import arrow.effects.flowablek.functor.functor
 import arrow.effects.flowablek.monadThrow.bindingCatch
@@ -132,20 +133,27 @@ class FlowableKTests : UnitSpec() {
       val flowable = Flowable.just(0L)
         .k()
         .bracketCase(
-          use = { FlowableK.just(it) },
-          release = { _, exitCase -> ec = exitCase; FlowableK.just(Unit) }
+          use = {
+            Flowable.timer(1, TimeUnit.SECONDS).doOnSubscribe { subscription -> //use is going to wait for 1 sec
+              Flowable.timer(100, TimeUnit.MILLISECONDS)                        //immediately cancel it
+                .subscribe { subscription.cancel() }
+            }.k()
+          },
+          release = { _, exitCase -> FlowableK { ec = exitCase } } //Since use got cancelled, ExitCase.Cancelled should be assigned here to ec
         )
+        .map { ec } //(Since use is a single value, release must be executed before map!) ????????????
         .value()
-        .delay(3, TimeUnit.SECONDS)
-        .doOnSubscribe { subscription ->
-          Flowable.just(0L).delay(1, TimeUnit.SECONDS)
-            .subscribe {
-              subscription.cancel()
-            }
-        }
+//        .delay(3, TimeUnit.SECONDS) //cancel occurs here, so release occurs too late because use is single value
+//        .doOnSubscribe { subscription ->
+//          Flowable.timer(1, TimeUnit.SECONDS)
+//            .subscribe {
+//              subscription.cancel()
+//            }
+//        }
+        .test().assertValue(ExitCase.Cancelled)
 
-      flowable.test().await(5, TimeUnit.SECONDS)
-      assertThat(ec, `is`(ExitCase.Cancelled as ExitCase<Throwable>))
+//      flowable.test().await(5, TimeUnit.SECONDS)
+//      assertThat(ec, `is`(ExitCase.Cancelled as ExitCase<Throwable>))
     }
   }
 }

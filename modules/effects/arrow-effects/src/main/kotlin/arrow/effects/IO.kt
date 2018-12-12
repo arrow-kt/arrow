@@ -133,7 +133,7 @@ sealed class IO<out A> : IOOf<A> {
   fun <B> bracket(release: (A) -> IO<Unit>, use: (A) -> IO<B>): IO<B> =
     bracketCase({ a, _ -> release(a) }, use)
 
-  fun <B> bracketCase(release: (A, ExitCase<Throwable>) -> IO<Unit>, use: (A) -> IO<B>): IO<B> =
+  fun <B> bracketCase(release: (A, ExitCase<Throwable>) -> IOOf<Unit>, use: (A) -> IOOf<B>): IO<B> =
     IOBracket(this, release, use)
 
   fun guarantee(finalizer: IO<Unit>): IO<A> = guaranteeCase { finalizer }
