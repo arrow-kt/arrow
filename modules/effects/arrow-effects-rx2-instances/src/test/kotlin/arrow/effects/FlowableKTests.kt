@@ -1,6 +1,7 @@
 package arrow.effects
 
 import arrow.effects.flowablek.async.async
+import arrow.effects.flowablek.bracket.bracketCase
 import arrow.effects.flowablek.foldable.foldable
 import arrow.effects.flowablek.functor.functor
 import arrow.effects.flowablek.monadThrow.bindingCatch
@@ -141,6 +142,7 @@ class FlowableKTests : UnitSpec() {
             }
           }
         )
+        .map { ec } //(Since use is a single value, release must be executed before map!) ????????????
         .value()
         .subscribe()
         .dispose()
