@@ -1,6 +1,6 @@
 ---
 name: Feature request
-about: What would you like to see in Arrow.
+about: What would you like to see in Arrow?
 title: [Request]
 labels: ''
 assignees: Maintainers
