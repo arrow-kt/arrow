@@ -9,7 +9,6 @@ import io.reactivex.exceptions.Exceptions
 import io.reactivex.internal.disposables.DisposableHelper
 import io.reactivex.plugins.RxJavaPlugins
 
-
 internal class MaybeKBracket<A>(private val source: MaybeSource<A>,
                                private val onErrorCall: (Throwable) -> Maybe<Unit>,
                                private val onCompleteCall: Maybe<Unit>,

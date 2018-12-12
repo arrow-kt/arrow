@@ -12,7 +12,7 @@ import org.reactivestreams.Publisher
 import org.reactivestreams.Subscriber
 import org.reactivestreams.Subscription
 
-class FlowableKBracket<A>(private val source: Flowable<A>,
+internal class FlowableKBracket<A>(private val source: Flowable<A>,
                           private val onError: (Throwable) -> Flowable<Unit>,
                           private val onComplete: Flowable<Unit>,
                           private val onDispose: Flowable<Unit>) : Flowable<A>() {
