@@ -13,9 +13,9 @@ import org.reactivestreams.Subscriber
 import org.reactivestreams.Subscription
 
 class FlowableKBracket<A>(private val source: Flowable<A>,
-                             private val onError: (Throwable) -> Flowable<Unit>,
-                             private val onComplete: Flowable<Unit>,
-                             private val onDispose: Flowable<Unit>) : Flowable<A>() {
+                          private val onError: (Throwable) -> Flowable<Unit>,
+                          private val onComplete: Flowable<Unit>,
+                          private val onDispose: Flowable<Unit>) : Flowable<A>() {
 
   override fun subscribeActual(s: Subscriber<in A>) {
     val parent = OnErrorNextSubscriber(s, onError, onComplete, onDispose)
@@ -23,7 +23,7 @@ class FlowableKBracket<A>(private val source: Flowable<A>,
     source.subscribe(parent)
   }
 
-  internal class OnErrorNextSubscriber<T>(
+  private class OnErrorNextSubscriber<T>(
     private val downstream: Subscriber<in T>,
     private val onErrorCall: (Throwable) -> Flowable<Unit>,
     private val onComplete: Flowable<Unit>,
@@ -91,20 +91,11 @@ class FlowableKBracket<A>(private val source: Flowable<A>,
         this::onErrorInner, downstream::onComplete)
     }
 
-    override fun toByte(): Byte {
-      TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun toByte(): Byte = get().toByte()
 
-    override fun toChar(): Char {
-      TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun toChar(): Char = get().toChar()
 
-    override fun toShort(): Short {
-      TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun toShort(): Short = get().toShort()
 
-    companion object {
-      private val serialVersionUID = 4063763155303814625L
-    }
   }
 }
