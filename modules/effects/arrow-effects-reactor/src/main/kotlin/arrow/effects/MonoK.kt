@@ -30,13 +30,21 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
 
   fun <B> bracketCase(use: (A) -> MonoKOf<B>, release: (A, ExitCase<Throwable>) -> MonoKOf<Unit>): MonoK<B> =
     flatMap { a ->
-      use(a).fix().flatMap { b ->
-        release(a, ExitCase.Completed)
-          .fix().map { b }
-      }.handleErrorWith { e ->
-        release(a, ExitCase.Error(e))
-          .fix().flatMap { MonoK.raiseError<B>(e) }
-      }
+      Mono.create<B> { sink ->
+        val d = use(a).fix().flatMap { b ->
+          release(a, ExitCase.Completed)
+            .fix().map { b }
+        }.handleErrorWith { e ->
+          release(a, ExitCase.Error(e))
+            .fix().flatMap { MonoK.raiseError<B>(e) }
+        }.mono.subscribe(
+          sink::success,
+          sink::error,
+          sink::success
+        )
+        sink.onCancel(d)
+        sink.onDispose { release(a, ExitCase.Cancelled).fix().mono.subscribe({}, sink::error) }
+      }.k()
     }
 
   fun handleErrorWith(function: (Throwable) -> MonoK<A>): MonoK<A> =
@@ -51,7 +59,7 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
   fun runAsyncCancellable(cb: (Either<Throwable, A>) -> MonoKOf<Unit>): MonoK<Disposable> =
     Mono.fromCallable {
       val disposable: reactor.core.Disposable = runAsync(cb).value().subscribe()
-      val dispose: Disposable = { disposable.dispose() }
+      val dispose: Disposable = disposable::dispose
       dispose
     }.k()
 

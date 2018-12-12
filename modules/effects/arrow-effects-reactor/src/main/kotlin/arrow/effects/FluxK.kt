@@ -32,17 +32,17 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
   fun <B> bracketCase(use: (A) -> FluxKOf<B>, release: (A, ExitCase<Throwable>) -> FluxKOf<Unit>): FluxK<B> =
     flatMap { a ->
       Flux.create<B> { sink ->
-        use(a).fix()
+        val d = use(a).fix()
           .flatMap { b ->
             release(a, ExitCase.Completed)
               .fix().map { b }
           }.handleErrorWith { e ->
             release(a, ExitCase.Error(e))
               .fix().flatMap { FluxK.raiseError<B>(e) }
-          }.flux.subscribe({ b -> sink.next(b) }, sink::error, sink::complete, { subscription ->
-          sink.onCancel(subscription::cancel)
+          }.flux.subscribe({ b -> sink.next(b) }, sink::error, sink::complete) { subscription ->
           sink.onRequest(subscription::request)
-        })
+        }
+        sink.onCancel(d)
         sink.onDispose { release(a, ExitCase.Cancelled).fix().flux.subscribe({}, sink::error, {}) }
       }.k()
     }
