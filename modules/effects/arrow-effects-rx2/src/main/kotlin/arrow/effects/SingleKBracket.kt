@@ -7,7 +7,6 @@ import io.reactivex.exceptions.Exceptions
 import io.reactivex.internal.disposables.DisposableHelper
 import io.reactivex.plugins.RxJavaPlugins
 
-
 internal class SingleKBracket<A>(private val source: SingleSource<A>,
                                  private val onErrorCall: (Throwable) -> Single<Unit>,
                                  private val onCompleteCall: Single<Unit>,

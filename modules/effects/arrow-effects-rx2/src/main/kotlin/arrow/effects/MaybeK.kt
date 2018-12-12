@@ -28,9 +28,9 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
   fun <B> bracketCase(use: (A) -> MaybeKOf<B>, release: (A, ExitCase<Throwable>) -> MaybeKOf<Unit>): MaybeK<B> =
     flatMap { a ->
       MaybeKBracket<B>(use(a).value(),
-        onErrorCall = { e -> release(a, ExitCase.Error(e)).value() },
-        onCompleteCall = release(a, ExitCase.Completed).value(),
-        onDisposeCall = release(a, ExitCase.Cancelled).value()
+        { e -> release(a, ExitCase.Error(e)).value() },
+        release(a, ExitCase.Completed).value(),
+        release(a, ExitCase.Cancelled).value()
       ).k()
     }
 
