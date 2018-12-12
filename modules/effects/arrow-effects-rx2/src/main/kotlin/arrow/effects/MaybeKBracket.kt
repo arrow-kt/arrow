@@ -31,7 +31,7 @@ internal class MaybeKBracket<A>(
       onDisposeCall.subscribe({}, { ex ->
         Exceptions.throwIfFatal(ex)
         RxJavaPlugins.onError(ex)
-      }, {})
+      }, { })
 
       upstream?.dispose()
       upstream = DisposableHelper.DISPOSED
