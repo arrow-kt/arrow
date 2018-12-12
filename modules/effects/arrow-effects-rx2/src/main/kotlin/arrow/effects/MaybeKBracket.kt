@@ -9,10 +9,11 @@ import io.reactivex.exceptions.Exceptions
 import io.reactivex.internal.disposables.DisposableHelper
 import io.reactivex.plugins.RxJavaPlugins
 
-internal class MaybeKBracket<A>(private val source: MaybeSource<A>,
-                               private val onErrorCall: (Throwable) -> Maybe<Unit>,
-                               private val onCompleteCall: Maybe<Unit>,
-                               private val onDisposeCall: Maybe<Unit>) : Maybe<A>() {
+internal class MaybeKBracket<A>(
+  private val source: MaybeSource<A>,
+  private val onErrorCall: (Throwable) -> Maybe<Unit>,
+  private val onCompleteCall: Maybe<Unit>,
+  private val onDisposeCall: Maybe<Unit>) : Maybe<A>() {
 
   override fun subscribeActual(observer: MaybeObserver<in A>) {
     source.subscribe(MaybeKBracketObserver(observer, onErrorCall, onCompleteCall, onDisposeCall))
