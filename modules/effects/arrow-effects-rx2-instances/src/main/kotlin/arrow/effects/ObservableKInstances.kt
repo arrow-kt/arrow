@@ -116,6 +116,9 @@ interface ObservableKAsyncInstance : Async<ForObservableK>, ObservableKMonadDefe
   override fun <A> asyncF(k: ProcF<ForObservableK, A>): ObservableK<A> =
     ObservableK.asyncF { _, cb -> k(cb) }
 
+  override fun <A> asyncF(k: ProcF<ForObservableK, A>): ObservableK<A> =
+    ObservableK.asyncF(k)
+
   override fun <A> ObservableKOf<A>.continueOn(ctx: CoroutineContext): ObservableK<A> =
     fix().continueOn(ctx)
 }
