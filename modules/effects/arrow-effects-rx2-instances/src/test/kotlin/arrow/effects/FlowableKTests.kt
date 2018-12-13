@@ -13,13 +13,13 @@ import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.Spec
+import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subscribers.TestSubscriber
-import org.hamcrest.CoreMatchers.`is`
-import org.hamcrest.MatcherAssert.assertThat
 import org.junit.runner.RunWith
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 @RunWith(KTestJUnitRunner::class)
@@ -128,24 +128,24 @@ class FlowableKTests : UnitSpec() {
 
     "FlowableK bracket cancellation should release resource with cancel exit status" {
       lateinit var ec: ExitCase<Throwable>
+      val countDownLatch = CountDownLatch(1)
 
-      val flowable = Flowable.just(0L)
-        .k()
+      FlowableK.just(Unit)
         .bracketCase(
-          use = { FlowableK.just(it) },
-          release = { _, exitCase -> ec = exitCase; FlowableK.just(Unit) }
+          use = { FlowableK.async<Nothing>({ }) },
+          release = { _, exitCase ->
+            FlowableK {
+              ec = exitCase
+              countDownLatch.countDown()
+            }
+          }
         )
         .value()
-        .delay(3, TimeUnit.SECONDS)
-        .doOnSubscribe { subscription ->
-          Flowable.just(0L).delay(1, TimeUnit.SECONDS)
-            .subscribe {
-              subscription.cancel()
-            }
-        }
+        .subscribe()
+        .dispose()
 
-      flowable.test().await(5, TimeUnit.SECONDS)
-      assertThat(ec, `is`(ExitCase.Cancelled as ExitCase<Throwable>))
+      countDownLatch.await(100, TimeUnit.MILLISECONDS)
+      ec shouldBe ExitCase.Cancelled
     }
   }
 }

@@ -31,11 +31,13 @@ fun <E> Either<E, *>.toExitCase() =
 interface Bracket<F, E> : MonadError<F, E> {
 
   /**
-   * A generalized version of [bracket] which uses [ExitCase] to distinguish between different exit cases when
-   * releasing the acquired resource.
+   * A way to safely acquire a resource and release in the face of errors and cancellation.
+   * It uses [ExitCase] to distinguish between different exit cases when releasing the acquired resource.
    *
-   * @param release is the action supposed to release the allocated resource after `use` is done, by observing and
-   * acting on its exit condition.
+   * @param use is the action to consume the resource and produce an [F] with the result.
+   * Once the resulting [F] terminates, either successfully, error or cancelled.
+   *
+   * @param release the allocated resource after the resulting [F] of [use] is terminates.
    *
    * {: data-executable='true'}
    *

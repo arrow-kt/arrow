@@ -119,7 +119,7 @@ interface ObservableKMonadDeferInstance : MonadDefer<ForObservableK>, Observable
 @extension
 interface ObservableKAsyncInstance : Async<ForObservableK>, ObservableKMonadDeferInstance {
   override fun <A> async(fa: Proc<A>): ObservableK<A> =
-    ObservableK.runAsync(fa)
+    ObservableK.async(fa)
 
   override fun <A> ObservableKOf<A>.continueOn(ctx: CoroutineContext): ObservableK<A> =
     fix().continueOn(ctx)

@@ -6,6 +6,7 @@ import arrow.effects.instances.io.applicativeError.attempt
 import arrow.effects.instances.io.async.async
 import arrow.effects.instances.io.monad.binding
 import arrow.effects.instances.io.monad.monad
+import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.milliseconds
 import arrow.effects.typeclasses.seconds
 import arrow.instances.option.eq.eq
@@ -19,6 +20,8 @@ import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldEqual
 import kotlinx.coroutines.newSingleThreadContext
 import org.junit.runner.RunWith
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 @RunWith(KTestJUnitRunner::class)
 class IOTest : UnitSpec() {
@@ -373,5 +376,22 @@ class IOTest : UnitSpec() {
       }.fix()
       result.unsafeRunSync() shouldBe 2
     }
+
+    "IO bracket cancellation should release resource with cancel exit status" {
+      lateinit var ec: ExitCase<Throwable>
+      val countDownLatch = CountDownLatch(1)
+
+      IO.just(0L)
+        .bracketCase(
+          use = { IO.never },
+          release = { _, exitCase -> IO { ec = exitCase; countDownLatch.countDown() } }
+        )
+        .unsafeRunAsyncCancellable { }
+        .invoke() //cancel immediately
+
+      countDownLatch.await(2, TimeUnit.SECONDS)
+      ec shouldBe ExitCase.Cancelled
+    }
+
   }
 }

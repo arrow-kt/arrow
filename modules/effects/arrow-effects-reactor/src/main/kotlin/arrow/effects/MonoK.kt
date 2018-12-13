@@ -28,13 +28,66 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
   fun <B> flatMap(f: (A) -> MonoKOf<B>): MonoK<B> =
     mono.flatMap { f(it).fix().mono }.k()
 
+  /**
+   * A way to safely acquire a resource and release in the face of errors and cancellation.
+   * It uses [ExitCase] to distinguish between different exit cases when releasing the acquired resource.
+   *
+   * @param use is the action to consume the resource and produce an [MonoK] with the result.
+   * Once the resulting [MonoK] terminates, either successfully, error or disposed,
+   * the [release] function will run to clean up the resources.
+   *
+   * @param release the allocated resource after the resulting [MonoK] of [use] is terminates.
+   *
+   * {: data-executable='true'}
+   * ```kotlin:ank
+   * import arrow.effects.*
+   * import arrow.effects.typeclasses.ExitCase
+   *
+   * class File(url: String) {
+   *   fun open(): File = this
+   *   fun close(): Unit {}
+   *   fun content(): MonoK<String> =
+   *     MonoK.just("This file contains some interesting content!")
+   * }
+   *
+   * fun openFile(uri: String): MonoK<File> = MonoK { File(uri).open() }
+   * fun closeFile(file: File): MonoK<Unit> = MonoK { file.close() }
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val safeComputation = openFile("data.json").bracketCase(
+   *     release = { file, exitCase ->
+   *       when (exitCase) {
+   *         is ExitCase.Completed -> { /* do something */ }
+   *         is ExitCase.Cancelled -> { /* do something */ }
+   *         is ExitCase.Error -> { /* do something */ }
+   *       }
+   *       closeFile(file)
+   *     },
+   *     use = { file -> file.content() }
+   *   )
+   *   //sampleEnd
+   *   println(safeComputation)
+   * }
+   *  ```
+   */
   fun <B> bracketCase(use: (A) -> MonoKOf<B>, release: (A, ExitCase<Throwable>) -> MonoKOf<Unit>): MonoK<B> =
     flatMap { a ->
-      use(a).fix().mono
-        .doOnError { release(a, ExitCase.Error(it)) }
-        .doOnCancel { release(a, ExitCase.Cancelled) }
-        .doOnSuccess { release(a, ExitCase.Completed) }
-        .k()
+      Mono.create<B> { sink ->
+        val d = use(a).fix().flatMap { b ->
+          release(a, ExitCase.Completed)
+            .fix().map { b }
+        }.handleErrorWith { e ->
+          release(a, ExitCase.Error(e))
+            .fix().flatMap { MonoK.raiseError<B>(e) }
+        }.mono.subscribe(
+          sink::success,
+          sink::error,
+          sink::success
+        )
+        sink.onCancel(d)
+        sink.onDispose { release(a, ExitCase.Cancelled).fix().mono.subscribe({}, sink::error) }
+      }.k()
     }
 
   fun handleErrorWith(function: (Throwable) -> MonoK<A>): MonoK<A> =
@@ -49,7 +102,7 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
   fun runAsyncCancellable(cb: (Either<Throwable, A>) -> MonoKOf<Unit>): MonoK<Disposable> =
     Mono.fromCallable {
       val disposable: reactor.core.Disposable = runAsync(cb).value().subscribe()
-      val dispose: Disposable = { disposable.dispose() }
+      val dispose: Disposable = disposable::dispose
       dispose
     }.k()
 
