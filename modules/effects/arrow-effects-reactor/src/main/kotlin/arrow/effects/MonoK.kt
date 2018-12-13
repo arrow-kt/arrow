@@ -6,6 +6,8 @@ import arrow.core.Either.Right
 import arrow.effects.CoroutineContextReactorScheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
+import arrow.effects.typeclasses.Proc
+import arrow.effects.typeclasses.ProcF
 import arrow.higherkind
 import reactor.core.publisher.Mono
 import reactor.core.publisher.MonoSink

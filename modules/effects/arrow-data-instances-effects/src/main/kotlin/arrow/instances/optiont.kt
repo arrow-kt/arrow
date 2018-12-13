@@ -1,6 +1,7 @@
 package arrow.effects.instances
 
 import arrow.core.Either
+import arrow.Kind
 import arrow.core.None
 import arrow.data.*
 import arrow.effects.Ref
