@@ -1,6 +1,5 @@
 package arrow.effects
 
-import arrow.Kind
 import arrow.core.Either
 import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.effects.typeclasses.*
