@@ -9,7 +9,13 @@ import arrow.core.Right
 import arrow.effects.Promise
 import arrow.typeclasses.MonadContinuation
 import java.util.concurrent.atomic.AtomicReference
+import arrow.core.left
+import arrow.effects.*
+import arrow.effects.internal.asyncIOContinuation
+import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.startCoroutine
+import kotlin.coroutines.suspendCoroutine
 
 /** A cancellable asynchronous computation that might fail. **/
 typealias ProcF<F, A> = ((Either<Throwable, A>) -> Unit) -> Kind<F, Unit>
@@ -93,7 +99,7 @@ interface Async<F> : MonadDefer<F> {
    *
    * @see async for a simpler, non suspending version.
    */
-  fun <A> asyncF(k: ProcF<F, A>): Kind<F, A> = TODO()
+  fun <A> asyncF(k: ProcF<F, A>): Kind<F, A>
 
   /**
    * Continue the evaluation on provided [CoroutineContext]
@@ -174,7 +180,7 @@ interface Async<F> : MonadDefer<F> {
    * ```
    */
   fun <A> defer(ctx: CoroutineContext, f: () -> Kind<F, A>): Kind<F, A> =
-    just(Unit).continueOn(ctx).flatMap { defer(f) }
+    ctx.shift().flatMap { defer(f) }
 
   /**
    * Shift evaluation to provided [CoroutineContext].
@@ -226,7 +232,7 @@ interface Async<F> : MonadDefer<F> {
    * ```
    */
   fun CoroutineContext.shift(): Kind<F, Unit> =
-    delay(this) { Unit }
+    just(Unit).continueOn(this) as Kind<F, Unit>
 
   /**
    * Task that never finishes evaluating.

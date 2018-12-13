@@ -1,13 +1,11 @@
 package arrow.effects.instances
 
-import arrow.Kind
 import arrow.core.*
 import arrow.data.*
 import arrow.effects.Ref
 import arrow.effects.typeclasses.*
 import arrow.extension
 import arrow.instances.StateTMonadThrowInstance
-import arrow.optics.Tuple
 import arrow.typeclasses.MonadError
 import arrow.undocumented
 import kotlin.coroutines.CoroutineContext
