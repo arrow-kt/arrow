@@ -6,6 +6,7 @@ import arrow.effects.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.Proc
+import arrow.effects.typeclasses.ProcF
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import io.reactivex.Observable
@@ -157,6 +158,19 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
             emitter.onComplete()
           })
         }
+      }.k()
+
+    fun <A> asyncF(fa: ProcF<ForObservableK, A>): ObservableK<A> =
+      Observable.create { emitter: ObservableEmitter<A> ->
+        val d = fa { either: Either<Throwable, A> ->
+          either.fold({
+            emitter.onError(it)
+          }, {
+            emitter.onNext(it)
+            emitter.onComplete()
+          })
+        }.fix().observable.subscribe()
+        emitter.setDisposable(d)
       }.k()
 
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> ObservableKOf<Either<A, B>>): ObservableK<B> {

@@ -23,7 +23,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 @RunWith(KTestJUnitRunner::class)
-class ObservableKTest : UnitSpec() {
+class ObservableKTests : UnitSpec() {
 
   fun <T> EQ(): Eq<ObservableKOf<T>> = object : Eq<ObservableKOf<T>> {
     override fun ObservableKOf<T>.eqv(b: ObservableKOf<T>): Boolean =
