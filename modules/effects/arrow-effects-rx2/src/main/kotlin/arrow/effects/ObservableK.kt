@@ -11,6 +11,7 @@ import arrow.typeclasses.Applicative
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
 import kotlin.coroutines.CoroutineContext
+import io.reactivex.disposables.Disposable as RxDisposable
 
 fun <A> Observable<A>.k(): ObservableK<A> = ObservableK(this)
 
@@ -74,11 +75,17 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
    */
   fun <B> bracketCase(use: (A) -> ObservableKOf<B>, release: (A, ExitCase<Throwable>) -> ObservableKOf<Unit>): ObservableK<B> =
     flatMap { a ->
-      ObservableKRunOnDispose(use(a).value(),
-        { e -> release(a, ExitCase.Error(e)).value() },
-        release(a, ExitCase.Cancelled).value(),
-        release(a, ExitCase.Completed).value()
-      ).k()
+      Observable.create<B> { sink ->
+        val d = use(a).fix()
+          .flatMap { b ->
+            release(a, ExitCase.Completed)
+              .fix().map { b }
+          }.handleErrorWith { e ->
+            release(a, ExitCase.Error(e))
+              .fix().flatMap { ObservableK.raiseError<B>(e) }
+          }.observable.subscribe({ b -> sink.onNext(b) }, sink::onError, sink::onComplete)
+        sink.setDisposable(d.onDispose { release(a, ExitCase.Cancelled).fix().observable.subscribe({}, sink::onError, {}) })
+      }.k()
     }
 
   fun <B> concatMap(f: (A) -> ObservableKOf<B>): ObservableK<B> =

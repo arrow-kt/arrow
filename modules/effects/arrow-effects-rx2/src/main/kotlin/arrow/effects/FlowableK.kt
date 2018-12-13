@@ -1,11 +1,7 @@
 package arrow.effects
 
 import arrow.Kind
-import arrow.core.Either
-import arrow.core.Eval
-import arrow.core.Left
-import arrow.core.Right
-import arrow.core.identity
+import arrow.core.*
 import arrow.effects.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
@@ -35,12 +31,18 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
 
   fun <B> bracketCase(use: (A) -> FlowableKOf<B>, release: (A, ExitCase<Throwable>) -> FlowableKOf<Unit>): FlowableK<B> =
     flatMap { a ->
-      FlowableKBracket(
-        use(a).value(),
-        { e -> release(a, ExitCase.Error(e)).value() },
-        release(a, ExitCase.Completed).value(),
-        release(a, ExitCase.Cancelled).value()
-      ).k()
+      Flowable.unsafeCreate<B> { s ->
+        use(a).fix()
+          .flatMap { b ->
+            release(a, ExitCase.Completed)
+              .fix().map { b }
+          }.handleErrorWith { e ->
+            release(a, ExitCase.Error(e))
+              .fix().flatMap { FlowableK.raiseError<B>(e) }
+          }.flowable.subscribe(s::onNext, s::onError, s::onComplete) { d ->
+          s.onSubscribe(d.onCancel { release(a, ExitCase.Cancelled).fix().flowable.subscribe({}, s::onError) })
+        }
+      }.k()
     }
 
   fun <B> concatMap(f: (A) -> FlowableKOf<B>): FlowableK<B> =
