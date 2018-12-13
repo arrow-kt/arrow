@@ -70,6 +70,15 @@ fun <A> Deferred<A>.k(): DeferredK<A> =
 fun <A> CoroutineScope.asyncK(ctx: CoroutineContext = Dispatchers.Default, start: CoroutineStart = CoroutineStart.LAZY, f: suspend () -> A): DeferredK<A> =
   DefaultGenerated(ctx, start, this, f)
 
+fun <A> CoroutineScope.asyncK2(ctx: CoroutineContext = Dispatchers.Default, start: CoroutineStart = CoroutineStart.LAZY, fa: suspend ((Either<Throwable, A>) -> Unit) -> Unit): DeferredK<A> =
+  DeferredK.Generated(ctx, start, this) {
+    CompletableDeferred<A>().apply {
+      fa {
+        it.fold(this::completeExceptionally, this::complete)
+      }
+    }.await()
+  }
+
 /**
  * Return the wrapped [Deferred] from a [DeferredK]
  *

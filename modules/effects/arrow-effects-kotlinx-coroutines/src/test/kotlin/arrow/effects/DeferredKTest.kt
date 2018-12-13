@@ -10,6 +10,7 @@ import arrow.core.Try
 import arrow.data.ListK
 import arrow.data.NonEmptyList
 import arrow.data.k
+import arrow.effects.deferredk.applicativeError.attempt
 import arrow.effects.deferredk.async.async
 import arrow.instances.`try`.functor.functor
 import arrow.instances.`try`.traverse.traverse
