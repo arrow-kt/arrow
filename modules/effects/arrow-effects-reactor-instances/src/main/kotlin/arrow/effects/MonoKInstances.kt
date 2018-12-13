@@ -10,7 +10,7 @@ import kotlin.coroutines.CoroutineContext
 
 @extension
 interface MonoKFunctorInstance : Functor<ForMonoK> {
-  override fun <A, B> Kind<ForMonoK, A>.map(f: (A) -> B): MonoK<B> =
+  override fun <A, B> MonoKOf<A>.map(f: (A) -> B): MonoK<B> =
     fix().map(f)
 }
 
@@ -19,7 +19,7 @@ interface MonoKApplicativeInstance : Applicative<ForMonoK> {
   override fun <A, B> MonoKOf<A>.ap(ff: MonoKOf<(A) -> B>): MonoK<B> =
     fix().ap(ff)
 
-  override fun <A, B> Kind<ForMonoK, A>.map(f: (A) -> B): MonoK<B> =
+  override fun <A, B> MonoKOf<A>.map(f: (A) -> B): MonoK<B> =
     fix().map(f)
 
   override fun <A> just(a: A): MonoK<A> =
@@ -31,7 +31,7 @@ interface MonoKMonadInstance : Monad<ForMonoK> {
   override fun <A, B> MonoKOf<A>.ap(ff: MonoKOf<(A) -> B>): MonoK<B> =
     fix().ap(ff)
 
-  override fun <A, B> MonoKOf<A>.flatMap(f: (A) -> Kind<ForMonoK, B>): MonoK<B> =
+  override fun <A, B> MonoKOf<A>.flatMap(f: (A) -> MonoKOf<B>): MonoK<B> =
     fix().flatMap(f)
 
   override fun <A, B> MonoKOf<A>.map(f: (A) -> B): MonoK<B> =
@@ -71,7 +71,7 @@ interface MonoKMonadThrowInstance : MonadThrow<ForMonoK>, MonoKMonadErrorInstanc
 
 @extension
 interface MonoKBracketInstance : Bracket<ForMonoK, Throwable>, MonoKMonadThrowInstance {
-  override fun <A, B> Kind<ForMonoK, A>.bracketCase(release: (A, ExitCase<Throwable>) -> Kind<ForMonoK, Unit>, use: (A) -> Kind<ForMonoK, B>): MonoK<B> =
+  override fun <A, B> MonoKOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> MonoKOf<Unit>, use: (A) -> MonoKOf<B>): MonoK<B> =
     fix().bracketCase({ use(it) }, { a, e -> release(a, e) })
 }
 
@@ -90,6 +90,9 @@ interface MonoKAsyncInstance :
   override fun <A> async(fa: Proc<A>): MonoK<A> =
     MonoK.async(fa)
 
+  override fun <A> asyncF(k: ProcF<ForMonoK, A>): MonoK<A> =
+    MonoK.asyncF(k)
+
   override fun <A> MonoKOf<A>.continueOn(ctx: CoroutineContext): MonoK<A> =
     fix().continueOn(ctx)
 }
@@ -106,7 +109,7 @@ interface MonoKEffectInstance :
 interface MonoKConcurrentEffectInstance :
   ConcurrentEffect<ForMonoK>,
   MonoKEffectInstance {
-  override fun <A> Kind<ForMonoK, A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> MonoKOf<Unit>): MonoK<Disposable> =
+  override fun <A> MonoKOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> MonoKOf<Unit>): MonoK<Disposable> =
     fix().runAsyncCancellable(cb)
 }
 

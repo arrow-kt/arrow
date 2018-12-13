@@ -1,8 +1,6 @@
 package arrow.effects
 
 import arrow.core.*
-import arrow.effects.internal.IOConnection
-import arrow.effects.internal.Platform
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.Proc

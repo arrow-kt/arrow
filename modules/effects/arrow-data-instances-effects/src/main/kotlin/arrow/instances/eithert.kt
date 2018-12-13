@@ -84,6 +84,10 @@ interface EitherTAsyncInstance<F> : Async<EitherTPartialOf<F, Throwable>>, Eithe
     EitherT.liftF(this, async(fa))
   }
 
+  override fun <A> asyncF(k: ProcF<EitherTPartialOf<F, Throwable>, A>): EitherT<F, Throwable, A> = ASF().run {
+    EitherT.liftF(this, asyncF { cb -> k(cb).value().void() })
+  }
+
   override fun <A> EitherTOf<F, Throwable, A>.continueOn(ctx: CoroutineContext): EitherT<F, Throwable, A> = ASF().run {
     EitherT(value().continueOn(ctx))
   }

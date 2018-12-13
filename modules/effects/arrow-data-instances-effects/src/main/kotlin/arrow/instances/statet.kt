@@ -1,14 +1,13 @@
 package arrow.effects.instances
 
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.Some
-import arrow.core.getOrElse
+import arrow.Kind
+import arrow.core.*
 import arrow.data.*
 import arrow.effects.Ref
 import arrow.effects.typeclasses.*
 import arrow.extension
 import arrow.instances.StateTMonadThrowInstance
+import arrow.optics.Tuple
 import arrow.typeclasses.MonadError
 import kotlin.coroutines.CoroutineContext
 
@@ -66,6 +65,13 @@ interface StateTAsyncInstane<F, S> : Async<StateTPartialOf<F, S>>, StateTMonadDe
 
   override fun <A> async(fa: Proc<A>): StateT<F, S, A> = AS().run {
     StateT.liftF(this, async(fa))
+  }
+
+  override fun <A> asyncF(k: ProcF<StateTPartialOf<F, S>, A>): StateT<F, S, A> = AS().run {
+    StateT.invoke(this) { s ->
+      asyncF<A> { cb -> k(cb).fix().runA(this, s) }
+        .map { Tuple2(s, it) }
+    }
   }
 
   override fun <A> StateTOf<F, S, A>.continueOn(ctx: CoroutineContext): StateT<F, S, A> = AS().run {

@@ -6,6 +6,7 @@ import arrow.effects.CoroutineContextReactorScheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.Proc
+import arrow.effects.typeclasses.ProcF
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import reactor.core.publisher.Flux
@@ -161,6 +162,18 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
             emitter.complete()
           })
         }
+      }.k()
+
+    fun <A> asyncF(fa: ProcF<ForFluxK, A>): FluxK<A> =
+      Flux.create { emitter: FluxSink<A> ->
+        fa { callback: Either<Throwable, A> ->
+          callback.fold({
+            emitter.error(it)
+          }, {
+            emitter.next(it)
+            emitter.complete()
+          })
+        }.fix().flux.subscribe({}, emitter::error)
       }.k()
 
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> FluxKOf<Either<A, B>>): FluxK<B> {

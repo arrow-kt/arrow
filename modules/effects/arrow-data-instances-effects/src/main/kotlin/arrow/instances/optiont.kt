@@ -1,5 +1,6 @@
 package arrow.effects.instances
 
+import arrow.Kind
 import arrow.core.None
 import arrow.data.*
 import arrow.effects.Ref
@@ -65,6 +66,10 @@ interface OptionTAsyncInstance<F> : Async<OptionTPartialOf<F>>, OptionTMonadDefe
 
   override fun <A> async(fa: Proc<A>): OptionT<F, A> = AS().run {
     OptionT.liftF(this, async(fa))
+  }
+
+  override fun <A> asyncF(k: ProcF<OptionTPartialOf<F>, A>): OptionT<F, A> = AS().run {
+    OptionT.liftF(this, asyncF { cb -> k(cb).value().void() })
   }
 
   override fun <A> OptionTOf<F, A>.continueOn(ctx: CoroutineContext): OptionT<F, A> = AS().run {

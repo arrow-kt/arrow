@@ -7,6 +7,7 @@ import arrow.effects.CoroutineContextReactorScheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.Proc
+import arrow.effects.typeclasses.ProcF
 import arrow.higherkind
 import reactor.core.publisher.Mono
 import reactor.core.publisher.MonoSink
@@ -139,6 +140,17 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
         }
       }.k()
 
+    fun <A> asyncF(fa: ProcF<ForMonoK, A>): MonoK<A> =
+      Mono.create { emitter: MonoSink<A> ->
+        fa { either: Either<Throwable, A> ->
+          either.fold({
+            emitter.error(it)
+          }, {
+            emitter.success(it)
+          })
+        }.fix().mono.subscribe({}, emitter::error)
+      }.k()
+
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> MonoKOf<Either<A, B>>): MonoK<B> {
       val either = f(a).value().block()
       return when (either) {
@@ -148,3 +160,4 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
     }
   }
 }
+
