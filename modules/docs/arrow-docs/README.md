@@ -104,7 +104,7 @@ jekyll serve --source build/site/
 
 That will launch the complete website in [127.0.0.1:4000](https://127.0.0.1:4000) so you can open it with a standard browser.
 
-## How to test
+## How to test links
 
 Test for broken links in documentation using
 
