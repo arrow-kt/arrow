@@ -24,6 +24,21 @@ available in docs under `modules/docs/arrow-docs/docs/docs/`.
 
 Let's say you want to add docs for a Type class, like `Applicative`. You'd need to add a README like [this one](https://github.com/arrow-kt/arrow/blob/master/modules/docs/arrow-docs/docs/docs/arrow/typeclasses/applicative/README.md).
 
+You'll find all the sections available in the [docs side menu](https://arrow-kt.io/docs/). As you can see, there's:
+* Quick start: Basically how to start using Arrow, including links to libraries, posts, talks, and sample projects.
+* API docs: This is the public API reference.
+* Patterns: This section is much more like blogposts. Each one describes real world problems and how to solve them using Arrow. Pretty instructive.
+* Data Types: Docs for all the data types included in Arrow.
+* Type Classes: Docs for all the type classes included in Arrow.
+* Effects: Docs for all the effects module constructs, including type classes and data types.
+* Optics: Docs for the fancy optics DSL and all the related types.
+* Arrow Query Language: A human readable DSL used to build up arrow programs without the need for more specific knowledge. Usable over any query system.
+* Generic: We have some stuff generated at compile time under our `generic` module. Here you'll find the docs for it.
+* Integration: Docs for Arrow integration with third party libraries.
+* Free: Docs for Arrow Free Monads constructs.
+* Recursion schemes: Docs on how arrow achieves recursion schemes.
+* Legal: Credits and Licenses.
+
 ### 3. Add a permalink to your file
 
 Add the proper permalink to your docs on top position of your README file, as in:
