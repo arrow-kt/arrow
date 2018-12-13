@@ -1,5 +1,6 @@
 package arrow.ank
 
+import arrow.core.Tuple2
 import arrow.core.toT
 import arrow.instances.list.foldable.foldLeft
 import java.nio.file.Path
@@ -15,7 +16,7 @@ fun Long.humanBytes(): String {
   return String.format("%.1f %sB", this / Math.pow(unit.toDouble(), exp.toDouble()), pre)
 }
 
-fun ank(source: Path, target: Path, compilerArgs: List<String>, ankOps: AnkOps): Int =
+fun ank(source: Path, target: Path, compilerArgs: List<String>, ankOps: AnkOps): Tuple2<Int, Int> =
   with(ankOps) {
     printConsole(colored(ANSI_PURPLE, AnkHeader))
     val heapSize = Runtime.getRuntime().totalMemory()
@@ -24,7 +25,8 @@ fun ank(source: Path, target: Path, compilerArgs: List<String>, ankOps: AnkOps):
     println("Starting ank with Heap Size: ${heapSize.humanBytes()}, Max Heap Size: ${heapMaxSize.humanBytes()}")
     val path = createTargetDirectory(source, target)
     withDocs(path) { candidates ->
-      val generated = candidates.foldIndexed(0) { curr, generated, doc ->
+      val generated = candidates.foldIndexed(0 toT 0) { curr, acc, doc ->
+        val (generated, skipped) = acc
         if (curr % 1000 == 0) System.gc() //gc hint every 100 processed files.
         // ignore first one, then output on every 100 or every fifth when below 1000
         if (isAnkCandidate(doc)) {
@@ -39,12 +41,13 @@ fun ank(source: Path, target: Path, compilerArgs: List<String>, ankOps: AnkOps):
             val usedHeap = totalHeap - Runtime.getRuntime().freeMemory()
             val message = "Ank: Compiled ~> [$curr] ${path.relativize(doc)} | Used Heap: ${usedHeap.humanBytes()}"
             printConsole(colored(ANSI_GREEN, message))
-            generated + 1
+            generated + 1 toT skipped
           }
         } else {
           readFile(doc) { contentReader ->
             generateFile(doc, contentReader)
-            generated + 1
+            if (skipped % 100 == 0) printConsole(colored(ANSI_GREEN, "Ank: Skipped so far ~> [$skipped]"))
+            generated toT skipped + 1
           }
         }
       }
