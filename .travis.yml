@@ -35,13 +35,13 @@ jobs:
  include:
  - stage: build-and-dokka
    script:
-   # redirecting outputs to files to avoid exceeding travis' logs limit
    - ./gradlew clean build dokka
-   - ./gradlew :arrow-docs:runAnk
+   - travis_wait 10 ./gradlew :arrow-docs:runAnk
  - stage: build-and-dokka-transfer
    script:
    - ./gradlew clean build dokka
-   - ./gradlew :arrow-docs:runAnk
+   - travis_wait 10 ./gradlew :arrow-docs:runAnk
+   # redirecting outputs to files to avoid exceeding travis' logs limit
    - aws s3 sync modules/docs/arrow-docs/build/site s3://$S3_BUCKET/site > aws_sync_dokka.log
  - stage: coverage-report
    script:
