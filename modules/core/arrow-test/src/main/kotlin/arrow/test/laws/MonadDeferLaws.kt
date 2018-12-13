@@ -218,13 +218,13 @@ object MonadDeferLaws {
     forFew(5, genIntSmall()) { num: Int ->
       val sideEffect = SideEffect()
       val (binding, dispose) = bindingCancellable {
-        val a = bindDefer { Thread.sleep(500); num }
+        val a = bindDefer { Thread.sleep(20); num }
         sideEffect.increment()
         val b = bindDefer { a + 1 }
         val c = just(b + 1).bind()
         c
       }
-      Try { Thread.sleep(250); dispose() }.recover { throw it }
+      Try { Thread.sleep(10); dispose() }.recover { throw it }
       binding.equalUnderTheLaw(raiseError(BindingCancellationException()), EQ) && sideEffect.counter == 0
     }
 
@@ -234,10 +234,10 @@ object MonadDeferLaws {
       val (binding, dispose) = bindingCancellable {
         val a = bindDefer { num }
         sideEffect.increment()
-        val b = bindDefer { Thread.sleep(500); sideEffect.increment(); a + 1 }
+        val b = bindDefer { Thread.sleep(20); sideEffect.increment(); a + 1 }
         b
       }
-      Try { Thread.sleep(250); dispose() }.recover { throw it }
+      Try { Thread.sleep(10); dispose() }.recover { throw it }
       binding.equalUnderTheLaw(raiseError(BindingCancellationException()), EQ)
         && sideEffect.counter == 0
     }
@@ -246,13 +246,13 @@ object MonadDeferLaws {
     forFew(5, genIntSmall()) { num: Int ->
       val sideEffect = SideEffect()
       val (binding, dispose) = bindingCancellable {
-        val a = bindIn(Dispatchers.Default) { Thread.sleep(500); num }
+        val a = bindIn(Dispatchers.Default) { Thread.sleep(20); num }
         sideEffect.increment()
         val b = bindIn(Dispatchers.Default) { a + 1 }
         val c = just(b + 1).bind()
         c
       }
-      Try { Thread.sleep(250); dispose() }.recover { throw it }
+      Try { Thread.sleep(10); dispose() }.recover { throw it }
       binding.equalUnderTheLaw(raiseError(BindingCancellationException()), EQ) && sideEffect.counter == 0
     }
 
@@ -262,10 +262,10 @@ object MonadDeferLaws {
       val (binding, dispose) = bindingCancellable {
         val a = bindIn(Dispatchers.Default) { num }
         sideEffect.increment()
-        val b = bindIn(Dispatchers.Default) { Thread.sleep(500); sideEffect.increment(); a + 1 }
+        val b = bindIn(Dispatchers.Default) { Thread.sleep(20); sideEffect.increment(); a + 1 }
         b
       }
-      Try { Thread.sleep(250); dispose() }.recover { throw it }
+      Try { Thread.sleep(10); dispose() }.recover { throw it }
       binding.equalUnderTheLaw(raiseError(BindingCancellationException()), EQ)
         && sideEffect.counter == 0
     }
