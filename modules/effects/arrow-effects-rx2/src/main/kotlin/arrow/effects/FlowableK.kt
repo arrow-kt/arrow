@@ -32,11 +32,19 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
    * A way to safely acquire a resource and release in the face of errors and cancellation.
    * It uses [ExitCase] to distinguish between different exit cases when releasing the acquired resource.
    *
+<<<<<<< HEAD
    * @param use is the action to consume the resource and produce an [FlowableK] with the result.
    * Once the resulting [FlowableK] terminates, either successfully, error or disposed,
    * the [release] function will run to clean up the resources.
    *
    * @param release the allocated resource after the resulting [FlowableK] of [use] is terminates.
+=======
+   * @param use is the action to consume the resource and produce an [ObservableK] with the result.
+   * Once the resulting [ObservableK] terminates, either successfully, error or disposed,
+   * the [release] function will run to clean up the resources.
+   *
+   * @param release the allocated resource after the resulting [ObservableK] of [use] is terminates.
+>>>>>>> Add documentation
    *
    * {: data-executable='true'}
    * ```kotlin:ank
@@ -47,12 +55,21 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
    * class File(url: String) {
    *   fun open(): File = this
    *   fun close(): Unit {}
+<<<<<<< HEAD
    *   fun content(): FlowableK<String> =
    *     Flowable.just("This", "file", "contains", "some", "interesting", "content!").k()
    * }
    *
    * fun openFile(uri: String): FlowableK<File> = FlowableK { File(uri).open() }
    * fun closeFile(file: File): FlowableK<Unit> = FlowableK { file.close() }
+=======
+   *   fun content(): ObservableK<String> =
+   *     Flowable.just("This", "file", "contains", "some", "interesting", "content!").k()
+   * }
+   *
+   * fun openFile(uri: String): ObservableK<File> = ObservableK { File(uri).open() }
+   * fun closeFile(file: File): ObservableK<Unit> = ObservableK { file.close() }
+>>>>>>> Add documentation
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
