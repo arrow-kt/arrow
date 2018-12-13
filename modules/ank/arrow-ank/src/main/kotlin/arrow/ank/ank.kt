@@ -1,21 +1,8 @@
 package arrow.ank
 
-import arrow.Kind
 import arrow.core.toT
-import arrow.data.Nel
-import arrow.typeclasses.MonadContinuation
+import arrow.instances.list.foldable.foldLeft
 import java.nio.file.Path
-
-suspend fun <F, A> MonadContinuation<F, *>.profile(name: String, f: Kind<F, A>): Kind<F, A> {
-  val start = System.currentTimeMillis()
-  // Get current size of heap in bytes
-  val initialHeapSize = Runtime.getRuntime().totalMemory()
-  val result = f.bind()
-  val heapUsed = initialHeapSize - Runtime.getRuntime().freeMemory()
-  val end = (start - System.currentTimeMillis()).toDouble() / 1000.0
-  println("[$name] completed in $end seconds. Heap size: ${initialHeapSize.humanBytes()}. Heap used: ${heapUsed.humanBytes()}")
-  return just(result)
-}
 
 /**
  * From https://stackoverflow.com/questions/3758606/how-to-convert-byte-size-into-human-readable-format-in-java
@@ -28,54 +15,41 @@ fun Long.humanBytes(): String {
   return String.format("%.1f %sB", this / Math.pow(unit.toDouble(), exp.toDouble()), pre)
 }
 
-fun <F> ank(source: Path, target: Path, compilerArgs: List<String>, ankOps: AnkOps<F>): Kind<F, Int> = with(ankOps) {
-  MF().bindingCatch {
-    printConsole(colored(ANSI_PURPLE, AnkHeader)).bind()
+fun ank(source: Path, target: Path, compilerArgs: List<String>, ankOps: AnkOps): Int =
+  with(ankOps) {
+    printConsole(colored(ANSI_PURPLE, AnkHeader))
     val heapSize = Runtime.getRuntime().totalMemory()
     val heapMaxSize = Runtime.getRuntime().maxMemory()
     println("Current heap used: ${(heapSize - Runtime.getRuntime().freeMemory()).humanBytes()}")
     println("Starting ank with Heap Size: ${heapSize.humanBytes()}, Max Heap Size: ${heapMaxSize.humanBytes()}")
-    printConsole("")
-    val path = profile("createTargetDirectory", createTargetDirectory(source, target)).bind()
-    val candidates = profile("getCandidatePaths", getCandidatePaths(path)).bind()
-      .fold({ raiseError<Nel<Path>>(Exception("No matching files found")).bind() }, { it })
-
-    val generated = candidates.all.foldIndexed(MF().just(0)) { curr, acc, p ->
-      acc.flatMap { generated ->
-        MF().binding {
-          if (curr % 100 == 0) System.gc() // hint force GC every 1000 files
-          // ignore first one, then output on every 100 or every fifth when below 1000
-          val printAnkProgress = (curr % 100 == 0 || (candidates.size < 1000 && curr % 5 == 0))
-          if (curr != 0 && printAnkProgress) {
+    val path = createTargetDirectory(source, target)
+    withDocs(path) { candidates ->
+      val generated = candidates.foldIndexed(0) { curr, generated, doc ->
+        if (curr % 1000 == 0) System.gc() //gc hint every 100 processed files.
+        // ignore first one, then output on every 100 or every fifth when below 1000
+        if (isAnkCandidate(doc)) {
+          readFile(doc) { contentReader ->
+            val preProcessed = preProcessMacros(doc, contentReader)
+            val parsedMarkdown = parseMarkdown(preProcessed)
+            val snippets = extractCode(parsedMarkdown)
+            val compiledResult = compileCode(doc, snippets.b, compilerArgs)
+            val result = replaceAnkToLang(snippets.a toT compiledResult)
+            generateFile(doc, result)
             val totalHeap = Runtime.getRuntime().totalMemory()
             val usedHeap = totalHeap - Runtime.getRuntime().freeMemory()
-            val message = "Ank: Processed ~> [$curr of ${candidates.size}] Heap total: ${totalHeap.humanBytes()}. Used Heap: ${usedHeap.humanBytes()} ]"
-            printConsole(colored(ANSI_GREEN, message)).bind()
+            val message = "Ank: Compiled ~> [$curr] ${path.relativize(doc)} | Used Heap: ${usedHeap.humanBytes()}"
+            printConsole(colored(ANSI_GREEN, message))
+            generated + 1
           }
-
-          val content = readFile(p).bind()
-
-          val preProcessed = preProcessMacros(p toT content)
-
-          val parsedMarkdown = parseMarkdown(preProcessed).bind()
-
-          val snippets = extractCode(preProcessed, parsedMarkdown).bind()
-            .fold({ return@binding generated }, { it })
-
-          val compiledResult = compileCode(p toT snippets, compilerArgs).bind()
-
-          val result = replaceAnkToLang(preProcessed, compiledResult)
-
-          generateFile(p, result).bind()
-
-          generated + snippets.foldLeft(1) { a, s -> if (s.isOutFile) a + 1 else a }
+        } else {
+          readFile(doc) { contentReader ->
+            generateFile(doc, contentReader)
+            generated + 1
+          }
         }
       }
-    }.bind()
-
-    val message = "Ank: Processed ~> [${candidates.size} of ${candidates.size}]"
-    printConsole(colored(ANSI_GREEN, message)).bind()
-
-    generated
+      val message = "Ank: Generated $generated files"
+      printConsole(colored(ANSI_GREEN, message))
+      generated
+    }
   }
-}
