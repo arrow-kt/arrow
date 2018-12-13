@@ -67,6 +67,15 @@ fun <A> Deferred<A>.k(): DeferredK<A> =
 fun <A> CoroutineScope.asyncK(ctx: CoroutineContext = Dispatchers.Default, start: CoroutineStart = CoroutineStart.LAZY, f: suspend CoroutineScope.() -> A): DeferredK<A> =
   DeferredK.Generated(ctx, start, this) { f() }
 
+fun <A> CoroutineScope.asyncK2(ctx: CoroutineContext = Dispatchers.Default, start: CoroutineStart = CoroutineStart.LAZY, fa: suspend ((Either<Throwable, A>) -> Unit) -> Unit): DeferredK<A> =
+  DeferredK.Generated(ctx, start, this) {
+    CompletableDeferred<A>().apply {
+      fa {
+        it.fold(this::completeExceptionally, this::complete)
+      }
+    }.await()
+  }
+
 /**
  * Return the wrapped [Deferred] from a [DeferredK]
  *
@@ -294,17 +303,21 @@ sealed class DeferredK<A>(
    * }
    */
   fun <B> bracketCase(use: (A) -> DeferredK<B>, release: (A, ExitCase<Throwable>) -> DeferredK<Unit>): DeferredK<B> =
-    flatMap { a ->
-      use(a)
-        .flatMap { b ->
-          release(a, ExitCase.Completed).map { b }
-        }.handleErrorWith { e ->
-          when (e) {
-            //TODO investigate how cancellation works / how to trigger this case for kotlinx.coroutines.Deferred.
-            is CancellationException -> release(a, ExitCase.Cancelled)
-            else -> release(a, ExitCase.Error(e))
-          }.flatMap { DeferredK.raiseError<B>(e) }
-        }
+    DeferredK.Generated(scope().coroutineContext, CoroutineStart.LAZY, scope()) {
+      val a = await()
+      Try { use(a).await() }.fold({ e ->
+        Try {
+          if (e is CancellationException) release(a, ExitCase.Cancelled).await()
+          else release(a, ExitCase.Error(e)).await()
+        }.fold({ e2 ->
+          throw e2 //todo throw composite failure
+        }, {
+          throw e
+        })
+      }, { b ->
+        release(a, ExitCase.Completed).await()
+        b
+      })
     }
 
   /**

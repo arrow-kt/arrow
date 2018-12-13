@@ -6,7 +6,9 @@ import arrow.core.Try
 import arrow.data.ListK
 import arrow.data.NonEmptyList
 import arrow.data.k
+import arrow.effects.deferredk.applicativeError.attempt
 import arrow.effects.deferredk.async.async
+import arrow.effects.typeclasses.ExitCase
 import arrow.instances.`try`.functor.functor
 import arrow.instances.`try`.traverse.traverse
 import arrow.instances.listk.functor.functor
@@ -26,11 +28,11 @@ import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.Unconfined
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.runBlocking
 import org.junit.runner.RunWith
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 @RunWith(KTestJUnitRunner::class)
 class DeferredKTest : UnitSpec() {
@@ -174,6 +176,35 @@ class DeferredKTest : UnitSpec() {
             checkAwaitAll(Option.functor(), Option.traverse(), Option.just(x)) &&
             checkAwaitAll(Try.functor(), Try.traverse(), Try.just(x))
         }
+      }
+    }
+
+    "test" {
+      runBlocking {
+        lateinit var ec: ExitCase<Throwable>
+        val countDownLatch = CountDownLatch(1)
+        DeferredK.just(Unit)
+          .bracketCase(
+            use = { DeferredK.async<Nothing> { } },
+            release = { _, exitCase ->
+              DeferredK {
+                ec = exitCase
+                countDownLatch.countDown()
+              }
+            }
+          )
+          .value().run {
+            async(Dispatchers.Default) {
+              delay(10)
+              cancel()
+            }
+            withContext(Dispatchers.Default) {
+              k().unsafeAttemptSync()
+            }
+          }
+
+        countDownLatch.await(50, TimeUnit.MILLISECONDS)
+        ec shouldBe ExitCase.Cancelled
       }
     }
   }
