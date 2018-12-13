@@ -7,7 +7,7 @@ jdk:
 
 before_script:
   - "echo $JAVA_OPTS"
-  - "export JAVA_OPTS=-Xmx4g -XX:-UseGCOverheadLimit"
+  - "export JAVA_OPTS=-XX:-UseGCOverheadLimit"
 
 stages:
 - name: build-and-dokka
