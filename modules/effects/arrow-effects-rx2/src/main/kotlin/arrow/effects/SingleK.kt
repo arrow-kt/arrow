@@ -28,6 +28,49 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
   fun <B> flatMap(f: (A) -> SingleKOf<B>): SingleK<B> =
     single.flatMap { f(it).fix().single }.k()
 
+  /**
+   * A way to safely acquire a resource and release in the face of errors and cancellation.
+   * It uses [ExitCase] to distinguish between different exit cases when releasing the acquired resource.
+   *
+   * @param use is the action to consume the resource and produce an [SingleK] with the result.
+   * Once the resulting [SingleK] terminates, either successfully, error or disposed,
+   * the [release] function will run to clean up the resources.
+   *
+   * @param release the allocated resource after the resulting [SingleK] of [use] is terminates.
+   *
+   * {: data-executable='true'}
+   * ```kotlin:ank
+   * import arrow.effects.*
+   * import arrow.effects.typeclasses.ExitCase
+   *
+   * class File(url: String) {
+   *   fun open(): File = this
+   *   fun close(): Unit {}
+   *   fun content(): SingleK<String> =
+   *     SingleK.just("This file contains some interesting content!")
+   * }
+   *
+   * fun openFile(uri: String): SingleK<File> = SingleK { File(uri).open() }
+   * fun closeFile(file: File): SingleK<Unit> = SingleK { file.close() }
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val safeComputation = openFile("data.json").bracketCase(
+   *     release = { file, exitCase ->
+   *       when (exitCase) {
+   *         is ExitCase.Completed -> { /* do something */ }
+   *         is ExitCase.Cancelled -> { /* do something */ }
+   *         is ExitCase.Error -> { /* do something */ }
+   *       }
+   *       closeFile(file)
+   *     },
+   *     use = { file -> file.content() }
+   *   )
+   *   //sampleEnd
+   *   println(safeComputation)
+   * }
+   *  ```
+   */
   fun <B> bracketCase(use: (A) -> SingleKOf<B>, release: (A, ExitCase<Throwable>) -> SingleKOf<Unit>): SingleK<B> =
     flatMap { a ->
       Single.create<B> { emitter ->

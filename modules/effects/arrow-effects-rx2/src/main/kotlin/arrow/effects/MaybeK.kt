@@ -25,6 +25,50 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
   fun <B> flatMap(f: (A) -> MaybeKOf<B>): MaybeK<B> =
     maybe.flatMap { f(it).fix().maybe }.k()
 
+
+  /**
+   * A way to safely acquire a resource and release in the face of errors and cancellation.
+   * It uses [ExitCase] to distinguish between different exit cases when releasing the acquired resource.
+   *
+   * @param use is the action to consume the resource and produce an [MaybeK] with the result.
+   * Once the resulting [MaybeK] terminates, either successfully, error or disposed,
+   * the [release] function will run to clean up the resources.
+   *
+   * @param release the allocated resource after the resulting [MaybeK] of [use] is terminates.
+   *
+   * {: data-executable='true'}
+   * ```kotlin:ank
+   * import arrow.effects.*
+   * import arrow.effects.typeclasses.ExitCase
+   *
+   * class File(url: String) {
+   *   fun open(): File = this
+   *   fun close(): Unit {}
+   *   fun content(): MaybeK<String> =
+   *     MaybeK.just("This file contains some interesting content!")
+   * }
+   *
+   * fun openFile(uri: String): MaybeK<File> = MaybeK { File(uri).open() }
+   * fun closeFile(file: File): MaybeK<Unit> = MaybeK { file.close() }
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val safeComputation = openFile("data.json").bracketCase(
+   *     release = { file, exitCase ->
+   *       when (exitCase) {
+   *         is ExitCase.Completed -> { /* do something */ }
+   *         is ExitCase.Cancelled -> { /* do something */ }
+   *         is ExitCase.Error -> { /* do something */ }
+   *       }
+   *       closeFile(file)
+   *     },
+   *     use = { file -> file.content() }
+   *   )
+   *   //sampleEnd
+   *   println(safeComputation)
+   * }
+   *  ```
+   */
   fun <B> bracketCase(use: (A) -> MaybeKOf<B>, release: (A, ExitCase<Throwable>) -> MaybeKOf<Unit>): MaybeK<B> =
     flatMap { a ->
       Maybe.create<B> { emitter ->

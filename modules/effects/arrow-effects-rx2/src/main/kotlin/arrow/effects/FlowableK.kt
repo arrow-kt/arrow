@@ -29,6 +29,50 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
   fun <B> flatMap(f: (A) -> FlowableKOf<B>): FlowableK<B> =
     flowable.flatMap { f(it).fix().flowable }.k()
 
+  /**
+   * A way to safely acquire a resource and release in the face of errors and cancellation.
+   * It uses [ExitCase] to distinguish between different exit cases when releasing the acquired resource.
+   *
+   * @param use is the action to consume the resource and produce an [ObservableK] with the result.
+   * Once the resulting [ObservableK] terminates, either successfully, error or disposed,
+   * the [release] function will run to clean up the resources.
+   *
+   * @param release the allocated resource after the resulting [ObservableK] of [use] is terminates.
+   *
+   * {: data-executable='true'}
+   * ```kotlin:ank
+   * import io.reactivex.Flowable
+   * import arrow.effects.*
+   * import arrow.effects.typeclasses.ExitCase
+   *
+   * class File(url: String) {
+   *   fun open(): File = this
+   *   fun close(): Unit {}
+   *   fun content(): ObservableK<String> =
+   *     Flowable.just("This", "file", "contains", "some", "interesting", "content!").k()
+   * }
+   *
+   * fun openFile(uri: String): ObservableK<File> = ObservableK { File(uri).open() }
+   * fun closeFile(file: File): ObservableK<Unit> = ObservableK { file.close() }
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val safeComputation = openFile("data.json").bracketCase(
+   *     release = { file, exitCase ->
+   *       when (exitCase) {
+   *         is ExitCase.Completed -> { /* do something */ }
+   *         is ExitCase.Cancelled -> { /* do something */ }
+   *         is ExitCase.Error -> { /* do something */ }
+   *       }
+   *       closeFile(file)
+   *     },
+   *     use = { file -> file.content() }
+   *   )
+   *   //sampleEnd
+   *   println(safeComputation)
+   * }
+   *  ```
+   */
   fun <B> bracketCase(use: (A) -> FlowableKOf<B>, release: (A, ExitCase<Throwable>) -> FlowableKOf<Unit>): FlowableK<B> =
     flatMap { a ->
       Flowable.unsafeCreate<B> { s ->

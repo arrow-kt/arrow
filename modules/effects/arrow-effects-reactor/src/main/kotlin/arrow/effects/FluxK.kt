@@ -29,6 +29,50 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
   fun <B> flatMap(f: (A) -> FluxKOf<B>): FluxK<B> =
     flux.flatMap { f(it).fix().flux }.k()
 
+  /**
+   * A way to safely acquire a resource and release in the face of errors and cancellation.
+   * It uses [ExitCase] to distinguish between different exit cases when releasing the acquired resource.
+   *
+   * @param use is the action to consume the resource and produce an [FluxK] with the result.
+   * Once the resulting [FluxK] terminates, either successfully, error or disposed,
+   * the [release] function will run to clean up the resources.
+   *
+   * @param release the allocated resource after the resulting [FluxK] of [use] is terminates.
+   *
+   * {: data-executable='true'}
+   * ```kotlin:ank
+   * import reactor.core.publisher.Flux
+   * import arrow.effects.*
+   * import arrow.effects.typeclasses.ExitCase
+   *
+   * class File(url: String) {
+   *   fun open(): File = this
+   *   fun close(): Unit {}
+   *   fun content(): FluxK<String> =
+   *     Flux.just("This", "file", "contains", "some", "interesting", "content!").k()
+   * }
+   *
+   * fun openFile(uri: String): FluxK<File> = FluxK { File(uri).open() }
+   * fun closeFile(file: File): FluxK<Unit> = FluxK { file.close() }
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val safeComputation = openFile("data.json").bracketCase(
+   *     release = { file, exitCase ->
+   *       when (exitCase) {
+   *         is ExitCase.Completed -> { /* do something */ }
+   *         is ExitCase.Cancelled -> { /* do something */ }
+   *         is ExitCase.Error -> { /* do something */ }
+   *       }
+   *       closeFile(file)
+   *     },
+   *     use = { file -> file.content() }
+   *   )
+   *   //sampleEnd
+   *   println(safeComputation)
+   * }
+   *  ```
+   */
   fun <B> bracketCase(use: (A) -> FluxKOf<B>, release: (A, ExitCase<Throwable>) -> FluxKOf<Unit>): FluxK<B> =
     flatMap { a ->
       Flux.create<B> { sink ->
