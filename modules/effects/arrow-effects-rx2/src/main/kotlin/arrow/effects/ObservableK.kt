@@ -11,7 +11,6 @@ import arrow.typeclasses.Applicative
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
 import kotlin.coroutines.CoroutineContext
-import io.reactivex.disposables.Disposable as RxDisposable
 
 fun <A> Observable<A>.k(): ObservableK<A> = ObservableK(this)
 
