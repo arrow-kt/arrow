@@ -28,9 +28,14 @@ interface Async<F> : MonadDefer<F> {
   fun <A> async(fa: Proc<A>): Kind<F, A>
 
   /**
-   * [[async]] variant that can suspend side effects in the provided registration function. On this variant, the passed
+   * [async] variant that can suspend side effects in the provided registration function. On this variant, the passed
    * in function is injected with a side-effectful callback for signaling the final result of an asynchronous process.
    * Its returned result needs to be a pure `F[Unit]` that gets evaluated by the runtime.
+   *
+   * ```kotlin
+   *
+   * ```
+   *
    */
   fun <A> asyncF(k: ProcF<F, A>): Kind<F, A>
 
@@ -58,23 +63,24 @@ interface Async<F> : MonadDefer<F> {
   fun <A> never(): Kind<F, A> =
     async { }
 
-  fun <A> cancellable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<F>): Kind<F, A> = asyncF { cb ->
-    val latch: Promise<F, Unit> = Promise.unsafeUncancelable(this)
-    val latchF = asyncF<Unit> { cb2 -> latch.get.map { cb2(rightUnit) } }
-    val token = k { r ->
-      latch.complete(Unit)
-      cb(r)
-    }
-
-    just(token).bracketCase(use = { latchF }, release = { r, exitCase ->
-      when (exitCase) {
-        is ExitCase.Cancelled -> r
-        else -> just(Unit)
+  fun <A> cancellable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<F>): Kind<F, A> = Promise.uncancelable<F, Unit>(this).flatMap { promise ->
+    asyncF<A> { cb ->
+      val latchF = asyncF<Unit> { cb2 -> promise.get.map { cb2(rightUnit) } }
+      val token = k { r ->
+        promise.complete(Unit)
+        cb(r)
       }
-    })
+
+      just(token).bracketCase(use = { latchF }, release = { r, exitCase ->
+        when (exitCase) {
+          is ExitCase.Cancelled -> r
+          else -> just(Unit)
+        }
+      })
+    }
   }
 
-  fun <F, A> cancellableF(k: ((Either<Throwable, A>) -> Unit) -> Kind<F, CancelToken<F>>, AS: Async<F>): Kind<F, A> = AS.run {
+  fun <A> cancellableF(k: ((Either<Throwable, A>) -> Unit) -> Kind<F, CancelToken<F>>, AS: Async<F>): Kind<F, A> =
     asyncF { cb ->
       val state = AtomicReference<(Either<Throwable, Unit>) -> Unit>(null)
       val cb1 = { r: Either<Throwable, A> ->
@@ -88,6 +94,7 @@ interface Async<F> : MonadDefer<F> {
           }
         }
       }
+
       k(cb1).bracketCase(use = {
         async<Unit> { cb ->
           if (!state.compareAndSet(null, cb)) cb(rightUnit)
@@ -99,7 +106,6 @@ interface Async<F> : MonadDefer<F> {
         }
       })
     }
-  }
 
 }
 
