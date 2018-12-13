@@ -2,6 +2,9 @@ package arrow.effects.typeclasses
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.core.Right
+import arrow.effects.Promise
+import arrow.effects.internal.CancelToken
 import arrow.typeclasses.MonadContinuation
 import kotlin.coroutines.CoroutineContext
 
@@ -38,4 +41,21 @@ interface Async<F> : MonadDefer<F> {
 
   fun <A> never(): Kind<F, A> =
     async { }
+
+  fun <A> cancellable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<F>): Kind<F, A> = asyncF { cb ->
+    val latch: Promise<F, Unit> = Promise.unsafeUncancelable(this)
+    val latchF = asyncF<Unit> { cb2 -> latch.get.map { cb2(Right(Unit)) } }
+    val token = k { r ->
+      latch.complete(Unit)
+      cb(r)
+    }
+
+    just(token).bracketCase(use = { latchF }, release = { r, exitCase ->
+      when (exitCase) {
+        is ExitCase.Cancelled -> r
+        else -> just(Unit)
+      }
+    })
+  }
+
 }

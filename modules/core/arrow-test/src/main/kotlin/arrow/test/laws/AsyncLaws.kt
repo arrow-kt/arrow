@@ -102,6 +102,12 @@ object AsyncLaws {
       }.equalUnderTheLaw(just(b), EQ)
     }
 
+  fun <F> Async<F>.asyncCancelableCoherence(EQ: Eq<Kind<F, Int>>): Unit =
+    forAll(genEither(genThrowable(), Gen.int())) { eith ->
+      async<Int> { cb -> cb(eith) }
+        .equalUnderTheLaw(cancellable { cb -> cb(eith); just(Unit) }, EQ)
+    }
+
   // Turns out that kotlinx.coroutines decides to rewrite thread names
   private fun getCurrentThread() =
     Thread.currentThread().name.substringBefore(' ').toInt()
