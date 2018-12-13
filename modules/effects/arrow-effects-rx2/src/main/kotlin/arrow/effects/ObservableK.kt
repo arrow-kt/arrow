@@ -162,15 +162,14 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
 
     fun <A> asyncF(fa: ProcF<ForObservableK, A>): ObservableK<A> =
       Observable.create { emitter: ObservableEmitter<A> ->
-        val d = fa { either: Either<Throwable, A> ->
+        fa { either: Either<Throwable, A> ->
           either.fold({
             emitter.onError(it)
           }, {
             emitter.onNext(it)
             emitter.onComplete()
           })
-        }.fix().observable.subscribe()
-        emitter.setDisposable(d)
+        }.fix().observable.subscribe({}, emitter::onError)
       }.k()
 
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> ObservableKOf<Either<A, B>>): ObservableK<B> {

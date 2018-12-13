@@ -17,7 +17,7 @@ import kotlin.coroutines.CoroutineContext
 
 @extension
 interface FlowableKFunctorInstance : Functor<ForFlowableK> {
-  override fun <A, B> Kind<ForFlowableK, A>.map(f: (A) -> B): FlowableK<B> =
+  override fun <A, B> FlowableKOf<A>.map(f: (A) -> B): FlowableK<B> =
     fix().map(f)
 }
 
@@ -26,7 +26,7 @@ interface FlowableKApplicativeInstance : Applicative<ForFlowableK> {
   override fun <A, B> FlowableKOf<A>.ap(ff: FlowableKOf<(A) -> B>): FlowableK<B> =
     fix().ap(ff)
 
-  override fun <A, B> Kind<ForFlowableK, A>.map(f: (A) -> B): FlowableK<B> =
+  override fun <A, B> FlowableKOf<A>.map(f: (A) -> B): FlowableK<B> =
     fix().map(f)
 
   override fun <A> just(a: A): FlowableK<A> =
@@ -38,13 +38,13 @@ interface FlowableKMonadInstance : Monad<ForFlowableK> {
   override fun <A, B> FlowableKOf<A>.ap(ff: FlowableKOf<(A) -> B>): FlowableK<B> =
     fix().ap(ff)
 
-  override fun <A, B> FlowableKOf<A>.flatMap(f: (A) -> Kind<ForFlowableK, B>): FlowableK<B> =
+  override fun <A, B> FlowableKOf<A>.flatMap(f: (A) -> FlowableKOf<B>): FlowableK<B> =
     fix().flatMap(f)
 
   override fun <A, B> FlowableKOf<A>.map(f: (A) -> B): FlowableK<B> =
     fix().map(f)
 
-  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, FlowableKOf<arrow.core.Either<A, B>>>): FlowableK<B> =
+  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, FlowableKOf<Either<A, B>>>): FlowableK<B> =
     FlowableK.tailRecM(a, f)
 
   override fun <A> just(a: A): FlowableK<A> =
@@ -53,25 +53,25 @@ interface FlowableKMonadInstance : Monad<ForFlowableK> {
 
 @extension
 interface FlowableKFoldableInstance : Foldable<ForFlowableK> {
-  override fun <A, B> Kind<ForFlowableK, A>.foldLeft(b: B, f: (B, A) -> B): B =
+  override fun <A, B> FlowableKOf<A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
 
-  override fun <A, B> Kind<ForFlowableK, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): arrow.core.Eval<B> =
+  override fun <A, B> FlowableKOf<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): arrow.core.Eval<B> =
     fix().foldRight(lb, f)
 }
 
 @extension
 interface FlowableKTraverseInstance : Traverse<ForFlowableK> {
-  override fun <A, B> Kind<ForFlowableK, A>.map(f: (A) -> B): FlowableK<B> =
+  override fun <A, B> FlowableKOf<A>.map(f: (A) -> B): FlowableK<B> =
     fix().map(f)
 
   override fun <G, A, B> FlowableKOf<A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, FlowableK<B>> =
     fix().traverse(AP, f)
 
-  override fun <A, B> Kind<ForFlowableK, A>.foldLeft(b: B, f: (B, A) -> B): B =
+  override fun <A, B> FlowableKOf<A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
 
-  override fun <A, B> Kind<ForFlowableK, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): arrow.core.Eval<B> =
+  override fun <A, B> FlowableKOf<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): arrow.core.Eval<B> =
     fix().foldRight(lb, f)
 }
 
@@ -102,7 +102,7 @@ interface FlowableKMonadThrowInstance : MonadThrow<ForFlowableK>, FlowableKMonad
 
 @extension
 interface FlowableKBracketInstance : Bracket<ForFlowableK, Throwable>, FlowableKMonadThrowInstance {
-  override fun <A, B> Kind<ForFlowableK, A>.bracketCase(release: (A, ExitCase<Throwable>) -> Kind<ForFlowableK, Unit>, use: (A) -> Kind<ForFlowableK, B>): FlowableK<B> =
+  override fun <A, B> FlowableKOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> FlowableKOf<Unit>, use: (A) -> FlowableKOf<B>): FlowableK<B> =
     fix().bracketCase({ use(it) }, { a, e -> release(a, e) })
 }
 
@@ -121,6 +121,9 @@ interface FlowableKAsyncInstance :
   override fun <A> async(fa: Proc<A>): FlowableK<A> =
     FlowableK.async(fa, BS())
 
+  override fun <A> asyncF(k: ProcF<ForFlowableK, A>): FlowableKOf<A> =
+    FlowableK.asyncF(k, BS())
+
   override fun <A> FlowableKOf<A>.continueOn(ctx: CoroutineContext): FlowableK<A> =
     fix().continueOn(ctx)
 }
@@ -135,31 +138,31 @@ interface FlowableKEffectInstance :
 
 @extension
 interface FlowableKConcurrentEffectInstance : ConcurrentEffect<ForFlowableK>, FlowableKEffectInstance {
-  override fun <A> Kind<ForFlowableK, A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> FlowableKOf<Unit>): FlowableK<Disposable> =
+  override fun <A> FlowableKOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> FlowableKOf<Unit>): FlowableK<Disposable> =
     fix().runAsyncCancellable(cb)
 }
 
 fun FlowableK.Companion.monadFlat(): FlowableKMonadInstance = monad()
 
 fun FlowableK.Companion.monadConcat(): FlowableKMonadInstance = object : FlowableKMonadInstance {
-  override fun <A, B> Kind<ForFlowableK, A>.flatMap(f: (A) -> Kind<ForFlowableK, B>): FlowableK<B> =
+  override fun <A, B> FlowableKOf<A>.flatMap(f: (A) -> FlowableKOf<B>): FlowableK<B> =
     fix().concatMap { f(it).fix() }
 }
 
 fun FlowableK.Companion.monadSwitch(): FlowableKMonadInstance = object : FlowableKMonadInstance {
-  override fun <A, B> Kind<ForFlowableK, A>.flatMap(f: (A) -> Kind<ForFlowableK, B>): FlowableK<B> =
+  override fun <A, B> FlowableKOf<A>.flatMap(f: (A) -> FlowableKOf<B>): FlowableK<B> =
     fix().switchMap { f(it).fix() }
 }
 
 fun FlowableK.Companion.monadErrorFlat(): FlowableKMonadErrorInstance = monadError()
 
 fun FlowableK.Companion.monadErrorConcat(): FlowableKMonadErrorInstance = object : FlowableKMonadErrorInstance {
-  override fun <A, B> Kind<ForFlowableK, A>.flatMap(f: (A) -> Kind<ForFlowableK, B>): FlowableK<B> =
+  override fun <A, B> FlowableKOf<A>.flatMap(f: (A) -> FlowableKOf<B>): FlowableK<B> =
     fix().concatMap { f(it).fix() }
 }
 
 fun FlowableK.Companion.monadErrorSwitch(): FlowableKMonadErrorInstance = object : FlowableKMonadErrorInstance {
-  override fun <A, B> Kind<ForFlowableK, A>.flatMap(f: (A) -> Kind<ForFlowableK, B>): FlowableK<B> =
+  override fun <A, B> FlowableKOf<A>.flatMap(f: (A) -> FlowableKOf<B>): FlowableK<B> =
     fix().switchMap { f(it).fix() }
 }
 

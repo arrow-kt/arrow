@@ -6,6 +6,7 @@ import arrow.effects.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.Proc
+import arrow.effects.typeclasses.ProcF
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import io.reactivex.BackpressureStrategy
@@ -160,6 +161,18 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
           })
 
         }
+      }, mode).k()
+
+    fun <A> asyncF(fa: ProcF<ForFlowableK, A>, mode: BackpressureStrategy = BackpressureStrategy.BUFFER): FlowableK<A> =
+      Flowable.create({ emitter: FlowableEmitter<A> ->
+        fa { either: Either<Throwable, A> ->
+          either.fold({
+            emitter.onError(it)
+          }, {
+            emitter.onNext(it)
+            emitter.onComplete()
+          })
+        }.fix().flowable.subscribe({}, emitter::onError)
       }, mode).k()
 
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> FlowableKOf<Either<A, B>>): FlowableK<B> {
