@@ -32,6 +32,7 @@ sealed class KindConnection<F> {
    *
    * Guaranteed idempotency - calling it multiple times should have the same side-effect as calling it only
    * once. Implementations of this method should also be thread-safe.
+<<<<<<< HEAD
    *
    * {: data-executable='true'}
    *
@@ -49,6 +50,8 @@ sealed class KindConnection<F> {
    *   //sampleEnd
    * }
    * ```
+=======
+>>>>>>> Add KindConnection
    */
   abstract fun cancel(): CancelToken<F>
 
@@ -57,6 +60,7 @@ sealed class KindConnection<F> {
   /**
    * Pushes a cancellation function, or token, meant to cancel and cleanup resources.
    * These functions are kept inside a stack, and executed in FIFO order on cancellation.
+<<<<<<< HEAD
    *
    * {: data-executable='true'}
    *
@@ -73,6 +77,8 @@ sealed class KindConnection<F> {
    *   //sampleEnd
    * }
    * ```
+=======
+>>>>>>> Add KindConnection
    */
   abstract fun push(token: CancelToken<F>): Unit
 
@@ -80,6 +86,7 @@ sealed class KindConnection<F> {
    * Pushes a pair of [KindConnection] on the stack, which on cancellation will get trampolined. This is useful in
    * race for example, because combining a whole collection of tasks, two by two, can lead to building a
    * cancelable that's stack unsafe.
+<<<<<<< HEAD
    *
    * {: data-executable='true'}
    *
@@ -99,6 +106,8 @@ sealed class KindConnection<F> {
    *   //sampleEnd
    * }
    * ```
+=======
+>>>>>>> Add KindConnection
    */
   abstract fun pushPair(lh: KindConnection<F>, rh: KindConnection<F>): Unit
 
@@ -107,6 +116,7 @@ sealed class KindConnection<F> {
    * A cancelable reference is meant to cancel and cleanup resources.
    *
    * @return the cancelable reference that was removed.
+<<<<<<< HEAD
    *
    * {: data-executable='true'}
    *
@@ -175,22 +185,6 @@ sealed class KindConnection<F> {
     operator fun <F> invoke(MD: MonadDefer<F>, run: (CancelToken<F>) -> Unit): KindConnection<F> =
       DefaultKindConnection(MD, run)
 
-    /**
-     * Construct an uncancelable [KindConnection] for a kind [F] based on [MonadDefer].
-     *
-     * {: data-executable='true'}
-     *
-     * ```kotlin:ank
-     * import arrow.effects.*
-     * import arrow.effects.instances.io.applicative.applicative
-     *
-     * fun main(args: Array<String>) {
-     *   //sampleStart
-     *   val conn: IOConnection = KindConnection.uncancelable(IO.applicative())
-     *   //sampleEnd
-     * }
-     * ```
-     **/
     fun <F> uncancelable(FA: Applicative<F>): KindConnection<F> = Uncancelable(FA)
   }
 
