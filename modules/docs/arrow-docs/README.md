@@ -1,6 +1,6 @@
 # Arrow docs
 
-_Arrow documentation deployed to the website._
+Arrow documentation deployed to the website.
 
 ## How to contribute
 
