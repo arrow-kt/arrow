@@ -5,6 +5,10 @@ dist: trusty
 jdk:
 - oraclejdk8
 
+before_script:
+  - "echo $JAVA_OPTS"
+  - "export JAVA_OPTS=-Xmx4g"
+
 stages:
 - name: build-and-dokka
   if: branch != master OR type = pull_request
