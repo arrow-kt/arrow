@@ -11,7 +11,7 @@ import arrow.typeclasses.MonadContinuation
 import java.util.concurrent.atomic.AtomicReference
 import arrow.core.left
 import arrow.effects.*
-import arrow.effects.internal.asyncIOContinuation
+import arrow.effects.internal.asyncContinuation
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine
@@ -32,6 +32,7 @@ typealias Proc<A> = ((Either<Throwable, A>) -> Unit) -> Unit
 interface Async<F> : MonadDefer<F> {
 
   /**
+<<<<<<< HEAD
    * Creates an instance of [F] that executes an asynchronous process on evaluation.
    *
    * This combinator can be used to wrap callbacks or other similar impure code.
@@ -98,6 +99,16 @@ interface Async<F> : MonadDefer<F> {
    * ```
    *
    * @see async for a simpler, non suspending version.
+=======
+   * [async] variant that can suspend side effects in the provided registration function. On this variant, the passed
+   * in function is injected with a side-effectful callback for signaling the final result of an asynchronous process.
+   * Its returned result needs to be a pure `F[Unit]` that gets evaluated by the runtime.
+   *
+   * ```kotlin
+   *
+   * ```
+   *
+>>>>>>> Fix API cancellableF
    */
   fun <A> asyncF(k: ProcF<F, A>): Kind<F, A>
 
