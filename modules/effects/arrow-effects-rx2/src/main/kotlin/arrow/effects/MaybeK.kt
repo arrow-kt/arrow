@@ -25,7 +25,6 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
   fun <B> flatMap(f: (A) -> MaybeKOf<B>): MaybeK<B> =
     maybe.flatMap { f(it).fix().maybe }.k()
 
-
   /**
    * A way to safely acquire a resource and release in the face of errors and cancellation.
    * It uses [ExitCase] to distinguish between different exit cases when releasing the acquired resource.

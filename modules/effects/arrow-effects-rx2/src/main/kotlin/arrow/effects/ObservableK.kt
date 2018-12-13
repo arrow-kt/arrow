@@ -11,7 +11,6 @@ import arrow.typeclasses.Applicative
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
 import kotlin.coroutines.CoroutineContext
-import io.reactivex.disposables.Disposable as RxDisposable
 
 fun <A> Observable<A>.k(): ObservableK<A> = ObservableK(this)
 
@@ -75,7 +74,7 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
    */
   fun <B> bracketCase(use: (A) -> ObservableKOf<B>, release: (A, ExitCase<Throwable>) -> ObservableKOf<Unit>): ObservableK<B> =
     flatMap { a ->
-      Observable.create<B> { sink ->
+      Observable.create<B> { emitter ->
         val d = use(a).fix()
           .flatMap { b ->
             release(a, ExitCase.Completed)
@@ -83,8 +82,8 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
           }.handleErrorWith { e ->
             release(a, ExitCase.Error(e))
               .fix().flatMap { ObservableK.raiseError<B>(e) }
-          }.observable.subscribe({ b -> sink.onNext(b) }, sink::onError, sink::onComplete)
-        sink.setDisposable(d.onDispose { release(a, ExitCase.Cancelled).fix().observable.subscribe({}, sink::onError, {}) })
+          }.observable.subscribe({ b -> emitter.onNext(b) }, emitter::onError, emitter::onComplete)
+        emitter.setDisposable(d.onDispose { release(a, ExitCase.Cancelled).fix().observable.subscribe({}, emitter::onError, {}) })
       }.k()
     }
 

@@ -33,11 +33,11 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
    * A way to safely acquire a resource and release in the face of errors and cancellation.
    * It uses [ExitCase] to distinguish between different exit cases when releasing the acquired resource.
    *
-   * @param use is the action to consume the resource and produce an [ObservableK] with the result.
-   * Once the resulting [ObservableK] terminates, either successfully, error or disposed,
+   * @param use is the action to consume the resource and produce an [FlowableK] with the result.
+   * Once the resulting [FlowableK] terminates, either successfully, error or disposed,
    * the [release] function will run to clean up the resources.
    *
-   * @param release the allocated resource after the resulting [ObservableK] of [use] is terminates.
+   * @param release the allocated resource after the resulting [FlowableK] of [use] is terminates.
    *
    * {: data-executable='true'}
    * ```kotlin:ank
@@ -48,12 +48,12 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
    * class File(url: String) {
    *   fun open(): File = this
    *   fun close(): Unit {}
-   *   fun content(): ObservableK<String> =
+   *   fun content(): FlowableK<String> =
    *     Flowable.just("This", "file", "contains", "some", "interesting", "content!").k()
    * }
    *
-   * fun openFile(uri: String): ObservableK<File> = ObservableK { File(uri).open() }
-   * fun closeFile(file: File): ObservableK<Unit> = ObservableK { file.close() }
+   * fun openFile(uri: String): FlowableK<File> = FlowableK { File(uri).open() }
+   * fun closeFile(file: File): FlowableK<Unit> = FlowableK { file.close() }
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
@@ -75,7 +75,7 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
    */
   fun <B> bracketCase(use: (A) -> FlowableKOf<B>, release: (A, ExitCase<Throwable>) -> FlowableKOf<Unit>): FlowableK<B> =
     flatMap { a ->
-      Flowable.unsafeCreate<B> { s ->
+      Flowable.unsafeCreate<B> { subscriber ->
         use(a).fix()
           .flatMap { b ->
             release(a, ExitCase.Completed)
@@ -83,8 +83,8 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
           }.handleErrorWith { e ->
             release(a, ExitCase.Error(e))
               .fix().flatMap { FlowableK.raiseError<B>(e) }
-          }.flowable.subscribe(s::onNext, s::onError, s::onComplete) { d ->
-          s.onSubscribe(d.onCancel { release(a, ExitCase.Cancelled).fix().flowable.subscribe({}, s::onError) })
+          }.flowable.subscribe(subscriber::onNext, subscriber::onError, subscriber::onComplete) { d ->
+          subscriber.onSubscribe(d.onCancel { release(a, ExitCase.Cancelled).fix().flowable.subscribe({}, subscriber::onError) })
         }
       }.k()
     }
