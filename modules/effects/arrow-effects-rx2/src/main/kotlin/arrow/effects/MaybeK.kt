@@ -4,6 +4,7 @@ import arrow.core.*
 import arrow.effects.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.Proc
+import arrow.effects.typeclasses.ProcF
 import arrow.higherkind
 import io.reactivex.Maybe
 import io.reactivex.MaybeEmitter
@@ -142,6 +143,17 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
           })
 
         }
+      }.k()
+
+    fun <A> asyncF(fa: ProcF<ForMaybeK, A>): MaybeK<A> =
+      Maybe.create { emitter: MaybeEmitter<A> ->
+        fa { either: Either<Throwable, A> ->
+          either.fold({
+            emitter.onError(it)
+          }, {
+            emitter.onSuccess(it)
+          })
+        }.fix().maybe.subscribe({}, emitter::onError)
       }.k()
 
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> MaybeKOf<Either<A, B>>): MaybeK<B> {
