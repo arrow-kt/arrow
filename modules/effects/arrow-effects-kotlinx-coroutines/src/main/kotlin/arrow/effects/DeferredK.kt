@@ -1,9 +1,12 @@
 package arrow.effects
 
 import arrow.core.*
+import arrow.effects.internal.IOConnection
+import arrow.effects.internal.Platform
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.Proc
+import arrow.effects.typeclasses.ProcF
 import arrow.higherkind
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
@@ -554,6 +557,15 @@ sealed class DeferredK<A>(
           fa {
             it.fold(this::completeExceptionally, this::complete)
           }
+        }.await()
+      }
+
+    fun <A> asyncF(scope: CoroutineScope = GlobalScope, ctx: CoroutineContext = Dispatchers.Default, start: CoroutineStart = CoroutineStart.LAZY, fa: ProcF<ForDeferredK, A>): DeferredK<A> =
+      Generated(ctx, start, scope) {
+        CompletableDeferred<A>().apply {
+          fa {
+            it.fold(this::completeExceptionally, this::complete)
+          }.await()
         }.await()
       }
 
