@@ -70,7 +70,7 @@ val ankMacroRegex: Regex = "ank_macro_hierarchy\\((.*?)\\)".toRegex()
 
 fun interpreter(): AnkOps = object : AnkOps {
 
-  override fun printConsole(msg: String): Unit = println(msg) 
+  override fun printConsole(msg: String): Unit = println(msg)
 
   override fun createTargetDirectory(source: Path, target: Path): Path {
     source.toFile().copyRecursively(target.toFile(), overwrite = true)
@@ -83,7 +83,7 @@ fun interpreter(): AnkOps = object : AnkOps {
     }
 
   override fun <A> readFile(path: Path, f: (String) -> A): A =
-    Files.newBufferedReader(path).useLines { f(it.toList().joinToString("\n"))  }
+    Files.newBufferedReader(path).useLines { f(it.toList().joinToString("\n")) }
 
   override fun <A> withDocs(root: Path, f: (List<Path>) -> A): A =
       f(Sequence {
@@ -103,7 +103,6 @@ fun interpreter(): AnkOps = object : AnkOps {
         generateMixedHierarchyDiagramCode(classes.toList()).joinToString("\n")
     }
   }
-
 
   val markDownParser = MarkdownParser(GFMFlavourDescriptor())
 
@@ -128,7 +127,6 @@ fun interpreter(): AnkOps = object : AnkOps {
       return content.a toT snippets.toList()
     }
 
-
   override fun compileCode(
     path: Path,
     snippets: List<Snippet>,
@@ -139,7 +137,6 @@ fun interpreter(): AnkOps = object : AnkOps {
       snip.compile(engineCache, path, i, snippets.size)
     }
   }
-
 
   private fun Snippet.compile(
     engineCache: Map<String, ScriptEngine>,
@@ -193,7 +190,6 @@ fun interpreter(): AnkOps = object : AnkOps {
         msg = colored(ANSI_RED, "ΛNK compilation failed [ $path ]")
       )
     }.eval(code)
-
 
   override fun replaceAnkToLang(compiledSnippets: Tuple2<String, List<Snippet>>): String =
       compiledSnippets.b.foldLeft(compiledSnippets.a) { content, snippet ->

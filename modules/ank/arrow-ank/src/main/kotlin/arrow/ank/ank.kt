@@ -2,7 +2,6 @@ package arrow.ank
 
 import arrow.core.Tuple2
 import arrow.core.toT
-import arrow.instances.list.foldable.foldLeft
 import java.nio.file.Path
 
 /**
