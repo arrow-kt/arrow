@@ -3,9 +3,9 @@ package arrow.optics
 import arrow.Kind
 import arrow.core.*
 import arrow.data.ListK
-import arrow.data.monoid
 import arrow.higherkind
 import arrow.instances.monoid
+import arrow.instances.listk.monoid.monoid
 import arrow.typeclasses.Const
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Monoid
@@ -71,7 +71,7 @@ interface Fold<S, A> : FoldOf<S, A> {
   /**
    * Check if there is no target
    */
-  fun isEmpty(s: S): Boolean = foldMap(AndMonoid, s, { _ -> false })
+  fun isEmpty(s: S): Boolean = foldMap(AndMonoid, s) { _ -> false }
 
   /**
    * Check if there is at least one target
@@ -81,12 +81,12 @@ interface Fold<S, A> : FoldOf<S, A> {
   /**
    * Get the first target
    */
-  fun headOption(s: S): Option<A> = foldMap(firstOptionMonoid<A>(), s, { b -> Const(Some(b)) }).value
+  fun headOption(s: S): Option<A> = foldMap(firstOptionMonoid<A>(), s) { b -> Const(Some(b)) }.value()
 
   /**
    * Get the last target
    */
-  fun lastOption(s: S): Option<A> = foldMap(lastOptionMonoid<A>(), s, { b -> Const(Some(b)) }).value
+  fun lastOption(s: S): Option<A> = foldMap(lastOptionMonoid<A>(), s) { b -> Const(Some(b)) }.value()
 
   /**
    * Fold using the given [Monoid] instance.
@@ -101,7 +101,7 @@ interface Fold<S, A> : FoldOf<S, A> {
   /**
    * Get all targets of the [Fold]
    */
-  fun getAll(s: S): ListK<A> = foldMap(ListK.monoid(), s, { ListK.just(it) })
+  fun getAll(s: S): ListK<A> = foldMap(ListK.monoid(), s) { ListK.just(it) }
 
   /**
    * Join two [Fold] with the same target
@@ -116,7 +116,7 @@ interface Fold<S, A> : FoldOf<S, A> {
    */
   fun <C> left(): Fold<Either<S, C>, Either<A, C>> = object : Fold<Either<S, C>, Either<A, C>> {
     override fun <R> foldMap(M: Monoid<R>, s: Either<S, C>, f: (Either<A, C>) -> R): R =
-      s.fold({ a1: S -> this@Fold.foldMap(M, a1, { b -> f(Either.Left(b)) }) }, { c -> f(Either.Right(c)) })
+      s.fold({ a1: S -> this@Fold.foldMap(M, a1) { b -> f(Either.Left(b)) } }, { c -> f(Either.Right(c)) })
   }
 
   /**
@@ -124,7 +124,7 @@ interface Fold<S, A> : FoldOf<S, A> {
    */
   fun <C> right(): Fold<Either<C, S>, Either<C, A>> = object : Fold<Either<C, S>, Either<C, A>> {
     override fun <R> foldMap(M: Monoid<R>, s: Either<C, S>, f: (Either<C, A>) -> R): R =
-      s.fold({ c -> f(Either.Left(c)) }, { a1 -> this@Fold.foldMap(M, a1, { b -> f(Either.Right(b)) }) })
+      s.fold({ c -> f(Either.Left(c)) }, { a1 -> this@Fold.foldMap(M, a1) { b -> f(Either.Right(b)) } })
   }
 
   /**
@@ -132,7 +132,7 @@ interface Fold<S, A> : FoldOf<S, A> {
    */
   infix fun <C> compose(other: Fold<A, C>): Fold<S, C> = object : Fold<S, C> {
     override fun <R> foldMap(M: Monoid<R>, s: S, f: (C) -> R): R =
-      this@Fold.foldMap(M, s, { c -> other.foldMap(M, c, f) })
+      this@Fold.foldMap(M, s) { c -> other.foldMap(M, c, f) }
   }
 
   /**
@@ -146,7 +146,7 @@ interface Fold<S, A> : FoldOf<S, A> {
   infix fun <C> compose(other: Optional<A, C>): Fold<S, C> = compose(other.asFold())
 
   /**
-   * Compose a [[Fold]] with a [Prism]
+   * Compose a [Fold] with a [Prism]
    */
   infix fun <C> compose(other: Prism<A, C>): Fold<S, C> = compose(other.asFold())
 
@@ -186,7 +186,7 @@ interface Fold<S, A> : FoldOf<S, A> {
    * Find the first element matching the predicate, if one exists.
    */
   fun find(s: S, p: (A) -> Boolean): Option<A> =
-    foldMap(firstOptionMonoid<A>(), s, { b -> (if (p(b)) Const(Some(b)) else Const(None)) }).value
+    foldMap(firstOptionMonoid<A>(), s) { b -> (if (p(b)) Const(Some(b)) else Const(None)) }.value()
 
   /**
    * Check whether at least one element satisfies the predicate.

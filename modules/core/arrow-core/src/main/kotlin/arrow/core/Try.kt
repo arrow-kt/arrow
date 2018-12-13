@@ -1,9 +1,8 @@
 package arrow.core
 
 import arrow.higherkind
-import arrow.legacy.Disjunction
 
-typealias Failure<A> = Try.Failure<A>
+typealias Failure = Try.Failure
 typealias Success<A> = Try.Success<A>
 
 /**
@@ -22,12 +21,12 @@ sealed class Try<out A> : TryOf<A> {
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> TryOf<Either<A, B>>): Try<B> {
       val ev: Try<Either<A, B>> = f(a).fix()
       return when (ev) {
-        is Failure -> Failure<B>(ev.exception).fix()
+        is Failure -> Failure(ev.exception).fix()
         is Success -> {
           val b: Either<A, B> = ev.value
           when (b) {
-            is Either.Left<A, B> -> tailRecM(b.a, f)
-            is Either.Right<A, B> -> Success(b.b)
+            is Either.Left -> tailRecM(b.a, f)
+            is Either.Right -> Success(b.b)
           }
         }
       }
@@ -45,29 +44,31 @@ sealed class Try<out A> : TryOf<A> {
 
   }
 
-  @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("getOrElse { ifEmpty }"))
-  operator fun invoke() = get()
-
   fun <B> ap(ff: TryOf<(A) -> B>): Try<B> = ff.fix().flatMap { f -> map(f) }.fix()
 
   /**
    * Returns the given function applied to the value from this `Success` or returns this if this is a `Failure`.
    */
-  inline fun <B> flatMap(crossinline f: (A) -> TryOf<B>): Try<B> = fold({ raise(it) }, { f(it).fix() })
+  inline fun <B> flatMap(f: (A) -> TryOf<B>): Try<B> =
+    when (this) {
+      is Failure -> this
+      is Success -> f(value).fix()
+    }
 
   /**
    * Maps the given function to the value from this `Success` or returns this if this is a `Failure`.
    */
-  inline fun <B> map(crossinline f: (A) -> B): Try<B> = fold({ Failure(it) }, { Success(f(it)) })
+  inline fun <B> map(f: (A) -> B): Try<B> =
+    flatMap { Success(f(it)) }
 
   /**
    * Converts this to a `Failure` if the predicate is not satisfied.
    */
-  inline fun filter(crossinline p: Predicate<A>): Try<A> =
-    fold(
-      { Failure(it) },
-      { if (p(it)) Success(it) else Failure(TryException.PredicateException("Predicate does not hold for $it")) }
-    )
+  fun filter(p: Predicate<A>): Try<A> =
+    flatMap { if (p(it)) Success(it) else Failure(TryException.PredicateException("Predicate does not hold for $it")) }
+
+  fun <B> mapFilter(f: (A) -> Option<B>): Try<B> =
+    flatMap { a -> f(a).fold({ Failure(TryException.PredicateException("Predicate does not hold")) }, { Try.just(it) }) }
 
   /**
    * Inverts this `Try`. If this is a `Failure`, returns its exception wrapped in a `Success`.
@@ -92,59 +93,49 @@ sealed class Try<out A> : TryOf<A> {
 
   abstract fun isSuccess(): Boolean
 
-  @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("fold({ Unit }, f)"))
-  fun foreach(f: (A) -> Unit) {
-    if (isSuccess()) f(get())
-  }
-
-  @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("map { f(it); it }"))
-  fun onEach(f: (A) -> Unit): Try<A> = map {
-    f(it)
-    it
-  }
-
   fun exists(predicate: Predicate<A>): Boolean = fold({ false }, { predicate(it) })
-
-  @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("getOrElse { ifEmpty }"))
-  abstract fun get(): A
-
-  @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("map { body(it); it }"))
-  fun onSuccess(body: (A) -> Unit): Try<A> {
-    foreach(body)
-    return this
-  }
-
-  @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("fold ({ Try { body(it); it }}, { Try.just(it) })"))
-  fun onFailure(body: (Throwable) -> Unit): Try<A> = when (this) {
-    is Success -> this
-    is Failure -> {
-      body(exception)
-      this
-    }
-  }
 
   fun toOption(): Option<A> = fold({ None }, { Some(it) })
 
   fun toEither(): Either<Throwable, A> = fold({ Left(it) }, { Right(it) })
 
-  @Deprecated("arrow.data.Either is already right biased. This function will be removed in future releases", ReplaceWith("toEither()"))
-  fun toDisjunction(): Disjunction<Throwable, A> = toEither().toDisjunction()
+  /**
+   * * Convenient method to solve a common scenario when using [Try]. The created [Try] object is often
+   * converted to [Either], and right after [Either.mapLeft] is called to translate the [Throwable] to a
+   * domain specific error object.
+   * * To make it easier this method takes an [onLeft] error domain object supplier, which does the conversion to domain error
+   * in the same time as conversion to [Either] occurs.
+   * * So instead of
+   * ```
+   * Try {
+   *    dangerousOperation()
+   * }.toEither()
+   *    .mapLeft { Error.ServerError("This really went wrong", it) }
+   * // Left(a=Error.ServerError@3ada9e34)
+   * ```
+   * One can write
+   * ```
+   * Try {
+   *    dangerousOperation()
+   * }.toEither {
+   *    Error.ServerError("This really went wrong", it)
+   * }
+   * // Left(a=Error.ServerError@4a5a3234)
+   * ```
+   */
+  fun <B> toEither(onLeft: (Throwable) -> B): Either<B, A> = this.toEither().fold({ onLeft(it).left() }, { it.right() })
 
-  fun <B> foldLeft(initial: B, operation: (B, A) -> B): B = this.fix().fold({ initial }, { operation(initial, it) })
+  fun <B> foldLeft(initial: B, operation: (B, A) -> B): B = fix().fold({ initial }, { operation(initial, it) })
 
-  fun <B> foldRight(initial: Eval<B>, operation: (A, Eval<B>) -> Eval<B>): Eval<B> = this.fix().fold({ initial }, { operation(it, initial) })
+  fun <B> foldRight(initial: Eval<B>, operation: (A, Eval<B>) -> Eval<B>): Eval<B> = fix().fold({ initial }, { operation(it, initial) })
 
   /**
    * The `Failure` type represents a computation that result in an exception.
    */
-  data class Failure<out A>(val exception: Throwable) : Try<A>() {
+  data class Failure(val exception: Throwable) : Try<Nothing>() {
     override fun isFailure(): Boolean = true
 
     override fun isSuccess(): Boolean = false
-
-    override fun get(): A {
-      throw exception
-    }
   }
 
   /**
@@ -154,12 +145,10 @@ sealed class Try<out A> : TryOf<A> {
     override fun isFailure(): Boolean = false
 
     override fun isSuccess(): Boolean = true
-
-    override fun get(): A = value
   }
 }
 
-sealed class TryException(override val message: String) : kotlin.Exception(message) {
+sealed class TryException(override val message: String) : Exception(message) {
   data class PredicateException(override val message: String) : TryException(message)
   data class UnsupportedOperationException(override val message: String) : TryException(message)
 }
@@ -169,17 +158,22 @@ sealed class TryException(override val message: String) : kotlin.Exception(messa
  *
  * ''Note:'': This will throw an exception if it is not a success and default throws an exception.
  */
-fun <B> TryOf<B>.getOrDefault(default: () -> B): B = fix().fold({ default() }, ::identity)
+inline fun <B> TryOf<B>.getOrDefault(default: () -> B): B = fix().fold({ default() }, ::identity)
 
 /**
  * Returns the value from this `Success` or the given `default` argument if this is a `Failure`.
  *
  * ''Note:'': This will throw an exception if it is not a success and default throws an exception.
  */
-fun <B> TryOf<B>.getOrElse(default: (Throwable) -> B): B = fix().fold(default, ::identity)
+inline fun <B> TryOf<B>.getOrElse(default: (Throwable) -> B): B = fix().fold(default, ::identity)
 
-fun <B, A : B> TryOf<A>.orElse(f: () -> TryOf<B>): Try<B> = when (this.fix()) {
-  is Try.Success -> this.fix()
+/**
+ * Returns the value from this `Success` or null if this is a `Failure`.
+ */
+fun <B> TryOf<B>.orNull(): B? = getOrElse { null }
+
+inline fun <B, A : B> TryOf<A>.orElse(f: () -> TryOf<B>): Try<B> = when (fix()) {
+  is Try.Success -> fix()
   is Try.Failure -> f().fix()
 }
 
@@ -198,15 +192,10 @@ fun <A> TryOf<A>.rescue(f: (Throwable) -> TryOf<A>): Try<A> = fix().recoverWith(
  */
 fun <B> TryOf<B>.recover(f: (Throwable) -> B): Try<B> = fix().fold({ Success(f(it)) }, { Success(it) })
 
-@Deprecated(DeprecatedAmbiguity, ReplaceWith("recover(f)"))
-fun <A> TryOf<A>.handle(f: (Throwable) -> A): Try<A> = fix().recover(f)
-
-/**
- * Completes this `Try` by applying the function `ifFailure` to this if this is of type `Failure`,
- * or conversely, by applying `ifSuccess` if this is a `Success`.
- */
-fun <A, B> TryOf<A>.transform(ifSuccess: (A) -> TryOf<B>, ifFailure: (Throwable) -> TryOf<B>): Try<B> = fix().fold({ ifFailure(it).fix() }, { fix().flatMap(ifSuccess) })
-
 fun <A> (() -> A).try_(): Try<A> = Try(this)
+
+fun <A> A.success(): Try<A> = Success(this)
+
+fun <A> Throwable.failure(): Try<A> = Failure(this)
 
 fun <T> TryOf<TryOf<T>>.flatten(): Try<T> = fix().flatMap(::identity)

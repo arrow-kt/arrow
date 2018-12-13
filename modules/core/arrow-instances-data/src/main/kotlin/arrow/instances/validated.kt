@@ -3,17 +3,18 @@ package arrow.instances
 import arrow.Kind
 import arrow.core.Eval
 import arrow.data.*
-import arrow.instance
+import arrow.deprecation.ExtensionsDSLDeprecated
+import arrow.extension
 import arrow.typeclasses.*
 import arrow.data.traverse as validatedTraverse
 
-@instance(Validated::class)
+@extension
 interface ValidatedFunctorInstance<E> : Functor<ValidatedPartialOf<E>> {
   override fun <A, B> Kind<ValidatedPartialOf<E>, A>.map(f: (A) -> B): Validated<E, B> = fix().map(f)
 }
 
-@instance(Validated::class)
-interface ValidatedApplicativeInstance<E> : ValidatedFunctorInstance<E>, Applicative<ValidatedPartialOf<E>> {
+@extension
+interface ValidatedApplicativeInstance<E> : Applicative<ValidatedPartialOf<E>>, ValidatedFunctorInstance<E> {
 
   fun SE(): Semigroup<E>
 
@@ -25,8 +26,10 @@ interface ValidatedApplicativeInstance<E> : ValidatedFunctorInstance<E>, Applica
 
 }
 
-@instance(Validated::class)
-interface ValidatedApplicativeErrorInstance<E> : ValidatedApplicativeInstance<E>, ApplicativeError<ValidatedPartialOf<E>, E> {
+@extension
+interface ValidatedApplicativeErrorInstance<E> : ApplicativeError<ValidatedPartialOf<E>, E>, ValidatedApplicativeInstance<E> {
+
+  override fun SE(): Semigroup<E>
 
   override fun <A> raiseError(e: E): Validated<E, A> = Invalid(e)
 
@@ -35,7 +38,7 @@ interface ValidatedApplicativeErrorInstance<E> : ValidatedApplicativeInstance<E>
 
 }
 
-@instance(Validated::class)
+@extension
 interface ValidatedFoldableInstance<E> : Foldable<ValidatedPartialOf<E>> {
 
   override fun <A, B> Kind<ValidatedPartialOf<E>, A>.foldLeft(b: B, f: (B, A) -> B): B =
@@ -45,14 +48,14 @@ interface ValidatedFoldableInstance<E> : Foldable<ValidatedPartialOf<E>> {
     fix().foldRight(lb, f)
 }
 
-@instance(Validated::class)
-interface ValidatedTraverseInstance<E> : ValidatedFoldableInstance<E>, Traverse<ValidatedPartialOf<E>> {
+@extension
+interface ValidatedTraverseInstance<E> : Traverse<ValidatedPartialOf<E>>, ValidatedFoldableInstance<E> {
 
   override fun <G, A, B> Kind<ValidatedPartialOf<E>, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Validated<E, B>> =
     fix().validatedTraverse(AP, f)
 }
 
-@instance(Validated::class)
+@extension
 interface ValidatedSemigroupKInstance<E> : SemigroupK<ValidatedPartialOf<E>> {
 
   fun SE(): Semigroup<E>
@@ -61,7 +64,7 @@ interface ValidatedSemigroupKInstance<E> : SemigroupK<ValidatedPartialOf<E>> {
     fix().combineK(SE(), y)
 }
 
-@instance(Validated::class)
+@extension
 interface ValidatedEqInstance<L, R> : Eq<Validated<L, R>> {
 
   fun EQL(): Eq<L>
@@ -80,10 +83,25 @@ interface ValidatedEqInstance<L, R> : Eq<Validated<L, R>> {
   }
 }
 
-@instance(Validated::class)
+@extension
 interface ValidatedShowInstance<L, R> : Show<Validated<L, R>> {
   override fun Validated<L, R>.show(): String =
     toString()
+}
+
+@extension
+interface ValidatedHashInstance<L, R> : Hash<Validated<L, R>>, ValidatedEqInstance<L, R> {
+  fun HL(): Hash<L>
+  fun HR(): Hash<R>
+
+  override fun EQL(): Eq<L> = HL()
+  override fun EQR(): Eq<R> = HR()
+
+  override fun Validated<L, R>.hash(): Int = fold({
+    HL().run { it.hash() }
+  }, {
+    HR().run { it.hash() }
+  })
 }
 
 class ValidatedContext<L>(val SL: Semigroup<L>) : ValidatedApplicativeErrorInstance<L>, ValidatedTraverseInstance<L>, ValidatedSemigroupKInstance<L> {
@@ -94,6 +112,7 @@ class ValidatedContext<L>(val SL: Semigroup<L>) : ValidatedApplicativeErrorInsta
 }
 
 class ValidatedContextPartiallyApplied<L>(val SL: Semigroup<L>) {
+  @Deprecated(ExtensionsDSLDeprecated)
   infix fun <A> extensions(f: ValidatedContext<L>.() -> A): A =
     f(ValidatedContext(SL))
 }

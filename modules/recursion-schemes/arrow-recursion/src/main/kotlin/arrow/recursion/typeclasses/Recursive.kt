@@ -8,22 +8,24 @@ import arrow.recursion.Coalgebra
 import arrow.recursion.hylo
 
 /**
+ * ank_macro_hierarchy(arrow.recursion.typeclasses.Recursive)
+ *
  * Typeclass for types that can be generically folded with algebras.
  */
 interface Recursive<T> {
   /**
    * Implementation for project.
    */
-  fun <F> projectT(FF: Functor<F>, t: Kind<T, F>): Kind<F, Kind<T, F>>
+  fun <F> Functor<F>.projectT(tf: Kind<T, F>): Kind<F, Kind<T, F>>
 
   /**
    * Creates a coalgebra given a functor.
    */
-  fun <F> project(FF: Functor<F>): Coalgebra<F, Kind<T, F>> = { projectT(FF, it) }
+  fun <F> Functor<F>.project(): Coalgebra<F, Kind<T, F>> = { projectT(it) }
 
   /**
    * Fold generalized over any recursive type.
    */
-  fun <F, A> Kind<T, F>.cata(FF: Functor<F>, alg: Algebra<F, Eval<A>>): A =
-    hylo(FF, alg, project(FF), this)
+  fun <F, A> Functor<F>.cata(tf: Kind<T, F>, alg: Algebra<F, Eval<A>>): A =
+    hylo(alg, project(), tf)
 }

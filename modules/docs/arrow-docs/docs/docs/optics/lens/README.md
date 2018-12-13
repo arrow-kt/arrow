@@ -14,35 +14,35 @@ A `Lens` (aka functional reference) is an optic that can focus into a structure 
 
 Lenses can be seen as a pair of functions, a getter and a setter. A `Lens<S, A>` represents a getter: `get: (S) -> A` and `setter: (A) -> (S) -> S` where `S` is called the source of the `Lens` and `A` is called the focus or target of the `Lens`.
 
-Given a simple structure `Foo` we can create a `Lens<Foo, Int>` to get, set or modify its value.
+Given a simple structure `Player` we can create a `Lens<Player, Int>` to get, set or modify its value.
 
 ```kotlin:ank
 import arrow.optics.*
 
-data class Foo(val value: Int)
+data class Player(val health: Int)
 
-val fooLens: Lens<Foo, Int> = Lens(
-    get = { foo -> foo.value },
-    set = { value -> { foo -> foo.copy(value = value) } }
+val playerLens: Lens<Player, Int> = Lens(
+    get = { player -> player.health },
+    set = { player, value -> player.copy(health = value) }
 )
 
-val foo = Foo(5)
+val player = Player(70)
 ```
 ```kotlin:ank
-fooLens.get(foo)
+playerLens.get(player)
 ```
 ```kotlin:ank
-fooLens.set(foo, 10)
+playerLens.set(player, 100)
 ```
 ```kotlin:ank
-fooLens.modify(foo) { it + 1 }
+playerLens.modify(player) { it - 20 }
 ```
 
-We can also `lift` above function `(Int) -> Int` to `(Foo) -> Foo`
+We can also `lift` above function `(Int) -> Int` to `(Player) -> Player`
 
 ```kotlin:ank
-val lift: (Foo) -> Foo = fooLens.lift { it + 1 }
-lift(foo)
+val lift: (Player) -> Player = playerLens.lift { it + 10 }
+lift(player)
 ```
 
 We can also `modify` and `lift` the focus of a `Lens` using a `Functor`
@@ -50,13 +50,51 @@ We can also `modify` and `lift` the focus of a `Lens` using a `Functor`
 ```kotlin:ank
 import arrow.*
 import arrow.core.*
+import arrow.instances.option.functor.*
 
-fooLens.modifyF(Option.functor(), foo) { it.some() }.fix()
+playerLens.modifyF(Option.functor(), player) { it.some() }.fix()
 ```
 
 ```kotlin:ank
-val liftF: (Foo) -> OptionOf<Foo> = fooLens.liftF(Option.functor()) { (it + 1).some() }
-liftF(foo)
+val liftF: (Player) -> OptionOf<Player> = playerLens.liftF(Option.functor()) { (it + 1).some() }
+liftF(player)
+```
+
+There are also some convenience methods to make working with [Reader]({{ '/docs/arrow/data/reader' | relative_url }}) easier.
+
+```kotlin:ank
+import arrow.data.*
+
+val reader: Reader<Player, Int> = playerLens.ask()
+
+reader
+  .map(Int::inc)
+  .runId(Player(50))
+```
+
+```kotlin:ank
+playerLens.asks(Int::inc)
+  .runId(Player(50))
+```
+
+There are also some convenience methods to make working with [State]({{ '/docs/arrow/data/state' | relative_url }}) easier.
+This can make working with nested structures in stateful computations significantly more elegant.
+
+```kotlin:ank
+import arrow.data.*
+
+val inspectHealth = playerLens.extract()
+inspectHealth.run(player)
+```
+
+```kotlin:ank
+val takeDamage = playerLens.update { it - 15 }
+takeDamage.run(player)
+```
+
+```kotlin:ank
+val restoreHealth = playerLens.assign(100)
+restoreHealth.run(player)
 ```
 
 ### Composition
@@ -99,22 +137,22 @@ What we actually wanted to do here is the following: focus into employee's compa
 ```kotlin
 val employeeCompany: Lens<Employee, Company> = Lens(
         get = { it.company },
-        set = { company -> { employee -> employee.copy(company = company) } }
+        set = { employee, company -> employee.copy(company = company) }
 )
 
 val companyAddress: Lens<Company, Address> = Lens(
         get = { it.address },
-        set = { address -> { company -> company.copy(address = address) } }
+        set = { company, address -> company.copy(address = address) }
 )
 
 val addressStrees: Lens<Address, Street> = Lens(
         get = { it.street },
-        set = { street -> { address -> address.copy(street = street) } }
+        set = { address, street -> address.copy(street = street) }
 )
 
 val streetName: Lens<Street, String> = Lens(
         get = { it.name },
-        set = { name -> { street -> street.copy(name = name) } }
+        set = { street, name -> street.copy(name = name) }
 )
 
 val employeeStreetName: Lens<Employee, String> = employeeCompany compose companyAddress compose addressStrees compose streetName
@@ -153,7 +191,7 @@ When dealing with polymorphic product types we can also have polymorphic lenses 
 ```kotlin
 fun <A, B, R> tuple2(): PLens<Tuple2<A, B>, Tuple2<R, B>, A, R> = PLens(
         { it.a },
-        { r -> { ab -> r toT ab.b } }
+        { ab, r -> r toT ab.b }
 )
 
 pFirstTuple2<Int, String, String>().set(5 toT "World", "Hello, ")

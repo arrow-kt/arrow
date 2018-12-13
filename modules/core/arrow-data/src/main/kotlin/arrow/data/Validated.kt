@@ -94,7 +94,7 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
   fun <EE, B> withEither(f: (Either<E, A>) -> Either<EE, B>): Validated<EE, B> = fromEither(f(toEither()))
 
   /**
-   * Validated is a [[functor.Bifunctor]], this method applies one of the
+   * Validated is a [functor.Bifunctor], this method applies one of the
    * given functions.
    */
   fun <EE, AA> bimap(fe: (E) -> EE, fa: (A) -> AA): Validated<EE, AA> = fold({ Invalid(fe(it)) }, { Valid(fa(it)) })
@@ -102,7 +102,7 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
   /**
    * Apply a function to a Valid value, returning a new Valid value
    */
-  fun <B> map(f: (A) -> B): Validated<E, B> = bimap(::identity, { f(it) })
+  fun <B> map(f: (A) -> B): Validated<E, B> = bimap(::identity) { f(it) }
 
   /**
    * Apply a function to an Invalid value, returning a new Invalid value.
@@ -129,7 +129,13 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
  * Return the Valid value, or the default if Invalid
  */
 fun <E, B> ValidatedOf<E, B>.getOrElse(default: () -> B): B =
-  fix().fold({ default() }, ::identity)
+    fix().fold({ default() }, ::identity)
+
+/**
+ * Return the Valid value, or null if Invalid
+ */
+fun <E, B> ValidatedOf<E, B>.orNull(): B? =
+  getOrElse { null }
 
 /**
  * Return the Valid value, or the result of f if Invalid
@@ -139,7 +145,7 @@ fun <E, B> ValidatedOf<E, B>.valueOr(f: (E) -> B): B =
 
 /**
  * If `this` is valid return `this`, otherwise if `that` is valid return `that`, otherwise combine the failures.
- * This is similar to [[orElse]] except that here failures are accumulated.
+ * This is similar to [orElse] except that here failures are accumulated.
  */
 fun <E, A> ValidatedOf<E, A>.findValid(SE: Semigroup<E>, that: () -> Validated<E, A>): Validated<E, A> =
   fix().fold(
@@ -155,7 +161,7 @@ fun <E, A> ValidatedOf<E, A>.findValid(SE: Semigroup<E>, that: () -> Validated<E
 
 /**
  * Return this if it is Valid, or else fall back to the given default.
- * The functionality is similar to that of [[findValid]] except for failure accumulation,
+ * The functionality is similar to that of [findValid] except for failure accumulation,
  * where here only the error on the right is preserved and the error on the left is ignored.
  */
 fun <E, A> ValidatedOf<E, A>.orElse(default: () -> Validated<E, A>): Validated<E, A> =
@@ -171,7 +177,7 @@ fun <E, A> ValidatedOf<E, A>.orElse(default: () -> Validated<E, A>): Validated<E
 fun <E, A, B> ValidatedOf<E, A>.ap(SE: Semigroup<E>, f: Validated<E, (A) -> B>): Validated<E, B> =
   fix().fold(
     { e -> f.fold({ Invalid(SE.run { it.combine(e) }) }, { Invalid(e) }) },
-    { a -> f.fold(::Invalid, { Valid(it(a)) }) }
+    { a -> f.fold(::Invalid) { Valid(it(a)) } }
   )
 
 fun <E, A> ValidatedOf<E, A>.handleLeftWith(f: (E) -> ValidatedOf<E, A>): Validated<E, A> =
@@ -184,7 +190,7 @@ fun <G, E, A, B> ValidatedOf<E, A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G
 fun <G, E, A> ValidatedOf<E, Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, Validated<E, A>> =
   fix().traverse(GA, ::identity)
 
-inline fun <E, A> ValidatedOf<E, A>.combine(SE: Semigroup<E>,
+fun <E, A> ValidatedOf<E, A>.combine(SE: Semigroup<E>,
                                             SA: Semigroup<A>,
                                             y: ValidatedOf<E, A>): Validated<E, A> =
   y.fix().let { that ->

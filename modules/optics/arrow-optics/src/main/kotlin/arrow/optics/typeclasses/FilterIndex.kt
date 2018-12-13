@@ -9,6 +9,8 @@ import arrow.typeclasses.Applicative
 import arrow.typeclasses.Traverse
 
 /**
+ * ank_macro_hierarchy(arrow.optics.typeclasses.FilterIndex)
+ *
  * [FilterIndex] provides a [Traversal] for a structure [S] with all its foci [A] whose index [I] satisfies a predicate.
  *
  * @param S source of [Traversal]
@@ -40,18 +42,13 @@ interface FilterIndex<S, I, A> {
         override fun <F> modifyF(FA: Applicative<F>, s: Kind<S, A>, f: (A) -> Kind<F, A>): Kind<F, Kind<S, A>> =
           traverse.run {
             FA.run {
-              zipWithIndex(s).traverse(this, { (a, j) ->
+              zipWithIndex(s).traverse(this) { (a, j) ->
                 if (p(j)) f(a) else just(a)
-              })
+              }
             }
           }
       }
     }
-
-    /**
-     * Filter the foci [A] of a [Traversal] with the predicate [p] given an instance [FilterIndex] [FI].
-     */
-    fun <S, I, A> filterIndex(FI: FilterIndex<S, I, A>, p: Predicate<I>): Traversal<S, A> = FI.filter(p)
 
   }
 

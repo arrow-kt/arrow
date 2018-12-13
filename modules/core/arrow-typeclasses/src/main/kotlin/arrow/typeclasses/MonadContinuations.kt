@@ -1,10 +1,11 @@
 package arrow.typeclasses
 
 import arrow.Kind
+import arrow.core.Continuation
 import java.util.concurrent.CountDownLatch
-import kotlin.coroutines.experimental.*
-import kotlin.coroutines.experimental.intrinsics.COROUTINE_SUSPENDED
-import kotlin.coroutines.experimental.intrinsics.suspendCoroutineOrReturn
+import kotlin.coroutines.*
+import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
+import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 
 interface BindingInContextContinuation<in T> : Continuation<T> {
   fun await(): Throwable?
@@ -41,6 +42,7 @@ open class MonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineC
         error = exception
         latch.countDown()
       }
+
     }
 
   protected lateinit var returnedMonad: Kind<F, A>
@@ -52,40 +54,35 @@ open class MonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineC
   suspend fun <B> (() -> B).bindIn(context: CoroutineContext): B =
     bindIn(context, this)
 
-  open suspend fun <B> bind(m: () -> Kind<F, B>): B = suspendCoroutineOrReturn { c ->
+  open suspend fun <B> bind(m: () -> Kind<F, B>): B = suspendCoroutineUninterceptedOrReturn { c ->
     val labelHere = c.stateStack // save the whole coroutine stack labels
-    returnedMonad = m().flatMap({ x: B ->
+    returnedMonad = m().flatMap { x: B ->
       c.stateStack = labelHere
       c.resume(x)
       returnedMonad
-    })
+    }
     COROUTINE_SUSPENDED
   }
 
-  open suspend fun <B> bindIn(context: CoroutineContext, m: () -> B): B = suspendCoroutineOrReturn { c ->
+  open suspend fun <B> bindIn(context: CoroutineContext, m: () -> B): B = suspendCoroutineUninterceptedOrReturn { c ->
     val labelHere = c.stateStack // save the whole coroutine stack labels
     val monadCreation: suspend () -> Kind<F, A> = {
-      just(m()).flatMap({ xx: B ->
+      just(m()).flatMap { xx: B ->
         c.stateStack = labelHere
         c.resume(xx)
         returnedMonad
-      })
+      }
     }
     val completion = bindingInContextContinuation(context)
-    returnedMonad = just(Unit).flatMap({
+    returnedMonad = just(Unit).flatMap {
       monadCreation.startCoroutine(completion)
       val error = completion.await()
       if (error != null) {
         throw error
       }
       returnedMonad
-    })
+    }
     COROUTINE_SUSPENDED
   }
 
-  @Deprecated("Yielding in comprehensions isn't required anymore", ReplaceWith("b"))
-  fun <B> yields(b: B): B = b
-
-  @Deprecated("Yielding in comprehensions isn't required anymore", ReplaceWith("b()"))
-  fun <B> yields(b: () -> B): B = b()
 }

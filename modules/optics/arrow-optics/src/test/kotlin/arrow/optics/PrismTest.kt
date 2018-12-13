@@ -1,11 +1,14 @@
 package arrow.optics
 
-import arrow.core.*
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.getOrElse
+import arrow.core.identity
 import arrow.data.ListK
-import arrow.data.eq
 import arrow.data.k
-import arrow.instances.StringMonoidInstance
 import arrow.instances.monoid
+import arrow.instances.listk.eq.eq
+import arrow.instances.option.eq.eq
 import arrow.test.UnitSpec
 import arrow.test.generators.genEither
 import arrow.test.generators.genFunctionAToB
@@ -161,54 +164,54 @@ class PrismTest : UnitSpec() {
     }
 
     "Joining two prisms together with same target should yield same result" {
-      forAll(SumGen, { a ->
+      forAll(SumGen) { a ->
         (sumPrism compose stringPrism).getOption(a) == sumPrism.getOption(a).flatMap(stringPrism::getOption) &&
           (sumPrism + stringPrism).getOption(a) == (sumPrism compose stringPrism).getOption(a)
-      })
+      }
     }
 
     "Checking if a prism exists with a target" {
-      forAll(SumGen, SumGen, Gen.bool(), { a, other, bool ->
+      forAll(SumGen, SumGen, Gen.bool()) { a, other, bool ->
         Prism.only(a, object : Eq<SumType> {
           override fun SumType.eqv(b: SumType): Boolean = bool
         }).isEmpty(other) == bool
-      })
+      }
     }
 
     "Checking if there is no target" {
-      forAll(SumGen, { sum ->
+      forAll(SumGen) { sum ->
         sumPrism.isEmpty(sum) == sum !is SumType.A
-      })
+      }
     }
 
     "Checking if a target exists" {
-      forAll(SumGen, { sum ->
+      forAll(SumGen) { sum ->
         sumPrism.nonEmpty(sum) == sum is SumType.A
-      })
+      }
     }
 
     "Setting a target on a prism should set the correct target"{
-      forAll(AGen, Gen.string(), { a, string ->
+      forAll(AGen, Gen.string()) { a, string ->
         sumPrism.setOption(a, string) == Some(a.copy(string = string))
-      })
+      }
     }
 
     "Finding a target using a predicate within a Lens should be wrapped in the correct option result" {
-      forAll(SumGen, Gen.bool(), { sum, predicate ->
+      forAll(SumGen, Gen.bool()) { sum, predicate ->
         sumPrism.find(sum) { predicate }.fold({ false }, { true }) == (predicate && sum is SumType.A)
-      })
+      }
     }
 
     "Checking existence predicate over the target should result in same result as predicate" {
-      forAll(SumGen, Gen.bool(), { sum, predicate ->
+      forAll(SumGen, Gen.bool()) { sum, predicate ->
         sumPrism.exist(sum) { predicate } == (predicate && sum is SumType.A)
-      })
+      }
     }
 
     "Checking satisfaction of predicate over the target should result in opposite result as predicate" {
-      forAll(SumGen, Gen.bool(), { sum, predicate ->
+      forAll(SumGen, Gen.bool()) { sum, predicate ->
         sumPrism.all(sum) { predicate } == (predicate || sum is SumType.B)
-      })
+      }
     }
 
   }

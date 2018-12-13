@@ -1,17 +1,24 @@
 package arrow.data
 
+import arrow.Kind2
 import arrow.core.Either
 import arrow.core.None
 import arrow.core.Some
 import arrow.data.Ior.Right
-import arrow.instances.ForIor
+import arrow.instances.eq
+import arrow.instances.hash
 import arrow.instances.semigroup
+import arrow.instances.ior.applicative.applicative
+import arrow.instances.ior.bifunctor.bifunctor
+import arrow.instances.ior.eq.eq
+import arrow.instances.ior.hash.hash
+import arrow.instances.ior.monad.monad
+import arrow.instances.ior.show.show
+import arrow.instances.ior.traverse.traverse
 import arrow.test.UnitSpec
-import arrow.test.laws.EqLaws
-import arrow.test.laws.MonadLaws
-import arrow.test.laws.ShowLaws
-import arrow.test.laws.TraverseLaws
+import arrow.test.laws.*
 import arrow.typeclasses.Eq
+import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
@@ -27,14 +34,17 @@ class IorTest : UnitSpec() {
 
     val EQ = Ior.eq(Eq.any(), Eq.any())
 
-    ForIor(Int.semigroup()) extensions {
-      testLaws(
-        EqLaws.laws(EQ, { Right(it) }),
-        ShowLaws.laws(Ior.show(), EQ) { Right(it) },
-        MonadLaws.laws(this, Eq.any()),
-        TraverseLaws.laws(Ior.traverse(), this, ::Right, Eq.any())
-      )
+    val EQ2: Eq<Kind2<ForIor, Int, Int>> = Eq { a, b ->
+      a.fix() == b.fix()
     }
+
+    testLaws(
+      BifunctorLaws.laws(Ior.bifunctor(), { Ior.Both(it, it) }, EQ2),
+      ShowLaws.laws(Ior.show(), EQ) { Right(it) },
+      MonadLaws.laws(Ior.monad(Int.semigroup()), Eq.any()),
+      TraverseLaws.laws(Ior.traverse(), Ior.applicative(Int.semigroup()), ::Right, Eq.any()),
+      HashLaws.laws(Ior.hash(Hash.any(), Int.hash()), Ior.eq(Eq.any(), Int.eq())) { Right(it) }
+    )
 
     "bimap() should allow modify both value" {
       forAll { a: Int, b: String ->
@@ -126,7 +136,7 @@ class IorTest : UnitSpec() {
 
     "Ior.monad.flatMap should combine left values" {
       val ior1 = Ior.Both(3, "Hello, world!")
-      val iorResult = intIorMonad.run { ior1.flatMap({ Ior.Left<Int, String>(7) }) }
+      val iorResult = intIorMonad.run { ior1.flatMap { Ior.Left<Int, String>(7) } }
       iorResult shouldBe Ior.Left<Int, String>(10)
     }
 

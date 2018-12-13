@@ -47,9 +47,9 @@ class NonEmptyList<out A> private constructor(
   fun <G, B> traverse(AG: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, NonEmptyList<B>> = with(AG) {
     f(fix().head).map2Eval(Eval.always {
       tail.k().traverse(AG, f)
-    }, {
-      NonEmptyList(it.a, it.b.fix().list)
-    }).value()
+    }) {
+      NonEmptyList(it.a, it.b.fix())
+    }.value()
   }
 
   fun <B> coflatMap(f: (NonEmptyListOf<A>) -> B): NonEmptyList<B> {
@@ -80,8 +80,6 @@ class NonEmptyList<out A> private constructor(
     return true
   }
 
-  fun show(): String = all.joinToString()
-
   override fun hashCode(): Int = all.hashCode()
 
   override fun toString(): String = "NonEmptyList(all=$all)"
@@ -101,7 +99,7 @@ class NonEmptyList<out A> private constructor(
       v: NonEmptyList<Either<A, B>>) {
       val head: Either<A, B> = v.head
       when (head) {
-        is Either.Right<A, B> -> {
+        is Either.Right -> {
           buf += head.b
           val x = fromList(v.tail)
           when (x) {
@@ -109,7 +107,7 @@ class NonEmptyList<out A> private constructor(
             is None -> Unit
           }
         }
-        is Either.Left<A, B> -> go(buf, f, f(head.a).fix() + v.tail)
+        is Either.Left -> go(buf, f, f(head.a).fix() + v.tail)
       }
     }
 
@@ -124,7 +122,7 @@ class NonEmptyList<out A> private constructor(
 
 fun <A> A.nel(): NonEmptyList<A> = NonEmptyList.of(this)
 
-inline fun <A, G> NonEmptyListOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, NonEmptyList<A>> =
+fun <A, G> NonEmptyListOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, NonEmptyList<A>> =
   fix().traverse(GA, ::identity)
 
 fun <A> NonEmptyListOf<A>.combineK(y: NonEmptyListOf<A>): NonEmptyList<A> = fix().plus(y.fix())

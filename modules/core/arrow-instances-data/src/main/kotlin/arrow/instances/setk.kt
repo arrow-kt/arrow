@@ -3,29 +3,30 @@ package arrow.instances
 import arrow.Kind
 import arrow.core.Eval
 import arrow.data.*
-import arrow.instance
+import arrow.deprecation.ExtensionsDSLDeprecated
+import arrow.extension
 import arrow.typeclasses.*
 import arrow.data.combineK as setCombineK
 import kotlin.collections.plus as setPlus
 
-@instance(SetK::class)
+@extension
 interface SetKSemigroupInstance<A> : Semigroup<SetK<A>> {
   override fun SetK<A>.combine(b: SetK<A>): SetK<A> =
     (this.setPlus(b)).k()
 }
 
-@instance(SetK::class)
-interface SetKMonoidInstance<A> : SetKSemigroupInstance<A>, Monoid<SetK<A>> {
+@extension
+interface SetKMonoidInstance<A> : Monoid<SetK<A>>, SetKSemigroupInstance<A> {
   override fun empty(): SetK<A> = emptySet<A>().k()
 }
 
-@instance(SetK::class)
+@extension
 interface SetKEqInstance<A> : Eq<SetK<A>> {
 
   fun EQ(): Eq<A>
 
   override fun SetK<A>.eqv(b: SetK<A>): Boolean =
-    if (size == b.size) set.map { aa ->
+    if (size == b.size) map { aa ->
       b.find { bb -> EQ().run { aa.eqv(bb) } } != null
     }.fold(true) { acc, bool ->
       acc && bool
@@ -34,13 +35,13 @@ interface SetKEqInstance<A> : Eq<SetK<A>> {
 
 }
 
-@instance(SetK::class)
+@extension
 interface SetKShowInstance<A> : Show<SetK<A>> {
   override fun SetK<A>.show(): String =
     toString()
 }
 
-@instance(SetK::class)
+@extension
 interface SetKFoldableInstance : Foldable<ForSetK> {
   override fun <A, B> Kind<ForSetK, A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
@@ -52,13 +53,13 @@ interface SetKFoldableInstance : Foldable<ForSetK> {
     fix().isEmpty()
 }
 
-@instance(SetK::class)
+@extension
 interface SetKSemigroupKInstance : SemigroupK<ForSetK> {
   override fun <A> Kind<ForSetK, A>.combineK(y: Kind<ForSetK, A>): SetK<A> =
     fix().setCombineK(y)
 }
 
-@instance(SetK::class)
+@extension
 interface SetKMonoidKInstance : MonoidK<ForSetK> {
   override fun <A> empty(): SetK<A> =
     SetK.empty()
@@ -67,7 +68,19 @@ interface SetKMonoidKInstance : MonoidK<ForSetK> {
     fix().setCombineK(y)
 }
 
+@extension
+interface SetKHashInstance<A> : Hash<SetK<A>>, SetKEqInstance<A> {
+  fun HA(): Hash<A>
+
+  override fun EQ(): Eq<A> = HA()
+
+  override fun SetK<A>.hash(): Int = foldLeft(1) { hash, a ->
+    31 * hash + HA().run { a.hash() }
+  }
+}
+
 object SetKContext : SetKFoldableInstance, SetKMonoidKInstance
 
+@Deprecated(ExtensionsDSLDeprecated)
 infix fun <A> ForSetK.Companion.extensions(f: SetKContext.() -> A): A =
   f(SetKContext)

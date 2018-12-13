@@ -4,7 +4,11 @@ package arrow.typeclasses
 
 import arrow.Kind
 import arrow.core.*
+import java.math.BigDecimal
 
+/**
+ * ank_macro_hierarchy(arrow.typeclasses.Applicative)
+ */
 interface Applicative<F> : Functor<F> {
 
   fun <A> just(a: A): Kind<F, A>
@@ -24,71 +28,71 @@ interface Applicative<F> : Functor<F> {
 
   fun <A, B, Z> Kind<F, Tuple2<A, B>>.product(
     other: Kind<F, Z>,
-    dummyImplicit: Any? = null): Kind<F, Tuple3<A, B, Z>> =
-    other.product(this).map({ Tuple3(it.b.a, it.b.b, it.a) })
+    dummyImplicit: Unit = Unit): Kind<F, Tuple3<A, B, Z>> =
+    other.product(this).map { Tuple3(it.b.a, it.b.b, it.a) }
 
   fun <A, B, C, Z> Kind<F, Tuple3<A, B, C>>.product(
     other: Kind<F, Z>,
-    dummyImplicit: Any? = null,
-    dummyImplicit2: Any? = null): Kind<F, Tuple4<A, B, C, Z>> =
-    other.product(this).map({ Tuple4(it.b.a, it.b.b, it.b.c, it.a) })
+    dummyImplicit: Unit = Unit,
+    dummyImplicit2: Unit = Unit): Kind<F, Tuple4<A, B, C, Z>> =
+    other.product(this).map { Tuple4(it.b.a, it.b.b, it.b.c, it.a) }
 
   fun <A, B, C, D, Z> Kind<F, Tuple4<A, B, C, D>>.product(
     other: Kind<F, Z>,
-    dummyImplicit: Any? = null,
-    dummyImplicit2: Any? = null,
-    dummyImplicit3: Any? = null): Kind<F, Tuple5<A, B, C, D, Z>> =
-    other.product(this).map({ Tuple5(it.b.a, it.b.b, it.b.c, it.b.d, it.a) })
+    dummyImplicit: Unit = Unit,
+    dummyImplicit2: Unit = Unit,
+    dummyImplicit3: Unit = Unit): Kind<F, Tuple5<A, B, C, D, Z>> =
+    other.product(this).map { Tuple5(it.b.a, it.b.b, it.b.c, it.b.d, it.a) }
 
   fun <A, B, C, D, E, Z> Kind<F, Tuple5<A, B, C, D, E>>.product(
     other: Kind<F, Z>,
-    dummyImplicit: Any? = null,
-    dummyImplicit2: Any? = null,
-    dummyImplicit3: Any? = null,
-    dummyImplicit4: Any? = null): Kind<F, Tuple6<A, B, C, D, E, Z>> =
-    other.product(this).map({ Tuple6(it.b.a, it.b.b, it.b.c, it.b.d, it.b.e, it.a) })
+    dummyImplicit: Unit = Unit,
+    dummyImplicit2: Unit = Unit,
+    dummyImplicit3: Unit = Unit,
+    dummyImplicit4: Unit = Unit): Kind<F, Tuple6<A, B, C, D, E, Z>> =
+    other.product(this).map { Tuple6(it.b.a, it.b.b, it.b.c, it.b.d, it.b.e, it.a) }
 
   fun <A, B, C, D, E, FF, Z> Kind<F, Tuple6<A, B, C, D, E, FF>>.product(
     other: Kind<F, Z>,
-    dummyImplicit: Any? = null,
-    dummyImplicit2: Any? = null,
-    dummyImplicit3: Any? = null,
-    dummyImplicit4: Any? = null,
-    dummyImplicit5: Any? = null): Kind<F, Tuple7<A, B, C, D, E, FF, Z>> =
-    other.product(this).map({ Tuple7(it.b.a, it.b.b, it.b.c, it.b.d, it.b.e, it.b.f, it.a) })
+    dummyImplicit: Unit = Unit,
+    dummyImplicit2: Unit = Unit,
+    dummyImplicit3: Unit = Unit,
+    dummyImplicit4: Unit = Unit,
+    dummyImplicit5: Unit = Unit): Kind<F, Tuple7<A, B, C, D, E, FF, Z>> =
+    other.product(this).map { Tuple7(it.b.a, it.b.b, it.b.c, it.b.d, it.b.e, it.b.f, it.a) }
 
   fun <A, B, C, D, E, FF, G, Z> Kind<F, Tuple7<A, B, C, D, E, FF, G>>.product(
     other: Kind<F, Z>,
-    dummyImplicit: Any? = null,
-    dummyImplicit2: Any? = null,
-    dummyImplicit3: Any? = null,
-    dummyImplicit4: Any? = null,
-    dummyImplicit5: Any? = null,
-    dummyImplicit6: Any? = null): Kind<F, Tuple8<A, B, C, D, E, FF, G, Z>> =
-    other.product(this).map({ Tuple8(it.b.a, it.b.b, it.b.c, it.b.d, it.b.e, it.b.f, it.b.g, it.a) })
+    dummyImplicit: Unit = Unit,
+    dummyImplicit2: Unit = Unit,
+    dummyImplicit3: Unit = Unit,
+    dummyImplicit4: Unit = Unit,
+    dummyImplicit5: Unit = Unit,
+    dummyImplicit6: Unit = Unit): Kind<F, Tuple8<A, B, C, D, E, FF, G, Z>> =
+    other.product(this).map { Tuple8(it.b.a, it.b.b, it.b.c, it.b.d, it.b.e, it.b.f, it.b.g, it.a) }
 
   fun <A, B, C, D, E, FF, G, H, Z> Kind<F, Tuple8<A, B, C, D, E, FF, G, H>>.product(
     other: Kind<F, Z>,
-    dummyImplicit: Any? = null,
-    dummyImplicit2: Any? = null,
-    dummyImplicit3: Any? = null,
-    dummyImplicit4: Any? = null,
-    dummyImplicit5: Any? = null,
-    dummyImplicit6: Any? = null,
-    dummyImplicit7: Any? = null): Kind<F, Tuple9<A, B, C, D, E, FF, G, H, Z>> =
-    other.product(this).map({ Tuple9(it.b.a, it.b.b, it.b.c, it.b.d, it.b.e, it.b.f, it.b.g, it.b.h, it.a) })
+    dummyImplicit: Unit = Unit,
+    dummyImplicit2: Unit = Unit,
+    dummyImplicit3: Unit = Unit,
+    dummyImplicit4: Unit = Unit,
+    dummyImplicit5: Unit = Unit,
+    dummyImplicit6: Unit = Unit,
+    dummyImplicit7: Unit = Unit): Kind<F, Tuple9<A, B, C, D, E, FF, G, H, Z>> =
+    other.product(this).map { Tuple9(it.b.a, it.b.b, it.b.c, it.b.d, it.b.e, it.b.f, it.b.g, it.b.h, it.a) }
 
   fun <A, B, C, D, E, FF, G, H, I, Z> Kind<F, Tuple9<A, B, C, D, E, FF, G, H, I>>.product(
     other: Kind<F, Z>,
-    dummyImplicit: Any? = null,
-    dummyImplicit2: Any? = null,
-    dummyImplicit3: Any? = null,
-    dummyImplicit4: Any? = null,
-    dummyImplicit5: Any? = null,
-    dummyImplicit6: Any? = null,
-    dummyImplicit7: Any? = null,
-    dummyImplicit9: Any? = null): Kind<F, Tuple10<A, B, C, D, E, FF, G, H, I, Z>> =
-    other.product(this).map({ Tuple10(it.b.a, it.b.b, it.b.c, it.b.d, it.b.e, it.b.f, it.b.g, it.b.h, it.b.i, it.a) })
+    dummyImplicit: Unit = Unit,
+    dummyImplicit2: Unit = Unit,
+    dummyImplicit3: Unit = Unit,
+    dummyImplicit4: Unit = Unit,
+    dummyImplicit5: Unit = Unit,
+    dummyImplicit6: Unit = Unit,
+    dummyImplicit7: Unit = Unit,
+    dummyImplicit9: Unit = Unit): Kind<F, Tuple10<A, B, C, D, E, FF, G, H, I, Z>> =
+    other.product(this).map { Tuple10(it.b.a, it.b.b, it.b.c, it.b.d, it.b.e, it.b.f, it.b.g, it.b.h, it.b.i, it.a) }
 
   fun <A, B> tupled(
     a: Kind<F, A>,
@@ -211,6 +215,9 @@ interface Applicative<F> : Functor<F> {
     f: Kind<F, FF>,
     lbd: (Tuple6<A, B, C, D, E, FF>) -> Z): Kind<F, Z> =
     a.product(b).product(c).product(d).product(e).product(f).map(lbd)
+
+  operator fun Kind<F, BigDecimal>.plus(other: Kind<F, BigDecimal>): Kind<F, BigDecimal> =
+    map(this, other) { (a, b) -> a + b }
 
   fun <A, B, C, D, E, FF, G, Z> map(
     a: Kind<F, A>,

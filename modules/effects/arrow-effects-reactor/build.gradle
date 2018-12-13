@@ -1,5 +1,4 @@
 dependencies {
-    compile project(':arrow-data')
     compile project(':arrow-effects')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     compile project(':arrow-annotations')
@@ -10,10 +9,9 @@ dependencies {
     testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
     testCompile project(':arrow-test')
 
-    compile "io.projectreactor:reactor-core:3.1.3.RELEASE"
-    testCompile "io.projectreactor:reactor-test:3.1.3.RELEASE"
+    compile "io.projectreactor:reactor-core:$projectReactorVersion"
+    testCompile "io.projectreactor:reactor-test:$projectReactorVersion"
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
-apply from: rootProject.file('gradle/generated-kotlin-sources.gradle')
 apply plugin: 'kotlin-kapt'

@@ -11,6 +11,22 @@ sealed class Option<out A> : OptionOf<A> {
 
   companion object {
 
+    /**
+     * Lifts a pure [A] value to [Option]
+     *
+     * {: data-executable='true'}
+     *
+     * ```kotlin:ank
+     * import arrow.core.Option
+     * fun main(args: Array<String>) {
+     * //sampleStart
+     * val result: Option<Int> = Option.just(1)
+     * //sampleEnd
+     * println(result)
+     * }
+     * ```
+     *
+     */
     fun <A> just(a: A): Option<A> = Some(a)
 
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> OptionOf<Either<A, B>>): Option<B> {
@@ -51,9 +67,6 @@ sealed class Option<out A> : OptionOf<A> {
    */
   fun isDefined(): Boolean = !isEmpty()
 
-  @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("getOrElse { ifEmpty }"))
-  abstract fun get(): A
-
   fun orNull(): A? = fold({ null }, ::identity)
 
   /**
@@ -66,13 +79,11 @@ sealed class Option<out A> : OptionOf<A> {
    * @param f the function to apply
    * @see flatMap
    */
-  inline fun <B> map(crossinline f: (A) -> B): Option<B> = fold({ None }, { a -> Some(f(a)) })
+  inline fun <B> map(f: (A) -> B): Option<B> =
+    flatMap { a -> Some(f(a)) }
 
-  inline fun <P1, R> map(p1: Option<P1>, crossinline f: (A, P1) -> R): Option<R> = if (isEmpty()) {
-    None
-  } else {
-    p1.map { pp1 -> f(get(), pp1) }
-  }
+  fun <B> mapFilter(f: (A) -> Option<B>): Option<B> =
+    flatMap { a -> f(a).fold({ empty<B>() }, { just(it) }) }
 
   inline fun <R> fold(ifEmpty: () -> R, ifSome: (A) -> R): R = when (this) {
     is None -> ifEmpty()
@@ -89,9 +100,14 @@ sealed class Option<out A> : OptionOf<A> {
    * @param f the function to apply
    * @see map
    */
-  fun <B> flatMap(f: (A) -> OptionOf<B>): Option<B> = fold({ None }, { a -> f(a) }).fix()
+  inline fun <B> flatMap(f: (A) -> OptionOf<B>): Option<B> =
+    when (this) {
+      is None -> this
+      is Some -> f(t).fix()
+    }
 
-  fun <B> ap(ff: OptionOf<(A) -> B>): Option<B> = ff.fix().flatMap { this.fix().map(it) }
+  fun <B> ap(ff: OptionOf<(A) -> B>): Option<B> =
+    ff.fix().flatMap { this.fix().map(it) }
 
   /**
    * Returns this $option if it is nonempty '''and''' applying the predicate $p to
@@ -99,8 +115,8 @@ sealed class Option<out A> : OptionOf<A> {
    *
    *  @param predicate the predicate used for testing.
    */
-  inline fun filter(crossinline predicate: Predicate<A>): Option<A> =
-    fold({ None }, { a -> if (predicate(a)) Some(a) else None })
+  fun filter(predicate: Predicate<A>): Option<A> =
+    flatMap { a -> if (predicate(a)) Some(a) else None }
 
   /**
    * Returns this $option if it is nonempty '''and''' applying the predicate $p to
@@ -108,7 +124,8 @@ sealed class Option<out A> : OptionOf<A> {
    *
    * @param predicate the predicate used for testing.
    */
-  inline fun filterNot(crossinline predicate: Predicate<A>): Option<A> = fold({ None }, { a -> if (!predicate(a)) Some(a) else None })
+  fun filterNot(predicate: Predicate<A>): Option<A> =
+    flatMap { a -> if (!predicate(a)) Some(a) else None }
 
   /**
    * Returns true if this option is nonempty '''and''' the predicate
@@ -117,7 +134,7 @@ sealed class Option<out A> : OptionOf<A> {
    *
    * @param predicate the predicate to test
    */
-  inline fun exists(crossinline predicate: Predicate<A>): Boolean = fold({ false }, { a -> predicate(a) })
+  fun exists(predicate: Predicate<A>): Boolean = fold({ false }, { a -> predicate(a) })
 
   /**
    * Returns true if this option is empty '''or''' the predicate
@@ -125,15 +142,10 @@ sealed class Option<out A> : OptionOf<A> {
    *
    * @param p the predicate to test
    */
-  inline fun forall(crossinline p: Predicate<A>): Boolean = fold({ true }, p)
-
-  @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("fold({ Unit }, f)"))
-  inline fun forEach(f: (A) -> Unit) {
-    if (nonEmpty()) f(get())
-  }
+  fun forall(p: Predicate<A>): Boolean = fold({ true }, p)
 
   fun <B> foldLeft(initial: B, operation: (B, A) -> B): B =
-    this.fix().let { option ->
+    fix().let { option ->
       when (option) {
         is Some -> operation(initial, option.t)
         is None -> initial
@@ -141,7 +153,7 @@ sealed class Option<out A> : OptionOf<A> {
     }
 
   fun <B> foldRight(initial: Eval<B>, operation: (A, Eval<B>) -> Eval<B>): Eval<B> =
-    this.fix().let { option ->
+    fix().let { option ->
       when (option) {
         is Some -> operation(option.t, initial)
         is None -> initial
@@ -151,7 +163,7 @@ sealed class Option<out A> : OptionOf<A> {
   fun <L> toEither(ifEmpty: () -> L): Either<L, A> =
     fold({ ifEmpty().left() }, { it.right() })
 
-  fun toList(): List<A> = fold(::emptyList, { listOf(it) })
+  fun toList(): List<A> = fold(::emptyList) { listOf(it) }
 
   infix fun <X> and(value: Option<X>): Option<X> = if (isEmpty()) {
     None
@@ -161,16 +173,12 @@ sealed class Option<out A> : OptionOf<A> {
 }
 
 object None : Option<Nothing>() {
-  override fun get() = throw NoSuchElementException("None.get")
-
   override fun isEmpty() = true
 
   override fun toString(): String = "None"
 }
 
 data class Some<out T>(val t: T) : Option<T>() {
-  override fun get() = t
-
   override fun isEmpty() = false
 
   override fun toString(): String = "Some($t)"
@@ -190,7 +198,7 @@ fun <T> Option<T>.getOrElse(default: () -> T): T = fold({ default() }, ::identit
  *
  * @param alternative the default option if this is empty.
  */
-fun <A, B : A> OptionOf<B>.orElse(alternative: () -> Option<B>): Option<B> = if (fix().isEmpty()) alternative() else fix()
+inline fun <A> OptionOf<A>.orElse(alternative: () -> Option<A>): Option<A> = if (fix().isEmpty()) alternative() else fix()
 
 infix fun <T> OptionOf<T>.or(value: Option<T>): Option<T> = if (fix().isEmpty()) {
   value
@@ -198,11 +206,7 @@ infix fun <T> OptionOf<T>.or(value: Option<T>): Option<T> = if (fix().isEmpty())
   fix()
 }
 
-fun <T> T?.toOption(): Option<T> = if (this != null) {
-  Some(this)
-} else {
-  None
-}
+fun <T> T?.toOption(): Option<T> = this?.let { Some(it) } ?: None
 
 fun <A> Boolean.maybe(f: () -> A): Option<A> =
   if (this) {
@@ -214,3 +218,17 @@ fun <A> Boolean.maybe(f: () -> A): Option<A> =
 fun <A> A.some(): Option<A> = Some(this)
 
 fun <A> none(): Option<A> = None
+
+fun <T> Iterable<T>.firstOrNone(): Option<T> = this.firstOrNull().toOption()
+
+fun <T> Iterable<T>.firstOrNone(predicate: (T) -> Boolean): Option<T> = this.firstOrNull(predicate).toOption()
+
+fun <T> Iterable<T>.singleOrNone(): Option<T> = this.singleOrNull().toOption()
+
+fun <T> Iterable<T>.singleOrNone(predicate: (T) -> Boolean): Option<T> = this.singleOrNull(predicate).toOption()
+
+fun <T> Iterable<T>.lastOrNone(): Option<T> = this.lastOrNull().toOption()
+
+fun <T> Iterable<T>.lastOrNone(predicate: (T) -> Boolean): Option<T> = this.lastOrNull(predicate).toOption()
+
+fun <T> Iterable<T>.elementAtOrNone(index: Int): Option<T> = this.elementAtOrNull(index).toOption()

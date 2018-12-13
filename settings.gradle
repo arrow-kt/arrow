@@ -42,6 +42,7 @@ include {
             _ 'core'
             _ 'data'
             _ 'free'
+            _ 'instances-free'
             _ 'instances-core'
             _ 'instances-data'
             _ 'generic'
@@ -55,13 +56,23 @@ include {
 
         effects {
             _ 'effects'
+            _ 'effects-instances'
+            _ 'data-instances-effects'
             _ 'effects-rx2'
+            _ 'effects-rx2-instances'
             _ 'effects-kotlinx-coroutines'
+            _ 'effects-kotlinx-coroutines-instances'
             _ 'effects-reactor'
+            _ 'effects-reactor-instances'
+        }
+
+        integrations {
+            _ 'integrations-retrofit-adapter'
         }
 
         folder('recursion-schemes') {
             _ 'recursion'
+            _ 'instances-recursion'
         }
 
         docs {
@@ -78,6 +89,27 @@ include {
             _ 'dagger-effects'
             _ 'dagger-effects-rx2'
             _ 'dagger-effects-kotlinx-coroutines'
+        }
+
+        shadow {
+            _ 'shadow'
+        }
+        
+        streams {
+            _ 'streams'
+        }
+
+        ank {
+            _ 'ank'
+            _ 'ank-gradle'
+        }
+
+        aql {
+            _ 'query-language'
+        }
+
+        reflect {
+            _ 'reflect'
         }
     }
 }

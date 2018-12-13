@@ -1,8 +1,6 @@
 package arrow.optics
 
-import arrow.core.Left
-import arrow.core.Right
-import arrow.core.identity
+import arrow.core.*
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 
@@ -36,7 +34,7 @@ val stringPrism: Prism<String, List<Char>> = Prism(
 
 internal val tokenLens: Lens<Token, String> = Lens(
   { token: Token -> token.value },
-  { value: String -> { token: Token -> token.copy(value = value) } }
+  { token: Token, value: String -> token.copy(value = value) }
 )
 
 internal val tokenIso: Iso<Token, String> = Iso(
@@ -44,8 +42,8 @@ internal val tokenIso: Iso<Token, String> = Iso(
   ::Token
 )
 
-internal val tokenSetter: Setter<Token, String> = Setter { s ->
-  { token -> token.copy(value = s(token.value)) }
+internal val tokenSetter: Setter<Token, String> = Setter { token, s ->
+  token.copy(value = s(token.value))
 }
 
 internal val userIso: Iso<User, Token> = Iso(
@@ -53,8 +51,8 @@ internal val userIso: Iso<User, Token> = Iso(
   ::User
 )
 
-internal val userSetter: Setter<User, Token> = Setter { s ->
-  { user -> user.copy(token = s(user.token)) }
+internal val userSetter: Setter<User, Token> = Setter { user, s ->
+  user.copy(token = s(user.token))
 }
 
 internal data class Token(val value: String) {
@@ -78,15 +76,15 @@ internal val tokenGetter: Getter<Token, String> = Getter(Token::value)
 
 internal val userLens: Lens<User, Token> = Lens(
   { user: User -> user.token },
-  { token: Token -> { user: User -> user.copy(token = token) } }
+  { user: User, token: Token -> user.copy(token = token) }
 )
 
 internal val optionalHead: Optional<List<Int>, Int> = Optional(
-  { it.firstOrNull()?.let(::Right) ?: it.let(::Left) },
-  { int -> { list -> listOf(int) + if (list.size > 1) list.drop(1) else emptyList() } }
+  { it.firstOrNull()?.right() ?: it.left() },
+  { list, int -> listOf(int) + if (list.size > 1) list.drop(1) else emptyList() }
 )
 
 internal val defaultHead: Optional<Int, Int> = Optional(
-  { it.let(::Right) },
-  { ::identity }
+  { it.right() },
+  { s, _ -> s }
 )

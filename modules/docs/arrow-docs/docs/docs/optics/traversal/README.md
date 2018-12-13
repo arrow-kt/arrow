@@ -11,7 +11,7 @@ beginner
 
 A `Traversal` is an optic that can see into a structure and get, set or modify 0 to N foci.
 
-It is a generalization of [`Traverse#traverse`](/docs/typeclasses/traverse). Given a `Traverse<F>` we can apply a function `(A) -> Kind<G, B>` to `Kind<F, A>` and get `Kind<G, Kind<F, B>>`.
+It is a generalization of [`Traverse#traverse`](/docs/arrow/typeclasses/traverse). Given a `Traverse<F>` we can apply a function `(A) -> Kind<G, B>` to `Kind<F, A>` and get `Kind<G, Kind<F, B>>`.
 We can think of `Kind<F, A>` as a structure `S` that has a focus `A`. So given a `PTraversal<S, T, A, B>` we can apply a function `(A) -> Kind<F, B>` to `S` and get `Kind<F, T>`.
 
  - `Traverse.traverse(fa: Kind<F, A>, f: (A) -> Kind<G, B>, GA: Applicative<G>): Kind<G, Kind<F, B>>`
@@ -24,6 +24,8 @@ import arrow.*
 import arrow.optics.*
 import arrow.core.*
 import arrow.data.*
+import arrow.instances.listk.traverse.*
+import arrow.instances.`try`.applicative.*
 
 val listTraversal: Traversal<ListKOf<Int>, Int> = Traversal.fromTraversable(ListK.traverse())
 
@@ -51,11 +53,30 @@ Arrow optics also provides a number of predefined `Traversal` optics.
 
 ```kotlin:ank
 import arrow.instances.*
+import arrow.optics.instances.*
 
 Tuple2.traversal<String>().combineAll(String.monoid(), "Hello, " toT "World!")
 ```
 ```kotlin:ank
 Tuple10.traversal<Int>().getAll(Tuple10(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
+```
+
+There are also some convenience methods to make working with [State]({{ '/docs/arrow/data/state' | relative_url }}) easier.
+This can make working with nested structures in stateful computations significantly more elegant.
+
+```kotlin:ank
+data class Enemy(val health: Int)
+val battlefield = listOf(Enemy(70), Enemy(80), Enemy(65)).k()
+
+val dropBomb = ListK.traversal<Enemy>().update { it.copy(health = it.health - 50) }
+
+dropBomb.run(battlefield)
+```
+
+```kotlin:ank
+val finishingMove = ListK.traversal<Enemy>().assign(Enemy(0))
+
+finishingMove.run(battlefield)
 ```
 
 ## Composition

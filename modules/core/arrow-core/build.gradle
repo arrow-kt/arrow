@@ -7,8 +7,9 @@ dependencies {
     testCompileOnly project(':arrow-annotations-processor')
     testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
     testCompile project(':arrow-test')
+    testCompile project(':arrow-syntax')
+    testCompile project(':arrow-instances-core')
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
-apply from: rootProject.file('gradle/generated-kotlin-sources.gradle')
 apply plugin: 'kotlin-kapt'

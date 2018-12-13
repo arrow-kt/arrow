@@ -9,8 +9,7 @@ dependencies {
     testCompile project(':arrow-test')
 
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
-    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
 }
 
-apply from: rootProject.file('gradle/generated-kotlin-sources.gradle')
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
 apply plugin: 'kotlin-kapt'

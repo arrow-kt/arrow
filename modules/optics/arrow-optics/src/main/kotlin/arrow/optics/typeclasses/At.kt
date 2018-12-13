@@ -12,6 +12,8 @@ import arrow.optics.Setter
 import arrow.optics.Traversal
 
 /**
+ * ank_macro_hierarchy(arrow.optics.typeclasses.At)
+ *
  * [At] provides a [Lens] for a structure [S] to focus in [A] at a given index [I].
  *
  * @param S source of [Lens]
@@ -101,15 +103,6 @@ interface At<S, I, A> {
   fun <T> Fold<T, S>.at(i: I): Fold<T, A> = this.compose(this@At.at(i))
 
   companion object {
-
-    /**
-     * Get an [At] for an index [i] given an [Index].
-     *
-     * @param AT [At] instance to provide [Lens] for a structure [S] to focus in [A] at a given index [I].
-     * @param i index [I] to zoom into [S] and find focus [A]
-     * @return [Lens] with a focus in [A] that was found at index [I].
-     */
-    fun <S, I, A> at(AT: At<S, I, A>, i: I): Lens<S, A> = AT.at(i)
 
     /**
      * Lift an instance of [At] using an [Iso].

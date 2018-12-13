@@ -18,10 +18,10 @@ In this doc we'll describe all the modules that form the core, alongside a list 
 {:.beginner}
 beginner
 
-The smallest set of constructs necessary to start in FP, and that other libraries can build upon.
+The smallest set of [datatypes]({{ '/docs/datatypes/intro/' | relative_url }}) necessary to start in FP, and that other libraries can build upon.
 The focus here is on API design and abstracting small code patterns.
 
-Datatypes: [`Either`]({{ '/docs/datatypes/either/' | relative_url }}), [`Option`]({{ '/docs/datatypes/option/' | relative_url }}), [`Try`]({{ '/docs/datatypes/try/' | relative_url }}), [`Eval`]({{ '/docs/datatypes/eval/' | relative_url }}), [`Id`]({{ '/docs/datatypes/id/' | relative_url }}), `TupleN`, `Function0`, `Function1`, `FunctionK`
+Datatypes: [`Either`]({{ '/docs/arrow/core/either/' | relative_url }}), [`Option`]({{ '/docs/arrow/core/option/' | relative_url }}), [`Try`]({{ '/docs/arrow/core/try/' | relative_url }}), [`Eval`]({{ '/docs/arrow/core/eval/' | relative_url }}), [`Id`]({{ '/docs/arrow/core/id/' | relative_url }}), `TupleN`, `Function0`, `Function1`, `FunctionK`
 
 ### arrow-syntax
 
@@ -47,7 +47,7 @@ Dependencies: arrow-core
 
 Datatypes: [`Const`]({{ '/docs/typeclasses/const/' | relative_url }})
 
-Typeclasses: [`Alternative`]({{ '/docs/typeclasses/alternative/' | relative_url }}), [`Bimonad`]({{ '/docs/typeclasses/bimonad/' | relative_url }}), [`Inject`]({{ '/docs/typeclasses/inject/' | relative_url }}), [`Reducible`]({{ '/docs/typeclasses/reducible/' | relative_url }}), [`Traverse`]({{ '/docs/typeclasses/traverse/' | relative_url }}), [`Applicative`]({{ '/docs/typeclasses/applicative/' | relative_url }}), [`Comonad`]({{ '/docs/typeclasses/comonad/' | relative_url }}), [`Eq`]({{ '/docs/typeclasses/eq/' | relative_url }}), [`Monad`]({{ '/docs/typeclasses/monad/' | relative_url }}), [`Monoid`]({{ '/docs/typeclasses/monoid/' | relative_url }}), [`Semigroup`]({{ '/docs/typeclasses/semigroup/' | relative_url }}), [`ApplicativeError`]({{ '/docs/typeclasses/applicativeerror/' | relative_url }}), [`Foldable`]({{ '/docs/typeclasses/foldable/' | relative_url }}), [`MonoidK`]({{ '/docs/typeclasses/monoidk/' | relative_url }}), [`SemigroupK`]({{ '/docs/typeclasses/semigroupk/' | relative_url }}), [`Bifoldable`]({{ '/docs/typeclasses/bifoldable/' | relative_url }}), [`Functor`]({{ '/docs/typeclasses/functor/' | relative_url }}), [`MonadError`]({{ '/docs/typeclasses/monaderror/' | relative_url }}), [`Order`]({{ '/docs/typeclasses/order/' | relative_url }}), [`Show`]({{ '/docs/typeclasses/show/' | relative_url }}), `Composed`
+Typeclasses: [`Alternative`]({{ '/docs/arrow/typeclasses/alternative/' | relative_url }}), [`Bimonad`]({{ '/docs/arrow/typeclasses/bimonad/' | relative_url }}), [`Inject`]({{ '/docs/typeclasses/inject/' | relative_url }}), [`Reducible`]({{ '/docs/arrow/typeclasses/reducible/' | relative_url }}), [`Traverse`]({{ '/docs/arrow/typeclasses/traverse/' | relative_url }}), [`Applicative`]({{ '/docs/arrow/typeclasses/applicative/' | relative_url }}), [`Comonad`]({{ '/docs/arrow/typeclasses/comonad/' | relative_url }}), [`Eq`]({{ '/docs/arrow/typeclasses/eq/' | relative_url }}), [`Monad`]({{ '/docs/arrow/typeclasses/monad/' | relative_url }}), [`Monoid`]({{ '/docs/arrow/typeclasses/monoid/' | relative_url }}), [`Semigroup`]({{ '/docs/arrow/typeclasses/semigroup/' | relative_url }}), [`ApplicativeError`]({{ '/docs/arrow/typeclasses/applicativeerror/' | relative_url }}), [`Foldable`]({{ '/docs/arrow/typeclasses/foldable/' | relative_url }}), [`MonoidK`]({{ '/docs/arrow/typeclasses/monoidk/' | relative_url }}), [`SemigroupK`]({{ '/docs/arrow/typeclasses/semigroupk/' | relative_url }}), [`Bifoldable`]({{ '/docs/arrow/typeclasses/bifoldable/' | relative_url }}), [`Functor`]({{ '/docs/arrow/typeclasses/functor/' | relative_url }}), [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror/' | relative_url }}), [`Order`]({{ '/docs/arrow/typeclasses/order/' | relative_url }}), [`Show`]({{ '/docs/arrow/typeclasses/show/' | relative_url }}), `Composed`
 
 ### arrow-data
 
@@ -59,7 +59,7 @@ You can also find more advanced constructs for pure functional programming like 
 
 Dependencies: arrow-typeclasses
 
-Datatypes: [`Cokleisli`]({{ '/docs/datatypes/cokleisli/' | relative_url }}), [`Coreader`]({{ '/docs/datatypes/coreader/' | relative_url }}), [`Ior`]({{ '/docs/datatypes/ior/' | relative_url }}), [`ListK`]({{ '/docs/datatypes/listK/' | relative_url }}), [`NonEmptyList`]({{ '/docs/datatypes/nonEmptyList/' | relative_url }}), [`SequenceK`]({{ '/docs/datatypes/sequenceK/' | relative_url }}), [`SortedMapK`]({{ '/docs/datatypes/sortedMapK/' | relative_url }}), [`StateT`]({{ '/docs/datatypes/stateT/' | relative_url }}), [`WriterT`]({{ '/docs/datatypes/writerT/' | relative_url }}), [`Coproduct`]({{ '/docs/datatypes/coproduct/' | relative_url }}), [`EitherT`]({{ '/docs/datatypes/eitherT/' | relative_url }}), [`Kleisli`]({{ '/docs/datatypes/kleisli/' | relative_url }}), [`MapK`]({{ '/docs/datatypes/mapK/' | relative_url }}), [`OptionT`]({{ '/docs/datatypes/optionT/' | relative_url }}), [`Reader`]({{ '/docs/datatypes/reader/' | relative_url }}), [`SetK`]({{ '/docs/datatypes/setK/' | relative_url }}), [`State`]({{ '/docs/datatypes/state/' | relative_url }}), [`Validated`]({{ '/docs/datatypes/validated/' | relative_url }})
+Datatypes: [`Cokleisli`]({{ '/docs/datatypes/cokleisli/' | relative_url }}), [`Coreader`]({{ '/docs/datatypes/coreader/' | relative_url }}), [`Ior`]({{ '/docs/arrow/data/ior/' | relative_url }}), [`ListK`]({{ '/docs/arrow/data/listk/' | relative_url }}), [`NonEmptyList`]({{ '/docs/arrow/data/nonemptylist/' | relative_url }}), [`SequenceK`]({{ '/docs/arrow/data/sequencek/' | relative_url }}), [`SortedMapK`]({{ '/docs/arrow/data/sortedmapk/' | relative_url }}), [`StateT`]({{ '/docs/arrow/data/statet/' | relative_url }}), [`WriterT`]({{ '/docs/arrow/data/writert/' | relative_url }}), [`Coproduct`]({{ '/docs/arrow/data/coproduct/' | relative_url }}), [`EitherT`]({{ '/docs/arrow/data/eithert/' | relative_url }}), [`Kleisli`]({{ '/docs/arrow/data/kleisli/' | relative_url }}), [`MapK`]({{ '/docs/arrow/data/mapk/' | relative_url }}), [`OptionT`]({{ '/docs/arrow/data/optiont/' | relative_url }}), [`Reader`]({{ '/docs/arrow/data/reader/' | relative_url }}), [`SetK`]({{ '/docs/arrow/data/setk/' | relative_url }}), [`State`]({{ '/docs/arrow/data/state/' | relative_url }}), [`Validated`]({{ '/docs/arrow/data/validated/' | relative_url }})
 
 ### arrow-instances-(core, data)
 
@@ -81,7 +81,7 @@ It also includes the instances available for datatypes in both arrow-core and ar
 
 Dependencies: arrow-instances-data
 
-Typeclasses: [`FunctorFilter`]({{ '/docs/typeclasses/functorFilter/' | relative_url }}), [`MonadFilter`]({{ '/docs/typeclasses/monadFilter/' | relative_url }}), [`MonadReader`]({{ '/docs/typeclasses/monadReader/' | relative_url }}), [`MonadWriter`]({{ '/docs/typeclasses/monadWriter/' | relative_url }}), [`MonadCombine`]({{ '/docs/typeclasses/monadCombine/' | relative_url }}), [`MonadState`]({{ '/docs/typeclasses/monadState/' | relative_url }}), [`TraverseFilter`]({{ '/docs/typeclasses/traverseFilter/' | relative_url }})
+Typeclasses: [`FunctorFilter`]({{ '/docs/arrow/mtl/typeclasses/functorfilter/' | relative_url }}), [`MonadFilter`]({{ '/docs/arrow/mtl/typeclasses/monadfilter/' | relative_url }}), [`MonadReader`]({{ '/docs/arrow/mtl/typeclasses/monadreader/' | relative_url }}), [`MonadWriter`]({{ '/docs/arrow/mtl/typeclasses/monadwriter/' | relative_url }}), [`MonadCombine`]({{ '/docs/arrow/mtl/typeclasses/monadcombine/' | relative_url }}), [`MonadState`]({{ '/docs/arrow/mtl/typeclasses/monadstate' | relative_url }}), [`TraverseFilter`]({{ '/docs/arrow/mtl/typeclasses/traversefilter/' | relative_url }})
 
 ## Extension libraries
 
@@ -111,7 +111,7 @@ The effects library abstracts over concurrency frameworks using typeclasses. Add
 
 Datatypes: [`IO`]({{ '/docs/effects/io/' | relative_url }})
 
-Typeclasses: [`MonadSuspend`]({{ '/docs/effects/monadsuspend/' | relative_url }}), [`Async`]({{ '/docs/effects/async/' | relative_url }}), [`Effect`]({{ '/docs/effects/effect/' | relative_url }})
+Typeclasses: [`MonadDefer`]({{ '/docs/effects/monaddefer/' | relative_url }}), [`Async`]({{ '/docs/effects/async/' | relative_url }}), [`Effect`]({{ '/docs/effects/effect/' | relative_url }})
 
 
 ### arrow-effects-(rx2, reactor, kotlinx-coroutines)
@@ -137,6 +137,13 @@ Recursion schemes is a construct to work with recursive data structures in a way
 Datatypes: [`Fix`]({{ '/docs/recursion/fix/' | relative_url }}), [`Mu`]({{ '/docs/recursion/mu/' | relative_url }}), [`Nu`]({{ '/docs/recursion/nu/' | relative_url }})
 
 Typeclasses: [`Corecursive`]({{ '/docs/recursion/corecursive/' | relative_url }}), [`Recursive`]({{ '/docs/recursion/recursive/' | relative_url }}), [`Birecursive`]({{ '/docs/recursion/birecursive/' | relative_url }})
+
+### arrow-integration-retrofit-adapter
+
+{:.advanced}
+advanced
+
+The [adapter]({{ 'docs/integrations/retrofit/' | relative_url }}) is a library that adds integration with Retrofit, providing extensions functions and/or classes to work with Retrofit by encapsulating the responses in the chosen datatypes, through the use of typeclasses.
 
 ### arrow-free
 

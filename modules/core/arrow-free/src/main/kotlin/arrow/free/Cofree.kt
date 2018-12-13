@@ -3,10 +3,10 @@ package arrow.free
 import arrow.Kind
 import arrow.core.Eval
 import arrow.core.ForEval
-import arrow.core.applicative
 import arrow.core.fix
 import arrow.higherkind
 import arrow.core.FunctionK
+import arrow.instances.eval.applicative.applicative
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.Traverse
@@ -20,25 +20,25 @@ data class Cofree<S, A>(val FS: Functor<S>, val head: A, val tail: Eval<CofreeEv
 
   inline fun <B> transform(f: (A) -> B, noinline g: (Cofree<S, A>) -> Cofree<S, B>): Cofree<S, B> = Cofree(FS, f(head), tail.map { it.map(g) })
 
-  fun <B> map(f: (A) -> B): Cofree<S, B> = transform(f, { it.map(f) })
+  fun <B> map(f: (A) -> B): Cofree<S, B> = transform(f) { it.map(f) }
 
   fun mapBranchingRoot(fk: FunctionK<S, S>): Cofree<S, A> = Cofree(FS, head, tail.map { fk(it) })
 
   // Due to the recursive nature of this function, it cannot be reified for FT to use functor<T>()
-  fun <T> mapBranchingS(fk: FunctionK<S, T>, FT: Functor<T>): Cofree<T, A> = Cofree(FT, head, tail.map { ce -> fk(ce.map({ it.mapBranchingS(fk, FT) })) })
+  fun <T> mapBranchingS(fk: FunctionK<S, T>, FT: Functor<T>): Cofree<T, A> = Cofree(FT, head, tail.map { ce -> fk(ce.map { it.mapBranchingS(fk, FT) }) })
 
   // Due to the recursive nature of this function, it cannot be reified for FT to use functor<T>()
   fun <T> mapBranchingT(fk: FunctionK<S, T>, FT: Functor<T>): Cofree<T, A> = FT.run {
-    Cofree(this, head, tail.map { ce -> fk(ce).map({ it.mapBranchingT(fk, this) }) })
+    Cofree(this, head, tail.map { ce -> fk(ce).map { it.mapBranchingT(fk, this) } })
   }
 
-  fun <B> coflatMap(f: (Cofree<S, A>) -> B): Cofree<S, B> = Cofree(FS, f(this), tail.map { it.map({ coflatMap(f) }) })
+  fun <B> coflatMap(f: (Cofree<S, A>) -> B): Cofree<S, B> = Cofree(FS, f(this), tail.map { it.map { coflatMap(f) } })
 
-  fun duplicate(): Cofree<S, Cofree<S, A>> = Cofree(FS, this, tail.map { it.map({ duplicate() }) })
+  fun duplicate(): Cofree<S, Cofree<S, A>> = Cofree(FS, this, tail.map { it.map { duplicate() } })
 
   fun runTail(): Cofree<S, A> = Cofree(FS, head, Eval.now(tail.value()))
 
-  fun run(): Cofree<S, A> = Cofree(FS, head, Eval.now(tail.map { it.map({ it.run() }) }.value()))
+  fun run(): Cofree<S, A> = Cofree(FS, head, Eval.now(tail.map { it.map { it.run() } }.value()))
 
   fun extract(): A = head
 
@@ -49,7 +49,7 @@ data class Cofree<S, A>(val FS: Functor<S>, val head: A, val tail: Eval<CofreeEv
 
   fun <F, M, A, B> Cofree<F, A>.cataM(MM: Monad<M>, TF: Traverse<F>, inclusion: FunctionK<ForEval, M>, folder: (A, Kind<F, B>) -> Kind<M, B>): Kind<M, B> = MM.run {
     fun loop(ev: Cofree<F, A>): Eval<Kind<M, B>> {
-      val looped: Kind<M, Kind<F, B>> = TF.run { ev.tailForced().traverse(MM, { inclusion(Eval.defer { loop(it) }).flatten() }) }
+      val looped: Kind<M, Kind<F, B>> = TF.run { ev.tailForced().traverse(MM) { inclusion(Eval.defer { loop(it) }).flatten() } }
       val folded: Kind<M, B> = looped.flatMap { fb -> folder(ev.head, fb) }
       return Eval.now(folded)
     }
@@ -60,7 +60,7 @@ data class Cofree<S, A>(val FS: Functor<S>, val head: A, val tail: Eval<CofreeEv
     fun <S, A> unfold(FS: Functor<S>, a: A, f: (A) -> Kind<S, A>): Cofree<S, A> = create(FS, a, f)
 
     fun <S, A> create(FS: Functor<S>, a: A, f: (A) -> Kind<S, A>): Cofree<S, A> = FS.run {
-      Cofree(this, a, Eval.later { f(a).map({ create(this, it, f) }) })
+      Cofree(this, a, Eval.later { f(a).map { create(this, it, f) } })
     }
 
   }

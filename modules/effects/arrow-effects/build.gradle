@@ -1,5 +1,5 @@
 dependencies {
-    compile project(':arrow-data')
+    compile project(':arrow-typeclasses')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     compile project(':arrow-annotations')
     kapt project(':arrow-annotations-processor')
@@ -11,5 +11,4 @@ dependencies {
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
-apply from: rootProject.file('gradle/generated-kotlin-sources.gradle')
 apply plugin: 'kotlin-kapt'

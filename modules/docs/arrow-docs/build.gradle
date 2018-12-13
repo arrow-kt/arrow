@@ -2,24 +2,29 @@ apply plugin: 'ank-gradle-plugin'
 apply plugin: 'org.ajoberstar.git-publish'
 
 dependencies {
-    compile('io.arrow-kt:ank-core:0.7.1') {
-        exclude group: 'io.arrow-kt', module: 'arrow-core'
-        exclude group: 'io.arrow-kt', module: 'arrow-instances-core'
-        exclude group: 'io.arrow-kt', module: 'arrow-free'
-    }
+//    compile('io.arrow-kt:ank-core:0.7.1') {
+//        exclude group: 'io.arrow-kt', module: 'arrow-core'
+//        exclude group: 'io.arrow-kt', module: 'arrow-instances-core'
+//        exclude group: 'io.arrow-kt', module: 'arrow-free'
+//    }
+    compile project(':arrow-ank')
     compile project(':arrow-data')
     compile project(':arrow-core')
     compile project(':arrow-instances-data')
-    compile project(':arrow-effects')
-    compile project(':arrow-effects-rx2')
-    compile project(':arrow-effects-reactor')
-    compile project(':arrow-effects-kotlinx-coroutines')
+    compile project(':arrow-effects-instances')
+    compile project(':arrow-data-instances-effects')
+    compile project(':arrow-effects-rx2-instances')
+    compile project(':arrow-effects-reactor-instances')
+    compile project(':arrow-effects-kotlinx-coroutines-instances')
     compile project(':arrow-optics')
-    compile project(':arrow-recursion')
+    compile project(':arrow-instances-recursion')
+    compile project(':arrow-integrations-retrofit-adapter')
     compile project(':arrow-mtl')
     compile project(':arrow-free')
     compile project(':arrow-typeclasses')
     compile project(':arrow-generic')
+    compile project(':arrow-query-language')
+    compile project(":arrow-reflect")
     kapt project(':arrow-annotations-processor')
     kaptTest project(':arrow-annotations-processor')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
@@ -27,8 +32,8 @@ dependencies {
     compile "io.kotlintest:kotlintest:$kotlinTestVersion"
 
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
-    compile "io.reactivex.rxjava2:rxjava:2.1.13"
-    compile "io.projectreactor:reactor-core:3.1.3.RELEASE"
+    compile "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
+    compile "io.projectreactor:reactor-core:$projectReactorVersion"
 }
 
 task printcp {
@@ -61,5 +66,4 @@ apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
 
 compileKotlin.kotlinOptions.freeCompilerArgs += ["-Xskip-runtime-version-check"]
 
-apply from: rootProject.file('gradle/generated-kotlin-sources.gradle')
 apply plugin: 'kotlin-kapt'

@@ -8,6 +8,7 @@ import java.io.File
 import javax.lang.model.element.Name
 
 val KindPostFix = "Of"
+val KindPartialPostFix = "PartialOf"
 val KindedJPostFix = "KindedJ"
 val HKMarkerPreFix = "For"
 
@@ -36,7 +37,7 @@ class HigherKindsFileGenerator(
   private val higherKinds: List<HigherKind> = annotatedList.map { HigherKind(it.classOrPackageProto.`package`, it) }
 
   /**
-   * Main entry point for higher kinds extension generation
+   * Main entry point for higher kinds instance generation
    */
   fun generate() {
     higherKinds.forEachIndexed { _, hk ->
@@ -61,7 +62,7 @@ class HigherKindsFileGenerator(
     val appliedTypeArgs = hk.typeArgs.dropLast(1)
     val expandedAppliedTypeArgs = appliedTypeArgs.joinToString(", ")
     val hkimpl = if (appliedTypeArgs.size == 1) "arrow.Kind" else "arrow.Kind${appliedTypeArgs.size}"
-    return "typealias ${hk.name.replace("Of$".toRegex(), { "PartialOf" })}<$expandedAppliedTypeArgs> = $hkimpl<${hk.markerName}, $expandedAppliedTypeArgs>"
+    return "typealias ${hk.name.replace("Of$".toRegex()) { "PartialOf" }}<$expandedAppliedTypeArgs> = $hkimpl<${hk.markerName}, $expandedAppliedTypeArgs>"
   }
 
   private fun genKindedJTypeAliases(hk: HigherKind): String =

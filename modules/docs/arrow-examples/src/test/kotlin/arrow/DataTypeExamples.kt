@@ -2,7 +2,11 @@ package arrow
 
 import arrow.Problem.*
 import arrow.core.*
-import arrow.typeclasses.binding
+import arrow.instances.`try`.applicative.applicative
+import arrow.instances.`try`.functor.functor
+import arrow.instances.option.applicative.applicative
+import arrow.instances.option.monad.binding
+import arrow.instances.option.monad.monad
 import io.kotlintest.matchers.Matcher
 import io.kotlintest.matchers.Result
 import io.kotlintest.matchers.shouldBe
@@ -13,7 +17,7 @@ import kotlin.reflect.KClass
 class DataTypeExamples : FreeSpec() { init {
 
   /**
-   * Option http://arrow-kt.io/docs/datatypes/option/
+   * Option http://arrow-kt.io/docs/arrow/core/option/
    ***/
   "Option: Some or None?" - {
     val someValue: Option<Int> = Some(42)
@@ -61,7 +65,7 @@ class DataTypeExamples : FreeSpec() { init {
 
     "Monad" {
       // Computing over dependent values ignoring absence
-      val six = Option.monad().binding {
+      val six = binding {
         val a = Option(1).bind()
         val b = Option(1 + a).bind()
         val c = Option(1 + b).bind()
@@ -69,7 +73,7 @@ class DataTypeExamples : FreeSpec() { init {
       }
       six shouldBe Some(6)
 
-      val none = Option.monad().binding {
+      val none = binding {
         val a = Option(1).bind()
         val b = noneValue.bind()
         val c = Option(1 + b).bind()
@@ -80,7 +84,7 @@ class DataTypeExamples : FreeSpec() { init {
 
   }
 
-  // http://arrow-kt.io/docs/datatypes/try/
+  // http://arrow-kt.io/docs/arrow/core/try/
   "Try and recover" - {
 
     "Old school" {
@@ -130,7 +134,7 @@ class DataTypeExamples : FreeSpec() { init {
 
     "Functor" {
       // Transforming the value, if the computation is a success:
-      val actual = Try.functor().run { Try { "3".toInt() }.map({ it + 1 }) }
+      val actual = Try.functor().run { Try { "3".toInt() }.map { it + 1 } }
       actual shouldBe Try.Success(4)
     }
 
@@ -146,7 +150,7 @@ class DataTypeExamples : FreeSpec() { init {
     }
   }
 
-  // Either http://arrow.io/docs/datatypes/either/
+  // Either http://arrow.io/docs/arrow/core/either/
   "Either left or right" - {
     fun parse(s: String): ProblemOrInt = Try { Right(s.toInt()) }.getOrElse { Left(invalidInt) }
     fun reciprocal(i: Int): Either<Problem, Double> = when (i) {

@@ -19,8 +19,9 @@ We can use that `Optional` to safely operate on that focus `S` i.e. operating on
 ```kotlin:ank
 import arrow.data.*
 import arrow.optics.typeclasses.*
+import arrow.optics.instances.listk.index.*
 
-val thirdListItemOptional = Index.index(ListK.index<String>(), 3)
+val thirdListItemOptional = ListK.index<String>().index(3)
 
 thirdListItemOptional.set(listOf("0", "1", "2", "3").k(), "newValue")
 ```
@@ -40,12 +41,13 @@ You may create instances of `Index` for your own datatypes which you will be abl
 
 See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }}) to provide your own `Index` instances for custom datatypes.
 
-### Instances
+### Data types
 
-The following datatypes in Arrow provide instances that adhere to the `Index` typeclass.
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.optics.typeclasses.*
 
-- [String]
-- [NonEmptyList]({{ '/docs/datatypes/nonemptylist' | relative_url }})
-- [ListK]({{ '/docs/datatypes/listk' | relative_url }})
-- [SequenceK]({{ '/docs/datatypes/sequencek' | relative_url }})
-- [MapK]({{ '/docs/datatypes/mapk' | relative_url }})
+TypeClass(Index::class).dtMarkdownList()
+```
+
+ank_macro_hierarchy(arrow.optics.typeclasses.Index)

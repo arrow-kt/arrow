@@ -1,15 +1,21 @@
 package arrow.effects
 
 import arrow.Kind
-import arrow.core.*
-import arrow.effects.CoroutineContextScheduler.asScheduler
+import arrow.core.Either
+import arrow.core.Eval
+import arrow.core.Left
+import arrow.core.Right
+import arrow.core.identity
+import arrow.effects.CoroutineContextRx2Scheduler.asScheduler
+import arrow.effects.typeclasses.Disposable
+import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.FlowableEmitter
-import kotlin.coroutines.experimental.CoroutineContext
+import kotlin.coroutines.CoroutineContext
 
 fun <A> Flowable<A>.k(): FlowableK<A> = FlowableK(this)
 
@@ -26,6 +32,15 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
 
   fun <B> flatMap(f: (A) -> FlowableKOf<B>): FlowableK<B> =
     flowable.flatMap { f(it).fix().flowable }.k()
+
+  fun <B> bracketCase(use: (A) -> FlowableKOf<B>, release: (A, ExitCase<Throwable>) -> FlowableKOf<Unit>): FlowableK<B> =
+    flatMap { a ->
+      use(a).fix().flowable
+        .doOnError { release(a, ExitCase.Error(it)) }
+        .doOnCancel { release(a, ExitCase.Cancelled) }
+        .doOnComplete { release(a, ExitCase.Completed) }
+        .k()
+    }
 
   fun <B> concatMap(f: (A) -> FlowableKOf<B>): FlowableK<B> =
     flowable.concatMap { f(it).fix().flowable }.k()
@@ -44,11 +59,10 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
     return Eval.defer { loop(this) }
   }
 
-  fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, FlowableK<B>> = GA.run {
-    foldRight(Eval.always { just(Flowable.empty<B>().k()) }) { a, eval ->
-      f(a).map2Eval(eval) { Flowable.concat(Flowable.just<B>(it.a), it.b.flowable).k() }
+  fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, FlowableK<B>> =
+    foldRight(Eval.always { GA.just(Flowable.empty<B>().k()) }) { a, eval ->
+      GA.run { f(a).map2Eval(eval) { Flowable.concat(Flowable.just<B>(it.a), it.b.flowable).k() } }
     }.value()
-  }
 
   fun handleErrorWith(function: (Throwable) -> FlowableK<A>): FlowableK<A> =
     flowable.onErrorResumeNext { t: Throwable -> function(t).flowable }.k()
@@ -57,7 +71,23 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
     flowable.observeOn(ctx.asScheduler()).k()
 
   fun runAsync(cb: (Either<Throwable, A>) -> FlowableKOf<Unit>): FlowableK<Unit> =
-    flowable.flatMap { cb(Right(it)).value() }.onErrorResumeNext(io.reactivex.functions.Function { cb(Left(it)).value() }).k()
+    flowable.flatMap { cb(Right(it)).value() }.onErrorResumeNext { t: Throwable -> cb(Left(t)).value() }.k()
+
+  fun runAsyncCancellable(cb: (Either<Throwable, A>) -> FlowableKOf<Unit>): FlowableK<Disposable> =
+    Flowable.fromCallable {
+      val disposable: io.reactivex.disposables.Disposable = runAsync(cb).value().subscribe()
+      val dispose: () -> Unit = { disposable.dispose() }
+      dispose
+    }.k()
+
+  override fun equals(other: Any?): Boolean =
+    when (other) {
+      is FlowableK<*> -> this.flowable == other.flowable
+      is Flowable<*> -> this.flowable == other
+      else -> false
+    }
+
+  override fun hashCode(): Int = flowable.hashCode()
 
   companion object {
     fun <A> just(a: A): FlowableK<A> =
@@ -86,92 +116,14 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
       }, mode).k()
 
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> FlowableKOf<Either<A, B>>): FlowableK<B> {
-      val either = f(a).fix().value().blockingFirst()
+      val either = f(a).value().blockingFirst()
       return when (either) {
         is Either.Left -> tailRecM(either.a, f)
         is Either.Right -> Flowable.just(either.b).k()
       }
     }
-
-    fun monadFlat(): FlowableKMonadInstance = monad()
-
-    fun monadConcat(): FlowableKMonadInstance = object : FlowableKMonadInstance {
-      override fun <A, B> Kind<ForFlowableK, A>.flatMap(f: (A) -> Kind<ForFlowableK, B>): FlowableK<B> =
-        fix().concatMap { f(it).fix() }
-    }
-
-    fun monadSwitch(): FlowableKMonadInstance = object : FlowableKMonadInstance {
-      override fun <A, B> Kind<ForFlowableK, A>.flatMap(f: (A) -> Kind<ForFlowableK, B>): FlowableK<B> =
-        fix().switchMap { f(it).fix() }
-    }
-
-    fun monadErrorFlat(): FlowableKMonadErrorInstance = monadError()
-
-    fun monadErrorConcat(): FlowableKMonadErrorInstance = object : FlowableKMonadErrorInstance {
-      override fun <A, B> Kind<ForFlowableK, A>.flatMap(f: (A) -> Kind<ForFlowableK, B>): FlowableK<B> =
-        fix().concatMap { f(it).fix() }
-    }
-
-    fun monadErrorSwitch(): FlowableKMonadErrorInstance = object : FlowableKMonadErrorInstance {
-      override fun <A, B> Kind<ForFlowableK, A>.flatMap(f: (A) -> Kind<ForFlowableK, B>): FlowableK<B> =
-        fix().switchMap { f(it).fix() }
-    }
-
-    fun monadSuspendBuffer(): FlowableKMonadDeferInstance = monadDefer()
-
-    fun monadSuspendDrop(): FlowableKMonadDeferInstance = object : FlowableKMonadDeferInstance {
-      override fun BS(): BackpressureStrategy = BackpressureStrategy.DROP
-    }
-
-    fun monadSuspendError(): FlowableKMonadDeferInstance = object : FlowableKMonadDeferInstance {
-      override fun BS(): BackpressureStrategy = BackpressureStrategy.ERROR
-    }
-
-    fun monadSuspendLatest(): FlowableKMonadDeferInstance = object : FlowableKMonadDeferInstance {
-      override fun BS(): BackpressureStrategy = BackpressureStrategy.LATEST
-    }
-
-    fun monadSuspendMissing(): FlowableKMonadDeferInstance = object : FlowableKMonadDeferInstance {
-      override fun BS(): BackpressureStrategy = BackpressureStrategy.MISSING
-    }
-
-    fun asyncBuffer(): FlowableKAsyncInstance = async()
-
-    fun asyncDrop(): FlowableKAsyncInstance = object : FlowableKAsyncInstance {
-      override fun BS(): BackpressureStrategy = BackpressureStrategy.DROP
-    }
-
-    fun asyncError(): FlowableKAsyncInstance = object : FlowableKAsyncInstance {
-      override fun BS(): BackpressureStrategy = BackpressureStrategy.ERROR
-    }
-
-    fun asyncLatest(): FlowableKAsyncInstance = object : FlowableKAsyncInstance {
-      override fun BS(): BackpressureStrategy = BackpressureStrategy.LATEST
-    }
-
-    fun asyncMissing(): FlowableKAsyncInstance = object : FlowableKAsyncInstance {
-      override fun BS(): BackpressureStrategy = BackpressureStrategy.MISSING
-    }
-
-    fun effectBuffer(): FlowableKEffectInstance = effect()
-
-    fun effectDrop(): FlowableKEffectInstance = object : FlowableKEffectInstance {
-      override fun BS(): BackpressureStrategy = BackpressureStrategy.DROP
-    }
-
-    fun effectError(): FlowableKEffectInstance = object : FlowableKEffectInstance {
-      override fun BS(): BackpressureStrategy = BackpressureStrategy.ERROR
-    }
-
-    fun effectLatest(): FlowableKEffectInstance = object : FlowableKEffectInstance {
-      override fun BS(): BackpressureStrategy = BackpressureStrategy.LATEST
-    }
-
-    fun effectMissing(): FlowableKEffectInstance = object : FlowableKEffectInstance {
-      override fun BS(): BackpressureStrategy = BackpressureStrategy.MISSING
-    }
   }
 }
 
-inline fun <A, G> FlowableKOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, FlowableK<A>> =
+fun <A, G> FlowableKOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, FlowableK<A>> =
   fix().traverse(GA, ::identity)

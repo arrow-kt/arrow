@@ -5,21 +5,26 @@ import arrow.core.Option
 import arrow.core.identity
 import arrow.higherkind
 
-fun <A, T> ConstOf<A, T>.value(): A = this.fix().value
+fun <A, T> ConstOf<A, T>.value(): A = this.fix().value()
 
 @higherkind
-data class Const<A, out T>(val value: A) : ConstOf<A, T> {
+data class Const<A, out T>(private val value: A) : ConstOf<A, T> {
 
   @Suppress("UNCHECKED_CAST")
   fun <U> retag(): Const<A, U> = this as Const<A, U>
 
+  @Suppress("UNUSED_PARAMETER")
   fun <G, U> traverse(GA: Applicative<G>, f: (T) -> Kind<G, U>): Kind<G, Const<A, U>> = GA.just(retag())
 
+  @Suppress("UNUSED_PARAMETER")
   fun <G, U> traverseFilter(GA: Applicative<G>, f: (T) -> Kind<G, Option<U>>): Kind<G, Const<A, U>> = GA.just(retag())
 
   companion object {
     fun <A, T> just(a: A): Const<A, T> = Const(a)
   }
+
+  fun value(): A = value
+
 }
 
 fun <A, T> ConstOf<A, T>.combine(SG: Semigroup<A>, that: ConstOf<A, T>): Const<A, T> = Const(SG.run { value().combine(that.value()) })

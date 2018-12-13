@@ -26,7 +26,7 @@ import arrow.optics.*
 
 val optionalHead: Optional<ListK<Int>, Int> = Optional(
     getOrModify = { list -> list.firstOrNull()?.right() ?: list.left() },
-    set = { int -> { list -> list.mapIndexed { index, value -> if (index == 0) int else value }.k() } }
+    set = { list, int -> list.mapIndexed { index, value -> if (index == 0) int else value }.k() }
 )
 ```
 
@@ -51,6 +51,8 @@ lifted(emptyList<Int>().k())
 Or modify or lift functions using `Applicative`
 
 ```kotlin:ank
+import arrow.instances.`try`.applicative.*
+
 ListK.head<Int>().modifyF(Try.applicative(), listOf(1, 3, 6).k()) { head ->
     Try { head / 2 }
 }
@@ -73,7 +75,7 @@ data class Participant(val name: String, val email: String?)
 
 val participantEmail: Optional<Participant, String> = Optional(
         getOrModify = { participant -> participant.email?.right() ?: participant.left() },
-        set = { email -> { participant -> participant.copy(email = email) } }
+        set = { participant, email -> participant.copy(email = email) }
 )
 
 val triedEmail: Optional<Try<Participant>, String> = Try.success<Participant>() compose participantEmail
@@ -122,7 +124,7 @@ val lifted: (Try<Tuple2<Int, String>>) -> Try<Tuple2<String, String>> = successT
 lifted(Try.Success(5 toT "World!"))
 ```
 ```kotlin:ank
-lifted(Try.Failure<Tuple2<Int, String>>(IllegalStateException("something went wrong")))
+lifted(Try.Failure(IllegalStateException("something went wrong")))
 ```
 
 ### Laws

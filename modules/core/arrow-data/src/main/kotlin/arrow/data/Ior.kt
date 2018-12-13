@@ -145,7 +145,7 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
     fold({ lc }, { f(it, lc) }, { _, b -> f(b, lc) })
 
   fun <G, C> traverse(GA: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, Ior<A, C>> = GA.run {
-    fold({ just(Left(it)) }, { f(it).map({ Right<A, C>(it) }) }, { _, b -> f(b).map({ Right<A, C>(it) }) })
+    fold({ just(Left(it)) }, { f(it).map { Right<A, C>(it) } }, { _, b -> f(b).map { Right<A, C>(it) } })
   }
 
   /**
@@ -284,7 +284,7 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
     override val isBoth: Boolean get() = false
 
     companion object {
-      inline operator fun <A> invoke(a: A): Ior<A, Nothing> = Left(a)
+      operator fun <A> invoke(a: A): Ior<A, Nothing> = Left(a)
     }
   }
 
@@ -294,7 +294,7 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
     override val isBoth: Boolean get() = false
 
     companion object {
-      inline operator fun <B> invoke(b: B): Ior<Nothing, B> = Right(b)
+      operator fun <B> invoke(b: B): Ior<Nothing, B> = Right(b)
     }
   }
 
@@ -331,7 +331,7 @@ fun <A, B, D> Ior<A, B>.ap(SG: Semigroup<A>, ff: IorOf<A, (B) -> D>): Ior<A, D> 
 
 inline fun <A, B> Ior<A, B>.getOrElse(crossinline default: () -> B): B = fold({ default() }, ::identity, { _, b -> b })
 
-inline fun <A, B, G> IorOf<A, Kind<G, B>>.sequence(GA: Applicative<G>): Kind<G, Ior<A, B>> =
+fun <A, B, G> IorOf<A, Kind<G, B>>.sequence(GA: Applicative<G>): Kind<G, Ior<A, B>> =
   fix().traverse(GA, ::identity)
 
 fun <A, B> Pair<A, B>.bothIor(): Ior<A, B> = Ior.Both(this.first, this.second)

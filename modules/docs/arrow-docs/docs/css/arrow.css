@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css?family=Titillium+Web:400,600");
+@import url("https://fonts.googleapis.com/css?family=Titillium+Web:400,600,700");
 @import url("https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,700");
 @font-face {
   font-family: 'monoidregular';
@@ -745,6 +745,8 @@ table {
     .doc-content ul li {
       list-style: circle;
       margin-bottom: 14px; }
+  .doc-content strong {
+    font-weight: 700; }
   .doc-content hr {
     border: none;
     height: 1px;
@@ -828,26 +830,35 @@ table {
 p code, ul code {
   background: #fff;
   font-family: "monoidregular", monospace;
-  padding: 0 8px;
+  padding: 0; /*8px leaving this constrain makes the dokka exported markdown to have weird distances between <code> declarations*/
   font-size: 0.8125rem;
+  font-size: 0.8rem;
   border-radius: 3px;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   -ms-border-radius: 3px;
   -o-border-radius: 3px; }
 
-.hljs {
-  padding: 24px;
-  background: #fff;
-  font-family: "monoidregular", monospace;
-  font-size: 0.875rem;
-  box-shadow: rgba(25, 62, 136, 0.1) 0 0 20px; }
+.CodeMirror {
+  background: #fff !important;
+  font-family: "monoidregular", monospace !important;
+  font-size: 0.8rem !important;
+  border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -o-border-radius: 3px;
+  z-index: 0; }
 
 .hljs {
   display: block;
   overflow-x: auto;
   color: #383a42;
-  background: #fafafa; }
+  background: #fafafa;
+  padding: 12px 0 12px 16px;
+  font-family: "monoidregular", monospace;
+  font-size: 0.8rem;
+  box-shadow: rgba(25, 62, 136, 0.1) 0 0 20px; }
 
 .hljs-doctag,
 .hljs-keyword,
@@ -857,6 +868,9 @@ p code, ul code {
 .hljs-built_in,
 .hljs-class .hljs-title {
   color: #F28B2D; }
+
+.language-kotlin {
+  display: none; }
 
 .features {
   padding: 96px 0 64px;

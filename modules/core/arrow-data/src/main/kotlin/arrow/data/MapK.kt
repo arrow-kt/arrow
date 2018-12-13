@@ -7,7 +7,7 @@ import arrow.typeclasses.Applicative
 import arrow.typeclasses.Foldable
 
 @higherkind
-data class MapK<K, out A>(val map: Map<K, A>) : MapKOf<K, A>, Map<K, A> by map {
+data class MapK<K, out A>(private val map: Map<K, A>) : MapKOf<K, A>, Map<K, A> by map {
 
   fun <B> map(f: (A) -> B): MapK<K, B> = this.map.map { it.key to f(it.value) }.toMap().k()
 
@@ -43,10 +43,19 @@ data class MapK<K, out A>(val map: Map<K, A>) : MapKOf<K, A>, Map<K, A> by map {
     this.map.foldLeft(b) { m, (k, v) -> f(m.k(), Tuple2(k, v)) }.k()
 
   fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, MapK<K, B>> = GA.run {
-    (Foldable.iterateRight(map.iterator(), Eval.always { just(emptyMap<K, B>().k()) }))({ kv, lbuf ->
+    (Foldable.iterateRight(map.iterator(), Eval.always { just(emptyMap<K, B>().k()) })) { kv, lbuf ->
       f(kv.value).map2Eval(lbuf) { (mapOf(kv.key to it.a).k() + it.b).k() }
-    }).value()
+    }.value()
   }
+
+  override fun equals(other: Any?): Boolean =
+    when (other) {
+      is MapK<*, *> -> this.map == other.map
+      is Map<*, *> -> this.map == other
+      else -> false
+    }
+
+  override fun hashCode(): Int = map.hashCode()
 
   companion object
 }
@@ -59,14 +68,14 @@ fun <K, A> Option<Tuple2<K, A>>.k(): MapK<K, A> =
     is None -> emptyMap<K, A>().k()
   }
 
-inline fun <K, V, G> MapKOf<K, Kind<G, V>>.sequence(GA: Applicative<G>): Kind<G, MapK<K, V>> =
+fun <K, V, G> MapKOf<K, Kind<G, V>>.sequence(GA: Applicative<G>): Kind<G, MapK<K, V>> =
   fix().traverse(GA, ::identity)
 
 fun <K, A> List<Map.Entry<K, A>>.k(): MapK<K, A> = this.map { it.key to it.value }.toMap().k()
 
 fun <K, A> Map<K, A>.getOption(k: K): Option<A> = Option.fromNullable(this[k])
 
-fun <K, A> MapK<K, A>.updated(k: K, value: A): MapK<K, A> = (map + (k to value)).k()
+fun <K, A> MapK<K, A>.updated(k: K, value: A): MapK<K, A> = (this + (k to value)).k()
 
 fun <K, A, B> Map<K, A>.foldLeft(b: Map<K, B>, f: (Map<K, B>, Map.Entry<K, A>) -> Map<K, B>): Map<K, B> {
   var result = b
@@ -75,7 +84,7 @@ fun <K, A, B> Map<K, A>.foldLeft(b: Map<K, B>, f: (Map<K, B>, Map.Entry<K, A>) -
 }
 
 fun <K, A, B> Map<K, A>.foldRight(b: Map<K, B>, f: (Map.Entry<K, A>, Map<K, B>) -> Map<K, B>): Map<K, B> =
-  this.entries.reversed().k().map.foldLeft(b) { x, y -> f(y, x) }
+  this.entries.reversed().k().foldLeft(b) { x, y: Map.Entry<K, A> -> f(y, x) }
 
 fun <A, B> Iterator<A>.iterateRight(lb: Eval<B>): (f: (A, Eval<B>) -> Eval<B>) -> Eval<B> = Foldable.iterateRight(this, lb)
 

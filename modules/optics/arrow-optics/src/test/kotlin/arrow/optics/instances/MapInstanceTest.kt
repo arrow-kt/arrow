@@ -4,6 +4,13 @@ import arrow.core.*
 import arrow.data.*
 import arrow.instances.monoid
 import arrow.instances.semigroup
+import arrow.instances.listk.eq.eq
+import arrow.instances.option.eq.eq
+import arrow.instances.option.monoid.monoid
+import arrow.optics.instances.mapk.at.at
+import arrow.optics.instances.mapk.each.each
+import arrow.optics.instances.mapk.filterIndex.filterIndex
+import arrow.optics.instances.mapk.index.index
 import arrow.optics.typeclasses.FilterIndex
 import arrow.test.UnitSpec
 import arrow.test.generators.*
@@ -41,7 +48,7 @@ class MapInstanceTest : UnitSpec() {
     ))
 
     testLaws(TraversalLaws.laws(
-      traversal = FilterIndex.filterIndex(MapK.filterIndex()) { true },
+      traversal = MapK.filterIndex<Char, Int>().filter { true },
       aGen = genMapK(genChars(), genIntSmall()),
       bGen = Gen.int(),
       funcGen = genFunctionAToB(Gen.int()),

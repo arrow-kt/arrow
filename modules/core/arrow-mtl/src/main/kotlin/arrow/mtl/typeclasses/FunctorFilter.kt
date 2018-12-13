@@ -4,6 +4,12 @@ import arrow.Kind
 import arrow.core.*
 import arrow.typeclasses.Functor
 
+/**
+ * ank_macro_hierarchy(arrow.mtl.typeclasses.FunctorFilter)
+ *
+ * A Functor with the ability to [mapFilter].
+ * Enables [collect] based on [PartialFunction] predicates.
+ */
 interface FunctorFilter<F> : Functor<F> {
 
   /**
@@ -27,5 +33,6 @@ interface FunctorFilter<F> : Functor<F> {
    * that don't.
    */
   fun <A> Kind<F, A>.filter(f: (A) -> Boolean): Kind<F, A> =
-    mapFilter({ a -> if (f(a)) Some(a) else None })
+    mapFilter { a -> if (f(a)) Some(a) else None }
+
 }

@@ -1,7 +1,7 @@
 package arrow.instances
 
-import arrow.core.BooleanInstances
 import arrow.typeclasses.Eq
+import arrow.typeclasses.Hash
 import arrow.typeclasses.Show
 
 interface BooleanShowInstance : Show<Boolean> {
@@ -13,15 +13,15 @@ interface BooleanEqInstance : Eq<Boolean> {
   override fun Boolean.eqv(b: Boolean): Boolean = this == b
 }
 
-// FIXME
-//fun Boolean.Companion.show(): Show<Boolean> =
-//  object : BooleanShowInstance {}
-//
-//fun Boolean.Companion.eq(): Eq<Boolean> =
-//  object : BooleanEqInstance {}
+interface BooleanHashInstance : Hash<Boolean>, BooleanEqInstance {
+  override fun Boolean.hash(): Int = this.hashCode()
+}
 
-fun BooleanInstances.show(): Show<Boolean> =
+fun Boolean.Companion.show(): Show<Boolean> =
   object : BooleanShowInstance {}
 
-fun BooleanInstances.eq(): Eq<Boolean> =
+fun Boolean.Companion.eq(): Eq<Boolean> =
   object : BooleanEqInstance {}
+
+fun Boolean.Companion.hash(): Hash<Boolean> =
+  object : BooleanHashInstance {}

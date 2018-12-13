@@ -7,7 +7,7 @@ import arrow.data.NonEmptyList
  */
 fun <A> NonEmptyList.Companion.head(): Lens<NonEmptyList<A>, A> = Lens(
   get = NonEmptyList<A>::head,
-  set = { newHead -> { nel -> NonEmptyList(newHead, nel.tail) } }
+  set = { nel, newHead -> NonEmptyList(newHead, nel.tail) }
 )
 
 /**
@@ -15,5 +15,5 @@ fun <A> NonEmptyList.Companion.head(): Lens<NonEmptyList<A>, A> = Lens(
  */
 fun <A> NonEmptyList.Companion.tail(): Lens<NonEmptyList<A>, List<A>> = Lens(
   get = NonEmptyList<A>::tail,
-  set = { newTail -> { nel -> NonEmptyList(nel.head, newTail) } }
+  set = { nel, newTail -> NonEmptyList(nel.head, newTail) }
 )

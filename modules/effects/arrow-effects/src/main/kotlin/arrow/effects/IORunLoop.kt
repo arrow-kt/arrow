@@ -1,13 +1,13 @@
 package arrow.effects
 
+import arrow.core.Continuation
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
+import arrow.effects.internal.IOConnection
 import arrow.effects.internal.Platform.ArrayStack
-import arrow.effects.typeclasses.Proc
-import kotlin.coroutines.experimental.Continuation
-import kotlin.coroutines.experimental.CoroutineContext
-import kotlin.coroutines.experimental.startCoroutine
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.startCoroutine
 
 private typealias Current = IOOf<Any?>
 private typealias BindF = (Any?) -> IO<Any?>
@@ -16,8 +16,16 @@ private typealias Callback = (Either<Throwable, Any?>) -> Unit
 
 @Suppress("UNCHECKED_CAST")
 internal object IORunLoop {
+
   fun <A> start(source: IO<A>, cb: (Either<Throwable, A>) -> Unit): Unit =
-    loop(source, cb as Callback, null, null, null)
+    loop(source, IOConnection.uncancelable, cb as Callback, null, null, null)
+
+  /**
+   * Evaluates the given `IO` reference, calling the given callback
+   * with the result when completed.
+   */
+  fun <A> startCancelable(source: IO<A>, conn: IOConnection, cb: (Either<Throwable, A>) -> Unit): Unit =
+    loop(source, conn, cb as Callback, null, null, null)
 
   fun <A> step(source: IO<A>): IO<A> {
     var currentIO: Current? = source
@@ -35,7 +43,7 @@ internal object IORunLoop {
         is IO.RaiseError -> {
           val errorHandler: IOFrame<Any?, IO<Any?>>? = findErrorHandlerInCallStack(bFirst, bRest)
           when (errorHandler) {
-          // Return case for unhandled errors
+            // Return case for unhandled errors
             null -> return currentIO
             else -> {
               val exception: Throwable = currentIO.exception
@@ -59,7 +67,7 @@ internal object IORunLoop {
         }
         is IO.Async -> {
           // Return case for Async operations
-          return suspendInAsync(currentIO as IO<A>, bFirst, bRest, currentIO.cont)
+          return suspendInAsync(currentIO as IO<A>, bFirst, bRest, currentIO.k)
         }
         is IO.Bind<*, *> -> {
           if (bFirst != null) {
@@ -82,8 +90,8 @@ internal object IORunLoop {
 
           bFirst = { c: Any? -> IO.just(c) }
 
-          currentIO = IO.async { cc ->
-            loop(localCont, cc.asyncCallback(currentCC), null, null, null)
+          currentIO = IO.async { conn, cc ->
+            loop(localCont, conn, cc.asyncCallback(currentCC), null, null, null)
           }
         }
         is IO.Map<*, *> -> {
@@ -119,34 +127,36 @@ internal object IORunLoop {
     } while (true)
   }
 
-  private inline fun <A> sanitizedCurrentIO(currentIO: Current?, unboxed: Any?): IO<A> =
+  private fun <A> sanitizedCurrentIO(currentIO: Current?, unboxed: Any?): IO<A> =
     (currentIO ?: IO.Pure(unboxed)) as IO<A>
 
   private fun <A> suspendInAsync(
     currentIO: IO<A>,
     bFirst: BindF?,
     bRest: CallStack?,
-    register: Proc<Any?>): IO<A> =
+    register: IOProc<Any?>): IO<A> =
   // Hitting an async boundary means we have to stop, however
   // if we had previous `flatMap` operations then we need to resume
   // the loop with the collected stack
     when {
       bFirst != null || (bRest != null && bRest.isNotEmpty()) ->
-        IO.Async { cb ->
-          val rcb = RestartCallback(cb as Callback)
+        IO.Async { conn, cb ->
+          val rcb = RestartCallback(conn, cb as Callback)
           rcb.prepare(bFirst, bRest)
-          register(rcb)
+          register(conn, rcb)
         }
       else -> currentIO
     }
 
   private fun loop(
     source: Current,
+    cancelable: IOConnection,
     cb: (Either<Throwable, Any?>) -> Unit,
     rcbRef: RestartCallback?,
     bFirstRef: BindF?,
     bRestRef: CallStack?): Unit {
     var currentIO: Current? = source
+    var conn: IOConnection = cancelable
     var bFirst: BindF? = bFirstRef
     var bRest: CallStack? = bRestRef
     var rcb: RestartCallback? = rcbRef
@@ -156,6 +166,10 @@ internal object IORunLoop {
     var result: Any? = null
 
     do {
+      if (conn.isCanceled()) {
+        cb(Left(OnCancel.CancellationException))
+        return
+      }
       when (currentIO) {
         is IO.Pure -> {
           result = currentIO.a
@@ -164,7 +178,7 @@ internal object IORunLoop {
         is IO.RaiseError -> {
           val errorHandler: IOFrame<Any?, IO<Any?>>? = findErrorHandlerInCallStack(bFirst, bRest)
           when (errorHandler) {
-          // Return case for unhandled errors
+            // Return case for unhandled errors
             null -> {
               cb(Left(currentIO.exception))
               return
@@ -191,11 +205,11 @@ internal object IORunLoop {
         }
         is IO.Async -> {
           if (rcb == null) {
-            rcb = RestartCallback(cb)
+            rcb = RestartCallback(conn, cb)
           }
           rcb.prepare(bFirst, bRest)
           // Return case for Async operations
-          currentIO.cont(rcb)
+          currentIO.k(conn, rcb)
           return
         }
         is IO.Bind<*, *> -> {
@@ -219,10 +233,9 @@ internal object IORunLoop {
 
           bFirst = { c: Any? -> IO.just(c) }
 
-          currentIO = IO.async { cc ->
-            loop(localCont, cc.asyncCallback(currentCC), null, null, null)
+          currentIO = IO.async { _, callback ->
+            loop(localCont, conn, callback.asyncCallback(currentCC), null, null, null)
           }
-
         }
         is IO.Map<*, *> -> {
           if (bFirst != null) {
@@ -233,6 +246,20 @@ internal object IORunLoop {
           }
           bFirst = currentIO as BindF
           currentIO = currentIO.source
+        }
+        is IO.ContextSwitch -> {
+          val next = currentIO.source
+          val modify = currentIO.modify
+          val restore = currentIO.restore
+
+          val old = conn
+          conn = modify(old)
+          currentIO = next
+          if (conn != old) {
+            rcb?.contextSwitch(conn)
+            if (restore != null)
+              currentIO = IO.Bind(next, RestoreContext(old, restore))
+          }
         }
         null -> {
           currentIO = IO.RaiseError(NullPointerException("Looping on null IO"))
@@ -309,11 +336,20 @@ internal object IORunLoop {
     return result
   }
 
-  private data class RestartCallback(val cb: Callback) : Callback {
+  /**
+   * A `RestartCallback` gets created only once, per [startCancelable] (`unsafeRunAsync`) invocation, once an `Async`
+   * state is hit, its job being to resume the loop after the boundary, but with the bind call-stack restored.
+   */
+  private data class RestartCallback(val connInit: IOConnection, val cb: Callback) : Callback {
 
+    private var conn: IOConnection = connInit
     private var canCall = false
     private var bFirst: BindF? = null
     private var bRest: CallStack? = null
+
+    fun contextSwitch(conn: IOConnection): Unit {
+      this.conn = conn
+    }
 
     fun prepare(bFirst: BindF?, bRest: CallStack?): Unit {
       canCall = true
@@ -325,18 +361,10 @@ internal object IORunLoop {
       if (canCall) {
         canCall = false
         when (either) {
-          is Either.Left -> loop(IO.RaiseError(either.a), cb, this, bFirst, bRest)
-          is Either.Right -> loop(IO.Pure(either.b), cb, this, bFirst, bRest)
+          is Either.Left -> loop(IO.RaiseError(either.a), conn, cb, this, bFirst, bRest)
+          is Either.Right -> loop(IO.Pure(either.b), conn, cb, this, bFirst, bRest)
         }
       }
-    }
-
-    companion object {
-      operator fun invoke(cb: Callback): RestartCallback =
-        when (cb) {
-          is RestartCallback -> cb
-          else -> RestartCallback(cb)
-        }
     }
   }
 
@@ -347,13 +375,27 @@ internal object IORunLoop {
       val normalResume: Continuation<Unit> = object : Continuation<Unit> {
         override val context: CoroutineContext = currentCC
 
-        override fun resume(value: Unit) {}
+        override fun resume(value: Unit) {
+        }
 
         override fun resumeWithException(exception: Throwable) {
           this@asyncCallback(Either.left(exception))
         }
+
       }
 
       func.startCoroutine(normalResume)
     }
+
+  private class RestoreContext(
+    val old: IOConnection,
+    val restore: (Any?, Throwable?, IOConnection, IOConnection) -> IOConnection) : IOFrame<Any?, IO<Any?>> {
+
+    override fun invoke(a: Any?): IO<Any?> = IO.ContextSwitch(IO.Pure(a), { current -> restore(a, null, old, current) }, null)
+
+    override fun recover(e: Throwable): IO<Any> =
+      IO.ContextSwitch(IO.RaiseError(e), { current ->
+        restore(null, e, old, current)
+      }, null)
+  }
 }

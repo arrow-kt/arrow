@@ -7,6 +7,11 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
     compile project(':arrow-annotations')
     compile 'me.eugeniomarletti.kotlin.metadata:kotlin-metadata:1.4.0'
+    compile("com.squareup:kotlinpoet:$kotlinPoetVersion") {
+        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-reflect'
+    }
+    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
+    compile 'com.github.aballano:MnemoniK:1.0.0'
     compileOnly 'com.google.auto.service:auto-service:1.0-rc4'
     kapt 'com.google.auto.service:auto-service:1.0-rc4'
 
