@@ -55,7 +55,13 @@ redirect_from:
    
 Again, take a look at [this PR](https://github.com/arrow-kt/arrow/pull/1134/files) for a real example.
 
-### 4. Format your docs properly
+### 4. Link your file from intro pages
+
+There are docs intro pages for both [data types](https://arrow-kt.io/docs/datatypes/intro/) and [type classes](https://arrow-kt.io/docs/typeclasses/intro/) which contain a list of the data types and typeclasses available in Arrow. Each item comes along with a brief and simple description. 
+
+In case you're adding docs for a data type or a type class, be sure to add a new entry from the corresponding intro page to your docs, so people can scan them easily in a single page.
+
+### 5. Format your docs properly
 
 If you're adding a data type, go to other already existing data type docs to follow the same approach. 
 Do the same for type class, and any other doc sections. 
