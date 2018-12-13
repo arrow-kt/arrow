@@ -3,6 +3,8 @@ package arrow.effects
 import arrow.core.*
 import arrow.effects.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.ExitCase
+import arrow.effects.typeclasses.Proc
+import arrow.effects.typeclasses.ProcF
 import arrow.higherkind
 import io.reactivex.Maybe
 import io.reactivex.MaybeEmitter
