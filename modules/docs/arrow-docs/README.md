@@ -15,7 +15,7 @@ Go to `modules/docs/arrow-docs/docs/_data/menu.yml` and add a menu entry in the 
   url: /docs/typeclasses/bracket/
 ```
    
-Check de7814d63cdba701ca2818d7936d3921193d0ba9 for a real example.
+Check [this PR](https://github.com/arrow-kt/arrow/pull/1134/files) for a real example.
 
 ### 2. Add your docs file
 
@@ -53,9 +53,7 @@ redirect_from:
 ---
 ``` 
    
-Again, take a look at de7814d63cdba701ca2818d7936d3921193d0ba9 for a real example.
-
-[Here you have an example](https://github.com/arrow-kt/arrow/pull/1134) of an already merged PR used to add a new docs section.
+Again, take a look at [this PR](https://github.com/arrow-kt/arrow/pull/1134/files) for a real example.
 
 ### 4. Format your docs properly
 
