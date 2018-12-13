@@ -11,8 +11,8 @@ In case you need to add a new docs section, you should go like this:
 Go to `modules/docs/arrow-docs/docs/_data/menu.yml` and add a menu entry in the proper section, as in:
 
 ```
-- title: Bracket
-  url: /docs/typeclasses/bracket/
+- title: Applicative
+  url: /docs/typeclasses/applicative/
 ```
    
 Check [this PR](https://github.com/arrow-kt/arrow/pull/1134/files) for a real example.
@@ -22,7 +22,7 @@ Check [this PR](https://github.com/arrow-kt/arrow/pull/1134/files) for a real ex
 Add your docs as a Markdown file inside the corresponding directory. You have directories for all the sections 
 available in docs under `modules/docs/arrow-docs/docs/docs/`.
 
-Let's say you want to add docs for a Type class, like `Applicative`. You'd need to add a README like [this one](https://github.com/arrow-kt/arrow/blob/master/modules/docs/arrow-docs/docs/docs/arrow/typeclasses/applicative/README.md).
+Let's say you want to add docs for a Type class, for instance `Applicative`. You'd need to add a README like [this one](https://github.com/arrow-kt/arrow/blob/master/modules/docs/arrow-docs/docs/docs/arrow/typeclasses/applicative/README.md).
 
 You'll find all the sections available in the [docs side menu](https://arrow-kt.io/docs/). As you can see, there's:
 * **Quick start:** Basically how to start using Arrow, including links to libraries, posts, talks, and sample projects.
@@ -79,17 +79,17 @@ If your snippet is showing examples on how to use the public API's in a broader 
 
 For the mentioned cases, you should double check which `Ank` modifiers you wanna use for the snippets (`silent`, `replace` or `outFile(<file>)`). You have more details about each one of those in [Ank docs](../../ank/README.md). You have some real examples [on this docs PR](https://github.com/arrow-kt/arrow/pull/1134/files).
 
-Also note that you can make your Ank snippets **editable and runnable in the actual browser**, which is quite handy. Just add `{: data-executable='true'}` before your Ank Kotlin snippet. That **must be** used as a norm for all the snippets except for the ones that just represent infrastructure for following snippets (where there's not much value on making then runnable).
+Also note that you can make your Ank snippets **editable and runnable in the actual browser**, which is quite handy. Just add this `{: data-executable='true'}` before your Ank Kotlin snippet. That **must be** used as a norm for all the snippets except for the ones that just represent infrastructure for following snippets (where there's not much value on making then runnable).
 
 ## How to deploy docs to a local server
 
 We use Jekyll so you can deploy your docs to a local server to test your changes and see how those would look once released.
 
-So, after adding your docs as mentioned before, you would:
+So, after making you doc changes as mentioned before, you would:
 
 ### 1. Run Ank to get your docs deployed locally
 
-Ank is in charge of compiling your doc snippets and deploying the proper binaries for those. Run the following command:
+Ank is in charge of compiling and validating your doc snippets and deploying the proper binaries for those. Run the following command:
 
 ```bash
 `./gradlew :arrow-docs:runAnk` (in arrow root dir)   
@@ -102,7 +102,7 @@ Once docs are deployed locally, go to `modules/docs/arrow-docs/` and do this:
 jekyll serve --source build/site/
 ```
 
-That will launch the complete website in `127.0.0.1:4000` so you can open it with a standard browser.
+That will launch the complete website in [127.0.0.1:4000](https://127.0.0.1:4000) so you can open it with a standard browser.
 
 ## How to test
 
