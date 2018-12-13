@@ -9,6 +9,7 @@ import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Fiber
 import arrow.effects.typeclasses.Proc
+import arrow.effects.typeclasses.ProcF
 import arrow.higherkind
 import kotlinx.coroutines.*
 import kotlinx.coroutines.selects.SelectClause0
