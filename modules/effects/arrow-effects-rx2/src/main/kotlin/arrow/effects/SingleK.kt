@@ -6,6 +6,8 @@ import arrow.core.Right
 import arrow.effects.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
+import arrow.effects.typeclasses.Proc
+import arrow.effects.typeclasses.ProcF
 import arrow.higherkind
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
