@@ -173,6 +173,16 @@ class FlowableKTests : UnitSpec() {
               .dispose()
           }.flatMap { latch.get }
         }.value()
+    }
+
+    "FlowableK should cancel KindConnection on dipose" {
+      Promise.uncancelable<ForFlowableK, Unit>(FlowableK.async()).flatMap { latch ->
+        FlowableK {
+          FlowableK.async<Unit>(fa = { conn, _ ->
+            conn.push(latch.complete(Unit))
+          }).flowable.subscribe().dispose()
+        }.flatMap { latch.get }
+      }.value()
         .test()
         .assertValue(Unit)
         .awaitTerminalEvent(100, TimeUnit.MILLISECONDS)

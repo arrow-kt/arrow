@@ -149,7 +149,7 @@ class MaybeKTests : UnitSpec() {
       ec shouldBe ExitCase.Cancelled
     }
 
-    "MaybeK should cancel KindConnection on dispose" {
+    "MaybeK should cancel KindConnection on dipose" {
       Promise.uncancelable<ForMaybeK, Unit>(MaybeK.async()).flatMap { latch ->
         MaybeK {
           MaybeK.async<Unit> { conn, _ ->
