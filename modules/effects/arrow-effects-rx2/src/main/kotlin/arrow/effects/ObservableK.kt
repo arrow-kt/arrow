@@ -8,11 +8,13 @@ import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.*
 import arrow.effects.typeclasses.Proc
 import arrow.effects.typeclasses.ProcF
+import arrow.effects.typeclasses.*
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
 import kotlin.coroutines.CoroutineContext
+import arrow.effects.handleErrorWith as handleErrorW
 
 fun <A> Observable<A>.k(): ObservableK<A> = ObservableK(this)
 
