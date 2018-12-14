@@ -167,7 +167,11 @@ sealed class KindConnection<F> {
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
+<<<<<<< HEAD
      *   val conn: IOConnection = KindConnection(IO.monadDefer()) { it.fix().unsafeRunAsync { } }
+=======
+     *   val conn: IOConnection = KindConnection(IO.monadDefer())
+>>>>>>> Add docs KindConnection
      *   //sampleEnd
      * }
      * ```
@@ -175,6 +179,22 @@ sealed class KindConnection<F> {
     operator fun <F> invoke(MD: MonadDefer<F>, run: (CancelToken<F>) -> Unit): KindConnection<F> =
       DefaultKindConnection(MD, run)
 
+    /**
+     * Construct an uncancelable [KindConnection] for a kind [F] based on [MonadDefer].
+     *
+     * {: data-executable='true'}
+     *
+     * ```kotlin:ank
+     * import arrow.effects.*
+     * import arrow.effects.instances.io.applicative.applicative
+     *
+     * fun main(args: Array<String>) {
+     *   //sampleStart
+     *   val conn: IOConnection = KindConnection.uncancelable(IO.applicative())
+     *   //sampleEnd
+     * }
+     * ```
+     **/
     fun <F> uncancelable(FA: Applicative<F>): KindConnection<F> = Uncancelable(FA)
   }
 
