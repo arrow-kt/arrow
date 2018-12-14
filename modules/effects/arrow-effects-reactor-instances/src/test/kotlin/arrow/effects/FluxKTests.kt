@@ -149,7 +149,7 @@ class FluxKTest : UnitSpec() {
         .verify()
     }
 
-    "FluxK should cancel KindConnection on dipose" {
+    "FluxK should cancel KindConnection on dispose" {
       Promise.uncancelable<ForFluxK, Unit>(FluxK.async()).flatMap { latch ->
         FluxK {
           FluxK.runAsync<Unit> { conn, _ ->

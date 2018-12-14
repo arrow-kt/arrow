@@ -109,7 +109,7 @@ class SingleKTests : UnitSpec() {
       test.assertNotTerminated().assertNotComplete().assertNoErrors().assertNoValues()
     }
 
-    "SingleK should cancel KindConnection on dipose" {
+    "SingleK should cancel KindConnection on dispose" {
       Promise.uncancelable<ForSingleK, Unit>(SingleK.async()).flatMap { latch ->
         SingleK {
           SingleK.async<Unit> { conn, _ ->

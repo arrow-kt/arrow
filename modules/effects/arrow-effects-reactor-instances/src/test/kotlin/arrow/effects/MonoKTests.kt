@@ -141,7 +141,7 @@ class MonoKTest : UnitSpec() {
         .verify()
     }
 
-    "MonoK should cancel KindConnection on dipose" {
+    "MonoK should cancel KindConnection on dispose" {
       Promise.uncancelable<ForMonoK, Unit>(MonoK.async()).flatMap { latch ->
         MonoK {
           MonoK.async<Unit> { conn, _ ->

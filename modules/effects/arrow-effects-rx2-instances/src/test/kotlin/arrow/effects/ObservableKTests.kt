@@ -128,7 +128,7 @@ class ObservableKTests : UnitSpec() {
       assertThat(ec, `is`(ExitCase.Cancelled as ExitCase<Throwable>))
     }
 
-    "ObservableK should cancel KindConnection on dipose" {
+    "ObservableK should cancel KindConnection on dispose" {
       Promise.uncancelable<ForObservableK, Unit>(ObservableK.async()).flatMap { latch ->
         ObservableK {
           ObservableK.async<Unit> { conn, _ ->
