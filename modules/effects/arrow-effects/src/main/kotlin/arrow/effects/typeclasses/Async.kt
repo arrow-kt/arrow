@@ -39,7 +39,7 @@ interface Async<F> : MonadDefer<F> {
    *
    * @param fa an asynchronous computation that might fail typed as [Proc].
    *
-   * ```kotlin:ank:playground:extension:playground:extension
+   * ```kotlin:ank:playground:extension
    * _imports_
    * import java.lang.RuntimeException
    *
