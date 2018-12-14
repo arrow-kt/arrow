@@ -27,19 +27,19 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class KleisliTest : UnitSpec() {
   private fun <A> TryEQ(): Eq<KleisliOf<ForTry, Int, A>> = Eq { a, b ->
-    a.fix().run(1) == b.fix().run(1)
+    a.run(1) == b.run(1)
   }
 
   private fun <A> ConestTryEQ(): Eq<Kind<Conested<Kind<ForKleisli, ForTry>, A>, Int>> = Eq { a, b ->
-    a.counnest().fix().run(1) == b.counnest().fix().run(1)
+    a.counnest().run(1) == b.counnest().run(1)
   }
 
   private fun IOEQ(): Eq<Kind<KleisliPartialOf<ForIO, Int>, Int>> = Eq { a, b ->
-    a.fix().run(1).attempt().unsafeRunSync() == b.fix().run(1).attempt().unsafeRunSync()
+    a.run(1).attempt().unsafeRunSync() == b.run(1).attempt().unsafeRunSync()
   }
 
   private fun IOEitherEQ(): Eq<Kind<KleisliPartialOf<ForIO, Int>, Either<Throwable, Int>>> = Eq { a, b ->
-    a.fix().run(1).attempt().unsafeRunSync() == b.fix().run(1).attempt().unsafeRunSync()
+    a.run(1).attempt().unsafeRunSync() == b.run(1).attempt().unsafeRunSync()
   }
 
   init {
@@ -58,9 +58,9 @@ class KleisliTest : UnitSpec() {
     "andThen should continue sequence" {
       val kleisli: Kleisli<ForId, Int, Int> = Kleisli { a: Int -> Id(a) }
 
-      kleisli.andThen(Id.monad(), Id(3)).run(0).fix().value shouldBe 3
+      kleisli.andThen(Id.monad(), Id(3)).run(0).value() shouldBe 3
 
-      kleisli.andThen(Id.monad()) { b -> Id(b + 1) }.run(0).fix().value shouldBe 1
+      kleisli.andThen(Id.monad()) { b -> Id(b + 1) }.run(0).value() shouldBe 1
     }
   }
 }

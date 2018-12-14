@@ -14,27 +14,27 @@ These instances are available in the module `arrow-instances`.
 
 ### Numbers
 
-- [`Show`]({{ '/docs/typeclasses/show/' | relative_url }})
+- [`Show`]({{ '/docs/arrow/typeclasses/show/' | relative_url }})
 
-- [`Eq`]({{ '/docs/typeclasses/eq/' | relative_url }})
+- [`Eq`]({{ '/docs/arrow/typeclasses/eq/' | relative_url }})
 
-- [`Order`]({{ '/docs/typeclasses/order/' | relative_url }})
+- [`Order`]({{ '/docs/arrow/typeclasses/order/' | relative_url }})
 
-- [`Semigroup`]({{ '/docs/typeclasses/semigroup/' | relative_url }})
+- [`Semigroup`]({{ '/docs/arrow/typeclasses/semigroup/' | relative_url }})
 
-- [`Monoid`]({{ '/docs/typeclasses/monoid/' | relative_url }})
+- [`Monoid`]({{ '/docs/arrow/typeclasses/monoid/' | relative_url }})
 
 ### String
 
-- [`Show`]({{ '/docs/typeclasses/show/' | relative_url }})
+- [`Show`]({{ '/docs/arrow/typeclasses/show/' | relative_url }})
 
-- [`Eq`]({{ '/docs/typeclasses/eq/' | relative_url }})
+- [`Eq`]({{ '/docs/arrow/typeclasses/eq/' | relative_url }})
 
-- [`Order`]({{ '/docs/typeclasses/order/' | relative_url }})
+- [`Order`]({{ '/docs/arrow/typeclasses/order/' | relative_url }})
 
-- [`Semigroup`]({{ '/docs/typeclasses/semigroup/' | relative_url }})
+- [`Semigroup`]({{ '/docs/arrow/typeclasses/semigroup/' | relative_url }})
 
-- [`Monoid`]({{ '/docs/typeclasses/monoid/' | relative_url }})
+- [`Monoid`]({{ '/docs/arrow/typeclasses/monoid/' | relative_url }})
 
 - [`FilterIndex`]({{ '/docs/optics/filterindex/' | relative_url }})
 
@@ -44,14 +44,14 @@ These instances are available in the module `arrow-instances`.
 
 Note that because Boolean doesn't have a companion object you'll find these in `BooleanInstances`.
 
-- [`Show`]({{ '/docs/typeclasses/show/' | relative_url }})
+- [`Show`]({{ '/docs/arrow/typeclasses/show/' | relative_url }})
 
-- [`Eq`]({{ '/docs/typeclasses/eq/' | relative_url }})
+- [`Eq`]({{ '/docs/arrow/typeclasses/eq/' | relative_url }})
 
 ### Char
 
-- [`Show`]({{ '/docs/typeclasses/show/' | relative_url }})
+- [`Show`]({{ '/docs/arrow/typeclasses/show/' | relative_url }})
 
-- [`Eq`]({{ '/docs/typeclasses/eq/' | relative_url }})
+- [`Eq`]({{ '/docs/arrow/typeclasses/eq/' | relative_url }})
 
-- [`Order`]({{ '/docs/typeclasses/order/' | relative_url }})
+- [`Order`]({{ '/docs/arrow/typeclasses/order/' | relative_url }})

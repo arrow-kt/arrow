@@ -55,7 +55,7 @@ object TraverseLaws {
     forAll(genFunctionAToB<Int, Kind<ForId, Int>>(genConstructor(genIntSmall(), ::Id)), genFunctionAToB<Int, Kind<ForId, Int>>(genConstructor(genIntSmall(), ::Id)), genConstructor(genIntSmall(), cf)) { f: (Int) -> Kind<ForId, Int>, g: (Int) -> Kind<ForId, Int>, fha: Kind<F, Int> ->
 
       val fa = fha.traverse(this, f).fix()
-      val composed = fa.map { it.traverse(this, g) }.value.value()
+      val composed = fa.map { it.traverse(this, g) }.value().value()
       val expected = fha.traverse(ComposedApplicative(this, this)) { a: Int -> f(a).map(g).nest() }.unnest().value().value()
       composed.equalUnderTheLaw(expected, EQ)
     }

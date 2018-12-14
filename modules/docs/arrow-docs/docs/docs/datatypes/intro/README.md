@@ -45,13 +45,13 @@ We will list all the datatypes available in arrow by the module they belong to, 
 Core contains the datatypes that are also used by the public API of several [typeclasses]({{ '/docs/patterns/glossary/' | relative_url }}),
 so they are always required.
 
-- [`Id`]({{ '/docs/datatypes/id/' | relative_url }}) - a simple wrapper without any behavior, used mostly for testing
+- [`Id`]({{ '/docs/arrow/core/id/' | relative_url }}) - a simple wrapper without any behavior, used mostly for testing
 
-- [`Option`]({{ '/docs/datatypes/option/' | relative_url }}) - absence of a value, or failure to construct a correct value
+- [`Option`]({{ '/docs/arrow/core/option/' | relative_url }}) - absence of a value, or failure to construct a correct value
 
-- [`Either`]({{ '/docs/datatypes/either/' | relative_url }}) - an if/else branch in execution
+- [`Either`]({{ '/docs/arrow/core/either/' | relative_url }}) - an if/else branch in execution
 
-- [`Eval`]({{ '/docs/datatypes/eval/' | relative_url }}) - lazy evaluation of functions with stack safety and memoization
+- [`Eval`]({{ '/docs/arrow/core/eval/' | relative_url }}) - lazy evaluation of functions with stack safety and memoization
 
 - `TupleN` - a heterogeneous grouping of 2-9 values without creating a named class
 
@@ -61,61 +61,61 @@ Data contains the bulk of the datatypes provided by Arrow. We can separate them 
 
 ##### General use
 
-- [`NonEmptyList`]({{ '/docs/datatypes/nonemptylist/' | relative_url }}) - a homogeneous list that has at least 1 value
+- [`NonEmptyList`]({{ '/docs/arrow/data/nonemptylist/' | relative_url }}) - a homogeneous list that has at least 1 value
 
-- [`Ior`]({{ '/docs/datatypes/ior/' | relative_url }}) - a branch in execution for three possible paths: one, two, or both
+- [`Ior`]({{ '/docs/arrow/data/ior/' | relative_url }}) - a branch in execution for three possible paths: one, two, or both
 
-- [`Const`]({{ '/docs/datatypes/const/' | relative_url }}) - tags a value with a "phantom generic" that's never instantiated, and it can be used for example to represents units or state
+- [`Const`]({{ '/docs/arrow/typeclasses/const/' | relative_url }}) - tags a value with a "phantom generic" that's never instantiated, and it can be used for example to represents units or state
 
-- [`Coproduct`]({{ '/docs/datatypes/coproduct/' | relative_url }}) - constructs a new composed type from two datatypes, allowing to contain and operate on either one of them
+- [`Coproduct`]({{ '/docs/arrow/data/coproduct/' | relative_url }}) - constructs a new composed type from two datatypes, allowing to contain and operate on either one of them
 
 ##### Error handling
 
-- [`Try`]({{ '/docs/datatypes/try/' | relative_url }}) - returns the result of executing a block of code that can fail and throw exceptions
+- [`Try`]({{ '/docs/arrow/core/try/' | relative_url }}) - returns the result of executing a block of code that can fail and throw exceptions
 
-- [`Validated`]({{ '/docs/datatypes/validated/' | relative_url }}) - returns the result of aggregating multiple calculations that can fail, and it also aggregates the errors
+- [`Validated`]({{ '/docs/arrow/data/validated/' | relative_url }}) - returns the result of aggregating multiple calculations that can fail, and it also aggregates the errors
 
 ##### Reader/Writer/State
 
-- [`Kleisli`]({{ '/docs/datatypes/kleisli/' | relative_url }}) - similar to Dependency Injection and Inversion of Control, it represents a calculation with a dependency on an external context
+- [`Kleisli`]({{ '/docs/arrow/data/kleisli/' | relative_url }}) - similar to Dependency Injection and Inversion of Control, it represents a calculation with a dependency on an external context
 
-- [`Reader`]({{ '/docs/datatypes/reader/' | relative_url }}) - same as kleisli but operating over the `Id` datatype
+- [`Reader`]({{ '/docs/arrow/data/reader/' | relative_url }}) - same as kleisli but operating over the `Id` datatype
 
-- [`Writer`]({{ '/docs/datatypes/writert/' | relative_url }}) - represents calculations that carry over one extra aggregated value, generally a logger or reporter
+- [`Writer`]({{ '/docs/arrow/data/writert/' | relative_url }}) - represents calculations that carry over one extra aggregated value, generally a logger or reporter
 
-- [`State`]({{ '/docs/datatypes/state/' | relative_url }}) - represents a stateful calculation with a carried value that can be read from or modified, like a combination of reader and writer
+- [`State`]({{ '/docs/arrow/data/state/' | relative_url }}) - represents a stateful calculation with a carried value that can be read from or modified, like a combination of reader and writer
 
 ##### Wrappers
 
 These types wrap over some of Kotlin's collections and functions to give them capabilities related to [typeclasses]({{ '/docs/typeclasses/intro/' | relative_url }}) provided by Arrow.
 
-- [`ListK`]({{ '/docs/datatypes/listk/' | relative_url }})
+- [`ListK`]({{ '/docs/arrow/data/listk/' | relative_url }})
 
-- [`SequenceK`]({{ '/docs/datatypes/sequencek/' | relative_url }})
+- [`SequenceK`]({{ '/docs/arrow/data/sequencek/' | relative_url }})
 
-- [`SetK`]({{ '/docs/datatypes/setk/' | relative_url }})
+- [`SetK`]({{ '/docs/arrow/data/setk/' | relative_url }})
 
-- [`MapK`]({{ '/docs/datatypes/mapk/' | relative_url }})
+- [`MapK`]({{ '/docs/arrow/data/mapk/' | relative_url }})
 
-- [`SortedMapK`]({{ '/docs/datatypes/sortedmapk/' | relative_url }})
+- [`SortedMapK`]({{ '/docs/arrow/data/sortedmapk/' | relative_url }})
 
-- [`Function0`]({{ '/docs/datatypes/function0/' | relative_url }})
+- [`Function0`]({{ '/docs/arrow/core/function0/' | relative_url }})
 
-- [`Function1`]({{ '/docs/datatypes/function1/' | relative_url }})
+- [`Function1`]({{ '/docs/arrow/core/function1/' | relative_url }})
 
 ##### Transformers
 
 A transformer is a special kind of datatype that allows combining two datatypes to give one of them the abstractions of another
 
-- [`OptionT`]({{ '/docs/datatypes/optiont/' | relative_url }}) - gives the datatype wrapped the properties of `Option`
+- [`OptionT`]({{ '/docs/arrow/data/optiont/' | relative_url }}) - gives the datatype wrapped the properties of `Option`
 
-- [`EitherT`]({{ '/docs/datatypes/eithert/' | relative_url }}) - gives the datatype wrapped the properties of `Either`
+- [`EitherT`]({{ '/docs/arrow/data/eithert/' | relative_url }}) - gives the datatype wrapped the properties of `Either`
 
-- [`ReaderT`]({{ '/docs/datatypes/kleisli/' | relative_url }}) - gives the datatype wrapped the properties of `Reader`
+- [`ReaderT`]({{ '/docs/arrow/data/kleisli/' | relative_url }}) - gives the datatype wrapped the properties of `Reader`
 
-- [`WriterT`]({{ '/docs/datatypes/writert/' | relative_url }}) - gives the datatype wrapped the properties of `Writer`
+- [`WriterT`]({{ '/docs/arrow/data/writert/' | relative_url }}) - gives the datatype wrapped the properties of `Writer`
 
-- [`StateT`]({{ '/docs/datatypes/statet/' | relative_url }}) - gives the datatype wrapped the properties of `State`
+- [`StateT`]({{ '/docs/arrow/data/statet/' | relative_url }}) - gives the datatype wrapped the properties of `State`
 
 
 ##### Codata
@@ -126,13 +126,13 @@ TODO
 
 - [`Coreader`]
 
-- [`Store`]({{ '/docs/datatypes/store/' | relative_url }}) - a datatype which holds an initial state and a function for extracting a representation of it.
+- [`Store`]({{ '/docs/arrow/data/store/' | relative_url }}) - a datatype which holds an initial state and a function for extracting a representation of it.
 
-- [`Moore`]({{ '/docs/datatypes/moore/' | relative_url }}) - a datatype which holds an initial state and can move to new states only when an event of a specific type is dispatched.
+- [`Moore`]({{ '/docs/arrow/data/moore/' | relative_url }}) - a datatype which holds an initial state and can move to new states only when an event of a specific type is dispatched.
 
-- [`Sum`]({{ '/docs/datatypes/sum/' | relative_url }}) - a datatype which holds two comonads and a flag for indicating which one is active. Both sides evolve at the same time.
+- [`Sum`]({{ '/docs/arrow/data/moore/' | relative_url }}) - a datatype which holds two comonads and a flag for indicating which one is active. Both sides evolve at the same time.
 
-- [`Day`]({{ '/docs/datatypes/day/' | relative_url }}) - a datatype which holds two comonads which evolve independently.
+- [`Day`]({{ '/docs/arrow/data/day/' | relative_url }}) - a datatype which holds two comonads which evolve independently.
 
 #### Effects
 

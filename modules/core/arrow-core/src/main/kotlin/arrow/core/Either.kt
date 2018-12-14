@@ -267,6 +267,36 @@ inline fun <A, B> EitherOf<A, B>.filterOrElse(predicate: (B) -> Boolean, default
   flatMap { if (predicate(it)) Right(it) else Left(default()) }
 
 /**
+ * * Returns [Either.Right] with the existing value of [Either.Right] if this is a [Either.Right] and the given
+ * predicate holds for the right value.
+ * * Returns `Left(default({right}))` if this is a [Either.Right] and the given predicate does not
+ * hold for the right value. Useful for error handling where 'default' returns a message with context on why the value
+ * did not pass the filter
+ * * Returns [Either.Left] with the existing value of [Either.Left] if this is a [Either.Left].
+ *
+ * Example:
+ *
+ * {: data-executable='true'}
+ * ```kotlin:ank
+ * import arrow.core.*
+ *
+ * Right(12).filterOrOther({ it > 10 }, { -1 })
+ * ```
+ *
+ * {: data-executable='true'}
+ * ```kotlin:ank
+ * Right(7).filterOrOther({ it > 10 }, { "Value '$it' not greater than 10" })
+ * ```
+ *
+ * {: data-executable='true'}
+ * ```kotlin:ank
+ * val left: Either<Int, Int> = Left(12)
+ * left.filterOrOther({ it > 10 }, { -1 })
+ * ```
+ */inline fun <A, B> EitherOf<A, B>.filterOrOther(predicate: (B) -> Boolean, default: (B) -> A): Either<A, B> =
+  flatMap { if (predicate(it)) arrow.core.Either.Right(it) else arrow.core.Either.Left(default(it)) }
+
+/**
  * * Returns [Either.Right] with the existing value of [Either.Right] if this is an [Either.Right] with a non-null value.
  * The returned Either.Right type is not nullable.
  * * Returns `Left(default())` if this is an [Either.Right] and the existing value is null

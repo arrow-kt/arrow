@@ -102,59 +102,59 @@ We will list them by their hierarchy.
 
 - [`Inject`]({{ '/docs/typeclasses/inject/' | relative_url }}) - transformation between datatypes
 
-- [`Alternative`]({{ '/docs/typeclasses/alternative/' | relative_url }}) - has an structure that contains either of two values
+- [`Alternative`]({{ '/docs/arrow/typeclasses/alternative/' | relative_url }}) - has an structure that contains either of two values
 
 ##### Show
 
-- [`Show`]({{ '/docs/typeclasses/show/' | relative_url }}) - literal representation of an object
+- [`Show`]({{ '/docs/arrow/typeclasses/show/' | relative_url }}) - literal representation of an object
 
 ##### Eq
 
-- [`Eq`]({{ '/docs/typeclasses/eq/' | relative_url }}) - structural equality between two objects
+- [`Eq`]({{ '/docs/arrow/typeclasses/eq/' | relative_url }}) - structural equality between two objects
 
-- [`Order`]({{ '/docs/typeclasses/order/' | relative_url }}) -  determine whether one object precedes another
+- [`Order`]({{ '/docs/arrow/typeclasses/order/' | relative_url }}) -  determine whether one object precedes another
 
-- [`Hash`]({{ '/docs/typeclasses/hash' | relative_url }}) - compute hash of an object
+- [`Hash`]({{ '/docs/arrow/typeclasses/hash' | relative_url }}) - compute hash of an object
 
 ##### Semigroup
 
-- [`Semigroup`]({{ '/docs/typeclasses/semigroup/' | relative_url }}) - can combine two objects together
+- [`Semigroup`]({{ '/docs/arrow/typeclasses/semigroup/' | relative_url }}) - can combine two objects together
 
-- [`SemigroupK`]({{ '/docs/typeclasses/semigroupk/' | relative_url }}) - can combine two datatypes together
+- [`SemigroupK`]({{ '/docs/arrow/typeclasses/semigroupk/' | relative_url }}) - can combine two datatypes together
 
-- [`Monoid`]({{ '/docs/typeclasses/monoid/' | relative_url }}) - combinable objects have an empty value
+- [`Monoid`]({{ '/docs/arrow/typeclasses/monoid/' | relative_url }}) - combinable objects have an empty value
 
-- [`MonoidK`]({{ '/docs/typeclasses/monoidk/' | relative_url }}) - combinable datatypes have an empty value
+- [`MonoidK`]({{ '/docs/arrow/typeclasses/monoidk/' | relative_url }}) - combinable datatypes have an empty value
 
 ##### Functor
 
-- [`Functor`]({{ '/docs/typeclasses/functor/' | relative_url }}) - its contents can be mapped
+- [`Functor`]({{ '/docs/arrow/typeclasses/functor/' | relative_url }}) - its contents can be mapped
 
-- [`Applicative`]({{ '/docs/typeclasses/applicative/' | relative_url }}) - independent execution
+- [`Applicative`]({{ '/docs/arrow/typeclasses/applicative/' | relative_url }}) - independent execution
 
-- [`ApplicativeError`]({{ '/docs/typeclasses/applicativeerror/' | relative_url }}) - recover from errors in independent execution
+- [`ApplicativeError`]({{ '/docs/arrow/typeclasses/applicativeerror/' | relative_url }}) - recover from errors in independent execution
 
-- [`Monad`]({{ '/docs/typeclasses/monad/' | relative_url }}) - sequential execution
+- [`Monad`]({{ '/docs/arrow/typeclasses/monad/' | relative_url }}) - sequential execution
 
-- [`MonadError`]({{ '/docs/typeclasses/monaderror/' | relative_url }}) - recover from errors in sequential execution
+- [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror/' | relative_url }}) - recover from errors in sequential execution
 
-- [`Comonad`]({{ '/docs/typeclasses/comonad/' | relative_url }}) - can extract values from it
+- [`Comonad`]({{ '/docs/arrow/typeclasses/comonad/' | relative_url }}) - can extract values from it
 
-- [`Bimonad`]({{ '/docs/typeclasses/bimonad/' | relative_url }}) - both monad and comonad
+- [`Bimonad`]({{ '/docs/arrow/typeclasses/bimonad/' | relative_url }}) - both monad and comonad
 
-- [`Bifunctor`]({{ '/docs/typeclasses/bifunctor' | relative_url }}) - same as functor but for two values in the container
+- [`Bifunctor`]({{ '/docs/arrow/typeclasses/bifunctor' | relative_url }}) - same as functor but for two values in the container
 
-- [`Profunctor`]({{ '/docs/typeclasses/profunctor' | relative_url }}) - function composition inside a context
+- [`Profunctor`]({{ '/docs/arrow/typeclasses/profunctor' | relative_url }}) - function composition inside a context
 
 ##### Foldable
 
-- [`Foldable`]({{ '/docs/typeclasses/foldable/' | relative_url }}) - has a structure from which a value can be computed from visiting each element
+- [`Foldable`]({{ '/docs/arrow/typeclasses/foldable/' | relative_url }}) - has a structure from which a value can be computed from visiting each element
 
-- [`Bifoldable`]({{ '/docs/typeclasses/bifoldable/' | relative_url }}) - same as foldable, but for structures with more than one possible type, like either
+- [`Bifoldable`]({{ '/docs/arrow/typeclasses/bifoldable/' | relative_url }}) - same as foldable, but for structures with more than one possible type, like either
 
-- [`Reducible`]({{ '/docs/typeclasses/reducible/' | relative_url }}) - structures that can be combined to a summary value
+- [`Reducible`]({{ '/docs/arrow/typeclasses/reducible/' | relative_url }}) - structures that can be combined to a summary value
 
-- [`Traverse`]({{ '/docs/typeclasses/traverse/' | relative_url }}) - has a structure for which each element can be visited and get applied an effect
+- [`Traverse`]({{ '/docs/arrow/typeclasses/traverse/' | relative_url }}) - has a structure for which each element can be visited and get applied an effect
 
 #### Effects
 
@@ -170,19 +170,19 @@ Effects provides a hierarchy of typeclasses for lazy and asynchronous execution.
 
 The Monad Template Library module gives more specialized version of existing typeclasses
 
-- [`FunctorFilter`]({{ '/docs/typeclasses/functorfilter/' | relative_url }}) - can map values that pass a predicate
+- [`FunctorFilter`]({{ '/docs/arrow/mtl/typeclasses/functorfilter/' | relative_url }}) - can map values that pass a predicate
 
-- [`MonadFilter`]({{ '/docs/typeclasses/monadfilter/' | relative_url }}) - can sequentially execute values that pass a predicate
+- [`MonadFilter`]({{ '/docs/arrow/mtl/typeclasses/monadfilter/' | relative_url }}) - can sequentially execute values that pass a predicate
 
-- [`TraverseFilter`]({{ '/docs/typeclasses/traversefilter/' | relative_url }}) - can traverse values that pass a predicate
+- [`TraverseFilter`]({{ '/docs/arrow/mtl/typeclasses/traversefilter/' | relative_url }}) - can traverse values that pass a predicate
 
-- [`MonadCombine`]({{ '/docs/typeclasses/monadcombine/' | relative_url }}) - has a structure that can be combined and split for several datatypes
+- [`MonadCombine`]({{ '/docs/arrow/mtl/typeclasses/monadcombine/' | relative_url }}) - has a structure that can be combined and split for several datatypes
 
-- [`MonadReader`]({{ '/docs/typeclasses/monadwriter/' | relative_url }}) - can implement the capabilities of the datatype [`Reader`]({{ '/docs/datatypes/reader/' | relative_url }})
+- [`MonadReader`]({{ '/docs/arrow/mtl/typeclasses/monadwriter/' | relative_url }}) - can implement the capabilities of the datatype [`Reader`]({{ '/docs/arrow/data/reader/' | relative_url }})
 
-- [`MonadWriter`]({{ '/docs/typeclasses/monadwriter/' | relative_url }}) - can implement the capabilities of the datatype [`Writer`]({{ '/docs/datatypes/writert/' | relative_url }})
+- [`MonadWriter`]({{ '/docs/arrow/mtl/typeclasses/monadwriter/' | relative_url }}) - can implement the capabilities of the datatype [`Writer`]({{ '/docs/arrow/data/writert/' | relative_url }})
 
-- [`MonadState`]({{ '/docs/typeclasses/monadstate/' | relative_url }}) - can implement the capabilities of the datatype [`State`]({{ '/docs/datatypes/state/' | relative_url }})
+- [`MonadState`]({{ '/docs/arrow/mtl/typeclasses/monadstate' | relative_url }}) - can implement the capabilities of the datatype [`State`]({{ '/docs/datatypes/state/' | relative_url }})
 
 #### Optics
 

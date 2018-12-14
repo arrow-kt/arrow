@@ -155,22 +155,6 @@ IO<Int> { throw RuntimeException("Boom!") }
   .unsafeRunSync()
 ```
 
-### merge
-
-Commonly used to aggregate the results of multiple independent blocking functions. Creates an `IO` that invokes 2-10 functions when run. Their results are accumulated on a TupleN, where N is the size.
-
-```kotlin
-IO.merge ({ 1 }, { 2 }, { 3 })
-  .attempt()
-  .unsafeRunSync()
-```
-
-```kotlin
-IO.merge ({ 1 }, { 2 }, { throw RuntimeException("Boom!") })
-  .attempt()
-  .unsafeRunSync()
-```
-
 ### suspend
 
 Used to defer the evaluation of an existing `IO`.
@@ -249,7 +233,7 @@ import arrow.effects.*
 
 ## Common operators
 
-IO implements all the operators common to all instances of [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}). Those include `map`, `flatMap`, and `handleErrorWith`.
+IO implements all the operators common to all instances of [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}). Those include `map`, `flatMap`, and `handleErrorWith`.
 
 
 ### Supported Type Classes
