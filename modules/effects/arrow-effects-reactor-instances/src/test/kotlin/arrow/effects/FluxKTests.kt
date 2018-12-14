@@ -4,6 +4,7 @@ import arrow.effects.fluxk.async.async
 import arrow.effects.fluxk.foldable.foldable
 import arrow.effects.fluxk.functor.functor
 import arrow.effects.fluxk.monad.binding
+import arrow.effects.fluxk.monad.flatMap
 import arrow.effects.fluxk.monadThrow.bindingCatch
 import arrow.effects.fluxk.traverse.traverse
 import arrow.effects.typeclasses.ExitCase
@@ -14,7 +15,6 @@ import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.Spec
-import io.kotlintest.TestCaseContext
 import io.kotlintest.matchers.shouldNotBe
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.not
@@ -148,5 +148,19 @@ class FluxKTest : UnitSpec() {
         .thenCancel()
         .verify()
     }
+
+    "FluxK should cancel KindConnection on dipose" {
+      Promise.uncancelable<ForFluxK, Unit>(FluxK.async()).flatMap { latch ->
+        FluxK {
+          FluxK.runAsync<Unit> { conn, _ ->
+            conn.push(latch.complete(Unit))
+          }.flux.subscribe().dispose()
+        }.flatMap { latch.get }
+      }.value()
+        .test()
+        .expectNext(Unit)
+        .expectComplete()
+    }
+
   }
 }

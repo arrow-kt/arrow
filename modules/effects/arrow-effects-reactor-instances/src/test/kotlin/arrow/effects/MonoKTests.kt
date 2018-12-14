@@ -1,6 +1,7 @@
 package arrow.effects
 
 import arrow.effects.monok.async.async
+import arrow.effects.monok.monad.flatMap
 import arrow.effects.monok.monadThrow.bindingCatch
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
@@ -139,5 +140,19 @@ class MonoKTest : UnitSpec() {
         .thenCancel()
         .verify()
     }
+
+    "MonoK should cancel KindConnection on dipose" {
+      Promise.uncancelable<ForMonoK, Unit>(MonoK.async()).flatMap { latch ->
+        MonoK {
+          MonoK.async<Unit> { conn, _ ->
+            conn.push(latch.complete(Unit))
+          }.mono.subscribe().dispose()
+        }.flatMap { latch.get }
+      }.value()
+        .test()
+        .expectNext(Unit)
+        .expectComplete()
+    }
+
   }
 }
