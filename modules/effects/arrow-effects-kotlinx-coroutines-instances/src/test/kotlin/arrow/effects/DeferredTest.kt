@@ -178,7 +178,7 @@ class DeferredKTest : UnitSpec() {
       }
     }
 
-    "FluxK should cancel KindConnection on dispose" {
+    "DeferredK should cancel KindConnection on dispose" {
       runBlocking {
         Promise.uncancelable<ForDeferredK, Unit>(DeferredK.async()).flatMap { latch ->
           DeferredK {
