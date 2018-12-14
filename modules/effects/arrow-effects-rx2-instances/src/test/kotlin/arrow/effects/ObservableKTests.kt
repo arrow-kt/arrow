@@ -3,6 +3,7 @@ package arrow.effects
 import arrow.effects.observablek.async.async
 import arrow.effects.observablek.foldable.foldable
 import arrow.effects.observablek.functor.functor
+import arrow.effects.observablek.monad.flatMap
 import arrow.effects.observablek.monadThrow.bindingCatch
 import arrow.effects.observablek.traverse.traverse
 import arrow.effects.typeclasses.ExitCase
@@ -10,6 +11,7 @@ import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
 import arrow.test.laws.FoldableLaws
 import arrow.test.laws.TraverseLaws
+import arrow.test.laws.equalUnderTheLaw
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.Spec
@@ -125,5 +127,19 @@ class ObservableKTests : UnitSpec() {
       observable.test().await(5, TimeUnit.SECONDS)
       assertThat(ec, `is`(ExitCase.Cancelled as ExitCase<Throwable>))
     }
+
+    "ObservableK should cancel KindConnection on dipose" {
+      Promise.uncancelable<ForObservableK, Unit>(ObservableK.async()).flatMap { latch ->
+        ObservableK {
+          ObservableK.async<Unit> { conn, _ ->
+            conn.push(latch.complete(Unit))
+          }.observable.subscribe().dispose()
+        }.flatMap { latch.get }
+      }.value()
+        .test()
+        .assertValue(Unit)
+        .awaitTerminalEvent(100, TimeUnit.MILLISECONDS)
+    }
+
   }
 }
