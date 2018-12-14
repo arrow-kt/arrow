@@ -6,11 +6,9 @@ import arrow.effects.CoroutineContextReactorScheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.MonadDefer
-import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import reactor.core.publisher.Flux
-import reactor.core.publisher.FluxSink
 import kotlin.coroutines.CoroutineContext
 
 fun <A> Flux<A>.k(): FluxK<A> = FluxK(this)
@@ -99,7 +97,36 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
     fun <A> defer(fa: () -> FluxKOf<A>): FluxK<A> =
       Flux.defer { fa().value() }.k()
 
-    fun <A> runAsync(fa: FluxKProc<A>): FluxK<A> =
+    /**
+     * Creates a [FluxK] that'll run [FluxKProc].
+     *
+     * {: data-executable='true'}
+     *
+     * ```kotlin:ank
+     * import arrow.core.Either
+     * import arrow.core.right
+     * import arrow.effects.FluxK
+     * import arrow.effects.FluxKConnection
+     * import arrow.effects.value
+     *
+     * class Resource {
+     *   fun asyncRead(f: (String) -> Unit): Unit = f("Some value of a resource")
+     *   fun close(): Unit = Unit
+     * }
+     *
+     * fun main(args: Array<String>) {
+     *   //sampleStart
+     *   val result = FluxK.async { conn: FluxKConnection, cb: (Either<Throwable, String>) -> Unit ->
+     *     val resource = Resource()
+     *     conn.push(FluxK { resource.close() })
+     *     resource.asyncRead { value -> cb(value.right()) }
+     *   }
+     *   //sampleEnd
+     *   result.value().subscribe(::println)
+     * }
+     * ```
+     */
+    fun <A> async(fa: FluxKProc<A>): FluxK<A> =
       Flux.create<A> { sink ->
         val conn = FluxKConnection()
         sink.onCancel { conn.cancel().value().subscribe() }
@@ -131,6 +158,17 @@ fun <A, G> FluxKOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, FluxK<A>> =
 typealias FluxKConnection = KindConnection<ForFluxK>
 typealias FluxKProc<A> = (FluxKConnection, (Either<Throwable, A>) -> Unit) -> Unit
 
+/**
+ * Connection for [FluxK].
+ *
+ * A connection is represented by a composite of `cancel` functions,
+ * [KindConnection.cancel] is idempotent and all methods are thread-safe & atomic.
+ *
+ * The cancellation functions are maintained in a stack and executed in a FIFO order.
+ *
+ * @see FluxK.async
+ */
+@Suppress("FunctionName")
 fun FluxKConnection(dummy: Unit = Unit): KindConnection<ForFluxK> = KindConnection(object : MonadDefer<ForFluxK> {
   override fun <A> defer(fa: () -> FluxKOf<A>): FluxK<A> =
     FluxK.defer(fa)
@@ -152,4 +190,4 @@ fun FluxKConnection(dummy: Unit = Unit): KindConnection<ForFluxK> = KindConnecti
 
   override fun <A, B> FluxKOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> FluxKOf<Unit>, use: (A) -> FluxKOf<B>): FluxK<B> =
     fix().bracketCase(release = release, use = use)
-})
+}) { it.value().subscribe() }

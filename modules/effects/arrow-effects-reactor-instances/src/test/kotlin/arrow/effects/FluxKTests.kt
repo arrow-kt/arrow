@@ -152,7 +152,7 @@ class FluxKTest : UnitSpec() {
     "FluxK should cancel KindConnection on dispose" {
       Promise.uncancelable<ForFluxK, Unit>(FluxK.async()).flatMap { latch ->
         FluxK {
-          FluxK.runAsync<Unit> { conn, _ ->
+          FluxK.async<Unit> { conn, _ ->
             conn.push(latch.complete(Unit))
           }.flux.subscribe().dispose()
         }.flatMap { latch.get }

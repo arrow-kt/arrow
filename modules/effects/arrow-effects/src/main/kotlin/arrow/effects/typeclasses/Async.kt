@@ -6,8 +6,9 @@ import arrow.effects.KindConnection
 import arrow.typeclasses.MonadContinuation
 import kotlin.coroutines.CoroutineContext
 
-/** An asynchronous computation that might fail. **/
+/** A cancellable asynchronous computation that might fail. **/
 typealias ProcF<F, A> = (KindConnection<F>, (Either<Throwable, A>) -> Unit) -> Unit
+/** An asynchronous computation that might fail. **/
 typealias Proc<A> = ((Either<Throwable, A>) -> Unit) -> Unit
 
 /**

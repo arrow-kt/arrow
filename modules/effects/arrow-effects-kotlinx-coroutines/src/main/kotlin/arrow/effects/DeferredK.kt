@@ -4,7 +4,6 @@ import arrow.core.*
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.MonadDefer
-import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
@@ -497,9 +496,9 @@ sealed class DeferredK<A>(
       CompletableDeferred<A>().apply { completeExceptionally(t) }.k()
 
     /**
-     * Starts a coroutine that'll run [Proc].
+     * Starts a coroutine that'll run [DeferredKProc].
      *
-     * Matching the behavior of [async],
+     * Matching the behavior of [asyncK],
      * its [CoroutineContext] is set to [DefaultDispatcher]
      * and its [CoroutineStart] is [CoroutineStart.LAZY].
      *
@@ -507,16 +506,22 @@ sealed class DeferredK<A>(
      *
      * ```kotlin:ank
      * import arrow.core.Either
-     * import arrow.core.left
+     * import arrow.core.right
      * import arrow.effects.DeferredK
+     * import arrow.effects.DeferredKConnection
      * import arrow.effects.unsafeAttemptSync
+     *
+     * class Resource {
+     *   fun asyncRead(f: (String) -> Unit): Unit = f("Some value of a resource")
+     *   fun close(): Unit = Unit
+     * }
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
-     *   val result = DeferredK.async { cb: (Either<Throwable, Int>) -> Unit ->
-     *     cb(
-     *       Exception("BOOM").left()
-     *     )
+     *   val result = DeferredK.async { conn: DeferredKConnection, cb: (Either<Throwable, String>) -> Unit ->
+     *     val resource = Resource()
+     *     conn.push(DeferredK { resource.close() })
+     *     resource.asyncRead { value -> cb(value.right()) }
      *   }
      *   //sampleEnd
      *   println(result.unsafeAttemptSync())
@@ -741,6 +746,17 @@ suspend fun <A> DeferredKOf<A>.await(): A = this.fix().await()
 typealias DeferredKConnection = KindConnection<ForDeferredK>
 typealias DeferredKProc<A> = (DeferredKConnection, (Either<Throwable, A>) -> Unit) -> Unit
 
+/**
+ * Connection for [DeferredK].
+ *
+ * A connection is represented by a composite of `cancel` functions,
+ * [KindConnection.cancel] is idempotent and all methods are thread-safe & atomic.
+ *
+ * The cancellation functions are maintained in a stack and executed in a FIFO order.
+ *
+ * @see DeferredK.async
+ */
+@Suppress("FunctionName")
 fun DeferredKConnection(dummy: Unit = Unit): KindConnection<ForDeferredK> = KindConnection(object : MonadDefer<ForDeferredK> {
   override fun <A> defer(fa: () -> DeferredKOf<A>): DeferredK<A> =
     DeferredK.defer(fa = fa)
@@ -762,4 +778,4 @@ fun DeferredKConnection(dummy: Unit = Unit): KindConnection<ForDeferredK> = Kind
 
   override fun <A, B> DeferredKOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> DeferredKOf<Unit>, use: (A) -> DeferredKOf<B>): DeferredK<B> =
     fix().bracketCase(release = release, use = use)
-})
+}) { it.unsafeRunSync() }

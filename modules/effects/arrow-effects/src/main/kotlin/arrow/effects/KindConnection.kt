@@ -162,7 +162,8 @@ sealed class KindConnection<F> {
      * }
      * ```
      **/
-    operator fun <F> invoke(MD: MonadDefer<F>): KindConnection<F> = DefaultKindConnection(MD)
+    operator fun <F> invoke(MD: MonadDefer<F>, run: (CancelToken<F>) -> Unit): KindConnection<F> =
+      DefaultKindConnection(MD, run)
 
     /**
      * Construct an uncancelable [KindConnection] for a kind [F] based on [MonadDefer].
@@ -198,7 +199,7 @@ sealed class KindConnection<F> {
   /**
    * Default [KindConnection] implementation.
    */
-  private class DefaultKindConnection<F>(MD: MonadDefer<F>) : KindConnection<F>(), MonadDefer<F> by MD {
+  private class DefaultKindConnection<F>(MD: MonadDefer<F>, val run: (CancelToken<F>) -> Unit) : KindConnection<F>(), MonadDefer<F> by MD {
     private val state: AtomicReference<List<CancelToken<F>>?> = AtomicReference(emptyList())
 
     override fun cancel(): CancelToken<F> = defer {
@@ -213,7 +214,7 @@ sealed class KindConnection<F> {
     override fun isCanceled(): Boolean = state.get() == null
 
     override tailrec fun push(token: CancelToken<F>): Unit = when (val list = state.get()) {
-      null -> if (!state.compareAndSet(list, listOf(token))) push(token) else Unit
+      null -> run(token) //If connection is already cancelled cancel token immediately.
       else -> if (!state.compareAndSet(list, listOf(token) + list)) push(token) else Unit
     }
 

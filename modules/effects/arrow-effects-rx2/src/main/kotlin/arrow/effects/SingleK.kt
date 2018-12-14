@@ -7,15 +7,13 @@ import arrow.effects.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.MonadDefer
-import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import io.reactivex.Single
-import io.reactivex.SingleEmitter
 import kotlin.coroutines.CoroutineContext
 
 fun <A> Single<A>.k(): SingleK<A> = SingleK(this)
 
-fun <A> SingleKOf<A>.value(): Single<A> = this.fix().single
+fun <A> SingleKOf<A>.value(): Single<A> = fix().single
 
 @higherkind
 data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
@@ -27,18 +25,18 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
     flatMap { a -> fa.fix().map { ff -> ff(a) } }
 
   fun <B> flatMap(f: (A) -> SingleKOf<B>): SingleK<B> =
-    single.flatMap { f(it).fix().single }.k()
+    single.flatMap { f(it).value() }.k()
 
   fun <B> bracketCase(use: (A) -> SingleKOf<B>, release: (A, ExitCase<Throwable>) -> SingleKOf<Unit>): SingleK<B> =
     flatMap { a ->
-      use(a).fix().single
+      use(a).value()
         .doOnSuccess { release(a, ExitCase.Completed) }
         .doOnError { release(a, ExitCase.Error(it)) }
         .k()
     }
 
-  fun handleErrorWith(function: (Throwable) -> SingleK<A>): SingleK<A> =
-    single.onErrorResumeNext { t: Throwable -> function(t).single }.k()
+  fun handleErrorWith(function: (Throwable) -> SingleKOf<A>): SingleK<A> =
+    single.onErrorResumeNext { t: Throwable -> function(t).value() }.k()
 
   fun continueOn(ctx: CoroutineContext): SingleK<A> =
     single.observeOn(ctx.asScheduler()).k()
@@ -75,6 +73,35 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
     fun <A> defer(fa: () -> SingleKOf<A>): SingleK<A> =
       Single.defer { fa().value() }.k()
 
+    /**
+     * Creates a [SingleK] that'll run [SingleKProc].
+     *
+     * {: data-executable='true'}
+     *
+     * ```kotlin:ank
+     * import arrow.core.Either
+     * import arrow.core.right
+     * import arrow.effects.SingleK
+     * import arrow.effects.SingleKConnection
+     * import arrow.effects.value
+     *
+     * class Resource {
+     *   fun asyncRead(f: (String) -> Unit): Unit = f("Some value of a resource")
+     *   fun close(): Unit = Unit
+     * }
+     *
+     * fun main(args: Array<String>) {
+     *   //sampleStart
+     *   val result = SingleK.async { conn: SingleKConnection, cb: (Either<Throwable, String>) -> Unit ->
+     *     val resource = Resource()
+     *     conn.push(SingleK { resource.close() })
+     *     resource.asyncRead { value -> cb(value.right()) }
+     *   }
+     *   //sampleEnd
+     *   result.value().subscribe(::println)
+     * }
+     * ```
+     */
     fun <A> async(fa: SingleKProc<A>): SingleK<A> =
       Single.create<A> { emitter ->
         val conn = SingleKConnection()
@@ -102,6 +129,17 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
 typealias SingleKConnection = KindConnection<ForSingleK>
 typealias SingleKProc<A> = (SingleKConnection, (Either<Throwable, A>) -> Unit) -> Unit
 
+/**
+ * Connection for [SingleK].
+ *
+ * A connection is represented by a composite of `cancel` functions,
+ * [KindConnection.cancel] is idempotent and all methods are thread-safe & atomic.
+ *
+ * The cancellation functions are maintained in a stack and executed in a FIFO order.
+ *
+ * @see SingleK.async
+ */
+@Suppress("FunctionName")
 fun SingleKConnection(dummy: Unit = Unit): KindConnection<ForSingleK> = KindConnection(object : MonadDefer<ForSingleK> {
   override fun <A> defer(fa: () -> SingleKOf<A>): SingleK<A> =
     SingleK.defer(fa)
@@ -123,4 +161,4 @@ fun SingleKConnection(dummy: Unit = Unit): KindConnection<ForSingleK> = KindConn
 
   override fun <A, B> SingleKOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> SingleKOf<Unit>, use: (A) -> SingleKOf<B>): SingleK<B> =
     fix().bracketCase(release = release, use = use)
-})
+}) { it.value().subscribe() }

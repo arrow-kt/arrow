@@ -1,7 +1,5 @@
-package arrow.effects.internal
+package arrow.effects
 
-import arrow.effects.IO
-import arrow.effects.fix
 import arrow.test.UnitSpec
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
@@ -22,7 +20,7 @@ class IOConnectionTests : UnitSpec() {
       effect shouldBe 1
     }
 
-    "cancels after being canceled" {
+    "cancel immediately if already canceled" {
       var effect = 0
       val initial = IO { effect += 1 }
       val c = IOConnection()

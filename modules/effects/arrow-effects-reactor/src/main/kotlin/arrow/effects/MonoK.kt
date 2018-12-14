@@ -7,10 +7,8 @@ import arrow.effects.CoroutineContextReactorScheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.MonadDefer
-import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import reactor.core.publisher.Mono
-import reactor.core.publisher.MonoSink
 import kotlin.coroutines.CoroutineContext
 
 fun <A> Mono<A>.k(): MonoK<A> = MonoK(this)
@@ -76,6 +74,35 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
     fun <A> defer(fa: () -> MonoKOf<A>): MonoK<A> =
       Mono.defer { fa().value() }.k()
 
+    /**
+     * Creates a [MonoK] that'll run [MonoKProc].
+     *
+     * {: data-executable='true'}
+     *
+     * ```kotlin:ank
+     * import arrow.core.Either
+     * import arrow.core.right
+     * import arrow.effects.MonoK
+     * import arrow.effects.MonoKConnection
+     * import arrow.effects.value
+     *
+     * class Resource {
+     *   fun asyncRead(f: (String) -> Unit): Unit = f("Some value of a resource")
+     *   fun close(): Unit = Unit
+     * }
+     *
+     * fun main(args: Array<String>) {
+     *   //sampleStart
+     *   val result = MonoK.async { conn: MonoKConnection, cb: (Either<Throwable, String>) -> Unit ->
+     *     val resource = Resource()
+     *     conn.push(MonoK { resource.close() })
+     *     resource.asyncRead { value -> cb(value.right()) }
+     *   }
+     *   //sampleEnd
+     *   result.value().subscribe(::println)
+     * }
+     * ```
+     */
     fun <A> async(fa: MonoKProc<A>): MonoK<A> =
       Mono.create<A> { sink ->
         val conn = MonoKConnection()
@@ -103,6 +130,17 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
 typealias MonoKConnection = KindConnection<ForMonoK>
 typealias MonoKProc<A> = (MonoKConnection, (Either<Throwable, A>) -> Unit) -> Unit
 
+/**
+ * Connection for [MonoK].
+ *
+ * A connection is represented by a composite of `cancel` functions,
+ * [KindConnection.cancel] is idempotent and all methods are thread-safe & atomic.
+ *
+ * The cancellation functions are maintained in a stack and executed in a FIFO order.
+ *
+ * @see MonoK.async
+ */
+@Suppress("FunctionName")
 fun MonoKConnection(dummy: Unit = Unit): KindConnection<ForMonoK> = KindConnection(object : MonadDefer<ForMonoK> {
   override fun <A> defer(fa: () -> MonoKOf<A>): MonoK<A> =
     MonoK.defer(fa)
@@ -124,4 +162,4 @@ fun MonoKConnection(dummy: Unit = Unit): KindConnection<ForMonoK> = KindConnecti
 
   override fun <A, B> MonoKOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> MonoKOf<Unit>, use: (A) -> MonoKOf<B>): MonoK<B> =
     fix().bracketCase(release = release, use = use)
-})
+}) { it.value().subscribe() }

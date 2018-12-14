@@ -8,7 +8,6 @@ import arrow.higherkind
 import arrow.typeclasses.Applicative
 import io.reactivex.Observable
 import kotlin.coroutines.CoroutineContext
-import arrow.effects.handleErrorWith as handleErrorW
 
 fun <A> Observable<A>.k(): ObservableK<A> = ObservableK(this)
 
@@ -95,6 +94,35 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
     fun <A> defer(fa: () -> ObservableKOf<A>): ObservableK<A> =
       Observable.defer { fa().value() }.k()
 
+    /**
+     * Creates a [ObservableK] that'll run [ObservableKProc].
+     *
+     * {: data-executable='true'}
+     *
+     * ```kotlin:ank
+     * import arrow.core.Either
+     * import arrow.core.right
+     * import arrow.effects.ObservableK
+     * import arrow.effects.ObservableKConnection
+     * import arrow.effects.value
+     *
+     * class Resource {
+     *   fun asyncRead(f: (String) -> Unit): Unit = f("Some value of a resource")
+     *   fun close(): Unit = Unit
+     * }
+     *
+     * fun main(args: Array<String>) {
+     *   //sampleStart
+     *   val result = ObservableK.async { conn: ObservableKConnection, cb: (Either<Throwable, String>) -> Unit ->
+     *     val resource = Resource()
+     *     conn.push(ObservableK { resource.close() })
+     *     resource.asyncRead { value -> cb(value.right()) }
+     *   }
+     *   //sampleEnd
+     *   result.value().subscribe(::println)
+     * }
+     * ```
+     */
     fun <A> async(fa: ObservableKProc<A>): ObservableK<A> =
       Observable.create<A> { emitter ->
         val connection = ObservableKConnection()
@@ -126,6 +154,17 @@ fun <A, G> ObservableKOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, Obser
 typealias ObservableKProc<A> = (ObservableKConnection, (Either<Throwable, A>) -> Unit) -> Unit
 typealias ObservableKConnection = KindConnection<ForObservableK>
 
+/**
+ * Connection for [ObservableK].
+ *
+ * A connection is represented by a composite of `cancel` functions,
+ * [KindConnection.cancel] is idempotent and all methods are thread-safe & atomic.
+ *
+ * The cancellation functions are maintained in a stack and executed in a FIFO order.
+ *
+ * @see ObservableK.async
+ */
+@Suppress("FunctionName")
 fun ObservableKConnection(dummy: Unit = Unit): KindConnection<ForObservableK> = KindConnection(object : MonadDefer<ForObservableK> {
   override fun <A> defer(fa: () -> ObservableKOf<A>): ObservableK<A> =
     ObservableK.defer(fa)
@@ -147,4 +186,4 @@ fun ObservableKConnection(dummy: Unit = Unit): KindConnection<ForObservableK> = 
 
   override fun <A, B> ObservableKOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> ObservableKOf<Unit>, use: (A) -> ObservableKOf<B>): ObservableK<B> =
     fix().bracketCase(release = release, use = use)
-})
+}) { it.value().subscribe() }

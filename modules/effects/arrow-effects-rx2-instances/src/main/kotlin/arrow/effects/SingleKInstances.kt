@@ -1,6 +1,5 @@
 package arrow.effects
 
-import arrow.Kind
 import arrow.core.Either
 import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.effects.typeclasses.*
@@ -10,7 +9,7 @@ import kotlin.coroutines.CoroutineContext
 
 @extension
 interface SingleKFunctorInstance : Functor<ForSingleK> {
-  override fun <A, B> Kind<ForSingleK, A>.map(f: (A) -> B): SingleK<B> =
+  override fun <A, B> SingleKOf<A>.map(f: (A) -> B): SingleK<B> =
     fix().map(f)
 }
 
@@ -19,7 +18,7 @@ interface SingleKApplicativeInstance : Applicative<ForSingleK> {
   override fun <A, B> SingleKOf<A>.ap(ff: SingleKOf<(A) -> B>): SingleK<B> =
     fix().ap(ff)
 
-  override fun <A, B> Kind<ForSingleK, A>.map(f: (A) -> B): SingleK<B> =
+  override fun <A, B> SingleKOf<A>.map(f: (A) -> B): SingleK<B> =
     fix().map(f)
 
   override fun <A> just(a: A): SingleK<A> =
@@ -31,13 +30,13 @@ interface SingleKMonadInstance : Monad<ForSingleK> {
   override fun <A, B> SingleKOf<A>.ap(ff: SingleKOf<(A) -> B>): SingleK<B> =
     fix().ap(ff)
 
-  override fun <A, B> SingleKOf<A>.flatMap(f: (A) -> Kind<ForSingleK, B>): SingleK<B> =
+  override fun <A, B> SingleKOf<A>.flatMap(f: (A) -> SingleKOf<B>): SingleK<B> =
     fix().flatMap(f)
 
   override fun <A, B> SingleKOf<A>.map(f: (A) -> B): SingleK<B> =
     fix().map(f)
 
-  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, SingleKOf<arrow.core.Either<A, B>>>): SingleK<B> =
+  override fun <A, B> tailRecM(a: A, f: Function1<A, SingleKOf<Either<A, B>>>): SingleK<B> =
     SingleK.tailRecM(a, f)
 
   override fun <A> just(a: A): SingleK<A> =
@@ -71,7 +70,7 @@ interface SingleKMonadThrowInstance : MonadThrow<ForSingleK>, SingleKMonadErrorI
 
 @extension
 interface SingleKBracketInstance : Bracket<ForSingleK, Throwable>, SingleKMonadThrowInstance {
-  override fun <A, B> Kind<ForSingleK, A>.bracketCase(release: (A, ExitCase<Throwable>) -> Kind<ForSingleK, Unit>, use: (A) -> Kind<ForSingleK, B>): SingleK<B> =
+  override fun <A, B> SingleKOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> SingleKOf<Unit>, use: (A) -> SingleKOf<B>): SingleK<B> =
     fix().bracketCase({ use(it) }, { a, e -> release(a, e) })
 }
 
@@ -102,7 +101,7 @@ interface SingleKEffectInstance :
 
 @extension
 interface SingleKConcurrentEffectInstance : ConcurrentEffect<ForSingleK>, SingleKEffectInstance {
-  override fun <A> Kind<ForSingleK, A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> SingleKOf<Unit>): SingleK<Disposable> =
+  override fun <A> SingleKOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> SingleKOf<Unit>): SingleK<Disposable> =
     fix().runAsyncCancellable(cb)
 }
 

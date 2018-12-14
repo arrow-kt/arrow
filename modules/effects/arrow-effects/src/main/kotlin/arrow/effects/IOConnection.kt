@@ -9,8 +9,11 @@ import arrow.effects.handleErrorWith as handleErrorW
 fun IOConnection.toDisposable(): Disposable = { cancel().fix().unsafeRunSync() }
 typealias IOConnection = KindConnection<ForIO>
 
-fun IOConnection(dummy: Unit = Unit): IOConnection = KindConnection(MD)
-internal val KindConnection.Companion.uncancelable: IOConnection get() = uncancelable(MD)
+fun IOConnection(dummy: Unit = Unit): IOConnection = KindConnection(MD) { it.fix().unsafeRunAsync { } }
+
+private val _uncancelable = KindConnection.uncancelable(MD)
+internal inline val KindConnection.Companion.uncancelable: IOConnection
+  inline get() = _uncancelable
 
 private object MD : MonadDefer<ForIO> {
   override fun <A> defer(fa: () -> IOOf<A>): IO<A> =

@@ -10,17 +10,15 @@ import arrow.effects.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.MonadDefer
-import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
-import io.reactivex.FlowableEmitter
 import kotlin.coroutines.CoroutineContext
 
 fun <A> Flowable<A>.k(): FlowableK<A> = FlowableK(this)
 
-fun <A> FlowableKOf<A>.value(): Flowable<A> = this.fix().flowable
+fun <A> FlowableKOf<A>.value(): Flowable<A> = fix().flowable
 
 @higherkind
 data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKindedJ<A> {
@@ -32,11 +30,11 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
     flatMap { a -> fa.fix().map { ff -> ff(a) } }
 
   fun <B> flatMap(f: (A) -> FlowableKOf<B>): FlowableK<B> =
-    flowable.flatMap { f(it).fix().flowable }.k()
+    flowable.flatMap { f(it).value() }.k()
 
   fun <B> bracketCase(use: (A) -> FlowableKOf<B>, release: (A, ExitCase<Throwable>) -> FlowableKOf<Unit>): FlowableK<B> =
     flatMap { a ->
-      use(a).fix().flowable
+      use(a).value()
         .doOnError { release(a, ExitCase.Error(it)) }
         .doOnCancel { release(a, ExitCase.Cancelled) }
         .doOnComplete { release(a, ExitCase.Completed) }
@@ -44,10 +42,10 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
     }
 
   fun <B> concatMap(f: (A) -> FlowableKOf<B>): FlowableK<B> =
-    flowable.concatMap { f(it).fix().flowable }.k()
+    flowable.concatMap { f(it).value() }.k()
 
   fun <B> switchMap(f: (A) -> FlowableKOf<B>): FlowableK<B> =
-    flowable.switchMap { f(it).fix().flowable }.k()
+    flowable.switchMap { f(it).value() }.k()
 
   fun <B> foldLeft(b: B, f: (B, A) -> B): B = flowable.reduce(b, f).blockingGet()
 
@@ -65,8 +63,8 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
       GA.run { f(a).map2Eval(eval) { Flowable.concat(Flowable.just<B>(it.a), it.b.flowable).k() } }
     }.value()
 
-  fun handleErrorWith(function: (Throwable) -> FlowableK<A>): FlowableK<A> =
-    flowable.onErrorResumeNext { t: Throwable -> function(t).flowable }.k()
+  fun handleErrorWith(function: (Throwable) -> FlowableKOf<A>): FlowableK<A> =
+    flowable.onErrorResumeNext { t: Throwable -> function(t).value() }.k()
 
   fun continueOn(ctx: CoroutineContext): FlowableK<A> =
     flowable.observeOn(ctx.asScheduler()).k()
@@ -103,6 +101,35 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
     fun <A> defer(fa: () -> FlowableKOf<A>): FlowableK<A> =
       Flowable.defer { fa().value() }.k()
 
+    /**
+     * Creates a [FlowableK] that'll run [FlowableKProc].
+     *
+     * {: data-executable='true'}
+     *
+     * ```kotlin:ank
+     * import arrow.core.Either
+     * import arrow.core.right
+     * import arrow.effects.FlowableK
+     * import arrow.effects.FlowableKConnection
+     * import arrow.effects.value
+     *
+     * class Resource {
+     *   fun asyncRead(f: (String) -> Unit): Unit = f("Some value of a resource")
+     *   fun close(): Unit = Unit
+     * }
+     *
+     * fun main(args: Array<String>) {
+     *   //sampleStart
+     *   val result = FlowableK.async { conn: FlowableKConnection, cb: (Either<Throwable, String>) -> Unit ->
+     *     val resource = Resource()
+     *     conn.push(FlowableK { resource.close() })
+     *     resource.asyncRead { value -> cb(value.right()) }
+     *   }
+     *   //sampleEnd
+     *   result.value().subscribe(::println)
+     * }
+     * ```
+     */
     fun <A> async(fa: FlowableKProc<A>, mode: BackpressureStrategy = BackpressureStrategy.BUFFER): FlowableK<A> =
       Flowable.create<A>({ emitter ->
         val conn = FlowableKConnection()
@@ -134,6 +161,17 @@ fun <A, G> FlowableKOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, Flowabl
 typealias FlowableKConnection = KindConnection<ForFlowableK>
 typealias FlowableKProc<A> = (FlowableKConnection, (Either<Throwable, A>) -> Unit) -> Unit
 
+/**
+ * Connection for [FlowableK].
+ *
+ * A connection is represented by a composite of `cancel` functions,
+ * [KindConnection.cancel] is idempotent and all methods are thread-safe & atomic.
+ *
+ * The cancellation functions are maintained in a stack and executed in a FIFO order.
+ *
+ * @see FlowableK.async
+ */
+@Suppress("FunctionName")
 fun FlowableKConnection(dummy: Unit = Unit): KindConnection<ForFlowableK> = KindConnection(object : MonadDefer<ForFlowableK> {
   override fun <A> defer(fa: () -> FlowableKOf<A>): FlowableK<A> =
     FlowableK.defer(fa)
@@ -155,4 +193,4 @@ fun FlowableKConnection(dummy: Unit = Unit): KindConnection<ForFlowableK> = Kind
 
   override fun <A, B> FlowableKOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> FlowableKOf<Unit>, use: (A) -> FlowableKOf<B>): FlowableK<B> =
     fix().bracketCase(release = release, use = use)
-})
+}) { it.value().subscribe() }
