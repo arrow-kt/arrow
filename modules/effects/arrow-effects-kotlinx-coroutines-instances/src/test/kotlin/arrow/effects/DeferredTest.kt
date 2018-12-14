@@ -7,6 +7,7 @@ import arrow.data.ListK
 import arrow.data.NonEmptyList
 import arrow.data.k
 import arrow.effects.deferredk.async.async
+import arrow.effects.deferredk.monad.flatMap
 import arrow.instances.`try`.functor.functor
 import arrow.instances.`try`.traverse.traverse
 import arrow.instances.listk.functor.functor
@@ -176,5 +177,18 @@ class DeferredKTest : UnitSpec() {
         }
       }
     }
+
+    "FluxK should cancel KindConnection on dipose" {
+      runBlocking {
+        Promise.uncancelable<ForDeferredK, Unit>(DeferredK.async()).flatMap { latch ->
+          DeferredK {
+            DeferredK.async<Unit>(start = CoroutineStart.DEFAULT) { conn, _ ->
+              conn.push(latch.complete(Unit))
+            }.cancel()
+          }.flatMap { latch.get }
+        }.await()
+      }
+    }
+    
   }
 }
