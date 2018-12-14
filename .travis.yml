@@ -5,11 +5,14 @@ dist: trusty
 jdk:
 - oraclejdk8
 
+before_script:
+- "echo $JAVA_OPTS"
+- "export JAVA_OPTS=-XX:-UseGCOverheadLimit"
+
 stages:
 - name: build-and-dokka
-- name: ank
   if: branch != master OR type = pull_request
-- name: ank-sync
+- name: build-and-dokka-transfer
   if: branch = master AND type != pull_request
 - name: coverage-report
   if: branch = master
@@ -22,7 +25,7 @@ env:
   global:
   # include $HOME/.local/bin for `aws`
   - PATH=$HOME/.local/bin:$PATH
-  - JAVA_OPTS="-Xms1g -Xmx2g -XX:-UseGCOverheadLimit -XX:MaxGCPauseMillis=500000"
+  - JAVA_OPTS="-Xms512m -Xmx1024m"
 
 before_install:
 - pip install --user awscli
@@ -30,26 +33,16 @@ before_install:
 
 jobs:
   include:
-   - stage: build-and-dokka
-     name: "Build"
-     script: ./gradlew clean build
-   - script:
-     name: "Dokka"
-     - ./gradlew dokka
-     # redirecting outputs to files to avoid exceeding travis' logs limit
-     - aws s3 sync modules/docs/arrow-docs/docs/docs/apidocs s3://$S3_BUCKET/apidocs > aws_upload_dokka.log
-  - stage: ank
+  - stage: build-and-dokka
     script:
-    - aws s3 sync s3://$S3_BUCKET/apidocs modules/docs/arrow-docs/docs/docs/apidocs > aws_download_dokka.log
-    - sudo cat /proc/meminfo
-    - java -XX:+PrintFlagsFinal -version | grep HeapSize
+    - ./gradlew clean build dokka
     - ./gradlew :arrow-docs:runAnk
-  - stage: ank-sync
+  - stage: build-and-dokka-transfer
     script:
-    - aws s3 sync s3://$S3_BUCKET/apidocs modules/docs/arrow-docs/docs/docs/apidocs > aws_download_dokka.log
-    - sudo cat /proc/meminfo
+    - ./gradlew clean build dokka
     - ./gradlew :arrow-docs:runAnk
-    - aws s3 sync modules/docs/arrow-docs/build/site s3://$S3_BUCKET/site > aws_upload_ank.log
+    # redirecting outputs to files to avoid exceeding travis' logs limit
+    - aws s3 sync modules/docs/arrow-docs/build/site s3://$S3_BUCKET/site > aws_sync_dokka.log
   - stage: coverage-report
     script:
     - ./gradlew codeCoverageReport
