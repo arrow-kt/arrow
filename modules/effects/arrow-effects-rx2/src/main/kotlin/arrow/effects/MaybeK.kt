@@ -3,6 +3,7 @@ package arrow.effects
 import arrow.core.*
 import arrow.effects.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.ExitCase
+import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import io.reactivex.Maybe
@@ -82,9 +83,12 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
     fun <A> defer(fa: () -> MaybeKOf<A>): MaybeK<A> =
       Maybe.defer { fa().value() }.k()
 
-    fun <A> async(fa: Proc<A>): MaybeK<A> =
-      Maybe.create { emitter: MaybeEmitter<A> ->
-        fa { either: Either<Throwable, A> ->
+    fun <A> async(fa: MaybeKProc<A>): MaybeK<A> =
+      Maybe.create<A> { emitter ->
+        val conn = MaybeKConnection()
+        emitter.setCancellable { conn.cancel().value().subscribe() }
+
+        fa(conn) { either: Either<Throwable, A> ->
           either.fold({
             emitter.onError(it)
           }, {
@@ -103,3 +107,29 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
     }
   }
 }
+
+typealias MaybeKConnection = KindConnection<ForMaybeK>
+typealias MaybeKProc<A> = (MaybeKConnection, (Either<Throwable, A>) -> Unit) -> Unit
+
+fun MaybeKConnection(dummy: Unit = Unit): KindConnection<ForMaybeK> = KindConnection(object : MonadDefer<ForMaybeK> {
+  override fun <A> defer(fa: () -> MaybeKOf<A>): MaybeK<A> =
+    MaybeK.defer(fa)
+
+  override fun <A> raiseError(e: Throwable): MaybeK<A> =
+    MaybeK.raiseError(e)
+
+  override fun <A> MaybeKOf<A>.handleErrorWith(f: (Throwable) -> MaybeKOf<A>): MaybeK<A> =
+    fix().handleErrorWith(f)
+
+  override fun <A> just(a: A): MaybeK<A> =
+    MaybeK.just(a)
+
+  override fun <A, B> MaybeKOf<A>.flatMap(f: (A) -> MaybeKOf<B>): MaybeK<B> =
+    fix().flatMap(f)
+
+  override fun <A, B> tailRecM(a: A, f: (A) -> MaybeKOf<Either<A, B>>): MaybeK<B> =
+    MaybeK.tailRecM(a, f)
+
+  override fun <A, B> MaybeKOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> MaybeKOf<Unit>, use: (A) -> MaybeKOf<B>): MaybeK<B> =
+    fix().bracketCase(release = release, use = use)
+})
