@@ -348,38 +348,6 @@ sealed class DeferredK<A>(
   companion object {
 
     /**
-     * Creates a [DeferredK] that just contains [Unit]
-     *
-     * Useful for comprehensions to avoid executing code at the beginning of a binding.
-     *
-     * This below executes `println("Stuff")` despite the resulting [DeferredK] never being executed itself.
-     * To avoid that call [bind] on a [DeferredK] before that. The second binding won't print a thing before run.
-     *
-     * {: data-executable='true'}
-     *
-     * ```kotlin:ank
-     * import arrow.effects.DeferredK
-     * import arrow.effects.deferredk.monad.monad
-     *
-     * fun main(args: Array<String>) {
-     *   //sampleStart
-     *   DeferredK.monad().binding {
-     *     println("Stuff")
-     *     DeferredK { 10 }.bind()
-     *   }
-     *
-     *   DeferredK.monad().binding {
-     *     DeferredK.unit().bind()
-     *     println("Other Stuff")
-     *     DeferredK { 10 }.bind()
-     *   }
-     *   //sampleEnd
-     * }
-     * ```
-     */
-    fun unit(): DeferredK<Unit> = just(Unit)
-
-    /**
      * Lifts a value a into a [DeferredK] of A
      *
      * {: data-executable='true'}
