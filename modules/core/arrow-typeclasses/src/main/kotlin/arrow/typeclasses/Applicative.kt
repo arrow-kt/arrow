@@ -15,6 +15,8 @@ interface Applicative<F> : Functor<F> {
 
   fun <A> A.just(dummy: Unit = Unit): Kind<F, A> = just(this)
 
+  fun unit(): Kind<F, Unit> = just(Unit)
+
   fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B>
 
   fun <A, B> Kind<F, A>.product(fb: Kind<F, B>): Kind<F, Tuple2<A, B>> =

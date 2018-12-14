@@ -2,10 +2,12 @@ package arrow.effects.typeclasses
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.effects.KindConnection
 import arrow.typeclasses.MonadContinuation
 import kotlin.coroutines.CoroutineContext
 
 /** An asynchronous computation that might fail. **/
+typealias ProcF<F, A> = (KindConnection<F>, (Either<Throwable, A>) -> Unit) -> Unit
 typealias Proc<A> = ((Either<Throwable, A>) -> Unit) -> Unit
 
 /**

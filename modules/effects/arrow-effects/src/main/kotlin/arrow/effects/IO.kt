@@ -5,17 +5,11 @@ import arrow.core.Either.Left
 import arrow.effects.OnCancel.Companion.CancellationException
 import arrow.effects.OnCancel.Silent
 import arrow.effects.OnCancel.ThrowCancellationException
-import arrow.effects.internal.IOBracket
-import arrow.effects.internal.IOCancel
-import arrow.effects.internal.IOConnection
+import arrow.effects.internal.*
 import arrow.effects.internal.Platform.maxStackDepthSize
 import arrow.effects.internal.Platform.onceOnly
 import arrow.effects.internal.Platform.unsafeResync
-import arrow.effects.internal.toDisposable
-import arrow.effects.typeclasses.Disposable
-import arrow.effects.typeclasses.Duration
-import arrow.effects.typeclasses.ExitCase
-import arrow.effects.typeclasses.Proc
+import arrow.effects.typeclasses.*
 import arrow.higherkind
 import kotlin.coroutines.CoroutineContext
 
@@ -27,7 +21,6 @@ enum class OnCancel { ThrowCancellationException, Silent;
 }
 
 typealias IOProc<A> = (IOConnection, (Either<Throwable, A>) -> Unit) -> Unit
-
 fun <T> Proc<T>.toIOProc(): IOProc<T> = { _: IOConnection, proc -> this(proc) }
 
 @higherkind

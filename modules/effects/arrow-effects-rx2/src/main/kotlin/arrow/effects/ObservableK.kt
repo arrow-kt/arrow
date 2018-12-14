@@ -3,19 +3,17 @@ package arrow.effects
 import arrow.Kind
 import arrow.core.*
 import arrow.effects.CoroutineContextRx2Scheduler.asScheduler
-import arrow.effects.typeclasses.Disposable
-import arrow.effects.typeclasses.ExitCase
-import arrow.effects.typeclasses.Proc
+import arrow.effects.typeclasses.*
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import io.reactivex.Observable
-import io.reactivex.ObservableEmitter
 import kotlin.coroutines.CoroutineContext
+import arrow.effects.handleErrorWith as handleErrorW
 
 fun <A> Observable<A>.k(): ObservableK<A> = ObservableK(this)
 
 fun <A> ObservableKOf<A>.value(): Observable<A> =
-  this.fix().observable
+  fix().observable
 
 @higherkind
 data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, ObservableKKindedJ<A> {
@@ -26,11 +24,11 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
     flatMap { a -> fa.fix().map { ff -> ff(a) } }
 
   fun <B> flatMap(f: (A) -> ObservableKOf<B>): ObservableK<B> =
-    observable.flatMap { f(it).fix().observable }.k()
+    observable.flatMap { f(it).value() }.k()
 
   fun <B> bracketCase(use: (A) -> ObservableKOf<B>, release: (A, ExitCase<Throwable>) -> ObservableKOf<Unit>): ObservableK<B> =
     flatMap { a ->
-      use(a).fix().observable
+      use(a).value()
         .doOnError { release(a, ExitCase.Error(it)) }
         .doOnDispose { release(a, ExitCase.Cancelled) }
         .doOnComplete { release(a, ExitCase.Completed) }
@@ -38,10 +36,10 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
     }
 
   fun <B> concatMap(f: (A) -> ObservableKOf<B>): ObservableK<B> =
-    observable.concatMap { f(it).fix().observable }.k()
+    observable.concatMap { f(it).value() }.k()
 
   fun <B> switchMap(f: (A) -> ObservableKOf<B>): ObservableK<B> =
-    observable.switchMap { f(it).fix().observable }.k()
+    observable.switchMap { f(it).value() }.k()
 
   fun <B> foldLeft(b: B, f: (B, A) -> B): B = observable.reduce(b, f).blockingGet()
 
@@ -59,8 +57,8 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
       GA.run { f(a).map2Eval(eval) { Observable.concat(Observable.just<B>(it.a), it.b.observable).k() } }
     }.value()
 
-  fun handleErrorWith(function: (Throwable) -> ObservableK<A>): ObservableK<A> =
-    this.fix().observable.onErrorResumeNext { t: Throwable -> function(t).observable }.k()
+  fun handleErrorWith(function: (Throwable) -> ObservableKOf<A>): ObservableK<A> =
+    value().onErrorResumeNext { t: Throwable -> function(t).value() }.k()
 
   fun continueOn(ctx: CoroutineContext): ObservableK<A> =
     observable.observeOn(ctx.asScheduler()).k()
@@ -97,14 +95,17 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
     fun <A> defer(fa: () -> ObservableKOf<A>): ObservableK<A> =
       Observable.defer { fa().value() }.k()
 
-    fun <A> runAsync(fa: Proc<A>): ObservableK<A> =
-      Observable.create { emitter: ObservableEmitter<A> ->
-        fa { either: Either<Throwable, A> ->
+    fun <A> async(fa: ObservableKProc<A>): ObservableK<A> =
+      Observable.create<A> { s ->
+        val connection = ObservableKConnection()
+        s.setCancellable { connection.cancel().value().subscribe() }
+
+        fa(connection) { either: Either<Throwable, A> ->
           either.fold({
-            emitter.onError(it)
+            s.onError(it)
           }, {
-            emitter.onNext(it)
-            emitter.onComplete()
+            s.onNext(it)
+            s.onComplete()
           })
         }
       }.k()
@@ -121,3 +122,29 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
 
 fun <A, G> ObservableKOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, ObservableK<A>> =
   fix().traverse(GA, ::identity)
+
+typealias ObservableKProc<A> = (ObservableKConnection, (Either<Throwable, A>) -> Unit) -> Unit
+typealias ObservableKConnection = KindConnection<ForObservableK>
+
+fun ObservableKConnection(dummy: Unit = Unit): KindConnection<ForObservableK> = KindConnection(object : MonadDefer<ForObservableK> {
+  override fun <A> defer(fa: () -> ObservableKOf<A>): ObservableK<A> =
+    ObservableK.defer(fa)
+
+  override fun <A> raiseError(e: Throwable): ObservableK<A> =
+    ObservableK.raiseError(e)
+
+  override fun <A> ObservableKOf<A>.handleErrorWith(f: (Throwable) -> ObservableKOf<A>): ObservableK<A> =
+    fix().handleErrorWith(f)
+
+  override fun <A> just(a: A): ObservableK<A> =
+    ObservableK.just(a)
+
+  override fun <A, B> ObservableKOf<A>.flatMap(f: (A) -> ObservableKOf<B>): ObservableK<B> =
+    fix().flatMap(f)
+
+  override fun <A, B> tailRecM(a: A, f: (A) -> ObservableKOf<Either<A, B>>): ObservableK<B> =
+    ObservableK.tailRecM(a, f)
+
+  override fun <A, B> ObservableKOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> ObservableKOf<Unit>, use: (A) -> ObservableKOf<B>): ObservableK<B> =
+    fix().bracketCase(release = release, use = use)
+})
