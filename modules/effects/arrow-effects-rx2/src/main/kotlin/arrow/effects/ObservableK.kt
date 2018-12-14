@@ -96,16 +96,16 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
       Observable.defer { fa().value() }.k()
 
     fun <A> async(fa: ObservableKProc<A>): ObservableK<A> =
-      Observable.create<A> { s ->
+      Observable.create<A> { emitter ->
         val connection = ObservableKConnection()
-        s.setCancellable { connection.cancel().value().subscribe() }
+        emitter.setCancellable { connection.cancel().value().subscribe() }
 
         fa(connection) { either: Either<Throwable, A> ->
           either.fold({
-            s.onError(it)
+            emitter.onError(it)
           }, {
-            s.onNext(it)
-            s.onComplete()
+            emitter.onNext(it)
+            emitter.onComplete()
           })
         }
       }.k()

@@ -6,6 +6,7 @@ import arrow.core.Right
 import arrow.effects.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
+import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import io.reactivex.Single
@@ -74,15 +75,17 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
     fun <A> defer(fa: () -> SingleKOf<A>): SingleK<A> =
       Single.defer { fa().value() }.k()
 
-    fun <A> async(fa: Proc<A>): SingleK<A> =
-      Single.create { emitter: SingleEmitter<A> ->
-        fa { either: Either<Throwable, A> ->
+    fun <A> async(fa: SingleKProc<A>): SingleK<A> =
+      Single.create<A> { emitter ->
+        val conn = SingleKConnection()
+        emitter.setCancellable { conn.cancel().value().subscribe() }
+
+        fa(conn) { either: Either<Throwable, A> ->
           either.fold({
             emitter.onError(it)
           }, {
             emitter.onSuccess(it)
           })
-
         }
       }.k()
 
@@ -95,3 +98,29 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
     }
   }
 }
+
+typealias SingleKConnection = KindConnection<ForSingleK>
+typealias SingleKProc<A> = (SingleKConnection, (Either<Throwable, A>) -> Unit) -> Unit
+
+fun SingleKConnection(dummy: Unit = Unit): KindConnection<ForSingleK> = KindConnection(object : MonadDefer<ForSingleK> {
+  override fun <A> defer(fa: () -> SingleKOf<A>): SingleK<A> =
+    SingleK.defer(fa)
+
+  override fun <A> raiseError(e: Throwable): SingleK<A> =
+    SingleK.raiseError(e)
+
+  override fun <A> SingleKOf<A>.handleErrorWith(f: (Throwable) -> SingleKOf<A>): SingleK<A> =
+    fix().handleErrorWith(f)
+
+  override fun <A> just(a: A): SingleK<A> =
+    SingleK.just(a)
+
+  override fun <A, B> SingleKOf<A>.flatMap(f: (A) -> SingleKOf<B>): SingleK<B> =
+    fix().flatMap(f)
+
+  override fun <A, B> tailRecM(a: A, f: (A) -> SingleKOf<Either<A, B>>): SingleK<B> =
+    SingleK.tailRecM(a, f)
+
+  override fun <A, B> SingleKOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> SingleKOf<Unit>, use: (A) -> SingleKOf<B>): SingleK<B> =
+    fix().bracketCase(release = release, use = use)
+})
