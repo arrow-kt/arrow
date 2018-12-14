@@ -178,5 +178,18 @@ class MonoKTest : UnitSpec() {
         .expectError(ConnectionCancellationException::class)
     }
 
+    "MonoK should cancel KindConnection on dipose" {
+      Promise.uncancelable<ForMonoK, Unit>(MonoK.async()).flatMap { latch ->
+        MonoK {
+          MonoK.async<Unit> { conn, _ ->
+            conn.push(latch.complete(Unit))
+          }.mono.subscribe().dispose()
+        }.flatMap { latch.get }
+      }.value()
+        .test()
+        .expectNext(Unit)
+        .expectComplete()
+    }
+
   }
 }
