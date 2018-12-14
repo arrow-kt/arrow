@@ -27,34 +27,34 @@ object MonadDeferLaws {
     testStackSafety: Boolean = true
   ): List<Law> =
     BracketLaws.laws(SC, EQ, EQ_EITHER, EQERR) + listOf(
-      Law("Sync bind: binding blocks") { SC.asyncBind(EQ) },
-      Law("Sync bind: binding failure") { SC.asyncBindError(EQERR) },
-      Law("Sync bind: unsafe binding") { SC.asyncBindUnsafe(EQ) },
-      Law("Sync bind: unsafe binding failure") { SC.asyncBindUnsafeError(EQERR) },
-      Law("Sync bind: binding in parallel") { SC.asyncParallelBind(EQ) },
-      Law("Sync bind: binding cancellation before flatMap") { SC.asyncCancellationBefore(EQ) },
-      Law("Sync bind: binding cancellation after flatMap") { SC.asyncCancellationAfter(EQ) },
-      Law("Sync bind: bindingInContext cancellation before flatMap") { SC.inContextCancellationBefore(EQ) },
-      Law("Sync bind: bindingInContext cancellation after flatMap") { SC.inContextCancellationAfter(EQ) },
-      Law("Sync bind: bindingInContext throw equivalent to raiseError") { SC.inContextErrorThrow(EQERR) },
-      Law("Sync bind: monad comprehensions binding in other threads equivalence") { SC.monadComprehensionsBindInContextEquivalent(EQ) },
-      Law("Sync laws: delay constant equals pure") { SC.delayConstantEqualsPure(EQ) },
-      Law("Sync laws: delay throw equals raiseError") { SC.delayThrowEqualsRaiseError(EQERR) },
-      Law("Sync laws: defer constant equals pure") { SC.deferConstantEqualsPure(EQ) },
-      Law("Sync laws: deferUnsafe constant right equals pure") { SC.deferUnsafeConstantRightEqualsPure(EQ) },
-      Law("Sync laws: deferUnsafe constant left equals raiseError") { SC.deferUnsafeConstantLeftEqualsRaiseError(EQERR) },
-      Law("Sync laws: propagate error through bind") { SC.propagateErrorsThroughBind(EQERR) },
-      Law("Sync laws: defer suspens evaluation") { SC.deferSuspendsEvaluation(EQ) },
-      Law("Sync laws: delay suspends evaluation") { SC.delaySuspendsEvaluation(EQ) },
-      Law("Sync laws: flatMap suspends evaluation") { SC.flatMapSuspendsEvaluation(EQ) },
-      Law("Sync laws: map suspends evaluation") { SC.mapSuspendsEvaluation(EQ) },
-      Law("Sync laws: Repeated evaluation not memoized") { SC.repeatedSyncEvaluationNotMemoized(EQ) }
+      Law("MonadDefer bind: binding blocks") { SC.asyncBind(EQ) },
+      Law("MonadDefer bind: binding failure") { SC.asyncBindError(EQERR) },
+      Law("MonadDefer bind: unsafe binding") { SC.asyncBindUnsafe(EQ) },
+      Law("MonadDefer bind: unsafe binding failure") { SC.asyncBindUnsafeError(EQERR) },
+      Law("MonadDefer bind: binding in parallel") { SC.asyncParallelBind(EQ) },
+      Law("MonadDefer bind: binding cancellation before flatMap") { SC.asyncCancellationBefore(EQ) },
+      Law("MonadDefer bind: binding cancellation after flatMap") { SC.asyncCancellationAfter(EQ) },
+      Law("MonadDefer bind: bindingInContext cancellation before flatMap") { SC.inContextCancellationBefore(EQ) },
+      Law("MonadDefer bind: bindingInContext cancellation after flatMap") { SC.inContextCancellationAfter(EQ) },
+      Law("MonadDefer bind: bindingInContext throw equivalent to raiseError") { SC.inContextErrorThrow(EQERR) },
+      Law("MonadDefer bind: monad comprehensions binding in other threads equivalence") { SC.monadComprehensionsBindInContextEquivalent(EQ) },
+      Law("MonadDefer laws: delay constant equals pure") { SC.delayConstantEqualsPure(EQ) },
+      Law("MonadDefer laws: delay throw equals raiseError") { SC.delayThrowEqualsRaiseError(EQERR) },
+      Law("MonadDefer laws: defer constant equals pure") { SC.deferConstantEqualsPure(EQ) },
+      Law("MonadDefer laws: deferUnsafe constant right equals pure") { SC.deferUnsafeConstantRightEqualsPure(EQ) },
+      Law("MonadDefer laws: deferUnsafe constant left equals raiseError") { SC.deferUnsafeConstantLeftEqualsRaiseError(EQERR) },
+      Law("MonadDefer laws: propagate error through bind") { SC.propagateErrorsThroughBind(EQERR) },
+      Law("MonadDefer laws: defer suspens evaluation") { SC.deferSuspendsEvaluation(EQ) },
+      Law("MonadDefer laws: delay suspends evaluation") { SC.delaySuspendsEvaluation(EQ) },
+      Law("MonadDefer laws: flatMap suspends evaluation") { SC.flatMapSuspendsEvaluation(EQ) },
+      Law("MonadDefer laws: map suspends evaluation") { SC.mapSuspendsEvaluation(EQ) },
+      Law("MonadDefer laws: Repeated evaluation not memoized") { SC.repeatedSyncEvaluationNotMemoized(EQ) }
     ) + if (testStackSafety) {
       listOf(
-        Law("Sync laws: stack safety over repeated left binds") { SC.stackSafetyOverRepeatedLeftBinds(5000, EQ) },
-        Law("Sync laws: stack safety over repeated right binds") { SC.stackSafetyOverRepeatedRightBinds(5000, EQ) },
-        Law("Sync laws: stack safety over repeated attempts") { SC.stackSafetyOverRepeatedAttempts(5000, EQ) },
-        Law("Sync laws: stack safety over repeated maps") { SC.stackSafetyOnRepeatedMaps(5000, EQ) }
+        Law("MonadDefer laws: stack safety over repeated left binds") { SC.stackSafetyOverRepeatedLeftBinds(5000, EQ) },
+        Law("MonadDefer laws: stack safety over repeated right binds") { SC.stackSafetyOverRepeatedRightBinds(5000, EQ) },
+        Law("MonadDefer laws: stack safety over repeated attempts") { SC.stackSafetyOverRepeatedAttempts(5000, EQ) },
+        Law("MonadDefer laws: stack safety over repeated maps") { SC.stackSafetyOnRepeatedMaps(5000, EQ) }
       )
     } else {
       emptyList()

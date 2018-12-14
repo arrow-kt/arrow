@@ -52,11 +52,14 @@ buildscript {
 
 apply from: 'detekt.gradle.kts'
 
+def pathApiDocs = "${rootDir}/modules/docs/arrow-docs/docs/docs/apidocs"
+
 allprojects {
     apply plugin: 'base'
 
     clean.doFirst {
         delete "${rootDir}/infographic/arrow-infographic.txt"
+        delete pathApiDocs
     }
 
     repositories {
@@ -87,8 +90,7 @@ subprojects { project ->
     //dokka log spam `Can't find node by signature` comes from https://github.com/Kotlin/dokka/issues/269
     dokka {
         outputFormat = 'jekyll'
-        outputDirectory = project.rootDir.absolutePath +
-                "/modules/docs/arrow-docs/docs/docs/apidocs"
+        outputDirectory = pathApiDocs
 
         includes = ['README.md']
         reportUndocumented = false

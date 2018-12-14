@@ -95,7 +95,7 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
       }.k()
 
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> MaybeKOf<Either<A, B>>): MaybeK<B> {
-      val either = f(a).fix().value().blockingGet()
+      val either = f(a).value().blockingGet()
       return when (either) {
         is Either.Left -> tailRecM(either.a, f)
         is Either.Right -> Maybe.just(either.b).k()

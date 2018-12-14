@@ -87,7 +87,7 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
       }.k()
 
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> MonoKOf<Either<A, B>>): MonoK<B> {
-      val either = f(a).fix().value().block()
+      val either = f(a).value().block()
       return when (either) {
         is Either.Left -> tailRecM(either.a, f)
         is Either.Right -> Mono.just(either.b).k()
