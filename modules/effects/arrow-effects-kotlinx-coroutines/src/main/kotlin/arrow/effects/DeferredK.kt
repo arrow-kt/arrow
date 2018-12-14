@@ -117,7 +117,7 @@ fun <A> DeferredKOf<A>.value(): Deferred<A> = this.fix().memoized
  * }
  * ```
  */
-fun <A> DeferredKOf<A>.scope(): CoroutineScope = this.fix()._scope
+fun <A> DeferredKOf<A>.scope(): CoroutineScope = this.fix().scope
 
 // FIXME (0.8.1)
 // The calls to `Unconfined` ask for @ExperimentalCoroutinesApi, which makes using DeferredK light up
@@ -128,16 +128,15 @@ fun <A> DeferredKOf<A>.scope(): CoroutineScope = this.fix()._scope
  * A wrapper class for [Deferred] that either memoizes its result or re-runs the computation each time, based on how it is constructed.
  */
 @higherkind
-@ExperimentalCoroutinesApi
 sealed class DeferredK<A>(
-  internal val _scope: CoroutineScope = GlobalScope,
+  internal val scope: CoroutineScope = GlobalScope,
   internal val memoized: Deferred<A>
 ) : DeferredKOf<A>, Deferred<A> by memoized {
 
   /**
    * Pure wrapper for already constructed [Deferred] instances. Created solely by `Deferred.k()` extension method
    */
-  internal class Wrapped<A>(scope: CoroutineScope = GlobalScope, memoized: Deferred<A>) : DeferredK<A>(_scope = scope, memoized = memoized)
+  internal class Wrapped<A>(scope: CoroutineScope = GlobalScope, memoized: Deferred<A>) : DeferredK<A>(scope, memoized)
 
   /**
    * Represents a [DeferredK] that can generate an instance of [Deferred] on every await
@@ -159,7 +158,7 @@ sealed class DeferredK<A>(
      */
     override suspend fun await(): A =
       if (memoized.isCompleted || memoized.isActive || memoized.isCancelled) {
-        _scope.async(ctx, coroutineStart) { generator() }.await()
+        scope.async(ctx, coroutineStart) { generator() }.await()
       } else {
         memoized.await()
       }
@@ -243,12 +242,12 @@ sealed class DeferredK<A>(
    * ```
    */
   fun <B> flatMap(f: (A) -> DeferredKOf<B>): DeferredK<B> = when (this) {
-    is Generated -> Generated(ctx, coroutineStart, _scope) {
+    is Generated -> Generated(ctx, coroutineStart, scope) {
       f(
-        _scope.async(ctx, coroutineStart) { generator() }.await()
+        scope.async(ctx, coroutineStart) { generator() }.await()
       ).await()
     }
-    is Wrapped -> Generated(Dispatchers.Unconfined, CoroutineStart.LAZY, _scope) {
+    is Wrapped -> Generated(Dispatchers.Unconfined, CoroutineStart.LAZY, scope) {
       f(
         memoized.await()
       ).await()
@@ -329,12 +328,12 @@ sealed class DeferredK<A>(
    * ```
    */
   fun continueOn(ctx: CoroutineContext): DeferredK<A> = when (this) {
-    is Generated -> Generated(ctx, coroutineStart, _scope) {
-      _scope.async(this@DeferredK.ctx, coroutineStart) {
+    is Generated -> Generated(ctx, coroutineStart, scope) {
+      scope.async(this@DeferredK.ctx, coroutineStart) {
         generator()
       }.await()
     }
-    is Wrapped -> _scope.asyncK(ctx, CoroutineStart.LAZY) { memoized.await() }
+    is Wrapped -> scope.asyncK(ctx, CoroutineStart.LAZY) { memoized.await() }
   }
 
   override fun equals(other: Any?): Boolean =
