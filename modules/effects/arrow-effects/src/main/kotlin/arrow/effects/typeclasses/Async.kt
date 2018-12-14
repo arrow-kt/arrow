@@ -33,13 +33,14 @@ interface Async<F> : MonadDefer<F> {
    *
    * @param fa an asynchronous computation that might fail typed as [Proc].
    *
+   * {: data-executable='true'}
+   * ```kotlin:ank
    * import arrow.Kind
    * import arrow.core.*
    * import arrow.effects.*
    * import arrow.effects.instances.io.async.async
    * import arrow.effects.typeclasses.Async
    * import java.lang.RuntimeException
-   *
    *
    * object GithubService {
    *   fun getUsernames(callback: (List<String>?, Throwable?) -> Unit): Unit =
@@ -49,7 +50,7 @@ interface Async<F> : MonadDefer<F> {
    * fun main(args: Array<String>) {
    *   //sampleStart
    *   fun <F> Async<F>.getUsernames(): Kind<F, List<String>> =
-   *     async { cb ->
+   *     async { cb: (Either<Throwable, List<String>>) -> Unit ->
    *       GithubService.getUsernames { names, throwable ->
    *         when {
    *           names != null -> cb(Right(names))
@@ -65,42 +66,250 @@ interface Async<F> : MonadDefer<F> {
    *   //sampleEnd
    *   println(result)
    * }
+   * ```
+   *
+   * @see asyncF for a version that can suspend side effects in the registration function.
    */
   fun <A> async(fa: Proc<A>): Kind<F, A> =
     asyncF { cb -> delay { fa(cb) } }
 
   /**
-   * [async] variant that can suspend side effects in the provided registration function. On this variant, the passed
-   * in function is injected with a side-effectful callback for signaling the final result of an asynchronous process.
-   * Its returned result needs to be a pure `F[Unit]` that gets evaluated by the runtime.
+   * [async] variant that can suspend side effects in the provided registration function.
+   *
+   * The passed in function is injected with a side-effectful callback for signaling the final result of an asynchronous process.
+   *
+   * {: data-executable='true'}
+   * ```kotlin:ank
+   * import arrow.core.Right
+   * import arrow.effects.*
+   * import arrow.effects.instances.io.async.async
+   * import arrow.effects.typeclasses.Async
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   fun <F> Async<F>.makeCompleteAndGetPromiseInAsync() =
+   *     asyncF<String> { cb: (Either<Throwable, String>) -> Unit ->
+   *       Promise.uncancelable<F, String>(this).flatMap { promise ->
+   *         promise.complete("Hello World!").flatMap {
+   *           promise.get.map { str -> cb(Right(str)) }
+   *         }
+   *       }
+   *     }
+   *
+   *   val result = IO.async().makeCompleteAndGetPromiseInAsync().fix().unsafeRunSync()
+   *  //sampleEnd
+   *  println(result)
+   * }
+   * ```
+   *
+   * @see async for a simpler, non suspending version.
    */
   fun <A> asyncF(k: ProcF<F, A>): Kind<F, A>
 
+  /**
+   * Continue the evaluation on provided [CoroutineContext]
+   *
+   * @param ctx [CoroutineContext] to run evaluation on
+   *
+   * {: data-executable='true'}
+   * ```kotlin:ank
+   * import arrow.Kind
+   * import arrow.effects.*
+   * import arrow.effects.deferredk.async.async
+   * import arrow.effects.typeclasses.Async
+   * import kotlinx.coroutines.Dispatchers
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   fun <F> Async<F>.runOnDefaultDispatcher(): Kind<F, String> =
+   *     just(Unit).continueOn(Dispatchers.Default).flatMap {
+   *       delay { Thread.currentThread().name }
+   *     }
+   *
+   *   val result = DeferredK.async().runOnDefaultDispatcher().fix().unsafeRunSync()
+   *   //sampleEnd
+   *   println(result)
+   * }
+   * ```
+   */
   fun <A> Kind<F, A>.continueOn(ctx: CoroutineContext): Kind<F, A> =
-    flatMap { a -> continueOn(ctx).map { a } }
+    defer(ctx) { this }
 
-  operator fun <A> invoke(ctx: CoroutineContext, f: () -> A): Kind<F, A> =
-    shift(ctx).flatMap { delay(f) }
-
-  fun <A> defer(ctx: CoroutineContext, f: () -> Kind<F, A>): Kind<F, A> =
-    shift(ctx).flatMap { defer(f) }
-
-  suspend fun <A> MonadContinuation<F, A>.continueOn(ctx: CoroutineContext): Unit =
-    shift(ctx).bind()
-
-  fun shift(ctx: CoroutineContext): Kind<F, Unit> = async { cb ->
-    val a: suspend () -> Unit = {
-      suspendCoroutine { ca: Continuation<Unit> ->
-        ca.resumeWith(Result.success(Unit))
+  /**
+   * Delay a computation on provided [CoroutineContext].
+   *
+   * @param ctx [CoroutineContext] to run evaluation on.
+   *
+   * {: data-executable='true'}
+   * ```kotlin:ank
+   * import arrow.Kind
+   * import arrow.effects.*
+   * import arrow.effects.instances.io.async.async
+   * import arrow.effects.typeclasses.Async
+   * import kotlinx.coroutines.Dispatchers
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   fun <F> Async<F>.invokeOnDefaultDispatcher(): Kind<F, String> =
+   *     delay(Dispatchers.Default) { Thread.currentThread().name }
+   *
+   *   val result = IO.async().invokeOnDefaultDispatcher().fix().unsafeRunSync()
+   *   //sampleEnd
+   *   println(result)
+   * }
+   * ```
+   */
+  fun <A> delay(ctx: CoroutineContext, f: () -> A): Kind<F, A> =
+    defer(ctx) {
+      try {
+        just(f())
+      } catch (t: Throwable) {
+        raiseError<A>(t)
       }
     }
-    a.startCoroutine(asyncIOContinuation(ctx, cb))
-  }
 
+  @Deprecated("Use delay instead",
+    ReplaceWith("delay(ctx, f)", "arrow.effects.typeclasses.Async"))
+  operator fun <A> invoke(ctx: CoroutineContext, f: () -> A): Kind<F, A> =
+    ctx.shift().flatMap { delay(f) }
+
+  /**
+   * Delay a computation on provided [CoroutineContext].
+   *
+   * @param ctx [CoroutineContext] to run evaluation on.
+   *
+   * {: data-executable='true'}
+   * ```kotlin:ank
+   * import arrow.Kind
+   * import arrow.effects.*
+   * import arrow.effects.instances.io.async.async
+   * import arrow.effects.typeclasses.Async
+   * import kotlinx.coroutines.Dispatchers
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   fun <F> Async<F>.invokeOnDefaultDispatcher(): Kind<F, String> =
+   *     defer(Dispatchers.Default) { delay { Thread.currentThread().name } }
+   *
+   *   val result = IO.async().invokeOnDefaultDispatcher().fix().unsafeRunSync()
+   *   //sampleEnd
+   *   println(result)
+   * }
+   * ```
+   */
+  fun <A> defer(ctx: CoroutineContext, f: () -> Kind<F, A>): Kind<F, A> =
+    ctx.shift().flatMap { defer(f) }
+
+  /**
+   * Shift evaluation to provided [CoroutineContext].
+   *
+   * @param ctx [CoroutineContext] to run evaluation on.
+   *
+   * {: data-executable='true'}
+   * ```kotlin:ank
+   * import arrow.effects.*
+   * import arrow.effects.instances.io.async.async
+   * import kotlinx.coroutines.Dispatchers
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   IO.async().run {
+   *     val result = binding {
+   *       continueOn(Dispatchers.Default)
+   *       Thread.currentThread().name
+   *     }.fix().unsafeRunSync()
+   *
+   *     println(result)
+   *   }
+   *   //sampleEnd
+   * }
+   * ```
+   */
+  suspend fun <A> MonadContinuation<F, A>.continueOn(ctx: CoroutineContext): Unit =
+    ctx.shift().bind()
+
+  /**
+   * Shift evaluation to provided [CoroutineContext].
+   *
+   * @receiver [CoroutineContext] to run evaluation on.
+   *
+   * {: data-executable='true'}
+   * ```kotlin:ank
+   * import arrow.effects.*
+   * import arrow.effects.instances.io.async.async
+   * import kotlinx.coroutines.Dispatchers
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   IO.async().run {
+   *     val result = Dispatchers.Default.shift().map {
+   *       Thread.currentThread().name
+   *     }.unsafeRunSync()
+   *
+   *     println(result)
+   *   }
+   *   //sampleEnd
+   * }
+   * ```
+   */
+  fun CoroutineContext.shift(): Kind<F, Unit> =
+    delay(this) { Unit }
+
+  /**
+   * Task that never finishes evaluating.
+   *
+   * {: data-executable='true'}
+   * ```kotlin:ank
+   * import arrow.effects.*
+   * import arrow.effects.instances.io.async.async
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val i = IO.async().never<Int>()
+   *     .fix().unsafeRunSync()
+   *
+   *   println(i)
+   *   //sampleEnd
+   * }
+   * ```
+   */
   fun <A> never(): Kind<F, A> =
     async { }
 
-  fun <A> cancellable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<F>): Kind<F, A> = Promise.uncancelable<F, Unit>(this).flatMap { promise ->
+  /**
+   * Creates a cancelable [F] instance that executes an asynchronous process on evaluation.
+   * Derived from [async] and [bracketCase] so does not require [F] to be cancelable.
+   *
+   * **NOTE**: Only for a cancelable type can [bracketCase] ever call `cancel` but that's of no concern for
+   * non-cancelable types as `cancel` never should be called.
+   *
+   * {: data-executable='true'}
+   * ```kotlin:ank
+   * import arrow.core.Right
+   * import arrow.effects.*
+   * import arrow.effects.instances.io.async.async
+   * import kotlinx.coroutines.GlobalScope
+   * import kotlinx.coroutines.async
+   * import kotlinx.coroutines.delay
+
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val result = IO.async().cancelable<String> { cb ->
+   *     val deferred = GlobalScope.async {
+   *       delay(1000)
+   *       cb(Right("Hello from ${Thread.currentThread().name}"))
+   *     }
+   *
+   *     IO { deferred.cancel().let { Unit } }
+   *   }.fix().unsafeRunSync()
+   *   //sampleEnd
+   *   println(result)
+   * }
+   * ```
+   *
+   * @see cancelableF for a version that can safely suspend impure callback registration code.
+   */
+  fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<F>): Kind<F, A> = Promise.uncancelable<F, Unit>(this).flatMap { promise ->
     asyncF<A> { cb ->
       val latchF = asyncF<Unit> { cb2 -> promise.get.map { cb2(rightUnit) } }
       val token = k { r ->
@@ -117,14 +326,49 @@ interface Async<F> : MonadDefer<F> {
     }
   }
 
-  fun <A> cancellableF(k: ((Either<Throwable, A>) -> Unit) -> Kind<F, CancelToken<F>>, AS: Async<F>): Kind<F, A> =
+  /**
+   * Creates a cancelable [F] instance that executes an asynchronous process on evaluation.
+   * Derived from [async] and [bracketCase] so does not require [F] to be cancelable.
+   *
+   * **NOTE**: Only for a cancelable type can [bracketCase] ever call `cancel` but that's of no concern for
+   * non-cancelable types as `cancel` never should be called.
+   *
+   * {: data-executable='true'}
+   * ```kotlin:ank
+   * import arrow.core.Right
+   * import arrow.effects.*
+   * import arrow.effects.instances.io.async.async
+   * import kotlinx.coroutines.GlobalScope
+   * import kotlinx.coroutines.async
+   * import kotlinx.coroutines.delay
+
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val result = IO.async().cancelable<String> { cb ->
+   *     IO {
+   *       val deferred = GlobalScope.async {
+   *         delay(1000)
+   *         cb(Right("Hello from ${Thread.currentThread().name}"))
+   *       }
+   *
+   *       IO { deferred.cancel().let { Unit } }
+   *     }
+   *   }.fix().unsafeRunSync()
+   *   //sampleEnd
+   *   println(result)
+   * }
+   * ```
+   *
+   * @see cancelable for a simpler non-suspending version.
+   */
+  fun <A> cancelableF(k: ((Either<Throwable, A>) -> Unit) -> Kind<F, CancelToken<F>>): Kind<F, A> =
     asyncF { cb ->
       val state = AtomicReference<(Either<Throwable, Unit>) -> Unit>(null)
       val cb1 = { r: Either<Throwable, A> ->
         try {
           cb(r)
         } finally {
-          if (!state.compareAndSet(null, dummy)) {
+          if (!state.compareAndSet(null, mapUnit)) {
             val cb2 = state.get()
             state.lazySet(null)
             cb2(rightUnit)
@@ -146,5 +390,5 @@ interface Async<F> : MonadDefer<F> {
 
 }
 
-internal val dummy: (Any?) -> Unit = { Unit }
+internal val mapUnit: (Any?) -> Unit = { Unit }
 internal val rightUnit = Right(Unit)
