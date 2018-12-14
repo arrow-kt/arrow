@@ -86,7 +86,7 @@ interface SingleKAsyncInstance :
   Async<ForSingleK>,
   SingleKMonadDeferInstance {
   override fun <A> async(fa: Proc<A>): SingleK<A> =
-    SingleK.async(fa)
+    SingleK.async { _, cb -> fa(cb) }
 
   override fun <A> SingleKOf<A>.continueOn(ctx: CoroutineContext): SingleK<A> =
     fix().continueOn(ctx)

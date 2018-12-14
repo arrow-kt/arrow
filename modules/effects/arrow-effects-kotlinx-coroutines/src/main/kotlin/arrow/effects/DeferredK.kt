@@ -3,6 +3,7 @@ package arrow.effects
 import arrow.core.*
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
+import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import kotlinx.coroutines.*
@@ -522,14 +523,16 @@ sealed class DeferredK<A>(
      * }
      * ```
      */
-    fun <A> async(scope: CoroutineScope = GlobalScope, ctx: CoroutineContext = Dispatchers.Default, start: CoroutineStart = CoroutineStart.LAZY, fa: Proc<A>): DeferredK<A> =
-      Generated(ctx, start, scope) {
+    fun <A> async(scope: CoroutineScope = GlobalScope, ctx: CoroutineContext = Dispatchers.Default, start: CoroutineStart = CoroutineStart.LAZY, fa: DeferredKProc<A>): DeferredK<A> {
+      val conn = DeferredKConnection()
+      return Generated(ctx, start, scope) {
         CompletableDeferred<A>().apply {
-          fa {
+          fa(conn) {
             it.fold(this::completeExceptionally, this::complete)
           }
         }.await()
-      }
+      }.apply { invokeOnCompletion { e -> if (e is CancellationException) conn.cancel().unsafeRunSync() } }
+    }
 
     fun <A, B> tailRecM(a: A, f: (A) -> DeferredKOf<Either<A, B>>): DeferredK<B> =
       f(a).value().let { initial: Deferred<Either<A, B>> ->
@@ -734,3 +737,29 @@ private fun Deferred<*>.forceExceptionPropagation(): Unit =
   }.let { }
 
 suspend fun <A> DeferredKOf<A>.await(): A = this.fix().await()
+
+typealias DeferredKConnection = KindConnection<ForDeferredK>
+typealias DeferredKProc<A> = (DeferredKConnection, (Either<Throwable, A>) -> Unit) -> Unit
+
+fun DeferredKConnection(dummy: Unit = Unit): KindConnection<ForDeferredK> = KindConnection(object : MonadDefer<ForDeferredK> {
+  override fun <A> defer(fa: () -> DeferredKOf<A>): DeferredK<A> =
+    DeferredK.defer(fa = fa)
+
+  override fun <A> raiseError(e: Throwable): DeferredK<A> =
+    DeferredK.raiseError(e)
+
+  override fun <A> DeferredKOf<A>.handleErrorWith(f: (Throwable) -> DeferredKOf<A>): DeferredK<A> =
+    fix().handleErrorWith(f)
+
+  override fun <A> just(a: A): DeferredK<A> =
+    DeferredK.just(a)
+
+  override fun <A, B> DeferredKOf<A>.flatMap(f: (A) -> DeferredKOf<B>): DeferredK<B> =
+    fix().flatMap(f)
+
+  override fun <A, B> tailRecM(a: A, f: (A) -> DeferredKOf<Either<A, B>>): DeferredK<B> =
+    DeferredK.tailRecM(a, f)
+
+  override fun <A, B> DeferredKOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> DeferredKOf<Unit>, use: (A) -> DeferredKOf<B>): DeferredK<B> =
+    fix().bracketCase(release = release, use = use)
+})

@@ -83,7 +83,6 @@ sealed class KindConnection<F> {
 
     override fun cancel(): CancelToken<F> = defer {
       state.getAndSet(null).let { stack ->
-        println("DefaultKindConnection#cancel($stack)")
         when {
           stack == null || stack.isEmpty() -> unit()
           else -> stack.cancelAll()

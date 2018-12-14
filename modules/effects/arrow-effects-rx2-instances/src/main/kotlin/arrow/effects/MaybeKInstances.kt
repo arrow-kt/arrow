@@ -107,7 +107,7 @@ interface MaybeKMonadDeferInstance : MonadDefer<ForMaybeK>, MaybeKBracketInstanc
 @extension
 interface MaybeKAsyncInstance : Async<ForMaybeK>, MaybeKMonadDeferInstance {
   override fun <A> async(fa: Proc<A>): MaybeK<A> =
-    MaybeK.async(fa)
+    MaybeK.async { _, cb -> fa(cb) }
 
   override fun <A> MaybeKOf<A>.continueOn(ctx: CoroutineContext): MaybeK<A> =
     fix().continueOn(ctx)
