@@ -9,6 +9,7 @@ import arrow.core.identity
 import arrow.effects.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
+import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import arrow.typeclasses.Applicative
@@ -102,16 +103,18 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
     fun <A> defer(fa: () -> FlowableKOf<A>): FlowableK<A> =
       Flowable.defer { fa().value() }.k()
 
-    fun <A> async(fa: Proc<A>, mode: BackpressureStrategy = BackpressureStrategy.BUFFER): FlowableK<A> =
-      Flowable.create({ emitter: FlowableEmitter<A> ->
-        fa { either: Either<Throwable, A> ->
+    fun <A> async(fa: FlowableKProc<A>, mode: BackpressureStrategy = BackpressureStrategy.BUFFER): FlowableK<A> =
+      Flowable.create<A>({ emitter ->
+        val conn = FlowableKConnection()
+        emitter.setCancellable { conn.cancel().value().subscribe() }
+
+        fa(conn) { either: Either<Throwable, A> ->
           either.fold({
             emitter.onError(it)
           }, {
             emitter.onNext(it)
             emitter.onComplete()
           })
-
         }
       }, mode).k()
 
@@ -127,3 +130,29 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
 
 fun <A, G> FlowableKOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, FlowableK<A>> =
   fix().traverse(GA, ::identity)
+
+typealias FlowableKConnection = KindConnection<ForFlowableK>
+typealias FlowableKProc<A> = (FlowableKConnection, (Either<Throwable, A>) -> Unit) -> Unit
+
+fun FlowableKConnection(dummy: Unit = Unit): KindConnection<ForFlowableK> = KindConnection(object : MonadDefer<ForFlowableK> {
+  override fun <A> defer(fa: () -> FlowableKOf<A>): FlowableK<A> =
+    FlowableK.defer(fa)
+
+  override fun <A> raiseError(e: Throwable): FlowableK<A> =
+    FlowableK.raiseError(e)
+
+  override fun <A> FlowableKOf<A>.handleErrorWith(f: (Throwable) -> FlowableKOf<A>): FlowableK<A> =
+    fix().handleErrorWith(f)
+
+  override fun <A> just(a: A): FlowableK<A> =
+    FlowableK.just(a)
+
+  override fun <A, B> FlowableKOf<A>.flatMap(f: (A) -> FlowableKOf<B>): FlowableK<B> =
+    fix().flatMap(f)
+
+  override fun <A, B> tailRecM(a: A, f: (A) -> FlowableKOf<Either<A, B>>): FlowableK<B> =
+    FlowableK.tailRecM(a, f)
+
+  override fun <A, B> FlowableKOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> FlowableKOf<Unit>, use: (A) -> FlowableKOf<B>): FlowableK<B> =
+    fix().bracketCase(release = release, use = use)
+})
