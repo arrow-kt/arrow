@@ -22,6 +22,23 @@ sealed class KindConnection<F> {
    *
    * Guaranteed idempotency - calling it multiple times should have the same side-effect as calling it only
    * once. Implementations of this method should also be thread-safe.
+   *
+   * {: data-executable='true'}
+   *
+   * ```kotlin:ank
+   * import arrow.effects.*
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val conn = IOConnection()
+   *
+   *   conn.push(IO { println("I get executed on cancellation") })
+   *
+   *   conn.cancel().fix().unsafeRunSync()
+   *   conn.cancel().fix().unsafeRunSync()
+   *   //sampleEnd
+   * }
+   * ```
    */
   abstract fun cancel(): CancelToken<F>
 
@@ -30,6 +47,22 @@ sealed class KindConnection<F> {
   /**
    * Pushes a cancellation function, or token, meant to cancel and cleanup resources.
    * These functions are kept inside a stack, and executed in FIFO order on cancellation.
+   *
+   * {: data-executable='true'}
+   *
+   * ```kotlin:ank
+   * import arrow.effects.*
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val conn = IOConnection()
+   *
+   *   conn.push(IO { println("I get executed on cancellation") })
+   *
+   *   conn.cancel().fix().unsafeRunSync()
+   *   //sampleEnd
+   * }
+   * ```
    */
   abstract fun push(token: CancelToken<F>): Unit
 
@@ -37,6 +70,25 @@ sealed class KindConnection<F> {
    * Pushes a pair of [KindConnection] on the stack, which on cancellation will get trampolined. This is useful in
    * race for example, because combining a whole collection of tasks, two by two, can lead to building a
    * cancelable that's stack unsafe.
+   *
+   * {: data-executable='true'}
+   *
+   * ```kotlin:ank
+   * import arrow.effects.*
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val conn = IOConnection()
+   *
+   *   conn.pushPair(
+   *     IOConnection().apply { push(IO { println("Connection A is getting cancelled") }) },
+   *     IOConnection().apply { push(IO { println("Connection B is getting cancelled") }) }
+   *   )
+   *
+   *   conn.cancel().fix().unsafeRunSync()
+   *   //sampleEnd
+   * }
+   * ```
    */
   abstract fun pushPair(lh: KindConnection<F>, rh: KindConnection<F>): Unit
 
@@ -45,7 +97,25 @@ sealed class KindConnection<F> {
    * A cancelable reference is meant to cancel and cleanup resources.
    *
    * @return the cancelable reference that was removed.
-   */
+   *
+   * {: data-executable='true'}
+   *
+   * ```kotlin:ank
+   * import arrow.effects.*
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val conn = IOConnection()
+   *
+   *   conn.push(IO { println("I was put first on the cancel stack") })
+   *   conn.push(IO { println("I was put second on the cancel stack") })
+   *   conn.pop()
+   *
+   *   val second = conn.cancel().fix().unsafeRunSync()
+   *   //sampleEnd
+   * }
+   * ```
+   **/
   abstract fun pop(): CancelToken<F>
 
   /**
@@ -53,13 +123,63 @@ sealed class KindConnection<F> {
    *
    * @return true on success, false if there was a race condition (i.e. the connection wasn't cancelled) or if
    * the type of the connection cannot be reactivated.
-   */
+   *
+   * {: data-executable='true'}
+   *
+   * ```kotlin:ank
+   * import arrow.effects.*
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val conn = IOConnection()
+   *
+   *   conn.cancel().fix().unsafeRunSync()
+   *   val isCancelled = conn.isCanceled()
+   *   val couldReactive = conn.tryReactivate()
+   *
+   *   val isReactivated = conn.isCanceled()
+   *   //sampleEnd
+   * }
+   * ```
+   **/
   abstract fun tryReactivate(): Boolean
 
   companion object {
 
+    /**
+     * Construct a [KindConnection] for a kind [F] based on [MonadDefer].
+     *
+     * {: data-executable='true'}
+     *
+     * ```kotlin:ank
+     * import arrow.effects.*
+     * import arrow.effects.instances.io.monadDefer.monadDefer
+     *
+     * fun main(args: Array<String>) {
+     *   //sampleStart
+     *   val conn: IOConnection = KindConnection(IO.monadDefer())
+     *   //sampleEnd
+     * }
+     * ```
+     **/
     operator fun <F> invoke(MD: MonadDefer<F>): KindConnection<F> = DefaultKindConnection(MD)
 
+    /**
+     * Construct an uncancelable [KindConnection] for a kind [F] based on [MonadDefer].
+     *
+     * {: data-executable='true'}
+     *
+     * ```kotlin:ank
+     * import arrow.effects.*
+     * import arrow.effects.instances.io.applicative.applicative
+     *
+     * fun main(args: Array<String>) {
+     *   //sampleStart
+     *   val conn: IOConnection = KindConnection.uncancelable(IO.applicative())
+     *   //sampleEnd
+     * }
+     * ```
+     **/
     fun <F> uncancelable(FA: Applicative<F>): KindConnection<F> = Uncancelable(FA)
   }
 
@@ -79,7 +199,7 @@ sealed class KindConnection<F> {
    * Default [KindConnection] implementation.
    */
   private class DefaultKindConnection<F>(MD: MonadDefer<F>) : KindConnection<F>(), MonadDefer<F> by MD {
-    private val state = AtomicReference(emptyList<CancelToken<F>>())
+    private val state: AtomicReference<List<CancelToken<F>>?> = AtomicReference(emptyList())
 
     override fun cancel(): CancelToken<F> = defer {
       state.getAndSet(null).let { stack ->
