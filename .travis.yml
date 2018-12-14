@@ -5,14 +5,11 @@ dist: trusty
 jdk:
 - oraclejdk8
 
-before_script:
-  - "echo $JAVA_OPTS"
-  - "export JAVA_OPTS=-XX:-UseGCOverheadLimit"
-
 stages:
 - name: build-and-dokka
+- name: ank
   if: branch != master OR type = pull_request
-- name: build-and-dokka-transfer
+- name: ank-sync
   if: branch = master AND type != pull_request
 - name: coverage-report
   if: branch = master
@@ -22,39 +19,49 @@ stages:
   if: branch = master AND type != pull_request
 
 env:
- global:
- # include $HOME/.local/bin for `aws`
- - PATH=$HOME/.local/bin:$PATH
- - JAVA_OPTS="-Xms512m -Xmx1024m"
+  global:
+  # include $HOME/.local/bin for `aws`
+  - PATH=$HOME/.local/bin:$PATH
+  - JAVA_OPTS="-Xms1g -Xmx2g -XX:-UseGCOverheadLimit -XX:MaxGCPauseMillis=500000"
 
 before_install:
 - pip install --user awscli
 - mkdir -p ~/site
 
 jobs:
- include:
- - stage: build-and-dokka
-   script:
-   - ./gradlew clean build dokka
-   - travis_wait 20 ./gradlew :arrow-docs:runAnk
- - stage: build-and-dokka-transfer
-   script:
-   - ./gradlew clean build dokka
-   - travis_wait 20 ./gradlew :arrow-docs:runAnk
-   # redirecting outputs to files to avoid exceeding travis' logs limit
-   - aws s3 sync modules/docs/arrow-docs/build/site s3://$S3_BUCKET/site > aws_sync_dokka.log
- - stage: coverage-report
-   script:
-   - ./gradlew codeCoverageReport
-   - bash <(curl -s https://codecov.io/bash)
- - stage: deploy
-   script:
-   - ./deploy-scripts/deploy.sh
- - stage: deploy-docs
-   script:
-   - aws s3 sync s3://$S3_BUCKET/site ~/site > aws_sync_jekyll.log
-   - rvm use 2.5.3 --install --fuzzy
-   - bundle install --gemfile modules/docs/arrow-docs/Gemfile --path vendor/bundle
-   - export BUNDLE_GEMFILE=modules/docs/arrow-docs/Gemfile
-   - travis_wait 10 bundle exec jekyll build -s ~/site -d ~/_site
-   - aws s3 sync ~/_site s3://$S3_BUCKET > aws_sync_site.log
+  include:
+   - stage: build-and-dokka
+     name: "Build"
+     script: ./gradlew clean build
+   - script:
+     name: "Dokka"
+     - ./gradlew dokka
+     # redirecting outputs to files to avoid exceeding travis' logs limit
+     - aws s3 sync modules/docs/arrow-docs/docs/docs/apidocs s3://$S3_BUCKET/apidocs > aws_upload_dokka.log
+  - stage: ank
+    script:
+    - aws s3 sync s3://$S3_BUCKET/apidocs modules/docs/arrow-docs/docs/docs/apidocs > aws_download_dokka.log
+    - sudo cat /proc/meminfo
+    - java -XX:+PrintFlagsFinal -version | grep HeapSize
+    - ./gradlew :arrow-docs:runAnk
+  - stage: ank-sync
+    script:
+    - aws s3 sync s3://$S3_BUCKET/apidocs modules/docs/arrow-docs/docs/docs/apidocs > aws_download_dokka.log
+    - sudo cat /proc/meminfo
+    - ./gradlew :arrow-docs:runAnk
+    - aws s3 sync modules/docs/arrow-docs/build/site s3://$S3_BUCKET/site > aws_upload_ank.log
+  - stage: coverage-report
+    script:
+    - ./gradlew codeCoverageReport
+    - bash <(curl -s https://codecov.io/bash)
+  - stage: deploy
+    script:
+    - ./deploy-scripts/deploy.sh
+  - stage: deploy-docs
+    script:
+    - aws s3 sync s3://$S3_BUCKET/site ~/site > aws_sync_jekyll.log
+    - rvm use 2.5.3 --install --fuzzy
+    - bundle install --gemfile modules/docs/arrow-docs/Gemfile --path vendor/bundle
+    - export BUNDLE_GEMFILE=modules/docs/arrow-docs/Gemfile
+    - travis_wait 10 bundle exec jekyll build -s ~/site -d ~/_site
+    - aws s3 sync ~/_site s3://$S3_BUCKET > aws_sync_site.log
