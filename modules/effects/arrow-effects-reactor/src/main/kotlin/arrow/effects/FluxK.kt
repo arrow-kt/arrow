@@ -100,16 +100,16 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
       Flux.defer { fa().value() }.k()
 
     fun <A> runAsync(fa: FluxKProc<A>): FluxK<A> =
-      Flux.create<A> { emitter ->
+      Flux.create<A> { sink ->
         val conn = FluxKConnection()
-        emitter.onCancel { conn.cancel().value().subscribe() }
+        sink.onCancel { conn.cancel().value().subscribe() }
 
         fa(conn) { callback: Either<Throwable, A> ->
           callback.fold({
-            emitter.error(it)
+            sink.error(it)
           }, {
-            emitter.next(it)
-            emitter.complete()
+            sink.next(it)
+            sink.complete()
           })
         }
       }.k()

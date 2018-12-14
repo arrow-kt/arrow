@@ -6,6 +6,7 @@ import arrow.core.Either.Right
 import arrow.effects.CoroutineContextReactorScheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
+import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import reactor.core.publisher.Mono
@@ -75,13 +76,16 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
     fun <A> defer(fa: () -> MonoKOf<A>): MonoK<A> =
       Mono.defer { fa().value() }.k()
 
-    fun <A> async(fa: Proc<A>): MonoK<A> =
-      Mono.create { emitter: MonoSink<A> ->
-        fa { either: Either<Throwable, A> ->
+    fun <A> async(fa: MonoKProc<A>): MonoK<A> =
+      Mono.create<A> { sink ->
+        val conn = MonoKConnection()
+        sink.onCancel { conn.cancel().value().subscribe() }
+
+        fa(conn) { either: Either<Throwable, A> ->
           either.fold({
-            emitter.error(it)
+            sink.error(it)
           }, {
-            emitter.success(it)
+            sink.success(it)
           })
         }
       }.k()
@@ -95,3 +99,29 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
     }
   }
 }
+
+typealias MonoKConnection = KindConnection<ForMonoK>
+typealias MonoKProc<A> = (MonoKConnection, (Either<Throwable, A>) -> Unit) -> Unit
+
+fun MonoKConnection(dummy: Unit = Unit): KindConnection<ForMonoK> = KindConnection(object : MonadDefer<ForMonoK> {
+  override fun <A> defer(fa: () -> MonoKOf<A>): MonoK<A> =
+    MonoK.defer(fa)
+
+  override fun <A> raiseError(e: Throwable): MonoK<A> =
+    MonoK.raiseError(e)
+
+  override fun <A> MonoKOf<A>.handleErrorWith(f: (Throwable) -> MonoKOf<A>): MonoK<A> =
+    fix().handleErrorWith(f)
+
+  override fun <A> just(a: A): MonoK<A> =
+    MonoK.just(a)
+
+  override fun <A, B> MonoKOf<A>.flatMap(f: (A) -> MonoKOf<B>): MonoK<B> =
+    fix().flatMap(f)
+
+  override fun <A, B> tailRecM(a: A, f: (A) -> MonoKOf<Either<A, B>>): MonoK<B> =
+    MonoK.tailRecM(a, f)
+
+  override fun <A, B> MonoKOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> MonoKOf<Unit>, use: (A) -> MonoKOf<B>): MonoK<B> =
+    fix().bracketCase(release = release, use = use)
+})
