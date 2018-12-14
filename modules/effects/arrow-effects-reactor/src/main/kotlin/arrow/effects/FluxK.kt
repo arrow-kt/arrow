@@ -5,7 +5,6 @@ import arrow.core.*
 import arrow.effects.CoroutineContextReactorScheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
-import arrow.effects.typeclasses.MonadDefer
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import reactor.core.publisher.Flux
@@ -154,40 +153,3 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
 
 fun <A, G> FluxKOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, FluxK<A>> =
   fix().traverse(GA, ::identity)
-
-typealias FluxKConnection = KindConnection<ForFluxK>
-typealias FluxKProc<A> = (FluxKConnection, (Either<Throwable, A>) -> Unit) -> Unit
-
-/**
- * Connection for [FluxK].
- *
- * A connection is represented by a composite of `cancel` functions,
- * [KindConnection.cancel] is idempotent and all methods are thread-safe & atomic.
- *
- * The cancellation functions are maintained in a stack and executed in a FIFO order.
- *
- * @see FluxK.async
- */
-@Suppress("FunctionName")
-fun FluxKConnection(dummy: Unit = Unit): KindConnection<ForFluxK> = KindConnection(object : MonadDefer<ForFluxK> {
-  override fun <A> defer(fa: () -> FluxKOf<A>): FluxK<A> =
-    FluxK.defer(fa)
-
-  override fun <A> raiseError(e: Throwable): FluxK<A> =
-    FluxK.raiseError(e)
-
-  override fun <A> FluxKOf<A>.handleErrorWith(f: (Throwable) -> FluxKOf<A>): FluxK<A> =
-    fix().handleErrorWith(f)
-
-  override fun <A> just(a: A): FluxK<A> =
-    FluxK.just(a)
-
-  override fun <A, B> FluxKOf<A>.flatMap(f: (A) -> FluxKOf<B>): FluxK<B> =
-    fix().flatMap(f)
-
-  override fun <A, B> tailRecM(a: A, f: (A) -> FluxKOf<Either<A, B>>): FluxK<B> =
-    FluxK.tailRecM(a, f)
-
-  override fun <A, B> FluxKOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> FluxKOf<Unit>, use: (A) -> FluxKOf<B>): FluxK<B> =
-    fix().bracketCase(release = release, use = use)
-}) { it.value().subscribe({}, {}) }
