@@ -170,11 +170,19 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
+<<<<<<< HEAD
      *   val result = FlowableK.async( fa= { conn: FlowableKConnection, cb: (Either<Throwable, String>) -> Unit ->
      *     val resource = Resource()
      *     conn.push(FlowableK { resource.close() })
      *     resource.asyncRead { value -> cb(value.right()) }
      *   })
+=======
+     *   val result = FlowableK.async { conn: FlowableKConnection, cb: (Either<Throwable, String>) -> Unit ->
+     *     val resource = Resource()
+     *     conn.push(FlowableK { resource.close() })
+     *     resource.asyncRead { value -> cb(value.right()) }
+     *   }
+>>>>>>> Add documentation
      *   //sampleEnd
      *   result.value().subscribe(::println)
      * }

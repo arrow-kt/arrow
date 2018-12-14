@@ -9,10 +9,10 @@ import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
 import arrow.effects.typeclasses.ProcF
-import arrow.higherkind
-import reactor.core.publisher.Mono
 import reactor.core.publisher.MonoSink
 import java.util.concurrent.atomic.AtomicBoolean
+import arrow.higherkind
+import reactor.core.publisher.Mono
 import kotlin.coroutines.CoroutineContext
 
 fun <A> Mono<A>.k(): MonoK<A> = MonoK(this)

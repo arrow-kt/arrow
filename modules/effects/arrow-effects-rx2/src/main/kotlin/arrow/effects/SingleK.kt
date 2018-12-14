@@ -198,4 +198,3 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
     }
   }
 }
-
