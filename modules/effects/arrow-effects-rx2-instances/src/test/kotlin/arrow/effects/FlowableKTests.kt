@@ -175,7 +175,7 @@ class FlowableKTests : UnitSpec() {
         }.value()
     }
 
-    "FlowableK should cancel KindConnection on dipose" {
+    "FlowableK should cancel KindConnection on dispose" {
       Promise.uncancelable<ForFlowableK, Unit>(FlowableK.async()).flatMap { latch ->
         FlowableK {
           FlowableK.async<Unit>(fa = { conn, _ ->

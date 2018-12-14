@@ -236,13 +236,13 @@ class DeferredKTest : UnitSpec() {
         .flatMap { latch ->
           DeferredK {
             val d = DeferredK.async<Unit> { _, _ -> }
-                .apply { invokeOnCompletion { e -> if (e is CancellationException) latch.complete(Unit).unsafeRunAsync { } } }
+              .apply { invokeOnCompletion { e -> if (e is CancellationException) latch.complete(Unit).unsafeRunAsync { } } }
             d.start()
             d.cancel()
             d.join()
           }.flatMap { latch.get }
         }.unsafeRunSync() shouldBe Unit
     }
-    
+
   }
 }
