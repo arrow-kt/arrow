@@ -120,9 +120,6 @@ interface FluxKAsyncInstance :
   override fun <A> asyncF(k: ProcF<ForFluxK, A>): FluxK<A> =
     FluxK.asyncF { _, cb -> k(cb) }
 
-  override fun <A> asyncF(k: ProcF<ForFluxK, A>): FluxK<A> =
-    FluxK.asyncF(k)
-
   override fun <A> FluxKOf<A>.continueOn(ctx: CoroutineContext): FluxK<A> =
     fix().continueOn(ctx)
 }
