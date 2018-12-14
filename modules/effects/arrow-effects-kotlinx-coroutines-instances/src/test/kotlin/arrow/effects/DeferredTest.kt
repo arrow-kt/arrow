@@ -179,33 +179,5 @@ class DeferredKTest : UnitSpec() {
       }
     }
 
-    "test" {
-      runBlocking {
-        lateinit var ec: ExitCase<Throwable>
-        val countDownLatch = CountDownLatch(1)
-        DeferredK.just(Unit)
-          .bracketCase(
-            use = { DeferredK.async<Nothing> { } },
-            release = { _, exitCase ->
-              DeferredK {
-                ec = exitCase
-                countDownLatch.countDown()
-              }
-            }
-          )
-          .value().run {
-            async(Dispatchers.Default) {
-              delay(10)
-              cancel()
-            }
-            withContext(Dispatchers.Default) {
-              k().unsafeAttemptSync()
-            }
-          }
-
-        countDownLatch.await(50, TimeUnit.MILLISECONDS)
-        ec shouldBe ExitCase.Cancelled
-      }
-    }
   }
 }

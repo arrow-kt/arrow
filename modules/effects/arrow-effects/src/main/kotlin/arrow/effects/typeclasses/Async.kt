@@ -35,7 +35,6 @@ interface Async<F> : MonadDefer<F> {
    * ```kotlin
    *
    * ```
-   *
    */
   fun <A> asyncF(k: ProcF<F, A>): Kind<F, A>
 
