@@ -170,4 +170,4 @@ fun MaybeKConnection(dummy: Unit = Unit): KindConnection<ForMaybeK> = KindConnec
 
   override fun <A, B> MaybeKOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> MaybeKOf<Unit>, use: (A) -> MaybeKOf<B>): MaybeK<B> =
     fix().bracketCase(release = release, use = use)
-}) { it.value().subscribe() }
+}) { it.value().subscribe({}, {}) }

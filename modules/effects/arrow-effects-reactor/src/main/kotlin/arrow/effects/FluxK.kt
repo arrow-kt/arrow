@@ -190,4 +190,4 @@ fun FluxKConnection(dummy: Unit = Unit): KindConnection<ForFluxK> = KindConnecti
 
   override fun <A, B> FluxKOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> FluxKOf<Unit>, use: (A) -> FluxKOf<B>): FluxK<B> =
     fix().bracketCase(release = release, use = use)
-}) { it.value().subscribe() }
+}) { it.value().subscribe({}, {}) }

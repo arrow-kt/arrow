@@ -162,4 +162,4 @@ fun MonoKConnection(dummy: Unit = Unit): KindConnection<ForMonoK> = KindConnecti
 
   override fun <A, B> MonoKOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> MonoKOf<Unit>, use: (A) -> MonoKOf<B>): MonoK<B> =
     fix().bracketCase(release = release, use = use)
-}) { it.value().subscribe() }
+}) { it.value().subscribe({}, {}) }

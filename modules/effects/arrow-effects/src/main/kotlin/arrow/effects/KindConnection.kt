@@ -157,7 +157,7 @@ sealed class KindConnection<F> {
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
-     *   val conn: IOConnection = KindConnection(IO.monadDefer())
+     *   val conn: IOConnection = KindConnection(IO.monadDefer()) { it.fix().unsafeRunAsync { } }
      *   //sampleEnd
      * }
      * ```
@@ -185,7 +185,7 @@ sealed class KindConnection<F> {
   }
 
   /**
-   * Reusable [KindConnection] reference that cannot be canceled.
+   * [KindConnection] reference that cannot be canceled.
    */
   private class Uncancelable<F>(FA: Applicative<F>) : KindConnection<F>(), Applicative<F> by FA {
     override fun cancel(): CancelToken<F> = unit()

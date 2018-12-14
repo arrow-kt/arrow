@@ -778,4 +778,4 @@ fun DeferredKConnection(dummy: Unit = Unit): KindConnection<ForDeferredK> = Kind
 
   override fun <A, B> DeferredKOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> DeferredKOf<Unit>, use: (A) -> DeferredKOf<B>): DeferredK<B> =
     fix().bracketCase(release = release, use = use)
-}) { it.unsafeRunSync() }
+}) { it.unsafeRunAsync { } }

@@ -98,7 +98,7 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
      *     resource.asyncRead { value -> cb(value.right()) }
      *   }
      *   //sampleEnd
-     *   result.value().subscribe(::println)
+     *   result.value().subscribe(::println, ::println)
      * }
      * ```
      */
@@ -161,4 +161,4 @@ fun SingleKConnection(dummy: Unit = Unit): KindConnection<ForSingleK> = KindConn
 
   override fun <A, B> SingleKOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> SingleKOf<Unit>, use: (A) -> SingleKOf<B>): SingleK<B> =
     fix().bracketCase(release = release, use = use)
-}) { it.value().subscribe() }
+}) { it.value().subscribe({}, {}) }

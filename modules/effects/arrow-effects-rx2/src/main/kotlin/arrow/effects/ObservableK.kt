@@ -186,4 +186,4 @@ fun ObservableKConnection(dummy: Unit = Unit): KindConnection<ForObservableK> = 
 
   override fun <A, B> ObservableKOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> ObservableKOf<Unit>, use: (A) -> ObservableKOf<B>): ObservableK<B> =
     fix().bracketCase(release = release, use = use)
-}) { it.value().subscribe() }
+}) { it.value().subscribe({}, {}) }

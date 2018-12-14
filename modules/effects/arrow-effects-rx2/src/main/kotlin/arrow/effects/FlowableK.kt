@@ -120,11 +120,11 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
-     *   val result = FlowableK.async { conn: FlowableKConnection, cb: (Either<Throwable, String>) -> Unit ->
+     *   val result = FlowableK.async( fa= { conn: FlowableKConnection, cb: (Either<Throwable, String>) -> Unit ->
      *     val resource = Resource()
      *     conn.push(FlowableK { resource.close() })
      *     resource.asyncRead { value -> cb(value.right()) }
-     *   }
+     *   })
      *   //sampleEnd
      *   result.value().subscribe(::println)
      * }
@@ -193,4 +193,4 @@ fun FlowableKConnection(dummy: Unit = Unit): KindConnection<ForFlowableK> = Kind
 
   override fun <A, B> FlowableKOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> FlowableKOf<Unit>, use: (A) -> FlowableKOf<B>): FlowableK<B> =
     fix().bracketCase(release = release, use = use)
-}) { it.value().subscribe() }
+}) { it.value().subscribe({}, {}) }
