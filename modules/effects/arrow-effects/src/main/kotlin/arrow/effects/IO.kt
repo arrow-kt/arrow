@@ -64,7 +64,7 @@ sealed class IO<out A> : IOOf<A> {
     operator fun <A> invoke(ctx: CoroutineContext, f: () -> A): IO<A> =
       IO.unit.continueOn(ctx).flatMap { invoke(f) }
 
-    val unit: IO<Unit> =
+    private val unit: IO<Unit> =
       just(Unit)
 
     val lazy: IO<Unit> =
