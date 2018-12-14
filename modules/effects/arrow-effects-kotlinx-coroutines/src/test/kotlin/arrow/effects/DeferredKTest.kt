@@ -12,6 +12,7 @@ import arrow.data.NonEmptyList
 import arrow.data.k
 import arrow.effects.deferredk.applicativeError.attempt
 import arrow.effects.deferredk.async.async
+import arrow.effects.deferredk.monad.flatMap
 import arrow.instances.`try`.functor.functor
 import arrow.instances.`try`.traverse.traverse
 import arrow.instances.option.functor.functor
@@ -242,6 +243,6 @@ class DeferredKTest : UnitSpec() {
           }.flatMap { latch.get }
         }.unsafeRunSync() shouldBe Unit
     }
-
+    
   }
 }
