@@ -4,7 +4,7 @@ jobs:
   build:
     working_directory: ~/arrow
     docker:
-      - image: circleci/android:api-25-alpha
+      - image: circleci/openjdk:8-jdk
     environment:
       JVM_OPTS: -Xmx4g
     steps:
