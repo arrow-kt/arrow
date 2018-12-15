@@ -32,12 +32,12 @@ jobs:
  - stage: build-and-dokka
    script:
    # redirecting outputs to files to avoid exceeding travis' logs limit
-   - ./gradlew clean build
+   #- ./gradlew clean #build doing this on CircleCI
    - ./gradlew dokka :arrow-docs:runAnk
  - stage: build-and-dokka-transfer
    script:
    - ./gradlew checkDependenciesVersion
-   - ./gradlew clean build
+   #- ./gradlew clean build #build doing this on CircleCI
    - ./gradlew dokka :arrow-docs:runAnk
    - aws s3 sync modules/docs/arrow-docs/build/site s3://$S3_BUCKET/site > aws_sync_dokka.log
  - stage: coverage-report
