@@ -8,6 +8,7 @@ import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
 import arrow.higherkind
 import reactor.core.publisher.Mono
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.CoroutineContext
 
 fun <A> Mono<A>.k(): MonoK<A> = MonoK(this)
@@ -105,7 +106,12 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
     fun <A> async(fa: MonoKProc<A>): MonoK<A> =
       Mono.create<A> { sink ->
         val conn = MonoKConnection()
-        sink.onCancel { conn.cancel().value().subscribe() }
+        val isCancelled = AtomicBoolean(false) //Sink is missing isCancelled so we have to do book keeping.
+        conn.push(MonoK { if (!isCancelled.get()) sink.error(ConnectionCancellationException) })
+        sink.onCancel {
+          isCancelled.compareAndSet(false, true)
+          conn.cancel().value().subscribe()
+        }
 
         fa(conn) { either: Either<Throwable, A> ->
           either.fold({
