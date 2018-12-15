@@ -4,7 +4,7 @@ jobs:
   build:
     working_directory: ~/arrow
     docker:
-      - image: circleci/openjdk
+      - image: circleci/openjdk:8-jdk
     steps:
       - checkout
       - run:
