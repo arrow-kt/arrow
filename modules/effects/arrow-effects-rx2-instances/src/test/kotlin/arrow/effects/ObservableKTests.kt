@@ -15,6 +15,7 @@ import arrow.test.laws.equalUnderTheLaw
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.Spec
+import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import io.reactivex.Observable
 import io.reactivex.observers.TestObserver
@@ -139,6 +140,30 @@ class ObservableKTests : UnitSpec() {
         .test()
         .assertValue(Unit)
         .awaitTerminalEvent(100, TimeUnit.MILLISECONDS)
+    }
+
+    "ObservableK async should be cancellable" {
+      Promise.uncancelable<ForObservableK, Unit>(ObservableK.async())
+        .flatMap { latch ->
+          ObservableK {
+            ObservableK.async<Unit> { _, _ -> }
+              .value()
+              .doOnDispose { latch.complete(Unit).fix().observable.subscribe() }
+              .subscribe()
+              .dispose()
+          }.flatMap { latch.get }
+        }.observable
+        .test()
+        .assertValue(Unit)
+        .awaitTerminalEvent(100, TimeUnit.MILLISECONDS)
+    }
+
+    "KindConnection can cancel upstream" {
+      ObservableK.async<Unit> { connection, _ ->
+        connection.cancel().fix().observable.subscribe()
+      }.observable
+        .test()
+        .assertError(ConnectionCancellationException)
     }
 
   }

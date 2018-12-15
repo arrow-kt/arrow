@@ -9,7 +9,6 @@ import arrow.core.identity
 import arrow.effects.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
-import arrow.effects.typeclasses.MonadDefer
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import io.reactivex.BackpressureStrategy

@@ -7,6 +7,7 @@ import arrow.effects.typeclasses.*
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import io.reactivex.Observable
+import io.reactivex.schedulers.Schedulers
 import kotlin.coroutines.CoroutineContext
 
 fun <A> Observable<A>.k(): ObservableK<A> = ObservableK(this)
@@ -126,7 +127,12 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
     fun <A> async(fa: ObservableKProc<A>): ObservableK<A> =
       Observable.create<A> { emitter ->
         val connection = ObservableKConnection()
-        emitter.setCancellable { connection.cancel().value().subscribe() }
+        //On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
+        //on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
+        connection.push(ObservableK { if (!emitter.isDisposed) emitter.onError(ConnectionCancellationException) })
+        emitter.setCancellable {
+          connection.cancel().value().observeOn(Schedulers.computation()).subscribe({}, {})
+        }
 
         fa(connection) { either: Either<Throwable, A> ->
           either.fold({

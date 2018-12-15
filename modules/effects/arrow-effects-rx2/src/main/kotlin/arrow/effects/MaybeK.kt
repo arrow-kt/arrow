@@ -3,7 +3,6 @@ package arrow.effects
 import arrow.core.*
 import arrow.effects.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.ExitCase
-import arrow.effects.typeclasses.MonadDefer
 import arrow.higherkind
 import io.reactivex.Maybe
 import kotlin.coroutines.CoroutineContext
