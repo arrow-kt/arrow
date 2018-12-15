@@ -9,4 +9,4 @@ jobs:
       - checkout
       - run:
           name: Build and Docs
-          command: ./gradlew clean build dokka :arrow-docs:runAnk
+          command: ./gradlew clean build dokka :arrow-docs:runAnk -Dkotlin.compiler.execution.strategy=in-process
