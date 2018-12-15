@@ -2,7 +2,6 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.core.*
-import arrow.effects.data.internal.IOCancellationException
 import arrow.effects.instances.io.async.async
 import arrow.effects.instances.io.monad.binding
 import arrow.effects.instances.io.monad.monad
