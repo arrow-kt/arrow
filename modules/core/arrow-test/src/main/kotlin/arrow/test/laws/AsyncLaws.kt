@@ -8,6 +8,8 @@ import arrow.effects.IO
 import arrow.effects.instances.io.async.defer
 import arrow.effects.instances.io.monadDefer.defer
 import arrow.effects.Promise
+import arrow.effects.instances.io.async.defer
+import arrow.effects.instances.io.monadDefer.defer
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.generators.genEither

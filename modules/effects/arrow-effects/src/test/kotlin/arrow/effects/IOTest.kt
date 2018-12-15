@@ -4,10 +4,13 @@ import arrow.core.*
 import arrow.effects.instances.io.applicativeError.attempt
 import arrow.effects.instances.io.async.async
 import arrow.effects.instances.io.concurrent.concurrent
+import arrow.effects.instances.io.async.cancelable
 import arrow.effects.instances.io.async.delay
+import arrow.effects.instances.io.concurrentEffect.concurrentEffect
 import arrow.effects.instances.io.monad.binding
 import arrow.effects.instances.io.monad.flatMap
 import arrow.effects.instances.io.monad.monad
+import arrow.effects.typeclasses.ConcurrentEffect
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.milliseconds
 import arrow.effects.typeclasses.seconds
@@ -449,19 +452,27 @@ class IOTest : UnitSpec() {
     }
 
     "Cancelable should run CancelToken" {
-      IO.async().run {
-        Promise.uncancelable<ForIO, Unit>(this).flatMap { p ->
-          GlobalScope.async(Dispatchers.Default) {
-            val d = cancelable<String> {
-              p.complete(Unit)
-            }.fix().unsafeRunAsyncCancellable { }
+      Promise.uncancelable<ForIO, Unit>(IO.async()).flatMap { p ->
+        IO.async().cancelable<Unit> { _ ->
+          p.complete(Unit)
+        }.fix()
+          .unsafeRunAsyncCancellable { }
+          .invoke()
 
-          }
+        p.get
+      }.unsafeRunSync() shouldBe Unit
+    }
 
-          p.get
-        }.equalUnderTheLaw(IO.just(Unit), EQ())
-      }
+    "CancelableF should run CancelToken" {
+      Promise.uncancelable<ForIO, Unit>(IO.async()).flatMap { p ->
+        IO.async().cancelableF<Unit> { _ ->
+          IO { p.complete(Unit) }
+        }.fix()
+          .unsafeRunAsyncCancellable { }
+          .invoke()
 
+        p.get
+      }.unsafeRunSync() shouldBe Unit
     }
 
   }
