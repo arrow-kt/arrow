@@ -14,9 +14,9 @@ import arrow.core.left
 import arrow.effects.*
 import arrow.effects.internal.asyncContinuation
 import kotlin.coroutines.Continuation
+import arrow.effects.*
+import arrow.effects.internal.unsafe
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.startCoroutine
-import kotlin.coroutines.suspendCoroutine
 
 /** A cancellable asynchronous computation that might fail. **/
 typealias ProcF<F, A> = ((Either<Throwable, A>) -> Unit) -> Kind<F, Unit>
@@ -181,7 +181,7 @@ interface Async<F> : MonadDefer<F> {
    * ```
    */
   fun <A> defer(ctx: CoroutineContext, f: () -> Kind<F, A>): Kind<F, A> =
-    ctx.shift().flatMap { defer(f) }
+    just(Unit).continueOn(ctx).flatMap { defer(f) }
 
   /**
    * Shift evaluation to provided [CoroutineContext].
@@ -302,7 +302,6 @@ interface Async<F> : MonadDefer<F> {
    *       _delay_({ service.cancel() })
    *     }
    *   }
-   *
    *
    *   //sampleEnd
    * }

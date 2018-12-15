@@ -36,8 +36,7 @@ object AsyncLaws {
       Law("Async Laws: bracket release is called on completed or error") { AC.bracketReleaseIscalledOnCompletedOrError(EQ) },
       Law("Async Laws: continueOn on comprehensions") { AC.continueOnComprehension(EQ) },
       Law("Async Laws: async cancelable coherence") { AC.asyncCancelableCoherence(EQ) },
-      Law("Async Laws: cancelable cancelableF coherence") { AC.cancelableCancelableFCoherence(EQ) },
-      Law("Async Laws: continueOn on comprehensions") { AC.continueOnComprehension(EQ) }
+      Law("Async Laws: cancelable cancelableF coherence") { AC.cancelableCancelableFCoherence(EQ) }
     )
 
   fun <F> Async<F>.asyncSuccess(EQ: Eq<Kind<F, Int>>): Unit =
