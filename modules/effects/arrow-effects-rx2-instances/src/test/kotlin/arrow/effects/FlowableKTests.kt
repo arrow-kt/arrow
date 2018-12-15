@@ -168,7 +168,7 @@ class FlowableKTests : UnitSpec() {
           FlowableK {
             FlowableK.async<Unit>(fa = { _, _ -> })
               .value()
-              .doOnCancel { latch.complete(Unit).fix().value().subscribe() }
+              .doOnCancel { latch.complete(Unit).value().subscribe() }
               .subscribe()
               .dispose()
           }.flatMap { latch.get }
@@ -180,7 +180,7 @@ class FlowableKTests : UnitSpec() {
 
     "KindConnection can cancel upstream" {
       FlowableK.async<Unit>(fa = { connection, _ ->
-        connection.cancel().fix().value().subscribe()
+        connection.cancel().value().subscribe()
       }).value()
         .test()
         .assertError(ConnectionCancellationException)

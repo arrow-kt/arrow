@@ -128,7 +128,7 @@ class SingleKTests : UnitSpec() {
           SingleK {
             SingleK.async<Unit> { _, _ -> }
               .value()
-              .doOnDispose { latch.complete(Unit).fix().value().subscribe() }
+              .doOnDispose { latch.complete(Unit).value().subscribe() }
               .subscribe()
               .dispose()
           }.flatMap { latch.get }
@@ -140,7 +140,7 @@ class SingleKTests : UnitSpec() {
 
     "KindConnection can cancel upstream" {
       SingleK.async<Unit> { connection, _ ->
-        connection.cancel().fix().value().subscribe()
+        connection.cancel().value().subscribe()
       }.value()
         .test()
         .assertError(ConnectionCancellationException)

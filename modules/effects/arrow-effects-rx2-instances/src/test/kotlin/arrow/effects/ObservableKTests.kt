@@ -148,7 +148,7 @@ class ObservableKTests : UnitSpec() {
           ObservableK {
             ObservableK.async<Unit> { _, _ -> }
               .value()
-              .doOnDispose { latch.complete(Unit).fix().observable.subscribe() }
+              .doOnDispose { latch.complete(Unit).value().subscribe() }
               .subscribe()
               .dispose()
           }.flatMap { latch.get }
@@ -160,7 +160,7 @@ class ObservableKTests : UnitSpec() {
 
     "KindConnection can cancel upstream" {
       ObservableK.async<Unit> { connection, _ ->
-        connection.cancel().fix().observable.subscribe()
+        connection.cancel().value().subscribe()
       }.observable
         .test()
         .assertError(ConnectionCancellationException)
