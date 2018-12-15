@@ -52,7 +52,7 @@ Mobilization 7, Łódź, Oct '17 - version 0.3.11
  
 ### Simple Dependency Management in Kotlin
 
-In this talk we introduce the concepts of Dependency Management as a language feature, typeclasses, and a live demo of [KEEP-87](https://github.com/Kotlin/KEEP/pull/87).
+In this talk we introduce the concepts of Dependency Management as a language feature, typeclasses, and a live demo of [KEEP-87](https://github.com/Kotlin/KEEP/pull/87). You can follow along the example in [this folder](https://github.com/arrow-kt/arrow/tree/master/modules/docs/arrow-examples/src/test/kotlin/arrow/typeclasses).
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/CR5h2Wq1yPE" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
 
