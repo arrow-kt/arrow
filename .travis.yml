@@ -32,7 +32,7 @@ jobs:
  - stage: build-and-dokka
    script:
    # redirecting outputs to files to avoid exceeding travis' logs limit
-   - ./gradlew clean #build 
+   - ./gradlew clean build 
    - ./gradlew dokka :arrow-docs:runAnk
  - stage: build-and-dokka-transfer
    script:
