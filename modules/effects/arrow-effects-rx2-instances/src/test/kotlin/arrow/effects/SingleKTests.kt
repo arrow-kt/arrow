@@ -122,5 +122,29 @@ class SingleKTests : UnitSpec() {
         .awaitTerminalEvent(100, TimeUnit.MILLISECONDS)
     }
 
+    "SingleK async should be cancellable" {
+      Promise.uncancelable<ForSingleK, Unit>(SingleK.async())
+        .flatMap { latch ->
+          SingleK {
+            SingleK.async<Unit> { _, _ -> }
+              .value()
+              .doOnDispose { latch.complete(Unit).fix().value().subscribe() }
+              .subscribe()
+              .dispose()
+          }.flatMap { latch.get }
+        }.value()
+        .test()
+        .assertValue(Unit)
+        .awaitTerminalEvent(100, TimeUnit.MILLISECONDS)
+    }
+
+    "KindConnection can cancel upstream" {
+      SingleK.async<Unit> { connection, _ ->
+        connection.cancel().fix().value().subscribe()
+      }.value()
+        .test()
+        .assertError(ConnectionCancellationException)
+    }
+
   }
 }
