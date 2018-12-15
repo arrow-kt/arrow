@@ -11,11 +11,11 @@ import java.util.concurrent.atomic.AtomicReference
 
 /**
  * A placeholder for a [CancelToken] that will be set at a later time, the equivalent of a
- * `Deferred[IO, CancelToken]`. Used in the implementation of `bracket`, see [IOBracket].
+ * `Promise<ForIO, CancelToken<ForIO>>`. Used in the implementation of `bracket`, see [IOBracket].
  */
 class ForwardCancelable {
 
-  private val state = AtomicReference<State>(init)
+  val state = AtomicReference<State>(init)
 
   fun cancel(): CancelToken<ForIO> {
     fun loop(conn: IOConnection, cb: (Either<Throwable, Unit>) -> Unit): Unit = state.get().let { current ->
@@ -66,7 +66,7 @@ class ForwardCancelable {
      *  - on `cancel`, if the state was [Active], or if it was [Empty],
      *    regardless, the state transitions to `Active(IO.unit)`, aka [finished]
      */
-    private sealed class State {
+    sealed class State {
       data class Empty(val stack: List<(Either<Throwable, Unit>) -> Unit>) : State()
       data class Active(val token: CancelToken<ForIO>) : State()
     }

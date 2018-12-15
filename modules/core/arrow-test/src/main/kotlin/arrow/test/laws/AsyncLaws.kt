@@ -4,7 +4,10 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
+import arrow.effects.IO
 import arrow.effects.Promise
+import arrow.effects.instances.io.async.defer
+import arrow.effects.instances.io.monadDefer.defer
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.generators.genEither
@@ -33,7 +36,8 @@ object AsyncLaws {
       Law("Async Laws: async can be derived from asyncF") { AC.asyncCanBeDerivedFromAsyncF(EQ) },
       Law("Async Laws: bracket release is called on completed or error") { AC.bracketReleaseIscalledOnCompletedOrError(EQ) },
       Law("Async Laws: continueOn on comprehensions") { AC.continueOnComprehension(EQ) },
-      Law("Async Laws: async cancelable coherence") { AC.asyncCancelableCoherence(EQ) }
+      Law("Async Laws: async cancelable coherence") { AC.asyncCancelableCoherence(EQ) },
+      Law("Async Laws: cancelable cancelableF coherence") { AC.cancelableCancelableFCoherence(EQ) }
     )
 
   fun <F> Async<F>.asyncSuccess(EQ: Eq<Kind<F, Int>>): Unit =
@@ -109,8 +113,14 @@ object AsyncLaws {
         .equalUnderTheLaw(cancelable { cb -> cb(eith); just(Unit) }, EQ)
     }
 
-  // Turns out that kotlinx.coroutines decides to rewrite thread names
-  private fun getCurrentThread() =
-    Thread.currentThread().name.substringBefore(' ').toInt()
+  fun <F> Async<F>.cancelableCancelableFCoherence(EQ: Eq<Kind<F, Int>>): Unit =
+    forAll(genEither(genThrowable(), Gen.int())) { eith ->
+      cancelable<Int> { cb -> cb(eith); just(Unit) }
+          .equalUnderTheLaw(cancelableF { cb -> delay { cb(eith); just(Unit) } }, EQ)
+      }
 
-}
+      // Turns out that kotlinx.coroutines decides to rewrite thread names
+      private fun getCurrentThread() =
+        Thread.currentThread().name.substringBefore(' ').toInt()
+
+    }

@@ -2,9 +2,7 @@ package arrow.effects.typeclasses
 
 import arrow.Kind
 import arrow.core.*
-import arrow.effects.*
 import arrow.effects.internal.CancelToken
-import arrow.effects.internal.unsafe
 import arrow.typeclasses.MonadContinuation
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
@@ -334,20 +332,7 @@ interface Async<F> : MonadDefer<F> {
    *     F.asyncF[A] { cb =>
    */
   fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<F>): Kind<F, A> =
-    asyncF { cb ->
-      val latch: Promise<ForId, Unit> = Promise.unsafe()
-      val token: CancelToken<F> = k { result ->
-        latch.complete(Unit)
-        cb(result)
-      }
-
-      just(token).bracketCase(use = {
-        delay { latch.get.fix().value() }
-      }, release = { token: CancelToken<F>, exitCase ->
-        if (exitCase is ExitCase.Cancelled) token
-        else just(Unit)
-      })
-    }
+    cancelableF { cb -> delay { k(cb) } }
 
   /**
    * Creates a cancelable [F] instance that executes an asynchronous process on evaluation.
