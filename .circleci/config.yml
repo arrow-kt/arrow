@@ -1,0 +1,12 @@
+version: 2
+
+jobs:
+  build:
+    working_directory: ~/arrow
+    docker:
+      - image: circleci/openjdk
+    steps:
+      - checkout
+      - run:
+          name: Build and Docs
+          command: ./gradlew clean build dokka :arrow-docs:runAnk
