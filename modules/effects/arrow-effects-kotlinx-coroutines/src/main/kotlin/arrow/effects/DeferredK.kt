@@ -502,9 +502,10 @@ sealed class DeferredK<A>(
      */
     fun <A> async(scope: CoroutineScope = GlobalScope, ctx: CoroutineContext = Dispatchers.Default, start: CoroutineStart = CoroutineStart.LAZY, fa: DeferredKProc<A>): DeferredK<A> {
       val conn = DeferredKConnection()
+      val supervisor = Job()
+      conn.push(DeferredK { if (!supervisor.isCancelled) supervisor.cancel() })
+
       return Generated(ctx, start, scope) {
-        val supervisor = Job()
-        conn.push(DeferredK { supervisor.cancel() })
         CompletableDeferred<A>(supervisor).apply {
           fa(conn) {
             it.fold(this::completeExceptionally, this::complete)
