@@ -139,5 +139,29 @@ class MaybeKTests : UnitSpec() {
         .awaitTerminalEvent(100, TimeUnit.MILLISECONDS)
     }
 
+    "MaybeK async should be cancellable" {
+      Promise.uncancelable<ForMaybeK, Unit>(MaybeK.async())
+        .flatMap { latch ->
+          MaybeK {
+            MaybeK.async<Unit> { _, _ -> }
+              .value()
+              .doOnDispose { latch.complete(Unit).fix().value().subscribe() }
+              .subscribe()
+              .dispose()
+          }.flatMap { latch.get }
+        }.value()
+        .test()
+        .assertValue(Unit)
+        .awaitTerminalEvent(100, TimeUnit.MILLISECONDS)
+    }
+
+    "KindConnection can cancel upstream" {
+      MaybeK.async<Unit> { connection, _ ->
+        connection.cancel().fix().value().subscribe()
+      }.value()
+        .test()
+        .assertError(ConnectionCancellationException)
+    }
+
   }
 }
