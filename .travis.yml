@@ -34,13 +34,13 @@ jobs:
    # redirecting outputs to files to avoid exceeding travis' logs limit
    - ./gradlew clean build
    - ./gradlew dokka
-   - ./gradlew :arrow-docs:runAnk
+   - ./gradlew :arrow-docs:runAnk -Dorg.gradle.jvmargs="-Xms1024m -Xmx4g -XX:MaxPermSize=1g"
  - stage: build-and-dokka-transfer
    script:
    - ./gradlew checkDependenciesVersion
    - ./gradlew clean build
    - ./gradlew dokka
-   - ./gradlew :arrow-docs:runAnk
+   - ./gradlew :arrow-docs:runAnk -Dorg.gradle.jvmargs="-Xms1024m -Xmx4g -XX:MaxPermSize=1g"
    - aws s3 sync modules/docs/arrow-docs/build/site s3://$S3_BUCKET/site > aws_sync_dokka.log
  - stage: coverage-report
    script:
