@@ -4,6 +4,7 @@ import arrow.core.*
 import arrow.effects.data.internal.IOCancellationException
 import arrow.effects.instances.io.applicativeError.attempt
 import arrow.effects.instances.io.async.async
+import arrow.effects.instances.io.async.delay
 import arrow.effects.instances.io.monad.binding
 import arrow.effects.instances.io.monad.monad
 import arrow.effects.typeclasses.ExitCase
@@ -13,15 +14,20 @@ import arrow.instances.option.eq.eq
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.laws.AsyncLaws
+import arrow.test.laws.equalUnderTheLaw
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldEqual
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.newSingleThreadContext
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 
 @RunWith(KTestJUnitRunner::class)
 class IOTest : UnitSpec() {
@@ -391,6 +397,22 @@ class IOTest : UnitSpec() {
 
       countDownLatch.await(2, TimeUnit.SECONDS)
       ec shouldBe ExitCase.Cancelled
+    }
+
+    "Cancelable should run CancelToken" {
+      IO.async().run {
+        Promise.uncancelable<ForIO, Unit>(this).flatMap { p ->
+          GlobalScope.async(Dispatchers.Default) {
+            val d = cancelable<String> {
+              p.complete(Unit)
+            }.fix().unsafeRunAsyncCancellable { }
+
+          }
+
+          p.get
+        }.equalUnderTheLaw(IO.just(Unit), EQ())
+      }
+
     }
 
   }

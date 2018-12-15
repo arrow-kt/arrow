@@ -1,17 +1,13 @@
 package arrow.effects.typeclasses
 
 import arrow.Kind
-import arrow.core.Either
-import arrow.core.Right
+import arrow.core.*
 import arrow.effects.*
 import arrow.effects.internal.CancelToken
-import arrow.effects.internal.asyncIOContinuation
+import arrow.effects.internal.unsafe
 import arrow.typeclasses.MonadContinuation
 import java.util.concurrent.atomic.AtomicReference
-import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.startCoroutine
-import kotlin.coroutines.suspendCoroutine
 
 /** An asynchronous computation that might fail. **/
 typealias Proc<A> = ((Either<Throwable, A>) -> Unit) -> Unit
@@ -80,7 +76,7 @@ interface Async<F> : MonadDefer<F> {
    *
    * {: data-executable='true'}
    * ```kotlin:ank
-   * import arrow.core.Right
+   * import arrow.core.*
    * import arrow.effects.*
    * import arrow.effects.instances.io.async.async
    * import arrow.effects.typeclasses.Async
@@ -132,8 +128,7 @@ interface Async<F> : MonadDefer<F> {
    * }
    * ```
    */
-  fun <A> Kind<F, A>.continueOn(ctx: CoroutineContext): Kind<F, A> =
-    defer(ctx) { this }
+  fun <A> Kind<F, A>.continueOn(ctx: CoroutineContext): Kind<F, A>
 
   /**
    * Delay a computation on provided [CoroutineContext].
@@ -198,7 +193,7 @@ interface Async<F> : MonadDefer<F> {
    * ```
    */
   fun <A> defer(ctx: CoroutineContext, f: () -> Kind<F, A>): Kind<F, A> =
-    ctx.shift().flatMap { defer(f) }
+    just(Unit).continueOn(ctx).flatMap { defer(f) }
 
   /**
    * Shift evaluation to provided [CoroutineContext].
@@ -285,46 +280,74 @@ interface Async<F> : MonadDefer<F> {
    *
    * {: data-executable='true'}
    * ```kotlin:ank
+   * import arrow.core.Left
    * import arrow.core.Right
    * import arrow.effects.*
    * import arrow.effects.instances.io.async.async
-   * import kotlinx.coroutines.GlobalScope
+   * import arrow.effects.instances.io.async.shift
+   * import kotlinx.coroutines.runBlocking
+   * import kotlinx.coroutines.Dispatchers.Default
    * import kotlinx.coroutines.async
    * import kotlinx.coroutines.delay
-
+   *
+   * object Account
+   *
+   * //Some impure API or code
+   * class NetworkService {
+   *   fun getAccounts(successCallback: (List<Account>) -> Unit,
+   *     failureCallback: (Throwable) -> Unit) {
+   *       kotlinx.coroutines.GlobalScope.async(Default) {
+   *         println("Making API call")
+   *         delay(500)
+   *         successCallback(listOf(Account))
+   *       }
+   *   }
+   *
+   *   fun cancel(): Unit = kotlinx.coroutines.runBlocking {
+   *     println("Cancelled, closing NetworkApi")
+   *     delay(500)
+   *     println("Closed NetworkApi")
+   *   }
+   * }
+   *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val result = IO.async().cancelable<String> { cb ->
-   *     val deferred = GlobalScope.async {
-   *       delay(1000)
-   *       cb(Right("Hello from ${Thread.currentThread().name}"))
-   *     }
+   *   val getAccounts = Default.shift().flatMap {
+   *     IO.async().cancelable<List<Account>> { cb ->
+   *       val service = NetworkService()
+   *       service.getAccounts(
+   *         successCallback = { accs -> cb(Right(accs)) },
+   *         failureCallback = { e -> cb(Left(e)) })
    *
-   *     IO { deferred.cancel().let { Unit } }
-   *   }.fix().unsafeRunSync()
+   *       IO { service.cancel() }
+   *     }
+   *   }.fix().unsafeRunAsyncCancellable { println(it) }
+   *
+   *   runBlocking {
+   *     delay(250)
+   *     getAccounts.invoke() //Cancel API call
+   *   }
    *   //sampleEnd
-   *   println(result)
    * }
    * ```
-   *
    * @see cancelableF for a version that can safely suspend impure callback registration code.
+   *     F.asyncF[A] { cb =>
    */
-  fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<F>): Kind<F, A> = Promise.uncancelable<F, Unit>(this).flatMap { promise ->
-    asyncF<A> { cb ->
-      val latchF = asyncF<Unit> { cb2 -> promise.get.map { cb2(rightUnit) } }
-      val token = k { r ->
-        promise.complete(Unit)
-        cb(r)
+  fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<F>): Kind<F, A> =
+    asyncF { cb ->
+      val latch: Promise<ForId, Unit> = Promise.unsafe()
+      val token: CancelToken<F> = k { result ->
+        latch.complete(Unit)
+        cb(result)
       }
 
-      just(token).bracketCase(use = { latchF }, release = { r, exitCase ->
-        when (exitCase) {
-          is ExitCase.Cancelled -> r
-          else -> just(Unit)
-        }
+      just(token).bracketCase(use = {
+        delay { latch.get.fix().value() }
+      }, release = { token: CancelToken<F>, exitCase ->
+        if (exitCase is ExitCase.Cancelled) token
+        else just(Unit)
       })
     }
-  }
 
   /**
    * Creates a cancelable [F] instance that executes an asynchronous process on evaluation.
@@ -344,7 +367,7 @@ interface Async<F> : MonadDefer<F> {
 
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val result = IO.async().cancelable<String> { cb ->
+   *   val result = IO.async().cancelableF<String> { cb ->
    *     IO {
    *       val deferred = GlobalScope.async {
    *         delay(1000)
