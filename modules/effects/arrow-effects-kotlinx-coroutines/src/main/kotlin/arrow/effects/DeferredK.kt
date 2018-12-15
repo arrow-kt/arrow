@@ -502,7 +502,8 @@ sealed class DeferredK<A>(
      */
     fun <A> async(scope: CoroutineScope = GlobalScope, ctx: CoroutineContext = Dispatchers.Default, start: CoroutineStart = CoroutineStart.LAZY, fa: DeferredKProc<A>): DeferredK<A> {
       val conn = DeferredKConnection()
-      val supervisor = Job()
+      //If the context doesn’t have a Job, then the coroutine which is created doesn’t have a parent.
+      val supervisor = scope.coroutineContext[Job] ?: Job()
       conn.push(DeferredK { if (!supervisor.isCancelled) supervisor.cancel() })
 
       return Generated(ctx, start, scope) {
