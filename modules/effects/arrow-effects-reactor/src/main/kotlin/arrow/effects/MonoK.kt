@@ -13,6 +13,7 @@ import reactor.core.publisher.MonoSink
 import java.util.concurrent.atomic.AtomicBoolean
 import arrow.higherkind
 import reactor.core.publisher.Mono
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.CoroutineContext
 
 fun <A> Mono<A>.k(): MonoK<A> = MonoK(this)
