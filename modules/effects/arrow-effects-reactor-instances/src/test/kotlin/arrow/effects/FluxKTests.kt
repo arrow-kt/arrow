@@ -23,6 +23,7 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.junit.runner.RunWith
 import reactor.core.publisher.Flux
 import reactor.core.scheduler.Schedulers
+import reactor.test.expectError
 import reactor.test.test
 import java.time.Duration
 
@@ -160,6 +161,30 @@ class FluxKTest : UnitSpec() {
         .test()
         .expectNext(Unit)
         .expectComplete()
+    }
+
+    "FluxK async should be cancellable" {
+      Promise.uncancelable<ForFluxK, Unit>(FluxK.async())
+        .flatMap { latch ->
+          FluxK {
+            FluxK.async<Unit> { _, _ -> }
+              .value()
+              .doOnCancel { latch.complete(Unit).value().subscribe() }
+              .subscribe()
+              .dispose()
+          }.flatMap { latch.get }
+        }.value()
+        .test()
+        .expectNext(Unit)
+        .expectComplete()
+    }
+
+    "KindConnection can cancel upstream" {
+      FluxK.async<Unit> { connection, _ ->
+        connection.cancel().value().subscribe()
+      }.value()
+        .test()
+        .expectError(ConnectionCancellationException::class)
     }
 
   }

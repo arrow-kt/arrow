@@ -128,6 +128,9 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
     fun <A> async(fa: FluxKProc<A>): FluxK<A> =
       Flux.create<A> { sink ->
         val conn = FluxKConnection()
+        //On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
+        //on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
+        conn.push(FluxK { if (!sink.isCancelled) sink.error(ConnectionCancellationException) })
         sink.onCancel { conn.cancel().value().subscribe() }
 
         fa(conn) { callback: Either<Throwable, A> ->
