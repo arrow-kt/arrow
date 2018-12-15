@@ -28,7 +28,9 @@ import arrow.typeclasses.Functor
 import arrow.typeclasses.Traverse
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
+import io.kotlintest.matchers.should
 import io.kotlintest.matchers.shouldBe
+import io.kotlintest.matchers.shouldThrow
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kotlinx.coroutines.*
@@ -240,6 +242,29 @@ class DeferredKTest : UnitSpec() {
             d.start()
             d.cancel()
             d.join()
+          }.flatMap { latch.get }
+        }.unsafeRunSync() shouldBe Unit
+    }
+
+    "KindConnection can cancel upstream" {
+      Try {
+        DeferredK.async<Unit> { conn, _ ->
+          conn.cancel().unsafeRunAsync { }
+        }.unsafeRunSync()
+      }.fold({ e -> e should { it is arrow.effects.ConnectionCancellationException } },
+        { throw AssertionError("Expected exception of type arrow.effects.ConnectionCancellationException but caught no exception") })
+    }
+
+    "DeferredK async should be cancellable" {
+      Promise.uncancelable<ForDeferredK, Unit>(DeferredK.async())
+        .flatMap { latch ->
+          DeferredK {
+            val d =
+              DeferredK.async<Unit> { _, _ -> }
+                .apply { invokeOnCompletion { e -> if (e is CancellationException) latch.complete(Unit).unsafeRunAsync { } } }
+
+            d.start()
+            d.cancelAndJoin()
           }.flatMap { latch.get }
         }.unsafeRunSync() shouldBe Unit
     }
