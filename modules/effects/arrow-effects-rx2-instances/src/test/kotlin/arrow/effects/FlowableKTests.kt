@@ -162,5 +162,29 @@ class FlowableKTests : UnitSpec() {
         .awaitTerminalEvent(100, TimeUnit.MILLISECONDS)
     }
 
+    "FlowableK async should be cancellable" {
+      Promise.uncancelable<ForFlowableK, Unit>(FlowableK.async())
+        .flatMap { latch ->
+          FlowableK {
+            FlowableK.async<Unit>(fa = { _, _ -> })
+              .value()
+              .doOnCancel { latch.complete(Unit).fix().value().subscribe() }
+              .subscribe()
+              .dispose()
+          }.flatMap { latch.get }
+        }.value()
+        .test()
+        .assertValue(Unit)
+        .awaitTerminalEvent(100, TimeUnit.MILLISECONDS)
+    }
+
+    "KindConnection can cancel upstream" {
+      FlowableK.async<Unit>(fa = { connection, _ ->
+        connection.cancel().fix().value().subscribe()
+      }).value()
+        .test()
+        .assertError(ConnectionCancellationException)
+    }
+
   }
 }
