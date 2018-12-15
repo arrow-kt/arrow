@@ -508,7 +508,7 @@ sealed class DeferredK<A>(
             it.fold(this::completeExceptionally, this::complete)
           }
         }.await()
-      }.apply { invokeOnCompletion { e -> if (e is CancellationException) conn.cancel().unsafeRunSync() } }
+      }.apply { invokeOnCompletion { e -> if (e is CancellationException) conn.cancel().unsafeRunAsync { } } }
     }
 
     fun <A, B> tailRecM(a: A, f: (A) -> DeferredKOf<Either<A, B>>): DeferredK<B> =
