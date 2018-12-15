@@ -14,13 +14,6 @@ import arrow.effects.typeclasses.*
 import arrow.higherkind
 import kotlin.coroutines.CoroutineContext
 
-enum class OnCancel { ThrowCancellationException, Silent;
-
-  companion object {
-    val CancellationException = arrow.effects.data.internal.IOCancellationException
-  }
-}
-
 typealias IOProc<A> = (IOConnection, (Either<Throwable, A>) -> Unit) -> Unit
 fun <T> Proc<T>.toIOProc(): IOProc<T> = { _: IOConnection, proc -> this(proc) }
 
@@ -51,7 +44,7 @@ sealed class IO<out A> : IOOf<A> {
     operator fun <A> invoke(ctx: CoroutineContext, f: () -> A): IO<A> =
       IO.unit.continueOn(ctx).flatMap { invoke(f) }
 
-    private val unit: IO<Unit> =
+    val unit: IO<Unit> =
       just(Unit)
 
     val lazy: IO<Unit> =

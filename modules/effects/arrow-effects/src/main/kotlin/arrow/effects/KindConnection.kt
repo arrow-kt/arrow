@@ -1,11 +1,21 @@
 package arrow.effects
 
 import arrow.Kind
+import arrow.effects.internal.JavaCancellationException
 import arrow.effects.typeclasses.MonadDefer
 import arrow.typeclasses.Applicative
 import java.util.concurrent.atomic.AtomicReference
 
 typealias CancelToken<F> = Kind<F, Unit>
+
+enum class OnCancel { ThrowCancellationException, Silent;
+
+  companion object {
+    val CancellationException = arrow.effects.ConnectionCancellationException
+  }
+}
+
+object ConnectionCancellationException : JavaCancellationException("User cancellation")
 
 /**
  * Connection for kinded type [F].

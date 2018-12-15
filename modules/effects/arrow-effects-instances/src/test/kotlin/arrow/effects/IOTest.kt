@@ -350,7 +350,7 @@ class IOTest : UnitSpec() {
             }
         IO(newSingleThreadContext("CancelThread")) { }
           .unsafeRunAsync { cancel() }
-      }.unsafeRunTimed(2.seconds) shouldBe Some(IOCancellationException)
+      }.unsafeRunTimed(2.seconds) shouldBe Some(ConnectionCancellationException)
     }
 
     "unsafeRunAsyncCancellable can cancel even for infinite asyncs" {
