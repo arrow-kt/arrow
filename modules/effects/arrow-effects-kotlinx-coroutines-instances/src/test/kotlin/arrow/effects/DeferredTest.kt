@@ -179,7 +179,7 @@ class DeferredKTest : UnitSpec() {
       }
     }
 
-    "test" {
+    "DeferredK bracket cancellation should release resource with cancel exit status" {
       runBlocking {
         lateinit var ec: ExitCase<Throwable>
         val countDownLatch = CountDownLatch(1)

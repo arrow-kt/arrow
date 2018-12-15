@@ -302,31 +302,29 @@ sealed class DeferredK<A>(
    *   println(safeComputation.unsafeRunSync())
    * }
    */
-  fun <B> bracketCase(use: (A) -> DeferredK<B>, release: (A, ExitCase<Throwable>) -> DeferredK<Unit>): DeferredK<B> =
+  fun <B> bracketCase(use: (A) -> DeferredKOf<B>, release: (A, ExitCase<Throwable>) -> DeferredKOf<Unit>): DeferredK<B> =
     when (this) {
       is Generated -> DeferredK.Generated(ctx, coroutineStart, _scope) {
-        _bracketCase(_scope.async(ctx, coroutineStart) { generator() }, use, release)
+        _scope.async(ctx, coroutineStart) { generator() }.bracketCase(use, release)
       }
       is Wrapped -> Generated(Dispatchers.Unconfined, CoroutineStart.LAZY, _scope) {
-        _bracketCase(memoized, use, release)
+        memoized.bracketCase(use, release)
       }
     }
 
-  private suspend fun <B> _bracketCase(self: Deferred<A>, use: (A) -> DeferredK<B>, release: (A, ExitCase<Throwable>) -> DeferredK<Unit>): B {
-    val a = self.await()
-    return Try { use(a).await() }.fold({ e ->
-      Try {
+  private suspend inline fun <B> Deferred<A>.bracketCase(use: (A) -> DeferredKOf<B>, release: (A, ExitCase<Throwable>) -> DeferredKOf<Unit>): B {
+    val a = await()
+    return try {
+      use(a).await()
+    } catch (e: Throwable) {
+      try {
         if (e is CancellationException) release(a, ExitCase.Cancelled).await()
         else release(a, ExitCase.Error(e)).await()
-      }.fold({ e2 ->
-        throw e2 //todo throw composite failure
-      }, {
-        throw e
-      })
-    }, { b ->
-      release(a, ExitCase.Completed).await()
-      b
-    })
+      } catch (e2: Throwable) {
+        throw e2.apply { addSuppressed(e) }
+      }
+      throw e
+    }
   }
 
   /**
