@@ -8,9 +8,6 @@ trigger_map:
 workflows:
   primary:
     steps:
-    - activate-ssh-key:
-        run_if: ''
-    - git-clone: {}
     - script:
         title: Clean build
         inputs:
