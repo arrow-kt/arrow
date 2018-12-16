@@ -7,6 +7,7 @@ jobs:
       - image: circleci/openjdk:8-jdk
     environment:
       _JAVA_OPTIONS: -Xmx4g -Xms512m
+      GRADLE_OPTS: "-Dkotlin.compiler.execution.strategy=“in-process”"
     steps:
       - checkout
       - run:
