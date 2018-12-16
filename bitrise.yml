@@ -2,11 +2,8 @@
 format_version: '6'
 default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
 project_type: other
-trigger_map:
-- pull_request_source_branch: "*"
-  workflow: primary
 workflows:
-  primary:
+  pullrequest:
     steps:
     - script:
         title: Clean build
@@ -14,4 +11,4 @@ workflows:
         - content: |-
             #!/usr/bin/env bash
             set -ex
-            ./gradlew clean build dokka :arrow-docs:runAnk && ./gradlew codeCoverageReport
+            ./gradlew clean build dokka :arrow-docs:runAnk
