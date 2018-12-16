@@ -9,4 +9,4 @@ jobs:
       - checkout
       - run:
           name: Clean build
-          command: ./gradlew dokka :arrow-docs:runAnk
+          command: ./gradlew --no-daemon clean build
