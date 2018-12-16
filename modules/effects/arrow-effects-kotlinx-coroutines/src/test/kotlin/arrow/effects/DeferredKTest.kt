@@ -82,9 +82,9 @@ class DeferredKTest : UnitSpec() {
           when (it) {
             is MyException -> {
             }
-            else -> fail("Should only throw MyException")
+            else -> fail("Should only throw MyException but found: $it")
           }
-        }, { fail("") })
+        }, { fail("Should only throw MyException but found: $it") })
       }
     }
 
@@ -103,20 +103,20 @@ class DeferredKTest : UnitSpec() {
         val exception = MyException()
         val ioa = DeferredK<Int>(Unconfined, GlobalScope, CoroutineStart.DEFAULT) { throw exception }
         ioa.unsafeRunAsync { either ->
-          either.fold({ throw exception }, { fail("") })
+          either.fold({ throw exception }, { fail("throw") })
         }
-        fail("Should rethrow the exception")
+        fail("unsafeRunAsync should rethrow the exception")
       } catch (myException: MyException) {
         // Success
       } catch (throwable: Throwable) {
-        fail("Should only throw MyException")
+        fail("Should only throw MyException but found: $throwable")
       }
     }
 
     "should complete when running a pure value with runAsync" {
       val expected = 0
       DeferredK.just(expected).runAsync { either ->
-        either.fold({ fail("") }, { DeferredK { it shouldBe expected } })
+        either.fold({ fail("Should be $expected but found $it") }, { DeferredK { it shouldBe expected } })
       }
     }
 
@@ -135,9 +135,9 @@ class DeferredKTest : UnitSpec() {
             is MyException -> {
               DeferredK { }
             }
-            else -> fail("Should only throw MyException")
+            else -> fail("Should only throw MyException but found: $it")
           }
-        }, { fail("") })
+        }, { fail("Should only throw MyException but found: $it") })
       }
     }
 
@@ -145,7 +145,7 @@ class DeferredKTest : UnitSpec() {
       val exception = MyException()
       val ioa = DeferredK<Int>(Unconfined, GlobalScope, CoroutineStart.DEFAULT) { throw exception }
       ioa.runAsync { either ->
-        either.fold({ DeferredK { it shouldBe exception } }, { fail("") })
+        either.fold({ DeferredK { it shouldBe exception } }, { fail("Should only throw MyException but found: $it") })
       }
     }
 
@@ -169,7 +169,7 @@ class DeferredKTest : UnitSpec() {
         ioa.runAsyncCancellable { either ->
           either.fold({ throw it }, { fail("") })
         }.unsafeRunSync()
-        fail("Should rethrow the exception")
+        fail("runAsyncCancellable(f).unsafeRunSync() should rethrow the exception from f")
       } catch (throwable: AssertionError) {
         fail("${throwable.message}")
       } catch (throwable: Throwable) {
