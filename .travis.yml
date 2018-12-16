@@ -21,7 +21,7 @@ env:
  global:
  # include $HOME/.local/bin for `aws`
  - PATH=$HOME/.local/bin:$PATH
- - JAVA_OPTS="-Xms1024m -Xmx4g -XX:MaxPermSize=1g"
+ - JAVA_OPTS="-Xms512m -Xmx1024m"
 
 before_install:
 - pip install --user awscli
@@ -32,15 +32,13 @@ jobs:
  - stage: build-and-dokka
    script:
    # redirecting outputs to files to avoid exceeding travis' logs limit
-   #- ./gradlew clean build
-   #- ./gradlew dokka
-   - ./gradlew clean dokka :arrow-docs:runAnk --no-daemon -Dorg.gradle.jvmargs="-Xms4g -Xmx4g -XX:MaxPermSize=3g"
+   - ./gradlew clean build 
+   - ./gradlew dokka :arrow-docs:runAnk
  - stage: build-and-dokka-transfer
    script:
    - ./gradlew checkDependenciesVersion
-   - ./gradlew clean build
-   - ./gradlew dokka
-   - ./gradlew :arrow-docs:runAnk --no-daemon -Dorg.gradle.jvmargs="-Xms4g -Xmx4g -XX:MaxPermSize=3g"
+   - ./gradlew clean build 
+   - ./gradlew dokka :arrow-docs:runAnk 
    - aws s3 sync modules/docs/arrow-docs/build/site s3://$S3_BUCKET/site > aws_sync_dokka.log
  - stage: coverage-report
    script:
