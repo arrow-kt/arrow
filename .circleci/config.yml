@@ -7,9 +7,9 @@ jobs:
       - image: circleci/openjdk:8-jdk
     environment:
       _JAVA_OPTIONS: -Xms512m -Xmx2048m
-      GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xms512m -Xmx2048m -XX:+HeapDumpOnOutOfMemoryError" -Dkotlin.compiler.execution.strategy=“in-process”'
+      GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xms512m -Xmx2048m -XX:+HeapDumpOnOutOfMemoryError" -Dorg.gradle.properties.parallel=false -Dorg.gradle.configureondemand=false -Dkotlin.compiler.execution.strategy=“in-process”'
     steps:
       - checkout
       - run:
           name: Clean build
-          command: ./gradlew clean build
+          command: ./gradlew --no-daemon --exclude-task jar clean build
