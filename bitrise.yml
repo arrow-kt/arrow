@@ -3,8 +3,9 @@ format_version: '6'
 default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
 project_type: other
 workflows:
-  GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"'
-  JAVA_OPTIONS: "-Xms512m -Xmx2048m"
+  envs:
+   - GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"'
+   - JAVA_OPTIONS: "-Xms512m -Xmx2048m"
   pullrequest:
     steps:
     - script:
