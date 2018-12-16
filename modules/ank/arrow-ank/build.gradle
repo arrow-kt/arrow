@@ -4,7 +4,6 @@ dependencies {
     compile project(":arrow-instances-core")
     compile project(":arrow-instances-data")
     compile project(":arrow-effects-instances")
-    compile project(":arrow-effects-kotlinx-coroutines-instances")
 
     compile "org.jetbrains:markdown:0.1.25"
     compile "com.github.born2snipe:cli-progress:0.4"
