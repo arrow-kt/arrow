@@ -6,10 +6,9 @@ jobs:
     docker:
       - image: circleci/openjdk:8-jdk-browsers
     environment:
-      JAVA_OPTS: -Xmx1536m
-      GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs="-Xmx1536m -XX:+HeapDumpOnOutOfMemoryError" -Dkotlin.compiler.execution.strategy=“in-process”'
+      GRADLE_OPTS: '-Dkotlin.compiler.execution.strategy=“in-process”'
     steps:
       - checkout
       - run:
           name: Clean build
-          command: ./gradlew --no-daemon --debug --stacktrace clean build
+          command: ./gradlew --stacktrace clean build
