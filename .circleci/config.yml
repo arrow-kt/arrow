@@ -4,11 +4,12 @@ jobs:
   build:
     working_directory: ~/arrow
     docker:
-      - image: circleci/openjdk:8-jdk-browsers
+      - image: circleci/openjdk:8-jdk
     environment:
+      _JAVA_OPTIONS: -Xms512m -Xmx2048m
       GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xms512m -Xmx2048m -XX:+HeapDumpOnOutOfMemoryError" -Dkotlin.compiler.execution.strategy=“in-process”'
     steps:
       - checkout
       - run:
           name: Clean build
-          command: ./gradlew --stacktrace clean build
+          command: ./gradlew clean build
