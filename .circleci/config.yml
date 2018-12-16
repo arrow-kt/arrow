@@ -12,4 +12,4 @@ jobs:
       - checkout
       - run:
           name: Clean build
-          command: ./gradlew --no-daemon --exclude-task jar clean build
+          command: ./gradlew --no-daemon clean build
