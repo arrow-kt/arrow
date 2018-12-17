@@ -44,6 +44,11 @@ fun <F> ank(source: Path, target: Path, compilerArgs: List<String>, ankOps: AnkO
 
           if (p.containsAnkSnippets().bind()) {
 
+            val totalHeap = Runtime.getRuntime().totalMemory()
+            val usedHeap = totalHeap - Runtime.getRuntime().freeMemory()
+            val message = "Ank: Compiling ~> [$curr] ${path.relativize(p)} | Used Heap: ${usedHeap.humanBytes()}"
+            printConsole(colored(ANSI_GREEN, message)).bind()
+
             val content = readFile(p).bind()
 
             val preProcessed = preProcessMacros(p toT content)
