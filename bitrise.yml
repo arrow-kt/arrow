@@ -15,10 +15,16 @@ workflows:
             set -ex
             ./gradlew build
     - script:
-        title: Dokka + Ank Type Check Docs
+        title: Dokka
         inputs:
         - content: |-
             #!/usr/bin/env bash
             set -ex
-            ./gradlew dokka :arrow-docs:runAnk
-
+            ./gradlew dokka
+  - script:
+      title: Ank Docs
+      inputs:
+        - content: |-
+            #!/usr/bin/env bash
+            set -ex
+            ./gradlew :arrow-docs:runAnk
