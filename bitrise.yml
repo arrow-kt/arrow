@@ -8,9 +8,17 @@ workflows:
       - _JAVA_OPTIONS: "-Xms512m -Xmx4g"
     steps:
     - script:
-        title: Clean build
+        title: Build
         inputs:
         - content: |-
             #!/usr/bin/env bash
             set -ex
-            ./gradlew clean dokka :arrow-docs:runAnk
+            ./gradlew build
+    - script:
+        title: Dokka + Ank Type Check Docs
+        inputs:
+        - content: |-
+            #!/usr/bin/env bash
+            set -ex
+            ./gradlew dokka :arrow-docs:runAnk
+
