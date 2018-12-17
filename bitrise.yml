@@ -21,7 +21,7 @@ workflows:
             #!/usr/bin/env bash
             set -ex
             ./gradlew dokka
-  - script:
+    - script:
         title: Ank Docs
         inputs:
         - content: |-
