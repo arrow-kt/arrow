@@ -37,7 +37,7 @@ interface Negative<F, A : Number> : Refinement<F, A> {
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val result = -11.negative(Int.order())
+   *   val result = (-11).negative(Int.order())
    *
    *  //sampleEnd
    *

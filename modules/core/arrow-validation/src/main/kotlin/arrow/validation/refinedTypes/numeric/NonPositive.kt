@@ -31,11 +31,11 @@ interface NonPositive<F, A : Number> : Refinement<F, A> {
    *
    * ```kotlin:ank
    * import arrow.instances.order
-   * import arrow.validation.refinedTypes.numeric.either.nonPositive.nonPositive
+   * import arrow.validation.refinedTypes.numeric.validated.nonPositive.nonPositive
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val x = 0.nonPositive(Int.order())
+   *   val result = 0.nonPositive(Int.order())
    *  //sampleEnd
    *
    *  println(result.isValid)

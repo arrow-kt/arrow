@@ -33,7 +33,7 @@ interface Positive<F, A : Number> : Refinement<F, A> {
    *
    * ```kotlin:ank
    * import arrow.instances.order
-   * import arrow.validation.refinedTypes.numeric.either.positive.positive
+   * import arrow.validation.refinedTypes.numeric.validated.positive.positive
    *
    * fun main(args: Array<String>) {
    *   //sampleStart

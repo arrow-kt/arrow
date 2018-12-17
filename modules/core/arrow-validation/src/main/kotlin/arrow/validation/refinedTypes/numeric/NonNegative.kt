@@ -31,7 +31,7 @@ interface NonNegative<F, A : Number> : Refinement<F, A> {
    *
    * ```kotlin:ank
    * import arrow.instances.order
-   * import arrow.validation.refinedTypes.numeric.either.nonNegative.nonNegative
+   * import arrow.validation.refinedTypes.numeric.validated.nonNegative.nonNegative
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
