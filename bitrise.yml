@@ -1,30 +1,37 @@
 ---
-format_version: '6'
-default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
+default_step_lib_source: "https://github.com/bitrise-io/bitrise-steplib.git"
+format_version: "6"
 project_type: other
 workflows:
   pullrequest:
     envs:
-      - _JAVA_OPTIONS: "-Xms512m -Xmx4g"
+      -
+        _JAVA_OPTIONS: "-Xms512m -Xmx4g"
     steps:
-    - script:
-        title: Build
-        inputs:
-        - content: |-
-            #!/usr/bin/env bash
-            set -ex
-            ./gradlew build
-    - script:
-        title: Dokka
-        inputs:
-        - content: |-
-            #!/usr/bin/env bash
-            set -ex
-            ./gradlew dokka
-    - script:
-        title: Ank Docs
-        inputs:
-        - content: |-
-            #!/usr/bin/env bash
-            set -ex
-            ./gradlew :arrow-docs:runAnk
+      -
+        script:
+          inputs:
+            -
+              content: |-
+                #!/usr/bin/env bash
+                set -ex
+                ./gradlew build
+          title: Build
+      -
+        script:
+          inputs:
+            -
+              content: |-
+                #!/usr/bin/env bash
+                set -ex
+                ./gradlew dokka
+          title: Dokka
+      -
+        script:
+          inputs:
+            -
+              content: |-
+                #!/usr/bin/env bash
+                set -ex
+                ./gradlew :arrow-docs:runAnk
+          title: Ank
