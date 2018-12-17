@@ -13,4 +13,4 @@ workflows:
         - content: |-
             #!/usr/bin/env bash
             set -ex
-            ./gradlew clean build dokka :arrow-docs:runAnk
+            ./gradlew clean dokka :arrow-docs:runAnk
