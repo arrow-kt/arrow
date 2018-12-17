@@ -3,8 +3,7 @@ package arrow.core
 import arrow.Kind
 import arrow.Kind2
 import arrow.core.*
-import arrow.instances.*
-import arrow.instances.eq
+import arrow.instances.combine
 import arrow.instances.either.applicative.applicative
 import arrow.instances.either.bifunctor.bifunctor
 import arrow.instances.either.eq.eq
@@ -15,12 +14,22 @@ import arrow.instances.either.semigroup.semigroup
 import arrow.instances.either.semigroupK.semigroupK
 import arrow.instances.either.show.show
 import arrow.instances.either.traverse.traverse
+import arrow.instances.eq
+import arrow.instances.hash
+import arrow.instances.monoid
+import arrow.instances.semigroup
 import arrow.test.UnitSpec
-import arrow.test.laws.*
+import arrow.test.laws.BifunctorLaws
+import arrow.test.laws.HashLaws
+import arrow.test.laws.MonadErrorLaws
+import arrow.test.laws.MonoidLaws
+import arrow.test.laws.SemigroupKLaws
+import arrow.test.laws.SemigroupLaws
+import arrow.test.laws.ShowLaws
+import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Hash
 import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
 
@@ -103,6 +112,17 @@ class EitherTest : UnitSpec() {
           && Right(a).filterOrElse({ it > a + 1 }, { b }) == Left(b)
           && left.filterOrElse({ it > a - 1 }, { b }) == Left(a)
           && left.filterOrElse({ it > a + 1 }, { b }) == Left(a)
+      }
+    }
+
+    "filterOrOther should filter values" {
+      forAll { a: Int, b: Int ->
+        val left: Either<Int, Int> = Left(a)
+
+        Right(a).filterOrOther({ it > a - 1 }, { it -> b + a }) == Right(a)
+                && Right(a).filterOrOther({ it > a + 1 }, { it -> b + a }) == Left(b + a)
+                && left.filterOrOther({ it > a - 1 }, { it -> b + a }) == Left(a)
+                && left.filterOrOther({ it > a + 1 }, { it -> b + a }) == Left(a)
       }
     }
 

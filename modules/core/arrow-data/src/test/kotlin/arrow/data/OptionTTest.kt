@@ -1,14 +1,18 @@
 package arrow.data
 
 import arrow.Kind
+import arrow.core.Either
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
+import arrow.effects.ForIO
+import arrow.effects.IO
+import arrow.effects.instances.io.applicativeError.attempt
+import arrow.effects.instances.io.async.async
+import arrow.effects.instances.optiont.async.async
 import arrow.instances.nonemptylist.monad.monad
 import arrow.instances.option.monad.monad
-import arrow.instances.option.semigroup.semigroup
 import arrow.instances.optiont.applicative.applicative
-import arrow.instances.optiont.monad.monad
 import arrow.instances.optiont.monoidK.monoidK
 import arrow.instances.optiont.semigroupK.semigroupK
 import arrow.mtl.instances.option.traverseFilter.traverseFilter
@@ -33,12 +37,21 @@ class OptionTTest : UnitSpec() {
     a.value() == b.value()
   }
 
+  private fun IOEQ(): Eq<Kind<OptionTPartialOf<ForIO>, Int>> = Eq { a, b ->
+    a.value().attempt().unsafeRunSync() == b.value().attempt().unsafeRunSync()
+  }
+
+  private fun IOEitherEQ(): Eq<Kind<OptionTPartialOf<ForIO>, Either<Throwable, Int>>> = Eq { a, b ->
+    a.value().attempt().unsafeRunSync() == b.value().attempt().unsafeRunSync()
+  }
+
   val NELM: Monad<ForNonEmptyList> = NonEmptyList.monad()
 
   init {
 
     testLaws(
-      MonadLaws.laws(OptionT.monad(Option.monad()), Eq.any()),
+      AsyncLaws.laws(OptionT.async(IO.async()), IOEQ(), IOEitherEQ()),
+
       SemigroupKLaws.laws(
         OptionT.semigroupK(Option.monad()),
         OptionT.applicative(Option.monad()),

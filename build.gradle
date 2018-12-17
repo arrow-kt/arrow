@@ -52,11 +52,14 @@ buildscript {
 
 apply from: 'detekt.gradle.kts'
 
+def pathApiDocs = "${rootDir}/modules/docs/arrow-docs/docs/docs/apidocs"
+
 allprojects {
     apply plugin: 'base'
 
     clean.doFirst {
         delete "${rootDir}/infographic/arrow-infographic.txt"
+        delete pathApiDocs
     }
 
     repositories {
@@ -87,8 +90,7 @@ subprojects { project ->
     //dokka log spam `Can't find node by signature` comes from https://github.com/Kotlin/dokka/issues/269
     dokka {
         outputFormat = 'jekyll'
-        outputDirectory = project.rootDir.absolutePath +
-                "/modules/docs/arrow-docs/docs/docs/apidocs"
+        outputDirectory = pathApiDocs
 
         includes = ['README.md']
         reportUndocumented = false
@@ -199,12 +201,44 @@ tasks.create('repl') {
     }
 }
 
-task wrapper(type: Wrapper) {
-    distributionUrl = "https://services.gradle.org/distributions/gradle-${project.ext.gradleVersion}-all.zip"
-}
-
 apply plugin: 'com.github.ben-manes.versions'
 
 configurations.all {
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
+dependencyUpdates {
+    outputFormatter { result ->
+        final dependenciesToCheck = [
+                'org.jetbrains.kotlin:kotlin-stdlib',
+                'org.jetbrains.kotlin:kotlin-stdlib-jdk7',
+                'org.jetbrains.kotlin:kotlin-stdlib-jdk8',
+                'org.jetbrains.kotlin:kotlin-gradle-plugin',
+                'org.jetbrains.kotlinx:kotlinx-coroutines-core'
+        ]
+        final disallowedQualifiers = ['alpha', 'beta', 'rc', 'cr', 'm', 'preview', 'eap']
+        final isDisallowed = { dependency -> { qualifier -> dependency.version ==~ /(?i).*[.-]${qualifier}[.\d-]*/ } }
+        final dependencies = result.current.dependencies
+            .plus(result.outdated.dependencies)
+            .plus(result.exceeded.dependencies)
+            .plus(result.unresolved.dependencies)
+            .findAll { dependency -> dependenciesToCheck.any { it == "${dependency.group}:${dependency.name}" } }
+
+        final isRejected = dependencies
+            .any { dependency -> disallowedQualifiers.any(isDisallowed(dependency)) }
+
+        if (isRejected) {
+            final title = "\nError: Kotlin and Coroutines must depends on release version!"
+            final message = dependencies
+                .inject(title) { acc, dependency ->
+                    "$acc\n${dependency.group}:${dependency.name}:${dependency.version}"
+                }
+            
+            throw new GradleException(message)
+        }
+    }
+}
+
+task checkDependenciesVersion {
+    dependsOn dependencyUpdates
 }
