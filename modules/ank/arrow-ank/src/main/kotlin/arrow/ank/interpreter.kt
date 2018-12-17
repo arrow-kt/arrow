@@ -78,6 +78,12 @@ fun <F> monadDeferInterpreter(MF: MonadDefer<F>): AnkOps<F> = object : AnkOps<F>
 
   override fun printConsole(msg: String): Kind<F, Unit> = MF.delay { println(msg) }
 
+  override fun Path.containsAnkSnippets(): Kind<F, Boolean> = MF.delay {
+    toFile().useLines { line ->
+      line.find { it.contains(AnkBlock) } != null
+    }
+  }
+
   override fun createTargetDirectory(source: Path, target: Path): Kind<F, Path> = MF.delay {
     source.toFile().copyRecursively(target.toFile(), overwrite = true); target
   }

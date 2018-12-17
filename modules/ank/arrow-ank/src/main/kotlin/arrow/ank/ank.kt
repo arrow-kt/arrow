@@ -42,22 +42,29 @@ fun <F> ank(source: Path, target: Path, compilerArgs: List<String>, ankOps: AnkO
             printConsole(colored(ANSI_GREEN, message)).bind()
           }
 
-          val content = readFile(p).bind()
+          if (p.containsAnkSnippets().bind()) {
 
-          val preProcessed = preProcessMacros(p toT content)
+            val content = readFile(p).bind()
 
-          val parsedMarkdown = parseMarkdown(preProcessed).bind()
+            val preProcessed = preProcessMacros(p toT content)
 
-          val snippets = extractCode(preProcessed, parsedMarkdown).bind()
-            .fold({ return@binding generated }, { it })
+            val parsedMarkdown = parseMarkdown(preProcessed).bind()
 
-          val compiledResult = compileCode(p toT snippets, compilerArgs).bind()
+            val snippets = extractCode(preProcessed, parsedMarkdown).bind()
+              .fold({ return@binding generated }, { it })
 
-          val result = replaceAnkToLang(preProcessed, compiledResult)
+            val compiledResult = compileCode(p toT snippets, compilerArgs).bind()
 
-          generateFile(p, result).bind()
+            val result = replaceAnkToLang(preProcessed, compiledResult)
 
-          generated + snippets.foldLeft(1) { a, s -> if (s.isOutFile) a + 1 else a }
+            generateFile(p, result).bind()
+
+            generated + snippets.foldLeft(1) { a, s -> if (s.isOutFile) a + 1 else a }
+          } else {
+            val content = readFile(p).bind()
+            generateFile(p, content).bind()
+            generated + 1
+          }
         }
       }
     }.bind()

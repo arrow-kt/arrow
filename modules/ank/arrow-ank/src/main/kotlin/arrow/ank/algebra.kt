@@ -31,4 +31,6 @@ interface AnkOps<F> {
 
   fun printConsole(msg: String): Kind<F, Unit>
 
+  fun Path.containsAnkSnippets(): Kind<F, Boolean>
+
 }
