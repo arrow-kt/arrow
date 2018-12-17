@@ -5,7 +5,7 @@ project_type: other
 workflows:
   pullrequest:
     envs:
-      - _JAVA_OPTIONS: "-Xms512m -Xmx3g"
+      - _JAVA_OPTIONS: "-Xms512m -Xmx4g"
     steps:
     - script:
         title: Clean build
