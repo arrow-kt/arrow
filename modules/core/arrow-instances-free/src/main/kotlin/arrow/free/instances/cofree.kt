@@ -9,8 +9,10 @@ import arrow.free.fix
 import arrow.extension
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Functor
+import arrow.undocumented
 
 @extension
+@undocumented
 interface CofreeFunctorInstance<S> : Functor<CofreePartialOf<S>> {
   override fun <A, B> Kind<CofreePartialOf<S>, A>.map(f: (A) -> B): Cofree<S, B> = fix().map(f)
 }

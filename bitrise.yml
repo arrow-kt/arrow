@@ -15,29 +15,43 @@ workflows:
     - _JAVA_OPTIONS: "-Xms512m -Xmx4g"
     steps:
     - script:
-        title: Build docs
+        title: dokka
         inputs:
         - content: |-
             #!/usr/bin/env bash
             set -ex
-            ./gradlew dokka :arrow-docs:runAnk
+            ./gradlew dokka
+    - script:
+        title: runAnk
+        inputs:
+        - content: |-
+            #!/usr/bin/env bash
+            set -ex
+            ./gradlew :arrow-docs:runAnk
   deploy:
     envs:
     - _JAVA_OPTIONS: "-Xms512m -Xmx4g"
     steps:
     - script:
-        title: Build docs
+        title: dokka
         inputs:
         - content: |-
             #!/usr/bin/env bash
             set -ex
             ./gradlew dokka :arrow-docs:runAnk
     - script:
+        title: runAnk
+        inputs:
+        - content: |-
+            #!/usr/bin/env bash
+            set -ex
+            ./gradlew :arrow-docs:runAnk
+    - script:
            deps:
              apt_get:
              - name: awscli
                bin_name: aws
-           title: Deploy docs
+           title: deploy
            inputs:
            - content: |-
                #!/usr/bin/env bash

@@ -1,10 +1,17 @@
 package arrow.common.utils
 
 import arrow.common.messager.logE
+import arrow.documented
 import arrow.meta.encoder.jvm.KotlinMetatadataEncoder
 import me.eugeniomarletti.kotlin.processing.KotlinAbstractProcessor
+import java.io.File
+import java.io.IOException
+import java.nio.file.Files
+import java.nio.file.Files.createFile
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.element.Element
+import javax.lang.model.element.ElementKind
+import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.TypeElement
 
 class KnownException(message: String, val element: Element?) : RuntimeException(message) {
@@ -15,9 +22,60 @@ class KnownException(message: String, val element: Element?) : RuntimeException(
 
 abstract class AbstractProcessor : KotlinAbstractProcessor(), ProcessorUtils, KotlinMetatadataEncoder {
 
+  private fun Element.kDocLocation(): File =
+    File(
+      System.getProperty("user.dir") +
+        "/build/kdocs/meta/"+ "${locationName().replace('.', '/')}.javadoc")
+
+  fun Element.kDoc(): String? =
+    try {
+      kDocLocation()
+        .readLines().joinToString("\n") {
+          val line = it.substringAfter(" * ")
+          if (line.trim() == "*") ""
+          else line
+        } + "\n"
+    } catch (e: Exception) {
+      null
+    }
+
+  private fun processElementDoc(e: Element): Unit {
+    val doc = elementUtils.getDocComment(e)
+    val kDocLocation = e.kDocLocation()
+    if (doc != null && doc.trim { it <= ' ' }.isNotEmpty()) {
+      try {
+        Files.createDirectories(kDocLocation.toPath().parent)
+        Files.createFile(kDocLocation.toPath())
+        kDocLocation.writeText(doc)
+      } catch (x: IOException) {
+        logE("Failed to generate kdoc file location: $kDocLocation", e)
+      }
+    }
+  }
+
+  private fun Element.locationName(): String = when (kind) {
+      ElementKind.CLASS -> (this as TypeElement).qualifiedName.toString()
+      ElementKind.INTERFACE -> (this as TypeElement).qualifiedName.toString()
+      ElementKind.METHOD -> (this as ExecutableElement).let {
+        val name = (it.enclosingElement as TypeElement).qualifiedName.toString()
+        val functionName = it.simpleName.toString()
+        "$name.$functionName"
+      }
+      else -> knownError("Unsupported @documented $kind")
+    }
+
+  private fun processDocs(roundEnv: RoundEnvironment): Unit =
+    roundEnv
+      .getElementsAnnotatedWith(documented::class.java)
+      .filterIsInstance<TypeElement>().forEach {
+        processElementDoc(it)
+        it.enclosedElements.forEach(::processElementDoc)
+      }
+
   final override fun process(annotations: Set<TypeElement>, roundEnv: RoundEnvironment): Boolean {
     if (!roundEnv.errorRaised()) {
       try {
+        processDocs(roundEnv)
         onProcess(annotations, roundEnv)
       } catch (e: KnownException) {
         logE(e.message, e.element)

@@ -138,13 +138,13 @@ class OptionalTest : UnitSpec() {
       }
     }
 
-    "void should always " {
+    "unit should always " {
       forAll { string: String ->
         Optional.void<String, Int>().getOption(string) == None
       }
     }
 
-    "void should always return source when setting target" {
+    "unit should always return source when setting target" {
       forAll { int: Int, string: String ->
         Optional.void<String, Int>().set(string, int) == string
       }
