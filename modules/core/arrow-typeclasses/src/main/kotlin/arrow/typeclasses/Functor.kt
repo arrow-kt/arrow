@@ -7,10 +7,10 @@ import arrow.documented
 /**
  * ank_macro_hierarchy(arrow.typeclasses.Functor)
  *
- * The [Functor] type class abstracts the ability to `map` over the computational context of a type constructor.
+ * The [Functor] type class abstracts the ability to [map] over the computational context of a type constructor.
  * Examples of type constructors that can implement instances of the Functor type class include [_dataType_],
- * [Option], [NonEmptyList], [List] and many other data types that include a `map` function with the shape
- * `fun F<A>.map(f: (A) -> B): F<B>` where `F` refers to any type constructor whose contents can be transformed.
+ * [Option], [NonEmptyList], [List] and many other data types that include a [map] function with the shape
+ * `fun <F, A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B>` where `F` refers to any type constructor whose contents can be transformed.
  *
  * ```kotlin:ank:playground:extension
  * _imports_
@@ -23,24 +23,20 @@ import arrow.documented
  *   println(result)
  * }
  * ```
- *
- * The `Functor` typeclass abstracts the ability to `map` over the computational context of a type constructor.
- * Examples of type constructors that can implement instances of the Functor typeclass include `Option`, `NonEmptyList`,
- * `List` and many other datatypes that include a `map` function with the shape `fun F<A>.map(f: (A) -> B): F<B>` where `F`
- * refers to `Option`, `List` or any other type constructor whose contents can be transformed.
- *
+
  * ### Example
  *
- * Oftentimes we find ourselves in situations where we need to transform the contents of some datatype. `Functor#map` allows
- * us to safely compute over values under the assumption that they'll be there returning the transformation encapsulated in the same context.
+ * Oftentimes we find ourselves in situations where we need to transform the contents of some data type.
+ * [map] allows us to safely compute over values under the assumption that they'll be there returning the
+ * transformation encapsulated in the same context.
  *
- * Consider both `Option` and `Try`:
+ * Consider both [Option] and [Try]:
  *
  * `Option<A>` allows us to model absence and has two possible states, `Some(a: A)` if the value is not absent and `None` to represent an empty case.
  * In a similar fashion `Try<A>` may have two possible cases `Success(a: A)` for computations that succeed and `Failure(e: Throwable)` if they fail
  * with an exception.
  *
- * Both `Try` and `Option` are examples of data types that can be computed over transforming their inner results.
+ * Both [Try] and [Option] are examples of data types that can be computed over transforming their inner results.
  *
  * ```kotlin:ank:playground
  * import arrow.*
