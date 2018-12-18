@@ -30,4 +30,7 @@ interface AnkOps<F> {
   fun generateFile(path: Path, newContent: String): Kind<F, Unit>
 
   fun printConsole(msg: String): Kind<F, Unit>
+
+  fun Path.containsAnkSnippets(): Kind<F, Boolean>
+
 }

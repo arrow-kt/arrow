@@ -11,13 +11,16 @@ import arrow.typeclasses.Applicative
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
+import arrow.undocumented
 
 @extension
+@undocumented
 interface FreeApplicativeFunctorInstance<S> : Functor<FreeApplicativePartialOf<S>> {
   override fun <A, B> Kind<FreeApplicativePartialOf<S>, A>.map(f: (A) -> B): FreeApplicative<S, B> = fix().map(f)
 }
 
 @extension
+@undocumented
 interface FreeApplicativeApplicativeInstance<S> : Applicative<FreeApplicativePartialOf<S>>, FreeApplicativeFunctorInstance<S> {
   override fun <A> just(a: A): FreeApplicative<S, A> = FreeApplicative.just(a)
 
@@ -28,6 +31,7 @@ interface FreeApplicativeApplicativeInstance<S> : Applicative<FreeApplicativePar
 }
 
 @extension
+@undocumented
 interface FreeApplicativeEq<F, G, A> : Eq<Kind<FreeApplicativePartialOf<F>, A>> {
   fun MG(): Monad<G>
 
