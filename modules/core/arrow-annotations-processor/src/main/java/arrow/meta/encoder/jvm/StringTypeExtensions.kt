@@ -3,6 +3,7 @@ package arrow.meta.encoder.jvm
 import arrow.common.utils.removeBackticks
 import arrow.meta.ast.PackageName
 import arrow.meta.ast.TypeName
+import arrow.meta.encoder.KotlinReservedKeywords
 
 internal fun String.removeVariance(): String =
   replace("out ", "").replace("in ", "")
@@ -40,23 +41,55 @@ internal fun String.asClassy(): TypeName.Classy {
   return TypeName.Classy(simpleName, rawTypeName, PackageName(pckg))
 }
 
-internal fun String.downKind(): Pair<String, String> =
-  run {
-    val classy = asClassy()
-    val kindedClassy = when {
-      classy.fqName == "arrow.Kind" -> {
-        val result = substringAfter("arrow.Kind<").substringBefore(",").asClassy()
-        if (result.fqName == "arrow.typeclasses.ForConst") result
-        else classy
-      }
-      else -> classy
+private val kindRegex: Regex =
+  "(arrow\\.Kind|arrow\\.typeclasses\\.Conested)<(.*), (.*)>".toRegex()
+
+fun String.downKParts(): List<String> =
+  when (val matchResult = kindRegex.find(this)) {
+    null -> listOf(this)
+    else -> {
+      val witness = matchResult.groupValues[2]
+      val value = matchResult.groupValues[3]
+      witness.downKParts() + value.downKParts()
     }
+  }
+
+data class DownKindReduction(
+  val pckg: String,
+  val name: String,
+  val additionalTypeArgs: List<String> = emptyList()
+)
+
+internal fun String.downKind(): DownKindReduction {
+  val parts = downKParts()
+  return if (parts.isEmpty()) {
+    val pckg =
+      if (this.contains(".")) this.substringBefore("<").substringBeforeLast(".")
+      else ""
+    DownKindReduction(pckg, this)
+  } else {
+    val dataType = parts[0]
+    val pckg =
+      if (dataType.contains(".")) dataType.substringBeforeLast(".")
+      else ""
+    val simpleName = dataType.substringAfterLast(".").substringBefore("<")
     val unAppliedName =
-      if (kindedClassy.simpleName.startsWith("For")) kindedClassy.simpleName.drop("For".length)
-      else kindedClassy.simpleName
+      if (simpleName.startsWith("For")) simpleName.drop("For".length)
+      else simpleName
     when {
-      unAppliedName.endsWith("PartialOf") -> Pair(kindedClassy.pckg.value, unAppliedName.substringBeforeLast("PartialOf"))
-      unAppliedName.endsWith("Of") -> Pair(kindedClassy.pckg.value, unAppliedName.substringBeforeLast("Of"))
-      else -> Pair(kindedClassy.pckg.value, unAppliedName)
+      unAppliedName.endsWith("PartialOf") ->
+        DownKindReduction(pckg, unAppliedName.substringBeforeLast("PartialOf"), parts.drop(1))
+      unAppliedName.endsWith("Of") ->
+        DownKindReduction(pckg, unAppliedName.substringBeforeLast("Of"), parts.drop(1))
+      else -> {
+        DownKindReduction(pckg, unAppliedName, parts.drop(1))
+      }
     }
+  }
+}
+
+fun String.quote(): String =
+  split(".").joinToString(".") {
+    if (KotlinReservedKeywords.contains(it)) "`$it`"
+    else it
   }

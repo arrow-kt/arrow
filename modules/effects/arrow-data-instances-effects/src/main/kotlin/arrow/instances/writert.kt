@@ -31,7 +31,7 @@ interface WriterTBrackInstance<F, W> : Bracket<WriterTPartialOf<F, W>, Throwable
           val r = release(wa.b, exitCase).value()
           when (exitCase) {
             is ExitCase.Completed -> r.flatMap { (l, _) -> ref.set(l) }
-            else -> r.void()
+            else -> r.unit()
           }
         }).flatMap { (w, b) ->
           ref.get.map { ww -> Tuple2(w.combine(ww), b) }
@@ -85,7 +85,7 @@ interface WriterTEffectInstance<F, W> : Effect<WriterTPartialOf<F, W>>, WriterTA
   override fun <A> WriterTOf<F, W, A>.runAsync(cb: (Either<Throwable, A>) -> WriterTOf<F, W, Unit>): WriterT<F, W, Unit> = EFF().run {
     WriterT.liftF(value().runAsync { r ->
       val f = cb.compose { a: Either<Throwable, Tuple2<W, A>> -> a.map(Tuple2<W, A>::b) }
-      f(r).value().void()
+      f(r).value().unit()
     }, MM(), this)
   }
 
@@ -103,7 +103,7 @@ interface WriterTConcurrentEffectInstance<F, W> : ConcurrentEffect<WriterTPartia
   override fun <A> WriterTOf<F, W, A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> WriterTOf<F, W, Unit>): WriterT<F, W, Disposable> = CEFF().run {
     WriterT.liftF(value().runAsyncCancellable { r: Either<Throwable, Tuple2<W, A>> ->
       val f = cb.compose { rr: Either<Throwable, Tuple2<W, A>> -> rr.map(Tuple2<W, A>::b) }
-      f(r).value().void()
+      f(r).value().unit()
     }, MM(), this)
   }
 

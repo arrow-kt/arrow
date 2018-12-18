@@ -1,7 +1,7 @@
 package arrow.instances
 
 import arrow.common.messager.log
-import arrow.common.utils.*
+import arrow.common.utils.knownError
 import arrow.extension
 import arrow.meta.ast.*
 import arrow.meta.encoder.TypeClassInstance
@@ -12,7 +12,7 @@ import javax.annotation.processing.Processor
 import javax.lang.model.element.TypeElement
 
 @AutoService(Processor::class)
-class ExtensionProcessor : MetaProcessor<extension>(extension::class) {
+class ExtensionProcessor : MetaProcessor<extension>(extension::class), PolyTemplateGenerator {
 
   override fun transform(annotatedElement: AnnotatedElement): List<FileSpec.Builder> =
     when (annotatedElement) {
@@ -134,6 +134,7 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class) {
       )
     }
     return Func(
+      kdoc = typeClass.kdoc?.eval(this),
       name = typeClass.name.simpleName.decapitalize(),
       parameters = requiredParameters,
       receiverType = target,
@@ -159,14 +160,11 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class) {
       .map { f ->
         val func = f.removeDummyArgs().downKindReturnType().wrap(wrappedType)
         val dummyArgsCount = f.countDummyArgs()
-        val allArgs = func.parameters + requiredParameters
-        val typeVariables = (instance.typeVariables + func.typeVariables)
-          .asSequence()
-          .map { it.removeConstrains() }
-          .distinctBy { it.name }
-          .toList()
+        val allArgs = requiredParameters + func.parameters
+        val typeVariables = extensionTypeVariables(func)
         func
           .copy(
+            kdoc = func.kdoc?.eval(this),
             modifiers =
             when {
               allArgs.size > 1 -> emptyList()
@@ -210,6 +208,12 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class) {
       .toList()
 
   }
+
+  private fun TypeClassInstance.extensionTypeVariables(func: Func): List<TypeName.TypeVariable> = (instance.typeVariables + func.typeVariables)
+      .asSequence()
+      .map { it.removeConstrains() }
+      .distinctBy { it.name }
+      .toList()
 
   private fun TypeClassInstance.staticExtensionImpl(
     companionOrFactory: TypeName,

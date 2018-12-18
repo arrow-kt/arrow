@@ -9,13 +9,16 @@ import arrow.instances.mapk.foldable.fold
 import arrow.instances.setk.eq.eq
 import arrow.instances.setk.hash.hash
 import arrow.typeclasses.*
+import arrow.undocumented
 
 @extension
+@undocumented
 interface MapKFunctorInstance<K> : Functor<MapKPartialOf<K>> {
   override fun <A, B> Kind<MapKPartialOf<K>, A>.map(f: (A) -> B): MapK<K, B> = fix().map(f)
 }
 
 @extension
+@undocumented
 interface MapKFoldableInstance<K> : Foldable<MapKPartialOf<K>> {
 
   override fun <A, B> Kind<MapKPartialOf<K>, A>.foldLeft(b: B, f: (B, A) -> B): B = fix().foldLeft(b, f)
@@ -25,6 +28,7 @@ interface MapKFoldableInstance<K> : Foldable<MapKPartialOf<K>> {
 }
 
 @extension
+@undocumented
 interface MapKTraverseInstance<K> : Traverse<MapKPartialOf<K>>, MapKFoldableInstance<K> {
 
   override fun <G, A, B> MapKOf<K, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, MapKOf<K, B>> =

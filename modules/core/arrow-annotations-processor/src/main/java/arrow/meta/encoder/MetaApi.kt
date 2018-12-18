@@ -15,6 +15,37 @@ data class TypeClassInstance(
   val projectedCompanion: TypeName
 )
 
+val KotlinReservedKeywords = setOf(
+  "package",
+  "as",
+  "typealias",
+  "class",
+  "this",
+  "super",
+  "val",
+  "var",
+  "fun",
+  "for",
+  "null",
+  "true",
+  "false",
+  "is",
+  "in",
+  "throw",
+  "return",
+  "break",
+  "continue",
+  "object",
+  "if",
+  "try",
+  "else",
+  "while",
+  "do",
+  "when",
+  "interface",
+  "typeof"
+)
+
 /**
  * Arrow-Meta provides a hydrated AST representing Kotlin Code.
  * The current implementation relies on TypeElement, KotlinMetadata library and Kotlin Poet
@@ -61,11 +92,11 @@ interface MetaApi {
    * ex: `Kind<ForIO, A> -> IO<A>`
    */
   val TypeName.downKind: TypeName
-  val TypeName.TypeVariable.downKind: TypeName.TypeVariable
-  val TypeName.FunctionLiteral.downKind: TypeName.FunctionLiteral
-  val TypeName.ParameterizedType.downKind: TypeName.ParameterizedType
-  val TypeName.WildcardType.downKind: TypeName.WildcardType
-  val TypeName.Classy.downKind: TypeName.Classy
+  val TypeName.TypeVariable.downKind: TypeName
+  val TypeName.FunctionLiteral.downKind: TypeName
+  val TypeName.ParameterizedType.downKind: TypeName
+  val TypeName.WildcardType.downKind: TypeName
+  val TypeName.Classy.downKind: TypeName
 
   /**
    * Recursively gathers all the nested [TypeName.TypeVariable] inside a [TypeName]
