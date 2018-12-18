@@ -21,6 +21,7 @@ import arrow.aql.instances.option.select.query
 import arrow.aql.instances.option.select.select
 import arrow.aql.instances.option.select.value
 import arrow.core.Id
+import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import arrow.instances.order

@@ -281,9 +281,17 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
   /**
    * @see [MetaApi.getDownKind]
    */
-  override val TypeName.TypeVariable.downKind: TypeName.TypeVariable
-    get() = name.downKind().let { (pckg, unPrefixedName) ->
-      if (pckg.isBlank()) this else copy(name = "$pckg.$unPrefixedName")
+  override val TypeName.TypeVariable.downKind: TypeName
+    get() = name.downKind().let { (pckg, unPrefixedName, extraArgs) ->
+      if (pckg.isBlank()) this
+      else {
+        if (extraArgs.isEmpty()) copy(name = "$pckg.$unPrefixedName")
+        else TypeName.ParameterizedType(
+          name = "$pckg.$unPrefixedName",
+          typeArguments = extraArgs.map { TypeName.TypeVariable(it) },
+          rawType = TypeName.Classy(unPrefixedName, "$pckg.$unPrefixedName", PackageName(pckg))
+        )
+      }
     }
 
   /**
@@ -368,7 +376,7 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
   /**
    * @see [MetaApi.getDownKind]
    */
-  override val TypeName.WildcardType.downKind: TypeName.WildcardType
+  override val TypeName.WildcardType.downKind: TypeName
     get() = if (upperBounds.isNotEmpty() &&
       (upperBounds.find {
         name.matches("arrow.Kind<(\\w?), (\\w?)>".toRegex()) ||
@@ -376,22 +384,34 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
       } != null)) {
       this
     } else {
-      name.downKind().let { (pckg, unPrefixedName) ->
-        if (pckg.isBlank()) this
-        else copy(
-          name = "$pckg.$unPrefixedName",
-          lowerBounds = lowerBounds.map { it.downKind },
-          upperBounds = upperBounds.map { it.downKind }
-        )
+      name.downKind().let { (pckg, unPrefixedName, extraArgs) ->
+        when {
+          pckg.isBlank() -> this
+          extraArgs.isEmpty() -> copy(
+            name = "$pckg.$unPrefixedName",
+            lowerBounds = lowerBounds.map { it.downKind },
+            upperBounds = upperBounds.map { it.downKind }
+          )
+          else -> TypeName.ParameterizedType(
+            name = "$pckg.$unPrefixedName",
+            typeArguments = extraArgs.map { TypeName.TypeVariable(it) },
+            rawType = TypeName.Classy(unPrefixedName, "$pckg.$unPrefixedName", PackageName(pckg))
+          )
+        }
       }
     }
 
   /**
    * @see [MetaApi.getDownKind]
    */
-  override val TypeName.Classy.downKind: TypeName.Classy
-    get() = fqName.downKind().let { (pckg, unPrefixedName) ->
-      copy(simpleName = unPrefixedName, fqName = "$pckg.$unPrefixedName")
+  override val TypeName.Classy.downKind: TypeName
+    get() = fqName.downKind().let { (pckg, unPrefixedName, extraArgs) ->
+      if (extraArgs.isEmpty()) copy(simpleName = unPrefixedName, fqName = "$pckg.$unPrefixedName")
+      else TypeName.ParameterizedType(
+        name = "$pckg.$unPrefixedName",
+        typeArguments = extraArgs.map { TypeName.TypeVariable(it) },
+        rawType = TypeName.Classy(unPrefixedName, "$pckg.$unPrefixedName", PackageName(pckg))
+      )
     }
 
   fun typeNameDownKindImpl(typeName: TypeName): TypeName =
@@ -522,8 +542,8 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
       val dataTypeDownKinded = downKind
       return when {
         this is TypeName.TypeVariable &&
-          (dataTypeDownKinded.simpleName == "arrow.Kind" ||
-            dataTypeDownKinded.simpleName == "arrow.typeclasses.Conested") -> {
+          (dataTypeDownKinded.simpleName.startsWith("arrow.Kind") ||
+            dataTypeDownKinded.simpleName.startsWith("arrow.typeclasses.Conested")) -> {
           simpleName
             .substringAfterLast("arrow.Kind<")
             .substringAfterLast("arrow.typeclasses.Conested<")
@@ -574,20 +594,26 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
         val typeClass = typeClassTypeName.type
         when {
           typeClass != null && typeClassTypeName is TypeName.ParameterizedType && typeClassTypeName.typeArguments.isNotEmpty() -> {
-            val dataTypeName = typeClassTypeName.typeArguments[0]
+            val dataTypeTypeArg = typeClassTypeName.typeArguments[0]
+            val dataTypeName =
+              if (dataTypeTypeArg is TypeName.TypeVariable && dataTypeTypeArg.name.contains("PartialOf<"))
+                TypeName.TypeVariable(dataTypeTypeArg.name.substringBefore("PartialOf<").substringAfter("<"))
+              else dataTypeTypeArg
             //profunctor and other cases are parametric to Kind2 values or Conested
             val projectedCompanion = dataTypeName.projectedCompanion
             val dataTypeDownKinded = dataTypeName.downKind
             val dataType = dataTypeDownKinded.type
             when {
-              dataType != null && dataTypeDownKinded is TypeName.TypeVariable -> TypeClassInstance(
+              dataType != null -> TypeClassInstance(
                 instance = instance,
                 dataType = dataType,
                 typeClass = typeClass,
                 instanceTypeElement = this@typeClassInstance,
-                dataTypeTypeElement = elementUtils.getTypeElement(dataTypeDownKinded.name),
-                typeClassTypeElement = elementUtils.getTypeElement(typeClassTypeName.rawType.fqName),
-                projectedCompanion = projectedCompanion
+                dataTypeTypeElement = elementUtils.getTypeElement(dataTypeDownKinded.rawName),
+                typeClassTypeElement = elementUtils.getTypeElement(typeClassTypeName.rawName),
+                projectedCompanion =
+                if (projectedCompanion is TypeName.ParameterizedType) projectedCompanion.rawType
+                else projectedCompanion
               )
               else -> null
             }
