@@ -201,10 +201,6 @@ tasks.create('repl') {
     }
 }
 
-task wrapper(type: Wrapper) {
-    distributionUrl = "https://services.gradle.org/distributions/gradle-${project.ext.gradleVersion}-all.zip"
-}
-
 apply plugin: 'com.github.ben-manes.versions'
 
 configurations.all {
