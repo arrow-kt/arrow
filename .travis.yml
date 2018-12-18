@@ -6,21 +6,25 @@ jdk:
 - oraclejdk8
 
 stages:
+- name: build
 - name: coverage-report
   if: branch = master
 - name: deploy
   if: branch = master AND type != pull_request
 
 env:
- global:
- - JAVA_OPTS="-Xms512m -Xmx1024m"
+  global:
+  - JAVA_OPTS="-Xms512m -Xmx1024m"
 
 jobs:
- include:
- - stage: coverage-report
-   script:
-   - ./gradlew codeCoverageReport
-   - bash <(curl -s https://codecov.io/bash)
- - stage: deploy
-   script:
-   - ./deploy-scripts/deploy.sh
+  include:
+  - stage: build
+    script:
+    - ./gradlew clean build
+  - stage: coverage-report
+    script:
+    - ./gradlew codeCoverageReport
+    - bash <(curl -s https://codecov.io/bash)
+  - stage: deploy
+    script:
+    - ./deploy-scripts/deploy.sh
