@@ -38,7 +38,7 @@ workflows:
         - content: |-
             #!/usr/bin/env bash
             set -ex
-            ./gradlew dokka :arrow-docs:runAnk
+            ./gradlew dokka
     - script:
         title: runAnk
         inputs:
