@@ -12,7 +12,7 @@ trigger_map:
 workflows:
   build:
     envs:
-    - _JAVA_OPTIONS: "-Xms512m -Xmx5g"
+    - _JAVA_OPTIONS: "-Xms512m -Xmx4g"
     steps:
     - script:
         title: dokka
@@ -30,7 +30,7 @@ workflows:
             ./gradlew :arrow-docs:runAnk
   deploy:
     envs:
-    - _JAVA_OPTIONS: "-Xms512m -Xmx5g"
+    - _JAVA_OPTIONS: "-Xms512m -Xmx4g"
     steps:
     - script:
         title: dokka
@@ -51,7 +51,7 @@ workflows:
              apt_get:
              - name: awscli
                bin_name: aws
-           title: Deploy docs
+           title: deploy
            inputs:
            - content: |-
                #!/usr/bin/env bash
