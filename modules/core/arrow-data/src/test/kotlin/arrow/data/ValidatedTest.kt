@@ -251,26 +251,3 @@ class ValidatedTest : UnitSpec() {
     }
   }
 }
-
-data class NetworkCorruptedField(val msg: String)
-data class Field(val msg: String)
-
-private fun map(list: List<Validated<NonEmptyList<NetworkCorruptedField>, Field>>): Validated<NonEmptyList<NetworkCorruptedField>, List<Field>> {
-  val errorList = ArrayList<NetworkCorruptedField>()
-  val fields = ArrayList<Field>()
-
-  list.forEach { validated ->
-    validated.fold(
-      fe = { errors: NonEmptyList<NetworkCorruptedField> ->
-        errorList.addAll(errors.all)
-      },
-      fa = { field -> fields.add(field) }
-    )
-  }
-
-  return if (errorList.isEmpty()) {
-    Valid(fields)
-  } else {
-    Invalid(NonEmptyList.fromListUnsafe(errorList))
-  }
-}
