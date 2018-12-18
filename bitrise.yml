@@ -12,7 +12,7 @@ trigger_map:
 workflows:
   build:
     envs:
-    - _JAVA_OPTIONS: "-Xms512m -Xmx4g"
+    - _JAVA_OPTIONS: "-Xms512m -Xmx5g"
     steps:
     - script:
         title: Build docs
@@ -23,7 +23,7 @@ workflows:
             ./gradlew dokka :arrow-docs:runAnk
   deploy:
     envs:
-    - _JAVA_OPTIONS: "-Xms512m -Xmx4g"
+    - _JAVA_OPTIONS: "-Xms512m -Xmx5g"
     steps:
     - script:
         title: Build docs
