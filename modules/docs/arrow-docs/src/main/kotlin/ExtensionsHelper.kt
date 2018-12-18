@@ -48,7 +48,7 @@ fun DataType.docsMarkdownLink(): String =
   kclass.docsMarkdownLink()
 
 fun <A : Any> KClass<A>.docsMarkdownLink(): String =
-  "[$simpleName]({{ '/docs/${qualifiedName?.toLowerCase()?.replace(".", "/")}' | relative_url }})"
+  "[$simpleName]({{ '/withDocs/${qualifiedName?.toLowerCase()?.replace(".", "/")}' | relative_url }})"
 
 fun TypeClass.hierarchyGraph(): String =
   """

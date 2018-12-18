@@ -62,6 +62,11 @@ allprojects {
         delete pathApiDocs
     }
 
+    //attempt to reduce travis memory constrains
+    tasks.withType(Test) {
+        forkEvery = 100
+    }
+
     repositories {
         jcenter()
         maven { url 'https://kotlin.bintray.com/kotlinx' }

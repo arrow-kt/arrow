@@ -293,8 +293,12 @@ inline fun <A, B> EitherOf<A, B>.filterOrElse(predicate: (B) -> Boolean, default
  * val left: Either<Int, Int> = Left(12)
  * left.filterOrOther({ it > 10 }, { -1 })
  * ```
- */inline fun <A, B> EitherOf<A, B>.filterOrOther(predicate: (B) -> Boolean, default: (B) -> A): Either<A, B> =
-  flatMap { if (predicate(it)) arrow.core.Either.Right(it) else arrow.core.Either.Left(default(it)) }
+ */
+inline fun <A, B> EitherOf<A, B>.filterOrOther(predicate: (B) -> Boolean, default: (B) -> A): Either<A, B> =
+  flatMap {
+    if (predicate(it)) arrow.core.Either.Right(it)
+    else arrow.core.Either.Left(default(it))
+  }
 
 /**
  * * Returns [Either.Right] with the existing value of [Either.Right] if this is an [Either.Right] with a non-null value.
