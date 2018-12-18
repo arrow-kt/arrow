@@ -43,7 +43,7 @@ interface EitherTBracketInstance<F> : Bracket<EitherTPartialOf<F, Throwable>, Th
                     )
                   }
                 }
-                else -> release(eith.b, exitCase).value().void()
+                else -> release(eith.b, exitCase).value().unit()
               }
               is Either.Left -> just(Unit)
             }
@@ -105,7 +105,7 @@ interface EitherTEffectInstance<F> : Effect<EitherTPartialOf<F, Throwable>>, Eit
     EitherT(value().runAsync { a ->
       cb(a.flatten())
         .value()
-        .void()
+        .unit()
     }.attempt())
   }
 
@@ -122,7 +122,7 @@ interface EitherTConcurrentEffectInstance<F> : ConcurrentEffect<EitherTPartialOf
     EitherT(value().runAsyncCancellable { a ->
       cb(a.flatten())
         .value()
-        .void()
+        .unit()
     }.attempt())
   }
 

@@ -8,8 +8,10 @@ import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Functor
+import arrow.undocumented
 
 @extension
+@undocumented
 interface MooreComonadInstance<V> : Comonad<MoorePartialOf<V>> {
   override fun <A, B> Kind<MoorePartialOf<V>, A>.coflatMap(f: (Kind<MoorePartialOf<V>, A>) -> B): Moore<V, B> =
       fix().coflatMap(f)
@@ -22,6 +24,7 @@ interface MooreComonadInstance<V> : Comonad<MoorePartialOf<V>> {
 }
 
 @extension
+@undocumented
 interface MooreFunctorInstance<V> : Functor<MoorePartialOf<V>> {
   override fun <A, B> Kind<MoorePartialOf<V>, A>.map(f: (A) -> B): Moore<V, B> =
       fix().map(f)

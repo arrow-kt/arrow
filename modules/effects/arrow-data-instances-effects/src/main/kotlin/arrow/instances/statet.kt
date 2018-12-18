@@ -34,7 +34,7 @@ interface StateTBracketInstance<F, S> : Bracket<StateTPartialOf<F, S>, Throwable
                   ref.set(Some(s2))
                 }
               }
-            else -> release(a, exitCase).runM(this, s0).void()
+            else -> release(a, exitCase).runM(this, s0).unit()
           }
         }).flatMap { (s, b) -> ref.get.map { it.getOrElse { s } }.tupleRight(b) }
       }

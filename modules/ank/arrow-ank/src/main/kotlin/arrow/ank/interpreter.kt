@@ -59,13 +59,17 @@ data class Snippet(
   val result: Option<String> = None,
   val isSilent: Boolean = fence.contains(AnkSilentBlock),
   val isReplace: Boolean = fence.contains(AnkReplaceBlock),
-  val isOutFile: Boolean = fence.contains(AnkOutFileBlock)
+  val isOutFile: Boolean = fence.contains(AnkOutFileBlock),
+  val isPlayground: Boolean = fence.contains(AnkPlayground),
+  val isPlaygroundExtension: Boolean = fence.contains(AnkPlaygroundExtension)
 )
 
 const val AnkBlock = ":ank"
 const val AnkSilentBlock = ":ank:silent"
 const val AnkReplaceBlock = ":ank:replace"
 const val AnkOutFileBlock = ":ank:outFile"
+const val AnkPlayground = ":ank:playground"
+const val AnkPlaygroundExtension = ":ank:playground:extension"
 
 val ankMacroRegex: Regex = "ank_macro_hierarchy\\((.*?)\\)".toRegex()
 
@@ -73,6 +77,12 @@ fun <F> monadDeferInterpreter(MF: MonadDefer<F>): AnkOps<F> = object : AnkOps<F>
   override fun MF(): MonadDefer<F> = MF
 
   override fun printConsole(msg: String): Kind<F, Unit> = MF.delay { println(msg) }
+
+  override fun Path.containsAnkSnippets(): Kind<F, Boolean> = MF.delay {
+    toFile().useLines { line ->
+      line.find { it.contains(AnkBlock) } != null
+    }
+  }
 
   override fun createTargetDirectory(source: Path, target: Path): Kind<F, Path> = MF.delay {
     source.toFile().copyRecursively(target.toFile(), overwrite = true); target
@@ -132,7 +142,8 @@ fun <F> monadDeferInterpreter(MF: MonadDefer<F>): AnkOps<F> = object : AnkOps<F>
       snippets.b.all.mapIndexed { i, snip ->
         binding {
           Try {
-            engineCache.getOrElse(snip.lang) {
+            if (snip.isPlaygroundExtension) ""
+            else engineCache.getOrElse(snip.lang) {
               throw CompilationException(
                 path = snippets.a,
                 snippet = snip,
@@ -162,6 +173,7 @@ fun <F> monadDeferInterpreter(MF: MonadDefer<F>): AnkOps<F> = object : AnkOps<F>
                 when {
                   // replace entire snippet with result
                   snip.isReplace -> Some("$it")
+                  snip.isPlaygroundExtension -> Some("$it")
                   // write result to a new file
                   snip.isOutFile -> delay {
                     val fileName = snip.fence.lines()[0].substringAfter("(").substringBefore(")")
@@ -184,9 +196,14 @@ fun <F> monadDeferInterpreter(MF: MonadDefer<F>): AnkOps<F> = object : AnkOps<F>
   override fun replaceAnkToLang(content: String, compiledSnippets: Nel<Snippet>): String =
     compiledSnippets.foldLeft(content) { content, snippet ->
       snippet.result.fold(
-        { content.replace(snippet.fence, "```${snippet.lang}\n" + snippet.code + "\n```") },
+        { content.replace(snippet.fence, "{: data-executable='true'}\n\n```${snippet.lang}\n${snippet.code}\n```") },
         {
           when {
+            // these are extensions declared in type classes that should be removed since the extension generator
+            // processor is the one in charge of projecting those examples in the generated markdown files
+            snippet.isPlaygroundExtension -> content.replace(snippet.fence, it)
+            // a regular playground
+            snippet.isPlayground -> content.replace(snippet.fence, "{: data-executable='true'}\n\n```${snippet.lang}\n${snippet.code}\n$it\n```")
             snippet.isReplace -> content.replace(snippet.fence, it)
             snippet.isOutFile -> content.replace(snippet.fence, "")
             else -> content.replace(snippet.fence, "```${snippet.lang}\n" + snippet.code + "\n" + it + "\n```")

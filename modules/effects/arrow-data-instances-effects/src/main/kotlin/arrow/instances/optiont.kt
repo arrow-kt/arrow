@@ -31,7 +31,7 @@ interface OptionTBracketInstance<F> : Bracket<OptionTPartialOf<F>, Throwable>, O
               is ExitCase.Completed -> release(a, exitCase).value().flatMap {
                 it.fold({ ref.set(true) }, { just(Unit) })
               }
-              else -> release(a, exitCase).value().void()
+              else -> release(a, exitCase).value().unit()
             }
           }
         )
