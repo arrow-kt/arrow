@@ -4,7 +4,7 @@ Arrow documentation deployed to the website.
 
 ## How to contribute
 
-In case you need to add a new docs section, you should go like this:
+We prefer Kdocs only for documenting data types or type classes. Only use tutorial style markdown docs for patterns or tutorials. In case you need to add a new docs section, you should go like this:
 
 ### 1. Add a menu entry to your docs
 
