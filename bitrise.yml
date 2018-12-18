@@ -36,9 +36,6 @@ workflows:
             #!/usr/bin/env bash
             set -ex
             ./gradlew build dokka :arrow-docs:runAnk
-            ./gradlew codeCoverageReport
-            bash <(curl -s https://codecov.io/bash)
-            ./deploy-scripts/deploy.sh
             bundle install --gemfile modules/docs/arrow-docs/Gemfile --path vendor/bundle
             export BUNDLE_GEMFILE=modules/docs/arrow-docs/Gemfile
             bundle exec jekyll build -s modules/docs/arrow-docs/build/site -d modules/docs/arrow-docs/build/_site
