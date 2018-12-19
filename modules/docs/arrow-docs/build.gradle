@@ -17,6 +17,7 @@ dependencies {
     compile project(':arrow-effects-reactor-instances')
     compile project(':arrow-effects-kotlinx-coroutines-instances')
     compile project(':arrow-optics')
+    compile project(':arrow-validation')
     compile project(':arrow-instances-recursion')
     compile project(':arrow-integrations-retrofit-adapter')
     compile project(':arrow-mtl')
