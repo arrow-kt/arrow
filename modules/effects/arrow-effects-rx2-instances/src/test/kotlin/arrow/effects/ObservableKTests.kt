@@ -3,6 +3,7 @@ package arrow.effects
 import arrow.effects.observablek.async.async
 import arrow.effects.observablek.foldable.foldable
 import arrow.effects.observablek.functor.functor
+import arrow.effects.observablek.monad.flatMap
 import arrow.effects.observablek.monadThrow.bindingCatch
 import arrow.effects.observablek.traverse.traverse
 import arrow.effects.typeclasses.ExitCase
@@ -10,9 +11,11 @@ import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
 import arrow.test.laws.FoldableLaws
 import arrow.test.laws.TraverseLaws
+import arrow.test.laws.equalUnderTheLaw
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.Spec
+import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import io.reactivex.Observable
 import io.reactivex.observers.TestObserver
@@ -23,7 +26,7 @@ import org.junit.runner.RunWith
 import java.util.concurrent.TimeUnit
 
 @RunWith(KTestJUnitRunner::class)
-class ObservableKTest : UnitSpec() {
+class ObservableKTests : UnitSpec() {
 
   fun <T> EQ(): Eq<ObservableKOf<T>> = object : Eq<ObservableKOf<T>> {
     override fun ObservableKOf<T>.eqv(b: ObservableKOf<T>): Boolean =
@@ -125,5 +128,43 @@ class ObservableKTest : UnitSpec() {
       observable.test().await(5, TimeUnit.SECONDS)
       assertThat(ec, `is`(ExitCase.Cancelled as ExitCase<Throwable>))
     }
+
+    "ObservableK should cancel KindConnection on dispose" {
+      Promise.uncancelable<ForObservableK, Unit>(ObservableK.async()).flatMap { latch ->
+        ObservableK {
+          ObservableK.async<Unit> { conn, _ ->
+            conn.push(latch.complete(Unit))
+          }.observable.subscribe().dispose()
+        }.flatMap { latch.get }
+      }.value()
+        .test()
+        .assertValue(Unit)
+        .awaitTerminalEvent(100, TimeUnit.MILLISECONDS)
+    }
+
+    "ObservableK async should be cancellable" {
+      Promise.uncancelable<ForObservableK, Unit>(ObservableK.async())
+        .flatMap { latch ->
+          ObservableK {
+            ObservableK.async<Unit> { _, _ -> }
+              .value()
+              .doOnDispose { latch.complete(Unit).value().subscribe() }
+              .subscribe()
+              .dispose()
+          }.flatMap { latch.get }
+        }.observable
+        .test()
+        .assertValue(Unit)
+        .awaitTerminalEvent(100, TimeUnit.MILLISECONDS)
+    }
+
+    "KindConnection can cancel upstream" {
+      ObservableK.async<Unit> { connection, _ ->
+        connection.cancel().value().subscribe()
+      }.observable
+        .test()
+        .assertError(ConnectionCancellationException)
+    }
+
   }
 }

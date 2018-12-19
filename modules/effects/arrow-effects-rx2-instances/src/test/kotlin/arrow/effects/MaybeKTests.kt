@@ -10,6 +10,7 @@ import arrow.effects.maybek.monad.monad
 import arrow.effects.maybek.monadDefer.monadDefer
 import arrow.effects.maybek.monadError.monadError
 import arrow.effects.maybek.monadThrow.bindingCatch
+import arrow.effects.maybek.monad.flatMap
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
@@ -124,5 +125,43 @@ class MaybeKTests : UnitSpec() {
       val foldedToSome = maybe.fold({ false }, { true })
       foldedToSome shouldBe true
     }
+
+    "MaybeK should cancel KindConnection on dispose" {
+      Promise.uncancelable<ForMaybeK, Unit>(MaybeK.async()).flatMap { latch ->
+        MaybeK {
+          MaybeK.async<Unit> { conn, _ ->
+            conn.push(latch.complete(Unit))
+          }.maybe.subscribe().dispose()
+        }.flatMap { latch.get }
+      }.value()
+        .test()
+        .assertValue(Unit)
+        .awaitTerminalEvent(100, TimeUnit.MILLISECONDS)
+    }
+
+    "MaybeK async should be cancellable" {
+      Promise.uncancelable<ForMaybeK, Unit>(MaybeK.async())
+        .flatMap { latch ->
+          MaybeK {
+            MaybeK.async<Unit> { _, _ -> }
+              .value()
+              .doOnDispose { latch.complete(Unit).value().subscribe() }
+              .subscribe()
+              .dispose()
+          }.flatMap { latch.get }
+        }.value()
+        .test()
+        .assertValue(Unit)
+        .awaitTerminalEvent(100, TimeUnit.MILLISECONDS)
+    }
+
+    "KindConnection can cancel upstream" {
+      MaybeK.async<Unit> { connection, _ ->
+        connection.cancel().value().subscribe()
+      }.value()
+        .test()
+        .assertError(ConnectionCancellationException)
+    }
+
   }
 }

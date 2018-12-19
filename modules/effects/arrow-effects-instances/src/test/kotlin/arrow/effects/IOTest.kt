@@ -2,7 +2,6 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.core.*
-import arrow.effects.data.internal.IOCancellationException
 import arrow.effects.instances.io.async.async
 import arrow.effects.instances.io.monad.binding
 import arrow.effects.instances.io.monad.monad
@@ -350,7 +349,7 @@ class IOTest : UnitSpec() {
             }
         IO(newSingleThreadContext("CancelThread")) { }
           .unsafeRunAsync { cancel() }
-      }.unsafeRunTimed(2.seconds) shouldBe Some(IOCancellationException)
+      }.unsafeRunTimed(2.seconds) shouldBe Some(ConnectionCancellationException)
     }
 
     "unsafeRunAsyncCancellable can cancel even for infinite asyncs" {

@@ -5,6 +5,7 @@ import arrow.effects.singlek.applicativeError.applicativeError
 import arrow.effects.singlek.async.async
 import arrow.effects.singlek.effect.effect
 import arrow.effects.singlek.functor.functor
+import arrow.effects.singlek.monad.flatMap
 import arrow.effects.singlek.monad.monad
 import arrow.effects.singlek.monadError.monadError
 import arrow.effects.singlek.monadThrow.bindingCatch
@@ -107,5 +108,43 @@ class SingleKTests : UnitSpec() {
       test.awaitTerminalEvent(5, TimeUnit.SECONDS)
       test.assertNotTerminated().assertNotComplete().assertNoErrors().assertNoValues()
     }
+
+    "SingleK should cancel KindConnection on dispose" {
+      Promise.uncancelable<ForSingleK, Unit>(SingleK.async()).flatMap { latch ->
+        SingleK {
+          SingleK.async<Unit> { conn, _ ->
+            conn.push(latch.complete(Unit))
+          }.single.subscribe().dispose()
+        }.flatMap { latch.get }
+      }.value()
+        .test()
+        .assertValue(Unit)
+        .awaitTerminalEvent(100, TimeUnit.MILLISECONDS)
+    }
+
+    "SingleK async should be cancellable" {
+      Promise.uncancelable<ForSingleK, Unit>(SingleK.async())
+        .flatMap { latch ->
+          SingleK {
+            SingleK.async<Unit> { _, _ -> }
+              .value()
+              .doOnDispose { latch.complete(Unit).value().subscribe() }
+              .subscribe()
+              .dispose()
+          }.flatMap { latch.get }
+        }.value()
+        .test()
+        .assertValue(Unit)
+        .awaitTerminalEvent(100, TimeUnit.MILLISECONDS)
+    }
+
+    "KindConnection can cancel upstream" {
+      SingleK.async<Unit> { connection, _ ->
+        connection.cancel().value().subscribe()
+      }.value()
+        .test()
+        .assertError(ConnectionCancellationException)
+    }
+
   }
 }

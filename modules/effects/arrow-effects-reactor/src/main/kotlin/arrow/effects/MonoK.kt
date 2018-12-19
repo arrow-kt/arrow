@@ -6,10 +6,9 @@ import arrow.core.Either.Right
 import arrow.effects.CoroutineContextReactorScheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
-import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import reactor.core.publisher.Mono
-import reactor.core.publisher.MonoSink
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.CoroutineContext
 
 fun <A> Mono<A>.k(): MonoK<A> = MonoK(this)
@@ -75,13 +74,50 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
     fun <A> defer(fa: () -> MonoKOf<A>): MonoK<A> =
       Mono.defer { fa().value() }.k()
 
-    fun <A> async(fa: Proc<A>): MonoK<A> =
-      Mono.create { emitter: MonoSink<A> ->
-        fa { either: Either<Throwable, A> ->
+    /**
+     * Creates a [MonoK] that'll run [MonoKProc].
+     *
+     * {: data-executable='true'}
+     *
+     * ```kotlin:ank
+     * import arrow.core.Either
+     * import arrow.core.right
+     * import arrow.effects.MonoK
+     * import arrow.effects.MonoKConnection
+     * import arrow.effects.value
+     *
+     * class Resource {
+     *   fun asyncRead(f: (String) -> Unit): Unit = f("Some value of a resource")
+     *   fun close(): Unit = Unit
+     * }
+     *
+     * fun main(args: Array<String>) {
+     *   //sampleStart
+     *   val result = MonoK.async { conn: MonoKConnection, cb: (Either<Throwable, String>) -> Unit ->
+     *     val resource = Resource()
+     *     conn.push(MonoK { resource.close() })
+     *     resource.asyncRead { value -> cb(value.right()) }
+     *   }
+     *   //sampleEnd
+     *   result.value().subscribe(::println)
+     * }
+     * ```
+     */
+    fun <A> async(fa: MonoKProc<A>): MonoK<A> =
+      Mono.create<A> { sink ->
+        val conn = MonoKConnection()
+        val isCancelled = AtomicBoolean(false) //Sink is missing isCancelled so we have to do book keeping.
+        conn.push(MonoK { if (!isCancelled.get()) sink.error(ConnectionCancellationException) })
+        sink.onCancel {
+          isCancelled.compareAndSet(false, true)
+          conn.cancel().value().subscribe()
+        }
+
+        fa(conn) { either: Either<Throwable, A> ->
           either.fold({
-            emitter.error(it)
+            sink.error(it)
           }, {
-            emitter.success(it)
+            sink.success(it)
           })
         }
       }.k()

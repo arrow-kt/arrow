@@ -5,6 +5,7 @@ import arrow.effects.flowablek.foldable.foldable
 import arrow.effects.flowablek.functor.functor
 import arrow.effects.flowablek.monadThrow.bindingCatch
 import arrow.effects.flowablek.traverse.traverse
+import arrow.effects.flowablek.monad.flatMap
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
@@ -147,5 +148,43 @@ class FlowableKTests : UnitSpec() {
       flowable.test().await(5, TimeUnit.SECONDS)
       assertThat(ec, `is`(ExitCase.Cancelled as ExitCase<Throwable>))
     }
+
+    "FlowableK should cancel KindConnection on dispose" {
+      Promise.uncancelable<ForFlowableK, Unit>(FlowableK.async()).flatMap { latch ->
+        FlowableK {
+          FlowableK.async<Unit>(fa = { conn, _ ->
+            conn.push(latch.complete(Unit))
+          }).flowable.subscribe().dispose()
+        }.flatMap { latch.get }
+      }.value()
+        .test()
+        .assertValue(Unit)
+        .awaitTerminalEvent(100, TimeUnit.MILLISECONDS)
+    }
+
+    "FlowableK async should be cancellable" {
+      Promise.uncancelable<ForFlowableK, Unit>(FlowableK.async())
+        .flatMap { latch ->
+          FlowableK {
+            FlowableK.async<Unit>(fa = { _, _ -> })
+              .value()
+              .doOnCancel { latch.complete(Unit).value().subscribe() }
+              .subscribe()
+              .dispose()
+          }.flatMap { latch.get }
+        }.value()
+        .test()
+        .assertValue(Unit)
+        .awaitTerminalEvent(100, TimeUnit.MILLISECONDS)
+    }
+
+    "KindConnection can cancel upstream" {
+      FlowableK.async<Unit>(fa = { connection, _ ->
+        connection.cancel().value().subscribe()
+      }).value()
+        .test()
+        .assertError(ConnectionCancellationException)
+    }
+
   }
 }
