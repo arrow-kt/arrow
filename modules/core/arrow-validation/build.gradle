@@ -1,5 +1,6 @@
 dependencies {
     compile project(':arrow-data')
+    compile project(':arrow-instances-data')
 
     kapt project(':arrow-annotations-processor')
     kaptTest project(':arrow-annotations-processor')
