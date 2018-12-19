@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.*
 import arrow.effects.instances.io.async.async
 import arrow.effects.instances.io.monad.binding
+import arrow.effects.instances.io.monad.flatMap
 import arrow.effects.instances.io.monad.monad
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.milliseconds
@@ -15,9 +16,12 @@ import arrow.test.laws.AsyncLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
+import io.kotlintest.matchers.should
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldEqual
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.newSingleThreadContext
+import kotlinx.coroutines.runBlocking
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -391,6 +395,26 @@ class IOTest : UnitSpec() {
 
       countDownLatch.await(2, TimeUnit.SECONDS)
       ec shouldBe ExitCase.Cancelled
+    }
+
+    "IO should cancel KindConnection on dispose" {
+        Promise.uncancelable<ForIO, Unit>(IO.async()).flatMap { latch ->
+          IO {
+            IO.async<Unit> { conn, _ ->
+              conn.push(latch.complete(Unit))
+            }.unsafeRunAsyncCancellable { cb -> Unit }
+              .invoke()
+          }.flatMap { latch.get }
+        }.unsafeRunSync()
+    }
+
+    "KindConnection can cancel upstream" {
+      Try {
+        IO.async<Unit> { conn, _ ->
+          conn.cancel().fix().unsafeRunAsync { }
+        }.unsafeRunSync()
+      }.fold({ e -> e should { it is arrow.effects.ConnectionCancellationException } },
+        { throw AssertionError("Expected exception of type arrow.effects.ConnectionCancellationException but caught no exception") })
     }
 
   }

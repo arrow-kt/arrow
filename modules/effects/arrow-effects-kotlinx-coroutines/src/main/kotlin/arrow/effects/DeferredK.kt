@@ -7,6 +7,9 @@ import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.MonadDefer
 import arrow.higherkind
 import kotlinx.coroutines.*
+import kotlinx.coroutines.selects.SelectClause0
+import kotlinx.coroutines.selects.SelectClause1
+import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -98,7 +101,7 @@ fun <A> CoroutineScope.asyncK(ctx: CoroutineContext = Dispatchers.Default, start
  * }
  * ```
  */
-fun <A> DeferredKOf<A>.value(): Deferred<A> = this.fix().memoized
+fun <A> DeferredKOf<A>.value(): Deferred<A> = this.fix().value()
 
 /**
  * Returns the [CoroutineScope] the [DeferredK] operates on
@@ -131,13 +134,17 @@ fun <A> DeferredKOf<A>.scope(): CoroutineScope = this.fix().scope
 @higherkind
 sealed class DeferredK<A>(
   internal val scope: CoroutineScope = GlobalScope,
-  internal val memoized: Deferred<A>
+  protected var memoized: Deferred<A>
 ) : DeferredKOf<A>, Deferred<A> by memoized {
+
+  abstract fun value(): Deferred<A>
 
   /**
    * Pure wrapper for already constructed [Deferred] instances. Created solely by `Deferred.k()` extension method
    */
-  internal class Wrapped<A>(scope: CoroutineScope = GlobalScope, memoized: Deferred<A>) : DeferredK<A>(scope, memoized)
+  internal class Wrapped<A>(scope: CoroutineScope = GlobalScope, memoized: Deferred<A>) : DeferredK<A>(scope, memoized) {
+    override fun value(): Deferred<A> = memoized
+  }
 
   /**
    * Represents a [DeferredK] that can generate an instance of [Deferred] on every await
@@ -157,12 +164,20 @@ sealed class DeferredK<A>(
     /**
      * Returns either the memoized [Deferred] if it has not been run yet. Or creates a new one.
      */
-    override suspend fun await(): A =
-      if (memoized.isCompleted || memoized.isActive || memoized.isCancelled) {
-        scope.async(ctx, coroutineStart) { generator() }.await()
-      } else {
-        memoized.await()
+    override suspend fun await(): A = value().await()
+
+    override fun start(): Boolean = value().start()
+
+    override fun value(): Deferred<A> {
+      if (isCompleted || isActive || isCancelled) {
+        memoized = scope.async(ctx, coroutineStart) {
+          generator()
+        }
       }
+
+      return memoized
+    }
+
   }
 
   /**
@@ -301,10 +316,10 @@ sealed class DeferredK<A>(
   fun <B> bracketCase(use: (A) -> DeferredKOf<B>, release: (A, ExitCase<Throwable>) -> DeferredKOf<Unit>): DeferredK<B> =
     when (this) {
       is Generated -> DeferredK.Generated(ctx, coroutineStart, scope) {
-        scope.async(ctx, coroutineStart) { generator() }.bracketCase(use, release)
+        value().bracketCase(use, release)
       }
       is Wrapped -> Generated(Dispatchers.Unconfined, CoroutineStart.LAZY, scope) {
-        memoized.bracketCase(use, release)
+        value().bracketCase(use, release)
       }
     }
 
@@ -549,6 +564,53 @@ sealed class DeferredK<A>(
         }
       }
   }
+
+  override val children: Sequence<Job>
+    get() = memoized.children
+  override val isActive: Boolean
+    get() = memoized.isActive
+  override val isCancelled: Boolean
+    get() = memoized.isCancelled
+  override val isCompleted: Boolean
+    get() = memoized.isCompleted
+  override val key: CoroutineContext.Key<*>
+    get() = memoized.key
+  override val onAwait: SelectClause1<A>
+    get() = memoized.onAwait
+  override val onJoin: SelectClause0
+    get() = memoized.onJoin
+
+  override suspend fun await(): A =
+    memoized.await()
+
+  override fun cancel() =
+    memoized.cancel()
+
+  @ObsoleteCoroutinesApi override fun cancel(cause: Throwable?): Boolean =
+    memoized.cancel(cause)
+
+  @InternalCoroutinesApi override fun getCancellationException(): CancellationException =
+    memoized.getCancellationException()
+
+  @ExperimentalCoroutinesApi override fun getCompleted(): A =
+    memoized.getCompleted()
+
+  @ExperimentalCoroutinesApi override fun getCompletionExceptionOrNull(): Throwable? =
+    memoized.getCompletionExceptionOrNull()
+
+  @InternalCoroutinesApi
+  override fun invokeOnCompletion(onCancelling: Boolean, invokeImmediately: Boolean, handler: CompletionHandler): DisposableHandle =
+    memoized.invokeOnCompletion(onCancelling, invokeImmediately, handler)
+
+  override fun invokeOnCompletion(handler: CompletionHandler): DisposableHandle =
+    memoized.invokeOnCompletion(handler)
+
+  override suspend fun join() =
+    memoized.join()
+
+  override fun start(): Boolean =
+    memoized.start()
+
 }
 
 /**
@@ -577,7 +639,11 @@ sealed class DeferredK<A>(
  */
 fun <A> DeferredKOf<A>.handleErrorWith(f: (Throwable) -> DeferredK<A>): DeferredK<A> =
   DeferredK.Generated(Dispatchers.Unconfined, CoroutineStart.LAZY) {
-    Try { await() }.fold({ f(it).await() }, ::identity)
+    try {
+      await()
+    } catch (e: Throwable) {
+      f(e).await()
+    }
   }
 
 /**
@@ -733,4 +799,4 @@ private fun Deferred<*>.forceExceptionPropagation(): Unit =
     if (a != null) throw a
   }.let { }
 
-suspend fun <A> DeferredKOf<A>.await(): A = this.fix().await()
+suspend fun <A> DeferredKOf<A>.await(): A = value().await()
