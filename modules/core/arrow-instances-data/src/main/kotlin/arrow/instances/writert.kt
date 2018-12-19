@@ -7,8 +7,10 @@ import arrow.data.*
 import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.typeclasses.*
+import arrow.undocumented
 
 @extension
+@undocumented
 interface WriterTFunctorInstance<F, W> : Functor<WriterTPartialOf<F, W>> {
   fun FF(): Functor<F>
 
@@ -16,6 +18,7 @@ interface WriterTFunctorInstance<F, W> : Functor<WriterTPartialOf<F, W>> {
 }
 
 @extension
+@undocumented
 interface WriterTApplicativeInstance<F, W> : Applicative<WriterTPartialOf<F, W>>, WriterTFunctorInstance<F, W> {
 
   fun AF(): Applicative<F>
@@ -35,6 +38,7 @@ interface WriterTApplicativeInstance<F, W> : Applicative<WriterTPartialOf<F, W>>
 }
 
 @extension
+@undocumented
 interface WriterTMonadInstance<F, W> : Monad<WriterTPartialOf<F, W>>, WriterTApplicativeInstance<F, W> {
 
   fun MF(): Monad<F>

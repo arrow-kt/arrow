@@ -5,11 +5,25 @@ import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Tuple2
 import arrow.core.identity
+import arrow.documented
 import kotlin.coroutines.startCoroutine
 
 /**
  * ank_macro_hierarchy(arrow.typeclasses.Monad)
+ *
+ * [Monad] abstract over the ability to declare sequential computations that are dependent in the order or
+ * the results of previous computations.
+ *
+ * Given a type constructor [F] with a value of [A] we can compose multiple operations of type
+ * `Kind<F, ?>` where `?` denotes a value being transformed.
+ *
+ * This is true for all type constructors that can support the [Monad] type class including and not limited to
+ * [IO], [DeferredK], [ObservableK], [Option], [Either], [List], [Try] ...
+ *
+ * [The Monad Tutorial](https://arrow-kt.io/docs/patterns/monads/)
+ *
  */
+@documented
 interface Monad<F> : Applicative<F> {
 
   fun <A, B> Kind<F, A>.flatMap(f: (A) -> Kind<F, B>): Kind<F, B>
@@ -19,6 +33,9 @@ interface Monad<F> : Applicative<F> {
   override fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B> =
     flatMap { a -> just(f(a)) }
 
+  /**
+   * @see [Applicative.ap]
+   */
   override fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B> =
     ff.flatMap { f -> this.map(f) }
 
