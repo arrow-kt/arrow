@@ -81,12 +81,12 @@ interface Fold<S, A> : FoldOf<S, A> {
   /**
    * Get the first target
    */
-  fun headOption(s: S): Option<A> = foldMap(firstOptionMonoid<A>(), s) { b -> Const(Some(b)) }.value
+  fun headOption(s: S): Option<A> = foldMap(firstOptionMonoid<A>(), s) { b -> Const(Some(b)) }.value()
 
   /**
    * Get the last target
    */
-  fun lastOption(s: S): Option<A> = foldMap(lastOptionMonoid<A>(), s) { b -> Const(Some(b)) }.value
+  fun lastOption(s: S): Option<A> = foldMap(lastOptionMonoid<A>(), s) { b -> Const(Some(b)) }.value()
 
   /**
    * Fold using the given [Monoid] instance.
@@ -186,7 +186,7 @@ interface Fold<S, A> : FoldOf<S, A> {
    * Find the first element matching the predicate, if one exists.
    */
   fun find(s: S, p: (A) -> Boolean): Option<A> =
-    foldMap(firstOptionMonoid<A>(), s) { b -> (if (p(b)) Const(Some(b)) else Const(None)) }.value
+    foldMap(firstOptionMonoid<A>(), s) { b -> (if (p(b)) Const(Some(b)) else Const(None)) }.value()
 
   /**
    * Check whether at least one element satisfies the predicate.

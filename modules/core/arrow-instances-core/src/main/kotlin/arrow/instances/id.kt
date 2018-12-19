@@ -13,7 +13,7 @@ interface IdEqInstance<A> : Eq<Id<A>> {
   fun EQ(): Eq<A>
 
   override fun Id<A>.eqv(b: Id<A>): Boolean =
-    EQ().run { value.eqv(b.value) }
+    EQ().run { value().eqv(b.value()) }
 }
 
 @extension
@@ -132,7 +132,7 @@ interface IdHashInstance<A> : Hash<Id<A>>, IdEqInstance<A> {
 
   override fun EQ(): Eq<A> = HA()
 
-  override fun Id<A>.hash(): Int = HA().run { value.hash() }
+  override fun Id<A>.hash(): Int = HA().run { value().hash() }
 }
 
 object IdContext : IdBimonadInstance, IdTraverseInstance {

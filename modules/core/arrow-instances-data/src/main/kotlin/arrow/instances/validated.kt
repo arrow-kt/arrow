@@ -6,9 +6,11 @@ import arrow.data.*
 import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.typeclasses.*
+import arrow.undocumented
 import arrow.data.traverse as validatedTraverse
 
 @extension
+@undocumented
 interface ValidatedFunctorInstance<E> : Functor<ValidatedPartialOf<E>> {
   override fun <A, B> Kind<ValidatedPartialOf<E>, A>.map(f: (A) -> B): Validated<E, B> = fix().map(f)
 }

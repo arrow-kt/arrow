@@ -6,7 +6,7 @@ package arrow.typeclasses
  * A hash function is a mapping of arbitrary data ([F]) to an output set of fixed size ([Int]). The result, a hash value, is
  *  most commonly used in collections like HashTable as a lookup value
  *
- * @see <a href="http://arrow-kt.io/docs/typeclasses/hash/">Hash documentation</a>
+ * @see <a href="http://arrow-kt.io/docs/arrow/typeclasses/hash/">Hash documentation</a>
  */
 interface Hash<in F> : Eq<F> {
 

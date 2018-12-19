@@ -22,9 +22,9 @@ can be found for examples [in JavaScript](https://github.com/hemanth/functional-
 A datatype is a class that encapsulates one reusable coding pattern.
 These solutions have a canonical implementation that is generalised for all possible uses.
 
-Some common patterns expressed as datatypes are absence handling with [`Option`]({{ '/docs/datatypes/option' | relative_url }}),
-branching in code with [`Either`]({{ '/docs/datatypes/either' | relative_url }}),
-catching exceptions with [`Try`]({{ '/docs/datatypes/try' | relative_url }}),
+Some common patterns expressed as datatypes are absence handling with [`Option`]({{ '/docs/arrow/core/option' | relative_url }}),
+branching in code with [`Either`]({{ '/docs/arrow/core/either' | relative_url }}),
+catching exceptions with [`Try`]({{ '/docs/arrow/core/try' | relative_url }}),
 or interacting with the platform the program runs in using [`IO`]({{ '/docs/effects/io' | relative_url }}).
 
 Some of these patterns are implemented using a mix of `sealed` classes where each inheritor is a `data` class.
@@ -50,10 +50,10 @@ Typeclasses are interface abstractions that define a set of extension functions 
 These extension functions are canonical and consistent across languages and libraries;
 and they have inherent mathematical properties that are testable, such as commutativity or associativity.
 
-Examples of behaviours abstracted by typeclasses are: comparability ([`Eq`]({{ '/docs/typeclasses/eq' | relative_url }})),
-composability ([`Monoid`]({{ '/docs/typeclasses/monoid' | relative_url }})),
-its contents can be mapped from one type to another ([`Functor`]({{ '/docs/typeclasses/functor' | relative_url }})),
-or error recovery ([`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }})).
+Examples of behaviours abstracted by typeclasses are: comparability ([`Eq`]({{ '/docs/arrow/typeclasses/eq' | relative_url }})),
+composability ([`Monoid`]({{ '/docs/arrow/typeclasses/monoid' | relative_url }})),
+its contents can be mapped from one type to another ([`Functor`]({{ '/docs/arrow/typeclasses/functor' | relative_url }})),
+or error recovery ([`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }})).
 
 Typeclasses have two main uses:
 
@@ -231,12 +231,12 @@ fun <L> ForEither(): EitherContextPartiallyApplied<L> =
 > NOTE: This approach to type constructors will be simplified if [KEEP-87](https://github.com/Kotlin/KEEP/pull/87) is approved. Go vote!
 
 A type constructor is any class or interface that has at least one generic parameter. For example,
-[`ListK<A>`]({{ '/docs/datatypes/listk' | relative_url }}) or [`Option<A>`]({{ '/docs/datatypes/option' | relative_url }}).
+[`ListK<A>`]({{ '/docs/arrow/data/listk' | relative_url }}) or [`Option<A>`]({{ '/docs/arrow/core/option' | relative_url }}).
 They're called constructors because they're similar to a factory function where the parameter is `A`, except type constructors work only for types.
 So, we could say that after applying the parameter `Int` to the type constructor `ListK<A>` it returns a `ListK<Int>`.
 As `ListK<Int>` isn't parametrized in any generic value it is not considered a type constructor anymore, just a regular type.
 
-Like functions, a type constructor with several parameters like [`Either<L, R>`]({{ '/docs/datatypes/either' | relative_url }}) can be partially applied for one of them to return another type constructor with one fewer parameter.
+Like functions, a type constructor with several parameters like [`Either<L, R>`]({{ '/docs/arrow/core/either' | relative_url }}) can be partially applied for one of them to return another type constructor with one fewer parameter.
 For example, applying `Throwable` to the left side yields `Either<Throwable, A>`, or applying `String` to the right side results in `Either<E, String>`.
 
 Type constructors are useful when matched with typeclasses because they help us represent instances of parametrized classes — the containers — that work for all generic parameters — the content.
@@ -298,7 +298,7 @@ Note that the annotation `@higherkind` will also generate the integration typeal
 
 Now that we have a way of representing generic constructors for any type, we can write typeclasses that are parametrised for containers.
 
-Let's take as an example a typeclass that specifies how to map the contents of any container `F`. This typeclass that comes from computer science is called a [`Functor`]({{ '/docs/typeclasses/functor' | relative_url }}).
+Let's take as an example a typeclass that specifies how to map the contents of any container `F`. This typeclass that comes from computer science is called a [`Functor`]({{ '/docs/arrow/typeclasses/functor' | relative_url }}).
 
 ```kotlin
 interface Functor<F> {
@@ -352,7 +352,7 @@ return list.map(f)
 
 Higher kinds are also used to model functions that require for a datatype to implement a typeclass. This way you can create functions that abstract behavior (defined by a typeclass) and allow callers to define which datatype they'd like to apply it to.
 
-Let's use the typeclass [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}), that contains the constructor function `just()`.
+Let's use the typeclass [`Applicative`]({{ '/docs/arrow/typeclasses/applicative' | relative_url }}), that contains the constructor function `just()`.
 
 ```kotlin
 interface Applicative<F>: Functor<F> {
@@ -382,7 +382,7 @@ interface ListKApplicativeInstance : Applicative<ForListK> {
 }
 ```
 
-And now we can show how this function `randomUserStructure()` can be used for any datatype that implements [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}). As the function returns a value `Kind<F, User>` the caller is responsible of calling `fix()` to downcast it to the expected value.
+And now we can show how this function `randomUserStructure()` can be used for any datatype that implements [`Applicative`]({{ '/docs/arrow/typeclasses/applicative' | relative_url }}). As the function returns a value `Kind<F, User>` the caller is responsible of calling `fix()` to downcast it to the expected value.
 
 ```kotlin
 val list = ListK.applicative().randomUserStructure(::User).fix()
@@ -399,7 +399,7 @@ val either = Either.applicative<Unit>().randomUserStructure(::User).fix()
 //Right(User(221))
 ```
 
-Passing the instance in every function call seems like a burden. So, because `randomUserStructure` is an extension function for [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}) we can omit the implicit parameter as long as we are within the scope of an Applicative instance. You can use the standard functions `with` and `run` for this.
+Passing the instance in every function call seems like a burden. So, because `randomUserStructure` is an extension function for [`Applicative`]({{ '/docs/arrow/typeclasses/applicative' | relative_url }}) we can omit the implicit parameter as long as we are within the scope of an Applicative instance. You can use the standard functions `with` and `run` for this.
 
 ```kotlin
 with (ListK.applicative()) {

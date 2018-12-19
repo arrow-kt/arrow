@@ -31,7 +31,7 @@ fun TypeClass.dtMarkdownList(): String =
     supportedDataTypes()
       .asSequence()
       .filterNot { it.kclass == Box::class }
-      .groupBy { it.kclass.java.canonicalName.substringBeforeLast(".") }
+      .groupBy { it.kclass.java.`package`.name }
       .toSortedMap()
       .map { entry ->
         "|__${entry.key}__|" +
@@ -48,7 +48,7 @@ fun DataType.docsMarkdownLink(): String =
   kclass.docsMarkdownLink()
 
 fun <A : Any> KClass<A>.docsMarkdownLink(): String =
-  "[$simpleName]({{ '/docs/${qualifiedName?.toLowerCase()?.replace(".", "/")}' | relative_url }})"
+  "[$simpleName]({{ '/withDocs/${qualifiedName?.toLowerCase()?.replace(".", "/")}' | relative_url }})"
 
 fun TypeClass.hierarchyGraph(): String =
   """

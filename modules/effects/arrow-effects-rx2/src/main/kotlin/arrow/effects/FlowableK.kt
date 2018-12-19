@@ -116,7 +116,7 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
       }, mode).k()
 
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> FlowableKOf<Either<A, B>>): FlowableK<B> {
-      val either = f(a).fix().value().blockingFirst()
+      val either = f(a).value().blockingFirst()
       return when (either) {
         is Either.Left -> tailRecM(either.a, f)
         is Either.Right -> Flowable.just(either.b).k()

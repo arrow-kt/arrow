@@ -60,7 +60,7 @@ val liftF: (Player) -> OptionOf<Player> = playerLens.liftF(Option.functor()) { (
 liftF(player)
 ```
 
-There are also some convenience methods to make working with [Reader]({{ '/docs/datatypes/reader' | relative_url }}) easier.
+There are also some convenience methods to make working with [Reader]({{ '/docs/arrow/data/reader' | relative_url }}) easier.
 
 ```kotlin:ank
 import arrow.data.*
@@ -77,7 +77,7 @@ playerLens.asks(Int::inc)
   .runId(Player(50))
 ```
 
-There are also some convenience methods to make working with [State]({{ '/docs/datatypes/state' | relative_url }}) easier.
+There are also some convenience methods to make working with [State]({{ '/docs/arrow/data/state' | relative_url }}) easier.
 This can make working with nested structures in stateful computations significantly more elegant.
 
 ```kotlin:ank

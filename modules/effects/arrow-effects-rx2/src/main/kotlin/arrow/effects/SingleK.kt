@@ -87,7 +87,7 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
       }.k()
 
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> SingleKOf<Either<A, B>>): SingleK<B> {
-      val either = f(a).fix().value().blockingGet()
+      val either = f(a).value().blockingGet()
       return when (either) {
         is Either.Left -> tailRecM(either.a, f)
         is Either.Right -> Single.just(either.b).k()
