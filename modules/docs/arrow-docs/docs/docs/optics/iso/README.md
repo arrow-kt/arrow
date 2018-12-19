@@ -62,6 +62,7 @@ We can do the same with a Functor mapping
 
 ```kotlin:ank
 import arrow.data.*
+import arrow.instances.`try`.functor.*
 
 pointIsoTuple.modifyF(Try.functor(), point) {
     Try { (tuple.a / 2) toT (tuple.b / 2) }

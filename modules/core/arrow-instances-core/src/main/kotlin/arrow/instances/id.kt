@@ -2,32 +2,33 @@ package arrow.instances
 
 import arrow.Kind
 import arrow.core.*
-import arrow.instance
+import arrow.deprecation.ExtensionsDSLDeprecated
+import arrow.extension
 import arrow.typeclasses.*
 import arrow.instances.traverse as idTraverse
 
-@instance(Id::class)
+@extension
 interface IdEqInstance<A> : Eq<Id<A>> {
 
   fun EQ(): Eq<A>
 
   override fun Id<A>.eqv(b: Id<A>): Boolean =
-    EQ().run { value.eqv(b.value) }
+    EQ().run { value().eqv(b.value()) }
 }
 
-@instance(Id::class)
+@extension
 interface IdShowInstance<A> : Show<Id<A>> {
   override fun Id<A>.show(): String =
     toString()
 }
 
-@instance(Id::class)
+@extension
 interface IdFunctorInstance : Functor<ForId> {
   override fun <A, B> Kind<ForId, A>.map(f: (A) -> B): Id<B> =
     fix().map(f)
 }
 
-@instance(Id::class)
+@extension
 interface IdApplicativeInstance : Applicative<ForId> {
   override fun <A, B> Kind<ForId, A>.ap(ff: Kind<ForId, (A) -> B>): Id<B> =
     fix().ap(ff)
@@ -39,7 +40,7 @@ interface IdApplicativeInstance : Applicative<ForId> {
     Id.just(a)
 }
 
-@instance(Id::class)
+@extension
 interface IdMonadInstance : Monad<ForId> {
   override fun <A, B> Kind<ForId, A>.ap(ff: Kind<ForId, (A) -> B>): Id<B> =
     fix().ap(ff)
@@ -57,7 +58,7 @@ interface IdMonadInstance : Monad<ForId> {
     Id.just(a)
 }
 
-@instance(Id::class)
+@extension
 interface IdComonadInstance : Comonad<ForId> {
   override fun <A, B> Kind<ForId, A>.coflatMap(f: (Kind<ForId, A>) -> B): Id<B> =
     fix().coflatMap(f)
@@ -69,7 +70,7 @@ interface IdComonadInstance : Comonad<ForId> {
     fix().map(f)
 }
 
-@instance(Id::class)
+@extension
 interface IdBimonadInstance : Bimonad<ForId> {
   override fun <A, B> Kind<ForId, A>.ap(ff: Kind<ForId, (A) -> B>): Id<B> =
     fix().ap(ff)
@@ -93,7 +94,7 @@ interface IdBimonadInstance : Bimonad<ForId> {
     fix().extract()
 }
 
-@instance(Id::class)
+@extension
 interface IdFoldableInstance : Foldable<ForId> {
   override fun <A, B> Kind<ForId, A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
@@ -109,7 +110,7 @@ fun <A, G, B> IdOf<A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G
 fun <A, G> IdOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, Id<A>> =
   idTraverse(GA, ::identity)
 
-@instance(Id::class)
+@extension
 interface IdTraverseInstance : Traverse<ForId> {
   override fun <A, B> Kind<ForId, A>.map(f: (A) -> B): Id<B> =
     fix().map(f)
@@ -124,10 +125,21 @@ interface IdTraverseInstance : Traverse<ForId> {
     fix().foldRight(lb, f)
 }
 
+@extension
+interface IdHashInstance<A> : Hash<Id<A>>, IdEqInstance<A> {
+
+  fun HA(): Hash<A>
+
+  override fun EQ(): Eq<A> = HA()
+
+  override fun Id<A>.hash(): Int = HA().run { value().hash() }
+}
+
 object IdContext : IdBimonadInstance, IdTraverseInstance {
   override fun <A, B> Kind<ForId, A>.map(f: (A) -> B): Id<B> =
     fix().map(f)
 }
 
+@Deprecated(ExtensionsDSLDeprecated)
 infix fun <L> ForId.Companion.extensions(f: IdContext.() -> L): L =
   f(IdContext)

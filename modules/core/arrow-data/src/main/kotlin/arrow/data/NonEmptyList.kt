@@ -48,7 +48,7 @@ class NonEmptyList<out A> private constructor(
     f(fix().head).map2Eval(Eval.always {
       tail.k().traverse(AG, f)
     }) {
-      NonEmptyList(it.a, it.b.fix().list)
+      NonEmptyList(it.a, it.b.fix())
     }.value()
   }
 
@@ -79,8 +79,6 @@ class NonEmptyList<out A> private constructor(
 
     return true
   }
-
-  fun show(): String = all.joinToString()
 
   override fun hashCode(): Int = all.hashCode()
 
@@ -124,7 +122,7 @@ class NonEmptyList<out A> private constructor(
 
 fun <A> A.nel(): NonEmptyList<A> = NonEmptyList.of(this)
 
-inline fun <A, G> NonEmptyListOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, NonEmptyList<A>> =
+fun <A, G> NonEmptyListOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, NonEmptyList<A>> =
   fix().traverse(GA, ::identity)
 
 fun <A> NonEmptyListOf<A>.combineK(y: NonEmptyListOf<A>): NonEmptyList<A> = fix().plus(y.fix())

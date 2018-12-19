@@ -1,10 +1,10 @@
 package arrow.effects
 
+import arrow.core.Continuation
 import reactor.core.Disposable
 import reactor.core.scheduler.Scheduler
-import kotlin.coroutines.experimental.Continuation
-import kotlin.coroutines.experimental.CoroutineContext
-import kotlin.coroutines.experimental.startCoroutine
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.startCoroutine
 
 object CoroutineContextReactorScheduler {
   private interface NonCancellableContinuation : Continuation<Unit>, Disposable

@@ -8,7 +8,7 @@ import io.kotlintest.properties.forAll
 
 object MonadStateLaws {
 
-  inline fun <F> laws(M: MonadState<F, Int>, EQ: Eq<Kind<F, Int>>, EQUnit: Eq<Kind<F, Unit>>): List<Law> =
+  fun <F> laws(M: MonadState<F, Int>, EQ: Eq<Kind<F, Int>>, EQUnit: Eq<Kind<F, Unit>>): List<Law> =
     MonadLaws.laws(M, EQ) + listOf(
       Law("Monad State Laws: idempotence") { M.monadStateGetIdempotent(EQ) },
       Law("Monad State Laws: set twice eq to set once the last element") { M.monadStateSetTwice(EQUnit) },

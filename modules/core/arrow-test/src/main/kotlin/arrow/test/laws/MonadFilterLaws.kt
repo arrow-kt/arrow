@@ -2,7 +2,6 @@ package arrow.test.laws
 
 import arrow.Kind
 import arrow.mtl.typeclasses.MonadFilter
-import arrow.mtl.typeclasses.bindingFilter
 import arrow.test.generators.genApplicative
 import arrow.test.generators.genConstructor
 import arrow.test.generators.genFunctionAToB
@@ -12,7 +11,7 @@ import io.kotlintest.properties.forAll
 
 object MonadFilterLaws {
 
-  inline fun <F> laws(MF: MonadFilter<F>, noinline cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): List<Law> =
+  fun <F> laws(MF: MonadFilter<F>, cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): List<Law> =
     MonadLaws.laws(MF, EQ) + FunctorFilterLaws.laws(MF, cf, EQ) + listOf(
       Law("MonadFilter Laws: Left Empty") { MF.monadFilterLeftEmpty(EQ) },
       Law("MonadFilter Laws: Right Empty") { MF.monadFilterRightEmpty(EQ) },

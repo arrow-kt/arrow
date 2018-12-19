@@ -10,7 +10,7 @@ permalink: /docs/optics/fold/
 beginner
 
 A `Fold` is an optic that can see into a structure and get 0 to N foci.
-It is a generalisation of an instance of [`Foldable`](/docs/typeclasses/foldable).
+It is a generalisation of an instance of [`Foldable`](/docs/arrow/typeclasses/foldable).
 
 Creating a `Fold` can be done by manually defining `foldMap`.
 
@@ -29,6 +29,8 @@ fun <T> nullableFold(): Fold<T?, T> = object : Fold<T?, T> {
 Or you can get a `Fold` from any existing `Foldable`.
 
 ```kotlin:ank:silent
+import arrow.instances.nonemptylist.foldable.*
+
 val nonEmptyIntFold: Fold<NonEmptyListOf<Int>, Int> = Fold.fromFoldable(NonEmptyList.foldable())
 ```
 

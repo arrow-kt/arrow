@@ -5,13 +5,16 @@ import arrow.data.Day
 import arrow.data.DayOf
 import arrow.data.DayPartialOf
 import arrow.data.fix
-import arrow.instance
+import arrow.deprecation.ExtensionsDSLDeprecated
+import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Functor
+import arrow.undocumented
 
-@instance(Day::class)
-interface ComonadDayInstance<F, G> : Comonad<DayPartialOf<F, G>> {
+@extension
+@undocumented
+interface DayComonadInstance<F, G> : Comonad<DayPartialOf<F, G>> {
   fun CF(): Comonad<F>
 
   fun CG(): Comonad<G>
@@ -26,15 +29,17 @@ interface ComonadDayInstance<F, G> : Comonad<DayPartialOf<F, G>> {
     fix().mapLazy(f)
 }
 
-@instance(Day::class)
-interface FunctorDayInstance<F, G> : Functor<DayPartialOf<F, G>> {
+@extension
+@undocumented
+interface DayFunctorInstance<F, G> : Functor<DayPartialOf<F, G>> {
 
   override fun <A, B> DayOf<F, G, A>.map(f: (A) -> B): Day<F, G, B> =
     fix().mapLazy(f)
 }
 
-@instance(Day::class)
-interface ApplicativeDayInstance<F, G> : Applicative<DayPartialOf<F, G>> {
+@extension
+@undocumented
+interface DayApplicativeInstance<F, G> : Applicative<DayPartialOf<F, G>> {
   fun AF(): Applicative<F>
 
   fun AG(): Applicative<G>
@@ -49,7 +54,7 @@ interface ApplicativeDayInstance<F, G> : Applicative<DayPartialOf<F, G>> {
     fix().ap(AF(), AG(), ff)
 }
 
-class DayContext<F, G>(val AF: Applicative<F>, val AG: Applicative<G>, val CF: Comonad<F>, val CG: Comonad<G>) : ComonadDayInstance<F, G>, ApplicativeDayInstance<F, G> {
+class DayContext<F, G>(val AF: Applicative<F>, val AG: Applicative<G>, val CF: Comonad<F>, val CG: Comonad<G>) : DayComonadInstance<F, G>, DayApplicativeInstance<F, G> {
   override fun <A, B> DayOf<F, G, A>.map(f: (A) -> B): Day<F, G, B> =
     fix().mapLazy(f)
 
@@ -61,6 +66,7 @@ class DayContext<F, G>(val AF: Applicative<F>, val AG: Applicative<G>, val CF: C
 }
 
 class DayContextPartiallyApplied<F, G>(val AF: Applicative<F>, val AG: Applicative<G>, val CF: Comonad<F>, val CG: Comonad<G>) {
+  @Deprecated(ExtensionsDSLDeprecated)
   infix fun <A> extensions(f: DayContext<F, G>.() -> A): A =
     f(DayContext(AF, AG, CF, CG))
 }

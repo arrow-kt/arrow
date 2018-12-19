@@ -1,12 +1,14 @@
 package arrow.optics.instances
 
-import arrow.core.*
+import arrow.core.Option
+import arrow.core.Try
 import arrow.data.ListK
-import arrow.data.eq
-import arrow.optics.typeclasses.FilterIndex
+import arrow.instances.listk.eq.eq
+import arrow.instances.option.eq.eq
+import arrow.optics.instances.`try`.each.each
 import arrow.test.UnitSpec
-import arrow.test.generators.*
-import arrow.test.laws.OptionalLaws
+import arrow.test.generators.genFunctionAToB
+import arrow.test.generators.genTry
 import arrow.test.laws.TraversalLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner

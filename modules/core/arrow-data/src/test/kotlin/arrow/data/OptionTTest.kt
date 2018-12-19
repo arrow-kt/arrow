@@ -1,8 +1,24 @@
 package arrow.data
 
 import arrow.Kind
-import arrow.core.*
-import arrow.mtl.instances.ForOptionT
+import arrow.core.Either
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
+import arrow.effects.ForIO
+import arrow.effects.IO
+import arrow.effects.instances.io.applicativeError.attempt
+import arrow.effects.instances.io.async.async
+import arrow.effects.instances.optiont.async.async
+import arrow.instances.nonemptylist.monad.monad
+import arrow.instances.option.applicative.applicative
+import arrow.instances.option.monad.monad
+import arrow.instances.optiont.applicative.applicative
+import arrow.instances.optiont.monoidK.monoidK
+import arrow.instances.optiont.semigroupK.semigroupK
+import arrow.mtl.instances.option.traverseFilter.traverseFilter
+import arrow.mtl.instances.optiont.functorFilter.functorFilter
+import arrow.mtl.instances.optiont.traverseFilter.traverseFilter
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
@@ -22,38 +38,43 @@ class OptionTTest : UnitSpec() {
     a.value() == b.value()
   }
 
+  private fun IOEQ(): Eq<Kind<OptionTPartialOf<ForIO>, Int>> = Eq { a, b ->
+    a.value().attempt().unsafeRunSync() == b.value().attempt().unsafeRunSync()
+  }
+
+  private fun IOEitherEQ(): Eq<Kind<OptionTPartialOf<ForIO>, Either<Throwable, Int>>> = Eq { a, b ->
+    a.value().attempt().unsafeRunSync() == b.value().attempt().unsafeRunSync()
+  }
+
   val NELM: Monad<ForNonEmptyList> = NonEmptyList.monad()
 
   init {
 
-    ForOptionT(Option.monad(), Option.traverseFilter()) extensions {
+    testLaws(
+      AsyncLaws.laws(OptionT.async(IO.async()), IOEQ(), IOEitherEQ()),
 
-      testLaws(
-        MonadLaws.laws(this, Eq.any()),
-        SemigroupKLaws.laws(
-          this,
-          this,
-          EQ()),
+      SemigroupKLaws.laws(
+        OptionT.semigroupK(Option.monad()),
+        OptionT.applicative(Option.monad()),
+        EQ()),
 
-        MonoidKLaws.laws(
-          this,
-          this,
-          EQ()),
+      MonoidKLaws.laws(
+        OptionT.monoidK(Option.monad()),
+        OptionT.applicative(Option.monad()),
+        EQ()),
 
-        FunctorFilterLaws.laws(
-          this,
-          { OptionT(Some(Some(it))) },
-          EQ()),
+      FunctorFilterLaws.laws(
+        OptionT.functorFilter(Option.monad()),
+        { OptionT(Some(Some(it))) },
+        EQ()),
 
-        TraverseFilterLaws.laws(
-          this,
-          this,
-          { OptionT(Some(Some(it))) },
-          EQ(),
-          EQ_NESTED())
-      )
-
-    }
+      TraverseFilterLaws.laws(
+        OptionT.traverseFilter(Option.traverseFilter()),
+        OptionT.applicative(Option.monad()),
+        { OptionT(Some(Some(it))) },
+        EQ(),
+        EQ_NESTED())
+    )
 
     "toLeft for Some should build a correct EitherT" {
       forAll { a: Int, b: String ->
@@ -62,7 +83,7 @@ class OptionTTest : UnitSpec() {
     }
 
     "toLeft for None should build a correct EitherT" {
-      forAll { a: Int, b: String ->
+      forAll { b: String ->
         OptionT.fromOption<ForNonEmptyList, Int>(this.NELM, None).toLeft(this.NELM) { b } == EitherT.right<ForNonEmptyList, Int, String>(this.NELM, b)
       }
     }
@@ -74,7 +95,7 @@ class OptionTTest : UnitSpec() {
     }
 
     "toRight for None should build a correct EitherT" {
-      forAll { a: Int, b: String ->
+      forAll { a: Int ->
         OptionT.fromOption<ForNonEmptyList, String>(this.NELM, None).toRight(this.NELM) { a } == EitherT.left<ForNonEmptyList, Int, String>(this.NELM, a)
       }
     }

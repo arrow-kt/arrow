@@ -9,7 +9,7 @@ import io.kotlintest.properties.forAll
 
 object SetterLaws {
 
-  inline fun <A, B> laws(setter: Setter<A, B>, aGen: Gen<A>, bGen: Gen<B>, funcGen: Gen<(B) -> B>, EQA: Eq<A>) = listOf(
+  fun <A, B> laws(setter: Setter<A, B>, aGen: Gen<A>, bGen: Gen<B>, funcGen: Gen<(B) -> B>, EQA: Eq<A>) = listOf(
     Law("Setter law: set is idempotent") { setter.setIdempotent(aGen, bGen, EQA) },
     Law("Setter law: modify identity") { setter.modifyIdentity(aGen, EQA) },
     Law("Setter law: compose modify") { setter.composeModify(aGen, EQA, funcGen) },

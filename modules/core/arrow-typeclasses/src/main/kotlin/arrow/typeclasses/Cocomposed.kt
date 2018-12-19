@@ -8,7 +8,9 @@ import arrow.Kind2
  *
  * Use counnest to expand it, conest to re-compose it
  */
-interface Conested<out F, out B>
+interface Conested<out F, out B> {
+  companion object
+}
 
 typealias ConestedType<F, A, B> = Kind<Conested<F, B>, A>
 

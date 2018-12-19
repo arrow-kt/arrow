@@ -1,9 +1,14 @@
 package arrow.optics.instances
 
 import arrow.*
+import arrow.core.Tuple2
+import arrow.core.left
+import arrow.core.right
 import arrow.data.*
 import arrow.typeclasses.*
 import arrow.optics.*
+import arrow.optics.instances.listk.filterIndex.filterIndex
+import arrow.optics.instances.listk.index.index
 import arrow.optics.typeclasses.*
 
 /**
@@ -100,3 +105,50 @@ interface StringIndexInstance : Index<String, Int, Char> {
   }
 
 }
+
+/**
+ * [String]'s [Cons] instance
+ */
+fun String.Companion.cons(): Cons<String, Char> = StringConsInstance()
+
+interface StringConsInstance : Cons<String, Char> {
+
+  override fun cons(): Prism<String, Tuple2<Char, String>> = Prism(
+    getOrModify = { if (it.isNotEmpty()) Tuple2(it.first(), it.drop(1)).right() else it.left() },
+    reverseGet = { (h, t) -> h + t }
+  )
+
+  companion object {
+    /**
+     * Operator overload to instantiate typeclass instance.
+     *
+     * @return [Cons] instance for [String]
+     */
+    operator fun invoke(): Cons<String, Char> = object : StringConsInstance {}
+  }
+
+}
+
+/**
+ * [String]'s [Snoc] instance
+ */
+fun String.Companion.snoc(): Snoc<String, Char> = StringSnocInstance()
+
+interface StringSnocInstance : Snoc<String, Char> {
+
+  override fun snoc(): Prism<String, Tuple2<String, Char>> = Prism(
+    getOrModify = { if (it.isNotEmpty()) Tuple2(it.dropLast(1), it.last()).right() else it.left() },
+    reverseGet = { (i, l) -> i + l }
+  )
+
+  companion object {
+    /**
+     * Operator overload to instantiate typeclass instance.
+     *
+     * @return [Cons] instance for [String]
+     */
+    operator fun invoke(): Snoc<String, Char> = object : StringSnocInstance {}
+  }
+
+}
+

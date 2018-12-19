@@ -3,24 +3,27 @@ package arrow.instances
 import arrow.Kind
 import arrow.core.*
 import arrow.data.*
-import arrow.instance
+import arrow.deprecation.ExtensionsDSLDeprecated
+import arrow.extension
+import arrow.instances.listk.foldable.foldLeft
 import arrow.typeclasses.*
+import java.util.*
 import arrow.data.combineK as listCombineK
 import kotlin.collections.plus as listPlus
 
-@instance(ListK::class)
+@extension
 interface ListKSemigroupInstance<A> : Semigroup<ListK<A>> {
   override fun ListK<A>.combine(b: ListK<A>): ListK<A> =
     (this.listPlus(b)).k()
 }
 
-@instance(ListK::class)
-interface ListKMonoidInstance<A> : ListKSemigroupInstance<A>, Monoid<ListK<A>> {
+@extension
+interface ListKMonoidInstance<A> : Monoid<ListK<A>>, ListKSemigroupInstance<A> {
   override fun empty(): ListK<A> =
     emptyList<A>().k()
 }
 
-@instance(ListK::class)
+@extension
 interface ListKEqInstance<A> : Eq<ListKOf<A>> {
 
   fun EQ(): Eq<A>
@@ -31,19 +34,19 @@ interface ListKEqInstance<A> : Eq<ListKOf<A>> {
     }
 }
 
-@instance(ListK::class)
+@extension
 interface ListKShowInstance<A> : Show<ListKOf<A>> {
   override fun ListKOf<A>.show(): String =
     toString()
 }
 
-@instance(ListK::class)
+@extension
 interface ListKFunctorInstance : Functor<ForListK> {
   override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B> =
     fix().map(f)
 }
 
-@instance(ListK::class)
+@extension
 interface ListKApplicativeInstance : Applicative<ForListK> {
   override fun <A, B> Kind<ForListK, A>.ap(ff: Kind<ForListK, (A) -> B>): ListK<B> =
     fix().ap(ff)
@@ -58,7 +61,7 @@ interface ListKApplicativeInstance : Applicative<ForListK> {
     ListK.just(a)
 }
 
-@instance(ListK::class)
+@extension
 interface ListKMonadInstance : Monad<ForListK> {
   override fun <A, B> Kind<ForListK, A>.ap(ff: Kind<ForListK, (A) -> B>): ListK<B> =
     fix().ap(ff)
@@ -79,7 +82,7 @@ interface ListKMonadInstance : Monad<ForListK> {
     ListK.just(a)
 }
 
-@instance(ListK::class)
+@extension
 interface ListKFoldableInstance : Foldable<ForListK> {
   override fun <A, B> Kind<ForListK, A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
@@ -91,7 +94,7 @@ interface ListKFoldableInstance : Foldable<ForListK> {
     fix().isEmpty()
 }
 
-@instance(ListK::class)
+@extension
 interface ListKTraverseInstance : Traverse<ForListK> {
   override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B> =
     fix().map(f)
@@ -109,13 +112,13 @@ interface ListKTraverseInstance : Traverse<ForListK> {
     fix().isEmpty()
 }
 
-@instance(ListK::class)
+@extension
 interface ListKSemigroupKInstance : SemigroupK<ForListK> {
   override fun <A> Kind<ForListK, A>.combineK(y: Kind<ForListK, A>): ListK<A> =
     fix().listCombineK(y)
 }
 
-@instance(ListK::class)
+@extension
 interface ListKMonoidKInstance : MonoidK<ForListK> {
   override fun <A> empty(): ListK<A> =
     ListK.empty()
@@ -124,10 +127,56 @@ interface ListKMonoidKInstance : MonoidK<ForListK> {
     fix().listCombineK(y)
 }
 
+@extension
+interface ListKHashInstance<A> : Hash<ListKOf<A>>, ListKEqInstance<A> {
+
+  fun HA(): Hash<A>
+
+  override fun EQ(): Eq<A> = HA()
+
+  override fun ListKOf<A>.hash(): Int = foldLeft(1) { hash, a ->
+    31 * hash + HA().run { a.hash() }
+  }
+}
+
 object ListKContext : ListKMonadInstance, ListKTraverseInstance, ListKMonoidKInstance {
   override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B> =
     fix().map(f)
 }
 
+@Deprecated(ExtensionsDSLDeprecated)
 infix fun <A> ForListK.Companion.extensions(f: ListKContext.() -> A): A =
   f(ListKContext)
+
+//object test {
+//
+//  // dog names can be treated as unique IDs here
+//  data class Dog(val id: String, val owner: String)
+//
+//
+//  val dogsAreCute: List<Pair<Dog, Boolean>> = listOf(
+//    Dog("Kessi", "Marc") to true,
+//    Dog("Rocky", "Martin") to false,
+//    Dog("Molly", "Martin") to true
+//  )
+//
+//  // loaded by the backend, so can contain new data
+//  val newDogs: List<Dog> = listOf(
+//    Dog("Kessi", "Marc"),
+//    Dog("Rocky", "Marc"),
+//    Dog("Buddy", "Martin")
+//  )
+//
+//  // this should be the result: a union that preserves the extra Boolean, but replaces dogs by
+//  // their new updated data
+//  val expected = listOf(
+//    newDogs[0] to true,
+//    newDogs[1] to false
+//  )
+//
+//  @JvmStatic
+//  fun main(args: Array<String>) {
+//    val actual = dogsAreCute.zip(newDogs)
+//    println(actual)
+//  }
+//}

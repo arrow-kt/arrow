@@ -1,6 +1,8 @@
 package arrow.test.laws
 
 import arrow.core.*
+import arrow.instances.const.applicative.applicative
+import arrow.instances.id.applicative.applicative
 import arrow.typeclasses.*
 import arrow.optics.Optional
 import arrow.typeclasses.Eq
@@ -10,7 +12,7 @@ import io.kotlintest.properties.forAll
 
 object OptionalLaws {
 
-  inline fun <A, B> laws(optional: Optional<A, B>, aGen: Gen<A>, bGen: Gen<B>, funcGen: Gen<(B) -> B>, EQA: Eq<A>, EQOptionB: Eq<Option<B>>): List<Law> = listOf(
+  fun <A, B> laws(optional: Optional<A, B>, aGen: Gen<A>, bGen: Gen<B>, funcGen: Gen<(B) -> B>, EQA: Eq<A>, EQOptionB: Eq<Option<B>>): List<Law> = listOf(
     Law("Optional Law: set what you get") { optional.getOptionSet(aGen, EQA) },
     Law("Optional Law: set what you get") { optional.setGetOption(aGen, bGen, EQOptionB) },
     Law("Optional Law: set is idempotent") { optional.setIdempotent(aGen, bGen, EQA) },

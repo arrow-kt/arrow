@@ -51,12 +51,6 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
     is Left -> ifLeft(a)
   }
 
-  @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("getOrElse { ifLeft }"))
-  fun get(): B = when (this) {
-    is Right -> b
-    is Left -> throw NoSuchElementException("Disjunction.Left")
-  }
-
   fun <C> foldLeft(initial: C, rightOperation: (C, B) -> C): C =
     fix().let { either ->
       when (either) {
@@ -155,7 +149,7 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
       get() = false
 
     companion object {
-      inline operator fun <A> invoke(a: A): Either<A, Nothing> = Left(a)
+      operator fun <A> invoke(a: A): Either<A, Nothing> = Left(a)
     }
   }
 
@@ -170,7 +164,7 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
       get() = true
 
     companion object {
-      inline operator fun <B> invoke(b: B): Either<Nothing, B> = Right(b)
+      operator fun <B> invoke(b: B): Either<Nothing, B> = Right(b)
     }
   }
 
@@ -237,7 +231,7 @@ inline fun <B> EitherOf<*, B>.getOrElse(default: () -> B): B =
  * Left(12).orNull()  // Result: null
  * ```
  */
-inline fun <B> EitherOf<*, B>.orNull(): B? =
+fun <B> EitherOf<*, B>.orNull(): B? =
   getOrElse { null }
 
 /**
@@ -271,6 +265,40 @@ inline fun <A, B> EitherOf<A, B>.getOrHandle(default: (A) -> B): B =
  */
 inline fun <A, B> EitherOf<A, B>.filterOrElse(predicate: (B) -> Boolean, default: () -> A): Either<A, B> =
   flatMap { if (predicate(it)) Right(it) else Left(default()) }
+
+/**
+ * * Returns [Either.Right] with the existing value of [Either.Right] if this is a [Either.Right] and the given
+ * predicate holds for the right value.
+ * * Returns `Left(default({right}))` if this is a [Either.Right] and the given predicate does not
+ * hold for the right value. Useful for error handling where 'default' returns a message with context on why the value
+ * did not pass the filter
+ * * Returns [Either.Left] with the existing value of [Either.Left] if this is a [Either.Left].
+ *
+ * Example:
+ *
+ * {: data-executable='true'}
+ * ```kotlin:ank
+ * import arrow.core.*
+ *
+ * Right(12).filterOrOther({ it > 10 }, { -1 })
+ * ```
+ *
+ * {: data-executable='true'}
+ * ```kotlin:ank
+ * Right(7).filterOrOther({ it > 10 }, { "Value '$it' not greater than 10" })
+ * ```
+ *
+ * {: data-executable='true'}
+ * ```kotlin:ank
+ * val left: Either<Int, Int> = Left(12)
+ * left.filterOrOther({ it > 10 }, { -1 })
+ * ```
+ */
+inline fun <A, B> EitherOf<A, B>.filterOrOther(predicate: (B) -> Boolean, default: (B) -> A): Either<A, B> =
+  flatMap {
+    if (predicate(it)) arrow.core.Either.Right(it)
+    else arrow.core.Either.Left(default(it))
+  }
 
 /**
  * * Returns [Either.Right] with the existing value of [Either.Right] if this is an [Either.Right] with a non-null value.
@@ -314,13 +342,6 @@ fun <A, B> EitherOf<A, B>.combineK(y: EitherOf<A, B>): Either<A, B> =
     is Either.Left -> y.fix()
     else -> fix()
   }
-
-@Deprecated(DeprecatedAmbiguity, ReplaceWith("Try { body }.toEither()"))
-inline fun <T> eitherTry(body: () -> T): Either<Throwable, T> = try {
-  Right(body())
-} catch (t: Throwable) {
-  Left(t)
-}
 
 fun <A> A.left(): Either<A, Nothing> = Either.Left(this)
 

@@ -1,7 +1,15 @@
 package arrow.data
 
 import arrow.core.*
-import arrow.instances.*
+import arrow.instances.eq
+import arrow.instances.monoid
+import arrow.instances.semigroup
+import arrow.instances.validated.applicative.applicative
+import arrow.instances.validated.eq.eq
+import arrow.instances.validated.functor.functor
+import arrow.instances.validated.semigroupK.semigroupK
+import arrow.instances.validated.show.show
+import arrow.instances.validated.traverse.traverse
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
@@ -22,18 +30,16 @@ class ValidatedTest : UnitSpec() {
 
     val VAL_SGK = Validated.semigroupK(String.semigroup())
 
-    ForValidated(String.semigroup()) extensions {
-      testLaws(
-        EqLaws.laws(EQ) { Valid(it) },
-        ShowLaws.laws(Validated.show(), EQ) { Valid(it) },
-        ApplicativeLaws.laws(this, Eq.any()),
-        TraverseLaws.laws(this, this, ::Valid, Eq.any()),
-        SemigroupKLaws.laws(
-          this,
-          this,
-          Eq.any())
-      )
-    }
+    testLaws(
+      EqLaws.laws(EQ) { Valid(it) },
+      ShowLaws.laws(Validated.show(), EQ) { Valid(it) },
+      ApplicativeLaws.laws(Validated.applicative(String.semigroup()), Eq.any()),
+      TraverseLaws.laws(Validated.traverse(), Validated.functor(), ::Valid, Eq.any()),
+      SemigroupKLaws.laws(
+        Validated.semigroupK(String.semigroup()),
+        Validated.applicative(String.semigroup()),
+        Eq.any())
+    )
 
 
     "fold should call function on Invalid" {

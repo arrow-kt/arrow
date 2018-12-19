@@ -27,7 +27,7 @@ later.unsafeRunAsync { }
 
 ### Main Combinators
 
-All the new combinators added by `MonadDefer` are constructors. `MonadDefer` also includes all combinators present in [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}).
+All the new combinators added by `MonadDefer` are constructors. `MonadDefer` also includes all combinators present in [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}).
 
 #### invoke
 
@@ -91,7 +91,7 @@ lazyResult
 #### deferUnsafe
 
 Takes as a parameter a function that returns `Either<Throwable, A>`.
-The left side of the [`Either`]({{ '/docs/datatypes/either' | relative_url }}) represents an error in the execution.
+The left side of the [`Either`]({{ '/docs/arrow/core/either' | relative_url }}) represents an error in the execution.
 This function is assumed to never throw any internal exceptions.
 
 ```kotlin
@@ -107,14 +107,13 @@ IO.async()
 
 Arrow provides `MonadDeferLaws` in the form of test cases for internal verification of lawful instances and third party apps creating their own `MonadDefer` instances.
 
-### Data Types
+### Data types
 
-The following data types in Arrow provide instances that adhere to the `MonadDefer` type class.
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.effects.typeclasses.*
 
-- [IO]({{ '/docs/effects/io' | relative_url }})
-- [ObservableK]({{ '/docs/integrations/rx2' | relative_url }})
-- [FlowableK]({{ '/docs/integrations/rx2' | relative_url }})
-- [DeferredK]({{ '/docs/integrations/kotlinxcoroutines/' | relative_url }})
-- [FluxK]({{ '/docs/integrations/reactor' | relative_url }})
-- [MonoK]({{ '/docs/integrations/reactor' | relative_url }})
+TypeClass(MonadDefer::class).dtMarkdownList()
+```
 
+ank_macro_hierarchy(arrow.effects.typeclasses.MonadDefer)

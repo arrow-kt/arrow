@@ -8,14 +8,20 @@ import arrow.effects.typeclasses.Async
 import arrow.test.generators.genIntSmall
 import arrow.test.generators.genThrowable
 import arrow.typeclasses.Eq
-import arrow.typeclasses.binding
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import kotlinx.coroutines.experimental.newSingleThreadContext
+import kotlinx.coroutines.newSingleThreadContext
 
 object AsyncLaws {
-  inline fun <F> laws(AC: Async<F>, EQ: Eq<Kind<F, Int>>, EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>, EQERR: Eq<Kind<F, Int>> = EQ): List<Law> =
-    MonadDeferLaws.laws(AC, EQERR, EQ_EITHER, EQ) + listOf(
+
+  fun <F> laws(
+    AC: Async<F>,
+    EQ: Eq<Kind<F, Int>>,
+    EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>,
+    EQERR: Eq<Kind<F, Int>> = EQ,
+    testStackSafety: Boolean = true
+  ): List<Law> =
+    MonadDeferLaws.laws(AC, EQERR, EQ_EITHER, testStackSafety = testStackSafety) + listOf(
       Law("Async Laws: success equivalence") { AC.asyncSuccess(EQ) },
       Law("Async Laws: error equivalence") { AC.asyncError(EQERR) },
       Law("Async Laws: continueOn jumps threads") { AC.continueOn(EQ) },
@@ -25,12 +31,12 @@ object AsyncLaws {
 
   fun <F> Async<F>.asyncSuccess(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.int()) { num: Int ->
-      async { ff: (Either<Throwable, Int>) -> Unit -> ff(Right(num)) }.equalUnderTheLaw(just<Int>(num), EQ)
+      async { ff: (Either<Throwable, Int>) -> Unit -> ff(Right(num)) }.equalUnderTheLaw(just(num), EQ)
     }
 
   fun <F> Async<F>.asyncError(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(genThrowable()) { e: Throwable ->
-      async { ff: (Either<Throwable, Int>) -> Unit -> ff(Left(e)) }.equalUnderTheLaw(raiseError<Int>(e), EQ)
+      async { ff: (Either<Throwable, Int>) -> Unit -> ff(Left(e)) }.equalUnderTheLaw(raiseError(e), EQ)
     }
 
   fun <F> Async<F>.continueOn(EQ: Eq<Kind<F, Int>>): Unit =

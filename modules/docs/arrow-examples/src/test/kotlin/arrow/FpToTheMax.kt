@@ -3,9 +3,11 @@ package arrow
 import arrow.core.*
 import arrow.data.*
 import arrow.effects.*
+import arrow.effects.instances.io.monadDefer.monadDefer
 import arrow.effects.typeclasses.MonadDefer
+import arrow.instances.id.monad.monad
+import arrow.instances.statet.monad.monad
 import arrow.typeclasses.Monad
-import arrow.typeclasses.binding
 import java.util.Random
 
 /**
@@ -20,8 +22,8 @@ interface Console<F> {
 }
 
 class ConsoleInstance<F>(val delay: MonadDefer<F>) : Console<F> {
-    override fun putStrLn(s: String): Kind<F, Unit> = delay { println(s) }
-    override fun getStrLn(): Kind<F, String> = delay { readLine().orEmpty() }
+    override fun putStrLn(s: String): Kind<F, Unit> = delay.delay { println(s) }
+    override fun getStrLn(): Kind<F, String> = delay.delay { readLine().orEmpty() }
 }
 
 interface FRandom<F> {
@@ -29,7 +31,7 @@ interface FRandom<F> {
 }
 
 class FRandomInstance<F>(val delay: MonadDefer<F>) : FRandom<F> {
-    override fun nextInt(upper: Int): Kind<F, Int> = delay { ORandom.nextInt(upper) }
+    override fun nextInt(upper: Int): Kind<F, Int> = delay.delay { ORandom.nextInt(upper) }
 }
 
 class MonadAndConsoleRandom<F>(M: Monad<F>, C: Console<F>, R: FRandom<F>) : Monad<F> by M, Console<F> by C, FRandom<F> by R
@@ -37,7 +39,7 @@ class MonadAndConsoleRandom<F>(M: Monad<F>, C: Console<F>, R: FRandom<F>) : Mona
 data class TestData(val input: List<String>, val output: List<String>, val nums: List<Int>) {
     fun putStrLn(s: String): Tuple2<TestData, Unit> = copy(output = output.plus(s)) toT Unit
     fun getStrLn(): Tuple2<TestData, String> = copy(input = input.drop(1)) toT input[0]
-    fun nextInt(upper: Int): Tuple2<TestData, Int> = copy(nums = nums.drop(1)) toT nums[0]
+    fun nextInt(@Suppress("UNUSED_PARAMETER") upper: Int): Tuple2<TestData, Int> = copy(nums = nums.drop(1)) toT nums[0]
 }
 
 

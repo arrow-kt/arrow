@@ -135,10 +135,10 @@ ForTry extensions {
 
 ```kotlin:ank
 import arrow.effects.*
-import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.async
 
-val asyncBalance: DeferredK<Int> = async { 1000 }.k()
-val asyncAvailable: DeferredK<Int> = async { 900 }.k()
+val asyncBalance: DeferredK<Int> = DeferredK { 1000 }
+val asyncAvailable: DeferredK<Int> = DeferredK { 900 }
 
 ForDeferredK extensions { 
   mapToAccount(asyncBalance, asyncAvailable)

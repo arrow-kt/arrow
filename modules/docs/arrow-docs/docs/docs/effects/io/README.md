@@ -155,22 +155,6 @@ IO<Int> { throw RuntimeException("Boom!") }
   .unsafeRunSync()
 ```
 
-### merge
-
-Commonly used to aggregate the results of multiple independent blocking functions. Creates an `IO` that invokes 2-10 functions when run. Their results are accumulated on a TupleN, where N is the size.
-
-```kotlin
-IO.merge ({ 1 }, { 2 }, { 3 })
-  .attempt()
-  .unsafeRunSync()
-```
-
-```kotlin
-IO.merge ({ 1 }, { 2 }, { throw RuntimeException("Boom!") })
-  .attempt()
-  .unsafeRunSync()
-```
-
 ### suspend
 
 Used to defer the evaluation of an existing `IO`.
@@ -249,16 +233,14 @@ import arrow.effects.*
 
 ## Common operators
 
-IO implements all the operators common to all instances of [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}). Those include `map`, `flatMap`, and `handleErrorWith`.
+IO implements all the operators common to all instances of [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}). Those include `map`, `flatMap`, and `handleErrorWith`.
 
 
-## Available Instances
+### Supported Type Classes
 
-* [Applicative]({{ '/docs/typeclasses/applicative' | relative_url }})
-* [ApplicativeError]({{ '/docs/typeclasses/applicativeerror' | relative_url }})
-* [Functor]({{ '/docs/typeclasses/functor' | relative_url }})
-* [Monad]({{ '/docs/typeclasses/monad' | relative_url }})
-* [MonadError]({{ '/docs/typeclasses/monaderror' | relative_url }})
-* [MonadDefer]({{ '/docs/effects/monaddefer/' | relative_url }})
-* [Async]({{ '/docs/effects/async' | relative_url }})
-* [Effect]({{ '/docs/effects/effect' | relative_url }})
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.effects.*
+
+DataType(IO::class).tcMarkdownList()
+```

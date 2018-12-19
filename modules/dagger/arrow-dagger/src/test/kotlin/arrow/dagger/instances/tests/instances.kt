@@ -1,8 +1,33 @@
 package arrow.dagger.instances.tests
 
-import arrow.core.*
-import arrow.dagger.instances.*
-import arrow.data.*
+import arrow.core.EitherPartialOf
+import arrow.core.ForEval
+import arrow.core.ForFunction0
+import arrow.core.ForId
+import arrow.core.ForOption
+import arrow.core.ForTry
+import arrow.core.Function1PartialOf
+import arrow.dagger.instances.ArrowInstances
+import arrow.dagger.instances.CoproductInstances
+import arrow.dagger.instances.EitherInstances
+import arrow.dagger.instances.EitherTInstances
+import arrow.dagger.instances.Function1Instances
+import arrow.dagger.instances.KleisliInstances
+import arrow.dagger.instances.MapKInstances
+import arrow.dagger.instances.OptionTInstances
+import arrow.dagger.instances.SortedMapKInstances
+import arrow.dagger.instances.StateTInstances
+import arrow.data.CoproductPartialOf
+import arrow.data.EitherTPartialOf
+import arrow.data.ForListK
+import arrow.data.ForNonEmptyList
+import arrow.data.ForSequenceK
+import arrow.data.ForSetK
+import arrow.data.KleisliPartialOf
+import arrow.data.MapKPartialOf
+import arrow.data.OptionTPartialOf
+import arrow.data.SortedMapKPartialOf
+import arrow.data.StateTPartialOf
 import arrow.typeclasses.*
 import dagger.Component
 import dagger.Module
@@ -124,26 +149,32 @@ interface Runtime {
   fun byteMonoid(): Monoid<Byte>
   fun byteOrder(): Order<Byte>
   fun byteEq(): Eq<@JvmSuppressWildcards Byte>
+  fun byteHash(): Hash<Byte>
   fun doubleSemigroup(): Semigroup<Double>
   fun doubleMonoid(): Monoid<Double>
   fun doubleOrder(): Order<Double>
   fun doubleEq(): Eq<@JvmSuppressWildcards Double>
+  fun doubleHash(): Hash<Double>
   fun intSemigroup(): Semigroup<Int>
   fun intMonoid(): Monoid<Int>
   fun intOrder(): Order<Int>
   fun intEq(): Eq<@JvmSuppressWildcards Int>
+  fun intHash(): Hash<Int>
   fun longSemigroup(): Semigroup<Long>
   fun longMonoid(): Monoid<Long>
   fun longOrder(): Order<Long>
   fun longEq(): Eq<@JvmSuppressWildcards Long>
+  fun longHash(): Hash<Long>
   fun shortSemigroup(): Semigroup<Short>
   fun shortMonoid(): Monoid<Short>
   fun shortOrder(): Order<Short>
   fun shortEq(): Eq<@JvmSuppressWildcards Short>
+  fun shortHash(): Hash<Short>
   fun floatSemigroup(): Semigroup<Float>
   fun floatMonoid(): Monoid<Float>
   fun floatOrder(): Order<Float>
   fun floatEq(): Eq<@JvmSuppressWildcards Float>
+  fun floatHash(): Hash<Float>
   fun optionFunctor(): Functor<ForOption>
   fun optionApplicative(): Applicative<ForOption>
   fun optionMonad(): Monad<ForOption>

@@ -1,10 +1,7 @@
 package arrow.dagger.instances
 
 import arrow.instances.*
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Order
-import arrow.typeclasses.Semigroup
+import arrow.typeclasses.*
 import dagger.Module
 import dagger.Provides
 
@@ -24,6 +21,9 @@ class NumberInstances {
   fun byteEq(): Eq<Byte> = Byte.eq()
 
   @Provides
+  fun byteHash(): Hash<Byte> = Byte.hash()
+
+  @Provides
   fun doubleSemigroup(): Semigroup<Double> = Double.semigroup()
 
   @Provides
@@ -34,6 +34,9 @@ class NumberInstances {
 
   @Provides
   fun doubleEq(): Eq<@JvmSuppressWildcards Double> = Double.eq()
+
+  @Provides
+  fun doubleHash(): Hash<Double> = Double.hash()
 
   @Provides
   fun intSemigroup(): Semigroup<Int> = Int.semigroup()
@@ -48,6 +51,9 @@ class NumberInstances {
   fun intEq(): Eq<@JvmSuppressWildcards Int> = Int.eq()
 
   @Provides
+  fun intHash(): Hash<Int> = Int.hash()
+
+  @Provides
   fun longSemigroup(): Semigroup<Long> = Long.semigroup()
 
   @Provides
@@ -58,6 +64,9 @@ class NumberInstances {
 
   @Provides
   fun longEq(): Eq<@JvmSuppressWildcards Long> = Long.eq()
+
+  @Provides
+  fun longHash(): Hash<Long> = Long.hash()
 
   @Provides
   fun shortSemigroup(): Semigroup<Short> = Short.semigroup()
@@ -72,6 +81,9 @@ class NumberInstances {
   fun shortEq(): Eq<@JvmSuppressWildcards Short> = Short.eq()
 
   @Provides
+  fun shortHash(): Hash<Short> = Short.hash()
+
+  @Provides
   fun floatSemigroup(): Semigroup<Float> = Float.semigroup()
 
   @Provides
@@ -82,5 +94,8 @@ class NumberInstances {
 
   @Provides
   fun floatEq(): Eq<@JvmSuppressWildcards Float> = Float.eq()
+
+  @Provides
+  fun floatHash(): Hash<Float> = Float.hash()
 
 }

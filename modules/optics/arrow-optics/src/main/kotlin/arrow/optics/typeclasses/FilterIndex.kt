@@ -9,6 +9,8 @@ import arrow.typeclasses.Applicative
 import arrow.typeclasses.Traverse
 
 /**
+ * ank_macro_hierarchy(arrow.optics.typeclasses.FilterIndex)
+ *
  * [FilterIndex] provides a [Traversal] for a structure [S] with all its foci [A] whose index [I] satisfies a predicate.
  *
  * @param S source of [Traversal]

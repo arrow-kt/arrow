@@ -4,12 +4,17 @@ import arrow.Kind
 import arrow.data.Sum
 import arrow.data.SumPartialOf
 import arrow.data.fix
-import arrow.instance
+import arrow.deprecation.ExtensionsDSLDeprecated
+import arrow.extension
 import arrow.typeclasses.Comonad
+import arrow.typeclasses.Eq
 import arrow.typeclasses.Functor
+import arrow.typeclasses.Hash
+import arrow.undocumented
 
-@instance(Sum::class)
-interface ComonadSumInstance<F, G> : Comonad<SumPartialOf<F, G>> {
+@extension
+@undocumented
+interface SumComonadInstance<F, G> : Comonad<SumPartialOf<F, G>> {
 
   fun CF(): Comonad<F>
 
@@ -25,8 +30,9 @@ interface ComonadSumInstance<F, G> : Comonad<SumPartialOf<F, G>> {
       fix().map(CF(), CG(), f)
 }
 
-@instance(Sum::class)
-interface FunctorSumInstance<F, G> : Functor<SumPartialOf<F, G>> {
+@extension
+@undocumented
+interface SumFunctorInstance<F, G> : Functor<SumPartialOf<F, G>> {
 
   fun FF(): Functor<F>
 
@@ -36,12 +42,34 @@ interface FunctorSumInstance<F, G> : Functor<SumPartialOf<F, G>> {
       fix().map(FF(), FG(), f)
 }
 
-class SumContext<F, G>(val CF: Comonad<F>, val CG: Comonad<G>) : ComonadSumInstance<F, G> {
+@extension
+interface SumEqInstance<F, G, A> : Eq<Sum<F, G, A>> {
+  fun EQF(): Eq<Kind<F, A>>
+  fun EQG(): Eq<Kind<G, A>>
+
+  override fun Sum<F, G, A>.eqv(b: Sum<F, G, A>): Boolean =
+    EQF().run { left.eqv(b.left) } &&
+      EQG().run { right.eqv(b.right) }
+}
+
+@extension
+interface SumHashInstance<F, G, A> : Hash<Sum<F, G, A>>, SumEqInstance<F, G, A> {
+  fun HF(): Hash<Kind<F, A>>
+  fun HG(): Hash<Kind<G, A>>
+
+  override fun EQF(): Eq<Kind<F, A>> = HF()
+  override fun EQG(): Eq<Kind<G, A>> = HG()
+
+  override fun Sum<F, G, A>.hash(): Int = 31 * HF().run { left.hash() } + HG().run { right.hash() }
+}
+
+class SumContext<F, G>(val CF: Comonad<F>, val CG: Comonad<G>) : SumComonadInstance<F, G> {
   override fun CF(): Comonad<F> = CF
   override fun CG(): Comonad<G> = CG
 }
 
 class SumContextPartiallyApplied<F, G>(val CF: Comonad<F>, val CG: Comonad<G>) {
+  @Deprecated(ExtensionsDSLDeprecated)
   infix fun <A> extensions(f: SumContext<F, G>.() -> A): A =
       f(SumContext(CF, CG))
 }
