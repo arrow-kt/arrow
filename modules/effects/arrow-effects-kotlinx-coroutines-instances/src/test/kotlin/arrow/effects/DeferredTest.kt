@@ -47,7 +47,7 @@ class DeferredKTest : UnitSpec() {
   }
 
   init {
-//    testLaws(AsyncLaws.laws(DeferredK.async(), EQ(), EQ()))
+    testLaws(AsyncLaws.laws(DeferredK.async(), EQ(), EQ()))
 
     "DeferredK is awaitable" {
       forAll(genIntSmall(), genIntSmall(), genIntSmall()) { x: Int, y: Int, z: Int ->
@@ -148,10 +148,10 @@ class DeferredKTest : UnitSpec() {
           either.fold({ throw it }, { fail("") })
         }.unsafeRunSync()
         fail("Should rethrow the exception")
-      } catch (throwable: AssertionError) {
-        fail("${throwable.message}")
-      } catch (throwable: Throwable) {
+      } catch (myException: MyException) {
         // Success
+      } catch (throwable: Throwable) {
+        fail("Should only throw MyException")
       }
     }
 
@@ -221,15 +221,15 @@ class DeferredKTest : UnitSpec() {
 //        }.await()
 //      }
 //    }
-
-    "KindConnection can cancel upstream" {
-      Try {
-        DeferredK.async<Unit> { conn, _ ->
-          conn.cancel().unsafeRunAsync { }
-        }.unsafeRunSync()
-      }.fold({ e -> e should { it is arrow.effects.ConnectionCancellationException } },
-        { throw AssertionError("Expected exception of type arrow.effects.ConnectionCancellationException but caught no exception") })
-    }
+//
+//    "KindConnection can cancel upstream" {
+//      Try {
+//        DeferredK.async<Unit> { conn, _ ->
+//          conn.cancel().unsafeRunAsync { }
+//        }.unsafeRunSync()
+//      }.fold({ e -> e should { it is arrow.effects.ConnectionCancellationException } },
+//        { throw AssertionError("Expected exception of type arrow.effects.ConnectionCancellationException but caught no exception") })
+//    }
 
     "DeferredK async should be cancellable" {
       Promise.uncancelable<ForDeferredK, Unit>(DeferredK.async())

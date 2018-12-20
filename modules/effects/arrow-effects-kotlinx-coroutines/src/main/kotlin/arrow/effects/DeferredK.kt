@@ -1,6 +1,8 @@
 package arrow.effects
 
 import arrow.core.*
+import arrow.effects.DeferredK.Generated.ConnectedGenerated
+import arrow.effects.DeferredK.Generated.DefaultGenerated
 import arrow.effects.internal.Platform
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
@@ -9,7 +11,6 @@ import arrow.higherkind
 import kotlinx.coroutines.*
 import kotlinx.coroutines.selects.SelectClause0
 import kotlinx.coroutines.selects.SelectClause1
-import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -69,7 +70,7 @@ fun <A> Deferred<A>.k(): DeferredK<A> =
  * ```
  */
 fun <A> CoroutineScope.asyncK(ctx: CoroutineContext = Dispatchers.Default, start: CoroutineStart = CoroutineStart.LAZY, f: suspend CoroutineScope.() -> A): DeferredK<A> =
-  DeferredK.Generated(ctx, start, this) { f() }
+  DefaultGenerated(ctx, start, this, f)
 
 /**
  * Return the wrapped [Deferred] from a [DeferredK]
@@ -133,8 +134,8 @@ fun <A> DeferredKOf<A>.scope(): CoroutineScope = this.fix().scope
  */
 @higherkind
 sealed class DeferredK<A>(
-  internal val scope: CoroutineScope = GlobalScope,
-  protected var memoized: Deferred<A>
+  internal open val scope: CoroutineScope = GlobalScope,
+  protected open var memoized: Deferred<A>
 ) : DeferredKOf<A>, Deferred<A> by memoized {
 
   abstract fun value(): Deferred<A>
@@ -154,30 +155,71 @@ sealed class DeferredK<A>(
    *  only when creating all deferred instances inside DeferredK or using DeferredK's methods
    *  one can guarantee not having memoization
    */
-  internal class Generated<A>(
-    val ctx: CoroutineContext = Dispatchers.Default,
-    val coroutineStart: CoroutineStart = CoroutineStart.LAZY,
-    scope: CoroutineScope = GlobalScope,
-    val generator: suspend () -> A
-  ) : DeferredK<A>(scope, scope.async(ctx, coroutineStart) { generator() }) {
+  internal sealed class Generated<A>(
+    override val scope: CoroutineScope = GlobalScope,
+    override var memoized: Deferred<A>
+  ) : DeferredK<A>(scope, memoized) {
 
-    /**
-     * Returns either the memoized [Deferred] if it has not been run yet. Or creates a new one.
-     */
-    override suspend fun await(): A = value().await()
+    internal class DefaultGenerated<A>(val ctx: CoroutineContext = Dispatchers.Default,
+                                       val coroutineStart: CoroutineStart = CoroutineStart.LAZY,
+                                       scope: CoroutineScope = GlobalScope,
+                                       val generator: suspend CoroutineScope.() -> A) : Generated<A>(scope, scope.async(ctx, coroutineStart) { generator() }) {
+      /**
+       * Returns either the memoized [Deferred] if it has not been run yet. Or creates a new one.
+       */
+      override suspend fun await(): A = value().await()
 
-    override fun start(): Boolean = value().start()
+      override fun start(): Boolean = value().start()
 
-    override fun value(): Deferred<A> {
-      if (isCompleted || isActive || isCancelled) {
-        memoized = scope.async(ctx, coroutineStart) {
-          generator()
+      override fun value(): Deferred<A> {
+        if (isCompleted || isActive || isCancelled) {
+          memoized = scope.async(ctx, coroutineStart) {
+            generator()
+          }
+        }
+
+        return memoized
+      }
+
+    }
+
+    internal class ConnectedGenerated<A>(
+      val ctx: CoroutineContext = Dispatchers.Default,
+      val coroutineStart: CoroutineStart = CoroutineStart.LAZY,
+      scope: CoroutineScope = GlobalScope,
+      val generator: suspend CoroutineScope.(DeferredKConnection) -> A
+    ) : Generated<A>(scope, wireConnection(ctx, coroutineStart, scope, generator)) {
+
+      companion object {
+        private fun <A> wireConnection(
+          ctx: CoroutineContext = Dispatchers.Default,
+          coroutineStart: CoroutineStart = CoroutineStart.LAZY,
+          scope: CoroutineScope = GlobalScope,
+          generator: suspend CoroutineScope.(DeferredKConnection) -> A
+        ): Deferred<A> {
+          val conn = DeferredKConnection()
+          val deferred = scope.async(ctx, coroutineStart) { generator(conn) }
+          conn.push(DeferredK { conn.cancel().unsafeRunAsync { } })
+          deferred.invokeOnCompletion { e -> if (e is CancellationException) conn.cancel().unsafeRunAsync { } }
+          return deferred
         }
       }
 
-      return memoized
-    }
+      /**
+       * Returns either the memoized [Deferred] if it has not been run yet. Or creates a new one.
+       */
+      override suspend fun await(): A = value().await()
 
+      override fun start(): Boolean = value().start()
+
+      override fun value(): Deferred<A> {
+        if (isCompleted || isActive || isCancelled) {
+          memoized = wireConnection(ctx, coroutineStart, scope, generator)
+        }
+        return memoized
+      }
+
+    }
   }
 
   /**
@@ -258,15 +300,14 @@ sealed class DeferredK<A>(
    * ```
    */
   fun <B> flatMap(f: (A) -> DeferredKOf<B>): DeferredK<B> = when (this) {
-    is Generated -> Generated(ctx, coroutineStart, scope) {
-      f(
-        scope.async(ctx, coroutineStart) { generator() }.await()
-      ).await()
+    is DefaultGenerated -> DefaultGenerated(ctx, coroutineStart, scope) {
+      f(value().await()).await()
     }
-    is Wrapped -> Generated(Dispatchers.Unconfined, CoroutineStart.LAZY, scope) {
-      f(
-        memoized.await()
-      ).await()
+    is ConnectedGenerated -> ConnectedGenerated(ctx, coroutineStart, scope) {
+      f(value().await()).await()
+    }
+    is Wrapped -> DefaultGenerated(Dispatchers.Unconfined, CoroutineStart.LAZY, scope) {
+      f(memoized.await()).await()
     }
   }
 
@@ -315,10 +356,13 @@ sealed class DeferredK<A>(
    */
   fun <B> bracketCase(use: (A) -> DeferredKOf<B>, release: (A, ExitCase<Throwable>) -> DeferredKOf<Unit>): DeferredK<B> =
     when (this) {
-      is Generated -> DeferredK.Generated(ctx, coroutineStart, scope) {
+      is DefaultGenerated -> DefaultGenerated(ctx, coroutineStart, scope) {
         value().bracketCase(use, release)
       }
-      is Wrapped -> Generated(Dispatchers.Unconfined, CoroutineStart.LAZY, scope) {
+      is Wrapped -> DefaultGenerated(Dispatchers.Unconfined, CoroutineStart.LAZY, scope) {
+        value().bracketCase(use, release)
+      }
+      is ConnectedGenerated -> ConnectedGenerated(ctx, coroutineStart, scope) {
         value().bracketCase(use, release)
       }
     }
@@ -359,12 +403,17 @@ sealed class DeferredK<A>(
    * ```
    */
   fun continueOn(ctx: CoroutineContext): DeferredK<A> = when (this) {
-    is Generated -> Generated(ctx, coroutineStart, scope) {
+    is DefaultGenerated -> DefaultGenerated(ctx, coroutineStart, scope) {
       scope.async(this@DeferredK.ctx, coroutineStart) {
         generator()
       }.await()
     }
     is Wrapped -> scope.asyncK(ctx, CoroutineStart.LAZY) { memoized.await() }
+    is ConnectedGenerated -> ConnectedGenerated(ctx, coroutineStart, scope) {
+      scope.async(this@DeferredK.ctx, coroutineStart) {
+        generator(it)
+      }.await()
+    }
   }
 
   override fun equals(other: Any?): Boolean =
@@ -421,8 +470,8 @@ sealed class DeferredK<A>(
      * }
      * ```
      */
-    fun <A> defer(scope: CoroutineScope = GlobalScope, ctx: CoroutineContext = Dispatchers.Unconfined, start: CoroutineStart = CoroutineStart.LAZY, fa: () -> DeferredKOf<A>): DeferredK<A> =
-      Generated(ctx, start, scope) { fa().await() }
+    fun <A> defer(scope: CoroutineScope = GlobalScope, ctx: CoroutineContext = Dispatchers.Unconfined, start: CoroutineStart = CoroutineStart.LAZY, fa: CoroutineScope.() -> DeferredKOf<A>): DeferredK<A> =
+      DefaultGenerated(ctx, start, scope) { fa().await() }
 
     /**
      * Wraps a suspend function in a [DeferredK]
@@ -448,8 +497,8 @@ sealed class DeferredK<A>(
      * }
      * ```
      */
-    operator fun <A> invoke(scope: CoroutineScope = GlobalScope, ctx: CoroutineContext = Dispatchers.Default, start: CoroutineStart = CoroutineStart.LAZY, f: suspend () -> A): DeferredK<A> =
-      Generated(ctx, start, scope, f)
+    operator fun <A> invoke(scope: CoroutineScope = GlobalScope, ctx: CoroutineContext = Dispatchers.Default, start: CoroutineStart = CoroutineStart.LAZY, f: suspend CoroutineScope.() -> A): DeferredK<A> =
+      DefaultGenerated(ctx, start, scope, f)
 
     /**
      * Wraps an existing [Deferred] in [DeferredK]
@@ -531,25 +580,19 @@ sealed class DeferredK<A>(
      * }
      * ```
      */
-    fun <A> async(scope: CoroutineScope = GlobalScope, ctx: CoroutineContext = Dispatchers.Default, start: CoroutineStart = CoroutineStart.LAZY, fa: DeferredKProc<A>): DeferredK<A> {
-      val conn = DeferredKConnection()
-      //If the context doesn’t have a Job, then the coroutine which is created doesn’t have a parent.
-      val supervisor = scope.coroutineContext[Job] ?: Job()
-      conn.push(DeferredK { if (!supervisor.isCancelled) supervisor.cancel() })
-
-      return Generated(ctx, start, scope) {
-        CompletableDeferred<A>(supervisor).apply {
+    fun <A> async(scope: CoroutineScope = GlobalScope, ctx: CoroutineContext = Dispatchers.Default, start: CoroutineStart = CoroutineStart.LAZY, fa: DeferredKProc<A>): DeferredK<A> =
+      ConnectedGenerated(ctx, start, scope) { conn ->
+        CompletableDeferred<A>().apply {
           fa(conn) {
             it.fold(this::completeExceptionally, this::complete)
           }
         }.await()
-      }.apply { invokeOnCompletion { e -> if (e is CancellationException) conn.cancel().unsafeRunAsync { } } }
-    }
+      }
 
     fun <A, B> tailRecM(a: A, f: (A) -> DeferredKOf<Either<A, B>>): DeferredK<B> =
       f(a).value().let { initial: Deferred<Either<A, B>> ->
         var current: Deferred<Either<A, B>> = initial
-        Generated(Dispatchers.Unconfined, CoroutineStart.LAZY, GlobalScope) {
+        DefaultGenerated(Dispatchers.Unconfined, CoroutineStart.LAZY, GlobalScope) {
           val result: B
           while (true) {
             val actual: Either<A, B> = current.await()
@@ -638,7 +681,7 @@ sealed class DeferredK<A>(
  * ```
  */
 fun <A> DeferredKOf<A>.handleErrorWith(f: (Throwable) -> DeferredK<A>): DeferredK<A> =
-  DeferredK.Generated(Dispatchers.Unconfined, CoroutineStart.LAZY) {
+  ConnectedGenerated(Dispatchers.Unconfined, CoroutineStart.LAZY) {
     try {
       await()
     } catch (e: Throwable) {
@@ -715,9 +758,17 @@ fun <A> DeferredKOf<A>.unsafeRunSync(): A =
  * ```
  */
 fun <A> DeferredKOf<A>.runAsync(cb: (Either<Throwable, A>) -> DeferredKOf<Unit>): DeferredK<Unit> =
-  DeferredK(scope(), Dispatchers.Unconfined, CoroutineStart.DEFAULT) {
+  DeferredK(scope(), Dispatchers.Unconfined, CoroutineStart.LAZY) {
     fix().forceExceptionPropagation()
-    unsafeRunAsync(cb.andThen { it.unsafeRunAsync { } })
+    val d = scope().async(Dispatchers.Unconfined, CoroutineStart.DEFAULT) {
+      try {
+        cb(Right(await()))
+      } catch (t: Throwable) {
+        cb(Left(t))
+      }.unsafeRunAsync { }
+    }
+    d.forceExceptionPropagation()
+    d.await()
   }
 
 /**
@@ -748,17 +799,51 @@ fun <A> DeferredKOf<A>.runAsync(cb: (Either<Throwable, A>) -> DeferredKOf<Unit>)
  * ```
  */
 fun <A> DeferredKOf<A>.runAsyncCancellable(onCancel: OnCancel = OnCancel.Silent, cb: (Either<Throwable, A>) -> DeferredKOf<Unit>): DeferredK<Disposable> =
-  DeferredK(scope(), Dispatchers.Unconfined, CoroutineStart.DEFAULT) {
+  ConnectedGenerated(Dispatchers.Unconfined, CoroutineStart.LAZY, scope()) { conn ->
     fix().forceExceptionPropagation()
     val call = CompletableDeferred<Unit>(parent = runAsync(cb))
     val disposable: Disposable = {
       when (onCancel) {
         OnCancel.ThrowCancellationException -> call.completeExceptionally(OnCancel.CancellationException)
-        OnCancel.Silent -> call.cancel()
+        OnCancel.Silent -> call.cancel().also { conn.cancel().unsafeRunAsync { } }
       }
     }
     disposable
   }
+
+//DeferredK(scope(), Dispatchers.Unconfined, CoroutineStart.LAZY) {
+//  scope().async(Dispatchers.Unconfined, CoroutineStart.DEFAULT) {
+//    try {
+//      cb(Right(await()))
+//    } catch (t: Throwable) {
+//      cb(Left(t))
+//    }.unsafeRunAsync { }
+//  }.run {
+//    forceExceptionPropagation()
+//    await()
+//  }
+//}
+fun <A> DeferredKOf<A>.unsafeRunAsyncCancellable(onCancel: OnCancel = OnCancel.Silent, cb: (Either<Throwable, A>) -> Unit): Disposable =
+  DeferredK(scope(), Dispatchers.Unconfined, CoroutineStart.DEFAULT) {
+    fix().forceExceptionPropagation()
+    val self = this@unsafeRunAsyncCancellable.fix()
+    self.start()
+    self.invokeOnCompletion {
+      if (self.isCompleted && !self.isCancelled && self.getCompletionExceptionOrNull() == null) {
+        cb(Right(self.getCompleted()))
+      } else if (self.getCompletionExceptionOrNull() != null) {
+        cb(Left(self.getCompletionExceptionOrNull()!!))
+      }
+    }
+
+    val disposable: Disposable = {
+      when (onCancel) {
+        OnCancel.ThrowCancellationException -> self.cancel()
+        OnCancel.Silent -> self.cancel()
+      }
+    }
+    disposable
+  }.unsafeRunSync()
 
 /**
  * Runs the [DeferredK] asynchronously and then runs the cb.

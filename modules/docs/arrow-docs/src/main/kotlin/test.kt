@@ -1,3 +1,4 @@
+
 import arrow.core.Try
 import arrow.effects.*
 import arrow.effects.deferredk.async.async
@@ -63,24 +64,6 @@ fun main(args: Array<String>) = runBlocking<Unit> {
   def.cancelAndJoin()
   println("isActive: ${def.isActive}, isCancelled: ${def.isCancelled}, isCompleted: ${def.isCompleted}")
   //isActive: false, isCancelled: true, isCompleted: true
-
-  Try {
-    val io = IO.async<Unit> { conn, _ ->
-      conn.push(IO { println("On cancel: Within async") })
-      runBlocking {
-        delay(1000)
-        conn.cancel().fix().unsafeRunAsync {
-          println("I finished cancelling $it")
-        }
-      }
-    }
-    println("ehhlo")
-    io.unsafeRunSync()
-  }.fold({ e ->
-    println("I am here $e")
-    e should { it is arrow.effects.ConnectionCancellationException }
-  },
-    { throw AssertionError("Expected exception of type arrow.effects.ConnectionCancellationException but caught no exception") })
 
 //  Promise.uncancelable<ForIO, Unit>(IO.async()).flatMap { latch ->
 //    IO.async<Unit> { conn, _ ->
