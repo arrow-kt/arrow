@@ -12,7 +12,7 @@ trigger_map:
 workflows:
   build:
     envs:
-    - _JAVA_OPTIONS: -Xms512m -Xmx3584m -XX:+HeapDumpOnOutOfMemoryError
+    - _JAVA_OPTIONS: -Xms512m -Xmx3584m
     steps:
     - script:
         title: dokka
@@ -30,7 +30,7 @@ workflows:
             ./gradlew :arrow-docs:runAnk
   deploy:
     envs:
-    - _JAVA_OPTIONS: -Xms512m -Xmx3584m -XX:+HeapDumpOnOutOfMemoryError
+    - _JAVA_OPTIONS: -Xms512m -Xmx3584m
     steps:
     - script:
         title: dokka
