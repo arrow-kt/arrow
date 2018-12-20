@@ -1,6 +1,6 @@
 package arrow.effects.internal
 
-import arrow.effects.IO
+import arrow.effects.*
 
 object IOCancel {
 

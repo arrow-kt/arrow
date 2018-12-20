@@ -5,11 +5,9 @@ import arrow.core.*
 import arrow.effects.CoroutineContextReactorScheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
-import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import reactor.core.publisher.Flux
-import reactor.core.publisher.FluxSink
 import kotlin.coroutines.CoroutineContext
 
 fun <A> Flux<A>.k(): FluxK<A> = FluxK(this)
@@ -151,14 +149,49 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
     fun <A> defer(fa: () -> FluxKOf<A>): FluxK<A> =
       Flux.defer { fa().value() }.k()
 
-    fun <A> async(fa: Proc<A>): FluxK<A> =
-      Flux.create { emitter: FluxSink<A> ->
-        fa { callback: Either<Throwable, A> ->
+    /**
+     * Creates a [FluxK] that'll run [FluxKProc].
+     *
+     * {: data-executable='true'}
+     *
+     * ```kotlin:ank
+     * import arrow.core.Either
+     * import arrow.core.right
+     * import arrow.effects.FluxK
+     * import arrow.effects.FluxKConnection
+     * import arrow.effects.value
+     *
+     * class Resource {
+     *   fun asyncRead(f: (String) -> Unit): Unit = f("Some value of a resource")
+     *   fun close(): Unit = Unit
+     * }
+     *
+     * fun main(args: Array<String>) {
+     *   //sampleStart
+     *   val result = FluxK.async { conn: FluxKConnection, cb: (Either<Throwable, String>) -> Unit ->
+     *     val resource = Resource()
+     *     conn.push(FluxK { resource.close() })
+     *     resource.asyncRead { value -> cb(value.right()) }
+     *   }
+     *   //sampleEnd
+     *   result.value().subscribe(::println)
+     * }
+     * ```
+     */
+    fun <A> async(fa: FluxKProc<A>): FluxK<A> =
+      Flux.create<A> { sink ->
+        val conn = FluxKConnection()
+        //On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
+        //on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
+        conn.push(FluxK { if (!sink.isCancelled) sink.error(ConnectionCancellationException) })
+        sink.onCancel { conn.cancel().value().subscribe() }
+
+        fa(conn) { callback: Either<Throwable, A> ->
           callback.fold({
-            emitter.error(it)
+            sink.error(it)
           }, {
-            emitter.next(it)
-            emitter.complete()
+            sink.next(it)
+            sink.complete()
           })
         }
       }.k()

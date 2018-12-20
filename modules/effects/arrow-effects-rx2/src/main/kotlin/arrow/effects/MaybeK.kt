@@ -3,15 +3,13 @@ package arrow.effects
 import arrow.core.*
 import arrow.effects.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.ExitCase
-import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import io.reactivex.Maybe
-import io.reactivex.MaybeEmitter
 import kotlin.coroutines.CoroutineContext
 
 fun <A> Maybe<A>.k(): MaybeK<A> = MaybeK(this)
 
-fun <A> MaybeKOf<A>.value(): Maybe<A> = this.fix().maybe
+fun <A> MaybeKOf<A>.value(): Maybe<A> = fix().maybe
 
 @higherkind
 data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
@@ -23,7 +21,7 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
     flatMap { a -> fa.fix().map { ff -> ff(a) } }
 
   fun <B> flatMap(f: (A) -> MaybeKOf<B>): MaybeK<B> =
-    maybe.flatMap { f(it).fix().maybe }.k()
+    maybe.flatMap { f(it).value() }.k()
 
   /**
    * A way to safely acquire a resource and release in the face of errors and cancellation.
@@ -101,8 +99,8 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
 
   fun forall(p: Predicate<A>): Boolean = fold({ true }, p)
 
-  fun handleErrorWith(function: (Throwable) -> MaybeK<A>): MaybeK<A> =
-    maybe.onErrorResumeNext { t: Throwable -> function(t).maybe }.k()
+  fun handleErrorWith(function: (Throwable) -> MaybeKOf<A>): MaybeK<A> =
+    maybe.onErrorResumeNext { t: Throwable -> function(t).value() }.k()
 
   fun continueOn(ctx: CoroutineContext): MaybeK<A> =
     maybe.observeOn(ctx.asScheduler()).k()
@@ -132,9 +130,44 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
     fun <A> defer(fa: () -> MaybeKOf<A>): MaybeK<A> =
       Maybe.defer { fa().value() }.k()
 
-    fun <A> async(fa: Proc<A>): MaybeK<A> =
-      Maybe.create { emitter: MaybeEmitter<A> ->
-        fa { either: Either<Throwable, A> ->
+    /**
+     * Creates a [MaybeK] that'll run [MaybeKProc].
+     *
+     * {: data-executable='true'}
+     *
+     * ```kotlin:ank
+     * import arrow.core.Either
+     * import arrow.core.right
+     * import arrow.effects.MaybeK
+     * import arrow.effects.MaybeKConnection
+     * import arrow.effects.value
+     *
+     * class Resource {
+     *   fun asyncRead(f: (String) -> Unit): Unit = f("Some value of a resource")
+     *   fun close(): Unit = Unit
+     * }
+     *
+     * fun main(args: Array<String>) {
+     *   //sampleStart
+     *   val result = MaybeK.async { conn: MaybeKConnection, cb: (Either<Throwable, String>) -> Unit ->
+     *     val resource = Resource()
+     *     conn.push(MaybeK { resource.close() })
+     *     resource.asyncRead { value -> cb(value.right()) }
+     *   }
+     *   //sampleEnd
+     *   result.value().subscribe(::println)
+     * }
+     * ```
+     */
+    fun <A> async(fa: MaybeKProc<A>): MaybeK<A> =
+      Maybe.create<A> { emitter ->
+        val conn = MaybeKConnection()
+        //On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
+        //on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
+        conn.push(MaybeK { if (!emitter.isDisposed) emitter.onError(ConnectionCancellationException) })
+        emitter.setCancellable { conn.cancel().value().subscribe() }
+
+        fa(conn) { either: Either<Throwable, A> ->
           either.fold({
             emitter.onError(it)
           }, {

@@ -1,6 +1,5 @@
 package arrow.effects
 
-import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.deprecation.ExtensionsDSLDeprecated
@@ -11,7 +10,7 @@ import kotlin.coroutines.CoroutineContext
 
 @extension
 interface MaybeKFunctorInstance : Functor<ForMaybeK> {
-  override fun <A, B> Kind<ForMaybeK, A>.map(f: (A) -> B): MaybeK<B> =
+  override fun <A, B> MaybeKOf<A>.map(f: (A) -> B): MaybeK<B> =
     fix().map(f)
 }
 
@@ -20,7 +19,7 @@ interface MaybeKApplicativeInstance : Applicative<ForMaybeK> {
   override fun <A, B> MaybeKOf<A>.ap(ff: MaybeKOf<(A) -> B>): MaybeK<B> =
     fix().ap(ff)
 
-  override fun <A, B> Kind<ForMaybeK, A>.map(f: (A) -> B): MaybeK<B> =
+  override fun <A, B> MaybeKOf<A>.map(f: (A) -> B): MaybeK<B> =
     fix().map(f)
 
   override fun <A> just(a: A): MaybeK<A> =
@@ -32,7 +31,7 @@ interface MaybeKMonadInstance : Monad<ForMaybeK> {
   override fun <A, B> MaybeKOf<A>.ap(ff: MaybeKOf<(A) -> B>): MaybeK<B> =
     fix().ap(ff)
 
-  override fun <A, B> MaybeKOf<A>.flatMap(f: (A) -> Kind<ForMaybeK, B>): MaybeK<B> =
+  override fun <A, B> MaybeKOf<A>.flatMap(f: (A) -> MaybeKOf<B>): MaybeK<B> =
     fix().flatMap(f)
 
   override fun <A, B> MaybeKOf<A>.map(f: (A) -> B): MaybeK<B> =
@@ -48,22 +47,22 @@ interface MaybeKMonadInstance : Monad<ForMaybeK> {
 @extension
 interface MaybeKFoldableInstance : Foldable<ForMaybeK> {
 
-  override fun <A, B> Kind<ForMaybeK, A>.foldLeft(b: B, f: (B, A) -> B): B =
+  override fun <A, B> MaybeKOf<A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
 
-  override fun <A, B> Kind<ForMaybeK, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+  override fun <A, B> MaybeKOf<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
     fix().foldRight(lb, f)
 
-  override fun <A> Kind<ForMaybeK, A>.isEmpty(): Boolean =
+  override fun <A> MaybeKOf<A>.isEmpty(): Boolean =
     fix().isEmpty()
 
-  override fun <A> Kind<ForMaybeK, A>.exists(p: (A) -> Boolean): Boolean =
+  override fun <A> MaybeKOf<A>.exists(p: (A) -> Boolean): Boolean =
     fix().exists(p)
 
   override fun <A> MaybeKOf<A>.forAll(p: (A) -> Boolean): Boolean =
     fix().forall(p)
 
-  override fun <A> Kind<ForMaybeK, A>.nonEmpty(): Boolean =
+  override fun <A> MaybeKOf<A>.nonEmpty(): Boolean =
     fix().nonEmpty()
 }
 
@@ -94,7 +93,7 @@ interface MaybeKMonadThrowInstance : MonadThrow<ForMaybeK>, MaybeKMonadErrorInst
 
 @extension
 interface MaybeKBracketInstance : Bracket<ForMaybeK, Throwable>, MaybeKMonadThrowInstance {
-  override fun <A, B> Kind<ForMaybeK, A>.bracketCase(release: (A, ExitCase<Throwable>) -> Kind<ForMaybeK, Unit>, use: (A) -> Kind<ForMaybeK, B>): MaybeK<B> =
+  override fun <A, B> MaybeKOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> MaybeKOf<Unit>, use: (A) -> MaybeKOf<B>): MaybeK<B> =
     fix().bracketCase({ use(it) }, { a, e -> release(a, e) })
 }
 
@@ -107,7 +106,7 @@ interface MaybeKMonadDeferInstance : MonadDefer<ForMaybeK>, MaybeKBracketInstanc
 @extension
 interface MaybeKAsyncInstance : Async<ForMaybeK>, MaybeKMonadDeferInstance {
   override fun <A> async(fa: Proc<A>): MaybeK<A> =
-    MaybeK.async(fa)
+    MaybeK.async { _, cb -> fa(cb) }
 
   override fun <A> MaybeKOf<A>.continueOn(ctx: CoroutineContext): MaybeK<A> =
     fix().continueOn(ctx)

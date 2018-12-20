@@ -88,7 +88,7 @@ interface MonoKAsyncInstance :
   Async<ForMonoK>,
   MonoKMonadDeferInstance {
   override fun <A> async(fa: Proc<A>): MonoK<A> =
-    MonoK.async(fa)
+    MonoK.async { _, cb -> fa(cb) }
 
   override fun <A> MonoKOf<A>.continueOn(ctx: CoroutineContext): MonoK<A> =
     fix().continueOn(ctx)

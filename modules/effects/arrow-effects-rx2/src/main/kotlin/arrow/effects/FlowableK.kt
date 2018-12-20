@@ -5,17 +5,15 @@ import arrow.core.*
 import arrow.effects.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
-import arrow.effects.typeclasses.Proc
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
-import io.reactivex.FlowableEmitter
 import kotlin.coroutines.CoroutineContext
 
 fun <A> Flowable<A>.k(): FlowableK<A> = FlowableK(this)
 
-fun <A> FlowableKOf<A>.value(): Flowable<A> = this.fix().flowable
+fun <A> FlowableKOf<A>.value(): Flowable<A> = fix().flowable
 
 @higherkind
 data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKindedJ<A> {
@@ -27,7 +25,7 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
     flatMap { a -> fa.fix().map { ff -> ff(a) } }
 
   fun <B> flatMap(f: (A) -> FlowableKOf<B>): FlowableK<B> =
-    flowable.flatMap { f(it).fix().flowable }.k()
+    flowable.flatMap { f(it).value() }.k()
 
   /**
    * A way to safely acquire a resource and release in the face of errors and cancellation.
@@ -90,10 +88,10 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
     }
 
   fun <B> concatMap(f: (A) -> FlowableKOf<B>): FlowableK<B> =
-    flowable.concatMap { f(it).fix().flowable }.k()
+    flowable.concatMap { f(it).value() }.k()
 
   fun <B> switchMap(f: (A) -> FlowableKOf<B>): FlowableK<B> =
-    flowable.switchMap { f(it).fix().flowable }.k()
+    flowable.switchMap { f(it).value() }.k()
 
   fun <B> foldLeft(b: B, f: (B, A) -> B): B = flowable.reduce(b, f).blockingGet()
 
@@ -111,8 +109,8 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
       GA.run { f(a).map2Eval(eval) { Flowable.concat(Flowable.just<B>(it.a), it.b.flowable).k() } }
     }.value()
 
-  fun handleErrorWith(function: (Throwable) -> FlowableK<A>): FlowableK<A> =
-    flowable.onErrorResumeNext { t: Throwable -> function(t).flowable }.k()
+  fun handleErrorWith(function: (Throwable) -> FlowableKOf<A>): FlowableK<A> =
+    flowable.onErrorResumeNext { t: Throwable -> function(t).value() }.k()
 
   fun continueOn(ctx: CoroutineContext): FlowableK<A> =
     flowable.observeOn(ctx.asScheduler()).k()
@@ -149,16 +147,50 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
     fun <A> defer(fa: () -> FlowableKOf<A>): FlowableK<A> =
       Flowable.defer { fa().value() }.k()
 
-    fun <A> async(fa: Proc<A>, mode: BackpressureStrategy = BackpressureStrategy.BUFFER): FlowableK<A> =
-      Flowable.create({ emitter: FlowableEmitter<A> ->
-        fa { either: Either<Throwable, A> ->
+    /**
+     * Creates a [FlowableK] that'll run [FlowableKProc].
+     *
+     * {: data-executable='true'}
+     *
+     * ```kotlin:ank
+     * import arrow.core.Either
+     * import arrow.core.right
+     * import arrow.effects.FlowableK
+     * import arrow.effects.FlowableKConnection
+     * import arrow.effects.value
+     *
+     * class Resource {
+     *   fun asyncRead(f: (String) -> Unit): Unit = f("Some value of a resource")
+     *   fun close(): Unit = Unit
+     * }
+     *
+     * fun main(args: Array<String>) {
+     *   //sampleStart
+     *   val result = FlowableK.async( fa= { conn: FlowableKConnection, cb: (Either<Throwable, String>) -> Unit ->
+     *     val resource = Resource()
+     *     conn.push(FlowableK { resource.close() })
+     *     resource.asyncRead { value -> cb(value.right()) }
+     *   })
+     *   //sampleEnd
+     *   result.value().subscribe(::println)
+     * }
+     * ```
+     */
+    fun <A> async(fa: FlowableKProc<A>, mode: BackpressureStrategy = BackpressureStrategy.BUFFER): FlowableK<A> =
+      Flowable.create<A>({ emitter ->
+        val conn = FlowableKConnection()
+        //On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
+        //on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
+        conn.push(FlowableK { if (!emitter.isCancelled) emitter.onError(ConnectionCancellationException) })
+        emitter.setCancellable { conn.cancel().value().subscribe() }
+
+        fa(conn) { either: Either<Throwable, A> ->
           either.fold({
             emitter.onError(it)
           }, {
             emitter.onNext(it)
             emitter.onComplete()
           })
-
         }
       }, mode).k()
 
