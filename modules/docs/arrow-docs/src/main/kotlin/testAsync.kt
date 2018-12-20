@@ -1,13 +1,33 @@
-import arrow.core.Right
+import arrow.Kind
+import arrow.core.Either
+import arrow.core.Left
 import arrow.effects.*
 import arrow.effects.deferredk.async.async
+import arrow.effects.deferredk.effect.effect
 import arrow.effects.deferredk.monad.flatMap
-import kotlinx.coroutines.cancelAndJoin
+import arrow.effects.deferredk.monad.map
+import arrow.effects.instances.io.async.async
+import arrow.effects.instances.io.effect.effect
+import arrow.effects.instances.io.monad.flatMap
+import arrow.effects.typeclasses.Effect
+import arrow.test.generators.genThrowable
+import io.kotlintest.matchers.shouldBe
+import io.kotlintest.properties.Gen
+import io.kotlintest.properties.forAll
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import java.lang.RuntimeException
 
 fun main(args: Array<String>) = runBlocking<Unit> {
+
+  ObservableK.async<Unit> { conn, cb ->
+    conn.cancel().value().subscribe()
+  }.value().subscribe(::println, ::println)
+
+  IO.async<Unit> { conn, _ ->
+    conn.cancel().fix().unsafeRunSync()
+  }.unsafeRunSync()
 
   //  IO.async<Unit> { conn, cb ->
 //    conn.push(IO { println("Hello from IO cancel stack") })
@@ -18,15 +38,26 @@ fun main(args: Array<String>) = runBlocking<Unit> {
 //    .runAsync { throw RuntimeException("Nested Boom!") }
 //    .unsafeRunAsync {  }
 
+
   println("runAsync")
   println("######################################################################")
 
-  IO.raiseError<Unit>(RuntimeException("IO Boom!"))
-    .runAsync { IO { println("runAsync $it") } }
-    .unsafeRunAsync { println("unsafeRunAsync $it") }
+  IO.effect().runAsyncShouldAlwaysExecuteWhenRun { it.fix().unsafeRunSync() }
+    .also { println("IO.effect().runAsyncShouldAlwaysExecuteWhenRun") }
+  IO.effect().runAsyncShouldRunWhenRaiseError2 { it.fix().unsafeRunSync() }
+    .also { println("IO.effect().runAsyncShouldRunWhenRaiseError2") }
+
+//  DeferredK.effect().runAsyncShouldAlwaysExecuteWhenRun { it.fix().unsafeRunSync() }
+//    .also { println("DeferredK.effect().runAsyncShouldAlwaysExecuteWhenRun") }
+//  DeferredK.effect().runAsyncShouldRunWhenRaiseError2 { it.fix().unsafeRunSync() }
+//    .also { println("DeferredK.effect().runAsyncShouldRunWhenRaiseError2") }
 
   DeferredK.raiseError<Unit>(RuntimeException("DeferredK Boom!"))
     .runAsync { DeferredK { println("runAsync $it") } }
+    .unsafeRunAsync { println("unsafeRunAsync $it") }
+
+  DeferredK.raiseError<Unit>(RuntimeException("DeferredK Boom!"))
+    .runAsync { DeferredK { it.fold({ e -> throw e }, { Unit }) } }
     .unsafeRunAsync { println("unsafeRunAsync $it") }
 
   println("######################################################################")
@@ -51,6 +82,36 @@ fun main(args: Array<String>) = runBlocking<Unit> {
   }.unsafeRunAsyncCancellable { }
     .invoke()
 
+  IO.async<Unit> { conn, cb ->
+    conn.push(IO { println("Hello from IO runAsyncCancellable cancel stack") })
+  }.runAsyncCancellable { IO { println("IO.runAsyncCancellable $it") } }
+    .unsafeRunSync()
+    .invoke()
+
+  DeferredK.async<Unit> { conn, cb ->
+    conn.push(DeferredK { println("Hello from DeferredK runAsyncCancellable cancel stack") })
+  }.runAsyncCancellable { DeferredK { println("DeferredK.runAsyncCancellable $it") } }
+    .unsafeRunSync()
+    .invoke()
+
+//  Promise.uncancelable<ForIO, Unit>(IO.async()).flatMap { latch ->
+//    IO.async<Unit> { conn, cb ->
+//      conn.push(latch.complete(Unit))
+//    }.unsafeRunAsyncCancellable { }
+//      .invoke()
+//
+//    latch.get
+//  }.unsafeRunSync()
+//
+//  Promise.uncancelable<ForDeferredK, Unit>(DeferredK.async()).flatMap { latch ->
+//    DeferredK.async<Unit> { conn, cb ->
+//      conn.push(latch.complete(Unit))
+//    }.unsafeRunAsyncCancellable { }
+//      .invoke()
+//
+//    latch.get
+//  }.unsafeRunSync()
+
 //  d.start()
 //  d.cancelAndJoin()
 
@@ -61,5 +122,37 @@ fun main(args: Array<String>) = runBlocking<Unit> {
 ////    .invoke()
 //
   delay(5000)
+}
+
+fun <F> Effect<F>.runAsyncShouldRunWhenRaiseError2(run: (Kind<F, Boolean>) -> Boolean): Unit {
+  forAll(genThrowable()) { t ->
+    run(Promise.uncancelable<F, Either<Throwable, Unit>>(this).flatMap { latch ->
+      run(raiseError<Unit>(t)
+        .runAsync { latch.complete(it) }.map { true })
+
+      latch.get.map { either -> either == Left(t) }
+    })
+  }
+}
+
+fun <F> Effect<F>.runAsyncShouldAlwaysExecuteWhenRun(run: (Kind<F, Boolean>) -> Boolean): Unit {
+  forAll(Gen.int()) { i ->
+    run(Promise.uncancelable<F, Int>(this).flatMap { latch ->
+      run(just(i)
+        .runAsync {
+          it.fold(latch::error, latch::complete)
+        }.map { true })
+      latch.get.map { ii -> i == ii }
+    })
+  }
+}
+
+//IO.async<Unit> { conn, cb ->
+//  conn.push(IO { println("Hello from IO cancel stack") })
+//}.unsafeRunAsyncCancellable { }
+//.invoke()
+
+fun <F> Effect<F>.asyncShouldCancelTokenOnAsync(): Unit {
 
 }
+

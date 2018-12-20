@@ -143,15 +143,13 @@ class DeferredKTest : UnitSpec() {
     "should catch exceptions within run block with runAsync" {
       try {
         val exception = MyException()
-        val ioa = DeferredK<Int>(GlobalScope, Unconfined, CoroutineStart.DEFAULT) { throw exception }
+        val ioa = DeferredK<Int>(GlobalScope, Unconfined, CoroutineStart.DEFAULT) { throw MyException() }
         ioa.runAsync { either ->
-          either.fold({ throw it }, { fail("") })
+          either.fold({ throw MyException() }, { fail("") })
         }.unsafeRunSync()
         fail("Should rethrow the exception")
       } catch (myException: MyException) {
         // Success
-      } catch (throwable: Throwable) {
-        fail("Should only throw MyException")
       }
     }
 
@@ -221,15 +219,15 @@ class DeferredKTest : UnitSpec() {
 //        }.await()
 //      }
 //    }
-//
-//    "KindConnection can cancel upstream" {
-//      Try {
-//        DeferredK.async<Unit> { conn, _ ->
-//          conn.cancel().unsafeRunAsync { }
-//        }.unsafeRunSync()
-//      }.fold({ e -> e should { it is arrow.effects.ConnectionCancellationException } },
-//        { throw AssertionError("Expected exception of type arrow.effects.ConnectionCancellationException but caught no exception") })
-//    }
+
+    "KindConnection can cancel upstream" {
+      Try {
+        DeferredK.async<Unit> { conn, _ ->
+          conn.cancel().unsafeRunSync()
+        }.unsafeRunSync()
+      }.fold({ e -> e should { it is arrow.effects.ConnectionCancellationException } },
+        { throw AssertionError("Expected exception of type arrow.effects.ConnectionCancellationException but caught no exception") })
+    }
 
     "DeferredK async should be cancellable" {
       Promise.uncancelable<ForDeferredK, Unit>(DeferredK.async())

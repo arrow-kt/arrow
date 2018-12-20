@@ -11,6 +11,7 @@ import arrow.higherkind
 import kotlinx.coroutines.*
 import kotlinx.coroutines.selects.SelectClause0
 import kotlinx.coroutines.selects.SelectClause1
+import java.lang.RuntimeException
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -759,17 +760,21 @@ fun <A> DeferredKOf<A>.unsafeRunSync(): A =
  */
 fun <A> DeferredKOf<A>.runAsync(cb: (Either<Throwable, A>) -> DeferredKOf<Unit>): DeferredK<Unit> =
   DeferredK(scope(), Dispatchers.Unconfined, CoroutineStart.LAZY) {
-    fix().forceExceptionPropagation()
-    val d = scope().async(Dispatchers.Unconfined, CoroutineStart.DEFAULT) {
-      try {
-        cb(Right(await()))
-      } catch (t: Throwable) {
-        cb(Left(t))
-      }.unsafeRunAsync { }
+    val result: A? = try {
+      await()
+    } catch (t: Throwable) {
+      cb(Left(t)).await()
+      null
     }
-    d.forceExceptionPropagation()
-    d.await()
+
+    result?.let { cb(Right(it)) }?.await()
+
+    Unit
   }
+//scope().async(Dispatchers.Unconfined, CoroutineStart.DEFAULT) {
+//  Try { await() }.fold({ cb(Left(it)) }, { cb(Right(it)) })
+//}.forceExceptionPropagation()
+
 
 /**
  * Runs the [DeferredK] asynchronously and continues with the [DeferredK] returned by cb.
@@ -799,13 +804,22 @@ fun <A> DeferredKOf<A>.runAsync(cb: (Either<Throwable, A>) -> DeferredKOf<Unit>)
  * ```
  */
 fun <A> DeferredKOf<A>.runAsyncCancellable(onCancel: OnCancel = OnCancel.Silent, cb: (Either<Throwable, A>) -> DeferredKOf<Unit>): DeferredK<Disposable> =
-  ConnectedGenerated(Dispatchers.Unconfined, CoroutineStart.LAZY, scope()) { conn ->
+  DeferredK(scope(), Dispatchers.Unconfined, CoroutineStart.DEFAULT) {
     fix().forceExceptionPropagation()
-    val call = CompletableDeferred<Unit>(parent = runAsync(cb))
+    val self = this@runAsyncCancellable.fix()
+    self.invokeOnCompletion {
+      if (self.isCompleted && !self.isCancelled && self.getCompletionExceptionOrNull() == null) {
+        cb(Right(self.getCompleted()))
+      } else if (self.getCompletionExceptionOrNull() != null) {
+        cb(Left(self.getCompletionExceptionOrNull()!!))
+      }
+    }
+
+    self.start()
     val disposable: Disposable = {
       when (onCancel) {
-        OnCancel.ThrowCancellationException -> call.completeExceptionally(OnCancel.CancellationException)
-        OnCancel.Silent -> call.cancel().also { conn.cancel().unsafeRunAsync { } }
+        OnCancel.ThrowCancellationException -> self.cancel()
+        OnCancel.Silent -> self.cancel()
       }
     }
     disposable
@@ -824,26 +838,7 @@ fun <A> DeferredKOf<A>.runAsyncCancellable(onCancel: OnCancel = OnCancel.Silent,
 //  }
 //}
 fun <A> DeferredKOf<A>.unsafeRunAsyncCancellable(onCancel: OnCancel = OnCancel.Silent, cb: (Either<Throwable, A>) -> Unit): Disposable =
-  DeferredK(scope(), Dispatchers.Unconfined, CoroutineStart.DEFAULT) {
-    fix().forceExceptionPropagation()
-    val self = this@unsafeRunAsyncCancellable.fix()
-    self.start()
-    self.invokeOnCompletion {
-      if (self.isCompleted && !self.isCancelled && self.getCompletionExceptionOrNull() == null) {
-        cb(Right(self.getCompleted()))
-      } else if (self.getCompletionExceptionOrNull() != null) {
-        cb(Left(self.getCompletionExceptionOrNull()!!))
-      }
-    }
-
-    val disposable: Disposable = {
-      when (onCancel) {
-        OnCancel.ThrowCancellationException -> self.cancel()
-        OnCancel.Silent -> self.cancel()
-      }
-    }
-    disposable
-  }.unsafeRunSync()
+  runAsyncCancellable(onCancel) { DeferredK { cb(it) } }.unsafeRunSync()
 
 /**
  * Runs the [DeferredK] asynchronously and then runs the cb.
