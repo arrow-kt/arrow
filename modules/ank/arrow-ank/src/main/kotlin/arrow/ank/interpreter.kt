@@ -1,26 +1,18 @@
 package arrow.ank
 
-import arrow.Kind
 import arrow.core.*
-import arrow.data.Nel
-import arrow.data.fix
 import arrow.effects.typeclasses.MonadDefer
-import arrow.instances.list.traverse.sequence
-import arrow.instances.sequence.foldable.isEmpty
-import org.intellij.markdown.MarkdownElementTypes
-import org.intellij.markdown.ast.ASTNode
-import org.intellij.markdown.ast.accept
-import org.intellij.markdown.ast.getTextInNode
-import org.intellij.markdown.ast.visitors.RecursiveVisitor
-import org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor
-import org.intellij.markdown.parser.MarkdownParser
+import arrow.instances.sequence.foldable.foldLeft
 import java.net.URL
 import java.net.URLClassLoader
 import java.nio.file.Files
 import java.nio.file.Path
-import java.util.stream.Collectors
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentMap
+import javax.script.ScriptContext
 import javax.script.ScriptEngine
 import javax.script.ScriptEngineManager
+
 
 val extensionMappings = mapOf(
   "java" to "java",
@@ -53,8 +45,6 @@ abstract class NoStackTrace(msg: String) : Throwable(msg, null, false, false)
 data class Snippet(
   val fence: String,
   val lang: String,
-  val startOffset: Int,
-  val endOffset: Int,
   val code: String,
   val result: Option<String> = None,
   val isSilent: Boolean = fence.contains(AnkSilentBlock),
@@ -73,128 +63,141 @@ const val AnkPlaygroundExtension = ":ank:playground:extension"
 
 val ankMacroRegex: Regex = "ank_macro_hierarchy\\((.*?)\\)".toRegex()
 
+sealed class SnippetParserState {
+  data class CollectingCode(val snippet: Snippet) : SnippetParserState()
+  object Searching : SnippetParserState()
+}
+
 fun <F> monadDeferInterpreter(MF: MonadDefer<F>): AnkOps<F> = object : AnkOps<F> {
   override fun MF(): MonadDefer<F> = MF
 
-  override fun printConsole(msg: String): Kind<F, Unit> = MF.delay { println(msg) }
+  override fun printConsole(msg: String): Unit = println(msg)
 
-  override fun Path.containsAnkSnippets(): Kind<F, Boolean> = MF.delay {
-    toFile().useLines { line ->
-      line.find { it.contains(AnkBlock) } != null
+  private fun Path.containsAnkSnippets(): Boolean =
+    toFile().bufferedReader().use {
+      it.lines().anyMatch { s -> s.contains(AnkBlock) || s.contains("ank_macro") }
     }
-  }
 
-  override fun createTargetDirectory(source: Path, target: Path): Kind<F, Path> = MF.delay {
-    source.toFile().copyRecursively(target.toFile(), overwrite = true); target
-  }
-
-  override fun getCandidatePaths(root: Path): Kind<F, Option<Nel<Path>>> = MF.delay {
-    Nel.fromList<Path>(
-      Files.walk(root).filter { Files.isDirectory(it).not() }.filter { path ->
+  override fun <A> Path.withAnkFiles(f: (AnkProcessingContext) -> A): Sequence<A> =
+    Files.walk(this)
+      .filter { Files.isDirectory(it).not() }
+      .filter { path ->
         SupportedMarkdownExtensions.fold(false) { c, ext ->
           c || path.toString().endsWith(ext)
-        }
-      }.collect(Collectors.toList())
-    )
+        } && path.containsAnkSnippets()
+      }.iterator().asSequence().mapIndexed { index, path ->
+        f(AnkProcessingContext(index, path))
+      }
+
+  override fun createTargetDirectory(source: Path, target: Path): Path {
+    source.toFile().copyRecursively(target.toFile(), overwrite = true)
+    return target
   }
 
-  override fun readFile(path: Path): Kind<F, String> = MF.delay {
-    String(Files.readAllBytes(path))
-  }
-
-  override fun preProcessMacros(pathAndContent: Tuple2<Path, String>): String {
-    val matches = ankMacroRegex.findAll(pathAndContent.b)
-    return if (matches.isEmpty()) pathAndContent.b else {
-      val classes = matches.map { it.groupValues[1] }
-      val cleanedSource = ankMacroRegex.replace(pathAndContent.b) { "" }
-      cleanedSource + "\n\n\n## Type Class Hierarchy\n\n" +
-        generateMixedHierarchyDiagramCode(classes.toList()).joinToString("\n")
+  override fun Path.processMacros(): Sequence<String> =
+    toFile().useLines { ls ->
+      val (classes, lines) =
+        ls
+          .fold(emptyList<String>() toT emptySequence<String>()) { (classes, lines), line ->
+            val cs = ankMacroRegex.findAll(line).map { it.groupValues[1] }
+            (classes + cs) toT lines + line
+          }
+      val cleanedSource = lines.map { ankMacroRegex.replace(it) { "" } }
+      if (classes.isNotEmpty()) {
+        cleanedSource +
+          sequenceOf("\n", "\n", "\n", "## Type Class Hierarchy", "\n", "\n") +
+          generateMixedHierarchyDiagramCode(classes.toList())
+      } else cleanedSource
     }
-  }
 
-  override fun parseMarkdown(markdown: String): Kind<F, ASTNode> = MF.delay {
-    MarkdownParser(GFMFlavourDescriptor()).buildMarkdownTreeFromString(markdown)
-  }
 
-  override fun extractCode(content: String, ast: ASTNode): Kind<F, Option<Nel<Snippet>>> = MF.delay {
-    val snippets = mutableListOf<Snippet>()
-    ast.accept(object : RecursiveVisitor() {
-      override fun visitNode(node: ASTNode) {
-        if (node.type == MarkdownElementTypes.CODE_FENCE) {
-          val fence = node.getTextInNode(content)
-          val lang = fence.takeWhile { it != ':' }.toString().replace("```", "")
-          if (fence.startsWith("```$lang$AnkBlock")) {
-            val code = fence.split("\n").drop(1).dropLast(1).joinToString("\n")
-            snippets.add(Snippet(fence.toString(), lang, node.startOffset, node.endOffset, code))
+  val fenceRegexStart = "```(.*):ank.*".toRegex()
+  val fenceRegexEnd = "```.*".toRegex()
+
+  override fun extractCode(content: Sequence<String>): Tuple2<Sequence<String>, Sequence<Snippet>> {
+    val result: Tuple3<SnippetParserState, Sequence<String>, Sequence<Snippet>> =
+      content
+        .fold(
+          Tuple3(SnippetParserState.Searching, emptySequence(), emptySequence())
+        ) { (state, lines, snippets), line ->
+          when (state) {
+            is SnippetParserState.Searching -> {
+              val startMatch = fenceRegexStart.matchEntire(line)
+              if (startMatch != null) { //found a fence start
+                val lang = startMatch.groupValues[1].trim()
+                val snippet = Snippet(line, lang, "")
+                Tuple3(SnippetParserState.CollectingCode(snippet), lines + line, snippets)
+              } else Tuple3(state, lines + line, snippets) // we are still searching
+            }
+            is SnippetParserState.CollectingCode -> {
+              val endMatch = fenceRegexEnd.matchEntire(line)
+              if (endMatch != null) { // found a fence end
+                Tuple3(SnippetParserState.Searching, lines + line, snippets + state.snippet.copy(fence = state.snippet.fence + "\n" + line))
+              } else { //accumulating code inside a fence
+                val modifiedSnippet = state.snippet.copy(
+                  fence = state.snippet.fence + "\n" + line,
+                  code = state.snippet.code + "\n" + line
+                )
+                Tuple3(state.copy(snippet = modifiedSnippet), lines + line, snippets)
+              }
+            }
           }
         }
-        super.visitNode(node)
-      }
-    })
-
-    Nel.fromList(snippets)
+    return result.b toT result.c
   }
 
-  override fun compileCode(snippets: Tuple2<Path, Nel<Snippet>>, compilerArgs: List<String>): Kind<F, Nel<Snippet>> = MF.run {
-    binding {
-      val engineCache = createEngineCache(snippets.b, compilerArgs).bind()
-      // run each snipped and handle its result
-      snippets.b.all.mapIndexed { i, snip ->
-        binding {
-          Try {
-            if (snip.isPlaygroundExtension) ""
-            else engineCache.getOrElse(snip.lang) {
-              throw CompilationException(
-                path = snippets.a,
-                snippet = snip,
-                underlying = IllegalStateException("No engine configured for `${snip.lang}`"),
-                msg = colored(ANSI_RED, "ΛNK compilation failed [ ${snippets.a} ]")
-              )
-            }.eval(snip.code)
-          }.fold({
-            // raise error and print to console
-            defer {
-              println(colored(ANSI_RED, "[${(i + 1) * 100 / snippets.b.size}%] ✗ ${snippets.a} [${i + 1} of ${snippets.b.size}]"))
-              raiseError<Snippet>(
-                CompilationException(snippets.a, snip, it, msg = "\n" + """
+  override fun compileCode(snippets: Tuple2<Path, Sequence<Snippet>>, compilerArgs: List<String>): Sequence<Snippet> {
+    val engineCache = getEngineCache(snippets.b, compilerArgs)
+    // run each snipped and handle its result
+    return snippets.b.mapIndexed { i, snip ->
+      Try {
+        if (snip.isPlaygroundExtension) ""
+        else engineCache.getOrElse(snip.lang) {
+          throw CompilationException(
+            path = snippets.a,
+            snippet = snip,
+            underlying = IllegalStateException("No engine configured for `${snip.lang}`"),
+            msg = colored(ANSI_RED, "ΛNK compilation failed [ ${snippets.a} ]")
+          )
+        }.eval(snip.code)
+      }.fold<Snippet>({
+        // raise error and print to console
+        println(colored(ANSI_RED, "[✗ ${snippets.a} [${i + 1}]"))
+        throw CompilationException(snippets.a, snip, it, msg = "\n" + """
                     |
                     |```
                     |${snip.code}
                     |```
                     |${colored(ANSI_RED, it.localizedMessage)}
                     """.trimMargin())
-              )
-            }.bind()
-          }, { result ->
-            // handle results, ignore silent snippets
-            if (snip.isSilent) snip
-            else {
-              val resultString: Option<String> = Option.fromNullable(result).fold({ None }, {
-                when {
-                  // replace entire snippet with result
-                  snip.isReplace -> Some("$it")
-                  snip.isPlaygroundExtension -> Some("$it")
-                  // write result to a new file
-                  snip.isOutFile -> delay {
-                    val fileName = snip.fence.lines()[0].substringAfter("(").substringBefore(")")
-                    val dir = snippets.a.parent
-                    Files.write(dir.resolve(fileName), result.toString().toByteArray())
-                    Some("")
-                  }.bind()
-                  // simply append result
-                  else -> Some("// $it")
-                }
-              })
-              snip.copy(result = resultString)
+      }, { result ->
+        // handle results, ignore silent snippets
+        if (snip.isSilent) snip
+        else {
+          val resultString: Option<String> = Option.fromNullable(result).fold({ None }, {
+            when {
+              // replace entire snippet with result
+              snip.isReplace -> Some("$it")
+              snip.isPlaygroundExtension -> Some("$it")
+              // write result to a new file
+              snip.isOutFile -> {
+                val fileName = snip.fence.lines()[0].substringAfter("(").substringBefore(")")
+                val dir = snippets.a.parent
+                Files.write(dir.resolve(fileName), result.toString().toByteArray())
+                Some("")
+              }
+              // simply append result
+              else -> Some("// $it")
             }
           })
+          snip.copy(result = resultString)
         }
-      }.sequence(MF)
-    }.flatten().map { Nel.fromListUnsafe(it.fix()) }
+      })
+    }
   }
 
-  override fun replaceAnkToLang(content: String, compiledSnippets: Nel<Snippet>): String =
-    compiledSnippets.foldLeft(content) { content, snippet ->
+  override fun replaceAnkToLang(content: Sequence<String>, compiledSnippets: Sequence<Snippet>): Sequence<String> =
+    sequenceOf(compiledSnippets.foldLeft(content.joinToString("\n")) { content, snippet ->
       snippet.result.fold(
         { content.replace(snippet.fence, "{: data-executable='true'}\n\n```${snippet.lang}\n${snippet.code}\n```") },
         {
@@ -210,46 +213,50 @@ fun <F> monadDeferInterpreter(MF: MonadDefer<F>): AnkOps<F> = object : AnkOps<F>
           }
         }
       )
-    }
+    })
 
-  override fun generateFile(path: Path, newContent: String): Kind<F, Unit> = MF.delay {
-    Files.write(path, newContent.toByteArray())
-    Unit
-  }
+  override fun generateFile(path: Path, newContent: Sequence<String>): Path =
+    Files.write(path, newContent.asIterable())
 
-  private fun createEngineCache(snippets: Nel<Snippet>, compilerArgs: List<String>): Kind<F, Map<String, ScriptEngine>> = MF.run {
-    bindingCatch {
-      val classLoader = delay { URLClassLoader(compilerArgs.map { URL(it) }.toTypedArray()) }.bind()
-      val seManager = delay { ScriptEngineManager(classLoader) }.bind()
-      delay {
-        snippets.all.asSequence().distinctBy { it.lang }.map {
-          it.lang to seManager.getEngineByExtension(extensionMappings.getOrDefault(it.lang, "kts"))
-        }.toMap()
-      }.bind()
+  private val engineCache: ConcurrentMap<List<String>, Map<String, ScriptEngine>> = ConcurrentHashMap()
+
+  private fun getEngineCache(snippets: Sequence<Snippet>, compilerArgs: List<String>): Map<String, ScriptEngine> {
+    val cache = engineCache[compilerArgs]
+    return if (cache == null) { //create a new engine
+      val classLoader = URLClassLoader(compilerArgs.map { URL(it) }.toTypedArray())
+      val seManager = ScriptEngineManager(classLoader)
+      val langs = snippets.map { it.lang }.distinct()
+      val engines = langs.toList().map {
+        it to seManager.getEngineByExtension(extensionMappings.getOrDefault(it, "kts"))
+      }.toMap()
+      engineCache.putIfAbsent(compilerArgs, engines) ?: engines
+    } else { //reset an engine. Non thread-safe
+      cache.forEach { _, engine ->
+        engine.setBindings(engine.createBindings(), ScriptContext.ENGINE_SCOPE)
+      }
+      cache
     }
   }
 
   //TODO Try by overriding dokka settings for packages so it does not create it's markdown package file, then for regular type classes pages we only check the first result with the comment but remove them all regardless
-  private fun generateMixedHierarchyDiagramCode(classes: List<String>): List<String> {
-    val packageName = classes.firstOrNull()?.substringBeforeLast(".")
+  private fun generateMixedHierarchyDiagramCode(classes: List<String>): Sequence<String> {
+    //val packageName = classes.firstOrNull()?.substringBeforeLast(".")
     //careful meta-meta-programming ahead
     val hierarchyGraphsJoined =
       "listOf(" + classes
         .map { "TypeClass($it::class)" }
         .joinToString(", ") + ").mixedHierarchyGraph()"
 
-    return listOf(
-      """
-      |<canvas id="$packageName-hierarchy-diagram"></canvas>
-      |<script>
-      |  drawNomNomlDiagram('$packageName-hierarchy-diagram', '$packageName-diagram.nomnol')
-      |</script>
-    """.trimMargin(),
-      """
-      |```kotlin:ank:outFile($packageName-diagram.nomnol)
-      |import arrow.reflect.*
-      |$hierarchyGraphsJoined
-      |```
-      |""".trimMargin())
+    return sequenceOf(
+      """<canvas id="hierarchy-diagram"></canvas>""",
+      """<script>""",
+      """  drawNomNomlDiagram('hierarchy-diagram', 'diagram.nomnol')""",
+      """</script>""",
+      "",
+      """```kotlin:ank:outFile(diagram.nomnol)""",
+      """import arrow.reflect.*""",
+      hierarchyGraphsJoined,
+      """```""""
+    )
   }
 }

@@ -9,6 +9,7 @@ dependencies {
     compile "com.github.born2snipe:cli-progress:0.4"
     compile "org.jetbrains.kotlin:kotlin-compiler:$kotlinVersion"
     compile "org.jetbrains.kotlin:kotlin-script-util:$kotlinVersion"
+    compile "com.google.guava:guava:23.0"
     kapt project(':arrow-annotations-processor')
 }
 
