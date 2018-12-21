@@ -13,7 +13,6 @@ import javax.script.ScriptContext
 import javax.script.ScriptEngine
 import javax.script.ScriptEngineManager
 
-
 val extensionMappings = mapOf(
   "java" to "java",
   "kotlin" to "kts"
@@ -109,7 +108,6 @@ fun <F> monadDeferInterpreter(MF: MonadDefer<F>): AnkOps<F> = object : AnkOps<F>
           generateMixedHierarchyDiagramCode(classes.toList())
       } else cleanedSource
     }
-
 
   val fenceRegexStart = "```(.*):ank.*".toRegex()
   val fenceRegexEnd = "```.*".toRegex()
