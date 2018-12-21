@@ -1,6 +1,7 @@
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Left
+import arrow.core.Right
 import arrow.effects.*
 import arrow.effects.deferredk.async.async
 import arrow.effects.deferredk.effect.effect
@@ -21,13 +22,27 @@ import java.lang.RuntimeException
 
 fun main(args: Array<String>) = runBlocking<Unit> {
 
-  ObservableK.async<Unit> { conn, cb ->
-    conn.cancel().value().subscribe()
-  }.value().subscribe(::println, ::println)
+  IO.async<Unit> { conn, cb ->
+    conn.push(IO { println("I got cancelled by IO") })
+    cb(Right(Unit))
+  }.flatMap {
+    IO.async<Unit> { conn, cb ->
+      conn.cancel().fix().unsafeRunSync()
+    }
+  }.runAsyncCancellable { IO { println(it) } }
+    .unsafeRunSync()
 
-  IO.async<Unit> { conn, _ ->
-    conn.cancel().fix().unsafeRunSync()
-  }.unsafeRunSync()
+//  DeferredK.async<Unit> { conn, cb ->
+//    conn.push(DeferredK { println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  I got cancelled by DeferredK") })
+//    cb(Right(Unit))
+//  }.flatMap {
+    DeferredK.async<Unit> { conn, cb ->
+      conn.push(DeferredK { println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@   But I did get called!") })
+//      conn.cancel().unsafeRunSync()
+//    }
+  }.runAsyncCancellable { DeferredK { println(it) } }
+    .unsafeRunSync()
+    .invoke()
 
   //  IO.async<Unit> { conn, cb ->
 //    conn.push(IO { println("Hello from IO cancel stack") })
@@ -90,7 +105,8 @@ fun main(args: Array<String>) = runBlocking<Unit> {
 
   DeferredK.async<Unit> { conn, cb ->
     conn.push(DeferredK { println("Hello from DeferredK runAsyncCancellable cancel stack") })
-  }.runAsyncCancellable { DeferredK { println("DeferredK.runAsyncCancellable $it") } }
+  }
+    .runAsyncCancellable { DeferredK { println("DeferredK.runAsyncCancellable $it") } }
     .unsafeRunSync()
     .invoke()
 

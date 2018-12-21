@@ -3,6 +3,7 @@ package arrow.effects
 import arrow.core.Either
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.MonadDefer
+import arrow.effects.handleErrorWith as handleErrorW
 
 typealias DeferredKConnection = KindConnection<ForDeferredK>
 typealias DeferredKProc<A> = (DeferredKConnection, (Either<Throwable, A>) -> Unit) -> Unit
@@ -26,7 +27,7 @@ fun DeferredKConnection(dummy: Unit = Unit): KindConnection<ForDeferredK> = Kind
     DeferredK.raiseError(e)
 
   override fun <A> DeferredKOf<A>.handleErrorWith(f: (Throwable) -> DeferredKOf<A>): DeferredK<A> =
-    fix().handleErrorWith(f)
+    handleErrorW(f)
 
   override fun <A> just(a: A): DeferredK<A> =
     DeferredK.just(a)
