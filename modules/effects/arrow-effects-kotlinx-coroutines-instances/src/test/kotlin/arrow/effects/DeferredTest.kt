@@ -168,16 +168,16 @@ class DeferredKTest : UnitSpec() {
       }
     }
 
-//    "awaitAll called on a Traverse instance of Kind<F, DeferredK<T>> should return a Traverse instance of Kind<F, T>" {
-//      forAll(Gen.string(), Gen.list(Gen.string())) { x, xs ->
-//        runBlocking {
-//          checkAwaitAll(ListK.functor(), ListK.traverse(), xs.k()) &&
-//            checkAwaitAll(NonEmptyList.functor(), NonEmptyList.traverse(), NonEmptyList(x, xs)) &&
-//            checkAwaitAll(Option.functor(), Option.traverse(), Option.just(x)) &&
-//            checkAwaitAll(Try.functor(), Try.traverse(), Try.just(x))
-//        }
-//      }
-//    }
+    "awaitAll called on a Traverse instance of Kind<F, DeferredK<T>> should return a Traverse instance of Kind<F, T>" {
+      forAll(Gen.string(), Gen.list(Gen.string())) { x, xs ->
+        runBlocking {
+          checkAwaitAll(ListK.functor(), ListK.traverse(), xs.k()) &&
+            checkAwaitAll(NonEmptyList.functor(), NonEmptyList.traverse(), NonEmptyList(x, xs)) &&
+            checkAwaitAll(Option.functor(), Option.traverse(), Option.just(x)) &&
+            checkAwaitAll(Try.functor(), Try.traverse(), Try.just(x))
+        }
+      }
+    }
 
     "DeferredK bracket cancellation should release resource with cancel exit status" {
       runBlocking {
@@ -208,17 +208,16 @@ class DeferredKTest : UnitSpec() {
       }
     }
 
-//    "DeferredK should cancel KindConnection on dispose" {
-//      runBlocking {
-//        Promise.uncancelable<ForDeferredK, Unit>(DeferredK.async()).flatMap { latch ->
-//          DeferredK {
-//            DeferredK.async<Unit>(start = CoroutineStart.DEFAULT) { conn, _ ->
-//              conn.push(latch.complete(Unit))
-//            }.cancel()
-//          }.flatMap { latch.get }
-//        }.await()
-//      }
-//    }
+    "DeferredK should cancel KindConnection on dispose" {
+      runBlocking {
+        val promise = Promise.unsafeUncancelable<ForDeferredK, Unit>(DeferredK.async())
+        DeferredK.async<Unit> { conn, _ ->
+          conn.push(promise.complete(Unit))
+        }.unsafeRunAsyncCancellable {  }
+          .invoke()
+        promise.get.await()
+      }
+    }
 
     "KindConnection can cancel upstream" {
       Try {
@@ -236,7 +235,6 @@ class DeferredKTest : UnitSpec() {
             val d =
               DeferredK.async<Unit> { _, _ -> }
                 .apply { invokeOnCompletion { e -> if (e is CancellationException) latch.complete(Unit).unsafeRunAsync { } } }
-
             d.start()
             d.cancelAndJoin()
           }.flatMap { latch.get }
