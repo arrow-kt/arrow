@@ -163,7 +163,7 @@ sealed class DeferredK<A>(
     internal class DefaultGenerated<A>(val ctx: CoroutineContext = Dispatchers.Default,
                                        val coroutineStart: CoroutineStart = CoroutineStart.LAZY,
                                        scope: CoroutineScope = GlobalScope,
-                                       val generator: suspend CoroutineScope.() -> A) : Generated<A>(scope + ctx, scope.async(ctx, coroutineStart) { generator() }) {
+                                       val generator: suspend CoroutineScope.() -> A) : Generated<A>(scope, scope.async(ctx, coroutineStart) { generator() }) {
       /**
        * Returns either the memoized [Deferred] if it has not been run yet. Or creates a new one.
        */
