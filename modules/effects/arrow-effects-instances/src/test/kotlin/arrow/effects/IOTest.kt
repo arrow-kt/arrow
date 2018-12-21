@@ -398,23 +398,28 @@ class IOTest : UnitSpec() {
     }
 
     "IO should cancel KindConnection on dispose" {
-        Promise.uncancelable<ForIO, Unit>(IO.async()).flatMap { latch ->
-          IO {
-            IO.async<Unit> { conn, _ ->
-              conn.push(latch.complete(Unit))
-            }.unsafeRunAsyncCancellable { cb -> Unit }
-              .invoke()
-          }.flatMap { latch.get }
-        }.unsafeRunSync()
+      Promise.uncancelable<ForIO, Unit>(IO.async()).flatMap { latch ->
+        IO {
+          IO.async<Unit> { conn, _ ->
+            conn.push(latch.complete(Unit))
+          }.unsafeRunAsyncCancellable { }
+            .invoke()
+        }.flatMap { latch.get }
+      }.unsafeRunSync()
     }
 
     "KindConnection can cancel upstream" {
-      Try {
-        IO.async<Unit> { conn, _ ->
-          conn.cancel().fix().unsafeRunAsync { }
-        }.unsafeRunSync()
-      }.fold({ e -> e should { it is arrow.effects.ConnectionCancellationException } },
-        { throw AssertionError("Expected exception of type arrow.effects.ConnectionCancellationException but caught no exception") })
+      Promise.uncancelable<ForIO, Unit>(IO.async()).flatMap { latch ->
+        IO.async<Unit> { conn, cb ->
+          conn.push(latch.complete(Unit))
+          cb(Right(Unit))
+        }.flatMap {
+          IO.async<Unit> { conn, _ ->
+            conn.cancel().fix().unsafeRunAsync { }
+          }
+        }.unsafeRunAsyncCancellable { }
+        latch.get
+      }.unsafeRunSync()
     }
 
   }

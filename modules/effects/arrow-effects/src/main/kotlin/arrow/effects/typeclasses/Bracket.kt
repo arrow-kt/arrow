@@ -43,7 +43,6 @@ interface Bracket<F, E> : MonadError<F, E> {
    *
    * ```kotlin:ank:playground:extension
    * _imports_
-   * _imports_bracket_
    * _imports_monaddefer_
    *
    * class File(url: String) {

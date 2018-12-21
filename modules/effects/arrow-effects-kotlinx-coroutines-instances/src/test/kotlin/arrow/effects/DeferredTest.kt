@@ -2,6 +2,7 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.core.Option
+import arrow.core.Right
 import arrow.core.Try
 import arrow.data.ListK
 import arrow.data.NonEmptyList
@@ -220,12 +221,18 @@ class DeferredKTest : UnitSpec() {
     }
 
     "KindConnection can cancel upstream" {
-      Try {
-        DeferredK.async<Unit> { conn, _ ->
-          conn.cancel().unsafeRunSync()
-        }.unsafeRunSync()
-      }.fold({ e -> e should { it is arrow.effects.ConnectionCancellationException } },
-        { throw AssertionError("Expected exception of type arrow.effects.ConnectionCancellationException but caught no exception") })
+      Promise.uncancelable<ForDeferredK, Unit>(DeferredK.async()).flatMap { latch ->
+        DeferredK.async<Unit> { conn, cb ->
+          conn.push(latch.complete(Unit))
+          cb(Right(Unit))
+        }.flatMap {
+          DeferredK.async<Unit> { conn, _ ->
+            conn.cancel().fix().unsafeRunAsync { }
+          }
+        }.unsafeRunAsyncCancellable { }
+
+        latch.get
+      }
     }
 
     "DeferredK async should be cancellable" {
