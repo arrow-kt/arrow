@@ -238,7 +238,6 @@ fun <F> monadDeferInterpreter(MF: MonadDefer<F>): AnkOps<F> = object : AnkOps<F>
 
   //TODO Try by overriding dokka settings for packages so it does not create it's markdown package file, then for regular type classes pages we only check the first result with the comment but remove them all regardless
   private fun generateMixedHierarchyDiagramCode(classes: List<String>): Sequence<String> {
-    //val packageName = classes.firstOrNull()?.substringBeforeLast(".")
     //careful meta-meta-programming ahead
     val hierarchyGraphsJoined =
       "listOf(" + classes

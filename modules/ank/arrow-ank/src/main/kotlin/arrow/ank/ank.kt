@@ -23,7 +23,6 @@ fun <F> ank(source: Path, target: Path, compilerArgs: List<String>, ankOps: AnkO
     printConsole("Current heap used: ${(heapSize - Runtime.getRuntime().freeMemory()).humanBytes()}")
     printConsole("Starting ank with Heap Size: ${heapSize.humanBytes()}, Max Heap Size: ${heapMaxSize.humanBytes()}")
     val path = createTargetDirectory(source, target)
-    //val generated = candidates.all.fold(MF().just(0 toT 0)) { acc, p ->
     val paths = path.withAnkFiles { (index, p) ->
       val totalHeap = Runtime.getRuntime().totalMemory()
       val usedHeap = totalHeap - Runtime.getRuntime().freeMemory()
