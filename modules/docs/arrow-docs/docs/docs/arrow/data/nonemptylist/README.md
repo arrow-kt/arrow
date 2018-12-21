@@ -3,7 +3,7 @@ layout: docs
 title: NonEmptyList
 permalink: /docs/arrow/data/nonemptylist/
 redirect_from:
-  - /docs/arrow/data/nonemptylist/
+  - /docs/datatypes/nonemptylist/
 video: TC6IzE61OyE
 ---
 
