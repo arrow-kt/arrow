@@ -108,6 +108,10 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
+# Jekyll
+_site
+.sass-cache
+
 ### Intellij Patch ###
 # Comment Reason: https://github.com/joeblau/gitignore.io/issues/186#issuecomment-215987721
 
