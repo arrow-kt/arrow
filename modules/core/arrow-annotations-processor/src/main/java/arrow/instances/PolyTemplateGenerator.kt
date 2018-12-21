@@ -26,6 +26,7 @@ interface PolyTemplateGenerator : MetaApi {
           value = value
             .removeExtensionDirective()
             .replaceApplicativeImports(info)
+            .replaceMonadDeferImports(info)
             .replaceImports(info)
             .replaceExtensionFactory(info)
             .replaceDataType(info)
@@ -103,6 +104,19 @@ interface PolyTemplateGenerator : MetaApi {
     return replace(
       "_imports_applicative_",
       "import ${applicativePackageName.value.quote()}.just$monoidImports"
+    )
+  }
+
+  private fun String.replaceMonadDeferImports(info: TypeClassInstance): String {
+    val monadDeferPackageName = PackageName(info.instance.packageName.value +
+      "." + info.projectedCompanion.simpleName.substringAfterLast(".").toLowerCase() +
+      ".monaddefer")
+    return replace(
+      "_imports_monaddefer_",
+      """
+        |import ${monadDeferPackageName.value.quote()}.defer
+        |import ${monadDeferPackageName.value.quote()}.delay
+      """.trimMargin()
     )
   }
 
