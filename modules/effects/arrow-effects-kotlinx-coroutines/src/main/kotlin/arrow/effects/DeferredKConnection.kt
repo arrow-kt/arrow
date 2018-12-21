@@ -3,7 +3,6 @@ package arrow.effects
 import arrow.core.Either
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.MonadDefer
-import kotlinx.coroutines.CoroutineScope
 import arrow.effects.handleErrorWith as handleErrorW
 
 typealias DeferredKConnection = KindConnection<ForDeferredK>

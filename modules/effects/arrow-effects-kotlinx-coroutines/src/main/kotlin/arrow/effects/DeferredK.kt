@@ -11,8 +11,6 @@ import arrow.higherkind
 import kotlinx.coroutines.*
 import kotlinx.coroutines.selects.SelectClause0
 import kotlinx.coroutines.selects.SelectClause1
-import java.lang.RuntimeException
-import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -787,7 +785,6 @@ fun <A> DeferredKOf<A>.runAsync(cb: (Either<Throwable, A>) -> DeferredKOf<Unit>)
 
     Unit
   }
-
 
 /**
  * Runs the [DeferredK] asynchronously and continues with the [DeferredK] returned by cb.
