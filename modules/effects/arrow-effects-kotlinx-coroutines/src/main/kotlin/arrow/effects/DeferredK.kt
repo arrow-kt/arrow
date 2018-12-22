@@ -3,8 +3,8 @@ package arrow.effects
 import arrow.core.*
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
-import arrow.effects.typeclasses.Proc
 import arrow.effects.typeclasses.ProcF
+import arrow.effects.typeclasses.MonadDefer
 import arrow.higherkind
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
@@ -118,22 +118,26 @@ fun <A> DeferredKOf<A>.value(): Deferred<A> = this.fix().memoized
  * }
  * ```
  */
-fun <A> DeferredKOf<A>.scope(): CoroutineScope = this.fix()._scope
+fun <A> DeferredKOf<A>.scope(): CoroutineScope = this.fix().scope
 
+// FIXME (0.8.1)
+// The calls to `Unconfined` ask for @ExperimentalCoroutinesApi, which makes using DeferredK light up
+// with warnings like a Xmas tree. Unconfined or an alternative will always exist.
+//
+// Please avoid adding the annotation for now.
 /**
  * A wrapper class for [Deferred] that either memoizes its result or re-runs the computation each time, based on how it is constructed.
  */
 @higherkind
-@ExperimentalCoroutinesApi
 sealed class DeferredK<A>(
-  internal val _scope: CoroutineScope = GlobalScope,
+  internal val scope: CoroutineScope = GlobalScope,
   internal val memoized: Deferred<A>
 ) : DeferredKOf<A>, Deferred<A> by memoized {
 
   /**
    * Pure wrapper for already constructed [Deferred] instances. Created solely by `Deferred.k()` extension method
    */
-  internal class Wrapped<A>(scope: CoroutineScope = GlobalScope, memoized: Deferred<A>) : DeferredK<A>(_scope = scope, memoized = memoized)
+  internal class Wrapped<A>(scope: CoroutineScope = GlobalScope, memoized: Deferred<A>) : DeferredK<A>(scope, memoized)
 
   /**
    * Represents a [DeferredK] that can generate an instance of [Deferred] on every await
@@ -155,7 +159,7 @@ sealed class DeferredK<A>(
      */
     override suspend fun await(): A =
       if (memoized.isCompleted || memoized.isActive || memoized.isCancelled) {
-        _scope.async(ctx, coroutineStart) { generator() }.await()
+        scope.async(ctx, coroutineStart) { generator() }.await()
       } else {
         memoized.await()
       }
@@ -239,12 +243,12 @@ sealed class DeferredK<A>(
    * ```
    */
   fun <B> flatMap(f: (A) -> DeferredKOf<B>): DeferredK<B> = when (this) {
-    is Generated -> Generated(ctx, coroutineStart, _scope) {
+    is Generated -> Generated(ctx, coroutineStart, scope) {
       f(
-        _scope.async(ctx, coroutineStart) { generator() }.await()
+        scope.async(ctx, coroutineStart) { generator() }.await()
       ).await()
     }
-    is Wrapped -> Generated(Dispatchers.Unconfined, CoroutineStart.LAZY, _scope) {
+    is Wrapped -> Generated(Dispatchers.Unconfined, CoroutineStart.LAZY, scope) {
       f(
         memoized.await()
       ).await()
@@ -313,10 +317,10 @@ sealed class DeferredK<A>(
     }
 
     return when (this) {
-      is Generated -> DeferredK.Generated(ctx, coroutineStart, _scope) {
-        f(_scope.async(ctx, coroutineStart) { generator() })
+      is Generated -> DeferredK.Generated(ctx, coroutineStart, scope) {
+        f(scope.async(ctx, coroutineStart) { generator() })
       }
-      is Wrapped -> Generated(Dispatchers.Unconfined, CoroutineStart.LAZY, _scope) {
+      is Wrapped -> Generated(Dispatchers.Unconfined, CoroutineStart.LAZY, scope) {
         f(memoized)
       }
     }
@@ -343,12 +347,12 @@ sealed class DeferredK<A>(
    * ```
    */
   fun continueOn(ctx: CoroutineContext): DeferredK<A> = when (this) {
-    is Generated -> Generated(ctx, coroutineStart, _scope) {
-      _scope.async(this@DeferredK.ctx, coroutineStart) {
+    is Generated -> Generated(ctx, coroutineStart, scope) {
+      scope.async(this@DeferredK.ctx, coroutineStart) {
         generator()
       }.await()
     }
-    is Wrapped -> _scope.asyncK(ctx, CoroutineStart.LAZY) { memoized.await() }
+    is Wrapped -> scope.asyncK(ctx, CoroutineStart.LAZY) { memoized.await() }
   }
 
   override fun equals(other: Any?): Boolean =
@@ -361,38 +365,6 @@ sealed class DeferredK<A>(
   override fun hashCode(): Int = memoized.hashCode()
 
   companion object {
-
-    /**
-     * Creates a [DeferredK] that just contains [Unit]
-     *
-     * Useful for comprehensions to avoid executing code at the beginning of a binding.
-     *
-     * This below executes `println("Stuff")` despite the resulting [DeferredK] never being executed itself.
-     * To avoid that call [bind] on a [DeferredK] before that. The second binding won't print a thing before run.
-     *
-     * {: data-executable='true'}
-     *
-     * ```kotlin:ank
-     * import arrow.effects.DeferredK
-     * import arrow.effects.deferredk.monad.monad
-     *
-     * fun main(args: Array<String>) {
-     *   //sampleStart
-     *   DeferredK.monad().binding {
-     *     println("Stuff")
-     *     DeferredK { 10 }.bind()
-     *   }
-     *
-     *   DeferredK.monad().binding {
-     *     DeferredK.unit().bind()
-     *     println("Other Stuff")
-     *     DeferredK { 10 }.bind()
-     *   }
-     *   //sampleEnd
-     * }
-     * ```
-     */
-    fun unit(): DeferredK<Unit> = just(Unit)
 
     /**
      * Lifts a value a into a [DeferredK] of A
@@ -515,9 +487,9 @@ sealed class DeferredK<A>(
       CompletableDeferred<A>().apply { completeExceptionally(t) }.k()
 
     /**
-     * Starts a coroutine that'll run [Proc].
+     * Starts a coroutine that'll run [DeferredKProc].
      *
-     * Matching the behavior of [async],
+     * Matching the behavior of [asyncK],
      * its [CoroutineContext] is set to [DefaultDispatcher]
      * and its [CoroutineStart] is [CoroutineStart.LAZY].
      *
@@ -525,30 +497,42 @@ sealed class DeferredK<A>(
      *
      * ```kotlin:ank
      * import arrow.core.Either
-     * import arrow.core.left
+     * import arrow.core.right
      * import arrow.effects.DeferredK
+     * import arrow.effects.DeferredKConnection
      * import arrow.effects.unsafeAttemptSync
+     *
+     * class Resource {
+     *   fun asyncRead(f: (String) -> Unit): Unit = f("Some value of a resource")
+     *   fun close(): Unit = Unit
+     * }
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
-     *   val result = DeferredK.async { cb: (Either<Throwable, Int>) -> Unit ->
-     *     cb(
-     *       Exception("BOOM").left()
-     *     )
+     *   val result = DeferredK.async { conn: DeferredKConnection, cb: (Either<Throwable, String>) -> Unit ->
+     *     val resource = Resource()
+     *     conn.push(DeferredK { resource.close() })
+     *     resource.asyncRead { value -> cb(value.right()) }
      *   }
      *   //sampleEnd
      *   println(result.unsafeAttemptSync())
      * }
      * ```
      */
-    fun <A> async(scope: CoroutineScope = GlobalScope, ctx: CoroutineContext = Dispatchers.Default, start: CoroutineStart = CoroutineStart.LAZY, fa: Proc<A>): DeferredK<A> =
-      Generated(ctx, start, scope) {
-        CompletableDeferred<A>().apply {
-          fa {
+    fun <A> async(scope: CoroutineScope = GlobalScope, ctx: CoroutineContext = Dispatchers.Default, start: CoroutineStart = CoroutineStart.LAZY, fa: DeferredKProc<A>): DeferredK<A> {
+      val conn = DeferredKConnection()
+      //If the context doesn’t have a Job, then the coroutine which is created doesn’t have a parent.
+      val supervisor = scope.coroutineContext[Job] ?: Job()
+      conn.push(DeferredK { if (!supervisor.isCancelled) supervisor.cancel() })
+
+      return Generated(ctx, start, scope) {
+        CompletableDeferred<A>(supervisor).apply {
+          fa(conn) {
             it.fold(this::completeExceptionally, this::complete)
           }
         }.await()
-      }
+      }.apply { invokeOnCompletion { e -> if (e is CancellationException) conn.cancel().unsafeRunAsync { } } }
+    }
 
     fun <A> asyncF(scope: CoroutineScope = GlobalScope, ctx: CoroutineContext = Dispatchers.Default, start: CoroutineStart = CoroutineStart.LAZY, fa: ProcF<ForDeferredK, A>): DeferredK<A> =
       Generated(ctx, start, scope) {

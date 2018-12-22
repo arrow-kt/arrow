@@ -2,15 +2,16 @@ package arrow.effects.typeclasses
 
 import arrow.Kind
 import arrow.core.*
-import arrow.effects.internal.CancelToken
+import arrow.effects.CancelToken
+import arrow.core.Either
 import arrow.typeclasses.MonadContinuation
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 
+/** A cancellable asynchronous computation that might fail. **/
+typealias ProcF<F, A> = ((Either<Throwable, A>) -> Unit) -> Kind<F, Unit>
 /** An asynchronous computation that might fail. **/
 typealias Proc<A> = ((Either<Throwable, A>) -> Unit) -> Unit
-
-typealias ProcF<F, A> = ((Either<Throwable, A>) -> Unit) -> Kind<F, Unit>
 
 /**
  * ank_macro_hierarchy(arrow.effects.typeclasses.Async)

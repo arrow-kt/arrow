@@ -87,7 +87,7 @@ interface DeferredKMonadDeferInstance : MonadDefer<ForDeferredK>, DeferredKBrack
 @extension
 interface DeferredKAsyncInstance : Async<ForDeferredK>, DeferredKMonadDeferInstance {
   override fun <A> async(fa: Proc<A>): DeferredK<A> =
-    DeferredK.async(fa = fa)
+    DeferredK.async(fa = { _, cb -> fa(cb) })
 
   override fun <A> asyncF(k: ProcF<ForDeferredK, A>): DeferredK<A> =
     DeferredK.asyncF(fa= k)

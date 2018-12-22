@@ -119,10 +119,10 @@ interface FlowableKAsyncInstance :
   Async<ForFlowableK>,
   FlowableKMonadDeferInstance {
   override fun <A> async(fa: Proc<A>): FlowableK<A> =
-    FlowableK.async(fa, BS())
+    FlowableK.async({ _, cb -> fa(cb) }, BS())
 
   override fun <A> asyncF(k: ProcF<ForFlowableK, A>): FlowableKOf<A> =
-    FlowableK.asyncF(k, BS())
+    FlowableK.asyncF({ _, cb -> k(cb) }, BS())
 
   override fun <A> FlowableKOf<A>.continueOn(ctx: CoroutineContext): FlowableK<A> =
     fix().continueOn(ctx)

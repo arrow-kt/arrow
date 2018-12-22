@@ -223,7 +223,7 @@ interface Promise<F, A> {
      * }
      * ```
      */
-    fun <F, A> uncancelable(AS: Async<F>): Kind<F, Promise<F, A>> = AS { unsafeUncancelable<F, A>(AS) }
+    fun <F, A> uncancelable(AS: Async<F>): Kind<F, Promise<F, A>> = AS.delay { unsafeUncancelable<F, A>(AS) }
 
     /**
      * Creates an empty `Promise` from on [Async] instance for [F].

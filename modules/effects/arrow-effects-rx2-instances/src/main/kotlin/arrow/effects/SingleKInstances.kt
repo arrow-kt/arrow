@@ -36,7 +36,7 @@ interface SingleKMonadInstance : Monad<ForSingleK> {
   override fun <A, B> SingleKOf<A>.map(f: (A) -> B): SingleK<B> =
     fix().map(f)
 
-  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, SingleKOf<Either<A, B>>>): SingleK<B> =
+  override fun <A, B> tailRecM(a: A, f: Function1<A, SingleKOf<Either<A, B>>>): SingleK<B> =
     SingleK.tailRecM(a, f)
 
   override fun <A> just(a: A): SingleK<A> =
@@ -85,10 +85,10 @@ interface SingleKAsyncInstance :
   Async<ForSingleK>,
   SingleKMonadDeferInstance {
   override fun <A> async(fa: Proc<A>): SingleK<A> =
-    SingleK.async(fa)
+    SingleK.async { _, cb -> fa(cb) }
 
   override fun <A> asyncF(k: ProcF<ForSingleK, A>): SingleK<A> =
-    SingleK.asyncF(k)
+    SingleK.asyncF { _, cb -> k(cb) }
 
   override fun <A> SingleKOf<A>.continueOn(ctx: CoroutineContext): SingleK<A> =
     fix().continueOn(ctx)

@@ -1,7 +1,7 @@
 package arrow.effects.typeclasses
 
 import arrow.Kind
-import arrow.effects.internal.CancelToken
+import arrow.effects.CancelToken
 
 /**
  * [Fiber] represents the pure result of an [Async] data type

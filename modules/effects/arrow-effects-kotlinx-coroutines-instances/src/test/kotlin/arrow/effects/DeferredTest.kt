@@ -6,9 +6,8 @@ import arrow.core.Try
 import arrow.data.ListK
 import arrow.data.NonEmptyList
 import arrow.data.k
-import arrow.effects.deferredk.applicativeError.attempt
 import arrow.effects.deferredk.async.async
-import arrow.effects.typeclasses.ExitCase
+import arrow.effects.deferredk.monad.flatMap
 import arrow.instances.`try`.functor.functor
 import arrow.instances.`try`.traverse.traverse
 import arrow.instances.listk.functor.functor
@@ -25,14 +24,14 @@ import arrow.typeclasses.Functor
 import arrow.typeclasses.Traverse
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
+import io.kotlintest.matchers.should
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.Unconfined
 import org.junit.runner.RunWith
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
+import java.lang.AssertionError
 
 @RunWith(KTestJUnitRunner::class)
 class DeferredKTest : UnitSpec() {
@@ -177,6 +176,41 @@ class DeferredKTest : UnitSpec() {
             checkAwaitAll(Try.functor(), Try.traverse(), Try.just(x))
         }
       }
+    }
+
+    "DeferredK should cancel KindConnection on dispose" {
+      runBlocking {
+        Promise.uncancelable<ForDeferredK, Unit>(DeferredK.async()).flatMap { latch ->
+          DeferredK {
+            DeferredK.async<Unit>(start = CoroutineStart.DEFAULT) { conn, _ ->
+              conn.push(latch.complete(Unit))
+            }.cancel()
+          }.flatMap { latch.get }
+        }.await()
+      }
+    }
+
+    "KindConnection can cancel upstream" {
+      Try {
+        DeferredK.async<Unit> { conn, _ ->
+          conn.cancel().unsafeRunAsync { }
+        }.unsafeRunSync()
+      }.fold({ e -> e should { it is arrow.effects.ConnectionCancellationException } },
+        { throw AssertionError("Expected exception of type arrow.effects.ConnectionCancellationException but caught no exception") })
+    }
+
+    "DeferredK async should be cancellable" {
+      Promise.uncancelable<ForDeferredK, Unit>(DeferredK.async())
+        .flatMap { latch ->
+          DeferredK {
+            val d =
+              DeferredK.async<Unit> { _, _ -> }
+                .apply { invokeOnCompletion { e -> if (e is CancellationException) latch.complete(Unit).unsafeRunAsync { } } }
+
+            d.start()
+            d.cancelAndJoin()
+          }.flatMap { latch.get }
+        }.unsafeRunSync() shouldBe Unit
     }
 
   }

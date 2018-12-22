@@ -68,7 +68,7 @@ interface OptionTAsyncInstance<F> : Async<OptionTPartialOf<F>>, OptionTMonadDefe
   }
 
   override fun <A> asyncF(k: ProcF<OptionTPartialOf<F>, A>): OptionT<F, A> = AS().run {
-    OptionT.liftF(this, asyncF { cb -> k(cb).value().void() })
+    OptionT.liftF(this, asyncF { cb -> k(cb).value().unit() })
   }
 
   override fun <A> OptionTOf<F, A>.continueOn(ctx: CoroutineContext): OptionT<F, A> = AS().run {

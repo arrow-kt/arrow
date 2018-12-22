@@ -68,7 +68,7 @@ interface WriterTAsyncInstance<F, W> : Async<WriterTPartialOf<F, W>>, WriterTMon
   }
 
   override fun <A> asyncF(k: ProcF<WriterTPartialOf<F, W>, A>): Kind<WriterTPartialOf<F, W>, A> = AS().run {
-    WriterT.liftF(asyncF { cb -> k(cb).value().void() }, MM(), this)
+    WriterT.liftF(asyncF { cb -> k(cb).value().unit() }, MM(), this)
   }
 
   override fun <A> WriterTOf<F, W, A>.continueOn(ctx: CoroutineContext): WriterT<F, W, A> = AS().run {
