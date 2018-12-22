@@ -170,11 +170,9 @@ class DeferredKTest : UnitSpec() {
     }
 
     "awaitAll called on a Traverse instance of Kind<F, DeferredK<T>> should return a Traverse instance of Kind<F, T>" {
-      forAll(Gen.string(), Gen.list(Gen.string())) { x, xs ->
+      forAll(Gen.string()) { x ->
         runBlocking {
-          checkAwaitAll(ListK.functor(), ListK.traverse(), xs.k()) &&
-            checkAwaitAll(NonEmptyList.functor(), NonEmptyList.traverse(), NonEmptyList(x, xs)) &&
-            checkAwaitAll(Option.functor(), Option.traverse(), Option.just(x)) &&
+          checkAwaitAll(Option.functor(), Option.traverse(), Option.just(x)) &&
             checkAwaitAll(Try.functor(), Try.traverse(), Try.just(x))
         }
       }
@@ -212,9 +210,9 @@ class DeferredKTest : UnitSpec() {
     "DeferredK should cancel KindConnection on dispose" {
       runBlocking {
         val promise = Promise.unsafeUncancelable<ForDeferredK, Unit>(DeferredK.async())
-        DeferredK.async<Unit> { conn, _ ->
+        val d = DeferredK.async<Unit>(ctx = Unconfined) { conn, _ ->
           conn.push(promise.complete(Unit))
-        }.unsafeRunAsyncCancellable {  }
+        }.unsafeRunAsyncCancellable { }
           .invoke()
         promise.get.await()
       }
