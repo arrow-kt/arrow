@@ -1,14 +1,10 @@
 package arrow.common.utils
 
-import arrow.common.messager.log
 import arrow.common.messager.logE
-import arrow.common.messager.logMW
 import arrow.documented
 import arrow.meta.encoder.jvm.KotlinMetatadataEncoder
 import me.eugeniomarletti.kotlin.metadata.kotlinMetadata
-import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.hasReceiver
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.receiverType
-import me.eugeniomarletti.kotlin.metadata.shadow.serialization.deserialization.getName
 import me.eugeniomarletti.kotlin.processing.KotlinAbstractProcessor
 import java.io.File
 import java.io.IOException
