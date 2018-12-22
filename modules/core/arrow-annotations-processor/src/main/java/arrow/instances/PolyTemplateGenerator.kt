@@ -9,7 +9,7 @@ import arrow.meta.encoder.TypeClassInstance
 import arrow.meta.encoder.jvm.quote
 import arrow.undocumented
 
-private val polyFunEvalRegex = "_(.*?)_\\((.*?)\\)".toRegex()
+private val polyFunEvalRegex = "_(.*?)_\\((.*?)\\)".toRegex(RegexOption.MULTILINE)
 
 private val ConstantTypeConstructor = "ForId"
 private val ConstantType1 = "String"

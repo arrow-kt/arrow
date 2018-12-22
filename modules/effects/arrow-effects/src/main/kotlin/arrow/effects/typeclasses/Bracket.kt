@@ -47,30 +47,31 @@ interface Bracket<F, E> : MonadError<F, E> {
    *
    * class File(url: String) {
    *   fun open(): File = this
-   *   fun close(): Unit {}
+   *   fun close(): Unite {}
    *   override fun toString(): String = "This file contains some interesting content!"
    * }
    *
-   * fun openFile(uri: String): Kind<F, File> = _delay_ { File(uri).open() }
-   * fun closeFile(file: File): Kind<F, Unit> = _delay_ { file.close() }
-   * fun fileToString(file: File): Kind<F, String> = _delay_ { file.toString() }
+   * fun openFile(uri: String): Kind<F, File> = _delay_({ File(uri).open() })
+   * fun closeFile(file: File): Kind<F, Unit> = _delay_({ file.close() })
+   * fun fileToString(file: File): Kind<F, String> = _delay_({ file.toString() })
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val safeComputation = openFile("data.json")._bracketCase_(
-   *     release = { file, exitCase ->
+   *   val release: (File, ExitCase<Throwable>) -> Kind<F, Unit> = { file, exitCase ->
    *       when (exitCase) {
    *         is ExitCase.Completed -> { /* do something */ }
    *         is ExitCase.Cancelled -> { /* do something */ }
    *         is ExitCase.Error -> { /* do something */ }
    *       }
    *       closeFile(file)
-   *    },
-   *    use = { file -> fileToString(file) }
-   *  )
-   *  //sampleEnd
-   *  println(safeComputation)
-   *  }
+   *   }
+   *
+   *   val use: (File) -> Kind<F, String> = { file -> fileToString(file) }
+   *
+   *   val safeComputation = openFile("data.json")._bracketCase_(release, use)
+   *   //sampleEnd
+   *   println(safeComputation)
+   * }
    *  ```
    */
   fun <A, B> Kind<F, A>.bracketCase(release: (A, ExitCase<E>) -> Kind<F, Unit>, use: (A) -> Kind<F, B>): Kind<F, B>
@@ -85,7 +86,6 @@ interface Bracket<F, E> : MonadError<F, E> {
    *
    * ```kotlin:ank:playground:extension
    * _imports_
-   * _imports_bracket_
    * _imports_monaddefer_
    *
    * class File(url: String) {
@@ -94,21 +94,17 @@ interface Bracket<F, E> : MonadError<F, E> {
    *   override fun toString(): String = "This file contains some interesting content!"
    * }
    *
-   * fun openFile(uri: String): Kind<F, File> = _delay_ { File(uri).open() }
-   * fun closeFile(file: File): Kind<F, Unit> = _delay_ { file.close() }
-   * fun fileToString(file: File): Kind<F, String> = _delay_ { file.toString() }
+   * fun openFile(uri: String): Kind<F, File> = _delay_({ File(uri).open() })
+   * fun closeFile(file: File): Kind<F, Unit> = _delay_({ file.close() })
+   * fun fileToString(file: File): Kind<F, String> = _delay_({ file.toString() })
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val safeComputation = openFile("data.json")._bracket_(
-   *     release = { file -> closeFile(file) },
-   *     use = { file -> fileToString(file) }
-   *   )
+   *   val safeComputation = openFile("data.json")._bracket_({ file -> closeFile(file) }, { file -> fileToString(file) })
    *   //sampleEnd
    *   println(safeComputation)
    * }
    * ```
-   *
    */
   fun <A, B> Kind<F, A>.bracket(release: (A) -> Kind<F, Unit>, use: (A) -> Kind<F, B>): Kind<F, B> =
     bracketCase({ a, _ -> release(a) }, use)
