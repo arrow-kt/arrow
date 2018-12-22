@@ -178,17 +178,18 @@ interface Async<F> : MonadDefer<F> {
    *
    * @param ctx [CoroutineContext] to run evaluation on.
    *
-   * ```kotlin:ank:playground:extension
-   * _imports_
+   * ```kotlin:ank:playground
+   * import arrow.effects.*
+   * import arrow.effects.instances.io.async.async
    * import kotlinx.coroutines.Dispatchers
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   _extensionFactory_.run {
+   *   IO.async().run {
    *     val result = binding {
-   *       _continueOn_(Dispatchers.Default)
+   *       continueOn(Dispatchers.Default)
    *       Thread.currentThread().name
-   *     }
+   *     }.fix().unsafeRunSync()
    *
    *     println(result)
    *   }
@@ -251,7 +252,11 @@ interface Async<F> : MonadDefer<F> {
    *
    * ```kotlin:ank:playground:extension
    * _imports_
+   * _imports_monaddefer_
+   *
    * import kotlinx.coroutines.Dispatchers.Default
+   * import kotlinx.coroutines.async
+   * import kotlinx.coroutines.GlobalScope
    *
    * object Account
    *
@@ -261,7 +266,7 @@ interface Async<F> : MonadDefer<F> {
    *     successCallback: (List<Account>) -> Unit,
    *     failureCallback: (Throwable) -> Unit) {
    *
-   *       kotlinx.coroutines.GlobalScope.async(Default) {
+   *       GlobalScope.async(Default) {
    *         println("Making API call")
    *         kotlinx.coroutines.delay(500)
    *         successCallback(listOf(Account))
@@ -288,10 +293,7 @@ interface Async<F> : MonadDefer<F> {
    *     }
    *   }
    *
-   *   runBlocking {
-   *     kotlinx.coroutines.delay(250)
-   *     getAccounts.invoke() //Cancel API call
-   *   }
+   *
    *   //sampleEnd
    * }
    * ```
@@ -310,6 +312,7 @@ interface Async<F> : MonadDefer<F> {
    *
    * ```kotlin:ank:playground:extension
    * _imports_
+   * _imports_monaddefer_
    *
    * fun main(args: Array<String>) {
    *   //sampleStart

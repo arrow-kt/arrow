@@ -116,9 +116,10 @@ interface PolyTemplateGenerator : MetaApi {
     return replace(
       "_imports_",
       """|import ${info.dataType.name.rawName.substringBeforeLast(".")}.*
-         |import ${packageName.value.quote()}.*
-         |$factoryImports
-         |$additionalImports""".trimMargin()
+             |import ${packageName.value.quote()}.*
+             |import arrow.core.*
+             |$factoryImports
+             |$additionalImports""".trimMargin()
     )
   }
 
