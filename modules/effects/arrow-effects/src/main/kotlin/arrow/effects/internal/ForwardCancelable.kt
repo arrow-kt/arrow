@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicReference
  */
 class ForwardCancelable {
 
-  val state = AtomicReference<State>(init)
+  private val state = AtomicReference<State>(init)
 
   fun cancel(): CancelToken<ForIO> {
     fun loop(conn: IOConnection, cb: (Either<Throwable, Unit>) -> Unit): Unit = state.get().let { current ->
@@ -63,7 +63,7 @@ class ForwardCancelable {
      *  - on `cancel`, if the state was [Active], or if it was [Empty],
      *    regardless, the state transitions to `Active(IO.unit)`, aka [finished]
      */
-    sealed class State {
+    private sealed class State {
       data class Empty(val stack: List<(Either<Throwable, Unit>) -> Unit>) : State()
       data class Active(val token: CancelToken<ForIO>) : State()
     }
