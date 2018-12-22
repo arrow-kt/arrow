@@ -116,11 +116,9 @@ interface PolyTemplateGenerator : MetaApi {
     return replace(
       "_imports_",
       """|import ${info.dataType.name.rawName.substringBeforeLast(".")}.*
-             |import ${packageName.value.quote()}.*
-             |import arrow.core.*
-             |$factoryImports
-             |$additionalImports
-             |""".trimMargin()
+         |import ${packageName.value.quote()}.*
+         |$factoryImports
+         |$additionalImports""".trimMargin()
     )
   }
 
@@ -138,8 +136,7 @@ interface PolyTemplateGenerator : MetaApi {
         val factory = it.returnType?.simpleName?.decapitalize()?.substringBefore("<") ?: ""
         val fact = if (factory == "functor") "monad" else factory
         """|import arrow.instances.id.$fact.$fact
-              |import arrow.core.*
-            """.trimMargin()
+           |import arrow.core.*""".trimMargin()
       }
     }
 

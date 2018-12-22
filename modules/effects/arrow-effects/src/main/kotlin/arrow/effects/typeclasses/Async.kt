@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.*
 import arrow.effects.CancelToken
 import arrow.core.Either
+import arrow.documented
 import arrow.typeclasses.MonadContinuation
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
@@ -19,6 +20,7 @@ typealias Proc<A> = ((Either<Throwable, A>) -> Unit) -> Unit
  * [Async] models how a data type runs an asynchronous computation that may fail.
  * Defined by the [Proc] signature, which is the consumption of a callback.
  **/
+@documented
 interface Async<F> : MonadDefer<F> {
 
   /**
@@ -28,13 +30,8 @@ interface Async<F> : MonadDefer<F> {
    *
    * @param fa an asynchronous computation that might fail typed as [Proc].
    *
-   * {: data-executable='true'}
-   * ```kotlin:ank
-   * import arrow.Kind
-   * import arrow.core.*
-   * import arrow.effects.*
-   * import arrow.effects.instances.io.async.async
-   * import arrow.effects.typeclasses.Async
+   * ```kotlin:ank:playground:extension:playground:extension
+   * _imports_
    * import java.lang.RuntimeException
    *
    * object GithubService {
@@ -55,9 +52,7 @@ interface Async<F> : MonadDefer<F> {
    *       }
    *     }
    *
-   *   val result = IO.async().getUsernames()
-   *     .fix()
-   *     .unsafeRunSync()
+   *   val result = _extensionFactory_.getUsernames()
    *   //sampleEnd
    *   println(result)
    * }
@@ -73,12 +68,8 @@ interface Async<F> : MonadDefer<F> {
    *
    * The passed in function is injected with a side-effectful callback for signaling the final result of an asynchronous process.
    *
-   * {: data-executable='true'}
-   * ```kotlin:ank
-   * import arrow.core.*
-   * import arrow.effects.*
-   * import arrow.effects.instances.io.async.async
-   * import arrow.effects.typeclasses.Async
+   * ```kotlin:ank:playground:extension
+   * _imports_
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
@@ -91,7 +82,7 @@ interface Async<F> : MonadDefer<F> {
    *       }
    *     }
    *
-   *   val result = IO.async().makeCompleteAndGetPromiseInAsync().fix().unsafeRunSync()
+   *   val result = _extensionFactory_.makeCompleteAndGetPromiseInAsync()
    *  //sampleEnd
    *  println(result)
    * }
@@ -106,22 +97,18 @@ interface Async<F> : MonadDefer<F> {
    *
    * @param ctx [CoroutineContext] to run evaluation on
    *
-   * {: data-executable='true'}
-   * ```kotlin:ank
-   * import arrow.Kind
-   * import arrow.effects.*
-   * import arrow.effects.deferredk.async.async
-   * import arrow.effects.typeclasses.Async
+   * ```kotlin:ank:playground:extension
+   * _imports_
    * import kotlinx.coroutines.Dispatchers
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
    *   fun <F> Async<F>.runOnDefaultDispatcher(): Kind<F, String> =
-   *     just(Unit).continueOn(Dispatchers.Default).flatMap {
-   *       delay { Thread.currentThread().name }
+   *     _just_(Unit)._continueOn_(Dispatchers.Default).flatMap {
+   *       _delay_({ Thread.currentThread().name })
    *     }
    *
-   *   val result = DeferredK.async().runOnDefaultDispatcher().fix().unsafeRunSync()
+   *   val result = _extensionFactory_.runOnDefaultDispatcher()
    *   //sampleEnd
    *   println(result)
    * }
@@ -134,20 +121,16 @@ interface Async<F> : MonadDefer<F> {
    *
    * @param ctx [CoroutineContext] to run evaluation on.
    *
-   * {: data-executable='true'}
-   * ```kotlin:ank
-   * import arrow.Kind
-   * import arrow.effects.*
-   * import arrow.effects.instances.io.async.async
-   * import arrow.effects.typeclasses.Async
+   * ```kotlin:ank:playground:extension
+   * _imports_
    * import kotlinx.coroutines.Dispatchers
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
    *   fun <F> Async<F>.invokeOnDefaultDispatcher(): Kind<F, String> =
-   *     delay(Dispatchers.Default) { Thread.currentThread().name }
+   *     _delay_(Dispatchers.Default, { Thread.currentThread().name })
    *
-   *   val result = IO.async().invokeOnDefaultDispatcher().fix().unsafeRunSync()
+   *   val result = _extensionFactory_.invokeOnDefaultDispatcher()
    *   //sampleEnd
    *   println(result)
    * }
@@ -172,20 +155,16 @@ interface Async<F> : MonadDefer<F> {
    *
    * @param ctx [CoroutineContext] to run evaluation on.
    *
-   * {: data-executable='true'}
-   * ```kotlin:ank
-   * import arrow.Kind
-   * import arrow.effects.*
-   * import arrow.effects.instances.io.async.async
-   * import arrow.effects.typeclasses.Async
+   * ```kotlin:ank:playground:extension
+   * _imports_
    * import kotlinx.coroutines.Dispatchers
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
    *   fun <F> Async<F>.invokeOnDefaultDispatcher(): Kind<F, String> =
-   *     defer(Dispatchers.Default) { delay { Thread.currentThread().name } }
+   *     _defer_(Dispatchers.Default, { delay { Thread.currentThread().name } })
    *
-   *   val result = IO.async().invokeOnDefaultDispatcher().fix().unsafeRunSync()
+   *   val result = _extensionFactory_.invokeOnDefaultDispatcher().fix().unsafeRunSync()
    *   //sampleEnd
    *   println(result)
    * }
@@ -199,19 +178,17 @@ interface Async<F> : MonadDefer<F> {
    *
    * @param ctx [CoroutineContext] to run evaluation on.
    *
-   * {: data-executable='true'}
-   * ```kotlin:ank
-   * import arrow.effects.*
-   * import arrow.effects.instances.io.async.async
+   * ```kotlin:ank:playground:extension
+   * _imports_
    * import kotlinx.coroutines.Dispatchers
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   IO.async().run {
+   *   _extensionFactory_.run {
    *     val result = binding {
-   *       continueOn(Dispatchers.Default)
+   *       _continueOn_(Dispatchers.Default)
    *       Thread.currentThread().name
-   *     }.fix().unsafeRunSync()
+   *     }
    *
    *     println(result)
    *   }
@@ -227,18 +204,16 @@ interface Async<F> : MonadDefer<F> {
    *
    * @receiver [CoroutineContext] to run evaluation on.
    *
-   * {: data-executable='true'}
-   * ```kotlin:ank
-   * import arrow.effects.*
-   * import arrow.effects.instances.io.async.async
+   * ```kotlin:ank:playground:extension
+   * _imports_
    * import kotlinx.coroutines.Dispatchers
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   IO.async().run {
-   *     val result = Dispatchers.Default.shift().map {
+   *   _extensionFactory_.run {
+   *     val result = Dispatchers.Default._shift_().map {
    *       Thread.currentThread().name
-   *     }.unsafeRunSync()
+   *     }
    *
    *     println(result)
    *   }
@@ -252,15 +227,12 @@ interface Async<F> : MonadDefer<F> {
   /**
    * Task that never finishes evaluating.
    *
-   * {: data-executable='true'}
-   * ```kotlin:ank
-   * import arrow.effects.*
-   * import arrow.effects.instances.io.async.async
+   * ```kotlin:ank:playground:extension
+   * _imports_
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val i = IO.async().never<Int>()
-   *     .fix().unsafeRunSync()
+   *   val i = _extensionFactory_.never<Int>()
    *
    *   println(i)
    *   //sampleEnd
@@ -277,53 +249,47 @@ interface Async<F> : MonadDefer<F> {
    * **NOTE**: Only for a cancelable type can [bracketCase] ever call `cancel` but that's of no concern for
    * non-cancelable types as `cancel` never should be called.
    *
-   * {: data-executable='true'}
-   * ```kotlin:ank
-   * import arrow.core.Left
-   * import arrow.core.Right
-   * import arrow.effects.*
-   * import arrow.effects.instances.io.async.async
-   * import arrow.effects.instances.io.async.shift
-   * import kotlinx.coroutines.runBlocking
+   * ```kotlin:ank:playground:extension
+   * _imports_
    * import kotlinx.coroutines.Dispatchers.Default
-   * import kotlinx.coroutines.async
-   * import kotlinx.coroutines.delay
    *
    * object Account
    *
    * //Some impure API or code
    * class NetworkService {
-   *   fun getAccounts(successCallback: (List<Account>) -> Unit,
+   *   fun getAccounts(
+   *     successCallback: (List<Account>) -> Unit,
    *     failureCallback: (Throwable) -> Unit) {
+   *
    *       kotlinx.coroutines.GlobalScope.async(Default) {
    *         println("Making API call")
-   *         delay(500)
+   *         kotlinx.coroutines.delay(500)
    *         successCallback(listOf(Account))
    *       }
    *   }
    *
    *   fun cancel(): Unit = kotlinx.coroutines.runBlocking {
    *     println("Cancelled, closing NetworkApi")
-   *     delay(500)
+   *     kotlinx.coroutines.delay(500)
    *     println("Closed NetworkApi")
    *   }
    * }
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val getAccounts = Default.shift().flatMap {
-   *     IO.async().cancelable<List<Account>> { cb ->
+   *   val getAccounts = Default._shift_().flatMap {
+   *     _extensionFactory_._cancelable_<List<Account>> { cb ->
    *       val service = NetworkService()
    *       service.getAccounts(
    *         successCallback = { accs -> cb(Right(accs)) },
    *         failureCallback = { e -> cb(Left(e)) })
    *
-   *       IO { service.cancel() }
+   *       _delay_({ service.cancel() })
    *     }
-   *   }.fix().unsafeRunAsyncCancellable { println(it) }
+   *   }
    *
    *   runBlocking {
-   *     delay(250)
+   *     kotlinx.coroutines.delay(250)
    *     getAccounts.invoke() //Cancel API call
    *   }
    *   //sampleEnd
@@ -342,27 +308,21 @@ interface Async<F> : MonadDefer<F> {
    * **NOTE**: Only for a cancelable type can [bracketCase] ever call `cancel` but that's of no concern for
    * non-cancelable types as `cancel` never should be called.
    *
-   * {: data-executable='true'}
-   * ```kotlin:ank
-   * import arrow.core.Right
-   * import arrow.effects.*
-   * import arrow.effects.instances.io.async.async
-   * import kotlinx.coroutines.GlobalScope
-   * import kotlinx.coroutines.async
-   * import kotlinx.coroutines.delay
-
+   * ```kotlin:ank:playground:extension
+   * _imports_
+   *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val result = IO.async().cancelableF<String> { cb ->
-   *     IO {
-   *       val deferred = GlobalScope.async {
-   *         delay(1000)
+   *   val result = _extensionFactory_._cancelableF_<String> { cb ->
+   *     _delay_({
+   *       val deferred = kotlinx.coroutines.GlobalScope.async {
+   *         kotlinx.coroutines.delay(1000)
    *         cb(Right("Hello from ${Thread.currentThread().name}"))
    *       }
    *
-   *       IO { deferred.cancel().let { Unit } }
-   *     }
-   *   }.fix().unsafeRunSync()
+   *       _delay_({ deferred.cancel().let { Unit } })
+   *     })
+   *   }
    *   //sampleEnd
    *   println(result)
    * }
