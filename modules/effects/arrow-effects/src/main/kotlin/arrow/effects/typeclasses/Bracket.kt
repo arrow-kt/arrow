@@ -47,7 +47,7 @@ interface Bracket<F, E> : MonadError<F, E> {
    *
    * class File(url: String) {
    *   fun open(): File = this
-   *   fun close(): Unite {}
+   *   fun close(): Unit {}
    *   override fun toString(): String = "This file contains some interesting content!"
    * }
    *
