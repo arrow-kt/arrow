@@ -70,6 +70,7 @@ interface Async<F> : MonadDefer<F> {
    *
    * ```kotlin:ank:playground:extension
    * _imports_
+   * import arrow.effects.typeclasses.Async
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
@@ -283,7 +284,7 @@ interface Async<F> : MonadDefer<F> {
    * fun main(args: Array<String>) {
    *   //sampleStart
    *   val getAccounts = Default._shift_().flatMap {
-   *     _extensionFactory_._cancelable_<List<Account>> { cb ->
+   *     _extensionFactory_.cancelable<List<Account>> { cb ->
    *       val service = NetworkService()
    *       service.getAccounts(
    *         successCallback = { accs -> cb(Right(accs)) },
@@ -313,21 +314,32 @@ interface Async<F> : MonadDefer<F> {
    * ```kotlin:ank:playground:extension
    * _imports_
    * _imports_monaddefer_
+   * import kotlinx.coroutines.async
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val result = _extensionFactory_._cancelableF_<String> { cb ->
-   *     _delay_({
+   *   val result = IO.async().cancelableF<String> { cb ->
+   *     delay {
    *       val deferred = kotlinx.coroutines.GlobalScope.async {
    *         kotlinx.coroutines.delay(1000)
    *         cb(Right("Hello from ${Thread.currentThread().name}"))
    *       }
    *
-   *       _delay_({ deferred.cancel().let { Unit } })
-   *     })
+   *       delay({ deferred.cancel().let { Unit } })
+   *     }
    *   }
+   *
+   *   println(result) //Run with `fix().unsafeRunSync()`
+   *
+   *   val result2 = IO.async().cancelableF<Unit> { cb ->
+   *     delay {
+   *       println("Doing something that can be cancelled.")
+   *       delay({ println("Cancelling the task") })
+   *     }
+   *   }
+   *
+   *   println(result2) //Run with `fix().unsafeRunAsyncCancellable { }.invoke()`
    *   //sampleEnd
-   *   println(result)
    * }
    * ```
    *

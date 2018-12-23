@@ -100,9 +100,7 @@ object AsyncLaws {
         })
 
         asyncF<Unit> { cb ->
-          br.flatMap {
-            delay { cb(Right(Unit)) }
-          }
+          br.flatMap { delay { cb(Right(Unit)) } }
         }.flatMap { promise.get }
       }.equalUnderTheLaw(just(b), EQ)
     }

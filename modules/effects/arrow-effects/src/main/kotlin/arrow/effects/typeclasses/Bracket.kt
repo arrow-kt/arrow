@@ -2,6 +2,7 @@ package arrow.effects.typeclasses
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.documented
 import arrow.effects.typeclasses.ExitCase.Error
 import arrow.typeclasses.MonadError
 
@@ -28,6 +29,7 @@ fun <E> Either<E, *>.toExitCase() =
  *
  * @define use is the action that uses the newly allocated resource and that will provide the final result.
  */
+@documented
 interface Bracket<F, E> : MonadError<F, E> {
 
   /**
@@ -39,11 +41,9 @@ interface Bracket<F, E> : MonadError<F, E> {
    *
    * @param release the allocated resource after the resulting [F] of [use] is terminates.
    *
-   * {: data-executable='true'}
-   *
-   * ```kotlin:ank
-   * import arrow.effects.IO
-   * import arrow.effects.typeclasses.ExitCase
+   * ```kotlin:ank:playground:extension
+   * _imports_
+   * _imports_monaddefer_
    *
    * class File(url: String) {
    *   fun open(): File = this
@@ -51,28 +51,28 @@ interface Bracket<F, E> : MonadError<F, E> {
    *   override fun toString(): String = "This file contains some interesting content!"
    * }
    *
-   * fun openFile(uri: String): IO<File> = IO { File(uri).open() }
-   * fun closeFile(file: File): IO<Unit> = IO { file.close() }
-   * fun fileToString(file: File): IO<String> = IO { file.toString() }
+   * fun openFile(uri: String): Kind<F, File> = _delay_({ File(uri).open() })
+   * fun closeFile(file: File): Kind<F, Unit> = _delay_({ file.close() })
+   * fun fileToString(file: File): Kind<F, String> = _delay_({ file.toString() })
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val safeComputation = openFile("data.json").bracketCase(
-   *     release = { file, exitCase ->
+   *   val release: (File, ExitCase<Throwable>) -> Kind<F, Unit> = { file, exitCase ->
    *       when (exitCase) {
    *         is ExitCase.Completed -> { /* do something */ }
    *         is ExitCase.Cancelled -> { /* do something */ }
    *         is ExitCase.Error -> { /* do something */ }
    *       }
    *       closeFile(file)
-   *    },
-   *    use = { file -> fileToString(file) }
-   *  )
-   *  //sampleEnd
-   *  println(safeComputation)
-   *  }
-   *  ```
+   *   }
    *
+   *   val use: (File) -> Kind<F, String> = { file -> fileToString(file) }
+   *
+   *   val safeComputation = openFile("data.json")._bracketCase_(release, use)
+   *   //sampleEnd
+   *   println(safeComputation)
+   * }
+   *  ```
    */
   fun <A, B> Kind<F, A>.bracketCase(release: (A, ExitCase<E>) -> Kind<F, Unit>, use: (A) -> Kind<F, B>): Kind<F, B>
 
@@ -84,10 +84,9 @@ interface Bracket<F, E> : MonadError<F, E> {
    * @param release is the action that's supposed to release the allocated resource after `use` is done, irregardless
    * of its exit condition.
    *
-   * {: data-executable='true'}
-   *
-   * ```kotlin:ank
-   * import arrow.effects.IO
+   * ```kotlin:ank:playground:extension
+   * _imports_
+   * _imports_monaddefer_
    *
    * class File(url: String) {
    *   fun open(): File = this
@@ -95,21 +94,17 @@ interface Bracket<F, E> : MonadError<F, E> {
    *   override fun toString(): String = "This file contains some interesting content!"
    * }
    *
-   * fun openFile(uri: String): IO<File> = IO { File(uri).open() }
-   * fun closeFile(file: File): IO<Unit> = IO { file.close() }
-   * fun fileToString(file: File): IO<String> = IO { file.toString() }
+   * fun openFile(uri: String): Kind<F, File> = _delay_({ File(uri).open() })
+   * fun closeFile(file: File): Kind<F, Unit> = _delay_({ file.close() })
+   * fun fileToString(file: File): Kind<F, String> = _delay_({ file.toString() })
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val safeComputation = openFile("data.json").bracket(
-   *     release = { file -> closeFile(file) },
-   *     use = { file -> fileToString(file) }
-   *   )
+   *   val safeComputation = openFile("data.json")._bracket_({ file -> closeFile(file) }, { file -> fileToString(file) })
    *   //sampleEnd
    *   println(safeComputation)
    * }
    * ```
-   *
    */
   fun <A, B> Kind<F, A>.bracket(release: (A) -> Kind<F, Unit>, use: (A) -> Kind<F, B>): Kind<F, B> =
     bracketCase({ a, _ -> release(a) }, use)

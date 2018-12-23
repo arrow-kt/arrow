@@ -2,7 +2,6 @@ package arrow.effects.internal
 
 import arrow.core.Either
 import arrow.effects.*
-import arrow.effects.internal.ErrorUtils.composeErrors
 import arrow.effects.typeclasses.ExitCase
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -143,7 +142,7 @@ internal object IOBracket {
   private class ReleaseRecover(val e: Throwable) : IOFrame<Unit, IO<Nothing>> {
 
     override fun recover(e2: Throwable): IO<Nothing> =
-      IO.raiseError(composeErrors(e, e2))
+      IO.raiseError(Platform.composeErrors(e, e2))
 
     override fun invoke(a: Unit): IO<Nothing> = IO.raiseError(e)
   }

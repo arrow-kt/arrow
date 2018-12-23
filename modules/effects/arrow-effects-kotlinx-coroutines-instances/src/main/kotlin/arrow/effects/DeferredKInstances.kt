@@ -81,7 +81,7 @@ interface DeferredKBracketInstance : Bracket<ForDeferredK, Throwable>, DeferredK
 @extension
 interface DeferredKMonadDeferInstance : MonadDefer<ForDeferredK>, DeferredKBracketInstance {
   override fun <A> defer(fa: () -> DeferredKOf<A>): DeferredK<A> =
-    DeferredK.defer(fa = fa)
+    DeferredK.defer(fa = { fa() })
 }
 
 @extension
@@ -90,7 +90,7 @@ interface DeferredKAsyncInstance : Async<ForDeferredK>, DeferredKMonadDeferInsta
     DeferredK.async(fa = { _, cb -> fa(cb) })
 
   override fun <A> asyncF(k: ProcF<ForDeferredK, A>): DeferredK<A> =
-    DeferredK.asyncF(fa= k)
+    DeferredK.asyncF(fa = { _, cb -> k(cb) })
 
   override fun <A> DeferredKOf<A>.continueOn(ctx: CoroutineContext): DeferredK<A> =
     fix().continueOn(ctx = ctx)
@@ -102,7 +102,7 @@ interface DeferredKAsyncInstance : Async<ForDeferredK>, DeferredKMonadDeferInsta
 @extension
 interface DeferredKEffectInstance : Effect<ForDeferredK>, DeferredKAsyncInstance {
   override fun <A> DeferredKOf<A>.runAsync(cb: (Either<Throwable, A>) -> DeferredKOf<Unit>): DeferredK<Unit> =
-    fix().deferredRunAsync(cb = cb)
+    deferredRunAsync(cb = cb)
 }
 
 @extension

@@ -11,7 +11,6 @@ import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
 import arrow.test.laws.FoldableLaws
 import arrow.test.laws.TraverseLaws
-import arrow.test.laws.equalUnderTheLaw
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.Spec
@@ -112,7 +111,7 @@ class ObservableKTests : UnitSpec() {
 
       ObservableK.just(Unit)
         .bracketCase(
-          use = { ObservableK.async<Nothing> { _,_ ->  } },
+          use = { ObservableK.async<Nothing> { _, _ -> } },
           release = { _, exitCase ->
             ObservableK {
               ec = exitCase

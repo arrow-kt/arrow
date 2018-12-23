@@ -133,7 +133,7 @@ class MaybeKTests : UnitSpec() {
       val countDownLatch = CountDownLatch(1)
       MaybeK.just(Unit)
         .bracketCase(
-          use = { MaybeK.async<Nothing> { _,_ -> } },
+          use = { MaybeK.async<Nothing> { _, _ -> } },
           release = { _, exitCase ->
             MaybeK {
               ec = exitCase

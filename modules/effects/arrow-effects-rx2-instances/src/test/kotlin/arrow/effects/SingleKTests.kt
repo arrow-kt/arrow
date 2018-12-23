@@ -17,7 +17,6 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.Spec
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
-import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers
@@ -119,7 +118,7 @@ class SingleKTests : UnitSpec() {
 
       SingleK.just(Unit)
         .bracketCase(
-          use = { SingleK.async<Nothing> { _,_ -> } },
+          use = { SingleK.async<Nothing> { _, _ -> } },
           release = { _, exitCase ->
             SingleK {
               ec = exitCase
