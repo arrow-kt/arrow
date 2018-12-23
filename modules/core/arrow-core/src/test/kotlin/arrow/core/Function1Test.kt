@@ -20,6 +20,7 @@ import arrow.typeclasses.Eq
 import arrow.typeclasses.conest
 import arrow.typeclasses.counnest
 import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
@@ -41,5 +42,23 @@ class Function1Test : UnitSpec() {
       MonadLaws.laws(Function1.monad(), EQ),
       CategoryLaws.laws(Function1.category(), { Function1.just(it) }, EQ)
     )
+    "Semigroup of Function1<A> is Function1<Semigroup<A>>"() {
+      forAll { a: Int ->
+        val left = Function1.semigroup<Int, Int>(Int.semigroup()).run {
+          Function1<Int, Int>({ it }).combine(Function1<Int, Int>({ it }))
+        }
+
+        val right = Function1<Int, Int>({ Int.monoid().run { it.combine(it) } })
+
+        left.invoke(a) == right.invoke(a)
+      }
+    }
+    "Function1<A>.empty() is Function1{A.empty()}" {
+      forAll { a: Int, b: Int ->
+        val left = Function1.monoid<Int, Int>(Int.monoid()).run { empty() }
+        val right = Function1<Int, Int>({ Int.monoid().run { empty() } })
+        left.invoke(a) == right.invoke(b)
+      }
+    }
   }
 }
