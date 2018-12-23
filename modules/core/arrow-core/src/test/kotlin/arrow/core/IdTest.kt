@@ -10,6 +10,10 @@ import arrow.instances.id.hash.hash
 import arrow.instances.id.monad.monad
 import arrow.instances.id.show.show
 import arrow.instances.id.traverse.traverse
+import arrow.instances.id.semigroup.semigroup
+import arrow.instances.id.monoid.monoid
+import arrow.instances.monoid
+import arrow.instances.semigroup
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
@@ -20,6 +24,8 @@ import org.junit.runner.RunWith
 class IdTest : UnitSpec() {
   init {
     testLaws(
+      SemigroupLaws.laws(Id.semigroup(Int.semigroup()), Id(1), Id(2), Id(3), Id.eq(Int.eq())),
+      MonoidLaws.laws(Id.monoid(Int.monoid()), Id(1), Id.eq(Int.eq())),
       ShowLaws.laws(Id.show(), Eq.any()) { Id(it) },
       MonadLaws.laws(Id.monad(), Eq.any()),
       TraverseLaws.laws(Id.traverse(), Id.applicative(), ::Id, Eq.any()),
