@@ -15,6 +15,7 @@ import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.Spec
+import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.not
@@ -26,6 +27,8 @@ import reactor.core.scheduler.Schedulers
 import reactor.test.expectError
 import reactor.test.test
 import java.time.Duration
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 @RunWith(KTestJUnitRunner::class)
 class FluxKTest : UnitSpec() {
@@ -126,28 +129,26 @@ class FluxKTest : UnitSpec() {
         .hasNotDroppedErrors()
     }
 
-    "Flux bracket cancellation should release resource with cancel exit status" {
+    "FluxK bracket cancellation should release resource with cancel exit status" {
       lateinit var ec: ExitCase<Throwable>
+      val countDownLatch = CountDownLatch(1)
 
-      val flux = Flux.just(0L)
-        .k()
+      FluxK.just(Unit)
         .bracketCase(
-          use = { FluxK.just(it) },
-          release = { _, exitCase -> ec = exitCase; FluxK.just(Unit) }
+          use = { FluxK.async<Nothing> { _, _ -> } },
+          release = { _, exitCase ->
+            FluxK {
+              ec = exitCase
+              countDownLatch.countDown()
+            }
+          }
         )
         .value()
-        .delayElements(Duration.ofSeconds(3))
+        .subscribe()
+        .dispose()
 
-      val test = flux.doOnSubscribe { subscription ->
-        Flux.just(0L).delayElements(Duration.ofSeconds(1))
-          .subscribe { subscription.cancel() }
-      }.test()
-
-      test
-        .thenAwait(Duration.ofSeconds(5))
-        .then { assertThat(ec, `is`(ExitCase.Cancelled as ExitCase<Throwable>)) }
-        .thenCancel()
-        .verify()
+      countDownLatch.await(100, TimeUnit.MILLISECONDS)
+      ec shouldBe ExitCase.Cancelled
     }
 
     "FluxK should cancel KindConnection on dispose" {

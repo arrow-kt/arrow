@@ -9,7 +9,7 @@ import arrow.meta.encoder.TypeClassInstance
 import arrow.meta.encoder.jvm.quote
 import arrow.undocumented
 
-private val polyFunEvalRegex = "_(.*?)_\\((.*?)\\)".toRegex()
+private val polyFunEvalRegex = "_(.*?)_\\((.*?)\\)".toRegex(RegexOption.MULTILINE)
 
 private val ConstantTypeConstructor = "ForId"
 private val ConstantType1 = "String"
@@ -26,6 +26,7 @@ interface PolyTemplateGenerator : MetaApi {
           value = value
             .removeExtensionDirective()
             .replaceApplicativeImports(info)
+            .replaceMonadDeferImports(info)
             .replaceImports(info)
             .replaceExtensionFactory(info)
             .replaceDataType(info)
@@ -103,6 +104,19 @@ interface PolyTemplateGenerator : MetaApi {
     return replace(
       "_imports_applicative_",
       "import ${applicativePackageName.value.quote()}.just$monoidImports"
+    )
+  }
+
+  private fun String.replaceMonadDeferImports(info: TypeClassInstance): String {
+    val monadDeferPackageName = PackageName(info.instance.packageName.value +
+      "." + info.projectedCompanion.simpleName.substringAfterLast(".").toLowerCase() +
+      ".monaddefer")
+    return replace(
+      "_imports_monaddefer_",
+      """
+        |import ${monadDeferPackageName.value.quote()}.defer
+        |import ${monadDeferPackageName.value.quote()}.delay
+      """.trimMargin()
     )
   }
 

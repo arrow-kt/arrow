@@ -9,16 +9,20 @@ import arrow.effects.singlek.monad.flatMap
 import arrow.effects.singlek.monad.monad
 import arrow.effects.singlek.monadError.monadError
 import arrow.effects.singlek.monadThrow.bindingCatch
+import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.Spec
+import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
+import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers
 import org.junit.runner.RunWith
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 @RunWith(KTestJUnitRunner::class)
@@ -109,6 +113,28 @@ class SingleKTests : UnitSpec() {
       test.assertNotTerminated().assertNotComplete().assertNoErrors().assertNoValues()
     }
 
+    "SingleK bracket cancellation should release resource with cancel exit status" {
+      lateinit var ec: ExitCase<Throwable>
+      val countDownLatch = CountDownLatch(1)
+
+      SingleK.just(Unit)
+        .bracketCase(
+          use = { SingleK.async<Nothing> { _, _ -> } },
+          release = { _, exitCase ->
+            SingleK {
+              ec = exitCase
+              countDownLatch.countDown()
+            }
+          }
+        )
+        .value()
+        .subscribe()
+        .dispose()
+
+      countDownLatch.await(100, TimeUnit.MILLISECONDS)
+      ec shouldBe ExitCase.Cancelled
+    }
+
     "SingleK should cancel KindConnection on dispose" {
       Promise.uncancelable<ForSingleK, Unit>(SingleK.async()).flatMap { latch ->
         SingleK {
@@ -147,4 +173,5 @@ class SingleKTests : UnitSpec() {
     }
 
   }
+
 }
