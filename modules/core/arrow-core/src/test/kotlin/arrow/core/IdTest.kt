@@ -1,6 +1,5 @@
 package arrow.core
 
-import arrow.core.Id
 import arrow.instances.eq
 import arrow.instances.hash
 import arrow.instances.id.applicative.applicative
@@ -8,8 +7,10 @@ import arrow.instances.id.comonad.comonad
 import arrow.instances.id.eq.eq
 import arrow.instances.id.hash.hash
 import arrow.instances.id.monad.monad
+import arrow.instances.id.monoid.monoid
 import arrow.instances.id.show.show
 import arrow.instances.id.traverse.traverse
+import arrow.instances.monoid
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
@@ -21,6 +22,7 @@ class IdTest : UnitSpec() {
   init {
     testLaws(
       ShowLaws.laws(Id.show(), Eq.any()) { Id(it) },
+      MonoidLaws.laws(Id.monoid(String.monoid()), Id("Hello"), Eq.any()),
       MonadLaws.laws(Id.monad(), Eq.any()),
       TraverseLaws.laws(Id.traverse(), Id.applicative(), ::Id, Eq.any()),
       ComonadLaws.laws(Id.comonad(), ::Id, Eq.any()),
