@@ -141,10 +141,8 @@ interface IOMonoidInstance<A> : Monoid<IO<A>>, IOSemigroupInstance<A> {
 
   fun SM(): Monoid<A>
 
-  override fun IO<A>.combine(b: IO<A>): IO<A> =
-    flatMap { a1: A -> b.map { a2: A -> SM().run { a1.combine(a2) } } }
-
   override fun empty(): IO<A> = IO.just(SM().empty())
+
 }
 
 object IOContext : IOConcurrentEffectInstance
