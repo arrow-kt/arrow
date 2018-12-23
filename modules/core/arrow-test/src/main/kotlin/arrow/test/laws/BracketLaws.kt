@@ -2,6 +2,8 @@ package arrow.test.laws
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.core.FunctionK
+import arrow.effects.Ref
 import arrow.effects.typeclasses.Bracket
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.generators.genApplicative
@@ -10,6 +12,7 @@ import arrow.test.generators.genThrowable
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
+import io.kotlintest.properties.map
 
 object BracketLaws {
 
@@ -27,7 +30,9 @@ object BracketLaws {
       Law("Bracket: uncancelable prevents Cancelled case") { BF.uncancelablePreventsCanceledCase(BF.just(Unit), BF.just(Unit), EQ) },
       Law("Bracket: acquire and release are uncancelable") { BF.acquireAndReleaseAreUncancelable({ BF.just(Unit) }, EQ) },
       Law("Bracket: guarantee is derived from bracket") { BF.guaranteeIsDerivedFromBracket(BF.just(Unit), EQ) },
-      Law("Bracket: guaranteeCase is derived from bracketCase") { BF.guaranteeCaseIsDerivedFromBracketCase({ BF.just(Unit) }, EQ) }
+      Law("Bracket: guaranteeCase is derived from bracketCase") { BF.guaranteeCaseIsDerivedFromBracketCase({ BF.just(Unit) }, EQ) },
+      Law("Bracket: bracket propagates transformer effects") { BF.bracketPropagatesTransformerEffects(EQ) },
+      Law("Bracket: bracket must run release task") { BF.bracketMustRunReleaseTask(EQ) }
     )
 
   fun <F> Bracket<F, Throwable>.bracketCaseWithJustUnitEqvMap(EQ: Eq<Kind<F, Int>>): Unit =
@@ -84,4 +89,22 @@ object BracketLaws {
     forAll(genApplicative(Gen.int(), this)) { fa: Kind<F, Int> ->
       fa.guaranteeCase(finalizer).equalUnderTheLaw(just(Unit).bracketCase({ _, e -> finalizer(e) }) { fa }, EQ)
     }
+
+  fun <F> Bracket<F, Throwable>.bracketPropagatesTransformerEffects(EQ: Eq<Kind<F, Int>>): Unit =
+    forAll(genApplicative(Gen.string(), this),
+      genFunctionAToB<String, Kind<F, Int>>(genApplicative(Gen.int(), this)),
+      genFunctionAToB<String, Kind<F, Unit>>(Gen.create { just(Unit) })) { acquire, use, release ->
+      acquire.bracket(use = use, release = release).equalUnderTheLaw(
+        acquire.flatMap { a -> use(a).flatMap { b -> release(a).map { b } } }
+        , EQ)
+    }
+
+  fun <F> Bracket<F, Throwable>.bracketMustRunReleaseTask(EQ: Eq<Kind<F, Int>>): Unit {
+    var r = 0
+
+    just(r).bracket(use = { just(Unit) }, release = { r = 1; just(Unit) })
+      .map { r }
+      .equalUnderTheLaw(just(1), EQ)
+  }
+
 }

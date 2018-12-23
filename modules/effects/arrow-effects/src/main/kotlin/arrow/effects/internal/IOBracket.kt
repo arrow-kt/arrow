@@ -2,7 +2,6 @@ package arrow.effects.internal
 
 import arrow.core.Either
 import arrow.effects.*
-import arrow.effects.internal.ErrorUtils.composeErrors
 import arrow.effects.typeclasses.ExitCase
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -11,7 +10,7 @@ internal object IOBracket {
   /**
    * Implementation for `IO.bracketCase`.
    */
-  operator fun <A, B> invoke(acquire: IO<A>, release: (A, ExitCase<Throwable>) -> IO<Unit>, use: (A) -> IO<B>): IO<B> =
+  operator fun <A, B> invoke(acquire: IO<A>, release: (A, ExitCase<Throwable>) -> IOOf<Unit>, use: (A) -> IOOf<B>): IO<B> =
     IO.Async { conn, cb ->
       // Placeholder for the future finalizer
       val deferredRelease = ForwardCancelable()
@@ -31,8 +30,8 @@ internal object IOBracket {
 
   // Internals of `IO.bracketCase`.
   private class BracketStart<A, B>(
-    val use: (A) -> IO<B>,
-    val release: (A, ExitCase<Throwable>) -> IO<Unit>,
+    val use: (A) -> IOOf<B>,
+    val release: (A, ExitCase<Throwable>) -> IOOf<Unit>,
     val conn: IOConnection,
     val deferredRelease: ForwardCancelable,
     val cb: (Either<Throwable, B>) -> Unit) : (Either<Throwable, A>) -> Unit, Runnable {
@@ -64,7 +63,7 @@ internal object IOBracket {
               } catch (nonFatal: Exception) {
                 IO.raiseError<B>(nonFatal)
               }
-              fb.flatMap(frame)
+              fb.fix().flatMap(frame)
             }
             // Registering our cancelable token ensures that in case cancellation is detected, release gets called
             deferredRelease.complete(frame.cancel)
@@ -96,7 +95,7 @@ internal object IOBracket {
       }
     }
 
-  private class BracketReleaseFrame<A, B>(val a: A, val releaseFn: (A, ExitCase<Throwable>) -> IO<Unit>) :
+  private class BracketReleaseFrame<A, B>(val a: A, val releaseFn: (A, ExitCase<Throwable>) -> IOOf<Unit>) :
     BaseReleaseFrame<A, B>() {
 
     override fun release(c: ExitCase<Throwable>): CancelToken<ForIO> =
@@ -143,7 +142,7 @@ internal object IOBracket {
   private class ReleaseRecover(val e: Throwable) : IOFrame<Unit, IO<Nothing>> {
 
     override fun recover(e2: Throwable): IO<Nothing> =
-      IO.raiseError(composeErrors(e, e2))
+      IO.raiseError(Platform.composeErrors(e, e2))
 
     override fun invoke(a: Unit): IO<Nothing> = IO.raiseError(e)
   }

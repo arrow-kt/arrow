@@ -10,6 +10,7 @@ import arrow.effects.maybek.monad.monad
 import arrow.effects.maybek.monadDefer.monadDefer
 import arrow.effects.maybek.monadError.monadError
 import arrow.effects.maybek.monadThrow.bindingCatch
+import arrow.effects.typeclasses.ExitCase
 import arrow.effects.maybek.monad.flatMap
 import arrow.test.UnitSpec
 import arrow.test.laws.*
@@ -22,6 +23,7 @@ import io.reactivex.Maybe
 import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers
 import org.junit.runner.RunWith
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 @RunWith(KTestJUnitRunner::class)
@@ -126,6 +128,27 @@ class MaybeKTests : UnitSpec() {
       foldedToSome shouldBe true
     }
 
+    "MaybeK bracket cancellation should release resource with cancel exit status" {
+      lateinit var ec: ExitCase<Throwable>
+      val countDownLatch = CountDownLatch(1)
+      MaybeK.just(Unit)
+        .bracketCase(
+          use = { MaybeK.async<Nothing> { _, _ -> } },
+          release = { _, exitCase ->
+            MaybeK {
+              ec = exitCase
+              countDownLatch.countDown()
+            }
+          }
+        )
+        .value()
+        .subscribe()
+        .dispose()
+
+      countDownLatch.await(100, TimeUnit.MILLISECONDS)
+      ec shouldBe ExitCase.Cancelled
+    }
+
     "MaybeK should cancel KindConnection on dispose" {
       Promise.uncancelable<ForMaybeK, Unit>(MaybeK.async()).flatMap { latch ->
         MaybeK {
@@ -164,4 +187,5 @@ class MaybeKTests : UnitSpec() {
     }
 
   }
+
 }

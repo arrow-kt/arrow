@@ -2,11 +2,13 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.core.Option
+import arrow.core.Right
 import arrow.core.Try
 import arrow.data.ListK
 import arrow.data.NonEmptyList
 import arrow.data.k
 import arrow.effects.deferredk.async.async
+import arrow.effects.typeclasses.ExitCase
 import arrow.effects.deferredk.monad.flatMap
 import arrow.instances.`try`.functor.functor
 import arrow.instances.`try`.traverse.traverse
@@ -26,12 +28,12 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.should
 import io.kotlintest.matchers.shouldBe
-import io.kotlintest.matchers.shouldThrow
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.Unconfined
 import org.junit.runner.RunWith
+import java.util.concurrent.CountDownLatch
 import java.lang.AssertionError
 import java.util.concurrent.TimeUnit
 
@@ -142,14 +144,12 @@ class DeferredKTest : UnitSpec() {
     "should catch exceptions within run block with runAsync" {
       try {
         val exception = MyException()
-        val ioa = DeferredK<Int>(GlobalScope, Unconfined, CoroutineStart.DEFAULT) { throw exception }
+        val ioa = DeferredK<Int>(GlobalScope, Unconfined, CoroutineStart.DEFAULT) { throw MyException() }
         ioa.runAsync { either ->
-          either.fold({ throw it }, { fail("") })
+          either.fold({ throw MyException() }, { fail("") })
         }.unsafeRunSync()
         fail("Should rethrow the exception")
-      } catch (throwable: AssertionError) {
-        fail("${throwable.message}")
-      } catch (throwable: Throwable) {
+      } catch (myException: MyException) {
         // Success
       }
     }
@@ -170,35 +170,67 @@ class DeferredKTest : UnitSpec() {
     }
 
     "awaitAll called on a Traverse instance of Kind<F, DeferredK<T>> should return a Traverse instance of Kind<F, T>" {
-      forAll(Gen.string(), Gen.list(Gen.string())) { x, xs ->
+      forAll(Gen.string()) { x ->
         runBlocking {
-          checkAwaitAll(ListK.functor(), ListK.traverse(), xs.k()) &&
-            checkAwaitAll(NonEmptyList.functor(), NonEmptyList.traverse(), NonEmptyList(x, xs)) &&
-            checkAwaitAll(Option.functor(), Option.traverse(), Option.just(x)) &&
+          checkAwaitAll(Option.functor(), Option.traverse(), Option.just(x)) &&
             checkAwaitAll(Try.functor(), Try.traverse(), Try.just(x))
         }
       }
     }
 
+    "DeferredK bracket cancellation should release resource with cancel exit status" {
+      runBlocking {
+        lateinit var ec: ExitCase<Throwable>
+        val countDownLatch = CountDownLatch(1)
+        DeferredK.just(Unit)
+          .bracketCase(
+            use = { DeferredK.async<Nothing> { _, _ -> } },
+            release = { _, exitCase ->
+              DeferredK {
+                ec = exitCase
+                countDownLatch.countDown()
+              }
+            }
+          )
+          .value().run {
+            async(Dispatchers.Default) {
+              delay(10)
+              cancel()
+            }
+            withContext(Dispatchers.Default) {
+              k().unsafeAttemptSync()
+            }
+          }
+
+        countDownLatch.await(50, TimeUnit.MILLISECONDS)
+        ec shouldBe ExitCase.Cancelled
+      }
+    }
+
     "DeferredK should cancel KindConnection on dispose" {
       runBlocking {
-        Promise.uncancelable<ForDeferredK, Unit>(DeferredK.async()).flatMap { latch ->
-          DeferredK {
-            DeferredK.async<Unit>(start = CoroutineStart.DEFAULT) { conn, _ ->
-              conn.push(latch.complete(Unit))
-            }.cancel()
-          }.flatMap { latch.get }
-        }.await()
+        val promise = Promise.unsafeUncancelable<ForDeferredK, Unit>(DeferredK.async())
+        val d = DeferredK.async<Unit>(ctx = Unconfined) { conn, _ ->
+          conn.push(promise.complete(Unit))
+        }.unsafeRunAsyncCancellable { }
+          .invoke()
+        promise.get.await()
       }
     }
 
     "KindConnection can cancel upstream" {
-      Try {
-        DeferredK.async<Unit> { conn, _ ->
-          conn.cancel().unsafeRunAsync { }
-        }.unsafeRunSync()
-      }.fold({ e -> e should { it is arrow.effects.ConnectionCancellationException } },
-        { throw AssertionError("Expected exception of type arrow.effects.ConnectionCancellationException but caught no exception") })
+      Promise.uncancelable<ForDeferredK, Unit>(DeferredK.async()).flatMap { latch ->
+        DeferredK.async<Unit> { conn, cb ->
+          conn.push(latch.complete(Unit))
+          cb(Right(Unit))
+        }.flatMap {
+          DeferredK.async<Unit> { conn, _ ->
+            conn.cancel().fix().unsafeRunAsync { }
+          }
+        }.unsafeRunAsyncCancellable { }
+
+        latch.get
+      }
     }
 
     "DeferredK async should be cancellable" {
@@ -208,7 +240,6 @@ class DeferredKTest : UnitSpec() {
             val d =
               DeferredK.async<Unit> { _, _ -> }
                 .apply { invokeOnCompletion { e -> if (e is CancellationException) latch.complete(Unit).unsafeRunAsync { } } }
-
             d.start()
             d.cancelAndJoin()
           }.flatMap { latch.get }

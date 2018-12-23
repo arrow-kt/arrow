@@ -4,7 +4,9 @@ import arrow.Kind
 import arrow.core.*
 import arrow.effects.instances.io.async.async
 import arrow.effects.instances.io.monad.binding
+import arrow.effects.instances.io.monad.flatMap
 import arrow.effects.instances.io.monad.monad
+import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.milliseconds
 import arrow.effects.typeclasses.seconds
 import arrow.instances.option.eq.eq
@@ -14,10 +16,15 @@ import arrow.test.laws.AsyncLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
+import io.kotlintest.matchers.should
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldEqual
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.newSingleThreadContext
+import kotlinx.coroutines.runBlocking
 import org.junit.runner.RunWith
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 @RunWith(KTestJUnitRunner::class)
 class IOTest : UnitSpec() {
@@ -373,5 +380,47 @@ class IOTest : UnitSpec() {
       }.fix()
       result.unsafeRunSync() shouldBe 2
     }
+
+    "IO bracket cancellation should release resource with cancel exit status" {
+      lateinit var ec: ExitCase<Throwable>
+      val countDownLatch = CountDownLatch(1)
+
+      IO.just(0L)
+        .bracketCase(
+          use = { IO.never },
+          release = { _, exitCase -> IO { ec = exitCase; countDownLatch.countDown() } }
+        )
+        .unsafeRunAsyncCancellable { }
+        .invoke() //cancel immediately
+
+      countDownLatch.await(2, TimeUnit.SECONDS)
+      ec shouldBe ExitCase.Cancelled
+    }
+
+    "IO should cancel KindConnection on dispose" {
+      Promise.uncancelable<ForIO, Unit>(IO.async()).flatMap { latch ->
+        IO {
+          IO.async<Unit> { conn, _ ->
+            conn.push(latch.complete(Unit))
+          }.unsafeRunAsyncCancellable { }
+            .invoke()
+        }.flatMap { latch.get }
+      }.unsafeRunSync()
+    }
+
+    "KindConnection can cancel upstream" {
+      Promise.uncancelable<ForIO, Unit>(IO.async()).flatMap { latch ->
+        IO.async<Unit> { conn, cb ->
+          conn.push(latch.complete(Unit))
+          cb(Right(Unit))
+        }.flatMap {
+          IO.async<Unit> { conn, _ ->
+            conn.cancel().fix().unsafeRunAsync { }
+          }
+        }.unsafeRunAsyncCancellable { }
+        latch.get
+      }.unsafeRunSync()
+    }
+
   }
 }
