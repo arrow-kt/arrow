@@ -33,6 +33,7 @@ class IdTest : UnitSpec() {
       ComonadLaws.laws(Id.comonad(), ::Id, Eq.any()),
       HashLaws.laws(Id.hash(Int.hash()), Id.eq(Int.eq())) { Id(it) }
     )
+
     "Semigroup of Id<A> is Id<Semigroup<A>>"() {
       forAll { a: Int ->
         val left = Id.semigroup(Int.semigroup()).run {
@@ -44,6 +45,7 @@ class IdTest : UnitSpec() {
         Id.eq(Int.eq()).run { left.eqv(right) }
       }
     }
+
     "Id<A>.empty() is Id{A.empty()}" {
       forAll { a: Int, b: Int ->
         val left = Id.monoid(Int.monoid()).run { empty() }

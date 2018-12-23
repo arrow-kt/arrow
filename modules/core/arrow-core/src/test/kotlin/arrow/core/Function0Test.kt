@@ -32,6 +32,7 @@ class Function0Test : UnitSpec() {
       MonadLaws.laws(Function0.monad(), EQ),
       ComonadLaws.laws(Function0.comonad(), { { it }.k() }, EQ)
     )
+
     "Semigroup of Function0<A> is Function0<Semigroup<A>>"() {
       forAll { a: Int ->
         val left = Function0.semigroup(Int.semigroup()).run { Function0({ a }).combine(Function0({ a })) }
@@ -40,6 +41,7 @@ class Function0Test : UnitSpec() {
         left.invoke() == right.invoke()
       }
     }
+
     "Function0<A>.empty() is Function0{A.empty()}" {
       Function0.monoid(Int.monoid()).run { empty() }.invoke() == Function0({ Int.monoid().run { empty() }}).invoke()
     }

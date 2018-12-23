@@ -42,6 +42,7 @@ class Function1Test : UnitSpec() {
       MonadLaws.laws(Function1.monad(), EQ),
       CategoryLaws.laws(Function1.category(), { Function1.just(it) }, EQ)
     )
+
     "Semigroup of Function1<A> is Function1<Semigroup<A>>"() {
       forAll { a: Int ->
         val left = Function1.semigroup<Int, Int>(Int.semigroup()).run {
@@ -53,6 +54,7 @@ class Function1Test : UnitSpec() {
         left.invoke(a) == right.invoke(a)
       }
     }
+
     "Function1<A>.empty() is Function1{A.empty()}" {
       forAll { a: Int, b: Int ->
         val left = Function1.monoid<Int, Int>(Int.monoid()).run { empty() }
