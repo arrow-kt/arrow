@@ -9,9 +9,11 @@ import arrow.extension
 import arrow.instances.WriterTMonadThrow
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.Monoid
+import arrow.undocumented
 import kotlin.coroutines.CoroutineContext
 
 @extension
+@undocumented
 interface WriterTBrackInstance<F, W> : Bracket<WriterTPartialOf<F, W>, Throwable>, WriterTMonadThrow<F, W> {
 
   fun MD(): MonadDefer<F>
@@ -43,6 +45,7 @@ interface WriterTBrackInstance<F, W> : Bracket<WriterTPartialOf<F, W>, Throwable
 }
 
 @extension
+@undocumented
 interface WriterTMonadDeferInstance<F, W> : MonadDefer<WriterTPartialOf<F, W>>, WriterTBrackInstance<F, W> {
 
   override fun MD(): MonadDefer<F>
@@ -55,6 +58,7 @@ interface WriterTMonadDeferInstance<F, W> : MonadDefer<WriterTPartialOf<F, W>>, 
 }
 
 @extension
+@undocumented
 interface WriterTAsyncInstance<F, W> : Async<WriterTPartialOf<F, W>>, WriterTMonadDeferInstance<F, W> {
 
   fun AS(): Async<F>
@@ -78,6 +82,7 @@ interface WriterTAsyncInstance<F, W> : Async<WriterTPartialOf<F, W>>, WriterTMon
 }
 
 @extension
+@undocumented
 interface WriterTEffectInstance<F, W> : Effect<WriterTPartialOf<F, W>>, WriterTAsyncInstance<F, W> {
 
   fun EFF(): Effect<F>
@@ -96,6 +101,7 @@ interface WriterTEffectInstance<F, W> : Effect<WriterTPartialOf<F, W>>, WriterTA
 }
 
 @extension
+@undocumented
 interface WriterTConcurrentEffectInstance<F, W> : ConcurrentEffect<WriterTPartialOf<F, W>>, WriterTEffectInstance<F, W> {
 
   fun CEFF(): ConcurrentEffect<F>

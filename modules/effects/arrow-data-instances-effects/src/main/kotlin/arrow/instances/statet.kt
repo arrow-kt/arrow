@@ -7,9 +7,11 @@ import arrow.effects.typeclasses.*
 import arrow.extension
 import arrow.instances.StateTMonadThrowInstance
 import arrow.typeclasses.MonadError
+import arrow.undocumented
 import kotlin.coroutines.CoroutineContext
 
 @extension
+@undocumented
 interface StateTBracketInstance<F, S> : Bracket<StateTPartialOf<F, S>, Throwable>, StateTMonadThrowInstance<F, S> {
 
   fun MD(): MonadDefer<F>
@@ -44,6 +46,7 @@ interface StateTBracketInstance<F, S> : Bracket<StateTPartialOf<F, S>, Throwable
 }
 
 @extension
+@undocumented
 interface StateTMonadDeferInstance<F, S> : MonadDefer<StateTPartialOf<F, S>>, StateTBracketInstance<F, S> {
 
   override fun MD(): MonadDefer<F>
@@ -55,6 +58,7 @@ interface StateTMonadDeferInstance<F, S> : MonadDefer<StateTPartialOf<F, S>>, St
 }
 
 @extension
+@undocumented
 interface StateTAsyncInstane<F, S> : Async<StateTPartialOf<F, S>>, StateTMonadDeferInstance<F, S> {
 
   fun AS(): Async<F>

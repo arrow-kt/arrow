@@ -318,7 +318,7 @@ interface Async<F> : MonadDefer<F> {
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val result = IO.async().cancelableF<String> { cb ->
+   *   val result = _extensionFactory_.cancelableF<String> { cb ->
    *     delay {
    *       val deferred = kotlinx.coroutines.GlobalScope.async {
    *         kotlinx.coroutines.delay(1000)
@@ -331,7 +331,7 @@ interface Async<F> : MonadDefer<F> {
    *
    *   println(result) //Run with `fix().unsafeRunSync()`
    *
-   *   val result2 = IO.async().cancelableF<Unit> { cb ->
+   *   val result2 = _extensionFactory_.cancelableF<Unit> { cb ->
    *     delay {
    *       println("Doing something that can be cancelled.")
    *       delay({ println("Cancelling the task") })

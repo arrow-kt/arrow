@@ -14,39 +14,34 @@ interface MonoKFunctorInstance : Functor<ForMonoK> {
 }
 
 @extension
-interface MonoKApplicativeInstance : Applicative<ForMonoK> {
-  override fun <A, B> MonoKOf<A>.ap(ff: MonoKOf<(A) -> B>): MonoK<B> =
-    fix().ap(ff)
-
+interface MonoKApplicativeInstance : Applicative<ForMonoK>, MonoKFunctorInstance {
   override fun <A, B> MonoKOf<A>.map(f: (A) -> B): MonoK<B> =
     fix().map(f)
+
+  override fun <A, B> MonoKOf<A>.ap(ff: MonoKOf<(A) -> B>): MonoK<B> =
+    fix().ap(ff)
 
   override fun <A> just(a: A): MonoK<A> =
     MonoK.just(a)
 }
 
 @extension
-interface MonoKMonadInstance : Monad<ForMonoK> {
+interface MonoKMonadInstance : Monad<ForMonoK>, MonoKApplicativeInstance {
+  override fun <A, B> MonoKOf<A>.map(f: (A) -> B): MonoK<B> =
+    fix().map(f)
+
   override fun <A, B> MonoKOf<A>.ap(ff: MonoKOf<(A) -> B>): MonoK<B> =
     fix().ap(ff)
 
   override fun <A, B> MonoKOf<A>.flatMap(f: (A) -> MonoKOf<B>): MonoK<B> =
     fix().flatMap(f)
 
-  override fun <A, B> MonoKOf<A>.map(f: (A) -> B): MonoK<B> =
-    fix().map(f)
-
   override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, MonoKOf<Either<A, B>>>): MonoK<B> =
     MonoK.tailRecM(a, f)
-
-  override fun <A> just(a: A): MonoK<A> =
-    MonoK.just(a)
 }
 
 @extension
-interface MonoKApplicativeErrorInstance :
-  ApplicativeError<ForMonoK, Throwable>,
-  MonoKApplicativeInstance {
+interface MonoKApplicativeErrorInstance : ApplicativeError<ForMonoK, Throwable>, MonoKApplicativeInstance {
   override fun <A> raiseError(e: Throwable): MonoK<A> =
     MonoK.raiseError(e)
 
@@ -55,9 +50,10 @@ interface MonoKApplicativeErrorInstance :
 }
 
 @extension
-interface MonoKMonadErrorInstance :
-  MonadError<ForMonoK, Throwable>,
-  MonoKMonadInstance {
+interface MonoKMonadErrorInstance : MonadError<ForMonoK, Throwable>, MonoKMonadInstance, MonoKApplicativeErrorInstance {
+  override fun <A, B> MonoKOf<A>.map(f: (A) -> B): MonoK<B> =
+    fix().map(f)
+
   override fun <A> raiseError(e: Throwable): MonoK<A> =
     MonoK.raiseError(e)
 
@@ -75,17 +71,13 @@ interface MonoKBracketInstance : Bracket<ForMonoK, Throwable>, MonoKMonadThrowIn
 }
 
 @extension
-interface MonoKMonadDeferInstance :
-  MonoKBracketInstance,
-  MonadDefer<ForMonoK> {
+interface MonoKMonadDeferInstance : MonadDefer<ForMonoK>, MonoKBracketInstance {
   override fun <A> defer(fa: () -> MonoKOf<A>): MonoK<A> =
     MonoK.defer(fa)
 }
 
 @extension
-interface MonoKAsyncInstance :
-  Async<ForMonoK>,
-  MonoKMonadDeferInstance {
+interface MonoKAsyncInstance : Async<ForMonoK>, MonoKMonadDeferInstance {
   override fun <A> async(fa: Proc<A>): MonoK<A> =
     MonoK.async { _, cb -> fa(cb) }
 
@@ -97,17 +89,13 @@ interface MonoKAsyncInstance :
 }
 
 @extension
-interface MonoKEffectInstance :
-  Effect<ForMonoK>,
-  MonoKAsyncInstance {
+interface MonoKEffectInstance : Effect<ForMonoK>, MonoKAsyncInstance {
   override fun <A> MonoKOf<A>.runAsync(cb: (Either<Throwable, A>) -> MonoKOf<Unit>): MonoK<Unit> =
     fix().runAsync(cb)
 }
 
 @extension
-interface MonoKConcurrentEffectInstance :
-  ConcurrentEffect<ForMonoK>,
-  MonoKEffectInstance {
+interface MonoKConcurrentEffectInstance : ConcurrentEffect<ForMonoK>, MonoKEffectInstance {
   override fun <A> MonoKOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> MonoKOf<Unit>): MonoK<Disposable> =
     fix().runAsyncCancellable(cb)
 }
