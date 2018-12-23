@@ -5,15 +5,27 @@ import arrow.Kind2
 import arrow.core.*
 import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Contravariant
-import arrow.typeclasses.Category
-import arrow.typeclasses.Conested
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
-import arrow.typeclasses.Profunctor
-import arrow.typeclasses.conest
-import arrow.typeclasses.counnest
+import arrow.typeclasses.*
+
+@extension
+interface Function1SemigroupInstance<A, B> : Semigroup<Function1<A, B>> {
+  fun SB(): Semigroup<B>
+
+  override fun Function1<A, B>.combine(b: Function1<A, B>): Function1<A, B> {
+    return { a: A -> SB().run { invoke(a).combine(b(a)) } }.k()
+  }
+}
+
+@extension
+interface Function1MonoidInstance<A, B> : Monoid<Function1<A, B>>, Function1SemigroupInstance<A, B> {
+  fun MB(): Monoid<B>
+
+  override fun SB() = MB()
+
+  override fun empty(): Function1<A, B> {
+    return Function1 { MB().run { empty() } }
+  }
+}
 
 @extension
 interface Function1FunctorInstance<I> : Functor<Function1PartialOf<I>> {

@@ -8,12 +8,13 @@ import arrow.core.invoke
 import arrow.instances.function1.category.category
 import arrow.instances.function1.contravariant.contravariant
 import arrow.instances.function1.monad.monad
+import arrow.instances.function1.monoid.monoid
 import arrow.instances.function1.profunctor.profunctor
+import arrow.instances.function1.semigroup.semigroup
+import arrow.instances.monoid
+import arrow.instances.semigroup
 import arrow.test.UnitSpec
-import arrow.test.laws.CategoryLaws
-import arrow.test.laws.ContravariantLaws
-import arrow.test.laws.MonadLaws
-import arrow.test.laws.ProfunctorLaws
+import arrow.test.laws.*
 import arrow.typeclasses.Conested
 import arrow.typeclasses.Eq
 import arrow.typeclasses.conest
@@ -33,6 +34,8 @@ class Function1Test : UnitSpec() {
 
   init {
     testLaws(
+      SemigroupLaws.laws(Function1.semigroup<Int, Int>(Int.semigroup()), { a: Int -> a + 1 }.k(), { a: Int -> a + 2 }.k(), { a: Int -> a + 3 }.k(), EQ),
+      MonoidLaws.laws(Function1.monoid<Int, Int>(Int.monoid()), { a: Int -> a + 1 }.k(), EQ),
       ContravariantLaws.laws(Function1.contravariant(), { Function1.just<Int, Int>(it).conest() }, ConestedEQ),
       ProfunctorLaws.laws(Function1.profunctor(), { Function1.just(it) }, EQ),
       MonadLaws.laws(Function1.monad(), EQ),
