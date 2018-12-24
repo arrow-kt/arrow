@@ -1,4 +1,4 @@
- package arrow.effects.internal
+package arrow.effects.internal
 
 import arrow.core.Either
 import arrow.core.None

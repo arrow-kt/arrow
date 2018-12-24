@@ -1,17 +1,22 @@
 package arrow.effects
 
-import arrow.core.Either
-import arrow.core.Left
-import arrow.core.Right
+import arrow.Kind
+import arrow.core.*
 import arrow.effects.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
+import arrow.effects.typeclasses.Fiber
 import arrow.effects.typeclasses.ProcF
 import arrow.higherkind
+import arrow.typeclasses.Applicative
+import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.subjects.BehaviorSubject
+import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 
 fun <A> Single<A>.k(): SingleK<A> = SingleK(this)
@@ -29,6 +34,26 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
 
   fun <B> flatMap(f: (A) -> SingleKOf<B>): SingleK<B> =
     single.flatMap { f(it).value() }.k()
+
+  fun <B> foldLeft(b: B, f: (B, A) -> B): B =
+    f(b, single.blockingGet())
+
+  fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+    f(single.blockingGet(), lb)
+
+  fun <G, B> traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, SingleK<B>> = GA.run {
+    return try {
+      f(single.blockingGet()).map { SingleK.just(it) }
+    } catch (e: Throwable) {
+      just(SingleK.raiseError(e))
+    }
+  }
+
+  fun exists(predicate: Predicate<A>): Boolean =
+    foldLeft(false) { _, a -> predicate(a) }
+
+  fun forall(predicate: Predicate<A>): Boolean =
+    foldLeft(true) { _, a -> predicate(a) }
 
   /**
    * A way to safely acquire a resource and release in the face of errors and cancellation.
@@ -94,6 +119,16 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
   fun continueOn(ctx: CoroutineContext): SingleK<A> =
     single.observeOn(ctx.asScheduler()).k()
 
+  fun startF(ctx: CoroutineContext): SingleK<Fiber<ForSingleK, A>> = SingleK {
+    val join = BehaviorSubject.create<A>()
+    val disposable = single.subscribeOn(ctx.asScheduler()).subscribe({
+      join.onNext(it)
+      join.onComplete()
+    }, join::onError)
+    val cancel = SingleK { disposable.dispose() }
+    Fiber(join.firstOrError().k(), cancel)
+  }
+
   fun runAsync(cb: (Either<Throwable, A>) -> SingleKOf<Unit>): SingleK<Unit> =
     single.flatMap { cb(Right(it)).value() }.onErrorResumeNext { cb(Left(it)).value() }.k()
 
@@ -125,6 +160,41 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
 
     fun <A> defer(fa: () -> SingleKOf<A>): SingleK<A> =
       Single.defer { fa().value() }.k()
+
+    fun <A, B> racePair(ctx: CoroutineContext, fa: SingleK<A>, fb: SingleK<B>): SingleK<Either<Tuple2<A, Fiber<ForSingleK, B>>, Tuple2<Fiber<ForSingleK, A>, B>>> = SingleK.async { conn, cb ->
+      val disposable = CompositeDisposable()
+      val cancel = SingleK { disposable.dispose() }
+      conn.push(cancel)
+      val active = AtomicReference(true)
+      val promiseA = BehaviorSubject.create<A>()
+      val promiseB = BehaviorSubject.create<B>()
+      disposable.add(fa.single.subscribeOn(ctx.asScheduler())
+        .subscribe({ a ->
+          cb(Right(Left(Tuple2(a, Fiber(promiseB.firstOrError().k(), cancel)))))
+        }, { e ->
+          if (active.getAndSet(false)) {
+            disposable.dispose()
+            conn.pop()
+            cb(Left(e))
+          } else {
+            promiseA.onError(e)
+          }
+        }))
+      disposable.add(fb.single.subscribeOn(ctx.asScheduler())
+        .subscribe({ b ->
+          disposable.dispose()
+          conn.pop()
+          cb(Right(Right(Tuple2(Fiber(promiseA.firstOrError().k(), cancel), b))))
+        }, { e ->
+          if (active.getAndSet(false)) {
+            disposable.dispose()
+            conn.pop()
+            cb(Left(e))
+          } else {
+            promiseB.onError(e)
+          }
+        }))
+    }
 
     /**
      * Creates a [SingleK] that'll run [SingleKProc].

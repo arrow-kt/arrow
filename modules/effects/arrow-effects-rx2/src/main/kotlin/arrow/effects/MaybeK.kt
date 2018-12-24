@@ -5,10 +5,14 @@ import arrow.effects.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
+import arrow.effects.typeclasses.Fiber
 import arrow.effects.typeclasses.ProcF
 import arrow.higherkind
 import io.reactivex.Maybe
 import io.reactivex.MaybeEmitter
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.subjects.BehaviorSubject
+import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 
 fun <A> Maybe<A>.k(): MaybeK<A> = MaybeK(this)
@@ -109,6 +113,16 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
   fun continueOn(ctx: CoroutineContext): MaybeK<A> =
     maybe.observeOn(ctx.asScheduler()).k()
 
+  fun startF(ctx: CoroutineContext): MaybeK<Fiber<ForMaybeK, A>> = MaybeK {
+    val join = BehaviorSubject.create<A>()
+    val disposable = maybe.subscribeOn(ctx.asScheduler()).subscribe({
+      join.onNext(it)
+      join.onComplete()
+    }, join::onError, join::onComplete)
+    val cancel = MaybeK { disposable.dispose() }
+    Fiber(join.firstElement().k(), cancel)
+  }
+
   fun runAsync(cb: (Either<Throwable, A>) -> MaybeKOf<Unit>): MaybeK<Unit> =
     maybe.flatMap { cb(Right(it)).value() }.onErrorResumeNext(io.reactivex.functions.Function { cb(Left(it)).value() }).k()
 
@@ -133,6 +147,41 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
 
     fun <A> defer(fa: () -> MaybeKOf<A>): MaybeK<A> =
       Maybe.defer { fa().value() }.k()
+
+    fun <A, B> racePair(ctx: CoroutineContext, fa: MaybeK<A>, fb: MaybeK<B>): MaybeK<Either<Tuple2<A, Fiber<ForMaybeK, B>>, Tuple2<Fiber<ForMaybeK, A>, B>>> = MaybeK.async { conn, cb ->
+      val disposable = CompositeDisposable()
+      val cancel = MaybeK { disposable.dispose() }
+      conn.push(cancel)
+      val active = AtomicReference(true)
+      val promiseA = BehaviorSubject.create<A>()
+      val promiseB = BehaviorSubject.create<B>()
+      disposable.add(fa.maybe.subscribeOn(ctx.asScheduler())
+        .subscribe({ a ->
+          cb(Right(Left(Tuple2(a, Fiber(promiseB.firstElement().k(), cancel)))))
+        }, { e ->
+          if (active.getAndSet(false)) {
+            disposable.dispose()
+            conn.pop()
+            cb(Left(e))
+          } else {
+            promiseA.onError(e)
+          }
+        }))
+      disposable.add(fb.maybe.subscribeOn(ctx.asScheduler())
+        .subscribe({ b ->
+          disposable.dispose()
+          conn.pop()
+          cb(Right(Right(Tuple2(Fiber(promiseA.firstElement().k(), cancel), b))))
+        }, { e ->
+          if (active.getAndSet(false)) {
+            disposable.dispose()
+            conn.pop()
+            cb(Left(e))
+          } else {
+            promiseB.onError(e)
+          }
+        }))
+    }
 
     /**
      * Creates a [MaybeK] that'll run [MaybeKProc].

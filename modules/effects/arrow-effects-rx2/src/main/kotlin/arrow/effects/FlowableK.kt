@@ -7,12 +7,15 @@ import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
+import arrow.effects.typeclasses.Fiber
 import arrow.effects.typeclasses.ProcF
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.FlowableEmitter
+import io.reactivex.Single
+import io.reactivex.subjects.BehaviorSubject
 import kotlin.coroutines.CoroutineContext
 
 fun <A> Flowable<A>.k(): FlowableK<A> = FlowableK(this)
@@ -118,6 +121,13 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
 
   fun continueOn(ctx: CoroutineContext): FlowableK<A> =
     flowable.observeOn(ctx.asScheduler()).k()
+
+  fun startF(ctx: CoroutineContext, strategy: BackpressureStrategy= BackpressureStrategy.BUFFER): FlowableK<Fiber<ForFlowableK, A>> = FlowableK {
+    val join = BehaviorSubject.create<A>()
+    val disposable = flowable.subscribeOn(ctx.asScheduler()).subscribe(join::onNext, join::onError, join::onComplete)
+    val cancel = FlowableK { disposable.dispose() }
+    Fiber(join.toFlowable(strategy).k(), cancel)
+  }
 
   fun runAsync(cb: (Either<Throwable, A>) -> FlowableKOf<Unit>): FlowableK<Unit> =
     flowable.flatMap { cb(Right(it)).value() }.onErrorResumeNext { t: Throwable -> cb(Left(t)).value() }.k()
