@@ -53,7 +53,8 @@ dependencies {
     compile "io.arrow-kt:arrow-instances-core:$arrow_version"
     compile "io.arrow-kt:arrow-instances-data:$arrow_version"
     kapt    "io.arrow-kt:arrow-annotations-processor:$arrow_version"
-
+    
+    compile "io.arrow-kt:arrow-query-language:$arrow_version" //optional
     compile "io.arrow-kt:arrow-free:$arrow_version" //optional
     compile "io.arrow-kt:arrow-instances-free:$arrow_version" //optional
     compile "io.arrow-kt:arrow-mtl:$arrow_version" //optional
