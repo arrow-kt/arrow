@@ -3,6 +3,7 @@ package arrow.effects
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.core.Tuple2
 import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.effects.observablek.monad.monad
 import arrow.effects.observablek.monadError.monadError
@@ -129,13 +130,22 @@ interface ObservableKAsyncInstance : Async<ForObservableK>, ObservableKMonadDefe
 }
 
 @extension
+interface ObservableKConcurrentInstance : Concurrent<ForObservableK>, ObservableKAsyncInstance {
+  override fun <A> ObservableKOf<A>.startF(ctx: CoroutineContext): ObservableK<Fiber<ForObservableK, A>> =
+    fix().startF(ctx)
+
+  override fun <A, B> racePair(ctx: CoroutineContext, fa: ObservableKOf<A>, fb: ObservableKOf<B>): ObservableK<Either<Tuple2<A, Fiber<ForObservableK, B>>, Tuple2<Fiber<ForObservableK, A>, B>>> =
+    ObservableK.racePair(ctx, fa, fb)
+}
+
+@extension
 interface ObservableKEffectInstance : Effect<ForObservableK>, ObservableKAsyncInstance {
   override fun <A> ObservableKOf<A>.runAsync(cb: (Either<Throwable, A>) -> ObservableKOf<Unit>): ObservableK<Unit> =
     fix().runAsync(cb)
 }
 
 @extension
-interface ObservableKConcurrentEffectInstance : ConcurrentEffect<ForObservableK>, ObservableKEffectInstance {
+interface ObservableKConcurrentEffectInstance : ConcurrentEffect<ForObservableK>, ObservableKConcurrentInstance, ObservableKEffectInstance {
   override fun <A> ObservableKOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> ObservableKOf<Unit>): ObservableK<Disposable> =
     fix().runAsyncCancellable(cb)
 }

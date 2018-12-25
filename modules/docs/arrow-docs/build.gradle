@@ -10,6 +10,7 @@ dependencies {
     compile project(':arrow-ank')
     compile project(':arrow-data')
     compile project(':arrow-core')
+    compile project(':arrow-test')
     compile project(':arrow-instances-data')
     compile project(':arrow-effects-instances')
     compile project(':arrow-data-instances-effects')

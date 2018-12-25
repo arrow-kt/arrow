@@ -10,6 +10,8 @@ import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Fiber
 import arrow.effects.typeclasses.Proc
 import arrow.effects.typeclasses.ProcF
+import arrow.effects.internal.unsafe
+import arrow.effects.typeclasses.*
 import arrow.higherkind
 import kotlinx.coroutines.*
 import kotlinx.coroutines.selects.SelectClause0
@@ -486,6 +488,14 @@ sealed class DeferredK<A>(
       }.await()
     }
     is Error -> this
+  }
+
+  fun startF(ctx: CoroutineContext): DeferredK<Fiber<ForDeferredK, A>> = DeferredK {
+    val promise = Promise.unsafe<Either<Throwable, A>>()
+    val d = continueOn(ctx)
+    d.start()
+    d.invokeOnCompletion { e -> e?.let { promise.complete(Left(it)) } ?: promise.complete(Right(d.getCompleted())) }
+    Fiber(DeferredK { promise.get.value().fold({ throw it }, ::identity) }, DeferredK { d.cancel() })
   }
 
   override fun equals(other: Any?): Boolean =

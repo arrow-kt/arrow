@@ -1,6 +1,8 @@
 package arrow.effects
 
 import arrow.effects.observablek.async.async
+import arrow.effects.observablek.concurrent.concurrent
+import arrow.effects.observablek.concurrentEffect.concurrentEffect
 import arrow.effects.observablek.foldable.foldable
 import arrow.effects.observablek.functor.functor
 import arrow.effects.observablek.monad.flatMap
@@ -8,10 +10,7 @@ import arrow.effects.observablek.monadThrow.bindingCatch
 import arrow.effects.observablek.traverse.traverse
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
-import arrow.test.laws.AsyncLaws
-import arrow.test.laws.FoldableLaws
-import arrow.test.laws.TraverseLaws
-import arrow.test.laws.equalUnderTheLaw
+import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.Spec
@@ -56,7 +55,7 @@ class ObservableKTests : UnitSpec() {
   }
 
   init {
-    testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ(), testStackSafety = false))
+    testLaws(ConcurrentLaws.laws(ObservableK.concurrent(), EQ(), EQ(), EQ(), testStackSafety = false))
 //     FIXME(paco) #691
 //    testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ()))
 //    testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ()))

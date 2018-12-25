@@ -148,14 +148,15 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
     fun <A> defer(fa: () -> MaybeKOf<A>): MaybeK<A> =
       Maybe.defer { fa().value() }.k()
 
-    fun <A, B> racePair(ctx: CoroutineContext, fa: MaybeK<A>, fb: MaybeK<B>): MaybeK<Either<Tuple2<A, Fiber<ForMaybeK, B>>, Tuple2<Fiber<ForMaybeK, A>, B>>> = MaybeK.async { conn, cb ->
+    fun <A, B> racePair(ctx: CoroutineContext, fa: MaybeKOf<A>, fb: MaybeKOf<B>): MaybeK<Either<Tuple2<A, Fiber<ForMaybeK, B>>, Tuple2<Fiber<ForMaybeK, A>, B>>> = MaybeK.async { conn, cb ->
       val disposable = CompositeDisposable()
       val cancel = MaybeK { disposable.dispose() }
       conn.push(cancel)
       val active = AtomicReference(true)
       val promiseA = BehaviorSubject.create<A>()
       val promiseB = BehaviorSubject.create<B>()
-      disposable.add(fa.maybe.subscribeOn(ctx.asScheduler())
+      disposable.add(fa.value()
+        .subscribeOn(ctx.asScheduler())
         .subscribe({ a ->
           cb(Right(Left(Tuple2(a, Fiber(promiseB.firstElement().k(), cancel)))))
         }, { e ->
@@ -167,7 +168,8 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
             promiseA.onError(e)
           }
         }))
-      disposable.add(fb.maybe.subscribeOn(ctx.asScheduler())
+      disposable.add(fb.value()
+        .subscribeOn(ctx.asScheduler())
         .subscribe({ b ->
           disposable.dispose()
           conn.pop()

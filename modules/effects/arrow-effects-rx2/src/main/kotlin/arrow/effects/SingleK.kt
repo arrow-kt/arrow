@@ -15,7 +15,9 @@ import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
+import io.reactivex.subjects.ReplaySubject
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 
@@ -120,7 +122,7 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
     single.observeOn(ctx.asScheduler()).k()
 
   fun startF(ctx: CoroutineContext): SingleK<Fiber<ForSingleK, A>> = SingleK {
-    val join = BehaviorSubject.create<A>()
+    val join = ReplaySubject.create<A>()
     val disposable = single.subscribeOn(ctx.asScheduler()).subscribe({
       join.onNext(it)
       join.onComplete()
@@ -161,39 +163,59 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
     fun <A> defer(fa: () -> SingleKOf<A>): SingleK<A> =
       Single.defer { fa().value() }.k()
 
-    fun <A, B> racePair(ctx: CoroutineContext, fa: SingleK<A>, fb: SingleK<B>): SingleK<Either<Tuple2<A, Fiber<ForSingleK, B>>, Tuple2<Fiber<ForSingleK, A>, B>>> = SingleK.async { conn, cb ->
+    fun <A, B> racePair(ctx: CoroutineContext, fa: SingleKOf<A>, fb: SingleKOf<B>): SingleK<Either<Tuple2<A, Fiber<ForSingleK, B>>, Tuple2<Fiber<ForSingleK, A>, B>>> = SingleK.async { conn, cb ->
+      val active = AtomicReference(true)
+      val isSecond = AtomicReference(false)
+      val promiseA = ReplaySubject.create<A>().apply { toSerialized() }
+      val promiseB = ReplaySubject.create<B>().apply { toSerialized() }
+
       val disposable = CompositeDisposable()
       val cancel = SingleK { disposable.dispose() }
       conn.push(cancel)
-      val active = AtomicReference(true)
-      val promiseA = BehaviorSubject.create<A>()
-      val promiseB = BehaviorSubject.create<B>()
-      disposable.add(fa.single.subscribeOn(ctx.asScheduler())
-        .subscribe({ a ->
-          cb(Right(Left(Tuple2(a, Fiber(promiseB.firstOrError().k(), cancel)))))
-        }, { e ->
-          if (active.getAndSet(false)) {
-            disposable.dispose()
-            conn.pop()
-            cb(Left(e))
-          } else {
-            promiseA.onError(e)
-          }
-        }))
-      disposable.add(fb.single.subscribeOn(ctx.asScheduler())
-        .subscribe({ b ->
-          disposable.dispose()
-          conn.pop()
-          cb(Right(Right(Tuple2(Fiber(promiseA.firstOrError().k(), cancel), b))))
-        }, { e ->
-          if (active.getAndSet(false)) {
-            disposable.dispose()
-            conn.pop()
-            cb(Left(e))
-          } else {
-            promiseB.onError(e)
-          }
-        }))
+
+      disposable.add(
+        SingleK.just(Unit)
+          .continueOn(ctx)
+          .flatMap { fa }
+          .value()
+          .subscribe({ a ->
+            if (isSecond.getAndSet(true)) {
+              promiseA.onNext(a)
+              promiseA.onComplete()
+              disposable.dispose()
+              conn.pop()
+            } else cb(Right(Left(Tuple2(a, Fiber(promiseB.firstOrError().k(), cancel)))))
+          }, { e ->
+            if (active.getAndSet(false)) {
+              disposable.dispose()
+              conn.pop()
+              cb(Left(e))
+            } else {
+              promiseA.onError(e)
+            }
+          }))
+
+      disposable.add(
+        SingleK.just(Unit)
+          .continueOn(ctx)
+          .flatMap { fb }
+          .value()
+          .subscribe({ b ->
+            if (isSecond.getAndSet(true)) {
+              promiseB.onNext(b)
+              promiseB.onComplete()
+              disposable.dispose()
+              conn.pop()
+            } else cb(Right(Right(Tuple2(Fiber(promiseA.firstOrError().k(), cancel), b))))
+          }, { e ->
+            if (active.getAndSet(false)) {
+              disposable.dispose()
+              conn.pop()
+              cb(Left(e))
+            } else {
+              promiseB.onError(e)
+            }
+          }))
     }
 
     /**
@@ -231,7 +253,11 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
         //On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
         //on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
         conn.push(SingleK { if (!emitter.isDisposed) emitter.onError(ConnectionCancellationException) })
-        emitter.setCancellable { conn.cancel().value().subscribe() }
+        emitter.setCancellable {
+          conn.cancel().value().blockingGet()
+//            .subscribeOn(Schedulers.trampoline())
+//            .subscribe { t1, t2 ->  }
+        }
 
         fa(conn) { either: Either<Throwable, A> ->
           either.fold({
@@ -268,3 +294,50 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
     }
   }
 }
+
+/**
+ * Runs the [SingleK] asynchronously and then runs the cb.
+ * Catches all errors that may be thrown in await. Errors from cb will still throw as expected.
+ *
+ * {: data-executable='true'}
+ *
+ * ```kotlin:ank
+ * import arrow.core.Either
+ * import arrow.effects.SingleK
+ * import arrow.effects.unsafeRunAsync
+ *
+ * fun main(args: Array<String>) {
+ *   //sampleStart
+ *   SingleK.just(1).unsafeRunAsync { either: Either<Throwable, Int> ->
+ *     either.fold({ t: Throwable ->
+ *       println(t)
+ *     }, { i: Int ->
+ *       println("DONE WITH $i")
+ *     })
+ *   }
+ *   //sampleEnd
+ * }
+ * ```
+ */
+fun <A> SingleKOf<A>.unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit =
+  value().subscribe({ cb(Right(it)) }, { cb(Left(it)) }).let {  }
+
+/**
+ * Runs this [SingleK] with [Single.blockingGet]. Does not handle errors at all, rethrowing them if they happen.
+ *
+ * {: data-executable='true'}
+ *
+ * ```kotlin:ank
+ * import arrow.effects.DeferredK
+ * import arrow.effects.unsafeRunSync
+ *
+ * fun main(args: Array<String>) {
+ *   //sampleStart
+ *   val result: DeferredK<String> = DeferredK.raiseError<String>(Exception("BOOM"))
+ *   //sampleEnd
+ *   println(result.unsafeRunSync())
+ * }
+ * ```
+ */
+fun <A> SingleKOf<A>.unsafeRunSync(): A =
+  value().blockingGet()

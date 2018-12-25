@@ -3,6 +3,7 @@ package arrow.effects
 import arrow.effects.maybek.applicative.applicative
 import arrow.effects.maybek.applicativeError.applicativeError
 import arrow.effects.maybek.async.async
+import arrow.effects.maybek.concurrent.concurrent
 import arrow.effects.maybek.effect.effect
 import arrow.effects.maybek.foldable.foldable
 import arrow.effects.maybek.functor.functor
@@ -66,7 +67,8 @@ class MaybeKTests : UnitSpec() {
       ApplicativeErrorLaws.laws(MaybeK.applicativeError(), EQ(), EQ(), EQ()),
       MonadDeferLaws.laws(MaybeK.monadDefer(), EQ(), EQ(), EQ(), testStackSafety = false),
       AsyncLaws.laws(MaybeK.async(), EQ(), EQ(), testStackSafety = false),
-      AsyncLaws.laws(MaybeK.effect(), EQ(), EQ(), testStackSafety = false)
+      AsyncLaws.laws(MaybeK.effect(), EQ(), EQ(), testStackSafety = false),
+      ConcurrentLaws.laws(MaybeK.concurrent(), EQ(), EQ(), EQ(), testStackSafety = false)
     )
 
     "Multi-thread Maybes finish correctly" {

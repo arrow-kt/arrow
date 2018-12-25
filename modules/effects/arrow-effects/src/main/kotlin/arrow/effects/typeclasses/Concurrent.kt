@@ -78,9 +78,6 @@ interface Concurrent<F> : Async<F> {
    */
   fun <A, B> racePair(ctx: CoroutineContext, fa: Kind<F, A>, fb: Kind<F, B>): Kind<F, Either<Tuple2<A, Fiber<F, B>>, Tuple2<Fiber<F, A>, B>>>
 
-  //TODO blocked by Async#asyncF (https://github.com/arrow-kt/arrow/issues/1124)
-  //fun <A> cancelable(cb: ((Either<Throwable, A>) -> Unit) -> Kind<F, Unit>): Kind<F, A> =
-
   /**
    * Race two tasks concurrently within a new [F] on [ctx].
    * At the end of the race it automatically cancels the loser.

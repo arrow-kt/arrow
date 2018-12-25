@@ -3,6 +3,7 @@ package arrow.effects
 import arrow.effects.singlek.applicative.applicative
 import arrow.effects.singlek.applicativeError.applicativeError
 import arrow.effects.singlek.async.async
+import arrow.effects.singlek.concurrent.concurrent
 import arrow.effects.singlek.effect.effect
 import arrow.effects.singlek.functor.functor
 import arrow.effects.singlek.monad.flatMap
@@ -63,7 +64,8 @@ class SingleKTests : UnitSpec() {
       MonadErrorLaws.laws(SingleK.monadError(), EQ(), EQ(), EQ()),
       ApplicativeErrorLaws.laws(SingleK.applicativeError(), EQ(), EQ(), EQ()),
       AsyncLaws.laws(SingleK.async(), EQ(), EQ(), testStackSafety = false),
-      AsyncLaws.laws(SingleK.effect(), EQ(), EQ(), testStackSafety = false)
+      AsyncLaws.laws(SingleK.effect(), EQ(), EQ(), testStackSafety = false),
+      ConcurrentLaws.laws(SingleK.concurrent(), EQ(), EQ(), EQ(), testStackSafety = false)
     )
 
     "Multi-thread Singles finish correctly" {

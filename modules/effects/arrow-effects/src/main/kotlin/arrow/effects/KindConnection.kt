@@ -103,6 +103,32 @@ sealed class KindConnection<F> {
   abstract fun pushPair(lh: KindConnection<F>, rh: KindConnection<F>): Unit
 
   /**
+   * Pushes a pair of [KindConnection] on the stack, which on cancellation will get trampolined. This is useful in
+   * race for example, because combining a whole collection of tasks, two by two, can lead to building a
+   * cancelable that's stack unsafe.
+   *
+   * {: data-executable='true'}
+   *
+   * ```kotlin:ank
+   * import arrow.effects.*
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val conn = IOConnection()
+   *
+   *   conn.pushPair(
+   *     IO { println("Connection A is getting cancelled") },
+   *     IO { println("Connection B is getting cancelled") }
+   *   )
+   *
+   *   conn.cancel().fix().unsafeRunSync()
+   *   //sampleEnd
+   * }
+   * ```
+   */
+  abstract fun pushPair(lh: CancelToken<F>, rh: CancelToken<F>): Unit
+
+  /**
    * Pops a cancelable reference from the FIFO stack of references for this connection.
    * A cancelable reference is meant to cancel and cleanup resources.
    *
@@ -204,6 +230,8 @@ sealed class KindConnection<F> {
     override fun pop(): CancelToken<F> = unit()
     override fun tryReactivate(): Boolean = true
     override fun pushPair(lh: KindConnection<F>, rh: KindConnection<F>): Unit = Unit
+    override fun pushPair(lh: CancelToken<F>, rh: CancelToken<F>): Unit = Unit
+    override fun toString(): String = "UncancelableConnection"
   }
 
   /**
@@ -231,6 +259,9 @@ sealed class KindConnection<F> {
     override fun pushPair(lh: KindConnection<F>, rh: KindConnection<F>): Unit =
       push(listOf(lh.cancel(), rh.cancel()).cancelAll())
 
+    override fun pushPair(lh: CancelToken<F>, rh: CancelToken<F>) =
+      push(listOf(lh, rh).cancelAll())
+
     override tailrec fun pop(): CancelToken<F> {
       val state = state.get()
       return when {
@@ -247,8 +278,7 @@ sealed class KindConnection<F> {
       fold(unit()) { acc, f -> f.flatMap { acc } }
     }
 
-    override fun toString(): String = state.get().toString()
-
+    override fun toString(): String = "KindConnection(state = ${state.get().toString()})"
   }
 
 }
