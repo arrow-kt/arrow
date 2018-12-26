@@ -1,11 +1,13 @@
 package arrow.effects
 
 import arrow.effects.monok.async.async
+import arrow.effects.monok.concurrent.concurrent
 import arrow.effects.monok.monad.flatMap
 import arrow.effects.monok.monadThrow.bindingCatch
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
+import arrow.test.laws.ConcurrentLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.Spec
@@ -59,7 +61,7 @@ class MonoKTest : UnitSpec() {
 
   init {
     testLaws(
-      AsyncLaws.laws(MonoK.async(), EQ(), EQ(), testStackSafety = false)
+      ConcurrentLaws.laws(MonoK.concurrent(), EQ(), EQ(), EQ(), testStackSafety = false)
     )
 
     "Multi-thread Monos finish correctly" {

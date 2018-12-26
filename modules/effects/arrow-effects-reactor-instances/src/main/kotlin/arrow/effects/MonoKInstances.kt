@@ -1,6 +1,8 @@
 package arrow.effects
 
+import arrow.Kind
 import arrow.core.Either
+import arrow.core.Tuple2
 import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.effects.typeclasses.*
 import arrow.extension
@@ -89,13 +91,24 @@ interface MonoKAsyncInstance : Async<ForMonoK>, MonoKMonadDeferInstance {
 }
 
 @extension
+interface MonoKConcurrentInstance : Concurrent<ForMonoK>, MonoKAsyncInstance {
+  override fun <A> Kind<ForMonoK, A>.startF(ctx: CoroutineContext): Kind<ForMonoK, Fiber<ForMonoK, A>> =
+    fix().startF(ctx)
+
+  override fun <A, B> racePair(ctx: CoroutineContext, fa: Kind<ForMonoK, A>, fb: Kind<ForMonoK, B>): Kind<ForMonoK, Either<Tuple2<A, Fiber<ForMonoK, B>>, Tuple2<Fiber<ForMonoK, A>, B>>> =
+    MonoK.racePair(ctx, fa, fb)
+
+}
+
+@extension
 interface MonoKEffectInstance : Effect<ForMonoK>, MonoKAsyncInstance {
+
   override fun <A> MonoKOf<A>.runAsync(cb: (Either<Throwable, A>) -> MonoKOf<Unit>): MonoK<Unit> =
     fix().runAsync(cb)
 }
 
 @extension
-interface MonoKConcurrentEffectInstance : ConcurrentEffect<ForMonoK>, MonoKEffectInstance {
+interface MonoKConcurrentEffectInstance : ConcurrentEffect<ForMonoK>, MonoKEffectInstance, MonoKConcurrentInstance {
   override fun <A> MonoKOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> MonoKOf<Unit>): MonoK<Disposable> =
     fix().runAsyncCancellable(cb)
 }

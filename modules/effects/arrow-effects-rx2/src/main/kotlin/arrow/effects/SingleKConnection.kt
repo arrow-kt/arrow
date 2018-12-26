@@ -40,4 +40,7 @@ fun SingleKConnection(dummy: Unit = Unit): KindConnection<ForSingleK> = KindConn
 
   override fun <A, B> SingleKOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> SingleKOf<Unit>, use: (A) -> SingleKOf<B>): SingleK<B> =
     fix().bracketCase(release = release, use = use)
-}) { it.value().subscribe({}, {}) }
+}) { it.value().subscribe({
+}, {
+  println("##################################################### I FAILED TO RUN!")
+}) }

@@ -64,7 +64,7 @@ allprojects {
 
     //attempt to reduce travis memory constrains
     tasks.withType(Test) {
-        forkEvery = 100
+//        forkEvery = 100
     }
 
     repositories {

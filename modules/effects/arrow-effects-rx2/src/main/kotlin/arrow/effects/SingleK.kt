@@ -12,6 +12,7 @@ import arrow.effects.typeclasses.ProcF
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import io.reactivex.Flowable
+import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
 import io.reactivex.disposables.CompositeDisposable
@@ -163,59 +164,40 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
     fun <A> defer(fa: () -> SingleKOf<A>): SingleK<A> =
       Single.defer { fa().value() }.k()
 
-    fun <A, B> racePair(ctx: CoroutineContext, fa: SingleKOf<A>, fb: SingleKOf<B>): SingleK<Either<Tuple2<A, Fiber<ForSingleK, B>>, Tuple2<Fiber<ForSingleK, A>, B>>> = SingleK.async { conn, cb ->
-      val active = AtomicReference(true)
-      val isSecond = AtomicReference(false)
-      val promiseA = ReplaySubject.create<A>().apply { toSerialized() }
-      val promiseB = ReplaySubject.create<B>().apply { toSerialized() }
+    fun <A, B> racePair(ctx: CoroutineContext, fa: SingleKOf<A>, fb: SingleKOf<B>): SingleK<Either<Tuple2<A, Fiber<ForSingleK, B>>, Tuple2<Fiber<ForSingleK, A>, B>>> {
+      val scheduler = ctx.asScheduler()
+      val promiseA = ReplaySubject.create<A>()
+      val promiseB = ReplaySubject.create<B>()
 
-      val disposable = CompositeDisposable()
-      val cancel = SingleK { disposable.dispose() }
-      conn.push(cancel)
+      val disposableA = fa.value()
+        .observeOn(scheduler)
+        .subscribeOn(scheduler)
+        .subscribe({ a ->
+          promiseA.onNext(a)
+          promiseA.onComplete()
+        }, promiseA::onError)
 
-      disposable.add(
-        SingleK.just(Unit)
-          .continueOn(ctx)
-          .flatMap { fa }
-          .value()
-          .subscribe({ a ->
-            if (isSecond.getAndSet(true)) {
-              promiseA.onNext(a)
-              promiseA.onComplete()
-              disposable.dispose()
-              conn.pop()
-            } else cb(Right(Left(Tuple2(a, Fiber(promiseB.firstOrError().k(), cancel)))))
-          }, { e ->
-            if (active.getAndSet(false)) {
-              disposable.dispose()
-              conn.pop()
-              cb(Left(e))
-            } else {
-              promiseA.onError(e)
-            }
-          }))
+      val disposableB = fb.value()
+        .observeOn(scheduler)
+        .subscribeOn(scheduler)
+        .subscribe({ b ->
+          promiseB.onNext(b)
+          promiseB.onComplete()
+        }, promiseB::onError)
 
-      disposable.add(
-        SingleK.just(Unit)
-          .continueOn(ctx)
-          .flatMap { fb }
-          .value()
-          .subscribe({ b ->
-            if (isSecond.getAndSet(true)) {
-              promiseB.onNext(b)
-              promiseB.onComplete()
-              disposable.dispose()
-              conn.pop()
-            } else cb(Right(Right(Tuple2(Fiber(promiseA.firstOrError().k(), cancel), b))))
-          }, { e ->
-            if (active.getAndSet(false)) {
-              disposable.dispose()
-              conn.pop()
-              cb(Left(e))
-            } else {
-              promiseB.onError(e)
-            }
-          }))
+      val joinA = promiseA.firstOrError()
+      val joinB = promiseB.firstOrError()
+
+      return Single.ambArray<Either<Tuple2<A, Fiber<ForSingleK, B>>, Tuple2<Fiber<ForSingleK, A>, B>>>(
+        joinA.map { Left(Tuple2(it, Fiber(joinB.k(), SingleK { disposableB.dispose() }))) },
+        joinB.map { Right(Tuple2(Fiber(joinA.k(), SingleK { disposableA.dispose() }), it)) }
+      ).doOnError {
+        disposableA.dispose()
+        disposableB.dispose()
+      }.doOnDispose {
+        disposableA.dispose()
+        disposableB.dispose()
+      }.k()
     }
 
     /**
