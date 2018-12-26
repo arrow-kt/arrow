@@ -187,7 +187,6 @@ sealed class DeferredK<A>(
                                        scope: CoroutineScope = CoroutineScope(ctx),
                                        val generator: suspend () -> A) : Generated<A>(scope, scope.async(ctx, coroutineStart) { generator() }) {
 
-
       /**
        * Awaits either the memoized [Deferred] if it has not been run yet. Or creates a new one.
        *
