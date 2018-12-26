@@ -8,6 +8,23 @@ import arrow.typeclasses.*
 import arrow.instances.traverse as idTraverse
 
 @extension
+interface IdSemigroupInstance<A> : Semigroup<Id<A>> {
+  fun SA(): Semigroup<A>
+
+  override fun Id<A>.combine(b: Id<A>): Id<A> {
+    return Id(SA().run { value().combine(b.value()) })
+  }
+}
+
+@extension
+interface IdMonoidInstance<A> : Monoid<Id<A>>, IdSemigroupInstance<A> {
+  fun MA(): Monoid<A>
+  override fun SA(): Semigroup<A> = MA()
+
+  override fun empty(): Id<A> = Id(MA().run { empty() })
+}
+
+@extension
 interface IdEqInstance<A> : Eq<Id<A>> {
 
   fun EQ(): Eq<A>
