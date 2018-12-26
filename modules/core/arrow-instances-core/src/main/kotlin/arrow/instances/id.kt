@@ -21,7 +21,7 @@ interface IdMonoidInstance<A> : Monoid<Id<A>>, IdSemigroupInstance<A> {
   fun MA(): Monoid<A>
   override fun SA(): Semigroup<A> = MA()
 
-  override fun empty(): Id<A> = Id(MA().run { empty() })
+  override fun empty(): Id<A> = Id(MA().empty())
 }
 
 @extension
@@ -37,29 +37,6 @@ interface IdEqInstance<A> : Eq<Id<A>> {
 interface IdShowInstance<A> : Show<Id<A>> {
   override fun Id<A>.show(): String =
     toString()
-}
-
-@extension
-interface IdSemigroupInstance<A> : Semigroup<Id<A>> {
-
-  fun SA(): Semigroup<A>
-
-  override fun Id<A>.combine(b: Id<A>): Id<A> = SA().run {
-    Id(value().combine(b.value()))
-  }
-
-}
-
-@extension
-interface IdMonoidInstance<A> : Monoid<Id<A>>, IdSemigroupInstance<A> {
-
-  fun MA(): Monoid<A>
-
-  override fun SA() = MA()
-
-  override fun empty(): Id<A> =
-    Id(MA().empty())
-
 }
 
 @extension
