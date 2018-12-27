@@ -2,7 +2,7 @@ package arrow.syntax.function
 
 infix fun <P1, R> P1.pipeLazy(t: (P1) -> R): () -> R = { t(this) }
 
-infix inline fun <P1, R> P1.pipe(t: (P1) -> R): R = t(this)
+inline infix fun <P1, R> P1.pipe(t: (P1) -> R): R = t(this)
 
 infix fun <P1, P2, R> P1.pipe2(t: (P1, P2) -> R): (P2) -> R = { p2 -> t(this, p2) }
 

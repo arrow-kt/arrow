@@ -10,8 +10,6 @@ import arrow.test.concurrency.SideEffect
 import arrow.test.generators.genIntSmall
 import arrow.test.generators.genThrowable
 import arrow.typeclasses.Eq
-import io.kotlintest.matchers.Matcher
-import io.kotlintest.matchers.should
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.forAll
 import kotlinx.coroutines.Dispatchers

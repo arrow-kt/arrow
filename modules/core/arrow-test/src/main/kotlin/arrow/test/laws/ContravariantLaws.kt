@@ -19,6 +19,7 @@ object ContravariantLaws {
 
     fun <F> Contravariant<F>.identity(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
         forAll(genConstructor(Gen.int(), cf)) { fa: Kind<F, Int> ->
+            @Suppress("ExplicitItLambdaParameter")
             fa.contramap { it: Int -> it }.equalUnderTheLaw(fa, EQ)
         }
 

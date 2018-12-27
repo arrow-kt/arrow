@@ -20,8 +20,6 @@ import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldEqual
 import kotlinx.coroutines.newSingleThreadContext
 import org.junit.runner.RunWith
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 
 @RunWith(KTestJUnitRunner::class)
 class IOTest : UnitSpec() {

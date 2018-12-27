@@ -12,7 +12,6 @@ import arrow.instances.eq
 import arrow.instances.list.traverse.traverse
 import arrow.instances.option.eq.eq
 import arrow.test.UnitSpec
-import arrow.test.generators.genIntSmall
 import arrow.test.laws.equalUnderTheLaw
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
@@ -20,7 +19,6 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.properties.map
 import org.junit.runner.RunWith
-import kotlin.math.absoluteValue
 
 @RunWith(KTestJUnitRunner::class)
 class SemaphoreTest : UnitSpec() {

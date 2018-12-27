@@ -18,7 +18,6 @@ typealias FluxKProcF<A> = (FluxKConnection, (Either<Throwable, A>) -> Unit) -> F
  *
  * @see FluxK.async
  */
-@Suppress("FunctionName")
 fun FluxKConnection(dummy: Unit = Unit): KindConnection<ForFluxK> = KindConnection(object : MonadDefer<ForFluxK> {
   override fun <A> defer(fa: () -> FluxKOf<A>): FluxK<A> =
     FluxK.defer(fa)

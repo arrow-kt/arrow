@@ -1,3 +1,4 @@
+@file:Suppress("NotImplementedDeclaration")
 package arrow.ap.objects.deriving
 
 import arrow.core.Either

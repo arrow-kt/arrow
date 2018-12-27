@@ -1,10 +1,20 @@
 package arrow.meta.encoder.jvm
 
-import arrow.meta.ast.*
 import arrow.meta.ast.Annotation
+import arrow.meta.ast.Code
+import arrow.meta.ast.Func
+import arrow.meta.ast.Modifier
+import arrow.meta.ast.PackageName
+import arrow.meta.ast.Parameter
 import arrow.meta.ast.TypeName
+import arrow.meta.ast.UseSiteTarget
 import arrow.meta.encoder.MetaApi
-import com.squareup.kotlinpoet.*
+import com.squareup.kotlinpoet.AnnotationSpec
+import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.ParameterizedTypeName
+import com.squareup.kotlinpoet.TypeVariableName
+import com.squareup.kotlinpoet.WildcardTypeName
 import me.eugeniomarletti.kotlin.metadata.KotlinMetadataUtils
 import javax.lang.model.element.ExecutableElement
 
@@ -84,6 +94,7 @@ interface KotlinPoetEncoder {
       typeArguments = typeArguments.map { it.toMeta() }
     )
 
+  @Suppress("ComplexMethod")
   private fun com.squareup.kotlinpoet.KModifier.toMeta(): Modifier =
     when (this) {
       KModifier.PUBLIC -> Modifier.Public

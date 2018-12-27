@@ -9,12 +9,10 @@ import arrow.instances.sequencek.eq.eq
 import arrow.optics.instances.sequencek.each.each
 import arrow.optics.instances.sequencek.filterIndex.filterIndex
 import arrow.optics.instances.sequencek.index.index
-import arrow.optics.typeclasses.FilterIndex
 import arrow.test.UnitSpec
 import arrow.test.generators.*
 import arrow.test.laws.OptionalLaws
 import arrow.test.laws.TraversalLaws
-import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import org.junit.runner.RunWith

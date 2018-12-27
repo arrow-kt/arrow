@@ -63,7 +63,7 @@ data class OptionT<F, A>(private val value: Kind<F, Option<A>>) : OptionTOf<F, A
       }
     })
 
-  fun <B> flatMap(MF: Monad<F>, f: (A) -> OptionTOf<F, B>): OptionT<F, B> = flatMapF(MF) { it -> f(it).value() }
+  fun <B> flatMap(MF: Monad<F>, f: (A) -> OptionTOf<F, B>): OptionT<F, B> = flatMapF(MF) { f(it).value() }
 
   fun <B> flatMapF(MF: Monad<F>, f: (A) -> Kind<F, Option<B>>): OptionT<F, B> = MF.run {
     OptionT(value.flatMap { option -> option.fold({ just(None) }, f) })

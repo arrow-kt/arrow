@@ -6,7 +6,6 @@ import arrow.instances.`try`.applicative.applicative
 import arrow.instances.`try`.functor.functor
 import arrow.instances.option.applicative.applicative
 import arrow.instances.option.monad.binding
-import arrow.instances.option.monad.monad
 import io.kotlintest.matchers.Matcher
 import io.kotlintest.matchers.Result
 import io.kotlintest.matchers.shouldBe

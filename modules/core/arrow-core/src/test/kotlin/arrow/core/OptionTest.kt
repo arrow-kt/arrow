@@ -1,7 +1,5 @@
 package arrow.core
 
-import arrow.Kind
-import arrow.core.*
 import arrow.instances.eq
 import arrow.instances.hash
 import arrow.instances.monoid
@@ -14,13 +12,11 @@ import arrow.mtl.instances.option.monadFilter.monadFilter
 import arrow.mtl.instances.option.traverseFilter.traverseFilter
 import arrow.syntax.collections.firstOption
 import arrow.test.UnitSpec
-import arrow.test.generators.genOption
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
-import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
 

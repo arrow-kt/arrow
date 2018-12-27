@@ -1,3 +1,4 @@
+@file:Suppress("StringLiteralDuplication")
 package arrow.generic
 
 import com.squareup.kotlinpoet.AnnotationSpec
@@ -8,11 +9,11 @@ import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.LambdaTypeName
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.TypeVariableName
 import java.io.File
-import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 
 private val genericsToClassNames: Map<String, String> = mapOf(
         "A" to "First",

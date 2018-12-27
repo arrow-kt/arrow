@@ -70,7 +70,7 @@ data class EitherT<F, A, B>(private val value: Kind<F, Either<A, B>>) : EitherTO
   }
 
   fun <C> flatMap(MF: Monad<F>, f: (B) -> EitherTOf<F, A, C>): EitherT<F, A, C> =
-    flatMapF(MF) { it -> f(it).value() }
+    flatMapF(MF) { f(it).value() }
 
   fun <C> flatMapF(MF: Monad<F>, f: (B) -> Kind<F, Either<A, C>>): EitherT<F, A, C> = MF.run {
     EitherT(value.flatMap { either -> either.fold({ MF.just(Left(it)) }, { f(it) }) })

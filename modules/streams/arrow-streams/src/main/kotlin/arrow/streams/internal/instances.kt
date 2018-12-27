@@ -1,3 +1,4 @@
+@file:Suppress("UnusedImports")
 package arrow.streams.internal
 
 import arrow.*

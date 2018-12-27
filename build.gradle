@@ -29,9 +29,13 @@ buildscript {
         projectReactorVersion = '3.1.8.RELEASE'
         rxJavaVersion = '2.2.1'
         dokka_version = '0.9.17'
+        detekt_version = '1.0.0-RC12'
     }
 
     repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
         jcenter()
         maven { url "http://dl.bintray.com/kotlin/kotlin-dev" }
         maven { url "https://dl.bintray.com/jetbrains/markdown/" }
@@ -46,10 +50,9 @@ buildscript {
         classpath 'org.ajoberstar:gradle-git-publish:1.0.1'
         classpath "net.rdrei.android.buildtimetracker:gradle-plugin:0.11.1"
         classpath "org.jetbrains.dokka:dokka-gradle-plugin:$dokka_version"
+        classpath "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:$detekt_version"
     }
 }
-
-apply from: 'detekt.gradle.kts'
 
 def pathApiDocs = "${rootDir}/modules/docs/arrow-docs/docs/docs/apidocs"
 
@@ -59,11 +62,6 @@ allprojects {
     clean.doFirst {
         delete "${rootDir}/infographic/arrow-infographic.txt"
         delete pathApiDocs
-    }
-
-    //attempt to reduce travis memory constrains
-    tasks.withType(Test) {
-        forkEvery = 100
     }
 
     repositories {
@@ -83,6 +81,7 @@ subprojects { project ->
     apply plugin: 'kotlin'
     apply plugin: 'jacoco'
     apply plugin: 'org.jetbrains.dokka'
+    apply plugin: 'io.gitlab.arturbosch.detekt'
 
     archivesBaseName = POM_ARTIFACT_ID
 
@@ -112,6 +111,13 @@ subprojects { project ->
             suffix = "#L"
         }
 
+    }
+
+    detekt {
+        toolVersion = detekt_version
+        input = files("src/main/java", "src/main/kotlin", "src/test/kotlin")
+        parallel = true
+        config = files("${rootProject.projectDir}/detekt.yml")
     }
 
     task codeCoverageReport(type: JacocoReport) {
@@ -158,8 +164,6 @@ subprojects { project ->
     tasks.withType(Test) {
         maxParallelForks = Runtime.runtime.availableProcessors()
     }
-
-    build.dependsOn ':detekt'
 
     sourceCompatibility = javaVersion
     targetCompatibility = javaVersion

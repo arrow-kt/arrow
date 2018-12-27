@@ -4,6 +4,7 @@
  */
 package arrow.meta.ast
 
+@Suppress("UtilityClassWithPublicConstructor")
 sealed class Tree {
   companion object
 }

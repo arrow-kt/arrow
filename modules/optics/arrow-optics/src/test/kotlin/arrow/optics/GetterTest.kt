@@ -6,7 +6,6 @@ import arrow.data.k
 import arrow.data.map
 import arrow.data.run
 import arrow.data.*
-import arrow.instances.StringMonoidInstance
 import arrow.instances.monoid
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB

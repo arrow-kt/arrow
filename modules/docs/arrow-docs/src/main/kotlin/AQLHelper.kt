@@ -22,7 +22,7 @@ typealias BoxOf<A> = arrow.Kind<ForBox, A>
 inline fun <A> BoxOf<A>.fix(): Box<A> =
   this as Box<A>
 
-//@higherkind 
+//@higherkind
 sealed class Box<out A> : BoxOf<A> {
 
   object Empty : Box<Nothing>()

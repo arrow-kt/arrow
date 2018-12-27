@@ -1,7 +1,6 @@
 package arrow.free
 
 import arrow.core.*
-import arrow.free.instances.ForCoyoneda
 import arrow.free.instances.coyoneda.functor.functor
 import arrow.instances.id.functor.functor
 import arrow.instances.option.functor.functor

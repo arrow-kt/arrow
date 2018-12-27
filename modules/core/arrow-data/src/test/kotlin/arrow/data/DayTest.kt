@@ -43,6 +43,7 @@ class DayTest : UnitSpec() {
     }
 
 
+    @Suppress("ExplicitItLambdaParameter") // Required at runtime or else test fails
     "Day coflatmap should transform result type" {
       val d = day.coflatMap(Id.comonad(), Id.comonad()) { it: DayOf<ForId, ForId, Tuple2Of<Int, Int>> ->
         val (left, right) = it.fix().extract(Id.comonad(), Id.comonad()).fix()
@@ -63,6 +64,7 @@ class DayTest : UnitSpec() {
       d.extract(Id.comonad(), Id.comonad()) shouldBe "Both sides are equal"
     }
 
+    @Suppress("ExplicitItLambdaParameter") // Required at runtime or else test fails
     "Day coflatMapLazy should transform result type" {
       val d = day.coflatMapLazy(Id.comonad(), Id.comonad()) { it: DayOf<ForId, ForId, Tuple2Of<Int, Int>> ->
         val (left, right) = it.fix().extract(Id.comonad(), Id.comonad()).fix()

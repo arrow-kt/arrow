@@ -1,3 +1,4 @@
+@file:Suppress("UnusedImports")
 package arrow.effects
 
 import arrow.core.Either
@@ -19,7 +20,6 @@ typealias DeferredKProcF<A> = (DeferredKConnection, (Either<Throwable, A>) -> Un
  *
  * @see DeferredK.async
  */
-@Suppress("FunctionName")
 fun DeferredKConnection(dummy: Unit = Unit): KindConnection<ForDeferredK> = KindConnection(object : MonadDefer<ForDeferredK> {
   override fun <A> defer(fa: () -> DeferredKOf<A>): DeferredK<A> =
     DeferredK.defer(fa = fa)

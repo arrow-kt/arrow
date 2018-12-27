@@ -34,6 +34,7 @@ data class Db(val content: MapK<Int, String>) {
 }
 
 @optics
+@Suppress("UtilityClassWithPublicConstructor")
 sealed class NetworkResult {
   companion object
 }
