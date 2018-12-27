@@ -11,7 +11,6 @@ import arrow.effects.instances.io.applicativeError.attempt
 import arrow.effects.instances.io.async.async
 import arrow.effects.instances.optiont.async.async
 import arrow.instances.nonemptylist.monad.monad
-import arrow.instances.option.applicative.applicative
 import arrow.instances.option.monad.monad
 import arrow.instances.optiont.applicative.applicative
 import arrow.instances.optiont.monoidK.monoidK

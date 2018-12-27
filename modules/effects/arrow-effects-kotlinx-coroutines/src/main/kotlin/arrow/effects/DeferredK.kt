@@ -695,7 +695,7 @@ sealed class DeferredK<A>(
     memoized.cancel()
 
   @ObsoleteCoroutinesApi override fun cancel(cause: Throwable?): Boolean =
-    memoized.cancel()
+    memoized.cancel(cause)
 
   @InternalCoroutinesApi override fun getCancellationException(): CancellationException =
     memoized.getCancellationException()

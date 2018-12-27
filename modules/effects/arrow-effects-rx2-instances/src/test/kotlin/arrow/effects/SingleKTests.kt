@@ -17,7 +17,6 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.Spec
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
-import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers
@@ -62,8 +61,8 @@ class SingleKTests : UnitSpec() {
       MonadLaws.laws(SingleK.monad(), EQ()),
       MonadErrorLaws.laws(SingleK.monadError(), EQ(), EQ(), EQ()),
       ApplicativeErrorLaws.laws(SingleK.applicativeError(), EQ(), EQ(), EQ()),
-      AsyncLaws.laws(SingleK.async(), EQ(), EQ(), EQ(), testStackSafety = false),
-      AsyncLaws.laws(SingleK.effect(), EQ(), EQ(), EQ(), testStackSafety = false)
+      AsyncLaws.laws(SingleK.async(), EQ(), EQ(), testStackSafety = false),
+      AsyncLaws.laws(SingleK.effect(), EQ(), EQ(), testStackSafety = false)
     )
 
     "Multi-thread Singles finish correctly" {
