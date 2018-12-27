@@ -444,7 +444,7 @@ sealed class DeferredK<A>(
         if (e is CancellationException) release(a, ExitCase.Cancelled).await()
         else release(a, ExitCase.Error(e)).await()
       } catch (e2: Throwable) {
-        Platform.composeErrors(e, e2)
+        throw Platform.composeErrors(e, e2)
       }
       throw e
     }
@@ -695,7 +695,7 @@ sealed class DeferredK<A>(
     memoized.cancel()
 
   @ObsoleteCoroutinesApi override fun cancel(cause: Throwable?): Boolean =
-    memoized.cancel(cause)
+    memoized.cancel()
 
   @InternalCoroutinesApi override fun getCancellationException(): CancellationException =
     memoized.getCancellationException()

@@ -1,32 +1,24 @@
 package arrow.effects
 
 import arrow.Kind
-import arrow.core.Option
-import arrow.core.Right
-import arrow.core.Try
-import arrow.data.ListK
-import arrow.data.NonEmptyList
-import arrow.data.k
+import arrow.core.*
 import arrow.effects.deferredk.async.async
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.deferredk.monad.flatMap
 import arrow.instances.`try`.functor.functor
 import arrow.instances.`try`.traverse.traverse
-import arrow.instances.listk.functor.functor
-import arrow.instances.listk.traverse.traverse
-import arrow.instances.nonemptylist.functor.functor
-import arrow.instances.nonemptylist.traverse.traverse
 import arrow.instances.option.functor.functor
 import arrow.instances.option.traverse.traverse
 import arrow.test.UnitSpec
 import arrow.test.generators.genIntSmall
 import arrow.test.laws.AsyncLaws
+import arrow.test.laws.shouldBe
+import arrow.test.laws.throwableEq
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Traverse
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
-import io.kotlintest.matchers.should
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -40,7 +32,10 @@ import java.util.concurrent.TimeUnit
 @RunWith(KTestJUnitRunner::class)
 class DeferredKTest : UnitSpec() {
   fun <A> EQ(): Eq<Kind<ForDeferredK, A>> = Eq { a, b ->
-    a.unsafeAttemptSync() == b.unsafeAttemptSync()
+    val other = b.unsafeAttemptSync()
+    a.unsafeAttemptSync().fold(
+      { eA -> other.fold({ eB -> throwableEq().run { eA.eqv(eB) } }, { false }) },
+      { a -> other.fold({ false }, { b -> a == b }) })
   }
 
   suspend fun <F, A> checkAwaitAll(FF: Functor<F>, T: Traverse<F>, v: Kind<F, A>) = FF.run {
@@ -68,7 +63,7 @@ class DeferredKTest : UnitSpec() {
       }
     }
 
-    class MyException : Exception()
+    class MyException(message: String = "") : Exception(message)
 
     "should return an error when running an exception with unsafeRunAsync" {
       DeferredK.raiseError<Int>(MyException()).unsafeRunAsync { either ->
@@ -86,7 +81,9 @@ class DeferredKTest : UnitSpec() {
       val exception = MyException()
       val ioa = DeferredK<Int>(Unconfined, GlobalScope, CoroutineStart.DEFAULT) { throw exception }
       ioa.unsafeRunAsync { either ->
-        either.fold({ it shouldBe exception }, { fail("") })
+        either.fold({
+          it.shouldBe(exception, throwableEq())
+        }, { fail("") })
       }
     }
 
@@ -184,23 +181,15 @@ class DeferredKTest : UnitSpec() {
         val countDownLatch = CountDownLatch(1)
         DeferredK.just(Unit)
           .bracketCase(
-            use = { DeferredK.async<Nothing> { _, _ -> } },
+            use = { DeferredK.async<Nothing>(Unconfined) { _, _ -> } },
             release = { _, exitCase ->
               DeferredK {
                 ec = exitCase
                 countDownLatch.countDown()
               }
             }
-          )
-          .value().run {
-            async(Dispatchers.Default) {
-              delay(10)
-              cancel()
-            }
-            withContext(Dispatchers.Default) {
-              k().unsafeAttemptSync()
-            }
-          }
+          ).unsafeRunAsyncCancellable { }
+          .invoke()
 
         countDownLatch.await(50, TimeUnit.MILLISECONDS)
         ec shouldBe ExitCase.Cancelled
@@ -210,7 +199,7 @@ class DeferredKTest : UnitSpec() {
     "DeferredK should cancel KindConnection on dispose" {
       runBlocking {
         val promise = Promise.unsafeUncancelable<ForDeferredK, Unit>(DeferredK.async())
-        val d = DeferredK.async<Unit>(ctx = Unconfined) { conn, _ ->
+        DeferredK.async<Unit>(ctx = Unconfined) { conn, _ ->
           conn.push(promise.complete(Unit))
         }.unsafeRunAsyncCancellable { }
           .invoke()
