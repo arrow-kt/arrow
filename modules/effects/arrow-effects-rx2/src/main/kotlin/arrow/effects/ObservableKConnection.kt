@@ -7,7 +7,7 @@ import arrow.effects.typeclasses.MonadDefer
 
 typealias ObservableKConnection = KindConnection<ForObservableK>
 typealias ObservableKProc<A> = (ObservableKConnection, (Either<Throwable, A>) -> Unit) -> Unit
-typealias ObservableKProcF<A> = (ObservableKConnection, (Either<Throwable, A>) -> Unit) -> Kind<ForObservableK, Unit>
+typealias ObservableKProcF<A> = (ObservableKConnection, (Either<Throwable, A>) -> Unit) -> ObservableKOf<Unit>
 
 /**
  * Connection for [ObservableK].

@@ -441,8 +441,8 @@ sealed class DeferredK<A>(
       use(a).await()
     } catch (e: Throwable) {
       try {
-        if (e is CancellationException) release(a, ExitCase.Cancelled).also { println("release#await") }.await()
-        else release(a, ExitCase.Error(e)).also { println("release#await") }.await()
+        if (e is CancellationException) release(a, ExitCase.Cancelled).await()
+        else release(a, ExitCase.Error(e)).await()
       } catch (e2: Throwable) {
         throw Platform.composeErrors(e, e2)
       }

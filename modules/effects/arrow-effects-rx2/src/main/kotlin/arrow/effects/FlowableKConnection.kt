@@ -1,13 +1,12 @@
 package arrow.effects
 
-import arrow.Kind
 import arrow.core.Either
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.MonadDefer
 
 typealias FlowableKConnection = KindConnection<ForFlowableK>
 typealias FlowableKProc<A> = (FlowableKConnection, (Either<Throwable, A>) -> Unit) -> Unit
-typealias FlowableKProcF<A> = (FlowableKConnection, (Either<Throwable, A>) -> Unit) -> Kind<ForFlowableK, Unit>
+typealias FlowableKProcF<A> = (FlowableKConnection, (Either<Throwable, A>) -> Unit) -> FlowableKOf<A>
 
 /**
  * Connection for [FlowableK].

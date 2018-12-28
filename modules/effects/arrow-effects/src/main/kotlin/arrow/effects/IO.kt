@@ -16,7 +16,7 @@ import arrow.higherkind
 import kotlin.coroutines.CoroutineContext
 
 typealias IOProc<A> = (IOConnection, (Either<Throwable, A>) -> Unit) -> Unit
-typealias IOProcF<A> = (IOConnection, (Either<Throwable, A>) -> Unit) -> Kind<ForIO, Unit>
+typealias IOProcF<A> = (IOConnection, (Either<Throwable, A>) -> Unit) -> IOOf<Unit>
 
 fun <A> Proc<A>.toIOProc(): IOProc<A> = { _: IOConnection, proc -> this(proc) }
 fun <A> ProcF<ForIO, A>.toIOProcF(): IOProcF<A> = { _: IOConnection, proc -> this(proc) }

@@ -7,7 +7,7 @@ import arrow.effects.typeclasses.MonadDefer
 
 typealias MonoKConnection = KindConnection<ForMonoK>
 typealias MonoKProc<A> = (MonoKConnection, (Either<Throwable, A>) -> Unit) -> Unit
-typealias MonoKProcF<A> = (MonoKConnection, (Either<Throwable, A>) -> Unit) -> Kind<ForMonoK, Unit>
+typealias MonoKProcF<A> = (MonoKConnection, (Either<Throwable, A>) -> Unit) -> MonoKOf<Unit>
 
 /**
  * Connection for [MonoK].

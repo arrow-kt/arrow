@@ -8,7 +8,7 @@ import arrow.effects.handleErrorWith as handleErrorW
 
 typealias DeferredKConnection = KindConnection<ForDeferredK>
 typealias DeferredKProc<A> = (DeferredKConnection, (Either<Throwable, A>) -> Unit) -> Unit
-typealias DeferredKProcF<A> = (DeferredKConnection, (Either<Throwable, A>) -> Unit) -> Kind<ForDeferredK, Unit>
+typealias DeferredKProcF<A> = (DeferredKConnection, (Either<Throwable, A>) -> Unit) -> DeferredKOf<Unit>
 
 /**
  * Connection for [DeferredK].
