@@ -11,9 +11,7 @@ import arrow.instances.traverse as idTraverse
 interface IdSemigroupInstance<A> : Semigroup<Id<A>> {
   fun SA(): Semigroup<A>
 
-  override fun Id<A>.combine(b: Id<A>): Id<A> {
-    return Id(SA().run { value().combine(b.value()) })
-  }
+  override fun Id<A>.combine(b: Id<A>): Id<A> = Id(SA().run { value().combine(b.value()) })
 }
 
 @extension
