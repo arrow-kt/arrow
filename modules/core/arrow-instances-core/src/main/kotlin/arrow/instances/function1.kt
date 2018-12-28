@@ -11,9 +11,7 @@ import arrow.typeclasses.*
 interface Function1SemigroupInstance<A, B> : Semigroup<Function1<A, B>> {
   fun SB(): Semigroup<B>
 
-  override fun Function1<A, B>.combine(b: Function1<A, B>): Function1<A, B> {
-    return { a: A -> SB().run { invoke(a).combine(b(a)) } }.k()
-  }
+  override fun Function1<A, B>.combine(b: Function1<A, B>): Function1<A, B> = { a: A -> SB().run { invoke(a).combine(b(a)) } }.k()
 }
 
 @extension
@@ -22,9 +20,7 @@ interface Function1MonoidInstance<A, B> : Monoid<Function1<A, B>>, Function1Semi
 
   override fun SB() = MB()
 
-  override fun empty(): Function1<A, B> {
-    return Function1 { MB().run { empty() } }
-  }
+  override fun empty(): Function1<A, B> = Function1 { MB().run { empty() } }
 }
 
 @extension

@@ -81,7 +81,7 @@ interface DeferredKBracketInstance : Bracket<ForDeferredK, Throwable>, DeferredK
 @extension
 interface DeferredKMonadDeferInstance : MonadDefer<ForDeferredK>, DeferredKBracketInstance {
   override fun <A> defer(fa: () -> DeferredKOf<A>): DeferredK<A> =
-    DeferredK.defer(fa = { fa() })
+    DeferredK.defer(fa = fa)
 }
 
 @extension
