@@ -1,6 +1,5 @@
 package arrow.effects
 
-import arrow.Kind
 import arrow.core.*
 import arrow.core.Either.Left
 import arrow.effects.OnCancel.Companion.CancellationException

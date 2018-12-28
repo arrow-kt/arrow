@@ -1,6 +1,5 @@
 package arrow.effects
 
-import arrow.Kind
 import arrow.core.Either
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.MonadDefer
