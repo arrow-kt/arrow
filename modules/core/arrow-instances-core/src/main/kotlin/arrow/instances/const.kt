@@ -54,7 +54,7 @@ interface ConstFoldableInstance<A> : Foldable<ConstPartialOf<A>> {
 @extension
 interface ConstTraverseInstance<X> : Traverse<ConstPartialOf<X>>, ConstFoldableInstance<X> {
 
-  override fun <T, U> Kind<ConstPartialOf<X>, T>.map(f: (T) -> U): Const<X, U> = fix().retag()
+  override fun <T, U> ConstOf<X, T>.map(f: (T) -> U): Const<X, U> = fix().retag()
 
   override fun <G, A, B> ConstOf<X, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, ConstOf<X, B>> =
     fix().traverse(AP, f)
@@ -108,7 +108,7 @@ class ConstContext<A>(val MA: Monoid<A>) : ConstApplicativeInstance<A>, ConstTra
   override fun MA(): Monoid<A> = MA
 
   override fun <T, U> ConstOf<A, T>.map(f: (T) -> U): Const<A, U> =
-    fix().map(f)
+    fix().retag()
 }
 
 class ConstContextPartiallyApplied<L>(val MA: Monoid<L>) {

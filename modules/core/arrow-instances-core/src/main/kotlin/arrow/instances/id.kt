@@ -11,9 +11,7 @@ import arrow.instances.traverse as idTraverse
 interface IdSemigroupInstance<A> : Semigroup<Id<A>> {
   fun SA(): Semigroup<A>
 
-  override fun Id<A>.combine(b: Id<A>): Id<A> {
-    return Id(SA().run { value().combine(b.value()) })
-  }
+  override fun Id<A>.combine(b: Id<A>): Id<A> = Id(SA().run { value().combine(b.value()) })
 }
 
 @extension
@@ -138,7 +136,7 @@ interface IdTraverseInstance : Traverse<ForId> {
   override fun <A, B> IdOf<A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
 
-  override fun <A, B> arrow.Kind<arrow.core.ForId, A>.foldRight(lb: arrow.core.Eval<B>, f: (A, arrow.core.Eval<B>) -> arrow.core.Eval<B>): Eval<B> =
+  override fun <A, B> IdOf<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
     fix().foldRight(lb, f)
 }
 
