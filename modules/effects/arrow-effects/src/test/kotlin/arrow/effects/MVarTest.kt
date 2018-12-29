@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.*
 import arrow.effects.instances.io.async.async
 import arrow.effects.instances.io.monad.binding
+import arrow.effects.instances.io.monad.flatMap
 import arrow.effects.typeclasses.seconds
 import arrow.instances.either.eq.eq
 import arrow.instances.option.eq.eq
@@ -91,6 +92,26 @@ class MVarTest : UnitSpec() {
 
         task.equalUnderTheLaw(IO.just(i toT i), EQ())
       }
+    }
+
+    "put(null) works" {
+      val task = mvar.empty<String?>().flatMap { mvar ->
+        mvar.put(null).flatMap { mvar.read() }
+      }
+
+      task.equalUnderTheLaw(IO.just(null), EQ())
+    }
+
+    "take/put test is stack safe" {
+      fun loop(n: Int, acc: Int, ch: MVar<ForIO, Int>): IO<Int> =
+        if (n <= 0) IO.just(acc) else
+          ch.take().flatMap { x ->
+            ch.put(1).flatMap { loop(n - 1, acc + x, ch) }
+          }
+
+      val count = 10000
+      val task = mvar.of(1).flatMap { ch -> loop(count, 0, ch) }
+      task.equalUnderTheLaw(IO.just(count), EQ())
     }
 
   }

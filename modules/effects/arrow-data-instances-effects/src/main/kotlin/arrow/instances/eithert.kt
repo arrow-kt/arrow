@@ -24,44 +24,42 @@ interface EitherTBracketInstance<F> : Bracket<EitherTPartialOf<F, Throwable>, Th
 
   override fun <A, B> EitherTOf<F, Throwable, A>.bracketCase(
     release: (A, ExitCase<Throwable>) -> EitherTOf<F, Throwable, Unit>,
-    use: (A) -> EitherTOf<F, Throwable, B>): EitherT<F, Throwable, B> =
+    use: (A) -> EitherTOf<F, Throwable, B>): EitherT<F, Throwable, B> = MDF().run {
 
-    EitherT.liftF<F, Throwable, Ref<F, Option<Throwable>>>(MDF(), Ref.of(None, MDF())).flatMap(MDF()) { ref ->
+    EitherT.liftF<F, Throwable, Ref<F, Option<Throwable>>>(this, Ref.of(None, this)).flatMap(this) { ref ->
       EitherT(
-        MDF().run {
-          value().bracketCase(use = { eith ->
-            when (eith) {
-              is Either.Right -> use(eith.b).value()
-              is Either.Left -> just(eith)
-            }
-          }, release = { eith, exitCase ->
-            when (eith) {
-              is Either.Right -> when (exitCase) {
-                is ExitCase.Completed -> {
-                  release(eith.b, ExitCase.Completed).value().flatMap {
-                    it.fold(
-                      { l -> ref.set(Some(l)) },
-                      { just(Unit) }
-                    )
-                  }
-                }
-                else -> release(eith.b, exitCase).value().unit()
-              }
-              is Either.Left -> just(Unit)
-            }
-          }).flatMap { eith ->
-            when (eith) {
-              is Either.Right -> ref.get.map {
-                it.fold(
-                  { eith },
-                  { throwable -> throwable.left() })
-              }
-              is Either.Left -> just(eith)
-            }
+        value().bracketCase(use = { eith ->
+          when (eith) {
+            is Either.Right -> use(eith.b).value()
+            is Either.Left -> just(eith)
           }
-        }
-      )
+        }, release = { eith, exitCase ->
+          when (eith) {
+            is Either.Right -> when (exitCase) {
+              is ExitCase.Completed -> {
+                release(eith.b, ExitCase.Completed).value().flatMap {
+                  it.fold(
+                    { l -> ref.set(Some(l)) },
+                    { just(Unit) }
+                  )
+                }
+              }
+              else -> release(eith.b, exitCase).value().unit()
+            }
+            is Either.Left -> just(Unit)
+          }
+        }).flatMap { eith ->
+          when (eith) {
+            is Either.Right -> ref.get().map {
+              it.fold(
+                { eith },
+                { throwable -> throwable.left() })
+            }
+            is Either.Left -> just(eith)
+          }
+        })
     }
+  }
 
 }
 

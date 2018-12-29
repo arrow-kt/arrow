@@ -40,7 +40,7 @@ interface OptionTBracketInstance<F> : Bracket<OptionTPartialOf<F>, Throwable>, O
       }).flatMap { option ->
         option.fold(
           { just(None) },
-          { ref.get.map { b -> if (b) None else option } }
+          { ref.get().map { b -> if (b) None else option } }
         )
       }
     })

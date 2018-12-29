@@ -17,8 +17,7 @@ interface MVar<F, A> {
   /**
    * Returns true if there are no elements. Otherwise false.
    *
-   * {: data-executable='true'}
-   * ```kotlin:ank
+   * ```kotlin:ank:playground
    * import arrow.effects.*
    * import arrow.effects.instances.io.async.async
    * import arrow.effects.instances.io.monad.flatMap
@@ -43,8 +42,7 @@ interface MVar<F, A> {
   /**
    * Returns true if there no elements. Otherwise false.
    *
-   * {: data-executable='true'}
-   * ```kotlin:ank
+   * ```kotlin:ank:playground
    * import arrow.effects.*
    * import arrow.effects.instances.io.async.async
    * import arrow.effects.instances.io.monad.flatMap
@@ -70,8 +68,7 @@ interface MVar<F, A> {
    * Puts [A] in the [MVar] if it is empty,
    * or blocks if full until the given value is next in line to be consumed by [take].
    *
-   * {: data-executable='true'}
-   * ```kotlin:ank
+   * ```kotlin:ank:playground
    * import arrow.effects.*
    * import arrow.effects.instances.io.async.async
    * import arrow.effects.instances.io.monad.flatMap
@@ -95,8 +92,7 @@ interface MVar<F, A> {
    * Fill the [MVar] if we can do it without blocking.
    * Returns true if successfully put the value or false otherwise.
    *
-   * {: data-executable='true'}
-   * ```kotlin:ank
+   * ```kotlin:ank:playground
    * import arrow.effects.*
    * import arrow.effects.instances.io.async.async
    * import arrow.effects.instances.io.monad.flatMap
@@ -121,8 +117,7 @@ interface MVar<F, A> {
   /**
    * Takes the value out of the [MVar] if full, or blocks until a value is available.
    *
-   * {: data-executable='true'}
-   * ```kotlin:ank
+   * ```kotlin:ank:playground
    * import arrow.effects.*
    * import arrow.effects.instances.io.async.async
    * import arrow.effects.instances.io.monad.flatMap
@@ -147,8 +142,7 @@ interface MVar<F, A> {
   /**
    * Try to take the value of [MVar], returns result as an [Option].
    *
-   * {: data-executable='true'}
-   * ```kotlin:ank
+   * ```kotlin:ank:playground
    * import arrow.core.*
    * import arrow.effects.*
    * import arrow.effects.instances.io.async.async
@@ -174,8 +168,7 @@ interface MVar<F, A> {
   /**
    * Tries reading the current value, or blocks until there is a value available.
    *
-   * {: data-executable='true'}
-   * ```kotlin:ank
+   * ```kotlin:ank:playground
    * import arrow.core.toT
    * import arrow.effects.*
    * import arrow.effects.instances.io.async.async
@@ -211,9 +204,7 @@ interface MVar<F, A> {
     /**
      * Create an uncancelable empty [MVar].
      *
-     * {: data-executable='true'}
-     *
-     * ```kotlin:ank
+     * ```kotlin:ank:playground
      * import arrow.effects.*
      * import arrow.effects.instances.io.async.async
      *
@@ -230,9 +221,7 @@ interface MVar<F, A> {
     /**
      * Create an uncancelable [MVar] that's initialized to an [initial] value.
      *
-     * {: data-executable='true'}
-     *
-     * ```kotlin:ank
+     * ```kotlin:ank:playground
      * import arrow.effects.*
      * import arrow.effects.instances.io.async.async
      *
@@ -263,9 +252,7 @@ interface MVar<F, A> {
  * Builds a [Mvar] value for data types [F]
  * without deciding the type of the MVar's value.
  *
- * {: data-executable='true'}
- *
- * ```kotlin:ank
+ * ```kotlin:ank:playground
  * import arrow.effects.*
  * import arrow.effects.instances.io.async.async
  *
@@ -283,9 +270,7 @@ interface MVarPartialOf<F> {
   /**
    * Builds a [Mvar] with a value of type [A].
    *
-   * {: data-executable='true'}
-   *
-   * ```kotlin:ank
+   * ```kotlin:ank:playground
    * import arrow.effects.*
    * import arrow.effects.instances.io.async.async
    *
@@ -302,9 +287,7 @@ interface MVarPartialOf<F> {
   /**
    * Builds an empty [Mvar] for type [A].
    *
-   * {: data-executable='true'}
-   *
-   * ```kotlin:ank
+   * ```kotlin:ank:playground
    * import arrow.effects.*
    * import arrow.effects.instances.io.async.async
    *

@@ -4,29 +4,31 @@ import arrow.Kind
 import arrow.core.*
 import arrow.effects.MVar
 import arrow.effects.typeclasses.Async
+import arrow.effects.typeclasses.rightUnit
+import arrow.effects.typeclasses.unitCallback
 import java.util.concurrent.atomic.AtomicReference
 
-/**
- * <<MVar>> implementation for <<Async>> data types.
- */
+//[MVar] implementation for [Async] data types.
 internal class MVarAsync<F, A> private constructor(initial: State<A>, AS: Async<F>) : MVar<F, A>, Async<F> by AS {
 
-  /** Shared mutable state. */
   private val stateRef = AtomicReference<State<A>>(initial)
 
-  override fun put(a: A): Kind<F, Unit> = async { cb ->
-    unsafePut(a, cb)
-  }
+  override fun put(a: A): Kind<F, Unit> =
+    tryPut(a).flatMap { result ->
+      if (result) unit()
+      else asyncF { cb -> unsafePut(a, cb) }
+    }
 
-  override fun tryPut(a: A): Kind<F, Boolean> = async { cb ->
-    unsafePut1(a, cb)
-  }
+  override fun tryPut(a: A): Kind<F, Boolean> =
+    defer { unsafeTryPut(a) }
 
   override fun take(): Kind<F, A> =
-    async(::unsafeTake)
+    tryTake().flatMap {
+      it.fold({ asyncF(::unsafeTake) }, ::just)
+    }
 
   override fun tryTake(): Kind<F, Option<A>> =
-    async(::unsafeTake1)
+    defer(::unsafeTryTake)
 
   override fun read(): Kind<F, A> =
     async(::unsafeRead)
@@ -41,9 +43,9 @@ internal class MVarAsync<F, A> private constructor(initial: State<A>, AS: Async<
   override fun isNotEmpty(): Kind<F, Boolean> =
     isEmpty().map { !it }
 
-  private tailrec fun unsafePut1(a: A, onPut: Listener<Boolean>): Unit =
+  private tailrec fun unsafeTryPut(a: A): Kind<F, Boolean> =
     when (val current = stateRef.get()) {
-      is State.WaitForTake -> onPut(Right(false))
+      is State.WaitForTake -> justFalse
       is State.WaitForPut -> {
         val first: Listener<A>? = current.takes.firstOrNull()
         val update: State<A> =
@@ -53,22 +55,18 @@ internal class MVarAsync<F, A> private constructor(initial: State<A>, AS: Async<
             else State.WaitForPut(emptyList(), rest)
           }
 
-        if (!stateRef.compareAndSet(current, update)) unsafePut1(a, onPut) // retry
-        else {
-          val value = Right(a)
-          streamAll(value, current.reads) // Satisfies all current `read` requests found
-          first?.invoke(value) // Satisfies the first `take` request found
-          onPut(Right(true)) // Signals completion of `put`
-        }
+        if (!stateRef.compareAndSet(current, update)) unsafeTryPut(a) // retry
+        else if (first != null && current.reads.isNotEmpty()) streamPutAndReads(a, current.reads, first)
+        else justTrue
       }
     }
 
-  private tailrec fun unsafePut(a: A, onPut: Listener<Unit>): Unit =
+  private tailrec fun unsafePut(a: A, onPut: Listener<Unit>): Kind<F, Unit> =
     when (val current = stateRef.get()) {
       is State.WaitForTake -> {
         val update = State.WaitForTake(current.value, current.puts + Tuple2(a, onPut))
         if (!stateRef.compareAndSet(current, update)) unsafePut(a, onPut) // retry
-        else Unit
+        else unit()
       }
 
       is State.WaitForPut -> {
@@ -81,53 +79,56 @@ internal class MVarAsync<F, A> private constructor(initial: State<A>, AS: Async<
           }
 
         if (!stateRef.compareAndSet(current, update)) unsafePut(a, onPut) // retry
-        else {
-          val value = Right(a)
-          streamAll(value, current.reads) // Satisfies all current `read` requests found
-          first?.invoke(value)// Satisfies the first `take` request found
-          onPut(Right(Unit)) // Signals completion of `put`
-        }
+        else streamPutAndReads(a, current.reads, first).map { _ -> onPut(rightUnit) }
       }
     }
 
-  private tailrec fun unsafeTake1(onTake: Listener<Option<A>>): Unit =
+  private tailrec fun unsafeTryTake(): Kind<F, Option<A>> =
     when (val current = stateRef.get()) {
       is State.WaitForTake ->
         if (current.puts.isEmpty()) {
-          if (stateRef.compareAndSet(current, State.empty())) onTake(Right(Some(current.value))) // Signals completion of `take`
-          else unsafeTake1(onTake) // retry
+          if (stateRef.compareAndSet(current, State.empty())) just(Some(current.value)) // Signals completion of `take`
+          else unsafeTryTake() // retry
         } else {
           val (ax, notify) = current.puts.first()
           val xs = current.puts.drop(1)
           val update = State.WaitForTake(ax, xs)
           if (stateRef.compareAndSet(current, update)) {
-            onTake(Right(Some(current.value))) // Signals completion of `take`
-            notify(Right(Unit)) // Complete the `put` request waiting on a notification
-          } else unsafeTake1(onTake) // retry
+            asyncBoundary.map { _ ->
+              notify(rightUnit) // Complete the `put` request waiting on a notification
+              Some(current.value) // Signals completion of `take`
+            }
+          } else unsafeTryTake() // retry
         }
 
-      is State.WaitForPut -> onTake(Right(None))
+      is State.WaitForPut -> justNone
     }
 
-  private tailrec fun unsafeTake(onTake: Listener<A>): Unit =
+  private tailrec fun unsafeTake(onTake: Listener<A>): Kind<F, Unit> =
     when (val current = stateRef.get()) {
       is State.WaitForTake ->
         if (current.puts.isEmpty()) {
-          if (stateRef.compareAndSet(current, State.empty())) onTake(Right(current.value)) // Signals completion of `take`
-          else unsafeTake(onTake) // retry }
+          if (stateRef.compareAndSet(current, State.empty())) onTake(Right(current.value)).run { unit() } // Signals completion of `take`
+          else unsafeTake(onTake) // retry
         } else {
           val (ax, notify) = current.puts.first()
           val xs = current.puts.drop(1)
           val update = State.WaitForTake(ax, xs)
           if (stateRef.compareAndSet(current, update)) {
-            onTake(Right(current.value)) // Signals completion of `take`
-            notify(Right(Unit)) // Signals completion of `take`
+            asyncBoundary.map { _ ->
+              try {
+                notify(rightUnit)
+              } // Signals completion of `take`
+              finally {
+                onTake(Right(current.value))
+              } // Signals completion of `take`
+            }
           } else unsafeTake(onTake) // retry
         }
 
       is State.WaitForPut ->
         if (!stateRef.compareAndSet(current, State.WaitForPut(current.reads, current.takes + onTake))) unsafeTake(onTake)
-        else Unit
+        else unit()
     }
 
   private tailrec fun unsafeRead(onRead: Listener<A>): Unit =
@@ -143,35 +144,43 @@ internal class MVarAsync<F, A> private constructor(initial: State<A>, AS: Async<
         else Unit
     }
 
-  private fun streamAll(value: Either<Nothing, A>, listeners: Iterable<Listener<A>>): Unit =
-    listeners.forEach { it.invoke(value) }
+  private fun streamPutAndReads(a: A, reads: List<Listener<A>>, first: Listener<A>?): Kind<F, Boolean> =
+    asyncBoundary.map { _ ->
+      val value = Right(a)
+      reads.forEach { it.invoke(value) } // Satisfies all current `read` requests found
+      first?.invoke(value)
+      true
+    }
+
+  private val justNone = just(None)
+  private val justFalse = just(false)
+  private val justTrue = just(true)
+  private val asyncBoundary = async(unitCallback)
 
   companion object {
-    /** Builds an <<MVarAsync>> instance with an `initial` value. */
+    /** Builds an [MVarAsync] instance with an [initial] value. */
     operator fun <F, A> invoke(initial: A, AS: Async<F>): Kind<F, MVar<F, A>> = AS.delay {
       MVarAsync(State(initial), AS)
     }
 
-    /** Returns an empty <<MVarAsync>> instance. */
+    /** Returns an empty [MVarAsync] instance. */
     fun <F, A> empty(AS: Async<F>): Kind<F, MVar<F, A>> = AS.delay {
       MVarAsync(State.empty<A>(), AS)
     }
 
-    /** ADT modelling the internal state of `MVar`. */
+    /** Internal state of [MVar]. */
     private sealed class State<A> {
 
-      /** Private <<State>> builders.*/
       companion object {
-        private val ref = WaitForPut<Any>(emptyList(), emptyList())
         operator fun <A> invoke(a: A): State<A> = WaitForTake(a, emptyList())
-        /** `Empty` state, reusing the same instance. */
+
+        private val ref = WaitForPut<Any>(emptyList(), emptyList())
         fun <A> empty(): State<A> = ref as State<A>
       }
 
       /**
-       * `MVarAsync` state signaling it has `take` callbacks
-       * registered and we are waiting for one or multiple
-       * `put` operations.
+       * [MVarAsync] state signaling it has [take] callbacks registered
+       * and we are waiting for one or multiple [put] operations.
        *
        * @param takes are the rest of the requests waiting in line,
        *        if more than one `take` requests were registered
@@ -179,8 +188,8 @@ internal class MVarAsync<F, A> private constructor(initial: State<A>, AS: Async<
       data class WaitForPut<A>(val reads: List<Listener<A>>, val takes: List<Listener<A>>) : State<A>()
 
       /**
-       * `MVarAsync` state signaling it has one or more values enqueued,
-       * to be signaled on the next `take`.
+       * [MVarAsync] state signaling it has one or more values enqueued,
+       * to be signaled on the next [take].
        *
        * @param value is the first value to signal
        * @param puts are the rest of the `put` requests, along with the

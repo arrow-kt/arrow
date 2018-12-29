@@ -55,7 +55,7 @@ sealed class IO<out A> : IOOf<A> {
             IO { callback(Left(t)) }
           }
 
-          IORunLoop.startCancelable(fa, conn2) { Unit }
+          IORunLoop.startCancelable(fa, conn2, mapUnit)
         }
       }
 
