@@ -8,8 +8,10 @@ import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Functor
+import arrow.undocumented
 
 @extension
+@undocumented
 interface StoreComonadInstance<S> : Comonad<StorePartialOf<S>> {
   override fun <A, B> Kind<StorePartialOf<S>, A>.coflatMap(f: (Kind<StorePartialOf<S>, A>) -> B): Store<S, B> =
       fix().coflatMap(f)
@@ -22,6 +24,7 @@ interface StoreComonadInstance<S> : Comonad<StorePartialOf<S>> {
 }
 
 @extension
+@undocumented
 interface StoreFunctorInstance<S> : Functor<StorePartialOf<S>> {
   override fun <A, B> Kind<StorePartialOf<S>, A>.map(f: (A) -> B): Store<S, B> =
       fix().map(f)

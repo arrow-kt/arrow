@@ -9,6 +9,7 @@ import arrow.extension
 import arrow.mtl.typeclasses.FunctorFilter
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
+import arrow.undocumented
 
 //import arrow.higherkind
 
@@ -35,6 +36,7 @@ sealed class Box<out A> : BoxOf<A> {
 }
 
 @extension
+@undocumented
 interface BoxFunctor : Functor<ForBox> {
   override fun <A, B> BoxOf<A>.map(f: (A) -> B): Box<B> =
     when (val box = fix()) {

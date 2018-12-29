@@ -5,6 +5,7 @@ import arrow.effects.flowablek.foldable.foldable
 import arrow.effects.flowablek.functor.functor
 import arrow.effects.flowablek.monadThrow.bindingCatch
 import arrow.effects.flowablek.traverse.traverse
+import arrow.effects.flowablek.monad.flatMap
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
@@ -13,13 +14,13 @@ import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.Spec
+import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subscribers.TestSubscriber
-import org.hamcrest.CoreMatchers.`is`
-import org.hamcrest.MatcherAssert.assertThat
 import org.junit.runner.RunWith
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 @RunWith(KTestJUnitRunner::class)
@@ -128,24 +129,62 @@ class FlowableKTests : UnitSpec() {
 
     "FlowableK bracket cancellation should release resource with cancel exit status" {
       lateinit var ec: ExitCase<Throwable>
+      val countDownLatch = CountDownLatch(1)
 
-      val flowable = Flowable.just(0L)
-        .k()
+      FlowableK.just(Unit)
         .bracketCase(
-          use = { FlowableK.just(it) },
-          release = { _, exitCase -> ec = exitCase; FlowableK.just(Unit) }
+          use = { FlowableK.async<Nothing>({ _, _ -> }) },
+          release = { _, exitCase ->
+            FlowableK {
+              ec = exitCase
+              countDownLatch.countDown()
+            }
+          }
         )
         .value()
-        .delay(3, TimeUnit.SECONDS)
-        .doOnSubscribe { subscription ->
-          Flowable.just(0L).delay(1, TimeUnit.SECONDS)
-            .subscribe {
-              subscription.cancel()
-            }
-        }
+        .subscribe()
+        .dispose()
 
-      flowable.test().await(5, TimeUnit.SECONDS)
-      assertThat(ec, `is`(ExitCase.Cancelled as ExitCase<Throwable>))
+      countDownLatch.await(100, TimeUnit.MILLISECONDS)
+      ec shouldBe ExitCase.Cancelled
     }
+
+    "FlowableK should cancel KindConnection on dispose" {
+      Promise.uncancelable<ForFlowableK, Unit>(FlowableK.async()).flatMap { latch ->
+        FlowableK {
+          FlowableK.async<Unit>(fa = { conn, _ ->
+            conn.push(latch.complete(Unit))
+          }).flowable.subscribe().dispose()
+        }.flatMap { latch.get }
+      }.value()
+        .test()
+        .assertValue(Unit)
+        .awaitTerminalEvent(100, TimeUnit.MILLISECONDS)
+    }
+
+    "FlowableK async should be cancellable" {
+      Promise.uncancelable<ForFlowableK, Unit>(FlowableK.async())
+        .flatMap { latch ->
+          FlowableK {
+            FlowableK.async<Unit>(fa = { _, _ -> })
+              .value()
+              .doOnCancel { latch.complete(Unit).value().subscribe() }
+              .subscribe()
+              .dispose()
+          }.flatMap { latch.get }
+        }.value()
+        .test()
+        .assertValue(Unit)
+        .awaitTerminalEvent(100, TimeUnit.MILLISECONDS)
+    }
+
+    "KindConnection can cancel upstream" {
+      FlowableK.async<Unit>(fa = { connection, _ ->
+        connection.cancel().value().subscribe()
+      }).value()
+        .test()
+        .assertError(ConnectionCancellationException)
+    }
+
   }
 }

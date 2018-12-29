@@ -207,7 +207,7 @@ operator fun <K, V> Map<out K, V>.plus(tuples: Array<out Tuple2<K, V>>): Map<K, 
 operator fun <K, V> Map<out K, V>.plus(tuples: Sequence<Tuple2<K, V>>): Map<K, V> =
   LinkedHashMap(this).apply { putAll(tuples) }.optimizeReadOnlyMap()
 
-inline fun <K, V> Map.Entry<K, V>.toTuple2(): Tuple2<K, V> = Tuple2(key, value)
+fun <K, V> Map.Entry<K, V>.toTuple2(): Tuple2<K, V> = Tuple2(key, value)
 
 internal fun mapCapacity(expectedSize: Int): Int =
   when {

@@ -1,11 +1,12 @@
 package arrow.effects
 
-import arrow.Kind
 import arrow.core.*
-import arrow.effects.data.internal.IOCancellationException
+import arrow.effects.instances.io.applicativeError.attempt
 import arrow.effects.instances.io.async.async
 import arrow.effects.instances.io.monad.binding
+import arrow.effects.instances.io.monad.flatMap
 import arrow.effects.instances.io.monad.monad
+import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.milliseconds
 import arrow.effects.typeclasses.seconds
 import arrow.instances.option.eq.eq
@@ -19,15 +20,16 @@ import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldEqual
 import kotlinx.coroutines.newSingleThreadContext
 import org.junit.runner.RunWith
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 @RunWith(KTestJUnitRunner::class)
 class IOTest : UnitSpec() {
-  val EQ_OPTION = Option.eq(Eq.any())
 
-  fun <A> EQ(): Eq<Kind<ForIO, A>> {
+  fun <A> EQ(): Eq<IOOf<A>> {
     return Eq { a, b ->
-      EQ_OPTION.run {
-        a.fix().attempt().unsafeRunTimed(60.seconds).eqv(b.fix().attempt().unsafeRunTimed(60.seconds))
+      Option.eq(Eq.any()).run {
+        a.attempt().unsafeRunTimed(1.seconds).eqv(b.attempt().unsafeRunTimed(1.seconds))
       }
     }
   }
@@ -350,7 +352,7 @@ class IOTest : UnitSpec() {
             }
         IO(newSingleThreadContext("CancelThread")) { }
           .unsafeRunAsync { cancel() }
-      }.unsafeRunTimed(2.seconds) shouldBe Some(IOCancellationException)
+      }.unsafeRunTimed(2.seconds) shouldBe Some(ConnectionCancellationException)
     }
 
     "unsafeRunAsyncCancellable can cancel even for infinite asyncs" {
@@ -374,5 +376,69 @@ class IOTest : UnitSpec() {
       }.fix()
       result.unsafeRunSync() shouldBe 2
     }
+
+    "IO bracket cancellation should release resource with cancel exit status" {
+      Promise.uncancelable<ForIO, ExitCase<Throwable>>(IO.async()).flatMap { p ->
+        IO.just(0L)
+          .bracketCase(
+            use = { IO.never },
+            release = { _, exitCase -> p.complete(exitCase) }
+          )
+          .unsafeRunAsyncCancellable { }
+          .invoke() //cancel immediately
+
+        p.get
+      }.unsafeRunSync() shouldBe ExitCase.Cancelled
+    }
+
+    "Cancelable should run CancelToken" {
+      Promise.uncancelable<ForIO, Unit>(IO.async()).flatMap { p ->
+        IO.async().cancelable<Unit> { _ ->
+          p.complete(Unit)
+        }.fix()
+          .unsafeRunAsyncCancellable { }
+          .invoke()
+
+        p.get
+      }.unsafeRunSync() shouldBe Unit
+    }
+
+    "CancelableF should run CancelToken" {
+      Promise.uncancelable<ForIO, Unit>(IO.async()).flatMap { p ->
+        IO.async().cancelableF<Unit> { _ ->
+          IO { p.complete(Unit) }
+        }.fix()
+          .unsafeRunAsyncCancellable { }
+          .invoke()
+
+        p.get
+      }.unsafeRunSync() shouldBe Unit
+    }
+
+    "IO should cancel KindConnection on dispose" {
+      Promise.uncancelable<ForIO, Unit>(IO.async()).flatMap { latch ->
+        IO {
+          IO.async<Unit> { conn, _ ->
+            conn.push(latch.complete(Unit))
+          }.unsafeRunAsyncCancellable { }
+            .invoke()
+        }.flatMap { latch.get }
+      }.unsafeRunSync()
+    }
+
+    "KindConnection can cancel upstream" {
+      Promise.uncancelable<ForIO, Unit>(IO.async()).flatMap { latch ->
+        IO.async<Unit> { conn, cb ->
+          conn.push(latch.complete(Unit))
+          cb(Right(Unit))
+        }.flatMap {
+          IO.async<Unit> { conn, _ ->
+            conn.cancel().fix().unsafeRunAsync { }
+          }
+        }.unsafeRunAsyncCancellable { }
+        latch.get
+      }.unsafeRunSync()
+    }
+
   }
 }

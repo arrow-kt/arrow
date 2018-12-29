@@ -3,6 +3,7 @@ package arrow.effects
 import arrow.effects.observablek.async.async
 import arrow.effects.observablek.foldable.foldable
 import arrow.effects.observablek.functor.functor
+import arrow.effects.observablek.monad.flatMap
 import arrow.effects.observablek.monadThrow.bindingCatch
 import arrow.effects.observablek.traverse.traverse
 import arrow.effects.typeclasses.ExitCase
@@ -13,17 +14,17 @@ import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.Spec
+import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import io.reactivex.Observable
 import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers
-import org.hamcrest.CoreMatchers.`is`
-import org.hamcrest.MatcherAssert.assertThat
 import org.junit.runner.RunWith
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 @RunWith(KTestJUnitRunner::class)
-class ObservableKTest : UnitSpec() {
+class ObservableKTests : UnitSpec() {
 
   fun <T> EQ(): Eq<ObservableKOf<T>> = object : Eq<ObservableKOf<T>> {
     override fun ObservableKOf<T>.eqv(b: ObservableKOf<T>): Boolean =
@@ -55,9 +56,9 @@ class ObservableKTest : UnitSpec() {
 
   init {
     testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ(), testStackSafety = false))
-    // FIXME(paco) #691
-    //testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ()))
-    //testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ()))
+//     FIXME(paco) #691
+//    testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ()))
+//    testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ()))
 
     testLaws(
       FoldableLaws.laws(ObservableK.foldable(), { ObservableK.just(it) }, Eq.any()),
@@ -106,24 +107,62 @@ class ObservableKTest : UnitSpec() {
 
     "ObservableK bracket cancellation should release resource with cancel exit status" {
       lateinit var ec: ExitCase<Throwable>
+      val countDownLatch = CountDownLatch(1)
 
-      val observable = Observable.just(0L)
-        .k()
+      ObservableK.just(Unit)
         .bracketCase(
-          use = { ObservableK.just(it) },
-          release = { _, exitCase -> ec = exitCase; ObservableK.just(Unit) }
+          use = { ObservableK.async<Nothing> { _, _ -> } },
+          release = { _, exitCase ->
+            ObservableK {
+              ec = exitCase
+              countDownLatch.countDown()
+            }
+          }
         )
         .value()
-        .delay(3, TimeUnit.SECONDS)
-        .doOnSubscribe { subscription ->
-          Observable.just(0L).delay(1, TimeUnit.SECONDS)
-            .subscribe {
-              subscription.dispose()
-            }
-        }
+        .subscribe()
+        .dispose()
 
-      observable.test().await(5, TimeUnit.SECONDS)
-      assertThat(ec, `is`(ExitCase.Cancelled as ExitCase<Throwable>))
+      countDownLatch.await(100, TimeUnit.MILLISECONDS)
+      ec shouldBe ExitCase.Cancelled
     }
+
+    "ObservableK should cancel KindConnection on dispose" {
+      Promise.uncancelable<ForObservableK, Unit>(ObservableK.async()).flatMap { latch ->
+        ObservableK {
+          ObservableK.async<Unit> { conn, _ ->
+            conn.push(latch.complete(Unit))
+          }.observable.subscribe().dispose()
+        }.flatMap { latch.get }
+      }.value()
+        .test()
+        .assertValue(Unit)
+        .awaitTerminalEvent(100, TimeUnit.MILLISECONDS)
+    }
+
+    "ObservableK async should be cancellable" {
+      Promise.uncancelable<ForObservableK, Unit>(ObservableK.async())
+        .flatMap { latch ->
+          ObservableK {
+            ObservableK.async<Unit> { _, _ -> }
+              .value()
+              .doOnDispose { latch.complete(Unit).value().subscribe() }
+              .subscribe()
+              .dispose()
+          }.flatMap { latch.get }
+        }.observable
+        .test()
+        .assertValue(Unit)
+        .awaitTerminalEvent(100, TimeUnit.MILLISECONDS)
+    }
+
+    "KindConnection can cancel upstream" {
+      ObservableK.async<Unit> { connection, _ ->
+        connection.cancel().value().subscribe()
+      }.observable
+        .test()
+        .assertError(ConnectionCancellationException)
+    }
+
   }
 }

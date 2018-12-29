@@ -5,6 +5,7 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import arrow.effects.IO
+import arrow.effects.KindConnection
 import arrow.effects.typeclasses.Duration
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
@@ -42,12 +43,13 @@ object Platform {
     }
   }
 
-  inline fun onceOnly(crossinline f: () -> Unit): () -> Unit {
+  inline fun <F, A> onceOnly(conn: KindConnection<F>, crossinline f: (A) -> Unit): (A) -> Unit {
     val wasCalled = AtomicBoolean(false)
 
-    return {
+    return { a ->
       if (!wasCalled.getAndSet(true)) {
-        f()
+        conn.pop()
+        f(a)
       }
     }
   }
@@ -74,6 +76,19 @@ object Platform {
       is Either.Right -> Some(eitherRef.b)
     }
   }
+
+  /**
+   * Composes multiple errors together, meant for those cases in which error suppression, due to a second error being
+   * triggered, is not acceptable.
+   *
+   * On top of the JVM this function uses Throwable#addSuppressed, available since Java 7. On top of JavaScript the
+   * function would return a CompositeException.
+   */
+  fun composeErrors(first: Throwable, vararg rest: Throwable): Throwable {
+    rest.forEach { if (it != first) first.addSuppressed(it) }
+    return first
+  }
+
 }
 
 private class OneShotLatch : AbstractQueuedSynchronizer() {

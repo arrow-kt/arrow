@@ -28,6 +28,7 @@ dependencies {
     compile project(':arrow-effects-rx2-instances')
     compile project(':arrow-effects-kotlinx-coroutines-instances')
     compile project(':arrow-optics')
+    compile project(':arrow-validation')
 
     kapt project(':arrow-annotations-processor')
     kaptTest project(':arrow-annotations-processor')

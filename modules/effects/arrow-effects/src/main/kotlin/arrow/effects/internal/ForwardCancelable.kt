@@ -1,17 +1,14 @@
 package arrow.effects.internal
 
 import arrow.core.Either
-import arrow.effects.ForIO
-import arrow.effects.IO
-import arrow.effects.IORunLoop
-import arrow.effects.fix
+import arrow.effects.*
 import arrow.effects.internal.ForwardCancelable.Companion.State.Active
 import arrow.effects.internal.ForwardCancelable.Companion.State.Empty
 import java.util.concurrent.atomic.AtomicReference
 
 /**
  * A placeholder for a [CancelToken] that will be set at a later time, the equivalent of a
- * `Deferred[IO, CancelToken]`. Used in the implementation of `bracket`, see [IOBracket].
+ * `Promise<ForIO, CancelToken<ForIO>>`. Used in the implementation of `bracket`, see [IOBracket].
  */
 class ForwardCancelable {
 
@@ -31,7 +28,7 @@ class ForwardCancelable {
       }
     }
 
-    return IO.Async { conn, cb -> loop(conn, cb) }
+    return IO.async { conn, cb -> loop(conn, cb) }
   }
 
   fun complete(value: CancelToken<ForIO>): Unit = state.get().let { current ->

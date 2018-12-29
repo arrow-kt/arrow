@@ -31,7 +31,7 @@ fun TypeClass.dtMarkdownList(): String =
     supportedDataTypes()
       .asSequence()
       .filterNot { it.kclass == Box::class }
-      .groupBy { it.kclass.java.canonicalName.substringBeforeLast(".") }
+      .groupBy { it.kclass.java.`package`.name }
       .toSortedMap()
       .map { entry ->
         "|__${entry.key}__|" +

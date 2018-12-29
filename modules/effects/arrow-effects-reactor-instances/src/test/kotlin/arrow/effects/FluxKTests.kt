@@ -4,6 +4,7 @@ import arrow.effects.fluxk.async.async
 import arrow.effects.fluxk.foldable.foldable
 import arrow.effects.fluxk.functor.functor
 import arrow.effects.fluxk.monad.binding
+import arrow.effects.fluxk.monad.flatMap
 import arrow.effects.fluxk.monadThrow.bindingCatch
 import arrow.effects.fluxk.traverse.traverse
 import arrow.effects.typeclasses.ExitCase
@@ -14,17 +15,19 @@ import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.Spec
-import io.kotlintest.TestCaseContext
+import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
-import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.CoreMatchers.startsWith
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.runner.RunWith
 import reactor.core.publisher.Flux
 import reactor.core.scheduler.Schedulers
+import reactor.test.expectError
 import reactor.test.test
 import java.time.Duration
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 @RunWith(KTestJUnitRunner::class)
 class FluxKTest : UnitSpec() {
@@ -125,28 +128,64 @@ class FluxKTest : UnitSpec() {
         .hasNotDroppedErrors()
     }
 
-    "Flux bracket cancellation should release resource with cancel exit status" {
+    "FluxK bracket cancellation should release resource with cancel exit status" {
       lateinit var ec: ExitCase<Throwable>
+      val countDownLatch = CountDownLatch(1)
 
-      val flux = Flux.just(0L)
-        .k()
+      FluxK.just(Unit)
         .bracketCase(
-          use = { FluxK.just(it) },
-          release = { _, exitCase -> ec = exitCase; FluxK.just(Unit) }
+          use = { FluxK.async<Nothing> { _, _ -> } },
+          release = { _, exitCase ->
+            FluxK {
+              ec = exitCase
+              countDownLatch.countDown()
+            }
+          }
         )
         .value()
-        .delayElements(Duration.ofSeconds(3))
+        .subscribe()
+        .dispose()
 
-      val test = flux.doOnSubscribe { subscription ->
-        Flux.just(0L).delayElements(Duration.ofSeconds(1))
-          .subscribe { subscription.cancel() }
-      }.test()
-
-      test
-        .thenAwait(Duration.ofSeconds(5))
-        .then { assertThat(ec, `is`(ExitCase.Cancelled as ExitCase<Throwable>)) }
-        .thenCancel()
-        .verify()
+      countDownLatch.await(100, TimeUnit.MILLISECONDS)
+      ec shouldBe ExitCase.Cancelled
     }
+
+    "FluxK should cancel KindConnection on dispose" {
+      Promise.uncancelable<ForFluxK, Unit>(FluxK.async()).flatMap { latch ->
+        FluxK {
+          FluxK.async<Unit> { conn, _ ->
+            conn.push(latch.complete(Unit))
+          }.flux.subscribe().dispose()
+        }.flatMap { latch.get }
+      }.value()
+        .test()
+        .expectNext(Unit)
+        .expectComplete()
+    }
+
+    "FluxK async should be cancellable" {
+      Promise.uncancelable<ForFluxK, Unit>(FluxK.async())
+        .flatMap { latch ->
+          FluxK {
+            FluxK.async<Unit> { _, _ -> }
+              .value()
+              .doOnCancel { latch.complete(Unit).value().subscribe() }
+              .subscribe()
+              .dispose()
+          }.flatMap { latch.get }
+        }.value()
+        .test()
+        .expectNext(Unit)
+        .expectComplete()
+    }
+
+    "KindConnection can cancel upstream" {
+      FluxK.async<Unit> { connection, _ ->
+        connection.cancel().value().subscribe()
+      }.value()
+        .test()
+        .expectError(ConnectionCancellationException::class)
+    }
+
   }
 }

@@ -21,9 +21,9 @@ buildscript {
         gradleVersionsPluginVersion = '0.20.0'
         javaVersion = JavaVersion.VERSION_1_7
         kotlinTestVersion = '2.0.7'
-        kotlinVersion = '1.3.0'
+        kotlinVersion = '1.3.11'
         daggerVersion = '2.17'
-        kotlinxCoroutinesVersion = '1.0.0'
+        kotlinxCoroutinesVersion = '1.1.0'
         kotlinxCollectionsImmutableVersion = '0.1'
         kotlinPoetVersion = '1.0.0-RC1'
         projectReactorVersion = '3.1.8.RELEASE'
@@ -60,6 +60,11 @@ allprojects {
     clean.doFirst {
         delete "${rootDir}/infographic/arrow-infographic.txt"
         delete pathApiDocs
+    }
+
+    //attempt to reduce travis memory constrains
+    tasks.withType(Test) {
+        forkEvery = 100
     }
 
     repositories {
@@ -201,12 +206,44 @@ tasks.create('repl') {
     }
 }
 
-task wrapper(type: Wrapper) {
-    distributionUrl = "https://services.gradle.org/distributions/gradle-${project.ext.gradleVersion}-all.zip"
-}
-
 apply plugin: 'com.github.ben-manes.versions'
 
 configurations.all {
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
+dependencyUpdates {
+    outputFormatter { result ->
+        final dependenciesToCheck = [
+                'org.jetbrains.kotlin:kotlin-stdlib',
+                'org.jetbrains.kotlin:kotlin-stdlib-jdk7',
+                'org.jetbrains.kotlin:kotlin-stdlib-jdk8',
+                'org.jetbrains.kotlin:kotlin-gradle-plugin',
+                'org.jetbrains.kotlinx:kotlinx-coroutines-core'
+        ]
+        final disallowedQualifiers = ['alpha', 'beta', 'rc', 'cr', 'm', 'preview', 'eap']
+        final isDisallowed = { dependency -> { qualifier -> dependency.version ==~ /(?i).*[.-]${qualifier}[.\d-]*/ } }
+        final dependencies = result.current.dependencies
+            .plus(result.outdated.dependencies)
+            .plus(result.exceeded.dependencies)
+            .plus(result.unresolved.dependencies)
+            .findAll { dependency -> dependenciesToCheck.any { it == "${dependency.group}:${dependency.name}" } }
+
+        final isRejected = dependencies
+            .any { dependency -> disallowedQualifiers.any(isDisallowed(dependency)) }
+
+        if (isRejected) {
+            final title = "\nError: Kotlin and Coroutines must depends on release version!"
+            final message = dependencies
+                .inject(title) { acc, dependency ->
+                    "$acc\n${dependency.group}:${dependency.name}:${dependency.version}"
+                }
+            
+            throw new GradleException(message)
+        }
+    }
+}
+
+task checkDependenciesVersion {
+    dependsOn dependencyUpdates
 }

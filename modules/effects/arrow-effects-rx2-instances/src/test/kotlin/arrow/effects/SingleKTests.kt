@@ -5,19 +5,23 @@ import arrow.effects.singlek.applicativeError.applicativeError
 import arrow.effects.singlek.async.async
 import arrow.effects.singlek.effect.effect
 import arrow.effects.singlek.functor.functor
+import arrow.effects.singlek.monad.flatMap
 import arrow.effects.singlek.monad.monad
 import arrow.effects.singlek.monadError.monadError
 import arrow.effects.singlek.monadThrow.bindingCatch
+import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.Spec
+import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers
 import org.junit.runner.RunWith
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 @RunWith(KTestJUnitRunner::class)
@@ -57,8 +61,8 @@ class SingleKTests : UnitSpec() {
       MonadLaws.laws(SingleK.monad(), EQ()),
       MonadErrorLaws.laws(SingleK.monadError(), EQ(), EQ(), EQ()),
       ApplicativeErrorLaws.laws(SingleK.applicativeError(), EQ(), EQ(), EQ()),
-      AsyncLaws.laws(SingleK.async(), EQ(), EQ(), EQ(), testStackSafety = false),
-      AsyncLaws.laws(SingleK.effect(), EQ(), EQ(), EQ(), testStackSafety = false)
+      AsyncLaws.laws(SingleK.async(), EQ(), EQ(), testStackSafety = false),
+      AsyncLaws.laws(SingleK.effect(), EQ(), EQ(), testStackSafety = false)
     )
 
     "Multi-thread Singles finish correctly" {
@@ -107,5 +111,66 @@ class SingleKTests : UnitSpec() {
       test.awaitTerminalEvent(5, TimeUnit.SECONDS)
       test.assertNotTerminated().assertNotComplete().assertNoErrors().assertNoValues()
     }
+
+    "SingleK bracket cancellation should release resource with cancel exit status" {
+      lateinit var ec: ExitCase<Throwable>
+      val countDownLatch = CountDownLatch(1)
+
+      SingleK.just(Unit)
+        .bracketCase(
+          use = { SingleK.async<Nothing> { _, _ -> } },
+          release = { _, exitCase ->
+            SingleK {
+              ec = exitCase
+              countDownLatch.countDown()
+            }
+          }
+        )
+        .value()
+        .subscribe()
+        .dispose()
+
+      countDownLatch.await(100, TimeUnit.MILLISECONDS)
+      ec shouldBe ExitCase.Cancelled
+    }
+
+    "SingleK should cancel KindConnection on dispose" {
+      Promise.uncancelable<ForSingleK, Unit>(SingleK.async()).flatMap { latch ->
+        SingleK {
+          SingleK.async<Unit> { conn, _ ->
+            conn.push(latch.complete(Unit))
+          }.single.subscribe().dispose()
+        }.flatMap { latch.get }
+      }.value()
+        .test()
+        .assertValue(Unit)
+        .awaitTerminalEvent(100, TimeUnit.MILLISECONDS)
+    }
+
+    "SingleK async should be cancellable" {
+      Promise.uncancelable<ForSingleK, Unit>(SingleK.async())
+        .flatMap { latch ->
+          SingleK {
+            SingleK.async<Unit> { _, _ -> }
+              .value()
+              .doOnDispose { latch.complete(Unit).value().subscribe() }
+              .subscribe()
+              .dispose()
+          }.flatMap { latch.get }
+        }.value()
+        .test()
+        .assertValue(Unit)
+        .awaitTerminalEvent(100, TimeUnit.MILLISECONDS)
+    }
+
+    "KindConnection can cancel upstream" {
+      SingleK.async<Unit> { connection, _ ->
+        connection.cancel().value().subscribe()
+      }.value()
+        .test()
+        .assertError(ConnectionCancellationException)
+    }
+
   }
+
 }

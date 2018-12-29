@@ -5,11 +5,10 @@ import arrow.core.*
 import arrow.effects.CoroutineContextReactorScheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
-import arrow.effects.typeclasses.Proc
+import reactor.core.publisher.FluxSink
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import reactor.core.publisher.Flux
-import reactor.core.publisher.FluxSink
 import kotlin.coroutines.CoroutineContext
 
 fun <A> Flux<A>.k(): FluxK<A> = FluxK(this)
@@ -29,13 +28,66 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
   fun <B> flatMap(f: (A) -> FluxKOf<B>): FluxK<B> =
     flux.flatMap { f(it).fix().flux }.k()
 
+  /**
+   * A way to safely acquire a resource and release in the face of errors and cancellation.
+   * It uses [ExitCase] to distinguish between different exit cases when releasing the acquired resource.
+   *
+   * @param use is the action to consume the resource and produce an [FluxK] with the result.
+   * Once the resulting [FluxK] terminates, either successfully, error or disposed,
+   * the [release] function will run to clean up the resources.
+   *
+   * @param release the allocated resource after the resulting [FluxK] of [use] is terminates.
+   *
+   * {: data-executable='true'}
+   * ```kotlin:ank
+   * import reactor.core.publisher.Flux
+   * import arrow.effects.*
+   * import arrow.effects.typeclasses.ExitCase
+   *
+   * class File(url: String) {
+   *   fun open(): File = this
+   *   fun close(): Unit {}
+   *   fun content(): FluxK<String> =
+   *     Flux.just("This", "file", "contains", "some", "interesting", "content!").k()
+   * }
+   *
+   * fun openFile(uri: String): FluxK<File> = FluxK { File(uri).open() }
+   * fun closeFile(file: File): FluxK<Unit> = FluxK { file.close() }
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val safeComputation = openFile("data.json").bracketCase(
+   *     release = { file, exitCase ->
+   *       when (exitCase) {
+   *         is ExitCase.Completed -> { /* do something */ }
+   *         is ExitCase.Cancelled -> { /* do something */ }
+   *         is ExitCase.Error -> { /* do something */ }
+   *       }
+   *       closeFile(file)
+   *     },
+   *     use = { file -> file.content() }
+   *   )
+   *   //sampleEnd
+   *   println(safeComputation)
+   * }
+   *  ```
+   */
   fun <B> bracketCase(use: (A) -> FluxKOf<B>, release: (A, ExitCase<Throwable>) -> FluxKOf<Unit>): FluxK<B> =
     flatMap { a ->
-      use(a).value()
-        .doOnError { release(a, ExitCase.Error(it)) }
-        .doOnCancel { release(a, ExitCase.Cancelled) }
-        .doOnComplete { release(a, ExitCase.Completed) }
-        .k()
+      Flux.create<B> { sink ->
+        val d = use(a).fix()
+          .flatMap { b ->
+            release(a, ExitCase.Completed)
+              .fix().map { b }
+          }.handleErrorWith { e ->
+            release(a, ExitCase.Error(e))
+              .fix().flatMap { FluxK.raiseError<B>(e) }
+          }.flux.subscribe({ b -> sink.next(b) }, sink::error, sink::complete) { subscription ->
+          sink.onRequest(subscription::request)
+        }
+        sink.onCancel(d)
+        sink.onDispose { release(a, ExitCase.Cancelled).fix().flux.subscribe({}, sink::error, {}) }
+      }.k()
     }
 
   fun <B> concatMap(f: (A) -> FluxKOf<B>): FluxK<B> =
@@ -98,20 +150,73 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
     fun <A> defer(fa: () -> FluxKOf<A>): FluxK<A> =
       Flux.defer { fa().value() }.k()
 
-    fun <A> runAsync(fa: Proc<A>): FluxK<A> =
-      Flux.create { emitter: FluxSink<A> ->
-        fa { callback: Either<Throwable, A> ->
+    /**
+     * Creates a [FluxK] that'll run [FluxKProc].
+     *
+     * {: data-executable='true'}
+     *
+     * ```kotlin:ank
+     * import arrow.core.Either
+     * import arrow.core.right
+     * import arrow.effects.FluxK
+     * import arrow.effects.FluxKConnection
+     * import arrow.effects.value
+     *
+     * class Resource {
+     *   fun asyncRead(f: (String) -> Unit): Unit = f("Some value of a resource")
+     *   fun close(): Unit = Unit
+     * }
+     *
+     * fun main(args: Array<String>) {
+     *   //sampleStart
+     *   val result = FluxK.async { conn: FluxKConnection, cb: (Either<Throwable, String>) -> Unit ->
+     *     val resource = Resource()
+     *     conn.push(FluxK { resource.close() })
+     *     resource.asyncRead { value -> cb(value.right()) }
+     *   }
+     *   //sampleEnd
+     *   result.value().subscribe(::println)
+     * }
+     * ```
+     */
+    fun <A> async(fa: FluxKProc<A>): FluxK<A> =
+      Flux.create<A> { sink ->
+        val conn = FluxKConnection()
+        //On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
+        //on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
+        conn.push(FluxK { if (!sink.isCancelled) sink.error(ConnectionCancellationException) })
+        sink.onCancel { conn.cancel().value().subscribe() }
+
+        fa(conn) { callback: Either<Throwable, A> ->
           callback.fold({
-            emitter.error(it)
+            sink.error(it)
           }, {
-            emitter.next(it)
-            emitter.complete()
+            sink.next(it)
+            sink.complete()
           })
         }
       }.k()
 
+    fun <A> asyncF(fa: FluxKProcF<A>): FluxK<A> =
+      Flux.create { sink: FluxSink<A> ->
+        val conn = FluxKConnection()
+        //On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
+        //on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
+        conn.push(FluxK { if (!sink.isCancelled) sink.error(ConnectionCancellationException) })
+        sink.onCancel { conn.cancel().value().subscribe() }
+
+        fa(conn) { callback: Either<Throwable, A> ->
+          callback.fold({
+            sink.error(it)
+          }, {
+            sink.next(it)
+            sink.complete()
+          })
+        }.fix().flux.subscribe({}, sink::error)
+      }.k()
+
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> FluxKOf<Either<A, B>>): FluxK<B> {
-      val either = f(a).fix().value().blockFirst()
+      val either = f(a).value().blockFirst()
       return when (either) {
         is Either.Left -> tailRecM(either.a, f)
         is Either.Right -> Flux.just(either.b).k()

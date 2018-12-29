@@ -10,6 +10,8 @@ import arrow.effects.maybek.monad.monad
 import arrow.effects.maybek.monadDefer.monadDefer
 import arrow.effects.maybek.monadError.monadError
 import arrow.effects.maybek.monadThrow.bindingCatch
+import arrow.effects.typeclasses.ExitCase
+import arrow.effects.maybek.monad.flatMap
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
@@ -21,6 +23,7 @@ import io.reactivex.Maybe
 import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers
 import org.junit.runner.RunWith
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 @RunWith(KTestJUnitRunner::class)
@@ -62,8 +65,8 @@ class MaybeKTests : UnitSpec() {
       MonadErrorLaws.laws(MaybeK.monadError(), EQ(), EQ(), EQ()),
       ApplicativeErrorLaws.laws(MaybeK.applicativeError(), EQ(), EQ(), EQ()),
       MonadDeferLaws.laws(MaybeK.monadDefer(), EQ(), EQ(), EQ(), testStackSafety = false),
-      AsyncLaws.laws(MaybeK.async(), EQ(), EQ(), EQ(), testStackSafety = false),
-      AsyncLaws.laws(MaybeK.effect(), EQ(), EQ(), EQ(), testStackSafety = false)
+      AsyncLaws.laws(MaybeK.async(), EQ(), EQ(), testStackSafety = false),
+      AsyncLaws.laws(MaybeK.effect(), EQ(), EQ(), testStackSafety = false)
     )
 
     "Multi-thread Maybes finish correctly" {
@@ -124,5 +127,65 @@ class MaybeKTests : UnitSpec() {
       val foldedToSome = maybe.fold({ false }, { true })
       foldedToSome shouldBe true
     }
+
+    "MaybeK bracket cancellation should release resource with cancel exit status" {
+      lateinit var ec: ExitCase<Throwable>
+      val countDownLatch = CountDownLatch(1)
+      MaybeK.just(Unit)
+        .bracketCase(
+          use = { MaybeK.async<Nothing> { _, _ -> } },
+          release = { _, exitCase ->
+            MaybeK {
+              ec = exitCase
+              countDownLatch.countDown()
+            }
+          }
+        )
+        .value()
+        .subscribe()
+        .dispose()
+
+      countDownLatch.await(100, TimeUnit.MILLISECONDS)
+      ec shouldBe ExitCase.Cancelled
+    }
+
+    "MaybeK should cancel KindConnection on dispose" {
+      Promise.uncancelable<ForMaybeK, Unit>(MaybeK.async()).flatMap { latch ->
+        MaybeK {
+          MaybeK.async<Unit> { conn, _ ->
+            conn.push(latch.complete(Unit))
+          }.maybe.subscribe().dispose()
+        }.flatMap { latch.get }
+      }.value()
+        .test()
+        .assertValue(Unit)
+        .awaitTerminalEvent(100, TimeUnit.MILLISECONDS)
+    }
+
+    "MaybeK async should be cancellable" {
+      Promise.uncancelable<ForMaybeK, Unit>(MaybeK.async())
+        .flatMap { latch ->
+          MaybeK {
+            MaybeK.async<Unit> { _, _ -> }
+              .value()
+              .doOnDispose { latch.complete(Unit).value().subscribe() }
+              .subscribe()
+              .dispose()
+          }.flatMap { latch.get }
+        }.value()
+        .test()
+        .assertValue(Unit)
+        .awaitTerminalEvent(100, TimeUnit.MILLISECONDS)
+    }
+
+    "KindConnection can cancel upstream" {
+      MaybeK.async<Unit> { connection, _ ->
+        connection.cancel().value().subscribe()
+      }.value()
+        .test()
+        .assertError(ConnectionCancellationException)
+    }
+
   }
+
 }

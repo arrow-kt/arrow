@@ -33,16 +33,16 @@ interface OptionApplicativeErrorInstance : ApplicativeError<ForOption, Unit>, Op
   override fun <A> raiseError(e: Unit): Option<A> =
     None
 
-  override fun <A> Kind<ForOption, A>.handleErrorWith(f: (Unit) -> Kind<ForOption, A>): Option<A> =
+  override fun <A> OptionOf<A>.handleErrorWith(f: (Unit) -> OptionOf<A>): Option<A> =
     fix().orElse { f(Unit).fix() }
 }
 
 @extension
 interface OptionMonadErrorInstance : MonadError<ForOption, Unit>, OptionMonadInstance {
-  override fun <A> raiseError(e: Unit): Kind<ForOption, A> =
+  override fun <A> raiseError(e: Unit): OptionOf<A> =
     None
 
-  override fun <A> Kind<ForOption, A>.handleErrorWith(f: (Unit) -> Kind<ForOption, A>): Option<A> =
+  override fun <A> OptionOf<A>.handleErrorWith(f: (Unit) -> OptionOf<A>): Option<A> =
     fix().orElse { f(Unit).fix() }
 }
 
@@ -72,16 +72,16 @@ interface OptionShowInstance<A> : Show<Option<A>> {
 
 @extension
 interface OptionFunctorInstance : Functor<ForOption> {
-  override fun <A, B> Kind<ForOption, A>.map(f: (A) -> B): Option<B> =
+  override fun <A, B> OptionOf<A>.map(f: (A) -> B): Option<B> =
     fix().map(f)
 }
 
 @extension
 interface OptionApplicativeInstance : Applicative<ForOption> {
-  override fun <A, B> Kind<ForOption, A>.ap(ff: Kind<ForOption, (A) -> B>): Option<B> =
+  override fun <A, B> OptionOf<A>.ap(ff: OptionOf<(A) -> B>): Option<B> =
     fix().ap(ff)
 
-  override fun <A, B> Kind<ForOption, A>.map(f: (A) -> B): Option<B> =
+  override fun <A, B> OptionOf<A>.map(f: (A) -> B): Option<B> =
     fix().map(f)
 
   override fun <A> just(a: A): Option<A> =
@@ -90,16 +90,16 @@ interface OptionApplicativeInstance : Applicative<ForOption> {
 
 @extension
 interface OptionMonadInstance : Monad<ForOption> {
-  override fun <A, B> Kind<ForOption, A>.ap(ff: Kind<ForOption, (A) -> B>): Option<B> =
+  override fun <A, B> OptionOf<A>.ap(ff: OptionOf<(A) -> B>): Option<B> =
     fix().ap(ff)
 
-  override fun <A, B> Kind<ForOption, A>.flatMap(f: (A) -> Kind<ForOption, B>): Option<B> =
+  override fun <A, B> OptionOf<A>.flatMap(f: (A) -> OptionOf<B>): Option<B> =
     fix().flatMap(f)
 
   override fun <A, B> tailRecM(a: A, f: (A) -> OptionOf<Either<A, B>>): Option<B> =
     Option.tailRecM(a, f)
 
-  override fun <A, B> Kind<ForOption, A>.map(f: (A) -> B): Option<B> =
+  override fun <A, B> OptionOf<A>.map(f: (A) -> B): Option<B> =
     fix().map(f)
 
   override fun <A> just(a: A): Option<A> =
@@ -108,28 +108,28 @@ interface OptionMonadInstance : Monad<ForOption> {
 
 @extension
 interface OptionFoldableInstance : Foldable<ForOption> {
-  override fun <A> Kind<ForOption, A>.exists(p: (A) -> Boolean): Boolean =
+  override fun <A> OptionOf<A>.exists(p: (A) -> Boolean): Boolean =
     fix().exists(p)
 
-  override fun <A, B> Kind<ForOption, A>.foldLeft(b: B, f: (B, A) -> B): B =
+  override fun <A, B> OptionOf<A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
 
-  override fun <A, B> Kind<ForOption, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+  override fun <A, B> OptionOf<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
     fix().foldRight(lb, f)
 
   override fun <A> OptionOf<A>.forAll(p: (A) -> Boolean): Boolean =
     fix().forall(p)
 
-  override fun <A> Kind<ForOption, A>.isEmpty(): Boolean =
+  override fun <A> OptionOf<A>.isEmpty(): Boolean =
     fix().isEmpty()
 
-  override fun <A> Kind<ForOption, A>.nonEmpty(): Boolean =
+  override fun <A> OptionOf<A>.nonEmpty(): Boolean =
     fix().nonEmpty()
 }
 
 @extension
 interface OptionSemigroupKInstance : SemigroupK<ForOption> {
-  override fun <A> Kind<ForOption, A>.combineK(y: Kind<ForOption, A>): Option<A> =
+  override fun <A> OptionOf<A>.combineK(y: OptionOf<A>): Option<A> =
     orElse { y.fix() }
 }
 
@@ -138,7 +138,7 @@ interface OptionMonoidKInstance : MonoidK<ForOption> {
   override fun <A> empty(): Option<A> =
     Option.empty()
 
-  override fun <A> Kind<ForOption, A>.combineK(y: Kind<ForOption, A>): Option<A> =
+  override fun <A> OptionOf<A>.combineK(y: OptionOf<A>): Option<A> =
     orElse { y.fix() }
 }
 
@@ -155,28 +155,28 @@ fun <A, G, B> OptionOf<A>.traverseFilter(GA: Applicative<G>, f: (A) -> Kind<G, O
 
 @extension
 interface OptionTraverseInstance : Traverse<ForOption> {
-  override fun <A, B> Kind<ForOption, A>.map(f: (A) -> B): Option<B> =
+  override fun <A, B> OptionOf<A>.map(f: (A) -> B): Option<B> =
     fix().map(f)
 
-  override fun <G, A, B> Kind<ForOption, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Option<B>> =
+  override fun <G, A, B> OptionOf<A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Option<B>> =
     optionTraverse(AP, f)
 
-  override fun <A> Kind<ForOption, A>.exists(p: (A) -> Boolean): Boolean =
+  override fun <A> OptionOf<A>.exists(p: (A) -> Boolean): Boolean =
     fix().exists(p)
 
-  override fun <A, B> Kind<ForOption, A>.foldLeft(b: B, f: (B, A) -> B): B =
+  override fun <A, B> OptionOf<A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
 
-  override fun <A, B> Kind<ForOption, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+  override fun <A, B> OptionOf<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
     fix().foldRight(lb, f)
 
-  override fun <A> Kind<ForOption, A>.forAll(p: (A) -> Boolean): Boolean =
+  override fun <A> OptionOf<A>.forAll(p: (A) -> Boolean): Boolean =
     fix().forall(p)
 
-  override fun <A> Kind<ForOption, A>.isEmpty(): Boolean =
+  override fun <A> OptionOf<A>.isEmpty(): Boolean =
     fix().isEmpty()
 
-  override fun <A> Kind<ForOption, A>.nonEmpty(): Boolean =
+  override fun <A> OptionOf<A>.nonEmpty(): Boolean =
     fix().nonEmpty()
 }
 
@@ -195,7 +195,7 @@ interface OptionHashInstance<A> : Hash<Option<A>>, OptionEqInstance<A> {
 }
 
 object OptionContext : OptionMonadErrorInstance, OptionTraverseInstance {
-  override fun <A, B> Kind<ForOption, A>.map(f: (A) -> B): Option<B> =
+  override fun <A, B> OptionOf<A>.map(f: (A) -> B): Option<B> =
     fix().map(f)
 }
 
