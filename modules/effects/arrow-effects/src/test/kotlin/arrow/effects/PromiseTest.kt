@@ -38,11 +38,9 @@ class PromiseTest : UnitSpec() {
   init {
 
     "tryGet before completing" {
-      forAll(Gen.int()) { i ->
-        promise<Int>().flatMap { p ->
-          p.tryGet
-        }.equalUnderTheLaw(IO.just(None), EQ())
-      }
+      promise<Int>().flatMap { p ->
+        p.tryGet
+      }.equalUnderTheLaw(IO.just(None), EQ())
     }
 
     "tryGet after completing" {

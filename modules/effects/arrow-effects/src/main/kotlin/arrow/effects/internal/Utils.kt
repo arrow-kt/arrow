@@ -5,6 +5,7 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import arrow.effects.IO
+import arrow.effects.KindConnection
 import arrow.effects.typeclasses.Duration
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
@@ -42,12 +43,13 @@ object Platform {
     }
   }
 
-  inline fun onceOnly(crossinline f: () -> Unit): () -> Unit {
+  inline fun <F, A> onceOnly(conn: KindConnection<F>, crossinline f: (A) -> Unit): (A) -> Unit {
     val wasCalled = AtomicBoolean(false)
 
-    return {
+    return { a ->
       if (!wasCalled.getAndSet(true)) {
-        f()
+        conn.pop()
+        f(a)
       }
     }
   }

@@ -5,6 +5,7 @@ import arrow.effects.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.ExitCase
 import arrow.higherkind
 import io.reactivex.Maybe
+import io.reactivex.MaybeEmitter
 import kotlin.coroutines.CoroutineContext
 
 fun <A> Maybe<A>.k(): MaybeK<A> = MaybeK(this)
@@ -175,6 +176,23 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
           })
 
         }
+      }.k()
+
+    fun <A> asyncF(fa: MaybeKProcF<A>): MaybeK<A> =
+      Maybe.create { emitter: MaybeEmitter<A> ->
+        val conn = MaybeKConnection()
+        //On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
+        //on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
+        conn.push(MaybeK { if (!emitter.isDisposed) emitter.onError(ConnectionCancellationException) })
+        emitter.setCancellable { conn.cancel().value().subscribe() }
+
+        fa(conn) { either: Either<Throwable, A> ->
+          either.fold({
+            emitter.onError(it)
+          }, {
+            emitter.onSuccess(it)
+          })
+        }.fix().maybe.subscribe({}, emitter::onError)
       }.k()
 
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> MaybeKOf<Either<A, B>>): MaybeK<B> {

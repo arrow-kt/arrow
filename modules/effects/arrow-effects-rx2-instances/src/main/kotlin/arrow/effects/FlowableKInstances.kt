@@ -44,7 +44,7 @@ interface FlowableKMonadInstance : Monad<ForFlowableK> {
   override fun <A, B> FlowableKOf<A>.map(f: (A) -> B): FlowableK<B> =
     fix().map(f)
 
-  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, FlowableKOf<arrow.core.Either<A, B>>>): FlowableK<B> =
+  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, FlowableKOf<Either<A, B>>>): FlowableK<B> =
     FlowableK.tailRecM(a, f)
 
   override fun <A> just(a: A): FlowableK<A> =
@@ -120,6 +120,9 @@ interface FlowableKAsyncInstance :
   FlowableKMonadDeferInstance {
   override fun <A> async(fa: Proc<A>): FlowableK<A> =
     FlowableK.async({ _, cb -> fa(cb) }, BS())
+
+  override fun <A> asyncF(k: ProcF<ForFlowableK, A>): FlowableKOf<A> =
+    FlowableK.asyncF({ _, cb -> k(cb) }, BS())
 
   override fun <A> FlowableKOf<A>.continueOn(ctx: CoroutineContext): FlowableK<A> =
     fix().continueOn(ctx)

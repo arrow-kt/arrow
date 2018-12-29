@@ -6,6 +6,7 @@ import arrow.effects.typeclasses.MonadDefer
 
 typealias FluxKConnection = KindConnection<ForFluxK>
 typealias FluxKProc<A> = (FluxKConnection, (Either<Throwable, A>) -> Unit) -> Unit
+typealias FluxKProcF<A> = (FluxKConnection, (Either<Throwable, A>) -> Unit) -> FluxKOf<Unit>
 
 /**
  * Connection for [FluxK].

@@ -3,6 +3,8 @@ package arrow.common.utils
 import arrow.common.messager.logE
 import arrow.documented
 import arrow.meta.encoder.jvm.KotlinMetatadataEncoder
+import me.eugeniomarletti.kotlin.metadata.kotlinMetadata
+import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.receiverType
 import me.eugeniomarletti.kotlin.processing.KotlinAbstractProcessor
 import java.io.File
 import java.io.IOException
@@ -58,8 +60,14 @@ abstract class AbstractProcessor : KotlinAbstractProcessor(), ProcessorUtils, Ko
       ElementKind.INTERFACE -> (this as TypeElement).qualifiedName.toString()
       ElementKind.METHOD -> (this as ExecutableElement).let {
         val name = (it.enclosingElement as TypeElement).qualifiedName.toString()
+
+        val extensionName = (it.enclosingElement.kotlinMetadata?.asClassOrPackageDataWrapper(it.enclosingElement as TypeElement) as? ClassOrPackageDataWrapper.Class)?.let { classData ->
+          val n = classData.getFunction(it).toMeta(classData, it).receiverType?.simpleName
+          if (n == classData.simpleName) "" else "$n-"
+        } ?: ""
+
         val functionName = it.simpleName.toString()
-        "$name.$functionName"
+        "$name.$extensionName$functionName"
       }
       else -> knownError("Unsupported @documented $kind")
     }

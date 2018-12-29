@@ -13,7 +13,7 @@ import kotlin.coroutines.CoroutineContext
 
 @extension
 interface FluxKFunctorInstance : Functor<ForFluxK> {
-  override fun <A, B> Kind<ForFluxK, A>.map(f: (A) -> B): FluxK<B> =
+  override fun <A, B> FluxKOf<A>.map(f: (A) -> B): FluxK<B> =
     fix().map(f)
 }
 
@@ -25,7 +25,7 @@ interface FluxKApplicativeInstance : Applicative<ForFluxK> {
   override fun <A, B> FluxKOf<A>.ap(ff: FluxKOf<(A) -> B>): FluxK<B> =
     fix().ap(ff)
 
-  override fun <A, B> Kind<ForFluxK, A>.map(f: (A) -> B): FluxK<B> =
+  override fun <A, B> FluxKOf<A>.map(f: (A) -> B): FluxK<B> =
     fix().map(f)
 }
 
@@ -34,10 +34,10 @@ interface FluxKMonadInstance : Monad<ForFluxK> {
   override fun <A, B> FluxKOf<A>.ap(ff: FluxKOf<(A) -> B>): FluxK<B> =
     fix().ap(ff)
 
-  override fun <A, B> Kind<ForFluxK, A>.flatMap(f: (A) -> Kind<ForFluxK, B>): FluxK<B> =
+  override fun <A, B> FluxKOf<A>.flatMap(f: (A) -> FluxKOf<B>): FluxK<B> =
     fix().flatMap(f)
 
-  override fun <A, B> Kind<ForFluxK, A>.map(f: (A) -> B): FluxK<B> =
+  override fun <A, B> FluxKOf<A>.map(f: (A) -> B): FluxK<B> =
     fix().map(f)
 
   override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, FluxKOf<arrow.core.Either<A, B>>>): FluxK<B> =
@@ -49,25 +49,25 @@ interface FluxKMonadInstance : Monad<ForFluxK> {
 
 @extension
 interface FluxKFoldableInstance : Foldable<ForFluxK> {
-  override fun <A, B> Kind<ForFluxK, A>.foldLeft(b: B, f: (B, A) -> B): B =
+  override fun <A, B> FluxKOf<A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
 
-  override fun <A, B> Kind<ForFluxK, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): arrow.core.Eval<B> =
+  override fun <A, B> FluxKOf<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): arrow.core.Eval<B> =
     fix().foldRight(lb, f)
 }
 
 @extension
 interface FluxKTraverseInstance : Traverse<ForFluxK> {
-  override fun <A, B> Kind<ForFluxK, A>.map(f: (A) -> B): FluxK<B> =
+  override fun <A, B> FluxKOf<A>.map(f: (A) -> B): FluxK<B> =
     fix().map(f)
 
   override fun <G, A, B> FluxKOf<A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, FluxK<B>> =
     fix().traverse(AP, f)
 
-  override fun <A, B> Kind<ForFluxK, A>.foldLeft(b: B, f: (B, A) -> B): B =
+  override fun <A, B> FluxKOf<A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
 
-  override fun <A, B> Kind<ForFluxK, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): arrow.core.Eval<B> =
+  override fun <A, B> FluxKOf<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): arrow.core.Eval<B> =
     fix().foldRight(lb, f)
 }
 
@@ -98,7 +98,7 @@ interface FluxKMonadThrowInstance : MonadThrow<ForFluxK>, FluxKMonadErrorInstanc
 
 @extension
 interface FluxKBracketInstance : Bracket<ForFluxK, Throwable>, FluxKMonadThrowInstance {
-  override fun <A, B> Kind<ForFluxK, A>.bracketCase(release: (A, ExitCase<Throwable>) -> Kind<ForFluxK, Unit>, use: (A) -> Kind<ForFluxK, B>): FluxK<B> =
+  override fun <A, B> FluxKOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> Kind<ForFluxK, Unit>, use: (A) -> FluxKOf<B>): FluxK<B> =
     fix().bracketCase({ use(it) }, { a, e -> release(a, e) })
 }
 
@@ -117,6 +117,9 @@ interface FluxKAsyncInstance :
   override fun <A> async(fa: Proc<A>): FluxK<A> =
     FluxK.async { _, cb -> fa(cb) }
 
+  override fun <A> asyncF(k: ProcF<ForFluxK, A>): FluxK<A> =
+    FluxK.asyncF { _, cb -> k(cb) }
+
   override fun <A> FluxKOf<A>.continueOn(ctx: CoroutineContext): FluxK<A> =
     fix().continueOn(ctx)
 }
@@ -133,31 +136,31 @@ interface FluxKEffectInstance :
 interface FluxKConcurrentEffectInstance :
   ConcurrentEffect<ForFluxK>,
   FluxKEffectInstance {
-  override fun <A> Kind<ForFluxK, A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> FluxKOf<Unit>): FluxK<Disposable> =
+  override fun <A> FluxKOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> FluxKOf<Unit>): FluxK<Disposable> =
     fix().runAsyncCancellable(cb)
 }
 
 fun FluxK.Companion.monadFlat(): FluxKMonadInstance = monad()
 
 fun FluxK.Companion.monadConcat(): FluxKMonadInstance = object : FluxKMonadInstance {
-  override fun <A, B> Kind<ForFluxK, A>.flatMap(f: (A) -> Kind<ForFluxK, B>): FluxK<B> =
+  override fun <A, B> FluxKOf<A>.flatMap(f: (A) -> FluxKOf<B>): FluxK<B> =
     fix().concatMap { f(it).fix() }
 }
 
 fun FluxK.Companion.monadSwitch(): FluxKMonadInstance = object : FluxKMonadErrorInstance {
-  override fun <A, B> Kind<ForFluxK, A>.flatMap(f: (A) -> Kind<ForFluxK, B>): FluxK<B> =
+  override fun <A, B> FluxKOf<A>.flatMap(f: (A) -> FluxKOf<B>): FluxK<B> =
     fix().switchMap { f(it).fix() }
 }
 
 fun FluxK.Companion.monadErrorFlat(): FluxKMonadErrorInstance = monadError()
 
 fun FluxK.Companion.monadErrorConcat(): FluxKMonadErrorInstance = object : FluxKMonadErrorInstance {
-  override fun <A, B> Kind<ForFluxK, A>.flatMap(f: (A) -> Kind<ForFluxK, B>): FluxK<B> =
+  override fun <A, B> FluxKOf<A>.flatMap(f: (A) -> FluxKOf<B>): FluxK<B> =
     fix().concatMap { f(it).fix() }
 }
 
 fun FluxK.Companion.monadErrorSwitch(): FluxKMonadErrorInstance = object : FluxKMonadErrorInstance {
-  override fun <A, B> Kind<ForFluxK, A>.flatMap(f: (A) -> Kind<ForFluxK, B>): FluxK<B> =
+  override fun <A, B> FluxKOf<A>.flatMap(f: (A) -> FluxKOf<B>): FluxK<B> =
     fix().switchMap { f(it).fix() }
 }
 

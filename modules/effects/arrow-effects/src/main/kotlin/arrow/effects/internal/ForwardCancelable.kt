@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicReference
 
 /**
  * A placeholder for a [CancelToken] that will be set at a later time, the equivalent of a
- * `Deferred[IO, CancelToken]`. Used in the implementation of `bracket`, see [IOBracket].
+ * `Promise<ForIO, CancelToken<ForIO>>`. Used in the implementation of `bracket`, see [IOBracket].
  */
 class ForwardCancelable {
 

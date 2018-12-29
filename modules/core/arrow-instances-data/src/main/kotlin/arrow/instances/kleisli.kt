@@ -95,6 +95,12 @@ interface KleisliMonadErrorInstance<F, D, E> : MonadError<KleisliPartialOf<F, D>
   override fun AE(): ApplicativeError<F, E> = ME()
 
   override fun AF(): Applicative<F> = ME()
+
+}
+
+@extension
+interface KleisliMonadThrow<F, D> : MonadThrow<KleisliPartialOf<F, D>>, KleisliMonadErrorInstance<F, D, Throwable> {
+  override fun ME(): MonadError<F, Throwable>
 }
 
 /**

@@ -9,9 +9,11 @@ import arrow.instances.EitherTMonadThrowInstance
 import arrow.instances.either.monad.flatten
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Monad
+import arrow.undocumented
 import kotlin.coroutines.CoroutineContext
 
 @extension
+@undocumented
 interface EitherTBracketInstance<F> : Bracket<EitherTPartialOf<F, Throwable>, Throwable>, EitherTMonadThrowInstance<F> {
 
   fun MDF(): MonadDefer<F>
@@ -64,6 +66,7 @@ interface EitherTBracketInstance<F> : Bracket<EitherTPartialOf<F, Throwable>, Th
 }
 
 @extension
+@undocumented
 interface EitherTMonadDeferInstance<F> : MonadDefer<EitherTPartialOf<F, Throwable>>, EitherTBracketInstance<F> {
 
   override fun MDF(): MonadDefer<F>
@@ -74,6 +77,7 @@ interface EitherTMonadDeferInstance<F> : MonadDefer<EitherTPartialOf<F, Throwabl
 }
 
 @extension
+@undocumented
 interface EitherTAsyncInstance<F> : Async<EitherTPartialOf<F, Throwable>>, EitherTMonadDeferInstance<F> {
 
   fun ASF(): Async<F>
@@ -84,6 +88,10 @@ interface EitherTAsyncInstance<F> : Async<EitherTPartialOf<F, Throwable>>, Eithe
     EitherT.liftF(this, async(fa))
   }
 
+  override fun <A> asyncF(k: ProcF<EitherTPartialOf<F, Throwable>, A>): EitherT<F, Throwable, A> = ASF().run {
+    EitherT.liftF(this, asyncF { cb -> k(cb).value().unit() })
+  }
+
   override fun <A> EitherTOf<F, Throwable, A>.continueOn(ctx: CoroutineContext): EitherT<F, Throwable, A> = ASF().run {
     EitherT(value().continueOn(ctx))
   }
@@ -91,6 +99,7 @@ interface EitherTAsyncInstance<F> : Async<EitherTPartialOf<F, Throwable>>, Eithe
 }
 
 @extension
+@undocumented
 interface EitherTEffectInstance<F> : Effect<EitherTPartialOf<F, Throwable>>, EitherTAsyncInstance<F> {
 
   fun EFF(): Effect<F>
@@ -108,6 +117,7 @@ interface EitherTEffectInstance<F> : Effect<EitherTPartialOf<F, Throwable>>, Eit
 }
 
 @extension
+@undocumented
 interface EitherTConcurrentEffectInstance<F> : ConcurrentEffect<EitherTPartialOf<F, Throwable>>, EitherTEffectInstance<F> {
 
   fun CEFF(): ConcurrentEffect<F>

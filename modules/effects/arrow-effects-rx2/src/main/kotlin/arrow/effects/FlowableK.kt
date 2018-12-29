@@ -9,6 +9,7 @@ import arrow.higherkind
 import arrow.typeclasses.Applicative
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
+import io.reactivex.FlowableEmitter
 import kotlin.coroutines.CoroutineContext
 
 fun <A> Flowable<A>.k(): FlowableK<A> = FlowableK(this)
@@ -192,6 +193,24 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
             emitter.onComplete()
           })
         }
+      }, mode).k()
+
+    fun <A> asyncF(fa: FlowableKProcF<A>, mode: BackpressureStrategy = BackpressureStrategy.BUFFER): FlowableK<A> =
+      Flowable.create({ emitter: FlowableEmitter<A> ->
+        val conn = FlowableKConnection()
+        //On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
+        //on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
+        conn.push(FlowableK { if (!emitter.isCancelled) emitter.onError(ConnectionCancellationException) })
+        emitter.setCancellable { conn.cancel().value().subscribe() }
+
+        fa(conn) { either: Either<Throwable, A> ->
+          either.fold({
+            emitter.onError(it)
+          }, {
+            emitter.onNext(it)
+            emitter.onComplete()
+          })
+        }.fix().flowable.subscribe({}, emitter::onError)
       }, mode).k()
 
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> FlowableKOf<Either<A, B>>): FlowableK<B> {

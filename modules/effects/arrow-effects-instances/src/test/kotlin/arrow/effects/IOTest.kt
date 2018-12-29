@@ -1,7 +1,7 @@
 package arrow.effects
 
-import arrow.Kind
 import arrow.core.*
+import arrow.effects.instances.io.applicativeError.attempt
 import arrow.effects.instances.io.async.async
 import arrow.effects.instances.io.monad.binding
 import arrow.effects.instances.io.monad.flatMap
@@ -25,12 +25,11 @@ import java.util.concurrent.TimeUnit
 
 @RunWith(KTestJUnitRunner::class)
 class IOTest : UnitSpec() {
-  val EQ_OPTION = Option.eq(Eq.any())
 
-  fun <A> EQ(): Eq<Kind<ForIO, A>> {
+  fun <A> EQ(): Eq<IOOf<A>> {
     return Eq { a, b ->
-      EQ_OPTION.run {
-        a.fix().attempt().unsafeRunTimed(60.seconds).eqv(b.fix().attempt().unsafeRunTimed(60.seconds))
+      Option.eq(Eq.any()).run {
+        a.attempt().unsafeRunTimed(1.seconds).eqv(b.attempt().unsafeRunTimed(1.seconds))
       }
     }
   }
@@ -379,19 +378,41 @@ class IOTest : UnitSpec() {
     }
 
     "IO bracket cancellation should release resource with cancel exit status" {
-      lateinit var ec: ExitCase<Throwable>
-      val countDownLatch = CountDownLatch(1)
+      Promise.uncancelable<ForIO, ExitCase<Throwable>>(IO.async()).flatMap { p ->
+        IO.just(0L)
+          .bracketCase(
+            use = { IO.never },
+            release = { _, exitCase -> p.complete(exitCase) }
+          )
+          .unsafeRunAsyncCancellable { }
+          .invoke() //cancel immediately
 
-      IO.just(0L)
-        .bracketCase(
-          use = { IO.never },
-          release = { _, exitCase -> IO { ec = exitCase; countDownLatch.countDown() } }
-        )
-        .unsafeRunAsyncCancellable { }
-        .invoke() //cancel immediately
+        p.get
+      }.unsafeRunSync() shouldBe ExitCase.Cancelled
+    }
 
-      countDownLatch.await(2, TimeUnit.SECONDS)
-      ec shouldBe ExitCase.Cancelled
+    "Cancelable should run CancelToken" {
+      Promise.uncancelable<ForIO, Unit>(IO.async()).flatMap { p ->
+        IO.async().cancelable<Unit> { _ ->
+          p.complete(Unit)
+        }.fix()
+          .unsafeRunAsyncCancellable { }
+          .invoke()
+
+        p.get
+      }.unsafeRunSync() shouldBe Unit
+    }
+
+    "CancelableF should run CancelToken" {
+      Promise.uncancelable<ForIO, Unit>(IO.async()).flatMap { p ->
+        IO.async().cancelableF<Unit> { _ ->
+          IO { p.complete(Unit) }
+        }.fix()
+          .unsafeRunAsyncCancellable { }
+          .invoke()
+
+        p.get
+      }.unsafeRunSync() shouldBe Unit
     }
 
     "IO should cancel KindConnection on dispose" {

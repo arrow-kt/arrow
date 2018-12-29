@@ -6,14 +6,7 @@ import arrow.core.Eval
 import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.effects.observablek.monad.monad
 import arrow.effects.observablek.monadError.monadError
-import arrow.effects.typeclasses.Async
-import arrow.effects.typeclasses.Bracket
-import arrow.effects.typeclasses.ConcurrentEffect
-import arrow.effects.typeclasses.Disposable
-import arrow.effects.typeclasses.Effect
-import arrow.effects.typeclasses.ExitCase
-import arrow.effects.typeclasses.MonadDefer
-import arrow.effects.typeclasses.Proc
+import arrow.effects.typeclasses.*
 import arrow.extension
 import arrow.typeclasses.*
 import kotlin.coroutines.CoroutineContext
@@ -47,7 +40,7 @@ interface ObservableKMonadInstance : Monad<ForObservableK> {
   override fun <A, B> ObservableKOf<A>.map(f: (A) -> B): ObservableK<B> =
     fix().map(f)
 
-  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, ObservableKOf<arrow.core.Either<A, B>>>): ObservableK<B> =
+  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, ObservableKOf<Either<A, B>>>): ObservableK<B> =
     ObservableK.tailRecM(a, f)
 
   override fun <A> just(a: A): ObservableK<A> =
@@ -119,6 +112,9 @@ interface ObservableKMonadDeferInstance : MonadDefer<ForObservableK>, Observable
 interface ObservableKAsyncInstance : Async<ForObservableK>, ObservableKMonadDeferInstance {
   override fun <A> async(fa: Proc<A>): ObservableK<A> =
     ObservableK.async { _, cb -> fa(cb) }
+
+  override fun <A> asyncF(k: ProcF<ForObservableK, A>): ObservableK<A> =
+    ObservableK.asyncF { _, cb -> k(cb) }
 
   override fun <A> ObservableKOf<A>.continueOn(ctx: CoroutineContext): ObservableK<A> =
     fix().continueOn(ctx)

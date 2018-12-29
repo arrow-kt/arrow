@@ -46,7 +46,7 @@ class KleisliTest : UnitSpec() {
 
     testLaws(
       BracketLaws.laws(
-        BF = Kleisli.bracket<ForIO, Int, Throwable>(IO.bracket()),
+        Kleisli.bracket<ForIO, Int, Throwable>(IO.bracket()),
         EQ = IOEQ(),
         EQ_EITHER = IOEitherEQ(),
         EQERR = IOEQ()

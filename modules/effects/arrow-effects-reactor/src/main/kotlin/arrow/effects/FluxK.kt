@@ -5,6 +5,7 @@ import arrow.core.*
 import arrow.effects.CoroutineContextReactorScheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
+import reactor.core.publisher.FluxSink
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import reactor.core.publisher.Flux
@@ -194,6 +195,24 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
             sink.complete()
           })
         }
+      }.k()
+
+    fun <A> asyncF(fa: FluxKProcF<A>): FluxK<A> =
+      Flux.create { sink: FluxSink<A> ->
+        val conn = FluxKConnection()
+        //On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
+        //on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
+        conn.push(FluxK { if (!sink.isCancelled) sink.error(ConnectionCancellationException) })
+        sink.onCancel { conn.cancel().value().subscribe() }
+
+        fa(conn) { callback: Either<Throwable, A> ->
+          callback.fold({
+            sink.error(it)
+          }, {
+            sink.next(it)
+            sink.complete()
+          })
+        }.fix().flux.subscribe({}, sink::error)
       }.k()
 
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> FluxKOf<Either<A, B>>): FluxK<B> {

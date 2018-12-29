@@ -8,6 +8,7 @@ import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
 import arrow.higherkind
 import reactor.core.publisher.Mono
+import reactor.core.publisher.MonoSink
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.CoroutineContext
 
@@ -175,6 +176,25 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
         }
       }.k()
 
+    fun <A> asyncF(fa: MonoKProcF<A>): MonoK<A> =
+      Mono.create { sink: MonoSink<A> ->
+        val conn = MonoKConnection()
+        val isCancelled = AtomicBoolean(false) //Sink is missing isCancelled so we have to do book keeping.
+        conn.push(MonoK { if (!isCancelled.get()) sink.error(ConnectionCancellationException) })
+        sink.onCancel {
+          isCancelled.compareAndSet(false, true)
+          conn.cancel().value().subscribe()
+        }
+
+        fa(conn) { either: Either<Throwable, A> ->
+          either.fold({
+            sink.error(it)
+          }, {
+            sink.success(it)
+          })
+        }.fix().mono.subscribe({}, sink::error)
+      }.k()
+
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> MonoKOf<Either<A, B>>): MonoK<B> {
       val either = f(a).value().block()
       return when (either) {
@@ -184,3 +204,4 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
     }
   }
 }
+

@@ -6,9 +6,11 @@ import arrow.effects.typeclasses.*
 import arrow.extension
 import arrow.instances.KleisliMonadErrorInstance
 import arrow.typeclasses.MonadError
+import arrow.undocumented
 import kotlin.coroutines.CoroutineContext
 
 @extension
+@undocumented
 interface KleisliBracketInstance<F, R, E> : Bracket<KleisliPartialOf<F, R>, E>, KleisliMonadErrorInstance<F, R, E> {
 
   fun BF(): Bracket<F, E>

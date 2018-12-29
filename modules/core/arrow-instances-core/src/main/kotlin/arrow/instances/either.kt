@@ -1,7 +1,6 @@
 package arrow.instances
 
 import arrow.Kind
-import arrow.Kind2
 import arrow.core.*
 import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
@@ -48,12 +47,12 @@ interface EitherMonoidInstance<L, R> : Monoid<Either<L, R>>, EitherSemigroupInst
 
 @extension
 interface EitherFunctorInstance<L> : Functor<EitherPartialOf<L>> {
-  override fun <A, B> Kind<EitherPartialOf<L>, A>.map(f: (A) -> B): Either<L, B> = fix().map(f)
+  override fun <A, B> EitherOf<L, A>.map(f: (A) -> B): Either<L, B> = fix().map(f)
 }
 
 @extension
 interface EitherBifunctorInstance : Bifunctor<ForEither> {
-  override fun <A, B, C, D> Kind2<ForEither, A, B>.bimap(fl: (A) -> C, fr: (B) -> D): Kind2<ForEither, C, D> =
+  override fun <A, B, C, D> EitherOf<A, B>.bimap(fl: (A) -> C, fr: (B) -> D): Either<C, D> =
     fix().bimap(fl, fr)
 }
 
@@ -62,24 +61,24 @@ interface EitherApplicativeInstance<L> : Applicative<EitherPartialOf<L>>, Either
 
   override fun <A> just(a: A): Either<L, A> = Right(a)
 
-  override fun <A, B> Kind<EitherPartialOf<L>, A>.map(f: (A) -> B): Either<L, B> = fix().map(f)
+  override fun <A, B> EitherOf<L, A>.map(f: (A) -> B): Either<L, B> = fix().map(f)
 
-  override fun <A, B> Kind<EitherPartialOf<L>, A>.ap(ff: Kind<EitherPartialOf<L>, (A) -> B>): Either<L, B> =
+  override fun <A, B> EitherOf<L, A>.ap(ff: EitherOf<L, (A) -> B>): Either<L, B> =
     fix().eitherAp(ff)
 }
 
 @extension
 interface EitherMonadInstance<L> : Monad<EitherPartialOf<L>>, EitherApplicativeInstance<L> {
 
-  override fun <A, B> Kind<EitherPartialOf<L>, A>.map(f: (A) -> B): Either<L, B> = fix().map(f)
+  override fun <A, B> EitherOf<L, A>.map(f: (A) -> B): Either<L, B> = fix().map(f)
 
-  override fun <A, B> Kind<EitherPartialOf<L>, A>.ap(ff: Kind<EitherPartialOf<L>, (A) -> B>): Either<L, B> =
+  override fun <A, B> EitherOf<L, A>.ap(ff: EitherOf<L, (A) -> B>): Either<L, B> =
     fix().eitherAp(ff)
 
-  override fun <A, B> Kind<EitherPartialOf<L>, A>.flatMap(f: (A) -> Kind<EitherPartialOf<L>, B>): Either<L, B> =
+  override fun <A, B> EitherOf<L, A>.flatMap(f: (A) -> EitherOf<L, B>): Either<L, B> =
     fix().eitherFlatMap { f(it).fix() }
 
-  override fun <A, B> tailRecM(a: A, f: (A) -> Kind<EitherPartialOf<L>, Either<A, B>>): Either<L, B> =
+  override fun <A, B> tailRecM(a: A, f: (A) -> EitherOf<L, Either<A, B>>): Either<L, B> =
     Either.tailRecM(a, f)
 }
 
@@ -88,7 +87,7 @@ interface EitherApplicativeErrorInstance<L> : ApplicativeError<EitherPartialOf<L
 
   override fun <A> raiseError(e: L): Either<L, A> = Left(e)
 
-  override fun <A> Kind<EitherPartialOf<L>, A>.handleErrorWith(f: (L) -> Kind<EitherPartialOf<L>, A>): Either<L, A> {
+  override fun <A> EitherOf<L, A>.handleErrorWith(f: (L) -> EitherOf<L, A>): Either<L, A> {
     val fea = fix()
     return when (fea) {
       is Either.Left -> f(fea.a).fix()
@@ -103,10 +102,10 @@ interface EitherMonadErrorInstance<L> : MonadError<EitherPartialOf<L>, L>, Eithe
 @extension
 interface EitherFoldableInstance<L> : Foldable<EitherPartialOf<L>> {
 
-  override fun <A, B> Kind<EitherPartialOf<L>, A>.foldLeft(b: B, f: (B, A) -> B): B =
+  override fun <A, B> EitherOf<L, A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
 
-  override fun <A, B> Kind<EitherPartialOf<L>, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+  override fun <A, B> EitherOf<L, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
     fix().foldRight(lb, f)
 }
 
@@ -116,14 +115,14 @@ fun <G, A, B, C> EitherOf<A, B>.traverse(GA: Applicative<G>, f: (B) -> Kind<G, C
 @extension
 interface EitherTraverseInstance<L> : Traverse<EitherPartialOf<L>>, EitherFoldableInstance<L> {
 
-  override fun <G, A, B> Kind<EitherPartialOf<L>, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Kind<EitherPartialOf<L>, B>> =
+  override fun <G, A, B> EitherOf<L, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, EitherOf<L, B>> =
     fix().eitherTraverse(AP, f)
 }
 
 @extension
 interface EitherSemigroupKInstance<L> : SemigroupK<EitherPartialOf<L>> {
 
-  override fun <A> Kind<EitherPartialOf<L>, A>.combineK(y: Kind<EitherPartialOf<L>, A>): Either<L, A> =
+  override fun <A> EitherOf<L, A>.combineK(y: EitherOf<L, A>): Either<L, A> =
     fix().eitherCombineK(y)
 }
 
@@ -171,7 +170,7 @@ interface EitherHashInstance<L, R> : Hash<Either<L, R>>, EitherEqInstance<L, R> 
 }
 
 class EitherContext<L> : EitherMonadErrorInstance<L>, EitherTraverseInstance<L>, EitherSemigroupKInstance<L> {
-  override fun <A, B> Kind<EitherPartialOf<L>, A>.map(f: (A) -> B): Either<L, B> =
+  override fun <A, B> EitherOf<L, A>.map(f: (A) -> B): Either<L, B> =
     fix().map(f)
 }
 

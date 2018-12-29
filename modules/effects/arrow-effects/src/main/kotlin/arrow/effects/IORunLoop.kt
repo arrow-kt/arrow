@@ -16,14 +16,14 @@ private typealias Callback = (Either<Throwable, Any?>) -> Unit
 @Suppress("UNCHECKED_CAST")
 internal object IORunLoop {
 
-  fun <A> start(source: IO<A>, cb: (Either<Throwable, A>) -> Unit): Unit =
+  fun <A> start(source: IOOf<A>, cb: (Either<Throwable, A>) -> Unit): Unit =
     loop(source, IOConnection.uncancelable, cb as Callback, null, null, null)
 
   /**
    * Evaluates the given `IO` reference, calling the given callback
    * with the result when completed.
    */
-  fun <A> startCancelable(source: IO<A>, conn: IOConnection, cb: (Either<Throwable, A>) -> Unit): Unit =
+  fun <A> startCancelable(source: IOOf<A>, conn: IOConnection, cb: (Either<Throwable, A>) -> Unit): Unit =
     loop(source, conn, cb as Callback, null, null, null)
 
   fun <A> step(source: IO<A>): IO<A> {

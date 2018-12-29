@@ -125,7 +125,7 @@ class MonoKTest : UnitSpec() {
 
       MonoK.just(Unit)
         .bracketCase(
-          use = { MonoK.async<Nothing> { _, _ -> } },
+          use = { MonoK.async<Nothing> { _,_ -> } },
           release = { _, exitCase ->
             MonoK {
               ec = exitCase

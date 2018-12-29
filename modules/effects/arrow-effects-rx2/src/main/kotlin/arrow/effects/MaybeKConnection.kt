@@ -1,11 +1,13 @@
 package arrow.effects
 
+import arrow.Kind
 import arrow.core.Either
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.MonadDefer
 
 typealias MaybeKConnection = KindConnection<ForMaybeK>
 typealias MaybeKProc<A> = (MaybeKConnection, (Either<Throwable, A>) -> Unit) -> Unit
+typealias MaybeKProcF<A> = (MaybeKConnection, (Either<Throwable, A>) -> Unit) -> Kind<ForMaybeK, Unit>
 
 /**
  * Connection for [MaybeK].

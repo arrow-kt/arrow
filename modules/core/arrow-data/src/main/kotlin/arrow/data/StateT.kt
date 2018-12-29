@@ -201,7 +201,7 @@ class StateT<F, S, A>(
    * @param ff function with the [StateT] context.
    */
   fun <B> ap(MF: Monad<F>, ff: StateTOf<F, S, (A) -> B>): StateT<F, S, B> =
-    ff.fix().map2(MF, this) { f, a -> f(a) }
+    ff.fix().map2(MF, this) { f: (A) -> B, a: A -> f(a) }
 
   /**
    * Create a product of the value types of [StateT].

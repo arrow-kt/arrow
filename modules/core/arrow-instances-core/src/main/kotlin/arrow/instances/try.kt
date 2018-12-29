@@ -40,7 +40,7 @@ interface TryApplicativeErrorInstance : ApplicativeError<ForTry, Throwable>, Try
   override fun <A> raiseError(e: Throwable): Try<A> =
     Failure(e)
 
-  override fun <A> Kind<ForTry, A>.handleErrorWith(f: (Throwable) -> Kind<ForTry, A>): Try<A> =
+  override fun <A> TryOf<A>.handleErrorWith(f: (Throwable) -> TryOf<A>): Try<A> =
     fix().recoverWith { f(it).fix() }
 
 }
@@ -50,7 +50,7 @@ interface TryMonadErrorInstance : MonadError<ForTry, Throwable>, TryMonadInstanc
   override fun <A> raiseError(e: Throwable): Try<A> =
     Failure(e)
 
-  override fun <A> Kind<ForTry, A>.handleErrorWith(f: (Throwable) -> Kind<ForTry, A>): Try<A> =
+  override fun <A> TryOf<A>.handleErrorWith(f: (Throwable) -> TryOf<A>): Try<A> =
     fix().recoverWith { f(it).fix() }
 }
 
@@ -85,16 +85,16 @@ interface TryShowInstance<A> : Show<Try<A>> {
 
 @extension
 interface TryFunctorInstance : Functor<ForTry> {
-  override fun <A, B> Kind<ForTry, A>.map(f: (A) -> B): Try<B> =
+  override fun <A, B> TryOf<A>.map(f: (A) -> B): Try<B> =
     fix().map(f)
 }
 
 @extension
 interface TryApplicativeInstance : Applicative<ForTry> {
-  override fun <A, B> Kind<ForTry, A>.ap(ff: Kind<ForTry, (A) -> B>): Try<B> =
+  override fun <A, B> TryOf<A>.ap(ff: TryOf<(A) -> B>): Try<B> =
     fix().ap(ff)
 
-  override fun <A, B> Kind<ForTry, A>.map(f: (A) -> B): Try<B> =
+  override fun <A, B> TryOf<A>.map(f: (A) -> B): Try<B> =
     fix().map(f)
 
   override fun <A> just(a: A): Try<A> =
@@ -103,16 +103,16 @@ interface TryApplicativeInstance : Applicative<ForTry> {
 
 @extension
 interface TryMonadInstance : Monad<ForTry> {
-  override fun <A, B> Kind<ForTry, A>.ap(ff: Kind<ForTry, (A) -> B>): Try<B> =
+  override fun <A, B> TryOf<A>.ap(ff: TryOf<(A) -> B>): Try<B> =
     fix().ap(ff)
 
-  override fun <A, B> Kind<ForTry, A>.flatMap(f: (A) -> Kind<ForTry, B>): Try<B> =
+  override fun <A, B> TryOf<A>.flatMap(f: (A) -> TryOf<B>): Try<B> =
     fix().flatMap(f)
 
   override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, TryOf<Either<A, B>>>): Try<B> =
     Try.tailRecM(a, f)
 
-  override fun <A, B> Kind<ForTry, A>.map(f: (A) -> B): Try<B> =
+  override fun <A, B> TryOf<A>.map(f: (A) -> B): Try<B> =
     fix().map(f)
 
   override fun <A> just(a: A): Try<A> =
@@ -124,10 +124,10 @@ interface TryFoldableInstance : Foldable<ForTry> {
   override fun <A> TryOf<A>.exists(p: (A) -> Boolean): Boolean =
     fix().exists(p)
 
-  override fun <A, B> Kind<ForTry, A>.foldLeft(b: B, f: (B, A) -> B): B =
+  override fun <A, B> TryOf<A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
 
-  override fun <A, B> Kind<ForTry, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+  override fun <A, B> TryOf<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
     fix().foldRight(lb, f)
 }
 
@@ -149,10 +149,10 @@ interface TryTraverseInstance : Traverse<ForTry> {
   override fun <A> TryOf<A>.exists(p: (A) -> Boolean): kotlin.Boolean =
     fix().exists(p)
 
-  override fun <A, B> Kind<ForTry, A>.foldLeft(b: B, f: (B, A) -> B): B =
+  override fun <A, B> TryOf<A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
 
-  override fun <A, B> Kind<ForTry, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+  override fun <A, B> TryOf<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
     fix().foldRight(lb, f)
 }
 
@@ -174,7 +174,7 @@ interface TryHashInstance<A> : Hash<Try<A>>, TryEqInstance<A> {
 }
 
 object TryContext : TryMonadErrorInstance, TryTraverseInstance {
-  override fun <A, B> Kind<ForTry, A>.map(f: (A) -> B): Try<B> =
+  override fun <A, B> TryOf<A>.map(f: (A) -> B): Try<B> =
     fix().map(f)
 }
 

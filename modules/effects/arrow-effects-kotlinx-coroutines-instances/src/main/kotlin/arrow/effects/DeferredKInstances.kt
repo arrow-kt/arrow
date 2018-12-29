@@ -89,10 +89,13 @@ interface DeferredKAsyncInstance : Async<ForDeferredK>, DeferredKMonadDeferInsta
   override fun <A> async(fa: Proc<A>): DeferredK<A> =
     DeferredK.async(fa = { _, cb -> fa(cb) })
 
+  override fun <A> asyncF(k: ProcF<ForDeferredK, A>): DeferredK<A> =
+    DeferredK.asyncF(fa = { _, cb -> k(cb) })
+
   override fun <A> DeferredKOf<A>.continueOn(ctx: CoroutineContext): DeferredK<A> =
     fix().continueOn(ctx = ctx)
 
-  override fun <A> invoke(ctx: CoroutineContext, f: () -> A): Kind<ForDeferredK, A> =
+  override fun <A> invoke(ctx: CoroutineContext, f: () -> A): DeferredK<A> =
     DeferredK.invoke(ctx = ctx, f = { f() })
 }
 
@@ -104,7 +107,7 @@ interface DeferredKEffectInstance : Effect<ForDeferredK>, DeferredKAsyncInstance
 
 @extension
 interface DeferredKConcurrentEffectInstance : ConcurrentEffect<ForDeferredK>, DeferredKEffectInstance {
-  override fun <A> DeferredKOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> Kind<ForDeferredK, Unit>): Kind<ForDeferredK, Disposable> =
+  override fun <A> DeferredKOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> Kind<ForDeferredK, Unit>): DeferredK<Disposable> =
     fix().runAsyncCancellable(onCancel = OnCancel.ThrowCancellationException, cb = cb)
 }
 

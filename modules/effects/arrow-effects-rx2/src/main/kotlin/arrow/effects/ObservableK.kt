@@ -3,11 +3,13 @@ package arrow.effects
 import arrow.Kind
 import arrow.core.*
 import arrow.effects.CoroutineContextRx2Scheduler.asScheduler
+import arrow.effects.typeclasses.Disposable
+import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.*
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import io.reactivex.Observable
-import io.reactivex.schedulers.Schedulers
+import io.reactivex.ObservableEmitter
 import kotlin.coroutines.CoroutineContext
 
 fun <A> Observable<A>.k(): ObservableK<A> = ObservableK(this)
@@ -180,9 +182,7 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
         //On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
         //on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
         connection.push(ObservableK { if (!emitter.isDisposed) emitter.onError(ConnectionCancellationException) })
-        emitter.setCancellable {
-          connection.cancel().value().observeOn(Schedulers.computation()).subscribe({}, {})
-        }
+        emitter.setCancellable { connection.cancel().value().subscribe({}, {}) }
 
         fa(connection) { either: Either<Throwable, A> ->
           either.fold({
@@ -192,6 +192,24 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
             emitter.onComplete()
           })
         }
+      }.k()
+
+    fun <A> asyncF(fa: ObservableKProcF<A>): ObservableK<A> =
+      Observable.create { emitter: ObservableEmitter<A> ->
+        val connection = ObservableKConnection()
+        //On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
+        //on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
+        connection.push(ObservableK { if (!emitter.isDisposed) emitter.onError(ConnectionCancellationException) })
+        emitter.setCancellable { connection.cancel().value().subscribe({}, {}) }
+
+        fa(connection) { either: Either<Throwable, A> ->
+          either.fold({
+            emitter.onError(it)
+          }, {
+            emitter.onNext(it)
+            emitter.onComplete()
+          })
+        }.fix().observable.subscribe({}, emitter::onError)
       }.k()
 
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> ObservableKOf<Either<A, B>>): ObservableK<B> {

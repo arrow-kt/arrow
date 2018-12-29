@@ -1,6 +1,5 @@
 package arrow.core
 
-import arrow.core.Id
 import arrow.instances.eq
 import arrow.instances.hash
 import arrow.instances.id.applicative.applicative
@@ -8,6 +7,7 @@ import arrow.instances.id.comonad.comonad
 import arrow.instances.id.eq.eq
 import arrow.instances.id.hash.hash
 import arrow.instances.id.monad.monad
+import arrow.instances.id.monoid.monoid
 import arrow.instances.id.show.show
 import arrow.instances.id.traverse.traverse
 import arrow.instances.id.semigroup.semigroup

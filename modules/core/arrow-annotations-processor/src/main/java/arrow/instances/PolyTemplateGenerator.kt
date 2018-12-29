@@ -110,7 +110,7 @@ interface PolyTemplateGenerator : MetaApi {
   private fun String.replaceMonadDeferImports(info: TypeClassInstance): String {
     val monadDeferPackageName = PackageName(info.instance.packageName.value +
       "." + info.projectedCompanion.simpleName.substringAfterLast(".").toLowerCase() +
-      ".monaddefer")
+      ".monadDefer")
     return replace(
       "_imports_monaddefer_",
       """
@@ -133,8 +133,7 @@ interface PolyTemplateGenerator : MetaApi {
              |import ${packageName.value.quote()}.*
              |import arrow.core.*
              |$factoryImports
-             |$additionalImports
-             |""".trimMargin()
+             |$additionalImports""".trimMargin()
     )
   }
 
@@ -152,8 +151,7 @@ interface PolyTemplateGenerator : MetaApi {
         val factory = it.returnType?.simpleName?.decapitalize()?.substringBefore("<") ?: ""
         val fact = if (factory == "functor") "monad" else factory
         """|import arrow.instances.id.$fact.$fact
-              |import arrow.core.*
-            """.trimMargin()
+           |import arrow.core.*""".trimMargin()
       }
     }
 

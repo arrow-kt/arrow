@@ -1,18 +1,17 @@
 package arrow.effects.instances
 
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.Some
-import arrow.core.getOrElse
+import arrow.core.*
 import arrow.data.*
 import arrow.effects.Ref
 import arrow.effects.typeclasses.*
 import arrow.extension
 import arrow.instances.StateTMonadThrowInstance
 import arrow.typeclasses.MonadError
+import arrow.undocumented
 import kotlin.coroutines.CoroutineContext
 
 @extension
+@undocumented
 interface StateTBracketInstance<F, S> : Bracket<StateTPartialOf<F, S>, Throwable>, StateTMonadThrowInstance<F, S> {
 
   fun MD(): MonadDefer<F>
@@ -47,6 +46,7 @@ interface StateTBracketInstance<F, S> : Bracket<StateTPartialOf<F, S>, Throwable
 }
 
 @extension
+@undocumented
 interface StateTMonadDeferInstance<F, S> : MonadDefer<StateTPartialOf<F, S>>, StateTBracketInstance<F, S> {
 
   override fun MD(): MonadDefer<F>
@@ -58,6 +58,7 @@ interface StateTMonadDeferInstance<F, S> : MonadDefer<StateTPartialOf<F, S>>, St
 }
 
 @extension
+@undocumented
 interface StateTAsyncInstane<F, S> : Async<StateTPartialOf<F, S>>, StateTMonadDeferInstance<F, S> {
 
   fun AS(): Async<F>
@@ -66,6 +67,13 @@ interface StateTAsyncInstane<F, S> : Async<StateTPartialOf<F, S>>, StateTMonadDe
 
   override fun <A> async(fa: Proc<A>): StateT<F, S, A> = AS().run {
     StateT.liftF(this, async(fa))
+  }
+
+  override fun <A> asyncF(k: ProcF<StateTPartialOf<F, S>, A>): StateT<F, S, A> = AS().run {
+    StateT.invoke(this) { s ->
+      asyncF<A> { cb -> k(cb).fix().runA(this, s) }
+        .map { Tuple2(s, it) }
+    }
   }
 
   override fun <A> StateTOf<F, S, A>.continueOn(ctx: CoroutineContext): StateT<F, S, A> = AS().run {

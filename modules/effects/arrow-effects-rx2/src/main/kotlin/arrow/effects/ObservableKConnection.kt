@@ -4,8 +4,9 @@ import arrow.core.Either
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.MonadDefer
 
-typealias ObservableKProc<A> = (ObservableKConnection, (Either<Throwable, A>) -> Unit) -> Unit
 typealias ObservableKConnection = KindConnection<ForObservableK>
+typealias ObservableKProc<A> = (ObservableKConnection, (Either<Throwable, A>) -> Unit) -> Unit
+typealias ObservableKProcF<A> = (ObservableKConnection, (Either<Throwable, A>) -> Unit) -> ObservableKOf<Unit>
 
 /**
  * Connection for [ObservableK].

@@ -10,8 +10,8 @@ internal object IOBracket {
   /**
    * Implementation for `IO.bracketCase`.
    */
-  operator fun <A, B> invoke(acquire: IO<A>, release: (A, ExitCase<Throwable>) -> IOOf<Unit>, use: (A) -> IOOf<B>): IO<B> =
-    IO.Async { conn, cb ->
+  operator fun <A, B> invoke(acquire: IOOf<A>, release: (A, ExitCase<Throwable>) -> IOOf<Unit>, use: (A) -> IOOf<B>): IO<B> =
+    IO.async { conn, cb ->
       // Placeholder for the future finalizer
       val deferredRelease = ForwardCancelable()
       conn.push(deferredRelease.cancel())
@@ -65,9 +65,9 @@ internal object IOBracket {
               }
               fb.fix().flatMap(frame)
             }
+
             // Registering our cancelable token ensures that in case cancellation is detected, release gets called
             deferredRelease.complete(frame.cancel)
-
             // Actual execution
             IORunLoop.startCancelable(onNext(), conn, cb)
           }
@@ -77,8 +77,8 @@ internal object IOBracket {
     }
   }
 
-  fun <A> guaranteeCase(source: IO<A>, release: (ExitCase<Throwable>) -> IO<Unit>): IO<A> =
-    IO.Async { conn, cb ->
+  fun <A> guaranteeCase(source: IO<A>, release: (ExitCase<Throwable>) -> IOOf<Unit>): IO<A> =
+    IO.async { conn, cb ->
       // TODO on cats-effect all this block is run using an immediate ExecutionContext for stack safety.
 
       val frame = EnsureReleaseFrame<A>(release)
@@ -102,7 +102,7 @@ internal object IOBracket {
       releaseFn(a, c)
   }
 
-  private class EnsureReleaseFrame<A>(val releaseFn: (ExitCase<Throwable>) -> IO<Unit>) : BaseReleaseFrame<Unit, A>() {
+  private class EnsureReleaseFrame<A>(val releaseFn: (ExitCase<Throwable>) -> IOOf<Unit>) : BaseReleaseFrame<Unit, A>() {
 
     override fun release(c: ExitCase<Throwable>): CancelToken<ForIO> = releaseFn(c)
   }

@@ -1,7 +1,6 @@
 package arrow.instances
 
 import arrow.Kind
-import arrow.Kind2
 import arrow.core.*
 import arrow.core.Either.Left
 import arrow.core.Either.Right
@@ -14,7 +13,7 @@ import arrow.instances.traverse as tuple2Traverse
 
 @extension
 interface Tuple2FunctorInstance<F> : Functor<Tuple2PartialOf<F>> {
-  override fun <A, B> Kind<Tuple2PartialOf<F>, A>.map(f: (A) -> B) =
+  override fun <A, B> Tuple2Of<F, A>.map(f: (A) -> B) =
     fix().map(f)
 }
 
@@ -22,10 +21,10 @@ interface Tuple2FunctorInstance<F> : Functor<Tuple2PartialOf<F>> {
 interface Tuple2ApplicativeInstance<F> : Applicative<Tuple2PartialOf<F>>, Tuple2FunctorInstance<F> {
   fun MF(): Monoid<F>
 
-  override fun <A, B> Kind<Tuple2PartialOf<F>, A>.map(f: (A) -> B) =
+  override fun <A, B> Tuple2Of<F, A>.map(f: (A) -> B) =
     fix().map(f)
 
-  override fun <A, B> Kind<Tuple2PartialOf<F>, A>.ap(ff: Kind<Tuple2PartialOf<F>, (A) -> B>) =
+  override fun <A, B> Tuple2Of<F, A>.ap(ff: Tuple2Of<F, (A) -> B>) =
     fix().ap(ff.fix())
 
   override fun <A> just(a: A) =
@@ -37,13 +36,13 @@ interface Tuple2MonadInstance<F> : Monad<Tuple2PartialOf<F>>, Tuple2ApplicativeI
 
   override fun MF(): Monoid<F>
 
-  override fun <A, B> Kind<Tuple2PartialOf<F>, A>.map(f: (A) -> B) =
+  override fun <A, B> Tuple2Of<F, A>.map(f: (A) -> B) =
     fix().map(f)
 
-  override fun <A, B> Kind<Tuple2PartialOf<F>, A>.ap(ff: Kind<Tuple2PartialOf<F>, (A) -> B>) =
+  override fun <A, B> Tuple2Of<F, A>.ap(ff: Tuple2Of<F, (A) -> B>) =
     fix().ap(ff)
 
-  override fun <A, B> Kind<Tuple2PartialOf<F>, A>.flatMap(f: (A) -> Kind<Tuple2PartialOf<F>, B>) =
+  override fun <A, B> Tuple2Of<F, A>.flatMap(f: (A) -> Tuple2Of<F, B>) =
     fix().flatMap { f(it).fix() }
 
   override tailrec fun <A, B> tailRecM(a: A, f: (A) -> Tuple2Of<F, Either<A, B>>): Tuple2<F, B> {
@@ -57,7 +56,7 @@ interface Tuple2MonadInstance<F> : Monad<Tuple2PartialOf<F>>, Tuple2ApplicativeI
 
 @extension
 interface Tuple2BifunctorInstance : Bifunctor<ForTuple2> {
-  override fun <A, B, C, D> Kind2<ForTuple2, A, B>.bimap(
+  override fun <A, B, C, D> Tuple2Of<A, B>.bimap(
     fl: (A) -> C,
     fr: (B) -> D
   ) = fix().bimap(fl, fr)
@@ -65,19 +64,19 @@ interface Tuple2BifunctorInstance : Bifunctor<ForTuple2> {
 
 @extension
 interface Tuple2ComonadInstance<F> : Comonad<Tuple2PartialOf<F>>, Tuple2FunctorInstance<F> {
-  override fun <A, B> Kind<Tuple2PartialOf<F>, A>.coflatMap(f: (Kind<Tuple2PartialOf<F>, A>) -> B) =
+  override fun <A, B> Tuple2Of<F, A>.coflatMap(f: (Tuple2Of<F, A>) -> B) =
     fix().coflatMap(f)
 
-  override fun <A> Kind<Tuple2PartialOf<F>, A>.extract() =
+  override fun <A> Tuple2Of<F, A>.extract() =
     fix().extract()
 }
 
 @extension
 interface Tuple2FoldableInstance<F> : Foldable<Tuple2PartialOf<F>> {
-  override fun <A, B> Kind<Tuple2PartialOf<F>, A>.foldLeft(b: B, f: (B, A) -> B) =
+  override fun <A, B> Tuple2Of<F, A>.foldLeft(b: B, f: (B, A) -> B) =
     fix().foldL(b, f)
 
-  override fun <A, B> Kind<Tuple2PartialOf<F>, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>) =
+  override fun <A, B> Tuple2Of<F, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>) =
     fix().foldR(lb, f)
 }
 

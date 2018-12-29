@@ -437,7 +437,7 @@ sealed class DeferredK<A>(
 
   private suspend inline fun <B> Deferred<A>.bracketCase(use: (A) -> DeferredKOf<B>, release: (A, ExitCase<Throwable>) -> DeferredKOf<Unit>): B {
     val a = await()
-    return try {
+    val b = try {
       use(a).await()
     } catch (e: Throwable) {
       try {
@@ -448,6 +448,9 @@ sealed class DeferredK<A>(
       }
       throw e
     }
+
+    release(a, ExitCase.Completed).await()
+    return b
   }
 
   /**
@@ -649,6 +652,16 @@ sealed class DeferredK<A>(
       return ConnectedGenerated(ctx, start, newScope) { conn ->
         CompletableDeferred<A>(parent).apply {
           fa(conn) { it.fold(this::completeExceptionally, this::complete) }
+        }.await()
+      }
+    }
+
+    fun <A> asyncF(scope: CoroutineScope = GlobalScope, ctx: CoroutineContext = Dispatchers.Default, start: CoroutineStart = CoroutineStart.LAZY, fa: DeferredKProcF<A>): DeferredK<A> {
+      val newScope = if (scope.coroutineContext[Job] == null) scope + Job() else scope
+      val parent = newScope.coroutineContext[Job]!!
+      return ConnectedGenerated(ctx, start, scope) { conn ->
+        CompletableDeferred<A>(parent).apply {
+          fa(conn) { it.fold(this::completeExceptionally, this::complete) }.await()
         }.await()
       }
     }
