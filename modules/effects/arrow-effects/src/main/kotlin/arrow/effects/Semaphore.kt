@@ -26,13 +26,13 @@ interface Semaphore<F> {
    *   val semaphore = Semaphore.uncancelable<ForIO>(5, IO.async())
    *
    *   val result = semaphore.flatMap { s ->
-   *     s.available
+   *     s.available()
    *   }
    *   //sampleEnd
    *   println(result)
    * }
    **/
-  val available: Kind<F, Long>
+  fun available(): Kind<F, Long>
 
   /**
    * Get a snapshot of the current count, may be negative.
@@ -50,13 +50,13 @@ interface Semaphore<F> {
    *   val semaphore = Semaphore.uncancelable<ForIO>(5, IO.async())
    *
    *   val result = semaphore.flatMap { s ->
-   *     s.count
+   *     s.count()
    *   }
    *   //sampleEnd
    *   println(result)
    * }
    **/
-  val count: Kind<F, Long>
+  fun count(): Kind<F, Long>
 
   /**
    * Acquires [n] resources
@@ -79,7 +79,7 @@ interface Semaphore<F> {
    *
    *   semaphore.flatMap { s ->
    *     s.acquireN(5).flatMap {
-   *       s.available
+   *       s.available()
    *     }
    *   }.unsafeRunSync() == 0L
    *   //sampleEnd
@@ -129,8 +129,8 @@ interface Semaphore<F> {
    *
    * @see tryAcquireN
    */
-  val tryAcquire: Kind<F, Boolean>
-    get() = tryAcquireN(1)
+  fun tryAcquire(): Kind<F, Boolean> =
+    tryAcquireN(1)
 
   /**
    * Release [n] resources
@@ -149,7 +149,7 @@ interface Semaphore<F> {
    *   semaphore.flatMap { s ->
    *     s.acquireN(5).flatMap {
    *       s.releaseN(3).flatMap {
-   *         s.available
+   *         s.available()
    *       }
    *     }
    *   }.unsafeRunSync() == 3L
@@ -164,8 +164,8 @@ interface Semaphore<F> {
    *
    * @see releaseN
    */
-  val release: Kind<F, Unit>
-    get() = releaseN(1)
+  fun release(): Kind<F, Unit> =
+    releaseN(1)
 
   /**
    * Runs the supplied effect that acquires a permit, and then releases the permit.
@@ -222,6 +222,7 @@ interface Semaphore<F> {
 // A semaphore is either empty, and there are number of outstanding acquires (Left)
 // or it is non-empty, and there are n permits available (Right)
 private typealias State<F> = Either<AcquiredPermits<F>, Long>
+
 private typealias AcquiredPermits<F> = List<Tuple2<Long, Promise<F, Unit>>>
 
 private fun <F> ApplicativeError<F, Throwable>.assertNonNegative(n: Long): Kind<F, Unit> =
@@ -232,13 +233,13 @@ internal class UncancelableSemaphore<F>(private val state: Ref<F, State<F>>,
 
   private val promise = Promise.uncancelable<F, Unit>(AS)
 
-  override val available: Kind<F, Long>
-    get() = state.get.map { state ->
+  override fun available(): Kind<F, Long> =
+    state.get().map { state ->
       state.fold({ 0L }, ::identity)
     }
 
-  override val count: Kind<F, Long>
-    get() = state.get.map { state ->
+  override fun count(): Kind<F, Long> =
+    state.get().map { state ->
       state.fold({ it.map { (a, _) -> a }.sum().unaryMinus() }, ::identity)
     }
 
@@ -316,6 +317,6 @@ internal class UncancelableSemaphore<F>(private val state: Ref<F, State<F>>,
     }
 
   override fun <A> withPermit(t: Kind<F, A>): Kind<F, A> =
-    acquire.bracket({ release }, { t })
+    acquire.bracket({ release() }, { t })
 
 }

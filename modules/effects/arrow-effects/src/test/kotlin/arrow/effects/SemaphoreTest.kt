@@ -39,7 +39,7 @@ class SemaphoreTest : UnitSpec() {
       val n = 20L
       semaphore(n).flatMap { s ->
         (0 until n).toList().traverse(IO.applicative()) { s.acquire }.flatMap {
-          s.available
+          s.available()
         }
       }.equalUnderTheLaw(IO.just(0L), EQ(Long.eq()))
     }
@@ -48,7 +48,7 @@ class SemaphoreTest : UnitSpec() {
       val n = 20
       semaphore(20).flatMap { s ->
         (0 until n).toList().traverse(IO.applicative()) { s.acquire }.flatMap {
-          s.tryAcquire
+          s.tryAcquire()
         }
       }.equalUnderTheLaw(IO.just(true), EQ(Boolean.eq()))
     }
@@ -57,7 +57,7 @@ class SemaphoreTest : UnitSpec() {
       val n = 20
       semaphore(20).flatMap { s ->
         (0 until n).toList().traverse(IO.applicative()) { s.acquire }.flatMap {
-          s.tryAcquire
+          s.tryAcquire()
         }
       }.equalUnderTheLaw(IO.just(false), EQ(Boolean.eq()))
     }
@@ -74,12 +74,12 @@ class SemaphoreTest : UnitSpec() {
     "withPermit" {
       forAll(Gen.positiveIntegers().map(Int::toLong)) { i ->
         semaphore(i).flatMap { s ->
-          s.available.flatMap { current ->
+          s.available().flatMap { current ->
             s.withPermit(IO.defer {
-              s.available.map { it == current - 1L }
+              s.available().map { it == current - 1L }
             }).flatMap { didAcquire ->
               IO.defer {
-                s.available.map { it == current && didAcquire }
+                s.available().map { it == current && didAcquire }
               }
             }
           }

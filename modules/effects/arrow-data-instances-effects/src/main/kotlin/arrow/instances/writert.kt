@@ -36,7 +36,7 @@ interface WriterTBrackInstance<F, W> : Bracket<WriterTPartialOf<F, W>, Throwable
             else -> r.unit()
           }
         }).flatMap { (w, b) ->
-          ref.get.map { ww -> Tuple2(w.combine(ww), b) }
+          ref.get().map { ww -> Tuple2(w.combine(ww), b) }
         }
       })
     }

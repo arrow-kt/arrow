@@ -21,7 +21,6 @@ interface StateTBracketInstance<F, S> : Bracket<StateTPartialOf<F, S>, Throwable
   override fun <A, B> StateTOf<F, S, A>.bracketCase(
     release: (A, ExitCase<Throwable>) -> StateTOf<F, S, Unit>,
     use: (A) -> StateTOf<F, S, B>): StateT<F, S, B> = MD().run {
-
     StateT.liftF<F, S, Ref<F, Option<S>>>(this, Ref.of(None, this)).flatMap { ref ->
       StateT<F, S, B>(this) { startS ->
         runM(this, startS).bracketCase(use = { (s, a) ->
@@ -31,14 +30,14 @@ interface StateTBracketInstance<F, S> : Bracket<StateTPartialOf<F, S>, Throwable
         }, release = { (s0, a), exitCase ->
           when (exitCase) {
             is ExitCase.Completed ->
-              ref.get.map { it.getOrElse { s0 } }.flatMap { s1 ->
+              ref.get().map { it.getOrElse { s0 } }.flatMap { s1 ->
                 release(a, ExitCase.Completed).fix().runS(this, s1).flatMap { s2 ->
                   ref.set(Some(s2))
                 }
               }
             else -> release(a, exitCase).runM(this, s0).unit()
           }
-        }).flatMap { (s, b) -> ref.get.map { it.getOrElse { s } }.tupleRight(b) }
+        }).flatMap { (s, b) -> ref.get().map { it.getOrElse { s } }.tupleRight(b) }
       }
     }
   }
