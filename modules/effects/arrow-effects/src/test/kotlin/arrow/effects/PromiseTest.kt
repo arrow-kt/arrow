@@ -154,8 +154,17 @@ class PromiseTest : UnitSpec() {
 
     }
 
+
     tests("UncancelablePromise") { Promise.uncancelable(IO.async()) }
     tests("CancelablePromise") { Promise(IO.concurrent()) }
+
+    "CancelablePromise - supports cancellation of get" {
+      Promise<ForIO, Unit>(IO.concurrent()).flatMap { p ->
+        p.get
+      }
+        .unsafeRunAsyncCancellable { }
+        .invoke()
+    }
 
   }
 
