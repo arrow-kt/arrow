@@ -169,19 +169,6 @@ Add the dependencies that you want to use
 
 ## Enabling kapt
 
-Add to your pom.xml file the following repository:
-```
-<repositories>
-    <repository>
-        <snapshots>
-            <enabled>false</enabled>
-        </snapshots>
-        <id>jitpack</id>
-        <url>https://jitpack.io</url>
-    </repository>
-</repositories>
-```
-
 Enable annotaton processing using kotlin plugin 
 ```
 <plugin>
