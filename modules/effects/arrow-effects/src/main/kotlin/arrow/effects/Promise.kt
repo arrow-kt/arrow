@@ -293,7 +293,6 @@ interface Promise<F, A> {
 
 }
 
-
 internal class CancelablePromise<F, A>(CF: Concurrent<F>) : Promise<F, A>, Concurrent<F> by CF {
 
   internal class CallbackId

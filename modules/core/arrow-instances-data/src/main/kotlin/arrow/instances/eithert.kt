@@ -181,7 +181,6 @@ private fun <F, L, A> handleErrorWith(fa: EitherTOf<F, L, A>, f: (L) -> EitherTO
     })
   }
 
-
 class EitherTContext<F, E>(val MF: MonadError<F, E>) : EitherTMonadErrorInstance<F, E>, EitherTSemigroupKInstance<F, E> {
   override fun FF(): Functor<F> = MF
   override fun MF(): Monad<F> = MF
