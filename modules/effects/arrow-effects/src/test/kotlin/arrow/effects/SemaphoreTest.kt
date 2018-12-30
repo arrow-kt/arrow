@@ -4,6 +4,7 @@ import arrow.core.toT
 import arrow.effects.instances.io.applicative.applicative
 import arrow.effects.instances.io.applicativeError.handleError
 import arrow.effects.instances.io.async.async
+import arrow.effects.instances.io.concurrent.concurrent
 import arrow.effects.instances.io.functor.unit
 import arrow.effects.instances.io.monad.flatMap
 import arrow.effects.instances.io.monad.map
@@ -141,6 +142,14 @@ class SemaphoreTest : UnitSpec() {
     }
 
     tests("UncancelableSemaphore") { Semaphore.uncancelable(it, IO.async()) }
+    tests("CancelableSemaphore") { Semaphore(it, IO.concurrent()) }
+
+    "CancelableSemaphore - supports cancellation of acquire" {
+      Semaphore(0, IO.concurrent()).flatMap { s ->
+        s.acquire()
+      }.unsafeRunAsyncCancellable { }
+        .invoke()
+    }
 
   }
 

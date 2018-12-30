@@ -3,6 +3,7 @@ package arrow.effects
 import arrow.Kind
 import arrow.core.*
 import arrow.effects.typeclasses.Async
+import arrow.effects.typeclasses.Concurrent
 import arrow.typeclasses.ApplicativeError
 
 /**
@@ -195,6 +196,31 @@ interface Semaphore<F> {
 
     /**
      * Construct a [Semaphore] initialized with [n] available permits.
+     *
+     * {: data-executable='true'}
+     *
+     * ```kotlin:ank
+     * import arrow.effects.*
+     * import arrow.effects.instances.io.concurrent.concurrent
+     *
+     * fun main(args: Array<String>) {
+     *   //sampleStart
+     *   val semaphore = Semaphore<ForIO>(5, IO.concurrent())
+     *   //sampleEnd
+     * }
+     */
+    operator fun <F> invoke(n: Long, CF: Concurrent<F>): Kind<F, Semaphore<F>> = CF.run {
+      assertNonNegative(n).flatMap {
+        Ref.of<F, State<F>>(Right(n), CF).map { ref ->
+          //          Promise<F, Unit>(this).map { promise ->
+          DefaultSemaphore(ref, Promise<F, Unit>(this), this)
+//          }
+        }
+      }
+    }
+
+    /**
+     * Construct a [Semaphore] initialized with [n] available permits.
      * Since it's based on [Async] it's constrained with an uncancelable [acquire] operation.
      *
      * {: data-executable='true'}
@@ -211,7 +237,11 @@ interface Semaphore<F> {
      */
     fun <F> uncancelable(n: Long, AS: Async<F>): Kind<F, Semaphore<F>> = AS.run {
       assertNonNegative(n).flatMap {
-        Ref.of<F, State<F>>(Right(n), AS).map { ref -> UncancelableSemaphore(ref, AS) }
+        Ref.of<F, State<F>>(Right(n), AS).map { ref ->
+          //          Promise.uncancelable<F, Unit>(this).map { promise ->
+          DefaultSemaphore(ref, Promise.uncancelable<F, Unit>(this), this)
+//          }
+        }
       }
     }
 
@@ -228,10 +258,10 @@ private typealias AcquiredPermits<F> = List<Tuple2<Long, Promise<F, Unit>>>
 private fun <F> ApplicativeError<F, Throwable>.assertNonNegative(n: Long): Kind<F, Unit> =
   if (n < 0) raiseError(IllegalArgumentException("n must be nonnegative, was: $n")) else just(Unit)
 
-internal class UncancelableSemaphore<F>(private val state: Ref<F, State<F>>,
-                                        private val AS: Async<F>) : Semaphore<F>, Async<F> by AS {
 
-  private val promise = Promise.uncancelable<F, Unit>(AS)
+internal class DefaultSemaphore<F>(private val state: Ref<F, State<F>>,
+                                   private val promise: Kind<F, Promise<F, Unit>>,
+                                   AS: Async<F>) : Semaphore<F>, Async<F> by AS {
 
   override fun available(): Kind<F, Long> =
     state.get().map { state ->
@@ -270,7 +300,7 @@ internal class UncancelableSemaphore<F>(private val state: Ref<F, State<F>>,
 
   override fun tryAcquireN(n: Long): Kind<F, Boolean> =
     assertNonNegative(n).flatMap {
-      if (n == 0L) AS.just(true)
+      if (n == 0L) just(true)
       else state.modify { old ->
         val u = old.fold({ waiting -> Left(waiting) }, { m ->
           if (m >= n) Right(m - n) else Right(m)
