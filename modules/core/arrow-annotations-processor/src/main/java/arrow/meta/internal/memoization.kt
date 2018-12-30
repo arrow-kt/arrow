@@ -11,10 +11,6 @@ private interface MemoizedCall<in F, out R> {
   operator fun invoke(f: F): R
 }
 
-private data class MemoizeKey0<R>(val p1: Byte) : MemoizedCall<() -> R, R> {
-  override fun invoke(f: () -> R): R = f()
-}
-
 private data class MemoizeKey1<out P1, R>(val p1: P1) : MemoizedCall<(P1) -> R, R> {
   override fun invoke(f: (P1) -> R) = f(p1)
 }
