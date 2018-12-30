@@ -11,10 +11,8 @@ import arrow.effects.instances.io.async.async
 import arrow.effects.instances.io.monad.monad
 import arrow.effects.instances.statet.async.async
 import arrow.instances.`try`.monad.monad
-import arrow.instances.applicative
 import arrow.instances.listk.monad.monad
 import arrow.instances.listk.semigroupK.semigroupK
-import arrow.instances.semigroupK
 import arrow.instances.statet.applicative.applicative
 import arrow.instances.statet.semigroupK.semigroupK
 import arrow.mtl.instances.StateTMonadStateInstance

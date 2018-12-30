@@ -7,24 +7,19 @@ import arrow.effects.IO
 import arrow.effects.instances.eithert.async.async
 import arrow.effects.instances.io.applicativeError.attempt
 import arrow.effects.instances.io.async.async
-import arrow.instances.eithert.semigroupK.semigroupK
-import arrow.effects.fix
-import arrow.effects.instances.eithert.monadDefer.monadDefer
-import arrow.effects.instances.io.applicativeError.attempt
-import arrow.effects.instances.io.async.async
 import arrow.effects.typeclasses.seconds
-import arrow.instances.*
+import arrow.instances.eithert.applicative.applicative
+import arrow.instances.eithert.functor.functor
+import arrow.instances.eithert.semigroupK.semigroupK
+import arrow.instances.eithert.traverse.traverse
 import arrow.instances.id.functor.functor
 import arrow.instances.id.monad.monad
 import arrow.instances.id.traverse.traverse
 import arrow.instances.option.functor.functor
 import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
-import arrow.test.laws.MonadDeferLaws
-import arrow.test.laws.MonadErrorLaws
 import arrow.test.laws.SemigroupKLaws
 import arrow.test.laws.TraverseLaws
-import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.forAll
@@ -40,9 +35,9 @@ class EitherTTest : UnitSpec() {
   init {
 
     testLaws(
-      AsyncLaws.laws<EitherTPartialOf<ForIO, Throwable>>(EitherT.async<ForIO>(IO.async()), EQ(), EQ()),
-      TraverseLaws.laws<EitherTPartialOf<ForId, Int>>(EitherT.traverse<ForId, Int>(Id.traverse()), EitherT.functor<ForId, Int>(Id.functor()), { EitherT(Id(Right(it))) }, Eq.any()),
-      SemigroupKLaws.laws<EitherTPartialOf<ForId, Int>>(
+      AsyncLaws.laws(EitherT.async(IO.async()), EQ(), EQ()),
+      TraverseLaws.laws(EitherT.traverse<ForId, Int>(Id.traverse()), EitherT.functor<ForId, Int>(Id.functor()), { EitherT(Id(Right(it))) }, Eq.any()),
+      SemigroupKLaws.laws(
         EitherT.semigroupK<ForId, Int>(Id.monad()),
         EitherT.applicative<ForId, Int>(Id.monad()),
         Eq.any())
