@@ -1,6 +1,5 @@
 package arrow.meta.processor
 
-import aballano.kotlinmemoization.memoize
 import arrow.common.utils.AbstractProcessor
 import arrow.common.utils.ClassOrPackageDataWrapper
 import arrow.common.utils.ProcessorUtils
@@ -8,6 +7,7 @@ import arrow.common.utils.knownError
 import arrow.meta.ast.Type
 import arrow.meta.ast.TypeName
 import arrow.meta.encoder.jvm.JvmMetaApi
+import arrow.meta.internal.memoize
 import arrow.meta.processor.MetaProcessor.AnnotatedElement
 import com.squareup.kotlinpoet.FileSpec
 import me.eugeniomarletti.kotlin.metadata.KotlinMetadataUtils
