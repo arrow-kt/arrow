@@ -3,6 +3,7 @@ package arrow.effects
 import arrow.core.*
 import arrow.effects.instances.io.async.async
 import arrow.effects.instances.io.bracket.guarantee
+import arrow.effects.instances.io.concurrent.concurrent
 import arrow.effects.instances.io.monad.binding
 import arrow.effects.instances.io.monad.flatMap
 import arrow.effects.instances.io.monadDefer.monadDefer
@@ -146,6 +147,7 @@ class PromiseTest : UnitSpec() {
           binding {
             val p = promise().bind()
             p.tryError(t).bind()
+            p.get.bind()
           }.equalUnderTheLaw(IO.raiseError(t), EQ())
         }
       }
@@ -153,6 +155,7 @@ class PromiseTest : UnitSpec() {
     }
 
     tests("UncancelablePromise") { Promise.uncancelable(IO.async()) }
+    tests("CancelablePromise") { Promise(IO.concurrent()) }
 
   }
 
