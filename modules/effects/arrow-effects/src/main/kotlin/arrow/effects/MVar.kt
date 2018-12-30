@@ -288,7 +288,7 @@ interface MVarPartialOf<F> {
    * Builds an empty [Mvar] for type [A].
    *
    * ```kotlin:ank:playground
-   *e import arrow.effects.*
+   * import arrow.effects.*
    * import arrow.effects.instances.io.async.async
    *
    * fun main(args: Array<String>) {

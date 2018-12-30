@@ -67,7 +67,7 @@ interface EitherTApplicativeErrorInstance<F, L> : ApplicativeError<EitherTPartia
   override fun <A> raiseError(e: L): EitherT<F, L, A> = AE().run {
     EitherT.liftF(this, raiseError(e))
   }
-  
+
 }
 
 @extension
@@ -98,7 +98,7 @@ interface EitherTTraverseInstance<F, L> : Traverse<EitherTPartialOf<F, L>>, Eith
   fun TF(): Traverse<F>
 
   override fun FF(): Functor<F> = TF()
-  
+
   override fun FFF(): Foldable<F> = TF()
 
   override fun <A, B> EitherTOf<F, L, A>.map(f: (A) -> B): EitherT<F, L, B> =

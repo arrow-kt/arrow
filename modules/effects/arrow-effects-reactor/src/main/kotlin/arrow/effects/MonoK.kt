@@ -7,10 +7,7 @@ import arrow.core.Tuple2
 import arrow.effects.CoroutineContextReactorScheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
-import arrow.effects.typeclasses.MonadDefer
-import arrow.effects.typeclasses.Proc
 import arrow.effects.typeclasses.Fiber
-import arrow.effects.typeclasses.ProcF
 import reactor.core.publisher.MonoSink
 import arrow.higherkind
 import reactor.core.publisher.Mono

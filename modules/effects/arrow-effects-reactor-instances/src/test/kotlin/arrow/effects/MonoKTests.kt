@@ -61,7 +61,8 @@ class MonoKTest : UnitSpec() {
 
   init {
     testLaws(
-      ConcurrentLaws.laws(MonoK.concurrent(), EQ(), EQ(), EQ(), testStackSafety = false)
+      AsyncLaws.laws(MonoK.async(), EQ(), EQ(), testStackSafety = false)
+//      ConcurrentLaws.laws(MonoK.concurrent(), EQ(), EQ(), EQ(), testStackSafety = false)
     )
 
     "Multi-thread Monos finish correctly" {
@@ -127,7 +128,7 @@ class MonoKTest : UnitSpec() {
 
       MonoK.just(Unit)
         .bracketCase(
-          use = { MonoK.async<Nothing> { _,_ -> } },
+          use = { MonoK.async<Nothing> { _, _ -> } },
           release = { _, exitCase ->
             MonoK {
               ec = exitCase

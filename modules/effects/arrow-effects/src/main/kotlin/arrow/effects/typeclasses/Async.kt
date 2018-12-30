@@ -5,17 +5,8 @@ import arrow.core.*
 import arrow.effects.CancelToken
 import arrow.core.Either
 import arrow.documented
-import arrow.core.Right
-import arrow.effects.Promise
-import arrow.effects.KindConnection
 import arrow.typeclasses.MonadContinuation
 import java.util.concurrent.atomic.AtomicReference
-import arrow.core.left
-import arrow.effects.*
-import arrow.effects.internal.asyncContinuation
-import kotlin.coroutines.Continuation
-import arrow.effects.*
-import arrow.effects.internal.unsafe
 import kotlin.coroutines.CoroutineContext
 
 /** A cancellable asynchronous computation that might fail. **/
@@ -158,7 +149,7 @@ interface Async<F> : MonadDefer<F> {
   @Deprecated("Use delay instead",
     ReplaceWith("delay(ctx, f)", "arrow.effects.typeclasses.Async"))
   operator fun <A> invoke(ctx: CoroutineContext, f: () -> A): Kind<F, A> =
-    ctx.shift().flatMap { delay(f) }
+    delay(ctx, f)
 
   /**
    * Delay a computation on provided [CoroutineContext].
@@ -233,7 +224,7 @@ interface Async<F> : MonadDefer<F> {
    * ```
    */
   fun CoroutineContext.shift(): Kind<F, Unit> =
-    just(Unit).continueOn(this) as Kind<F, Unit>
+    delay(this) { Unit }
 
   /**
    * Task that never finishes evaluating.

@@ -4,7 +4,7 @@ import arrow.core.toT
 import arrow.effects.instances.io.applicative.applicative
 import arrow.effects.instances.io.applicativeError.handleError
 import arrow.effects.instances.io.async.async
-import arrow.effects.instances.io.functor.void
+import arrow.effects.instances.io.functor.unit
 import arrow.effects.instances.io.monad.flatMap
 import arrow.effects.instances.io.monad.map
 import arrow.instances.eq
@@ -128,8 +128,8 @@ class SemaphoreTest : UnitSpec() {
         val permits: List<Long> = listOf(1, 0, 20, 4, 0, 5, 2, 1, 1, 3)
         semaphore(0).flatMap { s ->
           IO.parallelMapN(Dispatchers.Default,
-            permits.traverse(IO.applicative()) { s.acquireN(it) }.void(),
-            permits.reversed().traverse(IO.applicative()) { s.releaseN(it) }.void()
+            permits.traverse(IO.applicative()) { s.acquireN(it) }.unit(),
+            permits.reversed().traverse(IO.applicative()) { s.releaseN(it) }.unit()
           ) { _, _ -> Unit }
             .flatMap {
               s.count()

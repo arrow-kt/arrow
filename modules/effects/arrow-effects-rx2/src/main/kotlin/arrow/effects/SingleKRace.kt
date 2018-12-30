@@ -3,13 +3,11 @@ package arrow.effects
 import arrow.core.*
 import arrow.effects.typeclasses.Fiber
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.ReplaySubject
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.CoroutineContext
 import arrow.effects.CoroutineContextRx2Scheduler.asScheduler
 import io.reactivex.Single
-
 
 fun <A, B> SingleK.Companion.racePair2(ctx: CoroutineContext, fa: SingleKOf<A>, fb: SingleKOf<B>): SingleK<Either<Tuple2<A, Fiber<ForSingleK, B>>, Tuple2<Fiber<ForSingleK, A>, B>>> {
   val promiseA = ReplaySubject.create<A>().apply { toSerialized() }

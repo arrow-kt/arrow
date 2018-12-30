@@ -1,7 +1,6 @@
 package arrow.effects
 
 import arrow.core.*
-import arrow.effects.internal.IOConnection
 import arrow.effects.internal.asyncContinuation
 import arrow.effects.internal.unsafe
 import arrow.effects.typeclasses.Fiber

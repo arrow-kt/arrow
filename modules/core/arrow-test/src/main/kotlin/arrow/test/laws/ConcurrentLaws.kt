@@ -25,7 +25,7 @@ object ConcurrentLaws {
                EQ_UNIT: Eq<Kind<F, Unit>>,
                ctx: CoroutineContext = Dispatchers.Default,
                testStackSafety: Boolean = true): List<Law> =
-    AsyncLaws.laws(CF, EQ, EQ_EITHER, EQ, testStackSafety) + listOf(
+    AsyncLaws.laws(CF, EQ, EQ_EITHER, testStackSafety) + listOf(
       Law("Concurrent Laws: cancel on bracket releases") { CF.cancelOnBracketReleases(EQ, ctx) },
 //      Law("Concurrent Laws: async cancelable coherence") { CF.asyncCancelableCoherence(EQ) },
 //      Law("Concurrent Laws: async cancelable receives cancel signal") { CF.asyncCancelableReceivesCancelSignal(EQ) },
@@ -39,11 +39,11 @@ object ConcurrentLaws {
 //      Law("Concurrent Laws: release is not cancelable") { CF.releaseIsNotCancelable(EQ, ctx) },
       Law("Concurrent Laws: race mirrors left winner") { CF.raceMirrorsLeftWinner(EQ, ctx) },
       Law("Concurrent Laws: race mirrors right winner") { CF.raceMirrorsRightWinner(EQ, ctx) },
-//      Law("Concurrent Laws: race cancels loser") { CF.raceCancelsLoser(EQ, ctx) },
-//      Law("Concurrent Laws: race cancels both") { CF.raceCancelsBoth(EQ, ctx) },
+      Law("Concurrent Laws: race cancels loser") { CF.raceCancelsLoser(EQ, ctx) },
+      Law("Concurrent Laws: race cancels both") { CF.raceCancelsBoth(EQ, ctx) },
       Law("Concurrent Laws: race pair mirrors left winner") { CF.racePairMirrorsLeftWinner(EQ, ctx) },
       Law("Concurrent Laws: race pair mirrors right winner") { CF.racePairMirrorsRightWinner(EQ, ctx) },
-//      Law("Concurrent Laws: race pair cancels loser") { CF.racePairCancelsLoser(EQ, ctx) },
+      Law("Concurrent Laws: race pair cancels loser") { CF.racePairCancelsLoser(EQ, ctx) },
       Law("Concurrent Laws: race pair can join left") { CF.racePairCanJoinLeft(EQ, ctx) },
       Law("Concurrent Laws: race pair can join right") { CF.racePairCanJoinRight(EQ, ctx) },
       Law("Concurrent Laws: cancelling race pair cancels both") { CF.racePairCancelsBoth(EQ, ctx) },

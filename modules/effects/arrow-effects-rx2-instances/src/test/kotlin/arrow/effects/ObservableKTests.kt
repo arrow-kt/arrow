@@ -55,7 +55,8 @@ class ObservableKTests : UnitSpec() {
   }
 
   init {
-    testLaws(ConcurrentLaws.laws(ObservableK.concurrent(), EQ(), EQ(), EQ(), testStackSafety = false))
+//    testLaws(ConcurrentLaws.laws(ObservableK.concurrent(), EQ(), EQ(), EQ(), testStackSafety = false))
+    testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ(), testStackSafety = false))
 //     FIXME(paco) #691
 //    testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ()))
 //    testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ()))

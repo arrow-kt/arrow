@@ -14,7 +14,6 @@ import arrow.effects.typeclasses.seconds
 import arrow.instances.nonemptylist.monad.monad
 import arrow.instances.option.monad.monad
 import arrow.instances.optiont.applicative.applicative
-import arrow.instances.optiont.async.async
 import arrow.instances.optiont.monad.monad
 import arrow.instances.optiont.monoidK.monoidK
 import arrow.instances.optiont.semigroupK.semigroupK

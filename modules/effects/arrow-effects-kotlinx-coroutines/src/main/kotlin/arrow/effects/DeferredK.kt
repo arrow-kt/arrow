@@ -8,8 +8,6 @@ import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Fiber
-import arrow.effects.typeclasses.Proc
-import arrow.effects.typeclasses.ProcF
 import arrow.effects.internal.unsafe
 import arrow.effects.typeclasses.*
 import arrow.higherkind

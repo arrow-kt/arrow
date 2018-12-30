@@ -6,16 +6,11 @@ import arrow.effects.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.*
-import arrow.effects.typeclasses.Proc
-import arrow.effects.typeclasses.ProcF
 import arrow.effects.typeclasses.*
 import arrow.higherkind
 import arrow.typeclasses.Applicative
-import io.reactivex.BackpressureStrategy
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
-import io.reactivex.functions.BiFunction
-import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
 import kotlin.coroutines.CoroutineContext
 

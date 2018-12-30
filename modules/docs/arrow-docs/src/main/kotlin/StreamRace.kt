@@ -18,14 +18,13 @@ fun main(args: Array<String>) = runBlocking {
     ObservableK {
       it.fold({ (str, fiber) ->
         println("A WON [$str]")
-      },{ (fiber, str) ->
+      }, { (fiber, str) ->
         println("B WON [$str]")
       })
     }
   }
     .observable
     .subscribe()
-
 
   delay(10000)
 }

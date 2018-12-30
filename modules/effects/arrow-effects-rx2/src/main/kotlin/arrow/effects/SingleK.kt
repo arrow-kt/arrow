@@ -5,21 +5,12 @@ import arrow.core.*
 import arrow.effects.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
-import arrow.effects.typeclasses.MonadDefer
-import arrow.effects.typeclasses.Proc
 import arrow.effects.typeclasses.Fiber
-import arrow.effects.typeclasses.ProcF
 import arrow.higherkind
 import arrow.typeclasses.Applicative
-import io.reactivex.Flowable
-import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
-import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.ReplaySubject
-import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 
 fun <A> Single<A>.k(): SingleK<A> = SingleK(this)
@@ -302,7 +293,7 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
  * ```
  */
 fun <A> SingleKOf<A>.unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit =
-  value().subscribe({ cb(Right(it)) }, { cb(Left(it)) }).let {  }
+  value().subscribe({ cb(Right(it)) }, { cb(Left(it)) }).let { }
 
 /**
  * Runs this [SingleK] with [Single.blockingGet]. Does not handle errors at all, rethrowing them if they happen.

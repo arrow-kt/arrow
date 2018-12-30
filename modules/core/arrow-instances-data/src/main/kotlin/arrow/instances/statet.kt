@@ -44,7 +44,6 @@ interface StateTApplicativeInstance<F, S> : Applicative<StateTPartialOf<F, S>>, 
 
 }
 
-
 @extension
 @undocumented
 interface StateTMonadInstance<F, S> : Monad<StateTPartialOf<F, S>>, StateTApplicativeInstance<F, S> {
@@ -106,15 +105,17 @@ interface StateTApplicativeErrorInstance<F, S, E> : ApplicativeError<StateTParti
 @undocumented
 interface StateTMonadErrorInstance<F, S, E> : MonadError<StateTPartialOf<F, S>, E>, StateTApplicativeErrorInstance<F, S, E>, StateTMonadInstance<F, S> {
 
-  override fun MF(): Monad<F> = ME()
-
   override fun ME(): MonadError<F, E>
+
+  override fun MF(): Monad<F> = ME()
 
 }
 
 @extension
 @undocumented
-interface StateTMonadThrowInstance<F, S> : MonadThrow<StateTPartialOf<F, S>>, StateTMonadErrorInstance<F, S, Throwable>
+interface StateTMonadThrowInstance<F, S> : MonadThrow<StateTPartialOf<F, S>>, StateTMonadErrorInstance<F, S, Throwable> {
+  override fun ME(): MonadError<F, Throwable>
+}
 
 /**
  * Alias for[StateT.Companion.applicative]

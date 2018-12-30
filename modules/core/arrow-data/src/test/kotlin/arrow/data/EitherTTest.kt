@@ -7,9 +7,7 @@ import arrow.effects.IO
 import arrow.effects.instances.eithert.async.async
 import arrow.effects.instances.io.applicativeError.attempt
 import arrow.effects.instances.io.async.async
-import arrow.instances.eithert.applicative.applicative
 import arrow.instances.eithert.semigroupK.semigroupK
-import arrow.instances.eithert.traverse.traverse
 import arrow.effects.fix
 import arrow.effects.instances.eithert.monadDefer.monadDefer
 import arrow.effects.instances.io.applicativeError.attempt

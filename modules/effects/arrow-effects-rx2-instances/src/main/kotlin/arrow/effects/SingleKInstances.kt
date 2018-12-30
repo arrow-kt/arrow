@@ -1,6 +1,5 @@
 package arrow.effects
 
-import arrow.Kind
 import arrow.core.Either
 import arrow.core.Tuple2
 import arrow.deprecation.ExtensionsDSLDeprecated

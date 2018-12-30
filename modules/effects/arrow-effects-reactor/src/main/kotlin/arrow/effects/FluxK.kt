@@ -6,9 +6,6 @@ import arrow.effects.CoroutineContextReactorScheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
 import reactor.core.publisher.FluxSink
-import arrow.effects.typeclasses.MonadDefer
-import arrow.effects.typeclasses.Proc
-import arrow.effects.typeclasses.ProcF
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import reactor.core.publisher.Flux
