@@ -1,7 +1,13 @@
 package arrow.meta.encoder
 
-import arrow.meta.ast.*
 import arrow.meta.ast.Annotation
+import arrow.meta.ast.Code
+import arrow.meta.ast.Func
+import arrow.meta.ast.Modifier
+import arrow.meta.ast.Parameter
+import arrow.meta.ast.Tree
+import arrow.meta.ast.Type
+import arrow.meta.ast.TypeName
 import javax.lang.model.element.TypeElement
 import kotlin.reflect.KClass
 

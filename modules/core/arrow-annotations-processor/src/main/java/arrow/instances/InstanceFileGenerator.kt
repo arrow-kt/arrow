@@ -2,7 +2,12 @@ package arrow.instances
 
 import arrow.common.Package
 import arrow.common.messager.logW
-import arrow.common.utils.*
+import arrow.common.utils.ClassOrPackageDataWrapper
+import arrow.common.utils.ProcessorUtils
+import arrow.common.utils.extractFullName
+import arrow.common.utils.fullName
+import arrow.common.utils.removeBackticks
+import arrow.common.utils.typeConstraints
 import arrow.derive.FunctionSignature
 import arrow.derive.HKArgs
 import arrow.derive.asKotlin
@@ -42,7 +47,7 @@ data class Instance(
             .map { it.extractFullName(target.dataTypeInstance).asKotlin() }
             .joinToString(separator = " : ", prefix = ": ")
         else ""
-        if (reified) "reified $name" + upperBound else name + upperBound
+        if (reified) "reified $name$upperBound" else name + upperBound
       }
     } else {
       emptyList()
@@ -181,7 +186,7 @@ class InstanceFileGenerator(
   private val instances: List<Instance> = annotatedList.map { Instance(it.dataType.`package`, it, processorUtils) }
 
   /**
-   * Main entry point for deriving instance generation
+   * Main entry point for deriving instance generation.
    */
   fun generate() {
     instances.forEach {
@@ -208,6 +213,7 @@ class InstanceFileGenerator(
                 |""".trimMargin()
 
   private fun genDatatypeExtensions(i: Instance): String = i.extendingFunctions().joinToString(separator = "\n", transform = { fm ->
+    @Suppress("SwallowedException")
     try {
       val typeClassTypeArgs = i.target.typeClass.typeParameters.drop(1).flatMap {
         if (it.hasName()) listOf(i.target.typeClass.nameResolver.getString(it.name))

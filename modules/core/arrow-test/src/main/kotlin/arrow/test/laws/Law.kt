@@ -2,9 +2,7 @@ package arrow.test.laws
 
 import arrow.typeclasses.Eq
 import io.kotlintest.matchers.should
-import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.Gen
-import kotlin.reflect.KClass
 
 fun throwableEq() = Eq { a: Throwable, b ->
   a::class == b::class && a.message == b.message

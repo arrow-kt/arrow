@@ -1,9 +1,27 @@
 package arrow.meta.decoder
 
-import arrow.meta.ast.*
 import arrow.meta.ast.Annotation
+import arrow.meta.ast.Code
+import arrow.meta.ast.Func
+import arrow.meta.ast.Modifier
+import arrow.meta.ast.Parameter
+import arrow.meta.ast.Property
+import arrow.meta.ast.Tree
+import arrow.meta.ast.Type
 import arrow.meta.ast.TypeName
-import com.squareup.kotlinpoet.*
+import arrow.meta.ast.UseSiteTarget
+import com.squareup.kotlinpoet.AnnotationSpec
+import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.CodeBlock
+import com.squareup.kotlinpoet.FunSpec
+import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.LambdaTypeName
+import com.squareup.kotlinpoet.ParameterSpec
+import com.squareup.kotlinpoet.ParameterizedTypeName
+import com.squareup.kotlinpoet.PropertySpec
+import com.squareup.kotlinpoet.TypeSpec
+import com.squareup.kotlinpoet.TypeVariableName
+import com.squareup.kotlinpoet.WildcardTypeName
 
 /**
  * Provides ways to go from a [Tree] to [Code] for the purposes of code gen and reporting
@@ -116,6 +134,7 @@ interface TypeDecoder : MetaDecoder<Type> {
     return builderWithReturn.build()
   }
 
+  @Suppress("ComplexMethod")
   fun Modifier.lyrics(): KModifier =
     when (this) {
       Modifier.Public -> KModifier.PUBLIC

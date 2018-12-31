@@ -75,6 +75,7 @@ class ForwardCancelable {
     // TODO this runs in an immediate execution context in cats-effect
       token.fix().unsafeRunAsync { r ->
         stack.forEach { cb ->
+          @Suppress("SwallowedException")
           try {
             cb(r)
           } catch (nonFatal: Exception) {

@@ -42,7 +42,6 @@ typealias State<S, A> = StateT<ForId, S, A>
  *
  * @param run the stateful function to wrap with [State].
  */
-@Suppress("FunctionName")
 fun <S, A> State(run: (S) -> Tuple2<S, A>): State<S, A> = StateT(Id(run.andThen { Id(it) }))
 
 /**
@@ -84,7 +83,6 @@ fun <S, A> StateT<ForId, S, A>.runS(initial: S): S = run(initial).a
 /**
  * Alias for StateId to make working with `StateT<ForId, S, A>` more elegant.
  */
-@Suppress("FunctionName")
 fun State() = StateApi
 
 object StateApi {

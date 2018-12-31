@@ -9,7 +9,6 @@ import arrow.aql.instances.list.groupBy.groupBy
 import arrow.aql.instances.list.orderBy.orderBy
 import arrow.aql.instances.list.orderBy.orderMap
 import arrow.aql.instances.list.select.query
-import arrow.aql.instances.list.select.select
 import arrow.aql.instances.list.select.value
 import arrow.aql.instances.list.sum.sum
 import arrow.aql.instances.list.union.union
@@ -21,7 +20,6 @@ import arrow.aql.instances.option.select.query
 import arrow.aql.instances.option.select.select
 import arrow.aql.instances.option.select.value
 import arrow.core.Id
-import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import arrow.instances.order

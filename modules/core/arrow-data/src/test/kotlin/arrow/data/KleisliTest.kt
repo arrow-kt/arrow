@@ -23,7 +23,6 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import org.junit.runner.RunWith
 
-@Suppress("TestFunctionName")
 @RunWith(KTestJUnitRunner::class)
 class KleisliTest : UnitSpec() {
   private fun <A> TryEQ(): Eq<KleisliOf<ForTry, Int, A>> = Eq { a, b ->

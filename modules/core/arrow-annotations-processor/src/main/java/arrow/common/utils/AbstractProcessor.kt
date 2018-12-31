@@ -9,7 +9,6 @@ import me.eugeniomarletti.kotlin.processing.KotlinAbstractProcessor
 import java.io.File
 import java.io.IOException
 import java.nio.file.Files
-import java.nio.file.Files.createFile
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.element.Element
 import javax.lang.model.element.ElementKind
@@ -30,6 +29,7 @@ abstract class AbstractProcessor : KotlinAbstractProcessor(), ProcessorUtils, Ko
         "/build/kdocs/meta/"+ "${locationName().replace('.', '/')}.javadoc")
 
   fun Element.kDoc(): String? =
+    @Suppress("SwallowedException")
     try {
       kDocLocation()
         .readLines().joinToString("\n") {
@@ -41,10 +41,11 @@ abstract class AbstractProcessor : KotlinAbstractProcessor(), ProcessorUtils, Ko
       null
     }
 
-  private fun processElementDoc(e: Element): Unit {
+  private fun processElementDoc(e: Element) {
     val doc = elementUtils.getDocComment(e)
     val kDocLocation = e.kDocLocation()
     if (doc != null && doc.trim { it <= ' ' }.isNotEmpty()) {
+      @Suppress("SwallowedException")
       try {
         Files.createDirectories(kDocLocation.toPath().parent)
         Files.createFile(kDocLocation.toPath())

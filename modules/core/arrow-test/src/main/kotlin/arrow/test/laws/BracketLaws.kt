@@ -2,8 +2,6 @@ package arrow.test.laws
 
 import arrow.Kind
 import arrow.core.Either
-import arrow.core.FunctionK
-import arrow.effects.Ref
 import arrow.effects.typeclasses.Bracket
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.generators.genApplicative
@@ -12,7 +10,6 @@ import arrow.test.generators.genThrowable
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import io.kotlintest.properties.map
 
 object BracketLaws {
 

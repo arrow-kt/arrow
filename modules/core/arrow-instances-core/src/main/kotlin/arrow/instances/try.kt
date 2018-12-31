@@ -1,3 +1,4 @@
+@file:Suppress("UnusedImports")
 package arrow.instances
 
 import arrow.Kind

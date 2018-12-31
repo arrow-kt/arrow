@@ -11,7 +11,6 @@ import arrow.optics.instances.mapk.at.at
 import arrow.optics.instances.mapk.each.each
 import arrow.optics.instances.mapk.filterIndex.filterIndex
 import arrow.optics.instances.mapk.index.index
-import arrow.optics.typeclasses.FilterIndex
 import arrow.test.UnitSpec
 import arrow.test.generators.*
 import arrow.test.laws.LensLaws

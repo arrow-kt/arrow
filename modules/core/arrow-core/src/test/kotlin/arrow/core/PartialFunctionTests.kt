@@ -1,6 +1,5 @@
 package arrow.core
 
-import arrow.core.*
 import arrow.test.UnitSpec
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.should

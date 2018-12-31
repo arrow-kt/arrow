@@ -64,13 +64,10 @@ abstract class APTest(
           val expected = File(expectedDir, dest).readText()
           val actual = File(actualFileLocation(targetDir)).listFiles()[0].readText()
 
-          actual shouldBe expected
+          actual.replace("\r\n", "\n") shouldBe expected.replace("\r\n", "\n")
 
         }
       }
-
     }
-
   }
-
 }
