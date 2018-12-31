@@ -1,7 +1,6 @@
 package arrow.optics
 
 import arrow.core.*
-import arrow.instances.IntMonoidInstance
 import arrow.instances.monoid
 import arrow.instances.either.applicative.applicative
 import arrow.instances.option.monoid.monoid

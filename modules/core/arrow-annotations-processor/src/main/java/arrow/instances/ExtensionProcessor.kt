@@ -3,7 +3,12 @@ package arrow.instances
 import arrow.common.messager.log
 import arrow.common.utils.knownError
 import arrow.extension
-import arrow.meta.ast.*
+import arrow.meta.ast.Code
+import arrow.meta.ast.Func
+import arrow.meta.ast.Modifier
+import arrow.meta.ast.PackageName
+import arrow.meta.ast.Type
+import arrow.meta.ast.TypeName
 import arrow.meta.encoder.TypeClassInstance
 import arrow.meta.processor.MetaProcessor
 import com.google.auto.service.AutoService
@@ -105,6 +110,7 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class), PolyTempl
    * Not all wrapped types can be introspected as TypeElement
    */
   private fun TypeElement?.wrappedTypeFunctions(): List<String> =
+    @Suppress("SwallowedException")
     try {
       elementUtils.getAllMembers(this).map { it.simpleName.toString() }
     } catch (e: Exception) {

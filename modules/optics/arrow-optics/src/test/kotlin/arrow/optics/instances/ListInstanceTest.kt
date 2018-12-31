@@ -11,7 +11,6 @@ import arrow.optics.instances.listk.each.each
 import arrow.optics.instances.listk.filterIndex.filterIndex
 import arrow.optics.instances.listk.index.index
 import arrow.optics.instances.listk.snoc.snoc
-import arrow.optics.typeclasses.FilterIndex
 import arrow.test.UnitSpec
 import arrow.test.generators.*
 import arrow.test.laws.OptionalLaws

@@ -13,7 +13,7 @@ private typealias BindF = (Any?) -> IO<Any?>
 private typealias CallStack = ArrayStack<BindF>
 private typealias Callback = (Either<Throwable, Any?>) -> Unit
 
-@Suppress("UNCHECKED_CAST")
+@Suppress("UNCHECKED_CAST", "ReturnCount", "ComplexMethod")
 internal object IORunLoop {
 
   fun <A> start(source: IOOf<A>, cb: (Either<Throwable, A>) -> Unit): Unit =
@@ -320,6 +320,7 @@ internal object IORunLoop {
     var result: IOFrame<Any?, IO<Any?>>? = null
     var cursor: BindF? = bFirst
 
+    @Suppress("LoopWithTooManyJumpStatements")
     do {
       if (cursor != null && cursor is IOFrame) {
         result = cursor

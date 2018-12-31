@@ -1,3 +1,4 @@
+@file:Suppress("UnusedImports")
 package arrow.effects
 
 import arrow.Kind

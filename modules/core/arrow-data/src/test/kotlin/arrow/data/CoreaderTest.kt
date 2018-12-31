@@ -15,35 +15,35 @@ class CoreaderTest : UnitSpec() {
 
       "map should return mapped value" {
         forAll { num: Int ->
-          invoke<Int, Int> { it -> it * 2 }.map { it -> it * 3 }
+          invoke<Int, Int> { it * 2 }.map { it * 3 }
             .runId(num) == num * 6
         }
       }
 
       "flatMap should map over the inner value" {
         forAll { num: Int ->
-          invoke<Int, Int> { it -> it * 2 }.flatMap { a -> Coreader.just<Int, Int>(Id.comonad(), a * 3) }
+          invoke<Int, Int> { it * 2 }.flatMap { a -> Coreader.just<Int, Int>(Id.comonad(), a * 3) }
             .runId(num) == num * 6
         }
       }
 
       "bimap should map over both sides of the run function" {
         forAll { num: Int ->
-          invoke<Int, Int> { it -> it * 2 }.bimap({ a: String -> Integer.parseInt(a) }, { it.toString() })
+          invoke<Int, Int> { it * 2 }.bimap({ a: String -> Integer.parseInt(a) }, { it.toString() })
             .runId("$num") == "${num * 2}"
         }
       }
 
       "lmap should map over the left side of the function" {
         forAll { num: Int ->
-          invoke<Int, Int> { it -> it * 2 }.lmap { a: String -> Integer.parseInt(a) }
+          invoke<Int, Int> { it * 2 }.lmap { a: String -> Integer.parseInt(a) }
             .runId("$num") == num * 2
         }
       }
 
       "contramapValue" {
         forAll { num: Int ->
-          invoke<Int, Int> { it -> it * 2 }.contramapValue { a: IdOf<Int> -> Id(a.value() * 3) }
+          invoke<Int, Int> { it * 2 }.contramapValue { a: IdOf<Int> -> Id(a.value() * 3) }
             .runId(num) == num * 6
         }
       }

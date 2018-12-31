@@ -93,8 +93,8 @@ class FunctionSyntaxTest : UnitSpec() {
       val b = { _: Int -> counterB++ }.memoize()
 
 
-      (1..5).forEach { a(1) }
-      (1..5).forEach { b(1) }
+      repeat(5) { a(1) }
+      repeat(5) { b(1) }
 
       counterA shouldBe 5
       counterB shouldBe 1 // calling several times a memoized function with the same parameter is computed just once
@@ -109,8 +109,8 @@ class FunctionSyntaxTest : UnitSpec() {
       val b = { counterB++ }.memoize()
 
 
-      (1..5).forEach { a() }
-      (1..5).forEach { b() }
+      repeat(5) { a() }
+      repeat(5) { b() }
 
       counterA shouldBe 5
       counterB shouldBe 1 // calling several times a memoized function with the same parameter is computed just once

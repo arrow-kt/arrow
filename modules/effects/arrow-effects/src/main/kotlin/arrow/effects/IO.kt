@@ -21,6 +21,7 @@ fun <A> Proc<A>.toIOProc(): IOProc<A> = { _: IOConnection, proc -> this(proc) }
 fun <A> ProcF<ForIO, A>.toIOProcF(): IOProcF<A> = { _: IOConnection, proc -> this(proc) }
 
 @higherkind
+@Suppress("StringLiteralDuplication")
 sealed class IO<out A> : IOOf<A> {
 
   companion object {

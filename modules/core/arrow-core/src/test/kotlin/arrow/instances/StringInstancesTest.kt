@@ -1,7 +1,6 @@
 package arrow.instances
 
 import arrow.test.UnitSpec
-import arrow.test.laws.EqLaws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.ShowLaws
 import io.kotlintest.KTestJUnitRunner

@@ -7,10 +7,10 @@ import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf
 import java.io.File
 import javax.lang.model.element.Name
 
-val KindPostFix = "Of"
-val KindPartialPostFix = "PartialOf"
-val KindedJPostFix = "KindedJ"
-val HKMarkerPreFix = "For"
+const val KindPostFix = "Of"
+const val KindPartialPostFix = "PartialOf"
+const val KindedJPostFix = "KindedJ"
+const val HKMarkerPreFix = "For"
 
 data class HigherKind(
   val `package`: Package,
@@ -24,9 +24,9 @@ data class HigherKind(
   val expandedTypeArgs: String = target.classOrPackageProto.typeParameters.joinToString(
     separator = ", ", transform = { target.classOrPackageProto.nameResolver.getString(it.name) })
   val typeConstraints = target.classOrPackageProto.typeConstraints()
-  val name: String = "${kindName}$KindPostFix"
-  val nameJ: String = "${kindName}$KindedJPostFix"
-  val markerName = "$HKMarkerPreFix${kindName}"
+  val name: String = "$kindName$KindPostFix"
+  val nameJ: String = "$kindName$KindedJPostFix"
+  val markerName = "$HKMarkerPreFix$kindName"
 }
 
 class HigherKindsFileGenerator(
@@ -37,7 +37,7 @@ class HigherKindsFileGenerator(
   private val higherKinds: List<HigherKind> = annotatedList.map { HigherKind(it.classOrPackageProto.`package`, it) }
 
   /**
-   * Main entry point for higher kinds instance generation
+   * Main entry point for higher kinds instance generation.
    */
   fun generate() {
     higherKinds.forEachIndexed { _, hk ->

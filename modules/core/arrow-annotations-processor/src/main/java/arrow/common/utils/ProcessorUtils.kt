@@ -1,8 +1,17 @@
 package arrow.common.utils
 
 import arrow.meta.encoder.jvm.asKotlin
-import me.eugeniomarletti.kotlin.metadata.*
+import me.eugeniomarletti.kotlin.metadata.KotlinClassMetadata
+import me.eugeniomarletti.kotlin.metadata.KotlinMetadata
+import me.eugeniomarletti.kotlin.metadata.KotlinMetadataUtils
+import me.eugeniomarletti.kotlin.metadata.KotlinPackageMetadata
+import me.eugeniomarletti.kotlin.metadata.extractFullName
+import me.eugeniomarletti.kotlin.metadata.getPropertyOrNull
+import me.eugeniomarletti.kotlin.metadata.getValueParameterOrNull
 import me.eugeniomarletti.kotlin.metadata.jvm.getJvmMethodSignature
+import me.eugeniomarletti.kotlin.metadata.kotlinMetadata
+import me.eugeniomarletti.kotlin.metadata.modality
+import me.eugeniomarletti.kotlin.metadata.proto
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.TypeTable
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.supertypes

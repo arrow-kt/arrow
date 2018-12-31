@@ -16,12 +16,16 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kotlinx.coroutines.Dispatchers
 import org.junit.runner.RunWith
+import kotlin.coroutines.CoroutineContext
 
 @RunWith(KTestJUnitRunner::class)
 class PromiseTest : UnitSpec() {
 
   init {
-    fun tests(label: String, promise: () -> IOOf<Promise<ForIO, Int>>): Unit {
+    fun tests(label: String,
+              ctx: CoroutineContext = Dispatchers.Default,
+              promise: () -> IOOf<Promise<ForIO, Int>>): Unit {
+
       "$label - complete" {
         forAll(Gen.int()) { i ->
           promise().flatMap { p ->
@@ -72,8 +76,8 @@ class PromiseTest : UnitSpec() {
           val state = Ref.of(0, IO.monadDefer()).bind()
           val modifyGate = promise().bind()
           val readGate = promise().bind()
-          modifyGate.get.flatMap { state.update { i -> i * 2 }.flatMap { readGate.complete(1) } }.startF(Dispatchers.Default).bind()
-          state.set(1).flatMap { modifyGate.complete(1) }.startF(Dispatchers.Default).bind()
+          modifyGate.get.flatMap { state.update { i -> i * 2 }.flatMap { readGate.complete(1) } }.startF(ctx).bind()
+          state.set(1).flatMap { modifyGate.complete(1) }.startF(ctx).bind()
           readGate.get.bind()
           state.get().bind()
         }.unsafeRunSync() shouldBe 2

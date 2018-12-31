@@ -3,13 +3,11 @@ package arrow.reflect.tests
 import arrow.core.Option
 import arrow.core.Try
 import arrow.instances.TryMonadErrorInstance
-import arrow.mtl.typeclasses.MonadCombine
 import arrow.reflect.*
 import arrow.test.UnitSpec
 import arrow.typeclasses.*
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
-import io.kotlintest.matchers.shouldNot
 import org.junit.runner.RunWith
 
 object Bogus

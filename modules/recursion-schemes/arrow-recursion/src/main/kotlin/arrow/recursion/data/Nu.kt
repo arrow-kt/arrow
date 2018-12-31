@@ -11,7 +11,7 @@ import arrow.recursion.Coalgebra
 class Nu<out F>(val a: Any?, val unNu: Coalgebra<F, Any?>) : NuOf<F> {
   companion object {
     // Necessary because of Coalgebra's variance
-    @Suppress("UNCHECKED_CAST")
+    @Suppress("UNCHECKED_CAST", "ExplicitItLambdaParameter")
     operator fun <F, A> invoke(a: A, unNu: Coalgebra<F, A>) = Nu(a) { it -> unNu(it as A) }
   }
 }

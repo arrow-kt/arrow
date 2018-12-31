@@ -1,7 +1,15 @@
 package arrow.meta.encoder.jvm
 
-import arrow.common.utils.*
-import arrow.meta.ast.*
+import arrow.common.utils.ClassOrPackageDataWrapper
+import arrow.common.utils.ProcessorUtils
+import arrow.common.utils.fullName
+import arrow.common.utils.removeBackticks
+import arrow.common.utils.simpleName
+import arrow.meta.ast.Func
+import arrow.meta.ast.Modifier
+import arrow.meta.ast.PackageName
+import arrow.meta.ast.Parameter
+import arrow.meta.ast.TypeName
 import me.eugeniomarletti.kotlin.metadata.escapedClassName
 import me.eugeniomarletti.kotlin.metadata.jvm.jvmMethodSignature
 import me.eugeniomarletti.kotlin.metadata.modality
@@ -29,6 +37,7 @@ interface KotlinMetatadataEncoder {
         interfaces.isEmpty() -> acc
         else -> {
           interfaces.flatMap { i ->
+            @Suppress("SwallowedException")
             try {
               val className = i.removeBackticks().substringBefore("<")
               val typeClassElement = processorUtils.elementUtils.getTypeElement(className)

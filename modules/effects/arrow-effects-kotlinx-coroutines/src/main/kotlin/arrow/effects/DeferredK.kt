@@ -442,6 +442,7 @@ sealed class DeferredK<A>(
     val b = try {
       use(a).await()
     } catch (e: Throwable) {
+      @Suppress("InstanceOfCheckForException")
       try {
         if (e is CancellationException) release(a, ExitCase.Cancelled).await()
         else release(a, ExitCase.Error(e)).await()

@@ -11,9 +11,9 @@ import arrow.undocumented
 
 private val polyFunEvalRegex = "_(.*?)_\\((.*?)\\)".toRegex(RegexOption.MULTILINE)
 
-private val ConstantTypeConstructor = "ForId"
-private val ConstantType1 = "String"
-private val ConstantType2 = "CharSequence"
+private const val ConstantTypeConstructor = "ForId"
+private const val ConstantType1 = "String"
+private const val ConstantType2 = "CharSequence"
 
 interface PolyTemplateGenerator : MetaApi {
 

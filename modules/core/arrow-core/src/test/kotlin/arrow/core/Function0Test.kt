@@ -1,8 +1,6 @@
 package arrow.core
 
 import arrow.Kind
-import arrow.core.*
-import arrow.instances.extensions
 import arrow.instances.function0.comonad.comonad
 import arrow.instances.function0.monad.monad
 import arrow.instances.function0.monoid.monoid
@@ -12,8 +10,8 @@ import arrow.instances.semigroup
 import arrow.test.UnitSpec
 import arrow.test.laws.ComonadLaws
 import arrow.test.laws.MonadLaws
-import arrow.test.laws.SemigroupLaws
 import arrow.test.laws.MonoidLaws
+import arrow.test.laws.SemigroupLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.forAll

@@ -25,6 +25,7 @@ class NonEmptyList<out A> private constructor(
 
   fun containsAll(elements: Collection<@UnsafeVariance A>): Boolean = elements.all(this::contains)
 
+  @Suppress("FunctionOnlyReturningConstant")
   fun isEmpty(): Boolean = false
 
   fun <B> map(f: (A) -> B): NonEmptyList<B> = NonEmptyList(f(head), tail.map(f))

@@ -1,7 +1,11 @@
 package arrow.renzu
 
 import arrow.common.messager.log
-import arrow.common.utils.*
+import arrow.common.utils.ClassOrPackageDataWrapper
+import arrow.common.utils.extractFullName
+import arrow.common.utils.recurseFilesUpwards
+import arrow.common.utils.removeBackticks
+import arrow.common.utils.simpleName
 import arrow.instances.AnnotatedInstance
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.TypeTable
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.supertypes
@@ -41,6 +45,7 @@ fun parentTypeClasses(processor: RenzuProcessor, current: ClassOrPackageDataWrap
     }
     else -> {
       interfaces.flatMap { i ->
+        @Suppress("SwallowedException")
         try {
           val className = i.removeBackticks().substringBefore("<")
           val typeClassElement = processor.elementUtils.getTypeElement(className)
