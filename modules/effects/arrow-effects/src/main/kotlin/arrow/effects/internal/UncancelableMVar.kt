@@ -9,7 +9,7 @@ import arrow.effects.typeclasses.unitCallback
 import java.util.concurrent.atomic.AtomicReference
 
 //[MVar] implementation for [Async] data types.
-internal class MVarAsync<F, A> private constructor(initial: State<A>, AS: Async<F>) : MVar<F, A>, Async<F> by AS {
+internal class UncancelableMVar<F, A> private constructor(initial: State<A>, AS: Async<F>) : MVar<F, A>, Async<F> by AS {
 
   private val stateRef = AtomicReference<State<A>>(initial)
 
@@ -40,8 +40,12 @@ internal class MVarAsync<F, A> private constructor(initial: State<A>, AS: Async<
     }
   }
 
-  override fun isNotEmpty(): Kind<F, Boolean> =
-    isEmpty().map { !it }
+  override fun isNotEmpty(): Kind<F, Boolean> = delay {
+    when (stateRef.get()) {
+      is State.WaitForPut -> false
+      is State.WaitForTake -> true
+    }
+  }
 
   private tailrec fun unsafeTryPut(a: A): Kind<F, Boolean> =
     when (val current = stateRef.get()) {
@@ -158,14 +162,14 @@ internal class MVarAsync<F, A> private constructor(initial: State<A>, AS: Async<
   private val asyncBoundary = async(unitCallback)
 
   companion object {
-    /** Builds an [MVarAsync] instance with an [initial] value. */
+    /** Builds an [UncancelableMVar] instance with an [initial] value. */
     operator fun <F, A> invoke(initial: A, AS: Async<F>): Kind<F, MVar<F, A>> = AS.delay {
-      MVarAsync(State(initial), AS)
+      UncancelableMVar(State(initial), AS)
     }
 
-    /** Returns an empty [MVarAsync] instance. */
+    /** Returns an empty [UncancelableMVar] instance. */
     fun <F, A> empty(AS: Async<F>): Kind<F, MVar<F, A>> = AS.delay {
-      MVarAsync(State.empty<A>(), AS)
+      UncancelableMVar(State.empty<A>(), AS)
     }
 
     /** Internal state of [MVar]. */
@@ -179,7 +183,7 @@ internal class MVarAsync<F, A> private constructor(initial: State<A>, AS: Async<
       }
 
       /**
-       * [MVarAsync] state signaling it has [take] callbacks registered
+       * [UncancelableMVar] state signaling it has [take] callbacks registered
        * and we are waiting for one or multiple [put] operations.
        *
        * @param takes are the rest of the requests waiting in line,
@@ -188,7 +192,7 @@ internal class MVarAsync<F, A> private constructor(initial: State<A>, AS: Async<
       data class WaitForPut<A>(val reads: List<Listener<A>>, val takes: List<Listener<A>>) : State<A>()
 
       /**
-       * [MVarAsync] state signaling it has one or more values enqueued,
+       * [UncancelableMVar] state signaling it has one or more values enqueued,
        * to be signaled on the next [take].
        *
        * @param value is the first value to signal

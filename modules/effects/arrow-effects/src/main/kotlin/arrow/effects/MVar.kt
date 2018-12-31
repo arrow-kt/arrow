@@ -2,8 +2,10 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.core.Option
-import arrow.effects.internal.MVarAsync
+import arrow.effects.internal.UncancelableMVar
+import arrow.effects.internal.CancelableMVar
 import arrow.effects.typeclasses.Async
+import arrow.effects.typeclasses.Concurrent
 
 /**
  * It's a mutable variable with context [F], that is either empty or contains a value of type [A].
@@ -202,6 +204,40 @@ interface MVar<F, A> {
   companion object {
 
     /**
+     * Create an cancelable empty [MVar].
+     *
+     * ```kotlin:ank:playground
+     * import arrow.effects.*
+     * import arrow.effects.instances.io.concurrent.concurrent
+     *
+     * fun main(args: Array<String>) {
+     *   //sampleStart
+     *   val mvar: IOOf<MVar<ForIO, Int>> = MVar.empty(IO.concurrent())
+     *   //sampleEnd
+     * }
+     * ```
+     */
+    fun <F, A> empty(CF: Concurrent<F>): Kind<F, MVar<F, A>> =
+      CancelableMVar.empty(CF)
+
+    /**
+     * Create an uncancelable [MVar] that's initialized to an [initial] value.
+     *
+     * ```kotlin:ank:playground
+     * import arrow.effects.*
+     * import arrow.effects.instances.io.concurrent.concurrent
+     *
+     * fun main(args: Array<String>) {
+     *   //sampleStart
+     *   val mvar: IOOf<MVar<ForIO, Int>> = MVar.cancelable(5, IO.concurrent())
+     *   //sampleEnd
+     * }
+     * ```
+     */
+    fun <F, A> cancelable(initial: A, CF: Concurrent<F>): Kind<F, MVar<F, A>> =
+      CancelableMVar(initial, CF)
+
+    /**
      * Create an uncancelable empty [MVar].
      *
      * ```kotlin:ank:playground
@@ -216,7 +252,7 @@ interface MVar<F, A> {
      * ```
      */
     fun <F, A> uncancelableEmpty(AS: Async<F>): Kind<F, MVar<F, A>> =
-      MVarAsync.empty(AS)
+      UncancelableMVar.empty(AS)
 
     /**
      * Create an uncancelable [MVar] that's initialized to an [initial] value.
@@ -233,15 +269,24 @@ interface MVar<F, A> {
      * ```
      */
     fun <F, A> uncancelableOf(initial: A, AS: Async<F>): Kind<F, MVar<F, A>> =
-      MVarAsync(initial, AS)
+      UncancelableMVar(initial, AS)
 
     operator fun <F> invoke(AS: Async<F>) = object : MVarPartialOf<F> {
 
       override fun <A> of(a: A): Kind<F, MVar<F, A>> =
-        MVarAsync(a, AS)
+        UncancelableMVar(a, AS)
 
       override fun <A> empty(): Kind<F, MVar<F, A>> =
-        MVarAsync.empty(AS)
+        UncancelableMVar.empty(AS)
+    }
+
+    operator fun <F> invoke(CF: Concurrent<F>) = object : MVarPartialOf<F> {
+
+      override fun <A> of(a: A): Kind<F, MVar<F, A>> =
+        CancelableMVar(a, CF)
+
+      override fun <A> empty(): Kind<F, MVar<F, A>> =
+        CancelableMVar.empty(CF)
     }
 
   }

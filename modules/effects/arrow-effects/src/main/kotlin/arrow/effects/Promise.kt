@@ -2,11 +2,11 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.core.*
+import arrow.effects.internal.ImmediateContext
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Concurrent
 import arrow.effects.typeclasses.mapUnit
 import java.util.concurrent.atomic.AtomicReference
-import kotlin.coroutines.EmptyCoroutineContext
 
 /**
  * When made, a [Promise] is empty. Until it is fulfilled, which can only happen once.
@@ -380,14 +380,14 @@ internal class CancelablePromise<F, A>(CF: Concurrent<F>) : Promise<F, A>, Concu
     val rightA = Right(a)
 
     return list.fold(unit()) { acc, next ->
-      acc.flatMap { delay { next(rightA) }.startF(EmptyCoroutineContext).map(mapUnit) }
+      acc.flatMap { delay { next(rightA) }.startF(ImmediateContext).map(mapUnit) }
     }
   }
 
   private fun notifyError(error: Throwable, list: Collection<(Either<Throwable, A>) -> Unit>): Kind<F, Unit> {
     val leftError = Left(error)
     return list.fold(unit()) { acc, next ->
-      acc.flatMap { delay { next(leftError) }.startF(EmptyCoroutineContext).map(mapUnit) }
+      acc.flatMap { delay { next(leftError) }.startF(ImmediateContext).map(mapUnit) }
     }
   }
 
