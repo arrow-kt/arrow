@@ -24,9 +24,9 @@ idea {
 
 dependencies {
     compile project(':arrow-instances-data')
-    compile project(':arrow-effects-instances')
-    compile project(':arrow-effects-rx2-instances')
-    compile project(':arrow-effects-kotlinx-coroutines-instances')
+    compile project(':arrow-effects-extensions')
+    compile project(':arrow-effects-rx2-extensions')
+    compile project(':arrow-effects-kotlinx-coroutines-extensions')
     compile project(':arrow-optics')
     compile project(':arrow-validation')
 

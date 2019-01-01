@@ -1,5 +1,5 @@
 dependencies {
-    compile project(':arrow-effects-reactor')
+    compile project(':arrow-effects-rx2-data')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     compile project(':arrow-annotations')
     kapt project(':arrow-annotations-processor')
@@ -9,8 +9,7 @@ dependencies {
     testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
     testCompile project(':arrow-test')
 
-    compile "io.projectreactor:reactor-core:$projectReactorVersion"
-    testCompile "io.projectreactor:reactor-test:$projectReactorVersion"
+    compile "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

@@ -1,20 +1,16 @@
-def retrofitVersion = "2.4.0"
-
 dependencies {
-    compile project(':arrow-effects')
-    compile project(':arrow-typeclasses')
+    compile project(':arrow-effects-reactor-data')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     compile project(':arrow-annotations')
-    compile "com.squareup.retrofit2:retrofit:$retrofitVersion"
     kapt project(':arrow-annotations-processor')
     kaptTest project(':arrow-annotations-processor')
     compileOnly project(':arrow-annotations-processor')
     testCompileOnly project(':arrow-annotations-processor')
+    testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
     testCompile project(':arrow-test')
-    testCompile "com.squareup.retrofit2:converter-gson:$retrofitVersion"
-    testCompile 'com.squareup.okhttp3:mockwebserver:3.11.0'
-    testCompile project(':arrow-effects-rx2')
-    testCompile project(':arrow-effects-extensions')
+
+    compile "io.projectreactor:reactor-core:$projectReactorVersion"
+    testCompile "io.projectreactor:reactor-test:$projectReactorVersion"
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
