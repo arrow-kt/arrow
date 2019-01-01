@@ -59,7 +59,7 @@ dependencies {
     kapt    "io.arrow-kt:arrow-annotations-processor:$arrow_version"
 
     compile "io.arrow-kt:arrow-free:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-instances-free:$arrow_version" //optional
+    compile "io.arrow-kt:arrow-free-instances:$arrow_version" //optional
     compile "io.arrow-kt:arrow-mtl:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects-instances:$arrow_version" //optional

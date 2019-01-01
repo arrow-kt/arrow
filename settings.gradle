@@ -41,8 +41,6 @@ include {
             _ 'annotations-processor'
             _ 'core'
             _ 'data'
-            _ 'free'
-            _ 'instances-free'
             _ 'instances-core'
             _ 'instances-data'
             _ 'generic'
@@ -52,6 +50,11 @@ include {
             _ 'test'
             _ 'typeclasses'
             _ 'validation'
+        }
+
+        free {
+            _ 'free'
+            _ 'free-extensions'
         }
 
         effects {

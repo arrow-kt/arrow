@@ -55,7 +55,7 @@ dependencies {
     
     compile "io.arrow-kt:arrow-query-language:$arrow_version" //optional
     compile "io.arrow-kt:arrow-free:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-instances-free:$arrow_version" //optional
+    compile "io.arrow-kt:arrow-free-extensions:$arrow_version" //optional
     compile "io.arrow-kt:arrow-mtl:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects-instances:$arrow_version" //optional
