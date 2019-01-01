@@ -54,6 +54,7 @@ include {
 
         free {
             _ 'free'
+            _ 'free-data'
             _ 'free-extensions'
         }
 
