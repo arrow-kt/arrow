@@ -134,6 +134,18 @@ interface ObservableKConcurrentInstance : Concurrent<ForObservableK>, Observable
   override fun <A> ObservableKOf<A>.startF(ctx: CoroutineContext): ObservableK<Fiber<ForObservableK, A>> =
     fix().startF(ctx)
 
+  override fun <A> asyncF(k: ConnectedProcF<ForObservableK, A>): ObservableK<A> =
+    ObservableK.asyncF(k)
+
+  override fun <A> async(fa: ConnectedProc<ForObservableK, A>): ObservableK<A> =
+    ObservableK.async(fa)
+
+  override fun <A> asyncF(k: ProcF<ForObservableK, A>): ObservableK<A> =
+    ObservableK.async { _, cb -> k(cb) }
+
+  override fun <A> async(fa: Proc<A>): ObservableK<A> =
+    ObservableK.async { _, cb -> fa(cb) }
+
   override fun <A, B> racePair(ctx: CoroutineContext, fa: ObservableKOf<A>, fb: ObservableKOf<B>): ObservableK<Either<Tuple2<A, Fiber<ForObservableK, B>>, Tuple2<Fiber<ForObservableK, A>, B>>> =
     ObservableK.racePair(ctx, fa, fb)
 }

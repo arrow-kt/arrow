@@ -56,7 +56,12 @@ sealed class IO<out A> : IOOf<A> {
             IO { callback(Left(t)) }
           }
 
-          IORunLoop.startCancelable(fa, conn2, mapUnit)
+          //DEV: If fa cancels conn2 like so `conn.cancel().map { cb(Right(Unit)) }`
+          //It doesn't run the stack of conn2, instead the result is seen it cb of startCancelable.
+          IORunLoop.startCancelable(fa, conn2) {
+            if (it == Left(ConnectionCancellationException) && conn.isNotCanceled()) IORunLoop.start(conn.cancel(), mapUnit)
+            else Unit
+          }
         }
       }
 

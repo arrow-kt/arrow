@@ -122,6 +122,18 @@ interface MaybeKConcurrentInstance : Concurrent<ForMaybeK>, MaybeKAsyncInstance 
   override fun <A> MaybeKOf<A>.startF(ctx: CoroutineContext): MaybeK<Fiber<ForMaybeK, A>> =
     fix().startF(ctx)
 
+  override fun <A> asyncF(k: ConnectedProcF<ForMaybeK, A>): MaybeK<A> =
+    MaybeK.asyncF(k)
+
+  override fun <A> async(fa: ConnectedProc<ForMaybeK, A>): MaybeK<A> =
+    MaybeK.async(fa)
+
+  override fun <A> asyncF(k: ProcF<ForMaybeK, A>): MaybeK<A> =
+    MaybeK.async { _, cb -> k(cb) }
+
+  override fun <A> async(fa: Proc<A>): MaybeK<A> =
+    MaybeK.async { _, cb -> fa(cb) }
+
   override fun <A, B> racePair(ctx: CoroutineContext, fa: MaybeKOf<A>, fb: MaybeKOf<B>): MaybeK<Either<Tuple2<A, Fiber<ForMaybeK, B>>, Tuple2<Fiber<ForMaybeK, A>, B>>> =
     MaybeK.racePair(ctx, fa, fb)
 }

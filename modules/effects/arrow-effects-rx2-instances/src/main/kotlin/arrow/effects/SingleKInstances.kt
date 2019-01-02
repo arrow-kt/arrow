@@ -101,6 +101,18 @@ interface SingleKConcurrentInstance : Concurrent<ForSingleK>, SingleKAsyncInstan
   override fun <A> SingleKOf<A>.startF(ctx: CoroutineContext): SingleK<Fiber<ForSingleK, A>> =
     fix().startF(ctx)
 
+  override fun <A> asyncF(k: ConnectedProcF<ForSingleK, A>): SingleK<A> =
+    SingleK.asyncF(k)
+
+  override fun <A> async(fa: ConnectedProc<ForSingleK, A>): SingleK<A> =
+    SingleK.async(fa)
+
+  override fun <A> asyncF(k: ProcF<ForSingleK, A>): SingleK<A> =
+    SingleK.asyncF { _, cb -> k(cb) }
+
+  override fun <A> async(fa: Proc<A>): SingleK<A> =
+    SingleK.async { _, cb -> fa(cb) }
+
   override fun <A, B> racePair(ctx: CoroutineContext, fa: SingleKOf<A>, fb: SingleKOf<B>): SingleK<Either<Tuple2<A, Fiber<ForSingleK, B>>, Tuple2<Fiber<ForSingleK, A>, B>>> =
     SingleK.racePair2(ctx, fa, fb)
 

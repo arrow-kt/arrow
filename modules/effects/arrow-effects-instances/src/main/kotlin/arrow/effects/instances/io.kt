@@ -123,6 +123,18 @@ interface IOConcurrentInstance : Concurrent<ForIO>, IOAsyncInstance {
   override fun <A> Kind<ForIO, A>.startF(ctx: CoroutineContext): IO<Fiber<ForIO, A>> =
     ioStart(ctx)
 
+  override fun <A> asyncF(k: ConnectedProcF<ForIO, A>): IO<A> =
+    IO.asyncF(k)
+
+  override fun <A> async(fa: ConnectedProc<ForIO, A>): IO<A> =
+    IO.async(fa)
+
+  override fun <A> asyncF(k: ProcF<ForIO, A>): IO<A> =
+    IO.asyncF { _, cb -> k(cb) }
+
+  override fun <A> async(fa: Proc<A>): IO<A> =
+    IO.async { _, cb -> fa(cb) }
+
   override fun <A, B> racePair(ctx: CoroutineContext, lh: Kind<ForIO, A>, rh: Kind<ForIO, B>): IO<Either<Tuple2<A, Fiber<ForIO, B>>, Tuple2<Fiber<ForIO, A>, B>>> =
     IO.racePair(ctx, lh, rh)
 

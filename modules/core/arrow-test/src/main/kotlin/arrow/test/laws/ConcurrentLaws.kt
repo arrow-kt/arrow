@@ -39,12 +39,15 @@ object ConcurrentLaws {
       Law("Concurrent Laws: race mirrors right winner") { CF.raceMirrorsRightWinner(EQ, ctx) },
       Law("Concurrent Laws: race cancels loser") { CF.raceCancelsLoser(EQ, ctx) },
       Law("Concurrent Laws: race cancels both") { CF.raceCancelsBoth(EQ, ctx) },
+      Law("Concurrent Laws: race is cancellable by participants") { CF.raceCanBeCancelledByParticipants(EQ, ctx) },
       Law("Concurrent Laws: race pair mirrors left winner") { CF.racePairMirrorsLeftWinner(EQ, ctx) },
       Law("Concurrent Laws: race pair mirrors right winner") { CF.racePairMirrorsRightWinner(EQ, ctx) },
       Law("Concurrent Laws: race pair cancels loser") { CF.racePairCancelsLoser(EQ, ctx) },
       Law("Concurrent Laws: race pair can join left") { CF.racePairCanJoinLeft(EQ, ctx) },
       Law("Concurrent Laws: race pair can join right") { CF.racePairCanJoinRight(EQ, ctx) },
+      Law("Concurrent Laws: race pair is cancellable by participants") { CF.racePairCanBeCancelledByParticipants(EQ, ctx) },
       Law("Concurrent Laws: parallel map cancels both") { CF.parMapCancelsBoth(EQ, ctx) },
+      Law("Concurrent Laws: parallel is cancellable by participants") { CF.parMapCanBeCancelledByParticipants(EQ, ctx) },
       Law("Concurrent Laws: cancelling race pair cancels both") { CF.racePairCancelsBoth(EQ, ctx) },
       Law("Concurrent Laws: action concurrent with pure value is just action") { CF.actionConcurrentWithPureValueIsJustAction(EQ, ctx) }
     )
@@ -92,7 +95,7 @@ object ConcurrentLaws {
       binding {
         val release = Promise<F, Int>(this@asyncFRegisterCanBeCancelled).bind()
         val acquire = Promise<F, Unit>(this@asyncFRegisterCanBeCancelled).bind()
-        val task = asyncF<Unit> {
+        val task = asyncF<Unit> { _, _ ->
           acquire.complete(Unit).bracket(use = { never<Unit>() }, release = { release.complete(i) })
         }
         val (_, cancel) = task.startF(ctx).bind()
@@ -203,6 +206,17 @@ object ConcurrentLaws {
       }.equalUnderTheLaw(just(a + b), EQ)
     }
 
+  fun <F> Concurrent<F>.raceCanBeCancelledByParticipants(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
+    forAll(Gen.int()) { i ->
+      binding {
+        val latch = Promise<F, Int>(this@raceCanBeCancelledByParticipants).bind()
+        val cancel = asyncF<Unit> { conn, cb -> conn.cancel().map { cb(Right(Unit)) } }
+        val loser = unit().bracket(use = { never<Int>() }, release = { latch.complete(i) })
+        raceN(ctx, cancel, loser).startF(ctx).bind()
+        latch.get.bind()
+      }.equalUnderTheLaw(just(i), EQ)
+    }
+
   fun <F> Concurrent<F>.racePairMirrorsLeftWinner(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext): Unit =
     forAll(Gen.int().map(::just)) { fa ->
       val never = never<Int>()
@@ -295,6 +309,17 @@ object ConcurrentLaws {
       }.equalUnderTheLaw(just(a + b), EQ)
     }
 
+  fun <F> Concurrent<F>.racePairCanBeCancelledByParticipants(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
+    forAll(Gen.int()) { i ->
+      binding {
+        val latch = Promise<F, Int>(this@racePairCanBeCancelledByParticipants).bind()
+        val cancel = asyncF<Unit> { conn, cb -> conn.cancel().map { cb(Right(Unit)) } }
+        val loser = unit().bracket(use = { never<Int>() }, release = { latch.complete(i) })
+        racePair(ctx, cancel, loser).startF(ctx).bind()
+        latch.get.bind()
+      }.equalUnderTheLaw(just(i), EQ)
+    }
+
   fun <F> Concurrent<F>.parMapCancelsBoth(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
     forAll(Gen.int(), Gen.int()) { a, b ->
       binding {
@@ -309,6 +334,17 @@ object ConcurrentLaws {
         s.acquireN(2L).flatMap { cancelRace }.bind()
         pa.get.bind() + pb.get.bind()
       }.equalUnderTheLaw(just(a + b), EQ)
+    }
+
+  fun <F> Concurrent<F>.parMapCanBeCancelledByParticipants(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
+    forAll(Gen.int()) { i ->
+      binding {
+        val latch = Promise<F, Int>(this@parMapCanBeCancelledByParticipants).bind()
+        val cancel = asyncF<Unit> { conn, cb -> conn.cancel().map { cb(Right(Unit)) } }
+        val loser = unit().bracket(use = { never<Int>() }, release = { latch.complete(i) })
+        parMapN(ctx, cancel, loser, ::Tuple2).startF(ctx).bind()
+        latch.get.bind()
+      }.equalUnderTheLaw(just(i), EQ)
     }
 
   fun <F> Concurrent<F>.actionConcurrentWithPureValueIsJustAction(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext): Unit =

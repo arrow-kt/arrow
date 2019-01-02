@@ -95,6 +95,18 @@ interface MonoKConcurrentInstance : Concurrent<ForMonoK>, MonoKAsyncInstance {
   override fun <A> Kind<ForMonoK, A>.startF(ctx: CoroutineContext): Kind<ForMonoK, Fiber<ForMonoK, A>> =
     fix().startF(ctx)
 
+  override fun <A> asyncF(k: ConnectedProcF<ForMonoK, A>): MonoK<A> =
+    MonoK.asyncF(k)
+
+  override fun <A> async(fa: ConnectedProc<ForMonoK, A>): MonoK<A> =
+    MonoK.async(fa)
+
+  override fun <A> asyncF(k: ProcF<ForMonoK, A>): MonoK<A> =
+    MonoK.asyncF { _, cb -> k(cb) }
+
+  override fun <A> async(fa: Proc<A>): MonoK<A> =
+    MonoK.async { _, cb -> fa(cb) }
+
   override fun <A, B> racePair(ctx: CoroutineContext, fa: Kind<ForMonoK, A>, fb: Kind<ForMonoK, B>): Kind<ForMonoK, Either<Tuple2<A, Fiber<ForMonoK, B>>, Tuple2<Fiber<ForMonoK, A>, B>>> =
     MonoK.racePair(ctx, fa, fb)
 

@@ -106,6 +106,18 @@ interface DeferredKConcurrentInstance : Concurrent<ForDeferredK>, DeferredKAsync
   override fun <A> Kind<ForDeferredK, A>.startF(ctx: CoroutineContext): DeferredK<Fiber<ForDeferredK, A>> =
     deferredStartF(ctx)
 
+  override fun <A> asyncF(k: ConnectedProcF<ForDeferredK, A>): DeferredK<A> =
+    DeferredK.asyncF(fa = k)
+
+  override fun <A> async(fa: ConnectedProc<ForDeferredK, A>): DeferredK<A> =
+    DeferredK.async(fa = fa)
+
+  override fun <A> asyncF(k: ProcF<ForDeferredK, A>): DeferredK<A> =
+    DeferredK.asyncF(fa = { _, cb -> k(cb) })
+
+  override fun <A> async(fa: Proc<A>): DeferredK<A> =
+    DeferredK.async(fa = { _, cb -> fa(cb) })
+
   override fun <A, B> racePair(ctx: CoroutineContext,
                                lh: Kind<ForDeferredK, A>,
                                rh: Kind<ForDeferredK, B>): Kind<ForDeferredK, Either<Tuple2<A, Fiber<ForDeferredK, B>>, Tuple2<Fiber<ForDeferredK, A>, B>>> =

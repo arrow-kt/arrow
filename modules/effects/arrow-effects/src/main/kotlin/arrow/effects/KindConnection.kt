@@ -54,6 +54,8 @@ sealed class KindConnection<F> {
 
   abstract fun isCanceled(): Boolean
 
+  fun isNotCanceled(): Boolean = !isCanceled()
+
   /**
    * Pushes a cancellation function, or token, meant to cancel and cleanup resources.
    * These functions are kept inside a stack, and executed in FIFO order on cancellation.

@@ -3,12 +3,30 @@ package arrow.effects.typeclasses
 import arrow.Kind
 import arrow.core.*
 import arrow.effects.Fiber
+import arrow.effects.KindConnection
 import kotlin.coroutines.CoroutineContext
+
+/** A connected asynchronous computation that might fail. **/
+typealias ConnectedProcF<F, A> = (KindConnection<F>, ((Either<Throwable, A>) -> Unit)) -> Kind<F, Unit>
+
+/** A connected asynchronous computation that might fail. **/
+typealias ConnectedProc<F, A> = (KindConnection<F>, ((Either<Throwable, A>) -> Unit)) -> Unit
 
 /**
  * Type class for async data types that are cancelable and can be started concurrently.
  */
 interface Concurrent<F> : Async<F> {
+
+  fun <A> async(fa: ConnectedProc<F, A>): Kind<F, A> =
+    asyncF { conn, cb -> delay { fa(conn, cb) } }
+
+  fun <A> asyncF(k: ConnectedProcF<F, A>): Kind<F, A>
+
+  override fun <A> asyncF(k: ProcF<F, A>): Kind<F, A> =
+    asyncF { _, cb -> k(cb) }
+
+  override fun <A> async(fa: Proc<A>): Kind<F, A> =
+    async { _, cb -> fa(cb) }
 
   /**
    * Create a new [F] that upon execution starts the receiver [F] within a [Fiber] on [ctx].

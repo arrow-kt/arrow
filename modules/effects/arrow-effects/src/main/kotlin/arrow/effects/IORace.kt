@@ -51,12 +51,16 @@ fun <A, B> IO.Companion.racePair(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<
   IO.async { conn, cb ->
     val active = AtomicBoolean(true)
 
+    val upstreamCancelToken = IO.defer { if (conn.isCanceled()) IO.unit else conn.cancel() }
+
     // Cancelable connection for the left value
     val connA = IOConnection()
+    connA.push(upstreamCancelToken)
     val promiseA = Promise.unsafe<Either<Throwable, A>>()
 
     // Cancelable connection for the right value
     val connB = IOConnection()
+    connB.push(upstreamCancelToken)
     val promiseB = Promise.unsafe<Either<Throwable, B>>()
 
     conn.pushPair(connA, connB)
