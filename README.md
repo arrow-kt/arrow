@@ -40,9 +40,9 @@ allprojects {
 }
 ```
 
-# Starting in Arrow 0.9.0 
+# Dependency breakdown starting in Arrow 0.9.0
 
-Starting in 0.9.0 Arrow follows the following convention for artifact publication.
+Starting in 0.9.0, Arrow follows the following convention for artifact publication.
 
 The arrow modules are Core, Effects, Optics, Recursion, etc.
 
