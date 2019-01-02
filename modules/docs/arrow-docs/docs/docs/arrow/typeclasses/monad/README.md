@@ -61,15 +61,13 @@ or lazily, i.e. `IO` or `ObservableK`.
 Combines two nested elements into one `Kind<F, A>`
 
 ```kotlin:ank
-ForOption extensions {
-  Some(Some(1)).flatten()
-}
+import arrow.core.extensions.option.monad.flatten
+
+Some(Some(1)).flatten()
 ```
 
 ```kotlin:ank
-ForOption extensions {
-  Some(None).flatten()
-}
+Some(None).flatten()
 ```
 
 #### mproduct
@@ -77,10 +75,10 @@ ForOption extensions {
 Like `flatMap`, but it combines the two sequential elements in a `Tuple2`.
 
 ```kotlin:ank
-ForOption extensions {
-  Some(5).mproduct {
-    Some(it * 11)
-  }
+import arrow.core.extensions.option.monad.mproduct
+
+Some(5).mproduct {
+  Some(it * 11)
 }
 ```
 
@@ -90,9 +88,9 @@ Executes sequentially two elements that are independent from one another.
 The [`Eval`]({{ '/docs/arrow/core/eval' | relative_url }}) variant allows you to pass lazily calculated values.
 
 ```kotlin:ank
-ForOption extensions {
-  Some(1).followedBy(Some(2))
-}
+import arrow.core.extensions.option.monad.followedBy
+  
+Some(1).followedBy(Some(2))
 ```
 
 #### effectM

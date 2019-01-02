@@ -2,7 +2,6 @@ package arrow.effects.rx2.extensions
 
 import arrow.core.Either
 import arrow.core.Eval
-import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.effects.rx2.ForMaybeK
 import arrow.effects.rx2.MaybeK
 import arrow.effects.rx2.MaybeKOf
@@ -126,9 +125,3 @@ interface MaybeKEffectInstance :
   override fun <A> MaybeKOf<A>.runAsync(cb: (Either<Throwable, A>) -> MaybeKOf<Unit>): MaybeK<Unit> =
     fix().runAsync(cb)
 }
-
-object MaybeKContext : MaybeKEffectInstance
-
-@Deprecated(ExtensionsDSLDeprecated)
-infix fun <A> ForMaybeK.Companion.extensions(f: MaybeKContext.() -> A): A =
-  f(MaybeKContext)

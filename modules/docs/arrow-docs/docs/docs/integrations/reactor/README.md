@@ -92,24 +92,22 @@ When rewritten using `bindingCatch` it becomes:
 ```kotlin
 import arrow.effects.reactor.*
 import arrow.typeclasses.*
+import arrow.effects.reactor.extensions.flux.monadThrow.bindingCatch
 
-ForFluxK extensions {
-  bindingCatch {
-    val songUrl = getSongUrlAsync().bind()
-    val musicPlayer = MediaPlayer.load(songUrl)
-    val totalTime = musicPlayer.getTotaltime()
+bindingCatch {
+  val songUrl = getSongUrlAsync().bind()
+  val musicPlayer = MediaPlayer.load(songUrl)
+  val totalTime = musicPlayer.getTotaltime()
     
-    val end = DirectProcessor.create<Unit>()
-    Flux.interval(Duration.ofMillis(100)).takeUntilOther(end).bind()
+  val end = DirectProcessor.create<Unit>()
+  Flux.interval(Duration.ofMillis(100)).takeUntilOther(end).bind()
     
-    val tick = musicPlayer.getCurrentTime().bind()
-    val percent = (tick / totalTime * 100).toInt()
-    if (percent >= 100) {
-      end.onNext(Unit)
-    }
-    
-    percent
-  }.fix()
+  val tick = musicPlayer.getCurrentTime().bind()
+  val percent = (tick / totalTime * 100).toInt()
+  if (percent >= 100) {
+    end.onNext(Unit)
+  }
+  percent
 }
 ```
 

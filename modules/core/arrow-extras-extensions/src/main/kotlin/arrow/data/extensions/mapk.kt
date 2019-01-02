@@ -3,7 +3,6 @@ package arrow.data.extensions
 import arrow.Kind
 import arrow.core.Eval
 import arrow.data.*
-import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.data.extensions.mapk.foldable.fold
 import arrow.data.extensions.setk.eq.eq
@@ -93,14 +92,3 @@ interface MapKHashInstance<K, A> : Hash<MapK<K, A>>, MapKEqInstance<K, A> {
       31 * hash + HA().run { a.hash() }
     }
 }
-
-class MapKContext<L> : MapKTraverseInstance<L>
-
-class MapKContextPartiallyApplied<L> {
-  @Deprecated(ExtensionsDSLDeprecated)
-  infix fun <A> extensions(f: MapKContext<L>.() -> A): A =
-    f(MapKContext())
-}
-
-fun <L> ForMapK(): MapKContextPartiallyApplied<L> =
-  MapKContextPartiallyApplied()

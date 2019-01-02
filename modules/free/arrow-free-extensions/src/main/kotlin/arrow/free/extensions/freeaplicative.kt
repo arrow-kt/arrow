@@ -2,7 +2,7 @@ package arrow.free.extensions
 
 import arrow.Kind
 import arrow.core.FunctionK
-import arrow.deprecation.ExtensionsDSLDeprecated
+
 import arrow.free.FreeApplicative
 import arrow.free.FreeApplicativePartialOf
 import arrow.free.fix
@@ -40,14 +40,3 @@ interface FreeApplicativeEq<F, G, A> : Eq<Kind<FreeApplicativePartialOf<F>, A>> 
   override fun Kind<FreeApplicativePartialOf<F>, A>.eqv(b: Kind<FreeApplicativePartialOf<F>, A>): Boolean =
     fix().foldMap(FK(), MG()) == b.fix().foldMap(FK(), MG())
 }
-
-class FreeApplicativeContext<S> : FreeApplicativeApplicativeInstance<S>
-
-class FreeApplicativeContextPartiallyApplied<S> {
-  @Deprecated(ExtensionsDSLDeprecated)
-  infix fun <A> extensions(f: FreeApplicativeContext<S>.() -> A): A =
-    f(FreeApplicativeContext())
-}
-
-fun <S> ForFreeApplicative(): FreeApplicativeContextPartiallyApplied<S> =
-  FreeApplicativeContextPartiallyApplied()

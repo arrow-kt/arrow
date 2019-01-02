@@ -6,7 +6,6 @@ import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.option.foldable.foldable
 import arrow.core.extensions.option.traverse.traverse
 import arrow.data.*
-import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.typeclasses.*
 
@@ -141,20 +140,3 @@ interface OptionTMonoidKInstance<F> : MonoidK<OptionTPartialOf<F>>, OptionTSemig
 
   override fun <A> empty(): OptionT<F, A> = OptionT(MF().just(None))
 }
-
-class OptionTContext<F>(val MF: Monad<F>) : OptionTMonadInstance<F>, OptionTMonoidKInstance<F> {
-
-  override fun MF(): Monad<F> = MF
-
-  override fun <A, B> OptionTOf<F, A>.map(f: (A) -> B): OptionT<F, B> =
-    fix().map(f)
-}
-
-class OptionTContextPartiallyApplied<F>(val MF: Monad<F>) {
-  @Deprecated(ExtensionsDSLDeprecated)
-  infix fun <A> extensions(f: OptionTContext<F>.() -> A): A =
-    f(OptionTContext(MF))
-}
-
-fun <F> ForOptionT(MF: Monad<F>): OptionTContextPartiallyApplied<F> =
-  OptionTContextPartiallyApplied(MF)

@@ -5,7 +5,7 @@ import arrow.core.Function1
 import arrow.core.Function1PartialOf
 import arrow.core.extensions.Function1MonadInstance
 import arrow.core.fix
-import arrow.deprecation.ExtensionsDSLDeprecated
+
 import arrow.extension
 import arrow.mtl.typeclasses.MonadReader
 
@@ -16,14 +16,3 @@ interface Function1MonadReaderInstance<I> : MonadReader<Function1PartialOf<I>, I
 
   override fun <A> Kind<Function1PartialOf<I>, A>.local(f: (I) -> I): Function1<I, A> = fix().local(f)
 }
-
-class Function1MtlContext<A> : Function1MonadReaderInstance<A>
-
-class Function1MtlContextPartiallyApplied<L> {
-  @Deprecated(ExtensionsDSLDeprecated)
-  infix fun <A> extensions(f: Function1MtlContext<L>.() -> A): A =
-    f(Function1MtlContext())
-}
-
-fun <L> ForForFunction1(): Function1MtlContextPartiallyApplied<L> =
-  Function1MtlContextPartiallyApplied()

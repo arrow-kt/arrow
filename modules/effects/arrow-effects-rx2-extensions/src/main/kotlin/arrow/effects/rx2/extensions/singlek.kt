@@ -1,7 +1,6 @@
 package arrow.effects.rx2.extensions
 
 import arrow.core.Either
-import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.effects.rx2.ForSingleK
 import arrow.effects.rx2.SingleK
 import arrow.effects.rx2.SingleKOf
@@ -111,9 +110,3 @@ interface SingleKConcurrentEffectInstance : ConcurrentEffect<ForSingleK>, Single
   override fun <A> SingleKOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> SingleKOf<Unit>): SingleK<Disposable> =
     fix().runAsyncCancellable(cb)
 }
-
-object SingleKContext : SingleKConcurrentEffectInstance
-
-@Deprecated(ExtensionsDSLDeprecated)
-infix fun <A> ForSingleK.Companion.extensions(f: SingleKContext.() -> A): A =
-  f(SingleKContext)

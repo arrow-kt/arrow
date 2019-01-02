@@ -2,7 +2,7 @@ package arrow.data.extensions
 
 import arrow.core.*
 import arrow.data.*
-import arrow.deprecation.ExtensionsDSLDeprecated
+
 import arrow.extension
 import arrow.core.extensions.id.monad.monad
 import arrow.data.extensions.statet.applicative.applicative
@@ -128,32 +128,3 @@ fun <S> StateApi.functor(): Functor<StateTPartialOf<ForId, S>> = StateT.functor(
  * Alias for [StateT.Companion.monad]
  */
 fun <S> StateApi.monad(): Monad<StateTPartialOf<ForId, S>> = StateT.monad(Id.monad())
-
-class StateTContext<F, S, E>(val ME: MonadError<F, E>) : StateTMonadErrorInstance<F, S, E> {
-  override fun MF(): Monad<F> = ME()
-
-  override fun ME(): MonadError<F, E> = ME
-}
-
-class StateTContextPartiallyApplied<F, S, E>(val ME: MonadError<F, E>) {
-  @Deprecated(ExtensionsDSLDeprecated)
-  infix fun <A> extensions(f: StateTContext<F, S, E>.() -> A): A =
-    f(StateTContext(ME))
-}
-
-fun <F, S, E> ForStateT(ME: MonadError<F, E>): StateTContextPartiallyApplied<F, S, E> =
-  StateTContextPartiallyApplied(ME)
-
-class StateTMonadContext<S> : StateTMonadInstance<ForId, S> {
-  override fun MF(): Monad<ForId> = Id.monad()
-}
-
-class StateContextPartiallyApplied<S>() {
-  @Deprecated(ExtensionsDSLDeprecated)
-  infix fun <A> extensions(f: StateTMonadContext<S>.() -> A): A =
-    f(StateTMonadContext())
-}
-
-fun <S> ForState(): StateContextPartiallyApplied<S> =
-  StateContextPartiallyApplied()
-

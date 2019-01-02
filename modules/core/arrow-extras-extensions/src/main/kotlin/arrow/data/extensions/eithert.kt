@@ -6,7 +6,6 @@ import arrow.core.extensions.either.foldable.foldable
 import arrow.core.extensions.either.monad.monad
 import arrow.core.extensions.either.traverse.traverse
 import arrow.data.*
-import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.typeclasses.*
 
@@ -143,18 +142,3 @@ fun <F, A, B, G, C> EitherTOf<F, A, B>.traverse(FF: Traverse<F>, GA: Applicative
 
 fun <F, G, A, B> EitherTOf<F, A, Kind<G, B>>.sequence(FF: Traverse<F>, GA: Applicative<G>): Kind<G, EitherT<F, A, B>> =
   traverse(FF, GA, ::identity)
-
-class EitherTContext<F, E>(val MF: MonadError<F, E>) : EitherTMonadErrorInstance<F, E>, EitherTSemigroupKInstance<F, E> {
-  override fun FF(): Functor<F> = MF
-  override fun MF(): Monad<F> = MF
-  override fun AE(): ApplicativeError<F, E> = MF
-}
-
-class EitherTContextPartiallyApplied<F, E>(val MF: MonadError<F, E>) {
-  @Deprecated(ExtensionsDSLDeprecated)
-  infix fun <A> extensions(f: EitherTContext<F, E>.() -> A): A =
-    f(EitherTContext(MF))
-}
-
-fun <F, E> ForEitherT(MF: MonadError<F, E>): EitherTContextPartiallyApplied<F, E> =
-  EitherTContextPartiallyApplied(MF)

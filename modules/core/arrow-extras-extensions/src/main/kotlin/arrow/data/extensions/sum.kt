@@ -4,7 +4,7 @@ import arrow.Kind
 import arrow.data.Sum
 import arrow.data.SumPartialOf
 import arrow.data.fix
-import arrow.deprecation.ExtensionsDSLDeprecated
+
 import arrow.extension
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Eq
@@ -62,17 +62,3 @@ interface SumHashInstance<F, G, A> : Hash<Sum<F, G, A>>, SumEqInstance<F, G, A> 
 
   override fun Sum<F, G, A>.hash(): Int = 31 * HF().run { left.hash() } + HG().run { right.hash() }
 }
-
-class SumContext<F, G>(val CF: Comonad<F>, val CG: Comonad<G>) : SumComonadInstance<F, G> {
-  override fun CF(): Comonad<F> = CF
-  override fun CG(): Comonad<G> = CG
-}
-
-class SumContextPartiallyApplied<F, G>(val CF: Comonad<F>, val CG: Comonad<G>) {
-  @Deprecated(ExtensionsDSLDeprecated)
-  infix fun <A> extensions(f: SumContext<F, G>.() -> A): A =
-      f(SumContext(CF, CG))
-}
-
-fun <F, G> ForSum(CF: Comonad<F>, CG: Comonad<G>): SumContextPartiallyApplied<F, G> =
-  SumContextPartiallyApplied(CF, CG)

@@ -5,10 +5,7 @@ import arrow.core.Either
 import arrow.core.Option
 import arrow.core.Tuple2
 import arrow.data.*
-import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
-import arrow.data.extensions.ListKMonoidKInstance
-import arrow.data.extensions.ListKTraverseInstance
 import arrow.mtl.typeclasses.FunctorFilter
 import arrow.mtl.typeclasses.MonadCombine
 import arrow.mtl.typeclasses.MonadFilter
@@ -80,17 +77,3 @@ interface ListKMonadFilterInstance : MonadFilter<ForListK> {
     ListK.just(a)
 }
 
-object ListKMtlContext : ListKMonadCombineInstance, ListKTraverseInstance, ListKMonoidKInstance {
-  override fun <A> empty(): ListK<A> =
-    ListK.empty()
-
-  override fun <A> Kind<ForListK, A>.combineK(y: Kind<ForListK, A>): ListK<A> =
-    fix().listCombineK(y)
-
-  override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B> =
-    fix().map(f)
-}
-
-@Deprecated(ExtensionsDSLDeprecated)
-infix fun <A> ForListK.Companion.extensions(f: ListKMtlContext.() -> A): A =
-  f(ListKMtlContext)

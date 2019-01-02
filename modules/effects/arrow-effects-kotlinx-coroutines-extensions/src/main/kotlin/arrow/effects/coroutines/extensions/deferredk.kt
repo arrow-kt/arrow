@@ -3,7 +3,6 @@ package arrow.effects.coroutines.extensions
 
 import arrow.Kind
 import arrow.core.Either
-import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.effects.OnCancel
 import arrow.effects.coroutines.*
 import arrow.effects.coroutines.extensions.deferredk.applicative.applicative
@@ -113,9 +112,3 @@ interface DeferredKConcurrentEffectInstance : ConcurrentEffect<ForDeferredK>, De
   override fun <A> DeferredKOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> Kind<ForDeferredK, Unit>): DeferredK<Disposable> =
     fix().runAsyncCancellable(onCancel = OnCancel.ThrowCancellationException, cb = cb)
 }
-
-object DeferredKContext : DeferredKConcurrentEffectInstance
-
-@Deprecated(ExtensionsDSLDeprecated)
-infix fun <A> ForDeferredK.Companion.extensions(f: DeferredKContext.() -> A): A =
-  f(DeferredKContext)

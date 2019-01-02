@@ -5,10 +5,7 @@ import arrow.core.Either
 import arrow.core.Option
 import arrow.core.Tuple2
 import arrow.data.*
-import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
-import arrow.data.extensions.SequenceKMonoidKInstance
-import arrow.data.extensions.SequenceKTraverseInstance
 import arrow.mtl.typeclasses.FunctorFilter
 import arrow.mtl.typeclasses.MonadCombine
 import arrow.mtl.typeclasses.MonadFilter
@@ -79,18 +76,3 @@ interface SequenceKMonadFilterInstance : MonadFilter<ForSequenceK> {
   override fun <A> just(a: A): SequenceK<A> =
     SequenceK.just(a)
 }
-
-object SequenceKMtlContext : SequenceKMonadCombineInstance, SequenceKTraverseInstance, SequenceKMonoidKInstance {
-  override fun <A> empty(): SequenceK<A> =
-    SequenceK.empty()
-
-  override fun <A> Kind<ForSequenceK, A>.combineK(y: Kind<ForSequenceK, A>): SequenceK<A> =
-    fix().sequenceCombineK(y)
-
-  override fun <A, B> Kind<ForSequenceK, A>.map(f: (A) -> B): SequenceK<B> =
-    fix().map(f)
-}
-
-@Deprecated(ExtensionsDSLDeprecated)
-infix fun <A> ForSequenceK.Companion.extensions(f: SequenceKMtlContext.() -> A): A =
-  f(SequenceKMtlContext)

@@ -1,7 +1,6 @@
 package arrow.core.extensions
 
 import arrow.core.*
-import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.typeclasses.*
 
@@ -76,9 +75,3 @@ interface EvalBimonadInstance : Bimonad<ForEval> {
   override fun <A> EvalOf<A>.extract(): A =
     fix().extract()
 }
-
-object EvalContext : EvalBimonadInstance
-
-@Deprecated(ExtensionsDSLDeprecated)
-infix fun <L> ForEval.Companion.extensions(f: EvalContext.() -> L): L =
-  f(EvalContext)

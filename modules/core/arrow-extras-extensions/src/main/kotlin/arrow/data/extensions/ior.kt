@@ -5,7 +5,6 @@ import arrow.Kind2
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.data.*
-import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.typeclasses.*
 import arrow.undocumented
@@ -120,20 +119,3 @@ interface IorHashInstance<L, R> : Hash<Ior<L, R>>, IorEqInstance<L, R> {
     is Ior.Both -> 31 * HL().run { leftValue.hash() } + HR().run { rightValue.hash() }
   }
 }
-
-class IorContext<L>(val SL: Semigroup<L>) : IorMonadInstance<L>, IorTraverseInstance<L> {
-
-  override fun SL(): Semigroup<L> = SL
-
-  override fun <A, B> Kind<IorPartialOf<L>, A>.map(f: (A) -> B): Ior<L, B> =
-    fix().map(f)
-}
-
-class IorContextPartiallyApplied<L>(val SL: Semigroup<L>) {
-  @Deprecated(ExtensionsDSLDeprecated)
-  infix fun <A> extensions(f: IorContext<L>.() -> A): A =
-    f(IorContext(SL))
-}
-
-fun <L> ForIor(SL: Semigroup<L>): IorContextPartiallyApplied<L> =
-  IorContextPartiallyApplied(SL)

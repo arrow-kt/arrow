@@ -3,7 +3,6 @@ package arrow.core.extensions
 
 import arrow.Kind
 import arrow.core.*
-import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.typeclasses.*
 import arrow.core.extensions.traverse as idTraverse
@@ -150,12 +149,3 @@ interface IdHashInstance<A> : Hash<Id<A>>, IdEqInstance<A> {
 
   override fun Id<A>.hash(): Int = HA().run { value().hash() }
 }
-
-object IdContext : IdBimonadInstance, IdTraverseInstance {
-  override fun <A, B> IdOf<A>.map(f: (A) -> B): Id<B> =
-    fix().map(f)
-}
-
-@Deprecated(ExtensionsDSLDeprecated)
-infix fun <L> ForId.Companion.extensions(f: IdContext.() -> L): L =
-  f(IdContext)

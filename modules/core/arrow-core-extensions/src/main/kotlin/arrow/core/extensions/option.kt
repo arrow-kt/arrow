@@ -3,7 +3,6 @@ package arrow.core.extensions
 
 import arrow.Kind
 import arrow.core.*
-import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.typeclasses.*
 import arrow.core.extensions.traverse as optionTraverse
@@ -194,12 +193,3 @@ interface OptionHashInstance<A> : Hash<Option<A>>, OptionEqInstance<A> {
     HA().run { it.hash() }
   })
 }
-
-object OptionContext : OptionMonadErrorInstance, OptionTraverseInstance {
-  override fun <A, B> OptionOf<A>.map(f: (A) -> B): Option<B> =
-    fix().map(f)
-}
-
-@Deprecated(ExtensionsDSLDeprecated)
-infix fun <A> ForOption.Companion.extensions(f: OptionContext.() -> A): A =
-  f(OptionContext)

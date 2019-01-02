@@ -3,7 +3,6 @@ package arrow.effects.rx2.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
-import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.effects.rx2.ForObservableK
 import arrow.effects.rx2.ObservableK
 import arrow.effects.rx2.ObservableKOf
@@ -159,12 +158,3 @@ fun ObservableK.Companion.monadErrorSwitch(): ObservableKMonadErrorInstance = ob
   override fun <A, B> ObservableKOf<A>.flatMap(f: (A) -> ObservableKOf<B>): ObservableK<B> =
     fix().switchMap { f(it).fix() }
 }
-
-object ObservableKContext : ObservableKConcurrentEffectInstance, ObservableKTraverseInstance {
-  override fun <A, B> ObservableKOf<A>.map(f: (A) -> B): ObservableK<B> =
-    fix().map(f)
-}
-
-@Deprecated(ExtensionsDSLDeprecated)
-infix fun <A> ForObservableK.Companion.extensions(f: ObservableKContext.() -> A): A =
-  f(ObservableKContext)

@@ -135,16 +135,15 @@ While our code looks very similar to what we had before there are some key advan
 import arrow.typeclasses.*
 import arrow.data.extensions.*
 import arrow.core.extensions.either.monadError.*
+import arrow.data.extensions.statet.monad.binding
 
 fun stackOperationsS2() =
- ForStateT<EitherPartialOf<StackError>, Stack, StackError>(Either.monadError<StackError>()) extensions {
-  binding {
+  binding<EitherPartialOf<StackError>, Stack, String>(Either.monadError<StackError>()) {
     pushS("a").bind()
     popS().bind()
     val string = popS().bind()
     string
-  }.fix()
- }
+  }
 
 stackOperationsS2().runM(Either.monad<StackError>(), listOf("hello", "world", "!"))
 ```

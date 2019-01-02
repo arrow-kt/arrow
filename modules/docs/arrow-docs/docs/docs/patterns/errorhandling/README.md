@@ -140,15 +140,14 @@ Arrow provides [monadic comprehensions]({{ '/docs/patterns/monad_comprehensions'
 ```kotlin
 import arrow.typeclasses.*
 import arrow.data.extensions.*
+import arrow.data.extensions.option.monad.binding
 
 fun attackOption(): Option<Impacted> =
-  ForOption extensions {
-    binding {
-        val nuke = arm().bind()
-        val target = aim().bind()
-        val impact = launch(target, nuke).bind()
-        impact
-    }.fix()
+  binding {
+    val nuke = arm().bind()
+    val target = aim().bind()
+    val impact = launch(target, nuke).bind()
+    impact
   }
 
 attackOption()
@@ -261,14 +260,14 @@ Except for the types signatures our program remains unchanged when we compute ov
 All values on the left side assume to be `Right` biased and whenever a `Left` value is found the computation short-circuits producing a result that is compatible with the function type signature.
 
 ```kotlin
+import arrow.core.extensions.either.monad.binding
+
 fun attackEither(): Either<NukeException, Impacted> =
-  ForEither<NukeException>() extensions {
-   binding {
+  binding {
     val nuke = arm().bind()
     val target = aim().bind()
     val impact = launch(target, nuke).bind()
     impact
-   }.fix()
   }
   
 attackEither()

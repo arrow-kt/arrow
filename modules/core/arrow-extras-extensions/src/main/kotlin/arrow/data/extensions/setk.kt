@@ -3,7 +3,7 @@ package arrow.data.extensions
 import arrow.Kind
 import arrow.core.Eval
 import arrow.data.*
-import arrow.deprecation.ExtensionsDSLDeprecated
+
 import arrow.extension
 import arrow.typeclasses.*
 import arrow.data.combineK as setCombineK
@@ -78,9 +78,3 @@ interface SetKHashInstance<A> : Hash<SetK<A>>, SetKEqInstance<A> {
     31 * hash + HA().run { a.hash() }
   }
 }
-
-object SetKContext : SetKFoldableInstance, SetKMonoidKInstance
-
-@Deprecated(ExtensionsDSLDeprecated)
-infix fun <A> ForSetK.Companion.extensions(f: SetKContext.() -> A): A =
-  f(SetKContext)

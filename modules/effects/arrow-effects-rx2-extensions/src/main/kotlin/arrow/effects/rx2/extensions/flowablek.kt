@@ -3,7 +3,6 @@ package arrow.effects.rx2.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
-import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.effects.rx2.FlowableK
 import arrow.effects.rx2.FlowableKOf
 import arrow.effects.rx2.ForFlowableK
@@ -223,12 +222,3 @@ fun FlowableK.Companion.effectLatest(): FlowableKEffectInstance = object : Flowa
 fun FlowableK.Companion.effectMissing(): FlowableKEffectInstance = object : FlowableKEffectInstance {
   override fun BS(): BackpressureStrategy = BackpressureStrategy.MISSING
 }
-
-object FlowableKContext : FlowableKConcurrentEffectInstance, FlowableKTraverseInstance {
-  override fun <A, B> FlowableKOf<A>.map(f: (A) -> B): FlowableK<B> =
-    fix().map(f)
-}
-
-@Deprecated(ExtensionsDSLDeprecated)
-infix fun <A> ForFlowableK.Companion.extensions(f: FlowableKContext.() -> A): A =
-  f(FlowableKContext)

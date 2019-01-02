@@ -7,7 +7,6 @@ import arrow.data.Coproduct
 import arrow.data.CoproductOf
 import arrow.data.CoproductPartialOf
 import arrow.data.fix
-import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.core.extensions.either.eq.eq
 import arrow.core.extensions.either.hash.hash
@@ -107,17 +106,3 @@ interface CoproductHashInstance<F, G, A> : Hash<Coproduct<F, G, A>>, CoproductEq
 
   override fun Coproduct<F, G, A>.hash(): Int = Either.hash(HF(), HG()).run { run.hash() }
 }
-
-class CoproductContext<F, G>(val TF: Traverse<F>, val TG: Traverse<G>) : CoproductTraverseInstance<F, G> {
-  override fun TF(): Traverse<F> = TF
-  override fun TG(): Traverse<G> = TG
-}
-
-class CoproductContextPartiallyApplied<F, G>(val TF: Traverse<F>, val TG: Traverse<G>) {
-  @Deprecated(ExtensionsDSLDeprecated)
-  infix fun <A> extensions(f: CoproductContext<F, G>.() -> A): A =
-    f(CoproductContext(TF, TG))
-}
-
-fun <F, G> ForCoproduct(TF: Traverse<F>, TG: Traverse<G>): CoproductContextPartiallyApplied<F, G> =
-  CoproductContextPartiallyApplied(TF, TG)

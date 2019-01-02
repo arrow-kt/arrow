@@ -2,7 +2,6 @@ package arrow.core.extensions
 
 import arrow.Kind
 import arrow.core.Eval
-import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.typeclasses.*
 import arrow.typeclasses.ap as constAp
@@ -103,19 +102,3 @@ interface ConstHashInstance<A, T> : Hash<Const<A, T>>, ConstEqInstance<A, T> {
 
   override fun Const<A, T>.hash(): Int = HA().run { value().hash() }
 }
-
-class ConstContext<A>(val MA: Monoid<A>) : ConstApplicativeInstance<A>, ConstTraverseInstance<A> {
-  override fun MA(): Monoid<A> = MA
-
-  override fun <T, U> ConstOf<A, T>.map(f: (T) -> U): Const<A, U> =
-    fix().retag()
-}
-
-class ConstContextPartiallyApplied<L>(val MA: Monoid<L>) {
-  infix fun <A> extensions(f: ConstContext<L>.() -> A): A =
-    f(ConstContext(MA))
-}
-
-@Deprecated(ExtensionsDSLDeprecated)
-fun <L> ForConst(MA: Monoid<L>): ConstContextPartiallyApplied<L> =
-  ConstContextPartiallyApplied(MA)

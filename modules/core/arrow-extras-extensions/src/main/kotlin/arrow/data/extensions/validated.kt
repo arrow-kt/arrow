@@ -3,7 +3,7 @@ package arrow.data.extensions
 import arrow.Kind
 import arrow.core.Eval
 import arrow.data.*
-import arrow.deprecation.ExtensionsDSLDeprecated
+
 import arrow.extension
 import arrow.typeclasses.*
 import arrow.undocumented
@@ -105,19 +105,3 @@ interface ValidatedHashInstance<L, R> : Hash<Validated<L, R>>, ValidatedEqInstan
     HR().run { it.hash() }
   })
 }
-
-class ValidatedContext<L>(val SL: Semigroup<L>) : ValidatedApplicativeErrorInstance<L>, ValidatedTraverseInstance<L>, ValidatedSemigroupKInstance<L> {
-  override fun SE(): Semigroup<L> = SL
-
-  override fun <A, B> Kind<ValidatedPartialOf<L>, A>.map(f: (A) -> B): Validated<L, B> =
-    fix().map(f)
-}
-
-class ValidatedContextPartiallyApplied<L>(val SL: Semigroup<L>) {
-  @Deprecated(ExtensionsDSLDeprecated)
-  infix fun <A> extensions(f: ValidatedContext<L>.() -> A): A =
-    f(ValidatedContext(SL))
-}
-
-fun <L> ForValidated(SL: Semigroup<L>): ValidatedContextPartiallyApplied<L> =
-  ValidatedContextPartiallyApplied(SL)

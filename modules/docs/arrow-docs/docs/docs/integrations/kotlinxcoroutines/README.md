@@ -124,20 +124,16 @@ These benefits include capturing all exceptions that happen inside the block.
 ```kotlin
 import arrow.effects.coroutines.*
 import arrow.typeclasses.*
+import arrow.effects.coroutines.extensions.deferred.monadThrow.bindingCatch
 
-ForDeferredK extensions { 
-  bindingCatch {
-      val songUrl = getSongUrlAsync().bind()
-      val musicPlayer = MediaPlayer.load(songUrl)
-      val totalTime = musicPlayer.getTotaltime() // Oh oh, total time is 0
-    
-      val timelineClick = audioTimeline.click().bind()
-    
-      val percent = (timelineClick / totalTime * 100).toInt()
-    
-      percent
-  }.unsafeAttemptSync()
-}
+bindingCatch {
+  val songUrl = getSongUrlAsync().bind()
+  val musicPlayer = MediaPlayer.load(songUrl)
+  val totalTime = musicPlayer.getTotaltime() // Oh oh, total time is 0  
+  val timelineClick = audioTimeline.click().bind()   
+  val percent = (timelineClick / totalTime * 100).toInt()
+  percent
+}.unsafeAttemptSync()
  // Failure(ArithmeticException("/ by zero"))
 ```
 

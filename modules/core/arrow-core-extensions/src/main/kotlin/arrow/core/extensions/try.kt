@@ -4,7 +4,6 @@ package arrow.core.extensions
 import arrow.Kind
 import arrow.core.*
 import arrow.core.Try.Failure
-import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.typeclasses.*
 import arrow.core.extensions.traverse as tryTraverse
@@ -173,12 +172,3 @@ interface TryHashInstance<A> : Hash<Try<A>>, TryEqInstance<A> {
     HA().run { it.hash() }
   })
 }
-
-object TryContext : TryMonadErrorInstance, TryTraverseInstance {
-  override fun <A, B> TryOf<A>.map(f: (A) -> B): Try<B> =
-    fix().map(f)
-}
-
-@Deprecated(ExtensionsDSLDeprecated)
-infix fun <A> ForTry.Companion.extensions(f: TryContext.() -> A): A =
-  f(TryContext)

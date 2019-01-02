@@ -3,7 +3,6 @@ package arrow.data.extensions
 import arrow.Kind
 import arrow.core.*
 import arrow.data.*
-import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.data.extensions.listk.foldable.foldLeft
 import arrow.typeclasses.*
@@ -138,45 +137,3 @@ interface ListKHashInstance<A> : Hash<ListKOf<A>>, ListKEqInstance<A> {
     31 * hash + HA().run { a.hash() }
   }
 }
-
-object ListKContext : ListKMonadInstance, ListKTraverseInstance, ListKMonoidKInstance {
-  override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B> =
-    fix().map(f)
-}
-
-@Deprecated(ExtensionsDSLDeprecated)
-infix fun <A> ForListK.Companion.extensions(f: ListKContext.() -> A): A =
-  f(ListKContext)
-
-//object test {
-//
-//  // dog names can be treated as unique IDs here
-//  data class Dog(val id: String, val owner: String)
-//
-//
-//  val dogsAreCute: List<Pair<Dog, Boolean>> = listOf(
-//    Dog("Kessi", "Marc") to true,
-//    Dog("Rocky", "Martin") to false,
-//    Dog("Molly", "Martin") to true
-//  )
-//
-//  // loaded by the backend, so can contain new data
-//  val newDogs: List<Dog> = listOf(
-//    Dog("Kessi", "Marc"),
-//    Dog("Rocky", "Marc"),
-//    Dog("Buddy", "Martin")
-//  )
-//
-//  // this should be the result: a union that preserves the extra Boolean, but replaces dogs by
-//  // their new updated data
-//  val expected = listOf(
-//    newDogs[0] to true,
-//    newDogs[1] to false
-//  )
-//
-//  @JvmStatic
-//  fun main(args: Array<String>) {
-//    val actual = dogsAreCute.zip(newDogs)
-//    println(actual)
-//  }
-//}

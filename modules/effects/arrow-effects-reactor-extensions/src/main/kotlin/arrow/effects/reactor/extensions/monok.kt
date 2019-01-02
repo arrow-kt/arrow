@@ -1,7 +1,6 @@
 package arrow.effects.reactor.extensions
 
 import arrow.core.Either
-import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.effects.reactor.ForMonoK
 import arrow.effects.typeclasses.*
 import arrow.extension
@@ -103,9 +102,3 @@ interface MonoKConcurrentEffectInstance : ConcurrentEffect<ForMonoK>, MonoKEffec
   override fun <A> MonoKOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> MonoKOf<Unit>): MonoK<Disposable> =
     fix().runAsyncCancellable(cb)
 }
-
-object MonoKContext : MonoKConcurrentEffectInstance
-
-@Deprecated(ExtensionsDSLDeprecated)
-infix fun <A> ForMonoK.Companion.extensions(f: MonoKContext.() -> A): A =
-  f(MonoKContext)

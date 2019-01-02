@@ -3,7 +3,6 @@ package arrow.effects.reactor.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
-import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.effects.reactor.extensions.fluxk.monad.monad
 import arrow.effects.reactor.extensions.fluxk.monadError.monadError
 import arrow.effects.typeclasses.*
@@ -167,12 +166,3 @@ fun FluxK.Companion.monadErrorSwitch(): FluxKMonadErrorInstance = object : FluxK
   override fun <A, B> FluxKOf<A>.flatMap(f: (A) -> FluxKOf<B>): FluxK<B> =
     fix().switchMap { f(it).fix() }
 }
-
-object FluxKContext : FluxKConcurrentEffectInstance, FluxKTraverseInstance {
-  override fun <A, B> FluxKOf<A>.map(f: (A) -> B): FluxK<B> =
-    fix().map(f)
-}
-
-@Deprecated(ExtensionsDSLDeprecated)
-infix fun <A> ForFluxK.Companion.extensions(f: FluxKContext.() -> A): A =
-  f(FluxKContext)

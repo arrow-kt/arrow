@@ -124,9 +124,9 @@ When rewritten using `bindingCatch` it becomes:
 ```kotlin
 import arrow.effects.rx2.*
 import arrow.typeclasses.*
+import arrow.effects.rx2.extensions.observable.monadThrow.bindingCatch
 
-ForObservableK extensions { 
- bindingCatch {
+bindingCatch {
   val songUrl = getSongUrlAsync().bind()
   val musicPlayer = MediaPlayer.load(songUrl)
   val totalTime = musicPlayer.getTotaltime()
@@ -141,7 +141,6 @@ ForObservableK extensions {
   }
 
   percent
- }.fix()
 }
 ```
 

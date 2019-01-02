@@ -1,7 +1,7 @@
 package arrow.free.extensions
 
 import arrow.Kind
-import arrow.deprecation.ExtensionsDSLDeprecated
+
 import arrow.free.Cofree
 import arrow.free.CofreeOf
 import arrow.free.CofreePartialOf
@@ -25,14 +25,3 @@ interface CofreeComonadInstance<S> : Comonad<CofreePartialOf<S>>, CofreeFunctorI
 
   override fun <A> Kind<CofreePartialOf<S>, A>.duplicate(): Kind<CofreePartialOf<S>, Cofree<S, A>> = fix().duplicate()
 }
-
-class CofreeContext<S> : CofreeComonadInstance<S>
-
-class CofreeContextPartiallyApplied<S> {
-  @Deprecated(ExtensionsDSLDeprecated)
-  infix fun <A> extensions(f: CofreeContext<S>.() -> A): A =
-    f(CofreeContext())
-}
-
-fun <S> ForCofree(): CofreeContextPartiallyApplied<S> =
-  CofreeContextPartiallyApplied()

@@ -2,9 +2,6 @@ package arrow.mtl.extensions
 
 import arrow.Kind
 import arrow.core.*
-import arrow.core.extensions.OptionMonoidKInstance
-import arrow.core.extensions.OptionTraverseInstance
-import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.mtl.typeclasses.FunctorFilter
 import arrow.mtl.typeclasses.MonadCombine
@@ -112,18 +109,3 @@ interface OptionMonadFilterInstance : MonadFilter<ForOption> {
   override fun <A> just(a: A): Option<A> =
     Option.just(a)
 }
-
-object OptionMtlContext : OptionMonadCombineInstance, OptionTraverseInstance, OptionMonoidKInstance {
-  override fun <A> empty(): Option<A> =
-    Option.empty()
-
-  override fun <A> Kind<ForOption, A>.combineK(y: Kind<ForOption, A>): Option<A> =
-    orElse { y.fix() }
-
-  override fun <A, B> Kind<ForOption, A>.map(f: (A) -> B): Option<B> =
-    fix().map(f)
-}
-
-@Deprecated(ExtensionsDSLDeprecated)
-infix fun <A> ForOption.Companion.extensions(f: OptionMtlContext.() -> A): A =
-  f(OptionMtlContext)

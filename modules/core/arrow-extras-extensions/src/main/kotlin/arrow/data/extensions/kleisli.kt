@@ -3,7 +3,6 @@ package arrow.data.extensions
 import arrow.Kind
 import arrow.core.*
 import arrow.data.*
-import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.core.extensions.id.applicative.applicative
 import arrow.core.extensions.id.functor.functor
@@ -117,29 +116,3 @@ fun <D> ReaderApi.applicative(): Applicative<ReaderPartialOf<D>> = Kleisli.appli
  * Alias for [Kleisli] for [Id]
  */
 fun <D> ReaderApi.monad(): Monad<ReaderPartialOf<D>> = Kleisli.monad(Id.monad())
-
-class ReaderContext<D> : KleisliMonadInstance<ForId, D> {
-  override fun MF(): Monad<ForId> = Id.monad()
-}
-
-class ReaderContextPartiallyApplied<L> {
-  @Deprecated(ExtensionsDSLDeprecated)
-  inline fun <A> extensions(f: ReaderContext<L>.() -> A): A =
-    f(ReaderContext())
-}
-
-fun <D> Reader(): ReaderContextPartiallyApplied<D> =
-  ReaderContextPartiallyApplied()
-
-class KleisliContext<F, D, E>(val ME: MonadError<F, E>) : KleisliMonadErrorInstance<F, D, E> {
-  override fun ME(): MonadError<F, E> = ME
-}
-
-class KleisliContextPartiallyApplied<F, D, E>(val MF: MonadError<F, E>) {
-  @Deprecated(ExtensionsDSLDeprecated)
-  infix fun <A> extensions(f: KleisliContext<F, D, E>.() -> A): A =
-    f(KleisliContext(MF))
-}
-
-fun <F, D, E> ForKleisli(MF: MonadError<F, E>): KleisliContextPartiallyApplied<F, D, E> =
-  KleisliContextPartiallyApplied(MF)

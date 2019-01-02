@@ -4,13 +4,12 @@ import arrow.Kind
 import arrow.core.toT
 import arrow.data.StateT
 import arrow.data.StateTPartialOf
-import arrow.data.extensions.*
-import arrow.deprecation.ExtensionsDSLDeprecated
+import arrow.data.extensions.StateTMonadInstance
+import arrow.data.extensions.StateTSemigroupKInstance
 import arrow.extension
 import arrow.mtl.typeclasses.MonadCombine
 import arrow.mtl.typeclasses.MonadState
 import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadError
 import arrow.typeclasses.SemigroupK
 
 @extension
@@ -41,20 +40,3 @@ interface StateTMonadCombineInstance<F, S> : MonadCombine<StateTPartialOf<F, S>>
     StateT(just({ s: S -> ma.map { a: A -> s toT a } }))
   }
 }
-
-class StateTMtlContext<F, S, E>(val ME: MonadError<F, E>) : StateTMonadStateInstance<F, S>, StateTMonadErrorInstance<F, S, E> {
-
-  override fun MF(): Monad<F> = ME
-
-  override fun ME(): MonadError<F, E> = ME
-
-}
-
-class StateTMtlContextPartiallyApplied<F, S, E>(val ME: MonadError<F, E>) {
-  @Deprecated(ExtensionsDSLDeprecated)
-  infix fun <A> extensions(f: StateTMtlContext<F, S, E>.() -> A): A =
-    f(StateTMtlContext(ME))
-}
-
-fun <F, S, E> ForStateT(ME: MonadError<F, E>): StateTMtlContextPartiallyApplied<F, S, E> =
-  StateTMtlContextPartiallyApplied(ME)

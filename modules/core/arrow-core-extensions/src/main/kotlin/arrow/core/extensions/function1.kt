@@ -2,7 +2,6 @@ package arrow.core.extensions
 
 import arrow.Kind
 import arrow.core.*
-import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.typeclasses.*
 
@@ -78,15 +77,3 @@ interface Function1CategoryInstance : Category<ForFunction1> {
 
   override fun <A, B, C> Function1Of<B, C>.compose(arr: Function1Of<A, B>): Function1Of<A, C> = fix().compose(arr.fix())
 }
-
-class Function1Context<A> : Function1MonadInstance<A>
-
-class Function1ContextPartiallyApplied<L> {
-  infix fun <A> extensions(f: Function1Context<L>.() -> A): A =
-    f(Function1Context())
-}
-
-@Deprecated(ExtensionsDSLDeprecated)
-fun <L> ForFunction1(): Function1ContextPartiallyApplied<L> =
-  Function1ContextPartiallyApplied()
-

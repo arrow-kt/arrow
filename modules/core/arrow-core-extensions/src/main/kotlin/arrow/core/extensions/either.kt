@@ -3,7 +3,6 @@ package arrow.core.extensions
 
 import arrow.Kind
 import arrow.core.*
-import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.extension
 import arrow.typeclasses.*
 import arrow.core.ap as eitherAp
@@ -169,17 +168,3 @@ interface EitherHashInstance<L, R> : Hash<Either<L, R>>, EitherEqInstance<L, R> 
     HR().run { it.hash() }
   })
 }
-
-class EitherContext<L> : EitherMonadErrorInstance<L>, EitherTraverseInstance<L>, EitherSemigroupKInstance<L> {
-  override fun <A, B> EitherOf<L, A>.map(f: (A) -> B): Either<L, B> =
-    fix().map(f)
-}
-
-class EitherContextPartiallyApplied<L> {
-  infix fun <A> extensions(f: EitherContext<L>.() -> A): A =
-    f(EitherContext())
-}
-
-@Deprecated(ExtensionsDSLDeprecated)
-fun <L> ForEither(): EitherContextPartiallyApplied<L> =
-  EitherContextPartiallyApplied()

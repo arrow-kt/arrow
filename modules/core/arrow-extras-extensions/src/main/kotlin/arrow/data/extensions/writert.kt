@@ -4,7 +4,7 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.toT
 import arrow.data.*
-import arrow.deprecation.ExtensionsDSLDeprecated
+
 import arrow.extension
 import arrow.typeclasses.*
 import arrow.undocumented
@@ -117,18 +117,3 @@ interface WriterTMonoidKInstance<F, W> : MonoidK<WriterTPartialOf<F, W>>, Writer
 
   override fun <A> empty(): WriterT<F, W, A> = WriterT(MF().empty())
 }
-
-class WriterTContext<F, W>(val MF: Monad<F>, val MW: Monoid<W>) : WriterTMonadInstance<F, W> {
-  override fun FF(): Functor<F> = MF
-  override fun MF(): Monad<F> = MF
-  override fun MM(): Monoid<W> = MW
-}
-
-class WriterTContextPartiallyApplied<F, W>(val MF: Monad<F>, val MW: Monoid<W>) {
-  @Deprecated(ExtensionsDSLDeprecated)
-  infix fun <A> extensions(f: WriterTContext<F, W>.() -> A): A =
-    f(WriterTContext(MF, MW))
-}
-
-fun <F, W> ForWriterT(MF: Monad<F>, MW: Monoid<W>): WriterTContextPartiallyApplied<F, W> =
-  WriterTContextPartiallyApplied(MF, MW)
