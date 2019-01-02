@@ -1,16 +1,16 @@
 package arrow.effects
 
 import arrow.Kind
-import arrow.effects.instances.io.applicative.applicative
-import arrow.effects.instances.io.applicativeError.handleError
-import arrow.effects.instances.io.async.async
-import arrow.effects.instances.io.monad.flatMap
-import arrow.effects.instances.io.monad.map
+import arrow.effects.extensions.io.applicative.applicative
+import arrow.effects.extensions.io.applicativeError.handleError
+import arrow.effects.extensions.io.async.async
+import arrow.effects.extensions.io.monad.flatMap
+import arrow.effects.extensions.io.monad.map
 import arrow.effects.typeclasses.seconds
-import arrow.instances.either.eq.eq
-import arrow.instances.eq
-import arrow.instances.list.traverse.traverse
-import arrow.instances.option.eq.eq
+import arrow.core.extensions.either.eq.eq
+import arrow.core.extensions.eq
+import arrow.data.extensions.list.traverse.traverse
+import arrow.core.extensions.option.eq.eq
 import arrow.test.UnitSpec
 import arrow.test.laws.equalUnderTheLaw
 import arrow.typeclasses.Eq

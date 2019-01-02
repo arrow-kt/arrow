@@ -2,9 +2,9 @@ package arrow.optics
 
 import arrow.core.*
 import arrow.data.ListK
-import arrow.instances.monoid
-import arrow.instances.listk.eq.eq
-import arrow.instances.option.eq.eq
+import arrow.core.extensions.monoid
+import arrow.data.extensions.listk.eq.eq
+import arrow.core.extensions.option.eq.eq
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genTuple

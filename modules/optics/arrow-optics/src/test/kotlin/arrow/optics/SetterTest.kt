@@ -2,7 +2,7 @@ package arrow.optics
 
 import arrow.core.*
 import arrow.data.*
-import arrow.instances.option.functor.functor
+import arrow.core.extensions.option.functor.functor
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genOption

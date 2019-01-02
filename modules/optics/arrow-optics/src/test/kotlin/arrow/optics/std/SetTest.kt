@@ -2,7 +2,7 @@ package arrow.optics
 
 import arrow.data.SetK
 import arrow.core.SetInstances
-import arrow.instances.setk.monoid.monoid
+import arrow.data.extensions.setk.monoid.monoid
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genSetK

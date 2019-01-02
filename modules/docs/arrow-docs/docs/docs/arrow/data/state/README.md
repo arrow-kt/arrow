@@ -95,7 +95,7 @@ The `flatMap` method on `State<S, A>` lets you use the result of one `State` in 
 
 ```kotlin:ank:silent
 import arrow.typeclasses.*
-import arrow.instances.*
+import arrow.data.extensions.*
 
 fun stackOperations() = ForState<Stack>() extensions {
   binding {

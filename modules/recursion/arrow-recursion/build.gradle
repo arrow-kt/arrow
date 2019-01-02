@@ -1,0 +1,7 @@
+dependencies {
+    compile project(':arrow-recursion-data')
+    compile project(':arrow-recursion-extensions')
+}
+
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
+apply plugin: 'kotlin-kapt'

@@ -1,14 +1,15 @@
 package arrow.effects
 
-import arrow.effects.singlek.applicative.applicative
-import arrow.effects.singlek.applicativeError.applicativeError
-import arrow.effects.singlek.async.async
-import arrow.effects.singlek.effect.effect
-import arrow.effects.singlek.functor.functor
-import arrow.effects.singlek.monad.flatMap
-import arrow.effects.singlek.monad.monad
-import arrow.effects.singlek.monadError.monadError
-import arrow.effects.singlek.monadThrow.bindingCatch
+import arrow.effects.rx2.*
+import arrow.effects.rx2.extensions.singlek.applicative.applicative
+import arrow.effects.rx2.extensions.singlek.applicativeError.applicativeError
+import arrow.effects.rx2.extensions.singlek.async.async
+import arrow.effects.rx2.extensions.singlek.effect.effect
+import arrow.effects.rx2.extensions.singlek.functor.functor
+import arrow.effects.rx2.extensions.singlek.monad.flatMap
+import arrow.effects.rx2.extensions.singlek.monad.monad
+import arrow.effects.rx2.extensions.singlek.monadError.monadError
+import arrow.effects.rx2.extensions.singlek.monadThrow.bindingCatch
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
 import arrow.test.laws.*

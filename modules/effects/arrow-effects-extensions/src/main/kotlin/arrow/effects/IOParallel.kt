@@ -1,7 +1,7 @@
 package arrow.effects
 
 import arrow.core.*
-import arrow.effects.instances.io.concurrentEffect.concurrentEffect
+import arrow.effects.extensions.io.concurrentEffect.concurrentEffect
 import arrow.effects.internal.Platform.onceOnly
 import arrow.effects.internal.parMapCancellable2
 import arrow.effects.internal.parMapCancellable3

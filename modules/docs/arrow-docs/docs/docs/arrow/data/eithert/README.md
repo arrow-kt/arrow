@@ -69,8 +69,8 @@ that enables monad comprehensions for all datatypes for which a monad instance i
 
 ```kotlin:ank
 import arrow.typeclasses.*
-import arrow.instances.*
-import arrow.instances.either.monad.*
+import arrow.data.extensions.*
+import arrow.core.extensions.either.monad.*
 
 fun getCountryCode(maybePerson : Either<BizError, Person>): Either<BizError, String> =
   binding<BizError, String> {
@@ -216,7 +216,7 @@ eitherTVal.value()
 So how would our function look if we implemented it with the EitherT monad transformer?
 
 ```kotlin
-import arrow.instances.eithert.monad.*
+import arrow.core.extensions.eithert.monad.*
 
 fun getCountryCode(personId: Int): ObservableK<Either<BizError, String>> =
   EitherT.monad<ForObservableK, BizError>(ObservableK.monad()).binding {
@@ -236,7 +236,7 @@ Here we no longer have to deal with the `Left` cases, and the binding to the val
 As `EitherT<F, A ,B>` allows to manipulate the nested `Either` structure, it provides a `mapLeft` method to map over the left element of nested Eithers.
 
 ```kotlin:ank
-import arrow.instances.option.functor.*
+import arrow.core.extensions.option.functor.*
 
 EitherT(Option(3.left())).mapLeft(Option.functor(), {it + 1})
 ```

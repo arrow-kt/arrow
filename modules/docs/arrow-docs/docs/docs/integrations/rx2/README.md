@@ -163,7 +163,7 @@ Note that [`MonadDefer`]({{ '/docs/effects/monaddefer' | relative_url }}) provid
 Invoking this `Disposable` causes an `BindingCancellationException` in the chain which needs to be handled by the subscriber, similarly to what `Deferred` does.
 
 ```kotlin
-import arrow.effects.instances.observable.monad.*
+import arrow.effects.extensions.observable.monad.*
 
 val (observable, disposable) =
   bindingCancellable {

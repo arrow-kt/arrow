@@ -51,7 +51,7 @@ that enables monad comprehensions for all datatypes for which a monad instance i
 
 ```kotlin:ank
 import arrow.typeclasses.*
-import arrow.instances.*
+import arrow.data.extensions.*
 
 fun getCountryCode(maybePerson : Option<Person>): Option<String> =
   ForOption extensions {

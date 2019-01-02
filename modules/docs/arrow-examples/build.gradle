@@ -23,17 +23,17 @@ idea {
 }
 
 dependencies {
-    compile project(':arrow-instances-data')
+    compile project(':arrow-extras-extensions')
     compile project(':arrow-effects-extensions')
     compile project(':arrow-effects-rx2-extensions')
     compile project(':arrow-effects-kotlinx-coroutines-extensions')
     compile project(':arrow-optics')
     compile project(':arrow-validation')
 
-    kapt project(':arrow-annotations-processor')
-    kaptTest project(':arrow-annotations-processor')
-    compileOnly project(':arrow-annotations-processor')
-    testCompileOnly project(':arrow-annotations-processor')
+    kapt project(':arrow-meta')
+    kaptTest project(':arrow-meta')
+    compileOnly project(':arrow-meta')
+    testCompileOnly project(':arrow-meta')
 
     testCompile project(':arrow-test')
 

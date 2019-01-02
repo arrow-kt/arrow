@@ -1,11 +1,16 @@
 package arrow.effects
 
-import arrow.effects.flowablek.async.async
-import arrow.effects.flowablek.foldable.foldable
-import arrow.effects.flowablek.functor.functor
-import arrow.effects.flowablek.monadThrow.bindingCatch
-import arrow.effects.flowablek.traverse.traverse
-import arrow.effects.flowablek.monad.flatMap
+import arrow.effects.rx2.*
+import arrow.effects.rx2.extensions.asyncDrop
+import arrow.effects.rx2.extensions.asyncError
+import arrow.effects.rx2.extensions.asyncLatest
+import arrow.effects.rx2.extensions.asyncMissing
+import arrow.effects.rx2.extensions.flowablek.async.async
+import arrow.effects.rx2.extensions.flowablek.foldable.foldable
+import arrow.effects.rx2.extensions.flowablek.functor.functor
+import arrow.effects.rx2.extensions.flowablek.monad.flatMap
+import arrow.effects.rx2.extensions.flowablek.monadThrow.bindingCatch
+import arrow.effects.rx2.extensions.flowablek.traverse.traverse
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws

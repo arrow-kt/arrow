@@ -45,8 +45,8 @@ Example:
 
 ```kotlin:ank
 import arrow.core.*
-import arrow.instances.*
-import arrow.instances.function1.profunctor.*
+import arrow.data.extensions.*
+import arrow.core.extensions.function1.profunctor.*
 
 val fab: Function1<Double, Double> = { x: Double -> x * 3 }.k()
 val f: (Int) -> Double = { x -> x.toDouble() / 2 }  
@@ -66,7 +66,7 @@ Contramap on the first type parameter and map on the second type parameter
 
 ```kotlin:ank
 import arrow.core.*
-import arrow.instances.*
+import arrow.data.extensions.*
 
 val f: Function1<Int, Int> = { x: Int -> x + 10 }.k()
 val fl: (String) -> Int = { x -> x.toInt() }

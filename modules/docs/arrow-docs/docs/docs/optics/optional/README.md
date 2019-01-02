@@ -51,7 +51,7 @@ lifted(emptyList<Int>().k())
 Or modify or lift functions using `Applicative`
 
 ```kotlin:ank
-import arrow.instances.`try`.applicative.*
+import arrow.core.extensions.`try`.applicative.*
 
 ListK.head<Int>().modifyF(Try.applicative(), listOf(1, 3, 6).k()) { head ->
     Try { head / 2 }

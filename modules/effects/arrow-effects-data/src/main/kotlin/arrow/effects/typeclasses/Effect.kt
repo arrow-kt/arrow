@@ -10,7 +10,7 @@ import arrow.effects.IO
 interface Effect<F> : Async<F> {
   fun <A> Kind<F, A>.runAsync(cb: (Either<Throwable, A>) -> Kind<F, Unit>): Kind<F, Unit>
 
-  fun <A> Kind<F, A>.toIO(): IO<A> = IO.async { ioConnection, cb ->
+  fun <A> Kind<F, A>.toIO(): IO<A> = IO.async { _, cb ->
     runAsync { r ->
       cb(r).just()
     }

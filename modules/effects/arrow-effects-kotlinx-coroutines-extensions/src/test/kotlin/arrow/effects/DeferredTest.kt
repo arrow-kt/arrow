@@ -2,13 +2,15 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.core.*
-import arrow.effects.deferredk.async.async
+import arrow.effects.coroutines.*
 import arrow.effects.typeclasses.ExitCase
-import arrow.effects.deferredk.monad.flatMap
-import arrow.instances.`try`.functor.functor
-import arrow.instances.`try`.traverse.traverse
-import arrow.instances.option.functor.functor
-import arrow.instances.option.traverse.traverse
+import arrow.core.extensions.`try`.functor.functor
+import arrow.core.extensions.`try`.traverse.traverse
+import arrow.core.extensions.option.functor.functor
+import arrow.core.extensions.option.traverse.traverse
+import arrow.effects.coroutines.extensions.awaitAll
+import arrow.effects.coroutines.extensions.deferredk.async.async
+import arrow.effects.coroutines.extensions.deferredk.monad.flatMap
 import arrow.test.UnitSpec
 import arrow.test.generators.genIntSmall
 import arrow.test.laws.AsyncLaws

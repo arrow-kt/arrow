@@ -176,7 +176,7 @@ Transforming the inner contents
 
 ```kotlin:ank
 import arrow.typeclasses.*
-import arrow.instances.option.functor.*
+import arrow.core.extensions.option.functor.*
 
 Option.functor().run {
   Some(1).map { it + 1 }
@@ -188,7 +188,7 @@ Option.functor().run {
 Computing over independent values
 
 ```kotlin:ank
-import arrow.instances.option.applicative.*
+import arrow.core.extensions.option.applicative.*
 
 tupled(Some(1), Some("Hello"), Some(20.0))
 ```

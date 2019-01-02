@@ -105,11 +105,12 @@ Note that classes must have companion objects for this to work. All typeclass in
 import arrow.*
 import arrow.core.*
 import arrow.data.*
-import arrow.instances.*
+import arrow.core.extensions.*
+import arrow.data.extensions.*
 import arrow.typeclasses.*
-import arrow.instances.option.functor.*
-import arrow.instances.either.monadError.*
-import arrow.instances.listk.traverse.*
+import arrow.core.extensions.option.functor.*
+import arrow.core.extensions.either.monadError.*
+import arrow.data.extensions.listk.traverse.*
 ```
 
 ```kotlin:ank
@@ -121,7 +122,7 @@ Option.functor()
 ```
 
 ```kotlin:ank
-import arrow.instances.mapk.semigroup.*
+import arrow.data.extensions.mapk.semigroup.*
 
 MapK.semigroup<String, Int>(Int.semigroup())
 ```
@@ -331,7 +332,7 @@ interface ListKFunctorInstance : Functor<ForListK>
 
 ```kotlin:ank
 // Somewhere else in the codebase
-import arrow.instances.listk.functor.*
+import arrow.data.extensions.listk.functor.*
 ListK.functor()
 ```
 

@@ -17,7 +17,7 @@ beginner
 
 ```groovy
 // gradle
-compile "io.arrow-kt:arrow-data:$arrow_version"
+compile "io.arrow-kt:arrow-extras:$arrow_version"
 ```
 
 ```kotlin:ank
@@ -85,7 +85,7 @@ nelOne.flatMap { one ->
 
 ```kotlin:ank
 import arrow.typeclasses.*
-import arrow.instances.*
+import arrow.data.extensions.*
 
 val nelOne: NonEmptyList<Int> = NonEmptyList.of(1)
 val nelTwo: NonEmptyList<Int> = NonEmptyList.of(2)

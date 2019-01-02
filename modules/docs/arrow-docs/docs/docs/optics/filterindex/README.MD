@@ -20,7 +20,7 @@ import arrow.core.*
 import arrow.data.*
 import arrow.optics.*
 import arrow.optics.typeclasses.*
-import arrow.instances.listk.traverse.*
+import arrow.data.extensions.listk.traverse.*
 
 val filterIndexStringByIndex = FilterIndex.fromTraverse<ForListK, String>({ list ->
     list.fix().map {

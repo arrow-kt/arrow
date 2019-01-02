@@ -29,27 +29,29 @@ buildscript {
 apply plugin: 'ch.tutteli.settings'
 
 
-include(':arrow-annotations-processor-test-models')
-project(':arrow-annotations-processor-test-models').projectDir = new File('modules/core/arrow-annotations-processor/models')
+include(':arrow-meta-test-models')
+project(':arrow-meta-test-models').projectDir = new File('modules/meta/arrow-meta/models')
 
 //noinspection GroovyAssignabilityCheck
 include {
     modules {
 
-        core {
+        meta {
             _ 'annotations'
-            _ 'annotations-processor'
-            _ 'core'
-            _ 'data'
-            _ 'instances-core'
-            _ 'instances-data'
+            _ 'meta'
+        }
+
+        core {
+            _ 'core-data'
+            _ 'core-extensions'
+            _ 'extras'
+            _ 'extras-extensions'
             _ 'generic'
             _ 'kindedj'
             _ 'mtl'
             _ 'syntax'
             _ 'test'
             _ 'typeclasses'
-            _ 'validation'
         }
 
         free {
@@ -77,9 +79,10 @@ include {
             _ 'integrations-retrofit-adapter'
         }
 
-        folder('recursion-schemes') {
+        recursion {
             _ 'recursion'
-            _ 'instances-recursion'
+            _ 'recursion-data'
+            _ 'recursion-extensions'
         }
 
         docs {
@@ -117,6 +120,10 @@ include {
 
         reflect {
             _ 'reflect'
+        }
+
+        validation {
+            _ 'validation'
         }
     }
 }

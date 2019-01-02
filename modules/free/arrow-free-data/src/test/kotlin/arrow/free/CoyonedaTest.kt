@@ -1,9 +1,9 @@
 package arrow.free
 
 import arrow.core.*
-import arrow.free.instances.coyoneda.functor.functor
-import arrow.instances.id.functor.functor
-import arrow.instances.option.functor.functor
+import arrow.free.extensions.coyoneda.functor.functor
+import arrow.core.extensions.id.functor.functor
+import arrow.core.extensions.option.functor.functor
 import arrow.test.UnitSpec
 import arrow.test.laws.FunctorLaws
 import arrow.typeclasses.Eq

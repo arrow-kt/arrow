@@ -81,7 +81,7 @@ fun <F> Functor<F>.multiplyBy2(fa: Kind<F, Int>): Kind<F, Int> =
 And we can call it on the typeclass instances:
 
 ```kotlin:ank
-import arrow.instances.*
+import arrow.core.extensions.*
 
 ForOption extensions { 
   multiplyBy2(Option(1)) 

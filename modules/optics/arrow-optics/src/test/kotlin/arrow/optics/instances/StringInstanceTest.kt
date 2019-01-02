@@ -2,11 +2,12 @@ package arrow.optics.instances
 
 import arrow.core.Option
 import arrow.core.Tuple2
+import arrow.core.extensions.eq
 import arrow.data.ListK
-import arrow.instances.eq
-import arrow.instances.listk.eq.eq
-import arrow.instances.option.eq.eq
-import arrow.instances.tuple2.eq.eq
+import arrow.data.extensions.listk.eq.eq
+import arrow.core.extensions.option.eq.eq
+import arrow.core.extensions.tuple2.eq.eq
+import arrow.optics.extensions.*
 import arrow.test.UnitSpec
 import arrow.test.generators.genChars
 import arrow.test.generators.genFunctionAToB

@@ -1,10 +1,10 @@
 package arrow.typeclasses
 
-import arrow.instances.monoid
-import arrow.instances.const.applicative.applicative
-import arrow.instances.const.eq.eq
-import arrow.instances.const.show.show
-import arrow.mtl.instances.const.traverseFilter.traverseFilter
+import arrow.core.extensions.const.applicative.applicative
+import arrow.core.extensions.const.eq.eq
+import arrow.core.extensions.const.show.show
+import arrow.core.extensions.monoid
+import arrow.mtl.extensions.const.traverseFilter.traverseFilter
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import io.kotlintest.KTestJUnitRunner

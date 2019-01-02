@@ -17,7 +17,7 @@ It can be considered the typeclass equivalent of Java's `Object#toString`.
 
 ```kotlin:ank
 import arrow.*
-import arrow.instances.*
+import arrow.data.extensions.*
 
 ForInt extensions { 1.show() }
 ```

@@ -18,7 +18,7 @@ beginner
 import arrow.aql.instances.list.select.*
 import arrow.aql.instances.list.orderBy.*
 import arrow.aql.instances.listk.select.select
-import arrow.instances.order
+import arrow.core.extensions.order
 import arrow.aql.Ord
 
 fun main(args: Array<String>) {
@@ -42,7 +42,7 @@ import arrow.aql.instances.list.groupBy.*
 import arrow.aql.instances.list.orderBy.*
 import arrow.aql.instances.listk.select.selectAll
 import arrow.aql.instances.id.select.value
-import arrow.instances.order
+import arrow.core.extensions.order
 import arrow.aql.Ord
 
 data class Student(val name: String, val age: Int)

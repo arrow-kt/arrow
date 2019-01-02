@@ -139,7 +139,7 @@ Arrow provides [monadic comprehensions]({{ '/docs/patterns/monad_comprehensions'
 
 ```kotlin
 import arrow.typeclasses.*
-import arrow.instances.*
+import arrow.data.extensions.*
 
 fun attackOption(): Option<Impacted> =
   ForOption extensions {
@@ -200,7 +200,7 @@ Just like it does for `Option`, Arrow also provides `Monad` instances for `Try` 
 
 ```kotlin
 import arrow.typeclasses.*
-import arrow.instances.*
+import arrow.data.extensions.*
 
 fun attackTry(): Try<Impacted> =
   ForTry extensions {
@@ -288,19 +288,19 @@ Typeclasses allows us to code focusing on the behaviors and not the datatypes th
 Arrow provides the following `MonadError` instances for `Option`, `Try` and `Either`
 
 ```kotlin:ank
-import arrow.instances.option.monadError.*
+import arrow.core.extensions.option.monadError.*
 
 Option.monadError()
 ```
 
 ```kotlin:ank
-import arrow.instances.`try`.monadError.*
+import arrow.core.extensions.`try`.monadError.*
 
 Try.monadError()
 ```
 
 ```kotlin:ank
-import arrow.instances.either.monadError.*
+import arrow.core.extensions.either.monadError.*
 
 Either.monadError<NukeException>()
 ```

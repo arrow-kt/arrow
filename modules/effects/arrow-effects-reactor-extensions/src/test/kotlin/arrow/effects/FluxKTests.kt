@@ -1,12 +1,13 @@
 package arrow.effects
 
-import arrow.effects.fluxk.async.async
-import arrow.effects.fluxk.foldable.foldable
-import arrow.effects.fluxk.functor.functor
-import arrow.effects.fluxk.monad.binding
-import arrow.effects.fluxk.monad.flatMap
-import arrow.effects.fluxk.monadThrow.bindingCatch
-import arrow.effects.fluxk.traverse.traverse
+import arrow.effects.reactor.*
+import arrow.effects.reactor.extensions.fluxk.monad.binding
+import arrow.effects.reactor.extensions.fluxk.monad.flatMap
+import arrow.effects.reactor.extensions.fluxk.monadThrow.bindingCatch
+import arrow.effects.reactor.extensions.fluxk.async.async
+import arrow.effects.reactor.extensions.fluxk.foldable.foldable
+import arrow.effects.reactor.extensions.fluxk.functor.functor
+import arrow.effects.reactor.extensions.fluxk.traverse.traverse
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws

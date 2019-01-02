@@ -45,30 +45,30 @@ Add the dependencies into the project's `build.gradle`
 ```groovy
 def arrow_version = "0.8.2"
 dependencies {
-    compile "io.arrow-kt:arrow-core:$arrow_version"
+    compile "io.arrow-kt:arrow-core-data:$arrow_version"
     compile "io.arrow-kt:arrow-syntax:$arrow_version"
     compile "io.arrow-kt:arrow-typeclasses:$arrow_version"
-    compile "io.arrow-kt:arrow-data:$arrow_version"
-    compile "io.arrow-kt:arrow-instances-core:$arrow_version"
-    compile "io.arrow-kt:arrow-instances-data:$arrow_version"
-    kapt    "io.arrow-kt:arrow-annotations-processor:$arrow_version"
+    compile "io.arrow-kt:arrow-extras:$arrow_version"
+    compile "io.arrow-kt:arrow-core-extensions:$arrow_version"
+    compile "io.arrow-kt:arrow-extras-extensions:$arrow_version"
+    kapt    "io.arrow-kt:arrow-meta:$arrow_version"
     
     compile "io.arrow-kt:arrow-query-language:$arrow_version" //optional
     compile "io.arrow-kt:arrow-free:$arrow_version" //optional
     compile "io.arrow-kt:arrow-free-extensions:$arrow_version" //optional
     compile "io.arrow-kt:arrow-mtl:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-effects-instances:$arrow_version" //optional
+    compile "io.arrow-kt:arrow-effects-extensions:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects-rx2:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-effects-rx2-instances:$arrow_version" //optional
+    compile "io.arrow-kt:arrow-effects-rx2-extensions:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects-reactor:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-effects-reactor-instances:$arrow_version" //optional
+    compile "io.arrow-kt:arrow-effects-reactor-extensions:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects-kotlinx-coroutines:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-effects-kotlinx-coroutines-instances:$arrow_version" //optional
+    compile "io.arrow-kt:arrow-effects-kotlinx-coroutines-extensions:$arrow_version" //optional
     compile "io.arrow-kt:arrow-optics:$arrow_version" //optional
     compile "io.arrow-kt:arrow-generic:$arrow_version" //optional
     compile "io.arrow-kt:arrow-recursion:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-instances-recursion:$arrow_version" //optional
+    compile "io.arrow-kt:arrow-extensions-recursion:$arrow_version" //optional
     compile "io.arrow-kt:arrow-integration-retrofit-adapter:$arrow_version" //optional
 }
 ```
@@ -87,7 +87,7 @@ apply from: rootProject.file('gradle/generated-kotlin-sources.gradle') //only fo
 def arrow_version = "0.8.2"
 dependencies {
     ...
-    kapt    'io.arrow-kt:arrow-annotations-processor:$arrow_version' //optional
+    kapt    'io.arrow-kt:arrow-meta:$arrow_version' //optional
     ...
 }
 ```

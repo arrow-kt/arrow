@@ -1,8 +1,9 @@
 package arrow.effects
 
-import arrow.effects.monok.async.async
-import arrow.effects.monok.monad.flatMap
-import arrow.effects.monok.monadThrow.bindingCatch
+import arrow.effects.reactor.*
+import arrow.effects.reactor.extensions.monok.async.async
+import arrow.effects.reactor.extensions.monok.monad.flatMap
+import arrow.effects.reactor.extensions.monok.monadThrow.bindingCatch
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
@@ -125,7 +126,7 @@ class MonoKTest : UnitSpec() {
 
       MonoK.just(Unit)
         .bracketCase(
-          use = { MonoK.async<Nothing> { _,_ -> } },
+          use = { MonoK.async<Nothing> { _, _ -> } },
           release = { _, exitCase ->
             MonoK {
               ec = exitCase

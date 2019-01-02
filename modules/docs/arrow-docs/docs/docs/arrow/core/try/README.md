@@ -169,7 +169,7 @@ Transforming the value, if the computation is a success:
 
 ```kotlin:ank
 import arrow.typeclasses.*
-import arrow.instances.*
+import arrow.data.extensions.*
 
 ForTry extensions {
   Try { "3".toInt() }.map { it + 1}

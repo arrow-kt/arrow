@@ -35,21 +35,21 @@ Now that you've learned about the Semigroup instance for Int try to guess how it
 ```kotlin:ank
 import arrow.*
 import arrow.typeclasses.*
-import arrow.instances.*
+import arrow.data.extensions.*
 
 ForInt extensions { 1.combine(2) }
 ```
 
 ```kotlin:ank   
 import arrow.data.*
-import arrow.instances.listk.semigroup.*
+import arrow.data.extensions.listk.semigroup.*
 
 ListK.semigroup<Int>().run { listOf(1, 2, 3).k().combine(listOf(4, 5, 6).k()) }
 ```
 
 ```kotlin:ank
 import arrow.core.*
-import arrow.instances.option.monoid.*
+import arrow.core.extensions.option.monoid.*
 
 Option.monoid<Int>(Int.semigroup()).run { Option(1).combine(Option(2)) }
 ```

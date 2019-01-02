@@ -138,7 +138,7 @@ We can run the program for `IO`:
 
 ```kotlin:ank
 import arrow.effects.IO
-import arrow.effects.instances.io.bracket.bracket
+import arrow.effects.extensions.io.bracket.bracket
 import arrow.Kind
 import arrow.effects.typeclasses.Bracket
 

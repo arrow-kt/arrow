@@ -263,7 +263,7 @@ import arrow.aql.box.select.*
 import arrow.aql.box.orderBy.*
 import arrow.aql.instances.id.select.*
 import arrow.aql.Ord
-import arrow.instances.order
+import arrow.core.extensions.order
 
 fun main(args: Array<String>) {
 //sampleStart
