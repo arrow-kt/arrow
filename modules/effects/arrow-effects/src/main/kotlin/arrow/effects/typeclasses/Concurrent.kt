@@ -13,9 +13,7 @@ interface Concurrent<F> : Async<F> {
   /**
    * Create a new [F] that upon execution starts the receiver [F] within a [Fiber] on [ctx].
    *
-   * {: data-executable='true'}
-   *
-   * ```kotlin:ank
+   * ```kotlin:ank:playground
    * import arrow.effects.*
    * import arrow.effects.instances.io.async.async
    * import arrow.effects.instances.io.monad.binding
@@ -43,9 +41,7 @@ interface Concurrent<F> : Async<F> {
    * Race two tasks concurrently within a new [F].
    * Race results in a winner and the other, yet to finish task running in a [Fiber].
    *
-   * {: data-executable='true'}
-   *
-   * ```kotlin:ank
+   * ```kotlin:ank:playground
    * import arrow.effects.*
    * import arrow.effects.instances.io.async.async
    * import arrow.effects.instances.io.concurrent.racePair
@@ -78,6 +74,35 @@ interface Concurrent<F> : Async<F> {
    */
   fun <A, B> racePair(ctx: CoroutineContext, fa: Kind<F, A>, fb: Kind<F, B>): Kind<F, Either<Tuple2<A, Fiber<F, B>>, Tuple2<Fiber<F, A>, B>>>
 
+  /**
+   * Map two tasks in parallel within a new [F] on [ctx].
+   *
+   * ```kotlin:ank:playground
+   * import arrow.effects.instances.io.concurrent.parMapN
+   * import arrow.effects.instances.io.monadDefer.delay
+   * import kotlinx.coroutines.Dispatchers
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val result = parMapN(Dispatchers.Default,
+   *     delay { "First one is on ${Thread.currentThread().name}" },
+   *     delay { "Second one is on ${Thread.currentThread().name}" }
+   *   ) { a, b ->
+   *     "$a\n$b"
+   *   }
+   *   //sampleEnd
+   *   println(result.unsafeRunSync())
+   * }
+   * ```
+   *
+   * @param ctx [CoroutineContext] to execute the source [F] on.
+   * @param fa value to parallel map
+   * @param fb value to parallel map
+   * @param f function to map/combine value [A] and [B]
+   * @return [F] with the result of function [f].
+   *
+   * @see racePair for a version that does not await all results to be finished.
+   */
   fun <A, B, C> parMapN(ctx: CoroutineContext, fa: Kind<F, A>, fb: Kind<F, B>, f: (A, B) -> C): Kind<F, C> =
     racePair(ctx, fa, fb).flatMap {
       it.fold({ (a, fiberB) ->
@@ -87,6 +112,9 @@ interface Concurrent<F> : Async<F> {
       })
     }
 
+  /**
+   * @see parMapN
+   */
   fun <A, B, C, D> parMapN(ctx: CoroutineContext, fa: Kind<F, A>, fb: Kind<F, B>, fc: Kind<F, C>, f: (A, B, C) -> D): Kind<F, D> =
     racePair(ctx, fa, racePair(ctx, fb, fc)).flatMap {
       it.fold({ (a, bOrC) ->
@@ -110,6 +138,9 @@ interface Concurrent<F> : Async<F> {
       })
     }
 
+  /**
+   * @see parMapN
+   */
   fun <A, B, C, D, E> parMapN(
     ctx: CoroutineContext,
     fa: Kind<F, A>,
@@ -121,6 +152,9 @@ interface Concurrent<F> : Async<F> {
       f(a, b, c, d)
     }
 
+  /**
+   * @see parMapN
+   */
   fun <A, B, C, D, E, G> parMapN(
     ctx: CoroutineContext,
     fa: Kind<F, A>,
@@ -133,6 +167,9 @@ interface Concurrent<F> : Async<F> {
       f(a, b, c, d, e)
     }
 
+  /**
+   * @see parMapN
+   */
   fun <A, B, C, D, E, G, H> parMapN(
     ctx: CoroutineContext,
     fa: Kind<F, A>,
@@ -146,6 +183,9 @@ interface Concurrent<F> : Async<F> {
       f(a, b, c, d, e, g)
     }
 
+  /**
+   * @see parMapN
+   */
   fun <A, B, C, D, E, G, H, I> parMapN(
     ctx: CoroutineContext,
     fa: Kind<F, A>,
@@ -160,6 +200,9 @@ interface Concurrent<F> : Async<F> {
       f(a, b, c, d, e, g, h)
     }
 
+  /**
+   * @see parMapN
+   */
   fun <A, B, C, D, E, G, H, I, J> parMapN(
     ctx: CoroutineContext,
     fa: Kind<F, A>,
@@ -174,6 +217,9 @@ interface Concurrent<F> : Async<F> {
       f(a, b, c, d, e, g, h, i)
     }
 
+  /**
+   * @see parMapN
+   */
   fun <A, B, C, D, E, G, H, I, J, K> parMapN(
     ctx: CoroutineContext,
     fa: Kind<F, A>,
@@ -194,9 +240,7 @@ interface Concurrent<F> : Async<F> {
    * Race two tasks concurrently within a new [F] on [ctx].
    * At the end of the race it automatically cancels the loser.
    *
-   * {: data-executable='true'}
-   *
-   * ```kotlin:ank
+   * ```kotlin:ank:playground
    * import arrow.effects.*
    * import arrow.effects.instances.io.concurrent.raceN
    * import arrow.effects.instances.io.monad.binding
