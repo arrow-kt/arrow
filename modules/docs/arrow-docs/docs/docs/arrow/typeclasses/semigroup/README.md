@@ -35,7 +35,7 @@ Now that you've learned about the Semigroup instance for Int try to guess how it
 ```kotlin:ank
 import arrow.*
 import arrow.typeclasses.*
-import arrow.data.extensions.*
+import arrow.core.extensions.*
 
 ForInt extensions { 1.combine(2) }
 ```

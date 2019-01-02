@@ -18,7 +18,7 @@ Creating a `Fold` can be done by manually defining `foldMap`.
 import arrow.data.*
 import arrow.optics.*
 import arrow.typeclasses.*
-import arrow.data.extensions.*
+import arrow.core.extensions.*
 
 fun <T> nullableFold(): Fold<T?, T> = object : Fold<T?, T> {
     override fun <R> foldMap(M: Monoid<R>, s: T?, f: (T) -> R): R =

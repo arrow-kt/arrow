@@ -30,7 +30,7 @@ Compare [a] with [b]. Returns an Int whose sign is:
 ```kotlin:ank
 import arrow.*
 import arrow.typeclasses.*
-import arrow.data.extensions.*
+import arrow.core.extensions.*
 
 Int.order().run { 1.compare(2) }
 ```

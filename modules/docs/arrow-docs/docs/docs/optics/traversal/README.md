@@ -52,8 +52,8 @@ fun <A> traversalTuple2Example(): Traversal<Tuple2<A, A>, A> = Traversal(
 Arrow optics also provides a number of predefined `Traversal` optics.
 
 ```kotlin:ank
-import arrow.data.extensions.*
-import arrow.optics.instances.*
+import arrow.core.extensions.*
+import arrow.optics.extensions.*
 
 Tuple2.traversal<String>().combineAll(String.monoid(), "Hello, " toT "World!")
 ```

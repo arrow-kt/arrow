@@ -29,7 +29,7 @@ Because `Kind<F, B>` cannot be created until `A` is unwrapped, it means that one
 
 ```kotlin:ank
 import arrow.core.*
-import arrow.data.extensions.*
+import arrow.core.extensions.*
 import arrow.effects.*
 
 Some(1).flatMap { a ->

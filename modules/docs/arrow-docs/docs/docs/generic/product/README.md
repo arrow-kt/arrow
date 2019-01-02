@@ -96,7 +96,7 @@ hListOf(1000, 900).toAccount()
 In the examples below we can observe how 2 different `Int` properties are returned inside a type constructor such as `Option`, `Try`, `Deferred` etc... and the automatically mapped to the shape of our `Account` data class removing all boilerplate from extracting the values from their context and returning an `Account` value in the same context.
 
 ```kotlin:ank
-import arrow.data.extensions.*
+import arrow.core.extensions.*
 
 val maybeBalance: Option<Int> = Option(1000)
 val maybeAvailable: Option<Int> = Option(900)
@@ -134,13 +134,14 @@ ForTry extensions {
 ```
 
 ```kotlin:ank
-import arrow.effects.*
+import arrow.effects.coroutines.*
+import arrow.effects.coroutines.extensions.deferredk.applicative.applicative
 import kotlinx.coroutines.async
 
 val asyncBalance: DeferredK<Int> = DeferredK { 1000 }
 val asyncAvailable: DeferredK<Int> = DeferredK { 900 }
 
-ForDeferredK extensions { 
+DeferredK.applicative().run { 
   mapToAccount(asyncBalance, asyncAvailable)
 }
 ```

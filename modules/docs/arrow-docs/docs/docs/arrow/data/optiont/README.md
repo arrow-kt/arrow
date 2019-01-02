@@ -51,7 +51,7 @@ that enables monad comprehensions for all datatypes for which a monad instance i
 
 ```kotlin:ank
 import arrow.typeclasses.*
-import arrow.data.extensions.*
+import arrow.core.extensions.*
 
 fun getCountryCode(maybePerson : Option<Person>): Option<String> =
   ForOption extensions {
@@ -101,7 +101,8 @@ val adressDB: Map<Int, Address> = mapOf(
 Now we've got two new functions in the mix that are going to call a remote service, and they return a `ObservableK`. This is common in most APIs that handle loading asynchronously.
 
 ```kotlin:ank
-import arrow.effects.*
+import arrow.effects.rx2.*
+import arrow.effects.rx2.extensions.*
 
 fun findPerson(personId : Int) : ObservableK<Option<Person>> =
   ObservableK.just(Option.fromNullable(personDB.get(personId))) //mock impl for simplicity
@@ -181,7 +182,7 @@ We can now lift any value to a `OptionT<F, A>` which looks like this:
 
 ```kotlin:ank
 import arrow.data.*
-import arrow.effects.observablek.applicative.*
+import arrow.effects.rx2.extensions.observablek.applicative.*
 
 val optTVal = OptionT.just<ForObservableK, Int>(ObservableK.applicative(), 1)
 optTVal

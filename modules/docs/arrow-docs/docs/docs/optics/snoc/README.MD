@@ -16,7 +16,7 @@ It can be constructed by providing the `Prism`.
 
 ```kotlin:ank
 import arrow.data.ListK
-import arrow.optics.instances.listk.snoc.snoc
+import arrow.optics.extensions.listk.snoc.snoc
 import arrow.optics.typeclasses.Snoc
 
 val listLast = ListK.snoc<Int>().snoc()
@@ -29,7 +29,7 @@ It defines two functions `snoc` and `unsnoc`.
 `snoc` appends an element `A` to a structure `S`.
 
 ```kotlin:ank
-import arrow.optics.instances.list.snoc.snoc
+import arrow.optics.extensions.list.snoc.snoc
 
 listOf(1, 2).snoc(3)
 ```
@@ -37,7 +37,7 @@ listOf(1, 2).snoc(3)
 `unsnoc` detaches the last element `A` from a structure `S`.
 
 ```kotlin:ank
-import arrow.optics.instances.list.snoc.unsnoc
+import arrow.optics.extensions.list.snoc.unsnoc
 
 listOf(1, 2, 3).unsnoc()
 ```

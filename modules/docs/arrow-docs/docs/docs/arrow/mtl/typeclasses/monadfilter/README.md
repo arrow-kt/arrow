@@ -27,8 +27,8 @@ When `continueIf` is satisfied the computation continues
 import arrow.*
 import arrow.core.*
 import arrow.mtl.typeclasses.*
-import arrow.mtl.instances.*
-import arrow.mtl.instances.option.monadFilter.*
+import arrow.mtl.extensions.*
+import arrow.mtl.extensions.option.monadFilter.*
 
 ForOption extensions {
   bindingFilter {
@@ -43,7 +43,7 @@ ForOption extensions {
 
 ```kotlin:ank
 import arrow.data.*
-import arrow.mtl.instances.listk.monadFilter.*
+import arrow.mtl.extensions.listk.monadFilter.*
 
 ForListK extensions {
  bindingFilter {
@@ -109,7 +109,7 @@ bindingFilter {
 When `bindWithFilter` returns `false` the computation short circuits yielding the monad's empty value
 
 ```kotlin:ank
-import arrow.mtl.instances.option.monadFilter.*
+import arrow.mtl.extensions.option.monadFilter.*
 
 bindingFilter {
  val a = Option(0).bind()
@@ -119,7 +119,7 @@ bindingFilter {
 ```   
 
 ```kotlin:ank
-import arrow.mtl.instances.listk.monadFilter.*
+import arrow.mtl.extensions.listk.monadFilter.*
 
 bindingFilter {
  val a = listOf(0).k().bind()

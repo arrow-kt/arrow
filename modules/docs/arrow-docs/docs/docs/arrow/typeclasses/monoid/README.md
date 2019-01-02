@@ -25,7 +25,7 @@ And let's see the instance of Monoid<String> in action.
 
 ```kotlin:ank
 import arrow.*
-import arrow.data.extensions.*
+import arrow.core.extensions.*
 import arrow.typeclasses.*
 
 ForString extensions {
@@ -52,6 +52,7 @@ This is also true if we define our own instances. As an example, let's use `Fold
 
 ```kotlin:ank
 import arrow.data.*
+import arrow.data.extensions.*
 
 ForListK extensions {
   listOf(1, 2, 3, 4, 5).k().foldMap(Int.monoid(), ::identity)
