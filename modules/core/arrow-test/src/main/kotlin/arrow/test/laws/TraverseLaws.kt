@@ -8,6 +8,9 @@ import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genIntSmall
 import arrow.typeclasses.*
 import io.kotlintest.properties.forAll
+import arrow.instances.*
+import arrow.instances.const.applicative.applicative
+import arrow.instances.id.applicative.applicative
 
 typealias TI<A> = Tuple2<IdOf<A>, IdOf<A>>
 
@@ -35,7 +38,7 @@ object TraverseLaws {
       )
   */
 
-  inline fun <F> laws(TF: Traverse<F>, FF: Functor<F>, noinline cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): List<Law> =
+  fun <F> laws(TF: Traverse<F>, FF: Functor<F>, cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): List<Law> =
     FoldableLaws.laws(TF, cf, Eq.any()) + FunctorLaws.laws(FF, cf, EQ) + listOf(
       Law("Traverse Laws: Identity") { TF.identityTraverse(FF, cf, EQ) },
       Law("Traverse Laws: Sequential composition") { TF.sequentialComposition(cf, EQ) },
@@ -55,7 +58,7 @@ object TraverseLaws {
     forAll(genFunctionAToB<Int, Kind<ForId, Int>>(genConstructor(genIntSmall(), ::Id)), genFunctionAToB<Int, Kind<ForId, Int>>(genConstructor(genIntSmall(), ::Id)), genConstructor(genIntSmall(), cf)) { f: (Int) -> Kind<ForId, Int>, g: (Int) -> Kind<ForId, Int>, fha: Kind<F, Int> ->
 
       val fa = fha.traverse(idApp, f).fix()
-      val composed = fa.map { it.traverse(idApp, g) }.value.value()
+      val composed = fa.map { it.traverse(idApp, g) }.value().value()
       val expected = fha.traverse(ComposedApplicative(idApp, idApp)) { a: Int -> f(a).map(g).nest() }.unnest().value().value()
       composed.equalUnderTheLaw(expected, EQ)
     }
@@ -88,7 +91,7 @@ object TraverseLaws {
     }
 
   fun <F> Traverse<F>.foldMapDerived(cf: (Int) -> Kind<F, Int>) =
-    forAll(genFunctionAToB<Int, Int>(genIntSmall()), genConstructor(genIntSmall(), cf)) { f: (Int) -> Int, fa: Kind<F, Int> ->
+    forAll(genFunctionAToB(genIntSmall()), genConstructor(genIntSmall(), cf)) { f: (Int) -> Int, fa: Kind<F, Int> ->
       val traversed = fa.traverse(Const.applicative(Int.monoid())) { a -> f(a).const() }.value()
       val mapped = fa.foldMap(Int.monoid(), f)
       mapped.equalUnderTheLaw(traversed, Eq.any())

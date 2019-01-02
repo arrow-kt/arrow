@@ -34,13 +34,13 @@ class DaggerKleisliFunctorInstance<F, L> @Inject constructor(val FF: Functor<F>)
 }
 
 class DaggerKleisliApplicativeInstance<F, L> @Inject constructor(val AF: Applicative<F>) : KleisliApplicativeInstance<F, L> {
-  override fun FF(): Applicative<F> = AF
+  override fun AF(): Applicative<F> = AF
 }
 
 class DaggerKleisliMonadInstance<F, L> @Inject constructor(val MF: Monad<F>) : KleisliMonadInstance<F, L> {
-  override fun FF(): Monad<F> = MF
+  override fun MF(): Monad<F> = MF
 }
 
 class DaggerKleisliMonadErrorInstance<F, L> @Inject constructor(val MF: MonadError<F, L>) : KleisliMonadErrorInstance<F, L, L> {
-  override fun FF(): MonadError<F, L> = MF
+  override fun ME(): MonadError<F, L> = MF
 }

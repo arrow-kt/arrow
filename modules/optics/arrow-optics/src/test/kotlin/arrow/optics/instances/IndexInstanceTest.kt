@@ -2,6 +2,8 @@ package arrow.optics.instances
 
 import arrow.data.*
 import arrow.instances.eq
+import arrow.instances.sequencek.eq.eq
+import arrow.optics.instances.sequencek.index.index
 import arrow.test.UnitSpec
 import arrow.test.generators.*
 import arrow.test.laws.OptionalLaws

@@ -27,7 +27,7 @@ class Function1<I, out O>(val f: (I) -> O) : Function1Of<I, O> {
 
     fun <I, A> just(a: A): Function1<I, A> = { _: I -> a }.k()
 
-    tailrec private fun <I, A, B> step(a: A, t: I, fn: (A) -> Function1Of<I, Either<A, B>>): B {
+    private tailrec fun <I, A, B> step(a: A, t: I, fn: (A) -> Function1Of<I, Either<A, B>>): B {
       val af = fn(a)(t)
       return when (af) {
         is Either.Right -> af.b

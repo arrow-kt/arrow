@@ -1,5 +1,6 @@
 package arrow.instances
 
+import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.typeclasses.*
 
 //////////
@@ -25,6 +26,13 @@ interface ByteShowInstance : Show<Byte> {
   override fun Byte.show(): String = toString()
 }
 
+interface ByteHashInstance : Hash<Byte>, ByteEqInstance {
+  override fun Byte.hash(): Int = hashCode()
+}
+
+fun Byte.Companion.hash(): Hash<Byte> =
+  object : ByteHashInstance {}
+
 fun Byte.Companion.show(): Show<Byte> =
   object : ByteShowInstance {}
 
@@ -43,6 +51,7 @@ fun Byte.Companion.monoid(): Monoid<Byte> =
 object ByteContext : ByteShowInstance, ByteOrderInstance, ByteMonoidInstance
 
 object ForByte {
+  @Deprecated(ExtensionsDSLDeprecated)
   infix fun <L> extensions(f: ByteContext.() -> L): L =
     f(ByteContext)
 }
@@ -71,6 +80,13 @@ interface DoubleShowInstance : Show<Double> {
   override fun Double.show(): String = toString()
 }
 
+interface DoubleHashInstance : Hash<Double>, DoubleEqInstance {
+  override fun Double.hash(): Int = hashCode()
+}
+
+fun Double.Companion.hash(): Hash<Double> =
+  object : DoubleHashInstance {}
+
 fun Double.Companion.show(): Show<Double> =
   object : DoubleShowInstance {}
 
@@ -89,6 +105,8 @@ fun Double.Companion.monoid(): Monoid<Double> =
 object DoubleContext : DoubleShowInstance, DoubleOrderInstance, DoubleMonoidInstance
 
 object ForDouble {
+  @Deprecated(ExtensionsDSLDeprecated)
+
   infix fun <L> extensions(f: DoubleContext.() -> L): L =
     f(DoubleContext)
 }
@@ -116,6 +134,13 @@ interface IntOrderInstance : Order<Int> {
   override fun Int.compare(b: Int): Int = compareTo(b)
 }
 
+interface IntHashInstance : Hash<Int>, IntEqInstance {
+  override fun Int.hash(): Int = hashCode()
+}
+
+fun Int.Companion.hash(): Hash<Int> =
+  object : IntHashInstance {}
+
 fun Int.Companion.show(): Show<Int> =
   object : IntShowInstance {}
 
@@ -134,6 +159,7 @@ fun Int.Companion.monoid(): Monoid<Int> =
 object IntContext : IntShowInstance, IntOrderInstance, IntMonoidInstance
 
 object ForInt {
+  @Deprecated(ExtensionsDSLDeprecated)
   infix fun <L> extensions(f: IntContext.() -> L): L =
     f(IntContext)
 }
@@ -162,6 +188,13 @@ interface LongShowInstance : Show<Long> {
   override fun Long.show(): String = toString()
 }
 
+interface LongHashInstance : Hash<Long>, LongEqInstance {
+  override fun Long.hash(): Int = hashCode()
+}
+
+fun Long.Companion.hash(): Hash<Long> =
+  object : LongHashInstance {}
+
 fun Long.Companion.show(): Show<Long> =
   object : LongShowInstance {}
 
@@ -180,6 +213,7 @@ fun Long.Companion.monoid(): Monoid<Long> =
 object LongContext : LongShowInstance, LongOrderInstance, LongMonoidInstance
 
 object ForLong {
+  @Deprecated(ExtensionsDSLDeprecated)
   infix fun <L> extensions(f: LongContext.() -> L): L =
     f(LongContext)
 }
@@ -208,6 +242,13 @@ interface ShortShowInstance : Show<Short> {
   override fun Short.show(): String = toString()
 }
 
+interface ShortHashInstance : Hash<Short>, ShortEqInstance {
+  override fun Short.hash(): Int = hashCode()
+}
+
+fun Short.Companion.hash(): Hash<Short> =
+  object : ShortHashInstance {}
+
 fun Short.Companion.show(): Show<Short> =
   object : ShortShowInstance {}
 
@@ -226,6 +267,7 @@ fun Short.Companion.monoid(): Monoid<Short> =
 object ShortContext : ShortShowInstance, ShortOrderInstance, ShortMonoidInstance
 
 object ForShort {
+  @Deprecated(ExtensionsDSLDeprecated)
   infix fun <L> extensions(f: ShortContext.() -> L): L =
     f(ShortContext)
 }
@@ -254,6 +296,13 @@ interface FloatShowInstance : Show<Float> {
   override fun Float.show(): String = toString()
 }
 
+interface FloatHashInstance : Hash<Float>, FloatEqInstance {
+  override fun Float.hash(): Int = hashCode()
+}
+
+fun Float.Companion.hash(): Hash<Float> =
+  object : FloatHashInstance {}
+
 fun Float.Companion.show(): Show<Float> =
   object : FloatShowInstance {}
 
@@ -272,6 +321,7 @@ fun Float.Companion.monoid(): Monoid<Float> =
 object FloatContext : FloatShowInstance, FloatOrderInstance, FloatMonoidInstance
 
 object ForFloat {
+  @Deprecated(ExtensionsDSLDeprecated)
   infix fun <L> extensions(f: FloatContext.() -> L): L =
     f(FloatContext)
 }

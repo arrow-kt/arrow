@@ -2,10 +2,10 @@ package arrow.optics.instances
 
 import arrow.core.Option
 import arrow.core.Try
-import arrow.core.each
-import arrow.core.eq
 import arrow.data.ListK
-import arrow.data.eq
+import arrow.instances.listk.eq.eq
+import arrow.instances.option.eq.eq
+import arrow.optics.instances.`try`.each.each
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genTry

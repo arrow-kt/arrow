@@ -44,7 +44,6 @@ typealias Reader<D, A> = ReaderT<ForId, D, A>
  *
  * @param run the dependency dependent computation.
  */
-@Suppress("FunctionName")
 fun <D, A> Reader(run: ReaderFun<D, A>): Reader<D, A> = ReaderT(run.andThen { Id(it) })
 
 /**
@@ -110,7 +109,6 @@ fun <D, A, B> Reader<D, A>.andThen(f: (A) -> B): Reader<D, B> = map(f)
  */
 fun <D, A, B> Reader<D, A>.andThen(b: B): Reader<D, B> = map { _ -> b }
 
-@Suppress("FunctionName")
 fun Reader(): ReaderApi = ReaderApi
 
 object ReaderApi {

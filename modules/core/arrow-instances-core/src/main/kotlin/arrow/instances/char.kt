@@ -1,6 +1,7 @@
 package arrow.instances
 
 import arrow.typeclasses.Eq
+import arrow.typeclasses.Hash
 import arrow.typeclasses.Order
 import arrow.typeclasses.Show
 
@@ -30,6 +31,10 @@ interface CharOrderInstance : Order<Char> {
   override fun Char.neqv(b: Char): Boolean = this != b
 }
 
+interface CharHashInstance : Hash<Char>, CharEqInstance {
+  override fun Char.hash(): Int = this.hashCode()
+}
+
 fun Char.Companion.show(): Show<Char> =
   object : CharShowInstance {}
 
@@ -38,3 +43,6 @@ fun Char.Companion.eq(): Eq<Char> =
 
 fun Char.Companion.order(): Order<Char> =
   object : CharOrderInstance {}
+
+fun Char.Companion.hash(): Hash<Char> =
+  object : CharHashInstance {}

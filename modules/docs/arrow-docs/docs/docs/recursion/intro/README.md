@@ -160,7 +160,7 @@ import arrow.recursion.data.*
 typealias IntFixList = Fix<ForIntListPattern>
 ```
 
-So why do this? We can now define a [Functor]({{ '/docs/typeclasses/functor' | relative_url }}) instance for 
+So why do this? We can now define a [Functor]({{ '/docs/arrow/typeclasses/functor' | relative_url }}) instance for 
 `IntListPattern`, allowing us to traverse into the structure.
 
 ```kotlin
@@ -196,6 +196,8 @@ fun <F, A> Functor<F>.ana(a: A, coalg: Coalgebra<F, A>): Fix<F>
 We can use them to rewrite our `multiply` and `downFrom` functions.
 
 ```kotlin:ank
+import arrow.recursion.instances.fix.recursive.*
+
 // We extract these functions out for later use
 val multiply: Algebra<ForIntListPattern, Eval<Int>> = { l ->
   val list = l.fix()

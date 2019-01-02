@@ -2,17 +2,40 @@ package arrow.test.laws
 
 import arrow.test.generators.genTuple
 import arrow.typeclasses.Eq
-import io.kotlintest.TestContext
+import io.kotlintest.should
 import io.kotlintest.properties.Gen
 
-data class Law(val name: String, val test: TestContext.() -> Unit)
+fun throwableEq() = Eq { a: Throwable, b ->
+  a::class == b::class && a.message == b.message
+}
+
+data class Law(val name: String, val test: () -> Unit)
 
 fun <A> A.equalUnderTheLaw(b: A, eq: Eq<A>): Boolean =
   eq.run { eqv(b) }
 
-fun <A> forFew(amount: Int, genA: Gen<A>, fn: (a: A) -> Boolean) {
-  val listA = genA.random().take(amount).map(fn).toList()
-  listA.forEachIndexed { index :Int ,passed:Boolean ->
+fun <A> A.shouldBe(b: A, eq: Eq<A>): Unit = eq.run {
+  this.should {
+    io.kotlintest.matchers.Result(eqv(b),
+      "Expected: $this but found: $b")
+  }
+}
+
+fun <A> forFew(amount: Int, gena: Gen<A>, fn: (a: A) -> Boolean): Unit {
+  for (k in 0..amount) {
+    val a = gena.generate()
+    val passed = fn(a)
+    if (!passed) {
+      throw AssertionError("Property failed for\n$a)")
+    }
+  }
+}
+
+fun <A, B> forFew(amount: Int, gena: Gen<A>, genb: Gen<B>, fn: (a: A, b: B) -> Boolean): Unit {
+  for (k in 0..amount) {
+    val a = gena.generate()
+    val b = genb.generate()
+    val passed = fn(a, b)
     if (!passed) {
       throw AssertionError("Property failed for\n${listA[index]})")
     }
@@ -23,7 +46,7 @@ fun <A, B> forFew(amount: Int, gena: Gen<A>, genb: Gen<B>, fn: (a: A, b: B) -> B
   genTuple(gena, genb).random().take(amount).map {
     if (!fn(it.a, it.b)) {
       throw AssertionError("Property failed for\n${it.a}\n${it.b})")
-    } 
+    }
   }
 }
 

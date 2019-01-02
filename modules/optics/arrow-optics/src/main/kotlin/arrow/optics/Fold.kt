@@ -3,9 +3,9 @@ package arrow.optics
 import arrow.Kind
 import arrow.core.*
 import arrow.data.ListK
-import arrow.data.monoid
 import arrow.higherkind
 import arrow.instances.monoid
+import arrow.instances.listk.monoid.monoid
 import arrow.typeclasses.Const
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Monoid
@@ -81,12 +81,12 @@ interface Fold<S, A> : FoldOf<S, A> {
   /**
    * Get the first target
    */
-  fun headOption(s: S): Option<A> = foldMap(firstOptionMonoid<A>(), s) { b -> Const(Some(b)) }.value
+  fun headOption(s: S): Option<A> = foldMap(firstOptionMonoid<A>(), s) { b -> Const(Some(b)) }.value()
 
   /**
    * Get the last target
    */
-  fun lastOption(s: S): Option<A> = foldMap(lastOptionMonoid<A>(), s) { b -> Const(Some(b)) }.value
+  fun lastOption(s: S): Option<A> = foldMap(lastOptionMonoid<A>(), s) { b -> Const(Some(b)) }.value()
 
   /**
    * Fold using the given [Monoid] instance.
@@ -146,7 +146,7 @@ interface Fold<S, A> : FoldOf<S, A> {
   infix fun <C> compose(other: Optional<A, C>): Fold<S, C> = compose(other.asFold())
 
   /**
-   * Compose a [[Fold]] with a [Prism]
+   * Compose a [Fold] with a [Prism]
    */
   infix fun <C> compose(other: Prism<A, C>): Fold<S, C> = compose(other.asFold())
 
@@ -186,7 +186,7 @@ interface Fold<S, A> : FoldOf<S, A> {
    * Find the first element matching the predicate, if one exists.
    */
   fun find(s: S, p: (A) -> Boolean): Option<A> =
-    foldMap(firstOptionMonoid<A>(), s) { b -> (if (p(b)) Const(Some(b)) else Const(None)) }.value
+    foldMap(firstOptionMonoid<A>(), s) { b -> (if (p(b)) Const(Some(b)) else Const(None)) }.value()
 
   /**
    * Check whether at least one element satisfies the predicate.

@@ -11,7 +11,7 @@ import io.kotlintest.properties.forAll
 
 object ContravariantLaws {
 
-    inline fun <F> laws(CF: Contravariant<F>, noinline cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): List<Law> =
+    fun <F> laws(CF: Contravariant<F>, cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): List<Law> =
         InvariantLaws.laws(CF, cf, EQ) + listOf(
             Law("Contravariant Laws: Contravariant Identity") { CF.identity(cf, EQ) },
             Law("Contravariant Laws: Contravariant Composition") { CF.composition(cf, EQ) }
@@ -19,6 +19,7 @@ object ContravariantLaws {
 
     fun <F> Contravariant<F>.identity(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
         forAll(genConstructor(Gen.int(), cf)) { fa: Kind<F, Int> ->
+            @Suppress("ExplicitItLambdaParameter")
             fa.contramap { it: Int -> it }.equalUnderTheLaw(fa, EQ)
         }
 

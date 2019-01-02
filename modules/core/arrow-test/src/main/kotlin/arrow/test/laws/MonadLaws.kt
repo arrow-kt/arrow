@@ -12,14 +12,13 @@ import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genIntSmall
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monad
-import arrow.typeclasses.binding
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import kotlinx.coroutines.experimental.newSingleThreadContext
+import kotlinx.coroutines.newSingleThreadContext
 
 object MonadLaws {
 
-  inline fun <F> laws(M: Monad<F>, EQ: Eq<Kind<F, Int>>): List<Law> =
+  fun <F> laws(M: Monad<F>, EQ: Eq<Kind<F, Int>>): List<Law> =
     ApplicativeLaws.laws(M, EQ) + listOf(
       Law("Monad Laws: left identity") { M.leftIdentity(EQ) },
       Law("Monad Laws: right identity") { M.rightIdentity(EQ) },
@@ -34,7 +33,7 @@ object MonadLaws {
     )
 
   fun <F> Monad<F>.leftIdentity(EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(genFunctionAToB<Int, Kind<F, Int>>(genApplicative(Gen.int(), this)), Gen.int()) { f: (Int) -> Kind<F, Int>, a: Int ->
+    forAll(genFunctionAToB(genApplicative(Gen.int(), this)), Gen.int()) { f: (Int) -> Kind<F, Int>, a: Int ->
       just(a).flatMap(f).equalUnderTheLaw(f(a), EQ)
     }
 
@@ -43,22 +42,20 @@ object MonadLaws {
       fa.flatMap { just(it) }.equalUnderTheLaw(fa, EQ)
     }
 
-  fun <F> Monad<F>.kleisliLeftIdentity(EQ: Eq<Kind<F, Int>>) {
-    val M = this
-    forAll(genFunctionAToB<Int, Kind<F, Int>>(genApplicative(Gen.int(), this)), Gen.int()) { f: (Int) -> Kind<F, Int>, a: Int ->
-      (Kleisli { n: Int -> just(n) }.andThen(M, Kleisli(f)).run(a).equalUnderTheLaw(f(a), EQ))
+  fun <F> Monad<F>.kleisliLeftIdentity(EQ: Eq<Kind<F, Int>>): Unit =
+    forAll(genFunctionAToB(genApplicative(Gen.int(), this)), Gen.int()) { f: (Int) -> Kind<F, Int>, a: Int ->
+      (Kleisli { n: Int -> just(n) }.andThen(this, Kleisli(f)).run(a).equalUnderTheLaw(f(a), EQ))
     }
   }
 
-  fun <F> Monad<F>.kleisliRightIdentity(EQ: Eq<Kind<F, Int>>) {
-    val M = this
-    forAll(genFunctionAToB<Int, Kind<F, Int>>(genApplicative(Gen.int(), this)), Gen.int()) { f: (Int) -> Kind<F, Int>, a: Int ->
-      (Kleisli(f).andThen(M, Kleisli { n: Int -> just(n) }).run(a).equalUnderTheLaw(f(a), EQ))
+  fun <F> Monad<F>.kleisliRightIdentity(EQ: Eq<Kind<F, Int>>): Unit =
+    forAll(genFunctionAToB(genApplicative(Gen.int(), this)), Gen.int()) { f: (Int) -> Kind<F, Int>, a: Int ->
+      (Kleisli(f).andThen(this, Kleisli { n: Int -> just(n) }).run(a).equalUnderTheLaw(f(a), EQ))
     }
   }
 
   fun <F> Monad<F>.mapFlatMapCoherence(EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(genFunctionAToB<Int, Int>(Gen.int()), genApplicative(Gen.int(), this)) { f: (Int) -> Int, fa: Kind<F, Int> ->
+    forAll(genFunctionAToB(Gen.int()), genApplicative(Gen.int(), this)) { f: (Int) -> Int, fa: Kind<F, Int> ->
       fa.flatMap { just(f(it)) }.equalUnderTheLaw(fa.map(f), EQ)
     }
 

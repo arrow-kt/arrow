@@ -39,11 +39,16 @@ stack safety).
 Arrow provides `RecursiveLaws` in the form of test cases for internal verification of 
 lawful instances and third party apps creating their own `Recursive` instances.
 
-### Data Types
+### Data types
 
 Arrow provides three datatypes that are instances of `Recursive`, each modeling a
 different way of defining recursion.
 
-- [Fix]({{ 'docs/recursion/fix' | relative_url }})
-- [Mu]({{ 'docs/recursion/mu' | relative_url }})
-- [Nu]({{ 'docs/recursion/nu' | relative_url }})
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.recursion.typeclasses.*
+
+TypeClass(Recursive::class).dtMarkdownList()
+```
+
+ank_macro_hierarchy(arrow.recursion.typeclasses.Recursive)

@@ -18,14 +18,12 @@ fun <K, V> MapInstances.at(): At<Map<K, V>, K, Option<V>> = MapAtInstance()
 interface MapAtInstance<K, V> : At<Map<K, V>, K, Option<V>> {
   override fun at(i: K): Lens<Map<K, V>, Option<V>> = PLens(
     get = { it.getOption(i) },
-    set = { optV ->
-      { map ->
-        optV.fold({
-          (map - i)
-        }, {
-          (map + (i to it))
-        })
-      }
+    set = { map, optV ->
+      optV.fold({
+        (map - i)
+      }, {
+        (map + (i to it))
+      })
     }
   )
 
@@ -46,7 +44,7 @@ fun <K, V> MapInstances.traversal(): Traversal<Map<K, V>, V> = MapTraversal()
  */
 interface MapTraversal<K, V> : Traversal<Map<K, V>, V> {
   override fun <F> modifyF(FA: Applicative<F>, s: Map<K, V>, f: (V) -> Kind<F, V>): Kind<F, Map<K, V>> = FA.run {
-    s.k().traverse(FA, f).map { it.map }
+    s.k().traverse(FA, f)
   }
 
   companion object {
@@ -111,7 +109,7 @@ fun <K, V> MapInstances.index(): Index<Map<K, V>, K, V> = MapIndexInstance()
 interface MapIndexInstance<K, V> : Index<Map<K, V>, K, V> {
   override fun index(i: K): Optional<Map<K, V>, V> = POptional(
     getOrModify = { it[i]?.right() ?: it.left() },
-    set = { v -> { m -> m.mapValues { (k, vv) -> if (k == i) v else vv } } }
+    set = { m, v -> m.mapValues { (k, vv) -> if (k == i) v else vv } }
   )
 
   companion object {

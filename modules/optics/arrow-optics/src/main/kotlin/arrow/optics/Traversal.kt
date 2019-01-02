@@ -5,6 +5,9 @@ import arrow.core.*
 import arrow.data.*
 import arrow.higherkind
 import arrow.instances.monoid
+import arrow.instances.const.applicative.applicative
+import arrow.instances.id.applicative.applicative
+import arrow.instances.listk.monoid.monoid
 import arrow.typeclasses.*
 
 /**
@@ -188,7 +191,7 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
    * Map each target to a Monoid and combine the results
    */
   fun <R> foldMap(M: Monoid<R>, s: S, f: (A) -> R): R =
-    modifyF(Const.applicative(M, Unit), s) { b -> Const(f(b)) }.value()
+    modifyF(Const.applicative(M), s) { b -> Const(f(b)) }.value()
 
   /**
    * Fold using the given [Monoid] instance.
@@ -228,12 +231,12 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
   /**
    * Find the first target or [Option.None] if no targets
    */
-  fun headOption(s: S): Option<A> = foldMap(firstOptionMonoid<A>(), s) { b -> Const(Some(b)) }.value
+  fun headOption(s: S): Option<A> = foldMap(firstOptionMonoid<A>(), s) { b -> Const(Some(b)) }.value()
 
   /**
    * Find the first target or [Option.None] if no targets
    */
-  fun lastOption(s: S): Option<A> = foldMap(lastOptionMonoid<A>(), s) { b -> Const(Some(b)) }.value
+  fun lastOption(s: S): Option<A> = foldMap(lastOptionMonoid<A>(), s) { b -> Const(Some(b)) }.value()
 
   fun <U, V> choice(other: PTraversal<U, V, A, B>): PTraversal<Either<S, U>, Either<T, V>, A, B> = object : PTraversal<Either<S, U>, Either<T, V>, A, B> {
     override fun <F> modifyF(FA: Applicative<F>, s: Either<S, U>, f: (A) -> Kind<F, B>): Kind<F, Either<T, V>> = FA.run {
@@ -299,7 +302,7 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
 
   operator fun <C> plus(other: Fold<A, C>): Fold<S, C> = compose(other)
 
-  fun asSetter(): PSetter<S, T, A, B> = PSetter { f -> { s -> modify(s, f) } }
+  fun asSetter(): PSetter<S, T, A, B> = PSetter { s, f -> modify(s, f) }
 
   fun asFold(): Fold<S, A> = object : Fold<S, A> {
     override fun <R> foldMap(M: Monoid<R>, s: S, f: (A) -> R): R =
@@ -312,7 +315,7 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
   fun find(s: S, p: (A) -> Boolean): Option<A> = foldMap(firstOptionMonoid<A>(), s) { a ->
     if (p(a)) Const(Some(a))
     else Const(None)
-  }.value
+  }.value()
 
   /**
    * Map each target to a Monoid and combine the results
@@ -336,4 +339,58 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
    * Check if forall targets satisfy the predicate
    */
   fun forall(s: S, p: (A) -> Boolean): Boolean = foldMap(s, p, AndMonoid)
+
+  /**
+   * Extracts the focus [A] viewed through the [PTraversal].
+   */
+  fun extract(): State<S, ListK<A>> = State { s -> Tuple2(s, getAll(s)) }
+
+  /**
+   * Transforms a [PTraversal] into a [State].
+   * Alias for [extract].
+   */
+  fun toState(): State<S, ListK<A>> = extract()
+
+  /**
+   * Extract and map the focus [A] viewed through the [PTraversal] and applies [f] to it.
+   */
+  fun <C> extractMap(f: (A) -> C): State<S, ListK<C>> =
+    extract().map { it.map(f) }
+
 }
+
+/**
+ * Update the focus [A] viewed through the [Traversal] and returns its *new* value.
+ */
+fun <S, A> Traversal<S, A>.update(f: (A) -> A): State<S, ListK<A>> =
+  updateOld(f).map { it.map(f) }
+
+/**
+ * Update the focus [A] viewed through the [Traversal] and returns its *old* value.
+ */
+fun <S, A> Traversal<S, A>.updateOld(f: (A) -> A): State<S, ListK<A>> =
+  arrow.data.State { s -> Tuple2(modify(s, f), getAll(s)) }
+
+/**
+ * Update the focus [A] viewed through the [Traversal] and ignores both values
+ */
+fun <S, A> Traversal<S, A>.update_(f: (A) -> A): State<S, Unit> =
+  State { s -> Tuple2(modify(s, f), kotlin.Unit) }
+
+/**
+ * Assign the focus [A] viewed through the [Traversal] and returns its *new* value.
+ */
+fun <S, A> Traversal<S, A>.assign(a: A): State<S, ListK<A>> =
+  update { _ -> a }
+
+/**
+ * Assign the focus [A] viewed through the [Traversal] and returns its *old* value.
+ */
+fun <S, A> Traversal<S, A>.assignOld(a: A): State<S, ListK<A>> =
+  updateOld { _ -> a }
+
+/**
+ * Assign the focus [A] viewed through the [Traversal] and ignores both values.
+ */
+fun <S, A> Traversal<S, A>.assign_(a: A): State<S, Unit> =
+  update_ { _ -> a }

@@ -14,14 +14,17 @@ Note: This section keeps on growing! Keep an eye on it from time to time.
 This document is meant to be an introduction to Functional Programming for people from all backgrounds.
 We'll go through some of the key concepts and then dive into their implementation and use in real world cases.
 
+Some similar documents, focused on explaining general concepts rather than Arrow's versions,
+can be found for examples [in JavaScript](https://github.com/hemanth/functional-programming-jargon) and [in Scala](https://gist.github.com/jdegoes/97459c0045f373f4eaf126998d8f65dc).
+
 ### Datatypes
 
 A datatype is a class that encapsulates one reusable coding pattern.
 These solutions have a canonical implementation that is generalised for all possible uses.
 
-Some common patterns expressed as datatypes are absence handling with [`Option`]({{ '/docs/datatypes/option' | relative_url }}),
-branching in code with [`Either`]({{ '/docs/datatypes/either' | relative_url }}),
-catching exceptions with [`Try`]({{ '/docs/datatypes/try' | relative_url }}),
+Some common patterns expressed as datatypes are absence handling with [`Option`]({{ '/docs/arrow/core/option' | relative_url }}),
+branching in code with [`Either`]({{ '/docs/arrow/core/either' | relative_url }}),
+catching exceptions with [`Try`]({{ '/docs/arrow/core/try' | relative_url }}),
 or interacting with the platform the program runs in using [`IO`]({{ '/docs/effects/io' | relative_url }}).
 
 Some of these patterns are implemented using a mix of `sealed` classes where each inheritor is a `data` class.
@@ -47,10 +50,10 @@ Typeclasses are interface abstractions that define a set of extension functions 
 These extension functions are canonical and consistent across languages and libraries;
 and they have inherent mathematical properties that are testable, such as commutativity or associativity.
 
-Examples of behaviours abstracted by typeclasses are: comparability ([`Eq`]({{ '/docs/typeclasses/eq' | relative_url }})),
-composability ([`Monoid`]({{ '/docs/typeclasses/monoid' | relative_url }})),
-its contents can be mapped from one type to another ([`Functor`]({{ '/docs/typeclasses/functor' | relative_url }})),
-or error recovery ([`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }})).
+Examples of behaviours abstracted by typeclasses are: comparability ([`Eq`]({{ '/docs/arrow/typeclasses/eq' | relative_url }})),
+composability ([`Monoid`]({{ '/docs/arrow/typeclasses/monoid' | relative_url }})),
+its contents can be mapped from one type to another ([`Functor`]({{ '/docs/arrow/typeclasses/functor' | relative_url }})),
+or error recovery ([`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }})).
 
 Typeclasses have two main uses:
 
@@ -74,19 +77,29 @@ interface Eq<F> {
 }
 ```
 
-### Instances
+### Instances and Extensions Interfaces
 
 A single implementation of a typeclass for a specific datatype or class.
 Because typeclasses require generic parameters each implementation is meant to be unique for that parameter.
 
+For example, given a class like this:
+
 ```kotlin
-@instance(User::class)
+data class User(val id: Int) {
+  companion object
+}
+```
+
+We can declare that instances of this class can be equated based on their `id` property, and therefore that `User` itself is an instance of the `Eq` typeclass:
+
+```kotlin
+@extension
 interface UserEqInstance: Eq<User> {
   override fun User.eqv(b: User): Boolean = id == b.id
 }
 ```
 
-All typeclass instances provided Arrow can be found in the companion object of the type they're defined for, including platform types like String or Int.
+Note that classes must have companion objects for this to work. All typeclass instances provided by Arrow can be found in the companion object of the type they're defined for, including platform types like String or Int.
 
 ```kotlin:ank:silent
 import arrow.*
@@ -94,6 +107,9 @@ import arrow.core.*
 import arrow.data.*
 import arrow.instances.*
 import arrow.typeclasses.*
+import arrow.instances.option.functor.*
+import arrow.instances.either.monadError.*
+import arrow.instances.listk.traverse.*
 ```
 
 ```kotlin:ank
@@ -105,6 +121,8 @@ Option.functor()
 ```
 
 ```kotlin:ank
+import arrow.instances.mapk.semigroup.*
+
 MapK.semigroup<String, Int>(Int.semigroup())
 ```
 
@@ -116,9 +134,9 @@ Either.monadError<Throwable>()
 ListK.traverse()
 ```
 
-If you're defining your own instances and would like for them to be discoverable in their corresponding datatypes' companion object, you can generate it by annotating them as `@instance`, and Arrow's [annotation processor](https://github.com/arrow-kt/arrow#additional-setup) will create the extension functions for you.
+If you're defining your own instances and would like for them to be discoverable in their corresponding datatypes' companion object, you can generate it by annotating them as `@extension`, and Arrow's [annotation processor](https://github.com/arrow-kt/arrow#additional-setup) will create the extension functions for you.
 
-NOTE: If you'd like to use `@instance` for transitive typeclasses, like a `Show<List<A>>` that requires a function returning a `Show<A>`, you'll need for the function providing the transitive typeclass to have 0 parameters, and for any new typeclass defined outside Arrow to be on a package named `typeclass`. This will make the transitive typeclass a parameter of the extension function. This is a *temporary* limitation of the processor to be fixed because we don't have an annotation or type marker for what's a typeclass and what's not.
+NOTE: If you'd like to use `@extension` for transitive typeclasses, like a `Show<List<A>>` that requires a function returning a `Show<A>`, you'll need for the function providing the transitive typeclass to have 0 parameters. This will make the transitive typeclass a parameter of the extension function.
 
 
 ### Syntax
@@ -213,12 +231,12 @@ fun <L> ForEither(): EitherContextPartiallyApplied<L> =
 > NOTE: This approach to type constructors will be simplified if [KEEP-87](https://github.com/Kotlin/KEEP/pull/87) is approved. Go vote!
 
 A type constructor is any class or interface that has at least one generic parameter. For example,
-[`ListK<A>`]({{ '/docs/datatypes/listk' | relative_url }}) or [`Option<A>`]({{ '/docs/datatypes/option' | relative_url }}).
+[`ListK<A>`]({{ '/docs/arrow/data/listk' | relative_url }}) or [`Option<A>`]({{ '/docs/arrow/core/option' | relative_url }}).
 They're called constructors because they're similar to a factory function where the parameter is `A`, except type constructors work only for types.
 So, we could say that after applying the parameter `Int` to the type constructor `ListK<A>` it returns a `ListK<Int>`.
 As `ListK<Int>` isn't parametrized in any generic value it is not considered a type constructor anymore, just a regular type.
 
-Like functions, a type constructor with several parameters like [`Either<L, R>`]({{ '/docs/datatypes/either' | relative_url }}) can be partially applied for one of them to return another type constructor with one fewer parameter.
+Like functions, a type constructor with several parameters like [`Either<L, R>`]({{ '/docs/arrow/core/either' | relative_url }}) can be partially applied for one of them to return another type constructor with one fewer parameter.
 For example, applying `Throwable` to the left side yields `Either<Throwable, A>`, or applying `String` to the right side results in `Either<E, String>`.
 
 Type constructors are useful when matched with typeclasses because they help us represent instances of parametrized classes — the containers — that work for all generic parameters — the content.
@@ -255,13 +273,13 @@ This function by convention is called `fix()`, as in, fixing a type from somethi
 fun Kind<ForListK, A>.fix() = this as ListK<A>
 ```
 
-This way we have can to convert from `ListK<A>` to `Kind<ForListK, A>` via simple subclassing and from `Kind<ForListK, A>` to `ListK<A>` using the function `fix()`.
+This way we can convert from `ListK<A>` to `Kind<ForListK, A>` via simple subclassing and from `Kind<ForListK, A>` to `ListK<A>` using the function `fix()`.
 Being able to define extension functions that work for partially applied generics is a feature from Kotlin that's not available in Java.
 You can define `fun Kind<ForOption, A>.fix()` and `fun Kind<ForListK, A>.fix()` and the compiler can smartly decide which one you're trying to use.
 If it can't it means there's an ambiguity you should fix!
 
 The function `fix()` is already defined for all datatypes in Λrrow, alongside a typealias for its `Kind<F, A>` specialization done by suffixing the type with Of, as in `ListKOf<A>` or `OptionOf<A>`. If you're creating your own datatype that's also a type constructor and would like to create all these helper types and functions,
-you can do so simply by annotating it as `@higerkind` and the Λrrow's [annotation processor](https://github.com/arrow-kt/arrow#additional-setup) will create them for you.
+you can do so simply by annotating it as `@higherkind` and the Λrrow's [annotation processor](https://github.com/arrow-kt/arrow#additional-setup) will create them for you.
 
 ```kotlin
 @higherkind
@@ -274,13 +292,13 @@ data class ListK<A>(val list: List<A>): ListKOf<A>
 // fun ListKOf<A>.fix() = this as ListK<A>
 ```
 
-Note that the annotation `@higerkind` will also generate the integration typealiases required by [KindedJ]({{ '/docs/integrations/kindedj' | relative_url }}) as long as the datatype is invariant. You can read more about sharing Higher Kinds and type constructors across JVM libraries in [KindedJ's README](https://github.com/KindedJ/KindedJ#rationale).
+Note that the annotation `@higherkind` will also generate the integration typealiases required by [KindedJ]({{ '/docs/integrations/kindedj' | relative_url }}) as long as the datatype is invariant. You can read more about sharing Higher Kinds and type constructors across JVM libraries in [KindedJ's README](https://github.com/KindedJ/KindedJ#rationale).
 
 #### Using Higher Kinds with typeclasses
 
 Now that we have a way of representing generic constructors for any type, we can write typeclasses that are parametrised for containers.
 
-Let's take as an example a typeclass that specifies how to map the contents of any container `F`. This typeclass that comes from computer science is called a [`Functor`]({{ '/docs/typeclasses/functor' | relative_url }}).
+Let's take as an example a typeclass that specifies how to map the contents of any container `F`. This typeclass that comes from computer science is called a [`Functor`]({{ '/docs/arrow/typeclasses/functor' | relative_url }}).
 
 ```kotlin
 interface Functor<F> {
@@ -293,7 +311,7 @@ See how the class is parametrized on the container `F`, and the function is para
 Let's define an instance of `Functor` for the datatype `ListK`, our own wrapper for lists.
 
 ```kotlin
-@instance(ListK::class)
+@extension
 interface ListKFunctorInstance : Functor<ForListK> {
   override fun <A, B> Kind<F, A>.map(f: (A) -> B): ListK<B> {
     val list: ListK<A> = this.fix()
@@ -302,15 +320,18 @@ interface ListKFunctorInstance : Functor<ForListK> {
 }
 ```
 
-This interface extends `Functor` for the value `F` of `ListK`. We use an annotation processor `@instance` to generate an object out of an interface with all the default methods already defined, and to add an extension function to get it into the companion object of the datatype.
+This interface extends `Functor` for the value `F` of `ListK`. We use an annotation processor `@extension` to generate an object out of an interface with all the default methods already defined, and to add an extension function to get it into the companion object of the datatype.
+The `@extension` processor also projects all type class declared functions into the data type that it's extending as extensions functions.
+These extensions functions may be imported a la carte when working with concrete data types. 
 
 ```kotlin
-@instance(ListK::class)
+@extension
 interface ListKFunctorInstance : Functor<ForListK>
 ```
 
 ```kotlin:ank
 // Somewhere else in the codebase
+import arrow.instances.listk.functor.*
 ListK.functor()
 ```
 
@@ -331,7 +352,7 @@ return list.map(f)
 
 Higher kinds are also used to model functions that require for a datatype to implement a typeclass. This way you can create functions that abstract behavior (defined by a typeclass) and allow callers to define which datatype they'd like to apply it to.
 
-Let's use the typeclass [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}), that contains the constructor function `just()`.
+Let's use the typeclass [`Applicative`]({{ '/docs/arrow/typeclasses/applicative' | relative_url }}), that contains the constructor function `just()`.
 
 ```kotlin
 interface Applicative<F>: Functor<F> {
@@ -361,7 +382,7 @@ interface ListKApplicativeInstance : Applicative<ForListK> {
 }
 ```
 
-And now we can show how this function `randomUserStructure()` can be used for any datatype that implements [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}). As the function returns a value `Kind<F, User>` the caller is responsible of calling `fix()` to downcast it to the expected value.
+And now we can show how this function `randomUserStructure()` can be used for any datatype that implements [`Applicative`]({{ '/docs/arrow/typeclasses/applicative' | relative_url }}). As the function returns a value `Kind<F, User>` the caller is responsible of calling `fix()` to downcast it to the expected value.
 
 ```kotlin
 val list = ListK.applicative().randomUserStructure(::User).fix()
@@ -378,7 +399,7 @@ val either = Either.applicative<Unit>().randomUserStructure(::User).fix()
 //Right(User(221))
 ```
 
-Passing the instance in every function call seems like a burden. So, because `randomUserStructure` is an extension function for [`Applicative`]({{ '/docs/typeclasses/applicative' | relative_url }}) we can omit the implicit parameter as long as we are within the scope of an Applicative instance. You can use the standard functions `with` and `run` for this.
+Passing the instance in every function call seems like a burden. So, because `randomUserStructure` is an extension function for [`Applicative`]({{ '/docs/arrow/typeclasses/applicative' | relative_url }}) we can omit the implicit parameter as long as we are within the scope of an Applicative instance. You can use the standard functions `with` and `run` for this.
 
 ```kotlin
 with (ListK.applicative()) {

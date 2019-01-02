@@ -20,6 +20,9 @@ out/
 .gradle/
 build/
 
+# dokka + ank apidocs merge to sources
+apidocs/
+
 # Local configuration file (sdk path, etc)
 local.properties
 
@@ -104,6 +107,10 @@ com_crashlytics_export_strings.xml
 crashlytics.properties
 crashlytics-build.properties
 fabric.properties
+
+# Jekyll
+_site
+.sass-cache
 
 ### Intellij Patch ###
 # Comment Reason: https://github.com/joeblau/gitignore.io/issues/186#issuecomment-215987721

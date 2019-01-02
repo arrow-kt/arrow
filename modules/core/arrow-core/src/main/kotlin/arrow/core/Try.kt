@@ -44,9 +44,6 @@ sealed class Try<out A> : TryOf<A> {
 
   }
 
-  @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("getOrElse { ifEmpty }"))
-  operator fun invoke() = get()
-
   fun <B> ap(ff: TryOf<(A) -> B>): Try<B> = ff.fix().flatMap { f -> map(f) }.fix()
 
   /**
@@ -69,6 +66,9 @@ sealed class Try<out A> : TryOf<A> {
    */
   fun filter(p: Predicate<A>): Try<A> =
     flatMap { if (p(it)) Success(it) else Failure(TryException.PredicateException("Predicate does not hold for $it")) }
+
+  fun <B> mapFilter(f: (A) -> Option<B>): Try<B> =
+    flatMap { a -> f(a).fold({ Failure(TryException.PredicateException("Predicate does not hold")) }, { Try.just(it) }) }
 
   /**
    * Inverts this `Try`. If this is a `Failure`, returns its exception wrapped in a `Success`.
@@ -93,36 +93,7 @@ sealed class Try<out A> : TryOf<A> {
 
   abstract fun isSuccess(): Boolean
 
-  @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("fold({ Unit }, f)"))
-  fun foreach(f: (A) -> Unit) {
-    if (isSuccess()) f(get())
-  }
-
-  @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("map { f(it); it }"))
-  fun onEach(f: (A) -> Unit): Try<A> = map {
-    f(it)
-    it
-  }
-
   fun exists(predicate: Predicate<A>): Boolean = fold({ false }, { predicate(it) })
-
-  @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("getOrElse { ifEmpty }"))
-  abstract fun get(): A
-
-  @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("map { body(it); it }"))
-  fun onSuccess(body: (A) -> Unit): Try<A> {
-    fold({ Unit }, body)
-    return this
-  }
-
-  @Deprecated(DeprecatedUnsafeAccess, ReplaceWith("fold ({ Try { body(it); it }}, { Try.just(it) })"))
-  fun onFailure(body: (Throwable) -> Unit): Try<A> = when (this) {
-    is Success -> this
-    is Failure -> {
-      body(exception)
-      this
-    }
-  }
 
   fun toOption(): Option<A> = fold({ None }, { Some(it) })
 
@@ -165,10 +136,6 @@ sealed class Try<out A> : TryOf<A> {
     override fun isFailure(): Boolean = true
 
     override fun isSuccess(): Boolean = false
-
-    override fun get(): Nothing {
-      throw exception
-    }
   }
 
   /**
@@ -178,8 +145,6 @@ sealed class Try<out A> : TryOf<A> {
     override fun isFailure(): Boolean = false
 
     override fun isSuccess(): Boolean = true
-
-    override fun get(): A = value
   }
 }
 
@@ -226,16 +191,6 @@ fun <A> TryOf<A>.rescue(f: (Throwable) -> TryOf<A>): Try<A> = fix().recoverWith(
  * This is like map for the exception.
  */
 fun <B> TryOf<B>.recover(f: (Throwable) -> B): Try<B> = fix().fold({ Success(f(it)) }, { Success(it) })
-
-@Deprecated(DeprecatedAmbiguity, ReplaceWith("recover(f)"))
-fun <A> TryOf<A>.handle(f: (Throwable) -> A): Try<A> = fix().recover(f)
-
-/**
- * Completes this `Try` by applying the function `ifFailure` to this if this is of type `Failure`,
- * or conversely, by applying `ifSuccess` if this is a `Success`.
- */
-@Deprecated(DeprecatedAmbiguity, ReplaceWith("fold(ifFailure, ifSuccess)"))
-inline fun <A, B> TryOf<A>.transform(ifSuccess: (A) -> TryOf<B>, ifFailure: (Throwable) -> TryOf<B>): Try<B> = fix().fold({ ifFailure(it).fix() }, { fix().flatMap(ifSuccess) })
 
 fun <A> (() -> A).try_(): Try<A> = Try(this)
 

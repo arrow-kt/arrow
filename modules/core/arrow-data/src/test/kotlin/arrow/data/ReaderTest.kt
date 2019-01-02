@@ -13,11 +13,11 @@ class ReaderTest : UnitSpec() {
   init {
 
     "map should return mapped value" {
-      { a: Int -> a * 2 }.reader().map { it -> it * 3 }.runId(2) shouldBe 12
+      { a: Int -> a * 2 }.reader().map { it * 3 }.runId(2) shouldBe 12
     }
 
     "map should be callable without explicit functor instance" {
-      { a: Int -> a * 2 }.reader().map { it -> it * 3 }.runId(2) shouldBe 12
+      { a: Int -> a * 2 }.reader().map { it * 3 }.runId(2) shouldBe 12
     }
 
     "flatMap should map over the inner value" {
@@ -46,8 +46,8 @@ class ReaderTest : UnitSpec() {
 
     "local should switch context to be able to combine Readers with different contexts" {
       val r = { a: Int -> a * 2 }.reader()
-      r.local<Boolean> { it -> if (it) 1 else 3 }.runId(false) shouldBe 6
-      r.local<Boolean> { it -> if (it) 1 else 3 }.runId(true) shouldBe 2
+      r.local<Boolean> { if (it) 1 else 3 }.runId(false) shouldBe 6
+      r.local<Boolean> { if (it) 1 else 3 }.runId(true) shouldBe 2
     }
 
     "reader should lift a reader from any (A) -> B function" {

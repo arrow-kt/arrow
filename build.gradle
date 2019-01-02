@@ -23,18 +23,22 @@ buildscript {
         jUnitVersion = '4.12'
         jUnitVintageVersion = '5.2.0'
         kotlinTestVersion = '3.1.5'
-        kotlinVersion = '1.2.61'
+        kotlinVersion = '1.3.11'
         daggerVersion = '2.17'
-        kotlinxCoroutinesVersion = '0.24.0'
+        kotlinxCoroutinesVersion = '1.1.0'
         kotlinxCollectionsImmutableVersion = '0.1'
-        kotlinPoetVersion='1.0.0-RC1'
-        projectReactorVersion='3.1.8.RELEASE'
-        rxJavaVersion='2.2.1'
+        kotlinPoetVersion = '1.0.0-RC1'
+        projectReactorVersion = '3.1.8.RELEASE'
+        rxJavaVersion = '2.2.1'
+        dokka_version = '0.9.17'
+        detekt_version = '1.0.0-RC12'
     }
 
     repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
         jcenter()
-        maven { url 'https://jitpack.io' }
         maven { url "http://dl.bintray.com/kotlin/kotlin-dev" }
         maven { url "https://dl.bintray.com/jetbrains/markdown/" }
         maven { url "https://dl.bintray.com/arrow-kt/arrow-kt/" }
@@ -47,16 +51,19 @@ buildscript {
         classpath 'io.arrow-kt:ank-gradle-plugin:0.7.1'
         classpath 'org.ajoberstar:gradle-git-publish:1.0.1'
         classpath "net.rdrei.android.buildtimetracker:gradle-plugin:0.11.1"
+        classpath "org.jetbrains.dokka:dokka-gradle-plugin:$dokka_version"
+        classpath "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:$detekt_version"
     }
 }
 
-apply from: 'detekt.gradle.kts'
+def pathApiDocs = "${rootDir}/modules/docs/arrow-docs/docs/docs/apidocs"
 
 allprojects {
     apply plugin: 'base'
 
     clean.doFirst {
         delete "${rootDir}/infographic/arrow-infographic.txt"
+        delete pathApiDocs
     }
 
     repositories {
@@ -65,7 +72,6 @@ allprojects {
         maven { url "http://dl.bintray.com/kotlin/kotlin-dev" }
         maven { url "http://dl.bintray.com/arrow-kt/arrow-kt" }
         maven { url "https://dl.bintray.com/jetbrains/markdown/" }
-        maven { url 'https://jitpack.io' }
     }
 }
 
@@ -76,11 +82,44 @@ subprojects { project ->
 
     apply plugin: 'kotlin'
     apply plugin: 'jacoco'
+    apply plugin: 'org.jetbrains.dokka'
+    apply plugin: 'io.gitlab.arturbosch.detekt'
 
     archivesBaseName = POM_ARTIFACT_ID
 
     jacoco {
         toolVersion '0.8.2'
+    }
+
+    //dokka log spam `Can't find node by signature` comes from https://github.com/Kotlin/dokka/issues/269
+    dokka {
+        outputFormat = 'jekyll'
+        outputDirectory = pathApiDocs
+
+        includes = ['README.md']
+        reportUndocumented = false
+
+        // Specifies the location of the project source code on the Web.
+        // If provided, Dokka generates "source" links for each declaration.
+        // Repeat for multiple mappings
+        linkMapping {
+            // Source directory
+            dir = "src/main/kotlin"
+
+            // URL showing where the source code can be accessed through the web browser
+            url = "https://github.com/arrow-kt/arrow/blob/master/${relativeProjectPath('src/main/kotlin')}"
+
+            // Suffix which is used to append the line number to the URL. Use #L for GitHub
+            suffix = "#L"
+        }
+
+    }
+
+    detekt {
+        toolVersion = detekt_version
+        input = files("src/main/java", "src/main/kotlin", "src/test/kotlin")
+        parallel = true
+        config = files("${rootProject.projectDir}/detekt.yml")
     }
 
     task codeCoverageReport(type: JacocoReport) {
@@ -120,6 +159,7 @@ subprojects { project ->
     test {
         useJUnitPlatform()
         testLogging {
+            exceptionFormat 'full'
             events "passed", "skipped", "failed", "standardOut", "standardError"
         }
     }
@@ -127,8 +167,6 @@ subprojects { project ->
     tasks.withType(Test) {
         maxParallelForks = Runtime.runtime.availableProcessors()
     }
-
-    build.dependsOn ':detekt'
 
     sourceCompatibility = javaVersion
     targetCompatibility = javaVersion
@@ -174,12 +212,44 @@ tasks.create('repl') {
     }
 }
 
-task wrapper(type: Wrapper) {
-    distributionUrl = "https://services.gradle.org/distributions/gradle-${project.ext.gradleVersion}-all.zip"
-}
-
 apply plugin: 'com.github.ben-manes.versions'
 
 configurations.all {
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
+dependencyUpdates {
+    outputFormatter { result ->
+        final dependenciesToCheck = [
+                'org.jetbrains.kotlin:kotlin-stdlib',
+                'org.jetbrains.kotlin:kotlin-stdlib-jdk7',
+                'org.jetbrains.kotlin:kotlin-stdlib-jdk8',
+                'org.jetbrains.kotlin:kotlin-gradle-plugin',
+                'org.jetbrains.kotlinx:kotlinx-coroutines-core'
+        ]
+        final disallowedQualifiers = ['alpha', 'beta', 'rc', 'cr', 'm', 'preview', 'eap']
+        final isDisallowed = { dependency -> { qualifier -> dependency.version ==~ /(?i).*[.-]${qualifier}[.\d-]*/ } }
+        final dependencies = result.current.dependencies
+            .plus(result.outdated.dependencies)
+            .plus(result.exceeded.dependencies)
+            .plus(result.unresolved.dependencies)
+            .findAll { dependency -> dependenciesToCheck.any { it == "${dependency.group}:${dependency.name}" } }
+
+        final isRejected = dependencies
+            .any { dependency -> disallowedQualifiers.any(isDisallowed(dependency)) }
+
+        if (isRejected) {
+            final title = "\nError: Kotlin and Coroutines must depends on release version!"
+            final message = dependencies
+                .inject(title) { acc, dependency ->
+                    "$acc\n${dependency.group}:${dependency.name}:${dependency.version}"
+                }
+            
+            throw new GradleException(message)
+        }
+    }
+}
+
+task checkDependenciesVersion {
+    dependsOn dependencyUpdates
 }

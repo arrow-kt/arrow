@@ -31,14 +31,16 @@ class DaggerWriterTFunctorInstance<F, W> @Inject constructor(val FF: Functor<F>)
   override fun FF(): Functor<F> = FF
 }
 
-class DaggerWriterTApplicativeInstance<F, L> @Inject constructor(val MF: Monad<F>, val ML: Monoid<L>) : WriterTApplicativeInstance<F, L> {
-  override fun FF(): Monad<F> = MF
+class DaggerWriterTApplicativeInstance<F, L> @Inject constructor(val AF: Applicative<F>, val ML: Monoid<L>) : WriterTApplicativeInstance<F, L> {
+  override fun FF(): Functor<F> = AF
   override fun MM(): Monoid<L> = ML
+  override fun AF(): Applicative<F> = AF
 }
 
 class DaggerWriterTMonadInstance<F, L> @Inject constructor(val MF: Monad<F>, val ML: Monoid<L>) : WriterTMonadInstance<F, L> {
   override fun FF(): Monad<F> = MF
   override fun MM(): Monoid<L> = ML
+  override fun MF(): Monad<F> = MF
 }
 
 class DaggerWriterTSemigroupKInstance<F, L> @Inject constructor(val SKF: SemigroupK<F>) : WriterTSemigroupKInstance<F, L> {
@@ -47,4 +49,5 @@ class DaggerWriterTSemigroupKInstance<F, L> @Inject constructor(val SKF: Semigro
 
 class DaggerWriterTMonoidKInstance<F, L> @Inject constructor(val SKF: MonoidK<F>) : WriterTMonoidKInstance<F, L> {
   override fun SS(): MonoidK<F> = SKF
+  override fun MF(): MonoidK<F> = SKF
 }

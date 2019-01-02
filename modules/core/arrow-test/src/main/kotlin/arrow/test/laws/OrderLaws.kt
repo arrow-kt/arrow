@@ -8,13 +8,8 @@ import java.util.*
 
 object OrderLaws {
 
-  val random = Random()
-
-  inline fun <F> laws(O: Order<F>, fGen: Gen<F>, funcGen: Gen<(F) -> F>): List<Law> =
-    EqLaws.laws(O) {
-      val fSeq = fGen.random()
-fSeq.elementAt(random.nextInt(fSeq.count()))
-    } + listOf(
+  fun <F> laws(O: Order<F>, fGen: Gen<F>, funcGen: Gen<(F) -> F>): List<Law> =
+    EqLaws.laws(O) { fGen.generate() } + listOf(
       Law("Order law: reflexivity equality") { O.reflexitivityEq(fGen) },
       Law("Order law: symmetry equality") { O.symmetryEq(fGen) },
       Law("Order law: antisymmetry equality") { O.antisymmetryEq(fGen, funcGen) },
@@ -28,7 +23,8 @@ fSeq.elementAt(random.nextInt(fSeq.count()))
       Law("Order law: totality order") { O.totalityOrder(fGen) },
       Law("Order law: compare order") { O.compareOrder(fGen) },
       Law("Order law: min order") { O.minOrder(fGen) },
-      Law("Order law: max order") { O.maxOrder(fGen) }
+      Law("Order law: max order") { O.maxOrder(fGen) },
+      Law("Order law: operator compareTo delegates to compare order") { O.operatorCompareToOrder(fGen) }
     )
 
   fun <F> Order<F>.reflexitivityEq(fGen: Gen<F>) = run{
@@ -110,5 +106,10 @@ fSeq.elementAt(random.nextInt(fSeq.count()))
       if (c < 0) m == y
       else if (c == 0) (m == x) && (m == y)
       else m == x
+    }
+
+  fun <F> Order<F>.operatorCompareToOrder(fGen: Gen<F>): Unit =
+    forAll(fGen, fGen) { x, y ->
+      x.compare(y) == x.compareTo(y)
     }
 }

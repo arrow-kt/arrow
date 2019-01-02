@@ -2,10 +2,14 @@ package arrow.optics
 
 import arrow.core.None
 import arrow.data.*
-import arrow.optics.dsl.at
-import arrow.optics.instances.traversal
-import arrow.test.UnitSpec
-import io.kotlintest.shouldBe
+import arrow.optics.dsl.*
+import arrow.optics.instances.*
+import arrow.optics.instances.listk.index.index
+import arrow.optics.instances.mapk.at.at
+import arrow.optics.instances.mapk.each.each
+import arrow.test.*
+
+import io.kotlintest.matchers.shouldBe
 
 @optics
 data class Street(val number: Int, val name: String) {

@@ -3,9 +3,9 @@ package arrow.optics
 import arrow.core.Option
 import arrow.data.ForListK
 import arrow.data.ListK
-import arrow.data.foldable
 import arrow.data.k
 import arrow.instances.monoid
+import arrow.instances.listk.foldable.foldable
 import arrow.test.UnitSpec
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.properties.Gen
@@ -24,7 +24,7 @@ class FoldTest : UnitSpec() {
       val select = Fold.select<List<Int>> { it.contains(1) }
 
       forAll(Gen.list(Gen.int())) { ints ->
-        select.run { getAll(ints) }.list.firstOrNull() ==
+        select.run { getAll(ints) }.firstOrNull() ==
           ints.let { if (it.contains(1)) it else null }
       }
     }

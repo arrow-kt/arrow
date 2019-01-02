@@ -5,7 +5,9 @@ import arrow.core.Option
 import arrow.core.each
 import arrow.core.eq
 import arrow.data.ListK
-import arrow.data.eq
+import arrow.instances.listk.eq.eq
+import arrow.instances.option.eq.eq
+import arrow.optics.instances.either.each.each
 import arrow.test.UnitSpec
 import arrow.test.generators.genEither
 import arrow.test.generators.genFunctionAToB

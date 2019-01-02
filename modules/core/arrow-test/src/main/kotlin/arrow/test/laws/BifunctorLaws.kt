@@ -10,6 +10,7 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
 object BifunctorLaws {
+
     fun <F> laws(BF: Bifunctor<F>, f: (Int) -> Kind2<F, Int, Int>, EQ: Eq<Kind2<F, Int, Int>>): List<Law> =
         listOf(
             Law("Bifunctor Laws: Identity") { BF.identity(f, EQ) },
@@ -28,8 +29,8 @@ object BifunctorLaws {
             genFunctionAToB<Int, Int>(Gen.int()),
             genFunctionAToB<Int, Int>(Gen.int()),
             genFunctionAToB<Int, Int>(Gen.int())
-        ) { fa: Kind2<F, Int, Int>, f, g, x, y ->
-            fa.bimap(f, g).bimap(x, y).equalUnderTheLaw(fa.bimap(f andThen x, g andThen y), EQ)
+        ) { fa: Kind2<F, Int, Int>, ff, g, x, y ->
+            fa.bimap(ff, g).bimap(x, y).equalUnderTheLaw(fa.bimap(ff andThen x, g andThen y), EQ)
         }
 
 }

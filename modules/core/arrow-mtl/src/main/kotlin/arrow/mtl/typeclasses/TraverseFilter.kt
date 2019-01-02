@@ -2,9 +2,13 @@ package arrow.mtl.typeclasses
 
 import arrow.Kind
 import arrow.core.*
+import arrow.instances.id.applicative.applicative
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Traverse
 
+/**
+ * ank_macro_hierarchy(arrow.mtl.typeclasses.TraverseFilter)
+ */
 interface TraverseFilter<F> : Traverse<F>, FunctorFilter<F> {
 
   fun <G, A, B> Kind<F, A>.traverseFilter(AP: Applicative<G>, f: (A) -> Kind<G, Option<B>>): Kind<G, Kind<F, B>>

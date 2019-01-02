@@ -1,0 +1,14 @@
+apply plugin: 'kotlin'
+
+dependencies {
+    compile project(":arrow-instances-core")
+    compile project(":arrow-instances-data")
+    compile project(":arrow-effects-instances")
+
+    compile "org.jetbrains.kotlin:kotlin-compiler:$kotlinVersion"
+    compile "org.jetbrains.kotlin:kotlin-script-util:$kotlinVersion"
+    kapt project(':arrow-annotations-processor')
+}
+
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
+apply plugin: 'kotlin-kapt'

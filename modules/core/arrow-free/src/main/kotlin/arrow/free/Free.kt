@@ -8,7 +8,7 @@ import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Monad
 
-inline fun <M, S, A> FreeOf<S, A>.foldMapK(f: FunctionK<S, M>, MM: Monad<M>): Kind<M, A> =
+fun <M, S, A> FreeOf<S, A>.foldMapK(f: FunctionK<S, M>, MM: Monad<M>): Kind<M, A> =
   (this as Free<S, A>).foldMap(f, MM)
 
 @higherkind
@@ -63,6 +63,7 @@ fun <S, A, B> FreeOf<S, A>.flatMap(f: (A) -> Free<S, B>): Free<S, B> = Free.Flat
 
 fun <S, A, B> FreeOf<S, A>.ap(ff: FreeOf<S, (A) -> B>): Free<S, B> = ff.fix().flatMap { f -> map(f = f) }.fix()
 
+/** Takes one evaluation step in the Free monad, re-associating left-nested binds in the process. */
 @Suppress("UNCHECKED_CAST")
 tailrec fun <S, A> Free<S, A>.step(): Free<S, A> =
   if (this is Free.FlatMapped<S, A, *> && this.c is Free.FlatMapped<S, *, *>) {

@@ -1,6 +1,9 @@
 package arrow.generic
 
 import arrow.core.*
+import arrow.instances.`try`.applicative.applicative
+import arrow.instances.option.applicative.applicative
+import arrow.instances.option.monoid.monoid
 import arrow.product
 import arrow.test.UnitSpec
 import arrow.test.generators.genOption
@@ -98,7 +101,7 @@ class ProductTest : UnitSpec() {
           a.combine(b) == Person(
             a.name + b.name,
             a.age + b.age,
-            Option.monoid(this).combineAll(a.related, b.related)
+            Option.monoid(this).combineAll(listOf(a.related, b.related))
           )
         }
       }
@@ -109,44 +112,33 @@ class ProductTest : UnitSpec() {
         a + b == Person(
           a.name + b.name,
           a.age + b.age,
-          Option.monoid(Person.monoid()).combineAll(a.related, b.related)
+          Option.monoid(Person.monoid()).combineAll(listOf(a.related, b.related))
         )
       }
     }
 
     "Monoid empty" {
-      forAll(genPerson(), genPerson()) { a, b ->
-        Person.monoid().empty() == Person("", 0, None)
-      }
+      Person.monoid().empty() shouldBe Person("", 0, None)
     }
 
     "Monoid empty syntax" {
-      forAll(genPerson(), genPerson()) { a, b ->
-        emptyPerson() == Person("", 0, None)
-      }
+      emptyPerson() shouldBe  Person("", 0, None)
     }
 
-    fun defaultPerson(age: Int) = Person("", age, None)
-
-    val getPerson: (Int) -> Person = { age :Int -> genPerson().random().firstOrNull{it.age == age}.toOption().getOrElse{defaultPerson(age)}}
-
     testLaws(
-      EqLaws.laws(
-        Person.eq(),
-        getPerson),
+      EqLaws.laws(Person.eq()) { personGen().generate().copy(age = it) },
       SemigroupLaws.laws(
         Person.semigroup(),
-        getPerson(1),
-        getPerson(2),
-        getPerson(3),
+        personGen().generate(),
+        personGen().generate(),
+        personGen().generate(),
         Person.eq()
       ),
       MonoidLaws.laws(
         Person.monoid(),
-        getPerson(1),
+        personGen().generate(),
         Person.eq()
       )
     )
-
   }
 }

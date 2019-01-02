@@ -1,7 +1,11 @@
 package arrow.renzu
 
 import arrow.common.messager.log
-import arrow.common.utils.*
+import arrow.common.utils.ClassOrPackageDataWrapper
+import arrow.common.utils.extractFullName
+import arrow.common.utils.recurseFilesUpwards
+import arrow.common.utils.removeBackticks
+import arrow.common.utils.simpleName
 import arrow.instances.AnnotatedInstance
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.TypeTable
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.supertypes
@@ -9,8 +13,8 @@ import java.io.File
 import javax.lang.model.element.Name
 
 data class Instance(val target: AnnotatedInstance) {
-  val name: Name = target.classElement.simpleName
-  val arrowModule: String = target.classOrPackageProto.`package`.substringAfterLast(".")
+  val name: Name = target.instance.simpleName
+  val arrowModule: String = target.dataTypeInstance.`package`.substringAfterLast(".")
 }
 
 data class TypeClass(val processor: RenzuProcessor, val simpleName: String, val classWrapper: ClassOrPackageDataWrapper.Class) {
@@ -41,6 +45,7 @@ fun parentTypeClasses(processor: RenzuProcessor, current: ClassOrPackageDataWrap
     }
     else -> {
       interfaces.flatMap { i ->
+        @Suppress("SwallowedException")
         try {
           val className = i.removeBackticks().substringBefore("<")
           val typeClassElement = processor.elementUtils.getTypeElement(className)
@@ -73,7 +78,7 @@ class RenzuGenerator(
   private fun normalizeTypeclassTree(instances: List<Instance>)
     : Map<TypeClass, Pair<Instances, Set<ParentTypeClass>>> =
     instances.fold(mapOf()) { acc, instance ->
-      parentTypeClasses(processor, instance.target.classOrPackageProto).fold(acc) { acc2, typeclass ->
+      parentTypeClasses(processor, instance.target.dataTypeInstance).fold(acc) { acc2, typeclass ->
         val parentTypeClasses = parentTypeClasses(processor, typeclass.classWrapper)
 
         val value = acc2[typeclass]

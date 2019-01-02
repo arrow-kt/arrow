@@ -22,7 +22,7 @@ abstract class UnitSpec : AbstractStringSpec() {
   }
 
 
-  inline fun <F> Eq<F>.logged(): Eq<F> = Eq { a, b ->
+  fun <F> Eq<F>.logged(): Eq<F> = Eq { a, b ->
     try {
       val result = a.eqv(b)
       if (!result) {

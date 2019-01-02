@@ -37,3 +37,7 @@ Note: This section keeps on growing! Keep an eye on it from time to time.
 [istonikula/realworld-api](https://github.com/istonikula/realworld-api): A spring 5 project
 
 [Karumi/play-framework-kotlin](https://github.com/Karumi/play-framework-kotlin): A Play Framework project using Kotlin and Arrow.
+
+#### Katas
+
+[pedrovgs/KotlinKatas](https://github.com/pedrovgs/KotlinKatas): Kotlin training repository used to learn Kotlin and Functional Programming by solving some common katas using just purely functional programming powered by Arrow.

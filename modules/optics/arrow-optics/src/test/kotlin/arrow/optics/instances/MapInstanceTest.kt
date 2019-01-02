@@ -7,6 +7,13 @@ import arrow.core.monoid
 import arrow.data.*
 import arrow.instances.monoid
 import arrow.instances.semigroup
+import arrow.instances.listk.eq.eq
+import arrow.instances.option.eq.eq
+import arrow.instances.option.monoid.monoid
+import arrow.optics.instances.mapk.at.at
+import arrow.optics.instances.mapk.each.each
+import arrow.optics.instances.mapk.filterIndex.filterIndex
+import arrow.optics.instances.mapk.index.index
 import arrow.test.UnitSpec
 import arrow.test.generators.*
 import arrow.test.laws.LensLaws
