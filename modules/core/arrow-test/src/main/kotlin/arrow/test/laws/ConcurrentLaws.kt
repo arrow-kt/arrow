@@ -44,6 +44,7 @@ object ConcurrentLaws {
       Law("Concurrent Laws: race pair cancels loser") { CF.racePairCancelsLoser(EQ, ctx) },
       Law("Concurrent Laws: race pair can join left") { CF.racePairCanJoinLeft(EQ, ctx) },
       Law("Concurrent Laws: race pair can join right") { CF.racePairCanJoinRight(EQ, ctx) },
+      Law("Concurrent Laws: parallel map cancels both") { CF.parMapCancelsBoth(EQ, ctx) },
       Law("Concurrent Laws: cancelling race pair cancels both") { CF.racePairCancelsBoth(EQ, ctx) },
       Law("Concurrent Laws: action concurrent with pure value is just action") { CF.actionConcurrentWithPureValueIsJustAction(EQ, ctx) }
     )
@@ -290,6 +291,22 @@ object ConcurrentLaws {
         val race = racePair(ctx, loserA, loserB).startF(ctx).bind()
 
         s.acquireN(2L).flatMap { race.cancel() }.bind()
+        pa.get.bind() + pb.get.bind()
+      }.equalUnderTheLaw(just(a + b), EQ)
+    }
+
+  fun <F> Concurrent<F>.parMapCancelsBoth(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
+    forAll(Gen.int(), Gen.int()) { a, b ->
+      binding {
+        val s = Semaphore(0L, this@parMapCancelsBoth).bind()
+        val pa = Promise.uncancelable<F, Int>(this@parMapCancelsBoth).bind()
+        val pb = Promise.uncancelable<F, Int>(this@parMapCancelsBoth).bind()
+
+        val loserA = s.release().bracket(use = { never<String>() }, release = { pa.complete(a) })
+        val loserB = s.release().bracket(use = { never<Int>() }, release = { pb.complete(b) })
+
+        val (_, cancelRace) = parMapN(ctx, loserA, loserB, ::Tuple2).startF(ctx).bind()
+        s.acquireN(2L).flatMap { cancelRace }.bind()
         pa.get.bind() + pb.get.bind()
       }.equalUnderTheLaw(just(a + b), EQ)
     }

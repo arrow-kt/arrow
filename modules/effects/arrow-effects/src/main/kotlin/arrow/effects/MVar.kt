@@ -238,6 +238,23 @@ interface MVar<F, A> {
       CancelableMVar(initial, CF)
 
     /**
+     * Create an uncancelable [MVar] that's initialized to an [initial] value.
+     *
+     * ```kotlin:ank:playground
+     * import arrow.effects.*
+     * import arrow.effects.instances.io.concurrent.concurrent
+     *
+     * fun main(args: Array<String>) {
+     *   //sampleStart
+     *   val mvar: IOOf<MVar<ForIO, Int>> = MVar.cancelable(5, IO.concurrent())
+     *   //sampleEnd
+     * }
+     * ```
+     */
+    operator fun <F, A> invoke(initial: A, CF: Concurrent<F>): Kind<F, MVar<F, A>> =
+      CancelableMVar(initial, CF)
+
+    /**
      * Create an uncancelable empty [MVar].
      *
      * ```kotlin:ank:playground
@@ -294,7 +311,7 @@ interface MVar<F, A> {
 }
 
 /**
- * Builds a [Mvar] value for data types [F]
+ * Builds a [MVar] value for data types [F]
  * without deciding the type of the MVar's value.
  *
  * ```kotlin:ank:playground
@@ -313,7 +330,7 @@ interface MVar<F, A> {
 interface MVarPartialOf<F> {
 
   /**
-   * Builds a [Mvar] with a value of type [A].
+   * Builds a [MVar] with a value of type [A].
    *
    * ```kotlin:ank:playground
    * import arrow.effects.*
@@ -330,7 +347,7 @@ interface MVarPartialOf<F> {
   fun <A> of(a: A): Kind<F, MVar<F, A>>
 
   /**
-   * Builds an empty [Mvar] for type [A].
+   * Builds an empty [MVar] for type [A].
    *
    * ```kotlin:ank:playground
    * import arrow.effects.*

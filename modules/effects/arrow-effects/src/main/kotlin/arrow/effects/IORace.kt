@@ -45,7 +45,7 @@ import kotlin.coroutines.suspendCoroutine
  * @return [IO] either [Left] with product of the winner's result [ioA] and still running task [ioB],
  *   or [Right] with product of running task [ioA] and the winner's result [ioB].
  *
- * @see raceN for a simpler version that cancels loser.
+ * @see [arrow.effects.typeclasses.Concurrent.raceN] for a simpler version that cancels loser.
  */
 fun <A, B> IO.Companion.racePair(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<B>): IO<Either<Tuple2<A, Fiber<ForIO, B>>, Tuple2<Fiber<ForIO, A>, B>>> =
   IO.async { conn, cb ->

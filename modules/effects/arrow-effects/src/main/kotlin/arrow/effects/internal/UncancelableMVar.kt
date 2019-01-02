@@ -112,8 +112,10 @@ internal class UncancelableMVar<F, A> private constructor(initial: State<A>, AS:
     when (val current = stateRef.get()) {
       is State.WaitForTake ->
         if (current.puts.isEmpty()) {
-          if (stateRef.compareAndSet(current, State.empty())) onTake(Right(current.value)).run { unit() } // Signals completion of `take`
-          else unsafeTake(onTake) // retry
+          if (stateRef.compareAndSet(current, State.empty())) {
+            onTake(Right(current.value))
+            unit() // Signals completion of `take`
+          } else unsafeTake(onTake) // retry
         } else {
           val (ax, notify) = current.puts.first()
           val xs = current.puts.drop(1)
