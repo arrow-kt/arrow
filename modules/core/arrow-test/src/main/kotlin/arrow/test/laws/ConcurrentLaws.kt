@@ -26,7 +26,8 @@ object ConcurrentLaws {
                testStackSafety: Boolean = true): List<Law> =
     AsyncLaws.laws(CF, EQ, EQ_EITHER, testStackSafety) + listOf(
       Law("Concurrent Laws: cancel on bracket releases") { CF.cancelOnBracketReleases(EQ, ctx) },
-      Law("Concurrent Laws: async cancelable receives cancel signal") { CF.asyncCancelableReceivesCancelSignal(EQ, ctx) },
+      Law("Concurrent Laws: cancelable should run CancelToken on cancel") { CF.cancelableReceivesCancelSignal(EQ, ctx) },
+      Law("Concurrent Laws: cancelableF should run CancelToken on cancel") { CF.cancelableFReceivesCancelSignal(EQ, ctx) },
       Law("Concurrent Laws: async can cancel upstream") { CF.asyncCanCancelUpstream(EQ, ctx) },
       Law("Concurrent Laws: async should run KindConnection on Fiber#cancel") { CF.asyncShouldRunKindConnectionOnCancel(EQ, ctx) },
       Law("Concurrent Laws: asyncF register can be cancelled") { CF.asyncFRegisterCanBeCancelled(EQ, ctx) },
@@ -80,10 +81,10 @@ object ConcurrentLaws {
     }
   }
 
-  fun <F> Concurrent<F>.asyncCancelableReceivesCancelSignal(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
+  fun <F> Concurrent<F>.cancelableReceivesCancelSignal(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
     forAll(Gen.int()) { i ->
       binding {
-        val release = Promise.uncancelable<F, Int>(this@asyncCancelableReceivesCancelSignal).bind()
+        val release = Promise.uncancelable<F, Int>(this@cancelableReceivesCancelSignal).bind()
         val latch = Promise.unsafe<Unit>()
         val async = cancelable<Unit> { latch.complete(Unit); release.complete(i) }
         val (_, cancel) = async.startF(ctx).bind()
@@ -92,6 +93,23 @@ object ConcurrentLaws {
         release.get.bind()
       }.equalUnderTheLaw(just(i), EQ)
     }
+
+  fun <F> Concurrent<F>.cancelableFReceivesCancelSignal(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
+    forAll(Gen.int()) { i ->
+      binding {
+        val release = Promise<F, Int>(this@cancelableFReceivesCancelSignal).bind()
+        val latch = Promise<F, Unit>(this@cancelableFReceivesCancelSignal).bind()
+        val async = cancelableF<Unit> {
+          latch.complete(Unit)
+            .map { release.complete(i) }
+        }
+        val (_, cancel) = async.startF(ctx).bind()
+        asyncF<Unit> { cb -> latch.get.map { cb(Right(it)) } }.bind()
+        cancel.bind()
+        release.get.bind()
+      }.equalUnderTheLaw(just(i), EQ)
+    }
+
 
   fun <F> Concurrent<F>.asyncCanCancelUpstream(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
     forAll(Gen.int()) { i ->
