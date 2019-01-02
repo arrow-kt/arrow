@@ -45,6 +45,30 @@ allprojects {
 }
 ```
 
+# Starting in Arrow 0.9.0 
+
+Starting in 0.9.0 Arrow follows the following convention for artifact publication.
+
+The arrow modules are Core, Effects, Optics, Recursion, etc.
+
+An Arrow module is composed of data types and type classes.
+Arrow modules are exported and published with the following semantics.
+
+If we take for example `arrow-core`. 
+
+Arrow core contains the basic arrow type classes and data types and it's composed of 3 main artifacts that may be used a la carte:
+
+Recomended for most use cases:
+
+- `arrow-core` (Depends on data and extensions modules and exports both)
+
+Trimmed down versions:
+
+- `arrow-core-data` (Only data types)
+- `arrow-core-extensions` (Only type class extensions)
+
+# Current stable version
+
 Add the dependencies into the project's `build.gradle`
 
 ```groovy
