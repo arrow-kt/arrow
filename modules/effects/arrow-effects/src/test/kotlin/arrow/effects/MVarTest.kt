@@ -11,12 +11,12 @@ import arrow.instances.option.eq.eq
 import arrow.test.UnitSpec
 import arrow.test.laws.equalUnderTheLaw
 import arrow.typeclasses.Eq
-import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class MVarTest : UnitSpec() {
 
   fun <A> EQ(): Eq<Kind<ForIO, A>> = Eq { a, b ->

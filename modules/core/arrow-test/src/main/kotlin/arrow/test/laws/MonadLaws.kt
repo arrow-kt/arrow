@@ -33,7 +33,7 @@ object MonadLaws {
     )
 
   fun <F> Monad<F>.leftIdentity(EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(genFunctionAToB(genApplicative(Gen.int(), this)), Gen.int()) { f: (Int) -> Kind<F, Int>, a: Int ->
+    forAll(genFunctionAToB<Int, Kind<F, Int>>(genApplicative(Gen.int(), this)), Gen.int()) { f: (Int) -> Kind<F, Int>, a: Int ->
       just(a).flatMap(f).equalUnderTheLaw(f(a), EQ)
     }
 
@@ -42,20 +42,22 @@ object MonadLaws {
       fa.flatMap { just(it) }.equalUnderTheLaw(fa, EQ)
     }
 
-  fun <F> Monad<F>.kleisliLeftIdentity(EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(genFunctionAToB(genApplicative(Gen.int(), this)), Gen.int()) { f: (Int) -> Kind<F, Int>, a: Int ->
-      (Kleisli { n: Int -> just(n) }.andThen(this, Kleisli(f)).run(a).equalUnderTheLaw(f(a), EQ))
+  fun <F> Monad<F>.kleisliLeftIdentity(EQ: Eq<Kind<F, Int>>) {
+    val M = this
+    forAll(genFunctionAToB<Int, Kind<F, Int>>(genApplicative(Gen.int(), this)), Gen.int()) { f: (Int) -> Kind<F, Int>, a: Int ->
+      (Kleisli { n: Int -> just(n) }.andThen(M, Kleisli(f)).run(a).equalUnderTheLaw(f(a), EQ))
     }
   }
 
-  fun <F> Monad<F>.kleisliRightIdentity(EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(genFunctionAToB(genApplicative(Gen.int(), this)), Gen.int()) { f: (Int) -> Kind<F, Int>, a: Int ->
-      (Kleisli(f).andThen(this, Kleisli { n: Int -> just(n) }).run(a).equalUnderTheLaw(f(a), EQ))
+  fun <F> Monad<F>.kleisliRightIdentity(EQ: Eq<Kind<F, Int>>) {
+    val M = this
+    forAll(genFunctionAToB<Int, Kind<F, Int>>(genApplicative(Gen.int(), this)), Gen.int()) { f: (Int) -> Kind<F, Int>, a: Int ->
+      (Kleisli(f).andThen(M, Kleisli { n: Int -> just(n) }).run(a).equalUnderTheLaw(f(a), EQ))
     }
   }
 
   fun <F> Monad<F>.mapFlatMapCoherence(EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(genFunctionAToB(Gen.int()), genApplicative(Gen.int(), this)) { f: (Int) -> Int, fa: Kind<F, Int> ->
+    forAll(genFunctionAToB<Int, Int>(Gen.int()), genApplicative(Gen.int(), this)) { f: (Int) -> Int, fa: Kind<F, Int> ->
       fa.flatMap { just(f(it)) }.equalUnderTheLaw(fa.map(f), EQ)
     }
 

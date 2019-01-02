@@ -8,8 +8,12 @@ import java.util.*
 
 object OrderLaws {
 
+  val random = Random()
+
   fun <F> laws(O: Order<F>, fGen: Gen<F>, funcGen: Gen<(F) -> F>): List<Law> =
-    EqLaws.laws(O) { fGen.generate() } + listOf(
+    EqLaws.laws(O) { val fSeq = fGen.random()
+      fSeq.elementAt(random.nextInt(fSeq.count()))
+    } + listOf(
       Law("Order law: reflexivity equality") { O.reflexitivityEq(fGen) },
       Law("Order law: symmetry equality") { O.symmetryEq(fGen) },
       Law("Order law: antisymmetry equality") { O.antisymmetryEq(fGen, funcGen) },

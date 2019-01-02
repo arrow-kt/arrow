@@ -13,11 +13,11 @@ import arrow.test.laws.MonadLaws
 import arrow.test.laws.MonoidLaws
 import arrow.test.laws.SemigroupLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class Function0Test : UnitSpec() {
   val EQ: Eq<Kind<ForFunction0, Int>> = Eq { a, b ->
     a() == b()

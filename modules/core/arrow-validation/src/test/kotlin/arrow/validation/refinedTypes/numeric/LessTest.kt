@@ -3,13 +3,13 @@ package arrow.validation.refinedTypes.numeric
 import arrow.instances.order
 import arrow.test.UnitSpec
 import arrow.validation.refinedTypes.numeric.validated.less.less
-import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.filter
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class LessTest : UnitSpec() {
   init {
     val max = 100

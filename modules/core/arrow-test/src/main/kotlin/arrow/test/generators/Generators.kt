@@ -29,7 +29,7 @@ fun <F, A> genDoubleConstructor(valueGen: Gen<A>, cf: (A) -> Kind2<F, A, A>): Ge
 
 fun <F, A, B> genConstructor2(valueGen: Gen<A>, ff: (A) -> Kind<F, (A) -> B>): Gen<Kind<F, (A) -> B>> = valueGen.map(ff)
 
-fun genIntSmall(): Gen<Int> = Gen.oneOf(Gen.negativeIntegers(), Gen.choose(0, Int.MAX_VALUE / 10000))
+fun genIntSmall(): Gen<Int> = Gen.oneOf(Gen.choose(Int.MIN_VALUE / 10000, -1), Gen.choose(0, Int.MAX_VALUE / 10000))
 
 fun <A, B> genTuple(genA: Gen<A>, genB: Gen<B>): Gen<Tuple2<A, B>> = Gen.bind(genA,genB){ a:A, b:B -> Tuple2(a, b) }
 
@@ -58,7 +58,7 @@ fun <A, B, C, D, E, F, G, H, I, J> genTuple(genA: Gen<A>, genB: Gen<B>, genC: Ge
   Gen.bind(genTuple(genA,genB, genC, genD, genE, genF, genG, genH, genI), genJ){tuple: Tuple9<A, B, C, D, E, F, G, H, I>, j:J -> Tuple10(tuple.a, tuple.b, tuple.c, tuple.d, tuple.e, tuple.f, tuple.g, tuple.h, tuple.i, j)}
 
 fun genIntPredicate(): Gen<(Int) -> Boolean> =
-  Gen.int().filter {it==0}.flatMap { num ->
+  Gen.int().filterNot {it==0}.flatMap { num ->
     val absNum = Math.abs(num)
     Gen.from(listOf<(Int) -> Boolean>(
       { it > num },

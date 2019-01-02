@@ -9,7 +9,7 @@ import arrow.optics.instances.mapk.at.at
 import arrow.optics.instances.mapk.each.each
 import arrow.test.*
 
-import io.kotlintest.matchers.shouldBe
+import io.kotlintest.shouldBe
 
 @optics
 data class Street(val number: Int, val name: String) {

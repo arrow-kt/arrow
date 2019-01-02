@@ -9,9 +9,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
-import javax.script.ScriptContext
-import javax.script.ScriptEngine
-import javax.script.ScriptEngineManager
+import javax.script.*
 
 val extensionMappings = mapOf(
   "java" to "java",
@@ -195,19 +193,19 @@ fun <F> monadDeferInterpreter(MF: MonadDefer<F>): AnkOps<F> = object : AnkOps<F>
   }
 
   override fun replaceAnkToLang(content: Sequence<String>, compiledSnippets: Sequence<Snippet>): Sequence<String> =
-    sequenceOf(compiledSnippets.foldLeft(content.joinToString("\n")) { content, snippet ->
+    sequenceOf(compiledSnippets.foldLeft(content.joinToString("\n")) { snippetContent, snippet ->
       snippet.result.fold(
-        { content.replace(snippet.fence, "{: data-executable='true'}\n\n```${snippet.lang}\n${snippet.code}\n```") },
+        { snippetContent.replace(snippet.fence, "{: data-executable='true'}\n\n```${snippet.lang}\n${snippet.code}\n```") },
         {
           when {
             // these are extensions declared in type classes that should be removed since the extension generator
             // processor is the one in charge of projecting those examples in the generated markdown files
-            snippet.isPlaygroundExtension -> content.replace(snippet.fence, it)
+            snippet.isPlaygroundExtension -> snippetContent.replace(snippet.fence, it)
             // a regular playground
-            snippet.isPlayground -> content.replace(snippet.fence, "{: data-executable='true'}\n\n```${snippet.lang}\n${snippet.code}\n$it\n```")
-            snippet.isReplace -> content.replace(snippet.fence, it)
-            snippet.isOutFile -> content.replace(snippet.fence, "")
-            else -> content.replace(snippet.fence, "```${snippet.lang}\n" + snippet.code + "\n" + it + "\n```")
+            snippet.isPlayground -> snippetContent.replace(snippet.fence, "{: data-executable='true'}\n\n```${snippet.lang}\n${snippet.code}\n$it\n```")
+            snippet.isReplace -> snippetContent.replace(snippet.fence, it)
+            snippet.isOutFile -> snippetContent.replace(snippet.fence, "")
+            else -> snippetContent.replace(snippet.fence, "```${snippet.lang}\n" + snippet.code + "\n" + it + "\n```")
           }
         }
       )

@@ -3,11 +3,11 @@ package arrow.validation.refinedTypes.numeric
 import arrow.instances.order
 import arrow.test.UnitSpec
 import arrow.validation.refinedTypes.numeric.validated.nonNegative.nonNegative
-import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class NonNegativeTest : UnitSpec() {
   init {
 

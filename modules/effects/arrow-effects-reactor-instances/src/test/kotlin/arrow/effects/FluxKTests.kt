@@ -13,7 +13,7 @@ import arrow.test.laws.AsyncLaws
 import arrow.test.laws.FoldableLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.Spec
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
@@ -29,7 +29,7 @@ import java.time.Duration
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class FluxKTest : UnitSpec() {
 
   fun <T> assertThreadNot(flux: Flux<T>, name: String): Flux<T> =

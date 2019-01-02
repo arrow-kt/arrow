@@ -14,13 +14,13 @@ import arrow.instances.option.eq.eq
 import arrow.test.UnitSpec
 import arrow.test.laws.equalUnderTheLaw
 import arrow.typeclasses.Eq
-import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.properties.map
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class SemaphoreTest : UnitSpec() {
 
   fun <A> EQ(EQA: Eq<A>): Eq<Kind<ForIO, A>> = Eq { a, b ->

@@ -15,11 +15,12 @@ import arrow.instances.either.semigroupK.semigroupK
 import arrow.instances.either.show.show
 import arrow.instances.either.traverse.traverse
 import arrow.test.UnitSpec
+import arrow.test.generators.genIntSmall
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Hash
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.properties.forAll
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
 @RunWith(KotlinTestRunner::class)
@@ -65,7 +66,7 @@ class EitherTest : UnitSpec() {
 
     "combine a right and a left should return left" {
       forAll { a: String, b: String ->
-        Either.left(a) == Either.left(a).combine(String.monoid(), String.monoid(), Either.right(b))
+        Either.left(a) == Either.left(a).combine(String.monoid(), String.monoid(), Either.right(b)) &&
         Either.left(a) == Either.right(b).combine(String.monoid(), String.monoid(), Either.left(a))
       }
     }
@@ -94,7 +95,7 @@ class EitherTest : UnitSpec() {
     }
 
     "filterOrElse should filter values" {
-      forAll { a: Int, b: Int ->
+      forAll(genIntSmall(), genIntSmall()) { a: Int, b: Int ->
         val left: Either<Int, Int> = Left(a)
 
         Right(a).filterOrElse({ it > a - 1 }, { b }) == Right(a)
@@ -105,7 +106,7 @@ class EitherTest : UnitSpec() {
     }
 
     "filterOrOther should filter values" {
-      forAll { a: Int, b: Int ->
+      forAll(genIntSmall(), genIntSmall()) { a: Int, b: Int ->
         val left: Either<Int, Int> = Left(a)
 
         Right(a).filterOrOther({ it > a - 1 }, { b + a }) == Right(a)
@@ -153,7 +154,7 @@ class EitherTest : UnitSpec() {
     }
 
     "mapLeft should alter left instance only" {
-      forAll { a: Int, b: Int ->
+      forAll(genIntSmall(), genIntSmall()) { a: Int, b: Int ->
         val right: Either<Int, Int> = Right(a)
         val left: Either<Int, Int> = Left(b)
         right.mapLeft { it + 1 } == right && left.mapLeft { it + 1 } == Left(b + 1)

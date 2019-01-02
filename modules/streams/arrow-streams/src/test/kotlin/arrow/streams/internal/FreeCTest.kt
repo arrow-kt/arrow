@@ -17,7 +17,7 @@ import arrow.test.generators.genThrowable
 import arrow.test.laws.EqLaws
 import arrow.test.laws.MonadDeferLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -73,7 +73,7 @@ private fun stackSafeTestProgram(n: Int, stopAt: Int): FreeC<ForOps, Int> = Ops.
   r
 }.fix()
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class FreeCTest : UnitSpec() {
 
   init {

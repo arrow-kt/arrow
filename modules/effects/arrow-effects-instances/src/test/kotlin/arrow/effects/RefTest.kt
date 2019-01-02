@@ -3,12 +3,12 @@ package arrow.effects
 import arrow.effects.instances.io.monadDefer.monadDefer
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
-import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class RefTest : UnitSpec() {
 
   init {

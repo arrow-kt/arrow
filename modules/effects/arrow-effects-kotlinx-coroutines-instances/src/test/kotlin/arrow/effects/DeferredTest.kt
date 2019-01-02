@@ -12,14 +12,13 @@ import arrow.instances.option.traverse.traverse
 import arrow.test.UnitSpec
 import arrow.test.generators.genIntSmall
 import arrow.test.laws.AsyncLaws
-import arrow.test.laws.shouldBe
 import arrow.test.laws.throwableEq
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Traverse
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.fail
-import io.kotlintest.matchers.shouldBe
+import io.kotlintest.runner.junit4.KotlinTestRunner
+import io.kotlintest.fail
+import io.kotlintest.shouldBe
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kotlinx.coroutines.*
@@ -29,7 +28,7 @@ import java.util.concurrent.CountDownLatch
 import java.lang.AssertionError
 import java.util.concurrent.TimeUnit
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class DeferredKTest : UnitSpec() {
   fun <A> EQ(): Eq<Kind<ForDeferredK, A>> = Eq { a, b ->
     val other = b.unsafeAttemptSync()

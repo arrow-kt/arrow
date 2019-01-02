@@ -7,7 +7,7 @@ import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.Spec
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
@@ -23,7 +23,7 @@ import java.time.Duration
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class MonoKTest : UnitSpec() {
 
   fun <T> assertThreadNot(mono: Mono<T>, name: String): Mono<T> =

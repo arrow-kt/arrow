@@ -1,8 +1,6 @@
 package arrow.core
 
-import arrow.instances.eq
-import arrow.instances.hash
-import arrow.instances.monoid
+import arrow.instances.*
 import arrow.instances.option.applicative.applicative
 import arrow.instances.option.eq.eq
 import arrow.instances.option.hash.hash
@@ -14,21 +12,17 @@ import arrow.syntax.collections.firstOption
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
-import io.kotlintest.fail
-import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldNotBe
 import org.junit.runner.RunWith
-import java.util.*
 
 @RunWith(KotlinTestRunner::class)
 class OptionTest : UnitSpec() {
 
   val some: Option<String> = Some("kotlin")
   val none: Option<String> = Option.empty()
-  val random = Random()
 
   init {
 

@@ -6,13 +6,13 @@ import arrow.instances.TryMonadErrorInstance
 import arrow.reflect.*
 import arrow.test.UnitSpec
 import arrow.typeclasses.*
-import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.matchers.shouldBe
 import org.junit.runner.RunWith
 
 object Bogus
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class ReflectionTests : UnitSpec() {
 
   init {
