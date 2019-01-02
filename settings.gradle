@@ -42,6 +42,7 @@ include {
         }
 
         core {
+            _ 'core'
             _ 'core-data'
             _ 'core-extensions'
             _ 'extras'
