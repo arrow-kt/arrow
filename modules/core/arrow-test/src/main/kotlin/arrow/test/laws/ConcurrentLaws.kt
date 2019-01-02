@@ -2,9 +2,7 @@ package arrow.test.laws
 
 import arrow.Kind
 import arrow.core.*
-import arrow.effects.MVar
-import arrow.effects.Promise
-import arrow.effects.Semaphore
+import arrow.effects.*
 import arrow.effects.internal.unsafe
 import arrow.effects.typeclasses.Concurrent
 import arrow.effects.typeclasses.ExitCase
@@ -15,6 +13,7 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.properties.map
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import kotlin.coroutines.CoroutineContext
 
 object ConcurrentLaws {
@@ -28,7 +27,11 @@ object ConcurrentLaws {
     AsyncLaws.laws(CF, EQ, EQ_EITHER, testStackSafety) + listOf(
       Law("Concurrent Laws: cancel on bracket releases") { CF.cancelOnBracketReleases(EQ, ctx) },
       Law("Concurrent Laws: async cancelable receives cancel signal") { CF.asyncCancelableReceivesCancelSignal(EQ, ctx) },
+      Law("Concurrent Laws: async can cancel upstream") { CF.asyncCanCancelUpstream(EQ, ctx) },
+      Law("Concurrent Laws: async should run KindConnection on Fiber#cancel") { CF.asyncShouldRunKindConnectionOnCancel(EQ, ctx) },
       Law("Concurrent Laws: asyncF register can be cancelled") { CF.asyncFRegisterCanBeCancelled(EQ, ctx) },
+      Law("Concurrent Laws: asyncF can cancel upstream") { CF.asyncFCanCancelUpstream(EQ, ctx) },
+      Law("Concurrent Laws: asyncF should run KindConnection on Fiber#cancel") { CF.asyncFShouldRunKindConnectionOnCancel(EQ, ctx) },
       Law("Concurrent Laws: start join is identity") { CF.startJoinIsIdentity(EQ, ctx) },
       Law("Concurrent Laws: join is idempotent") { CF.joinIsIdempotent(EQ, ctx) },
       Law("Concurrent Laws: start cancel is unit") { CF.startCancelIsUnit(EQ_UNIT, ctx) },
@@ -90,6 +93,48 @@ object ConcurrentLaws {
       }.equalUnderTheLaw(just(i), EQ)
     }
 
+  fun <F> Concurrent<F>.asyncCanCancelUpstream(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
+    forAll(Gen.int()) { i ->
+      binding {
+        val latch = Promise<F, Int>(this@asyncCanCancelUpstream).bind()
+        val cancelToken = Promise.unsafe<CancelToken<F>>()
+
+        val upstream = async<Unit> { conn, cb ->
+          conn.push(latch.complete(i))
+          cb(Right(Unit))
+        }
+
+        val downstream = async<Unit> { conn, _ -> cancelToken.complete(conn.cancel()) }
+
+        upstream.followedBy(downstream).startF(ctx).bind()
+
+        delay(ctx) {
+          cancelToken.get.value()
+        }.flatten().startF(ctx).bind()
+
+        latch.get.bind()
+      }.equalUnderTheLaw(just(i), EQ)
+    }
+
+  fun <F> Concurrent<F>.asyncShouldRunKindConnectionOnCancel(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
+    forAll(Gen.int()) { i ->
+      binding {
+        val latch = Promise<F, Int>(this@asyncShouldRunKindConnectionOnCancel).bind()
+
+        val (_, cancel) = async<Unit> { conn, _ ->
+          conn.push(latch.complete(i))
+        }.startF(ctx).bind()
+
+        defer(Dispatchers.Default) {
+          //Without sleep we sometimes run into the edge case `cancel` runs before `conn.push`
+          runBlocking { kotlinx.coroutines.delay(1) }
+          cancel
+        }.bind()
+
+        latch.get.bind()
+      }.equalUnderTheLaw(just(i), EQ)
+    }
+
   fun <F> Concurrent<F>.asyncFRegisterCanBeCancelled(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
     forAll(Gen.int()) { i ->
       binding {
@@ -102,6 +147,44 @@ object ConcurrentLaws {
         acquire.get.bind()
         cancel.startF(ctx).bind()
         release.get.bind()
+      }.equalUnderTheLaw(just(i), EQ)
+    }
+
+  fun <F> Concurrent<F>.asyncFCanCancelUpstream(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
+    forAll(Gen.int()) { i ->
+      binding {
+        val latch = Promise<F, Int>(this@asyncFCanCancelUpstream).bind()
+        val upstream = async<Unit> { conn, cb ->
+          conn.push(latch.complete(i))
+          cb(Right(Unit))
+        }
+        val downstream = asyncF<Unit> { conn, _ ->
+          conn.cancel()
+        }
+
+        upstream.followedBy(downstream).startF(ctx).bind()
+
+        latch.get.bind()
+      }.equalUnderTheLaw(just(i), EQ)
+    }
+
+  fun <F> Concurrent<F>.asyncFShouldRunKindConnectionOnCancel(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
+    forAll(Gen.int()) { i ->
+      binding {
+        val latch = Promise<F, Int>(this@asyncFShouldRunKindConnectionOnCancel).bind()
+
+        val (_, cancel) = asyncF<Unit> { conn, _ ->
+          conn.push(latch.complete(i))
+          never()
+        }.startF(ctx).bind()
+
+        defer(Dispatchers.Default) {
+          //Without sleep we sometimes run into the edge case `cancel` runs before `conn.push`
+          runBlocking { kotlinx.coroutines.delay(1) }
+          cancel
+        }.bind()
+
+        latch.get.bind()
       }.equalUnderTheLaw(just(i), EQ)
     }
 
