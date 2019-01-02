@@ -5,8 +5,8 @@ import arrow.integrations.retrofit.adapter.retrofit.retrofit
 import arrow.test.UnitSpec
 import com.google.common.reflect.TypeToken
 import io.kotlintest.runner.junit4.KotlinTestRunner
-import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldThrow
+import io.kotlintest.shouldBe
 import okhttp3.HttpUrl
 import org.junit.runner.RunWith
 

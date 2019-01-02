@@ -1,17 +1,12 @@
 package arrow.optics
 
 import arrow.core.*
-import arrow.data.State
-import arrow.data.k
-import arrow.data.map
-import arrow.data.run
 import arrow.data.*
 import arrow.instances.monoid
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import arrow.test.generators.genFunctionAToB
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
@@ -135,58 +130,58 @@ class GetterTest : UnitSpec() {
     }
 
     "Asking for the focus in a Reader" {
-      forAll(TokenGen) { token: Token ->
+      forAll(genToken) { token: Token ->
         tokenGetter.ask().runId(token) == token.value
       }
     }
 
     "toReader is an alias for ask" {
-      forAll(TokenGen) { token: Token ->
+      forAll(genToken) { token: Token ->
         tokenGetter.ask().runId(token) == tokenLens.toReader().runId(token)
       }
     }
 
     "Asks with f is the same as applying f to the focus of the lens" {
-      forAll(TokenGen, genFunctionAToB<String, String>(Gen.string())) { token, f ->
+      forAll(genToken, genFunctionAToB<String, String>(Gen.string())) { token, f ->
         tokenGetter.asks(f).runId(token) == f(token.value)
       }
     }
 
     "Asking for the focus in a Reader" {
-      forAll(TokenGen) { token: Token ->
+      forAll(genToken) { token: Token ->
         tokenGetter.ask().runId(token) == token.value
       }
     }
 
     "toReader is an alias for ask" {
-      forAll(TokenGen) { token: Token ->
+      forAll(genToken) { token: Token ->
         tokenGetter.ask().runId(token) == tokenLens.toReader().runId(token)
       }
     }
 
     "Asks with f is the same as applying f to the focus of the lens" {
-      forAll(TokenGen, genFunctionAToB<String, String>(Gen.string())) { token, f ->
+      forAll(genToken, genFunctionAToB<String, String>(Gen.string())) { token, f ->
         tokenGetter.asks(f).runId(token) == f(token.value)
       }
     }
 
     "Extract should extract the focus from the state" {
-      forAll(TokenGen) { token ->
-        tokenGetter.extract().run(token) ==
+      forAll(genToken) { generatedToken ->
+        tokenGetter.extract().run(generatedToken) ==
           State { token: Token ->
             token toT tokenGetter.get(token)
-          }.run(token)
+          }.run(generatedToken)
       }
     }
 
     "toState should be an alias to extract" {
-      forAll(TokenGen) { token ->
+      forAll(genToken) { token ->
         tokenGetter.toState().run(token) == tokenGetter.extract().run(token)
       }
     }
 
     "extractMap with f should be same as extract and map" {
-      forAll(TokenGen, genFunctionAToB<String, String>(Gen.string())) { token, f ->
+      forAll(genToken, genFunctionAToB<String, String>(Gen.string())) { token, f ->
         tokenGetter.extractMap(f).run(token) == tokenGetter.extract().map(f).run(token)
       }
     }

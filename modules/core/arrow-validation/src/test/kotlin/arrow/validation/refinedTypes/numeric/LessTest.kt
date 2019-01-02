@@ -2,11 +2,11 @@ package arrow.validation.refinedTypes.numeric
 
 import arrow.instances.order
 import arrow.test.UnitSpec
+import arrow.test.generators.genGreaterOrEqThan
+import arrow.test.generators.genLessThan
 import arrow.validation.refinedTypes.numeric.validated.less.less
-import io.kotlintest.runner.junit4.KotlinTestRunner
-import io.kotlintest.properties.Gen
-import io.kotlintest.properties.filter
 import io.kotlintest.properties.forAll
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
 @RunWith(KotlinTestRunner::class)
@@ -15,24 +15,16 @@ class LessTest : UnitSpec() {
     val max = 100
 
     "Can create Less for every number less than max defined by instance" {
-      forAll(LessThanGen(max)) { x: Int ->
+      forAll(genLessThan(max)) { x: Int ->
         x.less(Int.order(), max).isValid
       }
     }
 
     "Can not create Less for every number greater or equal to max defined by instance" {
-      forAll(GreaterOrEqThanGen(max)) { x: Int ->
+      forAll(genGreaterOrEqThan(max)) { x: Int ->
         x.less(Int.order(), max).isInvalid
       }
     }
 
-  }
-
-  class LessThanGen(private val max: Int) : Gen<Int> {
-    override fun generate(): Int = Gen.int().filter { it < max }.generate()
-  }
-
-  class GreaterOrEqThanGen(private val max: Int) : Gen<Int> {
-    override fun generate(): Int = Gen.int().filter { it >= max }.generate()
   }
 }

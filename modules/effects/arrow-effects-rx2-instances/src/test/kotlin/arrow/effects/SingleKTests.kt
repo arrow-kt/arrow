@@ -14,9 +14,8 @@ import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import io.kotlintest.runner.junit4.KotlinTestRunner
-import io.kotlintest.Spec
-import io.kotlintest.matchers.shouldBe
-import io.kotlintest.matchers.shouldNotBe
+import io.kotlintest.shouldBe
+import io.kotlintest.shouldNotBe
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers
@@ -47,11 +46,6 @@ class SingleKTests : UnitSpec() {
         errA == errB
       }
 
-  }
-
-  override fun interceptSpec(context: Spec, spec: () -> Unit) {
-    println("SingleK: Skipping sync laws for stack safety because they are not supported. See https://github.com/ReactiveX/RxJava/issues/6322")
-    super.interceptSpec(context, spec)
   }
 
   init {

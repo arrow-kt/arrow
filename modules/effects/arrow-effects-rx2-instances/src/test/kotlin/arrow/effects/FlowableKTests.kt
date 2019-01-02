@@ -3,16 +3,13 @@ package arrow.effects
 import arrow.effects.flowablek.async.async
 import arrow.effects.flowablek.foldable.foldable
 import arrow.effects.flowablek.functor.functor
+import arrow.effects.flowablek.monad.flatMap
 import arrow.effects.flowablek.monadThrow.bindingCatch
 import arrow.effects.flowablek.traverse.traverse
-import arrow.effects.flowablek.monad.flatMap
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
-import arrow.test.laws.AsyncLaws
-import arrow.test.laws.FoldableLaws
-import arrow.test.laws.TraverseLaws
+import arrow.test.laws.*
 import arrow.typeclasses.Eq
-import arrow.typeclasses.bindingCatch
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldNotBe
@@ -46,11 +43,6 @@ class FlowableKTests : UnitSpec() {
         errA == errB
       }
 
-  }
-
-  override fun interceptSpec(context: Spec, spec: () -> Unit) {
-    println("FlowableK: Skipping sync laws for stack safety because they are not supported. See https://github.com/ReactiveX/RxJava/issues/6322")
-    super.interceptSpec(context, spec)
   }
 
   init {

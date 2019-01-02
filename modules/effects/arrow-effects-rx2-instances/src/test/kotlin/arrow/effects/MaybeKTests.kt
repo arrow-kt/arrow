@@ -6,16 +6,15 @@ import arrow.effects.maybek.async.async
 import arrow.effects.maybek.effect.effect
 import arrow.effects.maybek.foldable.foldable
 import arrow.effects.maybek.functor.functor
+import arrow.effects.maybek.monad.flatMap
 import arrow.effects.maybek.monad.monad
 import arrow.effects.maybek.monadDefer.monadDefer
 import arrow.effects.maybek.monadError.monadError
 import arrow.effects.maybek.monadThrow.bindingCatch
 import arrow.effects.typeclasses.ExitCase
-import arrow.effects.maybek.monad.flatMap
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
-import io.kotlintest.Spec
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldNotBe
@@ -49,11 +48,6 @@ class MaybeKTests : UnitSpec() {
         errA == errB
       }
 
-  }
-
-  override fun interceptSpec(context: Spec, spec: () -> Unit) {
-    println("MaybeK: Skipping sync laws for stack safety because they are not supported. See https://github.com/ReactiveX/RxJava/issues/6322")
-    super.interceptSpec(context, spec)
   }
 
   init {

@@ -4,6 +4,7 @@ import arrow.test.generators.genTuple
 import arrow.typeclasses.Eq
 import io.kotlintest.TestContext
 import io.kotlintest.properties.Gen
+import io.kotlintest.should
 
 fun throwableEq() = Eq { a: Throwable, b ->
   a::class == b::class && a.message == b.message
@@ -13,6 +14,12 @@ data class Law(val name: String, val test: TestContext.() -> Unit)
 
 fun <A> A.equalUnderTheLaw(b: A, eq: Eq<A>): Boolean =
   eq.run { eqv(b) }
+
+fun <A> A.shouldBeEq(b: A, eq: Eq<A>): Unit = eq.run {
+  this.should {
+    io.kotlintest.Result(eqv(b), "Expected: $this but found: $b", "$this and $b should be equal")
+  }
+}
 
 fun <A> forFew(amount: Int, gena: Gen<A>, fn: (a: A) -> Boolean): Unit {
   gena.random().take(amount).map{

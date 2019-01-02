@@ -2,8 +2,6 @@ package arrow.optics.instances
 
 import arrow.core.Either
 import arrow.core.Option
-import arrow.core.each
-import arrow.core.eq
 import arrow.data.ListK
 import arrow.instances.listk.eq.eq
 import arrow.instances.option.eq.eq

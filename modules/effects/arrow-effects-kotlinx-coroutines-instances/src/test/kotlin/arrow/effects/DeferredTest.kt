@@ -11,8 +11,7 @@ import arrow.instances.option.functor.functor
 import arrow.instances.option.traverse.traverse
 import arrow.test.UnitSpec
 import arrow.test.generators.genIntSmall
-import arrow.test.laws.AsyncLaws
-import arrow.test.laws.throwableEq
+import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Traverse
@@ -81,7 +80,7 @@ class DeferredKTest : UnitSpec() {
       val ioa = DeferredK<Int>(Unconfined, GlobalScope, CoroutineStart.DEFAULT) { throw exception }
       ioa.unsafeRunAsync { either ->
         either.fold({
-          it.shouldBe(exception, throwableEq())
+          it.shouldBeEq(exception, throwableEq())
         }, { fail("") })
       }
     }

@@ -9,14 +9,11 @@ import arrow.effects.fluxk.monadThrow.bindingCatch
 import arrow.effects.fluxk.traverse.traverse
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
-import arrow.test.laws.AsyncLaws
-import arrow.test.laws.FoldableLaws
-import arrow.test.laws.TraverseLaws
+import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import io.kotlintest.runner.junit4.KotlinTestRunner
-import io.kotlintest.Spec
-import io.kotlintest.matchers.shouldBe
-import io.kotlintest.matchers.shouldNotBe
+import io.kotlintest.shouldBe
+import io.kotlintest.shouldNotBe
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.CoreMatchers.startsWith
 import org.hamcrest.MatcherAssert.assertThat
@@ -56,11 +53,6 @@ class FluxKTest : UnitSpec() {
 
         errA == errB
       }
-  }
-
-  override fun interceptSpec(context: Spec, spec: () -> Unit) {
-    println("FluxK: Skipping sync laws for stack safety because they are not supported. See https://github.com/reactor/reactor-core/issues/1441")
-    super.interceptSpec(context, spec)
   }
 
   init {

@@ -2,9 +2,11 @@ package arrow.validation.refinedTypes.numeric
 
 import arrow.instances.order
 import arrow.test.UnitSpec
+import arrow.test.generators.genGreater
+import arrow.test.generators.genLessEqual
 import arrow.validation.refinedTypes.numeric.validated.nonPositive.nonPositive
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.properties.forAll
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
 @RunWith(KotlinTestRunner::class)
@@ -12,13 +14,13 @@ class NonPositiveTest : UnitSpec() {
   init {
 
     "Should create NonPositive for every x <= 0" {
-      forAll(LessEqualTest.LessEqualGen(0)) { x: Int ->
+      forAll(genLessEqual(0)) { x: Int ->
         x.nonPositive(Int.order()).isValid
       }
     }
 
     "Should not create NonPositive for any x > 0" {
-      forAll(GreaterTest.GreaterGen(0)) { x: Int ->
+      forAll(genGreater(0)) { x: Int ->
         x.nonPositive(Int.order()).isInvalid
       }
     }

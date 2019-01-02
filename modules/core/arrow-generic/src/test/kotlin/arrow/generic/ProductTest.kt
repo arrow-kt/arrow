@@ -8,13 +8,12 @@ import arrow.product
 import arrow.test.UnitSpec
 import arrow.test.generators.genOption
 import arrow.test.generators.genTuple
-import arrow.test.laws.EqLaws
-import arrow.test.laws.MonoidLaws
-import arrow.test.laws.SemigroupLaws
+import arrow.test.laws.*
 import arrow.typeclasses.Applicative
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.runner.junit4.KotlinTestRunner
+import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
 
 @product
@@ -125,18 +124,24 @@ class ProductTest : UnitSpec() {
       emptyPerson() shouldBe  Person("", 0, None)
     }
 
+    fun defaultPerson(age: Int) = Person("", age, None)
+
+    val getPerson: (Int) -> Person = { age :Int -> genPerson().random().firstOrNull{it.age == age}.toOption().getOrElse{defaultPerson(age)}}
+
     testLaws(
-      EqLaws.laws(Person.eq()) { personGen().generate().copy(age = it) },
+      EqLaws.laws(
+        Person.eq(),
+        getPerson),
       SemigroupLaws.laws(
         Person.semigroup(),
-        personGen().generate(),
-        personGen().generate(),
-        personGen().generate(),
+        getPerson(1),
+        getPerson(2),
+        getPerson(3),
         Person.eq()
       ),
       MonoidLaws.laws(
         Person.monoid(),
-        personGen().generate(),
+        getPerson(1),
         Person.eq()
       )
     )

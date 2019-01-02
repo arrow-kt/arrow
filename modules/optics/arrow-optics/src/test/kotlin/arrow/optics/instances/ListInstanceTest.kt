@@ -1,9 +1,7 @@
 package arrow.optics.instances
 
-import arrow.core.ListInstances
-import arrow.core.Option
-import arrow.core.eq
-import arrow.data.*
+import arrow.core.*
+import arrow.data.ListK
 import arrow.instances.eq
 import arrow.instances.listk.eq.eq
 import arrow.instances.option.eq.eq
@@ -14,11 +12,8 @@ import arrow.optics.instances.listk.filterIndex.filterIndex
 import arrow.optics.instances.listk.index.index
 import arrow.optics.instances.listk.snoc.snoc
 import arrow.test.UnitSpec
-import arrow.test.generators.genFunctionAToB
-import arrow.test.generators.genListK
-import arrow.test.laws.OptionalLaws
-import arrow.test.laws.PrismLaws
-import arrow.test.laws.TraversalLaws
+import arrow.test.generators.*
+import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.runner.junit4.KotlinTestRunner

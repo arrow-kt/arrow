@@ -2,19 +2,17 @@ package arrow.optics
 
 import arrow.core.*
 import arrow.data.*
-import arrow.instances.monoid
 import arrow.instances.`try`.applicative.applicative
 import arrow.instances.listk.eq.eq
+import arrow.instances.monoid
 import arrow.instances.option.eq.eq
 import arrow.test.UnitSpec
 import arrow.test.generators.*
-import arrow.test.laws.OptionalLaws
-import arrow.test.laws.SetterLaws
-import arrow.test.laws.TraversalLaws
+import arrow.test.laws.*
 import arrow.typeclasses.Eq
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
 @RunWith(KotlinTestRunner::class)
@@ -205,11 +203,11 @@ class OptionalTest : UnitSpec() {
     val successInt = Try.success<Int>().asOptional()
 
     "Extract should extract the focus from the state" {
-      forAll(genTry(Gen.int())) { x ->
-        successInt.extract().run(x) ==
+      forAll(genTry(Gen.int())) { tryInt ->
+        successInt.extract().run(tryInt) ==
           State { x: Try<Int> ->
             x toT successInt.getOption(x)
-          }.run(x)
+          }.run(tryInt)
       }
     }
 

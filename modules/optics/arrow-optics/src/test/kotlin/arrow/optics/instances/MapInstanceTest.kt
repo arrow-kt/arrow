@@ -2,8 +2,6 @@ package arrow.optics.instances
 
 import arrow.core.MapInstances
 import arrow.core.Option
-import arrow.core.eq
-import arrow.core.monoid
 import arrow.data.*
 import arrow.instances.monoid
 import arrow.instances.semigroup

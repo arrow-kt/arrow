@@ -1,13 +1,10 @@
 package arrow.core
 
 import arrow.test.UnitSpec
-import io.kotlintest.runner.junit4.KotlinTestRunner
+import io.kotlintest.*
 import io.kotlintest.matchers.startWith
-import io.kotlintest.should
-import io.kotlintest.shouldBe
-import io.kotlintest.shouldThrow
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
-import java.lang.IllegalArgumentException
 
 @RunWith(KotlinTestRunner::class)
 class PartialFunctionTests : UnitSpec() {
@@ -34,13 +31,13 @@ class PartialFunctionTests : UnitSpec() {
       val isEven = PartialFunction(definetAt, body)
 
       (isEven.isDefinedAt(2)) shouldBe true
-      isEven(2) shouldBe true
+      isEven(2) shouldBe body
     }
 
     "toPartialFunction"{
       val isEven = body.toPartialFunction(definetAt)
       (isEven.isDefinedAt(2)) shouldBe true
-      isEven(2) shouldBe true
+      isEven(2) shouldBe body
     }
 
     "orElse" {

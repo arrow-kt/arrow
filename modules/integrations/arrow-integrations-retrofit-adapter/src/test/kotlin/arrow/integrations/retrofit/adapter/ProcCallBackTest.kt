@@ -14,7 +14,7 @@ import arrow.integrations.retrofit.adapter.retrofit.ApiClientTest
 import arrow.integrations.retrofit.adapter.retrofit.retrofit
 import arrow.test.UnitSpec
 import io.kotlintest.runner.junit4.KotlinTestRunner
-import io.kotlintest.matchers.fail
+import io.kotlintest.fail
 import okhttp3.HttpUrl
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer

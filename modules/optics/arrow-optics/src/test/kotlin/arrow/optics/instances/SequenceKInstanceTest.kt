@@ -1,7 +1,6 @@
 package arrow.optics.instances
 
 import arrow.core.Option
-import arrow.core.eq
 import arrow.data.*
 import arrow.instances.eq
 import arrow.instances.listk.eq.eq

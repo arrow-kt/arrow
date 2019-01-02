@@ -57,8 +57,20 @@ fun <A, B, C, D, E, F, G, H, I> genTuple(genA: Gen<A>, genB: Gen<B>, genC: Gen<C
 fun <A, B, C, D, E, F, G, H, I, J> genTuple(genA: Gen<A>, genB: Gen<B>, genC: Gen<C>, genD: Gen<D>, genE: Gen<E>, genF: Gen<F>, genG: Gen<G>, genH: Gen<H>, genI: Gen<I>, genJ: Gen<J>): Gen<Tuple10<A, B, C, D, E, F, G, H, I, J>> =
   Gen.bind(genTuple(genA,genB, genC, genD, genE, genF, genG, genH, genI), genJ){tuple: Tuple9<A, B, C, D, E, F, G, H, I>, j:J -> Tuple10(tuple.a, tuple.b, tuple.c, tuple.d, tuple.e, tuple.f, tuple.g, tuple.h, tuple.i, j)}
 
+fun genNonZeroInt(): Gen<Int> = Gen.int().filter { it != 0 }
+
+fun genLessThan(max: Int) : Gen<Int> = Gen.int().filter { it < max }
+
+fun genLessEqual(max: Int) : Gen<Int> = Gen.int().filter { it <= max }
+
+fun genGreaterEqual(min: Int) : Gen<Int> = Gen.int().filter { it >= min }
+
+fun genGreaterOrEqThan(max: Int) : Gen<Int> = Gen.int().filter { it >= max }
+
+fun genGreater(min: Int): Gen<Int> = Gen.int().filter { it > min }
+
 fun genIntPredicate(): Gen<(Int) -> Boolean> =
-  Gen.int().filterNot {it==0}.flatMap { num ->
+  genNonZeroInt().flatMap { num ->
     val absNum = Math.abs(num)
     Gen.from(listOf<(Int) -> Boolean>(
       { it > num },
@@ -94,6 +106,8 @@ fun genTimeUnit(): Gen<TimeUnit> = Gen.from(TimeUnit.values())
 fun <A> genListK(genA: Gen<A>): Gen<ListK<A>> = Gen.list(genA).map{ it.k() }
 
 fun <A> genSequenceK(genA: Gen<A>): Gen<SequenceK<A>> = Gen.list(genA).map{ it.asSequence().k() }
+
+fun genNonEmptyString(): Gen<String> = Gen.string().filter{it.isNotEmpty()}
 
 fun genChar(): Gen<Char> =
   Gen.from(('A'..'Z') + ('a'..'z') + ('0'..'9') + "!@#$%%^&*()_-~`,<.?/:;}{][±§".toList())

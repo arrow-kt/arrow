@@ -7,7 +7,7 @@ import arrow.reflect.*
 import arrow.test.UnitSpec
 import arrow.typeclasses.*
 import io.kotlintest.runner.junit4.KotlinTestRunner
-import io.kotlintest.matchers.shouldBe
+import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
 
 object Bogus

@@ -37,7 +37,7 @@ class SequenceKTest : UnitSpec() {
       ShowLaws.laws(show, eq) { sequenceOf(it).k() },
       MonadLaws.laws(SequenceK.monad(), eq),
       MonoidKLaws.laws(SequenceK.monoidK(), SequenceK.applicative(), eq),
-      MonoidLaws.laws(SequenceK.monoid(), Gen.list(Gen.int()).map { it.asSequence() }.generate().k(), eq),
+      MonoidLaws.laws(SequenceK.monoid(), Gen.int().random().k(), eq),
       TraverseLaws.laws(SequenceK.traverse(), SequenceK.applicative(), { n: Int -> SequenceK(sequenceOf(n)) }, eq),
       HashLaws.laws(SequenceK.hash(Int.hash()), SequenceK.eq(Int.eq())) { sequenceOf(it).k() }
     )
