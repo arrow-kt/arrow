@@ -10,8 +10,9 @@ import org.junit.runner.RunWith
 class PartialFunctionTests : UnitSpec() {
 
   private val definetAt: (Int) -> Boolean = { it.rem(2) == 0 }
+  private val bodyContent = "is even"
   private val body: (Int) -> String = {
-    "is even"
+    bodyContent
   }
 
   init {
@@ -31,13 +32,13 @@ class PartialFunctionTests : UnitSpec() {
       val isEven = PartialFunction(definetAt, body)
 
       (isEven.isDefinedAt(2)) shouldBe true
-      isEven(2) shouldBe body
+      isEven(2) shouldBe bodyContent
     }
 
     "toPartialFunction"{
       val isEven = body.toPartialFunction(definetAt)
       (isEven.isDefinedAt(2)) shouldBe true
-      isEven(2) shouldBe body
+      isEven(2) shouldBe bodyContent
     }
 
     "orElse" {
