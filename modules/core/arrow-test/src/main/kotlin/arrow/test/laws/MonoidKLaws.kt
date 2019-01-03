@@ -1,7 +1,7 @@
 package arrow.test.laws
 
 import arrow.Kind
-import arrow.instances.list.foldable.fold
+import arrow.data.extensions.list.foldable.fold
 import arrow.test.generators.genConstructor
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Eq

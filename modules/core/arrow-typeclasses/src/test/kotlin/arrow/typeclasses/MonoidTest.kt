@@ -1,7 +1,7 @@
 package arrow.typeclasses
 
-import arrow.instances.monoid
-import arrow.instances.monoid.invariant.invariant
+import arrow.core.extensions.monoid
+import arrow.core.extensions.monoid.invariant.invariant
 import arrow.test.UnitSpec
 import arrow.test.laws.InvariantLaws
 import io.kotlintest.KTestJUnitRunner

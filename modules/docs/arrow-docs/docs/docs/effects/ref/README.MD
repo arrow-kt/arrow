@@ -19,7 +19,7 @@ Since the allocation of mutable state is not referentially transparent this side
 
 ```kotlin:ank:silent
 import arrow.effects.*
-import arrow.effects.instances.io.monadDefer.monadDefer
+import arrow.effects.extensions.io.monadDefer.monadDefer
 
 val ioRef: IO<Ref<ForIO, Int>> = Ref.of(1, IO.monadDefer()).fix()
 ```
@@ -58,8 +58,8 @@ ioRef.flatMap { ref ->
 ```
 ```kotlin:ank
 import arrow.core.toT
-import arrow.effects.instances.io.monad.flatMap
-import arrow.effects.instances.io.monad.map
+import arrow.effects.extensions.io.monad.flatMap
+import arrow.effects.extensions.io.monad.map
 
 ioRef.flatMap { ref ->
   ref.getAndSet(5).flatMap { old ->

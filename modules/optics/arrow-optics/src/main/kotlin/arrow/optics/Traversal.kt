@@ -4,10 +4,10 @@ import arrow.Kind
 import arrow.core.*
 import arrow.data.*
 import arrow.higherkind
-import arrow.instances.monoid
-import arrow.instances.const.applicative.applicative
-import arrow.instances.id.applicative.applicative
-import arrow.instances.listk.monoid.monoid
+import arrow.core.extensions.monoid
+import arrow.core.extensions.const.applicative.applicative
+import arrow.core.extensions.id.applicative.applicative
+import arrow.data.extensions.listk.monoid.monoid
 import arrow.typeclasses.*
 
 /**

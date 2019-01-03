@@ -17,7 +17,7 @@ It can be considered the typeclass equivalent of Java's `Object#equals`.
 Depending on your needs this comparison can be structural -the content of the object-, referential -the memory address of the object-, based on an identity -like an Id fields-, or any combination of the above.
 
 ```kotlin:ank
-import arrow.instances.*
+import arrow.core.extensions.*
 
 // Enable the extension functions inside Eq using run
 String.eq().run {

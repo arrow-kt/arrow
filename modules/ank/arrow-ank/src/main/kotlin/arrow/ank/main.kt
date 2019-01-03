@@ -4,7 +4,7 @@ package arrow.ank
 
 import arrow.effects.IO
 import arrow.effects.fix
-import arrow.effects.instances.io.monadDefer.monadDefer
+import arrow.effects.extensions.io.monadDefer.monadDefer
 import java.nio.file.Paths
 
 fun main(vararg args: String) {

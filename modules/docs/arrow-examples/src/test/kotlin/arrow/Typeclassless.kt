@@ -7,7 +7,7 @@ import arrow.core.identity
 import arrow.data.ForListK
 import arrow.data.ListK
 import arrow.data.k
-import arrow.instances.listk.applicative.applicative
+import arrow.data.extensions.listk.applicative.applicative
 import arrow.typeclasses.Applicative
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.specs.FreeSpec

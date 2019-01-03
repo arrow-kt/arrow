@@ -16,9 +16,9 @@ Whenever `true` is returned from an expression affecting one of the items in the
 
 {: data-executable='true'}
 ```kotlin:ank
-import arrow.aql.instances.list.select.*
-import arrow.aql.instances.list.where.*
-import arrow.aql.instances.listk.select.select
+import arrow.aql.extensions.list.select.*
+import arrow.aql.extensions.list.where.*
+import arrow.aql.extensions.listk.select.select
 
 data class Student(val name: String, val age: Int)
 

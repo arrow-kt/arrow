@@ -2,7 +2,7 @@ package arrow.test.laws
 
 import arrow.Kind2
 import arrow.core.Eval
-import arrow.instances.monoid
+import arrow.core.extensions.monoid
 import arrow.test.generators.genConstructor
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genIntSmall

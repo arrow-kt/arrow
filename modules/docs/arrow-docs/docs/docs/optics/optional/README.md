@@ -33,7 +33,7 @@ val optionalHead: Optional<ListK<Int>, Int> = Optional(
 Our `optionalHead` allows us to operate on the head of `List<Int>` without having to worry if it is available. You can find `optionalHead` in the optics library: `ListK.head<Int>()`
 
 ```kotlin:ank
-import arrow.optics.instances.*
+import arrow.optics.extensions.*
 
 ListK.head<Int>().set(listOf(1, 3, 6).k(), 5)
 ```
@@ -51,7 +51,7 @@ lifted(emptyList<Int>().k())
 Or modify or lift functions using `Applicative`
 
 ```kotlin:ank
-import arrow.instances.`try`.applicative.*
+import arrow.core.extensions.`try`.applicative.*
 
 ListK.head<Int>().modifyF(Try.applicative(), listOf(1, 3, 6).k()) { head ->
     Try { head / 2 }

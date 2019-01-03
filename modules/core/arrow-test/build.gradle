@@ -1,16 +1,16 @@
 dependencies {
-    compile project(':arrow-data')
+    compile project(':arrow-extras')
     compile project(':arrow-optics')
     compile project(':arrow-effects')
     compile project(':arrow-mtl')
     compile project(':arrow-free')
-    compile project(':arrow-instances-data')
-    compile project(':arrow-effects-instances')
+    compile project(':arrow-extras-extensions')
+    compile project(':arrow-effects-extensions')
     compile project(":arrow-recursion")
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
     compile "io.kotlintest:kotlintest:$kotlinTestVersion"
-    kapt project(':arrow-annotations-processor')
+    kapt project(':arrow-meta')
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

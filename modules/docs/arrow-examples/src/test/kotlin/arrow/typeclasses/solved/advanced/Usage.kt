@@ -3,12 +3,12 @@
 package com.pacoworks.typeclasses.basics.solved.advanced
 
 import arrow.Kind
-import arrow.effects.DeferredK
-import arrow.effects.ForDeferredK
-import arrow.effects.deferredk.async.async
-import arrow.effects.fix
+import arrow.effects.coroutines.DeferredK
+import arrow.effects.coroutines.ForDeferredK
+import arrow.effects.coroutines.extensions.deferredk.async.async
+import arrow.effects.coroutines.fix
+import arrow.effects.coroutines.unsafeRunSync
 import arrow.effects.typeclasses.Async
-import arrow.effects.unsafeRunSync
 import arrow.typeclasses.DaoDatabase
 import arrow.typeclasses.Index
 import arrow.typeclasses.NetworkModule

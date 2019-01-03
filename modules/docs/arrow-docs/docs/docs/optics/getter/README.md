@@ -38,7 +38,7 @@ Or from any of the optics defined in `arrow-optics` that allow to safely getting
 
 ```kotlin:ank:silent
 import arrow.core.*
-import arrow.optics.instances.*
+import arrow.optics.extensions.*
 
 val headGetter: Getter<NonEmptyList<String>, String> = NonEmptyList.head<String>().asGetter()
 val tupleGetter: Getter<Tuple2<String, Int>, String> = Tuple2.first<String, Int>().asGetter()

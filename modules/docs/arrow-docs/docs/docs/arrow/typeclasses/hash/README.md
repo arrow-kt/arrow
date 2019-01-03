@@ -18,7 +18,7 @@ A hash function is a mapping of arbitrary data (`F`) to an output set of fixed s
 
 {: data-executable='true'}
 ```kotlin:ank
-import arrow.instances.*
+import arrow.core.extensions.*
 
 fun main(args: Array<String>) {
   //sampleStart
@@ -39,7 +39,7 @@ Computes a hash of an instance of `F`.
 
 {: data-executable='true'}
 ```kotlin:ank
-import arrow.instances.*
+import arrow.core.extensions.*
 
 fun main(args: Array<String>) {
   //sampleStart

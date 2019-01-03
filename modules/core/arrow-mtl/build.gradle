@@ -1,11 +1,11 @@
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     compile project(':arrow-annotations')
-    compile project(':arrow-instances-data')
-    kapt project(':arrow-annotations-processor')
-    kaptTest project(':arrow-annotations-processor')
-    compileOnly project(':arrow-annotations-processor')
-    testCompileOnly project(':arrow-annotations-processor')
+    compile project(':arrow-extras-extensions')
+    kapt project(':arrow-meta')
+    kaptTest project(':arrow-meta')
+    compileOnly project(':arrow-meta')
+    testCompileOnly project(':arrow-meta')
     testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
     testCompile project(':arrow-test')
 }

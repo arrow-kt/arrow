@@ -24,8 +24,8 @@ import arrow.*
 import arrow.optics.*
 import arrow.core.*
 import arrow.data.*
-import arrow.instances.listk.traverse.*
-import arrow.instances.`try`.applicative.*
+import arrow.data.extensions.listk.traverse.*
+import arrow.core.extensions.`try`.applicative.*
 
 val listTraversal: Traversal<ListKOf<Int>, Int> = Traversal.fromTraversable(ListK.traverse())
 
@@ -52,8 +52,8 @@ fun <A> traversalTuple2Example(): Traversal<Tuple2<A, A>, A> = Traversal(
 Arrow optics also provides a number of predefined `Traversal` optics.
 
 ```kotlin:ank
-import arrow.instances.*
-import arrow.optics.instances.*
+import arrow.core.extensions.*
+import arrow.optics.extensions.*
 
 Tuple2.traversal<String>().combineAll(String.monoid(), "Hello, " toT "World!")
 ```

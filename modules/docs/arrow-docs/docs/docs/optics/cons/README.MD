@@ -16,7 +16,7 @@ It can be constructed by providing the `Prism`.
 
 ```kotlin:ank
 import arrow.data.ListK
-import arrow.optics.instances.listk.cons.cons
+import arrow.optics.extensions.listk.cons.cons
 import arrow.optics.typeclasses.Cons
 
 val listFirst = ListK.cons<Int>().cons()
@@ -29,7 +29,7 @@ It defines two functions `cons` and `uncons`.
 `cons` prepends an element `A` to a structure `S`.
 
 ```kotlin:ank
-import arrow.optics.instances.list.cons.cons
+import arrow.optics.extensions.list.cons.cons
 
 1.cons(listOf(2, 3))
 ```
@@ -37,7 +37,7 @@ import arrow.optics.instances.list.cons.cons
 `uncons` detaches the first element `A` from a structure `S`.
 
 ```kotlin:ank
-import arrow.optics.instances.list.cons.uncons
+import arrow.optics.extensions.list.cons.uncons
 
 listOf(1, 2, 3).uncons()
 ```
