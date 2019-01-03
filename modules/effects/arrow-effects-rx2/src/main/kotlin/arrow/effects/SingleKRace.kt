@@ -9,7 +9,7 @@ import kotlin.coroutines.CoroutineContext
 import arrow.effects.CoroutineContextRx2Scheduler.asScheduler
 import io.reactivex.Single
 
-fun <A, B> SingleK.Companion.racePair2(ctx: CoroutineContext, fa: SingleKOf<A>, fb: SingleKOf<B>): SingleK<Either<Tuple2<A, Fiber<ForSingleK, B>>, Tuple2<Fiber<ForSingleK, A>, B>>> {
+fun <A, B> SingleK.Companion.racePair(ctx: CoroutineContext, fa: SingleKOf<A>, fb: SingleKOf<B>): SingleK<Either<Tuple2<A, Fiber<ForSingleK, B>>, Tuple2<Fiber<ForSingleK, A>, B>>> {
   val promiseA = ReplaySubject.create<A>().apply { toSerialized() }
   val promiseB = ReplaySubject.create<B>().apply { toSerialized() }
   val active = AtomicBoolean(true)
@@ -32,10 +32,6 @@ fun <A, B> SingleK.Companion.racePair2(ctx: CoroutineContext, fa: SingleKOf<A>, 
     disposableA.add(fa.value()
       .observeOn(scheduler)
       .subscribeOn(scheduler)
-      .flatMap {
-        if (conn.isCanceled() && active.get()) Single.error<A>(ConnectionCancellationException())
-        else Single.just(it)
-      }
       .subscribe({ a ->
         if (active.getAndSet(false)) {
           conn.pop()
@@ -58,10 +54,6 @@ fun <A, B> SingleK.Companion.racePair2(ctx: CoroutineContext, fa: SingleKOf<A>, 
     disposableB.add(fb.value()
       .observeOn(scheduler)
       .subscribeOn(scheduler)
-      .flatMap {
-        if (conn.isCanceled() && active.get()) Single.error<B>(ConnectionCancellationException())
-        else Single.just(it)
-      }
       .subscribe({ b ->
         if (active.getAndSet(false)) {
           conn.pop()
