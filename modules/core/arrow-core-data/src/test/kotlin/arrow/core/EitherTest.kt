@@ -2,10 +2,9 @@ package arrow.core
 
 import arrow.Kind
 import arrow.Kind2
-import arrow.core.*
 import arrow.core.extensions.*
-import arrow.data.extensions.*
 import arrow.core.extensions.either.applicative.applicative
+import arrow.core.extensions.either.applicativeError.applicativeError
 import arrow.core.extensions.either.bifunctor.bifunctor
 import arrow.core.extensions.either.eq.eq
 import arrow.core.extensions.either.hash.hash
@@ -15,8 +14,12 @@ import arrow.core.extensions.either.semigroup.semigroup
 import arrow.core.extensions.either.semigroupK.semigroupK
 import arrow.core.extensions.either.show.show
 import arrow.core.extensions.either.traverse.traverse
+import arrow.data.*
+import arrow.data.extensions.nonemptylist.semigroup.semigroup
+import arrow.data.extensions.validated.applicativeError.applicativeError
 import arrow.test.UnitSpec
 import arrow.test.laws.*
+import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Hash
 import io.kotlintest.KTestJUnitRunner
@@ -35,16 +38,16 @@ class EitherTest : UnitSpec() {
 
   init {
 
-      testLaws(
-        BifunctorLaws.laws(Either.bifunctor(), { Right(it) }, EQ2),
-        SemigroupLaws.laws(Either.semigroup(String.semigroup(), String.semigroup()), Either.right("1"), Either.right("2"), Either.right("3"), Either.eq(String.eq(), String.eq())),
-        MonoidLaws.laws(Either.monoid(MOL=String.monoid(), MOR = Int.monoid()), Either.right(1), Either.eq(String.eq(), Int.eq())),
-        ShowLaws.laws(Either.show(), Either.eq(String.eq(), Int.eq())) { Right(it) },
-        MonadErrorLaws.laws(Either.monadError(), Eq.any(), Eq.any()),
-        TraverseLaws.laws(Either.traverse(), Either.applicative(), { Right(it) }, Eq.any()),
-        SemigroupKLaws.laws(Either.semigroupK(), Either.applicative(), EQ),
-        HashLaws.laws(Either.hash(Hash.any(), Int.hash()), EQ2) { Right(it) }
-      )
+    testLaws(
+      BifunctorLaws.laws(Either.bifunctor(), { Right(it) }, EQ2),
+      SemigroupLaws.laws(Either.semigroup(String.semigroup(), String.semigroup()), Either.right("1"), Either.right("2"), Either.right("3"), Either.eq(String.eq(), String.eq())),
+      MonoidLaws.laws(Either.monoid(MOL = String.monoid(), MOR = Int.monoid()), Either.right(1), Either.eq(String.eq(), Int.eq())),
+      ShowLaws.laws(Either.show(), Either.eq(String.eq(), Int.eq())) { Right(it) },
+      MonadErrorLaws.laws(Either.monadError(), Eq.any(), Eq.any()),
+      TraverseLaws.laws(Either.traverse(), Either.applicative(), { Right(it) }, Eq.any()),
+      SemigroupKLaws.laws(Either.semigroupK(), Either.applicative(), EQ),
+      HashLaws.laws(Either.hash(Hash.any(), Int.hash()), EQ2) { Right(it) }
+    )
 
     "empty should return a Right of the empty of the inner type" {
       forAll { _: String ->
@@ -110,17 +113,17 @@ class EitherTest : UnitSpec() {
         val left: Either<Int, Int> = Left(a)
 
         Right(a).filterOrOther({ it > a - 1 }, { b + a }) == Right(a)
-                && Right(a).filterOrOther({ it > a + 1 }, { b + a }) == Left(b + a)
-                && left.filterOrOther({ it > a - 1 }, { b + a }) == Left(a)
-                && left.filterOrOther({ it > a + 1 }, { b + a }) == Left(a)
+          && Right(a).filterOrOther({ it > a + 1 }, { b + a }) == Left(b + a)
+          && left.filterOrOther({ it > a - 1 }, { b + a }) == Left(a)
+          && left.filterOrOther({ it > a + 1 }, { b + a }) == Left(a)
       }
     }
 
     "leftIfNull should return Left if Right value is null of if Either is Left" {
       forAll { a: Int, b: Int ->
-        Right(a).leftIfNull { b }  == Right(a)
-          && Right( null ).leftIfNull { b }  == Left(b)
-        && Left(a).leftIfNull { b } == Left(a)
+        Right(a).leftIfNull { b } == Right(a)
+          && Right(null).leftIfNull { b } == Left(b)
+          && Left(a).leftIfNull { b } == Left(a)
       }
     }
 

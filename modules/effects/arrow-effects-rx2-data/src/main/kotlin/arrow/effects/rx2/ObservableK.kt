@@ -41,7 +41,7 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
    * {: data-executable='true'}
    * ```kotlin:ank
    * import io.reactivex.Observable
-   * import arrow.effects.*
+   * import arrow.effects.rx2.*
    * import arrow.effects.typeclasses.ExitCase
    *
    * class File(url: String) {
@@ -155,7 +155,7 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
      * ```kotlin:ank
      * import arrow.core.Either
      * import arrow.core.right
-     * import arrow.effects.ObservableK
+     * import arrow.effects.rx2.ObservableK
      * import arrow.effects.rx2.ObservableKConnection
      * import arrow.effects.rx2.value
      *

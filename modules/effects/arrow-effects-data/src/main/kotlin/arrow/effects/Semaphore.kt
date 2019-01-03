@@ -18,8 +18,8 @@ interface Semaphore<F> {
    *
    * ```kotlin:ank
    * import arrow.effects.*
-   * import arrow.effects.instances.io.async.async
-   * import arrow.effects.instances.io.monad.flatMap
+   * import arrow.effects.extensions.io.async.async
+   * import arrow.effects.extensions.io.monad.flatMap
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
@@ -42,8 +42,8 @@ interface Semaphore<F> {
    *
    * ```kotlin:ank
    * import arrow.effects.*
-   * import arrow.effects.instances.io.async.async
-   * import arrow.effects.instances.io.monad.flatMap
+   * import arrow.effects.extensions.io.async.async
+   * import arrow.effects.extensions.io.monad.flatMap
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
@@ -66,8 +66,8 @@ interface Semaphore<F> {
    *
    * ```kotlin:ank
    * import arrow.effects.*
-   * import arrow.effects.instances.io.async.async
-   * import arrow.effects.instances.io.monad.flatMap
+   * import arrow.effects.extensions.io.async.async
+   * import arrow.effects.extensions.io.monad.flatMap
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
@@ -104,8 +104,8 @@ interface Semaphore<F> {
    *
    * ```kotlin:ank
    * import arrow.effects.*
-   * import arrow.effects.instances.io.async.async
-   * import arrow.effects.instances.io.monad.flatMap
+   * import arrow.effects.extensions.io.async.async
+   * import arrow.effects.extensions.io.monad.flatMap
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
@@ -139,8 +139,8 @@ interface Semaphore<F> {
    *
    * ```kotlin:ank
    * import arrow.effects.*
-   * import arrow.effects.instances.io.async.async
-   * import arrow.effects.instances.io.monad.flatMap
+   * import arrow.effects.extensions.io.async.async
+   * import arrow.effects.extensions.io.monad.flatMap
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
@@ -174,8 +174,8 @@ interface Semaphore<F> {
    *
    * ```kotlin:ank
    * import arrow.effects.*
-   * import arrow.effects.instances.io.async.async
-   * import arrow.effects.instances.io.monad.flatMap
+   * import arrow.effects.extensions.io.async.async
+   * import arrow.effects.extensions.io.monad.flatMap
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
@@ -201,7 +201,7 @@ interface Semaphore<F> {
      *
      * ```kotlin:ank
      * import arrow.effects.*
-     * import arrow.effects.instances.io.async.async
+     * import arrow.effects.extensions.io.async.async
      *
      * fun main(args: Array<String>) {
      *   //sampleStart

@@ -19,7 +19,7 @@ interface Hash<in F> : Eq<F> {
    * {: data-executable='true'}
    *
    * ```kotlin:ank
-   * import arrow.data.extensions.*
+   * import arrow.core.extensions.*
    *
    * fun main(args: Array<String>) {
    *   //sampleStart

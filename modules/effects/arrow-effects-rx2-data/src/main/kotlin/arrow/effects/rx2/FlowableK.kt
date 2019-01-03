@@ -42,7 +42,7 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
    * {: data-executable='true'}
    * ```kotlin:ank
    * import io.reactivex.Flowable
-   * import arrow.effects.*
+   * import arrow.effects.rx2.*
    * import arrow.effects.typeclasses.ExitCase
    *
    * class File(url: String) {
@@ -157,7 +157,7 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
      * ```kotlin:ank
      * import arrow.core.Either
      * import arrow.core.right
-     * import arrow.effects.FlowableK
+     * import arrow.effects.rx2.FlowableK
      * import arrow.effects.rx2.FlowableKConnection
      * import arrow.effects.rx2.value
      *

@@ -66,7 +66,7 @@ interface Bracket<F, E> : MonadError<F, E> {
    *       closeFile(file)
    *   }
    *
-   *   val use: (File) -> Kind<F, String> = { file -> fileToString(file) }
+   *   val use: (File) -> Kind<F, String> = { file: File -> fileToString(file) }
    *
    *   val safeComputation = openFile("data.json")._bracketCase_(release, use)
    *   //sampleEnd
@@ -100,7 +100,7 @@ interface Bracket<F, E> : MonadError<F, E> {
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val safeComputation = openFile("data.json")._bracket_({ file -> closeFile(file) }, { file -> fileToString(file) })
+   *   val safeComputation = openFile("data.json")._bracket_({ file: File -> closeFile(file) }, { file -> fileToString(file) })
    *   //sampleEnd
    *   println(safeComputation)
    * }

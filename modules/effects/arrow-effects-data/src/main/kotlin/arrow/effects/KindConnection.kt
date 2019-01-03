@@ -163,7 +163,7 @@ sealed class KindConnection<F> {
      *
      * ```kotlin:ank
      * import arrow.effects.*
-     * import arrow.effects.instances.io.monadDefer.monadDefer
+     * import arrow.effects.extensions.io.monadDefer.monadDefer
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
@@ -182,7 +182,7 @@ sealed class KindConnection<F> {
      *
      * ```kotlin:ank
      * import arrow.effects.*
-     * import arrow.effects.instances.io.applicative.applicative
+     * import arrow.effects.extensions.io.applicative.applicative
      *
      * fun main(args: Array<String>) {
      *   //sampleStart

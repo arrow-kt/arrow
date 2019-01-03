@@ -38,6 +38,7 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
    * {: data-executable='true'}
    * ```kotlin:ank
    * import arrow.effects.*
+   * import arrow.effects.rx2.*
    * import arrow.effects.typeclasses.ExitCase
    *
    * class File(url: String) {

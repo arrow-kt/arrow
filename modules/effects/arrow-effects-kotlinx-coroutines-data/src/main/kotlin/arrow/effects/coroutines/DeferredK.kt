@@ -24,9 +24,9 @@ import kotlin.coroutines.CoroutineContext
  *  For more Information visit the general [DeferredK] documentation.
  *
  * ```kotlin:ank:playground
- * import arrow.effects.DeferredK
- * import arrow.effects.k
- * import arrow.effects.unsafeRunSync
+ * import arrow.effects.coroutines.DeferredK
+ * import arrow.effects.coroutines.k
+ * import arrow.effects.coroutines.unsafeRunSync
  * import kotlinx.coroutines.GlobalScope
  * import kotlinx.coroutines.async
  *
@@ -53,9 +53,9 @@ fun <A> Deferred<A>.k(): DeferredK<A> =
  *  For more Information visit the general [DeferredK] documentation.
  *
  * ```kotlin:ank:playground
- * import arrow.effects.DeferredK
- * import arrow.effects.asyncK
- * import arrow.effects.unsafeRunSync
+ * import arrow.effects.coroutines.DeferredK
+ * import arrow.effects.coroutines.asyncK
+ * import arrow.effects.coroutines.unsafeRunSync
  * import kotlinx.coroutines.GlobalScope
  *
  * fun main(args: Array<String>) {
@@ -82,8 +82,8 @@ fun <A> CoroutineScope.asyncK(ctx: CoroutineContext = Dispatchers.Default, start
  *  For more Information visit the general [DeferredK] documentation.
  *
  * ```kotlin:ank:playground
- * import arrow.effects.DeferredK
- * import arrow.effects.value
+ * import arrow.effects.coroutines.DeferredK
+ * import arrow.effects.coroutines.value
  * import kotlinx.coroutines.Deferred
  * import kotlinx.coroutines.runBlocking
  *
@@ -112,8 +112,8 @@ fun <A> DeferredKOf<A>.value(): Deferred<A> = fix().value()
  *  For more Information visit the general [DeferredK] documentation.
  *
  * ```kotlin:ank:playground
- * import arrow.effects.DeferredK
- * import arrow.effects.value
+ * import arrow.effects.coroutines.DeferredK
+ * import arrow.effects.coroutines.value
  * import kotlinx.coroutines.Deferred
  * import kotlinx.coroutines.runBlocking
  *
@@ -136,8 +136,8 @@ suspend fun <A> DeferredKOf<A>.await(): A = value().await()
  * Returns the [CoroutineScope] the [DeferredK] operates on
  *
  * ```kotlin:ank:playground
- * import arrow.effects.DeferredK
- * import arrow.effects.scope
+ * import arrow.effects.coroutines.DeferredK
+ * import arrow.effects.coroutines.scope
  * import kotlinx.coroutines.CoroutineScope
  *
  * fun main(args: Array<String>) {
@@ -306,8 +306,8 @@ sealed class DeferredK<A>(
    * Note: This function will always rerun when await is called. For more Information visit the general [DeferredK] documentation.
    *
    * ```kotlin:ank:playground
-   * import arrow.effects.DeferredK
-   * import arrow.effects.unsafeRunSync
+   * import arrow.effects.coroutines.DeferredK
+   * import arrow.effects.coroutines.unsafeRunSync
    *
    * fun main(args: Array<String>) {
    *    //sampleStart
@@ -330,8 +330,8 @@ sealed class DeferredK<A>(
    *  For more Information visit the general [DeferredK] documentation.
    *
    * ```kotlin:ank:playground
-   * import arrow.effects.DeferredK
-   * import arrow.effects.unsafeRunSync
+   * import arrow.effects.coroutines.DeferredK
+   * import arrow.effects.coroutines.unsafeRunSync
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
@@ -355,8 +355,8 @@ sealed class DeferredK<A>(
    *  For more Information visit the general [DeferredK] documentation.
    *
    * ```kotlin:ank:playground
-   * import arrow.effects.DeferredK
-   * import arrow.effects.unsafeRunSync
+   * import arrow.effects.coroutines.DeferredK
+   * import arrow.effects.coroutines.unsafeRunSync
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
@@ -391,11 +391,11 @@ sealed class DeferredK<A>(
    *  For more Information visit the general [DeferredK] documentation.
    *
    * ```kotlin:ank:playground
-   * import arrow.effects.DeferredK
-   * import arrow.effects.deferredk.bracket.bracket
+   * import arrow.effects.coroutines.DeferredK
+   * import arrow.effects.coroutines.extensions.deferredk.bracket.bracket
    * import arrow.Kind
    * import arrow.effects.typeclasses.Bracket
-   * import arrow.effects.unsafeRunSync
+   * import arrow.effects.coroutines.unsafeRunSync
    *
    * class File(url: String) {
    *   fun open(): File = this
@@ -462,8 +462,8 @@ sealed class DeferredK<A>(
    * Continue the next computation on a different [CoroutineContext].
    *
    * ```kotlin:ank:playground
-   * import arrow.effects.DeferredK
-   * import arrow.effects.unsafeRunSync
+   * import arrow.effects.coroutines.DeferredK
+   * import arrow.effects.coroutines.unsafeRunSync
    * import kotlinx.coroutines.Dispatchers
    *
    * fun main(args: Array<String>) {
@@ -506,8 +506,8 @@ sealed class DeferredK<A>(
      * Lifts a value a into a [DeferredK] of A
      *
      * ```kotlin:ank:playground
-     * import arrow.effects.DeferredK
-     * import arrow.effects.unsafeRunSync
+     * import arrow.effects.coroutines.DeferredK
+     * import arrow.effects.coroutines.unsafeRunSync
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
@@ -527,8 +527,8 @@ sealed class DeferredK<A>(
      *  For more Information visit the general [DeferredK] documentation.
      *
      * ```kotlin:ank:playground
-     * import arrow.effects.DeferredK
-     * import arrow.effects.unsafeRunSync
+     * import arrow.effects.coroutines.DeferredK
+     * import arrow.effects.coroutines.unsafeRunSync
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
@@ -560,8 +560,8 @@ sealed class DeferredK<A>(
      *  For more Information visit the general [DeferredK] documentation.
      *
      * ```kotlin:ank:playground
-     * import arrow.effects.DeferredK
-     * import arrow.effects.unsafeRunSync
+     * import arrow.effects.coroutines.DeferredK
+     * import arrow.effects.coroutines.unsafeRunSync
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
@@ -584,8 +584,8 @@ sealed class DeferredK<A>(
      *  For more Information visit the general [DeferredK] documentation.
      *
      * ```kotlin:ank:playground
-     * import arrow.effects.DeferredK
-     * import arrow.effects.unsafeRunSync
+     * import arrow.effects.coroutines.DeferredK
+     * import arrow.effects.coroutines.unsafeRunSync
      * import kotlinx.coroutines.GlobalScope
      * import kotlinx.coroutines.async
      *
@@ -606,8 +606,8 @@ sealed class DeferredK<A>(
      * Creates a failed [DeferredK] with the throwable
      *
      * ```kotlin:ank:playground
-     * import arrow.effects.DeferredK
-     * import arrow.effects.unsafeAttemptSync
+     * import arrow.effects.coroutines.DeferredK
+     * import arrow.effects.coroutines.unsafeAttemptSync
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
@@ -630,9 +630,9 @@ sealed class DeferredK<A>(
      * ```kotlin:ank:playground
      * import arrow.core.Either
      * import arrow.core.right
-     * import arrow.effects.DeferredK
-     * import arrow.effects.DeferredKConnection
-     * import arrow.effects.unsafeAttemptSync
+     * import arrow.effects.coroutines.DeferredK
+     * import arrow.effects.coroutines.DeferredKConnection
+     * import arrow.effects.coroutines.unsafeAttemptSync
      *
      * class Resource {
      *   fun asyncRead(f: (String) -> Unit): Unit = f("Some value of a resource")
@@ -746,9 +746,9 @@ sealed class DeferredK<A>(
  *  For more Information visit the general [DeferredK] documentation.
  *
  * ```kotlin:ank:playground
- * import arrow.effects.DeferredK
- * import arrow.effects.unsafeAttemptSync
- * import arrow.effects.handleErrorWith
+ * import arrow.effects.coroutines.DeferredK
+ * import arrow.effects.coroutines.unsafeAttemptSync
+ * import arrow.effects.coroutines.handleErrorWith
  *
  * fun main(args: Array<String>) {
  *   //sampleStart
@@ -776,8 +776,8 @@ fun <A> DeferredKOf<A>.handleErrorWith(f: (Throwable) -> DeferredKOf<A>): Deferr
  * Wrap [unsafeRunSync] in [Try] to catch any thrown errors
  *
  * ```kotlin:ank:playground
- * import arrow.effects.DeferredK
- * import arrow.effects.unsafeAttemptSync
+ * import arrow.effects.coroutines.DeferredK
+ * import arrow.effects.coroutines.unsafeAttemptSync
  *
  * fun main(args: Array<String>) {
  *   //sampleStart
@@ -795,8 +795,8 @@ fun <A> DeferredKOf<A>.unsafeAttemptSync(): Try<A> =
  * Use [unsafeAttemptSync] if they should be caught automatically.
  *
  * ```kotlin:ank:playground
- * import arrow.effects.DeferredK
- * import arrow.effects.unsafeRunSync
+ * import arrow.effects.coroutines.DeferredK
+ * import arrow.effects.coroutines.unsafeRunSync
  *
  * fun main(args: Array<String>) {
  *   //sampleStart
@@ -817,9 +817,9 @@ fun <A> DeferredKOf<A>.unsafeRunSync(): A =
  *
  * ```kotlin:ank:playground
  * import arrow.core.Either
- * import arrow.effects.DeferredK
- * import arrow.effects.unsafeRunSync
- * import arrow.effects.runAsync
+ * import arrow.effects.coroutines.DeferredK
+ * import arrow.effects.coroutines.unsafeRunSync
+ * import arrow.effects.coroutines.runAsync
  *
  * fun main(args: Array<String>) {
  *   //sampleStart
@@ -855,10 +855,10 @@ fun <A> DeferredKOf<A>.runAsync(cb: (Either<Throwable, A>) -> DeferredKOf<Unit>)
  *
  * ```kotlin:ank:playground
  * import arrow.core.Either
- * import arrow.effects.DeferredK
- * import arrow.effects.unsafeAttemptSync
+ * import arrow.effects.coroutines.DeferredK
+ * import arrow.effects.coroutines.unsafeAttemptSync
  * import arrow.effects.typeclasses.Disposable
- * import arrow.effects.runAsyncCancellable
+ * import arrow.effects.coroutines.runAsyncCancellable
  * import kotlinx.coroutines.delay
  *
  * fun main(args: Array<String>) {
@@ -906,8 +906,8 @@ fun <A> DeferredKOf<A>.unsafeRunAsyncCancellable(onCancel: OnCancel = OnCancel.S
  *
  * ```kotlin:ank:playground
  * import arrow.core.Either
- * import arrow.effects.DeferredK
- * import arrow.effects.unsafeRunAsync
+ * import arrow.effects.coroutines.DeferredK
+ * import arrow.effects.coroutines.unsafeRunAsync
  * import kotlinx.coroutines.delay
  *
  * fun main(args: Array<String>) {

@@ -70,6 +70,7 @@ interface Async<F> : MonadDefer<F> {
    *
    * ```kotlin:ank:playground:extension
    * _imports_
+   * import arrow.effects.*
    * import arrow.effects.typeclasses.Async
    *
    * fun main(args: Array<String>) {
@@ -181,7 +182,7 @@ interface Async<F> : MonadDefer<F> {
    *
    * ```kotlin:ank:playground
    * import arrow.effects.*
-   * import arrow.effects.instances.io.async.async
+   * import arrow.effects.extensions.io.async.async
    * import kotlinx.coroutines.Dispatchers
    *
    * fun main(args: Array<String>) {

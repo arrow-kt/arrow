@@ -42,7 +42,7 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
    * {: data-executable='true'}
    * ```kotlin:ank
    * import reactor.core.publisher.Flux
-   * import arrow.effects.*
+   * import arrow.effects.reactor.*
    * import arrow.effects.typeclasses.ExitCase
    *
    * class File(url: String) {
@@ -159,9 +159,9 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
      * ```kotlin:ank
      * import arrow.core.Either
      * import arrow.core.right
-     * import arrow.effects.FluxK
-     * import arrow.effects.FluxKConnection
-     * import arrow.effects.value
+     * import arrow.effects.reactor.FluxK
+     * import arrow.effects.reactor.FluxKConnection
+     * import arrow.effects.reactor.value
      *
      * class Resource {
      *   fun asyncRead(f: (String) -> Unit): Unit = f("Some value of a resource")

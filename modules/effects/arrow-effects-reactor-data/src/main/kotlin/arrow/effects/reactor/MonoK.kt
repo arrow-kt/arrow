@@ -42,6 +42,7 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
    * {: data-executable='true'}
    * ```kotlin:ank
    * import arrow.effects.*
+   * import arrow.effects.reactor.*
    * import arrow.effects.typeclasses.ExitCase
    *
    * class File(url: String) {
@@ -137,9 +138,9 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
      * ```kotlin:ank
      * import arrow.core.Either
      * import arrow.core.right
-     * import arrow.effects.MonoK
-     * import arrow.effects.MonoKConnection
-     * import arrow.effects.value
+     * import arrow.effects.reactor.MonoK
+     * import arrow.effects.reactor.MonoKConnection
+     * import arrow.effects.reactor.value
      *
      * class Resource {
      *   fun asyncRead(f: (String) -> Unit): Unit = f("Some value of a resource")

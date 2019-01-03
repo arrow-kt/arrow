@@ -41,6 +41,7 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
    * {: data-executable='true'}
    * ```kotlin:ank
    * import arrow.effects.*
+   * import arrow.effects.rx2.*
    * import arrow.effects.typeclasses.ExitCase
    *
    * class File(url: String) {

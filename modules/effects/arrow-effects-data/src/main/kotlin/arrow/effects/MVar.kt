@@ -19,8 +19,8 @@ interface MVar<F, A> {
    *
    * ```kotlin:ank:playground
    * import arrow.effects.*
-   * import arrow.effects.instances.io.async.async
-   * import arrow.effects.instances.io.monad.flatMap
+   * import arrow.effects.extensions.io.async.async
+   * import arrow.effects.extensions.io.monad.flatMap
    *
    * fun main(args: Array<String>) {
    * //sampleStart
@@ -44,8 +44,8 @@ interface MVar<F, A> {
    *
    * ```kotlin:ank:playground
    * import arrow.effects.*
-   * import arrow.effects.instances.io.async.async
-   * import arrow.effects.instances.io.monad.flatMap
+   * import arrow.effects.extensions.io.async.async
+   * import arrow.effects.extensions.io.monad.flatMap
    *
    * fun main(args: Array<String>) {
    * //sampleStart
@@ -70,8 +70,8 @@ interface MVar<F, A> {
    *
    * ```kotlin:ank:playground
    * import arrow.effects.*
-   * import arrow.effects.instances.io.async.async
-   * import arrow.effects.instances.io.monad.flatMap
+   * import arrow.effects.extensions.io.async.async
+   * import arrow.effects.extensions.io.monad.flatMap
    *
    * fun main(args: Array<String>) {
    * //sampleStart
@@ -94,8 +94,8 @@ interface MVar<F, A> {
    *
    * ```kotlin:ank:playground
    * import arrow.effects.*
-   * import arrow.effects.instances.io.async.async
-   * import arrow.effects.instances.io.monad.flatMap
+   * import arrow.effects.extensions.io.async.async
+   * import arrow.effects.extensions.io.monad.flatMap
    *
    * fun main(args: Array<String>) {
    * //sampleStart
@@ -119,8 +119,8 @@ interface MVar<F, A> {
    *
    * ```kotlin:ank:playground
    * import arrow.effects.*
-   * import arrow.effects.instances.io.async.async
-   * import arrow.effects.instances.io.monad.flatMap
+   * import arrow.effects.extensions.io.async.async
+   * import arrow.effects.extensions.io.monad.flatMap
    *
    * fun main(args: Array<String>) {
    * //sampleStart
@@ -145,8 +145,8 @@ interface MVar<F, A> {
    * ```kotlin:ank:playground
    * import arrow.core.*
    * import arrow.effects.*
-   * import arrow.effects.instances.io.async.async
-   * import arrow.effects.instances.io.monad.flatMap
+   * import arrow.effects.extensions.io.async.async
+   * import arrow.effects.extensions.io.monad.flatMap
    *
    * fun main(args: Array<String>) {
    * //sampleStart
@@ -171,9 +171,9 @@ interface MVar<F, A> {
    * ```kotlin:ank:playground
    * import arrow.core.toT
    * import arrow.effects.*
-   * import arrow.effects.instances.io.async.async
-   * import arrow.effects.instances.io.monad.flatMap
-   * import arrow.effects.instances.io.monad.map
+   * import arrow.effects.extensions.io.async.async
+   * import arrow.effects.extensions.io.monad.flatMap
+   * import arrow.effects.extensions.io.monad.map
    * fun main(args: Array<String>) {
    * //sampleStart
    * val mvar = MVar(IO.async())
@@ -206,7 +206,7 @@ interface MVar<F, A> {
      *
      * ```kotlin:ank:playground
      * import arrow.effects.*
-     * import arrow.effects.instances.io.async.async
+     * import arrow.effects.extensions.io.async.async
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
@@ -223,7 +223,7 @@ interface MVar<F, A> {
      *
      * ```kotlin:ank:playground
      * import arrow.effects.*
-     * import arrow.effects.instances.io.async.async
+     * import arrow.effects.extensions.io.async.async
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
@@ -254,7 +254,7 @@ interface MVar<F, A> {
  *
  * ```kotlin:ank:playground
  * import arrow.effects.*
- * import arrow.effects.instances.io.async.async
+ * import arrow.effects.extensions.io.async.async
  *
  * fun main(args: Array<String>) {
  *   //sampleStart
@@ -272,7 +272,7 @@ interface MVarPartialOf<F> {
    *
    * ```kotlin:ank:playground
    * import arrow.effects.*
-   * import arrow.effects.instances.io.async.async
+   * import arrow.effects.extensions.io.async.async
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
@@ -289,7 +289,7 @@ interface MVarPartialOf<F> {
    *
    * ```kotlin:ank:playground
    * import arrow.effects.*
-   * import arrow.effects.instances.io.async.async
+   * import arrow.effects.extensions.io.async.async
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
