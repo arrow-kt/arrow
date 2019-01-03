@@ -4,7 +4,6 @@ import arrow.Kind
 import arrow.Kind2
 import arrow.core.extensions.*
 import arrow.core.extensions.either.applicative.applicative
-import arrow.core.extensions.either.applicativeError.applicativeError
 import arrow.core.extensions.either.bifunctor.bifunctor
 import arrow.core.extensions.either.eq.eq
 import arrow.core.extensions.either.hash.hash
@@ -14,12 +13,8 @@ import arrow.core.extensions.either.semigroup.semigroup
 import arrow.core.extensions.either.semigroupK.semigroupK
 import arrow.core.extensions.either.show.show
 import arrow.core.extensions.either.traverse.traverse
-import arrow.data.*
-import arrow.data.extensions.nonemptylist.semigroup.semigroup
-import arrow.data.extensions.validated.applicativeError.applicativeError
 import arrow.test.UnitSpec
 import arrow.test.laws.*
-import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Hash
 import io.kotlintest.KTestJUnitRunner
