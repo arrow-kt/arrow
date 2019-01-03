@@ -3,7 +3,6 @@ package arrow.effects
 import arrow.effects.maybek.applicative.applicative
 import arrow.effects.maybek.applicativeError.applicativeError
 import arrow.effects.maybek.async.async
-import arrow.effects.maybek.concurrent.concurrent
 import arrow.effects.maybek.effect.effect
 import arrow.effects.maybek.foldable.foldable
 import arrow.effects.maybek.functor.functor
@@ -148,7 +147,7 @@ class MaybeKTests : UnitSpec() {
         .dispose()
 
       countDownLatch.await(100, TimeUnit.MILLISECONDS)
-      ec shouldBe ExitCase.Cancelled
+      ec shouldBe ExitCase.Canceled
     }
 
     "MaybeK should cancel KindConnection on dispose" {
@@ -185,7 +184,7 @@ class MaybeKTests : UnitSpec() {
         connection.cancel().value().subscribe()
       }.value()
         .test()
-        .assertError(ConnectionCancellationException)
+        .assertError { it is ConnectionCancellationException }
     }
 
   }

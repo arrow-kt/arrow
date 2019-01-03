@@ -9,7 +9,6 @@ import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Fiber
 import arrow.effects.internal.unsafe
-import arrow.effects.typeclasses.*
 import arrow.higherkind
 import kotlinx.coroutines.*
 import kotlinx.coroutines.selects.SelectClause0
@@ -444,7 +443,7 @@ sealed class DeferredK<A>(
     } catch (e: Throwable) {
       @Suppress("InstanceOfCheckForException")
       try {
-        if (e is CancellationException) release(a, ExitCase.Cancelled).await()
+        if (e is CancellationException) release(a, ExitCase.Canceled).await()
         else release(a, ExitCase.Error(e)).await()
       } catch (e2: Throwable) {
         throw Platform.composeErrors(e, e2)

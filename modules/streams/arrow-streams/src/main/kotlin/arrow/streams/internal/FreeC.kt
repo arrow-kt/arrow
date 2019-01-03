@@ -134,7 +134,7 @@ sealed class FreeC<F, out R> : FreeCOf<F, R> {
     fun asExitCase(): ExitCase<Throwable> = this.fold(
       pure = { ExitCase.Completed },
       fail = { t -> ExitCase.Error(t) },
-      interrupted = { _, _ -> ExitCase.Cancelled }
+      interrupted = { _, _ -> ExitCase.Canceled }
     )
 
     companion object {

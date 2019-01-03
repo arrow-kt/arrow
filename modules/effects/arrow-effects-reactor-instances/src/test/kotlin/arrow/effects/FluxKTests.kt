@@ -147,7 +147,7 @@ class FluxKTest : UnitSpec() {
         .dispose()
 
       countDownLatch.await(100, TimeUnit.MILLISECONDS)
-      ec shouldBe ExitCase.Cancelled
+      ec shouldBe ExitCase.Canceled
     }
 
     "FluxK should cancel KindConnection on dispose" {

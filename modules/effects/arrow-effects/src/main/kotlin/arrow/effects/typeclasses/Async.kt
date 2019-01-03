@@ -5,12 +5,14 @@ import arrow.core.*
 import arrow.effects.CancelToken
 import arrow.core.Either
 import arrow.documented
+import arrow.effects.internal.Callback
 import arrow.typeclasses.MonadContinuation
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 
 /** A asynchronous computation that might fail. **/
 typealias ProcF<F, A> = ((Either<Throwable, A>) -> Unit) -> Kind<F, Unit>
+
 /** An asynchronous computation that might fail. **/
 typealias Proc<A> = ((Either<Throwable, A>) -> Unit) -> Unit
 
@@ -275,7 +277,7 @@ interface Async<F> : MonadDefer<F> {
    *   }
    *
    *   fun cancel(): Unit = kotlinx.coroutines.runBlocking {
-   *     println("Cancelled, closing NetworkApi")
+   *     println("Canceled, closing NetworkApi")
    *     kotlinx.coroutines.delay(500)
    *     println("Closed NetworkApi")
    *   }
@@ -346,11 +348,13 @@ interface Async<F> : MonadDefer<F> {
    */
   fun <A> cancelableF(k: ((Either<Throwable, A>) -> Unit) -> Kind<F, CancelToken<F>>): Kind<F, A> =
     asyncF { cb ->
-      val state = AtomicReference<(Either<Throwable, Unit>) -> Unit>(null)
+      val state = AtomicReference<Callback<Unit>>(null)
       val cb1 = { r: Either<Throwable, A> ->
         try {
           cb(r)
         } finally {
+          // This compareAndSet can only succeed in case the operation is already finished
+          // and no cancellation token was installed yet
           if (!state.compareAndSet(null, mapUnit)) {
             val cb2 = state.get()
             state.lazySet(null)
@@ -359,13 +363,17 @@ interface Async<F> : MonadDefer<F> {
         }
       }
 
+      // Until we've got a cancellation token, the task needs to be evaluated,
+      // uninterruptedly, otherwise risking a leak, hence the bracket
       k(cb1).bracketCase(use = {
         async<Unit> { cb ->
-          if (!state.compareAndSet(null, cb)) cb(rightUnit)
+          if (!state.compareAndSet(null, cb)) {
+            cb(rightUnit)
+          }
         }
       }, release = { token, exitCase ->
         when (exitCase) {
-          is ExitCase.Cancelled -> token
+          is ExitCase.Canceled -> token
           else -> just(Unit)
         }
       })

@@ -59,7 +59,7 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
    *     release = { file, exitCase ->
    *       when (exitCase) {
    *         is ExitCase.Completed -> { /* do something */ }
-   *         is ExitCase.Cancelled -> { /* do something */ }
+   *         is ExitCase.Canceled -> { /* do something */ }
    *         is ExitCase.Error -> { /* do something */ }
    *       }
    *       closeFile(file)
@@ -82,7 +82,7 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
             release(a, ExitCase.Error(e))
               .fix().flatMap { MaybeK.raiseError<B>(e) }
           }.maybe.subscribe(emitter::onSuccess, emitter::onError, emitter::onComplete)
-        emitter.setDisposable(d.onDispose { release(a, ExitCase.Cancelled).fix().maybe.subscribe({}, emitter::onError) })
+        emitter.setDisposable(d.onDispose { release(a, ExitCase.Canceled).fix().maybe.subscribe({}, emitter::onError) })
       }.k()
     }
 
@@ -216,7 +216,7 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
         val conn = MaybeKConnection()
         //On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
         //on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
-        conn.push(MaybeK { if (!emitter.isDisposed) emitter.onError(ConnectionCancellationException) })
+        conn.push(MaybeK { if (!emitter.isDisposed) emitter.onError(ConnectionCancellationException()) })
         emitter.setCancellable { conn.cancel().value().subscribe() }
 
         fa(conn) { either: Either<Throwable, A> ->
@@ -234,7 +234,7 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
         val conn = MaybeKConnection()
         //On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
         //on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
-        conn.push(MaybeK { if (!emitter.isDisposed) emitter.onError(ConnectionCancellationException) })
+        conn.push(MaybeK { if (!emitter.isDisposed) emitter.onError(ConnectionCancellationException()) })
         emitter.setCancellable { conn.cancel().value().subscribe() }
 
         fa(conn) { either: Either<Throwable, A> ->

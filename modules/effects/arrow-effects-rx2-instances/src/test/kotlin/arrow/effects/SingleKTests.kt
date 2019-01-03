@@ -18,7 +18,6 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.Spec
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
-import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers
@@ -63,9 +62,9 @@ class SingleKTests : UnitSpec() {
       MonadLaws.laws(SingleK.monad(), EQ()),
       MonadErrorLaws.laws(SingleK.monadError(), EQ(), EQ(), EQ()),
       ApplicativeErrorLaws.laws(SingleK.applicativeError(), EQ(), EQ(), EQ()),
-      AsyncLaws.laws(SingleK.async(), EQ(), EQ(), testStackSafety = false),
+//      AsyncLaws.laws(SingleK.async(), EQ(), EQ(), testStackSafety = false),
       AsyncLaws.laws(SingleK.effect(), EQ(), EQ(), testStackSafety = false)
-//      , ConcurrentLaws.laws(SingleK.concurrent(), EQ(), EQ(), EQ(), testStackSafety = false)
+      , ConcurrentLaws.laws(SingleK.concurrent(), EQ(), EQ(), EQ(), testStackSafety = false)
     )
 
     "Multi-thread Singles finish correctly" {
@@ -134,7 +133,7 @@ class SingleKTests : UnitSpec() {
         .dispose()
 
       countDownLatch.await(100, TimeUnit.MILLISECONDS)
-      ec shouldBe ExitCase.Cancelled
+      ec shouldBe ExitCase.Canceled
     }
 
     "SingleK should cancel KindConnection on dispose" {
@@ -171,7 +170,7 @@ class SingleKTests : UnitSpec() {
         connection.cancel().value().subscribe()
       }.value()
         .test()
-        .assertError(ConnectionCancellationException)
+        .assertError { it is ConnectionCancellationException }
     }
 
   }

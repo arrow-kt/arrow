@@ -18,12 +18,12 @@ fun <A, B> SingleK.Companion.racePair2(ctx: CoroutineContext, fa: SingleKOf<A>, 
   val disposableA = CompositeDisposable()
   val cancelA = SingleK {
     disposableA.dispose()
-    promiseA.onError(ConnectionCancellationException)
+    promiseA.onError(ConnectionCancellationException())
   }
   val disposableB = CompositeDisposable()
   val cancelB = SingleK {
     disposableB.dispose()
-    promiseB.onError(ConnectionCancellationException)
+    promiseB.onError(ConnectionCancellationException())
   }
 
   return SingleK.async { conn, cb ->
@@ -33,7 +33,7 @@ fun <A, B> SingleK.Companion.racePair2(ctx: CoroutineContext, fa: SingleKOf<A>, 
       .observeOn(scheduler)
       .subscribeOn(scheduler)
       .flatMap {
-        if (conn.isCanceled() && active.get()) Single.error<A>(ConnectionCancellationException)
+        if (conn.isCanceled() && active.get()) Single.error<A>(ConnectionCancellationException())
         else Single.just(it)
       }
       .subscribe({ a ->
@@ -46,9 +46,9 @@ fun <A, B> SingleK.Companion.racePair2(ctx: CoroutineContext, fa: SingleKOf<A>, 
         }
       }, { error ->
         if (active.getAndSet(false)) { //if an error finishes first, stop the race.
-          disposableB.dispose()
-          promiseB.onError(ConnectionCancellationException)
           conn.pop()
+          disposableB.dispose()
+          promiseB.onError(ConnectionCancellationException())
           cb(Left(error))
         } else {
           promiseA.onError(error)
@@ -59,7 +59,7 @@ fun <A, B> SingleK.Companion.racePair2(ctx: CoroutineContext, fa: SingleKOf<A>, 
       .observeOn(scheduler)
       .subscribeOn(scheduler)
       .flatMap {
-        if (conn.isCanceled() && active.get()) Single.error<B>(ConnectionCancellationException)
+        if (conn.isCanceled() && active.get()) Single.error<B>(ConnectionCancellationException())
         else Single.just(it)
       }
       .subscribe({ b ->
@@ -72,14 +72,13 @@ fun <A, B> SingleK.Companion.racePair2(ctx: CoroutineContext, fa: SingleKOf<A>, 
         }
       }, { error ->
         if (active.getAndSet(false)) { //if an error finishes first, stop the race.
-          disposableA.dispose()
-          promiseA.onError(ConnectionCancellationException)
           conn.pop()
+          disposableA.dispose()
+          promiseA.onError(ConnectionCancellationException())
           cb(Left(error))
         } else {
           promiseB.onError(error)
         }
-      })
-    )
+      }))
   }
 }

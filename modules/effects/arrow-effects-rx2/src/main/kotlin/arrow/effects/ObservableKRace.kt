@@ -68,4 +68,4 @@ fun <A, B> ObservableK.Companion.racePair(ctx: CoroutineContext, fa: ObservableK
 }
 
 internal fun <A> BehaviorSubject<A>.toFiber(d: Disposable): Fiber<ForObservableK, A> =
-  Fiber(k(), ObservableK { onError(ConnectionCancellationException); d.dispose() })
+  Fiber(k(), ObservableK { onError(ConnectionCancellationException()); d.dispose() })

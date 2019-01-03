@@ -427,7 +427,9 @@ internal class UncancelablePromise<F, A>(AS: Async<F>) : Promise<F, A>, Async<F>
   private tailrec fun loop(k: (Either<Throwable, A>) -> Unit): Unit {
     val st = state.get()
     when (st) {
-      is State.Pending<A> -> loop(k)
+      is State.Pending<A> -> {
+        loop(k)
+      }
       is State.Full -> k(Right(st.value))
       is State.Error -> k(Left(st.throwable))
     }

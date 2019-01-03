@@ -62,7 +62,7 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
    *     release = { file, exitCase ->
    *       when (exitCase) {
    *         is ExitCase.Completed -> { /* do something */ }
-   *         is ExitCase.Cancelled -> { /* do something */ }
+   *         is ExitCase.Canceled -> { /* do something */ }
    *         is ExitCase.Error -> { /* do something */ }
    *       }
    *       closeFile(file)
@@ -85,7 +85,7 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
             release(a, ExitCase.Error(e))
               .fix().flatMap { FlowableK.raiseError<B>(e) }
           }.flowable.subscribe(subscriber::onNext, subscriber::onError, subscriber::onComplete) { d ->
-          subscriber.onSubscribe(d.onCancel { release(a, ExitCase.Cancelled).fix().flowable.subscribe({}, subscriber::onError) })
+          subscriber.onSubscribe(d.onCancel { release(a, ExitCase.Canceled).fix().flowable.subscribe({}, subscriber::onError) })
         }
       }.k()
     }
@@ -191,7 +191,7 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
         val conn = FlowableKConnection()
         //On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
         //on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
-        conn.push(FlowableK { if (!emitter.isCancelled) emitter.onError(ConnectionCancellationException) })
+        conn.push(FlowableK { if (!emitter.isCancelled) emitter.onError(ConnectionCancellationException()) })
         emitter.setCancellable { conn.cancel().value().subscribe() }
 
         fa(conn) { either: Either<Throwable, A> ->
@@ -209,7 +209,7 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
         val conn = FlowableKConnection()
         //On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
         //on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
-        conn.push(FlowableK { if (!emitter.isCancelled) emitter.onError(ConnectionCancellationException) })
+        conn.push(FlowableK { if (!emitter.isCancelled) emitter.onError(ConnectionCancellationException()) })
         emitter.setCancellable { conn.cancel().value().subscribe() }
 
         fa(conn) { either: Either<Throwable, A> ->

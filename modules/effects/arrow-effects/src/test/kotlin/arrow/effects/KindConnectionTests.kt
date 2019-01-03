@@ -6,7 +6,7 @@ import io.kotlintest.matchers.shouldBe
 import org.junit.runner.RunWith
 
 @RunWith(KTestJUnitRunner::class)
-class IOConnectionTests : UnitSpec() {
+class KindConnectionTests : UnitSpec() {
 
   init {
     "initial push" {
@@ -18,6 +18,23 @@ class IOConnectionTests : UnitSpec() {
       effect shouldBe 1
       c.cancel().fix().unsafeRunSync()
       effect shouldBe 1
+    }
+
+    "empty; isCanceled" {
+      val c = IOConnection()
+      c.isCanceled() shouldBe false
+    }
+
+    "empty; isNotCanceled" {
+      val c = IOConnection()
+      c.isNotCanceled() shouldBe true
+    }
+
+    "empty; push; cancel; isCanceled" {
+      val c = IOConnection()
+      c.push(IO {})
+      c.cancel().fix().unsafeRunSync()
+      c.isCanceled() shouldBe true
     }
 
     "cancel immediately if already canceled" {
@@ -76,6 +93,18 @@ class IOConnectionTests : UnitSpec() {
       c.cancel().fix().unsafeRunSync()
 
       effect shouldBe 0
+    }
+
+    "pushPair" {
+      var effect = 0
+      val initial1 = IO { effect += 1 }
+      val initial2 = IO { effect += 2 }
+
+      val c = IOConnection()
+      c.pushPair(initial1, initial2)
+      c.cancel().fix().unsafeRunSync()
+
+      effect shouldBe 3
     }
 
     "uncancelable returns same reference" {

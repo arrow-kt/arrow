@@ -7,12 +7,7 @@ import arrow.effects.typeclasses.ExitCase
 import arrow.effects.deferredk.monad.flatMap
 import arrow.core.Option
 import arrow.core.Try
-import arrow.data.ListK
-import arrow.data.NonEmptyList
-import arrow.data.k
-import arrow.effects.deferredk.applicativeError.attempt
-import arrow.effects.deferredk.async.async
-import arrow.effects.deferredk.monad.flatMap
+import arrow.effects.deferredk.concurrentEffect.concurrentEffect
 import arrow.instances.`try`.functor.functor
 import arrow.instances.`try`.traverse.traverse
 import arrow.instances.option.functor.functor
@@ -20,9 +15,9 @@ import arrow.instances.option.traverse.traverse
 import arrow.test.UnitSpec
 import arrow.test.generators.genIntSmall
 import arrow.test.laws.AsyncLaws
+import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.shouldBe
 import arrow.test.laws.throwableEq
-import arrow.test.laws.ConcurrentLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Traverse
@@ -30,7 +25,6 @@ import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
 import io.kotlintest.matchers.should
 import io.kotlintest.matchers.shouldBe
-import io.kotlintest.matchers.shouldThrow
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kotlinx.coroutines.*
@@ -203,7 +197,7 @@ class DeferredKTest : UnitSpec() {
           .invoke()
 
         countDownLatch.await(50, TimeUnit.MILLISECONDS)
-        ec shouldBe ExitCase.Cancelled
+        ec shouldBe ExitCase.Canceled
       }
     }
 

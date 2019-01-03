@@ -1,8 +1,6 @@
 package arrow.effects
 
 import arrow.effects.observablek.async.async
-import arrow.effects.observablek.concurrent.concurrent
-import arrow.effects.observablek.concurrentEffect.concurrentEffect
 import arrow.effects.observablek.foldable.foldable
 import arrow.effects.observablek.functor.functor
 import arrow.effects.observablek.monad.flatMap
@@ -125,7 +123,7 @@ class ObservableKTests : UnitSpec() {
         .dispose()
 
       countDownLatch.await(100, TimeUnit.MILLISECONDS)
-      ec shouldBe ExitCase.Cancelled
+      ec shouldBe ExitCase.Canceled
     }
 
     "ObservableK should cancel KindConnection on dispose" {
@@ -176,7 +174,7 @@ class ObservableKTests : UnitSpec() {
         connection.cancel().value().subscribe()
       }.observable
         .test()
-        .assertError(ConnectionCancellationException)
+        .assertError { it is ConnectionCancellationException }
     }
 
   }

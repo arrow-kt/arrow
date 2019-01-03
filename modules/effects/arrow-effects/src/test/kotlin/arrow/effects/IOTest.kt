@@ -351,7 +351,7 @@ class IOTest : UnitSpec() {
             }
         IO(newSingleThreadContext("CancelThread")) { }
           .unsafeRunAsync { cancel() }
-      }.unsafeRunTimed(2.seconds) shouldBe Some(ConnectionCancellationException)
+      }.unsafeRunTimed(2.seconds).exists { it is ConnectionCancellationException }
     }
 
     "unsafeRunAsyncCancellable can cancel even for infinite asyncs" {
@@ -387,7 +387,7 @@ class IOTest : UnitSpec() {
           .invoke() //cancel immediately
 
         p.get
-      }.unsafeRunSync() shouldBe ExitCase.Cancelled
+      }.unsafeRunSync() shouldBe ExitCase.Canceled
     }
 
     "Cancelable should run CancelToken" {

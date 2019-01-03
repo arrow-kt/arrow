@@ -212,9 +212,7 @@ interface Semaphore<F> {
     operator fun <F> invoke(n: Long, CF: Concurrent<F>): Kind<F, Semaphore<F>> = CF.run {
       assertNonNegative(n).flatMap {
         Ref.of<F, State<F>>(Right(n), CF).map { ref ->
-          //          Promise<F, Unit>(this).map { promise ->
-          DefaultSemaphore(ref, Promise<F, Unit>(this), this)
-//          }
+          DefaultSemaphore(ref, Promise(this), this)
         }
       }
     }
@@ -238,9 +236,7 @@ interface Semaphore<F> {
     fun <F> uncancelable(n: Long, AS: Async<F>): Kind<F, Semaphore<F>> = AS.run {
       assertNonNegative(n).flatMap {
         Ref.of<F, State<F>>(Right(n), AS).map { ref ->
-          //          Promise.uncancelable<F, Unit>(this).map { promise ->
-          DefaultSemaphore(ref, Promise.uncancelable<F, Unit>(this), this)
-//          }
+          DefaultSemaphore(ref, Promise.uncancelable(this), this)
         }
       }
     }

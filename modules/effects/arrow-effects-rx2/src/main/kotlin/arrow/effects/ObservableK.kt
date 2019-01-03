@@ -6,7 +6,6 @@ import arrow.effects.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.*
-import arrow.effects.typeclasses.*
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import io.reactivex.Observable
@@ -62,7 +61,7 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
    *     release = { file, exitCase ->
    *       when (exitCase) {
    *         is ExitCase.Completed -> { /* do something */ }
-   *         is ExitCase.Cancelled -> { /* do something */ }
+   *         is ExitCase.Canceled -> { /* do something */ }
    *         is ExitCase.Error -> { /* do something */ }
    *       }
    *       closeFile(file)
@@ -85,7 +84,7 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
             release(a, ExitCase.Error(e))
               .fix().flatMap { ObservableK.raiseError<B>(e) }
           }.observable.subscribe({ b -> emitter.onNext(b) }, emitter::onError, emitter::onComplete)
-        emitter.setDisposable(d.onDispose { release(a, ExitCase.Cancelled).fix().observable.subscribe({}, emitter::onError, {}) })
+        emitter.setDisposable(d.onDispose { release(a, ExitCase.Canceled).fix().observable.subscribe({}, emitter::onError, {}) })
       }.k()
     }
 
@@ -190,7 +189,7 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
         val connection = ObservableKConnection()
         //On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
         //on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
-        connection.push(ObservableK { if (!emitter.isDisposed) emitter.onError(ConnectionCancellationException) })
+        connection.push(ObservableK { if (!emitter.isDisposed) emitter.onError(ConnectionCancellationException()) })
         emitter.setCancellable { connection.cancel().value().subscribe({}, {}) }
 
         fa(connection) { either: Either<Throwable, A> ->
@@ -208,7 +207,7 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
         val connection = ObservableKConnection()
         //On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
         //on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
-        connection.push(ObservableK { if (!emitter.isDisposed) emitter.onError(ConnectionCancellationException) })
+        connection.push(ObservableK { if (!emitter.isDisposed) emitter.onError(ConnectionCancellationException()) })
         emitter.setCancellable { connection.cancel().value().subscribe({}, {}) }
 
         fa(connection) { either: Either<Throwable, A> ->

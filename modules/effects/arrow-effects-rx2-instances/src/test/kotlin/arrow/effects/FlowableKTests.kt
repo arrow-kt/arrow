@@ -146,7 +146,7 @@ class FlowableKTests : UnitSpec() {
         .dispose()
 
       countDownLatch.await(100, TimeUnit.MILLISECONDS)
-      ec shouldBe ExitCase.Cancelled
+      ec shouldBe ExitCase.Canceled
     }
 
     "FlowableK should cancel KindConnection on dispose" {
@@ -193,7 +193,7 @@ class FlowableKTests : UnitSpec() {
         connection.cancel().value().subscribe()
       }).value()
         .test()
-        .assertError(ConnectionCancellationException)
+        .assertError { it is ConnectionCancellationException }
     }
 
   }
