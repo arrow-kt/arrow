@@ -4,8 +4,8 @@ import arrow.Kind
 import arrow.core.Eval
 import arrow.core.Id
 import arrow.core.value
-import arrow.instances.monoid
-import arrow.instances.id.monad.monad
+import arrow.core.extensions.monoid
+import arrow.core.extensions.id.monad.monad
 import arrow.test.concurrency.SideEffect
 import arrow.test.generators.genConstructor
 import arrow.test.generators.genFunctionAToB

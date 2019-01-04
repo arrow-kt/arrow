@@ -2,7 +2,7 @@ package arrow.optics
 
 import arrow.core.*
 import arrow.data.*
-import arrow.instances.monoid
+import arrow.core.extensions.monoid
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import io.kotlintest.properties.Gen

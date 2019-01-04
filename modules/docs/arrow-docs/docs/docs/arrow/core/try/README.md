@@ -169,11 +169,10 @@ Transforming the value, if the computation is a success:
 
 ```kotlin:ank
 import arrow.typeclasses.*
-import arrow.instances.*
+import arrow.core.extensions.*
+import arrow.core.extensions.`try`.functor.*
 
-ForTry extensions {
-  Try { "3".toInt() }.map { it + 1}
-}
+Try { "3".toInt() }.map { it + 1 }
 ```
 
 [`Applicative`]({{ '/docs/arrow/typeclasses/applicative/' | relative_url }})
@@ -181,51 +180,46 @@ ForTry extensions {
 Computing over independent values:
 
 ```kotlin:ank
-ForTry extensions {
-  tupled(Try { "3".toInt() }, Try { "5".toInt() }, Try { "nope".toInt() })
-}
+import arrow.core.extensions.`try`.applicative.tupled
+  
+tupled(Try { "3".toInt() }, Try { "5".toInt() }, Try { "nope".toInt() })
 ```
 
 [`Monad`]({{ '/docs/arrow/typeclasses/monad/' | relative_url }})
 
 Computing over dependent values ignoring failure:
 
-```kotlin
-ForTry extensions {
-  binding {
-    val a = Try { "3".toInt() }.bind()
-    val b = Try { "4".toInt() }.bind()
-    val c = Try { "5".toInt() }.bind()
-    a + b + c
-  }
-} // Success(value=12)
+```kotlin:ank
+import arrow.core.extensions.`try`.monad.binding
+
+binding {
+  val a = Try { "3".toInt() }.bind()
+  val b = Try { "4".toInt() }.bind()
+  val c = Try { "5".toInt() }.bind()
+  a + b + c
+}
 ```
 
-```kotlin
-ForTry extensions {
-  binding {
-    val a = Try { "none".toInt() }.bind()
-    val b = Try { "4".toInt() }.bind()
-    val c = Try { "5".toInt() }.bind()
-
-    a + b + c
-  }
+```kotlin:ank
+binding {
+  val a = Try { "none".toInt() }.bind()
+  val b = Try { "4".toInt() }.bind()
+  val c = Try { "5".toInt() }.bind()
+  a + b + c
 }
-// Failure(exception=java.lang.NumberFormatException: For input string: "none")
 ```
 
 Computing over dependent values that are automatically lifted to the context of `Try`:
 
-```kotlin
-ForTry extensions {
-  bindingCatch {
-    val a = "none".toInt()
-    val b = "4".toInt()
-    val c = "5".toInt()
-    a + b + c
-  }
+```kotlin:ank
+import arrow.core.extensions.`try`.monadThrow.bindingCatch
+
+bindingCatch {
+  val a = "none".toInt()
+  val b = "4".toInt()
+  val c = "5".toInt()
+  a + b + c
 }
-// Failure(exception=java.lang.NumberFormatException: For input string: "none")
 ```
 
 ### Supported type classes

@@ -1,14 +1,15 @@
 package arrow.optics
 
 import arrow.core.None
-import arrow.data.*
-import arrow.optics.dsl.*
-import arrow.optics.instances.*
-import arrow.optics.instances.listk.index.index
-import arrow.optics.instances.mapk.at.at
-import arrow.optics.instances.mapk.each.each
-import arrow.test.*
-
+import arrow.data.ListK
+import arrow.data.MapK
+import arrow.data.k
+import arrow.optics.dsl.at
+import arrow.optics.extensions.listk.index.index
+import arrow.optics.extensions.mapk.at.at
+import arrow.optics.extensions.mapk.each.each
+import arrow.optics.extensions.traversal
+import arrow.test.UnitSpec
 import io.kotlintest.shouldBe
 
 @optics

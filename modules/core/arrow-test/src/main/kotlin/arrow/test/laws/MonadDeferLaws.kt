@@ -5,7 +5,7 @@ import arrow.core.*
 import arrow.data.k
 import arrow.effects.data.internal.BindingCancellationException
 import arrow.effects.typeclasses.MonadDefer
-import arrow.instances.list.foldable.foldLeft
+import arrow.data.extensions.list.foldable.foldLeft
 import arrow.test.concurrency.SideEffect
 import arrow.test.generators.genIntSmall
 import arrow.test.generators.genThrowable

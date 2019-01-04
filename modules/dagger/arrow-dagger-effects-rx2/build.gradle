@@ -2,7 +2,7 @@
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     compile project(':arrow-dagger')
-    compile project(':arrow-effects-rx2-instances')
+    compile project(':arrow-effects-rx2-extensions')
     kapt "com.google.dagger:dagger-compiler:$daggerVersion"
     kaptTest "com.google.dagger:dagger-compiler:$daggerVersion"
     testCompile("junit:junit:$jUnitVersion")

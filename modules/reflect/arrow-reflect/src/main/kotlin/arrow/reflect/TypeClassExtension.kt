@@ -12,7 +12,7 @@ import io.github.classgraph.TypeArgument
 data class TypeClassExtension(
   val dataType: DataType,
   val typeClass: TypeClass,
-  val instance: Instance
+  val instance: Extension
 )
 
 internal fun ClassInfo.isTypeClassInstance(): Boolean =
@@ -26,7 +26,7 @@ internal fun ClassInfo.asClassTypeExtension(): TypeClassExtension? =
     TypeClassExtension(
       dataType = dataType,
       typeClass = TypeClass(Class.forName(typeClass).kotlin),
-      instance = Instance(Class.forName(name).kotlin)
+      instance = Extension(Class.forName(name).kotlin)
     )
   } else null
 

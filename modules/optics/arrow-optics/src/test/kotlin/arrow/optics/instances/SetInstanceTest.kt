@@ -1,10 +1,11 @@
 package arrow.optics.instances
 
+import arrow.core.extensions.eq
 import arrow.data.SetK
-import arrow.instances.eq
-import arrow.instances.setk.eq.eq
+import arrow.data.extensions.setk.eq.eq
 import arrow.optics.AndMonoid
-import arrow.optics.instances.setk.at.at
+import arrow.optics.extensions.SetAt
+import arrow.optics.extensions.setk.at.at
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genSetK
@@ -30,7 +31,7 @@ class SetInstanceTest : UnitSpec() {
     ))
 
     testLaws(LensLaws.laws(
-      lens = SetAtInstance<String>().at(Gen.string().random().first()),
+      lens = SetAt<String>().at(Gen.string().random().first()),
       aGen = Gen.set(Gen.string()),
       bGen = Gen.bool(),
       funcGen = genFunctionAToB(Gen.bool()),

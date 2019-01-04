@@ -15,11 +15,11 @@ beginner
 
 {:data-executable='true'}
 ```kotlin:ank
-import arrow.aql.instances.list.select.*
-import arrow.aql.instances.list.where.*
-import arrow.aql.instances.list.sum.*
-import arrow.aql.instances.listk.select.selectAll
-import arrow.aql.instances.id.select.value
+import arrow.aql.extensions.list.select.*
+import arrow.aql.extensions.list.where.*
+import arrow.aql.extensions.list.sum.*
+import arrow.aql.extensions.listk.select.selectAll
+import arrow.aql.extensions.id.select.value
 
 data class Student(val name: String, val age: Int)
 

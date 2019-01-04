@@ -2,10 +2,10 @@ package arrow.optics
 
 import arrow.core.*
 import arrow.data.*
-import arrow.instances.listk.eq.eq
-import arrow.instances.monoid
-import arrow.instances.option.eq.eq
-import arrow.instances.option.functor.functor
+import arrow.core.extensions.monoid
+import arrow.data.extensions.listk.eq.eq
+import arrow.core.extensions.option.eq.eq
+import arrow.core.extensions.option.functor.functor
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.laws.*

@@ -4,8 +4,8 @@ import arrow.core.identity
 import arrow.data.ForListK
 import arrow.data.ListK
 import arrow.data.k
-import arrow.instances.list.semigroupK.combineK
-import arrow.instances.listk.monoid.monoid
+import arrow.data.extensions.list.semigroupK.combineK
+import arrow.data.extensions.listk.monoid.monoid
 import arrow.typeclasses.Foldable
 
 interface Union<F> {

@@ -3,7 +3,7 @@ package arrow.test.laws
 import arrow.Kind
 import arrow.core.Eval
 import arrow.core.Option
-import arrow.instances.monoid
+import arrow.core.extensions.monoid
 import arrow.test.generators.genConstructor
 import arrow.test.generators.genFunctionAAToA
 import arrow.test.generators.genFunctionAToB

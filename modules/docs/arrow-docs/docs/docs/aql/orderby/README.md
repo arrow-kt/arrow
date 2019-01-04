@@ -15,10 +15,10 @@ beginner
 
 {:data-executable='true'}
 ```kotlin:ank
-import arrow.aql.instances.list.select.*
-import arrow.aql.instances.list.orderBy.*
-import arrow.aql.instances.listk.select.select
-import arrow.instances.order
+import arrow.aql.extensions.list.select.*
+import arrow.aql.extensions.list.orderBy.*
+import arrow.aql.extensions.listk.select.select
+import arrow.core.extensions.order
 import arrow.aql.Ord
 
 fun main(args: Array<String>) {
@@ -36,13 +36,13 @@ println(result)
 
 {:data-executable='true'}
 ```kotlin:ank
-import arrow.aql.instances.list.select.*
-import arrow.aql.instances.list.where.*
-import arrow.aql.instances.list.groupBy.*
-import arrow.aql.instances.list.orderBy.*
-import arrow.aql.instances.listk.select.selectAll
-import arrow.aql.instances.id.select.value
-import arrow.instances.order
+import arrow.aql.extensions.list.select.*
+import arrow.aql.extensions.list.where.*
+import arrow.aql.extensions.list.groupBy.*
+import arrow.aql.extensions.list.orderBy.*
+import arrow.aql.extensions.listk.select.selectAll
+import arrow.aql.extensions.id.select.value
+import arrow.core.extensions.order
 import arrow.aql.Ord
 
 data class Student(val name: String, val age: Int)

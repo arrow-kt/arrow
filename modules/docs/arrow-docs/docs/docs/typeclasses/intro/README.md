@@ -42,7 +42,7 @@ For this short example we will make available the scope of the typeclass `Eq` im
 This will make all the `Eq` extension functions, such as `eqv` and `neqv`, available inside the `run` block.
 
 ```kotlin:ank
-import arrow.instances.*
+import arrow.core.extensions.*
 
 val stringEq = String.eq()
 

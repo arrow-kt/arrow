@@ -2,10 +2,10 @@ package arrow
 
 import arrow.Problem.*
 import arrow.core.*
-import arrow.instances.`try`.applicative.applicative
-import arrow.instances.`try`.functor.functor
-import arrow.instances.option.applicative.applicative
-import arrow.instances.option.monad.binding
+import arrow.core.extensions.`try`.applicative.applicative
+import arrow.core.extensions.`try`.functor.functor
+import arrow.core.extensions.option.applicative.applicative
+import arrow.core.extensions.option.monad.binding
 import io.kotlintest.Matcher
 import io.kotlintest.Result
 import io.kotlintest.shouldBe

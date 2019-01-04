@@ -1,14 +1,14 @@
 package arrow.optics.instances
 
-import arrow.core.Option
+import arrow.core.*
+import arrow.core.extensions.eq
 import arrow.data.*
-import arrow.instances.eq
-import arrow.instances.listk.eq.eq
-import arrow.instances.option.eq.eq
-import arrow.instances.sequencek.eq.eq
-import arrow.optics.instances.sequencek.each.each
-import arrow.optics.instances.sequencek.filterIndex.filterIndex
-import arrow.optics.instances.sequencek.index.index
+import arrow.data.extensions.listk.eq.eq
+import arrow.core.extensions.option.eq.eq
+import arrow.data.extensions.sequencek.eq.eq
+import arrow.optics.extensions.sequencek.each.each
+import arrow.optics.extensions.sequencek.filterIndex.filterIndex
+import arrow.optics.extensions.sequencek.index.index
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genSequenceK

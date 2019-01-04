@@ -1,9 +1,9 @@
 package arrow.optics.instances
 
+import arrow.core.extensions.eq
 import arrow.data.*
-import arrow.instances.eq
-import arrow.instances.sequencek.eq.eq
-import arrow.optics.instances.sequencek.index.index
+import arrow.data.extensions.sequencek.eq.eq
+import arrow.optics.extensions.sequencek.index.index
 import arrow.test.UnitSpec
 import arrow.test.generators.*
 import arrow.test.laws.OptionalLaws

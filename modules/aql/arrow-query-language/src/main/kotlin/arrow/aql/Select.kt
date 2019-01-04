@@ -24,8 +24,8 @@ interface Select<F> {
    * {: data-executable='true'}
    *
    * ```kotlin:ank
-   * import arrow.aql.instances.list.select.*
-   * import arrow.aql.instances.listk.select.select
+   * import arrow.aql.extensions.list.select.*
+   * import arrow.aql.extensions.listk.select.select
    *
    * fun main(args: Array<String>) {
    *   //sampleStart

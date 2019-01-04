@@ -1,8 +1,8 @@
 package arrow.optics
 
 import arrow.data.SetK
-import arrow.core.SetInstances
-import arrow.instances.setk.monoid.monoid
+import arrow.core.SetExtensions
+import arrow.data.extensions.setk.monoid.monoid
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genSetK
@@ -18,7 +18,7 @@ class SetTest : UnitSpec() {
   init {
 
     testLaws(IsoLaws.laws(
-      iso = SetInstances.toSetK(),
+      iso = SetExtensions.toSetK(),
       aGen = Gen.set(Gen.int()),
       bGen = genSetK(Gen.int()),
       funcGen = genFunctionAToB(genSetK(Gen.int())),

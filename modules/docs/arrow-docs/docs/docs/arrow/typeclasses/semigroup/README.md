@@ -34,28 +34,34 @@ Now that you've learned about the Semigroup instance for Int try to guess how it
 
 ```kotlin:ank
 import arrow.*
-import arrow.typeclasses.*
-import arrow.instances.*
+import arrow.core.extensions.*
 
-ForInt extensions { 1.combine(2) }
+Int.semigroup().run { 1.combine(2) }
 ```
 
 ```kotlin:ank   
 import arrow.data.*
-import arrow.instances.listk.semigroup.*
+import arrow.data.extensions.*
+import arrow.data.extensions.listk.semigroup.*
 
-ListK.semigroup<Int>().run { listOf(1, 2, 3).k().combine(listOf(4, 5, 6).k()) }
+ListK.semigroup<Int>().run {
+  listOf(1, 2, 3).k().combine(listOf(4, 5, 6).k())
+}
 ```
 
 ```kotlin:ank
 import arrow.core.*
-import arrow.instances.option.monoid.*
+import arrow.core.extensions.option.semigroup.semigroup
 
-Option.monoid<Int>(Int.semigroup()).run { Option(1).combine(Option(2)) }
+Option.semigroup(Int.semigroup()).run {
+  Option(1).combine(Option(2))
+}
 ```
 
 ```kotlin:ank
-Option.monoid<Int>(Int.semigroup()).run { Option(1).combine(None) }
+Option.semigroup(Int.semigroup()).run {
+  Option(1).combine(None)
+}
 ```
 
 Many of these types have methods defined directly on them, which allow for such combining, e.g. `+` on `List`, but the value of having a `Semigroup` typeclass available is that these compose.
@@ -63,7 +69,7 @@ Many of these types have methods defined directly on them, which allow for such 
 Additionaly `Semigroup` adds `+` syntax to all types for which a Semigroup instance exists:
 
 ```kotlin:ank
-Option.monoid<Int>(Int.semigroup()).run {
+Option.semigroup(Int.semigroup()).run {
   Option(1) + Option(2)
 }
 ```

@@ -1,11 +1,13 @@
 package arrow.optics
 
-import arrow.core.ListInstances
+import arrow.core.ListExtensions
 import arrow.core.Option
-import arrow.data.*
-import arrow.instances.listk.monoid.monoid
-import arrow.instances.nonemptylist.semigroup.semigroup
-import arrow.instances.option.monoid.monoid
+import arrow.core.extensions.option.monoid.monoid
+import arrow.data.ListK
+import arrow.data.NonEmptyList
+import arrow.data.extensions.listk.monoid.monoid
+import arrow.data.extensions.nonemptylist.semigroup.semigroup
+import arrow.data.k
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genNonEmptyList
@@ -51,7 +53,7 @@ class ListTest : UnitSpec() {
     ))
 
     testLaws(IsoLaws.laws(
-      iso = ListInstances.toListK(),
+      iso = ListExtensions.toListK(),
       aGen = Gen.list(Gen.int()),
       bGen = Gen.list(Gen.int()).map { it.k() },
       funcGen = genFunctionAToB(Gen.list(Gen.int()).map { it.k() }),
