@@ -2,7 +2,7 @@ package arrow.reflect.tests
 
 import arrow.core.Option
 import arrow.core.Try
-import arrow.core.extensions.TryMonadErrorInstance
+import arrow.core.extensions.TryMonadError
 import arrow.reflect.*
 import arrow.test.UnitSpec
 import arrow.typeclasses.*
@@ -53,7 +53,7 @@ class ReflectionTests : UnitSpec() {
       DataType(Try::class).extensions().contains(TypeClassExtension(
         DataType(Try::class),
         TypeClass(MonadError::class),
-        Extension(TryMonadErrorInstance::class)
+        Extension(TryMonadError::class)
       )) shouldBe true
     }
 

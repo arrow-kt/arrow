@@ -2,21 +2,17 @@ package arrow.optics.extensions
 
 import arrow.Kind
 import arrow.core.*
-import arrow.data.fix
-import arrow.core.*
 import arrow.data.k
-import arrow.data.extensions.list.traverse.traverse
 import arrow.core.extensions.option.applicative.applicative
 import arrow.optics.*
 import arrow.optics.typeclasses.*
-import arrow.optics.*
 import arrow.optics.typeclasses.Cons
 import arrow.optics.typeclasses.Each
 import arrow.optics.typeclasses.FilterIndex
 import arrow.optics.typeclasses.Index
 import arrow.typeclasses.Applicative
 
-fun <A> ListInstances.traversal(): Traversal<List<A>, A> = ListTraversal()
+fun <A> ListExtensions.traversal(): Traversal<List<A>, A> = ListTraversal()
 
 /**
  * [Traversal] for [List] that focuses in each [A] of the source [List].
@@ -37,12 +33,12 @@ interface ListTraversal<A> : Traversal<List<A>, A> {
 
 }
 
-fun <A> ListInstances.each(): Each<List<A>, A> = ListEachInstance()
+fun <A> ListExtensions.each(): Each<List<A>, A> = ListEach()
 
 /**
  * [Each] instance definition for [List] that summons a [Traversal] to focus in each [A] of the source [List].
  */
-interface ListEachInstance<A> : Each<List<A>, A> {
+interface ListEach<A> : Each<List<A>, A> {
   override fun each() = ListTraversal<A>()
 
   companion object {
@@ -51,16 +47,16 @@ interface ListEachInstance<A> : Each<List<A>, A> {
      *
      * @return [Index] instance for [String]
      */
-    operator fun <A> invoke() = object : ListEachInstance<A> {}
+    operator fun <A> invoke() = object : ListEach<A> {}
   }
 }
 
-fun <A> ListInstances.filterIndex(): FilterIndex<List<A>, Int, A> = ListFilterIndexInstance()
+fun <A> ListExtensions.filterIndex(): FilterIndex<List<A>, Int, A> = ListFilterIndex()
 
 /**
  * [FilterIndex] instance definition for [List].
  */
-interface ListFilterIndexInstance<A> : FilterIndex<List<A>, Int, A> {
+interface ListFilterIndex<A> : FilterIndex<List<A>, Int, A> {
   override fun filter(p: (Int) -> Boolean): Traversal<List<A>, A> = object : Traversal<List<A>, A> {
     override fun <F> modifyF(FA: Applicative<F>, s: List<A>, f: (A) -> Kind<F, A>): Kind<F, List<A>> =
       s.mapIndexed { index, a -> a toT index }.k().traverse(FA) { (a, j) ->
@@ -74,16 +70,16 @@ interface ListFilterIndexInstance<A> : FilterIndex<List<A>, Int, A> {
      *
      * @return [Index] instance for [String]
      */
-    operator fun <A> invoke() = object : ListFilterIndexInstance<A> {}
+    operator fun <A> invoke() = object : ListFilterIndex<A> {}
   }
 }
 
-fun <A> ListInstances.index(): Index<List<A>, Int, A> = ListIndexInstance()
+fun <A> ListExtensions.index(): Index<List<A>, Int, A> = ListIndex()
 
 /**
  * [Index] instance definition for [List].
  */
-interface ListIndexInstance<A> : Index<List<A>, Int, A> {
+interface ListIndex<A> : Index<List<A>, Int, A> {
   override fun index(i: Int): Optional<List<A>, A> = POptional(
     getOrModify = { it.getOrNull(i)?.right() ?: it.left() },
     set = { l, a -> l.mapIndexed { index: Int, aa: A -> if (index == i) a else aa } }
@@ -91,16 +87,16 @@ interface ListIndexInstance<A> : Index<List<A>, Int, A> {
 
   companion object {
 
-    operator fun <A> invoke() = object : ListIndexInstance<A> {}
+    operator fun <A> invoke() = object : ListIndex<A> {}
   }
 }
 
-fun <A> ListInstances.cons(): Cons<List<A>, A> = ListConsInstance()
+fun <A> ListExtensions.cons(): Cons<List<A>, A> = ListCons()
 
 /**
  * [Cons] instance definition for [List].
  */
-interface ListConsInstance<A> : Cons<List<A>, A> {
+interface ListCons<A> : Cons<List<A>, A> {
   override fun cons(): Prism<List<A>, Tuple2<A, List<A>>> = PPrism(
     getOrModify = { list -> list.firstOrNull()?.let { Tuple2(it, list.drop(1)) }?.right() ?: list.left() },
     reverseGet = { (a, aas) -> listOf(a) + aas }
@@ -108,16 +104,16 @@ interface ListConsInstance<A> : Cons<List<A>, A> {
 
   companion object {
 
-    operator fun <A> invoke() = object : ListConsInstance<A> {}
+    operator fun <A> invoke() = object : ListCons<A> {}
   }
 }
 
-fun <A> ListInstances.snoc(): Snoc<List<A>, A> = ListSnocInstance()
+fun <A> ListExtensions.snoc(): Snoc<List<A>, A> = ListSnoc()
 
 /**
  * [Snoc] instance definition for [List].
  */
-interface ListSnocInstance<A> : Snoc<List<A>, A> {
+interface ListSnoc<A> : Snoc<List<A>, A> {
 
   override fun snoc() = object : Prism<List<A>, Tuple2<List<A>, A>> {
     override fun getOrModify(s: List<A>): Either<List<A>, Tuple2<List<A>, A>> =
@@ -131,7 +127,7 @@ interface ListSnocInstance<A> : Snoc<List<A>, A> {
 
   companion object {
 
-    operator fun <A> invoke() = object : ListSnocInstance<A> {}
+    operator fun <A> invoke() = object : ListSnoc<A> {}
   }
 
 }

@@ -13,7 +13,7 @@ import arrow.undocumented
 
 @extension
 @undocumented
-interface DayComonadInstance<F, G> : Comonad<DayPartialOf<F, G>> {
+interface DayComonad<F, G> : Comonad<DayPartialOf<F, G>> {
   fun CF(): Comonad<F>
 
   fun CG(): Comonad<G>
@@ -30,7 +30,7 @@ interface DayComonadInstance<F, G> : Comonad<DayPartialOf<F, G>> {
 
 @extension
 @undocumented
-interface DayFunctorInstance<F, G> : Functor<DayPartialOf<F, G>> {
+interface DayFunctor<F, G> : Functor<DayPartialOf<F, G>> {
 
   override fun <A, B> DayOf<F, G, A>.map(f: (A) -> B): Day<F, G, B> =
     fix().mapLazy(f)
@@ -38,7 +38,7 @@ interface DayFunctorInstance<F, G> : Functor<DayPartialOf<F, G>> {
 
 @extension
 @undocumented
-interface DayApplicativeInstance<F, G> : Applicative<DayPartialOf<F, G>> {
+interface DayApplicative<F, G> : Applicative<DayPartialOf<F, G>> {
   fun AF(): Applicative<F>
 
   fun AG(): Applicative<G>

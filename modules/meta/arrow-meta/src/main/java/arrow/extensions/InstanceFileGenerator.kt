@@ -200,7 +200,7 @@ class InstanceFileGenerator(
 
   private fun genImports(i: Instance): String = """
             |import ${i.`package`}.*
-            |import ${i.target.dataTypeInstance.`package`}.*
+            |import ${i.target.dataType.`package`}.*
             |""".trimMargin()
 
   private fun genCompanionExtensions(i: Instance): String =

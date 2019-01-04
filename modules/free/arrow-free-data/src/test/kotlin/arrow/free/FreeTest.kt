@@ -4,7 +4,7 @@ import arrow.core.*
 import arrow.data.NonEmptyList
 import arrow.data.fix
 import arrow.free.extensions.FreeEq
-import arrow.free.extensions.FreeMonadInstance
+import arrow.free.extensions.FreeMonad
 import arrow.free.extensions.free.eq.eq
 import arrow.free.extensions.free.monad.monad
 import arrow.higherkind
@@ -25,7 +25,7 @@ sealed class Ops<out A> : OpsOf<A> {
   data class Add(val a: Int, val y: Int) : Ops<Int>()
   data class Subtract(val a: Int, val y: Int) : Ops<Int>()
 
-  companion object : FreeMonadInstance<ForOps> {
+  companion object : FreeMonad<ForOps> {
     fun value(n: Int): Free<ForOps, Int> = Free.liftF(Value(n))
     fun add(n: Int, y: Int): Free<ForOps, Int> = Free.liftF(Add(n, y))
     fun subtract(n: Int, y: Int): Free<ForOps, Int> = Free.liftF(Subtract(n, y))

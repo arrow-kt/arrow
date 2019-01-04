@@ -9,12 +9,12 @@ import arrow.typeclasses.*
 import arrow.data.combineK as nelCombineK
 
 @extension
-interface NonEmptyListSemigroupInstance<A> : Semigroup<NonEmptyList<A>> {
+interface NonEmptyListSemigroup<A> : Semigroup<NonEmptyList<A>> {
   override fun NonEmptyList<A>.combine(b: NonEmptyList<A>): NonEmptyList<A> = this + b
 }
 
 @extension
-interface NonEmptyListEqInstance<A> : Eq<NonEmptyList<A>> {
+interface NonEmptyListEq<A> : Eq<NonEmptyList<A>> {
 
   fun EQ(): Eq<A>
 
@@ -25,19 +25,19 @@ interface NonEmptyListEqInstance<A> : Eq<NonEmptyList<A>> {
 }
 
 @extension
-interface NonEmptyListShowInstance<A> : Show<NonEmptyList<A>> {
+interface NonEmptyListShow<A> : Show<NonEmptyList<A>> {
   override fun NonEmptyList<A>.show(): String =
     toString()
 }
 
 @extension
-interface NonEmptyListFunctorInstance : Functor<ForNonEmptyList> {
+interface NonEmptyListFunctor : Functor<ForNonEmptyList> {
   override fun <A, B> Kind<ForNonEmptyList, A>.map(f: (A) -> B): NonEmptyList<B> =
     fix().map(f)
 }
 
 @extension
-interface NonEmptyListApplicativeInstance : Applicative<ForNonEmptyList> {
+interface NonEmptyListApplicative : Applicative<ForNonEmptyList> {
   override fun <A, B> Kind<ForNonEmptyList, A>.ap(ff: Kind<ForNonEmptyList, (A) -> B>): NonEmptyList<B> =
     fix().ap(ff)
 
@@ -49,37 +49,7 @@ interface NonEmptyListApplicativeInstance : Applicative<ForNonEmptyList> {
 }
 
 @extension
-interface NonEmptyListMonadInstance : Monad<ForNonEmptyList> {
-  override fun <A, B> Kind<ForNonEmptyList, A>.ap(ff: Kind<ForNonEmptyList, (A) -> B>): NonEmptyList<B> =
-    fix().ap(ff)
-
-  override fun <A, B> Kind<ForNonEmptyList, A>.flatMap(f: (A) -> Kind<ForNonEmptyList, B>): NonEmptyList<B> =
-    fix().flatMap(f)
-
-  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, NonEmptyListOf<Either<A, B>>>): NonEmptyList<B> =
-    NonEmptyList.tailRecM(a, f)
-
-  override fun <A, B> Kind<ForNonEmptyList, A>.map(f: (A) -> B): NonEmptyList<B> =
-    fix().map(f)
-
-  override fun <A> just(a: A): NonEmptyList<A> =
-    NonEmptyList.just(a)
-}
-
-@extension
-interface NonEmptyListComonadInstance : Comonad<ForNonEmptyList> {
-  override fun <A, B> Kind<ForNonEmptyList, A>.coflatMap(f: (Kind<ForNonEmptyList, A>) -> B): NonEmptyList<B> =
-    fix().coflatMap(f)
-
-  override fun <A> Kind<ForNonEmptyList, A>.extract(): A =
-    fix().extract()
-
-  override fun <A, B> Kind<ForNonEmptyList, A>.map(f: (A) -> B): NonEmptyList<B> =
-    fix().map(f)
-}
-
-@extension
-interface NonEmptyListBimonadInstance : Bimonad<ForNonEmptyList> {
+interface NonEmptyListMonad : Monad<ForNonEmptyList> {
   override fun <A, B> Kind<ForNonEmptyList, A>.ap(ff: Kind<ForNonEmptyList, (A) -> B>): NonEmptyList<B> =
     fix().ap(ff)
 
@@ -94,6 +64,36 @@ interface NonEmptyListBimonadInstance : Bimonad<ForNonEmptyList> {
 
   override fun <A> just(a: A): NonEmptyList<A> =
     NonEmptyList.just(a)
+}
+
+@extension
+interface NonEmptyListComonad : Comonad<ForNonEmptyList> {
+  override fun <A, B> Kind<ForNonEmptyList, A>.coflatMap(f: (Kind<ForNonEmptyList, A>) -> B): NonEmptyList<B> =
+    fix().coflatMap(f)
+
+  override fun <A> Kind<ForNonEmptyList, A>.extract(): A =
+    fix().extract()
+
+  override fun <A, B> Kind<ForNonEmptyList, A>.map(f: (A) -> B): NonEmptyList<B> =
+    fix().map(f)
+}
+
+@extension
+interface NonEmptyListBimonad : Bimonad<ForNonEmptyList> {
+  override fun <A, B> Kind<ForNonEmptyList, A>.ap(ff: Kind<ForNonEmptyList, (A) -> B>): NonEmptyList<B> =
+    fix().ap(ff)
+
+  override fun <A, B> Kind<ForNonEmptyList, A>.flatMap(f: (A) -> Kind<ForNonEmptyList, B>): NonEmptyList<B> =
+    fix().flatMap(f)
+
+  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, NonEmptyListOf<Either<A, B>>>): NonEmptyList<B> =
+    NonEmptyList.tailRecM(a, f)
+
+  override fun <A, B> Kind<ForNonEmptyList, A>.map(f: (A) -> B): NonEmptyList<B> =
+    fix().map(f)
+
+  override fun <A> just(a: A): NonEmptyList<A> =
+    NonEmptyList.just(a)
 
   override fun <A, B> Kind<ForNonEmptyList, A>.coflatMap(f: (Kind<ForNonEmptyList, A>) -> B): NonEmptyList<B> =
     fix().coflatMap(f)
@@ -103,7 +103,7 @@ interface NonEmptyListBimonadInstance : Bimonad<ForNonEmptyList> {
 }
 
 @extension
-interface NonEmptyListFoldableInstance : Foldable<ForNonEmptyList> {
+interface NonEmptyListFoldable : Foldable<ForNonEmptyList> {
   override fun <A, B> Kind<ForNonEmptyList, A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
 
@@ -115,7 +115,7 @@ interface NonEmptyListFoldableInstance : Foldable<ForNonEmptyList> {
 }
 
 @extension
-interface NonEmptyListTraverseInstance : Traverse<ForNonEmptyList> {
+interface NonEmptyListTraverse : Traverse<ForNonEmptyList> {
   override fun <A, B> Kind<ForNonEmptyList, A>.map(f: (A) -> B): NonEmptyList<B> =
     fix().map(f)
 
@@ -133,13 +133,13 @@ interface NonEmptyListTraverseInstance : Traverse<ForNonEmptyList> {
 }
 
 @extension
-interface NonEmptyListSemigroupKInstance : SemigroupK<ForNonEmptyList> {
+interface NonEmptyListSemigroupK : SemigroupK<ForNonEmptyList> {
   override fun <A> Kind<ForNonEmptyList, A>.combineK(y: Kind<ForNonEmptyList, A>): NonEmptyList<A> =
     fix().nelCombineK(y)
 }
 
 @extension
-interface NonEmptyListHashInstance<A> : Hash<NonEmptyList<A>>, NonEmptyListEqInstance<A> {
+interface NonEmptyListHash<A> : Hash<NonEmptyList<A>>, NonEmptyListEq<A> {
   fun HA(): Hash<A>
 
   override fun EQ(): Eq<A> = HA()

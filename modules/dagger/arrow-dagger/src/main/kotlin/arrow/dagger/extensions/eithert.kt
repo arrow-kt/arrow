@@ -11,61 +11,61 @@ import javax.inject.Inject
 abstract class EitherTInstances<F, L> {
 
   @Provides
-  fun eitherTFunctor(ev: DaggerEitherTFunctorInstance<F, L>): Functor<EitherTPartialOf<F, L>> = ev
+  fun eitherTFunctor(ev: DaggerEitherTFunctor<F, L>): Functor<EitherTPartialOf<F, L>> = ev
 
   @Provides
-  fun eitherTApplicative(ev: DaggerEitherTApplicativeInstance<F, L>): Applicative<EitherTPartialOf<F, L>> = ev
+  fun eitherTApplicative(ev: DaggerEitherTApplicative<F, L>): Applicative<EitherTPartialOf<F, L>> = ev
 
   @Provides
-  fun eitherTMonad(ev: DaggerEitherTMonadInstance<F, L>): Monad<EitherTPartialOf<F, L>> = ev
+  fun eitherTMonad(ev: DaggerEitherTMonad<F, L>): Monad<EitherTPartialOf<F, L>> = ev
 
   @Provides
-  fun eitherTApplicativeError(ev: DaggerEitherTMonadErrorInstance<F, L>): ApplicativeError<EitherTPartialOf<F, L>, L> = ev
+  fun eitherTApplicativeError(ev: DaggerEitherTMonadError<F, L>): ApplicativeError<EitherTPartialOf<F, L>, L> = ev
 
   @Provides
-  fun eitherTMonadError(ev: DaggerEitherTMonadErrorInstance<F, L>): MonadError<EitherTPartialOf<F, L>, L> = ev
+  fun eitherTMonadError(ev: DaggerEitherTMonadError<F, L>): MonadError<EitherTPartialOf<F, L>, L> = ev
 
   @Provides
-  fun eitherTFoldable(ev: DaggerEitherTFoldableInstance<F, L>): Foldable<EitherTPartialOf<F, L>> = ev
+  fun eitherTFoldable(ev: DaggerEitherTFoldable<F, L>): Foldable<EitherTPartialOf<F, L>> = ev
 
   @Provides
-  fun eitherTTraverse(ev: DaggerEitherTTraverseInstance<F, L>): Traverse<EitherTPartialOf<F, L>> = ev
+  fun eitherTTraverse(ev: DaggerEitherTTraverse<F, L>): Traverse<EitherTPartialOf<F, L>> = ev
 
   @Provides
-  fun eitherTSemigroupK(ev: DaggerEitherTSemigroupKInstance<F, L>): SemigroupK<EitherTPartialOf<F, L>> = ev
+  fun eitherTSemigroupK(ev: DaggerEitherTSemigroupK<F, L>): SemigroupK<EitherTPartialOf<F, L>> = ev
 
 }
 
-class DaggerEitherTFunctorInstance<F, L> @Inject constructor(val FF: Functor<F>) : EitherTFunctorInstance<F, L> {
+class DaggerEitherTFunctor<F, L> @Inject constructor(val FF: Functor<F>) : EitherTFunctor<F, L> {
   override fun FF(): Functor<F> = FF
 }
 
-class DaggerEitherTApplicativeInstance<F, L> @Inject constructor(val AF: Applicative<F>) : EitherTApplicativeInstance<F, L> {
+class DaggerEitherTApplicative<F, L> @Inject constructor(val AF: Applicative<F>) : EitherTApplicative<F, L> {
   override fun AF(): Applicative<F> = AF
   override fun FF(): Functor<F> = AF
 }
 
-class DaggerEitherTMonadInstance<F, L> @Inject constructor(val MF: Monad<F>) : EitherTMonadInstance<F, L> {
+class DaggerEitherTMonad<F, L> @Inject constructor(val MF: Monad<F>) : EitherTMonad<F, L> {
   override fun FF(): Functor<F> = MF
   override fun MF(): Monad<F> = MF
 }
 
-class DaggerEitherTMonadErrorInstance<F, L> @Inject constructor(val ME: MonadError<F, L>) : EitherTMonadErrorInstance<F, L> {
+class DaggerEitherTMonadError<F, L> @Inject constructor(val ME: MonadError<F, L>) : EitherTMonadError<F, L> {
   override fun FF(): Functor<F> = ME
   override fun MF(): Monad<F> = ME
   override fun AE(): ApplicativeError<F, L> = ME
 }
 
-class DaggerEitherTFoldableInstance<F, L> @Inject constructor(val FFF: Foldable<F>) : EitherTFoldableInstance<F, L> {
+class DaggerEitherTFoldable<F, L> @Inject constructor(val FFF: Foldable<F>) : EitherTFoldable<F, L> {
   override fun FFF(): Foldable<F> = FFF
 }
 
-class DaggerEitherTTraverseInstance<F, L> @Inject constructor(val FFF: Traverse<F>) : EitherTTraverseInstance<F, L> {
+class DaggerEitherTTraverse<F, L> @Inject constructor(val FFF: Traverse<F>) : EitherTTraverse<F, L> {
   override fun FF(): Functor<F> = FFF
   override fun FFF(): Foldable<F> = FFF
   override fun TF(): Traverse<F> = FFF
 }
 
-class DaggerEitherTSemigroupKInstance<F, L> @Inject constructor(val MF: Monad<F>) : EitherTSemigroupKInstance<F, L> {
+class DaggerEitherTSemigroupK<F, L> @Inject constructor(val MF: Monad<F>) : EitherTSemigroupK<F, L> {
   override fun MF(): Monad<F> = MF
 }

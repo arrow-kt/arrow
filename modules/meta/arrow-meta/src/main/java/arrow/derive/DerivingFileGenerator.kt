@@ -184,7 +184,7 @@ class TypeclassInstanceGenerator(
 
   val companionFactoryName: String = typeClassName[0].toLowerCase() + typeClassName.drop(1)
 
-  val instanceName: String = "$receiverSimpleName${typeClassName}Instance"
+  val instanceName: String = "$receiverSimpleName${typeClassName}"
 
   fun targetHasFunction(f: FunctionSignature, c: ClassOrPackageDataWrapper): Boolean =
     c.functionList.any {

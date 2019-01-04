@@ -12,7 +12,7 @@ import kotlin.coroutines.CoroutineContext
 
 @extension
 @undocumented
-interface OptionTBracketInstance<F> : Bracket<OptionTPartialOf<F>, Throwable>, OptionTMonadError<F, Throwable> {
+interface OptionTBracket<F> : Bracket<OptionTPartialOf<F>, Throwable>, OptionTMonadError<F, Throwable> {
 
   fun MD(): MonadDefer<F>
 
@@ -50,7 +50,7 @@ interface OptionTBracketInstance<F> : Bracket<OptionTPartialOf<F>, Throwable>, O
 
 @extension
 @undocumented
-interface OptionTMonadDeferInstance<F> : MonadDefer<OptionTPartialOf<F>>, OptionTBracketInstance<F> {
+interface OptionTMonadDefer<F> : MonadDefer<OptionTPartialOf<F>>, OptionTBracket<F> {
 
   override fun MD(): MonadDefer<F>
 
@@ -61,7 +61,7 @@ interface OptionTMonadDeferInstance<F> : MonadDefer<OptionTPartialOf<F>>, Option
 
 @extension
 @undocumented
-interface OptionTAsyncInstance<F> : Async<OptionTPartialOf<F>>, OptionTMonadDeferInstance<F> {
+interface OptionTAsync<F> : Async<OptionTPartialOf<F>>, OptionTMonadDefer<F> {
 
   fun AS(): Async<F>
 

@@ -94,7 +94,7 @@ We can declare that instances of this class can be equated based on their `id` p
 
 ```kotlin
 @extension
-interface UserEqInstance: Eq<User> {
+interface UserEq: Eq<User> {
   override fun User.eqv(b: User): Boolean = id == b.id
 }
 ```
@@ -199,7 +199,7 @@ listOf(Right(1), Right(2), Right(3)).sequence(Either.applicative<Throwable>())
 If you defined your own instances over your own data types and wish to use a similar `extensions` DSL you can do so for both types with a single type argument such as `Option`:
 
 ```kotlin:ank:silent
-object OptionContext : OptionMonadErrorInstance, OptionTraverseInstance {
+object OptionContext : OptionMonadError, OptionTraverse{
   override fun <A, B> Kind<ForOption, A>.map(f: (A) -> B): Option<B> =
     fix().map(f)
 }
@@ -211,7 +211,7 @@ infix fun <A> ForOption.Companion.extensions(f: OptionContext.() -> A): A =
 Or for types that require partial application of some of their type arguments such as `Either<L, R>` where `L` needs to be partially applied
 
 ```kotlin:ank:silent
-class EitherContext<L> : EitherMonadErrorInstance<L>, EitherTraverseInstance<L> {
+class EitherContext<L> : EitherMonadError<L>, EitherTraverse<L> {
   override fun <A, B> Kind<EitherPartialOf<L>, A>.map(f: (A) -> B): Either<L, B> =
     fix().map(f)
 }
@@ -311,7 +311,7 @@ Let's define an instance of `Functor` for the datatype `ListK`, our own wrapper 
 
 ```kotlin
 @extension
-interface ListKFunctorInstance : Functor<ForListK> {
+interface ListKFunctor : Functor<ForListK> {
   override fun <A, B> Kind<F, A>.map(f: (A) -> B): ListK<B> {
     val list: ListK<A> = this.fix()
     return list.map(f)
@@ -325,7 +325,7 @@ These extensions functions may be imported a la carte when working with concrete
 
 ```kotlin
 @extension
-interface ListKFunctorInstance : Functor<ForListK>
+interface ListKFunctor : Functor<ForListK>
 ```
 
 ```kotlin:ank
@@ -374,7 +374,7 @@ Now lets create a simple example instance of `Applicative` where our `F` is `Lis
 
 ```kotlin
 @instance
-interface ListKApplicativeInstance : Applicative<ForListK> {
+interface ListKApplicative : Applicative<ForListK> {
   override fun <A> just(a: A): Kind<ForListK, A> = ListK(listOf(a))
 
   /* ... */

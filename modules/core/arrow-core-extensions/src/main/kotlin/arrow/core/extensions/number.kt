@@ -5,273 +5,273 @@ import arrow.typeclasses.*
 //////////
 // Byte
 //////////
-interface ByteSemigroupInstance : Semigroup<Byte> {
+interface ByteSemigroup : Semigroup<Byte> {
   override fun Byte.combine(b: Byte): Byte = (this + b).toByte()
 }
 
-interface ByteMonoidInstance : Monoid<Byte>, ByteSemigroupInstance {
+interface ByteMonoid: Monoid<Byte>, ByteSemigroup {
   override fun empty(): Byte = 0
 }
 
-interface ByteOrderInstance : Order<Byte> {
+interface ByteOrder : Order<Byte> {
   override fun Byte.compare(b: Byte): Int = compareTo(b)
 }
 
-interface ByteEqInstance : Eq<Byte> {
+interface ByteEq : Eq<Byte> {
   override fun Byte.eqv(b: Byte): Boolean = this == b
 }
 
-interface ByteShowInstance : Show<Byte> {
+interface ByteShow : Show<Byte> {
   override fun Byte.show(): String = toString()
 }
 
-interface ByteHashInstance : Hash<Byte>, ByteEqInstance {
+interface ByteHash: Hash<Byte>, ByteEq {
   override fun Byte.hash(): Int = hashCode()
 }
 
 fun Byte.Companion.hash(): Hash<Byte> =
-  object : ByteHashInstance {}
+  object : ByteHash{}
 
 fun Byte.Companion.show(): Show<Byte> =
-  object : ByteShowInstance {}
+  object : ByteShow{}
 
 fun Byte.Companion.eq(): Eq<Byte> =
-  object : ByteEqInstance {}
+  object : ByteEq{}
 
 fun Byte.Companion.order(): Order<Byte> =
-  object : ByteOrderInstance {}
+  object : ByteOrder{}
 
 fun Byte.Companion.semigroup(): Semigroup<Byte> =
-  object : ByteSemigroupInstance {}
+  object : ByteSemigroup{}
 
 fun Byte.Companion.monoid(): Monoid<Byte> =
-  object : ByteMonoidInstance {}
+  object : ByteMonoid{}
 
 //////////
 // Double
 //////////
 
-interface DoubleSemigroupInstance : Semigroup<Double> {
+interface DoubleSemigroup : Semigroup<Double> {
   override fun Double.combine(b: Double): Double = this + b
 }
 
-interface DoubleMonoidInstance : Monoid<Double>, DoubleSemigroupInstance {
+interface DoubleMonoid: Monoid<Double>, DoubleSemigroup {
   override fun empty(): Double = .0
 }
 
-interface DoubleOrderInstance : Order<Double> {
+interface DoubleOrder : Order<Double> {
   override fun Double.compare(b: Double): Int = compareTo(b)
 }
 
-interface DoubleEqInstance : Eq<Double> {
+interface DoubleEq : Eq<Double> {
   override fun Double.eqv(b: Double): Boolean = this == b
 }
 
-interface DoubleShowInstance : Show<Double> {
+interface DoubleShow : Show<Double> {
   override fun Double.show(): String = toString()
 }
 
-interface DoubleHashInstance : Hash<Double>, DoubleEqInstance {
+interface DoubleHash: Hash<Double>, DoubleEq {
   override fun Double.hash(): Int = hashCode()
 }
 
 fun Double.Companion.hash(): Hash<Double> =
-  object : DoubleHashInstance {}
+  object : DoubleHash{}
 
 fun Double.Companion.show(): Show<Double> =
-  object : DoubleShowInstance {}
+  object : DoubleShow{}
 
 fun Double.Companion.eq(): Eq<Double> =
-  object : DoubleEqInstance {}
+  object : DoubleEq{}
 
 fun Double.Companion.order(): Order<Double> =
-  object : DoubleOrderInstance {}
+  object : DoubleOrder{}
 
 fun Double.Companion.semigroup(): Semigroup<Double> =
-  object : DoubleSemigroupInstance {}
+  object : DoubleSemigroup{}
 
 fun Double.Companion.monoid(): Monoid<Double> =
-  object : DoubleMonoidInstance {}
+  object : DoubleMonoid{}
 
 //////////
 // Int
 //////////
-interface IntSemigroupInstance : Semigroup<Int> {
+interface IntSemigroup : Semigroup<Int> {
   override fun Int.combine(b: Int): Int = this + b
 }
 
-interface IntMonoidInstance : Monoid<Int>, IntSemigroupInstance {
+interface IntMonoid: Monoid<Int>, IntSemigroup {
   override fun empty(): Int = 0
 }
 
-interface IntEqInstance : Eq<Int> {
+interface IntEq : Eq<Int> {
   override fun Int.eqv(b: Int): Boolean = this == b
 }
 
-interface IntShowInstance : Show<Int> {
+interface IntShow : Show<Int> {
   override fun Int.show(): String = toString()
 }
 
-interface IntOrderInstance : Order<Int> {
+interface IntOrder : Order<Int> {
   override fun Int.compare(b: Int): Int = compareTo(b)
 }
 
-interface IntHashInstance : Hash<Int>, IntEqInstance {
+interface IntHash: Hash<Int>, IntEq {
   override fun Int.hash(): Int = hashCode()
 }
 
 fun Int.Companion.hash(): Hash<Int> =
-  object : IntHashInstance {}
+  object : IntHash{}
 
 fun Int.Companion.show(): Show<Int> =
-  object : IntShowInstance {}
+  object : IntShow{}
 
 fun Int.Companion.eq(): Eq<Int> =
-  object : IntEqInstance {}
+  object : IntEq{}
 
 fun Int.Companion.order(): Order<Int> =
-  object : IntOrderInstance {}
+  object : IntOrder{}
 
 fun Int.Companion.semigroup(): Semigroup<Int> =
-  object : IntSemigroupInstance {}
+  object : IntSemigroup{}
 
 fun Int.Companion.monoid(): Monoid<Int> =
-  object : IntMonoidInstance {}
+  object : IntMonoid{}
 
 //////////
 // Long
 //////////
 
-interface LongSemigroupInstance : Semigroup<Long> {
+interface LongSemigroup : Semigroup<Long> {
   override fun Long.combine(b: Long): Long = this + b
 }
 
-interface LongMonoidInstance : Monoid<Long>, LongSemigroupInstance {
+interface LongMonoid: Monoid<Long>, LongSemigroup {
   override fun empty(): Long = 0L
 }
 
-interface LongOrderInstance : Order<Long> {
+interface LongOrder : Order<Long> {
   override fun Long.compare(b: Long): Int = compareTo(b)
 }
 
-interface LongEqInstance : Eq<Long> {
+interface LongEq : Eq<Long> {
   override fun Long.eqv(b: Long): Boolean = this == b
 }
 
-interface LongShowInstance : Show<Long> {
+interface LongShow : Show<Long> {
   override fun Long.show(): String = toString()
 }
 
-interface LongHashInstance : Hash<Long>, LongEqInstance {
+interface LongHash: Hash<Long>, LongEq {
   override fun Long.hash(): Int = hashCode()
 }
 
 fun Long.Companion.hash(): Hash<Long> =
-  object : LongHashInstance {}
+  object : LongHash{}
 
 fun Long.Companion.show(): Show<Long> =
-  object : LongShowInstance {}
+  object : LongShow{}
 
 fun Long.Companion.eq(): Eq<Long> =
-  object : LongEqInstance {}
+  object : LongEq{}
 
 fun Long.Companion.order(): Order<Long> =
-  object : LongOrderInstance {}
+  object : LongOrder{}
 
 fun Long.Companion.semigroup(): Semigroup<Long> =
-  object : LongSemigroupInstance {}
+  object : LongSemigroup{}
 
 fun Long.Companion.monoid(): Monoid<Long> =
-  object : LongMonoidInstance {}
+  object : LongMonoid{}
 
 //////////
 // Short
 //////////
 
-interface ShortSemigroupInstance : Semigroup<Short> {
+interface ShortSemigroup : Semigroup<Short> {
   override fun Short.combine(b: Short): Short = (this + b).toShort()
 }
 
-interface ShortMonoidInstance : Monoid<Short>, ShortSemigroupInstance {
+interface ShortMonoid: Monoid<Short>, ShortSemigroup {
   override fun empty(): Short = 0
 }
 
-interface ShortOrderInstance : Order<Short> {
+interface ShortOrder : Order<Short> {
   override fun Short.compare(b: Short): Int = compareTo(b)
 }
 
-interface ShortEqInstance : Eq<Short> {
+interface ShortEq : Eq<Short> {
   override fun Short.eqv(b: Short): Boolean = this == b
 }
 
-interface ShortShowInstance : Show<Short> {
+interface ShortShow : Show<Short> {
   override fun Short.show(): String = toString()
 }
 
-interface ShortHashInstance : Hash<Short>, ShortEqInstance {
+interface ShortHash: Hash<Short>, ShortEq {
   override fun Short.hash(): Int = hashCode()
 }
 
 fun Short.Companion.hash(): Hash<Short> =
-  object : ShortHashInstance {}
+  object : ShortHash{}
 
 fun Short.Companion.show(): Show<Short> =
-  object : ShortShowInstance {}
+  object : ShortShow{}
 
 fun Short.Companion.eq(): Eq<Short> =
-  object : ShortEqInstance {}
+  object : ShortEq{}
 
 fun Short.Companion.order(): Order<Short> =
-  object : ShortOrderInstance {}
+  object : ShortOrder{}
 
 fun Short.Companion.semigroup(): Semigroup<Short> =
-  object : ShortSemigroupInstance {}
+  object : ShortSemigroup{}
 
 fun Short.Companion.monoid(): Monoid<Short> =
-  object : ShortMonoidInstance {}
+  object : ShortMonoid{}
 
 //////////
 // Float
 //////////
 
-interface FloatSemigroupInstance : Semigroup<Float> {
+interface FloatSemigroup : Semigroup<Float> {
   override fun Float.combine(b: Float): Float = this + b
 }
 
-interface FloatMonoidInstance : Monoid<Float>, FloatSemigroupInstance {
+interface FloatMonoid: Monoid<Float>, FloatSemigroup {
   override fun empty(): Float = 0f
 }
 
-interface FloatOrderInstance : Order<Float> {
+interface FloatOrder : Order<Float> {
   override fun Float.compare(b: Float): Int = compareTo(b)
 }
 
-interface FloatEqInstance : Eq<Float> {
+interface FloatEq : Eq<Float> {
   override fun Float.eqv(b: Float): Boolean = this == b
 }
 
-interface FloatShowInstance : Show<Float> {
+interface FloatShow : Show<Float> {
   override fun Float.show(): String = toString()
 }
 
-interface FloatHashInstance : Hash<Float>, FloatEqInstance {
+interface FloatHash: Hash<Float>, FloatEq {
   override fun Float.hash(): Int = hashCode()
 }
 
 fun Float.Companion.hash(): Hash<Float> =
-  object : FloatHashInstance {}
+  object : FloatHash{}
 
 fun Float.Companion.show(): Show<Float> =
-  object : FloatShowInstance {}
+  object : FloatShow{}
 
 fun Float.Companion.eq(): Eq<Float> =
-  object : FloatEqInstance {}
+  object : FloatEq{}
 
 fun Float.Companion.order(): Order<Float> =
-  object : FloatOrderInstance {}
+  object : FloatOrder{}
 
 fun Float.Companion.semigroup(): Semigroup<Float> =
-  object : FloatSemigroupInstance {}
+  object : FloatSemigroup{}
 
 fun Float.Companion.monoid(): Monoid<Float> =
-  object : FloatMonoidInstance {}
+  object : FloatMonoid{}

@@ -25,7 +25,7 @@ fun <L, R> Either.Companion.traversal(): Traversal<Either<L, R>, R> = object : T
  * [Each] instance for [Either] that has focus in each [Either.Right].
  */
 @extension
-interface EitherEachInstance<L, R> : Each<Either<L, R>, R> {
+interface EitherEach<L, R> : Each<Either<L, R>, R> {
   override fun each(): Traversal<Either<L, R>, R> =
     Either.traversal()
 }

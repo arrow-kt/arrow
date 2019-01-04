@@ -28,7 +28,7 @@ fun <A> ListK.Companion.traversal(): Traversal<ListK<A>, A> = object : Traversal
  * [Each] instance definition for [ListK].
  */
 @extension
-interface ListKEachInstance<A> : Each<ListK<A>, A> {
+interface ListKEach<A> : Each<ListK<A>, A> {
   override fun each(): Traversal<ListK<A>, A> =
     ListK.traversal()
 }
@@ -37,7 +37,7 @@ interface ListKEachInstance<A> : Each<ListK<A>, A> {
  * [FilterIndex] instance definition for [ListK].
  */
 @extension
-interface ListKFilterIndexInstance<A> : FilterIndex<ListK<A>, Int, A> {
+interface ListKFilterIndex<A> : FilterIndex<ListK<A>, Int, A> {
   override fun filter(p: (Int) -> Boolean): Traversal<ListK<A>, A> = object : Traversal<ListK<A>, A> {
     override fun <F> modifyF(FA: Applicative<F>, s: ListK<A>, f: (A) -> Kind<F, A>): Kind<F, ListK<A>> = FA.run {
       s.mapIndexed { index, a -> a toT index }.k().traverse(FA) { (a, j) ->
@@ -51,7 +51,7 @@ interface ListKFilterIndexInstance<A> : FilterIndex<ListK<A>, Int, A> {
  * [Index] instance definition for [ListK].
  */
 @extension
-interface ListKIndexInstance<A> : Index<ListK<A>, Int, A> {
+interface ListKIndex<A> : Index<ListK<A>, Int, A> {
   override fun index(i: Int): Optional<ListK<A>, A> = POptional(
     getOrModify = { it.getOrNull(i)?.right() ?: it.left() },
     set = { l, a -> l.mapIndexed { index: Int, aa: A -> if (index == i) a else aa }.k() }
@@ -62,7 +62,7 @@ interface ListKIndexInstance<A> : Index<ListK<A>, Int, A> {
  * [Cons] instance definition for [ListK].
  */
 @extension
-interface ListKConsInstance<A> : Cons<ListK<A>, A> {
+interface ListKCons<A> : Cons<ListK<A>, A> {
   override fun cons(): Prism<ListK<A>, Tuple2<A, ListK<A>>> = PPrism(
     getOrModify = { list -> list.firstOrNull()?.let { Tuple2(it, list.drop(1).k()) }?.right() ?: list.left() },
     reverseGet = { (a, aas) -> ListK(listOf(a) + aas) }
@@ -73,7 +73,7 @@ interface ListKConsInstance<A> : Cons<ListK<A>, A> {
  * [Snoc] instance definition for [ListK].
  */
 @extension
-interface ListKSnocInstance<A> : Snoc<ListK<A>, A> {
+interface ListKSnoc<A> : Snoc<ListK<A>, A> {
 
   override fun snoc() = object : Prism<ListK<A>, Tuple2<ListK<A>, A>> {
     override fun getOrModify(s: ListK<A>): Either<ListK<A>, Tuple2<ListK<A>, A>> =

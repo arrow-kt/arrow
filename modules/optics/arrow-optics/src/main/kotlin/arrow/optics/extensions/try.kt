@@ -23,7 +23,7 @@ fun <A> Try.Companion.traversal(): Traversal<Try<A>, A> = object : Traversal<Try
  * [Each] instance definition for [Try].
  */
 @extension
-interface TryEachInstance<A> : Each<Try<A>, A> {
+interface TryEach<A> : Each<Try<A>, A> {
   override fun each(): Traversal<Try<A>, A> =
     Try.traversal()
 }

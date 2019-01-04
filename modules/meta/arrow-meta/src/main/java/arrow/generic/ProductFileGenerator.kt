@@ -112,53 +112,53 @@ class ProductFileGenerator(
 
   private fun semigroupInstance(product: AnnotatedGeneric): String =
     """|
-                |interface ${product.sourceSimpleName}SemigroupInstance : arrow.typeclasses.Semigroup<${product.sourceClassName}> {
+                |interface ${product.sourceSimpleName}Semigroup : arrow.typeclasses.Semigroup<${product.sourceClassName}> {
                 |  override fun ${product.sourceClassName}.combine(b: ${product.sourceClassName}): ${product.sourceClassName} {
                 |    val (${product.types().joinToString(", ") { "x$it" }}) = this
                 |    val (${product.types().joinToString(", ") { "y$it" }}) = b
-                |    return ${product.sourceClassName}(${product.types().zip(product.targetNames).joinToString(", ") { "with(${it.second.companionFromType()}.semigroup${it.second.typeArg()}(${it.second.instance(product, "${product.sourceSimpleName}SemigroupInstance", "semigroup()")})){ x${it.first}.combine(y${it.first}) }" }})
+                |    return ${product.sourceClassName}(${product.types().zip(product.targetNames).joinToString(", ") { "with(${it.second.companionFromType()}.semigroup${it.second.typeArg()}(${it.second.instance(product, "${product.sourceSimpleName}Semigroup", "semigroup()")})){ x${it.first}.combine(y${it.first}) }" }})
                 |  }
                 |
                 |  companion object {
                 |    val defaultInstance : arrow.typeclasses.Semigroup<${product.sourceClassName}> =
-                |      object : ${product.sourceSimpleName}SemigroupInstance {}
+                |      object : ${product.sourceSimpleName}Semigroup{}
                 |  }
                 |}
                 |
                 |fun ${product.sourceClassName}.Companion.semigroup(): ${Semigroup.type}<${product.sourceClassName}> =
-                |  ${product.sourceSimpleName}SemigroupInstance.defaultInstance
+                |  ${product.sourceSimpleName}Semigroup.defaultInstance
                 |""".trimMargin()
 
   private fun monoidInstance(product: AnnotatedGeneric): String =
     """|
-                |interface ${product.sourceSimpleName}MonoidInstance : arrow.typeclasses.Monoid<${product.sourceClassName}>, ${product.sourceSimpleName}SemigroupInstance {
+                |interface ${product.sourceSimpleName}Monoid: arrow.typeclasses.Monoid<${product.sourceClassName}>, ${product.sourceSimpleName}Semigroup {
                 |  override fun empty(): ${product.sourceClassName} =
-                |    ${product.sourceClassName}(${product.types().zip(product.targetNames).joinToString(", ") { "with(${it.second.companionFromType()}.monoid${it.second.typeArg()}(${it.second.instance(product, "${product.sourceSimpleName}MonoidInstance", "monoid()")})){ empty() }" }})
+                |    ${product.sourceClassName}(${product.types().zip(product.targetNames).joinToString(", ") { "with(${it.second.companionFromType()}.monoid${it.second.typeArg()}(${it.second.instance(product, "${product.sourceSimpleName}Monoid", "monoid()")})){ empty() }" }})
                 |
                 |    companion object {
                 |       val defaultInstance : arrow.typeclasses.Monoid<${product.sourceClassName}> =
-                |           object : ${product.sourceSimpleName}MonoidInstance {}
+                |           object : ${product.sourceSimpleName}Monoid{}
                 |    }
                 |}
                 |
                 |fun ${product.sourceClassName}.Companion.monoid(): ${Monoid.type}<${product.sourceClassName}> =
-                |  ${product.sourceSimpleName}MonoidInstance.defaultInstance
+                |  ${product.sourceSimpleName}Monoid.defaultInstance
                 |""".trimMargin()
 
   private fun eqInstance(product: AnnotatedGeneric): String =
     """|
-                |interface ${product.sourceSimpleName}EqInstance : arrow.typeclasses.Eq<${product.sourceClassName}> {
+                |interface ${product.sourceSimpleName}Eq : arrow.typeclasses.Eq<${product.sourceClassName}> {
                 |  override fun ${product.sourceClassName}.eqv(b: ${product.sourceClassName}): Boolean =
                 |    this == b
                 |
                 |  companion object {
                 |    val defaultInstance : arrow.typeclasses.Eq<${product.sourceClassName}> =
-                |           object : ${product.sourceSimpleName}EqInstance {}
+                |           object : ${product.sourceSimpleName}Eq{}
                 |  }
                 |}
                 |
                 |fun ${product.sourceClassName}.Companion.eq(): ${Eq.type}<${product.sourceClassName}> =
-                |  ${product.sourceSimpleName}EqInstance.defaultInstance
+                |  ${product.sourceSimpleName}Eq.defaultInstance
                 |""".trimMargin()
 
   //TODO instance imports are hardcoded
@@ -188,13 +188,13 @@ class ProductFileGenerator(
             |
             |${eqInstance(product)}
             |
-            |interface ${product.sourceSimpleName}ShowInstance : arrow.typeclasses.Show<${product.sourceClassName}> {
+            |interface ${product.sourceSimpleName}Show : arrow.typeclasses.Show<${product.sourceClassName}> {
             |  override fun ${product.sourceClassName}.show(): String =
             |    this.toString()
             |}
             |
             |fun ${product.sourceClassName}.Companion.show(): ${Show.type}<${product.sourceClassName}> =
-            |  object : ${product.sourceSimpleName}ShowInstance {}
+            |  object : ${product.sourceSimpleName}Show{}
             |
             |""".trimMargin()
 
@@ -254,19 +254,6 @@ class ProductFileGenerator(
   private fun AnnotatedGeneric.types(): List<String> =
     (0 until focusSize).toList().map { letters[it].toString().capitalize() }
 
-  private fun AnnotatedGeneric.arityConcreteInstanceProviders(tc: DerivedTypeClass): String =
-    targetNames.mapIndexed { i, t -> i to t }.joinToString("\n  ") { "fun ${tc.type.substringAfterLast(".")[0]}${letters[it.first].toString().capitalize()}(): ${tc.type}<${it.second}>" }
-
-  private fun AnnotatedGeneric.arityConcreteInstanceInjections(tc: DerivedTypeClass): String =
-    targetNames.mapIndexed { i, t -> i to t }.joinToString(", ") {
-      "val ${tc.type.substringAfterLast(".")[0]}${letters[it.first].toString().capitalize()}: ${tc.type}<${it.second}>"
-    }
-
-  private fun AnnotatedGeneric.arityConcreteInstanceImplementations(tc: DerivedTypeClass): String =
-    targetNames.mapIndexed { i, t -> i to t }.joinToString("\n      ") {
-      "override fun ${tc.type.substringAfterLast(".")[0]}${letters[it.first].toString().capitalize()}(): ${tc.type}<${it.second}> = ${"${tc.type.substringBeforeLast(".")}.${tc.type.substringAfterLast(".").decapitalize()}"}()"
-    }
-
   private fun AnnotatedGeneric.arityInstanceProviders(tc: DerivedTypeClass): String =
     types().joinToString("\n  ") { "fun ${tc.type.substringAfterLast(".")[0]}$it(): ${tc.type}<$it>" }
 
@@ -282,13 +269,10 @@ class ProductFileGenerator(
   private fun AnnotatedGeneric.isRecursive(name: String): Boolean =
     sourceClassName in name
 
-  private fun AnnotatedGeneric.foldRecursive(name: String, ifNotRecursive: () -> String, ifRecursive: () -> String): String =
-    if (isRecursive(name)) ifRecursive() else ifNotRecursive()
-
   private fun semigroupTupleNInstance(product: AnnotatedGeneric): String =
     if (product.hasTupleFocus)
       """|
-                |interface Tuple${product.focusSize}SemigroupInstance<${product.expandedTypeArgs()}>
+                |interface Tuple${product.focusSize}Semigroup<${product.expandedTypeArgs()}>
                 | : ${Semigroup.type}<arrow.core.Tuple${product.focusSize}<${product.expandedTypeArgs()}>> {
                 |
                 |  ${product.arityInstanceProviders(Semigroup)}
@@ -304,8 +288,8 @@ class ProductFileGenerator(
                 |}
                 |
                 |object Tuple${product.focusSize}SemigroupInstanceImplicits {
-                |  fun <${product.expandedTypeArgs()}> instance(${product.arityInstanceInjections(Semigroup)}): Tuple${product.focusSize}SemigroupInstance<${product.expandedTypeArgs()}> =
-                |    object : Tuple${product.focusSize}SemigroupInstance<${product.expandedTypeArgs()}> {
+                |  fun <${product.expandedTypeArgs()}> instance(${product.arityInstanceInjections(Semigroup)}): Tuple${product.focusSize}Semigroup<${product.expandedTypeArgs()}> =
+                |    object : Tuple${product.focusSize}Semigroup<${product.expandedTypeArgs()}> {
                 |      ${product.arityInstanceImplementations(Semigroup)}
                 |    }
                 |}
@@ -315,7 +299,7 @@ class ProductFileGenerator(
   private fun monoidTupleNInstance(product: AnnotatedGeneric): String =
     if (product.hasTupleFocus)
       """|
-                |interface Tuple${product.focusSize}MonoidInstance<${product.expandedTypeArgs()}>
+                |interface Tuple${product.focusSize}Monoid<${product.expandedTypeArgs()}>
                 | : ${Monoid.type}<arrow.core.Tuple${product.focusSize}<${product.expandedTypeArgs()}>> {
                 |
                 |  ${product.arityInstanceProviders(Monoid)}
@@ -335,8 +319,8 @@ class ProductFileGenerator(
                 |}
                 |
                 |object Tuple${product.focusSize}MonoidInstanceImplicits {
-                |  fun <${product.expandedTypeArgs()}> instance(${product.arityInstanceInjections(Monoid)}): Tuple${product.focusSize}MonoidInstance<${product.expandedTypeArgs()}> =
-                |    object : Tuple${product.focusSize}MonoidInstance<${product.expandedTypeArgs()}> {
+                |  fun <${product.expandedTypeArgs()}> instance(${product.arityInstanceInjections(Monoid)}): Tuple${product.focusSize}Monoid<${product.expandedTypeArgs()}> =
+                |    object : Tuple${product.focusSize}Monoid<${product.expandedTypeArgs()}> {
                 |      ${product.arityInstanceImplementations(Monoid)}
                 |    }
                 |}
@@ -346,7 +330,7 @@ class ProductFileGenerator(
   private fun eqTupleNInstance(product: AnnotatedGeneric): String =
     if (product.hasTupleFocus)
       """|
-                |interface Tuple${product.focusSize}EqInstance<${product.expandedTypeArgs()}>
+                |interface Tuple${product.focusSize}Eq<${product.expandedTypeArgs()}>
                 | : ${Eq.type}<arrow.core.Tuple${product.focusSize}<${product.expandedTypeArgs()}>> {
                 |
                 |  ${product.arityInstanceProviders(Eq)}
@@ -362,8 +346,8 @@ class ProductFileGenerator(
                 |}
                 |
                 |object Tuple${product.focusSize}EqInstanceImplicits {
-                |  fun <${product.expandedTypeArgs()}> instance(${product.arityInstanceInjections(Eq)}): Tuple${product.focusSize}EqInstance<${product.expandedTypeArgs()}> =
-                |    object : Tuple${product.focusSize}EqInstance<${product.expandedTypeArgs()}> {
+                |  fun <${product.expandedTypeArgs()}> instance(${product.arityInstanceInjections(Eq)}): Tuple${product.focusSize}Eq<${product.expandedTypeArgs()}> =
+                |    object : Tuple${product.focusSize}Eq<${product.expandedTypeArgs()}> {
                 |      ${product.arityInstanceImplementations(Eq)}
                 |    }
                 |}
@@ -373,7 +357,7 @@ class ProductFileGenerator(
   private fun orderTupleNInstance(product: AnnotatedGeneric): String =
     if (product.hasTupleFocus)
       """|
-                |interface Tuple${product.focusSize}OrderInstance<${product.expandedTypeArgs()}>
+                |interface Tuple${product.focusSize}Order<${product.expandedTypeArgs()}>
                 | : ${Order.type}<arrow.core.Tuple${product.focusSize}<${product.expandedTypeArgs()}>> {
                 |
                 |  ${product.arityInstanceProviders(Order)}
@@ -390,8 +374,8 @@ class ProductFileGenerator(
                 |}
                 |
                 |object Tuple${product.focusSize}OrderInstanceImplicits {
-                |  fun <${product.expandedTypeArgs()}> instance(${product.arityInstanceInjections(Order)}): Tuple${product.focusSize}OrderInstance<${product.expandedTypeArgs()}> =
-                |    object : Tuple${product.focusSize}OrderInstance<${product.expandedTypeArgs()}> {
+                |  fun <${product.expandedTypeArgs()}> instance(${product.arityInstanceInjections(Order)}): Tuple${product.focusSize}Order<${product.expandedTypeArgs()}> =
+                |    object : Tuple${product.focusSize}Order<${product.expandedTypeArgs()}> {
                 |      ${product.arityInstanceImplementations(Order)}
                 |    }
                 |}
@@ -401,7 +385,7 @@ class ProductFileGenerator(
   private fun showTupleNInstance(product: AnnotatedGeneric): String =
     if (product.hasTupleFocus)
       """|
-                |interface Tuple${product.focusSize}ShowInstance<${product.expandedTypeArgs()}>
+                |interface Tuple${product.focusSize}Show<${product.expandedTypeArgs()}>
                 | : ${Show.type}<arrow.core.Tuple${product.focusSize}<${product.expandedTypeArgs()}>> {
                 |
                 |  ${product.arityInstanceProviders(Show)}
@@ -416,8 +400,8 @@ class ProductFileGenerator(
                 |}
                 |
                 |object Tuple${product.focusSize}ShowInstanceImplicits {
-                |  fun <${product.expandedTypeArgs()}> instance(${product.arityInstanceInjections(Show)}): Tuple${product.focusSize}ShowInstance<${product.expandedTypeArgs()}> =
-                |    object : Tuple${product.focusSize}ShowInstance<${product.expandedTypeArgs()}> {
+                |  fun <${product.expandedTypeArgs()}> instance(${product.arityInstanceInjections(Show)}): Tuple${product.focusSize}Show<${product.expandedTypeArgs()}> =
+                |    object : Tuple${product.focusSize}Show<${product.expandedTypeArgs()}> {
                 |      ${product.arityInstanceImplementations(Show)}
                 |    }
                 |}

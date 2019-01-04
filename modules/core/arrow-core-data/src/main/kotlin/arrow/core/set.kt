@@ -1,5 +1,5 @@
 package arrow.core
 
-object SetInstances
+object SetExtensions
 
 object SortedSetInstances

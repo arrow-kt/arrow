@@ -11,28 +11,28 @@ import javax.inject.Inject
 abstract class EitherInstances<L> {
 
   @Provides
-  fun eitherFunctor(ev: DaggerEitherFunctorInstance<L>): Functor<EitherPartialOf<L>> = ev
+  fun eitherFunctor(ev: DaggerEitherFunctor<L>): Functor<EitherPartialOf<L>> = ev
 
   @Provides
-  fun eitherApplicative(ev: DaggerEitherApplicativeInstance<L>): Applicative<EitherPartialOf<L>> = ev
+  fun eitherApplicative(ev: DaggerEitherApplicative<L>): Applicative<EitherPartialOf<L>> = ev
 
   @Provides
-  fun eitherMonad(ev: DaggerEitherMonadInstance<L>): Monad<EitherPartialOf<L>> = ev
+  fun eitherMonad(ev: DaggerEitherMonad<L>): Monad<EitherPartialOf<L>> = ev
 
   @Provides
-  fun eitherFoldable(ev: DaggerEitherFoldableInstance<L>): Foldable<EitherPartialOf<L>> = ev
+  fun eitherFoldable(ev: DaggerEitherFoldable<L>): Foldable<EitherPartialOf<L>> = ev
 
   @Provides
-  fun eitherTraverse(ev: DaggerEitherTraverseInstance<L>): Traverse<EitherPartialOf<L>> = ev
+  fun eitherTraverse(ev: DaggerEitherTraverse<L>): Traverse<EitherPartialOf<L>> = ev
 
   @Provides
-  fun eitherSemigroupK(ev: DaggerEitherSemigroupKInstance<L>): SemigroupK<EitherPartialOf<L>> = ev
+  fun eitherSemigroupK(ev: DaggerEitherSemigroupK<L>): SemigroupK<EitherPartialOf<L>> = ev
 
 }
 
-class DaggerEitherFunctorInstance<F> @Inject constructor() : EitherFunctorInstance<F>
-class DaggerEitherApplicativeInstance<F> @Inject constructor() : EitherApplicativeInstance<F>
-class DaggerEitherMonadInstance<F> @Inject constructor() : EitherMonadInstance<F>
-class DaggerEitherFoldableInstance<F> @Inject constructor() : EitherFoldableInstance<F>
-class DaggerEitherTraverseInstance<F> @Inject constructor() : EitherTraverseInstance<F>
-class DaggerEitherSemigroupKInstance<F> @Inject constructor() : EitherSemigroupKInstance<F>
+class DaggerEitherFunctor<F> @Inject constructor() : EitherFunctor<F>
+class DaggerEitherApplicative<F> @Inject constructor() : EitherApplicative<F>
+class DaggerEitherMonad<F> @Inject constructor() : EitherMonad<F>
+class DaggerEitherFoldable<F> @Inject constructor() : EitherFoldable<F>
+class DaggerEitherTraverse<F> @Inject constructor() : EitherTraverse<F>
+class DaggerEitherSemigroupK<F> @Inject constructor() : EitherSemigroupK<F>

@@ -1,3 +1,3 @@
 package arrow.core
 
-object ListInstances
+object ListExtensions

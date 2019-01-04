@@ -13,7 +13,7 @@ data class Cons(val head: Int, val tail: IntList) : IntList()
 object NilPattern : IntListPattern<Nothing>()
 @higherkind data class ConsPattern<out A>(val head: Int, val tail: A) : IntListPattern<A>()
 
-interface IntListPatternFunctorInstance : Functor<ForIntListPattern> {
+interface IntListPatternFunctor : Functor<ForIntListPattern> {
   override fun <A, B> IntListPatternOf<A>.map(f: (A) -> B): IntListPatternOf<B> {
     val lp = fix()
     return when (lp) {
@@ -113,7 +113,7 @@ fun <B, A : B> Kind<ForIntListPattern, A>.widen(): IntListPattern<B> = IntListPa
   widen<B, A>() as IntListPattern<B>
 }
 
-fun IntListPattern.Companion.functor(): IntListPatternFunctorInstance = object : IntListPatternFunctorInstance {
+fun IntListPattern.Companion.functor(): IntListPatternFunctor = object : IntListPatternFunctor{
 
 }
 

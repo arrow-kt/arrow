@@ -11,7 +11,7 @@ import arrow.undocumented
 
 @extension
 @undocumented
-interface WriterTFunctorInstance<F, W> : Functor<WriterTPartialOf<F, W>> {
+interface WriterTFunctor<F, W> : Functor<WriterTPartialOf<F, W>> {
   fun FF(): Functor<F>
 
   override fun <A, B> WriterTOf<F, W, A>.map(f: (A) -> B): WriterT<F, W, B> = fix().map(FF()) { f(it) }
@@ -19,7 +19,7 @@ interface WriterTFunctorInstance<F, W> : Functor<WriterTPartialOf<F, W>> {
 
 @extension
 @undocumented
-interface WriterTApplicativeInstance<F, W> : Applicative<WriterTPartialOf<F, W>>, WriterTFunctorInstance<F, W> {
+interface WriterTApplicative<F, W> : Applicative<WriterTPartialOf<F, W>>, WriterTFunctor<F, W> {
 
   fun AF(): Applicative<F>
 
@@ -39,7 +39,7 @@ interface WriterTApplicativeInstance<F, W> : Applicative<WriterTPartialOf<F, W>>
 
 @extension
 @undocumented
-interface WriterTMonadInstance<F, W> : Monad<WriterTPartialOf<F, W>>, WriterTApplicativeInstance<F, W> {
+interface WriterTMonad<F, W> : Monad<WriterTPartialOf<F, W>>, WriterTApplicative<F, W> {
 
   fun MF(): Monad<F>
 
@@ -61,7 +61,7 @@ interface WriterTMonadInstance<F, W> : Monad<WriterTPartialOf<F, W>>, WriterTApp
 }
 
 @extension
-interface WriterTApplicativeError<F, W, E> : ApplicativeError<WriterTPartialOf<F, W>, E>, WriterTApplicativeInstance<F, W> {
+interface WriterTApplicativeError<F, W, E> : ApplicativeError<WriterTPartialOf<F, W>, E>, WriterTApplicative<F, W> {
 
   fun AE(): ApplicativeError<F, E>
 
@@ -79,7 +79,7 @@ interface WriterTApplicativeError<F, W, E> : ApplicativeError<WriterTPartialOf<F
 }
 
 @extension
-interface WriterTMonadError<F, W, E> : MonadError<WriterTPartialOf<F, W>, E>, WriterTApplicativeError<F, W, E>, WriterTMonadInstance<F, W> {
+interface WriterTMonadError<F, W, E> : MonadError<WriterTPartialOf<F, W>, E>, WriterTApplicativeError<F, W, E>, WriterTMonad<F, W> {
 
   fun ME(): MonadError<F, E>
 
@@ -100,7 +100,7 @@ interface WriterTMonadThrow<F, W> : MonadThrow<WriterTPartialOf<F, W>>, WriterTM
 }
 
 @extension
-interface WriterTSemigroupKInstance<F, W> : SemigroupK<WriterTPartialOf<F, W>> {
+interface WriterTSemigroupK<F, W> : SemigroupK<WriterTPartialOf<F, W>> {
 
   fun SS(): SemigroupK<F>
 
@@ -109,7 +109,7 @@ interface WriterTSemigroupKInstance<F, W> : SemigroupK<WriterTPartialOf<F, W>> {
 }
 
 @extension
-interface WriterTMonoidKInstance<F, W> : MonoidK<WriterTPartialOf<F, W>>, WriterTSemigroupKInstance<F, W> {
+interface WriterTMonoidK<F, W> : MonoidK<WriterTPartialOf<F, W>>, WriterTSemigroupK<F, W> {
 
   fun MF(): MonoidK<F>
 

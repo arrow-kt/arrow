@@ -2,49 +2,49 @@ package arrow.core.extensions
 
 import arrow.typeclasses.*
 
-interface StringSemigroupInstance : Semigroup<String> {
+interface StringSemigroup : Semigroup<String> {
   override fun String.combine(b: String): String = "${this}$b"
 }
 
 fun String.Companion.semigroup(): Semigroup<String> =
-  object : StringSemigroupInstance {}
+  object : StringSemigroup{}
 
-interface StringMonoidInstance : Monoid<String>, StringSemigroupInstance {
+interface StringMonoid: Monoid<String>, StringSemigroup {
   override fun empty(): String = ""
 }
 
 fun String.Companion.monoid(): Monoid<String> =
-  object : StringMonoidInstance {}
+  object : StringMonoid{}
 
-interface StringEqInstance : Eq<String> {
+interface StringEq : Eq<String> {
   override fun String.eqv(b: String): Boolean = this == b
 }
 
 fun String.Companion.eq(): Eq<String> =
-  object : StringEqInstance {}
+  object : StringEq{}
 
-interface StringShowInstance : Show<String> {
+interface StringShow : Show<String> {
   override fun String.show(): String = this
 }
 
 fun String.Companion.show(): Show<String> =
-  object : StringShowInstance {}
+  object : StringShow{}
 
-interface StringOrderInstance : Order<String> {
+interface StringOrder : Order<String> {
   override fun String.compare(b: String): Int = this.compareTo(b)
 }
 
 fun String.Companion.order(): Order<String> =
-  object : StringOrderInstance {}
+  object : StringOrder{}
 
-interface StringHashInstance : Hash<String>, StringEqInstance {
+interface StringHash: Hash<String>, StringEq {
   override fun String.hash(): Int = hashCode()
 }
 
 fun String.Companion.hash(): Hash<String> =
-  object : StringHashInstance {}
+  object : StringHash{}
 
-object StringContext : StringShowInstance, StringOrderInstance, StringMonoidInstance
+object StringContext : StringShow, StringOrder, StringMonoid
 
 object ForString {
   infix fun <L> extensions(f: StringContext.() -> L): L =

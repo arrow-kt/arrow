@@ -17,7 +17,7 @@ import arrow.free.map as freeMap
 
 @extension
 @undocumented
-interface FreeFunctorInstance<S> : Functor<FreePartialOf<S>> {
+interface FreeFunctor<S> : Functor<FreePartialOf<S>> {
 
   override fun <A, B> Kind<FreePartialOf<S>, A>.map(f: (A) -> B): Free<S, B> =
     fix().freeMap(f)
@@ -25,7 +25,7 @@ interface FreeFunctorInstance<S> : Functor<FreePartialOf<S>> {
 
 @extension
 @undocumented
-interface FreeApplicativeInstance<S> : Applicative<FreePartialOf<S>>, FreeFunctorInstance<S> {
+interface FreeApplicative<S> : Applicative<FreePartialOf<S>>, FreeFunctor<S> {
 
   override fun <A> just(a: A): Free<S, A> = Free.just(a)
 
@@ -38,7 +38,7 @@ interface FreeApplicativeInstance<S> : Applicative<FreePartialOf<S>>, FreeFuncto
 
 @extension
 @undocumented
-interface FreeMonadInstance<S> : Monad<FreePartialOf<S>>, FreeApplicativeInstance<S> {
+interface FreeMonad<S> : Monad<FreePartialOf<S>>, FreeApplicative<S> {
 
   override fun <A, B> Kind<FreePartialOf<S>, A>.map(f: (A) -> B): Free<S, B> =
     fix().freeMap(f)

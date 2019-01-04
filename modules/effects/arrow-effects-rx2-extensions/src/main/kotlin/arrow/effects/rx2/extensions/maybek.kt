@@ -12,13 +12,13 @@ import arrow.typeclasses.*
 import kotlin.coroutines.CoroutineContext
 
 @extension
-interface MaybeKFunctorInstance : Functor<ForMaybeK> {
+interface MaybeKFunctor : Functor<ForMaybeK> {
   override fun <A, B> MaybeKOf<A>.map(f: (A) -> B): MaybeK<B> =
     fix().map(f)
 }
 
 @extension
-interface MaybeKApplicativeInstance : Applicative<ForMaybeK> {
+interface MaybeKApplicative : Applicative<ForMaybeK> {
   override fun <A, B> MaybeKOf<A>.ap(ff: MaybeKOf<(A) -> B>): MaybeK<B> =
     fix().ap(ff)
 
@@ -30,7 +30,7 @@ interface MaybeKApplicativeInstance : Applicative<ForMaybeK> {
 }
 
 @extension
-interface MaybeKMonadInstance : Monad<ForMaybeK> {
+interface MaybeKMonad : Monad<ForMaybeK> {
   override fun <A, B> MaybeKOf<A>.ap(ff: MaybeKOf<(A) -> B>): MaybeK<B> =
     fix().ap(ff)
 
@@ -48,7 +48,7 @@ interface MaybeKMonadInstance : Monad<ForMaybeK> {
 }
 
 @extension
-interface MaybeKFoldableInstance : Foldable<ForMaybeK> {
+interface MaybeKFoldable : Foldable<ForMaybeK> {
 
   override fun <A, B> MaybeKOf<A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
@@ -70,9 +70,9 @@ interface MaybeKFoldableInstance : Foldable<ForMaybeK> {
 }
 
 @extension
-interface MaybeKApplicativeErrorInstance :
+interface MaybeKApplicativeError :
   ApplicativeError<ForMaybeK, Throwable>,
-  MaybeKApplicativeInstance {
+  MaybeKApplicative{
   override fun <A> raiseError(e: Throwable): MaybeK<A> =
     MaybeK.raiseError(e)
 
@@ -81,9 +81,9 @@ interface MaybeKApplicativeErrorInstance :
 }
 
 @extension
-interface MaybeKMonadErrorInstance :
+interface MaybeKMonadError :
   MonadError<ForMaybeK, Throwable>,
-  MaybeKMonadInstance {
+  MaybeKMonad{
   override fun <A> raiseError(e: Throwable): MaybeK<A> =
     MaybeK.raiseError(e)
 
@@ -92,22 +92,22 @@ interface MaybeKMonadErrorInstance :
 }
 
 @extension
-interface MaybeKMonadThrowInstance : MonadThrow<ForMaybeK>, MaybeKMonadErrorInstance
+interface MaybeKMonadThrow: MonadThrow<ForMaybeK>, MaybeKMonadError
 
 @extension
-interface MaybeKBracketInstance : Bracket<ForMaybeK, Throwable>, MaybeKMonadThrowInstance {
+interface MaybeKBracket: Bracket<ForMaybeK, Throwable>, MaybeKMonadThrow {
   override fun <A, B> MaybeKOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> MaybeKOf<Unit>, use: (A) -> MaybeKOf<B>): MaybeK<B> =
     fix().bracketCase({ use(it) }, { a, e -> release(a, e) })
 }
 
 @extension
-interface MaybeKMonadDeferInstance : MonadDefer<ForMaybeK>, MaybeKBracketInstance {
+interface MaybeKMonadDefer: MonadDefer<ForMaybeK>, MaybeKBracket {
   override fun <A> defer(fa: () -> MaybeKOf<A>): MaybeK<A> =
     MaybeK.defer(fa)
 }
 
 @extension
-interface MaybeKAsyncInstance : Async<ForMaybeK>, MaybeKMonadDeferInstance {
+interface MaybeKAsync: Async<ForMaybeK>, MaybeKMonadDefer {
   override fun <A> async(fa: Proc<A>): MaybeK<A> =
     MaybeK.async { _, cb -> fa(cb) }
 
@@ -119,9 +119,9 @@ interface MaybeKAsyncInstance : Async<ForMaybeK>, MaybeKMonadDeferInstance {
 }
 
 @extension
-interface MaybeKEffectInstance :
+interface MaybeKEffect :
   Effect<ForMaybeK>,
-  MaybeKAsyncInstance {
+  MaybeKAsync{
   override fun <A> MaybeKOf<A>.runAsync(cb: (Either<Throwable, A>) -> MaybeKOf<Unit>): MaybeK<Unit> =
     fix().runAsync(cb)
 }

@@ -26,7 +26,7 @@ fun <L, R> Either<L, R>.combine(SGL: Semigroup<L>, SGR: Semigroup<R>, b: Either<
 }
 
 @extension
-interface EitherSemigroupInstance<L, R> : Semigroup<Either<L, R>> {
+interface EitherSemigroup<L, R> : Semigroup<Either<L, R>> {
 
   fun SGL(): Semigroup<L>
   fun SGR(): Semigroup<R>
@@ -35,7 +35,7 @@ interface EitherSemigroupInstance<L, R> : Semigroup<Either<L, R>> {
 }
 
 @extension
-interface EitherMonoidInstance<L, R> : Monoid<Either<L, R>>, EitherSemigroupInstance<L, R> {
+interface EitherMonoid<L, R> : Monoid<Either<L, R>>, EitherSemigroup<L, R> {
   fun MOL(): Monoid<L>
   fun MOR(): Monoid<R>
 
@@ -46,18 +46,18 @@ interface EitherMonoidInstance<L, R> : Monoid<Either<L, R>>, EitherSemigroupInst
 }
 
 @extension
-interface EitherFunctorInstance<L> : Functor<EitherPartialOf<L>> {
+interface EitherFunctor<L> : Functor<EitherPartialOf<L>> {
   override fun <A, B> EitherOf<L, A>.map(f: (A) -> B): Either<L, B> = fix().map(f)
 }
 
 @extension
-interface EitherBifunctorInstance : Bifunctor<ForEither> {
+interface EitherBifunctor : Bifunctor<ForEither> {
   override fun <A, B, C, D> EitherOf<A, B>.bimap(fl: (A) -> C, fr: (B) -> D): Either<C, D> =
     fix().bimap(fl, fr)
 }
 
 @extension
-interface EitherApplicativeInstance<L> : Applicative<EitherPartialOf<L>>, EitherFunctorInstance<L> {
+interface EitherApplicative<L> : Applicative<EitherPartialOf<L>>, EitherFunctor<L> {
 
   override fun <A> just(a: A): Either<L, A> = Right(a)
 
@@ -68,7 +68,7 @@ interface EitherApplicativeInstance<L> : Applicative<EitherPartialOf<L>>, Either
 }
 
 @extension
-interface EitherMonadInstance<L> : Monad<EitherPartialOf<L>>, EitherApplicativeInstance<L> {
+interface EitherMonad<L> : Monad<EitherPartialOf<L>>, EitherApplicative<L> {
 
   override fun <A, B> EitherOf<L, A>.map(f: (A) -> B): Either<L, B> = fix().map(f)
 
@@ -83,7 +83,7 @@ interface EitherMonadInstance<L> : Monad<EitherPartialOf<L>>, EitherApplicativeI
 }
 
 @extension
-interface EitherApplicativeErrorInstance<L> : ApplicativeError<EitherPartialOf<L>, L>, EitherApplicativeInstance<L> {
+interface EitherApplicativeError<L> : ApplicativeError<EitherPartialOf<L>, L>, EitherApplicative<L> {
 
   override fun <A> raiseError(e: L): Either<L, A> = Left(e)
 
@@ -97,10 +97,10 @@ interface EitherApplicativeErrorInstance<L> : ApplicativeError<EitherPartialOf<L
 }
 
 @extension
-interface EitherMonadErrorInstance<L> : MonadError<EitherPartialOf<L>, L>, EitherApplicativeErrorInstance<L>, EitherMonadInstance<L>
+interface EitherMonadError<L> : MonadError<EitherPartialOf<L>, L>, EitherApplicativeError<L>, EitherMonad<L>
 
 @extension
-interface EitherFoldableInstance<L> : Foldable<EitherPartialOf<L>> {
+interface EitherFoldable<L> : Foldable<EitherPartialOf<L>> {
 
   override fun <A, B> EitherOf<L, A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
@@ -113,21 +113,21 @@ fun <G, A, B, C> EitherOf<A, B>.traverse(GA: Applicative<G>, f: (B) -> Kind<G, C
   fix().fold({ GA.just(Either.Left(it)) }, { GA.run { f(it).map { Either.Right(it) } } })
 
 @extension
-interface EitherTraverseInstance<L> : Traverse<EitherPartialOf<L>>, EitherFoldableInstance<L> {
+interface EitherTraverse<L> : Traverse<EitherPartialOf<L>>, EitherFoldable<L> {
 
   override fun <G, A, B> EitherOf<L, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, EitherOf<L, B>> =
     fix().eitherTraverse(AP, f)
 }
 
 @extension
-interface EitherSemigroupKInstance<L> : SemigroupK<EitherPartialOf<L>> {
+interface EitherSemigroupK<L> : SemigroupK<EitherPartialOf<L>> {
 
   override fun <A> EitherOf<L, A>.combineK(y: EitherOf<L, A>): Either<L, A> =
     fix().eitherCombineK(y)
 }
 
 @extension
-interface EitherEqInstance<in L, in R> : Eq<Either<L, R>> {
+interface EitherEq<in L, in R> : Eq<Either<L, R>> {
 
   fun EQL(): Eq<L>
 
@@ -147,13 +147,13 @@ interface EitherEqInstance<in L, in R> : Eq<Either<L, R>> {
 }
 
 @extension
-interface EitherShowInstance<L, R> : Show<Either<L, R>> {
+interface EitherShow<L, R> : Show<Either<L, R>> {
   override fun Either<L, R>.show(): String =
     toString()
 }
 
 @extension
-interface EitherHashInstance<L, R> : Hash<Either<L, R>>, EitherEqInstance<L, R> {
+interface EitherHash<L, R> : Hash<Either<L, R>>, EitherEq<L, R> {
 
   fun HL(): Hash<L>
   fun HR(): Hash<R>

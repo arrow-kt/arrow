@@ -4,7 +4,7 @@ import arrow.extension
 import arrow.typeclasses.*
 
 @extension
-interface MonoidInvariantInstance<A> : Invariant<ForMonoid> {
+interface MonoidInvariant<A> : Invariant<ForMonoid> {
     override fun <A, B> MonoidOf<A>.imap(f: (A) -> B, g: (B) -> A): Monoid<B> =
         object : Monoid<B> {
             override fun empty(): B = f(this@imap.fix().empty())

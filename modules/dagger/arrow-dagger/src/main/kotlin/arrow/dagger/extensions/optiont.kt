@@ -11,55 +11,55 @@ import javax.inject.Inject
 abstract class OptionTInstances<F> {
 
   @Provides
-  fun optionTFunctor(ev: DaggerOptionTFunctorInstance<F>): Functor<OptionTPartialOf<F>> = ev
+  fun optionTFunctor(ev: DaggerOptionTFunctor<F>): Functor<OptionTPartialOf<F>> = ev
 
   @Provides
-  fun optionTApplicative(ev: DaggerOptionTApplicativeInstance<F>): Applicative<OptionTPartialOf<F>> = ev
+  fun optionTApplicative(ev: DaggerOptionTApplicative<F>): Applicative<OptionTPartialOf<F>> = ev
 
   @Provides
-  fun optionTMonad(ev: DaggerOptionTMonadInstance<F>): Monad<OptionTPartialOf<F>> = ev
+  fun optionTMonad(ev: DaggerOptionTMonad<F>): Monad<OptionTPartialOf<F>> = ev
 
   @Provides
-  fun optionTFoldable(ev: DaggerOptionTFoldableInstance<F>): Foldable<OptionTPartialOf<F>> = ev
+  fun optionTFoldable(ev: DaggerOptionTFoldable<F>): Foldable<OptionTPartialOf<F>> = ev
 
   @Provides
-  fun optionTTraverse(ev: DaggerOptionTTraverseInstance<F>): Traverse<OptionTPartialOf<F>> = ev
+  fun optionTTraverse(ev: DaggerOptionTTraverse<F>): Traverse<OptionTPartialOf<F>> = ev
 
   @Provides
-  fun optionTSemigroupK(ev: DaggerOptionTSemigroupKInstance<F>): SemigroupK<OptionTPartialOf<F>> = ev
+  fun optionTSemigroupK(ev: DaggerOptionTSemigroupK<F>): SemigroupK<OptionTPartialOf<F>> = ev
 
   @Provides
-  fun optionTMonoidK(ev: DaggerOptionTMonoidKInstance<F>): MonoidK<OptionTPartialOf<F>> = ev
+  fun optionTMonoidK(ev: DaggerOptionTMonoidK<F>): MonoidK<OptionTPartialOf<F>> = ev
 
 }
 
-class DaggerOptionTFunctorInstance<F> @Inject constructor(val FF: Functor<F>) : OptionTFunctorInstance<F> {
+class DaggerOptionTFunctor<F> @Inject constructor(val FF: Functor<F>) : OptionTFunctor<F> {
   override fun FF(): Functor<F> = FF
 }
 
-class DaggerOptionTApplicativeInstance<F> @Inject constructor(val AF: Applicative<F>) : OptionTApplicativeInstance<F> {
+class DaggerOptionTApplicative<F> @Inject constructor(val AF: Applicative<F>) : OptionTApplicative<F> {
   override fun FF(): Functor<F> = AF
   override fun AF(): Applicative<F> = AF
 }
 
-class DaggerOptionTMonadInstance<F> @Inject constructor(val FF: Monad<F>) : OptionTMonadInstance<F> {
+class DaggerOptionTMonad<F> @Inject constructor(val FF: Monad<F>) : OptionTMonad<F> {
   override fun FF(): Monad<F> = FF
   override fun MF(): Monad<F> = FF
 }
 
-class DaggerOptionTFoldableInstance<F> @Inject constructor(val FFF: Foldable<F>) : OptionTFoldableInstance<F> {
+class DaggerOptionTFoldable<F> @Inject constructor(val FFF: Foldable<F>) : OptionTFoldable<F> {
   override fun FFF(): Foldable<F> = FFF
 }
 
-class DaggerOptionTTraverseInstance<F> @Inject constructor(val FFF: Traverse<F>) : OptionTTraverseInstance<F> {
+class DaggerOptionTTraverse<F> @Inject constructor(val FFF: Traverse<F>) : OptionTTraverse<F> {
   override fun FFF(): Traverse<F> = FFF
   override fun FFT(): Traverse<F> = FFF
 }
 
-class DaggerOptionTSemigroupKInstance<F> @Inject constructor(val FF: Monad<F>) : OptionTSemigroupKInstance<F> {
+class DaggerOptionTSemigroupK<F> @Inject constructor(val FF: Monad<F>) : OptionTSemigroupK<F> {
   override fun MF(): Monad<F> = FF
 }
 
-class DaggerOptionTMonoidKInstance<F> @Inject constructor(val FF: Monad<F>) : OptionTMonoidKInstance<F> {
+class DaggerOptionTMonoidK<F> @Inject constructor(val FF: Monad<F>) : OptionTMonoidK<F> {
   override fun MF(): Monad<F> = FF
 }

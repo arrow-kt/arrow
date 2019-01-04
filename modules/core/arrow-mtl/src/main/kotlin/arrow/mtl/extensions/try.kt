@@ -9,7 +9,7 @@ import arrow.extension
 import arrow.mtl.typeclasses.FunctorFilter
 
 @extension
-interface TryFunctorFilterInstance : FunctorFilter<ForTry> {
+interface TryFunctorFilter : FunctorFilter<ForTry> {
 
   override fun <A, B> Kind<ForTry, A>.mapFilter(f: (A) -> Option<B>): Try<B> =
     fix().mapFilter(f)

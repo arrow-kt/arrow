@@ -24,7 +24,7 @@ fun <A> Option.Companion.traversal(): Traversal<Option<A>, A> = object : Travers
  * [Each] instance definition for [Option].
  */
 @extension
-interface OptionEachInstance<A> : Each<Option<A>, A> {
+interface OptionEach<A> : Each<Option<A>, A> {
   override fun each(): Traversal<Option<A>, A> =
     Option.traversal()
 }

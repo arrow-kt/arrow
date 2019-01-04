@@ -14,7 +14,7 @@ import arrow.undocumented
 
 @extension
 @undocumented
-interface SumComonadInstance<F, G> : Comonad<SumPartialOf<F, G>> {
+interface SumComonad<F, G> : Comonad<SumPartialOf<F, G>> {
 
   fun CF(): Comonad<F>
 
@@ -32,7 +32,7 @@ interface SumComonadInstance<F, G> : Comonad<SumPartialOf<F, G>> {
 
 @extension
 @undocumented
-interface SumFunctorInstance<F, G> : Functor<SumPartialOf<F, G>> {
+interface SumFunctor<F, G> : Functor<SumPartialOf<F, G>> {
 
   fun FF(): Functor<F>
 
@@ -43,7 +43,7 @@ interface SumFunctorInstance<F, G> : Functor<SumPartialOf<F, G>> {
 }
 
 @extension
-interface SumEqInstance<F, G, A> : Eq<Sum<F, G, A>> {
+interface SumEq<F, G, A> : Eq<Sum<F, G, A>> {
   fun EQF(): Eq<Kind<F, A>>
   fun EQG(): Eq<Kind<G, A>>
 
@@ -53,7 +53,7 @@ interface SumEqInstance<F, G, A> : Eq<Sum<F, G, A>> {
 }
 
 @extension
-interface SumHashInstance<F, G, A> : Hash<Sum<F, G, A>>, SumEqInstance<F, G, A> {
+interface SumHash<F, G, A> : Hash<Sum<F, G, A>>, SumEq<F, G, A> {
   fun HF(): Hash<Kind<F, A>>
   fun HG(): Hash<Kind<G, A>>
 

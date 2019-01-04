@@ -10,13 +10,13 @@ import arrow.effects.ap as ioAp
 import arrow.effects.handleErrorWith as ioHandleErrorWith
 
 @extension
-interface IOFunctorInstance : Functor<ForIO> {
+interface IOFunctor : Functor<ForIO> {
   override fun <A, B> IOOf<A>.map(f: (A) -> B): IO<B> =
     fix().map(f)
 }
 
 @extension
-interface IOApplicativeInstance : Applicative<ForIO> {
+interface IOApplicative : Applicative<ForIO> {
   override fun <A, B> IOOf<A>.map(f: (A) -> B): IO<B> =
     fix().map(f)
 
@@ -28,7 +28,7 @@ interface IOApplicativeInstance : Applicative<ForIO> {
 }
 
 @extension
-interface IOMonadInstance : Monad<ForIO> {
+interface IOMonad : Monad<ForIO> {
   override fun <A, B> IOOf<A>.flatMap(f: (A) -> IOOf<B>): IO<B> =
     fix().flatMap(f)
 
@@ -43,7 +43,7 @@ interface IOMonadInstance : Monad<ForIO> {
 }
 
 @extension
-interface IOApplicativeErrorInstance : ApplicativeError<ForIO, Throwable>, IOApplicativeInstance {
+interface IOApplicativeError: ApplicativeError<ForIO, Throwable>, IOApplicative {
   override fun <A> IOOf<A>.attempt(): IO<Either<Throwable, A>> =
     fix().attempt()
 
@@ -55,7 +55,7 @@ interface IOApplicativeErrorInstance : ApplicativeError<ForIO, Throwable>, IOApp
 }
 
 @extension
-interface IOMonadErrorInstance : MonadError<ForIO, Throwable>, IOApplicativeErrorInstance, IOMonadInstance {
+interface IOMonadError: MonadError<ForIO, Throwable>, IOApplicativeError, IOMonad {
 
   override fun <A> just(a: A): IO<A> = IO.just(a)
 
@@ -76,10 +76,10 @@ interface IOMonadErrorInstance : MonadError<ForIO, Throwable>, IOApplicativeErro
 }
 
 @extension
-interface IOMonadThrowInstance : MonadThrow<ForIO>, IOMonadErrorInstance
+interface IOMonadThrow: MonadThrow<ForIO>, IOMonadError
 
 @extension
-interface IOBracketInstance : Bracket<ForIO, Throwable>, IOMonadThrowInstance {
+interface IOBracket: Bracket<ForIO, Throwable>, IOMonadThrow {
   override fun <A, B> IOOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> IOOf<Unit>, use: (A) -> IOOf<B>): IO<B> =
     fix().bracketCase({ a, e -> release(a, e) }, { a -> use(a) })
 
@@ -94,7 +94,7 @@ interface IOBracketInstance : Bracket<ForIO, Throwable>, IOMonadThrowInstance {
 }
 
 @extension
-interface IOMonadDeferInstance : MonadDefer<ForIO>, IOBracketInstance {
+interface IOMonadDefer: MonadDefer<ForIO>, IOBracket {
   override fun <A> defer(fa: () -> IOOf<A>): IO<A> =
     IO.defer(fa)
 
@@ -102,7 +102,7 @@ interface IOMonadDeferInstance : MonadDefer<ForIO>, IOBracketInstance {
 }
 
 @extension
-interface IOAsyncInstance : Async<ForIO>, IOMonadDeferInstance {
+interface IOAsync: Async<ForIO>, IOMonadDefer {
   override fun <A> async(fa: Proc<A>): IO<A> =
     IO.async(fa.toIOProc())
 
@@ -114,18 +114,18 @@ interface IOAsyncInstance : Async<ForIO>, IOMonadDeferInstance {
 }
 
 @extension
-interface IOEffectInstance : Effect<ForIO>, IOAsyncInstance {
+interface IOEffect: Effect<ForIO>, IOAsync {
   override fun <A> IOOf<A>.runAsync(cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Unit> =
     fix().runAsync(cb)
 }
 
 @extension
-interface IOConcurrentEffectInstance : ConcurrentEffect<ForIO>, IOEffectInstance {
+interface IOConcurrentEffect: ConcurrentEffect<ForIO>, IOEffect {
   override fun <A> IOOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Disposable> =
     fix().runAsyncCancellable(OnCancel.ThrowCancellationException, cb)
 }
 
-interface IOSemigroupInstance<A> : Semigroup<IO<A>> {
+interface IOSemigroup<A> : Semigroup<IO<A>> {
 
   fun SG(): Semigroup<A>
 
@@ -134,7 +134,7 @@ interface IOSemigroupInstance<A> : Semigroup<IO<A>> {
 }
 
 @extension
-interface IOMonoidInstance<A> : Monoid<IO<A>>, IOSemigroupInstance<A> {
+interface IOMonoid<A> : Monoid<IO<A>>, IOSemigroup<A> {
 
   override fun SG(): Semigroup<A> = SM()
 

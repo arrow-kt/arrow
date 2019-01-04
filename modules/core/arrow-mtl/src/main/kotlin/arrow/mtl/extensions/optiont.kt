@@ -7,8 +7,8 @@ import arrow.core.extensions.option.applicative.applicative
 import arrow.core.fix
 import arrow.data.OptionT
 import arrow.data.OptionTPartialOf
-import arrow.data.extensions.OptionTFunctorInstance
-import arrow.data.extensions.OptionTTraverseInstance
+import arrow.data.extensions.OptionTFunctor
+import arrow.data.extensions.OptionTTraverse
 import arrow.data.fix
 import arrow.data.mapFilter
 import arrow.extension
@@ -18,7 +18,7 @@ import arrow.mtl.typeclasses.TraverseFilter
 import arrow.typeclasses.*
 
 @extension
-interface OptionTFunctorFilterInstance<F> : FunctorFilter<OptionTPartialOf<F>>, OptionTFunctorInstance<F> {
+interface OptionTFunctorFilter<F> : FunctorFilter<OptionTPartialOf<F>>, OptionTFunctor<F> {
 
   override fun FF(): Functor<F>
 
@@ -27,9 +27,9 @@ interface OptionTFunctorFilterInstance<F> : FunctorFilter<OptionTPartialOf<F>>, 
 }
 
 @extension
-interface OptionTTraverseFilterInstance<F> :
+interface OptionTTraverseFilter<F> :
   TraverseFilter<OptionTPartialOf<F>>,
-  OptionTTraverseInstance<F> {
+  OptionTTraverse<F> {
 
   override fun FFT(): Traverse<F> = FFF()
 

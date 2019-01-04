@@ -14,7 +14,7 @@ import kotlin.coroutines.CoroutineContext
 
 @extension
 @undocumented
-interface WriterTBrackInstance<F, W> : Bracket<WriterTPartialOf<F, W>, Throwable>, WriterTMonadThrow<F, W> {
+interface WriterTBrack<F, W> : Bracket<WriterTPartialOf<F, W>, Throwable>, WriterTMonadThrow<F, W> {
 
   fun MD(): MonadDefer<F>
 
@@ -46,7 +46,7 @@ interface WriterTBrackInstance<F, W> : Bracket<WriterTPartialOf<F, W>, Throwable
 
 @extension
 @undocumented
-interface WriterTMonadDeferInstance<F, W> : MonadDefer<WriterTPartialOf<F, W>>, WriterTBrackInstance<F, W> {
+interface WriterTMonadDefer<F, W> : MonadDefer<WriterTPartialOf<F, W>>, WriterTBrack<F, W> {
 
   override fun MD(): MonadDefer<F>
 
@@ -59,7 +59,7 @@ interface WriterTMonadDeferInstance<F, W> : MonadDefer<WriterTPartialOf<F, W>>, 
 
 @extension
 @undocumented
-interface WriterTAsyncInstance<F, W> : Async<WriterTPartialOf<F, W>>, WriterTMonadDeferInstance<F, W> {
+interface WriterTAsync<F, W> : Async<WriterTPartialOf<F, W>>, WriterTMonadDefer<F, W> {
 
   fun AS(): Async<F>
 
@@ -83,7 +83,7 @@ interface WriterTAsyncInstance<F, W> : Async<WriterTPartialOf<F, W>>, WriterTMon
 
 @extension
 @undocumented
-interface WriterTEffectInstance<F, W> : Effect<WriterTPartialOf<F, W>>, WriterTAsyncInstance<F, W> {
+interface WriterTEffect<F, W> : Effect<WriterTPartialOf<F, W>>, WriterTAsync<F, W> {
 
   fun EFF(): Effect<F>
 
@@ -102,7 +102,7 @@ interface WriterTEffectInstance<F, W> : Effect<WriterTPartialOf<F, W>>, WriterTA
 
 @extension
 @undocumented
-interface WriterTConcurrentEffectInstance<F, W> : ConcurrentEffect<WriterTPartialOf<F, W>>, WriterTEffectInstance<F, W> {
+interface WriterTConcurrentEffect<F, W> : ConcurrentEffect<WriterTPartialOf<F, W>>, WriterTEffect<F, W> {
 
   fun CEFF(): ConcurrentEffect<F>
 

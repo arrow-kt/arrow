@@ -10,7 +10,7 @@ import arrow.extension
 import arrow.typeclasses.*
 
 @extension
-interface OptionTFunctorInstance<F> : Functor<OptionTPartialOf<F>> {
+interface OptionTFunctor<F> : Functor<OptionTPartialOf<F>> {
 
   fun FF(): Functor<F>
 
@@ -19,7 +19,7 @@ interface OptionTFunctorInstance<F> : Functor<OptionTPartialOf<F>> {
 }
 
 @extension
-interface OptionTApplicativeInstance<F> : Applicative<OptionTPartialOf<F>>, OptionTFunctorInstance<F> {
+interface OptionTApplicative<F> : Applicative<OptionTPartialOf<F>>, OptionTFunctor<F> {
 
   fun AF(): Applicative<F>
 
@@ -34,7 +34,7 @@ interface OptionTApplicativeInstance<F> : Applicative<OptionTPartialOf<F>>, Opti
 }
 
 @extension
-interface OptionTMonadInstance<F> : Monad<OptionTPartialOf<F>>, OptionTApplicativeInstance<F> {
+interface OptionTMonad<F> : Monad<OptionTPartialOf<F>>, OptionTApplicative<F> {
 
   fun MF(): Monad<F>
 
@@ -53,7 +53,7 @@ interface OptionTMonadInstance<F> : Monad<OptionTPartialOf<F>>, OptionTApplicati
 }
 
 @extension
-interface OptionTApplicativeErrorInstance<F, E> : ApplicativeError<OptionTPartialOf<F>, E>, OptionTApplicativeInstance<F> {
+interface OptionTApplicativeError<F, E> : ApplicativeError<OptionTPartialOf<F>, E>, OptionTApplicative<F> {
 
   fun AE(): ApplicativeError<F, E>
 
@@ -69,7 +69,7 @@ interface OptionTApplicativeErrorInstance<F, E> : ApplicativeError<OptionTPartia
 }
 
 @extension
-interface OptionTMonadError<F, E> : MonadError<OptionTPartialOf<F>, E>, OptionTMonadInstance<F>, OptionTApplicativeErrorInstance<F, E> {
+interface OptionTMonadError<F, E> : MonadError<OptionTPartialOf<F>, E>, OptionTMonad<F>, OptionTApplicativeError<F, E> {
 
   fun ME(): MonadError<F, E>
 
@@ -101,7 +101,7 @@ fun <F, G, A> OptionTOf<F, Kind<G, A>>.sequence(FF: Traverse<F>, GA: Applicative
   traverse(FF, GA, ::identity)
 
 @extension
-interface OptionTFoldableInstance<F> : Foldable<OptionTPartialOf<F>> {
+interface OptionTFoldable<F> : Foldable<OptionTPartialOf<F>> {
 
   fun FFF(): Foldable<F>
 
@@ -114,7 +114,7 @@ interface OptionTFoldableInstance<F> : Foldable<OptionTPartialOf<F>> {
 }
 
 @extension
-interface OptionTTraverseInstance<F> : Traverse<OptionTPartialOf<F>>, OptionTFoldableInstance<F> {
+interface OptionTTraverse<F> : Traverse<OptionTPartialOf<F>>, OptionTFoldable<F> {
 
   fun FFT(): Traverse<F>
 
@@ -126,7 +126,7 @@ interface OptionTTraverseInstance<F> : Traverse<OptionTPartialOf<F>>, OptionTFol
 }
 
 @extension
-interface OptionTSemigroupKInstance<F> : SemigroupK<OptionTPartialOf<F>> {
+interface OptionTSemigroupK<F> : SemigroupK<OptionTPartialOf<F>> {
 
   fun MF(): Monad<F>
 
@@ -134,7 +134,7 @@ interface OptionTSemigroupKInstance<F> : SemigroupK<OptionTPartialOf<F>> {
 }
 
 @extension
-interface OptionTMonoidKInstance<F> : MonoidK<OptionTPartialOf<F>>, OptionTSemigroupKInstance<F> {
+interface OptionTMonoidK<F> : MonoidK<OptionTPartialOf<F>>, OptionTSemigroupK<F> {
 
   override fun MF(): Monad<F>
 

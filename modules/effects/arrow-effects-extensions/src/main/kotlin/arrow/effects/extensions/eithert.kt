@@ -6,7 +6,7 @@ import arrow.effects.Ref
 import arrow.effects.typeclasses.*
 import arrow.extension
 import arrow.core.extensions.either.monad.flatten
-import arrow.data.extensions.EitherTMonadThrowInstance
+import arrow.data.extensions.EitherTMonadThrow
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Monad
 import arrow.undocumented
@@ -14,7 +14,7 @@ import kotlin.coroutines.CoroutineContext
 
 @extension
 @undocumented
-interface EitherTBracketInstance<F> : Bracket<EitherTPartialOf<F, Throwable>, Throwable>, EitherTMonadThrowInstance<F> {
+interface EitherTBracket<F> : Bracket<EitherTPartialOf<F, Throwable>, Throwable>, EitherTMonadThrow<F> {
 
   fun MDF(): MonadDefer<F>
 
@@ -65,7 +65,7 @@ interface EitherTBracketInstance<F> : Bracket<EitherTPartialOf<F, Throwable>, Th
 
 @extension
 @undocumented
-interface EitherTMonadDeferInstance<F> : MonadDefer<EitherTPartialOf<F, Throwable>>, EitherTBracketInstance<F> {
+interface EitherTMonadDefer<F> : MonadDefer<EitherTPartialOf<F, Throwable>>, EitherTBracket<F> {
 
   override fun MDF(): MonadDefer<F>
 
@@ -76,7 +76,7 @@ interface EitherTMonadDeferInstance<F> : MonadDefer<EitherTPartialOf<F, Throwabl
 
 @extension
 @undocumented
-interface EitherTAsyncInstance<F> : Async<EitherTPartialOf<F, Throwable>>, EitherTMonadDeferInstance<F> {
+interface EitherTAsync<F> : Async<EitherTPartialOf<F, Throwable>>, EitherTMonadDefer<F> {
 
   fun ASF(): Async<F>
 
@@ -98,7 +98,7 @@ interface EitherTAsyncInstance<F> : Async<EitherTPartialOf<F, Throwable>>, Eithe
 
 @extension
 @undocumented
-interface EitherTEffectInstance<F> : Effect<EitherTPartialOf<F, Throwable>>, EitherTAsyncInstance<F> {
+interface EitherTEffect<F> : Effect<EitherTPartialOf<F, Throwable>>, EitherTAsync<F> {
 
   fun EFF(): Effect<F>
 
@@ -116,7 +116,7 @@ interface EitherTEffectInstance<F> : Effect<EitherTPartialOf<F, Throwable>>, Eit
 
 @extension
 @undocumented
-interface EitherTConcurrentEffectInstance<F> : ConcurrentEffect<EitherTPartialOf<F, Throwable>>, EitherTEffectInstance<F> {
+interface EitherTConcurrentEffect<F> : ConcurrentEffect<EitherTPartialOf<F, Throwable>>, EitherTEffect<F> {
 
   fun CEFF(): ConcurrentEffect<F>
 

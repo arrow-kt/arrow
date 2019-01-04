@@ -200,7 +200,7 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class), PolyTempl
               //Const is a special case because it uses a phantom type arg and the Kotlin compiler chooses to
               //recursively call the extension if you ascribe the call types
               val typeVars =
-                if (instance.name.simpleName == "ConstFunctorInstance") emptyList()
+                if (instance.name.simpleName == "ConstFunctor") emptyList()
                 else func.typeVariables
               val companionOrFactory = extensionsCompanionOrFactory(wrappedType)
               if (receiverType != null) {
