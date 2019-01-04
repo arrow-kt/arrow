@@ -2,15 +2,11 @@ package arrow.test.laws
 
 import arrow.Kind
 import arrow.core.*
-import arrow.instances.const.applicative.applicative
-import arrow.instances.id.applicative.applicative
-import arrow.instances.monoid
 import arrow.test.generators.genConstructor
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genIntSmall
 import arrow.typeclasses.*
 import io.kotlintest.properties.forAll
-import arrow.data.extensions.*
 import arrow.core.extensions.const.applicative.applicative
 import arrow.core.extensions.id.applicative.applicative
 import arrow.core.extensions.monoid
