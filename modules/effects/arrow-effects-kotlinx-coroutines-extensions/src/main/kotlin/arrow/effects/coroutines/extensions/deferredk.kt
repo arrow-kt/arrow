@@ -72,6 +72,9 @@ interface DeferredKMonadError: MonadError<ForDeferredK, Throwable>, DeferredKMon
 }
 
 @extension
+interface DeferredKMonadThrow: MonadThrow<ForDeferredK>, DeferredKMonadError
+
+@extension
 interface DeferredKBracket: Bracket<ForDeferredK, Throwable>, DeferredKMonadError {
   override fun <A, B> DeferredKOf<A>.bracketCase(
     release: (A, ExitCase<Throwable>) -> Kind<ForDeferredK, Unit>,
