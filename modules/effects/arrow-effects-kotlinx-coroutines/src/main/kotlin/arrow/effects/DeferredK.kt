@@ -8,7 +8,6 @@ import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Fiber
-import arrow.effects.internal.unsafe
 import arrow.higherkind
 import kotlinx.coroutines.*
 import kotlinx.coroutines.selects.SelectClause0
@@ -488,14 +487,6 @@ sealed class DeferredK<A>(
     is Error -> this
   }
 
-  fun startF(ctx: CoroutineContext): DeferredK<Fiber<ForDeferredK, A>> = DeferredK {
-    val promise = Promise.unsafe<Either<Throwable, A>>()
-    val d = continueOn(ctx)
-    d.start()
-    d.invokeOnCompletion { e -> e?.let { promise.complete(Left(it)) } ?: promise.complete(Right(d.getCompleted())) }
-    Fiber(DeferredK { promise.get.value().fold({ throw it }, ::identity) }, DeferredK { d.cancel() })
-  }
-
   override fun equals(other: Any?): Boolean =
     when (other) {
       is DeferredK<*> -> this.memoized == other.memoized
@@ -695,21 +686,6 @@ sealed class DeferredK<A>(
         }
       }
 
-    fun <A, B> racePair(ctx: CoroutineContext,
-                        lh: DeferredKOf<A>,
-                        rh: DeferredKOf<B>): DeferredK<Either<Tuple2<A, Fiber<ForDeferredK, B>>, Tuple2<Fiber<ForDeferredK, A>, B>>> =
-      lh.startF(ctx).flatMap { fiberA ->
-        rh.startF(ctx).flatMap { fiberB ->
-          DeferredK.async<Either<Tuple2<A, Fiber<ForDeferredK, B>>, Tuple2<Fiber<ForDeferredK, A>, B>>> { conn, cb ->
-            fiberA.join().fix().invokeOnCompletion { error ->
-              error?.let { cb(it.left()) } ?: cb((fiberA.join().fix().getCompleted() toT fiberB).left().right())
-            }
-            fiberB.join().unsafeRunAsync { eith ->
-              cb(eith.map { (fiberA toT it).right() })
-            }
-          }
-        }
-      }
   }
 
   override val children: Sequence<Job>

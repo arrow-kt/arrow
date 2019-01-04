@@ -33,9 +33,7 @@ sealed class KindConnection<F> {
    * Guaranteed idempotency - calling it multiple times should have the same side-effect as calling it only
    * once. Implementations of this method should also be thread-safe.
    *
-   * {: data-executable='true'}
-   *
-   * ```kotlin:ank
+   * ```kotlin:ank:playground
    * import arrow.effects.*
    *
    * fun main(args: Array<String>) {
@@ -52,17 +50,59 @@ sealed class KindConnection<F> {
    */
   abstract fun cancel(): CancelToken<F>
 
+  /**
+   * Check if the [KindConnection] is canceled
+   *
+   * ```kotlin:ank:playground
+   * import arrow.effects.*
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val conn = IOConnection()
+   *
+   *   val isNotCanceled = conn.isCanceled()
+   *
+   *   conn.cancel().fix().unsafeRunSync()
+   *
+   *   val isCanceled = conn.isCanceled()
+   *   //sampleEnd
+   *   println("isNotCanceled: $isNotCanceled, isCanceled: $isCanceled")
+   * }
+   * ```
+   *
+   * @see isNotCanceled
+   */
   abstract fun isCanceled(): Boolean
 
+  /**
+   * Check if the [KindConnection] is not canceled
+   *
+   * ```kotlin:ank:playground
+   * import arrow.effects.*
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val conn = IOConnection()
+   *
+   *   val isNotCanceled = conn.isNotCanceled()
+   *
+   *   conn.cancel().fix().unsafeRunSync()
+   *
+   *   val isCanceled = conn.isNotCanceled()
+   *   //sampleEnd
+   *   println("isNotCanceled: $isNotCanceled, isCanceled: $isCanceled")
+   * }
+   * ```
+   *
+   * @see isCanceled
+   */
   fun isNotCanceled(): Boolean = !isCanceled()
 
   /**
    * Pushes a cancellation function, or token, meant to cancel and cleanup resources.
    * These functions are kept inside a stack, and executed in FIFO order on cancellation.
    *
-   * {: data-executable='true'}
-   *
-   * ```kotlin:ank
+   * ```kotlin:ank:playground
    * import arrow.effects.*
    *
    * fun main(args: Array<String>) {
@@ -83,9 +123,7 @@ sealed class KindConnection<F> {
    * race for example, because combining a whole collection of tasks, two by two, can lead to building a
    * cancelable that's stack unsafe.
    *
-   * {: data-executable='true'}
-   *
-   * ```kotlin:ank
+   * ```kotlin:ank:playground
    * import arrow.effects.*
    *
    * fun main(args: Array<String>) {
@@ -109,9 +147,7 @@ sealed class KindConnection<F> {
    * race for example, because combining a whole collection of tasks, two by two, can lead to building a
    * cancelable that's stack unsafe.
    *
-   * {: data-executable='true'}
-   *
-   * ```kotlin:ank
+   * ```kotlin:ank:playground
    * import arrow.effects.*
    *
    * fun main(args: Array<String>) {
@@ -136,9 +172,7 @@ sealed class KindConnection<F> {
    *
    * @return the cancelable reference that was removed.
    *
-   * {: data-executable='true'}
-   *
-   * ```kotlin:ank
+   * ```kotlin:ank:playground
    * import arrow.effects.*
    *
    * fun main(args: Array<String>) {
@@ -162,9 +196,7 @@ sealed class KindConnection<F> {
    * @return true on success, false if there was a race condition (i.e. the connection wasn't cancelled) or if
    * the type of the connection cannot be reactivated.
    *
-   * {: data-executable='true'}
-   *
-   * ```kotlin:ank
+   * ```kotlin:ank:playground
    * import arrow.effects.*
    *
    * fun main(args: Array<String>) {
@@ -187,9 +219,7 @@ sealed class KindConnection<F> {
     /**
      * Construct a [KindConnection] for a kind [F] based on [MonadDefer].
      *
-     * {: data-executable='true'}
-     *
-     * ```kotlin:ank
+     * ```kotlin:ank:playground
      * import arrow.effects.*
      * import arrow.effects.instances.io.monadDefer.monadDefer
      *
@@ -206,9 +236,7 @@ sealed class KindConnection<F> {
     /**
      * Construct an uncancelable [KindConnection] for a kind [F] based on [MonadDefer].
      *
-     * {: data-executable='true'}
-     *
-     * ```kotlin:ank
+     * ```kotlin:ank:playground
      * import arrow.effects.*
      * import arrow.effects.instances.io.applicative.applicative
      *

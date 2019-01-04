@@ -7,7 +7,6 @@ import arrow.effects.typeclasses.ExitCase
 import arrow.effects.deferredk.monad.flatMap
 import arrow.core.Option
 import arrow.core.Try
-import arrow.effects.deferredk.concurrentEffect.concurrentEffect
 import arrow.instances.`try`.functor.functor
 import arrow.instances.`try`.traverse.traverse
 import arrow.instances.option.functor.functor
@@ -15,15 +14,12 @@ import arrow.instances.option.traverse.traverse
 import arrow.test.UnitSpec
 import arrow.test.generators.genIntSmall
 import arrow.test.laws.AsyncLaws
-import arrow.test.laws.ConcurrentLaws
-import arrow.test.laws.shouldBe
 import arrow.test.laws.throwableEq
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Traverse
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
-import io.kotlintest.matchers.should
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll

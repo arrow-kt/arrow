@@ -116,20 +116,6 @@ interface SingleKConcurrentInstance : Concurrent<ForSingleK>, SingleKAsyncInstan
   override fun <A, B> racePair(ctx: CoroutineContext, fa: SingleKOf<A>, fb: SingleKOf<B>): SingleK<Either<Tuple2<A, Fiber<ForSingleK, B>>, Tuple2<Fiber<ForSingleK, A>, B>>> =
     SingleK.racePair(ctx, fa, fb)
 
-//  override fun <A, B> raceN(ctx: CoroutineContext, fa: Kind<ForSingleK, A>, fb: Kind<ForSingleK, B>): SingleK<Either<A, B>> {
-//    val scheduler = ctx.asScheduler()
-//    return Single.ambArray(
-//      fa.value()
-//        .observeOn(scheduler)
-//        .subscribeOn(scheduler)
-//        .map(::Left),
-//      fb.value()
-//        .observeOn(scheduler)
-//        .subscribeOn(scheduler)
-//        .map(::Right)
-//    ).k()
-//  }
-
 }
 
 @extension

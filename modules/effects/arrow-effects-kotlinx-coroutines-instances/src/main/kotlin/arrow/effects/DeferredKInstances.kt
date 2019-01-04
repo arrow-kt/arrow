@@ -1,4 +1,5 @@
 @file:Suppress("UnusedImports")
+
 package arrow.effects
 
 import arrow.Kind
@@ -102,38 +103,13 @@ interface DeferredKAsyncInstance : Async<ForDeferredK>, DeferredKMonadDeferInsta
 }
 
 @extension
-interface DeferredKConcurrentInstance : Concurrent<ForDeferredK>, DeferredKAsyncInstance {
-
-  override fun <A> Kind<ForDeferredK, A>.startF(ctx: CoroutineContext): DeferredK<Fiber<ForDeferredK, A>> =
-    deferredStartF(ctx)
-
-  override fun <A> asyncF(k: ConnectedProcF<ForDeferredK, A>): DeferredK<A> =
-    DeferredK.asyncF(fa = k)
-
-  override fun <A> async(fa: ConnectedProc<ForDeferredK, A>): DeferredK<A> =
-    DeferredK.async(fa = fa)
-
-  override fun <A> asyncF(k: ProcF<ForDeferredK, A>): DeferredK<A> =
-    DeferredK.asyncF(fa = { _, cb -> k(cb) })
-
-  override fun <A> async(fa: Proc<A>): DeferredK<A> =
-    DeferredK.async(fa = { _, cb -> fa(cb) })
-
-  override fun <A, B> racePair(ctx: CoroutineContext,
-                               lh: Kind<ForDeferredK, A>,
-                               rh: Kind<ForDeferredK, B>): Kind<ForDeferredK, Either<Tuple2<A, Fiber<ForDeferredK, B>>, Tuple2<Fiber<ForDeferredK, A>, B>>> =
-    DeferredK.racePair(ctx, lh, rh)
-
-}
-
-@extension
 interface DeferredKEffectInstance : Effect<ForDeferredK>, DeferredKAsyncInstance {
   override fun <A> DeferredKOf<A>.runAsync(cb: (Either<Throwable, A>) -> DeferredKOf<Unit>): DeferredK<Unit> =
     fix().deferredRunAsync(cb = cb)
 }
 
 @extension
-interface DeferredKConcurrentEffectInstance : ConcurrentEffect<ForDeferredK>, DeferredKEffectInstance, DeferredKConcurrentInstance {
+interface DeferredKConcurrentEffectInstance : ConcurrentEffect<ForDeferredK>, DeferredKEffectInstance {
   override fun <A> DeferredKOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> Kind<ForDeferredK, Unit>): DeferredK<Disposable> =
     fix().runAsyncCancellable(onCancel = OnCancel.ThrowCancellationException, cb = cb)
 }

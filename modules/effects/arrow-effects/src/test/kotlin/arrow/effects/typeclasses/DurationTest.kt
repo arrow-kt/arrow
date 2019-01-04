@@ -1,6 +1,5 @@
 package arrow.effects.typeclasses
 
-import arrow.effects.typeclasses.Duration
 import arrow.test.UnitSpec
 import arrow.test.generators.genIntSmall
 import arrow.test.generators.genTimeUnit

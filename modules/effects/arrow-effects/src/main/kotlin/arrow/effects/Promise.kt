@@ -20,9 +20,7 @@ interface Promise<F, A> {
    * Get the promised value.
    * Suspending the Fiber running the action until the result is available.
    *
-   * {: data-executable='true'}
-   *
-   * ```kotlin:ank
+   * ```kotlin:ank:playground
    * import arrow.effects.*
    * import arrow.effects.typeclasses.*
    * import arrow.effects.instances.io.async.async
@@ -51,9 +49,7 @@ interface Promise<F, A> {
    * Try get the promised value, it returns [None] if promise is not fulfilled yet.
    * Returns [Some] of [A] if promise is fulfilled, [None] otherwise.
    *
-   * {: data-executable='true'}
-   *
-   * ```kotlin:ank
+   * ```kotlin:ank:playground
    * import arrow.core.*
    * import arrow.effects.*
    * import arrow.effects.typeclasses.*
@@ -83,9 +79,7 @@ interface Promise<F, A> {
    * Completes, or fulfills, the promise with the specified value [A].
    * Results in an [Promise.AlreadyFulfilled] within [F] if the promise is already fulfilled.
    *
-   * {: data-executable='true'}
-   *
-   * ```kotlin:ank
+   * ```kotlin:ank:playground
    * import arrow.effects.*
    * import arrow.effects.instances.io.async.async
    * import arrow.effects.instances.io.monad.flatMap
@@ -116,9 +110,7 @@ interface Promise<F, A> {
    * Try to complete, or fulfill, the promise with the specified value [A].
    * Returns `true` if the promise successfully completed, `false` otherwise.
    *
-   * {: data-executable='true'}
-   *
-   * ```kotlin:ank
+   * ```kotlin:ank:playground
    * import arrow.effects.*
    * import arrow.effects.instances.io.async.async
    * import arrow.effects.instances.io.monad.flatMap
@@ -146,9 +138,7 @@ interface Promise<F, A> {
    * Errors the promise with the specified [Throwable].
    * Results in an [Promise.AlreadyFulfilled] within [F] if the promise is already fulfilled.
    *
-   * {: data-executable='true'}
-   *
-   * ```kotlin:ank
+   * ```kotlin:ank:playground
    * import arrow.effects.*
    * import arrow.effects.instances.io.async.async
    * import arrow.effects.instances.io.monad.flatMap
@@ -178,9 +168,7 @@ interface Promise<F, A> {
    * Tries to error the promise with the specified [Throwable].
    * Returns `true` if the promise already completed or errored, `false` otherwise.
    *
-   * {: data-executable='true'}
-   *
-   * ```kotlin:ank
+   * ```kotlin:ank:playground
    * import arrow.core.Right
    * import arrow.effects.*
    * import arrow.effects.instances.io.async.async
@@ -212,9 +200,7 @@ interface Promise<F, A> {
     /**
      * Creates an empty `Promise` from on [Async] instance for [F].
      *
-     * {: data-executable='true'}
-     *
-     * ```kotlin:ank
+     * ```kotlin:ank:playground
      * import arrow.effects.*
      * import arrow.effects.instances.io.concurrent.concurrent
      *
@@ -232,9 +218,7 @@ interface Promise<F, A> {
      * Creates an empty `Promise` from on [Concurrent] instance for [F].
      * This method is considered unsafe because it is not referentially transparent -- it allocates mutable state.
      *
-     * {: data-executable='true'}
-     *
-     * ```kotlin:ank
+     * ```kotlin:ank:playground
      * import arrow.effects.*
      * import arrow.effects.instances.io.concurrent.concurrent
      *
@@ -251,9 +235,7 @@ interface Promise<F, A> {
      * Creates an empty `Promise` from on [Async] instance for [F].
      * Does not support cancellation of [get] operation.
      *
-     * {: data-executable='true'}
-     *
-     * ```kotlin:ank
+     * ```kotlin:ank:playground
      * import arrow.effects.*
      * import arrow.effects.instances.io.async.async
      *
@@ -272,9 +254,7 @@ interface Promise<F, A> {
      * Does not support cancellation of [get] operation.
      * This method is considered unsafe because it is not referentially transparent -- it allocates mutable state.
      *
-     * {: data-executable='true'}
-     *
-     * ```kotlin:ank
+     * ```kotlin:ank:playground
      * import arrow.effects.*
      * import arrow.effects.instances.io.async.async
      *

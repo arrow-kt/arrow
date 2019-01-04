@@ -15,9 +15,7 @@ interface Semaphore<F> {
   /**
    * Get a snapshot of the currently available permits, always non negative.
    *
-   * {: data-executable='true'}
-   *
-   * ```kotlin:ank
+   * ```kotlin:ank:playground
    * import arrow.effects.*
    * import arrow.effects.instances.io.async.async
    * import arrow.effects.instances.io.monad.flatMap
@@ -39,9 +37,7 @@ interface Semaphore<F> {
    * Get a snapshot of the current count, may be negative.
    * The count is current available permits minus the outstanding acquires.
    *
-   * {: data-executable='true'}
-   *
-   * ```kotlin:ank
+   * ```kotlin:ank:playground
    * import arrow.effects.*
    * import arrow.effects.instances.io.async.async
    * import arrow.effects.instances.io.monad.flatMap
@@ -63,9 +59,7 @@ interface Semaphore<F> {
    * Acquires [n] resources
    * Suspending the [Fiber] running the action until the resources are available.
    *
-   * {: data-executable='true'}
-   *
-   * ```kotlin:ank
+   * ```kotlin:ank:playground
    * import arrow.effects.*
    * import arrow.effects.instances.io.async.async
    * import arrow.effects.instances.io.monad.flatMap
@@ -101,9 +95,7 @@ interface Semaphore<F> {
   /**
    * Try to acquires [n] resources and get an immediate response as [Boolean].
    *
-   * {: data-executable='true'}
-   *
-   * ```kotlin:ank
+   * ```kotlin:ank:playground
    * import arrow.effects.*
    * import arrow.effects.instances.io.async.async
    * import arrow.effects.instances.io.monad.flatMap
@@ -136,9 +128,7 @@ interface Semaphore<F> {
   /**
    * Release [n] resources
    *
-   * {: data-executable='true'}
-   *
-   * ```kotlin:ank
+   * ```kotlin:ank:playground
    * import arrow.effects.*
    * import arrow.effects.instances.io.async.async
    * import arrow.effects.instances.io.monad.flatMap
@@ -171,9 +161,7 @@ interface Semaphore<F> {
   /**
    * Runs the supplied effect that acquires a permit, and then releases the permit.
    *
-   * {: data-executable='true'}
-   *
-   * ```kotlin:ank
+   * ```kotlin:ank:playground
    * import arrow.effects.*
    * import arrow.effects.instances.io.async.async
    * import arrow.effects.instances.io.monad.flatMap
@@ -197,9 +185,7 @@ interface Semaphore<F> {
     /**
      * Construct a [Semaphore] initialized with [n] available permits.
      *
-     * {: data-executable='true'}
-     *
-     * ```kotlin:ank
+     * ```kotlin:ank:playground
      * import arrow.effects.*
      * import arrow.effects.instances.io.concurrent.concurrent
      *
@@ -221,9 +207,7 @@ interface Semaphore<F> {
      * Construct a [Semaphore] initialized with [n] available permits.
      * Since it's based on [Async] it's constrained with an uncancelable [acquire] operation.
      *
-     * {: data-executable='true'}
-     *
-     * ```kotlin:ank
+     * ```kotlin:ank:playground
      * import arrow.effects.*
      * import arrow.effects.instances.io.async.async
      *

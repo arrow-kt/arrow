@@ -10,12 +10,8 @@ import arrow.higherkind
 import arrow.typeclasses.Applicative
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
-import io.reactivex.SingleTransformer
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
-import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.ReplaySubject
-import java.util.concurrent.Executor
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.CoroutineContext
 

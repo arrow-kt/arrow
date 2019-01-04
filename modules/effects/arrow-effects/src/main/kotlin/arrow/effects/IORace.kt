@@ -1,7 +1,6 @@
 package arrow.effects
 
 import arrow.core.*
-import arrow.effects.internal.asyncContinuation
 import arrow.effects.internal.unsafe
 import arrow.effects.typeclasses.Fiber
 import java.util.concurrent.atomic.AtomicBoolean
@@ -97,17 +96,18 @@ fun <A, B> IO.Companion.racePair(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<
             cb(Left(r2.fold({ CompositeFailure(error, it) }, { error })))
           }
         } else {
-          promiseA.complete(error.left())
+          promiseA.complete(Left(error))
         }
       }, { a ->
         if (active.getAndSet(false)) {
           conn.pop()
-          cb(Tuple2(a, Fiber(promiseB, connB)).left().right())
+          cb(Right(Left(Tuple2(a, Fiber(promiseB, connB)))))
         } else {
-          promiseA.complete(a.right())
+          promiseA.complete(Right(a))
         }
       })
     })
+
 
     b.startCoroutine(asyncContinuation(ctx) { either ->
       either.fold({ error ->
@@ -117,17 +117,35 @@ fun <A, B> IO.Companion.racePair(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<
             cb(Left(r2.fold({ CompositeFailure(error, it) }, { error })))
           }
         } else {
-          promiseB.complete(error.left())
+          promiseB.complete(Left(error))
         }
       }, { b ->
         if (active.getAndSet(false)) {
           conn.pop()
-          cb(Tuple2(Fiber(promiseA, connA), b).right().right())
+          cb(Right(Right(Tuple2(Fiber(promiseA, connA), b))))
         } else {
-          promiseB.complete(b.right())
+          promiseB.complete(Right(b))
         }
       })
     })
+
+  }
+
+/**
+ * [arrow.core.Continuation] to run coroutine on `ctx` and link result to callback [cc].
+ * Use [asyncContinuation] to run suspended functions within a context `ctx` and pass the result to [cc].
+ */
+internal fun <A> asyncContinuation(ctx: CoroutineContext, cc: (Either<Throwable, A>) -> Unit): arrow.core.Continuation<A> =
+  object : arrow.core.Continuation<A> {
+    override val context: CoroutineContext = ctx
+
+    override fun resume(value: A) {
+      cc(value.right())
+    }
+
+    override fun resumeWithException(exception: Throwable) {
+      cc(exception.left())
+    }
 
   }
 

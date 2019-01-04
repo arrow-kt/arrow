@@ -4,7 +4,7 @@ import kotlin.coroutines.Continuation
 import kotlin.coroutines.ContinuationInterceptor
 import kotlin.coroutines.CoroutineContext
 
-object ImmediateContext : ContinuationInterceptor {
+internal object ImmediateContext : ContinuationInterceptor {
 
   override val key: CoroutineContext.Key<*> = ContinuationInterceptor
 

@@ -4,6 +4,7 @@ import arrow.core.*
 import arrow.effects.instances.io.applicativeError.attempt
 import arrow.effects.instances.io.async.async
 import arrow.effects.instances.io.concurrent.concurrent
+import arrow.effects.instances.io.concurrent.parMapN
 import arrow.effects.instances.io.monad.binding
 import arrow.effects.instances.io.monad.flatMap
 import arrow.effects.instances.io.monad.monad
@@ -263,7 +264,7 @@ class IOTest : UnitSpec() {
         }
 
       val result =
-        IO.parallelMapN(newSingleThreadContext("all"),
+        parMapN(newSingleThreadContext("all"),
           makePar(6), makePar(3), makePar(2), makePar(4), makePar(1), makePar(5))
         { six, tree, two, four, one, five -> listOf(six, tree, two, four, one, five) }
           .unsafeRunSync()
@@ -289,7 +290,7 @@ class IOTest : UnitSpec() {
         }.order()
 
       val result =
-        IO.parallelMapN(newSingleThreadContext("all"),
+        parMapN(newSingleThreadContext("all"),
           makePar(6), IO.just(1L).order(), makePar(4), IO.defer { IO.just(2L) }.order(), makePar(5), IO { 3L }.order())
         { six, tree, two, four, one, five -> listOf(six, tree, two, four, one, five) }
           .unsafeRunSync()
@@ -307,7 +308,7 @@ class IOTest : UnitSpec() {
         }
 
       val result =
-        IO.parallelMapN(newSingleThreadContext("all"),
+        parMapN(newSingleThreadContext("all"),
           makePar(6), IO.just(1L), makePar(4), IO.defer { IO.just(2L) }, makePar(5), IO { 3L })
         { _, _, _, _, _, _ ->
           Thread.currentThread().name
@@ -318,7 +319,7 @@ class IOTest : UnitSpec() {
 
     "parallel IO#defer, IO#suspend and IO#async are run in the expected CoroutineContext" {
       val result =
-        IO.parallelMapN(newSingleThreadContext("here"),
+        parMapN(newSingleThreadContext("here"),
           IO { Thread.currentThread().name },
           IO.defer { IO.just(Thread.currentThread().name) },
           IO.async<String> { TODO, cb -> cb(Thread.currentThread().name.right()) },
@@ -437,30 +438,6 @@ class IOTest : UnitSpec() {
         }.unsafeRunAsyncCancellable { }
         latch.get
       }.unsafeRunSync()
-    }
-
-    "Cancelable should run CancelToken" {
-      Promise.uncancelable<ForIO, Unit>(IO.async()).flatMap { p ->
-        IO.async().cancelable<Unit> { _ ->
-          p.complete(Unit)
-        }.fix()
-          .unsafeRunAsyncCancellable { }
-          .invoke()
-
-        p.get
-      }.unsafeRunSync() shouldBe Unit
-    }
-
-    "CancelableF should run CancelToken" {
-      Promise.uncancelable<ForIO, Unit>(IO.async()).flatMap { p ->
-        IO.async().cancelableF<Unit> { _ ->
-          IO { p.complete(Unit) }
-        }.fix()
-          .unsafeRunAsyncCancellable { }
-          .invoke()
-
-        p.get
-      }.unsafeRunSync() shouldBe Unit
     }
 
   }

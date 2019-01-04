@@ -10,7 +10,6 @@ import arrow.higherkind
 import arrow.typeclasses.Applicative
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
-import io.reactivex.subjects.BehaviorSubject
 import kotlin.coroutines.CoroutineContext
 
 fun <A> Observable<A>.k(): ObservableK<A> = ObservableK(this)
@@ -20,6 +19,7 @@ fun <A> ObservableKOf<A>.value(): Observable<A> =
 
 @higherkind
 data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, ObservableKKindedJ<A> {
+
   fun <B> map(f: (A) -> B): ObservableK<B> =
     observable.map(f).k()
 
@@ -115,13 +115,6 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
 
   fun continueOn(ctx: CoroutineContext): ObservableK<A> =
     observable.observeOn(ctx.asScheduler()).k()
-
-  fun startF(ctx: CoroutineContext): ObservableK<Fiber<ForObservableK, A>> = ObservableK {
-    val join = BehaviorSubject.create<A>()
-    val disposable = observable.subscribeOn(ctx.asScheduler()).subscribe(join::onNext, join::onError, join::onComplete)
-    val cancel = ObservableK { disposable.dispose() }
-    Fiber(join.hide().k(), cancel)
-  }
 
   fun runAsync(cb: (Either<Throwable, A>) -> ObservableKOf<Unit>): ObservableK<Unit> =
     observable.flatMap { cb(Right(it)).value() }.onErrorResumeNext { t: Throwable -> cb(Left(t)).value() }.k()

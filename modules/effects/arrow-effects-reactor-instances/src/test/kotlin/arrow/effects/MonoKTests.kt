@@ -58,10 +58,7 @@ class MonoKTest : UnitSpec() {
   }
 
   init {
-    testLaws(
-      AsyncLaws.laws(MonoK.async(), EQ(), EQ(), testStackSafety = false)
-//      ConcurrentLaws.laws(MonoK.concurrent(), EQ(), EQ(), EQ(), testStackSafety = false)
-    )
+    testLaws(AsyncLaws.laws(MonoK.async(), EQ(), EQ(), testStackSafety = false))
 
     "Multi-thread Monos finish correctly" {
       val value: Mono<Long> = bindingCatch {

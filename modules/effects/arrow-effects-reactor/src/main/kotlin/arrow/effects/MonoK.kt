@@ -3,16 +3,13 @@ package arrow.effects
 import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
-import arrow.core.Tuple2
 import arrow.effects.CoroutineContextReactorScheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
-import arrow.effects.typeclasses.Fiber
 import reactor.core.publisher.MonoSink
 import arrow.higherkind
 import reactor.core.publisher.Mono
 import reactor.core.publisher.*
-import reactor.core.scheduler.Schedulers
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.CoroutineContext
 
@@ -23,6 +20,7 @@ fun <A> MonoKOf<A>.value(): Mono<A> =
 
 @higherkind
 data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
+
   fun <B> map(f: (A) -> B): MonoK<B> =
     mono.map(f).k()
 
@@ -100,19 +98,6 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
   fun continueOn(ctx: CoroutineContext): MonoK<A> =
     mono.publishOn(ctx.asScheduler()).k()
 
-  fun startF(ctx: CoroutineContext): MonoK<Fiber<ForMonoK, A>> = MonoK {
-    val promise = MonoProcessor.create<A>()
-    val disp = mono
-      .publishOn(ctx.asScheduler())
-      .subscribeOn(ctx.asScheduler())
-      .subscribe({ a ->
-        promise.onNext(a)
-        promise.onComplete()
-      }, promise::onError)
-
-    Fiber(MonoK(promise), MonoK { disp.dispose(); promise.dispose() })
-  }
-
   fun runAsync(cb: (Either<Throwable, A>) -> MonoKOf<Unit>): MonoK<Unit> =
     mono.flatMap { cb(Right(it)).value() }.onErrorResume { cb(Left(it)).value() }.k()
 
@@ -144,43 +129,6 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
 
     fun <A> defer(fa: () -> MonoKOf<A>): MonoK<A> =
       Mono.defer { fa().value() }.k()
-
-    fun <A, B> racePair(ctx: CoroutineContext, fa: MonoKOf<A>, fb: MonoKOf<B>): MonoK<Either<Tuple2<A, Fiber<ForMonoK, B>>, Tuple2<Fiber<ForMonoK, A>, B>>> {
-      val promiseA = MonoProcessor.create<A>()
-      val dispA = fa.value().publishOn(ctx.asScheduler()).subscribeOn(ctx.asScheduler())
-        .subscribe({ a ->
-          promiseA.onNext(a)
-          promiseA.onComplete()
-        }, promiseA::onError)
-
-      val joinA = MonoK(promiseA)
-      val cancelA = MonoK { dispA.dispose() }.flatMap { MonoK { promiseA.dispose() } }
-      val fiberA = Fiber(joinA, cancelA)
-
-      val promiseB = MonoProcessor.create<B>()
-      val dispB = fb.value().publishOn(ctx.asScheduler()).subscribeOn(ctx.asScheduler())
-        .subscribe({ b ->
-          promiseB.onNext(b)
-          promiseB.onComplete()
-        }, promiseB::onError)
-
-      val joinB = MonoK(promiseB)
-      val cancelB = MonoK { dispB.dispose() }.flatMap { MonoK { promiseB.dispose() } }
-      val fiberB = Fiber(joinB, cancelB)
-
-      return MonoK(Mono.first(
-        promiseA.map { a -> Left(Tuple2(a, fiberB)) },
-        promiseB.map { b -> Right(Tuple2(fiberA, b)) }
-      )
-        .doOnCancel {
-          cancelA.flatMap { cancelB }
-            .mono.subscribeOn(Schedulers.immediate()).publishOn(Schedulers.immediate()).subscribe()
-        }
-        .doOnError {
-          cancelA.flatMap { cancelB }
-            .mono.subscribeOn(Schedulers.immediate()).publishOn(Schedulers.immediate()).subscribe()
-        })
-    }
 
     /**
      * Creates a [MonoK] that'll run [MonoKProc].

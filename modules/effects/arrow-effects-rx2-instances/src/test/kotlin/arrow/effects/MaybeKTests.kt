@@ -67,7 +67,6 @@ class MaybeKTests : UnitSpec() {
       MonadDeferLaws.laws(MaybeK.monadDefer(), EQ(), EQ(), EQ(), testStackSafety = false),
       AsyncLaws.laws(MaybeK.async(), EQ(), EQ(), testStackSafety = false),
       AsyncLaws.laws(MaybeK.effect(), EQ(), EQ(), testStackSafety = false)
-//      ,ConcurrentLaws.laws(MaybeK.concurrent(), EQ(), EQ(), EQ(), testStackSafety = false)
     )
 
     "Multi-thread Maybes finish correctly" {
