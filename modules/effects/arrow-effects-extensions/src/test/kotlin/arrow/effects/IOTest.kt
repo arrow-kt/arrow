@@ -1,6 +1,7 @@
 package arrow.effects
 
 import arrow.core.*
+import arrow.core.extensions.option.eq.eq
 import arrow.effects.extensions.io.applicativeError.attempt
 import arrow.effects.extensions.io.async.async
 import arrow.effects.extensions.io.monad.binding
@@ -9,15 +10,14 @@ import arrow.effects.extensions.io.monad.monad
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.milliseconds
 import arrow.effects.typeclasses.seconds
-import arrow.core.extensions.option.eq.eq
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.laws.AsyncLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.fail
-import kotlinx.coroutines.newSingleThreadContext
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
+import kotlinx.coroutines.newSingleThreadContext
 import org.junit.runner.RunWith
 
 @RunWith(KotlinTestRunner::class)
@@ -56,14 +56,6 @@ class IOTest : UnitSpec() {
 
     "should yield immediate successful invoke value" {
       val run = IO { 1 }.unsafeRunSync()
-
-      val expected = 1
-
-      run shouldBe expected
-    }
-
-    "should yield immediate successful pure value" {
-      val run = IO.just(1).unsafeRunSync()
 
       val expected = 1
 
