@@ -11,19 +11,19 @@ import arrow.data.combineK as listCombineK
 import kotlin.collections.plus as listPlus
 
 @extension
-interface ListKSemigroupInstance<A> : Semigroup<ListK<A>> {
+interface ListKSemigroup<A> : Semigroup<ListK<A>> {
   override fun ListK<A>.combine(b: ListK<A>): ListK<A> =
     (this.listPlus(b)).k()
 }
 
 @extension
-interface ListKMonoidInstance<A> : Monoid<ListK<A>>, ListKSemigroupInstance<A> {
+interface ListKMonoid<A> : Monoid<ListK<A>>, ListKSemigroup<A> {
   override fun empty(): ListK<A> =
     emptyList<A>().k()
 }
 
 @extension
-interface ListKEqInstance<A> : Eq<ListKOf<A>> {
+interface ListKEq<A> : Eq<ListKOf<A>> {
 
   fun EQ(): Eq<A>
 
@@ -34,19 +34,19 @@ interface ListKEqInstance<A> : Eq<ListKOf<A>> {
 }
 
 @extension
-interface ListKShowInstance<A> : Show<ListKOf<A>> {
+interface ListKShow<A> : Show<ListKOf<A>> {
   override fun ListKOf<A>.show(): String =
     toString()
 }
 
 @extension
-interface ListKFunctorInstance : Functor<ForListK> {
+interface ListKFunctor : Functor<ForListK> {
   override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B> =
     fix().map(f)
 }
 
 @extension
-interface ListKApplicativeInstance : Applicative<ForListK> {
+interface ListKApplicative : Applicative<ForListK> {
   override fun <A, B> Kind<ForListK, A>.ap(ff: Kind<ForListK, (A) -> B>): ListK<B> =
     fix().ap(ff)
 
@@ -61,7 +61,7 @@ interface ListKApplicativeInstance : Applicative<ForListK> {
 }
 
 @extension
-interface ListKMonadInstance : Monad<ForListK> {
+interface ListKMonad : Monad<ForListK> {
   override fun <A, B> Kind<ForListK, A>.ap(ff: Kind<ForListK, (A) -> B>): ListK<B> =
     fix().ap(ff)
 
@@ -82,7 +82,7 @@ interface ListKMonadInstance : Monad<ForListK> {
 }
 
 @extension
-interface ListKFoldableInstance : Foldable<ForListK> {
+interface ListKFoldable : Foldable<ForListK> {
   override fun <A, B> Kind<ForListK, A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
 
@@ -94,7 +94,7 @@ interface ListKFoldableInstance : Foldable<ForListK> {
 }
 
 @extension
-interface ListKTraverseInstance : Traverse<ForListK> {
+interface ListKTraverse : Traverse<ForListK> {
   override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B> =
     fix().map(f)
 
@@ -112,13 +112,13 @@ interface ListKTraverseInstance : Traverse<ForListK> {
 }
 
 @extension
-interface ListKSemigroupKInstance : SemigroupK<ForListK> {
+interface ListKSemigroupK : SemigroupK<ForListK> {
   override fun <A> Kind<ForListK, A>.combineK(y: Kind<ForListK, A>): ListK<A> =
     fix().listCombineK(y)
 }
 
 @extension
-interface ListKMonoidKInstance : MonoidK<ForListK> {
+interface ListKMonoidK : MonoidK<ForListK> {
   override fun <A> empty(): ListK<A> =
     ListK.empty()
 
@@ -127,7 +127,7 @@ interface ListKMonoidKInstance : MonoidK<ForListK> {
 }
 
 @extension
-interface ListKHashInstance<A> : Hash<ListKOf<A>>, ListKEqInstance<A> {
+interface ListKHash<A> : Hash<ListKOf<A>>, ListKEq<A> {
 
   fun HA(): Hash<A>
 

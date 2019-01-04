@@ -12,7 +12,7 @@ import arrow.mtl.typeclasses.MonadFilter
 import arrow.data.combineK as listCombineK
 
 @extension
-interface ListKMonadCombineInstance : MonadCombine<ForListK> {
+interface ListKMonadCombine : MonadCombine<ForListK> {
   override fun <A> empty(): ListK<A> =
     ListK.empty()
 
@@ -42,7 +42,7 @@ interface ListKMonadCombineInstance : MonadCombine<ForListK> {
 }
 
 @extension
-interface ListKFunctorFilterInstance : FunctorFilter<ForListK> {
+interface ListKFunctorFilter : FunctorFilter<ForListK> {
   override fun <A, B> Kind<ForListK, A>.mapFilter(f: (A) -> Option<B>): ListK<B> =
     fix().mapFilter(f)
 
@@ -51,7 +51,7 @@ interface ListKFunctorFilterInstance : FunctorFilter<ForListK> {
 }
 
 @extension
-interface ListKMonadFilterInstance : MonadFilter<ForListK> {
+interface ListKMonadFilter : MonadFilter<ForListK> {
   override fun <A> empty(): ListK<A> =
     ListK.empty()
 

@@ -1,8 +1,8 @@
 package arrow.dagger.effects.extensions
 
 import arrow.effects.*
-import arrow.effects.extensions.IOMonoidInstance
-import arrow.effects.extensions.IOSemigroupInstance
+import arrow.effects.extensions.IOMonoid
+import arrow.effects.extensions.IOSemigroup
 import arrow.effects.extensions.io.applicative.applicative
 import arrow.effects.extensions.io.applicativeError.applicativeError
 import arrow.effects.extensions.io.async.async
@@ -53,10 +53,10 @@ class IOInstances {
 
 }
 
-class DaggerIOSemigroupInstance<A> @Inject constructor(val monoidA: Monoid<A>) : IOSemigroupInstance<A> {
+class DaggerIOSemigroup<A> @Inject constructor(val monoidA: Monoid<A>) : IOSemigroup<A> {
   override fun SG(): Semigroup<A> = monoidA
 }
 
-class DaggerIOMonoidInstance<A> @Inject constructor(val monoidA: Monoid<A>) : IOMonoidInstance<A> {
+class DaggerIOMonoid<A> @Inject constructor(val monoidA: Monoid<A>) : IOMonoid<A> {
   override fun SM(): Monoid<A> = monoidA
 }

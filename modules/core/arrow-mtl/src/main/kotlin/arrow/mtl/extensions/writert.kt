@@ -5,7 +5,7 @@ import arrow.core.Tuple2
 import arrow.data.WriterT
 import arrow.data.WriterTOf
 import arrow.data.WriterTPartialOf
-import arrow.data.extensions.WriterTMonadInstance
+import arrow.data.extensions.WriterTMonad
 import arrow.data.fix
 import arrow.extension
 import arrow.mtl.typeclasses.MonadFilter
@@ -14,7 +14,7 @@ import arrow.typeclasses.Monad
 import arrow.typeclasses.Monoid
 
 @extension
-interface WriterTMonadFilterInstance<F, W> : MonadFilter<WriterTPartialOf<F, W>>, WriterTMonadInstance<F, W> {
+interface WriterTMonadFilter<F, W> : MonadFilter<WriterTPartialOf<F, W>>, WriterTMonad<F, W> {
   override fun FF(): MonadFilter<F>
 
   override fun MF(): Monad<F> = FF()
@@ -25,7 +25,7 @@ interface WriterTMonadFilterInstance<F, W> : MonadFilter<WriterTPartialOf<F, W>>
 }
 
 @extension
-interface WriterTMonadWriterInstance<F, W> : MonadWriter<WriterTPartialOf<F, W>, W>, WriterTMonadInstance<F, W> {
+interface WriterTMonadWriter<F, W> : MonadWriter<WriterTPartialOf<F, W>, W>, WriterTMonad<F, W> {
 
   override fun MF(): Monad<F>
 

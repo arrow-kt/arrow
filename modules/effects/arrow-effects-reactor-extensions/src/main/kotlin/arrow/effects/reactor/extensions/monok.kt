@@ -11,13 +11,13 @@ import arrow.typeclasses.*
 import kotlin.coroutines.CoroutineContext
 
 @extension
-interface MonoKFunctorInstance : Functor<ForMonoK> {
+interface MonoKFunctor : Functor<ForMonoK> {
   override fun <A, B> MonoKOf<A>.map(f: (A) -> B): MonoK<B> =
     fix().map(f)
 }
 
 @extension
-interface MonoKApplicativeInstance : Applicative<ForMonoK>, MonoKFunctorInstance {
+interface MonoKApplicative: Applicative<ForMonoK>, MonoKFunctor {
   override fun <A, B> MonoKOf<A>.map(f: (A) -> B): MonoK<B> =
     fix().map(f)
 
@@ -29,7 +29,7 @@ interface MonoKApplicativeInstance : Applicative<ForMonoK>, MonoKFunctorInstance
 }
 
 @extension
-interface MonoKMonadInstance : Monad<ForMonoK>, MonoKApplicativeInstance {
+interface MonoKMonad: Monad<ForMonoK>, MonoKApplicative {
   override fun <A, B> MonoKOf<A>.map(f: (A) -> B): MonoK<B> =
     fix().map(f)
 
@@ -44,7 +44,7 @@ interface MonoKMonadInstance : Monad<ForMonoK>, MonoKApplicativeInstance {
 }
 
 @extension
-interface MonoKApplicativeErrorInstance : ApplicativeError<ForMonoK, Throwable>, MonoKApplicativeInstance {
+interface MonoKApplicativeError: ApplicativeError<ForMonoK, Throwable>, MonoKApplicative {
   override fun <A> raiseError(e: Throwable): MonoK<A> =
     MonoK.raiseError(e)
 
@@ -53,7 +53,7 @@ interface MonoKApplicativeErrorInstance : ApplicativeError<ForMonoK, Throwable>,
 }
 
 @extension
-interface MonoKMonadErrorInstance : MonadError<ForMonoK, Throwable>, MonoKMonadInstance, MonoKApplicativeErrorInstance {
+interface MonoKMonadError: MonadError<ForMonoK, Throwable>, MonoKMonad, MonoKApplicativeError {
   override fun <A, B> MonoKOf<A>.map(f: (A) -> B): MonoK<B> =
     fix().map(f)
 
@@ -65,22 +65,22 @@ interface MonoKMonadErrorInstance : MonadError<ForMonoK, Throwable>, MonoKMonadI
 }
 
 @extension
-interface MonoKMonadThrowInstance : MonadThrow<ForMonoK>, MonoKMonadErrorInstance
+interface MonoKMonadThrow: MonadThrow<ForMonoK>, MonoKMonadError
 
 @extension
-interface MonoKBracketInstance : Bracket<ForMonoK, Throwable>, MonoKMonadThrowInstance {
+interface MonoKBracket: Bracket<ForMonoK, Throwable>, MonoKMonadThrow {
   override fun <A, B> MonoKOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> MonoKOf<Unit>, use: (A) -> MonoKOf<B>): MonoK<B> =
     fix().bracketCase({ use(it) }, { a, e -> release(a, e) })
 }
 
 @extension
-interface MonoKMonadDeferInstance : MonadDefer<ForMonoK>, MonoKBracketInstance {
+interface MonoKMonadDefer: MonadDefer<ForMonoK>, MonoKBracket {
   override fun <A> defer(fa: () -> MonoKOf<A>): MonoK<A> =
     MonoK.defer(fa)
 }
 
 @extension
-interface MonoKAsyncInstance : Async<ForMonoK>, MonoKMonadDeferInstance {
+interface MonoKAsync: Async<ForMonoK>, MonoKMonadDefer {
   override fun <A> async(fa: Proc<A>): MonoK<A> =
     MonoK.async { _, cb -> fa(cb) }
 
@@ -92,13 +92,13 @@ interface MonoKAsyncInstance : Async<ForMonoK>, MonoKMonadDeferInstance {
 }
 
 @extension
-interface MonoKEffectInstance : Effect<ForMonoK>, MonoKAsyncInstance {
+interface MonoKEffect: Effect<ForMonoK>, MonoKAsync {
   override fun <A> MonoKOf<A>.runAsync(cb: (Either<Throwable, A>) -> MonoKOf<Unit>): MonoK<Unit> =
     fix().runAsync(cb)
 }
 
 @extension
-interface MonoKConcurrentEffectInstance : ConcurrentEffect<ForMonoK>, MonoKEffectInstance {
+interface MonoKConcurrentEffect: ConcurrentEffect<ForMonoK>, MonoKEffect {
   override fun <A> MonoKOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> MonoKOf<Unit>): MonoK<Disposable> =
     fix().runAsyncCancellable(cb)
 }

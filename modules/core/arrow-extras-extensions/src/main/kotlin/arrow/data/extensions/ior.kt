@@ -11,18 +11,18 @@ import arrow.undocumented
 
 @extension
 @undocumented
-interface IorFunctorInstance<L> : Functor<IorPartialOf<L>> {
+interface IorFunctor<L> : Functor<IorPartialOf<L>> {
   override fun <A, B> Kind<IorPartialOf<L>, A>.map(f: (A) -> B): Ior<L, B> = fix().map(f)
 }
 
 @extension
-interface IorBifunctorInstance : Bifunctor<ForIor> {
+interface IorBifunctor : Bifunctor<ForIor> {
   override fun <A, B, C, D> Kind2<ForIor, A, B>.bimap(fl: (A) -> C, fr: (B) -> D): Kind2<ForIor, C, D> =
     fix().bimap(fl, fr)
 }
 
 @extension
-interface IorApplicativeInstance<L> : Applicative<IorPartialOf<L>>, IorFunctorInstance<L> {
+interface IorApplicative<L> : Applicative<IorPartialOf<L>>, IorFunctor<L> {
 
   fun SL(): Semigroup<L>
 
@@ -35,7 +35,7 @@ interface IorApplicativeInstance<L> : Applicative<IorPartialOf<L>>, IorFunctorIn
 }
 
 @extension
-interface IorMonadInstance<L> : Monad<IorPartialOf<L>>, IorApplicativeInstance<L> {
+interface IorMonad<L> : Monad<IorPartialOf<L>>, IorApplicative<L> {
 
   override fun SL(): Semigroup<L>
 
@@ -53,7 +53,7 @@ interface IorMonadInstance<L> : Monad<IorPartialOf<L>>, IorApplicativeInstance<L
 }
 
 @extension
-interface IorFoldableInstance<L> : Foldable<IorPartialOf<L>> {
+interface IorFoldable<L> : Foldable<IorPartialOf<L>> {
 
   override fun <B, C> Kind<IorPartialOf<L>, B>.foldLeft(b: C, f: (C, B) -> C): C = fix().foldLeft(b, f)
 
@@ -63,7 +63,7 @@ interface IorFoldableInstance<L> : Foldable<IorPartialOf<L>> {
 }
 
 @extension
-interface IorTraverseInstance<L> : Traverse<IorPartialOf<L>>, IorFoldableInstance<L> {
+interface IorTraverse<L> : Traverse<IorPartialOf<L>>, IorFoldable<L> {
 
   override fun <G, B, C> IorOf<L, B>.traverse(AP: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, Ior<L, C>> =
     fix().traverse(AP, f)
@@ -71,7 +71,7 @@ interface IorTraverseInstance<L> : Traverse<IorPartialOf<L>>, IorFoldableInstanc
 }
 
 @extension
-interface IorEqInstance<L, R> : Eq<Ior<L, R>> {
+interface IorEq<L, R> : Eq<Ior<L, R>> {
 
   fun EQL(): Eq<L>
 
@@ -98,13 +98,13 @@ interface IorEqInstance<L, R> : Eq<Ior<L, R>> {
 }
 
 @extension
-interface IorShowInstance<L, R> : Show<Ior<L, R>> {
+interface IorShow<L, R> : Show<Ior<L, R>> {
   override fun Ior<L, R>.show(): String =
     toString()
 }
 
 @extension
-interface IorHashInstance<L, R> : Hash<Ior<L, R>>, IorEqInstance<L, R> {
+interface IorHash<L, R> : Hash<Ior<L, R>>, IorEq<L, R> {
 
   fun HL(): Hash<L>
   fun HR(): Hash<R>

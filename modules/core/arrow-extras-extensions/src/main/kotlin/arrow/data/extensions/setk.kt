@@ -10,18 +10,18 @@ import arrow.data.combineK as setCombineK
 import kotlin.collections.plus as setPlus
 
 @extension
-interface SetKSemigroupInstance<A> : Semigroup<SetK<A>> {
+interface SetKSemigroup<A> : Semigroup<SetK<A>> {
   override fun SetK<A>.combine(b: SetK<A>): SetK<A> =
     (this.setPlus(b)).k()
 }
 
 @extension
-interface SetKMonoidInstance<A> : Monoid<SetK<A>>, SetKSemigroupInstance<A> {
+interface SetKMonoid<A> : Monoid<SetK<A>>, SetKSemigroup<A> {
   override fun empty(): SetK<A> = emptySet<A>().k()
 }
 
 @extension
-interface SetKEqInstance<A> : Eq<SetK<A>> {
+interface SetKEq<A> : Eq<SetK<A>> {
 
   fun EQ(): Eq<A>
 
@@ -36,13 +36,13 @@ interface SetKEqInstance<A> : Eq<SetK<A>> {
 }
 
 @extension
-interface SetKShowInstance<A> : Show<SetK<A>> {
+interface SetKShow<A> : Show<SetK<A>> {
   override fun SetK<A>.show(): String =
     toString()
 }
 
 @extension
-interface SetKFoldableInstance : Foldable<ForSetK> {
+interface SetKFoldable : Foldable<ForSetK> {
   override fun <A, B> Kind<ForSetK, A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
 
@@ -54,13 +54,13 @@ interface SetKFoldableInstance : Foldable<ForSetK> {
 }
 
 @extension
-interface SetKSemigroupKInstance : SemigroupK<ForSetK> {
+interface SetKSemigroupK : SemigroupK<ForSetK> {
   override fun <A> Kind<ForSetK, A>.combineK(y: Kind<ForSetK, A>): SetK<A> =
     fix().setCombineK(y)
 }
 
 @extension
-interface SetKMonoidKInstance : MonoidK<ForSetK> {
+interface SetKMonoidK : MonoidK<ForSetK> {
   override fun <A> empty(): SetK<A> =
     SetK.empty()
 
@@ -69,7 +69,7 @@ interface SetKMonoidKInstance : MonoidK<ForSetK> {
 }
 
 @extension
-interface SetKHashInstance<A> : Hash<SetK<A>>, SetKEqInstance<A> {
+interface SetKHash<A> : Hash<SetK<A>>, SetKEq<A> {
   fun HA(): Hash<A>
 
   override fun EQ(): Eq<A> = HA()

@@ -5,16 +5,16 @@ import arrow.typeclasses.Hash
 import arrow.typeclasses.Order
 import arrow.typeclasses.Show
 
-interface CharShowInstance : Show<Char> {
+interface CharShow : Show<Char> {
   override fun Char.show(): String =
     this.toString()
 }
 
-interface CharEqInstance : Eq<Char> {
+interface CharEq : Eq<Char> {
   override fun Char.eqv(b: Char): Boolean = this == b
 }
 
-interface CharOrderInstance : Order<Char> {
+interface CharOrder : Order<Char> {
   override fun Char.eqv(b: Char): Boolean = this == b
 
   override fun Char.compare(b: Char): Int =
@@ -31,18 +31,18 @@ interface CharOrderInstance : Order<Char> {
   override fun Char.neqv(b: Char): Boolean = this != b
 }
 
-interface CharHashInstance : Hash<Char>, CharEqInstance {
+interface CharHash: Hash<Char>, CharEq {
   override fun Char.hash(): Int = this.hashCode()
 }
 
 fun Char.Companion.show(): Show<Char> =
-  object : CharShowInstance {}
+  object : CharShow{}
 
 fun Char.Companion.eq(): Eq<Char> =
-  object : CharEqInstance {}
+  object : CharEq{}
 
 fun Char.Companion.order(): Order<Char> =
-  object : CharOrderInstance {}
+  object : CharOrder{}
 
 fun Char.Companion.hash(): Hash<Char> =
-  object : CharHashInstance {}
+  object : CharHash{}

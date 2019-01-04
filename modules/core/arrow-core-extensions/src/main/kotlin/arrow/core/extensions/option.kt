@@ -8,7 +8,7 @@ import arrow.typeclasses.*
 import arrow.core.extensions.traverse as optionTraverse
 
 @extension
-interface OptionSemigroupInstance<A> : Semigroup<Option<A>> {
+interface OptionSemigroup<A> : Semigroup<Option<A>> {
 
   fun SG(): Semigroup<A>
 
@@ -23,13 +23,13 @@ interface OptionSemigroupInstance<A> : Semigroup<Option<A>> {
 }
 
 @extension
-interface OptionMonoidInstance<A> : Monoid<Option<A>>, OptionSemigroupInstance<A> {
+interface OptionMonoid<A> : Monoid<Option<A>>, OptionSemigroup<A> {
   override fun SG(): Semigroup<A>
   override fun empty(): Option<A> = None
 }
 
 @extension
-interface OptionApplicativeErrorInstance : ApplicativeError<ForOption, Unit>, OptionApplicativeInstance {
+interface OptionApplicativeError: ApplicativeError<ForOption, Unit>, OptionApplicative {
   override fun <A> raiseError(e: Unit): Option<A> =
     None
 
@@ -38,7 +38,7 @@ interface OptionApplicativeErrorInstance : ApplicativeError<ForOption, Unit>, Op
 }
 
 @extension
-interface OptionMonadErrorInstance : MonadError<ForOption, Unit>, OptionMonadInstance {
+interface OptionMonadError: MonadError<ForOption, Unit>, OptionMonad {
   override fun <A> raiseError(e: Unit): OptionOf<A> =
     None
 
@@ -47,7 +47,7 @@ interface OptionMonadErrorInstance : MonadError<ForOption, Unit>, OptionMonadIns
 }
 
 @extension
-interface OptionEqInstance<A> : Eq<Option<A>> {
+interface OptionEq<A> : Eq<Option<A>> {
 
   fun EQ(): Eq<A>
 
@@ -65,19 +65,19 @@ interface OptionEqInstance<A> : Eq<Option<A>> {
 }
 
 @extension
-interface OptionShowInstance<A> : Show<Option<A>> {
+interface OptionShow<A> : Show<Option<A>> {
   override fun Option<A>.show(): String =
     toString()
 }
 
 @extension
-interface OptionFunctorInstance : Functor<ForOption> {
+interface OptionFunctor : Functor<ForOption> {
   override fun <A, B> OptionOf<A>.map(f: (A) -> B): Option<B> =
     fix().map(f)
 }
 
 @extension
-interface OptionApplicativeInstance : Applicative<ForOption> {
+interface OptionApplicative : Applicative<ForOption> {
   override fun <A, B> OptionOf<A>.ap(ff: OptionOf<(A) -> B>): Option<B> =
     fix().ap(ff)
 
@@ -89,7 +89,7 @@ interface OptionApplicativeInstance : Applicative<ForOption> {
 }
 
 @extension
-interface OptionMonadInstance : Monad<ForOption> {
+interface OptionMonad : Monad<ForOption> {
   override fun <A, B> OptionOf<A>.ap(ff: OptionOf<(A) -> B>): Option<B> =
     fix().ap(ff)
 
@@ -107,7 +107,7 @@ interface OptionMonadInstance : Monad<ForOption> {
 }
 
 @extension
-interface OptionFoldableInstance : Foldable<ForOption> {
+interface OptionFoldable : Foldable<ForOption> {
   override fun <A> OptionOf<A>.exists(p: (A) -> Boolean): Boolean =
     fix().exists(p)
 
@@ -128,13 +128,13 @@ interface OptionFoldableInstance : Foldable<ForOption> {
 }
 
 @extension
-interface OptionSemigroupKInstance : SemigroupK<ForOption> {
+interface OptionSemigroupK : SemigroupK<ForOption> {
   override fun <A> OptionOf<A>.combineK(y: OptionOf<A>): Option<A> =
     orElse { y.fix() }
 }
 
 @extension
-interface OptionMonoidKInstance : MonoidK<ForOption> {
+interface OptionMonoidK : MonoidK<ForOption> {
   override fun <A> empty(): Option<A> =
     Option.empty()
 
@@ -154,7 +154,7 @@ fun <A, G, B> OptionOf<A>.traverseFilter(GA: Applicative<G>, f: (A) -> Kind<G, O
 }
 
 @extension
-interface OptionTraverseInstance : Traverse<ForOption> {
+interface OptionTraverse : Traverse<ForOption> {
   override fun <A, B> OptionOf<A>.map(f: (A) -> B): Option<B> =
     fix().map(f)
 
@@ -181,7 +181,7 @@ interface OptionTraverseInstance : Traverse<ForOption> {
 }
 
 @extension
-interface OptionHashInstance<A> : Hash<Option<A>>, OptionEqInstance<A> {
+interface OptionHash<A> : Hash<Option<A>>, OptionEq<A> {
 
   fun HA(): Hash<A>
 

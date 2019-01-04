@@ -20,21 +20,21 @@ interface ConstContravariant<A> : Contravariant<ConstPartialOf<A>> {
 }
 
 @extension
-interface ConstFunctorInstance<A> : Functor<ConstPartialOf<A>> {
+interface ConstFunctor<A> : Functor<ConstPartialOf<A>> {
   override fun <T, U> ConstOf<A, T>.map(f: (T) -> U): Const<A, U> =
     fix().retag()
 }
 
 @extension
-interface ConstApplicativeInstance<A> : Applicative<ConstPartialOf<A>> {
+interface ConstApplicative<A> : Applicative<ConstPartialOf<A>> {
 
   fun MA(): Monoid<A>
 
   override fun <T, U> ConstOf<A, T>.map(f: (T) -> U): Const<A, U> = fix().retag()
 
-  override fun <T> just(a: T): Const<A, T> = object : ConstMonoidInstance<A, T> {
+  override fun <T> just(a: T): Const<A, T> = object : ConstMonoid<A, T> {
     override fun SA(): Semigroup<A> = MA()
-    override fun MA(): Monoid<A> = this@ConstApplicativeInstance.MA()
+    override fun MA(): Monoid<A> = this@ConstApplicative.MA()
   }.empty().fix()
 
   override fun <T, U> ConstOf<A, T>.ap(ff: ConstOf<A, (T) -> U>): Const<A, U> =
@@ -42,7 +42,7 @@ interface ConstApplicativeInstance<A> : Applicative<ConstPartialOf<A>> {
 }
 
 @extension
-interface ConstFoldableInstance<A> : Foldable<ConstPartialOf<A>> {
+interface ConstFoldable<A> : Foldable<ConstPartialOf<A>> {
 
   override fun <T, U> ConstOf<A, T>.foldLeft(b: U, f: (U, T) -> U): U = b
 
@@ -51,7 +51,7 @@ interface ConstFoldableInstance<A> : Foldable<ConstPartialOf<A>> {
 }
 
 @extension
-interface ConstTraverseInstance<X> : Traverse<ConstPartialOf<X>>, ConstFoldableInstance<X> {
+interface ConstTraverse<X> : Traverse<ConstPartialOf<X>>, ConstFoldable<X> {
 
   override fun <T, U> ConstOf<X, T>.map(f: (T) -> U): Const<X, U> = fix().retag()
 
@@ -60,7 +60,7 @@ interface ConstTraverseInstance<X> : Traverse<ConstPartialOf<X>>, ConstFoldableI
 }
 
 @extension
-interface ConstSemigroupInstance<A, T> : Semigroup<ConstOf<A, T>> {
+interface ConstSemigroup<A, T> : Semigroup<ConstOf<A, T>> {
 
   fun SA(): Semigroup<A>
 
@@ -69,7 +69,7 @@ interface ConstSemigroupInstance<A, T> : Semigroup<ConstOf<A, T>> {
 }
 
 @extension
-interface ConstMonoidInstance<A, T> : Monoid<ConstOf<A, T>>, ConstSemigroupInstance<A, T> {
+interface ConstMonoid<A, T> : Monoid<ConstOf<A, T>>, ConstSemigroup<A, T> {
 
   fun MA(): Monoid<A>
 
@@ -80,7 +80,7 @@ interface ConstMonoidInstance<A, T> : Monoid<ConstOf<A, T>>, ConstSemigroupInsta
 }
 
 @extension
-interface ConstEqInstance<A, T> : Eq<Const<A, T>> {
+interface ConstEq<A, T> : Eq<Const<A, T>> {
 
   fun EQ(): Eq<A>
 
@@ -89,13 +89,13 @@ interface ConstEqInstance<A, T> : Eq<Const<A, T>> {
 }
 
 @extension
-interface ConstShowInstance<A, T> : Show<Const<A, T>> {
+interface ConstShow<A, T> : Show<Const<A, T>> {
   override fun Const<A, T>.show(): String =
     toString()
 }
 
 @extension
-interface ConstHashInstance<A, T> : Hash<Const<A, T>>, ConstEqInstance<A, T> {
+interface ConstHash<A, T> : Hash<Const<A, T>>, ConstEq<A, T> {
   fun HA(): Hash<A>
 
   override fun EQ(): Eq<A> = HA()

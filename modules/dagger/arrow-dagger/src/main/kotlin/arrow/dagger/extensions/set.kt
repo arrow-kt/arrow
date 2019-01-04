@@ -1,9 +1,9 @@
 package arrow.dagger.extensions
 
 import arrow.data.*
-import arrow.data.extensions.SetKEqInstance
-import arrow.data.extensions.SetKMonoidInstance
-import arrow.data.extensions.SetKSemigroupInstance
+import arrow.data.extensions.SetKEq
+import arrow.data.extensions.SetKMonoid
+import arrow.data.extensions.SetKSemigroup
 import arrow.data.extensions.setk.foldable.foldable
 import arrow.data.extensions.setk.monoidK.monoidK
 import arrow.data.extensions.setk.semigroupK.semigroupK
@@ -29,10 +29,10 @@ class SetKInstances {
 
 }
 
-class DaggerSetKSemigroupInstance<A> : SetKSemigroupInstance<A>
+class DaggerSetKSemigroup<A> : SetKSemigroup<A>
 
-class DaggerSetKMonoidInstance<A> : SetKMonoidInstance<A>
+class DaggerSetKMonoid<A> : SetKMonoid<A>
 
-class DaggerSetKEqInstance<A> @Inject constructor(val eqA: Eq<A>) : SetKEqInstance<A> {
+class DaggerSetKEq<A> @Inject constructor(val eqA: Eq<A>) : SetKEq<A> {
   override fun EQ(): Eq<A> = eqA
 }

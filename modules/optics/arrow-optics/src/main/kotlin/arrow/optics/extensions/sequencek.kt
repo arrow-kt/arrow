@@ -27,7 +27,7 @@ fun <A> SequenceK.Companion.traversal(): Traversal<SequenceK<A>, A> = object : T
  * [Each] instance definition for [SequenceK].
  */
 @extension
-interface SequenceKEachInstance<A> : Each<SequenceK<A>, A> {
+interface SequenceKEach<A> : Each<SequenceK<A>, A> {
   override fun each(): Traversal<SequenceK<A>, A> =
     SequenceK.traversal()
 }
@@ -36,7 +36,7 @@ interface SequenceKEachInstance<A> : Each<SequenceK<A>, A> {
  * [FilterIndex] instance definition for [SequenceK].
  */
 @extension
-interface SequenceKFilterIndexInstance<A> : FilterIndex<SequenceK<A>, Int, A> {
+interface SequenceKFilterIndex<A> : FilterIndex<SequenceK<A>, Int, A> {
   override fun filter(p: (Int) -> Boolean): Traversal<SequenceK<A>, A> = object : Traversal<SequenceK<A>, A> {
     override fun <F> modifyF(FA: Applicative<F>, s: SequenceK<A>, f: (A) -> Kind<F, A>): Kind<F, SequenceK<A>> = FA.run {
       s.mapIndexed { index, a -> a toT index }.k().traverse(FA) { (a, j) ->
@@ -50,7 +50,7 @@ interface SequenceKFilterIndexInstance<A> : FilterIndex<SequenceK<A>, Int, A> {
  * [Index] instance definition for [SequenceK].
  */
 @extension
-interface SequenceKIndexInstance<A> : Index<SequenceK<A>, Int, A> {
+interface SequenceKIndex<A> : Index<SequenceK<A>, Int, A> {
   override fun index(i: Int): Optional<SequenceK<A>, A> = POptional(
     getOrModify = { it.elementAtOrNull(i)?.right() ?: it.left() },
     set = { s, a -> s.mapIndexed { index, aa -> if (index == i) a else aa }.k() }

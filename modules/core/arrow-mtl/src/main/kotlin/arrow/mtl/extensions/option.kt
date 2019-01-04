@@ -12,7 +12,7 @@ import arrow.core.extensions.traverse as optionTraverse
 import arrow.core.extensions.traverseFilter as optionTraverseFilter
 
 @extension
-interface OptionMonadCombineInstance : MonadCombine<ForOption> {
+interface OptionMonadCombine : MonadCombine<ForOption> {
   override fun <A> empty(): Option<A> =
     Option.empty()
 
@@ -42,7 +42,7 @@ interface OptionMonadCombineInstance : MonadCombine<ForOption> {
 }
 
 @extension
-interface OptionFunctorFilterInstance : FunctorFilter<ForOption> {
+interface OptionFunctorFilter : FunctorFilter<ForOption> {
   override fun <A, B> Kind<ForOption, A>.mapFilter(f: (A) -> Option<B>): Option<B> =
     fix().mapFilter(f)
 
@@ -51,7 +51,7 @@ interface OptionFunctorFilterInstance : FunctorFilter<ForOption> {
 }
 
 @extension
-interface OptionTraverseFilterInstance : TraverseFilter<ForOption> {
+interface OptionTraverseFilter : TraverseFilter<ForOption> {
   override fun <A> Kind<ForOption, A>.filter(f: (A) -> Boolean): Option<A> =
     fix().filter(f)
 
@@ -84,7 +84,7 @@ interface OptionTraverseFilterInstance : TraverseFilter<ForOption> {
 }
 
 @extension
-interface OptionMonadFilterInstance : MonadFilter<ForOption> {
+interface OptionMonadFilter : MonadFilter<ForOption> {
   override fun <A> empty(): Option<A> =
     Option.empty()
 

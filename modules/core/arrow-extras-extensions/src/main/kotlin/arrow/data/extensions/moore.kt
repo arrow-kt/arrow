@@ -11,7 +11,7 @@ import arrow.undocumented
 
 @extension
 @undocumented
-interface MooreComonadInstance<V> : Comonad<MoorePartialOf<V>> {
+interface MooreComonad<V> : Comonad<MoorePartialOf<V>> {
   override fun <A, B> Kind<MoorePartialOf<V>, A>.coflatMap(f: (Kind<MoorePartialOf<V>, A>) -> B): Moore<V, B> =
       fix().coflatMap(f)
 
@@ -24,7 +24,7 @@ interface MooreComonadInstance<V> : Comonad<MoorePartialOf<V>> {
 
 @extension
 @undocumented
-interface MooreFunctorInstance<V> : Functor<MoorePartialOf<V>> {
+interface MooreFunctor<V> : Functor<MoorePartialOf<V>> {
   override fun <A, B> Kind<MoorePartialOf<V>, A>.map(f: (A) -> B): Moore<V, B> =
       fix().map(f)
 }

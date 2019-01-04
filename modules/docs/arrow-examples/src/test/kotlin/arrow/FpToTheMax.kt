@@ -21,7 +21,7 @@ interface Console<F> {
     fun getStrLn(): Kind<F, String>
 }
 
-class ConsoleInstance<F>(val delay: MonadDefer<F>) : Console<F> {
+class ConsoleImpl<F>(val delay: MonadDefer<F>) : Console<F> {
     override fun putStrLn(s: String): Kind<F, Unit> = delay.delay { println(s) }
     override fun getStrLn(): Kind<F, String> = delay.delay { readLine().orEmpty() }
 }
@@ -30,7 +30,7 @@ interface FRandom<F> {
     fun nextInt(upper: Int): Kind<F, Int>
 }
 
-class FRandomInstance<F>(val delay: MonadDefer<F>) : FRandom<F> {
+class FRandomImpl<F>(val delay: MonadDefer<F>) : FRandom<F> {
     override fun nextInt(upper: Int): Kind<F, Int> = delay.delay { ORandom.nextInt(upper) }
 }
 
@@ -48,11 +48,11 @@ typealias ForTestIO = StatePartialOf<TestData>
 // Helper to make it clearer.
 fun <A> TestIO(f: (TestData) -> Tuple2<TestData, A>) = State(f)
 
-class TestIORandomInstance: FRandom<ForTestIO> {
+class TestIORandom: FRandom<ForTestIO> {
     override fun nextInt(upper: Int): Kind<ForTestIO, Int> = TestIO { it.nextInt(upper) }
 }
 
-class TestIOConsoleInstance: Console<ForTestIO> {
+class TestIOConsole: Console<ForTestIO> {
     override fun putStrLn(s: String): Kind<ForTestIO, Unit> = TestIO { it.putStrLn(s)}
     override fun getStrLn(): Kind<ForTestIO, String> = TestIO { it.getStrLn() }
 }
@@ -95,7 +95,7 @@ object FpToTheMax {
     @JvmStatic
     fun main(args: Array<String>) {
         val module = IO.monadDefer().run {
-            MonadAndConsoleRandom(this, ConsoleInstance(this), FRandomInstance(this))
+            MonadAndConsoleRandom(this, ConsoleImpl(this), FRandomImpl(this))
         }
         val r = module.fMain()
         r.fix().unsafeRunSync()
@@ -107,7 +107,7 @@ object FpToTheMax {
         val testData: TestData = TestData(listOf("Plop", "4", "n"), listOf(), listOf(3))
 
         val m: Monad<ForTestIO> = StateT.monad(Id.monad())
-        val module: MonadAndConsoleRandom<ForTestIO> = MonadAndConsoleRandom(m, TestIOConsoleInstance(), TestIORandomInstance() )
+        val module: MonadAndConsoleRandom<ForTestIO> = MonadAndConsoleRandom(m, TestIOConsole(), TestIORandom() )
 
         module.fMain().fix().run(testData).a.output
     }

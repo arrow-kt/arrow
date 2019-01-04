@@ -15,7 +15,7 @@ import arrow.recursion.typeclasses.Corecursive
 import arrow.recursion.typeclasses.Recursive
 
 @extension
-interface MuBirecursiveInstance : Birecursive<ForMu> {
+interface MuBirecursive : Birecursive<ForMu> {
   override fun <F> Functor<F>.embedT(tf: Kind<F, Eval<Kind<ForMu, F>>>): Eval<Mu<F>> =
     Eval.now(object : Mu<F>() {
       override fun <A> unMu(fa: Algebra<F, Eval<A>>) =
@@ -30,7 +30,7 @@ interface MuBirecursiveInstance : Birecursive<ForMu> {
 }
 
 @extension
-interface MuRecursiveInstance : Recursive<ForMu>, MuBirecursiveInstance
+interface MuRecursive: Recursive<ForMu>, MuBirecursive
 
 @extension
-interface MuCorecursiveInstance : Corecursive<ForMu>, MuBirecursiveInstance
+interface MuCorecursive: Corecursive<ForMu>, MuBirecursive

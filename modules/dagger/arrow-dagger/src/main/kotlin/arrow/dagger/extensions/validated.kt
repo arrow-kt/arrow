@@ -11,37 +11,37 @@ import javax.inject.Inject
 abstract class ValidatedInstances<L> {
 
   @Provides
-  fun validatedFunctor(ev: DaggerValidatedFunctorInstance<L>): Functor<ValidatedPartialOf<L>> = ev
+  fun validatedFunctor(ev: DaggerValidatedFunctor<L>): Functor<ValidatedPartialOf<L>> = ev
 
   @Provides
-  fun validatedApplicative(ev: DaggerValidatedApplicativeInstance<L>): Applicative<ValidatedPartialOf<L>> = ev
+  fun validatedApplicative(ev: DaggerValidatedApplicative<L>): Applicative<ValidatedPartialOf<L>> = ev
 
   @Provides
-  fun validatedFoldable(ev: DaggerValidatedFoldableInstance<L>): Foldable<ValidatedPartialOf<L>> = ev
+  fun validatedFoldable(ev: DaggerValidatedFoldable<L>): Foldable<ValidatedPartialOf<L>> = ev
 
   @Provides
-  fun validatedTraverse(ev: DaggerValidatedTraverseInstance<L>): Traverse<ValidatedPartialOf<L>> = ev
+  fun validatedTraverse(ev: DaggerValidatedTraverse<L>): Traverse<ValidatedPartialOf<L>> = ev
 
   @Provides
-  fun validatedSemigroupK(ev: DaggerValidatedSemigroupKInstance<L>): SemigroupK<ValidatedPartialOf<L>> = ev
+  fun validatedSemigroupK(ev: DaggerValidatedSemigroupK<L>): SemigroupK<ValidatedPartialOf<L>> = ev
 
 }
 
-class DaggerValidatedFunctorInstance<F> @Inject constructor() : ValidatedFunctorInstance<F>
+class DaggerValidatedFunctor<F> @Inject constructor() : ValidatedFunctor<F>
 
-class DaggerValidatedApplicativeInstance<F> @Inject constructor(val SE: Semigroup<F>) : ValidatedApplicativeInstance<F> {
+class DaggerValidatedApplicative<F> @Inject constructor(val SE: Semigroup<F>) : ValidatedApplicative<F> {
   override fun SE(): Semigroup<F> = SE
 }
 
-class DaggerValidatedFoldableInstance<F> @Inject constructor() : ValidatedFoldableInstance<F>
+class DaggerValidatedFoldable<F> @Inject constructor() : ValidatedFoldable<F>
 
-class DaggerValidatedTraverseInstance<F> @Inject constructor() : ValidatedTraverseInstance<F>
+class DaggerValidatedTraverse<F> @Inject constructor() : ValidatedTraverse<F>
 
-class DaggerValidatedSemigroupKInstance<F> @Inject constructor(val SE: Semigroup<F>) : ValidatedSemigroupKInstance<F> {
+class DaggerValidatedSemigroupK<F> @Inject constructor(val SE: Semigroup<F>) : ValidatedSemigroupK<F> {
   override fun SE(): Semigroup<F> = SE
 }
 
-class DaggerValidatedEqInstance<L, R> @Inject constructor(val eqL: Eq<L>, val eqR: Eq<R>) : ValidatedEqInstance<L, R> {
+class DaggerValidatedEq<L, R> @Inject constructor(val eqL: Eq<L>, val eqR: Eq<R>) : ValidatedEq<L, R> {
   override fun EQL(): Eq<L> = eqL
   override fun EQR(): Eq<R> = eqR
 }

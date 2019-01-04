@@ -11,31 +11,31 @@ import javax.inject.Inject
 abstract class MapKInstances<L> {
 
   @Provides
-  fun mapKFunctor(ev: DaggerMapKFunctorInstance<L>): Functor<MapKPartialOf<L>> = ev
+  fun mapKFunctor(ev: DaggerMapKFunctor<L>): Functor<MapKPartialOf<L>> = ev
 
   @Provides
-  fun mapKFoldable(ev: DaggerMapKFoldableInstance<L>): Foldable<MapKPartialOf<L>> = ev
+  fun mapKFoldable(ev: DaggerMapKFoldable<L>): Foldable<MapKPartialOf<L>> = ev
 
   @Provides
-  fun mapKTraverse(ev: DaggerMapKTraverseInstance<L>): Traverse<MapKPartialOf<L>> = ev
+  fun mapKTraverse(ev: DaggerMapKTraverse<L>): Traverse<MapKPartialOf<L>> = ev
 
 }
 
-class DaggerMapKFunctorInstance<K> @Inject constructor() : MapKFunctorInstance<K>
+class DaggerMapKFunctor<K> @Inject constructor() : MapKFunctor<K>
 
-class DaggerMapKFoldableInstance<K> @Inject constructor() : MapKFoldableInstance<K>
+class DaggerMapKFoldable<K> @Inject constructor() : MapKFoldable<K>
 
-class DaggerMapKTraverseInstance<K> @Inject constructor() : MapKTraverseInstance<K>
+class DaggerMapKTraverse<K> @Inject constructor() : MapKTraverse<K>
 
-class DaggerMapKSemigroupInstance<K, A> @Inject constructor(val SG: Semigroup<A>) : MapKSemigroupInstance<K, A> {
+class DaggerMapKSemigroup<K, A> @Inject constructor(val SG: Semigroup<A>) : MapKSemigroup<K, A> {
   override fun SG(): Semigroup<A> = SG
 }
 
-class DaggerMapKMonoidInstance<K, A> @Inject constructor(val SG: Semigroup<A>) : MapKMonoidInstance<K, A> {
+class DaggerMapKMonoid<K, A> @Inject constructor(val SG: Semigroup<A>) : MapKMonoid<K, A> {
   override fun SG(): Semigroup<A> = SG
 }
 
-class DaggerMapKEqInstance<K, A> @Inject constructor(val EQK: Eq<K>, val EQA: Eq<A>) : MapKEqInstance<K, A> {
+class DaggerMapKEq<K, A> @Inject constructor(val EQK: Eq<K>, val EQA: Eq<A>) : MapKEq<K, A> {
   override fun EQK(): Eq<K> = EQK
 
   override fun EQA(): Eq<A> = EQA

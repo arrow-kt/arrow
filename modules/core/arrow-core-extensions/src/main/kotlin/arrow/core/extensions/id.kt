@@ -8,14 +8,14 @@ import arrow.typeclasses.*
 import arrow.core.extensions.traverse as idTraverse
 
 @extension
-interface IdSemigroupInstance<A> : Semigroup<Id<A>> {
+interface IdSemigroup<A> : Semigroup<Id<A>> {
   fun SA(): Semigroup<A>
 
   override fun Id<A>.combine(b: Id<A>): Id<A> = Id(SA().run { value().combine(b.value()) })
 }
 
 @extension
-interface IdMonoidInstance<A> : Monoid<Id<A>>, IdSemigroupInstance<A> {
+interface IdMonoid<A> : Monoid<Id<A>>, IdSemigroup<A> {
   fun MA(): Monoid<A>
   override fun SA(): Semigroup<A> = MA()
 
@@ -23,7 +23,7 @@ interface IdMonoidInstance<A> : Monoid<Id<A>>, IdSemigroupInstance<A> {
 }
 
 @extension
-interface IdEqInstance<A> : Eq<Id<A>> {
+interface IdEq<A> : Eq<Id<A>> {
 
   fun EQ(): Eq<A>
 
@@ -32,19 +32,19 @@ interface IdEqInstance<A> : Eq<Id<A>> {
 }
 
 @extension
-interface IdShowInstance<A> : Show<Id<A>> {
+interface IdShow<A> : Show<Id<A>> {
   override fun Id<A>.show(): String =
     toString()
 }
 
 @extension
-interface IdFunctorInstance : Functor<ForId> {
+interface IdFunctor : Functor<ForId> {
   override fun <A, B> IdOf<A>.map(f: (A) -> B): Id<B> =
     fix().map(f)
 }
 
 @extension
-interface IdApplicativeInstance : Applicative<ForId> {
+interface IdApplicative : Applicative<ForId> {
   override fun <A, B> IdOf<A>.ap(ff: IdOf<(A) -> B>): Id<B> =
     fix().ap(ff)
 
@@ -56,37 +56,7 @@ interface IdApplicativeInstance : Applicative<ForId> {
 }
 
 @extension
-interface IdMonadInstance : Monad<ForId> {
-  override fun <A, B> IdOf<A>.ap(ff: IdOf<(A) -> B>): Id<B> =
-    fix().ap(ff)
-
-  override fun <A, B> IdOf<A>.flatMap(f: (A) -> IdOf<B>): Id<B> =
-    fix().flatMap(f)
-
-  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, IdOf<Either<A, B>>>): Id<B> =
-    Id.tailRecM(a, f)
-
-  override fun <A, B> IdOf<A>.map(f: (A) -> B): Id<B> =
-    fix().map(f)
-
-  override fun <A> just(a: A): Id<A> =
-    Id.just(a)
-}
-
-@extension
-interface IdComonadInstance : Comonad<ForId> {
-  override fun <A, B> IdOf<A>.coflatMap(f: (IdOf<A>) -> B): Id<B> =
-    fix().coflatMap(f)
-
-  override fun <A> IdOf<A>.extract(): A =
-    fix().extract()
-
-  override fun <A, B> IdOf<A>.map(f: (A) -> B): Id<B> =
-    fix().map(f)
-}
-
-@extension
-interface IdBimonadInstance : Bimonad<ForId> {
+interface IdMonad : Monad<ForId> {
   override fun <A, B> IdOf<A>.ap(ff: IdOf<(A) -> B>): Id<B> =
     fix().ap(ff)
 
@@ -101,6 +71,36 @@ interface IdBimonadInstance : Bimonad<ForId> {
 
   override fun <A> just(a: A): Id<A> =
     Id.just(a)
+}
+
+@extension
+interface IdComonad : Comonad<ForId> {
+  override fun <A, B> IdOf<A>.coflatMap(f: (IdOf<A>) -> B): Id<B> =
+    fix().coflatMap(f)
+
+  override fun <A> IdOf<A>.extract(): A =
+    fix().extract()
+
+  override fun <A, B> IdOf<A>.map(f: (A) -> B): Id<B> =
+    fix().map(f)
+}
+
+@extension
+interface IdBimonad : Bimonad<ForId> {
+  override fun <A, B> IdOf<A>.ap(ff: IdOf<(A) -> B>): Id<B> =
+    fix().ap(ff)
+
+  override fun <A, B> IdOf<A>.flatMap(f: (A) -> IdOf<B>): Id<B> =
+    fix().flatMap(f)
+
+  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, IdOf<Either<A, B>>>): Id<B> =
+    Id.tailRecM(a, f)
+
+  override fun <A, B> IdOf<A>.map(f: (A) -> B): Id<B> =
+    fix().map(f)
+
+  override fun <A> just(a: A): Id<A> =
+    Id.just(a)
 
   override fun <A, B> IdOf<A>.coflatMap(f: (IdOf<A>) -> B): Id<B> =
     fix().coflatMap(f)
@@ -110,7 +110,7 @@ interface IdBimonadInstance : Bimonad<ForId> {
 }
 
 @extension
-interface IdFoldableInstance : Foldable<ForId> {
+interface IdFoldable : Foldable<ForId> {
   override fun <A, B> IdOf<A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
 
@@ -126,7 +126,7 @@ fun <A, G> IdOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, Id<A>> =
   idTraverse(GA, ::identity)
 
 @extension
-interface IdTraverseInstance : Traverse<ForId> {
+interface IdTraverse : Traverse<ForId> {
   override fun <A, B> IdOf<A>.map(f: (A) -> B): Id<B> =
     fix().map(f)
 
@@ -141,7 +141,7 @@ interface IdTraverseInstance : Traverse<ForId> {
 }
 
 @extension
-interface IdHashInstance<A> : Hash<Id<A>>, IdEqInstance<A> {
+interface IdHash<A> : Hash<Id<A>>, IdEq<A> {
 
   fun HA(): Hash<A>
 

@@ -7,7 +7,7 @@ import arrow.optics.typeclasses.At
 /**
  * [At] instance definition for [Set].
  */
-interface SetAtInstance<A> : At<Set<A>, A, Boolean> {
+interface SetAt<A> : At<Set<A>, A, Boolean> {
   override fun at(i: A): Lens<Set<A>, Boolean> = PLens(
     get = { it.contains(i) },
     set = { s, b -> (if (b) s + i else s - i) }
@@ -19,6 +19,6 @@ interface SetAtInstance<A> : At<Set<A>, A, Boolean> {
      *
      * @return [Index] instance for [String]
      */
-    operator fun <A> invoke() = object : SetAtInstance<A> {}
+    operator fun <A> invoke() = object : SetAt<A> {}
   }
 }

@@ -27,7 +27,7 @@ fun <A> NonEmptyList.Companion.traversal(): Traversal<NonEmptyList<A>, A> = obje
  * [Each] instance definition for [NonEmptyList].
  */
 @extension
-interface NonEmptyListEachInstance<A> : Each<NonEmptyList<A>, A> {
+interface NonEmptyListEach<A> : Each<NonEmptyList<A>, A> {
   override fun each(): Traversal<NonEmptyList<A>, A> =
     NonEmptyList.traversal()
 }
@@ -36,7 +36,7 @@ interface NonEmptyListEachInstance<A> : Each<NonEmptyList<A>, A> {
  * [FilterIndex] instance definition for [NonEmptyList].
  */
 @extension
-interface NonEmptyListFilterIndexInstance<A> : FilterIndex<NonEmptyList<A>, Int, A> {
+interface NonEmptyListFilterIndex<A> : FilterIndex<NonEmptyList<A>, Int, A> {
   override fun filter(p: (Int) -> Boolean): Traversal<NonEmptyList<A>, A> = object : Traversal<NonEmptyList<A>, A> {
     override fun <F> modifyF(FA: Applicative<F>, s: NonEmptyList<A>, f: (A) -> Kind<F, A>): Kind<F, NonEmptyList<A>> =
       s.all.mapIndexed { index, a -> a toT index }
@@ -49,7 +49,7 @@ interface NonEmptyListFilterIndexInstance<A> : FilterIndex<NonEmptyList<A>, Int,
  * [Index] instance definition for [NonEmptyList].
  */
 @extension
-interface NonEmptyListIndexInstance<A> : Index<NonEmptyList<A>, Int, A> {
+interface NonEmptyListIndex<A> : Index<NonEmptyList<A>, Int, A> {
   override fun index(i: Int): Optional<NonEmptyList<A>, A> = POptional(
     getOrModify = { l -> l.all.getOrNull(i)?.right() ?: l.left() },
     set = { l, a ->

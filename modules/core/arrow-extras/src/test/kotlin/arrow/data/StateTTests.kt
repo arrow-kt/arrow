@@ -15,7 +15,7 @@ import arrow.data.extensions.listk.monad.monad
 import arrow.data.extensions.listk.semigroupK.semigroupK
 import arrow.data.extensions.statet.applicative.applicative
 import arrow.data.extensions.statet.semigroupK.semigroupK
-import arrow.mtl.extensions.StateTMonadStateInstance
+import arrow.mtl.extensions.StateTMonadState
 import arrow.mtl.extensions.listk.monadCombine.monadCombine
 import arrow.mtl.extensions.statet.monadCombine.monadCombine
 import arrow.mtl.extensions.statet.monadState.monadState
@@ -31,7 +31,7 @@ import org.junit.runner.RunWith
 @RunWith(KTestJUnitRunner::class)
 class StateTTests : UnitSpec() {
 
-  val M: StateTMonadStateInstance<ForTry, Int> = StateT.monadState(Try.monad())
+  val M: StateTMonadState<ForTry, Int> = StateT.monadState(Try.monad())
 
   val EQ: Eq<StateTOf<ForTry, Int, Int>> = Eq { a, b ->
     a.runM(Try.monad(), 1) == b.runM(Try.monad(), 1)

@@ -9,8 +9,8 @@ import arrow.data.NonEmptyList
 import arrow.data.SequenceK
 import arrow.data.extensions.listk.eq.eq
 import arrow.data.extensions.sequencek.eq.eq
-import arrow.optics.extensions.ListFilterIndexInstance
-import arrow.optics.extensions.MapFilterIndexInstance
+import arrow.optics.extensions.ListFilterIndex
+import arrow.optics.extensions.MapFilterIndex
 import arrow.optics.extensions.filterIndex
 import arrow.optics.extensions.listk.filterIndex.filterIndex
 import arrow.optics.extensions.mapk.filterIndex.filterIndex
@@ -39,7 +39,7 @@ class FilterIndexInstanceTest : UnitSpec() {
     ))
 
     testLaws(TraversalLaws.laws(
-      traversal = ListFilterIndexInstance<String>().filter { true },
+      traversal = ListFilterIndex<String>().filter { true },
       aGen = Gen.list(Gen.string()),
       bGen = Gen.string(),
       funcGen = genFunctionAToB(Gen.string()),
@@ -79,7 +79,7 @@ class FilterIndexInstanceTest : UnitSpec() {
     ))
 
     testLaws(TraversalLaws.laws(
-      traversal = MapFilterIndexInstance<Char, Int>().filter { true },
+      traversal = MapFilterIndex<Char, Int>().filter { true },
       aGen = genMapK(genChars(), genIntSmall()),
       bGen = Gen.int(),
       funcGen = genFunctionAToB(Gen.int()),

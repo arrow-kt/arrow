@@ -14,13 +14,13 @@ import arrow.effects.coroutines.handleErrorWith as deferredHandleErrorWith
 import arrow.effects.coroutines.runAsync as deferredRunAsync
 
 @extension
-interface DeferredKFunctorInstance : Functor<ForDeferredK> {
+interface DeferredKFunctor : Functor<ForDeferredK> {
   override fun <A, B> DeferredKOf<A>.map(f: (A) -> B): DeferredK<B> =
     fix().map(f)
 }
 
 @extension
-interface DeferredKApplicativeInstance : Applicative<ForDeferredK> {
+interface DeferredKApplicative : Applicative<ForDeferredK> {
   override fun <A, B> DeferredKOf<A>.map(f: (A) -> B): DeferredK<B> =
     fix().map(f)
 
@@ -36,7 +36,7 @@ suspend fun <F, A> Kind<F, DeferredKOf<A>>.awaitAll(T: Traverse<F>): Kind<F, A> 
 }
 
 @extension
-interface DeferredKMonadInstance : Monad<ForDeferredK> {
+interface DeferredKMonad : Monad<ForDeferredK> {
   override fun <A, B> DeferredKOf<A>.flatMap(f: (A) -> Kind<ForDeferredK, B>): DeferredK<B> =
     fix().flatMap(f = f)
 
@@ -54,7 +54,7 @@ interface DeferredKMonadInstance : Monad<ForDeferredK> {
 }
 
 @extension
-interface DeferredKApplicativeErrorInstance : ApplicativeError<ForDeferredK, Throwable>, DeferredKApplicativeInstance {
+interface DeferredKApplicativeError: ApplicativeError<ForDeferredK, Throwable>, DeferredKApplicative {
   override fun <A> raiseError(e: Throwable): DeferredK<A> =
     DeferredK.raiseError(e)
 
@@ -63,7 +63,7 @@ interface DeferredKApplicativeErrorInstance : ApplicativeError<ForDeferredK, Thr
 }
 
 @extension
-interface DeferredKMonadErrorInstance : MonadError<ForDeferredK, Throwable>, DeferredKMonadInstance {
+interface DeferredKMonadError: MonadError<ForDeferredK, Throwable>, DeferredKMonad {
   override fun <A> raiseError(e: Throwable): DeferredK<A> =
     DeferredK.raiseError(e)
 
@@ -72,7 +72,7 @@ interface DeferredKMonadErrorInstance : MonadError<ForDeferredK, Throwable>, Def
 }
 
 @extension
-interface DeferredKBracketInstance : Bracket<ForDeferredK, Throwable>, DeferredKMonadErrorInstance {
+interface DeferredKBracket: Bracket<ForDeferredK, Throwable>, DeferredKMonadError {
   override fun <A, B> DeferredKOf<A>.bracketCase(
     release: (A, ExitCase<Throwable>) -> Kind<ForDeferredK, Unit>,
     use: (A) -> Kind<ForDeferredK, B>
@@ -81,13 +81,13 @@ interface DeferredKBracketInstance : Bracket<ForDeferredK, Throwable>, DeferredK
 }
 
 @extension
-interface DeferredKMonadDeferInstance : MonadDefer<ForDeferredK>, DeferredKBracketInstance {
+interface DeferredKMonadDefer: MonadDefer<ForDeferredK>, DeferredKBracket {
   override fun <A> defer(fa: () -> DeferredKOf<A>): DeferredK<A> =
     DeferredK.defer(fa = fa)
 }
 
 @extension
-interface DeferredKAsyncInstance : Async<ForDeferredK>, DeferredKMonadDeferInstance {
+interface DeferredKAsync: Async<ForDeferredK>, DeferredKMonadDefer {
   override fun <A> async(fa: Proc<A>): DeferredK<A> =
     DeferredK.async(fa = { _, cb -> fa(cb) })
 
@@ -102,13 +102,13 @@ interface DeferredKAsyncInstance : Async<ForDeferredK>, DeferredKMonadDeferInsta
 }
 
 @extension
-interface DeferredKEffectInstance : Effect<ForDeferredK>, DeferredKAsyncInstance {
+interface DeferredKEffect: Effect<ForDeferredK>, DeferredKAsync {
   override fun <A> DeferredKOf<A>.runAsync(cb: (Either<Throwable, A>) -> DeferredKOf<Unit>): DeferredK<Unit> =
     deferredRunAsync(cb = cb)
 }
 
 @extension
-interface DeferredKConcurrentEffectInstance : ConcurrentEffect<ForDeferredK>, DeferredKEffectInstance {
+interface DeferredKConcurrentEffect: ConcurrentEffect<ForDeferredK>, DeferredKEffect {
   override fun <A> DeferredKOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> Kind<ForDeferredK, Unit>): DeferredK<Disposable> =
     fix().runAsyncCancellable(onCancel = OnCancel.ThrowCancellationException, cb = cb)
 }

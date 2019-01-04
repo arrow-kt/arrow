@@ -9,7 +9,7 @@ import arrow.extension
 import arrow.mtl.typeclasses.FunctorFilter
 
 @extension
-interface NonEmptyListFunctorFilterInstance : FunctorFilter<ForNonEmptyList> {
+interface NonEmptyListFunctorFilter : FunctorFilter<ForNonEmptyList> {
   override fun <A, B> Kind<ForNonEmptyList, A>.mapFilter(f: (A) -> Option<B>): NonEmptyList<B> =
     fix().mapFilter(f)
 

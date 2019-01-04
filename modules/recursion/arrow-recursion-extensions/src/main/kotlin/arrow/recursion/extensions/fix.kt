@@ -12,7 +12,7 @@ import arrow.recursion.typeclasses.Corecursive
 import arrow.recursion.typeclasses.Recursive
 
 @extension
-interface FixBirecursiveInstance : Birecursive<ForFix> {
+interface FixBirecursive : Birecursive<ForFix> {
   override fun <F> Functor<F>.projectT(tf: Kind<ForFix, F>) =
     tf.fix().unfix.map { it.value() }
 
@@ -21,7 +21,7 @@ interface FixBirecursiveInstance : Birecursive<ForFix> {
 }
 
 @extension
-interface FixRecursiveInstance : Recursive<ForFix>, FixBirecursiveInstance
+interface FixRecursive: Recursive<ForFix>, FixBirecursive
 
 @extension
-interface FixCorecursiveInstance : Corecursive<ForFix>, FixBirecursiveInstance
+interface FixCorecursive: Corecursive<ForFix>, FixBirecursive

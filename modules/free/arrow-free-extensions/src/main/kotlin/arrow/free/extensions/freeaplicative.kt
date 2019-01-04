@@ -15,13 +15,13 @@ import arrow.undocumented
 
 @extension
 @undocumented
-interface FreeApplicativeFunctorInstance<S> : Functor<FreeApplicativePartialOf<S>> {
+interface FreeApplicativeFunctor<S> : Functor<FreeApplicativePartialOf<S>> {
   override fun <A, B> Kind<FreeApplicativePartialOf<S>, A>.map(f: (A) -> B): FreeApplicative<S, B> = fix().map(f)
 }
 
 @extension
 @undocumented
-interface FreeApplicativeApplicativeInstance<S> : Applicative<FreeApplicativePartialOf<S>>, FreeApplicativeFunctorInstance<S> {
+interface FreeApplicativeApplicative<S> : Applicative<FreeApplicativePartialOf<S>>, FreeApplicativeFunctor<S> {
   override fun <A> just(a: A): FreeApplicative<S, A> = FreeApplicative.just(a)
 
   override fun <A, B> Kind<FreeApplicativePartialOf<S>, A>.ap(ff: Kind<FreeApplicativePartialOf<S>, (A) -> B>): FreeApplicative<S, B> =

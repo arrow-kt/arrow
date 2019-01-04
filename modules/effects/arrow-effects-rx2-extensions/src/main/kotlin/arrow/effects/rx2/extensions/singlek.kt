@@ -11,13 +11,13 @@ import arrow.typeclasses.*
 import kotlin.coroutines.CoroutineContext
 
 @extension
-interface SingleKFunctorInstance : Functor<ForSingleK> {
+interface SingleKFunctor : Functor<ForSingleK> {
   override fun <A, B> SingleKOf<A>.map(f: (A) -> B): SingleK<B> =
     fix().map(f)
 }
 
 @extension
-interface SingleKApplicativeInstance : Applicative<ForSingleK> {
+interface SingleKApplicative : Applicative<ForSingleK> {
   override fun <A, B> SingleKOf<A>.ap(ff: SingleKOf<(A) -> B>): SingleK<B> =
     fix().ap(ff)
 
@@ -29,7 +29,7 @@ interface SingleKApplicativeInstance : Applicative<ForSingleK> {
 }
 
 @extension
-interface SingleKMonadInstance : Monad<ForSingleK> {
+interface SingleKMonad : Monad<ForSingleK> {
   override fun <A, B> SingleKOf<A>.ap(ff: SingleKOf<(A) -> B>): SingleK<B> =
     fix().ap(ff)
 
@@ -47,9 +47,9 @@ interface SingleKMonadInstance : Monad<ForSingleK> {
 }
 
 @extension
-interface SingleKApplicativeErrorInstance :
+interface SingleKApplicativeError :
   ApplicativeError<ForSingleK, Throwable>,
-  SingleKApplicativeInstance {
+  SingleKApplicative{
   override fun <A> raiseError(e: Throwable): SingleK<A> =
     SingleK.raiseError(e)
 
@@ -58,9 +58,9 @@ interface SingleKApplicativeErrorInstance :
 }
 
 @extension
-interface SingleKMonadErrorInstance :
+interface SingleKMonadError :
   MonadError<ForSingleK, Throwable>,
-  SingleKMonadInstance {
+  SingleKMonad{
   override fun <A> raiseError(e: Throwable): SingleK<A> =
     SingleK.raiseError(e)
 
@@ -69,24 +69,24 @@ interface SingleKMonadErrorInstance :
 }
 
 @extension
-interface SingleKMonadThrowInstance : MonadThrow<ForSingleK>, SingleKMonadErrorInstance
+interface SingleKMonadThrow: MonadThrow<ForSingleK>, SingleKMonadError
 
 @extension
-interface SingleKBracketInstance : Bracket<ForSingleK, Throwable>, SingleKMonadThrowInstance {
+interface SingleKBracket: Bracket<ForSingleK, Throwable>, SingleKMonadThrow {
   override fun <A, B> SingleKOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> SingleKOf<Unit>, use: (A) -> SingleKOf<B>): SingleK<B> =
     fix().bracketCase({ use(it) }, { a, e -> release(a, e) })
 }
 
 @extension
-interface SingleKMonadDeferInstance : MonadDefer<ForSingleK>, SingleKBracketInstance {
+interface SingleKMonadDefer: MonadDefer<ForSingleK>, SingleKBracket {
   override fun <A> defer(fa: () -> SingleKOf<A>): SingleK<A> =
     SingleK.defer(fa)
 }
 
 @extension
-interface SingleKAsyncInstance :
+interface SingleKAsync :
   Async<ForSingleK>,
-  SingleKMonadDeferInstance {
+  SingleKMonadDefer{
   override fun <A> async(fa: Proc<A>): SingleK<A> =
     SingleK.async { _, cb -> fa(cb) }
 
@@ -98,15 +98,15 @@ interface SingleKAsyncInstance :
 }
 
 @extension
-interface SingleKEffectInstance :
+interface SingleKEffect :
   Effect<ForSingleK>,
-  SingleKAsyncInstance {
+  SingleKAsync{
   override fun <A> SingleKOf<A>.runAsync(cb: (Either<Throwable, A>) -> SingleKOf<Unit>): SingleK<Unit> =
     fix().runAsync(cb)
 }
 
 @extension
-interface SingleKConcurrentEffectInstance : ConcurrentEffect<ForSingleK>, SingleKEffectInstance {
+interface SingleKConcurrentEffect: ConcurrentEffect<ForSingleK>, SingleKEffect {
   override fun <A> SingleKOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> SingleKOf<Unit>): SingleK<Disposable> =
     fix().runAsyncCancellable(cb)
 }

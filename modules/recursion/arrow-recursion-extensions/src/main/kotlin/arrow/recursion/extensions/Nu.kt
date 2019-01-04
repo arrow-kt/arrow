@@ -14,7 +14,7 @@ import arrow.recursion.typeclasses.Corecursive
 import arrow.recursion.typeclasses.Recursive
 
 @extension
-interface NuBirecursiveInstance : Birecursive<ForNu> {
+interface NuBirecursive : Birecursive<ForNu> {
   override fun <F> Functor<F>.projectT(tf: Kind<ForNu, F>): Kind<F, Nu<F>> {
     val fix = tf.fix()
     val unNu = fix.unNu
@@ -29,7 +29,7 @@ interface NuBirecursiveInstance : Birecursive<ForNu> {
 }
 
 @extension
-interface NuRecursiveInstance : Recursive<ForNu>, NuBirecursiveInstance
+interface NuRecursive: Recursive<ForNu>, NuBirecursive
 
 @extension
-interface NuCorecursiveInstance : Corecursive<ForNu>, NuBirecursiveInstance
+interface NuCorecursive: Corecursive<ForNu>, NuBirecursive

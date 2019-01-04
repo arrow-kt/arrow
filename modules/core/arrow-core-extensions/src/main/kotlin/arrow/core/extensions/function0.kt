@@ -5,7 +5,7 @@ import arrow.extension
 import arrow.typeclasses.*
 
 @extension
-interface Function0SemigroupInstance<A> : Semigroup<Function0<A>> {
+interface Function0Semigroup<A> : Semigroup<Function0<A>> {
   fun SA(): Semigroup<A>
 
   override fun Function0<A>.combine(b: Function0<A>): Function0<A> =
@@ -13,7 +13,7 @@ interface Function0SemigroupInstance<A> : Semigroup<Function0<A>> {
 }
 
 @extension
-interface Function0MonoidInstance<A> : Monoid<Function0<A>>, Function0SemigroupInstance<A> {
+interface Function0Monoid<A> : Monoid<Function0<A>>, Function0Semigroup<A> {
   fun MA(): Monoid<A>
 
   override fun SA() = MA()
@@ -23,13 +23,13 @@ interface Function0MonoidInstance<A> : Monoid<Function0<A>>, Function0SemigroupI
 }
 
 @extension
-interface Function0FunctorInstance : Functor<ForFunction0> {
+interface Function0Functor : Functor<ForFunction0> {
   override fun <A, B> Function0Of<A>.map(f: (A) -> B): Function0<B> =
     fix().map(f)
 }
 
 @extension
-interface Function0ApplicativeInstance : Applicative<ForFunction0> {
+interface Function0Applicative : Applicative<ForFunction0> {
   override fun <A, B> Function0Of<A>.ap(ff: Function0Of<(A) -> B>): Function0<B> =
     fix().ap(ff)
 
@@ -41,7 +41,7 @@ interface Function0ApplicativeInstance : Applicative<ForFunction0> {
 }
 
 @extension
-interface Function0MonadInstance : Monad<ForFunction0> {
+interface Function0Monad : Monad<ForFunction0> {
   override fun <A, B> Function0Of<A>.ap(ff: Function0Of<(A) -> B>): Function0<B> =
     fix().ap(ff)
 
@@ -59,7 +59,7 @@ interface Function0MonadInstance : Monad<ForFunction0> {
 }
 
 @extension
-interface Function0ComonadInstance : Comonad<ForFunction0> {
+interface Function0Comonad : Comonad<ForFunction0> {
   override fun <A, B> Function0Of<A>.coflatMap(f: (Function0Of<A>) -> B): Function0<B> =
     fix().coflatMap(f)
 
@@ -71,7 +71,7 @@ interface Function0ComonadInstance : Comonad<ForFunction0> {
 }
 
 @extension
-interface Function0BimonadInstance : Bimonad<ForFunction0> {
+interface Function0Bimonad : Bimonad<ForFunction0> {
   override fun <A, B> Function0Of<A>.ap(ff: Function0Of<(A) -> B>): Function0<B> =
     fix().ap(ff)
 

@@ -2,7 +2,7 @@ package arrow.effects.extensions
 
 import arrow.Kind
 import arrow.data.*
-import arrow.data.extensions.KleisliMonadErrorInstance
+import arrow.data.extensions.KleisliMonadError
 import arrow.effects.typeclasses.*
 import arrow.extension
 import arrow.typeclasses.MonadError
@@ -11,7 +11,7 @@ import kotlin.coroutines.CoroutineContext
 
 @extension
 @undocumented
-interface KleisliBracketInstance<F, R, E> : Bracket<KleisliPartialOf<F, R>, E>, KleisliMonadErrorInstance<F, R, E> {
+interface KleisliBracket<F, R, E> : Bracket<KleisliPartialOf<F, R>, E>, KleisliMonadError<F, R, E> {
 
   fun BF(): Bracket<F, E>
 
@@ -35,7 +35,7 @@ interface KleisliBracketInstance<F, R, E> : Bracket<KleisliPartialOf<F, R>, E>, 
 }
 
 //TODO fix stack safety issue. AsyncLaws#stack safety over repeated attempts fails.
-internal interface KleisliMonadDeferInstance<F, R> : MonadDefer<KleisliPartialOf<F, R>>, KleisliBracketInstance<F, R, Throwable> {
+internal interface KleisliMonadDefer<F, R> : MonadDefer<KleisliPartialOf<F, R>>, KleisliBracket<F, R, Throwable> {
 
   fun MDF(): MonadDefer<F>
 
@@ -47,7 +47,7 @@ internal interface KleisliMonadDeferInstance<F, R> : MonadDefer<KleisliPartialOf
 
 }
 
-internal interface KleisliAsyncInstance<F, R> : Async<KleisliPartialOf<F, R>>, KleisliMonadDeferInstance<F, R> {
+internal interface KleisliAsync<F, R> : Async<KleisliPartialOf<F, R>>, KleisliMonadDefer<F, R> {
 
   fun ASF(): Async<F>
 

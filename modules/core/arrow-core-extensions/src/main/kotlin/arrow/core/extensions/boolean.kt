@@ -4,24 +4,24 @@ import arrow.typeclasses.Eq
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Show
 
-interface BooleanShowInstance : Show<Boolean> {
+interface BooleanShow : Show<Boolean> {
   override fun Boolean.show(): String =
     this.toString()
 }
 
-interface BooleanEqInstance : Eq<Boolean> {
+interface BooleanEq : Eq<Boolean> {
   override fun Boolean.eqv(b: Boolean): Boolean = this == b
 }
 
-interface BooleanHashInstance : Hash<Boolean>, BooleanEqInstance {
+interface BooleanHash: Hash<Boolean>, BooleanEq {
   override fun Boolean.hash(): Int = this.hashCode()
 }
 
 fun Boolean.Companion.show(): Show<Boolean> =
-  object : BooleanShowInstance {}
+  object : BooleanShow{}
 
 fun Boolean.Companion.eq(): Eq<Boolean> =
-  object : BooleanEqInstance {}
+  object : BooleanEq{}
 
 fun Boolean.Companion.hash(): Hash<Boolean> =
-  object : BooleanHashInstance {}
+  object : BooleanHash{}

@@ -165,7 +165,7 @@ So why do this? We can now define a [Functor]({{ '/docs/arrow/typeclasses/functo
 
 ```kotlin
 @instance(IntListPattern::class)
-interface IntListPatternFunctorInstance : Functor<ForIntListPattern> {
+interface IntListPatternFunctor : Functor<ForIntListPattern> {
   override fun <A, B> IntListPatternOf<A>.map(f: (A) -> B): IntListPatternOf<B> {
     val lp = fix()
     return when (lp) {

@@ -4,7 +4,7 @@ import arrow.Kind
 import arrow.core.*
 import arrow.data.NonEmptyList
 import arrow.data.fix
-import arrow.free.extensions.FreeApplicativeApplicativeInstance
+import arrow.free.extensions.FreeApplicativeApplicative
 import arrow.free.extensions.FreeApplicativeEq
 import arrow.free.extensions.freeapplicative.applicative.applicative
 import arrow.free.extensions.freeapplicative.eq.eq
@@ -27,7 +27,7 @@ sealed class OpsAp<out A> : Kind<OpsAp.F, A> {
   data class Add(val a: Int, val y: Int) : OpsAp<Int>()
   data class Subtract(val a: Int, val y: Int) : OpsAp<Int>()
 
-  companion object : FreeApplicativeApplicativeInstance<F> {
+  companion object : FreeApplicativeApplicative<F> {
     fun value(n: Int): FreeApplicative<F, Int> = FreeApplicative.liftF(Value(n))
     fun add(n: Int, y: Int): FreeApplicative<F, Int> = FreeApplicative.liftF(Add(n, y))
     fun subtract(n: Int, y: Int): FreeApplicative<F, Int> = FreeApplicative.liftF(Subtract(n, y))

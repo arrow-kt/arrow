@@ -4,7 +4,7 @@ import arrow.core.extensions.eq
 import arrow.data.SetK
 import arrow.data.extensions.setk.eq.eq
 import arrow.optics.AndMonoid
-import arrow.optics.extensions.SetAtInstance
+import arrow.optics.extensions.SetAt
 import arrow.optics.extensions.setk.at.at
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
@@ -31,7 +31,7 @@ class SetInstanceTest : UnitSpec() {
     ))
 
     testLaws(LensLaws.laws(
-      lens = SetAtInstance<String>().at(Gen.string().generate()),
+      lens = SetAt<String>().at(Gen.string().generate()),
       aGen = Gen.set(Gen.string()),
       bGen = Gen.bool(),
       funcGen = genFunctionAToB(Gen.bool()),

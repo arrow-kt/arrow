@@ -12,13 +12,13 @@ import arrow.undocumented
 
 @extension
 @undocumented
-interface MapKFunctorInstance<K> : Functor<MapKPartialOf<K>> {
+interface MapKFunctor<K> : Functor<MapKPartialOf<K>> {
   override fun <A, B> Kind<MapKPartialOf<K>, A>.map(f: (A) -> B): MapK<K, B> = fix().map(f)
 }
 
 @extension
 @undocumented
-interface MapKFoldableInstance<K> : Foldable<MapKPartialOf<K>> {
+interface MapKFoldable<K> : Foldable<MapKPartialOf<K>> {
 
   override fun <A, B> Kind<MapKPartialOf<K>, A>.foldLeft(b: B, f: (B, A) -> B): B = fix().foldLeft(b, f)
 
@@ -28,14 +28,14 @@ interface MapKFoldableInstance<K> : Foldable<MapKPartialOf<K>> {
 
 @extension
 @undocumented
-interface MapKTraverseInstance<K> : Traverse<MapKPartialOf<K>>, MapKFoldableInstance<K> {
+interface MapKTraverse<K> : Traverse<MapKPartialOf<K>>, MapKFoldable<K> {
 
   override fun <G, A, B> MapKOf<K, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, MapKOf<K, B>> =
     fix().traverse(AP, f)
 }
 
 @extension
-interface MapKSemigroupInstance<K, A> : Semigroup<MapK<K, A>> {
+interface MapKSemigroup<K, A> : Semigroup<MapK<K, A>> {
 
   fun SG(): Semigroup<A>
 
@@ -47,7 +47,7 @@ interface MapKSemigroupInstance<K, A> : Semigroup<MapK<K, A>> {
 }
 
 @extension
-interface MapKMonoidInstance<K, A> : Monoid<MapK<K, A>>, MapKSemigroupInstance<K, A> {
+interface MapKMonoid<K, A> : Monoid<MapK<K, A>>, MapKSemigroup<K, A> {
 
   override fun SG(): Semigroup<A>
 
@@ -55,7 +55,7 @@ interface MapKMonoidInstance<K, A> : Monoid<MapK<K, A>>, MapKSemigroupInstance<K
 }
 
 @extension
-interface MapKEqInstance<K, A> : Eq<MapK<K, A>> {
+interface MapKEq<K, A> : Eq<MapK<K, A>> {
 
   fun EQK(): Eq<K>
 
@@ -73,13 +73,13 @@ interface MapKEqInstance<K, A> : Eq<MapK<K, A>> {
 }
 
 @extension
-interface MapKShowInstance<K, A> : Show<MapK<K, A>> {
+interface MapKShow<K, A> : Show<MapK<K, A>> {
   override fun MapK<K, A>.show(): String =
     toString()
 }
 
 @extension
-interface MapKHashInstance<K, A> : Hash<MapK<K, A>>, MapKEqInstance<K, A> {
+interface MapKHash<K, A> : Hash<MapK<K, A>>, MapKEq<K, A> {
   fun HK(): Hash<K>
   fun HA(): Hash<A>
 

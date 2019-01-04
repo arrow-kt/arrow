@@ -3,8 +3,8 @@ package arrow.mtl.extensions
 import arrow.Kind
 import arrow.data.Kleisli
 import arrow.data.KleisliPartialOf
-import arrow.data.extensions.KleisliMonadErrorInstance
-import arrow.data.extensions.KleisliMonadInstance
+import arrow.data.extensions.KleisliMonadError
+import arrow.data.extensions.KleisliMonad
 import arrow.data.fix
 
 import arrow.extension
@@ -13,7 +13,7 @@ import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 
 @extension
-interface KleisliMonadReaderInstance<F, D> : MonadReader<KleisliPartialOf<F, D>, D>, KleisliMonadInstance<F, D> {
+interface KleisliMonadReader<F, D> : MonadReader<KleisliPartialOf<F, D>, D>, KleisliMonad<F, D> {
 
   override fun MF(): Monad<F>
 
@@ -22,7 +22,7 @@ interface KleisliMonadReaderInstance<F, D> : MonadReader<KleisliPartialOf<F, D>,
   override fun <A> Kind<KleisliPartialOf<F, D>, A>.local(f: (D) -> D): Kleisli<F, D, A> = fix().local(f)
 }
 
-class KleisliMtlContext<F, D, E>(val MF: MonadError<F, E>) : KleisliMonadReaderInstance<F, D>, KleisliMonadErrorInstance<F, D, E> {
+class KleisliMtlContext<F, D, E>(val MF: MonadError<F, E>) : KleisliMonadReader<F, D>, KleisliMonadError<F, D, E> {
 
   override fun MF(): Monad<F> = MF
 

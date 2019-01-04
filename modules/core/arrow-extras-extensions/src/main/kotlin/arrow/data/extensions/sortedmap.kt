@@ -6,15 +6,15 @@ import arrow.data.*
 
 import arrow.typeclasses.*
 
-interface SortedMapKFunctorInstance<A : Comparable<A>> : Functor<SortedMapKPartialOf<A>> {
+interface SortedMapKFunctor<A : Comparable<A>> : Functor<SortedMapKPartialOf<A>> {
   override fun <B, C> SortedMapKOf<A, B>.map(f: (B) -> C): SortedMapK<A, C> =
     fix().map(f)
 }
 
-fun <A : Comparable<A>> SortedMapK.Companion.functor(): SortedMapKFunctorInstance<A> =
-  object : SortedMapKFunctorInstance<A> {}
+fun <A : Comparable<A>> SortedMapK.Companion.functor(): SortedMapKFunctor<A> =
+  object : SortedMapKFunctor<A> {}
 
-interface SortedMapKFoldableInstance<A : Comparable<A>> : Foldable<SortedMapKPartialOf<A>> {
+interface SortedMapKFoldable<A : Comparable<A>> : Foldable<SortedMapKPartialOf<A>> {
   override fun <B, C> SortedMapKOf<A, B>.foldLeft(b: C, f: (C, B) -> C): C =
     fix().foldLeft(b, f)
 
@@ -22,18 +22,18 @@ interface SortedMapKFoldableInstance<A : Comparable<A>> : Foldable<SortedMapKPar
     fix().foldRight(lb, f)
 }
 
-fun <A : Comparable<A>> SortedMapK.Companion.foldable(): SortedMapKFoldableInstance<A> =
-  object : SortedMapKFoldableInstance<A> {}
+fun <A : Comparable<A>> SortedMapK.Companion.foldable(): SortedMapKFoldable<A> =
+  object : SortedMapKFoldable<A> {}
 
-interface SortedMapKTraverseInstance<A : Comparable<A>> : Traverse<SortedMapKPartialOf<A>>, SortedMapKFoldableInstance<A> {
+interface SortedMapKTraverse<A : Comparable<A>> : Traverse<SortedMapKPartialOf<A>>, SortedMapKFoldable<A> {
   override fun <G, B, C> SortedMapKOf<A, B>.traverse(AP: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, Kind<SortedMapKPartialOf<A>, C>> =
     fix().traverse(AP, f)
 }
 
-fun <A : Comparable<A>> SortedMapK.Companion.traverse(): SortedMapKTraverseInstance<A> =
-  object : SortedMapKTraverseInstance<A> {}
+fun <A : Comparable<A>> SortedMapK.Companion.traverse(): SortedMapKTraverse<A> =
+  object : SortedMapKTraverse<A> {}
 
-interface SortedMapKSemigroupInstance<A : Comparable<A>, B> : Semigroup<SortedMapKOf<A, B>> {
+interface SortedMapKSemigroup<A : Comparable<A>, B> : Semigroup<SortedMapKOf<A, B>> {
   fun SG(): Semigroup<B>
 
   override fun SortedMapKOf<A, B>.combine(b: SortedMapKOf<A, B>): SortedMapKOf<A, B> =
@@ -43,24 +43,24 @@ interface SortedMapKSemigroupInstance<A : Comparable<A>, B> : Semigroup<SortedMa
     else b.fix().foldLeft<B>(this.fix()) { my: SortedMapK<A, B>, (k, a) -> my.updated(k, SG().run { a.maybeCombine(my[k]) }) }
 }
 
-fun <A : Comparable<A>, B> SortedMapK.Companion.semigroup(SB: Semigroup<B>): SortedMapKSemigroupInstance<A, B> =
-  object : SortedMapKSemigroupInstance<A, B> {
+fun <A : Comparable<A>, B> SortedMapK.Companion.semigroup(SB: Semigroup<B>): SortedMapKSemigroup<A, B> =
+  object : SortedMapKSemigroup<A, B> {
     override fun SG(): Semigroup<B> = SB
   }
 
-interface SortedMapKMonoidInstance<A : Comparable<A>, B> : Monoid<SortedMapKOf<A, B>>, SortedMapKSemigroupInstance<A, B> {
+interface SortedMapKMonoid<A : Comparable<A>, B> : Monoid<SortedMapKOf<A, B>>, SortedMapKSemigroup<A, B> {
   override fun empty(): SortedMapK<A, B> = sortedMapOf<A, B>().k()
 }
 
-fun <A : Comparable<A>, B> SortedMapK.Companion.monoid(SB: Semigroup<B>): SortedMapKMonoidInstance<A, B> =
-  object : SortedMapKMonoidInstance<A, B> {
+fun <A : Comparable<A>, B> SortedMapK.Companion.monoid(SB: Semigroup<B>): SortedMapKMonoid<A, B> =
+  object : SortedMapKMonoid<A, B> {
     override fun SG(): Semigroup<B> = SB
   }
 
-interface SortedMapKShowInstance<A : Comparable<A>, B> : Show<SortedMapKOf<A, B>> {
+interface SortedMapKShow<A : Comparable<A>, B> : Show<SortedMapKOf<A, B>> {
   override fun SortedMapKOf<A, B>.show(): String =
     toString()
 }
 
-fun <A : Comparable<A>, B> SortedMapK.Companion.show(): SortedMapKShowInstance<A, B> =
-  object : SortedMapKShowInstance<A, B> {}
+fun <A : Comparable<A>, B> SortedMapK.Companion.show(): SortedMapKShow<A, B> =
+  object : SortedMapKShow<A, B> {}

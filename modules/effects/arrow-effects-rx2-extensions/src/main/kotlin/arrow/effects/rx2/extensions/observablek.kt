@@ -15,13 +15,13 @@ import arrow.typeclasses.*
 import kotlin.coroutines.CoroutineContext
 
 @extension
-interface ObservableKFunctorInstance : Functor<ForObservableK> {
+interface ObservableKFunctor : Functor<ForObservableK> {
   override fun <A, B> ObservableKOf<A>.map(f: (A) -> B): ObservableK<B> =
     fix().map(f)
 }
 
 @extension
-interface ObservableKApplicativeInstance : Applicative<ForObservableK> {
+interface ObservableKApplicative : Applicative<ForObservableK> {
   override fun <A, B> ObservableKOf<A>.ap(ff: ObservableKOf<(A) -> B>): ObservableK<B> =
     fix().ap(ff)
 
@@ -33,7 +33,7 @@ interface ObservableKApplicativeInstance : Applicative<ForObservableK> {
 }
 
 @extension
-interface ObservableKMonadInstance : Monad<ForObservableK> {
+interface ObservableKMonad : Monad<ForObservableK> {
   override fun <A, B> ObservableKOf<A>.ap(ff: ObservableKOf<(A) -> B>): ObservableK<B> =
     fix().ap(ff)
 
@@ -51,7 +51,7 @@ interface ObservableKMonadInstance : Monad<ForObservableK> {
 }
 
 @extension
-interface ObservableKFoldableInstance : Foldable<ForObservableK> {
+interface ObservableKFoldable : Foldable<ForObservableK> {
   override fun <A, B> ObservableKOf<A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
 
@@ -60,7 +60,7 @@ interface ObservableKFoldableInstance : Foldable<ForObservableK> {
 }
 
 @extension
-interface ObservableKTraverseInstance : Traverse<ForObservableK> {
+interface ObservableKTraverse : Traverse<ForObservableK> {
   override fun <A, B> ObservableKOf<A>.map(f: (A) -> B): ObservableK<B> =
     fix().map(f)
 
@@ -75,9 +75,9 @@ interface ObservableKTraverseInstance : Traverse<ForObservableK> {
 }
 
 @extension
-interface ObservableKApplicativeErrorInstance :
+interface ObservableKApplicativeError :
   ApplicativeError<ForObservableK, Throwable>,
-  ObservableKApplicativeInstance {
+  ObservableKApplicative{
   override fun <A> raiseError(e: Throwable): ObservableK<A> =
     ObservableK.raiseError(e)
 
@@ -86,9 +86,9 @@ interface ObservableKApplicativeErrorInstance :
 }
 
 @extension
-interface ObservableKMonadErrorInstance :
+interface ObservableKMonadError :
   MonadError<ForObservableK, Throwable>,
-  ObservableKMonadInstance {
+  ObservableKMonad{
   override fun <A> raiseError(e: Throwable): ObservableK<A> =
     ObservableK.raiseError(e)
 
@@ -97,22 +97,22 @@ interface ObservableKMonadErrorInstance :
 }
 
 @extension
-interface ObservableKMonadThrowInstance : MonadThrow<ForObservableK>, ObservableKMonadErrorInstance
+interface ObservableKMonadThrow: MonadThrow<ForObservableK>, ObservableKMonadError
 
 @extension
-interface ObservableKBracketInstance : Bracket<ForObservableK, Throwable>, ObservableKMonadThrowInstance {
+interface ObservableKBracket: Bracket<ForObservableK, Throwable>, ObservableKMonadThrow {
   override fun <A, B> ObservableKOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> ObservableKOf<Unit>, use: (A) -> ObservableKOf<B>): ObservableK<B> =
     fix().bracketCase({ use(it) }, { a, e -> release(a, e) })
 }
 
 @extension
-interface ObservableKMonadDeferInstance : MonadDefer<ForObservableK>, ObservableKBracketInstance {
+interface ObservableKMonadDefer: MonadDefer<ForObservableK>, ObservableKBracket {
   override fun <A> defer(fa: () -> ObservableKOf<A>): ObservableK<A> =
     ObservableK.defer(fa)
 }
 
 @extension
-interface ObservableKAsyncInstance : Async<ForObservableK>, ObservableKMonadDeferInstance {
+interface ObservableKAsync: Async<ForObservableK>, ObservableKMonadDefer {
   override fun <A> async(fa: Proc<A>): ObservableK<A> =
     ObservableK.async { _, cb -> fa(cb) }
 
@@ -124,37 +124,37 @@ interface ObservableKAsyncInstance : Async<ForObservableK>, ObservableKMonadDefe
 }
 
 @extension
-interface ObservableKEffectInstance : Effect<ForObservableK>, ObservableKAsyncInstance {
+interface ObservableKEffect: Effect<ForObservableK>, ObservableKAsync {
   override fun <A> ObservableKOf<A>.runAsync(cb: (Either<Throwable, A>) -> ObservableKOf<Unit>): ObservableK<Unit> =
     fix().runAsync(cb)
 }
 
 @extension
-interface ObservableKConcurrentEffectInstance : ConcurrentEffect<ForObservableK>, ObservableKEffectInstance {
+interface ObservableKConcurrentEffect: ConcurrentEffect<ForObservableK>, ObservableKEffect {
   override fun <A> ObservableKOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> ObservableKOf<Unit>): ObservableK<Disposable> =
     fix().runAsyncCancellable(cb)
 }
 
-fun ObservableK.Companion.monadFlat(): ObservableKMonadInstance = monad()
+fun ObservableK.Companion.monadFlat(): ObservableKMonad = monad()
 
-fun ObservableK.Companion.monadConcat(): ObservableKMonadInstance = object : ObservableKMonadInstance {
+fun ObservableK.Companion.monadConcat(): ObservableKMonad = object : ObservableKMonad{
   override fun <A, B> ObservableKOf<A>.flatMap(f: (A) -> ObservableKOf<B>): ObservableK<B> =
     fix().concatMap { f(it).fix() }
 }
 
-fun ObservableK.Companion.monadSwitch(): ObservableKMonadInstance = object : ObservableKMonadErrorInstance {
+fun ObservableK.Companion.monadSwitch(): ObservableKMonad = object : ObservableKMonadError{
   override fun <A, B> ObservableKOf<A>.flatMap(f: (A) -> ObservableKOf<B>): ObservableK<B> =
     fix().switchMap { f(it).fix() }
 }
 
-fun ObservableK.Companion.monadErrorFlat(): ObservableKMonadErrorInstance = monadError()
+fun ObservableK.Companion.monadErrorFlat(): ObservableKMonadError = monadError()
 
-fun ObservableK.Companion.monadErrorConcat(): ObservableKMonadErrorInstance = object : ObservableKMonadErrorInstance {
+fun ObservableK.Companion.monadErrorConcat(): ObservableKMonadError = object : ObservableKMonadError{
   override fun <A, B> ObservableKOf<A>.flatMap(f: (A) -> ObservableKOf<B>): ObservableK<B> =
     fix().concatMap { f(it).fix() }
 }
 
-fun ObservableK.Companion.monadErrorSwitch(): ObservableKMonadErrorInstance = object : ObservableKMonadErrorInstance {
+fun ObservableK.Companion.monadErrorSwitch(): ObservableKMonadError = object : ObservableKMonadError{
   override fun <A, B> ObservableKOf<A>.flatMap(f: (A) -> ObservableKOf<B>): ObservableK<B> =
     fix().switchMap { f(it).fix() }
 }
