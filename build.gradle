@@ -236,15 +236,15 @@ dependencyUpdates {
             .findAll { dependency -> dependenciesToCheck.any { it == "${dependency.group}:${dependency.name}" } }
 
         final isRejected = dependencies
-            .any { dependency -> disallowedQualifiers.any(isDisallowed(dependency)) }
+                .any { dependency -> disallowedQualifiers.any(isDisallowed(dependency)) }
 
         if (isRejected) {
             final title = "\nError: Kotlin and Coroutines must depends on release version!"
             final message = dependencies
-                .inject(title) { acc, dependency ->
-                    "$acc\n${dependency.group}:${dependency.name}:${dependency.version}"
-                }
-            
+                    .inject(title) { acc, dependency ->
+                "$acc\n${dependency.group}:${dependency.name}:${dependency.version}"
+            }
+
             throw new GradleException(message)
         }
     }
