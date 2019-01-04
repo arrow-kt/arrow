@@ -63,11 +63,11 @@ fun genLessThan(max: Int) : Gen<Int> = Gen.int().filter { it < max }
 
 fun genLessEqual(max: Int) : Gen<Int> = Gen.int().filter { it <= max }
 
+fun genGreaterThan(min: Int): Gen<Int> = Gen.int().filter { it > min }
+
 fun genGreaterEqual(min: Int) : Gen<Int> = Gen.int().filter { it >= min }
 
 fun genGreaterOrEqThan(max: Int) : Gen<Int> = Gen.int().filter { it >= max }
-
-fun genGreater(min: Int): Gen<Int> = Gen.int().filter { it > min }
 
 fun genIntPredicate(): Gen<(Int) -> Boolean> =
   genNonZeroInt().flatMap { num ->

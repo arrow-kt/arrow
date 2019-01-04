@@ -2,7 +2,7 @@ package arrow.validation.refinedTypes.numeric
 
 import arrow.core.extensions.order
 import arrow.test.UnitSpec
-import arrow.test.generators.genGreater
+import arrow.test.generators.genGreaterThan
 import arrow.test.generators.genLessEqual
 import arrow.validation.refinedTypes.numeric.validated.lessEqual.lessEqual
 import io.kotlintest.properties.forAll
@@ -22,7 +22,7 @@ class LessEqualTest : UnitSpec() {
     }
 
     "Can not create LessEqual for any number greater than min defined by instance" {
-      forAll(genGreater(max)) { x: Int ->
+      forAll(genGreaterThan(max)) { x: Int ->
         x.lessEqual(Int.order(), max).isInvalid
       }
     }

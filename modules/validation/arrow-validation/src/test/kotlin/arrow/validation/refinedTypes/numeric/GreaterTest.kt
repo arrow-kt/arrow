@@ -2,7 +2,7 @@ package arrow.validation.refinedTypes.numeric
 
 import arrow.core.extensions.order
 import arrow.test.UnitSpec
-import arrow.test.generators.genGreater
+import arrow.test.generators.genGreaterThan
 import arrow.test.generators.genLessEqual
 import arrow.validation.refinedTypes.numeric.validated.greater.greater
 import io.kotlintest.properties.forAll
@@ -15,7 +15,7 @@ class GreaterTest : UnitSpec() {
     val min = 100
 
     "Can create Greater for every number greater than the min defined by instace" {
-      forAll(genGreater(min)) { x: Int ->
+      forAll(genGreaterThan(min)) { x: Int ->
         x.greater(Int.order(), min).isValid
       }
     }
