@@ -3,6 +3,8 @@ package arrow.effects
 import arrow.effects.extensions.io.monadDefer.monadDefer
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
+import arrow.test.generators.genGreaterEqual
+import arrow.test.generators.genLessThan
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.runner.junit4.KotlinTestRunner
@@ -125,7 +127,7 @@ class RefTest : UnitSpec() {
       }
 
       "tryUpdate fail concurrent modification" {
-        forAll(Gen.int(), Gen.int(), genFunctionAToB<Int, Int>(Gen.int())) { a, b, f ->
+        forAll(genGreaterEqual(0), genLessThan(0), genFunctionAToB<Int, Int>(Gen.int())) { a, b, f ->
           Ref.of(a, iom).flatMap { ref ->
             ref.tryUpdate {
               ref.set(b).fix().unsafeRunSync()
