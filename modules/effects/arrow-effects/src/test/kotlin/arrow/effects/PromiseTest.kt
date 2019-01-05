@@ -30,7 +30,7 @@ class PromiseTest : UnitSpec() {
         forAll(Gen.int()) { i ->
           promise().flatMap { p ->
             p.complete(i).flatMap {
-              p.get
+              p.get()
             }
           }.equalUnderTheLaw(IO.just(i), EQ())
         }
@@ -45,8 +45,8 @@ class PromiseTest : UnitSpec() {
           val task = binding {
             val p = Promise.uncancelable<ForIO, Unit>(IO.async()).bind()
             val latch = Promise.uncancelable<ForIO, Unit>(IO.async()).bind()
-            val fb = latch.complete(Unit).flatMap { p.get.flatMap { foreverAsync(0) } }.startF(Dispatchers.Default).bind()
-            latch.get.bind()
+            val fb = latch.complete(Unit).flatMap { p.get().flatMap { foreverAsync(0) } }.startF(Dispatchers.Default).bind()
+            latch.get().bind()
             p.complete(Unit).guarantee(fb.cancel()).bind()
             true
           }
@@ -66,26 +66,26 @@ class PromiseTest : UnitSpec() {
             val p = promise().bind()
             p.complete(a).bind()
             p.complete(b).bind()
-            p.get.bind()
+            p.get().bind()
           }.equalUnderTheLaw(IO.raiseError(Promise.AlreadyFulfilled), EQ())
         }
       }
 
-      "$label - get blocks until set" {
+      "$label - get() blocks until set" {
         binding {
           val state = Ref.of(0, IO.monadDefer()).bind()
           val modifyGate = promise().bind()
           val readGate = promise().bind()
-          modifyGate.get.flatMap { state.update { i -> i * 2 }.flatMap { readGate.complete(1) } }.startF(ctx).bind()
+          modifyGate.get().flatMap { state.update { i -> i * 2 }.flatMap { readGate.complete(1) } }.startF(ctx).bind()
           state.set(1).flatMap { modifyGate.complete(1) }.startF(ctx).bind()
-          readGate.get.bind()
+          readGate.get().bind()
           state.get().bind()
         }.unsafeRunSync() shouldBe 2
       }
 
       "$label - tryGet before completing" {
         promise().flatMap { p ->
-          p.tryGet
+          p.tryGet()
         }.equalUnderTheLaw(IO.just(None), EQ())
       }
 
@@ -93,7 +93,7 @@ class PromiseTest : UnitSpec() {
         forAll(Gen.int()) { i ->
           promise().flatMap { p ->
             p.complete(i).flatMap {
-              p.tryGet
+              p.tryGet()
             }
           }.equalUnderTheLaw(IO.just(Some(i)), EQ())
         }
@@ -103,7 +103,7 @@ class PromiseTest : UnitSpec() {
         forAll(Gen.int()) { i ->
           binding {
             val p = promise().bind()
-            p.tryComplete(i).bind() toT p.get.bind()
+            p.tryComplete(i).bind() toT p.get().bind()
           }.equalUnderTheLaw(IO.just(true toT i), EQ())
         }
       }
@@ -113,7 +113,7 @@ class PromiseTest : UnitSpec() {
           binding {
             val p = promise().bind()
             p.complete(a).bind()
-            p.tryComplete(b).bind() toT p.get.bind()
+            p.tryComplete(b).bind() toT p.get().bind()
           }.equalUnderTheLaw(IO.just(false toT a), EQ())
         }
       }
@@ -131,7 +131,7 @@ class PromiseTest : UnitSpec() {
             val p = promise().bind()
             p.complete(i).bind()
             p.error(t).bind()
-            p.get.bind()
+            p.get().bind()
           }.equalUnderTheLaw(IO.raiseError(Promise.AlreadyFulfilled), EQ())
         }
       }
@@ -141,7 +141,7 @@ class PromiseTest : UnitSpec() {
           binding {
             val p = promise().bind()
             p.complete(i).bind()
-            p.tryError(t).bind() toT p.get.bind()
+            p.tryError(t).bind() toT p.get().bind()
           }.equalUnderTheLaw(IO.just(false toT i), EQ())
         }
       }
@@ -151,20 +151,19 @@ class PromiseTest : UnitSpec() {
           binding {
             val p = promise().bind()
             p.tryError(t).bind()
-            p.get.bind()
+            p.get().bind()
           }.equalUnderTheLaw(IO.raiseError(t), EQ())
         }
       }
 
     }
 
-
     tests("UncancelablePromise") { Promise.uncancelable(IO.async()) }
     tests("CancelablePromise") { Promise(IO.concurrent()) }
 
-    "CancelablePromise - supports cancellation of get" {
+    "CancelablePromise - supports cancellation of get()" {
       Promise<ForIO, Unit>(IO.concurrent()).flatMap { p ->
-        p.get
+        p.get()
       }
         .unsafeRunAsyncCancellable { }
         .invoke()

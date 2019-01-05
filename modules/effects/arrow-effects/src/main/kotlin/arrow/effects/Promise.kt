@@ -43,7 +43,7 @@ interface Promise<F, A> {
    * }
    * ```
    */
-  val get: Kind<F, A>
+  fun get(): Kind<F, A>
 
   /**
    * Try get the promised value, it returns [None] if promise is not fulfilled yet.
@@ -73,7 +73,7 @@ interface Promise<F, A> {
    * }
    * ```
    */
-  val tryGet: Kind<F, Option<A>>
+  fun tryGet(): Kind<F, Option<A>>
 
   /**
    * Completes, or fulfills, the promise with the specified value [A].
@@ -284,35 +284,33 @@ internal class CancelablePromise<F, A>(CF: Concurrent<F>) : Promise<F, A>, Concu
 
   private val state: AtomicReference<State<A>> = AtomicReference(State.Pending(emptyMap()))
 
-  override val get: Kind<F, A>
-    get() = defer {
-      when (val current = state.get()) {
-        is State.Full -> just(current.value)
-        is State.Pending -> cancelable { cb ->
-          val id = unsafeRegister(cb)
-          tailrec fun unregister(): Unit = when (val current = state.get()) {
-            is State.Full -> Unit
-            is State.Error -> Unit
-            is State.Pending -> {
-              val updated = State.Pending(current.joiners - id)
-              if (state.compareAndSet(current, updated)) Unit
-              else unregister()
-            }
+  override fun get(): Kind<F, A> = defer {
+    when (val current = state.get()) {
+      is State.Full -> just(current.value)
+      is State.Pending -> cancelable { cb ->
+        val id = unsafeRegister(cb)
+        tailrec fun unregister(): Unit = when (val current = state.get()) {
+          is State.Full -> Unit
+          is State.Error -> Unit
+          is State.Pending -> {
+            val updated = State.Pending(current.joiners - id)
+            if (state.compareAndSet(current, updated)) Unit
+            else unregister()
           }
-          delay { unregister() }
         }
-        is State.Error -> raiseError(current.throwable)
+        delay { unregister() }
       }
+      is State.Error -> raiseError(current.throwable)
     }
+  }
 
-  override val tryGet: Kind<F, Option<A>>
-    get() = delay {
-      when (val current = state.get()) {
-        is State.Full -> Some(current.value)
-        is State.Pending -> None
-        is State.Error -> None
-      }
+  override fun tryGet(): Kind<F, Option<A>> = delay {
+    when (val current = state.get()) {
+      is State.Full -> Some(current.value)
+      is State.Pending -> None
+      is State.Error -> None
     }
+  }
 
   override fun complete(a: A): Kind<F, Unit> =
     tryComplete(a).flatMap { didComplete ->
@@ -399,21 +397,19 @@ internal class UncancelablePromise<F, A>(AS: Async<F>) : Promise<F, A>, Async<F>
 
   private val state: AtomicReference<State<A>> = AtomicReference(State.Pending(emptyList()))
 
-  override val get: Kind<F, A> = async { k: (Either<Throwable, A>) -> Unit ->
+  override fun get(): Kind<F, A> = async { k: (Either<Throwable, A>) -> Unit ->
     calculateNewGetState(k)
     loop(k)
   }
 
-  private tailrec fun loop(k: (Either<Throwable, A>) -> Unit): Unit {
-    val st = state.get()
-    when (st) {
+  private tailrec fun loop(k: (Either<Throwable, A>) -> Unit): Unit =
+    when (val st = state.get()) {
       is State.Pending<A> -> {
         loop(k)
       }
       is State.Full -> k(Right(st.value))
       is State.Error -> k(Left(st.throwable))
     }
-  }
 
   private tailrec fun calculateNewGetState(k: (Either<Throwable, A>) -> Unit): Unit {
     val oldState = state.get()
@@ -425,15 +421,13 @@ internal class UncancelablePromise<F, A>(AS: Async<F>) : Promise<F, A>, Async<F>
     return if (state.compareAndSet(oldState, newState)) Unit else calculateNewGetState(k)
   }
 
-  override val tryGet: Kind<F, Option<A>>
-    get() {
-      val oldState = state.get()
-      return when (oldState) {
-        is State.Full -> just(Some(oldState.value))
-        is State.Pending<A> -> just(None)
-        is State.Error -> just(None)
-      }
+  override fun tryGet(): Kind<F, Option<A>> =
+    when (val oldState = state.get()) {
+      is State.Full -> just(Some(oldState.value))
+      is State.Pending<A> -> just(None)
+      is State.Error -> just(None)
     }
+
 
   override fun complete(a: A): Kind<F, Unit> =
     tryComplete(a).flatMap { didComplete ->
@@ -441,8 +435,7 @@ internal class UncancelablePromise<F, A>(AS: Async<F>) : Promise<F, A>, Async<F>
     }
 
   override fun tryComplete(a: A): Kind<F, Boolean> = defer {
-    val oldState = state.get()
-    when (oldState) {
+    when (val oldState = state.get()) {
       is State.Pending -> {
         calculateNewTryCompleteState(a)
         just(true)

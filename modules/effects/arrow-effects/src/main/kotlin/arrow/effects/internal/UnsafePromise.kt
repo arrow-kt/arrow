@@ -11,19 +11,18 @@ internal class UnsafePromise<A> : Promise<ForId, A> {
 
   private val state: AtomicReference<State<A>> = AtomicReference(State.Pending(emptyList()))
 
-  override val get: Id<A>
-    get() {
-      tailrec fun loop(): Id<A> = when (val st = state.get()) {
-        is State.Pending<A> -> loop()
-        is State.Full -> Id(st.value)
-        is State.Error -> throw st.throwable
-      }
-
-      return loop()
+  override fun get(): Id<A> {
+    tailrec fun loop(): Id<A> = when (val st = state.get()) {
+      is State.Pending<A> -> loop()
+      is State.Full -> Id(st.value)
+      is State.Error -> throw st.throwable
     }
 
-  override val tryGet: Kind<ForId, Option<A>>
-    get() = when (val oldState = state.get()) {
+    return loop()
+  }
+
+  override fun tryGet(): Kind<ForId, Option<A>> =
+    when (val oldState = state.get()) {
       is State.Pending<A> -> Id(None)
       is State.Full -> Id(Some(oldState.value))
       is State.Error -> Id(None)

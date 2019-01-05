@@ -131,7 +131,7 @@ class ObservableKTests : UnitSpec() {
           ObservableK.async<Unit> { conn, _ ->
             conn.push(latch.complete(Unit))
           }.observable.subscribe().dispose()
-        }.flatMap { latch.get }
+        }.flatMap { latch.get() }
       }.value()
         .test()
         .assertValue(Unit)
@@ -147,7 +147,7 @@ class ObservableKTests : UnitSpec() {
               .doOnDispose { latch.complete(Unit).value().subscribe() }
               .subscribe()
               .dispose()
-          }.flatMap { latch.get }
+          }.flatMap { latch.get() }
         }.observable
         .test()
         .assertValue(Unit)
@@ -161,7 +161,7 @@ class ObservableKTests : UnitSpec() {
           ObservableK.async<Unit> { conn, _ ->
             conn.push(latch.complete(Unit))
           }.observable.subscribe().dispose()
-        }.flatMap { latch.get }
+        }.flatMap { latch.get() }
       }.value()
         .test()
         .assertValue(Unit)

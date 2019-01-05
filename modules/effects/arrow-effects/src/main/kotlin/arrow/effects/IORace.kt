@@ -155,7 +155,7 @@ internal class CompositeFailure(first: Throwable, second: Throwable) :
 internal fun <A> Fiber(promise: Promise<ForId, Either<Throwable, A>>, conn: IOConnection): Fiber<ForIO, A> {
   val join: IO<A> = IO.defer {
     try {
-      promise.get.value().fold(
+      promise.get().value().fold(
         { IO.raiseError<A>(it) },
         { IO.just(it) }
       )

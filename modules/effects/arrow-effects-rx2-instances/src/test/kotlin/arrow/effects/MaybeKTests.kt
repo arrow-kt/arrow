@@ -155,7 +155,7 @@ class MaybeKTests : UnitSpec() {
           MaybeK.async<Unit> { conn, _ ->
             conn.push(latch.complete(Unit))
           }.maybe.subscribe().dispose()
-        }.flatMap { latch.get }
+        }.flatMap { latch.get() }
       }.value()
         .test()
         .assertValue(Unit)
@@ -171,7 +171,7 @@ class MaybeKTests : UnitSpec() {
               .doOnDispose { latch.complete(Unit).value().subscribe() }
               .subscribe()
               .dispose()
-          }.flatMap { latch.get }
+          }.flatMap { latch.get() }
         }.value()
         .test()
         .assertValue(Unit)

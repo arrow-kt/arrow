@@ -155,7 +155,7 @@ class FlowableKTests : UnitSpec() {
           FlowableK.async<Unit>(fa = { conn, _ ->
             conn.push(latch.complete(Unit))
           }).flowable.subscribe().dispose()
-        }.flatMap { latch.get }
+        }.flatMap { latch.get() }
       }.value()
         .test()
         .assertValue(Unit)
@@ -171,7 +171,7 @@ class FlowableKTests : UnitSpec() {
               .doOnCancel { latch.complete(Unit).value().subscribe() }
               .subscribe()
               .dispose()
-          }.flatMap { latch.get }
+          }.flatMap { latch.get() }
         }.value()
     }
 
@@ -181,7 +181,7 @@ class FlowableKTests : UnitSpec() {
           FlowableK.async<Unit>(fa = { conn, _ ->
             conn.push(latch.complete(Unit))
           }).flowable.subscribe().dispose()
-        }.flatMap { latch.get }
+        }.flatMap { latch.get() }
       }.value()
         .test()
         .assertValue(Unit)

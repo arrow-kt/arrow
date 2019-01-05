@@ -156,7 +156,7 @@ class FluxKTest : UnitSpec() {
           FluxK.async<Unit> { conn, _ ->
             conn.push(latch.complete(Unit))
           }.flux.subscribe().dispose()
-        }.flatMap { latch.get }
+        }.flatMap { latch.get() }
       }.value()
         .test()
         .expectNext(Unit)
@@ -172,7 +172,7 @@ class FluxKTest : UnitSpec() {
               .doOnCancel { latch.complete(Unit).value().subscribe() }
               .subscribe()
               .dispose()
-          }.flatMap { latch.get }
+          }.flatMap { latch.get() }
         }.value()
         .test()
         .expectNext(Unit)

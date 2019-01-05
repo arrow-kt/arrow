@@ -268,7 +268,7 @@ internal class DefaultSemaphore<F>(private val state: Ref<F, State<F>>,
         }.flatMap { u ->
           u.fold({ waiting ->
             waiting.lastOrNone()
-              .map { (_, promise) -> promise.get }
+              .map { (_, promise) -> promise.get() }
               .getOrElse { raiseError(RuntimeException("Semaphore has empty waiting queue rather than 0 count")) }
           }, {
             just(Unit)

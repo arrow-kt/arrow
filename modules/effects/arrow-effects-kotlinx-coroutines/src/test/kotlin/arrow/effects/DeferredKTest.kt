@@ -14,12 +14,14 @@ import arrow.instances.option.traverse.traverse
 import arrow.test.UnitSpec
 import arrow.test.generators.genIntSmall
 import arrow.test.laws.AsyncLaws
+import arrow.test.laws.shouldBe
 import arrow.test.laws.throwableEq
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Traverse
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
+import io.kotlintest.matchers.should
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -204,7 +206,7 @@ class DeferredKTest : UnitSpec() {
           conn.push(promise.complete(Unit))
         }.unsafeRunAsyncCancellable { }
           .invoke()
-        promise.get.await()
+        promise.get().await()
       }
     }
 
@@ -219,7 +221,7 @@ class DeferredKTest : UnitSpec() {
           }
         }.unsafeRunAsyncCancellable { }
 
-        latch.get
+        latch.get()
       }
     }
 
@@ -232,7 +234,7 @@ class DeferredKTest : UnitSpec() {
             d.start()
             d.cancel()
             d.join()
-          }.flatMap { latch.get }
+          }.flatMap { latch.get() }
         }.unsafeRunSync() shouldBe Unit
     }
 
@@ -255,7 +257,7 @@ class DeferredKTest : UnitSpec() {
 
             d.start()
             d.cancelAndJoin()
-          }.flatMap { latch.get }
+          }.flatMap { latch.get() }
         }.unsafeRunSync() shouldBe Unit
     }
 

@@ -387,7 +387,7 @@ class IOTest : UnitSpec() {
           .unsafeRunAsyncCancellable { }
           .invoke() //cancel immediately
 
-        p.get
+        p.get()
       }.unsafeRunSync() shouldBe ExitCase.Canceled
     }
 
@@ -399,7 +399,7 @@ class IOTest : UnitSpec() {
           .unsafeRunAsyncCancellable { }
           .invoke()
 
-        p.get
+        p.get()
       }.unsafeRunSync() shouldBe Unit
     }
 
@@ -411,7 +411,7 @@ class IOTest : UnitSpec() {
           .unsafeRunAsyncCancellable { }
           .invoke()
 
-        p.get
+        p.get()
       }.unsafeRunSync() shouldBe Unit
     }
 
@@ -422,7 +422,7 @@ class IOTest : UnitSpec() {
             conn.push(latch.complete(Unit))
           }.unsafeRunAsyncCancellable { }
             .invoke()
-        }.flatMap { latch.get }
+        }.flatMap { latch.get() }
       }.unsafeRunSync()
     }
 
@@ -436,7 +436,7 @@ class IOTest : UnitSpec() {
             conn.cancel().fix().unsafeRunAsync { }
           }
         }.unsafeRunAsyncCancellable { }
-        latch.get
+        latch.get()
       }.unsafeRunSync()
     }
 

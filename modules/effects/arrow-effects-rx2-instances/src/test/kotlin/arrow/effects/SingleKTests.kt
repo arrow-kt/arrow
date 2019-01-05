@@ -141,7 +141,7 @@ class SingleKTests : UnitSpec() {
           SingleK.async<Unit> { conn, _ ->
             conn.push(latch.complete(Unit))
           }.single.subscribe().dispose()
-        }.flatMap { latch.get }
+        }.flatMap { latch.get() }
       }.value()
         .test()
         .assertValue(Unit)
@@ -157,7 +157,7 @@ class SingleKTests : UnitSpec() {
               .doOnDispose { latch.complete(Unit).value().subscribe() }
               .subscribe()
               .dispose()
-          }.flatMap { latch.get }
+          }.flatMap { latch.get() }
         }.value()
         .test()
         .assertValue(Unit)
