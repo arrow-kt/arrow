@@ -182,7 +182,7 @@ class MonoKTest : UnitSpec() {
           MonoK.async<Unit> { conn, _ ->
             conn.push(latch.complete(Unit))
           }.mono.subscribe().dispose()
-        }.flatMap { latch.get }
+        }.flatMap { latch.get() }
       }.value()
         .test()
         .expectNext(Unit)
@@ -198,7 +198,7 @@ class MonoKTest : UnitSpec() {
               .doOnCancel { latch.complete(Unit).value().subscribe() }
               .subscribe()
               .dispose()
-          }.flatMap { latch.get }
+          }.flatMap { latch.get() }
         }.value()
         .test()
         .expectNext(Unit)
