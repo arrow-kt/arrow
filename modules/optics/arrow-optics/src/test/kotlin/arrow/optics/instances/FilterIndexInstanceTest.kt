@@ -80,7 +80,7 @@ class FilterIndexInstanceTest : UnitSpec() {
 
     testLaws(TraversalLaws.laws(
       traversal = MapFilterIndex<Char, Int>().filter { true },
-      aGen = genMapK(genChars(), genIntSmall()),
+      aGen = Gen.map(genChar(), genIntSmall()),
       bGen = Gen.int(),
       funcGen = genFunctionAToB(Gen.int()),
       EQA = Eq.any(),

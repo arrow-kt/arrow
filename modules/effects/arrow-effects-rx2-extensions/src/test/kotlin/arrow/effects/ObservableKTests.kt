@@ -2,14 +2,14 @@ package arrow.effects
 
 import arrow.effects.rx2.*
 import arrow.effects.rx2.extensions.observablek.async.async
-import arrow.effects.rx2.extensions.observablek.foldable.foldable
 import arrow.effects.rx2.extensions.observablek.functor.functor
 import arrow.effects.rx2.extensions.observablek.monad.flatMap
 import arrow.effects.rx2.extensions.observablek.monadThrow.bindingCatch
 import arrow.effects.rx2.extensions.observablek.traverse.traverse
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
-import arrow.test.laws.*
+import arrow.test.laws.AsyncLaws
+import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
@@ -54,7 +54,6 @@ class ObservableKTests : UnitSpec() {
 //    testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ()))
 
     testLaws(
-      FoldableLaws.laws(ObservableK.foldable(), { ObservableK.just(it) }, Eq.any()),
       TraverseLaws.laws(ObservableK.traverse(), ObservableK.functor(), { ObservableK.just(it) }, EQ())
     )
 

@@ -5,11 +5,13 @@ import arrow.core.*
 import arrow.test.generators.genConstructor
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genIntSmall
-import arrow.typeclasses.*
 import io.kotlintest.properties.forAll
 import arrow.core.extensions.const.applicative.applicative
 import arrow.core.extensions.id.applicative.applicative
+import arrow.core.extensions.id.comonad.extract
 import arrow.core.extensions.monoid
+import arrow.core.toT
+import arrow.typeclasses.*
 
 typealias TI<A> = Tuple2<IdOf<A>, IdOf<A>>
 
@@ -48,7 +50,7 @@ object TraverseLaws {
   fun <F> Traverse<F>.identityTraverse(FF: Functor<F>, cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>) = Id.applicative().run {
     val idApp = this
     forAll(genFunctionAToB<Int, Kind<ForId, Int>>(genConstructor(genIntSmall(), ::Id)), genConstructor(genIntSmall(), cf)) { f: (Int) -> Kind<ForId, Int>, fa: Kind<F, Int> ->
-      fa.traverse(idApp, f).value().equalUnderTheLaw(FF.run { fa.map(f).map { it.value() } }, EQ)
+      fa.traverse(idApp, f).extract().equalUnderTheLaw(FF.run { fa.map(f).map { it.extract() } }, EQ)
     }
   }
 
@@ -58,7 +60,7 @@ object TraverseLaws {
 
       val fa = fha.traverse(idApp, f).fix()
       val composed = fa.map { it.traverse(idApp, g) }.value().value()
-      val expected = fha.traverse(ComposedApplicative(idApp, idApp)) { a: Int -> f(a).map(g).nest() }.unnest().value().value()
+      val expected = fha.traverse(ComposedApplicative(idApp, idApp)) { a: Int -> f(a).map(g).nest() }.unnest().extract().extract()
       composed.equalUnderTheLaw(expected, EQ)
     }
   }
@@ -77,9 +79,9 @@ object TraverseLaws {
 
       }
 
-      val TIEQ: Eq<TI<Kind<F, Int>>> = Eq<TI<Kind<F, Int>>> { a, b ->
+      val TIEQ: Eq<TI<Kind<F, Int>>> = Eq { a, b ->
         with(EQ) {
-          a.a.value().eqv(b.a.value()) && a.b.value().eqv(b.b.value())
+          a.a.extract().eqv(b.a.extract()) && a.b.extract().eqv(b.b.extract())
         }
       }
 

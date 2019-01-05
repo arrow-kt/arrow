@@ -14,15 +14,15 @@ import io.kotlintest.properties.forAll
 object FunctorLaws {
 
   fun <F> laws(AP: Applicative<F>, EQ: Eq<Kind<F, Int>>): List<Law> =
-    InvariantLaws.laws(AP, AP::just, EQ) + listOf(
-      Law("Functor Laws: Covariant Identity") { AP.covariantIdentity(AP::just, EQ) },
-      Law("Functor Laws: Covariant Composition") { AP.covariantComposition(AP::just, EQ) }
+    InvariantLaws.laws(AP, AP::just, EQ, "Applicative") + listOf(
+      Law("Functor Laws: Covariant Identity using Applicative") { AP.covariantIdentity(AP::just, EQ) },
+      Law("Functor Laws: Covariant Composition using Applicative") { AP.covariantComposition(AP::just, EQ) }
     )
 
   fun <F> laws(FF: Functor<F>, f: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): List<Law> =
-    InvariantLaws.laws(FF, f, EQ) + listOf(
-      Law("Functor Laws: Covariant Identity") { FF.covariantIdentity(f, EQ) },
-      Law("Functor Laws: Covariant Composition") { FF.covariantComposition(f, EQ) }
+    InvariantLaws.laws(FF, f, EQ, "Functor") + listOf(
+      Law("Functor Laws: Covariant Identity using Functor") { FF.covariantIdentity(f, EQ) },
+      Law("Functor Laws: Covariant Composition using Functor") { FF.covariantComposition(f, EQ) }
     )
 
   fun <F> Functor<F>.covariantIdentity(f: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =

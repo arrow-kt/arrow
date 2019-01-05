@@ -3,9 +3,9 @@ package arrow.test.laws
 import arrow.Kind
 import arrow.core.Eval
 import arrow.core.Id
-import arrow.core.value
-import arrow.core.extensions.monoid
+import arrow.core.extensions.id.comonad.extract
 import arrow.core.extensions.id.monad.monad
+import arrow.core.extensions.monoid
 import arrow.test.concurrency.SideEffect
 import arrow.test.generators.genConstructor
 import arrow.test.generators.genFunctionAToB
@@ -93,7 +93,7 @@ object FoldableLaws {
     forAll(genFunctionAToB<Int, Int>(genIntSmall()), genConstructor(genIntSmall(), cf)) { f: (Int) -> Int, fa: Kind<F, Int> ->
       with(Int.monoid()) {
         val foldL: Int = fa.foldLeft(empty()) { acc, a -> acc.combine(f(a)) }
-        val foldM: Int = fa.foldM(Id.monad(), empty()) { acc, a -> Id(acc.combine(f(a))) }.value()
+        val foldM: Int = fa.foldM(Id.monad(), empty()) { acc, a -> Id(acc.combine(f(a))) }.extract()
         foldM.equalUnderTheLaw(foldL, EQ)
       }
     }

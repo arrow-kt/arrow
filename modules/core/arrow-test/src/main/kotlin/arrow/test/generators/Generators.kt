@@ -3,8 +3,9 @@ package arrow.test.generators
 import arrow.Kind
 import arrow.Kind2
 import arrow.core.*
-import arrow.data.*
+import arrow.core.extensions.option.functor.map
 import arrow.core.extensions.option.functor.functor
+import arrow.data.*
 import arrow.recursion.Algebra
 import arrow.recursion.Coalgebra
 import arrow.recursion.typeclasses.Corecursive
@@ -46,7 +47,7 @@ fun <A, B, C, D, E, F> genTuple(genA: Gen<A>, genB: Gen<B>, genC: Gen<C>, genD: 
   Gen.bind(genA,genB, genC, genD, genE, genF){a:A, b:B, c:C, d:D, e:E, f:F -> Tuple6(a, b, c, d, e, f)}
 
 fun <A, B, C, D, E, F, G> genTuple(genA: Gen<A>, genB: Gen<B>, genC: Gen<C>, genD: Gen<D>, genE: Gen<E>, genF: Gen<F>, genG: Gen<G>): Gen<Tuple7<A, B, C, D, E, F, G>> =
-  Gen.bind(genA,genB, genC, genD, genE, genF, genG){a:A, b:B, c:C, d:D, e:E, f:F, g:G -> Tuple7(a, b, c, d, e, f, g)}
+  Gen.bind(genA,genB, genC, genD, genE, genF, genG){a:A, b:B, c:C, d:D, e:E, f:F, g:G -> Tuple7(a, b, c, d, e, f, g) }
 
 fun <A, B, C, D, E, F, G, H> genTuple(genA: Gen<A>, genB: Gen<B>, genC: Gen<C>, genD: Gen<D>, genE: Gen<E>, genF: Gen<F>, genG: Gen<G>, genH: Gen<H>): Gen<Tuple8<A, B, C, D, E, F, G, H>> =
   Gen.bind(genTuple(genA,genB, genC, genD, genE, genF, genG), genH){ tuple: Tuple7<A, B, C, D, E, F, G>, h:H -> Tuple8(tuple.a, tuple.b, tuple.c, tuple.d, tuple.e, tuple.f, tuple.g, h)}
@@ -119,11 +120,11 @@ fun <A> genSetK(genA: Gen<A>): Gen<SetK<A>> = Gen.set(genA).map{ it.k() }
 typealias NatPattern = ForOption
 typealias GNat<T> = Kind<T, NatPattern>
 
-fun toGNatCoalgebra() = Coalgebra<NatPattern, Int> {
+fun toGNatCoalgebra(): Coalgebra<NatPattern, Int> = Coalgebra{
   if (it == 0) None else Some(it - 1)
 }
 
-fun fromGNatAlgebra() = Algebra<NatPattern, Eval<Int>> {
+fun fromGNatAlgebra(): Algebra<NatPattern, Eval<Int>> = Algebra{
   it.fix().fold({ Eval.Zero }, { it.map { it + 1 } })
 }
 
