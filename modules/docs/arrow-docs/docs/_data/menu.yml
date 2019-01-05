@@ -29,10 +29,10 @@ options:
         url: /docs/apidocs/arrow-core-extensions/
         
       - title: Core Extra Data Types
-        url: /docs/apidocs/arrow-extra-data/
+        url: /docs/apidocs/arrow-extras/
 
       - title: Core Extra Extensions
-        url: /docs/apidocs/arrow-extra-extensions/
+        url: /docs/apidocs/arrow-extras-extensions/
 
       - title: Effects
         url: /docs/apidocs/arrow-effects-data/
