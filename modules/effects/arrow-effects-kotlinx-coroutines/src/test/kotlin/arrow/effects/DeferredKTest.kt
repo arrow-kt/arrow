@@ -21,7 +21,6 @@ import arrow.typeclasses.Functor
 import arrow.typeclasses.Traverse
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.fail
-import io.kotlintest.matchers.should
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -243,7 +242,7 @@ class DeferredKTest : UnitSpec() {
         DeferredK.async<Unit> { conn, _ ->
           conn.cancel().unsafeRunAsync { }
         }.unsafeRunSync()
-      }.fold({ e -> e should { it is arrow.effects.ConnectionCancellationException } },
+      }.fold({ e -> e is CancellationException },
         { throw AssertionError("Expected exception of type arrow.effects.ConnectionCancellationException but caught no exception") })
     }
 

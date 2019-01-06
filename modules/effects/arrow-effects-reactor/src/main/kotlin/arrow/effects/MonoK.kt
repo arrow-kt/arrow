@@ -80,7 +80,7 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
           release(a, ExitCase.Completed)
             .fix().map { b }
         }.handleErrorWith { e ->
-          if (e is ConnectionCancellationException) release(a, ExitCase.Canceled).fix().flatMap { MonoK.raiseError<B>(e) }
+          if (e == OnCancel.CancellationException) release(a, ExitCase.Canceled).fix().flatMap { MonoK.raiseError<B>(e) }
           else release(a, ExitCase.Error(e)).fix().flatMap { MonoK.raiseError<B>(e) }
         }.mono.subscribe(
           sink::success,
@@ -163,7 +163,7 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
       Mono.create<A> { sink ->
         val conn = MonoKConnection()
         val isCancelled = AtomicBoolean(false) //Sink is missing isCancelled so we have to do book keeping.
-        conn.push(MonoK { if (!isCancelled.get()) sink.error(ConnectionCancellationException()) })
+        conn.push(MonoK { if (!isCancelled.get()) sink.error(OnCancel.CancellationException) })
         sink.onCancel {
           isCancelled.compareAndSet(false, true)
           conn.cancel().value().subscribe()
@@ -182,7 +182,7 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
       Mono.create { sink: MonoSink<A> ->
         val conn = MonoKConnection()
         val isCancelled = AtomicBoolean(false) //Sink is missing isCancelled so we have to do book keeping.
-        conn.push(MonoK { if (!isCancelled.get()) sink.error(ConnectionCancellationException()) })
+        conn.push(MonoK { if (!isCancelled.get()) sink.error(OnCancel.CancellationException) })
         sink.onCancel {
           isCancelled.compareAndSet(false, true)
           conn.cancel().value().subscribe()

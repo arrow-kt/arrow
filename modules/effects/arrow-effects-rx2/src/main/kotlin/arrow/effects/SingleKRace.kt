@@ -17,12 +17,12 @@ fun <A, B> SingleK.Companion.racePair(ctx: CoroutineContext, fa: SingleKOf<A>, f
   val disposableA = CompositeDisposable()
   val cancelA = SingleK {
     disposableA.dispose()
-    promiseA.onError(ConnectionCancellationException())
+    promiseA.onError(OnCancel.CancellationException)
   }
   val disposableB = CompositeDisposable()
   val cancelB = SingleK {
     disposableB.dispose()
-    promiseB.onError(ConnectionCancellationException())
+    promiseB.onError(OnCancel.CancellationException)
   }
 
   return SingleK.async { conn, cb ->
@@ -43,7 +43,7 @@ fun <A, B> SingleK.Companion.racePair(ctx: CoroutineContext, fa: SingleKOf<A>, f
         if (active.getAndSet(false)) { //if an error finishes first, stop the race.
           conn.pop()
           disposableB.dispose()
-          promiseB.onError(ConnectionCancellationException())
+          promiseB.onError(OnCancel.CancellationException)
           cb(Left(error))
         } else {
           promiseA.onError(error)
@@ -65,7 +65,7 @@ fun <A, B> SingleK.Companion.racePair(ctx: CoroutineContext, fa: SingleKOf<A>, f
         if (active.getAndSet(false)) { //if an error finishes first, stop the race.
           conn.pop()
           disposableA.dispose()
-          promiseA.onError(ConnectionCancellationException())
+          promiseA.onError(OnCancel.CancellationException)
           cb(Left(error))
         } else {
           promiseB.onError(error)

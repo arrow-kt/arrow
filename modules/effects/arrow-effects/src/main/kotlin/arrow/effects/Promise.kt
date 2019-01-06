@@ -31,12 +31,12 @@ interface Promise<F, A> {
    *   val promise = Promise.uncancelable<ForIO, Int>(IO.async())
    *
    *   promise.flatMap { p ->
-   *     p.get
+   *     p.get()
    *   }  //Never ends since is uncancelable
    *
    *   promise.flatMap { p ->
    *     p.complete(1).flatMap {
-   *       p.get
+   *       p.get()
    *     }
    *   }.unsafeRunSync() == IO.just(1).unsafeRunSync()
    *   //sampleEnd
@@ -61,12 +61,12 @@ interface Promise<F, A> {
    *   val promise = Promise.uncancelable<ForIO, Int>(IO.async())
    *
    *   promise.flatMap { p ->
-   *     p.tryGet
+   *     p.tryGet()
    *   }.unsafeRunSync() == None
    *
    *   promise.flatMap { p ->
    *     p.complete(1).flatMap {
-   *       p.tryGet
+   *       p.tryGet()
    *     }
    *   }.unsafeRunSync() == Some(1)
    *   //sampleEnd
@@ -90,7 +90,7 @@ interface Promise<F, A> {
    *
    *   promise.flatMap { p ->
    *     p.complete(1).flatMap {
-   *       p.get
+   *       p.get()
    *     }
    *   }.unsafeRunSync() == IO.just(1).unsafeRunSync()
    *
@@ -389,6 +389,7 @@ internal class CancelablePromise<F, A>(CF: Concurrent<F>) : Promise<F, A>, Concu
 }
 
 internal class UncancelablePromise<F, A>(AS: Async<F>) : Promise<F, A>, Async<F> by AS {
+
   internal sealed class State<out A> {
     data class Pending<A>(val joiners: List<(Either<Throwable, A>) -> Unit>) : State<A>()
     data class Full<A>(val value: A) : State<A>()

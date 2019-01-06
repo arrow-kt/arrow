@@ -11,11 +11,11 @@ typealias CancelToken<F> = Kind<F, Unit>
 enum class OnCancel { ThrowCancellationException, Silent;
 
   companion object {
-    val CancellationException get() = arrow.effects.ConnectionCancellationException()
+    val CancellationException get() = arrow.effects.ConnectionCancellationException
   }
 }
 
-class ConnectionCancellationException : JavaCancellationException("User cancellation")
+object ConnectionCancellationException : JavaCancellationException("User cancellation")
 
 /**
  * Connection for kinded type [F].
@@ -119,6 +119,30 @@ sealed class KindConnection<F> {
   abstract fun push(token: CancelToken<F>): Unit
 
   /**
+   * Pushes a number of cancellation function, or tokens, meant to cancel and cleanup resources.
+   * These functions are kept inside a stack, and executed in FIFO order on cancellation.
+   *
+   * ```kotlin:ank:playground
+   * import arrow.effects.*
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val conn = IOConnection()
+   *
+   *   conn.push(
+   *     IO { println("I get executed on cancellation first") },
+   *     IO { println("I get executed on cancellation second") },
+   *     IO { println("I get executed on cancellation third") }
+   *   )
+   *
+   *   conn.cancel().fix().unsafeRunSync()
+   *   //sampleEnd
+   * }
+   * ```
+   */
+  abstract fun push(vararg token: CancelToken<F>): Unit
+
+  /**
    * Pushes a pair of [KindConnection] on the stack, which on cancellation will get trampolined. This is useful in
    * race for example, because combining a whole collection of tasks, two by two, can lead to building a
    * cancelable that's stack unsafe.
@@ -140,7 +164,8 @@ sealed class KindConnection<F> {
    * }
    * ```
    */
-  abstract fun pushPair(lh: KindConnection<F>, rh: KindConnection<F>): Unit
+  fun pushPair(lh: KindConnection<F>, rh: KindConnection<F>): Unit =
+    push(lh.cancel(), rh.cancel())
 
   /**
    * Pushes a pair of [KindConnection] on the stack, which on cancellation will get trampolined. This is useful in
@@ -164,7 +189,8 @@ sealed class KindConnection<F> {
    * }
    * ```
    */
-  abstract fun pushPair(lh: CancelToken<F>, rh: CancelToken<F>): Unit
+  fun pushPair(lh: CancelToken<F>, rh: CancelToken<F>): Unit =
+    push(lh, rh)
 
   /**
    * Pops a cancelable reference from the FIFO stack of references for this connection.
@@ -204,7 +230,7 @@ sealed class KindConnection<F> {
    *   val conn = IOConnection()
    *
    *   conn.cancel().fix().unsafeRunSync()
-   *   val isCancelled = conn.isCanceled()
+   *   val isCanceled = conn.isCanceled()
    *   val couldReactive = conn.tryReactivate()
    *
    *   val isReactivated = conn.isCanceled()
@@ -257,10 +283,9 @@ sealed class KindConnection<F> {
     override fun cancel(): CancelToken<F> = unit()
     override fun isCanceled(): Boolean = false
     override fun push(token: CancelToken<F>) = Unit
+    override fun push(vararg token: CancelToken<F>) = Unit
     override fun pop(): CancelToken<F> = unit()
     override fun tryReactivate(): Boolean = true
-    override fun pushPair(lh: KindConnection<F>, rh: KindConnection<F>): Unit = Unit
-    override fun pushPair(lh: CancelToken<F>, rh: CancelToken<F>): Unit = Unit
     override fun toString(): String = "UncancelableConnection"
   }
 
@@ -286,11 +311,8 @@ sealed class KindConnection<F> {
       else -> if (!state.compareAndSet(list, listOf(token) + list)) push(token) else Unit
     }
 
-    override fun pushPair(lh: KindConnection<F>, rh: KindConnection<F>): Unit =
-      push(listOf(lh.cancel(), rh.cancel()).cancelAll())
-
-    override fun pushPair(lh: CancelToken<F>, rh: CancelToken<F>) =
-      push(listOf(lh, rh).cancelAll())
+    override fun push(vararg token: CancelToken<F>): Unit =
+      push(token.toList().cancelAll())
 
     override tailrec fun pop(): CancelToken<F> {
       val state = state.get()
@@ -305,6 +327,7 @@ sealed class KindConnection<F> {
       state.compareAndSet(null, emptyList())
 
     private fun List<CancelToken<F>>.cancelAll(): CancelToken<F> = defer {
+      //TODO this blocks forever if any `CancelToken<F>` doesn't terminate. Requires `fork`/`start` to avoid.
       fold(unit()) { acc, f -> f.flatMap { acc } }
     }
 

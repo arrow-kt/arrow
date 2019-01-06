@@ -135,7 +135,7 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
 
     val cancel = SingleK {
       disposable.dispose()
-      if (active.getAndSet(false)) join.onError(ConnectionCancellationException())
+      if (active.getAndSet(false)) join.onError(OnCancel.CancellationException)
     }
 
     Fiber(join.firstOrError().k(), cancel)
@@ -207,7 +207,7 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
         val conn = SingleKConnection()
         //On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
         //on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
-        conn.push(SingleK { if (!emitter.isDisposed) emitter.onError(ConnectionCancellationException()) })
+        conn.push(SingleK { if (!emitter.isDisposed) emitter.onError(OnCancel.CancellationException) })
         emitter.setCancellable { conn.cancel().value().subscribe() }
 
         fa(conn) { either: Either<Throwable, A> ->
@@ -224,7 +224,7 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
         val conn = SingleKConnection()
         //On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
         //on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
-        conn.push(SingleK { if (!emitter.isDisposed) emitter.onError(ConnectionCancellationException()) })
+        conn.push(SingleK { if (!emitter.isDisposed) emitter.onError(OnCancel.CancellationException) })
         emitter.setCancellable { conn.cancel().value().subscribe() }
 
         val registerCancel = CompositeDisposable()

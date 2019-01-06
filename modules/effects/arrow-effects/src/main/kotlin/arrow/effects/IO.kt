@@ -59,7 +59,7 @@ sealed class IO<out A> : IOOf<A> {
           //It doesn't run the stack of conn2, instead the result is seen it cb of startCancelable.
           IORunLoop.startCancelable(fa, conn2) {
 
-            if (it.fold({ e -> e is ConnectionCancellationException }, { false }) && conn.isNotCanceled()) IORunLoop.start(conn.cancel(), mapUnit)
+            if (it.fold({ e -> e == OnCancel.CancellationException }, { false }) && conn.isNotCanceled()) IORunLoop.start(conn.cancel(), mapUnit)
             else Unit
           }
         }

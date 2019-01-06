@@ -193,7 +193,7 @@ class FlowableKTests : UnitSpec() {
         connection.cancel().value().subscribe()
       }).value()
         .test()
-        .assertError { it is ConnectionCancellationException }
+        .assertError { it == OnCancel.CancellationException }
     }
 
   }

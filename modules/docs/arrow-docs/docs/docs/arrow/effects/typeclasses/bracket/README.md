@@ -323,7 +323,7 @@ val safeComputation = openFile("data.json").bracketCase(
     release = { file, exitCase ->
       when (exitCase) {
         is ExitCase.Completed -> { /* do something */ }
-        is ExitCase.Cancelled -> { /* do something */ }
+        is ExitCase.Canceled -> { /* do something */ }
         is ExitCase.Error -> { /* do something */ }
       }
       closeFile(file)

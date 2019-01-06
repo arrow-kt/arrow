@@ -16,6 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlin.coroutines.CoroutineContext
 
+@Suppress("LargeClass")
 object ConcurrentLaws {
 
   fun <F> laws(CF: Concurrent<F>,
@@ -228,17 +229,15 @@ object ConcurrentLaws {
     forAll(Gen.int()) { i ->
       binding {
         val latch = Promise<F, Int>(this@asyncFShouldRunKindConnectionOnCancel).bind()
+        val startLatch = Promise<F, Unit>(this@asyncFShouldRunKindConnectionOnCancel).bind()
 
         val (_, cancel) = asyncF<Unit> { conn, _ ->
           conn.push(latch.complete(i))
-          never()
+          //Wait with cancellation until it is run, if it doesn't run its cancellation is also doesn't run.
+          startLatch.complete(Unit)
         }.startF(ctx).bind()
 
-        defer(ctx) {
-          //Without sleep we sometimes run into the edge case `cancel` runs before `conn.push`
-          runBlocking { kotlinx.coroutines.delay(1) }
-          cancel
-        }.bind()
+        startLatch.get().flatMap { cancel }.bind()
 
         latch.get().bind()
       }.equalUnderTheLaw(just(i), EQ)
@@ -314,13 +313,19 @@ object ConcurrentLaws {
     }
 
   fun <F> Concurrent<F>.raceCanBeCancelledByParticipants(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
-    forAll(Gen.int()) { i ->
+    forAll(Gen.int(), Gen.bool()) { i, shouldLeftCancel ->
       binding {
-        val latch = Promise<F, Int>(this@raceCanBeCancelledByParticipants).bind()
-        val cancel = asyncF<Unit> { conn, cb -> conn.cancel().map { cb(Right(Unit)) } }
-        val loser = unit().bracket(use = { never<Int>() }, release = { latch.complete(i) })
-        raceN(ctx, cancel, loser).startF(ctx).bind()
-        latch.get().bind()
+        val endLatch = Promise<F, Int>(this@raceCanBeCancelledByParticipants).bind()
+        val startLatch = Promise<F, Unit>(this@raceCanBeCancelledByParticipants).bind()
+
+        val cancel = asyncF<Unit> { conn, cb -> startLatch.get().flatMap { conn.cancel().map { cb(Right(Unit)) } } }
+        val loser = startLatch.complete(Unit) //guarantees that both cancel & loser started
+          .bracket(use = { never<Int>() }, release = { endLatch.complete(i) })
+
+        if (shouldLeftCancel) raceN(ctx, cancel, loser).startF(ctx).bind()
+        else raceN(ctx, loser, cancel).startF(ctx).bind()
+
+        endLatch.get().bind()
       }.equalUnderTheLaw(just(i), EQ)
     }
 
@@ -414,13 +419,20 @@ object ConcurrentLaws {
     }
 
   fun <F> Concurrent<F>.racePairCanBeCancelledByParticipants(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
-    forAll(Gen.int()) { i ->
+    forAll(Gen.int(), Gen.bool()) { i, shouldLeftCancel ->
       binding {
-        val latch = Promise<F, Int>(this@racePairCanBeCancelledByParticipants).bind()
-        val cancel = asyncF<Unit> { conn, cb -> conn.cancel().map { cb(Right(Unit)) } }
-        val loser = unit().bracket(use = { never<Int>() }, release = { latch.complete(i) })
-        racePair(ctx, cancel, loser).startF(ctx).bind()
-        latch.get().bind()
+        val endLatch = Promise<F, Int>(this@racePairCanBeCancelledByParticipants).bind()
+        val startLatch = Promise<F, Unit>(this@racePairCanBeCancelledByParticipants).bind()
+
+        val cancel = asyncF<Unit> { conn, cb -> startLatch.get().flatMap { conn.cancel().map { cb(Right(Unit)) } } }
+
+        val loser = startLatch.complete(Unit) //guarantees that both cancel & loser actually started
+          .bracket(use = { never<Int>() }, release = { endLatch.complete(i) })
+
+        if (shouldLeftCancel) racePair(ctx, cancel, loser).startF(ctx).bind()
+        else racePair(ctx, loser, cancel).startF(ctx).bind()
+
+        endLatch.get().bind()
       }.equalUnderTheLaw(just(i), EQ)
     }
 
@@ -441,13 +453,18 @@ object ConcurrentLaws {
     }
 
   fun <F> Concurrent<F>.parMapCanBeCancelledByParticipants(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
-    forAll(Gen.int()) { i ->
+    forAll(Gen.int(), Gen.bool()) { i, shouldLeftCancel ->
       binding {
-        val latch = Promise<F, Int>(this@parMapCanBeCancelledByParticipants).bind()
-        val cancel = asyncF<Unit> { conn, cb -> conn.cancel().map { cb(Right(Unit)) } }
-        val loser = unit().bracket(use = { never<Int>() }, release = { latch.complete(i) })
-        parMapN(ctx, cancel, loser, ::Tuple2).startF(ctx).bind()
-        latch.get().bind()
+        val endLatch = Promise<F, Int>(this@parMapCanBeCancelledByParticipants).bind()
+        val startLatch = Promise<F, Unit>(this@parMapCanBeCancelledByParticipants).bind()
+
+        val cancel = asyncF<Unit> { conn, cb -> startLatch.get().flatMap { conn.cancel().map { cb(Right(Unit)) } } }
+        val loser = startLatch.complete(Unit).bracket(use = { never<Int>() }, release = { endLatch.complete(i) })
+
+        if (shouldLeftCancel) parMapN(ctx, cancel, loser, ::Tuple2).startF(ctx).bind()
+        else parMapN(ctx, loser, cancel, ::Tuple2).startF(ctx).bind()
+
+        endLatch.get().bind()
       }.equalUnderTheLaw(just(i), EQ)
     }
 

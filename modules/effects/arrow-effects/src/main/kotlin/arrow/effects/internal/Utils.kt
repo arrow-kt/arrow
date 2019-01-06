@@ -13,6 +13,10 @@ import java.util.concurrent.locks.AbstractQueuedSynchronizer
 
 typealias JavaCancellationException = java.util.concurrent.CancellationException
 
+class ArrowInternalException(override val message: String =
+    "Arrow-kt internal error. Please let us know and create a ticket at https://github.com/arrow-kt/arrow/issues/new/choose"
+) : RuntimeException(message)
+
 object Platform {
 
   class ArrayStack<A> : ArrayDeque<A>()
@@ -97,7 +101,7 @@ object Platform {
    * function would return a CompositeException.
    */
   fun composeErrors(first: Throwable, rest: List<Throwable>): Throwable {
-    rest.forEach {  if (it != first) first.addSuppressed(it) }
+    rest.forEach { if (it != first) first.addSuppressed(it) }
     return first
   }
 

@@ -1,7 +1,6 @@
 package arrow.effects
 
 import arrow.core.*
-import arrow.effects.internal.*
 import arrow.effects.typeclasses.Fiber
 import kotlin.coroutines.*
 import kotlin.coroutines.Continuation
@@ -21,7 +20,7 @@ import kotlin.coroutines.Continuation
  *   //sampleStart
  *   binding {
  *     val promise = Promise.uncancelable<ForIO, Int>(IO.async()).bind()
- *     val fiber = promise.get.startF(Dispatchers.Default).bind()
+ *     val fiber = promise.get().startF(Dispatchers.Default).bind()
  *     promise.complete(1).bind()
  *     fiber.join().bind()
  *   }.unsafeRunSync() == 1
@@ -34,7 +33,7 @@ import kotlin.coroutines.Continuation
  * @return [IO] with suspended execution of source [IO] on context [ctx].
  */
 fun <A> IOOf<A>.startF(ctx: CoroutineContext): IO<Fiber<ForIO, A>> = IO {
-  val promise = Promise.unsafe<Either<Throwable, A>>()
+  val promise = IOUnsafePromise<A>()
 
   // A new IOConnection, because its cancellation is now decoupled from our current one.
   // We use this [IOConnection] to start [IORunLoop] and cancel the [Fiber].

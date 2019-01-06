@@ -1,7 +1,6 @@
 package arrow.effects.instances
 
 import arrow.core.Either
-import arrow.Kind
 import arrow.core.*
 import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.effects.*
@@ -40,7 +39,7 @@ interface IOMonadInstance : Monad<ForIO> {
   override fun <A, B> IOOf<A>.map(f: (A) -> B): IO<B> =
     fix().map(f)
 
-  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, IOOf<Either<A, B>>>): IO<B> =
+  override fun <A, B> tailRecM(a: A, f: (A) -> IOOf<Either<A, B>>): IO<B> =
     IO.tailRecM(a, f)
 
   override fun <A> just(a: A): IO<A> =
@@ -120,7 +119,7 @@ interface IOAsyncInstance : Async<ForIO>, IOMonadDeferInstance {
 
 @extension
 interface IOConcurrentInstance : Concurrent<ForIO>, IOAsyncInstance {
-  override fun <A> Kind<ForIO, A>.startF(ctx: CoroutineContext): IO<Fiber<ForIO, A>> =
+  override fun <A> IOOf<A>.startF(ctx: CoroutineContext): IO<Fiber<ForIO, A>> =
     ioStart(ctx)
 
   override fun <A> asyncF(k: ConnectedProcF<ForIO, A>): IO<A> =
@@ -135,8 +134,11 @@ interface IOConcurrentInstance : Concurrent<ForIO>, IOAsyncInstance {
   override fun <A> async(fa: Proc<A>): IO<A> =
     IO.async { _, cb -> fa(cb) }
 
-  override fun <A, B> racePair(ctx: CoroutineContext, lh: Kind<ForIO, A>, rh: Kind<ForIO, B>): IO<Either<Tuple2<A, Fiber<ForIO, B>>, Tuple2<Fiber<ForIO, A>, B>>> =
-    IO.racePair(ctx, lh, rh)
+  override fun <A, B> racePair(ctx: CoroutineContext, fa: IOOf<A>, fb: IOOf<B>): IO<RacePair<ForIO, A, B>> =
+    IO.racePair(ctx, fa, fb)
+
+  override fun <A, B, C> raceTriple(ctx: CoroutineContext, fa: IOOf<A>, fb: IOOf<B>, fc: IOOf<C>): IO<RaceTriple<ForIO, A, B, C>> =
+    IO.raceTriple(ctx, fa, fb, fc)
 
 }
 

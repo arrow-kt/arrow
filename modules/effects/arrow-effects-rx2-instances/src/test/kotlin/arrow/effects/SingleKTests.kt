@@ -3,7 +3,6 @@ package arrow.effects
 import arrow.effects.singlek.applicative.applicative
 import arrow.effects.singlek.applicativeError.applicativeError
 import arrow.effects.singlek.async.async
-import arrow.effects.singlek.concurrent.concurrent
 import arrow.effects.singlek.effect.effect
 import arrow.effects.singlek.functor.functor
 import arrow.effects.singlek.monad.flatMap
@@ -62,7 +61,7 @@ class SingleKTests : UnitSpec() {
       MonadLaws.laws(SingleK.monad(), EQ()),
       MonadErrorLaws.laws(SingleK.monadError(), EQ(), EQ(), EQ()),
       ApplicativeErrorLaws.laws(SingleK.applicativeError(), EQ(), EQ(), EQ()),
-      ConcurrentLaws.laws(SingleK.concurrent(), EQ(), EQ(), EQ(), testStackSafety = false),
+      AsyncLaws.laws(SingleK.async(), EQ(), EQ(), testStackSafety = false),
       AsyncLaws.laws(SingleK.effect(), EQ(), EQ(), testStackSafety = false)
     )
 
@@ -169,7 +168,7 @@ class SingleKTests : UnitSpec() {
         connection.cancel().value().subscribe()
       }.value()
         .test()
-        .assertError { it is ConnectionCancellationException }
+        .assertError { it == OnCancel.CancellationException }
     }
 
   }

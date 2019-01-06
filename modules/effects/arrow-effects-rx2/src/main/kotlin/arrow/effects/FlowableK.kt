@@ -182,7 +182,7 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
         val conn = FlowableKConnection()
         //On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
         //on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
-        conn.push(FlowableK { if (!emitter.isCancelled) emitter.onError(ConnectionCancellationException()) })
+        conn.push(FlowableK { if (!emitter.isCancelled) emitter.onError(OnCancel.CancellationException) })
         emitter.setCancellable { conn.cancel().value().subscribe() }
 
         fa(conn) { either: Either<Throwable, A> ->
@@ -200,7 +200,7 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
         val conn = FlowableKConnection()
         //On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
         //on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
-        conn.push(FlowableK { if (!emitter.isCancelled) emitter.onError(ConnectionCancellationException()) })
+        conn.push(FlowableK { if (!emitter.isCancelled) emitter.onError(OnCancel.CancellationException) })
         emitter.setCancellable { conn.cancel().value().subscribe() }
 
         fa(conn) { either: Either<Throwable, A> ->

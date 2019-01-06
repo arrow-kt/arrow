@@ -173,7 +173,7 @@ class ObservableKTests : UnitSpec() {
         connection.cancel().value().subscribe()
       }.observable
         .test()
-        .assertError { it is ConnectionCancellationException }
+        .assertError { it == OnCancel.CancellationException }
     }
 
   }

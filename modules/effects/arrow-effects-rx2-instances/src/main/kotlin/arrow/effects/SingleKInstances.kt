@@ -1,7 +1,6 @@
 package arrow.effects
 
 import arrow.core.Either
-import arrow.core.Tuple2
 import arrow.deprecation.ExtensionsDSLDeprecated
 import arrow.effects.typeclasses.*
 import arrow.extension
@@ -96,29 +95,6 @@ interface SingleKAsyncInstance :
 }
 
 @extension
-interface SingleKConcurrentInstance : Concurrent<ForSingleK>, SingleKAsyncInstance {
-
-  override fun <A> SingleKOf<A>.startF(ctx: CoroutineContext): SingleK<Fiber<ForSingleK, A>> =
-    fix().startF(ctx)
-
-  override fun <A> asyncF(k: ConnectedProcF<ForSingleK, A>): SingleK<A> =
-    SingleK.asyncF(k)
-
-  override fun <A> async(fa: ConnectedProc<ForSingleK, A>): SingleK<A> =
-    SingleK.async(fa)
-
-  override fun <A> asyncF(k: ProcF<ForSingleK, A>): SingleK<A> =
-    SingleK.asyncF { _, cb -> k(cb) }
-
-  override fun <A> async(fa: Proc<A>): SingleK<A> =
-    SingleK.async { _, cb -> fa(cb) }
-
-  override fun <A, B> racePair(ctx: CoroutineContext, fa: SingleKOf<A>, fb: SingleKOf<B>): SingleK<Either<Tuple2<A, Fiber<ForSingleK, B>>, Tuple2<Fiber<ForSingleK, A>, B>>> =
-    SingleK.racePair(ctx, fa, fb)
-
-}
-
-@extension
 interface SingleKEffectInstance :
   Effect<ForSingleK>,
   SingleKAsyncInstance {
@@ -127,7 +103,7 @@ interface SingleKEffectInstance :
 }
 
 @extension
-interface SingleKConcurrentEffectInstance : ConcurrentEffect<ForSingleK>, SingleKConcurrentInstance, SingleKEffectInstance {
+interface SingleKConcurrentEffectInstance : ConcurrentEffect<ForSingleK>, SingleKEffectInstance {
   override fun <A> SingleKOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> SingleKOf<Unit>): SingleK<Disposable> =
     fix().runAsyncCancellable(cb)
 }

@@ -41,7 +41,7 @@ interface Concurrent<F> : Async<F> {
    *   //sampleStart
    *   binding {
    *     val promise = Promise.uncancelable<ForIO, Int>(IO.async()).bind()
-   *     val fiber = promise.get.startF(Dispatchers.Default).bind()
+   *     val fiber = promise.get().startF(Dispatchers.Default).bind()
    *     promise.complete(1).bind()
    *     fiber.join().bind()
    *   }.unsafeRunSync() == 1
@@ -62,9 +62,8 @@ interface Concurrent<F> : Async<F> {
    * ```kotlin:ank:playground
    * import arrow.effects.*
    * import arrow.effects.instances.io.async.async
-   * import arrow.effects.instances.io.concurrent.racePair
    * import arrow.effects.instances.io.monad.binding
-   * import arrow.effects.typeclasses.Fiber
+   * import arrow.effects.typeclasses.*
    * import kotlinx.coroutines.Dispatchers
    * import java.lang.RuntimeException
    *
@@ -72,8 +71,8 @@ interface Concurrent<F> : Async<F> {
    *   //sampleStart
    *   binding {
    *     val promise = Promise.uncancelable<ForIO, Int>(IO.async()).bind()
-   *     val eitherGetOrUnit = racePair(Dispatchers.Default, promise.get, IO.unit).bind()
-   *     eitherGetOrUnit.fold(
+   *     val racePair = IO.racePair(Dispatchers.Default, promise.get(), IO.unit).bind()
+   *     racePair.fold(
    *       { IO.raiseError<Int>(RuntimeException("Promise.get cannot win before complete")) },
    *       { (a: Fiber<ForIO, Int>, _) -> promise.complete(1).flatMap { a.join() } }
    *     ).bind()
@@ -90,7 +89,45 @@ interface Concurrent<F> : Async<F> {
    *
    * @see raceN for a simpler version that cancels loser.
    */
-  fun <A, B> racePair(ctx: CoroutineContext, fa: Kind<F, A>, fb: Kind<F, B>): Kind<F, Either<Tuple2<A, Fiber<F, B>>, Tuple2<Fiber<F, A>, B>>>
+  fun <A, B> racePair(ctx: CoroutineContext, fa: Kind<F, A>, fb: Kind<F, B>): Kind<F, RacePair<F, A, B>>
+
+
+  /**
+   * Race three tasks concurrently within a new [F].
+   * Race results in a winner and the others, yet to finish task running in a [Fiber].
+   *
+   * ```kotlin:ank:playground
+   * import arrow.effects.*
+   * import arrow.effects.instances.io.async.async
+   * import arrow.effects.instances.io.monad.binding
+   * import arrow.effects.typeclasses.*
+   * import kotlinx.coroutines.Dispatchers
+   * import java.lang.RuntimeException
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   binding {
+   *     val promise = Promise.uncancelable<ForIO, Int>(IO.async()).bind()
+   *     val raceTriple = IO.raceTriple(Dispatchers.Default, promise.get(), IO.unit, IO.never).bind()
+   *     raceTriple.fold(
+   *       { IO.raiseError<Int>(RuntimeException("Promise.get cannot win before complete")) },
+   *       { (a: Fiber<ForIO, Int>, _, _) -> promise.complete(1).flatMap { a.join() } },
+   *       { IO.raiseError<Int>(RuntimeException("never cannot win before complete")) }
+   *     ).bind()
+   *   }.unsafeRunSync() == 1
+   *   //sampleEnd
+   * }
+   * ```
+   *
+   * @param ctx [CoroutineContext] to execute the source [F] on.
+   * @param fa task to participate in the race
+   * @param fb task to participate in the race
+   * @param fc task to participate in the race
+   * @return [RaceTriple]
+   *
+   * @see [arrow.effects.typeclasses.Concurrent.raceN] for a simpler version that cancels losers.
+   */
+  fun <A, B, C> raceTriple(ctx: CoroutineContext, fa: Kind<F, A>, fb: Kind<F, B>, fc: Kind<F, C>): Kind<F, RaceTriple<F, A, B, C>>
 
   /**
    * Map two tasks in parallel within a new [F] on [ctx].
@@ -123,37 +160,22 @@ interface Concurrent<F> : Async<F> {
    */
   fun <A, B, C> parMapN(ctx: CoroutineContext, fa: Kind<F, A>, fb: Kind<F, B>, f: (A, B) -> C): Kind<F, C> =
     racePair(ctx, fa, fb).flatMap {
-      it.fold({ (a, fiberB) ->
-        fiberB.join().map { b -> f(a, b) }
-      }, { (fiberA, b) ->
-        fiberA.join().map { a -> f(a, b) }
-      })
+      it.fold(
+        { (a, fiberB) -> fiberB.join().map { b -> f(a, b) } },
+        { (fiberA, b) -> fiberA.join().map { a -> f(a, b) } }
+      )
     }
 
   /**
    * @see parMapN
    */
   fun <A, B, C, D> parMapN(ctx: CoroutineContext, fa: Kind<F, A>, fb: Kind<F, B>, fc: Kind<F, C>, f: (A, B, C) -> D): Kind<F, D> =
-    racePair(ctx, fa, racePair(ctx, fb, fc)).flatMap {
-      it.fold({ (a, bOrC) ->
-        bOrC.join().flatMap { r ->
-          r.fold({ (b, fiberC) ->
-            fiberC.join().map { c -> f(a, b, c) }
-          }, { (fiberB, c) ->
-            fiberB.join().map { b -> f(a, b, c) }
-          })
-        }
-      }, { (fiberA, bOrD) ->
-        bOrD.fold({ (b, fiberC) ->
-          fiberA.join().flatMap { a ->
-            fiberC.join().map { c -> f(a, b, c) }
-          }
-        }, { (fiberB, c) ->
-          fiberA.join().flatMap { a ->
-            fiberB.join().map { b -> f(a, b, c) }
-          }
-        })
-      })
+    raceTriple(ctx, fa, fb, fc).flatMap {
+      it.fold(
+        { (a, fiberB, fiberC) -> fiberB.join().flatMap { b -> fiberC.join().map { c -> f(a, b, c) } } },
+        { (fiberA, b, fiberC) -> fiberA.join().flatMap { a -> fiberC.join().map { c -> f(a, b, c) } } },
+        { (fiberA, fiberB, c) -> fiberA.join().flatMap { a -> fiberB.join().map { b -> f(a, b, c) } } }
+      )
     }
 
   /**
@@ -166,7 +188,9 @@ interface Concurrent<F> : Async<F> {
     fc: Kind<F, C>,
     fd: Kind<F, D>,
     f: (A, B, C, D) -> E): Kind<F, E> =
-    parMapN(ctx, fa, fb, parMapN(ctx, fc, fd, ::Tuple2)) { a, b, (c, d) ->
+    parMapN(ctx,
+      parMapN(ctx, fa, fb, ::Tuple2),
+      parMapN(ctx, fc, fd, ::Tuple2)) { (a, b), (c, d) ->
       f(a, b, c, d)
     }
 
@@ -181,7 +205,9 @@ interface Concurrent<F> : Async<F> {
     fd: Kind<F, D>,
     fe: Kind<F, E>,
     f: (A, B, C, D, E) -> G): Kind<F, G> =
-    parMapN(ctx, fa, fb, parMapN(ctx, fc, fd, fe, ::Tuple3)) { a, b, (c, d, e) ->
+    parMapN(ctx,
+      parMapN(ctx, fa, fb, fc, ::Tuple3),
+      parMapN(ctx, fd, fe, ::Tuple2)) { (a, b, c), (d, e) ->
       f(a, b, c, d, e)
     }
 
@@ -197,7 +223,9 @@ interface Concurrent<F> : Async<F> {
     fe: Kind<F, E>,
     fg: Kind<F, G>,
     f: (A, B, C, D, E, G) -> H): Kind<F, H> =
-    parMapN(ctx, parMapN(ctx, fa, fb, fc, ::Tuple3), parMapN(ctx, fd, fe, fg, ::Tuple3)) { (a, b, c), (d, e, g) ->
+    parMapN(ctx,
+      parMapN(ctx, fa, fb, fc, ::Tuple3),
+      parMapN(ctx, fd, fe, fg, ::Tuple3)) { (a, b, c), (d, e, g) ->
       f(a, b, c, d, e, g)
     }
 
@@ -214,7 +242,10 @@ interface Concurrent<F> : Async<F> {
     fg: Kind<F, G>,
     fh: Kind<F, H>,
     f: (A, B, C, D, E, G, H) -> I): Kind<F, I> =
-    parMapN(ctx, parMapN(ctx, fa, fb, fc, ::Tuple3), parMapN(ctx, fd, fe, fg, ::Tuple3), fh) { (a, b, c), (d, e, g), h ->
+    parMapN(ctx,
+      parMapN(ctx, fa, fb, fc, ::Tuple3),
+      parMapN(ctx, fd, fe, ::Tuple2),
+      parMapN(ctx, fg, fh, ::Tuple2)) { (a, b, c), (d, e), (g, h) ->
       f(a, b, c, d, e, g, h)
     }
 
@@ -231,7 +262,10 @@ interface Concurrent<F> : Async<F> {
     fg: Kind<F, G>,
     fh: Kind<F, H>,
     fi: Kind<F, I>, f: (A, B, C, D, E, G, H, I) -> J): Kind<F, J> =
-    parMapN(ctx, parMapN(ctx, fa, fb, fc, ::Tuple3), parMapN(ctx, fd, fe, fg, ::Tuple3), parMapN(ctx, fh, fi, ::Tuple2)) { (a, b, c), (d, e, g), (h, i) ->
+    parMapN(ctx,
+      parMapN(ctx, fa, fb, fc, ::Tuple3),
+      parMapN(ctx, fd, fe, fg, ::Tuple3),
+      parMapN(ctx, fh, fi, ::Tuple2)) { (a, b, c), (d, e, g), (h, i) ->
       f(a, b, c, d, e, g, h, i)
     }
 
@@ -250,7 +284,10 @@ interface Concurrent<F> : Async<F> {
     fi: Kind<F, I>,
     fj: Kind<F, J>,
     f: (A, B, C, D, E, G, H, I, J) -> K): Kind<F, K> =
-    parMapN(ctx, parMapN(ctx, fa, fb, fc, ::Tuple3), parMapN(ctx, fd, fe, fg, ::Tuple3), parMapN(ctx, fh, fi, fj, ::Tuple3)) { (a, b, c), (d, e, g), (h, i, j) ->
+    parMapN(ctx,
+      parMapN(ctx, fa, fb, fc, ::Tuple3),
+      parMapN(ctx, fd, fe, fg, ::Tuple3),
+      parMapN(ctx, fh, fi, fj, ::Tuple3)) { (a, b, c), (d, e, g), (h, i, j) ->
       f(a, b, c, d, e, g, h, i, j)
     }
 
@@ -289,7 +326,7 @@ interface Concurrent<F> : Async<F> {
   fun <A, B> raceN(
     ctx: CoroutineContext,
     fa: Kind<F, A>,
-    fb: Kind<F, B>): Kind<F, Either<A, B>> =
+    fb: Kind<F, B>): Kind<F, Race2<A, B>> =
     racePair(ctx, fa, fb).flatMap {
       it.fold({ (a, b) ->
         b.cancel().map { a.left() }
@@ -305,19 +342,13 @@ interface Concurrent<F> : Async<F> {
     ctx: CoroutineContext,
     fa: Kind<F, A>,
     fb: Kind<F, B>,
-    fc: Kind<F, C>): Kind<F, Either<A, Either<B, C>>> =
-    racePair(ctx, fa, racePair(ctx, fb, fc)).flatMap {
-      it.fold({ (a, b) ->
-        b.cancel().map { a.left() }
-      }, { (a, b) ->
-        a.cancel().flatMap {
-          b.fold({ (b, c) ->
-            c.cancel().map { b.left().right() }
-          }, { (b, c) ->
-            b.cancel().map { c.right().right() }
-          })
-        }
-      })
+    fc: Kind<F, C>): Kind<F, Race3<A, B, C>> =
+    raceTriple(ctx, fa, fb, fc).flatMap {
+      it.fold(
+        { (a, fiberB, fiberC) -> fiberB.cancel().flatMap { fiberC.cancel().map { Left(Left(a)) } } },
+        { (fiberA, b, fiberC) -> fiberA.cancel().flatMap { fiberC.cancel().map { Left(Right(b)) } } },
+        { (fiberA, fiberB, c) -> fiberA.cancel().flatMap { fiberB.cancel().map { Right(c) } } }
+      )
     }
 
   /**
@@ -328,8 +359,11 @@ interface Concurrent<F> : Async<F> {
     a: Kind<F, A>,
     b: Kind<F, B>,
     c: Kind<F, C>,
-    d: Kind<F, D>): Kind<F, Either<Either<A, B>, Either<C, D>>> =
-    raceN(ctx, raceN(ctx, a, b), raceN(ctx, c, d))
+    d: Kind<F, D>): Kind<F, Race4<A, B, C, D>> =
+    raceN(ctx,
+      raceN(ctx, a, b),
+      raceN(ctx, c, d)
+    )
 
   /**
    * @see raceN
@@ -340,8 +374,11 @@ interface Concurrent<F> : Async<F> {
     b: Kind<F, B>,
     c: Kind<F, C>,
     d: Kind<F, D>,
-    e: Kind<F, E>): Kind<F, Either<Either<A, Either<B, C>>, Either<D, E>>> =
-    raceN(ctx, raceN(ctx, a, b, c), raceN(ctx, d, e))
+    e: Kind<F, E>): Kind<F, Race5<A, B, C, D, E>> =
+    raceN(ctx,
+      raceN(ctx, a, b, c),
+      raceN(ctx, d, e)
+    )
 
   /**
    * @see raceN
@@ -353,8 +390,11 @@ interface Concurrent<F> : Async<F> {
     c: Kind<F, C>,
     d: Kind<F, D>,
     e: Kind<F, E>,
-    g: Kind<F, G>): Kind<F, Either<Either<A, B>, Either<Either<C, D>, Either<E, G>>>> =
-    raceN(ctx, raceN(ctx, a, b), raceN(ctx, c, d), raceN(ctx, e, g))
+    g: Kind<F, G>): Kind<F, Race6<A, B, C, D, E, G>> =
+    raceN(ctx,
+      raceN(ctx, a, b, c),
+      raceN(ctx, d, e, g)
+    )
 
   /**
    * @see raceN
@@ -363,8 +403,16 @@ interface Concurrent<F> : Async<F> {
     ctx: CoroutineContext,
     a: Kind<F, A>,
     b: Kind<F, B>,
-    c: Kind<F, C>, d: Kind<F, D>, e: Kind<F, E>, g: Kind<F, G>, h: Kind<F, H>): Kind<F, Either<Either<A, Either<B, C>>, Either<Either<D, E>, Either<G, H>>>> =
-    raceN(ctx, raceN(ctx, a, b, c), raceN(ctx, d, e), raceN(ctx, g, h))
+    c: Kind<F, C>,
+    d: Kind<F, D>,
+    e: Kind<F, E>,
+    g: Kind<F, G>,
+    h: Kind<F, H>): Kind<F, Race7<A, B, C, D, E, G, H>> =
+    raceN(ctx,
+      raceN(ctx, a, b, c),
+      raceN(ctx, d, e),
+      raceN(ctx, g, h)
+    )
 
   /**
    * @see raceN
@@ -378,8 +426,13 @@ interface Concurrent<F> : Async<F> {
     e: Kind<F, E>,
     g: Kind<F, G>,
     h: Kind<F, H>,
-    i: Kind<F, I>): Kind<F, Either<Either<Either<A, B>, Either<C, D>>, Either<Either<E, G>, Either<H, I>>>> =
-    raceN(ctx, raceN(ctx, a, b), raceN(ctx, c, d), raceN(ctx, e, g), raceN(ctx, h, i))
+    i: Kind<F, I>): Kind<F, Race8<A, B, C, D, E, G, H, I>> =
+    raceN(ctx,
+      raceN(ctx, a, b),
+      raceN(ctx, c, d),
+      raceN(ctx, e, g),
+      raceN(ctx, h, i)
+    )
 
   /**
    * @see raceN
@@ -394,7 +447,147 @@ interface Concurrent<F> : Async<F> {
     g: Kind<F, G>,
     h: Kind<F, H>,
     i: Kind<F, I>,
-    j: Kind<F, J>): Kind<F, Either<Either<Either<A, Either<B, C>>, Either<D, E>>, Either<Either<G, H>, Either<I, J>>>> =
-    raceN(ctx, raceN(ctx, a, b, c), raceN(ctx, d, e), raceN(ctx, g, h), raceN(ctx, i, j))
+    j: Kind<F, J>): Kind<F, Race9<A, B, C, D, E, G, H, I, J>> =
+    raceN(ctx,
+      raceN(ctx, a, b, c),
+      raceN(ctx, d, e),
+      raceN(ctx, g, h),
+      raceN(ctx, i, j)
+    )
 
+}
+
+/** Alias for `Either` structure to provide consistent signature for race methods. */
+typealias RacePair<F, A, B> = Either<Tuple2<A, Fiber<F, B>>, Tuple2<Fiber<F, A>, B>>
+
+/** Alias for nested `Either` structures to provide nicer signatures and overload with a convenience [fold] method. */
+typealias RaceTriple<F, A, B, C> = Either<Tuple3<A, Fiber<F, B>, Fiber<F, C>>, Either<Tuple3<Fiber<F, A>, B, Fiber<F, C>>, Tuple3<Fiber<F, A>, Fiber<F, B>, C>>>
+
+/** A convenience [fold] method to provide a nicer API to work with race results. */
+inline fun <F, A, B, C, D> RaceTriple<F, A, B, C>.fold(
+  ifA: (Tuple3<A, Fiber<F, B>, Fiber<F, C>>) -> D,
+  ifB: (Tuple3<Fiber<F, A>, B, Fiber<F, C>>) -> D,
+  ifC: (Tuple3<Fiber<F, A>, Fiber<F, B>, C>) -> D,
+  dummy: Unit = Unit
+): D = when (this) {
+  is Either.Left -> ifA(this.a)
+  is Either.Right -> when (val b = this.b) {
+    is Either.Left -> ifB(b.a)
+    is Either.Right -> ifC(b.b)
+  }
+}
+
+/** Alias for `Either` structure to provide consistent signature for race methods. */
+typealias Race2<A, B> = Either<A, B>
+
+/** Alias for nested `Either` structures to provide nicer signatures and overload with a convenience [fold] method. */
+typealias Race3<A, B, C> = Either<Either<A, B>, C>
+
+/** Alias for nested `Either` structures to provide nicer signatures and overload with a convenience [fold] method. */
+typealias Race4<A, B, C, D> = Either<Either<A, B>, Either<C, D>>
+
+/** Alias for nested `Either` structures to provide nicer signatures and overload with a convenience [fold] method. */
+typealias Race5<A, B, C, D, E> = Either<Race3<A, B, C>, Race2<D, E>>
+
+/** Alias for nested `Either` structures to provide nicer signatures and overload with a convenience [fold] method. */
+typealias Race6<A, B, C, D, E, G> = Either<Race3<A, B, C>, Race3<D, E, G>>
+
+/** Alias for nested `Either` structures to provide nicer signatures and overload with a convenience [fold] method. */
+typealias Race7<A, B, C, D, E, G, H> = Race3<Race3<A, B, C>, Race2<D, E>, Race2<G, H>>
+
+/** Alias for nested `Either` structures to provide nicer signatures and overload with a convenience [fold] method. */
+typealias Race8<A, B, C, D, E, G, H, I> = Race4<Race2<A, B>, Race2<C, D>, Race2<E, G>, Race2<H, I>>
+
+/** Alias for nested `Either` structures to provide nicer signatures and overload with a convenience [fold] method. */
+typealias Race9<A, B, C, D, E, G, H, I, J> = Race4<Race3<A, B, C>, Race2<D, E>, Race2<G, H>, Race2<I, J>>
+
+/** A convenience [fold] method to provide a nicer API to work with race results. */
+inline fun <A, B, C, D> Race3<A, B, C>.fold(
+  ifA: (A) -> D,
+  ifB: (B) -> D,
+  ifC: (C) -> D
+): D = when (this) {
+  is Either.Left -> this.a.fold(ifA, ifB)
+  is Either.Right -> ifC(this.b)
+}
+
+/** A convenience [fold] method to provide a nicer API to work with race results. */
+inline fun <A, B, C, D, E> Race4<A, B, C, D>.fold(
+  ifA: (A) -> E,
+  ifB: (B) -> E,
+  ifC: (C) -> E,
+  ifD: (D) -> E
+): E = when (this) {
+  is Either.Left -> this.a.fold(ifA, ifB)
+  is Either.Right -> this.b.fold(ifC, ifD)
+}
+
+/** A convenience [fold] method to provide a nicer API to work with race results. */
+inline fun <A, B, C, D, E, G> Race5<A, B, C, D, E>.fold(
+  ifA: (A) -> G,
+  ifB: (B) -> G,
+  ifC: (C) -> G,
+  ifD: (D) -> G,
+  ifE: (E) -> G
+): G = when (this) {
+  is Either.Left -> this.a.fold(ifA, ifB, ifC)
+  is Either.Right -> this.b.fold(ifD, ifE)
+}
+
+/** A convenience [fold] method to provide a nicer API to work with race results. */
+inline fun <A, B, C, D, E, G, H> Race6<A, B, C, D, E, G>.fold(
+  ifA: (A) -> H,
+  ifB: (B) -> H,
+  ifC: (C) -> H,
+  ifD: (D) -> H,
+  ifE: (E) -> H,
+  ifG: (G) -> H
+): H = when (this) {
+  is Either.Left -> this.a.fold(ifA, ifB, ifC)
+  is Either.Right -> this.b.fold(ifD, ifE, ifG)
+}
+
+/** A convenience [fold] method to provide a nicer API to work with race results. */
+inline fun <A, B, C, D, E, G, H, I> Race7<A, B, C, D, E, G, H>.fold(
+  ifA: (A) -> I,
+  ifB: (B) -> I,
+  ifC: (C) -> I,
+  ifD: (D) -> I,
+  ifE: (E) -> I,
+  ifG: (G) -> I,
+  ifH: (H) -> I
+): I = when (this) {
+  is Either.Left -> this.a.fold(ifA, ifB, ifC, ifD, ifE)
+  is Either.Right -> this.b.fold(ifG, ifH)
+}
+
+/** A convenience [fold] method to provide a nicer API to work with race results. */
+inline fun <A, B, C, D, E, G, H, I, J> Race8<A, B, C, D, E, G, H, I>.fold(
+  ifA: (A) -> J,
+  ifB: (B) -> J,
+  ifC: (C) -> J,
+  ifD: (D) -> J,
+  ifE: (E) -> J,
+  ifG: (G) -> J,
+  ifH: (H) -> J,
+  ifI: (I) -> J
+): J = when (this) {
+  is Either.Left -> this.a.fold(ifA, ifB, ifC, ifD)
+  is Either.Right -> this.b.fold(ifE, ifG, ifH, ifI)
+}
+
+/** A convenience [fold] method to provide a nicer API to work with race results. */
+inline fun <A, B, C, D, E, G, H, I, J, K> Race9<A, B, C, D, E, G, H, I, J>.fold(
+  ifA: (A) -> K,
+  ifB: (B) -> K,
+  ifC: (C) -> K,
+  ifD: (D) -> K,
+  ifE: (E) -> K,
+  ifG: (G) -> K,
+  ifH: (H) -> K,
+  ifI: (I) -> K,
+  ifJ: (J) -> K
+): K = when (this) {
+  is Either.Left -> this.a.fold(ifA, ifB, ifC, ifD, ifE)
+  is Either.Right -> this.b.fold(ifG, ifH, ifI, ifJ)
 }
