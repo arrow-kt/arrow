@@ -2,7 +2,6 @@ package arrow.effects.typeclasses
 
 import arrow.Kind
 import arrow.core.Either
-import arrow.effects.IO
 
 /**
  * ank_macro_hierarchy(arrow.effects.typeclasses.Effect)
