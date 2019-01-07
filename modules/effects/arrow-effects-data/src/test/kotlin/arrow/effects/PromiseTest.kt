@@ -59,7 +59,7 @@ class PromiseTest : UnitSpec() {
     "complete twice results in AlreadyFulfilled" {
       forAll(Gen.int(), Gen.int()) { a, b ->
         binding {
-          val p = promise<Int>().bind()
+          val (p) = promise<Int>()
           p.complete(a).bind()
           p.complete(b).bind()
           p.get.bind()
@@ -70,7 +70,7 @@ class PromiseTest : UnitSpec() {
     "tryComplete" {
       forAll(Gen.int()) { i ->
         binding {
-          val p = promise<Int>().bind()
+          val (p) = promise<Int>()
           p.tryComplete(i).bind() toT p.get.bind()
         }.equalUnderTheLaw(IO.just(true toT i), EQ())
       }
@@ -79,7 +79,7 @@ class PromiseTest : UnitSpec() {
     "tryComplete returns false if already complete" {
       forAll(Gen.int(), Gen.int()) { a, b ->
         binding {
-          val p = promise<Int>().bind()
+          val (p) = promise<Int>()
           p.complete(a).bind()
           p.tryComplete(b).bind() toT p.get.bind()
         }.equalUnderTheLaw(IO.just(false toT a), EQ())
@@ -98,7 +98,7 @@ class PromiseTest : UnitSpec() {
     "error after completion results in AlreadyFulfilled" {
       forAll(Gen.int(), genThrowable()) { i, t ->
         binding {
-          val p = promise<Int>().bind()
+          val (p) = promise<Int>()
           p.complete(i).bind()
           p.error(t).bind()
           p.get.bind()
@@ -109,7 +109,7 @@ class PromiseTest : UnitSpec() {
     "tryError returns false if already completed" {
       forAll(Gen.int(), genThrowable()) { i, t ->
         binding {
-          val p = promise<Int>().bind()
+          val (p) = promise<Int>()
           p.complete(i).bind()
           p.tryError(t).bind() toT p.get.bind()
         }.equalUnderTheLaw(IO.just(false toT i), EQ())
@@ -119,7 +119,7 @@ class PromiseTest : UnitSpec() {
     "tryError" {
       forAll(genThrowable()) { t ->
         binding {
-          val p = promise<Int>().bind()
+          val (p) = promise<Int>()
           p.tryError(t).bind()
         }.equalUnderTheLaw(IO.raiseError(t), EQ())
       }

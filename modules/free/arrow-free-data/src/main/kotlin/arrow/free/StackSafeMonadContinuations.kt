@@ -4,13 +4,14 @@ import arrow.Kind
 import arrow.core.Continuation
 import arrow.typeclasses.Monad
 import arrow.typeclasses.stateStack
+import arrow.typeclasses.suspended.MonadSyntax
 import kotlin.coroutines.*
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 
 @RestrictsSuspension
 open class StackSafeMonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineContext = EmptyCoroutineContext) :
-  Continuation<Free<F, A>>, Monad<F> by M {
+  Continuation<Free<F, A>>, Monad<F> by M, MonadSyntax<F> {
 
   override fun resume(value: Free<F, A>) {
     returnedMonad = value
@@ -24,7 +25,7 @@ open class StackSafeMonadContinuation<F, A>(M: Monad<F>, override val context: C
 
   internal fun returnedMonad(): Free<F, A> = returnedMonad
 
-  suspend fun <B> Kind<F, B>.bind(): B = bind { Free.liftF(this) }
+  override suspend fun <B> Kind<F, B>.bind(): B = bind { Free.liftF(this) }
 
   suspend fun <B> Free<F, B>.bind(): B = bind { this }
 

@@ -127,7 +127,7 @@ import arrow.typeclasses.*
 import arrow.effects.rx2.extensions.observable.monadThrow.bindingCatch
 
 bindingCatch {
-  val songUrl = getSongUrlAsync().bind()
+  val (songUrl) = getSongUrlAsync()
   val musicPlayer = MediaPlayer.load(songUrl)
   val totalTime = musicPlayer.getTotaltime()
 

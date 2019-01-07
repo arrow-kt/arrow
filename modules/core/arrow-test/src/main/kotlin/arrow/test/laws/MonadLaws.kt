@@ -72,15 +72,15 @@ object MonadLaws {
   fun <F> Monad<F>.equivalentComprehensions(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.int()) { num: Int ->
       val aa = binding {
-        val a = just(num).bind()
-        val b = just(a + 1).bind()
-        val c = just(b + 1).bind()
+        val (a) = just(num)
+        val (b) = just(a + 1)
+        val (c) = just(b + 1)
         c
       }
       val bb = bindingStackSafe {
-        val a = just(num).bind()
-        val b = just(a + 1).bind()
-        val c = just(b + 1).bind()
+        val (a) = just(num)
+        val (b) = just(a + 1)
+        val (c) = just(b + 1)
         c
       }.run(this)
       aa.equalUnderTheLaw(bb, EQ) &&
@@ -90,9 +90,9 @@ object MonadLaws {
   fun <F> Monad<F>.monadComprehensions(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.int()) { num: Int ->
       binding {
-        val a = just(num).bind()
-        val b = just(a + 1).bind()
-        val c = just(b + 1).bind()
+        val (a) = just(num)
+        val (b) = just(a + 1)
+        val (c) = just(b + 1)
         c
       }.equalUnderTheLaw(just(num + 2), EQ)
     }
@@ -107,7 +107,7 @@ object MonadLaws {
     }
 
   fun <F> Monad<F>.stackSafeTestProgram(n: Int, stopAt: Int): Free<F, Int> = bindingStackSafe {
-    val v = this.just(n + 1).bind()
+    val (v) = this.just(n + 1)
     val r = if (v < stopAt) stackSafeTestProgram(v, stopAt).bind() else this.just(v).bind()
     r
   }

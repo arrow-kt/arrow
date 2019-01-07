@@ -23,8 +23,8 @@ fun <A, B, C> parallelMap(first: DeferredK<A>,
                      second: DeferredK<B>,
                      f: (A, B) -> C): DeferredK<C> =
   DeferredK.monad().binding {
-    val fiberOne: Fiber<ForDeferredK, A> = first.startF().bind()
-    val fiberTwo: Fiber<ForDeferredK, B> = second.startF().bind()
+    val (fiberOne: Fiber<ForDeferredK, A>) = first.startF()
+    val (fiberTwo: Fiber<ForDeferredK, B>) = second.startF()
     f(fiberOne.join.bind(), fiberTwo.join.bind())
   }.fix()
 

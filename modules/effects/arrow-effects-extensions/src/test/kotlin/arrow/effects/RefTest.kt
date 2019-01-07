@@ -74,10 +74,10 @@ class RefTest : UnitSpec() {
       "access success" {
         forAll(Gen.int(), Gen.int()) { a, b ->
           binding {
-            val ref = Ref.of(a, this@with).bind()
+            val (ref) = Ref.of(a, this@with)
             val (_, setter) = ref.access().bind()
-            val success = setter(b).bind()
-            val result = ref.get().bind()
+            val (success) = setter(b)
+            val (result) = ref.get()
             success && result == b
           }.fix().unsafeRunSync()
         }
@@ -86,11 +86,11 @@ class RefTest : UnitSpec() {
       "access failure" {
         forAll(Gen.int(), Gen.int(), Gen.int()) { a, b, c ->
           binding {
-            val ref = Ref.of(a, this@with).bind()
+            val (ref) = Ref.of(a, this@with)
             val (_, setter) = ref.access().bind()
             ref.set(b).bind()
-            val success = setter(c).bind()
-            val result = ref.get().bind()
+            val (success) = setter(c)
+            val (result) = ref.get()
             !success && result == b
           }.fix().unsafeRunSync()
         }
@@ -99,12 +99,12 @@ class RefTest : UnitSpec() {
       "access fail multiple times" {
         forAll(Gen.int(), Gen.int(), Gen.int(), Gen.int()) { a, b, c, d ->
           binding {
-            val ref = Ref.of(a, this@with).bind()
+            val (ref) = Ref.of(a, this@with)
             val (_, setter) = ref.access().bind()
-            val cond1 = setter(b).bind()
+            val (cond1) = setter(b)
             ref.set(c).bind()
-            val cond2 = setter(d).bind()
-            val result = ref.get().bind()
+            val (cond2) = setter(d)
+            val (result) = ref.get()
             cond1 && !cond2 && result == c
           }.fix().unsafeRunSync()
         }

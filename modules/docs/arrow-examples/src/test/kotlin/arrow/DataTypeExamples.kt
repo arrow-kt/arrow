@@ -65,17 +65,17 @@ class DataTypeExamples : FreeSpec() { init {
     "Monad" {
       // Computing over dependent values ignoring absence
       val six = binding {
-        val a = Option(1).bind()
-        val b = Option(1 + a).bind()
-        val c = Option(1 + b).bind()
+        val (a) = Option(1)
+        val (b) = Option(1 + a)
+        val (c) = Option(1 + b)
         a + b + c
       }
       six shouldBe Some(6)
 
       val none = binding {
-        val a = Option(1).bind()
-        val b = noneValue.bind()
-        val c = Option(1 + b).bind()
+        val (a) = Option(1)
+        val (b) = noneValue
+        val (c) = Option(1 + b)
         a + b + c
       }
       none shouldBe None

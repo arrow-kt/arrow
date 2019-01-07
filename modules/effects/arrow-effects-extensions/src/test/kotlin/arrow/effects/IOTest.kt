@@ -368,7 +368,7 @@ class IOTest : UnitSpec() {
 
     "IO.binding should for comprehend over IO" {
       val result = binding {
-        val x = IO.just(1).bind()
+        val (x) = IO.just(1)
         val y = bind { IO { x + 1 } }
         y
       }.fix()

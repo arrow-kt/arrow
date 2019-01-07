@@ -6,6 +6,7 @@ import arrow.core.Eval
 import arrow.core.Tuple2
 import arrow.core.identity
 import arrow.documented
+import kotlin.coroutines.RestrictsSuspension
 import kotlin.coroutines.startCoroutine
 
 /**

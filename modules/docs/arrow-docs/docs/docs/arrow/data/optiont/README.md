@@ -56,10 +56,10 @@ import arrow.core.extensions.option.monad.binding
 
 fun getCountryCode(maybePerson : Option<Person>): Option<String> =
    binding {
-     val person = maybePerson.bind()
-     val address = person.address.bind()
-     val country = address.country.bind()
-     val code = country.code.bind()
+     val (person) = maybePerson
+     val (address) = person.address
+     val (country) = address.country
+     val (code) = country.code
      code
    }
 ```
@@ -145,7 +145,7 @@ import arrow.effects.rx2.extensions.observablek.monad.binding
 
 fun getCountryCode(personId: Int): ObservableK<Option<String>> =
     binding {
-      val maybePerson = findPerson(personId).bind()
+      val (maybePerson) = findPerson(personId)
       val person = maybePerson.fold(
         { ObservableK.raiseError<Person>(NoSuchElementException("...")) },
         { ObservableK.just(it) }
@@ -154,7 +154,7 @@ fun getCountryCode(personId: Int): ObservableK<Option<String>> =
         { ObservableK.raiseError<Address>(NoSuchElementException("...")) },
         { ObservableK.just(it) }
       ).bind()
-      val maybeCountry = findCountry(address.id).bind()
+      val (maybeCountry) = findCountry(address.id)
       val country = maybeCountry.fold(
         { ObservableK.raiseError<Country>(NoSuchElementException("...")) },
         { ObservableK.just(it) }
@@ -209,10 +209,10 @@ import arrow.effects.rx2.extensions.observablek.monad.monad
 
 fun getCountryCode(personId: Int): ObservableK<Option<String>> =
    binding(ObservableK.monad()) {
-    val person = OptionT(findPerson(personId)).bind()
-    val address = OptionT(ObservableK.just(person.address)).bind()
-    val country = OptionT(findCountry(address.id)).bind()
-    val code = OptionT(ObservableK.just(country.code)).bind()
+    val (person) = OptionT(findPerson(personId))
+    val (address) = OptionT(ObservableK.just(person.address))
+    val (country) = OptionT(findCountry(address.id))
+    val (code) = OptionT(ObservableK.just(country.code))
     code
   }.value().fix()
 ```

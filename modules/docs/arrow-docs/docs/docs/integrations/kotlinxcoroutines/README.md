@@ -127,10 +127,10 @@ import arrow.typeclasses.*
 import arrow.effects.coroutines.extensions.deferred.monadThrow.bindingCatch
 
 bindingCatch {
-  val songUrl = getSongUrlAsync().bind()
+  val (songUrl) = getSongUrlAsync()
   val musicPlayer = MediaPlayer.load(songUrl)
   val totalTime = musicPlayer.getTotaltime() // Oh oh, total time is 0  
-  val timelineClick = audioTimeline.click().bind()   
+  val (timelineClick) = audioTimeline.click()   
   val percent = (timelineClick / totalTime * 100).toInt()
   percent
 }.unsafeAttemptSync()
@@ -170,7 +170,7 @@ import arrow.effects.coroutines.extensions.deferred.monad.*
 
 val (deferred, unsafeCancel) =
   bindingCancellable {
-    val userProfile = DeferredK { getUserProfile("123") }.bind()
+    val (userProfile) = DeferredK { getUserProfile("123") }
     val friendProfiles = userProfile.friends().map { friend ->
         DeferredK { getProfile(friend.id) }.bind()
     }

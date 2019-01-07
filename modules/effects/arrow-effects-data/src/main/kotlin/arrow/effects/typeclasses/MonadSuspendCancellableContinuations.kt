@@ -3,6 +3,7 @@ package arrow.effects.typeclasses
 import arrow.Kind
 import arrow.core.Either
 import arrow.effects.data.internal.BindingCancellationException
+import arrow.effects.typeclasses.suspended.MonadDeferSyntax
 import arrow.typeclasses.MonadErrorContinuation
 import arrow.typeclasses.stateStack
 import java.util.concurrent.atomic.AtomicBoolean
@@ -18,7 +19,7 @@ typealias Disposable = () -> Unit
 @RestrictsSuspension
 @Suppress("DELEGATED_MEMBER_HIDES_SUPERTYPE_OVERRIDE")
 open class MonadDeferCancellableContinuation<F, A>(SC: MonadDefer<F>, override val context: CoroutineContext = EmptyCoroutineContext) :
-  MonadErrorContinuation<F, A>(SC), MonadDefer<F> by SC {
+  MonadErrorContinuation<F, A>(SC), MonadDefer<F> by SC, MonadDeferSyntax<F> {
 
   protected val cancelled: AtomicBoolean = AtomicBoolean(false)
 

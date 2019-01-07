@@ -36,13 +36,13 @@ sealed class Ops<out A> : OpsOf<A> {
 class FreeTest : UnitSpec() {
 
   private val program = Ops.binding {
-    val added = Ops.add(10, 10).bind()
+    val (added) = Ops.add(10, 10)
     val subtracted = bind { Ops.subtract(added, 50) }
     subtracted
   }.fix()
 
   private fun stackSafeTestProgram(n: Int, stopAt: Int): Free<ForOps, Int> = Ops.binding {
-    val v = Ops.add(n, 1).bind()
+    val (v) = Ops.add(n, 1)
     val r = bind { if (v < stopAt) stackSafeTestProgram(v, stopAt) else Free.just(v) }
     r
   }.fix()

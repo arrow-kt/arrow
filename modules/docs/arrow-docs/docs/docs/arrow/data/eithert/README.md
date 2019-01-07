@@ -74,9 +74,9 @@ import arrow.core.extensions.either.monad.*
 
 fun getCountryCode(maybePerson : Either<BizError, Person>): Either<BizError, String> =
   binding<BizError, String> {
-    val person = maybePerson.bind()
-    val address = person.address.toEither({ AddressNotFound(person.id) }).bind()
-    val country = address.country.toEither({ CountryNotFound(address.id)}).bind()
+    val (person) = maybePerson
+    val (address) = person.address.toEither({ AddressNotFound(person.id) })
+    val (country) = address.country.toEither({ CountryNotFound(address.id)})
     country.code
   }.fix()
 ```
@@ -167,7 +167,7 @@ import arrow.effects.rx2.extensions.observablek.monad.*
 
 fun getCountryCode(personId: Int): ObservableK<Either<BizError, String>> =
   binding {
-    val person = findPerson(personId).bind()
+    val (person) = findPerson(personId)
     val address = person.fold (
       { it.left() },
       { it.address.toEither { AddressNotFound(personId) } }
@@ -220,11 +220,11 @@ import arrow.data.extensions.eithert.monad.*
 
 fun getCountryCode(personId: Int): ObservableK<Either<BizError, String>> =
   EitherT.monad<ForObservableK, BizError>(ObservableK.monad()).binding {
-    val person = EitherT(findPerson(personId)).bind()
+    val (person) = EitherT(findPerson(personId))
     val address = EitherT(ObservableK.just(
       person.address.toEither { AddressNotFound(personId) }
     )).bind()
-    val country = EitherT(findCountry(address.id)).bind()
+    val (country) = EitherT(findCountry(address.id))
     country.code
   }.value().fix()
 ```

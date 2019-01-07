@@ -93,9 +93,9 @@ val nelTwo: NonEmptyList<Int> = NonEmptyList.of(2)
 val nelThree: NonEmptyList<Int> = NonEmptyList.of(3)
 
 binding {
-  val one = nelOne.bind()
-  val two = nelTwo.bind()
-  val three = nelThree.bind()
+  val (one) = nelOne
+  val (two) = nelTwo
+  val (three) = nelThree
   one + two + three
 }
 ```
@@ -104,8 +104,8 @@ Monad binding in `NonEmptyList` and other collection related data type can be us
 
 ```kotlin:ank
 binding {
-  val x = NonEmptyList.of(1, 2, 3).bind()
-  val y = NonEmptyList.of(1, 2, 3).bind()
+  val (x) = NonEmptyList.of(1, 2, 3)
+  val (y) = NonEmptyList.of(1, 2, 3)
   x + y
 }
 ```
