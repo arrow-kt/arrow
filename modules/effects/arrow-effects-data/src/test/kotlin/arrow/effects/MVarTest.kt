@@ -8,6 +8,7 @@ import arrow.effects.extensions.io.monad.flatMap
 import arrow.effects.typeclasses.seconds
 import arrow.core.extensions.either.eq.eq
 import arrow.core.extensions.option.eq.eq
+import arrow.effects.extensions.io.monad.F
 import arrow.test.UnitSpec
 import arrow.test.laws.equalUnderTheLaw
 import arrow.typeclasses.Eq
@@ -31,7 +32,7 @@ class MVarTest : UnitSpec() {
 
     "empty; put; isNotEmpty; take; put; take" {
       forAll(Gen.int(), Gen.int()) { a, b ->
-        val task = binding {
+        val task = F {
           val av = mvar.empty<Int>().bind()
           val isEmpty = av.isEmpty().bind()
           av.put(a).bind()
@@ -48,7 +49,7 @@ class MVarTest : UnitSpec() {
 
     "empty; tryPut; tryPut; isNotEmpty; tryTake; tryTake; put; take" {
       forAll(Gen.int(), Gen.int(), Gen.int()) { a, b, c ->
-        val task = binding {
+        val task = F {
           val av = mvar.empty<Int>().bind()
           val isEmpty = av.isEmpty().bind()
           val p1 = av.tryPut(a).bind()
@@ -67,7 +68,7 @@ class MVarTest : UnitSpec() {
 
     "initial; isNotEmpty; take; put; take" {
       forAll(Gen.int(), Gen.int()) { a, b ->
-        val task = binding {
+        val task = F {
           val av = mvar.of(a).bind()
           val isNotEmpty = av.isNotEmpty().bind()
           val r1 = av.take().bind()
@@ -83,7 +84,7 @@ class MVarTest : UnitSpec() {
 
     "initial; read; take" {
       forAll(Gen.int()) { i ->
-        val task = binding {
+        val task = F {
           val av = mvar.of(i).bind()
           val read = av.read().bind()
           val take = av.take().bind()

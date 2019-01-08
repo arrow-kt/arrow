@@ -12,6 +12,7 @@ import arrow.effects.typeclasses.seconds
 import arrow.core.extensions.option.eq.eq
 import arrow.data.extensions.list.traverse.sequence
 import arrow.data.k
+import arrow.effects.extensions.io.monad.F
 import arrow.effects.extensions.io.monadDefer.bindingCancellable
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
@@ -370,7 +371,7 @@ class IOTest : UnitSpec() {
     }
 
     "IO.binding should for comprehend over IO" {
-      val result = binding {
+      val result = F {
         val (x) = IO.just(1)
         val y = bind { IO { x + 1 } }
         y

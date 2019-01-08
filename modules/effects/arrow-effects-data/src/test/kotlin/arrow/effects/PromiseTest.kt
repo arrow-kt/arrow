@@ -8,6 +8,7 @@ import arrow.effects.extensions.io.monad.flatMap
 import arrow.effects.typeclasses.seconds
 import arrow.core.extensions.either.eq.eq
 import arrow.core.extensions.option.eq.eq
+import arrow.effects.extensions.io.monad.F
 import arrow.test.UnitSpec
 import arrow.test.generators.genThrowable
 import arrow.test.laws.equalUnderTheLaw
@@ -58,7 +59,7 @@ class PromiseTest : UnitSpec() {
 
     "complete twice results in AlreadyFulfilled" {
       forAll(Gen.int(), Gen.int()) { a, b ->
-        binding {
+        F {
           val (p) = promise<Int>()
           p.complete(a).bind()
           p.complete(b).bind()
@@ -69,7 +70,7 @@ class PromiseTest : UnitSpec() {
 
     "tryComplete" {
       forAll(Gen.int()) { i ->
-        binding {
+        F {
           val (p) = promise<Int>()
           p.tryComplete(i).bind() toT p.get.bind()
         }.equalUnderTheLaw(IO.just(true toT i), EQ())
@@ -78,7 +79,7 @@ class PromiseTest : UnitSpec() {
 
     "tryComplete returns false if already complete" {
       forAll(Gen.int(), Gen.int()) { a, b ->
-        binding {
+        F {
           val (p) = promise<Int>()
           p.complete(a).bind()
           p.tryComplete(b).bind() toT p.get.bind()
@@ -97,7 +98,7 @@ class PromiseTest : UnitSpec() {
 
     "error after completion results in AlreadyFulfilled" {
       forAll(Gen.int(), genThrowable()) { i, t ->
-        binding {
+        F {
           val (p) = promise<Int>()
           p.complete(i).bind()
           p.error(t).bind()
@@ -108,7 +109,7 @@ class PromiseTest : UnitSpec() {
 
     "tryError returns false if already completed" {
       forAll(Gen.int(), genThrowable()) { i, t ->
-        binding {
+        F {
           val (p) = promise<Int>()
           p.complete(i).bind()
           p.tryError(t).bind() toT p.get.bind()
@@ -118,7 +119,7 @@ class PromiseTest : UnitSpec() {
 
     "tryError" {
       forAll(genThrowable()) { t ->
-        binding {
+        F {
           val (p) = promise<Int>()
           p.tryError(t).bind()
         }.equalUnderTheLaw(IO.raiseError(t), EQ())

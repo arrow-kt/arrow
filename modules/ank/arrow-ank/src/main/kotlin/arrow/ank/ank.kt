@@ -16,7 +16,7 @@ fun Long.humanBytes(): String {
 }
 
 fun <F> ank(source: Path, target: Path, compilerArgs: List<String>, ankOps: AnkOps<F>): Kind<F, Unit> = with(ankOps) {
-  MF().binding {
+  MF().F {
     printConsole(colored(ANSI_PURPLE, AnkHeader))
     val heapSize = Runtime.getRuntime().totalMemory()
     val heapMaxSize = Runtime.getRuntime().maxMemory()

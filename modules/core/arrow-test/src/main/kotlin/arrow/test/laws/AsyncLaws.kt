@@ -67,7 +67,7 @@ object AsyncLaws {
 
   fun <F> Async<F>.continueOnComprehension(EQ: Eq<Kind<F, Int>>): Unit =
     forFew(5, genIntSmall(), genIntSmall()) { threadId1: Int, threadId2: Int ->
-      binding {
+      F {
         continueOn(newSingleThreadContext(threadId1.toString()))
         val t1: Int = getCurrentThread()
         continueOn(newSingleThreadContext(threadId2.toString()))

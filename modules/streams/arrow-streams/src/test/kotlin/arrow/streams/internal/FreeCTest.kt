@@ -61,13 +61,13 @@ val ioInterpreter: FunctionK<ForOps, ForIO> = object : FunctionK<ForOps, ForIO> 
   }
 }
 
-private val program = Ops.binding {
+private val program = Ops.F {
   val (added) = Ops.add(10, 10)
   val subtracted = bind { Ops.subtract(added, 50) }
   subtracted
 }.fix()
 
-private fun stackSafeTestProgram(n: Int, stopAt: Int): FreeC<ForOps, Int> = Ops.binding {
+private fun stackSafeTestProgram(n: Int, stopAt: Int): FreeC<ForOps, Int> = Ops.F {
   val (v) = Ops.add(n, 1)
   val r = bind { if (v < stopAt) stackSafeTestProgram(v, stopAt) else FreeC.just(v) }
   r
