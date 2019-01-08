@@ -2,7 +2,7 @@ package arrow.mtl.typeclasses
 
 import arrow.Kind
 import arrow.core.*
-import arrow.instances.id.applicative.applicative
+import arrow.core.extensions.id.applicative.applicative
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Traverse
 

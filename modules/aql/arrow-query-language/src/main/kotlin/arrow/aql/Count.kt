@@ -4,7 +4,7 @@ import arrow.core.*
 import arrow.data.ForListK
 import arrow.data.fix
 import arrow.data.k
-import arrow.instances.monoid
+import arrow.core.extensions.monoid
 import arrow.typeclasses.Foldable
 
 interface Count<F> {

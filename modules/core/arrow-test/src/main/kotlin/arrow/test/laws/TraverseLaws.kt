@@ -7,9 +7,10 @@ import arrow.test.generators.genConstructor
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genIntSmall
 import io.kotlintest.properties.forAll
-import arrow.instances.*
-import arrow.instances.const.applicative.applicative
-import arrow.instances.id.applicative.applicative
+import arrow.data.extensions.*
+import arrow.core.extensions.const.applicative.applicative
+import arrow.core.extensions.id.applicative.applicative
+import arrow.core.extensions.monoid
 
 typealias TI<A> = Tuple2<IdOf<A>, IdOf<A>>
 

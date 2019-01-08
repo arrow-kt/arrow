@@ -5,10 +5,10 @@ import arrow.core.*
 import arrow.effects.ForIO
 import arrow.effects.IO
 import arrow.effects.fix
-import arrow.effects.instances.io.monadError.monadError
+import arrow.effects.extensions.io.monadError.monadError
 import arrow.higherkind
-import arrow.instances.`try`.monadError.monadError
-import arrow.instances.either.monadError.monadError
+import arrow.core.extensions.`try`.monadError.monadError
+import arrow.core.extensions.either.monadError.monadError
 import arrow.streams.internal.freec.eq.eq
 import arrow.streams.internal.freec.monadDefer.monadDefer
 import arrow.test.UnitSpec

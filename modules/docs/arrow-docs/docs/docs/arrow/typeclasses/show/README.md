@@ -17,9 +17,9 @@ It can be considered the typeclass equivalent of Java's `Object#toString`.
 
 ```kotlin:ank
 import arrow.*
-import arrow.instances.*
+import arrow.core.extensions.*
 
-ForInt extensions { 1.show() }
+Int.show().run { 1.show() }
 ```
 
 ### Main Combinators

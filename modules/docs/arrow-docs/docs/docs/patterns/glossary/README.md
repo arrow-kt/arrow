@@ -94,7 +94,7 @@ We can declare that instances of this class can be equated based on their `id` p
 
 ```kotlin
 @extension
-interface UserEqInstance: Eq<User> {
+interface UserEq: Eq<User> {
   override fun User.eqv(b: User): Boolean = id == b.id
 }
 ```
@@ -105,11 +105,12 @@ Note that classes must have companion objects for this to work. All typeclass in
 import arrow.*
 import arrow.core.*
 import arrow.data.*
-import arrow.instances.*
+import arrow.core.extensions.*
+import arrow.data.extensions.*
 import arrow.typeclasses.*
-import arrow.instances.option.functor.*
-import arrow.instances.either.monadError.*
-import arrow.instances.listk.traverse.*
+import arrow.core.extensions.option.functor.*
+import arrow.core.extensions.either.monadError.*
+import arrow.data.extensions.listk.traverse.*
 ```
 
 ```kotlin:ank
@@ -121,7 +122,7 @@ Option.functor()
 ```
 
 ```kotlin:ank
-import arrow.instances.mapk.semigroup.*
+import arrow.data.extensions.mapk.semigroup.*
 
 MapK.semigroup<String, Int>(Int.semigroup())
 ```
@@ -143,15 +144,15 @@ NOTE: If you'd like to use `@extension` for transitive typeclasses, like a `Show
 
 Arrow provides a `extensions` DSL making available in the scoped block all the functions and extensions defined in all instances for that datatype. Use the infix function `extensions` on an object, or function, with the name of the datatype prefixed by For-.
 
-```kotlin
-ForOption extensions {
-  binding {
-    val a = Option(1).bind()
-    val b = Option(a + 1).bind()
-    a + b
-  }.fix()
+```kotlin:ank
+import arrow.core.Option
+import arrow.core.extensions.option.monad.binding
+
+binding {
+  val a = Option(1).bind()
+  val b = Option(a + 1).bind()
+  a + b
 }
-//Option(3)
 ```
 
 ```kotlin
@@ -163,44 +164,42 @@ ForOption extensions {
 //Option(6)
 ```
 
-```kotlin
-ForOption extensions {
-  listOf(Option(1), Option(2), Option(3)).k().traverse(this, ::identity)
+```kotlin:ank
+import arrow.data.extensions.list.traverse.sequence
+import arrow.core.extensions.option.applicative.applicative
+
+listOf(Option(1), Option(2), Option(3)).sequence(Option.applicative())
+```
+
+```kotlin:ank
+import arrow.core.extensions.`try`.monad.binding
+
+binding {
+  val a = Try { 1 }.bind()
+  val b = Try { a + 1 }.bind()
+  a + b
 }
-//Option(ListK(1, 2, 3))
+```
+
+```kotlin:ank
+import arrow.core.extensions.`try`.applicative.map
+
+map(Try { 1 }, Try { 2 }, Try { 3 }) { (one, two, three) ->
+  one + two + three
+}
 ```
 
 ```kotlin
-ForTry extensions {
-  binding {
-    val a = Try { 1 }.bind()
-    val b = Try { a + 1 }.bind()
-    a + b
-  }.fix()
-}
-//Success(3)
-```
+import arrow.data.extensions.list.traverse.sequence
+import arrow.core.extensions.either.applicative.applicative
 
-```kotlin
-ForTry extensions {
-  map(Try { 1 }, Try { 2 }, Try { 3 }, { (one, two, three) ->
-    one + two + three
-  })
-}
-//Success(6)
-```
-
-```kotlin
-ForEither<Throwable>() extensions {
-  listOf(just(1), just(2), just(3)).k().traverse(this, ::identity)
-}
-//Right<Throwable, ListK<Int>>(ListK(1,2,3))
+listOf(Right(1), Right(2), Right(3)).sequence(Either.applicative<Throwable>())
 ```
 
 If you defined your own instances over your own data types and wish to use a similar `extensions` DSL you can do so for both types with a single type argument such as `Option`:
 
 ```kotlin:ank:silent
-object OptionContext : OptionMonadErrorInstance, OptionTraverseInstance {
+object OptionContext : OptionMonadError, OptionTraverse{
   override fun <A, B> Kind<ForOption, A>.map(f: (A) -> B): Option<B> =
     fix().map(f)
 }
@@ -212,7 +211,7 @@ infix fun <A> ForOption.Companion.extensions(f: OptionContext.() -> A): A =
 Or for types that require partial application of some of their type arguments such as `Either<L, R>` where `L` needs to be partially applied
 
 ```kotlin:ank:silent
-class EitherContext<L> : EitherMonadErrorInstance<L>, EitherTraverseInstance<L> {
+class EitherContext<L> : EitherMonadError<L>, EitherTraverse<L> {
   override fun <A, B> Kind<EitherPartialOf<L>, A>.map(f: (A) -> B): Either<L, B> =
     fix().map(f)
 }
@@ -312,7 +311,7 @@ Let's define an instance of `Functor` for the datatype `ListK`, our own wrapper 
 
 ```kotlin
 @extension
-interface ListKFunctorInstance : Functor<ForListK> {
+interface ListKFunctor : Functor<ForListK> {
   override fun <A, B> Kind<F, A>.map(f: (A) -> B): ListK<B> {
     val list: ListK<A> = this.fix()
     return list.map(f)
@@ -326,12 +325,12 @@ These extensions functions may be imported a la carte when working with concrete
 
 ```kotlin
 @extension
-interface ListKFunctorInstance : Functor<ForListK>
+interface ListKFunctor : Functor<ForListK>
 ```
 
 ```kotlin:ank
 // Somewhere else in the codebase
-import arrow.instances.listk.functor.*
+import arrow.data.extensions.listk.functor.*
 ListK.functor()
 ```
 
@@ -375,7 +374,7 @@ Now lets create a simple example instance of `Applicative` where our `F` is `Lis
 
 ```kotlin
 @instance
-interface ListKApplicativeInstance : Applicative<ForListK> {
+interface ListKApplicative : Applicative<ForListK> {
   override fun <A> just(a: A): Kind<ForListK, A> = ListK(listOf(a))
 
   /* ... */

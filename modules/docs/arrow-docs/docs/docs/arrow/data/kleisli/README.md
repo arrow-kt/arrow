@@ -52,8 +52,8 @@ The `ap` function transform the `Kleisli` into another `Kleisli` with a function
 
 ```kotlin:ank
 import arrow.data.fix
-import arrow.instances.option.applicative.*
-import arrow.instances.option.monad.*
+import arrow.core.extensions.option.applicative.*
+import arrow.core.extensions.option.monad.*
 
 val intToDouble = {number:Int -> number.toDouble()}
 

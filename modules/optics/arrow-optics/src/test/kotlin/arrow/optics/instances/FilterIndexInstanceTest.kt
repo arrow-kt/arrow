@@ -1,18 +1,21 @@
 package arrow.optics.instances
 
 import arrow.core.Option
+import arrow.core.extensions.eq
+import arrow.core.extensions.option.eq.eq
 import arrow.data.ListK
 import arrow.data.MapK
 import arrow.data.NonEmptyList
 import arrow.data.SequenceK
-import arrow.instances.eq
-import arrow.instances.listk.eq.eq
-import arrow.instances.option.eq.eq
-import arrow.instances.sequencek.eq.eq
-import arrow.optics.instances.listk.filterIndex.filterIndex
-import arrow.optics.instances.mapk.filterIndex.filterIndex
-import arrow.optics.instances.nonemptylist.filterIndex.filterIndex
-import arrow.optics.instances.sequencek.filterIndex.filterIndex
+import arrow.data.extensions.listk.eq.eq
+import arrow.data.extensions.sequencek.eq.eq
+import arrow.optics.extensions.ListFilterIndex
+import arrow.optics.extensions.MapFilterIndex
+import arrow.optics.extensions.filterIndex
+import arrow.optics.extensions.listk.filterIndex.filterIndex
+import arrow.optics.extensions.mapk.filterIndex.filterIndex
+import arrow.optics.extensions.nonemptylist.filterIndex.filterIndex
+import arrow.optics.extensions.sequencek.filterIndex.filterIndex
 import arrow.test.UnitSpec
 import arrow.test.generators.*
 import arrow.test.laws.TraversalLaws
@@ -36,7 +39,7 @@ class FilterIndexInstanceTest : UnitSpec() {
     ))
 
     testLaws(TraversalLaws.laws(
-      traversal = ListFilterIndexInstance<String>().filter { true },
+      traversal = ListFilterIndex<String>().filter { true },
       aGen = Gen.list(Gen.string()),
       bGen = Gen.string(),
       funcGen = genFunctionAToB(Gen.string()),
@@ -76,7 +79,7 @@ class FilterIndexInstanceTest : UnitSpec() {
     ))
 
     testLaws(TraversalLaws.laws(
-      traversal = MapFilterIndexInstance<Char, Int>().filter { true },
+      traversal = MapFilterIndex<Char, Int>().filter { true },
       aGen = genMapK(genChars(), genIntSmall()),
       bGen = Gen.int(),
       funcGen = genFunctionAToB(Gen.int()),

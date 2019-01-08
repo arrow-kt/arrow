@@ -4,7 +4,7 @@ import arrow.Kind
 import arrow.Kind2
 import arrow.core.*
 import arrow.data.*
-import arrow.instances.option.functor.functor
+import arrow.core.extensions.option.functor.functor
 import arrow.recursion.Algebra
 import arrow.recursion.Coalgebra
 import arrow.recursion.typeclasses.Corecursive

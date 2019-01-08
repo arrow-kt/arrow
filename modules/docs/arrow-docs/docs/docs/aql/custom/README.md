@@ -238,7 +238,7 @@ println(result)
 import arrow.aql.*
 import arrow.aql.box.select.*
 import arrow.aql.box.groupBy.*
-import arrow.aql.instances.id.select.*
+import arrow.aql.extensions.id.select.*
 
 fun main(args: Array<String>) {
 //sampleStart
@@ -261,9 +261,9 @@ println(result)
 import arrow.aql.*
 import arrow.aql.box.select.*
 import arrow.aql.box.orderBy.*
-import arrow.aql.instances.id.select.*
+import arrow.aql.extensions.id.select.*
 import arrow.aql.Ord
-import arrow.instances.order
+import arrow.core.extensions.order
 
 fun main(args: Array<String>) {
 //sampleStart
@@ -309,7 +309,7 @@ import arrow.aql.*
 import arrow.aql.box.select.query
 import arrow.aql.box.select.selectAll
 import arrow.aql.box.union.union
-import arrow.aql.instances.list.select.value
+import arrow.aql.extensions.list.select.value
 import arrow.aql.box.where.where
 
 fun main(args: Array<String>) {

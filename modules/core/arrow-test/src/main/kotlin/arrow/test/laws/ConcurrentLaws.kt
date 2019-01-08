@@ -2,16 +2,16 @@ package arrow.test.laws
 
 import arrow.Kind
 import arrow.core.*
-import arrow.effects.*
+import arrow.effects.CancelToken
+import arrow.effects.MVar
+import arrow.effects.Promise
+import arrow.effects.Semaphore
 import arrow.effects.internal.unsafe
 import arrow.effects.typeclasses.Concurrent
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.fold
 import arrow.test.generators.genEither
 import arrow.test.generators.genThrowable
-import arrow.test.laws.ConcurrentLaws.racePairCanCancelsLoser
-import arrow.test.laws.ConcurrentLaws.raceTripleCanJoinMiddle
-import arrow.test.laws.ConcurrentLaws.raceTripleCanJoinRight
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll

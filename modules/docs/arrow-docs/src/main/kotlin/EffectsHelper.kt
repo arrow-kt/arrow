@@ -1,11 +1,12 @@
 package arrow.effects
 
-import arrow.effects.deferredk.monad.monad
+import arrow.effects.coroutines.*
+import arrow.effects.coroutines.extensions.deferredk.monad.monad
 import arrow.effects.typeclasses.Fiber
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
-import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.Dispatchers.Unconfined
+import kotlin.coroutines.CoroutineContext
 
 val UI = Unconfined
 

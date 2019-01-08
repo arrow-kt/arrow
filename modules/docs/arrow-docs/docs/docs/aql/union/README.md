@@ -15,9 +15,9 @@ beginner
 
 {:data-executable='true'}
 ```kotlin:ank
-import arrow.aql.instances.list.select.*
-import arrow.aql.instances.list.union.union
-import arrow.aql.instances.listk.select.selectAll
+import arrow.aql.extensions.list.select.*
+import arrow.aql.extensions.list.union.union
+import arrow.aql.extensions.listk.select.selectAll
 
 data class Student(val name: String, val age: Int)
 

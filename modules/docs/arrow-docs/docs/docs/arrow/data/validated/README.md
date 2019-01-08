@@ -228,9 +228,9 @@ import arrow.*
 import arrow.core.*
 import arrow.typeclasses.*
 import arrow.data.*
-import arrow.instances.validated.applicativeError.*
-import arrow.instances.either.applicativeError.*
-import arrow.instances.nonemptylist.semigroup.*
+import arrow.data.extensions.validated.applicativeError.*
+import arrow.core.extensions.either.applicativeError.*
+import arrow.data.extensions.nonemptylist.semigroup.*
 
 sealed class ValidationError(val msg: String) {
   data class DoesNotContain(val value: String) : ValidationError("Did not contain $value")

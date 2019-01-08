@@ -193,3 +193,9 @@ DM Ersin on [Gitter](https://gitter.im/ersin-ertan) or [Slack](https://kotlinlan
 [Functional Hangman](https://lordraydenmk.github.io/2018/functional-hangman-in-kotlin-with-arrow/) game - console application written with Arrow. Uses the `IO<A>` monad to push side effects to the edge of the system.
 
 November '18 - version 0.8.1
+
+### Getting started with FP in Kotlin and Arrow: Typeclasses
+
+[Getting started with FP in Kotlin and Arrow: Typeclasses](http://www.smartjava.org/content/kotlin-arrow-typeclasses/) explores part of the Arrow library by explaining how you can use Arrow to create your own typeclasses and use the ones provided by Arrow to make your code more concise and better readable.
+
+January '19 - version 0.8.1

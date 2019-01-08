@@ -1,7 +1,7 @@
 package arrow.optics
 
+import arrow.core.ListExtensions
 import arrow.data.ListK
-import arrow.core.ListInstances
 
 private val stringToList: Iso<String, List<Char>> = Iso(
   get = CharSequence::toList,
@@ -18,4 +18,4 @@ fun String.Companion.toList(): Iso<String, List<Char>> =
  * [Iso] that defines equality between String and [ListK] of [Char]
  */
 fun String.Companion.toListK(): Iso<String, ListK<Char>> =
-  stringToList compose ListInstances.toListK()
+  stringToList compose ListExtensions.toListK()

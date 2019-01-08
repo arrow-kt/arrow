@@ -2,7 +2,7 @@ package arrow.ank
 
 import arrow.core.*
 import arrow.effects.typeclasses.MonadDefer
-import arrow.instances.sequence.foldable.foldLeft
+import arrow.data.extensions.sequence.foldable.foldLeft
 import java.net.URL
 import java.net.URLClassLoader
 import java.nio.file.Files

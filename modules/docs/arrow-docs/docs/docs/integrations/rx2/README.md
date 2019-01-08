@@ -33,7 +33,7 @@ The largest quality of life improvement when using Observables in Arrow is the i
 To wrap any existing Observable in its Arrow Wrapper counterpart you can use the extension function `k()`.
 
 ```kotlin:ank
-import arrow.effects.*
+import arrow.effects.rx2.*
 import io.reactivex.*
 import io.reactivex.subjects.*
 
@@ -122,11 +122,11 @@ getSongUrlAsync()
 When rewritten using `bindingCatch` it becomes:
 
 ```kotlin
-import arrow.effects.*
+import arrow.effects.rx2.*
 import arrow.typeclasses.*
+import arrow.effects.rx2.extensions.observable.monadThrow.bindingCatch
 
-ForObservableK extensions { 
- bindingCatch {
+bindingCatch {
   val songUrl = getSongUrlAsync().bind()
   val musicPlayer = MediaPlayer.load(songUrl)
   val totalTime = musicPlayer.getTotaltime()
@@ -141,7 +141,6 @@ ForObservableK extensions {
   }
 
   percent
- }.fix()
 }
 ```
 
@@ -163,7 +162,7 @@ Note that [`MonadDefer`]({{ '/docs/effects/monaddefer' | relative_url }}) provid
 Invoking this `Disposable` causes an `BindingCancellationException` in the chain which needs to be handled by the subscriber, similarly to what `Deferred` does.
 
 ```kotlin
-import arrow.effects.instances.observable.monad.*
+import arrow.effects.rx2.extensions.observable.monad.*
 
 val (observable, disposable) =
   bindingCancellable {
@@ -191,11 +190,11 @@ To overcome this limitation and run code in a stack safe way, one can make use o
 {: data-executable='true'}
 ```kotlin:ank
 import arrow.Kind
-import arrow.effects.FlowableK
-import arrow.effects.ForFlowableK
-import arrow.effects.fix
-import arrow.effects.flowablek.monad.monad
-import arrow.effects.flowablek.applicativeError.attempt
+import arrow.effects.rx2.FlowableK
+import arrow.effects.rx2.ForFlowableK
+import arrow.effects.rx2.fix
+import arrow.effects.rx2.extensions.flowablek.monad.monad
+import arrow.effects.rx2.extensions.flowablek.applicativeError.attempt
 import arrow.free.bindingStackSafe
 import arrow.free.run
 
@@ -229,7 +228,7 @@ Try {
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.effects.*
+import arrow.effects.rx2.*
 
 DataType(ObservableK::class).tcMarkdownList()
 ```
