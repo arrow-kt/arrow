@@ -2,12 +2,27 @@ package arrow.effects.typeclasses.suspended
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.core.identity
+import arrow.data.extensions.list.foldable.sequence_
+import arrow.data.k
 import arrow.effects.CancelToken
 import arrow.effects.typeclasses.*
 import arrow.typeclasses.suspended.MonadErrorSyntax
+import arrow.typeclasses.suspended.MonadSyntax
 import kotlin.coroutines.CoroutineContext
 
-interface BracketSyntax<F, E> : MonadErrorSyntax<F, E>, Bracket<F, E> {
+interface ListTraverseSyntax<F> : MonadSyntax<F> {
+  suspend fun <A, B> List<Kind<F, A>>.traverse(f: (Kind<F, A>) -> Kind<F, B>) : List<B> =
+    k().traverse(this@ListTraverseSyntax, f).bind()
+
+  suspend fun <A> List<Kind<F, A>>.sequence() : List<A> =
+    traverse(::identity)
+
+  suspend fun <A> List<Kind<F, A>>.sequence_() : Unit =
+    k().sequence_(this@ListTraverseSyntax).bind()
+}
+
+interface BracketSyntax<F, E> : MonadErrorSyntax<F, E>, Bracket<F, E>, ListTraverseSyntax<F> {
 
   private suspend fun <A> bracketing(fb: Bracket<F, E>.() -> Kind<F, A>): A =
     run<Bracket<F, E>, Kind<F, A>> { fb(this) }.bind()

@@ -6,6 +6,8 @@ import arrow.core.extensions.monoid
 import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.option.eq.eq
 import arrow.core.extensions.option.hash.hash
+import arrow.core.extensions.option.monad.F
+import arrow.core.extensions.option.monad.binding
 import arrow.core.extensions.option.monoid.monoid
 import arrow.core.extensions.option.show.show
 import arrow.mtl.extensions.option.monadFilter.monadFilter
@@ -32,7 +34,7 @@ class OptionTest : UnitSpec() {
       ShowLaws.laws(Option.show(), Option.eq(Int.eq())) { Some(it) },
       MonoidLaws.laws(Option.monoid(Int.monoid()), Some(1), Option.eq(Int.eq())),
       //testLaws(MonadErrorLaws.laws(monadError<ForOption, Unit>(), Eq.any(), EQ_EITHER)) TODO reenable once the MonadErrorLaws are parametric to `E`
-      FunctorFilterLaws.laws(Option.traverseFilter(), {Option(it)}, Eq.any()),
+      FunctorFilterLaws.laws(Option.traverseFilter(), { Option(it) }, Eq.any()),
       TraverseFilterLaws.laws(Option.traverseFilter(), Option.applicative(), ::Some, Eq.any()),
       MonadFilterLaws.laws(Option.monadFilter(), ::Some, Eq.any()),
       HashLaws.laws(Option.hash(Int.hash()), Option.eq(Int.eq())) { it.some() }
@@ -134,6 +136,14 @@ class OptionTest : UnitSpec() {
       None or x shouldBe Some(2)
       None or None shouldBe None
 
+    }
+
+    "applicative range syntax" {
+      val result: Option<Int> = F {
+        val (a, b, c, d) = Option(1)..Option(2)..Option(3)..Option(4)
+        a + b + c + d
+      }
+      result shouldBe Some(1 + 2 + 3 + 4)
     }
   }
 

@@ -2,7 +2,6 @@ package arrow.typeclasses
 
 import arrow.Kind
 import arrow.core.Continuation
-import arrow.core.Tuple2
 import arrow.typeclasses.suspended.MonadSyntax
 import java.util.concurrent.CountDownLatch
 import kotlin.coroutines.*

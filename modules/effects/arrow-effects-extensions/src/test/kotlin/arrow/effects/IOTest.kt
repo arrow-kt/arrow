@@ -10,6 +10,9 @@ import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.milliseconds
 import arrow.effects.typeclasses.seconds
 import arrow.core.extensions.option.eq.eq
+import arrow.data.extensions.list.traverse.sequence
+import arrow.data.k
+import arrow.effects.extensions.io.monadDefer.bindingCancellable
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.laws.AsyncLaws
@@ -436,6 +439,13 @@ class IOTest : UnitSpec() {
         }.unsafeRunAsyncCancellable { }
         latch.get
       }.unsafeRunSync()
+    }
+
+    "List traverse F syntax" {
+      bindingCancellable {
+        val listOfInts: List<Int> = listOf(IO { 1 }, IO { 2 }, IO { 3 }).traverse(::identity)
+        listOfInts
+      }.a.fix().unsafeRunSync() shouldBe listOf(1, 2, 3)
     }
 
   }

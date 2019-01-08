@@ -32,13 +32,13 @@ class MVarTest : UnitSpec() {
     "empty; put; isNotEmpty; take; put; take" {
       forAll(Gen.int(), Gen.int()) { a, b ->
         val task = binding {
-          val (av) = mvar.empty<Int>()
-          val (isEmpty) = av.isEmpty()
+          val av = mvar.empty<Int>().bind()
+          val isEmpty = av.isEmpty().bind()
           av.put(a).bind()
-          val (isNotEmpty) = av.isNotEmpty()
-          val (r1) = av.take()
+          val isNotEmpty = av.isNotEmpty().bind()
+          val r1 = av.take().bind()
           av.put(b).bind()
-          val (r2) = av.take()
+          val r2 = av.take().bind()
           Tuple4(isEmpty, isNotEmpty, r1, r2)
         }
 
@@ -49,15 +49,15 @@ class MVarTest : UnitSpec() {
     "empty; tryPut; tryPut; isNotEmpty; tryTake; tryTake; put; take" {
       forAll(Gen.int(), Gen.int(), Gen.int()) { a, b, c ->
         val task = binding {
-          val (av) = mvar.empty<Int>()
-          val (isEmpty) = av.isEmpty()
-          val (p1) = av.tryPut(a)
-          val (p2) = av.tryPut(b)
-          val (isNotEmpty) = av.isNotEmpty()
-          val (r1) = av.tryTake()
-          val (r2) = av.tryTake()
-          val (_) = av.put(c)
-          val (r3) = av.take()
+          val av = mvar.empty<Int>().bind()
+          val isEmpty = av.isEmpty().bind()
+          val p1 = av.tryPut(a).bind()
+          val p2 = av.tryPut(b).bind()
+          val isNotEmpty = av.isNotEmpty().bind()
+          val r1 = av.tryTake().bind()
+          val r2 = av.tryTake().bind()
+          av.put(c).bind()
+          val r3 = av.take().bind()
           Tuple7(isEmpty, p1, p2, isNotEmpty, r1, r2, r3)
         }
 
@@ -68,11 +68,11 @@ class MVarTest : UnitSpec() {
     "initial; isNotEmpty; take; put; take" {
       forAll(Gen.int(), Gen.int()) { a, b ->
         val task = binding {
-          val (av) = mvar.of(a)
-          val (isNotEmpty) = av.isNotEmpty()
-          val (r1) = av.take()
+          val av = mvar.of(a).bind()
+          val isNotEmpty = av.isNotEmpty().bind()
+          val r1 = av.take().bind()
           av.put(b).bind()
-          val (r2) = av.take()
+          val r2 = av.take().bind()
 
           Tuple3(isNotEmpty, r1, r2)
         }
@@ -84,9 +84,9 @@ class MVarTest : UnitSpec() {
     "initial; read; take" {
       forAll(Gen.int()) { i ->
         val task = binding {
-          val (av) = mvar.of(i)
-          val (read) = av.read()
-          val (take) = av.take()
+          val av = mvar.of(i).bind()
+          val read = av.read().bind()
+          val take = av.take().bind()
           read toT take
         }
 

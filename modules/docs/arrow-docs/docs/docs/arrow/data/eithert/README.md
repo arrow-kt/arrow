@@ -167,7 +167,7 @@ import arrow.effects.rx2.extensions.observablek.monad.*
 
 fun getCountryCode(personId: Int): ObservableK<Either<BizError, String>> =
   binding {
-    val (person) = findPerson(personId)
+    val person = findPerson(personId).bind()
     val address = person.fold (
       { it.left() },
       { it.address.toEither { AddressNotFound(personId) } }
@@ -181,7 +181,7 @@ fun getCountryCode(personId: Int): ObservableK<Either<BizError, String>> =
         { it.code.right() }
     )
     code
-  }.fix()
+  }
 ```
 
 While we've got the logic working now, we're in a situation where we're forced to deal with the `Left cases`. We also have a ton of boilerplate type conversion with `fold`. The type conversion is necessary because in a monad comprehension you can only use a type of Monad. If we start with `ObservableK`, we have to stay in it’s monadic context by lifting anything we compute sequentially to a `ObservableK` whether or not it's async.

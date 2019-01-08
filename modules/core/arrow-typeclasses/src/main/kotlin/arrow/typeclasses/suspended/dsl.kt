@@ -20,6 +20,24 @@ interface ApplicativeSyntax<F> : FunctorSyntax<F>, Applicative<F> {
   private suspend fun <A> applicative(fb: Applicative<F>.() -> Kind<F, A>): A =
     run<Applicative<F>, Kind<F, A>> { fb(this) }.bind()
 
+  suspend operator fun <A, B> Kind<F, A>.rangeTo(fb: Kind<F, B>): Tuple2<A, B> =
+    tupled(fb)
+
+  suspend operator fun <A, B, C> Tuple2<A, B>.rangeTo(fc: Kind<F, C>): Tuple3<A, B, C> =
+    Tuple3(a, b, fc.bind())
+
+  suspend operator fun <A, B, C, D> Tuple3<A, B, C>.rangeTo(fd: Kind<F, D>): Tuple4<A, B, C, D> =
+    Tuple4(a, b, c, fd.bind())
+
+  suspend operator fun <A, B, C, D, E> Tuple4<A, B, C, D>.rangeTo(fe: Kind<F, E>): Tuple5<A, B, C, D, E> =
+    Tuple5(a, b, c, d, fe.bind())
+
+  suspend operator fun <A, B, C, D, E, FF> Tuple5<A, B, C, D, E>.rangeTo(ff: Kind<F, FF>): Tuple6<A, B, C, D, E, FF> =
+    Tuple6(a, b, c, d, e, ff.bind())
+
+  suspend operator fun <A, B, C, D, E, FF, G> Tuple6<A, B, C, D, E, FF>.rangeTo(fg: Kind<F, G>): Tuple7<A, B, C, D, E, FF, G> =
+    Tuple7(a, b, c, d, e, f, fg.bind())
+
   suspend fun <A, B, Z> Kind<F, A>.map(
     fb: Kind<F, B>,
     f: (Tuple2<A, B>) -> Z

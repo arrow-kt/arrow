@@ -144,23 +144,23 @@ Let's look at how a similar implementation would look like using monad comprehen
 import arrow.effects.rx2.extensions.observablek.monad.binding
 
 fun getCountryCode(personId: Int): ObservableK<Option<String>> =
-    binding {
-      val (maybePerson) = findPerson(personId)
-      val person = maybePerson.fold(
-        { ObservableK.raiseError<Person>(NoSuchElementException("...")) },
-        { ObservableK.just(it) }
-      ).bind()
-      val address = person.address.fold(
-        { ObservableK.raiseError<Address>(NoSuchElementException("...")) },
-        { ObservableK.just(it) }
-      ).bind()
-      val (maybeCountry) = findCountry(address.id)
-      val country = maybeCountry.fold(
-        { ObservableK.raiseError<Country>(NoSuchElementException("...")) },
-        { ObservableK.just(it) }
-      ).bind()
-      country.code
-    }              
+       binding {
+        val maybePerson = findPerson(personId).bind()
+        val person = maybePerson.fold(
+          { ObservableK.raiseError<Person>(NoSuchElementException("...")) },
+          { ObservableK.just(it) }
+        ).bind()
+        val address = person.address.fold(
+          { ObservableK.raiseError<Address>(NoSuchElementException("...")) },
+          { ObservableK.just(it) }
+        ).bind()
+        val maybeCountry = findCountry(address.id).bind()
+        val country = maybeCountry.fold(
+          { ObservableK.raiseError<Country>(NoSuchElementException("...")) },
+          { ObservableK.just(it) }
+        ).bind()
+        country.code
+      }       
 ```
 
 While we've got the logic working now, we're in a situation where we're forced to deal with the `None cases`. We also have a ton of boilerplate type conversion with `fold`. The type conversion is necessary because in a monad comprehension you can only use a type of Monad. If we start with `ObservableK`, we have to stay in it’s monadic context by lifting anything we compute sequentially to a `ObservableK` whether or not it's async.

@@ -6,7 +6,6 @@ import arrow.core.Eval
 import arrow.core.Tuple2
 import arrow.core.identity
 import arrow.documented
-import kotlin.coroutines.RestrictsSuspension
 import kotlin.coroutines.startCoroutine
 
 /**
@@ -75,5 +74,8 @@ interface Monad<F> : Applicative<F> {
     wrapReturn.startCoroutine(continuation, continuation)
     return continuation.returnedMonad()
   }
+
+  fun <B> F(c: suspend MonadContinuation<F, *>.() -> B): Kind<F, B> =
+    binding(c)
 
 }
