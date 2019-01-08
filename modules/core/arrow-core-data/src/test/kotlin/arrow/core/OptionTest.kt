@@ -145,6 +145,16 @@ class OptionTest : UnitSpec() {
       }
       result shouldBe Some(1 + 2 + 3 + 4)
     }
+
+    "functor invoke syntax" {
+      val result: Option<Int> = F {
+        val x = Option(1)() { it + 1 }
+        val y = Option(1)() { it + 1 }
+        x + y
+      }
+      result shouldBe Some(4)
+    }
+
   }
 
 }

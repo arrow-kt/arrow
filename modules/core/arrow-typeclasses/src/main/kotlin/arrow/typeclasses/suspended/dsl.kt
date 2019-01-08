@@ -13,6 +13,9 @@ interface BindSyntax<F> {
 interface FunctorSyntax<F> : Functor<F>, BindSyntax<F> {
   suspend fun <A, B> Kind<F, A>.map(unit: Unit = Unit, f: (A) -> B): B =
     f(bind())
+
+  suspend operator fun <A, B> Kind<F, A>.invoke(f: (A) -> B): B =
+    f(bind())
 }
 
 interface ApplicativeSyntax<F> : FunctorSyntax<F>, Applicative<F> {
