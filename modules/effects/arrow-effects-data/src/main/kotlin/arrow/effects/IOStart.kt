@@ -33,7 +33,7 @@ import kotlin.coroutines.Continuation
  * @return [IO] with suspended execution of source [IO] on context [ctx].
  */
 fun <A> IOOf<A>.startF(ctx: CoroutineContext): IO<Fiber<ForIO, A>> = IO {
-  val promise = IOUnsafePromise<A>()
+  val promise = UnsafePromise<A>()
 
   // A new IOConnection, because its cancellation is now decoupled from our current one.
   // We use this [IOConnection] to start [IORunLoop] and cancel the [Fiber].

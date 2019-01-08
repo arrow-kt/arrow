@@ -11,7 +11,6 @@ import arrow.effects.internal.Platform
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.MonadDefer
-import arrow.effects.typeclasses.Fiber
 import arrow.higherkind
 import kotlinx.coroutines.*
 import kotlinx.coroutines.selects.SelectClause0
@@ -771,12 +770,6 @@ fun <A> DeferredKOf<A>.handleErrorWith(f: (Throwable) -> DeferredKOf<A>): Deferr
       f(e).await()
     }
   }
-}
-
-fun <A> DeferredKOf<A>.startF(ctx: CoroutineContext): DeferredK<Fiber<ForDeferredK, A>> {
-  val join = scope().asyncK(ctx = ctx, start = CoroutineStart.DEFAULT) { await() }
-  val cancel = DeferredK(start = CoroutineStart.LAZY) { join.cancel() }
-  return DeferredK.just(Fiber(join, cancel))
 }
 
 /**

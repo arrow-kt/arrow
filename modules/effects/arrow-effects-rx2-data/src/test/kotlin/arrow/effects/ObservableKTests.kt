@@ -155,26 +155,12 @@ class ObservableKTests : UnitSpec() {
         .awaitTerminalEvent(100, TimeUnit.MILLISECONDS)
     }
 
-
-    "ObservableK should cancel KindConnection on dipose" {
-      Promise.uncancelable<ForObservableK, Unit>(ObservableK.async()).flatMap { latch ->
-        ObservableK {
-          ObservableK.async<Unit> { conn, _ ->
-            conn.push(latch.complete(Unit))
-          }.observable.subscribe().dispose()
-        }.flatMap { latch.get() }
-      }.value()
-        .test()
-        .assertValue(Unit)
-        .awaitTerminalEvent(100, TimeUnit.MILLISECONDS)
-    }
-
     "KindConnection can cancel upstream" {
       ObservableK.async<Unit> { connection, _ ->
         connection.cancel().value().subscribe()
       }.observable
         .test()
-        .assertError { it == OnCancel.CancellationException }
+        .assertError(ConnectionCancellationException)
     }
 
   }

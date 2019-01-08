@@ -81,8 +81,8 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
           release(a, ExitCase.Completed)
             .fix().map { b }
         }.handleErrorWith { e ->
-          if (e == OnCancel.CancellationException) release(a, ExitCase.Canceled).fix().flatMap { raiseError<B>(e) }
-          else release(a, ExitCase.Error(e)).fix().flatMap { raiseError<B>(e) }
+          release(a, ExitCase.Error(e))
+            .fix().flatMap { raiseError<B>(e) }
         }.mono.subscribe(
           sink::success,
           sink::error,

@@ -56,12 +56,12 @@ fun <A, B> IO.Companion.racePair(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<
     // Cancelable connection for the left value
     val connA = IOConnection()
     connA.push(upstreamCancelToken)
-    val promiseA = IOUnsafePromise<A>()
+    val promiseA = UnsafePromise<A>()
 
     // Cancelable connection for the right value
     val connB = IOConnection()
     connB.push(upstreamCancelToken)
-    val promiseB = IOUnsafePromise<B>()
+    val promiseB = UnsafePromise<B>()
 
     conn.pushPair(connA, connB)
 
@@ -132,10 +132,7 @@ fun <A, B> IO.Companion.racePair(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<
 
   }
 
-/**
- * Meant for internal use for [IO.Companion.racePair] and [startF].
- */
-internal class IOUnsafePromise<A> {
+internal class UnsafePromise<A> {
 
   private sealed class State<out A> {
     object Empty : State<Nothing>()
@@ -176,7 +173,7 @@ internal class IOUnsafePromise<A> {
 
 }
 
-internal fun <A> Fiber(promise: IOUnsafePromise<A>, conn: IOConnection): Fiber<ForIO, A> {
+internal fun <A> Fiber(promise: UnsafePromise<A>, conn: IOConnection): Fiber<ForIO, A> {
   val join: IO<A> = IO.async { conn2, cb ->
     conn2.push(IO { promise.remove(cb) })
     conn.push(conn2.cancel())

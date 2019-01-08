@@ -169,7 +169,7 @@ class SingleKTests : UnitSpec() {
         connection.cancel().value().subscribe()
       }.value()
         .test()
-        .assertError { it == OnCancel.CancellationException }
+        .assertError(ConnectionCancellationException)
     }
 
   }

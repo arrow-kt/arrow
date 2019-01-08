@@ -184,7 +184,7 @@ class MaybeKTests : UnitSpec() {
         connection.cancel().value().subscribe()
       }.value()
         .test()
-        .assertError { it is ConnectionCancellationException }
+        .assertError(ConnectionCancellationException)
     }
 
   }

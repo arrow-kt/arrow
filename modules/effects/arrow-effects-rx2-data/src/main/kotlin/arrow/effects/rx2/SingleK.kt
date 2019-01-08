@@ -213,7 +213,7 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
  *     either.fold({ t: Throwable ->
  *       println(t)
  *     }, { i: Int ->
- *       println("DONE WITH $i")
+ *       println("Finished with $i")
  *     })
  *   }
  *   //sampleEnd

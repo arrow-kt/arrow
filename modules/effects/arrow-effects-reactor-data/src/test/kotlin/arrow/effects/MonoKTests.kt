@@ -177,42 +177,5 @@ class MonoKTest : UnitSpec() {
         .expectError(ConnectionCancellationException::class)
     }
 
-    "MonoK should cancel KindConnection on dispose" {
-      Promise.uncancelable<ForMonoK, Unit>(MonoK.async()).flatMap { latch ->
-        MonoK {
-          MonoK.async<Unit> { conn, _ ->
-            conn.push(latch.complete(Unit))
-          }.mono.subscribe().dispose()
-        }.flatMap { latch.get() }
-      }.value()
-        .test()
-        .expectNext(Unit)
-        .expectComplete()
-    }
-
-    "MonoK async should be cancellable" {
-      Promise.uncancelable<ForMonoK, Unit>(MonoK.async())
-        .flatMap { latch ->
-          MonoK {
-            MonoK.async<Unit> { _, _ -> }
-              .value()
-              .doOnCancel { latch.complete(Unit).value().subscribe() }
-              .subscribe()
-              .dispose()
-          }.flatMap { latch.get() }
-        }.value()
-        .test()
-        .expectNext(Unit)
-        .expectComplete()
-    }
-
-    "KindConnection can cancel upstream" {
-      MonoK.async<Unit> { connection, _ ->
-        connection.cancel().value().subscribe()
-      }.value()
-        .test()
-        .expectError(ConnectionCancellationException::class)
-    }
-
   }
 }

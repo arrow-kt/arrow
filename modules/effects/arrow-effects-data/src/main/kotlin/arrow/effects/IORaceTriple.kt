@@ -53,15 +53,15 @@ fun <A, B, C> IO.Companion.raceTriple(ctx: CoroutineContext, ioA: IOOf<A>, ioB: 
 
     val connA = IOConnection()
     connA.push(upstreamCancelToken)
-    val promiseA = IOUnsafePromise<A>()
+    val promiseA = UnsafePromise<A>()
 
     val connB = IOConnection()
     connB.push(upstreamCancelToken)
-    val promiseB = IOUnsafePromise<B>()
+    val promiseB = UnsafePromise<B>()
 
     val connC = IOConnection()
     connC.push(upstreamCancelToken)
-    val promiseC = IOUnsafePromise<C>()
+    val promiseC = UnsafePromise<C>()
 
     conn.push(connA.cancel(), connB.cancel(), connC.cancel())
 

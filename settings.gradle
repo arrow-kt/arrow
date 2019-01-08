@@ -66,7 +66,6 @@ include {
             _ 'effects-rx2-extensions'
             _ 'effects-kotlinx-coroutines-data'
             _ 'effects-kotlinx-coroutines-extensions'
-            _ 'effects-reactor'
             _ 'effects-reactor-data'
             _ 'effects-reactor-extensions'
         }
@@ -76,7 +75,6 @@ include {
         }
 
         recursion {
-            _ 'recursion'
             _ 'recursion-data'
             _ 'recursion-extensions'
         }

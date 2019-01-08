@@ -180,25 +180,12 @@ class FlowableKTests : UnitSpec() {
         }.value()
     }
 
-    "FlowableK should cancel KindConnection on dispose" {
-      Promise.uncancelable<ForFlowableK, Unit>(FlowableK.async()).flatMap { latch ->
-        FlowableK {
-          FlowableK.async<Unit>(fa = { conn, _ ->
-            conn.push(latch.complete(Unit))
-          }).flowable.subscribe().dispose()
-        }.flatMap { latch.get() }
-      }.value()
-        .test()
-        .assertValue(Unit)
-        .awaitTerminalEvent(100, TimeUnit.MILLISECONDS)
-    }
-
     "KindConnection can cancel upstream" {
       FlowableK.async<Unit>(fa = { connection, _ ->
         connection.cancel().value().subscribe()
       }).value()
         .test()
-        .assertError { it == OnCancel.CancellationException }
+        .assertError(ConnectionCancellationException)
     }
 
   }
