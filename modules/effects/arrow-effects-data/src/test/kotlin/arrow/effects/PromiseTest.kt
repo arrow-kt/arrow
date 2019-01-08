@@ -2,13 +2,12 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.core.*
-import arrow.effects.extensions.io.async.async
-import arrow.effects.extensions.io.monad.binding
-import arrow.effects.extensions.io.monad.flatMap
-import arrow.effects.typeclasses.seconds
 import arrow.core.extensions.either.eq.eq
 import arrow.core.extensions.option.eq.eq
+import arrow.effects.extensions.io.async.async
 import arrow.effects.extensions.io.monad.F
+import arrow.effects.extensions.io.monad.flatMap
+import arrow.effects.typeclasses.seconds
 import arrow.test.UnitSpec
 import arrow.test.generators.genThrowable
 import arrow.test.laws.equalUnderTheLaw

@@ -1,13 +1,12 @@
 package arrow.effects
 
 import arrow.effects.reactor.*
-import arrow.effects.reactor.extensions.fluxk.monad.binding
-import arrow.effects.reactor.extensions.fluxk.monad.flatMap
-import arrow.effects.reactor.extensions.fluxk.monadThrow.bindingCatch
 import arrow.effects.reactor.extensions.fluxk.async.async
 import arrow.effects.reactor.extensions.fluxk.foldable.foldable
 import arrow.effects.reactor.extensions.fluxk.functor.functor
 import arrow.effects.reactor.extensions.fluxk.monad.F
+import arrow.effects.reactor.extensions.fluxk.monad.flatMap
+import arrow.effects.reactor.extensions.fluxk.monadThrow.bindingCatch
 import arrow.effects.reactor.extensions.fluxk.traverse.traverse
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec

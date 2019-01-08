@@ -1,22 +1,18 @@
 package arrow.effects
 
 import arrow.core.*
+import arrow.core.extensions.option.eq.eq
+import arrow.data.invalidNel
+import arrow.data.validNel
 import arrow.effects.extensions.io.applicativeError.attempt
 import arrow.effects.extensions.io.async.async
-import arrow.effects.extensions.io.monad.binding
+import arrow.effects.extensions.io.monad.F
 import arrow.effects.extensions.io.monad.flatMap
 import arrow.effects.extensions.io.monad.monad
+import arrow.effects.extensions.io.monadDefer.bindingCancellable
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.milliseconds
 import arrow.effects.typeclasses.seconds
-import arrow.core.extensions.option.eq.eq
-import arrow.data.extensions.list.traverse.sequence
-import arrow.data.invalidNel
-import arrow.data.k
-import arrow.data.valid
-import arrow.data.validNel
-import arrow.effects.extensions.io.monad.F
-import arrow.effects.extensions.io.monadDefer.bindingCancellable
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.laws.AsyncLaws

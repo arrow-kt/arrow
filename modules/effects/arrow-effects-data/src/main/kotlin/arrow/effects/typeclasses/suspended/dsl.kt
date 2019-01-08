@@ -18,23 +18,23 @@ import arrow.core.extensions.either.applicative.tupled as tuppledEither
 import arrow.data.extensions.validated.applicative.tupled as tuppledVal
 
 interface ListTraverseSyntax<F> : MonadSyntax<F> {
-  suspend fun <A, B> List<Kind<F, A>>.traverse(f: (Kind<F, A>) -> Kind<F, B>) : List<B> =
+  suspend fun <A, B> List<Kind<F, A>>.traverse(f: (Kind<F, A>) -> Kind<F, B>): List<B> =
     k().traverse(this@ListTraverseSyntax, f).bind()
 
-  suspend fun <A> List<Kind<F, A>>.sequence() : List<A> =
+  suspend fun <A> List<Kind<F, A>>.sequence(): List<A> =
     traverse(::identity)
 
-  suspend fun <A> List<Kind<F, A>>.sequence_() : Unit =
+  suspend fun <A> List<Kind<F, A>>.sequence_(): Unit =
     k().sequence_(this@ListTraverseSyntax).bind()
 
 }
 
 interface ValidatedSyntax<F, E> : MonadSyntax<F>, ApplicativeError<F, E> {
-  
+
   suspend fun <A, B> validate(
     a: ValidatedNel<E, A>,
     b: ValidatedNel<E, B>
-    ): ValidatedNel<E, Tuple2<A, B>> =
+  ): ValidatedNel<E, Tuple2<A, B>> =
     tuppledVal(Nel.semigroup(), a, b)
 
   suspend fun <A, B, C> validate(
@@ -53,7 +53,7 @@ interface ValidatedSyntax<F, E> : MonadSyntax<F>, ApplicativeError<F, E> {
     tuppledVal(Nel.semigroup(), a, b, c, d)
 
   suspend operator fun <A> ValidatedNel<E, A>.component1(): A =
-    fold<Kind<F, A>>( { raiseError(it.head) }, ::just).bind()
+    fold<Kind<F, A>>({ raiseError(it.head) }, ::just).bind()
 
   fun <A> ValidatedNel<E, A>.errors(): List<E> =
     fold({ it.all }, { emptyList() })
