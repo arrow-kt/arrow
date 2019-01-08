@@ -14,10 +14,12 @@ import arrow.core.extensions.either.semigroupK.semigroupK
 import arrow.core.extensions.either.show.show
 import arrow.core.extensions.either.traverse.traverse
 import arrow.test.UnitSpec
+import arrow.test.generators.genEither
 import arrow.test.generators.genIntSmall
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Hash
+import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
@@ -37,7 +39,7 @@ class EitherTest : UnitSpec() {
     testLaws(
       BifunctorLaws.laws(Either.bifunctor(), { Right(it) }, EQ2),
       SemigroupLaws.laws(Either.semigroup(String.semigroup(), String.semigroup()), Either.right("1"), Either.right("2"), Either.right("3"), Either.eq(String.eq(), String.eq())),
-      MonoidLaws.laws(Either.monoid(MOL = String.monoid(), MOR = Int.monoid()), Either.right(1), Either.eq(String.eq(), Int.eq())),
+      MonoidLaws.laws(Either.monoid(MOL = String.monoid(), MOR = Int.monoid()), genEither(Gen.string(), Gen.int()), Either.eq(String.eq(), Int.eq())),
       ShowLaws.laws(Either.show(), Either.eq(String.eq(), Int.eq())) { Right(it) },
       MonadErrorLaws.laws(Either.monadError(), Eq.any(), Eq.any()),
       TraverseLaws.laws(Either.traverse(), Either.applicative(), { Right(it) }, Eq.any()),

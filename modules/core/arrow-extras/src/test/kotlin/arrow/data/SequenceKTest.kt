@@ -11,6 +11,7 @@ import arrow.data.extensions.sequencek.monoid.monoid
 import arrow.data.extensions.sequencek.monoidK.monoidK
 import arrow.data.extensions.sequencek.traverse.traverse
 import arrow.test.UnitSpec
+import arrow.test.generators.genSequenceK
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Show
@@ -37,7 +38,7 @@ class SequenceKTest : UnitSpec() {
       ShowLaws.laws(show, eq) { sequenceOf(it).k() },
       MonadLaws.laws(SequenceK.monad(), eq),
       MonoidKLaws.laws(SequenceK.monoidK(), SequenceK.applicative(), eq),
-      MonoidLaws.laws(SequenceK.monoid(), Gen.int().random().k(), eq),
+      MonoidLaws.laws(SequenceK.monoid(), genSequenceK(Gen.int()), eq),
       TraverseLaws.laws(SequenceK.traverse(), SequenceK.applicative(), { n: Int -> SequenceK(sequenceOf(n)) }, eq),
       HashLaws.laws(SequenceK.hash(Int.hash()), SequenceK.eq(Int.eq())) { sequenceOf(it).k() }
     )

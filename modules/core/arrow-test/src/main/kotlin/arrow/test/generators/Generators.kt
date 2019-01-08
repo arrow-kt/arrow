@@ -99,6 +99,9 @@ fun <A> genTry(genA: Gen<A>, genThrowable: Gen<Throwable> = genThrowable()): Gen
 fun <A> genNonEmptyList(genA: Gen<A>): Gen<NonEmptyList<A>> =
   genA.flatMap { head -> Gen.list(genA).map { NonEmptyList(head, it) } }
 
+fun <K: Comparable<K>, V> genSortedMapK(genK: Gen<K>, genV: Gen<V>): Gen<SortedMapK<K, V>> =
+  Gen.bind(genK,genV) { k:K , v:V -> sortedMapOf(k to v) }.map { it.k() }
+
 fun <K, V> genMapK(genK: Gen<K>, genV: Gen<V>): Gen<MapK<K, V>> =
   Gen.map(genK,genV).map { it.k() }
 
