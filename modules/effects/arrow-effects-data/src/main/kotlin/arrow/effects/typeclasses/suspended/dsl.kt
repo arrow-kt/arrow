@@ -1,15 +1,21 @@
 package arrow.effects.typeclasses.suspended
 
 import arrow.Kind
-import arrow.core.Either
-import arrow.core.identity
+import arrow.core.*
+import arrow.data.Nel
+import arrow.data.Validated
+import arrow.data.ValidatedNel
 import arrow.data.extensions.list.foldable.sequence_
+import arrow.data.extensions.nonemptylist.semigroup.semigroup
 import arrow.data.k
 import arrow.effects.CancelToken
 import arrow.effects.typeclasses.*
+import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.suspended.MonadErrorSyntax
 import arrow.typeclasses.suspended.MonadSyntax
 import kotlin.coroutines.CoroutineContext
+import arrow.core.extensions.either.applicative.tupled as tuppledEither
+import arrow.data.extensions.validated.applicative.tupled as tuppledVal
 
 interface ListTraverseSyntax<F> : MonadSyntax<F> {
   suspend fun <A, B> List<Kind<F, A>>.traverse(f: (Kind<F, A>) -> Kind<F, B>) : List<B> =
@@ -20,9 +26,74 @@ interface ListTraverseSyntax<F> : MonadSyntax<F> {
 
   suspend fun <A> List<Kind<F, A>>.sequence_() : Unit =
     k().sequence_(this@ListTraverseSyntax).bind()
+
 }
 
-interface BracketSyntax<F, E> : MonadErrorSyntax<F, E>, Bracket<F, E>, ListTraverseSyntax<F> {
+interface ValidatedSyntax<F, E> : MonadSyntax<F>, ApplicativeError<F, E> {
+  
+  suspend fun <A, B> validate(
+    a: ValidatedNel<E, A>,
+    b: ValidatedNel<E, B>
+    ): ValidatedNel<E, Tuple2<A, B>> =
+    tuppledVal(Nel.semigroup(), a, b)
+
+  suspend fun <A, B, C> validate(
+    a: Validated<Nel<E>, A>,
+    b: Validated<Nel<E>, B>,
+    c: Validated<Nel<E>, C>
+  ): ValidatedNel<E, Tuple3<A, B, C>> =
+    tuppledVal(Nel.semigroup(), a, b, c)
+
+  suspend fun <A, B, C, D> validate(
+    a: Validated<Nel<E>, A>,
+    b: Validated<Nel<E>, B>,
+    c: Validated<Nel<E>, C>,
+    d: Validated<Nel<E>, D>
+  ): ValidatedNel<E, Tuple4<A, B, C, D>> =
+    tuppledVal(Nel.semigroup(), a, b, c, d)
+
+  suspend operator fun <A> ValidatedNel<E, A>.component1(): A =
+    fold<Kind<F, A>>( { raiseError(it.head) }, ::just).bind()
+
+  fun <A> ValidatedNel<E, A>.errors(): List<E> =
+    fold({ it.all }, { emptyList() })
+
+}
+
+interface EitherSyntax<F, E> : MonadSyntax<F>, ApplicativeError<F, E> {
+
+  suspend fun <A, B> validate(
+    a: Either<E, A>,
+    b: Either<E, B>
+  ): Either<E, Tuple2<A, B>> =
+    tuppledEither(a, b)
+
+  suspend fun <A, B, C> validate(
+    a: Either<E, A>,
+    b: Either<E, B>,
+    c: Either<E, C>
+  ): Either<E, Tuple3<A, B, C>> =
+    tuppledEither(a, b, c)
+
+  suspend fun <A, B, C> validate(
+    a: Either<E, A>,
+    b: Either<E, B>,
+    c: Either<E, C>,
+    d: Either<E, C>
+  ): Either<E, Tuple3<A, B, C>> =
+    tuppledEither(a, b, c)
+
+  suspend operator fun <A> Either<E, A>.component1(): A =
+    fold<Kind<F, A>>(::raiseError, ::just).bind()
+
+}
+
+interface BracketSyntax<F, E> :
+  MonadErrorSyntax<F, E>,
+  Bracket<F, E>,
+  ListTraverseSyntax<F>,
+  ValidatedSyntax<F, E>,
+  EitherSyntax<F, E> {
 
   private suspend fun <A> bracketing(fb: Bracket<F, E>.() -> Kind<F, A>): A =
     run<Bracket<F, E>, Kind<F, A>> { fb(this) }.bind()

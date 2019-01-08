@@ -11,7 +11,10 @@ import arrow.effects.typeclasses.milliseconds
 import arrow.effects.typeclasses.seconds
 import arrow.core.extensions.option.eq.eq
 import arrow.data.extensions.list.traverse.sequence
+import arrow.data.invalidNel
 import arrow.data.k
+import arrow.data.valid
+import arrow.data.validNel
 import arrow.effects.extensions.io.monad.F
 import arrow.effects.extensions.io.monadDefer.bindingCancellable
 import arrow.test.UnitSpec
@@ -449,5 +452,18 @@ class IOTest : UnitSpec() {
       }.a.fix().unsafeRunSync() shouldBe listOf(1, 2, 3)
     }
 
+    "Validated F syntax" {
+
+      bindingCancellable {
+        validate(
+          Error.invalidNel(),
+          4.validNel(),
+          Error.invalidNel()
+        ).errors()
+      }.a.fix().unsafeRunSync() shouldBe listOf(Error, Error)
+    }
+
   }
 }
+
+object Error : Throwable()
