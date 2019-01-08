@@ -281,7 +281,7 @@ class IOTest : UnitSpec() {
       val result =
         IO.parallelMapN(newSingleThreadContext("all"),
           makePar(6), IO.just(1L).order(), makePar(4), IO.defer { IO.just(2L) }.order(), makePar(5), IO { 3L }.order())
-        { six, tree, two, four, one, five -> listOf(six, tree, two, four, one, five) }
+        { six, one, four, two, five, three -> listOf(six, one, four, two, five, three) }
           .unsafeRunSync()
 
       result shouldBe listOf(6L, 1, 4, 2, 5, 3)
