@@ -6,8 +6,12 @@ import arrow.effects.*
 import arrow.effects.internal.unsafe
 import arrow.effects.typeclasses.Concurrent
 import arrow.effects.typeclasses.ExitCase
+import arrow.effects.typeclasses.fold
 import arrow.test.generators.genEither
 import arrow.test.generators.genThrowable
+import arrow.test.laws.ConcurrentLaws.racePairCanCancelsLoser
+import arrow.test.laws.ConcurrentLaws.raceTripleCanJoinMiddle
+import arrow.test.laws.ConcurrentLaws.raceTripleCanJoinRight
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -45,8 +49,17 @@ object ConcurrentLaws {
       Law("Concurrent Laws: race pair can cancel loser") { CF.racePairCanCancelsLoser(EQ, ctx) },
       Law("Concurrent Laws: race pair can join left") { CF.racePairCanJoinLeft(EQ, ctx) },
       Law("Concurrent Laws: race pair can join right") { CF.racePairCanJoinRight(EQ, ctx) },
-      Law("Concurrent Laws: race pair is cancellable by participants") { CF.racePairCanBeCancelledByParticipants(EQ, ctx) },
       Law("Concurrent Laws: cancelling race pair cancels both") { CF.racePairCancelCancelsBoth(EQ, ctx) },
+      Law("Concurrent Laws: race pair is cancellable by participants") { CF.racePairCanBeCancelledByParticipants(EQ, ctx) },
+      Law("Concurrent Laws: race triple mirrors left winner") { CF.raceTripleMirrorsLeftWinner(EQ, ctx) },
+      Law("Concurrent Laws: race triple mirrors middle winner") { CF.raceTripleMirrorsMiddleWinner(EQ, ctx) },
+      Law("Concurrent Laws: race triple mirrors right winner") { CF.raceTripleMirrorsRightWinner(EQ, ctx) },
+      Law("Concurrent Laws: race triple can cancel loser") { CF.raceTripleCanCancelsLoser(EQ, ctx) },
+      Law("Concurrent Laws: race triple can join left") { CF.raceTripleCanJoinLeft(EQ, ctx) },
+      Law("Concurrent Laws: race triple can join middle") { CF.raceTripleCanJoinMiddle(EQ, ctx) },
+      Law("Concurrent Laws: race triple can join right") { CF.raceTripleCanJoinRight(EQ, ctx) },
+      Law("Concurrent Laws: race triple is cancellable by participants") { CF.raceTripleCanBeCancelledByParticipants(EQ, ctx) },
+      Law("Concurrent Laws: cancelling race triple cancels all") { CF.raceTripleCancelCancelsAll(EQ, ctx) },
       Law("Concurrent Laws: race mirrors left winner") { CF.raceMirrorsLeftWinner(EQ, ctx) },
       Law("Concurrent Laws: race mirrors right winner") { CF.raceMirrorsRightWinner(EQ, ctx) },
       Law("Concurrent Laws: race cancels loser") { CF.raceCancelsLoser(EQ, ctx) },
@@ -434,6 +447,164 @@ object ConcurrentLaws {
 
         endLatch.get().bind()
       }.equalUnderTheLaw(just(i), EQ)
+    }
+
+  fun <F> Concurrent<F>.raceTripleMirrorsLeftWinner(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
+    forAll(Gen.int().map(::just)) { fa ->
+      val never = never<Int>()
+      val received = raceTriple(ctx, fa, never, never).flatMap { either ->
+        either.fold(
+          { (a, fiberB, fiberC) -> fiberB.cancel().followedBy(fiberC.cancel()).map { a } },
+          { raiseError(AssertionError("never() finished race")) },
+          { raiseError(AssertionError("never() finished race")) })
+      }
+
+      received.equalUnderTheLaw(raceN(ctx, fa, never, never).map { it.fold(::identity, ::identity, ::identity) }, EQ)
+    }
+
+  fun <F> Concurrent<F>.raceTripleMirrorsMiddleWinner(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
+    forAll(Gen.int().map(::just)) { fa ->
+      val never = never<Int>()
+      val received = raceTriple(ctx, never, fa, never).flatMap { either ->
+        either.fold(
+          { raiseError<Int>(AssertionError("never() finished race")) },
+          { (fiberA, b, fiberC) -> fiberA.cancel().followedBy(fiberC.cancel()).map { b } },
+          { raiseError(AssertionError("never() finished race")) })
+      }
+
+      received.equalUnderTheLaw(raceN(ctx, never, fa, never).map { it.fold(::identity, ::identity, ::identity) }, EQ)
+    }
+
+  fun <F> Concurrent<F>.raceTripleMirrorsRightWinner(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
+    forAll(Gen.int().map(::just)) { fa ->
+      val never = never<Int>()
+      val received = raceTriple(ctx, never, never, fa).flatMap { either ->
+        either.fold(
+          { raiseError<Int>(AssertionError("never() finished race")) },
+          { raiseError(AssertionError("never() finished race")) },
+          { (fiberA, fiberB, c) -> fiberA.cancel().followedBy(fiberB.cancel()).map { c } })
+      }
+
+      received.equalUnderTheLaw(raceN(ctx, never, never, fa).map { it.fold(::identity, ::identity, ::identity) }, EQ)
+    }
+
+  fun <F> Concurrent<F>.raceTripleCanCancelsLoser(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
+    forAll(genEither(genThrowable(), Gen.string()), Gen.oneOf(listOf(1, 2, 3)), Gen.int(), Gen.int()) { eith, leftWinner, a, b ->
+      val received = binding {
+        val s = Semaphore(0L, this@raceTripleCanCancelsLoser).bind()
+        val pa = Promise.uncancelable<F, Int>(this@raceTripleCanCancelsLoser).bind()
+        val pb = Promise.uncancelable<F, Int>(this@raceTripleCanCancelsLoser).bind()
+
+        val winner = s.acquireN(2).flatMap { async<String> { cb -> cb(eith) } }
+        val loser = s.release().bracket(use = { never<String>() }, release = { pa.complete(a) })
+        val loser2 = s.release().bracket(use = { never<String>() }, release = { pb.complete(b) })
+
+        val race = when (leftWinner) {
+          1 -> raceTriple(ctx, winner, loser, loser2)
+          2 -> raceTriple(ctx, loser, winner, loser2)
+          else -> raceTriple(ctx, loser, loser2, winner)
+        }
+
+        val combinePromises = pa.get().flatMap { a -> pb.get().map { b -> a + b } }
+
+        race.attempt()
+          .flatMap { attempt ->
+            attempt.fold({ combinePromises },
+              {
+                it.fold(
+                  { (_, fiberB, fiberC) -> fiberB.cancel().followedBy(fiberC.cancel()).startF(ctx).flatMap { combinePromises } },
+                  { (fiberA, _, fiberC) -> fiberA.cancel().followedBy(fiberC.cancel()).startF(ctx).flatMap { combinePromises } },
+                  { (fiberA, fiberB, _) -> fiberA.cancel().followedBy(fiberB.cancel()).startF(ctx).flatMap { combinePromises } })
+              })
+          }.bind()
+      }
+
+      received.equalUnderTheLaw(just(a + b), EQ)
+    }
+
+  fun <F> Concurrent<F>.raceTripleCanJoinLeft(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
+    forAll(Gen.int()) { i ->
+      Promise<F, Int>(this@raceTripleCanJoinLeft).flatMap { p ->
+        raceTriple(ctx, p.get(), just(Unit), never<Unit>()).flatMap { result ->
+          result.fold(
+            { raiseError<Int>(AssertionError("Promise#get can never win race")) },
+            { (fiber, _, _) -> p.complete(i).flatMap { fiber.join() } },
+            { raiseError(AssertionError("never() can never win race")) }
+          )
+        }
+      }.equalUnderTheLaw(just(i), EQ)
+    }
+
+  fun <F> Concurrent<F>.raceTripleCanJoinMiddle(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
+    forAll(Gen.int()) { i ->
+      Promise<F, Int>(this@raceTripleCanJoinMiddle).flatMap { p ->
+        raceTriple(ctx, just(Unit), p.get(), never<Unit>()).flatMap { result ->
+          result.fold(
+            { (_, fiber, _) -> p.complete(i).flatMap { fiber.join() } },
+            { raiseError(AssertionError("Promise#get can never win race")) },
+            { raiseError(AssertionError("never() can never win race")) }
+          )
+        }
+      }.equalUnderTheLaw(just(i), EQ)
+    }
+
+  fun <F> Concurrent<F>.raceTripleCanJoinRight(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
+    forAll(Gen.int()) { i ->
+      Promise<F, Int>(this@raceTripleCanJoinRight).flatMap { p ->
+        raceTriple(ctx, just(Unit), never<Unit>(), p.get()).flatMap { result ->
+          result.fold(
+            { (_, _, fiber) -> p.complete(i).flatMap { fiber.join() } },
+            { raiseError(AssertionError("never() can never win race")) },
+            { raiseError(AssertionError("Promise#get can never win race")) }
+          )
+        }
+      }.equalUnderTheLaw(just(i), EQ)
+    }
+
+  fun <F> Concurrent<F>.raceTripleCanBeCancelledByParticipants(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
+    forAll(Gen.int(), Gen.oneOf(listOf(1, 2, 3))) { i, shouldCancel ->
+      binding {
+        val endLatch = Promise<F, Int>(this@raceTripleCanBeCancelledByParticipants).bind()
+        val startLatch = Promise<F, Unit>(this@raceTripleCanBeCancelledByParticipants).bind()
+        val start2Latch = Promise<F, Unit>(this@raceTripleCanBeCancelledByParticipants).bind()
+
+        val cancel = asyncF<Unit> { conn, cb ->
+          startLatch.get().followedBy(start2Latch.get())
+            .flatMap { conn.cancel().map { cb(Right(Unit)) } }
+        }
+
+        val loser = startLatch.complete(Unit) //guarantees that both cancel & loser actually started
+          .bracket(use = { never<Int>() }, release = { endLatch.complete(i) })
+        val loser2 = start2Latch.complete(Unit) //guarantees that both cancel & loser actually started
+          .bracket(use = { never<Int>() }, release = { endLatch.complete(i) })
+
+        when (shouldCancel) {
+          1 -> raceTriple(ctx, cancel, loser, loser2).startF(ctx).bind()
+          2 -> raceTriple(ctx, loser, cancel, loser2).startF(ctx).bind()
+          else -> raceTriple(ctx, loser, loser2, cancel).startF(ctx).bind()
+        }
+
+        endLatch.get().bind()
+      }.equalUnderTheLaw(just(i), EQ)
+    }
+
+  fun <F> Concurrent<F>.raceTripleCancelCancelsAll(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
+    forAll(Gen.int(), Gen.int(), Gen.int()) { a, b, c ->
+      binding {
+        val s = Semaphore(0L, this@raceTripleCancelCancelsAll).bind()
+        val pa = Promise<F, Int>(this@raceTripleCancelCancelsAll).bind()
+        val pb = Promise<F, Int>(this@raceTripleCancelCancelsAll).bind()
+        val pc = Promise<F, Int>(this@raceTripleCancelCancelsAll).bind()
+
+        val loserA: Kind<F, Int> = s.release().bracket(use = { never<Int>() }, release = { pa.complete(a) })
+        val loserB: Kind<F, Int> = s.release().bracket(use = { never<Int>() }, release = { pb.complete(b) })
+        val loserC: Kind<F, Int> = s.release().bracket(use = { never<Int>() }, release = { pc.complete(c) })
+
+        val (_, cancelRacePair) = raceTriple(ctx, loserA, loserB, loserC).startF(ctx).bind()
+
+        s.acquireN(3L).flatMap { cancelRacePair }.bind()
+        pa.get().bind() + pb.get().bind() + pc.get().bind()
+      }.equalUnderTheLaw(just(a + b + c), EQ)
     }
 
   fun <F> Concurrent<F>.parMapCancelCancelsBoth(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
