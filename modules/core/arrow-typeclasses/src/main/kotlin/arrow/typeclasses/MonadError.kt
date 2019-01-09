@@ -16,6 +16,9 @@ interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F> {
 
 }
 
+/**
+ * ank_macro_hierarchy(arrow.typeclasses.MonadThrow)
+ */
 interface MonadThrow<F> : MonadError<F, Throwable> {
 
   /**

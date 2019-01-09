@@ -148,7 +148,7 @@ sealed class FreeC<F, out R> : FreeCOf<F, R> {
       fun <A> interrupted(scopeId: Any?, failure: Option<Throwable>): Result<A> =
         FreeC.Interrupted<Any?, A, Any?>(scopeId, failure)
 
-      fun <A> interrupted(scopeId: Token, failure: Option<Throwable>): Result<A> =
+      internal fun <A> interrupted(scopeId: Token, failure: Option<Throwable>): Result<A> =
         FreeC.Interrupted<Any?, A, Token>(scopeId, failure)
 
       fun <A> fromEither(either: Either<Throwable, A>): Result<A> =
