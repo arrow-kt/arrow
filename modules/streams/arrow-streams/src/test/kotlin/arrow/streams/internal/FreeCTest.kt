@@ -136,11 +136,6 @@ class FreeCTest : UnitSpec() {
       }
     }
 
-    "Running a interrupted value without errors" {
-      FreeC.interrupted<EitherPartialOf<Throwable>, String, Token>(Token(), None)
-        .run(Either.monadError()) shouldBe Right(None)
-    }
-
     "Running a interrupted value with errors" {
       forAll(genThrowable()) { t ->
         FreeC.interrupted<EitherPartialOf<Throwable>, String, Token>(Token(), t.some())
@@ -208,7 +203,12 @@ class FreeCTest : UnitSpec() {
       }
     }
 
-    "Running a interrupted value without errors" {
+    "Running a interrupted value without errors using Either" {
+      FreeC.interrupted<EitherPartialOf<Throwable>, String, Token>(Token(), None)
+        .run(Either.monadError()) shouldBe Right(None)
+    }
+
+    "Running a interrupted value without errors using Try" {
       FreeC.interrupted<EitherPartialOf<Throwable>, String, Token>(Token(), None)
         .foldMap(EitherToTry, Try.monadError()) shouldBe Success(None)
     }

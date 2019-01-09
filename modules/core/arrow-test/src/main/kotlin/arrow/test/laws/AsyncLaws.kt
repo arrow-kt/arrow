@@ -21,19 +21,18 @@ object AsyncLaws {
     AC: Async<F>,
     EQ: Eq<Kind<F, Int>>,
     EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>,
-    testStackSafety: Boolean = true,
-    subName: String = ""
+    testStackSafety: Boolean = true
   ): List<Law> =
     MonadDeferLaws.laws(AC, EQ, EQ_EITHER, testStackSafety = testStackSafety) + listOf(
-      Law("Async Laws: success equivalence $subName") { AC.asyncSuccess(EQ) },
-      Law("Async Laws: error equivalence $subName") { AC.asyncError(EQ) },
-      Law("Async Laws: continueOn jumps threads $subName") { AC.continueOn(EQ) },
-      Law("Async Laws: async constructor $subName") { AC.asyncConstructor(EQ) },
-      Law("Async Laws: async can be derived from asyncF $subName") { AC.asyncCanBeDerivedFromAsyncF(EQ) },
-      Law("Async Laws: bracket release is called on completed or error $subName") { AC.bracketReleaseIscalledOnCompletedOrError(EQ) },
-      Law("Async Laws: continueOn on comprehensions $subName") { AC.continueOnComprehension(EQ) },
-      Law("Async Laws: async cancelable coherence $subName") { AC.asyncCancelableCoherence(EQ) },
-      Law("Async Laws: cancelable cancelableF coherence $subName") { AC.cancelableCancelableFCoherence(EQ) }
+      Law("Async Laws: success equivalence") { AC.asyncSuccess(EQ) },
+      Law("Async Laws: error equivalence") { AC.asyncError(EQ) },
+      Law("Async Laws: continueOn jumps threads") { AC.continueOn(EQ) },
+      Law("Async Laws: async constructor") { AC.asyncConstructor(EQ) },
+      Law("Async Laws: async can be derived from asyncF") { AC.asyncCanBeDerivedFromAsyncF(EQ) },
+      Law("Async Laws: bracket release is called on completed or error") { AC.bracketReleaseIscalledOnCompletedOrError(EQ) },
+      Law("Async Laws: continueOn on comprehensions") { AC.continueOnComprehension(EQ) },
+      Law("Async Laws: async cancelable coherence") { AC.asyncCancelableCoherence(EQ) },
+      Law("Async Laws: cancelable cancelableF coherence") { AC.cancelableCancelableFCoherence(EQ) }
     )
 
   fun <F> Async<F>.asyncSuccess(EQ: Eq<Kind<F, Int>>): Unit =
