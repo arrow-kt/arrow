@@ -86,34 +86,34 @@ class AQLTests : UnitSpec() {
     val jack = Student("Jack", 32)
     val chris = Student("Chris", 40)
 
-    "AQL is able to `groupBy`" {
+    "AQL is able to filter using `where` and then `groupBy`" {
       listOf(john, jane, jack).query {
         selectAll() where { age > 30 } groupBy { age }
-      }.value() shouldBe mapOf(32 to listOf(jane, jack))
+      }.value() shouldBe Id(mapOf(32 to listOf(jane, jack)))
     }
 
     "AQL is able to `sum`" {
       listOf(john, jane, jack).query {
         selectAll() where { age > 30 } sum { age.toLong() }
-      }.value() shouldBe 64L
+      }.value() shouldBe Id(64L)
     }
 
     "AQL is able to `orderBy by Asc` simple selects" {
       listOf(1, 2, 3).query {
         select { this * 10 } orderBy Ord.Asc(Int.order())
-      }.value() shouldBe listOf(10, 20, 30)
+      }.value() shouldBe Id(listOf(10, 20, 30))
     }
 
     "AQL is able to `orderBy by Desc` simple selects" {
       listOf(1, 2, 3).query {
         select { this * 10 } orderBy Ord.Desc(Int.order())
-      }.value() shouldBe listOf(30, 20, 10)
+      }.value() shouldBe Id(listOf(30, 20, 10))
     }
 
     "AQL is able to `groupBy` and then orderBy `keys`"{
       listOf(john, jane, jack).query {
         selectAll() where { age > 30 } groupBy { age } orderMap Ord.Desc(Int.order())
-      }.value() shouldBe mapOf(32 to listOf(jane, jack))
+      }.value() shouldBe Id(mapOf(32 to listOf(jane, jack)))
     }
 
     "AQL is able to `union`" {
