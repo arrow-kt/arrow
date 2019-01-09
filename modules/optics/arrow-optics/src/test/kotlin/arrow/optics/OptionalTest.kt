@@ -1,14 +1,19 @@
 package arrow.optics
 
 import arrow.core.*
-import arrow.data.*
-import arrow.core.extensions.monoid
 import arrow.core.extensions.`try`.applicative.applicative
-import arrow.data.extensions.listk.eq.eq
+import arrow.core.extensions.monoid
 import arrow.core.extensions.option.eq.eq
+import arrow.data.*
+import arrow.data.extensions.list.foldable.nonEmpty
+import arrow.data.extensions.listk.eq.eq
 import arrow.test.UnitSpec
-import arrow.test.generators.*
-import arrow.test.laws.*
+import arrow.test.generators.genFunctionAToB
+import arrow.test.generators.genTry
+import arrow.test.generators.genTuple
+import arrow.test.laws.OptionalLaws
+import arrow.test.laws.SetterLaws
+import arrow.test.laws.TraversalLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -176,19 +181,19 @@ class OptionalTest : UnitSpec() {
 
     "Finding a target using a predicate should be wrapped in the correct option result" {
       forAll(Gen.list(Gen.int()), Gen.bool()) { list, predicate ->
-        optionalHead.find(list) { predicate }.fold({ false }, { true }) == predicate
+        optionalHead.find(list) { predicate }.fold({ false }, { true }) == (predicate && list.nonEmpty())
       }
     }
 
     "Checking existence predicate over the target should result in same result as predicate" {
       forAll(Gen.list(Gen.int()), Gen.bool()) { list, predicate ->
-        optionalHead.exists(list) { predicate } == predicate
+        optionalHead.exists(list) { predicate } == (predicate && list.nonEmpty())
       }
     }
 
     "Checking satisfaction of predicate over the target should result in opposite result as predicate" {
       forAll(Gen.list(Gen.int()), Gen.bool()) { list, predicate ->
-        optionalHead.all(list) { predicate } == predicate
+        optionalHead.all(list) { predicate } == if(list.isEmpty()) true else predicate
       }
     }
 

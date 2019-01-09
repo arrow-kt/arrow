@@ -18,7 +18,7 @@ class StringTest : UnitSpec() {
       iso = String.toList(),
       aGen = Gen.string(),
       bGen = Gen.list(genChar()),
-      funcGen = Gen.list(genChar()).map { list -> {it:List<Char> -> list + it} },
+      funcGen = Gen.list(genChar()).map { list -> {chars:List<Char> -> list + chars} },
       EQA = Eq.any(),
       EQB = Eq.any(),
       bMonoid = object : Monoid<List<Char>> {

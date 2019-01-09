@@ -2,12 +2,13 @@ package arrow.optics.instances
 
 import arrow.core.MapInstances
 import arrow.core.Option
-import arrow.data.*
 import arrow.core.extensions.monoid
-import arrow.core.extensions.semigroup
-import arrow.data.extensions.listk.eq.eq
 import arrow.core.extensions.option.eq.eq
 import arrow.core.extensions.option.monoid.monoid
+import arrow.core.extensions.semigroup
+import arrow.data.ListK
+import arrow.data.MapK
+import arrow.data.extensions.listk.eq.eq
 import arrow.optics.extensions.at
 import arrow.optics.extensions.each
 import arrow.optics.extensions.filterIndex
@@ -72,7 +73,7 @@ class MapInstanceTest : UnitSpec() {
     ))
 
     testLaws(OptionalLaws.laws(
-      optional = MapK.index<String, Int>().index(Gen.string().random().toList().toString()),
+      optional = MapK.index<String, Int>().index(""),
       aGen = genMapK(Gen.string(), Gen.int()),
       bGen = Gen.int(),
       funcGen = genFunctionAToB(Gen.int()),
@@ -81,7 +82,7 @@ class MapInstanceTest : UnitSpec() {
     ))
 
     testLaws(OptionalLaws.laws(
-      optional = MapInstances.index<String, Int>().index(Gen.string().random().toList().toString()),
+      optional = MapInstances.index<String, Int>().index(""),
       aGen = Gen.map(Gen.string(), Gen.int()),
       bGen = Gen.int(),
       funcGen = genFunctionAToB(Gen.int()),
@@ -90,7 +91,7 @@ class MapInstanceTest : UnitSpec() {
     ))
 
     testLaws(LensLaws.laws(
-      lens = MapK.at<String, Int>().at(Gen.string().random().toList().toString()),
+      lens = MapK.at<String, Int>().at(""),
       aGen = genMapK(Gen.string(), Gen.int()),
       bGen = genOption(Gen.int()),
       funcGen = genFunctionAToB(genOption(Gen.int())),
@@ -100,7 +101,7 @@ class MapInstanceTest : UnitSpec() {
     ))
 
     testLaws(LensLaws.laws(
-      lens = MapInstances.at<String, Int>().at(Gen.string().random().toList().toString()),
+      lens = MapInstances.at<String, Int>().at(""),
       aGen = Gen.map(Gen.string(), Gen.int()),
       bGen = genOption(Gen.int()),
       funcGen = genFunctionAToB(genOption(Gen.int())),

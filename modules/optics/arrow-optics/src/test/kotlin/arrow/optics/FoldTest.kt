@@ -70,7 +70,7 @@ class FoldTest : UnitSpec() {
 
       "Checking existence of a target" {
         forAll(Gen.list(Gen.int()), Gen.bool()) { ints, predicate ->
-          exists(ints.k()) { predicate } == predicate && ints.nonEmpty()
+          exists(ints.k()) { predicate } == (predicate && ints.nonEmpty())
         }
       }
 

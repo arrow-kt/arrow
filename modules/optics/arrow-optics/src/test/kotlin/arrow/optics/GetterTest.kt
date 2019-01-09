@@ -1,8 +1,8 @@
 package arrow.optics
 
 import arrow.core.*
-import arrow.data.*
 import arrow.core.extensions.monoid
+import arrow.data.*
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import io.kotlintest.properties.Gen
@@ -126,24 +126,6 @@ class GetterTest : UnitSpec() {
       val first = tokenGetter.second<Int>()
       forAll(Gen.int(), genToken) { int: Int, token: Token ->
         first.get(int toT token) == int toT token.value
-      }
-    }
-
-    "Asking for the focus in a Reader" {
-      forAll(genToken) { token: Token ->
-        tokenGetter.ask().runId(token) == token.value
-      }
-    }
-
-    "toReader is an alias for ask" {
-      forAll(genToken) { token: Token ->
-        tokenGetter.ask().runId(token) == tokenLens.toReader().runId(token)
-      }
-    }
-
-    "Asks with f is the same as applying f to the focus of the lens" {
-      forAll(genToken, genFunctionAToB<String, String>(Gen.string())) { token, f ->
-        tokenGetter.asks(f).runId(token) == f(token.value)
       }
     }
 

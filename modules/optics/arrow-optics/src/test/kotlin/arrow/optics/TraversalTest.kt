@@ -2,13 +2,13 @@ package arrow.optics
 
 import arrow.Kind
 import arrow.core.Option
+import arrow.core.extensions.monoid
+import arrow.core.extensions.option.eq.eq
 import arrow.core.toOption
 import arrow.core.toT
 import arrow.data.*
-import arrow.core.extensions.monoid
 import arrow.data.extensions.listk.eq.eq
 import arrow.data.extensions.listk.traverse.traverse
-import arrow.core.extensions.option.eq.eq
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genListK
@@ -104,7 +104,7 @@ class TraversalTest : UnitSpec() {
 
       "asFold should behave as valid Fold: lastOption" {
         forAll(genListK(Gen.int())) { ints ->
-          lastOption(ints) == ints.lastOrNull()?.toOption()
+          lastOption(ints) == ints.lastOrNull().toOption()
         }
       }
     }
