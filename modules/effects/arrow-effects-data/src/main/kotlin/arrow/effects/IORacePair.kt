@@ -2,6 +2,7 @@ package arrow.effects
 
 import arrow.core.*
 import arrow.effects.internal.ArrowInternalException
+import arrow.effects.internal.Platform
 import arrow.effects.typeclasses.Fiber
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
@@ -14,9 +15,7 @@ import kotlin.coroutines.suspendCoroutine
  * Race two tasks concurrently within a new [IO].
  * Race results in a winner and the other, yet to finish task running in a [Fiber].
  *
- * {: data-executable='true'}
- *
- * ```kotlin:ank
+ * ```kotlin:ank:playground
  * import arrow.effects.*
  * import arrow.effects.extensions.io.async.async
  * import arrow.effects.extensions.io.concurrent.racePair
@@ -94,7 +93,7 @@ fun <A, B> IO.Companion.racePair(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<
         if (active.getAndSet(false)) { //if an error finishes first, stop the race.
           connB.cancel().fix().unsafeRunAsync { r2 ->
             conn.pop()
-            cb(Left(r2.fold({ CompositeFailure(error, it) }, { error })))
+            cb(Left(r2.fold({ Platform.composeErrors(error, it) }, { error })))
           }
         } else {
           promiseA.complete(Left(error))
@@ -115,7 +114,7 @@ fun <A, B> IO.Companion.racePair(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<
         if (active.getAndSet(false)) { //if an error finishes first, stop the race.
           connA.cancel().fix().unsafeRunAsync { r2 ->
             conn.pop()
-            cb(Left(r2.fold({ CompositeFailure(error, it) }, { error })))
+            cb(Left(r2.fold({ Platform.composeErrors(error, it) }, { error })))
           }
         } else {
           promiseB.complete(Left(error))
@@ -205,6 +204,3 @@ internal fun <A> asyncContinuation(ctx: CoroutineContext, cc: (Either<Throwable,
     }
 
   }
-
-internal class CompositeFailure(first: Throwable, second: Throwable) :
-  Throwable("Two exceptions were thrown, first $first: ${first.message}. second: $second: ${second.message}", first)

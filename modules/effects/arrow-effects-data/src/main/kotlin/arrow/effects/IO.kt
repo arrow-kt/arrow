@@ -136,9 +136,7 @@ sealed class IO<out A> : IOOf<A> {
 
   internal abstract fun unsafeRunTimedTotal(limit: Duration): Option<A>
 
-  /**
-   * Makes the source [IO] uninterpretable such that a [Fiber.cancel] signal has no effect.
-   */
+  /** Makes the source [IO] uncancelable such that a [Fiber.cancel] signal has no effect. */
   fun uncancelable(): IO<A> =
     IO.ContextSwitch(this, ContextSwitch.makeUncancelable, ContextSwitch.disableUncancelable())
 
@@ -203,7 +201,7 @@ sealed class IO<out A> : IOOf<A> {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
 
     companion object {
-      /** Internal reusable reference. */
+      //Internal reusable reference.
       internal val makeUncancelable: (IOConnection) -> IOConnection = { IOConnection.uncancelable }
 
       internal fun <A> disableUncancelable(): (A, Throwable?, IOConnection, IOConnection) -> IOConnection =

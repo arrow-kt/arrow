@@ -8,8 +8,6 @@ import arrow.effects.typeclasses.*
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.EmptyCoroutineContext
 
-typealias Callback<A> = (Either<Nothing, A>) -> Unit
-
 internal class CancelableMVar<F, A> private constructor(initial: State<A>, CF: Concurrent<F>) : MVar<F, A>, Concurrent<F> by CF {
 
   private val state = AtomicReference(initial)
@@ -25,7 +23,6 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, CF: C
       CancelableMVar(State.empty<A>(), CF)
     }
 
-    internal class CallbackId
     internal sealed class State<out A> {
       companion object {
         private val ref = WaitForPut<Any>(linkedMapOf(), linkedMapOf())
@@ -34,8 +31,8 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, CF: C
         fun <A> empty(): State<A> = ref as State<A>
       }
 
-      data class WaitForPut<A>(val reads: Map<CallbackId, Callback<A>>, val takes: Map<CallbackId, Callback<A>>) : State<A>()
-      data class WaitForTake<A>(val value: A, val listeners: Map<CallbackId, Tuple2<A, Callback<Unit>>>) : State<A>()
+      data class WaitForPut<A>(val reads: Map<Token, (Either<Nothing, A>) -> Unit>, val takes: Map<Token, (Either<Nothing, A>) -> Unit>) : State<A>()
+      data class WaitForTake<A>(val value: A, val listeners: Map<Token, Tuple2<A, (Either<Nothing, Unit>) -> Unit>>) : State<A>()
     }
   }
 
@@ -91,10 +88,10 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, CF: C
       }
     }
 
-  private tailrec fun unsafePut(a: A, onPut: Callback<Unit>): Kind<F, CancelToken<F>> =
+  private tailrec fun unsafePut(a: A, onPut: (Either<Nothing, Unit>) -> Unit): Kind<F, CancelToken<F>> =
     when (val current = state.get()) {
       is State.WaitForTake -> {
-        val id = CallbackId()
+        val id = Token()
         val newMap = current.listeners + Pair(id, Tuple2(a, onPut))
         if (state.compareAndSet(current, State.WaitForTake(current.value, newMap))) just(delay { unsafeCancelPut(id) })
         else unsafePut(a, onPut)
@@ -119,7 +116,7 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, CF: C
       }
     }
 
-  private tailrec fun unsafeCancelPut(id: CallbackId): Unit =
+  private tailrec fun unsafeCancelPut(id: Token): Unit =
     when (val current = state.get()) {
       is State.WaitForTake -> {
         val update = current.copy(listeners = current.listeners - id)
@@ -145,7 +142,7 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, CF: C
       is State.WaitForPut -> just(None)
     }
 
-  private tailrec fun unsafeTake(onTake: Callback<A>): Kind<F, CancelToken<F>> =
+  private tailrec fun unsafeTake(onTake: (Either<Nothing, A>) -> Unit): Kind<F, CancelToken<F>> =
     when (val current = state.get()) {
       is State.WaitForTake -> {
         if (current.listeners.isEmpty()) {
@@ -167,14 +164,14 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, CF: C
         }
       }
       is State.WaitForPut -> {
-        val id = CallbackId()
+        val id = Token()
         val newQueue = current.takes + Pair(id, onTake)
         if (state.compareAndSet(current, State.WaitForPut(current.reads, newQueue))) just(delay { unsafeCancelTake(id) })
         else unsafeTake(onTake)
       }
     }
 
-  private tailrec fun unsafeCancelTake(id: CallbackId): Unit =
+  private tailrec fun unsafeCancelTake(id: Token): Unit =
     when (val current = state.get()) {
       is State.WaitForPut -> {
         val newMap = current.takes - id
@@ -185,21 +182,21 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, CF: C
       is State.WaitForTake -> Unit
     }
 
-  private tailrec fun unsafeRead(onRead: Callback<A>): Kind<F, Unit> =
+  private tailrec fun unsafeRead(onRead: (Either<Nothing, A>) -> Unit): Kind<F, Unit> =
     when (val current = state.get()) {
       is State.WaitForTake -> {
         onRead(Right(current.value))
         unit()
       }
       is State.WaitForPut -> {
-        val id = CallbackId()
+        val id = Token()
         val newReads = current.reads + Pair(id, onRead)
         if (state.compareAndSet(current, State.WaitForPut(newReads, current.takes))) delay { unsafeCancelRead(id) }
         else unsafeRead(onRead)
       }
     }
 
-  private tailrec fun unsafeCancelRead(id: CallbackId): Unit =
+  private tailrec fun unsafeCancelRead(id: Token): Unit =
     when (val current = state.get()) {
       is State.WaitForPut -> {
         val newMap = current.reads - id
@@ -210,7 +207,7 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, CF: C
       is State.WaitForTake -> Unit
     }
 
-  private fun streamPutAndReads(a: A, put: Callback<A>?, reads: Map<CallbackId, Callback<A>>): Kind<F, Boolean> {
+  private fun streamPutAndReads(a: A, put: ((Either<Nothing, A>) -> Unit)?, reads: Map<Token, (Either<Nothing, A>) -> Unit>): Kind<F, Boolean> {
     val value = Right(a)
     return streamAll(value, reads.values).flatMap { _ ->
       if (put != null) delay { put(value) }.startF(ImmediateContext).map { true }
@@ -219,7 +216,7 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, CF: C
   }
 
   // For streaming a value to a whole `reads` collection
-  private fun streamAll(value: Either<Nothing, A>, listeners: Iterable<Callback<A>>): Kind<F, Unit> =
+  private fun streamAll(value: Either<Nothing, A>, listeners: Iterable<(Either<Nothing, A>) -> Unit>): Kind<F, Unit> =
     listeners.fold(null as Kind<F, Fiber<F, Unit>>?) { acc, cb ->
       val task = delay { cb(value) }.startF(EmptyCoroutineContext)
       acc?.flatMap { task } ?: task

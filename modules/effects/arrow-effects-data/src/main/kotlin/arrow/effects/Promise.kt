@@ -3,6 +3,7 @@ package arrow.effects
 import arrow.Kind
 import arrow.core.*
 import arrow.effects.internal.ImmediateContext
+import arrow.effects.internal.Token
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Concurrent
 import arrow.effects.typeclasses.mapUnit
@@ -275,9 +276,8 @@ interface Promise<F, A> {
 
 internal class CancelablePromise<F, A>(CF: Concurrent<F>) : Promise<F, A>, Concurrent<F> by CF {
 
-  internal class CallbackId
   internal sealed class State<out A> {
-    data class Pending<A>(val joiners: Map<CallbackId, (Either<Throwable, A>) -> Unit>) : State<A>()
+    data class Pending<A>(val joiners: Map<Token, (Either<Throwable, A>) -> Unit>) : State<A>()
     data class Full<A>(val value: A) : State<A>()
     data class Error<A>(val throwable: Throwable) : State<A>()
   }
@@ -369,8 +369,8 @@ internal class CancelablePromise<F, A>(CF: Concurrent<F>) : Promise<F, A>, Concu
     }
   }
 
-  private fun unsafeRegister(cb: (Either<Throwable, A>) -> Unit): CallbackId {
-    val id = CallbackId()
+  private fun unsafeRegister(cb: (Either<Throwable, A>) -> Unit): Token {
+    val id = Token()
 
     tailrec fun register(): Either<Throwable, A>? = when (val current = state.get()) {
       is State.Full -> Right(current.value)

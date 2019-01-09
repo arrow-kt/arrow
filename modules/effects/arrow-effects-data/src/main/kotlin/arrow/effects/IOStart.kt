@@ -8,9 +8,7 @@ import kotlin.coroutines.Continuation
 /**
  * Create a new [IO] that upon execution starts the receiver [IO] within a [Fiber] on [ctx].
  *
- * {: data-executable='true'}
- *
- * ```kotlin:ank
+ * ```kotlin:ank:playground
  * import arrow.effects.*
  * import arrow.effects.extensions.io.async.async
  * import arrow.effects.extensions.io.monad.binding
