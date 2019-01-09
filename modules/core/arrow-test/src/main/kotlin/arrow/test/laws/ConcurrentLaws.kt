@@ -6,7 +6,6 @@ import arrow.effects.CancelToken
 import arrow.effects.MVar
 import arrow.effects.Promise
 import arrow.effects.Semaphore
-import arrow.effects.internal.unsafe
 import arrow.effects.typeclasses.Concurrent
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.fold
@@ -17,7 +16,9 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.properties.map
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 
 @Suppress("LargeClass")
@@ -132,14 +133,17 @@ object ConcurrentLaws {
       binding {
         val release = Promise.uncancelable<F, Int>(this@cancelableReceivesCancelSignal).bind()
         val cancelToken: CancelToken<F> = release.complete(i)
-        val latch = Promise.unsafe<Unit>()
+        val latch = CountDownLatch(1)
 
         val (_, cancel) = cancelable<Unit> {
-          latch.complete(Unit)
+          latch.countDown()
           cancelToken
         }.startF(ctx).bind()
 
-        ctx.shift().followedBy(asyncF<Unit> { cb -> delay { cb(Right(latch.get().value())) } }).bind()
+        ctx.shift().followedBy(asyncF<Unit> { cb ->
+          delay { latch.await(500, TimeUnit.MILLISECONDS) }
+            .map { cb(Right(Unit)) }
+        }).bind()
 
         cancel.bind()
         release.get().bind()
@@ -167,20 +171,25 @@ object ConcurrentLaws {
     forAll(Gen.int()) { i ->
       binding {
         val latch = Promise<F, Int>(this@asyncCanCancelUpstream).bind()
-        val cancelToken = Promise.unsafe<CancelToken<F>>()
+        val cancelToken = AtomicReference<CancelToken<F>>()
+        val cancelLatch = CountDownLatch(1)
 
         val upstream = async<Unit> { conn, cb ->
           conn.push(latch.complete(i))
           cb(Right(Unit))
         }
 
-        val downstream = async<Unit> { conn, _ -> cancelToken.complete(conn.cancel()) }
+        val downstream = async<Unit> { conn, _ ->
+          cancelToken.set(conn.cancel())
+          cancelLatch.countDown()
+        }
 
         upstream.followedBy(downstream).startF(ctx).bind()
 
         delay(ctx) {
-          cancelToken.get().value()
-        }.flatten().startF(ctx).bind()
+          cancelLatch.await(500, TimeUnit.MILLISECONDS)
+        }.flatMap { cancelToken.get() ?: raiseError(AssertionError("CancelToken was not set.")) }
+          .startF(ctx).bind()
 
         latch.get().bind()
       }.equalUnderTheLaw(just(i), EQ)
@@ -190,16 +199,16 @@ object ConcurrentLaws {
     forAll(Gen.int()) { i ->
       binding {
         val latch = Promise<F, Int>(this@asyncShouldRunKindConnectionOnCancel).bind()
+        val startLatch = CountDownLatch(1)
 
         val (_, cancel) = async<Unit> { conn, _ ->
           conn.push(latch.complete(i))
+          startLatch.countDown()
         }.startF(ctx).bind()
 
-        defer(ctx) {
-          //Without sleep we sometimes run into the edge case `cancel` runs before `conn.push`
-          runBlocking { kotlinx.coroutines.delay(1) }
-          cancel
-        }.bind()
+        delay(ctx) {
+          startLatch.await(500, TimeUnit.MILLISECONDS)
+        }.followedBy(cancel).bind()
 
         latch.get().bind()
       }.equalUnderTheLaw(just(i), EQ)
