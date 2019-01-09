@@ -34,6 +34,14 @@ Introductory talk to Functional architectures to be built on top of Arrow.
 
 KotlinConf, San Francisco, Nov '17 - version 0.3.11
 
+### Manual documentation is dead. Long live automated documentation! Automated documentation with ΛNK.
+
+It includes how the ΛNK plugin works: from having a tool that evaluates and verifies your doc snippets at compile time, to generating code documentation that is always correct and up to date.
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/CvNoX2gGd9c?rel=0" frameborder="0" allowfullscreen></iframe>
+
+droidconSF, San Francisco, Nov '18 - version 0.8.1
+
 ### Building a DSL... in Kotlin
  
  Make DSLs stack safe, composable and reusable under different runtime requirements thanks to Arrow.
