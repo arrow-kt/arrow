@@ -6,6 +6,7 @@ import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.option.monoid.monoid
 import arrow.product
 import arrow.test.UnitSpec
+import arrow.test.generators.genNonEmptyList
 import arrow.test.generators.genOption
 import arrow.test.generators.genTuple
 import arrow.test.laws.EqLaws
@@ -70,7 +71,7 @@ class ProductTest : UnitSpec() {
     }
 
     "List<@product>.combineAll()" {
-      forAll(Gen.list(genPerson())) {
+      forAll(genNonEmptyList(genPerson()).map { it.all }) {
         it.combineAll() == it.reduce { a, b -> a + b }
       }
     }
@@ -126,15 +127,11 @@ class ProductTest : UnitSpec() {
       emptyPerson() shouldBe Person("", 0, None)
     }
 
-    fun defaultPerson(age: Int) = Person("", age, None)
-
-    val getPerson: (Int) -> Person = { age: Int ->
-      genPerson().random().firstOrNull { it.age == age }.toOption().getOrElse { defaultPerson(age) }
-    }
+    val getPersonWithAge: (Int) -> Person = { age: Int -> Person("", age, None)}
 
     testLaws(
-      EqLaws.laws(Person.eq(), getPerson),
-      SemigroupLaws.laws(Person.semigroup(), getPerson(1), getPerson(2), getPerson(3), Person.eq()),
+      EqLaws.laws(Person.eq(), getPersonWithAge),
+      SemigroupLaws.laws(Person.semigroup(), getPersonWithAge(1), getPersonWithAge(2), getPersonWithAge(3), Person.eq()),
       MonoidLaws.laws(Person.monoid(), genPerson(), Person.eq())
     )
   }
