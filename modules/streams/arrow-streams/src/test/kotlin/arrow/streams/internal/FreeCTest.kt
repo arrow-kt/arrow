@@ -136,13 +136,6 @@ class FreeCTest : UnitSpec() {
       }
     }
 
-    "Running a interrupted value with errors" {
-      forAll(genThrowable()) { t ->
-        FreeC.interrupted<EitherPartialOf<Throwable>, String, Token>(Token(), t.some())
-          .run(Either.monadError()) == Left(t)
-      }
-    }
-
     "Running an Suspend value" {
       forAll(Gen.string()) { s ->
         FreeC.liftF<EitherPartialOf<Throwable>, String>(s.right())
@@ -150,15 +143,7 @@ class FreeCTest : UnitSpec() {
       }
     }
 
-    "Running a FlatMapped value" {
-      forAll(Gen.string()) { s ->
-        FreeC.FlatMapped(FreeC.just("")) { FreeC.just<EitherPartialOf<Throwable>, String>(s) }
-          .run(Either.monadError()) == Right(Some(s))
-
-      }
-    }
-
-    "Running a suspended value"{
+    "Running a deferred value"{
       forAll(Gen.string()) { s ->
         FreeC.defer { FreeC.just<EitherPartialOf<Throwable>, String>(s) }
           .run(Either.monadError()) == Right(Some(s))
@@ -213,7 +198,14 @@ class FreeCTest : UnitSpec() {
         .foldMap(EitherToTry, Try.monadError()) shouldBe Success(None)
     }
 
-    "Running a interrupted value with errors" {
+    "Running a interrupted value with errors using Either" {
+      forAll(genThrowable()) { t ->
+        FreeC.interrupted<EitherPartialOf<Throwable>, String, Token>(Token(), t.some())
+          .run(Either.monadError()) == Left(t)
+      }
+    }
+
+    "Running a interrupted value with errors using Try" {
       forAll(genThrowable()) { t ->
         FreeC.interrupted<EitherPartialOf<Throwable>, String, Token>(Token(), t.some())
           .foldMap(EitherToTry, Try.monadError()) == Failure(t)
@@ -227,7 +219,15 @@ class FreeCTest : UnitSpec() {
       }
     }
 
-    "Running a FlatMapped value" {
+    "Running a FlatMapped value using Either" {
+      forAll(Gen.string()) { s ->
+        FreeC.FlatMapped(FreeC.just("")) { FreeC.just<EitherPartialOf<Throwable>, String>(s) }
+          .run(Either.monadError()) == Right(Some(s))
+
+      }
+    }
+
+    "Running a FlatMapped value using Try" {
       forAll(Gen.string()) { s ->
         FreeC.FlatMapped(FreeC.just("")) { FreeC.just<EitherPartialOf<Throwable>, String>(s) }
           .foldMap(EitherToTry, Try.monadError()) == Success(Some(s))
