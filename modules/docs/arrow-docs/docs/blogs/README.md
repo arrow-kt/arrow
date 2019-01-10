@@ -1,6 +1,6 @@
 ---
 layout: blog
-title: Blogs & Presentations
+title: Community Resources
 permalink: /blogs/
 ---
 

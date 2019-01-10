@@ -15,11 +15,8 @@ tab:
     - title: All
       url: /category/all
       
-    - title: Videos
-      url: /category/videos
+    - title: Media
+      url: /category/media
       
     - title: News
       url: /category/news
-      
-    - title: Podcast
-      url: /category/podcast
