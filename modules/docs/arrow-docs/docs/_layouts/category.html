@@ -8,19 +8,23 @@ layout: blog
             {% for post in site.categories[page.category] %}
             <div class="blog-item">
                 <div class="blog-item-header">
-                   {% if post.icon != "" %}
+                   {% if post.icon %}
                    <div class="icon">
                        <img src="{{ post.icon }}" alt="">
                    </div>
                    {% endif %}
-                   {% if post.version != "" %}
+                   {% if post.version %}
                    <div class="version">{{ post.version }}</div>
                    {% endif %}
 
-                    {% if post.video != "" %} 
-                    <a href="{{ post.video }}">
+                    {% if post.video %}
+                    <a href="{{ post.video }}" class="header-container">
                         <img src="{{ post.header-image }}" alt="">
                     </a>
+                    {% else %}
+                    <div class="header-container">
+                        <img src="{{ post.header-image }}" alt="">
+                    </div>
                     {% endif %}
                 </div>
                 <div class="blog-item-content">
