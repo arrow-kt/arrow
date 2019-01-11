@@ -83,7 +83,7 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, CF: C
         if (!state.compareAndSet(current, update)) {
           unsafeTryPut(a)
         } else if (first != null || current.reads.isNotEmpty()) {
-          streamPutAndReads(a, first, current.reads)
+          callPutAndAllReaders(a, first, current.reads)
         } else just(true)
       }
     }
@@ -105,7 +105,7 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, CF: C
         }
 
         if (state.compareAndSet(current, update)) {
-          if (first != null || current.reads.isNotEmpty()) streamPutAndReads(a, first, current.reads).map {
+          if (first != null || current.reads.isNotEmpty()) callPutAndAllReaders(a, first, current.reads).map {
             onPut(rightUnit)
             unit()
           } else {
@@ -135,7 +135,7 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, CF: C
         } else {
           val (ax, notify) = current.listeners.values.first()
           val xs = current.listeners.toList().drop(1)
-          if (state.compareAndSet(current, State.WaitForTake(ax, xs.toMap()))) delay { notify(rightUnit) }.startF(ImmediateContext).map { Some(current.value) }
+          if (state.compareAndSet(current, State.WaitForTake(ax, xs.toMap()))) delay { notify(rightUnit) }.startF(EmptyCoroutineContext).map { Some(current.value) }
           else unsafeTryTake()
         }
       }
@@ -156,7 +156,7 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, CF: C
           val (ax, notify) = current.listeners.values.first()
           val xs = current.listeners.toList().drop(0)
           if (state.compareAndSet(current, State.WaitForTake(ax, xs.toMap()))) {
-            delay { notify(rightUnit) }.startF(ImmediateContext).map {
+            delay { notify(rightUnit) }.startF(EmptyCoroutineContext).map {
               onTake(Right(current.value))
               unit()
             }
@@ -207,17 +207,17 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, CF: C
       is State.WaitForTake -> Unit
     }
 
-  private fun streamPutAndReads(a: A, put: ((Either<Nothing, A>) -> Unit)?, reads: Map<Token, (Either<Nothing, A>) -> Unit>): Kind<F, Boolean> {
+  private fun callPutAndAllReaders(a: A, put: ((Either<Nothing, A>) -> Unit)?, reads: Map<Token, (Either<Nothing, A>) -> Unit>): Kind<F, Boolean> {
     val value = Right(a)
-    return streamAll(value, reads.values).flatMap { _ ->
-      if (put != null) delay { put(value) }.startF(ImmediateContext).map { true }
+    return reads.values.callAll(value).flatMap {
+      if (put != null) delay { put(value) }.startF(EmptyCoroutineContext).map { true }
       else just(true)
     }
   }
 
   // For streaming a value to a whole `reads` collection
-  private fun streamAll(value: Either<Nothing, A>, listeners: Iterable<(Either<Nothing, A>) -> Unit>): Kind<F, Unit> =
-    listeners.fold(null as Kind<F, Fiber<F, Unit>>?) { acc, cb ->
+  private fun Iterable<(Either<Nothing, A>) -> Unit>.callAll(value: Either<Nothing, A>): Kind<F, Unit> =
+    fold(null as Kind<F, Fiber<F, Unit>>?) { acc, cb ->
       val task = delay { cb(value) }.startF(EmptyCoroutineContext)
       acc?.flatMap { task } ?: task
     }?.map(mapUnit) ?: unit()

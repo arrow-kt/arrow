@@ -4,8 +4,10 @@ import arrow.Kind
 import arrow.core.*
 import arrow.effects.Promise
 import arrow.effects.typeclasses.Concurrent
+import arrow.effects.typeclasses.Fiber
 import arrow.effects.typeclasses.mapUnit
 import java.util.concurrent.atomic.AtomicReference
+import kotlin.coroutines.EmptyCoroutineContext
 
 internal class CancelablePromise<F, A>(CF: Concurrent<F>) : Promise<F, A>, Concurrent<F> by CF {
 
@@ -59,8 +61,8 @@ internal class CancelablePromise<F, A>(CF: Concurrent<F>) : Promise<F, A>, Concu
     is State.Error -> just(false)
     is State.Pending -> {
       if (state.compareAndSet(current, State.Full(a))) {
-        val list = current.joiners.values
-        if (list.isNotEmpty()) notify(a, list).map { true }
+        val joiners = current.joiners.values
+        if (joiners.isNotEmpty()) joiners.callAll(Right(a)).map { true }
         else just(true)
       } else unsafeTryComplete(a)
     }
@@ -71,27 +73,18 @@ internal class CancelablePromise<F, A>(CF: Concurrent<F>) : Promise<F, A>, Concu
     is State.Error -> just(false)
     is State.Pending -> {
       if (state.compareAndSet(current, State.Error(error))) {
-        val list = current.joiners.values
-        if (list.isNotEmpty()) notifyError(error, list).map { true }
+        val joiners = current.joiners.values
+        if (joiners.isNotEmpty()) joiners.callAll(Left(error)).map { true }
         else just(true)
       } else unsafeTryError(error)
     }
   }
 
-  private fun notify(a: A, list: Collection<(Either<Throwable, A>) -> Unit>): Kind<F, Unit> {
-    val rightA = Right(a)
-
-    return list.fold(unit()) { acc, next ->
-      acc.flatMap { delay { next(rightA) }.startF(ImmediateContext).map(mapUnit) }
-    }
-  }
-
-  private fun notifyError(error: Throwable, list: Collection<(Either<Throwable, A>) -> Unit>): Kind<F, Unit> {
-    val leftError = Left(error)
-    return list.fold(unit()) { acc, next ->
-      acc.flatMap { delay { next(leftError) }.startF(ImmediateContext).map(mapUnit) }
-    }
-  }
+  private fun Iterable<(Either<Throwable, A>) -> Unit>.callAll(value: Either<Throwable, A>): Kind<F, Unit> =
+    fold(null as Kind<F, Fiber<F, Unit>>?) { acc, cb ->
+      val task = delay { cb(value) }.startF(EmptyCoroutineContext)
+      acc?.flatMap { task } ?: task
+    }?.map(mapUnit) ?: unit()
 
   private fun unsafeRegister(cb: (Either<Throwable, A>) -> Unit): Token {
     val id = Token()
