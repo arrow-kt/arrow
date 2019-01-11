@@ -107,7 +107,7 @@ Dokka is responsible of generating documentation based on source code annotation
 
 ### 2. Run the docs in your local server
 
-Once docs are generated locally, do this (also from the root directory):
+Once docs are generated locally, do this (**also from the root directory**):
 
 ```bash
 bundle install --gemfile modules/docs/arrow-docs/Gemfile --path vendor/bundle
