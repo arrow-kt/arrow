@@ -95,7 +95,7 @@ So, after making you doc changes as mentioned before, you would:
 
 ### 1. Run Dokka and Ank to get your docs deployed locally
 
-Dokka is responsible of generating documentation based on source code annotations, while Ank is in charge of compiling and validating your doc snippets and deploying the proper binaries for those. Run the following commands in Arrow root dir:
+Dokka is responsible of generating documentation based on source code annotations, while Ank is in charge of compiling and validating your doc snippets and deploying the proper binaries for those. Run the following commands in this exact order in Arrow **root dir**:
 
 ```bash
 ./gradlew dokka
