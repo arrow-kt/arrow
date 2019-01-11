@@ -10,7 +10,7 @@ internal class UncancelablePromise<F, A>(AS: Async<F>) : Promise<F, A>, Async<F>
 
   internal sealed class State<out A> {
     data class Pending<A>(val joiners: List<(Either<Throwable, A>) -> Unit>) : State<A>()
-    data class Full<A>(val value: A) : State<A>()
+    data class Complete<A>(val value: A) : State<A>()
     data class Error<A>(val throwable: Throwable) : State<A>()
   }
 
@@ -25,7 +25,7 @@ internal class UncancelablePromise<F, A>(AS: Async<F>) : Promise<F, A>, Async<F>
   }
 
   private tailrec fun register(cb: (Either<Throwable, A>) -> Unit): Either<Throwable, A>? = when (val current = state.get()) {
-    is State.Full -> Right(current.value)
+    is State.Complete -> Right(current.value)
     is State.Pending -> {
       val updated = State.Pending(current.joiners + cb)
       if (state.compareAndSet(current, updated)) null
@@ -36,7 +36,7 @@ internal class UncancelablePromise<F, A>(AS: Async<F>) : Promise<F, A>, Async<F>
 
   override fun tryGet(): Kind<F, Option<A>> =
     when (val oldState = state.get()) {
-      is State.Full -> just(Some(oldState.value))
+      is State.Complete -> just(Some(oldState.value))
       is State.Pending<A> -> just(None)
       is State.Error -> just(None)
     }
@@ -51,10 +51,10 @@ internal class UncancelablePromise<F, A>(AS: Async<F>) : Promise<F, A>, Async<F>
   }
 
   private tailrec fun unsafeTryComplete(a: A): Kind<F, Boolean> = when (val current = state.get()) {
-    is State.Full -> just(false)
+    is State.Complete -> just(false)
     is State.Error -> just(false)
     is State.Pending -> {
-      if (state.compareAndSet(current, State.Full(a))) {
+      if (state.compareAndSet(current, State.Complete(a))) {
         val list = current.joiners
         if (list.isNotEmpty()) {
           delay {
@@ -76,7 +76,7 @@ internal class UncancelablePromise<F, A>(AS: Async<F>) : Promise<F, A>, Async<F>
     defer { unsafeTryError(throwable) }
 
   private tailrec fun unsafeTryError(error: Throwable): Kind<F, Boolean> = when (val current = state.get()) {
-    is State.Full -> just(false)
+    is State.Complete -> just(false)
     is State.Error -> just(false)
     is State.Pending -> {
       if (state.compareAndSet(current, State.Error(error))) {
