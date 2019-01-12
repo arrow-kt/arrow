@@ -7,7 +7,6 @@ import arrow.effects.extensions.io.async.async
 import arrow.effects.extensions.io.concurrent.concurrent
 import arrow.effects.extensions.io.functor.tupleLeft
 import arrow.effects.extensions.io.monad.flatMap
-import arrow.effects.extensions.io.monad.followedBy
 import arrow.effects.extensions.io.monadDefer.monadDefer
 import arrow.test.UnitSpec
 import arrow.test.generators.genThrowable
