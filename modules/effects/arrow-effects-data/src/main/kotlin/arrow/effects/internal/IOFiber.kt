@@ -3,7 +3,6 @@ package arrow.effects.internal
 import arrow.effects.ForIO
 import arrow.effects.IO
 import arrow.effects.IOConnection
-import arrow.effects.UnsafePromise
 import arrow.effects.typeclasses.Fiber
 
 internal fun <A> IOFiber(promise: UnsafePromise<A>, conn: IOConnection): Fiber<ForIO, A> {

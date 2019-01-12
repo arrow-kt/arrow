@@ -1,15 +1,13 @@
 package arrow.effects.internal
 
-import arrow.core.Either
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.Some
+import arrow.core.*
 import arrow.effects.IO
 import arrow.effects.KindConnection
 import arrow.effects.typeclasses.Duration
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.locks.AbstractQueuedSynchronizer
+import kotlin.coroutines.CoroutineContext
 
 typealias JavaCancellationException = java.util.concurrent.CancellationException
 
@@ -120,3 +118,22 @@ private class OneShotLatch : AbstractQueuedSynchronizer() {
     return true
   }
 }
+
+
+/**
+ * [arrow.core.Continuation] to run coroutine on `ctx` and link result to callback [cc].
+ * Use [asyncContinuation] to run suspended functions within a context `ctx` and pass the result to [cc].
+ */
+internal fun <A> asyncContinuation(ctx: CoroutineContext, cc: (Either<Throwable, A>) -> Unit): arrow.core.Continuation<A> =
+  object : arrow.core.Continuation<A> {
+    override val context: CoroutineContext = ctx
+
+    override fun resume(value: A) {
+      cc(value.right())
+    }
+
+    override fun resumeWithException(exception: Throwable) {
+      cc(exception.left())
+    }
+
+  }

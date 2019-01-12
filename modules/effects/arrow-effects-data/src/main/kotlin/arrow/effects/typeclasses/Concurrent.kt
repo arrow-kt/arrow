@@ -2,7 +2,6 @@ package arrow.effects.typeclasses
 
 import arrow.Kind
 import arrow.core.*
-import arrow.effects.Fiber
 import arrow.effects.KindConnection
 import kotlin.coroutines.CoroutineContext
 

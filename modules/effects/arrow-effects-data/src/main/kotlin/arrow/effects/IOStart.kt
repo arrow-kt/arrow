@@ -1,6 +1,9 @@
 package arrow.effects
 
 import arrow.core.*
+import arrow.effects.internal.IOFiber
+import arrow.effects.internal.UnsafePromise
+import arrow.effects.internal.asyncContinuation
 import arrow.effects.typeclasses.Fiber
 import kotlin.coroutines.*
 import kotlin.coroutines.Continuation
@@ -56,5 +59,5 @@ fun <A> IOOf<A>.startF(ctx: CoroutineContext): IO<Fiber<ForIO, A>> = IO {
     )
   })
 
-  Fiber(promise, conn)
+  IOFiber(promise, conn)
 }

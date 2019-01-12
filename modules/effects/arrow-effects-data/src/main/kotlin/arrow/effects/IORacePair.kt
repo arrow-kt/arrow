@@ -1,11 +1,12 @@
 package arrow.effects
 
 import arrow.core.*
-import arrow.effects.internal.ArrowInternalException
+import arrow.effects.internal.IOFiber
 import arrow.effects.internal.Platform
+import arrow.effects.internal.UnsafePromise
+import arrow.effects.internal.asyncContinuation
 import arrow.effects.typeclasses.Fiber
 import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine
@@ -101,7 +102,7 @@ fun <A, B> IO.Companion.racePair(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<
       }, { a ->
         if (active.getAndSet(false)) {
           conn.pop()
-          cb(Right(Left(Tuple2(a, Fiber(promiseB, connB)))))
+          cb(Right(Left(Tuple2(a, IOFiber(promiseB, connB)))))
         } else {
           promiseA.complete(Right(a))
         }
@@ -122,85 +123,11 @@ fun <A, B> IO.Companion.racePair(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<
       }, { b ->
         if (active.getAndSet(false)) {
           conn.pop()
-          cb(Right(Right(Tuple2(Fiber(promiseA, connA), b))))
+          cb(Right(Right(Tuple2(IOFiber(promiseA, connA), b))))
         } else {
           promiseB.complete(Right(b))
         }
       })
     })
-
-  }
-
-internal class UnsafePromise<A> {
-
-  private sealed class State<out A> {
-    object Empty : State<Nothing>()
-    data class Waiting<A>(val joiners: List<(Either<Throwable, A>) -> Unit>) : State<A>()
-    data class Full<A>(val a: Either<Throwable, A>) : State<A>()
-  }
-
-  private val state: AtomicReference<State<A>> = AtomicReference(State.Empty)
-
-  fun get(cb: (Either<Throwable, A>) -> Unit): Unit {
-    tailrec fun go(): Unit = when (val oldState = state.get()) {
-      State.Empty -> if (state.compareAndSet(oldState, State.Waiting(listOf(cb)))) Unit else go()
-      is State.Waiting -> if (state.compareAndSet(oldState, State.Waiting(oldState.joiners + cb))) Unit else go()
-      is State.Full -> cb(oldState.a)
-    }
-
-    go()
-  }
-
-  fun complete(value: Either<Throwable, A>): Unit {
-    tailrec fun go(): Unit = when (val oldState = state.get()) {
-      State.Empty -> if (state.compareAndSet(oldState, State.Full(value))) Unit else go()
-      is State.Waiting -> {
-        if (state.compareAndSet(oldState, State.Full(value))) oldState.joiners.forEach { it(value) }
-        else go()
-      }
-      is State.Full -> throw ArrowInternalException()
-    }
-
-    go()
-  }
-
-  fun remove(cb: (Either<Throwable, A>) -> Unit) = when (val oldState = state.get()) {
-    State.Empty -> Unit
-    is State.Waiting -> state.set(State.Waiting(oldState.joiners - cb))
-    is State.Full -> Unit
-  }
-
-}
-
-internal fun <A> Fiber(promise: UnsafePromise<A>, conn: IOConnection): Fiber<ForIO, A> {
-  val join: IO<A> = IO.async { conn2, cb ->
-    conn2.push(IO { promise.remove(cb) })
-    conn.push(conn2.cancel())
-
-    promise.get { a ->
-      cb(a)
-      conn2.pop()
-      conn.pop()
-    }
-  }
-
-  return Fiber(join, conn.cancel())
-}
-
-/**
- * [arrow.core.Continuation] to run coroutine on `ctx` and link result to callback [cc].
- * Use [asyncContinuation] to run suspended functions within a context `ctx` and pass the result to [cc].
- */
-internal fun <A> asyncContinuation(ctx: CoroutineContext, cc: (Either<Throwable, A>) -> Unit): arrow.core.Continuation<A> =
-  object : arrow.core.Continuation<A> {
-    override val context: CoroutineContext = ctx
-
-    override fun resume(value: A) {
-      cc(value.right())
-    }
-
-    override fun resumeWithException(exception: Throwable) {
-      cc(exception.left())
-    }
 
   }
