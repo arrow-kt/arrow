@@ -21,6 +21,7 @@ interface StateTBracket<F, S> : Bracket<StateTPartialOf<F, S>, Throwable>, State
   override fun <A, B> StateTOf<F, S, A>.bracketCase(
     release: (A, ExitCase<Throwable>) -> StateTOf<F, S, Unit>,
     use: (A) -> StateTOf<F, S, B>): StateT<F, S, B> = MD().run {
+
     StateT.liftF<F, S, Ref<F, Option<S>>>(this, Ref.of(None, this)).flatMap { ref ->
       StateT<F, S, B>(this) { startS ->
         runM(this, startS).bracketCase(use = { (s, a) ->

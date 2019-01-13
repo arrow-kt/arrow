@@ -8,6 +8,7 @@ dependencies {
     testCompileOnly project(':arrow-meta')
     testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
     testCompile project(':arrow-test')
+    testCompile project(":arrow-effects-reactor-extensions")
 
     compile "io.projectreactor:reactor-core:$projectReactorVersion"
     testCompile "io.projectreactor:reactor-test:$projectReactorVersion"

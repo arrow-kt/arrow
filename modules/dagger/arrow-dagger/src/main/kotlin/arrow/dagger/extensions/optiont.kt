@@ -47,6 +47,18 @@ class DaggerOptionTMonad<F> @Inject constructor(val FF: Monad<F>) : OptionTMonad
   override fun MF(): Monad<F> = FF
 }
 
+class DaggerOptionTApplicativeError<F, E> @Inject constructor(val AE: ApplicativeError<F, E> ) : OptionTApplicativeError<F, E> {
+  override fun FF(): Functor<F> = AE
+  override fun AF(): Applicative<F> = AE
+  override fun AE(): ApplicativeError<F, E> = AE
+}
+
+class DaggerOptionTMonadError<F, E> @Inject constructor(val ME: MonadError<F, E>) : OptionTMonadError<F, E> {
+  override fun FF(): Functor<F> = ME
+  override fun AF(): Applicative<F> = ME
+  override fun ME(): MonadError<F, E> = ME
+}
+
 class DaggerOptionTFoldable<F> @Inject constructor(val FFF: Foldable<F>) : OptionTFoldable<F> {
   override fun FFF(): Foldable<F> = FFF
 }

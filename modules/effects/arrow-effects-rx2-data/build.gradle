@@ -8,6 +8,7 @@ dependencies {
     testCompileOnly project(':arrow-meta')
     testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
     testCompile project(':arrow-test')
+    testCompile project(":arrow-effects-rx2-extensions")
 
     compile "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
 }
