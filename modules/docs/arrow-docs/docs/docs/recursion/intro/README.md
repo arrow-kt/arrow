@@ -16,7 +16,7 @@ powerful abstractions for recursive datatypes.
 
 The traditional definition of a linked list uses arbitrary recursion.
 
-```kotlin:ank
+```kotlin:ank:silent
 // The generic type parameter is omitted for simplicity
 sealed class IntList {
   object Nil : IntList()
@@ -108,7 +108,7 @@ and any functions implemented with them would also become stack safe.
 Lists are not the only data structure that can be folded and unfolded. Binary trees can also use this
 pattern.
 
-```kotlin:ank
+```kotlin:ank:silent
 sealed class IntTree {
   data class Leaf(val value: Int) : IntTree()
   data class Node(val left: IntTree, val right: IntTree) : IntTree()
@@ -138,7 +138,7 @@ Arrow's recursion schemes allow us to solve this problem.
 The solution to this initially seems a bit strange. First, we must define a type's pattern, where
 the recursive type is replaced with a type parameter.
 
-```kotlin:ank
+```kotlin:ank:silent
 @higherkind sealed class IntListPattern<out A> : IntListPatternOf<A> { 
   object NilPattern : IntListPattern<Nothing>()
   @higherkind data class ConsPattern<out A>(val head: Int, val tail: A) : IntListPattern<A>()
@@ -168,7 +168,7 @@ typealias IntFixList = Fix<ForIntListPattern>
 So why do this? We can now define a [Functor]({{ '/docs/arrow/typeclasses/functor' | relative_url }}) instance for 
 `IntListPattern`, allowing us to traverse into the structure.
 
-```kotlin:ank
+```kotlin:ank:silent
 interface IntListPatternFunctor : Functor<ForIntListPattern> {
   override fun <A, B> IntListPatternOf<A>.map(f: (A) -> B): IntListPatternOf<B> {
     val lp = fix()
@@ -189,7 +189,7 @@ The [Recursive]({{ '/docs/recursion/recursive' | relative_url }}) typeclass prov
 [Corecursive]({{ '/docs/recursion/recursive' | relative_url }}) typeclass provides `ana`, which are very
 similar to fold and unfold.
 
-```kotlin:ank
+```kotlin:ank:silent
 typealias Algebra<F, A> = (Kind<F, A>) -> A     // fold
 typealias Coalgebra<F, A> = (A) -> Kind<F, A>   // unfold
 
