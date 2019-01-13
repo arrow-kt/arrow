@@ -97,7 +97,7 @@ object AsyncLaws {
 
         asyncF<Unit> { cb ->
           br.flatMap { delay { cb(Right(Unit)) } }
-        }.flatMap { promise.get }
+        }.flatMap { promise.get() }
       }.equalUnderTheLaw(just(b), EQ)
     }
 
@@ -110,11 +110,11 @@ object AsyncLaws {
   fun <F> Async<F>.cancelableCancelableFCoherence(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(genEither(genThrowable(), Gen.int())) { eith ->
       cancelable<Int> { cb -> cb(eith); just(Unit) }
-          .equalUnderTheLaw(cancelableF { cb -> delay { cb(eith); just(Unit) } }, EQ)
-      }
-
-      // Turns out that kotlinx.coroutines decides to rewrite thread names
-      private fun getCurrentThread() =
-        Thread.currentThread().name.substringBefore(' ').toInt()
-
+        .equalUnderTheLaw(cancelableF { cb -> delay { cb(eith); just(Unit) } }, EQ)
     }
+
+  // Turns out that kotlinx.coroutines decides to rewrite thread names
+  private fun getCurrentThread() =
+    Thread.currentThread().name.substringBefore(' ').toInt()
+
+}

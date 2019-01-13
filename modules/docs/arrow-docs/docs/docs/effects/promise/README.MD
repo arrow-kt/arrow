@@ -59,7 +59,7 @@ import arrow.effects.extensions.io.monad.flatMap
 fun main(args: Array<String>) {
 //sampleStart
 Promise.uncancelable<ForIO, Int>(IO.async()).flatMap { p ->
-  p.get
+  p.get()
 } //never ends because `get` keeps waiting for p to be fulfilled.
 //sampleEnd
 }
@@ -75,7 +75,7 @@ fun main(args: Array<String>) {
 //sampleStart
 val result = Promise.uncancelable<ForIO, Int>(IO.async()).flatMap { p ->
   p.complete(1).flatMap {
-    p.get
+    p.get()
   }
 }.unsafeRunSync()
 //sampleEnd
@@ -97,7 +97,7 @@ fun main(args: Array<String>) {
 //sampleStart
 val result = Promise.uncancelable<ForIO, Int>(IO.async()).flatMap { p ->
   p.complete(2).flatMap {
-    p.get
+    p.get()
   }
 }.unsafeRunSync()
 //sampleEnd
