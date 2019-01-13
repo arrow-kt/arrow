@@ -36,7 +36,7 @@ class DataTypeExamples : FreeSpec() { init {
       // Option can also be used with when statements:
       val msg = when (someValue) {
         is Some -> "ok"
-        None    -> "ko"
+        None -> "ko"
       }
       msg shouldBe "ok"
     }
@@ -153,7 +153,7 @@ class DataTypeExamples : FreeSpec() { init {
   "Either left or right" - {
     fun parse(s: String): ProblemOrInt = Try { Right(s.toInt()) }.getOrElse { Left(invalidInt) }
     fun reciprocal(i: Int): Either<Problem, Double> = when (i) {
-      0    -> Left(noReciprocal)
+      0 -> Left(noReciprocal)
       else -> Either.Right(1.0 / i)
     }
 
@@ -226,9 +226,9 @@ private object AuthorizationException : GeneralException()
 
 fun playLottery(guess: Int): Int {
   return when (guess) {
-    42        -> 1000 // jackpot
+    42 -> 1000 // jackpot
     in 10..41 -> 1
-    in 0..9   -> throw AuthorizationException
-    else      -> throw NoConnectionException
+    in 0..9 -> throw AuthorizationException
+    else -> throw NoConnectionException
   }
 }
