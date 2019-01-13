@@ -56,7 +56,7 @@ class PrismTest : UnitSpec() {
       ),
 
       OptionalLaws.laws(
-        optional = sumPrism.asOptional(),
+        optionalGen = sumPrism.asOptional(),
         aGen = genSum,
         bGen = Gen.string(),
         funcGen = genFunctionAToB(Gen.string()),

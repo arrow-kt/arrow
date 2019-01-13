@@ -73,7 +73,7 @@ class MapInstanceTest : UnitSpec() {
     ))
 
     testLaws(OptionalLaws.laws(
-      optional = MapK.index<String, Int>().index(""),
+      optionalGen = Gen.string().map { MapK.index<String, Int>().index(it) },
       aGen = genMapK(Gen.string(), Gen.int()),
       bGen = Gen.int(),
       funcGen = genFunctionAToB(Gen.int()),
@@ -82,7 +82,7 @@ class MapInstanceTest : UnitSpec() {
     ))
 
     testLaws(OptionalLaws.laws(
-      optional = MapInstances.index<String, Int>().index(""),
+      optionalGen = Gen.string().map { MapInstances.index<String, Int>().index(it) },
       aGen = Gen.map(Gen.string(), Gen.int()),
       bGen = Gen.int(),
       funcGen = genFunctionAToB(Gen.int()),

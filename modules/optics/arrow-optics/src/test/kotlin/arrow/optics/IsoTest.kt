@@ -58,7 +58,7 @@ class IsoTest : UnitSpec() {
       ),
 
       OptionalLaws.laws(
-        optional = tokenIso.asOptional(),
+        optionalGen = tokenIso.asOptional(),
         aGen = genToken,
         bGen = Gen.string(),
         funcGen = genFunctionAToB(Gen.string()),

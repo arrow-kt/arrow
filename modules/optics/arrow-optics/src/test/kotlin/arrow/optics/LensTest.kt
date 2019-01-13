@@ -41,7 +41,7 @@ class LensTest : UnitSpec() {
       ),
 
       OptionalLaws.laws(
-        optional = tokenLens.asOptional(),
+        optionalGen = tokenLens.asOptional(),
         aGen = genToken,
         bGen = Gen.string(),
         funcGen = genFunctionAToB(Gen.string()),
