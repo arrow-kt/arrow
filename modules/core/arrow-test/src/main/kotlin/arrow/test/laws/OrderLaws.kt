@@ -8,10 +8,10 @@ import java.util.*
 
 object OrderLaws {
 
-  val random = Random()
-
-  fun <F> laws(O: Order<F>, fGen: Gen<F>, funcGen: Gen<(F) -> F>): List<Law> =
-    EqLaws.laws(O) { val fSeq = fGen.random()
+  fun <F> laws(O: Order<F>, fGen: Gen<F>, funcGen: Gen<(F) -> F>): List<Law> {
+    val random = Random()
+    return EqLaws.laws(O) {
+      val fSeq = fGen.random()
       fSeq.elementAt(random.nextInt(fSeq.count()))
     } + listOf(
       Law("Order law: reflexivity equality") { O.reflexitivityEq(fGen) },
@@ -30,8 +30,9 @@ object OrderLaws {
       Law("Order law: max order") { O.maxOrder(fGen) },
       Law("Order law: operator compareTo delegates to compare order") { O.operatorCompareToOrder(fGen) }
     )
+  }
 
-  fun <F> Order<F>.reflexitivityEq(fGen: Gen<F>) = run{
+  fun <F> Order<F>.reflexitivityEq(fGen: Gen<F>) = run {
     val eq = this
     forAll(fGen) { x ->
       x.equalUnderTheLaw(x, eq)
