@@ -31,13 +31,14 @@ class IsoTest : UnitSpec() {
 
     testLaws(
       LensLaws.laws(
-        lens = tokenIso.asLens(),
+        lensGen = Gen.constant(tokenIso.asLens()),
         aGen = genToken,
         bGen = Gen.string(),
         funcGen = genFunctionAToB(Gen.string()),
         EQA = Token.eq(),
         EQB = Eq.any(),
-        MB = String.monoid()),
+        MB = String.monoid()
+      ),
 
       PrismLaws.laws(
         prism = aIso.asPrism(),
@@ -45,7 +46,8 @@ class IsoTest : UnitSpec() {
         bGen = Gen.string(),
         funcGen = genFunctionAToB(Gen.string()),
         EQA = Eq.any(),
-        EQOptionB = Eq.any()),
+        EQOptionB = Eq.any()
+      ),
 
       TraversalLaws.laws(
         traversal = tokenIso.asTraversal(),
@@ -58,7 +60,7 @@ class IsoTest : UnitSpec() {
       ),
 
       OptionalLaws.laws(
-        optionalGen = tokenIso.asOptional(),
+        optionalGen = Gen.constant(tokenIso.asOptional()),
         aGen = genToken,
         bGen = Gen.string(),
         funcGen = genFunctionAToB(Gen.string()),
@@ -81,7 +83,8 @@ class IsoTest : UnitSpec() {
         funcGen = genFunctionAToB(Gen.string()),
         EQA = Token.eq(),
         EQB = Eq.any(),
-        bMonoid = String.monoid())
+        bMonoid = String.monoid()
+      )
     )
 
     with(tokenIso.asFold()) {
@@ -164,7 +167,9 @@ class IsoTest : UnitSpec() {
 
     "Lifting a function as a functor should yield the same result as not yielding" {
       forAll(genToken, Gen.string()) { token, value ->
-        tokenIso.modifyF(Option.functor(), token) { Some(value) } == tokenIso.liftF(Option.functor()) { Some(value) }(token)
+        tokenIso.modifyF(Option.functor(), token) { Some(value) } == tokenIso.liftF(Option.functor()) { Some(value) }(
+          token
+        )
       }
     }
 
@@ -186,7 +191,7 @@ class IsoTest : UnitSpec() {
       val left = tokenIso.left<Int>()
       forAll(genToken, Gen.int()) { token: Token, int: Int ->
         left.get(Either.Left(token)) == Either.Left(token.value) &&
-          left.get(Either.Right(int)) == Either.Right(int)
+            left.get(Either.Right(int)) == Either.Right(int)
       }
     }
 
@@ -194,7 +199,7 @@ class IsoTest : UnitSpec() {
       val left = tokenIso.right<Int>()
       forAll(genToken, Gen.int()) { token: Token, int: Int ->
         left.get(Either.Left(int)) == Either.Left(int) &&
-          left.get(Either.Right(token)) == Either.Right(token.value)
+            left.get(Either.Right(token)) == Either.Right(token.value)
       }
     }
 

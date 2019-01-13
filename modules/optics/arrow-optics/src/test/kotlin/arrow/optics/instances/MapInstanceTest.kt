@@ -32,83 +32,99 @@ class MapInstanceTest : UnitSpec() {
 
   init {
 
-    testLaws(TraversalLaws.laws(
-      traversal = MapK.each<Int, String>().each(),
-      aGen = genMapK(Gen.int(), Gen.string()),
-      bGen = Gen.string(),
-      funcGen = genFunctionAToB(Gen.string()),
-      EQA = Eq.any(),
-      EQOptionB = Option.eq(Eq.any()),
-      EQListB = ListK.eq(Eq.any())
-    ))
+    testLaws(
+      TraversalLaws.laws(
+        traversal = MapK.each<Int, String>().each(),
+        aGen = genMapK(Gen.int(), Gen.string()),
+        bGen = Gen.string(),
+        funcGen = genFunctionAToB(Gen.string()),
+        EQA = Eq.any(),
+        EQOptionB = Option.eq(Eq.any()),
+        EQListB = ListK.eq(Eq.any())
+      )
+    )
 
-    testLaws(TraversalLaws.laws(
-      traversal = MapInstances.each<Int, String>().each(),
-      aGen = Gen.map(Gen.int(), Gen.string()),
-      bGen = Gen.string(),
-      funcGen = genFunctionAToB(Gen.string()),
-      EQA = Eq.any(),
-      EQOptionB = Option.eq(Eq.any()),
-      EQListB = ListK.eq(Eq.any())
-    ))
+    testLaws(
+      TraversalLaws.laws(
+        traversal = MapInstances.each<Int, String>().each(),
+        aGen = Gen.map(Gen.int(), Gen.string()),
+        bGen = Gen.string(),
+        funcGen = genFunctionAToB(Gen.string()),
+        EQA = Eq.any(),
+        EQOptionB = Option.eq(Eq.any()),
+        EQListB = ListK.eq(Eq.any())
+      )
+    )
 
-    testLaws(TraversalLaws.laws(
-      traversal = MapK.filterIndex<Char, Int>().filter { true },
-      aGen = genMapK(genChar(), genIntSmall()),
-      bGen = Gen.int(),
-      funcGen = genFunctionAToB(Gen.int()),
-      EQA = Eq.any(),
-      EQOptionB = Option.eq(Eq.any()),
-      EQListB = ListK.eq(Eq.any())
-    ))
+    testLaws(
+      TraversalLaws.laws(
+        traversal = MapK.filterIndex<Char, Int>().filter { true },
+        aGen = genMapK(genChar(), genIntSmall()),
+        bGen = Gen.int(),
+        funcGen = genFunctionAToB(Gen.int()),
+        EQA = Eq.any(),
+        EQOptionB = Option.eq(Eq.any()),
+        EQListB = ListK.eq(Eq.any())
+      )
+    )
 
-    testLaws(TraversalLaws.laws(
-      traversal = MapInstances.filterIndex<Char, Int>().filter { true },
-      aGen = Gen.map(genChar(), genIntSmall()),
-      bGen = Gen.int(),
-      funcGen = genFunctionAToB(Gen.int()),
-      EQA = Eq.any(),
-      EQOptionB = Option.eq(Eq.any()),
-      EQListB = ListK.eq(Eq.any())
-    ))
+    testLaws(
+      TraversalLaws.laws(
+        traversal = MapInstances.filterIndex<Char, Int>().filter { true },
+        aGen = Gen.map(genChar(), genIntSmall()),
+        bGen = Gen.int(),
+        funcGen = genFunctionAToB(Gen.int()),
+        EQA = Eq.any(),
+        EQOptionB = Option.eq(Eq.any()),
+        EQListB = ListK.eq(Eq.any())
+      )
+    )
 
-    testLaws(OptionalLaws.laws(
-      optionalGen = Gen.string().map { MapK.index<String, Int>().index(it) },
-      aGen = genMapK(Gen.string(), Gen.int()),
-      bGen = Gen.int(),
-      funcGen = genFunctionAToB(Gen.int()),
-      EQOptionB = Eq.any(),
-      EQA = Eq.any()
-    ))
+    testLaws(
+      OptionalLaws.laws(
+        optionalGen = Gen.string().map { MapK.index<String, Int>().index(it) },
+        aGen = genMapK(Gen.string(), Gen.int()),
+        bGen = Gen.int(),
+        funcGen = genFunctionAToB(Gen.int()),
+        EQOptionB = Eq.any(),
+        EQA = Eq.any()
+      )
+    )
 
-    testLaws(OptionalLaws.laws(
-      optionalGen = Gen.string().map { MapInstances.index<String, Int>().index(it) },
-      aGen = Gen.map(Gen.string(), Gen.int()),
-      bGen = Gen.int(),
-      funcGen = genFunctionAToB(Gen.int()),
-      EQOptionB = Eq.any(),
-      EQA = Eq.any()
-    ))
+    testLaws(
+      OptionalLaws.laws(
+        optionalGen = Gen.string().map { MapInstances.index<String, Int>().index(it) },
+        aGen = Gen.map(Gen.string(), Gen.int()),
+        bGen = Gen.int(),
+        funcGen = genFunctionAToB(Gen.int()),
+        EQOptionB = Eq.any(),
+        EQA = Eq.any()
+      )
+    )
 
-    testLaws(LensLaws.laws(
-      lens = MapK.at<String, Int>().at(""),
-      aGen = genMapK(Gen.string(), Gen.int()),
-      bGen = genOption(Gen.int()),
-      funcGen = genFunctionAToB(genOption(Gen.int())),
-      EQA = Eq.any(),
-      EQB = Eq.any(),
-      MB = Option.monoid(Int.monoid())
-    ))
+    testLaws(
+      LensLaws.laws(
+        lensGen = Gen.string().map { MapK.at<String, Int>().at(it) },
+        aGen = genMapK(Gen.string(), Gen.int()),
+        bGen = genOption(Gen.int()),
+        funcGen = genFunctionAToB(genOption(Gen.int())),
+        EQA = Eq.any(),
+        EQB = Eq.any(),
+        MB = Option.monoid(Int.monoid())
+      )
+    )
 
-    testLaws(LensLaws.laws(
-      lens = MapInstances.at<String, Int>().at(""),
-      aGen = Gen.map(Gen.string(), Gen.int()),
-      bGen = genOption(Gen.int()),
-      funcGen = genFunctionAToB(genOption(Gen.int())),
-      EQA = Eq.any(),
-      EQB = Eq.any(),
-      MB = Option.monoid(Int.semigroup())
-    ))
+    testLaws(
+      LensLaws.laws(
+        lensGen = Gen.string().map { MapInstances.at<String, Int>().at(it) },
+        aGen = Gen.map(Gen.string(), Gen.int()),
+        bGen = genOption(Gen.int()),
+        funcGen = genFunctionAToB(genOption(Gen.int())),
+        EQA = Eq.any(),
+        EQB = Eq.any(),
+        MB = Option.monoid(Int.semigroup())
+      )
+    )
 
   }
 }
