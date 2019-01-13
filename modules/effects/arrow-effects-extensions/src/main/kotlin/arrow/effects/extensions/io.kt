@@ -1,6 +1,7 @@
 package arrow.effects.extensions
 
 import arrow.core.Either
+import arrow.core.*
 import arrow.effects.*
 import arrow.effects.typeclasses.*
 import arrow.extension
@@ -8,6 +9,7 @@ import arrow.typeclasses.*
 import kotlin.coroutines.CoroutineContext
 import arrow.effects.ap as ioAp
 import arrow.effects.handleErrorWith as ioHandleErrorWith
+import arrow.effects.startF as ioStart
 
 @extension
 interface IOFunctor : Functor<ForIO> {
@@ -35,7 +37,7 @@ interface IOMonad : Monad<ForIO> {
   override fun <A, B> IOOf<A>.map(f: (A) -> B): IO<B> =
     fix().map(f)
 
-  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, IOOf<Either<A, B>>>): IO<B> =
+  override fun <A, B> tailRecM(a: A, f: (A) -> IOOf<Either<A, B>>): IO<B> =
     IO.tailRecM(a, f)
 
   override fun <A> just(a: A): IO<A> =
@@ -114,17 +116,43 @@ interface IOAsync: Async<ForIO>, IOMonadDefer {
 }
 
 @extension
+interface IOConcurrent : Concurrent<ForIO>, IOAsync {
+  override fun <A> IOOf<A>.startF(ctx: CoroutineContext): IO<Fiber<ForIO, A>> =
+    ioStart(ctx)
+
+  override fun <A> asyncF(k: ConnectedProcF<ForIO, A>): IO<A> =
+    IO.asyncF(k)
+
+  override fun <A> async(fa: ConnectedProc<ForIO, A>): IO<A> =
+    IO.async(fa)
+
+  override fun <A> asyncF(k: ProcF<ForIO, A>): IO<A> =
+    IO.asyncF { _, cb -> k(cb) }
+
+  override fun <A> async(fa: Proc<A>): IO<A> =
+    IO.async { _, cb -> fa(cb) }
+
+  override fun <A, B> racePair(ctx: CoroutineContext, fa: IOOf<A>, fb: IOOf<B>): IO<RacePair<ForIO, A, B>> =
+    IO.racePair(ctx, fa, fb)
+
+  override fun <A, B, C> raceTriple(ctx: CoroutineContext, fa: IOOf<A>, fb: IOOf<B>, fc: IOOf<C>): IO<RaceTriple<ForIO, A, B, C>> =
+    IO.raceTriple(ctx, fa, fb, fc)
+
+}
+
+@extension
 interface IOEffect: Effect<ForIO>, IOAsync {
   override fun <A> IOOf<A>.runAsync(cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Unit> =
     fix().runAsync(cb)
 }
 
 @extension
-interface IOConcurrentEffect: ConcurrentEffect<ForIO>, IOEffect {
+interface IOConcurrentEffect: ConcurrentEffect<ForIO>, IOEffect, IOConcurrent {
   override fun <A> IOOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Disposable> =
     fix().runAsyncCancellable(OnCancel.ThrowCancellationException, cb)
 }
 
+@extension
 interface IOSemigroup<A> : Semigroup<IO<A>> {
 
   fun SG(): Semigroup<A>

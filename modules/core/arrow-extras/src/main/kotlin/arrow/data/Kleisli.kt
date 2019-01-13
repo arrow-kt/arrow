@@ -7,12 +7,12 @@ import arrow.core.identity
 import arrow.higherkind
 import arrow.typeclasses.*
 
-fun <F, D, A> KleisliOf<F, D, A>.run(d: D): Kind<F, A> = fix().run(d)
-
 /**
  * Alias that represents a function from [D] to a monadic value `Kind<F, A>`
  */
 typealias KleisliFun<F, D, A> = (D) -> Kind<F, A>
+
+fun <F, D, A> KleisliOf<F, D, A>.run(d: D): Kind<F, A> = fix().run(d)
 
 /**
  * [Kleisli] represents a function parameter from [D] to a value `Kind<F, A>`.
@@ -31,9 +31,8 @@ class Kleisli<F, D, A>(val run: KleisliFun<F, D, A>) : KleisliOf<F, D, A>, Kleis
    * @param ff function with the [Kleisli] context.
    * @param AF [Applicative] for the context [F].
    */
-  fun <B> ap(AF: Applicative<F>, ff: KleisliOf<F, D, (A) -> B>): Kleisli<F, D, B> = AF.run {
-    Kleisli { d -> run(d).ap(ff.run(d)) }
-  }
+  fun <B> ap(AF: Applicative<F>, ff: KleisliOf<F, D, (A) -> B>): Kleisli<F, D, B> =
+    AF.run { Kleisli { run(it).ap(ff.run(it)) } }
 
   /**
    * Map the end of the arrow [A] to [B] given a function [f].

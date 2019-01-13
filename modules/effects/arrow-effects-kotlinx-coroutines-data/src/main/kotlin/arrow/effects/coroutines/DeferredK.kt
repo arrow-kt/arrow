@@ -190,7 +190,6 @@ sealed class DeferredK<A>(
                                        val coroutineStart: CoroutineStart = CoroutineStart.LAZY,
                                        scope: CoroutineScope = CoroutineScope(ctx),
                                        val generator: suspend () -> A) : Generated<A>(scope, scope.async(ctx, coroutineStart) { generator() }) {
-
       /**
        * Awaits either the memoized [Deferred] if it has not been run yet. Or creates a new one.
        *
@@ -446,7 +445,7 @@ sealed class DeferredK<A>(
     } catch (e: Throwable) {
       @Suppress("InstanceOfCheckForException")
       try {
-        if (e is CancellationException) release(a, ExitCase.Cancelled).await()
+        if (e is CancellationException) release(a, ExitCase.Canceled).await()
         else release(a, ExitCase.Error(e)).await()
       } catch (e2: Throwable) {
         throw Platform.composeErrors(e, e2)
@@ -689,6 +688,7 @@ sealed class DeferredK<A>(
           result
         }
       }
+
   }
 
   override val children: Sequence<Job>

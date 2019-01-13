@@ -2,7 +2,7 @@ package arrow.effects.reactor
 
 import arrow.Kind
 import arrow.core.*
-import arrow.effects.ConnectionCancellationException
+import arrow.effects.OnCancel
 import arrow.effects.reactor.CoroutineContextReactorScheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
@@ -61,7 +61,7 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
    *     release = { file, exitCase ->
    *       when (exitCase) {
    *         is ExitCase.Completed -> { /* do something */ }
-   *         is ExitCase.Cancelled -> { /* do something */ }
+   *         is ExitCase.Canceled -> { /* do something */ }
    *         is ExitCase.Error -> { /* do something */ }
    *       }
    *       closeFile(file)
@@ -87,7 +87,7 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
           sink.onRequest(subscription::request)
         }
         sink.onCancel(d)
-        sink.onDispose { release(a, ExitCase.Cancelled).fix().flux.subscribe({}, sink::error, {}) }
+        sink.onDispose { release(a, ExitCase.Canceled).fix().flux.subscribe({}, sink::error, {}) }
       }.k()
     }
 
@@ -185,7 +185,7 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
         val conn = FluxKConnection()
         //On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
         //on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
-        conn.push(FluxK { if (!sink.isCancelled) sink.error(ConnectionCancellationException) })
+        conn.push(FluxK { if (!sink.isCancelled) sink.error(OnCancel.CancellationException) })
         sink.onCancel { conn.cancel().value().subscribe() }
 
         fa(conn) { callback: Either<Throwable, A> ->
@@ -203,7 +203,7 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
         val conn = FluxKConnection()
         //On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
         //on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
-        conn.push(FluxK { if (!sink.isCancelled) sink.error(ConnectionCancellationException) })
+        conn.push(FluxK { if (!sink.isCancelled) sink.error(OnCancel.CancellationException) })
         sink.onCancel { conn.cancel().value().subscribe() }
 
         fa(conn) { callback: Either<Throwable, A> ->

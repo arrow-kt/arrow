@@ -23,7 +23,7 @@ class ForwardCancelable {
         is Active -> {
           state.lazySet(finished) // GC purposes
           // TODO this runs in an immediate execution context in cats-effect
-          IORunLoop.startCancelable(current.token.fix(), conn, cb)
+          IORunLoop.startCancelable(current.token, conn, cb)
         }
       }
     }
@@ -74,14 +74,17 @@ class ForwardCancelable {
     private fun execute(token: CancelToken<ForIO>, stack: List<(Either<Throwable, Unit>) -> Unit>): Unit =
     // TODO this runs in an immediate execution context in cats-effect
       token.fix().unsafeRunAsync { r ->
-        stack.forEach { cb ->
-          @Suppress("SwallowedException")
+        val errors = stack.fold(emptyList<Throwable>()) { acc, cb ->
           try {
             cb(r)
-          } catch (nonFatal: Exception) {
-            // Logger.reportFailure(e) // TODO should we ignore this?
+            acc
+          } catch (nonFatal: Throwable) {
+            acc + nonFatal
           }
         }
+
+        if (errors.isNotEmpty()) throw Platform.composeErrors(errors.first(), errors.drop(1))
+        else Unit
       }
   }
 }
