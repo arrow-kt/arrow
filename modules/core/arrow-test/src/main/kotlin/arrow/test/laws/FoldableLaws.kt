@@ -74,13 +74,12 @@ object FoldableLaws {
   fun <F> Foldable<F>.forallConsistentWithExists(cf: (Int) -> Kind<F, Int>) =
     forAll(genIntPredicate(), genConstructor(Gen.int(), cf)) { f: (Int) -> Boolean, fa: Kind<F, Int> ->
       if (fa.forAll(f)) {
-        val negationExists = fa.exists { a -> !(f(a)) }
-        // if p is true for all elements, then there cannot be an element for which
+        // if f is true for all elements, then there cannot be an element for which
         // it does not hold.
-        !negationExists &&
-            // if p is true for all elements, then either there must be no elements
-            // or there must exist an element for which it is true.
-            (fa.isEmpty() || fa.exists(f))
+        val negationExists = fa.exists { a -> !(f(a)) }
+        // if f is true for all elements, then either there must be no elements
+        // or there must exist an element for which it is true.
+        !negationExists && (fa.isEmpty() || fa.exists(f))
       } else true
     }
 
