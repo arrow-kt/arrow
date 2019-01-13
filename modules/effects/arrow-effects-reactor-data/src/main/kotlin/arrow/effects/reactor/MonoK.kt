@@ -3,13 +3,14 @@ package arrow.effects.reactor
 import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
-import arrow.effects.ConnectionCancellationException
+import arrow.effects.OnCancel
 import arrow.effects.reactor.CoroutineContextReactorScheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
+import reactor.core.publisher.MonoSink
 import arrow.higherkind
 import reactor.core.publisher.Mono
-import reactor.core.publisher.MonoSink
+import reactor.core.publisher.*
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.CoroutineContext
 
@@ -61,7 +62,7 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
    *     release = { file, exitCase ->
    *       when (exitCase) {
    *         is ExitCase.Completed -> { /* do something */ }
-   *         is ExitCase.Cancelled -> { /* do something */ }
+   *         is ExitCase.Canceled -> { /* do something */ }
    *         is ExitCase.Error -> { /* do something */ }
    *       }
    *       closeFile(file)
@@ -88,7 +89,7 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
           sink::success
         )
         sink.onCancel(d)
-        sink.onDispose { release(a, ExitCase.Cancelled).fix().mono.subscribe({}, sink::error) }
+        sink.onDispose { release(a, ExitCase.Canceled).fix().mono.subscribe({}, sink::error) }
       }.k()
     }
 
@@ -163,7 +164,7 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
       Mono.create<A> { sink ->
         val conn = MonoKConnection()
         val isCancelled = AtomicBoolean(false) //Sink is missing isCancelled so we have to do book keeping.
-        conn.push(MonoK { if (!isCancelled.get()) sink.error(ConnectionCancellationException) })
+        conn.push(MonoK { if (!isCancelled.get()) sink.error(OnCancel.CancellationException) })
         sink.onCancel {
           isCancelled.compareAndSet(false, true)
           conn.cancel().value().subscribe()
@@ -182,7 +183,7 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
       Mono.create { sink: MonoSink<A> ->
         val conn = MonoKConnection()
         val isCancelled = AtomicBoolean(false) //Sink is missing isCancelled so we have to do book keeping.
-        conn.push(MonoK { if (!isCancelled.get()) sink.error(ConnectionCancellationException) })
+        conn.push(MonoK { if (!isCancelled.get()) sink.error(OnCancel.CancellationException) })
         sink.onCancel {
           isCancelled.compareAndSet(false, true)
           conn.cancel().value().subscribe()
@@ -206,4 +207,3 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
     }
   }
 }
-

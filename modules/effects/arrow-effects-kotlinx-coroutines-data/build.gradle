@@ -8,6 +8,7 @@ dependencies {
     testCompileOnly project(':arrow-meta')
     testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
     testCompile project(':arrow-test')
+    testCompile project(":arrow-effects-kotlinx-coroutines-extensions")
 
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
 }

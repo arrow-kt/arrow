@@ -9,8 +9,9 @@ import arrow.typeclasses.MonadContinuation
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 
-/** A cancellable asynchronous computation that might fail. **/
+/** A asynchronous computation that might fail. **/
 typealias ProcF<F, A> = ((Either<Throwable, A>) -> Unit) -> Kind<F, Unit>
+
 /** An asynchronous computation that might fail. **/
 typealias Proc<A> = ((Either<Throwable, A>) -> Unit) -> Unit
 
@@ -30,7 +31,7 @@ interface Async<F> : MonadDefer<F> {
    *
    * @param fa an asynchronous computation that might fail typed as [Proc].
    *
-   * ```kotlin:ank:playground:extension:playground:extension
+   * ```kotlin:ank:playground:extension
    * _imports_
    * import java.lang.RuntimeException
    *
@@ -79,7 +80,7 @@ interface Async<F> : MonadDefer<F> {
    *     asyncF<String> { cb: (Either<Throwable, String>) -> Unit ->
    *       Promise.uncancelable<F, String>(this).flatMap { promise ->
    *         promise.complete("Hello World!").flatMap {
-   *           promise.get.map { str -> cb(Right(str)) }
+   *           promise.get().map { str -> cb(Right(str)) }
    *         }
    *       }
    *     }
@@ -150,7 +151,7 @@ interface Async<F> : MonadDefer<F> {
   @Deprecated("Use delay instead",
     ReplaceWith("delay(ctx, f)", "arrow.effects.typeclasses.Async"))
   operator fun <A> invoke(ctx: CoroutineContext, f: () -> A): Kind<F, A> =
-    ctx.shift().flatMap { delay(f) }
+    delay(ctx, f)
 
   /**
    * Delay a computation on provided [CoroutineContext].
@@ -276,7 +277,7 @@ interface Async<F> : MonadDefer<F> {
    *   }
    *
    *   fun cancel(): Unit = kotlinx.coroutines.runBlocking {
-   *     println("Cancelled, closing NetworkApi")
+   *     println("Canceled, closing NetworkApi")
    *     kotlinx.coroutines.delay(500)
    *     println("Closed NetworkApi")
    *   }
@@ -294,7 +295,6 @@ interface Async<F> : MonadDefer<F> {
    *       _delay_({ service.cancel() })
    *     }
    *   }
-   *
    *
    *   //sampleEnd
    * }
@@ -367,7 +367,7 @@ interface Async<F> : MonadDefer<F> {
         }
       }, release = { token, exitCase ->
         when (exitCase) {
-          is ExitCase.Cancelled -> token
+          is ExitCase.Canceled -> token
           else -> just(Unit)
         }
       })

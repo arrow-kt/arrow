@@ -24,7 +24,7 @@ object BracketLaws {
       Law("Bracket: bracketCase with just Unit is uncancelable") { BF.bracketCaseWithJustUnitIsUncancelable(EQ) },
       Law("Bracket: bracketCase failure in acquisition remains failure") { BF.bracketCaseFailureInAcquisitionRemainsFailure(EQ) },
       Law("Bracket: bracket is derived from bracketCase") { BF.bracketIsDerivedFromBracketCase(EQ) },
-      Law("Bracket: uncancelable prevents Cancelled case") { BF.uncancelablePreventsCanceledCase(BF.just(Unit), BF.just(Unit), EQ) },
+      Law("Bracket: uncancelable prevents Canceled case") { BF.uncancelablePreventsCanceledCase(BF.just(Unit), BF.just(Unit), EQ) },
       Law("Bracket: acquire and release are uncancelable") { BF.acquireAndReleaseAreUncancelable({ BF.just(Unit) }, EQ) },
       Law("Bracket: guarantee is derived from bracket") { BF.guaranteeIsDerivedFromBracket(BF.just(Unit), EQ) },
       Law("Bracket: guaranteeCase is derived from bracketCase") { BF.guaranteeCaseIsDerivedFromBracketCase({ BF.just(Unit) }, EQ) },
@@ -62,7 +62,7 @@ object BracketLaws {
     EQ: Eq<Kind<F, Int>>): Unit =
     forAll(genApplicative(Gen.int(), this)) { fa: Kind<F, Int> ->
       just(Unit).bracketCase(use = { fa }, release = { _, b ->
-        if (b == ExitCase.Cancelled) onCancel else onFinish
+        if (b == ExitCase.Canceled) onCancel else onFinish
       }).uncancelable().equalUnderTheLaw(fa.guarantee(onFinish), EQ)
     }
 
