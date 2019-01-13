@@ -79,8 +79,6 @@ class FlowableKTests : UnitSpec() {
     //testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), EQ(), EQ()))
     //testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), EQ(), EQ()))
 
-    testLaws(FoldableLaws.laws(FlowableK.foldable(), { FlowableK.just(it) }, Eq.any()))
-
     testLaws(TraverseLaws.laws(FlowableK.traverse(), FlowableK.functor(), { FlowableK.just(it) }, EQ()))
 
     "Multi-thread Flowables finish correctly" {
