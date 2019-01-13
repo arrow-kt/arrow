@@ -60,7 +60,7 @@ interface DeferredKApplicativeError : ApplicativeError<ForDeferredK, Throwable>,
     DeferredK.raiseError(e)
 
   override fun <A> DeferredKOf<A>.handleErrorWith(f: (Throwable) -> DeferredKOf<A>): DeferredK<A> =
-    deferredHandleErrorWith { f(it).fix() }
+    deferredHandleErrorWith(f)
 }
 
 @extension
@@ -69,7 +69,7 @@ interface DeferredKMonadError : MonadError<ForDeferredK, Throwable>, DeferredKMo
     DeferredK.raiseError(e)
 
   override fun <A> DeferredKOf<A>.handleErrorWith(f: (Throwable) -> DeferredKOf<A>): DeferredK<A> =
-    deferredHandleErrorWith { f(it).fix() }
+    deferredHandleErrorWith(f)
 }
 
 @extension
@@ -81,9 +81,7 @@ interface DeferredKBracket : Bracket<ForDeferredK, Throwable>, DeferredKMonadThr
     release: (A, ExitCase<Throwable>) -> DeferredKOf<Unit>,
     use: (A) -> DeferredKOf<B>
   ): DeferredK<B> =
-    fix().bracketCase(
-      use = { a -> use(a) },
-      release = { a, e -> release(a, e) })
+    fix().bracketCase(use = use, release = release)
 }
 
 @extension

@@ -2,7 +2,7 @@ package arrow.effects.rx2
 
 import arrow.Kind
 import arrow.core.*
-import arrow.effects.ConnectionCancellationException
+import arrow.effects.OnCancel
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
 import arrow.higherkind
@@ -19,6 +19,7 @@ fun <A> ObservableKOf<A>.value(): Observable<A> =
 
 @higherkind
 data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, ObservableKKindedJ<A> {
+
   fun <B> map(f: (A) -> B): ObservableK<B> =
     observable.map(f).k()
 
@@ -38,8 +39,7 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
    *
    * @param release the allocated resource after the resulting [ObservableK] of [use] is terminates.
    *
-   * {: data-executable='true'}
-   * ```kotlin:ank
+   * ```kotlin:ank:playground
    * import io.reactivex.Observable
    * import arrow.effects.rx2.*
    * import arrow.effects.typeclasses.ExitCase
@@ -60,7 +60,7 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
    *     release = { file, exitCase ->
    *       when (exitCase) {
    *         is ExitCase.Completed -> { /* do something */ }
-   *         is ExitCase.Cancelled -> { /* do something */ }
+   *         is ExitCase.Canceled -> { /* do something */ }
    *         is ExitCase.Error -> { /* do something */ }
    *       }
    *       closeFile(file)
@@ -83,7 +83,7 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
             release(a, ExitCase.Error(e))
               .fix().flatMap { raiseError<B>(e) }
           }.observable.subscribe({ b -> emitter.onNext(b) }, emitter::onError, emitter::onComplete)
-        emitter.setDisposable(d.onDispose { release(a, ExitCase.Cancelled).fix().observable.subscribe({}, emitter::onError, {}) })
+        emitter.setDisposable(d.onDispose { release(a, ExitCase.Canceled).fix().observable.subscribe({}, emitter::onError, {}) })
       }.k()
     }
 
@@ -150,9 +150,7 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
     /**
      * Creates a [ObservableK] that'll run [ObservableKProc].
      *
-     * {: data-executable='true'}
-     *
-     * ```kotlin:ank
+     * ```kotlin:ank:playground
      * import arrow.core.Either
      * import arrow.core.right
      * import arrow.effects.rx2.ObservableK
@@ -181,7 +179,7 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
         val connection = ObservableKConnection()
         //On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
         //on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
-        connection.push(ObservableK { if (!emitter.isDisposed) emitter.onError(ConnectionCancellationException) })
+        connection.push(ObservableK { if (!emitter.isDisposed) emitter.onError(OnCancel.CancellationException) })
         emitter.setCancellable { connection.cancel().value().subscribe({}, {}) }
 
         fa(connection) { either: Either<Throwable, A> ->
@@ -199,7 +197,7 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
         val connection = ObservableKConnection()
         //On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
         //on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
-        connection.push(ObservableK { if (!emitter.isDisposed) emitter.onError(ConnectionCancellationException) })
+        connection.push(ObservableK { if (!emitter.isDisposed) emitter.onError(OnCancel.CancellationException) })
         emitter.setCancellable { connection.cancel().value().subscribe({}, {}) }
 
         fa(connection) { either: Either<Throwable, A> ->

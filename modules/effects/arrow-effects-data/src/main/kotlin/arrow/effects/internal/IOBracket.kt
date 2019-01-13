@@ -123,7 +123,7 @@ internal object IOBracket {
           IO.unit
       }
 
-    val cancel: CancelToken<ForIO> = applyRelease(ExitCase.Cancelled).fix().uncancelable()
+    val cancel: CancelToken<ForIO> = applyRelease(ExitCase.Canceled).fix().uncancelable()
 
     // Unregistering cancel token, otherwise we can have a memory leak;
     // N.B. conn.pop() happens after the evaluation of `release`, because
