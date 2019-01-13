@@ -1,131 +1,161 @@
 package arrow.effects
 
-import arrow.Kind
 import arrow.core.*
+import arrow.effects.extensions.io.applicative.product
+import arrow.effects.extensions.io.applicativeError.attempt
 import arrow.effects.extensions.io.async.async
-import arrow.effects.extensions.io.monad.binding
+import arrow.effects.extensions.io.concurrent.concurrent
+import arrow.effects.extensions.io.functor.tupleLeft
 import arrow.effects.extensions.io.monad.flatMap
-import arrow.effects.typeclasses.seconds
-import arrow.core.extensions.either.eq.eq
-import arrow.core.extensions.option.eq.eq
+import arrow.effects.extensions.io.monadDefer.monadDefer
 import arrow.test.UnitSpec
 import arrow.test.generators.genThrowable
+import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.matchers.shouldBe
 import arrow.test.laws.equalUnderTheLaw
 import arrow.typeclasses.Eq
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
+import kotlinx.coroutines.Dispatchers
 import org.junit.runner.RunWith
+import java.lang.RuntimeException
+import kotlin.coroutines.CoroutineContext
 
 @RunWith(KotlinTestRunner::class)
 class PromiseTest : UnitSpec() {
 
-  fun <A> EQ(): Eq<Kind<ForIO, A>> = Eq { a, b ->
-    Option.eq(Either.eq(Eq.any(), Eq.any())).run {
-      a.fix().attempt().unsafeRunTimed(60.seconds).eqv(b.fix().attempt().unsafeRunTimed(60.seconds))
-    }
-  }
-
-  private fun <A> promise(): IO<Promise<ForIO, A>> = Promise.uncancelable<ForIO, A>(IO.async()).fix()
-
   init {
 
-    "tryGet before completing" {
-      promise<Int>().flatMap { p ->
-        p.tryGet
-      }.equalUnderTheLaw(IO.just(None), EQ())
-    }
+    fun tests(
+      label: String,
+      ctx: CoroutineContext = Dispatchers.Default,
+      promise: IO<Promise<ForIO, Int>>
+    ): Unit {
 
-    "tryGet after completing" {
-      forAll(Gen.int()) { i ->
-        promise<Int>().flatMap { p ->
-          p.complete(i).flatMap {
-            p.tryGet
-          }
-        }.equalUnderTheLaw(IO.just(Some(i)), EQ())
-      }
-    }
-
-    "complete" {
-      forAll(Gen.int()) { i ->
-        promise<Int>().flatMap { p ->
-          p.complete(i).flatMap {
-            p.get
-          }
-        }.equalUnderTheLaw(IO.just(i), EQ())
-      }
-    }
-
-    "complete twice results in AlreadyFulfilled" {
-      forAll(Gen.int(), Gen.int()) { a, b ->
-        binding {
-          val p = promise<Int>().bind()
-          p.complete(a).bind()
-          p.complete(b).bind()
-          p.get.bind()
-        }.equalUnderTheLaw(IO.raiseError(Promise.AlreadyFulfilled), EQ())
-      }
-    }
-
-    "tryComplete" {
-      forAll(Gen.int()) { i ->
-        binding {
-          val p = promise<Int>().bind()
-          p.tryComplete(i).bind() toT p.get.bind()
-        }.equalUnderTheLaw(IO.just(true toT i), EQ())
-      }
-    }
-
-    "tryComplete returns false if already complete" {
-      forAll(Gen.int(), Gen.int()) { a, b ->
-        binding {
-          val p = promise<Int>().bind()
-          p.complete(a).bind()
-          p.tryComplete(b).bind() toT p.get.bind()
-        }.equalUnderTheLaw(IO.just(false toT a), EQ())
-      }
-    }
-
-    "error" {
-      val error = RuntimeException("Boom")
-      promise<Int>().flatMap { p ->
-        p.error(error).flatMap {
-          p.get
+      "$label - complete" {
+        forAll(Gen.int()) { a ->
+          promise.flatMap { p ->
+            p.complete(a).flatMap {
+              p.get()
+            }
+          }.unsafeRunSync() == a
         }
-      }.equalUnderTheLaw(IO.raiseError(error), EQ())
-    }
+      }
 
-    "error after completion results in AlreadyFulfilled" {
-      forAll(Gen.int(), genThrowable()) { i, t ->
-        binding {
-          val p = promise<Int>().bind()
-          p.complete(i).bind()
-          p.error(t).bind()
-          p.get.bind()
-        }.equalUnderTheLaw(IO.raiseError(Promise.AlreadyFulfilled), EQ())
+      "$label - complete twice should result in Promise.AlreadyFulfilled" {
+        forAll(Gen.int(), Gen.int()) { a, b ->
+          promise.flatMap { p ->
+            p.complete(a).flatMap {
+              p.complete(b)
+                .attempt()
+                .product(p.get())
+            }
+          }.unsafeRunSync() == Tuple2(Left(Promise.AlreadyFulfilled), a)
+        }
+      }
+
+      "$label - tryComplete" {
+        forAll(Gen.int()) { a ->
+          promise.flatMap { p ->
+            p.tryComplete(a).flatMap { didComplete ->
+              p.get().tupleLeft(didComplete)
+            }
+          }.unsafeRunSync() == Tuple2(true, a)
+        }
+      }
+
+      "$label - tryComplete twice returns false" {
+        forAll(Gen.int(), Gen.int()) { a, b ->
+          promise.flatMap { p ->
+            p.tryComplete(a).flatMap {
+              p.tryComplete(b).flatMap { didComplete ->
+                p.get().tupleLeft(didComplete)
+              }
+            }
+          }.unsafeRunSync() == Tuple2(false, a)
+        }
+      }
+
+      "$label - error" {
+        forAll(genThrowable()) { error ->
+          promise.flatMap { p ->
+            p.error(error).flatMap {
+              p.get().attempt()
+            }
+          }.unsafeRunSync() == Left(error)
+        }
+      }
+
+      "$label - error twice should result in Promise.AlreadyFulfilled" {
+        forAll(genThrowable()) { error ->
+          promise.flatMap { p ->
+            p.error(error).flatMap {
+              p.error(RuntimeException("Boom!")).attempt()
+                .product(p.get().attempt())
+            }
+          }.unsafeRunSync() == Tuple2(Left(Promise.AlreadyFulfilled), Left(error))
+        }
+      }
+
+      "$label - tryError" {
+        forAll(genThrowable()) { error ->
+          promise.flatMap { p ->
+            p.tryError(error).flatMap { didError ->
+              p.get().attempt()
+                .tupleLeft(didError)
+            }
+          }.unsafeRunSync() == Tuple2(true, Left(error))
+        }
+      }
+
+      "$label - tryError twice returns false" {
+        forAll(genThrowable()) { error ->
+          promise.flatMap { p ->
+            p.tryError(error).flatMap {
+              p.tryError(RuntimeException("Boom!")).flatMap { didComplete ->
+                p.get().attempt()
+                  .tupleLeft(didComplete)
+              }
+            }
+          }.unsafeRunSync() == Tuple2(false, Left(error))
+        }
+      }
+
+      "$label - get blocks until set" {
+        Ref.of(0, IO.monadDefer()).flatMap { state ->
+          promise.flatMap { modifyGate ->
+            promise.flatMap { readGate ->
+              modifyGate.get().flatMap { state.update { i -> i * 2 }.flatMap { readGate.complete(0) } }.startF(ctx).flatMap {
+                state.set(1).flatMap { modifyGate.complete(0) }.startF(ctx).flatMap {
+                  readGate.get().flatMap {
+                    state.get()
+                  }
+                }
+              }
+            }
+          }
+        }.unsafeRunSync() shouldBe 2
+      }
+
+      "$label - tryGet returns None for empty Promise" {
+        promise.flatMap { p -> p.tryGet() }.unsafeRunSync() shouldBe None
+      }
+
+      "$label - tryGet returns Some for completed promise" {
+        forAll(Gen.int()) { a ->
+          promise.flatMap { p ->
+            p.complete(a).flatMap {
+              p.tryGet()
+            }
+          }.unsafeRunSync() == Some(a)
+        }
       }
     }
 
-    "tryError returns false if already completed" {
-      forAll(Gen.int(), genThrowable()) { i, t ->
-        binding {
-          val p = promise<Int>().bind()
-          p.complete(i).bind()
-          p.tryError(t).bind() toT p.get.bind()
-        }.equalUnderTheLaw(IO.just(false toT i), EQ())
-      }
-    }
-
-    "tryError" {
-      forAll(genThrowable()) { t ->
-        binding {
-          val p = promise<Int>().bind()
-          p.tryError(t).bind()
-        }.equalUnderTheLaw(IO.raiseError(t), EQ())
-      }
-    }
+    tests("CancelablePromise", promise = Promise<ForIO, Int>(IO.concurrent()).fix())
+    tests("UncancelablePromise", promise = Promise.uncancelable<ForIO, Int>(IO.async()).fix())
 
   }
 
 }
-

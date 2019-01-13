@@ -8,9 +8,13 @@ import arrow.typeclasses.MonadError
 
 sealed class ExitCase<out E> {
 
-  object Completed : ExitCase<Nothing>()
+  object Completed : ExitCase<Nothing>() {
+    override fun toString() = "ExitCase.Completed"
+  }
 
-  object Cancelled : ExitCase<Nothing>()
+  object Canceled : ExitCase<Nothing>() {
+    override fun toString() = "ExitCase.Canceled"
+  }
 
   data class Error<out E>(val e: E) : ExitCase<E>()
 }
@@ -60,7 +64,7 @@ interface Bracket<F, E> : MonadError<F, E> {
    *   val release: (File, ExitCase<Throwable>) -> Kind<F, Unit> = { file, exitCase ->
    *       when (exitCase) {
    *         is ExitCase.Completed -> { /* do something */ }
-   *         is ExitCase.Cancelled -> { /* do something */ }
+   *         is ExitCase.Canceled -> { /* do something */ }
    *         is ExitCase.Error -> { /* do something */ }
    *       }
    *       closeFile(file)
