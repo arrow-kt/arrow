@@ -1,14 +1,14 @@
 package arrow.effects
 
 import arrow.core.*
-import arrow.core.extensions.option.eq.eq
 import arrow.data.invalidNel
 import arrow.data.validNel
-import arrow.effects.extensions.io.applicativeError.attempt
+import arrow.effects.IO.Companion.just
 import arrow.effects.extensions.io.async.async
+import arrow.effects.extensions.io.concurrent.concurrent
+import arrow.effects.extensions.io.concurrent.parMapN
 import arrow.effects.extensions.io.monad.F
 import arrow.effects.extensions.io.monad.flatMap
-import arrow.effects.extensions.io.monad.monad
 import arrow.effects.extensions.io.monadDefer.bindingCancellable
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.milliseconds

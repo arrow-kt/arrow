@@ -36,5 +36,7 @@ interface MonadThrow<F> : MonadError<F, Throwable> {
     return continuation.returnedMonad()
   }
 
+  override fun <B> binding(c: suspend MonadContinuation<F, *>.() -> B): Kind<F, B> =
+    bindingCatch { c() }
 }
 

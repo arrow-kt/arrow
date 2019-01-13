@@ -30,8 +30,8 @@ fun <A, B, C> parMap(first: DeferredK<A>,
     val (fiberOne) = first.startF(IO)
     val (fiberTwo) = second.startF(IO)
 
-    val (one) = fiberOne.join
-    val (two) = fiberTwo.join
+    val (one) = fiberOne.join()
+    val (two) = fiberTwo.join()
     f(one, two)
   }
 

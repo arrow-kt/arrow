@@ -3,7 +3,11 @@ package arrow.effects.typeclasses
 import arrow.Kind
 import arrow.core.*
 import arrow.effects.KindConnection
+import arrow.effects.data.internal.BindingCancellationException
+import arrow.typeclasses.MonadContinuation
+import arrow.typeclasses.MonadError
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.startCoroutine
 
 /** A connected asynchronous computation that might fail. **/
 typealias ConnectedProcF<F, A> = (KindConnection<F>, ((Either<Throwable, A>) -> Unit)) -> Kind<F, Unit>
@@ -453,6 +457,29 @@ interface Concurrent<F> : Async<F> {
       raceN(ctx, g, h),
       raceN(ctx, i, j)
     )
+
+  /**
+   * Entry point for monad bindings which enables for comprehensions. The underlying impl is based on coroutines.
+   * A coroutines is initiated and inside [ConcurrentCancellableContinuation] suspended yielding to [Monad.flatMap]. Once all the flatMap binds are completed
+   * the underlying monad is returned from the act of executing the coroutine
+   *
+   * This one operates over [Concurrent] instances
+   *
+   * This operation is cancellable by calling invoke on the [Disposable] return.
+   * If [Disposable.invoke] is called the binding result will become a lifted [BindingCancellationException].
+   */
+  fun <B> bindingConcurrent(c: suspend ConcurrentCancellableContinuation<F, *>.() -> B): Tuple2<Kind<F, B>, Disposable> {
+    val continuation = ConcurrentCancellableContinuation<F, B>(this)
+    val wrapReturn: suspend ConcurrentCancellableContinuation<F, *>.() -> Kind<F, B> = { just(c()) }
+    wrapReturn.startCoroutine(continuation, continuation)
+    return continuation.returnedMonad() toT continuation.disposable()
+  }
+
+  override fun <B> binding(c: suspend MonadContinuation<F, *>.() -> B): Kind<F, B> =
+    bindingCancellable { c() }.a
+
+  fun <B> concurrent(c: suspend ConcurrentCancellableContinuation<F, *>.() -> B): Kind<F, B> =
+    bindingConcurrent { c() }.a
 
 }
 

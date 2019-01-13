@@ -119,16 +119,16 @@ interface ApplicativeErrorSyntax<F, E> : ApplicativeError<F, E>, ApplicativeSynt
 }
 
 interface MonadSyntax<F> : ApplicativeSyntax<F>, Monad<F> {
-  suspend fun <A> Kind<F, A>.followedBy(fb: Kind<F, A>): A =
-    run<Monad<F>, Kind<F, A>> { followedBy(fb) }.bind()
+  suspend fun <A, B> Kind<F, A>.followedBy(unit: Unit = Unit, fb: Kind<F, B>): B =
+    run<Monad<F>, Kind<F, B>> { followedBy(fb) }.bind()
 
-  suspend fun <A> Kind<F, A>.forEffect(fb: Kind<F, A>): A =
+  suspend fun <A, B> Kind<F, A>.forEffect(unit: Unit = Unit, fb: Kind<F, B>): A =
     run<Monad<F>, Kind<F, A>> { forEffect(fb) }.bind()
 
-  suspend fun <A> Kind<F, A>.effectM(f: (A) -> Kind<F, A>): A =
+  suspend infix fun <A> Kind<F, A>.effectM(f: (A) -> Kind<F, A>): A =
     run<Monad<F>, Kind<F, A>> { effectM(f) }.bind()
 
-  suspend fun <A> Kind<F, A>.mproduct(f: (A) -> Kind<F, A>): Tuple2<A, A> =
+  suspend infix fun <A> Kind<F, A>.mproduct(f: (A) -> Kind<F, A>): Tuple2<A, A> =
     run<Monad<F>, Kind<F, Tuple2<A, A>>> { mproduct(f) }.bind()
 
   suspend fun <A> Kind<F, Boolean>.ifM(ifTrue: () -> Kind<F, A>, ifFalse: () -> Kind<F, A>, unit: Unit = Unit): A =

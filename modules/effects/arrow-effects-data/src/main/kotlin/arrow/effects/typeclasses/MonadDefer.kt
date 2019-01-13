@@ -5,6 +5,7 @@ import arrow.core.Either
 import arrow.core.Tuple2
 import arrow.core.toT
 import arrow.effects.data.internal.BindingCancellationException
+import arrow.typeclasses.MonadContinuation
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
 import kotlin.coroutines.startCoroutine
@@ -62,6 +63,9 @@ interface MonadDefer<F> : MonadThrow<F>, Bracket<F, Throwable> {
     wrapReturn.startCoroutine(continuation, continuation)
     return continuation.returnedMonad() toT continuation.disposable()
   }
+
+  override fun <B> binding(c: suspend MonadContinuation<F, *>.() -> B): Kind<F, B> =
+    bindingCancellable { c() }.a
 
 }
 
