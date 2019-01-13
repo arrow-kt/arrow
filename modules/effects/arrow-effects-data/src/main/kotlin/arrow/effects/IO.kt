@@ -55,11 +55,11 @@ sealed class IO<out A> : IOOf<A> {
             IO { callback(Left(t)) }
           }
 
-          //DEV: If fa cancels conn2 like so `conn.cancel().map { cb(Right(Unit)) }`
-          //It doesn't run the stack of conn2, instead the result is seen it cb of startCancelable.
-          IORunLoop.startCancelable(fa, conn2) {
-
-            if (it.fold({ e -> e == OnCancel.CancellationException }, { false }) && conn.isNotCanceled()) IORunLoop.start(conn.cancel(), mapUnit)
+          IORunLoop.startCancelable(fa, conn2) { result ->
+            // DEV: If fa cancels conn2 like so `conn.cancel().map { cb(Right(Unit)) }`
+            // It doesn't run the stack of conn2, instead the result is seen in the cb of startCancelable.
+            val resultCancelled = result.fold({ e -> e == OnCancel.CancellationException }, { false })
+            if (resultCancelled && conn.isNotCanceled()) IORunLoop.start(conn.cancel(), mapUnit)
             else Unit
           }
         }
