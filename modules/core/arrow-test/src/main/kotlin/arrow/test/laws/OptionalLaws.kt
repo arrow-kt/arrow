@@ -5,7 +5,6 @@ import arrow.core.extensions.const.applicative.applicative
 import arrow.core.extensions.id.applicative.applicative
 import arrow.typeclasses.*
 import arrow.optics.Optional
-import arrow.optics.extensions.list.cons.cons
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
 import io.kotlintest.properties.Gen
