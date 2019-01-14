@@ -34,6 +34,7 @@ operator fun <A, B> AndThenOf<A, B>.invoke(a: A): B = fix().invoke(a)
  *   println("f(0) = ${f(0)}, f2(0) = ${f2(0)}")
  * }
  * ```
+ *
  */
 @higherkind
 sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
@@ -101,9 +102,19 @@ sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
       else -> composeF(AndThen(g))
     }
 
+  /**
+   * Alias for [andThen]
+   *
+   * @see andThen
+   */
   fun <C> map(f: (B) -> C): AndThen<A, C> =
     andThen(f)
 
+  /**
+   * Alias for [andThen]
+   *
+   * @see compose
+   */
   fun <C> contramap(f: (C) -> A): AndThen<C, B> =
     this compose f
 
@@ -169,6 +180,9 @@ sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
       else -> Single(f, 0)
     }
 
+    fun <I, A, B> tailRecM(a: A, f: (A) -> AndThenOf<I, Either<A, B>>): AndThen<I, B> =
+      AndThen { t: I -> step(a, t, f) }
+
     private tailrec fun <I, A, B> step(a: A, t: I, fn: (A) -> AndThenOf<I, Either<A, B>>): B {
       val af = fn(a)(t)
       return when (af) {
@@ -176,9 +190,6 @@ sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
         is Either.Left -> step(af.a, t, fn)
       }
     }
-
-    fun <I, A, B> tailRecM(a: A, f: (A) -> AndThenOf<I, Either<A, B>>): AndThen<I, B> =
-      AndThen { t: I -> step(a, t, f) }
 
     /**
      * Establishes the maximum stack depth when fusing `andThen` or `compose` calls.
