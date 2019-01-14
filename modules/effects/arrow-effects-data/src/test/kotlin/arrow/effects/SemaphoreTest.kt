@@ -16,7 +16,6 @@ import arrow.test.laws.equalUnderTheLaw
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import io.kotlintest.properties.map
 import kotlinx.coroutines.Dispatchers
 import org.junit.runner.RunWith
 

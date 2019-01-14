@@ -1,7 +1,6 @@
 package arrow.effects
 
 import arrow.core.*
-import arrow.core.extensions.option.eq.eq
 import arrow.effects.IO.Companion.just
 import arrow.effects.extensions.io.async.async
 import arrow.effects.extensions.io.concurrent.concurrent
@@ -48,14 +47,6 @@ class IOTest : UnitSpec() {
 
     "should yield immediate successful invoke value" {
       val run = IO { 1 }.unsafeRunSync()
-
-      val expected = 1
-
-      run shouldBe expected
-    }
-
-    "should yield immediate successful pure value" {
-      val run = IO.just(1).unsafeRunSync()
 
       val expected = 1
 

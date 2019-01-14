@@ -32,7 +32,6 @@ import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 import java.lang.AssertionError
 import java.util.concurrent.TimeUnit
-import arrow.test.laws.shouldBe
 
 @RunWith(KotlinTestRunner::class)
 class DeferredKTest : UnitSpec() {
