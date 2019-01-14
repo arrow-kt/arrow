@@ -14,7 +14,6 @@ import arrow.test.generators.genThrowable
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import io.kotlintest.properties.map
 import kotlinx.coroutines.Dispatchers
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -281,7 +280,8 @@ object ConcurrentLaws {
 
   fun <F> Concurrent<F>.startCancelIsUnit(EQ_UNIT: Eq<Kind<F, Unit>>, ctx: CoroutineContext): Unit =
     forAll(Gen.int().map(::just)) { fa ->
-      fa.startF(ctx).flatMap { (_, cancel) -> cancel }.equalUnderTheLaw(just(Unit), EQ_UNIT)
+      fa.startF(ctx).flatMap { (_, cancel) -> cancel }
+        .equalUnderTheLaw(just<Unit>(Unit), EQ_UNIT)
     }
 
   fun <F> Concurrent<F>.uncancelableMirrorsSource(EQ: Eq<Kind<F, Int>>): Unit =
@@ -498,7 +498,7 @@ object ConcurrentLaws {
     }
 
   fun <F> Concurrent<F>.raceTripleCanCancelsLoser(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
-    forAll(genEither(genThrowable(), Gen.string()), Gen.oneOf(listOf(1, 2, 3)), Gen.int(), Gen.int()) { eith, leftWinner, a, b ->
+    forAll(genEither(genThrowable(), Gen.string()), Gen.from(listOf(1, 2, 3)), Gen.int(), Gen.int()) { eith, leftWinner, a, b ->
       val received = binding {
         val s = Semaphore(0L, this@raceTripleCanCancelsLoser).bind()
         val pa = Promise.uncancelable<F, Int>(this@raceTripleCanCancelsLoser).bind()
@@ -571,7 +571,7 @@ object ConcurrentLaws {
     }
 
   fun <F> Concurrent<F>.raceTripleCanBeCancelledByParticipants(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
-    forAll(Gen.int(), Gen.oneOf(listOf(1, 2, 3))) { i, shouldCancel ->
+    forAll(Gen.int(), Gen.from(listOf(1, 2, 3))) { i, shouldCancel ->
       binding {
         val endLatch = Promise<F, Int>(this@raceTripleCanBeCancelledByParticipants).bind()
         val startLatch = Promise<F, Unit>(this@raceTripleCanBeCancelledByParticipants).bind()

@@ -17,12 +17,13 @@ import arrow.test.UnitSpec
 import arrow.test.generators.genIntSmall
 import arrow.test.laws.AsyncLaws
 import arrow.test.laws.throwableEq
+import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Traverse
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.fail
-import io.kotlintest.matchers.shouldBe
+import io.kotlintest.runner.junit4.KotlinTestRunner
+import io.kotlintest.fail
+import io.kotlintest.shouldBe
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kotlinx.coroutines.*
@@ -31,9 +32,8 @@ import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 import java.lang.AssertionError
 import java.util.concurrent.TimeUnit
-import arrow.test.laws.shouldBe
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class DeferredKTest : UnitSpec() {
   fun <A> EQ(): Eq<Kind<ForDeferredK, A>> = Eq { a, b ->
     val other = b.unsafeAttemptSync()
@@ -86,7 +86,7 @@ class DeferredKTest : UnitSpec() {
       val ioa = DeferredK<Int>(Unconfined, GlobalScope, CoroutineStart.DEFAULT) { throw exception }
       ioa.unsafeRunAsync { either ->
         either.fold({
-          it.shouldBe(exception, throwableEq())
+          it.shouldBeEq(exception, throwableEq())
         }, { fail("") })
       }
     }

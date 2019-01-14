@@ -7,6 +7,8 @@ dependencies {
     testCompileOnly project(':arrow-meta')
 
     testCompile project(':arrow-test')
+    testRuntime("org.junit.vintage:junit-vintage-engine:$jUnitVintageVersion")
+    testCompile "io.kotlintest:kotlintest-runner-junit4:$kotlinTestVersion"
 
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
 }

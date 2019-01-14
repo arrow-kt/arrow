@@ -33,10 +33,10 @@ interface SortedMapKTraverse<A : Comparable<A>> : Traverse<SortedMapKPartialOf<A
 fun <A : Comparable<A>> SortedMapK.Companion.traverse(): SortedMapKTraverse<A> =
   object : SortedMapKTraverse<A> {}
 
-interface SortedMapKSemigroup<A : Comparable<A>, B> : Semigroup<SortedMapKOf<A, B>> {
+interface SortedMapKSemigroup<A : Comparable<A>, B> : Semigroup<SortedMapK<A, B>> {
   fun SG(): Semigroup<B>
 
-  override fun SortedMapKOf<A, B>.combine(b: SortedMapKOf<A, B>): SortedMapKOf<A, B> =
+  override fun SortedMapK<A, B>.combine(b: SortedMapK<A, B>): SortedMapK<A, B> =
     if (this.fix().size < b.fix().size) this.fix().foldLeft<B>(b.fix()) { my, (k, b) ->
       my.updated(k, SG().run { b.maybeCombine(my[k]) })
     }
@@ -48,7 +48,7 @@ fun <A : Comparable<A>, B> SortedMapK.Companion.semigroup(SB: Semigroup<B>): Sor
     override fun SG(): Semigroup<B> = SB
   }
 
-interface SortedMapKMonoid<A : Comparable<A>, B> : Monoid<SortedMapKOf<A, B>>, SortedMapKSemigroup<A, B> {
+interface SortedMapKMonoid<A : Comparable<A>, B> : Monoid<SortedMapK<A, B>>, SortedMapKSemigroup<A, B> {
   override fun empty(): SortedMapK<A, B> = sortedMapOf<A, B>().k()
 }
 

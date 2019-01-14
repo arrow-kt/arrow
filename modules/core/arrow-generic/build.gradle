@@ -7,7 +7,8 @@ dependencies {
     kaptTest project(':arrow-meta')
     compileOnly project(':arrow-meta')
     testCompileOnly project(':arrow-meta')
-    testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
+    testRuntime("org.junit.vintage:junit-vintage-engine:$jUnitVintageVersion")
+    testCompile "io.kotlintest:kotlintest-runner-junit4:$kotlinTestVersion"
     testCompile project(':arrow-syntax')
     testCompile project(':arrow-test')
 }

@@ -2,14 +2,14 @@ package arrow.core
 
 import arrow.higherkind
 
-fun <A> IdOf<A>.value(): A = this.fix().value()
+fun <A> IdOf<A>.value(): A = this.fix().extract()
 
 @higherkind
 data class Id<out A>(private val value: A) : IdOf<A> {
 
-  inline fun <B> map(f: (A) -> B): Id<B> = Id(f(value()))
+  inline fun <B> map(f: (A) -> B): Id<B> = Id(f(extract()))
 
-  inline fun <B> flatMap(f: (A) -> IdOf<B>): Id<B> = f(value()).fix()
+  inline fun <B> flatMap(f: (A) -> IdOf<B>): Id<B> = f(extract()).fix()
 
   fun <B> foldLeft(initial: B, operation: (B, A) -> B): B = operation(initial, value)
 
@@ -18,8 +18,6 @@ data class Id<out A>(private val value: A) : IdOf<A> {
   fun <B> coflatMap(f: (IdOf<A>) -> B): Id<B> = this.fix().map { f(this) }
 
   fun extract(): A = value
-
-  fun value(): A = value
 
   fun <B> ap(ff: IdOf<(A) -> B>): Id<B> = ff.fix().flatMap { f -> map(f) }.fix()
 
