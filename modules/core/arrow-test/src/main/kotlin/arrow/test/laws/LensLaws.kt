@@ -1,10 +1,16 @@
 package arrow.test.laws
 
-import arrow.core.*
+import arrow.core.Id
+import arrow.core.compose
 import arrow.core.extensions.const.applicative.applicative
 import arrow.core.extensions.id.functor.functor
-import arrow.typeclasses.*
+import arrow.core.identity
+import arrow.core.value
 import arrow.optics.Lens
+import arrow.typeclasses.Const
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.value
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
@@ -18,7 +24,7 @@ object LensLaws {
     EQA: Eq<A>,
     EQB: Eq<B>,
     MB: Monoid<B>
-  ) =
+  ): List<Law> =
     listOf(
       Law("Lens law: get set") { lensGetSet(lensGen, aGen, EQA) },
       Law("Lens law: set get") { lensSetGet(lensGen, aGen, bGen, EQB) },
@@ -29,6 +35,19 @@ object LensLaws {
       Law("Lens law: consistent modify modify id") { lensConsistentModifyModifyId(lensGen, aGen, funcGen, EQA) },
       Law("Lens law: consistent get modify id") { lensConsistentGetModifyid(lensGen, aGen, EQB, MB) }
     )
+
+  /**
+   * Warning: Use only when a `Gen.constant()` applies
+   */
+  fun <A, B> laws(
+    lens: Lens<A, B>,
+    aGen: Gen<A>,
+    bGen: Gen<B>,
+    funcGen: Gen<(B) -> B>,
+    EQA: Eq<A>,
+    EQB: Eq<B>,
+    MB: Monoid<B>
+  ): List<Law> = laws(Gen.constant(lens), aGen, bGen, funcGen, EQA, EQB, MB)
 
   fun <A, B> lensGetSet(lensGen: Gen<Lens<A, B>>, aGen: Gen<A>, EQA: Eq<A>) =
     forAll(lensGen, aGen) { lens, a ->

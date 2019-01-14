@@ -22,7 +22,7 @@ class TupleTest : UnitSpec() {
 
     testLaws(
       LensLaws.laws(
-        lensGen = Gen.constant(Tuple2.first()),
+        lens = Tuple2.first(),
         aGen = genTuple(Gen.int(), Gen.string()),
         bGen = Gen.int(),
         funcGen = genFunctionAToB(Gen.int()),
@@ -34,7 +34,7 @@ class TupleTest : UnitSpec() {
 
     testLaws(
       LensLaws.laws(
-        lensGen = Gen.constant(Tuple2.second()),
+        lens = Tuple2.second(),
         aGen = genTuple(Gen.int(), Gen.string()),
         bGen = Gen.string(),
         funcGen = genFunctionAToB(Gen.string()),
@@ -46,7 +46,7 @@ class TupleTest : UnitSpec() {
 
     testLaws(
       LensLaws.laws(
-        lensGen = Gen.constant(Tuple3.first()),
+        lens = Tuple3.first(),
         aGen = genTuple(Gen.int(), Gen.string(), Gen.string()),
         bGen = Gen.int(),
         funcGen = genFunctionAToB(Gen.int()),
@@ -58,7 +58,7 @@ class TupleTest : UnitSpec() {
 
     testLaws(
       LensLaws.laws(
-        lensGen = Gen.constant(Tuple3.second()),
+        lens = Tuple3.second(),
         aGen = genTuple(Gen.int(), Gen.string(), Gen.int()),
         bGen = Gen.string(),
         funcGen = genFunctionAToB(Gen.string()),
@@ -70,7 +70,7 @@ class TupleTest : UnitSpec() {
 
     testLaws(
       LensLaws.laws(
-        lensGen = Gen.constant(Tuple3.third()),
+        lens = Tuple3.third(),
         aGen = genTuple(Gen.int(), Gen.int(), Gen.string()),
         bGen = Gen.string(),
         funcGen = genFunctionAToB(Gen.string()),

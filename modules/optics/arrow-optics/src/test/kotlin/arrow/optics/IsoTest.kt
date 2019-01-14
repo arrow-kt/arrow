@@ -31,7 +31,7 @@ class IsoTest : UnitSpec() {
 
     testLaws(
       LensLaws.laws(
-        lensGen = Gen.constant(tokenIso.asLens()),
+        lens = tokenIso.asLens(),
         aGen = genToken,
         bGen = Gen.string(),
         funcGen = genFunctionAToB(Gen.string()),
@@ -60,7 +60,7 @@ class IsoTest : UnitSpec() {
       ),
 
       OptionalLaws.laws(
-        optionalGen = Gen.constant(tokenIso.asOptional()),
+        optional = tokenIso.asOptional(),
         aGen = genToken,
         bGen = Gen.string(),
         funcGen = genFunctionAToB(Gen.string()),

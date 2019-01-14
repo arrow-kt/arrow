@@ -5,6 +5,7 @@ import arrow.core.extensions.const.applicative.applicative
 import arrow.core.extensions.id.applicative.applicative
 import arrow.typeclasses.*
 import arrow.optics.Optional
+import arrow.optics.extensions.list.cons.cons
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
 import io.kotlintest.properties.Gen
@@ -42,6 +43,18 @@ object OptionalLaws {
       )
     }
   )
+
+  /**
+   * Warning: Use only when a `Gen.constant()` applies
+   */
+  fun <A, B> laws(
+    optional: Optional<A, B>,
+    aGen: Gen<A>,
+    bGen: Gen<B>,
+    funcGen: Gen<(B) -> B>,
+    EQA: Eq<A>,
+    EQOptionB: Eq<Option<B>>
+  ): List<Law> = laws(Gen.constant(optional), aGen, bGen, funcGen, EQA, EQOptionB)
 
   fun <A, B> getOptionSet(optionalGen: Gen<Optional<A, B>>, aGen: Gen<A>, EQA: Eq<A>): Unit =
     forAll(optionalGen, aGen) { optional, a ->

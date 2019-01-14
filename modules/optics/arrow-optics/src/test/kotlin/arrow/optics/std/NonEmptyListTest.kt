@@ -19,7 +19,7 @@ class NonEmptyListTest : UnitSpec() {
 
     testLaws(
       LensLaws.laws(
-        lensGen = Gen.constant(NonEmptyList.head()),
+        lens = NonEmptyList.head(),
         aGen = genNonEmptyList(Gen.string()),
         bGen = Gen.string(),
         funcGen = genFunctionAToB(Gen.string()),
@@ -30,7 +30,7 @@ class NonEmptyListTest : UnitSpec() {
     )
 
     testLaws(LensLaws.laws(
-      lensGen = Gen.constant(NonEmptyList.tail()),
+      lens = NonEmptyList.tail(),
       aGen = genNonEmptyList(Gen.string()),
       bGen = Gen.list(Gen.string()),
       funcGen = genFunctionAToB(Gen.list(Gen.string())),

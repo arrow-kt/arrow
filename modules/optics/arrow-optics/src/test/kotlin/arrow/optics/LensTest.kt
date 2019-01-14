@@ -21,7 +21,7 @@ class LensTest : UnitSpec() {
   init {
     testLaws(
       LensLaws.laws(
-        lensGen = Gen.constant(tokenLens),
+        lens = tokenLens,
         aGen = genToken,
         bGen = Gen.string(),
         funcGen = genFunctionAToB(Gen.string()),
@@ -41,7 +41,7 @@ class LensTest : UnitSpec() {
       ),
 
       OptionalLaws.laws(
-        optionalGen = Gen.constant(tokenLens.asOptional()),
+        optional = tokenLens.asOptional(),
         aGen = genToken,
         bGen = Gen.string(),
         funcGen = genFunctionAToB(Gen.string()),
@@ -60,7 +60,7 @@ class LensTest : UnitSpec() {
 
     testLaws(
       LensLaws.laws(
-        lensGen = Gen.constant(Lens.id()),
+        lens = Lens.id(),
         aGen = Gen.int(),
         bGen = Gen.int(),
         funcGen = genFunctionAToB(Gen.int()),
