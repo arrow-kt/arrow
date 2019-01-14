@@ -13,6 +13,7 @@ import me.eugeniomarletti.kotlin.metadata.kotlinMetadata
 import me.eugeniomarletti.kotlin.metadata.modality
 import me.eugeniomarletti.kotlin.metadata.proto
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf
+import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.Flags
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.TypeTable
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.supertypes
 import me.eugeniomarletti.kotlin.metadata.shadow.serialization.deserialization.getName
@@ -28,7 +29,7 @@ interface ProcessorUtils : KotlinMetadataUtils {
     .let { it as KotlinClassMetadata }.data
     .let { (nameResolver, classProto) ->
       classProto.constructorOrBuilderList
-        .first()
+        .first { it.isPrimary }
         .valueParameterList
         .map(ProtoBuf.ValueParameter::getName)
         .map(nameResolver::getString)
@@ -43,7 +44,7 @@ interface ProcessorUtils : KotlinMetadataUtils {
     .let { it as KotlinClassMetadata }.data
     .let { data ->
       data.proto.constructorOrBuilderList
-        .first()
+        .first { it.isPrimary }
         .valueParameterList
         .map { it.type.extractFullName(data) }
     }
@@ -97,6 +98,9 @@ interface ProcessorUtils : KotlinMetadataUtils {
   }
 
 }
+
+private val ProtoBuf.ConstructorOrBuilder.isPrimary: Boolean get() = !isSecondary
+private val ProtoBuf.ConstructorOrBuilder.isSecondary: Boolean get() = Flags.IS_SECONDARY[flags]
 
 fun String.removeBackticks() = replace("`", "")
 

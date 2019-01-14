@@ -32,6 +32,13 @@ class OptionalTest : APTest("arrow.ap.objects.optional") {
       processor = OpticsProcessor()
     ))
 
+    testProcessor(AnnotationProcessor(
+      name = "Optionals will be generated for secondary constructor arguments",
+      sourceFiles = listOf("OptionalSecondaryConstructor.java"),
+      destFile = "OptionalSecondaryConstructor.kt",
+      processor = OpticsProcessor()
+    ))
+
   }
 
 }
