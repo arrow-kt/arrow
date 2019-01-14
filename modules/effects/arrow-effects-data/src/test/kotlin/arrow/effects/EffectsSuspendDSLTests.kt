@@ -1,33 +1,28 @@
 package arrow.effects
 
-import arrow.Kind
-import arrow.effects.extensions.io.concurrent.concurrent
-import arrow.effects.typeclasses.ConcurrentEffects
+import arrow.effects.typeclasses.fx
+import arrow.effects.extensions.io.concurrent.invoke
 import arrow.test.UnitSpec
 import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import org.junit.runner.RunWith
 
-suspend fun <F> ConcurrentEffects<F>.addOne(fa: Kind<F, Int>): Int {
-  val (a) = fa
-  return a + 1
-}
+fun helloWorld(): String =
+  "Hello World"
 
-suspend fun <F> ConcurrentEffects<F>.addTwo(fa: Kind<F, Int>): Int {
-  val (a) = fa
-  return a + 2
-}
+suspend fun printHelloWorld(): Unit =
+  println(helloWorld())
 
-suspend fun <F> ConcurrentEffects<F>.app(): Int =
-  addOne(1.just()) + addTwo(1.just())
+val program: IO<Unit> = fx {
+  effect { printHelloWorld() } // compiles and suspends all side effects in the context of IO
+}
 
 @RunWith(KTestJUnitRunner::class)
 class EffectsSuspendDSLTests : UnitSpec() {
 
   init {
     "Suspended algebras can be composed and interpreted" {
-      val result: IO<Int> = concurrent { app() }
-      result.unsafeRunSync() shouldBe 5
+      program.unsafeRunSync() shouldBe Unit
     }
   }
 

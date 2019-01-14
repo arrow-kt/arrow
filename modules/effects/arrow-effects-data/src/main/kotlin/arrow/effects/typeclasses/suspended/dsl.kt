@@ -12,9 +12,12 @@ import arrow.data.extensions.nonemptylist.semigroup.semigroup
 import arrow.effects.CancelToken
 import arrow.effects.typeclasses.*
 import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Continuation
 import arrow.typeclasses.suspended.MonadErrorSyntax
 import arrow.typeclasses.suspended.MonadSyntax
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.coroutines.startCoroutine
 import arrow.core.extensions.either.applicative.tupled as tuppledEither
 import arrow.data.extensions.validated.applicative.tupled as tuppledVal
 
@@ -152,17 +155,33 @@ interface BracketSyntax<F, E> :
 
 interface MonadDeferSyntax<F> : BracketSyntax<F, Throwable>, MonadDefer<F> {
 
+  suspend fun <A> effect(
+    context: CoroutineContext = EmptyCoroutineContext,
+    f: suspend () -> A
+  ): A =
+    delay {
+      lateinit var result: Kind<F, A>
+      val continuation = object : Continuation<A> {
+        override fun resume(value: A) {
+          result = value.just()
+        }
+        override fun resumeWithException(exception: Throwable) {
+          result = raiseError(exception)
+        }
+        override val context: CoroutineContext = context
+      }
+      f.startCoroutine(continuation)
+      result
+    }.bind().bind()
+
+  fun <A> (suspend MonadDeferCancellableContinuation<F, *>.() -> A).k(): Kind<F, A> =
+    bindingCancellable { this.this@k() }.a
+
   private suspend fun <A> deferring(fb: MonadDefer<F>.() -> Kind<F, A>): A =
     run<MonadDefer<F>, Kind<F, A>> { fb(this) }.bind()
 
   suspend fun <A> defer(unit: Unit = Unit, fb: () -> Kind<F, A>): A =
     deferring { defer(fb) }
-
-  suspend fun <A> effect(f: () -> A): A =
-    deferring { delay(f) }
-
-  suspend fun <A> effect(fb: Kind<F, A>): A =
-    deferring { delay(fb) }
 
   suspend fun lazy(unit: Unit = Unit): Unit =
     deferring { lazy() }
@@ -236,17 +255,17 @@ interface ConcurrentSyntax<F> : AsyncSyntax<F>, Concurrent<F> {
 
   private suspend fun <A> concurrently(fb: Concurrent<F>.() -> Kind<F, A>): A =
     run<Concurrent<F>, Kind<F, A>> { fb(this) }.bind()
-  
+
   suspend fun <A> async(unit: Unit = Unit, fa: ConnectedProc<F, A>): A =
     concurrently { async(fa) }
 
-  suspend fun <A> asyncF(unit: Unit= Unit, k: ConnectedProcF<F, A>): A =
+  suspend fun <A> asyncF(unit: Unit = Unit, k: ConnectedProcF<F, A>): A =
     concurrently { asyncF(k) }
 
-  suspend fun <A> asyncF(unit1: Unit= Unit, unit2: Unit= Unit, k: ProcF<F, A>): A =
+  suspend fun <A> asyncF(unit1: Unit = Unit, unit2: Unit = Unit, k: ProcF<F, A>): A =
     concurrently { asyncF(k) }
 
-  suspend fun <A> async(unit1: Unit = Unit, unit2: Unit= Unit, fa: Proc<A>): A =
+  suspend fun <A> async(unit1: Unit = Unit, unit2: Unit = Unit, fa: Proc<A>): A =
     concurrently { async(fa) }
 
   suspend fun <A> Kind<F, A>.startF(unit1: Unit = Unit, ctx: CoroutineContext): Fiber<F, A> =
@@ -475,4 +494,3 @@ interface ConcurrentEffectSyntax<F> : ConcurrentEffect<F>, EffectSyntax<F> {
     concurrentEffect { runAsyncCancellable(cb) }
 
 }
-

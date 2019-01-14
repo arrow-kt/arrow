@@ -16,6 +16,8 @@ typealias ConnectedProcF<F, A> = (KindConnection<F>, ((Either<Throwable, A>) -> 
 typealias ConnectedProc<F, A> = (KindConnection<F>, ((Either<Throwable, A>) -> Unit)) -> Unit
 
 /**
+ * ank_macro_hierarchy(arrow.effects.typeclasses.Concurrent)
+ *
  * Type class for async data types that are cancelable and can be started concurrently.
  */
 interface Concurrent<F> : Async<F> {
@@ -478,10 +480,16 @@ interface Concurrent<F> : Async<F> {
   override fun <B> binding(c: suspend MonadContinuation<F, *>.() -> B): Kind<F, B> =
     bindingCancellable { c() }.a
 
-  fun <B> concurrent(c: suspend ConcurrentCancellableContinuation<F, *>.() -> B): Kind<F, B> =
-    bindingConcurrent { c() }.a
+  operator fun <B> arrow.effects.typeclasses.fx.invoke(c: suspend ConcurrentCancellableContinuation<F, *>.() -> B): Kind<F, B> {
+    val continuation = ConcurrentCancellableContinuation<F, B>(this@Concurrent)
+    val wrapReturn: suspend ConcurrentCancellableContinuation<F, *>.() -> Kind<F, B> = { just(c()) }
+    wrapReturn.startCoroutine(continuation, continuation)
+    return continuation.returnedMonad()
+  }
 
 }
+
+object fx
 
 /** Alias for `Either` structure to provide consistent signature for race methods. */
 typealias RacePair<F, A, B> = Either<Tuple2<A, Fiber<F, B>>, Tuple2<Fiber<F, A>, B>>
