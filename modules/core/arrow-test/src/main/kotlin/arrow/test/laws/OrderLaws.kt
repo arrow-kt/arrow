@@ -4,11 +4,16 @@ import arrow.typeclasses.Eq
 import arrow.typeclasses.Order
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
+import java.util.*
 
 object OrderLaws {
 
-  fun <F> laws(O: Order<F>, fGen: Gen<F>, funcGen: Gen<(F) -> F>): List<Law> =
-    EqLaws.laws(O) { fGen.generate() } + listOf(
+  fun <F> laws(O: Order<F>, fGen: Gen<F>, funcGen: Gen<(F) -> F>): List<Law> {
+    val random = Random()
+    return EqLaws.laws(O) {
+      val fSeq = fGen.random()
+      fSeq.elementAt(random.nextInt(fSeq.count()))
+    } + listOf(
       Law("Order law: reflexivity equality") { O.reflexitivityEq(fGen) },
       Law("Order law: symmetry equality") { O.symmetryEq(fGen) },
       Law("Order law: antisymmetry equality") { O.antisymmetryEq(fGen, funcGen) },
@@ -25,11 +30,14 @@ object OrderLaws {
       Law("Order law: max order") { O.maxOrder(fGen) },
       Law("Order law: operator compareTo delegates to compare order") { O.operatorCompareToOrder(fGen) }
     )
+  }
 
-  fun <F> Order<F>.reflexitivityEq(fGen: Gen<F>) =
+  fun <F> Order<F>.reflexitivityEq(fGen: Gen<F>) = run {
+    val eq = this
     forAll(fGen) { x ->
-      x.equalUnderTheLaw(x, this)
+      x.equalUnderTheLaw(x, eq)
     }
+  }
 
   fun <F> Order<F>.symmetryEq(fGen: Gen<F>) =
     forAll(fGen, fGen) { x, y ->

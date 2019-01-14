@@ -3,9 +3,9 @@ package arrow.test.laws
 import arrow.Kind
 import arrow.core.Eval
 import arrow.core.Id
-import arrow.core.value
-import arrow.core.extensions.monoid
+import arrow.core.extensions.id.comonad.extract
 import arrow.core.extensions.id.monad.monad
+import arrow.core.extensions.monoid
 import arrow.test.concurrency.SideEffect
 import arrow.test.generators.genConstructor
 import arrow.test.generators.genFunctionAToB
@@ -74,13 +74,12 @@ object FoldableLaws {
   fun <F> Foldable<F>.forallConsistentWithExists(cf: (Int) -> Kind<F, Int>) =
     forAll(genIntPredicate(), genConstructor(Gen.int(), cf)) { f: (Int) -> Boolean, fa: Kind<F, Int> ->
       if (fa.forAll(f)) {
-        val negationExists = fa.exists { a -> !(f(a)) }
-        // if p is true for all elements, then there cannot be an element for which
+        // if f is true for all elements, then there cannot be an element for which
         // it does not hold.
-        !negationExists &&
-          // if p is true for all elements, then either there must be no elements
-          // or there must exist an element for which it is true.
-          (fa.isEmpty() || fa.exists(f))
+        val negationExists = fa.exists { a -> !(f(a)) }
+        // if f is true for all elements, then either there must be no elements
+        // or there must exist an element for which it is true.
+        !negationExists && (fa.isEmpty() || fa.exists(f))
       } else true
     }
 
@@ -93,7 +92,7 @@ object FoldableLaws {
     forAll(genFunctionAToB<Int, Int>(genIntSmall()), genConstructor(genIntSmall(), cf)) { f: (Int) -> Int, fa: Kind<F, Int> ->
       with(Int.monoid()) {
         val foldL: Int = fa.foldLeft(empty()) { acc, a -> acc.combine(f(a)) }
-        val foldM: Int = fa.foldM(Id.monad(), empty()) { acc, a -> Id(acc.combine(f(a))) }.value()
+        val foldM: Int = fa.foldM(Id.monad(), empty()) { acc, a -> Id(acc.combine(f(a))) }.extract()
         foldM.equalUnderTheLaw(foldL, EQ)
       }
     }

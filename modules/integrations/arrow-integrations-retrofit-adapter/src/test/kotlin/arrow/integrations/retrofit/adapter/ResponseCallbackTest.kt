@@ -6,14 +6,14 @@ import arrow.effects.extensions.io.async.async
 import arrow.integrations.retrofit.adapter.retrofit.ApiClientTest
 import arrow.integrations.retrofit.adapter.retrofit.retrofit
 import arrow.test.UnitSpec
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.fail
+import io.kotlintest.runner.junit4.KotlinTestRunner
+import io.kotlintest.fail
 import okhttp3.HttpUrl
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class ResponseCallbackTest : UnitSpec() {
   private val server = MockWebServer().apply {
     enqueue(MockResponse().setBody("{response:  \"hello, world!\"}").setResponseCode(200))

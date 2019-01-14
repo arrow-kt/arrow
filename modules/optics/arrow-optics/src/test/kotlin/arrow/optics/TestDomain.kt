@@ -9,19 +9,16 @@ sealed class SumType {
   data class B(val int: Int) : SumType()
 }
 
-object AGen : Gen<SumType.A> {
-  override fun generate(): SumType.A = SumType.A(Gen.string().generate())
-}
+val genSumTypeA: Gen<SumType.A> = Gen.string().map { SumType.A(it) }
 
-object SumGen : Gen<SumType> {
-  override fun generate(): SumType = Gen.oneOf(AGen, Gen.create { SumType.B(Gen.int().generate()) }).generate()
-}
+val genSum: Gen<SumType> =
+  Gen.oneOf<SumType>(Gen.string().map { SumType.A(it) }, Gen.int().map { SumType.B(it) })
 
 val sumPrism: Prism<SumType, String> = Prism(
   {
     when (it) {
       is SumType.A -> Right(it.string)
-      else -> Left(it)
+      else         -> Left(it)
     }
   },
   SumType::A
@@ -63,14 +60,11 @@ internal data class Token(val value: String) {
   }
 }
 
-internal object TokenGen : Gen<Token> {
-  override fun generate() = Token(Gen.string().generate())
-}
+internal val genToken : Gen<Token> = Gen.string().map { Token(it) }
 
 internal data class User(val token: Token)
-internal object UserGen : Gen<User> {
-  override fun generate() = User(TokenGen.generate())
-}
+
+internal val genUser : Gen<User> = genToken.map { User(it) }
 
 internal val tokenGetter: Getter<Token, String> = Getter(Token::value)
 

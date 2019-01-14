@@ -5,15 +5,15 @@ import com.google.common.io.Files
 import com.google.testing.compile.CompilationSubject.assertThat
 import com.google.testing.compile.Compiler.javac
 import com.google.testing.compile.JavaFileObjects
-import io.kotlintest.matchers.shouldBe
-import io.kotlintest.specs.StringSpec
+import io.kotlintest.shouldBe
+import io.kotlintest.specs.AbstractStringSpec
 import java.io.File
 import java.nio.file.Paths
 
 abstract class APTest(
   private val pckg: String,
   private val enforcePackage: Boolean = true
-) : StringSpec() {
+) : AbstractStringSpec() {
 
   fun testProcessor(
     vararg processor: AnnotationProcessor,

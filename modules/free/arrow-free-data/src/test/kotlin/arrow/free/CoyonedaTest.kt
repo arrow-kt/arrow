@@ -7,12 +7,12 @@ import arrow.core.extensions.option.functor.functor
 import arrow.test.UnitSpec
 import arrow.test.laws.FunctorLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.properties.forAll
+import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class CoyonedaTest : UnitSpec() {
   val EQ: Eq<CoyonedaOf<ForId, Int, Int>> = Eq { a, b ->
     a.fix().lower(Id.functor()) == b.fix().lower(Id.functor())

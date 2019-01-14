@@ -6,7 +6,6 @@ import arrow.effects.rx2.extensions.asyncError
 import arrow.effects.rx2.extensions.asyncLatest
 import arrow.effects.rx2.extensions.asyncMissing
 import arrow.effects.rx2.extensions.flowablek.async.async
-import arrow.effects.rx2.extensions.flowablek.foldable.foldable
 import arrow.effects.rx2.extensions.flowablek.functor.functor
 import arrow.effects.rx2.extensions.flowablek.monad.flatMap
 import arrow.effects.rx2.extensions.flowablek.monadThrow.bindingCatch
@@ -14,13 +13,11 @@ import arrow.effects.rx2.extensions.flowablek.traverse.traverse
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
-import arrow.test.laws.FoldableLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.Spec
-import io.kotlintest.matchers.shouldBe
-import io.kotlintest.matchers.shouldNotBe
+import io.kotlintest.runner.junit4.KotlinTestRunner
+import io.kotlintest.shouldBe
+import io.kotlintest.shouldNotBe
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subscribers.TestSubscriber
@@ -28,7 +25,7 @@ import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class FlowableKTests : UnitSpec() {
 
   fun <T> EQ(): Eq<FlowableKOf<T>> = object : Eq<FlowableKOf<T>> {
@@ -51,11 +48,6 @@ class FlowableKTests : UnitSpec() {
         errA == errB
       }
 
-  }
-
-  override fun interceptSpec(context: Spec, spec: () -> Unit) {
-    println("FlowableK: Skipping sync laws for stack safety because they are not supported. See https://github.com/ReactiveX/RxJava/issues/6322")
-    super.interceptSpec(context, spec)
   }
 
   init {
@@ -85,10 +77,7 @@ class FlowableKTests : UnitSpec() {
     //testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), EQ(), EQ()))
     //testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), EQ(), EQ()))
 
-    testLaws(
-      FoldableLaws.laws(FlowableK.foldable(), { FlowableK.just(it) }, Eq.any()),
-      TraverseLaws.laws(FlowableK.traverse(), FlowableK.functor(), { FlowableK.just(it) }, EQ())
-    )
+    testLaws(TraverseLaws.laws(FlowableK.traverse(), FlowableK.functor(), { FlowableK.just(it) }, EQ()))
 
     "Multi-thread Flowables finish correctly" {
       val value: Flowable<Long> = bindingCatch {

@@ -8,10 +8,9 @@ import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.Spec
-import io.kotlintest.matchers.shouldBe
-import io.kotlintest.matchers.shouldNotBe
+import io.kotlintest.runner.junit4.KotlinTestRunner
+import io.kotlintest.shouldBe
+import io.kotlintest.shouldNotBe
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.CoreMatchers.startsWith
 import org.hamcrest.MatcherAssert.assertThat
@@ -24,7 +23,7 @@ import java.time.Duration
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class MonoKTest : UnitSpec() {
 
   fun <T> assertThreadNot(mono: Mono<T>, name: String): Mono<T> =
@@ -51,11 +50,6 @@ class MonoKTest : UnitSpec() {
 
         errA == errB
       }
-  }
-
-  override fun interceptSpec(context: Spec, spec: () -> Unit) {
-    println("MonoK: Skipping sync laws for stack safety because they are not supported. See https://github.com/reactor/reactor-core/issues/1441")
-    super.interceptSpec(context, spec)
   }
 
   init {

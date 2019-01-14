@@ -14,8 +14,8 @@ import arrow.core.extensions.option.monad.monad
 import arrow.test.UnitSpec
 import arrow.test.laws.EqLaws
 import arrow.test.laws.MonadLaws
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
+import io.kotlintest.runner.junit4.KotlinTestRunner
+import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
 
 @higherkind
@@ -32,7 +32,7 @@ sealed class Ops<out A> : OpsOf<A> {
   }
 }
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class FreeTest : UnitSpec() {
 
   private val program = Ops.binding {
