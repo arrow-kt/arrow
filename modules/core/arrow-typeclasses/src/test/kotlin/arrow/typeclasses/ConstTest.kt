@@ -7,10 +7,10 @@ import arrow.core.extensions.monoid
 import arrow.mtl.extensions.const.traverseFilter.traverseFilter
 import arrow.test.UnitSpec
 import arrow.test.laws.*
-import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class ConstTest : UnitSpec() {
   init {
     Int.monoid().run {

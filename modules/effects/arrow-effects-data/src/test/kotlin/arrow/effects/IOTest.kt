@@ -13,14 +13,13 @@ import arrow.effects.typeclasses.seconds
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.laws.ConcurrentLaws
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.fail
-import io.kotlintest.matchers.shouldBe
-import io.kotlintest.matchers.shouldEqual
+import io.kotlintest.fail
+import io.kotlintest.runner.junit4.KotlinTestRunner
+import io.kotlintest.shouldBe
 import kotlinx.coroutines.newSingleThreadContext
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class IOTest : UnitSpec() {
 
   init {
@@ -29,9 +28,9 @@ class IOTest : UnitSpec() {
     "should defer evaluation until run" {
       var run = false
       val ioa = IO { run = true }
-      run shouldEqual false
+      run shouldBe false
       ioa.unsafeRunSync()
-      run shouldEqual true
+      run shouldBe true
     }
 
     class MyException : Exception()
@@ -48,14 +47,6 @@ class IOTest : UnitSpec() {
 
     "should yield immediate successful invoke value" {
       val run = IO { 1 }.unsafeRunSync()
-
-      val expected = 1
-
-      run shouldBe expected
-    }
-
-    "should yield immediate successful pure value" {
-      val run = IO.just(1).unsafeRunSync()
 
       val expected = 1
 
@@ -243,7 +234,7 @@ class IOTest : UnitSpec() {
       fun makePar(num: Long) =
         IO(newSingleThreadContext("$num")) {
           // Sleep according to my number
-          Thread.sleep(num * 20)
+          Thread.sleep(num * 40)
         }.map {
           // Add myself to order list
           order.add(num)
@@ -272,14 +263,14 @@ class IOTest : UnitSpec() {
       fun makePar(num: Long) =
         IO(newSingleThreadContext("$num")) {
           // Sleep according to my number
-          Thread.sleep(num * 20)
+          Thread.sleep(num * 30)
           num
         }.order()
 
       val result =
         parMapN(newSingleThreadContext("all"),
           makePar(6), IO.just(1L).order(), makePar(4), IO.defer { IO.just(2L) }.order(), makePar(5), IO { 3L }.order())
-        { six, tree, two, four, one, five -> listOf(six, tree, two, four, one, five) }
+        { six, one, four, two, five, three -> listOf(six, one, four, two, five, three) }
           .unsafeRunSync()
 
       result shouldBe listOf(6L, 1, 4, 2, 5, 3)
@@ -339,7 +330,7 @@ class IOTest : UnitSpec() {
             }
         IO(newSingleThreadContext("CancelThread")) { }
           .unsafeRunAsync { cancel() }
-      }.unsafeRunTimed(2.seconds).exists { it == OnCancel.CancellationException }
+      }.unsafeRunTimed(2.seconds) shouldBe Some(OnCancel.CancellationException)
     }
 
     "unsafeRunAsyncCancellable can cancel even for infinite asyncs" {

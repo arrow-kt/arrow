@@ -15,11 +15,11 @@ import arrow.test.generators.genOption
 import arrow.test.laws.IsoLaws
 import arrow.test.laws.OptionalLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class ListTest : UnitSpec() {
 
   init {
@@ -55,8 +55,8 @@ class ListTest : UnitSpec() {
     testLaws(IsoLaws.laws(
       iso = ListExtensions.toListK(),
       aGen = Gen.list(Gen.int()),
-      bGen = Gen.create { Gen.list(Gen.int()).generate().k() },
-      funcGen = genFunctionAToB(Gen.create { Gen.list(Gen.int()).generate().k() }),
+      bGen = Gen.list(Gen.int()).map { it.k() },
+      funcGen = genFunctionAToB(Gen.list(Gen.int()).map { it.k() }),
       EQA = Eq.any(),
       EQB = Eq.any(),
       bMonoid = ListK.monoid())

@@ -2,12 +2,12 @@ package arrow.syntax.test
 
 import arrow.syntax.function.*
 import arrow.test.UnitSpec
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
+import io.kotlintest.runner.junit4.KotlinTestRunner
+import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
 import java.util.*
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class FunctionSyntaxTest : UnitSpec() {
 
   val f = { prefix: String, numericPostfix: Int, values: List<String> ->
@@ -33,7 +33,8 @@ class FunctionSyntaxTest : UnitSpec() {
       val ninja = "ninja"
       val get = { potato }
       val map = { word: String -> ninja + word }
-      ninja + potato shouldBe (get andThen map)()
+      (get andThen map)()
+      (ninja + potato) shouldBe (get andThen map)()
     }
 
     "it should compose function correctly (forwardCompose)" {

@@ -3,8 +3,9 @@ package arrow.test.generators
 import arrow.Kind
 import arrow.Kind2
 import arrow.core.*
-import arrow.data.*
+import arrow.core.extensions.option.functor.map
 import arrow.core.extensions.option.functor.functor
+import arrow.data.*
 import arrow.recursion.Algebra
 import arrow.recursion.Coalgebra
 import arrow.recursion.typeclasses.Corecursive
@@ -14,104 +15,65 @@ import io.kotlintest.properties.Gen
 import java.util.concurrent.TimeUnit
 
 fun <F, A> genApplicative(valueGen: Gen<A>, AP: Applicative<F>): Gen<Kind<F, A>> =
-  object : Gen<Kind<F, A>> {
-    override fun generate(): Kind<F, A> =
-      AP.just(valueGen.generate())
-  }
+   valueGen.map { AP.just(it) }
 
-fun <A, B> genFunctionAToB(genB: Gen<B>): Gen<(A) -> B> =
-  object : Gen<(A) -> B> {
-    override fun generate(): (A) -> B {
-      val v = genB.generate()
-      return { _ -> v }
-    }
-  }
+fun <A, B> genFunctionAToB(genB: Gen<B>): Gen<(A) -> B> = genB.map { b:B -> { _: A -> b } }
 
-fun <A> genFunctionAAToA(genA: Gen<A>): Gen<(A, A) -> A> =
-  object : Gen<(A, A) -> A> {
-    override fun generate(): (A, A) -> A {
-      val v = genA.generate()
-      return { _, _ -> v }
-    }
-  }
+fun <A> genFunctionAAToA(genA: Gen<A>): Gen<(A, A) -> A> = genA.map { a:A -> { _: A, _: A -> a } }
 
-fun genThrowable(): Gen<Throwable> = object : Gen<Throwable> {
-  override fun generate(): Throwable =
-    Gen.oneOf(listOf(RuntimeException(), NoSuchElementException(), IllegalArgumentException())).generate()
-}
+fun genThrowable(): Gen<Throwable> = Gen.from(listOf(RuntimeException(), NoSuchElementException(), IllegalArgumentException()))
 
-inline fun <F, A> genConstructor(valueGen: Gen<A>, crossinline cf: (A) -> Kind<F, A>): Gen<Kind<F, A>> =
-  object : Gen<Kind<F, A>> {
-    override fun generate(): Kind<F, A> =
-      cf(valueGen.generate())
-  }
+fun <F, A> genConstructor(valueGen: Gen<A>, cf: (A) -> Kind<F, A>): Gen<Kind<F, A>> = valueGen.map(cf)
 
-inline fun <F, A> genDoubleConstructor(valueGen: Gen<A>, crossinline cf: (A) -> Kind2<F, A, A>): Gen<Kind2<F, A, A>> =
-  object : Gen<Kind2<F, A, A>> {
-    override fun generate(): Kind2<F, A, A> =
-      cf(valueGen.generate())
-  }
+fun <F, A> genDoubleConstructor(valueGen: Gen<A>, cf: (A) -> Kind2<F, A, A>): Gen<Kind2<F, A, A>> =
+  valueGen.map(cf)
 
-inline fun <F, A, B> genConstructor2(valueGen: Gen<A>, crossinline ff: (A) -> Kind<F, (A) -> B>): Gen<Kind<F, (A) -> B>> =
-  object : Gen<Kind<F, (A) -> B>> {
-    override fun generate(): Kind<F, (A) -> B> =
-      ff(valueGen.generate())
-  }
+fun <F, A, B> genConstructor2(valueGen: Gen<A>, ff: (A) -> Kind<F, (A) -> B>): Gen<Kind<F, (A) -> B>> = valueGen.map(ff)
 
-fun genIntSmall(): Gen<Int> =
-  Gen.oneOf(Gen.negativeIntegers(), Gen.choose(0, Int.MAX_VALUE / 10000))
+fun genIntSmall(): Gen<Int> = Gen.oneOf(Gen.choose(Int.MIN_VALUE / 10000, -1), Gen.choose(0, Int.MAX_VALUE / 10000))
 
-fun <A, B> genTuple(genA: Gen<A>, genB: Gen<B>): Gen<Tuple2<A, B>> =
-  object : Gen<Tuple2<A, B>> {
-    override fun generate(): Tuple2<A, B> = Tuple2(genA.generate(), genB.generate())
-  }
+fun <A, B> genTuple(genA: Gen<A>, genB: Gen<B>): Gen<Tuple2<A, B>> = Gen.bind(genA,genB){ a:A, b:B -> Tuple2(a, b) }
 
 fun <A, B, C> genTuple(genA: Gen<A>, genB: Gen<B>, genC: Gen<C>): Gen<Tuple3<A, B, C>> =
-  object : Gen<Tuple3<A, B, C>> {
-    override fun generate(): Tuple3<A, B, C> = Tuple3(genA.generate(), genB.generate(), genC.generate())
-  }
+  Gen.bind(genA,genB, genC){a:A, b:B, c:C -> Tuple3(a, b, c)}
 
 fun <A, B, C, D> genTuple(genA: Gen<A>, genB: Gen<B>, genC: Gen<C>, genD: Gen<D>): Gen<Tuple4<A, B, C, D>> =
-  object : Gen<Tuple4<A, B, C, D>> {
-    override fun generate(): Tuple4<A, B, C, D> = Tuple4(genA.generate(), genB.generate(), genC.generate(), genD.generate())
-  }
+  Gen.bind(genA,genB, genC, genD){a:A, b:B, c:C, d:D -> Tuple4(a, b, c, d)}
 
 fun <A, B, C, D, E> genTuple(genA: Gen<A>, genB: Gen<B>, genC: Gen<C>, genD: Gen<D>, genE: Gen<E>): Gen<Tuple5<A, B, C, D, E>> =
-  object : Gen<Tuple5<A, B, C, D, E>> {
-    override fun generate(): Tuple5<A, B, C, D, E> = Tuple5(genA.generate(), genB.generate(), genC.generate(), genD.generate(), genE.generate())
-  }
+  Gen.bind(genA,genB, genC, genD, genE){a:A, b:B, c:C, d:D, e:E -> Tuple5(a, b, c, d, e)}
 
 fun <A, B, C, D, E, F> genTuple(genA: Gen<A>, genB: Gen<B>, genC: Gen<C>, genD: Gen<D>, genE: Gen<E>, genF: Gen<F>): Gen<Tuple6<A, B, C, D, E, F>> =
-  object : Gen<Tuple6<A, B, C, D, E, F>> {
-    override fun generate(): Tuple6<A, B, C, D, E, F> = Tuple6(genA.generate(), genB.generate(), genC.generate(), genD.generate(), genE.generate(), genF.generate())
-  }
+  Gen.bind(genA,genB, genC, genD, genE, genF){a:A, b:B, c:C, d:D, e:E, f:F -> Tuple6(a, b, c, d, e, f)}
 
 fun <A, B, C, D, E, F, G> genTuple(genA: Gen<A>, genB: Gen<B>, genC: Gen<C>, genD: Gen<D>, genE: Gen<E>, genF: Gen<F>, genG: Gen<G>): Gen<Tuple7<A, B, C, D, E, F, G>> =
-  object : Gen<Tuple7<A, B, C, D, E, F, G>> {
-    override fun generate(): Tuple7<A, B, C, D, E, F, G> = Tuple7(genA.generate(), genB.generate(), genC.generate(), genD.generate(), genE.generate(), genF.generate(), genG.generate())
-  }
+  Gen.bind(genA,genB, genC, genD, genE, genF, genG){a:A, b:B, c:C, d:D, e:E, f:F, g:G -> Tuple7(a, b, c, d, e, f, g) }
 
 fun <A, B, C, D, E, F, G, H> genTuple(genA: Gen<A>, genB: Gen<B>, genC: Gen<C>, genD: Gen<D>, genE: Gen<E>, genF: Gen<F>, genG: Gen<G>, genH: Gen<H>): Gen<Tuple8<A, B, C, D, E, F, G, H>> =
-  object : Gen<Tuple8<A, B, C, D, E, F, G, H>> {
-    override fun generate(): Tuple8<A, B, C, D, E, F, G, H> = Tuple8(genA.generate(), genB.generate(), genC.generate(), genD.generate(), genE.generate(), genF.generate(), genG.generate(), genH.generate())
-  }
+  Gen.bind(genTuple(genA,genB, genC, genD, genE, genF, genG), genH){ tuple: Tuple7<A, B, C, D, E, F, G>, h:H -> Tuple8(tuple.a, tuple.b, tuple.c, tuple.d, tuple.e, tuple.f, tuple.g, h)}
 
 fun <A, B, C, D, E, F, G, H, I> genTuple(genA: Gen<A>, genB: Gen<B>, genC: Gen<C>, genD: Gen<D>, genE: Gen<E>, genF: Gen<F>, genG: Gen<G>, genH: Gen<H>, genI: Gen<I>): Gen<Tuple9<A, B, C, D, E, F, G, H, I>> =
-  object : Gen<Tuple9<A, B, C, D, E, F, G, H, I>> {
-    override fun generate(): Tuple9<A, B, C, D, E, F, G, H, I> = Tuple9(genA.generate(), genB.generate(), genC.generate(), genD.generate(), genE.generate(), genF.generate(), genG.generate(), genH.generate(), genI.generate())
-  }
+  Gen.bind(genTuple(genA,genB, genC, genD, genE, genF, genG, genH), genI){ tuple: Tuple8<A, B, C, D, E, F, G, H>, i:I -> Tuple9(tuple.a, tuple.b, tuple.c, tuple.d, tuple.e, tuple.f, tuple.g, tuple.h, i)}
 
 fun <A, B, C, D, E, F, G, H, I, J> genTuple(genA: Gen<A>, genB: Gen<B>, genC: Gen<C>, genD: Gen<D>, genE: Gen<E>, genF: Gen<F>, genG: Gen<G>, genH: Gen<H>, genI: Gen<I>, genJ: Gen<J>): Gen<Tuple10<A, B, C, D, E, F, G, H, I, J>> =
-  object : Gen<Tuple10<A, B, C, D, E, F, G, H, I, J>> {
-    override fun generate(): Tuple10<A, B, C, D, E, F, G, H, I, J> = Tuple10(genA.generate(), genB.generate(), genC.generate(), genD.generate(), genE.generate(), genF.generate(), genG.generate(), genH.generate(), genI.generate(), genJ.generate())
-  }
+  Gen.bind(genTuple(genA,genB, genC, genD, genE, genF, genG, genH, genI), genJ){tuple: Tuple9<A, B, C, D, E, F, G, H, I>, j:J -> Tuple10(tuple.a, tuple.b, tuple.c, tuple.d, tuple.e, tuple.f, tuple.g, tuple.h, tuple.i, j)}
+
+fun genNonZeroInt(): Gen<Int> = Gen.int().filter { it != 0 }
+
+fun genLessThan(max: Int) : Gen<Int> = Gen.int().filter { it < max }
+
+fun genLessEqual(max: Int) : Gen<Int> = Gen.int().filter { it <= max }
+
+fun genGreaterThan(min: Int): Gen<Int> = Gen.int().filter { it > min }
+
+fun genGreaterEqual(min: Int) : Gen<Int> = Gen.int().filter { it >= min }
+
+fun genGreaterOrEqThan(max: Int) : Gen<Int> = Gen.int().filter { it >= max }
 
 fun genIntPredicate(): Gen<(Int) -> Boolean> =
-  Gen.int().let { gen ->
-    /* If you ever see two zeros in a row please contact the maintainers for a pat in the back */
-    val num = gen.generate().let { if (it == 0) gen.generate() else it }
+  genNonZeroInt().flatMap { num ->
     val absNum = Math.abs(num)
-    Gen.oneOf(listOf<(Int) -> Boolean>(
+    Gen.from(listOf<(Int) -> Boolean>(
       { it > num },
       { it <= num },
       { it % absNum == 0 },
@@ -120,76 +82,52 @@ fun genIntPredicate(): Gen<(Int) -> Boolean> =
   }
 
 fun <B> genOption(genB: Gen<B>): Gen<Option<B>> =
-  object : Gen<Option<B>> {
-    val random = genIntSmall()
-    override fun generate(): Option<B> =
-      if (random.generate() % 20 == 0) None else Option.just(genB.generate())
-  }
+  genB.orNull().map { it.toOption() }
 
-inline fun <reified E, reified A> genEither(genE: Gen<E>, genA: Gen<A>): Gen<Either<E, A>> =
-  object : Gen<Either<E, A>> {
-    override fun generate(): Either<E, A> =
-      Gen.oneOf(genE, genA).generate().let {
-        when (it) {
-          is E -> Left(it)
-          is A -> Right(it)
-          else -> throw IllegalStateException("genEither incorrect value $it")
-        }
-      }
-  }
-
-inline fun <reified E, reified A> genValidated(genE: Gen<E>, genA: Gen<A>): Gen<Validated<E, A>> =
-  Gen.create { Validated.fromEither(genEither(genE, genA).generate()) }
-
-inline fun <reified A> genTry(genA: Gen<A>, genThrowable: Gen<Throwable> = genThrowable()): Gen<Try<A>> = Gen.create {
-  genEither(genThrowable, genA).generate().fold(
-    { throwable -> Failure(throwable) },
-    { a -> Success(a) }
-  )
+fun <E, A> genEither(genE: Gen<E>, genA: Gen<A>): Gen<Either<E, A>>  {
+  val genLeft = genE.map<Either<E, A>> { Left(it) }
+  val genRight = genA.map<Either<E, A>> { Right(it) }
+  return Gen.oneOf(genLeft,genRight)
 }
 
-fun <A> genNullable(genA: Gen<A>): Gen<A?> =
-  Gen.oneOf(genA, Gen.create { null })
+fun <E, A> genValidated(genE: Gen<E>, genA: Gen<A>): Gen<Validated<E, A>> =
+  genEither(genE, genA).map { Validated.fromEither(it) }
+
+fun <A> genTry(genA: Gen<A>, genThrowable: Gen<Throwable> = genThrowable()): Gen<Try<A>> =
+  genEither(genThrowable, genA).map{ it.fold({ Failure(it) }, { Success(it) }) }
 
 fun <A> genNonEmptyList(genA: Gen<A>): Gen<NonEmptyList<A>> =
-  Gen.create { NonEmptyList(genA.generate(), Gen.list(genA).generate()) }
+  genA.flatMap { head -> Gen.list(genA).map { NonEmptyList(head, it) } }
 
-fun <K, V> genMap(genK: Gen<K>, genV: Gen<V>): Gen<Map<K, V>> =
-  Gen.create { Gen.list(genK).generate().map { it to genV.generate() }.toMap() }
+fun <K: Comparable<K>, V> genSortedMapK(genK: Gen<K>, genV: Gen<V>): Gen<SortedMapK<K, V>> =
+  Gen.bind(genK,genV) { k:K , v:V -> sortedMapOf(k to v) }.map { it.k() }
 
 fun <K, V> genMapK(genK: Gen<K>, genV: Gen<V>): Gen<MapK<K, V>> =
-  Gen.create { Gen.list(genK).generate().map { it to genV.generate() }.toMap().k() }
+  Gen.map(genK,genV).map { it.k() }
 
-fun genTimeUnit(): Gen<TimeUnit> = object : Gen<TimeUnit> {
-  val units = TimeUnit.values()
-  val random = Gen.choose(0, units.size - 1)
-  override fun generate(): TimeUnit = units[random.generate()]
-}
+fun genTimeUnit(): Gen<TimeUnit> = Gen.from(TimeUnit.values())
 
-fun <A> genListK(genA: Gen<A>): Gen<ListK<A>> =
-  Gen.create { Gen.list(genA).generate().k() }
+fun <A> genListK(genA: Gen<A>): Gen<ListK<A>> = Gen.list(genA).map{ it.k() }
 
-fun <A> genSequenceK(genA: Gen<A>): Gen<SequenceK<A>> =
-  Gen.create { Gen.list(genA).generate().asSequence().k() }
+fun <A> genSequenceK(genA: Gen<A>): Gen<SequenceK<A>> = Gen.list(genA).map{ it.asSequence().k() }
 
-fun genChars(): Gen<Char> =
-  Gen.oneOf(('A'..'Z') + ('a'..'z') + ('0'..'9') + "!@#$%%^&*()_-~`,<.?/:;}{][±§".toList())
+fun genNonEmptyString(): Gen<String> = Gen.string().filter{it.isNotEmpty()}
 
-fun <A> genSetK(genA: Gen<A>): Gen<SetK<A>> {
-  val genSetA = Gen.set(genA)
-  return Gen.create { genSetA.generate().k() }
-}
+fun genChar(): Gen<Char> =
+  Gen.from(('A'..'Z') + ('a'..'z') + ('0'..'9') + "!@#$%%^&*()_-~`,<.?/:;}{][±§".toList())
+
+fun <A> genSetK(genA: Gen<A>): Gen<SetK<A>> = Gen.set(genA).map{ it.k() }
 
 // For generating recursive data structures with recursion schemes
 
 typealias NatPattern = ForOption
 typealias GNat<T> = Kind<T, NatPattern>
 
-fun toGNatCoalgebra() = Coalgebra<NatPattern, Int> {
+fun toGNatCoalgebra(): Coalgebra<NatPattern, Int> = Coalgebra{
   if (it == 0) None else Some(it - 1)
 }
 
-fun fromGNatAlgebra() = Algebra<NatPattern, Eval<Int>> {
+fun fromGNatAlgebra(): Algebra<NatPattern, Eval<Int>> = Algebra{
   it.fix().fold({ Eval.Zero }, { it.map { it + 1 } })
 }
 

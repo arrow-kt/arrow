@@ -10,14 +10,14 @@ import arrow.effects.extensions.io.monadDefer.monadDefer
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.laws.equalUnderTheLaw
-import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import kotlinx.coroutines.Dispatchers
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class RefTest : UnitSpec() {
 
   init {
@@ -104,13 +104,11 @@ class RefTest : UnitSpec() {
       }
     }
 
-    "tryUpdate - modification occurs successfully" {
-      forAll(Gen.int(), Gen.int(), genFunctionAToB<Int, Int>(Gen.int())) { a, b, f ->
+    "tryUpdate - should fail to update if modification has occurred" {
+      forAll(Gen.int(), genFunctionAToB<Int, Int>(Gen.int())) { a, f ->
         Ref.of(a, IO.monadDefer()).flatMap { ref ->
           ref.tryUpdate {
-
-            ref.set(b).fix().unsafeRunSync()
-
+            ref.update(Int::inc).fix().unsafeRunSync()
             f(it)
           }
         }.equalUnderTheLaw(IO.just(false), EQ())

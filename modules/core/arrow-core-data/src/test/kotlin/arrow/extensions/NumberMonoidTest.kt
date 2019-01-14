@@ -2,11 +2,11 @@ package arrow.extensions
 
 import arrow.core.extensions.monoid
 import arrow.test.UnitSpec
-import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class NumberMonoidTest : UnitSpec() {
   init {
 
