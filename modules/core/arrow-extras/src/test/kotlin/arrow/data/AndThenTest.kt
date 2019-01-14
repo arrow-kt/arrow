@@ -2,11 +2,6 @@ package arrow.data
 
 import arrow.Kind
 import arrow.core.*
-import arrow.core.extensions.function1.category.category
-import arrow.core.extensions.function1.contravariant.contravariant
-import arrow.core.extensions.function1.monad.monad
-import arrow.core.extensions.function1.monoid.monoid
-import arrow.core.extensions.function1.profunctor.profunctor
 import arrow.core.extensions.monoid
 import arrow.data.extensions.andthen.category.category
 import arrow.data.extensions.andthen.contravariant.contravariant
@@ -21,13 +16,13 @@ import arrow.typeclasses.Conested
 import arrow.typeclasses.Eq
 import arrow.typeclasses.conest
 import arrow.typeclasses.counnest
-import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class AndThenTest : UnitSpec() {
 
   val ConestedEQ: Eq<Kind<Conested<ForAndThen, Int>, Int>> = Eq { a, b ->
@@ -42,7 +37,7 @@ class AndThenTest : UnitSpec() {
 
     testLaws(
       MonadLaws.laws(AndThen.monad(), EQ),
-      MonoidLaws.laws(AndThen.monoid<Int, Int>(Int.monoid()), AndThen { a: Int -> a + 1 }, EQ),
+      MonoidLaws.laws(AndThen.monoid<Int, Int>(Int.monoid()), Gen.int().map { i -> AndThen<Int, Int> { i } }, EQ),
       ContravariantLaws.laws(AndThen.contravariant(), { AndThen.just<Int, Int>(it).conest() }, ConestedEQ),
       ProfunctorLaws.laws(AndThen.profunctor(), { AndThen.just(it) }, EQ),
       CategoryLaws.laws(AndThen.category(), { AndThen.just(it) }, EQ)
