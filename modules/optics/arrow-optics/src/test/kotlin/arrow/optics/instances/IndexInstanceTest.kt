@@ -17,14 +17,16 @@ class IndexInstanceTest : UnitSpec() {
 
   init {
 
-    testLaws(OptionalLaws.laws(
-      optional = SequenceK.index<String>().index(5),
-      aGen = genSequenceK(Gen.string()),
-      bGen = Gen.string(),
-      funcGen = genFunctionAToB(Gen.string()),
-      EQOptionB = Eq.any(),
-      EQA = SequenceK.eq(String.eq())
-    ))
+    testLaws(
+      OptionalLaws.laws(
+        optionalGen = Gen.int().map { SequenceK.index<String>().index(it) },
+        aGen = genSequenceK(Gen.string()),
+        bGen = Gen.string(),
+        funcGen = genFunctionAToB(Gen.string()),
+        EQOptionB = Eq.any(),
+        EQA = SequenceK.eq(String.eq())
+      )
+    )
 
   }
 }

@@ -22,7 +22,7 @@ fun <A> A.shouldBeEq(b: A, eq: Eq<A>): Unit = eq.run {
 }
 
 fun <A> forFew(amount: Int, gena: Gen<A>, fn: (a: A) -> Boolean): Unit {
-  gena.random().take(amount).map{
+  gena.random().take(amount).map {
     if (!fn(it)) {
       throw AssertionError("Property failed for\n$it)")
     }

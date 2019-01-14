@@ -6,8 +6,6 @@ dependencies {
     kaptTest "com.google.dagger:dagger-compiler:$daggerVersion"
     testCompile("junit:junit:$jUnitVersion")
     testRuntime("org.junit.vintage:junit-vintage-engine:$jUnitVintageVersion")
-    testCompile("junit:junit:$jUnitVersion")
-    testRuntime("org.junit.vintage:junit-vintage-engine:$jUnitVintageVersion")
     testCompile "io.kotlintest:kotlintest-runner-junit4:$kotlinTestVersion"
     testCompile project(':arrow-test')
 }

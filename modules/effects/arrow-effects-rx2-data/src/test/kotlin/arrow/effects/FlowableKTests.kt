@@ -6,7 +6,6 @@ import arrow.effects.rx2.extensions.asyncError
 import arrow.effects.rx2.extensions.asyncLatest
 import arrow.effects.rx2.extensions.asyncMissing
 import arrow.effects.rx2.extensions.flowablek.async.async
-import arrow.effects.rx2.extensions.flowablek.foldable.foldable
 import arrow.effects.rx2.extensions.flowablek.functor.functor
 import arrow.effects.rx2.extensions.flowablek.monad.flatMap
 import arrow.effects.rx2.extensions.flowablek.monadThrow.bindingCatch
@@ -14,7 +13,6 @@ import arrow.effects.rx2.extensions.flowablek.traverse.traverse
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
-import arrow.test.laws.FoldableLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.runner.junit4.KotlinTestRunner
@@ -78,8 +76,6 @@ class FlowableKTests : UnitSpec() {
     // FIXME(paco) #691
     //testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), EQ(), EQ()))
     //testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), EQ(), EQ()))
-
-    testLaws(FoldableLaws.laws(FlowableK.foldable(), { FlowableK.just(it) }, Eq.any()))
 
     testLaws(TraverseLaws.laws(FlowableK.traverse(), FlowableK.functor(), { FlowableK.just(it) }, EQ()))
 

@@ -56,7 +56,7 @@ class PrismTest : UnitSpec() {
       ),
 
       OptionalLaws.laws(
-        optional = sumPrism.asOptional(),
+        optionalGen = Gen.constant(sumPrism.asOptional()),
         aGen = genSum,
         bGen = Gen.string(),
         funcGen = genFunctionAToB(Gen.string()),
@@ -65,50 +65,60 @@ class PrismTest : UnitSpec() {
       )
     )
 
-    testLaws(PrismLaws.laws(
-      prism = sumPrism.first(),
-      aGen = genTuple(genSum, Gen.int()),
-      bGen = genTuple(Gen.string(), Gen.int()),
-      funcGen = genFunctionAToB(genTuple(Gen.string(), Gen.int())),
-      EQA = Eq.any(),
-      EQOptionB = Eq.any()
-    ))
+    testLaws(
+      PrismLaws.laws(
+        prism = sumPrism.first(),
+        aGen = genTuple(genSum, Gen.int()),
+        bGen = genTuple(Gen.string(), Gen.int()),
+        funcGen = genFunctionAToB(genTuple(Gen.string(), Gen.int())),
+        EQA = Eq.any(),
+        EQOptionB = Eq.any()
+      )
+    )
 
-    testLaws(PrismLaws.laws(
-      prism = sumPrism.second(),
-      aGen = genTuple(Gen.int(), genSum),
-      bGen = genTuple(Gen.int(), Gen.string()),
-      funcGen = genFunctionAToB(genTuple(Gen.int(), Gen.string())),
-      EQA = Eq.any(),
-      EQOptionB = Eq.any()
-    ))
+    testLaws(
+      PrismLaws.laws(
+        prism = sumPrism.second(),
+        aGen = genTuple(Gen.int(), genSum),
+        bGen = genTuple(Gen.int(), Gen.string()),
+        funcGen = genFunctionAToB(genTuple(Gen.int(), Gen.string())),
+        EQA = Eq.any(),
+        EQOptionB = Eq.any()
+      )
+    )
 
-    testLaws(PrismLaws.laws(
-      prism = sumPrism.right<SumType, SumType, String, String, Int>(),
-      aGen = genEither(Gen.int(), genSum),
-      bGen = genEither(Gen.int(), Gen.string()),
-      funcGen = genFunctionAToB(genEither(Gen.int(), Gen.string())),
-      EQA = Eq.any(),
-      EQOptionB = Eq.any()
-    ))
+    testLaws(
+      PrismLaws.laws(
+        prism = sumPrism.right<SumType, SumType, String, String, Int>(),
+        aGen = genEither(Gen.int(), genSum),
+        bGen = genEither(Gen.int(), Gen.string()),
+        funcGen = genFunctionAToB(genEither(Gen.int(), Gen.string())),
+        EQA = Eq.any(),
+        EQOptionB = Eq.any()
+      )
+    )
 
-    testLaws(PrismLaws.laws(
-      prism = sumPrism.left<SumType, SumType, String, String, Int>(),
-      aGen = genEither(genSum, Gen.int()),
-      bGen = genEither(Gen.string(), Gen.int()),
-      funcGen = genFunctionAToB(genEither(Gen.string(), Gen.int())),
-      EQA = Eq.any(),
-      EQOptionB = Eq.any()
-    ))
+    testLaws(
+      PrismLaws.laws(
+        prism = sumPrism.left<SumType, SumType, String, String, Int>(),
+        aGen = genEither(genSum, Gen.int()),
+        bGen = genEither(Gen.string(), Gen.int()),
+        funcGen = genFunctionAToB(genEither(Gen.string(), Gen.int())),
+        EQA = Eq.any(),
+        EQOptionB = Eq.any()
+      )
+    )
 
-    testLaws(PrismLaws.laws(
-      prism = Prism.id(),
-      aGen = genEither(Gen.int(), Gen.int()),
-      bGen = genEither(Gen.int(), Gen.int()),
-      funcGen = genFunctionAToB(genEither(Gen.int(), Gen.int())),
-      EQA = Eq.any(),
-      EQOptionB = Eq.any()
-    ))
+    testLaws(
+      PrismLaws.laws(
+        prism = Prism.id(),
+        aGen = genEither(Gen.int(), Gen.int()),
+        bGen = genEither(Gen.int(), Gen.int()),
+        funcGen = genFunctionAToB(genEither(Gen.int(), Gen.int())),
+        EQA = Eq.any(),
+        EQOptionB = Eq.any()
+      )
+    )
 
     with(sumPrism.asFold()) {
 
@@ -139,14 +149,14 @@ class PrismTest : UnitSpec() {
       "asFold should behave as valid Fold: combineAll" {
         forAll(genSum) { sum: SumType ->
           combineAll(String.monoid(), sum) ==
-            sumPrism.getOption(sum).fold({ String.monoid().empty() }, ::identity)
+              sumPrism.getOption(sum).fold({ String.monoid().empty() }, ::identity)
         }
       }
 
       "asFold should behave as valid Fold: fold" {
         forAll(genSum) { sum: SumType ->
           fold(String.monoid(), sum) ==
-            sumPrism.getOption(sum).fold({ String.monoid().empty() }, ::identity)
+              sumPrism.getOption(sum).fold({ String.monoid().empty() }, ::identity)
         }
       }
 
@@ -166,7 +176,7 @@ class PrismTest : UnitSpec() {
     "Joining two prisms together with same target should yield same result" {
       forAll(genSum) { a ->
         (sumPrism compose stringPrism).getOption(a) == sumPrism.getOption(a).flatMap(stringPrism::getOption) &&
-          (sumPrism + stringPrism).getOption(a) == (sumPrism compose stringPrism).getOption(a)
+            (sumPrism + stringPrism).getOption(a) == (sumPrism compose stringPrism).getOption(a)
       }
     }
 

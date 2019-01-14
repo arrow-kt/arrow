@@ -20,24 +20,28 @@ class SetInstanceTest : UnitSpec() {
 
   init {
 
-    testLaws(LensLaws.laws(
-      lens = SetK.at<String>().at(Gen.string().random().first()),
-      aGen = genSetK(Gen.string()),
-      bGen = Gen.bool(),
-      funcGen = genFunctionAToB(Gen.bool()),
-      EQA = SetK.eq(String.eq()),
-      EQB = Eq.any(),
-      MB = AndMonoid
-    ))
+    testLaws(
+      LensLaws.laws(
+        lensGen = Gen.string().map { SetK.at<String>().at(it) },
+        aGen = genSetK(Gen.string()),
+        bGen = Gen.bool(),
+        funcGen = genFunctionAToB(Gen.bool()),
+        EQA = SetK.eq(String.eq()),
+        EQB = Eq.any(),
+        MB = AndMonoid
+      )
+    )
 
-    testLaws(LensLaws.laws(
-      lens = SetAt<String>().at(Gen.string().random().first()),
-      aGen = Gen.set(Gen.string()),
-      bGen = Gen.bool(),
-      funcGen = genFunctionAToB(Gen.bool()),
-      EQA = Eq.any(),
-      EQB = Eq.any(),
-      MB = AndMonoid
-    ))
+    testLaws(
+      LensLaws.laws(
+        lensGen = Gen.string().map { SetAt<String>().at(it) },
+        aGen = Gen.set(Gen.string()),
+        bGen = Gen.bool(),
+        funcGen = genFunctionAToB(Gen.bool()),
+        EQA = Eq.any(),
+        EQB = Eq.any(),
+        MB = AndMonoid
+      )
+    )
   }
 }

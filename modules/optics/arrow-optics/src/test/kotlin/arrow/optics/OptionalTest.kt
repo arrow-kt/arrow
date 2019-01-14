@@ -26,7 +26,7 @@ class OptionalTest : UnitSpec() {
   init {
 
     testLaws(OptionalLaws.laws(
-      optional = optionalHead,
+      optionalGen = Gen.constant(optionalHead),
       aGen = Gen.list(Gen.int()),
       bGen = Gen.int(),
       funcGen = genFunctionAToB(Gen.int()),
@@ -35,7 +35,7 @@ class OptionalTest : UnitSpec() {
     ))
 
     testLaws(OptionalLaws.laws(
-      optional = Optional.id(),
+      optionalGen = Gen.constant(Optional.id()),
       aGen = Gen.int(),
       bGen = Gen.int(),
       funcGen = genFunctionAToB(Gen.int()),
@@ -44,7 +44,7 @@ class OptionalTest : UnitSpec() {
     ))
 
     testLaws(OptionalLaws.laws(
-      optional = optionalHead.first(),
+      optionalGen = Gen.constant(optionalHead.first()),
       aGen = genTuple(Gen.list(Gen.int()), Gen.bool()),
       bGen = genTuple(Gen.int(), Gen.bool()),
       funcGen = genFunctionAToB(genTuple(Gen.int(), Gen.bool())),
@@ -53,7 +53,7 @@ class OptionalTest : UnitSpec() {
     ))
 
     testLaws(OptionalLaws.laws(
-      optional = optionalHead.first(),
+      optionalGen = Gen.constant(optionalHead.first()),
       aGen = genTuple(Gen.list(Gen.int()), Gen.bool()),
       bGen = genTuple(Gen.int(), Gen.bool()),
       funcGen = genFunctionAToB(genTuple(Gen.int(), Gen.bool())),
@@ -62,7 +62,7 @@ class OptionalTest : UnitSpec() {
     ))
 
     testLaws(OptionalLaws.laws(
-      optional = optionalHead.second(),
+      optionalGen = Gen.constant(optionalHead.second()),
       aGen = genTuple(Gen.bool(), Gen.list(Gen.int())),
       bGen = genTuple(Gen.bool(), Gen.int()),
       funcGen = genFunctionAToB(genTuple(Gen.bool(), Gen.int())),
