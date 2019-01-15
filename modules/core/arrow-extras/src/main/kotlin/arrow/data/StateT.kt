@@ -99,7 +99,7 @@ class StateT<F, S, A>(
      * @param f the modify function to apply.
      */
     fun <F, S> modify(AF: Applicative<F>, f: (S) -> S): StateT<F, S, Unit> = AF.run {
-      StateT<F, S, Unit>(just({ s ->
+      StateT(just({ s ->
         just(f(s)).map { Tuple2(it, Unit) }
       }))
     }
@@ -169,7 +169,7 @@ class StateT<F, S, A>(
   fun <B, Z> map2(MF: Monad<F>, sb: StateTOf<F, S, B>, fn: (A, B) -> Z): StateT<F, S, Z> =
     MF.run {
       invokeF(runF.map2(sb.fix().runF) { (ssa, ssb) ->
-        ssa.andThen { fsa ->
+        AndThen(ssa).andThen { fsa ->
           fsa.flatMap { (s, a) ->
             ssb(s).map { (s, b) -> Tuple2(s, fn(a, b)) }
           }
@@ -186,7 +186,7 @@ class StateT<F, S, A>(
    */
   fun <B, Z> map2Eval(MF: Monad<F>, sb: EvalOf<StateT<F, S, B>>, fn: (A, B) -> Z): Eval<StateT<F, S, Z>> = MF.run {
     runF.map2Eval(sb.fix().map { it.runF }) { (ssa, ssb) ->
-      ssa.andThen { fsa ->
+      AndThen(ssa).andThen { fsa ->
         fsa.flatMap { (s, a) ->
           ssb((s)).map { (s, b) -> Tuple2(s, fn(a, b)) }
         }
@@ -221,7 +221,7 @@ class StateT<F, S, A>(
   fun <B> flatMap(MF: Monad<F>, fas: (A) -> StateTOf<F, S, B>): StateT<F, S, B> = MF.run {
     invokeF(
       runF.map { sfsa ->
-        sfsa.andThen { fsa ->
+        AndThen(sfsa).andThen { fsa ->
           fsa.flatMap {
             fas(it.b).runM(MF, it.a)
           }
@@ -238,7 +238,7 @@ class StateT<F, S, A>(
   fun <B> flatMapF(MF: Monad<F>, faf: (A) -> Kind<F, B>): StateT<F, S, B> = MF.run {
     invokeF(
       runF.map { sfsa ->
-        sfsa.andThen { fsa ->
+        AndThen(sfsa).andThen { fsa ->
           fsa.flatMap { (s, a) ->
             faf(a).map { b -> Tuple2(s, b) }
           }
