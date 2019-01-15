@@ -28,7 +28,9 @@ interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F> {
  * Oftentimes we find ourselves in situations where we need to sequence some computations that could potentially fail.
  * [bindingCatch] allows us to safely compute those by automatically catching any exceptions thrown during the process.
  *
- * ```kotlin:ank:playground
+ * ```kotlin:ank:playground:extension
+ * _imports_
+ *
  * import arrow.Kind
  * import arrow.effects.*
  * import arrow.effects.extensions.io.async.async
@@ -57,7 +59,7 @@ interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F> {
  *        impact
  *      }
  *    //sampleEnd
- *    println(IO.async().attack())
+ *    println(_extensionFactory_.attack())
  * }
  * ```
  */
