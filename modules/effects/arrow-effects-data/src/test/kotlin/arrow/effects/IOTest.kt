@@ -371,7 +371,7 @@ class IOTest : UnitSpec() {
 
     "Cancelable should run CancelToken" {
       Promise.uncancelable<ForIO, Unit>(IO.async()).flatMap { p ->
-        IO.async().cancelable<Unit> { _ ->
+        IO.concurrent().cancelable<Unit> { _ ->
           p.complete(Unit)
         }.fix()
           .unsafeRunAsyncCancellable { }
@@ -383,7 +383,7 @@ class IOTest : UnitSpec() {
 
     "CancelableF should run CancelToken" {
       Promise.uncancelable<ForIO, Unit>(IO.async()).flatMap { p ->
-        IO.async().cancelableF<Unit> { _ ->
+        IO.concurrent().cancelableF<Unit> { _ ->
           IO { p.complete(Unit) }
         }.fix()
           .unsafeRunAsyncCancellable { }
