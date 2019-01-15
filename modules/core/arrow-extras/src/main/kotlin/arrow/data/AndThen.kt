@@ -2,6 +2,7 @@ package arrow.data
 
 import arrow.core.*
 import arrow.higherkind
+import kotlin.coroutines.CoroutineContext
 
 operator fun <A, B> AndThenOf<A, B>.invoke(a: A): B = fix().invoke(a)
 
@@ -46,16 +47,17 @@ sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
   }
 
   /**
+   * Compose a function to be invoked after the current function is invoked.
+   *
    * ```kotlin:ank:playground
    * import arrow.data.AndThen
    * import arrow.data.extensions.list.foldable.foldLeft
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val f = (0..10000).toList()
-   *     .foldLeft(AndThen { x: Int -> x + 1 }) { acc, _ ->
-   *       acc.andThen { it + 1 }
-   *     }
+   *   val f = (0..10000).toList().foldLeft(AndThen { i: Int -> i + 1 }) { acc, _ ->
+   *     acc.andThen { it + 1 }
+   *   }
    *
    *   val result = f(0)
    *   //sampleEnd
@@ -63,8 +65,9 @@ sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
    * }
    * ```
    *
-   * @param g function to invoke after this [AndThen].
-   * @return a function wrapped in [AndThen] from [A] to [X].
+   * @param g function to apply on the result of this function.
+   * @return a composed [AndThen] function that first applies this function to its input,
+   * and then applies [g] to the result.
    */
   fun <X> andThen(g: (B) -> X): AndThen<A, X> =
     when (this) {
@@ -75,6 +78,8 @@ sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
     }
 
   /**
+   * Compose a function to be invoked before the current function is invoked.
+   *
    * ```kotlin:ank:playground
    * import arrow.data.AndThen
    * import arrow.data.extensions.list.foldable.foldLeft
@@ -91,8 +96,9 @@ sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
    * }
    * ```
    *
-   * @param g function to invoke before this [AndThen].
-   * @return a function wrapped in [AndThen] from [C] to [B].
+   * @param g function to invoke before invoking this function with the result.
+   * @return a composed [AndThen] function that first applies [g] to its input,
+   * and then applies this function to the result.
    */
   infix fun <C> compose(g: (C) -> A): AndThen<C, B> =
     when (this) {
@@ -143,6 +149,7 @@ sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
    *
    * @param a value to invoke function with
    * @return result of type [B].
+   *
    **/
   @Suppress("UNCHECKED_CAST")
   override fun invoke(a: A): B = loop(this as AndThen<Any?, Any?>, a)
@@ -174,6 +181,7 @@ sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
      *
      * @param f the function to wrap
      * @return wrapped function [f].
+     *
      */
     operator fun <A, B> invoke(f: (A) -> B): AndThen<A, B> = when (f) {
       is AndThen<A, B> -> f
