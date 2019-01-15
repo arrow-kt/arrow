@@ -2,7 +2,6 @@ package arrow.data
 
 import arrow.core.*
 import arrow.higherkind
-import kotlin.coroutines.CoroutineContext
 
 operator fun <A, B> AndThenOf<A, B>.invoke(a: A): B = fix().invoke(a)
 
