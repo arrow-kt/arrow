@@ -1,4 +1,2 @@
 plugins:
   - jekyll-redirect-from
-
-permalink: /:categories/:title/
