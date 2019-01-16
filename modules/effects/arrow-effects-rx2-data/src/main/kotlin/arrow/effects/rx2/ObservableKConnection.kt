@@ -19,6 +19,7 @@ typealias ObservableKProcF<A> = (ObservableKConnection, (Either<Throwable, A>) -
  *
  * @see ObservableK.async
  */
+@Suppress("UNUSED_PARAMETER", "FunctionName")
 fun ObservableKConnection(dummy: Unit = Unit): KindConnection<ForObservableK> = KindConnection(object : MonadDefer<ForObservableK> {
   override fun <A> defer(fa: () -> ObservableKOf<A>): ObservableK<A> =
     ObservableK.defer(fa)

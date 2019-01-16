@@ -20,6 +20,7 @@ import kotlinx.coroutines.newSingleThreadContext
 import org.junit.runner.RunWith
 
 @RunWith(KotlinTestRunner::class)
+@kotlinx.coroutines.ObsoleteCoroutinesApi
 class IOTest : UnitSpec() {
 
   init {
@@ -151,7 +152,6 @@ class IOTest : UnitSpec() {
         either.fold({ fail("") }, { IO { it shouldBe expected } })
       }
     }
-
 
     "should complete when running a return value with runAsync" {
       val expected = 0
@@ -300,7 +300,7 @@ class IOTest : UnitSpec() {
         parMapN(newSingleThreadContext("here"),
           IO { Thread.currentThread().name },
           IO.defer { IO.just(Thread.currentThread().name) },
-          IO.async<String> { TODO, cb -> cb(Thread.currentThread().name.right()) },
+          IO.async<String> { _, cb -> cb(Thread.currentThread().name.right()) },
           ::Tuple3)
           .unsafeRunSync()
 
@@ -308,10 +308,10 @@ class IOTest : UnitSpec() {
     }
 
     "unsafeRunAsyncCancellable should cancel correctly" {
-      IO.async { TODO, cb: (Either<Throwable, Int>) -> Unit ->
+      IO.async { _, cb: (Either<Throwable, Int>) -> Unit ->
         val cancel =
           IO(newSingleThreadContext("RunThread")) { }
-            .flatMap { IO.async<Int> { TODO, cb -> Thread.sleep(500); cb(1.right()) } }
+            .flatMap { IO.async<Int> { _, cb -> Thread.sleep(500); cb(1.right()) } }
             .unsafeRunAsyncCancellable(OnCancel.Silent) {
               cb(it)
             }
@@ -321,12 +321,12 @@ class IOTest : UnitSpec() {
     }
 
     "unsafeRunAsyncCancellable should throw the appropriate exception" {
-      IO.async<Throwable> { TODO, cb ->
+      IO.async<Throwable> { _, cb ->
         val cancel =
           IO(newSingleThreadContext("RunThread")) { }
-            .flatMap { IO.async<Int> { TODO, cb -> Thread.sleep(500); cb(1.right()) } }
+            .flatMap { IO.async<Int> { _, cb -> Thread.sleep(500); cb(1.right()) } }
             .unsafeRunAsyncCancellable(OnCancel.ThrowCancellationException) {
-              it.fold({ t -> cb(t.right()) }, { _ -> })
+              it.fold({ t -> cb(t.right()) }, { })
             }
         IO(newSingleThreadContext("CancelThread")) { }
           .unsafeRunAsync { cancel() }
@@ -334,10 +334,10 @@ class IOTest : UnitSpec() {
     }
 
     "unsafeRunAsyncCancellable can cancel even for infinite asyncs" {
-      IO.async { TODO, cb: (Either<Throwable, Int>) -> Unit ->
+      IO.async { _, cb: (Either<Throwable, Int>) -> Unit ->
         val cancel =
           IO(newSingleThreadContext("RunThread")) { }
-            .flatMap { IO.async<Int> { TODO, _ -> Thread.sleep(5000); } }
+            .flatMap { IO.async<Int> { _, _ -> Thread.sleep(5000); } }
             .unsafeRunAsyncCancellable(OnCancel.ThrowCancellationException) {
               cb(it)
             }
@@ -371,7 +371,7 @@ class IOTest : UnitSpec() {
 
     "Cancelable should run CancelToken" {
       Promise.uncancelable<ForIO, Unit>(IO.async()).flatMap { p ->
-        IO.concurrent().cancelable<Unit> { _ ->
+        IO.concurrent().cancelable<Unit> {
           p.complete(Unit)
         }.fix()
           .unsafeRunAsyncCancellable { }
@@ -383,7 +383,7 @@ class IOTest : UnitSpec() {
 
     "CancelableF should run CancelToken" {
       Promise.uncancelable<ForIO, Unit>(IO.async()).flatMap { p ->
-        IO.concurrent().cancelableF<Unit> { _ ->
+        IO.concurrent().cancelableF<Unit> {
           IO { p.complete(Unit) }
         }.fix()
           .unsafeRunAsyncCancellable { }

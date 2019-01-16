@@ -645,6 +645,7 @@ typealias RacePair<F, A, B> = Either<Tuple2<A, Fiber<F, B>>, Tuple2<Fiber<F, A>,
 typealias RaceTriple<F, A, B, C> = Either<Tuple3<A, Fiber<F, B>, Fiber<F, C>>, Either<Tuple3<Fiber<F, A>, B, Fiber<F, C>>, Tuple3<Fiber<F, A>, Fiber<F, B>, C>>>
 
 /** A convenience [fold] method to provide a nicer API to work with race results. */
+@Suppress("UNUSED_PARAMETER")
 inline fun <F, A, B, C, D> RaceTriple<F, A, B, C>.fold(
   ifA: (Tuple3<A, Fiber<F, B>, Fiber<F, C>>) -> D,
   ifB: (Tuple3<Fiber<F, A>, B, Fiber<F, C>>) -> D,

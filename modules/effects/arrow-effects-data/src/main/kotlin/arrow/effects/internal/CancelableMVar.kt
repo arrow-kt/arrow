@@ -8,7 +8,7 @@ import arrow.effects.typeclasses.*
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.EmptyCoroutineContext
 
-internal class CancelableMVar<F, A> private constructor(initial: State<A>, CF: Concurrent<F>) : MVar<F, A>, Concurrent<F> by CF {
+internal class CancelableMVar<F, A> private constructor(initial: State<A>, private val CF: Concurrent<F>) : MVar<F, A>, Concurrent<F> by CF {
 
   private val state = AtomicReference(initial)
 
@@ -27,7 +27,7 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, CF: C
       companion object {
         private val ref = WaitForPut<Any>(linkedMapOf(), linkedMapOf())
         operator fun <A> invoke(a: A): State<A> = WaitForTake(a, linkedMapOf())
-        /** `Empty` state, reusing the same instance. */
+        @Suppress("UNCHECKED_CAST")
         fun <A> empty(): State<A> = ref as State<A>
       }
 
@@ -221,5 +221,13 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, CF: C
       val task = delay { cb(value) }.startF(EmptyCoroutineContext)
       acc?.flatMap { task } ?: task
     }?.map(mapUnit) ?: unit()
+
+  override fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B> = CF.run {
+    this@ap.ap(ff)
+  }
+
+  override fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B> = CF.run {
+    this@map.map(f)
+  }
 
 }

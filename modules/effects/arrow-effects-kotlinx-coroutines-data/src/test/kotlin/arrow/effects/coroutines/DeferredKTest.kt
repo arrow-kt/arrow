@@ -35,14 +35,15 @@ import java.util.concurrent.TimeUnit
 
 @RunWith(KotlinTestRunner::class)
 class DeferredKTest : UnitSpec() {
-  fun <A> EQ(): Eq<Kind<ForDeferredK, A>> = Eq { a, b ->
+
+  private fun <A> EQ(): Eq<Kind<ForDeferredK, A>> = Eq { a, b ->
     val other = b.unsafeAttemptSync()
     a.unsafeAttemptSync().fold(
       { eA -> other.fold({ eB -> throwableEq().run { eA.eqv(eB) } }, { false }) },
-      { a -> other.fold({ false }, { b -> a == b }) })
+      { aa -> other.fold({ false }, { b -> aa == b }) })
   }
 
-  suspend fun <F, A> checkAwaitAll(FF: Functor<F>, T: Traverse<F>, v: Kind<F, A>) = FF.run {
+  private suspend fun <F, A> checkAwaitAll(FF: Functor<F>, T: Traverse<F>, v: Kind<F, A>) = FF.run {
     v.map { DeferredK { it } }.awaitAll(T) == v
   }
 
