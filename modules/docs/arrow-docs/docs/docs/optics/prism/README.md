@@ -6,7 +6,10 @@ permalink: /docs/optics/prism/
 
 ## Prism
 
-A `Prism` is a loss less invertible optic that can see into a structure and optionally find its focus. They're mostly used for structures that have a relationship only under a certain condition. I.e. a certain `sum` of a `sum type` (`sealed class`), the head of a list or all whole double values and integers (safe casting).
+{:.beginner}
+beginner
+
+A `Prism` is a lossless invertible optic that can see into a structure and optionally find its focus. They're mostly used for structures that have a relationship only under a certain condition. I.e. a certain `sum` of a `sum type` (`sealed class`), the head of a list or all whole double values and integers (safe casting).
 
 Since `Prism` has an optional focus it can be seen as a pair of functions `getOrModify` and `reverseGet`.
 
@@ -39,17 +42,6 @@ val networkSuccessPrism: Prism<NetworkResult, NetworkResult.Success> = Prism(
 
 As is clear from above `Prism` definition it gathers two concepts: pattern matching and constructor.
 
-Since sealed classes enforce a certain relationship we can omit the `reverseGet` parameter to create a `Prism` for them. 
-
-```kotlin:ank:silent
-val networkSuccessPrism2: Prism<NetworkResult, NetworkResult.Success> = Prism { networkResult ->
-    when (networkResult) {
-        is NetworkResult.Success -> networkResult.right()
-        else -> networkResult.left()
-    }
-}
-```
-
 Like mentioned we can now operate on `NetworkResult` as if it were `Success`
 
 ```kotlin:ank
@@ -72,6 +64,8 @@ lifted(NetworkResult.Failure)
 We can also modify or lift functions using `Functors`
 
 ```kotlin:ank
+import arrow.core.extensions.option.applicative.*
+
 networkSuccessPrism.modifyF(Option.applicative(), networkResult) { success ->
     success.some()
 }
@@ -128,17 +122,19 @@ networkInt.getOption(NetworkResult.Success("5"))
 
 ## Generated prisms <a id="generated-prisms"></a>
 
-Prisms can be generated for `sealed classes` by the `@optics` annotation. For every defined subtype a `Prism` will be generated. The prisms will be generated in the same package as the `sealed class` and will be named `parentnameSubtypename()`.
+Prisms can be generated for `sealed classes` by the `@optics` annotation. For every defined subtype a `Prism` will be generated.
+The prisms will be generated as extension properties on the companion object `val T.Companion.subTypeName`.
 
 ```kotlin
 @optics sealed class Shape {
+  companion object { }
   data class Circle(val radius: Double) : Shape()
   data class Rectangle(val width: Double, val height: Double) : Shape()
 }
 ```
 ```kotlin:ank:silent
-val circleShape: Prism<Shape, Shape.Circle> = shapeCircle()
-val rectangleShape: Prism<Shape, Shape.Rectangle> = shapeRectangle()
+val circleShape: Prism<Shape, Shape.Circle> = Shape.circle
+val rectangleShape: Prism<Shape, Shape.Rectangle> = Shape.rectangle
 ```
 
 ### Polymorphic prisms <a id="PPrism"></a>
@@ -146,7 +142,7 @@ When dealing with polymorphic sum types like `Try<A>` we can also have polymorph
 
 ```kotlin
 fun <A, B> trySuccess(): PPrism<Try<A>, Try<B>, A, B> = PPrism(
-        getOrModify = { aTry -> aTry.fold({ Try.Failure<B>(it).left() }, { it.right() }) },
+        getOrModify = { aTry -> aTry.fold({ Try.Failure(it).left() }, { it.right() }) },
         reverseGet = { b -> Try.Success(b) }
 )
 
@@ -154,12 +150,12 @@ val liftSuccess: (Try<Int>) -> Try<String> = pTrySuccess<Int, String>().lift(Int
 liftSuccess(Try.Success(5))
 ```
 ```kotlin
-liftSuccess(Try.Failure<Int>(ArithmeticException("/ by zero")))
+liftSuccess(Try.Failure(ArithmeticException("/ by zero")))
 ```
 
 ### Laws
 
 Arrow provides [`PrismLaws`][prism_laws_source]{:target="_blank"} in the form of test cases for internal verification of lawful instances and third party apps creating their own prisms.
 
-[prism_laws_source]: https://github.com/arrow-kt/arrow/blob/master/arrow-test/src/main/kotlin/arrow/laws/PrismLaws.kt
+[prism_laws_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-test/src/main/kotlin/arrow/test/laws/PrismLaws.kt
 

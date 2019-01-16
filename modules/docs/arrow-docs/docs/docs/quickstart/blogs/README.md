@@ -8,21 +8,23 @@ permalink: /docs/quickstart/blogs/
 
 A selection of external links to some of the content created by maintainers and users.
 
+### State of the functional ecosystem in Kotlin: Mid 2018 checkup
+
+This talk focuses on the day-to-day problems Arrow solves, from small ideas to big concepts.
+
+It includes an overview of all the modules available, and some of the 3rd party libraries made by the community.
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/q_1xPYQLyaU?rel=0" frameborder="0" allowfullscreen></iframe>
+
+Conference for Kotliners, Budapest, Jun '18 - version 0.7.2
+
 ### Functional Programming in Kotlin with Arrow
 
-A rundown of all the features included in the library.
+A rundown of all the features included in the library, focusing on implementation details.
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/IL5XzaCMKpQ?rel=0" frameborder="0" allowfullscreen></iframe>
 
 Lambda World, Cadiz, Nov '17 - version 0.3.11
-
-### Kotlin for the Pragmatic Functionalist
-
-An introduction to Arrow and the enhancements it brings to Kotlin's standard library.
-
-<iframe width="560" height="315" src="https://www.youtube.com/embed/s9oMED6ZikQ?rel=0" frameborder="0" allowfullscreen></iframe>
-
-KotlinConf, San Francisco, Nov '17 - version 0.3.11
 
 ### Architectures Using Functional Programming Concepts
 
@@ -31,6 +33,14 @@ Introductory talk to Functional architectures to be built on top of Arrow.
 <iframe width="560" height="315" src="https://www.youtube.com/embed/qI1ctQ0293o?rel=0" frameborder="0" allowfullscreen></iframe>
 
 KotlinConf, San Francisco, Nov '17 - version 0.3.11
+
+### Manual documentation is dead. Long live automated documentation! Automated documentation with ΛNK.
+
+It includes how the ΛNK plugin works: from having a tool that evaluates and verifies your doc snippets at compile time, to generating code documentation that is always correct and up to date.
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/CvNoX2gGd9c?rel=0" frameborder="0" allowfullscreen></iframe>
+
+droidconSF, San Francisco, Nov '18 - version 0.8.1
 
 ### Building a DSL... in Kotlin
  
@@ -46,7 +56,23 @@ KotlinConf, San Francisco, Nov '17 - version 0.3.11
  
 <iframe width="560" height="315" src="https://www.youtube.com/embed/qGef3sFAIxU" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
  
- Mobilization 7, Łódź, Oct '17 - version 0.3.11
+Mobilization 7, Łódź, Oct '17 - version 0.3.11
+ 
+### Simple Dependency Management in Kotlin
+
+In this talk we introduce the concepts of Dependency Management as a language feature, typeclasses, and a live demo of [KEEP-87](https://github.com/Kotlin/KEEP/pull/87). You can follow along the example in [this folder](https://github.com/arrow-kt/arrow/tree/master/modules/docs/arrow-examples/src/test/kotlin/arrow/typeclasses).
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/CR5h2Wq1yPE" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
+
+AndroidTO, Toronto, Nov '18 - version 0.8.0
+
+### Kotlin for the Pragmatic Functionalist
+
+An introduction to Arrow and the enhancements it brings to Kotlin's standard library.
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/s9oMED6ZikQ?rel=0" frameborder="0" allowfullscreen></iframe>
+
+KotlinConf, San Francisco, Nov '17 - version 0.3.11
  
 ### It's all about morphisms
  
@@ -64,6 +90,29 @@ Voxxed Days, Vienna, Mar '18 - version 0.6.1
 
 Kotlin Meetup, Sydney, Mar '18 - version 0.6.1
 
+### Functional Programming in Kotlin with Arrow by Emmanuel Nhan
+[@nhanmanu](https://twitter.com/nhanmanu) introduces Kotlin and how it is a good fit for functional programming. The talk goes through some interesting features of Kotlin, then show how to use them to enter the world of Higher Kinds and Typeclasses. In the last part, we explore some Arrow capabilities & built-in syntax, using validation as an example. 
+
+<iframe src="//www.slideshare.net/slideshow/embed_code/key/eOPu1UXHZrloFf" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/EmmanuelNhan/functional-programming-in-kotlin-with-arrow-sunnytech-2018" title="Functional programming in kotlin with Arrow [Sunnytech 2018]" target="_blank">Functional programming in kotlin with Arrow [Sunnytech 2018]</a> </strong> de <strong><a href="//www.slideshare.net/EmmanuelNhan" target="_blank">Emmanuel Nhan</a></strong> </div>
+
+Sunny Tech, Montpellier, June '18 - version 0.7.2
+
+### Higher Kinded Types in a Lower Kinded Language by Jacob Bass
+
+It's hard coming back down to the earth of a JVM based language after spending time with Haskell and OCaml. This talk will discuss functional programming in Kotlin with the Arrow library, how the abstractions it provides can improve your code, and how this magic that provides higher-kinded types works under the hood.
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/ERM0mBPNLHc" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
+
+Yow! Lambda Jam, Sydney, Australia, June '18 - version 0.7
+
+### Arrow and Functional Programming for Kotlin Developers
+
+A beginner level introduction to Functional Programming for Kotlin and/or Android Developers or developers with OOP background.
+ 
+<iframe width="560" height="315" src="https://www.youtube.com/embed/qYgilPqMOp0" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
+ 
+DroidJam India, Bangalore, India, July '18 - version 0.7.2
+
 ### Functional Programming in Kotlin
 
 An ongoing blog series introducing Functional Programming architectures from scratch
@@ -78,7 +127,7 @@ Nov '17 - version 0.3.11
 
 ### Happy Path: Kotlin + Actors + Arrow
 
-[@javipacheco](https://github.com/javipacheco) creates a Proof of Concept architecture for Android using the Actor pattern and modelling the domain with [`Either`]({{ '/docs/datatypes/either' | relative_url }}).
+[@javipacheco](https://github.com/javipacheco) creates a Proof of Concept architecture for Android using the Actor pattern and modelling the domain with [`Either`]({{ '/docs/arrow/core/either' | relative_url }}).
 
 [Happy Path: Kotlin + Actors + Arrow](https://medium.com/@javipacheco/happy-path-kotlin-actors-arrow-proof-of-concept-322e9099d2ea)
 
@@ -86,7 +135,7 @@ Nov '17 - version 0.3.11
 
 ### Handling exceptions in Arrow
 
-[@uris77](https://github.com/uris77) explains how to use [`Try`]({{ '/docs/datatypes/try' | relative_url }}) in real world examples.
+[@uris77](https://github.com/uris77) explains how to use [`Try`]({{ '/docs/arrow/core/try' | relative_url }}) in real world examples.
 
 [Handling Kotlin Exceptions with Arrow – A Functional Approach](https://www.spantree.net/blog/2017/09/15/kotlin-exception-handling-with-kategory.html)
 
@@ -97,20 +146,23 @@ Sept '17 - version 0.3.11
 [@msya](https://github.com/msya) explains how to use various optics and type classes in Arrow. He discusses optics such as 
 [`Lens`]({{ '/docs/optics/lens' | relative_url }}) and [`Iso`]({{ '/docs/optics/iso' | relative_url }}). He also goes over the purpose for type classes and how [KEEP-87](https://github.com/Kotlin/KEEP/pull/87) will make it easier to implement them.
 
-Kotlin Brooklyn Meetup, Jan ’18 - version 0.6.1
-
 [Functional Programming with Arrow](https://speakerdeck.com/heyitsmohit/functional-programming-with-arrow)
+
+Kotlin Brooklyn Meetup, Jan '18 - version 0.6.1
 
 ### Android Functional Validation
 
 [@dcampogiani](https://github.com/dcampogiani) explores some data types in Arrow and uses them to validate a form on Android.
+
+Video in Italian
+<iframe src="https://player.vimeo.com/video/279931528" width="560" height="315" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
 
 * [Introduction](http://danielecampogiani.com/blog/2018/02/android-functional-validation-1-intro/)
 * [Option](http://danielecampogiani.com/blog/2018/02/android-functional-validation-2-option/)
 * [Either](http://danielecampogiani.com/blog/2018/02/android-functional-validation-3-either/)
 * [Validated](http://danielecampogiani.com/blog/2018/02/android-functional-validation-4-validated/)
 
-April ’18 - version 0.7
+April '18 - version 0.7
 
 ### 1/n - How do I ... in FP : Validation
 
@@ -118,4 +170,40 @@ April ’18 - version 0.7
 
 [1/n - How do I ... in FP : Validation](https://www.enhan.eu/how-to-in-fp/)
 
-April ’18 - version 0.7
+April '18 - version 0.7
+
+### Arrow 101 — Building an Android app using Functional Programming
+
+[Leandro Ferreira](https://twitter.com/mLeandroBF) presents how to build a simple app using Arrow and how to implement solutions with Semigroups.
+
+[Arrow 101 — Building an Android app using Functional Programming](https://medium.com/@lehen01/arrow-101-building-an-android-app-using-functional-programming-fe959675d96d)
+
+[Arrow 101 — Modelling a real world problem with Semigroups](https://medium.com/@lehen01/arrow-101-modelling-a-real-world-problem-with-semigroups-d8f22cdf54c)
+
+June '18 - version 0.7
+
+### Polyjokes — A polymorphic approach using Arrow
+
+[@dcampogiani](https://github.com/dcampogiani) is using a polymorphic approach to retrieve a random user and then a joke about him.
+
+[Polyjokes — A polymorphic approach using Arrow](https://github.com/dcampogiani/polyjokes)
+
+October '18 - version 0.7.3
+
+### Arrow-kt Tiny Cards Flashcards
+
+[Arrow-kt Collection](https://tiny.cards/collections/W1aS1cV/arrow-kt) Data types, type classes, effects, optics, generic, free, recursion schemes
+
+DM Ersin on [Gitter](https://gitter.im/ersin-ertan) or [Slack](https://kotlinlang.slack.com/messages/D624ZNAF9/team/U619WRNJE/) if you have more concise/simpler definitions, can correct misinterpretations, or can help with a deck
+
+### Functional Hangman Game written with Arrow
+
+[Functional Hangman](https://lordraydenmk.github.io/2018/functional-hangman-in-kotlin-with-arrow/) game - console application written with Arrow. Uses the `IO<A>` monad to push side effects to the edge of the system.
+
+November '18 - version 0.8.1
+
+### Getting started with FP in Kotlin and Arrow: Typeclasses
+
+[Getting started with FP in Kotlin and Arrow: Typeclasses](http://www.smartjava.org/content/kotlin-arrow-typeclasses/) explores part of the Arrow library by explaining how you can use Arrow to create your own typeclasses and use the ones provided by Arrow to make your code more concise and better readable.
+
+January '19 - version 0.8.1

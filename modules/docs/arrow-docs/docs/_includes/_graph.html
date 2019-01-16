@@ -1,0 +1,23 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Arrow Graph</title>
+    <link rel="shortcut icon" type="image/png" href="favicon.png">
+    <script src="../js/lodash.min.js"></script>
+    <script src="../js/dagre.min.js"></script>
+    <script src="../js/nomnoml.js"></script>
+</head>
+<body>
+<canvas id="target-canvas" style="margin-top:120px"></canvas>
+<script>
+    var canvas = document.getElementById('target-canvas');
+    var req = new Request('https://raw.githubusercontent.com/arrow-kt/arrow/master/infographic/arrow-infographic.txt');
+    fetch(req)
+      .then(function(response) { return response.text() })
+      .then(function(nomlText) {
+        nomnoml.draw(canvas, nomlText);
+      });
+</script>
+</body>
+</html>

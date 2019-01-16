@@ -6,7 +6,10 @@ permalink: /docs/optics/iso/
 
 ## Iso
 
-An `Iso` is a loss less invertible optic that defines an isomorphism between a type `S` and `A` i.e. a data class and its properties represented by `TupleN`.
+{:.beginner}
+beginner
+
+An `Iso` is a lossless invertible optic that defines an isomorphism between a type `S` and `A` i.e. a data class and its properties represented by `TupleN`.
 
 Isos can be seen as a pair of functions that represent an isomorphism, `get` and `reverseGet`. So an `Iso<S, A>` represents two getters: `get: (S) -> A` and `reverseGet: (A) -> S` where `S` is called the source of the `Iso` and `A` is called the focus or target of the `Iso`.
 
@@ -59,6 +62,7 @@ We can do the same with a Functor mapping
 
 ```kotlin:ank
 import arrow.data.*
+import arrow.core.extensions.`try`.functor.*
 
 pointIsoTuple.modifyF(Try.functor(), point) {
     Try { (tuple.a / 2) toT (tuple.b / 2) }
@@ -112,13 +116,16 @@ val nullableOptionIso: Iso<String?, Option<String>> = nullableToOption()
 
 ### Generating isos
 
-To avoid boilerplate, isos can be generated for a `data class` to `TupleN` with 2 to 10 parameters by the `@optics` annotation. The `Iso` will be generated in the same package as the `data class` and will be named `classnameIso()`.
+To avoid boilerplate, isos can be generated for a `data class` to `TupleN` with 2 to 10 parameters by the `@optics` annotation.
+The `Iso` will be generated as a extension property on the companion object `val T.Companion.iso`.
 
 ```kotlin
-@optics data class Pos(val x: Int, val y: Int)
+@optics data class Pos(val x: Int, val y: Int) {
+  companion object
+}
 ```
 ```kotlin:ank:silent
-val iso: Iso<Pos, Tuple2<Int, Int>> = posIso()
+val iso: Iso<Pos, Tuple2<Int, Int>> = Pos.iso
 ```
 
 ### Polymorphic isos
@@ -147,4 +154,4 @@ reverse
 
 Arrow provides [`IsoLaws`][iso_laws_source]{:target="_blank"} in the form of test cases for internal verification of lawful instances and third party apps creating their own isos.
 
-[iso_laws_source]: https://github.com/arrow-kt/arrow/blob/master/arrow-test/src/main/kotlin/arrow/laws/IsoLaws.kt
+[iso_laws_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-test/src/main/kotlin/arrow/test/laws/IsoLaws.kt

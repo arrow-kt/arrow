@@ -6,6 +6,9 @@ permalink: /docs/effects/io/
 
 ## IO
 
+{:.intermediate}
+intermediate
+
 `IO` is the most common data type used to represent side-effects in functional languages.
 This means `IO` is the data type of choice when interacting with the external environment: databases, network, operative systems, files...
 
@@ -23,6 +26,8 @@ Running in this context means evaluating the content of an `IO` object, and prop
 
 Note that `IO` objects can be run multiple times, and depending on how they are constructed they will evaluate its content again every time they're run.
 
+The general good practice is to have a single unsafe run call per program, at the entry point. In backend applications or command line tools this can be at the main. For Android apps, specially those before Android 9.0, this could happen per Activity.
+
 ### attempt
 
 Executes and defers the result into a new `IO` that has captured any exceptions inside `Either<Throwable, A>`.
@@ -39,6 +44,8 @@ Takes as a parameter a callback from a result of `Either<Throwable, A>` to a new
 All exceptions that would happen on the function parameter are automatically captured and propagated to the `IO<Unit>` return.
 
 It runs the current `IO` asynchronously, calling the callback parameter on completion and returning its result.
+
+The operation will not yield a result immediately; ultimately to start running the suspended computation you have to evaluate that new instance using an unsafe operator like `unsafeRunAsync` or `unsafeRunSync` for `IO`.
 
 ```kotlin
 IO<Int> { throw RuntimeException("Boom!") }
@@ -148,22 +155,6 @@ IO<Int> { throw RuntimeException("Boom!") }
   .unsafeRunSync()
 ```
 
-### merge
-
-Commonly used to aggregate the results of multiple independent blocking functions. Creates an `IO` that invokes 2-10 functions when run. Their results are accumulated on a TupleN, where N is the size.
-
-```kotlin
-IO.merge ({ 1 }, { 2 }, { 3 })
-  .attempt()
-  .unsafeRunSync()
-```
-
-```kotlin
-IO.merge ({ 1 }, { 2 }, { throw RuntimeException("Boom!") })
-  .attempt()
-  .unsafeRunSync()
-```
-
 ### suspend
 
 Used to defer the evaluation of an existing `IO`.
@@ -200,25 +191,26 @@ IO.async<Int> { callback ->
 
 ## Effect Comprehensions
 
-`IO` is usually best paired with [comprehensions]({{ '/docs/patterns/monadcomprehensions' | relative_url }}) to get a cleaner syntax.
-[Comprehensions]({{ '/docs/patterns/monadcomprehensions' | relative_url }}) also enable cancellation and parallelization of IO effects.
+`IO` is usually best paired with [comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) to get a cleaner syntax.
+[Comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) also enable cancellation and parallelization of IO effects.
 
 ```kotlin
-IO.monad().binding {
-    val file = getFile("/tmp/file.txt").bind()
-    val lines = file.readLines().bind()
-    val average =
-      if (lines.isEmpty()) {
-        0
-      } else {
-        val count = lines.map { it.length }.foldLeft(0) { acc, lineLength -> acc + lineLength }
-        count / lines.length
-      }
-    average
-  }
-  .fix()
-  .attempt()
-  .unsafeRunSync()
+import arrow.typeclasses.*
+import arrow.effects.*
+import arrow.effects.extensions.io.monad.binding
+
+binding {
+  val file = getFile("/tmp/file.txt").bind()
+  val lines = file.readLines().bind()
+  val average =
+    if (lines.isEmpty()) {
+      0
+    } else {
+      val count = lines.map { it.length }.foldLeft(0) { acc, lineLength -> acc + lineLength }
+      count / lines.length
+    }
+  average
+}.attempt().unsafeRunSync()
 ```
 
 ## Syntax
@@ -227,7 +219,9 @@ IO.monad().binding {
 
 Puts the value `A` inside an `IO<A>` using `just`.
 
-```kotlin
+```kotlin:ank
+import arrow.effects.*
+
 1.liftIO()
   .attempt()
   .unsafeRunSync()
@@ -235,16 +229,14 @@ Puts the value `A` inside an `IO<A>` using `just`.
 
 ## Common operators
 
-IO implements all the operators common to all instances of [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}). Those include `map`, `flatMap`, and `handleErrorWith`.
+IO implements all the operators common to all instances of [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}). Those include `map`, `flatMap`, and `handleErrorWith`.
 
 
-## Available Instances
+### Supported Type Classes
 
-* [Applicative]({{ '/docs/typeclasses/applicative' | relative_url }})
-* [ApplicativeError]({{ '/docs/typeclasses/applicativeerror' | relative_url }})
-* [Functor]({{ '/docs/typeclasses/functor' | relative_url }})
-* [Monad]({{ '/docs/typeclasses/monad' | relative_url }})
-* [MonadError]({{ '/docs/typeclasses/monaderror' | relative_url }})
-* [MonadDefer]({{ '/docs/effects/monaddefer/' | relative_url }})
-* [Async]({{ '/docs/effects/async' | relative_url }})
-* [Effect]({{ '/docs/effects/effect' | relative_url }})
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.effects.*
+
+DataType(IO::class).tcMarkdownList()
+```

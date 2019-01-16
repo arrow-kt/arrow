@@ -3,20 +3,28 @@ sudo: required
 dist: trusty
 
 jdk:
-  - oraclejdk8
+- oraclejdk8
 
-script:
-  - ./gradlew clean build :arrow-docs:runAnk
-  - ./gradlew codeCoverageReport
+stages:
+- name: build
+- name: coverage-report
+  if: branch = master
+- name: deploy
+  if: branch = master AND type != pull_request
 
-after_success:
-  - bash <(curl -s https://codecov.io/bash)
-  - ./deploy-scripts/deploy.sh
+env:
+  global:
+  - JAVA_OPTS="-Xms512m -Xmx1024m"
 
-deploy:
-  provider: pages
-  skip_cleanup: true
-  github_token: $GITHUB_TOKEN
-  local_dir: modules/docs/arrow-docs/build/site
-  on:
-    branch: master
+jobs:
+  include:
+  - stage: build
+    script:
+    - ./gradlew clean build
+  - stage: coverage-report
+    script:
+    - ./gradlew codeCoverageReport
+    - bash <(curl -s https://codecov.io/bash)
+  - stage: deploy
+    script:
+    - ./deploy-scripts/deploy.sh

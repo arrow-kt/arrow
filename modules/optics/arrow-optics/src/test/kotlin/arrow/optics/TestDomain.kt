@@ -1,8 +1,6 @@
 package arrow.optics
 
-import arrow.core.Left
-import arrow.core.Right
-import arrow.core.identity
+import arrow.core.*
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 
@@ -11,19 +9,16 @@ sealed class SumType {
   data class B(val int: Int) : SumType()
 }
 
-object AGen : Gen<SumType.A> {
-  override fun generate(): SumType.A = SumType.A(Gen.string().generate())
-}
+val genSumTypeA: Gen<SumType.A> = Gen.string().map { SumType.A(it) }
 
-object SumGen : Gen<SumType> {
-  override fun generate(): SumType = Gen.oneOf(AGen, Gen.create { SumType.B(Gen.int().generate()) }).generate()
-}
+val genSum: Gen<SumType> =
+  Gen.oneOf<SumType>(Gen.string().map { SumType.A(it) }, Gen.int().map { SumType.B(it) })
 
 val sumPrism: Prism<SumType, String> = Prism(
   {
     when (it) {
       is SumType.A -> Right(it.string)
-      else -> Left(it)
+      else         -> Left(it)
     }
   },
   SumType::A
@@ -36,7 +31,7 @@ val stringPrism: Prism<String, List<Char>> = Prism(
 
 internal val tokenLens: Lens<Token, String> = Lens(
   { token: Token -> token.value },
-  { value: String -> { token: Token -> token.copy(value = value) } }
+  { token: Token, value: String -> token.copy(value = value) }
 )
 
 internal val tokenIso: Iso<Token, String> = Iso(
@@ -44,8 +39,8 @@ internal val tokenIso: Iso<Token, String> = Iso(
   ::Token
 )
 
-internal val tokenSetter: Setter<Token, String> = Setter { s ->
-  { token -> token.copy(value = s(token.value)) }
+internal val tokenSetter: Setter<Token, String> = Setter { token, s ->
+  token.copy(value = s(token.value))
 }
 
 internal val userIso: Iso<User, Token> = Iso(
@@ -53,8 +48,8 @@ internal val userIso: Iso<User, Token> = Iso(
   ::User
 )
 
-internal val userSetter: Setter<User, Token> = Setter { s ->
-  { user -> user.copy(token = s(user.token)) }
+internal val userSetter: Setter<User, Token> = Setter { user, s ->
+  user.copy(token = s(user.token))
 }
 
 internal data class Token(val value: String) {
@@ -65,28 +60,25 @@ internal data class Token(val value: String) {
   }
 }
 
-internal object TokenGen : Gen<Token> {
-  override fun generate() = Token(Gen.string().generate())
-}
+internal val genToken : Gen<Token> = Gen.string().map { Token(it) }
 
 internal data class User(val token: Token)
-internal object UserGen : Gen<User> {
-  override fun generate() = User(TokenGen.generate())
-}
+
+internal val genUser : Gen<User> = genToken.map { User(it) }
 
 internal val tokenGetter: Getter<Token, String> = Getter(Token::value)
 
 internal val userLens: Lens<User, Token> = Lens(
   { user: User -> user.token },
-  { token: Token -> { user: User -> user.copy(token = token) } }
+  { user: User, token: Token -> user.copy(token = token) }
 )
 
 internal val optionalHead: Optional<List<Int>, Int> = Optional(
-  { it.firstOrNull()?.let(::Right) ?: it.let(::Left) },
-  { int -> { list -> listOf(int) + if (list.size > 1) list.drop(1) else emptyList() } }
+  { it.firstOrNull()?.right() ?: it.left() },
+  { list, int -> listOf(int) + if (list.size > 1) list.drop(1) else emptyList() }
 )
 
 internal val defaultHead: Optional<Int, Int> = Optional(
-  { it.let(::Right) },
-  { ::identity }
+  { it.right() },
+  { s, _ -> s }
 )

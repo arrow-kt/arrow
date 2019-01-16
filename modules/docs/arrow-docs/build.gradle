@@ -2,31 +2,42 @@ apply plugin: 'ank-gradle-plugin'
 apply plugin: 'org.ajoberstar.git-publish'
 
 dependencies {
-    compile('io.arrow-kt:ank-core:0.7.0-20180405.163901-2') {
-        exclude group: 'io.arrow-kt', module: 'arrow-core'
-        exclude group: 'io.arrow-kt', module: 'arrow-instances-core'
-        exclude group: 'io.arrow-kt', module: 'arrow-free'
-    }
-    compile project(':arrow-data')
-    compile project(':arrow-core')
-    compile project(':arrow-instances-data')
-    compile project(':arrow-effects')
-    compile project(':arrow-effects-rx2')
-    compile project(':arrow-effects-kotlinx-coroutines')
+//    compile('io.arrow-kt:ank-core:0.7.1') {
+//        exclude group: 'io.arrow-kt', module: 'arrow-core'
+//        exclude group: 'io.arrow-kt', module: 'arrow-extensions-core'
+//        exclude group: 'io.arrow-kt', module: 'arrow-free'
+//    }
+    compile project(':arrow-ank')
+    compile project(':arrow-extras')
+    compile project(':arrow-core-data')
+    compile project(':arrow-test')
+    compile project(':arrow-extras-extensions')
+    compile project(':arrow-effects-extensions')
+    compile project(':arrow-effects-rx2-extensions')
+    compile project(':arrow-effects-reactor-extensions')
+    compile project(':arrow-effects-kotlinx-coroutines-extensions')
     compile project(':arrow-optics')
-    compile project(':arrow-recursion')
+    compile project(':arrow-validation')
+    compile project(':arrow-recursion-extensions')
+    compile project(':arrow-integrations-retrofit-adapter')
     compile project(':arrow-mtl')
-    compile project(':arrow-free')
+    compile project(':arrow-free-data')
+    compile project(':arrow-test')
+    compile project(':arrow-free-extensions')
     compile project(':arrow-typeclasses')
     compile project(':arrow-generic')
-    kapt project(':arrow-annotations-processor')
-    kaptTest project(':arrow-annotations-processor')
+    compile project(':arrow-query-language')
+    compile project(":arrow-reflect")
+    kapt project(':arrow-meta')
+    kaptTest project(':arrow-meta')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     compile "org.jetbrains.kotlinx:kotlinx-collections-immutable:$kotlinxCollectionsImmutableVersion"
-    compile "io.kotlintest:kotlintest:$kotlinTestVersion"
-
+    testCompile("junit:junit:$jUnitVersion")
+    testRuntime("org.junit.vintage:junit-vintage-engine:$jUnitVintageVersion")
+    compile "io.kotlintest:kotlintest-runner-junit4:$kotlinTestVersion"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
-    compile "io.reactivex.rxjava2:rxjava:2.1.4"
+    compile "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
+    compile "io.projectreactor:reactor-core:$projectReactorVersion"
 }
 
 task printcp {
@@ -59,5 +70,4 @@ apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
 
 compileKotlin.kotlinOptions.freeCompilerArgs += ["-Xskip-runtime-version-check"]
 
-apply from: rootProject.file('gradle/generated-kotlin-sources.gradle')
 apply plugin: 'kotlin-kapt'

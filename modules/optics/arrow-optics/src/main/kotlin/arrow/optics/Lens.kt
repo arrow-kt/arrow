@@ -2,6 +2,7 @@ package arrow.optics
 
 import arrow.Kind
 import arrow.core.*
+import arrow.data.*
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Functor
@@ -49,17 +50,17 @@ interface PLens<S, T, A, B> : PLensOf<S, T, A, B> {
      */
     fun <S> codiagonal(): Lens<Either<S, S>, S> = Lens(
       get = { it.fold(::identity, ::identity) },
-      set = { a -> { it.bimap({ a }, { a }) } }
+      set = { s, b -> s.bimap({ b }, { b }) }
     )
 
     /**
      * Invoke operator overload to create a [PLens] of type `S` with target `A`.
      * Can also be used to construct [Lens]
      */
-    operator fun <S, T, A, B> invoke(get: (S) -> A, set: (B) -> (S) -> T) = object : PLens<S, T, A, B> {
+    operator fun <S, T, A, B> invoke(get: (S) -> A, set: (S, B) -> T) = object : PLens<S, T, A, B> {
       override fun get(s: S): A = get(s)
 
-      override fun set(s: S, b: B): T = set(b)(s)
+      override fun set(s: S, b: B): T = set(s, b)
     }
   }
 
@@ -67,7 +68,7 @@ interface PLens<S, T, A, B> : PLensOf<S, T, A, B> {
    * Modify the focus of a [PLens] using Functor function
    */
   fun <F> modifyF(FF: Functor<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> = FF.run {
-    f(get(s)).map({ b -> set(s, b) })
+    f(get(s)).map { b -> set(s, b) }
   }
 
   /**
@@ -80,7 +81,7 @@ interface PLens<S, T, A, B> : PLensOf<S, T, A, B> {
    */
   infix fun <S1, T1> choice(other: PLens<S1, T1, A, B>): PLens<Either<S, S1>, Either<T, T1>, A, B> = PLens(
     { ss -> ss.fold(this::get, other::get) },
-    { b -> { ss -> ss.bimap({ s -> set(s, b) }, { s -> other.set(s, b) }) } }
+    { ss, b -> ss.bimap({ s -> set(s, b) }, { s -> other.set(s, b) }) }
   )
 
   /**
@@ -89,7 +90,7 @@ interface PLens<S, T, A, B> : PLensOf<S, T, A, B> {
   infix fun <S1, T1, A1, B1> split(other: PLens<S1, T1, A1, B1>): PLens<Tuple2<S, S1>, Tuple2<T, T1>, Tuple2<A, A1>, Tuple2<B, B1>> =
     PLens(
       { (s, c) -> get(s) toT other.get(c) },
-      { (b, b1) -> { (s, s1) -> set(s, b) toT other.set(s1, b1) } }
+      { (s, s1), (b, b1) -> set(s, b) toT other.set(s1, b1) }
     )
 
   /**
@@ -97,7 +98,7 @@ interface PLens<S, T, A, B> : PLensOf<S, T, A, B> {
    */
   fun <C> first(): PLens<Tuple2<S, C>, Tuple2<T, C>, Tuple2<A, C>, Tuple2<B, C>> = PLens(
     { (s, c) -> get(s) toT c },
-    { (b, c) -> { (s, _) -> set(s, b) toT c } }
+    { (s, _) , (b, c) -> set(s, b) toT c }
   )
 
   /**
@@ -105,7 +106,7 @@ interface PLens<S, T, A, B> : PLensOf<S, T, A, B> {
    */
   fun <C> second(): PLens<Tuple2<C, S>, Tuple2<C, T>, Tuple2<C, A>, Tuple2<C, B>> = PLens(
     { (c, s) -> c toT get(s) },
-    { (c, b) -> { (_, s) -> c toT set(s, b) } }
+    { (_, s) , (c, b) -> c toT set(s, b) }
   )
 
   /**
@@ -113,7 +114,7 @@ interface PLens<S, T, A, B> : PLensOf<S, T, A, B> {
    */
   infix fun <C, D> compose(l: PLens<A, B, C, D>): PLens<S, T, C, D> = Lens(
     { a -> l.get(get(a)) },
-    { c -> { s -> set(s, l.set(get(s), c)) } }
+    { s, c -> set(s, l.set(get(s), c)) }
   )
 
   /**
@@ -180,13 +181,13 @@ interface PLens<S, T, A, B> : PLensOf<S, T, A, B> {
    */
   fun asOptional(): POptional<S, T, A, B> = POptional(
     { s -> Either.Right(get(s)) },
-    { b -> { s -> set(s, b) } }
+    { s, b -> set(s, b) }
   )
 
   /**
    * View a [PLens] as a [PSetter]
    */
-  fun asSetter(): PSetter<S, T, A, B> = PSetter { f -> { s -> modify(s, f) } }
+  fun asSetter(): PSetter<S, T, A, B> = PSetter { s, f -> modify(s, f) }
 
   /**
    * View a [PLens] as a [Fold]
@@ -200,7 +201,7 @@ interface PLens<S, T, A, B> : PLensOf<S, T, A, B> {
    */
   fun asTraversal(): PTraversal<S, T, A, B> = object : PTraversal<S, T, A, B> {
     override fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T> = FA.run {
-      f(get(s)).map({ b -> this@PLens.set(s, b) })
+      f(get(s)).map { b -> this@PLens.set(s, b) }
     }
   }
 
@@ -226,4 +227,73 @@ interface PLens<S, T, A, B> : PLensOf<S, T, A, B> {
    */
   fun exist(s: S, p: (A) -> Boolean): Boolean = p(get(s))
 
+  /**
+   * Extracts the value viewed through the [get] function.
+   */
+  fun ask(): Reader<S, A> = Reader(::get)
+
+  /**
+   * Transforms a [PLens] into a [Reader]. Alias for [ask].
+   */
+  fun toReader(): Reader<S, A> = ask()
+
+  /**
+   * Extracts the value viewed through the [get] and applies [f] to it.
+   *
+   * @param f function to apply to the focus.
+   */
+  fun <C> asks(f: (A) -> C): Reader<S, C> = ask().map(f)
+
+  /**
+   * Extracts the focus [A] viewed through the [PLens].
+   */
+  fun extract(): State<S, A> = State { s -> Tuple2(s, get(s)) }
+
+  /**
+   * Transforms a [PLens] into a [State].
+   * Alias for [extract].
+   */
+  fun toState(): State<S, A> = extract()
+
+  /**
+   * Extracts and maps the focus [A] viewed through the [PLens] and applies [f] to it.
+   */
+  fun <C> extractMap(f: (A) -> C): State<S, C> = extract().map(f)
+
 }
+
+/**
+ * Update the focus [A] viewed through the [Lens] and returns its *new* value.
+ */
+fun <S, A> Lens<S, A>.update(f: (A) -> A): State<S, A> = State { s ->
+  val b = f(get(s))
+  Tuple2(set(s, b), b)
+}
+
+/**
+ * Update the focus [A] viewed through the [Lens] and returns its *old* value.
+ */
+fun <S, A> Lens<S, A>.updateOld(f: (A) -> A): State<S, A> = State { s ->
+  Tuple2(modify(s, f), get(s))
+}
+
+/**
+ * Modify the focus [A] viewed through the [Lens] and ignores both values.
+ */
+fun <S, A> Lens<S, A>.update_(f: (A) -> A): State<S, Unit> =
+  State { s -> Tuple2(modify(s, f), Unit) }
+
+/**
+ * Assign the focus [A] viewed through the [Lens] and returns its *new* value.
+ */
+fun <S, A> Lens<S, A>.assign(a: A): State<S, A> = update { _ -> a }
+
+/**
+ * Assign the value focus [A] through the [Lens] and returns its *old* value.
+ */
+fun <S, A> Lens<S, A>.assignOld(a: A): State<S, A> = updateOld { _ -> a }
+
+/**
+ * Assign the focus [A] viewed through the [Lens] and ignores both values.
+ */
+fun <S, A> Lens<S, A>.assign_(a: A): State<S, Unit> = update_ { _ -> a }

@@ -1,7 +1,7 @@
 nav:
     - title: Documentation
       url: /docs
-  
+
     - title: Blog
       url: /category/all
 
@@ -10,13 +10,13 @@ nav:
 
     - title: License
       url: https://github.com/arrow-kt/arrow#license
-      
+
 tab:
     - title: All
       url: /category/all
-      
+
     - title: Media
       url: /category/media
-      
+
     - title: News
       url: /category/news

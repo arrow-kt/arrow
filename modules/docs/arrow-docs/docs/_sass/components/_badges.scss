@@ -1,0 +1,86 @@
+// Badges
+// -----------------------------------------------
+// -----------------------------------------------
+%badge {
+  color: transparent;
+  height: 32px;
+  margin: 48px 0 32px;
+  position: relative;
+  transition: opacity ease 400ms;
+
+  &:before {
+    content: "";
+    position: absolute;
+    top: 9px;
+    left: -22px;
+    width: 14px;
+    height: 15px;
+    z-index: 3;
+  }
+
+  &:after {
+    color: #fff;
+    display: block;
+    font-size: 1rem;
+    font-weight: 700;
+    left: -36px;
+    padding: 4px 16px 4px 36px;
+    position: absolute;
+    top: 50%;
+    transform: translate(0, -50%);
+    z-index: 2;
+  }
+}
+
+.toggled %badge  {
+  opacity: 0;
+  z-index: 0;
+}
+
+@media(min-width:768px) {
+  .toggled %badge  {
+    opacity: 1;
+  }
+}
+
+.doc-content .beginner {
+  @extend %badge;
+
+  &:before {
+    border-top: 9px double rgba(255, 255, 255, .33);
+    border-bottom: 3px solid #fff;
+  }
+
+  &:after {
+    background-color: #61a8ff;
+    content: 'BEGINNER';
+  }
+}
+
+.doc-content .intermediate {
+  @extend %badge;
+
+  &:before {
+    border-top: 3px solid rgba(255, 255, 255, .5);
+    border-bottom: 9px double #fff;
+  }
+
+  &:after {
+    background-color: #557fe8;
+    content: 'INTERMEDIATE';
+  }
+}
+
+.doc-content .advanced {
+  @extend %badge;
+
+  &:before {
+    border-top: 9px double #fff;
+    border-bottom: 3px solid #fff;
+  }
+
+  &:after {
+    background-color: #00b5e2;
+    content: 'ADVANCED';
+  }
+}

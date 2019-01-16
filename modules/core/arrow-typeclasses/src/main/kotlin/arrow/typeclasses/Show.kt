@@ -1,6 +1,8 @@
 package arrow.typeclasses
 
 /**
+ * ank_macro_hierarchy(arrow.typeclasses.Show)
+ *
  * A type class used to get a textual representation for an instance of type [A] in a type safe way.
  *
  */
@@ -17,12 +19,12 @@ interface Show<in A> {
   companion object {
 
     /**
-     * Construct a [Show] instance from a function `(A) -> String`
+     * Construct a [Show] instance from a function `A.() -> String`
      *
      * @param fshow function that defines a textual representation for type [A].
      * @returns a [Show] instance that is defined by the [fshow] function.
      */
-    inline operator fun <A> invoke(crossinline fshow: (A) -> String): Show<A> = object : Show<A> {
+    inline operator fun <A> invoke(crossinline fshow: A.() -> String): Show<A> = object : Show<A> {
       override fun A.show(): String =
         fshow(this)
     }

@@ -28,36 +28,55 @@ buildscript {
 
 apply plugin: 'ch.tutteli.settings'
 
+
+include(':arrow-meta-test-models')
+project(':arrow-meta-test-models').projectDir = new File('modules/meta/arrow-meta/models')
+
 //noinspection GroovyAssignabilityCheck
 include {
     modules {
 
-        core {
+        meta {
             _ 'annotations'
-            _ 'annotations-processor'
-            _ 'annotations-processor-test'
-            _ 'core'
-            _ 'data'
-            _ 'free'
-            _ 'instances-core'
-            _ 'instances-data'
+            _ 'meta'
+        }
+
+        core {
+            _ 'core-data'
+            _ 'core-extensions'
+            _ 'extras'
+            _ 'extras-extensions'
             _ 'generic'
             _ 'kindedj'
             _ 'mtl'
             _ 'syntax'
             _ 'test'
             _ 'typeclasses'
-            _ 'validation'
+        }
+
+        free {
+            _ 'free-data'
+            _ 'free-extensions'
         }
 
         effects {
-            _ 'effects'
-            _ 'effects-rx2'
-            _ 'effects-kotlinx-coroutines'
+            _ 'effects-data'
+            _ 'effects-extensions'
+            _ 'effects-rx2-data'
+            _ 'effects-rx2-extensions'
+            _ 'effects-kotlinx-coroutines-data'
+            _ 'effects-kotlinx-coroutines-extensions'
+            _ 'effects-reactor-data'
+            _ 'effects-reactor-extensions'
         }
 
-        folder('recursion-schemes') {
-            _ 'recursion'
+        integrations {
+            _ 'integrations-retrofit-adapter'
+        }
+
+        recursion {
+            _ 'recursion-data'
+            _ 'recursion-extensions'
         }
 
         docs {
@@ -74,6 +93,31 @@ include {
             _ 'dagger-effects'
             _ 'dagger-effects-rx2'
             _ 'dagger-effects-kotlinx-coroutines'
+        }
+
+        shadow {
+            _ 'shadow'
+        }
+
+        streams {
+            _ 'streams'
+        }
+
+        ank {
+            _ 'ank'
+            _ 'ank-gradle'
+        }
+
+        aql {
+            _ 'query-language'
+        }
+
+        reflect {
+            _ 'reflect'
+        }
+
+        validation {
+            _ 'validation'
         }
     }
 }

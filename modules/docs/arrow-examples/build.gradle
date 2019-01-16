@@ -1,20 +1,45 @@
-dependencies {
-    compile project(':arrow-data')
-    compile project(':arrow-effects')
-    compile project(':arrow-effects-rx2')
-    compile project(':arrow-effects-kotlinx-coroutines')
-    compile project(':arrow-optics')
+apply plugin: 'idea'
 
-    kapt project(':arrow-annotations-processor')
-    kaptTest project(':arrow-annotations-processor')
-    compileOnly project(':arrow-annotations-processor')
-    testCompileOnly project(':arrow-annotations-processor')
+idea {
+    module {
+        sourceDirs += files(
+                'build/generated/source/kapt/main',
+                'build/generated/source/kapt/debug',
+                'build/generated/source/kapt/release',
+                'build/generated/source/kaptKotlin/main',
+                'build/generated/source/kaptKotlin/debug',
+                'build/generated/source/kaptKotlin/release',
+                'build/tmp/kapt/main/kotlinGenerated')
+        generatedSourceDirs += files(
+                'build/generated/source/kapt/main',
+                'build/generated/source/kapt/debug',
+                'build/generated/source/kapt/release',
+                'build/generated/source/kaptKotlin/main',
+                'build/generated/source/kaptKotlin/debug',
+                'build/generated/source/kaptKotlin/release',
+                'build/tmp/kapt/main/kotlinGenerated')
+    }
+}
+
+dependencies {
+    compile project(':arrow-extras-extensions')
+    compile project(':arrow-effects-extensions')
+    compile project(':arrow-effects-rx2-extensions')
+    compile project(':arrow-effects-kotlinx-coroutines-extensions')
+    compile project(':arrow-optics')
+    compile project(':arrow-validation')
+
+    kapt project(':arrow-meta')
+    kaptTest project(':arrow-meta')
+    compileOnly project(':arrow-meta')
+    testCompileOnly project(':arrow-meta')
 
     testCompile project(':arrow-test')
+    testRuntime("org.junit.vintage:junit-vintage-engine:$jUnitVintageVersion")
+    testCompile "io.kotlintest:kotlintest-runner-junit4:$kotlinTestVersion"
 
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
 }
 
-apply from: rootProject.file('gradle/generated-kotlin-sources.gradle')
 apply plugin: 'kotlin-kapt'

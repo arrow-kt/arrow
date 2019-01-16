@@ -2,10 +2,13 @@ package arrow
 
 import arrow.Problem.*
 import arrow.core.*
-import arrow.typeclasses.binding
-import io.kotlintest.matchers.Matcher
-import io.kotlintest.matchers.Result
-import io.kotlintest.matchers.shouldBe
+import arrow.core.extensions.`try`.applicative.applicative
+import arrow.core.extensions.`try`.functor.functor
+import arrow.core.extensions.option.applicative.applicative
+import arrow.core.extensions.option.monad.binding
+import io.kotlintest.Matcher
+import io.kotlintest.Result
+import io.kotlintest.shouldBe
 import io.kotlintest.specs.FreeSpec
 import kotlin.reflect.KClass
 
@@ -13,14 +16,14 @@ import kotlin.reflect.KClass
 class DataTypeExamples : FreeSpec() { init {
 
   /**
-   * Option http://arrow-kt.io/docs/datatypes/option/
+   * Option http://arrow-kt.io/docs/arrow/core/option/
    ***/
   "Option: Some or None?" - {
     val someValue: Option<Int> = Some(42)
     val noneValue: Option<Int> = None
 
     "getOrElse" {
-      someValue.getOrElse { -1 }.shouldBe(42)
+      someValue.getOrElse { -1 }.shouldBe<Int, Int>(42)
       noneValue.getOrElse { -1 }.shouldBe(-1)
     }
 
@@ -61,7 +64,7 @@ class DataTypeExamples : FreeSpec() { init {
 
     "Monad" {
       // Computing over dependent values ignoring absence
-      val six = Option.monad().binding {
+      val six = binding {
         val a = Option(1).bind()
         val b = Option(1 + a).bind()
         val c = Option(1 + b).bind()
@@ -69,7 +72,7 @@ class DataTypeExamples : FreeSpec() { init {
       }
       six shouldBe Some(6)
 
-      val none = Option.monad().binding {
+      val none = binding {
         val a = Option(1).bind()
         val b = noneValue.bind()
         val c = Option(1 + b).bind()
@@ -80,7 +83,7 @@ class DataTypeExamples : FreeSpec() { init {
 
   }
 
-  // http://arrow-kt.io/docs/datatypes/try/
+  // http://arrow-kt.io/docs/arrow/core/try/
   "Try and recover" - {
 
     "Old school" {
@@ -130,7 +133,7 @@ class DataTypeExamples : FreeSpec() { init {
 
     "Functor" {
       // Transforming the value, if the computation is a success:
-      val actual = Try.functor().run { Try { "3".toInt() }.map({ it + 1 }) }
+      val actual = Try.functor().run { Try { "3".toInt() }.map { it + 1 } }
       actual shouldBe Try.Success(4)
     }
 
@@ -146,7 +149,7 @@ class DataTypeExamples : FreeSpec() { init {
     }
   }
 
-  // Either http://arrow.io/docs/datatypes/either/
+  // Either http://arrow.io/docs/arrow/core/either/
   "Either left or right" - {
     fun parse(s: String): ProblemOrInt = Try { Right(s.toInt()) }.getOrElse { Left(invalidInt) }
     fun reciprocal(i: Int): Either<Problem, Double> = when (i) {
@@ -193,10 +196,14 @@ class DataTypeExamples : FreeSpec() { init {
 
   fun aFailureOfType(expected: KClass<*>): Matcher<Try<Int>> = object : Matcher<Try<Int>> {
     override fun test(value: Try<Int>): Result = when (value) {
-      is Success -> Result(false, "Expected a failure, got $value")
+      is Success -> Result(false, "Expected a failure, got $value", "Received expected failure")
       is Failure -> {
         val javaClass = value.exception.javaClass
-        Result(expected.java.isAssignableFrom(javaClass), "Expected Try.Failure(${expected.java}), got $value")
+        Result(
+          expected.java.isAssignableFrom(javaClass),
+          "Expected Try.Failure(${expected.java}), got $value",
+          "Received expected failure"
+        )
       }
     }
   }

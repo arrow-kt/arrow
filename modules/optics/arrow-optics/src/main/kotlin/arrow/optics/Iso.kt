@@ -19,7 +19,7 @@ typealias IsoPartialOf<S> = Kind<ForIso, S>
 typealias IsoKindedJ<S, A> = PIsoKindedJ<S, S, A, A>
 
 /**
- * An [Iso] is a loss less invertible optic that defines an isomorphism between a type `S` and `A`.
+ * An [Iso] is a loss less invertible optic that defines an isomorphism between a type [S] and [A]
  * i.e. a data class and its properties represented by TupleN
  *
  * A (polymorphic) [PIso] is useful when setting or modifying a value for a constructed type
@@ -197,6 +197,8 @@ interface PIso<S, T, A, B> : PIsoOf<S, T, A, B> {
 
   operator fun <C, D> plus(other: PLens<A, B, C, D>): PLens<S, T, C, D> = compose(other)
 
+  operator fun <C, D> plus(other: PPrism<A, B, C, D>): PPrism<S, T, C, D> = compose(other)
+
   operator fun <C> plus(other: Getter<A, C>): Getter<S, C> = compose(other)
 
   operator fun <C, D> plus(other: PSetter<A, B, C, D>): PSetter<S, T, C, D> = compose(other)
@@ -218,7 +220,7 @@ interface PIso<S, T, A, B> : PIsoOf<S, T, A, B> {
   /**
    * View a [PIso] as a [PLens]
    */
-  fun asLens(): PLens<S, T, A, B> = PLens(this::get, { b -> { _ -> set(b) } })
+  fun asLens(): PLens<S, T, A, B> = PLens(this::get) { _, b -> set(b) }
 
   /**
    * View a [PIso] as a [Getter]
@@ -230,13 +232,13 @@ interface PIso<S, T, A, B> : PIsoOf<S, T, A, B> {
    */
   fun asOptional(): POptional<S, T, A, B> = POptional(
     { s -> Either.Right(get(s)) },
-    { b -> { _ -> set(b) } }
+    { _, b -> set(b) }
   )
 
   /**
    * View a [PIso] as a [PSetter]
    */
-  fun asSetter(): PSetter<S, T, A, B> = PSetter { f -> { s -> modify(s, f) } }
+  fun asSetter(): PSetter<S, T, A, B> = PSetter { s, f -> modify(s, f) }
 
   /**
    * View a [PIso] as a [Fold]

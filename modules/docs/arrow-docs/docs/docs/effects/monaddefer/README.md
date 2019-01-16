@@ -6,11 +6,28 @@ permalink: /docs/effects/monaddefer/
 
 ## MonadDefer
 
-`MonadDefer` is a typeclass representing suspension of execution via functions, allowing for asynchronous and lazy computations.
+{:.intermediate}
+intermediate
 
-`MonadDefer` includes all combinators present in [`MonadError`]({{ '/docs/typeclasses/monaderror' | relative_url }}).
+`MonadDefer` is a typeclass to abstract over computations that cause side effects. This means that the computations are defered until they're are asked to be performed *synchronously*. Without effect suspension the effects would otherwise run immediately.
+
+```kotlin
+val now = IO.applicative().just(println("eager side effect"))
+// Print: "eager side effect"
+
+now.unsafeRunAsync { }
+// Nothing, the effect has run already
+
+val later = IO.monadDefer().invoke { println("lazy side effect") }
+// Nothing, the effect is deferred until executed
+
+later.unsafeRunAsync { }
+// Print: "lazy side effect"
+```
 
 ### Main Combinators
+
+All the new combinators added by `MonadDefer` are constructors. `MonadDefer` also includes all combinators present in [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}).
 
 #### invoke
 
@@ -43,7 +60,7 @@ This can be used to wrap synchronous APIs that already return the expected datat
 #### lazy
 
 Suspends a function returning `Unit`.
-Useful in cases like [Monad Comprehension]({{ '/docs/patterns/monadcomprehensions' | relative_url }}) where you'd want to defer the start of the comprehension until the datatype is run without needing to use suspend.
+Useful in cases like [Monad Comprehension]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) where you'd want to defer the start of the comprehension until the datatype is run without needing to use suspend.
 
 ```kotlin
 val SC = IO.monadDefer()
@@ -74,7 +91,7 @@ lazyResult
 #### deferUnsafe
 
 Takes as a parameter a function that returns `Either<Throwable, A>`.
-The left side of the [`Either`]({{ '/docs/datatypes/either' | relative_url }}) represents an error in the execution.
+The left side of the [`Either`]({{ '/docs/arrow/core/either' | relative_url }}) represents an error in the execution.
 This function is assumed to never throw any internal exceptions.
 
 ```kotlin
@@ -86,39 +103,17 @@ IO.async()
 
 > deferUnsafe() exists for performance purposes when throwing can be avoided.
 
-### Comprehensions
-
-#### bindindCancellable
-
-It starts a [Monad Comprehension]({{ '/docs/patterns/monadcomprehensions' | relative_url }}) that allows for cancellation and suspension in separate threads.
-
-#### bindindCancellable#bindDefer
-
-Binds the function parameter by wrapping the result in `just()`.
-
-Exceptions are wrapped in `raiseError()`.
-
-#### bindindCancellable#bindDeferIn
-
-Executes the function parameter in a separate `CoroutineContext` and wraps the result in `just()`.
-
-Exceptions are wrapped in `raiseError()`.
-
-#### bindindCancellable#bindDeferUnsafe
-
-Binds the function parameter by wrapping the result in `just()`.
-
-While there is no wrapping of exceptions, the left side of the [`Either`]({{ '/docs/datatypes/either' | relative_url }}) represents an error in the execution.
-
 ### Laws
 
-Arrow provides [`MonadDeferLaws`]({{ '/docs/typeclasses/laws#monaddeferlaws' | relative_url }}) in the form of test cases for internal verification of lawful instances and third party apps creating their own `MonadDefer` instances.
+Arrow provides `MonadDeferLaws` in the form of test cases for internal verification of lawful instances and third party apps creating their own `MonadDefer` instances.
 
-### Data Types
+### Data types
 
-The following data types in Arrow provide instances that adhere to the `MonadDefer` type class.
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.effects.typeclasses.*
 
-- [IO]({{ '/docs/effects/io' | relative_url }})
-- [ObservableK]({{ '/docs/integrations/rx2' | relative_url }})
-- [FlowableK]({{ '/docs/integrations/rx2' | relative_url }})
-- [DeferredK]({{ '/docs/integrations/kotlinxcoroutines/' | relative_url }})
+TypeClass(MonadDefer::class).dtMarkdownList()
+```
+
+ank_macro_hierarchy(arrow.effects.typeclasses.MonadDefer)

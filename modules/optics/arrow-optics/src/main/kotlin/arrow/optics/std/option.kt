@@ -3,64 +3,48 @@ package arrow.optics
 import arrow.core.*
 
 /**
- * [PIso] that defines the equality in the kotlin nullable structure and [arrow.Option]
+ * [PIso] that defines the equality between [Option] and the nullable platform type.
  */
-fun <A, B> pNullableToOption(): PIso<A?, B?, Option<A>, Option<B>> = PIso(
-  get = { a -> Option.fromNullable(a) },
-  reverseGet = { option -> option.fix().fold({ null }, ::identity) }
+fun <A, B> Option.Companion.toPNullable(): PIso<Option<A>, Option<B>, A?, B?> = PIso(
+  get = { it.fold({ null }, ::identity) },
+  reverseGet = Option.Companion::fromNullable
 )
 
 /**
- * [Iso] that defines the equality in the kotlin nullable structure and [arrow.Option]
+ * [PIso] that defines the isomorphic relationship between [Option] and the nullable platform type.
  */
-fun <A> nullableToOption(): Iso<A?, Option<A>> = pNullableToOption()
+fun <A> Option.Companion.toNullable(): Iso<Option<A>, A?> = toPNullable()
 
 /**
- * [PPrism] to focus into an [arrow.Option.Some]
+ * [PPrism] to focus into an [arrow.core.Some]
  */
-fun <A, B> pSomePrism(): PPrism<Option<A>, Option<B>, A, B> = PPrism(
-  getOrModify = { option -> option.fix().fold({ Either.Left(None) }, { a -> Either.Right(a) }) },
-  reverseGet = { b -> Some(b) }
+fun <A, B> Option.Companion.PSome(): PPrism<Option<A>, Option<B>, A, B> = PPrism(
+  getOrModify = { option -> option.fold({ Either.Left(None) }, ::Right) },
+  reverseGet = ::Some
 )
 
 /**
- * [Prism] to focus into an [arrow.Option.Some]
+ * [Prism] to focus into an [arrow.core.Some]
  */
-fun <A> somePrism(): Prism<Option<A>, A> = pSomePrism()
+fun <A> Option.Companion.some(): Prism<Option<A>, A> = PSome()
 
 /**
- * [Prism] to focus into an [arrow.Option.None]
+ * [Prism] to focus into an [arrow.core.None]
  */
-fun <A> nonePrism(): Prism<Option<A>, Unit> = Prism(
-  getOrModify = { option -> option.fix().fold({ Either.Right(Unit) }, { Either.Left(Some(it)) }) },
+fun <A> Option.Companion.none(): Prism<Option<A>, Unit> = Prism(
+  getOrModify = { option -> option.fold({ Either.Right(Unit) }, { Either.Left(option) }) },
   reverseGet = { _ -> None }
 )
 
 /**
- * [Iso] that defines the equality between and [arrow.Option] and [arrow.Either]
+ * [Iso] that defines the equality between and [arrow.core.Option] and [arrow.core.Either]
  */
-fun <A, B> pOptionToEither(): PIso<Option<A>, Option<B>, Either<Unit, A>, Either<Unit, B>> = PIso(
-  get = { opt -> opt.fix().fold({ Either.Left(Unit) }, { a -> Either.Right(a) }) },
-  reverseGet = { either -> either.fix().fold({ None }, { b -> Some(b) }) }
+fun <A, B> Option.Companion.toPEither(): PIso<Option<A>, Option<B>, Either<Unit, A>, Either<Unit, B>> = PIso(
+  get = { opt -> opt.fold({ Either.Left(Unit) }, ::Right) },
+  reverseGet = { either -> either.fold({ None }, ::Some) }
 )
 
 /**
- * [Iso] that defines the equality between and [arrow.Option] and [arrow.Either]
+ * [Iso] that defines the equality between and [arrow.core.Option] and [arrow.core.Either]
  */
-fun <A> optionToEither(): Iso<Option<A>, Either<Unit, A>> = pOptionToEither()
-
-/**
- * [Optional] to safely operate on value inside an [arrow.Option]
- */
-fun <A> optionOptional(): Optional<Option<A>, A> = Optional(
-  getOrModify = { a -> a.fix().fold({ Left(a) }, { Right(it) }) },
-  set = { a -> { it.fix().fold({ Option.empty() }, { a.toOption() }) } }
-)
-
-/**
- * [Optional] to safely operate on a nullable value.
- */
-fun <A> nullableOptional(): Optional<A?, A> = Optional(
-  getOrModify = { a -> a?.let(::Right) ?: a.let(::Left) },
-  set = { a -> { if (it != null) a else null } }
-)
+fun <A> Option.Companion.toEither(): Iso<Option<A>, Either<Unit, A>> = toPEither()

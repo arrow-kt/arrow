@@ -2,15 +2,21 @@
 layout: docs
 title: Dependency Injection
 permalink: /docs/patterns/dependency_injection/
+video: CR5h2Wq1yPE
 ---
 
-If you would like to know about using the [`Reader`]({{ '/docs/datatypes/reader' | relative_url }}) datatype instead, visit [this article](https://medium.com/@JorgeCastilloPr/kotlin-dependency-injection-with-the-reader-monad-7d52f94a482e) by [Jorge Castillo](https://github.com/JorgeCastilloPrz).
+If you would like to know about using the [`Reader`]({{ '/docs/arrow/data/reader' | relative_url }}) datatype instead, visit [this article](https://medium.com/@JorgeCastilloPr/kotlin-dependency-injection-with-the-reader-monad-7d52f94a482e) by [Jorge Castillo](https://github.com/JorgeCastilloPrz).
+
+If what you want is the example of the video to follow along, you can find it in [this folder](https://github.com/arrow-kt/arrow/tree/master/modules/docs/arrow-examples/src/test/kotlin/arrow/typeclasses).
 
 ## Dependency Injection using the `Typeclassless` technique
 
+{:.intermediate}
+intermediate
+
 Arrow allows abstracting polymorphic code that operates over the evidence of having an instance of a [typeclass]({{ '/docs/typeclasses/intro' | relative_url }}) available.
 This enables programs that are not coupled to specific datatype implementations.
-The technique demonstrated below to write polymorphic code is available for all other typeclasses besides [`Functor`]({{ '/docs/typeclasses/functor' | relative_url }}).
+The technique demonstrated below to write polymorphic code is available for all other typeclasses besides [`Functor`]({{ '/docs/arrow/typeclasses/functor' | relative_url }}).
 
 ```kotlin
 fun <F> multiplyBy2(FT: Functor<F>, fa: Kind<F, Int>): Kind<F, Int> =
@@ -23,7 +29,7 @@ multiplyBy2(Try.functor(), Try.just(1))
 // Success(2)
 ```
 
-In the example above we've defined a function that can operate over any data type for which a [`Functor`]({{ '/docs/typeclasses/functor' | relative_url }}) instance is available.
+In the example above we've defined a function that can operate over any data type for which a [`Functor`]({{ '/docs/arrow/typeclasses/functor' | relative_url }}) instance is available.
 And then we applied `multiplyBy2` to two different datatypes for which Functor instances exist.
 This technique applied to other Typeclasses allows users to describe entire programs in terms of behaviors typeclasses removing
 dependencies to concrete data types and how they operate.
@@ -63,19 +69,32 @@ fun <F> printAllValues(S: Show<Kind<F, Int>>, fa: List<Kind<F, Int>>): Unit {
 
 An extension function is applied to a type, that becomes bound to `this` and enables calling all its functions without using `this.method()`. If we declare a function to depend on the typeclass, we get automatic access to the extension functions declared inside.
 
-```kotlin
+```kotlin:ank:silent
+import arrow.*
+import arrow.core.*
+import arrow.typeclasses.*
+
 fun <F> Functor<F>.multiplyBy2(fa: Kind<F, Int>): Kind<F, Int> =
   fa.map { it * 2 }
 ```
 
 And we can call it on the typeclass instances:
 
-```kotlin
-Option.functor().multiplyBy2(Try.just(1))
+```kotlin:ank
+import arrow.core.extensions.*
+import arrow.core.extensions.option.functor.functor
+
+Option.functor().run { 
+  multiplyBy2(Option(1)) 
+}
 ```
 
-```kotlin
-Try.functor().multiplyBy2(Try.just(1))
+```kotlin:ank
+import arrow.core.extensions.`try`.functor.functor
+
+Try.functor().run { 
+  multiplyBy2(Try.just(1))
+}
 ```
 
 The same applies to functions without a return value, so you don't have to remember to use the right function.
@@ -98,7 +117,7 @@ Extension functions declared for the same types can call into each other without
 This is the simplest, most direct case, and that's no coincidence. Most FP languages only allow functions scoped to global, a module, or an object that acts as a namespace.
 Programs are composed by functions and tested on their typeclass and data parameters that define the functionality.
 
-```kotlin
+```kotlin:ank:silent
 fun <A> Eq<A>.remove(l: List<A>, a: A): List<A> =
   l.filterNot { a.eqv(it) }
 ```
@@ -113,14 +132,16 @@ object FunctorLaws {
 
   fun <F> Functor<F>.covariantIdentityTest(f: (Int) -> Kind<F, Int>): Unit = ...
 
-  fun <F> Functor<F>.covariantComposition(f: (Int) -> Kind<F, Int>: Unit = ...
+  fun <F> Functor<F>.covariantComposition(f: (Int) -> Kind<F, Int>): Unit = ...
 }
 
 ...
 
 import arrow.test.FunctorLaws.test
 
-Option.functor().test { it.some() }
+Option.functor.run {
+  test { it.some() }
+}
 ```
 
 ```kotlin
@@ -201,11 +222,13 @@ This makes that extension functions declared inside a class require using the st
 class Parser {
   fun Monad<ForOption>.parseInt(s: String): Option<Int> = ...
 
-  fun ???.parseInts(l: List<Option<String>>): Option<List<Int>> =
+  fun ???.parseInts(l: List<Option<String>>): Option<List<Int>> = ...
 }
 
 // TEDIOUS AND NOT IDIOMATIC
-Parser().run { Option.monad().parseInt("123") }
+ForOption extensions { 
+  Parser().run { parseInt("123") }
+}
 ```
 
 For these cases the most ergonomic option is not to use extension functions, and instead fall back to regular parameter passing.
@@ -213,9 +236,11 @@ Once inside the method we can use the standard library functions to access the s
 
 ```kotlin
 class Parser {
-  fun parseInt(M: Monad<ForOption>, s: String): Option<Int> = M.run { ... }
+  fun parseInt(M: Monad<ForOption>, s: String): Option<Int> =
+    M.run { ... }
 
-  fun parseInts(M: Monad<ForOption>, l: List<Option<String>>): Option<List<Int>> = M.run { ListK.traverse().run { ... } }
+  fun parseInts(M: Monad<ForOption>, l: List<Option<String>>): Option<List<Int>> =
+    M.run { ListK.traverse().run { ... } }
 }
 
 // JUST MEH

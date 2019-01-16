@@ -6,6 +6,9 @@ permalink: /docs/optics/at/
 
 ## At
 
+{:.beginner}
+beginner
+
 `At` provides a [Lens]({{ '/docs/optics/lens' | relative_url }}) for a structure `S` to focus in `A` at a given index `I`.
 
 ### Example
@@ -19,8 +22,9 @@ A `MapK<Int, String>` can be indexed by its keys `Int` but not for every index a
 import arrow.core.*
 import arrow.data.*
 import arrow.optics.typeclasses.*
+import arrow.optics.extensions.mapk.at.*
 
-val mapAt = At.at(MapK.at<Int, String>(), 2)
+val mapAt = MapK.at<Int, String>().at(2)
 
 val map = mapOf(
             1 to "one",
@@ -45,9 +49,13 @@ You may create instances of `At` for your own datatypes which you will be able t
 
 See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | relative_url }}) to provide your own `At` instances for custom datatypes.
 
-### Instances
+### Data types
 
-The following datatypes in Arrow provide instances that adhere to the `At` typeclass.
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.optics.typeclasses.*
 
-- [SetK]({{ '/docs/datatypes/setk' | relative_url }})
-- [MapK]({{ '/docs/datatypes/mapk' | relative_url }})
+TypeClass(At::class).dtMarkdownList()
+```
+
+ank_macro_hierarchy(arrow.optics.typeclasses.At)

@@ -3,12 +3,14 @@ package arrow.typeclasses
 import arrow.core.Tuple2
 
 /**
+ * ank_macro_hierarchy(arrow.typeclasses.Order)
+ *
  * The [Order] type class is used to define a total ordering on some type [F] and is defined by being able to fully determine order between two instances.
  *
  * [Order] is a subtype of [Eq] and defines [eqv] in terms of [compare].
  *
  * @see [Eq]
- * @see <a href="http://arrow-kt.io/docs/typeclasses/order/">Order documentation</a>
+ * @see <a href="http://arrow-kt.io/docs/arrow/typeclasses/order/">Order documentation</a>
  */
 interface Order<F> : Eq<F> {
 
@@ -23,6 +25,9 @@ interface Order<F> : Eq<F> {
    * @returns zero objects are equal, a negative number if [this@compare] is less than [b], or a positive number if [this@compare] greater than [b].
    */
   fun F.compare(b: F): Int
+
+  /** Kotlin operator overload */
+  operator fun F.compareTo(b: F): Int = compare(b)
 
   /** @see [Eq.eqv] */
   override fun F.eqv(b: F): Boolean = this.compare(b) == 0

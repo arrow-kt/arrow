@@ -6,6 +6,9 @@ permalink: /docs/optics/filterindex/
 
 ## FilterIndex
 
+{:.beginner}
+beginner
+
 `FilterIndex` provides a [Traversal]({{ '/docs/optics/traversal' | relative_url }}) that can focus into a structure `S` and get, set or modify 0 to N foci whose index `I` satisfies a predicate.
 
 If for a structure `S` the foci `A` can be indexed by `I` then a `Traversal` can be created by `FilterIndex` that is filtered by a predicate on `I`.
@@ -17,6 +20,7 @@ import arrow.core.*
 import arrow.data.*
 import arrow.optics.*
 import arrow.optics.typeclasses.*
+import arrow.data.extensions.listk.traverse.*
 
 val filterIndexStringByIndex = FilterIndex.fromTraverse<ForListK, String>({ list ->
     list.fix().map {
@@ -36,16 +40,18 @@ filter.getAll(listOf("H", "He", "Hel", "Hell", "Hello").k())
 Arrow provides `FilterIndex` instances for some common datatypes both in Arrow and the Kotlin stdlib that can be filtered by index, like `ListK` and `MapK`. You can look them up by calling `FilterIndex.filterIndex()`.
 
 ```kotlin:ank
-FilterIndex.filterIndex(ListK.filterIndex<Int>()) { index -> index % 2 == 0 }
+import arrow.optics.extensions.listk.filterIndex.*
+ListK.filterIndex<Int>().filter { index -> index % 2 == 0 }
             .getAll(listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9).k())
 ```
 
-### Instances
+### Data types
 
-The following datatypes in Arrow provide instances that adhere to the `FilterIndex` typeclass.
+```kotlin:ank:replace
+import arrow.reflect.*
+import arrow.optics.typeclasses.*
 
-- [String]
-- [NonEmptyList]({{ '/docs/datatypes/nonemptylist' | relative_url }})
-- [ListK]({{ '/docs/datatypes/listk' | relative_url }})
-- [SequenceK]({{ '/docs/datatypes/sequencek' | relative_url }})
-- [MapK]({{ '/docs/datatypes/mapk' | relative_url }})
+TypeClass(FilterIndex::class).dtMarkdownList()
+```
+
+ank_macro_hierarchy(arrow.optics.typeclasses.FilterIndex)
