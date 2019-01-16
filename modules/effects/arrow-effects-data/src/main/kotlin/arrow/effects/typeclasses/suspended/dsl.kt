@@ -287,9 +287,8 @@ interface ConcurrentSyntax<F> : AsyncSyntax<F>, Concurrent<F> {
   ): RaceTriple<F, A, B, C> =
     concurrently { raceTriple(ctx, fa, fb, fc) }
 
-  suspend fun <A, B, C> parMapN(
-    unit1: Unit = Unit,
-    ctx: CoroutineContext,
+  suspend fun <A, B, C> parMap(
+    ctx: CoroutineContext = EmptyCoroutineContext,
     fa: Kind<F, A>,
     fb: Kind<F, B>,
     f: (A, B) -> C
