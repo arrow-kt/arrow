@@ -17,11 +17,12 @@ import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.laws.ComonadLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
+import arrow.core.FunctionK
+import io.kotlintest.runner.junit4.KotlinTestRunner
+import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class CofreeTest : UnitSpec() {
 
   init {

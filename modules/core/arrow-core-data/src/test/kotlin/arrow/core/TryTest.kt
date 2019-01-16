@@ -12,15 +12,20 @@ import arrow.core.extensions.`try`.show.show
 import arrow.core.extensions.`try`.traverse.traverse
 import arrow.mtl.extensions.`try`.functorFilter.functorFilter
 import arrow.test.UnitSpec
+import arrow.test.generators.genTry
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Hash
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.*
+import io.kotlintest.fail
+import io.kotlintest.matchers.beTheSameInstanceAs
+import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
+import io.kotlintest.runner.junit4.KotlinTestRunner
+import io.kotlintest.should
+import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class TryTest : UnitSpec() {
 
   val success = Try { "10".toInt() }
@@ -32,7 +37,7 @@ class TryTest : UnitSpec() {
 
     testLaws(
       SemigroupLaws.laws(Try.semigroup(Int.semigroup()), Try.just(1), Try.just(2), Try.just(3), EQ),
-      MonoidLaws.laws(Try.monoid(MO = Int.monoid()), Try.just(1), EQ),
+      MonoidLaws.laws(Try.monoid(MO = Int.monoid()), genTry(Gen.int()), EQ),
       ShowLaws.laws(Try.show(), EQ) { Try.just(it) },
       MonadErrorLaws.laws(Try.monadError(), Eq.any(), Eq.any()),
       TraverseLaws.laws(Try.traverse(), Try.functor(), ::Success, Eq.any()),
@@ -118,7 +123,7 @@ class TryTest : UnitSpec() {
       val e: Throwable = Exception()
 
       Success(1).getOrElse { _: Throwable -> 2 } shouldBe 1
-      Failure(e).getOrElse { (it shouldEqual e); 2 } shouldBe 2
+      Failure(e).getOrElse { (it shouldBe e); 2 } shouldBe 2
     }
 
     "orNull returns null if Failure" {

@@ -33,8 +33,10 @@ object MonoidKLaws {
       fa.combineK(empty<Int>()).equalUnderTheLaw(fa, EQ)
     }
 
-  fun <F> MonoidK<F>.monoidKFold(f: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(genConstructor(Gen.int(), f)) { fa: Kind<F, Int> ->
-      listOf(fa).fold(this.algebra()).equalUnderTheLaw(fa, EQ)
-    }
+  fun <F> MonoidK<F>.monoidKFold(f: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit {
+      val mo = this
+      forAll(genConstructor(Gen.int(), f)) { fa: Kind<F, Int> ->
+          listOf(fa).fold(mo.algebra()).equalUnderTheLaw(fa, EQ)
+      }
+  }
 }

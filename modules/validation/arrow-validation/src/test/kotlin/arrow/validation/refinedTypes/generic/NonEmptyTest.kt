@@ -1,18 +1,17 @@
 package arrow.validation.refinedTypes.generic
 
 import arrow.test.UnitSpec
+import arrow.test.generators.genNonEmptyString
 import arrow.validation.refinedTypes.generic.validated.nonEmpty.nonEmpty
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.properties.Gen
-import io.kotlintest.properties.filter
 import io.kotlintest.properties.forAll
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class NonEmptyTest : UnitSpec() {
   init {
     "Should create NonEmpty for every string with length > 0" {
-      forAll(NonEmptyStringGen()) { s: String ->
+      forAll(genNonEmptyString()) { s: String ->
         s.nonEmpty("").isValid
       }
     }
@@ -22,7 +21,4 @@ class NonEmptyTest : UnitSpec() {
     }
   }
 
-  class NonEmptyStringGen : Gen<String> {
-    override fun generate(): String = Gen.string().filter(String::isNotEmpty).generate()
-  }
 }

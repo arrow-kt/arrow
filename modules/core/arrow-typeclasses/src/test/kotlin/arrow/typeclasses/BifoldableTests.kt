@@ -4,10 +4,10 @@ import arrow.Kind2
 import arrow.core.*
 import arrow.test.UnitSpec
 import arrow.test.laws.BifoldableLaws
-import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class BifoldableTests : UnitSpec() {
   init {
 

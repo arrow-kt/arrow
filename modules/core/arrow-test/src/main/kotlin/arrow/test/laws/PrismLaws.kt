@@ -23,7 +23,7 @@ object PrismLaws {
 
   fun <A, B> Prism<A, B>.partialRoundTripOneWay(aGen: Gen<A>, EQA: Eq<A>): Unit =
     forAll(aGen) { a ->
-      getOrModify(a).fold(::identity, this::reverseGet)
+      getOrModify(a).fold(::identity, ::reverseGet)
         .equalUnderTheLaw(a, EQA)
     }
 

@@ -12,9 +12,9 @@ fun <A> Try<A>.combine(SG: Semigroup<A>, b: Try<A>): Try<A> =
   when (this) {
     is Success<A> -> when (b) {
       is Success<A> -> Success(SG.run { value.combine(b.value) })
-      is Failure -> this
+      is Failure -> b
     }
-    is Failure -> b
+    is Failure -> this
   }
 
 @extension

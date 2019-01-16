@@ -2,7 +2,6 @@ package arrow.effects
 
 import arrow.effects.rx2.*
 import arrow.effects.rx2.extensions.observablek.async.async
-import arrow.effects.rx2.extensions.observablek.foldable.foldable
 import arrow.effects.rx2.extensions.observablek.functor.functor
 import arrow.effects.rx2.extensions.observablek.monad.flatMap
 import arrow.effects.rx2.extensions.observablek.monadThrow.bindingCatch
@@ -11,10 +10,9 @@ import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.Spec
-import io.kotlintest.matchers.shouldBe
-import io.kotlintest.matchers.shouldNotBe
+import io.kotlintest.runner.junit4.KotlinTestRunner
+import io.kotlintest.shouldBe
+import io.kotlintest.shouldNotBe
 import io.reactivex.Observable
 import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers
@@ -22,7 +20,7 @@ import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class ObservableKTests : UnitSpec() {
 
   fun <T> EQ(): Eq<ObservableKOf<T>> = object : Eq<ObservableKOf<T>> {
@@ -48,11 +46,6 @@ class ObservableKTests : UnitSpec() {
       }
   }
 
-  override fun interceptSpec(context: Spec, spec: () -> Unit) {
-    println("ObservableK: Skipping sync laws for stack safety because they are not supported. See https://github.com/ReactiveX/RxJava/issues/6322")
-    super.interceptSpec(context, spec)
-  }
-
   init {
     testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ(), testStackSafety = false))
 //     FIXME(paco) #691
@@ -60,7 +53,6 @@ class ObservableKTests : UnitSpec() {
 //    testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ()))
 
     testLaws(
-      FoldableLaws.laws(ObservableK.foldable(), { ObservableK.just(it) }, Eq.any()),
       TraverseLaws.laws(ObservableK.traverse(), ObservableK.functor(), { ObservableK.just(it) }, EQ())
     )
 

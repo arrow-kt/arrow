@@ -43,6 +43,13 @@ class IsoTest : APTest("arrow.ap.objects.iso") {
       processor = OpticsProcessor()
     ))
 
+    testProcessor(AnnotationProcessor(
+      name = "Isos will be generated for data class with secondary constructors",
+      sourceFiles = listOf("IsoSecondaryConstructor.java"),
+      destFile = "IsoSecondaryConstructor.kt",
+      processor = OpticsProcessor()
+    ))
+
   }
 
 }

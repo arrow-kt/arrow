@@ -33,7 +33,7 @@ and `Ior` is a `sealed` class with three `data` class inheritors, `Left(val a: A
 
 Datatypes that express patterns like deferred evaluation can do it by nesting themselves with every operation they chain. One example is `IO`.
 
-```kotlin:ank
+```kotlin:ank:silent
 import arrow.effects.*
 
 IO { 0 }
@@ -68,7 +68,7 @@ You can read more about all the [typeclasses]({{ '/docs/typeclasses/intro' | rel
 
 Let's dive in one example. The typeclass `Eq` parametrized to `F` defines equality between two objects of type `F`:
 
-```kotlin
+```kotlin:ank:silent
 interface Eq<F> {
   fun F.eqv(b: F): Boolean
 
@@ -84,7 +84,7 @@ Because typeclasses require generic parameters each implementation is meant to b
 
 For example, given a class like this:
 
-```kotlin
+```kotlin:ank:silent
 data class User(val id: Int) {
   companion object
 }
@@ -92,7 +92,9 @@ data class User(val id: Int) {
 
 We can declare that instances of this class can be equated based on their `id` property, and therefore that `User` itself is an instance of the `Eq` typeclass:
 
-```kotlin
+```kotlin:ank:silent
+import arrow.extension
+
 @extension
 interface UserEq: Eq<User> {
   override fun User.eqv(b: User): Boolean = id == b.id
@@ -113,25 +115,25 @@ import arrow.core.extensions.either.monadError.*
 import arrow.data.extensions.listk.traverse.*
 ```
 
-```kotlin:ank
+```kotlin:ank:silent
 String.eq()
 ```
 
-```kotlin:ank
+```kotlin:ank:silent
 Option.functor()
 ```
 
-```kotlin:ank
+```kotlin:ank:silent
 import arrow.data.extensions.mapk.semigroup.*
 
 MapK.semigroup<String, Int>(Int.semigroup())
 ```
 
-```kotlin:ank
+```kotlin:ank:silent
 Either.monadError<Throwable>()
 ```
 
-```kotlin:ank
+```kotlin:ank:silent
 ListK.traverse()
 ```
 
@@ -144,7 +146,7 @@ NOTE: If you'd like to use `@extension` for transitive typeclasses, like a `Show
 
 Arrow provides a `extensions` DSL making available in the scoped block all the functions and extensions defined in all instances for that datatype. Use the infix function `extensions` on an object, or function, with the name of the datatype prefixed by For-.
 
-```kotlin:ank
+```kotlin:ank:silent
 import arrow.core.Option
 import arrow.core.extensions.option.monad.binding
 
@@ -155,16 +157,15 @@ binding {
 }
 ```
 
-```kotlin
-ForOption extensions {
-  map(Option(1), Option(2), Option(3), { (one, two, three) ->
-    one + two + three
-  })
+```kotlin:ank
+import arrow.core.extensions.option.applicative.map
+
+map(Option(1), Option(2), Option(3)) { (one, two, three) ->
+  one + two + three
 }
-//Option(6)
 ```
 
-```kotlin:ank
+```kotlin:ank:silent
 import arrow.data.extensions.list.traverse.sequence
 import arrow.core.extensions.option.applicative.applicative
 
@@ -181,7 +182,7 @@ binding {
 }
 ```
 
-```kotlin:ank
+```kotlin:ank:silent
 import arrow.core.extensions.`try`.applicative.map
 
 map(Try { 1 }, Try { 2 }, Try { 3 }) { (one, two, three) ->
@@ -189,7 +190,7 @@ map(Try { 1 }, Try { 2 }, Try { 3 }) { (one, two, three) ->
 }
 ```
 
-```kotlin
+```kotlin:ank:silent
 import arrow.data.extensions.list.traverse.sequence
 import arrow.core.extensions.either.applicative.applicative
 
@@ -253,13 +254,13 @@ What Λrrow does instead is define a surrogate type that's not parametrized to r
 These types are named same as the container and prefixed by For-, as in `ForOption` or `ForListK`.
 You have seen these types used in the Syntax section above! 
 
-```kotlin
+```kotlin:ank:silent
 class ForOption private constructor() { companion object {} }
 
 sealed class Option<A>: Kind<ForOption, A>
 ```
 
-```kotlin
+```kotlin:ank:silent
 class ForListK private constructor() { companion object {} }
 
 data class ListK<A>(val list: List<A>): Kind<ForListK, A>
@@ -268,8 +269,8 @@ data class ListK<A>(val list: List<A>): Kind<ForListK, A>
 As `ListK<A>` is the only existing implementation of `Kind<ForListK, A>`, we can define an extension function on `Kind<ForListK, A>` to do the downcasting safely for us.
 This function by convention is called `fix()`, as in, fixing a type from something generic into concrete.
 
-```kotlin
-fun Kind<ForListK, A>.fix() = this as ListK<A>
+```kotlin:ank:silent
+fun <A> Kind<ForListK, A>.fix() = this as ListK<A>
 ```
 
 This way we can convert from `ListK<A>` to `Kind<ForListK, A>` via simple subclassing and from `Kind<ForListK, A>` to `ListK<A>` using the function `fix()`.
@@ -280,9 +281,8 @@ If it can't it means there's an ambiguity you should fix!
 The function `fix()` is already defined for all datatypes in Λrrow, alongside a typealias for its `Kind<F, A>` specialization done by suffixing the type with Of, as in `ListKOf<A>` or `OptionOf<A>`. If you're creating your own datatype that's also a type constructor and would like to create all these helper types and functions,
 you can do so simply by annotating it as `@higherkind` and the Λrrow's [annotation processor](https://github.com/arrow-kt/arrow#additional-setup) will create them for you.
 
-```kotlin
-@higherkind
-data class ListK<A>(val list: List<A>): ListKOf<A>
+```kotlin:ank:silent
+@higherkind data class ListK<A>(val list: List<A>): ListKOf<A>
 
 // Generates the following code:
 //
@@ -299,7 +299,7 @@ Now that we have a way of representing generic constructors for any type, we can
 
 Let's take as an example a typeclass that specifies how to map the contents of any container `F`. This typeclass that comes from computer science is called a [`Functor`]({{ '/docs/arrow/typeclasses/functor' | relative_url }}).
 
-```kotlin
+```kotlin:ank:silent
 interface Functor<F> {
   fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B>
 }
@@ -312,9 +312,8 @@ Let's define an instance of `Functor` for the datatype `ListK`, our own wrapper 
 ```kotlin
 @extension
 interface ListKFunctor : Functor<ForListK> {
-  override fun <A, B> Kind<F, A>.map(f: (A) -> B): ListK<B> {
-    val list: ListK<A> = this.fix()
-    return list.map(f)
+  override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): Kind<ForListK, B> {
+    return this.fix().map(f)
   }
 }
 ```
@@ -323,14 +322,13 @@ This interface extends `Functor` for the value `F` of `ListK`. We use an annotat
 The `@extension` processor also projects all type class declared functions into the data type that it's extending as extensions functions.
 These extensions functions may be imported a la carte when working with concrete data types. 
 
-```kotlin
+```kotlin:ank:silent
 @extension
 interface ListKFunctor : Functor<ForListK>
 ```
 
-```kotlin:ank
+```kotlin
 // Somewhere else in the codebase
-import arrow.data.extensions.listk.functor.*
 ListK.functor()
 ```
 
@@ -353,31 +351,28 @@ Higher kinds are also used to model functions that require for a datatype to imp
 
 Let's use the typeclass [`Applicative`]({{ '/docs/arrow/typeclasses/applicative' | relative_url }}), that contains the constructor function `just()`.
 
-```kotlin
+```kotlin:ank:silent
 interface Applicative<F>: Functor<F> {
 
   // Constructs the current datatype with a value of type A inside
   fun <A> just(a: A): Kind<F, A>
 
-  /* ... */
 }
 ```
 
 Once we have this typeclass behavior define we can now write a function that's parametrized for any `F` that has one instance of `Applicative`. The function uses the constructor `just` to create a value of type `Kind<F, User>`, effectively generifying the return on any container `F`.
 
-```kotlin
+```kotlin:ank:silent
 fun <F> Applicative<F>.randomUserStructure(f: (Int) -> User): Kind<F, User> =
-  AP.just(f(Math.random()))
+  this.just(f(Math.random().toInt()))
 ```
 
 Now lets create a simple example instance of `Applicative` where our `F` is `ListK`. This implementation of a `just` constructor is trivial for lists, as it just requires wrapping the value.
 
 ```kotlin
-@instance
+@extension
 interface ListKApplicative : Applicative<ForListK> {
   override fun <A> just(a: A): Kind<ForListK, A> = ListK(listOf(a))
-
-  /* ... */
 }
 ```
 
@@ -422,7 +417,6 @@ It is also possible to use a form of [`Dependency Injection`]({{ '/docs/patterns
 
 ```kotlin
 class UserFetcher<F>(AP: Applicative<F>): Applicative<F> by AP {
-
     fun genUser() = randomUserStructure(::User)
 }
 

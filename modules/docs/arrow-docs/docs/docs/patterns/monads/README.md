@@ -194,7 +194,7 @@ class Talk {
 }
 
 class Conference {
-    fun getCities() List<City> { ... }
+    fun getCities(): List<City> { ... }
 }
 ```
 
