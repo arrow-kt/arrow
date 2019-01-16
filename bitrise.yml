@@ -58,5 +58,6 @@ workflows:
                set -ex
                bundle install --gemfile modules/docs/arrow-docs/Gemfile --path vendor/bundle
                export BUNDLE_GEMFILE=modules/docs/arrow-docs/Gemfile
+               export JEKYLL_ENV=production
                bundle exec jekyll build -s modules/docs/arrow-docs/build/site -d modules/docs/arrow-docs/build/_site
                aws s3 sync modules/docs/arrow-docs/build/_site s3://$S3_BUCKET > aws_sync_jekyll.log
