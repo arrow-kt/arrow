@@ -14,12 +14,12 @@ Go to `modules/docs/arrow-docs/docs/_data/menu.yml` and add a menu entry in the 
 - title: Applicative
   url: /docs/typeclasses/applicative/
 ```
-   
+
 Check [this PR](https://github.com/arrow-kt/arrow/pull/1134/files) for a real example.
 
 ### 2. Add your docs file
 
-Add your docs as a Markdown file inside the corresponding directory. You have directories for all the sections 
+Add your docs as a Markdown file inside the corresponding directory. You have directories for all the sections
 available in docs under `modules/docs/arrow-docs/docs/docs/`.
 
 Let's say you want to add docs for a Type class, for extension `Applicative`. You'd need to add a README like [this one](https://github.com/arrow-kt/arrow/blob/master/modules/docs/arrow-docs/docs/docs/arrow/typeclasses/applicative/README.md).
@@ -51,26 +51,26 @@ permalink: /docs/arrow/typeclasses/applicative/
 redirect_from:
   - /docs/typeclasses/applicative/
 ---
-``` 
-   
+```
+
 Again, take a look at [this PR](https://github.com/arrow-kt/arrow/pull/1134/files) for a real example.
 
 ### 4. Link your file from intro pages
 
-There are docs intro pages for both [data types](https://arrow-kt.io/docs/datatypes/intro/) and [type classes](https://arrow-kt.io/docs/typeclasses/intro/) which contain a list of the data types and typeclasses available in Arrow. Each item comes along with a brief and simple description. 
+There are docs intro pages for both [data types](https://arrow-kt.io/docs/datatypes/intro/) and [type classes](https://arrow-kt.io/docs/typeclasses/intro/) which contain a list of the data types and typeclasses available in Arrow. Each item comes along with a brief and simple description.
 
 In case you're adding docs for a data type or a type class, be sure to add a new entry from the corresponding intro page to your docs, so people can scan them easily in a single page.
 
 ### 5. Format your docs properly
 
-If you're adding a data type, go to other already existing data type docs to follow the same approach. 
-Do the same for type class, and any other doc sections. 
+If you're adding a data type, go to other already existing data type docs to follow the same approach.
+Do the same for type class, and any other doc sections.
   * Use proper `{:.beginner} / {:.intermediate} / {:.advanced}` tags per section to reflect the difficulty of it.
   * Use proper Ank snippet configurations (more details in policies section below).
 
 ## Doc snippets policies
 
-Whenever you are documenting a new type (type class, data type, whatever) you'll wonder how to add code snippets to it. Please, 
+Whenever you are documenting a new type (type class, data type, whatever) you'll wonder how to add code snippets to it. Please,
 use the follow priority check list:
 
 ### 1. Snippets for public API docs
@@ -102,7 +102,7 @@ Dokka is responsible of generating documentation based on source code annotation
 ```
 
 ```bash
-`./gradlew :arrow-docs:runAnk`
+./gradlew :arrow-docs:runAnk
 ```
 
 ### 2. Run the docs in your local server
