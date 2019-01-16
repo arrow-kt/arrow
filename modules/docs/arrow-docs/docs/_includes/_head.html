@@ -38,6 +38,6 @@
     <script src="{{ '/js/diagrams.js' | relative_url }}"></script>
 
     {% if jekyll.environment == 'production' and site.data.commons.google_analytics %}
-    {% include _google-analytics.html %}
+        {% include _google-tag-manager.html %}
     {% endif %}
 </head>
