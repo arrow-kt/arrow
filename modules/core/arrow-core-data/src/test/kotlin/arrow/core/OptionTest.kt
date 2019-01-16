@@ -12,15 +12,17 @@ import arrow.mtl.extensions.option.monadFilter.monadFilter
 import arrow.mtl.extensions.option.traverseFilter.traverseFilter
 import arrow.syntax.collections.firstOption
 import arrow.test.UnitSpec
+import arrow.test.generators.genOption
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
-import io.kotlintest.matchers.shouldNotBe
+import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
+import io.kotlintest.runner.junit4.KotlinTestRunner
+import io.kotlintest.shouldBe
+import io.kotlintest.shouldNotBe
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class OptionTest : UnitSpec() {
 
   val some: Option<String> = Some("kotlin")
@@ -30,7 +32,7 @@ class OptionTest : UnitSpec() {
 
     testLaws(
       ShowLaws.laws(Option.show(), Option.eq(Int.eq())) { Some(it) },
-      MonoidLaws.laws(Option.monoid(Int.monoid()), Some(1), Option.eq(Int.eq())),
+      MonoidLaws.laws(Option.monoid(Int.monoid()), genOption(Gen.int()), Option.eq(Int.eq())),
       //testLaws(MonadErrorLaws.laws(monadError<ForOption, Unit>(), Eq.any(), EQ_EITHER)) TODO reenable once the MonadErrorLaws are parametric to `E`
       FunctorFilterLaws.laws(Option.traverseFilter(), {Option(it)}, Eq.any()),
       TraverseFilterLaws.laws(Option.traverseFilter(), Option.applicative(), ::Some, Eq.any()),
@@ -107,7 +109,7 @@ class OptionTest : UnitSpec() {
 
     "toList" {
       some.toList() shouldBe listOf("kotlin")
-      none.toList() shouldBe listOf<String>()
+      none.toList() shouldBe listOf()
     }
 
     "firstOption" {

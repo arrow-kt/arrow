@@ -37,10 +37,25 @@ class DaggerWriterTApplicative<F, L> @Inject constructor(val AF: Applicative<F>,
   override fun AF(): Applicative<F> = AF
 }
 
+class DaggerWriterTApplicativeError<F, L, E> @Inject constructor(val AE: ApplicativeError<F, E>, val ML: Monoid<L>) : WriterTApplicativeError<F, L, E> {
+  override fun FF(): Functor<F> = AE
+  override fun MM(): Monoid<L> = ML
+  override fun AF(): Applicative<F> = AE
+  override fun AE(): ApplicativeError<F, E> = AE
+}
+
 class DaggerWriterTMonad<F, L> @Inject constructor(val MF: Monad<F>, val ML: Monoid<L>) : WriterTMonad<F, L> {
   override fun FF(): Monad<F> = MF
   override fun MM(): Monoid<L> = ML
   override fun MF(): Monad<F> = MF
+}
+
+class DaggerWriterTMonadError<F, L, E> @Inject constructor(val ME: MonadError<F, E>, val ML: Monoid<L>) : WriterTMonadError<F, L, E> {
+  override fun FF(): Functor<F> = ME
+  override fun MM(): Monoid<L> = ML
+  override fun AF(): Applicative<F> = ME
+  override fun AE(): ApplicativeError<F, E> = ME
+  override fun ME(): MonadError<F, E> = ME
 }
 
 class DaggerWriterTSemigroupK<F, L> @Inject constructor(val SKF: SemigroupK<F>) : WriterTSemigroupK<F, L> {

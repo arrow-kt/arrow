@@ -10,7 +10,7 @@ import arrow.optics.extensions.mapk.at.at
 import arrow.optics.extensions.mapk.each.each
 import arrow.optics.extensions.traversal
 import arrow.test.UnitSpec
-import io.kotlintest.matchers.shouldBe
+import io.kotlintest.shouldBe
 
 @optics
 data class Street(val number: Int, val name: String) {
@@ -52,21 +52,31 @@ class BoundedTest : UnitSpec() {
 
   init {
 
-    val john = Employee("John Doe", Company("Kategory", Address("Functional city", Street(42, "lambda street"))))
-    val jane = Employee("Jane Doe", Company("Kategory", Address("Functional city", Street(42, "lambda street"))))
+    val john = Employee(
+      "John Doe",
+      Company("Kategory", Address("Functional city", Street(42, "lambda street")))
+    )
+    val jane = Employee(
+      "Jane Doe",
+      Company("Kategory", Address("Functional city", Street(42, "lambda street")))
+    )
 
     val employees = CompanyEmployees(listOf(john, jane).k())
 
-    val db = Db(mapOf(
-      One to "one",
-      Two to "two",
-      Three to "three",
-      Four to "four"
-    ).k())
+    val db = Db(
+      mapOf(
+        One to "one",
+        Two to "two",
+        Three to "three",
+        Four to "four"
+      ).k()
+    )
 
     "@optics generate DSL properly" {
-      Employee.company.address.street.name.modify(john, String::toUpperCase) shouldBe
-        (Employee.company compose
+      Employee.company.address.street.name.modify(
+        john,
+        String::toUpperCase
+      ) shouldBe (Employee.company compose
           Company.address compose
           Address.street compose
           Street.name).modify(john, String::toUpperCase)
@@ -74,10 +84,11 @@ class BoundedTest : UnitSpec() {
 
     "Index enables special Index syntax" {
       ListK.index<Employee>().run {
-        CompanyEmployees.employees[1].company.address.street.name.modify(employees, String::toUpperCase)
-      } shouldBe
-
-        (CompanyEmployees.employees compose
+        CompanyEmployees.employees[1].company.address.street.name.modify(
+          employees,
+          String::toUpperCase
+        )
+      } shouldBe (CompanyEmployees.employees compose
           ListK.index<Employee>().index(1) compose
           Employee.company compose
           Company.address compose
@@ -88,19 +99,13 @@ class BoundedTest : UnitSpec() {
     "Working with At in Optics should be same as in DSL" {
       MapK.at<Keys, String>().run {
         Db.content.at(MapK.at(), One).set(db, None)
-      } shouldBe
-
-        (Db.content compose
-          MapK.at<Keys, String>().at(One))
-          .set(db, None)
+      } shouldBe (Db.content compose MapK.at<Keys, String>().at(One)).set(db, None)
     }
 
     "Working with Each in Optics should be same as in DSL" {
       MapK.each<Keys, String>().run {
         Db.content.every.modify(db, String::toUpperCase)
-      } shouldBe
-
-        (Db.content compose MapK.traversal()).modify(db, String::toUpperCase)
+      } shouldBe (Db.content compose MapK.traversal()).modify(db, String::toUpperCase)
     }
 
   }

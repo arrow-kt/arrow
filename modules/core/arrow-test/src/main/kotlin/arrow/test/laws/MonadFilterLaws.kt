@@ -20,7 +20,7 @@ object MonadFilterLaws {
       Law("MonadFilter Laws: Comprehension bindWithFilter Guards") { MF.monadFilterBindWithFilterComprehensions(EQ) })
 
   fun <F> MonadFilter<F>.monadFilterLeftEmpty(EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(genFunctionAToB(genApplicative(Gen.int(), this))) { f: (Int) -> Kind<F, Int> ->
+    forAll(genFunctionAToB<Int,  Kind<F, Int>>(genApplicative(Gen.int(), this))) { f: (Int) -> Kind<F, Int> ->
       empty<Int>().flatMap(f).equalUnderTheLaw(empty(), EQ)
     }
 
@@ -30,7 +30,7 @@ object MonadFilterLaws {
     }
 
   fun <F> MonadFilter<F>.monadFilterConsistency(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(genFunctionAToB(Gen.bool()), genConstructor(Gen.int(), cf)) { f: (Int) -> Boolean, fa: Kind<F, Int> ->
+    forAll(genFunctionAToB<Int,Boolean>(Gen.bool()), genConstructor(Gen.int(), cf)) { f: (Int) -> Boolean, fa: Kind<F, Int> ->
       fa.filter(f).equalUnderTheLaw(fa.flatMap { a -> if (f(a)) just(a) else empty() }, EQ)
     }
 

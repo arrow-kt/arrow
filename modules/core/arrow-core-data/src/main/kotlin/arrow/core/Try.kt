@@ -100,12 +100,14 @@ sealed class Try<out A> : TryOf<A> {
   fun toEither(): Either<Throwable, A> = fold({ Left(it) }, { Right(it) })
 
   /**
-   * * Convenient method to solve a common scenario when using [Try]. The created [Try] object is often
+   * Convenient method to solve a common scenario when using [Try]. The created [Try] object is often
    * converted to [Either], and right after [Either.mapLeft] is called to translate the [Throwable] to a
-   * domain specific error object.
-   * * To make it easier this method takes an [onLeft] error domain object supplier, which does the conversion to domain error
-   * in the same time as conversion to [Either] occurs.
-   * * So instead of
+   * domain specific error object.<br>
+   *
+   * To make it easier this method takes an [onLeft] error domain object supplier, which does the conversion to domain error
+   * in the same time as conversion to [Either] occurs.<br>
+   *
+   * So instead of
    * ```
    * Try {
    *    dangerousOperation()

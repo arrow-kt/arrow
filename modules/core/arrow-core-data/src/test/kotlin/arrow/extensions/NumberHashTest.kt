@@ -4,10 +4,10 @@ import arrow.core.extensions.eq
 import arrow.core.extensions.hash
 import arrow.test.UnitSpec
 import arrow.test.laws.HashLaws
-import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class NumberHashTest : UnitSpec() {
   init {
 

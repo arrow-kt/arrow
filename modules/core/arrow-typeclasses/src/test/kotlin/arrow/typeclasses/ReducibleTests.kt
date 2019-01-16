@@ -8,11 +8,11 @@ import arrow.core.extensions.semigroup
 import arrow.data.extensions.listk.foldable.foldable
 import arrow.test.UnitSpec
 import arrow.test.laws.ReducibleLaws
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
+import io.kotlintest.runner.junit4.KotlinTestRunner
+import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class ReducibleTests : UnitSpec() {
   init {
     val nonEmptyReducible = object : NonEmptyReducible<ForNonEmptyList, ForListK> {
@@ -31,6 +31,7 @@ class ReducibleTests : UnitSpec() {
 
     with(nonEmptyReducible) {
       with(Int.semigroup()) {
+        val SG = this
 
         "Reducible<NonEmptyList> default size implementation" {
           val nel = NonEmptyList.of(1, 2, 3)
@@ -44,13 +45,13 @@ class ReducibleTests : UnitSpec() {
           val nel = NonEmptyList(1, tail)
           nel.reduceLeft { a, b -> a + b } shouldBe total
           nel.reduceRight { x, ly -> ly.map { x + it } }.value() shouldBe (total)
-          nel.reduce(this) shouldBe total
+          nel.reduce(SG) shouldBe total
 
           // more basic checks
           val names = NonEmptyList.of("Aaron", "Betty", "Calvin", "Deirdra")
           val totalLength = names.all.map { it.length }.sum()
           names.reduceLeftTo({ it.length }, { sum, s -> s.length + sum }) shouldBe totalLength
-          names.reduceMap(this) { it.length } shouldBe totalLength
+          names.reduceMap(SG) { it.length } shouldBe totalLength
         }
       }
     }

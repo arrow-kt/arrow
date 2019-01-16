@@ -9,14 +9,14 @@ import arrow.test.concurrency.SideEffect
 import arrow.test.laws.ComonadLaws
 import arrow.test.laws.MonadLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.fail
-import io.kotlintest.matchers.shouldBe
+import io.kotlintest.fail
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
+import io.kotlintest.runner.junit4.KotlinTestRunner
+import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class EvalTest : UnitSpec() {
   val EQ: Eq<Kind<ForEval, Int>> = Eq { a, b ->
     a.value() == b.value()
@@ -155,7 +155,7 @@ class EvalTest : UnitSpec() {
       class Defer : O()
 
       companion object {
-        val gen = Gen.oneOf(
+        val gen = Gen.oneOf<O>(
           Gen.create { O.Map { it + 1 } },
           Gen.create { O.FlatMap { Eval.Now(it) } },
           Gen.create { O.Memoize() },
@@ -189,7 +189,7 @@ class EvalTest : UnitSpec() {
 
       val gen = Gen.create {
         val leaf = { Eval.Now(0) }
-        val eval = build(leaf, (0 until maxDepth).map { O.gen.generate() })
+        val eval = build(leaf, O.gen.random().take(maxDepth).toList())
         DeepEval(eval)
       }
     }

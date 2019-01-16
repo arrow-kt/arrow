@@ -93,22 +93,28 @@ We use Jekyll so you can deploy your docs to a local server to test your changes
 
 So, after making you doc changes as mentioned before, you would:
 
-### 1. Run Ank to get your docs deployed locally
+### 1. Run Dokka and Ank to get your docs deployed locally
 
-Ank is in charge of compiling and validating your doc snippets and deploying the proper binaries for those. Run the following command:
+Dokka is responsible of generating documentation based on source code annotations, while Ank is in charge of compiling and validating your doc snippets and deploying the proper binaries for those. Run the following commands in this exact order in Arrow **root dir**:
 
 ```bash
-`./gradlew :arrow-docs:runAnk` (in arrow root dir)   
+./gradlew dokka
+```
+
+```bash
+`./gradlew :arrow-docs:runAnk`
 ```
 
 ### 2. Run the docs in your local server
 
-Once docs are deployed locally, go to `modules/docs/arrow-docs/` and do this:
+Once docs are generated locally, do this (**also from the root directory**):
+
 ```bash
-jekyll serve --source build/site/
+bundle install --gemfile modules/docs/arrow-docs/Gemfile --path vendor/bundle
+BUNDLE_GEMFILE=modules/docs/arrow-docs/Gemfile bundle exec jekyll serve -s modules/docs/arrow-docs/build/site/
 ```
 
-That will launch the complete website in [127.0.0.1:4000](https://127.0.0.1:4000) so you can open it with a standard browser.
+This will install any needed dependencies locally, and will use it to launch the complete website in [127.0.0.1:4000](https://127.0.0.1:4000) so you can open it with a standard browser.
 
 ## How to test links
 

@@ -1,14 +1,13 @@
 package arrow.effects.rx2
 
-import arrow.core.Either
-import arrow.core.Left
-import arrow.core.Right
-import arrow.effects.ConnectionCancellationException
+import arrow.core.*
+import arrow.effects.OnCancel
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
 import arrow.higherkind
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
+import io.reactivex.disposables.CompositeDisposable
 import kotlin.coroutines.CoroutineContext
 import arrow.effects.rx2.CoroutineContextRx2Scheduler.asScheduler
 
@@ -38,8 +37,7 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
    *
    * @param release the allocated resource after the resulting [SingleK] of [use] is terminates.
    *
-   * {: data-executable='true'}
-   * ```kotlin:ank
+   * ```kotlin:ank:playground
    * import arrow.effects.*
    * import arrow.effects.rx2.*
    * import arrow.effects.typeclasses.ExitCase
@@ -60,7 +58,7 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
    *     release = { file, exitCase ->
    *       when (exitCase) {
    *         is ExitCase.Completed -> { /* do something */ }
-   *         is ExitCase.Cancelled -> { /* do something */ }
+   *         is ExitCase.Canceled -> { /* do something */ }
    *         is ExitCase.Error -> { /* do something */ }
    *       }
    *       closeFile(file)
@@ -73,19 +71,20 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
    *  ```
    */
   fun <B> bracketCase(use: (A) -> SingleKOf<B>, release: (A, ExitCase<Throwable>) -> SingleKOf<Unit>): SingleK<B> =
-    flatMap { a ->
-      Single.create<B> { emitter ->
-        val d = use(a).fix()
-          .flatMap { b ->
-            release(a, ExitCase.Completed)
-              .fix().map { b }
-          }.handleErrorWith { e ->
-            release(a, ExitCase.Error(e))
-              .fix().flatMap { raiseError<B>(e) }
-          }.single.subscribe(emitter::onSuccess, emitter::onError)
-        emitter.setDisposable(d.onDispose { release(a, ExitCase.Cancelled).fix().single.subscribe({}, emitter::onError) })
-      }.k()
-    }
+    SingleK(Single.create<B> { emitter ->
+      single.subscribe({ a ->
+        if (emitter.isDisposed) {
+          release(a, ExitCase.Canceled).fix().single.subscribe({}, emitter::onError)
+        } else {
+          emitter.setDisposable(use(a).fix()
+            .flatMap { b -> release(a, ExitCase.Completed).fix().map { b } }
+            .handleErrorWith { e -> release(a, ExitCase.Error(e)).fix().flatMap { SingleK.raiseError<B>(e) } }
+            .single
+            .doOnDispose { release(a, ExitCase.Canceled).fix().single.subscribe({}, emitter::onError) }
+            .subscribe(emitter::onSuccess, emitter::onError))
+        }
+      }, emitter::onError)
+    })
 
   fun handleErrorWith(function: (Throwable) -> SingleKOf<A>): SingleK<A> =
     single.onErrorResumeNext { t: Throwable -> function(t).value() }.k()
@@ -128,9 +127,7 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
     /**
      * Creates a [SingleK] that'll run [SingleKProc].
      *
-     * {: data-executable='true'}
-     *
-     * ```kotlin:ank
+     * ```kotlin:ank:playground
      * import arrow.core.Either
      * import arrow.core.right
      * import arrow.effects.rx2.SingleK
@@ -155,11 +152,11 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
      * ```
      */
     fun <A> async(fa: SingleKProc<A>): SingleK<A> =
-      Single.create<A> { emitter ->
+      SingleK(Single.create<A> { emitter ->
         val conn = SingleKConnection()
         //On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
         //on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
-        conn.push(SingleK { if (!emitter.isDisposed) emitter.onError(ConnectionCancellationException) })
+        conn.push(SingleK { if (!emitter.isDisposed) emitter.onError(OnCancel.CancellationException) })
         emitter.setCancellable { conn.cancel().value().subscribe() }
 
         fa(conn) { either: Either<Throwable, A> ->
@@ -169,24 +166,28 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
             emitter.onSuccess(it)
           })
         }
-      }.k()
+      })
 
     fun <A> asyncF(fa: SingleKProcF<A>): SingleK<A> =
-      Single.create { emitter: SingleEmitter<A> ->
+      SingleK(Single.create { emitter: SingleEmitter<A> ->
         val conn = SingleKConnection()
         //On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
         //on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
-        conn.push(SingleK { if (!emitter.isDisposed) emitter.onError(ConnectionCancellationException) })
+        conn.push(SingleK { if (!emitter.isDisposed) emitter.onError(OnCancel.CancellationException) })
         emitter.setCancellable { conn.cancel().value().subscribe() }
 
-        fa(conn) { either: Either<Throwable, A> ->
+        val registerCancel = CompositeDisposable()
+        conn.push(SingleK { registerCancel.dispose() })
+        registerCancel.add(fa(conn) { either: Either<Throwable, A> ->
           either.fold({
             emitter.onError(it)
           }, {
             emitter.onSuccess(it)
           })
-        }.fix().single.subscribe({}, emitter::onError)
-      }.k()
+        }.fix().single.subscribe({
+          conn.pop()
+        }, emitter::onError))
+      })
 
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> SingleKOf<Either<A, B>>): SingleK<B> {
       val either = f(a).value().blockingGet()
@@ -197,3 +198,44 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
     }
   }
 }
+
+/**
+ * Runs the [SingleK] asynchronously and then runs the cb.
+ * Catches all errors that may be thrown in await. Errors from cb will still throw as expected.
+ *
+ * ```kotlin:ank:playground
+ * import arrow.core.Either
+ * import arrow.effects.rx2.*
+ *
+ * fun main(args: Array<String>) {
+ *   //sampleStart
+ *   SingleK.just(1).unsafeRunAsync { either: Either<Throwable, Int> ->
+ *     either.fold({ t: Throwable ->
+ *       println(t)
+ *     }, { i: Int ->
+ *       println("Finished with $i")
+ *     })
+ *   }
+ *   //sampleEnd
+ * }
+ * ```
+ */
+fun <A> SingleKOf<A>.unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit =
+  value().subscribe({ cb(Right(it)) }, { cb(Left(it)) }).let { }
+
+/**
+ * Runs this [SingleK] with [Single.blockingGet]. Does not handle errors at all, rethrowing them if they happen.
+ *
+ * ```kotlin:ank:playground
+ * import arrow.effects.rx2.*
+ *
+ * fun main(args: Array<String>) {
+ *   //sampleStart
+ *   val result: SingleK<String> = SingleK.raiseError<String>(Exception("BOOM"))
+ *   //sampleEnd
+ *   println(result.unsafeRunSync())
+ * }
+ * ```
+ */
+fun <A> SingleKOf<A>.unsafeRunSync(): A =
+  value().blockingGet()

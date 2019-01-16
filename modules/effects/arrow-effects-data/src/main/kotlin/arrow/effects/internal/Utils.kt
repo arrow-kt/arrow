@@ -1,17 +1,19 @@
 package arrow.effects.internal
 
-import arrow.core.Either
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.Some
+import arrow.core.*
 import arrow.effects.IO
 import arrow.effects.KindConnection
 import arrow.effects.typeclasses.Duration
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.locks.AbstractQueuedSynchronizer
+import kotlin.coroutines.CoroutineContext
 
 typealias JavaCancellationException = java.util.concurrent.CancellationException
+
+class ArrowInternalException(override val message: String =
+    "Arrow-kt internal error. Please let us know and create a ticket at https://github.com/arrow-kt/arrow/issues/new/choose"
+) : RuntimeException(message)
 
 object Platform {
 
@@ -89,6 +91,18 @@ object Platform {
     return first
   }
 
+  /**
+   * Composes multiple errors together, meant for those cases in which error suppression, due to a second error being
+   * triggered, is not acceptable.
+   *
+   * On top of the JVM this function uses Throwable#addSuppressed, available since Java 7. On top of JavaScript the
+   * function would return a CompositeException.
+   */
+  fun composeErrors(first: Throwable, rest: List<Throwable>): Throwable {
+    rest.forEach { if (it != first) first.addSuppressed(it) }
+    return first
+  }
+
 }
 
 private class OneShotLatch : AbstractQueuedSynchronizer() {
@@ -104,3 +118,22 @@ private class OneShotLatch : AbstractQueuedSynchronizer() {
     return true
   }
 }
+
+
+/**
+ * [arrow.core.Continuation] to run coroutine on `ctx` and link result to callback [cc].
+ * Use [asyncContinuation] to run suspended functions within a context `ctx` and pass the result to [cc].
+ */
+internal fun <A> asyncContinuation(ctx: CoroutineContext, cc: (Either<Throwable, A>) -> Unit): arrow.core.Continuation<A> =
+  object : arrow.core.Continuation<A> {
+    override val context: CoroutineContext = ctx
+
+    override fun resume(value: A) {
+      cc(value.right())
+    }
+
+    override fun resumeWithException(exception: Throwable) {
+      cc(exception.left())
+    }
+
+  }

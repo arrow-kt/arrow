@@ -4,9 +4,9 @@ import arrow.effects.IO
 import arrow.integrations.retrofit.adapter.retrofit.retrofit
 import arrow.test.UnitSpec
 import com.google.common.reflect.TypeToken
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
-import io.kotlintest.matchers.shouldThrow
+import io.kotlintest.runner.junit4.KotlinTestRunner
+import io.kotlintest.shouldBe
+import io.kotlintest.shouldThrow
 import okhttp3.HttpUrl
 import org.junit.runner.RunWith
 
@@ -15,7 +15,7 @@ private val NO_ANNOTATIONS = emptyArray<Annotation>()
 private val retrofit = retrofit(HttpUrl.parse("http://localhost:1")!!)
 private val factory = CallKindAdapterFactory.create()
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class CallKindAdapterFactoryTest : UnitSpec() {
   init {
     "Non CallK Class should return null" {

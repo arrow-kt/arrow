@@ -10,6 +10,7 @@ dependencies {
     compile project(':arrow-ank')
     compile project(':arrow-extras')
     compile project(':arrow-core-data')
+    compile project(':arrow-test')
     compile project(':arrow-extras-extensions')
     compile project(':arrow-effects-extensions')
     compile project(':arrow-effects-rx2-extensions')
@@ -20,7 +21,7 @@ dependencies {
     compile project(':arrow-recursion-extensions')
     compile project(':arrow-integrations-retrofit-adapter')
     compile project(':arrow-mtl')
-    compile project(':arrow-free')
+    compile project(':arrow-free-data')
     compile project(':arrow-test')
     compile project(':arrow-free-extensions')
     compile project(':arrow-typeclasses')
@@ -31,8 +32,9 @@ dependencies {
     kaptTest project(':arrow-meta')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     compile "org.jetbrains.kotlinx:kotlinx-collections-immutable:$kotlinxCollectionsImmutableVersion"
-    compile "io.kotlintest:kotlintest:$kotlinTestVersion"
-
+    testCompile("junit:junit:$jUnitVersion")
+    testRuntime("org.junit.vintage:junit-vintage-engine:$jUnitVintageVersion")
+    compile "io.kotlintest:kotlintest-runner-junit4:$kotlinTestVersion"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
     compile "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
     compile "io.projectreactor:reactor-core:$projectReactorVersion"

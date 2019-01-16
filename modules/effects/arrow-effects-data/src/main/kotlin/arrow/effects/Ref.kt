@@ -154,7 +154,8 @@ interface Ref<F, A> {
       }
 
       override fun tryUpdate(f: (A) -> A): Kind<F, Boolean> = MD.run {
-        tryModify { a -> Tuple2(f(a), Unit) }.map(Option<Unit>::isDefined)
+        tryModify { a -> Tuple2(f(a), Unit) }
+          .map(Option<Unit>::isDefined)
       }
 
       override fun <B> tryModify(f: (A) -> Tuple2<A, B>): Kind<F, Option<B>> = MD.delay {
