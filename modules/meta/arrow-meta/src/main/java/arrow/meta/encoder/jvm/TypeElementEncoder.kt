@@ -3,41 +3,23 @@ package arrow.meta.encoder.jvm
 import arrow.common.utils.ClassOrPackageDataWrapper
 import arrow.common.utils.ProcessorUtils
 import arrow.meta.Either
+import arrow.meta.ast.*
 import arrow.meta.ast.Annotation
-import arrow.meta.ast.Code
-import arrow.meta.ast.Func
-import arrow.meta.ast.PackageName
-import arrow.meta.ast.Parameter
-import arrow.meta.ast.Property
-import arrow.meta.ast.Tree
-import arrow.meta.ast.Type
-import arrow.meta.ast.TypeName
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.asTypeName
 import com.squareup.kotlinpoet.asTypeVariableName
-import me.eugeniomarletti.kotlin.metadata.getterModality
-import me.eugeniomarletti.kotlin.metadata.getterVisibility
-import me.eugeniomarletti.kotlin.metadata.isDelegated
-import me.eugeniomarletti.kotlin.metadata.isPrimary
-import me.eugeniomarletti.kotlin.metadata.isVar
+import me.eugeniomarletti.kotlin.metadata.*
 import me.eugeniomarletti.kotlin.metadata.jvm.getJvmConstructorSignature
 import me.eugeniomarletti.kotlin.metadata.jvm.getJvmFieldSignature
 import me.eugeniomarletti.kotlin.metadata.jvm.getJvmMethodSignature
 import me.eugeniomarletti.kotlin.metadata.jvm.jvmPropertySignature
-import me.eugeniomarletti.kotlin.metadata.modality
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.TypeTable
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.hasReceiver
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.jvm.JvmProtoBuf
-import me.eugeniomarletti.kotlin.metadata.visibility
-import javax.lang.model.element.Element
-import javax.lang.model.element.ElementKind
-import javax.lang.model.element.ExecutableElement
+import javax.lang.model.element.*
 import javax.lang.model.element.Modifier
-import javax.lang.model.element.PackageElement
-import javax.lang.model.element.TypeElement
-import javax.lang.model.element.VariableElement
 import javax.lang.model.type.NoType
 import javax.lang.model.util.ElementFilter
 import javax.lang.model.util.Elements
@@ -160,6 +142,21 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
     }
   }
 
+  private fun Func.maybeAsSuspendedContinuation(protoFun: ProtoBuf.Function): Func =
+    if (protoFun.isSuspend) {
+      copy(
+        modifiers = modifiers + arrow.meta.ast.Modifier.Suspend,
+        parameters = parameters.filterNot { it.type.rawName == "kotlin.coroutines.Continuation" },
+        returnType = parameters.lastOrNull().let {
+          val t = it?.type
+          if (t is TypeName.ParameterizedType &&
+            t.rawName == "kotlin.coroutines.Continuation" &&
+            t.typeArguments.isNotEmpty()) t.typeArguments[0]
+          else null
+        } ?: returnType
+      )
+    } else this
+
   private fun TypeName.ParameterizedType.isSuspendedContinuation(): Boolean =
     when {
       rawType.fqName == Function2::class.qualifiedName && typeArguments.size == 3 -> {
@@ -274,7 +271,7 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
                 modifiers = function.modifiers +
                   listOfNotNull(templateFunction.second.modality?.toMeta()) +
                   modifiersFromFlags(templateFunction.second.flags)
-              )
+              ).maybeAsSuspendedContinuation(templateFunction.second)
               if (templateFunction.second.hasReceiverType()) {
                 val receiverTypeName = metaApi().run { fMod.parameters[0].type.asKotlin() }
                 val functionWithReceiver = fMod.copy(receiverType = receiverTypeName)

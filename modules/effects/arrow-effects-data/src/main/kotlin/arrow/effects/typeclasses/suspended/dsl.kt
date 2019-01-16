@@ -156,7 +156,6 @@ interface BracketSyntax<F, E> :
 interface MonadDeferSyntax<F> : BracketSyntax<F, Throwable>, MonadDefer<F> {
 
   suspend fun <A> effect(
-    context: CoroutineContext = EmptyCoroutineContext,
     f: suspend () -> A
   ): A =
     delay {
@@ -168,7 +167,7 @@ interface MonadDeferSyntax<F> : BracketSyntax<F, Throwable>, MonadDefer<F> {
         override fun resumeWithException(exception: Throwable) {
           result = raiseError(exception)
         }
-        override val context: CoroutineContext = context
+        override val context: CoroutineContext = EmptyCoroutineContext
       }
       f.startCoroutine(continuation)
       result
