@@ -4,8 +4,8 @@ import arrow.Kind
 import arrow.core.*
 import arrow.effects.KindConnection
 import arrow.effects.data.internal.BindingCancellationException
+import arrow.effects.fx
 import arrow.typeclasses.MonadContinuation
-import arrow.typeclasses.MonadError
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine
 
@@ -480,7 +480,7 @@ interface Concurrent<F> : Async<F> {
   override fun <B> binding(c: suspend MonadContinuation<F, *>.() -> B): Kind<F, B> =
     bindingCancellable { c() }.a
 
-  operator fun <B> arrow.effects.typeclasses.fx.invoke(c: suspend ConcurrentCancellableContinuation<F, *>.() -> B): Kind<F, B> {
+  operator fun <B> fx.invoke(c: suspend ConcurrentCancellableContinuation<F, *>.() -> B): Kind<F, B> {
     val continuation = ConcurrentCancellableContinuation<F, B>(this@Concurrent)
     val wrapReturn: suspend ConcurrentCancellableContinuation<F, *>.() -> Kind<F, B> = { just(c()) }
     wrapReturn.startCoroutine(continuation, continuation)
@@ -488,8 +488,6 @@ interface Concurrent<F> : Async<F> {
   }
 
 }
-
-object fx
 
 /** Alias for `Either` structure to provide consistent signature for race methods. */
 typealias RacePair<F, A, B> = Either<Tuple2<A, Fiber<F, B>>, Tuple2<Fiber<F, A>, B>>

@@ -1,64 +1,49 @@
 package arrow.effects
 
-import arrow.core.Continuation
-import arrow.core.Either
 import arrow.effects.extensions.io.concurrent.invoke
-import arrow.effects.typeclasses.fx
+import arrow.effects.extensions.io.unsafeRun.runBlocking
 import arrow.test.UnitSpec
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
+import io.kotlintest.runner.junit4.KotlinTestRunner
+import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
-import java.util.concurrent.atomic.AtomicReference
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
-import kotlin.coroutines.RestrictsSuspension
-import kotlin.coroutines.startCoroutine
 
+/**
+ * A pure expression is defined in the environment
+ */
 fun helloWorld(): String =
   "Hello World"
 
+/**
+ * side effects always are `suspended`.
+ * This prevents them from running in the environment without an
+ * effectful continuation in scope
+ */
 suspend fun printHello(): Unit =
   println(helloWorld())
 
+/**
+ * An `fx` block encapsulates the composition of an effectful program
+ * and allows side-effects flagged as `suspended` to bind and compose as long as
+ * they are declared within an `effect` block.
+ *
+ * Effect blocks suspend side effect in the monadic computation of the runtime
+ * data type which it needs to be at least able to provide a `MonadDefer` extension.
+ */
 val program: IO<String> = fx {
   effect { printHello() }
   helloWorld()
 }
 
-@RestrictsSuspension
-object unsafe {
-
-  operator fun <A> invoke(f: suspend unsafe.() -> A): A {
-    val c = UnsafeContinuation<A>()
-    f.startCoroutine(this, c)
-    return c.result.get()
-  }
-
-}
-
-suspend fun <A> unsafe.runBlocking(fa: () -> IO<A>): A = fa().unsafeRunSync()
-suspend fun <A> unsafe.runNonBlocking(fa: () -> IO<A>, cb: (Either<Throwable, A>) -> Unit): Unit = fa().unsafeRunAsync(cb)
-
-private class UnsafeContinuation<A>(
-  val result: AtomicReference<A> = AtomicReference()
-) : Continuation<A> {
-
-  override fun resume(value: A) {
-    result.set(value)
-  }
-
-  override fun resumeWithException(exception: Throwable) {
-    throw exception
-  }
-
-  override val context: CoroutineContext = EmptyCoroutineContext
-}
-
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class EffectsSuspendDSLTests : UnitSpec() {
 
   init {
-    "Suspended algebras can be composed and interpreted" {
+
+    /**
+     * Effectful programs are allowed to run at the edge of the world inside
+     * explicitly user denoted unsafe blocks.
+     */
+    "Running effects requires an explicit `unsafe` context" {
       unsafe { runBlocking { program } } shouldBe helloWorld()
     }
   }

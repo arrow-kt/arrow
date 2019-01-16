@@ -1,7 +1,7 @@
 package arrow.effects.extensions
 
+import arrow.Kind
 import arrow.core.Either
-import arrow.core.*
 import arrow.effects.*
 import arrow.effects.typeclasses.*
 import arrow.extension
@@ -169,5 +169,15 @@ interface IOMonoid<A> : Monoid<IO<A>>, IOSemigroup<A> {
   fun SM(): Monoid<A>
 
   override fun empty(): IO<A> = IO.just(SM().empty())
+
+}
+
+@extension
+interface IOUnsafeRun : UnsafeRun<ForIO> {
+
+  override suspend fun <A> unsafe.runBlocking(fa: () -> Kind<ForIO, A>): A = fa().fix().unsafeRunSync()
+
+  override suspend fun <A> unsafe.runNonBlocking(fa: () -> Kind<ForIO, A>, cb: (Either<Throwable, A>) -> Unit) =
+    fa().fix().unsafeRunAsync(cb)
 
 }
