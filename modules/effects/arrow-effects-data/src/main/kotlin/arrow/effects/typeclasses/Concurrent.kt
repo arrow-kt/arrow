@@ -57,7 +57,7 @@ interface Concurrent<F> : Async<F> {
    *
    *       conn.push(_delay_({ GithubService.unregisterCallback(id) }))
    *       conn.push(_delay_({ println("Everything we push to the cancellation stack will execute on cancellation") }))
-   * }
+   *     }
    *
    *   val result = _extensionFactory_.getUsernames()
    *   //sampleEnd
@@ -65,12 +65,64 @@ interface Concurrent<F> : Async<F> {
    * }
    * ```
    *
-   * @param fa an asynchronous computation that might fail typed as [Proc].
+   * @param fa an asynchronous computation that might fail typed as [ConnectedProc].
    * @see asyncF for a version that can suspend side effects in the registration function.
    */
   fun <A> async(fa: ConnectedProc<F, A>): Kind<F, A> =
     asyncF { conn, cb -> delay { fa(conn, cb) } }
 
+  /**
+   * Creates a cancelable instance of [F] that executes an asynchronous process on evaluation.
+   * This combinator can be used to wrap callbacks or other similar impure code that requires cancellation code.
+   *
+   * ```kotlin:ank:playground:extension
+   * _imports_
+   * import java.lang.RuntimeException
+   *
+   * typealias Callback = (List<String>?, Throwable?) -> Unit
+   *
+   * class Id
+   * object GithubService {
+   *   private val listeners: MutableMap<Id, Callback> = mutableMapOf()
+   *   fun getUsernames(callback: (List<String>?, Throwable?) -> Unit): Id {
+   *     val id = Id()
+   *     listeners[id] = callback
+   *     //execute operation and call callback at some point in future
+   *     return id
+   *   }
+   *
+   *   fun unregisterCallback(id: Id): Unit {
+   *     listeners.remove(id)
+   *   }
+   * }
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   fun <F> Concurrent<F>.getUsernames(): Kind<F, List<String>> =
+   *     asyncF { conn: KindConnection<F>, cb: (Either<Throwable, List<String>>) -> Unit ->
+   *       delay {
+   *         val id = GithubService.getUsernames { names, throwable ->
+   *           when {
+   *             names != null -> cb(Right(names))
+   *             throwable != null -> cb(Left(throwable))
+   *             else -> cb(Left(RuntimeException("Null result and no exception")))
+   *           }
+   *         }
+   *
+   *         conn.push(_delay_({ GithubService.unregisterCallback(id) }))
+   *         conn.push(_delay_({ println("Everything we push to the cancellation stack will execute on cancellation") }))
+   *       }
+   *     }
+   *
+   *   val result = _extensionFactory_.getUsernames()
+   *   //sampleEnd
+   *   println(result)
+   * }
+   * ```
+   *
+   * @param fa a deferred asynchronous computation that might fail typed as [ConnectedProcF].
+   * @see async for a version that can suspend side effects in the registration function.
+   */
   fun <A> asyncF(fa: ConnectedProcF<F, A>): Kind<F, A>
 
   /**
