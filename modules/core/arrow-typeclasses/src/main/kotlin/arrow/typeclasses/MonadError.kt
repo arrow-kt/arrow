@@ -23,13 +23,24 @@ interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F> {
  * errors in the context of a binding, short-circuiting the complete computation and returning the error raised to the
  * same computational context (through [raiseError]).
  *
+ * ```kotlin:ank:playground:extension
+ * _imports_
+ *
+ * fun main(args: Array<String>) {
+ *   val result =
+ *   //sampleStart
+ *   _extensionFactory_
+ *   //sampleEnd
+ *   println(result)
+ * }
+ * ```
+ *
  * ### Example
  *
  * Oftentimes we find ourselves in situations where we need to sequence some computations that could potentially fail.
  * [bindingCatch] allows us to safely compute those by automatically catching any exceptions thrown during the process.
  *
- * ```kotlin:ank:playground:extension
- * _imports_
+ * ```kotlin:ank:playground
  *
  * import arrow.Kind
  * import arrow.effects.*
@@ -59,7 +70,7 @@ interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F> {
  *        impact
  *      }
  *    //sampleEnd
- *    println(_extensionFactory_.attack())
+ *    println(IO.async().attack())
  * }
  * ```
  */

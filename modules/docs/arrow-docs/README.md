@@ -98,11 +98,20 @@ So, after making you doc changes as mentioned before, you would:
 Dokka is responsible of generating documentation based on source code annotations, while Ank is in charge of compiling and validating your doc snippets and deploying the proper binaries for those. Run the following commands in this exact order in Arrow **root dir**:
 
 ```bash
-./gradlew dokka
+./gradlew clean dokka
 ```
 
+You can run Dokka for a **single module**. That will save you a lot of time. For example, if you've added some docs to the 
+`arrow-typeclasses` module, just run:
+
 ```bash
-`./gradlew :arrow-docs:runAnk`
+./gradlew clean :arrow-typeclasses:dokka
+```
+
+After running Dokka, you can run Ank. That will deploy all the Dokka generated binaries along with the rest of the docs.
+
+```bash
+./gradlew :arrow-docs:runAnk
 ```
 
 ### 2. Run the docs in your local server
