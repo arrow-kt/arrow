@@ -12,7 +12,6 @@ import arrow.effects.typeclasses.milliseconds
 import arrow.effects.typeclasses.seconds
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
-import arrow.test.concurrency.newSingleThreadContext
 import arrow.test.laws.ConcurrentLaws
 import io.kotlintest.fail
 import io.kotlintest.runner.junit4.KotlinTestRunner
