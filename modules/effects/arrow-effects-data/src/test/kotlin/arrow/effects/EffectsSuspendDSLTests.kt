@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import org.junit.runner.RunWith
 import kotlin.coroutines.EmptyCoroutineContext
 
+@Suppress("RedundantSuspendModifier")
 @RunWith(KotlinTestRunner::class)
 class EffectsSuspendDSLTests : UnitSpec() {
 
@@ -32,8 +33,6 @@ class EffectsSuspendDSLTests : UnitSpec() {
        */
       suspend fun printHello(): Unit =
         println(helloWorld())
-
-      suspend fun test(): IO<String> = fx { "" }
 
       /**
        * An `fx` block encapsulates the composition of an effectful program
@@ -64,7 +63,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
         ) { a, b ->
           listOf(a, b)
         }
-        ! suspend { println(result) }
+        effect { println(result) }
         result
       }
       unsafe { runBlocking { program } }.distinct().size shouldBe 2
