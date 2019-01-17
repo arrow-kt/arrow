@@ -33,6 +33,8 @@ class EffectsSuspendDSLTests : UnitSpec() {
       suspend fun printHello(): Unit =
         println(helloWorld())
 
+      suspend fun test(): IO<String> = fx { "" }
+
       /**
        * An `fx` block encapsulates the composition of an effectful program
        * and allows side-effects flagged as `suspended` to bind and compose as long as
@@ -49,17 +51,20 @@ class EffectsSuspendDSLTests : UnitSpec() {
     }
 
     "Direct syntax for concurrent operations" {
+      suspend fun getThreadName(): String =
+        Thread.currentThread().name
+
       val program = fx {
         // note how the receiving value is typed in the environment and not inside IO despite being effectful and
         // non-blocking parallel computations
         val result: List<String> = parMap(
           Dispatchers.Default,
-          delay { Thread.currentThread().name },
-          delay { Thread.currentThread().name }
+           { getThreadName() },
+           { getThreadName() }
         ) { a, b ->
           listOf(a, b)
         }
-        effect { println(result) }
+        ! suspend { println(result) }
         result
       }
       unsafe { runBlocking { program } }.distinct().size shouldBe 2

@@ -1,9 +1,9 @@
 package arrow.effects.typeclasses.suspended
 
+
 import arrow.Kind
 import arrow.core.*
 import arrow.data.*
-import arrow.data.extensions.list.foldable.foldM
 import arrow.data.extensions.list.foldable.sequence_
 import arrow.data.extensions.list.traverse.flatTraverse
 import arrow.data.extensions.listk.foldable.traverse_
@@ -11,36 +11,163 @@ import arrow.data.extensions.listk.monad.monad
 import arrow.data.extensions.nonemptylist.semigroup.semigroup
 import arrow.effects.CancelToken
 import arrow.effects.typeclasses.*
-import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.*
 import arrow.typeclasses.Continuation
-import arrow.typeclasses.suspended.MonadErrorSyntax
-import arrow.typeclasses.suspended.MonadSyntax
+import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.startCoroutine
 import arrow.core.extensions.either.applicative.tupled as tuppledEither
 import arrow.data.extensions.validated.applicative.tupled as tuppledVal
 
+interface BindSyntax<F> {
+  suspend fun <A> Kind<F, A>.bind(): A
+  suspend operator fun <A> Kind<F, A>.component1(): A =
+    bind()
+  fun <A> (suspend () -> A).k(): Kind<F, A>
+  fun <A, B> (suspend (A) -> B).k(): (Kind<F, A>) -> Kind<F, B> =
+    { suspend { this(it.bind()) }.k() }
+  fun <A, B> (suspend (A) -> B).k(unit: Unit = Unit): (A) -> Kind<F, B> =
+    { suspend { this(it) }.k() }
+}
+
+interface FunctorSyntax<F> : Functor<F>, BindSyntax<F> {
+  suspend fun <A, B> map(fa: suspend () -> A, f: (A) -> B): B =
+    fa.k().map(f).bind()
+}
+
+interface ApplicativeSyntax<F> : FunctorSyntax<F>, Applicative<F> {
+
+  private suspend fun <A> applicative(fb: Applicative<F>.() -> Kind<F, A>): A =
+    run<Applicative<F>, Kind<F, A>> { fb(this) }.bind()
+
+  suspend operator fun <A, B> Kind<F, A>.rangeTo(fb: Kind<F, B>): Tuple2<A, B> =
+    tupled(fb)
+
+  suspend operator fun <A, B, C> Tuple2<A, B>.rangeTo(fc: Kind<F, C>): Tuple3<A, B, C> =
+    Tuple3(a, b, fc.bind())
+
+  suspend operator fun <A, B, C, D> Tuple3<A, B, C>.rangeTo(fd: Kind<F, D>): Tuple4<A, B, C, D> =
+    Tuple4(a, b, c, fd.bind())
+
+  suspend operator fun <A, B, C, D, E> Tuple4<A, B, C, D>.rangeTo(fe: Kind<F, E>): Tuple5<A, B, C, D, E> =
+    Tuple5(a, b, c, d, fe.bind())
+
+  suspend operator fun <A, B, C, D, E, FF> Tuple5<A, B, C, D, E>.rangeTo(ff: Kind<F, FF>): Tuple6<A, B, C, D, E, FF> =
+    Tuple6(a, b, c, d, e, ff.bind())
+
+  suspend operator fun <A, B, C, D, E, FF, G> Tuple6<A, B, C, D, E, FF>.rangeTo(fg: Kind<F, G>): Tuple7<A, B, C, D, E, FF, G> =
+    Tuple7(a, b, c, d, e, f, fg.bind())
+
+  suspend fun <A, B, Z> Kind<F, A>.map(
+    fb: Kind<F, B>,
+    f: (Tuple2<A, B>) -> Z
+  ): Z =
+    applicative { map(this@map, fb, f) }
+
+  suspend fun <A, B, C, Z> Kind<F, A>.map(
+    fb: Kind<F, B>,
+    fc: Kind<F, C>,
+    f: (Tuple3<A, B, C>) -> Z
+  ): Z =
+    applicative { map(this@map, fb, fc, f) }
+
+  suspend fun <A, B, C, D, Z> Kind<F, A>.map(
+    fb: Kind<F, B>,
+    fc: Kind<F, C>,
+    fd: Kind<F, D>,
+    f: (Tuple4<A, B, C, D>) -> Z
+  ): Z =
+    applicative { map(this@map, fb, fc, fd, f) }
+
+  suspend fun <A, B> Kind<F, A>.tupled(fb: Kind<F, B>): Tuple2<A, B> =
+    super.tupled(this, fb).bind()
+
+  suspend fun <A, B, C> Kind<F, A>.tupled(
+    fb: Kind<F, B>,
+    fc: Kind<F, C>
+  ): Tuple3<A, B, C> =
+    super.tupled(this, fb, fc).bind()
+
+  suspend fun <A, B, C, D> Kind<F, A>.tupled(
+    fb: Kind<F, B>,
+    fc: Kind<F, C>,
+    fd: Kind<F, D>
+  ): Tuple4<A, B, C, D> =
+    super.tupled(this, fb, fc, fd).bind()
+
+  suspend fun <A, B, C, D, E> Kind<F, A>.tupled(
+    fb: Kind<F, B>,
+    fc: Kind<F, C>,
+    fd: Kind<F, D>,
+    fe: Kind<F, E>
+  ): Tuple5<A, B, C, D, E> =
+    super.tupled(this, fb, fc, fd, fe).bind()
+
+}
+
+interface ApplicativeErrorSyntax<F, E> : ApplicativeError<F, E>, ApplicativeSyntax<F> {
+  suspend fun <A> E.raiseError(): A =
+    run<ApplicativeError<F, E>, Kind<F, A>> { raiseError(this@raiseError) }.bind()
+
+  suspend fun <A> Kind<F, A>.handleErrorWith(unit: Unit = Unit, f: (E) -> Kind<F, A>): A =
+    run<ApplicativeError<F, E>, Kind<F, A>> { handleErrorWith(f) }.bind()
+
+  suspend fun <A> OptionOf<A>.getOrRaiseError(f: () -> E): A =
+    run<ApplicativeError<F, E>, Kind<F, A>> { this@getOrRaiseError.fromOption(f) }.bind()
+
+  suspend fun <A, B> Either<B, A>.getOrRaiseError(f: (B) -> E): A =
+    run<ApplicativeError<F, E>, Kind<F, A>> { this@getOrRaiseError.fromEither(f) }.bind()
+
+  suspend fun <A> TryOf<A>.getOrRaiseError(f: (Throwable) -> E): A =
+    run<ApplicativeError<F, E>, Kind<F, A>> { this@getOrRaiseError.fromTry(f) }.bind()
+
+  suspend fun <A> handleError(fa: suspend () -> A, f: (E) -> A): A =
+    run<ApplicativeError<F, E>, Kind<F, A>> { fa.k().handleError(f) }.bind()
+
+  suspend fun <A> attempt(fa: suspend () -> A): Either<E, A> =
+    run<ApplicativeError<F, E>, Kind<F, Either<E, A>>> { fa.k().attempt() }.bind()
+
+}
+
+interface MonadSyntax<F> : ApplicativeSyntax<F>, Monad<F> {
+
+  suspend infix fun <A, B> (suspend () -> A).followedBy(fb: suspend () -> B): B =
+    run<Monad<F>, Kind<F, B>> { this@followedBy.k().followedBy(fb.k()) }.bind()
+
+  suspend fun <A, B> (suspend () -> A).forEffect(fb: suspend () -> B): A =
+    run<Monad<F>, Kind<F, A>> { this@forEffect.k().forEffect(fb.k()) }.bind()
+
+  suspend infix fun <A> Kind<F, A>.effectM(f: (A) -> Kind<F, A>): A =
+    run<Monad<F>, Kind<F, A>> { effectM(f) }.bind()
+
+  suspend infix fun <A> Kind<F, A>.mproduct(f: (A) -> Kind<F, A>): Tuple2<A, A> =
+    run<Monad<F>, Kind<F, Tuple2<A, A>>> { mproduct(f) }.bind()
+
+}
+
+interface MonadErrorSyntax<F, E> : MonadSyntax<F>, MonadError<F, E> {
+  suspend fun <A> ensure(fa: suspend () -> A, error: () -> E, predicate: (A) -> Boolean): A =
+    run<Monad<F>, Kind<F, A>> { fa.k().ensure(error, predicate) }.bind()
+}
+
 interface ListFoldableSyntax<F> : MonadSyntax<F> {
 
-  suspend fun <A, B> List<Kind<F, A>>.traverse_(f: (Kind<F, A>) -> Kind<F, B>): Unit =
-    k().traverse_(this@ListFoldableSyntax, f).bind()
+  suspend fun <A, B> List<suspend () -> A>.traverse_(f: suspend (A) -> B): Unit =
+    k().map { it.k() }.traverse_(this@ListFoldableSyntax, f.k()).bind()
 
-  suspend fun <A> List<Kind<F, A>>.sequence_(): Unit =
-    k().sequence_(this@ListFoldableSyntax).bind()
-
-  suspend fun <A, B> List<A>.foldM(z: B, f: (B, A) -> Kind<F, B>): B =
-    foldM(this@ListFoldableSyntax, z, f).bind()
+  suspend fun <A> List<suspend () -> A>.sequence_(): Unit =
+    k().map { it.k() }.sequence_(this@ListFoldableSyntax).bind()
 
 }
 
 interface ListTraverseSyntax<F> : ListFoldableSyntax<F>, MonadSyntax<F> {
 
-  suspend fun <A, B> List<Kind<F, A>>.traverse(f: (Kind<F, A>) -> Kind<F, B>): List<B> =
-    k().traverse(this@ListTraverseSyntax, f).bind()
+  suspend fun <A, B> List<suspend () -> A>.traverse(f: suspend (A) -> B): List<B> =
+    k().map { it.k() }.traverse(this@ListTraverseSyntax, f.k()).bind()
 
-  suspend fun <A> List<Kind<F, A>>.sequence(): List<A> =
-    traverse(::identity)
+  suspend fun <A> List<suspend () -> A>.sequence(): List<A> =
+    traverse { it }
 
   suspend fun <A, B> List<A>.flatTraverse(f: (A) -> Kind<F, List<B>>): List<B> =
     flatTraverse(
@@ -49,7 +176,7 @@ interface ListTraverseSyntax<F> : ListFoldableSyntax<F>, MonadSyntax<F> {
       f.andThen { kind -> kind.map { list -> list.k() } }
     ).bind().fix()
 
-  suspend fun <A> List<List<Kind<F, A>>>.flatSequence(): List<A> =
+  suspend fun <A> List<List<suspend () -> A>>.flatSequence(): List<A> =
     flatten().sequence()
 }
 
@@ -155,23 +282,25 @@ interface BracketSyntax<F, E> :
 
 interface MonadDeferSyntax<F> : BracketSyntax<F, Throwable>, MonadDefer<F> {
 
-  suspend fun <A> effect(
-    f: suspend () -> A
-  ): A =
+  override fun <A> (suspend () -> A).k(): Kind<F, A> =
     delay {
-      lateinit var result: Kind<F, A>
+      val result: AtomicReference<A> = AtomicReference()
       val continuation = object : Continuation<A> {
         override fun resume(value: A) {
-          result = value.just()
+          result.set(value)
         }
         override fun resumeWithException(exception: Throwable) {
-          result = raiseError(exception)
+          throw exception
         }
         override val context: CoroutineContext = EmptyCoroutineContext
       }
-      f.startCoroutine(continuation)
-      result
-    }.bind().bind()
+      this@k.startCoroutine(continuation)
+      result.get()
+    }
+
+  suspend fun <A> effect(f: suspend () -> A): A = f.k().bind()
+
+  suspend operator fun <A> (suspend () -> A).not(): A = k().bind()
 
   fun <A> (suspend MonadDeferCancellableContinuation<F, *>.() -> A).k(): Kind<F, A> =
     bindingCancellable { this.this@k() }.a
@@ -289,11 +418,11 @@ interface ConcurrentSyntax<F> : AsyncSyntax<F>, Concurrent<F> {
 
   suspend fun <A, B, C> parMap(
     ctx: CoroutineContext = EmptyCoroutineContext,
-    fa: Kind<F, A>,
-    fb: Kind<F, B>,
+    fa: suspend () -> A,
+    fb: suspend () -> B,
     f: (A, B) -> C
   ): C =
-    concurrently { parMapN(ctx, fa, fb, f) }
+    concurrently { parMapN(ctx, fa.k(), fb.k(), f) }
 
   suspend fun <A, B, C, D> parMapN(
     unit1: Unit = Unit,
