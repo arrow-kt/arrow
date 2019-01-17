@@ -12,11 +12,11 @@ import arrow.effects.typeclasses.milliseconds
 import arrow.effects.typeclasses.seconds
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
+import arrow.test.concurrency.newCoroutineDispatcher
 import arrow.test.laws.ConcurrentLaws
 import io.kotlintest.fail
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
-import kotlinx.coroutines.newSingleThreadContext
 import org.junit.runner.RunWith
 
 @RunWith(KotlinTestRunner::class)
@@ -232,7 +232,7 @@ class IOTest : UnitSpec() {
       val order = mutableListOf<Long>()
 
       fun makePar(num: Long) =
-        IO(newSingleThreadContext("$num")) {
+        IO(newCoroutineDispatcher("$num")) {
           // Sleep according to my number
           Thread.sleep(num * 40)
         }.map {
@@ -242,7 +242,7 @@ class IOTest : UnitSpec() {
         }
 
       val result =
-        parMapN(newSingleThreadContext("all"),
+        parMapN(newCoroutineDispatcher("all"),
           makePar(6), makePar(3), makePar(2), makePar(4), makePar(1), makePar(5))
         { six, tree, two, four, one, five -> listOf(six, tree, two, four, one, five) }
           .unsafeRunSync()
@@ -261,14 +261,14 @@ class IOTest : UnitSpec() {
         }
 
       fun makePar(num: Long) =
-        IO(newSingleThreadContext("$num")) {
+        IO(newCoroutineDispatcher("$num")) {
           // Sleep according to my number
           Thread.sleep(num * 30)
           num
         }.order()
 
       val result =
-        parMapN(newSingleThreadContext("all"),
+        parMapN(newCoroutineDispatcher("all"),
           makePar(6), IO.just(1L).order(), makePar(4), IO.defer { IO.just(2L) }.order(), makePar(5), IO { 3L }.order())
         { six, one, four, two, five, three -> listOf(six, one, four, two, five, three) }
           .unsafeRunSync()
@@ -279,14 +279,14 @@ class IOTest : UnitSpec() {
 
     "parallel mapping is done in the expected CoroutineContext" {
       fun makePar(num: Long) =
-        IO(newSingleThreadContext("$num")) {
+        IO(newCoroutineDispatcher("$num")) {
           // Sleep according to my number
           Thread.sleep(num * 20)
           num
         }
 
       val result =
-        parMapN(newSingleThreadContext("all"),
+        parMapN(newCoroutineDispatcher("all"),
           makePar(6), IO.just(1L), makePar(4), IO.defer { IO.just(2L) }, makePar(5), IO { 3L })
         { _, _, _, _, _, _ ->
           Thread.currentThread().name
@@ -297,10 +297,10 @@ class IOTest : UnitSpec() {
 
     "parallel IO#defer, IO#suspend and IO#async are run in the expected CoroutineContext" {
       val result =
-        parMapN(newSingleThreadContext("here"),
+        parMapN(newCoroutineDispatcher("here"),
           IO { Thread.currentThread().name },
           IO.defer { IO.just(Thread.currentThread().name) },
-          IO.async<String> { TODO, cb -> cb(Thread.currentThread().name.right()) },
+          IO.async<String> { _, cb -> cb(Thread.currentThread().name.right()) },
           ::Tuple3)
           .unsafeRunSync()
 
@@ -308,40 +308,40 @@ class IOTest : UnitSpec() {
     }
 
     "unsafeRunAsyncCancellable should cancel correctly" {
-      IO.async { TODO, cb: (Either<Throwable, Int>) -> Unit ->
+      IO.async { _, cb: (Either<Throwable, Int>) -> Unit ->
         val cancel =
-          IO(newSingleThreadContext("RunThread")) { }
-            .flatMap { IO.async<Int> { TODO, cb -> Thread.sleep(500); cb(1.right()) } }
+          IO(newCoroutineDispatcher("RunThread")) { }
+            .flatMap { IO.async<Int> { _, cb -> Thread.sleep(500); cb(1.right()) } }
             .unsafeRunAsyncCancellable(OnCancel.Silent) {
               cb(it)
             }
-        IO(newSingleThreadContext("CancelThread")) { }
+        IO(newCoroutineDispatcher("CancelThread")) { }
           .unsafeRunAsync { cancel() }
       }.unsafeRunTimed(2.seconds) shouldBe None
     }
 
     "unsafeRunAsyncCancellable should throw the appropriate exception" {
-      IO.async<Throwable> { TODO, cb ->
+      IO.async<Throwable> { _, cb ->
         val cancel =
-          IO(newSingleThreadContext("RunThread")) { }
-            .flatMap { IO.async<Int> { TODO, cb -> Thread.sleep(500); cb(1.right()) } }
+          IO(newCoroutineDispatcher("RunThread")) { }
+            .flatMap { IO.async<Int> { _, cb -> Thread.sleep(500); cb(1.right()) } }
             .unsafeRunAsyncCancellable(OnCancel.ThrowCancellationException) {
-              it.fold({ t -> cb(t.right()) }, { _ -> })
+              it.fold({ t -> cb(t.right()) }, { })
             }
-        IO(newSingleThreadContext("CancelThread")) { }
+        IO(newCoroutineDispatcher("CancelThread")) { }
           .unsafeRunAsync { cancel() }
       }.unsafeRunTimed(2.seconds) shouldBe Some(OnCancel.CancellationException)
     }
 
     "unsafeRunAsyncCancellable can cancel even for infinite asyncs" {
-      IO.async { TODO, cb: (Either<Throwable, Int>) -> Unit ->
+      IO.async { _, cb: (Either<Throwable, Int>) -> Unit ->
         val cancel =
-          IO(newSingleThreadContext("RunThread")) { }
-            .flatMap { IO.async<Int> { TODO, _ -> Thread.sleep(5000); } }
+          IO(newCoroutineDispatcher("RunThread")) { }
+            .flatMap { IO.async<Int> { _, _ -> Thread.sleep(5000); } }
             .unsafeRunAsyncCancellable(OnCancel.ThrowCancellationException) {
               cb(it)
             }
-        IO(newSingleThreadContext("CancelThread")) { Thread.sleep(500); }
+        IO(newCoroutineDispatcher("CancelThread")) { Thread.sleep(500); }
           .unsafeRunAsync { cancel() }
       }.unsafeRunTimed(2.seconds) shouldBe None
     }
@@ -371,7 +371,7 @@ class IOTest : UnitSpec() {
 
     "Cancelable should run CancelToken" {
       Promise.uncancelable<ForIO, Unit>(IO.async()).flatMap { p ->
-        IO.async().cancelable<Unit> { _ ->
+        IO.async().cancelable<Unit> {
           p.complete(Unit)
         }.fix()
           .unsafeRunAsyncCancellable { }
@@ -383,7 +383,7 @@ class IOTest : UnitSpec() {
 
     "CancelableF should run CancelToken" {
       Promise.uncancelable<ForIO, Unit>(IO.async()).flatMap { p ->
-        IO.async().cancelableF<Unit> { _ ->
+        IO.async().cancelableF<Unit> {
           IO { p.complete(Unit) }
         }.fix()
           .unsafeRunAsyncCancellable { }
