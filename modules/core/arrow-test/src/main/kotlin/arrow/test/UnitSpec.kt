@@ -23,6 +23,6 @@ abstract class UnitSpec : AbstractStringSpec() {
      }
   }
 
-  override fun testCases(): List<TestCase> = lawTestCases
+  override fun testCases(): List<TestCase> = super.testCases() + lawTestCases
 
 }
