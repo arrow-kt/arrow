@@ -8,6 +8,7 @@ import arrow.core.extensions.option.traverse.traverse
 import arrow.data.*
 import arrow.extension
 import arrow.typeclasses.*
+import arrow.undocumented
 
 @extension
 interface OptionTFunctor<F> : Functor<OptionTPartialOf<F>> {
@@ -81,6 +82,7 @@ interface OptionTMonadError<F, E> : MonadError<OptionTPartialOf<F>, E>, OptionTM
 }
 
 @extension
+@undocumented
 interface OptionTMonadThrow<F> : MonadThrow<OptionTPartialOf<F>>, OptionTMonadError<F, Throwable> {
   override fun ME(): MonadError<F, Throwable>
 }
