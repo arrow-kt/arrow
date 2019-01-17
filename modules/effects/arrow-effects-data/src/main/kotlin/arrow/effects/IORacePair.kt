@@ -7,10 +7,8 @@ import arrow.effects.internal.UnsafePromise
 import arrow.effects.internal.asyncContinuation
 import arrow.effects.typeclasses.Fiber
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.coroutines.*
 import kotlin.coroutines.Continuation
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.startCoroutine
-import kotlin.coroutines.suspendCoroutine
 
 /**
  * Race two tasks concurrently within a new [IO].
@@ -39,6 +37,25 @@ import kotlin.coroutines.suspendCoroutine
  * }
  * ```
  *
+ * Since [ctx] is by default [EmptyCoroutineContext] this allows you to run the participants on their current context
+ * or use any other combinator to switch their context.
+ *
+ * ```kotlin:ank:playground
+ * import arrow.effects.*
+ * import arrow.effects.extensions.io.async.shift
+ * import kotlinx.coroutines.Dispatchers
+ *
+ * fun main(args: Array<String>) {
+ *   //sampleStart
+ *   val result = IO.racePair(
+ *     ioA = IO(Dispatchers.IO) { "I am running some blocking DB operation on ${Thread.currentThread().name}." },
+ *     ioB = Dispatchers.Default.shift().flatMap { IO { "I am running some time-out timer on ${Thread.currentThread().name}." } }
+ *   )
+ *   //sampleEnd
+ *   println(result.unsafeRunSync())
+ * }
+ * ```
+ *
  * @param ctx [CoroutineContext] to execute the source [IO] on.
  * @param ioA task to participate in the race
  * @param ioB task to participate in the race
@@ -47,7 +64,7 @@ import kotlin.coroutines.suspendCoroutine
  *
  * @see [arrow.effects.typeclasses.Concurrent.raceN] for a simpler version that cancels loser.
  */
-fun <A, B> IO.Companion.racePair(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<B>): IO<Either<Tuple2<A, Fiber<ForIO, B>>, Tuple2<Fiber<ForIO, A>, B>>> =
+fun <A, B> IO.Companion.racePair(ctx: CoroutineContext = EmptyCoroutineContext, ioA: IOOf<A>, ioB: IOOf<B>): IO<Either<Tuple2<A, Fiber<ForIO, B>>, Tuple2<Fiber<ForIO, A>, B>>> =
   IO.async { conn, cb ->
     val active = AtomicBoolean(true)
 

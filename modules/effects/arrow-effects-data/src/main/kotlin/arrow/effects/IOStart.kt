@@ -29,11 +29,42 @@ import kotlin.coroutines.Continuation
  * }
  * ```
  *
+ * Since [ctx] is by default [EmptyCoroutineContext] this allows you to run the [IO] on its current context
+ * or use any other combinator to switch context.
+ *
+ * ```kotlin:ank:playground
+ * import arrow.effects.*
+ * import kotlinx.coroutines.Dispatchers
+ *
+ * fun main(args: Array<String>) {
+ *   //sampleStart
+ *   val result = IO(Dispatchers.Default) { Thread.currentThread().name }
+ *     .startF().flatMap { (join, _) -> join }
+ *   //sampleEnd
+ *   println(result.unsafeRunSync())
+ * }
+ * ```
+ *
+ * ```kotlin:ank:playground
+ * import arrow.effects.*
+ * import arrow.effects.extensions.io.async.shift
+ * import kotlinx.coroutines.Dispatchers
+ *
+ * fun main(args: Array<String>) {
+ *   //sampleStart
+ *   val result = Dispatchers.Default.shift().flatMap {
+ *     IO { Thread.currentThread().name }
+ *   }.startF().flatMap { (join, _) -> join }
+ *   //sampleEnd
+ *   println(result.unsafeRunSync())
+ * }
+ * ```
+ *
  * @receiver [IO] to execute on [ctx] within a new suspended [IO].
  * @param ctx [CoroutineContext] to execute the source [IO] on.
  * @return [IO] with suspended execution of source [IO] on context [ctx].
  */
-fun <A> IOOf<A>.startF(ctx: CoroutineContext): IO<Fiber<ForIO, A>> = IO {
+fun <A> IOOf<A>.startF(ctx: CoroutineContext = EmptyCoroutineContext): IO<Fiber<ForIO, A>> = IO {
   val promise = UnsafePromise<A>()
 
   // A new IOConnection, because its cancellation is now decoupled from our current one.
