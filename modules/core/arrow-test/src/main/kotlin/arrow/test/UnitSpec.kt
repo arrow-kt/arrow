@@ -1,7 +1,6 @@
 package arrow.test
 
 import arrow.test.laws.Law
-import arrow.typeclasses.Eq
 import io.kotlintest.TestCase
 import io.kotlintest.TestType
 import io.kotlintest.specs.AbstractStringSpec
@@ -24,8 +23,6 @@ abstract class UnitSpec : AbstractStringSpec() {
      }
   }
 
-  override fun testCases(): List<TestCase> {
-    return lawTestCases
-  }
+  override fun testCases(): List<TestCase> = lawTestCases
 
 }
