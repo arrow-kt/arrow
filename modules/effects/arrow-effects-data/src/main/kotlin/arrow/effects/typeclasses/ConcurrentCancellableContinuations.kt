@@ -7,9 +7,8 @@ import arrow.typeclasses.MonadContinuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.RestrictsSuspension
-import kotlin.coroutines.startCoroutine
 
-typealias ConcurrentEffects<F> = ConcurrentCancellableContinuation<F, *>
+typealias Effects<F> = ConcurrentCancellableContinuation<F, *>
 
 @RestrictsSuspension
 @Suppress("DELEGATED_MEMBER_HIDES_SUPERTYPE_OVERRIDE")
@@ -34,3 +33,19 @@ class SyncContinuation<A: Any> : Continuation<A> {
   override val context: CoroutineContext = EmptyCoroutineContext
 }
 
+/*
+Arrow Fx : Bringing Typed FP to the masses.
+
+Arrow Fx is direct syntax for Effects and Typed Functional Programming in Kotlin.
+
+In the most recent years patterns like Tagless Final have become popular in the typed FP community in languages
+like Haskell, Scala, Kotlin and even Java.
+
+Arrow Fx takes tagless final and in general effectful programming over `IO` style monads further by:
+- Providing compile-time guarantees that declared suspended effects don't compile/run in the environment uncontrolled,
+- Eliminating all the syntactic noise of parametric `F` algebras by providing direct syntax in the environment with effect control over continuations.
+- Auto-binding kinded results in FP Type class combinators eliminating the need to unwrap via do notation or monadic comprehensions.
+
+In this talk we will look at some of the Kotlin and Arrow features and how Kotlin, despite some of its type system limitations
+can bring FP to the masses by enabling direct style for effectful programming.
+*/

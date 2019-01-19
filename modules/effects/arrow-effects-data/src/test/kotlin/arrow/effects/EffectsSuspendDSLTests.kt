@@ -7,7 +7,6 @@ import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import kotlinx.coroutines.Dispatchers
 import org.junit.runner.RunWith
-import kotlin.coroutines.EmptyCoroutineContext
 
 @Suppress("RedundantSuspendModifier")
 @RunWith(KotlinTestRunner::class)
@@ -58,8 +57,8 @@ class EffectsSuspendDSLTests : UnitSpec() {
         // non-blocking parallel computations
         val result: List<String> = parMap(
           Dispatchers.Default,
-           { getThreadName() },
-           { getThreadName() }
+          { getThreadName() },
+          { getThreadName() }
         ) { a, b ->
           listOf(a, b)
         }
@@ -68,6 +67,27 @@ class EffectsSuspendDSLTests : UnitSpec() {
       }
       unsafe { runBlocking { program } }.distinct().size shouldBe 2
     }
-  }
 
+    "infix followedBy" {
+      fun getThreadName(): String =
+        "Thread 1"
+
+      suspend fun print(): Unit =
+        println("BOOM!")
+
+      unsafe {
+        runBlocking {
+          fx {
+            suspend { getThreadName() } followedBy suspend { print() }
+          }
+        } shouldBe runBlocking {
+          fx {
+            effect { print() }
+            getThreadName()
+          }
+        }
+      }
+
+    }
+  }
 }

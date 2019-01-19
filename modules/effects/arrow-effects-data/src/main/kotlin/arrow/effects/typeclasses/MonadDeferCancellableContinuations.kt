@@ -17,12 +17,10 @@ import kotlin.coroutines.startCoroutine
 
 typealias Disposable = () -> Unit
 
-typealias Effects<F> = MonadDeferCancellableContinuation<F, *>
-
 @RestrictsSuspension
 @Suppress("DELEGATED_MEMBER_HIDES_SUPERTYPE_OVERRIDE")
 open class MonadDeferCancellableContinuation<F, A>(val SC: MonadDefer<F>, override val context: CoroutineContext = EmptyCoroutineContext) :
-  MonadErrorContinuation<F, A>(SC), MonadDefer<F> by SC, MonadDeferSyntax<F> {
+  MonadErrorContinuation<F, A>(SC), MonadDefer<F> by SC {
 
   protected val cancelled: AtomicBoolean = AtomicBoolean(false)
 
