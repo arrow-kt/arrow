@@ -69,7 +69,8 @@ Add the dependencies into the project's `build.gradle`
 ```groovy
 def arrow_version = "0.8.2"
 dependencies {
-    compile "io.arrow-kt:arrow-core-data:$arrow_version"
+    compile "io.arrow-kt:arrow-core:$arrow_version"
+    compile "io.arrow-kt:arrow-data:$arrow_version"
     compile "io.arrow-kt:arrow-syntax:$arrow_version"
     compile "io.arrow-kt:arrow-typeclasses:$arrow_version"
     compile "io.arrow-kt:arrow-extras:$arrow_version"
