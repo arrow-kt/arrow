@@ -1,9 +1,6 @@
 package arrow.effects
 
-import arrow.core.Option
-import arrow.core.left
-import arrow.core.none
-import arrow.core.right
+import arrow.core.*
 import arrow.effects.extensions.io.concurrent.invoke
 import arrow.effects.extensions.io.unsafeRun.runBlocking
 import arrow.test.UnitSpec
@@ -125,6 +122,40 @@ class EffectsSuspendDSLTests : UnitSpec() {
           }
         }
       }
+    }
+
+    "Try.getOrRaiseError success case" {
+      fxTest {
+        fx {
+          Try { 1 }.getOrRaiseError { throw TestError }
+        }
+      } shouldBe 1
+    }
+
+    "Try.getOrRaiseError error case" {
+      shouldThrow<TestError> {
+        fxTest {
+          fx {
+            Failure(TestError).getOrRaiseError { throw TestError }
+          }
+        }
+      }
+    }
+
+    "attempt success" {
+      fxTest {
+        fx {
+          attempt { 1 }
+        }
+      } shouldBe Right(1)
+    }
+
+    "attempt failure" {
+      fxTest {
+        fx {
+          attempt { throw TestError }
+        }
+      } shouldBe Left(TestError)
     }
 
   }
