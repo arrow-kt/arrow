@@ -61,8 +61,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
       val program = fx {
         // note how the receiving value is typed in the environment and not inside IO despite being effectful and
         // non-blocking parallel computations
-        val result: List<String> = parMap(
-          Dispatchers.Default,
+        val result: List<String> = Dispatchers.Default.parMap(
           { getThreadName() },
           { getThreadName() }
         ) { a, b ->
@@ -188,9 +187,9 @@ class EffectsSuspendDSLTests : UnitSpec() {
       fxTest {
         fx {
           continueOn(newSingleThreadContext("A"))
-          val contextA = !suspend { Thread.currentThread().name }
+          val contextA = effect { Thread.currentThread().name }
           continueOn(newSingleThreadContext("B"))
-          val contextB = !suspend { Thread.currentThread().name }
+          val contextB = effect { Thread.currentThread().name }
           contextA != contextB
         }
       } shouldBe true
@@ -221,6 +220,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
       msg.get() shouldBe const
     }
 
+    /** broken in master, release behavior is off */
     "bracketCase failure" {
       val msg: AtomicReference<Int> = AtomicReference(0)
       val const = 1
@@ -238,6 +238,40 @@ class EffectsSuspendDSLTests : UnitSpec() {
       msg.get() shouldBe const
     }
 
+    "startFiber" {
+      val const = 1
+      fxTest {
+        fx {
+          val fiber = Dispatchers.Default.startFiber { const }
+          val (n) = fiber.join()
+          n
+        }
+      } shouldBe const
+    }
+
+    "racePair" {
+      fxTest {
+        fx {
+          val race1 = Dispatchers.Default.racePair({ 1 }, { Thread.sleep(100); 2 })
+          val race2 = Dispatchers.Default.racePair({ Thread.sleep(100); 1 }, { 2 })
+          race1.fold({ true }, { false }) &&
+            race2.fold({ false }, { true })
+        }
+      } shouldBe true
+    }
+
+    "parallel" {
+      fxTest {
+        fx {
+          val (ta: String, tb: String) = Dispatchers.Default.parallel(
+            { Thread.currentThread().name },
+            { Thread.currentThread().name }
+          )
+          listOf(ta, tb).distinct().size
+        }
+      } shouldBe 2
+    }
+
   }
 }
 
@@ -245,3 +279,4 @@ fun <A> fxTest(f: () -> IO<A>): A =
   unsafe { runBlocking(f) }
 
 object TestError : Throwable()
+

@@ -19,8 +19,8 @@ interface ConcurrentSyntax<F> : AsyncSyntax<F>, Concurrent<F> {
   suspend fun <A> asyncCallback(k: SProc<A>): A =
     concurrently { asyncF(k.kr()) }
 
-  suspend fun <A> (suspend () -> A).startFiber(ctx: CoroutineContext): Fiber<F, A> =
-    concurrently { this@startFiber.k().startF(ctx) }
+  suspend fun <A> CoroutineContext.startFiber(f: suspend () -> A): Fiber<F, A> =
+    concurrently { f.k().startF(this@startFiber) }
 
   suspend fun <A, B> CoroutineContext.racePair(
     fa: suspend () -> A,
@@ -35,64 +35,31 @@ interface ConcurrentSyntax<F> : AsyncSyntax<F>, Concurrent<F> {
   ): RaceTriple<F, A, B, C> =
     concurrently { raceTriple(this@raceTriple, fa.k(), fb.k(), fc.k()) }
 
-  suspend operator fun <A, B, C> STuple2<A, B>.times(fc: suspend () -> C): STuple3<A, B, C> =
-    Tuple3(a, b, fc)
-
-  suspend operator fun <A, B, C, D> STuple3<A, B, C>.times(fd: suspend () -> D): STuple4<A, B, C, D> =
-    Tuple4(a, b, c, fd)
-
-  suspend operator fun <A, B, C, D, E> STuple4<A, B, C, D>.times(fe: suspend () -> E): STuple5<A, B, C, D, E> =
-    Tuple5(a, b, c, d, fe)
-
-  suspend fun <A, B> CoroutineContext.parallel(f: () -> STuple2<A, B>): Tuple2<A, B> {
-    val t = f()
-    return parTupled(this, t.a, t.b)
-  }
-
-  suspend fun <A, B, C> CoroutineContext.parallel(unit: Unit = Unit, f: () -> STuple3<A, B, C>): Tuple3<A, B, C> {
-    val t = f()
-    return parTupled(this, t.a, t.b, t.c)
-  }
-
-  suspend fun <A, B, C, D> CoroutineContext.parallel(unit: Unit = Unit, unit2: Unit = Unit, f: () -> STuple4<A, B, C, D>): Tuple4<A, B, C, D> {
-    val t = f()
-    return parTupled(this, t.a, t.b, t.c, t.d)
-  }
-
-  suspend fun <A, B, C, D, E> CoroutineContext.parallel(unit: Unit = Unit, unit2: Unit = Unit, unit3: Unit = Unit, f: () -> STuple5<A, B, C, D, E>): Tuple5<A, B, C, D, E> {
-    val t = f()
-    return parTupled(this, t.a, t.b, t.c, t.d, t.e)
-  }
-
-  suspend fun <A, B, C> parMap(
-    ctx: CoroutineContext,
+  suspend fun <A, B, C> CoroutineContext.parMap(
     fa: suspend () -> A,
     fb: suspend () -> B,
     f: (A, B) -> C
   ): C =
-    concurrently { parMapN(ctx, fa.k(), fb.k(), f) }
+    concurrently { parMapN(this@parMap, fa.k(), fb.k(), f) }
 
-  suspend fun <A, B, C, D> parMap(
-    ctx: CoroutineContext,
+  suspend fun <A, B, C, D> CoroutineContext.parMap(
     fa: suspend () -> A,
     fb: suspend () -> B,
     fc: suspend () -> C,
     f: (A, B, C) -> D
   ): D =
-    concurrently { parMapN(ctx, fa.k(), fb.k(), fc.k(), f) }
+    concurrently { parMapN(this@parMap, fa.k(), fb.k(), fc.k(), f) }
 
-  suspend fun <A, B, C, D, E> parMap(
-    ctx: CoroutineContext,
+  suspend fun <A, B, C, D, E> CoroutineContext.parMap(
     fa: suspend () -> A,
     fb: suspend () -> B,
     fc: suspend () -> C,
     fd: suspend () -> D,
     f: (A, B, C, D) -> E
   ): E =
-    concurrently { parMapN(ctx, fa.k(), fb.k(), fc.k(), fd.k(), f) }
+    concurrently { parMapN(this@parMap, fa.k(), fb.k(), fc.k(), fd.k(), f) }
 
-  suspend fun <A, B, C, D, E, G> parMap(
-    ctx: CoroutineContext,
+  suspend fun <A, B, C, D, E, G> CoroutineContext.parMap(
     fa: suspend () -> A,
     fb: suspend () -> B,
     fc: suspend () -> C,
@@ -100,41 +67,37 @@ interface ConcurrentSyntax<F> : AsyncSyntax<F>, Concurrent<F> {
     fe: suspend () -> E,
     f: (A, B, C, D, E) -> G
   ): G =
-    concurrently { parMapN(ctx, fa.k(), fb.k(), fc.k(), fd.k(), fe.k(), f) }
+    concurrently { parMapN(this@parMap, fa.k(), fb.k(), fc.k(), fd.k(), fe.k(), f) }
 
 
-  suspend fun <A, B> parTupled(
-    ctx: CoroutineContext,
+  suspend fun <A, B> CoroutineContext.parallel(
     fa: suspend () -> A,
     fb: suspend () -> B
   ): Tuple2<A, B> =
-    parMap(ctx, fa, fb, ::Tuple2)
+    this.parMap(fa, fb, ::Tuple2)
 
-  suspend fun <A, B, C> parTupled(
-    ctx: CoroutineContext,
+  suspend fun <A, B, C> CoroutineContext.parallel(
     fa: suspend () -> A,
     fb: suspend () -> B,
     fc: suspend () -> C
   ): Tuple3<A, B, C> =
-    parMap(ctx, fa, fb, fc, ::Tuple3)
+    this.parMap(fa, fb, fc, ::Tuple3)
 
-  suspend fun <A, B, C, D> parTupled(
-    ctx: CoroutineContext,
+  suspend fun <A, B, C, D> CoroutineContext.parallel(
     fa: suspend () -> A,
     fb: suspend () -> B,
     fc: suspend () -> C,
     fd: suspend () -> D
   ): Tuple4<A, B, C, D> =
-    parMap(ctx, fa, fb, fc, fd, ::Tuple4)
+    this.parMap(fa, fb, fc, fd, ::Tuple4)
 
-  suspend fun <A, B, C, D, E> parTupled(
-    ctx: CoroutineContext,
+  suspend fun <A, B, C, D, E> CoroutineContext.parallel(
     fa: suspend () -> A,
     fb: suspend () -> B,
     fc: suspend () -> C,
     fd: suspend () -> D,
     fe: suspend () -> E
   ): Tuple5<A, B, C, D, E> =
-    parMap(ctx, fa, fb, fc, fd, fe, ::Tuple5)
+    this.parMap(fa, fb, fc, fd, fe, ::Tuple5)
 
 }

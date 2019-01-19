@@ -60,7 +60,7 @@ internal object IOBracket {
             val onNext = {
               val fb = try {
                 use(a)
-              } catch (nonFatal: Exception) {
+              } catch (nonFatal: Throwable) {
                 IO.raiseError<B>(nonFatal)
               }
               fb.fix().flatMap(frame)
