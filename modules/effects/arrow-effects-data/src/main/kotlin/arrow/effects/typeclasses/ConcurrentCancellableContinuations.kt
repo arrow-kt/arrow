@@ -8,7 +8,7 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.RestrictsSuspension
 
-typealias Effects<F> = ConcurrentCancellableContinuation<F, *>
+typealias Fx<F> = ConcurrentCancellableContinuation<F, *>
 
 @RestrictsSuspension
 @Suppress("DELEGATED_MEMBER_HIDES_SUPERTYPE_OVERRIDE")

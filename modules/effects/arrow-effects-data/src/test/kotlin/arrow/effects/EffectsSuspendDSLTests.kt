@@ -3,6 +3,8 @@ package arrow.effects
 import arrow.core.*
 import arrow.effects.extensions.io.concurrent.invoke
 import arrow.effects.extensions.io.unsafeRun.runBlocking
+import arrow.effects.typeclasses.Proc
+import arrow.effects.typeclasses.suspended.SProc
 import arrow.test.UnitSpec
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
@@ -167,6 +169,31 @@ class EffectsSuspendDSLTests : UnitSpec() {
         }
       } shouldBe true
     }
+
+    "asyncCallback" {
+      val result = 1
+      fxTest {
+        fx {
+          val asyncResult = asyncCallback<Int> { cb ->
+            cb(Right(result))
+          }
+          asyncResult
+        }
+      } shouldBe result
+    }
+
+    "continueOn" {
+      fxTest {
+        fx {
+          continueOn(Dispatchers.IO)
+          val ioThreadName = ! suspend { Thread.currentThread().name }
+          continueOn(Dispatchers.Default)
+          val defaultThreadName = ! suspend { Thread.currentThread().name }
+          ioThreadName != defaultThreadName
+        }
+      } shouldBe true
+    }
+
 
   }
 }

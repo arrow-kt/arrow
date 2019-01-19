@@ -16,7 +16,7 @@ interface ConcurrentSyntax<F> : AsyncSyntax<F>, Concurrent<F> {
   private suspend fun <A> concurrently(fb: Concurrent<F>.() -> Kind<F, A>): A =
     run<Concurrent<F>, Kind<F, A>> { fb(this) }.bind()
 
-  suspend fun <A> async(k: SProc<A>): A =
+  suspend fun <A> asyncCallback(k: SProc<A>): A =
     concurrently { asyncF(k.kr()) }
 
   suspend fun <A> (suspend () -> A).startFiber(ctx: CoroutineContext): Fiber<F, A> =

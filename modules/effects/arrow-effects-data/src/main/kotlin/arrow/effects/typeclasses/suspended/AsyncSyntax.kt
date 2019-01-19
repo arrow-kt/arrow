@@ -37,7 +37,7 @@ interface AsyncSyntax<F> : MonadDeferSyntax<F>, Async<F> {
   suspend fun <A> CoroutineContext.defer(f: suspend () -> A): A =
     asyncOp { defer(this@defer) { f.k() } }
 
-  suspend fun CoroutineContext.shift(unit: Unit = Unit): Unit =
-    asyncOp { shift() }
+  suspend fun continueOn(ctx: CoroutineContext): Unit =
+    asyncOp { ctx.shift() }
 
 }
