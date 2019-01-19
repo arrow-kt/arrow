@@ -18,7 +18,7 @@ open class ConcurrentCancellableContinuation<F, A>(val CF: Concurrent<F>, overri
     bindingCancellable { c() }.a
 }
 
-class SyncContinuation<A: Any> : Continuation<A> {
+class SyncContinuation<A : Any> : Continuation<A> {
 
   lateinit var result: A
 

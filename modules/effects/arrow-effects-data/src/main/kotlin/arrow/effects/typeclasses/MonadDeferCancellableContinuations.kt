@@ -3,7 +3,6 @@ package arrow.effects.typeclasses
 import arrow.Kind
 import arrow.core.Either
 import arrow.effects.data.internal.BindingCancellationException
-import arrow.effects.typeclasses.suspended.MonadDeferSyntax
 import arrow.typeclasses.MonadContinuation
 import arrow.typeclasses.MonadErrorContinuation
 import arrow.typeclasses.stateStack
