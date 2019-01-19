@@ -158,6 +158,16 @@ class EffectsSuspendDSLTests : UnitSpec() {
       } shouldBe Left(TestError)
     }
 
+    "suspend () -> A ≅ Kind<F, A> isomorphism" {
+      fxTest {
+        fx {
+          val (suspendedValue) = suspend { 1 }.k()
+          val (ioValue) = IO.just(1)
+          suspendedValue == ioValue
+        }
+      } shouldBe true
+    }
+
   }
 }
 
