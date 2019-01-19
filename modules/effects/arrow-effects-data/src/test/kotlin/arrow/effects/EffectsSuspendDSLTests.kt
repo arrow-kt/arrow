@@ -3,15 +3,17 @@ package arrow.effects
 import arrow.core.*
 import arrow.effects.extensions.io.concurrent.invoke
 import arrow.effects.extensions.io.unsafeRun.runBlocking
-import arrow.effects.typeclasses.Proc
-import arrow.effects.typeclasses.suspended.SProc
 import arrow.test.UnitSpec
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldThrow
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ObsoleteCoroutinesApi
+import kotlinx.coroutines.newSingleThreadContext
 import org.junit.runner.RunWith
+import java.util.concurrent.atomic.AtomicReference
 
+@ObsoleteCoroutinesApi
 @Suppress("RedundantSuspendModifier")
 @RunWith(KotlinTestRunner::class)
 class EffectsSuspendDSLTests : UnitSpec() {
@@ -185,15 +187,56 @@ class EffectsSuspendDSLTests : UnitSpec() {
     "continueOn" {
       fxTest {
         fx {
-          continueOn(Dispatchers.IO)
-          val ioThreadName = ! suspend { Thread.currentThread().name }
-          continueOn(Dispatchers.Default)
-          val defaultThreadName = ! suspend { Thread.currentThread().name }
-          ioThreadName != defaultThreadName
+          continueOn(newSingleThreadContext("A"))
+          val contextA = !suspend { Thread.currentThread().name }
+          continueOn(newSingleThreadContext("B"))
+          val contextB = !suspend { Thread.currentThread().name }
+          contextA != contextB
         }
       } shouldBe true
     }
 
+    "CoroutineContext.defer" {
+      fxTest {
+        fx {
+          val contextA = newSingleThreadContext("A").defer { Thread.currentThread().name }
+          val contextB = newSingleThreadContext("B").defer { Thread.currentThread().name }
+          contextA != contextB
+        }
+      } shouldBe true
+    }
+
+    "bracketCase success" {
+      val msg: AtomicReference<Int> = AtomicReference(0)
+      val const = 1
+      fxTest {
+        fx {
+          bracketCase(
+            f = { const },
+            release = { n, exit -> msg.set(const) },
+            use = { it }
+          )
+        }
+      }
+      msg.get() shouldBe const
+    }
+
+    "bracketCase failure" {
+      val msg: AtomicReference<Int> = AtomicReference(0)
+      val const = 1
+      shouldThrow<TestError> {
+        fxTest {
+          fx {
+            bracketCase(
+              f = { const },
+              release = { n, exit -> msg.set(const) },
+              use = { throw TestError }
+            )
+          }
+        }
+      }
+      msg.get() shouldBe const
+    }
 
   }
 }
