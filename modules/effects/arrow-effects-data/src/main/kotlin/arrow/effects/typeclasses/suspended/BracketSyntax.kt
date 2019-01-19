@@ -6,10 +6,7 @@ import arrow.effects.typeclasses.ExitCase
 
 interface BracketSyntax<F, E> :
   MonadErrorSyntax<F, E>,
-  Bracket<F, E>,
-  ListTraverseSyntax<F>,
-  ValidatedSyntax<F, E>,
-  EitherSyntax<F, E> {
+  Bracket<F, E> {
 
   private suspend fun <A> bracketing(fb: suspend Bracket<F, E>.() -> Kind<F, A>): A =
     run<Bracket<F, E>, Kind<F, A>> { fb(this) }.bind()

@@ -1,10 +1,15 @@
 package arrow.effects
 
+import arrow.core.Option
+import arrow.core.left
+import arrow.core.none
+import arrow.core.right
 import arrow.effects.extensions.io.concurrent.invoke
 import arrow.effects.extensions.io.unsafeRun.runBlocking
 import arrow.test.UnitSpec
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
+import io.kotlintest.shouldThrow
 import kotlinx.coroutines.Dispatchers
 import org.junit.runner.RunWith
 
@@ -68,26 +73,64 @@ class EffectsSuspendDSLTests : UnitSpec() {
       unsafe { runBlocking { program } }.distinct().size shouldBe 2
     }
 
-    "infix followedBy" {
-      fun getThreadName(): String =
-        "Thread 1"
-
-      suspend fun print(): Unit =
-        println("BOOM!")
-
-      unsafe {
-        runBlocking {
+    "raiseError" {
+      shouldThrow<TestError> {
+        fxTest {
           fx {
-            suspend { getThreadName() } followedBy suspend { print() }
-          }
-        } shouldBe runBlocking {
-          fx {
-            effect { print() }
-            getThreadName()
+            TestError.raiseError<Int>()
           }
         }
       }
-
     }
+
+    "handleError" {
+      fxTest {
+        fx {
+          handleError({ throw TestError }) { 1 }
+        }
+      } shouldBe 1
+    }
+
+    "Option.getOrRaiseError success case" {
+      fxTest {
+        fx {
+          Option(1).getOrRaiseError { throw TestError }
+        }
+      } shouldBe 1
+    }
+
+    "Option.getOrRaiseError error case" {
+      shouldThrow<TestError> {
+        fxTest {
+          fx {
+            none<Int>().getOrRaiseError { throw TestError }
+          }
+        }
+      }
+    }
+
+    "Either.getOrRaiseError success case" {
+      fxTest {
+        fx {
+          1.right().getOrRaiseError { throw TestError }
+        }
+      } shouldBe 1
+    }
+
+    "Either.getOrRaiseError error case" {
+      shouldThrow<TestError> {
+        fxTest {
+          fx {
+            1.left().getOrRaiseError { throw TestError }
+          }
+        }
+      }
+    }
+
   }
 }
+
+fun <A> fxTest(f: () -> IO<A>): A =
+  unsafe { runBlocking(f) }
+
+object TestError : Throwable()

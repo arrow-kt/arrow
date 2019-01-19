@@ -26,9 +26,6 @@ interface ApplicativeErrorSyntax<F, E> : ApplicativeError<F, E>, ApplicativeSynt
   suspend fun <A> TryOf<A>.getOrRaiseError(f: (Throwable) -> E): A =
     run<ApplicativeError<F, E>, Kind<F, A>> { this@getOrRaiseError.fromTry(f) }.bind()
 
-  suspend fun <A> handleError(fa: suspend () -> A, f: (E) -> A): A =
-    run<ApplicativeError<F, E>, Kind<F, A>> { fa.k().handleError(f) }.bind()
-
   suspend fun <A> attempt(fa: suspend () -> A): Either<E, A> =
     run<ApplicativeError<F, E>, Kind<F, Either<E, A>>> { fa.k().attempt() }.bind()
 

@@ -139,23 +139,6 @@ class OptionTest : UnitSpec() {
 
     }
 
-    "applicative range syntax" {
-      val result: Option<Int> = F {
-        val (a, b, c, d) = Option(1)..Option(2)..Option(3)..Option(4)
-        a + b + c + d
-      }
-      result shouldBe Some(1 + 2 + 3 + 4)
-    }
-
-    "functor invoke syntax" {
-      val result: Option<Int> = F {
-        val x = Option(1)() { it + 1 }
-        val y = Option(1)() { it + 1 }
-        x + y
-      }
-      result shouldBe Some(4)
-    }
-
   }
 
 }

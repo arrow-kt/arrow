@@ -1,6 +1,7 @@
 package arrow.effects
 
 import arrow.core.*
+import arrow.data.extensions.list.traverse.traverse
 import arrow.data.invalidNel
 import arrow.data.validNel
 import arrow.effects.IO.Companion.just
@@ -419,24 +420,6 @@ class IOTest : UnitSpec() {
         }.unsafeRunAsyncCancellable { }
         latch.get()
       }.unsafeRunSync()
-    }
-
-    "List traverse F syntax" {
-      bindingCancellable {
-        val listOfInts: List<Int> = listOf(IO { 1 }, IO { 2 }, IO { 3 }).traverse(::identity)
-        listOfInts
-      }.a.fix().unsafeRunSync() shouldBe listOf(1, 2, 3)
-    }
-
-    "Validated F syntax" {
-
-      bindingCancellable {
-        validate(
-          Error.invalidNel(),
-          4.validNel(),
-          Error.invalidNel()
-        ).errors()
-      }.a.fix().unsafeRunSync() shouldBe listOf(Error, Error)
     }
 
   }
