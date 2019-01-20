@@ -289,5 +289,5 @@ operator fun <A> BIO.Companion.invoke(f: () -> A): IO<A> =
 operator fun <A> BIO.Companion.invoke(ctx: CoroutineContext, f: () -> A): IO<A> =
   BIO.lazy.continueOn(ctx).flatMap { invoke(f) }
 
-fun <A> eval(eval: Eval<A>): IO<A> =
+fun <A> BIO.Companion.eval(eval: Eval<A>): IO<A> =
   BIO.eval(eval, ::identity)
