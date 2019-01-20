@@ -27,58 +27,54 @@ When `continueIf` is satisfied the computation continues
 import arrow.*
 import arrow.core.*
 import arrow.mtl.typeclasses.*
-import arrow.mtl.instances.*
-import arrow.mtl.instances.option.monadFilter.*
+import arrow.mtl.extensions.*
+import arrow.mtl.extensions.option.monadFilter.*
 
-ForOption extensions {
-  bindingFilter {
-     val a = Option(1).bind()
-     val b = Option(1).bind()
-     val c = a + b
-     continueIf(c > 0)
-     c
-  }
+bindingFilter {
+  val a = Option(1).bind()
+  val b = Option(1).bind()
+  val c = a + b
+  continueIf(c > 0)
+  c
 }
 ```
 
 ```kotlin:ank
 import arrow.data.*
-import arrow.mtl.instances.listk.monadFilter.*
+import arrow.mtl.extensions.listk.monadFilter.*
 
-ForListK extensions {
- bindingFilter {
-     val a = listOf(1).k().bind()
-     val b = listOf(1).k().bind()
-     val c = a + b
-     continueIf(c > 0)
-     c
- }
+bindingFilter {
+  val a = listOf(1).k().bind()
+  val b = listOf(1).k().bind()
+  val c = a + b
+  continueIf(c > 0)
+  c
 }
 ```    
 
 When `continueIf` returns `false` the computation is interrupted and the `empty()` value is returned
 
 ```kotlin:ank
-ForOption extensions {
-  bindingFilter {
-     val a = Option(1).bind()
-     val b = Option(1).bind()
-     val c = a + b
-     continueIf(c < 0)
-     c
-  }
+import arrow.mtl.extensions.option.monadFilter.*
+
+bindingFilter {
+  val a = Option(1).bind()
+  val b = Option(1).bind()
+  val c = a + b
+  continueIf(c < 0)
+  c
 }
 ```
 
 ```kotlin:ank
-ForListK extensions {
- bindingFilter {
-     val a = listOf(1).k().bind()
-     val b = listOf(1).k().bind()
-     val c = a + b
-     continueIf(c < 0)
-     c
- }
+import arrow.mtl.extensions.list.monadFilter.*
+
+bindingFilter {
+  val a = listOf(1).k().bind()
+  val b = listOf(1).k().bind()
+  val c = a + b
+  continueIf(c < 0)
+  c
 }
 ```    
 
@@ -89,27 +85,29 @@ Binding over `MonadFilter` instances with `bindingFilter` brings into scope the 
 When `bindWithFilter` is satisfied the computation continues
 
 ```kotlin:ank
-ForOption extensions {
- bindingFilter {
-     val a = Option(1).bind()
-     val b = Option(1).bindWithFilter { it == a } //continues
-     a + b
- }
+import arrow.mtl.extensions.option.monadFilter.*
+
+bindingFilter {
+  val a = Option(1).bind()
+  val b = Option(1).bindWithFilter { it == a } //continues
+  a + b
 }
 ```
 
 ```kotlin:ank
+import arrow.mtl.extensions.list.monadFilter.*
+
 bindingFilter {
- val a = listOf(1).k().bind()
- val b = listOf(1).k().bindWithFilter { it == a } //continues
- a + b
+  val a = listOf(1).k().bind()
+  val b = listOf(1).k().bindWithFilter { it == a } //continues
+  a + b
 }
 ```
 
 When `bindWithFilter` returns `false` the computation short circuits yielding the monad's empty value
 
 ```kotlin:ank
-import arrow.mtl.instances.option.monadFilter.*
+import arrow.mtl.extensions.option.monadFilter.bindingFilter
 
 bindingFilter {
  val a = Option(0).bind()
@@ -119,7 +117,7 @@ bindingFilter {
 ```   
 
 ```kotlin:ank
-import arrow.mtl.instances.listk.monadFilter.*
+import arrow.mtl.extensions.list.monadFilter.*
 
 bindingFilter {
  val a = listOf(0).k().bind()

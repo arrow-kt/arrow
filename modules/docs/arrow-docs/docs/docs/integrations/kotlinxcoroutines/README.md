@@ -45,7 +45,7 @@ runBlocking { deferred.await() }
 
 What if we convert it to Arrow using `k()`?
 ```kotlin
-import arrow.effects.*
+import arrow.effects.coroutines.*
 
 val errorArrowWrapper = async { throw RuntimeException("BOOM!") }.k()
 deferredWrapper.unsafeAttemptSync()
@@ -122,22 +122,18 @@ It is also posible to `await()` on the wrapper like you would on `Deferred`, but
 These benefits include capturing all exceptions that happen inside the block.
 
 ```kotlin
-import arrow.effects.*
+import arrow.effects.coroutines.*
 import arrow.typeclasses.*
+import arrow.effects.coroutines.extensions.deferred.monadThrow.bindingCatch
 
-ForDeferredK extensions { 
-  bindingCatch {
-      val songUrl = getSongUrlAsync().bind()
-      val musicPlayer = MediaPlayer.load(songUrl)
-      val totalTime = musicPlayer.getTotaltime() // Oh oh, total time is 0
-    
-      val timelineClick = audioTimeline.click().bind()
-    
-      val percent = (timelineClick / totalTime * 100).toInt()
-    
-      percent
-  }.unsafeAttemptSync()
-}
+bindingCatch {
+  val songUrl = getSongUrlAsync().bind()
+  val musicPlayer = MediaPlayer.load(songUrl)
+  val totalTime = musicPlayer.getTotaltime() // Oh oh, total time is 0  
+  val timelineClick = audioTimeline.click().bind()   
+  val percent = (timelineClick / totalTime * 100).toInt()
+  percent
+}.unsafeAttemptSync()
  // Failure(ArithmeticException("/ by zero"))
 ```
 
@@ -170,7 +166,7 @@ Note that [`MonadDefer`]({{ '/docs/effects/monaddefer' | relative_url }}) provid
 Invoking this `Disposable` causes an `BindingCancellationException` in the chain which needs to be handled by the subscriber, similarly to what `Deferred` does.
 
 ```kotlin
-import arrow.effects.instances.deferred.monad.*
+import arrow.effects.coroutines.extensions.deferred.monad.*
 
 val (deferred, unsafeCancel) =
   bindingCancellable {
@@ -203,8 +199,8 @@ This cannot be rerun due to being a direct wrapper of `Deferred` created with `.
 
 {: data-executable='true'}
 ```kotlin:ank
-import arrow.effects.k
-import arrow.effects.unsafeRunSync
+import arrow.effects.coroutines.k
+import arrow.effects.coroutines.unsafeRunSync
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 
@@ -225,9 +221,9 @@ This will rerun only the deferred, because other cannot be rerun.
 
 {: data-executable='true'}
 ```kotlin:ank
-import arrow.effects.k
-import arrow.effects.DeferredK
-import arrow.effects.unsafeRunSync
+import arrow.effects.coroutines.k
+import arrow.effects.coroutines.unsafeRunSync
+import arrow.effects.coroutines.DeferredK
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 
@@ -254,8 +250,8 @@ This will rerun both the invoke method and flatMap correctly.
 
 {: data-executable='true'}
 ```kotlin:ank
-import arrow.effects.DeferredK
-import arrow.effects.unsafeRunSync
+import arrow.effects.coroutines.DeferredK
+import arrow.effects.coroutines.unsafeRunSync
 
 fun main() {
   //sampleStart
@@ -277,8 +273,8 @@ This will also rerun properly due to the deferred being created in the invoke co
 
 {: data-executable='true'}
 ```kotlin:ank
-import arrow.effects.DeferredK
-import arrow.effects.unsafeRunSync
+import arrow.effects.coroutines.DeferredK
+import arrow.effects.coroutines.unsafeRunSync
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 
@@ -301,8 +297,8 @@ Same example but using a suspend function instead
 
 {: data-executable='true'}
 ```kotlin:ank
-import arrow.effects.DeferredK
-import arrow.effects.unsafeRunSync
+import arrow.effects.coroutines.DeferredK
+import arrow.effects.coroutines.unsafeRunSync
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 
@@ -335,7 +331,7 @@ Instead of awaiting a `Deferred<A>` it may also be a good idea to use `suspend (
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.effects.*
+import arrow.effects.coroutines.*
 
 DataType(DeferredK::class).tcMarkdownList()
 ```

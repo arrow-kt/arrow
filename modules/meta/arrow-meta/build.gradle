@@ -1,0 +1,35 @@
+import org.gradle.internal.jvm.Jvm
+
+apply plugin: 'kotlin'
+apply plugin: 'kotlin-kapt'
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
+    compile project(':arrow-annotations')
+    compile 'me.eugeniomarletti.kotlin.metadata:kotlin-metadata:1.4.0'
+    compile("com.squareup:kotlinpoet:$kotlinPoetVersion") {
+        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-reflect'
+    }
+    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
+    compileOnly 'com.google.auto.service:auto-service:1.0-rc4'
+    kapt 'com.google.auto.service:auto-service:1.0-rc4'
+
+    //To generate stubs for data classes
+    kaptTest 'com.google.auto.service:auto-service:1.0-rc4'
+    testCompile "com.google.testing.compile:compile-testing:0.15"
+    testCompile fileTree(dir: './src/test/libs', includes: ['*.jar'])
+    testCompile project(":arrow-extras")
+    testCompile project(":arrow-meta-test-models")
+    testCompile project(":arrow-optics")
+    testCompile("junit:junit:$jUnitVersion")
+    testRuntime("org.junit.vintage:junit-vintage-engine:$jUnitVintageVersion")
+    testCompile "io.kotlintest:kotlintest-runner-junit4:$kotlinTestVersion"
+    def toolsJar = Jvm.current().getToolsJar()
+
+    if (!toolsJar)
+        throw new GradleException("tools.jar not found at your JAVA_HOME dir ${Jvm.current().getJavaHome().getAbsolutePath()}.\n" +
+                "Building with a JRE or JDK9 is currently not supported.")
+    testCompile files(toolsJar)
+}
+
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

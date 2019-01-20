@@ -29,8 +29,8 @@ It lifts an exception into the computational context of a type constructor.
 ```kotlin:ank
 import arrow.*
 import arrow.core.*
-import arrow.instances.*
-import arrow.instances.either.applicativeError.*
+import arrow.data.extensions.*
+import arrow.core.extensions.either.applicativeError.*
 
 val eitherResult: Either<Throwable, Int> =
   RuntimeException("BOOM!").raiseError()
@@ -40,7 +40,7 @@ eitherResult
 
 ```kotlin:ank
 import arrow.data.*
-import arrow.instances.`try`.applicativeError.*
+import arrow.core.extensions.`try`.applicativeError.*
 
 val tryResult: Try<Int> =
   RuntimeException("BOOM!").raiseError()
@@ -50,7 +50,7 @@ tryResult
 
 ```kotlin:ank
 import arrow.effects.*
-import arrow.effects.instances.io.applicativeError.*
+import arrow.effects.extensions.io.applicativeError.*
 
 val ioResult: IO<Int> =
   RuntimeException("BOOM!").raiseError()
@@ -63,7 +63,7 @@ ioResult.attempt().unsafeRunSync()
 Tests a predicate against the object, and if it fails it executes a function to create an error.
 
 ```kotlin:ank
-import arrow.instances.either.monadError.*
+import arrow.core.extensions.either.monadError.*
 
 Either.Right(1).ensure({ RuntimeException("Failed predicate") }, { it > 0 })
 ```

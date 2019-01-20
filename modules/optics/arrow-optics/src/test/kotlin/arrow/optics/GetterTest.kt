@@ -1,21 +1,16 @@
 package arrow.optics
 
 import arrow.core.*
-import arrow.data.State
-import arrow.data.k
-import arrow.data.map
-import arrow.data.run
+import arrow.core.extensions.monoid
 import arrow.data.*
-import arrow.instances.StringMonoidInstance
-import arrow.instances.monoid
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
-import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class GetterTest : UnitSpec() {
 
   init {
@@ -27,49 +22,49 @@ class GetterTest : UnitSpec() {
     with(tokenGetter.asFold()) {
 
       "asFold should behave as valid Fold: size" {
-        forAll(TokenGen) { token ->
+        forAll(genToken) { token ->
           size(token) == 1
         }
       }
 
       "asFold should behave as valid Fold: nonEmpty" {
-        forAll(TokenGen) { token ->
+        forAll(genToken) { token ->
           nonEmpty(token)
         }
       }
 
       "asFold should behave as valid Fold: isEmpty" {
-        forAll(TokenGen) { token ->
+        forAll(genToken) { token ->
           !isEmpty(token)
         }
       }
 
       "asFold should behave as valid Fold: getAll" {
-        forAll(TokenGen) { token ->
+        forAll(genToken) { token ->
           getAll(token) == listOf(token.value).k()
         }
       }
 
       "asFold should behave as valid Fold: combineAll" {
-        forAll(TokenGen) { token ->
+        forAll(genToken) { token ->
           combineAll(String.monoid(), token) == token.value
         }
       }
 
       "asFold should behave as valid Fold: fold" {
-        forAll(TokenGen) { token ->
+        forAll(genToken) { token ->
           fold(String.monoid(), token) == token.value
         }
       }
 
       "asFold should behave as valid Fold: headOption" {
-        forAll(TokenGen) { token ->
+        forAll(genToken) { token ->
           headOption(token) == Some(token.value)
         }
       }
 
       "asFold should behave as valid Fold: lastOption" {
-        forAll(TokenGen) { token ->
+        forAll(genToken) { token ->
           lastOption(token) == Some(token.value)
         }
       }
@@ -115,78 +110,60 @@ class GetterTest : UnitSpec() {
 
     "Pairing two disjoint getters should yield a pair of their results" {
       val splitGetter: Getter<Tuple2<Token, User>, Tuple2<String, Token>> = tokenGetter.split(userGetter)
-      forAll(TokenGen, UserGen) { token: Token, user: User ->
+      forAll(genToken, genUser) { token: Token, user: User ->
         splitGetter.get(token toT user) == token.value toT user.token
       }
     }
 
     "Creating a first pair with a type should result in the target to value" {
       val first = tokenGetter.first<Int>()
-      forAll(TokenGen, Gen.int()) { token: Token, int: Int ->
+      forAll(genToken, Gen.int()) { token: Token, int: Int ->
         first.get(token toT int) == token.value toT int
       }
     }
 
     "Creating a second pair with a type should result in the value target" {
       val first = tokenGetter.second<Int>()
-      forAll(Gen.int(), TokenGen) { int: Int, token: Token ->
+      forAll(Gen.int(), genToken) { int: Int, token: Token ->
         first.get(int toT token) == int toT token.value
       }
     }
 
     "Asking for the focus in a Reader" {
-      forAll(TokenGen) { token: Token ->
+      forAll(genToken) { token: Token ->
         tokenGetter.ask().runId(token) == token.value
       }
     }
 
     "toReader is an alias for ask" {
-      forAll(TokenGen) { token: Token ->
+      forAll(genToken) { token: Token ->
         tokenGetter.ask().runId(token) == tokenLens.toReader().runId(token)
       }
     }
 
     "Asks with f is the same as applying f to the focus of the lens" {
-      forAll(TokenGen, genFunctionAToB<String, String>(Gen.string())) { token, f ->
-        tokenGetter.asks(f).runId(token) == f(token.value)
-      }
-    }
-
-    "Asking for the focus in a Reader" {
-      forAll(TokenGen) { token: Token ->
-        tokenGetter.ask().runId(token) == token.value
-      }
-    }
-
-    "toReader is an alias for ask" {
-      forAll(TokenGen) { token: Token ->
-        tokenGetter.ask().runId(token) == tokenLens.toReader().runId(token)
-      }
-    }
-
-    "Asks with f is the same as applying f to the focus of the lens" {
-      forAll(TokenGen, genFunctionAToB<String, String>(Gen.string())) { token, f ->
+      forAll(genToken, genFunctionAToB<String, String>(Gen.string())) { token, f ->
         tokenGetter.asks(f).runId(token) == f(token.value)
       }
     }
 
     "Extract should extract the focus from the state" {
-      forAll(TokenGen) { token ->
-        tokenGetter.extract().run(token) ==
+      forAll(genToken) { generatedToken ->
+        tokenGetter.extract().run(generatedToken) ==
           State { token: Token ->
             token toT tokenGetter.get(token)
-          }.run(token)
+          }.run(generatedToken)
       }
     }
 
     "toState should be an alias to extract" {
-      forAll(TokenGen) { token ->
+      forAll(genToken) { token ->
         tokenGetter.toState().run(token) == tokenGetter.extract().run(token)
       }
     }
 
     "extractMap with f should be same as extract and map" {
-      forAll(TokenGen, genFunctionAToB<String, String>(Gen.string())) { token, f ->
+      forAll(genToken, genFunctionAToB<String, String>(Gen.string())) { token, f ->
         tokenGetter.extractMap(f).run(token) == tokenGetter.extract().map(f).run(token)
       }
     }

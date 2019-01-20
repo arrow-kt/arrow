@@ -2,12 +2,12 @@ package arrow.syntax.test
 
 import arrow.syntax.function.*
 import arrow.test.UnitSpec
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
+import io.kotlintest.runner.junit4.KotlinTestRunner
+import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
 import java.util.*
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class FunctionSyntaxTest : UnitSpec() {
 
   val f = { prefix: String, numericPostfix: Int, values: List<String> ->
@@ -33,7 +33,8 @@ class FunctionSyntaxTest : UnitSpec() {
       val ninja = "ninja"
       val get = { potato }
       val map = { word: String -> ninja + word }
-      ninja + potato shouldBe (get andThen map)()
+      (get andThen map)()
+      (ninja + potato) shouldBe (get andThen map)()
     }
 
     "it should compose function correctly (forwardCompose)" {
@@ -93,8 +94,8 @@ class FunctionSyntaxTest : UnitSpec() {
       val b = { _: Int -> counterB++ }.memoize()
 
 
-      (1..5).forEach { a(1) }
-      (1..5).forEach { b(1) }
+      repeat(5) { a(1) }
+      repeat(5) { b(1) }
 
       counterA shouldBe 5
       counterB shouldBe 1 // calling several times a memoized function with the same parameter is computed just once
@@ -109,8 +110,8 @@ class FunctionSyntaxTest : UnitSpec() {
       val b = { counterB++ }.memoize()
 
 
-      (1..5).forEach { a() }
-      (1..5).forEach { b() }
+      repeat(5) { a() }
+      repeat(5) { b() }
 
       counterA shouldBe 5
       counterB shouldBe 1 // calling several times a memoized function with the same parameter is computed just once

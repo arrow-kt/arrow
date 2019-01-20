@@ -194,7 +194,7 @@ class Talk {
 }
 
 class Conference {
-    fun getCities() List<City> { ... }
+    fun getCities(): List<City> { ... }
 }
 ```
 
@@ -516,7 +516,7 @@ For example, RxJava's Observable can be chained using `flatMap`, `switchMap`, an
 Instead, Arrow specifies that Monad must be implemented by a separate object or class, referred as the "instance of Monad for type F".
 
 ```kotlin
-object FutureMonadInstance: Monad<ForFuture> {
+object FutureMonad: Monad<ForFuture> {
     override fun <A> just (instance: A): Future<A> =
         Future(a)
 
@@ -524,7 +524,7 @@ object FutureMonadInstance: Monad<ForFuture> {
         flatMap(f) // as per precedence rules the class method is called
 }
 
-object OptionMonadInstance: Monad<ForOption> {
+object OptionMonad: Monad<ForOption> {
     override fun <A> just (instance: A): Option<A> =
         Some(a)
 
@@ -533,7 +533,7 @@ object OptionMonadInstance: Monad<ForOption> {
         flatMap(f)
 }
 
-object ObservableSwitchMonadInstance: Monad<ForObservable> {
+object ObservableSwitchMonad: Monad<ForObservable> {
     override fun <A> just (instance: A): Observable<A> =
         Observable.just(a)
 
@@ -542,7 +542,7 @@ object ObservableSwitchMonadInstance: Monad<ForObservable> {
         switchMap(f)
 }
 
-object ObservableConcatMonadInstance: Monad<ForObservable> {
+object ObservableConcatMonad: Monad<ForObservable> {
     override fun <A> just (instance: A): Observable<A> =
         Observable.just(a)
 
@@ -632,11 +632,11 @@ fun <F> bookSpeakersFlights(M: Monad<F>): Kind<F, Reservation> =
         reservations.bookFlight(speaker, city).bind()
     }
 
-bookSpeakersFlights(ObservableSwitchMonadInstance).fix() // Observable<Reservation>
+bookSpeakersFlights(ObservableSwitchMonad).fix() // Observable<Reservation>
 
-bookSpeakersFlights(OptionMonadInstance).fix() // Option<Reservation>
+bookSpeakersFlights(OptionMonad).fix() // Option<Reservation>
 
-bookSpeakersFlights(ListMonadInstance).fix() // List<Reservation>
+bookSpeakersFlights(ListMonad).fix() // List<Reservation>
 ```
 
 These are called [Monad Comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }}), and you can find a complete section of the docs explaining it.

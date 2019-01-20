@@ -34,6 +34,14 @@ Introductory talk to Functional architectures to be built on top of Arrow.
 
 KotlinConf, San Francisco, Nov '17 - version 0.3.11
 
+### Manual documentation is dead. Long live automated documentation! Automated documentation with ΛNK.
+
+It includes how the ΛNK plugin works: from having a tool that evaluates and verifies your doc snippets at compile time, to generating code documentation that is always correct and up to date.
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/CvNoX2gGd9c?rel=0" frameborder="0" allowfullscreen></iframe>
+
+droidconSF, San Francisco, Nov '18 - version 0.8.1
+
 ### Building a DSL... in Kotlin
  
  Make DSLs stack safe, composable and reusable under different runtime requirements thanks to Arrow.
@@ -52,7 +60,7 @@ Mobilization 7, Łódź, Oct '17 - version 0.3.11
  
 ### Simple Dependency Management in Kotlin
 
-In this talk we introduce the concepts of Dependency Management as a language feature, typeclasses, and a live demo of [KEEP-87](https://github.com/Kotlin/KEEP/pull/87).
+In this talk we introduce the concepts of Dependency Management as a language feature, typeclasses, and a live demo of [KEEP-87](https://github.com/Kotlin/KEEP/pull/87). You can follow along the example in [this folder](https://github.com/arrow-kt/arrow/tree/master/modules/docs/arrow-examples/src/test/kotlin/arrow/typeclasses).
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/CR5h2Wq1yPE" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
 
@@ -193,3 +201,9 @@ DM Ersin on [Gitter](https://gitter.im/ersin-ertan) or [Slack](https://kotlinlan
 [Functional Hangman](https://lordraydenmk.github.io/2018/functional-hangman-in-kotlin-with-arrow/) game - console application written with Arrow. Uses the `IO<A>` monad to push side effects to the edge of the system.
 
 November '18 - version 0.8.1
+
+### Getting started with FP in Kotlin and Arrow: Typeclasses
+
+[Getting started with FP in Kotlin and Arrow: Typeclasses](http://www.smartjava.org/content/kotlin-arrow-typeclasses/) explores part of the Arrow library by explaining how you can use Arrow to create your own typeclasses and use the ones provided by Arrow to make your code more concise and better readable.
+
+January '19 - version 0.8.1

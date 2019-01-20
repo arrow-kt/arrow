@@ -95,16 +95,17 @@ The `flatMap` method on `State<S, A>` lets you use the result of one `State` in 
 
 ```kotlin:ank:silent
 import arrow.typeclasses.*
-import arrow.instances.*
+import arrow.data.extensions.*
+import arrow.core.extensions.id.monad.monad
+import arrow.data.extensions.statet.monad.binding
 
-fun stackOperations() = ForState<Stack>() extensions {
-  binding {
+fun stackOperations() = 
+  binding<ForId, Stack, Option<String>>(Id.monad()) {
     val a = push("a").bind()
     val b = pop().bind()
     val c = pop().bind()
     c
-  }.fix()
-}
+  }
 ```
 
 At this point, we have not yet interacted with any Stack; we have written instructions to operate one. We need to pass in an initial stack value, and then we actually apply our operations to it:

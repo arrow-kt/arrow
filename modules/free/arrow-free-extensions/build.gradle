@@ -1,0 +1,16 @@
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
+    compile project(':arrow-annotations')
+    compile project(':arrow-free-data')
+    kapt project(':arrow-meta')
+    kaptTest project(':arrow-meta')
+    compileOnly project(':arrow-meta')
+    testCompileOnly project(':arrow-meta')
+    testRuntime("org.junit.vintage:junit-vintage-engine:$jUnitVintageVersion")
+    testCompile "io.kotlintest:kotlintest-runner-junit4:$kotlinTestVersion"
+    testCompile project(':arrow-extras-extensions')
+    testCompile project(':arrow-test')
+}
+
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
+apply plugin: 'kotlin-kapt'

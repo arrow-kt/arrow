@@ -3,7 +3,7 @@ layout: docs
 title: NonEmptyList
 permalink: /docs/arrow/data/nonemptylist/
 redirect_from:
-  - /docs/arrow/data/nonemptylist/
+  - /docs/datatypes/nonemptylist/
 video: TC6IzE61OyE
 ---
 
@@ -17,7 +17,7 @@ beginner
 
 ```groovy
 // gradle
-compile "io.arrow-kt:arrow-data:$arrow_version"
+compile "io.arrow-kt:arrow-extras:$arrow_version"
 ```
 
 ```kotlin:ank
@@ -85,31 +85,28 @@ nelOne.flatMap { one ->
 
 ```kotlin:ank
 import arrow.typeclasses.*
-import arrow.instances.*
+import arrow.data.extensions.*
+import arrow.data.extensions.nonemptylist.monad.binding
 
 val nelOne: NonEmptyList<Int> = NonEmptyList.of(1)
 val nelTwo: NonEmptyList<Int> = NonEmptyList.of(2)
 val nelThree: NonEmptyList<Int> = NonEmptyList.of(3)
 
-ForNonEmptyList extensions {
-  binding {
-    val one = nelOne.bind()
-    val two = nelTwo.bind()
-    val three = nelThree.bind()
-    one + two + three
-  }.fix()
+binding {
+  val one = nelOne.bind()
+  val two = nelTwo.bind()
+  val three = nelThree.bind()
+  one + two + three
 }
 ```
 
 Monad binding in `NonEmptyList` and other collection related data type can be used as generators
 
 ```kotlin:ank
-ForNonEmptyList extensions {
-  binding {
-    val x = NonEmptyList.of(1, 2, 3).bind()
-    val y = NonEmptyList.of(1, 2, 3).bind()
-    x + y
-  }.fix()
+binding {
+  val x = NonEmptyList.of(1, 2, 3).bind()
+  val y = NonEmptyList.of(1, 2, 3).bind()
+  x + y
 }
 ```
 
@@ -120,6 +117,7 @@ ForNonEmptyList extensions {
 ```kotlin:ank
 import arrow.data.*
 import java.util.*
+import arrow.data.extensions.nonemptylist.applicative.map
 
 data class Person(val id: UUID, val name: String, val year: Int)
 
@@ -128,10 +126,8 @@ val nelId: NonEmptyList<UUID> = NonEmptyList.of(UUID.randomUUID(), UUID.randomUU
 val nelName: NonEmptyList<String> = NonEmptyList.of("William Alvin Howard", "Haskell Curry")
 val nelYear: NonEmptyList<Int> = NonEmptyList.of(1926, 1900)
 
-ForNonEmptyList extensions {
- map(nelId, nelName, nelYear, { (id, name, year) ->
+map(nelId, nelName, nelYear) { (id, name, year) ->
   Person(id, name, year)
- })
 }
 ```
 

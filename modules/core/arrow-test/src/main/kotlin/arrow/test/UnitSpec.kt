@@ -3,22 +3,24 @@ package arrow.test
 import arrow.test.laws.Law
 import arrow.typeclasses.Eq
 import io.kotlintest.TestCase
-import io.kotlintest.specs.StringSpec
+import io.kotlintest.TestType
+import io.kotlintest.specs.AbstractStringSpec
 
 /**
  * Base class for unit tests
  */
-abstract class UnitSpec : StringSpec() {
+abstract class UnitSpec : AbstractStringSpec() {
 
   fun testLaws(vararg laws: List<Law>): List<TestCase> {
-    val flattened = laws.flatMap { list: List<Law> -> list.asIterable() }
-    val distinct = flattened.distinctBy { law: Law -> law.name }
-    return distinct.map { law: Law ->
-      val tc = TestCase(suite = rootTestSuite, name = law.name, test = law.test, config = defaultTestCaseConfig)
-      rootTestSuite.addTestCase(tc)
-      tc
-    }
+   laws
+     .flatMap { list: List<Law> -> list.asIterable() }
+     .distinctBy { law: Law -> law.name }
+     .map { law: Law ->
+       createTestCase(law.name, law.test, defaultTestCaseConfig, TestType.Test)
+     }
+   return testCases()
   }
+
 
   fun <F> Eq<F>.logged(): Eq<F> = Eq { a, b ->
     try {

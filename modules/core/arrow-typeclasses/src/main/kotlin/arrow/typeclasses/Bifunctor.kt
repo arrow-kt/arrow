@@ -38,7 +38,7 @@ interface Bifunctor<F> {
    *
    * ```kotlin:ank
    * import arrow.core.*
-   * import arrow.instances.tuple2.bifunctor.lift
+   * import arrow.core.extensions.tuple2.bifunctor.lift
    *
    * val sumFive : (Int) -> Int = { it + 5 }
    * val sumTwo : (Int) -> Int = { it + 2 }
@@ -65,7 +65,7 @@ interface Bifunctor<F> {
    *
    * ```kotlin:ank
    * import arrow.core.Tuple2
-   * import arrow.instances.tuple2.bifunctor.mapLeft
+   * import arrow.core.extensions.tuple2.bifunctor.mapLeft
    *
    * fun main(args: Array<String>) {
    *   //sampleStart

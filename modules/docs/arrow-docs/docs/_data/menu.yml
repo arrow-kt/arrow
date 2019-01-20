@@ -23,34 +23,40 @@ options:
         url: /docs/apidocs/arrow-typeclasses/
 
       - title: Core Data Types
-        url: /docs/apidocs/arrow-core/
+        url: /docs/apidocs/arrow-core-data/
 
       - title: Core Extensions
-        url: /docs/apidocs/arrow-instances-core/
+        url: /docs/apidocs/arrow-core-extensions/
+        
+      - title: Core Extra Data Types
+        url: /docs/apidocs/arrow-extras/
+
+      - title: Core Extra Extensions
+        url: /docs/apidocs/arrow-extras-extensions/
 
       - title: Effects
-        url: /docs/apidocs/arrow-effects/
+        url: /docs/apidocs/arrow-effects-data/
 
       - title: Effects Extensions
-        url: /docs/apidocs/arrow-effects/
+        url: /docs/apidocs/arrow-effects-extensions/
 
       - title: Effects Coroutines
-        url: /docs/apidocs/arrow-effects-kotlinx-coroutines/
+        url: /docs/apidocs/arrow-effects-kotlinx-coroutines-data/
 
       - title: Effects Coroutines Extensions
-        url: /docs/apidocs/arrow-effects-kotlinx-coroutines-instances/
+        url: /docs/apidocs/arrow-effects-kotlinx-coroutines-extensions/
 
       - title: Effects Rx2
-        url: /docs/apidocs/arrow-effects-rx2/
+        url: /docs/apidocs/arrow-effects-rx2-data/
 
       - title: Effects Rx2 Extensions
-        url: /docs/apidocs/arrow-effects-rx2-instances/
+        url: /docs/apidocs/arrow-effects-rx2-extensions/
 
       - title: Effects Reactor
-        url: /docs/apidocs/arrow-effects-reactor/
+        url: /docs/apidocs/arrow-effects-reactor-data/
 
       - title: Effects Reactor Extensions
-        url: /docs/apidocs/arrow-effects-reactor-instances/
+        url: /docs/apidocs/arrow-effects-reactor-extensions/
 
       - title: Streams
         url: /docs/apidocs/arrow-streams/
@@ -62,13 +68,19 @@ options:
         url: /docs/apidocs/arrow-optics/
 
       - title: Recursion
-        url: /docs/apidocs/arrow-recursion/
+        url: /docs/apidocs/arrow-recursion-data/
+
+      - title: Recursion Extensions
+        url: /docs/apidocs/arrow-recursion-extensions/
 
       - title: Generic
         url: /docs/apidocs/arrow-generic/
 
       - title: Free
-        url: /docs/apidocs/arrow-free/
+        url: /docs/apidocs/arrow-free-data/
+
+      - title: Validation
+        url: /docs/apidocs/arrow-validation/
 
   - title: Patterns
 

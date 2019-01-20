@@ -7,18 +7,18 @@ import arrow.core.fix
 import arrow.data.Invalid
 import arrow.data.Valid
 import arrow.data.Validated
-import arrow.instances.either.applicative.applicative
+import arrow.core.extensions.either.applicative.applicative
 import arrow.test.UnitSpec
 import arrow.test.generators.*
 import arrow.test.laws.IsoLaws
 import arrow.test.laws.PrismLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
-import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.properties.Gen
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class TryTest : UnitSpec() {
   init {
 

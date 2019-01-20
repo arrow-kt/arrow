@@ -2,18 +2,18 @@ package arrow.optics
 
 import arrow.data.MapK
 import arrow.data.SetK
-import arrow.instances.setk.monoid.monoid
+import arrow.data.extensions.setk.monoid.monoid
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genMapK
 import arrow.test.generators.genSetK
 import arrow.test.laws.IsoLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.properties.Gen
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class MapTest : UnitSpec() {
 
   init {

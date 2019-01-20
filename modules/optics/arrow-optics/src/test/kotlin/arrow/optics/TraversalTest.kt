@@ -1,13 +1,14 @@
 package arrow.optics
 
+import arrow.Kind
 import arrow.core.Option
+import arrow.core.extensions.monoid
+import arrow.core.extensions.option.eq.eq
 import arrow.core.toOption
 import arrow.core.toT
 import arrow.data.*
-import arrow.instances.monoid
-import arrow.instances.listk.eq.eq
-import arrow.instances.listk.traverse.traverse
-import arrow.instances.option.eq.eq
+import arrow.data.extensions.listk.eq.eq
+import arrow.data.extensions.listk.traverse.traverse
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genListK
@@ -15,12 +16,12 @@ import arrow.test.generators.genTuple
 import arrow.test.laws.SetterLaws
 import arrow.test.laws.TraversalLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class TraversalTest : UnitSpec() {
 
   init {
@@ -30,7 +31,7 @@ class TraversalTest : UnitSpec() {
     testLaws(
       TraversalLaws.laws(
         traversal = listKTraverse,
-        aGen = genListK(Gen.int()),
+        aGen = genListK(Gen.int()).map<Kind<ForListK, Int>> { it },
         bGen = Gen.int(),
         funcGen = genFunctionAToB(Gen.int()),
         EQA = Eq.any(),
@@ -40,7 +41,7 @@ class TraversalTest : UnitSpec() {
 
       SetterLaws.laws(
         setter = listKTraverse.asSetter(),
-        aGen = genListK(Gen.int()),
+        aGen = genListK(Gen.int()).map<Kind<ForListK, Int>> { it },
         bGen = Gen.int(),
         funcGen = genFunctionAToB(Gen.int()),
         EQA = ListK.eq(Eq.any())
@@ -103,7 +104,7 @@ class TraversalTest : UnitSpec() {
 
       "asFold should behave as valid Fold: lastOption" {
         forAll(genListK(Gen.int())) { ints ->
-          lastOption(ints) == ints.lastOrNull()?.toOption()
+          lastOption(ints) == ints.lastOrNull().toOption()
         }
       }
     }

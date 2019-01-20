@@ -19,7 +19,7 @@ Examples of that can run code asynchronously are typically datatypes that can su
 import arrow.*
 import arrow.core.*
 import arrow.effects.*
-import arrow.effects.instances.io.async.*
+import arrow.effects.extensions.io.async.*
 
 IO.async()
   .async { callback: (Either<Throwable, Int>) -> Unit ->

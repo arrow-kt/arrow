@@ -1,19 +1,21 @@
 package arrow.optics.instances
 
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Option
 import arrow.data.ListK
-import arrow.instances.listk.eq.eq
-import arrow.instances.option.eq.eq
-import arrow.optics.instances.either.each.each
+import arrow.data.extensions.listk.eq.eq
+import arrow.core.extensions.option.eq.eq
+import arrow.optics.extensions.either.each.each
 import arrow.test.UnitSpec
-import arrow.test.generators.*
+import arrow.test.generators.genEither
+import arrow.test.generators.genFunctionAToB
 import arrow.test.laws.TraversalLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class EitherInstanceTest : UnitSpec() {
 
   init {

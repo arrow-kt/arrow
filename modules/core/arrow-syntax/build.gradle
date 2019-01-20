@@ -1,8 +1,9 @@
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     compile project(':arrow-annotations')
-    compile project(':arrow-core')
-    testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
+    compile project(':arrow-core-data')
+    testRuntime("org.junit.vintage:junit-vintage-engine:$jUnitVintageVersion")
+    testCompile "io.kotlintest:kotlintest-runner-junit4:$kotlinTestVersion"
     testCompile project(':arrow-test')
 }
 

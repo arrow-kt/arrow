@@ -20,7 +20,7 @@ Since the allocation of mutable state is not referentially transparent this side
 {: data-executable='true'}
 ```kotlin:ank
 import arrow.effects.*
-import arrow.effects.instances.io.async.async
+import arrow.effects.extensions.io.async.async
 
 fun main(args: Array<String>) {
 //sampleStart
@@ -36,7 +36,7 @@ In case you want the side-effect to execute immediately and return the `Promise`
 {: data-executable='true'}
 ```kotlin:ank
 import arrow.effects.*
-import arrow.effects.instances.io.async.async
+import arrow.effects.extensions.io.async.async
 
 fun main(args: Array<String>) {
 //sampleStart
@@ -53,13 +53,13 @@ Get the promised value, suspending the fiber running the action until the result
 {: data-executable='true'}
 ```kotlin:ank
 import arrow.effects.*
-import arrow.effects.instances.io.async.async
-import arrow.effects.instances.io.monad.flatMap
+import arrow.effects.extensions.io.async.async
+import arrow.effects.extensions.io.monad.flatMap
 
 fun main(args: Array<String>) {
 //sampleStart
 Promise.uncancelable<ForIO, Int>(IO.async()).flatMap { p ->
-  p.get
+  p.get()
 } //never ends because `get` keeps waiting for p to be fulfilled.
 //sampleEnd
 }
@@ -68,14 +68,14 @@ Promise.uncancelable<ForIO, Int>(IO.async()).flatMap { p ->
 {: data-executable='true'}
 ```kotlin:ank
 import arrow.effects.*
-import arrow.effects.instances.io.async.async
-import arrow.effects.instances.io.monad.flatMap
+import arrow.effects.extensions.io.async.async
+import arrow.effects.extensions.io.monad.flatMap
 
 fun main(args: Array<String>) {
 //sampleStart
 val result = Promise.uncancelable<ForIO, Int>(IO.async()).flatMap { p ->
   p.complete(1).flatMap {
-    p.get
+    p.get()
   }
 }.unsafeRunSync()
 //sampleEnd
@@ -90,14 +90,14 @@ Fulfills the promise with a value. A promise cannot be fulfilled twice, so doing
 {: data-executable='true'}
 ```kotlin:ank
 import arrow.effects.*
-import arrow.effects.instances.io.async.async
-import arrow.effects.instances.io.monad.flatMap
+import arrow.effects.extensions.io.async.async
+import arrow.effects.extensions.io.monad.flatMap
 
 fun main(args: Array<String>) {
 //sampleStart
 val result = Promise.uncancelable<ForIO, Int>(IO.async()).flatMap { p ->
   p.complete(2).flatMap {
-    p.get
+    p.get()
   }
 }.unsafeRunSync()
 //sampleEnd
@@ -108,8 +108,8 @@ println(result)
 {: data-executable='true'}
 ```kotlin:ank
 import arrow.effects.*
-import arrow.effects.instances.io.async.async
-import arrow.effects.instances.io.monad.flatMap
+import arrow.effects.extensions.io.async.async
+import arrow.effects.extensions.io.monad.flatMap
 
 fun main(args: Array<String>) {
 //sampleStart
@@ -132,8 +132,8 @@ Breaks the promise with an exception. A promise cannot be broken twice, so doing
 {: data-executable='true'}
 ```kotlin:ank
 import arrow.effects.*
-import arrow.effects.instances.io.async.async
-import arrow.effects.instances.io.monad.flatMap
+import arrow.effects.extensions.io.async.async
+import arrow.effects.extensions.io.monad.flatMap
 
 fun main(args: Array<String>) {
 //sampleStart
@@ -150,8 +150,8 @@ println(result)
 {: data-executable='true'}
 ```kotlin:ank
 import arrow.effects.*
-import arrow.effects.instances.io.async.async
-import arrow.effects.instances.io.monad.flatMap
+import arrow.effects.extensions.io.async.async
+import arrow.effects.extensions.io.monad.flatMap
 
 fun main(args: Array<String>) {
 //sampleStart

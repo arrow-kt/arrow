@@ -1,15 +1,13 @@
 apply plugin: 'kotlin'
 
 dependencies {
-    compile project(":arrow-instances-core")
-    compile project(":arrow-instances-data")
-    compile project(":arrow-effects-instances")
+    compile project(":arrow-core-extensions")
+    compile project(":arrow-extras-extensions")
+    compile project(":arrow-effects-extensions")
 
-    compile "org.jetbrains:markdown:0.1.25"
-    compile "com.github.born2snipe:cli-progress:0.4"
     compile "org.jetbrains.kotlin:kotlin-compiler:$kotlinVersion"
     compile "org.jetbrains.kotlin:kotlin-script-util:$kotlinVersion"
-    kapt project(':arrow-annotations-processor')
+    kapt project(':arrow-meta')
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

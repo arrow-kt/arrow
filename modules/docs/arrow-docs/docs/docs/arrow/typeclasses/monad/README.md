@@ -29,7 +29,7 @@ Because `Kind<F, B>` cannot be created until `A` is unwrapped, it means that one
 
 ```kotlin:ank
 import arrow.core.*
-import arrow.instances.*
+import arrow.core.extensions.*
 import arrow.effects.*
 
 Some(1).flatMap { a ->
@@ -61,15 +61,13 @@ or lazily, i.e. `IO` or `ObservableK`.
 Combines two nested elements into one `Kind<F, A>`
 
 ```kotlin:ank
-ForOption extensions {
-  Some(Some(1)).flatten()
-}
+import arrow.core.extensions.option.monad.flatten
+
+Some(Some(1)).flatten()
 ```
 
 ```kotlin:ank
-ForOption extensions {
-  Some(None).flatten()
-}
+Some(None).flatten()
 ```
 
 #### mproduct
@@ -77,10 +75,10 @@ ForOption extensions {
 Like `flatMap`, but it combines the two sequential elements in a `Tuple2`.
 
 ```kotlin:ank
-ForOption extensions {
-  Some(5).mproduct {
-    Some(it * 11)
-  }
+import arrow.core.extensions.option.monad.mproduct
+
+Some(5).mproduct {
+  Some(it * 11)
 }
 ```
 
@@ -90,9 +88,9 @@ Executes sequentially two elements that are independent from one another.
 The [`Eval`]({{ '/docs/arrow/core/eval' | relative_url }}) variant allows you to pass lazily calculated values.
 
 ```kotlin:ank
-ForOption extensions {
-  Some(1).followedBy(Some(2))
-}
+import arrow.core.extensions.option.monad.followedBy
+  
+Some(1).followedBy(Some(2))
 ```
 
 #### effectM
@@ -100,7 +98,7 @@ ForOption extensions {
 Executes two elements sequentially and ignores the result of the second. This is useful for effects like logging.
 
 ```kotlin:ank
-import arrow.effects.instances.io.monad.*
+import arrow.effects.extensions.io.monad.*
 
 fun logValue(i: Int): IO<Unit> = IO { /* println(i) */ }
 
@@ -113,7 +111,7 @@ Executes sequentially two elements that are independent from one another, ignori
 The [`Eval`]({{ '/docs/arrow/core/eval' | relative_url }}) variant allows you to pass lazily calculated values.
 
 ```kotlin:ank
-import arrow.instances.option.monad.*
+import arrow.core.extensions.option.monad.*
 
 Some(1).forEffect(Some(2))
 ```

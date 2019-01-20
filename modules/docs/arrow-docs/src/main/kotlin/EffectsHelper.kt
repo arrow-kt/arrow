@@ -1,11 +1,12 @@
 package arrow.effects
 
-import arrow.effects.deferredk.monad.monad
+import arrow.effects.coroutines.*
+import arrow.effects.coroutines.extensions.deferredk.monad.monad
 import arrow.effects.typeclasses.Fiber
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
-import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.Dispatchers.Unconfined
+import kotlin.coroutines.CoroutineContext
 
 val UI = Unconfined
 
@@ -29,8 +30,8 @@ fun <A, B, C> parMap(first: DeferredK<A>,
     val fiberOne: Fiber<ForDeferredK, A> = first.startF(IO).bind()
     val fiberTwo: Fiber<ForDeferredK, B> = second.startF(IO).bind()
 
-    val one: A = fiberOne.join.bind()
-    val two: B = fiberTwo.join.bind()
+    val one: A = fiberOne.join().bind()
+    val two: B = fiberTwo.join().bind()
     f(one, two)
   }.fix()
 

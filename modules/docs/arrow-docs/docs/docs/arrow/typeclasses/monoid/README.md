@@ -25,23 +25,21 @@ And let's see the instance of Monoid<String> in action.
 
 ```kotlin:ank
 import arrow.*
-import arrow.instances.*
+import arrow.core.extensions.*
 import arrow.typeclasses.*
 
-ForString extensions {
-  empty()
-}
+String.monoid().run { empty() }
 ```
 
 ```kotlin:ank
-ForString extensions {
+String.monoid().run {
   listOf<String>("Λ", "R", "R", "O", "W").combineAll()
 }
 ```
 
 ```kotlin:ank
 import arrow.core.*
-import arrow.instances.option.monoid.*
+import arrow.core.extensions.option.monoid.*
 
 Option.monoid(Int.monoid()).run { listOf<Option<Int>>(Some(1), Some(1)).combineAll() }
 ```
@@ -52,16 +50,13 @@ This is also true if we define our own instances. As an example, let's use `Fold
 
 ```kotlin:ank
 import arrow.data.*
+import arrow.data.extensions.list.foldable.foldMap
 
-ForListK extensions {
-  listOf(1, 2, 3, 4, 5).k().foldMap(Int.monoid(), ::identity)
-}
+listOf(1, 2, 3, 4, 5).k().foldMap(Int.monoid(), ::identity)
 ```
 
 ```kotlin:ank
-ForListK extensions {
-  listOf(1, 2, 3, 4, 5).k().foldMap(String.monoid(), { it.toString() })
-}
+listOf(1, 2, 3, 4, 5).k().foldMap(String.monoid(), { it.toString() })
 ```
 
 To use this with a function that produces a tuple, we can define a Monoid for a tuple that will be valid for any tuple where the types it contains also have a Monoid available.
@@ -83,13 +78,11 @@ fun <A, B> monoidTuple(MA: Monoid<A>, MB: Monoid<B>): Monoid<Tuple2<A, B>> =
 This way we are able to combine both values in one pass, hurrah!
 
 ```kotlin:ank
-ForListK extensions {
-  val M = monoidTuple(Int.monoid(), String.monoid())
-  val list = listOf(1, 1).k()
+val M = monoidTuple(Int.monoid(), String.monoid())
+val list = listOf(1, 1).k()
 
-  list.foldMap(M) { n: Int ->
-   Tuple2(n, n.toString())
-  }
+list.foldMap(M) { n: Int ->
+  Tuple2(n, n.toString())
 }
 ```
 

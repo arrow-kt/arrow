@@ -2,9 +2,12 @@
 layout: docs
 title: Dependency Injection
 permalink: /docs/patterns/dependency_injection/
+video: CR5h2Wq1yPE
 ---
 
 If you would like to know about using the [`Reader`]({{ '/docs/arrow/data/reader' | relative_url }}) datatype instead, visit [this article](https://medium.com/@JorgeCastilloPr/kotlin-dependency-injection-with-the-reader-monad-7d52f94a482e) by [Jorge Castillo](https://github.com/JorgeCastilloPrz).
+
+If what you want is the example of the video to follow along, you can find it in [this folder](https://github.com/arrow-kt/arrow/tree/master/modules/docs/arrow-examples/src/test/kotlin/arrow/typeclasses).
 
 ## Dependency Injection using the `Typeclassless` technique
 
@@ -78,15 +81,18 @@ fun <F> Functor<F>.multiplyBy2(fa: Kind<F, Int>): Kind<F, Int> =
 And we can call it on the typeclass instances:
 
 ```kotlin:ank
-import arrow.instances.*
+import arrow.core.extensions.*
+import arrow.core.extensions.option.functor.functor
 
-ForOption extensions { 
+Option.functor().run { 
   multiplyBy2(Option(1)) 
 }
 ```
 
 ```kotlin:ank
-ForTry extensions { 
+import arrow.core.extensions.`try`.functor.functor
+
+Try.functor().run { 
   multiplyBy2(Try.just(1))
 }
 ```
@@ -133,7 +139,7 @@ object FunctorLaws {
 
 import arrow.test.FunctorLaws.test
 
-ForOption extensions { 
+Option.functor.run {
   test { it.some() }
 }
 ```

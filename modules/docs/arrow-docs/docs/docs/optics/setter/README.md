@@ -23,7 +23,7 @@ You can get a `Setter` for any existing `Functor`.
 import arrow.*
 import arrow.optics.*
 import arrow.data.*
-import arrow.instances.listk.functor.*
+import arrow.data.extensions.listk.functor.*
 
 val setter: Setter<ListKOf<Int>, Int> = Setter.fromFunctor(ListK.functor())
 setter.set(listOf(1, 2, 3, 4).k(), 5)

@@ -25,7 +25,7 @@ fun Kind2<F, A, B>.bimap(fl: (A) -> C, fr: (B) -> D): Kind2<F, C, D>
 import arrow.*
 import arrow.core.*
 import arrow.typeclasses.*
-import arrow.instances.either.bifunctor.*
+import arrow.core.extensions.either.bifunctor.*
 
 fun <F> greet(BF: Bifunctor<F>, p: Kind2<F, String, String>): Kind2<F, String, String> =
     BF.run { p.bimap({ "Hello $it" }, { "General $it" }) }
@@ -38,7 +38,7 @@ greet(Either.bifunctor(), Right("Kenobi")) // Right("General Kenobi")
 ```
 
 ```kotlin:ank
-import arrow.instances.tuple2.bifunctor.*
+import arrow.core.extensions.tuple2.bifunctor.*
 
 greet(Tuple2.bifunctor(), Tuple2("there", "Kenobi")) // Tuple2("Hello there", "General Kenobi")
 ```

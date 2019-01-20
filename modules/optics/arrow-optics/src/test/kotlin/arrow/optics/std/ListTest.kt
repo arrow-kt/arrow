@@ -1,11 +1,13 @@
 package arrow.optics
 
-import arrow.core.ListInstances
+import arrow.core.ListExtensions
 import arrow.core.Option
-import arrow.data.*
-import arrow.instances.listk.monoid.monoid
-import arrow.instances.nonemptylist.semigroup.semigroup
-import arrow.instances.option.monoid.monoid
+import arrow.core.extensions.option.monoid.monoid
+import arrow.data.ListK
+import arrow.data.NonEmptyList
+import arrow.data.extensions.listk.monoid.monoid
+import arrow.data.extensions.nonemptylist.semigroup.semigroup
+import arrow.data.k
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
 import arrow.test.generators.genNonEmptyList
@@ -13,11 +15,11 @@ import arrow.test.generators.genOption
 import arrow.test.laws.IsoLaws
 import arrow.test.laws.OptionalLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class ListTest : UnitSpec() {
 
   init {
@@ -51,10 +53,10 @@ class ListTest : UnitSpec() {
     ))
 
     testLaws(IsoLaws.laws(
-      iso = ListInstances.toListK(),
+      iso = ListExtensions.toListK(),
       aGen = Gen.list(Gen.int()),
-      bGen = Gen.create { Gen.list(Gen.int()).generate().k() },
-      funcGen = genFunctionAToB(Gen.create { Gen.list(Gen.int()).generate().k() }),
+      bGen = Gen.list(Gen.int()).map { it.k() },
+      funcGen = genFunctionAToB(Gen.list(Gen.int()).map { it.k() }),
       EQA = Eq.any(),
       EQB = Eq.any(),
       bMonoid = ListK.monoid())

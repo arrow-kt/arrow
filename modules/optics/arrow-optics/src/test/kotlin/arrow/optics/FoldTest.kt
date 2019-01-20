@@ -1,18 +1,19 @@
 package arrow.optics
 
 import arrow.core.Option
+import arrow.core.extensions.monoid
 import arrow.data.ForListK
 import arrow.data.ListK
+import arrow.data.extensions.list.foldable.nonEmpty
+import arrow.data.extensions.listk.foldable.foldable
 import arrow.data.k
-import arrow.instances.monoid
-import arrow.instances.listk.foldable.foldable
 import arrow.test.UnitSpec
-import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class FoldTest : UnitSpec() {
 
   init {
@@ -69,7 +70,7 @@ class FoldTest : UnitSpec() {
 
       "Checking existence of a target" {
         forAll(Gen.list(Gen.int()), Gen.bool()) { ints, predicate ->
-          exists(ints.k()) { predicate } == predicate
+          exists(ints.k()) { predicate } == (predicate && ints.nonEmpty())
         }
       }
 

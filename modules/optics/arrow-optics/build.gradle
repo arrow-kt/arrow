@@ -1,13 +1,15 @@
 dependencies {
-    compile project(':arrow-data')
-    compile project(':arrow-instances-data')
+    compile project(':arrow-extras')
+    compile project(':arrow-extras-extensions')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
-    testCompile "io.kotlintest:kotlintest:$kotlinTestVersion"
+    testCompile("junit:junit:$jUnitVersion")
+    testRuntime("org.junit.vintage:junit-vintage-engine:$jUnitVintageVersion")
+    testCompile "io.kotlintest:kotlintest-runner-junit4:$kotlinTestVersion"
     testCompile project(':arrow-test')
 
     compile project(':arrow-annotations')
-    kapt project(':arrow-annotations-processor')
-    kaptTest project(':arrow-annotations-processor')
+    kapt project(':arrow-meta')
+    kaptTest project(':arrow-meta')
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

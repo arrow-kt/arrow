@@ -138,7 +138,7 @@ We can run the program for `IO`:
 
 ```kotlin:ank
 import arrow.effects.IO
-import arrow.effects.instances.io.bracket.bracket
+import arrow.effects.extensions.io.bracket.bracket
 import arrow.Kind
 import arrow.effects.typeclasses.Bracket
 
@@ -176,8 +176,8 @@ Let's now run the same exact program also for `ObservableK`:
 {: data-executable='true'}
 
 ```kotlin:ank
-import arrow.effects.ObservableK
-import arrow.effects.observablek.bracket.bracket
+import arrow.effects.rx2.ObservableK
+import arrow.effects.rx2.extensions.observablek.bracket.bracket
 import arrow.Kind
 import arrow.effects.typeclasses.Bracket
 
@@ -215,8 +215,8 @@ And finally over `DeferredK`:
 {: data-executable='true'}
 
 ```kotlin:ank
-import arrow.effects.DeferredK
-import arrow.effects.deferredk.bracket.bracket
+import arrow.effects.coroutines.DeferredK
+import arrow.effects.coroutines.extensions.deferredk.bracket.bracket
 import arrow.Kind
 import arrow.effects.typeclasses.Bracket
 
@@ -323,7 +323,7 @@ val safeComputation = openFile("data.json").bracketCase(
     release = { file, exitCase ->
       when (exitCase) {
         is ExitCase.Completed -> { /* do something */ }
-        is ExitCase.Cancelled -> { /* do something */ }
+        is ExitCase.Canceled -> { /* do something */ }
         is ExitCase.Error -> { /* do something */ }
       }
       closeFile(file)

@@ -176,11 +176,9 @@ Transforming the inner contents
 
 ```kotlin:ank
 import arrow.typeclasses.*
-import arrow.instances.option.functor.*
+import arrow.core.extensions.option.functor.*
 
-Option.functor().run {
-  Some(1).map { it + 1 }
-}
+Some(1).map { it + 1 }
 ```
 
 [`Applicative`]({{ '/docs/arrow/typeclasses/applicative/' | relative_url }})
@@ -188,7 +186,7 @@ Option.functor().run {
 Computing over independent values
 
 ```kotlin:ank
-import arrow.instances.option.applicative.*
+import arrow.core.extensions.option.applicative.*
 
 tupled(Some(1), Some("Hello"), Some(20.0))
 ```
@@ -197,28 +195,24 @@ tupled(Some(1), Some("Hello"), Some(20.0))
 
 Computing over dependent values ignoring absence
 
-```kotlin
-ForOption extensions {
-  binding {
-   val a = Some(1).bind()
-   val b = Some(1 + a).bind()
-   val c = Some(1 + b).bind()
-   a + b + c
-  }
+```kotlin:ank
+import arrow.core.extensions.option.monad.binding
+
+binding {
+  val a = Some(1).bind()
+  val b = Some(1 + a).bind()
+  val c = Some(1 + b).bind()
+  a + b + c
 }
-//Some(value=6)
 ```
 
-```kotlin
-ForOption extensions {
-  binding {
-   val x = none<Int>().bind()
-   val y = Some(1 + x).bind()
-   val z = Some(1 + y).bind()
-   x + y + z
-  }
+```kotlin:ank
+binding {
+  val x = none<Int>().bind()
+  val y = Some(1 + x).bind()
+  val z = Some(1 + y).bind()
+  x + y + z
 }
-//None
 ```
 
 ### Supported type classes

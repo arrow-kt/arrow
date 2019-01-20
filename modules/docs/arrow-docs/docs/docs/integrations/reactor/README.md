@@ -33,7 +33,7 @@ The largest quality of life improvement when using Flux streams in Arrow is the 
 To wrap any existing Flux in its Arrow Wrapper counterpart you can use the extension function `k()`.
 
 ```kotlin:ank
-import arrow.effects.*
+import arrow.effects.reactor.*
 import reactor.core.publisher.*
 
 val flux = Flux.just(1, 2, 3, 4, 5).k()
@@ -90,26 +90,24 @@ getSongUrlAsync()
 When rewritten using `bindingCatch` it becomes:
 
 ```kotlin
-import arrow.effects.*
+import arrow.effects.reactor.*
 import arrow.typeclasses.*
+import arrow.effects.reactor.extensions.flux.monadThrow.bindingCatch
 
-ForFluxK extensions {
-  bindingCatch {
-    val songUrl = getSongUrlAsync().bind()
-    val musicPlayer = MediaPlayer.load(songUrl)
-    val totalTime = musicPlayer.getTotaltime()
+bindingCatch {
+  val songUrl = getSongUrlAsync().bind()
+  val musicPlayer = MediaPlayer.load(songUrl)
+  val totalTime = musicPlayer.getTotaltime()
     
-    val end = DirectProcessor.create<Unit>()
-    Flux.interval(Duration.ofMillis(100)).takeUntilOther(end).bind()
+  val end = DirectProcessor.create<Unit>()
+  Flux.interval(Duration.ofMillis(100)).takeUntilOther(end).bind()
     
-    val tick = musicPlayer.getCurrentTime().bind()
-    val percent = (tick / totalTime * 100).toInt()
-    if (percent >= 100) {
-      end.onNext(Unit)
-    }
-    
-    percent
-  }.fix()
+  val tick = musicPlayer.getCurrentTime().bind()
+  val percent = (tick / totalTime * 100).toInt()
+  if (percent >= 100) {
+    end.onNext(Unit)
+  }
+  percent
 }
 ```
 
@@ -130,7 +128,6 @@ Note that [`MonadDefer`]({{ '/docs/effects/monaddefer' | relative_url }}) provid
 Invoking this `Disposable` causes an `BindingCancellationException` in the chain which needs to be handled by the subscriber, similarly to what `Deferred` does.
 
 ```kotlin
-import arrow.effects.instances.defferred.monad.*
 
 val (flux, disposable) =
   bindingCancellable {
@@ -158,11 +155,11 @@ To overcome this limitation and run code in a stack safe way, one can make use o
 {: data-executable='true'}
 ```kotlin:ank
 import arrow.Kind
-import arrow.effects.MonoK
-import arrow.effects.ForMonoK
-import arrow.effects.fix
-import arrow.effects.monok.monad.monad
-import arrow.effects.monok.applicativeError.attempt
+import arrow.effects.reactor.MonoK
+import arrow.effects.reactor.ForMonoK
+import arrow.effects.reactor.fix
+import arrow.effects.reactor.extensions.monok.monad.monad
+import arrow.effects.reactor.extensions.monok.applicativeError.attempt
 import arrow.free.bindingStackSafe
 import arrow.free.run
 
@@ -196,7 +193,7 @@ Try {
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.effects.*
+import arrow.effects.reactor.*
 
 DataType(FluxK::class).tcMarkdownList()
 ```

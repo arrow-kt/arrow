@@ -32,21 +32,21 @@ A constructor function. It lifts an exception into the computational context of 
 ```kotlin:ank
 import arrow.*
 import arrow.core.*
-import arrow.instances.either.applicativeError.*
+import arrow.core.extensions.either.applicativeError.*
 
 Either.applicativeError<Throwable>().raiseError<Int>(RuntimeException("Paco"))
 ```
 
 ```kotlin:ank
 import arrow.data.*
-import arrow.instances.`try`.applicativeError.*
+import arrow.core.extensions.`try`.applicativeError.*
 
 Try.applicativeError().raiseError<Int>(RuntimeException("Paco"))
 ```
 
 ```kotlin:ank
 import arrow.effects.*
-import arrow.effects.instances.io.applicativeError.*
+import arrow.effects.extensions.io.applicativeError.*
 
 IO.applicativeError().raiseError<Int>(RuntimeException("Paco"))
 ```

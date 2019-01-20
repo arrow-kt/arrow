@@ -32,9 +32,10 @@ inline fun <F, R> FreeCOf<F, R>.fix(): FreeC<F, R> =
  * Typically the [FreeC] user provides interpretation of FreeC in form of [ViewL] structure through the [ViewL.fold] function,
  * that allows to step FreeC via series of Results ([FreeC.Pure], [FreeC.Fail] and [FreeC.Interrupted]) and FreeC step ([ViewL.View]).
  */
+@Suppress("StringLiteralDuplication", "TooGenericExceptionThrown")
 sealed class FreeC<F, out R> : FreeCOf<F, R> {
 
-  @Suppress("UNCHECKED_CAST", "ThrowRuntimeException")
+  @Suppress("UNCHECKED_CAST")
   fun <R2> flatMap(f: (R) -> FreeCOf<F, R2>): FreeC<F, R2> = FreeC.FlatMapped(this) { free: FreeC.Result<R> ->
     when (free) {
       is Pure<*, R> -> {
@@ -50,7 +51,7 @@ sealed class FreeC<F, out R> : FreeCOf<F, R> {
     } as FreeC<F, R2>
   }
 
-  @Suppress("UNCHECKED_CAST", "ThrowRuntimeException")
+  @Suppress("UNCHECKED_CAST")
   fun <R2> map(f: (R) -> R2): FreeC<F, R2> = FlatMapped(this) { free ->
     when (free) {
       is Pure<*, R> -> {
@@ -66,7 +67,7 @@ sealed class FreeC<F, out R> : FreeCOf<F, R> {
     } as FreeC<F, R2>
   }
 
-  @Suppress("UNCHECKED_CAST", "ThrowRuntimeException")
+  @Suppress("UNCHECKED_CAST")
   fun asHandler(e: Throwable): FreeC<F, R> = when (val view = ViewL(this.fix())) {
     is FreeC.Pure -> FreeC.Fail(e)
     is FreeC.Fail -> FreeC.Fail(CompositeFailure(view.error, e))
@@ -81,7 +82,7 @@ sealed class FreeC<F, out R> : FreeCOf<F, R> {
   val viewL: ViewL<F, R>
     get() = ViewL(this)
 
-  @Suppress("UNCHECKED_CAST", "ThrowRuntimeException")
+  @Suppress("UNCHECKED_CAST")
   open fun <G> translate(f: FunctionK<F, G>): FreeC<G, R> = FreeC.defer {
     when (val viewL = viewL) {
       is Pure -> viewL.asFreeC()
@@ -133,7 +134,7 @@ sealed class FreeC<F, out R> : FreeCOf<F, R> {
     fun asExitCase(): ExitCase<Throwable> = this.fold(
       pure = { ExitCase.Completed },
       fail = { t -> ExitCase.Error(t) },
-      interrupted = { _, _ -> ExitCase.Cancelled }
+      interrupted = { _, _ -> ExitCase.Canceled }
     )
 
     companion object {
@@ -147,7 +148,7 @@ sealed class FreeC<F, out R> : FreeCOf<F, R> {
       fun <A> interrupted(scopeId: Any?, failure: Option<Throwable>): Result<A> =
         FreeC.Interrupted<Any?, A, Any?>(scopeId, failure)
 
-      fun <A> interrupted(scopeId: Token, failure: Option<Throwable>): Result<A> =
+      internal fun <A> interrupted(scopeId: Token, failure: Option<Throwable>): Result<A> =
         FreeC.Interrupted<Any?, A, Token>(scopeId, failure)
 
       fun <A> fromEither(either: Either<Throwable, A>): Result<A> =
@@ -226,7 +227,7 @@ fun <F, R, R2> FreeCOf<F, R>.transformWith(f: (FreeC.Result<R>) -> FreeC<F, R2>)
 /**
  * Handle any error, potentially recovering from it, by mapping it to a [FreeCOf] value by [h].
  */
-@Suppress("UNCHECKED_CAST", "ThrowRuntimeException")
+@Suppress("UNCHECKED_CAST")
 fun <F, R> FreeCOf<F, R>.handleErrorWith(h: (Throwable) -> FreeCOf<F, R>): FreeC<F, R> =
   FreeC.FlatMapped(this.fix()) { free ->
     when (free) {
@@ -247,7 +248,7 @@ fun <F, R> FreeCOf<F, R>.handleErrorWith(h: (Throwable) -> FreeCOf<F, R>): FreeC
  *
  * @return [None] indicates that the [FreeC] was [FreeC.Interrupted].
  */
-@Suppress("UNCHECKED_CAST", "ThrowRuntimeException")
+@Suppress("UNCHECKED_CAST", "TooGenericExceptionThrown")
 fun <F, R> FreeCOf<F, R>.run(ME: MonadError<F, Throwable>): Kind<F, Option<R>> = when (val viewL = fix().viewL) {
   is FreeC.Pure -> ME.just(Some(viewL.r))
   is FreeC.Fail -> ME.raiseError(viewL.error)
@@ -270,7 +271,7 @@ fun <F, R> FreeCOf<F, R>.run(ME: MonadError<F, Throwable>): Kind<F, Option<R>> =
  *
  * This method uses `tailRecM` to provide stack-safety.
  */
-@Suppress("UNCHECKED_CAST", "ThrowRuntimeException")
+@Suppress("UNCHECKED_CAST")
 fun <M, S, A> FreeCOf<S, A>.foldMap(f: FunctionK<S, M>, MM: MonadError<M, Throwable>): Kind<M, Option<A>> = MM.tailRecM(this@foldMap) {
   val x = it.fix().step()
   when (x) {
@@ -405,7 +406,7 @@ inline fun <F, R, A> FreeC<F, R>.fold(
   is FreeC.FlatMapped<F, *, R> -> bind(this.fx, this.f as (Result<Any?>) -> FreeC<F, R>)
 }
 
-@Suppress("UNCHECKED_CAST", "ThrowRuntimeException")
+@Suppress("UNCHECKED_CAST")
 inline fun <R, A> FreeC.Result<R>.fold(
   pure: (R) -> A,
   fail: (Throwable) -> A,
@@ -417,7 +418,7 @@ inline fun <R, A> FreeC.Result<R>.fold(
   else -> throw AssertionError("Unreachable")
 }
 
-@Suppress("UNCHECKED_CAST", "ThrowRuntimeException")
+@Suppress("UNCHECKED_CAST", "TooGenericExceptionThrown")
 inline fun <F, R, A> ViewL<F, R>.fold(
   pure: (R) -> A,
   fail: (Throwable) -> A,

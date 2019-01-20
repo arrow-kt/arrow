@@ -4,7 +4,7 @@ Arrow documentation deployed to the website.
 
 ## How to contribute
 
-In case you need to add a new docs section, you should go like this:
+We prefer Kdocs only for documenting data types or type classes. Only use tutorial style markdown docs for patterns or tutorials. In case you need to add a new docs section, you should go like this:
 
 ### 1. Add a menu entry to your docs
 
@@ -14,15 +14,15 @@ Go to `modules/docs/arrow-docs/docs/_data/menu.yml` and add a menu entry in the 
 - title: Applicative
   url: /docs/typeclasses/applicative/
 ```
-   
+
 Check [this PR](https://github.com/arrow-kt/arrow/pull/1134/files) for a real example.
 
 ### 2. Add your docs file
 
-Add your docs as a Markdown file inside the corresponding directory. You have directories for all the sections 
+Add your docs as a Markdown file inside the corresponding directory. You have directories for all the sections
 available in docs under `modules/docs/arrow-docs/docs/docs/`.
 
-Let's say you want to add docs for a Type class, for instance `Applicative`. You'd need to add a README like [this one](https://github.com/arrow-kt/arrow/blob/master/modules/docs/arrow-docs/docs/docs/arrow/typeclasses/applicative/README.md).
+Let's say you want to add docs for a Type class, for extension `Applicative`. You'd need to add a README like [this one](https://github.com/arrow-kt/arrow/blob/master/modules/docs/arrow-docs/docs/docs/arrow/typeclasses/applicative/README.md).
 
 You'll find all the sections available in the [docs side menu](https://arrow-kt.io/docs/). As you can see, there's:
 * **Quick start:** Basically how to start using Arrow, including links to libraries, posts, talks, and sample projects.
@@ -51,26 +51,26 @@ permalink: /docs/arrow/typeclasses/applicative/
 redirect_from:
   - /docs/typeclasses/applicative/
 ---
-``` 
-   
+```
+
 Again, take a look at [this PR](https://github.com/arrow-kt/arrow/pull/1134/files) for a real example.
 
 ### 4. Link your file from intro pages
 
-There are docs intro pages for both [data types](https://arrow-kt.io/docs/datatypes/intro/) and [type classes](https://arrow-kt.io/docs/typeclasses/intro/) which contain a list of the data types and typeclasses available in Arrow. Each item comes along with a brief and simple description. 
+There are docs intro pages for both [data types](https://arrow-kt.io/docs/datatypes/intro/) and [type classes](https://arrow-kt.io/docs/typeclasses/intro/) which contain a list of the data types and typeclasses available in Arrow. Each item comes along with a brief and simple description.
 
 In case you're adding docs for a data type or a type class, be sure to add a new entry from the corresponding intro page to your docs, so people can scan them easily in a single page.
 
 ### 5. Format your docs properly
 
-If you're adding a data type, go to other already existing data type docs to follow the same approach. 
-Do the same for type class, and any other doc sections. 
+If you're adding a data type, go to other already existing data type docs to follow the same approach.
+Do the same for type class, and any other doc sections.
   * Use proper `{:.beginner} / {:.intermediate} / {:.advanced}` tags per section to reflect the difficulty of it.
   * Use proper Ank snippet configurations (more details in policies section below).
 
 ## Doc snippets policies
 
-Whenever you are documenting a new type (type class, data type, whatever) you'll wonder how to add code snippets to it. Please, 
+Whenever you are documenting a new type (type class, data type, whatever) you'll wonder how to add code snippets to it. Please,
 use the follow priority check list:
 
 ### 1. Snippets for public API docs
@@ -93,22 +93,37 @@ We use Jekyll so you can deploy your docs to a local server to test your changes
 
 So, after making you doc changes as mentioned before, you would:
 
-### 1. Run Ank to get your docs deployed locally
+### 1. Run Dokka and Ank to get your docs deployed locally
 
-Ank is in charge of compiling and validating your doc snippets and deploying the proper binaries for those. Run the following command:
+Dokka is responsible of generating documentation based on source code annotations, while Ank is in charge of compiling and validating your doc snippets and deploying the proper binaries for those. Run the following commands in this exact order in Arrow **root dir**:
 
 ```bash
-`./gradlew :arrow-docs:runAnk` (in arrow root dir)   
+./gradlew clean dokka
+```
+
+You can run Dokka for a **single module**. That will save you a lot of time. For example, if you've added some docs to the 
+`arrow-typeclasses` module, just run:
+
+```bash
+./gradlew clean :arrow-typeclasses:dokka
+```
+
+After running Dokka, you can run Ank. That will deploy all the Dokka generated binaries along with the rest of the docs.
+
+```bash
+./gradlew :arrow-docs:runAnk
 ```
 
 ### 2. Run the docs in your local server
 
-Once docs are deployed locally, go to `modules/docs/arrow-docs/` and do this:
+Once docs are generated locally, do this (**also from the root directory**):
+
 ```bash
-jekyll serve --source build/site/
+bundle install --gemfile modules/docs/arrow-docs/Gemfile --path vendor/bundle
+BUNDLE_GEMFILE=modules/docs/arrow-docs/Gemfile bundle exec jekyll serve -s modules/docs/arrow-docs/build/site/
 ```
 
-That will launch the complete website in [127.0.0.1:4000](https://127.0.0.1:4000) so you can open it with a standard browser.
+This will install any needed dependencies locally, and will use it to launch the complete website in [127.0.0.1:4000](https://127.0.0.1:4000) so you can open it with a standard browser.
 
 ## How to test links
 

@@ -15,8 +15,8 @@ beginner
 
 {: data-executable='true'}
 ```kotlin:ank
-import arrow.aql.instances.list.select.*
-import arrow.aql.instances.listk.select.select
+import arrow.aql.extensions.list.select.*
+import arrow.aql.extensions.listk.select.select
 fun main(args: Array<String>) {
 //sampleStart
 val result: List<Int> =
@@ -33,7 +33,7 @@ println(result)
 {: data-executable='true'}
 ```kotlin:ank
 import arrow.core.Option
-import arrow.aql.instances.option.select.*
+import arrow.aql.extensions.option.select.*
 
 fun main(args: Array<String>) {
 //sampleStart
@@ -50,8 +50,8 @@ println(result)
 
 {: data-executable='true'}
 ```kotlin:ank
-import arrow.aql.instances.sequence.select.*
-import arrow.aql.instances.sequencek.select.select
+import arrow.aql.extensions.sequence.select.*
+import arrow.aql.extensions.sequencek.select.select
 
 fun main(args: Array<String>) {
 //sampleStart

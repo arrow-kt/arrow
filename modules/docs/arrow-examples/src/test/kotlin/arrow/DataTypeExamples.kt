@@ -2,14 +2,13 @@ package arrow
 
 import arrow.Problem.*
 import arrow.core.*
-import arrow.instances.`try`.applicative.applicative
-import arrow.instances.`try`.functor.functor
-import arrow.instances.option.applicative.applicative
-import arrow.instances.option.monad.binding
-import arrow.instances.option.monad.monad
-import io.kotlintest.matchers.Matcher
-import io.kotlintest.matchers.Result
-import io.kotlintest.matchers.shouldBe
+import arrow.core.extensions.`try`.applicative.applicative
+import arrow.core.extensions.`try`.functor.functor
+import arrow.core.extensions.option.applicative.applicative
+import arrow.core.extensions.option.monad.binding
+import io.kotlintest.Matcher
+import io.kotlintest.Result
+import io.kotlintest.shouldBe
 import io.kotlintest.specs.FreeSpec
 import kotlin.reflect.KClass
 
@@ -24,7 +23,7 @@ class DataTypeExamples : FreeSpec() { init {
     val noneValue: Option<Int> = None
 
     "getOrElse" {
-      someValue.getOrElse { -1 }.shouldBe(42)
+      someValue.getOrElse { -1 }.shouldBe<Int, Int>(42)
       noneValue.getOrElse { -1 }.shouldBe(-1)
     }
 
@@ -197,10 +196,14 @@ class DataTypeExamples : FreeSpec() { init {
 
   fun aFailureOfType(expected: KClass<*>): Matcher<Try<Int>> = object : Matcher<Try<Int>> {
     override fun test(value: Try<Int>): Result = when (value) {
-      is Success -> Result(false, "Expected a failure, got $value")
+      is Success -> Result(false, "Expected a failure, got $value", "Received expected failure")
       is Failure -> {
         val javaClass = value.exception.javaClass
-        Result(expected.java.isAssignableFrom(javaClass), "Expected Try.Failure(${expected.java}), got $value")
+        Result(
+          expected.java.isAssignableFrom(javaClass),
+          "Expected Try.Failure(${expected.java}), got $value",
+          "Received expected failure"
+        )
       }
     }
   }

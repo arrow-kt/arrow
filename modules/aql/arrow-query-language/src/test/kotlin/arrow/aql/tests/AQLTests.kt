@@ -1,35 +1,33 @@
 package arrow.aql.tests
 
 import arrow.aql.Ord
-import arrow.aql.instances.id.select.value
-import arrow.aql.instances.list.count.count
-import arrow.aql.instances.list.count.value
-import arrow.aql.instances.list.from.join
-import arrow.aql.instances.list.groupBy.groupBy
-import arrow.aql.instances.list.orderBy.orderBy
-import arrow.aql.instances.list.orderBy.orderMap
-import arrow.aql.instances.list.select.query
-import arrow.aql.instances.list.select.select
-import arrow.aql.instances.list.select.value
-import arrow.aql.instances.list.sum.sum
-import arrow.aql.instances.list.union.union
-import arrow.aql.instances.list.where.where
-import arrow.aql.instances.list.where.whereSelection
-import arrow.aql.instances.listk.select.select
-import arrow.aql.instances.listk.select.selectAll
-import arrow.aql.instances.option.select.query
-import arrow.aql.instances.option.select.select
-import arrow.aql.instances.option.select.value
-import arrow.core.Id
+import arrow.aql.extensions.list.from.join
+import arrow.aql.extensions.list.groupBy.groupBy
+import arrow.aql.extensions.list.select.query
+import arrow.aql.extensions.list.orderBy.orderBy
+import arrow.aql.extensions.list.orderBy.orderMap
+import arrow.aql.extensions.list.orderBy.value
+import arrow.aql.extensions.list.sum.sum
+import arrow.aql.extensions.list.sum.value
+import arrow.aql.extensions.list.union.union
+import arrow.aql.extensions.list.where.where
+import arrow.aql.extensions.list.where.whereSelection
+import arrow.aql.extensions.list.count.count
+import arrow.aql.extensions.listk.select.select
+import arrow.aql.extensions.listk.select.selectAll
+import arrow.aql.extensions.listk.select.value
+import arrow.aql.extensions.option.select.query
+import arrow.aql.extensions.option.select.select
+import arrow.aql.extensions.option.select.value
 import arrow.core.Option
 import arrow.core.Some
-import arrow.instances.order
+import arrow.core.extensions.order
 import arrow.test.UnitSpec
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
+import io.kotlintest.shouldBe
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class AQLTests : UnitSpec() {
 
   init {
@@ -48,7 +46,7 @@ class AQLTests : UnitSpec() {
 
     "AQL is able to `select count`" {
       listOf(1, 2, 3).query { select { this } }.count()
-        .value() shouldBe 3L
+        .value() shouldBe listOf(3L)
     }
 
     "AQL is able to `select`, transform and filter data with `where`" {
@@ -77,7 +75,7 @@ class AQLTests : UnitSpec() {
       val jack = Student("Jack", 32)
       listOf(john, jane, jack).query {
         selectAll() groupBy { age }
-      }.value() shouldBe Id(mapOf(30 to listOf(john), 32 to listOf(jane, jack)))
+      }.value() shouldBe mapOf(30 to listOf(john), 32 to listOf(jane, jack))
     }
 
     data class Student(val name: String, val age: Int)
@@ -87,7 +85,7 @@ class AQLTests : UnitSpec() {
     val jack = Student("Jack", 32)
     val chris = Student("Chris", 40)
 
-    "AQL is able to `groupBy`" {
+    "AQL is able to filter using `where` and then `groupBy`" {
       listOf(john, jane, jack).query {
         selectAll() where { age > 30 } groupBy { age }
       }.value() shouldBe mapOf(32 to listOf(jane, jack))

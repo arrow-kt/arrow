@@ -27,9 +27,9 @@ import arrow.Kind
 import arrow.core.*
 import arrow.data.ListK
 import arrow.data.k
-import arrow.instances.monoid
-import arrow.instances.listk.foldable.foldable
-import arrow.instances.option.foldable.foldable
+import arrow.core.extensions.monoid
+import arrow.data.extensions.listk.foldable.foldable
+import arrow.core.extensions.option.foldable.foldable
 import arrow.typeclasses.Foldable
 ```
 
@@ -257,7 +257,7 @@ This method is primarily useful when `<_>` represents an action or effect, and t
 not otherwise needed.
 
 ```kotlin:ank:silent
-import arrow.instances.either.applicative.applicative
+import arrow.core.extensions.either.applicative.applicative
 
 fun <F> traverse(strKind: Kind<F, String>, FO: Foldable<F>): Either<Int,Unit> =
   FO.run {
@@ -281,7 +281,7 @@ traverse(strList, ListK.foldable())
 Similar to `traverse_` except it operates on `Kind<F, Kind<G, A>>` values, so no additional functions are needed.
 
 ```kotlin:ank:silent
-import arrow.instances.option.applicative.applicative
+import arrow.core.extensions.option.applicative.applicative
 
 fun <F> sequence(strKind: Kind<F, Kind<ForOption, String>>, FO: Foldable<F>):Option<Unit> =
   FO.run {
@@ -453,7 +453,7 @@ Monadic folding on `F` by mapping `A` values to `Kind<G, B>`, combining the `B` 
 Similar to `foldM`, but using a `Monoid<B>`.
 
 ```kotlin:ank:silent
-import arrow.instances.option.monad.monad
+import arrow.core.extensions.option.monad.monad
 
 fun <F> getLengthWithMonoid(strKind: Kind<F, String>, FO: Foldable<F>): Option<Int> =
   FO.run {
@@ -481,7 +481,7 @@ Certain structures are able to implement this in such a way that folds can be sh
 entirety of the structure), depending on the `G` result produced at a given step.
 
 ```kotlin:ank:silent
-import arrow.instances.either.monad.monad
+import arrow.core.extensions.either.monad.monad
 
 fun <F> maybeConcatenateString(strKind: Kind<F, String>, FO: Foldable<F>): Either<String,String> =
   FO.run {
@@ -508,8 +508,8 @@ maybeConcatenateString(strList, ListK.foldable())
 Get the element at the index of the Foldable.
 
 ```kotlin:ank
-import arrow.instances.either.monad.monad
-import arrow.instances.either.foldable.foldable
+import arrow.core.extensions.either.monad.monad
+import arrow.core.extensions.either.foldable.foldable
 
 fun foldableGet(strKind: EitherOf<String, String>): Option<String> =
   with(Either.foldable<String>()) {
