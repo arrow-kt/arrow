@@ -11,7 +11,7 @@ import arrow.effects.typeclasses.RacePair
 import arrow.effects.typeclasses.RaceTriple
 import kotlin.coroutines.CoroutineContext
 
-interface ConcurrentSyntax<F> : AsyncSyntax<F>, Concurrent<F> {
+interface ConcurrentSyntax<F> : AsyncSyntax<F>, Concurrent<F>, ListParTraverseSyntax<F> {
 
   private suspend fun <A> concurrently(fb: Concurrent<F>.() -> Kind<F, A>): A =
     run<Concurrent<F>, Kind<F, A>> { fb(this) }.bind()
@@ -19,7 +19,7 @@ interface ConcurrentSyntax<F> : AsyncSyntax<F>, Concurrent<F> {
   suspend fun <A> asyncCallback(k: SProc<A>): A =
     concurrently { asyncF(k.kr()) }
 
-  suspend fun <A> CoroutineContext.startFiber(f: suspend () -> A): Fiber<F, A> =
+  override suspend fun <A> CoroutineContext.startFiber(f: suspend () -> A): Fiber<F, A> =
     concurrently { f.k().startF(this@startFiber) }
 
   suspend fun <A, B> CoroutineContext.racePair(

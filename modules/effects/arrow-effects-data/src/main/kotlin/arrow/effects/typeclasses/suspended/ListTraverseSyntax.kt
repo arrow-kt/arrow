@@ -1,16 +1,16 @@
 package arrow.effects.typeclasses.suspended
 
-interface ListTraverseSyntax<F> : ListFoldableSyntax<F>, MonadSyntax<F> {
+interface ListTraverseSyntax<F> : MonadSyntax<F> {
 
-  suspend fun <A, B> List<suspend () -> A>.traverse(f: suspend (A) -> B): List<B> =
+  suspend fun <A, B> List<suspend () -> A>.traverseEffects(f: suspend (A) -> B): List<B> =
     map { fa: suspend () -> A -> f(fa()) }
 
-  suspend fun <A> List<suspend () -> A>.sequence(): List<A> =
-    traverse(::effectIdentity)
+  suspend fun <A> List<suspend () -> A>.sequenceEffects(): List<A> =
+    traverseEffects(::effectIdentity)
 
-  suspend fun <A, B> List<A>.flatTraverse(f: suspend (A) -> List<B>): List<B> =
-    flatMap { f(it) }
+  suspend fun <A, B> List<suspend () -> A>.flatTraverseEffects(f: suspend (A) -> List<B>): List<B> =
+    flatMap { f(it()) }
 
-  suspend fun <A> List<List<suspend () -> A>>.flatSequence(): List<A> =
-    flatten().sequence()
+  suspend fun <A> List<List<suspend () -> A>>.flatSequenceEffects(): List<A> =
+    flatten().sequenceEffects()
 }

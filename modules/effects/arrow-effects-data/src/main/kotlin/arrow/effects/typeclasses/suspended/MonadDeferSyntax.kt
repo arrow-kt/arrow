@@ -3,7 +3,7 @@ package arrow.effects.typeclasses.suspended
 import arrow.Kind
 import arrow.effects.typeclasses.MonadDefer
 
-interface MonadDeferSyntax<F> : BracketSyntax<F, Throwable>, MonadDefer<F> {
+interface MonadDeferSyntax<F> : BracketSyntax<F, Throwable>, MonadDefer<F>, ListTraverseSyntax<F> {
 
   suspend fun <A> effect(f: suspend () -> A): A = f()
 

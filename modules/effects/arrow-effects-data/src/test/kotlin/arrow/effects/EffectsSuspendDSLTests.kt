@@ -6,6 +6,7 @@ import arrow.effects.extensions.io.unsafeRun.runBlocking
 import arrow.test.UnitSpec
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
+import io.kotlintest.shouldNot
 import io.kotlintest.shouldThrow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ObsoleteCoroutinesApi
@@ -290,6 +291,63 @@ class EffectsSuspendDSLTests : UnitSpec() {
           }
         }
       }
+    }
+
+    "List.flatTraverseEffects syntax" {
+      fxTest {
+        fx {
+          val result = listOf(
+            suspend { 1 },
+            suspend { 2 },
+            suspend { 3 }
+          ).flatTraverseEffects {
+            listOf(it * 2)
+          }
+          result
+        }
+      } shouldBe listOf(2, 4, 6)
+    }
+
+    "List.traverseEffects syntax" {
+      fxTest {
+        fx {
+          listOf(
+            suspend { 1 },
+            suspend { 2 },
+            suspend { 3 }
+          ).traverseEffects(::effectIdentity)
+        }
+      } shouldBe listOf(1, 2, 3)
+    }
+
+    "List.sequenceEffects syntax" {
+      fxTest {
+        fx {
+          listOf(
+            suspend { 1 },
+            suspend { 2 },
+            suspend { 3 }
+          ).sequenceEffects()
+        }
+      } shouldBe listOf(1, 2, 3)
+    }
+
+    "List.parTraverseEffects syntax" {
+      val main = Thread.currentThread().name
+      fxTest {
+        fx {
+          listOf(
+            suspend { Thread.currentThread().name },
+            suspend { Thread.currentThread().name },
+            suspend { Thread.currentThread().name }
+          ).parTraverseEffects(
+            Dispatchers.Default,
+            ::effectIdentity
+          ).any {
+            it == main
+          }
+        }
+      } shouldBe false
     }
 
   }
