@@ -29,7 +29,7 @@ interface IOApplicative<E> : Applicative<BIOPartialOf<E>> {
     fix().map(f)
 
   override fun <A> just(a: A): BIO<E, A> =
-    IO.just(a)
+    BIO.just(a)
 
   override fun <A, B> BIOOf<E, A>.ap(ff: BIOOf<E, (A) -> B>): BIO<E, B> =
     ioAp(ff)
@@ -44,14 +44,14 @@ interface IOMonad<E> : Monad<BIOPartialOf<E>> {
     fix().map(f)
 
   override fun <A, B> tailRecM(a: A, f: (A) -> BIOOf<E, Either<A, B>>): BIO<E, B> =
-    IO.tailRecM(a, f)
+    BIO.tailRecM(a, f)
 
   override fun <A> just(a: A): BIO<E, A> =
-    IO.just(a)
+    BIO.just(a)
 }
 
 @extension
-interface IOApplicativeError<E>: ApplicativeError<ForIO, E>, IOApplicative<E> {
+interface IOApplicativeError<E>: ApplicativeError<BIOPartialOf<E>, E>, IOApplicative<E> {
   override fun <A> BIOOf<E, A>.attempt(): BIO<E, Either<Throwable, A>> =
     fix().attempt()
 
@@ -59,7 +59,7 @@ interface IOApplicativeError<E>: ApplicativeError<ForIO, E>, IOApplicative<E> {
     ioHandleErrorWith(f)
 
   override fun <A> raiseError(e: Throwable): BIO<E, A> =
-    IO.raiseError(e)
+    BIO.raiseError(e)
 }
 
 @extension
