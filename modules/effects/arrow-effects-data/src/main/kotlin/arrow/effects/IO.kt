@@ -179,7 +179,7 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
       throw Platform.CustomException(exception)
   }
 
-  internal data class Delay<E, out A>(val recovery: (Throwable) -> E, val thunk: () -> A) : BIO<E, A>() {
+  internal data class Delay<E, out A>(val fe: (Throwable) -> E, val thunk: () -> A) : BIO<E, A>() {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
 
     companion object {
@@ -188,7 +188,7 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
     }
   }
 
-  internal data class Suspend<E, out A>(val recovery: (Throwable) -> E, val thunk: () -> BIOOf<E, A>) : BIO<E, A>() {
+  internal data class Suspend<E, out A>(val fe: (Throwable) -> E, val thunk: () -> BIOOf<E, A>) : BIO<E, A>() {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
   }
 
@@ -240,13 +240,13 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
 fun <E, A, B> BIO<E, A>.ap(ff: BIOOf<E, (A) -> B>): BIO<E, B> =
   fix().flatMap { a -> ff.fix().map { it(a) } }
 
-fun <E : X, X, A, B> BIO<E, A>.flatMap(f: (A) -> BIO<X, B>): BIO<X, B> =
+fun <E: X, X, A, B> BIO<E, A>.flatMap(f: (A) -> BIO<X, B>): BIO<X, B> =
   BIO.Bind(this) { f(it).fix() }
 
 fun <E, X, A> BIO<E, A>.attempt(): BIO<X, Either<E, A>> =
   BIO.Bind(this, IOFrame.any())
 
-fun <E, A> BIO<E, A>.handleErrorWith(f: (Throwable) -> BIOOf<E, A>): BIO<E, A> =
+fun <E: X, X, A> BIO<E, A>.handleErrorWith(f: (E) -> BIOOf<X, A>): BIO<X, A> =
   BIO.Bind(fix(), IOFrame.errorHandler(f))
 
 fun <A> A.liftIO(): BIO<Nothing, A> = BIO.just(this)
