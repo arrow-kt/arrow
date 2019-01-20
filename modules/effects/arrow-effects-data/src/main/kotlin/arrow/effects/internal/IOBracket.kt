@@ -61,7 +61,7 @@ internal object IOBracket {
               val fb = try {
                 use(a)
               } catch (e: Throwable) {
-                IO.raiseError<B>(e)
+                BIO.raiseError<B>(e)
               }
 
               IO.Bind(fb.fix(), frame)
@@ -129,14 +129,14 @@ internal object IOBracket {
     // Unregistering cancel token, otherwise we can have a memory leak;
     // N.B. conn.pop() happens after the evaluation of `release`, because
     // otherwise we might have a conflict with the auto-cancellation logic
-    override fun recover(e: Throwable): IO<B> = IO.ContextSwitch(applyRelease(ExitCase.Error(e)), makeUncancelable, disableUncancelableAndPop)
+    override fun recover(e: Throwable): IO<B> = BIO.ContextSwitch(applyRelease(ExitCase.Error(e)), makeUncancelable, disableUncancelableAndPop)
       .flatMap(ReleaseRecover(e))
 
     override operator fun invoke(b: B): IO<B> =
     // Unregistering cancel token, otherwise we can have a memory leak
     // N.B. conn.pop() happens after the evaluation of `release`, because
     // otherwise we might have a conflict with the auto-cancellation logic
-      IO.ContextSwitch(applyRelease(ExitCase.Completed), makeUncancelable, disableUncancelableAndPop)
+      BIO.ContextSwitch(applyRelease(ExitCase.Completed), makeUncancelable, disableUncancelableAndPop)
         .map { b }
   }
 

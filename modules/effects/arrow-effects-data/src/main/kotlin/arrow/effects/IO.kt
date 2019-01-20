@@ -124,7 +124,7 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
   fun unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit =
     IORunLoop.start(this, cb)
 
-  fun runAsyncCancellable(onCancel: OnCancel = Silent, cb: (Either<Throwable, A>) -> IOOf<Unit>): BIO<E, Disposable> =
+  fun runAsyncCancellable(onCancel: OnCancel = Silent, cb: (Either<Throwable, A>) -> BIOOf<Nothing, Unit>): BIO<E, Disposable> =
     BIO.async { _ /* The start of this execution is immediate and uncancellable */, ccb ->
       val conn = IOConnection()
       val onCancelCb =
@@ -153,10 +153,10 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
   fun uncancelable(): BIO<E, A> =
     BIO.ContextSwitch(this, ContextSwitch.makeUncancelable, ContextSwitch.disableUncancelable())
 
-  fun <B> bracket(release: (A) -> IOOf<Unit>, use: (A) -> IOOf<B>): BIO<E, B> =
+  fun <B> bracket(release: (A) -> BIOOf<Nothing, Unit>, use: (A) -> BIOOf<Nothing, B>): BIO<E, B> =
     bracketCase({ a, _ -> release(a) }, use)
 
-  fun <B> bracketCase(release: (A, ExitCase<Throwable>) -> IOOf<Unit>, use: (A) -> IOOf<B>): BIO<E, B> =
+  fun <B> bracketCase(release: (A, ExitCase<Throwable>) -> BIOOf<Nothing, Unit>, use: (A) -> BIOOf<Nothing, B>): BIO<E, B> =
     IOBracket(this, release, use)
 
   fun guarantee(finalizer: BIOOf<Nothing, Unit>): BIO<E, A> = guaranteeCase { finalizer }
