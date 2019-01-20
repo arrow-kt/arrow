@@ -8,8 +8,8 @@ import arrow.effects.internal.Platform.ArrayStack
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine
 
-private typealias Current = IOOf<Any?>
-private typealias BindF = (Any?) -> IO<Any?>
+private typealias Current = BIOOf<Any?, Any?>
+private typealias BindF = (Any?) -> BIO<Any?, Any?>
 private typealias CallStack = ArrayStack<BindF>
 private typealias Callback = (Either<Throwable, Any?>) -> Unit
 
@@ -126,8 +126,8 @@ internal object IORunLoop {
     } while (true)
   }
 
-  private fun <A> sanitizedCurrentIO(currentIO: Current?, unboxed: Any?): IO<A> =
-    (currentIO ?: BIO.Pure(unboxed)) as IO<A>
+  private fun <E, A> sanitizedCurrentIO(currentIO: Current?, unboxed: Any?): BIO<E, A> =
+    (currentIO ?: BIO.Pure<E, Any?>(unboxed)) as BIO<E, A>
 
   private fun <A> suspendInAsync(
     currentIO: IO<A>,
