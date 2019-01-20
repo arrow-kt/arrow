@@ -26,7 +26,7 @@ internal object IORunLoop {
   fun <A> startCancelable(source: IOOf<A>, conn: IOConnection, cb: (Either<Throwable, A>) -> Unit): Unit =
     loop(source, conn, cb as Callback, null, null, null)
 
-  fun <A> step(source: IO<A>): IO<A> {
+  fun <E, A> step(source: BIO<E, A>): BIO<E, A> {
     var currentIO: Current? = source
     var bFirst: BindF? = null
     var bRest: CallStack? = null

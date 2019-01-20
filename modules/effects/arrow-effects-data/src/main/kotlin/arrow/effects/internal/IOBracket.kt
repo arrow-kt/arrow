@@ -78,7 +78,7 @@ internal object IOBracket {
     }
   }
 
-  fun <A> guaranteeCase(source: IO<A>, release: (ExitCase<Throwable>) -> IOOf<Unit>): IO<A> =
+  fun <E, A> guaranteeCase(source: BIO<E, A>, release: (ExitCase<Throwable>) -> IOOf<Unit>): BIO<E, A> =
     IO.async { conn, cb ->
       // TODO on cats-effect all this block is run using an immediate ExecutionContext for stack safety.
 

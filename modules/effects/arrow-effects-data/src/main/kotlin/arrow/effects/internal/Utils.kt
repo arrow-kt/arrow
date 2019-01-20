@@ -17,6 +17,8 @@ class ArrowInternalException(override val message: String =
 
 object Platform {
 
+  data class CustomException(val e: Any?): Throwable(message = e.toString())
+
   class ArrayStack<A> : ArrayDeque<A>()
 
   /**
