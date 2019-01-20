@@ -1,9 +1,6 @@
 package arrow.effects
 
-import arrow.core.Continuation
-import arrow.core.Either
-import arrow.core.Left
-import arrow.core.Right
+import arrow.core.*
 import arrow.effects.internal.Platform.ArrayStack
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine
@@ -40,7 +37,7 @@ internal object IORunLoop {
           hasResult = true
         }
         is BIO.RaiseError<*> -> {
-          val errorHandler: IOFrame<Any?, IO<Any?>>? = findErrorHandlerInCallStack(bFirst, bRest)
+          val errorHandler: IOFrame<Any?, BIO<Any?, Any?>>? = findErrorHandlerInCallStack(bFirst, bRest)
           when (errorHandler) {
             // Return case for unhandled errors
             null -> return currentIO
@@ -52,21 +49,22 @@ internal object IORunLoop {
           }
         }
         is BIO.Suspend<*, *> -> {
-          val thunk: () -> IOOf<Any?> = currentIO.thunk
-          currentIO = executeSafe { thunk() }
+          val thunk: () -> BIOOf<Any?, Any?> = currentIO.thunk
+          currentIO = executeSafe(currentIO.fe) { thunk() }
         }
         is BIO.Delay<*, *> -> {
+          val recover = currentIO.fe
           try {
             result = currentIO.thunk()
             hasResult = true
             currentIO = null
           } catch (t: Throwable) {
-            currentIO = BIO.RaiseError(t)
+            currentIO = BIO.RaiseError(recover(t))
           }
         }
         is BIO.Async<*, *> -> {
           // Return case for Async operations
-          return suspendInAsync(currentIO as IO<A>, bFirst, bRest, currentIO.k)
+          return suspendInAsync(currentIO as BIO<E, A>, bFirst, bRest, currentIO.k)
         }
         is BIO.Bind<*, *, *> -> {
           if (bFirst != null) {
@@ -129,11 +127,11 @@ internal object IORunLoop {
   private fun <E, A> sanitizedCurrentIO(currentIO: Current?, unboxed: Any?): BIO<E, A> =
     (currentIO ?: BIO.Pure<E, Any?>(unboxed)) as BIO<E, A>
 
-  private fun <A> suspendInAsync(
-    currentIO: IO<A>,
+  private fun <E, A> suspendInAsync(
+    currentIO: BIO<E, A>,
     bFirst: BindF?,
     bRest: CallStack?,
-    register: IOProc<Any?>): IO<A> =
+    register: IOProc<Any?>): BIO<E, A> =
   // Hitting an async boundary means we have to stop, however
   // if we had previous `flatMap` operations then we need to resume
   // the loop with the collected stack
@@ -175,7 +173,7 @@ internal object IORunLoop {
           hasResult = true
         }
         is BIO.RaiseError<*> -> {
-          val errorHandler: IOFrame<Any?, IO<Any?>>? = findErrorHandlerInCallStack(bFirst, bRest)
+          val errorHandler: IOFrame<Any?, BIO<Any?, Any?>>? = findErrorHandlerInCallStack(bFirst, bRest)
           when (errorHandler) {
             // Return case for unhandled errors
             null -> {
@@ -190,16 +188,17 @@ internal object IORunLoop {
           }
         }
         is BIO.Suspend<*, *> -> {
-          val thunk: () -> IOOf<Any?> = currentIO.thunk
-          currentIO = executeSafe { thunk() }
+          val thunk: () -> BIOOf<Any?, Any?> = currentIO.thunk
+          currentIO = executeSafe(currentIO.fe) { thunk() }
         }
         is BIO.Delay<*, *> -> {
+          val recover = currentIO.fe
           try {
             result = currentIO.thunk()
             hasResult = true
             currentIO = null
           } catch (t: Throwable) {
-            currentIO = BIO.RaiseError(t)
+            currentIO = BIO.RaiseError(recover(t))
           }
         }
         is BIO.Async<*, *> -> {
@@ -232,7 +231,7 @@ internal object IORunLoop {
 
           bFirst = { c: Any? -> IO.just(c) }
 
-          currentIO = IO.async { _, callback ->
+          currentIO = BIO.async { _, callback ->
             loop(localCont, conn, callback.asyncCallback(currentCC), null, null, null)
           }
         }
@@ -284,11 +283,11 @@ internal object IORunLoop {
     } while (true)
   }
 
-  private inline fun executeSafe(crossinline f: () -> IOOf<Any?>): IO<Any?> =
+  private inline fun executeSafe(mapError: (Throwable) -> (Any?) = ::identity, crossinline f: () -> BIOOf<Any?, Any?>): BIO<Any?, Any?> =
     try {
       f().fix()
     } catch (e: Throwable) {
-      BIO.RaiseError(e)
+      BIO.RaiseError(mapError(e))
     }
 
   /**
@@ -310,14 +309,14 @@ internal object IORunLoop {
       null
     }
 
-  private fun findErrorHandlerInCallStack(bFirst: BindF?, bRest: CallStack?): IOFrame<Any?, IO<Any?>>? {
+  private fun findErrorHandlerInCallStack(bFirst: BindF?, bRest: CallStack?): IOFrame<Any?, BIO<Any?, Any?>>? {
     if (bFirst != null && bFirst is IOFrame) {
       return bFirst
     } else if (bRest == null) {
       return null
     }
 
-    var result: IOFrame<Any?, IO<Any?>>? = null
+    var result: IOFrame<Any?, BIO<Any?, Any?>>? = null
     var cursor: BindF? = bFirst
 
     @Suppress("LoopWithTooManyJumpStatements")
@@ -389,11 +388,11 @@ internal object IORunLoop {
 
   private class RestoreContext(
     val old: IOConnection,
-    val restore: (Any?, Throwable?, IOConnection, IOConnection) -> IOConnection) : IOFrame<Any?, IO<Any?>> {
+    val restore: (Any?, Throwable?, IOConnection, IOConnection) -> IOConnection) : IOFrame<Any?, BIO<Any?, Any?>> {
 
-    override fun invoke(a: Any?): IO<Any?> = BIO.ContextSwitch(BIO.Pure(a), { current -> restore(a, null, old, current) }, null)
+    override fun invoke(a: Any?): BIO<Any?, Any?> = BIO.ContextSwitch(BIO.Pure(a), { current -> restore(a, null, old, current) }, null)
 
-    override fun recover(e: Throwable): IO<Any> =
+    override fun recover(e: Throwable): BIO<Any, Any> =
       BIO.ContextSwitch(BIO.RaiseError(e), { current ->
         restore(null, e, old, current)
       }, null)
