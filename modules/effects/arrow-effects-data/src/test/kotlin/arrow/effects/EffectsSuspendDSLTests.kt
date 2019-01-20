@@ -272,6 +272,26 @@ class EffectsSuspendDSLTests : UnitSpec() {
       } shouldBe 2
     }
 
+    "Either component1() syntax success" {
+      fxTest {
+        fx {
+          val (r) = 1.right()
+          r
+        }
+      } shouldBe 1
+    }
+
+    "Either component1() syntax failure" {
+      shouldThrow<TestError> {
+        fxTest {
+          fx {
+            val (r) = TestError.left()
+            r
+          }
+        }
+      }
+    }
+
   }
 }
 

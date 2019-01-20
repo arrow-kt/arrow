@@ -6,7 +6,7 @@ import arrow.core.OptionOf
 import arrow.core.TryOf
 import arrow.typeclasses.ApplicativeError
 
-interface ApplicativeErrorSyntax<F, E> : ApplicativeError<F, E>, ApplicativeSyntax<F> {
+interface ApplicativeErrorSyntax<F, E> : ApplicativeError<F, E>, ApplicativeSyntax<F>, EitherSyntax<F, E> {
 
   suspend fun <A> E.raiseError(): A =
     run<ApplicativeError<F, E>, Kind<F, A>> { raiseError(this@raiseError) }.bind()
