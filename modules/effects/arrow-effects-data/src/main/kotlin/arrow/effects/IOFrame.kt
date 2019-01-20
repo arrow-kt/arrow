@@ -1,7 +1,7 @@
 package arrow.effects
 
 import arrow.core.Either
-import arrow.effects.IO.Pure
+import arrow.effects.BIO.Companion.just
 
 /**
  * An [IOFrame] knows how to [recover] from a [Throwable] and how to map a value [A] to [R].
@@ -14,34 +14,28 @@ import arrow.effects.IO.Pure
  *
  * It's used to implement [attempt], [handleErrorWith] and [arrow.effects.internal.IOBracket]
  */
-internal interface IOFrame<in A, out R> : (A) -> R {
+internal interface IOFrame<E, in A, out R> : (A) -> R {
   override operator fun invoke(a: A): R
 
-  fun recover(e: Throwable): R
+  fun recover(e: E): R
 
-  fun fold(value: Either<Throwable, A>): R =
+  fun fold(value: Either<E, A>): R =
     when (value) {
       is Either.Right -> invoke(value.b)
       is Either.Left -> recover(value.a)
     }
 
   companion object {
-    fun <A> errorHandler(fe: (Throwable) -> IOOf<A>): IOFrame<A, IO<A>> =
-      ErrorHandler(fe)
-
-    internal data class ErrorHandler<A>(val fe: (Throwable) -> IOOf<A>) : IOFrame<A, IO<A>> {
-      override fun invoke(a: A): IO<A> = Pure(a)
-
-      override fun recover(e: Throwable): IO<A> = fe(e).fix()
-    }
+    fun <E, A> errorHandler(fe: (E) -> BIOOf<E, A>): IOFrame<E, A, BIO<E, A>> =
+      redeem(fe, ::just)
 
     @Suppress("UNCHECKED_CAST")
-    fun <A> any(): (A) -> IO<Either<Throwable, A>> = AttemptIO as (A) -> IO<Either<Throwable, A>>
+    fun <E, X, A, B> redeem(fe: (E) -> BIOOf<X, B>, fa: (A) -> BIOOf<X, B>): IOFrame<E, A, BIO<X, B>> = AttemptIO(fe, fa)
 
-    private object AttemptIO : IOFrame<Any?, IO<Either<Throwable, Any?>>> {
-      override operator fun invoke(a: Any?): IO<Either<Nothing, Any?>> = Pure(Either.Right(a))
+    class AttemptIO<E, X, A, B>(val fe: (E) -> BIOOf<X, B>, val fa: (A) -> BIOOf<X, B>) : IOFrame<E, A, BIO<X, B>> {
+      override fun invoke(a: A): BIO<X, B> = fa(a).fix()
 
-      override fun recover(e: Throwable): IO<Either<Throwable, Nothing>> = Pure(Either.Left(e))
+      override fun recover(e: E): BIO<X, B> = fe(e).fix()
     }
   }
 }

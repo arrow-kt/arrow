@@ -105,11 +105,21 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
   open fun <B> map(f: (A) -> B): BIO<E, B> =
     Map(this, f, 0)
 
-  fun <X> leftMap(f: (E) -> X): BIO<X, A> =
+  /**
+   * Maps the left side [E] of a [BIO].
+   *
+   * The difference between [handleErrorWith] and [mapLeft] is that [mapLeft] doesn't deal with exceptions.
+   */
+  fun <X> mapLeft(f: (E) -> X): BIO<X, A> =
     attempt<E, X, A>().flatMap {
       it.fold({ raiseError<X, A>(f(it)) }, { just(it) })
     }
 
+  /**
+   * Maps both sides of a [BIO].
+   *
+   * The difference between [redeem] and [bimap] is that [bimap] doesn't deal with exceptions.
+   */
   fun <X, B> bimap(f: (E) -> X, g: (A) -> B): BIO<X, B> =
     attempt<E, X, A>().flatMap {
       it.fold({ raiseError<X, B>(f(it)) }, { just(g(it)) })
@@ -118,10 +128,10 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
   open fun continueOn(ctx: CoroutineContext): BIO<E, A> =
     ContinueOn(this, ctx)
 
-  fun runAsync(cb: (Either<Throwable, A>) -> BIOOf<Nothing, Unit>): BIO<Nothing, Unit> =
+  fun runAsync(cb: (Either<E, A>) -> BIOOf<Nothing, Unit>): BIO<Nothing, Unit> =
     Delay.safe { unsafeRunAsync(cb.andThen { it.fix().unsafeRunAsync { } }) }
 
-  fun unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit =
+  fun unsafeRunAsync(cb: (Either<E, A>) -> Unit): Unit =
     IORunLoop.start(this, cb)
 
   fun runAsyncCancellable(onCancel: OnCancel = Silent, cb: (Either<Throwable, A>) -> BIOOf<Nothing, Unit>): BIO<E, Disposable> =
@@ -156,7 +166,7 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
   fun <B> bracket(release: (A) -> BIOOf<Nothing, Unit>, use: (A) -> BIOOf<Nothing, B>): BIO<E, B> =
     bracketCase({ a, _ -> release(a) }, use)
 
-  fun <B> bracketCase(release: (A, ExitCase<Throwable>) -> BIOOf<Nothing, Unit>, use: (A) -> BIOOf<Nothing, B>): BIO<E, B> =
+  fun <B> bracketCase(release: (A, ExitCase<E>) -> BIOOf<Nothing, Unit>, use: (A) -> BIOOf<Nothing, B>): BIO<E, B> =
     IOBracket(this, release, use)
 
   fun guarantee(finalizer: BIOOf<Nothing, Unit>): BIO<E, A> = guaranteeCase { finalizer }
@@ -237,17 +247,34 @@ sealed class BIO<out E, out A> : BIOOf<E, A> {
 
 // Victims of variance
 
-fun <E, A, B> BIO<E, A>.ap(ff: BIOOf<E, (A) -> B>): BIO<E, B> =
+fun <E, A, B> BIOOf<E, A>.ap(ff: BIOOf<E, (A) -> B>): BIO<E, B> =
   fix().flatMap { a -> ff.fix().map { it(a) } }
 
-fun <E: X, X, A, B> BIO<E, A>.flatMap(f: (A) -> BIO<X, B>): BIO<X, B> =
-  BIO.Bind(this) { f(it).fix() }
+fun <E : X, X, A, B> BIOOf<E, A>.flatMap(f: (A) -> BIO<X, B>): BIO<X, B> =
+  BIO.Bind(fix()) { f(it).fix() }
 
-fun <E, X, A> BIO<E, A>.attempt(): BIO<X, Either<E, A>> =
-  BIO.Bind(this, IOFrame.any())
+fun <E, X, A> BIOOf<E, A>.attempt(): BIO<X, Either<E, A>> =
+  BIO.Bind(fix(), object : IOFrame<E, A, BIO<X, Either<E, A>>> {
+    override fun invoke(a: A): BIO<X, Either<E, A>> = BIO.Pure(a.right())
 
-fun <E: X, X, A> BIO<E, A>.handleErrorWith(f: (E) -> BIOOf<X, A>): BIO<X, A> =
+    override fun recover(e: E): BIO<X, Either<E, A>> = BIO.Pure(e.left())
+  }) as BIO<X, Either<E, A>>
+
+/**
+ * Installs an error handler in this [BIO] that will map both values and exceptions.
+ *
+ * The difference between [handleErrorWith] and [mapLeft] is that [mapLeft] doesn't deal with exceptions.
+ */
+fun <E, A> BIOOf<E, A>.handleErrorWith(f: (E) -> BIOOf<E, A>): BIO<E, A> =
   BIO.Bind(fix(), IOFrame.errorHandler(f))
+
+/**
+ * Installs a mapping function and an error handler that will map both values and exceptions, atomically.
+ *
+ * The difference between [redeem] and [bifold] is that [bifold] doesn't deal with exceptions.
+ */
+fun <E, A> BIOOf<E, A>.redeem(fe: (E) -> BIOOf<E, A>, fa: (A) -> BIOOf<E, A>): BIO<E, A> =
+  BIO.Bind(fix(), IOFrame.redeem(fe, fa))
 
 fun <A> A.liftIO(): BIO<Nothing, A> = BIO.just(this)
 
