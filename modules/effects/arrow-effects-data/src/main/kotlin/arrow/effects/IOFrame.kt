@@ -27,10 +27,10 @@ internal interface IOFrame<E, in A, out R> : (A) -> R {
 
   companion object {
     fun <E, A> errorHandler(fe: (E) -> BIOOf<E, A>): IOFrame<E, A, BIO<E, A>> =
-      redeem(fe, ::just)
+      AttemptIO(fe, ::just)
 
-    @Suppress("UNCHECKED_CAST")
-    fun <E, X, A, B> redeem(fe: (E) -> BIOOf<X, B>, fa: (A) -> BIOOf<X, B>): IOFrame<E, A, BIO<X, B>> = AttemptIO(fe, fa)
+    fun <E, X, A, B> redeem(fe: (E) -> BIOOf<X, B>, fa: (A) -> BIOOf<X, B>): IOFrame<E, A, BIO<X, B>> =
+      AttemptIO(fe, fa)
 
     class AttemptIO<E, X, A, B>(val fe: (E) -> BIOOf<X, B>, val fa: (A) -> BIOOf<X, B>) : IOFrame<E, A, BIO<X, B>> {
       override fun invoke(a: A): BIO<X, B> = fa(a).fix()
