@@ -3,6 +3,17 @@ package arrow.effects
 import arrow.core.Either
 import arrow.effects.IO.Pure
 
+/**
+ * An [IOFrame] knows how to [recover] from a [Throwable] and how to map a value [A] to [R].
+ *
+ * Internal to `IO`'s implementations, used to specify
+ * error handlers in their respective `Bind` internal states.
+ *
+ * To use an [IOFrame] you must use [IO.Bind] instead of `flatMap` or the [IOFrame]
+ * is **not guaranteed** to execute.
+ *
+ * It's used to implement [attempt], [handleErrorWith] and [arrow.effects.internal.IOBracket]
+ */
 internal interface IOFrame<in A, out R> : (A) -> R {
   override operator fun invoke(a: A): R
 

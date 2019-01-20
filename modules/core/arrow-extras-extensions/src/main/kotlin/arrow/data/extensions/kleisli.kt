@@ -11,6 +11,7 @@ import arrow.data.extensions.kleisli.applicative.applicative
 import arrow.data.extensions.kleisli.functor.functor
 import arrow.data.extensions.kleisli.monad.monad
 import arrow.typeclasses.*
+import arrow.undocumented
 
 @extension
 interface KleisliFunctor<F, D> : Functor<KleisliPartialOf<F, D>> {
@@ -98,6 +99,7 @@ interface KleisliMonadError<F, D, E> : MonadError<KleisliPartialOf<F, D>, E>, Kl
 }
 
 @extension
+@undocumented
 interface KleisliMonadThrow<F, D> : MonadThrow<KleisliPartialOf<F, D>>, KleisliMonadError<F, D, Throwable> {
   override fun ME(): MonadError<F, Throwable>
 }
