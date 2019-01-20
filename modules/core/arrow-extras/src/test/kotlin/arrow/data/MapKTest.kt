@@ -11,7 +11,7 @@ import arrow.data.extensions.mapk.monoid.monoid
 import arrow.data.extensions.mapk.show.show
 import arrow.data.extensions.mapk.traverse.traverse
 import arrow.test.UnitSpec
-import arrow.test.generators.genMapK
+import arrow.test.generators.mapK
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
@@ -32,7 +32,7 @@ class MapKTest : UnitSpec() {
     testLaws(
       ShowLaws.laws(MapK.show(), EQ_TC) { mapOf(it.toString() to it).k() },
       TraverseLaws.laws(MapK.traverse(), MapK.functor(), { a: Int -> mapOf("key" to a).k() }, EQ),
-      MonoidLaws.laws(MapK.monoid<String, Int>(Int.semigroup()), genMapK(Gen.string(), Gen.int()), EQ),
+      MonoidLaws.laws(MapK.monoid<String, Int>(Int.semigroup()), Gen.mapK(Gen.string(), Gen.int()), EQ),
       SemigroupLaws.laws(MapK.monoid<String, Int>(Int.semigroup()),
         mapOf("key" to 1).k(),
         mapOf("key" to 2).k(),

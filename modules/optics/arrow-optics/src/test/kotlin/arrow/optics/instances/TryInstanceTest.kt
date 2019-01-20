@@ -7,8 +7,8 @@ import arrow.data.extensions.listk.eq.eq
 import arrow.core.extensions.option.eq.eq
 import arrow.optics.extensions.`try`.each.each
 import arrow.test.UnitSpec
-import arrow.test.generators.genFunctionAToB
-import arrow.test.generators.genTry
+import arrow.test.generators.`try`
+import arrow.test.generators.functionAToB
 import arrow.test.laws.TraversalLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
@@ -22,9 +22,9 @@ class TryInstanceTest : UnitSpec() {
 
     testLaws(TraversalLaws.laws(
       traversal = Try.each<String>().each(),
-      aGen = genTry(Gen.string()),
+      aGen = Gen.`try`(Gen.string()),
       bGen = Gen.string(),
-      funcGen = genFunctionAToB(Gen.string()),
+      funcGen = Gen.functionAToB(Gen.string()),
       EQA = Eq.any(),
       EQOptionB = Option.eq(Eq.any()),
       EQListB = ListK.eq(Eq.any())

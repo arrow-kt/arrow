@@ -3,8 +3,7 @@ package arrow.test.laws
 import arrow.Kind
 import arrow.core.andThen
 import arrow.core.identity
-import arrow.test.generators.genConstructor
-import arrow.test.generators.genFunctionAToB
+import arrow.test.generators.functionAToB
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Functor
@@ -26,15 +25,15 @@ object FunctorLaws {
     )
 
   fun <F> Functor<F>.covariantIdentity(f: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(genConstructor(Gen.int(), f)) { fa: Kind<F, Int> ->
+    forAll(Gen.int().map(f)) { fa: Kind<F, Int> ->
       fa.map(::identity).equalUnderTheLaw(fa, EQ)
     }
 
   fun <F> Functor<F>.covariantComposition(ff: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
     forAll(
-      genConstructor(Gen.int(), ff),
-      genFunctionAToB<Int, Int>(Gen.int()),
-      genFunctionAToB<Int, Int>(Gen.int())
+      Gen.int().map(ff),
+      Gen.functionAToB<Int, Int>(Gen.int()),
+      Gen.functionAToB<Int, Int>(Gen.int())
     ) { fa: Kind<F, Int>, f, g ->
       fa.map(f).map(g).equalUnderTheLaw(fa.map(f andThen g), EQ)
     }

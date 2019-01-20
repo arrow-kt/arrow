@@ -10,9 +10,9 @@ import arrow.core.extensions.monoid
 import arrow.data.extensions.listk.eq.eq
 import arrow.core.extensions.option.eq.eq
 import arrow.test.UnitSpec
-import arrow.test.generators.genEither
-import arrow.test.generators.genFunctionAToB
-import arrow.test.generators.genTuple
+import arrow.test.generators.either
+import arrow.test.generators.functionAToB
+import arrow.test.generators.tuple2
 import arrow.test.laws.OptionalLaws
 import arrow.test.laws.PrismLaws
 import arrow.test.laws.SetterLaws
@@ -32,7 +32,7 @@ class PrismTest : UnitSpec() {
         prism = sumPrism,
         aGen = genSum,
         bGen = Gen.string(),
-        funcGen = genFunctionAToB(Gen.string()),
+        funcGen = Gen.functionAToB(Gen.string()),
         EQA = Eq.any(),
         EQOptionB = Eq.any()
       ),
@@ -41,7 +41,7 @@ class PrismTest : UnitSpec() {
         setter = sumPrism.asSetter(),
         aGen = genSum,
         bGen = Gen.string(),
-        funcGen = genFunctionAToB(Gen.string()),
+        funcGen = Gen.functionAToB(Gen.string()),
         EQA = Eq.any()
       ),
 
@@ -49,7 +49,7 @@ class PrismTest : UnitSpec() {
         traversal = sumPrism.asTraversal(),
         aGen = genSum,
         bGen = Gen.string(),
-        funcGen = genFunctionAToB(Gen.string()),
+        funcGen = Gen.functionAToB(Gen.string()),
         EQA = Eq.any(),
         EQOptionB = Option.eq(Eq.any()),
         EQListB = ListK.eq(Eq.any())
@@ -59,7 +59,7 @@ class PrismTest : UnitSpec() {
         optional = sumPrism.asOptional(),
         aGen = genSum,
         bGen = Gen.string(),
-        funcGen = genFunctionAToB(Gen.string()),
+        funcGen = Gen.functionAToB(Gen.string()),
         EQA = Eq.any(),
         EQOptionB = Option.eq(Eq.any())
       )
@@ -68,9 +68,9 @@ class PrismTest : UnitSpec() {
     testLaws(
       PrismLaws.laws(
         prism = sumPrism.first(),
-        aGen = genTuple(genSum, Gen.int()),
-        bGen = genTuple(Gen.string(), Gen.int()),
-        funcGen = genFunctionAToB(genTuple(Gen.string(), Gen.int())),
+        aGen = Gen.tuple2(genSum, Gen.int()),
+        bGen = Gen.tuple2(Gen.string(), Gen.int()),
+        funcGen = Gen.functionAToB(Gen.tuple2(Gen.string(), Gen.int())),
         EQA = Eq.any(),
         EQOptionB = Eq.any()
       )
@@ -79,9 +79,9 @@ class PrismTest : UnitSpec() {
     testLaws(
       PrismLaws.laws(
         prism = sumPrism.second(),
-        aGen = genTuple(Gen.int(), genSum),
-        bGen = genTuple(Gen.int(), Gen.string()),
-        funcGen = genFunctionAToB(genTuple(Gen.int(), Gen.string())),
+        aGen = Gen.tuple2(Gen.int(), genSum),
+        bGen = Gen.tuple2(Gen.int(), Gen.string()),
+        funcGen = Gen.functionAToB(Gen.tuple2(Gen.int(), Gen.string())),
         EQA = Eq.any(),
         EQOptionB = Eq.any()
       )
@@ -90,9 +90,9 @@ class PrismTest : UnitSpec() {
     testLaws(
       PrismLaws.laws(
         prism = sumPrism.right<SumType, SumType, String, String, Int>(),
-        aGen = genEither(Gen.int(), genSum),
-        bGen = genEither(Gen.int(), Gen.string()),
-        funcGen = genFunctionAToB(genEither(Gen.int(), Gen.string())),
+        aGen = Gen.either(Gen.int(), genSum),
+        bGen = Gen.either(Gen.int(), Gen.string()),
+        funcGen = Gen.functionAToB(Gen.either(Gen.int(), Gen.string())),
         EQA = Eq.any(),
         EQOptionB = Eq.any()
       )
@@ -101,9 +101,9 @@ class PrismTest : UnitSpec() {
     testLaws(
       PrismLaws.laws(
         prism = sumPrism.left<SumType, SumType, String, String, Int>(),
-        aGen = genEither(genSum, Gen.int()),
-        bGen = genEither(Gen.string(), Gen.int()),
-        funcGen = genFunctionAToB(genEither(Gen.string(), Gen.int())),
+        aGen = Gen.either(genSum, Gen.int()),
+        bGen = Gen.either(Gen.string(), Gen.int()),
+        funcGen = Gen.functionAToB(Gen.either(Gen.string(), Gen.int())),
         EQA = Eq.any(),
         EQOptionB = Eq.any()
       )
@@ -112,9 +112,9 @@ class PrismTest : UnitSpec() {
     testLaws(
       PrismLaws.laws(
         prism = Prism.id(),
-        aGen = genEither(Gen.int(), Gen.int()),
-        bGen = genEither(Gen.int(), Gen.int()),
-        funcGen = genFunctionAToB(genEither(Gen.int(), Gen.int())),
+        aGen = Gen.either(Gen.int(), Gen.int()),
+        bGen = Gen.either(Gen.int(), Gen.int()),
+        funcGen = Gen.functionAToB(Gen.either(Gen.int(), Gen.int())),
         EQA = Eq.any(),
         EQOptionB = Eq.any()
       )

@@ -1,7 +1,7 @@
 package arrow.optics
 
 import arrow.test.UnitSpec
-import arrow.test.generators.genChar
+import arrow.test.generators.char
 import arrow.test.laws.IsoLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
@@ -17,8 +17,8 @@ class StringTest : UnitSpec() {
     testLaws(IsoLaws.laws(
       iso = String.toList(),
       aGen = Gen.string(),
-      bGen = Gen.list(genChar()),
-      funcGen = Gen.list(genChar()).map { list -> {chars:List<Char> -> list + chars} },
+      bGen = Gen.list(Gen.char()),
+      funcGen = Gen.list(Gen.char()).map { list -> { chars:List<Char> -> list + chars} },
       EQA = Eq.any(),
       EQB = Eq.any(),
       bMonoid = object : Monoid<List<Char>> {

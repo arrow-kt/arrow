@@ -18,10 +18,11 @@ import arrow.mtl.extensions.option.monadFilter.monadFilter
 import arrow.mtl.extensions.writert.monadFilter.monadFilter
 import arrow.mtl.extensions.writert.monadWriter.monadWriter
 import arrow.test.UnitSpec
-import arrow.test.generators.genIntSmall
-import arrow.test.generators.genTuple
+import arrow.test.generators.intSmall
+import arrow.test.generators.tuple2
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
+import io.kotlintest.properties.Gen
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
@@ -48,8 +49,8 @@ class WriterTTest : UnitSpec() {
       MonadWriterLaws.laws(WriterT.monad(Option.monad(), Int.monoid()),
         WriterT.monadWriter(Option.monad(), Int.monoid()),
         Int.monoid(),
-        genIntSmall(),
-        genTuple(genIntSmall(), genIntSmall()),
+        Gen.intSmall(),
+        Gen.tuple2(Gen.intSmall(), Gen.intSmall()),
         Eq { a, b ->
           a.value().fix().let { optionA: Option<Tuple2<Int, Int>> ->
             val optionB = b.value().fix()

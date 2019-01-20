@@ -1,7 +1,6 @@
 package arrow.test.laws
 
 import arrow.Kind2
-import arrow.test.generators.genDoubleConstructor
 import arrow.typeclasses.Category
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
@@ -17,17 +16,17 @@ object CategoryLaws {
     )
 
   fun <F> Category<F>.rightIdentity(f: (Int) -> Kind2<F, Int, Int>, EQ: Eq<Kind2<F, Int, Int>>): Unit =
-    forAll(genDoubleConstructor(Gen.int(), f)) { fa: Kind2<F, Int, Int> ->
+    forAll(Gen.int().map(f)) { fa: Kind2<F, Int, Int> ->
       fa.compose(id()).equalUnderTheLaw(fa, EQ)
     }
 
   fun <F> Category<F>.leftIdentity(f: (Int) -> Kind2<F, Int, Int>, EQ: Eq<Kind2<F, Int, Int>>): Unit =
-    forAll(genDoubleConstructor(Gen.int(), f)) { fa: Kind2<F, Int, Int> ->
+    forAll(Gen.int().map(f)) { fa: Kind2<F, Int, Int> ->
       id<Int>().compose(fa).equalUnderTheLaw(fa, EQ)
     }
 
   fun <F> Category<F>.associativity(f: (Int) -> Kind2<F, Int, Int>, EQ: Eq<Kind2<F, Int, Int>>): Unit =
-    forAll(genDoubleConstructor(Gen.int(), f), genDoubleConstructor(Gen.int(), f), genDoubleConstructor(Gen.int(), f)) { a, b, c ->
+    forAll(Gen.int().map(f), Gen.int().map(f), Gen.int().map(f)) { a, b, c ->
       a.compose(b).compose(c).equalUnderTheLaw(a.compose(b.compose(c)), EQ)
     }
 }

@@ -2,7 +2,6 @@ package arrow.test.laws
 
 import arrow.Kind
 import arrow.data.extensions.list.foldable.fold
-import arrow.test.generators.genConstructor
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Eq
 import arrow.typeclasses.MonoidK
@@ -24,18 +23,18 @@ object MonoidKLaws {
       Law("MonoidK Laws: Fold with Monoid instance") { SGK.monoidKFold(f, EQ) })
 
   fun <F> MonoidK<F>.monoidKLeftIdentity(f: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(genConstructor(Gen.int(), f)) { fa: Kind<F, Int> ->
+    forAll(Gen.int().map(f)) { fa: Kind<F, Int> ->
       empty<Int>().combineK(fa).equalUnderTheLaw(fa, EQ)
     }
 
   fun <F> MonoidK<F>.monoidKRightIdentity(f: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(genConstructor(Gen.int(), f)) { fa: Kind<F, Int> ->
+    forAll(Gen.int().map(f)) { fa: Kind<F, Int> ->
       fa.combineK(empty<Int>()).equalUnderTheLaw(fa, EQ)
     }
 
   fun <F> MonoidK<F>.monoidKFold(f: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit {
       val mo = this
-      forAll(genConstructor(Gen.int(), f)) { fa: Kind<F, Int> ->
+      forAll(Gen.int().map(f)) { fa: Kind<F, Int> ->
           listOf(fa).fold(mo.algebra()).equalUnderTheLaw(fa, EQ)
       }
   }
