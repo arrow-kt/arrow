@@ -25,18 +25,18 @@
                     {% endif %}
                 </div>
                 <div class="blog-item-content">
-                    {% if post.title != "" %}
+                    {% if post.title && post.title != "" %}
                     <h2>{{ post.title }}</h2>
                     {% endif %}
                     <hr>
-                    {% if post.excerpt != "" %}
-                    <p>{{ post.excerpt }}</p>
+                    {% if post.content && post.content != "" %}
+                    {{ post.content }}
                     {% endif %}
                     <ul>
-                        {% if post.event != "" %}
+                        {% if post.event && post.event != "" %}
                         <li>{{ post.event }}</li>
                         {% endif %}
-                        {% if post.date != "" %}
+                        {% if post.date && post.date != "" %}
                         <li>{{ post.date | date: '%B %d, %Y' }}</li>
                         {% endif %}
                     </ul>

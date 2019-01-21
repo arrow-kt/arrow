@@ -2,21 +2,31 @@
 // -----------------------------------------------
 // -----------------------------------------------
 .blog {
-    padding: ($base-point-grid * 8) 0;
+    padding: ($base-point-grid * 4) 0;
     background: rgba($brand-tertiary, 0.10);
     .blog-list {
+
+        column-count: 3;
+        column-gap: map-get($base-grid, gutter);
+        margin: 0 map-get($base-grid, gutter);
+
+        @include bp(large) {
+            column-count: 2;
+            column-gap: map-get($base-grid, gutter);
+        }
+
+        @include bp(medium) {
+            column-count: 1;
+            column-gap: map-get($base-grid, gutter);
+        }
+
         .blog-item {
-
             margin-bottom: ($base-point-grid * 4);
-            @include grid-column(4, $base-grid);
+            background-color: #eee;
+            display: inline-block;
+            margin: 0 0 map-get($base-grid, gutter);
+            width: 100%;
 
-            @include bp(large) {
-                @include grid-column(6, $base-grid);
-            }
-
-            @include bp(medium) {
-                @include grid-column(12, $base-grid);
-            }
             .blog-item-header {
                 position: relative;
                 .icon {
@@ -33,16 +43,17 @@
                     color: $white;
                     font-size: 0.875rem;
                 }
+                .header-container {
+                  display: block;
+                }
 
                 img {
                     width: 100%;
                 }
             }
             .blog-item-content {
-                position: relative;
                 padding: ($base-point-grid * 3);
                 background: $white;
-                height: 240px;
 
                 h2 {
                     margin-bottom: ($base-point-grid * 2);
@@ -62,10 +73,6 @@
                 }
 
                 ul {
-                    position: absolute;
-                    z-index: 15;
-                    bottom: ($base-point-grid * 3);
-                    left: ($base-point-grid * 3);
                     margin-top: ($base-point-grid * 2);
                     li {
                         color: rgba($brand-secondary, 0.8);
