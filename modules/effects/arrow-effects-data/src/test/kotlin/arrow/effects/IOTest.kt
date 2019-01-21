@@ -14,10 +14,13 @@ import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.laws.ConcurrentLaws
 import io.kotlintest.fail
+import io.kotlintest.properties.Gen
+import io.kotlintest.properties.forAll
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import kotlinx.coroutines.newSingleThreadContext
 import org.junit.runner.RunWith
+import java.lang.RuntimeException
 
 @RunWith(KotlinTestRunner::class)
 @kotlinx.coroutines.ObsoleteCoroutinesApi
@@ -331,6 +334,20 @@ class IOTest : UnitSpec() {
         IO(newSingleThreadContext("CancelThread")) { }
           .unsafeRunAsync { cancel() }
       }.unsafeRunTimed(2.seconds) shouldBe Some(OnCancel.CancellationException)
+    }
+
+    "IOFrame should always be called when using IO.Bind" {
+      val ThrowableAsStringFrame = object : IOFrame<Any?, IOOf<String>> {
+        override fun invoke(a: Any?) = just(a.toString())
+
+        override fun recover(e: Throwable) = just(e.message ?: "")
+
+      }
+
+      forAll(Gen.string()) { message ->
+        IO.Bind(IO.raiseError(RuntimeException(message)), ThrowableAsStringFrame as (Int) -> IO<String>)
+          .unsafeRunSync() == message
+      }
     }
 
     "unsafeRunAsyncCancellable can cancel even for infinite asyncs" {

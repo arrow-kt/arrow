@@ -60,10 +60,11 @@ internal object IOBracket {
             val onNext = {
               val fb = try {
                 use(a)
-              } catch (nonFatal: Exception) {
-                IO.raiseError<B>(nonFatal)
+              } catch (e: Throwable) {
+                IO.raiseError<B>(e)
               }
-              fb.fix().flatMap(frame)
+
+              IO.Bind(fb.fix(), frame)
             }
 
             // Registering our cancelable token ensures that in case cancellation is detected, release gets called
