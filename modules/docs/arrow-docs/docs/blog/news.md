@@ -1,5 +1,5 @@
 ---
-layout: category
+layout: blog
 title: News
 category: news
 ---

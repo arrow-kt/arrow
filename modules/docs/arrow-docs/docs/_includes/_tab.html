@@ -1,7 +1,7 @@
 <ul class="tab">
     {% for item in site.data.menu.tab %}
         {% assign cat = item.title | downcase %}
-        {% if page.url contains cat %}
+        {% if page.category == cat %}
             {% assign class = "tab-item active" %}
         {% else %}
             {% assign class = "tab-item" %}

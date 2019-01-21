@@ -1,5 +1,4 @@
 ---
-layout: category
 title: Functional Programming in Kotlin with Arrow
 icon: /img/icon-video.svg
 event: Lambda World, Cádiz

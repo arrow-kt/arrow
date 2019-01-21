@@ -1,5 +1,5 @@
 ---
-layout: category
+layout: blog
 title: Media
 category: media
 ---

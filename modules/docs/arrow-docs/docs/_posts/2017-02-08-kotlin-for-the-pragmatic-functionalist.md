@@ -1,5 +1,4 @@
 ---
-layout: category
 title: Kotlin for the Pragmatic Functionalist
 icon: /img/icon-video.svg
 event: KotlinConf
