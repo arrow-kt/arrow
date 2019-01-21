@@ -7,7 +7,7 @@ options:
         url: /docs/
 
       - title: Blogs & Presentations
-        url: /blogs/
+        url: /blog/
 
       - title: Projects & Examples
         url: /docs/quickstart/projects/
