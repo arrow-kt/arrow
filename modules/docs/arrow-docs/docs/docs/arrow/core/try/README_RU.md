@@ -8,7 +8,7 @@ video: XavztYVMUqI
 ---
 
 ## Try
-
+[English](/docs/arrow/core/try)
 {:.beginner}
 beginner
 
