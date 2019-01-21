@@ -2,7 +2,12 @@
    <div class="blog">
     <div class="container">
         <div class="blog-list">
-            {% for post in site.categories[page.category] %}
+            {% if page.category %}
+            {% assign post-list = site.categories[page.category] %}
+            {% else %}
+            {% assign post-list = site.posts %}
+            {% endif %}
+            {% for post in post-list %}
             <div class="blog-item">
                 <div class="blog-item-header">
                    {% if post.icon %}
