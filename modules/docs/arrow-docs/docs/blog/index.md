@@ -5,4 +5,5 @@ category: all
 permalink: /blog
 redirect_from:
   - /blog/all
+  - /docs/quickstart/blogs/
 ---
