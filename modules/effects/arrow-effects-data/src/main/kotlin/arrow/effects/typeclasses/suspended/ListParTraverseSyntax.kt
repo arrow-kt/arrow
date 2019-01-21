@@ -7,7 +7,7 @@ interface ListParTraverseSyntax<F> : MonadSyntax<F> {
 
   suspend fun <A> CoroutineContext.startFiber(f: suspend () -> A): Fiber<F, A>
 
-  suspend fun <A, B> List<suspend () -> A>.parTraverseEffects(
+  suspend fun <A, B> List<suspend () -> A>.parTraverse(
     ctx: CoroutineContext,
     f: suspend (A) -> B
   ): List<B> =
@@ -15,7 +15,7 @@ interface ListParTraverseSyntax<F> : MonadSyntax<F> {
       acc + ctx.startFiber { f(fa()) }
     }.map { it.join().bind() }
 
-  suspend fun <A> List<suspend () -> A>.parSequenceEffects(ctx: CoroutineContext): List<A> =
-    parTraverseEffects(ctx, ::effectIdentity)
+  suspend fun <A> List<suspend () -> A>.parSequence(ctx: CoroutineContext): List<A> =
+    parTraverse(ctx, ::effectIdentity)
 
 }
