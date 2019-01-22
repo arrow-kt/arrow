@@ -19,6 +19,7 @@ typealias FlowableKProcF<A> = (FlowableKConnection, (Either<Throwable, A>) -> Un
  *
  * @see FlowableK.async
  */
+@Suppress("UNUSED_PARAMETER", "FunctionName")
 fun FlowableKConnection(dummy: Unit = Unit): KindConnection<ForFlowableK> = KindConnection(object : MonadDefer<ForFlowableK> {
   override fun <A> defer(fa: () -> FlowableKOf<A>): FlowableK<A> =
     FlowableK.defer(fa)

@@ -19,6 +19,7 @@ typealias SingleKProcF<A> = (SingleKConnection, (Either<Throwable, A>) -> Unit) 
  *
  * @see SingleK.async
  */
+@Suppress("UNUSED_PARAMETER", "FunctionName")
 fun SingleKConnection(dummy: Unit = Unit): KindConnection<ForSingleK> = KindConnection(object : MonadDefer<ForSingleK> {
   override fun <A> defer(fa: () -> SingleKOf<A>): SingleK<A> =
     SingleK.defer(fa)
