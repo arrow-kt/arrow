@@ -9,7 +9,7 @@ import arrow.effects.typeclasses.mapUnit
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.EmptyCoroutineContext
 
-internal class CancelablePromise<F, A>(CF: Concurrent<F>) : Promise<F, A>, Concurrent<F> by CF {
+internal class CancelablePromise<F, A>(private val CF: Concurrent<F>) : Promise<F, A>, Concurrent<F> by CF {
 
   internal sealed class State<out A> {
     data class Pending<A>(val joiners: Map<Token, (Either<Throwable, A>) -> Unit>) : State<A>()
@@ -114,6 +114,14 @@ internal class CancelablePromise<F, A>(CF: Concurrent<F>) : Promise<F, A>, Concu
       if (state.compareAndSet(current, updated)) Unit
       else unregister(id)
     }
+  }
+
+  override fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B> = CF.run {
+    this@ap.ap(ff)
+  }
+
+  override fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B> = CF.run {
+    this@map.map(f)
   }
 
 }

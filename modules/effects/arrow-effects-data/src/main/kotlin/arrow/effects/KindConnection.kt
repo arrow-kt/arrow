@@ -292,7 +292,7 @@ sealed class KindConnection<F> {
   /**
    * Default [KindConnection] implementation.
    */
-  private class DefaultKindConnection<F>(MD: MonadDefer<F>, val run: (CancelToken<F>) -> Unit) : KindConnection<F>(), MonadDefer<F> by MD {
+  private class DefaultKindConnection<F>(private val MD: MonadDefer<F>, val run: (CancelToken<F>) -> Unit) : KindConnection<F>(), MonadDefer<F> by MD {
     private val state: AtomicReference<List<CancelToken<F>>?> = AtomicReference(emptyList())
 
     override fun cancel(): CancelToken<F> = defer {
@@ -329,6 +329,14 @@ sealed class KindConnection<F> {
     private fun List<CancelToken<F>>.cancelAll(): CancelToken<F> = defer {
       //TODO this blocks forever if any `CancelToken<F>` doesn't terminate. Requires `fork`/`start` to avoid.
       fold(unit()) { acc, f -> f.flatMap { acc } }
+    }
+
+    override fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B> = MD.run {
+      this@ap.ap(ff)
+    }
+
+    override fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B> = MD.run {
+      this@map.map(f)
     }
 
     override fun toString(): String = "KindConnection(state = ${state.get().toString()})"

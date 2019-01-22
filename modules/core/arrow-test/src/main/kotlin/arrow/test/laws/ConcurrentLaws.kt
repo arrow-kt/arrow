@@ -33,6 +33,8 @@ object ConcurrentLaws {
       Law("Concurrent Laws: cancel on bracket releases") { CF.cancelOnBracketReleases(EQ, ctx) },
       Law("Concurrent Laws: acquire is not cancelable") { CF.acquireBracketIsNotCancelable(EQ, ctx) },
       Law("Concurrent Laws: release is not cancelable") { CF.releaseBracketIsNotCancelable(EQ, ctx) },
+      Law("Concurrent Laws: async cancelable coherence") { CF.asyncCancelableCoherence(EQ) },
+      Law("Concurrent Laws: cancelable cancelableF coherence") { CF.cancelableCancelableFCoherence(EQ) },
       Law("Concurrent Laws: cancelable should run CancelToken on cancel") { CF.cancelableReceivesCancelSignal(EQ, ctx) },
       Law("Concurrent Laws: cancelableF should run CancelToken on cancel") { CF.cancelableFReceivesCancelSignal(EQ, ctx) },
       Law("Concurrent Laws: async can cancel upstream") { CF.asyncCanCancelUpstream(EQ, ctx) },
@@ -125,6 +127,18 @@ object ConcurrentLaws {
         mvar.take().bind()
         mvar.take().bind()
       }.equalUnderTheLaw(just(b), EQ)
+    }
+
+  fun <F> Concurrent<F>.asyncCancelableCoherence(EQ: Eq<Kind<F, Int>>): Unit =
+    forAll(genEither(genThrowable(), Gen.int())) { eith ->
+      async<Int> { cb -> cb(eith) }
+        .equalUnderTheLaw(cancelable { cb -> cb(eith); just<Unit>(Unit) }, EQ)
+    }
+
+  fun <F> Concurrent<F>.cancelableCancelableFCoherence(EQ: Eq<Kind<F, Int>>): Unit =
+    forAll(genEither(genThrowable(), Gen.int())) { eith ->
+      cancelable<Int> { cb -> cb(eith); just<Unit>(Unit) }
+        .equalUnderTheLaw(cancelableF { cb -> delay { cb(eith); just<Unit>(Unit) } }, EQ)
     }
 
   fun <F> Concurrent<F>.cancelableReceivesCancelSignal(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =

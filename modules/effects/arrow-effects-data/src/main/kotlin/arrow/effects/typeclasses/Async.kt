@@ -2,11 +2,9 @@ package arrow.effects.typeclasses
 
 import arrow.Kind
 import arrow.core.*
-import arrow.effects.CancelToken
 import arrow.core.Either
 import arrow.documented
 import arrow.typeclasses.MonadContinuation
-import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 
 /** A asynchronous computation that might fail. **/
@@ -245,133 +243,6 @@ interface Async<F> : MonadDefer<F> {
    */
   fun <A> never(): Kind<F, A> =
     async { }
-
-  /**
-   * Creates a cancelable [F] instance that executes an asynchronous process on evaluation.
-   * Derived from [async] and [bracketCase] so does not require [F] to be cancelable.
-   *
-   * **NOTE**: Only for a cancelable type can [bracketCase] ever call `cancel` but that's of no concern for
-   * non-cancelable types as `cancel` never should be called.
-   *
-   * ```kotlin:ank:playground:extension
-   * _imports_
-   * _imports_monaddefer_
-   *
-   * import kotlinx.coroutines.Dispatchers.Default
-   * import kotlinx.coroutines.async
-   * import kotlinx.coroutines.GlobalScope
-   *
-   * object Account
-   *
-   * //Some impure API or code
-   * class NetworkService {
-   *   fun getAccounts(
-   *     successCallback: (List<Account>) -> Unit,
-   *     failureCallback: (Throwable) -> Unit) {
-   *
-   *       GlobalScope.async(Default) {
-   *         println("Making API call")
-   *         kotlinx.coroutines.delay(500)
-   *         successCallback(listOf(Account))
-   *       }
-   *   }
-   *
-   *   fun cancel(): Unit = kotlinx.coroutines.runBlocking {
-   *     println("Canceled, closing NetworkApi")
-   *     kotlinx.coroutines.delay(500)
-   *     println("Closed NetworkApi")
-   *   }
-   * }
-   *
-   * fun main(args: Array<String>) {
-   *   //sampleStart
-   *   val getAccounts = Default._shift_().flatMap {
-   *     _extensionFactory_.cancelable<List<Account>> { cb ->
-   *       val service = NetworkService()
-   *       service.getAccounts(
-   *         successCallback = { accs -> cb(Right(accs)) },
-   *         failureCallback = { e -> cb(Left(e)) })
-   *
-   *       _delay_({ service.cancel() })
-   *     }
-   *   }
-   *
-   *   //sampleEnd
-   * }
-   * ```
-   * @see cancelableF for a version that can safely suspend impure callback registration code.
-   *     F.asyncF[A] { cb =>
-   */
-  fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<F>): Kind<F, A> =
-    cancelableF { cb -> delay { k(cb) } }
-
-  /**
-   * Creates a cancelable [F] instance that executes an asynchronous process on evaluation.
-   * Derived from [async] and [bracketCase] so does not require [F] to be cancelable.
-   *
-   * **NOTE**: Only for a cancelable type can [bracketCase] ever call `cancel` but that's of no concern for
-   * non-cancelable types as `cancel` never should be called.
-   *
-   * ```kotlin:ank:playground:extension
-   * _imports_
-   * _imports_monaddefer_
-   * import kotlinx.coroutines.async
-   *
-   * fun main(args: Array<String>) {
-   *   //sampleStart
-   *   val result = _extensionFactory_.cancelableF<String> { cb ->
-   *     delay {
-   *       val deferred = kotlinx.coroutines.GlobalScope.async {
-   *         kotlinx.coroutines.delay(1000)
-   *         cb(Right("Hello from ${Thread.currentThread().name}"))
-   *       }
-   *
-   *       delay({ deferred.cancel().let { Unit } })
-   *     }
-   *   }
-   *
-   *   println(result) //Run with `fix().unsafeRunSync()`
-   *
-   *   val result2 = _extensionFactory_.cancelableF<Unit> { cb ->
-   *     delay {
-   *       println("Doing something that can be cancelled.")
-   *       delay({ println("Cancelling the task") })
-   *     }
-   *   }
-   *
-   *   println(result2) //Run with `fix().unsafeRunAsyncCancellable { }.invoke()`
-   *   //sampleEnd
-   * }
-   * ```
-   *
-   * @see cancelable for a simpler non-suspending version.
-   */
-  fun <A> cancelableF(k: ((Either<Throwable, A>) -> Unit) -> Kind<F, CancelToken<F>>): Kind<F, A> =
-    asyncF { cb ->
-      val state = AtomicReference<(Either<Throwable, Unit>) -> Unit>(null)
-      val cb1 = { r: Either<Throwable, A> ->
-        try {
-          cb(r)
-        } finally {
-          if (!state.compareAndSet(null, mapUnit)) {
-            val cb2 = state.get()
-            state.lazySet(null)
-            cb2(rightUnit)
-          }
-        }
-      }
-
-      k(cb1).bracketCase(use = {
-        async<Unit> { cb ->
-          if (!state.compareAndSet(null, cb)) cb(rightUnit)
-        }
-      }, release = { token, exitCase ->
-        when (exitCase) {
-          is ExitCase.Canceled -> token
-          else -> just(Unit)
-        }
-      })
-    }
 
 }
 

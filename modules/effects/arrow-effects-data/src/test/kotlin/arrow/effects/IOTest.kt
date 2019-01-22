@@ -23,6 +23,7 @@ import org.junit.runner.RunWith
 import java.lang.RuntimeException
 
 @RunWith(KotlinTestRunner::class)
+@kotlinx.coroutines.ObsoleteCoroutinesApi
 class IOTest : UnitSpec() {
 
   init {
@@ -154,7 +155,6 @@ class IOTest : UnitSpec() {
         either.fold({ fail("") }, { IO { it shouldBe expected } })
       }
     }
-
 
     "should complete when running a return value with runAsync" {
       val expected = 0
@@ -388,7 +388,7 @@ class IOTest : UnitSpec() {
 
     "Cancelable should run CancelToken" {
       Promise.uncancelable<ForIO, Unit>(IO.async()).flatMap { p ->
-        IO.async().cancelable<Unit> {
+        IO.concurrent().cancelable<Unit> {
           p.complete(Unit)
         }.fix()
           .unsafeRunAsyncCancellable { }
@@ -400,7 +400,7 @@ class IOTest : UnitSpec() {
 
     "CancelableF should run CancelToken" {
       Promise.uncancelable<ForIO, Unit>(IO.async()).flatMap { p ->
-        IO.async().cancelableF<Unit> {
+        IO.concurrent().cancelableF<Unit> {
           IO { p.complete(Unit) }
         }.fix()
           .unsafeRunAsyncCancellable { }
