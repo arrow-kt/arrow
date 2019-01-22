@@ -7,11 +7,16 @@ import arrow.core.Right
 import arrow.effects.typeclasses.Async
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.coroutines.startCoroutine
 
 interface AsyncSyntax<F> : MonadDeferSyntax<F>, Async<F> {
 
   override fun <A> f(fa: suspend () -> A): Kind<F, A> =
-    super.async { cb -> AsyncContinuation(cb) }
+    super.async { cb ->
+      AsyncContinuation(cb).apply {
+        fa.startCoroutine(this)
+      }
+    }
 
   private suspend fun <A> asyncOp(fb: Async<F>.() -> Kind<F, A>): A =
     run<Async<F>, Kind<F, A>> { fb(this) }.bind()

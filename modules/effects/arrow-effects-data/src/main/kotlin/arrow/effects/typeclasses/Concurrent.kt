@@ -714,12 +714,6 @@ interface Concurrent<F> : Async<F> {
   override fun <B> binding(c: suspend MonadContinuation<F, *>.() -> B): Kind<F, B> =
     bindingCancellable { c() }.a
 
-  operator fun <B> fx.invoke(c: suspend ConcurrentCancellableContinuation<F, *>.() -> B): Kind<F, B> {
-    val continuation = ConcurrentCancellableContinuation<F, B>(this@Concurrent)
-    val wrapReturn: suspend ConcurrentCancellableContinuation<F, *>.() -> Kind<F, B> = { just(c()) }
-    wrapReturn.startCoroutine(continuation, continuation)
-    return continuation.returnedMonad()
-  }
 
 }
 
