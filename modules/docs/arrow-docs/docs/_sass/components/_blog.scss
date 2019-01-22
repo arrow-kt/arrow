@@ -5,27 +5,24 @@
     padding: ($base-point-grid * 4) 0;
     background: rgba($brand-tertiary, 0.10);
     .blog-list {
-
-        column-count: 3;
-        column-gap: map-get($base-grid, gutter);
-        margin: 0 map-get($base-grid, gutter);
-
-        @include bp(large) {
-            column-count: 2;
-            column-gap: map-get($base-grid, gutter);
-        }
-
-        @include bp(medium) {
-            column-count: 1;
-            column-gap: map-get($base-grid, gutter);
-        }
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        margin: 0 (map-get($base-grid, gutter)/2);
 
         .blog-item {
-            margin-bottom: ($base-point-grid * 4);
-            background-color: #eee;
-            display: inline-block;
-            margin: 0 0 map-get($base-grid, gutter);
-            width: 100%;
+
+            flex: 0.5 1 33%;
+            margin-bottom: $base-point-grid * 4;
+            padding: 0 (map-get($base-grid, gutter)/2);
+
+            @include bp(large) {
+                flex: 1 1 50%;
+            }
+
+            @include bp(medium) {
+                flex: 1 1 100%;
+            }
 
             .blog-item-header {
                 position: relative;
@@ -42,13 +39,24 @@
                     bottom: ($base-point-grid * 2);
                     color: $white;
                     font-size: 0.875rem;
+                    text-shadow: 0 0 2px rgba(0,0,0,0.7);
                 }
                 .header-container {
+                  background: #3860c3;
                   display: block;
-                }
 
-                img {
+                  img {
+                    vertical-align: top;
+                    height: 180px;
+                    object-fit: cover;
+                    object-position: center;
+                    opacity: 0.8;
+                    transition: opacity 0.2s ease-out;
                     width: 100%;
+                    &:hover {
+                      opacity: 0.1;
+                    }
+                  }
                 }
             }
             .blog-item-content {
