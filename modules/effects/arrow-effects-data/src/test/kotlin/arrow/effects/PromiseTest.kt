@@ -1,6 +1,9 @@
 package arrow.effects
 
-import arrow.core.*
+import arrow.core.Left
+import arrow.core.None
+import arrow.core.Some
+import arrow.core.Tuple2
 import arrow.effects.extensions.io.applicative.product
 import arrow.effects.extensions.io.applicativeError.attempt
 import arrow.effects.extensions.io.async.async
@@ -11,12 +14,11 @@ import arrow.effects.extensions.io.monadDefer.monadDefer
 import arrow.test.UnitSpec
 import arrow.test.generators.genThrowable
 import io.kotlintest.matchers.shouldBe
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import kotlinx.coroutines.Dispatchers
 import org.junit.runner.RunWith
-import java.lang.RuntimeException
 import kotlin.coroutines.CoroutineContext
 
 @RunWith(KotlinTestRunner::class)

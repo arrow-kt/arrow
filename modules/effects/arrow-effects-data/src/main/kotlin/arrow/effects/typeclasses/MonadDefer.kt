@@ -7,6 +7,7 @@ import arrow.core.toT
 import arrow.effects.data.internal.BindingCancellationException
 import arrow.typeclasses.MonadContinuation
 import arrow.typeclasses.MonadError
+import arrow.typeclasses.MonadErrorContinuation
 import arrow.typeclasses.MonadThrow
 import kotlin.coroutines.startCoroutine
 
@@ -67,5 +68,22 @@ interface MonadDefer<F> : MonadThrow<F>, Bracket<F, Throwable> {
   override fun <B> binding(c: suspend MonadContinuation<F, *>.() -> B): Kind<F, B> =
     bindingCancellable { c() }.a
 
-}
+  fun <A> fx(
+    f: suspend MonadDeferCancellableContinuation<F, *>.() -> A,
+    unit: Unit = Unit,
+    unit1: Unit = Unit
+  ): Kind<F, A> =
+    fxCancelable(f).a
 
+  fun <A> fxCancelable(f: suspend MonadDeferCancellableContinuation<F, *>.() -> A, unit: Unit = Unit): Tuple2<Kind<F, A>, Disposable> =
+    bindingCancellable { f() }
+
+  override fun <B> bindingCatch(c: suspend MonadErrorContinuation<F, *>.() -> B): Kind<F, B> =
+    bindingCancellable { c() }.a
+
+  override fun <A> fx(f: suspend MonadContinuation<F, *>.() -> A): Kind<F, A> =
+    fxCancelable(f).a
+
+  override fun <A> fx(f: suspend MonadErrorContinuation<F, *>.() -> A, unit: Unit): Kind<F, A> =
+    fxCancelable(f).a
+}

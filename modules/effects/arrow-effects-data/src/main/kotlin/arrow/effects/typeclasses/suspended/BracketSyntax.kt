@@ -3,6 +3,7 @@ package arrow.effects.typeclasses.suspended
 import arrow.Kind
 import arrow.effects.typeclasses.Bracket
 import arrow.effects.typeclasses.ExitCase
+import arrow.typeclasses.suspended.MonadErrorSyntax
 
 interface BracketSyntax<F, E> :
   MonadErrorSyntax<F, E>,

@@ -1,7 +1,7 @@
 package arrow.effects
 
 import arrow.effects.coroutines.*
-import arrow.effects.coroutines.extensions.deferredk.monad.F
+import arrow.effects.coroutines.extensions.deferredk.monad.fx
 import arrow.effects.typeclasses.Fiber
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
@@ -26,7 +26,7 @@ fun DeferredK.Companion.sleep(milis: Long, scope: CoroutineScope = GlobalScope):
 fun <A, B, C> parMap(first: DeferredK<A>,
                      second: DeferredK<B>,
                      f: (A, B) -> C): DeferredK<C> =
-  F {
+  fx {
     val (fiberOne) = first.startF(IO)
     val (fiberTwo) = second.startF(IO)
 

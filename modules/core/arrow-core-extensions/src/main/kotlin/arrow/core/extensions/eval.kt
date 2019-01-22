@@ -1,8 +1,11 @@
 package arrow.core.extensions
 
 import arrow.core.*
+import arrow.core.extensions.either.monad.monad
+import arrow.core.extensions.eval.monad.monad
 import arrow.extension
 import arrow.typeclasses.*
+import arrow.typeclasses.suspended.monad.Fx
 
 @extension
 interface EvalFunctor : Functor<ForEval> {
@@ -74,4 +77,9 @@ interface EvalBimonad : Bimonad<ForEval> {
 
   override fun <A> EvalOf<A>.extract(): A =
     fix().extract()
+}
+
+@extension
+interface EvalFx<A> : Fx<ForEval> {
+  override fun monad(): Monad<ForEval> = Eval.monad()
 }

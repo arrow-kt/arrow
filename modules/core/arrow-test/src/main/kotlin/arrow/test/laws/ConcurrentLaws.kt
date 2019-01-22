@@ -74,7 +74,7 @@ object ConcurrentLaws {
 
   fun <F> Concurrent<F>.cancelOnBracketReleases(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) {
     forAll(Gen.int()) { i ->
-      binding {
+      fx {
         val startLatch = Promise<F, Int>(this@cancelOnBracketReleases).bind() // A promise that `use` was executed
         val exitLatch = Promise<F, Int>(this@cancelOnBracketReleases).bind() // A promise that `release` was executed
 
@@ -99,7 +99,7 @@ object ConcurrentLaws {
 
   fun <F> Concurrent<F>.acquireBracketIsNotCancelable(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
     forAll(Gen.int(), Gen.int()) { a, b ->
-      binding {
+      fx {
         val mvar = MVar(a, this@acquireBracketIsNotCancelable).bind()
         val p = Promise.uncancelable<F, Unit>(this@acquireBracketIsNotCancelable).bind()
         val task = p.complete(Unit).flatMap { mvar.put(b) }
@@ -115,7 +115,7 @@ object ConcurrentLaws {
 
   fun <F> Concurrent<F>.releaseBracketIsNotCancelable(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
     forAll(Gen.int(), Gen.int()) { a, b ->
-      binding {
+      fx {
         val mvar = MVar(a, this@releaseBracketIsNotCancelable).bind()
         val p = Promise.uncancelable<F, Unit>(this@releaseBracketIsNotCancelable).bind()
         val task = p.complete(Unit)
@@ -143,7 +143,7 @@ object ConcurrentLaws {
 
   fun <F> Concurrent<F>.cancelableReceivesCancelSignal(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
     forAll(Gen.int()) { i ->
-      binding {
+      fx {
         val release = Promise.uncancelable<F, Int>(this@cancelableReceivesCancelSignal).bind()
         val cancelToken: CancelToken<F> = release.complete(i)
         val latch = CountDownLatch(1)
@@ -165,7 +165,7 @@ object ConcurrentLaws {
 
   fun <F> Concurrent<F>.cancelableFReceivesCancelSignal(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
     forAll(Gen.int()) { i ->
-      binding {
+      fx {
         val release = Promise<F, Int>(this@cancelableFReceivesCancelSignal).bind()
         val latch = Promise<F, Unit>(this@cancelableFReceivesCancelSignal).bind()
         val async = cancelableF<Unit> {
@@ -182,7 +182,7 @@ object ConcurrentLaws {
 
   fun <F> Concurrent<F>.asyncCanCancelUpstream(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
     forAll(Gen.int()) { i ->
-      binding {
+      fx {
         val latch = Promise<F, Int>(this@asyncCanCancelUpstream).bind()
         val cancelToken = AtomicReference<CancelToken<F>>()
         val cancelLatch = CountDownLatch(1)
@@ -210,7 +210,7 @@ object ConcurrentLaws {
 
   fun <F> Concurrent<F>.asyncShouldRunKindConnectionOnCancel(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
     forAll(Gen.int()) { i ->
-      binding {
+      fx {
         val latch = Promise<F, Int>(this@asyncShouldRunKindConnectionOnCancel).bind()
         val startLatch = CountDownLatch(1)
 
@@ -229,7 +229,7 @@ object ConcurrentLaws {
 
   fun <F> Concurrent<F>.asyncFRegisterCanBeCancelled(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
     forAll(Gen.int()) { i ->
-      binding {
+      fx {
         val release = Promise<F, Int>(this@asyncFRegisterCanBeCancelled).bind()
         val acquire = Promise<F, Unit>(this@asyncFRegisterCanBeCancelled).bind()
         val task = asyncF<Unit> { _, _ ->
@@ -244,7 +244,7 @@ object ConcurrentLaws {
 
   fun <F> Concurrent<F>.asyncFCanCancelUpstream(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
     forAll(Gen.int()) { i ->
-      binding {
+      fx {
         val latch = Promise<F, Int>(this@asyncFCanCancelUpstream).bind()
         val upstream = async<Unit> { conn, cb ->
           conn.push(latch.complete(i))
@@ -262,7 +262,7 @@ object ConcurrentLaws {
 
   fun <F> Concurrent<F>.asyncFShouldRunKindConnectionOnCancel(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
     forAll(Gen.int()) { i ->
-      binding {
+      fx {
         val latch = Promise<F, Int>(this@asyncFShouldRunKindConnectionOnCancel).bind()
         val startLatch = Promise<F, Unit>(this@asyncFShouldRunKindConnectionOnCancel).bind()
 
@@ -319,7 +319,7 @@ object ConcurrentLaws {
 
   fun <F> Concurrent<F>.raceCancelsLoser(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
     forAll(genEither(genThrowable(), Gen.string()), Gen.bool(), Gen.int()) { eith, leftWins, i ->
-      binding {
+      fx {
         val s = Semaphore(0L, this@raceCancelsLoser).bind()
         val promise = Promise.uncancelable<F, Int>(this@raceCancelsLoser).bind()
         val winner = s.acquire().flatMap { async<String> { cb -> cb(eith) } }
@@ -334,7 +334,7 @@ object ConcurrentLaws {
 
   fun <F> Concurrent<F>.raceCancelCancelsBoth(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
     forAll(Gen.int(), Gen.int()) { a, b ->
-      binding {
+      fx {
         val s = Semaphore(0L, this@raceCancelCancelsBoth).bind()
         val pa = Promise<F, Int>(this@raceCancelCancelsBoth).bind()
         val pb = Promise<F, Int>(this@raceCancelCancelsBoth).bind()
@@ -350,7 +350,7 @@ object ConcurrentLaws {
 
   fun <F> Concurrent<F>.raceCanBeCancelledByParticipants(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
     forAll(Gen.int(), Gen.bool()) { i, shouldLeftCancel ->
-      binding {
+      fx {
         val endLatch = Promise<F, Int>(this@raceCanBeCancelledByParticipants).bind()
         val startLatch = Promise<F, Unit>(this@raceCanBeCancelledByParticipants).bind()
 
@@ -391,7 +391,7 @@ object ConcurrentLaws {
 
   fun <F> Concurrent<F>.racePairCanCancelsLoser(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
     forAll(genEither(genThrowable(), Gen.string()), Gen.bool(), Gen.int()) { eith, leftWinner, i ->
-      val received = binding {
+      val received = fx {
         val s = Semaphore(0L, this@racePairCanCancelsLoser).bind()
         val p = Promise.uncancelable<F, Int>(this@racePairCanCancelsLoser).bind()
         val winner = s.acquire().flatMap { async<String> { cb -> cb(eith) } }
@@ -439,7 +439,7 @@ object ConcurrentLaws {
 
   fun <F> Concurrent<F>.racePairCancelCancelsBoth(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
     forAll(Gen.int(), Gen.int()) { a, b ->
-      binding {
+      fx {
         val s = Semaphore(0L, this@racePairCancelCancelsBoth).bind()
         val pa = Promise<F, Int>(this@racePairCancelCancelsBoth).bind()
         val pb = Promise<F, Int>(this@racePairCancelCancelsBoth).bind()
@@ -456,7 +456,7 @@ object ConcurrentLaws {
 
   fun <F> Concurrent<F>.racePairCanBeCancelledByParticipants(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
     forAll(Gen.int(), Gen.bool()) { i, shouldLeftCancel ->
-      binding {
+      fx {
         val endLatch = Promise<F, Int>(this@racePairCanBeCancelledByParticipants).bind()
         val startLatch = Promise<F, Unit>(this@racePairCanBeCancelledByParticipants).bind()
 
@@ -513,7 +513,7 @@ object ConcurrentLaws {
 
   fun <F> Concurrent<F>.raceTripleCanCancelsLoser(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
     forAll(genEither(genThrowable(), Gen.string()), Gen.from(listOf(1, 2, 3)), Gen.int(), Gen.int()) { eith, leftWinner, a, b ->
-      val received = binding {
+      val received = fx {
         val s = Semaphore(0L, this@raceTripleCanCancelsLoser).bind()
         val pa = Promise.uncancelable<F, Int>(this@raceTripleCanCancelsLoser).bind()
         val pb = Promise.uncancelable<F, Int>(this@raceTripleCanCancelsLoser).bind()
@@ -586,7 +586,7 @@ object ConcurrentLaws {
 
   fun <F> Concurrent<F>.raceTripleCanBeCancelledByParticipants(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
     forAll(Gen.int(), Gen.from(listOf(1, 2, 3))) { i, shouldCancel ->
-      binding {
+      fx {
         val endLatch = Promise<F, Int>(this@raceTripleCanBeCancelledByParticipants).bind()
         val startLatch = Promise<F, Unit>(this@raceTripleCanBeCancelledByParticipants).bind()
         val start2Latch = Promise<F, Unit>(this@raceTripleCanBeCancelledByParticipants).bind()
@@ -613,7 +613,7 @@ object ConcurrentLaws {
 
   fun <F> Concurrent<F>.raceTripleCancelCancelsAll(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
     forAll(Gen.int(), Gen.int(), Gen.int()) { a, b, c ->
-      binding {
+      fx {
         val s = Semaphore(0L, this@raceTripleCancelCancelsAll).bind()
         val pa = Promise<F, Int>(this@raceTripleCancelCancelsAll).bind()
         val pb = Promise<F, Int>(this@raceTripleCancelCancelsAll).bind()
@@ -632,7 +632,7 @@ object ConcurrentLaws {
 
   fun <F> Concurrent<F>.parMapCancelCancelsBoth(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
     forAll(Gen.int(), Gen.int()) { a, b ->
-      binding {
+      fx {
         val s = Semaphore(0L, this@parMapCancelCancelsBoth).bind()
         val pa = Promise<F, Int>(this@parMapCancelCancelsBoth).bind()
         val pb = Promise<F, Int>(this@parMapCancelCancelsBoth).bind()
@@ -648,7 +648,7 @@ object ConcurrentLaws {
 
   fun <F> Concurrent<F>.parMapCanBeCancelledByParticipants(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
     forAll(Gen.int(), Gen.bool()) { i, shouldLeftCancel ->
-      binding {
+      fx {
         val endLatch = Promise<F, Int>(this@parMapCanBeCancelledByParticipants).bind()
         val startLatch = Promise<F, Unit>(this@parMapCanBeCancelledByParticipants).bind()
 

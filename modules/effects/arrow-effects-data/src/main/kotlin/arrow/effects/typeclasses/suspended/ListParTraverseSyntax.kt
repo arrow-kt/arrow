@@ -1,6 +1,7 @@
 package arrow.effects.typeclasses.suspended
 
 import arrow.effects.typeclasses.Fiber
+import arrow.typeclasses.suspended.MonadSyntax
 import kotlin.coroutines.CoroutineContext
 
 interface ListParTraverseSyntax<F> : MonadSyntax<F> {

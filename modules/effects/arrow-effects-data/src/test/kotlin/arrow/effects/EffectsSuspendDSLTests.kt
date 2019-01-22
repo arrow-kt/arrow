@@ -1,7 +1,7 @@
 package arrow.effects
 
 import arrow.core.*
-import arrow.effects.extensions.io.concurrent.invoke
+import arrow.effects.extensions.io.fx.fx
 import arrow.effects.extensions.io.unsafeRun.runBlocking
 import arrow.test.UnitSpec
 import io.kotlintest.runner.junit4.KotlinTestRunner
@@ -28,7 +28,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
       /**
        * A pure expression is defined in the environment
        */
-      fun helloWorld(): String =
+      val helloWorld: String =
         "Hello World"
 
       /**
@@ -37,7 +37,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
        * effectful continuation in scope
        */
       suspend fun printHello(): Unit =
-        println(helloWorld())
+        println(helloWorld)
 
       /**
        * An `fx` block encapsulates the composition of an effectful program
@@ -49,9 +49,9 @@ class EffectsSuspendDSLTests : UnitSpec() {
        */
       val program: IO<String> = fx {
         effect { printHello() }
-        helloWorld()
+        helloWorld
       }
-      unsafe { runBlocking { program } } shouldBe helloWorld()
+      unsafe { runBlocking { program } } shouldBe helloWorld
     }
 
     "Direct syntax for concurrent operations" {

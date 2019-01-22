@@ -1,4 +1,4 @@
-package arrow.effects.typeclasses.suspended
+package arrow.typeclasses.suspended
 
 import arrow.Kind
 import arrow.core.Either

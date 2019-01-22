@@ -63,7 +63,7 @@ object FpToTheMax {
 
     fun parseInt(s: String): Option<Int> = Try { s.toInt() }.toOption()
 
-    fun <F> MonadAndConsoleRandom<F>.checkContinue(name: String): Kind<F, Boolean> = F {
+    fun <F> MonadAndConsoleRandom<F>.checkContinue(name: String): Kind<F, Boolean> = fx {
         val (_) = putStrLn("Do you want to continue, $name?")
         val (input) = getStrLn().map { it.toLowerCase() }
         when (input) {
@@ -73,7 +73,7 @@ object FpToTheMax {
         }.bind()
     }
 
-    fun <F> MonadAndConsoleRandom<F>.gameLoop(name: String): Kind<F, Unit> = F {
+    fun <F> MonadAndConsoleRandom<F>.gameLoop(name: String): Kind<F, Unit> = fx {
         val (num) = nextInt(5).map { it + 1 }
         putStrLn("Dear $name, please guess a number from 1 to 5:").bind()
         val (input) = getStrLn()
@@ -85,7 +85,7 @@ object FpToTheMax {
         (if (cont) gameLoop(name) else just(Unit)).bind()
     }
 
-    fun <F> MonadAndConsoleRandom<F>.fMain(): Kind<F, Unit> = F {
+    fun <F> MonadAndConsoleRandom<F>.fMain(): Kind<F, Unit> = fx {
         putStrLn("What is your name?").bind()
         val (name) = getStrLn()
         putStrLn("Hello $name, welcome to the game").bind()

@@ -4,7 +4,7 @@ import arrow.effects.reactor.*
 import arrow.effects.reactor.extensions.fluxk.async.async
 import arrow.effects.reactor.extensions.fluxk.foldable.foldable
 import arrow.effects.reactor.extensions.fluxk.functor.functor
-import arrow.effects.reactor.extensions.fluxk.monad.F
+import arrow.effects.reactor.extensions.fluxk.monad.fx
 import arrow.effects.reactor.extensions.fluxk.monad.flatMap
 import arrow.effects.reactor.extensions.fluxk.monadThrow.bindingCatch
 import arrow.effects.reactor.extensions.fluxk.traverse.traverse
@@ -102,7 +102,7 @@ class FluxKTest : UnitSpec() {
     }
 
     "Flux cancellation forces binding to cancel without completing too" {
-      val value: Flux<Long> = F {
+      val value: Flux<Long> = fx {
         val a = Flux.just(0L).delayElements(Duration.ofSeconds(3)).k().bind()
         a
       }.value()

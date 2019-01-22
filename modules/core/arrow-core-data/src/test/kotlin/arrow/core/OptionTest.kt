@@ -6,7 +6,6 @@ import arrow.core.extensions.monoid
 import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.option.eq.eq
 import arrow.core.extensions.option.hash.hash
-import arrow.core.extensions.option.monad.F
 import arrow.core.extensions.option.monoid.monoid
 import arrow.core.extensions.option.show.show
 import arrow.mtl.extensions.option.monadFilter.monadFilter

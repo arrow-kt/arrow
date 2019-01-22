@@ -3,6 +3,7 @@ package arrow.effects.typeclasses
 import arrow.Kind
 import arrow.core.Either
 import arrow.effects.data.internal.BindingCancellationException
+import arrow.effects.typeclasses.suspended.MonadDeferSyntax
 import arrow.typeclasses.MonadContinuation
 import arrow.typeclasses.MonadErrorContinuation
 import arrow.typeclasses.stateStack
@@ -19,14 +20,14 @@ typealias Disposable = () -> Unit
 @RestrictsSuspension
 @Suppress("DELEGATED_MEMBER_HIDES_SUPERTYPE_OVERRIDE")
 open class MonadDeferCancellableContinuation<F, A>(val SC: MonadDefer<F>, override val context: CoroutineContext = EmptyCoroutineContext) :
-  MonadErrorContinuation<F, A>(SC), MonadDefer<F> by SC {
+  MonadErrorContinuation<F, A>(SC), MonadDefer<F> by SC, MonadDeferSyntax<F> {
 
   protected val cancelled: AtomicBoolean = AtomicBoolean(false)
 
   fun disposable(): Disposable = { cancelled.set(true) }
 
   override fun <B> binding(c: suspend MonadContinuation<F, *>.() -> B): Kind<F, B> =
-    SC.binding(c)
+    fx(c)
 
   override fun returnedMonad(): Kind<F, A> = returnedMonad
 
@@ -80,4 +81,11 @@ open class MonadDeferCancellableContinuation<F, A>(val SC: MonadDefer<F>, overri
     }
     COROUTINE_SUSPENDED
   }
+
+  override fun <A> fx(f: suspend MonadContinuation<F, *>.() -> A): Kind<F, A> =
+    super<MonadDeferSyntax>.fx(f)
+
+  override fun <A> f(fa: suspend () -> A): Kind<F, A> =
+    super<MonadDeferSyntax>.f(fa)
+
 }

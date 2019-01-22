@@ -5,10 +5,12 @@ import arrow.data.*
 
 import arrow.extension
 import arrow.core.extensions.id.monad.monad
+import arrow.data.extensions.sequencek.monad.monad
 import arrow.data.extensions.statet.applicative.applicative
 import arrow.data.extensions.statet.functor.functor
 import arrow.data.extensions.statet.monad.monad
 import arrow.typeclasses.*
+import arrow.typeclasses.suspended.monad.Fx
 import arrow.undocumented
 
 @extension
@@ -131,3 +133,23 @@ fun <S> StateApi.functor(): Functor<StateTPartialOf<ForId, S>> = StateT.functor(
  * Alias for [StateT.Companion.monad]
  */
 fun <S> StateApi.monad(): Monad<StateTPartialOf<ForId, S>> = StateT.monad(Id.monad())
+
+@extension
+@undocumented
+interface StateTFx<F, S> : Fx<StateTPartialOf<F, S>> {
+
+  fun M() : Monad<F>
+
+  override fun monad(): Monad<StateTPartialOf<F, S>> =
+    StateT.monad(M())
+
+}
+
+@extension
+@undocumented
+interface StateFx<S> : StateTFx<ForId, S> {
+
+  override fun M(): Monad<ForId> =
+    Id.monad()
+
+}
