@@ -19,8 +19,8 @@
                    <div class="version">{{ post.version }}</div>
                    {% endif %}
 
-                    {% if post.video %}
-                    <a href="{{ post.video }}" class="header-container">
+                    {% if post.link %}
+                    <a href="{{ post.link }}" target="_blank" rel="noopener noreferrer" class="header-container">
                         <img src="{{ post.header-image }}" alt="">
                     </a>
                     {% else %}
