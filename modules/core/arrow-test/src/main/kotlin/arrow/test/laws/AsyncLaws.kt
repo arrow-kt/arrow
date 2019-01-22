@@ -7,9 +7,7 @@ import arrow.core.Right
 import arrow.effects.Promise
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.ExitCase
-import arrow.test.generators.genEither
-import arrow.test.generators.genIntSmall
-import arrow.test.generators.genThrowable
+import arrow.test.generators.*
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -30,9 +28,7 @@ object AsyncLaws {
       Law("Async Laws: async constructor") { AC.asyncConstructor(EQ) },
       Law("Async Laws: async can be derived from asyncF") { AC.asyncCanBeDerivedFromAsyncF(EQ) },
       Law("Async Laws: bracket release is called on completed or error") { AC.bracketReleaseIscalledOnCompletedOrError(EQ) },
-      Law("Async Laws: continueOn on comprehensions") { AC.continueOnComprehension(EQ) },
-      Law("Async Laws: async cancelable coherence") { AC.asyncCancelableCoherence(EQ) },
-      Law("Async Laws: cancelable cancelableF coherence") { AC.cancelableCancelableFCoherence(EQ) }
+      Law("Async Laws: continueOn on comprehensions") { AC.continueOnComprehension(EQ) }
     )
 
   fun <F> Async<F>.asyncSuccess(EQ: Eq<Kind<F, Int>>): Unit =
@@ -84,34 +80,21 @@ object AsyncLaws {
     }
 
   fun <F> Async<F>.bracketReleaseIscalledOnCompletedOrError(EQ: Eq<Kind<F, Int>>): Unit {
-    val async = this
-    forAll(Gen.string().map(::just), Gen.int()) { fa, b ->
-      Promise.uncancelable<F, Int>(async).flatMap { promise ->
+    forAll(genApplicativeError(Gen.string(), this), Gen.int()) { fa, b ->
+      Promise.uncancelable<F, Int>(this@bracketReleaseIscalledOnCompletedOrError).flatMap { promise ->
         val br = delay { promise }.bracketCase(use = { fa }, release = { r, exitCase ->
           when (exitCase) {
             is ExitCase.Completed -> r.complete(b)
-            is ExitCase.Error     -> r.complete(b)
-            else                  -> just<Unit>(Unit)
+            is ExitCase.Error -> r.complete(b)
+            else -> just<Unit>(Unit)
           }
         })
-        asyncF<Unit> { cb ->
-          br.flatMap { delay { cb(Right(Unit)) } }
-        }.flatMap { promise.get() }
+
+        asyncF<Unit> { cb -> delay { cb(Right(Unit)) }.flatMap { br.attempt().`as`(Unit) } }
+          .flatMap { promise.get() }
       }.equalUnderTheLaw(just(b), EQ)
     }
   }
-
-  fun <F> Async<F>.asyncCancelableCoherence(EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(genEither(genThrowable(), Gen.int())) { eith ->
-      async<Int> { cb -> cb(eith) }
-        .equalUnderTheLaw(cancelable { cb -> cb(eith); just<Unit>(Unit) }, EQ)
-    }
-
-  fun <F> Async<F>.cancelableCancelableFCoherence(EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(genEither(genThrowable(), Gen.int())) { eith ->
-      cancelable<Int> { cb -> cb(eith); just<Unit>(Unit) }
-        .equalUnderTheLaw(cancelableF { cb -> delay { cb(eith); just<Unit>(Unit) } }, EQ)
-    }
 
   // Turns out that kotlinx.coroutines decides to rewrite thread names
   private fun getCurrentThread() =

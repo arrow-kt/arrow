@@ -240,7 +240,7 @@ private fun <F> ApplicativeError<F, Throwable>.assertNonNegative(n: Long): Kind<
 
 internal class DefaultSemaphore<F>(private val state: Ref<F, State<F>>,
                                    private val promise: Kind<F, Promise<F, Unit>>,
-                                   AS: Async<F>) : Semaphore<F>, Async<F> by AS {
+                                   private val AS: Async<F>) : Semaphore<F>, Async<F> by AS {
 
   override fun available(): Kind<F, Long> =
     state.get().map { state ->
@@ -327,5 +327,13 @@ internal class DefaultSemaphore<F>(private val state: Ref<F, State<F>>,
 
   override fun <A> withPermit(t: Kind<F, A>): Kind<F, A> =
     acquire().bracket({ release() }, { t })
+
+  override fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B> = AS.run {
+    this@ap.ap(ff)
+  }
+
+  override fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B> = AS.run {
+    this@map.map(f)
+  }
 
 }

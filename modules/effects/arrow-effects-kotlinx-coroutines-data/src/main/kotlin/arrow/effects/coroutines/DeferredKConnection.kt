@@ -21,6 +21,7 @@ typealias DeferredKProcF<A> = (DeferredKConnection, (Either<Throwable, A>) -> Un
  *
  * @see DeferredK.async
  */
+@Suppress("UNUSED_PARAMETER", "FunctionName")
 fun DeferredKConnection(dummy: Unit = Unit): KindConnection<ForDeferredK> = KindConnection(object : MonadDefer<ForDeferredK> {
   override fun <A> defer(fa: () -> DeferredKOf<A>): DeferredK<A> =
     DeferredK.defer(fa = fa)

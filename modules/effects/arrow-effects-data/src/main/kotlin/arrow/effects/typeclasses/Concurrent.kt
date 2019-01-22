@@ -2,7 +2,9 @@ package arrow.effects.typeclasses
 
 import arrow.Kind
 import arrow.core.*
+import arrow.effects.CancelToken
 import arrow.effects.KindConnection
+import java.util.concurrent.atomic.AtomicReference
 import arrow.effects.data.internal.BindingCancellationException
 import arrow.effects.fx
 import arrow.typeclasses.MonadContinuation
@@ -22,16 +24,112 @@ typealias ConnectedProc<F, A> = (KindConnection<F>, ((Either<Throwable, A>) -> U
  */
 interface Concurrent<F> : Async<F> {
 
+  /**
+   * Creates a cancelable instance of [F] that executes an asynchronous process on evaluation.
+   * This combinator can be used to wrap callbacks or other similar impure code that requires cancellation code.
+   *
+   * ```kotlin:ank:playground:extension
+   * _imports_
+   * import java.lang.RuntimeException
+   *
+   * typealias Callback = (List<String>?, Throwable?) -> Unit
+   *
+   * class Id
+   * object GithubService {
+   *   private val listeners: MutableMap<Id, Callback> = mutableMapOf()
+   *   fun getUsernames(callback: (List<String>?, Throwable?) -> Unit): Id {
+   *     val id = Id()
+   *     listeners[id] = callback
+   *     //execute operation and call callback at some point in future
+   *     return id
+   *   }
+   *
+   *   fun unregisterCallback(id: Id): Unit {
+   *     listeners.remove(id)
+   *   }
+   * }
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   fun <F> Concurrent<F>.getUsernames(): Kind<F, List<String>> =
+   *     async { conn: KindConnection<F>, cb: (Either<Throwable, List<String>>) -> Unit ->
+   *       val id = GithubService.getUsernames { names, throwable ->
+   *         when {
+   *           names != null -> cb(Right(names))
+   *           throwable != null -> cb(Left(throwable))
+   *           else -> cb(Left(RuntimeException("Null result and no exception")))
+   *         }
+   *       }
+   *
+   *       conn.push(_delay_({ GithubService.unregisterCallback(id) }))
+   *       conn.push(_delay_({ println("Everything we push to the cancellation stack will execute on cancellation") }))
+   *     }
+   *
+   *   val result = _extensionFactory_.getUsernames()
+   *   //sampleEnd
+   *   println(result)
+   * }
+   * ```
+   *
+   * @param fa an asynchronous computation that might fail typed as [ConnectedProc].
+   * @see asyncF for a version that can suspend side effects in the registration function.
+   */
   fun <A> async(fa: ConnectedProc<F, A>): Kind<F, A> =
     asyncF { conn, cb -> delay { fa(conn, cb) } }
 
-  fun <A> asyncF(k: ConnectedProcF<F, A>): Kind<F, A>
-
-  override fun <A> asyncF(k: ProcF<F, A>): Kind<F, A> =
-    asyncF { _, cb -> k(cb) }
-
-  override fun <A> async(fa: Proc<A>): Kind<F, A> =
-    async { _, cb -> fa(cb) }
+  /**
+   * Creates a cancelable instance of [F] that executes an asynchronous process on evaluation.
+   * This combinator can be used to wrap callbacks or other similar impure code that requires cancellation code.
+   *
+   * ```kotlin:ank:playground:extension
+   * _imports_
+   * import java.lang.RuntimeException
+   *
+   * typealias Callback = (List<String>?, Throwable?) -> Unit
+   *
+   * class Id
+   * object GithubService {
+   *   private val listeners: MutableMap<Id, Callback> = mutableMapOf()
+   *   fun getUsernames(callback: (List<String>?, Throwable?) -> Unit): Id {
+   *     val id = Id()
+   *     listeners[id] = callback
+   *     //execute operation and call callback at some point in future
+   *     return id
+   *   }
+   *
+   *   fun unregisterCallback(id: Id): Unit {
+   *     listeners.remove(id)
+   *   }
+   * }
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   fun <F> Concurrent<F>.getUsernames(): Kind<F, List<String>> =
+   *     asyncF { conn: KindConnection<F>, cb: (Either<Throwable, List<String>>) -> Unit ->
+   *       delay {
+   *         val id = GithubService.getUsernames { names, throwable ->
+   *           when {
+   *             names != null -> cb(Right(names))
+   *             throwable != null -> cb(Left(throwable))
+   *             else -> cb(Left(RuntimeException("Null result and no exception")))
+   *           }
+   *         }
+   *
+   *         conn.push(_delay_({ GithubService.unregisterCallback(id) }))
+   *         conn.push(_delay_({ println("Everything we push to the cancellation stack will execute on cancellation") }))
+   *       }
+   *     }
+   *
+   *   val result = _extensionFactory_.getUsernames()
+   *   //sampleEnd
+   *   println(result)
+   * }
+   * ```
+   *
+   * @param fa a deferred asynchronous computation that might fail typed as [ConnectedProcF].
+   * @see async for a version that can suspend side effects in the registration function.
+   */
+  fun <A> asyncF(fa: ConnectedProcF<F, A>): Kind<F, A>
 
   /**
    * Create a new [F] that upon execution starts the receiver [F] within a [Fiber] on [ctx].
@@ -133,6 +231,126 @@ interface Concurrent<F> : Async<F> {
    * @see [arrow.effects.typeclasses.Concurrent.raceN] for a simpler version that cancels losers.
    */
   fun <A, B, C> raceTriple(ctx: CoroutineContext, fa: Kind<F, A>, fb: Kind<F, B>, fc: Kind<F, C>): Kind<F, RaceTriple<F, A, B, C>>
+
+  /**
+   * Creates a cancelable [F] instance that executes an asynchronous process on evaluation.
+   * Derived from [async] and [bracketCase].
+   *
+   * ```kotlin:ank:playground:extension
+   * _imports_
+   * _imports_monaddefer_
+   *
+   * import kotlinx.coroutines.Dispatchers.Default
+   * import kotlinx.coroutines.async
+   * import kotlinx.coroutines.GlobalScope
+   *
+   * object Account
+   *
+   * //Some impure API or code
+   * class NetworkService {
+   *   fun getAccounts(
+   *     successCallback: (List<Account>) -> Unit,
+   *     failureCallback: (Throwable) -> Unit) {
+   *
+   *       GlobalScope.async(Default) {
+   *         println("Making API call")
+   *         kotlinx.coroutines.delay(500)
+   *         successCallback(listOf(Account))
+   *       }
+   *   }
+   *
+   *   fun cancel(): Unit = kotlinx.coroutines.runBlocking {
+   *     println("Canceled, closing NetworkApi")
+   *     kotlinx.coroutines.delay(500)
+   *     println("Closed NetworkApi")
+   *   }
+   * }
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val getAccounts = Default._shift_().flatMap {
+   *     _extensionFactory_.cancelable<List<Account>> { cb ->
+   *       val service = NetworkService()
+   *       service.getAccounts(
+   *         successCallback = { accs -> cb(Right(accs)) },
+   *         failureCallback = { e -> cb(Left(e)) })
+   *
+   *       _delay_({ service.cancel() })
+   *     }
+   *   }
+   *
+   *   //sampleEnd
+   * }
+   * ```
+   * @see cancelableF for a version that can safely suspend impure callback registration code.
+   */
+  fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<F>): Kind<F, A> =
+    cancelableF { cb -> delay { k(cb) } }
+
+  /**
+   * Builder to create a cancelable [F] instance that executes an asynchronous process on evaluation.
+   * Function derived from [async] and [bracketCase].
+   *
+   * ```kotlin:ank:playground:extension
+   * _imports_
+   * _imports_monaddefer_
+   * import kotlinx.coroutines.async
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val result = _extensionFactory_.cancelableF<String> { cb ->
+   *     delay {
+   *       val deferred = kotlinx.coroutines.GlobalScope.async {
+   *         kotlinx.coroutines.delay(1000)
+   *         cb(Right("Hello from ${Thread.currentThread().name}"))
+   *       }
+   *
+   *       delay({ deferred.cancel().let { Unit } })
+   *     }
+   *   }
+   *
+   *   println(result) //Run with `fix().unsafeRunSync()`
+   *
+   *   val result2 = _extensionFactory_.cancelableF<Unit> { cb ->
+   *     delay {
+   *       println("Doing something that can be cancelled.")
+   *       delay({ println("Cancelling the task") })
+   *     }
+   *   }
+   *
+   *   println(result2) //Run with `fix().unsafeRunAsyncCancellable { }.invoke()`
+   *   //sampleEnd
+   * }
+   * ```
+   *
+   * @see cancelable for a simpler non-suspending version.
+   */
+  fun <A> cancelableF(k: ((Either<Throwable, A>) -> Unit) -> Kind<F, CancelToken<F>>): Kind<F, A> =
+    asyncF { cb ->
+      val state = AtomicReference<(Either<Throwable, Unit>) -> Unit>(null)
+      val cb1 = { r: Either<Throwable, A> ->
+        try {
+          cb(r)
+        } finally {
+          if (!state.compareAndSet(null, mapUnit)) {
+            val cb2 = state.get()
+            state.lazySet(null)
+            cb2(rightUnit)
+          }
+        }
+      }
+
+      k(cb1).bracketCase(use = {
+        async<Unit> { cb ->
+          if (!state.compareAndSet(null, cb)) cb(rightUnit)
+        }
+      }, release = { token, exitCase ->
+        when (exitCase) {
+          is ExitCase.Canceled -> token
+          else -> just(Unit)
+        }
+      })
+    }
 
   /**
    * Map two tasks in parallel within a new [F] on [ctx].
@@ -461,6 +679,22 @@ interface Concurrent<F> : Async<F> {
     )
 
   /**
+   * Overload for [Async.asyncF]
+   *
+   * @see [Async.asyncF]
+   */
+  override fun <A> asyncF(k: ProcF<F, A>): Kind<F, A> =
+    asyncF { _, cb -> k(cb) }
+
+  /**
+   * Overload for [Async.async]
+   *
+   * @see [Async.async]
+   */
+  override fun <A> async(fa: Proc<A>): Kind<F, A> =
+    async { _, cb -> fa(cb) }
+
+  /**
    * Entry point for monad bindings which enables for comprehensions. The underlying impl is based on coroutines.
    * A coroutines is initiated and inside [ConcurrentCancellableContinuation] suspended yielding to [Monad.flatMap]. Once all the flatMap binds are completed
    * the underlying monad is returned from the act of executing the coroutine
@@ -496,6 +730,7 @@ typealias RacePair<F, A, B> = Either<Tuple2<A, Fiber<F, B>>, Tuple2<Fiber<F, A>,
 typealias RaceTriple<F, A, B, C> = Either<Tuple3<A, Fiber<F, B>, Fiber<F, C>>, Either<Tuple3<Fiber<F, A>, B, Fiber<F, C>>, Tuple3<Fiber<F, A>, Fiber<F, B>, C>>>
 
 /** A convenience [fold] method to provide a nicer API to work with race results. */
+@Suppress("UNUSED_PARAMETER")
 inline fun <F, A, B, C, D> RaceTriple<F, A, B, C>.fold(
   ifA: (Tuple3<A, Fiber<F, B>, Fiber<F, C>>) -> D,
   ifB: (Tuple3<Fiber<F, A>, B, Fiber<F, C>>) -> D,

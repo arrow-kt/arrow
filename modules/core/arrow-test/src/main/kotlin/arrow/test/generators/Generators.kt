@@ -11,11 +11,20 @@ import arrow.recursion.Coalgebra
 import arrow.recursion.typeclasses.Corecursive
 import arrow.recursion.typeclasses.Recursive
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.ApplicativeError
 import io.kotlintest.properties.Gen
 import java.util.concurrent.TimeUnit
 
 fun <F, A> genApplicative(valueGen: Gen<A>, AP: Applicative<F>): Gen<Kind<F, A>> =
    valueGen.map { AP.just(it) }
+
+fun <F, A, E> genApplicativeError(valueGen: Gen<A>, errorGen: Gen<E>, AP: ApplicativeError<F, E>): Gen<Kind<F, A>> =
+  Gen.oneOf<Either<E, A>>(valueGen.map(::Right), errorGen.map(::Left)).map {
+    it.fold(AP::raiseError, AP::just)
+  }
+
+fun <F, A> genApplicativeError(valueGen: Gen<A>, AP: ApplicativeError<F, Throwable>): Gen<Kind<F, A>> =
+  genApplicativeError(valueGen, genThrowable(), AP)
 
 fun <A, B> genFunctionAToB(genB: Gen<B>): Gen<(A) -> B> = genB.map { b:B -> { _: A -> b } }
 
