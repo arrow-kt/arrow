@@ -28,9 +28,7 @@ object AsyncLaws {
       Law("Async Laws: async constructor") { AC.asyncConstructor(EQ) },
       Law("Async Laws: async can be derived from asyncF") { AC.asyncCanBeDerivedFromAsyncF(EQ) },
       Law("Async Laws: bracket release is called on completed or error") { AC.bracketReleaseIscalledOnCompletedOrError(EQ) },
-      Law("Async Laws: continueOn on comprehensions") { AC.continueOnComprehension(EQ) },
-      Law("Async Laws: async cancelable coherence") { AC.asyncCancelableCoherence(EQ) },
-      Law("Async Laws: cancelable cancelableF coherence") { AC.cancelableCancelableFCoherence(EQ) }
+      Law("Async Laws: continueOn on comprehensions") { AC.continueOnComprehension(EQ) }
     )
 
   fun <F> Async<F>.asyncSuccess(EQ: Eq<Kind<F, Int>>): Unit =
@@ -97,18 +95,6 @@ object AsyncLaws {
       }.equalUnderTheLaw(just(b), EQ)
     }
   }
-
-  fun <F> Async<F>.asyncCancelableCoherence(EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(genEither(genThrowable(), Gen.int())) { eith ->
-      async<Int> { cb -> cb(eith) }
-        .equalUnderTheLaw(cancelable { cb -> cb(eith); just<Unit>(Unit) }, EQ)
-    }
-
-  fun <F> Async<F>.cancelableCancelableFCoherence(EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(genEither(genThrowable(), Gen.int())) { eith ->
-      cancelable<Int> { cb -> cb(eith); just<Unit>(Unit) }
-        .equalUnderTheLaw(cancelableF { cb -> delay { cb(eith); just<Unit>(Unit) } }, EQ)
-    }
 
   // Turns out that kotlinx.coroutines decides to rewrite thread names
   private fun getCurrentThread() =

@@ -9,7 +9,7 @@ import arrow.effects.typeclasses.unitCallback
 import java.util.concurrent.atomic.AtomicReference
 
 //[MVar] implementation for [Async] data types.
-internal class UncancelableMVar<F, A> private constructor(initial: State<A>, AS: Async<F>) : MVar<F, A>, Async<F> by AS {
+internal class UncancelableMVar<F, A> private constructor(initial: State<A>, private val AS: Async<F>) : MVar<F, A>, Async<F> by AS {
 
   private val stateRef = AtomicReference<State<A>>(initial)
 
@@ -158,6 +158,14 @@ internal class UncancelableMVar<F, A> private constructor(initial: State<A>, AS:
       true
     }
 
+  override fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B> = AS.run {
+    this@ap.ap(ff)
+  }
+
+  override fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B> = AS.run {
+    this@map.map(f)
+  }
+
   private val justNone = just(None)
   private val justFalse = just(false)
   private val justTrue = just(true)
@@ -180,6 +188,7 @@ internal class UncancelableMVar<F, A> private constructor(initial: State<A>, AS:
       companion object {
         operator fun <A> invoke(a: A): State<A> = WaitForTake(a, emptyList())
         private val ref = WaitForPut<Any>(emptyList(), emptyList())
+        @Suppress("UNCHECKED_CAST")
         fun <A> empty(): State<A> = ref as State<A>
       }
 
