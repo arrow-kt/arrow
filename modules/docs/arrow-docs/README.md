@@ -147,7 +147,7 @@ The Front Matter values available to these files are:
 
 Then in the content section you can write a small description formatting it following Markdown as usual, including links. Please refrain of setting a long chunk of text here as it probably won't fit well between the other ones.
 
-To check how it will look there, please refer to the [Run the docs in your local server](#run-the-docs-in-your-local-server) section.
+To check how it will look there, please refer to the [Run the docs in your local server](#2-run-the-docs-in-your-local-server) section.
 
 
 ## How to test links
