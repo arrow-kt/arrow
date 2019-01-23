@@ -263,13 +263,14 @@ class EffectsSuspendDSLTests : UnitSpec() {
     "parallel" {
       fxTest {
         fx {
+          val currentThread = effect { Thread.currentThread().name }
           val (ta: String, tb: String) = Dispatchers.Default.parallel(
             { Thread.currentThread().name },
             { Thread.currentThread().name }
           )
-          listOf(ta, tb).distinct().size
+          ta != currentThread && tb != currentThread
         }
-      } shouldBe 2
+      } shouldBe true
     }
 
     "Either component1() syntax success" {
