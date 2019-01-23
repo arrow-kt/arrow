@@ -1,8 +1,11 @@
 # Arrow docs
 
-Arrow documentation deployed to the website.
+This is the Arrow documentation deployed to the website (arrow-kt.io).
 
-## How to contribute
+* [Documentation contribution](#documentation-contribution)
+* [Blog section contribution](#blog-section-contribution)
+
+## Documentation contribution
 
 We prefer Kdocs only for documenting data types or type classes. Only use tutorial style markdown docs for patterns or tutorials. In case you need to add a new docs section, you should go like this:
 
@@ -101,7 +104,7 @@ Dokka is responsible of generating documentation based on source code annotation
 ./gradlew clean dokka
 ```
 
-You can run Dokka for a **single module**. That will save you a lot of time. For example, if you've added some docs to the 
+You can run Dokka for a **single module**. That will save you a lot of time. For example, if you've added some docs to the
 `arrow-typeclasses` module, just run:
 
 ```bash
@@ -124,6 +127,12 @@ BUNDLE_GEMFILE=modules/docs/arrow-docs/Gemfile bundle exec jekyll serve -s modul
 ```
 
 This will install any needed dependencies locally, and will use it to launch the complete website in [127.0.0.1:4000](https://127.0.0.1:4000) so you can open it with a standard browser.
+
+
+## Documentation contribution
+
+If you had given a talk, written a post, or spread the word on Arrow some any other way, please don't hesitate to include that in the blog section.
+
 
 ## How to test links
 
