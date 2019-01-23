@@ -15,7 +15,6 @@ import javax.script.ScriptContext
 import javax.script.ScriptEngine
 import javax.script.ScriptEngineManager
 
-
 val extensionMappings = mapOf(
   "java" to "java",
   "kotlin" to "kts"
