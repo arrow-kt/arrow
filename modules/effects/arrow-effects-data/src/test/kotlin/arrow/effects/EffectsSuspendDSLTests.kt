@@ -11,7 +11,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.newSingleThreadContext
 import org.junit.runner.RunWith
-import java.io.File
 import java.util.concurrent.atomic.AtomicReference
 
 @ObsoleteCoroutinesApi
