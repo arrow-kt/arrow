@@ -6,7 +6,7 @@ import arrow.effects.Promise
 import arrow.effects.typeclasses.Async
 import java.util.concurrent.atomic.AtomicReference
 
-internal class UncancelablePromise<F, A>(AS: Async<F>) : Promise<F, A>, Async<F> by AS {
+internal class UncancelablePromise<F, A>(private val AS: Async<F>) : Promise<F, A>, Async<F> by AS {
 
   internal sealed class State<out A> {
     data class Pending<A>(val joiners: List<(Either<Throwable, A>) -> Unit>) : State<A>()
@@ -90,6 +90,14 @@ internal class UncancelablePromise<F, A>(AS: Async<F>) : Promise<F, A>, Async<F>
         } else just(true)
       } else unsafeTryError(error)
     }
+  }
+
+  override fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B> = AS.run {
+    this@ap.ap(ff)
+  }
+
+  override fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B> = AS.run {
+    this@map.map(f)
   }
 
 }

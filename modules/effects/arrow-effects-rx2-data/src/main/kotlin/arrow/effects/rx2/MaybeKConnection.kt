@@ -20,6 +20,7 @@ typealias MaybeKProcF<A> = (MaybeKConnection, (Either<Throwable, A>) -> Unit) ->
  *
  * @see MaybeK.async
  */
+@Suppress("UNUSED_PARAMETER", "FunctionName")
 fun MaybeKConnection(dummy: Unit = Unit): KindConnection<ForMaybeK> = KindConnection(object : MonadDefer<ForMaybeK> {
   override fun <A> defer(fa: () -> MaybeKOf<A>): MaybeK<A> =
     MaybeK.defer(fa)

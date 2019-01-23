@@ -3,6 +3,7 @@ package arrow.effects.rx2
 import arrow.Kind
 import arrow.core.*
 import arrow.effects.OnCancel
+import arrow.effects.internal.Platform
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
 import arrow.higherkind
@@ -72,20 +73,26 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
    * }
    *  ```
    */
-  fun <B> bracketCase(use: (A) -> FlowableKOf<B>, release: (A, ExitCase<Throwable>) -> FlowableKOf<Unit>): FlowableK<B> =
-    flatMap { a ->
-      Flowable.unsafeCreate<B> { subscriber ->
-        use(a).fix()
-          .flatMap { b ->
-            release(a, ExitCase.Completed)
-              .fix().map { b }
-          }.handleErrorWith { e ->
-            release(a, ExitCase.Error(e)).fix().flatMap { raiseError<B>(e) }
-          }.flowable.subscribe(subscriber::onNext, subscriber::onError, subscriber::onComplete) { d ->
-          subscriber.onSubscribe(d.onCancel { release(a, ExitCase.Canceled).fix().flowable.subscribe({}, subscriber::onError) })
+  fun <B> bracketCase(use: (A) -> FlowableKOf<B>, release: (A, ExitCase<Throwable>) -> FlowableKOf<Unit>, mode: BackpressureStrategy = BackpressureStrategy.BUFFER): FlowableK<B> =
+    FlowableK(Flowable.create<B>({ emitter ->
+      flowable.subscribe({ a ->
+        if (emitter.isCancelled) release(a, ExitCase.Canceled).fix().flowable.subscribe({}, emitter::onError)
+        else try {
+          emitter.setDisposable(use(a).fix()
+            .flatMap { b -> release(a, ExitCase.Completed).fix().map { b } }
+            .handleErrorWith { e -> release(a, ExitCase.Error(e)).fix().flatMap { FlowableK.raiseError<B>(e) } }
+            .flowable
+            .doOnCancel { release(a, ExitCase.Canceled).fix().flowable.subscribe({}, emitter::onError) }
+            .subscribe(emitter::onNext, emitter::onError))
+        } catch (e: Throwable) {
+          release(a, ExitCase.Error(e)).fix().flowable.subscribe({
+            emitter.onError(e)
+          }, { e2 ->
+            emitter.onError(Platform.composeErrors(e, e2))
+          })
         }
-      }.k()
-    }
+      }, emitter::onError, emitter::onComplete)
+    }, mode))
 
   fun <B> concatMap(f: (A) -> FlowableKOf<B>): FlowableK<B> =
     flowable.concatMap { f(it).value() }.k()

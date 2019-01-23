@@ -2,6 +2,7 @@ package arrow.effects.rx2
 
 import arrow.core.*
 import arrow.effects.OnCancel
+import arrow.effects.internal.Platform
 import arrow.effects.typeclasses.ExitCase
 import arrow.higherkind
 import io.reactivex.Maybe
@@ -69,19 +70,26 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
    *  ```
    */
   fun <B> bracketCase(use: (A) -> MaybeKOf<B>, release: (A, ExitCase<Throwable>) -> MaybeKOf<Unit>): MaybeK<B> =
-    flatMap { a ->
-      Maybe.create<B> { emitter ->
-        val d = use(a).fix()
-          .flatMap { b ->
-            release(a, ExitCase.Completed)
-              .fix().map { b }
-          }.handleErrorWith { e ->
-            release(a, ExitCase.Error(e))
-              .fix().flatMap { raiseError<B>(e) }
-          }.maybe.subscribe(emitter::onSuccess, emitter::onError, emitter::onComplete)
-        emitter.setDisposable(d.onDispose { release(a, ExitCase.Canceled).fix().maybe.subscribe({}, emitter::onError) })
-      }.k()
-    }
+    MaybeK(Maybe.create<B> { emitter ->
+      val a = maybe.blockingGet()
+      if (emitter.isDisposed) release(a, ExitCase.Canceled).fix().maybe.subscribe({}, emitter::onError)
+      else {
+        try {
+          emitter.setDisposable(use(a).fix()
+            .flatMap { b -> release(a, ExitCase.Completed).fix().map { b } }
+            .handleErrorWith { e -> release(a, ExitCase.Error(e)).fix().flatMap { MaybeK.raiseError<B>(e) } }
+            .maybe
+            .doOnDispose { release(a, ExitCase.Canceled).fix().maybe.subscribe({}, emitter::onError) }
+            .subscribe(emitter::onSuccess, emitter::onError))
+        } catch (e: Throwable) {
+          release(a, ExitCase.Error(e)).fix().maybe.subscribe({
+            emitter.onError(e)
+          }, { e2 ->
+            emitter.onError(Platform.composeErrors(e, e2))
+          })
+        }
+      }
+    })
 
   fun <B> fold(ifEmpty: () -> B, ifSome: (A) -> B): B = maybe.blockingGet().let {
     if (it == null) ifEmpty() else ifSome(it)
