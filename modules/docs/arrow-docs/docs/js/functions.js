@@ -120,6 +120,6 @@
           }
         };
 
-        linkifyAllLevels(".doc-content");
+        linkifyAllLevels(".doc-content, .blog-content");
     });
 })(jQuery);
