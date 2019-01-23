@@ -23,7 +23,7 @@ Pure functions return deterministically the same output given the same input and
 world. A pure expression can be defined and it's allowed to run in the Kotlin raw environment by the Kotlin compiler.
 
 ```kotlin:ank
-fun helloWorld(): String =
+val helloWorld: String =
   "Hello World"
   
 helloWorld
@@ -32,21 +32,24 @@ helloWorld
 ### Side effects
 
 Users can denote side effects and in general effectful statements and expressions with `suspend fun`.
+
+```kotlin:ank
+suspend fun sayHello(): Unit =
+  println(helloWorld)
+```
+
 A `suspend` function denotes a suspended computation. All side effects should be suspended and non-evaluated in 
 compositions to ensure purity and referential transparency of the effectful expressions.
-
-```kotlin:ank:fail
-suspend fun sayHello(): Unit =
-  println(helloWorld())
-
-sayHello()
-```
 
 Attempting to run a side effect in the pure environment is disallowed by the Kotlin compiler unless we prove that
 we know how to handle success and error outcomes from evaluating the effect once suspension is resumed. 
 
+```kotlin:ank:fail
+sayHello()
+```
+
 The Kotlin compiler won't allow side effects denoted as `suspend` to run or compile until you provide a `Continuation<A>`
-that handles success and error cases..
+that handles success and error cases.
 
 The Kotlin compiler automatically translates all suspended functions to a function that receives a `kotlin.coroutines.Continuation<A>` additional argument bridging this way CPS style continuation without callbacks.
 
@@ -55,18 +58,26 @@ The Kotlin compiler automatically translates all suspended functions to a functi
 It's fine though applying and composing side effects in the presence of an `fx` block. 
 `fx` is continuation that all data types providing an extension for `ConcurrentEffect<F>` can support.
 
-The example below proves how our effect controlled program can run in the context of the IO monad which Arrow provides.
+The example below proves how our effect controlled program can run in the context of the IO monad which Arrow provides
+while it fails to compile in all other positions due to being an uncontrolled invocation.
+
+```kotlin:ank:fail
+import arrow.effects.extensions.io.fx.fx
+
+fx {
+  sayHello() // Does not compile because Arrow Fx forces uses to denote side effects in `effect` blocks
+}
+val x = sayHello() // Does not compile because suspended functions need to be in a continuation
+```
 
 ```kotlin:ank
-import fx
-import arrow.effects.extensions.io.concurrent.invoke
-import arrow.effects.extensions.io.unsafe.unsafe
+import arrow.effects.extensions.io.fx.fx
 
 val program = fx {
-  // sayHello() // Does not compile because Arrow Fx forces uses to denote side effects in `effect` blocks
   effect { sayHello() } 
 }
-// val x = sayHello() // Does not compile because suspended functions need to be in a continuation
+
+program
 ```
 
 ### Executing effectful programs
@@ -86,7 +97,7 @@ Usage of `unsafe` is reserved to the end of the world and may be the only impure
 
 ```kotlin:ank
 import arrow.effects.unsafe
-import arrow.effects.extensions.io.unsafe.runBlocking
+import arrow.effects.extensions.io.unsafeRun.runBlocking
 
 unsafe { runBlocking { program } }
 ```
@@ -169,23 +180,37 @@ happens in a blocking or non-blocking style.
 
 The Arrow library already provides the ability to compute imperatively over all monads and brings first class do notation / comprehensions to all monads with an extremely elegant syntax thanks to Kotlin's operator overloading features and suspension system.
 
-```koltin:ank
-import arrow.core.extensions.option.monad.binding
+```kotlin:ank:playground
+import arrow.core.Option
+import arrow.core.extensions.option.fx.fx
 
-binding {
+//sampleStart
+val result = fx {
   val (one) = Option(1)
   val (two) = Option(one + one)
   two
 }
+//sampleEnd
+
+fun main() {
+  println(result)
+}
 ```
 
-```koltin:ank
-import arrow.effects.extensions.io.monad.binding
+```kotlin:ank:playground
+import arrow.effects.IO
+import arrow.effects.extensions.io.fx.fx
 
-binding {
+//sampleStart
+val result = fx {
   val (one) = IO { 1 }
   val (two) = IO { one + one }
   two
+}
+//sampleEnd
+
+fun main() {
+  println(result)
 }
 ```
 
@@ -207,14 +232,18 @@ effects nesting in a simple program that uses parallelism to process effectful c
 
 #### Concurrent parMap
 
-```kotlin:ank
+```kotlin:ank:playground
+import arrow.effects.extensions.io.fx.fx
+import arrow.effects.unsafe
+import arrow.effects.extensions.io.unsafeRun.runBlocking
+import kotlinx.coroutines.Dispatchers
+
 /** A user declared side effect **/
 //sampleStart
 suspend fun getThreadName(): String =
   Thread.currentThread().name
 
-val program = 
-fx {
+val program = fx {
   // note how the receiving value is typed in the environment and not inside IO despite being effectful and
   // non-blocking parallel computations
   val result: List<String> = 

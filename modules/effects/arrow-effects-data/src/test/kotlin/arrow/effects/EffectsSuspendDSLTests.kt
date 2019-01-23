@@ -11,6 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.newSingleThreadContext
 import org.junit.runner.RunWith
+import java.io.File
 import java.util.concurrent.atomic.AtomicReference
 
 @ObsoleteCoroutinesApi
@@ -347,6 +348,19 @@ class EffectsSuspendDSLTests : UnitSpec() {
           }
         }
       } shouldBe false
+    }
+
+    "fx can turn effects into pure kinded values" {
+      suspend fun sideEffect(): String {
+        println("Boom!")
+        return ""
+      }
+      fxTest {
+        fx {
+          val (result) = f { sideEffect() }
+          result
+        }
+      } shouldBe ""
     }
 
   }

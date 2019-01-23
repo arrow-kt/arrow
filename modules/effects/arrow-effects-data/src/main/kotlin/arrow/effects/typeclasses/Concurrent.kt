@@ -5,7 +5,6 @@ import arrow.core.*
 import arrow.effects.CancelToken
 import arrow.effects.KindConnection
 import arrow.effects.data.internal.BindingCancellationException
-import arrow.effects.fx
 import arrow.typeclasses.MonadContinuation
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
