@@ -1,16 +1,12 @@
 <nav id="navigation">
     <div class="navigation-brand">
-        <a href="https://github.com/arrow-kt/arrow">Λrrow</a>
+        <a href="/">Λrrow</a>
     </div>
     <ul class="navigation-menu">
-        <li class="navigation-menu-item">
-            <a href="/docs">Documentation</a>
+        {% for item in site.data.menu.nav %}
+        <li class="navigation-menu-item {% if item.url == category.url %}active {% endif %}">
+            <a href="{{ item.url }}" alt="{{ item.title }}">{{ item.title }}</a>
         </li>
-        <li class="navigation-menu-item">
-            <a href="https://github.com/arrow-kt/arrow">Github</a>
-        </li>
-        <li class="navigation-menu-item">
-            <a href="https://github.com/arrow-kt/arrow#license">License</a>
-        </li>
+        {% endfor %}
     </ul>
 </nav>

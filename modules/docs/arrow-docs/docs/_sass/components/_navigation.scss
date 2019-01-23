@@ -1,10 +1,9 @@
 // NAVIGATION
 // -----------------------------------------------
 // -----------------------------------------------
-
 #navigation {
     position: fixed;
-    z-index: 2;
+    z-index: 30;
     @include flexbox;
     @include justify-content(space-between);
     @include align-items(center);
@@ -27,15 +26,18 @@
             text-transform: uppercase;
             font-size: 0.875rem;
 
-            &:nth-child(-n+2) {
-                margin-right: ($base-point-grid * 4);
-            }
+            margin-right: ($base-point-grid * 4);
 
             @include bp(medium) {
-                &:nth-child(-n+2) {
+                &:last-child {
                     margin-right: ($base-point-grid * 2);
                 }
+
                 text-transform: none;
+            }
+
+            &.active {
+                border-bottom: 2px solid $brand-quaternary;
             }
         }
     }
