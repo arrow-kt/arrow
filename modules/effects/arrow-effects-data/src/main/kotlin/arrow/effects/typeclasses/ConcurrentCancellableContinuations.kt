@@ -7,8 +7,6 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.RestrictsSuspension
 
-//typealias Fx<F> = ConcurrentCancellableContinuation<F, *>
-
 @RestrictsSuspension
 @Suppress("DELEGATED_MEMBER_HIDES_SUPERTYPE_OVERRIDE")
 open class ConcurrentCancellableContinuation<F, A>(CF: Concurrent<F>, override val context: CoroutineContext = EmptyCoroutineContext) :
