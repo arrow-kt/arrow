@@ -59,7 +59,7 @@ open class MonadDeferCancellableContinuation<F, A>(val SC: MonadDefer<F>, overri
       val datatype = try {
         just(m())
       } catch (t: Throwable) {
-        ME.raiseError<B>(t)
+        raiseError<B>(t)
       }
       datatype.flatMap { xx: B ->
         c.stateStack = labelHere
