@@ -4,10 +4,12 @@ package arrow.effects.coroutines.extensions
 
 import arrow.Kind
 import arrow.core.Either
-import arrow.effects.OnCancel
+import arrow.effects.*
 import arrow.effects.coroutines.*
 import arrow.effects.coroutines.extensions.deferredk.applicative.applicative
+import arrow.effects.coroutines.extensions.deferredk.monadDefer.monadDefer
 import arrow.effects.typeclasses.*
+import arrow.effects.typeclasses.suspended.monaddefer.Fx
 import arrow.extension
 import arrow.typeclasses.*
 import kotlin.coroutines.CoroutineContext
@@ -115,4 +117,20 @@ interface DeferredKEffect : Effect<ForDeferredK>, DeferredKAsync {
 interface DeferredKConcurrentEffect : ConcurrentEffect<ForDeferredK>, DeferredKEffect {
   override fun <A> DeferredKOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> Kind<ForDeferredK, Unit>): DeferredK<Disposable> =
     fix().runAsyncCancellable(onCancel = OnCancel.ThrowCancellationException, cb = cb)
+}
+
+@extension
+interface DeferredKUnsafeRun : UnsafeRun<ForDeferredK> {
+
+  override suspend fun <A> unsafe.runBlocking(fa: () -> Kind<ForDeferredK, A>): A = fa().fix().unsafeRunSync()
+
+  override suspend fun <A> unsafe.runNonBlocking(fa: () -> Kind<ForDeferredK, A>, cb: (Either<Throwable, A>) -> Unit) =
+    fa().fix().unsafeRunAsync(cb)
+
+}
+
+//TODO Deferred does not yet have a Concurrent instance
+@extension
+interface DeferredKFx : Fx<ForDeferredK> {
+  override fun monadDefer(): MonadDefer<ForDeferredK> = DeferredK.monadDefer()
 }

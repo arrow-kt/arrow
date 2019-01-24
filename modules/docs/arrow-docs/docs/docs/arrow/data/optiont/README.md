@@ -46,22 +46,22 @@ fun getCountryCode(maybePerson : Option<Person>): Option<String> =
 
 Nested flatMap calls flatten the `Option` but the resulting function starts looking like a pyramid and can easily lead to callback hell.
 
-We can further simplify this case by using Arrow `binding` facilities
+We can further simplify this case by using Arrow `fx` facilities
 that enables monad comprehensions for all datatypes for which a monad instance is available.
 
 ```kotlin:ank:silent
 import arrow.typeclasses.*
 import arrow.core.extensions.*
-import arrow.core.extensions.option.monad.binding
+import arrow.core.extensions.option.fx.fx
 
 fun getCountryCode(maybePerson : Option<Person>): Option<String> =
-   binding {
-     val (person) = maybePerson
-     val (address) = person.address
-     val (country) = address.country
-     val (code) = country.code
-     code
-   }
+  fx {
+    val (person) = maybePerson
+    val (address) = person.address
+    val (country) = address.country
+    val (code) = country.code
+    code
+  }
 ```
 
 Alright, a piece of cake right? That's because we were dealing with a simple type `Option`. But here's where things can get more complicated. Let's introduce another monad in the middle of the computation. For example what happens when we need to load a person by id, then their address and country to obtain the country code from a remote service?
@@ -141,7 +141,7 @@ This isn't actually what we want since the inferred return type is `ObservableK<
 Let's look at how a similar implementation would look like using monad comprehensions without transformers:
 
 ```kotlin:ank
-import arrow.effects.rx2.extensions.observablek.monad.binding
+import arrow.effects.rx2.extensions.observablek.fx.fx
 
 fun getCountryCode(personId: Int): ObservableK<Option<String>> =
        binding {
