@@ -1,8 +1,6 @@
 package arrow.reflect
 
 import arrow.aql.Box
-import arrow.effects.IO
-import arrow.effects.extensions.io.applicative.applicative
 import kotlin.reflect.KClass
 import kotlin.reflect.full.declaredFunctions
 
