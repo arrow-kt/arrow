@@ -1,15 +1,19 @@
 nav:
     - title: Documentation
       url: /docs
+      icon: "fa-book"
 
     - title: Blog
       url: /blog
+      icon: "fa-rss"
 
     - title: Github
       url: https://github.com/arrow-kt/arrow
+      icon: "fa-github"
 
     - title: License
       url: https://github.com/arrow-kt/arrow#license
+      icon: "fa-creative-commons"
 
 tab:
     - title: All

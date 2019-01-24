@@ -6,7 +6,7 @@
     @include justify-content(space-between);
     @include align-items(center);
     height: ($base-point-grid * 11);
-    padding: 0 ($base-point-grid * 4);
+    padding: 0 ($base-point-grid * 4) 0 ($base-point-grid * 1);
     background: $white;
 
     .search-wrapper {

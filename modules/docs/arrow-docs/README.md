@@ -11,7 +11,7 @@ We prefer Kdocs only for documenting data types or type classes. Only use tutori
 
 ### 1. Add a menu entry to your docs
 
-Go to `modules/docs/arrow-docs/docs/_data/menu.yml` and add a menu entry in the proper section, as in:
+Go to `modules/docs/arrow-docs/docs/_data/sidebar.yml` and add a menu entry in the proper section, as in:
 
 ```
 - title: Applicative
