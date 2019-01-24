@@ -15,7 +15,7 @@ interface ApplicativeErrorSyntax<F, E> : ApplicativeError<F, E>, ApplicativeSynt
     run<ApplicativeError<F, E>, Kind<F, A>> { raiseError(e) }.bind()
 
   suspend fun <A> handleError(fa: suspend () -> A, recover: suspend (E) -> A): A =
-    run<ApplicativeError<F, E>, Kind<F, A>> { fa.k().handleErrorWith(recover.kr()) }.bind()
+    run<ApplicativeError<F, E>, Kind<F, A>> { fa.liftM().handleErrorWith(recover.flatLiftM()) }.bind()
 
   suspend fun <A> OptionOf<A>.getOrRaiseError(f: () -> E): A =
     run<ApplicativeError<F, E>, Kind<F, A>> { this@getOrRaiseError.fromOption(f) }.bind()
@@ -27,6 +27,6 @@ interface ApplicativeErrorSyntax<F, E> : ApplicativeError<F, E>, ApplicativeSynt
     run<ApplicativeError<F, E>, Kind<F, A>> { this@getOrRaiseError.fromTry(f) }.bind()
 
   suspend fun <A> attempt(fa: suspend () -> A): Either<E, A> =
-    run<ApplicativeError<F, E>, Kind<F, Either<E, A>>> { fa.k().attempt() }.bind()
+    run<ApplicativeError<F, E>, Kind<F, Either<E, A>>> { fa.liftM().attempt() }.bind()
 
 }

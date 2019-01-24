@@ -22,10 +22,10 @@ interface AsyncSyntax<F> : MonadDeferSyntax<F>, Async<F> {
     run<Async<F>, Kind<F, A>> { fb(this) }.bind()
 
   suspend fun <A> async(unit: Unit = Unit, fa: suspend ((Either<Throwable, A>) -> Unit) -> Unit): A =
-    asyncOp { asyncF(fa.kr()) }
+    asyncOp { asyncF(fa.flatLiftM()) }
 
   suspend fun <A> CoroutineContext.defer(f: suspend () -> A): A =
-    asyncOp { defer(this@defer) { f.k() } }
+    asyncOp { defer(this@defer) { f.liftM() } }
 
   suspend fun continueOn(ctx: CoroutineContext): Unit =
     asyncOp { ctx.shift() }

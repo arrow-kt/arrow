@@ -164,7 +164,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
     "suspend () -> A ≅ Kind<F, A> isomorphism" {
       fxTest {
         fx {
-          val (suspendedValue) = suspend { 1 }.k()
+          val (suspendedValue) = suspend { 1 }.liftM()
           val (ioValue) = IO.just(1)
           suspendedValue == ioValue
         }
