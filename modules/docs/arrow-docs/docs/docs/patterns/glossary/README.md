@@ -37,7 +37,6 @@ Datatypes that express patterns like deferred evaluation can do it by nesting th
 import arrow.effects.*
 
 IO { 0 }
- .continueOn(UI)
  .flatMap { IO { it * 2 } }
  .map { it + 1 }
 ```

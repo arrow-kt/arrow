@@ -3,7 +3,7 @@ package arrow.effects.rx2
 import arrow.Kind
 import arrow.core.*
 import arrow.effects.OnCancel
-import arrow.effects.rx2.CoroutineContextRx2Scheduler.asScheduler
+import arrow.effects.internal.Platform
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
 import arrow.higherkind
@@ -73,19 +73,25 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
    *  ```
    */
   fun <B> bracketCase(use: (A) -> ObservableKOf<B>, release: (A, ExitCase<Throwable>) -> ObservableKOf<Unit>): ObservableK<B> =
-    flatMap { a ->
-      Observable.create<B> { emitter ->
-        val d = use(a).fix()
-          .flatMap { b ->
-            release(a, ExitCase.Completed)
-              .fix().map { b }
-          }.handleErrorWith { e ->
-            release(a, ExitCase.Error(e))
-              .fix().flatMap { raiseError<B>(e) }
-          }.observable.subscribe({ b -> emitter.onNext(b) }, emitter::onError, emitter::onComplete)
-        emitter.setDisposable(d.onDispose { release(a, ExitCase.Canceled).fix().observable.subscribe({}, emitter::onError, {}) })
-      }.k()
-    }
+    ObservableK(Observable.create<B> { emitter ->
+      observable.subscribe({ a ->
+        if (emitter.isDisposed) release(a, ExitCase.Canceled).fix().observable.subscribe({}, emitter::onError)
+        else try {
+          emitter.setDisposable(use(a).fix()
+            .flatMap { b -> release(a, ExitCase.Completed).fix().map { b } }
+            .handleErrorWith { e -> release(a, ExitCase.Error(e)).fix().flatMap { ObservableK.raiseError<B>(e) } }
+            .observable
+            .doOnDispose { release(a, ExitCase.Canceled).fix().observable.subscribe({}, emitter::onError) }
+            .subscribe(emitter::onNext, emitter::onError))
+        } catch (e: Throwable) {
+          release(a, ExitCase.Error(e)).fix().observable.subscribe({
+            emitter.onError(e)
+          }, { e2 ->
+            emitter.onError(Platform.composeErrors(e, e2))
+          })
+        }
+      }, emitter::onError, emitter::onComplete)
+    })
 
   fun <B> concatMap(f: (A) -> ObservableKOf<B>): ObservableK<B> =
     observable.concatMap { f(it).value() }.k()
