@@ -2,11 +2,11 @@ package arrow.typeclasses.suspended
 
 import arrow.Kind
 
-interface Prelude {
+interface Predef {
   suspend fun <A> effectIdentity(a: A): A = a
 }
 
-interface BindSyntax<F> : Prelude {
+interface BindSyntax<F> : Predef {
 
   suspend fun <A> Kind<F, A>.bind(): A
 
