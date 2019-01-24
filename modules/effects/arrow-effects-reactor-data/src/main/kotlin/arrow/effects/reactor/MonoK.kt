@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.effects.OnCancel
+import arrow.effects.internal.Platform
 import arrow.effects.reactor.CoroutineContextReactorScheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
@@ -75,23 +76,29 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
    *  ```
    */
   fun <B> bracketCase(use: (A) -> MonoKOf<B>, release: (A, ExitCase<Throwable>) -> MonoKOf<Unit>): MonoK<B> =
-    flatMap { a ->
-      Mono.create<B> { sink ->
-        val d = use(a).fix().flatMap { b ->
-          release(a, ExitCase.Completed)
-            .fix().map { b }
-        }.handleErrorWith { e ->
-          release(a, ExitCase.Error(e))
-            .fix().flatMap { raiseError<B>(e) }
-        }.mono.subscribe(
-          sink::success,
-          sink::error,
-          sink::success
-        )
-        sink.onCancel(d)
-        sink.onDispose { release(a, ExitCase.Canceled).fix().mono.subscribe({}, sink::error) }
-      }.k()
-    }
+    MonoK(Mono.create<B> { sink ->
+      val isCanceled = AtomicBoolean(false)
+      sink.onCancel { isCanceled.set(true) }
+      val a: A? = mono.block()
+      if (a != null) {
+        if (isCanceled.get()) release(a, ExitCase.Canceled).fix().mono.subscribe({}, sink::error)
+        else try {
+          sink.onDispose(use(a).fix()
+            .flatMap { b -> release(a, ExitCase.Completed).fix().map { b } }
+            .handleErrorWith { e -> release(a, ExitCase.Error(e)).fix().flatMap { MonoK.raiseError<B>(e) } }
+            .mono
+            .doOnCancel { release(a, ExitCase.Canceled).fix().mono.subscribe({}, sink::error) }
+            .subscribe(sink::success, sink::error)
+          )
+        } catch (e: Throwable) {
+          release(a, ExitCase.Error(e)).fix().mono.subscribe({
+            sink.error(e)
+          }, { e2 ->
+            sink.error(Platform.composeErrors(e, e2))
+          })
+        }
+      } else sink.success(null)
+    })
 
   fun handleErrorWith(function: (Throwable) -> MonoK<A>): MonoK<A> =
     mono.onErrorResume { t: Throwable -> function(t).mono }.k()

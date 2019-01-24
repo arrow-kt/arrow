@@ -3,11 +3,8 @@
 package com.pacoworks.typeclasses.basics.solved
 
 import arrow.Kind
-import arrow.effects.coroutines.DeferredK
-import arrow.effects.coroutines.ForDeferredK
-import arrow.effects.coroutines.extensions.deferredk.async.async
-import arrow.effects.coroutines.fix
-import arrow.effects.coroutines.unsafeRunSync
+import arrow.effects.*
+import arrow.effects.extensions.io.async.async
 import arrow.effects.typeclasses.Async
 import arrow.typeclasses.DaoDatabase
 import arrow.typeclasses.Index
@@ -36,9 +33,9 @@ class MyActivity {
   }
 }
 
-val dependenciesAsValues: RequestOperationsAsync<ForDeferredK> =
-  object : RequestOperationsAsync<ForDeferredK>,
-    Async<ForDeferredK> by DeferredK.async() {
+val dependenciesAsValues: RequestOperationsAsync<ForIO> =
+  object : RequestOperationsAsync<ForIO>,
+    Async<ForIO> by IO.async() {
     override val network: NetworkModule = NetworkModule()
     override val dao: DaoDatabase = DaoDatabase()
     override val ctx: CoroutineContext = Dispatchers.Default

@@ -2,6 +2,7 @@ package arrow.effects.rx2
 
 import arrow.core.*
 import arrow.effects.OnCancel
+import arrow.effects.internal.Platform
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
 import arrow.higherkind
@@ -72,18 +73,22 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
    */
   fun <B> bracketCase(use: (A) -> SingleKOf<B>, release: (A, ExitCase<Throwable>) -> SingleKOf<Unit>): SingleK<B> =
     SingleK(Single.create<B> { emitter ->
-      single.subscribe({ a ->
-        if (emitter.isDisposed) {
-          release(a, ExitCase.Canceled).fix().single.subscribe({}, emitter::onError)
-        } else {
-          emitter.setDisposable(use(a).fix()
-            .flatMap { b -> release(a, ExitCase.Completed).fix().map { b } }
-            .handleErrorWith { e -> release(a, ExitCase.Error(e)).fix().flatMap { SingleK.raiseError<B>(e) } }
-            .single
-            .doOnDispose { release(a, ExitCase.Canceled).fix().single.subscribe({}, emitter::onError) }
-            .subscribe(emitter::onSuccess, emitter::onError))
-        }
-      }, emitter::onError)
+      val a = single.blockingGet()
+      if (emitter.isDisposed) release(a, ExitCase.Canceled).fix().single.subscribe({}, emitter::onError)
+      else try {
+        emitter.setDisposable(use(a).fix()
+          .flatMap { b -> release(a, ExitCase.Completed).fix().map { b } }
+          .handleErrorWith { e -> release(a, ExitCase.Error(e)).fix().flatMap { SingleK.raiseError<B>(e) } }
+          .single
+          .doOnDispose { release(a, ExitCase.Canceled).fix().single.subscribe({}, emitter::onError) }
+          .subscribe(emitter::onSuccess, emitter::onError))
+      } catch (e: Throwable) {
+        release(a, ExitCase.Error(e)).fix().single.subscribe({
+          emitter.onError(e)
+        }, { e2 ->
+          emitter.onError(Platform.composeErrors(e, e2))
+        })
+      }
     })
 
   fun handleErrorWith(function: (Throwable) -> SingleKOf<A>): SingleK<A> =
