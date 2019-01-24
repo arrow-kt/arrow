@@ -3,6 +3,7 @@ package arrow.effects.rx2
 import arrow.Kind
 import arrow.core.*
 import arrow.effects.OnCancel
+import arrow.effects.rx2.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
 import arrow.higherkind
@@ -11,7 +12,6 @@ import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.FlowableEmitter
 import kotlin.coroutines.CoroutineContext
-import arrow.effects.rx2.CoroutineContextRx2Scheduler.asScheduler
 
 fun <A> Flowable<A>.k(): FlowableK<A> = FlowableK(this)
 

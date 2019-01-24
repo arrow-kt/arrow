@@ -1,6 +1,7 @@
 package arrow.effects
 
 import arrow.core.*
+import arrow.core.extensions.`try`.monadError.monadError
 import arrow.effects.IO.Companion.just
 import arrow.effects.extensions.io.async.async
 import arrow.effects.extensions.io.concurrent.concurrent
@@ -438,3 +439,5 @@ class IOTest : UnitSpec() {
 }
 
 object Error : Throwable()
+
+val test = Try.monadError().binding {}

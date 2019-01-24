@@ -1,7 +1,10 @@
 package arrow.effects.rx2
 
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Left
+import arrow.core.Right
 import arrow.effects.OnCancel
+import arrow.effects.rx2.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
 import arrow.higherkind
@@ -9,7 +12,6 @@ import io.reactivex.Single
 import io.reactivex.SingleEmitter
 import io.reactivex.disposables.CompositeDisposable
 import kotlin.coroutines.CoroutineContext
-import arrow.effects.rx2.CoroutineContextRx2Scheduler.asScheduler
 
 fun <A> Single<A>.k(): SingleK<A> = SingleK(this)
 

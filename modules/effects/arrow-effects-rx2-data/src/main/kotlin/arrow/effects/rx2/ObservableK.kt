@@ -3,6 +3,7 @@ package arrow.effects.rx2
 import arrow.Kind
 import arrow.core.*
 import arrow.effects.OnCancel
+import arrow.effects.rx2.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
 import arrow.higherkind
@@ -10,7 +11,6 @@ import arrow.typeclasses.Applicative
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
 import kotlin.coroutines.CoroutineContext
-import arrow.effects.rx2.CoroutineContextRx2Scheduler.asScheduler
 
 fun <A> Observable<A>.k(): ObservableK<A> = ObservableK(this)
 

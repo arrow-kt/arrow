@@ -7,10 +7,9 @@ import arrow.effects.OnCancel
 import arrow.effects.reactor.CoroutineContextReactorScheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
-import reactor.core.publisher.MonoSink
 import arrow.higherkind
 import reactor.core.publisher.Mono
-import reactor.core.publisher.*
+import reactor.core.publisher.MonoSink
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.CoroutineContext
 

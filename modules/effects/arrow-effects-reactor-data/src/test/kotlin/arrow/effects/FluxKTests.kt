@@ -4,13 +4,15 @@ import arrow.effects.reactor.*
 import arrow.effects.reactor.extensions.fluxk.async.async
 import arrow.effects.reactor.extensions.fluxk.foldable.foldable
 import arrow.effects.reactor.extensions.fluxk.functor.functor
-import arrow.effects.reactor.extensions.fluxk.monad.fx
 import arrow.effects.reactor.extensions.fluxk.monad.flatMap
+import arrow.effects.reactor.extensions.fluxk.monad.fx
 import arrow.effects.reactor.extensions.fluxk.monadThrow.bindingCatch
 import arrow.effects.reactor.extensions.fluxk.traverse.traverse
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
-import arrow.test.laws.*
+import arrow.test.laws.AsyncLaws
+import arrow.test.laws.FoldableLaws
+import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe

@@ -4,12 +4,13 @@ package arrow.effects.coroutines.extensions
 
 import arrow.Kind
 import arrow.core.Either
-import arrow.effects.*
+import arrow.effects.OnCancel
 import arrow.effects.coroutines.*
 import arrow.effects.coroutines.extensions.deferredk.applicative.applicative
 import arrow.effects.coroutines.extensions.deferredk.monadDefer.monadDefer
 import arrow.effects.typeclasses.*
 import arrow.effects.typeclasses.suspended.monaddefer.Fx
+import arrow.effects.unsafe
 import arrow.extension
 import arrow.typeclasses.*
 import kotlin.coroutines.CoroutineContext

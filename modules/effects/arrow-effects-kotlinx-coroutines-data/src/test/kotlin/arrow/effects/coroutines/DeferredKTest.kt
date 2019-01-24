@@ -1,9 +1,8 @@
 package arrow.effects.coroutines
 
 import arrow.Kind
-import arrow.core.*
-import arrow.effects.typeclasses.ExitCase
 import arrow.core.Option
+import arrow.core.Right
 import arrow.core.Try
 import arrow.core.extensions.`try`.functor.functor
 import arrow.core.extensions.`try`.traverse.traverse
@@ -13,24 +12,24 @@ import arrow.effects.Promise
 import arrow.effects.coroutines.extensions.awaitAll
 import arrow.effects.coroutines.extensions.deferredk.async.async
 import arrow.effects.coroutines.extensions.deferredk.monad.flatMap
+import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
 import arrow.test.generators.genIntSmall
 import arrow.test.laws.AsyncLaws
+import arrow.test.laws.shouldBeEq
 import arrow.test.laws.throwableEq
-import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Traverse
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.fail
-import io.kotlintest.shouldBe
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
+import io.kotlintest.runner.junit4.KotlinTestRunner
+import io.kotlintest.shouldBe
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.Unconfined
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
-import java.lang.AssertionError
 import java.util.concurrent.TimeUnit
 
 @RunWith(KotlinTestRunner::class)
