@@ -18,6 +18,8 @@ import kotlin.coroutines.startCoroutine
  **/
 interface MonadDefer<F> : MonadThrow<F>, Bracket<F, Throwable> {
 
+  suspend fun <A> effectX(f: suspend () -> A): A = f()
+
   fun <A> defer(fa: () -> Kind<F, A>): Kind<F, A>
 
   fun <A> delay(f: () -> A): Kind<F, A> =
