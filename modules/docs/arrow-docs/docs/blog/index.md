@@ -1,8 +1,8 @@
 ---
 layout: blog
 title: All
-permalink: /blog
+permalink: /blog/
 redirect_from:
-  - /blog/all
+  - /blog/all/
   - /docs/quickstart/blogs/
 ---
