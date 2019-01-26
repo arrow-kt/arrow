@@ -61,3 +61,11 @@ interface IOConcurrentEffect : ConcurrentEffect<ForIO>, IOEffect, IOConcurrent {
   override fun <A> IOOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Disposable> =
     fix().runAsyncCancellable(OnCancel.ThrowCancellationException, cb)
 }
+
+fun IO.Companion.concurrent(dispatchers: Dispatchers<ForIO>) = object : IOConcurrent {
+  override fun dispatchers(): Dispatchers<ForIO> = dispatchers
+}
+
+fun IO.Companion.concurrentEffect(dispatchers: Dispatchers<ForIO>) = object : IOConcurrentEffect {
+  override fun dispatchers(): Dispatchers<ForIO> = dispatchers
+}
