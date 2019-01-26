@@ -36,7 +36,7 @@
     border: none;
     color: $brand-tertiary;
     display: inline-block;
-    padding: 24px;
+    padding: 24px 32px;
     position: relative;
     text-align: center;
     text-decoration: none;
@@ -45,7 +45,7 @@
     .menu-icon {
         position: absolute;
         top: 37%;
-        left: 25%;
+        left: 38%;
     }
 
     &:hover {
@@ -63,12 +63,12 @@
 
     #sidebar-wrapper {
         left: -100%;
-        width: 100%;
     }
 
     #wrapper.toggled {
         #sidebar-wrapper {
             left: 0;
+            width: 100%;
 
             .sidebar-toggle {
                 display: block;

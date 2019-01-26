@@ -12,7 +12,7 @@ nav:
       icon: "fa-github"
 
     - title: License
-      url: https://github.com/arrow-kt/arrow#license
+      url: https://github.com/arrow-kt/arrow/blob/master/LICENSE
       icon: "fa-creative-commons"
 
 tab:

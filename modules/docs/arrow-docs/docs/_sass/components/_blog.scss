@@ -50,11 +50,11 @@
                     height: 180px;
                     object-fit: cover;
                     object-position: center;
-                    opacity: 0.8;
+                    opacity: 0.4;
                     transition: opacity 0.2s ease-out;
                     width: 100%;
                     &:hover {
-                      opacity: 0.1;
+                      opacity: 0.8;
                     }
                   }
                 }
