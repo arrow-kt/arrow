@@ -8,6 +8,7 @@ import arrow.effects.typeclasses.*
 import arrow.effects.typeclasses.suspended.concurrent.Fx
 import arrow.extension
 import arrow.typeclasses.*
+import arrow.unsafe
 import kotlin.coroutines.CoroutineContext
 import arrow.effects.ap as ioAp
 import arrow.effects.handleErrorWith as ioHandleErrorWith

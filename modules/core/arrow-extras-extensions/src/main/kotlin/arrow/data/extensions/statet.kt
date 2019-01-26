@@ -5,12 +5,11 @@ import arrow.data.*
 
 import arrow.extension
 import arrow.core.extensions.id.monad.monad
-import arrow.data.extensions.sequencek.monad.monad
 import arrow.data.extensions.statet.applicative.applicative
 import arrow.data.extensions.statet.functor.functor
 import arrow.data.extensions.statet.monad.monad
 import arrow.typeclasses.*
-import arrow.typeclasses.suspended.monad.Fx
+import arrow.typeclasses.suspended.monad.commutative.safe.Fx
 import arrow.undocumented
 
 @extension

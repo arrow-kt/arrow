@@ -2,7 +2,7 @@ package arrow.effects.typeclasses
 
 import arrow.Kind
 import arrow.core.Either
-import arrow.effects.unsafe
+import arrow.unsafe
 
 interface UnsafeRun<F> {
   suspend fun <A> unsafe.runBlocking(fa: () -> Kind<F, A>): A

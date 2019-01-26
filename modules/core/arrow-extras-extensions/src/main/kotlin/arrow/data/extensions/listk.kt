@@ -5,12 +5,11 @@ import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Tuple2
 import arrow.data.*
-import arrow.data.extensions.kleisli.monad.monad
 import arrow.data.extensions.listk.foldable.foldLeft
 import arrow.data.extensions.listk.monad.monad
 import arrow.extension
 import arrow.typeclasses.*
-import arrow.typeclasses.suspended.monad.Fx
+import arrow.typeclasses.suspended.monad.commutative.safe.Fx
 import kotlin.collections.emptyList
 import kotlin.collections.fold
 import kotlin.collections.zip

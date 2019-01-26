@@ -11,6 +11,7 @@ import arrow.typeclasses.Applicative
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
 import kotlin.coroutines.CoroutineContext
+import arrow.effects.rx2.CoroutineContextRx2Scheduler.asScheduler
 
 fun <A> Observable<A>.k(): ObservableK<A> = ObservableK(this)
 

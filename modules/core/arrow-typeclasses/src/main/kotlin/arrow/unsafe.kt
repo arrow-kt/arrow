@@ -1,4 +1,4 @@
-package arrow.effects
+package arrow
 
 import arrow.core.Continuation
 import java.util.concurrent.atomic.AtomicReference
