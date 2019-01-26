@@ -44,7 +44,7 @@ interface IOMonad : Monad<ForIO> {
 }
 
 @extension
-interface IOApplicativeError: ApplicativeError<ForIO, Throwable>, IOApplicative {
+interface IOApplicativeError : ApplicativeError<ForIO, Throwable>, IOApplicative {
   override fun <A> IOOf<A>.attempt(): IO<Either<Throwable, A>> =
     fix().attempt()
 
@@ -56,7 +56,7 @@ interface IOApplicativeError: ApplicativeError<ForIO, Throwable>, IOApplicative 
 }
 
 @extension
-interface IOMonadError: MonadError<ForIO, Throwable>, IOApplicativeError, IOMonad {
+interface IOMonadError : MonadError<ForIO, Throwable>, IOApplicativeError, IOMonad {
 
   override fun <A> just(a: A): IO<A> = IO.just(a)
 
@@ -77,10 +77,10 @@ interface IOMonadError: MonadError<ForIO, Throwable>, IOApplicativeError, IOMona
 }
 
 @extension
-interface IOMonadThrow: MonadThrow<ForIO>, IOMonadError
+interface IOMonadThrow : MonadThrow<ForIO>, IOMonadError
 
 @extension
-interface IOBracket: Bracket<ForIO, Throwable>, IOMonadThrow {
+interface IOBracket : Bracket<ForIO, Throwable>, IOMonadThrow {
   override fun <A, B> IOOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> IOOf<Unit>, use: (A) -> IOOf<B>): IO<B> =
     fix().bracketCase({ a, e -> release(a, e) }, { a -> use(a) })
 
@@ -95,7 +95,7 @@ interface IOBracket: Bracket<ForIO, Throwable>, IOMonadThrow {
 }
 
 @extension
-interface IOMonadDefer: MonadDefer<ForIO>, IOBracket {
+interface IOMonadDefer : MonadDefer<ForIO>, IOBracket {
   override fun <A> defer(fa: () -> IOOf<A>): IO<A> =
     IO.defer(fa)
 
@@ -103,7 +103,7 @@ interface IOMonadDefer: MonadDefer<ForIO>, IOBracket {
 }
 
 @extension
-interface IOAsync: Async<ForIO>, IOMonadDefer {
+interface IOAsync : Async<ForIO>, IOMonadDefer {
   override fun <A> async(fa: Proc<A>): IO<A> =
     IO.async(fa.toIOProc())
 
@@ -114,10 +114,51 @@ interface IOAsync: Async<ForIO>, IOMonadDefer {
     fix().continueOn(ctx)
 }
 
+// FIXME default extensions are declared in arrow-effects-io-extensions due to multiplatform needs
+interface IOConcurrent : Concurrent<ForIO>, IOAsync {
+
+  override fun <A> IOOf<A>.startF(ctx: CoroutineContext): IO<Fiber<ForIO, A>> =
+    ioStart(ctx)
+
+  override fun <A> asyncF(fa: ConnectedProcF<ForIO, A>): IO<A> =
+    IO.asyncF(fa)
+
+  override fun <A> async(fa: ConnectedProc<ForIO, A>): IO<A> =
+    IO.async(fa)
+
+  override fun <A> asyncF(k: ProcF<ForIO, A>): IO<A> =
+    IO.asyncF { _, cb -> k(cb) }
+
+  override fun <A> async(fa: Proc<A>): IO<A> =
+    IO.async { _, cb -> fa(cb) }
+
+  override fun <A, B> racePair(ctx: CoroutineContext, fa: IOOf<A>, fb: IOOf<B>): IO<RacePair<ForIO, A, B>> =
+    IO.racePair(ctx, fa, fb)
+
+  override fun <A, B, C> raceTriple(ctx: CoroutineContext, fa: IOOf<A>, fb: IOOf<B>, fc: IOOf<C>): IO<RaceTriple<ForIO, A, B, C>> =
+    IO.raceTriple(ctx, fa, fb, fc)
+
+}
+
+fun IO.Companion.concurrent(dispatchers: Dispatchers<ForIO>): Concurrent<ForIO> = object : IOConcurrent {
+  override fun dispatchers(): Dispatchers<ForIO> = dispatchers
+}
+
 @extension
-interface IOEffect: Effect<ForIO>, IOAsync {
+interface IOEffect : Effect<ForIO>, IOAsync {
   override fun <A> IOOf<A>.runAsync(cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Unit> =
     fix().runAsync(cb)
+}
+
+// FIXME default extensions are declared in arrow-effects-io-extensions due to multiplatform needs
+interface IOConcurrentEffect : ConcurrentEffect<ForIO>, IOEffect, IOConcurrent {
+
+  override fun <A> IOOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Disposable> =
+    fix().runAsyncCancellable(OnCancel.ThrowCancellationException, cb)
+}
+
+fun IO.Companion.concurrentEffect(dispatchers: Dispatchers<ForIO>): ConcurrentEffect<ForIO> = object : IOConcurrentEffect {
+  override fun dispatchers(): Dispatchers<ForIO> = dispatchers
 }
 
 @extension
