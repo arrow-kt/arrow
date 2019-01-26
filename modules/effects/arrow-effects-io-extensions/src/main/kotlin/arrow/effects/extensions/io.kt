@@ -8,7 +8,6 @@ import arrow.extension
 import kotlin.coroutines.CoroutineContext
 import arrow.effects.IODispatchers as IOD
 import arrow.effects.ap as ioAp
-import arrow.effects.handleErrorWith as ioHandleErrorWith
 import arrow.effects.startF as ioStart
 
 @extension
