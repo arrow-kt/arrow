@@ -114,7 +114,7 @@ interface IOAsync : Async<ForIO>, IOMonadDefer {
     fix().continueOn(ctx)
 }
 
-// FIXME default extensions are declared in arrow-effects-io-extensions due to multiplatform needs
+// FIXME default @extension are temporarily declared in arrow-effects-io-extensions due to multiplatform needs
 interface IOConcurrent : Concurrent<ForIO>, IOAsync {
 
   override fun <A> IOOf<A>.startF(ctx: CoroutineContext): IO<Fiber<ForIO, A>> =
@@ -150,7 +150,7 @@ interface IOEffect : Effect<ForIO>, IOAsync {
     fix().runAsync(cb)
 }
 
-// FIXME default extensions are declared in arrow-effects-io-extensions due to multiplatform needs
+// FIXME default @extension are temporarily declared in arrow-effects-io-extensions due to multiplatform needs
 interface IOConcurrentEffect : ConcurrentEffect<ForIO>, IOEffect, IOConcurrent {
 
   override fun <A> IOOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Disposable> =
