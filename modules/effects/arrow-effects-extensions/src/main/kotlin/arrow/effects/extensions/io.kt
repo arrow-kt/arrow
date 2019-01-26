@@ -116,6 +116,7 @@ interface IOAsync: Async<ForIO>, IOMonadDefer {
 
 @extension
 interface IOConcurrent : Concurrent<ForIO>, IOAsync {
+  // FIXME this is a side-effect of how codegen is done
   fun env(): Environment<ForIO>
 
   override fun environment(): Environment<ForIO> = env()
@@ -151,6 +152,7 @@ interface IOEffect: Effect<ForIO>, IOAsync {
 
 @extension
 interface IOConcurrentEffect: ConcurrentEffect<ForIO>, IOEffect, IOConcurrent {
+  // FIXME this is a side-effect of how codegen is done
   fun concurrentEnv(): Environment<ForIO>
 
   override fun env(): Environment<ForIO> = concurrentEnv()
