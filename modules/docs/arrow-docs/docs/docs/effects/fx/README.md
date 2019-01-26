@@ -96,7 +96,7 @@ Running effectful computations is restricted to runtime extensions of the `Unsaf
 Usage of `unsafe` is reserved to the end of the world and may be the only impure execution of a well typed functional program:
 
 ```kotlin:ank
-import arrow.effects.unsafe
+import arrow.unsafe
 import arrow.effects.extensions.io.unsafeRun.runBlocking
 
 unsafe { runBlocking { program } }
@@ -234,7 +234,7 @@ effects nesting in a simple program that uses parallelism to process effectful c
 
 ```kotlin:ank:playground
 import arrow.effects.extensions.io.fx.fx
-import arrow.effects.unsafe
+import arrow.unsafe
 import arrow.effects.extensions.io.unsafeRun.runBlocking
 import kotlinx.coroutines.Dispatchers
 
