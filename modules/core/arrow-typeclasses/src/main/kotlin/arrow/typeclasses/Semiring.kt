@@ -2,6 +2,9 @@ package arrow.typeclasses
 
 import arrow.core.Option
 
+/**
+ * ank_macro_hierarchy(arrow.typeclasses.Semiring)
+ */
 interface Semiring<A> : Monoid<A> {
 
     fun zero(): A

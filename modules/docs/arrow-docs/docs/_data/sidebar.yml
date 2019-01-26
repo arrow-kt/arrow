@@ -229,6 +229,9 @@ options:
       - title: Monoid
         url: /docs/arrow/typeclasses/monoid/
 
+      - title: Semiring
+        url: /docs/arrow/typeclasses/semiring/
+
       - title: Foldable
         url: /docs/arrow/typeclasses/foldable/
 
