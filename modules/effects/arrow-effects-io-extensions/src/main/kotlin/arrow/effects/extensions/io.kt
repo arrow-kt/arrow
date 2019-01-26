@@ -2,6 +2,7 @@ package arrow.effects.extensions
 
 import arrow.core.Either
 import arrow.effects.*
+import arrow.effects.extensions.io.dispatchers.dispatchers
 import arrow.effects.typeclasses.*
 import arrow.extension
 import kotlin.coroutines.CoroutineContext
@@ -28,8 +29,8 @@ interface IOEnvironment : Environment<ForIO> {
 @extension
 interface IOConcurrent : Concurrent<ForIO>, IOAsync {
 
-  override fun environment(): Environment<ForIO> =
-    IO.environment()
+  override fun dispatchers(): Dispatchers<ForIO> =
+    IO.dispatchers()
 
   override fun <A> IOOf<A>.startF(ctx: CoroutineContext): IO<Fiber<ForIO, A>> =
     ioStart(ctx)
@@ -56,9 +57,6 @@ interface IOConcurrent : Concurrent<ForIO>, IOAsync {
 
 @extension
 interface IOConcurrentEffect : ConcurrentEffect<ForIO>, IOEffect, IOConcurrent {
-
-  override fun environment(): Environment<ForIO> =
-    IO.environment()
 
   override fun <A> IOOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Disposable> =
     fix().runAsyncCancellable(OnCancel.ThrowCancellationException, cb)
