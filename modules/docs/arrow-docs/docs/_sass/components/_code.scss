@@ -19,6 +19,15 @@ p, ul {
   font-size: 0.8rem !important;
   @include border-radius (3px);
   z-index: 0;
+
+  .CodeMirror-lines {
+    margin: 0;
+    padding: 12px 0 10px;
+  }
+
+  .CodeMirror-line {
+    line-height: 1.5;
+  }
 }
 
 .hljs {

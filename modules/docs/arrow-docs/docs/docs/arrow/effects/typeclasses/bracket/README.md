@@ -95,8 +95,7 @@ Note that the result is still an `IO.Async` operation, which means it's still de
 
 We've mentioned that `Bracket` is agnostic of whether the `use` lambda is computed synchronously or asynchronously.
 That's because it's able to run over any data type `F` that can support synchronous and asynchronous
-computations, like [`IO`]({{ '/docs/effects/io' | relative_url }}), [`Observable`]({{ '/docs/integrations/rx2' | relative_url }})
-or [`Deferred`]({{ '/docs/integrations/kotlinxcoroutines' | relative_url }}).
+computations, like [`IO`]({{ '/docs/effects/io' | relative_url }}) or [`Observable`]({{ '/docs/integrations/rx2' | relative_url }}).
 
 It basically targets what in Functional Programming is known as a "Higher Kind".
 
@@ -210,46 +209,7 @@ println(safeComputation)
 }
 ```
 
-And finally over `DeferredK`:
-
-{: data-executable='true'}
-
-```kotlin:ank
-import arrow.effects.coroutines.DeferredK
-import arrow.effects.coroutines.extensions.deferredk.bracket.bracket
-import arrow.Kind
-import arrow.effects.typeclasses.Bracket
-
-class File(url: String) {
-  fun open(): File = this
-  fun close(): Unit {}
-  override fun toString(): String = "This file contains some interesting content!"
-}
-
-class Program<F>(BF: Bracket<F, Throwable>) : Bracket<F, Throwable> by BF {
-
-  fun openFile(uri: String): Kind<F, File> = just(File(uri).open())
-
-  fun closeFile(file: File): Kind<F, Unit> = just(file.close())
-
-  fun fileToString(file: File): Kind<F, String> = just(file.toString())
-}
-
-fun main(args: Array<String>) {
-//sampleStart
-val deferredProgram = Program(DeferredK.bracket())
-
-val safeComputation= with (deferredProgram) {
-  openFile("data.json").bracket(
-    release = { file -> closeFile(file) },
-    use = { file -> fileToString(file) })
-}
-//sampleEnd
-println(safeComputation)
-}
-```
-
-Note that we're running the exact same program passing in three different data types. All of them can provide an
+Note that we're running the exact same program passing in two different data types. All of them can provide an
 instance of `Bracket`, which means that they can support asynchronous and synchronous computations.
 
 This is the style you'd usually use in a Functional Program.

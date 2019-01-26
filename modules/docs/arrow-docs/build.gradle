@@ -15,7 +15,6 @@ dependencies {
     compile project(':arrow-effects-extensions')
     compile project(':arrow-effects-rx2-extensions')
     compile project(':arrow-effects-reactor-extensions')
-    compile project(':arrow-effects-kotlinx-coroutines-extensions')
     compile project(':arrow-optics')
     compile project(':arrow-validation')
     compile project(':arrow-recursion-extensions')
@@ -30,6 +29,7 @@ dependencies {
     compile project(":arrow-reflect")
     kapt project(':arrow-meta')
     kaptTest project(':arrow-meta')
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     compile "org.jetbrains.kotlinx:kotlinx-collections-immutable:$kotlinxCollectionsImmutableVersion"
     testCompile("junit:junit:$jUnitVersion")

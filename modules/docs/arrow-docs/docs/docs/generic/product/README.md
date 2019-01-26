@@ -93,7 +93,7 @@ hListOf(1000, 900).toAccount()
 
 `@product` allows us map independent values in the context of any `Applicative` capable data type straight to the data class inside the data type context
 
-In the examples below we can observe how 2 different `Int` properties are returned inside a type constructor such as `Option`, `Try`, `Deferred` etc... and the automatically mapped to the shape of our `Account` data class removing all boilerplate from extracting the values from their context and returning an `Account` value in the same context.
+In the examples below we can observe how 2 different `Int` properties are returned inside a type constructor such as `Option`, `Try`, `IO` etc... and the automatically mapped to the shape of our `Account` data class removing all boilerplate from extracting the values from their context and returning an `Account` value in the same context.
 
 ```kotlin:ank
 import arrow.core.extensions.option.applicative.applicative
@@ -136,14 +136,13 @@ Try.applicative().run {
 ```
 
 ```kotlin:ank
-import arrow.effects.coroutines.*
-import arrow.effects.coroutines.extensions.deferredk.applicative.applicative
-import kotlinx.coroutines.async
+import arrow.effects.*
+import arrow.effects.extensions.io.applicative.applicative
 
-val asyncBalance: DeferredK<Int> = DeferredK { 1000 }
-val asyncAvailable: DeferredK<Int> = DeferredK { 900 }
+val asyncBalance: IO<Int> = IO { 1000 }
+val asyncAvailable: IO<Int> = IO { 900 }
 
-DeferredK.applicative().run {  
+IO.applicative().run {  
   mapToAccount(asyncBalance, asyncAvailable)
 }
 ```

@@ -8,9 +8,7 @@ import arrow.data.*
 import arrow.data.extensions.list.foldable.nonEmpty
 import arrow.data.extensions.listk.eq.eq
 import arrow.test.UnitSpec
-import arrow.test.generators.genFunctionAToB
-import arrow.test.generators.genTry
-import arrow.test.generators.genTuple
+import arrow.test.generators.*
 import arrow.test.laws.OptionalLaws
 import arrow.test.laws.SetterLaws
 import arrow.test.laws.TraversalLaws
@@ -27,7 +25,7 @@ class OptionalTest : UnitSpec() {
 
     testLaws(OptionalLaws.laws(
       optional = optionalHead,
-      aGen = Gen.list(Gen.int()),
+      aGen = genNonEmptyList(Gen.int()).map { it.all },
       bGen = Gen.int(),
       funcGen = genFunctionAToB(Gen.int()),
       EQA = Eq.any(),
@@ -45,7 +43,7 @@ class OptionalTest : UnitSpec() {
 
     testLaws(OptionalLaws.laws(
       optional = optionalHead.first(),
-      aGen = genTuple(Gen.list(Gen.int()), Gen.bool()),
+      aGen = genTuple(genNonEmptyList(Gen.int()).map { it.all }, Gen.bool()),
       bGen = genTuple(Gen.int(), Gen.bool()),
       funcGen = genFunctionAToB(genTuple(Gen.int(), Gen.bool())),
       EQA = Eq.any(),
@@ -54,7 +52,7 @@ class OptionalTest : UnitSpec() {
 
     testLaws(OptionalLaws.laws(
       optional = optionalHead.first(),
-      aGen = genTuple(Gen.list(Gen.int()), Gen.bool()),
+      aGen = genTuple(genNonEmptyList(Gen.int()).map { it.all }, Gen.bool()),
       bGen = genTuple(Gen.int(), Gen.bool()),
       funcGen = genFunctionAToB(genTuple(Gen.int(), Gen.bool())),
       EQA = Eq.any(),
@@ -63,7 +61,7 @@ class OptionalTest : UnitSpec() {
 
     testLaws(OptionalLaws.laws(
       optional = optionalHead.second(),
-      aGen = genTuple(Gen.bool(), Gen.list(Gen.int())),
+      aGen = genTuple(Gen.bool(), genNonEmptyList(Gen.int()).map { it.all }),
       bGen = genTuple(Gen.bool(), Gen.int()),
       funcGen = genFunctionAToB(genTuple(Gen.bool(), Gen.int())),
       EQA = Eq.any(),

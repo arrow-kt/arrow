@@ -3,55 +3,87 @@
 // -----------------------------------------------
 
 #wrapper {
-    padding-left: 50px;
-    transition: all 0.5s ease;
+    padding-left: 250px;
+    transition: padding 0.4s ease-in-out;
+    &.toggled {
+      padding-left: 0;
+    }
 }
 
 #sidebar-wrapper {
-    z-index: 1;
-    position: fixed;
-    left: -200px;
-    width: 250px;
+    background: $brand-primary;
+    left: 0;
     height: 100%;
     overflow-y: auto;
-    background: $brand-primary;
-    transition: all 0.5s ease;
+    position: fixed;
+    transition: left 0.4s ease-in-out;
+    width: 250px;
+    z-index: 11;
+
+    .sidebar-toggle {
+        display: none;
+    }
 }
 
 #wrapper.toggled {
     #sidebar-wrapper {
         left: -250px;
-        margin-left: 250px;
+    }
+}
+
+.sidebar-toggle {
+    background: none;
+    border: none;
+    color: $brand-tertiary;
+    display: inline-block;
+    padding: 24px 32px;
+    position: relative;
+    text-align: center;
+    text-decoration: none;
+    transition: color 0.3s ease, transform 0.3s ease;
+
+    .menu-icon {
+        position: absolute;
+        top: 37%;
+        left: 38%;
+    }
+
+    &:hover {
+        color: $brand-primary;
+        cursor: pointer;
+        transform: scaleX(1.5);
+    }
+}
+
+@include bp(medium) {
+    #wrapper {
+        padding-left: 0;
+        transition: all 0.4s ease-in-out;
+    }
+
+    #sidebar-wrapper {
+        left: -100%;
+    }
+
+    #wrapper.toggled {
+        #sidebar-wrapper {
+            left: 0;
+            width: 100%;
+
+            .sidebar-toggle {
+                display: block;
+                opacity: 0.7;
+                transition: opacity 0.3s ease, transform 0.3s ease;
+
+                &:hover {
+                    opacity: 1;
+                    transform: rotate(-180deg);
+                }
+            }
+        }
     }
 }
 
 #doc-wrapper {
     width: 100%;
-}
-
-
-@media(min-width:768px) {
-    #wrapper {
-        padding-left: 250px;
-    }
-
-    #wrapper.toggled {
-        padding-left: 50px;
-    }
-
-    #sidebar-wrapper {
-        left: 250px;
-        margin-left: -250px;
-    }
-
-    #wrapper.toggled #sidebar-wrapper {
-        left: -200px;
-        margin-left: 0;
-    }
-
-
-    #wrapper.toggled #doc-wrapper {
-        position: relative;
-        margin-right: 50px;
-    }
 }

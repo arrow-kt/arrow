@@ -1,5 +1,8 @@
 <div id="doc-wrapper">
     <div class="doc-header">
+        <button type="button" id="main-toggle" class="sidebar-toggle">
+            <i class="fa fa-lg fa-bars menu-icon"></i>
+        </button>
         <div class="search-wrapper">
           <input id="docsearch" class="search" placeholder="Search documentation..." type="search">
         </div>
@@ -13,6 +16,6 @@
         {% if page.video %}
         {% include _media-wrapper.html id=page.video %}
         {% endif %}
-        {{content}}
+        {{ content }}
     </div>
 </div>

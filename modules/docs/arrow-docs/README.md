@@ -1,14 +1,17 @@
 # Arrow docs
 
-Arrow documentation deployed to the website.
+This is the Arrow documentation deployed to the website (arrow-kt.io).
 
-## How to contribute
+* [Documentation contribution](#documentation-contribution)
+* [Blog section contribution](#blog-section-contribution)
+
+## Documentation contribution
 
 We prefer Kdocs only for documenting data types or type classes. Only use tutorial style markdown docs for patterns or tutorials. In case you need to add a new docs section, you should go like this:
 
 ### 1. Add a menu entry to your docs
 
-Go to `modules/docs/arrow-docs/docs/_data/menu.yml` and add a menu entry in the proper section, as in:
+Go to `modules/docs/arrow-docs/docs/_data/sidebar.yml` and add a menu entry in the proper section, as in:
 
 ```
 - title: Applicative
@@ -101,7 +104,7 @@ Dokka is responsible of generating documentation based on source code annotation
 ./gradlew clean dokka
 ```
 
-You can run Dokka for a **single module**. That will save you a lot of time. For example, if you've added some docs to the 
+You can run Dokka for a **single module**. That will save you a lot of time. For example, if you've added some docs to the
 `arrow-typeclasses` module, just run:
 
 ```bash
@@ -124,6 +127,30 @@ BUNDLE_GEMFILE=modules/docs/arrow-docs/Gemfile bundle exec jekyll serve -s modul
 ```
 
 This will install any needed dependencies locally, and will use it to launch the complete website in [127.0.0.1:4000](https://127.0.0.1:4000) so you can open it with a standard browser.
+
+
+## Blog section contribution
+
+If you had given a talk, written a post, or spread the word on Arrow in any other way, please don't hesitate to include it in the [blog section of the Arrow website](//arrow-kt.io/blog).
+
+To do so, please add a Markdown file inside the `_posts` directory and include the relevant info to your contribution. As standard for Jekyll posts, please name it as follows:
+
+`yyyy-mm-dd-title-in-kebab-case`
+
+The Front Matter values available to these files are:
+
+* `title`: A short title for your contribution.
+* `header-image`: You can link an external relevant image to be set as a header. Take into account that it will be mostly dynamically trimmed into a ~16:9 ratio. If you have no image you can always set one ready for it, i.e. `/img/blog-image-header.png`.
+* `icon`: An icon to be shown at the top-right of the header. In the same way as the image, you can select one of `/img/icon-podcast.svg`, `/img/icon-news.svg`, or `/img/icon-video.svg`.
+* `version`: Arrow version relevant to this contribution, e.g. `version 0.9.0`. You can leave it empty if it's something generic.
+* `category`: `news` or `media` mainly. It will affect the tab section where your contribution will appear in.
+* `link`: An external link pointing to where more info about your contribution can be found.
+* `event`: Optional field, add it if the contribution happened at some event or conference, useful for talks or workshops.
+
+Then in the content section you can write a small description following Markdown format as usual, including links. Please refrain of setting a long chunk of text here, as it probably won't fit well between the other ones.
+
+To check how it will actually look there, please refer to the [run the docs in your local server](#2-run-the-docs-in-your-local-server) section.
+
 
 ## How to test links
 

@@ -1,10 +1,9 @@
 // NAVIGATION
 // -----------------------------------------------
 // -----------------------------------------------
-
 #navigation {
     position: fixed;
-    z-index: 2;
+    z-index: 30;
     @include flexbox;
     @include justify-content(space-between);
     @include align-items(center);
@@ -17,8 +16,8 @@
         font-weight: $font-medium;
         text-transform: uppercase;
         letter-spacing: 4px;
-        @include bp(medium) {
-            font-size: 0.875rem;
+        @include bp(small) {
+            letter-spacing: 2px;
         }
     }
     .navigation-menu {
@@ -27,15 +26,19 @@
             text-transform: uppercase;
             font-size: 0.875rem;
 
-            &:nth-child(-n+2) {
-                margin-right: ($base-point-grid * 4);
+            @include bp(medium) {
+                text-transform: none;
             }
 
-            @include bp(medium) {
-                &:nth-child(-n+2) {
-                    margin-right: ($base-point-grid * 2);
-                }
-                text-transform: none;
+            &.active {
+                border-bottom: 2px solid $brand-quaternary;
+            }
+
+            & + .navigation-menu-item {
+              margin-left: ($base-point-grid * 4);
+              @include bp(small) {
+                  margin-left: ($base-point-grid * 3.2);
+              }
             }
         }
     }
@@ -45,6 +48,20 @@
 
         &:hover {
             text-decoration: none;
+        }
+    }
+
+    .nav-item-text {
+        @include bp(small) {
+            display: none;
+        }
+    }
+
+    .nav-item-icon {
+        display: none;
+
+        @include bp(small) {
+            display: inline-block;
         }
     }
 
