@@ -1,7 +1,6 @@
 package arrow.effects.extensions
 
 import arrow.core.Either
-import arrow.core.*
 import arrow.effects.*
 import arrow.effects.typeclasses.*
 import arrow.extension
@@ -117,6 +116,10 @@ interface IOAsync: Async<ForIO>, IOMonadDefer {
 
 @extension
 interface IOConcurrent : Concurrent<ForIO>, IOAsync {
+  fun env(): Environment<ForIO>
+
+  override fun environment(): Environment<ForIO> = env()
+
   override fun <A> IOOf<A>.startF(ctx: CoroutineContext): IO<Fiber<ForIO, A>> =
     ioStart(ctx)
 
@@ -148,6 +151,12 @@ interface IOEffect: Effect<ForIO>, IOAsync {
 
 @extension
 interface IOConcurrentEffect: ConcurrentEffect<ForIO>, IOEffect, IOConcurrent {
+  fun concurrentEnv(): Environment<ForIO>
+
+  override fun env(): Environment<ForIO> = concurrentEnv()
+
+  override fun environment(): Environment<ForIO> = concurrentEnv()
+
   override fun <A> IOOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Disposable> =
     fix().runAsyncCancellable(OnCancel.ThrowCancellationException, cb)
 }
