@@ -115,52 +115,9 @@ interface IOAsync: Async<ForIO>, IOMonadDefer {
 }
 
 @extension
-interface IOConcurrent : Concurrent<ForIO>, IOAsync {
-  // FIXME this is a side-effect of how codegen is done
-  fun env(): Environment<ForIO>
-
-  override fun environment(): Environment<ForIO> = env()
-
-  override fun <A> IOOf<A>.startF(ctx: CoroutineContext): IO<Fiber<ForIO, A>> =
-    ioStart(ctx)
-
-  override fun <A> asyncF(k: ConnectedProcF<ForIO, A>): IO<A> =
-    IO.asyncF(k)
-
-  override fun <A> async(fa: ConnectedProc<ForIO, A>): IO<A> =
-    IO.async(fa)
-
-  override fun <A> asyncF(k: ProcF<ForIO, A>): IO<A> =
-    IO.asyncF { _, cb -> k(cb) }
-
-  override fun <A> async(fa: Proc<A>): IO<A> =
-    IO.async { _, cb -> fa(cb) }
-
-  override fun <A, B> racePair(ctx: CoroutineContext, fa: IOOf<A>, fb: IOOf<B>): IO<RacePair<ForIO, A, B>> =
-    IO.racePair(ctx, fa, fb)
-
-  override fun <A, B, C> raceTriple(ctx: CoroutineContext, fa: IOOf<A>, fb: IOOf<B>, fc: IOOf<C>): IO<RaceTriple<ForIO, A, B, C>> =
-    IO.raceTriple(ctx, fa, fb, fc)
-
-}
-
-@extension
 interface IOEffect: Effect<ForIO>, IOAsync {
   override fun <A> IOOf<A>.runAsync(cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Unit> =
     fix().runAsync(cb)
-}
-
-@extension
-interface IOConcurrentEffect: ConcurrentEffect<ForIO>, IOEffect, IOConcurrent {
-  // FIXME this is a side-effect of how codegen is done
-  fun concurrentEnv(): Environment<ForIO>
-
-  override fun env(): Environment<ForIO> = concurrentEnv()
-
-  override fun environment(): Environment<ForIO> = concurrentEnv()
-
-  override fun <A> IOOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Disposable> =
-    fix().runAsyncCancellable(OnCancel.ThrowCancellationException, cb)
 }
 
 @extension
