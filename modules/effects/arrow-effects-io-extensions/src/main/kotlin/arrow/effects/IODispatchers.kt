@@ -7,7 +7,7 @@ import kotlin.coroutines.*
 @undocumented
 // FIXME use expected and actual for multiplatform
 object IODispatchers {
-  // FIXME use CommonPool in Java 8
+  // FIXME use ForkJoinPool.commonPool() in Java 8
   val CommonPool: CoroutineContext = EmptyCoroutineContext + Pool(ForkJoinPool())
 
   private class Pool(val pool: ForkJoinPool) : AbstractCoroutineContextElement(ContinuationInterceptor), ContinuationInterceptor {
