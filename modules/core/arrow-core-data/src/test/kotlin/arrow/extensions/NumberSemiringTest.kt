@@ -1,6 +1,5 @@
 package arrow.extensions
 
-import arrow.core.extensions.eq
 import arrow.core.extensions.semiring
 import arrow.test.UnitSpec
 import arrow.test.laws.SemiringLaws
@@ -17,10 +16,10 @@ class NumberSemiringTest : UnitSpec() {
     }
 
     init {
-        testLaws(SemiringLaws.laws(Byte.semiring(), A.toByte(), B.toByte(), C.toByte(), Byte.eq()))
-        testLaws(SemiringLaws.laws(Double.semiring(), A.toDouble(), B.toDouble(), C.toDouble(), Double.eq()))
-        testLaws(SemiringLaws.laws(Int.semiring(), A, B, C, Int.eq()))
-        testLaws(SemiringLaws.laws(Short.semiring(), A.toShort(), B.toShort(), C.toShort(), Short.eq()))
-        testLaws(SemiringLaws.laws(Float.semiring(), A.toFloat(), B.toFloat(), C.toFloat(), Float.eq()))
+        testLaws(SemiringLaws.laws(Byte.semiring(), A.toByte(), B.toByte(), C.toByte()))
+        testLaws(SemiringLaws.laws(Double.semiring(), A.toDouble(), B.toDouble(), C.toDouble()))
+        testLaws(SemiringLaws.laws(Int.semiring(), A, B, C))
+        testLaws(SemiringLaws.laws(Short.semiring(), A.toShort(), B.toShort(), C.toShort()))
+        testLaws(SemiringLaws.laws(Float.semiring(), A.toFloat(), B.toFloat(), C.toFloat()))
     }
 }
