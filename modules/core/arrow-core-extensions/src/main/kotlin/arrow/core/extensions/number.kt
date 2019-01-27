@@ -18,7 +18,7 @@ interface ByteSemiring: Semiring<Byte> {
     override fun one(): Byte = 1
 
     override fun Byte.combine(b: Byte): Byte = (this + b).toByte()
-    override fun Byte.product(b: Byte): Byte = (this * b).toByte()
+    override fun Byte.combineMultiplicate(b: Byte): Byte = (this * b).toByte()
 }
 
 interface ByteOrder : Order<Byte> {
@@ -75,7 +75,7 @@ interface DoubleSemiring: Semiring<Double> {
   override fun one(): Double = 1.0
 
   override fun Double.combine(b: Double): Double = this + b
-  override fun Double.product(b: Double): Double = this * b
+  override fun Double.combineMultiplicate(b: Double): Double = this * b
 }
 
 interface DoubleOrder : Order<Double> {
@@ -131,7 +131,7 @@ interface IntSemiring: Semiring<Int> {
     override fun one(): Int = 1
 
     override fun Int.combine(b: Int): Int = this + b
-    override fun Int.product(b: Int): Int = this * b
+    override fun Int.combineMultiplicate(b: Int): Int = this * b
 }
 
 interface IntEq : Eq<Int> {
@@ -188,7 +188,7 @@ interface LongSemiring: Semiring<Long> {
     override fun one(): Long = 1
 
     override fun Long.combine(b: Long): Long = this + b
-    override fun Long.product(b: Long): Long = this * b
+    override fun Long.combineMultiplicate(b: Long): Long = this * b
 }
 
 interface LongOrder : Order<Long> {
@@ -245,7 +245,7 @@ interface ShortSemiring: Semiring<Short> {
     override fun one(): Short = 1
 
     override fun Short.combine(b: Short): Short = (this + b).toShort()
-    override fun Short.product(b: Short): Short = (this * b).toShort()
+    override fun Short.combineMultiplicate(b: Short): Short = (this * b).toShort()
 }
 
 interface ShortOrder : Order<Short> {
@@ -302,7 +302,7 @@ interface FloatSemiring: Semiring<Float> {
     override fun one(): Float = 1f
 
     override fun Float.combine(b: Float): Float = this + b
-    override fun Float.product(b: Float): Float = this * b
+    override fun Float.combineMultiplicate(b: Float): Float = this * b
 }
 
 interface FloatOrder : Order<Float> {

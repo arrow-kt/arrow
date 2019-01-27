@@ -37,24 +37,26 @@ object SemiringLaws {
             A.combine(B).equalUnderTheLaw(B.combine(A), EQ)
 
     fun <F> Semiring<F>.semiringMultiplicativeCommutativity(A: F, B: F, C: F, EQ: Eq<F>): Boolean =
-            A.product(B).equalUnderTheLaw(B.product(A), EQ)
+            A.combineMultiplicate(B).equalUnderTheLaw(B.combineMultiplicate(A), EQ)
 
     fun <F> Semiring<F>.semiringRightDistributivity(A: F, B: F, C: F, EQ: Eq<F>): Boolean =
-            (A.combine(B)).product(C).equalUnderTheLaw((A.product(C)).combine(B.product(C)), EQ)
+            (A.combine(B)).combineMultiplicate(C)
+                    .equalUnderTheLaw((A.combineMultiplicate(C)).combine(B.combineMultiplicate(C)), EQ)
 
     fun <F> Semiring<F>.semiringLeftDistributivity(A: F, B: F, C: F, EQ: Eq<F>): Boolean =
-            A.combine(B.product(C)).equalUnderTheLaw((A.product(B)).combine(A.product(C)), EQ)
+            A.combine(B.combineMultiplicate(C))
+                    .equalUnderTheLaw((A.combineMultiplicate(B)).combine(A.combineMultiplicate(C)), EQ)
 
     fun <F> Semiring<F>.semiringMultiplicativeLeftIdentity(A: F, B: F, C: F, EQ: Eq<F>): Boolean =
-            (one().product(A)).equalUnderTheLaw(A, EQ)
+            (one().combineMultiplicate(A)).equalUnderTheLaw(A, EQ)
 
     fun <F> Semiring<F>.semiringMultiplicativeRightIdentity(A: F, B: F, C: F, EQ: Eq<F>): Boolean =
-            A.product(one()).equalUnderTheLaw(A, EQ)
+            A.combineMultiplicate(one()).equalUnderTheLaw(A, EQ)
 
     fun <F> Semiring<F>.semiringMultiplicativeLeftAbsorption(A: F, B: F, C: F, EQ: Eq<F>): Boolean =
-            (zero().product(A)).equalUnderTheLaw(zero(), EQ)
+            (zero().combineMultiplicate(A)).equalUnderTheLaw(zero(), EQ)
 
     fun <F> Semiring<F>.semiringMultiplicativeRightAbsorption(A: F, B: F, C: F, EQ: Eq<F>): Boolean =
-            A.product(zero()).equalUnderTheLaw(zero(), EQ)
+            A.combineMultiplicate(zero()).equalUnderTheLaw(zero(), EQ)
 
 }
