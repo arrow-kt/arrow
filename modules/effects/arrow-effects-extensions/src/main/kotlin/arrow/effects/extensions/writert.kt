@@ -1,17 +1,17 @@
 package arrow.effects.extensions
 
 import arrow.Kind
-import arrow.core.*
-import arrow.data.*
-import arrow.effects.typeclasses.*
-import arrow.extension
-import arrow.data.extensions.WriterTMonadThrow
 import arrow.core.Either
 import arrow.core.Tuple2
 import arrow.core.compose
-import arrow.data.*
+import arrow.data.WriterT
+import arrow.data.WriterTOf
+import arrow.data.WriterTPartialOf
+import arrow.data.extensions.WriterTMonadThrow
+import arrow.data.value
 import arrow.effects.Ref
 import arrow.effects.typeclasses.*
+import arrow.extension
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.Monoid
 import arrow.undocumented

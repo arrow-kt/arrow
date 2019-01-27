@@ -77,7 +77,7 @@ class RefTest : UnitSpec() {
 
       "access success" {
         forAll(Gen.int(), Gen.int()) { a, b ->
-          binding {
+          fx {
             val ref = Ref.of(a, this@with).bind()
             val (_, setter) = ref.access().bind()
             val success = setter(b).bind()
@@ -89,7 +89,7 @@ class RefTest : UnitSpec() {
 
       "access failure" {
         forAll(Gen.int(), Gen.int(), Gen.int()) { a, b, c ->
-          binding {
+          fx {
             val ref = Ref.of(a, this@with).bind()
             val (_, setter) = ref.access().bind()
             ref.set(b).bind()
@@ -102,7 +102,7 @@ class RefTest : UnitSpec() {
 
       "access fail multiple times" {
         forAll(Gen.int(), Gen.int(), Gen.int(), Gen.int()) { a, b, c, d ->
-          binding {
+          fx {
             val ref = Ref.of(a, this@with).bind()
             val (_, setter) = ref.access().bind()
             val cond1 = setter(b).bind()

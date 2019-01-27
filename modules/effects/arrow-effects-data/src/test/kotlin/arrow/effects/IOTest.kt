@@ -5,8 +5,8 @@ import arrow.effects.IO.Companion.just
 import arrow.effects.extensions.io.async.async
 import arrow.effects.extensions.io.concurrent.concurrent
 import arrow.effects.extensions.io.concurrent.parMapN
-import arrow.effects.extensions.io.monad.binding
 import arrow.effects.extensions.io.monad.flatMap
+import arrow.effects.extensions.io.monad.fx
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.milliseconds
 import arrow.effects.typeclasses.seconds
@@ -20,7 +20,6 @@ import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import kotlinx.coroutines.newSingleThreadContext
 import org.junit.runner.RunWith
-import java.lang.RuntimeException
 
 @RunWith(KotlinTestRunner::class)
 @kotlinx.coroutines.ObsoleteCoroutinesApi
@@ -364,8 +363,8 @@ class IOTest : UnitSpec() {
     }
 
     "IO.binding should for comprehend over IO" {
-      val result = binding {
-        val x = IO.just(1).bind()
+      val result = fx {
+        val (x) = IO.just(1)
         val y = bind { IO { x + 1 } }
         y
       }.fix()
@@ -437,3 +436,5 @@ class IOTest : UnitSpec() {
 
   }
 }
+
+object Error : Throwable()

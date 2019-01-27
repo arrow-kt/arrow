@@ -110,7 +110,7 @@ For that we have two flavors of the function `bind()`, which is a function only 
 
 ```kotlin:ank
 binding {
-  val a = IO.invoke { 1 }.bind()
+  val (a) = IO.invoke { 1 }
   a + 1
 }.fix().unsafeRunSync()
 ```
@@ -138,9 +138,9 @@ With this new style we can rewrite our original example of database fetching as:
 ```kotlin
 val university: IO<University> = 
   binding {
-    val student = getStudentFromDatabase("Bob Roxx").bind()
-    val university = getUniversityFromDatabase(student.universityId).bind()
-    val dean = getDeanFromDatabase(university.deanId).bind()
+    val (student) = getStudentFromDatabase("Bob Roxx")
+    val (university) = getUniversityFromDatabase(student.universityId)
+    val (dean) = getDeanFromDatabase(university.deanId)
     dean
   }
 ```
@@ -150,8 +150,8 @@ And you can still write your usual imperative code in the binding block, interle
 ```kotlin
 fun getNLines(path: FilePath, count: Int): IO<List<String>> = 
   binding {
-    val file = getFile(path).bind()
-    val lines = file.readLines().bind()
+    val (file) = getFile(path)
+    val (lines) = file.readLines()
     if (lines.length < count) {
       IO.raiseError(RuntimeException("File has fewer lines than expected")).bind()
     } else {
@@ -172,8 +172,8 @@ Let's take a somewhat common mistake and expand on it:
 ```kotlin
 fun getLineLengthAverage(path: FilePath): IO<List<String>> = 
   binding {
-    val file = getFile(path).bind()
-    val lines = file.readLines().bind()
+    val (file) = getFile(path)
+    val (lines) = file.readLines()
     val count = lines.map { it.length }.foldLeft(0) { acc, lineLength -> acc + lineLength }
     val average = count / lines.length
     average
@@ -191,8 +191,8 @@ It also contains a version of comprehensions that automatically wraps exceptions
 ```kotlin
 fun getLineLengthAverage(path: FilePath): IO<List<String>> = 
   bindingCatch {
-    val file = getFile(path).bind()
-    val lines = file.readLines().bind()
+    val (file) = getFile(path)
+    val (lines) = file.readLines()
     val count = lines.map { it.length }.foldLeft(0) { acc, lineLength -> acc + lineLength }
     val average = count / lines.length
     average
@@ -255,11 +255,11 @@ Let's see an example:
 IO.async().run {
   binding {
     // In current thread
-    val id = createIdFromNumber(762587).bind()
+    val (id) = createIdFromNumber(762587)
     continueOn(CommonPool)
 
     // In CommonPool now!
-    val result = request(id).bind()
+    val (result) = request(id)
     continueOn(Ui)
 
     // In Ui now!

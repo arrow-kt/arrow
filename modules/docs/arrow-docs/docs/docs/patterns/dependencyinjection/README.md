@@ -194,8 +194,8 @@ class UserFetcher<F>(ME: MonadError<F, Throwable>, val api: ApiService): MonadEr
 
   fun getUserFriends(fid: Kind<F, UserId>): Kind<F, List<User>> =
     bindingCatch {
-      val id = fid.bind()
-      val user = api.getUser(id).bind()
+      val (id) = fid
+      val (user) = api.getUser(id)
       user.friendIds.map { api.getUser(it.id) }.bind()
     }.handleError { listOf() }
 
@@ -384,8 +384,8 @@ class UserFetcher<F>(ME: MonadError<F, Throwable>, val api: ApiService): MonadEr
 
   fun getUserFriends(fid: Kind<F, UserId>): Kind<F, List<User>> =
     bindingCatch {
-      val id = fid.bind()
-      val user = api.getUser(id).bind()
+      val (id) = fid
+      val (user) = api.getUser(id)
       user.friendIds.map { api.getUser(it.id) }.bind()
     }.handleError { listOf() }
 
@@ -416,8 +416,8 @@ We can move the functions to an object scope, and make them depend on `FetcherDe
 object Api {
   fun FetcherDependencies.getUserFriends(fid: Kind<F, UserId>): Kind<F, List<User>> =
     bindingCatch {
-      val id = fid.bind()
-      val user = api().getUser(id).bind()
+      val (id) = fid
+      val (user) = api().getUser(id)
       user.friendIds.map { api().getUser(it.id) }.bind()
     }.handleError { listOf() }
 

@@ -95,14 +95,14 @@ import arrow.typeclasses.*
 import arrow.effects.reactor.extensions.flux.monadThrow.bindingCatch
 
 bindingCatch {
-  val songUrl = getSongUrlAsync().bind()
+  val (songUrl) = getSongUrlAsync()
   val musicPlayer = MediaPlayer.load(songUrl)
   val totalTime = musicPlayer.getTotaltime()
     
   val end = DirectProcessor.create<Unit>()
   Flux.interval(Duration.ofMillis(100)).takeUntilOther(end).bind()
     
-  val tick = musicPlayer.getCurrentTime().bind()
+  val (tick) = musicPlayer.getCurrentTime()
   val percent = (tick / totalTime * 100).toInt()
   if (percent >= 100) {
     end.onNext(Unit)

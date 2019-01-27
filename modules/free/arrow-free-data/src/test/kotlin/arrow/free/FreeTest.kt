@@ -35,14 +35,14 @@ sealed class Ops<out A> : OpsOf<A> {
 @RunWith(KotlinTestRunner::class)
 class FreeTest : UnitSpec() {
 
-  private val program = Ops.binding {
-    val added = Ops.add(10, 10).bind()
+  private val program = Ops.fx {
+    val (added) = Ops.add(10, 10)
     val subtracted = bind { Ops.subtract(added, 50) }
     subtracted
   }.fix()
 
-  private fun stackSafeTestProgram(n: Int, stopAt: Int): Free<ForOps, Int> = Ops.binding {
-    val v = Ops.add(n, 1).bind()
+  private fun stackSafeTestProgram(n: Int, stopAt: Int): Free<ForOps, Int> = Ops.fx {
+    val (v) = Ops.add(n, 1)
     val r = bind { if (v < stopAt) stackSafeTestProgram(v, stopAt) else Free.just(v) }
     r
   }.fix()

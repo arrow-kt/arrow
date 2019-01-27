@@ -224,7 +224,7 @@ object MonadDeferLaws {
         val a = bindDefer { Thread.sleep(20); num }
         sideEffect.increment()
         val b = bindDefer { a + 1 }
-        val c = just(b + 1).bind()
+        val (c) = just(b + 1)
         c
       }
       Try { Thread.sleep(10); dispose() }.recover { throw it }
@@ -252,7 +252,7 @@ object MonadDeferLaws {
         val a = bindIn(Dispatchers.Default) { Thread.sleep(20); num }
         sideEffect.increment()
         val b = bindIn(Dispatchers.Default) { a + 1 }
-        val c = just(b + 1).bind()
+        val (c) = just(b + 1)
         c
       }
       Try { Thread.sleep(10); dispose() }.recover { throw it }

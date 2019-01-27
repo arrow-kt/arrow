@@ -76,16 +76,16 @@ object MonadLaws {
   fun <F> Monad<F>.equivalentComprehensions(EQ: Eq<Kind<F, Int>>) {
     val M = this
     forAll(Gen.int()) { num: Int ->
-      val aa = binding {
-        val a = just(num).bind()
-        val b = just(a + 1).bind()
-        val c = just(b + 1).bind()
+      val aa = fx {
+        val (a) = just(num)
+        val (b) = just(a + 1)
+        val (c) = just(b + 1)
         c
       }
       val bb = bindingStackSafe {
-        val a = just(num).bind()
-        val b = just(a + 1).bind()
-        val c = just(b + 1).bind()
+        val (a) = just(num)
+        val (b) = just(a + 1)
+        val (c) = just(b + 1)
         c
       }.run(M)
       aa.equalUnderTheLaw(bb, EQ) &&
@@ -95,17 +95,17 @@ object MonadLaws {
 
   fun <F> Monad<F>.monadComprehensions(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.int()) { num: Int ->
-      binding {
-        val a = just(num).bind()
-        val b = just(a + 1).bind()
-        val c = just(b + 1).bind()
+      fx {
+        val (a) = just(num)
+        val (b) = just(a + 1)
+        val (c) = just(b + 1)
         c
       }.equalUnderTheLaw(just(num + 2), EQ)
     }
 
   fun <F> Monad<F>.monadComprehensionsBindInContext(EQ: Eq<Kind<F, Int>>): Unit =
     forFew(5, genIntSmall()) { num: Int ->
-      binding {
+      fx {
         val a = bindIn(newSingleThreadContext("$num")) { num + 1 }
         val b = bindIn(newSingleThreadContext("$a")) { a + 1 }
         b
@@ -113,7 +113,7 @@ object MonadLaws {
     }
 
   fun <F> Monad<F>.stackSafeTestProgram(n: Int, stopAt: Int): Free<F, Int> = bindingStackSafe {
-    val v = this.just(n + 1).bind()
+    val (v) = this.just(n + 1)
     val r = if (v < stopAt) stackSafeTestProgram(v, stopAt).bind() else this.just(v).bind()
     r
   }

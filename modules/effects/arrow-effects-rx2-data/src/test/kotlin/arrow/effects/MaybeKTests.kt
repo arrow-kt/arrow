@@ -7,12 +7,12 @@ import arrow.effects.rx2.extensions.maybek.async.async
 import arrow.effects.rx2.extensions.maybek.effect.effect
 import arrow.effects.rx2.extensions.maybek.foldable.foldable
 import arrow.effects.rx2.extensions.maybek.functor.functor
+import arrow.effects.rx2.extensions.maybek.monad.flatMap
 import arrow.effects.rx2.extensions.maybek.monad.monad
 import arrow.effects.rx2.extensions.maybek.monadDefer.monadDefer
 import arrow.effects.rx2.extensions.maybek.monadError.monadError
 import arrow.effects.rx2.extensions.maybek.monadThrow.bindingCatch
 import arrow.effects.typeclasses.ExitCase
-import arrow.effects.rx2.extensions.maybek.monad.flatMap
 import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq

@@ -74,9 +74,9 @@ import arrow.core.extensions.either.monad.*
 
 fun getCountryCode(maybePerson : Either<BizError, Person>): Either<BizError, String> =
   binding<BizError, String> {
-    val person = maybePerson.bind()
-    val address = person.address.toEither({ AddressNotFound(person.id) }).bind()
-    val country = address.country.toEither({ CountryNotFound(address.id)}).bind()
+    val (person) = maybePerson
+    val (address) = person.address.toEither({ AddressNotFound(person.id) })
+    val (country) = address.country.toEither({ CountryNotFound(address.id)})
     country.code
   }.fix()
 ```
@@ -181,7 +181,7 @@ fun getCountryCode(personId: Int): ObservableK<Either<BizError, String>> =
         { it.code.right() }
     )
     code
-  }.fix()
+  }
 ```
 
 While we've got the logic working now, we're in a situation where we're forced to deal with the `Left cases`. We also have a ton of boilerplate type conversion with `fold`. The type conversion is necessary because in a monad comprehension you can only use a type of Monad. If we start with `ObservableK`, we have to stay in it’s monadic context by lifting anything we compute sequentially to a `ObservableK` whether or not it's async.
@@ -220,11 +220,11 @@ import arrow.data.extensions.eithert.monad.*
 
 fun getCountryCode(personId: Int): ObservableK<Either<BizError, String>> =
   EitherT.monad<ForObservableK, BizError>(ObservableK.monad()).binding {
-    val person = EitherT(findPerson(personId)).bind()
+    val (person) = EitherT(findPerson(personId))
     val address = EitherT(ObservableK.just(
       person.address.toEither { AddressNotFound(personId) }
     )).bind()
-    val country = EitherT(findCountry(address.id)).bind()
+    val (country) = EitherT(findCountry(address.id))
     country.code
   }.value().fix()
 ```

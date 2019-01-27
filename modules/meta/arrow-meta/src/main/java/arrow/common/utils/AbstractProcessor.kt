@@ -1,6 +1,7 @@
 package arrow.common.utils
 
 import arrow.common.messager.logE
+import arrow.common.messager.logW
 import arrow.documented
 import arrow.meta.encoder.jvm.KotlinMetatadataEncoder
 import me.eugeniomarletti.kotlin.metadata.kotlinMetadata
@@ -47,11 +48,13 @@ abstract class AbstractProcessor : KotlinAbstractProcessor(), ProcessorUtils, Ko
     if (doc != null && doc.trim { it <= ' ' }.isNotEmpty()) {
       @Suppress("SwallowedException")
       try {
-        Files.createDirectories(kDocLocation.toPath().parent)
-        Files.createFile(kDocLocation.toPath())
+        val path = kDocLocation.toPath()
+        Files.createDirectories(path.parent)
+        Files.delete(path)
+        Files.createFile(path)
         kDocLocation.writeText(doc)
       } catch (x: IOException) {
-        logE("Failed to generate kdoc file location: $kDocLocation", e)
+        logW("Failed to generate kdoc file location: $kDocLocation", e)
       }
     }
   }
