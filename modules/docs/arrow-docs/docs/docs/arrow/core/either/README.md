@@ -347,9 +347,9 @@ tupled(Either.Right(1), Either.Right("a"), Either.Right(2.0))
 import arrow.core.extensions.either.monad.*
 
 binding {
-  val a = Either.Right(1).bind()
-  val b = Either.Right(1 + a).bind()
-  val c = Either.Right(1 + b).bind()
+  val (a) = Either.Right(1)
+  val (b) = Either.Right(1 + a)
+  val (c) = Either.Right(1 + b)
   a + b + c
 }
 // Right(6)

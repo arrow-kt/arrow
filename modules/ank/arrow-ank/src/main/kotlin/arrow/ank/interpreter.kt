@@ -1,15 +1,19 @@
 package arrow.ank
 
 import arrow.core.*
-import arrow.effects.typeclasses.MonadDefer
 import arrow.data.extensions.sequence.foldable.foldLeft
+import arrow.effects.typeclasses.MonadDefer
+import java.io.PrintWriter
+import java.io.StringWriter
 import java.net.URL
 import java.net.URLClassLoader
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
-import javax.script.*
+import javax.script.ScriptContext
+import javax.script.ScriptEngine
+import javax.script.ScriptEngineManager
 
 val extensionMappings = mapOf(
   "java" to "java",
@@ -47,6 +51,7 @@ data class Snippet(
   val isSilent: Boolean = fence.contains(AnkSilentBlock),
   val isReplace: Boolean = fence.contains(AnkReplaceBlock),
   val isOutFile: Boolean = fence.contains(AnkOutFileBlock),
+  val isFail: Boolean = fence.contains(AnkFailBlock),
   val isPlayground: Boolean = fence.contains(AnkPlayground),
   val isPlaygroundExtension: Boolean = fence.contains(AnkPlaygroundExtension)
 )
@@ -56,6 +61,7 @@ const val AnkSilentBlock = ":ank:silent"
 const val AnkReplaceBlock = ":ank:replace"
 const val AnkOutFileBlock = ":ank:outFile"
 const val AnkPlayground = ":ank:playground"
+const val AnkFailBlock = ":ank:fail"
 const val AnkPlaygroundExtension = ":ank:playground:extension"
 
 val ankMacroRegex: Regex = "ank_macro_hierarchy\\((.*?)\\)".toRegex()
@@ -158,14 +164,21 @@ fun <F> monadDeferInterpreter(MF: MonadDefer<F>): AnkOps<F> = object : AnkOps<F>
         }.eval(snip.code)
       }.fold<Snippet>({
         // raise error and print to console
-        println(colored(ANSI_RED, "[✗ ${snippets.a} [${i + 1}]"))
-        throw CompilationException(snippets.a, snip, it, msg = "\n" + """
+        if (snip.isFail) {
+          val sw = StringWriter()
+          val pw = PrintWriter(sw)
+          it.printStackTrace(pw)
+          snip.copy(result = sw.toString().some())
+        } else {
+          println(colored(ANSI_RED, "[✗ ${snippets.a} [${i + 1}]"))
+          throw CompilationException(snippets.a, snip, it, msg = "\n" + """
                     |
                     |```
                     |${snip.code}
                     |```
                     |${colored(ANSI_RED, it.localizedMessage)}
                     """.trimMargin())
+        }
       }, { result ->
         // handle results, ignore silent snippets
         if (snip.isSilent) snip

@@ -3,8 +3,11 @@ package arrow.core.extensions
 
 import arrow.Kind
 import arrow.core.*
+import arrow.core.extensions.option.monad.monad
+import arrow.core.extensions.option.monadError.monadError
 import arrow.extension
 import arrow.typeclasses.*
+import arrow.typeclasses.suspended.monad.Fx
 import arrow.core.extensions.traverse as optionTraverse
 
 @extension
@@ -192,4 +195,9 @@ interface OptionHash<A> : Hash<Option<A>>, OptionEq<A> {
   }, {
     HA().run { it.hash() }
   })
+}
+
+@extension
+interface OptionFx : Fx<ForOption> {
+  override fun monad(): Monad<ForOption> = Option.monad()
 }

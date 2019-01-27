@@ -3,14 +3,16 @@ package arrow.effects.reactor.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
-import arrow.effects.reactor.extensions.fluxk.monad.monad
-import arrow.effects.reactor.extensions.fluxk.monadError.monadError
-import arrow.effects.typeclasses.*
-import arrow.extension
 import arrow.effects.reactor.FluxK
 import arrow.effects.reactor.FluxKOf
 import arrow.effects.reactor.ForFluxK
+import arrow.effects.reactor.extensions.fluxk.monad.monad
+import arrow.effects.reactor.extensions.fluxk.monadDefer.monadDefer
+import arrow.effects.reactor.extensions.fluxk.monadError.monadError
 import arrow.effects.reactor.fix
+import arrow.effects.typeclasses.*
+import arrow.effects.typeclasses.suspended.monaddefer.Fx
+import arrow.extension
 import arrow.typeclasses.*
 import kotlin.coroutines.CoroutineContext
 
@@ -165,4 +167,11 @@ fun FluxK.Companion.monadErrorConcat(): FluxKMonadError = object : FluxKMonadErr
 fun FluxK.Companion.monadErrorSwitch(): FluxKMonadError = object : FluxKMonadError{
   override fun <A, B> FluxKOf<A>.flatMap(f: (A) -> FluxKOf<B>): FluxK<B> =
     fix().switchMap { f(it).fix() }
+}
+
+//TODO ObservableK does not yet have a Concurrent instance
+@extension
+interface FluxKFx : Fx<ForFluxK> {
+  override fun monadDefer(): MonadDefer<ForFluxK> =
+    FluxK.monadDefer()
 }

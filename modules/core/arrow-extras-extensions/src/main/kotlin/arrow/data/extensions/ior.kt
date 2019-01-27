@@ -5,8 +5,10 @@ import arrow.Kind2
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.data.*
+import arrow.data.extensions.ior.monad.monad
 import arrow.extension
 import arrow.typeclasses.*
+import arrow.typeclasses.suspended.monad.Fx
 import arrow.undocumented
 
 @extension
@@ -118,4 +120,14 @@ interface IorHash<L, R> : Hash<Ior<L, R>>, IorEq<L, R> {
     is Ior.Right -> HR().run { value.hash() }
     is Ior.Both -> 31 * HL().run { leftValue.hash() } + HR().run { rightValue.hash() }
   }
+}
+
+@extension
+interface IorFx<A> : Fx<IorPartialOf<A>> {
+
+  fun SL(): Semigroup<A>
+
+  override fun monad(): Monad<IorPartialOf<A>> =
+    Ior.monad(SL())
+
 }

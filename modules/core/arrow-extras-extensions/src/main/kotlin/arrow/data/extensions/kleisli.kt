@@ -7,10 +7,12 @@ import arrow.extension
 import arrow.core.extensions.id.applicative.applicative
 import arrow.core.extensions.id.functor.functor
 import arrow.core.extensions.id.monad.monad
+import arrow.data.extensions.ior.monad.monad
 import arrow.data.extensions.kleisli.applicative.applicative
 import arrow.data.extensions.kleisli.functor.functor
 import arrow.data.extensions.kleisli.monad.monad
 import arrow.typeclasses.*
+import arrow.typeclasses.suspended.monad.Fx
 import arrow.undocumented
 
 @extension
@@ -118,3 +120,14 @@ fun <D> ReaderApi.applicative(): Applicative<ReaderPartialOf<D>> = Kleisli.appli
  * Alias for [Kleisli] for [Id]
  */
 fun <D> ReaderApi.monad(): Monad<ReaderPartialOf<D>> = Kleisli.monad(Id.monad())
+
+@extension
+@undocumented
+interface KleisliFx<F, D> : Fx<KleisliPartialOf<F, D>> {
+
+  fun MF(): Monad<F>
+
+  override fun monad(): Monad<KleisliPartialOf<F, D>> =
+    Kleisli.monad(MF())
+
+}

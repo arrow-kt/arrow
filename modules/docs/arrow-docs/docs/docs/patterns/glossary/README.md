@@ -150,8 +150,8 @@ import arrow.core.Option
 import arrow.core.extensions.option.monad.binding
 
 binding {
-  val a = Option(1).bind()
-  val b = Option(a + 1).bind()
+  val (a) = Option(1)
+  val (b) = Option(a + 1)
   a + b
 }
 ```
@@ -175,8 +175,8 @@ listOf(Option(1), Option(2), Option(3)).sequence(Option.applicative())
 import arrow.core.extensions.`try`.monad.binding
 
 binding {
-  val a = Try { 1 }.bind()
-  val b = Try { a + 1 }.bind()
+  val (a) = Try { 1 }
+  val (b) = Try { a + 1 }
   a + b
 }
 ```

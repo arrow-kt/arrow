@@ -1,11 +1,14 @@
 package arrow.effects.extensions
 
+import arrow.Kind
 import arrow.core.Either
-import arrow.core.*
 import arrow.effects.*
+import arrow.effects.extensions.io.concurrent.concurrent
 import arrow.effects.typeclasses.*
+import arrow.effects.typeclasses.suspended.concurrent.Fx
 import arrow.extension
 import arrow.typeclasses.*
+import arrow.unsafe
 import kotlin.coroutines.CoroutineContext
 import arrow.effects.ap as ioAp
 import arrow.effects.handleErrorWith as ioHandleErrorWith
@@ -170,4 +173,20 @@ interface IOMonoid<A> : Monoid<IO<A>>, IOSemigroup<A> {
 
   override fun empty(): IO<A> = IO.just(SM().empty())
 
+}
+
+@extension
+interface IOUnsafeRun : UnsafeRun<ForIO> {
+
+  override suspend fun <A> unsafe.runBlocking(fa: () -> Kind<ForIO, A>): A = fa().fix().unsafeRunSync()
+
+  override suspend fun <A> unsafe.runNonBlocking(fa: () -> Kind<ForIO, A>, cb: (Either<Throwable, A>) -> Unit) =
+    fa().fix().unsafeRunAsync(cb)
+
+}
+
+@extension
+interface IOFx : Fx<ForIO> {
+  override fun concurrent(): Concurrent<ForIO> =
+    IO.concurrent()
 }

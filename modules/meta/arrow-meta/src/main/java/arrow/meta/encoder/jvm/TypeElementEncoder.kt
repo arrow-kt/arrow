@@ -3,41 +3,23 @@ package arrow.meta.encoder.jvm
 import arrow.common.utils.ClassOrPackageDataWrapper
 import arrow.common.utils.ProcessorUtils
 import arrow.meta.Either
+import arrow.meta.ast.*
 import arrow.meta.ast.Annotation
-import arrow.meta.ast.Code
-import arrow.meta.ast.Func
-import arrow.meta.ast.PackageName
-import arrow.meta.ast.Parameter
-import arrow.meta.ast.Property
-import arrow.meta.ast.Tree
-import arrow.meta.ast.Type
-import arrow.meta.ast.TypeName
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.asTypeName
 import com.squareup.kotlinpoet.asTypeVariableName
-import me.eugeniomarletti.kotlin.metadata.getterModality
-import me.eugeniomarletti.kotlin.metadata.getterVisibility
-import me.eugeniomarletti.kotlin.metadata.isDelegated
-import me.eugeniomarletti.kotlin.metadata.isPrimary
-import me.eugeniomarletti.kotlin.metadata.isVar
+import me.eugeniomarletti.kotlin.metadata.*
 import me.eugeniomarletti.kotlin.metadata.jvm.getJvmConstructorSignature
 import me.eugeniomarletti.kotlin.metadata.jvm.getJvmFieldSignature
 import me.eugeniomarletti.kotlin.metadata.jvm.getJvmMethodSignature
 import me.eugeniomarletti.kotlin.metadata.jvm.jvmPropertySignature
-import me.eugeniomarletti.kotlin.metadata.modality
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.TypeTable
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.hasReceiver
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.jvm.JvmProtoBuf
-import me.eugeniomarletti.kotlin.metadata.visibility
-import javax.lang.model.element.Element
-import javax.lang.model.element.ElementKind
-import javax.lang.model.element.ExecutableElement
+import javax.lang.model.element.*
 import javax.lang.model.element.Modifier
-import javax.lang.model.element.PackageElement
-import javax.lang.model.element.TypeElement
-import javax.lang.model.element.VariableElement
 import javax.lang.model.type.NoType
 import javax.lang.model.util.ElementFilter
 import javax.lang.model.util.Elements
@@ -160,48 +142,97 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
     }
   }
 
-  private fun TypeName.ParameterizedType.isSuspendedContinuation(): Boolean =
-    when {
-      rawType.fqName == Function2::class.qualifiedName && typeArguments.size == 3 -> {
-        val maybeContinuation = typeArguments[1]
-        when {
-          maybeContinuation is TypeName.WildcardType &&
-            maybeContinuation.lowerBounds.isNotEmpty() -> {
-            val lowerBoundsContinuation = maybeContinuation.lowerBounds[0]
-            lowerBoundsContinuation is TypeName.ParameterizedType &&
-              lowerBoundsContinuation.rawType.fqName == Continuation::class.qualifiedName
-          }
-          else -> false
+  private fun Func.maybeAsSuspendedContinuation(protoFun: ProtoBuf.Function): Func =
+    if (protoFun.isSuspend) {
+      copy(
+        modifiers = modifiers + arrow.meta.ast.Modifier.Suspend,
+        parameters = parameters.filterNot { it.type.rawName == "kotlin.coroutines.Continuation" },
+        returnType = parameters.lastOrNull().let {
+          val t = it?.type
+          if (t is TypeName.ParameterizedType &&
+            t.rawName == "kotlin.coroutines.Continuation" &&
+            t.typeArguments.isNotEmpty()) t.typeArguments[0]
+          else null
+        } ?: returnType
+      )
+    } else this
+
+  private fun Func.fixSuspendedParameters(): Func =
+      copy(
+        parameters = parameters.map { p ->
+          val t = p.type
+          val result = if (t is TypeName.ParameterizedType) t.asSuspendedContinuation()
+          else t
+          p.copy(type = result)
         }
+      )
+
+  fun TypeName.ParameterizedType.isSimpleContinuation(): Boolean =
+    (rawType.fqName == Function1::class.qualifiedName && typeArguments.size == 2 && {
+      val maybeContinuation = typeArguments[0]
+      when {
+        maybeContinuation is TypeName.WildcardType &&
+          maybeContinuation.lowerBounds.isNotEmpty() -> {
+          val lowerBoundsContinuation = maybeContinuation.lowerBounds[0]
+          lowerBoundsContinuation is TypeName.ParameterizedType &&
+            lowerBoundsContinuation.rawType.fqName == Continuation::class.qualifiedName
+        }
+        else -> false
       }
-      else -> false
+    }())
+
+  fun TypeName.ParameterizedType.isReceiverContinuation(): Boolean =
+    rawType.fqName == Function2::class.qualifiedName && typeArguments.size == 3 && {
+      val maybeContinuation = typeArguments[1]
+      when {
+        maybeContinuation is TypeName.WildcardType &&
+          maybeContinuation.lowerBounds.isNotEmpty() -> {
+          val lowerBoundsContinuation = maybeContinuation.lowerBounds[0]
+          lowerBoundsContinuation is TypeName.ParameterizedType &&
+            lowerBoundsContinuation.rawType.fqName == Continuation::class.qualifiedName
+        }
+        else -> false
+      }
+    }()
+
+  private fun TypeName.ParameterizedType.asSuspendedContinuation(): TypeName =
+    when {
+      isReceiverContinuation() -> TypeName.FunctionLiteral(
+        modifiers = listOf(arrow.meta.ast.Modifier.Suspend),
+        receiverType = typeArguments[0],
+        parameters = emptyList(),
+        returnType = (typeArguments[1] as? TypeName.WildcardType)?.let {
+          it.lowerBounds[0] as? TypeName.ParameterizedType
+        }?.let {
+          it.typeArguments[0]
+        } ?: TypeName.Unit
+      )
+      isSimpleContinuation() -> TypeName.FunctionLiteral(
+        receiverType = null,
+        modifiers = listOf(arrow.meta.ast.Modifier.Suspend),
+        parameters = emptyList(),
+        returnType = (typeArguments[0] as? TypeName.WildcardType)?.let {
+          it.lowerBounds[0] as? TypeName.ParameterizedType
+        }?.let {
+          it.typeArguments[0]
+        } ?: TypeName.Unit
+      )
+      else -> this
     }
 
-  private fun TypeName.ParameterizedType.asSuspendedContinuation(): TypeName.FunctionLiteral =
-    TypeName.FunctionLiteral(
-      modifiers = listOf(arrow.meta.ast.Modifier.Suspend),
-      receiverType = typeArguments[0],
-      parameters = emptyList(),
-      returnType = (typeArguments[1] as? TypeName.WildcardType)?.let {
-        it.lowerBounds[0] as? TypeName.ParameterizedType
-      }?.let {
-        it.typeArguments[0]
-      } ?: TypeName.Unit
-    )
-
-  fun Func.fixReceiverLiterals(meta: ClassOrPackageDataWrapper.Class, protoFun: ProtoBuf.Function): Func =
+  fun Func.fixLiterals(meta: ClassOrPackageDataWrapper.Class, protoFun: ProtoBuf.Function): Func =
     copy(
-      receiverType = receiverType?.fixReceiverLiterals(meta, protoFun.receiverType),
+      receiverType = receiverType?.fixLiterals(meta, protoFun.receiverType),
       parameters = if (parameters.size <= protoFun.valueParameterList.size)
-        parameters.mapIndexed { n, p -> p.fixReceiverLiterals(meta, protoFun.valueParameterList[n]) }
+        parameters.mapIndexed { n, p -> p.fixLiterals(meta, protoFun.valueParameterList[n]) }
       else parameters,
-      returnType = returnType?.fixReceiverLiterals(meta, protoFun.returnType)
+      returnType = returnType?.fixLiterals(meta, protoFun.returnType)
     )
 
-  private fun Parameter.fixReceiverLiterals(meta: ClassOrPackageDataWrapper.Class, protoParam: ProtoBuf.ValueParameter): Parameter =
-    copy(type = type.fixReceiverLiterals(meta, protoParam.type))
+  private fun Parameter.fixLiterals(meta: ClassOrPackageDataWrapper.Class, protoParam: ProtoBuf.ValueParameter): Parameter =
+    copy(type = type.fixLiterals(meta, protoParam.type))
 
-  private fun TypeName.fixReceiverLiterals(
+  private fun TypeName.fixLiterals(
     meta: ClassOrPackageDataWrapper.Class,
     protoType: ProtoBuf.Type
   ): TypeName =
@@ -209,11 +240,11 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
       is TypeName.TypeVariable -> this
       is TypeName.WildcardType -> this
       is TypeName.FunctionLiteral -> this
-      is TypeName.ParameterizedType -> fixReceiverLiterals(meta, protoType)
+      is TypeName.ParameterizedType -> fixLiterals(meta, protoType)
       is TypeName.Classy -> this
     }
 
-  private fun TypeName.ParameterizedType.fixReceiverLiterals(
+  private fun TypeName.ParameterizedType.fixLiterals(
     meta: ClassOrPackageDataWrapper.Class,
     protoType: ProtoBuf.Type
   ): TypeName {
@@ -222,7 +253,7 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
     }
     return if (
       "kotlin/ExtensionFunctionType" in jvmTypeAnnotations && typeArguments.size >= 2)
-      if (isSuspendedContinuation()) asSuspendedContinuation()
+      if (isReceiverContinuation() || isSimpleContinuation()) asSuspendedContinuation()
       else TypeName.FunctionLiteral(
         receiverType = typeArguments[0],
         parameters = typeArguments.drop(1).dropLast(1),
@@ -270,20 +301,23 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
 
           val result =
             if (templateFunction != null && templateFunction.second.modality != null) {
+              val (metaFun, protoFun) = templateFunction
               val fMod = function.copy(
                 modifiers = function.modifiers +
-                  listOfNotNull(templateFunction.second.modality?.toMeta()) +
-                  modifiersFromFlags(templateFunction.second.flags)
-              )
-              if (templateFunction.second.hasReceiverType()) {
-                val receiverTypeName = metaApi().run { fMod.parameters[0].type.asKotlin() }
+                  listOfNotNull(protoFun.modality?.toMeta()) +
+                  modifiersFromFlags(protoFun.flags)
+              ).maybeAsSuspendedContinuation(protoFun)
+              if (protoFun.hasReceiverType()) {
+                val receiverTypeName = metaApi().run {
+                  fMod.parameters[0].type.asKotlin().fixLiterals(metaFun, protoFun.receiverType)
+                }
                 val functionWithReceiver = fMod.copy(receiverType = receiverTypeName)
                 val arguments = functionWithReceiver.parameters.drop(1)
                 functionWithReceiver.copy(parameters = arguments)
-                  .fixReceiverLiterals(templateFunction.first, templateFunction.second)
-              } else fMod.fixReceiverLiterals(templateFunction.first, templateFunction.second)
+                  .fixLiterals(metaFun, protoFun)
+              } else fMod.fixLiterals(metaFun, protoFun)
             } else function
-          result
+          result.fixSuspendedParameters()
         } catch (e: IllegalArgumentException) {
           //some public final functions can't be seen as overridden
           templateFunction?.second?.toMeta(templateFunction.first, member)

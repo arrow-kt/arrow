@@ -5,8 +5,11 @@ import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Tuple2
 import arrow.data.*
+import arrow.data.extensions.optiont.monad.monad
+import arrow.data.extensions.sequencek.monad.monad
 import arrow.extension
 import arrow.typeclasses.*
+import arrow.typeclasses.suspended.monad.Fx
 import arrow.data.combineK as sequenceCombineK
 
 @extension
@@ -129,4 +132,12 @@ interface SequenceKHash<A> : Hash<SequenceK<A>>, SequenceKEq<A> {
   override fun SequenceK<A>.hash(): Int = foldLeft(1) { hash, a ->
     31 * hash + HA().run { a.hash() }
   }
+}
+
+@extension
+interface SequenceKFx<F> : Fx<ForSequenceK> {
+
+  override fun monad(): Monad<ForSequenceK> =
+    SequenceK.monad()
+
 }

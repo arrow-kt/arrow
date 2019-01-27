@@ -4,7 +4,10 @@ import arrow.Kind
 import arrow.core.*
 import arrow.effects.CancelToken
 import arrow.effects.MVar
-import arrow.effects.typeclasses.*
+import arrow.effects.typeclasses.Concurrent
+import arrow.effects.typeclasses.Fiber
+import arrow.effects.typeclasses.mapUnit
+import arrow.effects.typeclasses.rightUnit
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.EmptyCoroutineContext
 

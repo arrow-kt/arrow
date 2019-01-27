@@ -199,18 +199,18 @@ Computing over dependent values ignoring absence
 import arrow.core.extensions.option.monad.binding
 
 binding {
-  val a = Some(1).bind()
-  val b = Some(1 + a).bind()
-  val c = Some(1 + b).bind()
+  val (a) = Some(1)
+  val (b) = Some(1 + a)
+  val (c) = Some(1 + b)
   a + b + c
 }
 ```
 
 ```kotlin:ank
 binding {
-  val x = none<Int>().bind()
-  val y = Some(1 + x).bind()
-  val z = Some(1 + y).bind()
+  val (x) = none<Int>()
+  val (y) = Some(1 + x)
+  val (z) = Some(1 + y)
   x + y + z
 }
 ```
