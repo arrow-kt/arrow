@@ -200,8 +200,8 @@ import arrow.effects.*
 import arrow.effects.extensions.io.monad.binding
 
 binding {
-  val file = getFile("/tmp/file.txt").bind()
-  val lines = file.readLines().bind()
+  val (file) = getFile("/tmp/file.txt")
+  val (lines) = file.readLines()
   val average =
     if (lines.isEmpty()) {
       0

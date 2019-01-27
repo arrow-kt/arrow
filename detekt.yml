@@ -18,6 +18,7 @@ test-pattern:
     - 'TooGenericExceptionThrown'
     - 'TooManyFunctions'
     - 'WildcardImport'
+    - 'FunctionOnlyReturningConstant'
 
 output-reports:
   active: true

@@ -1,6 +1,8 @@
 package arrow.effects.rx2
 
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Left
+import arrow.core.Right
 import arrow.effects.OnCancel
 import arrow.effects.internal.Platform
 import arrow.effects.typeclasses.Disposable

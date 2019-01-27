@@ -2,11 +2,11 @@ package arrow.effects.reactor.extensions
 
 import arrow.core.Either
 import arrow.effects.reactor.ForMonoK
-import arrow.effects.typeclasses.*
-import arrow.extension
 import arrow.effects.reactor.MonoK
 import arrow.effects.reactor.MonoKOf
 import arrow.effects.reactor.fix
+import arrow.effects.typeclasses.*
+import arrow.extension
 import arrow.typeclasses.*
 import kotlin.coroutines.CoroutineContext
 

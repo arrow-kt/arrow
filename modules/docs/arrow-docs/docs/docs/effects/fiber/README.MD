@@ -19,17 +19,17 @@ when the resulting `IO` is canceled it does not propagate this cancellation back
 ```kotlin:ank
 import arrow.effects.*
 import kotlinx.coroutines.Dispatchers.Default
-import arrow.effects.io.monad.monad
+import arrow.effects.extensions.io.fx.fx
 import arrow.effects.typeclasses.Fiber
 
 fun <A, B, C> parallelMap(first: IO<A>,
                      second: IO<B>,
                      f: (A, B) -> C): IO<C> =
-  IO.monad().binding {
-    val fiberOne: Fiber<ForIO, A> = first.startF(Default).bind()
-    val fiberTwo: Fiber<ForIO, B> = second.startF(Default).bind()
+  fx {
+    val (fiberOne: Fiber<ForIO, A>) = first.startF(Default)
+    val (fiberTwo: Fiber<ForIO, B>) = second.startF(Default)
     f(fiberOne.join.bind(), fiberTwo.join.bind())
-  }.fix()
+  }
 
 val first = IO.sleep(5000).map {
   println("Hi, I am first")

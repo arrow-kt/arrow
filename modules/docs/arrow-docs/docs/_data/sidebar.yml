@@ -15,6 +15,13 @@ options:
       - title: Projects & Examples
         url: /docs/quickstart/projects/
 
+  - title: Arrow Fx
+
+    nested_options:
+
+      - title: Getting Started
+        url: /docs/effects/fx/
+
   - title: API Docs
 
     nested_options:

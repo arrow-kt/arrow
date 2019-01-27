@@ -144,9 +144,9 @@ import arrow.data.extensions.option.monad.binding
 
 fun attackOption(): Option<Impacted> =
   binding {
-    val nuke = arm().bind()
-    val target = aim().bind()
-    val impact = launch(target, nuke).bind()
+    val (nuke) = arm()
+    val (target) = aim()
+    val (impact) = launch(target, nuke)
     impact
   }
 
@@ -204,9 +204,9 @@ import arrow.data.extensions.*
 fun attackTry(): Try<Impacted> =
   ForTry extensions {
     binding {
-      val nuke = arm().bind()
-      val target = aim().bind()
-      val impact = launch(target, nuke).bind()
+      val (nuke) = arm()
+      val (target) = aim()
+      val (impact) = launch(target, nuke)
       impact
    }.fix()
   }
@@ -264,9 +264,9 @@ import arrow.core.extensions.either.monad.binding
 
 fun attackEither(): Either<NukeException, Impacted> =
   binding {
-    val nuke = arm().bind()
-    val target = aim().bind()
-    val impact = launch(target, nuke).bind()
+    val (nuke) = arm()
+    val (target) = aim()
+    val (impact) = launch(target, nuke)
     impact
   }
   
@@ -319,9 +319,9 @@ We can now express the same program as before in a fully polymorphic context
 ```kotlin
 fun <F> MonadError<F, NukeException>.attack():Kind<F, Impacted> =
   binding {
-    val nuke = arm<F>().bind()
-    val target = aim<F>().bind()
-    val impact = launch<F>(target, nuke).bind()
+    val (nuke) = arm<F>()
+    val (target) = aim<F>()
+    val (impact) = launch<F>(target, nuke)
     impact
   }
 ```
@@ -349,8 +349,8 @@ fun <f> MonadError<F, NukeException>.launchImjust(target: Target, nuke: Nuke): I
 
 fun <f> MonadError<F, NukeException>.attack(): Kind<F, Impacted> =
   bindingCatch {
-    val nuke = arm<F>().bind()
-    val target = aim<F>().bind()
+    val (nuke) = arm<F>()
+    val (target) = aim<F>()
     val impact = launchImpure<F>(target, nuke)
     impact
   }

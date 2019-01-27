@@ -63,8 +63,8 @@ val positive = generateSequence(1) { it + 1 }.k() // sequence of positive number
 val positiveEven = positive.filter { it % 2 == 0 }.k()
 
 binding {
-  val p = positive.bind()
-  val pe = positiveEven.bind()
+  val (p) = positive
+  val (pe) = positiveEven
   p + pe
 }.take(5).toList()
 ```
