@@ -32,6 +32,32 @@ interface OptionMonoid<A> : Monoid<Option<A>>, OptionSemigroup<A> {
 }
 
 @extension
+interface OptionSemiring<A> : Semiring<Option<A>> {
+
+  fun SG(): Semiring<A>
+  override fun zero(): Option<A> = None
+  override fun one(): Option<A> = None
+
+  override fun Option<A>.combine(b: Option<A>): Option<A> =
+          when (this) {
+            is Some<A> -> when (b) {
+              is Some<A> -> Some(SG().run { t.combine(b.t) })
+              None -> this
+            }
+            None -> b
+          }
+
+  override fun Option<A>.combineMultiplicate(b: Option<A>): Option<A> =
+          when (this) {
+            is Some<A> -> when (b) {
+              is Some<A> -> Some(SG().run { t.combineMultiplicate(b.t) })
+              None -> this
+            }
+            None -> b
+          }
+}
+
+@extension
 interface OptionApplicativeError: ApplicativeError<ForOption, Unit>, OptionApplicative {
   override fun <A> raiseError(e: Unit): Option<A> =
     None
