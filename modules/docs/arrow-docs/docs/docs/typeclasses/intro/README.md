@@ -128,7 +128,7 @@ We will list them by their hierarchy.
 
 ##### Semiring
 
-- [`Semigroup`]({{ '/docs/arrow/typeclasses/semiring/' | relative_url }}) - can combine or create the product from two objects
+- [`Semiring`]({{ '/docs/arrow/typeclasses/semiring/' | relative_url }}) - can combine or multiplicatively combine two objects together
 
 ##### Functor
 

@@ -7,9 +7,19 @@ import arrow.core.Option
  */
 interface Semiring<A> : Monoid<A> {
 
+    /**
+     * A zero value for this A
+     */
     fun zero(): A
+
+    /**
+     * A one value for this A
+     */
     fun one(): A
 
+    /**
+     * Multiplicatively combine two [A] values.
+     */
     fun A.combineMultiplicate(b: A): A
 
     override fun empty(): A = one()
@@ -17,6 +27,9 @@ interface Semiring<A> : Monoid<A> {
     operator fun A.times(b: A): A =
             this.combineMultiplicate(b)
 
-    fun A.maybeProduct(b: A?): A =
+    /**
+     * Maybe multiplicatively combine two [A] values.
+     */
+    fun A.maybeCombineMultiplicate(b: A?): A =
             Option.fromNullable(b).fold({ this }, { combineMultiplicate(it) })
 }
