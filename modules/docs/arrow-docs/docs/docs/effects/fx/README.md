@@ -6,12 +6,11 @@ permalink: /docs/effects/fx/
 
 ## Arrow Fx. Typed FP for the masses
 
-Arrow Fx is a library that brings purity, referential transparency and direct syntax for effectful programs denoted as suspended functions.
+Creating Typed Pure Functional Programs is fun and easy with Arrow Fx.
 
-Arrow Fx opens a world of purity and controlled effects to help you describe your favorite effectful programs in both polymorphic and concrete styles as you do today using a wrapper like IO, Deferred or Observable but with direct syntax and unwrapped values that respect non-blocking semantics.
+Arrow Fx brings purity, referential transparency and direct imperative syntax to effectful programs declared as suspended functions.
 
-Arrow Fx removes the need for all the combinators in the Functor hierarchy empowering programmers to express equivalent programs for all suspended capable runtimes like Kotlinx Coroutines, Reactor Framework, Rx2, etc bridging the gap of FP features a user must learn before
-is productive defining algebras and interpreters.
+Arrow Fx programs can run unmodified in multiple supported frameworks and runtimes such as Arrow Effects IO, KotlinX Coroutines Deferred, Rx2 Observable and many more.
 
 The below program illustrates the *Hello World* of effectful programming with Arrow Fx:
  
@@ -19,81 +18,135 @@ The below program illustrates the *Hello World* of effectful programming with Ar
 
 ### Pure functions
 
-Pure functions return deterministically the same output given the same input and do not alter the state of the outer
-world. A pure expression can be defined and it's allowed to run in the Kotlin raw environment by the Kotlin compiler.
+A pure function is a function that returns the same output consistently given the same input.
+to create a pure function in Kotlin we may use keyword `fun`.
 
 ```kotlin:ank
-val helloWorld: String =
+fun helloWorld(): String =
   "Hello World"
   
-helloWorld
+helloWorld()
 ```
+
+We can state that `helloWorld` is a pure functions because invoking `helloWorld()` consistently returns the same output given the same input and does not produce observable changes in the external world.
+
 
 ### Side effects
 
-Users can denote side effects and in general effectful statements and expressions with `suspend fun`.
+A side effect is an observable effect a function performs beside returning a value.
 
-```kotlin:ank
+We use `suspend fun` to denote a functions that may cause side effects.
+
+```kotlin:ank:silent
 suspend fun sayHello(): Unit =
   println(helloWorld)
 ```
 
-A `suspend` function denotes a suspended computation. All side effects should be suspended and non-evaluated in 
-compositions to ensure purity and referential transparency of the effectful expressions.
+`println` is a side effect because each time it's invoked it causes observable effects in the external world state.
+In this case invoking `println` causes a message to be sent to the system's standard out stream. This happens in addition to the function returns `Unit`
 
-Attempting to run a side effect in the pure environment is disallowed by the Kotlin compiler unless we prove that
-we know how to handle success and error outcomes from evaluating the effect once suspension is resumed. 
+When we denote side effects as `suspend` the Kotlin compiler will ensure we are not applying side effects uncontrolled in the pure environment.
 
 ```kotlin:ank:fail
 sayHello()
 ```
 
-The Kotlin compiler won't allow side effects denoted as `suspend` to run or compile until you provide a `Continuation<A>`
-that handles success and error cases.
+The Kotlin compiler disallows a suspend function in a pure environment because a `suspend fun` requires a continuation.
+A continuation proves we know how to handle success and error cases resulting from running the effect.
 
-The Kotlin compiler automatically translates all suspended functions to a function that receives a `kotlin.coroutines.Continuation<A>` additional argument bridging this way CPS style continuation without callbacks.
+Arrow implements all the continuations and suspension system needed to safely compose and run side effects in a pure functional program.
 
-### Composing effects and pure expressions
+### Composing Side Effects
 
-It's fine though applying and composing side effects in the presence of an `fx` block. 
-`fx` is continuation that all data types providing an extension for `ConcurrentEffect<F>` can support.
+#### `suspend` composition
 
-The example below proves how our effect controlled program can run in the context of the IO monad which Arrow provides
-while it fails to compile in all other positions due to being an uncontrolled invocation.
+Applying and composing suspended side effects it's allowed in the presence of other suspended side effect. 
+In the example below `sayHello` and `sayGoodBye` are valid inside `greet` because all of them are suspended functions.
 
-```kotlin:ank:fail
+```kotlin:ank:silent
+suspend fun sayGoodBye(): Unit =
+  println("Good bye World!")
+  
+suspend fun sayHello(): Unit =
+  println(helloWorld)
+  
+suspend fun greet(): Unit {
+  sayHello() // this is ok because
+  sayGoodBye() // `greet` is also `suspend`
+}
+```
+
+#### `fx` composition
+
+Side effects can be composed and turned into pure values in `fx` blocks. 
+
+#### Applying side effects with `effect`
+
+```kotlin:ank:silent
 import arrow.effects.extensions.io.fx.fx
 
-fx {
-  sayHello() // Does not compile because Arrow Fx forces uses to denote side effects in `effect` blocks
-}
-val x = sayHello() // Does not compile because suspended functions need to be in a continuation
+fun greet(): IO<Unit> =
+  fx {
+    effect { sayHello() }
+    effect { sayGoodBye() }
+  }
 ```
+
+Side effects are applied with the function `effect`. `effect` takes the suspended side effects `sayHello()` and `sayGoodbye()` and ensures they are controlled by the `IO` context before they get a chance to be executed. This ensures our effect compositions are pure and referentially transparent and will only run as part of an `IO` program.
+
+An attempt to run a side effect in an `fx` block not delimited by `effect` also results in a compilation error. 
+
+```kotlin:ank:silent
+import arrow.effects.extensions.io.fx.fx
+
+fun greet(): IO<Unit> =
+  fx {
+    sayHello()
+  }
+```
+
+Arrow enforces usage to be explicit about side effect application.
+
+You may have noticed we don't use `suspend fun` for `greet` in this case. 
+This is because `greet`'s return type is `IO` which is already a pure value.
+`IO` is one of the concrete data types Arrow uses to represent effectful programs and control effects.
+IO programs are suspended and won't run until the user explicitly chooses to perform effects via an unsafe block such as `unsafe { runBlocking { greet() } }` or similar.
+
+#### Turning side effects into pure values with `f` 
+
+`f`, unlike `effect` wraps the effect and turns it into a pure value that may be manually destructured:
 
 ```kotlin:ank
-import arrow.effects.extensions.io.fx.fx
-
-val program = fx {
-  effect { sayHello() } 
-}
-
-program
+fun greet(): IO<Unit> =
+  fx {
+    val pureHello: IO<Unit> = f { sayHello() }
+    val puregoodBye: IO<Unit> = f { sayHello() }
+    val (_ : Unit) = pureHello
+    val (_ : Unit) = pureGoodBye
+  }
 ```
+
+When we capture suspended side effects as `IO` values, we can pass them around and compose them until we are ready to apply the effects.
+We can extract the pure value's content and use their binding to continue composing out program.
+
+Note that while we are talking about effect application we are not running anything just yet.
+All `fx` blocks over Effectful capable data types like IO will always yield a non-executed program that we can explicitly run once we are ready to.
 
 ### Executing effectful programs
 
-All programs encapsulated in `fx` block yield a value at the end wrapped in the concurrent data type the user wishes
-to make its program concrete to. 
-This allows `Arrow Fx` to support as many possible run times as suspend capable monad data types exist.
+All programs encapsulated in `fx` blocks yield a value at the end wrapped in the concurrent data type the user wishes to make its program concrete to. 
+In the examples in this tutorial we are using `arrow.effects.IO` as target for our Fx programs.
 
-This implies Arrow Fx programs are not restricited to IO but in fact polymorphic and would work unmodified in many useful runtimes like the ones we find in popular libraries such as KotlinX Coroutines `Deferred`,
-Rx2 `Observable`, Reactor framework `Flux` and in general any third party data type that can model sync and async effect suspension.
+Arrow Fx programs are not restricted to `IO` but in fact polymorphic and would work unmodified in many useful runtimes like the ones we find in popular libraries such as KotlinX Coroutines `Deferred`, Rx2 `Observable`, Reactor framework `Flux` and in general any third party data type that can model sync and async effect suspension.
 
-The `program` above is ready to run as soon as the user is ready to commit to an execution strategy that will decide if the program runs
-blocking or non-blocking. Since both blocking and non-blocking execution scenarios perform the side effects contained i the program description we consider running effects an `unsafe` operation. 
+The `program` above is ready to run as soon as the user is ready to commit to an execution strategy that is either `blocking` or `non-blocking`.
+`blocking` execution strategies will block the current thread waiting for the program to yield a value whereas `non-blocking` strategies will inmediately return and perform the program's work without blocking the current thread.
 
-Running effectful computations is restricted to runtime extensions of the `Unsafe` type class which `IO` provides extensions for.
-Usage of `unsafe` is reserved to the end of the world and may be the only impure execution of a well typed functional program:
+Since both blocking and non-blocking execution scenarios perform side effects we consider running effects an `unsafe` operation. 
+
+Arrow restricts the ability to run programs to extensions of the `UnsafeRun` type class. 
+
+Usage of `unsafe` is reserved to the end of the world and may be the only impure execution of a well typed functional program.
 
 ```kotlin:ank
 import arrow.unsafe
@@ -102,7 +155,7 @@ import arrow.effects.extensions.io.unsafeRun.runBlocking
 unsafe { runBlocking { program } }
 ```
 
-Arrow Fx makes emphasis in guaranteeing users understand where they are performing side effects in their program declaration.
+Arrow Fx makes emphasis in guaranteeing users understand when they are performing side effects in their program declaration.
 
 If you've come this far and you are not too familiar with FP you are probably realizing by now that you already know how to use Arrow Fx
 for the most part. That is because Arrow Fx brings the most popular imperative style to effectful programs. A style that most OOP developers coming from other backgrounds are already accustomed to. 
