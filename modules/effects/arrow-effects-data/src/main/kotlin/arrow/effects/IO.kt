@@ -6,7 +6,6 @@ import arrow.effects.OnCancel.Companion.CancellationException
 import arrow.effects.OnCancel.Silent
 import arrow.effects.OnCancel.ThrowCancellationException
 import arrow.effects.internal.IOBracket
-import arrow.effects.internal.IOCancel
 import arrow.effects.internal.Platform.maxStackDepthSize
 import arrow.effects.internal.Platform.onceOnly
 import arrow.effects.internal.Platform.unsafeResync
@@ -56,7 +55,13 @@ sealed class IO<out A> : IOOf<A> {
             IO { callback(Left(t)) }
           }
 
-          IORunLoop.startCancelable(fa, conn2, mapUnit)
+          IORunLoop.startCancelable(fa, conn2) { result ->
+            // DEV: If fa cancels conn2 like so `conn.cancel().map { cb(Right(Unit)) }`
+            // It doesn't run the stack of conn2, instead the result is seen in the cb of startCancelable.
+            val resultCancelled = result.fold({ e -> e == OnCancel.CancellationException }, { false })
+            if (resultCancelled && conn.isNotCanceled()) IORunLoop.start(conn.cancel(), mapUnit)
+            else Unit
+          }
         }
       }
 
@@ -131,10 +136,9 @@ sealed class IO<out A> : IOOf<A> {
 
   internal abstract fun unsafeRunTimedTotal(limit: Duration): Option<A>
 
-  /**
-   * Makes the source `IO` uninterruptible such that a [Fiber.cancel] signal has no effect.
-   */
-  fun uncancelable(): IO<A> = IOCancel.uncancelable(this)
+  /** Makes the source [IO] uncancelable such that a [Fiber.cancel] signal has no effect. */
+  fun uncancelable(): IO<A> =
+    IO.ContextSwitch(this, ContextSwitch.makeUncancelable, ContextSwitch.disableUncancelable())
 
   fun <B> bracket(release: (A) -> IOOf<Unit>, use: (A) -> IOOf<B>): IO<B> =
     bracketCase({ a, _ -> release(a) }, use)
@@ -195,6 +199,14 @@ sealed class IO<out A> : IOOf<A> {
     val modify: (IOConnection) -> IOConnection,
     val restore: ((Any?, Throwable?, IOConnection, IOConnection) -> IOConnection)?) : IO<A>() {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
+
+    companion object {
+      //Internal reusable reference.
+      internal val makeUncancelable: (IOConnection) -> IOConnection = { IOConnection.uncancelable }
+
+      internal fun <A> disableUncancelable(): (A, Throwable?, IOConnection, IOConnection) -> IOConnection =
+        { _, _, old, _ -> old }
+    }
   }
 
   internal data class Map<E, out A>(val source: IOOf<E>, val g: (E) -> A, val index: Int) : IO<A>(), (E) -> IO<A> {

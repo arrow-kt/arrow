@@ -19,11 +19,11 @@ import arrow.typeclasses.Conested
 import arrow.typeclasses.Eq
 import arrow.typeclasses.conest
 import arrow.typeclasses.counnest
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
+import io.kotlintest.shouldBe
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class KleisliTest : UnitSpec() {
   private fun <A> TryEQ(): Eq<KleisliOf<ForTry, Int, A>> = Eq { a, b ->
     a.run(1) == b.run(1)

@@ -4,17 +4,23 @@ package arrow.core.extensions
 import arrow.Kind
 import arrow.core.*
 import arrow.core.Try.Failure
+import arrow.core.extensions.`try`.monad.monad
+import arrow.core.extensions.`try`.monadError.monadError
+import arrow.core.extensions.`try`.monadThrow.monadThrow
+import arrow.core.extensions.id.monad.monad
+import arrow.core.extensions.option.monadError.monadError
 import arrow.extension
 import arrow.typeclasses.*
+import arrow.typeclasses.suspended.monad.Fx
 import arrow.core.extensions.traverse as tryTraverse
 
 fun <A> Try<A>.combine(SG: Semigroup<A>, b: Try<A>): Try<A> =
   when (this) {
     is Success<A> -> when (b) {
       is Success<A> -> Success(SG.run { value.combine(b.value) })
-      is Failure -> this
+      is Failure -> b
     }
-    is Failure -> b
+    is Failure -> this
   }
 
 @extension
@@ -171,4 +177,9 @@ interface TryHash<A> : Hash<Try<A>>, TryEq<A> {
   }, {
     HA().run { it.hash() }
   })
+}
+
+@extension
+interface TryFx : arrow.typeclasses.suspended.monaderror.Fx<ForTry> {
+  override fun monadError(): MonadThrow<ForTry> = Try.monadThrow()
 }

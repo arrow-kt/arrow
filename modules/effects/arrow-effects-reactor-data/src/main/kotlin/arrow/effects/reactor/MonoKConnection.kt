@@ -19,6 +19,7 @@ typealias MonoKProcF<A> = (MonoKConnection, (Either<Throwable, A>) -> Unit) -> M
  *
  * @see MonoK.async
  */
+@Suppress("UNUSED_PARAMETER", "FunctionName")
 fun MonoKConnection(dummy: Unit = Unit): KindConnection<ForMonoK> = KindConnection(object : MonadDefer<ForMonoK> {
   override fun <A> defer(fa: () -> MonoKOf<A>): MonoK<A> =
     MonoK.defer(fa)

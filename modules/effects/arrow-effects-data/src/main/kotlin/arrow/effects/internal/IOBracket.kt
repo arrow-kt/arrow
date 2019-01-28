@@ -60,10 +60,11 @@ internal object IOBracket {
             val onNext = {
               val fb = try {
                 use(a)
-              } catch (nonFatal: Exception) {
-                IO.raiseError<B>(nonFatal)
+              } catch (e: Throwable) {
+                IO.raiseError<B>(e)
               }
-              fb.fix().flatMap(frame)
+
+              IO.Bind(fb.fix(), frame)
             }
 
             // Registering our cancelable token ensures that in case cancellation is detected, release gets called
@@ -123,7 +124,7 @@ internal object IOBracket {
           IO.unit
       }
 
-    val cancel: CancelToken<ForIO> = applyRelease(ExitCase.Cancelled).fix().uncancelable()
+    val cancel: CancelToken<ForIO> = applyRelease(ExitCase.Canceled).fix().uncancelable()
 
     // Unregistering cancel token, otherwise we can have a memory leak;
     // N.B. conn.pop() happens after the evaluation of `release`, because
@@ -131,20 +132,20 @@ internal object IOBracket {
     override fun recover(e: Throwable): IO<B> = IO.ContextSwitch(applyRelease(ExitCase.Error(e)), makeUncancelable, disableUncancelableAndPop)
       .flatMap(ReleaseRecover(e))
 
-    override operator fun invoke(b: B): IO<B> =
+    override operator fun invoke(a: B): IO<B> =
     // Unregistering cancel token, otherwise we can have a memory leak
     // N.B. conn.pop() happens after the evaluation of `release`, because
     // otherwise we might have a conflict with the auto-cancellation logic
       IO.ContextSwitch(applyRelease(ExitCase.Completed), makeUncancelable, disableUncancelableAndPop)
-        .map { b }
+        .map { a }
   }
 
-  private class ReleaseRecover(val e: Throwable) : IOFrame<Unit, IO<Nothing>> {
+  private class ReleaseRecover(val error: Throwable) : IOFrame<Unit, IO<Nothing>> {
 
-    override fun recover(e2: Throwable): IO<Nothing> =
-      IO.raiseError(Platform.composeErrors(e, e2))
+    override fun recover(e: Throwable): IO<Nothing> =
+      IO.raiseError(Platform.composeErrors(error, e))
 
-    override fun invoke(a: Unit): IO<Nothing> = IO.raiseError(e)
+    override fun invoke(a: Unit): IO<Nothing> = IO.raiseError(error)
   }
 
   private val makeUncancelable: (IOConnection) -> IOConnection = { IOConnection.uncancelable }

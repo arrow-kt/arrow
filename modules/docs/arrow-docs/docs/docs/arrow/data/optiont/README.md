@@ -46,22 +46,22 @@ fun getCountryCode(maybePerson : Option<Person>): Option<String> =
 
 Nested flatMap calls flatten the `Option` but the resulting function starts looking like a pyramid and can easily lead to callback hell.
 
-We can further simplify this case by using Arrow `binding` facilities
+We can further simplify this case by using Arrow `fx` facilities
 that enables monad comprehensions for all datatypes for which a monad instance is available.
 
 ```kotlin:ank:silent
 import arrow.typeclasses.*
 import arrow.core.extensions.*
-import arrow.core.extensions.option.monad.binding
+import arrow.core.extensions.option.fx.fx
 
 fun getCountryCode(maybePerson : Option<Person>): Option<String> =
-   binding {
-     val person = maybePerson.bind()
-     val address = person.address.bind()
-     val country = address.country.bind()
-     val code = country.code.bind()
-     code
-   }
+  fx {
+    val (person) = maybePerson
+    val (address) = person.address
+    val (country) = address.country
+    val (code) = country.code
+    code
+  }
 ```
 
 Alright, a piece of cake right? That's because we were dealing with a simple type `Option`. But here's where things can get more complicated. Let's introduce another monad in the middle of the computation. For example what happens when we need to load a person by id, then their address and country to obtain the country code from a remote service?
@@ -141,26 +141,26 @@ This isn't actually what we want since the inferred return type is `ObservableK<
 Let's look at how a similar implementation would look like using monad comprehensions without transformers:
 
 ```kotlin:ank
-import arrow.effects.rx2.extensions.observablek.monad.binding
+import arrow.effects.rx2.extensions.observablek.fx.fx
 
 fun getCountryCode(personId: Int): ObservableK<Option<String>> =
-    binding {
-      val maybePerson = findPerson(personId).bind()
-      val person = maybePerson.fold(
-        { ObservableK.raiseError<Person>(NoSuchElementException("...")) },
-        { ObservableK.just(it) }
-      ).bind()
-      val address = person.address.fold(
-        { ObservableK.raiseError<Address>(NoSuchElementException("...")) },
-        { ObservableK.just(it) }
-      ).bind()
-      val maybeCountry = findCountry(address.id).bind()
-      val country = maybeCountry.fold(
-        { ObservableK.raiseError<Country>(NoSuchElementException("...")) },
-        { ObservableK.just(it) }
-      ).bind()
-      country.code
-    }              
+       fx {
+        val maybePerson = findPerson(personId).bind()
+        val person = maybePerson.fold(
+          { ObservableK.raiseError<Person>(NoSuchElementException("...")) },
+          { ObservableK.just(it) }
+        ).bind()
+        val address = person.address.fold(
+          { ObservableK.raiseError<Address>(NoSuchElementException("...")) },
+          { ObservableK.just(it) }
+        ).bind()
+        val maybeCountry = findCountry(address.id).bind()
+        val country = maybeCountry.fold(
+          { ObservableK.raiseError<Country>(NoSuchElementException("...")) },
+          { ObservableK.just(it) }
+        ).bind()
+        country.code
+      }       
 ```
 
 While we've got the logic working now, we're in a situation where we're forced to deal with the `None cases`. We also have a ton of boilerplate type conversion with `fold`. The type conversion is necessary because in a monad comprehension you can only use a type of Monad. If we start with `ObservableK`, we have to stay in it’s monadic context by lifting anything we compute sequentially to a `ObservableK` whether or not it's async.
@@ -204,15 +204,15 @@ So how would our function look if we implemented it with the OptionT monad trans
 
 ```kotlin:ank:silent
 import arrow.effects.rx2.extensions.*
-import arrow.data.extensions.optiont.monad.binding
+import arrow.data.extensions.optiont.fx.fx
 import arrow.effects.rx2.extensions.observablek.monad.monad
 
 fun getCountryCode(personId: Int): ObservableK<Option<String>> =
-   binding(ObservableK.monad()) {
-    val person = OptionT(findPerson(personId)).bind()
-    val address = OptionT(ObservableK.just(person.address)).bind()
-    val country = OptionT(findCountry(address.id)).bind()
-    val code = OptionT(ObservableK.just(country.code)).bind()
+   fx(ObservableK.monad()) {
+    val (person) = OptionT(findPerson(personId))
+    val (address) = OptionT(ObservableK.just(person.address))
+    val (country) = OptionT(findCountry(address.id))
+    val (code) = OptionT(ObservableK.just(country.code))
     code
   }.value().fix()
 ```

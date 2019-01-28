@@ -1,12 +1,15 @@
 package arrow.effects.extensions
 
 import arrow.core.*
-import arrow.data.*
+import arrow.core.extensions.either.monad.flatten
+import arrow.data.EitherT
+import arrow.data.EitherTOf
+import arrow.data.EitherTPartialOf
+import arrow.data.extensions.EitherTMonadThrow
+import arrow.data.value
 import arrow.effects.Ref
 import arrow.effects.typeclasses.*
 import arrow.extension
-import arrow.core.extensions.either.monad.flatten
-import arrow.data.extensions.EitherTMonadThrow
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Monad
 import arrow.undocumented

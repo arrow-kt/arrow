@@ -7,7 +7,7 @@ import arrow.data.Store
 import arrow.data.Sum
 import arrow.core.extensions.id.comonad.comonad
 import arrow.data.extensions.store.comonad.comonad
-import io.kotlintest.matchers.shouldBe
+import io.kotlintest.shouldBe
 import io.kotlintest.specs.FreeSpec
 
 class ComonadicUisTest : FreeSpec() {

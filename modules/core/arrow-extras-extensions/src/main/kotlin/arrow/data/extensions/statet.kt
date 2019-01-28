@@ -9,8 +9,11 @@ import arrow.data.extensions.statet.applicative.applicative
 import arrow.data.extensions.statet.functor.functor
 import arrow.data.extensions.statet.monad.monad
 import arrow.typeclasses.*
+import arrow.typeclasses.suspended.monad.commutative.safe.Fx
+import arrow.undocumented
 
 @extension
+@undocumented
 interface StateTFunctor<F, S> : Functor<StateTPartialOf<F, S>> {
 
   fun FF(): Functor<F>
@@ -21,6 +24,7 @@ interface StateTFunctor<F, S> : Functor<StateTPartialOf<F, S>> {
 }
 
 @extension
+@undocumented
 interface StateTApplicative<F, S> : Applicative<StateTPartialOf<F, S>>, StateTFunctor<F, S> {
 
   fun MF(): Monad<F>
@@ -42,6 +46,7 @@ interface StateTApplicative<F, S> : Applicative<StateTPartialOf<F, S>>, StateTFu
 }
 
 @extension
+@undocumented
 interface StateTMonad<F, S> : Monad<StateTPartialOf<F, S>>, StateTApplicative<F, S> {
 
   override fun MF(): Monad<F>
@@ -61,6 +66,7 @@ interface StateTMonad<F, S> : Monad<StateTPartialOf<F, S>>, StateTApplicative<F,
 }
 
 @extension
+@undocumented
 interface StateTSemigroupK<F, S> : SemigroupK<StateTPartialOf<F, S>> {
 
   fun FF(): Monad<F>
@@ -73,6 +79,7 @@ interface StateTSemigroupK<F, S> : SemigroupK<StateTPartialOf<F, S>> {
 }
 
 @extension
+@undocumented
 interface StateTApplicativeError<F, S, E> : ApplicativeError<StateTPartialOf<F, S>, E>, StateTApplicative<F, S> {
 
   fun ME(): MonadError<F, E>
@@ -96,22 +103,19 @@ interface StateTApplicativeError<F, S, E> : ApplicativeError<StateTPartialOf<F, 
 }
 
 @extension
+@undocumented
 interface StateTMonadError<F, S, E> : MonadError<StateTPartialOf<F, S>, E>, StateTApplicativeError<F, S, E>, StateTMonad<F, S> {
-
-  override fun MF(): Monad<F> = ME()
 
   override fun ME(): MonadError<F, E>
 
+  override fun MF(): Monad<F> = ME()
+
 }
 
-fun <F, S, E> StateT.Companion.monadError(ME: MonadError<F, E>): MonadError<StateTPartialOf<F, S>, E> = object : StateTMonadError<F, S, E> {
-  override fun ME(): MonadError<F, E> = ME
-}
-
-interface StateTMonadThrow<F, S> : MonadThrow<StateTPartialOf<F, S>>, StateTMonadError<F, S, Throwable>
-
-fun <F, S> StateT.Companion.monadThrow(ME: MonadError<F, Throwable>): MonadThrow<StateTPartialOf<F, S>> = object : StateTMonadThrow<F, S> {
-  override fun ME(): MonadError<F, Throwable> = ME
+@extension
+@undocumented
+interface StateTMonadThrow<F, S> : MonadThrow<StateTPartialOf<F, S>>, StateTMonadError<F, S, Throwable> {
+  override fun ME(): MonadError<F, Throwable>
 }
 
 /**
@@ -128,3 +132,23 @@ fun <S> StateApi.functor(): Functor<StateTPartialOf<ForId, S>> = StateT.functor(
  * Alias for [StateT.Companion.monad]
  */
 fun <S> StateApi.monad(): Monad<StateTPartialOf<ForId, S>> = StateT.monad(Id.monad())
+
+@extension
+@undocumented
+interface StateTFx<F, S> : Fx<StateTPartialOf<F, S>> {
+
+  fun M() : Monad<F>
+
+  override fun monad(): Monad<StateTPartialOf<F, S>> =
+    StateT.monad(M())
+
+}
+
+@extension
+@undocumented
+interface StateFx<S> : StateTFx<ForId, S> {
+
+  override fun M(): Monad<ForId> =
+    Id.monad()
+
+}

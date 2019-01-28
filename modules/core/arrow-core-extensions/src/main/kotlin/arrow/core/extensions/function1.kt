@@ -2,8 +2,11 @@ package arrow.core.extensions
 
 import arrow.Kind
 import arrow.core.*
+import arrow.core.extensions.function0.monad.monad
+import arrow.core.extensions.function1.monad.monad
 import arrow.extension
 import arrow.typeclasses.*
+import arrow.typeclasses.suspended.monad.Fx
 
 @extension
 interface Function1Semigroup<A, B> : Semigroup<Function1<A, B>> {
@@ -69,6 +72,11 @@ interface Function1Monad<I> : Monad<Function1PartialOf<I>>, Function1Applicative
 
   override fun <A, B> tailRecM(a: A, f: (A) -> Function1Of<I, Either<A, B>>): Function1<I, B> =
     Function1.tailRecM(a, f)
+}
+
+@extension
+interface Function1Fx<A> : Fx<Function1PartialOf<A>> {
+  override fun monad(): Monad<Function1PartialOf<A>> = Function1.monad()
 }
 
 @extension

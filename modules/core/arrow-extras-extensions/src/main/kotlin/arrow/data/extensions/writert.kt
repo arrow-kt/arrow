@@ -4,9 +4,12 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.toT
 import arrow.data.*
+import arrow.data.extensions.statet.monad.monad
+import arrow.data.extensions.writert.monad.monad
 
 import arrow.extension
 import arrow.typeclasses.*
+import arrow.typeclasses.suspended.monad.Fx
 import arrow.undocumented
 
 @extension
@@ -61,6 +64,7 @@ interface WriterTMonad<F, W> : Monad<WriterTPartialOf<F, W>>, WriterTApplicative
 }
 
 @extension
+@undocumented
 interface WriterTApplicativeError<F, W, E> : ApplicativeError<WriterTPartialOf<F, W>, E>, WriterTApplicative<F, W> {
 
   fun AE(): ApplicativeError<F, E>
@@ -79,6 +83,7 @@ interface WriterTApplicativeError<F, W, E> : ApplicativeError<WriterTPartialOf<F
 }
 
 @extension
+@undocumented
 interface WriterTMonadError<F, W, E> : MonadError<WriterTPartialOf<F, W>, E>, WriterTApplicativeError<F, W, E>, WriterTMonad<F, W> {
 
   fun ME(): MonadError<F, E>
@@ -94,12 +99,14 @@ interface WriterTMonadError<F, W, E> : MonadError<WriterTPartialOf<F, W>, E>, Wr
 }
 
 @extension
+@undocumented
 interface WriterTMonadThrow<F, W> : MonadThrow<WriterTPartialOf<F, W>>, WriterTMonadError<F, W, Throwable> {
   override fun ME(): MonadError<F, Throwable>
   override fun MM(): Monoid<W>
 }
 
 @extension
+@undocumented
 interface WriterTSemigroupK<F, W> : SemigroupK<WriterTPartialOf<F, W>> {
 
   fun SS(): SemigroupK<F>
@@ -109,6 +116,7 @@ interface WriterTSemigroupK<F, W> : SemigroupK<WriterTPartialOf<F, W>> {
 }
 
 @extension
+@undocumented
 interface WriterTMonoidK<F, W> : MonoidK<WriterTPartialOf<F, W>>, WriterTSemigroupK<F, W> {
 
   fun MF(): MonoidK<F>
@@ -116,4 +124,17 @@ interface WriterTMonoidK<F, W> : MonoidK<WriterTPartialOf<F, W>>, WriterTSemigro
   override fun SS(): SemigroupK<F> = MF()
 
   override fun <A> empty(): WriterT<F, W, A> = WriterT(MF().empty())
+}
+
+@extension
+@undocumented
+interface WriterTFx<F, W> : Fx<WriterTPartialOf<F, W>> {
+
+  fun M() : Monad<F>
+
+  fun MW(): Monoid<W>
+
+  override fun monad(): Monad<WriterTPartialOf<F, W>> =
+    WriterT.monad(M(), MW())
+
 }

@@ -1,6 +1,0 @@
-dependencies {
-    compile project(':arrow-core-data')
-    compile project(':arrow-core-extensions')
-}
-
-apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

@@ -3,20 +3,24 @@ package arrow.effects
 import arrow.effects.extensions.io.monadDefer.monadDefer
 import arrow.test.UnitSpec
 import arrow.test.generators.genFunctionAToB
-import io.kotlintest.KTestJUnitRunner
+import arrow.test.generators.genGreaterEqual
+import arrow.test.generators.genLessThan
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class RefTest : UnitSpec() {
 
   init {
     with(IO.monadDefer()) {
+      val iom = this
+
       "set get" {
         forAll(Gen.int(), Gen.int()) { a, b ->
-          Ref.of(a, IO.monadDefer()).flatMap { ref ->
-            ref.set(b).flatMap { _ ->
+          Ref.of(a, iom).flatMap { ref ->
+            ref.set(b).flatMap {
               ref.get().map { get ->
                 get == b
               }
@@ -27,7 +31,7 @@ class RefTest : UnitSpec() {
 
       "getAndSet" {
         forAll(Gen.int(), Gen.int()) { a, b ->
-          Ref.of(a, this).flatMap { ref ->
+          Ref.of(a, iom).flatMap { ref ->
             ref.getAndSet(b).flatMap { old ->
               ref.get().map { new ->
                 old == a && new == b
@@ -39,8 +43,8 @@ class RefTest : UnitSpec() {
 
       "consistent set update" {
         forAll(Gen.int(), Gen.int()) { a, b ->
-          val set = Ref.of(a, this).flatMap { ref -> ref.set(b).flatMap { _ -> ref.get() } }
-          val update = Ref.of(a, this).flatMap { ref -> ref.update { _ -> b }.flatMap { _ -> ref.get() } }
+          val set = Ref.of(a, iom).flatMap { ref -> ref.set(b).flatMap { ref.get() } }
+          val update = Ref.of(a, iom).flatMap { ref -> ref.update { b }.flatMap { ref.get() } }
 
           set.flatMap { setA ->
             update.map { updateA ->
@@ -52,8 +56,8 @@ class RefTest : UnitSpec() {
 
       "access id" {
         forAll(Gen.int()) { a ->
-          Ref.of(a, this).flatMap { ref ->
-            ref.access().map { (a, _) -> a }.flatMap { _ ->
+          Ref.of(a, iom).flatMap { ref ->
+            ref.access().map { (a, _) -> a }.flatMap {
               ref.get().map { get ->
                 get == a
               }
@@ -64,8 +68,8 @@ class RefTest : UnitSpec() {
 
       "consistent access tryModify" {
         forAll(Gen.int(), genFunctionAToB<Int, Int>(Gen.int())) { a, f ->
-          val accessMap = Ref.of(a, this).flatMap { ref -> ref.access().map { (a, setter) -> setter(f(a)) } }.flatten()
-          val tryUpdate = Ref.of(a, this).flatMap { ref -> ref.tryUpdate(f) }
+          val accessMap = Ref.of(a, iom).flatMap { ref -> ref.access().map { (a, setter) -> setter(f(a)) } }.flatten()
+          val tryUpdate = Ref.of(a, iom).flatMap { ref -> ref.tryUpdate(f) }
 
           accessMap.fix().unsafeRunSync() == tryUpdate.unsafeRunSync()
         }
@@ -73,7 +77,7 @@ class RefTest : UnitSpec() {
 
       "access success" {
         forAll(Gen.int(), Gen.int()) { a, b ->
-          binding {
+          fx {
             val ref = Ref.of(a, this@with).bind()
             val (_, setter) = ref.access().bind()
             val success = setter(b).bind()
@@ -85,7 +89,7 @@ class RefTest : UnitSpec() {
 
       "access failure" {
         forAll(Gen.int(), Gen.int(), Gen.int()) { a, b, c ->
-          binding {
+          fx {
             val ref = Ref.of(a, this@with).bind()
             val (_, setter) = ref.access().bind()
             ref.set(b).bind()
@@ -98,7 +102,7 @@ class RefTest : UnitSpec() {
 
       "access fail multiple times" {
         forAll(Gen.int(), Gen.int(), Gen.int(), Gen.int()) { a, b, c, d ->
-          binding {
+          fx {
             val ref = Ref.of(a, this@with).bind()
             val (_, setter) = ref.access().bind()
             val cond1 = setter(b).bind()
@@ -112,7 +116,7 @@ class RefTest : UnitSpec() {
 
       "tryUpdate" {
         forAll(Gen.int(), genFunctionAToB<Int, Int>(Gen.int())) { a, f ->
-          Ref.of(a, this).flatMap { ref ->
+          Ref.of(a, iom).flatMap { ref ->
             ref.tryUpdate(f).flatMap {
               ref.get().map { newA ->
                 newA == f(a)
@@ -123,8 +127,8 @@ class RefTest : UnitSpec() {
       }
 
       "tryUpdate fail concurrent modification" {
-        forAll(Gen.int(), Gen.int(), genFunctionAToB<Int, Int>(Gen.int())) { a, b, f ->
-          Ref.of(a, this).flatMap { ref ->
+        forAll(genGreaterEqual(0), genLessThan(0), genFunctionAToB<Int, Int>(Gen.int())) { a, b, f ->
+          Ref.of(a, iom).flatMap { ref ->
             ref.tryUpdate {
               ref.set(b).fix().unsafeRunSync()
               f(it)

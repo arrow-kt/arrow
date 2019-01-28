@@ -4,8 +4,6 @@ title: Quick Start
 permalink: /docs/
 ---
 
-NOTE: The docs are currently at around 60% completion. They're the present priority project, and you can track the progress on the github issue [#311](https://github.com/arrow-kt/arrow/issues/311).
-
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core)
 [![Build Status](https://travis-ci.org/arrow-kt/arrow.svg?branch=master)](https://travis-ci.org/arrow-kt/arrow/)
 [![Kotlin version badge](https://img.shields.io/badge/kotlin-1.3-blue.svg)](https://kotlinlang.org/docs/reference/whatsnew13.html)
@@ -67,12 +65,16 @@ Trimmed down versions:
 - `arrow-core-data` (Only data types)
 - `arrow-core-extensions` (Only type class extensions)
 
-# Current stable version
+# Current stable version 0.8.2
+
+You can find the dependencies necessary in the Basic Setup of the README at the 0.8.2 tag clicking [here](https://github.com/arrow-kt/arrow/blob/0.8.2/README.md#basic-setup).
+
+# Next development version 0.9.0
 
 Add the dependencies into the project's `build.gradle`
 
 ```groovy
-def arrow_version = "0.8.2"
+def arrow_version = "0.9.0"
 dependencies {
     compile "io.arrow-kt:arrow-core-data:$arrow_version"
     compile "io.arrow-kt:arrow-syntax:$arrow_version"

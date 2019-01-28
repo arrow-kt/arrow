@@ -6,11 +6,14 @@ import arrow.core.extensions.const.show.show
 import arrow.core.extensions.monoid
 import arrow.mtl.extensions.const.traverseFilter.traverseFilter
 import arrow.test.UnitSpec
-import arrow.test.laws.*
-import io.kotlintest.KTestJUnitRunner
+import arrow.test.laws.ApplicativeLaws
+import arrow.test.laws.EqLaws
+import arrow.test.laws.ShowLaws
+import arrow.test.laws.TraverseFilterLaws
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class ConstTest : UnitSpec() {
   init {
     Int.monoid().run {

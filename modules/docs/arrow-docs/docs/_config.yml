@@ -1,8 +1,12 @@
+# Default Front Matter values to be set
 defaults:
--
-  scope:
-    path: "" # an empty string here means all files in the project
-  values:
-    layout: "docs"
+  -
+    scope:
+      path: "docs/apidocs"
+      type: "pages"
+    values:
+      layout: "docs"
+
+# Plugins
 plugins:
   - jekyll-redirect-from

@@ -4,11 +4,11 @@ import arrow.core.Id
 import arrow.core.Tuple2
 import arrow.core.value
 import arrow.test.UnitSpec
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
+import io.kotlintest.runner.junit4.KotlinTestRunner
+import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class ReaderTest : UnitSpec() {
   init {
 

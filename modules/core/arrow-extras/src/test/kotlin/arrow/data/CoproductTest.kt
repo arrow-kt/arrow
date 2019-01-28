@@ -24,10 +24,10 @@ import arrow.test.laws.HashLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Hash
-import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class CoproductTest : UnitSpec() {
   val EQ: Eq<Kind3<ForCoproduct, ForId, ForId, Int>> = Eq { a, b ->
     a.fix().fix() == b.fix().fix()

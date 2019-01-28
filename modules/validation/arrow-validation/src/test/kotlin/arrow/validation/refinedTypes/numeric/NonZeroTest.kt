@@ -1,19 +1,18 @@
 package arrow.validation.refinedTypes.numeric
 
 import arrow.test.UnitSpec
+import arrow.test.generators.genNonZeroInt
 import arrow.validation.refinedTypes.numeric.validated.nonZero.nonZero
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.properties.Gen
-import io.kotlintest.properties.filter
 import io.kotlintest.properties.forAll
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class NonZeroTest : UnitSpec() {
   init {
 
     "Can create NonZero from any number except 0" {
-      forAll(NonZeroIntGen()) { x: Int ->
+      forAll(genNonZeroInt()) { x: Int ->
         x.nonZero().isValid
       }
     }
@@ -24,7 +23,4 @@ class NonZeroTest : UnitSpec() {
 
   }
 
-  class NonZeroIntGen : Gen<Int> {
-    override fun generate(): Int = Gen.int().filter { it != 0 }.generate()
-  }
 }
