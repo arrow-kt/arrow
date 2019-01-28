@@ -1,8 +1,11 @@
 package arrow.core.extensions
 
 import arrow.core.*
+import arrow.core.extensions.eval.monad.monad
+import arrow.core.extensions.function0.monad.monad
 import arrow.extension
 import arrow.typeclasses.*
+import arrow.typeclasses.suspended.monad.Fx
 
 @extension
 interface Function0Semigroup<A> : Semigroup<Function0<A>> {
@@ -92,4 +95,9 @@ interface Function0Bimonad : Bimonad<ForFunction0> {
 
   override fun <A> Function0Of<A>.extract(): A =
     fix().extract()
+}
+
+@extension
+interface Function0Fx<A> : Fx<ForFunction0> {
+  override fun monad(): Monad<ForFunction0> = Function0.monad()
 }

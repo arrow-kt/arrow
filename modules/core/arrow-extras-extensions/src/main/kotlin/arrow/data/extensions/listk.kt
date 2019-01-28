@@ -1,12 +1,18 @@
 package arrow.data.extensions
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Eval
+import arrow.core.Tuple2
 import arrow.data.*
-import arrow.extension
 import arrow.data.extensions.listk.foldable.foldLeft
+import arrow.data.extensions.listk.monad.monad
+import arrow.extension
 import arrow.typeclasses.*
-import java.util.*
+import arrow.typeclasses.suspended.monad.commutative.safe.Fx
+import kotlin.collections.emptyList
+import kotlin.collections.fold
+import kotlin.collections.zip
 import arrow.data.combineK as listCombineK
 import kotlin.collections.plus as listPlus
 
@@ -79,6 +85,8 @@ interface ListKMonad : Monad<ForListK> {
 
   override fun <A> just(a: A): ListK<A> =
     ListK.just(a)
+
+
 }
 
 @extension
@@ -136,4 +144,12 @@ interface ListKHash<A> : Hash<ListKOf<A>>, ListKEq<A> {
   override fun ListKOf<A>.hash(): Int = foldLeft(1) { hash, a ->
     31 * hash + HA().run { a.hash() }
   }
+}
+
+@extension
+interface ListKFx : Fx<ForListK> {
+
+  override fun monad(): Monad<ForListK> =
+    ListK.monad()
+
 }

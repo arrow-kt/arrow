@@ -141,7 +141,7 @@ fun stackOperationsS2() =
   binding<EitherPartialOf<StackError>, Stack, String>(Either.monadError<StackError>()) {
     pushS("a").bind()
     popS().bind()
-    val string = popS().bind()
+    val (string) = popS()
     string
   }
 

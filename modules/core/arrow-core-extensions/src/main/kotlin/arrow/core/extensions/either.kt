@@ -3,12 +3,14 @@ package arrow.core.extensions
 
 import arrow.Kind
 import arrow.core.*
+import arrow.core.extensions.either.monad.monad
 import arrow.extension
 import arrow.typeclasses.*
+import arrow.typeclasses.suspended.monad.Fx
 import arrow.core.ap as eitherAp
 import arrow.core.combineK as eitherCombineK
-import arrow.core.flatMap as eitherFlatMap
 import arrow.core.extensions.traverse as eitherTraverse
+import arrow.core.flatMap as eitherFlatMap
 
 fun <L, R> Either<L, R>.combine(SGL: Semigroup<L>, SGR: Semigroup<R>, b: Either<L, R>): Either<L, R> {
   val a = this
@@ -167,4 +169,9 @@ interface EitherHash<L, R> : Hash<Either<L, R>>, EitherEq<L, R> {
   }, {
     HR().run { it.hash() }
   })
+}
+
+@extension
+interface EitherFx<A> : Fx<EitherPartialOf<A>> {
+  override fun monad(): Monad<EitherPartialOf<A>> = Either.monad()
 }

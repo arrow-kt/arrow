@@ -1,6 +1,9 @@
 package arrow.effects
 
-import arrow.core.*
+import arrow.core.Left
+import arrow.core.None
+import arrow.core.Some
+import arrow.core.Tuple2
 import arrow.effects.extensions.io.applicative.product
 import arrow.effects.extensions.io.applicativeError.attempt
 import arrow.effects.extensions.io.async.async
@@ -16,7 +19,6 @@ import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
 import kotlinx.coroutines.Dispatchers
 import org.junit.runner.RunWith
-import java.lang.RuntimeException
 import kotlin.coroutines.CoroutineContext
 
 @RunWith(KotlinTestRunner::class)

@@ -4,8 +4,11 @@ import arrow.Kind
 import arrow.core.*
 import arrow.effects.CancelToken
 import arrow.effects.KindConnection
+import arrow.effects.data.internal.BindingCancellationException
+import arrow.typeclasses.MonadContinuation
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.startCoroutine
 
 /** A connected asynchronous computation that might fail. **/
 typealias ConnectedProcF<F, A> = (KindConnection<F>, ((Either<Throwable, A>) -> Unit)) -> Kind<F, Unit>
@@ -14,6 +17,8 @@ typealias ConnectedProcF<F, A> = (KindConnection<F>, ((Either<Throwable, A>) -> 
 typealias ConnectedProc<F, A> = (KindConnection<F>, ((Either<Throwable, A>) -> Unit)) -> Unit
 
 /**
+ * ank_macro_hierarchy(arrow.effects.typeclasses.Concurrent)
+ *
  * Type class for async data types that are cancelable and can be started concurrently.
  */
 interface Concurrent<F> : Async<F> {
@@ -688,6 +693,27 @@ interface Concurrent<F> : Async<F> {
    */
   override fun <A> async(fa: Proc<A>): Kind<F, A> =
     async { _, cb -> fa(cb) }
+
+  /**
+   * Entry point for monad bindings which enables for comprehensions. The underlying impl is based on coroutines.
+   * A coroutines is initiated and inside [ConcurrentCancellableContinuation] suspended yielding to [Monad.flatMap]. Once all the flatMap binds are completed
+   * the underlying monad is returned from the act of executing the coroutine
+   *
+   * This one operates over [Concurrent] instances
+   *
+   * This operation is cancellable by calling invoke on the [Disposable] return.
+   * If [Disposable.invoke] is called the binding result will become a lifted [BindingCancellationException].
+   */
+  fun <B> bindingConcurrent(c: suspend ConcurrentCancellableContinuation<F, *>.() -> B): Tuple2<Kind<F, B>, Disposable> {
+    val continuation = ConcurrentCancellableContinuation<F, B>(this)
+    val wrapReturn: suspend ConcurrentCancellableContinuation<F, *>.() -> Kind<F, B> = { just(c()) }
+    wrapReturn.startCoroutine(continuation, continuation)
+    return continuation.returnedMonad() toT continuation.disposable()
+  }
+
+  override fun <B> binding(c: suspend MonadContinuation<F, *>.() -> B): Kind<F, B> =
+    bindingCancellable { c() }.a
+
 
 }
 

@@ -101,9 +101,9 @@ import arrow.data.extensions.statet.monad.binding
 
 fun stackOperations() = 
   binding<ForId, Stack, Option<String>>(Id.monad()) {
-    val a = push("a").bind()
-    val b = pop().bind()
-    val c = pop().bind()
+    val (a) = push("a")
+    val (b) = pop()
+    val (c) = pop()
     c
   }
 ```

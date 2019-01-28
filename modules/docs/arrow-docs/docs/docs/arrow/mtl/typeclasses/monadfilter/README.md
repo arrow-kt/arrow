@@ -31,8 +31,8 @@ import arrow.mtl.extensions.*
 import arrow.mtl.extensions.option.monadFilter.*
 
 bindingFilter {
-  val a = Option(1).bind()
-  val b = Option(1).bind()
+  val (a) = Option(1)
+  val (b) = Option(1)
   val c = a + b
   continueIf(c > 0)
   c
@@ -44,8 +44,8 @@ import arrow.data.*
 import arrow.mtl.extensions.listk.monadFilter.*
 
 bindingFilter {
-  val a = listOf(1).k().bind()
-  val b = listOf(1).k().bind()
+  val (a) = listOf(1).k()
+  val (b) = listOf(1).k()
   val c = a + b
   continueIf(c > 0)
   c
@@ -58,8 +58,8 @@ When `continueIf` returns `false` the computation is interrupted and the `empty(
 import arrow.mtl.extensions.option.monadFilter.*
 
 bindingFilter {
-  val a = Option(1).bind()
-  val b = Option(1).bind()
+  val (a) = Option(1)
+  val (b) = Option(1)
   val c = a + b
   continueIf(c < 0)
   c
@@ -70,8 +70,8 @@ bindingFilter {
 import arrow.mtl.extensions.list.monadFilter.*
 
 bindingFilter {
-  val a = listOf(1).k().bind()
-  val b = listOf(1).k().bind()
+  val (a) = listOf(1).k()
+  val (b) = listOf(1).k()
   val c = a + b
   continueIf(c < 0)
   c
@@ -88,7 +88,7 @@ When `bindWithFilter` is satisfied the computation continues
 import arrow.mtl.extensions.option.monadFilter.*
 
 bindingFilter {
-  val a = Option(1).bind()
+  val (a) = Option(1)
   val b = Option(1).bindWithFilter { it == a } //continues
   a + b
 }
@@ -98,7 +98,7 @@ bindingFilter {
 import arrow.mtl.extensions.list.monadFilter.*
 
 bindingFilter {
-  val a = listOf(1).k().bind()
+  val (a) = listOf(1).k()
   val b = listOf(1).k().bindWithFilter { it == a } //continues
   a + b
 }
@@ -110,7 +110,7 @@ When `bindWithFilter` returns `false` the computation short circuits yielding th
 import arrow.mtl.extensions.option.monadFilter.bindingFilter
 
 bindingFilter {
- val a = Option(0).bind()
+ val (a) = Option(0)
  val b = Option(1).bindWithFilter { it == a } //short circuits because a is 0
  a + b
 }
@@ -120,7 +120,7 @@ bindingFilter {
 import arrow.mtl.extensions.list.monadFilter.*
 
 bindingFilter {
- val a = listOf(0).k().bind()
+ val (a) = listOf(0).k()
  val b = listOf(1).k().bindWithFilter { it == a } //short circuits because a is 0
  a + b
 }
