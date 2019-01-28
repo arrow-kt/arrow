@@ -8,9 +8,9 @@ import arrow.effects.extensions.io.monad.flatMap
 import arrow.effects.typeclasses.seconds
 import arrow.test.UnitSpec
 import arrow.test.laws.equalUnderTheLaw
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import kotlinx.coroutines.Dispatchers
 import org.junit.runner.RunWith
 

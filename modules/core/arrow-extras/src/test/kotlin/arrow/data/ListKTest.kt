@@ -2,6 +2,9 @@ package arrow.data
 
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
+import arrow.core.identity
+import arrow.core.toT
+import arrow.data.extensions.list.fx.fx
 import arrow.data.extensions.listk.applicative.applicative
 import arrow.data.extensions.listk.eq.eq
 import arrow.data.extensions.listk.hash.hash
@@ -14,6 +17,7 @@ import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import io.kotlintest.runner.junit4.KotlinTestRunner
+import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
 
 @RunWith(KotlinTestRunner::class)
@@ -35,6 +39,12 @@ class ListKTest : UnitSpec() {
         EQ),
       HashLaws.laws(ListK.hash(Int.hash()), ListK.eq(Int.eq())) { listOf(it).k() }
     )
+
+    "List exports a commutative Fx instance" {
+      val ef1 = suspend { 1 }
+      val ef2 = suspend { 2 }
+      fx(ef1, ef2, ::identity) shouldBe listOf(1 toT 2)
+    }
 
   }
 }

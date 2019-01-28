@@ -6,6 +6,7 @@ import arrow.core.extensions.either.foldable.foldable
 import arrow.core.extensions.either.monad.monad
 import arrow.core.extensions.either.traverse.traverse
 import arrow.data.*
+import arrow.data.extensions.eithert.monadThrow.monadThrow
 import arrow.extension
 import arrow.typeclasses.*
 import arrow.undocumented
@@ -185,3 +186,14 @@ private fun <F, L, A> handleErrorWith(fa: EitherTOf<F, L, A>, f: (L) -> EitherTO
       }
     })
   }
+
+@extension
+@undocumented
+interface EitherTFx<F> : arrow.typeclasses.suspended.monaderror.Fx<EitherTPartialOf<F, Throwable>> {
+
+  fun M(): MonadThrow<F>
+
+  override fun monadError(): MonadThrow<EitherTPartialOf<F, Throwable>> =
+    EitherT.monadThrow(M(), M())
+
+}

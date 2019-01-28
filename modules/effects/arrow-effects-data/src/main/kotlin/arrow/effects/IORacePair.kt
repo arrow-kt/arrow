@@ -1,6 +1,9 @@
 package arrow.effects
 
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Left
+import arrow.core.Right
+import arrow.core.Tuple2
 import arrow.effects.internal.IOFiber
 import arrow.effects.internal.Platform
 import arrow.effects.internal.UnsafePromise

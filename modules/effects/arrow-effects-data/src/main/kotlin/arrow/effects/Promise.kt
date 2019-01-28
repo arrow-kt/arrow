@@ -1,7 +1,9 @@
 package arrow.effects
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
 import arrow.effects.internal.CancelablePromise
 import arrow.effects.internal.UncancelablePromise
 import arrow.effects.typeclasses.Async

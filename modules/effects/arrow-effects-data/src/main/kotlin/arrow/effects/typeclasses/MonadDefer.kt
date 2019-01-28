@@ -5,7 +5,9 @@ import arrow.core.Either
 import arrow.core.Tuple2
 import arrow.core.toT
 import arrow.effects.data.internal.BindingCancellationException
+import arrow.typeclasses.MonadContinuation
 import arrow.typeclasses.MonadError
+import arrow.typeclasses.MonadErrorContinuation
 import arrow.typeclasses.MonadThrow
 import kotlin.coroutines.startCoroutine
 
@@ -30,7 +32,7 @@ interface MonadDefer<F> : MonadThrow<F>, Bracket<F, Throwable> {
   fun <A> delay(fa: Kind<F, A>): Kind<F, A> = defer { fa }
 
   @Deprecated("Use delay instead",
-          ReplaceWith("delay(f)", "arrow.effects.typeclasses.MonadDefer"))
+    ReplaceWith("delay(f)", "arrow.effects.typeclasses.MonadDefer"))
   operator fun <A> invoke(f: () -> A): Kind<F, A> =
     defer {
       try {
@@ -63,5 +65,25 @@ interface MonadDefer<F> : MonadThrow<F>, Bracket<F, Throwable> {
     return continuation.returnedMonad() toT continuation.disposable()
   }
 
-}
+  override fun <B> binding(c: suspend MonadContinuation<F, *>.() -> B): Kind<F, B> =
+    bindingCancellable { c() }.a
 
+  fun <A> fx(
+    f: suspend MonadDeferCancellableContinuation<F, *>.() -> A,
+    unit: Unit = Unit,
+    unit1: Unit = Unit
+  ): Kind<F, A> =
+    fxCancelable(f).a
+
+  fun <A> fxCancelable(f: suspend MonadDeferCancellableContinuation<F, *>.() -> A, unit: Unit = Unit): Tuple2<Kind<F, A>, Disposable> =
+    bindingCancellable { f() }
+
+  override fun <B> bindingCatch(c: suspend MonadErrorContinuation<F, *>.() -> B): Kind<F, B> =
+    bindingCancellable { c() }.a
+
+  override fun <A> fx(f: suspend MonadContinuation<F, *>.() -> A): Kind<F, A> =
+    fxCancelable(f).a
+
+  override fun <A> fx(f: suspend MonadErrorContinuation<F, *>.() -> A, unit: Unit): Kind<F, A> =
+    fxCancelable(f).a
+}

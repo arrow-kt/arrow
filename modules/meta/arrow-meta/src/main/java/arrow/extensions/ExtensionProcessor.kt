@@ -3,12 +3,7 @@ package arrow.extensions
 import arrow.common.messager.log
 import arrow.common.utils.knownError
 import arrow.extension
-import arrow.meta.ast.Code
-import arrow.meta.ast.Func
-import arrow.meta.ast.Modifier
-import arrow.meta.ast.PackageName
-import arrow.meta.ast.Type
-import arrow.meta.ast.TypeName
+import arrow.meta.ast.*
 import arrow.meta.encoder.TypeClassInstance
 import arrow.meta.processor.MetaProcessor
 import com.google.auto.service.AutoService
@@ -162,7 +157,7 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class), PolyTempl
           .filterNot { it.type is TypeName.TypeVariable }
           .map { p -> p.type.simpleName }.toList()
       }
-      .map { it.removeConstrains(keepModifiers = setOf(Modifier.Infix, Modifier.Operator)) }
+      .map { it.removeConstrains(keepModifiers = setOf(Modifier.Infix, Modifier.Operator, Modifier.Suspend)) }
       .map { f ->
         val func = f.removeDummyArgs().downKindReturnType().wrap(wrappedType)
         val dummyArgsCount = f.countDummyArgs()
@@ -172,6 +167,7 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class), PolyTempl
           .copy(
             kdoc = func.kdoc?.eval(this),
             modifiers =
+            func.modifiers.filter { it == Modifier.Suspend } +
             when {
               allArgs.size > 1 -> emptyList()
               func.receiverType == null -> emptyList()
@@ -216,10 +212,10 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class), PolyTempl
   }
 
   private fun TypeClassInstance.extensionTypeVariables(func: Func): List<TypeName.TypeVariable> = (instance.typeVariables + func.typeVariables)
-      .asSequence()
-      .map { it.removeConstrains() }
-      .distinctBy { it.name }
-      .toList()
+    .asSequence()
+    .map { it.removeConstrains() }
+    .distinctBy { it.name }
+    .toList()
 
   private fun TypeClassInstance.staticExtensionImpl(
     companionOrFactory: TypeName,
@@ -257,14 +253,14 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class), PolyTempl
     }
 
   private fun TypeClassInstance.extensionsCompanionOrFactory(wrappedType: Pair<TypeName, TypeName.ParameterizedType>?): TypeName = if (wrappedType != null) {
-      val wrappedSimpleName = wrappedType.second.rawType.simpleName
-      val wrappedPackage = PackageName("${instance.packageName.value}.${wrappedSimpleName.toLowerCase()}")
-      TypeName.Classy(
-        wrappedSimpleName,
-        "${wrappedPackage.value}.${wrappedSimpleName.toLowerCase()}",
-        PackageName("${instance.packageName.value}.${wrappedSimpleName.toLowerCase()}.${typeClass.name.simpleName.decapitalize()}")
-      )
-    } else projectedCompanion
+    val wrappedSimpleName = wrappedType.second.rawType.simpleName
+    val wrappedPackage = PackageName("${instance.packageName.value}.${wrappedSimpleName.toLowerCase()}")
+    TypeName.Classy(
+      wrappedSimpleName,
+      "${wrappedPackage.value}.${wrappedSimpleName.toLowerCase()}",
+      PackageName("${instance.packageName.value}.${wrappedSimpleName.toLowerCase()}.${typeClass.name.simpleName.decapitalize()}")
+    )
+  } else projectedCompanion
 
 }
 

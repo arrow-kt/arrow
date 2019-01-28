@@ -67,7 +67,7 @@ val SC = IO.monadDefer()
 
 val result = SC.binding {
   println("Print: now")
-  val result = just(1).bind()
+  val (result) = just(1)
   result + 1
 }
 
@@ -76,7 +76,7 @@ val result = SC.binding {
 val lazyResult = SC.binding {
   SC.lazy().bind()
   println("Print: lazy")
-  val result = eagerIO().bind()
+  val (result) = eagerIO()
   result + 1
 }
 

@@ -6,11 +6,11 @@ import arrow.core.Eval
 import arrow.effects.rx2.FlowableK
 import arrow.effects.rx2.FlowableKOf
 import arrow.effects.rx2.ForFlowableK
-import arrow.effects.rx2.extensions.flowablek.monad.monad
-import arrow.effects.rx2.extensions.flowablek.monadError.monadError
-import arrow.effects.rx2.extensions.flowablek.monadDefer.monadDefer
 import arrow.effects.rx2.extensions.flowablek.async.async
 import arrow.effects.rx2.extensions.flowablek.effect.effect
+import arrow.effects.rx2.extensions.flowablek.monad.monad
+import arrow.effects.rx2.extensions.flowablek.monadDefer.monadDefer
+import arrow.effects.rx2.extensions.flowablek.monadError.monadError
 import arrow.effects.rx2.fix
 import arrow.effects.typeclasses.*
 import arrow.extension
