@@ -49,19 +49,19 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
    * ```
    * Left("tulip").isLeft           // Result: true
    * Right("venus fly-trap").isLeft // Result: false
-   * Both("venus", "fly-trap").isRight // Result: false
+   * Both("venus", "fly-trap").isLeft // Result: false
    * ```
    */
   abstract val isLeft: Boolean
 
   /**
-   * Returns `true` if this is a [Left], `false` otherwise.
+   * Returns `true` if this is a [Both], `false` otherwise.
    *
    * Example:
    * ```
-   * Left("tulip").isLeft           // Result: false
-   * Right("venus fly-trap").isLeft // Result: false
-   * Both("venus", "fly-trap").isRight // Result: true
+   * Left("tulip").isBoth           // Result: false
+   * Right("venus fly-trap").isBoth // Result: false
+   * Both("venus", "fly-trap").isBoth // Result: true
    * ```
    */
   abstract val isBoth: Boolean
