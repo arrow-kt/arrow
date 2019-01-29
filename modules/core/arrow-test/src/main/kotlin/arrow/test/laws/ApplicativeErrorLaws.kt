@@ -30,12 +30,12 @@ object ApplicativeErrorLaws {
     }
 
   fun <F> ApplicativeError<F, Throwable>.applicativeErrorHandleWith(EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(Gen.functionAToB<Throwable, Kind<F, Int>>(Gen.int().applicative(this)), Gen.throwable()) { f: (Throwable) -> Kind<F, Int>, e: Throwable ->
+    forAll(Gen.functionAToB<Throwable, Kind<F, Int>>(Gen.int().applicativeError(this)), Gen.throwable()) { f: (Throwable) -> Kind<F, Int>, e: Throwable ->
       raiseError<Int>(e).handleErrorWith(f).equalUnderTheLaw(f(e), EQ)
     }
 
   fun <F> ApplicativeError<F, Throwable>.applicativeErrorHandleWithPure(EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(Gen.functionAToB<Throwable, Kind<F, Int>>(Gen.int().applicative(this)), Gen.int()) { f: (Throwable) -> Kind<F, Int>, a: Int ->
+    forAll(Gen.functionAToB<Throwable, Kind<F, Int>>(Gen.int().applicativeError(this)), Gen.int()) { f: (Throwable) -> Kind<F, Int>, a: Int ->
       just(a).handleErrorWith(f).equalUnderTheLaw(just(a), EQ)
     }
 
