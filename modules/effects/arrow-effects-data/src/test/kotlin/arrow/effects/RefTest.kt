@@ -8,7 +8,7 @@ import arrow.effects.extensions.io.monad.flatten
 import arrow.effects.extensions.io.monad.map
 import arrow.effects.extensions.io.monadDefer.monadDefer
 import arrow.test.UnitSpec
-import arrow.test.generators.genFunctionAToB
+import arrow.test.generators.functionAToB
 import arrow.test.laws.equalUnderTheLaw
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -95,7 +95,7 @@ class RefTest : UnitSpec() {
     }
 
     "tryUpdate - modification occurs successfully" {
-      forAll(Gen.int(), genFunctionAToB<Int, Int>(Gen.int())) { a, f ->
+      forAll(Gen.int(), Gen.functionAToB<Int, Int>(Gen.int())) { a, f ->
         Ref.of(a, IO.monadDefer()).flatMap { ref ->
           ref.tryUpdate(f).flatMap {
             ref.get()
@@ -105,7 +105,7 @@ class RefTest : UnitSpec() {
     }
 
     "tryUpdate - should fail to update if modification has occurred" {
-      forAll(Gen.int(), genFunctionAToB<Int, Int>(Gen.int())) { a, f ->
+      forAll(Gen.int(), Gen.functionAToB<Int, Int>(Gen.int())) { a, f ->
         Ref.of(a, IO.monadDefer()).flatMap { ref ->
           ref.tryUpdate {
             ref.update(Int::inc).fix().unsafeRunSync()
@@ -139,7 +139,7 @@ class RefTest : UnitSpec() {
     }
 
     "consistent access tryModify" {
-      forAll(Gen.int(), genFunctionAToB<Int, Int>(Gen.int())) { a, f ->
+      forAll(Gen.int(), Gen.functionAToB<Int, Int>(Gen.int())) { a, f ->
         val accessMap = Ref.of(a, IO.monadDefer()).flatMap { ref -> ref.access().map { (a, setter) -> setter(f(a)) } }.flatten()
         val tryUpdate = Ref.of(a, IO.monadDefer()).flatMap { ref -> ref.tryUpdate(f) }
 

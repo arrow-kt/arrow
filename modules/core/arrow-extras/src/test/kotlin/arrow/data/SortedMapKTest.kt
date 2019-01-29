@@ -7,7 +7,7 @@ import arrow.data.extensions.monoid
 import arrow.data.extensions.show
 import arrow.data.extensions.traverse
 import arrow.test.UnitSpec
-import arrow.test.generators.genSortedMapK
+import arrow.test.generators.sortedMapK
 import arrow.test.laws.MonoidLaws
 import arrow.test.laws.SemigroupLaws
 import arrow.test.laws.ShowLaws
@@ -29,7 +29,7 @@ class SortedMapKTest : UnitSpec() {
 
     testLaws(
       ShowLaws.laws(SortedMapK.show(), EQ) { sortedMapOf("key" to 1).k() },
-      MonoidLaws.laws(SortedMapK.monoid<String, Int>(Int.monoid()), genSortedMapK(Gen.string(), Gen.int()), EQ),
+      MonoidLaws.laws(SortedMapK.monoid<String, Int>(Int.monoid()), Gen.sortedMapK(Gen.string(), Gen.int()), EQ),
       SemigroupLaws.laws(SortedMapK.monoid<String, Int>(Int.monoid()),
         sortedMapOf("key" to 1).k(),
         sortedMapOf("key" to 2).k(),

@@ -12,8 +12,8 @@ import arrow.core.extensions.either.monadError.monadError
 import arrow.streams.internal.freec.eq.eq
 import arrow.streams.internal.freec.monadDefer.monadDefer
 import arrow.test.UnitSpec
-import arrow.test.generators.genFunctionAToB
-import arrow.test.generators.genThrowable
+import arrow.test.generators.functionAToB
+import arrow.test.generators.throwable
 import arrow.test.laws.EqLaws
 import arrow.test.laws.MonadDeferLaws
 import arrow.typeclasses.Eq
@@ -114,7 +114,7 @@ class FreeCTest : UnitSpec() {
     }
 
     "errors are correctly captured" {
-      forAll(Gen.string(), genThrowable()) { s, t ->
+      forAll(Gen.string(), Gen.throwable()) { s, t ->
         FreeC.just<EitherPartialOf<Throwable>, String>(s)
           .map(::identity)
           .flatMap<String> { throw  t }
@@ -130,7 +130,7 @@ class FreeCTest : UnitSpec() {
     }
 
     "Running an error value" {
-      forAll(genThrowable()) { t ->
+      forAll(Gen.throwable()) { t ->
         FreeC.raiseError<EitherPartialOf<Throwable>, Int>(t)
           .run(Either.monadError()) == Left(t)
       }
@@ -151,7 +151,7 @@ class FreeCTest : UnitSpec() {
     }
 
     "map" {
-      forAll(Gen.string(), genFunctionAToB<String, String>(Gen.string())) { s, f ->
+      forAll(Gen.string(), Gen.functionAToB<String, String>(Gen.string())) { s, f ->
         FreeC.just<EitherPartialOf<Throwable>, String>(s)
           .map(f)
           .run(Either.monadError()) == Right(Some(f(s)))
@@ -159,7 +159,7 @@ class FreeCTest : UnitSpec() {
     }
 
     "flatMap"{
-      forAll(Gen.string(), genFunctionAToB<String, String>(Gen.string())) { s, f ->
+      forAll(Gen.string(), Gen.functionAToB<String, String>(Gen.string())) { s, f ->
         FreeC.just<EitherPartialOf<Throwable>, String>(s)
           .flatMap { FreeC.just<EitherPartialOf<Throwable>, String>(f(it)) }
           .run(Either.monadError()) == Right(Some(f(s)))
@@ -167,7 +167,7 @@ class FreeCTest : UnitSpec() {
     }
 
     "asHandler"{
-      forAll(Gen.string(), genThrowable()) { s, t ->
+      forAll(Gen.string(), Gen.throwable()) { s, t ->
         FreeC.just<EitherPartialOf<Throwable>, String>(s)
           .asHandler(t)
           .run(Either.monadError()) == Left(t)
@@ -182,7 +182,7 @@ class FreeCTest : UnitSpec() {
     }
 
     "translate fail value"{
-      forAll(genThrowable()) { t ->
+      forAll(Gen.throwable()) { t ->
         FreeC.raiseError<EitherPartialOf<Throwable>, String>(t)
           .foldMap(EitherToTry, Try.monadError()) == Failure(t)
       }
@@ -199,14 +199,14 @@ class FreeCTest : UnitSpec() {
     }
 
     "Running a interrupted value with errors using Either" {
-      forAll(genThrowable()) { t ->
+      forAll(Gen.throwable()) { t ->
         FreeC.interrupted<EitherPartialOf<Throwable>, String, Token>(Token(), t.some())
           .run(Either.monadError()) == Left(t)
       }
     }
 
     "Running a interrupted value with errors using Try" {
-      forAll(genThrowable()) { t ->
+      forAll(Gen.throwable()) { t ->
         FreeC.interrupted<EitherPartialOf<Throwable>, String, Token>(Token(), t.some())
           .foldMap(EitherToTry, Try.monadError()) == Failure(t)
       }

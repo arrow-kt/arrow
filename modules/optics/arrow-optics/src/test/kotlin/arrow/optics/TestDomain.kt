@@ -73,11 +73,6 @@ internal val userLens: Lens<User, Token> = Lens(
   { user: User, token: Token -> user.copy(token = token) }
 )
 
-internal val optionalHead: Optional<List<Int>, Int> = Optional(
-  { it.firstOrNull()?.right() ?: it.left() },
-  { list, int -> listOf(int) + if (list.size > 1) list.drop(1) else emptyList() }
-)
-
 internal val defaultHead: Optional<Int, Int> = Optional(
   { it.right() },
   { s, _ -> s }

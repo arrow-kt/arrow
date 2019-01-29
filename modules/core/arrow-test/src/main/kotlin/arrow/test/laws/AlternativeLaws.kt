@@ -1,9 +1,7 @@
 package arrow.test.laws
 
 import arrow.Kind
-import arrow.test.generators.genConstructor
-import arrow.test.generators.genConstructor2
-import arrow.test.generators.genFunctionAToB
+import arrow.test.generators.functionAToB
 import arrow.typeclasses.Alternative
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
@@ -21,12 +19,12 @@ object AlternativeLaws {
       Law("Alternative Laws: Right Distributivity") { AF.alternativeRightDistributivity(cf, cff, EQ) })
 
   fun <F> Alternative<F>.alternativeRightAbsorption(cff: (Int) -> Kind<F, (Int) -> Int>, EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(genConstructor2(Gen.int(), cff)) { fa: Kind<F, (Int) -> Int> ->
+    forAll(Gen.int().map(cff)) { fa: Kind<F, (Int) -> Int> ->
       empty<Int>().ap(fa).equalUnderTheLaw(empty(), EQ)
     }
 
   fun <F> Alternative<F>.alternativeLeftDistributivity(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(genConstructor(Gen.int(), cf), genConstructor(Gen.int(), cf), genFunctionAToB<Int, Int>(Gen.int())
+    forAll(Gen.int().map(cf), Gen.int().map(cf), Gen.functionAToB<Int, Int>(Gen.int())
     ) { fa: Kind<F, Int>, fa2: Kind<F, Int>, f: (Int) -> Int ->
       fa.combineK(fa2).map(f).equalUnderTheLaw(fa.map(f).combineK(fa2.map(f)), EQ)
     }
@@ -34,7 +32,7 @@ object AlternativeLaws {
   fun <F> Alternative<F>.alternativeRightDistributivity(cf: (Int) -> Kind<F, Int>,
                                                         cff: (Int) -> Kind<F, (Int) -> Int>,
                                                         EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(genConstructor(Gen.int(), cf), genConstructor2(Gen.int(), cff), genConstructor2(Gen.int(), cff)
+    forAll(Gen.int().map(cf), Gen.int().map(cff), Gen.int().map(cff)
     ) { fa: Kind<F, Int>, ff: Kind<F, (Int) -> Int>, fg: Kind<F, (Int) -> Int> ->
       fa.ap(ff.combineK(fg)).equalUnderTheLaw(fa.ap(ff).combineK(fa.ap(fg)), EQ)
     }

@@ -7,7 +7,7 @@ import arrow.optics.AndMonoid
 import arrow.optics.extensions.SetAt
 import arrow.optics.extensions.setk.at.at
 import arrow.test.UnitSpec
-import arrow.test.generators.genFunctionAToB
+import arrow.test.generators.functionAToB
 import arrow.test.generators.genSetK
 import arrow.test.laws.LensLaws
 import arrow.typeclasses.Eq
@@ -23,9 +23,9 @@ class SetInstanceTest : UnitSpec() {
     testLaws(
       LensLaws.laws(
         lensGen = Gen.string().map { SetK.at<String>().at(it) },
-        aGen = genSetK(Gen.string()),
+        aGen = Gen.genSetK(Gen.string()),
         bGen = Gen.bool(),
-        funcGen = genFunctionAToB(Gen.bool()),
+        funcGen = Gen.functionAToB(Gen.bool()),
         EQA = SetK.eq(String.eq()),
         EQB = Eq.any(),
         MB = AndMonoid
@@ -37,7 +37,7 @@ class SetInstanceTest : UnitSpec() {
         lensGen = Gen.string().map { SetAt<String>().at(it) },
         aGen = Gen.set(Gen.string()),
         bGen = Gen.bool(),
-        funcGen = genFunctionAToB(Gen.bool()),
+        funcGen = Gen.functionAToB(Gen.bool()),
         EQA = Eq.any(),
         EQB = Eq.any(),
         MB = AndMonoid

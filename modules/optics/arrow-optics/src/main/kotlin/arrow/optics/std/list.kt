@@ -19,7 +19,11 @@ fun <A> ListK.Companion.head(): Optional<List<A>, A> = Optional(
  */
 fun <A> ListK.Companion.tail(): Optional<List<A>, List<A>> = Optional(
   partialFunction = case(List<A>::isNotEmpty toT { list: List<A> -> list.drop(1) }),
-  set = { list, newTail -> (list.firstOrNull()?.let(::listOf) ?: emptyList()) + newTail }
+  set = { list, newTail ->
+    list.firstOrNull()?.let {
+      listOf(it) + newTail
+    } ?: emptyList()
+  }
 )
 
 /**
