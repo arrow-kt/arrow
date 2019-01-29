@@ -1,5 +1,6 @@
 package arrow.effects
 
+import arrow.Kind
 import arrow.core.*
 import arrow.effects.extensions.io.fx.fx
 import arrow.effects.extensions.io.unsafeRun.runBlocking
@@ -49,7 +50,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
        * data type which it needs to be at least able to provide a `MonadDefer` extension.
        */
       val program: IO<String> = fx {
-        effect { printHello() }
+
         helloWorld
       }
       unsafe { runBlocking { program } } shouldBe helloWorld
@@ -165,7 +166,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
     "suspend () -> A ≅ Kind<F, A> isomorphism" {
       fxTest {
         fx {
-          val (suspendedValue) = suspend { 1 }.liftM()
+          val (suspendedValue) = suspend { 1 }.effect()
           val (ioValue) = IO.just(1)
           suspendedValue == ioValue
         }
@@ -199,8 +200,8 @@ class EffectsSuspendDSLTests : UnitSpec() {
     "CoroutineContext.defer" {
       fxTest {
         fx {
-          val contextA = newSingleThreadContext("A").defer { Thread.currentThread().name }
-          val contextB = newSingleThreadContext("B").defer { Thread.currentThread().name }
+          val contextA = newSingleThreadContext("A").effect { Thread.currentThread().name }
+          val contextB = newSingleThreadContext("B").effect { Thread.currentThread().name }
           contextA != contextB
         }
       } shouldBe true
@@ -264,8 +265,8 @@ class EffectsSuspendDSLTests : UnitSpec() {
     "parallel" {
       fxTest {
         fx {
-          val currentThread = effect { Thread.currentThread().name }
-          val (ta: String, tb: String) = Dispatchers.Default.parallel(
+          val currentThread = !effect { Thread.currentThread().name }
+          val (ta: String, tb: String) = Dispatchers.Default.parTupled(
             { Thread.currentThread().name },
             { Thread.currentThread().name }
           )
@@ -351,20 +352,25 @@ class EffectsSuspendDSLTests : UnitSpec() {
       } shouldBe false
     }
 
-    "fx can turn effects into pure kinded values" {
+    "(suspend () -> A) <-> Kind<F, A>" {
+      val done = "done"
       suspend fun sideEffect(): String {
         println("Boom!")
-        return ""
+        return done
       }
       fxTest {
         fx {
-          val (result) = f { sideEffect() }
-          result
+          val suspendedFunction: suspend () -> String = suspend { sideEffect() }
+          val (_: Kind<ForIO, String>) = suspendedFunction
+          effect { sideEffect() }
+          val (_: String) = effect { sideEffect() }
+          val appliedPureEffect: String = !effect { sideEffect() }
+          appliedPureEffect
         }
-      } shouldBe ""
+      } shouldBe done
     }
-
   }
+
 }
 
 fun <A> fxTest(f: () -> IO<A>): A =

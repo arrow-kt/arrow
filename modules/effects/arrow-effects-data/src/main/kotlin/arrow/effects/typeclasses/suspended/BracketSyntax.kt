@@ -17,23 +17,23 @@ interface BracketSyntax<F, E> :
     release: suspend (A, ExitCase<E>) -> Unit,
     use: suspend (A) -> B
   ): B =
-    bracketing { f.liftM().bracketCase(release.flatLiftM(), use.flatLiftM()) }
+    bracketing { f.effect().bracketCase(release.flatLiftM(), use.flatLiftM()) }
 
   suspend fun <A, B> bracket(
     f: suspend () -> A,
     release: suspend (A) -> Unit,
     use: suspend (A) -> B
   ): B =
-    bracketing { f.liftM().bracket(release.flatLiftM(), use.flatLiftM()) }
+    bracketing { f.effect().bracket(release.flatLiftM(), use.flatLiftM()) }
 
   suspend fun <A> uncancelable(f: suspend () -> A): A =
-    bracketing { f.liftM().uncancelable() }
+    bracketing { f.effect().uncancelable() }
 
   suspend fun <A> guarantee(
     f: suspend () -> A,
     finalizer: suspend () -> Unit
   ): A =
-    bracketing { f.liftM().guarantee(finalizer.liftM()) }
+    bracketing { f.effect().guarantee(finalizer.effect()) }
 
   suspend fun <A> Kind<F, A>.guaranteeCase(
     unit: Unit = Unit,

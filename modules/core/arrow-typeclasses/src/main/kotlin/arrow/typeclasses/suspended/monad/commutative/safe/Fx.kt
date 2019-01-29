@@ -17,7 +17,7 @@ interface Fx<F> {
     f: (Tuple2<A, B>) -> C
   ): Kind<F, C> =
     monad().fx {
-      map(fa.liftM(), fb.liftM(), f).bind()
+      map(fa.effect(), fb.effect(), f).bind()
     }
 
   fun <A, B, C, D> fx(
@@ -27,7 +27,7 @@ interface Fx<F> {
     f: (Tuple3<A, B, C>) -> D
   ): Kind<F, D> =
     monad().fx {
-      map(fa.liftM(), fb.liftM(), fc.liftM(), f).bind()
+      map(fa.effect(), fb.effect(), fc.effect(), f).bind()
     }
 
   suspend fun <A> unsafe.fx(

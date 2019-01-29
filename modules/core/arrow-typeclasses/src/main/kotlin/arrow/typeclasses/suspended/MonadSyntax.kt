@@ -8,7 +8,7 @@ import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.startCoroutine
 
 interface MonadSyntax<F> : ApplicativeSyntax<F>, Monad<F> {
-  override fun <A> f(fa: suspend () -> A): Kind<F, A> =
+  override fun <A> effect(fa: suspend () -> A): Kind<F, A> =
     BlockingContinuation<F, A>(this).apply {
       fa.startCoroutine(this)
     }.retVal

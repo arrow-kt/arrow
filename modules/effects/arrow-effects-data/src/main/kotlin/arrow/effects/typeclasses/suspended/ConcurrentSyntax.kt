@@ -20,27 +20,27 @@ interface ConcurrentSyntax<F> : AsyncSyntax<F>, Concurrent<F>, ListParTraverseSy
     concurrently { asyncF(k.flatLiftM()) }
 
   override suspend fun <A> CoroutineContext.startFiber(f: suspend () -> A): Fiber<F, A> =
-    concurrently { f.liftM().startF(this@startFiber) }
+    concurrently { f.effect().startF(this@startFiber) }
 
   suspend fun <A, B> CoroutineContext.racePair(
     fa: suspend () -> A,
     fb: suspend () -> B
   ): RacePair<F, A, B> =
-    concurrently { racePair(this@racePair, fa.liftM(), fb.liftM()) }
+    concurrently { racePair(this@racePair, fa.effect(), fb.effect()) }
 
   suspend fun <A, B, C> CoroutineContext.raceTriple(
     fa: suspend () -> A,
     fb: suspend () -> B,
     fc: suspend () -> C
   ): RaceTriple<F, A, B, C> =
-    concurrently { raceTriple(this@raceTriple, fa.liftM(), fb.liftM(), fc.liftM()) }
+    concurrently { raceTriple(this@raceTriple, fa.effect(), fb.effect(), fc.effect()) }
 
   suspend fun <A, B, C> CoroutineContext.parMap(
     fa: suspend () -> A,
     fb: suspend () -> B,
     f: (A, B) -> C
   ): C =
-    concurrently { parMapN(this@parMap, fa.liftM(), fb.liftM(), f) }
+    concurrently { parMapN(this@parMap, fa.effect(), fb.effect(), f) }
 
   suspend fun <A, B, C, D> CoroutineContext.parMap(
     fa: suspend () -> A,
@@ -48,7 +48,7 @@ interface ConcurrentSyntax<F> : AsyncSyntax<F>, Concurrent<F>, ListParTraverseSy
     fc: suspend () -> C,
     f: (A, B, C) -> D
   ): D =
-    concurrently { parMapN(this@parMap, fa.liftM(), fb.liftM(), fc.liftM(), f) }
+    concurrently { parMapN(this@parMap, fa.effect(), fb.effect(), fc.effect(), f) }
 
   suspend fun <A, B, C, D, E> CoroutineContext.parMap(
     fa: suspend () -> A,
@@ -57,7 +57,7 @@ interface ConcurrentSyntax<F> : AsyncSyntax<F>, Concurrent<F>, ListParTraverseSy
     fd: suspend () -> D,
     f: (A, B, C, D) -> E
   ): E =
-    concurrently { parMapN(this@parMap, fa.liftM(), fb.liftM(), fc.liftM(), fd.liftM(), f) }
+    concurrently { parMapN(this@parMap, fa.effect(), fb.effect(), fc.effect(), fd.effect(), f) }
 
   suspend fun <A, B, C, D, E, G> CoroutineContext.parMap(
     fa: suspend () -> A,
@@ -67,23 +67,23 @@ interface ConcurrentSyntax<F> : AsyncSyntax<F>, Concurrent<F>, ListParTraverseSy
     fe: suspend () -> E,
     f: (A, B, C, D, E) -> G
   ): G =
-    concurrently { parMapN(this@parMap, fa.liftM(), fb.liftM(), fc.liftM(), fd.liftM(), fe.liftM(), f) }
+    concurrently { parMapN(this@parMap, fa.effect(), fb.effect(), fc.effect(), fd.effect(), fe.effect(), f) }
 
 
-  suspend fun <A, B> CoroutineContext.parallel(
+  suspend fun <A, B> CoroutineContext.parTupled(
     fa: suspend () -> A,
     fb: suspend () -> B
   ): Tuple2<A, B> =
     this.parMap(fa, fb, ::Tuple2)
 
-  suspend fun <A, B, C> CoroutineContext.parallel(
+  suspend fun <A, B, C> CoroutineContext.parTupled(
     fa: suspend () -> A,
     fb: suspend () -> B,
     fc: suspend () -> C
   ): Tuple3<A, B, C> =
     this.parMap(fa, fb, fc, ::Tuple3)
 
-  suspend fun <A, B, C, D> CoroutineContext.parallel(
+  suspend fun <A, B, C, D> CoroutineContext.parTupled(
     fa: suspend () -> A,
     fb: suspend () -> B,
     fc: suspend () -> C,
@@ -91,7 +91,7 @@ interface ConcurrentSyntax<F> : AsyncSyntax<F>, Concurrent<F>, ListParTraverseSy
   ): Tuple4<A, B, C, D> =
     this.parMap(fa, fb, fc, fd, ::Tuple4)
 
-  suspend fun <A, B, C, D, E> CoroutineContext.parallel(
+  suspend fun <A, B, C, D, E> CoroutineContext.parTupled(
     fa: suspend () -> A,
     fb: suspend () -> B,
     fc: suspend () -> C,
