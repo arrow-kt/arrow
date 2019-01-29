@@ -433,7 +433,7 @@ is trivial if your environment understand what a suspended effect is and has dir
 
 ```kotlin
 suspend fun <A, B> List<suspend () -> A>.traverse(f: (A) -> B): B =
-  map { effect { f(it()) } }
+  map { !effect { f(it()) } }
 ```
 
 # Conclusion
