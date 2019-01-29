@@ -9,6 +9,7 @@ import arrow.effects.Semaphore
 import arrow.effects.typeclasses.Concurrent
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.fold
+import arrow.test.generators.applicativeError
 import arrow.test.generators.either
 import arrow.test.generators.throwable
 import arrow.typeclasses.Eq
@@ -279,7 +280,7 @@ object ConcurrentLaws {
     }
 
   fun <F> Concurrent<F>.startJoinIsIdentity(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext): Unit =
-    forAll(Gen.int().map(::just)) { fa ->
+    forAll(Gen.int().applicativeError(this)) { fa ->
       fa.startF(ctx).flatMap { it.join() }.equalUnderTheLaw(fa, EQ)
     }
 
@@ -293,7 +294,7 @@ object ConcurrentLaws {
     }
 
   fun <F> Concurrent<F>.startCancelIsUnit(EQ_UNIT: Eq<Kind<F, Unit>>, ctx: CoroutineContext): Unit =
-    forAll(Gen.int().map(::just)) { fa ->
+    forAll(Gen.int().applicativeError(this)) { fa ->
       fa.startF(ctx).flatMap { (_, cancel) -> cancel }
         .equalUnderTheLaw(just<Unit>(Unit), EQ_UNIT)
     }
@@ -304,14 +305,14 @@ object ConcurrentLaws {
     }
 
   fun <F> Concurrent<F>.raceMirrorsLeftWinner(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext): Unit =
-    forAll(Gen.int().map(::just)) { fa ->
+    forAll(Gen.int().applicativeError(this)) { fa ->
       raceN(ctx, fa, never<Int>()).flatMap { either ->
         either.fold({ just(it) }, { raiseError(IllegalStateException("never() finished race")) })
       }.equalUnderTheLaw(fa, EQ)
     }
 
   fun <F> Concurrent<F>.raceMirrorsRightWinner(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext): Unit =
-    forAll(Gen.int().map(::just)) { fa ->
+    forAll(Gen.int().applicativeError(this)) { fa ->
       raceN(ctx, never<Int>(), fa).flatMap { either ->
         either.fold({ raiseError<Int>(IllegalStateException("never() finished race")) }, { just(it) })
       }.equalUnderTheLaw(fa, EQ)
@@ -366,7 +367,7 @@ object ConcurrentLaws {
     }
 
   fun <F> Concurrent<F>.racePairMirrorsLeftWinner(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext): Unit =
-    forAll(Gen.int().map(::just)) { fa ->
+    forAll(Gen.int().applicativeError(this)) { fa ->
       val never = never<Int>()
       val received = racePair(ctx, fa, never).flatMap { either ->
         either.fold({ (a, fiberB) ->
@@ -378,7 +379,7 @@ object ConcurrentLaws {
     }
 
   fun <F> Concurrent<F>.racePairMirrorsRightWinner(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext): Unit =
-    forAll(Gen.int().map(::just)) { fa ->
+    forAll(Gen.int().applicativeError(this)) { fa ->
       val never = never<Int>()
       val received = racePair(ctx, never, fa).flatMap { either ->
         either.fold({
@@ -473,7 +474,7 @@ object ConcurrentLaws {
     }
 
   fun <F> Concurrent<F>.raceTripleMirrorsLeftWinner(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
-    forAll(Gen.int().map(::just)) { fa ->
+    forAll(Gen.int().applicativeError(this)) { fa ->
       val never = never<Int>()
       val received = raceTriple(ctx, fa, never, never).flatMap { either ->
         either.fold(
@@ -486,7 +487,7 @@ object ConcurrentLaws {
     }
 
   fun <F> Concurrent<F>.raceTripleMirrorsMiddleWinner(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
-    forAll(Gen.int().map(::just)) { fa ->
+    forAll(Gen.int().applicativeError(this)) { fa ->
       val never = never<Int>()
       val received = raceTriple(ctx, never, fa, never).flatMap { either ->
         either.fold(
@@ -499,7 +500,7 @@ object ConcurrentLaws {
     }
 
   fun <F> Concurrent<F>.raceTripleMirrorsRightWinner(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
-    forAll(Gen.int().map(::just)) { fa ->
+    forAll(Gen.int().applicativeError(this)) { fa ->
       val never = never<Int>()
       val received = raceTriple(ctx, never, never, fa).flatMap { either ->
         either.fold(
