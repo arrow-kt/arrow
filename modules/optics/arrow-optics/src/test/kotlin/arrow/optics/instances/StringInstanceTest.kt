@@ -25,8 +25,8 @@ class StringInstanceTest : UnitSpec() {
       TraversalLaws.laws(
         traversal = String.each().each(),
         aGen = Gen.string(),
-        bGen = genChar(),
-        funcGen = genFunctionAToB(genChar()),
+        bGen = Gen.char(),
+        funcGen = Gen.functionAToB(Gen.char()),
         EQA = Eq.any(),
         EQOptionB = Option.eq(Eq.any()),
         EQListB = ListK.eq(Eq.any())
@@ -37,8 +37,8 @@ class StringInstanceTest : UnitSpec() {
       TraversalLaws.laws(
         traversal = String.filterIndex().filter { true },
         aGen = Gen.string(),
-        bGen = genChar(),
-        funcGen = genFunctionAToB(genChar()),
+        bGen = Gen.char(),
+        funcGen = Gen.functionAToB(Gen.char()),
         EQA = Eq.any(),
         EQOptionB = Option.eq(Eq.any()),
         EQListB = ListK.eq(Eq.any())
@@ -49,8 +49,8 @@ class StringInstanceTest : UnitSpec() {
       OptionalLaws.laws(
         optionalGen = Gen.int().map { String.index().index(it) },
         aGen = Gen.string(),
-        bGen = genChar(),
-        funcGen = genFunctionAToB(genChar()),
+        bGen = Gen.char(),
+        funcGen = Gen.functionAToB(Gen.char()),
         EQOptionB = Eq.any(),
         EQA = Eq.any()
       )
@@ -60,8 +60,8 @@ class StringInstanceTest : UnitSpec() {
       PrismLaws.laws(
         prism = String.cons().cons(),
         aGen = Gen.string(),
-        bGen = genTuple(genChar(), Gen.string()),
-        funcGen = genFunctionAToB(genTuple(genChar(), Gen.string())),
+        bGen = Gen.tuple2(Gen.char(), Gen.string()),
+        funcGen = Gen.functionAToB(Gen.tuple2(Gen.char(), Gen.string())),
         EQA = String.eq(),
         EQOptionB = Option.eq(Tuple2.eq(Char.eq(), String.eq()))
       )
@@ -71,8 +71,8 @@ class StringInstanceTest : UnitSpec() {
       PrismLaws.laws(
         prism = String.snoc().snoc(),
         aGen = Gen.string(),
-        bGen = genTuple(Gen.string(), genChar()),
-        funcGen = genFunctionAToB(genTuple(Gen.string(), genChar())),
+        bGen = Gen.tuple2(Gen.string(), Gen.char()),
+        funcGen = Gen.functionAToB(Gen.tuple2(Gen.string(), Gen.char())),
         EQA = String.eq(),
         EQOptionB = Option.eq(Tuple2.eq(String.eq(), Char.eq()))
       )

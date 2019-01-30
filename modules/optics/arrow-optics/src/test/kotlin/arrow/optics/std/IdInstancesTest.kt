@@ -3,7 +3,7 @@ package arrow.optics
 import arrow.core.Id
 import arrow.core.extensions.monoid
 import arrow.test.UnitSpec
-import arrow.test.generators.genFunctionAToB
+import arrow.test.generators.functionAToB
 import arrow.test.laws.IsoLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
@@ -18,7 +18,7 @@ class IdInstancesTest : UnitSpec() {
       iso = Id.toValue(),
       aGen = Gen.int().map { Id(it) },
       bGen = Gen.int(),
-      funcGen = genFunctionAToB(Gen.int()),
+      funcGen = Gen.functionAToB(Gen.int()),
       EQA = Eq.any(),
       EQB = Eq.any(),
       bMonoid = Int.monoid()

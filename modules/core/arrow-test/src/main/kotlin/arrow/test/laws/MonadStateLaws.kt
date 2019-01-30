@@ -2,8 +2,9 @@ package arrow.test.laws
 
 import arrow.Kind
 import arrow.mtl.typeclasses.MonadState
-import arrow.test.generators.genIntSmall
+import arrow.test.generators.intSmall
 import arrow.typeclasses.Eq
+import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
 object MonadStateLaws {
@@ -21,13 +22,13 @@ object MonadStateLaws {
   }
 
   fun <F> MonadState<F, Int>.monadStateSetTwice(EQ: Eq<Kind<F, Unit>>) {
-    forAll(genIntSmall(), genIntSmall()) { s: Int, t: Int ->
+    forAll(Gen.intSmall(), Gen.intSmall()) { s: Int, t: Int ->
       set(s).flatMap { set(t) }.equalUnderTheLaw(set(t), EQ)
     }
   }
 
   fun <F> MonadState<F, Int>.monadStateSetGet(EQ: Eq<Kind<F, Int>>) {
-    forAll(genIntSmall()) { s: Int ->
+    forAll(Gen.intSmall()) { s: Int ->
       set(s).flatMap { get() }.equalUnderTheLaw(set(s).flatMap { just(s) }, EQ)
     }
   }

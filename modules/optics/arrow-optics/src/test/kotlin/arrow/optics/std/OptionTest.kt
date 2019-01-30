@@ -5,9 +5,7 @@ import arrow.core.extensions.monoid
 import arrow.core.extensions.either.applicative.applicative
 import arrow.core.extensions.option.monoid.monoid
 import arrow.test.UnitSpec
-import arrow.test.generators.genEither
-import arrow.test.generators.genFunctionAToB
-import arrow.test.generators.genOption
+import arrow.test.generators.*
 import arrow.test.laws.IsoLaws
 import arrow.test.laws.PrismLaws
 import arrow.typeclasses.Eq
@@ -23,18 +21,18 @@ class OptionTest : UnitSpec() {
 
     testLaws(PrismLaws.laws(
       prism = Option.some(),
-      aGen = genOption(Gen.int()),
+      aGen = Gen.option(Gen.int()),
       bGen = Gen.int(),
-      funcGen = genFunctionAToB(Gen.int()),
+      funcGen = Gen.functionAToB(Gen.int()),
       EQA = Eq.any(),
       EQOptionB = Eq.any()
     ))
 
     testLaws(PrismLaws.laws(
       prism = Option.none(),
-      aGen = genOption(Gen.int()),
+      aGen = Gen.option(Gen.int()),
       bGen = Gen.create { Unit },
-      funcGen = genFunctionAToB(Gen.create { Unit }),
+      funcGen = Gen.functionAToB(Gen.create { Unit }),
       EQA = Eq.any(),
       EQOptionB = Eq.any()
     ))
@@ -42,18 +40,18 @@ class OptionTest : UnitSpec() {
     testLaws(IsoLaws.laws(
       iso = Option.toNullable<Int>().reverse(),
       aGen = Gen.int().orNull(),
-      bGen = genOption(Gen.int()),
+      bGen = Gen.option(Gen.int()),
       EQA = Eq.any(),
       EQB = Eq.any(),
-      funcGen = genFunctionAToB(genOption(Gen.int())),
+      funcGen = Gen.functionAToB(Gen.option(Gen.int())),
       bMonoid = Option.monoid(Int.monoid())
     ))
 
     testLaws(IsoLaws.laws(
       iso = Option.toEither(),
-      aGen = genOption(Gen.int()),
-      bGen = genEither(Gen.create { Unit }, Gen.int()),
-      funcGen = genFunctionAToB(genEither(Gen.create { Unit }, Gen.int())),
+      aGen = Gen.option(Gen.int()),
+      bGen = Gen.either(Gen.create { Unit }, Gen.int()),
+      funcGen = Gen.functionAToB(Gen.either(Gen.create { Unit }, Gen.int())),
       EQA = Eq.any(),
       EQB = Eq.any(),
       bMonoid = object : Monoid<Either<Unit, Int>> {

@@ -35,9 +35,9 @@ class MapInstanceTest : UnitSpec() {
     testLaws(
       TraversalLaws.laws(
         traversal = MapK.each<Int, String>().each(),
-        aGen = genMapK(Gen.int(), Gen.string()),
+        aGen = Gen.mapK(Gen.int(), Gen.string()),
         bGen = Gen.string(),
-        funcGen = genFunctionAToB(Gen.string()),
+        funcGen = Gen.functionAToB(Gen.string()),
         EQA = Eq.any(),
         EQOptionB = Option.eq(Eq.any()),
         EQListB = ListK.eq(Eq.any())
@@ -49,7 +49,7 @@ class MapInstanceTest : UnitSpec() {
         traversal = MapInstances.each<Int, String>().each(),
         aGen = Gen.map(Gen.int(), Gen.string()),
         bGen = Gen.string(),
-        funcGen = genFunctionAToB(Gen.string()),
+        funcGen = Gen.functionAToB(Gen.string()),
         EQA = Eq.any(),
         EQOptionB = Option.eq(Eq.any()),
         EQListB = ListK.eq(Eq.any())
@@ -59,9 +59,9 @@ class MapInstanceTest : UnitSpec() {
     testLaws(
       TraversalLaws.laws(
         traversal = MapK.filterIndex<Char, Int>().filter { true },
-        aGen = genMapK(genChar(), genIntSmall()),
+        aGen = Gen.mapK(Gen.char(), Gen.intSmall()),
         bGen = Gen.int(),
-        funcGen = genFunctionAToB(Gen.int()),
+        funcGen = Gen.functionAToB(Gen.int()),
         EQA = Eq.any(),
         EQOptionB = Option.eq(Eq.any()),
         EQListB = ListK.eq(Eq.any())
@@ -71,9 +71,9 @@ class MapInstanceTest : UnitSpec() {
     testLaws(
       TraversalLaws.laws(
         traversal = MapInstances.filterIndex<Char, Int>().filter { true },
-        aGen = Gen.map(genChar(), genIntSmall()),
+        aGen = Gen.map(Gen.char(), Gen.intSmall()),
         bGen = Gen.int(),
-        funcGen = genFunctionAToB(Gen.int()),
+        funcGen = Gen.functionAToB(Gen.int()),
         EQA = Eq.any(),
         EQOptionB = Option.eq(Eq.any()),
         EQListB = ListK.eq(Eq.any())
@@ -83,9 +83,9 @@ class MapInstanceTest : UnitSpec() {
     testLaws(
       OptionalLaws.laws(
         optionalGen = Gen.string().map { MapK.index<String, Int>().index(it) },
-        aGen = genMapK(Gen.string(), Gen.int()),
+        aGen = Gen.mapK(Gen.string(), Gen.int()),
         bGen = Gen.int(),
-        funcGen = genFunctionAToB(Gen.int()),
+        funcGen = Gen.functionAToB(Gen.int()),
         EQOptionB = Eq.any(),
         EQA = Eq.any()
       )
@@ -96,7 +96,7 @@ class MapInstanceTest : UnitSpec() {
         optionalGen = Gen.string().map { MapInstances.index<String, Int>().index(it) },
         aGen = Gen.map(Gen.string(), Gen.int()),
         bGen = Gen.int(),
-        funcGen = genFunctionAToB(Gen.int()),
+        funcGen = Gen.functionAToB(Gen.int()),
         EQOptionB = Eq.any(),
         EQA = Eq.any()
       )
@@ -105,9 +105,9 @@ class MapInstanceTest : UnitSpec() {
     testLaws(
       LensLaws.laws(
         lensGen = Gen.string().map { MapK.at<String, Int>().at(it) },
-        aGen = genMapK(Gen.string(), Gen.int()),
-        bGen = genOption(Gen.int()),
-        funcGen = genFunctionAToB(genOption(Gen.int())),
+        aGen = Gen.mapK(Gen.string(), Gen.int()),
+        bGen = Gen.option(Gen.int()),
+        funcGen = Gen.functionAToB(Gen.option(Gen.int())),
         EQA = Eq.any(),
         EQB = Eq.any(),
         MB = Option.monoid(Int.monoid())
@@ -118,8 +118,8 @@ class MapInstanceTest : UnitSpec() {
       LensLaws.laws(
         lensGen = Gen.string().map { MapInstances.at<String, Int>().at(it) },
         aGen = Gen.map(Gen.string(), Gen.int()),
-        bGen = genOption(Gen.int()),
-        funcGen = genFunctionAToB(genOption(Gen.int())),
+        bGen = Gen.option(Gen.int()),
+        funcGen = Gen.functionAToB(Gen.option(Gen.int())),
         EQA = Eq.any(),
         EQB = Eq.any(),
         MB = Option.monoid(Int.semigroup())

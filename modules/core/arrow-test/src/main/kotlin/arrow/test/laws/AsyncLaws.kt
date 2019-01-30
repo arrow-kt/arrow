@@ -37,12 +37,12 @@ object AsyncLaws {
     }
 
   fun <F> Async<F>.asyncError(EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(genThrowable()) { e: Throwable ->
+    forAll(Gen.throwable()) { e: Throwable ->
       async { ff: (Either<Throwable, Int>) -> Unit -> ff(Left(e)) }.equalUnderTheLaw(raiseError(e), EQ)
     }
 
   fun <F> Async<F>.continueOn(EQ: Eq<Kind<F, Int>>): Unit =
-    forFew(5, genIntSmall(), genIntSmall()) { threadId1: Int, threadId2: Int ->
+    forFew(5, Gen.intSmall(), Gen.intSmall()) { threadId1: Int, threadId2: Int ->
       Unit.just()
         .continueOn(newSingleThreadContext(threadId1.toString()))
         .map { getCurrentThread() }
@@ -52,7 +52,7 @@ object AsyncLaws {
     }
 
   fun <F> Async<F>.asyncConstructor(EQ: Eq<Kind<F, Int>>): Unit =
-    forFew(5, genIntSmall(), genIntSmall()) { threadId1: Int, threadId2: Int ->
+    forFew(5, Gen.intSmall(), Gen.intSmall()) { threadId1: Int, threadId2: Int ->
       invoke(newSingleThreadContext(threadId1.toString())) { getCurrentThread() }
         .flatMap {
           invoke(newSingleThreadContext(threadId2.toString())) { it + getCurrentThread() }
@@ -61,7 +61,7 @@ object AsyncLaws {
     }
 
   fun <F> Async<F>.continueOnComprehension(EQ: Eq<Kind<F, Int>>): Unit =
-    forFew(5, genIntSmall(), genIntSmall()) { threadId1: Int, threadId2: Int ->
+    forFew(5, Gen.intSmall(), Gen.intSmall()) { threadId1: Int, threadId2: Int ->
       fx {
         continueOn(newSingleThreadContext(threadId1.toString()))
         val t1: Int = getCurrentThread()
@@ -71,7 +71,7 @@ object AsyncLaws {
     }
 
   fun <F> Async<F>.asyncCanBeDerivedFromAsyncF(EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(genEither(genThrowable(), Gen.int())) { eith ->
+    forAll(Gen.either(Gen.throwable(), Gen.int())) { eith ->
       val k: ((Either<Throwable, Int>) -> Unit) -> Unit = { f ->
         f(eith)
       }
@@ -80,7 +80,7 @@ object AsyncLaws {
     }
 
   fun <F> Async<F>.bracketReleaseIscalledOnCompletedOrError(EQ: Eq<Kind<F, Int>>): Unit {
-    forAll(genApplicativeError(Gen.string(), this), Gen.int()) { fa, b ->
+    forAll(Gen.string().applicativeError(this), Gen.int()) { fa, b ->
       Promise.uncancelable<F, Int>(this@bracketReleaseIscalledOnCompletedOrError).flatMap { promise ->
         val br = delay { promise }.bracketCase(use = { fa }, release = { r, exitCase ->
           when (exitCase) {

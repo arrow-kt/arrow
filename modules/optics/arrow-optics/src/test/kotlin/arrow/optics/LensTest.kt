@@ -7,7 +7,7 @@ import arrow.data.extensions.listk.eq.eq
 import arrow.core.extensions.option.eq.eq
 import arrow.core.extensions.option.functor.functor
 import arrow.test.UnitSpec
-import arrow.test.generators.genFunctionAToB
+import arrow.test.generators.functionAToB
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
@@ -24,7 +24,7 @@ class LensTest : UnitSpec() {
         lens = tokenLens,
         aGen = genToken,
         bGen = Gen.string(),
-        funcGen = genFunctionAToB(Gen.string()),
+        funcGen = Gen.functionAToB(Gen.string()),
         EQA = Eq.any(),
         EQB = Eq.any(),
         MB = String.monoid()
@@ -34,7 +34,7 @@ class LensTest : UnitSpec() {
         traversal = tokenLens.asTraversal(),
         aGen = genToken,
         bGen = Gen.string(),
-        funcGen = genFunctionAToB(Gen.string()),
+        funcGen = Gen.functionAToB(Gen.string()),
         EQA = Eq.any(),
         EQOptionB = Option.eq(Eq.any()),
         EQListB = ListK.eq(Eq.any())
@@ -44,7 +44,7 @@ class LensTest : UnitSpec() {
         optional = tokenLens.asOptional(),
         aGen = genToken,
         bGen = Gen.string(),
-        funcGen = genFunctionAToB(Gen.string()),
+        funcGen = Gen.functionAToB(Gen.string()),
         EQA = Eq.any(),
         EQOptionB = Option.eq(Eq.any())
       ),
@@ -53,7 +53,7 @@ class LensTest : UnitSpec() {
         setter = tokenLens.asSetter(),
         aGen = genToken,
         bGen = Gen.string(),
-        funcGen = genFunctionAToB(Gen.string()),
+        funcGen = Gen.functionAToB(Gen.string()),
         EQA = Token.eq()
       )
     )
@@ -63,7 +63,7 @@ class LensTest : UnitSpec() {
         lens = Lens.id(),
         aGen = Gen.int(),
         bGen = Gen.int(),
-        funcGen = genFunctionAToB(Gen.int()),
+        funcGen = Gen.functionAToB(Gen.int()),
         EQA = Eq.any(),
         EQB = Eq.any(),
         MB = Int.monoid()
@@ -125,13 +125,13 @@ class LensTest : UnitSpec() {
     }
 
     "asGetter should behave as valid Getter: find" {
-      forAll(genToken, genFunctionAToB<String, Boolean>(Gen.bool())) { token, p ->
+      forAll(genToken, Gen.functionAToB<String, Boolean>(Gen.bool())) { token, p ->
         tokenLens.asGetter().find(token, p) == tokenGetter.find(token, p)
       }
     }
 
     "asGetter should behave as valid Getter: exist" {
-      forAll(genToken, genFunctionAToB<String, Boolean>(Gen.bool())) { token, p ->
+      forAll(genToken, Gen.functionAToB<String, Boolean>(Gen.bool())) { token, p ->
         tokenLens.asGetter().exist(token, p) == tokenGetter.exist(token, p)
       }
     }
@@ -207,7 +207,7 @@ class LensTest : UnitSpec() {
     }
 
     "Asks with f is the same as applying f to the focus of the lens" {
-      forAll(genToken, genFunctionAToB<String, String>(Gen.string())) { token, f ->
+      forAll(genToken, Gen.functionAToB<String, String>(Gen.string())) { token, f ->
         tokenLens.asks(f).runId(token) == f(token.value)
       }
     }
@@ -228,13 +228,13 @@ class LensTest : UnitSpec() {
     }
 
     "Extracts with f should be same as extract and map" {
-      forAll(genToken, genFunctionAToB<String, String>(Gen.string())) { generatedToken, f ->
+      forAll(genToken, Gen.functionAToB<String, String>(Gen.string())) { generatedToken, f ->
         tokenLens.extractMap(f).run(generatedToken) == tokenLens.extract().map(f).run(generatedToken)
       }
     }
 
     "update f should be same modify f within State and returning new state" {
-      forAll(genToken, genFunctionAToB<String, String>(Gen.string())) { generatedToken, f ->
+      forAll(genToken, Gen.functionAToB<String, String>(Gen.string())) { generatedToken, f ->
         tokenLens.update(f).run(generatedToken) ==
             State { token: Token ->
               tokenLens.modify(token, f)
@@ -244,7 +244,7 @@ class LensTest : UnitSpec() {
     }
 
     "updateOld f should be same as modify f within State and returning old state" {
-      forAll(genToken, genFunctionAToB<String, String>(Gen.string())) { generatedToken, f ->
+      forAll(genToken, Gen.functionAToB<String, String>(Gen.string())) { generatedToken, f ->
         tokenLens.updateOld(f).run(generatedToken) ==
             State { token: Token ->
               tokenLens.modify(token, f) toT tokenLens.get(token)
@@ -253,7 +253,7 @@ class LensTest : UnitSpec() {
     }
 
     "update_ f should be as modify f within State and returning Unit" {
-      forAll(genToken, genFunctionAToB<String, String>(Gen.string())) { generatedToken, f ->
+      forAll(genToken, Gen.functionAToB<String, String>(Gen.string())) { generatedToken, f ->
         tokenLens.update_(f).run(generatedToken) ==
             State { token: Token ->
               tokenLens.modify(token, f) toT Unit

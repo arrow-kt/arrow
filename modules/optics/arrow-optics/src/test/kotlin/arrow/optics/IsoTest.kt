@@ -11,7 +11,7 @@ import arrow.data.extensions.listk.eq.eq
 import arrow.core.extensions.option.eq.eq
 import arrow.core.extensions.option.functor.functor
 import arrow.test.UnitSpec
-import arrow.test.generators.genFunctionAToB
+import arrow.test.generators.functionAToB
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
@@ -34,7 +34,7 @@ class IsoTest : UnitSpec() {
         lens = tokenIso.asLens(),
         aGen = genToken,
         bGen = Gen.string(),
-        funcGen = genFunctionAToB(Gen.string()),
+        funcGen = Gen.functionAToB(Gen.string()),
         EQA = Token.eq(),
         EQB = Eq.any(),
         MB = String.monoid()
@@ -44,7 +44,7 @@ class IsoTest : UnitSpec() {
         prism = aIso.asPrism(),
         aGen = genSumTypeA,
         bGen = Gen.string(),
-        funcGen = genFunctionAToB(Gen.string()),
+        funcGen = Gen.functionAToB(Gen.string()),
         EQA = Eq.any(),
         EQOptionB = Eq.any()
       ),
@@ -53,7 +53,7 @@ class IsoTest : UnitSpec() {
         traversal = tokenIso.asTraversal(),
         aGen = genToken,
         bGen = Gen.string(),
-        funcGen = genFunctionAToB(Gen.string()),
+        funcGen = Gen.functionAToB(Gen.string()),
         EQA = Eq.any(),
         EQOptionB = Option.eq(Eq.any()),
         EQListB = ListK.eq(Eq.any())
@@ -63,7 +63,7 @@ class IsoTest : UnitSpec() {
         optional = tokenIso.asOptional(),
         aGen = genToken,
         bGen = Gen.string(),
-        funcGen = genFunctionAToB(Gen.string()),
+        funcGen = Gen.functionAToB(Gen.string()),
         EQA = Eq.any(),
         EQOptionB = Option.eq(Eq.any())
       ),
@@ -72,7 +72,7 @@ class IsoTest : UnitSpec() {
         setter = tokenIso.asSetter(),
         aGen = genToken,
         bGen = Gen.string(),
-        funcGen = genFunctionAToB(Gen.string()),
+        funcGen = Gen.functionAToB(Gen.string()),
         EQA = Token.eq()
       ),
 
@@ -80,7 +80,7 @@ class IsoTest : UnitSpec() {
         iso = tokenIso,
         aGen = genToken,
         bGen = Gen.string(),
-        funcGen = genFunctionAToB(Gen.string()),
+        funcGen = Gen.functionAToB(Gen.string()),
         EQA = Token.eq(),
         EQB = Eq.any(),
         bMonoid = String.monoid()
@@ -147,13 +147,13 @@ class IsoTest : UnitSpec() {
       }
 
       "asGetter should behave as valid Getter: find" {
-        forAll(genToken, genFunctionAToB<String, Boolean>(Gen.bool())) { token, p ->
+        forAll(genToken, Gen.functionAToB<String, Boolean>(Gen.bool())) { token, p ->
           find(token, p) == tokenGetter.find(token, p)
         }
       }
 
       "asGetter should behave as valid Getter: exist" {
-        forAll(genToken, genFunctionAToB<String, Boolean>(Gen.bool())) { token, p ->
+        forAll(genToken, Gen.functionAToB<String, Boolean>(Gen.bool())) { token, p ->
           exist(token, p) == tokenGetter.exist(token, p)
         }
       }

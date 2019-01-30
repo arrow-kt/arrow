@@ -30,9 +30,9 @@ class FilterIndexInstanceTest : UnitSpec() {
   init {
     testLaws(TraversalLaws.laws(
       traversal = ListK.filterIndex<String>().filter { true },
-      aGen = genListK(Gen.string()),
+      aGen = Gen.listK(Gen.string()),
       bGen = Gen.string(),
-      funcGen = genFunctionAToB(Gen.string()),
+      funcGen = Gen.functionAToB(Gen.string()),
       EQA = Eq.any(),
       EQListB = Eq.any(),
       EQOptionB = Eq.any()
@@ -42,7 +42,7 @@ class FilterIndexInstanceTest : UnitSpec() {
       traversal = ListFilterIndex<String>().filter { true },
       aGen = Gen.list(Gen.string()),
       bGen = Gen.string(),
-      funcGen = genFunctionAToB(Gen.string()),
+      funcGen = Gen.functionAToB(Gen.string()),
       EQA = Eq.any(),
       EQListB = Eq.any(),
       EQOptionB = Eq.any()
@@ -50,9 +50,9 @@ class FilterIndexInstanceTest : UnitSpec() {
 
     testLaws(TraversalLaws.laws(
       traversal = NonEmptyList.filterIndex<String>().filter { true },
-      aGen = genNonEmptyList(Gen.string()),
+      aGen = Gen.nonEmptyList(Gen.string()),
       bGen = Gen.string(),
-      funcGen = genFunctionAToB(Gen.string()),
+      funcGen = Gen.functionAToB(Gen.string()),
       EQA = Eq.any(),
       EQOptionB = Option.eq(Eq.any()),
       EQListB = ListK.eq(Eq.any())
@@ -60,9 +60,9 @@ class FilterIndexInstanceTest : UnitSpec() {
 
     testLaws(TraversalLaws.laws(
       traversal = SequenceK.filterIndex<Char>().filter { true },
-      aGen = genSequenceK(genChar()),
-      bGen = genChar(),
-      funcGen = genFunctionAToB(genChar()),
+      aGen = Gen.sequenceK(Gen.char()),
+      bGen = Gen.char(),
+      funcGen = Gen.functionAToB(Gen.char()),
       EQA = SequenceK.eq(Char.eq()),
       EQOptionB = Option.eq(Eq.any()),
       EQListB = ListK.eq(Eq.any())
@@ -70,9 +70,9 @@ class FilterIndexInstanceTest : UnitSpec() {
 
     testLaws(TraversalLaws.laws(
       traversal = MapK.filterIndex<Char, Int>().filter { true },
-      aGen = genMapK(genChar(), genIntSmall()),
+      aGen = Gen.mapK(Gen.char(), Gen.intSmall()),
       bGen = Gen.int(),
-      funcGen = genFunctionAToB(Gen.int()),
+      funcGen = Gen.functionAToB(Gen.int()),
       EQA = Eq.any(),
       EQOptionB = Option.eq(Eq.any()),
       EQListB = ListK.eq(Eq.any())
@@ -80,9 +80,9 @@ class FilterIndexInstanceTest : UnitSpec() {
 
     testLaws(TraversalLaws.laws(
       traversal = MapFilterIndex<Char, Int>().filter { true },
-      aGen = Gen.map(genChar(), genIntSmall()),
+      aGen = Gen.map(Gen.char(), Gen.intSmall()),
       bGen = Gen.int(),
-      funcGen = genFunctionAToB(Gen.int()),
+      funcGen = Gen.functionAToB(Gen.int()),
       EQA = Eq.any(),
       EQOptionB = Option.eq(Eq.any()),
       EQListB = ListK.eq(Eq.any())
@@ -91,8 +91,8 @@ class FilterIndexInstanceTest : UnitSpec() {
     testLaws(TraversalLaws.laws(
       traversal = String.filterIndex().filter { true },
       aGen = Gen.string(),
-      bGen = genChar(),
-      funcGen = genFunctionAToB(genChar()),
+      bGen = Gen.char(),
+      funcGen = Gen.functionAToB(Gen.char()),
       EQA = Eq.any(),
       EQOptionB = Option.eq(Eq.any()),
       EQListB = ListK.eq(Eq.any())
