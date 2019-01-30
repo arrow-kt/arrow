@@ -2,6 +2,7 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.core.*
+import arrow.data.StateT
 import arrow.effects.extensions.io.fx.fx
 import arrow.effects.extensions.io.unsafeRun.runBlocking
 import arrow.test.UnitSpec
@@ -244,7 +245,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
       val const = 1
       fxTest {
         fx {
-          val fiber = Dispatchers.Default.startFiber { const }
+          val fiber = Dispatchers.Default.startFiber { "Hello" }
           val (n) = fiber.join()
           n
         }
@@ -262,7 +263,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
       } shouldBe true
     }
 
-    "parallel" {
+    "parTupled" {
       fxTest {
         fx {
           val currentThread = !effect { Thread.currentThread().name }

@@ -4,29 +4,37 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.ForTry
 import arrow.core.Try
-import arrow.effects.ForIO
-import arrow.effects.IO
-import arrow.effects.extensions.io.applicativeError.attempt
-import arrow.effects.extensions.io.async.async
-import arrow.effects.extensions.io.monad.monad
-import arrow.effects.extensions.statet.async.async
+import arrow.core.Tuple2
 import arrow.core.extensions.`try`.monad.monad
 import arrow.data.extensions.listk.monad.monad
 import arrow.data.extensions.listk.semigroupK.semigroupK
 import arrow.data.extensions.statet.applicative.applicative
 import arrow.data.extensions.statet.semigroupK.semigroupK
+import arrow.effects.ForIO
+import arrow.effects.IO
+import arrow.effects.extensions.io.applicativeError.applicativeError
+import arrow.effects.extensions.io.applicativeError.attempt
+import arrow.effects.extensions.io.applicativeError.handleError
+import arrow.effects.extensions.io.async.async
+import arrow.effects.extensions.io.fx.fx
+import arrow.effects.extensions.io.monad.monad
+import arrow.effects.extensions.statet.async.async
+import arrow.effects.handleErrorWith
 import arrow.mtl.extensions.StateTMonadState
 import arrow.mtl.extensions.listk.monadCombine.monadCombine
 import arrow.mtl.extensions.statet.monadCombine.monadCombine
 import arrow.mtl.extensions.statet.monadState.monadState
+import arrow.mtl.typeclasses.MonadState
 import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
 import arrow.test.laws.MonadCombineLaws
 import arrow.test.laws.MonadStateLaws
 import arrow.test.laws.SemigroupKLaws
+import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Eq
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
+import java.lang.RuntimeException
 
 @RunWith(KotlinTestRunner::class)
 class StateTTests : UnitSpec() {
