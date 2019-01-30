@@ -172,6 +172,14 @@ interface Semiring<A> : Monoid<A> {
             this.combineMultiplicate(b)
 
     /**
+     * Maybe additively combine two [A] values.
+     */
+    fun A?.maybeCombineAddition(b: A?): A {
+        if (this == null) return zero()
+        return Option.fromNullable(b).fold({ this }, { combine(it) })
+    }
+
+    /**
      * Maybe multiplicatively combine two [A] values.
      */
     fun A?.maybeCombineMultiplicate(b: A?): A {
