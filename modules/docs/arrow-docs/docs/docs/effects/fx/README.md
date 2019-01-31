@@ -8,11 +8,11 @@ permalink: /docs/effects/fx/
 
 Arrow Fx brings purity, referential transparency and direct imperative syntax to typed FP in Kotlin.
 
-Arrow Fx programs can run unmodified in multiple supported frameworks and runtimes such as Arrow Effects IO, KotlinX Coroutines Deferred, Rx2 Observable and many more.
+Arrow Fx programs run unmodified in multiple supported frameworks and runtimes such as Arrow Effects IO, KotlinX Coroutines Deferred, Rx2 Observable and many more.
 
 Creating Typed Pure Functional Programs is fun and easy with Arrow Fx.
  
-## Introduction
+## Pure Functions, Side Effects and Program Execution
 
 ### Pure & Referentially Transparent Functions
 
@@ -22,7 +22,6 @@ Pure functions exhibit a deterministic behavior and cause no external observable
 We call this property referential transparency.
 
 Referential transparency allow us to reason about the different pieces of our program in isolation. 
-We no longer worry if mutability or arbitrary side effects could make our component behave non-deterministically since our functions are pure and produce always deterministic results given the same input.
 
 To create a pure function in Kotlin we may use the keyword `fun`.
 
@@ -50,7 +49,7 @@ In the example below `println(a : Any): Unit` is a side effect because each time
 
 When we denote side effects as `suspend` the Kotlin compiler will ensure we are not applying side effects uncontrolled in the pure environment.
 
-```kotlin:ank:playground
+```kotlin:ank:fail
 //sampleStart
 fun helloWorld(): String =
   "Hello World"
@@ -98,7 +97,7 @@ Side effects can be composed and turned into pure values in `fx` blocks.
 
 ##### Turning side effects into pure values with `effect` 
 
-`effect` wraps the effect and turns it into a pure value by lifting any `suspend () -> A` user declared side effects into an `IO<A>` value
+`effect` wraps the effect and turns it into a pure value by lifting any `suspend () -> A` user declared side effect into a `IO<A>` value
 
 ```kotlin:ank:playground
 import arrow.effects.extensions.io.fx.fx
@@ -113,8 +112,8 @@ fun greet(): IO<Unit> =
   fx {
     val pureHello: IO<Unit> = effect { sayHello() }
     val puregoodBye: IO<Unit> = effect { sayHello() }
-    val (_ : Unit) = pureHello
-    val (_ : Unit) = pureGoodBye
+    val _ : Unit = !pureHello
+    val _ : Unit = !pureGoodBye
   }
 //sampleEnd 
 fun main() {
@@ -125,6 +124,10 @@ fun main() {
 When we capture suspended side effects as `IO` values with `effect`, we can pass them around and compose them until we are ready to apply the effects
 
 ##### Applying side effects with `!effect`
+
+Side effects are applied with the operator `!` followed by the function `effect`. `!effect` takes the suspended side effects `sayHello()` and `sayGoodbye()` and ensures they are controlled by the `IO` context before they get a chance to be executed. This ensures our effect compositions are pure and referentially transparent and will only run as part of an `IO` program at the edge.
+Note running `greet()` does not perform any effects because it's an `IO` value.
+Since invoking this function does not produce effects we can be confident that `greet` is pure and referentially transparent despite referring to effects application.
 
 ```kotlin:ank:playground
 import arrow.effects.extensions.io.fx.fx
@@ -145,10 +148,6 @@ fun main() {
   greet().unsafeRunSync()
 }
 ```
-
-Side effects are applied with the operator `!` followed by the function `effect`. `!effect` takes the suspended side effects `sayHello()` and `sayGoodbye()` and ensures they are controlled by the `IO` context before they get a chance to be executed. This ensures our effect compositions are pure and referentially transparent and will only run as part of an `IO` program at the edge.
-Note running `greet()` does not perform any effects because it's an `IO` value.
-Since invoking this function does not produce effects we can be confident that `greet` is pure and referentially transparent despite referring to effects application.
 
 An attempt to run a side effect in an `fx` block not delimited by `effect` or `!effect` also results in a compilation error. 
 
@@ -270,11 +269,11 @@ fun main() { // The edge of our world
 }
 ```
 
-When we spawn fibers we can obtain their deferred non-blocking result  with direct syntax with `join()` and destructuring the effect.
+When we spawn fibers we can obtain their deferred non-blocking result using `join()` and destructuring the effect.
 
 Note that because we are using `Fiber` here and a Dispatcher that may not create new threads in all cases we are not guaranteed that the thread names printed would be different.
 
-This is part of the greatness of Fibers. They run as scheduled based on the policies provided by Dispatcher Context.
+This is part of the greatness of Fibers. They run as scheduled based on the policies provided by the Dispatcher's Context.
 
 ### Parallelization & Concurrency
 
@@ -307,11 +306,11 @@ fun main() { // The edge of our world
 }
 ```
 
-When all operations complete and the program resumes binding to the left hand side we observe how we just name the results and are already unboxed and destructured for us as `threadA` and `threadB`. While this resembles blocking direct style, it's in fact non-blocking and pure since side effects are suspended the bound in the IO continuation.
+When all operations complete and the program resumes binding to the left hand side we observe how we just name the results and are already unboxed and destructured for us as `threadA` and `threadB`. While this resembles blocking direct style, it's in fact non-blocking and pure since side effects are suspended first, then bound in the `IO` continuation.
 
 #### `parMap`
 
-`parMap` allows *n#* effects to run in parallel non-blocking waiting for all results to complete inthen it delegates to a user provided function that applies a final transformation over the results.
+`parMap` allows *n#* effects to run in parallel non-blocking waiting for all results to complete  and then it delegates to a user provided function that applies a final transformation over the results.
 Once the function specifies a valid return we can observe how the returned non-blocking value is bound in the left hand side. 
 
 ```kotlin:ank:playground
@@ -401,7 +400,7 @@ fun main() { // The edge of our world
 
 ### Cancelation
 
-Al concurrent `fx` continuations are cancelable. Users may use the `fxCancelable` function to run `fx` blocks that beside returning a value they return a disposable handler that can interrupt the operation.
+Al concurrent `fx` continuations are cancelable. Users may use the `fxCancelable` function to run `fx` blocks that beside returning a value it returns a disposable handler that can interrupt the operation.
 
 ```kotlin:ank:playground
 import arrow.unsafe
@@ -429,7 +428,7 @@ Deferring execution and being able to suspend side effects is important for prog
 
 Since Arrow Fx uses this lazy behavior by default we don't have to resort to special configuration arguments when creating deferred computations.
 
-The value `program` below is pure and referentially transparent because `fx` yields a lazy computation. 
+The value `program` below is pure and referentially transparent because `fx` returns a lazy computation. 
 
 ```kotlin:ank:playground
 import arrow.unsafe
@@ -491,6 +490,7 @@ fun main() {
 If an `async` computations fires immediately it does not give us a chance to suspend side effects. This implies that all functions that produce their effects immediately when invoked are impure and non-referentially transparent. This is the default in the KotlinX Coroutines Lib.
 
 Arrow Fx is not opinionated as to whether firing eagerly is a more or less appropriate technique. We, the authors, understand this style gathers a different audience where purity and referential transparency may be non goals or optimizations techniques are in play and that is just fine. 
+
 Life goes on.
 
 Arrow Fx offers in contrast a different approach that is inline with Arrow's main concern which is helping you as a user create well-typed safe and pure programs in Kotlin.
@@ -542,11 +542,11 @@ fun main() =
 Polymorphism is important for two main reasons: *Correctness* & *Flexibility*.
 
 Polymorphic programs are more likely to be correct because the API's available to them is constrained by the functionality described in the type classes that are used as scope, in the previous example the receiver of the function. 
-What's most amazing about this technique is that as we declare our programs only data types that are able to provide extensions for `Fx` and `UnsafeRun` are able to be provided as arguments to the final main. 
-You will not be able to compile this program unless your data type supported those extension.
+What's most amazing about this technique is that as we declare our programs only data types that are able to provide extensions for `Fx` and `UnsafeRun` are able to be provided as arguments to the final `main`. 
+You will not be able to compile this program unless your data type supported those extensions.
 
 Polymorphic programs are more flexible that their concrete counterparts because they can run unmodified in multiple runtimes.
-In the same way `main` is concrete above to `IO`. We could have used there instead Rx2 Observables, Reactor Flux or any other data type that is able to provide extensions for `Fx` and `UnsafeRun`.
+In the same way `main` is concrete in the previous example to `IO`, we could have used there instead Rx2 Observables, Reactor Flux or any other data type that is able to provide extensions for `Fx` and `UnsafeRun`.
 
 ### Fx for all data types
 
@@ -606,7 +606,7 @@ Arrow Fx eliminates the need for tagless style algebras and parametrization over
  
 When modeling effects as `suspend` functions that are disallowed to compile in the pure environment but welcome in compositional blocks denoted as `effect { sideEffect() }`.
 
-F brings first class, no-compromises direct style syntax for effectful programs that are constrained by monads that can provide an extension of `Concurrent<F>`.
+Arrow Fx brings first class, no-compromises direct style syntax for effectful programs that are constrained by monads that can provide an extension of `Concurrent<F>`.
  It models effects with the Kotlin Compiler native system support for `suspend` functions and abilities to declare restricted suspended blocks with `@RestrictsSuspension` in which effects are allowed to run and compose.
  
  We still preserve `F` to achieve polymorphism but it's usage it's restricted to type declarations and unnecessary in program composition.
@@ -616,19 +616,16 @@ F brings first class, no-compromises direct style syntax for effectful programs 
 This simplification is manifested in the world of suspended effects in the fact that all values of type `Kind<F, A>` can bind to `A` in the left hand side in a non blocking fashion because Kotlin supports imperative CPS and continuation styles syntactically. 
 Arrow Fx uses the Kotlin compiler native support for implicit CPS to achieve direct syntax for effectful monads.
 
-This has a tremendous impact in program declaration since all the functional combinators where before you had as return type a `Kind<F, A>`
-are gone. `map`, `flatMap`, etc. are either gone from the syntax or their returned values are flattened and automatically
-bound in the monad context and transparent to the user.
+This has a tremendous impact in program declaration since all the functional combinators where before you had as return type a `Kind<F, A>` are gone. 
+`map`, `flatMap` are no longer necessary because their returned values are flattened and automatically bound in the monad context.
 
-This leads us to realize that there is a direct relationship between `suspend () -> A` and `Kind<F, A>` or what in Scala is `F[A]`.
-This relationship establishes that a `suspend` function denoting an effect can be lifted to operate in the monadic context of a
-suspend capable data type.
+This leads us to realize that there is a some direct relationship between `suspend () -> A` and `Kind<F, A>` or what in Scala is `F[A]`.
+This relationship establishes that a `suspend` function denoting an effect can be deferred and controlled by the monadic context of a suspend capable data type.
 
 `effect()` takes us without blocking semantics from a suspended function to any `Kind<F, A>` for which an `Async<F>` extension exists.
-This includes IO and pretty much everything you are using today in a tagless final or IO wrapping style in FP.
+This includes IO and pretty much everything you are using today in a tagless final or IO wrapping style FP.
 
-This relationship also eliminates the need to ever use any of the functional combinators you find in the `Functor<F>`
-hierarchy for effectful monads. 
+This relationship also eliminates the need to ever use any of the functional combinators you find in the `Functor<F>` hierarchy for effectful monads. 
 All of them are swallowed by equivalent direct syntax in the environment as demonstrated in the examples below:
 
 #### Good bye `Functor`, `Applicative` and `Monad`
@@ -653,8 +650,7 @@ The following combinators illustrate how the Functor hierarchy functions are poi
 This is in general true for effectful data types that are non-commutative. 
 Note that implicit CPS style with auto-binding has the disadvantage that for non-commutative monads where the order of effects matter you can't apply substitution based on referential transparency.
 
-Arrow Fx is aware of this but still allows users to use `fx` on non-commutative monads such as List providing safe `fx` builders
-that guarantee suspended effects are applied in order in different arguments before they are composed.
+Arrow Fx is aware of this but still allows users to use `fx` on non-commutative monads such as `List` providing safe `fx` builders that guarantee suspended effects are applied in order in different arguments before they are composed.
 Altering the order of effect when using the safe builders for commutative monads does not alter the result
 
 ```kotlin:ank:playground
@@ -738,9 +734,9 @@ fun main() {
 
 Arrow Fx is a next generation Typed FP Effects Library that makes effectful and polymorphic programing first class in Kotlin acting as an extension to the Kotlin native suspend system.
 Complementing the Kotlin Coroutines library, Arrow Fx adds an extra layer of safety to concurrent and asynchronous programming making you well aware were effects are localized in your apps.
-It does all this by empowering polymorphic programs that can be interpreted untouched preserving the same in multiple popular frameworks such as Rx2, Reactor, etc.
+It does all this by empowering polymorphic programs that can be interpreted untouched preserving the same declaration in multiple popular frameworks such as Rx2, Reactor, etc.
 
-Arrow Fx offers direct style syntax and effect control without compromises and removes the syntactic burden of type parametrization while still yielding polymorphic programs that are pure, safe and referentially transparent.
+Arrow Fx offers direct style syntax and effect control without compromises and removes the syntactic burden of type parametrization while still yielding programs that are pure, safe and referentially transparent.
 
 Despite some of the Kotlin type system limitations like lack of Higher Kinded Types, The Kotlin language is excellent to encode typed programs with first class imperative syntax for FP. These programs are approachable by the broader programming community and arguably easier to encode than some solutions currently used in mainstream Kotlin and Scala FP communities.
 
