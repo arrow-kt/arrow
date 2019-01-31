@@ -100,6 +100,7 @@ Side effects can be composed and turned into pure values in `fx` blocks.
 `effect` wraps the effect and turns it into a pure value by lifting any `suspend () -> A` user declared side effect into a `IO<A>` value
 
 ```kotlin:ank:playground
+import arrow.effects.IO
 import arrow.effects.extensions.io.fx.fx
 //sampleStart
 suspend fun sayHello(): Unit =
@@ -130,6 +131,7 @@ Note running `greet()` does not perform any effects because it's an `IO` value.
 Since invoking this function does not produce effects we can be confident that `greet` is pure and referentially transparent despite referring to effects application.
 
 ```kotlin:ank:playground
+import arrow.effects.IO
 import arrow.effects.extensions.io.fx.fx
 //sampleStart
 suspend fun sayHello(): Unit =
@@ -152,6 +154,7 @@ fun main() {
 An attempt to run a side effect in an `fx` block not delimited by `effect` or `!effect` also results in a compilation error. 
 
 ```kotlin:ank:playground
+import arrow.effects.IO
 import arrow.effects.extensions.io.fx.fx
 //sampleStart
 suspend fun sayHello(): Unit =
@@ -182,6 +185,7 @@ Arrow restricts the ability to run programs to extensions of the `UnsafeRun` typ
 Usage of `unsafe` is reserved to the end of the world and may be the only impure execution of a well typed functional program.
 
 ```kotlin:ank:playground
+import arrow.effects.IO
 import arrow.unsafe
 import arrow.effects.extensions.io.unsafeRun.runBlocking
 import arrow.effects.extensions.io.fx.fx
@@ -219,6 +223,7 @@ Arrow Fx benefits from auto-binding and direct syntax for asynchronous programmi
 Performing effects while switching execution contexts a la carte is trivial.
 
 ```kotlin:ank:playground
+import arrow.effects.IO
 import arrow.unsafe
 import arrow.effects.extensions.io.unsafeRun.runBlocking
 import arrow.effects.extensions.io.fx.fx
@@ -248,6 +253,7 @@ In addition to `continueOn`, Arrow Fx allows users to override the executions co
 Fibers are similar to threads but much more lightweight and cheap.
 
 ```kotlin:ank:playground
+import arrow.effects.IO
 import arrow.unsafe
 import arrow.effects.extensions.io.unsafeRun.runBlocking
 import arrow.effects.extensions.io.fx.fx
@@ -284,6 +290,7 @@ Arrow Fx comes with built in versions of `parMap`, `parTupled`, `parTraverse` an
 `parTupled` allows N operations to run in parallel in a non-blocking fashion and gather all their results in a `Tuple` which has the same arity as the number of operations specified on the arguments. 
 
 ```kotlin:ank:playground
+import arrow.effects.IO
 import arrow.unsafe
 import arrow.effects.extensions.io.unsafeRun.runBlocking
 import arrow.effects.extensions.io.fx.fx
@@ -314,6 +321,7 @@ When all operations complete and the program resumes binding to the left hand si
 Once the function specifies a valid return we can observe how the returned non-blocking value is bound in the left hand side. 
 
 ```kotlin:ank:playground
+import arrow.effects.IO
 import arrow.unsafe
 import arrow.effects.extensions.io.unsafeRun.runBlocking
 import arrow.effects.extensions.io.fx.fx
@@ -347,6 +355,7 @@ fun main() { // The edge of our world
 `parTraverse` allows any `Iterable<suspend () -> A>` to iterate over its contained effects in parallel as we apply a user provided function over each effect result and then gather all the transformed results in a `List<B>` 
 
 ```kotlin:ank:playground
+import arrow.effects.IO
 import arrow.unsafe
 import arrow.effects.extensions.io.unsafeRun.runBlocking
 import arrow.effects.extensions.io.fx.fx
@@ -376,6 +385,7 @@ fun main() { // The edge of our world
 `parSequence` applies all effects in `Iterable<suspend () -> A>` in non-blocking in parallel and then gathers all the transformed results and returns them in a `List<B>` 
 
 ```kotlin:ank:playground
+import arrow.effects.IO
 import arrow.unsafe
 import arrow.effects.extensions.io.unsafeRun.runBlocking
 import arrow.effects.extensions.io.fx.fx
@@ -403,6 +413,7 @@ fun main() { // The edge of our world
 Al concurrent `fx` continuations are cancelable. Users may use the `fxCancelable` function to run `fx` blocks that beside returning a value it returns a disposable handler that can interrupt the operation.
 
 ```kotlin:ank:playground
+import arrow.effects.IO
 import arrow.unsafe
 import arrow.effects.extensions.io.unsafeRun.runBlocking
 import arrow.effects.extensions.io.fx.fxCancelable
@@ -431,6 +442,7 @@ Since Arrow Fx uses this lazy behavior by default we don't have to resort to spe
 The value `program` below is pure and referentially transparent because `fx` returns a lazy computation. 
 
 ```kotlin:ank:playground
+import arrow.effects.IO
 import arrow.unsafe
 import arrow.effects.extensions.io.unsafeRun.runBlocking
 import arrow.effects.extensions.io.fx.fx
@@ -517,6 +529,7 @@ We can also code agains't `Fx` assuming it would be provided at some point in th
 In the following example the program is declared polymorphic and then made concrete to Arrow IO at the edge.
 
 ```kotlin:ank:playground
+import arrow.effects.IO
 import arrow.unsafe
 import arrow.effects.extensions.io.unsafeRun.runBlocking
 import arrow.effects.extensions.io.fx.fx
@@ -556,6 +569,7 @@ The Arrow library already provides the ability to compute imperatively over all 
 
 *Fx over `Option`*
 ```kotlin:ank:playground
+import arrow.effects.IO
 import arrow.core.Option
 import arrow.core.extensions.option.fx.fx
 
@@ -574,6 +588,7 @@ fun main() {
 
 *Fx over `Either`*
 ```kotlin:ank:playground
+import arrow.effects.IO
 import arrow.core.Right
 import arrow.core.Either
 import arrow.core.extensions.either.fx.fx
@@ -704,6 +719,7 @@ The previous program shows how applying substitution alters the order of effects
 The same program expressed in a commutative monad which is the case of `IO` shows how both programs yield the same deterministic result even after changing the order of effects:
 
 ```kotlin:ank:playground
+import arrow.effects.IO
 import arrow.unsafe
 import arrow.effects.extensions.io.unsafeRun.runBlocking
 import arrow.effects.extensions.io.fx.fx
