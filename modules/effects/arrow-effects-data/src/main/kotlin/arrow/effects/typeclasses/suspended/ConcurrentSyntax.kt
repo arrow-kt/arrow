@@ -11,7 +11,7 @@ import arrow.effects.typeclasses.RacePair
 import arrow.effects.typeclasses.RaceTriple
 import kotlin.coroutines.CoroutineContext
 
-interface ConcurrentSyntax<F> : AsyncSyntax<F>, Concurrent<F>, ListParTraverseSyntax<F> {
+interface ConcurrentSyntax<F> : AsyncSyntax<F>, Concurrent<F>, IterableParTraverseSyntax<F> {
 
   private suspend fun <A> concurrently(fb: Concurrent<F>.() -> Kind<F, A>): A =
     run<Concurrent<F>, Kind<F, A>> { fb(this) }.bind()

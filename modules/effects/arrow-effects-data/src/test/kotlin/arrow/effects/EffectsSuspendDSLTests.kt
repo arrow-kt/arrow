@@ -2,9 +2,12 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.core.*
-import arrow.data.StateT
 import arrow.effects.extensions.io.fx.fx
 import arrow.effects.extensions.io.unsafeRun.runBlocking
+import arrow.effects.extensions.io.unsafeRun.unsafeRun
+import arrow.effects.typeclasses.UnsafeRun
+import arrow.effects.typeclasses.suspended.concurrent.FX
+import arrow.effects.typeclasses.suspended.concurrent.Fx
 import arrow.test.UnitSpec
 import arrow.unsafe
 import io.kotlintest.runner.junit4.KotlinTestRunner
@@ -245,7 +248,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
       val const = 1
       fxTest {
         fx {
-          val fiber = Dispatchers.Default.startFiber { "Hello" }
+          val fiber = Dispatchers.Default.startFiber { const }
           val (n) = fiber.join()
           n
         }
@@ -351,6 +354,36 @@ class EffectsSuspendDSLTests : UnitSpec() {
           }
         }
       } shouldBe false
+    }
+
+    "List.parSequence syntax" {
+      val main = Thread.currentThread().name
+      fxTest {
+        fx {
+          listOf(
+            suspend { Thread.currentThread().name },
+            suspend { Thread.currentThread().name },
+            suspend { Thread.currentThread().name }
+          ).parSequence(Dispatchers.Default).any {
+            it == main
+          }
+        }
+      } shouldBe false
+    }
+
+    "FX supports polymorphism" {
+      val const = 1
+
+      suspend fun sideEffect(): Int =
+        const
+
+      fun <F> Fx<F>.program(): Kind<F, Int> =
+        fx { !effect { sideEffect() } }
+
+      fun <F> UnsafeRun<F>.main(fx: Fx<F>): Int =
+        unsafe { runBlocking { fx.program() } }
+
+      IO.unsafeRun().main(IO.fx()) shouldBe const
     }
 
     "(suspend () -> A) <-> Kind<F, A>" {

@@ -4,11 +4,11 @@ import arrow.effects.typeclasses.Fiber
 import arrow.typeclasses.suspended.MonadSyntax
 import kotlin.coroutines.CoroutineContext
 
-interface ListParTraverseSyntax<F> : MonadSyntax<F> {
+interface IterableParTraverseSyntax<F> : MonadSyntax<F> {
 
   suspend fun <A> CoroutineContext.startFiber(f: suspend () -> A): Fiber<F, A>
 
-  suspend fun <A, B> List<suspend () -> A>.parTraverse(
+  suspend fun <A, B> Iterable<suspend () -> A>.parTraverse(
     ctx: CoroutineContext,
     f: suspend (A) -> B
   ): List<B> =
@@ -16,7 +16,7 @@ interface ListParTraverseSyntax<F> : MonadSyntax<F> {
       acc + ctx.startFiber { f(fa()) }
     }.map { it.join().bind() }
 
-  suspend fun <A> List<suspend () -> A>.parSequence(ctx: CoroutineContext): List<A> =
+  suspend fun <A> Iterable<suspend () -> A>.parSequence(ctx: CoroutineContext): List<A> =
     parTraverse(ctx, ::effectIdentity)
 
 }
