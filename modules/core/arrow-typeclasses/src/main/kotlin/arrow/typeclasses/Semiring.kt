@@ -166,7 +166,7 @@ interface Semiring<A> : Monoid<A> {
      */
     fun A.combineMultiplicate(b: A): A
 
-    override fun empty(): A = one()
+    override fun empty(): A = zero()
 
     operator fun A.times(b: A): A =
             this.combineMultiplicate(b)
