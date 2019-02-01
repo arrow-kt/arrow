@@ -6,7 +6,6 @@ import arrow.effects.extensions.io.fx.fx
 import arrow.effects.extensions.io.unsafeRun.runBlocking
 import arrow.effects.extensions.io.unsafeRun.unsafeRun
 import arrow.effects.typeclasses.UnsafeRun
-import arrow.effects.typeclasses.suspended.concurrent.FX
 import arrow.effects.typeclasses.suspended.concurrent.Fx
 import arrow.test.UnitSpec
 import arrow.unsafe
@@ -67,9 +66,10 @@ class EffectsSuspendDSLTests : UnitSpec() {
       val program = fx {
         // note how the receiving value is typed in the environment and not inside IO despite being effectful and
         // non-blocking parallel computations
-        val result: List<String> = Dispatchers.Default.parMap(
-          { getThreadName() },
-          { getThreadName() }
+        val result: List<String> = !parMapN(
+          Dispatchers.Default,
+          effect { getThreadName() },
+          effect { getThreadName() }
         ) { a, b ->
           listOf(a, b)
         }
@@ -83,7 +83,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
       shouldThrow<TestError> {
         fxTest {
           fx {
-            TestError.raiseError<Int>()
+            !TestError.raiseError<Int>()
           }
         }
       }
@@ -92,7 +92,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
     "handleError" {
       fxTest {
         fx {
-          handleError({ throw TestError }) { 1 }
+          !handleError({ throw TestError }) { 1 }
         }
       } shouldBe 1
     }
@@ -100,7 +100,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
     "Option.getOrRaiseError success case" {
       fxTest {
         fx {
-          Option(1).getOrRaiseError { throw TestError }
+          !Option(1).getOrRaiseError { throw TestError }
         }
       } shouldBe 1
     }
@@ -109,7 +109,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
       shouldThrow<TestError> {
         fxTest {
           fx {
-            none<Int>().getOrRaiseError { throw TestError }
+            !none<Int>().getOrRaiseError { throw TestError }
           }
         }
       }
@@ -118,7 +118,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
     "Either.getOrRaiseError success case" {
       fxTest {
         fx {
-          1.right().getOrRaiseError { throw TestError }
+          !1.right().getOrRaiseError { throw TestError }
         }
       } shouldBe 1
     }
@@ -127,7 +127,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
       shouldThrow<TestError> {
         fxTest {
           fx {
-            1.left().getOrRaiseError { throw TestError }
+            !1.left().getOrRaiseError { throw TestError }
           }
         }
       }
@@ -136,7 +136,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
     "Try.getOrRaiseError success case" {
       fxTest {
         fx {
-          Try { 1 }.getOrRaiseError { throw TestError }
+          !Try { 1 }.getOrRaiseError { throw TestError }
         }
       } shouldBe 1
     }
@@ -145,7 +145,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
       shouldThrow<TestError> {
         fxTest {
           fx {
-            Failure(TestError).getOrRaiseError { throw TestError }
+            !Failure(TestError).getOrRaiseError { throw TestError }
           }
         }
       }
@@ -154,7 +154,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
     "attempt success" {
       fxTest {
         fx {
-          attempt { 1 }
+          !attempt { 1 }
         }
       } shouldBe Right(1)
     }
@@ -162,7 +162,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
     "attempt failure" {
       fxTest {
         fx {
-          attempt { throw TestError }
+          !attempt { throw TestError }
         }
       } shouldBe Left(TestError)
     }
@@ -181,7 +181,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
       val result = 1
       fxTest {
         fx {
-          val asyncResult = asyncCallback<Int> { cb ->
+          val asyncResult = !async<Int> { cb ->
             cb(Right(result))
           }
           asyncResult
@@ -193,9 +193,9 @@ class EffectsSuspendDSLTests : UnitSpec() {
       fxTest {
         fx {
           continueOn(newSingleThreadContext("A"))
-          val contextA = effect { Thread.currentThread().name }
+          val contextA = !effect { Thread.currentThread().name }
           continueOn(newSingleThreadContext("B"))
-          val contextB = effect { Thread.currentThread().name }
+          val contextB = !effect { Thread.currentThread().name }
           contextA != contextB
         }
       } shouldBe true
@@ -204,8 +204,8 @@ class EffectsSuspendDSLTests : UnitSpec() {
     "CoroutineContext.defer" {
       fxTest {
         fx {
-          val contextA = newSingleThreadContext("A").effect { Thread.currentThread().name }
-          val contextB = newSingleThreadContext("B").effect { Thread.currentThread().name }
+          val contextA = !newSingleThreadContext("A").effect { Thread.currentThread().name }
+          val contextB = !newSingleThreadContext("B").effect { Thread.currentThread().name }
           contextA != contextB
         }
       } shouldBe true
@@ -216,7 +216,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
       val const = 1
       fxTest {
         fx {
-          bracketCase(
+          !bracketCase(
             f = { const },
             release = { n, exit -> msg.set(const) },
             use = { it }
@@ -233,7 +233,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
       shouldThrow<TestError> {
         fxTest {
           fx {
-            bracketCase(
+            !bracketCase(
               f = { const },
               release = { n, exit -> msg.set(const) },
               use = { throw TestError }
@@ -248,7 +248,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
       val const = 1
       fxTest {
         fx {
-          val fiber = Dispatchers.Default.startFiber { const }
+          val fiber = !Dispatchers.Default.startFiber { const }
           val (n) = fiber.join()
           n
         }
@@ -258,51 +258,28 @@ class EffectsSuspendDSLTests : UnitSpec() {
     "racePair" {
       fxTest {
         fx {
-          val race1 = Dispatchers.Default.racePair({ 1 }, { Thread.sleep(100); 2 })
-          val race2 = Dispatchers.Default.racePair({ Thread.sleep(100); 1 }, { 2 })
+          val race1 =
+            !racePair(
+              Dispatchers.Default,
+              effect { 1 },
+              effect { Thread.sleep(100); 2 }
+            )
+          val race2 =
+            !racePair(
+              Dispatchers.Default,
+              effect { Thread.sleep(100); 1 },
+              effect { 2 }
+            )
           race1.fold({ true }, { false }) &&
             race2.fold({ false }, { true })
         }
       } shouldBe true
     }
 
-    "parTupled" {
-      fxTest {
-        fx {
-          val currentThread = !effect { Thread.currentThread().name }
-          val (ta: String, tb: String) = Dispatchers.Default.parTupled(
-            { Thread.currentThread().name },
-            { Thread.currentThread().name }
-          )
-          ta != currentThread && tb != currentThread
-        }
-      } shouldBe true
-    }
-
-    "Either component1() syntax success" {
-      fxTest {
-        fx {
-          val (r) = 1.right()
-          r
-        }
-      } shouldBe 1
-    }
-
-    "Either component1() syntax failure" {
-      shouldThrow<TestError> {
-        fxTest {
-          fx {
-            val (r) = TestError.left()
-            r
-          }
-        }
-      }
-    }
-
     "List.flatTraverse syntax" {
       fxTest {
         fx {
-          val result = listOf(
+          val result = !listOf(
             suspend { 1 },
             suspend { 2 },
             suspend { 3 }
@@ -317,7 +294,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
     "List.traverse syntax" {
       fxTest {
         fx {
-          listOf(
+          !listOf(
             suspend { 1 },
             suspend { 2 },
             suspend { 3 }
@@ -329,7 +306,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
     "List.sequence syntax" {
       fxTest {
         fx {
-          listOf(
+          !listOf(
             suspend { 1 },
             suspend { 2 },
             suspend { 3 }
@@ -342,14 +319,15 @@ class EffectsSuspendDSLTests : UnitSpec() {
       val main = Thread.currentThread().name
       fxTest {
         fx {
-          listOf(
-            suspend { Thread.currentThread().name },
-            suspend { Thread.currentThread().name },
-            suspend { Thread.currentThread().name }
+          val result = !listOf(
+            effect { Thread.currentThread().name },
+            effect { Thread.currentThread().name },
+            effect { Thread.currentThread().name }
           ).parTraverse(
             Dispatchers.Default,
             ::effectIdentity
-          ).any {
+          )
+          result.any {
             it == main
           }
         }
@@ -360,11 +338,12 @@ class EffectsSuspendDSLTests : UnitSpec() {
       val main = Thread.currentThread().name
       fxTest {
         fx {
-          listOf(
-            suspend { Thread.currentThread().name },
-            suspend { Thread.currentThread().name },
-            suspend { Thread.currentThread().name }
-          ).parSequence(Dispatchers.Default).any {
+          val result = !listOf(
+            effect { Thread.currentThread().name },
+            effect { Thread.currentThread().name },
+            effect { Thread.currentThread().name }
+          ).parSequence(Dispatchers.Default)
+          result.any {
             it == main
           }
         }
@@ -394,12 +373,9 @@ class EffectsSuspendDSLTests : UnitSpec() {
       }
       fxTest {
         fx {
-          val suspendedFunction: suspend () -> String = suspend { sideEffect() }
-          val (_: Kind<ForIO, String>) = suspendedFunction
-          effect { sideEffect() }
-          val (_: String) = effect { sideEffect() }
-          val appliedPureEffect: String = !effect { sideEffect() }
-          appliedPureEffect
+          val (appliedPureEffect1: String) = effect { sideEffect() }
+          val appliedPureEffect2: String = !effect { sideEffect() }
+          appliedPureEffect1
         }
       } shouldBe done
     }

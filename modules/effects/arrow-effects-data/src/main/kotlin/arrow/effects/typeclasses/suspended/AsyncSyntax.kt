@@ -18,17 +18,11 @@ interface AsyncSyntax<F> : MonadDeferSyntax<F>, Async<F> {
       }
     }
 
-  private suspend fun <A> asyncOp(fb: Async<F>.() -> Kind<F, A>): A =
-    run<Async<F>, Kind<F, A>> { fb(this) }.bind()
+  private fun <A> asyncOp(fb: Async<F>.() -> Kind<F, A>): Kind<F, A> =
+    run<Async<F>, Kind<F, A>> { fb(this) }
 
-  suspend fun <A> async(unit: Unit = Unit, fa: suspend ((Either<Throwable, A>) -> Unit) -> Unit): A =
-    asyncOp { asyncF(fa.flatLiftM()) }
-
-  suspend fun <A> CoroutineContext.effect(f: suspend () -> A): A =
+  fun <A> CoroutineContext.effect(f: suspend () -> A): Kind<F, A> =
     asyncOp { defer(this@effect) { f.effect() } }
-
-  suspend fun continueOn(ctx: CoroutineContext): Unit =
-    asyncOp { ctx.shift() }
 
 }
 

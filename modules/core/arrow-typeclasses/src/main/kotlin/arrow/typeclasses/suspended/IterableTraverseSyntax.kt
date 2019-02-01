@@ -1,16 +1,19 @@
 package arrow.typeclasses.suspended
 
+import arrow.Kind
+
 interface IterableTraverseSyntax<F> : MonadSyntax<F> {
 
-  suspend fun <A, B> Iterable<suspend () -> A>.traverse(f: suspend (A) -> B): List<B> =
-    map { fa: suspend () -> A -> f(fa()) }
+  fun <A, B> Iterable<suspend () -> A>.traverse(f: suspend (A) -> B): Kind<F, List<B>> =
+    effect { map { fa: suspend () -> A -> f(fa()) } }
 
-  suspend fun <A> Iterable<suspend () -> A>.sequence(): List<A> =
+  fun <A> Iterable<suspend () -> A>.sequence(): Kind<F, List<A>> =
     traverse(::effectIdentity)
 
-  suspend fun <A, B> Iterable<suspend () -> A>.flatTraverse(f: suspend (A) -> List<B>): List<B> =
-    flatMap { f(it()) }
+  fun <A, B> Iterable<suspend () -> A>.flatTraverse(f: suspend (A) -> List<B>): Kind<F, List<B>> =
+    effect { flatMap { f(it()) } }
 
-  suspend fun <A> Iterable<Iterable<suspend () -> A>>.flatSequence(): List<A> =
+  fun <A> Iterable<Iterable<suspend () -> A>>.flatSequence(): Kind<F, List<A>> =
     flatten().sequence()
+
 }

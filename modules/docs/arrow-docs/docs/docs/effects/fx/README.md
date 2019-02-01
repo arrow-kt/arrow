@@ -111,14 +111,14 @@ suspend fun sayGoodBye(): Unit =
   
 fun greet(): IO<Unit> =
   fx {
-    val pureHello: IO<Unit> = effect { sayHello() }
-    val puregoodBye: IO<Unit> = effect { sayHello() }
-    val _ : Unit = !pureHello
-    val _ : Unit = !pureGoodBye
+    val pureHello = effect { sayHello() }
+    val pureGoodBye = effect { sayHello() }
+    !pureHello
+    !pureGoodBye
   }
 //sampleEnd 
 fun main() {
-  greet().unsafeRunSync()
+  println(greet())
 }
 ```
 
@@ -126,7 +126,7 @@ When we capture suspended side effects as `IO` values with `effect`, we can pass
 
 ##### Applying side effects with `!effect`
 
-Side effects are applied with the operator `!` followed by the function `effect`. `!effect` takes the suspended side effects `sayHello()` and `sayGoodbye()` and ensures they are controlled by the `IO` context before they get a chance to be executed. This ensures our effect compositions are pure and referentially transparent and will only run as part of an `IO` program at the edge.
+Side effects are applied with the operator `!`. Once you purify a side effect with `effect` you can extract it's value in a non blocking way. `!effect` takes the suspended side effects `sayHello()` and `sayGoodbye()` and ensures they are controlled by the `IO` context before they get a chance to be executed. This ensures our effect compositions are pure and referentially transparent and will only run as part of an `IO` program at the edge.
 Note running `greet()` does not perform any effects because it's an `IO` value.
 Since invoking this function does not produce effects we can be confident that `greet` is pure and referentially transparent despite referring to effects application.
 
@@ -147,13 +147,13 @@ fun greet(): IO<Unit> =
   }
 //sampleEnd 
 fun main() {
-  greet().unsafeRunSync()
+  println(greet()) //greet is a pure IO program
 }
 ```
 
 An attempt to run a side effect in an `fx` block not delimited by `effect` or `!effect` also results in a compilation error. 
 
-```kotlin:ank:playground
+```kotlin:ank:fail
 import arrow.effects.IO
 import arrow.effects.extensions.io.fx.fx
 //sampleStart
@@ -203,7 +203,7 @@ fun greet(): IO<Unit> =
   }
 
 fun main() { // The edge of our world
-  unsafe { runBlocking { program } }
+  unsafe { runBlocking { greet() } }
 }
 //sampleEnd 
 ```
@@ -227,6 +227,8 @@ import arrow.effects.IO
 import arrow.unsafe
 import arrow.effects.extensions.io.unsafeRun.runBlocking
 import arrow.effects.extensions.io.fx.fx
+import kotlinx.coroutines.newSingleThreadContext
+
 //sampleStart
 val contextA = newSingleThreadContext("A")
 val contextB = newSingleThreadContext("B")
@@ -257,15 +259,17 @@ import arrow.effects.IO
 import arrow.unsafe
 import arrow.effects.extensions.io.unsafeRun.runBlocking
 import arrow.effects.extensions.io.fx.fx
+import kotlinx.coroutines.Dispatchers
+
 //sampleStart
-suspend fun threadName(): Unit =
+suspend fun threadName(): String =
   Thread.currentThread().name
 
 val program = fx {
-  val fiberA = Dispatchers.Default.startFiber { threadName() }
-  val fiberB = Dispatchers.Default.startFiber { threadName() }
-  val (threadA) = fiberA.join()
-  val (threadB) = fiberA.join()
+  val fiberA = !Dispatchers.Default.startFiber { threadName() }
+  val fiberB = !Dispatchers.Default.startFiber { threadName() }
+  val threadA = !fiberA.join()
+  val threadB = !fiberA.join()
   !effect { println(threadA) }
   !effect { println(threadB) }
 }
@@ -283,41 +287,11 @@ This is part of the greatness of Fibers. They run as scheduled based on the poli
 
 ### Parallelization & Concurrency
 
-Arrow Fx comes with built in versions of `parMap`, `parTupled`, `parTraverse` and `parSequence` that allows users to dispatch effects in parallel and receive results non-blocking and direct syntax without wrappers. 
+Arrow Fx comes with built in versions of `parMapN`, `parTraverse` and `parSequence` that allows users to dispatch effects in parallel and receive results non-blocking and direct syntax without wrappers. 
 
-#### `parTupled`
+#### `parMapN`
 
-`parTupled` allows N operations to run in parallel in a non-blocking fashion and gather all their results in a `Tuple` which has the same arity as the number of operations specified on the arguments. 
-
-```kotlin:ank:playground
-import arrow.effects.IO
-import arrow.unsafe
-import arrow.effects.extensions.io.unsafeRun.runBlocking
-import arrow.effects.extensions.io.fx.fx
-//sampleStart
-suspend fun threadName(): Unit =
-  Thread.currentThread().name
-
-val program = fx {
-  val (threadA: String, threadB: String) = 
-    Dispatchers.Default.parTupled(
-      { threadName() },
-      { threadName() }
-    )
-  !effect { println(threadA) }
-  !effect { println(threadB) }
-}
-//sampleEnd
-fun main() { // The edge of our world
-  unsafe { runBlocking { program } }
-}
-```
-
-When all operations complete and the program resumes binding to the left hand side we observe how we just name the results and are already unboxed and destructured for us as `threadA` and `threadB`. While this resembles blocking direct style, it's in fact non-blocking and pure since side effects are suspended first, then bound in the `IO` continuation.
-
-#### `parMap`
-
-`parMap` allows *n#* effects to run in parallel non-blocking waiting for all results to complete  and then it delegates to a user provided function that applies a final transformation over the results.
+`parMapN` allows *N#* effects to run in parallel non-blocking waiting for all results to complete and then it delegates to a user provided function that applies a final transformation over the results.
 Once the function specifies a valid return we can observe how the returned non-blocking value is bound in the left hand side. 
 
 ```kotlin:ank:playground
@@ -325,8 +299,10 @@ import arrow.effects.IO
 import arrow.unsafe
 import arrow.effects.extensions.io.unsafeRun.runBlocking
 import arrow.effects.extensions.io.fx.fx
+import kotlinx.coroutines.Dispatchers
+
 //sampleStart
-suspend fun threadName(): Unit =
+suspend fun threadName(): String =
   Thread.currentThread().name
   
 data class ThreadInfo(
@@ -336,9 +312,10 @@ data class ThreadInfo(
 
 val program = fx {
   val (threadA: String, threadB: String) = 
-    Dispatchers.Default.parMap(
-      { threadName() },
-      { threadName() }
+    !parMapN(
+      Dispatchers.Default,
+      effect { threadName() },
+      effect { threadName() },
       ::ThreadInfo
     )
   !effect { println(threadA) }
@@ -359,15 +336,17 @@ import arrow.effects.IO
 import arrow.unsafe
 import arrow.effects.extensions.io.unsafeRun.runBlocking
 import arrow.effects.extensions.io.fx.fx
+import kotlinx.coroutines.Dispatchers
+
 //sampleStart
-suspend fun threadName(): Unit =
+suspend fun threadName(): String =
   Thread.currentThread().name
 
 val program = fx {
-  val result: List<String> = listOf(
-    suspend { threadName() },
-    suspend { threadName() },
-    suspend { threadName() }
+  val result: List<String> = !listOf(
+    effect { threadName() },
+    effect { threadName() },
+    effect { threadName() }
   ).parTraverse(Dispatchers.Default) {
       "running on: $it" 
     }
@@ -389,15 +368,17 @@ import arrow.effects.IO
 import arrow.unsafe
 import arrow.effects.extensions.io.unsafeRun.runBlocking
 import arrow.effects.extensions.io.fx.fx
+import kotlinx.coroutines.Dispatchers
+
 //sampleStart
-suspend fun threadName(): Unit =
+suspend fun threadName(): String =
   Thread.currentThread().name
 
 val program = fx {
-  val result: List<String> = listOf(
-    suspend { threadName() },
-    suspend { threadName() },
-    suspend { threadName() }
+  val result: List<String> = !listOf(
+    effect { threadName() },
+    effect { threadName() },
+    effect { threadName() }
   ).parSequence(Dispatchers.Default)
   
   !effect { println(result) }
@@ -408,17 +389,17 @@ fun main() { // The edge of our world
 }
 ```
 
-### Cancelation
+### Cancellation
 
-Al concurrent `fx` continuations are cancelable. Users may use the `fxCancelable` function to run `fx` blocks that beside returning a value it returns a disposable handler that can interrupt the operation.
+Al concurrent `fx` continuations are cancellable. Users may use the `fxCancellable` function to run `fx` blocks that beside returning a value it returns a disposable handler that can interrupt the operation.
 
 ```kotlin:ank:playground
 import arrow.effects.IO
 import arrow.unsafe
 import arrow.effects.extensions.io.unsafeRun.runBlocking
-import arrow.effects.extensions.io.fx.fxCancelable
+import arrow.effects.extensions.io.fx.fxCancellable
 //sampleStart
-val (_, disposable) = fxCancelable {
+val (_, disposable) = fxCancellable {
   !effect { println("BOOM!") }
 }
 //sampleEnd
@@ -586,19 +567,18 @@ fun main() {
 }
 ```
 
-*Fx over `Either`*
+*Fx over `Try`*
 ```kotlin:ank:playground
-import arrow.effects.IO
-import arrow.core.Right
-import arrow.core.Either
-import arrow.core.extensions.either.fx.fx
+import arrow.core.Try
+import arrow.core.extensions.`try`.fx.fx
 
 //sampleStart
-val result = fx<Throwable> {
-  val (one) = Right(1)
-  val (two) = Right(one + one)
-  two
-}
+val result = 
+  fx {
+    val (one) = Try { 1 }
+    val (two) = Try { one + one }
+    two
+  }
 //sampleEnd
 
 fun main() {
@@ -606,11 +586,12 @@ fun main() {
 }
 ```
 
-The `component1` operator over all `Kind<F, A>` is able to obtain a non blocking `A` bound in the LHS. 
+The `component1` operator over all `Kind<F, A>` is able to obtain a non blocking `A` bound in the LHS in the same way `!` does.
 
 ```kotlin
 suspend fun <A> Kind<F, A>.bind(): A
 suspend operator fun <A> Kind<F, A>.component1(): A = bind()
+suspend operator fun <A> Kind<F, A>.not(): A = bind()
 ```
 
 The result is destructuring syntax for all monadic expressions by receiving the value bound in the left hand side in a non blocking fashion.
@@ -631,14 +612,14 @@ Arrow Fx brings first class, no-compromises direct style syntax for effectful pr
 This simplification is manifested in the world of suspended effects in the fact that all values of type `Kind<F, A>` can bind to `A` in the left hand side in a non blocking fashion because Kotlin supports imperative CPS and continuation styles syntactically. 
 Arrow Fx uses the Kotlin compiler native support for implicit CPS to achieve direct syntax for effectful monads.
 
-This has a tremendous impact in program declaration since all the functional combinators where before you had as return type a `Kind<F, A>` are gone. 
-`map`, `flatMap` are no longer necessary because their returned values are flattened and automatically bound in the monad context.
+This has a tremendous impact in program declaration since all the functional combinators where before you had as return type a `Kind<F, A>` can be easily applied with `!` to obtain a non blocking value. 
+`map`, `flatMap` are no longer necessary because their returned values are flattened and automatically bound in the monad context when you use `!`
 
 This leads us to realize that there is a some direct relationship between `suspend () -> A` and `Kind<F, A>` or what in Scala is `F[A]`.
 This relationship establishes that a `suspend` function denoting an effect can be deferred and controlled by the monadic context of a suspend capable data type.
 
-`effect()` takes us without blocking semantics from a suspended function to any `Kind<F, A>` for which an `Async<F>` extension exists.
-This includes IO and pretty much everything you are using today in a tagless final or IO wrapping style FP.
+`effect` takes us without blocking semantics from a suspended function to any `Kind<F, A>`.
+This includes IO and pretty much everything you are using today in a tagless final or IO wrapping style.
 
 This relationship also eliminates the need to ever use any of the functional combinators you find in the `Functor<F>` hierarchy for effectful monads. 
 All of them are swallowed by equivalent direct syntax in the environment as demonstrated in the examples below:
@@ -657,8 +638,8 @@ The following combinators illustrate how the Functor hierarchy functions are poi
 | Applicative.just    | `just(1)` | `1` |
 | Applicative.mapN    | `mapN(just(1), just(2), ::Tuple2)` | `1 toT 2` |
 | Applicative.tupled  | `tupled(just(1), just(2))` | `1 toT 2` |
-| Monad.flatMap       | `IO { 1 }.flatMap { n -> IO { n + 1 } }` | `1 + 1` |
-| Monad.flatten       | `IO { IO { 1 } }.flatten()` | `1` |
+| Monad.flatMap       | `IO.just(1).flatMap { n -> IO { n + 1 } }` | `1 + 1` |
+| Monad.flatten       | `IO.just(IO.just(1))}.flatten()` | `1` |
 | MonadDefer.delay    | `IO.delay { 1 }` | `effect { 1 }` |
 | MonadDefer.defer    | `IO.defer { IO { 1 } }` | `effect { 1 }` |
 
@@ -669,12 +650,13 @@ Arrow Fx is aware of this but still allows users to use `fx` on non-commutative 
 Altering the order of effect when using the safe builders for commutative monads does not alter the result
 
 ```kotlin:ank:playground
+import arrow.core.identity
 import arrow.core.toT
 import arrow.data.extensions.list.fx.fx
 
 //sampleStart
-val result1 = fx(listOf(1, 2), listOf(true, false), ::Tuple2)
-val result2 = fx(listOf(true, false), listOf(1, 2), ::Tuple2)
+val result1 = fx(listOf(1, 2), listOf(true, false), ::identity)
+val result2 = fx(listOf(true, false), listOf(1, 2), ::identity)
 //sampleEnd
 
 fun main() {

@@ -9,13 +9,10 @@ interface BindSyntax<F> : Predef {
   suspend operator fun <A> Kind<F, A>.component1(): A =
     bind()
 
-  fun <A> effect(fa: suspend () -> A): Kind<F, A>
-
   suspend operator fun <A> Kind<F, A>.not(): A =
     bind()
 
-  suspend operator fun <A> (suspend () -> A).component1(): Kind<F, A> =
-    effect()
+  fun <A> effect(fa: suspend () -> A): Kind<F, A>
 
   fun <A> (suspend () -> A).effect(unit: Unit = Unit): Kind<F, A> = effect(this)
 
