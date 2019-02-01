@@ -62,6 +62,7 @@ include {
         effects {
             _ 'effects-data'
             _ 'effects-extensions'
+            _ 'effects-io-extensions'
             _ 'effects-rx2-data'
             _ 'effects-rx2-extensions'
             _ 'effects-reactor-data'
