@@ -11,8 +11,6 @@ import arrow.effects.typeclasses.suspended.concurrent.Fx
 import arrow.extension
 import kotlin.coroutines.CoroutineContext
 import arrow.effects.IODispatchers as IOD
-import arrow.effects.ap as ioAp
-import arrow.effects.startF as ioStart
 
 @extension
 interface IODispatchers : Dispatchers<ForIO> {
