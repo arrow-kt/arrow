@@ -1,16 +1,18 @@
 ---
 layout: docs
 title: Try
-permalink: /docs/arrow/core/try/ru
+permalink: /docs/arrow/core/try/ru/
 redirect_from:
   - /docs/datatypes/try/ru
 video: XavztYVMUqI
 ---
 
 ## Try
-[English](/docs/arrow/core/try)
+
 {:.beginner}
 beginner
+
+[English](/docs/arrow/core/try)
 
 В Arrow [есть множество способов для обработки ошибок](http://arrow-kt.io/docs/patterns/error_handling/), что позволяет выбрать оптимальную стратегию для любой ситуации.
 

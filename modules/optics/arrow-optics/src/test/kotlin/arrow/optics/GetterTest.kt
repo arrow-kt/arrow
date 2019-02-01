@@ -4,7 +4,7 @@ import arrow.core.*
 import arrow.core.extensions.monoid
 import arrow.data.*
 import arrow.test.UnitSpec
-import arrow.test.generators.genFunctionAToB
+import arrow.test.generators.functionAToB
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.runner.junit4.KotlinTestRunner
@@ -142,7 +142,7 @@ class GetterTest : UnitSpec() {
     }
 
     "Asks with f is the same as applying f to the focus of the lens" {
-      forAll(genToken, genFunctionAToB<String, String>(Gen.string())) { token, f ->
+      forAll(genToken, Gen.functionAToB<String, String>(Gen.string())) { token, f ->
         tokenGetter.asks(f).runId(token) == f(token.value)
       }
     }
@@ -163,7 +163,7 @@ class GetterTest : UnitSpec() {
     }
 
     "extractMap with f should be same as extract and map" {
-      forAll(genToken, genFunctionAToB<String, String>(Gen.string())) { token, f ->
+      forAll(genToken, Gen.functionAToB<String, String>(Gen.string())) { token, f ->
         tokenGetter.extractMap(f).run(token) == tokenGetter.extract().map(f).run(token)
       }
     }

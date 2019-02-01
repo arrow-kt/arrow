@@ -13,7 +13,7 @@ import arrow.mtl.extensions.option.monadFilter.monadFilter
 import arrow.mtl.extensions.option.traverseFilter.traverseFilter
 import arrow.syntax.collections.firstOption
 import arrow.test.UnitSpec
-import arrow.test.generators.genOption
+import arrow.test.generators.option
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
@@ -34,7 +34,7 @@ class OptionTest : UnitSpec() {
 
     testLaws(
       ShowLaws.laws(Option.show(), Option.eq(Int.eq())) { Some(it) },
-      MonoidLaws.laws(Option.monoid(Int.monoid()), genOption(Gen.int()), Option.eq(Int.eq())),
+      MonoidLaws.laws(Option.monoid(Int.monoid()), Gen.option(Gen.int()), Option.eq(Int.eq())),
       //testLaws(MonadErrorLaws.laws(monadError<ForOption, Unit>(), Eq.any(), EQ_EITHER)) TODO reenable once the MonadErrorLaws are parametric to `E`
       FunctorFilterLaws.laws(Option.traverseFilter(), { Option(it) }, Eq.any()),
       TraverseFilterLaws.laws(Option.traverseFilter(), Option.applicative(), ::Some, Eq.any()),

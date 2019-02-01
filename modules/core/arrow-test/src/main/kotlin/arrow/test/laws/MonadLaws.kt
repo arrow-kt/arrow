@@ -7,9 +7,7 @@ import arrow.data.Kleisli
 import arrow.free.Free
 import arrow.free.bindingStackSafe
 import arrow.free.run
-import arrow.test.generators.genApplicative
-import arrow.test.generators.genFunctionAToB
-import arrow.test.generators.genIntSmall
+import arrow.test.generators.*
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monad
 import io.kotlintest.properties.Gen
@@ -33,31 +31,31 @@ object MonadLaws {
     )
 
   fun <F> Monad<F>.leftIdentity(EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(genFunctionAToB<Int, Kind<F, Int>>(genApplicative(Gen.int(), this)), Gen.int()) { f: (Int) -> Kind<F, Int>, a: Int ->
+    forAll(Gen.functionAToB<Int, Kind<F, Int>>(Gen.int().applicative(this)), Gen.int()) { f: (Int) -> Kind<F, Int>, a: Int ->
       just(a).flatMap(f).equalUnderTheLaw(f(a), EQ)
     }
 
   fun <F> Monad<F>.rightIdentity(EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(genApplicative(Gen.int(), this)) { fa: Kind<F, Int> ->
+    forAll(Gen.int().applicative(this)) { fa: Kind<F, Int> ->
       fa.flatMap { just(it) }.equalUnderTheLaw(fa, EQ)
     }
 
   fun <F> Monad<F>.kleisliLeftIdentity(EQ: Eq<Kind<F, Int>>) {
     val M = this
-    forAll(genFunctionAToB<Int, Kind<F, Int>>(genApplicative(Gen.int(), this)), Gen.int()) { f: (Int) -> Kind<F, Int>, a: Int ->
+    forAll(Gen.functionAToB<Int, Kind<F, Int>>(Gen.int().applicative(this)), Gen.int()) { f: (Int) -> Kind<F, Int>, a: Int ->
       (Kleisli { n: Int -> just(n) }.andThen(M, Kleisli(f)).run(a).equalUnderTheLaw(f(a), EQ))
     }
   }
 
   fun <F> Monad<F>.kleisliRightIdentity(EQ: Eq<Kind<F, Int>>) {
     val M = this
-    forAll(genFunctionAToB<Int, Kind<F, Int>>(genApplicative(Gen.int(), this)), Gen.int()) { f: (Int) -> Kind<F, Int>, a: Int ->
+    forAll(Gen.functionAToB<Int, Kind<F, Int>>(Gen.int().applicative(this)), Gen.int()) { f: (Int) -> Kind<F, Int>, a: Int ->
       (Kleisli(f).andThen(M, Kleisli { n: Int -> just(n) }).run(a).equalUnderTheLaw(f(a), EQ))
     }
   }
 
   fun <F> Monad<F>.mapFlatMapCoherence(EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(genFunctionAToB<Int, Int>(Gen.int()), genApplicative(Gen.int(), this)) { f: (Int) -> Int, fa: Kind<F, Int> ->
+    forAll(Gen.functionAToB<Int, Int>(Gen.int()), Gen.int().applicative(this)) { f: (Int) -> Int, fa: Kind<F, Int> ->
       fa.flatMap { just(f(it)) }.equalUnderTheLaw(fa.map(f), EQ)
     }
 
@@ -104,7 +102,7 @@ object MonadLaws {
     }
 
   fun <F> Monad<F>.monadComprehensionsBindInContext(EQ: Eq<Kind<F, Int>>): Unit =
-    forFew(5, genIntSmall()) { num: Int ->
+    forFew(5, Gen.intSmall()) { num: Int ->
       fx {
         val a = bindIn(newSingleThreadContext("$num")) { num + 1 }
         val b = bindIn(newSingleThreadContext("$a")) { a + 1 }

@@ -6,9 +6,9 @@ import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.option.monoid.monoid
 import arrow.product
 import arrow.test.UnitSpec
-import arrow.test.generators.genNonEmptyList
-import arrow.test.generators.genOption
-import arrow.test.generators.genTuple
+import arrow.test.generators.nonEmptyList
+import arrow.test.generators.option
+import arrow.test.generators.tuple3
 import arrow.test.laws.EqLaws
 import arrow.test.laws.MonoidLaws
 import arrow.test.laws.SemigroupLaws
@@ -30,12 +30,12 @@ fun genPerson(): Gen<Person> {
   return Gen.bind(
     Gen.string(),
     Gen.int(),
-    genOption(genRelated)
+    Gen.option(genRelated)
   ) { name: String, age: Int, related: Option<Person> -> Person(name, age, related) }
 }
 
 fun tuple3PersonGen(): Gen<Tuple3<String, Int, Option<Person>>> =
-  genTuple(Gen.string(), Gen.int(), genOption(genPerson()))
+  Gen.tuple3(Gen.string(), Gen.int(), Gen.option(genPerson()))
 
 inline fun <reified F> Applicative<F>.testPersonApplicative() {
   forAll(Gen.string(), Gen.int(), genPerson()) { a, b, c ->
@@ -71,7 +71,7 @@ class ProductTest : UnitSpec() {
     }
 
     "List<@product>.combineAll()" {
-      forAll(genNonEmptyList(genPerson()).map { it.all }) {
+      forAll(Gen.nonEmptyList(genPerson()).map { it.all }) {
         it.combineAll() == it.reduce { a, b -> a + b }
       }
     }
