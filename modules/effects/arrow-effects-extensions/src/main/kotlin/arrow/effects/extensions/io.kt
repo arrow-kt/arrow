@@ -3,9 +3,7 @@ package arrow.effects.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.effects.*
-import arrow.effects.extensions.io.concurrent.concurrent
 import arrow.effects.typeclasses.*
-import arrow.effects.typeclasses.suspended.concurrent.Fx
 import arrow.extension
 import arrow.typeclasses.*
 import arrow.unsafe
@@ -193,10 +191,4 @@ interface IOUnsafeRun : UnsafeRun<ForIO> {
   override suspend fun <A> unsafe.runNonBlocking(fa: () -> Kind<ForIO, A>, cb: (Either<Throwable, A>) -> Unit) =
     fa().fix().unsafeRunAsync(cb)
 
-}
-
-@extension
-interface IOFx : Fx<ForIO> {
-  override fun concurrent(): Concurrent<ForIO> =
-    IO.concurrent()
 }

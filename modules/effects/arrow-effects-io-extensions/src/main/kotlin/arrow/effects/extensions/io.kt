@@ -1,11 +1,13 @@
 package arrow.effects.extensions
 
 import arrow.effects.*
+import arrow.effects.extensions.io.concurrent.concurrent
 import arrow.effects.extensions.io.dispatchers.dispatchers
 import arrow.effects.typeclasses.Concurrent
 import arrow.effects.typeclasses.ConcurrentEffect
 import arrow.effects.typeclasses.Dispatchers
 import arrow.effects.typeclasses.Environment
+import arrow.effects.typeclasses.suspended.concurrent.Fx
 import arrow.extension
 import kotlin.coroutines.CoroutineContext
 import arrow.effects.IODispatchers as IOD
@@ -36,3 +38,9 @@ interface IODefaultConcurrent : Concurrent<ForIO>, IOConcurrent {
 
 @extension
 interface IODefaultConcurrentEffect : ConcurrentEffect<ForIO>, IOConcurrentEffect, IODefaultConcurrent
+
+@extension
+interface IOFx : Fx<ForIO> {
+  override fun concurrent(): Concurrent<ForIO> =
+    IO.concurrent()
+}
