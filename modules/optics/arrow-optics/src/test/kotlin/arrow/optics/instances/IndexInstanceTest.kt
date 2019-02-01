@@ -20,9 +20,9 @@ class IndexInstanceTest : UnitSpec() {
     testLaws(
       OptionalLaws.laws(
         optionalGen = Gen.int().map { SequenceK.index<String>().index(it) },
-        aGen = genSequenceK(Gen.string()),
+        aGen = Gen.sequenceK(Gen.string()),
         bGen = Gen.string(),
-        funcGen = genFunctionAToB(Gen.string()),
+        funcGen = Gen.functionAToB(Gen.string()),
         EQOptionB = Eq.any(),
         EQA = SequenceK.eq(String.eq())
       )

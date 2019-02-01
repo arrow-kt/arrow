@@ -5,8 +5,8 @@ import arrow.core.*
 import arrow.data.*
 import arrow.core.extensions.option.functor.functor
 import arrow.test.UnitSpec
-import arrow.test.generators.genFunctionAToB
-import arrow.test.generators.genOption
+import arrow.test.generators.functionAToB
+import arrow.test.generators.option
 import arrow.test.laws.SetterLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
@@ -23,7 +23,7 @@ class SetterTest : UnitSpec() {
       setter = Setter.id(),
       aGen = Gen.int(),
       bGen = Gen.int(),
-      funcGen = genFunctionAToB(Gen.int()),
+      funcGen = Gen.functionAToB(Gen.int()),
       EQA = Eq.any()
     ))
 
@@ -31,15 +31,15 @@ class SetterTest : UnitSpec() {
       setter = tokenSetter,
       aGen = genToken,
       bGen = Gen.string(),
-      funcGen = genFunctionAToB(Gen.string()),
+      funcGen = Gen.functionAToB(Gen.string()),
       EQA = Eq.any()
     ))
 
     testLaws(SetterLaws.laws(
       setter = Setter.fromFunctor<ForOption, String, String>(Option.functor()),
-      aGen = genOption(Gen.string()).map<Kind<ForOption, String>> { it },
+      aGen = Gen.option(Gen.string()).map<Kind<ForOption, String>> { it },
       bGen = Gen.string(),
-      funcGen = genFunctionAToB(Gen.string()),
+      funcGen = Gen.functionAToB(Gen.string()),
       EQA = Eq.any()
     ))
 
@@ -63,7 +63,7 @@ class SetterTest : UnitSpec() {
     }
 
     "update_ f should be as modify f within State and returning Unit" {
-      forAll(genToken, genFunctionAToB<String, String>(Gen.string())) { generatedToken, f ->
+      forAll(genToken, Gen.functionAToB<String, String>(Gen.string())) { generatedToken, f ->
         tokenSetter.update_(f).run(generatedToken) ==
           State { token: Token ->
             tokenSetter.modify(token, f) toT Unit

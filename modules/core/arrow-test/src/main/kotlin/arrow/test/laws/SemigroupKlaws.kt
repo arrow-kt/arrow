@@ -1,7 +1,6 @@
 package arrow.test.laws
 
 import arrow.Kind
-import arrow.test.generators.genConstructor
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Eq
 import arrow.typeclasses.SemigroupK
@@ -17,7 +16,7 @@ object SemigroupKLaws {
     listOf(Law("SemigroupK: associativity") { SGK.semigroupKAssociative(f, EQ) })
 
   fun <F> SemigroupK<F>.semigroupKAssociative(f: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(genConstructor(Gen.int(), f), genConstructor(Gen.int(), f), genConstructor(Gen.int(), f)) { a, b, c ->
+    forAll(Gen.int().map(f), Gen.int().map(f), Gen.int().map(f)) { a, b, c ->
       a.combineK(b).combineK(c).equalUnderTheLaw(a.combineK(b.combineK(c)), EQ)
     }
 }

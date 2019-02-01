@@ -236,6 +236,9 @@ options:
       - title: Monoid
         url: /docs/arrow/typeclasses/monoid/
 
+      - title: Semiring
+        url: /docs/apidocs/arrow-typeclasses/arrow.typeclasses/-semiring/
+
       - title: Foldable
         url: /docs/arrow/typeclasses/foldable/
 

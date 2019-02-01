@@ -12,7 +12,7 @@ import arrow.core.extensions.`try`.show.show
 import arrow.core.extensions.`try`.traverse.traverse
 import arrow.mtl.extensions.`try`.functorFilter.functorFilter
 import arrow.test.UnitSpec
-import arrow.test.generators.genTry
+import arrow.test.generators.`try`
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Hash
@@ -37,7 +37,7 @@ class TryTest : UnitSpec() {
 
     testLaws(
       SemigroupLaws.laws(Try.semigroup(Int.semigroup()), Try.just(1), Try.just(2), Try.just(3), EQ),
-      MonoidLaws.laws(Try.monoid(MO = Int.monoid()), genTry(Gen.int()), EQ),
+      MonoidLaws.laws(Try.monoid(MO = Int.monoid()), Gen.`try`(Gen.int()), EQ),
       ShowLaws.laws(Try.show(), EQ) { Try.just(it) },
       MonadErrorLaws.laws(Try.monadError(), Eq.any(), Eq.any()),
       TraverseLaws.laws(Try.traverse(), Try.functor(), ::Success, Eq.any()),

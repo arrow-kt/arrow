@@ -9,8 +9,9 @@ import arrow.effects.Semaphore
 import arrow.effects.typeclasses.Concurrent
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.fold
-import arrow.test.generators.genEither
-import arrow.test.generators.genThrowable
+import arrow.test.generators.applicativeError
+import arrow.test.generators.either
+import arrow.test.generators.throwable
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -130,13 +131,13 @@ object ConcurrentLaws {
     }
 
   fun <F> Concurrent<F>.asyncCancelableCoherence(EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(genEither(genThrowable(), Gen.int())) { eith ->
+    forAll(Gen.either(Gen.throwable(), Gen.int())) { eith ->
       async<Int> { cb -> cb(eith) }
         .equalUnderTheLaw(cancelable { cb -> cb(eith); just<Unit>(Unit) }, EQ)
     }
 
   fun <F> Concurrent<F>.cancelableCancelableFCoherence(EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(genEither(genThrowable(), Gen.int())) { eith ->
+    forAll(Gen.either(Gen.throwable(), Gen.int())) { eith ->
       cancelable<Int> { cb -> cb(eith); just<Unit>(Unit) }
         .equalUnderTheLaw(cancelableF { cb -> delay { cb(eith); just<Unit>(Unit) } }, EQ)
     }
@@ -279,7 +280,7 @@ object ConcurrentLaws {
     }
 
   fun <F> Concurrent<F>.startJoinIsIdentity(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext): Unit =
-    forAll(Gen.int().map(::just)) { fa ->
+    forAll(Gen.int().applicativeError(this)) { fa ->
       fa.startF(ctx).flatMap { it.join() }.equalUnderTheLaw(fa, EQ)
     }
 
@@ -293,7 +294,7 @@ object ConcurrentLaws {
     }
 
   fun <F> Concurrent<F>.startCancelIsUnit(EQ_UNIT: Eq<Kind<F, Unit>>, ctx: CoroutineContext): Unit =
-    forAll(Gen.int().map(::just)) { fa ->
+    forAll(Gen.int().applicativeError(this)) { fa ->
       fa.startF(ctx).flatMap { (_, cancel) -> cancel }
         .equalUnderTheLaw(just<Unit>(Unit), EQ_UNIT)
     }
@@ -304,21 +305,21 @@ object ConcurrentLaws {
     }
 
   fun <F> Concurrent<F>.raceMirrorsLeftWinner(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext): Unit =
-    forAll(Gen.int().map(::just)) { fa ->
+    forAll(Gen.int().applicativeError(this)) { fa ->
       raceN(ctx, fa, never<Int>()).flatMap { either ->
         either.fold({ just(it) }, { raiseError(IllegalStateException("never() finished race")) })
       }.equalUnderTheLaw(fa, EQ)
     }
 
   fun <F> Concurrent<F>.raceMirrorsRightWinner(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext): Unit =
-    forAll(Gen.int().map(::just)) { fa ->
+    forAll(Gen.int().applicativeError(this)) { fa ->
       raceN(ctx, never<Int>(), fa).flatMap { either ->
         either.fold({ raiseError<Int>(IllegalStateException("never() finished race")) }, { just(it) })
       }.equalUnderTheLaw(fa, EQ)
     }
 
   fun <F> Concurrent<F>.raceCancelsLoser(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
-    forAll(genEither(genThrowable(), Gen.string()), Gen.bool(), Gen.int()) { eith, leftWins, i ->
+    forAll(Gen.either(Gen.throwable(), Gen.string()), Gen.bool(), Gen.int()) { eith, leftWins, i ->
       fx {
         val s = Semaphore(0L, this@raceCancelsLoser).bind()
         val promise = Promise.uncancelable<F, Int>(this@raceCancelsLoser).bind()
@@ -366,7 +367,7 @@ object ConcurrentLaws {
     }
 
   fun <F> Concurrent<F>.racePairMirrorsLeftWinner(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext): Unit =
-    forAll(Gen.int().map(::just)) { fa ->
+    forAll(Gen.int().applicativeError(this)) { fa ->
       val never = never<Int>()
       val received = racePair(ctx, fa, never).flatMap { either ->
         either.fold({ (a, fiberB) ->
@@ -378,7 +379,7 @@ object ConcurrentLaws {
     }
 
   fun <F> Concurrent<F>.racePairMirrorsRightWinner(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext): Unit =
-    forAll(Gen.int().map(::just)) { fa ->
+    forAll(Gen.int().applicativeError(this)) { fa ->
       val never = never<Int>()
       val received = racePair(ctx, never, fa).flatMap { either ->
         either.fold({
@@ -390,7 +391,7 @@ object ConcurrentLaws {
     }
 
   fun <F> Concurrent<F>.racePairCanCancelsLoser(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
-    forAll(genEither(genThrowable(), Gen.string()), Gen.bool(), Gen.int()) { eith, leftWinner, i ->
+    forAll(Gen.either(Gen.throwable(), Gen.string()), Gen.bool(), Gen.int()) { eith, leftWinner, i ->
       val received = fx {
         val s = Semaphore(0L, this@racePairCanCancelsLoser).bind()
         val p = Promise.uncancelable<F, Int>(this@racePairCanCancelsLoser).bind()
@@ -473,7 +474,7 @@ object ConcurrentLaws {
     }
 
   fun <F> Concurrent<F>.raceTripleMirrorsLeftWinner(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
-    forAll(Gen.int().map(::just)) { fa ->
+    forAll(Gen.int().applicativeError(this)) { fa ->
       val never = never<Int>()
       val received = raceTriple(ctx, fa, never, never).flatMap { either ->
         either.fold(
@@ -486,7 +487,7 @@ object ConcurrentLaws {
     }
 
   fun <F> Concurrent<F>.raceTripleMirrorsMiddleWinner(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
-    forAll(Gen.int().map(::just)) { fa ->
+    forAll(Gen.int().applicativeError(this)) { fa ->
       val never = never<Int>()
       val received = raceTriple(ctx, never, fa, never).flatMap { either ->
         either.fold(
@@ -499,7 +500,7 @@ object ConcurrentLaws {
     }
 
   fun <F> Concurrent<F>.raceTripleMirrorsRightWinner(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
-    forAll(Gen.int().map(::just)) { fa ->
+    forAll(Gen.int().applicativeError(this)) { fa ->
       val never = never<Int>()
       val received = raceTriple(ctx, never, never, fa).flatMap { either ->
         either.fold(
@@ -512,7 +513,7 @@ object ConcurrentLaws {
     }
 
   fun <F> Concurrent<F>.raceTripleCanCancelsLoser(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
-    forAll(genEither(genThrowable(), Gen.string()), Gen.from(listOf(1, 2, 3)), Gen.int(), Gen.int()) { eith, leftWinner, a, b ->
+    forAll(Gen.either(Gen.throwable(), Gen.string()), Gen.from(listOf(1, 2, 3)), Gen.int(), Gen.int()) { eith, leftWinner, a, b ->
       val received = fx {
         val s = Semaphore(0L, this@raceTripleCanCancelsLoser).bind()
         val pa = Promise.uncancelable<F, Int>(this@raceTripleCanCancelsLoser).bind()
