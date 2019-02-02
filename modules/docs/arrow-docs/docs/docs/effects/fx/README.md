@@ -251,7 +251,7 @@ In addition to `continueOn`, Arrow Fx allows users to override the executions co
 
 ### Fibers
 
-Fibers are similar to threads but much more lightweight and cheap.
+A [Fiber](/docs/effects/fiber) represents the pure result of a [Concurrent] data type being started concurrently and that can be either `join`ed or `cancel`ed.
 
 ```kotlin:ank:playground
 import arrow.effects.IO
