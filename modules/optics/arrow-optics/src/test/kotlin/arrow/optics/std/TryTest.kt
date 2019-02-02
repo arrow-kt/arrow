@@ -3,11 +3,11 @@ package arrow.optics
 import arrow.core.Either
 import arrow.core.Right
 import arrow.core.Try
-import arrow.core.fix
 import arrow.data.Invalid
 import arrow.data.Valid
 import arrow.data.Validated
 import arrow.core.extensions.either.applicative.applicative
+import arrow.core.fix
 import arrow.test.UnitSpec
 import arrow.test.generators.*
 import arrow.test.laws.IsoLaws
@@ -24,27 +24,27 @@ class TryTest : UnitSpec() {
 
     testLaws(PrismLaws.laws(
       prism = Try.success(),
-      aGen = genTry(Gen.int()),
+      aGen = Gen.`try`(Gen.int()),
       bGen = Gen.int(),
-      funcGen = genFunctionAToB(Gen.int()),
+      funcGen = Gen.functionAToB(Gen.int()),
       EQA = Eq.any(),
       EQOptionB = Eq.any()
     ))
 
     testLaws(PrismLaws.laws(
       prism = Try.failure(),
-      aGen = genTry(Gen.int()),
-      bGen = genThrowable(),
-      funcGen = genFunctionAToB(genThrowable()),
+      aGen = Gen.`try`(Gen.int()),
+      bGen = Gen.throwable(),
+      funcGen = Gen.functionAToB(Gen.throwable()),
       EQA = Eq.any(),
       EQOptionB = Eq.any()
     ))
 
     testLaws(IsoLaws.laws(
       iso = Try.toEither(),
-      aGen = genTry(Gen.int()),
-      bGen = genEither(genThrowable(), Gen.int()),
-      funcGen = genFunctionAToB(genEither(genThrowable(), Gen.int())),
+      aGen = Gen.`try`(Gen.int()),
+      bGen = Gen.either(Gen.throwable(), Gen.int()),
+      funcGen = Gen.functionAToB(Gen.either(Gen.throwable(), Gen.int())),
       EQA = Eq.any(),
       EQB = Eq.any(),
       bMonoid = object : Monoid<Either<Throwable, Int>> {
@@ -57,9 +57,9 @@ class TryTest : UnitSpec() {
 
     testLaws(IsoLaws.laws(
       iso = Try.toValidated(),
-      aGen = genTry(Gen.int()),
-      bGen = genValidated(genThrowable(), Gen.int()),
-      funcGen = genFunctionAToB(genValidated(genThrowable(), Gen.int())),
+      aGen = Gen.`try`(Gen.int()),
+      bGen = Gen.validated(Gen.throwable(), Gen.int()),
+      funcGen = Gen.functionAToB(Gen.validated(Gen.throwable(), Gen.int())),
       EQA = Eq.any(),
       EQB = Eq.any(),
       bMonoid = object : Monoid<Validated<Throwable, Int>> {

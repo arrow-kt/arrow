@@ -3,8 +3,11 @@ package arrow.core.extensions
 
 import arrow.Kind
 import arrow.core.*
+import arrow.core.extensions.function1.monad.monad
+import arrow.core.extensions.id.monad.monad
 import arrow.extension
 import arrow.typeclasses.*
+import arrow.typeclasses.suspended.monad.Fx
 import arrow.core.extensions.traverse as idTraverse
 
 @extension
@@ -148,4 +151,9 @@ interface IdHash<A> : Hash<Id<A>>, IdEq<A> {
   override fun EQ(): Eq<A> = HA()
 
   override fun Id<A>.hash(): Int = HA().run { value().hash() }
+}
+
+@extension
+interface IdFx<A> : Fx<ForId> {
+  override fun monad(): Monad<ForId> = Id.monad()
 }

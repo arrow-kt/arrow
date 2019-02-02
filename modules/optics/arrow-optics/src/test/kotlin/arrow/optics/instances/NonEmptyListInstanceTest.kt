@@ -9,8 +9,8 @@ import arrow.optics.extensions.nonemptylist.each.each
 import arrow.optics.extensions.nonemptylist.filterIndex.filterIndex
 import arrow.optics.extensions.nonemptylist.index.index
 import arrow.test.UnitSpec
-import arrow.test.generators.genFunctionAToB
-import arrow.test.generators.genNonEmptyList
+import arrow.test.generators.functionAToB
+import arrow.test.generators.nonEmptyList
 import arrow.test.laws.OptionalLaws
 import arrow.test.laws.TraversalLaws
 import arrow.typeclasses.Eq
@@ -26,9 +26,9 @@ class NonEmptyListInstanceTest : UnitSpec() {
     testLaws(
       TraversalLaws.laws(
         traversal = NonEmptyList.each<String>().each(),
-        aGen = genNonEmptyList(Gen.string()),
+        aGen = Gen.nonEmptyList(Gen.string()),
         bGen = Gen.string(),
-        funcGen = genFunctionAToB(Gen.string()),
+        funcGen = Gen.functionAToB(Gen.string()),
         EQA = Eq.any(),
         EQOptionB = Eq.any(),
         EQListB = ListK.eq(Eq.any())
@@ -38,9 +38,9 @@ class NonEmptyListInstanceTest : UnitSpec() {
     testLaws(
       TraversalLaws.laws(
         traversal = NonEmptyList.filterIndex<String>().filter { true },
-        aGen = genNonEmptyList(Gen.string()),
+        aGen = Gen.nonEmptyList(Gen.string()),
         bGen = Gen.string(),
-        funcGen = genFunctionAToB(Gen.string()),
+        funcGen = Gen.functionAToB(Gen.string()),
         EQA = Eq.any(),
         EQOptionB = Option.eq(Eq.any()),
         EQListB = ListK.eq(Eq.any())
@@ -50,9 +50,9 @@ class NonEmptyListInstanceTest : UnitSpec() {
     testLaws(
       OptionalLaws.laws(
         optionalGen = Gen.int().map { NonEmptyList.index<String>().index(it) },
-        aGen = genNonEmptyList(Gen.string()),
+        aGen = Gen.nonEmptyList(Gen.string()),
         bGen = Gen.string(),
-        funcGen = genFunctionAToB(Gen.string()),
+        funcGen = Gen.functionAToB(Gen.string()),
         EQOptionB = Eq.any(),
         EQA = Eq.any()
       )

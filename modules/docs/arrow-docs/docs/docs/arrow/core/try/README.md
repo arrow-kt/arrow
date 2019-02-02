@@ -8,9 +8,11 @@ video: XavztYVMUqI
 ---
 
 ## Try
-[Русский](/docs/arrow/core/try/ru)
+
 {:.beginner}
 beginner
+
+[Перевод на русский](/docs/arrow/core/try/ru)
 
 Arrow has [lots of different types of error handling and reporting](http://arrow-kt.io/docs/patterns/error_handling/), which allows you to choose the best strategy for your situation.
 
@@ -193,18 +195,18 @@ Computing over dependent values ignoring failure:
 import arrow.core.extensions.`try`.monad.binding
 
 binding {
-  val a = Try { "3".toInt() }.bind()
-  val b = Try { "4".toInt() }.bind()
-  val c = Try { "5".toInt() }.bind()
+  val (a) = Try { "3".toInt() }
+  val (b) = Try { "4".toInt() }
+  val (c) = Try { "5".toInt() }
   a + b + c
 }
 ```
 
 ```kotlin:ank
 binding {
-  val a = Try { "none".toInt() }.bind()
-  val b = Try { "4".toInt() }.bind()
-  val c = Try { "5".toInt() }.bind()
+  val (a) = Try { "none".toInt() }
+  val (b) = Try { "4".toInt() }
+  val (c) = Try { "5".toInt() }
   a + b + c
 }
 ```

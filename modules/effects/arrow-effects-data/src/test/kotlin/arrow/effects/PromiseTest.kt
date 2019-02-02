@@ -1,6 +1,9 @@
 package arrow.effects
 
-import arrow.core.*
+import arrow.core.Left
+import arrow.core.None
+import arrow.core.Some
+import arrow.core.Tuple2
 import arrow.effects.extensions.io.applicative.product
 import arrow.effects.extensions.io.applicativeError.attempt
 import arrow.effects.extensions.io.async.async
@@ -9,14 +12,13 @@ import arrow.effects.extensions.io.functor.tupleLeft
 import arrow.effects.extensions.io.monad.flatMap
 import arrow.effects.extensions.io.monadDefer.monadDefer
 import arrow.test.UnitSpec
-import arrow.test.generators.genThrowable
+import arrow.test.generators.throwable
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
 import kotlinx.coroutines.Dispatchers
 import org.junit.runner.RunWith
-import java.lang.RuntimeException
 import kotlin.coroutines.CoroutineContext
 
 @RunWith(KotlinTestRunner::class)
@@ -75,7 +77,7 @@ class PromiseTest : UnitSpec() {
       }
 
       "$label - error" {
-        forAll(genThrowable()) { error ->
+        forAll(Gen.throwable()) { error ->
           promise.flatMap { p ->
             p.error(error).flatMap {
               p.get().attempt()
@@ -85,7 +87,7 @@ class PromiseTest : UnitSpec() {
       }
 
       "$label - error twice should result in Promise.AlreadyFulfilled" {
-        forAll(genThrowable()) { error ->
+        forAll(Gen.throwable()) { error ->
           promise.flatMap { p ->
             p.error(error).flatMap {
               p.error(RuntimeException("Boom!")).attempt()
@@ -96,7 +98,7 @@ class PromiseTest : UnitSpec() {
       }
 
       "$label - tryError" {
-        forAll(genThrowable()) { error ->
+        forAll(Gen.throwable()) { error ->
           promise.flatMap { p ->
             p.tryError(error).flatMap { didError ->
               p.get().attempt()
@@ -107,7 +109,7 @@ class PromiseTest : UnitSpec() {
       }
 
       "$label - tryError twice returns false" {
-        forAll(genThrowable()) { error ->
+        forAll(Gen.throwable()) { error ->
           promise.flatMap { p ->
             p.tryError(error).flatMap {
               p.tryError(RuntimeException("Boom!")).flatMap { didComplete ->

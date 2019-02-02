@@ -4,9 +4,12 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.toT
 import arrow.data.*
+import arrow.data.extensions.statet.monad.monad
+import arrow.data.extensions.writert.monad.monad
 
 import arrow.extension
 import arrow.typeclasses.*
+import arrow.typeclasses.suspended.monad.Fx
 import arrow.undocumented
 
 @extension
@@ -121,4 +124,17 @@ interface WriterTMonoidK<F, W> : MonoidK<WriterTPartialOf<F, W>>, WriterTSemigro
   override fun SS(): SemigroupK<F> = MF()
 
   override fun <A> empty(): WriterT<F, W, A> = WriterT(MF().empty())
+}
+
+@extension
+@undocumented
+interface WriterTFx<F, W> : Fx<WriterTPartialOf<F, W>> {
+
+  fun M() : Monad<F>
+
+  fun MW(): Monoid<W>
+
+  override fun monad(): Monad<WriterTPartialOf<F, W>> =
+    WriterT.monad(M(), MW())
+
 }

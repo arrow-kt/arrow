@@ -2,6 +2,7 @@ package arrow.typeclasses
 
 import arrow.Kind
 import arrow.core.Continuation
+import arrow.typeclasses.suspended.MonadSyntax
 import java.util.concurrent.CountDownLatch
 import kotlin.coroutines.*
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
@@ -13,7 +14,7 @@ interface BindingInContextContinuation<in T> : Continuation<T> {
 
 @RestrictsSuspension
 open class MonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineContext = EmptyCoroutineContext) :
-  Continuation<Kind<F, A>>, Monad<F> by M {
+  Continuation<Kind<F, A>>, Monad<F> by M, MonadSyntax<F> {
 
   override fun resume(value: Kind<F, A>) {
     returnedMonad = value
@@ -49,7 +50,7 @@ open class MonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineC
 
   open fun returnedMonad(): Kind<F, A> = returnedMonad
 
-  suspend fun <B> Kind<F, B>.bind(): B = bind { this }
+  override suspend fun <B> Kind<F, B>.bind(): B = bind { this }
 
   suspend fun <B> (() -> B).bindIn(context: CoroutineContext): B =
     bindIn(context, this)

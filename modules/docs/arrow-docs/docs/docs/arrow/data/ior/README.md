@@ -77,8 +77,8 @@ fun validatePassword(password: String) = when {
 
 fun validateUser(name: String, pass: String) =
         binding<Nel<String>> {
-            val username = validateUsername(name).bind()
-            val password = validatePassword(pass).bind()
+            val (username) = validateUsername(name)
+            val (password) = validatePassword(pass)
             User(username, password)
         }.fix()
 ```

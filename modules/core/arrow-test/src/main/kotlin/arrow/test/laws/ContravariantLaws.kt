@@ -2,8 +2,7 @@ package arrow.test.laws
 
 import arrow.Kind
 import arrow.core.compose
-import arrow.test.generators.genConstructor
-import arrow.test.generators.genFunctionAToB
+import arrow.test.generators.functionAToB
 import arrow.typeclasses.Contravariant
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
@@ -18,16 +17,16 @@ object ContravariantLaws {
         )
 
     fun <F> Contravariant<F>.identity(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
-        forAll(genConstructor(Gen.int(), cf)) { fa: Kind<F, Int> ->
+        forAll(Gen.int().map(cf)) { fa: Kind<F, Int> ->
             @Suppress("ExplicitItLambdaParameter")
             fa.contramap { it: Int -> it }.equalUnderTheLaw(fa, EQ)
         }
 
     fun <F> Contravariant<F>.composition(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
         forAll(
-            genConstructor(Gen.int(), cf),
-            genFunctionAToB<Int, Int>(Gen.int()),
-            genFunctionAToB<Int, Int>(Gen.int())
+          Gen.int().map(cf),
+          Gen.functionAToB<Int, Int>(Gen.int()),
+          Gen.functionAToB<Int, Int>(Gen.int())
         ) { fa: Kind<F, Int>, f, g ->
             fa.contramap(f).contramap(g).equalUnderTheLaw(fa.contramap(f compose g), EQ)
         }

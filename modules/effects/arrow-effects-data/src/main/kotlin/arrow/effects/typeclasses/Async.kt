@@ -1,8 +1,8 @@
 package arrow.effects.typeclasses
 
 import arrow.Kind
-import arrow.core.*
 import arrow.core.Either
+import arrow.core.Right
 import arrow.documented
 import arrow.typeclasses.MonadContinuation
 import kotlin.coroutines.CoroutineContext

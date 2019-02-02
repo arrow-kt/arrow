@@ -625,10 +625,10 @@ This specialization can be accessed using the function `binding` on any Monad, a
 ```kotlin
 fun <F> bookSpeakersFlights(M: Monad<F>): Kind<F, Reservation> =
     M.binding {
-        val speaker = repository.loadSpeaker().bind()
-        val talk = speaker.nextTalk().bind()
-        val conference = talk.getConference().bind()
-        val city = conference.getCity().bind()
+        val (speaker) = repository.loadSpeaker()
+        val (talk) = speaker.nextTalk()
+        val (conference) = talk.getConference()
+        val (city) = conference.getCity()
         reservations.bookFlight(speaker, city).bind()
     }
 

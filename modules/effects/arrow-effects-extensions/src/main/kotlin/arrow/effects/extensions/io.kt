@@ -1,11 +1,12 @@
 package arrow.effects.extensions
 
+import arrow.Kind
 import arrow.core.Either
-import arrow.core.*
 import arrow.effects.*
 import arrow.effects.typeclasses.*
 import arrow.extension
 import arrow.typeclasses.*
+import arrow.unsafe
 import kotlin.coroutines.CoroutineContext
 import arrow.effects.ap as ioAp
 import arrow.effects.handleErrorWith as ioHandleErrorWith
@@ -45,7 +46,7 @@ interface IOMonad : Monad<ForIO> {
 }
 
 @extension
-interface IOApplicativeError: ApplicativeError<ForIO, Throwable>, IOApplicative {
+interface IOApplicativeError : ApplicativeError<ForIO, Throwable>, IOApplicative {
   override fun <A> IOOf<A>.attempt(): IO<Either<Throwable, A>> =
     fix().attempt()
 
@@ -57,7 +58,7 @@ interface IOApplicativeError: ApplicativeError<ForIO, Throwable>, IOApplicative 
 }
 
 @extension
-interface IOMonadError: MonadError<ForIO, Throwable>, IOApplicativeError, IOMonad {
+interface IOMonadError : MonadError<ForIO, Throwable>, IOApplicativeError, IOMonad {
 
   override fun <A> just(a: A): IO<A> = IO.just(a)
 
@@ -78,10 +79,10 @@ interface IOMonadError: MonadError<ForIO, Throwable>, IOApplicativeError, IOMona
 }
 
 @extension
-interface IOMonadThrow: MonadThrow<ForIO>, IOMonadError
+interface IOMonadThrow : MonadThrow<ForIO>, IOMonadError
 
 @extension
-interface IOBracket: Bracket<ForIO, Throwable>, IOMonadThrow {
+interface IOBracket : Bracket<ForIO, Throwable>, IOMonadThrow {
   override fun <A, B> IOOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> IOOf<Unit>, use: (A) -> IOOf<B>): IO<B> =
     fix().bracketCase({ a, e -> release(a, e) }, { a -> use(a) })
 
@@ -96,7 +97,7 @@ interface IOBracket: Bracket<ForIO, Throwable>, IOMonadThrow {
 }
 
 @extension
-interface IOMonadDefer: MonadDefer<ForIO>, IOBracket {
+interface IOMonadDefer : MonadDefer<ForIO>, IOBracket {
   override fun <A> defer(fa: () -> IOOf<A>): IO<A> =
     IO.defer(fa)
 
@@ -104,7 +105,7 @@ interface IOMonadDefer: MonadDefer<ForIO>, IOBracket {
 }
 
 @extension
-interface IOAsync: Async<ForIO>, IOMonadDefer {
+interface IOAsync : Async<ForIO>, IOMonadDefer {
   override fun <A> async(fa: Proc<A>): IO<A> =
     IO.async(fa.toIOProc())
 
@@ -115,13 +116,14 @@ interface IOAsync: Async<ForIO>, IOMonadDefer {
     fix().continueOn(ctx)
 }
 
-@extension
+// FIXME default @extension are temporarily declared in arrow-effects-io-extensions due to multiplatform needs
 interface IOConcurrent : Concurrent<ForIO>, IOAsync {
+
   override fun <A> IOOf<A>.startF(ctx: CoroutineContext): IO<Fiber<ForIO, A>> =
     ioStart(ctx)
 
-  override fun <A> asyncF(k: ConnectedProcF<ForIO, A>): IO<A> =
-    IO.asyncF(k)
+  override fun <A> asyncF(fa: ConnectedProcF<ForIO, A>): IO<A> =
+    IO.asyncF(fa)
 
   override fun <A> async(fa: ConnectedProc<ForIO, A>): IO<A> =
     IO.async(fa)
@@ -140,16 +142,25 @@ interface IOConcurrent : Concurrent<ForIO>, IOAsync {
 
 }
 
+fun IO.Companion.concurrent(dispatchers: Dispatchers<ForIO>): Concurrent<ForIO> = object : IOConcurrent {
+  override fun dispatchers(): Dispatchers<ForIO> = dispatchers
+}
+
 @extension
-interface IOEffect: Effect<ForIO>, IOAsync {
+interface IOEffect : Effect<ForIO>, IOAsync {
   override fun <A> IOOf<A>.runAsync(cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Unit> =
     fix().runAsync(cb)
 }
 
-@extension
-interface IOConcurrentEffect: ConcurrentEffect<ForIO>, IOEffect, IOConcurrent {
+// FIXME default @extension are temporarily declared in arrow-effects-io-extensions due to multiplatform needs
+interface IOConcurrentEffect : ConcurrentEffect<ForIO>, IOEffect, IOConcurrent {
+
   override fun <A> IOOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Disposable> =
     fix().runAsyncCancellable(OnCancel.ThrowCancellationException, cb)
+}
+
+fun IO.Companion.concurrentEffect(dispatchers: Dispatchers<ForIO>): ConcurrentEffect<ForIO> = object : IOConcurrentEffect {
+  override fun dispatchers(): Dispatchers<ForIO> = dispatchers
 }
 
 @extension
@@ -169,5 +180,15 @@ interface IOMonoid<A> : Monoid<IO<A>>, IOSemigroup<A> {
   fun SM(): Monoid<A>
 
   override fun empty(): IO<A> = IO.just(SM().empty())
+
+}
+
+@extension
+interface IOUnsafeRun : UnsafeRun<ForIO> {
+
+  override suspend fun <A> unsafe.runBlocking(fa: () -> Kind<ForIO, A>): A = fa().fix().unsafeRunSync()
+
+  override suspend fun <A> unsafe.runNonBlocking(fa: () -> Kind<ForIO, A>, cb: (Either<Throwable, A>) -> Unit) =
+    fa().fix().unsafeRunAsync(cb)
 
 }

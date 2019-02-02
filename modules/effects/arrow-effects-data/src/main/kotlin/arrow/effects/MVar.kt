@@ -2,8 +2,8 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.core.Option
-import arrow.effects.internal.UncancelableMVar
 import arrow.effects.internal.CancelableMVar
+import arrow.effects.internal.UncancelableMVar
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Concurrent
 

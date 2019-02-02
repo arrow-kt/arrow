@@ -15,6 +15,13 @@ options:
       - title: Projects & Examples
         url: /docs/quickstart/projects/
 
+  - title: Arrow Fx
+
+    nested_options:
+
+      - title: Getting Started
+        url: /docs/effects/fx/
+
   - title: API Docs
 
     nested_options:
@@ -228,6 +235,9 @@ options:
 
       - title: Monoid
         url: /docs/arrow/typeclasses/monoid/
+
+      - title: Semiring
+        url: /docs/apidocs/arrow-typeclasses/arrow.typeclasses/-semiring/
 
       - title: Foldable
         url: /docs/arrow/typeclasses/foldable/

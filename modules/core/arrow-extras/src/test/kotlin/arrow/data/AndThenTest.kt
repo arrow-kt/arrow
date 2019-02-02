@@ -10,7 +10,7 @@ import arrow.data.extensions.andthen.monoid.monoid
 import arrow.data.extensions.andthen.profunctor.profunctor
 import arrow.data.extensions.list.foldable.foldLeft
 import arrow.test.UnitSpec
-import arrow.test.generators.genFunctionAToB
+import arrow.test.generators.functionAToB
 import arrow.test.laws.*
 import arrow.typeclasses.Conested
 import arrow.typeclasses.Eq
@@ -44,7 +44,7 @@ class AndThenTest : UnitSpec() {
     )
 
     "compose a chain of functions with andThen should be same with AndThen" {
-      forAll(Gen.int(), Gen.list(genFunctionAToB<Int, Int>(Gen.int()))) { i, fs ->
+      forAll(Gen.int(), Gen.list(Gen.functionAToB<Int, Int>(Gen.int()))) { i, fs ->
         val result = fs.map(AndThen.Companion::invoke)
           .fold(AndThen<Int, Int>(::identity)) { acc, b ->
             acc.andThen(b)
@@ -59,7 +59,7 @@ class AndThenTest : UnitSpec() {
     }
 
     "compose a chain of function with compose should be same with AndThen" {
-      forAll(Gen.int(), Gen.list(genFunctionAToB<Int, Int>(Gen.int()))) { i, fs ->
+      forAll(Gen.int(), Gen.list(Gen.functionAToB<Int, Int>(Gen.int()))) { i, fs ->
         val result = fs.map(AndThen.Companion::invoke)
           .fold(AndThen<Int, Int>(::identity)) { acc, b ->
             acc.compose(b)
