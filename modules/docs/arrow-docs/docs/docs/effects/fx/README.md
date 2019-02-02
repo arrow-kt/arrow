@@ -502,7 +502,7 @@ Fx programs can be declared in a polymorphic style and made concrete to your fra
 ### Creating polymorphic programs
 
 So far all programs we've created in previous examples where built with `Arrow`'s `IO`.
-Fx is not restricted to `IO`. It just happens that since `IO` provides an extension for `Concurrent<F>` and we can then extensions for the `fx` DSL directly as in all previous examples.
+Fx is not restricted to `IO`. Since `IO` provides extensions for `Concurrent<F>` we can also create extensions for the `fx` DSL directly as in all previous examples.
 
 We can also code agains't `Fx` assuming it would be provided at some point in the future.
 
