@@ -8,12 +8,6 @@ import arrow.typeclasses.ApplicativeError
 
 interface ApplicativeErrorSyntax<F, E> : ApplicativeError<F, E>, ApplicativeSyntax<F> {
 
-  suspend fun <A> E.raiseError(): Kind<F, A> =
-    run<ApplicativeError<F, E>, Kind<F, A>> { raiseError(this@raiseError) }
-
-  suspend fun <A> raiseError(e: E, unit: Unit = Unit): Kind<F, A> =
-    run<ApplicativeError<F, E>, Kind<F, A>> { raiseError(e) }
-
   suspend fun <A> handleError(fa: suspend () -> A, recover: suspend (E) -> A): Kind<F, A> =
     run<ApplicativeError<F, E>, Kind<F, A>> { fa.effect().handleErrorWith(recover.flatLiftM()) }
 
