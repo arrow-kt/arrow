@@ -390,7 +390,7 @@ fun main() { // The edge of our world
 
 ### Cancellation
 
-Al concurrent `fx` continuations are cancellable. Users may use the `fxCancellable` function to run `fx` blocks that beside returning a value it returns a disposable handler that can interrupt the operation.
+All concurrent `fx` continuations are cancellable. Users may use the `fxCancellable` function to run `fx` blocks that beside returning a value it returns a disposable handler that can interrupt the operation.
 
 ```kotlin:ank:playground
 import arrow.effects.IO
