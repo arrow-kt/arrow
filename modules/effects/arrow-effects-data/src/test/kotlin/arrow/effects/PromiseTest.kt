@@ -125,8 +125,8 @@ class PromiseTest : UnitSpec() {
         Ref.of(0, IO.monadDefer()).flatMap { state ->
           promise.flatMap { modifyGate ->
             promise.flatMap { readGate ->
-              modifyGate.get().flatMap { state.update { i -> i * 2 }.flatMap { readGate.complete(0) } }.startF(ctx).flatMap {
-                state.set(1).flatMap { modifyGate.complete(0) }.startF(ctx).flatMap {
+              modifyGate.get().flatMap { state.update { i -> i * 2 }.flatMap { readGate.complete(0) } }.startFiber(ctx).flatMap {
+                state.set(1).flatMap { modifyGate.complete(0) }.startFiber(ctx).flatMap {
                   readGate.get().flatMap {
                     state.get()
                   }

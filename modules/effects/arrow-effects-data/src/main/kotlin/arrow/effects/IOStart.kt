@@ -37,7 +37,7 @@ import kotlin.coroutines.suspendCoroutine
  * @param ctx [CoroutineContext] to execute the source [IO] on.
  * @return [IO] with suspended execution of source [IO] on context [ctx].
  */
-fun <A> IOOf<A>.startF(ctx: CoroutineContext): IO<Fiber<ForIO, A>> = IO {
+fun <A> IOOf<A>.startFiber(ctx: CoroutineContext): IO<Fiber<ForIO, A>> = IO {
   val promise = UnsafePromise<A>()
 
   // A new IOConnection, because its cancellation is now decoupled from our current one.

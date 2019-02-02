@@ -12,7 +12,6 @@ import arrow.unsafe
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldThrow
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.newSingleThreadContext
 import org.junit.runner.RunWith
@@ -53,7 +52,6 @@ class EffectsSuspendDSLTests : UnitSpec() {
        * data type which it needs to be at least able to provide a `MonadDefer` extension.
        */
       val program: IO<String> = fx {
-
         helloWorld
       }
       unsafe { runBlocking { program } } shouldBe helloWorld
@@ -66,13 +64,10 @@ class EffectsSuspendDSLTests : UnitSpec() {
       val program = fx {
         // note how the receiving value is typed in the environment and not inside IO despite being effectful and
         // non-blocking parallel computations
-        val result: List<String> = !parMapN(
-          Dispatchers.Default,
+        val result: List<String> = ! NonBlocking.parMapN(
           effect { getThreadName() },
           effect { getThreadName() }
-        ) { a, b ->
-          listOf(a, b)
-        }
+        ) { a, b -> listOf(a, b) }
         effect { println(result) }
         result
       }
@@ -248,7 +243,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
       val const = 1
       fxTest {
         fx {
-          val fiber = !Dispatchers.Default.startFiber { const }
+          val fiber = !NonBlocking.startFiber(effect { const })
           val (n) = fiber.join()
           n
         }
@@ -259,14 +254,12 @@ class EffectsSuspendDSLTests : UnitSpec() {
       fxTest {
         fx {
           val race1 =
-            !racePair(
-              Dispatchers.Default,
+            !NonBlocking.racePair(
               effect { 1 },
               effect { Thread.sleep(100); 2 }
             )
           val race2 =
-            !racePair(
-              Dispatchers.Default,
+            !NonBlocking.racePair(
               effect { Thread.sleep(100); 1 },
               effect { 2 }
             )
@@ -319,13 +312,13 @@ class EffectsSuspendDSLTests : UnitSpec() {
       val main = Thread.currentThread().name
       fxTest {
         fx {
-          val result = !listOf(
-            effect { Thread.currentThread().name },
-            effect { Thread.currentThread().name },
-            effect { Thread.currentThread().name }
-          ).parTraverse(
-            Dispatchers.Default,
-            ::effectIdentity
+          val result = !NonBlocking.parTraverse(
+            listOf(
+              effect { Thread.currentThread().name },
+              effect { Thread.currentThread().name },
+              effect { Thread.currentThread().name }
+            ),
+            ::identity
           )
           result.any {
             it == main
@@ -338,11 +331,11 @@ class EffectsSuspendDSLTests : UnitSpec() {
       val main = Thread.currentThread().name
       fxTest {
         fx {
-          val result = !listOf(
+          val result = !NonBlocking.parSequence(listOf(
             effect { Thread.currentThread().name },
             effect { Thread.currentThread().name },
             effect { Thread.currentThread().name }
-          ).parSequence(Dispatchers.Default)
+          ))
           result.any {
             it == main
           }

@@ -231,7 +231,6 @@ import kotlinx.coroutines.newSingleThreadContext
 
 //sampleStart
 val contextA = newSingleThreadContext("A")
-val contextB = newSingleThreadContext("B")
 
 suspend fun printThreadName(): Unit =
   println(Thread.currentThread().name)
@@ -239,7 +238,7 @@ suspend fun printThreadName(): Unit =
 val program = fx {
   continueOn(contextA)
   !effect { printThreadName() }
-  continueOn(contextB)
+  continueOn(NonBlocking)
   !effect { printThreadName() }
 }
 //sampleEnd
@@ -259,15 +258,14 @@ import arrow.effects.IO
 import arrow.unsafe
 import arrow.effects.extensions.io.unsafeRun.runBlocking
 import arrow.effects.extensions.io.fx.fx
-import kotlinx.coroutines.Dispatchers
 
 //sampleStart
 suspend fun threadName(): String =
   Thread.currentThread().name
 
 val program = fx {
-  val fiberA = !Dispatchers.Default.startFiber { threadName() }
-  val fiberB = !Dispatchers.Default.startFiber { threadName() }
+  val fiberA = !NonBlocking.startFiber(effect { threadName() })
+  val fiberB = !NonBlocking.startFiber(effect { threadName() })
   val threadA = !fiberA.join()
   val threadB = !fiberA.join()
   !effect { println(threadA) }
@@ -280,6 +278,8 @@ fun main() { // The edge of our world
 ```
 
 When we spawn fibers we can obtain their deferred non-blocking result using `join()` and destructuring the effect.
+
+`NonBlocking` is an execution context available to all concurrent data types such as IO that you can use directly on `fx` blocks.
 
 Note that because we are using `Fiber` here and a Dispatcher that may not create new threads in all cases we are not guaranteed that the thread names printed would be different.
 
@@ -299,7 +299,6 @@ import arrow.effects.IO
 import arrow.unsafe
 import arrow.effects.extensions.io.unsafeRun.runBlocking
 import arrow.effects.extensions.io.fx.fx
-import kotlinx.coroutines.Dispatchers
 
 //sampleStart
 suspend fun threadName(): String =
@@ -312,8 +311,7 @@ data class ThreadInfo(
 
 val program = fx {
   val (threadA: String, threadB: String) = 
-    !parMapN(
-      Dispatchers.Default,
+    !NonBlocking.parMapN(
       effect { threadName() },
       effect { threadName() },
       ::ThreadInfo
@@ -336,21 +334,21 @@ import arrow.effects.IO
 import arrow.unsafe
 import arrow.effects.extensions.io.unsafeRun.runBlocking
 import arrow.effects.extensions.io.fx.fx
-import kotlinx.coroutines.Dispatchers
 
 //sampleStart
 suspend fun threadName(): String =
   Thread.currentThread().name
 
 val program = fx {
-  val result: List<String> = !listOf(
-    effect { threadName() },
-    effect { threadName() },
-    effect { threadName() }
-  ).parTraverse(Dispatchers.Default) {
+  val result: List<String> = !NonBlocking.parTraverse(
+    listOf(
+        effect { threadName() },
+        effect { threadName() },
+        effect { threadName() }
+    )
+  ) {
       "running on: $it" 
     }
-  
   !effect { println(result) }
 }
 //sampleEnd
@@ -368,18 +366,19 @@ import arrow.effects.IO
 import arrow.unsafe
 import arrow.effects.extensions.io.unsafeRun.runBlocking
 import arrow.effects.extensions.io.fx.fx
-import kotlinx.coroutines.Dispatchers
 
 //sampleStart
 suspend fun threadName(): String =
   Thread.currentThread().name
 
 val program = fx {
-  val result: List<String> = !listOf(
-    effect { threadName() },
-    effect { threadName() },
-    effect { threadName() }
-  ).parSequence(Dispatchers.Default)
+  val result: List<String> = !NonBlocking.parSequence(
+    listOf(
+      effect { threadName() },
+      effect { threadName() },
+      effect { threadName() }
+    )
+  )
   
   !effect { println(result) }
 }
