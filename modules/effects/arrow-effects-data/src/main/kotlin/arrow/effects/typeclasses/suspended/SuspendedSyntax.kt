@@ -21,6 +21,7 @@ class ForFx private constructor() {
   companion object
 }
 typealias FxOf<A> = Kind<ForFx, A>
+typealias FxProcF<A> = ConnectedProcF<ForFx, A>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
 inline fun <A> FxOf<A>.fix(): Fx<A> =
@@ -138,6 +139,17 @@ class Fx<A>(internal val fa: suspend () -> A) : FxOf<A> {
         //Is CancellationException from kotlin in kotlinx package???
         conn.push(Fx { continuation.resumeWith(Result.failure(CancellationException())) })
         fa { either ->
+          continuation.resumeWith(either.fold(Result.Companion::failure, Result.Companion::success))
+        }.fix().foldContinuation(EmptyCoroutineContext, mapUnit)
+      }
+    }
+
+    fun <A> asyncF(fa: FxProcF<A>): Fx<A> = Fx<A> {
+      suspendCoroutine { continuation ->
+        val conn = FxConnection()
+        //Is CancellationException from kotlin in kotlinx package???
+        conn.push(Fx { continuation.resumeWith(Result.failure(CancellationException())) })
+        fa(conn) { either ->
           continuation.resumeWith(either.fold(Result.Companion::failure, Result.Companion::success))
         }.fix().foldContinuation(EmptyCoroutineContext, mapUnit)
       }
@@ -272,9 +284,8 @@ interface FxDispatchers : Dispatchers<ForFx> {
 interface FxConcurrent : Concurrent<ForFx>, FxAsync {
   override fun dispatchers(): Dispatchers<ForFx> = Fx.dispatchers()
 
-  override fun <A> asyncF(fa: ConnectedProcF<ForFx, A>): Fx<A> {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-  }
+  override fun <A> asyncF(fa: FxProcF<A>): Fx<A> =
+    Fx.asyncF(fa)
 
   override fun <A> CoroutineContext.startFiber(kind: FxOf<A>): Fx<Fiber<ForFx, A>> {
     TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
