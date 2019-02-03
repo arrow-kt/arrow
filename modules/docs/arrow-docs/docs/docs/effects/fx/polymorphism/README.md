@@ -55,6 +55,7 @@ You will not be able to compile this program unless your data type supported tho
 
 Polymorphic programs are more flexible that their concrete counterparts because they can run unmodified in multiple runtimes.
 In the same way `main` is concrete in the previous example to `IO`, we could have used there instead Rx2 Observables, Reactor Flux or any other data type that is able to provide extensions for `Fx` and `UnsafeRun`.
+See [Issue 1281](https://github.com/arrow-kt/arrow/issues/1281) which tracks support for those frameworks or reach out to us if you are interested in support for any other framework.
 
 ## Fx for all data types
 

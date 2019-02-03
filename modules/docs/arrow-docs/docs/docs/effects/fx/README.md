@@ -219,7 +219,7 @@ fun main() { // The edge of our world
 
 Arrow Fx makes emphasis in guaranteeing users understand when they are performing side effects in their program declaration.
 
-Arrow Fx programs are not restricted to `IO` but in fact polymorphic and would work unmodified in many useful runtimes like the ones we find in popular libraries such as KotlinX Coroutines `Deferred`, Rx2 `Observable`, Reactor framework `Flux` and in general any third party data type that can model sync and async effect suspension.
+Arrow Fx programs are not restricted to `IO` but in fact polymorphic and would work unmodified in many useful runtimes like the ones we find in popular libraries such as KotlinX Coroutines `Deferred`, Rx2 `Observable`, Reactor framework `Flux` and in general any third party data type that can model sync and async effect suspension. See [Issue 1281](https://github.com/arrow-kt/arrow/issues/1281) which tracks support for those frameworks or reach out to us if you are interested in support for any other framework.
 
 If you've come this far and you are not too familiar with FP you may have realized that despite the buzzwords and some FP jargon, you already know how to use Arrow Fx for the most part. That is because Arrow Fx brings the most popular imperative style to effectful programs with few simple primitives for effect control and asynchronous programming. 
 
