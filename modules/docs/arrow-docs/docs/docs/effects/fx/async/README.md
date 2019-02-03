@@ -53,7 +53,7 @@ In addition to `continueOn`, Arrow Fx allows users to override the executions co
 
 ## Fibers
 
-Fibers are similar to threads but much more lightweight and cheap.
+A [Fiber](/docs/effects/fiber) represents the pure result of a [Concurrent] data type being started concurrently and that can be either `join`ed or `cancel`ed.
 
 ```kotlin:ank:playground
 import arrow.effects.IO
@@ -192,7 +192,7 @@ fun main() { // The edge of our world
 
 ## Cancellation
 
-Al concurrent `fx` continuations are cancellable. Users may use the `fxCancellable` function to run `fx` blocks that beside returning a value it returns a disposable handler that can interrupt the operation.
+All concurrent `fx` continuations are cancellable. Users may use the `fxCancellable` function to run `fx` blocks that beside returning a value it returns a disposable handler that can interrupt the operation.
 
 ```kotlin:ank:playground
 import arrow.effects.IO
