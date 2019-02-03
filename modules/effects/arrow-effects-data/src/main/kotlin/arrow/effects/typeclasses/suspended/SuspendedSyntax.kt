@@ -6,6 +6,7 @@ import arrow.core.left
 import arrow.core.right
 import arrow.effects.KindConnection
 import arrow.effects.internal.Platform
+import arrow.effects.internal.asyncContinuation
 import arrow.effects.typeclasses.*
 import arrow.effects.typeclasses.suspended.fx.dispatchers.dispatchers
 import arrow.extension
@@ -301,6 +302,15 @@ interface FxConcurrent : Concurrent<ForFx>, FxAsync {
 
   override fun <A> asyncF(k: ProcF<ForFx, A>): Fx<A> =
     Fx.asyncF(k)
+}
+
+@extension
+interface FxUnsafeRun : UnsafeRun<ForFx> {
+  override suspend fun <A> unsafe.runBlocking(fa: () -> FxOf<A>): A =
+    fa().fix().foldContinuation { throw it }
+
+  override suspend fun <A> unsafe.runNonBlocking(fa: () -> FxOf<A>, cb: (Either<Throwable, A>) -> Unit) =
+    fa().fix().fa.startCoroutine(asyncContinuation(NonBlocking, cb))
 }
 
 private fun <A> Fx<A>.foldContinuation(
