@@ -25,7 +25,7 @@ import kotlin.coroutines.suspendCoroutine
  *   //sampleStart
  *   binding {
  *     val promise = Promise.uncancelable<ForIO, Int>(IO.async()).bind()
- *     val fiber = promise.get().startF(Dispatchers.Default).bind()
+ *     val fiber = Dispatchers.Default.startFiber(promise.get()).bind()
  *     promise.complete(1).bind()
  *     fiber.join().bind()
  *   }.unsafeRunSync() == 1
