@@ -1,5 +1,6 @@
 package arrow.core
 
+import arrow.Kind
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
 import arrow.core.extensions.monoid
@@ -8,6 +9,7 @@ import arrow.core.extensions.option.eq.eq
 import arrow.core.extensions.option.fx.fx
 import arrow.core.extensions.option.hash.hash
 import arrow.core.extensions.option.monoid.monoid
+import arrow.core.extensions.option.semigroupal.semigroupal
 import arrow.core.extensions.option.show.show
 import arrow.mtl.extensions.option.monadFilter.monadFilter
 import arrow.mtl.extensions.option.traverseFilter.traverseFilter
@@ -30,6 +32,10 @@ class OptionTest : UnitSpec() {
   val some: Option<String> = Some("kotlin")
   val none: Option<String> = Option.empty()
 
+  val A: Option<Int> = Some(1)
+  val B: Option<Int> = Some(2)
+  val C: Option<Int> = Some(3)
+
   init {
 
     testLaws(
@@ -39,7 +45,10 @@ class OptionTest : UnitSpec() {
       FunctorFilterLaws.laws(Option.traverseFilter(), { Option(it) }, Eq.any()),
       TraverseFilterLaws.laws(Option.traverseFilter(), Option.applicative(), ::Some, Eq.any()),
       MonadFilterLaws.laws(Option.monadFilter(), ::Some, Eq.any()),
-      HashLaws.laws(Option.hash(Int.hash()), Option.eq(Int.eq())) { it.some() }
+      HashLaws.laws(Option.hash(Int.hash()), Option.eq(Int.eq())) { it.some() },
+      SemigroupalLaws.laws(Option.semigroupal(), A, B, C, this::bijection),
+      SemigroupalLaws.laws(Option.semigroupal(), A, B, Option.empty(), this::bijection),
+      SemigroupalLaws.laws(Option.semigroupal(), Option.empty(), B, C, this::bijection)
     )
 
     "fromNullable should work for both null and non-null values of nullable types" {
@@ -140,6 +149,18 @@ class OptionTest : UnitSpec() {
 
     }
 
+    "Some(1) x None should be None" {
+      Option.semigroupal().run {
+        A.product(none).shouldBe(none)
+      }
+    }
+
+    "None x Some(1) should be None" {
+      Option.semigroupal().run {
+        none.product(A).shouldBe(none)
+      }
+    }
+
     "fx can turn effects into pure kinded values" {
       suspend fun sideEffect(): Int =
         1
@@ -160,6 +181,11 @@ class OptionTest : UnitSpec() {
       }
     }
 
+  }
+
+  private fun bijection(from: Kind<ForOption, Tuple2<Tuple2<Int, Int>, Int>>): Option<Tuple2<Int, Tuple2<Int, Int>>> {
+    val ot = (from as Some<Tuple2<Tuple2<Int, Int>, Int>>)
+    return Tuple2(ot.t.a.a, Tuple2(ot.t.a.b, ot.t.b)).toOption()
   }
 
 }
