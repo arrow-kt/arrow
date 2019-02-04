@@ -23,11 +23,14 @@ class ForFx private constructor() {
   companion object
 }
 typealias FxOf<A> = Kind<ForFx, A>
+typealias FxProc<A> = ConnectedProc<ForFx, A>
 typealias FxProcF<A> = ConnectedProcF<ForFx, A>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
 inline fun <A> FxOf<A>.fix(): Fx<A> =
   this as Fx<A>
+
+suspend operator fun <A> FxOf<A>.invoke(): A = fix().invoke()
 
 class Fx<A>(internal val fa: suspend () -> A) : FxOf<A> {
 
@@ -135,11 +138,29 @@ class Fx<A>(internal val fa: suspend () -> A) : FxOf<A> {
         result.fold({ tailRecM(it, f) }, { just(it) })
       }
 
-    fun <A> asyncF(fa: ProcF<ForFx, A>): Fx<A> = Fx<A> {
+    /** Hide member because it's discouraged to use uncancelable builder for cancelable concrete type **/
+    internal fun <A> async(fa: Proc<A>): Fx<A> = Fx<A> {
+      suspendCoroutine { continuation ->
+        fa { either ->
+          continuation.resumeWith(either.fold(Result.Companion::failure, Result.Companion::success))
+        }
+      }
+    }
+
+    fun <A> async(fa: FxProc<A>): Fx<A> = Fx<A> {
       suspendCoroutine { continuation ->
         val conn = FxConnection()
         //Is CancellationException from kotlin in kotlinx package???
         conn.push(Fx { continuation.resumeWith(Result.failure(CancellationException())) })
+        fa(conn) { either ->
+          continuation.resumeWith(either.fold(Result.Companion::failure, Result.Companion::success))
+        }
+      }
+    }
+
+    /** Hide member because it's discouraged to use uncancelable builder for cancelable concrete type **/
+    internal fun <A> asyncF(fa: ProcF<ForFx, A>): Fx<A> = Fx<A> {
+      suspendCoroutine { continuation ->
         fa { either ->
           continuation.resumeWith(either.fold(Result.Companion::failure, Result.Companion::success))
         }.fix().foldContinuation(EmptyCoroutineContext, mapUnit)
@@ -243,11 +264,15 @@ interface FxBracket : Bracket<ForFx, Throwable>, FxMonadThrow {
 @extension
 interface FxMonadDefer : MonadDefer<ForFx>, FxBracket {
   override fun <A> defer(fa: () -> FxOf<A>): Fx<A> =
-    Fx { Unit }.flatMap { fa() }
+    unit().flatMap { fa() }
 }
 
 @extension
 interface FxAsync : Async<ForFx>, FxMonadDefer {
+
+  override fun <A> async(fa: Proc<A>): Fx<A> =
+    Fx.async(fa)
+
   override fun <A> asyncF(k: ProcF<ForFx, A>): Fx<A> =
     Fx.asyncF(k)
 
@@ -286,6 +311,9 @@ interface FxDispatchers : Dispatchers<ForFx> {
 interface FxConcurrent : Concurrent<ForFx>, FxAsync {
   override fun dispatchers(): Dispatchers<ForFx> = Fx.dispatchers()
 
+  override fun <A> async(fa: FxProc<A>): Fx<A> =
+    Fx.async(fa)
+
   override fun <A> asyncF(fa: FxProcF<A>): Fx<A> =
     Fx.asyncF(fa)
 
@@ -312,6 +340,9 @@ interface FxConcurrent : Concurrent<ForFx>, FxAsync {
 
   override fun <A> asyncF(k: ProcF<ForFx, A>): Fx<A> =
     Fx.asyncF(k)
+
+  override fun <A> async(fa: Proc<A>): Fx<A> =
+    Fx.async(fa)
 }
 
 @extension
@@ -359,6 +390,6 @@ internal fun <A> FxFiber(promise: UnsafePromise<A>, conn: KindConnection<ForFx>)
   return Fiber(join, conn.cancel())
 }
 
-fun main() {
-  unsafe { Fx.runBlocking(program) }
-}
+//fun main() {
+//  unsafe { Fx.runBlocking(program) }
+//}
