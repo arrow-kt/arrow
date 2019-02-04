@@ -97,7 +97,17 @@ class Fx<A>(internal val fa: suspend () -> A) : FxOf<A> {
     use: (A) -> FxOf<B>
   ): Fx<B> = Fx {
     val a = invoke()
-    val b = use(a).fix().foldContinuation { e ->
+
+    val fxB: Fx<B> = try {
+      use(a).fix()
+    } catch (e: Throwable) {
+      release(a, ExitCase.Error(e)).fix().foldContinuation { e2 ->
+        throw Platform.composeErrors(e, e2)
+      }
+      throw e
+    }
+
+    val b = fxB.foldContinuation { e ->
       when (e) {
         is CancellationException -> release(a, ExitCase.Canceled).fix().foldContinuation { e2 ->
           throw Platform.composeErrors(e, e2)
@@ -327,6 +337,7 @@ interface FxConcurrent : Concurrent<ForFx>, FxAsync {
           { promise.complete(it.right()) }
         )
       })
+
       FxFiber(promise, conn)
     }
 
