@@ -362,7 +362,7 @@ interface Concurrent<F> : Async<F> {
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val result = parMapN(Dispatchers.Default,
+     *   val result = Dispatchers.Default.parMapN(
    *     delay { "First one is on ${Thread.currentThread().name}" },
    *     delay { "Second one is on ${Thread.currentThread().name}" }
    *   ) { a, b ->
