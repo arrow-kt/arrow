@@ -56,10 +56,10 @@ class MVarTest : UnitSpec() {
         binding {
           val av = mvar.empty<Int>().bind()
 
-          val f1 = av.take().startF(Dispatchers.Default).bind()
+          val f1 = av.take().startFiber(Dispatchers.Default).bind()
           av.put(10).bind()
 
-          val f2 = av.take().startF(Dispatchers.Default).bind()
+          val f2 = av.take().startFiber(Dispatchers.Default).bind()
           av.put(20).bind()
 
           val aa = f1.join().bind()
@@ -73,9 +73,9 @@ class MVarTest : UnitSpec() {
         binding {
           val av = mvar.empty<Int>().bind()
 
-          val f1 = av.put(10).startF(Dispatchers.Default).bind()
-          val f2 = av.put(20).startF(Dispatchers.Default).bind()
-          val f3 = av.put(30).startF(Dispatchers.Default).bind()
+          val f1 = av.put(10).startFiber(Dispatchers.Default).bind()
+          val f2 = av.put(20).startFiber(Dispatchers.Default).bind()
+          val f3 = av.put(30).startFiber(Dispatchers.Default).bind()
 
           val aa = av.take().bind()
           val bb = av.take().bind()
@@ -93,9 +93,9 @@ class MVarTest : UnitSpec() {
         binding {
           val av = mvar.empty<Int>().bind()
 
-          val f1 = av.take().startF(Dispatchers.Default).bind()
-          val f2 = av.take().startF(Dispatchers.Default).bind()
-          val f3 = av.take().startF(Dispatchers.Default).bind()
+          val f1 = av.take().startFiber(Dispatchers.Default).bind()
+          val f2 = av.take().startFiber(Dispatchers.Default).bind()
+          val f3 = av.take().startFiber(Dispatchers.Default).bind()
 
           av.put(10).bind()
           av.put(20).bind()

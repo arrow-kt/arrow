@@ -6,7 +6,7 @@ import arrow.typeclasses.MonadError
 
 interface MonadErrorSyntax<F, E> : MonadSyntax<F>, ApplicativeErrorSyntax<F, E>,MonadError<F, E> {
 
-  suspend fun <A> ensure(fa: suspend () -> A, error: () -> E, predicate: (A) -> Boolean): A =
-    run<Monad<F>, Kind<F, A>> { fa.liftM().ensure(error, predicate) }.bind()
+  fun <A> ensure(fa: suspend () -> A, error: () -> E, predicate: (A) -> Boolean): Kind<F, A> =
+    run<Monad<F>, Kind<F, A>> { fa.effect().ensure(error, predicate) }
 
 }

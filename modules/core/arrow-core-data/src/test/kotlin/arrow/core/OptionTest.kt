@@ -144,7 +144,7 @@ class OptionTest : UnitSpec() {
       suspend fun sideEffect(): Int =
         1
       fx {
-        val (result) = f { sideEffect() }
+        val (result) = effect { sideEffect() }
         result
       } shouldBe Some(1)
     }
@@ -154,7 +154,7 @@ class OptionTest : UnitSpec() {
         throw Throwable()
       shouldThrow<Throwable> {
         fx {
-          val (result) = f { sideEffect() }
+          val (result) = effect { sideEffect() }
           result
         }
       }

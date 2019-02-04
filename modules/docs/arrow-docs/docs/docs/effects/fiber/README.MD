@@ -26,9 +26,9 @@ fun <A, B, C> parallelMap(first: IO<A>,
                      second: IO<B>,
                      f: (A, B) -> C): IO<C> =
   fx {
-    val (fiberOne: Fiber<ForIO, A>) = first.startF(Default)
-    val (fiberTwo: Fiber<ForIO, B>) = second.startF(Default)
-    f(fiberOne.join.bind(), fiberTwo.join.bind())
+    val (fiberOne: Fiber<ForIO, A>) = Default.startfiber(first)
+    val (fiberTwo: Fiber<ForIO, B>) = Default.startFiber(second)
+    f(!fiberOne.join, !fiberTwo.join)
   }
 
 val first = IO.sleep(5000).map {
@@ -57,8 +57,8 @@ which allows us to register an operation to run on cancelation, error or complet
 fun <A, B, C> parallelMap2(first: IO<A>,
                           second: IO<B>,
                           f: (A, B) -> C): IO<C> =
-      first.startF(Default).bracket(use = { (joinA, _) ->
-          second.startF(Default).bracket(use = { (joinB, _) ->
+      Default.startFiber(first).bracket(use = { (joinA, _) ->
+          Default.startFiber(second).bracket(use = { (joinB, _) ->
             joinA.flatMap { a ->
               joinB.map { b -> f(a, b) }
             }

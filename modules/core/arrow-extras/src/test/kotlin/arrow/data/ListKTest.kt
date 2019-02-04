@@ -41,9 +41,7 @@ class ListKTest : UnitSpec() {
     )
 
     "List exports a commutative Fx instance" {
-      val ef1 = suspend { 1 }
-      val ef2 = suspend { 2 }
-      fx(ef1, ef2, ::identity) shouldBe listOf(1 toT 2)
+      fx(listOf(1), listOf(2), ::identity) shouldBe listOf(1 toT 2)
     }
 
   }

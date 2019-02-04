@@ -172,6 +172,6 @@ interface EitherHash<L, R> : Hash<Either<L, R>>, EitherEq<L, R> {
 }
 
 @extension
-interface EitherFx<A> : Fx<EitherPartialOf<A>> {
-  override fun monad(): Monad<EitherPartialOf<A>> = Either.monad()
+interface EitherFx<L> : Fx<EitherPartialOf<L>> {
+  override fun monad(): Monad<EitherPartialOf<L>> = Either.monad()
 }
