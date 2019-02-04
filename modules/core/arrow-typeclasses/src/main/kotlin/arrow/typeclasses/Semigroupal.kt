@@ -1,7 +1,6 @@
 package arrow.typeclasses
 
 import arrow.Kind
-import arrow.core.Either
 import arrow.core.Tuple2
 
 /**
@@ -10,12 +9,7 @@ import arrow.core.Tuple2
 interface Semigroupal<F> {
 
     /**
-     * Additively combine two F<A> values
+     * Multiplicatively combine F<A> and F<B> into F<Tuple2<A, B>>
      */
-    fun <A, B> Kind<F, A>.combineAddition(y: Kind<F, B>): Kind<F, Either<A, B>>
-
-    /**
-     * Multiplicatively combine two F<A> values
-     */
-    fun <A, B> Kind<F, A>.combineMultiplicate(y: Kind<F, B>): Kind<F, Tuple2<A, B>>
+    fun <A, B> Kind<F, A>.product(y: Kind<F, B>): Kind<F, Tuple2<A, B>>
 }
