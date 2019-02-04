@@ -6,6 +6,7 @@ import arrow.core.left
 import arrow.core.right
 import arrow.effects.KindConnection
 import arrow.effects.internal.Platform
+import arrow.effects.internal.UnsafePromise
 import arrow.effects.internal.asyncContinuation
 import arrow.effects.typeclasses.*
 import arrow.effects.typeclasses.suspended.fx.dispatchers.dispatchers
@@ -288,9 +289,18 @@ interface FxConcurrent : Concurrent<ForFx>, FxAsync {
   override fun <A> asyncF(fa: FxProcF<A>): Fx<A> =
     Fx.asyncF(fa)
 
-  override fun <A> CoroutineContext.startFiber(kind: FxOf<A>): Fx<Fiber<ForFx, A>> {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-  }
+  override fun <A> CoroutineContext.startFiber(fa: FxOf<A>): Fx<Fiber<ForFx, A>> =
+    Fx {
+      val promise = UnsafePromise<A>()
+      val conn = FxConnection()
+      fa.fix().fa.startCoroutine(asyncContinuation(this@startFiber) { either ->
+        either.fold(
+          { promise.complete(it.left()) },
+          { promise.complete(it.right()) }
+        )
+      })
+      FxFiber(promise, conn)
+    }
 
   override fun <A, B> CoroutineContext.racePair(fa: FxOf<A>, fb: FxOf<B>): Fx<RacePair<ForFx, A, B>> {
     TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
@@ -335,6 +345,19 @@ private fun <A> Fx<A>.foldContinuation(
 
 fun FxConnection(): KindConnection<ForFx> =
   KindConnection(object : FxMonadDefer {}) { it.fix().foldContinuation { e -> throw e } }
+
+internal fun <A> FxFiber(promise: UnsafePromise<A>, conn: KindConnection<ForFx>): Fiber<ForFx, A> {
+  val join: Fx<A> = Fx.async { conn2, cb ->
+    conn2.push(Fx { promise.remove(cb) })
+    conn.push(conn2.cancel())
+    promise.get { a ->
+      cb(a)
+      conn2.pop()
+      conn.pop()
+    }
+  }
+  return Fiber(join, conn.cancel())
+}
 
 fun main() {
   unsafe { Fx.runBlocking(program) }
