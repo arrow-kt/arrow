@@ -1,9 +1,7 @@
 package arrow.effects.typeclasses.suspended
 
 import arrow.Kind
-import arrow.core.Either
-import arrow.core.left
-import arrow.core.right
+import arrow.core.*
 import arrow.effects.KindConnection
 import arrow.effects.internal.Platform
 import arrow.effects.internal.UnsafePromise
@@ -16,6 +14,7 @@ import arrow.typeclasses.Continuation
 import arrow.unsafe
 import java.util.concurrent.CancellationException
 import java.util.concurrent.ForkJoinPool
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.*
 
@@ -341,9 +340,8 @@ interface FxConcurrent : Concurrent<ForFx>, FxAsync {
       FxFiber(promise, conn)
     }
 
-  override fun <A, B> CoroutineContext.racePair(fa: FxOf<A>, fb: FxOf<B>): Fx<RacePair<ForFx, A, B>> {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-  }
+  override fun <A, B> CoroutineContext.racePair(fa: FxOf<A>, fb: FxOf<B>): Fx<RacePair<ForFx, A, B>> =
+    Fx.racePair(this, fa, fb)
 
   override fun <A, B, C> CoroutineContext.raceTriple(fa: FxOf<A>, fb: FxOf<B>, fc: FxOf<C>): Fx<RaceTriple<ForFx, A, B, C>> {
     TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
@@ -404,3 +402,67 @@ internal fun <A> FxFiber(promise: UnsafePromise<A>, conn: KindConnection<ForFx>)
 //fun main() {
 //  unsafe { Fx.runBlocking(program) }
 //}
+
+fun <A, B> Fx.Companion.racePair(ctx: CoroutineContext, fa: FxOf<A>, fb: FxOf<B>): Fx<Either<Tuple2<A, Fiber<ForFx, B>>, Tuple2<Fiber<ForFx, A>, B>>> =
+  Fx.async { conn, cb ->
+    val active = AtomicBoolean(true)
+    val upstreamCancelToken = Fx.defer { if (conn.isCanceled()) Fx { Unit } else conn.cancel() }
+
+    val connA = FxConnection()
+    connA.push(upstreamCancelToken)
+    val promiseA = UnsafePromise<A>()
+
+    val connB = FxConnection()
+    connB.push(upstreamCancelToken)
+    val promiseB = UnsafePromise<B>()
+
+    conn.pushPair(connA, connB)
+
+    fa.fix().fa.startCoroutine(asyncContinuation(ctx) { either ->
+      either.fold({ error ->
+        if (active.getAndSet(false)) { //if an error finishes first, stop the race.
+          connB.cancel().fix().fa.startCoroutine(Continuation(EmptyCoroutineContext) { result ->
+            conn.pop()
+            result.fold(
+              onSuccess = { cb(Left(error)) },
+              onFailure = { cb(Left(Platform.composeErrors(error, it))) }
+            )
+          })
+        } else {
+          promiseA.complete(Left(error))
+        }
+      }, { a ->
+        if (active.getAndSet(false)) {
+          conn.pop()
+          cb(Right(Left(Tuple2(a, FxFiber(promiseB, connB)))))
+        } else {
+          promiseA.complete(Right(a))
+        }
+      })
+    })
+
+    fb.fix().fa.startCoroutine(asyncContinuation(ctx) { either ->
+      either.fold({ error ->
+        if (active.getAndSet(false)) { //if an error finishes first, stop the race.
+          connA.cancel().fix().fa.startCoroutine(Continuation(EmptyCoroutineContext) { result ->
+            conn.pop()
+            result.fold(
+              onSuccess = { cb(Left(error)) },
+              onFailure = { cb(Left(Platform.composeErrors(error, it))) }
+            )
+          })
+        } else {
+          promiseB.complete(Left(error))
+        }
+      }, { b ->
+        if (active.getAndSet(false)) {
+          conn.pop()
+          cb(Right(Right(Tuple2(FxFiber(promiseA, connA), b))))
+        } else {
+          promiseB.complete(Right(b))
+        }
+      })
+    })
+  }
+
+
