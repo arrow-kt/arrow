@@ -250,25 +250,6 @@ class EffectsSuspendDSLTests : UnitSpec() {
       } shouldBe const
     }
 
-    "racePair" {
-      fxTest {
-        fx {
-          val race1 =
-            !NonBlocking.racePair(
-              effect { 1 },
-              effect { Thread.sleep(100); 2 }
-            )
-          val race2 =
-            !NonBlocking.racePair(
-              effect { Thread.sleep(100); 1 },
-              effect { 2 }
-            )
-          race1.fold({ true }, { false }) &&
-            race2.fold({ false }, { true })
-        }
-      } shouldBe true
-    }
-
     "List.flatTraverse syntax" {
       fxTest {
         fx {
