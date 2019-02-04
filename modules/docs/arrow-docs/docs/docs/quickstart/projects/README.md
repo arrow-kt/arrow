@@ -38,6 +38,8 @@ Note: This section keeps on growing! Keep an eye on it from time to time.
 
 [Karumi/play-framework-kotlin](https://github.com/Karumi/play-framework-kotlin): A Play Framework project using Kotlin and Arrow.
 
+[josdirksen/arrow-flux](https://github.com/josdirksen/arrow-flux): This project contains a sample service using Spring WebFlux as the web framework, Arrow to add some functional components and uses a reactive mongoDB driver, to make the complete flow reactive.
+
 #### Katas
 
 [pedrovgs/KotlinKatas](https://github.com/pedrovgs/KotlinKatas): Kotlin training repository used to learn Kotlin and Functional Programming by solving some common katas using just purely functional programming powered by Arrow.
