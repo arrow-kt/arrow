@@ -2,8 +2,10 @@ package arrow.effects
 
 import arrow.effects.typeclasses.suspended.*
 import arrow.effects.typeclasses.suspended.fx.async.async
+import arrow.effects.typeclasses.suspended.fx.concurrent.concurrent
 import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
+import arrow.test.laws.ConcurrentLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import kotlinx.coroutines.runBlocking
@@ -36,7 +38,7 @@ class FxTest : UnitSpec() {
   }
 
   init {
-    testLaws(AsyncLaws.laws(Fx.async(), EQ(), EQ()))
+    testLaws(ConcurrentLaws.laws(Fx.concurrent(), EQ(), EQ(), EQ()))
   }
 
 }
