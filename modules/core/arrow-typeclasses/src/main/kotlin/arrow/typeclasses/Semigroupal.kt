@@ -11,5 +11,5 @@ interface Semigroupal<F> {
     /**
      * Multiplicatively combine F<A> and F<B> into F<Tuple2<A, B>>
      */
-    fun <A, B> Kind<F, A>.product(y: Kind<F, B>): Kind<F, Tuple2<A, B>>
+    fun <A, B> Kind<F, A>.product(fb: Kind<F, B>): Kind<F, Tuple2<A, B>>
 }
