@@ -12,22 +12,20 @@ interface Fx<F> {
   fun monad(): Monad<F>
 
   fun <A, B, C> fx(
-    fa: suspend () -> A,
-    fb: suspend () -> B,
+    fa: Kind<F, A>,
+    fb: Kind<F, B>,
     f: (Tuple2<A, B>) -> C
   ): Kind<F, C> =
-    monad().fx {
-      map(fa.liftM(), fb.liftM(), f).bind()
-    }
+    monad().run { map(fa, fb, f) }
 
   fun <A, B, C, D> fx(
-    fa: suspend () -> A,
-    fb: suspend () -> B,
-    fc: suspend () -> C,
+    fa: Kind<F, A>,
+    fb: Kind<F, B>,
+    fc: Kind<F, C>,
     f: (Tuple3<A, B, C>) -> D
   ): Kind<F, D> =
-    monad().fx {
-      map(fa.liftM(), fb.liftM(), fc.liftM(), f).bind()
+    monad().run {
+      map(fa, fb, fc, f)
     }
 
   suspend fun <A> unsafe.fx(

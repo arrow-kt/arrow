@@ -2,6 +2,7 @@ package arrow.effects
 
 import arrow.core.*
 import arrow.effects.IO.Companion.just
+import arrow.effects.extensions.concurrent
 import arrow.effects.extensions.io.async.async
 import arrow.effects.extensions.io.concurrent.concurrent
 import arrow.effects.extensions.io.concurrent.parMapN
@@ -244,7 +245,7 @@ class IOTest : UnitSpec() {
         }
 
       val result =
-        parMapN(newSingleThreadContext("all"),
+        newSingleThreadContext("all").parMapN(
           makePar(6), makePar(3), makePar(2), makePar(4), makePar(1), makePar(5))
         { six, tree, two, four, one, five -> listOf(six, tree, two, four, one, five) }
           .unsafeRunSync()
@@ -270,7 +271,7 @@ class IOTest : UnitSpec() {
         }.order()
 
       val result =
-        parMapN(newSingleThreadContext("all"),
+        newSingleThreadContext("all").parMapN(
           makePar(6), IO.just(1L).order(), makePar(4), IO.defer { IO.just(2L) }.order(), makePar(5), IO { 3L }.order())
         { six, one, four, two, five, three -> listOf(six, one, four, two, five, three) }
           .unsafeRunSync()
@@ -288,7 +289,7 @@ class IOTest : UnitSpec() {
         }
 
       val result =
-        parMapN(newSingleThreadContext("all"),
+        newSingleThreadContext("all").parMapN(
           makePar(6), IO.just(1L), makePar(4), IO.defer { IO.just(2L) }, makePar(5), IO { 3L })
         { _, _, _, _, _, _ ->
           Thread.currentThread().name
@@ -299,7 +300,7 @@ class IOTest : UnitSpec() {
 
     "parallel IO#defer, IO#suspend and IO#async are run in the expected CoroutineContext" {
       val result =
-        parMapN(newSingleThreadContext("here"),
+        newSingleThreadContext("here").parMapN(
           IO { Thread.currentThread().name },
           IO.defer { IO.just(Thread.currentThread().name) },
           IO.async<String> { _, cb -> cb(Thread.currentThread().name.right()) },

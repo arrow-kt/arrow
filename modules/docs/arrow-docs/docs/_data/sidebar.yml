@@ -22,6 +22,12 @@ options:
       - title: Getting Started
         url: /docs/effects/fx/
 
+      - title: Asynchronous & Concurrent Programming
+        url: /docs/effects/fx/async/
+
+      - title: Polymorphism. One Program multiple runtimes
+        url: /docs/effects/fx/polymorphism/
+
   - title: API Docs
 
     nested_options:

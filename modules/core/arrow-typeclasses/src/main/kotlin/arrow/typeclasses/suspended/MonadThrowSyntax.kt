@@ -6,7 +6,7 @@ import arrow.typeclasses.MonadThrow
 import kotlin.coroutines.startCoroutine
 
 interface MonadThrowSyntax<F> : MonadErrorSyntax<F, Throwable>, MonadThrow<F> {
-  override fun <A> f(fa: suspend () -> A): Kind<F, A> =
+  override fun <A> effect(fa: suspend () -> A): Kind<F, A> =
     BlockingErrorContinuation<F, A>(this).apply {
       fa.startCoroutine(this)
     }.retVal

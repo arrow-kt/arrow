@@ -128,7 +128,7 @@ class SemaphoreTest : UnitSpec() {
       "$label - offsetting acquires/releases - acquires parallel with releases" {
         val permits: List<Long> = listOf(1, 0, 20, 4, 0, 5, 2, 1, 1, 3)
         semaphore(0).flatMap { s ->
-          parMapN(Dispatchers.Default,
+          Dispatchers.Default.parMapN(
             permits.traverse(IO.applicative()) { s.acquireN(it) }.unit(),
             permits.reversed().traverse(IO.applicative()) { s.releaseN(it) }.unit()
           ) { _, _ -> Unit }

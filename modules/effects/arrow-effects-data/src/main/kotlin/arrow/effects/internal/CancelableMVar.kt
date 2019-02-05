@@ -138,7 +138,7 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, priva
         } else {
           val (ax, notify) = current.listeners.values.first()
           val xs = current.listeners.toList().drop(1)
-          if (state.compareAndSet(current, State.WaitForTake(ax, xs.toMap()))) delay { notify(rightUnit) }.startF(EmptyCoroutineContext).map { Some(current.value) }
+          if (state.compareAndSet(current, State.WaitForTake(ax, xs.toMap()))) EmptyCoroutineContext.startFiber(delay { notify(rightUnit) }).map { Some(current.value) }
           else unsafeTryTake()
         }
       }
@@ -159,7 +159,7 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, priva
           val (ax, notify) = current.listeners.values.first()
           val xs = current.listeners.toList().drop(0)
           if (state.compareAndSet(current, State.WaitForTake(ax, xs.toMap()))) {
-            delay { notify(rightUnit) }.startF(EmptyCoroutineContext).map {
+            EmptyCoroutineContext.startFiber(delay { notify(rightUnit) }).map {
               onTake(Right(current.value))
               unit()
             }
@@ -213,7 +213,7 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, priva
   private fun callPutAndAllReaders(a: A, put: ((Either<Nothing, A>) -> Unit)?, reads: Map<Token, (Either<Nothing, A>) -> Unit>): Kind<F, Boolean> {
     val value = Right(a)
     return reads.values.callAll(value).flatMap {
-      if (put != null) delay { put(value) }.startF(EmptyCoroutineContext).map { true }
+      if (put != null) EmptyCoroutineContext.startFiber(delay { put(value) }).map { true }
       else just(true)
     }
   }
@@ -221,7 +221,7 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, priva
   // For streaming a value to a whole `reads` collection
   private fun Iterable<(Either<Nothing, A>) -> Unit>.callAll(value: Either<Nothing, A>): Kind<F, Unit> =
     fold(null as Kind<F, Fiber<F, Unit>>?) { acc, cb ->
-      val task = delay { cb(value) }.startF(EmptyCoroutineContext)
+      val task = EmptyCoroutineContext.startFiber(delay { cb(value) })
       acc?.flatMap { task } ?: task
     }?.map(mapUnit) ?: unit()
 
