@@ -149,18 +149,6 @@ class OptionTest : UnitSpec() {
 
     }
 
-    "Some(1) x None should be None" {
-      Option.semigroupal().run {
-        A.product(none).shouldBe(none)
-      }
-    }
-
-    "None x Some(1) should be None" {
-      Option.semigroupal().run {
-        none.product(A).shouldBe(none)
-      }
-    }
-
     "fx can turn effects into pure kinded values" {
       suspend fun sideEffect(): Int =
         1
