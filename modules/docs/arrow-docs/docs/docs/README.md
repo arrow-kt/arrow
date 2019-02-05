@@ -89,6 +89,7 @@ dependencies {
     compile "io.arrow-kt:arrow-mtl:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects-extensions:$arrow_version" //optional
+    compile "io.arrow-kt:arrow-effects-io-extensions:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects-rx2:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects-rx2-extensions:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects-reactor:$arrow_version" //optional
