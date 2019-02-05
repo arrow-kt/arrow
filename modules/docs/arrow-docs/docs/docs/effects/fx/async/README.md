@@ -1,6 +1,6 @@
 ---
 layout: docs
-title: Arrow Fx : Asynchronous & Concurrent Programming
+title: Arrow Fx - Asynchronous & Concurrent Programming
 permalink: /docs/effects/fx/async/
 ---
 
