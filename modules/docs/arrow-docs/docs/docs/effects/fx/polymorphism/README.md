@@ -1,6 +1,6 @@
 ---
 layout: docs
-title: Arrow Fx : Polymorphism. One Program multiple runtimes
+title: Arrow Fx - Polymorphism. One Program multiple runtimes
 permalink: /docs/effects/fx/polymorphism/
 ---
 
