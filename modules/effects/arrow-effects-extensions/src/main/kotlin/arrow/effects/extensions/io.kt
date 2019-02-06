@@ -10,7 +10,7 @@ import arrow.unsafe
 import kotlin.coroutines.CoroutineContext
 import arrow.effects.ap as ioAp
 import arrow.effects.handleErrorWith as ioHandleErrorWith
-import arrow.effects.startF as ioStart
+import arrow.effects.startFiber as ioStart
 
 @extension
 interface IOFunctor : Functor<ForIO> {
@@ -119,8 +119,8 @@ interface IOAsync : Async<ForIO>, IOMonadDefer {
 // FIXME default @extension are temporarily declared in arrow-effects-io-extensions due to multiplatform needs
 interface IOConcurrent : Concurrent<ForIO>, IOAsync {
 
-  override fun <A> IOOf<A>.startF(ctx: CoroutineContext): IO<Fiber<ForIO, A>> =
-    ioStart(ctx)
+  override fun <A> CoroutineContext.startFiber(fa: IOOf<A>): IO<Fiber<ForIO, A>> =
+    fa.ioStart(this)
 
   override fun <A> asyncF(fa: ConnectedProcF<ForIO, A>): IO<A> =
     IO.asyncF(fa)
@@ -134,11 +134,11 @@ interface IOConcurrent : Concurrent<ForIO>, IOAsync {
   override fun <A> async(fa: Proc<A>): IO<A> =
     IO.async { _, cb -> fa(cb) }
 
-  override fun <A, B> racePair(ctx: CoroutineContext, fa: IOOf<A>, fb: IOOf<B>): IO<RacePair<ForIO, A, B>> =
-    IO.racePair(ctx, fa, fb)
+  override fun <A, B> CoroutineContext.racePair(fa: Kind<ForIO, A>, fb: Kind<ForIO, B>): IO<RacePair<ForIO, A, B>> =
+    IO.racePair(this, fa, fb)
 
-  override fun <A, B, C> raceTriple(ctx: CoroutineContext, fa: IOOf<A>, fb: IOOf<B>, fc: IOOf<C>): IO<RaceTriple<ForIO, A, B, C>> =
-    IO.raceTriple(ctx, fa, fb, fc)
+  override fun <A, B, C> CoroutineContext.raceTriple(fa: Kind<ForIO, A>, fb: Kind<ForIO, B>, fc: Kind<ForIO, C>): IO<RaceTriple<ForIO, A, B, C>> =
+    IO.raceTriple(this, fa, fb, fc)
 
 }
 

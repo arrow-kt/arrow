@@ -11,24 +11,18 @@ import kotlin.coroutines.startCoroutine
 
 interface AsyncSyntax<F> : MonadDeferSyntax<F>, Async<F> {
 
-  override fun <A> f(fa: suspend () -> A): Kind<F, A> =
+  override fun <A> effect(fa: suspend () -> A): Kind<F, A> =
     super.async { cb ->
       AsyncContinuation(cb).apply {
         fa.startCoroutine(this)
       }
     }
 
-  private suspend fun <A> asyncOp(fb: Async<F>.() -> Kind<F, A>): A =
-    run<Async<F>, Kind<F, A>> { fb(this) }.bind()
+  private fun <A> asyncOp(fb: Async<F>.() -> Kind<F, A>): Kind<F, A> =
+    run<Async<F>, Kind<F, A>> { fb(this) }
 
-  suspend fun <A> async(unit: Unit = Unit, fa: suspend ((Either<Throwable, A>) -> Unit) -> Unit): A =
-    asyncOp { asyncF(fa.flatLiftM()) }
-
-  suspend fun <A> CoroutineContext.defer(f: suspend () -> A): A =
-    asyncOp { defer(this@defer) { f.liftM() } }
-
-  suspend fun continueOn(ctx: CoroutineContext): Unit =
-    asyncOp { ctx.shift() }
+  fun <A> CoroutineContext.effect(f: suspend () -> A): Kind<F, A> =
+    asyncOp { defer(this@effect) { f.effect() } }
 
 }
 
