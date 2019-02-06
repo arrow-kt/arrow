@@ -49,6 +49,7 @@ fun generateCoproducts(destination: File): Unit {
                     addCoproductClassDeclaration(generics)
                     addCoproductOfConstructors(generics)
                     addCopExtensionConstructors(generics)
+                    addExtensionConstructors(generics)
                     addSelectFunctions(generics)
                     addFoldFunction(generics)
                 }
@@ -68,7 +69,7 @@ private fun FileSpec.Builder.addCoproductClassDeclaration(generics: List<String>
     for (generic in generics) {
         addType(
                 TypeSpec.classBuilder(genericsToClassNames[generic]!!)
-                        .addModifiers(KModifier.INTERNAL, KModifier.DATA)
+                        .addModifiers(KModifier.DATA)
                         .addTypeVariables(generics.toTypeParameters())
                         .superclass(parameterizedCoproductNClassName(generics))
                         .addProperty(
@@ -106,14 +107,34 @@ private fun FileSpec.Builder.addCoproductOfConstructors(generics: List<String>):
 private fun FileSpec.Builder.addCopExtensionConstructors(generics: List<String>): Unit {
     for (generic in generics) {
         val additionalParameterCount = generics.indexOf(generic)
+        val typeParameters = generics.joinToString(separator = ", ")
 
         addFunction(
                 FunSpec.builder("cop")
+                        .addAnnotation(
+                                AnnotationSpec.builder(Deprecated::class)
+                                        .addMember("\t\t\nmessage = \"This has issues with type inference, use .${generic.toLowerCase()}() instead\",\n" +
+                                                "        replaceWith = ReplaceWith(\"this.${generic.toLowerCase()}<$typeParameters>()\")\n")
+                                        .build()
+                        )
                         .addAnnotations(additionalParameterSuppressAnnotation(additionalParameterCount))
                         .receiver(TypeVariableName(generic))
                         .addTypeVariables(generics.toTypeParameters())
                         .addParameters(additionalParameterSpecs(additionalParameterCount))
-                        .addStatement("return coproductOf<${generics.joinToString(separator = ", ")}>(this)")
+                        .addStatement("return coproductOf<$typeParameters>(this)")
+                        .returns(parameterizedCoproductNClassName(generics))
+                        .build()
+        )
+    }
+}
+
+private fun FileSpec.Builder.addExtensionConstructors(generics: List<String>): Unit {
+    for (generic in generics) {
+        addFunction(
+                FunSpec.builder(generic.toLowerCase())
+                        .receiver(TypeVariableName(generic))
+                        .addTypeVariables(generics.toTypeParameters())
+                        .addStatement("return ${genericsToClassNames[generic]}(this)")
                         .returns(parameterizedCoproductNClassName(generics))
                         .build()
         )

@@ -1,21 +1,16 @@
 package arrow.generic
 
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.Some
-import arrow.core.some
+import arrow.core.*
 import arrow.generic.coproduct2.Coproduct2
 import arrow.generic.coproduct2.cop
 import arrow.generic.coproduct2.coproductOf
 import arrow.generic.coproduct2.fold
 import arrow.generic.coproduct2.select
 import arrow.generic.coproduct22.Coproduct22
-import arrow.generic.coproduct3.cop
-import arrow.generic.coproduct3.fold
-import arrow.generic.coproduct3.select
+import arrow.generic.coproduct3.*
 import arrow.test.UnitSpec
-import io.kotlintest.shouldBe
 import io.kotlintest.runner.junit4.KotlinTestRunner
+import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
 
 @RunWith(KotlinTestRunner::class)
@@ -24,8 +19,13 @@ class CoproductTest : UnitSpec() {
     init {
 
         "Coproducts should be generated up to 22" {
-            class Proof2(f: Coproduct2<Unit, Unit>) { val x = f }
-            class Proof22(f: Coproduct22<Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit>) { val x = f }
+            class Proof2(f: Coproduct2<Unit, Unit>) {
+                val x = f
+            }
+
+            class Proof22(f: Coproduct22<Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit>) {
+                val x = f
+            }
         }
 
         "select should return None if value isn't correct type" {
@@ -81,6 +81,38 @@ class CoproductTest : UnitSpec() {
                     { "Second" },
                     { "Third" }
             ) shouldBe "Third"
+        }
+
+        "cop replacement functions are equivalent" {
+            val firstValue = "String"
+            val secondValue = 100L
+            val thirdValue = none<String>()
+
+            firstValue.cop<String, Long, Option<String>>() shouldBe firstValue.a<String, Long, Option<String>>()
+            secondValue.cop<String, Long, Option<String>>() shouldBe secondValue.b<String, Long, Option<String>>()
+            thirdValue.cop<String, Long, Option<String>>() shouldBe thirdValue.c<String, Long, Option<String>>()
+        }
+
+        "types can be inferred with the cop replacement functions" {
+            fun typeInferenceTest(input: String?): Coproduct3<String, Int, Option<String>> {
+                return when {
+                    input == null -> none<String>().c()
+                    input.length > 100 -> input.length.b()
+                    else -> input.a()
+                }
+            }
+
+            typeInferenceTest(null) shouldBe Third<String, Int, Option<String>>(none())
+        }
+
+        "Coproduct data classes should be available" {
+            val firstValue = "String"
+            val secondValue = 100L
+            val thirdValue = none<String>()
+
+            First<String, Long, Option<String>>(firstValue) shouldBe firstValue.a<String, Long, Option<String>>()
+            Second<String, Long, Option<String>>(secondValue) shouldBe secondValue.b<String, Long, Option<String>>()
+            Third<String, Long, Option<String>>(thirdValue) shouldBe thirdValue.c<String, Long, Option<String>>()
         }
     }
 }
