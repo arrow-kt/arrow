@@ -25,18 +25,6 @@ import arrow.documented
  *
  * Currently, [Semiring] instances are defined for all available number types.
  *
- * ```kotlin:ank:playground:extension
- * _imports_
- *
- * fun main(args: Array<String>) {
- *   val result =
- *   //sampleStart
- *   _extensionFactory_
- *   //sampleEnd
- *   println(result)
- * }
- * ```
- *
  * ### Examples
  *
  * Here a some examples:
