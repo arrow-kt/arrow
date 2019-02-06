@@ -72,24 +72,26 @@ import arrow.generic.coproduct3.coproductOf
 //error: type mismatch: inferred type is ServerError but String was expected
 ```
 
-##### cop
+##### extension constructors
 
 You might be saying "That's great and all but passing in values as parameters is so Java, I want something more Kotlin!". Well look no further, just like [Either]({{ '/docs/arrow/core/either' | relative_url }})'s `left()` and `right()` extension methods, Coproducts can be created with an extension method on any type:
 
 ```kotlin:ank
 import arrow.generic.*
-import arrow.generic.coproduct3.cop
+import arrow.generic.coproduct3.a
+import arrow.generic.coproduct3.b
 
-val apiResult = ServerError.cop<CommonServerError, RegistrationError, Registration>() //Returns Coproduct3<CommonServerError, RegistrationError, Registration>
+val apiResult = ServerError.a<CommonServerError, RegistrationError, Registration>() //Returns Coproduct3<CommonServerError, RegistrationError, Registration>
+val anotherResult = RegistrationError.b<CommonServerError, RegistrationError, Registration>() //Returns Coproduct3<CommonServerError, RegistrationError, Registration>
 ```
 
-All we have to do is provide the type parameters and we can make a Coproduct using the `cop` extension method. Just like `coproductOf`, if the type of the value isn't in the type parameters of the method call, it won't compile:
+All we have to do is provide the type parameters and we can make a Coproduct using the extension methods. Just like `coproductOf`, if the type of the value isn't in the type parameters of the method call, or it's not in the correct type parameter index, it won't compile:
 
 ```kotlin:ank
 import arrow.generic.*
-import arrow.generic.coproduct3.cop
+import arrow.generic.coproduct3.a
 
-//val apiResult = ServerError.cop<String, RegistrationError, Registration>()
+//val apiResult = ServerError.a<String, RegistrationError, Registration>()
 //error: type mismatch: inferred type is ServerError but String was expected
 ```
 
