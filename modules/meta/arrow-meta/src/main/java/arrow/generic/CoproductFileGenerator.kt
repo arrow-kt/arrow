@@ -131,7 +131,7 @@ private fun FileSpec.Builder.addCopExtensionConstructors(generics: List<String>)
 private fun FileSpec.Builder.addExtensionConstructors(generics: List<String>): Unit {
     for (generic in generics) {
         addFunction(
-                FunSpec.builder(generic.toLowerCase())
+                FunSpec.builder(genericsToClassNames[generic]!!.toCamelCase())
                         .receiver(TypeVariableName(generic))
                         .addTypeVariables(generics.toTypeParameters())
                         .addStatement("return ${genericsToClassNames[generic]}(this)")
@@ -190,6 +190,14 @@ private fun FileSpec.Builder.addFoldFunction(generics: List<String>): Unit {
                     }
                     .build()
     )
+}
+
+private fun String.toCamelCase(): String {
+    return if (isEmpty()) {
+         ""
+    } else {
+        first().toLowerCase() + substring(1)
+    }
 }
 
 private fun List<String>.toTypeParameters(): List<TypeVariableName> = map { TypeVariableName(it) }

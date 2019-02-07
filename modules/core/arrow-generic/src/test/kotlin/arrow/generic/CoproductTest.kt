@@ -88,17 +88,17 @@ class CoproductTest : UnitSpec() {
             val secondValue = 100L
             val thirdValue = none<String>()
 
-            firstValue.cop<String, Long, Option<String>>() shouldBe firstValue.a<String, Long, Option<String>>()
-            secondValue.cop<String, Long, Option<String>>() shouldBe secondValue.b<String, Long, Option<String>>()
-            thirdValue.cop<String, Long, Option<String>>() shouldBe thirdValue.c<String, Long, Option<String>>()
+            firstValue.cop<String, Long, Option<String>>() shouldBe firstValue.first<String, Long, Option<String>>()
+            secondValue.cop<String, Long, Option<String>>() shouldBe secondValue.second<String, Long, Option<String>>()
+            thirdValue.cop<String, Long, Option<String>>() shouldBe thirdValue.third<String, Long, Option<String>>()
         }
 
         "types can be inferred with the cop replacement functions" {
             fun typeInferenceTest(input: String?): Coproduct3<String, Int, Option<String>> {
                 return when {
-                    input == null -> none<String>().c()
-                    input.length > 100 -> input.length.b()
-                    else -> input.a()
+                    input == null -> none<String>().third()
+                    input.length > 100 -> input.length.second()
+                    else -> input.first()
                 }
             }
 
@@ -110,9 +110,9 @@ class CoproductTest : UnitSpec() {
             val secondValue = 100L
             val thirdValue = none<String>()
 
-            First<String, Long, Option<String>>(firstValue) shouldBe firstValue.a<String, Long, Option<String>>()
-            Second<String, Long, Option<String>>(secondValue) shouldBe secondValue.b<String, Long, Option<String>>()
-            Third<String, Long, Option<String>>(thirdValue) shouldBe thirdValue.c<String, Long, Option<String>>()
+            First<String, Long, Option<String>>(firstValue) shouldBe firstValue.first<String, Long, Option<String>>()
+            Second<String, Long, Option<String>>(secondValue) shouldBe secondValue.second<String, Long, Option<String>>()
+            Third<String, Long, Option<String>>(thirdValue) shouldBe thirdValue.third<String, Long, Option<String>>()
         }
     }
 }
