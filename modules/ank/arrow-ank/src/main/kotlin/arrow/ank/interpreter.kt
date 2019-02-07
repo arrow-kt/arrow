@@ -208,7 +208,11 @@ fun <F> monadDeferInterpreter(MF: MonadDefer<F>): AnkOps<F> = object : AnkOps<F>
   override fun replaceAnkToLang(content: Sequence<String>, compiledSnippets: Sequence<Snippet>): Sequence<String> =
     sequenceOf(compiledSnippets.foldLeft(content.joinToString("\n")) { snippetContent, snippet ->
       snippet.result.fold(
-        { snippetContent.replace(snippet.fence, "{: data-executable='true'}\n\n```${snippet.lang}\n${snippet.code}\n```") },
+        {
+          if (snippet.isPlayground)
+            snippetContent.replace(snippet.fence, "{: data-executable='true'}\n\n```${snippet.lang}\n${snippet.code}\n```")
+          else
+            snippetContent.replace(snippet.fence, "```${snippet.lang}\n${snippet.code}\n```") },
         {
           when {
             // these are extensions declared in type classes that should be removed since the extension generator
