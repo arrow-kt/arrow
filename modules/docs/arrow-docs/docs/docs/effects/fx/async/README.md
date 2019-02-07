@@ -7,7 +7,7 @@ permalink: /docs/effects/fx/async/
 - [Asynchronous & Concurrent Programming](#asynchronous---concurrent-programming)
   * [Dispatchers and Contexts](#dispatchers-and-contexts)
   * [Fibers](#fibers)
-  * [Parallelization & Concurrency](#parallelization---concurrency)
+  * [Parallelization & Concurrency](#parallelization--concurrency)
     + [`parMapN`](#-parmapn-)
     + [`parTraverse`](#-partraverse-)
     + [`parSequence`](#-parsequence-)
