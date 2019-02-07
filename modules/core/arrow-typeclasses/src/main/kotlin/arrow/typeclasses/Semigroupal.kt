@@ -11,7 +11,7 @@ interface Semigroupal<F> {
     /**
      * Given a type [A], create an "identity" for a F<A> value.
      */
-    fun <A> id(): Kind<F, A>
+    fun <A> identity(): Kind<F, A>
 
     /**
      * Multiplicatively combine F<A> and F<B> into F<Tuple2<A, B>>

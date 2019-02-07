@@ -18,10 +18,10 @@ object SemigroupalLaws {
             bijection(af.product(bf).product(cf)).shouldBe(af.product(bf.product(cf)))
 
     private fun <F, B> Semigroupal<F>.semigroupalLeftIdentity(bf: Kind<F, B>): Unit =
-            id<B>().product(bf).shouldBe(id<B>())
+            identity<B>().product(bf).shouldBe(identity<B>())
 
 
     private fun <F, A> Semigroupal<F>.semigroupalRightIdentity(af: Kind<F, A>): Unit =
-            af.product(id<A>()).shouldBe(id<A>())
+            af.product(identity<A>()).shouldBe(identity<A>())
 
 }

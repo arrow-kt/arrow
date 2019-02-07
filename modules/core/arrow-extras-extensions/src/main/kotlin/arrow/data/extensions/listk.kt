@@ -128,7 +128,7 @@ interface ListKSemigroupK : SemigroupK<ForListK> {
 
 @extension
 interface ListKSemigroupal : Semigroupal<ForListK> {
-  override fun <A> id(): Kind<ForListK, A> = ListK.empty()
+  override fun <A> identity(): Kind<ForListK, A> = ListK.empty()
   override fun <A, B> Kind<ForListK, A>.product(fb: Kind<ForListK, B>): Kind<ForListK, Tuple2<A, B>> =
     fb.fix().ap(this.map { a:A -> { b: B -> Tuple2(a,b)} })
 }

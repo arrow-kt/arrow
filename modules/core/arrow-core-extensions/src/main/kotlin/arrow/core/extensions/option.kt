@@ -27,7 +27,7 @@ interface OptionSemigroup<A> : Semigroup<Option<A>> {
 
 @extension
 interface OptionSemigroupal : Semigroupal<ForOption> {
-  override fun <A> id(): Option<A> = Option.empty()
+  override fun <A> identity(): Option<A> = Option.empty()
   override fun <A, B> Kind<ForOption, A>.product(fb: Kind<ForOption, B>): Kind<ForOption, Tuple2<A, B>> =
     fb.fix().ap(this.map { a:A -> { b: B -> Tuple2(a,b)} })
 }
