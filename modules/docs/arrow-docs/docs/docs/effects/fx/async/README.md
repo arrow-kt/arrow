@@ -4,13 +4,13 @@ title: Arrow Fx - Asynchronous & Concurrent Programming
 permalink: /docs/effects/fx/async/
 ---
 
-- [Asynchronous & Concurrent Programming](#asynchronous---concurrent-programming)
+- [Asynchronous & Concurrent Programming](#asynchronous--concurrent-programming)
   * [Dispatchers and Contexts](#dispatchers-and-contexts)
   * [Fibers](#fibers)
-  * [Parallelization & Concurrency](#parallelization---concurrency)
-    + [`parMapN`](#-parmapn-)
-    + [`parTraverse`](#-partraverse-)
-    + [`parSequence`](#-parsequence-)
+  * [Parallelization & Concurrency](#parallelization--concurrency)
+    + [`parMapN`](#parmapn)
+    + [`parTraverse`](#partraverse)
+    + [`parSequence`](#parsequence)
   * [Cancellation](#cancellation)
   * [Arrow Fx vs KotlinX Coroutines](#arrow-fx-vs-kotlinx-coroutines)
   * [Integrating with third party libraries](#integrating-with-third-party-libraries)
