@@ -8,7 +8,8 @@ permalink: /docs/effects/fx/polymorphism/
   * [Creating polymorphic programs](#creating-polymorphic-programs)
   * [Fx for all data types](#fx-for-all-data-types)
   * [Arrow Fx vs Tagless Final](#arrow-fx-vs-tagless-final)
-    + [Good bye `Functor`, `Applicative` and `Monad`](#good-bye--functor----applicative--and--monad-)
+    + [Good bye `Functor`, `Applicative` and `Monad`](#good-bye-functor-applicative-and-monad)
+    + [Commutative monads](#non-commutative-monads)
 
 # Polymorphism. One Program multiple runtimes
 
@@ -159,6 +160,9 @@ The following combinators illustrate how the Functor hierarchy functions are poi
 | MonadDefer.defer    | `IO.defer { IO { 1 } }` | `effect { 1 }` |
 
 This is in general true for effectful data types that are non-commutative. 
+
+### Non-commutative monads
+
 Note that implicit CPS style with non-blocking direct binding has the disadvantage that for non-commutative monads where the order of effects matter you can't apply substitution based on referential transparency.
 
 Arrow Fx is aware of this but still allows users to use `fx` on non-commutative monads such as `List` providing safe `fx` builders that guarantee suspended effects are applied in order in different arguments before they are composed.
