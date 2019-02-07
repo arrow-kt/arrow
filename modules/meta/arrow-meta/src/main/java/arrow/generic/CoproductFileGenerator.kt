@@ -90,9 +90,18 @@ private fun FileSpec.Builder.addCoproductClassDeclaration(generics: List<String>
 private fun FileSpec.Builder.addCoproductOfConstructors(generics: List<String>): Unit {
     for (generic in generics) {
         val additionalParameterCount = generics.indexOf(generic)
+        val typeParameters = generics.joinToString(separator = ", ")
+        val replacementClassName = genericsToClassNames[generic]
 
         addFunction(
                 FunSpec.builder("coproductOf")
+                        .addAnnotation(
+                                AnnotationSpec.builder(Deprecated::class)
+                                        .addMember("message = \"This has issues with type inference, use ${replacementClassName}() instead\",\n" +
+                                                "replaceWith = ReplaceWith(\"$replacementClassName<$typeParameters>(${generic.toLowerCase()})\"," +
+                                                " \"arrow.generic.coproduct${generics.size}.$replacementClassName\")\n")
+                                        .build()
+                        )
                         .addAnnotations(additionalParameterSuppressAnnotation(additionalParameterCount))
                         .addTypeVariables(generics.toTypeParameters())
                         .addParameter(generic.toLowerCase(), TypeVariableName(generic))
@@ -108,13 +117,14 @@ private fun FileSpec.Builder.addCopExtensionConstructors(generics: List<String>)
     for (generic in generics) {
         val additionalParameterCount = generics.indexOf(generic)
         val typeParameters = generics.joinToString(separator = ", ")
+        val replacementFunctionName = genericsToClassNames[generic]!!.toCamelCase()
 
         addFunction(
                 FunSpec.builder("cop")
                         .addAnnotation(
                                 AnnotationSpec.builder(Deprecated::class)
-                                        .addMember("\t\t\nmessage = \"This has issues with type inference, use .${generic.toLowerCase()}() instead\",\n" +
-                                                "        replaceWith = ReplaceWith(\"this.${generic.toLowerCase()}<$typeParameters>()\")\n")
+                                        .addMember("message = \"This has issues with type inference, use .${replacementFunctionName}() instead\",\n" +
+                                                "replaceWith = ReplaceWith(\"this.$replacementFunctionName<$typeParameters>()\")\n")
                                         .build()
                         )
                         .addAnnotations(additionalParameterSuppressAnnotation(additionalParameterCount))
