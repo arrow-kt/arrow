@@ -84,9 +84,7 @@ fun handleResult(apiResult: ApiResult): String {
 
 With Coproducts, we're able to define a result for this api call as `typealias ApiResult = Coproduct3<CommonServerError, RegistrationError, Registration>`. We've been able to compose these results without having to write our own sealed class containing all the common errors for each endpoint. This lets us flatten a layer of boilerplate by abstracting the sealed hierarchy and lets us freely compose types from different domain types.
 
-#### Extensions
-
-##### constructors
+#### Constructors
 
 So now that we've got our api response modeled, we need to be able to create an instance of `Coproduct3`.
 
@@ -119,7 +117,9 @@ fun main() {
 }
 ```
 
-##### extension constructors
+#### Extensions
+
+##### constructors
 
 You might be saying "That's great and all but passing in values as parameters is so Java, I want something more Kotlin!". Well look no further, just like [Either]({{ '/docs/arrow/core/either' | relative_url }})'s `left()` and `right()` extension methods, Coproducts can be created with an extension method on any type:
 
