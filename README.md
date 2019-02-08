@@ -26,6 +26,16 @@ Use the list below to learn more about Λrrow's main features.
 - [Projects and Examples](http://arrow-kt.io/docs/quickstart/projects/)
 - [Blogs and Presentations](http://arrow-kt.io/docs/quickstart/blogs/)
 
+#### Join Us
+
+Arrow is an inclusive community powered by awesome individuals like you. As an actively growing ecosystem, Arrow and its associated libraries and toolsets are in need of new contributors! We have issues suited for all levels, from entry to advanced, and our maintainers are happy to provide 1:1 mentoring. All are welcome in Arrow.
+
+If you’re looking to contribute, have questions, or want to keep up-to-date about what’s happening, please follow us here and say hello!
+
+- [Arrow on Twitter](https://twitter.com/arrow_kt)
+- [#Arrow on Kotlin Slack](https://kotlinlang.slack.com/)
+- [Arrow on Gitter](https://gitter.im/arrow-kt/Lobby)
+
 # Basic Setup
 
 Make sure to have the latest version of JDK 1.8 installed.
@@ -62,12 +72,16 @@ Trimmed down versions:
 - `arrow-core-data` (Only data types)
 - `arrow-core-extensions` (Only type class extensions)
 
-# Current stable version
+# Current stable version 0.8.2
+
+You can find the dependencies necessary in the Basic Setup of the README at the 0.8.2 tag clicking [here](https://github.com/arrow-kt/arrow/blob/0.8.2/README.md#basic-setup).
+
+# Next development version 0.9.0
 
 Add the dependencies into the project's `build.gradle`
 
 ```groovy
-def arrow_version = "0.8.2"
+def arrow_version = "0.9.0"
 dependencies {
     compile "io.arrow-kt:arrow-core-data:$arrow_version"
     compile "io.arrow-kt:arrow-syntax:$arrow_version"
@@ -83,6 +97,7 @@ dependencies {
     compile "io.arrow-kt:arrow-mtl:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects-extensions:$arrow_version" //optional
+    compile "io.arrow-kt:arrow-effects-io-extensions:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects-rx2:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects-rx2-extensions:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects-reactor:$arrow_version" //optional

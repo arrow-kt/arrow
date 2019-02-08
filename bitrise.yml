@@ -47,16 +47,17 @@ workflows:
             set -ex
             ./gradlew :arrow-docs:runAnk
     - script:
-           deps:
-             apt_get:
-             - name: awscli
-               bin_name: aws
-           title: deploy
-           inputs:
-           - content: |-
-               #!/usr/bin/env bash
-               set -ex
-               bundle install --gemfile modules/docs/arrow-docs/Gemfile --path vendor/bundle
-               export BUNDLE_GEMFILE=modules/docs/arrow-docs/Gemfile
-               bundle exec jekyll build -s modules/docs/arrow-docs/build/site -d modules/docs/arrow-docs/build/_site
-               aws s3 sync modules/docs/arrow-docs/build/_site s3://$S3_BUCKET > aws_sync_jekyll.log
+        title: deploy
+        inputs:
+        - content: |-
+            #!/usr/bin/env bash
+            set -ex
+            aws --version
+            apt remove -y awscli
+            pip install awscli
+            /usr/local/bin/aws --version
+            bundle install --gemfile modules/docs/arrow-docs/Gemfile --path vendor/bundle
+            export BUNDLE_GEMFILE=modules/docs/arrow-docs/Gemfile
+            export JEKYLL_ENV=production
+            bundle exec jekyll build -s modules/docs/arrow-docs/build/site -d modules/docs/arrow-docs/build/_site
+            /usr/local/bin/aws s3 sync modules/docs/arrow-docs/build/_site s3://$S3_BUCKET > aws_sync_jekyll.log

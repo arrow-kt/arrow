@@ -9,7 +9,7 @@ import arrow.documented
  *
  * The [Functor] type class abstracts the ability to [map] over the computational context of a type constructor.
  * Examples of type constructors that can implement instances of the Functor type class include [_dataType_],
- * [Option], [NonEmptyList], [List] and many other data types that include a [map] function with the shape
+ * [arrow.core.Option], [arrow.data.NonEmptyList], [List] and many other data types that include a [map] function with the shape
  * `fun <F, A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B>` where `F` refers to any type constructor whose contents can be transformed.
  *
  * ```kotlin:ank:playground:extension
@@ -30,13 +30,13 @@ import arrow.documented
  * [map] allows us to safely compute over values under the assumption that they'll be there returning the
  * transformation encapsulated in the same context.
  *
- * Consider both [Option] and [Try]:
+ * Consider both [arrow.core.Option] and [arrow.core.Try]:
  *
  * `Option<A>` allows us to model absence and has two possible states, `Some(a: A)` if the value is not absent and `None` to represent an empty case.
  * In a similar fashion `Try<A>` may have two possible cases `Success(a: A)` for computations that succeed and `Failure(e: Throwable)` if they fail
  * with an exception.
  *
- * Both [Try] and [Option] are examples of data types that can be computed over transforming their inner results.
+ * Both [arrow.core.Try] and [arrow.core.Option] are examples of data types that can be computed over transforming their inner results.
  *
  * ```kotlin:ank:playground
  * import arrow.*

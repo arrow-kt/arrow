@@ -93,9 +93,9 @@ val nelTwo: NonEmptyList<Int> = NonEmptyList.of(2)
 val nelThree: NonEmptyList<Int> = NonEmptyList.of(3)
 
 binding {
-  val one = nelOne.bind()
-  val two = nelTwo.bind()
-  val three = nelThree.bind()
+  val (one) = nelOne
+  val (two) = nelTwo
+  val (three) = nelThree
   one + two + three
 }
 ```
@@ -104,8 +104,8 @@ Monad binding in `NonEmptyList` and other collection related data type can be us
 
 ```kotlin:ank
 binding {
-  val x = NonEmptyList.of(1, 2, 3).bind()
-  val y = NonEmptyList.of(1, 2, 3).bind()
+  val (x) = NonEmptyList.of(1, 2, 3)
+  val (y) = NonEmptyList.of(1, 2, 3)
   x + y
 }
 ```
@@ -136,7 +136,7 @@ map(nelId, nelName, nelYear) { (id, name, year) ->
 - `NonEmptyList` is __used to model lists that guarantee at least one element__
 - We can easily construct values of `NonEmptyList` with `NonEmptyList.of`
 - `foldLeft`, `map`, `flatMap` and others are used to compute over the internal contents of a `NonEmptyList` value.
-- `binding { ... } Comprehensions` can be __used to imperatively compute__ over multiple `NonEmptyList` values in sequence.
+- `fx { ... }  and binding { ... } Comprehensions` can be __used to imperatively compute__ over multiple `NonEmptyList` values in sequence.
 - `NonEmptyList.applicative().map { ... }` can be used to compute over multiple `NonEmptyList` values preserving type information and __abstracting over arity__ with `map`
 
 ### Supported type classes

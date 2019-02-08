@@ -13,6 +13,14 @@ interface ByteMonoid: Monoid<Byte>, ByteSemigroup {
   override fun empty(): Byte = 0
 }
 
+interface ByteSemiring: Semiring<Byte> {
+    override fun zero(): Byte = 0
+    override fun one(): Byte = 1
+
+    override fun Byte.combine(b: Byte): Byte = (this + b).toByte()
+    override fun Byte.combineMultiplicate(b: Byte): Byte = (this * b).toByte()
+}
+
 interface ByteOrder : Order<Byte> {
   override fun Byte.compare(b: Byte): Int = compareTo(b)
 }
@@ -47,6 +55,9 @@ fun Byte.Companion.semigroup(): Semigroup<Byte> =
 fun Byte.Companion.monoid(): Monoid<Byte> =
   object : ByteMonoid{}
 
+fun Byte.Companion.semiring(): Semiring<Byte> =
+  object : ByteSemiring{}
+
 //////////
 // Double
 //////////
@@ -57,6 +68,14 @@ interface DoubleSemigroup : Semigroup<Double> {
 
 interface DoubleMonoid: Monoid<Double>, DoubleSemigroup {
   override fun empty(): Double = .0
+}
+
+interface DoubleSemiring: Semiring<Double> {
+  override fun zero(): Double = .0
+  override fun one(): Double = 1.0
+
+  override fun Double.combine(b: Double): Double = this + b
+  override fun Double.combineMultiplicate(b: Double): Double = this * b
 }
 
 interface DoubleOrder : Order<Double> {
@@ -93,6 +112,9 @@ fun Double.Companion.semigroup(): Semigroup<Double> =
 fun Double.Companion.monoid(): Monoid<Double> =
   object : DoubleMonoid{}
 
+fun Double.Companion.semiring(): Semiring<Double> =
+  object : DoubleSemiring{}
+
 //////////
 // Int
 //////////
@@ -102,6 +124,14 @@ interface IntSemigroup : Semigroup<Int> {
 
 interface IntMonoid: Monoid<Int>, IntSemigroup {
   override fun empty(): Int = 0
+}
+
+interface IntSemiring: Semiring<Int> {
+    override fun zero(): Int = 0
+    override fun one(): Int = 1
+
+    override fun Int.combine(b: Int): Int = this + b
+    override fun Int.combineMultiplicate(b: Int): Int = this * b
 }
 
 interface IntEq : Eq<Int> {
@@ -138,6 +168,9 @@ fun Int.Companion.semigroup(): Semigroup<Int> =
 fun Int.Companion.monoid(): Monoid<Int> =
   object : IntMonoid{}
 
+fun Int.Companion.semiring(): Semiring<Int> =
+  object : IntSemiring{}
+
 //////////
 // Long
 //////////
@@ -148,6 +181,14 @@ interface LongSemigroup : Semigroup<Long> {
 
 interface LongMonoid: Monoid<Long>, LongSemigroup {
   override fun empty(): Long = 0L
+}
+
+interface LongSemiring: Semiring<Long> {
+    override fun zero(): Long = 0
+    override fun one(): Long = 1
+
+    override fun Long.combine(b: Long): Long = this + b
+    override fun Long.combineMultiplicate(b: Long): Long = this * b
 }
 
 interface LongOrder : Order<Long> {
@@ -184,6 +225,9 @@ fun Long.Companion.semigroup(): Semigroup<Long> =
 fun Long.Companion.monoid(): Monoid<Long> =
   object : LongMonoid{}
 
+fun Long.Companion.semiring(): Semiring<Long> =
+  object : LongSemiring{}
+
 //////////
 // Short
 //////////
@@ -194,6 +238,14 @@ interface ShortSemigroup : Semigroup<Short> {
 
 interface ShortMonoid: Monoid<Short>, ShortSemigroup {
   override fun empty(): Short = 0
+}
+
+interface ShortSemiring: Semiring<Short> {
+    override fun zero(): Short = 0
+    override fun one(): Short = 1
+
+    override fun Short.combine(b: Short): Short = (this + b).toShort()
+    override fun Short.combineMultiplicate(b: Short): Short = (this * b).toShort()
 }
 
 interface ShortOrder : Order<Short> {
@@ -230,6 +282,9 @@ fun Short.Companion.semigroup(): Semigroup<Short> =
 fun Short.Companion.monoid(): Monoid<Short> =
   object : ShortMonoid{}
 
+fun Short.Companion.semiring(): Semiring<Short> =
+  object : ShortSemiring{}
+
 //////////
 // Float
 //////////
@@ -240,6 +295,14 @@ interface FloatSemigroup : Semigroup<Float> {
 
 interface FloatMonoid: Monoid<Float>, FloatSemigroup {
   override fun empty(): Float = 0f
+}
+
+interface FloatSemiring: Semiring<Float> {
+    override fun zero(): Float = 0f
+    override fun one(): Float = 1f
+
+    override fun Float.combine(b: Float): Float = this + b
+    override fun Float.combineMultiplicate(b: Float): Float = this * b
 }
 
 interface FloatOrder : Order<Float> {
@@ -275,3 +338,6 @@ fun Float.Companion.semigroup(): Semigroup<Float> =
 
 fun Float.Companion.monoid(): Monoid<Float> =
   object : FloatMonoid{}
+
+fun Float.Companion.semiring(): Semiring<Float> =
+  object : FloatSemiring{}

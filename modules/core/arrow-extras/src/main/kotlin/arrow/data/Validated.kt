@@ -220,14 +220,14 @@ fun <E, A> ValidatedOf<E, A>.combineK(SE: Semigroup<E>, y: ValidatedOf<E, A>): V
 fun <E, A> ValidatedOf<E, A>.toIor(): Ior<E, A> =
   fix().fold({ Ior.Left(it) }, { Ior.Right(it) })
 
-fun <E, A> A.valid(): Validated<E, A> =
+fun <A> A.valid(): Validated<Nothing, A> =
   Valid(this)
 
-fun <E, A> E.invalid(): Validated<E, A> =
+fun <E> E.invalid(): Validated<E, Nothing> =
   Invalid(this)
 
-fun <E, A> A.validNel(): ValidatedNel<E, A> =
+fun <A> A.validNel(): ValidatedNel<Nothing, A> =
   Validated.validNel(this)
 
-fun <E, A> E.invalidNel(): ValidatedNel<E, A> =
+fun <E> E.invalidNel(): ValidatedNel<E, Nothing> =
   Validated.invalidNel(this)

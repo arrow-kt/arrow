@@ -9,17 +9,15 @@ import arrow.data.extensions.listk.monoid.monoid
 import arrow.data.extensions.nonemptylist.semigroup.semigroup
 import arrow.data.k
 import arrow.test.UnitSpec
-import arrow.test.generators.genFunctionAToB
-import arrow.test.generators.genNonEmptyList
-import arrow.test.generators.genOption
+import arrow.test.generators.*
 import arrow.test.laws.IsoLaws
 import arrow.test.laws.OptionalLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class ListTest : UnitSpec() {
 
   init {
@@ -28,7 +26,7 @@ class ListTest : UnitSpec() {
       optional = ListK.head(),
       aGen = Gen.list(Gen.int()),
       bGen = Gen.int(),
-      funcGen = genFunctionAToB(Gen.int()),
+      funcGen = Gen.functionAToB(Gen.int()),
       EQA = Eq.any(),
       EQOptionB = Eq.any()
     ))
@@ -37,7 +35,7 @@ class ListTest : UnitSpec() {
       optional = ListK.tail(),
       aGen = Gen.list(Gen.int()),
       bGen = Gen.list(Gen.int()),
-      funcGen = genFunctionAToB(Gen.list(Gen.int())),
+      funcGen = Gen.functionAToB(Gen.list(Gen.int())),
       EQA = Eq.any(),
       EQOptionB = Eq.any()
     ))
@@ -45,8 +43,8 @@ class ListTest : UnitSpec() {
     testLaws(IsoLaws.laws(
       iso = ListK.toOptionNel(),
       aGen = Gen.list(Gen.int()),
-      bGen = genOption(genNonEmptyList(Gen.int())),
-      funcGen = genFunctionAToB(genOption(genNonEmptyList(Gen.int()))),
+      bGen = Gen.option(Gen.nonEmptyList(Gen.int())),
+      funcGen = Gen.functionAToB(Gen.option(Gen.nonEmptyList(Gen.int()))),
       EQA = Eq.any(),
       EQB = Eq.any(),
       bMonoid = Option.monoid(NonEmptyList.semigroup<Int>())
@@ -55,8 +53,8 @@ class ListTest : UnitSpec() {
     testLaws(IsoLaws.laws(
       iso = ListExtensions.toListK(),
       aGen = Gen.list(Gen.int()),
-      bGen = Gen.create { Gen.list(Gen.int()).generate().k() },
-      funcGen = genFunctionAToB(Gen.create { Gen.list(Gen.int()).generate().k() }),
+      bGen = Gen.list(Gen.int()).map { it.k() },
+      funcGen = Gen.functionAToB(Gen.list(Gen.int()).map { it.k() }),
       EQA = Eq.any(),
       EQB = Eq.any(),
       bMonoid = ListK.monoid())

@@ -6,10 +6,10 @@ import arrow.core.extensions.show
 import arrow.test.UnitSpec
 import arrow.test.laws.HashLaws
 import arrow.test.laws.ShowLaws
-import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class StringInstancesTest : UnitSpec() {
   init {
     testLaws(

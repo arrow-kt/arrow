@@ -8,23 +8,25 @@ import arrow.test.UnitSpec
 import arrow.test.generators.*
 import arrow.test.laws.OptionalLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.properties.Gen
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class IndexInstanceTest : UnitSpec() {
 
   init {
 
-    testLaws(OptionalLaws.laws(
-      optional = SequenceK.index<String>().index(5),
-      aGen = genSequenceK(Gen.string()),
-      bGen = Gen.string(),
-      funcGen = genFunctionAToB(Gen.string()),
-      EQOptionB = Eq.any(),
-      EQA = SequenceK.eq(String.eq())
-    ))
+    testLaws(
+      OptionalLaws.laws(
+        optionalGen = Gen.int().map { SequenceK.index<String>().index(it) },
+        aGen = Gen.sequenceK(Gen.string()),
+        bGen = Gen.string(),
+        funcGen = Gen.functionAToB(Gen.string()),
+        EQOptionB = Eq.any(),
+        EQA = SequenceK.eq(String.eq())
+      )
+    )
 
   }
 }

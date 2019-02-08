@@ -3,8 +3,11 @@ package arrow.core.extensions
 
 import arrow.Kind
 import arrow.core.*
+import arrow.core.extensions.option.monad.monad
+import arrow.core.extensions.option.monadError.monadError
 import arrow.extension
 import arrow.typeclasses.*
+import arrow.typeclasses.suspended.monad.Fx
 import arrow.core.extensions.traverse as optionTraverse
 
 @extension
@@ -26,6 +29,32 @@ interface OptionSemigroup<A> : Semigroup<Option<A>> {
 interface OptionMonoid<A> : Monoid<Option<A>>, OptionSemigroup<A> {
   override fun SG(): Semigroup<A>
   override fun empty(): Option<A> = None
+}
+
+@extension
+interface OptionSemiring<A> : Semiring<Option<A>> {
+
+  fun SG(): Semiring<A>
+  override fun zero(): Option<A> = None
+  override fun one(): Option<A> = None
+
+  override fun Option<A>.combine(b: Option<A>): Option<A> =
+          when (this) {
+            is Some<A> -> when (b) {
+              is Some<A> -> Some(SG().run { t.combine(b.t) })
+              None -> this
+            }
+            None -> b
+          }
+
+  override fun Option<A>.combineMultiplicate(b: Option<A>): Option<A> =
+          when (this) {
+            is Some<A> -> when (b) {
+              is Some<A> -> Some(SG().run { t.combineMultiplicate(b.t) })
+              None -> this
+            }
+            None -> b
+          }
 }
 
 @extension
@@ -192,4 +221,9 @@ interface OptionHash<A> : Hash<Option<A>>, OptionEq<A> {
   }, {
     HA().run { it.hash() }
   })
+}
+
+@extension
+interface OptionFx : Fx<ForOption> {
+  override fun monad(): Monad<ForOption> = Option.monad()
 }

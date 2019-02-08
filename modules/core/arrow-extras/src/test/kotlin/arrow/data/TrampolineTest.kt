@@ -3,12 +3,12 @@ package arrow.data
 import arrow.free.Trampoline
 import arrow.free.TrampolineF
 import arrow.free.runT
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.shouldBe
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 import arrow.test.UnitSpec
+import io.kotlintest.shouldBe
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class TrampolineTest : UnitSpec() {
 
   init {

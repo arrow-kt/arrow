@@ -2,7 +2,8 @@ package arrow.effects.rx2
 
 import arrow.Kind
 import arrow.core.*
-import arrow.effects.ConnectionCancellationException
+import arrow.effects.OnCancel
+import arrow.effects.internal.Platform
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
 import arrow.higherkind
@@ -39,8 +40,7 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
    *
    * @param release the allocated resource after the resulting [FlowableK] of [use] is terminates.
    *
-   * {: data-executable='true'}
-   * ```kotlin:ank
+   * ```kotlin:ank:playground
    * import io.reactivex.Flowable
    * import arrow.effects.rx2.*
    * import arrow.effects.typeclasses.ExitCase
@@ -61,7 +61,7 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
    *     release = { file, exitCase ->
    *       when (exitCase) {
    *         is ExitCase.Completed -> { /* do something */ }
-   *         is ExitCase.Cancelled -> { /* do something */ }
+   *         is ExitCase.Canceled -> { /* do something */ }
    *         is ExitCase.Error -> { /* do something */ }
    *       }
    *       closeFile(file)
@@ -73,21 +73,26 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
    * }
    *  ```
    */
-  fun <B> bracketCase(use: (A) -> FlowableKOf<B>, release: (A, ExitCase<Throwable>) -> FlowableKOf<Unit>): FlowableK<B> =
-    flatMap { a ->
-      Flowable.unsafeCreate<B> { subscriber ->
-        use(a).fix()
-          .flatMap { b ->
-            release(a, ExitCase.Completed)
-              .fix().map { b }
-          }.handleErrorWith { e ->
-            release(a, ExitCase.Error(e))
-              .fix().flatMap { raiseError<B>(e) }
-          }.flowable.subscribe(subscriber::onNext, subscriber::onError, subscriber::onComplete) { d ->
-          subscriber.onSubscribe(d.onCancel { release(a, ExitCase.Cancelled).fix().flowable.subscribe({}, subscriber::onError) })
+  fun <B> bracketCase(use: (A) -> FlowableKOf<B>, release: (A, ExitCase<Throwable>) -> FlowableKOf<Unit>, mode: BackpressureStrategy = BackpressureStrategy.BUFFER): FlowableK<B> =
+    FlowableK(Flowable.create<B>({ emitter ->
+      flowable.subscribe({ a ->
+        if (emitter.isCancelled) release(a, ExitCase.Canceled).fix().flowable.subscribe({}, emitter::onError)
+        else try {
+          emitter.setDisposable(use(a).fix()
+            .flatMap { b -> release(a, ExitCase.Completed).fix().map { b } }
+            .handleErrorWith { e -> release(a, ExitCase.Error(e)).fix().flatMap { FlowableK.raiseError<B>(e) } }
+            .flowable
+            .doOnCancel { release(a, ExitCase.Canceled).fix().flowable.subscribe({}, emitter::onError) }
+            .subscribe(emitter::onNext, emitter::onError))
+        } catch (e: Throwable) {
+          release(a, ExitCase.Error(e)).fix().flowable.subscribe({
+            emitter.onError(e)
+          }, { e2 ->
+            emitter.onError(Platform.composeErrors(e, e2))
+          })
         }
-      }.k()
-    }
+      }, emitter::onError, emitter::onComplete)
+    }, mode))
 
   fun <B> concatMap(f: (A) -> FlowableKOf<B>): FlowableK<B> =
     flowable.concatMap { f(it).value() }.k()
@@ -152,9 +157,7 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
     /**
      * Creates a [FlowableK] that'll run [FlowableKProc].
      *
-     * {: data-executable='true'}
-     *
-     * ```kotlin:ank
+     * ```kotlin:ank:playground
      * import arrow.core.Either
      * import arrow.core.right
      * import arrow.effects.rx2.FlowableK
@@ -168,7 +171,7 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
-     *   val result = FlowableK.async( fa= { conn: FlowableKConnection, cb: (Either<Throwable, String>) -> Unit ->
+     *   val result = FlowableK.async(fa= { conn: FlowableKConnection, cb: (Either<Throwable, String>) -> Unit ->
      *     val resource = Resource()
      *     conn.push(FlowableK { resource.close() })
      *     resource.asyncRead { value -> cb(value.right()) }
@@ -183,7 +186,7 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
         val conn = FlowableKConnection()
         //On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
         //on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
-        conn.push(FlowableK { if (!emitter.isCancelled) emitter.onError(ConnectionCancellationException) })
+        conn.push(FlowableK { if (!emitter.isCancelled) emitter.onError(OnCancel.CancellationException) })
         emitter.setCancellable { conn.cancel().value().subscribe() }
 
         fa(conn) { either: Either<Throwable, A> ->
@@ -201,7 +204,7 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
         val conn = FlowableKConnection()
         //On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
         //on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
-        conn.push(FlowableK { if (!emitter.isCancelled) emitter.onError(ConnectionCancellationException) })
+        conn.push(FlowableK { if (!emitter.isCancelled) emitter.onError(OnCancel.CancellationException) })
         emitter.setCancellable { conn.cancel().value().subscribe() }
 
         fa(conn) { either: Either<Throwable, A> ->

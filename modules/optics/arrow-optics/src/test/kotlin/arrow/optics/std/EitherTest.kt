@@ -5,17 +5,15 @@ import arrow.data.Invalid
 import arrow.data.Valid
 import arrow.data.Validated
 import arrow.test.UnitSpec
-import arrow.test.generators.genEither
-import arrow.test.generators.genFunctionAToB
-import arrow.test.generators.genValidated
+import arrow.test.generators.*
 import arrow.test.laws.IsoLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
-import io.kotlintest.KTestJUnitRunner
 import io.kotlintest.properties.Gen
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class EitherTest : UnitSpec() {
 
   init {
@@ -41,9 +39,9 @@ class EitherTest : UnitSpec() {
     }
     testLaws(IsoLaws.laws(
       iso = Either.toValidated(),
-      aGen = genEither(Gen.string(), Gen.int()),
-      bGen = genValidated(Gen.string(), Gen.int()),
-      funcGen = genFunctionAToB(genValidated(Gen.string(), Gen.int())),
+      aGen = Gen.either(Gen.string(), Gen.int()),
+      bGen = Gen.validated(Gen.string(), Gen.int()),
+      funcGen = Gen.functionAToB(Gen.validated(Gen.string(), Gen.int())),
       EQA = Eq.any(),
       EQB = Eq.any(),
       bMonoid = VAL_MONOID

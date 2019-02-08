@@ -7,9 +7,11 @@ import arrow.effects.rx2.ForObservableK
 import arrow.effects.rx2.ObservableK
 import arrow.effects.rx2.ObservableKOf
 import arrow.effects.rx2.extensions.observablek.monad.monad
+import arrow.effects.rx2.extensions.observablek.monadDefer.monadDefer
 import arrow.effects.rx2.extensions.observablek.monadError.monadError
 import arrow.effects.rx2.fix
 import arrow.effects.typeclasses.*
+import arrow.effects.typeclasses.suspended.monaddefer.Fx
 import arrow.extension
 import arrow.typeclasses.*
 import kotlin.coroutines.CoroutineContext
@@ -157,4 +159,10 @@ fun ObservableK.Companion.monadErrorConcat(): ObservableKMonadError = object : O
 fun ObservableK.Companion.monadErrorSwitch(): ObservableKMonadError = object : ObservableKMonadError{
   override fun <A, B> ObservableKOf<A>.flatMap(f: (A) -> ObservableKOf<B>): ObservableK<B> =
     fix().switchMap { f(it).fix() }
+}
+
+//TODO ObservableK does not yet have a Concurrent instance
+@extension
+interface ObservableKFx : Fx<ForObservableK> {
+  override fun monadDefer(): MonadDefer<ForObservableK> = ObservableK.monadDefer()
 }

@@ -248,11 +248,13 @@ inline fun <A, B> EitherOf<A, B>.getOrHandle(default: (A) -> B): B =
   fix().fold({ default(it) }, ::identity)
 
 /**
- * * Returns [Either.Right] with the existing value of [Either.Right] if this is a [Either.Right] and the given predicate
- * holds for the right value.
- * * Returns `Left(default)` if this is a [Either.Right] and the given predicate does not
- * hold for the right value.
- * * Returns [Either.Left] with the existing value of [Either.Left] if this is a [Either.Left].
+ * Returns [Either.Right] with the existing value of [Either.Right] if this is a [Either.Right] and the given predicate
+ * holds for the right value.<br>
+ *
+ * Returns `Left(default)` if this is a [Either.Right] and the given predicate does not
+ * hold for the right value.<br>
+ *
+ * Returns [Either.Left] with the existing value of [Either.Left] if this is a [Either.Left].<br>
  *
  * Example:
  * ```
@@ -267,12 +269,14 @@ inline fun <A, B> EitherOf<A, B>.filterOrElse(predicate: (B) -> Boolean, default
   flatMap { if (predicate(it)) Right(it) else Left(default()) }
 
 /**
- * * Returns [Either.Right] with the existing value of [Either.Right] if this is a [Either.Right] and the given
- * predicate holds for the right value.
- * * Returns `Left(default({right}))` if this is a [Either.Right] and the given predicate does not
+ * Returns [Either.Right] with the existing value of [Either.Right] if this is a [Either.Right] and the given
+ * predicate holds for the right value.<br>
+ *
+ * Returns `Left(default({right}))` if this is a [Either.Right] and the given predicate does not
  * hold for the right value. Useful for error handling where 'default' returns a message with context on why the value
- * did not pass the filter
- * * Returns [Either.Left] with the existing value of [Either.Left] if this is a [Either.Left].
+ * did not pass the filter<br>
+ *
+ * Returns [Either.Left] with the existing value of [Either.Left] if this is a [Either.Left].<br>
  *
  * Example:
  *
@@ -301,10 +305,12 @@ inline fun <A, B> EitherOf<A, B>.filterOrOther(predicate: (B) -> Boolean, defaul
   }
 
 /**
- * * Returns [Either.Right] with the existing value of [Either.Right] if this is an [Either.Right] with a non-null value.
+ * Returns [Either.Right] with the existing value of [Either.Right] if this is an [Either.Right] with a non-null value.
  * The returned Either.Right type is not nullable.
- * * Returns `Left(default())` if this is an [Either.Right] and the existing value is null
- * * Returns [Either.Left] with the existing value of [Either.Left] if this is an [Either.Left].
+ *
+ * Returns `Left(default())` if this is an [Either.Right] and the existing value is null
+ *
+ * Returns [Either.Left] with the existing value of [Either.Left] if this is an [Either.Left].
  *
  * Example:
  * ```

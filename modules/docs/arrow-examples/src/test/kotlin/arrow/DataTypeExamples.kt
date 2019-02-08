@@ -5,10 +5,10 @@ import arrow.core.*
 import arrow.core.extensions.`try`.applicative.applicative
 import arrow.core.extensions.`try`.functor.functor
 import arrow.core.extensions.option.applicative.applicative
-import arrow.core.extensions.option.monad.binding
-import io.kotlintest.matchers.Matcher
-import io.kotlintest.matchers.Result
-import io.kotlintest.matchers.shouldBe
+import arrow.core.extensions.option.monad.fx
+import io.kotlintest.Matcher
+import io.kotlintest.Result
+import io.kotlintest.shouldBe
 import io.kotlintest.specs.FreeSpec
 import kotlin.reflect.KClass
 
@@ -23,7 +23,7 @@ class DataTypeExamples : FreeSpec() { init {
     val noneValue: Option<Int> = None
 
     "getOrElse" {
-      someValue.getOrElse { -1 }.shouldBe(42)
+      someValue.getOrElse { -1 }.shouldBe<Int, Int>(42)
       noneValue.getOrElse { -1 }.shouldBe(-1)
     }
 
@@ -64,18 +64,18 @@ class DataTypeExamples : FreeSpec() { init {
 
     "Monad" {
       // Computing over dependent values ignoring absence
-      val six = binding {
-        val a = Option(1).bind()
-        val b = Option(1 + a).bind()
-        val c = Option(1 + b).bind()
+      val six = fx {
+        val (a) = Option(1)
+        val (b) = Option(1 + a)
+        val (c) = Option(1 + b)
         a + b + c
       }
       six shouldBe Some(6)
 
-      val none = binding {
-        val a = Option(1).bind()
-        val b = noneValue.bind()
-        val c = Option(1 + b).bind()
+      val none = fx {
+        val (a) = Option(1)
+        val (b) = noneValue
+        val (c) = Option(1 + b)
         a + b + c
       }
       none shouldBe None
@@ -196,10 +196,14 @@ class DataTypeExamples : FreeSpec() { init {
 
   fun aFailureOfType(expected: KClass<*>): Matcher<Try<Int>> = object : Matcher<Try<Int>> {
     override fun test(value: Try<Int>): Result = when (value) {
-      is Success -> Result(false, "Expected a failure, got $value")
+      is Success -> Result(false, "Expected a failure, got $value", "Received expected failure")
       is Failure -> {
         val javaClass = value.exception.javaClass
-        Result(expected.java.isAssignableFrom(javaClass), "Expected Try.Failure(${expected.java}), got $value")
+        Result(
+          expected.java.isAssignableFrom(javaClass),
+          "Expected Try.Failure(${expected.java}), got $value",
+          "Received expected failure"
+        )
       }
     }
   }

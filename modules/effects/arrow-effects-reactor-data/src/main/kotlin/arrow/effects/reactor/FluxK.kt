@@ -2,7 +2,8 @@ package arrow.effects.reactor
 
 import arrow.Kind
 import arrow.core.*
-import arrow.effects.ConnectionCancellationException
+import arrow.effects.OnCancel
+import arrow.effects.internal.Platform
 import arrow.effects.reactor.CoroutineContextReactorScheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
@@ -61,7 +62,7 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
    *     release = { file, exitCase ->
    *       when (exitCase) {
    *         is ExitCase.Completed -> { /* do something */ }
-   *         is ExitCase.Cancelled -> { /* do something */ }
+   *         is ExitCase.Canceled -> { /* do something */ }
    *         is ExitCase.Error -> { /* do something */ }
    *       }
    *       closeFile(file)
@@ -74,22 +75,28 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
    *  ```
    */
   fun <B> bracketCase(use: (A) -> FluxKOf<B>, release: (A, ExitCase<Throwable>) -> FluxKOf<Unit>): FluxK<B> =
-    flatMap { a ->
-      Flux.create<B> { sink ->
-        val d = use(a).fix()
-          .flatMap { b ->
-            release(a, ExitCase.Completed)
-              .fix().map { b }
-          }.handleErrorWith { e ->
-            release(a, ExitCase.Error(e))
-              .fix().flatMap { raiseError<B>(e) }
-          }.flux.subscribe({ b -> sink.next(b) }, sink::error, sink::complete) { subscription ->
-          sink.onRequest(subscription::request)
+    FluxK(Flux.create<B> { sink ->
+      flux.subscribe({ a ->
+        if (sink.isCancelled) release(a, ExitCase.Canceled).fix().flux.subscribe({}, sink::error)
+        else try {
+          sink.onDispose(use(a).fix()
+            .flatMap { b -> release(a, ExitCase.Completed).fix().map { b } }
+            .handleErrorWith { e -> release(a, ExitCase.Error(e)).fix().flatMap { FluxK.raiseError<B>(e) } }
+            .flux
+            .doOnCancel { release(a, ExitCase.Canceled).fix().flux.subscribe({}, sink::error) }
+            .subscribe({ sink.next(it) }, sink::error, { }, {
+              sink.onRequest(it::request)
+            })
+          )
+        } catch (e: Throwable) {
+          release(a, ExitCase.Error(e)).fix().flux.subscribe({
+            sink.error(e)
+          }, { e2 ->
+            sink.error(Platform.composeErrors(e, e2))
+          })
         }
-        sink.onCancel(d)
-        sink.onDispose { release(a, ExitCase.Cancelled).fix().flux.subscribe({}, sink::error, {}) }
-      }.k()
-    }
+      }, sink::error, sink::complete)
+    })
 
   fun <B> concatMap(f: (A) -> FluxKOf<B>): FluxK<B> =
     flux.concatMap { f(it).fix().flux }.k()
@@ -185,7 +192,7 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
         val conn = FluxKConnection()
         //On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
         //on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
-        conn.push(FluxK { if (!sink.isCancelled) sink.error(ConnectionCancellationException) })
+        conn.push(FluxK { if (!sink.isCancelled) sink.error(OnCancel.CancellationException) })
         sink.onCancel { conn.cancel().value().subscribe() }
 
         fa(conn) { callback: Either<Throwable, A> ->
@@ -203,7 +210,7 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
         val conn = FluxKConnection()
         //On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
         //on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
-        conn.push(FluxK { if (!sink.isCancelled) sink.error(ConnectionCancellationException) })
+        conn.push(FluxK { if (!sink.isCancelled) sink.error(OnCancel.CancellationException) })
         sink.onCancel { conn.cancel().value().subscribe() }
 
         fa(conn) { callback: Either<Throwable, A> ->

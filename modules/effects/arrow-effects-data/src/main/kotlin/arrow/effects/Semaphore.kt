@@ -3,6 +3,7 @@ package arrow.effects
 import arrow.Kind
 import arrow.core.*
 import arrow.effects.typeclasses.Async
+import arrow.effects.typeclasses.Concurrent
 import arrow.typeclasses.ApplicativeError
 
 /**
@@ -12,11 +13,9 @@ import arrow.typeclasses.ApplicativeError
 interface Semaphore<F> {
 
   /**
-   * Get a snapshot of the currently available permits, always non negative/
+   * Get a snapshot of the currently available permits, always non negative.
    *
-   * {: data-executable='true'}
-   *
-   * ```kotlin:ank
+   * ```kotlin:ank:playground
    * import arrow.effects.*
    * import arrow.effects.extensions.io.async.async
    * import arrow.effects.extensions.io.monad.flatMap
@@ -38,9 +37,7 @@ interface Semaphore<F> {
    * Get a snapshot of the current count, may be negative.
    * The count is current available permits minus the outstanding acquires.
    *
-   * {: data-executable='true'}
-   *
-   * ```kotlin:ank
+   * ```kotlin:ank:playground
    * import arrow.effects.*
    * import arrow.effects.extensions.io.async.async
    * import arrow.effects.extensions.io.monad.flatMap
@@ -60,11 +57,9 @@ interface Semaphore<F> {
 
   /**
    * Acquires [n] resources
-   * Suspending the fiber running the action until the resources are available.
+   * Suspending the [Fiber] running the action until the resources are available.
    *
-   * {: data-executable='true'}
-   *
-   * ```kotlin:ank
+   * ```kotlin:ank:playground
    * import arrow.effects.*
    * import arrow.effects.extensions.io.async.async
    * import arrow.effects.extensions.io.monad.flatMap
@@ -90,19 +85,17 @@ interface Semaphore<F> {
 
   /**
    * Acquire a resource
-   * Suspending the fiber running the action until the resource is available.
+   * Suspending the [Fiber] running the action until the resource is available.
    *
    * @see acquireN
    */
-  val acquire: Kind<F, Unit>
-    get() = acquireN(1)
+  fun acquire(): Kind<F, Unit> =
+    acquireN(1)
 
   /**
    * Try to acquires [n] resources and get an immediate response as [Boolean].
    *
-   * {: data-executable='true'}
-   *
-   * ```kotlin:ank
+   * ```kotlin:ank:playground
    * import arrow.effects.*
    * import arrow.effects.extensions.io.async.async
    * import arrow.effects.extensions.io.monad.flatMap
@@ -135,9 +128,7 @@ interface Semaphore<F> {
   /**
    * Release [n] resources
    *
-   * {: data-executable='true'}
-   *
-   * ```kotlin:ank
+   * ```kotlin:ank:playground
    * import arrow.effects.*
    * import arrow.effects.extensions.io.async.async
    * import arrow.effects.extensions.io.monad.flatMap
@@ -170,9 +161,7 @@ interface Semaphore<F> {
   /**
    * Runs the supplied effect that acquires a permit, and then releases the permit.
    *
-   * {: data-executable='true'}
-   *
-   * ```kotlin:ank
+   * ```kotlin:ank:playground
    * import arrow.effects.*
    * import arrow.effects.extensions.io.async.async
    * import arrow.effects.extensions.io.monad.flatMap
@@ -195,11 +184,30 @@ interface Semaphore<F> {
 
     /**
      * Construct a [Semaphore] initialized with [n] available permits.
+     *
+     * ```kotlin:ank:playground
+     * import arrow.effects.*
+     * import arrow.effects.extensions.io.concurrent.concurrent
+     *
+     * fun main(args: Array<String>) {
+     *   //sampleStart
+     *   val semaphore = Semaphore<ForIO>(5, IO.concurrent())
+     *   //sampleEnd
+     * }
+     */
+    operator fun <F> invoke(n: Long, CF: Concurrent<F>): Kind<F, Semaphore<F>> = CF.run {
+      assertNonNegative(n).flatMap {
+        Ref.of<F, State<F>>(Right(n), CF).map { ref ->
+          DefaultSemaphore(ref, Promise(this), this)
+        }
+      }
+    }
+
+    /**
+     * Construct a [Semaphore] initialized with [n] available permits.
      * Since it's based on [Async] it's constrained with an uncancelable [acquire] operation.
      *
-     * {: data-executable='true'}
-     *
-     * ```kotlin:ank
+     * ```kotlin:ank:playground
      * import arrow.effects.*
      * import arrow.effects.extensions.io.async.async
      *
@@ -211,7 +219,9 @@ interface Semaphore<F> {
      */
     fun <F> uncancelable(n: Long, AS: Async<F>): Kind<F, Semaphore<F>> = AS.run {
       assertNonNegative(n).flatMap {
-        Ref.of<F, State<F>>(Right(n), AS).map { ref -> UncancelableSemaphore(ref, AS) }
+        Ref.of<F, State<F>>(Right(n), AS).map { ref ->
+          DefaultSemaphore(ref, Promise.uncancelable(this), this)
+        }
       }
     }
 
@@ -228,10 +238,9 @@ private typealias AcquiredPermits<F> = List<Tuple2<Long, Promise<F, Unit>>>
 private fun <F> ApplicativeError<F, Throwable>.assertNonNegative(n: Long): Kind<F, Unit> =
   if (n < 0) raiseError(IllegalArgumentException("n must be nonnegative, was: $n")) else just(Unit)
 
-internal class UncancelableSemaphore<F>(private val state: Ref<F, State<F>>,
-                                        private val AS: Async<F>) : Semaphore<F>, Async<F> by AS {
-
-  private val promise = Promise.uncancelable<F, Unit>(AS)
+internal class DefaultSemaphore<F>(private val state: Ref<F, State<F>>,
+                                   private val promise: Kind<F, Promise<F, Unit>>,
+                                   private val AS: Async<F>) : Semaphore<F>, Async<F> by AS {
 
   override fun available(): Kind<F, Long> =
     state.get().map { state ->
@@ -259,7 +268,7 @@ internal class UncancelableSemaphore<F>(private val state: Ref<F, State<F>>,
         }.flatMap { u ->
           u.fold({ waiting ->
             waiting.lastOrNone()
-              .map { (_, promise) -> promise.get }
+              .map { (_, promise) -> promise.get() }
               .getOrElse { raiseError(RuntimeException("Semaphore has empty waiting queue rather than 0 count")) }
           }, {
             just(Unit)
@@ -270,7 +279,7 @@ internal class UncancelableSemaphore<F>(private val state: Ref<F, State<F>>,
 
   override fun tryAcquireN(n: Long): Kind<F, Boolean> =
     assertNonNegative(n).flatMap {
-      if (n == 0L) AS.just(true)
+      if (n == 0L) just(true)
       else state.modify { old ->
         val u = old.fold({ waiting -> Left(waiting) }, { m ->
           if (m >= n) Right(m - n) else Right(m)
@@ -317,6 +326,14 @@ internal class UncancelableSemaphore<F>(private val state: Ref<F, State<F>>,
     }
 
   override fun <A> withPermit(t: Kind<F, A>): Kind<F, A> =
-    acquire.bracket({ release() }, { t })
+    acquire().bracket({ release() }, { t })
+
+  override fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B> = AS.run {
+    this@ap.ap(ff)
+  }
+
+  override fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B> = AS.run {
+    this@map.map(f)
+  }
 
 }

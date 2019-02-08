@@ -14,12 +14,12 @@ import arrow.test.UnitSpec
 import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Semigroup
-import io.kotlintest.KTestJUnitRunner
-import io.kotlintest.matchers.fail
-import io.kotlintest.matchers.shouldBe
+import io.kotlintest.fail
+import io.kotlintest.runner.junit4.KotlinTestRunner
+import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class ValidatedTest : UnitSpec() {
 
   init {
@@ -92,7 +92,7 @@ class ValidatedTest : UnitSpec() {
 
     "valueOr should return value if is Valid or the the result of f in otherwise" {
       Valid(13).valueOr { fail("None should not be called") } shouldBe 13
-      Invalid(13).valueOr { e -> e.toString() + " is the defaultValue" } shouldBe "13 is the defaultValue"
+      Invalid(13).valueOr { e -> "$e is the defaultValue" } shouldBe "13 is the defaultValue"
     }
 
     "orElse should return Valid(value) if is Valid or the result of default in otherwise" {
@@ -106,7 +106,7 @@ class ValidatedTest : UnitSpec() {
     }
 
     "foldLeft should return f processed when is Valid" {
-      Valid(10).foldLeft("Tennant") { b, a -> a.toString() + " is " + b } shouldBe "10 is Tennant"
+      Valid(10).foldLeft("Tennant") { b, a -> "$a is $b" } shouldBe "10 is Tennant"
     }
 
     "toEither should return Either.Right(value) if is Valid or Either.Left(error) in otherwise" {

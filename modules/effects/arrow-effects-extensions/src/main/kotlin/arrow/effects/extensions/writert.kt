@@ -1,12 +1,17 @@
 package arrow.effects.extensions
 
 import arrow.Kind
-import arrow.core.*
-import arrow.data.*
+import arrow.core.Either
+import arrow.core.Tuple2
+import arrow.core.compose
+import arrow.data.WriterT
+import arrow.data.WriterTOf
+import arrow.data.WriterTPartialOf
+import arrow.data.extensions.WriterTMonadThrow
+import arrow.data.value
 import arrow.effects.Ref
 import arrow.effects.typeclasses.*
 import arrow.extension
-import arrow.data.extensions.WriterTMonadThrow
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.Monoid
 import arrow.undocumented
@@ -14,7 +19,7 @@ import kotlin.coroutines.CoroutineContext
 
 @extension
 @undocumented
-interface WriterTBrack<F, W> : Bracket<WriterTPartialOf<F, W>, Throwable>, WriterTMonadThrow<F, W> {
+interface WriterTBracket<F, W> : Bracket<WriterTPartialOf<F, W>, Throwable>, WriterTMonadThrow<F, W> {
 
   fun MD(): MonadDefer<F>
 
@@ -46,7 +51,7 @@ interface WriterTBrack<F, W> : Bracket<WriterTPartialOf<F, W>, Throwable>, Write
 
 @extension
 @undocumented
-interface WriterTMonadDefer<F, W> : MonadDefer<WriterTPartialOf<F, W>>, WriterTBrack<F, W> {
+interface WriterTMonadDefer<F, W> : MonadDefer<WriterTPartialOf<F, W>>, WriterTBracket<F, W> {
 
   override fun MD(): MonadDefer<F>
 

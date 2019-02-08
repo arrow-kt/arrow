@@ -6,8 +6,11 @@ import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.option.foldable.foldable
 import arrow.core.extensions.option.traverse.traverse
 import arrow.data.*
+import arrow.data.extensions.optiont.monad.monad
 import arrow.extension
 import arrow.typeclasses.*
+import arrow.typeclasses.suspended.monad.Fx
+import arrow.undocumented
 
 @extension
 interface OptionTFunctor<F> : Functor<OptionTPartialOf<F>> {
@@ -81,6 +84,7 @@ interface OptionTMonadError<F, E> : MonadError<OptionTPartialOf<F>, E>, OptionTM
 }
 
 @extension
+@undocumented
 interface OptionTMonadThrow<F> : MonadThrow<OptionTPartialOf<F>>, OptionTMonadError<F, Throwable> {
   override fun ME(): MonadError<F, Throwable>
 }
@@ -139,4 +143,14 @@ interface OptionTMonoidK<F> : MonoidK<OptionTPartialOf<F>>, OptionTSemigroupK<F>
   override fun MF(): Monad<F>
 
   override fun <A> empty(): OptionT<F, A> = OptionT(MF().just(None))
+}
+
+@extension
+interface OptionTFx<F> : Fx<OptionTPartialOf<F>> {
+
+  fun M(): Monad<F>
+
+  override fun monad(): Monad<OptionTPartialOf<F>> =
+    OptionT.monad(M())
+
 }

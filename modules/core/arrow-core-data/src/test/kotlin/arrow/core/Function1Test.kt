@@ -15,11 +15,12 @@ import arrow.typeclasses.Conested
 import arrow.typeclasses.Eq
 import arrow.typeclasses.conest
 import arrow.typeclasses.counnest
-import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class Function1Test : UnitSpec() {
   val ConestedEQ: Eq<Kind<Conested<ForFunction1, Int>, Int>> = Eq { a, b ->
     a.counnest().invoke(1) == b.counnest().invoke(1)
@@ -32,7 +33,7 @@ class Function1Test : UnitSpec() {
   init {
     testLaws(
       SemigroupLaws.laws(Function1.semigroup<Int, Int>(Int.semigroup()), { a: Int -> a + 1 }.k(), { a: Int -> a + 2 }.k(), { a: Int -> a + 3 }.k(), EQ),
-      MonoidLaws.laws(Function1.monoid<Int, Int>(Int.monoid()), { a: Int -> a + 1 }.k(), EQ),
+      MonoidLaws.laws(Function1.monoid<Int, Int>(Int.monoid()), Gen.constant({ a: Int -> a + 1 }.k()), EQ),
       ContravariantLaws.laws(Function1.contravariant(), { Function1.just<Int, Int>(it).conest() }, ConestedEQ),
       ProfunctorLaws.laws(Function1.profunctor(), { Function1.just(it) }, EQ),
       MonadLaws.laws(Function1.monad(), EQ),

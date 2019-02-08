@@ -4,17 +4,16 @@ import arrow.core.*
 import arrow.data.Validated
 import arrow.core.extensions.`try`.applicative.applicative
 import arrow.core.extensions.either.applicative.applicative
-import arrow.core.extensions.either.applicative.map2
 import arrow.test.UnitSpec
 import arrow.test.generators.*
 import arrow.test.laws.IsoLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
-import io.kotlintest.KTestJUnitRunner
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.properties.Gen
 import org.junit.runner.RunWith
 
-@RunWith(KTestJUnitRunner::class)
+@RunWith(KotlinTestRunner::class)
 class ValidatedTest : UnitSpec() {
 
   init {
@@ -22,9 +21,9 @@ class ValidatedTest : UnitSpec() {
     testLaws(
       IsoLaws.laws(
         iso = Validated.toEither(),
-        aGen = genValidated(Gen.string(), Gen.int()),
-        bGen = genEither(Gen.string(), Gen.int()),
-        funcGen = genFunctionAToB(genEither(Gen.string(), Gen.int())),
+        aGen = Gen.validated(Gen.string(), Gen.int()),
+        bGen = Gen.either(Gen.string(), Gen.int()),
+        funcGen = Gen.functionAToB(Gen.either(Gen.string(), Gen.int())),
         EQA = Eq.any(),
         EQB = Eq.any(),
         bMonoid = object : Monoid<Either<String, Int>> {
@@ -36,9 +35,9 @@ class ValidatedTest : UnitSpec() {
 
       IsoLaws.laws(
         iso = Validated.toTry(),
-        aGen = genValidated(genThrowable(), Gen.int()),
-        bGen = genTry(Gen.int()),
-        funcGen = genFunctionAToB(genTry(Gen.int())),
+        aGen = Gen.validated(Gen.throwable(), Gen.int()),
+        bGen = Gen.`try`(Gen.int()),
+        funcGen = Gen.functionAToB(Gen.`try`(Gen.int())),
         EQA = Eq.any(),
         EQB = Eq.any(),
         bMonoid = object : Monoid<Try<Int>> {

@@ -4,8 +4,11 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.data.*
+import arrow.data.extensions.listk.monad.monad
+import arrow.data.extensions.nonemptylist.monad.monad
 import arrow.extension
 import arrow.typeclasses.*
+import arrow.typeclasses.suspended.monad.Fx
 import arrow.data.combineK as nelCombineK
 
 @extension
@@ -153,3 +156,11 @@ fun <F, A> Reducible<F>.toNonEmptyList(fa: Kind<F, A>): NonEmptyList<A> =
   fa.reduceRightTo({ a -> NonEmptyList.of(a) }, { a, lnel ->
     lnel.map { nonEmptyList -> NonEmptyList(a, listOf(nonEmptyList.head) + nonEmptyList.tail) }
   }).value()
+
+@extension
+interface NelFx : Fx<ForNonEmptyList> {
+
+  override fun monad(): Monad<ForNonEmptyList> =
+    Nel.monad()
+
+}

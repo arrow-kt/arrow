@@ -38,22 +38,6 @@
             $("#video-panel").slideToggle("toggled");
         });
 
-        // Touch interactions on the sidebar
-        var sidebarWrapperEl = document.getElementById('sidebar-wrapper');
-        // create a simple instance, by default it only adds horizontal recognizers
-        if (sidebarWrapperEl) {
-            var sidebarWrapperTouch = new Hammer(sidebarWrapperEl);
-            // Listen to touch events, showing on swiperight, hiding on swipeleft
-            sidebarWrapperTouch.on("swiperight", function(ev) {
-                ev.preventDefault()
-                $("#wrapper").addClass("toggled");
-            });
-            sidebarWrapperTouch.on("swipeleft", function(ev) {
-                ev.preventDefault()
-                $("#wrapper").removeClass("toggled");
-            });
-        }
-
         /**
          * This function generates the “unrolling” of the secction by adding
          * some classes to the element and applying a jQuery slide action
@@ -120,6 +104,6 @@
           }
         };
 
-        linkifyAllLevels(".doc-content");
+        linkifyAllLevels(".doc-content, .blog-content");
     });
 })(jQuery);

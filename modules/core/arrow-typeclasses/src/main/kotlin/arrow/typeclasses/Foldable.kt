@@ -95,6 +95,9 @@ interface Foldable<F> {
     foldLeft(MN.empty()) { b, a -> b.combine(f(a)) }
   }
 
+  fun <A> orEmpty(AF: Applicative<F>, MA: Monoid<A>): Kind<F, A> =
+    AF.run { just(MA.empty()) }
+
   /**
    * Traverse F<A> using Applicative<G>.
    *

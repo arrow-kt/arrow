@@ -2,8 +2,10 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.core.Option
-import arrow.effects.internal.MVarAsync
+import arrow.effects.internal.CancelableMVar
+import arrow.effects.internal.UncancelableMVar
 import arrow.effects.typeclasses.Async
+import arrow.effects.typeclasses.Concurrent
 
 /**
  * It's a mutable variable with context [F], that is either empty or contains a value of type [A].
@@ -202,6 +204,57 @@ interface MVar<F, A> {
   companion object {
 
     /**
+     * Create an cancelable empty [MVar].
+     *
+     * ```kotlin:ank:playground
+     * import arrow.effects.*
+     * import arrow.effects.extensions.io.concurrent.concurrent
+     *
+     * fun main(args: Array<String>) {
+     *   //sampleStart
+     *   val mvar: IOOf<MVar<ForIO, Int>> = MVar.empty(IO.concurrent())
+     *   //sampleEnd
+     * }
+     * ```
+     */
+    fun <F, A> empty(CF: Concurrent<F>): Kind<F, MVar<F, A>> =
+      CancelableMVar.empty(CF)
+
+    /**
+     * Create an uncancelable [MVar] that's initialized to an [initial] value.
+     *
+     * ```kotlin:ank:playground
+     * import arrow.effects.*
+     * import arrow.effects.extensions.io.concurrent.concurrent
+     *
+     * fun main(args: Array<String>) {
+     *   //sampleStart
+     *   val mvar: IOOf<MVar<ForIO, Int>> = MVar.cancelable(5, IO.concurrent())
+     *   //sampleEnd
+     * }
+     * ```
+     */
+    fun <F, A> cancelable(initial: A, CF: Concurrent<F>): Kind<F, MVar<F, A>> =
+      CancelableMVar(initial, CF)
+
+    /**
+     * Create an uncancelable [MVar] that's initialized to an [initial] value.
+     *
+     * ```kotlin:ank:playground
+     * import arrow.effects.*
+     * import arrow.effects.extensions.io.concurrent.concurrent
+     *
+     * fun main(args: Array<String>) {
+     *   //sampleStart
+     *   val mvar: IOOf<MVar<ForIO, Int>> = MVar.cancelable(5, IO.concurrent())
+     *   //sampleEnd
+     * }
+     * ```
+     */
+    operator fun <F, A> invoke(initial: A, CF: Concurrent<F>): Kind<F, MVar<F, A>> =
+      CancelableMVar(initial, CF)
+
+    /**
      * Create an uncancelable empty [MVar].
      *
      * ```kotlin:ank:playground
@@ -216,7 +269,7 @@ interface MVar<F, A> {
      * ```
      */
     fun <F, A> uncancelableEmpty(AS: Async<F>): Kind<F, MVar<F, A>> =
-      MVarAsync.empty(AS)
+      UncancelableMVar.empty(AS)
 
     /**
      * Create an uncancelable [MVar] that's initialized to an [initial] value.
@@ -233,15 +286,24 @@ interface MVar<F, A> {
      * ```
      */
     fun <F, A> uncancelableOf(initial: A, AS: Async<F>): Kind<F, MVar<F, A>> =
-      MVarAsync(initial, AS)
+      UncancelableMVar(initial, AS)
 
     operator fun <F> invoke(AS: Async<F>) = object : MVarPartialOf<F> {
 
       override fun <A> of(a: A): Kind<F, MVar<F, A>> =
-        MVarAsync(a, AS)
+        UncancelableMVar(a, AS)
 
       override fun <A> empty(): Kind<F, MVar<F, A>> =
-        MVarAsync.empty(AS)
+        UncancelableMVar.empty(AS)
+    }
+
+    operator fun <F> invoke(CF: Concurrent<F>) = object : MVarPartialOf<F> {
+
+      override fun <A> of(a: A): Kind<F, MVar<F, A>> =
+        CancelableMVar(a, CF)
+
+      override fun <A> empty(): Kind<F, MVar<F, A>> =
+        CancelableMVar.empty(CF)
     }
 
   }
@@ -249,7 +311,7 @@ interface MVar<F, A> {
 }
 
 /**
- * Builds a [Mvar] value for data types [F]
+ * Builds a [MVar] value for data types [F]
  * without deciding the type of the MVar's value.
  *
  * ```kotlin:ank:playground
@@ -268,7 +330,7 @@ interface MVar<F, A> {
 interface MVarPartialOf<F> {
 
   /**
-   * Builds a [Mvar] with a value of type [A].
+   * Builds a [MVar] with a value of type [A].
    *
    * ```kotlin:ank:playground
    * import arrow.effects.*
@@ -285,7 +347,7 @@ interface MVarPartialOf<F> {
   fun <A> of(a: A): Kind<F, MVar<F, A>>
 
   /**
-   * Builds an empty [Mvar] for type [A].
+   * Builds an empty [MVar] for type [A].
    *
    * ```kotlin:ank:playground
    * import arrow.effects.*

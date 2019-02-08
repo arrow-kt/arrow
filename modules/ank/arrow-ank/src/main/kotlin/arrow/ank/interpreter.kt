@@ -1,8 +1,10 @@
 package arrow.ank
 
 import arrow.core.*
-import arrow.effects.typeclasses.MonadDefer
 import arrow.data.extensions.sequence.foldable.foldLeft
+import arrow.effects.typeclasses.MonadDefer
+import java.io.PrintWriter
+import java.io.StringWriter
 import java.net.URL
 import java.net.URLClassLoader
 import java.nio.file.Files
@@ -49,6 +51,7 @@ data class Snippet(
   val isSilent: Boolean = fence.contains(AnkSilentBlock),
   val isReplace: Boolean = fence.contains(AnkReplaceBlock),
   val isOutFile: Boolean = fence.contains(AnkOutFileBlock),
+  val isFail: Boolean = fence.contains(AnkFailBlock),
   val isPlayground: Boolean = fence.contains(AnkPlayground),
   val isPlaygroundExtension: Boolean = fence.contains(AnkPlaygroundExtension)
 )
@@ -58,6 +61,7 @@ const val AnkSilentBlock = ":ank:silent"
 const val AnkReplaceBlock = ":ank:replace"
 const val AnkOutFileBlock = ":ank:outFile"
 const val AnkPlayground = ":ank:playground"
+const val AnkFailBlock = ":ank:fail"
 const val AnkPlaygroundExtension = ":ank:playground:extension"
 
 val ankMacroRegex: Regex = "ank_macro_hierarchy\\((.*?)\\)".toRegex()
@@ -160,14 +164,21 @@ fun <F> monadDeferInterpreter(MF: MonadDefer<F>): AnkOps<F> = object : AnkOps<F>
         }.eval(snip.code)
       }.fold<Snippet>({
         // raise error and print to console
-        println(colored(ANSI_RED, "[✗ ${snippets.a} [${i + 1}]"))
-        throw CompilationException(snippets.a, snip, it, msg = "\n" + """
+        if (snip.isFail) {
+          val sw = StringWriter()
+          val pw = PrintWriter(sw)
+          it.printStackTrace(pw)
+          snip.copy(result = sw.toString().some())
+        } else {
+          println(colored(ANSI_RED, "[✗ ${snippets.a} [${i + 1}]"))
+          throw CompilationException(snippets.a, snip, it, msg = "\n" + """
                     |
                     |```
                     |${snip.code}
                     |```
                     |${colored(ANSI_RED, it.localizedMessage)}
                     """.trimMargin())
+        }
       }, { result ->
         // handle results, ignore silent snippets
         if (snip.isSilent) snip
@@ -195,19 +206,23 @@ fun <F> monadDeferInterpreter(MF: MonadDefer<F>): AnkOps<F> = object : AnkOps<F>
   }
 
   override fun replaceAnkToLang(content: Sequence<String>, compiledSnippets: Sequence<Snippet>): Sequence<String> =
-    sequenceOf(compiledSnippets.foldLeft(content.joinToString("\n")) { content, snippet ->
+    sequenceOf(compiledSnippets.foldLeft(content.joinToString("\n")) { snippetContent, snippet ->
       snippet.result.fold(
-        { content.replace(snippet.fence, "{: data-executable='true'}\n\n```${snippet.lang}\n${snippet.code}\n```") },
+        {
+          if (snippet.isPlayground)
+            snippetContent.replace(snippet.fence, "{: data-executable='true'}\n\n```${snippet.lang}\n${snippet.code}\n```")
+          else
+            snippetContent.replace(snippet.fence, "```${snippet.lang}\n${snippet.code}\n```") },
         {
           when {
             // these are extensions declared in type classes that should be removed since the extension generator
             // processor is the one in charge of projecting those examples in the generated markdown files
-            snippet.isPlaygroundExtension -> content.replace(snippet.fence, it)
+            snippet.isPlaygroundExtension -> snippetContent.replace(snippet.fence, it)
             // a regular playground
-            snippet.isPlayground -> content.replace(snippet.fence, "{: data-executable='true'}\n\n```${snippet.lang}\n${snippet.code}\n$it\n```")
-            snippet.isReplace -> content.replace(snippet.fence, it)
-            snippet.isOutFile -> content.replace(snippet.fence, "")
-            else -> content.replace(snippet.fence, "```${snippet.lang}\n" + snippet.code + "\n" + it + "\n```")
+            snippet.isPlayground -> snippetContent.replace(snippet.fence, "{: data-executable='true'}\n\n```${snippet.lang}\n${snippet.code}\n$it\n```")
+            snippet.isReplace -> snippetContent.replace(snippet.fence, it)
+            snippet.isOutFile -> snippetContent.replace(snippet.fence, "")
+            else -> snippetContent.replace(snippet.fence, "```${snippet.lang}\n" + snippet.code + "\n" + it + "\n```")
           }
         }
       )
