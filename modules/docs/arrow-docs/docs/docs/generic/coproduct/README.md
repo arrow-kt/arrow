@@ -58,7 +58,31 @@ Let's say we have an api. Our api operates under the following conditions:
 
 Because we have some common errors that every endpoint can return to us, we can define a sealed class of these and call them `CommonServerError` because they make sense to be sealed together for reusability. Likewise, we can logically group our specific errors into `RegistrationError` and we have `Registration` as our success type.
 
-With Coproducts, we're able to define a result for this api call as `Coproduct3<CommonServerError, RegistrationError, Registration>`. We've been able to compose these results without having to write our own sealed class containing all the common errors for each endpoint.
+The most obvious approach would be to use Kotlin's `sealed class` to create a return type for this api call:
+
+```kotlin:ank
+sealed class ApiResult {
+  data class CommonServerError(val value: CommonServerError): ApiResult()
+  data class RegistrationError(val value: RegistrationError): ApiResult()
+  data class Registration(val value: Registration): ApiResult()
+}
+```
+
+Immediately we can observe there's boilerplate to this approach. We need to make a data class that just holds a single value to combine these results to a common type. Any time we need to add to ApiResult we need to go through and add another wrapping class to conform it to this type.
+
+Upon using it we can also observe that there's unwrapping that needs to take place to actually use the values:
+
+```kotlin:ank
+fun handleResult(apiResult: ApiResult): String {
+  return when (apiResult) {
+    is ApiResult.CommonServerError -> "Common: ${apiResult.value}"
+    is ApiResult.RegistrationError -> "RegistrationError: ${apiResult.value}"
+    is ApiResult.Registration -> "Registration: ${apiResult.value}"
+  }
+}
+```
+
+With Coproducts, we're able to define a result for this api call as `typealias ApiResult = Coproduct3<CommonServerError, RegistrationError, Registration>`. We've been able to compose these results without having to write our own sealed class containing all the common errors for each endpoint. This lets us flatten a layer of boilerplate by abstracting the sealed hierarchy and lets us freely compose types from different domain types.
 
 #### Extensions
 
