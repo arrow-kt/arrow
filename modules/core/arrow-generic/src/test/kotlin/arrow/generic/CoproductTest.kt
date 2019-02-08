@@ -93,7 +93,7 @@ class CoproductTest : UnitSpec() {
             thirdValue.cop<String, Long, Option<String>>() shouldBe thirdValue.third<String, Long, Option<String>>()
         }
 
-        "types can be inferred with the cop replacement functions" {
+        "types can be inferred with the extension constructors" {
             fun typeInferenceTest(input: String?): Coproduct3<String, Int, Option<String>> {
                 return when {
                     input == null -> none<String>().third()
@@ -103,6 +103,18 @@ class CoproductTest : UnitSpec() {
             }
 
             typeInferenceTest(null) shouldBe Third<String, Int, Option<String>>(none())
+        }
+
+        "types can be inferred with the ADT constructors" {
+            fun typeInferenceTest(input: String?): Coproduct3<String, Int, Option<String>> {
+                return when {
+                    input == null -> Third(none())
+                    input.length > 100 -> Second(input.length)
+                    else -> First(input)
+                }
+            }
+
+            typeInferenceTest(null) shouldBe none<String>().third<String, Int, Option<String>>()
         }
 
         "Coproduct data classes should be available" {
