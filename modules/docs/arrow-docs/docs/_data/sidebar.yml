@@ -185,7 +185,7 @@ options:
         url: /docs/arrow/data/moore/
 
       - title: Sum
-        url: /docs/arrow/data/moore/
+        url: /docs/arrow/data/sum/
 
       - title: Day
         url: /docs/arrow/data/day/
@@ -231,7 +231,7 @@ options:
         url: /docs/arrow/typeclasses/eq/
 
       - title: Hash
-        url: /docs/arrow/typeclasses/hash
+        url: /docs/arrow/typeclasses/hash/
 
       - title: Order
         url: /docs/arrow/typeclasses/order/
@@ -291,7 +291,7 @@ options:
         url: /docs/arrow/mtl/typeclasses/monadwriter/
 
       - title: MonadState
-        url: /docs/arrow/mtl/typeclasses/monadstate
+        url: /docs/arrow/mtl/typeclasses/monadstate/
 
       - title: MonadCombine
         url: /docs/arrow/mtl/typeclasses/monadcombine/
@@ -303,10 +303,10 @@ options:
         url: /docs/arrow/typeclasses/bimonad/
 
       - title: Bifunctor
-        url: /docs/arrow/typeclasses/bifunctor
+        url: /docs/arrow/typeclasses/bifunctor/
 
       - title: Profunctor
-        url: /docs/arrow/typeclasses/profunctor
+        url: /docs/arrow/typeclasses/profunctor/
 
       - title: SemigroupK
         url: /docs/arrow/typeclasses/semigroupk/
@@ -374,7 +374,7 @@ options:
         url: /docs/optics/traversal/
 
       - title: Cons
-        url: /docs/optics/cons
+        url: /docs/optics/cons/
 
       - title: Snoc
         url: /docs/optics/snoc/
@@ -396,37 +396,37 @@ options:
     nested_options:
 
       - title: Λrrow Query Language
-        url: /docs/aql/intro
+        url: /docs/aql/intro/
 
       - title: select
-        url: /docs/aql/select
+        url: /docs/aql/select/
 
       - title: from
-        url: /docs/aql/from
+        url: /docs/aql/from/
 
       - title: where
-        url: /docs/aql/where
+        url: /docs/aql/where/
 
       - title: groupBy
-        url: /docs/aql/groupby
+        url: /docs/aql/groupby/
 
       - title: orderBy
-        url: /docs/aql/orderby
+        url: /docs/aql/orderby/
 
       - title: sum
-        url: /docs/aql/sum
+        url: /docs/aql/sum/
 
       - title: union
-        url: /docs/aql/union
+        url: /docs/aql/union/
 
       - title: Custom Data Types
-        url: /docs/aql/custom
+        url: /docs/aql/custom/
 
   - title: Generic
     nested_options:
 
           - title: Coproduct
-            url: /docs/generic/coproduct
+            url: /docs/generic/coproduct/
 
           - title: Product
             url: /docs/generic/product/
