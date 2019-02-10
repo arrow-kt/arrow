@@ -41,6 +41,13 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
       }
     }
 
+  override fun equals(other: Any?): Boolean =
+    when (other) {
+      is SequenceK<*> -> this.sequence.toList().k() == other.sequence.toList().k()
+      is Sequence<*> -> this.sequence.toList() == other.toList()
+      else -> false
+    }
+
   companion object {
 
     fun <A> just(a: A): SequenceK<A> = sequenceOf(a).k()
