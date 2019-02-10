@@ -5,14 +5,14 @@ permalink: /docs/effects/fx/
 ---
 
 - [Arrow Fx. Typed FP for the masses](#arrow-fx-typed-fp-for-the-masses)
-  * [Pure Functions, Side Effects and Program Execution](#pure-functions--side-effects--and-program-execution)
-    + [Pure & Referentially Transparent Functions](#pure---referentially-transparent-functions)
-    + [Side effects](#side-effects)
-        * [`suspend` composition](#-suspend--composition)
-        * [`fx` composition](#-fx--composition)
-        * [Turning side effects into pure values with `effect`](#turning-side-effects-into-pure-values-with--effect-)
-        * [Applying side effects with `!effect`](#applying-side-effects-with---effect-)
-    + [Executing effectful programs](#executing-effectful-programs)
+- [Pure Functions, Side Effects, and Program Execution](#pure-functions--side-effects--and-program-execution)
+  * [Pure & Referentially Transparent Functions](#pure---referentially-transparent-functions)
+  * [Side effects](#side-effects)
+      - [`suspend` composition](#-suspend--composition)
+      - [`fx` composition](#-fx--composition)
+      - [Turning side effects into pure values with `effect`](#turning-side-effects-into-pure-values-with--effect-)
+      - [Applying side effects with `!effect`](#applying-side-effects-with---effect-)
+  * [Executing effectful programs](#executing-effectful-programs)
 - [Conclusion](#conclusion)
 
 # Arrow Fx. Typed FP for the masses
@@ -29,7 +29,7 @@ Arrow Fx programs run unmodified in multiple supported frameworks and runtimes s
 
 A pure function is a function that consistently returns the same output when given the same input. Pure functions exhibit a deterministic behavior and cause no observable effects externally. We call this property, referential transparency.
 
-Referential transparency allows us to reason about the different pieces of our program in isolation. 
+Referential transparency allows us to reason about the different pieces of our program in isolation.
 
 To create a pure function in Kotlin, let's use the keyword `fun`:
 
@@ -75,13 +75,13 @@ The Kotlin compiler disallows the invocation of suspended functions in the pure 
 
 A continuation is a Kotlin Interface, `Continuation<A>`, that proves we know how to handle success and error cases resulting from running the suspended effect.
 
-This is a great built-in feature of the Kotlin compiler that already makes it an ideal choice for Typed FP, but it's not the only one. 
+This is a great built-in feature of the Kotlin compiler that already makes it an ideal choice for Typed FP, but it's not the only one.
 
 Continue reading on if you're curious to see how the Kotlin Compiler and Arrow Fx can eliminate many of the functional idioms by using direct syntax, overall effectful monads.
 
 #### `suspend` composition
 
-Applying and composing suspended side effects is allowed in the presence of other suspended side effects. 
+Applying and composing suspended side effects is allowed in the presence of other suspended side effects.
 
 In the example below, `sayHello` and `sayGoodBye` are valid inside `greet` because they are all suspended functions.
 
@@ -91,7 +91,7 @@ suspend fun sayGoodBye(): Unit =
   println("Good bye World!")
   
 suspend fun sayHello(): Unit =
-  println(helloWorld())
+  println("Hello World")
   
 suspend fun greet(): Unit {
   sayHello() // this is ok because
@@ -121,7 +121,7 @@ suspend fun sayGoodBye(): Unit =
 fun greet(): IO<Unit> =
   fx {
     val pureHello = effect { sayHello() }
-    val pureGoodBye = effect { sayHello() }
+    val pureGoodBye = effect { sayGoodBye() }
   }
 //sampleEnd 
 fun main() {
@@ -185,7 +185,7 @@ Arrow enforces usage to be explicit about effects application.
 The `greet` program is ready to run as soon as the user is ready to commit to an execution strategy that is either `blocking` or `non-blocking`.
 `blocking` execution strategies will block the current thread that's waiting for the program to yield a value whereas `non-blocking` strategies will immediately return and perform the program's work without blocking the current thread.
 
-Since both blocking and non-blocking execution scenarios perform side effects, we consider running effects as an `unsafe` operation. 
+Since both blocking and non-blocking execution scenarios perform side effects, we consider running effects as an `unsafe` operation.
 
 Arrow restricts the ability to run programs to extensions of the `UnsafeRun` type class. 
 
@@ -219,7 +219,7 @@ Arrow Fx emphasizes the guarantee that users understand when they are performing
 
 Arrow Fx programs are not restricted to `IO` but, in fact, are polymorphic and would work unmodified in many useful runtimes like the ones we find in popular libraries such as KotlinX Coroutines `Deferred`, Rx2 `Observable`, Reactor framework `Flux`, and in general, any third party data type that can model sync and async effect suspension. See [Issue 1281](https://github.com/arrow-kt/arrow/issues/1281) which tracks support for those frameworks or reach out to us if you are interested in support for any other framework.
 
-If you're not very familiar with Functional Programming, and you've made it this far, you may realize that despite the buzzwords and some FP jargon, you already know how to use Arrow Fx in general. This is because Arrow Fx brings the most popular imperative style to effectful programs with few simple primitives for effect control and asynchronous programming. 
+If you're not very familiar with Functional Programming, and you've made it this far, you may realize that despite the buzzwords and some FP jargon, you already know how to use Arrow Fx in general. This is because Arrow Fx brings the most popular imperative style to effectful programs with few simple primitives for effect control and asynchronous programming.
 
 
 # Conclusion

@@ -48,8 +48,8 @@ fun main() =
 
 Polymorphism is important for two main reasons: *Correctness* & *Flexibility*.
 
-Polymorphic programs are more likely to be correct because the APIs available to them are constrained by the functionality described in the type classes that are used as a scope. In the previous example, this is the receiver of the function. 
-What's most amazing about this technique is that, as we declare our programs, only data types that can provide extensions for `Fx` and `UnsafeRun` are able to be provided as arguments to the final `main`. 
+Polymorphic programs are more likely to be correct because the APIs available to them are constrained by the functionality described in the type classes that are used as a scope. In the previous example, this is the receiver of the function.
+What's most amazing about this technique is that, as we declare our programs, only data types that can provide extensions for `Fx` and `UnsafeRun` are able to be provided as arguments to the final `main`.
 You will not be able to compile this program unless your data type supports those extensions.
 
 Polymorphic programs are more flexible than their concrete counterparts because they can run unmodified in multiple runtimes.
@@ -123,10 +123,10 @@ Arrow Fx brings first class, no-compromises, direct style syntax for effectful p
 
  As a consequence of the assimilation and elimination of the `F` type parameter from the syntax in such programs, the entire hierarchy of type class combinators we find in `Functor`, `Applicative`, and `Monad` disappear and what they model is swallowed as syntax that operates directly over the environment.
 
-This simplification is manifested in the world of suspended effects in the fact that all values of type `Kind<F, A>` can bind to `A` in the left-hand side in a non-blocking fashion because Kotlin supports imperative CPS and continuation styles syntactically. 
+This simplification is manifested in the world of suspended effects in the fact that all values of type `Kind<F, A>` can bind to `A` in the left-hand side in a non-blocking fashion because Kotlin supports imperative CPS and continuation styles syntactically.
 Arrow Fx uses the Kotlin compiler native support for implicit CPS to achieve direct syntax for effectful monads.
 
-This has a tremendous impact on program declaration since all the functional combinators can be easily applied with `!` to obtain a non blocking value, where before you had `Kind,F, A>` as a return type. 
+This has a tremendous impact on program declaration since all the functional combinators can be easily applied with `!` to obtain a non blocking value, where before you had `Kind,F, A>` as a return type.
 `map` and `flatMap` are no longer necessary because their returned values are flattened and automatically bound in the monad context when you use `!`.
 
 This leads us to the realization that there is a direct relationship between `suspend () -> A` and `Kind<F, A>`, or, what `F[A]` is in Scala.
@@ -135,7 +135,7 @@ This relationship establishes that a `suspend` function denoting an effect can b
 `effect` takes us, without blocking semantics, from a suspended function to any `Kind<F, A>`.
 This includes IO and pretty much everything you are using today in a tagless final or IO wrapping style.
 
-This relationship also eliminates the need for using any of the functional combinators you find in the `Functor<F>` hierarchy for effectful monads. 
+This relationship also eliminates the need for using any of the functional combinators you find in the `Functor<F>` hierarchy for effectful monads.
 These are all swallowed by equivalent direct syntax in the environment as demonstrated in the examples below:
 
 ### Good bye `Functor`, `Applicative` and `Monad`
@@ -157,11 +157,14 @@ The following combinators illustrate how the Functor hierarchy functions are poi
 | MonadDefer.delay    | `IO.delay { 1 }` | `effect { 1 }` |
 | MonadDefer.defer    | `IO.defer { IO { 1 } }` | `effect { 1 }` |
 
-This is, in general, true for effectful data types that are non-commutative. 
+This is, in general, true for effectful data types that are commutative.
+
+### Non-commutative monads
+
 Note that implicit CPS style with non-blocking direct binding has a disadvantage. You cannot apply substitution based on referential transparency for non-commutative monads where the order of effects matter.
 
 Arrow Fx is aware of this but still allows users to use `fx` on non-commutative monads such as `List`, providing safe `fx` builders that guarantee suspended effects are applied in order in different arguments before they are composed.
-Altering the order of effect when using the safe builders for non-commutative monads does not alter the results because it enforces effect order prior to composition.
+Altering the order of effects when using the safe builders for non-commutative monads does not alter the results because it enforces effect order prior to composition.
 
 ```kotlin:ank:playground
 import arrow.core.identity

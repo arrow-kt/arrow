@@ -13,7 +13,7 @@ permalink: /docs/effects/fx/async/
     + [`parSequence`](#-parsequence-)
   * [Cancellation](#cancellation)
   * [Arrow Fx vs KotlinX Coroutines](#arrow-fx-vs-kotlinx-coroutines)
-  * [Integrating with third party libraries](#integrating-with-third--party-libraries)
+  * [Integrating with third-party libraries](#integrating-with-third-party-libraries)
 
 # Asynchronous & Concurrent Programming
 
@@ -88,12 +88,12 @@ This is part of the greatness of Fibers. They run as scheduled based on the poli
 
 ## Parallelization & Concurrency
 
-Arrow Fx comes with built-in versions of `parMapN`, `parTraverse`, and `parSequence` allowing users to dispatch effects in parallel and receive non-blocking results and direct syntax without wrappers. 
+Arrow Fx comes with built-in versions of `parMapN`, `parTraverse`, and `parSequence` allowing users to dispatch effects in parallel and receive non-blocking results and direct syntax without wrappers.
 
 ### `parMapN`
 
 `parMapN` allows *N#* effects to run in parallel non-blocking waiting for all results to complete and then delegates to a user-provided function that applies a final transformation over the results.
-Once the function specifies a valid return, we can observe how the returned non-blocking value is bound on the left-hand side. 
+Once the function specifies a valid return, we can observe how the returned non-blocking value is bound on the left-hand side.
 
 ```kotlin:ank:playground
 import arrow.effects.IO
@@ -128,7 +128,7 @@ fun main() { // The edge of our world
 
 ### `parTraverse`
 
-`parTraverse` allows any `Iterable<suspend () -> A>` to iterate over its contained effects in parallel as we apply a user-provided function over each effect result and then gather all the transformed results in a `List<B>`. 
+`parTraverse` allows any `Iterable<suspend () -> A>` to iterate over its contained effects in parallel as we apply a user-provided function over each effect result and then gather all the transformed results in a `List<B>`.
 
 ```kotlin:ank:playground
 import arrow.effects.IO
@@ -160,7 +160,7 @@ fun main() { // The edge of our world
 
 ### `parSequence`
 
-`parSequence` applies all effects in `Iterable<suspend () -> A>` in non-blocking in parallel and then gathers all the transformed results and returns them in a `List<B>`. 
+`parSequence` applies all effects in `Iterable<suspend () -> A>` in non-blocking in parallel and then gathers all the transformed results and returns them in a `List<B>`.
 
 ```kotlin:ank:playground
 import arrow.effects.IO
@@ -210,7 +210,7 @@ fun main() { // The edge of our world
 
 ## Arrow Fx vs KotlinX Coroutines
 
-In the same way that Arrow serves as a companion to the Kotlin standard library in providing the abstractions and runtime to implement Typed FP in Kotlin, Arrow Fx can be seen as a companion to the KotlinX Coroutines library. 
+In the same way that Arrow serves as a companion to the Kotlin standard library in providing the abstractions and runtime to implement Typed FP in Kotlin, Arrow Fx can be seen as a companion to the KotlinX Coroutines library.
 
 Arrow Fx adds an extra layer of security and effect control where we can easily model side effects and how they interact with pure computations.
 
@@ -220,7 +220,7 @@ Deferring execution and being able to suspend side effects is essential for prog
 
 Since Arrow Fx uses this lazy behavior by default, we don't have to resort to special configuration arguments when creating deferred computations.
 
-The value `program` below is pure and referentially transparent because `fx` returns a lazy computation: 
+The value `program` below is pure and referentially transparent because `fx` returns a lazy computation:
 
 ```kotlin:ank:playground
 import arrow.effects.IO
@@ -261,7 +261,7 @@ fun main() {
 ```
 
 In the previous program, `printThreadName()` may be invoked before we call `await`.
-If we wanted a pure lazy version of this operation, we need to hint to the `async` constructor that our policy is not to start right away. 
+If we wanted a pure lazy version of this operation, we need to hint to the `async` constructor that our policy is not to start right away.
 
 ```kotlin:ank:playground
 import kotlinx.coroutines.*
@@ -282,7 +282,7 @@ fun main() {
 
 If an `async` computation fires immediately, it does not give us a chance to suspend side effects. This implies that all functions that immediately produce their effects when invoked are impure and non-referentially transparent. This is the default in the KotlinX Coroutines Library.
 
-Arrow Fx is not opinionated as to whether eagerly firing is a more or less appropriate technique. We, the authors, understand this style gathers a different audience where purity and referential transparency may not be goals or optimization techniques are in play, and that's just fine. 
+Arrow Fx is not opinionated as to whether eagerly firing is a more or less appropriate technique. We, the authors, understand this style gathers a different audience where purity and referential transparency may not be goals or optimization techniques are in play, and that's just fine.
 
 Life goes on.
 
