@@ -10,27 +10,28 @@ video: DBvVd1pfLMo
 ## Id
 
 {:.beginner}
+beginner
 
-The identity monad can be seen as the ambient monad that encodes the effect of having no effect.
-It is ambient in the sense that plain pure values are values of `Id`.
+[English](/docs/arrow/core/id/)
+
+Id (монада идентичности) должна рассматриваться, как монада, в которую вкладывается эффект отсутствия эффекта. Любое значение может являться значением `Id`.
 
 ```kotlin:ank
 import arrow.*
 import arrow.core.*
 
-Id("hello")
+Id("привет")
 ```
 
-Using this type declaration, we can treat our Id type constructor as a `Monad` and as a `Comonad`.
-The `just` method, which has type `A -> Id<A>` just becomes the identity function. The `map` method
-from `Functor` just becomes function application
+Используя данную декларацию мы можем обращаться с нашим конструктором типа `Id` как с `Монадой` и как с `Комонадой`.
+Метод `just`, который имеет тип `A -> Id<A>` просто становится функцией, переводящей аргумент в себя. Метод `map` от функтора просто становиться применением функции.
 
 ```kotlin:ank
 val id: Id<Int> = Id.just(3)
-id.map{it + 3}
+id.map { it + 3 }
 ```
 
-### Supported type classes
+### Поддерживаемые классы типа
 
 ```kotlin:ank:replace
 import arrow.reflect.*
