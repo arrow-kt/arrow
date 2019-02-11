@@ -117,5 +117,9 @@ include {
         validation {
             _ 'validation'
         }
+        
+        benchmarks {
+            _ 'benchmarks-effects'
+        }
     }
 }

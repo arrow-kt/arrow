@@ -1,6 +1,5 @@
 package arrow.benchmarks.effects
 
-import arrow.core.flatMap
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
 
