@@ -1,0 +1,19 @@
+
+dependencies {
+    compile project(":arrow-effects-data")
+    compile project(":arrow-effects-extensions")
+    compile project(":arrow-effects-io-extensions")
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
+}
+
+apply plugin: "me.champeau.gradle.jmh"
+
+jmh {
+    resultFormat = 'csv'
+    resultsFile = file('build/reports/benchmarks.csv')
+    timeOnIteration = '1s'
+    if (project.hasProperty("jmhInclude"))
+        include = [jmhInclude]
+    if (project.hasProperty("jmhResultsFile"))
+        resultsFile = file(jmhResultsFile)
+}
