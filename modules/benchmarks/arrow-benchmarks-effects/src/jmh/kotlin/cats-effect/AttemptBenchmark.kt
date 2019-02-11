@@ -1,13 +1,7 @@
 package arrow.benchmarks.effects
 
-import arrow.Kind
-import arrow.core.*
 import arrow.effects.IO
 import arrow.effects.extensions.io.fx.fx
-import arrow.effects.extensions.io.unsafeRun.runBlocking
-import arrow.effects.extensions.io.unsafeRun.unsafeRun
-import arrow.effects.typeclasses.UnsafeRun
-import arrow.effects.typeclasses.suspended.concurrent.Fx
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
 
@@ -19,11 +13,17 @@ open class AttemptBenchmark {
   @Param("10000")
   var size: Int = 0
 
+
   @Benchmark
   fun happyPath(): Int {
+
     fun loop(i: Int): IO<Int> =
-      if (i < size) IO.just(i + 1).attempt().flatMap { it.fold({ e -> IO.raiseError<Int>(e) }, { n -> loop(n) }) }
-      else IO.just(i)
+      fx {
+        if (i < size) {
+          !attempt { i + 1 }.flatMap { it.fold({ e -> IO.raiseError<Int>(e) }, { n -> loop(n) }) }
+        }
+        else !suspend { 1 }.effect()
+      }
 
     return loop(0).unsafeRunSync()
   }
@@ -31,16 +31,19 @@ open class AttemptBenchmark {
   @Benchmark
   fun errorRaised(): Int {
     val dummy = RuntimeException("dummy")
-    fun id(i: Int): IO<Int> = IO.just(i)
+
+    suspend fun id(i: Int) = i
 
     fun loop(i: Int): IO<Int> =
-      if (i < size)
-        IO.raiseError<Int>(dummy)
-          .flatMap { IO.just(it + 1) }
-          .attempt()
-          .flatMap { it.fold({ e -> loop(i + 1) }, {i -> id(i)}) }
-      else
-        IO.just(i)
+      fx {
+        if (i < size)
+          !dummy.raiseError<Int>()
+                  .flatMap { suspend { it + 1 }.effect() }
+                  .attempt()
+                  .flatMap { it.fold({loop(i + 1)},{ i -> effect {id(i)}})}
+        else
+          !suspend { 1 }.effect()
+      }
 
     return loop(0).unsafeRunSync()
   }
