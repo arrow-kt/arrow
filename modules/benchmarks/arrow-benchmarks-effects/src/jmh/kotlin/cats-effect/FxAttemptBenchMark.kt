@@ -17,7 +17,7 @@ val dummy = object : RuntimeException("dummy") {
 @Measurement(iterations = 10)
 open class FxAttemptBenchMark {
 
-  @Param("1000")
+  @Param("10000")
   var size: Int = 0
 
   fun loopHappy(size: Int, i: Int): Fx<Int> =

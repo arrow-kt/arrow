@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit
 @Measurement(iterations = 10)
 open class IOAttemptBenchMark {
 
-  @Param("1000")
+  @Param("10000")
   var size: Int = 0
 
   fun loopHappy(size: Int, i: Int): IO<Int> =
