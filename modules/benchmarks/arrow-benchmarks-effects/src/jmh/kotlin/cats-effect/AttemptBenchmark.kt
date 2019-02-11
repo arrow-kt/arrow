@@ -20,7 +20,7 @@ open class AttemptBenchmark {
     fun loop(i: Int): IO<Int> =
       fx {
         if (i < size) {
-          !attempt { i + 1 }.flatMap { it.fold({ e -> IO.raiseError<Int>(e) }, { n -> loop(n) }) }
+          !attempt { i + 1 }.flatMap { it.fold({ e -> e.raiseError<Int>() }, { n -> loop(n) }) }
         }
         else !suspend { 1 }.effect()
       }
