@@ -1,9 +1,32 @@
 package arrow.benchmarks.effects
 
-import arrow.effects.IO
-import arrow.effects.extensions.io.fx.fx
+import arrow.effects.typeclasses.suspended.Fx
+import arrow.effects.typeclasses.suspended.fx.unsafeRun.runBlocking
+import arrow.unsafe
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
+
+val dummy = object : RuntimeException("dummy") {
+  override fun fillInStackTrace(): Throwable =
+    this
+}
+
+fun loopHappy(size: Int, i: Int): Fx<Int> =
+  if (i < size) {
+    Fx { i + 1 }.attempt().flatMap { either ->
+      either.fold({ Fx.raiseError<Int>(it) }, { n -> loopHappy(size, n) })
+    }
+  } else Fx.just(1)
+
+fun loopNotHappy(size: Int, i: Int): Fx<Int> =
+  if (i < size) {
+    Fx.raiseError<Int>(dummy)
+      .map { it + 1 }
+      .attempt()
+      .flatMap { either ->
+        either.fold({ loopNotHappy(size, i + 1) }, { Fx.just(it) })
+      }
+  } else Fx.just(1)
 
 @State(Scope.Thread)
 @BenchmarkMode(Mode.Throughput)
@@ -13,39 +36,12 @@ open class AttemptBenchmark {
   @Param("10000")
   var size: Int = 0
 
+  @Benchmark
+  fun happyPath(): Int =
+    unsafe { runBlocking { loopHappy(size, 0) } }
 
   @Benchmark
-  fun happyPath(): Int {
-
-    fun loop(i: Int): IO<Int> =
-      fx {
-        if (i < size) {
-          !attempt { i + 1 }.flatMap { it.fold({ e -> e.raiseError<Int>() }, { n -> loop(n) }) }
-        }
-        else !suspend { 1 }.effect()
-      }
-
-    return loop(0).unsafeRunSync()
-  }
-
-  @Benchmark
-  fun errorRaised(): Int {
-    val dummy = RuntimeException("dummy")
-
-    suspend fun id(i: Int) = i
-
-    fun loop(i: Int): IO<Int> =
-      fx {
-        if (i < size)
-          !dummy.raiseError<Int>()
-                  .flatMap { suspend { it + 1 }.effect() }
-                  .attempt()
-                  .flatMap { it.fold({loop(i + 1)},{ i -> effect {id(i)}})}
-        else
-          !suspend { 1 }.effect()
-      }
-
-    return loop(0).unsafeRunSync()
-  }
+  fun errorRaised(): Int =
+    unsafe { runBlocking { loopNotHappy(size, 0) } }
 
 }
