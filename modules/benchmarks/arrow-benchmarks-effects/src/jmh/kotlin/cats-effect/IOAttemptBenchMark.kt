@@ -8,8 +8,9 @@ import java.util.concurrent.TimeUnit
 
 
 @State(Scope.Thread)
-@BenchmarkMode(Mode.AverageTime)
-@OutputTimeUnit(TimeUnit.NANOSECONDS)
+@Fork(2)
+@Warmup(iterations = 10, time = 1, timeUnit = TimeUnit.SECONDS)
+@Measurement(iterations = 10)
 open class IOAttemptBenchMark {
 
   @Param("1000")
