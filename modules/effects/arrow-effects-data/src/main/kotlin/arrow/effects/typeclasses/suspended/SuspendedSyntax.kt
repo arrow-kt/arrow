@@ -2,7 +2,7 @@ package arrow.effects.typeclasses.suspended
 
 import arrow.Kind
 import arrow.core.*
-import arrow.effects.*
+import arrow.effects.KindConnection
 import arrow.effects.internal.Platform
 import arrow.effects.internal.UnsafePromise
 import arrow.effects.internal.asyncContinuation
@@ -16,6 +16,7 @@ import java.util.concurrent.CancellationException
 import java.util.concurrent.ForkJoinPool
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
+import java.util.concurrent.locks.ReentrantLock
 import kotlin.coroutines.*
 
 class ForFx private constructor() {
@@ -356,11 +357,47 @@ interface FxConcurrent : Concurrent<ForFx>, FxAsync {
     Fx.async(fa)
 }
 
+private class BlockingCoroutine<T>(override val context: CoroutineContext) : kotlin.coroutines.Continuation<T> {
+  private val lock = ReentrantLock()
+  private val done = lock.newCondition()
+  private var result: Result<T>? = null
+
+  private inline fun <T> locked(block: () -> T): T {
+    lock.lock()
+    return try {
+      block()
+    } finally {
+      lock.unlock()
+    }
+  }
+
+  private inline fun loop(block: () -> Unit): Nothing {
+    while (true) {
+      block()
+    }
+  }
+
+  override fun resumeWith(result: Result<T>) = locked {
+    this.result = result
+    done.signal()
+  }
+
+  fun getValue(): T = locked<T> {
+    loop {
+      val result = this.result
+      if (result == null) {
+        done.awaitUninterruptibly()
+      } else {
+        return@locked result.getOrThrow()
+      }
+    }
+  }
+}
+
 @extension
 interface FxUnsafeRun : UnsafeRun<ForFx> {
-  override suspend fun <A> unsafe.runBlocking(fa: () -> FxOf<A>): A = suspendCoroutine { cont ->
-    fa().fix().fa.startCoroutine(cont)
-  }
+  override suspend fun <A> unsafe.runBlocking(fa: () -> FxOf<A>): A =
+    BlockingCoroutine<A>(NonBlocking).also { fa().fix().fa.startCoroutine(it) }.getValue()
 
   override suspend fun <A> unsafe.runNonBlocking(fa: () -> FxOf<A>, cb: (Either<Throwable, A>) -> Unit) =
     fa().fix().fa.startCoroutine(asyncContinuation(NonBlocking, cb))
