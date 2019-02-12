@@ -104,6 +104,13 @@ private val ProtoBuf.ConstructorOrBuilder.isSecondary: Boolean get() = Flags.IS_
 
 fun String.removeBackticks() = replace("`", "")
 
+fun String.toCamelCase(): String =
+        when {
+            length <= 1 -> toLowerCase()
+
+            else -> first().toLowerCase() + substring(1)
+        }
+
 fun knownError(message: String, element: Element? = null): Nothing =
   throw KnownException(message, element)
 
