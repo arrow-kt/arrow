@@ -48,6 +48,8 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
       else -> false
     }
 
+  override fun hashCode(): Int = this.sequence.hashCode()
+
   companion object {
 
     fun <A> just(a: A): SequenceK<A> = sequenceOf(a).k()
