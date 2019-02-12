@@ -93,7 +93,7 @@ suspend fun sayGoodBye(): Unit =
   println("Good bye World!")
   
 suspend fun sayHello(): Unit =
-  println(helloWorld())
+  println("Hello World")
   
 suspend fun greet(): Unit {
   sayHello() // this is ok because
@@ -123,7 +123,7 @@ suspend fun sayGoodBye(): Unit =
 fun greet(): IO<Unit> =
   fx {
     val pureHello = effect { sayHello() }
-    val pureGoodBye = effect { sayHello() }
+    val pureGoodBye = effect { sayGoodBye() }
   }
 //sampleEnd 
 fun main() {
