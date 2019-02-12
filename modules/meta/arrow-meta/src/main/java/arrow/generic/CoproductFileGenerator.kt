@@ -2,6 +2,7 @@
 
 package arrow.generic
 
+import arrow.common.utils.toCamelCase
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import java.io.File
@@ -232,14 +233,6 @@ private fun methodDocumentation(
     }
 
     return "$description\n\n$parameters@return $output\n"
-}
-
-private fun String.toCamelCase(): String {
-    return if (isEmpty()) {
-        ""
-    } else {
-        first().toLowerCase() + substring(1)
-    }
 }
 
 private fun List<String>.toTypeParameters(): List<TypeVariableName> = map { TypeVariableName(it) }

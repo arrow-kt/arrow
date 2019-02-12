@@ -23,9 +23,7 @@ compile 'io.arrow-kt:arrow-generic:$arrow_version'
 
 Coproducts represent a sealed hierarchy of types where only one of the specified set of types exist every time. Conceptually, it's very similar to the stdlib `sealed` class, or to [Either]({{ '/docs/arrow/core/either' | relative_url }}) if we move on to Arrow data types. [Either]({{ '/docs/arrow/core/either' | relative_url }}) supports one of two values, an `Either<A, B>` has to contain an instance of `A` or `B`. We can extrapolate that concept to `N` number of types. So a `Coproduct5<A, B, C, D, E>` has to contain an instance of `A`, `B`, `C`, `D`, or `E`. For example, perhaps there's a search function for a Car Dealer app that can show `Dealership`s, `Car`s and `SalesPerson`s in a list, we could model that list of results as `List<Coproduct3<Dealership, Car, SalesPerson>`. The result would contain a list of heterogeneous elements but each element is one of `Dealership`, `Car` or `SalesPerson` and our UI can render the list elements based on those types.
 
-{: data-executable='true'}
-
-```kotlin:ank
+```kotlin:ank:playground
 import arrow.generic.*
 import arrow.generic.coproduct3.*
 
@@ -88,15 +86,17 @@ With Coproducts, we're able to define a result for this api call as `typealias A
 
 So now that we've got our api response modeled, we need to be able to create an instance of `Coproduct3`.
 
-{: data-executable='true'}
-
-```kotlin:ank
+```kotlin:ank:playground
 import arrow.generic.*
 import arrow.generic.coproduct3.First
 
 
 fun main() {
-    println(First<CommonServerError, RegistrationError, Registration>(ServerError))
+    println(
+        //sampleStart
+        First<CommonServerError, RegistrationError, Registration>(ServerError)
+        //sampleEnd
+    )
 }
 ```
 
@@ -104,16 +104,16 @@ Coproducts are backed by a sealed class hierarchy and we can use the data classe
 
 If we pass in a value that doesn't correspond to any types on the Coproduct, it won't compile:
 
-{: data-executable='true'}
-
-```kotlin:ank
+```kotlin:ank:fail
 import arrow.generic.*
 import arrow.generic.coproduct3.First
 
 fun main() {
-//    println(
-//        First<String, RegistrationError, Registration>(ServerError)
-//    )
+    println(
+        //sampleStart
+        First<String, RegistrationError, Registration>(ServerError)
+        //sampleEnd
+    )
 }
 ```
 
@@ -123,31 +123,30 @@ fun main() {
 
 You might be saying "That's great and all but passing in values as parameters is so Java, I want something more Kotlin!". Well look no further, just like [Either]({{ '/docs/arrow/core/either' | relative_url }})'s `left()` and `right()` extension methods, Coproducts can be created with an extension method on any type:
 
-{: data-executable='true'}
-
-
-```kotlin:ank
+```kotlin:ank:playground
 import arrow.generic.*
 import arrow.generic.coproduct3.*
 
 fun main() {
+    //sampleStart
     println(ServerError.first<CommonServerError, RegistrationError, Registration>())
     println(CarAlreadyRegistered.second<CommonServerError, RegistrationError, Registration>())
+    //sampleEnd
 }
 ```
 
 All we have to do is provide the type parameters and we can make a Coproduct using the extension methods. Just like the data classes, if the type of the value isn't in the type parameters of the method call, or it's not in the correct type parameter index, it won't compile:
 
-{: data-executable='true'}
-
-```kotlin:ank
+```kotlin:ank:fail
 import arrow.generic.*
 import arrow.generic.coproduct3.first
 
 fun main() {
-//    println(
-//        "String".first<CommonServerError, RegistrationError, Registration>()
-//    )
+    println(
+        //sampleStart
+        "String".first<CommonServerError, RegistrationError, Registration>()
+        //sampleEnd
+    )
 }
 ```
 
@@ -155,9 +154,7 @@ fun main() {
 
 Obviously, we're not just modeling errors for fun, we're going to handle them! All Coproducts have `fold` which allows us to condense the Coproduct down to a single type. For example, we could handle errors as such in a UI:
 
-{: data-executable='true'}
-
-```kotlin:ank
+```kotlin:ank:playground
 import arrow.generic.*
 import arrow.generic.coproduct3.*
 
@@ -199,9 +196,7 @@ fun main() {
 
 This example returns `Unit` because all of these are side effects, let's say our application was built for a command line and we just have to show a `String` for the result of the call (if only it was always that easy):
 
-{: data-executable='true'}
-
-```kotlin:ank
+```kotlin:ank:playground
 import arrow.generic.*
 import arrow.generic.coproduct3.*
 
@@ -235,9 +230,7 @@ Here we're able to return the result of the `fold` and since it's exhaustively e
 
 We're able to take a Coproduct and `select` the type we care about from it. `select` returns an `Option`, if the value of the Coproduct was for the type you're trying to `select`, you'll get `Some`, if it was not the type used with `select`, you'll get `None`.
 
-{: data-executable='true'}
-
-```kotlin:ank
+```kotlin:ank:playground
 import arrow.generic.*
 import arrow.generic.coproduct3.Coproduct3
 import arrow.generic.coproduct3.select
@@ -264,17 +257,17 @@ fun main() {
 
 `select` can only be called with a type that exists on the Coproduct, if the type doesn't exist, it won't compile:
 
-{: data-executable='true'}
-
-```kotlin:ank
+```kotlin:ank:fail
 import arrow.generic.*
 import arrow.generic.coproduct3.Coproduct3
 import arrow.generic.coproduct3.select
 
 fun main() {
-//    println(
-//        ServerError.first<CommonServerError, RegistrationError, Registration>()
-//                    .select<String>()
-//    )
+    println(
+        //sampleStart
+        ServerError.first<CommonServerError, RegistrationError, Registration>()
+                    .select<String>()
+        //sampleEnd
+    )
 }
 ```
