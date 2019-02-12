@@ -180,6 +180,27 @@ fun greet(): IO<Unit> =
 
 Arrow enforces usage to be explicit about effects application.
 
+#### Applying existing datatypes
+
+Composition using regular datatypes such as `IO` is still possible within `fx` blocks the same way as `effect` blocks. In addition to `!` you can also use the extension function `bind()` to execute them.
+
+```kotlin:ank:playground
+import arrow.effects.IO
+import arrow.effects.extensions.io.fx.fx
+//sampleStart
+fun sayInIO(s: String): IO<Unit> =
+  IO { println(s) }
+  
+fun greet(): IO<Unit> =
+  fx {
+    sayInIO("Hello World").bind()
+  }
+//sampleEnd 
+fun main() {
+  println(greet()) //greet is a pure IO program
+}
+```
+
 ## Executing effectful programs
 
 The `greet` program is ready to run as soon as the user is ready to commit to an execution strategy that is either `blocking` or `non-blocking`.
