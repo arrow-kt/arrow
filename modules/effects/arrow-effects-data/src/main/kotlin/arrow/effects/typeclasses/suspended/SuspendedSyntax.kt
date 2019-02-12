@@ -32,7 +32,7 @@ inline fun <A> FxOf<A>.fix(): Fx<A> =
 
 suspend operator fun <A> FxOf<A>.invoke(): A = fix().fa.invoke()
 
-class Fx<A>(internal val fa: suspend () -> A) : FxOf<A> {
+inline class Fx<A>(internal val fa: suspend () -> A) : FxOf<A> {
   companion object
 }
 
@@ -459,7 +459,7 @@ suspend fun <A, B> (suspend () -> A).ap(ff: suspend () -> (A) -> B): suspend () 
   map(ff())
 
 suspend fun <A, B> (suspend () -> A).flatMap(f: (A) -> suspend () -> B): suspend () -> B =
-  { f(this())() }
+  map(f)()
 
 suspend inline fun <A> (suspend () -> A).attempt(unit: Unit = Unit): suspend () -> Either<Throwable, A> =
   attempt(this)
