@@ -4,17 +4,6 @@ title: Arrow Fx - Asynchronous & Concurrent Programming
 permalink: /docs/effects/fx/async/
 ---
 
-- [Asynchronous & Concurrent Programming](#asynchronous---concurrent-programming)
-  * [Dispatchers and Contexts](#dispatchers-and-contexts)
-  * [Fibers](#fibers)
-  * [Parallelization & Concurrency](#parallelization---concurrency)
-    + [`parMapN`](#-parmapn-)
-    + [`parTraverse`](#-partraverse-)
-    + [`parSequence`](#-parsequence-)
-  * [Cancellation](#cancellation)
-  * [Arrow Fx vs KotlinX Coroutines](#arrow-fx-vs-kotlinx-coroutines)
-  * [Integrating with third-party libraries](#integrating-with-third-party-libraries)
-
 # Asynchronous & Concurrent Programming
 
 Arrow Fx benefits from the `!effect` application and direct syntax for asynchronous programming by yielding extremely succinct programs without callbacks. This allows us to use direct style syntax with asynchronous and concurrent operations while preserving effect control in the types and runtime and bind their results to the left-hand side. The resulting expressions enjoy the same syntax that most OOP and Java programmers are already accustomed to, direct blocking imperative style.

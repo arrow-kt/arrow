@@ -4,12 +4,6 @@ title: Arrow Fx - Polymorphism. One Program multiple runtimes
 permalink: /docs/effects/fx/polymorphism/
 ---
 
-- [Polymorphism. One Program multiple runtimes](#polymorphism-one-program-multiple-runtimes)
-  * [Creating polymorphic programs](#creating-polymorphic-programs)
-  * [Fx for all data types](#fx-for-all-data-types)
-  * [Arrow Fx vs Tagless Final](#arrow-fx-vs-tagless-final)
-    + [Good bye `Functor`, `Applicative` and `Monad`](#good-bye--functor----applicative--and--monad-)
-
 # Polymorphism. One Program multiple runtimes
 
 Fx programs can be declared in a polymorphic style and made concrete to your framework of choice at the edge of the world.
