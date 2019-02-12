@@ -1,5 +1,6 @@
 package arrow.benchmarks.effects
 
+import arrow.core.Either
 import arrow.effects.IO
 import arrow.effects.extensions.io.unsafeRun.runBlocking
 import arrow.unsafe
@@ -11,15 +12,19 @@ import java.util.concurrent.TimeUnit
 @Fork(2)
 @Warmup(iterations = 10, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 10)
+@CompilerControl(CompilerControl.Mode.DONT_INLINE)
 open class IOAttemptBenchMark {
 
-  @Param("10000")
+  @Param("100000")
   var size: Int = 0
 
   fun loopHappy(size: Int, i: Int): IO<Int> =
     if (i < size) {
       IO { i + 1 }.attempt().flatMap { either ->
-        either.fold({ IO.raiseError<Int>(it) }, { n -> loopHappy(size, n) })
+        when (either) {
+          is Either.Left -> IO.raiseError(either.a)
+          is Either.Right -> loopHappy(size, either.b)
+        }
       }
     } else IO.just(1)
 
@@ -29,16 +34,17 @@ open class IOAttemptBenchMark {
         .map { it + 1 }
         .attempt()
         .flatMap { either ->
-          either.fold({ loopNotHappy(size, i + 1) }, { IO.just(it) })
+          when (either) {
+            is Either.Left -> loopNotHappy(size, i + 1)
+            is Either.Right -> IO.just(either.b)
+          }
         }
     } else IO.just(1)
 
-  @CompilerControl(CompilerControl.Mode.DONT_INLINE)
   @Benchmark
   fun happyPath(): Int =
     unsafe { runBlocking { loopHappy(size, 0) } }
 
-  @CompilerControl(CompilerControl.Mode.DONT_INLINE)
   @Benchmark
   fun errorRaised(): Int =
     unsafe { runBlocking { loopNotHappy(size, 0) } }

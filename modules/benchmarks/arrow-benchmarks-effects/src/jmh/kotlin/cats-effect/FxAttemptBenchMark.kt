@@ -1,8 +1,8 @@
 package arrow.benchmarks.effects
 
-import arrow.effects.typeclasses.suspended.Fx
-import arrow.effects.typeclasses.suspended.fx.unsafeRun.runBlocking
-import arrow.unsafe
+import arrow.core.Either
+import arrow.effects.typeclasses.suspended.*
+import kotlinx.coroutines.runBlocking
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
 
@@ -15,36 +15,41 @@ val dummy = object : RuntimeException("dummy") {
 @Fork(2)
 @Warmup(iterations = 10, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 10)
+@CompilerControl(CompilerControl.Mode.DONT_INLINE)
 open class FxAttemptBenchMark {
 
-  @Param("10000")
+  @Param("100000")
   var size: Int = 0
 
-  fun loopHappy(size: Int, i: Int): Fx<Int> =
+  tailrec suspend fun loopHappy(size: Int, i: Int): Int =
     if (i < size) {
-      Fx { i + 1 }.attempt().flatMap { either ->
-        either.fold({ Fx.raiseError<Int>(it) }, { n -> loopHappy(size, n) })
+      val attempted = !attempt { i + 1 }
+      when (attempted) {
+        is Either.Left -> !attempted.a.raiseError<Int>()
+        is Either.Right -> loopHappy(size, attempted.b)
       }
-    } else Fx.just(1)
+    } else 1
 
-  fun loopNotHappy(size: Int, i: Int): Fx<Int> =
+
+  suspend fun loopNotHappy(size: Int, i: Int): Int =
     if (i < size) {
-      Fx.raiseError<Int>(dummy)
+      val attempted = !dummy.raiseError<Int>()
         .map { it + 1 }
         .attempt()
-        .flatMap { either ->
-          either.fold({ loopNotHappy(size, i + 1) }, { Fx.just(it) })
-        }
-    } else Fx.just(1)
+      when (attempted) {
+        is Either.Left -> loopNotHappy(size, i + 1)
+        is Either.Right -> attempted.b
+      }
+    } else 1
 
-  @CompilerControl(CompilerControl.Mode.DONT_INLINE)
+
+
   @Benchmark
   fun happyPath(): Int =
-    unsafe { runBlocking { loopHappy(size, 0) } }
+    runBlocking { !fx { loopHappy(size, 0) } }
 
-  @CompilerControl(CompilerControl.Mode.DONT_INLINE)
   @Benchmark
   fun errorRaised(): Int =
-    unsafe { runBlocking { loopNotHappy(size, 0) } }
+    runBlocking { !fx { loopNotHappy(size, 0) } }
 
 }
