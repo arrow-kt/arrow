@@ -96,6 +96,9 @@ sealed class IO<out A> : IOOf<A> {
   open fun <B> map(f: (A) -> B): IO<B> =
     Map(this, f, 0)
 
+  open fun <B> mapFilter(f: (A) -> Option<B>): IO<B> =
+    MapFilter(this, f, 0)
+
   open fun <B> flatMap(f: (A) -> IOOf<B>): IO<B> =
     Bind(this) { f(it).fix() }
 
@@ -156,6 +159,15 @@ sealed class IO<out A> : IOOf<A> {
     override fun <B> map(f: (A) -> B): IO<B> = Suspend { Pure(f(a)) }
 
     // Pure can be replaced by its value
+    override fun <B> mapFilter(f: (A) -> Option<B>): IO<B> =
+      Suspend {
+        f(a).fold(
+          { RaiseError(IllegalArgumentException("IO execution should yield a valid result")) },
+          { Pure(it) }
+        )
+      }
+
+    // Pure can be replaced by its value
     override fun <B> flatMap(f: (A) -> IOOf<B>): IO<B> = Suspend { f(a).fix() }
 
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = Some(a)
@@ -164,6 +176,9 @@ sealed class IO<out A> : IOOf<A> {
   internal data class RaiseError(val exception: Throwable) : IO<Nothing>() {
     // Errors short-circuit
     override fun <B> map(f: (Nothing) -> B): IO<B> = this
+
+    // Errors short-circuit
+    override fun <B> mapFilter(f: (Nothing) -> Option<B>): IO<B> = this
 
     // Errors short-circuit
     override fun <B> flatMap(f: (Nothing) -> IOOf<B>): IO<B> = this
@@ -219,6 +234,25 @@ sealed class IO<out A> : IOOf<A> {
       else Map(this, f, 0)
 
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
+  }
+
+  internal data class MapFilter<E, out A>(val source: IOOf<E>, val g: (E) -> Option<A>, val index: Int) : IO<A>(), (E) -> IO<A> {
+    override fun invoke(value: E): IO<A> = g(value)
+      .fold(
+        { raiseError(IllegalArgumentException("IO execution should yield a valid result")) },
+        { just(it) }
+      )
+
+    override fun <B> mapFilter(f: (A) -> Option<B>): IO<B> {
+      val h: (Option<A>) -> Option<B> = { it.fold({ None }, { a: A -> f(a) }) }
+
+      return when {
+        index != maxStackDepthSize -> MapFilter(source, g.andThen(h), index + 1)
+        else -> MapFilter(this, f, 0)
+      }
+    }
+
+    override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachale")
   }
 }
 
