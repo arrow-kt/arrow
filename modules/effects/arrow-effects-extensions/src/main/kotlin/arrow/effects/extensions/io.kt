@@ -2,9 +2,11 @@ package arrow.effects.extensions
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.core.Option
 import arrow.effects.*
 import arrow.effects.typeclasses.*
 import arrow.extension
+import arrow.mtl.typeclasses.FunctorFilter
 import arrow.typeclasses.*
 import arrow.unsafe
 import kotlin.coroutines.CoroutineContext
@@ -16,6 +18,15 @@ import arrow.effects.startFiber as ioStart
 interface IOFunctor : Functor<ForIO> {
   override fun <A, B> IOOf<A>.map(f: (A) -> B): IO<B> =
     fix().map(f)
+}
+
+@extension
+interface IOFunctorFilter : FunctorFilter<ForIO> {
+  override fun <A, B> IOOf<A>.map(f: (A) -> B): IO<B> =
+    fix().map(f)
+
+  override fun <A, B> IOOf<A>.mapFilter(f: (A) -> Option<B>): IO<B> =
+    fix().mapFilter(f)
 }
 
 @extension
