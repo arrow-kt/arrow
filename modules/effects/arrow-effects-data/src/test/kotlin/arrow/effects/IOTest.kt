@@ -208,6 +208,22 @@ class IOTest : UnitSpec() {
       run shouldBe expected
     }
 
+    "should mapFilter values to Some case conditional is valid and correctly on success" {
+      val run = IO.just(1).mapFilter { if (it == 1) Some(it) else None }.unsafeRunSync()
+
+      val expected = 1
+
+      run shouldBe expected
+    }
+
+    "should mapFilter values to None case conditional is invalid and correctly on success" {
+      try {
+        IO.just(1).mapFilter { if (it != 1) Some(it) else None }.unsafeRunSync()
+      } catch (throwable: Throwable) {
+        // Success
+      }
+    }
+
     "should flatMap values correctly on success" {
       val run = just(1).flatMap { num -> IO { num + 1 } }.unsafeRunSync()
 
