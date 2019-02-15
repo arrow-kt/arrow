@@ -49,76 +49,71 @@ open class IOAsyncBenchmark {
       IO.unit
     }.fix()
 
-  @Benchmark
-  fun async() = {
-    fun loop(i: Int): IO<Int> =
-      if (i < size) evalAsync(i + 1).flatMap { loop(it) }
-      else evalAsync(i)
+  fun asyncLoop(i: Int): IO<Int> =
+    if (i < size) evalAsync(i + 1).flatMap { asyncLoop(it) }
+    else evalAsync(i)
 
-    IO { 0 }.flatMap { loop(it) }.unsafeRunSync()
+  @Benchmark
+  fun async(): Int =
+    asyncLoop(0).unsafeRunSync()
+
+  fun cancelableLoop(i: Int): IO<Int> =
+    if (i < size) evalCancelable(i + 1).flatMap { cancelableLoop(it) }
+    else evalCancelable(i)
+
+  @Benchmark
+  fun cancelable(): Int =
+    cancelableLoop(0).unsafeRunSync()
+
+  fun parMap2Task(): IO<Int> = (0 until size).toList().foldLeft(IO { 0 }) { acc, i ->
+    NonBlocking.parMapN(acc, IO { i }) { a, b -> a + b }
   }
 
   @Benchmark
-  fun cancelable() = {
-    fun loop(i: Int): IO<Int> =
-      if (i < size) evalCancelable(i + 1).flatMap { loop(it) }
-      else evalCancelable(i)
+  fun parMap2(): Int =
+    parMap2Task().unsafeRunSync()
 
-    IO { 0 }.flatMap { loop(it) }.unsafeRunSync()
-  }
-
-  @Benchmark
-  fun parMap2() = {
-    val task = (0 until size).toList().foldLeft(IO { 0 }) { acc, i ->
-      NonBlocking.parMapN(acc, IO { i }) { a, b -> a + b }
-    }
-    task.unsafeRunSync()
-  }
-
-  @Benchmark
-  fun racePair() = {
-    val task = (0 until size).toList().foldLeft(IO{0}) { acc, _ ->
-      IO.racePair(NonBlocking, acc, IO { 1 }).flatMap { ei ->
-        when (ei) {
-          is Either.Left -> ei.a.b.cancel().map { ei.a.a }
-          is Either.Right ->  ei.b.a.cancel().map { ei.b.b }
-        }
+  fun raicePairTask(): IO<Int> = (0 until size).toList().foldLeft(IO{0}) { acc, _ ->
+    IO.racePair(NonBlocking, acc, IO { 1 }).flatMap { ei ->
+      when (ei) {
+        is Either.Left -> ei.a.b.cancel().map { ei.a.a }
+        is Either.Right ->  ei.b.a.cancel().map { ei.b.b }
       }
     }
-
-    task.unsafeRunSync()
   }
 
   @Benchmark
-  fun start() = {
-    fun loop(i: Int): IO<Int> =
-      if (i < size)
-        (IO { i + 1 }).startFiber(NonBlocking).flatMap{it.join()}.flatMap { loop(it) }
-      else
-        IO.just(i)
+  fun racePair(): Int =
+    raicePairTask().unsafeRunSync()
 
-    IO { 0 }.flatMap { loop(it) }.unsafeRunSync()
-  }
-
-  @Benchmark
-  fun uncancelable() = {
-    fun loop(i: Int): IO<Int> =
-      if (i < size)
-        IO { i + 1 }.uncancelable().flatMap { loop(it) }
-      else
-        IO.just(i)
-
-    IO { 0 }.flatMap { loop(it) }.unsafeRunSync()
-  }
+  fun startLoop(i: Int): IO<Int> =
+    if (i < size)
+      (IO { i + 1 }).startFiber(NonBlocking).flatMap{it.join()}.flatMap { startLoop(it) }
+    else
+      IO.just(i)
 
   @Benchmark
-  fun bracket() = {
-    fun loop(i: Int): IO<Int> =
-      if (i < size)
-        IO { i }.bracket({ IO.unit }, { ib -> IO { ib + 1 } }).flatMap { loop(it) }
-      else
-        IO.just(i)
-    IO { 0 }.flatMap { loop(it) }.unsafeRunSync()
-  }
+  fun start(): Int =
+    startLoop(0).unsafeRunSync()
+
+  fun uncancelableLoop(i: Int): IO<Int> =
+    if (i < size)
+      IO { i + 1 }.uncancelable().flatMap { uncancelableLoop(it) }
+    else
+      IO.just(i)
+
+  @Benchmark
+  fun uncancelable(): Int =
+    uncancelableLoop(0).unsafeRunSync()
+
+  fun bracketLoop(i: Int): IO<Int> =
+    if (i < size)
+      IO { i }.bracket({ IO.unit }, { ib -> IO { ib + 1 } }).flatMap { bracketLoop(it) }
+    else
+      IO.just(i)
+
+  @Benchmark
+  fun bracket(): Int =
+    bracketLoop(0).unsafeRunSync()
 
 }
