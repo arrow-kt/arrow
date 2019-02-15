@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit
 @Warmup(iterations = 10, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 10)
 @CompilerControl(CompilerControl.Mode.DONT_INLINE)
-class IOHandleErrorBenchmark {
+open class IOHandleErrorBenchmark {
 
   @Param("10000")
   var size: Int = 0

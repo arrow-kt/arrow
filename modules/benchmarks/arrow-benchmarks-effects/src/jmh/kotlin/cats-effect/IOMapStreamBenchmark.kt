@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit
 @Warmup(iterations = 10, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 10)
 @CompilerControl(CompilerControl.Mode.DONT_INLINE)
-class MapStreamBenchmark {
+open class IOMapStreamBenchmark {
 
   private fun streamTest(times: Int, batchSize: Int): Long {
     var stream = range(0, times)
