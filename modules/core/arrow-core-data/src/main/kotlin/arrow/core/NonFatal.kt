@@ -1,13 +1,50 @@
 package arrow.core
 
+import arrow.documented
+
 /**
  * Extractor of non-fatal Throwables. Will not match fatal errors like `VirtualMachineError`
  * (for example, `OutOfMemoryError` and `StackOverflowError`, subclasses of `VirtualMachineError`), `ThreadDeath`,
  * `LinkageError`, `InterruptedException`.
  */
+@documented
 object NonFatal {
+
   /**
+   * Checks whether the passed [t] Throwable is NonFatal.
+   *
+   * @param t the Throwable to check
    * @return true if the provided `Throwable` is to be considered non-fatal, or false if it is to be considered fatal
+   * Kind<F, A> -> Kind<F, B>
+   *
+   * ```kotlin:ank:playground
+   * import arrow.*
+   * import arrow.core.*
+   * import arrow.data.*
+   *
+   * fun unsafeFunction(i: Int): String =
+   *    when (i) {
+   *         1 -> throw IllegalArgumentException("Non-Fatal")
+   *         2 -> throw OutOfMemoryError("Fatal")
+   *         else -> "Hello"
+   *    }
+   * fun main(args: Array<String>) {
+   *   val nonFatal: Either<Throwable, String> =
+   *   //sampleStart
+   *   try {
+   *      Right(unsafeFunction(1))
+   *   } catch (t: Throwable) {
+   *     if (NonFatal(t)) {
+   *         Left(t)
+   *     } else {
+   *         throw t
+   *     }
+   *   }
+   *   //sampleEnd
+   *   println(nonFatal)
+   * }
+   * ```
+   *
    */
   operator fun invoke(t: Throwable): Boolean =
     when (t) {
@@ -17,8 +54,38 @@ object NonFatal {
 }
 
 /**
- * @throw @receiver if it is fatal
- * @return @receiver if it is non-fatal
+ * Returns the Throwable if NonFatal and throws it otherwise.
+ *
+ * @throws Throwable the Throwable `this` if Fatal
+ * @return the Throwable `this` if NonFatal
+ * Kind<F, A> -> Kind<F, B>
+ *
+ * ```kotlin:ank:playground
+ * import arrow.*
+ * import arrow.core.*
+ * import arrow.data.*
+ *
+ * fun unsafeFunction(i: Int): String =
+ *    when (i) {
+ *         1 -> throw IllegalArgumentException("Non-Fatal")
+ *         2 -> throw OutOfMemoryError("Fatal")
+ *         else -> "Hello"
+ *    }
+ * fun main(args: Array<String>) {
+ *   val nonFatal: Either<Throwable, String> =
+ *   //sampleStart
+ *   try {
+ *      Right(unsafeFunction(1))
+ *   } catch (t: Throwable) {
+ *     if (t.nonFatalOrThrow()) {
+ *         Left(t)
+ *     }
+ *   }
+ *   //sampleEnd
+ *   println(nonFatal)
+ * }
+ * ```
+ *
  */
-fun Throwable.nonFatal(): Throwable =
+fun Throwable.nonFatalOrThrow(): Throwable =
   if (NonFatal(this)) this else throw this

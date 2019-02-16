@@ -22,9 +22,9 @@ class NonFatalTest : UnitSpec() {
         NonFatal(it) shouldBe true
       }
     }
-    "Test nonfatals using Throwable#nonFatal" {
+    "Test nonfatals using Throwable#nonFatalOrThrow" {
       nonFatals.forEach {
-        it.nonFatal() shouldBe it
+        it.nonFatalOrThrow() shouldBe it
       }
     }
 
@@ -44,10 +44,10 @@ class NonFatalTest : UnitSpec() {
         NonFatal(it) shouldBe false
       }
     }
-    "Test fatals using Throwable#nonFatal" {
+    "Test fatals using Throwable#nonFatalOrThrow" {
       fatals.forEach {
         shouldThrowAny {
-          it.nonFatal()
+          it.nonFatalOrThrow()
         }
       }
     }
