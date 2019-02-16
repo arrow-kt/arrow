@@ -81,15 +81,15 @@ open class IOAsyncBenchmark {
   fun start(): Int =
     startLoop(0).unsafeRunSync()
 
-  fun uncancelableLoop(i: Int): IO<Int> =
-    if (i < size)
-      IO { i + 1 }.uncancelable().flatMap { uncancelableLoop(it) }
-    else
-      IO.just(i)
-
-  @Benchmark
-  fun uncancelable(): Int =
-    uncancelableLoop(0).unsafeRunSync()
+//  fun uncancelableLoop(i: Int): IO<Int> =
+//    if (i < size)
+//      IO { i + 1 }.uncancelable().flatMap { uncancelableLoop(it) }
+//    else
+//      IO.just(i)
+//
+//  @Benchmark
+//  fun uncancelable(): Int =
+//    uncancelableLoop(0).unsafeRunSync()
 
   fun bracketLoop(i: Int): IO<Int> =
     if (i < size)
