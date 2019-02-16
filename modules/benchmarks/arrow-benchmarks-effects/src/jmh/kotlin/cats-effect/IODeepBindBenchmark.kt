@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit
 @CompilerControl(CompilerControl.Mode.DONT_INLINE)
 open class IODeepBindBenchmark {
 
-  @Param("100000")
+  @Param("50000")
   var size: Int = 0
 
   @Benchmark

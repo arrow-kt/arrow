@@ -9,13 +9,21 @@ dependencies {
 }
 
 apply plugin: "me.champeau.gradle.jmh"
+apply plugin: "io.morethan.jmhreport"
 
 jmh {
-    resultFormat = 'csv'
-    resultsFile = file('build/reports/benchmarks.csv')
+    resultFormat = 'json'
+    resultsFile = file('build/reports/benchmarks.json')
     timeOnIteration = '1s'
     if (project.hasProperty("jmhInclude"))
         include = [jmhInclude]
     if (project.hasProperty("jmhResultsFile"))
         resultsFile = file(jmhResultsFile)
 }
+
+jmhReport {
+    jmhResultPath = project.file('build/reports/benchmarks.json')
+    jmhReportOutput = project.file('build/reports')
+}
+
+tasks.jmh.finalizedBy tasks.jmhReport

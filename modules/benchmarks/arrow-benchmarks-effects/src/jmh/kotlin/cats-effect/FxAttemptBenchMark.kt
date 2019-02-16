@@ -18,7 +18,7 @@ val dummy = object : RuntimeException("dummy") {
 @CompilerControl(CompilerControl.Mode.DONT_INLINE)
 open class FxAttemptBenchMark {
 
-  @Param("100000")
+  @Param("100")
   var size: Int = 0
 
   tailrec suspend fun loopHappy(size: Int, i: Int): Int =

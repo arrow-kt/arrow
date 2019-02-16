@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit
 @CompilerControl(CompilerControl.Mode.DONT_INLINE)
 open class IOAttemptBenchMark {
 
-  @Param("100000")
+  @Param("100")
   var size: Int = 0
 
   fun loopHappy(size: Int, i: Int): IO<Int> =
