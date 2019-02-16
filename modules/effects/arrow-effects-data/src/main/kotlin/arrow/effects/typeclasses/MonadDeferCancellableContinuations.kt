@@ -2,6 +2,7 @@ package arrow.effects.typeclasses
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.core.NonFatal
 import arrow.effects.data.internal.BindingCancellationException
 import arrow.effects.typeclasses.suspended.MonadDeferSyntax
 import arrow.typeclasses.MonadContinuation
@@ -59,7 +60,7 @@ open class MonadDeferCancellableContinuation<F, A>(val SC: MonadDefer<F>, overri
       val datatype = try {
         just(m())
       } catch (t: Throwable) {
-        raiseError<B>(t)
+        t.raiseNonFatal<B>()
       }
       datatype.flatMap { xx: B ->
         c.stateStack = labelHere

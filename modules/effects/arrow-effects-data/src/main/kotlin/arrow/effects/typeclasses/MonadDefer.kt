@@ -2,6 +2,7 @@ package arrow.effects.typeclasses
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.core.NonFatal
 import arrow.core.Tuple2
 import arrow.core.toT
 import arrow.effects.data.internal.BindingCancellationException
@@ -25,7 +26,7 @@ interface MonadDefer<F> : MonadThrow<F>, Bracket<F, Throwable> {
       try {
         just(f())
       } catch (t: Throwable) {
-        raiseError<A>(t)
+        t.raiseNonFatal<A>()
       }
     }
 
@@ -38,7 +39,7 @@ interface MonadDefer<F> : MonadThrow<F>, Bracket<F, Throwable> {
       try {
         just(f())
       } catch (t: Throwable) {
-        raiseError<A>(t)
+        t.raiseNonFatal<A>()
       }
     }
 

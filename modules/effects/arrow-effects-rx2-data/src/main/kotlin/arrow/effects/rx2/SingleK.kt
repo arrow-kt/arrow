@@ -2,6 +2,7 @@ package arrow.effects.rx2
 
 import arrow.core.Either
 import arrow.core.Left
+import arrow.core.NonFatal
 import arrow.core.Right
 import arrow.effects.OnCancel
 import arrow.effects.internal.Platform
@@ -85,11 +86,15 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
           .doOnDispose { release(a, ExitCase.Canceled).fix().single.subscribe({}, emitter::onError) }
           .subscribe(emitter::onSuccess, emitter::onError))
       } catch (e: Throwable) {
-        release(a, ExitCase.Error(e)).fix().single.subscribe({
-          emitter.onError(e)
-        }, { e2 ->
-          emitter.onError(Platform.composeErrors(e, e2))
-        })
+        if (NonFatal(e)) {
+          release(a, ExitCase.Error(e)).fix().single.subscribe({
+            emitter.onError(e)
+          }, { e2 ->
+            emitter.onError(Platform.composeErrors(e, e2))
+          })
+        } else {
+          throw e
+        }
       }
     })
 

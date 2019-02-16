@@ -37,7 +37,11 @@ sealed class Try<out A> : TryOf<A> {
       try {
         Success(f())
       } catch (e: Throwable) {
-        Failure(e)
+        if (NonFatal(e)) {
+          Failure(e)
+        } else {
+          throw e
+        }
       }
 
     fun <A> raise(e: Throwable): Try<A> = Failure(e)

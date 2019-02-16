@@ -2,6 +2,7 @@ package arrow.effects.typeclasses
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.core.NonFatal
 import arrow.core.Right
 import arrow.documented
 import arrow.typeclasses.MonadContinuation
@@ -142,7 +143,7 @@ interface Async<F> : MonadDefer<F> {
       try {
         just(f())
       } catch (t: Throwable) {
-        raiseError<A>(t)
+        t.raiseNonFatal<A>()
       }
     }
 
