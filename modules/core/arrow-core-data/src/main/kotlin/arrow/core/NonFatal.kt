@@ -28,6 +28,7 @@ object NonFatal {
    *         2 -> throw OutOfMemoryError("Fatal")
    *         else -> "Hello"
    *    }
+   *
    * fun main(args: Array<String>) {
    *   val nonFatal: Either<Throwable, String> =
    *   //sampleStart
@@ -71,15 +72,14 @@ object NonFatal {
  *         2 -> throw OutOfMemoryError("Fatal")
  *         else -> "Hello"
  *    }
+ *
  * fun main(args: Array<String>) {
  *   val nonFatal: Either<Throwable, String> =
  *   //sampleStart
  *   try {
  *      Right(unsafeFunction(1))
  *   } catch (t: Throwable) {
- *     if (t.nonFatalOrThrow()) {
- *         Left(t)
- *     }
+*       Left(t.nonFatalOrThrow())
  *   }
  *   //sampleEnd
  *   println(nonFatal)
