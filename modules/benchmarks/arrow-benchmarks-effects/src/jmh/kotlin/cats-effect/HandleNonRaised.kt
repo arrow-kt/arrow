@@ -5,6 +5,7 @@ import arrow.effects.extensions.io.applicativeError.handleErrorWith
 import arrow.effects.typeclasses.suspended.*
 import arrow.effects.typeclasses.suspended.fx.unsafeRun.runBlocking
 import arrow.unsafe
+import kotlinx.coroutines.runBlocking
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
 
@@ -52,5 +53,9 @@ open class HandleNonRaised {
   @Benchmark
   fun fx_direct(): Int =
     unsafe { runBlocking { Fx { fxDirectHappyPathLoop(0) } } }
+
+  @Benchmark
+  fun kotlinx_coroutines(): Int =
+    runBlocking { fxDirectHappyPathLoop(0) }
 
 }

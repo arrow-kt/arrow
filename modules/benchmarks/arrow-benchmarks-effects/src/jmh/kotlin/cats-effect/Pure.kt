@@ -5,6 +5,7 @@ import arrow.effects.extensions.io.unsafeRun.runBlocking as ioRunBlocking
 import arrow.effects.typeclasses.suspended.*
 import arrow.effects.typeclasses.suspended.fx.unsafeRun.runBlocking as fxRunBlocking
 import arrow.unsafe
+import kotlinx.coroutines.runBlocking
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
 
@@ -25,6 +26,10 @@ open class Pure {
   @Benchmark
   fun fx_direct(): Int =
     unsafe { fxRunBlocking { Fx { fxDirectPureLoop(0) } } }
+
+  @Benchmark
+  fun kotlinx_coroutines(): Int =
+    runBlocking { fxDirectPureLoop(0) }
 
   tailrec suspend fun fxPureLoop(i: Int): suspend () -> Int {
     val j = !just(i)

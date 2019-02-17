@@ -24,7 +24,7 @@ open class Async {
   @Param("500")
   var size: Int = 0
 
-  suspend fun fxAsyncLoop(i: Int): suspend () -> Int =
+  tailrec suspend fun fxAsyncLoop(i: Int): suspend () -> Int =
     NonBlocking.continueOn {
       if (i > size) i else fxAsyncLoop(i + 1)()
     }
