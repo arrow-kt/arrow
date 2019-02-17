@@ -20,8 +20,7 @@ select * from list
 
 __AQL__
 
-{: data-executable='true'}
-```kotlin:ank
+```kotlin:ank:playground
 import arrow.aql.extensions.list.select.*
 import arrow.aql.extensions.listk.select.select
 fun main(args: Array<String>) {

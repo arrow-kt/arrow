@@ -187,8 +187,7 @@ This is a limitation on rx2's side. See the corresponding github [issue]({{ 'htt
 
 To overcome this limitation and run code in a stack safe way, one can make use of `bindingStackSafe` which is provided for every instance of [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) when you have `arrow-free` included.
 
-{: data-executable='true'}
-```kotlin:ank
+```kotlin:ank:playground
 import arrow.Kind
 import arrow.effects.rx2.FlowableK
 import arrow.effects.rx2.ForFlowableK
