@@ -63,9 +63,7 @@ interface BoxSelect : Select<ForBox> {
 AQL delegates operations to the `Functor` of your choosing.
 Once we have this two instance we are able to `select` data from our `Box<A>` values.
 
-{: data-executable='true'}
-
-```kotlin:ank
+```kotlin:ank:playground
 import arrow.aql.*
 import arrow.aql.box.select.*
 fun main(args: Array<String>) {
@@ -110,9 +108,7 @@ interface BoxWhere : Where<ForBox> {
 AQL delegates operations for `Where` to the `FunctorFilter` of your choosing.
 Once we have this two instance we are able to us `where` to filter data from our `Box<A>` values.
 
-{: data-executable='true'}
-
-```kotlin:ank
+```kotlin:ank:playground
 import arrow.aql.box.select.*
 import arrow.aql.box.where.*
 
@@ -131,9 +127,7 @@ println(result)
 }
 ```
 
-{: data-executable='true'}
-
-```kotlin:ank
+```kotlin:ank:playground
 import arrow.aql.box.select.*
 import arrow.aql.box.where.*
 
@@ -212,9 +206,7 @@ Once we have these instances we are able to use many of the combinators availabl
 
 ### count
 
-{: data-executable='true'}
-
-```kotlin:ank
+```kotlin:ank:playground
 import arrow.aql.*
 import arrow.aql.box.select.*
 import arrow.aql.box.count.*
@@ -232,9 +224,7 @@ println(result)
 
 ### groupBy
 
-{: data-executable='true'}
-
-```kotlin:ank
+```kotlin:ank:playground
 import arrow.aql.*
 import arrow.aql.box.select.*
 import arrow.aql.box.groupBy.*
@@ -255,9 +245,7 @@ println(result)
 
 ### orderBy
 
-{: data-executable='true'}
-
-```kotlin:ank
+```kotlin:ank:playground
 import arrow.aql.*
 import arrow.aql.box.select.*
 import arrow.aql.box.orderBy.*
@@ -280,9 +268,7 @@ println(result)
 
 ### sum
 
-{: data-executable='true'}
-
-```kotlin:ank
+```kotlin:ank:playground
 import arrow.aql.*
 import arrow.aql.box.select.*
 import arrow.aql.box.sum.*
@@ -302,9 +288,7 @@ println(result)
 
 ### union
 
-{: data-executable='true'}
-
-```kotlin:ank
+```kotlin:ank:playground
 import arrow.aql.*
 import arrow.aql.box.select.query
 import arrow.aql.box.select.selectAll
