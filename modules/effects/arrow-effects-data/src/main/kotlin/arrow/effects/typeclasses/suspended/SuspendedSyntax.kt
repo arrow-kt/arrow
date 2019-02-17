@@ -7,6 +7,7 @@ import arrow.effects.internal.Platform
 import arrow.effects.internal.UnsafePromise
 import arrow.effects.internal.asyncContinuation
 import arrow.effects.typeclasses.*
+import arrow.effects.typeclasses.suspended.fx.concurrent.startFiber
 import arrow.effects.typeclasses.suspended.fx.dispatchers.dispatchers
 import arrow.extension
 import arrow.typeclasses.*
@@ -443,8 +444,19 @@ suspend inline fun <A> (suspend () -> A).bind(): A =
 suspend inline operator fun <A> (suspend () -> A).component1(): A =
   this()
 
-fun <A> Throwable.raiseError(): suspend () -> A =
-  { throw this }
+/**
+ * Avoid recalculating stack traces on rethrows
+ */
+class RaisedError(val exception: Throwable) : Throwable() {
+  override fun fillInStackTrace(): Throwable =
+    this
+
+  override val cause: Throwable?
+    get() = exception
+}
+
+inline fun <A> Throwable.raiseError(): suspend () -> A =
+  { throw RaisedError(this) }
 
 suspend fun <A, B> (suspend () -> A).map(f: (A) -> B): suspend () -> B =
   { f(this()) }
@@ -459,7 +471,13 @@ suspend fun <A, B> (suspend () -> A).ap(ff: suspend () -> (A) -> B): suspend () 
   map(ff())
 
 suspend fun <A, B> (suspend () -> A).flatMap(f: (A) -> suspend () -> B): suspend () -> B =
-  map(f)()
+  {
+    try {
+      !f(this())
+    } catch (e: Throwable) {
+      !raiseError<B>(e)
+    }
+  }
 
 suspend inline fun <A> (suspend () -> A).attempt(unit: Unit = Unit): suspend () -> Either<Throwable, A> =
   attempt(this)
@@ -476,12 +494,14 @@ suspend inline fun <A> attempt(crossinline f: suspend () -> A): suspend () -> Ei
 val unit: suspend () -> Unit = { Unit }
 
 fun <A> raiseError(e: Throwable, unit: Unit = Unit): suspend () -> A =
-  { throw e }
+  { throw RaisedError(e) }
 
 inline fun <A> (suspend () -> A).handleErrorWith(crossinline f: (Throwable) -> suspend () -> A): suspend () -> A =
   {
     try {
       this()
+    } catch (r: RaisedError) {
+      f(r.exception)()
     } catch (e: Throwable) {
       f(e)()
     }
@@ -491,6 +511,8 @@ inline fun <A> (suspend () -> A).handleError(crossinline f: (Throwable) -> A): s
   {
     try {
       this()
+    } catch (r: RaisedError) {
+      f(r.exception)
     } catch (e: Throwable) {
       f(e)
     }
@@ -540,7 +562,7 @@ suspend fun <A, B> (suspend () -> A).bracketCase(
 }
 
 suspend fun <A> CoroutineContext.continueOn(fa: suspend () -> A): suspend () -> A =
-  unit.map { fa.foldContinuation(this) { throw it } }
+  { !startFiber(fa) }
 
 tailrec suspend fun <A, B> tailRecLoop(a: A, f: (A) -> suspend () -> Either<A, B>): suspend () -> B =
   when (val result = f(a)()) {
@@ -548,16 +570,15 @@ tailrec suspend fun <A, B> tailRecLoop(a: A, f: (A) -> suspend () -> Either<A, B
     is Either.Right -> result.b.just()
   }
 
-fun <A> CoroutineContext.startFiber(fa: suspend () -> A): suspend () -> A {
+suspend fun <A> CoroutineContext.startFiber(fa: suspend () -> A): suspend () -> A = {
   val promise = UnsafePromise<A>()
-  val conn = FxConnection()
   fa.startCoroutine(asyncContinuation(this) { either ->
     either.fold(
       { promise.complete(it.left()) },
       { promise.complete(it.right()) }
     )
   })
-  return FxFiber(promise, conn).join().fix().fa
+  FxFiber(promise, FxConnection()).join().fix().fa()
 }
 
 /** Hide member because it's discouraged to use uncancelable builder for cancelable concrete type **/

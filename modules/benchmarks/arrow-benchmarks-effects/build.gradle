@@ -12,6 +12,13 @@ apply plugin: "me.champeau.gradle.jmh"
 apply plugin: "io.morethan.jmhreport"
 
 jmh {
+    include = [
+            'arrow.benchmarks.effects.Pure',
+            'arrow.benchmarks.effects.Delay',
+            'arrow.benchmarks.effects.Async',
+            'arrow.benchmarks.effects.HandleNonRaised',
+            'arrow.benchmarks.effects.HandleRaisedError'
+    ]
     resultFormat = 'json'
     resultsFile = file('build/reports/benchmarks.json')
     timeOnIteration = '1s'
