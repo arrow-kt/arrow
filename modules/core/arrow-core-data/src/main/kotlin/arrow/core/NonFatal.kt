@@ -12,7 +12,6 @@ object NonFatal {
    *
    * @param t the Throwable to check
    * @return true if the provided `Throwable` is to be considered non-fatal, or false if it is to be considered fatal
-   * Kind<F, A> -> Kind<F, B>
    *
    * ```kotlin:ank:playground
    * import arrow.*
@@ -56,7 +55,6 @@ object NonFatal {
  *
  * @throws Throwable the Throwable `this` if Fatal
  * @return the Throwable `this` if NonFatal
- * Kind<F, A> -> Kind<F, B>
  *
  * ```kotlin:ank:playground
  * import arrow.*
