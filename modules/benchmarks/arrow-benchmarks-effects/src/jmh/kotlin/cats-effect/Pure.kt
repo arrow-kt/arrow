@@ -19,13 +19,20 @@ open class Pure {
   @Param("50000")
   var size: Int = 0
 
+  tailrec suspend fun fxDirectPureLoop(i: Int): Int =
+    if (i > size) i else fxDirectPureLoop(i + 1)
+
+  @Benchmark
+  fun fx_direct(): Int =
+    unsafe { fxRunBlocking { Fx { fxDirectPureLoop(0) } } }
+
   tailrec suspend fun fxPureLoop(i: Int): suspend () -> Int {
     val j = !just(i)
     return if (j > size) just(j) else fxPureLoop(j + 1)
   }
 
   @Benchmark
-  fun fxPure(): Int =
+  fun fx(): Int =
     unsafe { fxRunBlocking { Fx { !fxPureLoop(0) } } }
 
   fun ioPureLoop(i: Int): IO<Int> =
@@ -34,7 +41,7 @@ open class Pure {
     }
 
   @Benchmark
-  fun ioPure(): Int =
+  fun io(): Int =
     unsafe { ioRunBlocking { ioPureLoop(0) } }
 
 }

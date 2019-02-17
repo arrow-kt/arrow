@@ -30,7 +30,7 @@ open class Async {
     }
 
   @Benchmark
-  fun fxAsync(): Int =
+  fun fx(): Int =
     unsafe { fxRunBlocking { Fx { fxAsyncLoop(0)() } } }
 
   fun ioAsyncLoop(i: Int): IO<Int> =
@@ -39,7 +39,7 @@ open class Async {
     )
 
   @Benchmark
-  fun ioAsync(): Int =
+  fun io(): Int =
     unsafe { ioRunBlocking { ioAsyncLoop(0) } }
 
 }

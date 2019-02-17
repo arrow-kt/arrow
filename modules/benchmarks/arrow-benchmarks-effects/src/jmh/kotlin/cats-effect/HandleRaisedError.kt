@@ -30,7 +30,7 @@ open class HandleRaisedError {
       IO.just(i)
 
   @Benchmark
-  fun ioErrorRaised(): Int =
+  fun io(): Int =
     ioErrorRaisedloop(0).unsafeRunSync()
 
   tailrec suspend fun fxErrorRaisedloop(i: Int): Int =
@@ -43,7 +43,22 @@ open class HandleRaisedError {
     } else i
 
   @Benchmark
-  fun fxErrorRaised(): Int =
+  fun fx(): Int =
     unsafe { runBlocking { Fx { fxErrorRaisedloop(0) } } }
+
+  tailrec suspend fun fxDirectErrorRaisedloop(i: Int): Int =
+    if (i < size) {
+      val result = try {
+        val n: Int = throw dummy
+        n + 1 + 1
+      } catch (t: Throwable) {
+        i + 1
+      }
+      fxDirectErrorRaisedloop(result)
+    } else i
+
+  @Benchmark
+  fun fx_direct(): Int =
+    unsafe { runBlocking { Fx { fxDirectErrorRaisedloop(0) } } }
 
 }

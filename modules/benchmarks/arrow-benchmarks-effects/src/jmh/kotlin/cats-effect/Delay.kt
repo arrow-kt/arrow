@@ -19,13 +19,20 @@ open class Delay {
   @Param("50000")
   var size: Int = 0
 
+  tailrec suspend fun fxDirectDelayLoop(i: Int): Int =
+    if (i > size) i else fxDirectDelayLoop(i + 1)
+
+  @Benchmark
+  fun fx_direct(): Int =
+    unsafe { fxRunBlocking { Fx { fxDirectDelayLoop(0) } } }
+
   tailrec suspend fun fxDelayLoop(i: Int): suspend () -> Int {
     val j = !fx { i }
     return if (j > size) fx { j } else fxDelayLoop(j + 1)
   }
 
   @Benchmark
-  fun fxDelay(): Int =
+  fun fx(): Int =
     unsafe { fxRunBlocking { Fx { !fxDelayLoop(0) } } }
 
   fun ioDelayLoop(i: Int): IO<Int> =
@@ -34,7 +41,7 @@ open class Delay {
     }
 
   @Benchmark
-  fun ioDelay(): Int =
+  fun io(): Int =
     unsafe { ioRunBlocking { ioDelayLoop(0) } }
 
 }

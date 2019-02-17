@@ -26,10 +26,8 @@ open class HandleNonRaised {
     IO.just(i)
 
   @Benchmark
-  fun ioHappyPath(): Int =
+  fun io(): Int =
     ioHappyPathLoop(0).unsafeRunSync()
-
-  val dummy = RuntimeException("dummy")
 
   tailrec suspend fun fxHappyPathLoop(i: Int): Int =
     if (i < size) {
@@ -38,7 +36,21 @@ open class HandleNonRaised {
     } else i
 
   @Benchmark
-  fun fxHappyPath(): Int =
+  fun fx(): Int =
     unsafe { runBlocking { Fx { fxHappyPathLoop(0) } } }
+
+  tailrec suspend fun fxDirectHappyPathLoop(i: Int): Int =
+    if (i < size) {
+      val n = try {
+        i + 1
+      } catch (t : Throwable) {
+        throw t
+      }
+      fxDirectHappyPathLoop(n)
+    } else i
+
+  @Benchmark
+  fun fx_direct(): Int =
+    unsafe { runBlocking { Fx { fxDirectHappyPathLoop(0) } } }
 
 }
