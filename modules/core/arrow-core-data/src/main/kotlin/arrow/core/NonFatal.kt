@@ -1,13 +1,10 @@
 package arrow.core
 
-import arrow.documented
-
 /**
  * Extractor of non-fatal Throwables. Will not match fatal errors like `VirtualMachineError`
  * (for example, `OutOfMemoryError` and `StackOverflowError`, subclasses of `VirtualMachineError`), `ThreadDeath`,
  * `LinkageError`, `InterruptedException`.
  */
-@documented
 object NonFatal {
 
   /**
