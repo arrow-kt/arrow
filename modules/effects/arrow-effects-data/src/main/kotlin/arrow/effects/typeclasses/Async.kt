@@ -2,7 +2,6 @@ package arrow.effects.typeclasses
 
 import arrow.Kind
 import arrow.core.Either
-import arrow.core.NonFatal
 import arrow.core.Right
 import arrow.documented
 import arrow.typeclasses.MonadContinuation

@@ -2,7 +2,6 @@ package arrow.effects.typeclasses
 
 import arrow.Kind
 import arrow.core.Either
-import arrow.core.NonFatal
 import arrow.core.Tuple2
 import arrow.core.toT
 import arrow.effects.data.internal.BindingCancellationException
