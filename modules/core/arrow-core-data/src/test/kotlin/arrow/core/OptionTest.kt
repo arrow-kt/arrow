@@ -11,6 +11,7 @@ import arrow.core.extensions.option.hash.hash
 import arrow.core.extensions.option.monoid.monoid
 import arrow.core.extensions.option.semigroupal.semigroupal
 import arrow.core.extensions.option.show.show
+import arrow.core.extensions.tuple2.eq.eq
 import arrow.mtl.extensions.option.monadFilter.monadFilter
 import arrow.mtl.extensions.option.traverseFilter.traverseFilter
 import arrow.syntax.collections.firstOption
@@ -36,6 +37,15 @@ class OptionTest : UnitSpec() {
   val B: Option<Int> = Some(2)
   val C: Option<Int> = Some(3)
 
+  val EQ: Eq<Kind<ForOption, Tuple2<Int, Tuple2<Int, Int>>>> = object : Eq<Kind<ForOption, Tuple2<Int, Tuple2<Int, Int>>>> {
+
+    override fun Kind<ForOption, Tuple2<Int, Tuple2<Int, Int>>>.eqv(b: Kind<ForOption, Tuple2<Int, Tuple2<Int, Int>>>): Boolean {
+        return Option.eq(Tuple2.eq(Int.eq(), Tuple2.eq(Int.eq(), Int.eq()))).run {
+          this@eqv.fix().eqv(b.fix())
+        }
+      }
+  }
+
   init {
 
     testLaws(
@@ -46,9 +56,9 @@ class OptionTest : UnitSpec() {
       TraverseFilterLaws.laws(Option.traverseFilter(), Option.applicative(), ::Some, Eq.any()),
       MonadFilterLaws.laws(Option.monadFilter(), ::Some, Eq.any()),
       HashLaws.laws(Option.hash(Int.hash()), Option.eq(Int.eq())) { it.some() },
-      SemigroupalLaws.laws(Option.semigroupal(), A, B, C, this::bijection),
-      SemigroupalLaws.laws(Option.semigroupal(), A, B, Option.empty(), this::bijection),
-      SemigroupalLaws.laws(Option.semigroupal(), Option.empty(), B, C, this::bijection)
+      SemigroupalLaws.laws(Option.semigroupal(), A, B, C, this::bijection, EQ),
+      SemigroupalLaws.laws(Option.semigroupal(), A, B, Option.empty(), this::bijection, EQ),
+      SemigroupalLaws.laws(Option.semigroupal(), Option.empty(), B, C, this::bijection, EQ)
     )
 
     "fromNullable should work for both null and non-null values of nullable types" {

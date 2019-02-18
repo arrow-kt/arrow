@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.*
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
+import arrow.core.extensions.tuple2.eq.eq
 import arrow.data.extensions.list.fx.fx
 import arrow.data.extensions.listk.applicative.applicative
 import arrow.data.extensions.listk.eq.eq
@@ -32,11 +33,12 @@ class ListKTest : UnitSpec() {
   init {
 
     val EQ: Eq<ListKOf<Int>> = ListK.eq(Eq.any())
+    val EQ2_SEMIGROUPAL: Eq<ListKOf<Tuple2<Int, Tuple2<Int, Int>>>> = ListK.eq(Tuple2.eq(Int.eq(), Tuple2.eq(Int.eq(), Int.eq())))
 
     testLaws(
       ShowLaws.laws(ListK.show(), EQ) { listOf(it).k() },
       SemigroupKLaws.laws(ListK.semigroupK(), applicative, Eq.any()),
-      SemigroupalLaws.laws(ListK.semigroupal(), A, B, C, this::bijection),
+      SemigroupalLaws.laws(ListK.semigroupal(), A, B, C, this::bijection, EQ2_SEMIGROUPAL),
       MonoidKLaws.laws(ListK.monoidK(), applicative, Eq.any()),
       TraverseLaws.laws(ListK.traverse(), applicative, { n: Int -> ListK(listOf(n)) }, Eq.any()),
       MonadCombineLaws.laws(ListK.monadCombine(),
