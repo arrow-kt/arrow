@@ -52,4 +52,8 @@ open class Pure {
   fun cats_io(): Int =
     arrow.benchmarks.effects.scala.cats.`Pure$`.`MODULE$`.unsafeIOPureLoop(size, 0)
 
+  @Benchmark
+  fun zio(): Int =
+    arrow.benchmarks.effects.scala.zio.`Pure$`.`MODULE$`.unsafeIOPureLoop(size, 0)
+
 }

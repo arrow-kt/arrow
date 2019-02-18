@@ -49,4 +49,8 @@ open class Delay {
   fun io(): Int =
     unsafe { ioRunBlocking { ioDelayLoop(0) } }
 
+  @Benchmark
+  fun cats_io(): Int =
+    arrow.benchmarks.effects.scala.cats.`Delay$`.`MODULE$`.unsafeIODelayLoop(size, 0)
+
 }

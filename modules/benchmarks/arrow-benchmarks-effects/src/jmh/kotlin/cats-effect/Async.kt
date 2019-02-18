@@ -46,4 +46,8 @@ open class Async {
   fun cats_io(): Int =
     arrow.benchmarks.effects.scala.cats.`Async$`.`MODULE$`.unsafeIOAsyncLoop(size, 0)
 
+  @Benchmark
+  fun zio(): Int =
+    arrow.benchmarks.effects.scala.zio.`Async$`.`MODULE$`.unsafeIOAsyncLoop(size, 0)
+
 }
