@@ -4,8 +4,10 @@ dependencies {
     compile project(":arrow-effects-extensions")
     compile project(":arrow-effects-io-extensions")
     compile project(":arrow-effects-rx2-extensions")
+    compile project(":arrow-scala-benchmarks")
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
+    compileOnly "org.openjdk.jmh:jmh-core:1.21"
 }
 
 apply plugin: "me.champeau.gradle.jmh"

@@ -9,7 +9,6 @@ import kotlinx.coroutines.runBlocking
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
 
-
 @State(Scope.Thread)
 @Fork(2)
 @Warmup(iterations = 10, time = 1, timeUnit = TimeUnit.SECONDS)
@@ -48,5 +47,9 @@ open class Pure {
   @Benchmark
   fun io(): Int =
     unsafe { ioRunBlocking { ioPureLoop(0) } }
+
+  @Benchmark
+  fun cats_io(): Int =
+    arrow.benchmarks.effects.scala.cats.`Pure$`.`MODULE$`.unsafeIOPureLoop(size, 0)
 
 }

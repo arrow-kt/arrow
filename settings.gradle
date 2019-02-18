@@ -119,6 +119,7 @@ include {
         }
         
         benchmarks {
+            _ 'scala-benchmarks'
             _ 'benchmarks-effects'
         }
     }

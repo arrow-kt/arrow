@@ -1,0 +1,12 @@
+plugins {
+    id 'scala'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.scala-lang:scala-library:2.12.8'
+    implementation 'org.typelevel:cats-effect_2.12:1.2.0'
+}
