@@ -17,8 +17,7 @@ A `Promise` guarantees (promises) `A` at some point in the future within the con
 A promise can easily be made by calling `uncancelable`.
 Since the allocation of mutable state is not referentially transparent this side-effect is contained within `F`.
 
-{: data-executable='true'}
-```kotlin:ank
+```kotlin:ank:playground
 import arrow.effects.*
 import arrow.effects.extensions.io.async.async
 
@@ -33,8 +32,7 @@ println(promise)
 
 In case you want the side-effect to execute immediately and return the `Promise` instance you can use the `unsafeUncancelable` function.
 
-{: data-executable='true'}
-```kotlin:ank
+```kotlin:ank:playground
 import arrow.effects.*
 import arrow.effects.extensions.io.async.async
 
@@ -50,8 +48,7 @@ println(unsafePromise)
 
 Get the promised value, suspending the fiber running the action until the result is available.
 
-{: data-executable='true'}
-```kotlin:ank
+```kotlin:ank:playground
 import arrow.effects.*
 import arrow.effects.extensions.io.async.async
 import arrow.effects.extensions.io.monad.flatMap
@@ -65,8 +62,7 @@ Promise.uncancelable<ForIO, Int>(IO.async()).flatMap { p ->
 }
 ```
 
-{: data-executable='true'}
-```kotlin:ank
+```kotlin:ank:playground
 import arrow.effects.*
 import arrow.effects.extensions.io.async.async
 import arrow.effects.extensions.io.monad.flatMap
@@ -87,8 +83,7 @@ println(result)
 
 Fulfills the promise with a value. A promise cannot be fulfilled twice, so doing so results in an error.
 
-{: data-executable='true'}
-```kotlin:ank
+```kotlin:ank:playground
 import arrow.effects.*
 import arrow.effects.extensions.io.async.async
 import arrow.effects.extensions.io.monad.flatMap
@@ -105,8 +100,7 @@ println(result)
 }
 ```
 
-{: data-executable='true'}
-```kotlin:ank
+```kotlin:ank:playground
 import arrow.effects.*
 import arrow.effects.extensions.io.async.async
 import arrow.effects.extensions.io.monad.flatMap
@@ -129,8 +123,7 @@ println(result)
 
 Breaks the promise with an exception. A promise cannot be broken twice, so doing so will result in an error.
 
-{: data-executable='true'}
-```kotlin:ank
+```kotlin:ank:playground
 import arrow.effects.*
 import arrow.effects.extensions.io.async.async
 import arrow.effects.extensions.io.monad.flatMap
@@ -147,8 +140,7 @@ println(result)
 }
 ```
 
-{: data-executable='true'}
-```kotlin:ank
+```kotlin:ank:playground
 import arrow.effects.*
 import arrow.effects.extensions.io.async.async
 import arrow.effects.extensions.io.monad.flatMap
