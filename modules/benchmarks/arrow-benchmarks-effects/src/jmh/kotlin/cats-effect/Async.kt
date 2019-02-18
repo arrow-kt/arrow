@@ -42,4 +42,8 @@ open class Async {
   fun io(): Int =
     unsafe { ioRunBlocking { ioAsyncLoop(0) } }
 
+  @Benchmark
+  fun cats_io(): Int =
+    arrow.benchmarks.effects.scala.cats.`Async$`.`MODULE$`.unsafeIOAsyncLoop(size, 0)
+
 }
