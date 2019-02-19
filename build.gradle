@@ -39,7 +39,7 @@ buildscript {
             url "https://plugins.gradle.org/m2/"
         }
         jcenter()
-        maven { url "http://dl.bintray.com/kotlin/kotlin-dev" }
+        maven { url "https://dl.bintray.com/kotlin/kotlin-dev" }
         maven { url "https://dl.bintray.com/jetbrains/markdown/" }
         maven { url "https://dl.bintray.com/arrow-kt/arrow-kt/" }
     }
@@ -69,8 +69,8 @@ allprojects {
     repositories {
         jcenter()
         maven { url 'https://kotlin.bintray.com/kotlinx' }
-        maven { url "http://dl.bintray.com/kotlin/kotlin-dev" }
-        maven { url "http://dl.bintray.com/arrow-kt/arrow-kt" }
+        maven { url "https://dl.bintray.com/kotlin/kotlin-dev" }
+        maven { url "https://dl.bintray.com/arrow-kt/arrow-kt" }
         maven { url "https://dl.bintray.com/jetbrains/markdown/" }
     }
 }
