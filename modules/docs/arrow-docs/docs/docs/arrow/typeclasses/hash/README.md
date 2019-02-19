@@ -16,8 +16,7 @@ It can be considered the typeclass equivalent of Java's `Object#hashcode` and Ko
 
 A hash function is a mapping of arbitrary data (`F`) to an output set of fixed size (`Int`). The result, a hash value, is most commonly used in collections like HashTable as a lookup value.
 
-{: data-executable='true'}
-```kotlin:ank
+```kotlin:ank:playground
 import arrow.core.extensions.*
 
 fun main(args: Array<String>) {
@@ -37,8 +36,7 @@ Computes a hash of an instance of `F`.
 
 `fun F.hash(): Int`
 
-{: data-executable='true'}
-```kotlin:ank
+```kotlin:ank:playground
 import arrow.core.extensions.*
 
 fun main(args: Array<String>) {
@@ -60,8 +58,7 @@ Hash contains a special instance that delegates to Kotlin's `Any?.hashCode()` fu
 It also might make more sense to provide your own instance in for some cases, for example when there is already a unique property on an object.
 Hash has a constructor to create a `Hash` instance from any function `(F) -> Int`.
 
-{: data-executable='true'}
-```kotlin:ank
+```kotlin:ank:playground
 import arrow.typeclasses.Hash
 
 data class User(val id: String, val name: String)
@@ -76,8 +73,7 @@ fun main(args: Array<String>) {
 }
 ```
 
-{: data-executable='true'}
-```kotlin:ank
+```kotlin:ank:playground
 import arrow.typeclasses.Hash
 
 data class User(val id: String, val name: String)
@@ -93,8 +89,7 @@ fun main(args: Array<String>) {
 }
 ```
 
-{: data-executable='true'}
-```kotlin:ank
+```kotlin:ank:playground
 import arrow.core.*
 import arrow.typeclasses.Hash
 
@@ -107,8 +102,7 @@ fun main(args: Array<String>) {
 }
 ```
 
-{: data-executable='true'}
-```kotlin:ank
+```kotlin:ank:playground
 import arrow.typeclasses.Hash
 
 fun main(args: Array<String>) {

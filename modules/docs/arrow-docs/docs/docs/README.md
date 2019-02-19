@@ -38,7 +38,10 @@ In your project's root `build.gradle` append the jcenter repository to your list
 ```groovy
 allprojects {
     repositories {
+        mavenCentral()
         jcenter()
+        maven { url "https://dl.bintray.com/arrow-kt/arrow-kt/" }
+        maven { url 'https://oss.jfrog.org/artifactory/oss-snapshot-local/' }
     }
 }
 ```
@@ -74,7 +77,9 @@ You can find the dependencies necessary in the Basic Setup of the README at the 
 Add the dependencies into the project's `build.gradle`
 
 ```groovy
-def arrow_version = "0.9.0"
+apply plugin: 'kotlin'
+apply plugin: 'kotlin-kapt'
+def arrow_version = "0.9.0-SNAPSHOT"
 dependencies {
     compile "io.arrow-kt:arrow-core-data:$arrow_version"
     compile "io.arrow-kt:arrow-syntax:$arrow_version"
@@ -89,6 +94,7 @@ dependencies {
     compile "io.arrow-kt:arrow-mtl:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects-extensions:$arrow_version" //optional
+    compile "io.arrow-kt:arrow-effects-io-extensions:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects-rx2:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects-rx2-extensions:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects-reactor:$arrow_version" //optional
