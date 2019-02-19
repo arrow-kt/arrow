@@ -25,7 +25,7 @@ interface MonadDefer<F> : MonadThrow<F>, Bracket<F, Throwable> {
       try {
         just(f())
       } catch (t: Throwable) {
-        raiseError<A>(t)
+        t.raiseNonFatal<A>()
       }
     }
 
@@ -38,7 +38,7 @@ interface MonadDefer<F> : MonadThrow<F>, Bracket<F, Throwable> {
       try {
         just(f())
       } catch (t: Throwable) {
-        raiseError<A>(t)
+        t.raiseNonFatal<A>()
       }
     }
 

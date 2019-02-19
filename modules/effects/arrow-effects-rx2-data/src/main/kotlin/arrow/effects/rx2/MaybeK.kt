@@ -82,11 +82,15 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
             .doOnDispose { release(a, ExitCase.Canceled).fix().maybe.subscribe({}, emitter::onError) }
             .subscribe(emitter::onSuccess, emitter::onError))
         } catch (e: Throwable) {
-          release(a, ExitCase.Error(e)).fix().maybe.subscribe({
-            emitter.onError(e)
-          }, { e2 ->
-            emitter.onError(Platform.composeErrors(e, e2))
-          })
+          if (NonFatal(e)) {
+            release(a, ExitCase.Error(e)).fix().maybe.subscribe({
+              emitter.onError(e)
+            }, { e2 ->
+              emitter.onError(Platform.composeErrors(e, e2))
+            })
+          } else {
+            throw e
+          }
         }
       }
     })

@@ -42,7 +42,11 @@ sealed class FreeC<F, out R> : FreeCOf<F, R> {
         try {
           f(free.r)
         } catch (t: Throwable) {
-          FreeC.Fail<F, R2>(t)
+          if (NonFatal(t)) {
+            FreeC.Fail<F, R2>(t)
+          } else {
+            throw t
+          }
         }
       }
       is Fail<*, R> -> free
@@ -58,7 +62,11 @@ sealed class FreeC<F, out R> : FreeCOf<F, R> {
         try {
           FreeC.Pure<F, R2>(f(free.r))
         } catch (t: Throwable) {
-          FreeC.Fail<F, R2>(t)
+          if (NonFatal(t)) {
+            FreeC.Fail<F, R2>(t)
+          } else {
+            throw t
+          }
         }
       }
       is Fail<*, R> -> free
@@ -187,7 +195,11 @@ sealed class FreeC<F, out R> : FreeCOf<F, R> {
     override fun <G> translate(f: FunctionK<F, G>): FreeC<G, R> = try {
       Suspend(f(fr))
     } catch (t: Throwable) {
-      FreeC.Fail(t)
+      if (NonFatal(t)) {
+        FreeC.Fail(t)
+      } else {
+        throw t
+      }
     }
   }
 
@@ -220,7 +232,11 @@ fun <F, R, R2> FreeCOf<F, R>.transformWith(f: (FreeC.Result<R>) -> FreeC<F, R2>)
   try {
     f(r)
   } catch (t: Throwable) {
-    FreeC.Fail<F, R2>(t)
+    if (NonFatal(t)) {
+      FreeC.Fail<F, R2>(t)
+    } else {
+      throw t
+    }
   }
 }
 
@@ -236,7 +252,11 @@ fun <F, R> FreeCOf<F, R>.handleErrorWith(h: (Throwable) -> FreeCOf<F, R>): FreeC
         try {
           h(free.error)
         } catch (t: Throwable) {
-          FreeC.Fail<F, R>(t)
+          if (NonFatal(t)) {
+            FreeC.Fail<F, R>(t)
+          } else {
+            throw t
+          }
         }
       is FreeC.Interrupted<*, R, *> -> free
       else -> throw AssertionError("Unreachable BOOM!")
@@ -324,7 +344,11 @@ fun <R> FreeC.Result<R>.recoverWith(f: (Throwable) -> Result<R>): Result<R> = wh
     try {
       f(error)
     } catch (t: Throwable) {
-      Result.raiseError<R>(CompositeFailure(error, t))
+      if (NonFatal(t)) {
+        Result.raiseError<R>(CompositeFailure(error, t))
+      } else {
+        throw t
+      }
     }
   else -> this
 }
@@ -334,7 +358,11 @@ fun <F, A, B> FreeCOf<F, A>.bracketCase(use: (A) -> FreeCOf<F, B>, release: (A, 
     val used: FreeC<F, B> = try {
       use(a).fix()
     } catch (t: Throwable) {
-      FreeC.Fail(t)
+      if (NonFatal(t)) {
+        FreeC.Fail(t)
+      } else {
+        throw t
+      }
     }
     used.transformWith { result ->
       release(a, result.asExitCase()).transformWith<F, Unit, B> { r2 ->

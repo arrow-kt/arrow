@@ -1,6 +1,7 @@
 package arrow.effects.internal
 
 import arrow.core.Either
+import arrow.core.NonFatal
 import arrow.effects.*
 import arrow.effects.typeclasses.ExitCase
 import java.util.concurrent.atomic.AtomicBoolean
@@ -61,7 +62,11 @@ internal object IOBracket {
               val fb = try {
                 use(a)
               } catch (e: Throwable) {
-                IO.raiseError<B>(e)
+                if (NonFatal(e)) {
+                  IO.raiseError<B>(e)
+                } else {
+                  throw e
+                }
               }
 
               IO.Bind(fb.fix(), frame)
