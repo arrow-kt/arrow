@@ -1,6 +1,7 @@
 package arrow.typeclasses
 
 import arrow.Kind
+import arrow.core.NonFatal
 import arrow.documented
 import kotlin.coroutines.startCoroutine
 
@@ -141,4 +142,6 @@ interface MonadThrow<F> : MonadError<F, Throwable> {
   fun <A> fx(f: suspend MonadErrorContinuation<F, *>.() -> A, unit: Unit = Unit): Kind<F, A> =
     bindingCatch { f() }
 
+  fun <A> Throwable.raiseNonFatal(): Kind<F, A> =
+    if (NonFatal(this)) raiseError(this) else throw this
 }

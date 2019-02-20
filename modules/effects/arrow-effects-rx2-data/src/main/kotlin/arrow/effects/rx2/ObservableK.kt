@@ -85,11 +85,15 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
             .doOnDispose { release(a, ExitCase.Canceled).fix().observable.subscribe({}, emitter::onError) }
             .subscribe(emitter::onNext, emitter::onError))
         } catch (e: Throwable) {
-          release(a, ExitCase.Error(e)).fix().observable.subscribe({
-            emitter.onError(e)
-          }, { e2 ->
-            emitter.onError(Platform.composeErrors(e, e2))
-          })
+          if (NonFatal(e)) {
+            release(a, ExitCase.Error(e)).fix().observable.subscribe({
+              emitter.onError(e)
+            }, { e2 ->
+              emitter.onError(Platform.composeErrors(e, e2))
+            })
+          } else {
+            throw e
+          }
         }
       }, emitter::onError, emitter::onComplete)
     })
