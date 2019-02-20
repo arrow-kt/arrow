@@ -25,9 +25,17 @@ class SetKTest : UnitSpec() {
   val B: SetK<Int> = setOf(3,4).k()
   val C: SetK<Int> = setOf(5).k()
 
-  val EQ_SEMIGROUPAL: Eq<SetKOf<Tuple2<Int, Tuple2<Int, Int>>>> = object : Eq<SetKOf<Tuple2<Int, Tuple2<Int, Int>>>> {
+  val associativeEq: Eq<SetKOf<Tuple2<Int, Tuple2<Int, Int>>>> = object : Eq<SetKOf<Tuple2<Int, Tuple2<Int, Int>>>> {
     override fun SetKOf<Tuple2<Int, Tuple2<Int, Int>>>.eqv(b: SetKOf<Tuple2<Int, Tuple2<Int, Int>>>): Boolean {
       return SetK.eq(Tuple2.eq(Int.eq(), Tuple2.eq(Int.eq(), Int.eq()))).run {
+        this@eqv.fix().eqv(b.fix())
+      }
+    }
+  }
+
+  val eq: Eq<SetKOf<Tuple2<Any, Any>>> = object : Eq<SetKOf<Tuple2<Any, Any>>> {
+    override fun SetKOf<Tuple2<Any, Any>>.eqv(b: SetKOf<Tuple2<Any, Any>>): Boolean {
+      return SetK.eq(Tuple2.eq(Eq.any(), Eq.any())).run {
         this@eqv.fix().eqv(b.fix())
       }
     }
@@ -40,7 +48,7 @@ class SetKTest : UnitSpec() {
     testLaws(
       ShowLaws.laws(SetK.show(), EQ) { SetK.just(it) },
       SemigroupKLaws.laws(SetK.semigroupK(), { SetK.just(it) }, Eq.any()),
-      SemigroupalLaws.laws(SetK.semigroupal(), A, B, C, this::bijection, EQ_SEMIGROUPAL),
+      SemigroupalLaws.laws(SetK.semigroupal(), A, B, C, this::bijection, associativeEq, eq),
       MonoidKLaws.laws(SetK.monoidK(), { SetK.just(it) }, Eq.any()),
       FoldableLaws.laws(SetK.foldable(), { SetK.just(it) }, Eq.any()),
       HashLaws.laws(SetK.hash(Int.hash()), SetK.eq(Int.eq())) { SetK.just(it) }

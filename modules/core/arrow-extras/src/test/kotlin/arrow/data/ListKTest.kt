@@ -32,19 +32,19 @@ class ListKTest : UnitSpec() {
 
   init {
 
-    val EQ: Eq<ListKOf<Int>> = ListK.eq(Eq.any())
-    val EQ2_SEMIGROUPAL: Eq<ListKOf<Tuple2<Int, Tuple2<Int, Int>>>> = ListK.eq(Tuple2.eq(Int.eq(), Tuple2.eq(Int.eq(), Int.eq())))
+    val eq: Eq<ListKOf<Int>> = ListK.eq(Eq.any())
+    val associativeEq: Eq<ListKOf<Tuple2<Int, Tuple2<Int, Int>>>> = ListK.eq(Tuple2.eq(Int.eq(), Tuple2.eq(Int.eq(), Int.eq())))
 
     testLaws(
-      ShowLaws.laws(ListK.show(), EQ) { listOf(it).k() },
+      ShowLaws.laws(ListK.show(), eq) { listOf(it).k() },
       SemigroupKLaws.laws(ListK.semigroupK(), applicative, Eq.any()),
-      SemigroupalLaws.laws(ListK.semigroupal(), A, B, C, this::bijection, EQ2_SEMIGROUPAL),
+      SemigroupalLaws.laws(ListK.semigroupal(), A, B, C, this::bijection, associativeEq, ListK.eq(Eq.any())),
       MonoidKLaws.laws(ListK.monoidK(), applicative, Eq.any()),
       TraverseLaws.laws(ListK.traverse(), applicative, { n: Int -> ListK(listOf(n)) }, Eq.any()),
       MonadCombineLaws.laws(ListK.monadCombine(),
         { n -> ListK(listOf(n)) },
         { n -> ListK(listOf({ s: Int -> n * s })) },
-        EQ),
+        eq),
       HashLaws.laws(ListK.hash(Int.hash()), ListK.eq(Int.eq())) { listOf(it).k() }
     )
 

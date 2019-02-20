@@ -35,9 +35,14 @@ class SequenceKTest : UnitSpec() {
         toList() == b.toList()
     }
 
-    val bijectiveEq: Eq<Kind<ForSequenceK, Tuple2<Int, Tuple2<Int, Int>>>> = object : Eq<Kind<ForSequenceK, Tuple2<Int, Tuple2<Int, Int>>>> {
+    val associativeEq: Eq<Kind<ForSequenceK, Tuple2<Int, Tuple2<Int, Int>>>> = object : Eq<Kind<ForSequenceK, Tuple2<Int, Tuple2<Int, Int>>>> {
       override fun Kind<ForSequenceK, Tuple2<Int, Tuple2<Int, Int>>>.eqv(b: Kind<ForSequenceK, Tuple2<Int, Tuple2<Int, Int>>>): Boolean =
         this.toList() == b.toList()
+    }
+
+    val tupleEq: Eq<Kind<ForSequenceK, Tuple2<Any, Any>>> = object : Eq<Kind<ForSequenceK, Tuple2<Any, Any>>> {
+      override fun Kind<ForSequenceK, Tuple2<Any, Any>>.eqv(b: Kind<ForSequenceK, Tuple2<Any, Any>>): Boolean =
+              this.toList() == b.toList()
     }
 
     val show: Show<Kind<ForSequenceK, Int>> = object : Show<Kind<ForSequenceK, Int>> {
@@ -50,7 +55,7 @@ class SequenceKTest : UnitSpec() {
       MonadLaws.laws(SequenceK.monad(), eq),
       MonoidKLaws.laws(SequenceK.monoidK(), SequenceK.applicative(), eq),
       MonoidLaws.laws(SequenceK.monoid(), Gen.sequenceK(Gen.int()), eq),
-      SemigroupalLaws.laws(SequenceK.semigroupal(), A, B, C, this::bijection, bijectiveEq),
+      SemigroupalLaws.laws(SequenceK.semigroupal(), A, B, C, this::bijection, associativeEq, tupleEq),
       TraverseLaws.laws(SequenceK.traverse(), SequenceK.applicative(), { n: Int -> SequenceK(sequenceOf(n)) }, eq),
       HashLaws.laws(SequenceK.hash(Int.hash()), SequenceK.eq(Int.eq())) { sequenceOf(it).k() }
     )
