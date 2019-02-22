@@ -8,6 +8,7 @@ import arrow.core.extensions.`try`.monad.monad
 import arrow.data.extensions.listk.monad.monad
 import arrow.data.extensions.listk.semigroupK.semigroupK
 import arrow.data.extensions.statet.applicative.applicative
+import arrow.data.extensions.statet.divisible.divisible
 import arrow.data.extensions.statet.semigroupK.semigroupK
 import arrow.effects.ForIO
 import arrow.effects.IO
@@ -20,10 +21,7 @@ import arrow.mtl.extensions.listk.monadCombine.monadCombine
 import arrow.mtl.extensions.statet.monadCombine.monadCombine
 import arrow.mtl.extensions.statet.monadState.monadState
 import arrow.test.UnitSpec
-import arrow.test.laws.AsyncLaws
-import arrow.test.laws.MonadCombineLaws
-import arrow.test.laws.MonadStateLaws
-import arrow.test.laws.SemigroupKLaws
+import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith

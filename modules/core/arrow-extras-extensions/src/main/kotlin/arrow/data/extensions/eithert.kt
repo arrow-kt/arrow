@@ -138,6 +138,70 @@ interface EitherTSemigroupK<F, L> : SemigroupK<EitherTPartialOf<F, L>> {
     fix().combineK(MF(), y)
 }
 
+@extension
+@undocumented
+interface EitherTContravariant<F, L> : Contravariant<EitherTPartialOf<F, L>> {
+  fun CF(): Contravariant<F>
+
+  override fun <A, B> Kind<EitherTPartialOf<F, L>, A>.contramap(f: (B) -> A): Kind<EitherTPartialOf<F, L>, B> =
+    EitherT(
+      CF().run { value().contramap<Either<L, A>, Either<L, B>> { it.map(f) } }
+    )
+}
+
+@extension
+@undocumented
+interface EitherTDivide<F, L> : Divide<EitherTPartialOf<F, L>>, EitherTContravariant<F, L> {
+  fun DF(): Divide<F>
+  override fun CF(): Contravariant<F> = DF()
+
+  override fun <A, B, Z> divide(fa: Kind<EitherTPartialOf<F, L>, A>, fb: Kind<EitherTPartialOf<F, L>, B>, f: (Z) -> Tuple2<A, B>): Kind<EitherTPartialOf<F, L>, Z> =
+    EitherT(
+      DF().divide(fa.value(), fb.value()) { either ->
+        either.fold({ it.left() toT it.left() }, {
+          val (a, b) = f(it)
+          a.right() toT b.right()
+        })
+      }
+    )
+}
+
+@extension
+@undocumented
+interface EitherTDivisibleInstance<F, L> : Divisible<EitherTPartialOf<F, L>>, EitherTDivide<F, L> {
+
+  fun DFF(): Divisible<F>
+  override fun DF(): Divide<F> = DFF()
+
+  override fun <A> conquer(): Kind<EitherTPartialOf<F, L>, A> =
+    EitherT(
+      DFF().conquer()
+    )
+}
+
+@extension
+@undocumented
+interface EitherTDecidableInstance<F, L> : Decidable<EitherTPartialOf<F, L>>, EitherTDivisibleInstance<F, L> {
+
+  fun DFFF(): Decidable<F>
+  override fun DFF(): Divisible<F> = DFFF()
+
+  override fun <A, B, Z> choose(fa: Kind<EitherTPartialOf<F, L>, A>, fb: Kind<EitherTPartialOf<F, L>, B>, f: (Z) -> Either<A, B>): Kind<EitherTPartialOf<F, L>, Z> =
+    EitherT(
+      DFFF().choose(fa.value(), fb.value()) { either ->
+        either.map(f).fold({ left ->
+          left.left().left()
+        }, { e ->
+          e.fold({ a ->
+            a.right().left()
+          }, { b ->
+            b.right().right()
+          })
+        })
+      }
+    )
+}
+
 fun <F, A, B, C> EitherTOf<F, A, B>.foldLeft(FF: Foldable<F>, b: C, f: (C, B) -> C): C =
   FF.compose(Either.foldable<A>()).foldLC(value(), b, f)
 

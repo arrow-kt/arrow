@@ -1,8 +1,7 @@
 package arrow.data.extensions
 
 import arrow.Kind
-import arrow.core.Either
-import arrow.core.toT
+import arrow.core.*
 import arrow.data.*
 import arrow.data.extensions.statet.monad.monad
 import arrow.data.extensions.writert.monad.monad
@@ -124,6 +123,62 @@ interface WriterTMonoidK<F, W> : MonoidK<WriterTPartialOf<F, W>>, WriterTSemigro
   override fun SS(): SemigroupK<F> = MF()
 
   override fun <A> empty(): WriterT<F, W, A> = WriterT(MF().empty())
+}
+
+@extension
+interface WriterTContravariantInstance<F, W> : Contravariant<WriterTPartialOf<F, W>> {
+  fun CF(): Contravariant<F>
+
+  override fun <A, B> Kind<WriterTPartialOf<F, W>, A>.contramap(f: (B) -> A): Kind<WriterTPartialOf<F, W>, B> =
+    WriterT(
+      CF().run {
+        value().contramap<Tuple2<W, A>, Tuple2<W, B>> { (w, b) ->
+          w toT f(b)
+        }
+      }
+    )
+}
+
+@extension
+interface WriterTDivideInstance<F, W> : Divide<WriterTPartialOf<F, W>>, WriterTContravariantInstance<F, W> {
+  fun DF(): Divide<F>
+  override fun CF(): Contravariant<F> = DF()
+
+  override fun <A, B, Z> divide(fa: Kind<WriterTPartialOf<F, W>, A>, fb: Kind<WriterTPartialOf<F, W>, B>, f: (Z) -> Tuple2<A, B>): Kind<WriterTPartialOf<F, W>, Z> =
+    WriterT(
+      DF().divide(fa.value(), fb.value()) { (w, z) ->
+        val (a, b) = f(z)
+        (w toT a) toT (w toT b)
+      }
+    )
+}
+
+@extension
+interface WriterTDivisibleInstance<F, W> : Divisible<WriterTPartialOf<F, W>>, WriterTDivideInstance<F, W> {
+  fun DFF(): Divisible<F>
+  override fun DF(): Divide<F> = DFF()
+
+  override fun <A> conquer(): Kind<WriterTPartialOf<F, W>, A> =
+    WriterT(
+      DFF().conquer()
+    )
+}
+
+@extension
+interface WriterTDecidableInstance<F, W> : Decidable<WriterTPartialOf<F, W>>, WriterTDivisibleInstance<F, W> {
+  fun DFFF(): Decidable<F>
+  override fun DFF(): Divisible<F> = DFFF()
+
+  override fun <A, B, Z> choose(fa: Kind<WriterTPartialOf<F, W>, A>, fb: Kind<WriterTPartialOf<F, W>, B>, f: (Z) -> Either<A, B>): Kind<WriterTPartialOf<F, W>, Z> =
+    WriterT(
+      DFFF().choose(fa.value(), fb.value()) { (w, z) ->
+        f(z).fold({ a ->
+          (w toT a).left()
+        }, { b ->
+          (w toT b).right()
+        })
+      }
+    )
 }
 
 @extension
