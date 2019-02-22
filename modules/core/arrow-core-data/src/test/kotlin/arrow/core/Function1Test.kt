@@ -2,7 +2,6 @@ package arrow.core
 
 import arrow.Kind
 import arrow.core.extensions.function1.category.category
-import arrow.core.extensions.function1.contravariant.contravariant
 import arrow.core.extensions.function1.divisible.divisible
 import arrow.core.extensions.function1.monad.monad
 import arrow.core.extensions.function1.monoid.monoid

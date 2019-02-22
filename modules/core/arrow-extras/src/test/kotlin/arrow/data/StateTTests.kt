@@ -8,7 +8,6 @@ import arrow.core.extensions.`try`.monad.monad
 import arrow.data.extensions.listk.monad.monad
 import arrow.data.extensions.listk.semigroupK.semigroupK
 import arrow.data.extensions.statet.applicative.applicative
-import arrow.data.extensions.statet.divisible.divisible
 import arrow.data.extensions.statet.semigroupK.semigroupK
 import arrow.effects.ForIO
 import arrow.effects.IO
