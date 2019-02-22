@@ -37,7 +37,7 @@ fun <A> forFew(amount: Int, gena: Gen<A>, fn: (a: A) -> Boolean): Unit {
   }
 }
 
-fun <A, B> forFew(amount: Int, gena: Gen<A>, genb: Gen<B>, fn: (a: A, b: B) -> Boolean): Unit {
+fun <A, B> forFew(amount: Int, gena: Gen<A>, genb: Gen<B>, fn: (a: A, b: B) -> Boolean) {
   Gen.tuple2(gena, genb).random().take(amount).map {
     if (!fn(it.a, it.b)) {
       throw AssertionError("Property failed for\n${it.a}\n${it.b})")
