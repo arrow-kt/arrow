@@ -11,7 +11,7 @@ import arrow.core.*
  * A useful example could be deriving serializers for a datatype from simpler serializers
  *
  * ```kotlin:ank:playground
- * import arrow.typeclasses.divide
+ * import arrow.typeclasses.Divide
  * import arrow.Kind
  * import arrow.core.Tuple2
  * import arrow.core.toT
@@ -65,7 +65,7 @@ interface Divide<F> : Contravariant<F> {
    *  a function from `C -> Tuple2<A, B>`
    *
    * ```kotlin:ank:playground
-   * import arrow.typeclasses.divide
+   * import arrow.typeclasses.Divide
    * import arrow.Kind
    * import arrow.core.Tuple2
    * import arrow.core.toT

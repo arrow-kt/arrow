@@ -19,7 +19,7 @@ A useful example is deriving serializers for a datatype from simpler serializers
 Here we can easily construct a serializer for a `Tuple<A, B>` because we already have a serializer for `A` and `B`. Since most data classes can be expressed with tuples writing serializers by combining them like this is trivial.
 
 ```kotlin:ank:playground
-import arrow.typeclasses.divide
+import arrow.typeclasses.Divide
 import arrow.Kind
 import arrow.core.Tuple2
 import arrow.core.toT
