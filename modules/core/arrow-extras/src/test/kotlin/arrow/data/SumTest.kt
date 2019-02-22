@@ -5,13 +5,12 @@ import arrow.core.ForId
 import arrow.core.Id
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
-import arrow.core.fix
 import arrow.core.extensions.id.comonad.comonad
 import arrow.core.extensions.id.eq.eq
 import arrow.core.extensions.id.functor.functor
 import arrow.core.extensions.id.hash.hash
+import arrow.core.fix
 import arrow.data.extensions.sum.comonad.comonad
-import arrow.data.extensions.sum.comonad.extract
 import arrow.data.extensions.sum.eq.eq
 import arrow.data.extensions.sum.hash.hash
 import arrow.test.UnitSpec
@@ -20,6 +19,7 @@ import arrow.test.laws.HashLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Hash
 import io.kotlintest.runner.junit4.KotlinTestRunner
+import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
 
 @RunWith(KotlinTestRunner::class)
