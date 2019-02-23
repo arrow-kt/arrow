@@ -6,7 +6,7 @@ import arrow.core.*
 /**
  * [Divide] is a typeclass that models the divide part of divide and conquer.
  *
- * [Divide] basically states: Given a Kind<F, A> and a Kind<F, B> and a way to turn C into an A and B it gives you a Kind<F, C>
+ * [Divide] basically states: Given a Kind<F, A> and a Kind<F, B> and a way to turn C into a tuple of A and B it gives you a Kind<F, C>
  *
  * A useful example could be deriving serializers for a datatype from simpler serializers
  *

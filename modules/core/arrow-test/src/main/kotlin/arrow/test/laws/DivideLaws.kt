@@ -25,16 +25,15 @@ object DivideLaws {
     EQ: Eq<Kind<F, Int>>
   ): Unit =
     forAll(Gen.int().map(cf)) { fa ->
-      EQ.run {
-        divide<Int, Int, Int>(
-          fa,
-          divide(fa, fa) { delta(it) }
-        ) { delta(it) }.eqv(
-          divide<Int, Int, Int>(
-            divide(fa, fa) { delta(it) },
-            fa
-          ) { delta(it) }
-        )
-      }
+      val a = divide<Int, Int, Int>(
+        fa,
+        divide(fa, fa) { delta(it) }
+      ) { delta(it) }
+      val b = divide<Int, Int, Int>(
+        divide(fa, fa) { delta(it) },
+        fa
+      ) { delta(it) }
+
+      a.equalUnderTheLaw(b, EQ)
     }
 }

@@ -21,9 +21,7 @@ object DivisibleLaws {
     EQ: Eq<Kind<F, Int>>
   ): Unit =
     forAll(Gen.int().map(cf)) { fa ->
-      EQ.run {
-        divide<Int, Int, Int>(fa, conquer()) { DivideLaws.delta(it) }.eqv(fa)
-      }
+      divide<Int, Int, Int>(fa, conquer()) { DivideLaws.delta(it) }.equalUnderTheLaw(fa, EQ)
     }
 
   fun <F> Divisible<F>.rightIdentity(
@@ -31,8 +29,6 @@ object DivisibleLaws {
     EQ: Eq<Kind<F, Int>>
   ): Unit =
     forAll(Gen.int().map(cf)) { fa ->
-      EQ.run {
-        divide<Int, Int, Int>(conquer(), fa) { DivideLaws.delta(it) }.eqv(fa)
-      }
+      divide<Int, Int, Int>(conquer(), fa) { DivideLaws.delta(it) }.equalUnderTheLaw(fa, EQ)
     }
 }
