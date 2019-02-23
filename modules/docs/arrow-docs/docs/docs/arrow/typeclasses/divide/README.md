@@ -34,7 +34,7 @@ class Serializer<A>(val func: (A) -> String): Kind<ForSerializer, A> {
    companion object {
      fun divide() = object: Divide<ForSerializer> {
        override fun <A, B> Kind<ForSerializer, A>.contramap(f: (B) -> A): Kind<ForSerializer, B> =
-         Serializer { fix().func(f(it)) }
+         Serializer { this@contramap.fix().func(f(it)) }
        override fun <A, B, Z> divide(fa: Kind<ForSerializer, A>, fb: Kind<ForSerializer, B>, f: (Z) -> Tuple2<A, B>) =
          Serializer { z: Z ->
            val (a, b) = f(z)
