@@ -36,7 +36,7 @@ fun <F> UnsafeRun<F>.main(fx: Fx<F>): Int =
 
 /* Run program in the IO monad */
 fun main() =
-  IO.unsafeRun().main(IO.fx()) 
+  IO.unsafeRun().main(IO.fx()) //XXX This doesn't compile
 //sampleEnd
 ```
 
