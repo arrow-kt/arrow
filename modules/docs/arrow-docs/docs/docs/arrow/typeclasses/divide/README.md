@@ -23,26 +23,9 @@ import arrow.typeclasses.Divide
 import arrow.Kind
 import arrow.core.Tuple2
 import arrow.core.toT
+import com.example.domain.*
 
 data class User(val name: String, val age: Int)
-
-// Boilerplate that @higherkind usually generates
-class ForSerializer
-fun <A> Kind<ForSerializer, A>.fix() = this as Serializer<A>
-
-class Serializer<A>(val func: (A) -> String): Kind<ForSerializer, A> {
-   companion object {
-     fun divide() = object: Divide<ForSerializer> {
-       override fun <A, B> Kind<ForSerializer, A>.contramap(f: (B) -> A): Kind<ForSerializer, B> =
-         Serializer { this@contramap.fix().func(f(it)) }
-       override fun <A, B, Z> divide(fa: Kind<ForSerializer, A>, fb: Kind<ForSerializer, B>, f: (Z) -> Tuple2<A, B>) =
-         Serializer { z: Z ->
-           val (a, b) = f(z)
-           "A: ${fa.fix().func(a)}; B: ${fb.fix().func(b)}"
-         }
-     }
-   }
-}
 
 val stringSerializer = Serializer<String> { "STRING: $it" }
 val intSerializer = Serializer<Int> { "INT: $it" }

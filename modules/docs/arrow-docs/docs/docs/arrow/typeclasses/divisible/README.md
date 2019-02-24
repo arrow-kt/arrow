@@ -17,38 +17,16 @@ beginner
 Extending the serializer example from `Divide` `conquer` would simply serialize data to an empty string.
 
 ```kotlin:ank:playground
-import arrow.typeclasses.divide
 import arrow.Kind
 import arrow.core.Tuple2
 import arrow.core.toT
-
-// Boilerplate that @higherkind usually generates
-class ForSerializer
-fun <A> Kind<ForSerializer, A>.fix() = this as Serializer<A>
-
-class Serializer<A>(val func: (A) -> String): Kind<ForSerializer, A> {
-   companion object {
-     fun divisible() = object: Divide<ForSerializer> {
-       override fun <A, B> Kind<ForSerializer, A>.contramap(f: (B) -> A): Kind<ForSerializer, B> =
-         Serializer { fix().func(f(it)) }
-       override fun <A, B, Z> divide(fa: Kind<ForSerializer, A>, fb: Kind<ForSerializer, B>, f: (Z) -> Tuple2<A, B>) =
-         Serializer { z: Z ->
-           val (a, b) = f(z)
-           "A: ${fa.fix().func(a)}; B: ${fb.fix().func(b)}"
-         }
-        override fun <A> conquer(): Kind<ForSerializer, A> =
-          Serializer { a: A ->
-            ""
-          }
-     }
-   }
-}
+import com.example.domain.*
 
 fun main(args: Array<String>) {
   //sampleStart
-   val emptySerializer: Serializer<Int> = Serializer.divisble().conquer().fix()
+   val emptySerializer: SerializerOf<Int> = Serializer.divisible().conquer()
 
-  val result = emptySerializer.func(1)
+  val result = emptySerializer.fix().func(1)
   //sampleEnd
   println(result)
 }
