@@ -1,7 +1,6 @@
 package arrow.core.extensions
 
 import arrow.core.*
-import arrow.core.extensions.eval.monad.monad
 import arrow.core.extensions.function0.monad.monad
 import arrow.extension
 import arrow.typeclasses.*

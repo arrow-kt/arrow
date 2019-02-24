@@ -1,15 +1,14 @@
 package arrow.data.extensions
 
 import arrow.Kind
+import arrow.core.Either
+import arrow.core.Tuple2
 import arrow.data.Sum
 import arrow.data.SumPartialOf
 import arrow.data.fix
 
 import arrow.extension
-import arrow.typeclasses.Comonad
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Hash
+import arrow.typeclasses.*
 import arrow.undocumented
 
 @extension
@@ -61,4 +60,59 @@ interface SumHash<F, G, A> : Hash<Sum<F, G, A>>, SumEq<F, G, A> {
   override fun EQG(): Eq<Kind<G, A>> = HG()
 
   override fun Sum<F, G, A>.hash(): Int = 31 * HF().run { left.hash() } + HG().run { right.hash() }
+}
+
+@extension
+interface ContravariantSumInstance<F, G> : Contravariant<SumPartialOf<F, G>> {
+  fun CF(): Contravariant<F>
+  fun CG(): Contravariant<G>
+
+  override fun <A, B> Kind<SumPartialOf<F, G>, A>.contramap(f: (B) -> A): Kind<SumPartialOf<F, G>, B> =
+    Sum(
+      CF().run { fix().left.contramap(f) },
+      CG().run { fix().right.contramap(f) },
+      fix().side
+    )
+}
+
+@extension
+interface DivideSumInstance<F, G> : Divide<SumPartialOf<F, G>>, ContravariantSumInstance<F, G> {
+  fun DF(): Divide<F>
+  override fun CF(): Contravariant<F> = DF()
+  fun DG(): Divide<G>
+  override fun CG(): Contravariant<G> = DG()
+
+  override fun <A, B, Z> divide(fa: Kind<SumPartialOf<F, G>, A>, fb: Kind<SumPartialOf<F, G>, B>, f: (Z) -> Tuple2<A, B>): Kind<SumPartialOf<F, G>, Z> =
+    Sum(
+      DF().divide(fa.fix().left, fb.fix().left, f),
+      DG().divide(fa.fix().right, fb.fix().right, f)
+    )
+}
+
+@extension
+interface DivisibleSumInstance<F, G> : Divisible<SumPartialOf<F, G>>, DivideSumInstance<F, G> {
+  fun DFF(): Divisible<F>
+  override fun DF(): Divide<F> = DFF()
+  fun DGG(): Divisible<G>
+  override fun DG(): Divide<G> = DGG()
+
+  override fun <A> conquer(): Kind<SumPartialOf<F, G>, A> =
+    Sum(
+      DFF().conquer(),
+      DGG().conquer()
+    )
+}
+
+@extension
+interface DecidableSumInstance<F, G> : Decidable<SumPartialOf<F, G>>, DivisibleSumInstance<F, G> {
+  fun DFFF(): Decidable<F>
+  override fun DFF(): Divisible<F> = DFFF()
+  fun DGGG(): Decidable<G>
+  override fun DGG(): Divisible<G> = DGGG()
+
+  override fun <A, B, Z> choose(fa: Kind<SumPartialOf<F, G>, A>, fb: Kind<SumPartialOf<F, G>, B>, f: (Z) -> Either<A, B>): Kind<SumPartialOf<F, G>, Z> =
+    Sum(
+      DFFF().choose(fa.fix().left, fb.fix().left, f),
+      DGGG().choose(fa.fix().right, fb.fix().right, f)
+    )
 }
