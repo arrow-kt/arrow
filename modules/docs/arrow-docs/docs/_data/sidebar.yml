@@ -239,6 +239,9 @@ options:
       - title: Semigroup
         url: /docs/arrow/typeclasses/semigroup/
 
+      - title: Semigroupal
+        url: /docs/apidocs/arrow-typeclasses/arrow.typeclasses/-semigroupal/
+
       - title: Monoid
         url: /docs/arrow/typeclasses/monoid/
 
