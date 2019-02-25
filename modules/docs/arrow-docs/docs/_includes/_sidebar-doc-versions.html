@@ -1,0 +1,39 @@
+<div>
+
+  <ul class="sidebar-nav">
+    {% for item in site.data.doc-versions.docVersions %}
+      <li class="sidebar-nav-item">
+          <a href="{% if item.url %}{{ item.url }}{% else %}#{% endif %}">
+              <span>{{ item.title }}</span>
+              {% if item.nested_options %}
+                <i class="fa fa-angle-right"></i>
+              {% endif%}
+          </a>
+          {% if item.nested_options %}
+          <ul>
+            {% for nested_item in item.nested_options %}
+              {% if nested_item.url == site.data.commons.stable_version %}
+                {% assign stable_version_title = nested_item.title %}
+              {% endif %}
+            {% endfor %}
+              <li class="sidebar-doc-version-stable">
+                <a href="{{ site.data.commons.stable_version }}">
+                  <span>STABLE ({{ stable_version_title }})</span>
+                </a>
+              </li>
+              {% for nested_item in item.nested_options %}
+                {% if nested_item.url != site.data.commons.stable_version %}
+                  <li>
+                    <a href="{{ nested_item.url }} /docs/">
+                      <span>{{ nested_item.title }}</span>
+                    </a>
+                  </li>
+                {% endif %}
+              {% endfor %}
+          </ul>
+          {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+
+</div>

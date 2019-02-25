@@ -1,0 +1,41 @@
+<div>
+
+    {% for item in site.data.doc-versions.docVersions %}
+
+      {% for nested_item in item.nested_options %}
+        {% if nested_item.url == site.data.commons.stable_version %}
+          {% assign stable_version = nested_item %}
+        {% endif %}
+        {% if nested_item.url == site.data.commons.next_version %}
+          {% assign next_version = nested_item %}
+        {% endif %}
+      {% endfor %}
+
+      {% for nested_item in item.nested_options %}
+        {% if nested_item.url == stable_version.previous %}
+          {% assign previous_version = nested_item %}
+        {% endif %}
+      {% endfor %}
+    {% endfor %}
+
+    <ul class="masthead-doc-version">
+        <li>
+          <a class="masthead-button button" href="{{ previous_version.url }}">
+            <span>{{ previous_version.title }}</span>
+          </a>
+        </li>
+
+        <li>
+          <a class="masthead-button button" href="{{ stable_version.url }}">
+            <span>{{ stable_version.title }}</span>
+          </a>
+        </li>
+
+        <li>
+          <a class="masthead-button button" href="{{ next_version.url }}">
+            <span>{{ next_version.title }}</span>
+          </a>
+        </li>
+    </ul>
+
+</div>

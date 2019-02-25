@@ -119,5 +119,16 @@
               text-decoration: none;
             }
         }
+
+        .masthead-doc-version {
+          margin-top: ($base-point-grid * 3);
+
+          transform: translateZ(76px);
+          transform-style: preserve-3d;
+
+          li {
+              display: inline-block;
+          }
+        }
     }
 }
