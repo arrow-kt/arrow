@@ -220,7 +220,7 @@ Enable annotaton processing using kotlin plugin
                 <annotationProcessorPaths>
                     <annotationProcessorPath>
                         <groupId>io.arrow-kt</groupId>
-                        <artifactId>arrow-annotations-processor</artifactId>
+                        <artifactId>arrow-meta</artifactId>
                         <version>${arrow.version}</version>
                     </annotationProcessorPath>
                 </annotationProcessorPaths>
