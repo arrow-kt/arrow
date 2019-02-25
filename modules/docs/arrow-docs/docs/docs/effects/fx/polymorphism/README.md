@@ -219,18 +219,20 @@ import arrow.effects.extensions.io.fx.fx
 import arrow.core.toT
 
 //sampleStart
-val result1 = 
+val result1 = unsafe { runBlocking {
   fx {
     val a = !effect { 1 }
     val b = !effect { 2 }
     a toT b
   }
+}}
 
-val result2 = 
+val result2 = unsafe { runBlocking {
   fx {
     val b = !effect { 2 }
     !effect { 1 } toT b
   }
+}}
 //sampleEnd
 
 fun main() {
