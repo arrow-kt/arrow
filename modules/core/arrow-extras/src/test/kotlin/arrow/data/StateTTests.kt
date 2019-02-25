@@ -20,10 +20,7 @@ import arrow.mtl.extensions.listk.monadCombine.monadCombine
 import arrow.mtl.extensions.statet.monadCombine.monadCombine
 import arrow.mtl.extensions.statet.monadState.monadState
 import arrow.test.UnitSpec
-import arrow.test.laws.AsyncLaws
-import arrow.test.laws.MonadCombineLaws
-import arrow.test.laws.MonadStateLaws
-import arrow.test.laws.SemigroupKLaws
+import arrow.test.laws.*
 import arrow.typeclasses.Eq
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith

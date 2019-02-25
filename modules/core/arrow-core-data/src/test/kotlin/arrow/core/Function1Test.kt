@@ -2,7 +2,7 @@ package arrow.core
 
 import arrow.Kind
 import arrow.core.extensions.function1.category.category
-import arrow.core.extensions.function1.contravariant.contravariant
+import arrow.core.extensions.function1.divisible.divisible
 import arrow.core.extensions.function1.monad.monad
 import arrow.core.extensions.function1.monoid.monoid
 import arrow.core.extensions.function1.profunctor.profunctor
@@ -34,7 +34,7 @@ class Function1Test : UnitSpec() {
     testLaws(
       SemigroupLaws.laws(Function1.semigroup<Int, Int>(Int.semigroup()), { a: Int -> a + 1 }.k(), { a: Int -> a + 2 }.k(), { a: Int -> a + 3 }.k(), EQ),
       MonoidLaws.laws(Function1.monoid<Int, Int>(Int.monoid()), Gen.constant({ a: Int -> a + 1 }.k()), EQ),
-      ContravariantLaws.laws(Function1.contravariant(), { Function1.just<Int, Int>(it).conest() }, ConestedEQ),
+      DivisibleLaws.laws(Function1.divisible(Int.monoid()), { Function1.just<Int, Int>(it).conest() }, ConestedEQ),
       ProfunctorLaws.laws(Function1.profunctor(), { Function1.just(it) }, EQ),
       MonadLaws.laws(Function1.monad(), EQ),
       CategoryLaws.laws(Function1.category(), { Function1.just(it) }, EQ)
