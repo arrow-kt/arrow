@@ -104,7 +104,7 @@ dependencies {
     compile "io.arrow-kt:arrow-optics:$arrow_version" //optional
     compile "io.arrow-kt:arrow-generic:$arrow_version" //optional
     compile "io.arrow-kt:arrow-recursion:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-extensions-recursion:$arrow_version" //optional
+    compile "io.arrow-kt:arrow-recursion-extensions:$arrow_version" //optional
     compile "io.arrow-kt:arrow-integration-retrofit-adapter:$arrow_version" //optional
 }
 ```
@@ -220,7 +220,7 @@ Enable annotaton processing using kotlin plugin
                 <annotationProcessorPaths>
                     <annotationProcessorPath>
                         <groupId>io.arrow-kt</groupId>
-                        <artifactId>arrow-annotations-processor</artifactId>
+                        <artifactId>arrow-meta</artifactId>
                         <version>${arrow.version}</version>
                     </annotationProcessorPath>
                 </annotationProcessorPaths>
