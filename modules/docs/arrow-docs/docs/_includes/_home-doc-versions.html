@@ -1,24 +1,21 @@
-<div>
+<div class="masthead-doc-version">
 
-    {% for item in site.data.doc-versions.docVersions %}
-
-      {% for nested_item in item.nested_options %}
-        {% if nested_item.url == site.data.commons.stable_version %}
-          {% assign stable_version = nested_item %}
+      {% for item in site.data.doc-versions.docVersions %}
+        {% if item.url == site.data.commons.stable_version %}
+          {% assign stable_version = item %}
         {% endif %}
-        {% if nested_item.url == site.data.commons.next_version %}
-          {% assign next_version = nested_item %}
+        {% if item.url == site.data.commons.next_version %}
+          {% assign next_version = item %}
         {% endif %}
       {% endfor %}
 
-      {% for nested_item in item.nested_options %}
-        {% if nested_item.url == stable_version.previous %}
-          {% assign previous_version = nested_item %}
+      {% for item in site.data.doc-versions.docVersions %}
+        {% if item.url == stable_version.previous %}
+          {% assign previous_version = item %}
         {% endif %}
       {% endfor %}
-    {% endfor %}
 
-    <ul class="masthead-doc-version">
+    <ul>
         <li>
           <a class="masthead-button button" href="{{ previous_version.url }}">
             <span>{{ previous_version.title }}</span>

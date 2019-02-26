@@ -1,39 +1,30 @@
-<div>
+{% for item in site.data.doc-versions.docVersions %}
+    {% if item.url == site.data.commons.stable_version %}
+      {% assign stable_version_title = item.title %}
+    {% endif %}
+{% endfor %}
 
-  <ul class="sidebar-nav">
-    {% for item in site.data.doc-versions.docVersions %}
-      <li class="sidebar-nav-item">
-          <a href="{% if item.url %}{{ item.url }}{% else %}#{% endif %}">
-              <span>{{ item.title }}</span>
-              {% if item.nested_options %}
-                <i class="fa fa-angle-right"></i>
-              {% endif%}
-          </a>
-          {% if item.nested_options %}
-          <ul>
-            {% for nested_item in item.nested_options %}
-              {% if nested_item.url == site.data.commons.stable_version %}
-                {% assign stable_version_title = nested_item.title %}
+<ul class="sidebar-nav">
+    <li class="sidebar-nav-item">
+        <a href="{% if item.url %}{{item.url}}{% else %}#{% endif %}">
+            <span>Documentation</span>
+        </a>
+        <ul>
+            <li>
+                <a href="{{ site.data.commons.stable_version | append: 'docs/' }}">
+                    <span>STABLE ({{ stable_version_title }})</span>
+                </a>
+            </li>
+            {% for item in site.data.doc-versions.docVersions %}
+              {% if item.url != site.data.commons.stable_version %}
+                <li>
+                    <a href="{{ item.url | append: 'docs/' }}">
+                        <span>{{ item.title }}</span>
+                    </a>
+                </li>
               {% endif %}
             {% endfor %}
-              <li class="sidebar-doc-version-stable">
-                <a href="{{ site.data.commons.stable_version }}">
-                  <span>STABLE ({{ stable_version_title }})</span>
-                </a>
-              </li>
-              {% for nested_item in item.nested_options %}
-                {% if nested_item.url != site.data.commons.stable_version %}
-                  <li>
-                    <a href="{{ nested_item.url }} /docs/">
-                      <span>{{ nested_item.title }}</span>
-                    </a>
-                  </li>
-                {% endif %}
-              {% endfor %}
-          </ul>
-          {% endif %}
-      </li>
-    {% endfor %}
-  </ul>
+        </ul>
+    </li>
 
-</div>
+</ul>

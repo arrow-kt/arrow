@@ -1,0 +1,24 @@
+{% for item in site.data.doc-versions.docVersions %}
+    {% if item.url == site.data.commons.stable_version %}
+      {% assign stable_version_title = item.title %}
+    {% endif %}
+{% endfor %}
+
+<div class="navigation-menu-item dropdown">
+    <button onclick="displayToogle()" class="dropbtn">DOCUMENTATION</button>
+
+    <div id="docVersionDropdown" class="dropdown-content">
+        <a href="{{ site.data.commons.stable_version | append: 'docs/' }}">
+            <span>STABLE ({{ stable_version_title }})</span>
+        </a>
+
+        {% for item in site.data.doc-versions.docVersions %}
+          {% if item.url != site.data.commons.stable_version %}
+              <a href="{{ item.url | append: 'docs/' }}">
+                  <span>{{ item.title }}</span>
+              </a>
+          {% endif %}
+        {% endfor %}
+
+    </div>
+</div>
