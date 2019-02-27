@@ -74,7 +74,7 @@ object MonadLaws {
   fun <F> Monad<F>.equivalentComprehensions(EQ: Eq<Kind<F, Int>>) {
     val M = this
     forAll(Gen.int()) { num: Int ->
-      val aa = fx {
+      val aa = binding {
         val (a) = just(num)
         val (b) = just(a + 1)
         val (c) = just(b + 1)
@@ -93,7 +93,7 @@ object MonadLaws {
 
   fun <F> Monad<F>.monadComprehensions(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.int()) { num: Int ->
-      fx {
+      binding {
         val (a) = just(num)
         val (b) = just(a + 1)
         val (c) = just(b + 1)
@@ -103,7 +103,7 @@ object MonadLaws {
 
   fun <F> Monad<F>.monadComprehensionsBindInContext(EQ: Eq<Kind<F, Int>>): Unit =
     forFew(5, Gen.intSmall()) { num: Int ->
-      fx {
+      binding {
         val a = bindIn(newSingleThreadContext("$num")) { num + 1 }
         val b = bindIn(newSingleThreadContext("$a")) { a + 1 }
         b
