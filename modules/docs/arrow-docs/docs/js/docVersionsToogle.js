@@ -15,3 +15,14 @@ window.onclick = function(event) {
     }
   }
 }
+
+function showTopWarning() {
+  const currentUrl = 'https://'+ window.location.host +'/'
+  console.log(currentUrl);
+  if (!currentUrl.includes(document.getElementById("stable").textContent)){
+    console.log({document.getElementById("stable")});
+    document.getElementById("topWarning").style.display = 'none';
+  }
+}
+
+window.onload = showTopWarning;

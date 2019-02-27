@@ -4,27 +4,29 @@
     {% endif %}
 {% endfor %}
 
-<ul class="sidebar-nav">
-    <li class="sidebar-nav-item">
-        <a href="{% if item.url %}{{item.url}}{% else %}#{% endif %}">
-            <span>Documentation</span>
-        </a>
-        <ul>
-            <li>
-                <a href="{{ site.data.commons.stable_version | append: 'docs/' }}">
-                    <span>STABLE ({{ stable_version_title }})</span>
-                </a>
-            </li>
-            {% for item in site.data.doc-versions.docVersions %}
-              {% if item.url != site.data.commons.stable_version %}
+    <ul class="sidebar-doc-versions sidebar-nav">
+        <li class="sidebar-nav-item">
+            <a href="{% if item.url %}{{item.url}}{% else %}#{% endif %}">
+                <span>Documentation</span>
+                {% if item.nested_options %}
+                    <i class="fa fa-angle-right"></i>
+                {% endif%}
+            </a>
+            <ul>
                 <li>
-                    <a href="{{ item.url | append: 'docs/' }}">
-                        <span>{{ item.title }}</span>
+                    <a href="{{ site.data.commons.stable_version | append: 'docs/' }}">
+                        <span>STABLE ({{ stable_version_title }})</span>
                     </a>
                 </li>
-              {% endif %}
-            {% endfor %}
-        </ul>
-    </li>
-
-</ul>
+                {% for item in site.data.doc-versions.docVersions %}
+                  {% if item.url != site.data.commons.stable_version %}
+                    <li>
+                        <a href="{{ item.url | append: 'docs/' }}">
+                            <span>{{ item.title }}</span>
+                        </a>
+                    </li>
+                  {% endif %}
+                {% endfor %}
+            </ul>
+        </li>
+    </ul>

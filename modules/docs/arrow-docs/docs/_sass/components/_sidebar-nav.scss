@@ -66,9 +66,29 @@
             }
         }
     }
+}
 
-    .sidebar-doc-version-stable {
-      border-bottom: 1px solid $brand-quaternary;
-      width: 90%
+.sidebar-doc-versions {
+    position: relative;
+    width: 95%;
+    margin-left: auto;
+    margin-right: auto;
+
+    .sidebar-nav-item {
+       a {
+         padding-left: 20px;
+       }
+       &.active {
+           > a {
+             border-left: none;
+           }
+         }
+       ul {
+         position: absolute;
+         width: 100%;
+         z-index: 1;
+         box-shadow: rgba(0, 0, 0, 0.3) 0px 8px 16px 0px;
+         background: $brand-primary;
+       }
     }
 }

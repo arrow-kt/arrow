@@ -1,0 +1,19 @@
+// TOP WARNINGS
+// -----------------------------------------------
+// -----------------------------------------------
+.top-warning {
+    height: 40px;
+    background-color: $brand-quaternary;
+    color: $white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 0px;
+    width: 100%;
+    z-index: 1101;
+
+    a {
+      color: $white;
+    }
+}

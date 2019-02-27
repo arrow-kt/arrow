@@ -1,0 +1,17 @@
+{% for item in site.data.doc-versions.docVersions %}
+  {% if item.url == site.data.commons.stable_version %}
+    {% assign stable_version = item.title %}
+    {% assign stable_version_url = site.data.commons.stable_version %}
+  {% endif %}
+{% endfor %}
+
+<div id="topWarning" class="top-warning">
+  <span>⚠️ (
+    <a href="{{stable_version_url}}">
+      <span>
+        {{stable_version}}
+      </span>
+    </a>
+      ) This is the documentation for the 'stable' release.
+    </span>
+</div>
