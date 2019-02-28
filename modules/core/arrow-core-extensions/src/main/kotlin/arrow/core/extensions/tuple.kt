@@ -96,19 +96,31 @@ interface Tuple2Traverse<F> : Traverse<Tuple2PartialOf<F>>, Tuple2Foldable<F> {
 }
 
 @extension
-interface Tuple2Monoid<A, B> : Monoid<Tuple2<A, B>> {
+interface Tuple2Semigroup<A, B> : Semigroup<Tuple2<A, B>> {
+
+  fun SA(): Monoid<A>
+
+  fun SB(): Monoid<B>
+
+  override fun Tuple2<A, B>.combine(b: Tuple2<A, B>): Tuple2<A, B> {
+    val (xa, xb) = this
+    val (ya, yb) = b
+    return Tuple2(SA().run { xa.combine(ya) }, SB().run { xb.combine(yb) })
+  }
+}
+
+@extension
+interface Tuple2Monoid<A, B> : Tuple2Semigroup<A, B>, Monoid<Tuple2<A, B>> {
+
+  override fun SA(): Monoid<A> = MA()
+
+  override fun SB(): Monoid<B> = MB()
 
   fun MA(): Monoid<A>
 
   fun MB(): Monoid<B>
 
   override fun empty(): Tuple2<A, B> = Tuple2(MA().empty(), MB().empty())
-
-  override fun Tuple2<A, B>.combine(b: Tuple2<A, B>): Tuple2<A, B> {
-    val (xa, xb) = this
-    val (ya, yb) = b
-    return Tuple2(MA().run { xa.combine(ya) }, MB().run { xb.combine(yb) })
-  }
 }
 
 @extension
