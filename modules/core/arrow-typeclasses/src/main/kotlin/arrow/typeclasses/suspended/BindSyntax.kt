@@ -2,6 +2,9 @@ package arrow.typeclasses.suspended
 
 import arrow.Kind
 
+/**
+ * All possible approaches to running [Kind] in the context of [Fx]
+ */
 interface BindSyntax<F> {
 
   suspend fun <A> Kind<F, A>.bind(): A
