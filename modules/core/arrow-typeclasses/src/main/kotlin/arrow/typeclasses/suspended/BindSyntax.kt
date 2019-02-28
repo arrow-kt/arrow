@@ -4,6 +4,14 @@ import arrow.Kind
 
 /**
  * All possible approaches to running [Kind] in the context of [Fx]
+ *
+ * ```
+ * fx {
+ *   val one = just(1).bind() // using bind
+ *   val (two) = just(one + 1) // using destructuring
+ *   val three = !just(two + 1)
+ * }
+ * ```
  */
 interface BindSyntax<F> {
 
