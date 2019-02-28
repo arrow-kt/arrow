@@ -13,4 +13,3 @@ interface Fx<F> {
   fun <A> fxCancellable(f: suspend ConcurrentCancellableContinuation<F, *>.() -> A): Tuple2<Kind<F, A>, Disposable> =
     concurrent().bindingConcurrent(f)
 }
-

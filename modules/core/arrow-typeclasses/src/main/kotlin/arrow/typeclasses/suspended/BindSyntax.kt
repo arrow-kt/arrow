@@ -11,5 +11,4 @@ interface BindSyntax<F> {
 
   suspend operator fun <A> Kind<F, A>.not(): A =
     bind()
-
 }
