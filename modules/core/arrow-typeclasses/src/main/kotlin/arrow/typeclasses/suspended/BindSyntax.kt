@@ -9,7 +9,7 @@ import arrow.Kind
  * fx {
  *   val one = just(1).bind() // using bind
  *   val (two) = just(one + 1) // using destructuring
- *   val three = !just(two + 1)
+ *   val three = !just(two + 1) // using not operator
  * }
  * ```
  */
