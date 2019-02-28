@@ -13,6 +13,14 @@ import arrow.effects.typeclasses.Disposable
  *
  * To run effects use any of the binding functions like you would with any other [Kind].
  *
+ * ```
+ * fx {
+ *   val one = effect { 1 }.bind() // using bind
+ *   val (two) = effect { one + 1 } // using destructuring
+ *   val three = !effect { two + 1 } // easiest to grep ;)
+ * }
+ * ```
+ *
  * @see [arrow.typeclasses.suspended.BindSyntax]
  * @see [arrow.typeclasses.suspended.monad.Fx]
  * @see [arrow.typeclasses.suspended.monaderror.Fx]
