@@ -2,7 +2,6 @@ package arrow.ank
 
 import arrow.core.*
 import arrow.data.extensions.sequence.foldable.foldLeft
-import arrow.effects.typeclasses.MonadDefer
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.net.URL
@@ -71,17 +70,16 @@ sealed class SnippetParserState {
   object Searching : SnippetParserState()
 }
 
-fun <F> monadDeferInterpreter(MF: MonadDefer<F>): AnkOps<F> = object : AnkOps<F> {
-  override fun MF(): MonadDefer<F> = MF
+val interpreter: AnkOps = object : AnkOps {
 
-  override fun printConsole(msg: String): Unit = println(msg)
+  override suspend fun printConsole(msg: String): Unit = println(msg)
 
   private fun Path.containsAnkSnippets(): Boolean =
     toFile().bufferedReader().use {
       it.lines().anyMatch { s -> s.contains(AnkBlock) || s.contains("ank_macro") }
     }
 
-  override fun <A> Path.withAnkFiles(f: (AnkProcessingContext) -> A): Sequence<A> =
+  override suspend fun Path.ankFiles(): Sequence<AnkProcessingContext> =
     Files.walk(this)
       .filter { Files.isDirectory(it).not() }
       .filter { path ->
@@ -89,15 +87,15 @@ fun <F> monadDeferInterpreter(MF: MonadDefer<F>): AnkOps<F> = object : AnkOps<F>
           c || path.toString().endsWith(ext)
         } && path.containsAnkSnippets()
       }.iterator().asSequence().mapIndexed { index, path ->
-        f(AnkProcessingContext(index, path))
+        AnkProcessingContext(index, path)
       }
 
-  override fun createTargetDirectory(source: Path, target: Path): Path {
+  override suspend fun createTargetDirectory(source: Path, target: Path): Path {
     source.toFile().copyRecursively(target.toFile(), overwrite = true)
     return target
   }
 
-  override fun Path.processMacros(): Sequence<String> =
+  override suspend fun Path.processMacros(): Sequence<String> =
     toFile().useLines { ls ->
       val (classes, lines) =
         ls
@@ -148,7 +146,7 @@ fun <F> monadDeferInterpreter(MF: MonadDefer<F>): AnkOps<F> = object : AnkOps<F>
     return result.b toT result.c
   }
 
-  override fun compileCode(snippets: Tuple2<Path, Sequence<Snippet>>, compilerArgs: List<String>): Sequence<Snippet> {
+  override suspend fun compileCode(snippets: Tuple2<Path, Sequence<Snippet>>, compilerArgs: List<String>): Sequence<Snippet> {
     val engineCache = getEngineCache(snippets.b, compilerArgs)
     // run each snipped and handle its result
     return snippets.b.mapIndexed { i, snip ->
@@ -228,7 +226,7 @@ fun <F> monadDeferInterpreter(MF: MonadDefer<F>): AnkOps<F> = object : AnkOps<F>
       )
     })
 
-  override fun generateFile(path: Path, newContent: Sequence<String>): Path =
+  override suspend fun generateFile(path: Path, newContent: Sequence<String>): Path =
     Files.write(path, newContent.asIterable())
 
   private val engineCache: ConcurrentMap<List<String>, Map<String, ScriptEngine>> = ConcurrentHashMap()

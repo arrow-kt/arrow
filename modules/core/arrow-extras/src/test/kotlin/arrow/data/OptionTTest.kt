@@ -2,6 +2,8 @@ package arrow.data
 
 import arrow.Kind
 import arrow.core.*
+import arrow.core.extensions.const.divisible.divisible
+import arrow.core.extensions.monoid
 import arrow.effects.ForIO
 import arrow.effects.IO
 import arrow.effects.extensions.io.applicativeError.attempt
@@ -11,6 +13,7 @@ import arrow.effects.typeclasses.seconds
 import arrow.data.extensions.nonemptylist.monad.monad
 import arrow.core.extensions.option.monad.monad
 import arrow.data.extensions.optiont.applicative.applicative
+import arrow.data.extensions.optiont.divisible.divisible
 import arrow.data.extensions.optiont.monoidK.monoidK
 import arrow.data.extensions.optiont.semigroupK.semigroupK
 import arrow.mtl.extensions.option.traverseFilter.traverseFilter
@@ -18,8 +21,7 @@ import arrow.mtl.extensions.optiont.functorFilter.functorFilter
 import arrow.mtl.extensions.optiont.traverseFilter.traverseFilter
 import arrow.test.UnitSpec
 import arrow.test.laws.*
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Monad
+import arrow.typeclasses.*
 import io.kotlintest.properties.forAll
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
@@ -70,7 +72,15 @@ class OptionTTest : UnitSpec() {
         OptionT.applicative(Option.monad()),
         { OptionT(Some(Some(it))) },
         EQ(),
-        EQ_NESTED())
+        EQ_NESTED()),
+
+      DivisibleLaws.laws(
+        OptionT.divisible(
+          Const.divisible(Int.monoid())
+        ),
+        { OptionT(it.const()) },
+        Eq { a, b -> a.value().value() == b.value().value() }
+      )
     )
 
     "toLeft for Some should build a correct EitherT" {

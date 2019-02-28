@@ -3,21 +3,24 @@ package arrow.data
 import arrow.Kind
 import arrow.core.ForId
 import arrow.core.Id
+import arrow.core.extensions.const.divisible.divisible
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
-import arrow.core.fix
 import arrow.core.extensions.id.comonad.comonad
 import arrow.core.extensions.id.eq.eq
 import arrow.core.extensions.id.functor.functor
 import arrow.core.extensions.id.hash.hash
+import arrow.core.extensions.monoid
+import arrow.core.fix
 import arrow.data.extensions.sum.comonad.comonad
+import arrow.data.extensions.sum.divisible.divisible
 import arrow.data.extensions.sum.eq.eq
 import arrow.data.extensions.sum.hash.hash
 import arrow.test.UnitSpec
 import arrow.test.laws.ComonadLaws
+import arrow.test.laws.DivisibleLaws
 import arrow.test.laws.HashLaws
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Hash
+import arrow.typeclasses.*
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
@@ -36,6 +39,15 @@ class SumTest : UnitSpec() {
     val IDH = Hash<Kind<ForId, Int>> { Id.hash(Int.hash()).run { it.fix().hash() } }
 
     testLaws(
+      DivisibleLaws.laws(
+        Sum.divisible(Const.divisible(Int.monoid()), Const.divisible(Int.monoid())),
+        { Sum.left(Const.just(it), Const.just(it)) },
+        Eq { a, b ->
+          a.fix().side == b.fix().side &&
+            a.fix().left.value() == b.fix().left.value() &&
+            a.fix().right.value() == b.fix().right.value()
+        }
+      ),
       ComonadLaws.laws(Sum.comonad(Id.comonad(), Id.comonad()), cf, EQ),
       HashLaws.laws(Sum.hash(IDH, IDH), Sum.eq(IDEQ, IDEQ), cf)
     )

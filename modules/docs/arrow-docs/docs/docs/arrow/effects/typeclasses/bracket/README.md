@@ -59,9 +59,7 @@ Read the [`IO`]({{ '/docs/effects/io' | relative_url }}) docs for more context o
 Now, let's say we want to open a file, do some work with it, and then close it. With `Bracket`, we could make that
 process look like this:
 
-{: data-executable='true'}
-
-```kotlin:ank
+```kotlin:ank:playground
 import arrow.effects.IO
 
 class File(url: String) {
@@ -133,9 +131,7 @@ Let's run the program for the three mentioned data types as an example of polymo
 
 We can run the program for `IO`:
 
-{: data-executable='true'}
-
-```kotlin:ank
+```kotlin:ank:playground
 import arrow.effects.IO
 import arrow.effects.extensions.io.bracket.bracket
 import arrow.Kind
@@ -172,9 +168,7 @@ println(safeComputation)
 
 Let's now run the same exact program also for `ObservableK`:
 
-{: data-executable='true'}
-
-```kotlin:ank
+```kotlin:ank:playground
 import arrow.effects.rx2.ObservableK
 import arrow.effects.rx2.extensions.observablek.bracket.bracket
 import arrow.Kind
@@ -222,9 +216,7 @@ Requires passing `release` and `use` lambdas. It ensures acquiring, using and re
 
 `fun <A, B> Kind<F, A>.bracket(release: (A) -> Kind<F, Unit>, use: (A) -> Kind<F, B>): Kind<F, B>`
 
-{: data-executable='true'}
-
-```kotlin:ank
+```kotlin:ank:playground
 import arrow.effects.IO
 
 class File(url: String) {
@@ -259,9 +251,7 @@ Requires passing `release` and `use` lambdas. It ensures acquiring, using and re
 
 `fun <A, B> Kind<F, A>.bracketCase(release: (A, ExitCase<Throwable>) -> Kind<F, Unit>, use: (A) -> Kind<F, B>): Kind<F, B>`
 
-{: data-executable='true'}
-
-```kotlin:ank
+```kotlin:ank:playground
 import arrow.effects.IO
 import arrow.effects.typeclasses.ExitCase
 

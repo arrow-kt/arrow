@@ -31,7 +31,7 @@ interface Fx<F> {
   suspend fun <A> unsafe.fx(
     f: suspend MonadContinuation<F, *>.() -> A
   ): Kind<F, A> =
-    monad().fx(f)
+    monad().binding(f)
 
 }
 

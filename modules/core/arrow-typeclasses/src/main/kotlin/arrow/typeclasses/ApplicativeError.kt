@@ -1,7 +1,14 @@
 package arrow.typeclasses
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Left
+import arrow.core.NonFatal
+import arrow.core.OptionOf
+import arrow.core.Right
+import arrow.core.TryOf
+import arrow.core.fix
+import arrow.core.identity
 
 /**
  * ank_macro_hierarchy(arrow.typeclasses.ApplicativeError)
@@ -36,7 +43,11 @@ interface ApplicativeError<F, E> : Applicative<F> {
     try {
       just(f())
     } catch (t: Throwable) {
-      raiseError<A>(recover(t))
+      if (NonFatal(t)) {
+        raiseError<A>(recover(t))
+      } else {
+        throw t
+      }
     }
 
   fun <A> ApplicativeError<F, Throwable>.catch(f: () -> A): Kind<F, A> =

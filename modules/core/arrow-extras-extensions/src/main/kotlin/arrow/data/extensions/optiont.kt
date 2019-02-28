@@ -146,6 +146,63 @@ interface OptionTMonoidK<F> : MonoidK<OptionTPartialOf<F>>, OptionTSemigroupK<F>
 }
 
 @extension
+interface OptionTContravariantInstance<F> : Contravariant<OptionTPartialOf<F>> {
+  fun CF(): Contravariant<F>
+
+  override fun <A, B> Kind<OptionTPartialOf<F>, A>.contramap(f: (B) -> A): Kind<OptionTPartialOf<F>, B> =
+    OptionT(
+      CF().run { value().contramap<Option<A>, Option<B>> { it.map(f) } }
+    )
+}
+
+@extension
+interface OptionTDivideInstance<F> : Divide<OptionTPartialOf<F>>, OptionTContravariantInstance<F> {
+  fun DF(): Divide<F>
+  override fun CF(): Contravariant<F> = DF()
+
+  override fun <A, B, Z> divide(fa: Kind<OptionTPartialOf<F>, A>, fb: Kind<OptionTPartialOf<F>, B>, f: (Z) -> Tuple2<A, B>): Kind<OptionTPartialOf<F>, Z> =
+    OptionT(
+      DF().divide(fa.value(), fb.value()) { opt ->
+        opt.map(f).fold({
+          none<A>() toT none()
+        }, { (a, b) ->
+          a.some() toT b.some()
+        })
+      }
+    )
+}
+
+@extension
+interface OptionTDivisibleInstance<F> : Divisible<OptionTPartialOf<F>>, OptionTDivideInstance<F> {
+  fun DFF(): Divisible<F>
+  override fun DF(): Divide<F> = DFF()
+
+  override fun <A> conquer(): Kind<OptionTPartialOf<F>, A> =
+    OptionT(DFF().conquer())
+}
+
+@extension
+interface OptionTDecidableInstance<F> : Decidable<OptionTPartialOf<F>>, OptionTDivisibleInstance<F> {
+  fun DFFF(): Decidable<F>
+  override fun DFF(): Divisible<F> = DFFF()
+
+  override fun <A, B, Z> choose(fa: Kind<OptionTPartialOf<F>, A>, fb: Kind<OptionTPartialOf<F>, B>, f: (Z) -> Either<A, B>): Kind<OptionTPartialOf<F>, Z> =
+    OptionT(
+      DFFF().choose(fa.value(), fb.value()) { opt ->
+        opt.map(f).fold({
+          none<A>().left()
+        }, { either ->
+          either.fold({ a ->
+            a.some().left()
+          }, { b ->
+            b.some().right()
+          })
+        })
+      }
+    )
+}
+
+@extension
 interface OptionTFx<F> : Fx<OptionTPartialOf<F>> {
 
   fun M(): Monad<F>

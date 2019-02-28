@@ -3,7 +3,7 @@ apply plugin: 'kotlin'
 dependencies {
     compile project(":arrow-core-extensions")
     compile project(":arrow-extras-extensions")
-    compile project(":arrow-effects-extensions")
+    compile project(":arrow-effects-io-extensions")
 
     compile "org.jetbrains.kotlin:kotlin-compiler:$kotlinVersion"
     compile "org.jetbrains.kotlin:kotlin-script-util:$kotlinVersion"

@@ -38,7 +38,10 @@ In your project's root `build.gradle` append the jcenter repository to your list
 ```groovy
 allprojects {
     repositories {
+        mavenCentral()
         jcenter()
+        maven { url "https://dl.bintray.com/arrow-kt/arrow-kt/" }
+        maven { url 'https://oss.jfrog.org/artifactory/oss-snapshot-local/' }
     }
 }
 ```
@@ -74,7 +77,9 @@ You can find the dependencies necessary in the Basic Setup of the README at the 
 Add the dependencies into the project's `build.gradle`
 
 ```groovy
-def arrow_version = "0.9.0"
+apply plugin: 'kotlin'
+apply plugin: 'kotlin-kapt'
+def arrow_version = "0.9.0-SNAPSHOT"
 dependencies {
     compile "io.arrow-kt:arrow-core-data:$arrow_version"
     compile "io.arrow-kt:arrow-syntax:$arrow_version"
@@ -99,7 +104,7 @@ dependencies {
     compile "io.arrow-kt:arrow-optics:$arrow_version" //optional
     compile "io.arrow-kt:arrow-generic:$arrow_version" //optional
     compile "io.arrow-kt:arrow-recursion:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-extensions-recursion:$arrow_version" //optional
+    compile "io.arrow-kt:arrow-recursion-extensions:$arrow_version" //optional
     compile "io.arrow-kt:arrow-integration-retrofit-adapter:$arrow_version" //optional
 }
 ```
@@ -215,7 +220,7 @@ Enable annotaton processing using kotlin plugin
                 <annotationProcessorPaths>
                     <annotationProcessorPath>
                         <groupId>io.arrow-kt</groupId>
-                        <artifactId>arrow-annotations-processor</artifactId>
+                        <artifactId>arrow-meta</artifactId>
                         <version>${arrow.version}</version>
                     </annotationProcessorPath>
                 </annotationProcessorPaths>

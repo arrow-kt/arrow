@@ -14,8 +14,7 @@ Whenever `true` is returned from an expression affecting one of the items in the
 
 `where` over `List`
 
-{: data-executable='true'}
-```kotlin:ank
+```kotlin:ank:playground
 import arrow.aql.extensions.list.select.*
 import arrow.aql.extensions.list.where.*
 import arrow.aql.extensions.listk.select.select

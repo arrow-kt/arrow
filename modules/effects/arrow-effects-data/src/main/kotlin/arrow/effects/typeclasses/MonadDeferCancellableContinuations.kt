@@ -3,10 +3,10 @@ package arrow.effects.typeclasses
 import arrow.Kind
 import arrow.core.Either
 import arrow.effects.data.internal.BindingCancellationException
-import arrow.effects.typeclasses.suspended.MonadDeferSyntax
 import arrow.typeclasses.MonadContinuation
 import arrow.typeclasses.MonadErrorContinuation
 import arrow.typeclasses.stateStack
+import arrow.typeclasses.suspended.BindSyntax
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -20,7 +20,7 @@ typealias Disposable = () -> Unit
 @RestrictsSuspension
 @Suppress("DELEGATED_MEMBER_HIDES_SUPERTYPE_OVERRIDE")
 open class MonadDeferCancellableContinuation<F, A>(val SC: MonadDefer<F>, override val context: CoroutineContext = EmptyCoroutineContext) :
-  MonadErrorContinuation<F, A>(SC), MonadDefer<F> by SC, MonadDeferSyntax<F> {
+  MonadErrorContinuation<F, A>(SC), MonadDefer<F> by SC, BindSyntax<F> {
 
   protected val cancelled: AtomicBoolean = AtomicBoolean(false)
 
@@ -39,6 +39,9 @@ open class MonadDeferCancellableContinuation<F, A>(val SC: MonadDefer<F>, overri
 
   suspend fun <B> bindDeferUnsafe(f: () -> Either<Throwable, B>): B =
     deferUnsafe(f).bind()
+
+  override fun <B> bindingCatch(c: suspend MonadErrorContinuation<F, *>.() -> B): Kind<F, B> =
+    bindingCancellable { c() }.a
 
   override suspend fun <B> bind(m: () -> Kind<F, B>): B = suspendCoroutineUninterceptedOrReturn { c ->
     val labelHere = c.stateStack // save the whole coroutine stack labels
@@ -59,7 +62,7 @@ open class MonadDeferCancellableContinuation<F, A>(val SC: MonadDefer<F>, overri
       val datatype = try {
         just(m())
       } catch (t: Throwable) {
-        raiseError<B>(t)
+        t.raiseNonFatal<B>()
       }
       datatype.flatMap { xx: B ->
         c.stateStack = labelHere
@@ -81,11 +84,5 @@ open class MonadDeferCancellableContinuation<F, A>(val SC: MonadDefer<F>, overri
     }
     COROUTINE_SUSPENDED
   }
-
-  override fun <A> fx(f: suspend MonadContinuation<F, *>.() -> A): Kind<F, A> =
-    super<MonadDeferSyntax>.fx(f)
-
-  override fun <A> effect(fa: suspend () -> A): Kind<F, A> =
-    super<MonadDeferSyntax>.effect(fa)
 
 }

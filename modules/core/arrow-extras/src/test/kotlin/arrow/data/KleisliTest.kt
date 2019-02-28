@@ -8,17 +8,18 @@ import arrow.effects.extensions.io.applicativeError.attempt
 import arrow.effects.extensions.io.bracket.bracket
 import arrow.effects.extensions.kleisli.bracket.bracket
 import arrow.core.extensions.`try`.monadError.monadError
+import arrow.core.extensions.const.divisible.divisible
 import arrow.core.extensions.id.monad.monad
+import arrow.core.extensions.monoid
 import arrow.data.extensions.kleisli.contravariant.contravariant
+import arrow.data.extensions.kleisli.divisible.divisible
 import arrow.data.extensions.kleisli.monadError.monadError
 import arrow.test.UnitSpec
 import arrow.test.laws.BracketLaws
 import arrow.test.laws.ContravariantLaws
+import arrow.test.laws.DivisibleLaws
 import arrow.test.laws.MonadErrorLaws
-import arrow.typeclasses.Conested
-import arrow.typeclasses.Eq
-import arrow.typeclasses.conest
-import arrow.typeclasses.counnest
+import arrow.typeclasses.*
 import io.kotlintest.shouldBe
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
@@ -51,6 +52,11 @@ class KleisliTest : UnitSpec() {
         EQERR = IOEQ()
       ),
       ContravariantLaws.laws(Kleisli.contravariant(), { Kleisli { x: Int -> Try.just(x) }.conest() }, ConestTryEQ()),
+      DivisibleLaws.laws(
+        Kleisli.divisible<ConstPartialOf<Int>, Int>(Const.divisible(Int.monoid())),
+        { Kleisli { it.const() } },
+        Eq { a, b -> a.run(1).value() == b.run(1).value() }
+      ),
       MonadErrorLaws.laws(Kleisli.monadError<ForTry, Int, Throwable>(Try.monadError()), TryEQ(), TryEQ())
     )
 
