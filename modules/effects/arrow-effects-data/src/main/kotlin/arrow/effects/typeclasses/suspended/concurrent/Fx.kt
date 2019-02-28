@@ -17,7 +17,7 @@ import arrow.effects.typeclasses.Disposable
  * fx {
  *   val one = effect { 1 }.bind() // using bind
  *   val (two) = effect { one + 1 } // using destructuring
- *   val three = !effect { two + 1 } // easiest to grep ;)
+ *   val three = !effect { two + 1 } // easiest to grep
  * }
  * ```
  *
