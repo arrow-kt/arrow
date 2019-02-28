@@ -69,9 +69,7 @@ interface MonadDefer<F> : MonadThrow<F>, Bracket<F, Throwable> {
     bindingCancellable { c() }.a
 
   fun <A> fx(
-    f: suspend MonadDeferCancellableContinuation<F, *>.() -> A,
-    unit: Unit = Unit,
-    unit1: Unit = Unit
+    f: suspend MonadDeferCancellableContinuation<F, *>.() -> A
   ): Kind<F, A> =
     fxCancelable(f).a
 
