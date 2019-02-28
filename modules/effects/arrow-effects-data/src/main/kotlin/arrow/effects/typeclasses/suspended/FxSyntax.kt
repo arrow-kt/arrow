@@ -37,10 +37,8 @@ interface FxSyntax<F> : Concurrent<F>, BindSyntax<F> {
     parTraverse(effects, ::identity)
 
   fun <A> effect(fa: suspend () -> A): Kind<F, A> =
-    defer {
-      async<A> { cb ->
-        fa.startCoroutine(asyncContinuation(EmptyCoroutineContext, cb))
-      }
+    async { cb ->
+      fa.startCoroutine(asyncContinuation(EmptyCoroutineContext, cb))
     }
 
   fun <A> ensure(fa: suspend () -> A, error: () -> Throwable, predicate: (A) -> Boolean): Kind<F, A> =
