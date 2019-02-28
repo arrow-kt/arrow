@@ -68,15 +68,6 @@ interface MonadDefer<F> : MonadThrow<F>, Bracket<F, Throwable> {
   override fun <B> binding(c: suspend MonadContinuation<F, *>.() -> B): Kind<F, B> =
     bindingCancellable { c() }.a
 
-  fun <A> fx(
-    f: suspend MonadDeferCancellableContinuation<F, *>.() -> A
-  ): Kind<F, A> =
-    fxCancelable(f).a
-
-  fun <A> fxCancelable(f: suspend MonadDeferCancellableContinuation<F, *>.() -> A, unit: Unit = Unit): Tuple2<Kind<F, A>, Disposable> =
-    bindingCancellable { f() }
-
   override fun <B> bindingCatch(c: suspend MonadErrorContinuation<F, *>.() -> B): Kind<F, B> =
     bindingCancellable { c() }.a
-
 }
