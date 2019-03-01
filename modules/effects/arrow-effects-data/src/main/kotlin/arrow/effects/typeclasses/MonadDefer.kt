@@ -58,6 +58,10 @@ interface MonadDefer<F> : MonadThrow<F>, Bracket<F, Throwable> {
    * This operation is cancellable by calling invoke on the [Disposable] return.
    * If [Disposable.invoke] is called the binding result will become a lifted [BindingCancellationException].
    */
+  @Deprecated(
+    "`bindingCancellable` is getting renamed to `fxCancellable` for consistency with the Arrow Fx system. Use the Fx extensions for comprehensions",
+    ReplaceWith("fxCancellable")
+  )
   fun <B> bindingCancellable(c: suspend MonadDeferCancellableContinuation<F, *>.() -> B): Tuple2<Kind<F, B>, Disposable> {
     val continuation = MonadDeferCancellableContinuation<F, B>(this)
     val wrapReturn: suspend MonadDeferCancellableContinuation<F, *>.() -> Kind<F, B> = { just(c()) }
