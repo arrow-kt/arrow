@@ -8,22 +8,12 @@ import arrow.documented
  * ank_macro_hierarchy(arrow.typeclasses.Semigroupal)
  *
  * The [Semigroupal] type class for a given type `F` can be seen as an abstraction over the [cartesian product](https://en.wikipedia.org/wiki/Cartesian_product).
- * It defines the functions [identity] and [product].
- *
- * The [identity] function returns the type `Kind<F, A>` for a given type `A`. For example, the identity element of the
- * type `Kind<ForOption, Int>` aka `ForOption<Int>` is [Option.empty].
+ * It defines the function [product].
  *
  * The [product] function for a given type `F`, `A` and `B` combines a `Kind<F, A>` and a `Kind<F, B>` into a `Kind<F, Tuple2<A, B>>`.
  * This function guarantees compliance with the following laws:
  *
- * ```kotlin
- * identity.product(b) == identity
- * ```
- * ```kotlin
- * a.product(identity) == identity
- * ```
- *
- * [Semigroupal]s are also associative under the bijection `f = (a,(b,c)) -> ((a,b),c)` or `f = ((a,b),c) -> (a,(b,c))`.
+ * [Semigroupal]s are associative under the bijection `f = (a,(b,c)) -> ((a,b),c)` or `f = ((a,b),c) -> (a,(b,c))`.
  * Therefore, the following laws also apply:
  *
  * ```kotlin
@@ -103,11 +93,6 @@ import arrow.documented
  */
 @documented
 interface Semigroupal<F> {
-
-    /**
-     * Given a type [A], create an "identity" for a F<A> value.
-     */
-    fun <A> identity(): Kind<F, A>
 
     /**
      * Multiplicatively combine F<A> and F<B> into F<Tuple2<A, B>>

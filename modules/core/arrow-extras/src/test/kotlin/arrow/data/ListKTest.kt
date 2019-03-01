@@ -26,19 +26,15 @@ import org.junit.runner.RunWith
 class ListKTest : UnitSpec() {
   val applicative = ListK.applicative()
 
-  val A: ListK<Int> = listOf(1,2).k()
-  val B: ListK<Int> = listOf(3,4).k()
-  val C: ListK<Int> = listOf(5).k()
-
   init {
 
     val eq: Eq<ListKOf<Int>> = ListK.eq(Eq.any())
-    val associativeEq: Eq<ListKOf<Tuple2<Int, Tuple2<Int, Int>>>> = ListK.eq(Tuple2.eq(Int.eq(), Tuple2.eq(Int.eq(), Int.eq())))
+    val associativeSemigroupalEq: Eq<ListKOf<Tuple2<Int, Tuple2<Int, Int>>>> = ListK.eq(Tuple2.eq(Int.eq(), Tuple2.eq(Int.eq(), Int.eq())))
 
     testLaws(
       ShowLaws.laws(ListK.show(), eq) { listOf(it).k() },
       SemigroupKLaws.laws(ListK.semigroupK(), applicative, Eq.any()),
-      SemigroupalLaws.laws(ListK.semigroupal(), A, B, C, this::bijection, associativeEq, ListK.eq(Eq.any())),
+      SemigroupalLaws.laws(ListK.semigroupal(), { ListK.just(it) }, this::bijection, associativeSemigroupalEq),
       MonoidKLaws.laws(ListK.monoidK(), applicative, Eq.any()),
       TraverseLaws.laws(ListK.traverse(), applicative, { n: Int -> ListK(listOf(n)) }, Eq.any()),
       MonadCombineLaws.laws(ListK.monadCombine(),

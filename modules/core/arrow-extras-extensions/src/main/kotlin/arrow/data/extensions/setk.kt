@@ -62,7 +62,6 @@ interface SetKSemigroupK : SemigroupK<ForSetK> {
 
 @extension
 interface SetKSemigroupal: Semigroupal<ForSetK> {
-  override fun <A> identity(): Kind<ForSetK, A> = SetK.empty()
   override fun <A, B> Kind<ForSetK, A>.product(fb: Kind<ForSetK, B>): Kind<ForSetK, Tuple2<A, B>> =
     fb.fix().flatMap { b -> this.fix().map { a -> Tuple2(a,b) } }.toSet().k()
 }

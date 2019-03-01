@@ -24,10 +24,6 @@ import org.junit.runner.RunWith
 @RunWith(KotlinTestRunner::class)
 class SequenceKTest : UnitSpec() {
 
-  val A: SequenceK<Int> = sequenceOf(1,2).k()
-  val B: SequenceK<Int> = sequenceOf(3,4).k()
-  val C: SequenceK<Int> = sequenceOf(5).k()
-
   init {
 
     val eq: Eq<Kind<ForSequenceK, Int>> = object : Eq<Kind<ForSequenceK, Int>> {
@@ -35,14 +31,9 @@ class SequenceKTest : UnitSpec() {
         toList() == b.toList()
     }
 
-    val associativeEq: Eq<Kind<ForSequenceK, Tuple2<Int, Tuple2<Int, Int>>>> = object : Eq<Kind<ForSequenceK, Tuple2<Int, Tuple2<Int, Int>>>> {
+    val associativeSemigroupalEq: Eq<Kind<ForSequenceK, Tuple2<Int, Tuple2<Int, Int>>>> = object : Eq<Kind<ForSequenceK, Tuple2<Int, Tuple2<Int, Int>>>> {
       override fun Kind<ForSequenceK, Tuple2<Int, Tuple2<Int, Int>>>.eqv(b: Kind<ForSequenceK, Tuple2<Int, Tuple2<Int, Int>>>): Boolean =
         this.toList() == b.toList()
-    }
-
-    val tupleEq: Eq<Kind<ForSequenceK, Tuple2<Any, Any>>> = object : Eq<Kind<ForSequenceK, Tuple2<Any, Any>>> {
-      override fun Kind<ForSequenceK, Tuple2<Any, Any>>.eqv(b: Kind<ForSequenceK, Tuple2<Any, Any>>): Boolean =
-              this.toList() == b.toList()
     }
 
     val show: Show<Kind<ForSequenceK, Int>> = object : Show<Kind<ForSequenceK, Int>> {
@@ -55,7 +46,7 @@ class SequenceKTest : UnitSpec() {
       MonadLaws.laws(SequenceK.monad(), eq),
       MonoidKLaws.laws(SequenceK.monoidK(), SequenceK.applicative(), eq),
       MonoidLaws.laws(SequenceK.monoid(), Gen.sequenceK(Gen.int()), eq),
-      SemigroupalLaws.laws(SequenceK.semigroupal(), A, B, C, this::bijection, associativeEq, tupleEq),
+      SemigroupalLaws.laws(SequenceK.semigroupal(), { SequenceK.just(it) }, this::bijection, associativeSemigroupalEq),
       TraverseLaws.laws(SequenceK.traverse(), SequenceK.applicative(), { n: Int -> SequenceK(sequenceOf(n)) }, eq),
       HashLaws.laws(SequenceK.hash(Int.hash()), SequenceK.eq(Int.eq())) { sequenceOf(it).k() }
     )

@@ -19,7 +19,6 @@ interface SequenceKSemigroup<A> : Semigroup<SequenceK<A>> {
 
 @extension
 interface SequenceKSemigroupal : Semigroupal<ForSequenceK> {
-  override fun <A> identity(): Kind<ForSequenceK, A> = SequenceK.empty()
   override fun <A, B> Kind<ForSequenceK, A>.product(fb: Kind<ForSequenceK, B>): Kind<ForSequenceK, Tuple2<A, B>> =
     fb.fix().ap(this.map { a: A -> { b: B -> Tuple2(a, b)} })
 }

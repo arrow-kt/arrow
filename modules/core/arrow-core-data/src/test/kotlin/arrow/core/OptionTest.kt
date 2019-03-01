@@ -31,27 +31,13 @@ class OptionTest : UnitSpec() {
   val some: Option<String> = Some("kotlin")
   val none: Option<String> = Option.empty()
 
-  val A: Option<Int> = Some(1)
-  val B: Option<Int> = Some(2)
-  val C: Option<Int> = Some(3)
-
-  val associativeEq: Eq<Kind<ForOption, Tuple2<Int, Tuple2<Int, Int>>>> = object : Eq<Kind<ForOption, Tuple2<Int, Tuple2<Int, Int>>>> {
-
+  val associativeSemigroupalEq = object : Eq<Kind<ForOption, Tuple2<Int, Tuple2<Int, Int>>>> {
     override fun Kind<ForOption, Tuple2<Int, Tuple2<Int, Int>>>.eqv(b: Kind<ForOption, Tuple2<Int, Tuple2<Int, Int>>>): Boolean {
         return Option.eq(Tuple2.eq(Int.eq(), Tuple2.eq(Int.eq(), Int.eq()))).run {
           this@eqv.fix().eqv(b.fix())
         }
       }
   }
-
-  val eq: Eq<Kind<ForOption, Tuple2<Any, Any>>> = object : Eq<Kind<ForOption, Tuple2<Any, Any>>> {
-    override fun Kind<ForOption, Tuple2<Any, Any>>.eqv(b: Kind<ForOption, Tuple2<Any, Any>>): Boolean {
-      return Option.eq(Eq.any()).run {
-        this@eqv.fix().eqv(b.fix())
-      }
-    }
-  }
-
 
   init {
 
@@ -63,9 +49,7 @@ class OptionTest : UnitSpec() {
       TraverseFilterLaws.laws(Option.traverseFilter(), Option.applicative(), ::Some, Eq.any()),
       MonadFilterLaws.laws(Option.monadFilter(), ::Some, Eq.any()),
       HashLaws.laws(Option.hash(Int.hash()), Option.eq(Int.eq())) { it.some() },
-      SemigroupalLaws.laws(Option.semigroupal(), A, B, C, this::bijection, associativeEq, eq),
-      SemigroupalLaws.laws(Option.semigroupal(), A, B, Option.empty(), this::bijection, associativeEq, eq),
-      SemigroupalLaws.laws(Option.semigroupal(), Option.empty(), B, C, this::bijection, associativeEq, eq)
+      SemigroupalLaws.laws(Option.semigroupal(), ::Some, ::bijection, associativeSemigroupalEq)
     )
 
     "fromNullable should work for both null and non-null values of nullable types" {
