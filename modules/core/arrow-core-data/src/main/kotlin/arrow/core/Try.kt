@@ -44,7 +44,10 @@ sealed class Try<out A> : TryOf<A> {
         }
       }
 
-    fun <A> raise(e: Throwable): Try<A> = Failure(e)
+    @Deprecated(DeprecatedAmbiguity, ReplaceWith("raiseError(e)"))
+    fun raise(e: Throwable): Try<Nothing> = Failure(e)
+
+    fun raiseError(e: Throwable): Try<Nothing> = Failure(e)
 
   }
 
@@ -185,23 +188,29 @@ inline fun <B, A : B> TryOf<A>.orElse(f: () -> TryOf<B>): Try<B> = when (fix()) 
 
 /**
  * Applies the given function `f` if this is a `Failure`, otherwise returns this if this is a `Success`.
- * This is like `flatMap` for the exception.
+ * This is like map for the exception.
  */
-fun <B> TryOf<B>.recoverWith(f: (Throwable) -> TryOf<B>): Try<B> = fix().fold({ f(it).fix() }, { Success(it) })
-
-@Deprecated(DeprecatedAmbiguity, ReplaceWith("recoverWith(f)"))
-fun <A> TryOf<A>.rescue(f: (Throwable) -> TryOf<A>): Try<A> = fix().recoverWith(f)
+fun <B> TryOf<B>.handleError(f: (Throwable) -> B): Try<B> = fix().fold({ Success(f(it)) }, { Success(it) })
 
 /**
  * Applies the given function `f` if this is a `Failure`, otherwise returns this if this is a `Success`.
- * This is like map for the exception.
+ * This is like `flatMap` for the exception.
  */
-fun <B> TryOf<B>.recover(f: (Throwable) -> B): Try<B> = fix().fold({ Success(f(it)) }, { Success(it) })
+fun <B> TryOf<B>.handleErrorWith(f: (Throwable) -> TryOf<B>): Try<B> = fix().fold({ f(it).fix() }, { Success(it) })
+
+@Deprecated(DeprecatedAmbiguity, ReplaceWith("handleErrorWith(f)"))
+fun <A> TryOf<A>.rescue(f: (Throwable) -> TryOf<A>): Try<A> = fix().recoverWith(f)
+
+@Deprecated(DeprecatedAmbiguity, ReplaceWith("handleError(f)"))
+fun <B> TryOf<B>.recover(f: (Throwable) -> B): Try<B> = handleError(f)
+
+@Deprecated(DeprecatedAmbiguity, ReplaceWith("handleErrorWith(f)"))
+fun <B> TryOf<B>.recoverWith(f: (Throwable) -> TryOf<B>): Try<B> = handleErrorWith(f)
 
 fun <A> (() -> A).try_(): Try<A> = Try(this)
 
 fun <A> A.success(): Try<A> = Success(this)
 
-fun <A> Throwable.failure(): Try<A> = Failure(this)
+fun Throwable.failure(): Try<Nothing> = Failure(this)
 
 fun <T> TryOf<TryOf<T>>.flatten(): Try<T> = fix().flatMap(::identity)
