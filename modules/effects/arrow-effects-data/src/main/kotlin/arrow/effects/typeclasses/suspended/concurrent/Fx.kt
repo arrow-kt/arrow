@@ -14,10 +14,12 @@ import arrow.effects.typeclasses.Disposable
  * To run effects use any of the binding functions like you would with any other [Kind].
  *
  * ```
+ * suspend fun sideEffect(n: Int) = println("Seen $n").let { n + 1 }
+ *
  * fx {
- *   val one = effect { 1 }.bind() // using bind
- *   val (two) = effect { one + 1 } // using destructuring
- *   val three = !effect { two + 1 } // easiest to grep
+ *   val one = effect { sideEffect() }.bind() // using bind
+ *   val (two) = effect { sideEffect(one) } // using destructuring
+ *   val three = !effect { sideEffect(two) } // easiest to grep for
  * }
  * ```
  *
