@@ -55,11 +55,11 @@ class TryTest : UnitSpec() {
       }
     }
 
-    "combine two Failures should return the second failure" {
+    "combine two Failures should return the first failure" {
       val throwable1 = Exception("foo")
-      val throwable2 = Exception("foo")
+      val throwable2 = Exception("bar")
 
-      Try.raise(throwable2) shouldBe Try.raise(throwable1).combine(String.monoid(), Try.raise(throwable2))
+      Try.raise(throwable1) shouldBe Try.raise(throwable1).combine(String.monoid(), Try.raise(throwable2))
     }
 
     "combine a Success and a Failure should return Failure" {
