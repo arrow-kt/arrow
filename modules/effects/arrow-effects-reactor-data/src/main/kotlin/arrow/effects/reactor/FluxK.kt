@@ -89,11 +89,15 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
             })
           )
         } catch (e: Throwable) {
-          release(a, ExitCase.Error(e)).fix().flux.subscribe({
-            sink.error(e)
-          }, { e2 ->
-            sink.error(Platform.composeErrors(e, e2))
-          })
+          if (NonFatal(e)) {
+            release(a, ExitCase.Error(e)).fix().flux.subscribe({
+              sink.error(e)
+            }, { e2 ->
+              sink.error(Platform.composeErrors(e, e2))
+            })
+          } else {
+            throw e
+          }
         }
       }, sink::error, sink::complete)
     })

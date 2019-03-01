@@ -2,6 +2,7 @@ package arrow.data
 
 import arrow.Kind
 import arrow.core.*
+import arrow.core.extensions.const.divisible.divisible
 import arrow.core.extensions.monoid
 import arrow.effects.ForIO
 import arrow.effects.IO
@@ -12,6 +13,7 @@ import arrow.data.extensions.listk.monad.monad
 import arrow.data.extensions.listk.monoidK.monoidK
 import arrow.core.extensions.option.monad.monad
 import arrow.data.extensions.writert.applicative.applicative
+import arrow.data.extensions.writert.divisible.divisible
 import arrow.data.extensions.writert.monad.monad
 import arrow.data.extensions.writert.monoidK.monoidK
 import arrow.mtl.extensions.option.monadFilter.monadFilter
@@ -21,7 +23,7 @@ import arrow.test.UnitSpec
 import arrow.test.generators.intSmall
 import arrow.test.generators.tuple2
 import arrow.test.laws.*
-import arrow.typeclasses.Eq
+import arrow.typeclasses.*
 import io.kotlintest.properties.Gen
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
@@ -40,6 +42,11 @@ class WriterTTest : UnitSpec() {
   init {
 
     testLaws(
+      DivisibleLaws.laws(
+        WriterT.divisible<ConstPartialOf<Int>, Int>(Const.divisible(Int.monoid())),
+        { WriterT(it.const()) },
+        Eq { a, b -> a.value().value() == b.value().value() }
+      ),
       AsyncLaws.laws(WriterT.async(IO.async(), Int.monoid()), IOEQ(), IOEitherEQ()),
       MonoidKLaws.laws(
         WriterT.monoidK<ForListK, Int>(ListK.monoidK()),

@@ -5,7 +5,6 @@ import arrow.common.messager.logW
 import arrow.documented
 import arrow.meta.encoder.jvm.KotlinMetatadataEncoder
 import me.eugeniomarletti.kotlin.metadata.kotlinMetadata
-import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.receiverType
 import me.eugeniomarletti.kotlin.processing.KotlinAbstractProcessor
 import java.io.File
 import java.io.IOException
@@ -25,9 +24,11 @@ class KnownException(message: String, val element: Element?) : RuntimeException(
 abstract class AbstractProcessor : KotlinAbstractProcessor(), ProcessorUtils, KotlinMetatadataEncoder {
 
   private fun Element.kDocLocation(): File =
-    File(
-      System.getProperty("user.dir") +
-        "/build/kdocs/meta/"+ "${locationName().replace('.', '/')}.javadoc")
+      locationName()
+          .replacePackageSeparatorsToFolderSeparators()
+          .replaceInvalidPathCharacters()
+          .let { "$userDir/build/kdocs/meta/$it.javadoc" }
+          .let(::File)
 
   fun Element.kDoc(): String? =
     @Suppress("SwallowedException")
@@ -49,9 +50,15 @@ abstract class AbstractProcessor : KotlinAbstractProcessor(), ProcessorUtils, Ko
       @Suppress("SwallowedException")
       try {
         val path = kDocLocation.toPath()
-        Files.createDirectories(path.parent)
-        Files.delete(path)
-        Files.createFile(path)
+        @Suppress("SwallowedException")
+        try { Files.createDirectories(path.parent) } catch (e : IOException) {
+        }
+        @Suppress("SwallowedException")
+        try { Files.delete(path) } catch (e : IOException) {
+        }
+        @Suppress("SwallowedException")
+        try { Files.createFile(path) } catch (e : IOException) {
+        }
         kDocLocation.writeText(doc)
       } catch (x: IOException) {
         logW("Failed to generate kdoc file location: $kDocLocation", e)
@@ -99,3 +106,7 @@ abstract class AbstractProcessor : KotlinAbstractProcessor(), ProcessorUtils, Ko
   protected abstract fun onProcess(annotations: Set<TypeElement>, roundEnv: RoundEnvironment)
 
 }
+
+private val userDir get() = System.getProperty("user.dir")
+private fun String.replacePackageSeparatorsToFolderSeparators() = replace('.', '/')
+private fun String.replaceInvalidPathCharacters() = replace('?', '_')

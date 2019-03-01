@@ -362,7 +362,7 @@ interface Concurrent<F> : Async<F> {
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val result = parMapN(Dispatchers.Default,
+     *   val result = Dispatchers.Default.parMapN(
    *     delay { "First one is on ${Thread.currentThread().name}" },
    *     delay { "Second one is on ${Thread.currentThread().name}" }
    *   ) { a, b ->
@@ -524,7 +524,7 @@ interface Concurrent<F> : Async<F> {
    * fun main(args: Array<String>) {
    *   //sampleStart
    *   binding {
-   *     val eitherGetOrUnit = raceN(Dispatchers.Default, IO.never, IO.just(5)).bind()
+   *     val eitherGetOrUnit = Dispatchers.Default.raceN(IO.never, IO.just(5)).bind()
    *     eitherGetOrUnit.fold(
    *       { IO.raiseError<Int>(RuntimeException("Never always loses race")) },
    *       IO.Companion::just

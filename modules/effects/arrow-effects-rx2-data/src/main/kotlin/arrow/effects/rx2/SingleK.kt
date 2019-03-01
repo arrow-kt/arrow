@@ -1,9 +1,11 @@
 package arrow.effects.rx2
 
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Left
+import arrow.core.NonFatal
+import arrow.core.Right
 import arrow.effects.OnCancel
 import arrow.effects.internal.Platform
-import arrow.effects.rx2.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
 import arrow.higherkind
@@ -11,6 +13,7 @@ import io.reactivex.Single
 import io.reactivex.SingleEmitter
 import io.reactivex.disposables.CompositeDisposable
 import kotlin.coroutines.CoroutineContext
+import arrow.effects.rx2.CoroutineContextRx2Scheduler.asScheduler
 
 fun <A> Single<A>.k(): SingleK<A> = SingleK(this)
 
@@ -83,20 +86,20 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
           .doOnDispose { release(a, ExitCase.Canceled).fix().single.subscribe({}, emitter::onError) }
           .subscribe(emitter::onSuccess, emitter::onError))
       } catch (e: Throwable) {
-        release(a, ExitCase.Error(e)).fix().single.subscribe({
-          emitter.onError(e)
-        }, { e2 ->
-          emitter.onError(Platform.composeErrors(e, e2))
-        })
+        if (NonFatal(e)) {
+          release(a, ExitCase.Error(e)).fix().single.subscribe({
+            emitter.onError(e)
+          }, { e2 ->
+            emitter.onError(Platform.composeErrors(e, e2))
+          })
+        } else {
+          throw e
+        }
       }
     })
 
   fun handleErrorWith(function: (Throwable) -> SingleKOf<A>): SingleK<A> =
     single.onErrorResumeNext { t: Throwable -> function(t).value() }.k()
-
-  fun attempt(): SingleK<Either<Throwable, A>> =
-    map<Either<Throwable, A>> { it.right() }
-      .handleErrorWith { SingleK.just(it.left()) }
 
   fun continueOn(ctx: CoroutineContext): SingleK<A> =
     single.observeOn(ctx.asScheduler()).k()

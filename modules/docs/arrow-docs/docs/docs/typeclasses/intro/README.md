@@ -102,7 +102,13 @@ We will list them by their hierarchy.
 
 - [`Inject`]({{ '/docs/typeclasses/inject/' | relative_url }}) - transformation between datatypes
 
-- [`Alternative`]({{ '/docs/arrow/typeclasses/alternative/' | relative_url }}) - has an structure that contains either of two values
+- [`Alternative`]({{ '/docs/arrow/typeclasses/alternative/' | relative_url }}) - has a structure that contains either of two values
+
+- [`Divide`]({{ '/docs/arrow/typeclasses/divide/' | relative_url }}) - models divide from the divide and conquer pattern
+
+- [`Divisible`]({{ '/docs/arrow/typeclasses/divisible/' | relative_url }}) - extends `Divide` with conquer
+
+- [`Decidable`]({{ '/docs/arrow/typeclasses/decidable/' | relative_url }}) - contravariant version of `Alternative`
 
 ##### Show
 

@@ -5,7 +5,7 @@ import arrow.core.*
 import arrow.core.extensions.`try`.applicative.applicative
 import arrow.core.extensions.`try`.functor.functor
 import arrow.core.extensions.option.applicative.applicative
-import arrow.core.extensions.option.monad.fx
+import arrow.core.extensions.option.fx.fx
 import io.kotlintest.Matcher
 import io.kotlintest.Result
 import io.kotlintest.shouldBe

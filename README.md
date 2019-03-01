@@ -81,7 +81,7 @@ You can find the dependencies necessary in the Basic Setup of the README at the 
 Add the dependencies into the project's `build.gradle`
 
 ```groovy
-def arrow_version = "0.9.0"
+def arrow_version = "0.9.0-SNAPSHOT"
 dependencies {
     compile "io.arrow-kt:arrow-core-data:$arrow_version"
     compile "io.arrow-kt:arrow-syntax:$arrow_version"
@@ -97,6 +97,7 @@ dependencies {
     compile "io.arrow-kt:arrow-mtl:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects-extensions:$arrow_version" //optional
+    compile "io.arrow-kt:arrow-effects-io-extensions:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects-rx2:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects-rx2-extensions:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects-reactor:$arrow_version" //optional
@@ -106,7 +107,7 @@ dependencies {
     compile "io.arrow-kt:arrow-optics:$arrow_version" //optional
     compile "io.arrow-kt:arrow-generic:$arrow_version" //optional
     compile "io.arrow-kt:arrow-recursion:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-extensions-recursion:$arrow_version" //optional
+    compile "io.arrow-kt:arrow-recursion-extensions:$arrow_version" //optional
     compile "io.arrow-kt:arrow-integration-retrofit-adapter:$arrow_version" //optional
 }
 ```
