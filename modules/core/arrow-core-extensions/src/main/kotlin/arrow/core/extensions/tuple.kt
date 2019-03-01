@@ -111,7 +111,7 @@ interface Tuple2Semigroup<A, B> : Semigroup<Tuple2<A, B>> {
 }
 
 @extension
-interface Tuple2Monoid<A, B> : Tuple2Semigroup<A, B>, Monoid<Tuple2<A, B>> {
+interface Tuple2Monoid<A, B> : Monoid<Tuple2<A, B>>, Tuple2Semigroup<A, B> {
 
   fun MA(): Monoid<A>
 
