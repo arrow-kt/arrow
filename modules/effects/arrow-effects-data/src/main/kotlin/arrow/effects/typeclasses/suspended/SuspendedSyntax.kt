@@ -7,7 +7,6 @@ import arrow.effects.internal.Platform
 import arrow.effects.internal.UnsafePromise
 import arrow.effects.internal.asyncContinuation
 import arrow.effects.typeclasses.*
-import arrow.effects.typeclasses.suspended.fx.concurrent.startFiber
 import arrow.effects.typeclasses.suspended.fx.dispatchers.dispatchers
 import arrow.extension
 import arrow.typeclasses.*
@@ -251,15 +250,17 @@ fun FxConnection(): KindConnection<ForFx> =
   KindConnection(object : FxMonadDefer {}) { it.fix().fa.foldContinuation { e -> throw e } }
 
 internal fun <A> FxFiber(promise: UnsafePromise<A>, conn: KindConnection<ForFx>): Fiber<ForFx, A> {
-  val join: Fx<A> = Fx { fromAsync<A> { conn2, cb ->
-    conn2.push(Fx { promise.remove(cb) })
-    conn.push(conn2.cancel())
-    promise.get { a ->
-      cb(a)
-      conn2.pop()
-      conn.pop()
-    }
-  }()}
+  val join: Fx<A> = Fx {
+    fromAsync<A> { conn2, cb ->
+      conn2.push(Fx { promise.remove(cb) })
+      conn.push(conn2.cancel())
+      promise.get { a ->
+        cb(a)
+        conn2.pop()
+        conn.pop()
+      }
+    }()
+  }
   return Fiber(join, conn.cancel())
 }
 
@@ -464,8 +465,9 @@ suspend fun <A, B> (suspend () -> A).map(f: (A) -> B): suspend () -> B =
 fun <A> just(a: A): suspend () -> A =
   { a }
 
-fun <A> A.just(unit: Unit = Unit): suspend () -> A =
-  { this }
+
+val <A> A.just: suspend () -> A
+  get() = { this }
 
 suspend fun <A, B> (suspend () -> A).ap(ff: suspend () -> (A) -> B): suspend () -> B =
   map(ff())
@@ -475,7 +477,9 @@ suspend fun <A, B> (suspend () -> A).flatMap(f: (A) -> suspend () -> B): suspend
     try {
       !f(this())
     } catch (e: Throwable) {
-      !raiseError<B>(e)
+      if (NonFatal(e)) {
+        !raiseError<B>(e)
+      } else throw e
     }
   }
 
@@ -494,16 +498,16 @@ suspend inline fun <A> attempt(crossinline f: suspend () -> A): suspend () -> Ei
 val unit: suspend () -> Unit = { Unit }
 
 fun <A> raiseError(e: Throwable, unit: Unit = Unit): suspend () -> A =
-  { throw RaisedError(e) }
+  { if (NonFatal(e)) throw RaisedError(e) else throw e }
 
 inline fun <A> (suspend () -> A).handleErrorWith(crossinline f: (Throwable) -> suspend () -> A): suspend () -> A =
   {
     try {
       this()
     } catch (r: RaisedError) {
-      f(r.exception)()
+      !f(r.exception)
     } catch (e: Throwable) {
-      f(e)()
+      !f(e)
     }
   }
 
@@ -514,7 +518,8 @@ inline fun <A> (suspend () -> A).handleError(crossinline f: (Throwable) -> A): s
     } catch (r: RaisedError) {
       f(r.exception)
     } catch (e: Throwable) {
-      f(e)
+      if (NonFatal(e)) f(e)
+      else throw e
     }
   }
 
@@ -567,7 +572,7 @@ suspend fun <A> CoroutineContext.continueOn(fa: suspend () -> A): suspend () -> 
 tailrec suspend fun <A, B> tailRecLoop(a: A, f: (A) -> suspend () -> Either<A, B>): suspend () -> B =
   when (val result = f(a)()) {
     is Either.Left -> tailRecLoop(result.a, f)
-    is Either.Right -> result.b.just()
+    is Either.Right -> result.b.just
   }
 
 suspend fun <A> CoroutineContext.startFiber(fa: suspend () -> A): suspend () -> A = {
