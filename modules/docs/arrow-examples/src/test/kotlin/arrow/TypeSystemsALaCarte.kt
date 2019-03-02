@@ -7,6 +7,22 @@ import arrow.typeclasses.Hash
 import arrow.typeclasses.Order
 import arrow.typeclasses.suspended.monad.Fx
 
+/**
+ * This is a working Kotlin transcription of Build Systems a la Carte
+ *
+ * Andrey Mokhov, Neil Mitchell, and Simon Peyton Jones. 2018. Build Systems à la Carte. Proc. ACM Program.
+ * Lang. 2, ICFP, Article 79 (September 2018), 29 pages. https://doi.org/10.1145/3236774
+ *
+ * You can find the paper here: https://www.microsoft.com/en-us/research/uploads/prod/2018/03/build-systems.pdf
+ * A video presentation: https://www.youtube.com/watch?v=BQVT6wiwCxM
+ *
+ * And a port to Rust syntax: https://github.com/theindigamer/bsalc-alt-code/blob/master/BSalC.rs
+ *
+ *
+ * This version is worse than the one in the paper because Kotlin won't allow us to put constraints on Task that are typeclasses
+ * Instead, we fix to a single F and work with it using receivers for the typeclasses required.
+ */
+
 /** The basic types */
 
 data class Store<I, K, V>(val information: I, private val get: (K) -> V) {
@@ -40,9 +56,7 @@ interface Task<F, K, V> {
 
 typealias Tasks<F, K, V> = (K) -> Option<Task<F, K, V>>
 
-typealias Build<F, I, K, V> = BuildSystem<K, F>.(Tasks<F, K, V>, K, Store<I, K, V>) ->
-/* Because tasks are fixed to F all builds are forced to be wrapped in F */
-Kind<F, Store<I, K, V>>
+typealias Build<F, I, K, V> = BuildSystem<K, F>.(Tasks<F, K, V>, K, Store<I, K, V>) -> /* Because tasks are fixed to F all builds are forced to be wrapped in F */ Kind<F, Store<I, K, V>>
 
 typealias Rebuilder<F, IR, K, V> = BuildComponents<K, F, IR>.(K, V, Task<F, K, V>) -> Task<F, K, V>
 
@@ -65,7 +79,8 @@ fun <F, I, K, V> BuildComponents<K, F, I>.topological(): Scheduler<F, I, I, K, V
         }, { task ->
           val value: V = store.getValue(currTarget)
 
-          // In the original rebuilder works for all F, so it's possible to get an Id one to run with State + Id without a Monad instance
+          // In the original rebuilder works for all F so it's possible to get an Id one to run with State + Id without a Monad instance
+          // This causes Build to return a Kind, and will probably make Rebuilder and Scheduler return one too if I dug a bit more on it
           //
           // val newTask: Task<ForId, K, V> = rebuilder(currTarget, value, task)
           // val newValue = newTask.run { State<I, V> { it toT store.getValue(currTarget) }.run(Id.monad(), acc.information).map { it.b } }.extract()
@@ -96,7 +111,7 @@ fun <F, I, K, V> suspending(): Scheduler<F, I, I, K, V> = { rebuilder: Rebuilder
             val newValue: V = !newTask.run { just(store.getValue(it)) }
             val newStore: Store<I, K, V> = store.putValue(eqInstance, target, newValue)
             (newStore toT completedTasks.plus(target)).left()
-          } // TODO handleErrorWith
+          } // TODO handleErrorWith if you ever make a serious build system
         }
       })
     }
@@ -104,8 +119,6 @@ fun <F, I, K, V> suspending(): Scheduler<F, I, I, K, V> = { rebuilder: Rebuilder
 }
 
 /** Rebuilding Strategies */
-
-/* The MAKE build system */
 
 typealias Time = Int
 
@@ -125,7 +138,7 @@ fun <F, K, V> modTimeRebuilder(): Rebuilder<F, MakeInfo<K>, K, V> = { key, value
   }
 }
 
-/** Full examples **/
+/** Existing build systems **/
 
 fun <F, K, V> BuildComponents<K, F, MakeInfo<K>>.make(): Build<F, MakeInfo<K>, K, V> = { tasks: Tasks<F, K, V>, key: K, store: Store<MakeInfo<K>, K, V> ->
   val topological: Scheduler<F, MakeInfo<K>, MakeInfo<K>, K, V> = topological()
@@ -133,7 +146,7 @@ fun <F, K, V> BuildComponents<K, F, MakeInfo<K>>.make(): Build<F, MakeInfo<K>, K
   build(tasks, key, store)
 }
 
-/* Helpers */
+/** Mock Helpers */
 
 typealias Graph<K> = List<K>
 
