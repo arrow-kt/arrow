@@ -2,6 +2,7 @@ package arrow.data.extensions
 
 import arrow.Kind
 import arrow.core.Eval
+import arrow.core.Tuple2
 import arrow.data.*
 
 import arrow.extension
@@ -57,6 +58,12 @@ interface SetKFoldable : Foldable<ForSetK> {
 interface SetKSemigroupK : SemigroupK<ForSetK> {
   override fun <A> Kind<ForSetK, A>.combineK(y: Kind<ForSetK, A>): SetK<A> =
     fix().setCombineK(y)
+}
+
+@extension
+interface SetKSemigroupal: Semigroupal<ForSetK> {
+  override fun <A, B> Kind<ForSetK, A>.product(fb: Kind<ForSetK, B>): Kind<ForSetK, Tuple2<A, B>> =
+    fb.fix().flatMap { b -> this.fix().map { a -> Tuple2(a,b) } }.toSet().k()
 }
 
 @extension

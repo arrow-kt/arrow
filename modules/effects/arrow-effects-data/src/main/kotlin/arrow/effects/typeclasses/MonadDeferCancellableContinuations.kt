@@ -27,7 +27,7 @@ open class MonadDeferCancellableContinuation<F, A>(val SC: MonadDefer<F>, overri
   fun disposable(): Disposable = { cancelled.set(true) }
 
   override fun <B> binding(c: suspend MonadContinuation<F, *>.() -> B): Kind<F, B> =
-    fx(c)
+    bindingCancellable(c).a
 
   override fun returnedMonad(): Kind<F, A> = returnedMonad
 
@@ -41,7 +41,7 @@ open class MonadDeferCancellableContinuation<F, A>(val SC: MonadDefer<F>, overri
     deferUnsafe(f).bind()
 
   override fun <B> bindingCatch(c: suspend MonadErrorContinuation<F, *>.() -> B): Kind<F, B> =
-    bindingCancellable { c() }.a
+    bindingCancellable(c).a
 
   override suspend fun <B> bind(m: () -> Kind<F, B>): B = suspendCoroutineUninterceptedOrReturn { c ->
     val labelHere = c.stateStack // save the whole coroutine stack labels

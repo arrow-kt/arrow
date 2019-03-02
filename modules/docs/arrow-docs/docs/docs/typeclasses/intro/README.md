@@ -132,6 +132,10 @@ We will list them by their hierarchy.
 
 - [`MonoidK`]({{ '/docs/arrow/typeclasses/monoidk/' | relative_url }}) - combinable datatypes have an empty value
 
+##### Semigroupal
+
+- [`Semigroupal`]({{ '/docs/arrow/typeclasses/semigroupal/' | relative_url }}) - abstraction over the cartesian product
+
 ##### Semiring
 
 - [`Semiring`]({{ '/docs/arrow/typeclasses/semiring/' | relative_url }}) - can combine or multiplicatively combine two objects together
