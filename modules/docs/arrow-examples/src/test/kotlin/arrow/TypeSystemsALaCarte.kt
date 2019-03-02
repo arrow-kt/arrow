@@ -9,6 +9,8 @@ import arrow.typeclasses.Eq
 import arrow.typeclasses.Order
 import arrow.typeclasses.suspended.monad.Fx
 
+/** The basic types */
+
 data class Store<I, K, V>(val information: I, private val get: (K) -> V) {
   fun putInfo(information: I) = Store(information, get)
 
@@ -44,7 +46,7 @@ typealias Build<F, I, K, V> = BuildSystem<K, F>.(tasks: Tasks<F, K, V>, key: K, 
 
 typealias Rebuilder<F, IR, K, V> = BuildComponents<K, F, IR>.(key: K, value: V, task: Task<F, K, V>) -> Kind<F, Task<F, K, V>>
 
-typealias Scheduler<F, I, IR, K, V> = BuildComponents<K, F, IR>.(rebuilder: Rebuilder<F, IR, K, V>) -> Build<F, I, K, V>
+typealias Scheduler<F, I, IR, K, V> = BuildComponents<K, F, IR>.(rebuilder: Rebuilder<F, IR, K, V>) -> Kind<F, Build<F, I, K, V>>
 
 interface BuildSystem<K, F> : Order<K>, Fx<F>
 
