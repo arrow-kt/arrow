@@ -1,9 +1,6 @@
 package arrow
 
-import arrow.core.Option
-import arrow.core.Tuple2
-import arrow.core.toOption
-import arrow.core.toT
+import arrow.core.*
 import arrow.mtl.typeclasses.MonadState
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Hash
@@ -45,7 +42,7 @@ typealias Tasks<F, K, V> = (K) -> Option<Task<F, K, V>>
 
 typealias Build<F, I, K, V> = BuildSystem<K, F>.(tasks: Tasks<F, K, V>, key: K, store: Store<I, K, V>) -> Kind<F, Store<I, K, V>>
 
-typealias Rebuilder<F, IR, K, V> = BuildComponents<K, F, IR>.(key: K, value: V, task: Task<F, K, V>) -> Kind<F, Task<F, K, V>>
+typealias Rebuilder<F, IR, K, V> = BuildComponents<K, F, IR>.(key: K, value: V, task: Task<F, K, V>) -> Task<F, K, V>
 
 typealias Scheduler<F, I, IR, K, V> = BuildComponents<K, F, IR>.(rebuilder: Rebuilder<F, IR, K, V>) -> Build<F, I, K, V>
 
@@ -65,11 +62,34 @@ fun <F, I, K, V> BuildComponents<K, F, I>.topological(): Scheduler<F, I, I, K, V
           acc
         }, { task ->
           val value: V = store.getValue(currTarget)
-          val newTask: Task<F, K, V> = !rebuilder(currTarget, value, task)
+          val newTask: Task<F, K, V> = rebuilder(currTarget, value, task)
           val newValue: V = !newTask.run { just(store.getValue(it)) }
           store.putValue(this@topological, currTarget, newValue)
         })
       }
+    }
+  }
+}
+
+fun <F, I, K, V> suspending(): Scheduler<F, I, I, K, V> = { rebuilder: Rebuilder<F, I, K, V> ->
+  { tasks: Tasks<F, K, V>, target: K, store: Store<I, K, V> ->
+    tailRecM(store toT emptySet<K>()) { state ->
+      val (store, done) = state
+      tasks(target).fold({
+        store.right().just()
+      }, { task ->
+        if (done.contains(target)) {
+          store.right().just()
+        } else {
+          val value: V = store.getValue(target)
+          fx {
+            val newTask: Task<F, K, V> = rebuilder(target, value, task)
+            val newValue: V = !newTask.run { just(store.getValue(it)) }
+            val newStore: Store<I, K, V> = store.putValue(this@suspending, target, newValue)
+            (newStore toT done.plus(target)).left()
+          } // TODO handleErrorWith
+        }
+      })
     }
   }
 }
@@ -83,17 +103,15 @@ typealias Time = Int
 typealias MakeInfo<K> = Tuple2<Time, Map<K, Time>>
 
 fun <F, K, V> modTimeRebuilder(): Rebuilder<F, MakeInfo<K>, K, V> = { key, value, task ->
-  fx {
-    object : Task<F, K, V> {
-      override fun run(func: (K) -> Kind<F, V>): Kind<F, V> = fx {
-        val (now: Time, modTimes: Map<K, Time>) = !get()
-        modTimes[key].toOption().fold({
-          set(now + 1 toT modTimes.plus(key to now))
-          !task.run(func)
-        }, {
-          value
-        })
-      }
+  object : Task<F, K, V> {
+    override fun run(func: (K) -> Kind<F, V>): Kind<F, V> = fx {
+      val (now: Time, modTimes: Map<K, Time>) = !get()
+      modTimes[key].toOption().fold({
+        !set(now + 1 toT modTimes.plus(key to now))
+        !task.run(func)
+      }, {
+        value
+      })
     }
   }
 }
