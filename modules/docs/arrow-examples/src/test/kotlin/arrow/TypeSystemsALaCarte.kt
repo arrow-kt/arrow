@@ -76,6 +76,7 @@ data class Hashable<V> private constructor(private val valueHash: Int) {
 
 /** Scheduling algorithms */
 
+// I didn't like the original version using State, so I rewrote it as a fold
 fun <F, I, K, V> BuildComponents<K, F, I>.topological(): Scheduler<F, I, I, K, V> = { rebuilder: Rebuilder<F, I, K, V> ->
   { tasks: Tasks<F, K, V>, target: K, store: Store<I, K, V> ->
     fx {
@@ -102,6 +103,7 @@ fun <F, I, K, V> BuildComponents<K, F, I>.topological(): Scheduler<F, I, I, K, V
   }
 }
 
+// I didn't like the original version using State, so I rewrote it as a tailRecM
 fun <F, I, K, V> suspending(): Scheduler<F, I, I, K, V> = { rebuilder: Rebuilder<F, I, K, V> ->
   val eqInstance = this // implicit label missing
   { tasks: Tasks<F, K, V>, target: K, startStore: Store<I, K, V> ->
