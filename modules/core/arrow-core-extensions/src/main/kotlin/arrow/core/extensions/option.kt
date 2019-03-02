@@ -3,8 +3,8 @@ package arrow.core.extensions
 
 import arrow.Kind
 import arrow.core.*
+import arrow.core.extensions.option.monad.map
 import arrow.core.extensions.option.monad.monad
-import arrow.core.extensions.option.monadError.monadError
 import arrow.extension
 import arrow.typeclasses.*
 import arrow.typeclasses.suspended.monad.Fx
@@ -23,6 +23,12 @@ interface OptionSemigroup<A> : Semigroup<Option<A>> {
       }
       None -> b
     }
+}
+
+@extension
+interface OptionSemigroupal : Semigroupal<ForOption> {
+  override fun <A, B> Kind<ForOption, A>.product(fb: Kind<ForOption, B>): Kind<ForOption, Tuple2<A, B>> =
+    fb.fix().ap(this.map { a:A -> { b: B -> Tuple2(a,b)} })
 }
 
 @extension

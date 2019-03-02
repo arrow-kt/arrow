@@ -6,6 +6,7 @@ import arrow.core.Eval
 import arrow.core.Tuple2
 import arrow.data.*
 import arrow.data.extensions.listk.foldable.foldLeft
+import arrow.data.extensions.listk.monad.map
 import arrow.data.extensions.listk.monad.monad
 import arrow.extension
 import arrow.typeclasses.*
@@ -123,6 +124,12 @@ interface ListKTraverse : Traverse<ForListK> {
 interface ListKSemigroupK : SemigroupK<ForListK> {
   override fun <A> Kind<ForListK, A>.combineK(y: Kind<ForListK, A>): ListK<A> =
     fix().listCombineK(y)
+}
+
+@extension
+interface ListKSemigroupal : Semigroupal<ForListK> {
+  override fun <A, B> Kind<ForListK, A>.product(fb: Kind<ForListK, B>): Kind<ForListK, Tuple2<A, B>> =
+    fb.fix().ap(this.map { a:A -> { b: B -> Tuple2(a,b)} })
 }
 
 @extension

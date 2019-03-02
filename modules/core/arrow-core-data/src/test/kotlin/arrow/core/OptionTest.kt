@@ -1,5 +1,6 @@
 package arrow.core
 
+import arrow.Kind
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
 import arrow.core.extensions.monoid
@@ -7,7 +8,9 @@ import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.option.eq.eq
 import arrow.core.extensions.option.hash.hash
 import arrow.core.extensions.option.monoid.monoid
+import arrow.core.extensions.option.semigroupal.semigroupal
 import arrow.core.extensions.option.show.show
+import arrow.core.extensions.tuple2.eq.eq
 import arrow.mtl.extensions.option.monadFilter.monadFilter
 import arrow.mtl.extensions.option.traverseFilter.traverseFilter
 import arrow.syntax.collections.firstOption
@@ -28,6 +31,14 @@ class OptionTest : UnitSpec() {
   val some: Option<String> = Some("kotlin")
   val none: Option<String> = Option.empty()
 
+  val associativeSemigroupalEq = object : Eq<Kind<ForOption, Tuple2<Int, Tuple2<Int, Int>>>> {
+    override fun Kind<ForOption, Tuple2<Int, Tuple2<Int, Int>>>.eqv(b: Kind<ForOption, Tuple2<Int, Tuple2<Int, Int>>>): Boolean {
+        return Option.eq(Tuple2.eq(Int.eq(), Tuple2.eq(Int.eq(), Int.eq()))).run {
+          this@eqv.fix().eqv(b.fix())
+        }
+      }
+  }
+
   init {
 
     testLaws(
@@ -37,7 +48,8 @@ class OptionTest : UnitSpec() {
       FunctorFilterLaws.laws(Option.traverseFilter(), { Option(it) }, Eq.any()),
       TraverseFilterLaws.laws(Option.traverseFilter(), Option.applicative(), ::Some, Eq.any()),
       MonadFilterLaws.laws(Option.monadFilter(), ::Some, Eq.any()),
-      HashLaws.laws(Option.hash(Int.hash()), Option.eq(Int.eq())) { it.some() }
+      HashLaws.laws(Option.hash(Int.hash()), Option.eq(Int.eq())) { it.some() },
+      SemigroupalLaws.laws(Option.semigroupal(), ::Some, ::bijection, associativeSemigroupalEq)
     )
 
     "fromNullable should work for both null and non-null values of nullable types" {
@@ -137,6 +149,11 @@ class OptionTest : UnitSpec() {
       None or None shouldBe None
     }
 
+  }
+
+  private fun bijection(from: Kind<ForOption, Tuple2<Tuple2<Int, Int>, Int>>): Option<Tuple2<Int, Tuple2<Int, Int>>> {
+    val ot = (from as Some<Tuple2<Tuple2<Int, Int>, Int>>)
+    return Tuple2(ot.t.a.a, Tuple2(ot.t.a.b, ot.t.b)).toOption()
   }
 
 }

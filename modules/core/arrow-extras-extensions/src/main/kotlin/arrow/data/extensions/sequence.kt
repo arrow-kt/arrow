@@ -5,7 +5,7 @@ import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Tuple2
 import arrow.data.*
-import arrow.data.extensions.optiont.monad.monad
+import arrow.data.extensions.sequencek.monad.map
 import arrow.data.extensions.sequencek.monad.monad
 import arrow.extension
 import arrow.typeclasses.*
@@ -15,6 +15,12 @@ import arrow.data.combineK as sequenceCombineK
 @extension
 interface SequenceKSemigroup<A> : Semigroup<SequenceK<A>> {
   override fun SequenceK<A>.combine(b: SequenceK<A>): SequenceK<A> = (this.sequence + b.sequence).k()
+}
+
+@extension
+interface SequenceKSemigroupal : Semigroupal<ForSequenceK> {
+  override fun <A, B> Kind<ForSequenceK, A>.product(fb: Kind<ForSequenceK, B>): Kind<ForSequenceK, Tuple2<A, B>> =
+    fb.fix().ap(this.map { a: A -> { b: B -> Tuple2(a, b)} })
 }
 
 @extension
