@@ -40,11 +40,13 @@ interface Task<F, K, V> {
 
 typealias Tasks<F, K, V> = (K) -> Option<Task<F, K, V>>
 
-typealias Build<F, I, K, V> = BuildSystem<K, F>.(tasks: Tasks<F, K, V>, key: K, store: Store<I, K, V>) -> Kind<F, Store<I, K, V>>
+typealias Build<F, I, K, V> = BuildSystem<K, F>.(Tasks<F, K, V>, K, Store<I, K, V>) ->
+/* Because tasks are fixed to F all builds are forced to be wrapped in F */
+Kind<F, Store<I, K, V>>
 
-typealias Rebuilder<F, IR, K, V> = BuildComponents<K, F, IR>.(key: K, value: V, task: Task<F, K, V>) -> Task<F, K, V>
+typealias Rebuilder<F, IR, K, V> = BuildComponents<K, F, IR>.(K, V, Task<F, K, V>) -> Task<F, K, V>
 
-typealias Scheduler<F, I, IR, K, V> = BuildComponents<K, F, IR>.(rebuilder: Rebuilder<F, IR, K, V>) -> Build<F, I, K, V>
+typealias Scheduler<F, I, IR, K, V> = BuildComponents<K, F, IR>.(Rebuilder<F, IR, K, V>) -> Build<F, I, K, V>
 
 interface BuildSystem<K, F> : Order<K>, Fx<F>
 
@@ -62,6 +64,12 @@ fun <F, I, K, V> BuildComponents<K, F, I>.topological(): Scheduler<F, I, I, K, V
           acc
         }, { task ->
           val value: V = store.getValue(currTarget)
+
+          // In the original rebuilder works for all F, so it's possible to get an Id one to run with State + Id without a Monad instance
+          //
+          // val newTask: Task<ForId, K, V> = rebuilder(currTarget, value, task)
+          // val newValue = newTask.run { State<I, V> { it toT store.getValue(currTarget) }.run(Id.monad(), acc.information).map { it.b } }.extract()
+
           val newTask: Task<F, K, V> = rebuilder(currTarget, value, task)
           val newValue: V = !newTask.run { just(store.getValue(it)) }
           store.putValue(this@topological, currTarget, newValue)
@@ -72,21 +80,22 @@ fun <F, I, K, V> BuildComponents<K, F, I>.topological(): Scheduler<F, I, I, K, V
 }
 
 fun <F, I, K, V> suspending(): Scheduler<F, I, I, K, V> = { rebuilder: Rebuilder<F, I, K, V> ->
-  { tasks: Tasks<F, K, V>, target: K, store: Store<I, K, V> ->
-    tailRecM(store toT emptySet<K>()) { state ->
-      val (store, done) = state
+  val eqInstance = this // implicit label missing
+  { tasks: Tasks<F, K, V>, target: K, startStore: Store<I, K, V> ->
+    tailRecM(startStore toT emptySet<K>()) { state ->
+      val (store, completedTasks) = state
       tasks(target).fold({
         store.right().just()
       }, { task ->
-        if (done.contains(target)) {
+        if (completedTasks.contains(target)) {
           store.right().just()
         } else {
           val value: V = store.getValue(target)
           fx {
             val newTask: Task<F, K, V> = rebuilder(target, value, task)
             val newValue: V = !newTask.run { just(store.getValue(it)) }
-            val newStore: Store<I, K, V> = store.putValue(this@suspending, target, newValue)
-            (newStore toT done.plus(target)).left()
+            val newStore: Store<I, K, V> = store.putValue(eqInstance, target, newValue)
+            (newStore toT completedTasks.plus(target)).left()
           } // TODO handleErrorWith
         }
       })
