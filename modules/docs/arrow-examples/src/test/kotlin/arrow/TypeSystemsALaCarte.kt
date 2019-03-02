@@ -87,7 +87,7 @@ fun <F, I, K, V> BuildComponents<K, F, I>.topological(): Scheduler<F, I, I, K, V
         }, { task ->
           val value: V = store.getValue(currTarget)
 
-          // In the original rebuilder works for all F so it's possible to get an Id one to run with State + Id without a Monad instance
+          // In the original Rebuilder works for all F so it's possible to get an Id one to run with State + Id without a Monad instance
           // This causes Build to return a Kind, and will probably make Rebuilder and Scheduler return one too if I dug a bit more on it
           //
           // val newTask: Task<ForId, K, V> = rebuilder(currTarget, value, task)
