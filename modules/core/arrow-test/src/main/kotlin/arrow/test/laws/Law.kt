@@ -10,7 +10,6 @@ import io.kotlintest.Result
 import io.kotlintest.TestContext
 import io.kotlintest.properties.Gen
 import io.kotlintest.should
-import io.kotlintest.shouldBe
 
 fun throwableEq() = Eq { a: Throwable, b ->
   a::class == b::class && a.message == b.message
