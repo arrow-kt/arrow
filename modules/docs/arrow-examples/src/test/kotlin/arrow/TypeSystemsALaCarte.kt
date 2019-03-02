@@ -19,11 +19,35 @@ import arrow.typeclasses.suspended.monad.Fx
  * And a port to Rust syntax: https://github.com/theindigamer/bsalc-alt-code/blob/master/BSalC.rs
  *
  *
- * This version is worse than the one in the paper because Kotlin won't allow us to put constraints on Task that are typeclasses
+ * This version is worse than the one in the paper because Kotlin won't allow us to put
+ * a constraint C on Task that is a typeclass like Functor<F>, Monad<F>, MonadState<F, X>...
+ *
+ * interface Task<C, K, V> {
+ *   fun <F> run(func: C.(K) -> Kind<F, V>): Kind<F, V>
+ * }
+ *
  * Instead, we fix to a single F and work with it using receivers for the typeclasses required.
+ * This has undesirable side-effects such as making other types monadic.
  */
 
 /** The basic types */
+
+interface Task<F, K, V> {
+  fun run(func: (K) -> Kind<F, V>): Kind<F, V>
+}
+
+typealias Tasks<F, K, V> = (K) -> Option<Task<F, K, V>>
+
+typealias Build<F, I, K, V> =
+  BuildSystem<K, F>.(Tasks<F, K, V>, K, Store<I, K, V>) -> /* Because tasks are fixed to F all builds are forced to be wrapped in F */ Kind<F, Store<I, K, V>>
+
+typealias Rebuilder<F, IR, K, V> = BuildComponents<K, F, IR>.(K, V, Task<F, K, V>) -> Task<F, K, V>
+
+typealias Scheduler<F, I, IR, K, V> = BuildComponents<K, F, IR>.(Rebuilder<F, IR, K, V>) -> Build<F, I, K, V>
+
+interface BuildSystem<K, F> : Order<K>, Fx<F>
+
+interface BuildComponents<K, F, IR> : Order<K>, Fx<F>, MonadState<F, IR>, BuildSystem<K, F>
 
 data class Store<I, K, V>(val information: I, private val get: (K) -> V) {
   fun putInfo(information: I) = Store(information, get)
@@ -49,22 +73,6 @@ data class Hashable<V> private constructor(private val valueHash: Int) {
 
   fun <I, K> getHash(hashable: arrow.typeclasses.Hash<V>, key: K, store: Store<I, K, V>) = Hashable(hashable, store.getValue(key))
 }
-
-interface Task<F, K, V> {
-  fun run(func: (K) -> Kind<F, V>): Kind<F, V>
-}
-
-typealias Tasks<F, K, V> = (K) -> Option<Task<F, K, V>>
-
-typealias Build<F, I, K, V> = BuildSystem<K, F>.(Tasks<F, K, V>, K, Store<I, K, V>) -> /* Because tasks are fixed to F all builds are forced to be wrapped in F */ Kind<F, Store<I, K, V>>
-
-typealias Rebuilder<F, IR, K, V> = BuildComponents<K, F, IR>.(K, V, Task<F, K, V>) -> Task<F, K, V>
-
-typealias Scheduler<F, I, IR, K, V> = BuildComponents<K, F, IR>.(Rebuilder<F, IR, K, V>) -> Build<F, I, K, V>
-
-interface BuildSystem<K, F> : Order<K>, Fx<F>
-
-interface BuildComponents<K, F, IR> : Order<K>, Fx<F>, MonadState<F, IR>, BuildSystem<K, F>
 
 /** Scheduling algorithms */
 
@@ -124,7 +132,7 @@ typealias Time = Int
 
 typealias MakeInfo<K> = Tuple2<Time, Map<K, Time>>
 
-fun <F, K, V> modTimeRebuilder(): Rebuilder<F, MakeInfo<K>, K, V> = { key, value, task ->
+fun <F, K, V> modTimeRebuilder(): Rebuilder<F, MakeInfo<K>, K, V> = { key: K, value: V, task: Task<F, K, V> ->
   object : Task<F, K, V> {
     override fun run(func: (K) -> Kind<F, V>): Kind<F, V> = fx {
       val (now: Time, modTimes: Map<K, Time>) = !get()
