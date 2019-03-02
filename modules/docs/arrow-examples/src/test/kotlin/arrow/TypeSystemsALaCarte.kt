@@ -4,13 +4,10 @@ import arrow.core.Option
 import arrow.core.Tuple2
 import arrow.core.toOption
 import arrow.core.toT
-import arrow.data.State
-import arrow.effects.extensions.io.concurrentEffect.concurrentEffect
-import arrow.effects.typeclasses.Concurrent
 import arrow.mtl.typeclasses.MonadState
-import arrow.typeclasses.Const
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Order
+import arrow.typeclasses.suspended.monad.Fx
 
 /**
 
@@ -38,6 +35,8 @@ type Scheduler c i ir k v=Rebuildercirkv->Buildcikv
 type Rebuilderc ir k v = k-> v-> Task ckv-> Task(MonadStateir)kv
 
  */
+
+/* Normal definition
 
 interface Task<K, V> {
   fun <F, S> run(CE: Concurrent<F>, MS: MonadState<F, S>, func: (K) -> Kind<F, V>): Kind<F, V>
@@ -76,76 +75,96 @@ typealias Rebuilder<IR, K, V> = (key: K, value: V, task: Task<K, V>) -> Task<K, 
 
 typealias Scheduler<I, IR, K, V> = (rebuilder: Rebuilder<IR, K, V>) -> Build<I, K, V>
 
+*/
+
+
+interface Task<F, K, V> {
+  fun run(func: (K) -> Kind<F, V>): Kind<F, V>
+}
+
+typealias Tasks<F, K, V> = (K) -> Option<Task<F, K, V>>
+
+data class Store<I, K, V>(val information: I, private val get: (K) -> V) {
+  fun putInfo(information: I) = Store(information, get)
+
+  fun getValue(key: K): V = get(key)
+
+  fun putValue(eq: Eq<K>, key: K, value: V): Store<I, K, V> =
+    Store(information) { newKey ->
+      val equals = eq.run {
+        key.eqv(newKey)
+      }
+      if (equals) value else get(newKey)
+    }
+}
+
+data class Hash<V> private constructor(private val valueHash: Int) {
+
+  companion object {
+    operator fun <V> invoke(hashable: arrow.typeclasses.Hash<V>, value: V) = hashable.run {
+      Hash<V>(value.hash())
+    }
+  }
+
+  fun <I, K> getHash(hashable: arrow.typeclasses.Hash<V>, key: K, store: Store<I, K, V>) = Hash(hashable, store.getValue(key))
+}
+
+typealias Build<F, I, K, V> = (tasks: Tasks<F, K, V>, key: K, store: Store<I, K, V>) -> Store<I, K, V>
+
+typealias Rebuilder<F, IR, K, V> = (key: K, value: V, task: Task<F, K, V>) -> Task<F, K, V>
+
+typealias Scheduler<F, I, IR, K, V> = (rebuilder: Rebuilder<F, IR, K, V>) -> Build<F, I, K, V>
 
 typealias Time = Int
 typealias MakeInfo<K> = Tuple2<Time, Map<K, Time>>
 
-fun <K, V> modTimeRebuilder(): Rebuilder<MakeInfo<K>, K, V> = { key, value, task ->
-  object : Task<K, V> {
-
-    override fun <F, S> run(CE: Concurrent<F>, MS: MonadState<F, S>, func: (K) -> Kind<F, V>): Kind<F, V> =
-      (MS.get() as Tuple2<Time, Map<K, Time>>).let { (now: Time, modTimes: Map<K, Time>) ->
-        modTimes[key].toOption().fold({
-          MS.set((now + 1 toT modTimes.plus(key to now)) as S)
-          task.run(CE, MS, func)
-        }, {
-          CE.just(value)
-        })
-      }
+fun <F, K, V> BuildSystem<K, F>.modTimeRebuilder(): Rebuilder<F, MakeInfo<K>, K, V> = { key, value, task ->
+  object : Task<F, K, V> {
+    override fun run(func: (K) -> Kind<F, V>): Kind<F, V> = fx {
+      val (now: Time, modTimes: Map<K, Time>) = !get()
+      modTimes[key].toOption().fold({
+        set(now + 1 toT modTimes.plus(key to now))
+        !task.run(func)
+      }, {
+        value
+      })
+    }
   }
 }
 
-
 typealias Graph<K> = List<K>
 
-fun <K> topSort(ord: Order<K>, depGraph: Graph<K>): List<K> = depGraph.sortedWith( Comparator { a, b -> ord.run { a.compare(b) } })
+fun <K> Order<K>.topSort(depGraph: Graph<K>): List<K> = depGraph.sortedWith(Comparator { a, b -> a.compare(b) })
 
 fun <K> reachable(f: ((K) -> List<K>), k: K): Graph<K> = f(k)
 
-fun <K, V> dependencies(task: Task<K, V>): List<K> = listOf()
+fun <F, K, V> dependencies(task: Task<F, K, V>): List<K> = listOf()
 
-//reachable :: Ord k => (k -> [k]) -> k -> Graph k
+interface BuildSystem<K, F> : Order<K>, Fx<F>, MonadState<F, MakeInfo<K>>
 
-fun <I, K, V> topological(ord: Order<K>, rebuilder: Rebuilder<I, K, V>, tasks: Tasks<K, V>, target: K, store: Store<I, K, V>): Scheduler<I, I, K, V> {
+fun <F, I, K, V> BuildSystem<K, F>.topological(rebuilder: Rebuilder<F, I, K, V>, tasks: Tasks<F, K, V>, target: K, store: Store<I, K, V>): Kind<F, Store<I, K, V>> = fx {
   val dep: (K) -> Graph<K> = { k: K -> tasks(k).fold({ emptyList() }, { dependencies(it) }) }
-  val order: List<K> = topSort(ord, reachable(dep, target))
-  val build: (K) -> State<Store<I, K, V>, Unit> = { k: K ->
-    tasks(k).fold({
-      State { s -> s toT Unit }
+  val order: List<K> = topSort(reachable(dep, target))
+  order.foldRight(store) { currTarget: K, acc: Store<I, K, V> ->
+    tasks(currTarget).fold({
+      acc
     }, { task ->
-      val value: V = store.getValue(k)
-      val newTask: Task<K, V> = rebuilder(k, value, task)
-      val fetch: (K) -> State<I, V> = {
-        store.getValue(it)
-      }
+      val value: V = store.getValue(currTarget)
+      val newTask: Task<F, K, V> = rebuilder(currTarget, value, task)
+      val newValue: V = !newTask.run { just(store.getValue(it)) }
+      store.putValue(this@topological, currTarget, newValue)
     })
   }
 }
 
-
-// topological :: Ord k => Scheduler Applicative i i k v
-// topological rebuilder tasks target = execState $ mapM_ build order
-//   where
-//     build :: k -> State (Store i k v) ()
-//     build key = case tasks key of
-//       Nothing -> return ()
-//       Just task -> do
-//         store <- get
-//         let value = getValue key store
-//             newTask :: Task (MonadState i) k v
-//             newTask = rebuilder key value task
-//             fetch :: k -> State i v
-//             fetch k = return (getValue k store)
-//         newValue <- liftStore (run newTask fetch)
-//         modify $ putValue key newValue
-//     order = topSort (reachable dep target)
-//     dep k = case tasks k of { Nothing -> []; Just task -> dependencies task }
-
-
-fun <K, V> make(): Build<MakeInfo<K>, K, V> =
-  { tasks, key, store ->
-    topological(modTimeRebuilder, tasks, key, store)
+fun <F, K, V> BuildSystem<K, F>.make(): Kind<F, Build<F, MakeInfo<K>, K, V>> = fx {
+  val build: Build<F, MakeInfo<K>, K, V> = { tasks: Tasks<F, K, V>, key: K, store: Store<MakeInfo<K>, K, V> ->
+    val topological: Kind<F, Store<MakeInfo<K>, K, V>> = topological(modTimeRebuilder(), tasks, key, store)
+    val bind: Store<MakeInfo<K>, K, V> = !topological
+    bind
   }
+  build
+}
 
 // -- A restarting task scheduler
 // restarting :: Ord k => Scheduler Monad (ir, Chain k) ir k v
@@ -170,6 +189,5 @@ fun <K, V> make(): Build<MakeInfo<K>, K, V> =
 //           Left dep -> go done $ dep: filter (/= dep) keys ++ [key]
 //           Right newValue -> do modify $ putValue key newValue
 //                                (key :) <$> go (Set.insert key done) keys
-
 
 fun <F, IR> restarting(ord: Order<F>) = 1
