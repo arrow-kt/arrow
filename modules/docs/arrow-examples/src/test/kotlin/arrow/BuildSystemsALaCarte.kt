@@ -39,7 +39,8 @@ interface Task<F, K, V> {
 typealias Tasks<F, K, V> = (K) -> Option<Task<F, K, V>>
 
 typealias Build<F, I, K, V> =
-  BuildSystem<K, F>.(Tasks<F, K, V>, K, Store<I, K, V>) -> /* Because tasks are fixed to F all builds are forced to be wrapped in F */ Kind<F, Store<I, K, V>>
+  BuildSystem<K, F>.(Tasks<F, K, V>, K, Store<I, K, V>) ->
+  /* Because tasks are fixed to F all builds are forced to be wrapped in F */ Kind<F, Store<I, K, V>>
 
 typealias Rebuilder<F, IR, K, V> = BuildComponents<K, F, IR>.(K, V, Task<F, K, V>) -> Task<F, K, V>
 
@@ -50,9 +51,11 @@ interface BuildSystem<K, F> : Order<K>, Fx<F>
 interface BuildComponents<K, F, IR> : Order<K>, Fx<F>, MonadState<F, IR>, BuildSystem<K, F>
 
 data class Store<I, K, V>(val information: I, private val get: (K) -> V) {
-  fun putInfo(information: I) = Store(information, get)
+  fun putInfo(information: I) =
+    Store(information, get)
 
-  fun getValue(key: K): V = get(key)
+  fun getValue(key: K): V =
+    get(key)
 
   fun putValue(eq: Eq<K>, key: K, value: V): Store<I, K, V> =
     Store(information) { newKey ->
@@ -71,7 +74,8 @@ data class Hashable<V> private constructor(private val valueHash: Int) {
     }
   }
 
-  fun <I, K> getHash(hashable: arrow.typeclasses.Hash<V>, key: K, store: Store<I, K, V>) = Hashable(hashable, store.getValue(key))
+  fun <I, K> getHash(hashable: arrow.typeclasses.Hash<V>, key: K, store: Store<I, K, V>) =
+    Hashable(hashable, store.getValue(key))
 }
 
 /** Scheduling algorithms */
@@ -82,7 +86,7 @@ fun <F, I, K, V> BuildComponents<K, F, I>.topological(): Scheduler<F, I, I, K, V
     fx {
       val dep: (K) -> Graph<K> = { k: K -> tasks(k).fold({ emptyList() }, { dependencies(it) }) }
       val order: List<K> = topSort(reachable(dep, target))
-      order.foldRight(store) { currTarget: K, acc: Store<I, K, V> ->
+      order.fold(store) { acc: Store<I, K, V>, currTarget: K ->
         tasks(currTarget).fold({
           acc
         }, { task ->
@@ -107,8 +111,7 @@ fun <F, I, K, V> BuildComponents<K, F, I>.topological(): Scheduler<F, I, I, K, V
 fun <F, I, K, V> suspending(): Scheduler<F, I, I, K, V> = { rebuilder: Rebuilder<F, I, K, V> ->
   val eqInstance = this // implicit label missing
   { tasks: Tasks<F, K, V>, target: K, startStore: Store<I, K, V> ->
-    tailRecM(startStore toT emptySet<K>()) { state ->
-      val (store, completedTasks) = state
+    tailRecM(startStore toT emptySet<K>()) { (store, completedTasks) ->
       tasks(target).fold({
         store.right().just()
       }, { task ->
