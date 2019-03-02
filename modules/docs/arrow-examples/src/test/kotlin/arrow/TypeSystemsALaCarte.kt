@@ -1,6 +1,7 @@
 package arrow
 
 import arrow.core.Option
+import arrow.effects.typeclasses.Concurrent
 import arrow.typeclasses.Eq
 
 /**
@@ -22,7 +23,7 @@ newtypeTask ckv = Task{
 run::forallf.cf
 =>(k->f v)-> f v}
 
-type Tasks ckv= k -> Maybe(Task ckv)
+type Tasks c k v= k -> Maybe(Task ckv)
 -- Build system (see ğ3.3) type Build c i k v = Tasks c k v -> k -> Store i k v -> Store i k v
 -- Build system components: a scheduler and a rebuilder (see ğ5)
 type Scheduler c i ir k v=Rebuildercirkv->Buildcikv
@@ -31,7 +32,7 @@ type Rebuilderc ir k v = k-> v-> Task ckv-> Task(MonadStateir)kv
  */
 
 interface Task<K, V> {
-    fun <F> run(func: (K) -> Kind<F, V>): Kind<F, V>
+    fun <F> run(CE: Concurrent<F>, func: (K) -> Kind<F, V>): Kind<F, V>
 }
 
 typealias Tasks<K, V> = (K) -> Option<Task<K, V>>
