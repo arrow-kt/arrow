@@ -82,13 +82,13 @@ data class Hashable<V> private constructor(private val valueHash: Int) {
 
 // I didn't like the original version using State, so I rewrote it as a fold
 fun <F, I, K, V> BuildComponents<K, F, I>.topological(): Scheduler<F, I, I, K, V> = { rebuilder: Rebuilder<F, I, K, V> ->
-  { tasks: Tasks<F, K, V>, target: K, store: Store<I, K, V> ->
+  { tasks: Tasks<F, K, V>, target: K, startStore: Store<I, K, V> ->
     fx {
       val dep: (K) -> Graph<K> = { k: K -> tasks(k).fold({ emptyList() }, { dependencies(it) }) }
       val order: List<K> = topSort(reachable(dep, target))
-      order.fold(store) { acc: Store<I, K, V>, currTarget: K ->
+      order.fold(startStore) { store: Store<I, K, V>, currTarget: K ->
         tasks(currTarget).fold({
-          acc
+          store
         }, { task ->
           val value: V = store.getValue(currTarget)
 
@@ -96,7 +96,8 @@ fun <F, I, K, V> BuildComponents<K, F, I>.topological(): Scheduler<F, I, I, K, V
           // This causes Build to return a Kind, and will probably make Rebuilder and Scheduler return one too if I dug a bit more on it
           //
           // val newTask: Task<ForId, K, V> = rebuilder(currTarget, value, task)
-          // val newValue = newTask.run { State<I, V> { it toT store.getValue(currTarget) }.run(Id.monad(), acc.information).map { it.b } }.extract()
+          // val newValue =
+          //   newTask.run { State<I, V> { it toT store.getValue(currTarget) }.run(Id.monad(), acc.information).map { it.b } }.extract()
 
           val newTask: Task<F, K, V> = rebuilder(currTarget, value, task)
           val newValue: V = !newTask.run { just(store.getValue(it)) }
