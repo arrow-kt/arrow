@@ -5,8 +5,6 @@ import arrow.test.generators.tuple3
 import arrow.test.generators.tuple4
 import arrow.test.generators.tuple5
 import arrow.typeclasses.Eq
-import io.kotlintest.Matcher
-import io.kotlintest.Result
 import io.kotlintest.TestContext
 import io.kotlintest.properties.Gen
 import io.kotlintest.should
@@ -21,11 +19,9 @@ fun <A> A.equalUnderTheLaw(b: A, eq: Eq<A>): Boolean =
   eq.run { eqv(b) }
 
 fun <A> A.shouldBeEq(b: A, eq: Eq<A>): Unit = eq.run {
-  this.should(object: Matcher<Eq<A>> {
-    override fun test(value: Eq<A>): Result {
-      return io.kotlintest.Result(eqv(b), "Expected: ${this@shouldBeEq} but found: $b", "$this and $b should be equal")
-    }
-  })
+  this.should {
+    io.kotlintest.Result(eqv(b), "Expected: $this but found: $b", "$this and $b should be equal")
+  }
 }
 
 fun <A> forFew(amount: Int, gena: Gen<A>, fn: (a: A) -> Boolean): Unit {
