@@ -53,11 +53,18 @@ suspend fun <E, A, B> (suspend () -> Either<E, A>).map(f: (A) -> B): suspend () 
 suspend fun <E, A, B> (suspend () -> Either<E, A>).mapLeft(f: (E) -> B): suspend () -> Either<B, A> =
   { mapLeft(f)() }
 
+suspend fun <E, A> (suspend () -> Either<E, A>).attempt(): Either<E, A> =
+  try {
+    this()
+  } catch (e: Throwable) {
+    throw RaisedError(e.nonFatalOrThrow())
+  }
+
 @Suppress("UNCHECKED_CAST")
 suspend fun <E, A, B> (suspend () -> Either<E, A>).flatMap(f: (A) -> suspend () -> Either<E, B>): suspend () -> Either<E, B> = {
-  when (val x = this()) {
+  when (val x = this.attempt()) {
     is Either.Left -> x.a.left()
-    is Either.Right -> f(x.b)()
+    is Either.Right -> f(x.b).attempt()
   }
 }
 
@@ -74,18 +81,26 @@ fun <E> E.raiseError(): suspend () -> Either<E, Nothing> =
   { left() }
 
 suspend fun <E, A> (suspend () -> Either<E, A>).handleErrorWith(f: (E) -> suspend () -> Either<E, A>): suspend () -> Either<E, A> = {
-  when (val result = this()) {
-    is Either.Left -> f(result.a)()
-    is Either.Right -> this@handleErrorWith()
+  when (val result = this.attempt()) {
+    is Either.Left -> f(result.a).attempt()
+    is Either.Right -> this@handleErrorWith.attempt()
+  }
+}
+
+suspend fun <E, A> (suspend () -> Either<E, A>).handleErrorWith(unit: Unit = Unit, f: (Throwable) -> suspend () -> Either<E, A>): suspend () -> Either<E, A> = {
+  try {
+    this()
+  } catch (t: Throwable) {
+    !f(t.nonFatalOrThrow())
   }
 }
 
 suspend fun <E, A> (suspend () -> Either<E, A>).handleError(f: (E) -> A): suspend () -> Either<E, A> = {
-  when (val result = this()) {
+  when (val result = this.attempt()) {
     is Either.Left -> {
       f(result.a).right()
     }
-    is Either.Right -> this@handleError()
+    is Either.Right -> this@handleError.attempt()
   }
 }
 
@@ -93,7 +108,7 @@ suspend fun <E, A> (suspend () -> Either<E, A>).ensure(
   error: () -> E,
   predicate: (A) -> Boolean
 ): suspend () -> Either<E, A> = {
-  when (val result = this()) {
+  when (val result = this.attempt()) {
     is Either.Left -> this@ensure()
     is Either.Right -> if (predicate(result.b)) this@ensure()
     else {
@@ -238,7 +253,7 @@ interface BIOMonadThrow<E> : MonadThrow<BIOPartialOf<E>>, BIOMonad<E> {
     BIO { throw RaisedError(e) }
 
   override fun <A> BIOOf<E, A>.handleErrorWith(f: (Throwable) -> BIOOf<E, A>): BIO<E, A> =
-    BIO { fix().fa.handleErrorWith { t: Throwable -> f(t).fix().fa }() }
+    BIO { !fix().fa.handleErrorWith { t: Throwable -> f(t).fix().fa } }
 }
 
 @extension
@@ -331,7 +346,7 @@ interface BIOUnsafeRun<E> : UnsafeRun<BIOPartialOf<E>> {
   override suspend fun <A> unsafe.runNonBlocking(fa: () -> BIOOf<E, A>, cb: (Either<Throwable, A>) -> Unit) {
     fa().fix()
       .fa
-      .startCoroutine(asyncContinuation(NonBlocking){ acb: Either<Throwable, Either<E, A>> ->
+      .startCoroutine(asyncContinuation(NonBlocking) { acb: Either<Throwable, Either<E, A>> ->
         when (acb) {
           is Either.Left -> cb(Left(acb.a))
           is Either.Right -> when (val result = acb.b) {

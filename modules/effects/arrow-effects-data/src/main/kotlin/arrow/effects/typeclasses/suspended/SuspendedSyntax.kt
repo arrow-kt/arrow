@@ -454,6 +454,13 @@ class RaisedError(val exception: Throwable) : Throwable() {
 
   override val cause: Throwable?
     get() = exception
+
+  override fun equals(other: Any?): Boolean =
+    when (other) {
+      is RaisedError -> exception.message == other.exception.message
+      is Throwable -> exception.message == other.message
+      else -> exception == other
+    }
 }
 
 inline fun <A> Throwable.raiseError(): suspend () -> A =
@@ -506,7 +513,7 @@ inline fun <A> (suspend () -> A).handleErrorWith(crossinline f: (Throwable) -> s
     } catch (r: RaisedError) {
       !f(r.exception)
     } catch (e: Throwable) {
-      !f(e)
+      !f(e.nonFatalOrThrow())
     }
   }
 
