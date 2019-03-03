@@ -119,7 +119,7 @@ fun <F, I, K, V> BuildComponents<K, F, I>.topological(): Scheduler<F, I, I, K, V
   }
 }
 
-// I didn't like the original version using State, so I rewrote it using fx
+// I didn't like the original version using State, so I FUCKED IT UP *sigh*
 fun <F, I, K, V> suspending(): Scheduler<F, I, I, K, V> = { rebuilder: Rebuilder<F, I, K, V> ->
   val eqInstance = this // implicit label missing
   { tasks: Tasks<F, K, V>, target: K, startStore: Store<I, K, V> ->
