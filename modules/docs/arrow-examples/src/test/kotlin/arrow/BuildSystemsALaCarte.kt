@@ -1,6 +1,9 @@
 package arrow
 
-import arrow.core.*
+import arrow.core.Option
+import arrow.core.Tuple2
+import arrow.core.toOption
+import arrow.core.toT
 import arrow.mtl.typeclasses.MonadState
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Hash
@@ -32,9 +35,7 @@ import arrow.typeclasses.suspended.monad.Fx
 
 /** The basic types */
 
-interface Task<F, K, V> {
-  fun run(func: (K) -> Kind<F, V>): Kind<F, V>
-}
+typealias Task<F, K, V> = ((K) -> Kind<F, V>) -> Kind<F, V>
 
 typealias Tasks<F, K, V> = (K) -> Option<Task<F, K, V>>
 
@@ -100,7 +101,7 @@ fun <F, I, K, V> BuildComponents<K, F, I>.topological(): Scheduler<F, I, I, K, V
           //   newTask.run { State<I, V> { it toT store.getValue(currTarget) }.run(Id.monad(), acc.information).map { it.b } }.extract()
 
           val newTask: Task<F, K, V> = rebuilder(currTarget, value, task)
-          val newValue: V = !newTask.run { just(store.getValue(it)) }
+          val newValue: V = !newTask { just(store.getValue(it)) }
           store.putValue(this@topological, currTarget, newValue)
         })
       }
@@ -108,27 +109,31 @@ fun <F, I, K, V> BuildComponents<K, F, I>.topological(): Scheduler<F, I, I, K, V
   }
 }
 
-// I didn't like the original version using State, so I rewrote it as a tailRecM
+// I didn't like the original version using State, so I rewrote it using fx
 fun <F, I, K, V> suspending(): Scheduler<F, I, I, K, V> = { rebuilder: Rebuilder<F, I, K, V> ->
   val eqInstance = this // implicit label missing
   { tasks: Tasks<F, K, V>, target: K, startStore: Store<I, K, V> ->
-    tailRecM(startStore toT emptySet<K>()) { (store, completedTasks) ->
+    fun fetch(key: K, store: Store<I, K, V>, completedTasks: Set<K>): Kind<F, Store<I, K, V>> =
       tasks(target).fold({
-        store.right().just()
+        store.just()
       }, { task ->
         if (completedTasks.contains(target)) {
-          store.right().just()
+          store.just()
         } else {
           val value: V = store.getValue(target)
           fx {
             val newTask: Task<F, K, V> = rebuilder(target, value, task)
-            val newValue: V = !newTask.run { just(store.getValue(it)) }
-            val newStore: Store<I, K, V> = store.putValue(eqInstance, target, newValue)
-            (newStore toT completedTasks.plus(target)).left()
+            val newValue: V = !newTask { kk ->
+              fx {
+                fetch(key, store, completedTasks).bind().getValue(kk)
+              }
+            }
+            store.putValue(eqInstance, target, newValue)
           } // TODO handleErrorWith if you ever make a serious build system
         }
       })
-    }
+
+    fetch(target, startStore, emptySet())
   }
 }
 
@@ -139,12 +144,12 @@ typealias Time = Int
 typealias MakeInfo<K> = Tuple2<Time, Map<K, Time>>
 
 fun <F, K, V> modTimeRebuilder(): Rebuilder<F, MakeInfo<K>, K, V> = { key: K, value: V, task: Task<F, K, V> ->
-  object : Task<F, K, V> {
-    override fun run(func: (K) -> Kind<F, V>): Kind<F, V> = fx {
+  { func: (K) -> Kind<F, V> ->
+    fx {
       val (now: Time, modTimes: Map<K, Time>) = !get()
       modTimes[key].toOption().fold({
         !set(now + 1 toT modTimes.plus(key to now))
-        !task.run(func)
+        !task(func)
       }, {
         value
       })
