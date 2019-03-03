@@ -1,14 +1,16 @@
 package arrow
 
-import arrow.core.Option
-import arrow.core.Tuple2
-import arrow.core.toOption
-import arrow.core.toT
+import arrow.core.*
+import arrow.core.extensions.order
+import arrow.effects.rx2.*
+import arrow.effects.rx2.extensions.observablek.monad.monad
 import arrow.mtl.typeclasses.MonadState
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Hash
+import arrow.typeclasses.Monad
 import arrow.typeclasses.Order
 import arrow.typeclasses.suspended.monad.Fx
+import io.reactivex.Observable
 
 /**
  * This is a working Kotlin transcription of Build Systems a la Carte
@@ -81,6 +83,14 @@ data class Hashable<V> private constructor(private val valueHash: Int) {
 
 /** Scheduling algorithms */
 
+typealias Graph<K> = List<K>
+
+fun <K> Order<K>.topSort(depGraph: Graph<K>): List<K> = depGraph.sortedWith(Comparator { a, b -> a.compare(b) })
+
+fun <K> reachable(f: ((K) -> List<K>), k: K): Graph<K> = f(k)
+
+fun <F, K, V> dependencies(task: Task<F, K, V>): List<K> = listOf()
+
 // I didn't like the original version using State, so I rewrote it as a fold
 fun <F, I, K, V> BuildComponents<K, F, I>.topological(): Scheduler<F, I, I, K, V> = { rebuilder: Rebuilder<F, I, K, V> ->
   { tasks: Tasks<F, K, V>, target: K, startStore: Store<I, K, V> ->
@@ -114,21 +124,24 @@ fun <F, I, K, V> suspending(): Scheduler<F, I, I, K, V> = { rebuilder: Rebuilder
   val eqInstance = this // implicit label missing
   { tasks: Tasks<F, K, V>, target: K, startStore: Store<I, K, V> ->
     fun fetch(key: K, store: Store<I, K, V>, completedTasks: Set<K>): Kind<F, Store<I, K, V>> =
-      tasks(target).fold({
+      tasks(key).fold({
         store.just()
       }, { task ->
-        if (completedTasks.contains(target)) {
+        // FIXME completedTasks is never updated!!!
+        if (completedTasks.contains(key)) {
           store.just()
         } else {
-          val value: V = store.getValue(target)
           fx {
-            val newTask: Task<F, K, V> = rebuilder(target, value, task)
+            val value: V = store.getValue(key)
+            val newTask: Task<F, K, V> = rebuilder(key, value, task)
             val newValue: V = !newTask { kk ->
               fx {
-                fetch(key, store, completedTasks).bind().getValue(kk)
+                fetch(kk, store, completedTasks).bind().getValue(key)
               }
             }
-            store.putValue(eqInstance, target, newValue)
+            println("Writing $key $newValue")
+
+            store.putValue(eqInstance, key, newValue)
           } // TODO handleErrorWith if you ever make a serious build system
         }
       })
@@ -165,12 +178,54 @@ fun <F, K, V> BuildComponents<K, F, MakeInfo<K>>.make(): Build<F, MakeInfo<K>, K
   build(tasks, key, store)
 }
 
-/** Mock Helpers */
+fun <F, K, V> BuildComponents<K, F, MakeInfo<K>>.mine(): Build<F, MakeInfo<K>, K, V> = { tasks: Tasks<F, K, V>, key: K, store: Store<MakeInfo<K>, K, V> ->
+  val suspending: Scheduler<F, MakeInfo<K>, MakeInfo<K>, K, V> = suspending()
+  val build: Build<F, MakeInfo<K>, K, V> = suspending(modTimeRebuilder())
+  build(tasks, key, store)
+}
 
-typealias Graph<K> = List<K>
+fun main() {
+  val a = object : BuildComponents<Int, ForObservableK, MakeInfo<Int>> {
+    var i: MakeInfo<Int> = 0 toT emptyMap()
 
-fun <K> Order<K>.topSort(depGraph: Graph<K>): List<K> = depGraph.sortedWith(Comparator { a, b -> a.compare(b) })
+    override fun Int.compare(b: Int): Int = Int.order().run { compare(b) }
 
-fun <K> reachable(f: ((K) -> List<K>), k: K): Graph<K> = f(k)
+    override fun monad(): Monad<ForObservableK> = ObservableK.monad()
 
-fun <F, K, V> dependencies(task: Task<F, K, V>): List<K> = listOf()
+    override fun get(): Kind<ForObservableK, MakeInfo<Int>> = ObservableK.just(i)
+
+    override fun set(s: MakeInfo<Int>): Kind<ForObservableK, Unit> = ObservableK {
+      i = s
+    }
+
+    override fun <A, B> Kind<ForObservableK, A>.flatMap(f: (A) -> Kind<ForObservableK, B>): Kind<ForObservableK, B> =
+      fix().concatMap { f(it).fix() }
+
+    override fun <A, B> tailRecM(a: A, f: (A) -> Kind<ForObservableK, Either<A, B>>): Kind<ForObservableK, B> = ObservableK.tailRecM(a, f)
+
+    override fun <A> just(a: A): Kind<ForObservableK, A> = ObservableK.just(a)
+  }
+
+  val build: ObservableK<Store<MakeInfo<Int>, Int, String>> = a.mine<ForObservableK, Int, String>().invoke(a, {
+    println("Building $it")
+    when (it) {
+      0 -> Some({ buildDep: (Int) -> Kind<ForObservableK, String> ->
+        Observable.range(1, 5).concatMap { buildDep(it).value() }.k()
+      })
+      1 -> Some({ buildDep: (Int) -> Kind<ForObservableK, String> ->
+        Observable.range(2, 5).concatMap { buildDep(it).value() }.k()
+      })
+      2 -> Some({ buildDep: (Int) -> Kind<ForObservableK, String> ->
+        Observable.range(100, 5).concatMap { buildDep(it).value() }.k()
+      })
+      100 -> Some({ buildDep: (Int) -> Kind<ForObservableK, String> ->
+        Observable.range(300, 5).concatMap { buildDep(it).value() }.k()
+      })
+      else -> Some({ func: (Int) -> Kind<ForObservableK, String> ->
+        Observable.just("$it").k()
+      })
+    }
+  }, 0, Store(0 toT emptyMap()) { it.toString() }).fix()
+
+  println(build.value().blockingFirst().information)
+}
