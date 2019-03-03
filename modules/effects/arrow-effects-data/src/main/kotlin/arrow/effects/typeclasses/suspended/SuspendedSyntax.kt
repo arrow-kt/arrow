@@ -130,7 +130,7 @@ private class PoolContinuation<T>(
 ) : kotlin.coroutines.Continuation<T> {
   override val context: CoroutineContext = cont.context
 
-  override fun resumeWith(result: Result<T>) {
+  override fun resumeWith(result: kotlin.Result<T>) {
     pool.execute { cont.resumeWith(result) }
   }
 }
@@ -183,7 +183,7 @@ interface FxConcurrent : Concurrent<ForFx>, FxAsync {
 private class BlockingCoroutine<T>(override val context: CoroutineContext) : kotlin.coroutines.Continuation<T> {
   private val lock = ReentrantLock()
   private val done = lock.newCondition()
-  private var result: Result<T>? = null
+  private var result: kotlin.Result<T>? = null
 
   private inline fun <T> locked(block: () -> T): T {
     lock.lock()
@@ -200,7 +200,7 @@ private class BlockingCoroutine<T>(override val context: CoroutineContext) : kot
     }
   }
 
-  override fun resumeWith(result: Result<T>) = locked {
+  override fun resumeWith(result: kotlin.Result<T>) = locked {
     this.result = result
     done.signal()
   }
@@ -226,7 +226,7 @@ interface FxUnsafeRun : UnsafeRun<ForFx> {
     fa().fix().fa.startCoroutine(asyncContinuation(NonBlocking, cb))
 }
 
-private fun <A> (suspend () -> A).foldContinuation(
+internal fun <A> (suspend () -> A).foldContinuation(
   context: CoroutineContext = EmptyCoroutineContext,
   onError: (Throwable) -> A
 ): A {
@@ -331,7 +331,7 @@ suspend fun <A, B> CoroutineContext.racePair(
 }
 
 suspend fun <A, B, C> CoroutineContext.raceTriple(fa: suspend () -> A, fb: suspend () -> B, fc: suspend () -> C): suspend () -> RaceTriple<ForFx, A, B, C> =
-  fromAsync { conn, cb ->
+  fromAsync<RaceTriple<ForFx, A, B, C>> { conn, cb ->
     val active = AtomicBoolean(true)
 
     val upstreamCancelToken = Fx { if (conn.isCanceled()) Fx { Unit }() else conn.cancel()() }
@@ -465,7 +465,6 @@ suspend fun <A, B> (suspend () -> A).map(f: (A) -> B): suspend () -> B =
 fun <A> just(a: A): suspend () -> A =
   { a }
 
-
 val <A> A.just: suspend () -> A
   get() = { this }
 
@@ -590,7 +589,7 @@ suspend fun <A> CoroutineContext.startFiber(fa: suspend () -> A): suspend () -> 
 internal fun <A> fromAsync(fa: Proc<A>): suspend () -> A = {
   suspendCoroutine { continuation ->
     fa { either ->
-      continuation.resumeWith(either.fold(Result.Companion::failure, Result.Companion::success))
+      continuation.resumeWith(either.fold({ kotlin.Result.failure<A>(it) }, { kotlin.Result.success(it) }))
     }
   }
 }
@@ -599,9 +598,9 @@ suspend fun <A> fromAsync(fa: FxProc<A>): suspend () -> A = {
   suspendCoroutine { continuation ->
     val conn = FxConnection()
     //Is CancellationException from kotlin in kotlinx package???
-    conn.push(Fx { continuation.resumeWith(Result.failure(CancellationException())) })
+    conn.push(Fx { continuation.resumeWith(kotlin.Result.failure(CancellationException())) })
     fa(conn) { either ->
-      continuation.resumeWith(either.fold(Result.Companion::failure, Result.Companion::success))
+      continuation.resumeWith(either.fold({ kotlin.Result.failure<A>(it) }, { kotlin.Result.success(it) }))
     }
   }
 }
@@ -610,7 +609,7 @@ suspend fun <A> fromAsync(fa: FxProc<A>): suspend () -> A = {
 internal fun <A> fromAsyncF(fa: ProcF<ForFx, A>): suspend () -> A = {
   suspendCoroutine { continuation ->
     fa { either ->
-      continuation.resumeWith(either.fold(Result.Companion::failure, Result.Companion::success))
+      continuation.resumeWith(either.fold({ kotlin.Result.failure<A>(it) }, { kotlin.Result.success(it) }))
     }.fix().fa.foldContinuation(EmptyCoroutineContext, mapUnit)
   }
 }
@@ -619,11 +618,12 @@ fun <A> fromAsyncF(fa: FxProcF<A>): suspend () -> A = {
   suspendCoroutine { continuation ->
     val conn = FxConnection()
     //Is CancellationException from kotlin in kotlinx package???
-    conn.push(Fx { continuation.resumeWith(Result.failure(CancellationException())) })
+    conn.push(Fx { continuation.resumeWith(kotlin.Result.failure(CancellationException())) })
     fa(conn) { either ->
-      continuation.resumeWith(either.fold(Result.Companion::failure, Result.Companion::success))
+      continuation.resumeWith(either.fold({ kotlin.Result.failure<A>(it) }, { kotlin.Result.success(it) }))
     }.fix().fa.foldContinuation(EmptyCoroutineContext, mapUnit)
   }
 }
 
-private fun <P1, P2, R> ((P1) -> (P2) -> R).uncurried(): (P1, P2) -> R = { p1: P1, p2: P2 -> this(p1)(p2) }
+internal fun <P1, P2, R> ((P1) -> (P2) -> R).uncurried(): (P1, P2) -> R = { p1: P1, p2: P2 -> this(p1)(p2) }
+

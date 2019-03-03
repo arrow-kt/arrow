@@ -2,7 +2,6 @@ package arrow.effects
 
 import arrow.core.*
 import arrow.effects.IO.Companion.just
-import arrow.effects.extensions.concurrent
 import arrow.effects.extensions.io.async.async
 import arrow.effects.extensions.io.concurrent.concurrent
 import arrow.effects.extensions.io.concurrent.parMapN
