@@ -1,6 +1,5 @@
 package arrow.effects.typeclasses.suspended
 
-import arrow.Kind
 import arrow.core.*
 import arrow.effects.KindConnection
 import arrow.effects.internal.Platform
@@ -12,10 +11,8 @@ import arrow.effects.typeclasses.suspended.bio.monad.flatMap
 import arrow.extension
 import arrow.typeclasses.*
 import java.util.concurrent.CancellationException
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
-import kotlin.coroutines.startCoroutine
-import kotlin.coroutines.suspendCoroutine
+import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.coroutines.*
 
 class ForBIO private constructor() {
   companion object
@@ -303,7 +300,7 @@ interface BIOConcurrent<E> : Concurrent<BIOPartialOf<E>>, BIOAsync<E> {
   }
 
   override fun <A> asyncF(fa: ConnectedProcF<BIOPartialOf<E>, A>): BIO<E, A> =
-    TODO()
+    BIO { fromAsyncF(fa)().right() }
 
   override fun <A, B> CoroutineContext.racePair(fa: BIOOf<E, A>, fb: BIOOf<E, B>): BIO<E, RacePair<BIOPartialOf<E>, A, B>> {
     TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
@@ -336,4 +333,93 @@ internal fun <E, A> BIOFiber(
     }
   }
   return Fiber(join, conn.cancel())
+}
+
+fun <E, A> fromAsyncF(fa: BIOProcF<E, A>): suspend () -> A = {
+  suspendCoroutine { continuation ->
+    val conn = BIOConnection<E>()
+    //Is CancellationException from kotlin in kotlinx package???
+    conn.push(BIO { continuation.resumeWith(kotlin.Result.failure(CancellationException())).right() })
+    fa(conn) { either ->
+      continuation.resumeWith(either.fold({ kotlin.Result.failure<A>(it) }, { kotlin.Result.success(it) }))
+    }.fix().fa.foldContinuation(EmptyCoroutineContext, mapUnit)
+  }
+}
+
+suspend fun <E, A, B> CoroutineContext.racePair(
+  fa: suspend () -> Either<E, A>,
+  fb: suspend () -> Either<E, B>
+): suspend () ->
+Either<E,
+  Either<
+    Tuple2<A, Fiber<BIOPartialOf<E>, B>>,
+    Tuple2<Fiber<BIOPartialOf<E>, A>, B>
+    >
+  > = {
+  fromAsync<E, Either<Tuple2<A, Fiber<BIOPartialOf<E>, B>>, Tuple2<Fiber<BIOPartialOf<E>, A>, B>>> { conn, cb: (Either<Throwable, Either<Tuple2<A, Fiber<BIOPartialOf<E>, B>>, Tuple2<Fiber<BIOPartialOf<E>, A>, B>>>) -> Unit ->
+    val active: AtomicBoolean = AtomicBoolean(true)
+    val upstreamCancelToken: BIO<E, Unit> = BIO.unit.flatMap { if (conn.isCanceled()) BIO.unit else conn.cancel() }
+
+    val connA: KindConnection<BIOPartialOf<E>> = BIOConnection()
+    connA.push(upstreamCancelToken)
+    val promiseA: UnsafePromise<Either<E, A>> = UnsafePromise()
+
+    val connB: KindConnection<BIOPartialOf<E>> = BIOConnection()
+    connB.push(upstreamCancelToken)
+    val promiseB = UnsafePromise<Either<E, B>>()
+
+    conn.pushPair(connA, connB)
+
+    fa.startCoroutine(asyncContinuation(this) { either ->
+      either.fold({ error: Throwable ->
+        if (active.getAndSet(false)) { //if an error finishes first, stop the race.
+          connB.cancel().fix().fa.startCoroutine(Continuation(EmptyCoroutineContext) { result ->
+            conn.pop()
+            result.fold(
+              onSuccess = { cb(Left(error)) },
+              onFailure = { cb(Left(Platform.composeErrors(error, it))) }
+            )
+          })
+        } else {
+          promiseA.complete(Left(error))
+        }
+      }, { a ->
+        when (a) {
+          is Either.Right ->
+            if (active.getAndSet(false)) {
+              conn.pop()
+              val fiber = BIOFiber(promiseB, connB)
+              cb(Right(Left(Tuple2(a.b, fiber))))
+            } else {
+              promiseA.complete(Right(a))
+            }
+          else -> TODO() // how to handle the E case here?
+        }
+      })
+    })
+
+    fb.startCoroutine(asyncContinuation(this) { either ->
+      either.fold({ error ->
+        if (active.getAndSet(false)) { //if an error finishes first, stop the race.
+          connA.cancel().fix().fa.startCoroutine(Continuation(EmptyCoroutineContext) { result ->
+            conn.pop()
+            result.fold(
+              onSuccess = { cb(Left(error)) },
+              onFailure = { cb(Left(Platform.composeErrors(error, it))) }
+            )
+          })
+        } else {
+          promiseB.complete(Left(error))
+        }
+      }, { b ->
+        if (active.getAndSet(false)) {
+          conn.pop()
+          val fiber = BIOFiber(promiseA, connA)
+          cb(Right(Right(Tuple2(fiber, b))))
+        } else {
+          promiseB.complete(Right(b))
+        }
+      })
+    })
+  }()
 }
