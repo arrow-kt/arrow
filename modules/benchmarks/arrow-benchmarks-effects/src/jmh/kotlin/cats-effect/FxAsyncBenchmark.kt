@@ -20,7 +20,7 @@ open class FxAsyncBenchmark {
   var size: Int = 0
 
   suspend fun evalAsync(n: Int): suspend () -> Int =
-    fromAsync { _, callback -> callback(Right(n)) }
+    fromAsync<Int> { _, callback -> callback(Right(n)) }
 
   tailrec suspend fun loopAsync(i: Int): suspend () -> Int =
     if (i < size) loopAsync(!evalAsync(i + 1))

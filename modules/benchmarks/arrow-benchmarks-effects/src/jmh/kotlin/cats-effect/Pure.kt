@@ -1,9 +1,12 @@
 package arrow.benchmarks.effects
 
+import arrow.core.Either
+import arrow.core.right
 import arrow.effects.IO
 import arrow.effects.extensions.io.unsafeRun.runBlocking as ioRunBlocking
 import arrow.effects.typeclasses.suspended.*
 import arrow.effects.typeclasses.suspended.fx.unsafeRun.runBlocking as fxRunBlocking
+import arrow.effects.typeclasses.suspended.bio.unsafeRun.runBlocking as bioRunBlocking
 import arrow.unsafe
 import kotlinx.coroutines.runBlocking
 import org.openjdk.jmh.annotations.*
@@ -38,6 +41,15 @@ open class Pure {
   @Benchmark
   fun fx(): Int =
     unsafe { fxRunBlocking { Fx { !fxPureLoop(0) } } }
+
+  tailrec suspend fun <E> bioPureLoop(i: Int): Either<E, Int> {
+    val j = !just(i)
+    return if (j > size) j.right()  else bioPureLoop(j + 1)
+  }
+
+  @Benchmark
+  fun bio(): Int =
+    unsafe { bioRunBlocking { BIO { bioPureLoop<String>(0) } } }
 
   fun ioPureLoop(i: Int): IO<Int> =
     IO.just(i).flatMap { j ->
