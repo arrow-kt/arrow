@@ -6,10 +6,11 @@ import arrow.effects.internal.Platform
 import arrow.effects.internal.UnsafePromise
 import arrow.effects.internal.asyncContinuation
 import arrow.effects.typeclasses.*
-import arrow.effects.typeclasses.suspended.bio.applicativeError.raiseError
 import arrow.effects.typeclasses.suspended.bio.monad.flatMap
+import arrow.effects.typeclasses.suspended.concurrent.Fx
 import arrow.extension
 import arrow.typeclasses.*
+import arrow.unsafe
 import java.util.concurrent.CancellationException
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.*
@@ -21,6 +22,7 @@ typealias BIOOf<E, A> = arrow.Kind2<ForBIO, E, A>
 typealias BIOPartialOf<E> = arrow.Kind<ForBIO, E>
 typealias BIOProc<E, A> = ConnectedProc<BIOPartialOf<E>, A>
 typealias BIOProcF<E, A> = ConnectedProcF<BIOPartialOf<E>, A>
+typealias BIOConnectedProc<E, A> = (KindConnection<BIOPartialOf<E>>, ((Either<Throwable, Either<E, A>>) -> Unit)) -> Unit
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
 inline fun <E, A> BIOOf<E, A>.fix(): BIO<E, A> =
@@ -39,20 +41,23 @@ class BIO<out E, out A>(internal val fa: suspend () -> Either<E, A>) : BIOOf<E, 
   }
 }
 
+suspend operator fun <E, A> BIOOf<Nothing, A>.invoke(): Either<E, A> =
+  fix().fa.invoke()
+
 fun <A> A.just(): BIO<Nothing, A> =
   BIO { right() }
 
 suspend fun <E, A, B> (suspend () -> Either<E, A>).map(f: (A) -> B): suspend () -> Either<E, B> =
-  { !map(f) }
+  { this().map(f) }
 
 suspend fun <E, A, B> (suspend () -> Either<E, A>).mapLeft(f: (E) -> B): suspend () -> Either<B, A> =
-  { !mapLeft(f) }
+  { mapLeft(f)() }
 
 @Suppress("UNCHECKED_CAST")
 suspend fun <E, A, B> (suspend () -> Either<E, A>).flatMap(f: (A) -> suspend () -> Either<E, B>): suspend () -> Either<E, B> = {
-  when (val x = !this) {
+  when (val x = this()) {
     is Either.Left -> x.a.left()
-    is Either.Right -> !f(x.b)
+    is Either.Right -> f(x.b)()
   }
 }
 
@@ -63,24 +68,24 @@ suspend fun <E, A> attempt(
   fa: suspend () -> A,
   onError: (Throwable) -> E
 ): suspend () -> Either<E, A> =
-  { !attempt(fa).mapLeft(onError) }
+  { attempt(fa).mapLeft(onError)() }
 
 fun <E> E.raiseError(): suspend () -> Either<E, Nothing> =
   { left() }
 
 suspend fun <E, A> (suspend () -> Either<E, A>).handleErrorWith(f: (E) -> suspend () -> Either<E, A>): suspend () -> Either<E, A> = {
-  when (val result = !this) {
-    is Either.Left -> !f(result.a)
-    is Either.Right -> !this@handleErrorWith
+  when (val result = this()) {
+    is Either.Left -> f(result.a)()
+    is Either.Right -> this@handleErrorWith()
   }
 }
 
 suspend fun <E, A> (suspend () -> Either<E, A>).handleError(f: (E) -> A): suspend () -> Either<E, A> = {
-  when (val result = !this) {
+  when (val result = this()) {
     is Either.Left -> {
       f(result.a).right()
     }
-    is Either.Right -> !this@handleError
+    is Either.Right -> this@handleError()
   }
 }
 
@@ -88,9 +93,9 @@ suspend fun <E, A> (suspend () -> Either<E, A>).ensure(
   error: () -> E,
   predicate: (A) -> Boolean
 ): suspend () -> Either<E, A> = {
-  when (val result = !this) {
-    is Either.Left -> !this@ensure
-    is Either.Right -> if (predicate(result.b)) !this@ensure
+  when (val result = this()) {
+    is Either.Left -> this@ensure()
+    is Either.Right -> if (predicate(result.b)) this@ensure()
     else {
       error().left()
     }
@@ -101,7 +106,7 @@ suspend fun <E, A, B> (suspend () -> Either<E, A>).bracketCase(
   release: (A, ExitCase<Throwable>) -> suspend () -> Either<E, Unit>,
   use: (A) -> suspend () -> Either<E, B>
 ): suspend () -> Either<E, B> = {
-  when (val result = !this) {
+  when (val result = this()) {
     is Either.Left -> result.a.left()
     is Either.Right -> {
       val a = result.b
@@ -135,7 +140,7 @@ suspend fun <E, A, B> (suspend () -> Either<E, A>).bracketCase(
 fun <E> BIOConnection(): KindConnection<BIOPartialOf<E>> =
   KindConnection(object : BIOMonadDefer<E> {}) { it.fix().fa.foldContinuation { e -> throw e } }
 
-suspend fun <E, A> fromAsync(fa: BIOProc<E, A>): suspend () -> Either<E, A> =
+suspend fun <E, A> fromAsync(fa: BIOConnectedProc<E, A>): suspend () -> Either<E, A> =
   suspendCoroutine { continuation ->
     val conn = BIOConnection<E>()
     //Is CancellationException from kotlin in kotlinx package???
@@ -143,8 +148,10 @@ suspend fun <E, A> fromAsync(fa: BIOProc<E, A>): suspend () -> Either<E, A> =
     fa(conn) { either ->
       continuation.resumeWith(
         either.fold(
-          { kotlin.Result.failure<suspend () -> Either<E, A>>(it) },
-          { kotlin.Result.success(suspend { it.right() }) }
+          {
+            kotlin.Result.failure<suspend () -> Either<E, A>>(it)
+          },
+          { kotlin.Result.success(suspend { it }) }
         )
       )
     }
@@ -302,12 +309,37 @@ interface BIOConcurrent<E> : Concurrent<BIOPartialOf<E>>, BIOAsync<E> {
   override fun <A> asyncF(fa: ConnectedProcF<BIOPartialOf<E>, A>): BIO<E, A> =
     BIO { fromAsyncF(fa)().right() }
 
-  override fun <A, B> CoroutineContext.racePair(fa: BIOOf<E, A>, fb: BIOOf<E, B>): BIO<E, RacePair<BIOPartialOf<E>, A, B>> {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-  }
+  override fun <A, B> CoroutineContext.racePair(fa: BIOOf<E, A>, fb: BIOOf<E, B>): BIO<E, RacePair<BIOPartialOf<E>, A, B>> =
+    BIO { !racePair(fa.fix().fa, fb.fix().fa) }
 
-  override fun <A, B, C> CoroutineContext.raceTriple(fa: BIOOf<E, A>, fb: BIOOf<E, B>, fc: BIOOf<E, C>): BIO<E, RaceTriple<BIOPartialOf<E>, A, B, C>> {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+  override fun <A, B, C> CoroutineContext.raceTriple(fa: BIOOf<E, A>, fb: BIOOf<E, B>, fc: BIOOf<E, C>): BIO<E, RaceTriple<BIOPartialOf<E>, A, B, C>> =
+    BIO { !raceTriple(fa.fix().fa, fb.fix().fa, fc.fix().fa) }
+
+}
+
+@extension
+interface BIOFx<E> : Fx<BIOPartialOf<E>> {
+  override fun concurrent(): Concurrent<BIOPartialOf<E>> =
+    object : BIOConcurrent<E> {}
+}
+
+@extension
+interface BIOUnsafeRun<E> : UnsafeRun<BIOPartialOf<E>> {
+  override suspend fun <A> unsafe.runBlocking(fa: () -> BIOOf<E, A>): A =
+    BlockingCoroutine<Either<E, A>>(EmptyCoroutineContext).also { fa().fix().fa.startCoroutine(it) }.getValue().getOrHandle { throw IllegalStateException("Unhandled case: $it") }
+
+  override suspend fun <A> unsafe.runNonBlocking(fa: () -> BIOOf<E, A>, cb: (Either<Throwable, A>) -> Unit) {
+    fa().fix()
+      .fa
+      .startCoroutine(asyncContinuation(NonBlocking){ acb: Either<Throwable, Either<E, A>> ->
+        when (acb) {
+          is Either.Left -> cb(Left(acb.a))
+          is Either.Right -> when (val result = acb.b) {
+            is Either.Left -> cb(Left(IllegalStateException("BIO Unhandled case: ${result.a}")))
+            is Either.Right -> cb(Right(result.b))
+          }
+        }
+      })
   }
 
 }
@@ -317,7 +349,7 @@ internal fun <E, A> BIOFiber(
   conn: KindConnection<BIOPartialOf<E>>
 ): Fiber<BIOPartialOf<E>, A> {
   val join: BIO<E, A> = BIO {
-    fromAsync<E, Either<E, A>> { conn2: KindConnection<BIOPartialOf<E>>, cb ->
+    fromAsync<E, A> { conn2: KindConnection<BIOPartialOf<E>>, cb ->
       conn2.push(BIO { promise.remove(cb).right() })
       conn.push(conn2.cancel())
       promise.get { a ->
@@ -326,11 +358,6 @@ internal fun <E, A> BIOFiber(
         conn.pop()
       }
     }()
-  }.flatMap {
-    when (it) {
-      is Either.Left -> it.a.raiseError<E, A>()
-      is Either.Right -> it.b.just()
-    }
   }
   return Fiber(join, conn.cancel())
 }
@@ -350,13 +377,8 @@ suspend fun <E, A, B> CoroutineContext.racePair(
   fa: suspend () -> Either<E, A>,
   fb: suspend () -> Either<E, B>
 ): suspend () ->
-Either<E,
-  Either<
-    Tuple2<A, Fiber<BIOPartialOf<E>, B>>,
-    Tuple2<Fiber<BIOPartialOf<E>, A>, B>
-    >
-  > = {
-  fromAsync<E, Either<Tuple2<A, Fiber<BIOPartialOf<E>, B>>, Tuple2<Fiber<BIOPartialOf<E>, A>, B>>> { conn, cb: (Either<Throwable, Either<Tuple2<A, Fiber<BIOPartialOf<E>, B>>, Tuple2<Fiber<BIOPartialOf<E>, A>, B>>>) -> Unit ->
+Either<E, RacePair<BIOPartialOf<E>, A, B>> = {
+  fromAsync<E, RacePair<BIOPartialOf<E>, A, B>> { conn: KindConnection<BIOPartialOf<E>>, cb ->
     val active: AtomicBoolean = AtomicBoolean(true)
     val upstreamCancelToken: BIO<E, Unit> = BIO.unit.flatMap { if (conn.isCanceled()) BIO.unit else conn.cancel() }
 
@@ -384,16 +406,13 @@ Either<E,
           promiseA.complete(Left(error))
         }
       }, { a ->
-        when (a) {
-          is Either.Right ->
-            if (active.getAndSet(false)) {
-              conn.pop()
-              val fiber = BIOFiber(promiseB, connB)
-              cb(Right(Left(Tuple2(a.b, fiber))))
-            } else {
-              promiseA.complete(Right(a))
-            }
-          else -> TODO() // how to handle the E case here?
+        if (active.getAndSet(false)) {
+          conn.pop()
+          val fiber = BIOFiber(promiseB, connB)
+          val tuple = a.map { Tuple2(it, fiber).left() }
+          cb(Right(tuple))
+        } else {
+          promiseA.complete(Right(a))
         }
       })
     })
@@ -415,7 +434,8 @@ Either<E,
         if (active.getAndSet(false)) {
           conn.pop()
           val fiber = BIOFiber(promiseA, connA)
-          cb(Right(Right(Tuple2(fiber, b))))
+          val tuple = b.map { Tuple2(fiber, it).right() }
+          cb(Right(tuple))
         } else {
           promiseB.complete(Right(b))
         }
@@ -423,3 +443,113 @@ Either<E,
     })
   }()
 }
+
+suspend fun <E, A, B, C> CoroutineContext.raceTriple(
+  fa: suspend () -> Either<E, A>,
+  fb: suspend () -> Either<E, B>,
+  fc: suspend () -> Either<E, C>
+): suspend () -> Either<E, RaceTriple<BIOPartialOf<E>, A, B, C>> =
+  fromAsync { conn: KindConnection<BIOPartialOf<E>>,
+              cb: (Either<Throwable, Either<E, RaceTriple<BIOPartialOf<E>, A, B, C>>>) -> Unit ->
+
+    val active = AtomicBoolean(true)
+
+    val upstreamCancelToken = BIO.unit.flatMap { if (conn.isCanceled()) BIO.unit else conn.cancel() }
+
+    val connA = BIOConnection<E>()
+    connA.push(upstreamCancelToken)
+    val promiseA = UnsafePromise<Either<E, A>>()
+
+    val connB = BIOConnection<E>()
+    connB.push(upstreamCancelToken)
+    val promiseB = UnsafePromise<Either<E, B>>()
+
+    val connC = BIOConnection<E>()
+    connC.push(upstreamCancelToken)
+    val promiseC = UnsafePromise<Either<E, C>>()
+
+    conn.push(connA.cancel(), connB.cancel(), connC.cancel())
+
+    fa.startCoroutine(asyncContinuation(this) { either ->
+      either.fold({ error ->
+        if (active.getAndSet(false)) { //if an error finishes first, stop the race.
+          connB.cancel().fix().fa.startCoroutine(Continuation(EmptyCoroutineContext) { r2 ->
+            connC.cancel().fix().fa.startCoroutine(Continuation(EmptyCoroutineContext) { r3 ->
+              conn.pop()
+              val errorResult = r2.fold(onFailure = { e2 ->
+                r3.fold(onFailure = { e3 -> Platform.composeErrors(error, e2, e3) }, onSuccess = { Platform.composeErrors(error, e2) })
+              }, onSuccess = {
+                r3.fold(onFailure = { e3 -> Platform.composeErrors(error, e3) }, onSuccess = { error })
+              })
+              cb(Left(errorResult))
+            })
+          })
+        } else {
+          promiseA.complete(Left(error))
+        }
+      }, { a: Either<E, A> ->
+        if (active.getAndSet(false)) {
+          conn.pop()
+          val tuple = a.map { Tuple3(it, BIOFiber(promiseB, connB), BIOFiber(promiseC, connC)).left() }
+          cb(tuple.right())
+        } else {
+          promiseA.complete(Right(a))
+        }
+      })
+    })
+
+    fb.startCoroutine(asyncContinuation(this) { either ->
+      either.fold({ error ->
+        if (active.getAndSet(false)) { //if an error finishes first, stop the race.
+          connA.cancel().fix().fa.startCoroutine(Continuation(EmptyCoroutineContext) { r2 ->
+            connC.cancel().fix().fa.startCoroutine(Continuation(EmptyCoroutineContext) { r3 ->
+              conn.pop()
+              val errorResult = r2.fold(onFailure = { e2 ->
+                r3.fold(onFailure = { e3 -> Platform.composeErrors(error, e2, e3) }, onSuccess = { Platform.composeErrors(error, e2) })
+              }, onSuccess = {
+                r3.fold(onFailure = { e3 -> Platform.composeErrors(error, e3) }, onSuccess = { error })
+              })
+              cb(Left(errorResult))
+            })
+          })
+        } else {
+          promiseB.complete(Left(error))
+        }
+      }, { b ->
+        if (active.getAndSet(false)) {
+          conn.pop()
+          cb(b.map { Right(Left(Tuple3(BIOFiber(promiseA, connA), it, BIOFiber(promiseC, connC)))) }.right())
+        } else {
+          promiseB.complete(Right(b))
+        }
+      })
+    })
+
+    fc.startCoroutine(asyncContinuation(this) { either ->
+      either.fold({ error ->
+        if (active.getAndSet(false)) { //if an error finishes first, stop the race.
+          connA.cancel().fix().fa.startCoroutine(Continuation(EmptyCoroutineContext) { r2 ->
+            connB.cancel().fix().fa.startCoroutine(Continuation(EmptyCoroutineContext) { r3 ->
+              conn.pop()
+              val errorResult = r2.fold(onFailure = { e2 ->
+                r3.fold(onFailure = { e3 -> Platform.composeErrors(error, e2, e3) }, onSuccess = { Platform.composeErrors(error, e2) })
+              }, onSuccess = {
+                r3.fold(onFailure = { e3 -> Platform.composeErrors(error, e3) }, onSuccess = { error })
+              })
+              cb(Left(errorResult))
+            })
+          })
+        } else {
+          promiseC.complete(Left(error))
+        }
+      }, { c ->
+        if (active.getAndSet(false)) {
+          conn.pop()
+          cb(c.map { Tuple3(BIOFiber(promiseA, connA), BIOFiber(promiseB, connB), it).right().right() }.right())
+        } else {
+          promiseC.complete(Right(c))
+        }
+      })
+    })
+
+  }

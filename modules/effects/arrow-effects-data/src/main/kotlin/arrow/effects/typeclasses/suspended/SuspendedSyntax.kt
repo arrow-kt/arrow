@@ -180,7 +180,7 @@ interface FxConcurrent : Concurrent<ForFx>, FxAsync {
     Fx { fromAsync(fa)() }
 }
 
-private class BlockingCoroutine<T>(override val context: CoroutineContext) : kotlin.coroutines.Continuation<T> {
+internal class BlockingCoroutine<T>(override val context: CoroutineContext) : kotlin.coroutines.Continuation<T> {
   private val lock = ReentrantLock()
   private val done = lock.newCondition()
   private var result: kotlin.Result<T>? = null
