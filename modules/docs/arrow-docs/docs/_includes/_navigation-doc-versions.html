@@ -5,8 +5,16 @@
 {% endfor %}
 
 <div class="navigation-menu-item dropdown">
-    <button onclick="displayToogle()" class="dropbtn">DOCUMENTATION</button>
-
+   {% for item in site.data.doc-versions.docMenu %}
+        <li onclick="displayToogle()" class="dropbtn dropbutton navigation-menu-item {% if item.url == category.url %}active {% endif %}">
+          {% if item.icon != "" %}
+              <i class="nav-item-icon fa fa-lg {{ item.icon }} dropbutton" aria-hidden="true"></i>
+              <span class="nav-item-text dropbutton">{{ item.title }}</span>
+           {% else %}
+              <span class="dropbutton">{{ item.title }}</span>
+           {% endif %}
+        </li>
+   {% endfor %}
     <div id="docVersionDropdown" class="dropdown-content">
         <a href="{{ site.data.commons.stable_version | append: 'docs/' }}">
             <span>STABLE ({{ stable_version_title }})</span>

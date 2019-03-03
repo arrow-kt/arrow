@@ -4,7 +4,7 @@ function displayToogle() {
 
 // Close the dropdown if the user clicks outside of it
 window.onclick = function(event) {
-  if (!event.target.matches('.dropbtn')) {
+  if (!event.target.matches('.dropbutton')) {
     var dropdowns = document.getElementsByClassName("dropdown-content");
     var i;
     for (i = 0; i < dropdowns.length; i++) {
@@ -18,10 +18,8 @@ window.onclick = function(event) {
 
 function showTopWarning() {
   const currentUrl = 'https://'+ window.location.host +'/'
-  console.log(currentUrl);
   if (!currentUrl.includes(document.getElementById("stable").textContent)){
-    console.log({document.getElementById("stable")});
-    document.getElementById("topWarning").style.display = 'none';
+    document.getElementById("topWarning").style.display = 'flex';
   }
 }
 
