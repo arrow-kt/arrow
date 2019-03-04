@@ -1,10 +1,14 @@
 package arrow.benchmarks.effects
 
+import arrow.core.getOrHandle
+import arrow.core.right
 import arrow.effects.IO
 import arrow.effects.extensions.io.monad.followedBy
-import arrow.effects.typeclasses.suspended.Fx
-import arrow.effects.typeclasses.suspended.NonBlocking
-import arrow.effects.typeclasses.suspended.continueOn
+import arrow.effects.typeclasses.suspended.*
+import arrow.effects.typeclasses.suspended.bio.monad.followedBy
+import arrow.effects.typeclasses.suspended.rio.monad.followedBy
+import arrow.effects.typeclasses.suspended.bio.async.shift as bioShift
+import arrow.effects.typeclasses.suspended.rio.async.shift as rioShift
 import arrow.unsafe
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
@@ -41,6 +45,24 @@ open class Async {
   @Benchmark
   fun io(): Int =
     unsafe { ioRunBlocking { ioAsyncLoop(0) } }
+
+  fun bioAsyncLoop(i: Int): BIO<Int, Int> =
+    NonBlocking.bioShift<Int>().followedBy(
+      if (i > size) BIO { i.right() } else bioAsyncLoop(i + 1)
+    )
+
+  @Benchmark
+  fun fx_bio(): Int =
+    unsafe { fxRunBlocking { bioAsyncLoop(0).toFx() }.getOrHandle { 0 } }
+
+  fun rioAsyncLoop(i: Int): RIO<Int, Int, Int> =
+    NonBlocking.rioShift<Int, Int>().followedBy(
+      if (i > size) RIO { i.right() } else rioAsyncLoop(i + 1)
+    )
+
+  @Benchmark
+  fun fx_rio(): Int =
+    unsafe { fxRunBlocking { rioAsyncLoop(0).toFx(0) }.getOrHandle { 0 } }
 
   @Benchmark
   fun cats_io(): Int =

@@ -20,7 +20,6 @@ class ForBIO private constructor() {
 }
 typealias BIOOf<E, A> = arrow.Kind2<ForBIO, E, A>
 typealias BIOPartialOf<E> = arrow.Kind<ForBIO, E>
-typealias BIOProc<E, A> = ConnectedProc<BIOPartialOf<E>, A>
 typealias BIOProcF<E, A> = ConnectedProcF<BIOPartialOf<E>, A>
 typealias BIOConnectedProc<E, A> = (KindConnection<BIOPartialOf<E>>, ((Either<Throwable, Either<E, A>>) -> Unit)) -> Unit
 
@@ -41,7 +40,10 @@ class BIO<out E, out A>(internal val fa: suspend () -> Either<E, A>) : BIOOf<E, 
   }
 }
 
-suspend operator fun <E, A> BIOOf<Nothing, A>.invoke(): Either<E, A> =
+fun <E, A> BIOOf<E, A>.toFx(): arrow.effects.typeclasses.suspended.Fx<Either<E, A>> =
+  Fx(fix().fa)
+
+suspend operator fun <E, A> BIOOf<E, A>.invoke(): Either<E, A> =
   fix().fa.invoke()
 
 fun <A> A.just(): BIO<Nothing, A> =
@@ -91,16 +93,17 @@ suspend fun <E, A> (suspend () -> Either<E, A>).handleErrorWith(unit: Unit = Uni
   try {
     this()
   } catch (t: Throwable) {
-    !f(t.nonFatalOrThrow())
+    f(t.nonFatalOrThrow())()
   }
 }
 
+@Suppress("UNCHECKED_CAST")
 suspend fun <E, A> (suspend () -> Either<E, A>).handleError(f: (E) -> A): suspend () -> Either<E, A> = {
   when (val result = this.attempt()) {
     is Either.Left -> {
       f(result.a).right()
     }
-    is Either.Right -> this@handleError.attempt()
+    is Either.Right -> this@handleError()
   }
 }
 
@@ -184,7 +187,7 @@ internal fun <E, A> fromAsyncF(fa: ProcF<BIOPartialOf<E>, A>): suspend () -> A =
 @extension
 interface BIOFunctor<E> : Functor<BIOPartialOf<E>> {
   override fun <A, B> BIOOf<E, A>.map(f: (A) -> B): BIO<E, B> =
-    BIO { !fix().fa.map(f) }
+    BIO { fix().fa.map(f)() }
 }
 
 @extension
@@ -195,15 +198,15 @@ interface BIOApplicative<E> : Applicative<BIOPartialOf<E>>, BIOFunctor<E> {
   @Suppress("UNCHECKED_CAST")
   override fun <A, B> BIOOf<E, A>.ap(ff: BIOOf<E, (A) -> B>): BIO<E, B> =
     BIO {
-      val result = !ff.fix().fa
-      !when (result) {
+      val result = ff.fix().fa()
+      when (result) {
         is Either.Left -> this@ap.fix().fa as (suspend () -> Either<E, B>)
         is Either.Right -> fix().fa.ap<E, A, B> { result.b }
-      }
+      }()
     }
 
   override fun <A, B> BIOOf<E, A>.map(f: (A) -> B): BIO<E, B> =
-    BIO { !fix().fa.map(f) }
+    BIO { fix().fa.map(f)() }
 }
 
 @extension
@@ -212,14 +215,14 @@ interface BIOApplicativeError<E> : ApplicativeError<BIOPartialOf<E>, E>, BIOAppl
     BIO { e.left() }
 
   override fun <A> BIOOf<E, A>.handleErrorWith(f: (E) -> BIOOf<E, A>): BIO<E, A> =
-    BIO { !fix().fa.handleErrorWith { e: E -> f(e).fix().fa } }
+    BIO { fix().fa.handleErrorWith { e: E -> f(e).fix().fa }() }
 
 }
 
 @extension
 interface BIOMonad<E> : Monad<BIOPartialOf<E>>, BIOApplicative<E> {
   override fun <A, B> BIOOf<E, A>.flatMap(f: (A) -> BIOOf<E, B>): BIO<E, B> =
-    BIO { !fix().fa.flatMap { a: A -> f(a).fix().fa } }
+    BIO { fix().fa.flatMap { a: A -> f(a).fix().fa }() }
 
   override fun <A, B> tailRecM(a: A, f: (A) -> BIOOf<E, Either<A, B>>): BIO<E, B> =
     f(a).flatMap {
@@ -232,15 +235,15 @@ interface BIOMonad<E> : Monad<BIOPartialOf<E>>, BIOApplicative<E> {
   @Suppress("UNCHECKED_CAST")
   override fun <A, B> BIOOf<E, A>.ap(ff: BIOOf<E, (A) -> B>): BIO<E, B> =
     BIO {
-      val result = !ff.fix().fa
-      !when (result) {
+      val result = ff.fix().fa()
+      when (result) {
         is Either.Left -> this@ap.fix().fa as (suspend () -> Either<E, B>)
         is Either.Right -> fix().fa.ap<E, A, B> { result.b }
-      }
+      }()
     }
 
   override fun <A, B> BIOOf<E, A>.map(f: (A) -> B): BIO<E, B> =
-    BIO { !fix().fa.map(f) }
+    BIO { fix().fa.map(f)() }
 
 }
 
@@ -253,7 +256,7 @@ interface BIOMonadThrow<E> : MonadThrow<BIOPartialOf<E>>, BIOMonad<E> {
     BIO { throw RaisedError(e) }
 
   override fun <A> BIOOf<E, A>.handleErrorWith(f: (Throwable) -> BIOOf<E, A>): BIO<E, A> =
-    BIO { !fix().fa.handleErrorWith { t: Throwable -> f(t).fix().fa } }
+    BIO { fix().fa.handleErrorWith { t: Throwable -> f(t).fix().fa }() }
 }
 
 @extension
@@ -325,10 +328,10 @@ interface BIOConcurrent<E> : Concurrent<BIOPartialOf<E>>, BIOAsync<E> {
     BIO { fromAsyncF(fa)().right() }
 
   override fun <A, B> CoroutineContext.racePair(fa: BIOOf<E, A>, fb: BIOOf<E, B>): BIO<E, RacePair<BIOPartialOf<E>, A, B>> =
-    BIO { !racePair(fa.fix().fa, fb.fix().fa) }
+    BIO { racePair(fa.fix().fa, fb.fix().fa)() }
 
   override fun <A, B, C> CoroutineContext.raceTriple(fa: BIOOf<E, A>, fb: BIOOf<E, B>, fc: BIOOf<E, C>): BIO<E, RaceTriple<BIOPartialOf<E>, A, B, C>> =
-    BIO { !raceTriple(fa.fix().fa, fb.fix().fa, fc.fix().fa) }
+    BIO { raceTriple(fa.fix().fa, fb.fix().fa, fc.fix().fa)() }
 
 }
 
@@ -336,27 +339,6 @@ interface BIOConcurrent<E> : Concurrent<BIOPartialOf<E>>, BIOAsync<E> {
 interface BIOFx<E> : Fx<BIOPartialOf<E>> {
   override fun concurrent(): Concurrent<BIOPartialOf<E>> =
     object : BIOConcurrent<E> {}
-}
-
-@extension
-interface BIOUnsafeRun<E> : UnsafeRun<BIOPartialOf<E>> {
-  override suspend fun <A> unsafe.runBlocking(fa: () -> BIOOf<E, A>): A =
-    BlockingCoroutine<Either<E, A>>(EmptyCoroutineContext).also { fa().fix().fa.startCoroutine(it) }.getValue().getOrHandle { throw IllegalStateException("Unhandled case: $it") }
-
-  override suspend fun <A> unsafe.runNonBlocking(fa: () -> BIOOf<E, A>, cb: (Either<Throwable, A>) -> Unit) {
-    fa().fix()
-      .fa
-      .startCoroutine(asyncContinuation(NonBlocking) { acb: Either<Throwable, Either<E, A>> ->
-        when (acb) {
-          is Either.Left -> cb(Left(acb.a))
-          is Either.Right -> when (val result = acb.b) {
-            is Either.Left -> cb(Left(IllegalStateException("BIO Unhandled case: ${result.a}")))
-            is Either.Right -> cb(Right(result.b))
-          }
-        }
-      })
-  }
-
 }
 
 internal fun <E, A> BIOFiber(

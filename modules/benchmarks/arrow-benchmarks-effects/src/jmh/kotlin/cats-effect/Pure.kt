@@ -1,16 +1,16 @@
 package arrow.benchmarks.effects
 
 import arrow.core.Either
+import arrow.core.getOrHandle
 import arrow.core.right
 import arrow.effects.IO
-import arrow.effects.extensions.io.unsafeRun.runBlocking as ioRunBlocking
 import arrow.effects.typeclasses.suspended.*
-import arrow.effects.typeclasses.suspended.fx.unsafeRun.runBlocking as fxRunBlocking
-import arrow.effects.typeclasses.suspended.bio.unsafeRun.runBlocking as bioRunBlocking
 import arrow.unsafe
 import kotlinx.coroutines.runBlocking
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
+import arrow.effects.extensions.io.unsafeRun.runBlocking as ioRunBlocking
+import arrow.effects.typeclasses.suspended.fx.unsafeRun.runBlocking as fxRunBlocking
 
 @State(Scope.Thread)
 @Fork(2)
@@ -44,12 +44,25 @@ open class Pure {
 
   tailrec suspend fun <E> bioPureLoop(i: Int): Either<E, Int> {
     val j = !just(i)
-    return if (j > size) j.right()  else bioPureLoop(j + 1)
+    return if (j > size) j.right() else bioPureLoop(j + 1)
   }
 
   @Benchmark
-  fun bio(): Int =
-    unsafe { bioRunBlocking { BIO { bioPureLoop<String>(0) } } }
+  fun fx_bio(): Int =
+    unsafe { fxRunBlocking { BIO { bioPureLoop<String>(0) }.toFx() }.getOrHandle { 0 } }
+
+  tailrec suspend fun <R, E> rioPureLoop(i: Int): RIO<R, E, Int> {
+    val j = just(i)()
+    return if (j > size) RIO { j.right() } else rioPureLoop(j + 1)
+  }
+
+  @Benchmark
+  fun fx_rio(): Int =
+    unsafe {
+      fxRunBlocking {
+        Fx { rioPureLoop<Int, Int>(0).toFx(0)() }
+      }.getOrHandle { 0 }
+    }
 
   fun ioPureLoop(i: Int): IO<Int> =
     IO.just(i).flatMap { j ->
