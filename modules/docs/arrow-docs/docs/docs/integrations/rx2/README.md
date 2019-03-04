@@ -210,7 +210,7 @@ fun main() {
 }
 ```
 
-```kotlin:ank
+```kotlin:ank:fail
 import arrow.core.Try
 // This will result in a stack overflow
 

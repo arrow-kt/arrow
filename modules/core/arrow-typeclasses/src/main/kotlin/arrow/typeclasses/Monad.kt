@@ -72,10 +72,7 @@ interface Monad<F> : Applicative<F> {
     "`binding` is getting renamed to `fx` for consistency with the Arrow Fx system. Use the Fx extensions for comprehensions",
     ReplaceWith("fx")
   )
-  fun <B> binding(c: suspend MonadContinuation<F, *>.() -> B): Kind<F, B> =
-    fx(c)
-
-  fun <A> fx(c: suspend MonadContinuation<F, *>.() -> A): Kind<F, A> {
+  fun <A> binding(c: suspend MonadContinuation<F, *>.() -> A): Kind<F, A> {
     val continuation = MonadContinuation<F, A>(this)
     val wrapReturn: suspend MonadContinuation<F, *>.() -> Kind<F, A> = { just(c()) }
     wrapReturn.startCoroutine(continuation, continuation)

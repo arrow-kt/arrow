@@ -3,6 +3,7 @@ package arrow.effects.reactor
 import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
+import arrow.core.NonFatal
 import arrow.effects.OnCancel
 import arrow.effects.internal.Platform
 import arrow.effects.reactor.CoroutineContextReactorScheduler.asScheduler
@@ -90,11 +91,15 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
             .subscribe(sink::success, sink::error)
           )
         } catch (e: Throwable) {
-          release(a, ExitCase.Error(e)).fix().mono.subscribe({
-            sink.error(e)
-          }, { e2 ->
-            sink.error(Platform.composeErrors(e, e2))
-          })
+          if (NonFatal(e)) {
+            release(a, ExitCase.Error(e)).fix().mono.subscribe({
+              sink.error(e)
+            }, { e2 ->
+              sink.error(Platform.composeErrors(e, e2))
+            })
+          } else {
+            throw e
+          }
         }
       } else sink.success(null)
     })

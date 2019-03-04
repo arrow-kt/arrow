@@ -239,6 +239,9 @@ options:
       - title: Semigroup
         url: /docs/arrow/typeclasses/semigroup/
 
+      - title: Semigroupal
+        url: /docs/apidocs/arrow-typeclasses/arrow.typeclasses/-semigroupal/
+
       - title: Monoid
         url: /docs/arrow/typeclasses/monoid/
 
@@ -319,6 +322,16 @@ options:
 
       - title: Alternative
         url: /docs/arrow/typeclasses/alternative/
+
+
+      - title: Divide
+        url: /docs/arrow/typeclasses/divide/
+
+      - title: Divisible
+        url: /docs/arrow/typeclasses/divisible/
+
+      - title: Decidable
+        url: /docs/arrow/typeclasses/decidable/
 
   - title: Effects
 
@@ -425,11 +438,11 @@ options:
   - title: Generic
     nested_options:
 
-          - title: Coproduct
-            url: /docs/generic/coproduct/
+      - title: Coproduct
+        url: /docs/generic/coproduct/
 
-          - title: Product
-            url: /docs/generic/product/
+      - title: Product
+        url: /docs/generic/product/
 
   - title: Integrations
 

@@ -3,6 +3,7 @@ package arrow.effects
 import arrow.core.Continuation
 import arrow.core.Either
 import arrow.core.Left
+import arrow.core.NonFatal
 import arrow.core.Right
 import arrow.effects.internal.Platform.ArrayStack
 import kotlin.coroutines.CoroutineContext
@@ -61,7 +62,11 @@ internal object IORunLoop {
             hasResult = true
             currentIO = null
           } catch (t: Throwable) {
-            currentIO = IO.RaiseError(t)
+            if (NonFatal(t)) {
+              currentIO = IO.RaiseError(t)
+            } else {
+              throw t
+            }
           }
         }
         is IO.Async -> {
@@ -199,7 +204,11 @@ internal object IORunLoop {
             hasResult = true
             currentIO = null
           } catch (t: Throwable) {
-            currentIO = IO.RaiseError(t)
+            if (NonFatal(t)) {
+              currentIO = IO.RaiseError(t)
+            } else {
+              throw t
+            }
           }
         }
         is IO.Async -> {
@@ -288,7 +297,11 @@ internal object IORunLoop {
     try {
       f().fix()
     } catch (e: Throwable) {
-      IO.RaiseError(e)
+      if (NonFatal(e)) {
+        IO.RaiseError(e)
+      } else {
+        throw e
+      }
     }
 
   /**

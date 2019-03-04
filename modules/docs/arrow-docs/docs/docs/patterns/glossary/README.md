@@ -143,7 +143,7 @@ NOTE: If you'd like to use `@extension` for transitive typeclasses, like a `Show
 
 ### Syntax
 
-Arrow provides a `extensions` DSL making available in the scoped block all the functions and extensions defined in all instances for that datatype. Use the infix function `extensions` on an object, or function, with the name of the datatype prefixed by For-.
+When creating an instance with the `@extension` annotation, the processor generates extension functions for the type that are available simply by importing them. See for example the coroutine function `binding`, the constructor `map`, and the method `sequence` defined in the instances of `Monad`, `Applicative` and `Traverse`:
 
 ```kotlin:ank:silent
 import arrow.core.Option
@@ -194,35 +194,6 @@ import arrow.data.extensions.list.traverse.sequence
 import arrow.core.extensions.either.applicative.applicative
 
 listOf(Right(1), Right(2), Right(3)).sequence(Either.applicative<Throwable>())
-```
-
-If you defined your own instances over your own data types and wish to use a similar `extensions` DSL you can do so for both types with a single type argument such as `Option`:
-
-```kotlin:ank:silent
-object OptionContext : OptionMonadError, OptionTraverse{
-  override fun <A, B> Kind<ForOption, A>.map(f: (A) -> B): Option<B> =
-    fix().map(f)
-}
-
-infix fun <A> ForOption.Companion.extensions(f: OptionContext.() -> A): A =
-  f(OptionContext)
-```
-
-Or for types that require partial application of some of their type arguments such as `Either<L, R>` where `L` needs to be partially applied
-
-```kotlin:ank:silent
-class EitherContext<L> : EitherMonadError<L>, EitherTraverse<L> {
-  override fun <A, B> Kind<EitherPartialOf<L>, A>.map(f: (A) -> B): Either<L, B> =
-    fix().map(f)
-}
-
-class EitherContextPartiallyApplied<L> {
-  infix fun <A> extensions(f: EitherContext<L>.() -> A): A =
-    f(EitherContext())
-}
-
-fun <L> ForEither(): EitherContextPartiallyApplied<L> =
-  EitherContextPartiallyApplied()
 ```
 
 ### Type constructors
