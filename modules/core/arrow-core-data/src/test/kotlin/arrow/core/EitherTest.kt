@@ -169,5 +169,12 @@ class EitherTest : UnitSpec() {
       }
     }
 
+    "handleErrorWith should handle left instance otherwise return Right" {
+      forAll { a: Int, b: Int ->
+        Left(a).handleErrorWith { Right(b) } == Right(b)
+          && Right(a).handleErrorWith { Right(b) } == Right(a)
+      }
+    }
+
   }
 }
