@@ -27,16 +27,16 @@ class RIOTest : UnitSpec() {
       runBlocking {
         RIO<Int, Throwable, Boolean> {
           try {
-            (a.fix().fa(it) == b.fix().fa(it)).right()
+            (a.fix().fa(this) == b.fix().fa(this)).right()
           } catch (e: Throwable) {
             val errA = try {
-              a.fix().fa(it)
+              a.fix().fa(this)
               throw IllegalArgumentException()
             } catch (err: Throwable) {
               err.nonFatalOrThrow()
             }
             val errB = try {
-              b.fix().fa(it)
+              b.fix().fa(this)
               throw IllegalStateException()
             } catch (err: Throwable) {
               err.nonFatalOrThrow()
