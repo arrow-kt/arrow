@@ -6,48 +6,48 @@ import arrow.effects.internal.Platform
 import arrow.effects.internal.UnsafePromise
 import arrow.effects.internal.asyncContinuation
 import arrow.effects.typeclasses.*
-import arrow.effects.typeclasses.suspended.bio.monad.flatMap
+import arrow.effects.typeclasses.suspended.catchfx.monad.flatMap
+import arrow.effects.typeclasses.suspended.catchfx.monad.monad
 import arrow.effects.typeclasses.suspended.concurrent.Fx
 import arrow.extension
 import arrow.typeclasses.*
-import arrow.unsafe
 import java.util.concurrent.CancellationException
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.*
 
-class ForBIO private constructor() {
+class ForCatchFx private constructor() {
   companion object
 }
-typealias BIOOf<E, A> = arrow.Kind2<ForBIO, E, A>
-typealias BIOPartialOf<E> = arrow.Kind<ForBIO, E>
-typealias BIOProcF<E, A> = ConnectedProcF<BIOPartialOf<E>, A>
-typealias BIOConnectedProc<E, A> = (KindConnection<BIOPartialOf<E>>, ((Either<Throwable, Either<E, A>>) -> Unit)) -> Unit
+typealias CatchFxOf<E, A> = arrow.Kind2<ForCatchFx, E, A>
+typealias CatchFxPartialOf<E> = arrow.Kind<ForCatchFx, E>
+typealias CatchFxProcF<E, A> = ConnectedProcF<CatchFxPartialOf<E>, A>
+typealias CatchFxConnectedProc<E, A> = (KindConnection<CatchFxPartialOf<E>>, ((Either<Throwable, Either<E, A>>) -> Unit)) -> Unit
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
-inline fun <E, A> BIOOf<E, A>.fix(): BIO<E, A> =
-  this as BIO<E, A>
+inline fun <E, A> CatchFxOf<E, A>.fix(): CatchFx<E, A> =
+  this as CatchFx<E, A>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
-inline fun <E, A> (suspend () -> Either<E, A>).k(): BIO<E, A> =
-  BIO(this)
+inline fun <E, A> (suspend () -> Either<E, A>).k(): CatchFx<E, A> =
+  CatchFx(this)
 
-class BIO<out E, out A>(internal val fa: suspend () -> Either<E, A>) : BIOOf<E, A> {
+class CatchFx<out E, out A>(internal val fa: suspend () -> Either<E, A>) : CatchFxOf<E, A> {
   companion object {
-    val unit: BIO<Nothing, Unit> = BIO { Unit.right() }
+    val unit: CatchFx<Nothing, Unit> = CatchFx { Unit.right() }
 
-    fun <A> just(a: A): BIO<Nothing, A> =
-      BIO { a.right() }
+    fun <A> just(a: A): CatchFx<Nothing, A> =
+      CatchFx { a.right() }
   }
 }
 
-fun <E, A> BIOOf<E, A>.toFx(): arrow.effects.typeclasses.suspended.Fx<Either<E, A>> =
+fun <E, A> CatchFxOf<E, A>.toFx(): arrow.effects.typeclasses.suspended.Fx<Either<E, A>> =
   Fx(fix().fa)
 
-suspend operator fun <E, A> BIOOf<E, A>.invoke(): Either<E, A> =
+suspend operator fun <E, A> CatchFxOf<E, A>.invoke(): Either<E, A> =
   fix().fa.invoke()
 
-fun <A> A.just(): BIO<Nothing, A> =
-  BIO { right() }
+fun <A> A.just(): CatchFx<Nothing, A> =
+  CatchFx { right() }
 
 suspend fun <E, A, B> (suspend () -> Either<E, A>).map(f: (A) -> B): suspend () -> Either<E, B> =
   { this().map(f) }
@@ -155,14 +155,14 @@ suspend fun <E, A, B> (suspend () -> Either<E, A>).bracketCase(
 
 }
 
-fun <E> BIOConnection(): KindConnection<BIOPartialOf<E>> =
-  KindConnection(object : BIOMonadDefer<E> {}) { it.fix().fa.foldContinuation { e -> throw e } }
+fun <E> CatchFxConnection(): KindConnection<CatchFxPartialOf<E>> =
+  KindConnection(object : CatchFxMonadDefer<E> {}) { it.fix().fa.foldContinuation { e -> throw e } }
 
-suspend fun <E, A> fromAsync(fa: BIOConnectedProc<E, A>): suspend () -> Either<E, A> =
+suspend fun <E, A> fromAsync(fa: CatchFxConnectedProc<E, A>): suspend () -> Either<E, A> =
   suspendCoroutine { continuation ->
-    val conn = BIOConnection<E>()
+    val conn = CatchFxConnection<E>()
     //Is CancellationException from kotlin in kotlinx package???
-    conn.push(BIO { continuation.resumeWith(kotlin.Result.failure(CancellationException())).right() })
+    conn.push(CatchFx { continuation.resumeWith(kotlin.Result.failure(CancellationException())).right() })
     fa(conn) { either ->
       continuation.resumeWith(
         either.fold(
@@ -176,7 +176,7 @@ suspend fun <E, A> fromAsync(fa: BIOConnectedProc<E, A>): suspend () -> Either<E
   }
 
 /** Hide member because it's discouraged to use uncancelable builder for cancelable concrete type **/
-internal fun <E, A> fromAsyncF(fa: ProcF<BIOPartialOf<E>, A>): suspend () -> A = {
+internal fun <E, A> fromAsyncF(fa: ProcF<CatchFxPartialOf<E>, A>): suspend () -> A = {
   suspendCoroutine { continuation ->
     fa { either ->
       continuation.resumeWith(either.fold({ kotlin.Result.failure<A>(it) }, { kotlin.Result.success(it) }))
@@ -185,19 +185,19 @@ internal fun <E, A> fromAsyncF(fa: ProcF<BIOPartialOf<E>, A>): suspend () -> A =
 }
 
 @extension
-interface BIOFunctor<E> : Functor<BIOPartialOf<E>> {
-  override fun <A, B> BIOOf<E, A>.map(f: (A) -> B): BIO<E, B> =
-    BIO { fix().fa.map(f)() }
+interface CatchFxFunctor<E> : Functor<CatchFxPartialOf<E>> {
+  override fun <A, B> CatchFxOf<E, A>.map(f: (A) -> B): CatchFx<E, B> =
+    CatchFx { fix().fa.map(f)() }
 }
 
 @extension
-interface BIOApplicative<E> : Applicative<BIOPartialOf<E>>, BIOFunctor<E> {
-  override fun <A> just(a: A): BIO<E, A> =
-    BIO.just(a)
+interface CatchFxApplicative<E> : Applicative<CatchFxPartialOf<E>>, CatchFxFunctor<E> {
+  override fun <A> just(a: A): CatchFx<E, A> =
+    CatchFx.just(a)
 
   @Suppress("UNCHECKED_CAST")
-  override fun <A, B> BIOOf<E, A>.ap(ff: BIOOf<E, (A) -> B>): BIO<E, B> =
-    BIO {
+  override fun <A, B> CatchFxOf<E, A>.ap(ff: CatchFxOf<E, (A) -> B>): CatchFx<E, B> =
+    CatchFx {
       val result = ff.fix().fa()
       when (result) {
         is Either.Left -> this@ap.fix().fa as (suspend () -> Either<E, B>)
@@ -205,26 +205,26 @@ interface BIOApplicative<E> : Applicative<BIOPartialOf<E>>, BIOFunctor<E> {
       }()
     }
 
-  override fun <A, B> BIOOf<E, A>.map(f: (A) -> B): BIO<E, B> =
-    BIO { fix().fa.map(f)() }
+  override fun <A, B> CatchFxOf<E, A>.map(f: (A) -> B): CatchFx<E, B> =
+    CatchFx { fix().fa.map(f)() }
 }
 
 @extension
-interface BIOApplicativeError<E> : ApplicativeError<BIOPartialOf<E>, E>, BIOApplicative<E> {
-  override fun <A> raiseError(e: E): BIO<E, A> =
-    BIO { e.left() }
+interface CatchFxApplicativeError<E> : ApplicativeError<CatchFxPartialOf<E>, E>, CatchFxApplicative<E> {
+  override fun <A> raiseError(e: E): CatchFx<E, A> =
+    CatchFx { e.left() }
 
-  override fun <A> BIOOf<E, A>.handleErrorWith(f: (E) -> BIOOf<E, A>): BIO<E, A> =
-    BIO { fix().fa.handleErrorWith { e: E -> f(e).fix().fa }() }
+  override fun <A> CatchFxOf<E, A>.handleErrorWith(f: (E) -> CatchFxOf<E, A>): CatchFx<E, A> =
+    CatchFx { fix().fa.handleErrorWith { e: E -> f(e).fix().fa }() }
 
 }
 
 @extension
-interface BIOMonad<E> : Monad<BIOPartialOf<E>>, BIOApplicative<E> {
-  override fun <A, B> BIOOf<E, A>.flatMap(f: (A) -> BIOOf<E, B>): BIO<E, B> =
-    BIO { fix().fa.flatMap { a: A -> f(a).fix().fa }() }
+interface CatchFxMonad<E> : Monad<CatchFxPartialOf<E>>, CatchFxApplicative<E> {
+  override fun <A, B> CatchFxOf<E, A>.flatMap(f: (A) -> CatchFxOf<E, B>): CatchFx<E, B> =
+    CatchFx { fix().fa.flatMap { a: A -> f(a).fix().fa }() }
 
-  override fun <A, B> tailRecM(a: A, f: (A) -> BIOOf<E, Either<A, B>>): BIO<E, B> =
+  override fun <A, B> tailRecM(a: A, f: (A) -> CatchFxOf<E, Either<A, B>>): CatchFx<E, B> =
     f(a).flatMap {
       it.fold(
         { x -> tailRecM(x, f) },
@@ -233,8 +233,8 @@ interface BIOMonad<E> : Monad<BIOPartialOf<E>>, BIOApplicative<E> {
     }
 
   @Suppress("UNCHECKED_CAST")
-  override fun <A, B> BIOOf<E, A>.ap(ff: BIOOf<E, (A) -> B>): BIO<E, B> =
-    BIO {
+  override fun <A, B> CatchFxOf<E, A>.ap(ff: CatchFxOf<E, (A) -> B>): CatchFx<E, B> =
+    CatchFx {
       val result = ff.fix().fa()
       when (result) {
         is Either.Left -> this@ap.fix().fa as (suspend () -> Either<E, B>)
@@ -242,27 +242,27 @@ interface BIOMonad<E> : Monad<BIOPartialOf<E>>, BIOApplicative<E> {
       }()
     }
 
-  override fun <A, B> BIOOf<E, A>.map(f: (A) -> B): BIO<E, B> =
-    BIO { fix().fa.map(f)() }
+  override fun <A, B> CatchFxOf<E, A>.map(f: (A) -> B): CatchFx<E, B> =
+    CatchFx { fix().fa.map(f)() }
 
 }
 
 @extension
-interface BIOMonadError<E> : MonadError<BIOPartialOf<E>, E>, BIOApplicativeError<E>, BIOMonad<E>
+interface CatchFxMonadError<E> : MonadError<CatchFxPartialOf<E>, E>, CatchFxApplicativeError<E>, CatchFxMonad<E>
 
 @extension
-interface BIOMonadThrow<E> : MonadThrow<BIOPartialOf<E>>, BIOMonad<E> {
-  override fun <A> raiseError(e: Throwable): BIO<E, A> =
-    BIO { throw RaisedError(e) }
+interface CatchFxMonadThrow<E> : MonadThrow<CatchFxPartialOf<E>>, CatchFxMonad<E> {
+  override fun <A> raiseError(e: Throwable): CatchFx<E, A> =
+    CatchFx { throw RaisedError(e) }
 
-  override fun <A> BIOOf<E, A>.handleErrorWith(f: (Throwable) -> BIOOf<E, A>): BIO<E, A> =
-    BIO { fix().fa.handleErrorWith { t: Throwable -> f(t).fix().fa }() }
+  override fun <A> CatchFxOf<E, A>.handleErrorWith(f: (Throwable) -> CatchFxOf<E, A>): CatchFx<E, A> =
+    CatchFx { fix().fa.handleErrorWith { t: Throwable -> f(t).fix().fa }() }
 }
 
 @extension
-interface BIOBracket<E> : Bracket<BIOPartialOf<E>, Throwable>, BIOMonadThrow<E> {
-  override fun <A, B> BIOOf<E, A>.bracketCase(release: (A, ExitCase<Throwable>) -> BIOOf<E, Unit>, use: (A) -> BIOOf<E, B>): BIO<E, B> =
-    BIO {
+interface CatchFxBracket<E> : Bracket<CatchFxPartialOf<E>, Throwable>, CatchFxMonadThrow<E> {
+  override fun <A, B> CatchFxOf<E, A>.bracketCase(release: (A, ExitCase<Throwable>) -> CatchFxOf<E, Unit>, use: (A) -> CatchFxOf<E, B>): CatchFx<E, B> =
+    CatchFx {
       fix().fa.bracketCase(
         release.curry().andThen { a -> a.andThen { b -> b.fix().fa } }.uncurried(),
         use.andThen { a -> a.fix().fa }
@@ -271,48 +271,48 @@ interface BIOBracket<E> : Bracket<BIOPartialOf<E>, Throwable>, BIOMonadThrow<E> 
 }
 
 @extension
-interface BIOMonadDefer<E> : MonadDefer<BIOPartialOf<E>>, BIOBracket<E> {
-  override fun <A> defer(fa: () -> BIOOf<E, A>): BIO<E, A> =
+interface CatchFxMonadDefer<E> : MonadDefer<CatchFxPartialOf<E>>, CatchFxBracket<E> {
+  override fun <A> defer(fa: () -> CatchFxOf<E, A>): CatchFx<E, A> =
     unit().flatMap { fa() }
 }
 
 @extension
-interface BIOAsync<E> : Async<BIOPartialOf<E>>, BIOMonadDefer<E> {
+interface CatchFxAsync<E> : Async<CatchFxPartialOf<E>>, CatchFxMonadDefer<E> {
 
-  override fun <A> async(fa: Proc<A>): BIO<E, A> =
-    BIO { fromAsync(fa)().right() }
+  override fun <A> async(fa: Proc<A>): CatchFx<E, A> =
+    CatchFx { fromAsync(fa)().right() }
 
-  override fun <A> asyncF(k: ProcF<BIOPartialOf<E>, A>): BIO<E, A> =
-    BIO { fromAsyncF(k)().right() }
+  override fun <A> asyncF(k: ProcF<CatchFxPartialOf<E>, A>): CatchFx<E, A> =
+    CatchFx { fromAsyncF(k)().right() }
 
-  override fun <A> BIOOf<E, A>.continueOn(ctx: CoroutineContext): BIO<E, A> =
-    BIO { ctx.continueOn(fix().fa)() }
+  override fun <A> CatchFxOf<E, A>.continueOn(ctx: CoroutineContext): CatchFx<E, A> =
+    CatchFx { ctx.continueOn(fix().fa)() }
 
 }
 
 @extension
-interface BIODispatchers<E> : Dispatchers<BIOPartialOf<E>> {
+interface CatchFxDispatchers<E> : Dispatchers<CatchFxPartialOf<E>> {
   override fun default(): CoroutineContext =
     NonBlocking
 }
 
 @extension
-interface BIOConcurrent<E> : Concurrent<BIOPartialOf<E>>, BIOAsync<E> {
-  override fun dispatchers(): Dispatchers<BIOPartialOf<E>> =
-    object : BIODispatchers<E> {}
+interface CatchFxConcurrent<E> : Concurrent<CatchFxPartialOf<E>>, CatchFxAsync<E> {
+  override fun dispatchers(): Dispatchers<CatchFxPartialOf<E>> =
+    object : CatchFxDispatchers<E> {}
 
-  override fun <A> async(fa: Proc<A>): BIO<E, A> =
-    BIO { fromAsync(fa)().right() }
+  override fun <A> async(fa: Proc<A>): CatchFx<E, A> =
+    CatchFx { fromAsync(fa)().right() }
 
-  override fun <A> asyncF(k: ProcF<BIOPartialOf<E>, A>): BIO<E, A> =
-    BIO { fromAsyncF(k)().right() }
+  override fun <A> asyncF(k: ProcF<CatchFxPartialOf<E>, A>): CatchFx<E, A> =
+    CatchFx { fromAsyncF(k)().right() }
 
-  override fun <A> BIOOf<E, A>.continueOn(ctx: CoroutineContext): BIO<E, A> =
-    BIO { ctx.continueOn(fix().fa)() }
+  override fun <A> CatchFxOf<E, A>.continueOn(ctx: CoroutineContext): CatchFx<E, A> =
+    CatchFx { ctx.continueOn(fix().fa)() }
 
-  override fun <A> CoroutineContext.startFiber(kind: BIOOf<E, A>): BIO<E, Fiber<BIOPartialOf<E>, A>> {
+  override fun <A> CoroutineContext.startFiber(kind: CatchFxOf<E, A>): CatchFx<E, Fiber<CatchFxPartialOf<E>, A>> {
     val promise = UnsafePromise<Either<E, A>>()
-    val conn = BIOConnection<E>()
+    val conn = CatchFxConnection<E>()
     kind.fix().fa.startCoroutine(asyncContinuation(this) { either ->
       either.fold(
         { promise.complete(it.left()) },
@@ -321,33 +321,33 @@ interface BIOConcurrent<E> : Concurrent<BIOPartialOf<E>>, BIOAsync<E> {
         }
       )
     })
-    return BIO { BIOFiber(promise, conn).right() }
+    return CatchFx { CatchFxFiber(promise, conn).right() }
   }
 
-  override fun <A> asyncF(fa: ConnectedProcF<BIOPartialOf<E>, A>): BIO<E, A> =
-    BIO { fromAsyncF(fa)().right() }
+  override fun <A> asyncF(fa: ConnectedProcF<CatchFxPartialOf<E>, A>): CatchFx<E, A> =
+    CatchFx { fromAsyncF(fa)().right() }
 
-  override fun <A, B> CoroutineContext.racePair(fa: BIOOf<E, A>, fb: BIOOf<E, B>): BIO<E, RacePair<BIOPartialOf<E>, A, B>> =
-    BIO { racePair(fa.fix().fa, fb.fix().fa)() }
+  override fun <A, B> CoroutineContext.racePair(fa: CatchFxOf<E, A>, fb: CatchFxOf<E, B>): CatchFx<E, RacePair<CatchFxPartialOf<E>, A, B>> =
+    CatchFx { racePair(fa.fix().fa, fb.fix().fa)() }
 
-  override fun <A, B, C> CoroutineContext.raceTriple(fa: BIOOf<E, A>, fb: BIOOf<E, B>, fc: BIOOf<E, C>): BIO<E, RaceTriple<BIOPartialOf<E>, A, B, C>> =
-    BIO { raceTriple(fa.fix().fa, fb.fix().fa, fc.fix().fa)() }
+  override fun <A, B, C> CoroutineContext.raceTriple(fa: CatchFxOf<E, A>, fb: CatchFxOf<E, B>, fc: CatchFxOf<E, C>): CatchFx<E, RaceTriple<CatchFxPartialOf<E>, A, B, C>> =
+    CatchFx { raceTriple(fa.fix().fa, fb.fix().fa, fc.fix().fa)() }
 
 }
 
 @extension
-interface BIOFx<E> : Fx<BIOPartialOf<E>> {
-  override fun concurrent(): Concurrent<BIOPartialOf<E>> =
-    object : BIOConcurrent<E> {}
+interface CatchFxFx<E> : Fx<CatchFxPartialOf<E>> {
+  override fun concurrent(): Concurrent<CatchFxPartialOf<E>> =
+    object : CatchFxConcurrent<E> {}
 }
 
-internal fun <E, A> BIOFiber(
+internal fun <E, A> CatchFxFiber(
   promise: UnsafePromise<Either<E, A>>,
-  conn: KindConnection<BIOPartialOf<E>>
-): Fiber<BIOPartialOf<E>, A> {
-  val join: BIO<E, A> = BIO {
-    fromAsync<E, A> { conn2: KindConnection<BIOPartialOf<E>>, cb ->
-      conn2.push(BIO { promise.remove(cb).right() })
+  conn: KindConnection<CatchFxPartialOf<E>>
+): Fiber<CatchFxPartialOf<E>, A> {
+  val join: CatchFx<E, A> = CatchFx {
+    fromAsync<E, A> { conn2: KindConnection<CatchFxPartialOf<E>>, cb ->
+      conn2.push(CatchFx { promise.remove(cb).right() })
       conn.push(conn2.cancel())
       promise.get { a ->
         cb(a)
@@ -359,11 +359,11 @@ internal fun <E, A> BIOFiber(
   return Fiber(join, conn.cancel())
 }
 
-fun <E, A> fromAsyncF(fa: BIOProcF<E, A>): suspend () -> A = {
+fun <E, A> fromAsyncF(fa: CatchFxProcF<E, A>): suspend () -> A = {
   suspendCoroutine { continuation ->
-    val conn = BIOConnection<E>()
+    val conn = CatchFxConnection<E>()
     //Is CancellationException from kotlin in kotlinx package???
-    conn.push(BIO { continuation.resumeWith(kotlin.Result.failure(CancellationException())).right() })
+    conn.push(CatchFx { continuation.resumeWith(kotlin.Result.failure(CancellationException())).right() })
     fa(conn) { either ->
       continuation.resumeWith(either.fold({ kotlin.Result.failure<A>(it) }, { kotlin.Result.success(it) }))
     }.fix().fa.foldContinuation(EmptyCoroutineContext, mapUnit)
@@ -374,16 +374,16 @@ suspend fun <E, A, B> CoroutineContext.racePair(
   fa: suspend () -> Either<E, A>,
   fb: suspend () -> Either<E, B>
 ): suspend () ->
-Either<E, RacePair<BIOPartialOf<E>, A, B>> = {
-  fromAsync<E, RacePair<BIOPartialOf<E>, A, B>> { conn: KindConnection<BIOPartialOf<E>>, cb ->
+Either<E, RacePair<CatchFxPartialOf<E>, A, B>> = {
+  fromAsync<E, RacePair<CatchFxPartialOf<E>, A, B>> { conn: KindConnection<CatchFxPartialOf<E>>, cb ->
     val active: AtomicBoolean = AtomicBoolean(true)
-    val upstreamCancelToken: BIO<E, Unit> = BIO.unit.flatMap { if (conn.isCanceled()) BIO.unit else conn.cancel() }
+    val upstreamCancelToken: CatchFx<E, Unit> = CatchFx.unit.flatMap { if (conn.isCanceled()) CatchFx.unit else conn.cancel() }
 
-    val connA: KindConnection<BIOPartialOf<E>> = BIOConnection()
+    val connA: KindConnection<CatchFxPartialOf<E>> = CatchFxConnection()
     connA.push(upstreamCancelToken)
     val promiseA: UnsafePromise<Either<E, A>> = UnsafePromise()
 
-    val connB: KindConnection<BIOPartialOf<E>> = BIOConnection()
+    val connB: KindConnection<CatchFxPartialOf<E>> = CatchFxConnection()
     connB.push(upstreamCancelToken)
     val promiseB = UnsafePromise<Either<E, B>>()
 
@@ -405,7 +405,7 @@ Either<E, RacePair<BIOPartialOf<E>, A, B>> = {
       }, { a ->
         if (active.getAndSet(false)) {
           conn.pop()
-          val fiber = BIOFiber(promiseB, connB)
+          val fiber = CatchFxFiber(promiseB, connB)
           val tuple = a.map { Tuple2(it, fiber).left() }
           cb(Right(tuple))
         } else {
@@ -430,7 +430,7 @@ Either<E, RacePair<BIOPartialOf<E>, A, B>> = {
       }, { b ->
         if (active.getAndSet(false)) {
           conn.pop()
-          val fiber = BIOFiber(promiseA, connA)
+          val fiber = CatchFxFiber(promiseA, connA)
           val tuple = b.map { Tuple2(fiber, it).right() }
           cb(Right(tuple))
         } else {
@@ -445,23 +445,23 @@ suspend fun <E, A, B, C> CoroutineContext.raceTriple(
   fa: suspend () -> Either<E, A>,
   fb: suspend () -> Either<E, B>,
   fc: suspend () -> Either<E, C>
-): suspend () -> Either<E, RaceTriple<BIOPartialOf<E>, A, B, C>> =
-  fromAsync { conn: KindConnection<BIOPartialOf<E>>,
-              cb: (Either<Throwable, Either<E, RaceTriple<BIOPartialOf<E>, A, B, C>>>) -> Unit ->
+): suspend () -> Either<E, RaceTriple<CatchFxPartialOf<E>, A, B, C>> =
+  fromAsync { conn: KindConnection<CatchFxPartialOf<E>>,
+              cb: (Either<Throwable, Either<E, RaceTriple<CatchFxPartialOf<E>, A, B, C>>>) -> Unit ->
 
     val active = AtomicBoolean(true)
 
-    val upstreamCancelToken = BIO.unit.flatMap { if (conn.isCanceled()) BIO.unit else conn.cancel() }
+    val upstreamCancelToken = CatchFx.unit.flatMap { if (conn.isCanceled()) CatchFx.unit else conn.cancel() }
 
-    val connA = BIOConnection<E>()
+    val connA = CatchFxConnection<E>()
     connA.push(upstreamCancelToken)
     val promiseA = UnsafePromise<Either<E, A>>()
 
-    val connB = BIOConnection<E>()
+    val connB = CatchFxConnection<E>()
     connB.push(upstreamCancelToken)
     val promiseB = UnsafePromise<Either<E, B>>()
 
-    val connC = BIOConnection<E>()
+    val connC = CatchFxConnection<E>()
     connC.push(upstreamCancelToken)
     val promiseC = UnsafePromise<Either<E, C>>()
 
@@ -487,7 +487,7 @@ suspend fun <E, A, B, C> CoroutineContext.raceTriple(
       }, { a: Either<E, A> ->
         if (active.getAndSet(false)) {
           conn.pop()
-          val tuple = a.map { Tuple3(it, BIOFiber(promiseB, connB), BIOFiber(promiseC, connC)).left() }
+          val tuple = a.map { Tuple3(it, CatchFxFiber(promiseB, connB), CatchFxFiber(promiseC, connC)).left() }
           cb(tuple.right())
         } else {
           promiseA.complete(Right(a))
@@ -515,7 +515,7 @@ suspend fun <E, A, B, C> CoroutineContext.raceTriple(
       }, { b ->
         if (active.getAndSet(false)) {
           conn.pop()
-          cb(b.map { Right(Left(Tuple3(BIOFiber(promiseA, connA), it, BIOFiber(promiseC, connC)))) }.right())
+          cb(b.map { Right(Left(Tuple3(CatchFxFiber(promiseA, connA), it, CatchFxFiber(promiseC, connC)))) }.right())
         } else {
           promiseB.complete(Right(b))
         }
@@ -542,7 +542,7 @@ suspend fun <E, A, B, C> CoroutineContext.raceTriple(
       }, { c ->
         if (active.getAndSet(false)) {
           conn.pop()
-          cb(c.map { Tuple3(BIOFiber(promiseA, connA), BIOFiber(promiseB, connB), it).right().right() }.right())
+          cb(c.map { Tuple3(CatchFxFiber(promiseA, connA), CatchFxFiber(promiseB, connB), it).right().right() }.right())
         } else {
           promiseC.complete(Right(c))
         }

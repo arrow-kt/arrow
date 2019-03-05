@@ -13,40 +13,40 @@ import java.util.concurrent.CancellationException
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.*
 
-class ForRIO private constructor() {
+class ForEnvFx private constructor() {
   companion object
 }
-typealias RIOOf<R, E, A> = arrow.Kind3<ForRIO, R, E, A>
-typealias RIOPartialOf<R, E> = arrow.Kind2<ForRIO, R, E>
-typealias RIOProcF<R, E, A> = ConnectedProcF<RIOPartialOf<R, E>, A>
-typealias RIOConnectedProc<R, E, A> = (KindConnection<RIOPartialOf<R, E>>, ((Either<Throwable, Either<E, A>>) -> Unit)) -> Unit
+typealias EnvFxOf<R, E, A> = arrow.Kind3<ForEnvFx, R, E, A>
+typealias EnvFxPartialOf<R, E> = arrow.Kind2<ForEnvFx, R, E>
+typealias EnvFxProcF<R, E, A> = ConnectedProcF<EnvFxPartialOf<R, E>, A>
+typealias EnvFxConnectedProc<R, E, A> = (KindConnection<EnvFxPartialOf<R, E>>, ((Either<Throwable, Either<E, A>>) -> Unit)) -> Unit
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
-inline fun <R, E, A> RIOOf<R, E, A>.fix(): RIO<R, E, A> =
-  this as RIO<R, E, A>
+inline fun <R, E, A> EnvFxOf<R, E, A>.fix(): EnvFx<R, E, A> =
+  this as EnvFx<R, E, A>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
-fun <R, E, A> effect(f: suspend (R) -> Either<E, A>): RIO<R, E, A> =
-  RIO(f)
+fun <R, E, A> effect(f: suspend R.() -> Either<E, A>): EnvFx<R, E, A> =
+  EnvFx(f)
 
-class RIO<R, out E, out A>(internal val fa: suspend R.() -> Either<E, A>) : RIOOf<R, E, A> {
+class EnvFx<R, out E, out A>(internal val fa: suspend R.() -> Either<E, A>) : EnvFxOf<R, E, A> {
   companion object {
-    fun <R, E> unit(): RIO<R, E, Unit> =
-      RIO { Unit.right() }
+    fun <R, E> unit(): EnvFx<R, E, Unit> =
+      EnvFx { Unit.right() }
 
-    fun <R, E, A> just(a: A): RIO<R, E, A> =
-      RIO { a.right() }
+    fun <R, E, A> just(a: A): EnvFx<R, E, A> =
+      EnvFx { a.right() }
   }
 }
 
-fun <R, E, A> RIOOf<R, E, A>.toFx(r: R): arrow.effects.typeclasses.suspended.Fx<Either<E, A>> =
+fun <R, E, A> EnvFxOf<R, E, A>.toFx(r: R): arrow.effects.typeclasses.suspended.Fx<Either<E, A>> =
   Fx { fix().fa.invoke(r) }
 
-suspend operator fun <R, E, A> RIOOf<R, E, A>.invoke(r: R): Either<E, A> =
+suspend operator fun <R, E, A> EnvFxOf<R, E, A>.invoke(r: R): Either<E, A> =
   fix().fa.invoke(r)
 
-fun <A> A.just(unit: Unit = Unit): RIO<Nothing, Nothing, A> =
-  RIO { right() }
+fun <A> A.just(unit: Unit = Unit): EnvFx<Nothing, Nothing, A> =
+  EnvFx { right() }
 
 suspend fun <R, E, A, B> (suspend R.() -> Either<E, A>).map(f: (A) -> B): suspend R.() -> Either<E, B> =
   { this@map(this).map(f) }
@@ -156,14 +156,14 @@ suspend fun <R, E, A, B> (suspend R.() -> Either<E, A>).bracketCase(
 
 }
 
-fun <R, E> RIOConnection(r: R): KindConnection<RIOPartialOf<R, E>> =
-  KindConnection(object : RIOMonadDefer<R, E> {}) { suspend { it.fix().fa(r) }.foldContinuation { e -> throw e } }
+fun <R, E> EnvFxConnection(r: R): KindConnection<EnvFxPartialOf<R, E>> =
+  KindConnection(object : EnvFxMonadDefer<R, E> {}) { suspend { it.fix().fa(r) }.foldContinuation { e -> throw e } }
 
-suspend fun <R, E, A> fromAsync(fa: RIOConnectedProc<R, E, A>): suspend R.() -> Either<E, A> = {
+suspend fun <R, E, A> fromAsync(fa: EnvFxConnectedProc<R, E, A>): suspend R.() -> Either<E, A> = {
   suspendCoroutine { continuation ->
-    val conn = RIOConnection<R, E>(this)
+    val conn = EnvFxConnection<R, E>(this)
     //Is CancellationException from kotlin in kotlinx package???
-    conn.push(RIO { continuation.resumeWith(Result.failure(CancellationException())).right() })
+    conn.push(EnvFx { continuation.resumeWith(Result.failure(CancellationException())).right() })
     fa(conn) { either: Either<Throwable, Either<E, A>> ->
       continuation.resumeWith(
         either.fold(
@@ -178,7 +178,7 @@ suspend fun <R, E, A> fromAsync(fa: RIOConnectedProc<R, E, A>): suspend R.() -> 
 }
 
 /** Hide member because it's discouraged to use uncancelable builder for cancelable concrete type **/
-internal fun <R, E, A> fromAsyncF(fa: ProcF<RIOPartialOf<R, E>, A>): suspend R.() -> A = {
+internal fun <R, E, A> fromAsyncF(fa: ProcF<EnvFxPartialOf<R, E>, A>): suspend R.() -> A = {
   suspendCoroutine { continuation ->
     suspend {
       fa { either ->
@@ -188,11 +188,11 @@ internal fun <R, E, A> fromAsyncF(fa: ProcF<RIOPartialOf<R, E>, A>): suspend R.(
   }
 }
 
-fun <R, E, A> fromAsyncF(fa: RIOProcF<R, E, A>): suspend R.() -> A = {
+fun <R, E, A> fromAsyncF(fa: EnvFxProcF<R, E, A>): suspend R.() -> A = {
   suspendCoroutine { continuation ->
-    val conn = RIOConnection<R, E>(this)
+    val conn = EnvFxConnection<R, E>(this)
     //Is CancellationException from kotlin in kotlinx package???
-    conn.push(RIO { continuation.resumeWith(kotlin.Result.failure(CancellationException())).right() })
+    conn.push(EnvFx { continuation.resumeWith(kotlin.Result.failure(CancellationException())).right() })
     suspend {
       fa(conn) { either ->
         continuation.resumeWith(either.fold({ kotlin.Result.failure<A>(it) }, { kotlin.Result.success(it) }))
@@ -202,24 +202,24 @@ fun <R, E, A> fromAsyncF(fa: RIOProcF<R, E, A>): suspend R.() -> A = {
 }
 
 @extension
-interface RIOFunctor<R, E> : Functor<RIOPartialOf<R, E>> {
+interface EnvFxFunctor<R, E> : Functor<EnvFxPartialOf<R, E>> {
 
-  override fun <A, B> RIOOf<R, E, A>.map(f: (A) -> B): RIO<R, E, B> =
-    RIO { fix().fa.map(f)(this) }
+  override fun <A, B> EnvFxOf<R, E, A>.map(f: (A) -> B): EnvFx<R, E, B> =
+    EnvFx { fix().fa.map(f)(this) }
 
 }
 
 @extension
-interface RIOApplicative<R, E> : Applicative<RIOPartialOf<R, E>>, RIOFunctor<R, E> {
-  override fun <A> just(a: A): RIO<R, E, A> =
-    RIO.just(a)
+interface EnvFxApplicative<R, E> : Applicative<EnvFxPartialOf<R, E>>, EnvFxFunctor<R, E> {
+  override fun <A> just(a: A): EnvFx<R, E, A> =
+    EnvFx.just(a)
 
-  override fun <A, B> RIOOf<R, E, A>.map(f: (A) -> B): RIO<R, E, B> =
-    RIO { fix().fa.map(f)(this) }
+  override fun <A, B> EnvFxOf<R, E, A>.map(f: (A) -> B): EnvFx<R, E, B> =
+    EnvFx { fix().fa.map(f)(this) }
 
   @Suppress("UNCHECKED_CAST")
-  override fun <A, B> RIOOf<R, E, A>.ap(ff: RIOOf<R, E, (A) -> B>): RIO<R, E, B> =
-    RIO {
+  override fun <A, B> EnvFxOf<R, E, A>.ap(ff: EnvFxOf<R, E, (A) -> B>): EnvFx<R, E, B> =
+    EnvFx {
       val result: Either<E, (A) -> B> = ff.fix().fa(this)
       when (result) {
         is Either.Left -> this@ap.fix().fa(this) as Either<E, B>
@@ -229,21 +229,21 @@ interface RIOApplicative<R, E> : Applicative<RIOPartialOf<R, E>>, RIOFunctor<R, 
 }
 
 @extension
-interface RIOApplicativeError<R, E> : ApplicativeError<RIOPartialOf<R, E>, E>, RIOApplicative<R, E> {
-  override fun <A> raiseError(e: E): RIO<R, E, A> =
-    RIO { e.left() }
+interface EnvFxApplicativeError<R, E> : ApplicativeError<EnvFxPartialOf<R, E>, E>, EnvFxApplicative<R, E> {
+  override fun <A> raiseError(e: E): EnvFx<R, E, A> =
+    EnvFx { e.left() }
 
-  override fun <A> RIOOf<R, E, A>.handleErrorWith(f: (E) -> RIOOf<R, E, A>): RIO<R, E, A> =
-    RIO { fix().fa.handleErrorWith { e: E -> f(e).fix().fa }(this) }
+  override fun <A> EnvFxOf<R, E, A>.handleErrorWith(f: (E) -> EnvFxOf<R, E, A>): EnvFx<R, E, A> =
+    EnvFx { fix().fa.handleErrorWith { e: E -> f(e).fix().fa }(this) }
 
 }
 
 @extension
-interface RIOMonad<R, E> : Monad<RIOPartialOf<R, E>>, RIOApplicative<R, E> {
-  override fun <A, B> RIOOf<R, E, A>.flatMap(f: (A) -> RIOOf<R, E, B>): RIO<R, E, B> =
-    RIO { fix().fa.flatMap { a: A -> f(a).fix().fa }(this) }
+interface EnvFxMonad<R, E> : Monad<EnvFxPartialOf<R, E>>, EnvFxApplicative<R, E> {
+  override fun <A, B> EnvFxOf<R, E, A>.flatMap(f: (A) -> EnvFxOf<R, E, B>): EnvFx<R, E, B> =
+    EnvFx { fix().fa.flatMap { a: A -> f(a).fix().fa }(this) }
 
-  override fun <A, B> tailRecM(a: A, f: (A) -> RIOOf<R, E, Either<A, B>>): RIO<R, E, B> =
+  override fun <A, B> tailRecM(a: A, f: (A) -> EnvFxOf<R, E, Either<A, B>>): EnvFx<R, E, B> =
     f(a).flatMap {
       it.fold(
         { x -> tailRecM(x, f) },
@@ -252,8 +252,8 @@ interface RIOMonad<R, E> : Monad<RIOPartialOf<R, E>>, RIOApplicative<R, E> {
     }
 
   @Suppress("UNCHECKED_CAST")
-  override fun <A, B> RIOOf<R, E, A>.ap(ff: RIOOf<R, E, (A) -> B>): RIO<R, E, B> =
-    RIO {
+  override fun <A, B> EnvFxOf<R, E, A>.ap(ff: EnvFxOf<R, E, (A) -> B>): EnvFx<R, E, B> =
+    EnvFx {
       val result: Either<E, (A) -> B> = ff.fix().fa(this)
       when (result) {
         is Either.Left -> this@ap.fix().fa(this) as Either<E, B>
@@ -261,27 +261,27 @@ interface RIOMonad<R, E> : Monad<RIOPartialOf<R, E>>, RIOApplicative<R, E> {
       }
     }
 
-  override fun <A, B> RIOOf<R, E, A>.map(f: (A) -> B): RIO<R, E, B> =
-    RIO { fix().fa.map(f)(this) }
+  override fun <A, B> EnvFxOf<R, E, A>.map(f: (A) -> B): EnvFx<R, E, B> =
+    EnvFx { fix().fa.map(f)(this) }
 
 }
 
 @extension
-interface RIOMonadError<R, E> : MonadError<RIOPartialOf<R, E>, E>, RIOApplicativeError<R, E>, RIOMonad<R, E>
+interface EnvFxMonadError<R, E> : MonadError<EnvFxPartialOf<R, E>, E>, EnvFxApplicativeError<R, E>, EnvFxMonad<R, E>
 
 @extension
-interface RIOMonadThrow<R, E> : MonadThrow<RIOPartialOf<R, E>>, RIOMonad<R, E> {
-  override fun <A> raiseError(e: Throwable): RIO<R, E, A> =
-    RIO { throw RaisedError(e) }
+interface EnvFxMonadThrow<R, E> : MonadThrow<EnvFxPartialOf<R, E>>, EnvFxMonad<R, E> {
+  override fun <A> raiseError(e: Throwable): EnvFx<R, E, A> =
+    EnvFx { throw RaisedError(e) }
 
-  override fun <A> RIOOf<R, E, A>.handleErrorWith(f: (Throwable) -> RIOOf<R, E, A>): RIO<R, E, A> =
-    RIO { fix().fa.handleErrorWith { t: Throwable -> f(t).fix().fa }(this) }
+  override fun <A> EnvFxOf<R, E, A>.handleErrorWith(f: (Throwable) -> EnvFxOf<R, E, A>): EnvFx<R, E, A> =
+    EnvFx { fix().fa.handleErrorWith { t: Throwable -> f(t).fix().fa }(this) }
 }
 
 @extension
-interface RIOBracket<R, E> : Bracket<RIOPartialOf<R, E>, Throwable>, RIOMonadThrow<R, E> {
-  override fun <A, B> RIOOf<R, E, A>.bracketCase(release: (A, ExitCase<Throwable>) -> RIOOf<R, E, Unit>, use: (A) -> RIOOf<R, E, B>): RIO<R, E, B> =
-    RIO {
+interface EnvFxBracket<R, E> : Bracket<EnvFxPartialOf<R, E>, Throwable>, EnvFxMonadThrow<R, E> {
+  override fun <A, B> EnvFxOf<R, E, A>.bracketCase(release: (A, ExitCase<Throwable>) -> EnvFxOf<R, E, Unit>, use: (A) -> EnvFxOf<R, E, B>): EnvFx<R, E, B> =
+    EnvFx {
       fix().fa.bracketCase(
         release.curry().andThen { a -> a.andThen { b -> b.fix().fa } }.uncurried(),
         use.andThen { a -> a.fix().fa }
@@ -290,49 +290,49 @@ interface RIOBracket<R, E> : Bracket<RIOPartialOf<R, E>, Throwable>, RIOMonadThr
 }
 
 @extension
-interface RIOMonadDefer<R, E> : MonadDefer<RIOPartialOf<R, E>>, RIOBracket<R, E> {
-  override fun <A> defer(fa: () -> RIOOf<R, E, A>): RIO<R, E, A> =
+interface EnvFxMonadDefer<R, E> : MonadDefer<EnvFxPartialOf<R, E>>, EnvFxBracket<R, E> {
+  override fun <A> defer(fa: () -> EnvFxOf<R, E, A>): EnvFx<R, E, A> =
     unit().flatMap { fa() }
 }
 
 @extension
-interface RIOAsync<R, E> : Async<RIOPartialOf<R, E>>, RIOMonadDefer<R, E> {
+interface EnvFxAsync<R, E> : Async<EnvFxPartialOf<R, E>>, EnvFxMonadDefer<R, E> {
 
-  override fun <A> async(fa: Proc<A>): RIO<R, E, A> =
-    RIO { fromAsync(fa)().right() }
+  override fun <A> async(fa: Proc<A>): EnvFx<R, E, A> =
+    EnvFx { fromAsync(fa)().right() }
 
-  override fun <A> asyncF(k: ProcF<RIOPartialOf<R, E>, A>): RIO<R, E, A> =
-    RIO { fromAsyncF(k)(this).right() }
+  override fun <A> asyncF(k: ProcF<EnvFxPartialOf<R, E>, A>): EnvFx<R, E, A> =
+    EnvFx { fromAsyncF(k)(this).right() }
 
-  override fun <A> RIOOf<R, E, A>.continueOn(ctx: CoroutineContext): RIO<R, E, A> =
-    RIO { ctx.continueOn(suspend { fix().fa(this) })() }
+  override fun <A> EnvFxOf<R, E, A>.continueOn(ctx: CoroutineContext): EnvFx<R, E, A> =
+    EnvFx { ctx.continueOn(suspend { fix().fa(this) })() }
 
 }
 
 @extension
-interface RIODispatchers<R, E> : Dispatchers<RIOPartialOf<R, E>> {
+interface EnvFxDispatchers<R, E> : Dispatchers<EnvFxPartialOf<R, E>> {
   override fun default(): CoroutineContext =
     NonBlocking
 }
 
 @extension
-interface RIOConcurrent<R, E> : Concurrent<RIOPartialOf<R, E>>, RIOAsync<R, E> {
-  override fun dispatchers(): Dispatchers<RIOPartialOf<R, E>> =
-    object : RIODispatchers<R, E> {}
+interface EnvFxConcurrent<R, E> : Concurrent<EnvFxPartialOf<R, E>>, EnvFxAsync<R, E> {
+  override fun dispatchers(): Dispatchers<EnvFxPartialOf<R, E>> =
+    object : EnvFxDispatchers<R, E> {}
 
-  override fun <A> async(fa: Proc<A>): RIO<R, E, A> =
-    RIO { fromAsync(fa)().right() }
+  override fun <A> async(fa: Proc<A>): EnvFx<R, E, A> =
+    EnvFx { fromAsync(fa)().right() }
 
-  override fun <A> asyncF(k: ProcF<RIOPartialOf<R, E>, A>): RIO<R, E, A> =
-    RIO { fromAsyncF(k)(this).right() }
+  override fun <A> asyncF(k: ProcF<EnvFxPartialOf<R, E>, A>): EnvFx<R, E, A> =
+    EnvFx { fromAsyncF(k)(this).right() }
 
-  override fun <A> RIOOf<R, E, A>.continueOn(ctx: CoroutineContext): RIO<R, E, A> =
-    RIO { ctx.continueOn(suspend { fix().fa(this) })() }
+  override fun <A> EnvFxOf<R, E, A>.continueOn(ctx: CoroutineContext): EnvFx<R, E, A> =
+    EnvFx { ctx.continueOn(suspend { fix().fa(this) })() }
 
-  override fun <A> CoroutineContext.startFiber(kind: RIOOf<R, E, A>): RIO<R, E, Fiber<RIOPartialOf<R, E>, A>> =
-    RIO {
+  override fun <A> CoroutineContext.startFiber(kind: EnvFxOf<R, E, A>): EnvFx<R, E, Fiber<EnvFxPartialOf<R, E>, A>> =
+    EnvFx {
       val promise = UnsafePromise<Either<E, A>>()
-      val conn = RIOConnection<R, E>(this)
+      val conn = EnvFxConnection<R, E>(this)
       suspend { kind.fix().fa(this) }.startCoroutine(asyncContinuation(this@startFiber) { either ->
         either.fold(
           { promise.complete(it.left()) },
@@ -341,33 +341,33 @@ interface RIOConcurrent<R, E> : Concurrent<RIOPartialOf<R, E>>, RIOAsync<R, E> {
           }
         )
       })
-      RIOFiber(promise, conn).right()
+      EnvFxFiber(promise, conn).right()
     }
 
-  override fun <A> asyncF(fa: ConnectedProcF<RIOPartialOf<R, E>, A>): RIO<R, E, A> =
-    RIO { fromAsyncF(fa)(this).right() }
+  override fun <A> asyncF(fa: ConnectedProcF<EnvFxPartialOf<R, E>, A>): EnvFx<R, E, A> =
+    EnvFx { fromAsyncF(fa)(this).right() }
 
-  override fun <A, B> CoroutineContext.racePair(fa: RIOOf<R, E, A>, fb: RIOOf<R, E, B>): RIO<R, E, RacePair<RIOPartialOf<R, E>, A, B>> =
-    RIO { racePair(fa.fix().fa, fb.fix().fa)(this) }
+  override fun <A, B> CoroutineContext.racePair(fa: EnvFxOf<R, E, A>, fb: EnvFxOf<R, E, B>): EnvFx<R, E, RacePair<EnvFxPartialOf<R, E>, A, B>> =
+    EnvFx { racePair(fa.fix().fa, fb.fix().fa)(this) }
 
-  override fun <A, B, C> CoroutineContext.raceTriple(fa: RIOOf<R, E, A>, fb: RIOOf<R, E, B>, fc: RIOOf<R, E, C>): RIO<R, E, RaceTriple<RIOPartialOf<R, E>, A, B, C>> =
-    RIO { raceTriple(fa.fix().fa, fb.fix().fa, fc.fix().fa)(this) }
+  override fun <A, B, C> CoroutineContext.raceTriple(fa: EnvFxOf<R, E, A>, fb: EnvFxOf<R, E, B>, fc: EnvFxOf<R, E, C>): EnvFx<R, E, RaceTriple<EnvFxPartialOf<R, E>, A, B, C>> =
+    EnvFx { raceTriple(fa.fix().fa, fb.fix().fa, fc.fix().fa)(this) }
 
 }
 
 @extension
-interface RIOFx<R, E> : Fx<RIOPartialOf<R, E>> {
-  override fun concurrent(): Concurrent<RIOPartialOf<R, E>> =
-    object : RIOConcurrent<R, E> {}
+interface EnvFxFx<R, E> : Fx<EnvFxPartialOf<R, E>> {
+  override fun concurrent(): Concurrent<EnvFxPartialOf<R, E>> =
+    object : EnvFxConcurrent<R, E> {}
 }
 
-internal fun <R, E, A> RIOFiber(
+internal fun <R, E, A> EnvFxFiber(
   promise: UnsafePromise<Either<E, A>>,
-  conn: KindConnection<RIOPartialOf<R, E>>
-): Fiber<RIOPartialOf<R, E>, A> {
-  val join: RIO<R, E, A> = RIO {
-    fromAsync<R, E, A> { conn2: KindConnection<RIOPartialOf<R, E>>, cb ->
-      conn2.push(RIO { promise.remove(cb).right() })
+  conn: KindConnection<EnvFxPartialOf<R, E>>
+): Fiber<EnvFxPartialOf<R, E>, A> {
+  val join: EnvFx<R, E, A> = EnvFx {
+    fromAsync<R, E, A> { conn2: KindConnection<EnvFxPartialOf<R, E>>, cb ->
+      conn2.push(EnvFx { promise.remove(cb).right() })
       conn.push(conn2.cancel())
       promise.get { a ->
         cb(a)
@@ -383,16 +383,16 @@ suspend fun <R, E, A, B> CoroutineContext.racePair(
   fa: suspend R.() -> Either<E, A>,
   fb: suspend R.() -> Either<E, B>
 ): suspend R.() ->
-Either<E, RacePair<RIOPartialOf<R, E>, A, B>> = {
-  fromAsync<R, E, RacePair<RIOPartialOf<R, E>, A, B>> { conn: KindConnection<RIOPartialOf<R, E>>, cb ->
+Either<E, RacePair<EnvFxPartialOf<R, E>, A, B>> = {
+  fromAsync<R, E, RacePair<EnvFxPartialOf<R, E>, A, B>> { conn: KindConnection<EnvFxPartialOf<R, E>>, cb ->
     val active: AtomicBoolean = AtomicBoolean(true)
-    val upstreamCancelToken: RIO<R, E, Unit> = if (conn.isCanceled()) RIO.unit() else conn.cancel().fix()
+    val upstreamCancelToken: EnvFx<R, E, Unit> = if (conn.isCanceled()) EnvFx.unit() else conn.cancel().fix()
 
-    val connA: KindConnection<RIOPartialOf<R, E>> = RIOConnection(this)
+    val connA: KindConnection<EnvFxPartialOf<R, E>> = EnvFxConnection(this)
     connA.push(upstreamCancelToken)
     val promiseA: UnsafePromise<Either<E, A>> = UnsafePromise()
 
-    val connB: KindConnection<RIOPartialOf<R, E>> = RIOConnection(this)
+    val connB: KindConnection<EnvFxPartialOf<R, E>> = EnvFxConnection(this)
     connB.push(upstreamCancelToken)
     val promiseB = UnsafePromise<Either<E, B>>()
 
@@ -414,7 +414,7 @@ Either<E, RacePair<RIOPartialOf<R, E>, A, B>> = {
       }, { a ->
         if (active.getAndSet(false)) {
           conn.pop()
-          val fiber = RIOFiber(promiseB, connB)
+          val fiber = EnvFxFiber(promiseB, connB)
           val tuple = a.map { Tuple2(it, fiber).left() }
           cb(Right(tuple))
         } else {
@@ -439,7 +439,7 @@ Either<E, RacePair<RIOPartialOf<R, E>, A, B>> = {
       }, { b ->
         if (active.getAndSet(false)) {
           conn.pop()
-          val fiber = RIOFiber(promiseA, connA)
+          val fiber = EnvFxFiber(promiseA, connA)
           val tuple = b.map { Tuple2(fiber, it).right() }
           cb(Right(tuple))
         } else {
@@ -454,23 +454,23 @@ suspend fun <R, E, A, B, C> CoroutineContext.raceTriple(
   fa: suspend R.() -> Either<E, A>,
   fb: suspend R.() -> Either<E, B>,
   fc: suspend R.() -> Either<E, C>
-): suspend R.() -> Either<E, RaceTriple<RIOPartialOf<R, E>, A, B, C>> = {
-  fromAsync { conn: KindConnection<RIOPartialOf<R, E>>,
-              cb: (Either<Throwable, Either<E, RaceTriple<RIOPartialOf<R, E>, A, B, C>>>) -> Unit ->
+): suspend R.() -> Either<E, RaceTriple<EnvFxPartialOf<R, E>, A, B, C>> = {
+  fromAsync { conn: KindConnection<EnvFxPartialOf<R, E>>,
+              cb: (Either<Throwable, Either<E, RaceTriple<EnvFxPartialOf<R, E>, A, B, C>>>) -> Unit ->
 
     val active = AtomicBoolean(true)
 
-    val upstreamCancelToken: RIO<R, E, Unit> = if (conn.isCanceled()) RIO.unit() else conn.cancel().fix()
+    val upstreamCancelToken: EnvFx<R, E, Unit> = if (conn.isCanceled()) EnvFx.unit() else conn.cancel().fix()
 
-    val connA = RIOConnection<R, E>(this)
+    val connA = EnvFxConnection<R, E>(this)
     connA.push(upstreamCancelToken)
     val promiseA = UnsafePromise<Either<E, A>>()
 
-    val connB = RIOConnection<R, E>(this)
+    val connB = EnvFxConnection<R, E>(this)
     connB.push(upstreamCancelToken)
     val promiseB = UnsafePromise<Either<E, B>>()
 
-    val connC = RIOConnection<R, E>(this)
+    val connC = EnvFxConnection<R, E>(this)
     connC.push(upstreamCancelToken)
     val promiseC = UnsafePromise<Either<E, C>>()
 
@@ -496,7 +496,7 @@ suspend fun <R, E, A, B, C> CoroutineContext.raceTriple(
       }, { a: Either<E, A> ->
         if (active.getAndSet(false)) {
           conn.pop()
-          val tuple = a.map { Tuple3(it, RIOFiber(promiseB, connB), RIOFiber(promiseC, connC)).left() }
+          val tuple = a.map { Tuple3(it, EnvFxFiber(promiseB, connB), EnvFxFiber(promiseC, connC)).left() }
           cb(tuple.right())
         } else {
           promiseA.complete(Right(a))
@@ -524,7 +524,7 @@ suspend fun <R, E, A, B, C> CoroutineContext.raceTriple(
       }, { b ->
         if (active.getAndSet(false)) {
           conn.pop()
-          cb(b.map { Right(Left(Tuple3(RIOFiber(promiseA, connA), it, RIOFiber(promiseC, connC)))) }.right())
+          cb(b.map { Right(Left(Tuple3(EnvFxFiber(promiseA, connA), it, EnvFxFiber(promiseC, connC)))) }.right())
         } else {
           promiseB.complete(Right(b))
         }
@@ -551,7 +551,7 @@ suspend fun <R, E, A, B, C> CoroutineContext.raceTriple(
       }, { c ->
         if (active.getAndSet(false)) {
           conn.pop()
-          cb(c.map { Tuple3(RIOFiber(promiseA, connA), RIOFiber(promiseB, connB), it).right().right() }.right())
+          cb(c.map { Tuple3(EnvFxFiber(promiseA, connA), EnvFxFiber(promiseB, connB), it).right().right() }.right())
         } else {
           promiseC.complete(Right(c))
         }
@@ -560,3 +560,6 @@ suspend fun <R, E, A, B, C> CoroutineContext.raceTriple(
 
   }(this)
 }
+
+suspend fun <R, E, A> ConcurrentCancellableContinuation<EnvFxPartialOf<R, E>, *>.deps(f: suspend R.() -> A) : EnvFx<R, E, A> =
+  EnvFx { f(this).right() }

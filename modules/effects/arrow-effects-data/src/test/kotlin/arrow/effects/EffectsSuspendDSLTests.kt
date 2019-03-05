@@ -343,7 +343,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
       } shouldBe false
     }
 
-    "RIO supports polymorphism" {
+    "EnvFx supports polymorphism" {
       val const = 1
 
       suspend fun sideEffect(): Int =

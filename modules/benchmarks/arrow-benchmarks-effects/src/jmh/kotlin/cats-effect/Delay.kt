@@ -5,8 +5,8 @@ import arrow.core.right
 import arrow.effects.IO
 import arrow.effects.extensions.io.unsafeRun.runBlocking as ioRunBlocking
 import arrow.effects.typeclasses.suspended.*
-import arrow.effects.typeclasses.suspended.bio.monad.flatMap
-import arrow.effects.typeclasses.suspended.rio.monad.flatMap
+import arrow.effects.typeclasses.suspended.catchfx.monad.flatMap
+import arrow.effects.typeclasses.suspended.envfx.monad.flatMap
 import arrow.effects.typeclasses.suspended.fx.unsafeRun.runBlocking as fxRunBlocking
 import arrow.unsafe
 import kotlinx.coroutines.runBlocking
@@ -53,18 +53,18 @@ open class Delay {
   fun io(): Int =
     unsafe { ioRunBlocking { ioDelayLoop(0) } }
 
-  fun bioDelayLoop(i: Int): BIO<Int, Int> =
-    BIO { i.right() }.flatMap { j ->
-      if (j > size) BIO { j.right() } else bioDelayLoop(j + 1)
+  fun bioDelayLoop(i: Int): CatchFx<Int, Int> =
+    CatchFx { i.right() }.flatMap { j ->
+      if (j > size) CatchFx { j.right() } else bioDelayLoop(j + 1)
     }
 
   @Benchmark
   fun fx_rio(): Int =
     unsafe { fxRunBlocking { rioDelayLoop(0).toFx(0) }.getOrHandle { 0 } }
 
-  fun rioDelayLoop(i: Int): RIO<Int, Int, Int> =
-    RIO<Int, Int, Int> { i.right() }.flatMap { j ->
-      if (j > size) RIO { j.right() } else rioDelayLoop(j + 1)
+  fun rioDelayLoop(i: Int): EnvFx<Int, Int, Int> =
+    EnvFx<Int, Int, Int> { i.right() }.flatMap { j ->
+      if (j > size) EnvFx { j.right() } else rioDelayLoop(j + 1)
     }
 
   @Benchmark

@@ -49,11 +49,11 @@ open class Pure {
 
   @Benchmark
   fun fx_bio(): Int =
-    unsafe { fxRunBlocking { BIO { bioPureLoop<String>(0) }.toFx() }.getOrHandle { 0 } }
+    unsafe { fxRunBlocking { CatchFx { bioPureLoop<String>(0) }.toFx() }.getOrHandle { 0 } }
 
-  tailrec suspend fun <R, E> rioPureLoop(i: Int): RIO<R, E, Int> {
+  tailrec suspend fun <R, E> rioPureLoop(i: Int): EnvFx<R, E, Int> {
     val j = just(i)()
-    return if (j > size) RIO { j.right() } else rioPureLoop(j + 1)
+    return if (j > size) EnvFx { j.right() } else rioPureLoop(j + 1)
   }
 
   @Benchmark

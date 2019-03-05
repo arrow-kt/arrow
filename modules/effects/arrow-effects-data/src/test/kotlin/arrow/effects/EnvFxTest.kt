@@ -5,15 +5,12 @@ import arrow.core.getOrHandle
 import arrow.core.left
 import arrow.core.nonFatalOrThrow
 import arrow.core.right
-import arrow.effects.typeclasses.suspended.BIO
-import arrow.effects.typeclasses.suspended.BIOPartialOf
-import arrow.effects.typeclasses.suspended.bio.applicativeError.attempt
-import arrow.effects.typeclasses.suspended.bio.applicativeError.raiseError
-import arrow.effects.typeclasses.suspended.bio.concurrent.concurrent
-import arrow.effects.typeclasses.suspended.bio.fx.fx
-import arrow.effects.typeclasses.suspended.fix
+import arrow.effects.typeclasses.suspended.*
+import arrow.effects.typeclasses.suspended.envfx.applicativeError.attempt
+import arrow.effects.typeclasses.suspended.envfx.applicativeError.raiseError
+import arrow.effects.typeclasses.suspended.envfx.concurrent.concurrent
+import arrow.effects.typeclasses.suspended.envfx.fx.fx
 import arrow.effects.typeclasses.suspended.fx.unsafeRun.runBlocking
-import arrow.effects.typeclasses.suspended.toFx
 import arrow.test.UnitSpec
 import arrow.test.laws.ConcurrentLaws
 import arrow.typeclasses.Eq
@@ -23,23 +20,23 @@ import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
 
 @RunWith(KotlinTestRunner::class)
-class BIOTest : UnitSpec() {
+class EnvFxTest : UnitSpec() {
 
-  fun <A> EQ(): Eq<Kind<BIOPartialOf<Throwable>, A>> = Eq { a, b ->
+  fun <A> EQ(): Eq<Kind<EnvFxPartialOf<Int, Throwable>, A>> = Eq { a, b ->
     unsafe {
       runBlocking {
-        BIO<Throwable, Boolean> {
+        EnvFx<Int, Throwable, Boolean> {
           try {
-            (a.fix().fa() == b.fix().fa()).right()
+            (a.fix().fa(this) == b.fix().fa(this)).right()
           } catch (e: Throwable) {
             val errA = try {
-              a.fix().fa()
+              a.fix().fa(this)
               throw IllegalArgumentException()
             } catch (err: Throwable) {
               err.nonFatalOrThrow()
             }
             val errB = try {
-              b.fix().fa()
+              b.fix().fa(this)
               throw IllegalStateException()
             } catch (err: Throwable) {
               err.nonFatalOrThrow()
@@ -47,35 +44,33 @@ class BIOTest : UnitSpec() {
             println("Found errors: $errA and $errB")
             (errA.message == errB.message).right()
           }
-        }.toFx()
+        }.toFx(0)
       }.getOrHandle { throw it }
     }
   }
 
   init {
-    "Bio fx blocks" {
-      val program: BIO<TestUserError, Int> =
+    "Rio fx blocks" {
+      val program: EnvFx<Int, TestUserError, Int> =
         fx {
           val a = !effect { 1 }
           val b = !effect { 1 }
           a + b
         }
-      unsafe { runBlocking { program.attempt().toFx() } } shouldBe 2.right().right()
+      unsafe { runBlocking { program.attempt().toFx(0) } } shouldBe 2.right().right()
     }
 
-    "Bio fx error" {
-      val program: BIO<TestUserError, Int> =
+    "Rio fx error" {
+      val program: EnvFx<Int, TestUserError, Int> =
         fx {
           val a = !effect { 1 }
-          val b: Int = !TestUserError.raiseError<TestUserError, Int>()
+          val b: Int = !TestUserError.raiseError<Int, TestUserError, Int>()
           a + b
         }
-      unsafe { runBlocking { program.attempt().toFx() } } shouldBe TestUserError.left().right()
+      unsafe { runBlocking { program.attempt().toFx(0) } } shouldBe TestUserError.left().right()
     }
 
-    testLaws(ConcurrentLaws.laws(BIO.concurrent(), EQ(), EQ(), EQ()))
+    testLaws(ConcurrentLaws.laws(EnvFx.concurrent(), EQ(), EQ(), EQ()))
   }
 
 }
-
-object TestUserError
