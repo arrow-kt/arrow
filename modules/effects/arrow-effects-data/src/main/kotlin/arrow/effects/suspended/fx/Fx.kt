@@ -1,4 +1,4 @@
-package arrow.effects.typeclasses.suspended
+package arrow.effects.suspended.fx
 
 import arrow.Kind
 import arrow.core.*
@@ -6,8 +6,8 @@ import arrow.effects.KindConnection
 import arrow.effects.internal.Platform
 import arrow.effects.internal.UnsafePromise
 import arrow.effects.internal.asyncContinuation
+import arrow.effects.suspended.fx.fx.dispatchers.dispatchers
 import arrow.effects.typeclasses.*
-import arrow.effects.typeclasses.suspended.fx.dispatchers.dispatchers
 import arrow.extension
 import arrow.typeclasses.*
 import arrow.typeclasses.Continuation
@@ -605,7 +605,7 @@ suspend fun <A> fromAsync(fa: FxProc<A>): suspend () -> A = {
   suspendCoroutine { continuation ->
     val conn = FxConnection()
     //Is CancellationException from kotlin in kotlinx package???
-    conn.push(Fx { continuation.resumeWith(kotlin.Result.failure(CancellationException())) })
+    conn.push(Fx { continuation.resumeWith(Result.failure(CancellationException())) })
     fa(conn) { either ->
       continuation.resumeWith(either.fold({ kotlin.Result.failure<A>(it) }, { kotlin.Result.success(it) }))
     }
@@ -625,7 +625,7 @@ fun <A> fromAsyncF(fa: FxProcF<A>): suspend () -> A = {
   suspendCoroutine { continuation ->
     val conn = FxConnection()
     //Is CancellationException from kotlin in kotlinx package???
-    conn.push(Fx { continuation.resumeWith(kotlin.Result.failure(CancellationException())) })
+    conn.push(Fx { continuation.resumeWith(Result.failure(CancellationException())) })
     fa(conn) { either ->
       continuation.resumeWith(either.fold({ kotlin.Result.failure<A>(it) }, { kotlin.Result.success(it) }))
     }.fix().fa.foldContinuation(EmptyCoroutineContext, mapUnit)

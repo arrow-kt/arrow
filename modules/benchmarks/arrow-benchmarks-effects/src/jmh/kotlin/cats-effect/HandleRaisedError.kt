@@ -2,8 +2,11 @@ package arrow.benchmarks.effects
 
 import arrow.effects.IO
 import arrow.effects.extensions.io.applicativeError.handleErrorWith
-import arrow.effects.typeclasses.suspended.*
-import arrow.effects.typeclasses.suspended.fx.unsafeRun.runBlocking
+import arrow.effects.suspended.fx.Fx
+import arrow.effects.suspended.fx.flatMap
+import arrow.effects.suspended.fx.handleError
+import arrow.effects.suspended.fx.not
+import arrow.effects.suspended.fx.fx.unsafeRun.runBlocking
 import arrow.unsafe
 import kotlinx.coroutines.runBlocking
 import org.openjdk.jmh.annotations.*
@@ -36,9 +39,9 @@ open class HandleRaisedError {
 
   tailrec suspend fun fxErrorRaisedloop(i: Int): Int =
     if (i < size) {
-      val result = !raiseError<Int>(dummy)
-        .flatMap { x -> just(x + 1) }
-        .flatMap { x -> just(x + 1) }
+      val result = !arrow.effects.suspended.fx.raiseError<Int>(dummy)
+        .flatMap { x -> arrow.effects.suspended.fx.just(x + 1) }
+        .flatMap { x -> arrow.effects.suspended.fx.just(x + 1) }
         .handleError { i + 1 }
       fxErrorRaisedloop(result)
     } else i

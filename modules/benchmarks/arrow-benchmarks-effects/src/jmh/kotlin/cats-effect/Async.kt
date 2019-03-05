@@ -4,18 +4,24 @@ import arrow.core.getOrHandle
 import arrow.core.right
 import arrow.effects.IO
 import arrow.effects.extensions.io.monad.followedBy
-import arrow.effects.typeclasses.suspended.*
-import arrow.effects.typeclasses.suspended.catchfx.monad.followedBy
-import arrow.effects.typeclasses.suspended.envfx.monad.followedBy
-import arrow.effects.typeclasses.suspended.catchfx.async.shift as bioShift
-import arrow.effects.typeclasses.suspended.envfx.async.shift as rioShift
+import arrow.effects.suspended.env.EnvFx
+import arrow.effects.suspended.env.toFx
+import arrow.effects.suspended.error.CatchFx
+import arrow.effects.suspended.error.toFx
+import arrow.effects.suspended.fx.Fx
+import arrow.effects.suspended.fx.NonBlocking
+import arrow.effects.suspended.fx.continueOn
+import arrow.effects.suspended.error.catchfx.monad.followedBy
+import arrow.effects.suspended.env.envfx.monad.followedBy
+import arrow.effects.suspended.error.catchfx.async.shift as bioShift
+import arrow.effects.suspended.env.envfx.async.shift as rioShift
 import arrow.unsafe
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
 import arrow.effects.extensions.io.async.shift as ioShift
 import arrow.effects.extensions.io.unsafeRun.runBlocking as ioRunBlocking
-import arrow.effects.typeclasses.suspended.fx.async.shift as fxShift
-import arrow.effects.typeclasses.suspended.fx.unsafeRun.runBlocking as fxRunBlocking
+import arrow.effects.suspended.fx.fx.async.shift as fxShift
+import arrow.effects.suspended.fx.fx.unsafeRun.runBlocking as fxRunBlocking
 
 
 @State(Scope.Thread)

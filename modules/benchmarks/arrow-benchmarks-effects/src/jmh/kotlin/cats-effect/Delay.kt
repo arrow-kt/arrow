@@ -3,11 +3,16 @@ package arrow.benchmarks.effects
 import arrow.core.getOrHandle
 import arrow.core.right
 import arrow.effects.IO
+import arrow.effects.suspended.env.EnvFx
+import arrow.effects.suspended.env.toFx
+import arrow.effects.suspended.error.CatchFx
+import arrow.effects.suspended.error.toFx
+import arrow.effects.suspended.fx.Fx
+import arrow.effects.suspended.fx.not
 import arrow.effects.extensions.io.unsafeRun.runBlocking as ioRunBlocking
-import arrow.effects.typeclasses.suspended.*
-import arrow.effects.typeclasses.suspended.catchfx.monad.flatMap
-import arrow.effects.typeclasses.suspended.envfx.monad.flatMap
-import arrow.effects.typeclasses.suspended.fx.unsafeRun.runBlocking as fxRunBlocking
+import arrow.effects.suspended.error.catchfx.monad.flatMap
+import arrow.effects.suspended.env.envfx.monad.flatMap
+import arrow.effects.suspended.fx.fx.unsafeRun.runBlocking as fxRunBlocking
 import arrow.unsafe
 import kotlinx.coroutines.runBlocking
 import org.openjdk.jmh.annotations.*
@@ -36,8 +41,8 @@ open class Delay {
     runBlocking { fxDirectDelayLoop(0) }
 
   tailrec suspend fun fxDelayLoop(i: Int): suspend () -> Int {
-    val j = !fx { i }
-    return if (j > size) fx { j } else fxDelayLoop(j + 1)
+    val j = !arrow.effects.suspended.fx.fx { i }
+    return if (j > size) arrow.effects.suspended.fx.fx { j } else fxDelayLoop(j + 1)
   }
 
   @Benchmark

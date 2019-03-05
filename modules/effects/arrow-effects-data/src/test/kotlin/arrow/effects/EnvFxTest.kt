@@ -5,12 +5,12 @@ import arrow.core.getOrHandle
 import arrow.core.left
 import arrow.core.nonFatalOrThrow
 import arrow.core.right
-import arrow.effects.typeclasses.suspended.*
-import arrow.effects.typeclasses.suspended.envfx.applicativeError.attempt
-import arrow.effects.typeclasses.suspended.envfx.applicativeError.raiseError
-import arrow.effects.typeclasses.suspended.envfx.concurrent.concurrent
-import arrow.effects.typeclasses.suspended.envfx.fx.fx
-import arrow.effects.typeclasses.suspended.fx.unsafeRun.runBlocking
+import arrow.effects.suspended.env.*
+import arrow.effects.suspended.env.envfx.applicativeError.attempt
+import arrow.effects.suspended.env.envfx.applicativeError.raiseError
+import arrow.effects.suspended.env.envfx.concurrent.concurrent
+import arrow.effects.suspended.env.envfx.fx.fx
+import arrow.effects.suspended.fx.fx.unsafeRun.runBlocking
 import arrow.test.UnitSpec
 import arrow.test.laws.ConcurrentLaws
 import arrow.typeclasses.Eq
@@ -64,7 +64,7 @@ class EnvFxTest : UnitSpec() {
       val program: EnvFx<Int, TestUserError, Int> =
         fx {
           val a = !effect { 1 }
-          val b: Int = !TestUserError.raiseError<Int, TestUserError, Int>()
+          val b = !TestUserError.raiseError<Int, TestUserError, Int>()
           a + b
         }
       unsafe { runBlocking { program.attempt().toFx(0) } } shouldBe TestUserError.left().right()

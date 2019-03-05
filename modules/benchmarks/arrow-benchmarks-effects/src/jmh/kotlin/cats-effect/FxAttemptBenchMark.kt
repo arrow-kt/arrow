@@ -1,7 +1,7 @@
 package arrow.benchmarks.effects
 
 import arrow.core.Either
-import arrow.effects.typeclasses.suspended.*
+import arrow.effects.suspended.fx.*
 import kotlinx.coroutines.runBlocking
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
@@ -23,7 +23,7 @@ open class FxAttemptBenchMark {
 
   tailrec suspend fun loopHappy(size: Int, i: Int): Int =
     if (i < size) {
-      val attempted = !attempt { i + 1 }
+      val attempted = !arrow.effects.suspended.fx.attempt { i + 1 }
       when (attempted) {
         is Either.Left -> !attempted.a.raiseError<Int>()
         is Either.Right -> loopHappy(size, attempted.b)

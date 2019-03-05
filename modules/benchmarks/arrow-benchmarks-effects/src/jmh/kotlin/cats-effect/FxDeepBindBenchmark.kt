@@ -1,7 +1,10 @@
 package arrow.benchmarks.effects
 
-import arrow.effects.typeclasses.suspended.*
-import arrow.effects.typeclasses.suspended.fx.unsafeRun.runBlocking
+import arrow.effects.suspended.fx.Fx
+import arrow.effects.suspended.fx.NonBlocking
+import arrow.effects.suspended.fx.fx.unsafeRun.runBlocking
+import arrow.effects.suspended.fx.not
+import arrow.effects.suspended.fx.startFiber
 import arrow.unsafe
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
@@ -17,8 +20,8 @@ open class FxDeepBindBenchmark {
   var size: Int = 0
 
   tailrec suspend fun pureLoop(i: Int): suspend () -> Int {
-    val j = !just(i)
-    return if (j > size) just(j) else pureLoop(j + 1)
+    val j = !arrow.effects.suspended.fx.just(i)
+    return if (j > size) arrow.effects.suspended.fx.just(j) else pureLoop(j + 1)
   }
 
   @Benchmark

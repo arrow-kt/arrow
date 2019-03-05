@@ -1,8 +1,9 @@
 package arrow.benchmarks.effects
 
 import arrow.effects.IO
-import arrow.effects.typeclasses.suspended.just
-import arrow.effects.typeclasses.suspended.map
+import arrow.effects.suspended.env.just
+import arrow.effects.suspended.fx.just
+import arrow.effects.suspended.fx.map
 import arrow.unsafe
 import kotlinx.coroutines.runBlocking
 import org.openjdk.jmh.annotations.*

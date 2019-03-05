@@ -1,10 +1,10 @@
 package arrow.effects
 
-import arrow.effects.typeclasses.suspended.Fx
-import arrow.effects.typeclasses.suspended.FxOf
-import arrow.effects.typeclasses.suspended.fx.concurrent.concurrent
-import arrow.effects.typeclasses.suspended.fx.unsafeRun.runBlocking
-import arrow.effects.typeclasses.suspended.invoke
+import arrow.effects.suspended.fx.Fx
+import arrow.effects.suspended.fx.FxOf
+import arrow.effects.suspended.fx.fx.concurrent.concurrent
+import arrow.effects.suspended.fx.fx.unsafeRun.runBlocking
+import arrow.effects.suspended.fx.invoke
 import arrow.test.UnitSpec
 import arrow.test.laws.ConcurrentLaws
 import arrow.typeclasses.Eq
@@ -20,16 +20,16 @@ class FxTest : UnitSpec() {
       runBlocking {
         Fx {
           try {
-            a.invoke() == b.invoke()
+            a() == b()
           } catch (e: Throwable) {
             val errA = try {
-              a.invoke()
+              a()
               throw IllegalArgumentException()
             } catch (err: Throwable) {
               err
             }
             val errB = try {
-              b.invoke()
+              b()
               throw IllegalStateException()
             } catch (err: Throwable) {
               err

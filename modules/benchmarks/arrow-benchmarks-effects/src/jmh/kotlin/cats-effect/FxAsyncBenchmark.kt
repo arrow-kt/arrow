@@ -2,9 +2,9 @@ package arrow.benchmarks.effects
 
 import arrow.core.Right
 import arrow.data.extensions.list.foldable.foldLeft
-import arrow.effects.typeclasses.suspended.*
-import arrow.effects.typeclasses.suspended.fx.concurrent.parMapN
-import arrow.effects.typeclasses.suspended.fx.unsafeRun.runBlocking
+import arrow.effects.suspended.fx.*
+import arrow.effects.suspended.fx.fx.concurrent.parMapN
+import arrow.effects.suspended.fx.fx.unsafeRun.runBlocking
 import arrow.unsafe
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
@@ -20,7 +20,7 @@ open class FxAsyncBenchmark {
   var size: Int = 0
 
   suspend fun evalAsync(n: Int): suspend () -> Int =
-    fromAsync<Int> { _, callback -> callback(Right(n)) }
+    arrow.effects.suspended.fx.fromAsync<Int> { _, callback -> callback(Right(n)) }
 
   tailrec suspend fun loopAsync(i: Int): suspend () -> Int =
     if (i < size) loopAsync(!evalAsync(i + 1))

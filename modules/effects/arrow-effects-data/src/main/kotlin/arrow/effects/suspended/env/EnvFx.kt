@@ -1,10 +1,12 @@
-package arrow.effects.typeclasses.suspended
+package arrow.effects.suspended.env
 
 import arrow.core.*
 import arrow.effects.KindConnection
 import arrow.effects.internal.Platform
 import arrow.effects.internal.UnsafePromise
 import arrow.effects.internal.asyncContinuation
+import arrow.effects.suspended.error.mapLeft
+import arrow.effects.suspended.fx.*
 import arrow.effects.typeclasses.*
 import arrow.effects.typeclasses.suspended.concurrent.Fx
 import arrow.extension
@@ -39,8 +41,8 @@ class EnvFx<R, out E, out A>(internal val fa: suspend R.() -> Either<E, A>) : En
   }
 }
 
-fun <R, E, A> EnvFxOf<R, E, A>.toFx(r: R): arrow.effects.typeclasses.suspended.Fx<Either<E, A>> =
-  Fx { fix().fa.invoke(r) }
+fun <R, E, A> EnvFxOf<R, E, A>.toFx(r: R): arrow.effects.suspended.fx.Fx<Either<E, A>> =
+  arrow.effects.suspended.fx.Fx { fix().fa.invoke(r) }
 
 suspend operator fun <R, E, A> EnvFxOf<R, E, A>.invoke(r: R): Either<E, A> =
   fix().fa.invoke(r)
@@ -78,7 +80,7 @@ suspend fun <R, E, A> attempt(
   onError: (Throwable) -> E,
   unit: Unit = Unit
 ): suspend R.() -> Either<E, A> =
-  { attempt(fa).mapLeft(onError)() }
+  { arrow.effects.suspended.fx.attempt(fa).mapLeft(onError)() }
 
 fun <R, E> E.raiseError(unit: Unit = Unit): suspend R.() -> Either<E, Nothing> =
   { this@raiseError.left() }
@@ -192,7 +194,7 @@ fun <R, E, A> fromAsyncF(fa: EnvFxProcF<R, E, A>): suspend R.() -> A = {
   suspendCoroutine { continuation ->
     val conn = EnvFxConnection<R, E>(this)
     //Is CancellationException from kotlin in kotlinx package???
-    conn.push(EnvFx { continuation.resumeWith(kotlin.Result.failure(CancellationException())).right() })
+    conn.push(EnvFx { continuation.resumeWith(Result.failure(CancellationException())).right() })
     suspend {
       fa(conn) { either ->
         continuation.resumeWith(either.fold({ kotlin.Result.failure<A>(it) }, { kotlin.Result.success(it) }))
@@ -299,7 +301,7 @@ interface EnvFxMonadDefer<R, E> : MonadDefer<EnvFxPartialOf<R, E>>, EnvFxBracket
 interface EnvFxAsync<R, E> : Async<EnvFxPartialOf<R, E>>, EnvFxMonadDefer<R, E> {
 
   override fun <A> async(fa: Proc<A>): EnvFx<R, E, A> =
-    EnvFx { fromAsync(fa)().right() }
+    EnvFx { (arrow.effects.suspended.fx.fromAsync(fa))().right() }
 
   override fun <A> asyncF(k: ProcF<EnvFxPartialOf<R, E>, A>): EnvFx<R, E, A> =
     EnvFx { fromAsyncF(k)(this).right() }
@@ -321,7 +323,7 @@ interface EnvFxConcurrent<R, E> : Concurrent<EnvFxPartialOf<R, E>>, EnvFxAsync<R
     object : EnvFxDispatchers<R, E> {}
 
   override fun <A> async(fa: Proc<A>): EnvFx<R, E, A> =
-    EnvFx { fromAsync(fa)().right() }
+    EnvFx { (arrow.effects.suspended.fx.fromAsync(fa))().right() }
 
   override fun <A> asyncF(k: ProcF<EnvFxPartialOf<R, E>, A>): EnvFx<R, E, A> =
     EnvFx { fromAsyncF(k)(this).right() }
@@ -456,7 +458,7 @@ suspend fun <R, E, A, B, C> CoroutineContext.raceTriple(
   fc: suspend R.() -> Either<E, C>
 ): suspend R.() -> Either<E, RaceTriple<EnvFxPartialOf<R, E>, A, B, C>> = {
   fromAsync { conn: KindConnection<EnvFxPartialOf<R, E>>,
-              cb: (Either<Throwable, Either<E, RaceTriple<EnvFxPartialOf<R, E>, A, B, C>>>) -> Unit ->
+                                           cb: (Either<Throwable, Either<E, RaceTriple<EnvFxPartialOf<R, E>, A, B, C>>>) -> Unit ->
 
     val active = AtomicBoolean(true)
 
@@ -560,6 +562,3 @@ suspend fun <R, E, A, B, C> CoroutineContext.raceTriple(
 
   }(this)
 }
-
-suspend fun <R, E, A> ConcurrentCancellableContinuation<EnvFxPartialOf<R, E>, *>.deps(f: suspend R.() -> A) : EnvFx<R, E, A> =
-  EnvFx { f(this).right() }

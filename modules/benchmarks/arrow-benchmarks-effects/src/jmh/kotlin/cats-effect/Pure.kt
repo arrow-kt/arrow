@@ -4,13 +4,19 @@ import arrow.core.Either
 import arrow.core.getOrHandle
 import arrow.core.right
 import arrow.effects.IO
-import arrow.effects.typeclasses.suspended.*
+import arrow.effects.suspended.env.EnvFx
+import arrow.effects.suspended.env.toFx
+import arrow.effects.suspended.error.CatchFx
+import arrow.effects.suspended.error.toFx
+import arrow.effects.suspended.fx.Fx
+import arrow.effects.suspended.fx.invoke
+import arrow.effects.suspended.fx.not
 import arrow.unsafe
 import kotlinx.coroutines.runBlocking
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
 import arrow.effects.extensions.io.unsafeRun.runBlocking as ioRunBlocking
-import arrow.effects.typeclasses.suspended.fx.unsafeRun.runBlocking as fxRunBlocking
+import arrow.effects.suspended.fx.fx.unsafeRun.runBlocking as fxRunBlocking
 
 @State(Scope.Thread)
 @Fork(2)
@@ -34,8 +40,8 @@ open class Pure {
     runBlocking { fxDirectPureLoop(0) }
 
   tailrec suspend fun fxPureLoop(i: Int): suspend () -> Int {
-    val j = !just(i)
-    return if (j > size) just(j) else fxPureLoop(j + 1)
+    val j = !arrow.effects.suspended.fx.just(i)
+    return if (j > size) arrow.effects.suspended.fx.just(j) else fxPureLoop(j + 1)
   }
 
   @Benchmark
@@ -43,7 +49,7 @@ open class Pure {
     unsafe { fxRunBlocking { Fx { !fxPureLoop(0) } } }
 
   tailrec suspend fun <E> bioPureLoop(i: Int): Either<E, Int> {
-    val j = !just(i)
+    val j = !arrow.effects.suspended.fx.just(i)
     return if (j > size) j.right() else bioPureLoop(j + 1)
   }
 
@@ -52,7 +58,7 @@ open class Pure {
     unsafe { fxRunBlocking { CatchFx { bioPureLoop<String>(0) }.toFx() }.getOrHandle { 0 } }
 
   tailrec suspend fun <R, E> rioPureLoop(i: Int): EnvFx<R, E, Int> {
-    val j = just(i)()
+    val j = (arrow.effects.suspended.fx.just(i))()
     return if (j > size) EnvFx { j.right() } else rioPureLoop(j + 1)
   }
 

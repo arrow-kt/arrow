@@ -2,8 +2,10 @@ package arrow.benchmarks.effects
 
 import arrow.effects.IO
 import arrow.effects.extensions.io.applicativeError.handleErrorWith
-import arrow.effects.typeclasses.suspended.*
-import arrow.effects.typeclasses.suspended.fx.unsafeRun.runBlocking
+import arrow.effects.suspended.fx.Fx
+import arrow.effects.suspended.fx.handleErrorWith
+import arrow.effects.suspended.fx.not
+import arrow.effects.suspended.fx.fx.unsafeRun.runBlocking
 import arrow.unsafe
 import kotlinx.coroutines.runBlocking
 import org.openjdk.jmh.annotations.*
@@ -32,7 +34,7 @@ open class HandleNonRaised {
 
   tailrec suspend fun fxHappyPathLoop(i: Int): Int =
     if (i < size) {
-      val n = !just(i + 1).handleErrorWith { raiseError(it) }
+      val n = !arrow.effects.suspended.fx.just(i + 1).handleErrorWith { arrow.effects.suspended.fx.raiseError(it) }
       fxHappyPathLoop(n)
     } else i
 

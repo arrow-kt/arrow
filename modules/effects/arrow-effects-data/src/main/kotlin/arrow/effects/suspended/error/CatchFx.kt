@@ -1,13 +1,13 @@
-package arrow.effects.typeclasses.suspended
+package arrow.effects.suspended.error
 
 import arrow.core.*
 import arrow.effects.KindConnection
 import arrow.effects.internal.Platform
 import arrow.effects.internal.UnsafePromise
 import arrow.effects.internal.asyncContinuation
+import arrow.effects.suspended.error.catchfx.monad.flatMap
+import arrow.effects.suspended.fx.*
 import arrow.effects.typeclasses.*
-import arrow.effects.typeclasses.suspended.catchfx.monad.flatMap
-import arrow.effects.typeclasses.suspended.catchfx.monad.monad
 import arrow.effects.typeclasses.suspended.concurrent.Fx
 import arrow.extension
 import arrow.typeclasses.*
@@ -40,8 +40,8 @@ class CatchFx<out E, out A>(internal val fa: suspend () -> Either<E, A>) : Catch
   }
 }
 
-fun <E, A> CatchFxOf<E, A>.toFx(): arrow.effects.typeclasses.suspended.Fx<Either<E, A>> =
-  Fx(fix().fa)
+fun <E, A> CatchFxOf<E, A>.toFx(): arrow.effects.suspended.fx.Fx<Either<E, A>> =
+  arrow.effects.suspended.fx.Fx(fix().fa)
 
 suspend operator fun <E, A> CatchFxOf<E, A>.invoke(): Either<E, A> =
   fix().fa.invoke()
@@ -77,7 +77,7 @@ suspend fun <E, A> attempt(
   fa: suspend () -> A,
   onError: (Throwable) -> E
 ): suspend () -> Either<E, A> =
-  { attempt(fa).mapLeft(onError)() }
+  { arrow.effects.suspended.fx.attempt(fa).mapLeft(onError)() }
 
 fun <E> E.raiseError(): suspend () -> Either<E, Nothing> =
   { left() }
@@ -162,7 +162,7 @@ suspend fun <E, A> fromAsync(fa: CatchFxConnectedProc<E, A>): suspend () -> Eith
   suspendCoroutine { continuation ->
     val conn = CatchFxConnection<E>()
     //Is CancellationException from kotlin in kotlinx package???
-    conn.push(CatchFx { continuation.resumeWith(kotlin.Result.failure(CancellationException())).right() })
+    conn.push(CatchFx { continuation.resumeWith(Result.failure(CancellationException())).right() })
     fa(conn) { either ->
       continuation.resumeWith(
         either.fold(
@@ -363,7 +363,7 @@ fun <E, A> fromAsyncF(fa: CatchFxProcF<E, A>): suspend () -> A = {
   suspendCoroutine { continuation ->
     val conn = CatchFxConnection<E>()
     //Is CancellationException from kotlin in kotlinx package???
-    conn.push(CatchFx { continuation.resumeWith(kotlin.Result.failure(CancellationException())).right() })
+    conn.push(CatchFx { continuation.resumeWith(Result.failure(CancellationException())).right() })
     fa(conn) { either ->
       continuation.resumeWith(either.fold({ kotlin.Result.failure<A>(it) }, { kotlin.Result.success(it) }))
     }.fix().fa.foldContinuation(EmptyCoroutineContext, mapUnit)
@@ -447,7 +447,7 @@ suspend fun <E, A, B, C> CoroutineContext.raceTriple(
   fc: suspend () -> Either<E, C>
 ): suspend () -> Either<E, RaceTriple<CatchFxPartialOf<E>, A, B, C>> =
   fromAsync { conn: KindConnection<CatchFxPartialOf<E>>,
-              cb: (Either<Throwable, Either<E, RaceTriple<CatchFxPartialOf<E>, A, B, C>>>) -> Unit ->
+                                            cb: (Either<Throwable, Either<E, RaceTriple<CatchFxPartialOf<E>, A, B, C>>>) -> Unit ->
 
     val active = AtomicBoolean(true)
 
