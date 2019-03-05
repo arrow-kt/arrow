@@ -1,10 +1,7 @@
 package arrow.effects
 
 import arrow.Kind
-import arrow.core.getOrHandle
-import arrow.core.left
-import arrow.core.nonFatalOrThrow
-import arrow.core.right
+import arrow.core.*
 import arrow.effects.suspended.env.*
 import arrow.effects.suspended.env.envfx.applicativeError.attempt
 import arrow.effects.suspended.env.envfx.applicativeError.raiseError
@@ -68,6 +65,20 @@ class EnvFxTest : UnitSpec() {
           a + b
         }
       unsafe { runBlocking { program.attempt().toFx(0) } } shouldBe TestUserError.left().right()
+    }
+
+    "Rio fx deps" {
+      fun <R> program(): EnvFx<R, CustomError, Unit>
+        where R : Service1, R : Service2 =
+        env {
+          fx {
+            !effect { foo() }
+            !effect { bar() }
+          }
+        }
+
+      val result: Either<CustomError, Unit> = unsafe { runBlocking { program<Module>().toFx(Module.impl()) } }
+      result shouldBe Unit.right()
     }
 
     testLaws(ConcurrentLaws.laws(EnvFx.concurrent(), EQ(), EQ(), EQ()))

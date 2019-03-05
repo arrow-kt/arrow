@@ -31,6 +31,9 @@ inline fun <R, E, A> EnvFxOf<R, E, A>.fix(): EnvFx<R, E, A> =
 fun <R, E, A> effect(f: suspend R.() -> Either<E, A>): EnvFx<R, E, A> =
   EnvFx(f)
 
+fun <R, E, A> env(f: R.() -> EnvFx<R, E, A>): EnvFx<R, E, A> =
+  EnvFx { f(this).fa(this) }
+
 class EnvFx<R, out E, out A>(internal val fa: suspend R.() -> Either<E, A>) : EnvFxOf<R, E, A> {
   companion object {
     fun <R, E> unit(): EnvFx<R, E, Unit> =
@@ -47,8 +50,8 @@ fun <R, E, A> EnvFxOf<R, E, A>.toFx(r: R): arrow.effects.suspended.fx.Fx<Either<
 suspend operator fun <R, E, A> EnvFxOf<R, E, A>.invoke(r: R): Either<E, A> =
   fix().fa.invoke(r)
 
-fun <A> A.just(unit: Unit = Unit): EnvFx<Nothing, Nothing, A> =
-  EnvFx { right() }
+fun <R, E, A> A.just(): EnvFx<R, E, A> =
+  EnvFx { this@just.right() }
 
 suspend fun <R, E, A, B> (suspend R.() -> Either<E, A>).map(f: (A) -> B): suspend R.() -> Either<E, B> =
   { this@map(this).map(f) }
