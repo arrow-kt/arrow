@@ -1,17 +1,40 @@
 {% for item in site.data.doc-versions.docVersions %}
   {% if item.url == site.data.commons.stable_version %}
-    {% assign stable_version = item.title %}
-    {% assign stable_version_url = site.data.commons.stable_version %}
+    {% assign stable_version = item %}
+  {% endif %}
+  {% if item.url == site.data.commons.next_version %}
+    {% assign next_version = item %}
+  {% endif %}
+{% endfor %}
+
+{% for item in site.data.doc-versions.docVersions %}
+  {% if item.url == stable_version.previous %}
+    {% assign previous_version = item %}
   {% endif %}
 {% endfor %}
 
 <div id="topWarning" class="top-warning">
-  <span>⚠️ (
-    <a href="{{stable_version_url}}">
-      <span>
-        {{stable_version}}
-      </span>
-    </a>
-      ) Documentation for the 'stable' release.
-    </span>
+  <div class="top-container">
+      <div class="top-tabs">
+          <a href="{{previous_version.url}}">
+            <span>
+              {{ site.data.doc-versions.previous }} {{ previous_version.title }}
+            </span>
+          </a>
+      </div>
+      <div class="top-tabs">
+          <a href="{{stable_version.url}}">
+            <span>
+              {{ site.data.doc-versions.stable }} {{ stable_version.title }}
+            </span>
+          </a>
+      </div>
+      <div class="top-tabs">
+          <a href="{{next_version.url}}">
+            <span>
+              {{ site.data.doc-versions.next }} {{ next_version.title }}
+            </span>
+          </a>
+      </div>
+  </div>
 </div>

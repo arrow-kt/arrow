@@ -17,8 +17,9 @@
 
     <ul>
         <li>
-          <a class="masthead-button button" href="{{ previous_version.url }}">
+          <a class="masthead-button small-button button" href="{{ previous_version.url }}">
             <span>{{ previous_version.title }}</span>
+            <span>{{ site.data.doc-versions.previous }}</span>
           </a>
         </li>
 
@@ -26,12 +27,14 @@
           <a class="masthead-button button" href="{{ stable_version.url }}">
             <span>{{ stable_version.title }}</span>
             <span id="stable" class="disabled">{{ stable_version.url }}</span>
+            <span>{{ site.data.doc-versions.stable }}</span>
           </a>
         </li>
 
         <li>
-          <a class="masthead-button button" href="{{ next_version.url }}">
+          <a class="masthead-button small-button button" href="{{ next_version.url }}">
             <span>{{ next_version.title }}</span>
+            <span>{{ site.data.doc-versions.next }}</span>
           </a>
         </li>
     </ul>

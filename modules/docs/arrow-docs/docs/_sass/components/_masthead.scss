@@ -107,6 +107,16 @@
                 text-decoration: none;
                 background: rgba($brand-tertiary, 0.6);
             }
+
+            span {
+              display: block;
+            }
+        }
+
+        .small-button {
+          padding: ($base-point-grid) ($base-point-grid * 2);
+          font-size: 0.700rem;
+          width: ($base-point-grid * 11);
         }
 
         .masthead-stars {
@@ -129,10 +139,10 @@
           li {
               display: inline-block;
           }
-        }
-    }
 
-    .disabled {
-      display: none;
+          .disabled {
+            display: none;
+          }
+        }
     }
 }

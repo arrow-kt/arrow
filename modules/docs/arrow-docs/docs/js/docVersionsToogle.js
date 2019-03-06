@@ -1,3 +1,5 @@
+/* When the user clicks on the navigation Documentation button,
+toggle between hiding and showing the dropdown content */
 function displayToogle() {
   document.getElementById("docVersionDropdown").classList.toggle("show");
 }
@@ -16,6 +18,7 @@ window.onclick = function(event) {
   }
 }
 
+// Check the Arrow version and show a warning on top if we are not in the stable version
 function showTopWarning() {
   const currentUrl = 'https://'+ window.location.host +'/'
   if (!currentUrl.includes(document.getElementById("stable").textContent)){

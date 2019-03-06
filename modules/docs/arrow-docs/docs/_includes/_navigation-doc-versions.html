@@ -1,6 +1,6 @@
 {% for item in site.data.doc-versions.docVersions %}
     {% if item.url == site.data.commons.stable_version %}
-      {% assign stable_version_title = item.title %}
+      {% assign stable_version = item %}
     {% endif %}
 {% endfor %}
 
@@ -17,7 +17,7 @@
    {% endfor %}
     <div id="docVersionDropdown" class="dropdown-content">
         <a href="{{ site.data.commons.stable_version | append: 'docs/' }}">
-            <span>STABLE ({{ stable_version_title }})</span>
+            <span>{{ stable_version.title }} - {{ site.data.doc-versions.stable }}</span>
         </a>
 
         {% for item in site.data.doc-versions.docVersions %}

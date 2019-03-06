@@ -44,13 +44,14 @@
 
         .dropbtn {
           @include links($white, $white, rgba($white, 0.5), rgba($white, 0.5));
-          
+
           cursor: pointer;
           border: none;
           background: transparent;
           color: $white;
           font-family: $brand-font-family;
           font-size: 0.875rem;
+          margin-bottom: 10px;
         }
 
         .dropdown {
@@ -64,6 +65,7 @@
           }
         }
 
+        /* Documentation Dropdown Content (Hidden by Default) */
         .dropdown-content {
           display: none;
           position: absolute;
@@ -71,7 +73,8 @@
           overflow: auto;
           box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
           z-index: 1;
-          margin-left: 7px;
+          margin-left: -8px;
+          background: rgba($brand-primary, 0.95);
 
           a {
             padding: 12px 9px;
@@ -80,7 +83,9 @@
           }
         }
 
-
+        /* Show the documentatioin dropdown menu (use JS to add this class
+          to the .dropdown-content container when the user clicks on
+          the dropdown button) */
         .show {
           display: block;
         }

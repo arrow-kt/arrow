@@ -1,20 +1,33 @@
-// TOP WARNINGS
+// TOP DOC VERSION WARNINGS
 // -----------------------------------------------
 // -----------------------------------------------
 .top-warning {
     height: 40px;
-    background-color: $brand-quaternary;
+    background-color: $top-warning-base;
     color: $white;
     display: flex;
     align-items: center;
-    justify-content: center;
-    position: fixed;
+    justify-content: space-around;
+    position: sticky;
     top: 0px;
     width: 100%;
-    z-index: 1101;
+    z-index: 2;
     display: none;
-    
+    overflow: hidden;
+
     a {
       color: $white;
+    }
+
+    .top-container {
+      display: flex;
+      width: 40%;
+      justify-content: space-around;
+
+      .top-tabs {
+        width: 33%;
+        padding: 10px 0;
+        text-align: center;
+      }
     }
 }
