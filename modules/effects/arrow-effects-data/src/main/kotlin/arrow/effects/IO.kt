@@ -243,14 +243,11 @@ sealed class IO<out A> : IOOf<A> {
         { just(it) }
       )
 
-    override fun <B> mapFilter(f: (A) -> Option<B>): IO<B> {
-      val h: (Option<A>) -> Option<B> = { it.fold({ None }, { a: A -> f(a) }) }
-
-      return when {
-        index != maxStackDepthSize -> MapFilter(source, g.andThen(h), index + 1)
+    override fun <B> mapFilter(f: (A) -> Option<B>): IO<B> =
+      when {
+        index != maxStackDepthSize -> MapFilter(source, g.andThen { it.flatMap { a: A -> f(a) } }, index + 1)
         else -> MapFilter(this, f, 0)
       }
-    }
 
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
   }
