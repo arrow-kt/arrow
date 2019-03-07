@@ -3,6 +3,7 @@ package arrow.effects.rx2.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.core.Option
 import arrow.effects.rx2.FlowableK
 import arrow.effects.rx2.FlowableKOf
 import arrow.effects.rx2.ForFlowableK
@@ -14,6 +15,7 @@ import arrow.effects.rx2.extensions.flowablek.monadError.monadError
 import arrow.effects.rx2.fix
 import arrow.effects.typeclasses.*
 import arrow.extension
+import arrow.mtl.typeclasses.FunctorFilter
 import arrow.typeclasses.*
 import io.reactivex.BackpressureStrategy
 import kotlin.coroutines.CoroutineContext
@@ -22,6 +24,15 @@ import kotlin.coroutines.CoroutineContext
 interface FlowableKFunctor : Functor<ForFlowableK> {
   override fun <A, B> FlowableKOf<A>.map(f: (A) -> B): FlowableK<B> =
     fix().map(f)
+}
+
+@extension
+interface FlowableKFunctorFilter : FunctorFilter<ForFlowableK> {
+  override fun <A, B> FlowableKOf<A>.map(f: (A) -> B): FlowableK<B> =
+    fix().map(f)
+
+  override fun <A, B> FlowableKOf<A>.mapFilter(f: (A) -> Option<B>): FlowableK<B> =
+    fix().mapFilter(f)
 }
 
 @extension
