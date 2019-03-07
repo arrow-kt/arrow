@@ -252,7 +252,7 @@ sealed class IO<out A> : IOOf<A> {
       }
     }
 
-    override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachale")
+    override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
   }
 }
 
