@@ -162,7 +162,7 @@ sealed class IO<out A> : IOOf<A> {
     override fun <B> mapFilter(f: (A) -> Option<B>): IO<B> =
       Suspend {
         f(a).fold(
-          { RaiseError(IllegalArgumentException("IO execution should yield a valid result")) },
+          { RaiseError(IllegalArgumentException("IO execution yield invalid result after mapFilter")) },
           { Pure(it) }
         )
       }
@@ -239,7 +239,7 @@ sealed class IO<out A> : IOOf<A> {
   internal data class MapFilter<E, out A>(val source: IOOf<E>, val g: (E) -> Option<A>, val index: Int) : IO<A>(), (E) -> IO<A> {
     override fun invoke(value: E): IO<A> = g(value)
       .fold(
-        { raiseError(IllegalArgumentException("IO execution should yield a valid result")) },
+        { raiseError(IllegalArgumentException("IO execution yield invalid result after mapFilter")) },
         { just(it) }
       )
 

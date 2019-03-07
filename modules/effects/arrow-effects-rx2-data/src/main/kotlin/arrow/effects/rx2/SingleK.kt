@@ -2,7 +2,6 @@ package arrow.effects.rx2
 
 import arrow.core.Either
 import arrow.core.Left
-import arrow.core.NonFatal
 import arrow.core.Option
 import arrow.core.Right
 import arrow.effects.OnCancel
