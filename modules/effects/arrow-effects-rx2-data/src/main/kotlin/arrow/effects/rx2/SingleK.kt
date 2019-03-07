@@ -2,6 +2,7 @@ package arrow.effects.rx2
 
 import arrow.core.Either
 import arrow.core.Left
+import arrow.core.Option
 import arrow.core.Right
 import arrow.effects.OnCancel
 import arrow.effects.internal.Platform
@@ -23,6 +24,13 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
 
   fun <B> map(f: (A) -> B): SingleK<B> =
     single.map(f).k()
+
+  fun <B> mapFilter(f: (A) -> Option<B>): SingleK<B> =
+    single
+      .filter { f(it).isDefined() }
+      .map { f(it).orNull()!! }
+      .toSingle()
+      .k()
 
   fun <B> ap(fa: SingleKOf<(A) -> B>): SingleK<B> =
     flatMap { a -> fa.fix().map { ff -> ff(a) } }

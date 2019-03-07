@@ -1,12 +1,14 @@
 package arrow.effects.rx2.extensions
 
 import arrow.core.Either
+import arrow.core.Option
 import arrow.effects.rx2.ForSingleK
 import arrow.effects.rx2.SingleK
 import arrow.effects.rx2.SingleKOf
 import arrow.effects.rx2.fix
 import arrow.effects.typeclasses.*
 import arrow.extension
+import arrow.mtl.typeclasses.FunctorFilter
 import arrow.typeclasses.*
 import kotlin.coroutines.CoroutineContext
 
@@ -14,6 +16,15 @@ import kotlin.coroutines.CoroutineContext
 interface SingleKFunctor : Functor<ForSingleK> {
   override fun <A, B> SingleKOf<A>.map(f: (A) -> B): SingleK<B> =
     fix().map(f)
+}
+
+@extension
+interface SingleKFunctorFilter : FunctorFilter<ForSingleK> {
+  override fun <A, B> SingleKOf<A>.map(f: (A) -> B): SingleK<B> =
+    fix().map(f)
+
+  override fun <A, B> SingleKOf<A>.mapFilter(f: (A) -> Option<B>): SingleK<B> =
+    fix().mapFilter(f)
 }
 
 @extension
