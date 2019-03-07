@@ -2,12 +2,14 @@ package arrow.effects.rx2.extensions
 
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.core.Option
 import arrow.effects.rx2.ForMaybeK
 import arrow.effects.rx2.MaybeK
 import arrow.effects.rx2.MaybeKOf
 import arrow.effects.rx2.fix
 import arrow.effects.typeclasses.*
 import arrow.extension
+import arrow.mtl.typeclasses.FunctorFilter
 import arrow.typeclasses.*
 import kotlin.coroutines.CoroutineContext
 
@@ -15,6 +17,15 @@ import kotlin.coroutines.CoroutineContext
 interface MaybeKFunctor : Functor<ForMaybeK> {
   override fun <A, B> MaybeKOf<A>.map(f: (A) -> B): MaybeK<B> =
     fix().map(f)
+}
+
+@extension
+interface MaybeKFunctorFilter : FunctorFilter<ForMaybeK> {
+  override fun <A, B> MaybeKOf<A>.map(f: (A) -> B): MaybeK<B> =
+    fix().map(f)
+
+  override fun <A, B> MaybeKOf<A>.mapFilter(f: (A) -> Option<B>): MaybeK<B> =
+    fix().mapFilter(f)
 }
 
 @extension
