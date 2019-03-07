@@ -1,9 +1,15 @@
 package arrow.effects.extensions
 
 import arrow.Kind
+import arrow.aql.From
+import arrow.aql.Select
+import arrow.aql.Where
 import arrow.core.Either
 import arrow.core.Option
 import arrow.effects.*
+import arrow.effects.extensions.io.applicative.applicative
+import arrow.effects.extensions.io.functor.functor
+import arrow.effects.extensions.io.functorFilter.functorFilter
 import arrow.effects.typeclasses.*
 import arrow.extension
 import arrow.mtl.typeclasses.FunctorFilter
@@ -202,4 +208,19 @@ interface IOUnsafeRun : UnsafeRun<ForIO> {
   override suspend fun <A> unsafe.runNonBlocking(fa: () -> Kind<ForIO, A>, cb: (Either<Throwable, A>) -> Unit) =
     fa().fix().unsafeRunAsync(cb)
 
+}
+
+@extension
+interface IOFrom : From<ForIO> {
+  override fun applicative(): Applicative<ForIO> = IO.applicative()
+}
+
+@extension
+interface IOSelect : Select<ForIO> {
+  override fun functor(): Functor<ForIO> = IO.functor()
+}
+
+@extension
+interface IOWhere : Where<ForIO> {
+  override fun functorFilter(): FunctorFilter<ForIO> = IO.functorFilter()
 }

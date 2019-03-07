@@ -1,10 +1,16 @@
 package arrow.effects.rx2.extensions
 
+import arrow.aql.From
+import arrow.aql.Select
+import arrow.aql.Where
 import arrow.core.Either
 import arrow.core.Option
 import arrow.effects.rx2.ForSingleK
 import arrow.effects.rx2.SingleK
 import arrow.effects.rx2.SingleKOf
+import arrow.effects.rx2.extensions.singlek.applicative.applicative
+import arrow.effects.rx2.extensions.singlek.functor.functor
+import arrow.effects.rx2.extensions.singlek.functorFilter.functorFilter
 import arrow.effects.rx2.fix
 import arrow.effects.typeclasses.*
 import arrow.extension
@@ -120,4 +126,19 @@ interface SingleKEffect :
 interface SingleKConcurrentEffect: ConcurrentEffect<ForSingleK>, SingleKEffect {
   override fun <A> SingleKOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> SingleKOf<Unit>): SingleK<Disposable> =
     fix().runAsyncCancellable(cb)
+}
+
+@extension
+interface SingleKFrom : From<ForSingleK> {
+  override fun applicative(): Applicative<ForSingleK> = SingleK.applicative()
+}
+
+@extension
+interface SingleKSelect : Select<ForSingleK> {
+  override fun functor(): Functor<ForSingleK> = SingleK.functor()
+}
+
+@extension
+interface SingleKWhere : Where<ForSingleK> {
+  override fun functorFilter(): FunctorFilter<ForSingleK> = SingleK.functorFilter()
 }

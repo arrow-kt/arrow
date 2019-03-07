@@ -1,10 +1,16 @@
 package arrow.effects.reactor.extensions
 
+import arrow.aql.From
+import arrow.aql.Select
+import arrow.aql.Where
 import arrow.core.Either
 import arrow.core.Option
 import arrow.effects.reactor.ForMonoK
 import arrow.effects.reactor.MonoK
 import arrow.effects.reactor.MonoKOf
+import arrow.effects.reactor.extensions.monok.applicative.applicative
+import arrow.effects.reactor.extensions.monok.functor.functor
+import arrow.effects.reactor.extensions.monok.functorFilter.functorFilter
 import arrow.effects.reactor.fix
 import arrow.effects.typeclasses.*
 import arrow.extension
@@ -113,4 +119,19 @@ interface MonoKEffect: Effect<ForMonoK>, MonoKAsync {
 interface MonoKConcurrentEffect: ConcurrentEffect<ForMonoK>, MonoKEffect {
   override fun <A> MonoKOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> MonoKOf<Unit>): MonoK<Disposable> =
     fix().runAsyncCancellable(cb)
+}
+
+@extension
+interface MonoKFrom : From<ForMonoK> {
+  override fun applicative(): Applicative<ForMonoK> = MonoK.applicative()
+}
+
+@extension
+interface MonoKSelect : Select<ForMonoK> {
+  override fun functor(): Functor<ForMonoK> = MonoK.functor()
+}
+
+@extension
+interface MonoKWhere : Where<ForMonoK> {
+  override fun functorFilter(): FunctorFilter<ForMonoK> = MonoK.functorFilter()
 }

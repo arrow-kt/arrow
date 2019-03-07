@@ -1,14 +1,19 @@
 package arrow.effects.rx2.extensions
 
 import arrow.Kind
+import arrow.aql.*
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Option
 import arrow.effects.rx2.FlowableK
 import arrow.effects.rx2.FlowableKOf
 import arrow.effects.rx2.ForFlowableK
+import arrow.effects.rx2.extensions.flowablek.applicative.applicative
 import arrow.effects.rx2.extensions.flowablek.async.async
 import arrow.effects.rx2.extensions.flowablek.effect.effect
+import arrow.effects.rx2.extensions.flowablek.foldable.foldable
+import arrow.effects.rx2.extensions.flowablek.functor.functor
+import arrow.effects.rx2.extensions.flowablek.functorFilter.functorFilter
 import arrow.effects.rx2.extensions.flowablek.monad.monad
 import arrow.effects.rx2.extensions.flowablek.monadDefer.monadDefer
 import arrow.effects.rx2.extensions.flowablek.monadError.monadError
@@ -154,6 +159,46 @@ interface FlowableKEffect :
 interface FlowableKConcurrentEffect: ConcurrentEffect<ForFlowableK>, FlowableKEffect {
   override fun <A> FlowableKOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> FlowableKOf<Unit>): FlowableK<Disposable> =
     fix().runAsyncCancellable(cb)
+}
+
+@extension
+interface FlowableKFrom : From<ForFlowableK> {
+  override fun applicative(): Applicative<ForFlowableK> = FlowableK.applicative()
+}
+
+@extension
+interface FlowableKSelect : Select<ForFlowableK> {
+  override fun functor(): Functor<ForFlowableK> = FlowableK.functor()
+}
+
+@extension
+interface FlowableKWhere : Where<ForFlowableK> {
+  override fun functorFilter(): FunctorFilter<ForFlowableK> = FlowableK.functorFilter()
+}
+
+@extension
+interface FlowableKGroupBy : GroupBy<ForFlowableK> {
+  override fun foldable(): Foldable<ForFlowableK> = FlowableK.foldable()
+}
+
+@extension
+interface FlowableKCount : Count<ForFlowableK> {
+  override fun foldable(): Foldable<ForFlowableK> = FlowableK.foldable()
+}
+
+@extension
+interface FlowableKSum : Sum<ForFlowableK> {
+  override fun foldable(): Foldable<ForFlowableK> = FlowableK.foldable()
+}
+
+@extension
+interface FlowableKOrderBy : OrderBy<ForFlowableK> {
+  override fun foldable(): Foldable<ForFlowableK> = FlowableK.foldable()
+}
+
+@extension
+interface FlowableKUnion : Union<ForFlowableK> {
+  override fun foldable(): Foldable<ForFlowableK> = FlowableK.foldable()
 }
 
 fun FlowableK.Companion.monadFlat(): FlowableKMonad = monad()

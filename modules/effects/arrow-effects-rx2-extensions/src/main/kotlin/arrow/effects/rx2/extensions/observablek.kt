@@ -1,12 +1,17 @@
 package arrow.effects.rx2.extensions
 
 import arrow.Kind
+import arrow.aql.*
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Option
 import arrow.effects.rx2.ForObservableK
 import arrow.effects.rx2.ObservableK
 import arrow.effects.rx2.ObservableKOf
+import arrow.effects.rx2.extensions.observablek.applicative.applicative
+import arrow.effects.rx2.extensions.observablek.foldable.foldable
+import arrow.effects.rx2.extensions.observablek.functor.functor
+import arrow.effects.rx2.extensions.observablek.functorFilter.functorFilter
 import arrow.effects.rx2.extensions.observablek.monad.monad
 import arrow.effects.rx2.extensions.observablek.monadDefer.monadDefer
 import arrow.effects.rx2.extensions.observablek.monadError.monadError
@@ -146,6 +151,46 @@ interface ObservableKEffect: Effect<ForObservableK>, ObservableKAsync {
 interface ObservableKConcurrentEffect: ConcurrentEffect<ForObservableK>, ObservableKEffect {
   override fun <A> ObservableKOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> ObservableKOf<Unit>): ObservableK<Disposable> =
     fix().runAsyncCancellable(cb)
+}
+
+@extension
+interface ObservableKFrom : From<ForObservableK> {
+  override fun applicative(): Applicative<ForObservableK> = ObservableK.applicative()
+}
+
+@extension
+interface ObservableKSelect : Select<ForObservableK> {
+  override fun functor(): Functor<ForObservableK> = ObservableK.functor()
+}
+
+@extension
+interface ObservableKWhere : Where<ForObservableK> {
+  override fun functorFilter(): FunctorFilter<ForObservableK> = ObservableK.functorFilter()
+}
+
+@extension
+interface ObservableKGroupBy : GroupBy<ForObservableK> {
+  override fun foldable(): Foldable<ForObservableK> = ObservableK.foldable()
+}
+
+@extension
+interface ObservableKCount : Count<ForObservableK> {
+  override fun foldable(): Foldable<ForObservableK> = ObservableK.foldable()
+}
+
+@extension
+interface ObservableKSum : Sum<ForObservableK> {
+  override fun foldable(): Foldable<ForObservableK> = ObservableK.foldable()
+}
+
+@extension
+interface ObservableKOrderBy : OrderBy<ForObservableK> {
+  override fun foldable(): Foldable<ForObservableK> = ObservableK.foldable()
+}
+
+@extension
+interface ObservableKUnion : Union<ForObservableK> {
+  override fun foldable(): Foldable<ForObservableK> = ObservableK.foldable()
 }
 
 fun ObservableK.Companion.monadFlat(): ObservableKMonad = monad()

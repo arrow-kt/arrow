@@ -1,11 +1,16 @@
 package arrow.effects.rx2.extensions
 
+import arrow.aql.*
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Option
 import arrow.effects.rx2.ForMaybeK
 import arrow.effects.rx2.MaybeK
 import arrow.effects.rx2.MaybeKOf
+import arrow.effects.rx2.extensions.maybek.applicative.applicative
+import arrow.effects.rx2.extensions.maybek.foldable.foldable
+import arrow.effects.rx2.extensions.maybek.functor.functor
+import arrow.effects.rx2.extensions.maybek.functorFilter.functorFilter
 import arrow.effects.rx2.fix
 import arrow.effects.typeclasses.*
 import arrow.extension
@@ -135,4 +140,44 @@ interface MaybeKEffect :
   MaybeKAsync{
   override fun <A> MaybeKOf<A>.runAsync(cb: (Either<Throwable, A>) -> MaybeKOf<Unit>): MaybeK<Unit> =
     fix().runAsync(cb)
+}
+
+@extension
+interface MaybeKFrom : From<ForMaybeK> {
+  override fun applicative(): Applicative<ForMaybeK> = MaybeK.applicative()
+}
+
+@extension
+interface MaybeKSelect : Select<ForMaybeK> {
+  override fun functor(): Functor<ForMaybeK> = MaybeK.functor()
+}
+
+@extension
+interface MaybeKWhere : Where<ForMaybeK> {
+  override fun functorFilter(): FunctorFilter<ForMaybeK> = MaybeK.functorFilter()
+}
+
+@extension
+interface MaybeKGroupBy : GroupBy<ForMaybeK> {
+  override fun foldable(): Foldable<ForMaybeK> = MaybeK.foldable()
+}
+
+@extension
+interface MaybeKCount : Count<ForMaybeK> {
+  override fun foldable(): Foldable<ForMaybeK> = MaybeK.foldable()
+}
+
+@extension
+interface MaybeKSum : Sum<ForMaybeK> {
+  override fun foldable(): Foldable<ForMaybeK> = MaybeK.foldable()
+}
+
+@extension
+interface MaybeKOrderBy : OrderBy<ForMaybeK> {
+  override fun foldable(): Foldable<ForMaybeK> = MaybeK.foldable()
+}
+
+@extension
+interface MaybeKUnion : Union<ForMaybeK> {
+  override fun foldable(): Foldable<ForMaybeK> = MaybeK.foldable()
 }
