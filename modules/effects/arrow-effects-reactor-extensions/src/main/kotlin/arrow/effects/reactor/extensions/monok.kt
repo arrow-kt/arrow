@@ -1,12 +1,14 @@
 package arrow.effects.reactor.extensions
 
 import arrow.core.Either
+import arrow.core.Option
 import arrow.effects.reactor.ForMonoK
 import arrow.effects.reactor.MonoK
 import arrow.effects.reactor.MonoKOf
 import arrow.effects.reactor.fix
 import arrow.effects.typeclasses.*
 import arrow.extension
+import arrow.mtl.typeclasses.FunctorFilter
 import arrow.typeclasses.*
 import kotlin.coroutines.CoroutineContext
 
@@ -15,6 +17,16 @@ interface MonoKFunctor : Functor<ForMonoK> {
   override fun <A, B> MonoKOf<A>.map(f: (A) -> B): MonoK<B> =
     fix().map(f)
 }
+
+@extension
+interface SingleKFunctorFilter : FunctorFilter<ForMonoK> {
+  override fun <A, B> MonoKOf<A>.map(f: (A) -> B): MonoK<B> =
+    fix().map(f)
+
+  override fun <A, B> MonoKOf<A>.mapFilter(f: (A) -> Option<B>): MonoK<B> =
+    fix().mapFilter(f)
+}
+
 
 @extension
 interface MonoKApplicative: Applicative<ForMonoK>, MonoKFunctor {

@@ -3,6 +3,7 @@ package arrow.effects.reactor
 import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
+import arrow.core.Option
 import arrow.effects.OnCancel
 import arrow.effects.internal.Platform
 import arrow.effects.reactor.CoroutineContextReactorScheduler.asScheduler
@@ -11,6 +12,7 @@ import arrow.effects.typeclasses.ExitCase
 import arrow.higherkind
 import reactor.core.publisher.Mono
 import reactor.core.publisher.MonoSink
+import reactor.core.publisher.toMono
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.CoroutineContext
 
@@ -23,6 +25,13 @@ fun <A> MonoKOf<A>.value(): Mono<A> =
 data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
   fun <B> map(f: (A) -> B): MonoK<B> =
     mono.map(f).k()
+
+  fun <B> mapFilter(f: (A) -> Option<B>): MonoK<B> =
+    mono
+      .filter { f(it).isDefined() }
+      .map { f(it).orNull()!! }
+      .toMono()
+      .k()
 
   fun <B> ap(fa: MonoKOf<(A) -> B>): MonoK<B> =
     flatMap { a -> fa.fix().map { ff -> ff(a) } }
