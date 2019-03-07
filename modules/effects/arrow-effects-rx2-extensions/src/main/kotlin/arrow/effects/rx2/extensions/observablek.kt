@@ -3,6 +3,7 @@ package arrow.effects.rx2.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.core.Option
 import arrow.effects.rx2.ForObservableK
 import arrow.effects.rx2.ObservableK
 import arrow.effects.rx2.ObservableKOf
@@ -13,6 +14,7 @@ import arrow.effects.rx2.fix
 import arrow.effects.typeclasses.*
 import arrow.effects.typeclasses.suspended.monaddefer.Fx
 import arrow.extension
+import arrow.mtl.typeclasses.FunctorFilter
 import arrow.typeclasses.*
 import kotlin.coroutines.CoroutineContext
 
@@ -20,6 +22,15 @@ import kotlin.coroutines.CoroutineContext
 interface ObservableKFunctor : Functor<ForObservableK> {
   override fun <A, B> ObservableKOf<A>.map(f: (A) -> B): ObservableK<B> =
     fix().map(f)
+}
+
+@extension
+interface ObservableKFunctorFilter : FunctorFilter<ForObservableK> {
+  override fun <A, B> ObservableKOf<A>.map(f: (A) -> B): ObservableK<B> =
+    fix().map(f)
+
+  override fun <A, B> ObservableKOf<A>.mapFilter(f: (A) -> Option<B>): ObservableK<B> =
+    fix().mapFilter(f)
 }
 
 @extension

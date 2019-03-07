@@ -3,6 +3,7 @@ dependencies {
     compile project(':arrow-annotations')
     compile project(':arrow-effects-extensions')
     compile project(':arrow-effects-reactor-extensions')
+    compile project(':arrow-effects-rx2-extensions')
     compile project(':arrow-mtl')
     kapt project(':arrow-meta')
     kaptTest project(':arrow-meta')

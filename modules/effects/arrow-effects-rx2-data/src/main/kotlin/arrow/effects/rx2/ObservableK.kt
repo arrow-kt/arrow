@@ -24,6 +24,12 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
   fun <B> map(f: (A) -> B): ObservableK<B> =
     observable.map(f).k()
 
+  fun <B> mapFilter(f: (A) -> Option<B>): ObservableK<B> =
+    observable
+      .filter { f(it).isDefined() }
+      .map { f(it).orNull()!! }
+      .k()
+
   fun <B> ap(fa: ObservableKOf<(A) -> B>): ObservableK<B> =
     flatMap { a -> fa.fix().map { ff -> ff(a) } }
 
