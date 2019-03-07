@@ -3,6 +3,7 @@ package arrow.effects.reactor.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.core.Option
 import arrow.effects.reactor.FluxK
 import arrow.effects.reactor.FluxKOf
 import arrow.effects.reactor.ForFluxK
@@ -13,6 +14,7 @@ import arrow.effects.reactor.fix
 import arrow.effects.typeclasses.*
 import arrow.effects.typeclasses.suspended.monaddefer.Fx
 import arrow.extension
+import arrow.mtl.typeclasses.FunctorFilter
 import arrow.typeclasses.*
 import kotlin.coroutines.CoroutineContext
 
@@ -20,6 +22,15 @@ import kotlin.coroutines.CoroutineContext
 interface FluxKFunctor : Functor<ForFluxK> {
   override fun <A, B> FluxKOf<A>.map(f: (A) -> B): FluxK<B> =
     fix().map(f)
+}
+
+@extension
+interface FluxKFunctorFilter : FunctorFilter<ForFluxK> {
+  override fun <A, B> FluxKOf<A>.map(f: (A) -> B): FluxK<B> =
+    fix().map(f)
+
+  override fun <A, B> FluxKOf<A>.mapFilter(f: (A) -> Option<B>): FluxK<B> =
+    fix().mapFilter(f)
 }
 
 @extension

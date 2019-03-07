@@ -2,6 +2,7 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     compile project(':arrow-annotations')
     compile project(':arrow-effects-extensions')
+    compile project(':arrow-effects-reactor-extensions')
     compile project(':arrow-mtl')
     kapt project(':arrow-meta')
     kaptTest project(':arrow-meta')

@@ -24,6 +24,12 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
   fun <B> map(f: (A) -> B): FluxK<B> =
     flux.map(f).k()
 
+  fun <B> mapFilter(f: (A) -> Option<B>): FluxK<B> =
+    flux
+      .filter { f(it).isDefined() }
+      .map { f(it).orNull()!! }
+      .k()
+
   fun <B> ap(fa: FluxKOf<(A) -> B>): FluxK<B> =
     flatMap { a -> fa.fix().map { ff -> ff(a) } }
 
