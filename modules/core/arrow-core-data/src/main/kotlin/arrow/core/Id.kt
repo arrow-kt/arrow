@@ -1,5 +1,6 @@
 package arrow.core
 
+import arrow.core.Id.Companion.just
 import arrow.higherkind
 
 fun <A> IdOf<A>.value(): A = this.fix().extract()
@@ -43,3 +44,6 @@ data class Id<out A>(private val value: A) : IdOf<A> {
   override fun hashCode(): Int = value.hashCode()
 
 }
+
+fun <A, B> Id<Either<A, B>>.select(f: IdOf<(A) -> B>): Id<B> =
+  flatMap { it.fold({ l -> just(l).ap(f) }, { r -> just(identity(r)) }) }
