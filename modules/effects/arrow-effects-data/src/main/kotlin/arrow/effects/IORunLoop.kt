@@ -103,6 +103,16 @@ internal object IORunLoop {
           bFirst = currentIO as BindF
           currentIO = currentIO.source
         }
+        is IO.MapFilter<*, *> -> {
+          if (bFirst != null) {
+            if (bRest == null) {
+              bRest = ArrayStack()
+            }
+            bRest.push(bFirst)
+          }
+          bFirst = currentIO as BindF
+          currentIO = currentIO.source
+        }
         null -> {
           currentIO = IO.RaiseError(NullPointerException("Stepping on null IO"))
         }
@@ -237,6 +247,16 @@ internal object IORunLoop {
           }
         }
         is IO.Map<*, *> -> {
+          if (bFirst != null) {
+            if (bRest == null) {
+              bRest = ArrayStack()
+            }
+            bRest.push(bFirst)
+          }
+          bFirst = currentIO as BindF
+          currentIO = currentIO.source
+        }
+        is IO.MapFilter<*, *> -> {
           if (bFirst != null) {
             if (bRest == null) {
               bRest = ArrayStack()
