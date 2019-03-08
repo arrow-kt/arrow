@@ -11,6 +11,7 @@ import arrow.core.ap as eitherAp
 import arrow.core.combineK as eitherCombineK
 import arrow.core.extensions.traverse as eitherTraverse
 import arrow.core.flatMap as eitherFlatMap
+import arrow.core.handleErrorWith as eitherHandleErrorWith
 
 fun <L, R> Either<L, R>.combine(SGL: Semigroup<L>, SGR: Semigroup<R>, b: Either<L, R>): Either<L, R> {
   val a = this
@@ -89,13 +90,8 @@ interface EitherApplicativeError<L> : ApplicativeError<EitherPartialOf<L>, L>, E
 
   override fun <A> raiseError(e: L): Either<L, A> = Left(e)
 
-  override fun <A> EitherOf<L, A>.handleErrorWith(f: (L) -> EitherOf<L, A>): Either<L, A> {
-    val fea = fix()
-    return when (fea) {
-      is Either.Left -> f(fea.a).fix()
-      is Either.Right -> fea
-    }
-  }
+  override fun <A> EitherOf<L, A>.handleErrorWith(f: (L) -> EitherOf<L, A>): Either<L, A> =
+    fix().eitherHandleErrorWith(f)
 }
 
 @extension
