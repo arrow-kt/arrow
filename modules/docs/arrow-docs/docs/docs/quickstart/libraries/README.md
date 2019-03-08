@@ -61,12 +61,12 @@ Dependencies: arrow-typeclasses
 
 Datatypes: [`Cokleisli`]({{ '/docs/datatypes/cokleisli/' | relative_url }}), [`Coreader`]({{ '/docs/datatypes/coreader/' | relative_url }}), [`Ior`]({{ '/docs/arrow/data/ior/' | relative_url }}), [`ListK`]({{ '/docs/arrow/data/listk/' | relative_url }}), [`NonEmptyList`]({{ '/docs/arrow/data/nonemptylist/' | relative_url }}), [`SequenceK`]({{ '/docs/arrow/data/sequencek/' | relative_url }}), [`SortedMapK`]({{ '/docs/arrow/data/sortedmapk/' | relative_url }}), [`StateT`]({{ '/docs/arrow/data/statet/' | relative_url }}), [`WriterT`]({{ '/docs/arrow/data/writert/' | relative_url }}), [`Coproduct`]({{ '/docs/arrow/data/coproduct/' | relative_url }}), [`EitherT`]({{ '/docs/arrow/data/eithert/' | relative_url }}), [`Kleisli`]({{ '/docs/arrow/data/kleisli/' | relative_url }}), [`MapK`]({{ '/docs/arrow/data/mapk/' | relative_url }}), [`OptionT`]({{ '/docs/arrow/data/optiont/' | relative_url }}), [`Reader`]({{ '/docs/arrow/data/reader/' | relative_url }}), [`SetK`]({{ '/docs/arrow/data/setk/' | relative_url }}), [`State`]({{ '/docs/arrow/data/state/' | relative_url }}), [`Validated`]({{ '/docs/arrow/data/validated/' | relative_url }})
 
-### arrow-(core, extras, effects)-instances
+### arrow-(core, extras, effects)-extensions
 
 {:.intermediate}
 intermediate
 
-These libraries include the possible [typeclass instances]({{ '/docs/patterns/glossary/#instances' | relative_url }}) that can be implemented for the datatypes in their respective libraries.
+These libraries include the possible [typeclass extensions]({{ '/docs/patterns/glossary/#instances-and-extensions-interfaces' | relative_url }}) that can be implemented for the datatypes in their respective libraries.
 
 Dependencies: arrow-typeclasses, and the base libraries they extend
 
@@ -77,9 +77,9 @@ advanced
 
 Advanced [typeclasses]({{ '/docs/typeclasses/intro' | relative_url }}) to be used in programs using the Tagless-final architecture.
 
-It also includes the instances available for datatypes in both arrow-core and arrow-extras
+It also includes the extensions available for datatypes in both arrow-core and arrow-extras
 
-Dependencies: arrow-extras-instances
+Dependencies: arrow-extras-extensions
 
 Typeclasses: [`FunctorFilter`]({{ '/docs/arrow/mtl/typeclasses/functorfilter/' | relative_url }}), [`MonadFilter`]({{ '/docs/arrow/mtl/typeclasses/monadfilter/' | relative_url }}), [`MonadReader`]({{ '/docs/arrow/mtl/typeclasses/monadreader/' | relative_url }}), [`MonadWriter`]({{ '/docs/arrow/mtl/typeclasses/monadwriter/' | relative_url }}), [`MonadCombine`]({{ '/docs/arrow/mtl/typeclasses/monadcombine/' | relative_url }}), [`MonadState`]({{ '/docs/arrow/mtl/typeclasses/monadstate' | relative_url }}), [`TraverseFilter`]({{ '/docs/arrow/mtl/typeclasses/traversefilter/' | relative_url }})
 
@@ -96,7 +96,7 @@ Optics is the functional way of handling immutable data and collections in a way
 
 It can be used alongside annotation processing to generate [simple DSLs]({{ '/docs/optics/dsl/' | relative_url }}) that read like imperative code.
 
-For all the new typeclasses it also includes the instances available for basic types and datatypes in both arrow-core and arrow-extras.
+For all the new typeclasses it also includes the extensions available for basic types and datatypes in both arrow-core and arrow-extras.
 
 Datatypes: [`Fold`]({{ '/docs/optics/fold/' | relative_url }}), [`Getter`]({{ '/docs/optics/getter/' | relative_url }}), [`Iso`]({{ '/docs/optics/iso/' | relative_url }}), [`Lens`]({{ '/docs/optics/lens/' | relative_url }}), [`Optional`]({{ '/docs/optics/optional/' | relative_url }}), [`Prism`]({{ '/docs/optics/prism/' | relative_url }}), [`Setter`]({{ '/docs/optics/setter/' | relative_url }}), [`Traversal`]({{ '/docs/optics/traversal/' | relative_url }})
 

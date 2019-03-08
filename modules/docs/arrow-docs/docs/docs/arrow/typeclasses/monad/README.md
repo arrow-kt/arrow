@@ -18,7 +18,7 @@ head to [The Monad Tutorial]({{ '/docs/patterns/monads' | relative_url }}).
 
 ### Main Combinators
 
-`Monad` includes all combinators present in [`Applicative`]({{ '/docs/arrow/typeclasses/applicative/' | relative_url }}).
+`Monad` includes all combinators present in [`Applicative`]({{ '/docs/arrow/typeclasses/applicative/' | relative_url }}) and [`Selective`]({{ '/docs/arrow/typeclasses/selective/' | relative_url }}).
 
 #### Kind<F, A>#flatMap
 
@@ -118,7 +118,7 @@ Some(1).forEffect(Some(2))
 
 ### Laws
 
-Arrow provides [`MonadLaws`][monad_law_source]{:target="_blank"} in the form of test cases for internal verification of lawful instances and third party apps creating their own Applicative instances.
+Arrow provides [`MonadLaws`][monad_law_source]{:target="_blank"} in the form of test cases for internal verification of lawful instances and third party apps creating their own Monad instances.
 
 #### Creating your own `Monad` instances
 
