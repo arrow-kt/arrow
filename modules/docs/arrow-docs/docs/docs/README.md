@@ -170,7 +170,7 @@ Add the dependencies that you want to use
 ```
 <dependency>
     <groupId>io.arrow-kt</groupId>
-    <artifactId>arrow-core</artifactId>
+    <artifactId>arrow-core-extensions</artifactId>
     <version>${arrow.version}</version>
 </dependency>
 <dependency>
@@ -185,17 +185,7 @@ Add the dependencies that you want to use
 </dependency>
 <dependency>
     <groupId>io.arrow-kt</groupId>
-    <artifactId>arrow-data</artifactId>
-    <version>${arrow.version}</version>
-</dependency>
-<dependency>
-    <groupId>io.arrow-kt</groupId>
-    <artifactId>arrow-extensions-core</artifactId>
-    <version>${arrow.version}</version>
-</dependency>
-<dependency>
-    <groupId>io.arrow-kt</groupId>
-    <artifactId>arrow-extensions-data</artifactId>
+    <artifactId>arrow-extras-extensions</artifactId>
     <version>${arrow.version}</version>
 </dependency>
 ```
