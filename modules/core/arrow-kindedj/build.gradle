@@ -1,5 +1,5 @@
 dependencies {
-    compile project(':arrow-extras')
+    compile project(':arrow-extras-data')
 
     kapt project(':arrow-meta')
     kaptTest project(':arrow-meta')
