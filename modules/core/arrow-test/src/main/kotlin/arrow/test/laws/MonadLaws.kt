@@ -3,6 +3,7 @@ package arrow.test.laws
 import arrow.Kind
 import arrow.core.Left
 import arrow.core.Right
+import arrow.core.identity
 import arrow.data.Kleisli
 import arrow.free.Free
 import arrow.free.bindingStackSafe
@@ -28,7 +29,8 @@ object MonadLaws {
       Law("Monad Laws: monad comprehensions binding in other threads") { M.monadComprehensionsBindInContext(EQ) },
       Law("Monad Laws: stack-safe//unsafe monad comprehensions equivalence") { M.equivalentComprehensions(EQ) },
       Law("Monad Laws: stack safe") { M.stackSafety(5000, EQ) },
-      Law("Monad Laws: stack safe comprehensions") { M.stackSafetyComprehensions(5000, EQ) }
+      Law("Monad Laws: stack safe comprehensions") { M.stackSafetyComprehensions(5000, EQ) },
+      Law("Monad Laws: selectM == select when Selective has a monad instance") { M.selectEQSelectM(EQ) }
     )
 
   fun <F> Monad<F>.leftIdentity(EQ: Eq<Kind<F, Int>>): Unit =
@@ -100,6 +102,12 @@ object MonadLaws {
         val (c) = just(b + 1)
         c
       }.equalUnderTheLaw(just(num + 2), EQ)
+    }
+
+  fun <F> Monad<F>.selectEQSelectM(EQ: Eq<Kind<F, Int>>): Unit =
+    forAll(Gen.either(Gen.int(), Gen.int())) { either ->
+      val f = just<(Int) -> Int>(::identity)
+      just(either).select(f).equalUnderTheLaw(just(either).selectM(f), EQ)
     }
 
   fun <F> Monad<F>.monadComprehensionsBindInContext(EQ: Eq<Kind<F, Int>>): Unit =
