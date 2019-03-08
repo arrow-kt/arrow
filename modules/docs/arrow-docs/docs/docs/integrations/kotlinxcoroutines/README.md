@@ -1,7 +1,7 @@
 ---
 layout: docs
-title: Coroutines
-permalink: /docs/integrations/coroutines/
+title: kotlinx.coroutines
+permalink: /docs/integrations/kotlinxcoroutines/
 ---
 
 As of Arrow 0.9.0 we have deprecated support for `Deferred` from `kotlinx.coroutines`. Using `Deferred` as a return type is considered a smell by the library owners, and we were not able to make it work consistently against some of the Laws.
