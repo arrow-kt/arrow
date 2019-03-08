@@ -2,7 +2,7 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     compile project(':arrow-annotations')
     compile project(':arrow-typeclasses')
-    compile project(':arrow-extras')
+    compile project(':arrow-extras-data')
     compile project(':arrow-core-extensions')
     kapt project(':arrow-meta')
     kaptTest project(':arrow-meta')

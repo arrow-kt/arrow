@@ -44,7 +44,7 @@ include {
         core {
             _ 'core-data'
             _ 'core-extensions'
-            _ 'extras'
+            _ 'extras-data'
             _ 'extras-extensions'
             _ 'generic'
             _ 'kindedj'
