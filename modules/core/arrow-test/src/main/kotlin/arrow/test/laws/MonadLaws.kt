@@ -17,7 +17,8 @@ import kotlinx.coroutines.newSingleThreadContext
 object MonadLaws {
 
   fun <F> laws(M: Monad<F>, EQ: Eq<Kind<F, Int>>): List<Law> =
-    ApplicativeLaws.laws(M, EQ) + listOf(
+    SelectiveLaws.laws(M, EQ) +
+      listOf(
       Law("Monad Laws: left identity") { M.leftIdentity(EQ) },
       Law("Monad Laws: right identity") { M.rightIdentity(EQ) },
       Law("Monad Laws: kleisli left identity") { M.kleisliLeftIdentity(EQ) },
