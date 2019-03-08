@@ -1,4 +1,5 @@
 apply plugin: 'idea'
+apply plugin: 'kotlin-kapt'
 
 idea {
     module {
@@ -41,4 +42,3 @@ dependencies {
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
 }
 
-apply plugin: 'kotlin-kapt'

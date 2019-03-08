@@ -23,7 +23,7 @@ buildscript {
         jUnitVersion = '4.12'
         jUnitVintageVersion = '5.2.0'
         kotlinTestVersion = '3.1.5'
-        kotlinVersion = '1.3.11'
+        kotlinVersion = '1.3.21'
         daggerVersion = '2.17'
         kotlinxCoroutinesVersion = '1.1.0'
         kotlinxCollectionsImmutableVersion = '0.1'
