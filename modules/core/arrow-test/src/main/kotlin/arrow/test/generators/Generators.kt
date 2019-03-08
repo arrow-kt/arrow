@@ -15,10 +15,10 @@ import io.kotlintest.properties.Gen
 import java.util.concurrent.TimeUnit
 
 fun Gen.Companion.short(): Gen<Short> =
-        Gen.int().filter { it >= Short.MIN_VALUE && it <= Short.MAX_VALUE }.map { it.toShort() }
+        Gen.choose(Short.MIN_VALUE.toInt(), Short.MAX_VALUE.toInt()).map { it.toShort() }
 
 fun Gen.Companion.byte(): Gen<Byte> =
-        Gen.int().filter { it >= Byte.MIN_VALUE && it <= Byte.MAX_VALUE }.map { it.toByte() }
+        Gen.choose(Byte.MIN_VALUE.toInt(), Byte.MAX_VALUE.toInt()).map { it.toByte() }
 
 fun <F, A> Gen<A>.applicative(AP: Applicative<F>): Gen<Kind<F, A>> =
   map { AP.just(it) }
