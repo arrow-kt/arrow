@@ -1,5 +1,5 @@
 dependencies {
-    compile project(':arrow-extras')
+    compile project(':arrow-extras-data')
     compile project(':arrow-extras-extensions')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     testCompile("junit:junit:$jUnitVersion")
