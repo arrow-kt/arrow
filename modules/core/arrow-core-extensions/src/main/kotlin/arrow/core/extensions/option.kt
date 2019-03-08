@@ -3,6 +3,7 @@ package arrow.core.extensions
 
 import arrow.Kind
 import arrow.core.*
+import arrow.core.select as optionSelect
 import arrow.core.extensions.option.monad.map
 import arrow.core.extensions.option.monad.monad
 import arrow.extension
@@ -124,6 +125,12 @@ interface OptionApplicative : Applicative<ForOption> {
 }
 
 @extension
+interface OptionSelective : Selective<ForOption>, OptionApplicative {
+  override fun <A, B> OptionOf<Either<A, B>>.select(f: OptionOf<(A) -> B>): Option<B> =
+    fix().optionSelect(f)
+}
+
+@extension
 interface OptionMonad : Monad<ForOption> {
   override fun <A, B> OptionOf<A>.ap(ff: OptionOf<(A) -> B>): Option<B> =
     fix().ap(ff)
@@ -139,6 +146,9 @@ interface OptionMonad : Monad<ForOption> {
 
   override fun <A> just(a: A): Option<A> =
     Option.just(a)
+
+  override fun <A, B> OptionOf<Either<A, B>>.select(f: OptionOf<(A) -> B>): OptionOf<B> =
+    fix().optionSelect(f)
 }
 
 @extension
