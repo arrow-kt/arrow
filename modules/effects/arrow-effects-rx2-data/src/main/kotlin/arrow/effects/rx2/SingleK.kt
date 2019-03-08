@@ -14,6 +14,7 @@ import io.reactivex.SingleEmitter
 import io.reactivex.disposables.CompositeDisposable
 import kotlin.coroutines.CoroutineContext
 import arrow.effects.rx2.CoroutineContextRx2Scheduler.asScheduler
+import io.reactivex.Observable
 
 fun <A> Single<A>.k(): SingleK<A> = SingleK(this)
 
@@ -27,9 +28,7 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
 
   fun <B> mapFilter(f: (A) -> Option<B>): SingleK<B> =
     single
-      .filter { f(it).isDefined() }
-      .map { f(it).orNull()!! }
-      .toSingle()
+      .flatMap { f(it).fold<Single<B>>({ Observable.empty<B>().singleOrError() }, { b: B -> Single.just(b) }) }
       .k()
 
   fun <B> ap(fa: SingleKOf<(A) -> B>): SingleK<B> =

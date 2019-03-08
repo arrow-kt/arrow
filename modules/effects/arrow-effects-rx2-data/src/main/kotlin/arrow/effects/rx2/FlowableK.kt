@@ -26,8 +26,7 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
 
   fun <B> mapFilter(f: (A) -> Option<B>): FlowableK<B> =
     flowable
-      .filter { f(it).isDefined() }
-      .map { f(it).orNull()!! }
+      .flatMap { f(it).fold<Flowable<B>>({ Flowable.empty() }, { b: B -> Flowable.just(b) }) }
       .k()
 
   fun <B> ap(fa: FlowableKOf<(A) -> B>): FlowableK<B> =

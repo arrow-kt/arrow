@@ -22,8 +22,7 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
 
   fun <B> mapFilter(f: (A) -> Option<B>): MaybeK<B> =
     maybe
-      .filter { f(it).isDefined() }
-      .map { f(it).orNull()!! }
+      .flatMap { f(it).fold<Maybe<B>>({ Maybe.empty() }, { b: B -> Maybe.just(b) }) }
       .k()
 
   fun <B> ap(fa: MaybeKOf<(A) -> B>): MaybeK<B> =

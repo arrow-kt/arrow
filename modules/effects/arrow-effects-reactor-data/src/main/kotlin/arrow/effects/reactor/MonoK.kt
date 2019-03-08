@@ -12,7 +12,6 @@ import arrow.effects.typeclasses.ExitCase
 import arrow.higherkind
 import reactor.core.publisher.Mono
 import reactor.core.publisher.MonoSink
-import reactor.core.publisher.toMono
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.CoroutineContext
 
@@ -28,9 +27,7 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
 
   fun <B> mapFilter(f: (A) -> Option<B>): MonoK<B> =
     mono
-      .filter { f(it).isDefined() }
-      .map { f(it).orNull()!! }
-      .toMono()
+      .flatMap { f(it).fold<Mono<B>>({ Mono.empty() }, { b: B -> Mono.just(b) }) }
       .k()
 
   fun <B> ap(fa: MonoKOf<(A) -> B>): MonoK<B> =
