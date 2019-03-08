@@ -13,7 +13,7 @@ fun throwableEq() = Eq { a: Throwable, b ->
   a::class == b::class && a.message == b.message
 }
 
-data class Law(val name: String, val test: TestContext.() -> Unit)
+data class Law (val name: String, val test: suspend TestContext.() -> Unit)
 
 fun <A> A.equalUnderTheLaw(b: A, eq: Eq<A>): Boolean =
   eq.run { eqv(b) }
