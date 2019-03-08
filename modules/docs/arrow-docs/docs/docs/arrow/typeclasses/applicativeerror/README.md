@@ -58,7 +58,7 @@ This method requires a function that creates a new datatype from an error, `(E) 
 If [`Monad`]({{ '/docs/arrow/typeclasses/monad' | relative_url }}) has `flatMap` to allow mapping the value inside a *successful* datatype into a new datatype, you can think of `handleErrorWith` as a way that allows you to map the value of a *failed datatype into a new datatype.
 
 ```kotlin:ank
-val eitherAE = Either.applicativeError<Throwable>()
+import arrow.core.handleErrorWith
 
 val success: Either<Throwable, Int> = Either.Right(1)
 
@@ -127,6 +127,8 @@ Constructor function. It takes two function parameters. The first is a generator
 `catch()` runs the generator function to generate a success datatype, and if it throws an exception it uses the error mapping function to create a new failure datatype.
 
 ```kotlin:ank
+val eitherAE = Either.applicativeError<Throwable>()
+
 eitherAE.catch(::identity) { 1 }
 ```
 
