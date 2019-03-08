@@ -92,7 +92,7 @@ dependencies {
     kapt    "io.arrow-kt:arrow-meta:$arrow_version"
     
     compile "io.arrow-kt:arrow-query-language:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-free:$arrow_version" //optional
+    compile "io.arrow-kt:arrow-free-data:$arrow_version" //optional
     compile "io.arrow-kt:arrow-free-extensions:$arrow_version" //optional
     compile "io.arrow-kt:arrow-mtl:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects-data:$arrow_version" //optional
