@@ -10,6 +10,7 @@ import arrow.data.extensions.listk.applicative.applicative
 import arrow.data.extensions.listk.eq.eq
 import arrow.data.extensions.listk.hash.hash
 import arrow.data.extensions.listk.monoidK.monoidK
+import arrow.data.extensions.listk.monoidal.monoidal
 import arrow.data.extensions.listk.semigroupK.semigroupK
 import arrow.data.extensions.listk.semigroupal.semigroupal
 import arrow.data.extensions.listk.show.show
@@ -35,6 +36,7 @@ class ListKTest : UnitSpec() {
       ShowLaws.laws(ListK.show(), eq) { listOf(it).k() },
       SemigroupKLaws.laws(ListK.semigroupK(), applicative, Eq.any()),
       SemigroupalLaws.laws(ListK.semigroupal(), { ListK.just(it) }, this::bijection, associativeSemigroupalEq),
+      MonoidalLaws.laws(ListK.monoidal(), applicative, ListK.eq(Tuple2.eq(Int.eq(), Int.eq()))),
       MonoidKLaws.laws(ListK.monoidK(), applicative, Eq.any()),
       TraverseLaws.laws(ListK.traverse(), applicative, { n: Int -> ListK(listOf(n)) }, Eq.any()),
       MonadCombineLaws.laws(ListK.monadCombine(),
