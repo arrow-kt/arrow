@@ -68,11 +68,7 @@ Trimmed down versions:
 - `arrow-core-data` (Only data types)
 - `arrow-core-extensions` (Only type class extensions)
 
-# Current stable version 0.8.2
-
-You can find the dependencies necessary in the Basic Setup of the README at the 0.8.2 tag clicking [here](https://github.com/arrow-kt/arrow/blob/0.8.2/README.md#basic-setup).
-
-# Next development version 0.9.0
+# Current stable version 0.9.0
 
 Add the dependencies into the project's `build.gradle`
 
@@ -99,8 +95,6 @@ dependencies {
     compile "io.arrow-kt:arrow-effects-rx2-extensions:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects-reactor-data:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects-reactor-extensions:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-effects-kotlinx-coroutines-data:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-effects-kotlinx-coroutines-extensions:$arrow_version" //optional
     compile "io.arrow-kt:arrow-optics:$arrow_version" //optional
     compile "io.arrow-kt:arrow-generic:$arrow_version" //optional
     compile "io.arrow-kt:arrow-recursion-data:$arrow_version" //optional
@@ -121,7 +115,7 @@ Add the dependencies into the project's `build.gradle`
 apply plugin: 'kotlin-kapt' //optional
 apply from: rootProject.file('gradle/generated-kotlin-sources.gradle') //only for Android projects
 
-def arrow_version = "0.8.2"
+def arrow_version = "0.9.0"
 dependencies {
     ...
     kapt    'io.arrow-kt:arrow-meta:$arrow_version' //optional
@@ -162,7 +156,7 @@ Add to your pom.xml file the following properties:
 ```
 <properties>
     <kotlin.version>1.3.0</kotlin.version>
-    <arrow.version>0.8.2</arrow.version>
+    <arrow.version>0.9.0</arrow.version>
 </properties>
 ```
 
