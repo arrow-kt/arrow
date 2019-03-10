@@ -237,7 +237,7 @@ interface TypeDecoder : MetaDecoder<Type> {
   fun Iterable<Parameter>.code(f: (Parameter) -> Code = { Code(it.lyrics().toString()) }): Code {
     val list = toList()
     return if (list.isEmpty()) Code.empty
-    else Code(list.joinToString(", ") {
+    else Code(list.joinToString(",·") {
       f(it).toString()
     })
   }
@@ -259,7 +259,7 @@ interface TypeDecoder : MetaDecoder<Type> {
   fun <A : Any> List<A>.joinToCode(separator: String): Code =
     if (isEmpty()) Code("")
     else {
-      val code = joinToString(", ") { separator }
+      val code = joinToString(",·") { separator }
       val args = map { it.resolveDynamicArg() }.toTypedArray()
       Code((if (args.isEmpty()) CodeBlock.of(code) else CodeBlock.of(code, *args)).toString())
     }
