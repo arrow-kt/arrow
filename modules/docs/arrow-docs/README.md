@@ -126,7 +126,7 @@ bundle install --gemfile modules/docs/arrow-docs/Gemfile --path vendor/bundle
 BUNDLE_GEMFILE=modules/docs/arrow-docs/Gemfile bundle exec jekyll serve -s modules/docs/arrow-docs/build/site/
 ```
 
-This will install any needed dependencies locally, and will use it to launch the complete website in [127.0.0.1:4000](https://127.0.0.1:4000) so you can open it with a standard browser.
+This will install any needed dependencies locally, and will use it to launch the complete website in [127.0.0.1:4000](http://127.0.0.1:4000) so you can open it with a standard browser.
 
 
 ## Blog section contribution
