@@ -27,7 +27,12 @@ data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
 
   fun <B> mapFilter(f: (A) -> Option<B>): MonoK<B> =
     mono
-      .flatMap { f(it).fold<Mono<B>>({ Mono.empty() }, { b: B -> Mono.just(b) }) }
+      .flatMap {
+        f(it).fold<Mono<B>>(
+          { Mono.error(IllegalArgumentException("MonoK execution yield invalid result after mapFilter")) },
+          { b: B -> Mono.just(b) }
+        )
+      }
       .k()
 
   fun <B> ap(fa: MonoKOf<(A) -> B>): MonoK<B> =
