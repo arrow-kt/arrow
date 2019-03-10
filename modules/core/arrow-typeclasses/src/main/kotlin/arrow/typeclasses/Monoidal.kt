@@ -1,9 +1,102 @@
 package arrow.typeclasses
 
 import arrow.Kind
+import arrow.core.Option
 
 /**
  * ank_macro_hierarchy(arrow.typeclasses.Monoidal)
+ *
+ * The [Monoidal] type class adds an identity element to the [Semigroupal] type class by defining the function [identity].
+ *
+ * [identity] returns a specific identity `Kind<F, A>` value for a given type [F] and [A].
+ *
+ * Like any other Monoid type class, [Monoidal] also complies with the left and right identity law:
+ *
+ * ```kotlin
+ * f((a.product(b)).product(c)) == a.product(b.product(c))
+ * ```
+ *
+ * ```kotlin
+ * fa.product(identity) == identity.product(fa) == identity
+ * ```
+ *
+ * Currently, [Monoidal] instances are defined for [Option], [ListK], [SequenceK] and [SetK].
+ *
+ * ### Examples
+ *
+ * ```kotlin:ank:playground:extension
+ * _imports_
+ *
+ * fun main(args: Array<String>) {
+ *   val result =
+ *   //sampleStart
+ *   _extensionFactory_
+ *   //sampleEnd
+ *   println(result)
+ * }
+ * ```
+ *
+ * The following examples show the identity elements for the already defined [Monoidal] instances:
+ *
+ * ```kotlin:ank:playground
+ * import arrow.core.Option
+ * import arrow.core.extensions.option.monoidal.monoidal
+ *
+ * fun main(args: Array<String>) {
+ *   val result =
+ *   //sampleStart
+ *   Option.monoidal().run {
+ *     identity<Any>()
+ *   }
+ *   //sampleEnd
+ *   println(result)
+ * }
+ * ```
+ *
+ * ```kotlin:ank:playground
+ * import arrow.data.ListK
+ * import arrow.data.extensions.listk.monoidal.monoidal
+ *
+ * fun main(args: Array<String>) {
+ *   val result =
+ *   //sampleStart
+ *   ListK.monoidal().run {
+ *     identity<Any>()
+ *   }
+ *   //sampleEnd
+ *   println(result)
+ * }
+ * ```
+ *
+ * ```kotlin:ank:playground
+ * import arrow.data.SetK
+ * import arrow.data.extensions.setk.monoidal.monoidal
+ *
+ * fun main(args: Array<String>) {
+ *   val result =
+ *   //sampleStart
+ *   SetK.monoidal().run {
+ *     identity<Any>()
+ *   }
+ *   //sampleEnd
+ *   println(result)
+ * }
+ * ```
+ *
+ * ```kotlin:ank:playground
+ * import arrow.data.SequenceK
+ * import arrow.data.extensions.sequencek.monoidal.monoidal
+ *
+ * fun main(args: Array<String>) {
+ *   val result =
+ *   //sampleStart
+ *   SequenceK.monoidal().run {
+ *     identity<Any>()
+ *   }
+ *   //sampleEnd
+ *   println(result)
+ * }
+ * ```
  */
 interface Monoidal<F> : Semigroupal<F> {
 
