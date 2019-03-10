@@ -11,7 +11,6 @@ import arrow.data.extensions.sequencek.monad.monad
 import arrow.data.extensions.sequencek.monoid.monoid
 import arrow.data.extensions.sequencek.monoidK.monoidK
 import arrow.data.extensions.sequencek.monoidal.monoidal
-import arrow.data.extensions.sequencek.semigroupal.semigroupal
 import arrow.data.extensions.sequencek.traverse.traverse
 import arrow.test.UnitSpec
 import arrow.test.generators.sequenceK
@@ -52,8 +51,7 @@ class SequenceKTest : UnitSpec() {
       MonadLaws.laws(SequenceK.monad(), eq),
       MonoidKLaws.laws(SequenceK.monoidK(), SequenceK.applicative(), eq),
       MonoidLaws.laws(SequenceK.monoid(), Gen.sequenceK(Gen.int()), eq),
-      SemigroupalLaws.laws(SequenceK.semigroupal(), { SequenceK.just(it) }, this::bijection, associativeSemigroupalEq),
-      MonoidalLaws.laws(SequenceK.monoidal(), { SequenceK.just(it) }, tuple2Eq),
+      MonoidalLaws.laws(SequenceK.monoidal(), { SequenceK.just(it) }, tuple2Eq, this::bijection, associativeSemigroupalEq),
       TraverseLaws.laws(SequenceK.traverse(), SequenceK.applicative(), { n: Int -> SequenceK(sequenceOf(n)) }, eq),
       HashLaws.laws(SequenceK.hash(Int.hash()), SequenceK.eq(Int.eq())) { sequenceOf(it).k() }
     )

@@ -50,8 +50,7 @@ class OptionTest : UnitSpec() {
       TraverseFilterLaws.laws(Option.traverseFilter(), Option.applicative(), ::Some, Eq.any()),
       MonadFilterLaws.laws(Option.monadFilter(), ::Some, Eq.any()),
       HashLaws.laws(Option.hash(Int.hash()), Option.eq(Int.eq())) { it.some() },
-      SemigroupalLaws.laws(Option.semigroupal(), ::Some, ::bijection, associativeSemigroupalEq),
-      MonoidalLaws.laws(Option.monoidal(), ::Some, Eq.any())
+      MonoidalLaws.laws(Option.monoidal(), ::Some, Eq.any(), ::bijection, associativeSemigroupalEq)
     )
 
     "fromNullable should work for both null and non-null values of nullable types" {

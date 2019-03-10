@@ -11,7 +11,6 @@ import arrow.data.extensions.setk.hash.hash
 import arrow.data.extensions.setk.monoidK.monoidK
 import arrow.data.extensions.setk.monoidal.monoidal
 import arrow.data.extensions.setk.semigroupK.semigroupK
-import arrow.data.extensions.setk.semigroupal.semigroupal
 import arrow.data.extensions.setk.show.show
 import arrow.test.UnitSpec
 import arrow.test.laws.*
@@ -37,8 +36,7 @@ class SetKTest : UnitSpec() {
     testLaws(
       ShowLaws.laws(SetK.show(), EQ) { SetK.just(it) },
       SemigroupKLaws.laws(SetK.semigroupK(), { SetK.just(it) }, Eq.any()),
-      SemigroupalLaws.laws(SetK.semigroupal(), { SetK.just(it) }, this::bijection, associativeSemigroupalEq),
-      MonoidalLaws.laws(SetK.monoidal(), { SetK.just(it) }, Eq.any()),
+      MonoidalLaws.laws(SetK.monoidal(), { SetK.just(it) }, Eq.any(), this::bijection, associativeSemigroupalEq),
       MonoidKLaws.laws(SetK.monoidK(), { SetK.just(it) }, Eq.any()),
       FoldableLaws.laws(SetK.foldable(), { SetK.just(it) }, Eq.any()),
       HashLaws.laws(SetK.hash(Int.hash()), SetK.eq(Int.eq())) { SetK.just(it) }
