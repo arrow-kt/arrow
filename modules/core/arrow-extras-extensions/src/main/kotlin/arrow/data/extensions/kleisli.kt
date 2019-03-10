@@ -34,6 +34,45 @@ interface KleisliContravariant<F, D> : Contravariant<Conested<Kind<ForKleisli, F
 }
 
 @extension
+interface KleisliContravariantInstance<F, D> : Contravariant<KleisliPartialOf<F, D>> {
+
+  fun CF(): Contravariant<F>
+
+  override fun <A, B> Kind<KleisliPartialOf<F, D>, A>.contramap(f: (B) -> A): Kind<KleisliPartialOf<F, D>, B> =
+    Kleisli { d -> CF().run { fix().run(d).contramap(f) } }
+}
+
+@extension
+interface KleisliDivideInstance<F, D> : Divide<KleisliPartialOf<F, D>>, KleisliContravariantInstance<F, D> {
+
+  fun DF(): Divide<F>
+  override fun CF(): Contravariant<F> = DF()
+
+  override fun <A, B, Z> divide(fa: Kind<KleisliPartialOf<F, D>, A>, fb: Kind<KleisliPartialOf<F, D>, B>, f: (Z) -> Tuple2<A, B>): Kind<KleisliPartialOf<F, D>, Z> =
+    Kleisli { d -> DF().divide(fa.fix().run(d), fb.fix().run(d), f) }
+}
+
+@extension
+interface KleisliDivisibleInstance<F, D> : Divisible<KleisliPartialOf<F, D>>, KleisliDivideInstance<F, D> {
+
+  fun DFF(): Divisible<F>
+  override fun DF(): Divide<F> = DFF()
+
+  override fun <A> conquer(): Kind<KleisliPartialOf<F, D>, A> =
+    Kleisli { DFF().conquer() }
+}
+
+@extension
+interface KleisliDecidableInstance<F, D> : Decidable<KleisliPartialOf<F, D>>, KleisliDivisibleInstance<F, D> {
+
+  fun DFFF(): Decidable<F>
+  override fun DFF(): Divisible<F> = DFFF()
+
+  override fun <A, B, Z> choose(fa: Kind<KleisliPartialOf<F, D>, A>, fb: Kind<KleisliPartialOf<F, D>, B>, f: (Z) -> Either<A, B>): Kind<KleisliPartialOf<F, D>, Z> =
+    Kleisli { d -> DFFF().choose(fa.fix().run(d), fb.fix().run(d), f) }
+}
+
+@extension
 interface KleisliApplicative<F, D> : Applicative<KleisliPartialOf<F, D>>, KleisliFunctor<F, D> {
 
   fun AF(): Applicative<F>

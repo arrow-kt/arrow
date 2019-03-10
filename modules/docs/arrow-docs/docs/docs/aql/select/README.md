@@ -13,8 +13,7 @@ beginner
 
 `select` over `List`
 
-{: data-executable='true'}
-```kotlin:ank
+```kotlin:ank:playground
 import arrow.aql.extensions.list.select.*
 import arrow.aql.extensions.listk.select.select
 fun main(args: Array<String>) {
@@ -30,8 +29,7 @@ println(result)
 
 `select` over `Option`
 
-{: data-executable='true'}
-```kotlin:ank
+```kotlin:ank:playground
 import arrow.core.Option
 import arrow.aql.extensions.option.select.*
 
@@ -48,8 +46,7 @@ println(result)
 
 `select` over `Sequence`
 
-{: data-executable='true'}
-```kotlin:ank
+```kotlin:ank:playground
 import arrow.aql.extensions.sequence.select.*
 import arrow.aql.extensions.sequencek.select.select
 

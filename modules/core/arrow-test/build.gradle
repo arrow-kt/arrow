@@ -1,5 +1,5 @@
 dependencies {
-    compile project(':arrow-extras')
+    compile project(':arrow-extras-data')
     compile project(':arrow-optics')
     compile project(':arrow-effects-data')
     compile project(':arrow-mtl')

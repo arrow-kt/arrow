@@ -1,6 +1,7 @@
 package arrow.effects.internal
 
 import arrow.core.Either
+import arrow.core.NonFatal
 import arrow.effects.*
 import arrow.effects.internal.ForwardCancelable.Companion.State.Active
 import arrow.effects.internal.ForwardCancelable.Companion.State.Empty
@@ -78,8 +79,12 @@ class ForwardCancelable {
           try {
             cb(r)
             acc
-          } catch (nonFatal: Throwable) {
-            acc + nonFatal
+          } catch (t: Throwable) {
+            if (NonFatal(t))  {
+              acc + t
+            } else {
+              throw t
+            }
           }
         }
 

@@ -1,6 +1,7 @@
 package arrow.core
 
 import arrow.Kind
+import arrow.core.Function0.Companion.just
 import arrow.higherkind
 
 fun <A> (() -> A).k(): Function0<A> = Function0(this)
@@ -36,3 +37,6 @@ data class Function0<out A>(internal val f: () -> A) : Function0Of<A> {
 
   }
 }
+
+fun <A, B> Function0<Either<A, B>>.select(f: Function0Of<(A) -> B>): Function0<B> =
+  flatMap  { it.fold({l -> just(l).ap(f)}, {r -> just(identity(r))})}

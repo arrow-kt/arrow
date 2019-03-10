@@ -1,18 +1,10 @@
 @file:Suppress("StringLiteralDuplication")
+
 package arrow.generic
 
-import com.squareup.kotlinpoet.AnnotationSpec
-import com.squareup.kotlinpoet.ClassName
-import com.squareup.kotlinpoet.FileSpec
-import com.squareup.kotlinpoet.FunSpec
-import com.squareup.kotlinpoet.KModifier
-import com.squareup.kotlinpoet.LambdaTypeName
-import com.squareup.kotlinpoet.ParameterSpec
-import com.squareup.kotlinpoet.ParameterizedTypeName
+import arrow.common.utils.toCamelCase
+import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
-import com.squareup.kotlinpoet.PropertySpec
-import com.squareup.kotlinpoet.TypeSpec
-import com.squareup.kotlinpoet.TypeVariableName
 import java.io.File
 
 private val genericsToClassNames: Map<String, String> = mapOf(
@@ -49,6 +41,7 @@ fun generateCoproducts(destination: File): Unit {
                     addCoproductClassDeclaration(generics)
                     addCoproductOfConstructors(generics)
                     addCopExtensionConstructors(generics)
+                    addExtensionConstructors(generics)
                     addSelectFunctions(generics)
                     addFoldFunction(generics)
                 }
@@ -60,6 +53,9 @@ fun generateCoproducts(destination: File): Unit {
 private fun FileSpec.Builder.addCoproductClassDeclaration(generics: List<String>): Unit {
     addType(
             TypeSpec.classBuilder("Coproduct${generics.size}")
+                    .addKdoc(
+                            "Represents a sealed hierarchy of ${generics.size} types where only one of the types is actually present.\n"
+                    )
                     .addModifiers(KModifier.SEALED)
                     .addTypeVariables(generics.map { TypeVariableName(it) })
                     .build()
@@ -68,7 +64,10 @@ private fun FileSpec.Builder.addCoproductClassDeclaration(generics: List<String>
     for (generic in generics) {
         addType(
                 TypeSpec.classBuilder(genericsToClassNames[generic]!!)
-                        .addModifiers(KModifier.INTERNAL, KModifier.DATA)
+                        .addKdoc(
+                                "Represents the ${genericsToClassNames[generic]!!.toLowerCase()} type of a Coproduct${generics.size}\n"
+                        )
+                        .addModifiers(KModifier.DATA)
                         .addTypeVariables(generics.toTypeParameters())
                         .superclass(parameterizedCoproductNClassName(generics))
                         .addProperty(
@@ -89,9 +88,18 @@ private fun FileSpec.Builder.addCoproductClassDeclaration(generics: List<String>
 private fun FileSpec.Builder.addCoproductOfConstructors(generics: List<String>): Unit {
     for (generic in generics) {
         val additionalParameterCount = generics.indexOf(generic)
+        val typeParameters = generics.joinToString(separator = ", ")
+        val replacementClassName = genericsToClassNames[generic]
 
         addFunction(
                 FunSpec.builder("coproductOf")
+                        .addAnnotation(
+                                AnnotationSpec.builder(Deprecated::class)
+                                        .addMember("message = \"This has issues with type inference, use ${replacementClassName}() instead\",\n" +
+                                                "replaceWith = ReplaceWith(\"$replacementClassName<$typeParameters>(${generic.toLowerCase()})\"," +
+                                                " \"arrow.generic.coproduct${generics.size}.$replacementClassName\")\n")
+                                        .build()
+                        )
                         .addAnnotations(additionalParameterSuppressAnnotation(additionalParameterCount))
                         .addTypeVariables(generics.toTypeParameters())
                         .addParameter(generic.toLowerCase(), TypeVariableName(generic))
@@ -106,14 +114,41 @@ private fun FileSpec.Builder.addCoproductOfConstructors(generics: List<String>):
 private fun FileSpec.Builder.addCopExtensionConstructors(generics: List<String>): Unit {
     for (generic in generics) {
         val additionalParameterCount = generics.indexOf(generic)
+        val typeParameters = generics.joinToString(separator = ", ")
+        val replacementFunctionName = genericsToClassNames[generic]!!.toCamelCase()
 
         addFunction(
                 FunSpec.builder("cop")
+                        .addAnnotation(
+                                AnnotationSpec.builder(Deprecated::class)
+                                        .addMember("message = \"This has issues with type inference, use .${replacementFunctionName}() instead\",\n" +
+                                                "replaceWith = ReplaceWith(\"this.$replacementFunctionName<$typeParameters>()\")\n")
+                                        .build()
+                        )
                         .addAnnotations(additionalParameterSuppressAnnotation(additionalParameterCount))
                         .receiver(TypeVariableName(generic))
                         .addTypeVariables(generics.toTypeParameters())
                         .addParameters(additionalParameterSpecs(additionalParameterCount))
-                        .addStatement("return coproductOf<${generics.joinToString(separator = ", ")}>(this)")
+                        .addStatement("return coproductOf<$typeParameters>(this)")
+                        .returns(parameterizedCoproductNClassName(generics))
+                        .build()
+        )
+    }
+}
+
+private fun FileSpec.Builder.addExtensionConstructors(generics: List<String>): Unit {
+    for (generic in generics) {
+        addFunction(
+                FunSpec.builder(genericsToClassNames[generic]!!.toCamelCase())
+                        .addKdoc(
+                                methodDocumentation(
+                                        description = "Creates a Coproduct from the $generic type",
+                                        output = "A Coproduct${generics.size}<${generics.joinToString(separator = ", ")}> where the receiver is the $generic"
+                                )
+                        )
+                        .receiver(TypeVariableName(generic))
+                        .addTypeVariables(generics.toTypeParameters())
+                        .addStatement("return ${genericsToClassNames[generic]}(this)")
                         .returns(parameterizedCoproductNClassName(generics))
                         .build()
         )
@@ -132,6 +167,12 @@ private fun FileSpec.Builder.addSelectFunctions(generics: List<String>): Unit {
 
         addFunction(
                 FunSpec.builder("select")
+                        .addKdoc(
+                                methodDocumentation(
+                                        description = "Transforms the Coproduct into an Option based on the actual value of the Coproduct",
+                                        output = "None if the Coproduct was not the specified type, Some if it was the specified type"
+                                )
+                        )
                         .addAnnotations(additionalParameterSuppressAnnotation(additionalParameterCount))
                         .addTypeVariable(TypeVariableName(generic))
                         .receiver(ClassName("", "Coproduct${generics.size}").parameterizedBy(*receiverGenerics))
@@ -146,6 +187,15 @@ private fun FileSpec.Builder.addSelectFunctions(generics: List<String>): Unit {
 private fun FileSpec.Builder.addFoldFunction(generics: List<String>): Unit {
     addFunction(
             FunSpec.builder("fold")
+                    .addKdoc(
+                            methodDocumentation(
+                                    description = "Runs the function related to the actual value of the Coproduct and returns the result",
+                                    input = generics.map {
+                                        it.toLowerCase() to "The function used to map ${it.toUpperCase()} to the RESULT type"
+                                    },
+                                    output = "RESULT generated by one of the input functions"
+                            )
+                    )
                     .receiver(parameterizedCoproductNClassName(generics))
                     .addTypeVariables(generics.toTypeParameters() + TypeVariableName("RESULT"))
                     .addParameters(
@@ -169,6 +219,20 @@ private fun FileSpec.Builder.addFoldFunction(generics: List<String>): Unit {
                     }
                     .build()
     )
+}
+
+private fun methodDocumentation(
+        output: String,
+        description: String,
+        input: List<Pair<String, String>> = emptyList()
+): String {
+    val parameters = if (input.isEmpty()) {
+        ""
+    } else {
+        input.joinToString(separator = "") { "@param ${it.first} ${it.second}\n" } + "\n"
+    }
+
+    return "$description\n\n$parameters@return $output\n"
 }
 
 private fun List<String>.toTypeParameters(): List<TypeVariableName> = map { TypeVariableName(it) }

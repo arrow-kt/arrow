@@ -1,26 +1,18 @@
 @file:Suppress("UnusedImports")
+
 package arrow.core.extensions
 
 import arrow.Kind
 import arrow.core.*
 import arrow.core.Try.Failure
-import arrow.core.extensions.`try`.monad.monad
-import arrow.core.extensions.`try`.monadError.monadError
 import arrow.core.extensions.`try`.monadThrow.monadThrow
-import arrow.core.extensions.id.monad.monad
-import arrow.core.extensions.option.monadError.monadError
 import arrow.extension
 import arrow.typeclasses.*
-import arrow.typeclasses.suspended.monad.Fx
 import arrow.core.extensions.traverse as tryTraverse
 
 fun <A> Try<A>.combine(SG: Semigroup<A>, b: Try<A>): Try<A> =
-  when (this) {
-    is Success<A> -> when (b) {
-      is Success<A> -> Success(SG.run { value.combine(b.value) })
-      is Failure -> b
-    }
-    is Failure -> this
+  flatMap { a ->
+    b.map { b -> SG.run { a + b } }
   }
 
 @extension
@@ -41,7 +33,7 @@ interface TryMonoid<A> : Monoid<Try<A>>, TrySemigroup<A> {
 }
 
 @extension
-interface TryApplicativeError: ApplicativeError<ForTry, Throwable>, TryApplicative {
+interface TryApplicativeError : ApplicativeError<ForTry, Throwable>, TryApplicative {
 
   override fun <A> raiseError(e: Throwable): Try<A> =
     Failure(e)
@@ -52,7 +44,7 @@ interface TryApplicativeError: ApplicativeError<ForTry, Throwable>, TryApplicati
 }
 
 @extension
-interface TryMonadError: MonadError<ForTry, Throwable>, TryMonad {
+interface TryMonadError : MonadError<ForTry, Throwable>, TryMonad {
   override fun <A> raiseError(e: Throwable): Try<A> =
     Failure(e)
 
@@ -61,7 +53,7 @@ interface TryMonadError: MonadError<ForTry, Throwable>, TryMonad {
 }
 
 @extension
-interface TryMonadThrow: MonadThrow<ForTry>, TryMonadError
+interface TryMonadThrow : MonadThrow<ForTry>, TryMonadError
 
 @extension
 interface TryEq<A> : Eq<Try<A>> {

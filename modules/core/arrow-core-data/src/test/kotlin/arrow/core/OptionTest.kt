@@ -1,14 +1,16 @@
 package arrow.core
 
+import arrow.Kind
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
 import arrow.core.extensions.monoid
 import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.option.eq.eq
-import arrow.core.extensions.option.fx.fx
 import arrow.core.extensions.option.hash.hash
 import arrow.core.extensions.option.monoid.monoid
+import arrow.core.extensions.option.semigroupal.semigroupal
 import arrow.core.extensions.option.show.show
+import arrow.core.extensions.tuple2.eq.eq
 import arrow.mtl.extensions.option.monadFilter.monadFilter
 import arrow.mtl.extensions.option.traverseFilter.traverseFilter
 import arrow.syntax.collections.firstOption
@@ -21,7 +23,6 @@ import io.kotlintest.properties.forAll
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldNotBe
-import io.kotlintest.shouldThrow
 import org.junit.runner.RunWith
 
 @RunWith(KotlinTestRunner::class)
@@ -29,6 +30,14 @@ class OptionTest : UnitSpec() {
 
   val some: Option<String> = Some("kotlin")
   val none: Option<String> = Option.empty()
+
+  val associativeSemigroupalEq = object : Eq<Kind<ForOption, Tuple2<Int, Tuple2<Int, Int>>>> {
+    override fun Kind<ForOption, Tuple2<Int, Tuple2<Int, Int>>>.eqv(b: Kind<ForOption, Tuple2<Int, Tuple2<Int, Int>>>): Boolean {
+        return Option.eq(Tuple2.eq(Int.eq(), Tuple2.eq(Int.eq(), Int.eq()))).run {
+          this@eqv.fix().eqv(b.fix())
+        }
+      }
+  }
 
   init {
 
@@ -39,7 +48,8 @@ class OptionTest : UnitSpec() {
       FunctorFilterLaws.laws(Option.traverseFilter(), { Option(it) }, Eq.any()),
       TraverseFilterLaws.laws(Option.traverseFilter(), Option.applicative(), ::Some, Eq.any()),
       MonadFilterLaws.laws(Option.monadFilter(), ::Some, Eq.any()),
-      HashLaws.laws(Option.hash(Int.hash()), Option.eq(Int.eq())) { it.some() }
+      HashLaws.laws(Option.hash(Int.hash()), Option.eq(Int.eq())) { it.some() },
+      SemigroupalLaws.laws(Option.semigroupal(), ::Some, ::bijection, associativeSemigroupalEq)
     )
 
     "fromNullable should work for both null and non-null values of nullable types" {
@@ -137,29 +147,13 @@ class OptionTest : UnitSpec() {
       x or None shouldBe Some(2)
       None or x shouldBe Some(2)
       None or None shouldBe None
-
     }
 
-    "fx can turn effects into pure kinded values" {
-      suspend fun sideEffect(): Int =
-        1
-      fx {
-        val (result) = effect { sideEffect() }
-        result
-      } shouldBe Some(1)
-    }
+  }
 
-    "fx lets thrown exception pass through for monads that can handle Throwable" {
-      suspend fun sideEffect(): Int =
-        throw Throwable()
-      shouldThrow<Throwable> {
-        fx {
-          val (result) = effect { sideEffect() }
-          result
-        }
-      }
-    }
-
+  private fun bijection(from: Kind<ForOption, Tuple2<Tuple2<Int, Int>, Int>>): Option<Tuple2<Int, Tuple2<Int, Int>>> {
+    val ot = (from as Some<Tuple2<Tuple2<Int, Int>, Int>>)
+    return Tuple2(ot.t.a.a, Tuple2(ot.t.a.b, ot.t.b)).toOption()
   }
 
 }

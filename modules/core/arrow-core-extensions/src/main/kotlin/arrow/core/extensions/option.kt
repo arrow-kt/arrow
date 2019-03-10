@@ -3,8 +3,9 @@ package arrow.core.extensions
 
 import arrow.Kind
 import arrow.core.*
+import arrow.core.select as optionSelect
+import arrow.core.extensions.option.monad.map
 import arrow.core.extensions.option.monad.monad
-import arrow.core.extensions.option.monadError.monadError
 import arrow.extension
 import arrow.typeclasses.*
 import arrow.typeclasses.suspended.monad.Fx
@@ -23,6 +24,12 @@ interface OptionSemigroup<A> : Semigroup<Option<A>> {
       }
       None -> b
     }
+}
+
+@extension
+interface OptionSemigroupal : Semigroupal<ForOption> {
+  override fun <A, B> Kind<ForOption, A>.product(fb: Kind<ForOption, B>): Kind<ForOption, Tuple2<A, B>> =
+    fb.fix().ap(this.map { a:A -> { b: B -> Tuple2(a,b)} })
 }
 
 @extension
@@ -118,6 +125,12 @@ interface OptionApplicative : Applicative<ForOption> {
 }
 
 @extension
+interface OptionSelective : Selective<ForOption>, OptionApplicative {
+  override fun <A, B> OptionOf<Either<A, B>>.select(f: OptionOf<(A) -> B>): Option<B> =
+    fix().optionSelect(f)
+}
+
+@extension
 interface OptionMonad : Monad<ForOption> {
   override fun <A, B> OptionOf<A>.ap(ff: OptionOf<(A) -> B>): Option<B> =
     fix().ap(ff)
@@ -133,6 +146,9 @@ interface OptionMonad : Monad<ForOption> {
 
   override fun <A> just(a: A): Option<A> =
     Option.just(a)
+
+  override fun <A, B> OptionOf<Either<A, B>>.select(f: OptionOf<(A) -> B>): OptionOf<B> =
+    fix().optionSelect(f)
 }
 
 @extension

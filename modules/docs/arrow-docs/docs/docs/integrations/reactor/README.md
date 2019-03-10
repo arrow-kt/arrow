@@ -152,8 +152,7 @@ This is a limitation on reactor's side. See the corresponding github [issue]({{ 
 
 To overcome this limitation and run code in a stack safe way, one can make use of `bindingStackSafe` which is provided for every instance of [`Monad`]({{ '/docs/typeclasses/monad' | relative_url }}) when you have `arrow-free` included.
 
-{: data-executable='true'}
-```kotlin:ank
+```kotlin:ank:playground
 import arrow.Kind
 import arrow.effects.reactor.MonoK
 import arrow.effects.reactor.ForMonoK
@@ -176,7 +175,7 @@ fun main() {
 }
 ```
 
-```kotlin:ank
+```kotlin:ank:fail
 import arrow.core.Try
 
 // This will result in a stack overflow

@@ -2,7 +2,6 @@ package arrow.core.extensions
 
 import arrow.Kind
 import arrow.core.*
-import arrow.core.extensions.function0.monad.monad
 import arrow.core.extensions.function1.monad.monad
 import arrow.extension
 import arrow.typeclasses.*
@@ -37,6 +36,56 @@ interface Function1Contravariant<O> : Contravariant<Conested<ForFunction1, O>> {
 
   fun <A, B> Function1Of<A, O>.contramapC(f: (B) -> A): Function1Of<B, O> =
     conest().contramap(f).counnest()
+}
+
+@extension
+interface Function1Divide<O> : Divide<Conested<ForFunction1, O>>, Function1Contravariant<O> {
+  fun MO(): Monoid<O>
+
+  override fun <A, B, Z> divide(fa: Kind<Conested<ForFunction1, O>, A>, fb: Kind<Conested<ForFunction1, O>, B>, f: (Z) -> Tuple2<A, B>): Kind<Conested<ForFunction1, O>, Z> =
+    Function1<Z, O> {
+      val (a, b) = f(it)
+
+      MO().run {
+        fa.counnest().invoke(a) +
+          fb.counnest().invoke(b)
+      }
+    }.conest()
+
+  fun <A, B, Z> divideC(fa: Function1Of<A, O>, fb: Function1Of<A, O>, f: (Z) -> Tuple2<A, B>): Function1Of<Z, O> =
+    divide(fa.conest(), fb.conest(), f).counnest()
+}
+
+@extension
+interface Function1Divisible<O> : Divisible<Conested<ForFunction1, O>>, Function1Divide<O> {
+  override fun MO(): Monoid<O> = MOO()
+  fun MOO(): Monoid<O>
+
+  override fun <A> conquer(): Kind<Conested<ForFunction1, O>, A> =
+    Function1<A, O> {
+      MOO().empty()
+    }.conest()
+
+  fun <A> conquerC(): Function1Of<A, O> =
+    conquer<A>().counnest()
+}
+
+@extension
+interface Function1Decidable<O> : Decidable<Conested<ForFunction1, O>>, Function1Divisible<O> {
+  override fun MOO(): Monoid<O> = MOOO()
+  fun MOOO(): Monoid<O>
+
+  override fun <A, B, Z> choose(fa: Kind<Conested<ForFunction1, O>, A>, fb: Kind<Conested<ForFunction1, O>, B>, f: (Z) -> Either<A, B>): Kind<Conested<ForFunction1, O>, Z> =
+    Function1<Z, O> {
+      f(it).fold({
+        fa.counnest().invoke(it)
+      }, {
+        fb.counnest().invoke(it)
+      })
+    }.conest()
+
+  fun <A, B, Z> chooseC(fa: Function1Of<A, O>, fb: Function1Of<B, O>, f: (Z) -> Either<A, B>): Function1Of<Z, O> =
+    choose(fa.conest(), fb.conest(), f).counnest()
 }
 
 @extension

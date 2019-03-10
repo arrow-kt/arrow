@@ -2,12 +2,11 @@ package arrow.effects
 
 import arrow.core.*
 import arrow.effects.IO.Companion.just
-import arrow.effects.extensions.concurrent
 import arrow.effects.extensions.io.async.async
 import arrow.effects.extensions.io.concurrent.concurrent
 import arrow.effects.extensions.io.concurrent.parMapN
+import arrow.effects.extensions.io.fx.fx
 import arrow.effects.extensions.io.monad.flatMap
-import arrow.effects.extensions.io.monad.fx
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.milliseconds
 import arrow.effects.typeclasses.seconds

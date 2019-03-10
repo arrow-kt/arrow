@@ -367,3 +367,15 @@ fun <A, B> B?.rightIfNotNull(default: () -> A): Either<A, B> = when (this) {
   null -> Either.Left(default())
   else -> Either.Right(this)
 }
+
+/**
+ * Applies the given function `f` if this is a [Left], otherwise returns this if this is a [Right].
+ * This is like `flatMap` for the exception.
+ */
+fun <A, B> EitherOf<A, B>.handleErrorWith(f: (A) -> EitherOf<A, B>): Either<A, B> =
+  fix().let {
+    when (it) {
+      is Either.Left -> f(it.a).fix()
+      is Either.Right -> it
+    }
+  }

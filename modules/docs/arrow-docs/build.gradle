@@ -8,7 +8,7 @@ dependencies {
 //        exclude group: 'io.arrow-kt', module: 'arrow-free'
 //    }
     compile project(':arrow-ank')
-    compile project(':arrow-extras')
+    compile project(':arrow-extras-data')
     compile project(':arrow-core-data')
     compile project(':arrow-test')
     compile project(':arrow-extras-extensions')

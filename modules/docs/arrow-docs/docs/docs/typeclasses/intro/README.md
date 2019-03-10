@@ -102,7 +102,13 @@ We will list them by their hierarchy.
 
 - [`Inject`]({{ '/docs/typeclasses/inject/' | relative_url }}) - transformation between datatypes
 
-- [`Alternative`]({{ '/docs/arrow/typeclasses/alternative/' | relative_url }}) - has an structure that contains either of two values
+- [`Alternative`]({{ '/docs/arrow/typeclasses/alternative/' | relative_url }}) - has a structure that contains either of two values
+
+- [`Divide`]({{ '/docs/arrow/typeclasses/divide/' | relative_url }}) - models divide from the divide and conquer pattern
+
+- [`Divisible`]({{ '/docs/arrow/typeclasses/divisible/' | relative_url }}) - extends `Divide` with conquer
+
+- [`Decidable`]({{ '/docs/arrow/typeclasses/decidable/' | relative_url }}) - contravariant version of `Alternative`
 
 ##### Show
 
@@ -125,6 +131,10 @@ We will list them by their hierarchy.
 - [`Monoid`]({{ '/docs/arrow/typeclasses/monoid/' | relative_url }}) - combinable objects have an empty value
 
 - [`MonoidK`]({{ '/docs/arrow/typeclasses/monoidk/' | relative_url }}) - combinable datatypes have an empty value
+
+##### Semigroupal
+
+- [`Semigroupal`]({{ '/docs/arrow/typeclasses/semigroupal/' | relative_url }}) - abstraction over the cartesian product
 
 ##### Semiring
 

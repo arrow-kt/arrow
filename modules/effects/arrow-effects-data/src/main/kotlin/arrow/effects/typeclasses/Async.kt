@@ -142,7 +142,7 @@ interface Async<F> : MonadDefer<F> {
       try {
         just(f())
       } catch (t: Throwable) {
-        raiseError<A>(t)
+        t.raiseNonFatal<A>()
       }
     }
 
