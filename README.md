@@ -76,16 +76,6 @@ Trimmed down versions:
 
 ```groovy
 def arrow_version = "0.9.0"
-```
-
-You can find the dependencies necessary in the Basic Setup of the README at the 0.9.0 tag clicking [here](https://github.com/arrow-kt/arrow/blob/0.9.0/README.md#next-development-version-090).
-
-# Next development version 0.9.1
-
-Add the dependencies into the project's `build.gradle`
-
-```groovy
-def arrow_version = "0.9.1-SNAPSHOT"
 dependencies {
     compile "io.arrow-kt:arrow-core-data:$arrow_version"
     compile "io.arrow-kt:arrow-core-extensions:$arrow_version"
@@ -115,6 +105,7 @@ dependencies {
     compile "io.arrow-kt:arrow-query-language:$arrow_version" //optional
     compile "io.arrow-kt:arrow-integration-retrofit-adapter:$arrow_version" //optional
 }
+
 ```
 
 # Additional Setup
