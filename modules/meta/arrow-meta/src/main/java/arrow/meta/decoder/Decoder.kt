@@ -216,7 +216,7 @@ interface TypeDecoder : MetaDecoder<Type> {
     }
 
   operator fun Code.Companion.invoke(f: () -> String): Code =
-    Code(CodeBlock.of(f().trimMargin()).toString())
+    Code(f().trimMargin())
 
   operator fun TypeName?.unaryPlus(): Code =
     if (this != null) Code(CodeBlock.of("%T", this.lyrics()).toString())
@@ -257,7 +257,7 @@ interface TypeDecoder : MetaDecoder<Type> {
   }
 
   fun <A : Any> List<A>.joinToCode(separator: String): Code =
-    if (isEmpty()) Code(CodeBlock.of("").toString())
+    if (isEmpty()) Code("")
     else {
       val code = joinToString(", ") { separator }
       val args = map { it.resolveDynamicArg() }.toTypedArray()
