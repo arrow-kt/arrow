@@ -7,6 +7,7 @@ import arrow.core.extensions.semigroup
 import arrow.data.extensions.validated.applicative.applicative
 import arrow.data.extensions.validated.eq.eq
 import arrow.data.extensions.validated.functor.functor
+import arrow.data.extensions.validated.selective.selective
 import arrow.data.extensions.validated.semigroupK.semigroupK
 import arrow.data.extensions.validated.show.show
 import arrow.data.extensions.validated.traverse.traverse
@@ -33,7 +34,7 @@ class ValidatedTest : UnitSpec() {
     testLaws(
       EqLaws.laws(EQ) { Valid(it) },
       ShowLaws.laws(Validated.show(), EQ) { Valid(it) },
-      ApplicativeLaws.laws(Validated.applicative(String.semigroup()), Eq.any()),
+      SelectiveLaws.laws(Validated.selective(String.semigroup()), Eq.any()),
       TraverseLaws.laws(Validated.traverse(), Validated.functor(), ::Valid, Eq.any()),
       SemigroupKLaws.laws(
         Validated.semigroupK(String.semigroup()),
