@@ -67,6 +67,7 @@
 
         /* Documentation Dropdown Content (Hidden by Default) */
         .dropdown-content {
+          font-size: 0.800rem;
           display: none;
           position: absolute;
           min-width: 145px;
@@ -80,6 +81,12 @@
             padding: 12px 9px;
             text-decoration: none;
             display: block;
+          }
+
+          .inner {
+            width: 90%;
+            height: 1px;
+            border-bottom: solid 1px rgba(255, 255, 255, 0.5);
           }
         }
 

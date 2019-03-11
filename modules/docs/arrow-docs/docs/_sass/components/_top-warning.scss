@@ -1,18 +1,17 @@
-// TOP DOC VERSION WARNINGS
+// TOP DOC VERSION TAB
 // -----------------------------------------------
 // -----------------------------------------------
 .top-warning {
     height: 40px;
+    align-items: center;
     background-color: $top-warning-base;
     color: $white;
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
+    justify-content: center;
     position: sticky;
     top: 0px;
     width: 100%;
     z-index: 2;
-    display: none;
+    display: flex;
     overflow: hidden;
 
     a {
@@ -21,13 +20,49 @@
 
     .top-container {
       display: flex;
-      width: 40%;
-      justify-content: space-around;
+      position: absolute;
 
       .top-tabs {
-        width: 33%;
-        padding: 10px 0;
-        text-align: center;
+
+        &:active,
+        &:focus,
+        &:hover {
+            a {
+              color: $white;
+            }
+        }
+
+        a {
+          color: #92b6eb;
+          font-size: 0.875rem;
+          text-decoration: none;
+          padding: 0 25px;
+        }
+
+        @include bp(small) {
+          a {
+            font-size: 0.775rem;
+            padding: 0 $base-point-grid;
+          }
+        }
+
+        .disabled {
+          display: none;
+        }
+
+        .middle-tab {
+          border-left: solid 1px #92b6eb;
+          border-right: solid 1px #92b6eb;
+        }
       }
     }
+
+  .close {
+    margin-left: 93%;
+    cursor: pointer;
+  }
+
+  @include bp(small) {
+    justify-content: space-evenly;
+  }
 }

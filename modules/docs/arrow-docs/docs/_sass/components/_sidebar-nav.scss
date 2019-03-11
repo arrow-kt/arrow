@@ -65,18 +65,23 @@
                 }
             }
         }
+
+        .inner {
+          height: 1px;
+          border-bottom: solid 1px rgba(255, 255, 255, 0.5);
+        }
     }
 }
 
 .sidebar-doc-versions {
     position: relative;
-    width: 95%;
+    width: 93%;
     margin-left: auto;
     margin-right: auto;
 
     .sidebar-nav-item {
        a {
-         padding-left: 20px;
+         padding-left: 18px;
        }
        &.active {
            > a {
@@ -89,10 +94,12 @@
          z-index: 1;
          box-shadow: rgba(0, 0, 0, 0.3) 0px 8px 16px 0px;
          background: $brand-primary;
+         
+         li {
+           a {
+             font-size: 0.800rem;
+           }
+         }
        }
-    }
-
-    .disabled {
-      display: none;
     }
 }

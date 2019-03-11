@@ -1,42 +1,32 @@
 <div class="masthead-doc-version">
+  <ul>
+    <li>
+      <a class="masthead-button secondary-button button"
+        href="{{ previous_version.url }}">
+        <span>{{ previous_version.title }}</span>
+        <span class="secondary-doc-version-text">
+          {{ site.data.doc-versions.previous }}
+        </span>
+      </a>
+    </li>
 
-      {% for item in site.data.doc-versions.docVersions %}
-        {% if item.url == site.data.commons.stable_version %}
-          {% assign stable_version = item %}
-        {% endif %}
-        {% if item.url == site.data.commons.next_version %}
-          {% assign next_version = item %}
-        {% endif %}
-      {% endfor %}
+    <li>
+      <a class="masthead-button button" href="{{ stable_version.url }}">
+        <span>{{ stable_version.title }}</span>
+        <span class="secondary-doc-version-text">
+          {{ site.data.doc-versions.stable }}
+        </span>
+      </a>
+    </li>
 
-      {% for item in site.data.doc-versions.docVersions %}
-        {% if item.url == stable_version.previous %}
-          {% assign previous_version = item %}
-        {% endif %}
-      {% endfor %}
-
-    <ul>
-        <li>
-          <a class="masthead-button small-button button" href="{{ previous_version.url }}">
-            <span>{{ previous_version.title }}</span>
-            <span>{{ site.data.doc-versions.previous }}</span>
-          </a>
-        </li>
-
-        <li>
-          <a class="masthead-button button" href="{{ stable_version.url }}">
-            <span>{{ stable_version.title }}</span>
-            <span id="stable" class="disabled">{{ stable_version.url }}</span>
-            <span>{{ site.data.doc-versions.stable }}</span>
-          </a>
-        </li>
-
-        <li>
-          <a class="masthead-button small-button button" href="{{ next_version.url }}">
-            <span>{{ next_version.title }}</span>
-            <span>{{ site.data.doc-versions.next }}</span>
-          </a>
-        </li>
-    </ul>
-
+    <li>
+      <a class="masthead-button secondary-button button"
+        href="{{ next_version.url }}">
+        <span>{{ next_version.title }}</span>
+        <span class="secondary-doc-version-text">
+          {{ site.data.doc-versions.next }}
+        </span>
+      </a>
+    </li>
+  </ul>
 </div>

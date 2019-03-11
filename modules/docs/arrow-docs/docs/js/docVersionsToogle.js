@@ -6,24 +6,35 @@ function displayToogle() {
 
 // Close the dropdown if the user clicks outside of it
 window.onclick = function(event) {
-  if (!event.target.matches('.dropbutton')) {
+  if (!event.target.matches(".dropbutton")) {
     var dropdowns = document.getElementsByClassName("dropdown-content");
     var i;
     for (i = 0; i < dropdowns.length; i++) {
       var openDropdown = dropdowns[i];
-      if (openDropdown.classList.contains('show')) {
-        openDropdown.classList.remove('show');
+      if (openDropdown.classList.contains("show")) {
+        openDropdown.classList.remove("show");
       }
     }
   }
-}
+};
 
-// Check the Arrow version and show a warning on top if we are not in the stable version
-function showTopWarning() {
-  const currentUrl = 'https://'+ window.location.host +'/'
-  if (!currentUrl.includes(document.getElementById("stable").textContent)){
-    document.getElementById("topWarning").style.display = 'flex';
+// Check the Arrow version and remark the version in wich we are
+function highlightDocVersion() {
+  const currentUrl = "https://" + window.location.host + "/";
+
+  if (currentUrl.includes(document.getElementById("previous").textContent)) {
+    document.getElementById("top-previous").style.color = "white";
+  }
+  if (currentUrl.includes(document.getElementById("stable").textContent)) {
+    document.getElementById("top-stable").style.color = "white";
+  }
+  if (currentUrl.includes(document.getElementById("next").textContent)) {
+    document.getElementById("top-next").style.color = "white";
   }
 }
 
-window.onload = showTopWarning;
+function closeTop() {
+  document.getElementById("topWarning").style.display = "none";
+}
+
+window.onload = highlightDocVersion;
