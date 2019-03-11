@@ -10,15 +10,13 @@ import arrow.core.Option
  *
  * [identity] returns a specific identity `Kind<F, A>` value for a given type [F] and [A].
  *
- * Like any other Monoid type class, [Monoidal] also complies with the left and right identity law:
- *
- * ```kotlin
- * f((a.product(b)).product(c)) == a.product(b.product(c))
- * ```
+ * This type class complies with the following law:
  *
  * ```kotlin
  * fa.product(identity) == identity.product(fa) == identity
  * ```
+ *
+ * In addition, the laws of the [Semigroupal] type class also apply.
  *
  * Currently, [Monoidal] instances are defined for [Option], [ListK], [SequenceK] and [SetK].
  *
