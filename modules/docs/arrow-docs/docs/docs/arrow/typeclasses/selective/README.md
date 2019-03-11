@@ -83,7 +83,7 @@ TypeClass(Selective::class).dtMarkdownList()
 <canvas id="hierarchy-diagram" style="margin-top:120px"></canvas>
 
 <script>
-  drawNomNomlDiagram('hierarchy-diagram', 'monad.nomnol')
+  drawNomNomlDiagram('hierarchy-diagram', 'selective.nomnol')
 </script>
 
 ```kotlin:ank:outFile(selective.nomnol)
