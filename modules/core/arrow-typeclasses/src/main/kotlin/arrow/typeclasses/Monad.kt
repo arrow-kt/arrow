@@ -24,7 +24,7 @@ import kotlin.coroutines.startCoroutine
  *
  */
 @documented
-interface Monad<F> : Applicative<F> {
+interface Monad<F> : Selective<F> {
 
   fun <A, B> Kind<F, A>.flatMap(f: (A) -> Kind<F, B>): Kind<F, B>
 
@@ -62,6 +62,11 @@ interface Monad<F> : Applicative<F> {
 
   fun <B> Kind<F, Boolean>.ifM(ifTrue: () -> Kind<F, B>, ifFalse: () -> Kind<F, B>): Kind<F, B> =
     flatMap { if (it) ifTrue() else ifFalse() }
+
+  fun <A, B> Kind<F, Either<A, B>>.selectM(f: Kind<F, (A) -> B>): Kind<F, B> =
+    flatMap { it.fold({ a -> f.map { ff -> ff(a) } }, { b -> just(b) }) }
+
+  override fun <A, B> Kind<F, Either<A, B>>.select(f: Kind<F, (A) -> B>): Kind<F, B> = selectM(f)
 
   /**
    * Entry point for monad bindings which enables for comprehension. The underlying implementation is based on coroutines.

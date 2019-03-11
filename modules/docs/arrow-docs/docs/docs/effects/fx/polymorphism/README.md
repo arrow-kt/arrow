@@ -26,11 +26,11 @@ import arrow.effects.extensions.io.fx.fx
 suspend fun printThreadName(): Unit =
   println(Thread.currentThread().name)
 
-/* for all `F` that provide an `Fx` extension define a program function
+/* for all `F` that provide an `Fx` extension define a program function */
 fun <F> Fx<F>.program(): Kind<F, Int> =
   fx { !effect { sideEffect() } }
 
-/* for all `F` that provide an `UnsafeRun` extension define a main function
+/* for all `F` that provide an `UnsafeRun` extension define a main function */
 fun <F> UnsafeRun<F>.main(fx: Fx<F>): Int =
   unsafe { runBlocking { fx.program() } }
 

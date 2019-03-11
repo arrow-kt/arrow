@@ -278,6 +278,9 @@ options:
       - title: ApplicativeError
         url: /docs/arrow/typeclasses/applicativeerror/
 
+      - title: Selective
+        url: /docs/arrow/typeclasses/selective/
+
       - title: Monad
         url: /docs/arrow/typeclasses/monad/
 
