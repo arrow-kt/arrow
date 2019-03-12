@@ -33,6 +33,11 @@ interface OptionSemigroupal : Semigroupal<ForOption> {
 }
 
 @extension
+interface OptionMonoidal : Monoidal<ForOption>, OptionSemigroupal {
+  override fun <A> identity(): Kind<ForOption, A> = None
+}
+
+@extension
 interface OptionMonoid<A> : Monoid<Option<A>>, OptionSemigroup<A> {
   override fun SG(): Semigroup<A>
   override fun empty(): Option<A> = None

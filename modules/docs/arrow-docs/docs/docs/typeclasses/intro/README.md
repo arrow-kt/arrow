@@ -136,6 +136,8 @@ We will list them by their hierarchy.
 
 - [`Semigroupal`]({{ '/docs/arrow/typeclasses/semigroupal/' | relative_url }}) - abstraction over the cartesian product
 
+- [`Monoidal`]({{ '/docs/arrow/typeclasses/monoidal/' | relative_url }}) - adds an identity element to a semigroupal
+
 ##### Semiring
 
 - [`Semiring`]({{ '/docs/arrow/typeclasses/semiring/' | relative_url }}) - can combine or multiplicatively combine two objects together
