@@ -20,21 +20,30 @@ window.onclick = function(event) {
 
 // Check the Arrow version and remark the version in wich we are
 function highlightDocVersion() {
-  const currentUrl = "https://" + window.location.host + "/";
+  if( !sessionStorage.getItem('showTopWarning')) {
 
-  if (currentUrl.includes(document.getElementById("previous").textContent)) {
-    document.getElementById("top-previous").style.color = "white";
+        document.getElementById("topWarning").style.display = "block";
+
+        const currentUrl = "https://" + window.location.host + "/";
+
+        if (currentUrl.includes(document.getElementById("previous").textContent)) {
+          document.getElementById("top-previous").style.color = "white";
+        }
+        if (currentUrl.includes(document.getElementById("stable").textContent)) {
+          document.getElementById("top-stable").style.color = "white";
+        }
+        if (currentUrl.includes(document.getElementById("next").textContent)) {
+          document.getElementById("top-next").style.color = "white";
+        }
   }
-  if (currentUrl.includes(document.getElementById("stable").textContent)) {
-    document.getElementById("top-stable").style.color = "white";
-  }
-  if (currentUrl.includes(document.getElementById("next").textContent)) {
-    document.getElementById("top-next").style.color = "white";
+  else {
+    document.getElementById("topWarning").style.display = "none";
   }
 }
 
 function closeTop() {
   document.getElementById("topWarning").style.display = "none";
+  sessionStorage.setItem('showTopWarning', 1);
 }
 
 window.onload = highlightDocVersion;

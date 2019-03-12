@@ -2,41 +2,30 @@
 // -----------------------------------------------
 // -----------------------------------------------
 .top-warning {
-    height: 40px;
-    align-items: center;
+    height: 43px;
     background-color: $top-warning-base;
     color: $white;
-    justify-content: center;
     position: sticky;
     top: 0px;
     width: 100%;
     z-index: 2;
-    display: flex;
+    display: none;
     overflow: hidden;
-
-    a {
-      color: $white;
-    }
+    text-align: center;
+    padding: 8px 0;
 
     .top-container {
-      display: flex;
-      position: absolute;
-
-      .top-tabs {
-
-        &:active,
-        &:focus,
-        &:hover {
-            a {
-              color: $white;
-            }
-        }
+        display: inline-block;
 
         a {
           color: #92b6eb;
           font-size: 0.875rem;
           text-decoration: none;
           padding: 0 25px;
+
+          &:hover {
+            color: $white;
+          }
         }
 
         @include bp(small) {
@@ -54,15 +43,12 @@
           border-left: solid 1px #92b6eb;
           border-right: solid 1px #92b6eb;
         }
-      }
     }
 
   .close {
-    margin-left: 93%;
+    float: right;
+    margin-right: 3%;
     cursor: pointer;
-  }
-
-  @include bp(small) {
-    justify-content: space-evenly;
+    margin-top: 2px;
   }
 }

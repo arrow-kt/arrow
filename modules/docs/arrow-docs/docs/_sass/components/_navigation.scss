@@ -83,10 +83,8 @@
             display: block;
           }
 
-          .inner {
-            width: 90%;
-            height: 1px;
-            border-bottom: solid 1px rgba(255, 255, 255, 0.5);
+          a:nth-child(4) {
+            border-top: solid 1px rgba(255, 255, 255, 0.5);
           }
         }
 

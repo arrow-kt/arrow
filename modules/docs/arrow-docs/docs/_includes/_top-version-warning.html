@@ -14,32 +14,26 @@
 {% endfor %}
 
 <div id="topWarning" class="top-warning">
-  <div class="top-container">
-    <div class="top-tabs">
-      <a href="{{ previous_version.url | append: 'docs/' }}">
-        <span id="top-previous">
-          {{ site.data.doc-versions.previous }} {{ previous_version.title }}
-        </span>
-        <span id="previous" class="disabled"> {{ previous_version.url }} </span>
-      </a>
+    <div class="top-container">
+        <a href="{{ previous_version.url | append: 'docs/' }}">
+          <span id="top-previous">
+            {{ site.data.doc-versions.previous }} {{ previous_version.title }}
+          </span>
+          <span id="previous" class="disabled"> {{ previous_version.url }} </span>
+        </a>
+        <a href="{{ stable_version.url | append: 'docs/' }}" class="middle-tab">
+          <span id="top-stable"">
+            {{ site.data.doc-versions.stable }} {{ stable_version.title }}
+          </span>
+          <span id="stable" class="disabled">{{ stable_version.url }}</span>
+        </a>
+        <a href="{{ next_version.url | append: 'docs/' }}">
+          <span id="top-next">
+            {{ site.data.doc-versions.next }} {{ next_version.title }}
+          </span>
+          <span id="next" class="disabled">{{ next_version.url }}</span>
+        </a>
     </div>
-    <div class="top-tabs">
-      <a href="{{ stable_version.url | append: 'docs/' }}" class="middle-tab">
-        <span id="top-stable"">
-          {{ site.data.doc-versions.stable }} {{ stable_version.title }}
-        </span>
-        <span id="stable" class="disabled">{{ stable_version.url }}</span>
-      </a>
-    </div>
-    <div class="top-tabs">
-      <a href="{{ next_version.url | append: 'docs/' }}">
-        <span id="top-next">
-          {{ site.data.doc-versions.next }} {{ next_version.title }}
-        </span>
-        <span id="next" class="disabled">{{ next_version.url }}</span>
-      </a>
-    </div>
-  </div>
   <div onclick="closeTop()" class="close">
     <img src="../img/close.svg" alt="close" />
   </div>
