@@ -8,7 +8,7 @@ import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.option.eq.eq
 import arrow.core.extensions.option.hash.hash
 import arrow.core.extensions.option.monoid.monoid
-import arrow.core.extensions.option.semigroupal.semigroupal
+import arrow.core.extensions.option.monoidal.monoidal
 import arrow.core.extensions.option.show.show
 import arrow.core.extensions.tuple2.eq.eq
 import arrow.mtl.extensions.option.monadFilter.monadFilter
@@ -49,7 +49,7 @@ class OptionTest : UnitSpec() {
       TraverseFilterLaws.laws(Option.traverseFilter(), Option.applicative(), ::Some, Eq.any()),
       MonadFilterLaws.laws(Option.monadFilter(), ::Some, Eq.any()),
       HashLaws.laws(Option.hash(Int.hash()), Option.eq(Int.eq())) { it.some() },
-      SemigroupalLaws.laws(Option.semigroupal(), ::Some, ::bijection, associativeSemigroupalEq)
+      MonoidalLaws.laws(Option.monoidal(), ::Some, Eq.any(), ::bijection, associativeSemigroupalEq)
     )
 
     "fromNullable should work for both null and non-null values of nullable types" {

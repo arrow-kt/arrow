@@ -67,6 +67,11 @@ interface SetKSemigroupal: Semigroupal<ForSetK> {
 }
 
 @extension
+interface SetKMonoidal : Monoidal<ForSetK>, SetKSemigroupal {
+  override fun <A> identity(): Kind<ForSetK, A> = SetK.empty()
+}
+
+@extension
 interface SetKMonoidK : MonoidK<ForSetK> {
   override fun <A> empty(): SetK<A> =
     SetK.empty()

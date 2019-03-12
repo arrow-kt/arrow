@@ -136,6 +136,11 @@ interface ListKSemigroupal : Semigroupal<ForListK> {
 }
 
 @extension
+interface ListKMonoidal : Monoidal<ForListK>, ListKSemigroupal {
+  override fun <A> identity(): Kind<ForListK, A> = ListK.empty()
+}
+
+@extension
 interface ListKMonoidK : MonoidK<ForListK> {
   override fun <A> empty(): ListK<A> =
     ListK.empty()
