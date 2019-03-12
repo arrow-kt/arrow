@@ -49,7 +49,7 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
         classpath 'io.arrow-kt:ank-gradle-plugin:0.7.1'
-        classpath 'org.ajoberstar:gradle-git-publish:1.0.1'
+        classpath 'org.ajoberstar:gradle-git-publish:2.0.0'
         classpath "net.rdrei.android.buildtimetracker:gradle-plugin:0.11.1"
         classpath "org.jetbrains.dokka:dokka-gradle-plugin:$dokka_version"
         classpath "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:$detekt_version"
