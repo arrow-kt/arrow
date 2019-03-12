@@ -163,32 +163,43 @@ Add to your pom.xml file the following properties:
 ```
 <properties>
     <kotlin.version>1.3.0</kotlin.version>
-    <arrow.version>0.8.2</arrow.version>
+     <arrow.version>0.9.0</arrow.version>
 </properties>
 ```
 
 Add the dependencies that you want to use
 ```
-<dependency>
-    <groupId>io.arrow-kt</groupId>
-    <artifactId>arrow-core-extensions</artifactId>
-    <version>${arrow.version}</version>
-</dependency>
-<dependency>
-    <groupId>io.arrow-kt</groupId>
-    <artifactId>arrow-syntax</artifactId>
-    <version>${arrow.version}</version>
-</dependency>
-<dependency>
-    <groupId>io.arrow-kt</groupId>
-    <artifactId>arrow-typeclasses</artifactId>
-    <version>${arrow.version}</version>
-</dependency>
-<dependency>
-    <groupId>io.arrow-kt</groupId>
-    <artifactId>arrow-extras-extensions</artifactId>
-    <version>${arrow.version}</version>
-</dependency>
+        <dependency>
+            <groupId>io.arrow-kt</groupId>
+            <artifactId>arrow-core-data</artifactId>
+            <version>${arrow.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.arrow-kt</groupId>
+            <artifactId>arrow-core-extensions</artifactId>
+            <version>${arrow.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.arrow-kt</groupId>
+            <artifactId>arrow-syntax</artifactId>
+            <version>${arrow.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.arrow-kt</groupId>
+            <artifactId>arrow-typeclasses</artifactId>
+            <version>${arrow.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.arrow-kt</groupId>
+            <artifactId>arrow-extras-data</artifactId>
+            <version>${arrow.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.arrow-kt</groupId>
+            <artifactId>arrow-extras-extensions</artifactId>
+            <version>${arrow.version}</version>
+        </dependency>
+
 ```
 
 ## Enabling kapt
