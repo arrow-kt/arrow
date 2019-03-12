@@ -2,6 +2,9 @@ package arrow.extensions
 
 import arrow.core.extensions.monoid
 import arrow.test.UnitSpec
+import arrow.test.generators.byte
+import arrow.test.generators.short
+import io.kotlintest.properties.Gen
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith
@@ -10,60 +13,57 @@ import org.junit.runner.RunWith
 class NumberMonoidTest : UnitSpec() {
   init {
 
-    "should semigroup with the instance passed" {
-      "int" {
-        forAll { value: Int ->
-          val seen = Int.monoid().run { value.combine(value) }
-          val expected = value + value
+    "should semigroup with the instance passed - int" {
+      forAll { value: Int ->
+        val seen = Int.monoid().run { value.combine(value) }
+        val expected = value + value
 
-          expected == seen
-        }
+        expected == seen
       }
+    }
 
-      "float" {
-        forAll { value: Float ->
-          val seen = Float.monoid().run { value.combine(value) }
-          val expected = value + value
+    "should semigroup with the instance passed - float" {
+      forAll(Gen.numericFloats()) { value: Float ->
+        val seen = Float.monoid().run { value.combine(value) }
+        val expected = value + value
 
-          expected == seen
-        }
+        expected == seen
       }
+    }
 
-      "double" {
-        forAll { value: Double ->
-          val seen = Double.monoid().run { value.combine(value) }
-          val expected = value + value
+    "should semigroup with the instance passed - double" {
+      forAll(Gen.numericDoubles()) { value: Double ->
+        val seen = Double.monoid().run { value.combine(value) }
+        val expected = value + value
 
-          expected == seen
-        }
+        expected == seen
       }
+    }
 
-      "long" {
+    "should semigroup with the instance passed - long" {
+      forAll { value: Long ->
+        val seen = Long.monoid().run  { value.combine(value) }
+        val expected = value + value
 
-        forAll { value: Long ->
-          val seen = Long.monoid().run  { value.combine(value) }
-          val expected = value + value
-
-          expected == seen
-        }
+        expected == seen
       }
+    }
 
-      "short" {
-        forAll { value: Short ->
-          val seen = Short.monoid().run  { value.combine(value) }
-          val expected = (value + value).toShort()
+    "should semigroup with the instance passed - short" {
+      forAll(Gen.short()) { value: Short ->
+        val seen = Short.monoid().run  { value.combine(value) }
+        val expected = (value + value).toShort()
 
-          expected == seen
-        }
+        expected == seen
       }
+    }
 
-      "byte" {
-        forAll { value: Byte ->
-          val seen = Byte.monoid().run { value.combine(value) }
-          val expected = (value + value).toByte()
+    "should semigroup with the instance passed - byte" {
+      forAll(Gen.byte()) { value: Byte ->
+        val seen = Byte.monoid().run { value.combine(value) }
+        val expected = (value + value).toByte()
 
-          expected == seen
-        }
+        expected == seen
       }
     }
   }
