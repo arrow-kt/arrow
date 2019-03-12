@@ -128,6 +128,7 @@ BUNDLE_GEMFILE=modules/docs/arrow-docs/Gemfile bundle exec jekyll serve -s modul
 
 This will install any needed dependencies locally, and will use it to launch the complete website in [127.0.0.1:4000](http://127.0.0.1:4000) so you can open it with a standard browser.
 
+If you should get an error while installing the Ruby gem _http_parser_, please check if the path to your Arrow directory contains spaces. According to this [issue](https://github.com/tmm1/http_parser.rb/issues/47), the installation with spaces in the path is currently not working.
 
 ## Blog section contribution
 
