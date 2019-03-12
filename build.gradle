@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
+import com.github.benmanes.gradle.versions.reporter.PlainTextReporter
+
 buildscript {
     ext {
         // Constants
         daggerVersion = '2.21'
         detekt_version = '1.0.0-RC12'
         dokka_version = '0.9.17'
-        gradleVersionsPluginVersion = '0.20.0'
+        gradleVersionsPluginVersion = '0.21.0'
         jUnitVersion = '4.12'
         jUnitVintageVersion = '5.4.0'
         javaVersion = JavaVersion.VERSION_1_7
@@ -239,6 +241,9 @@ dependencyUpdates {
             .plus(result.exceeded.dependencies)
             .plus(result.unresolved.dependencies)
             .findAll { dependency -> dependenciesToCheck.any { it == "${dependency.group}:${dependency.name}" } }
+
+        def plainTextReporter = new PlainTextReporter(project, revision, gradleReleaseChannel)
+        plainTextReporter.write(System.out, result)
 
         final isRejected = dependencies
                 .any { dependency -> disallowedQualifiers.any(isDisallowed(dependency)) }
