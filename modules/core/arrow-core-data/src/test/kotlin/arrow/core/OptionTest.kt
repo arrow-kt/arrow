@@ -9,7 +9,6 @@ import arrow.core.extensions.option.eq.eq
 import arrow.core.extensions.option.hash.hash
 import arrow.core.extensions.option.monoid.monoid
 import arrow.core.extensions.option.monoidal.monoidal
-import arrow.core.extensions.option.semigroupal.semigroupal
 import arrow.core.extensions.option.show.show
 import arrow.core.extensions.tuple2.eq.eq
 import arrow.mtl.extensions.option.monadFilter.monadFilter
