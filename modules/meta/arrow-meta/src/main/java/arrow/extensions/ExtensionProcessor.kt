@@ -233,7 +233,7 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class), PolyTempl
     companionOrFactory: TypeName,
     impl: String
   ): String =
-    """|return ${+companionOrFactory}.${typeClass.name.simpleName.decapitalize()}${+instance.typeVariables}(${requiredParameters.code { +it.name }}).run {
+    """|return ${+companionOrFactory}.${typeClass.name.simpleName.decapitalize()}${+instance.typeVariables}(${requiredParameters.code { +it.name }}).run·{
            |  $impl
            |}
            |
