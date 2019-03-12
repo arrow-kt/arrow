@@ -6,8 +6,8 @@ dependencies {
     compile project(":arrow-extras-extensions")
     compile project(":arrow-effects-io-extensions")
 
-    compile "org.jetbrains.kotlin:kotlin-compiler:$kotlinVersion"
-    compile "org.jetbrains.kotlin:kotlin-script-util:$kotlinVersion"
+    compile "org.jetbrains.kotlin:kotlin-compiler:$ankKotlinVersion"
+    compile "org.jetbrains.kotlin:kotlin-script-util:$ankKotlinVersion"
     kapt project(':arrow-meta')
 }
 
