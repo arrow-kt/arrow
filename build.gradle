@@ -213,7 +213,7 @@ tasks.create('repl') {
 }
 
 tasks.wrapper {
-    gradleVersion = "5.2.1"
+    gradleVersion = "5.0"
     distributionType = Wrapper.DistributionType.ALL
 }
 
