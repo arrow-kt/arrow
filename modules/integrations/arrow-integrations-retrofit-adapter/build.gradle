@@ -1,4 +1,4 @@
-def retrofitVersion = "2.4.0"
+apply plugin: 'kotlin-kapt'
 
 dependencies {
     compile project(':arrow-effects-data')
@@ -14,10 +14,9 @@ dependencies {
     testRuntime("org.junit.vintage:junit-vintage-engine:$jUnitVintageVersion")
     testCompile "io.kotlintest:kotlintest-runner-junit4:$kotlinTestVersion"
     testCompile "com.squareup.retrofit2:converter-gson:$retrofitVersion"
-    testCompile 'com.squareup.okhttp3:mockwebserver:3.11.0'
+    testCompile 'com.squareup.okhttp3:mockwebserver:3.13.1'
     testCompile project(':arrow-effects-rx2-extensions')
     testCompile project(':arrow-effects-extensions')
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
-apply plugin: 'kotlin-kapt'

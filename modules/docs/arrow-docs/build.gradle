@@ -1,4 +1,5 @@
 apply plugin: 'ank-gradle-plugin'
+apply plugin: 'kotlin-kapt'
 apply plugin: 'org.ajoberstar.git-publish'
 
 dependencies {
@@ -69,5 +70,3 @@ targetCompatibility = javaVersion
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
 
 compileKotlin.kotlinOptions.freeCompilerArgs += ["-Xskip-runtime-version-check"]
-
-apply plugin: 'kotlin-kapt'
