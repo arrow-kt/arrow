@@ -14,6 +14,12 @@ import arrow.typeclasses.ApplicativeError
 import io.kotlintest.properties.Gen
 import java.util.concurrent.TimeUnit
 
+fun Gen.Companion.short(): Gen<Short> =
+        Gen.choose(Short.MIN_VALUE.toInt(), Short.MAX_VALUE.toInt()).map { it.toShort() }
+
+fun Gen.Companion.byte(): Gen<Byte> =
+        Gen.choose(Byte.MIN_VALUE.toInt(), Byte.MAX_VALUE.toInt()).map { it.toByte() }
+
 fun <F, A> Gen<A>.applicative(AP: Applicative<F>): Gen<Kind<F, A>> =
   map { AP.just(it) }
 
@@ -30,6 +36,8 @@ fun <A, B> Gen.Companion.functionAToB(gen: Gen<B>): Gen<(A) -> B> = gen.map { b:
 fun <A> Gen.Companion.functionAAToA(gen: Gen<A>): Gen<(A, A) -> A> = gen.map { a: A -> { _: A, _: A -> a } }
 
 fun Gen.Companion.throwable(): Gen<Throwable> = Gen.from(listOf(RuntimeException(), NoSuchElementException(), IllegalArgumentException()))
+
+fun Gen.Companion.fatalThrowable(): Gen<Throwable> = Gen.from(listOf(ThreadDeath(), StackOverflowError(), OutOfMemoryError(), InterruptedException()))
 
 fun Gen.Companion.intSmall(): Gen<Int> = Gen.oneOf(Gen.choose(Int.MIN_VALUE / 10000, -1), Gen.choose(0, Int.MAX_VALUE / 10000))
 

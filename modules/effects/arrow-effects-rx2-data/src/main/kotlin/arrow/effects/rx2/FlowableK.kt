@@ -85,11 +85,15 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
             .doOnCancel { release(a, ExitCase.Canceled).fix().flowable.subscribe({}, emitter::onError) }
             .subscribe(emitter::onNext, emitter::onError))
         } catch (e: Throwable) {
-          release(a, ExitCase.Error(e)).fix().flowable.subscribe({
-            emitter.onError(e)
-          }, { e2 ->
-            emitter.onError(Platform.composeErrors(e, e2))
-          })
+          if (NonFatal(e)) {
+            release(a, ExitCase.Error(e)).fix().flowable.subscribe({
+              emitter.onError(e)
+            }, { e2 ->
+              emitter.onError(Platform.composeErrors(e, e2))
+            })
+          } else {
+            throw e
+          }
         }
       }, emitter::onError, emitter::onComplete)
     }, mode))

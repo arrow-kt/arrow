@@ -1,3 +1,5 @@
+apply plugin: 'kotlin-kapt'
+
 dependencies {
     compile project(':arrow-effects-data')
     compile project(':arrow-effects-extensions')
@@ -14,4 +16,3 @@ dependencies {
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
-apply plugin: 'kotlin-kapt'

@@ -1,5 +1,7 @@
+apply plugin: 'kotlin-kapt'
+
 dependencies {
-    compile project(':arrow-extras')
+    compile project(':arrow-extras-data')
     compile project(':arrow-extras-extensions')
 
     kapt project(':arrow-meta')
@@ -15,4 +17,3 @@ dependencies {
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
-apply plugin: 'kotlin-kapt'

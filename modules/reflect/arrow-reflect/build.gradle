@@ -1,5 +1,7 @@
+apply plugin: 'kotlin-kapt'
+
 dependencies {
-    compile 'io.github.classgraph:classgraph:4.4.12'
+    compile 'io.github.classgraph:classgraph:4.8.14'
     compile project(':arrow-core-extensions')
     compile project(':arrow-extras-extensions')
     compile project(':arrow-effects-extensions')
@@ -17,4 +19,3 @@ dependencies {
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
-apply plugin: 'kotlin-kapt'

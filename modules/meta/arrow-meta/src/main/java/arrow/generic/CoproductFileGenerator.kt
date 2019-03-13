@@ -88,7 +88,7 @@ private fun FileSpec.Builder.addCoproductClassDeclaration(generics: List<String>
 private fun FileSpec.Builder.addCoproductOfConstructors(generics: List<String>): Unit {
     for (generic in generics) {
         val additionalParameterCount = generics.indexOf(generic)
-        val typeParameters = generics.joinToString(separator = ", ")
+        val typeParameters = generics.joinToString(separator = ",·")
         val replacementClassName = genericsToClassNames[generic]
 
         addFunction(
@@ -114,7 +114,7 @@ private fun FileSpec.Builder.addCoproductOfConstructors(generics: List<String>):
 private fun FileSpec.Builder.addCopExtensionConstructors(generics: List<String>): Unit {
     for (generic in generics) {
         val additionalParameterCount = generics.indexOf(generic)
-        val typeParameters = generics.joinToString(separator = ", ")
+        val typeParameters = generics.joinToString(separator = ",·")
         val replacementFunctionName = genericsToClassNames[generic]!!.toCamelCase()
 
         addFunction(
@@ -143,7 +143,7 @@ private fun FileSpec.Builder.addExtensionConstructors(generics: List<String>): U
                         .addKdoc(
                                 methodDocumentation(
                                         description = "Creates a Coproduct from the $generic type",
-                                        output = "A Coproduct${generics.size}<${generics.joinToString(separator = ", ")}> where the receiver is the $generic"
+                                        output = "A Coproduct${generics.size}<${generics.joinToString(separator = ",·")}> where the receiver is the $generic"
                                 )
                         )
                         .receiver(TypeVariableName(generic))
