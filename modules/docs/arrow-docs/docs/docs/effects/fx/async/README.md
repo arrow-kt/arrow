@@ -241,7 +241,7 @@ suspend fun printThreadName(): Unit =
   println(Thread.currentThread().name)
 
 suspend fun program() = 
-  async { printThreadName() }
+  GlobalScope.async { printThreadName() }
 
 fun main() { 
   runBlocking<Unit> { program().await() }
@@ -261,7 +261,7 @@ suspend fun printThreadName(): Unit =
   println(Thread.currentThread().name)
 
 suspend fun program() = 
-  async(start = CoroutineStart.LAZY) { printThreadName() }
+  GlobalScope.async(start = CoroutineStart.LAZY) { printThreadName() }
 
 fun main() { 
   runBlocking<Unit> { program().await() }

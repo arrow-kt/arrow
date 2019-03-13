@@ -1,9 +1,10 @@
 @file:Suppress("UnusedImports")
+
 package arrow.core.extensions
 
 import arrow.Kind
 import arrow.core.*
-import arrow.core.extensions.function1.monad.monad
+import arrow.core.select as idSelect
 import arrow.core.extensions.id.monad.monad
 import arrow.extension
 import arrow.typeclasses.*
@@ -59,6 +60,12 @@ interface IdApplicative : Applicative<ForId> {
 }
 
 @extension
+interface IdSelective : Selective<ForId>, IdApplicative {
+  override fun <A, B> IdOf<Either<A, B>>.select(f: Kind<ForId, (A) -> B>): Kind<ForId, B> =
+    fix().idSelect(f)
+}
+
+@extension
 interface IdMonad : Monad<ForId> {
   override fun <A, B> IdOf<A>.ap(ff: IdOf<(A) -> B>): Id<B> =
     fix().ap(ff)
@@ -74,6 +81,9 @@ interface IdMonad : Monad<ForId> {
 
   override fun <A> just(a: A): Id<A> =
     Id.just(a)
+
+  override fun <A, B> IdOf<Either<A, B>>.select(f: Kind<ForId, (A) -> B>): Kind<ForId, B> =
+    fix().idSelect(f)
 }
 
 @extension

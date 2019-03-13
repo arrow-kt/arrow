@@ -202,14 +202,12 @@ import arrow.typeclasses.*
 import arrow.data.extensions.*
 
 fun attackTry(): Try<Impacted> =
-  ForTry extensions {
-    binding {
-      val (nuke) = arm()
-      val (target) = aim()
-      val (impact) = launch(target, nuke)
-      impact
-   }.fix()
-  }
+  binding {
+    val (nuke) = arm()
+    val (target) = aim()
+    val (impact) = launch(target, nuke)
+    impact
+  }.fix()
 
 attackTry()
 //Failure(RuntimeException("SystemOffline"))

@@ -46,16 +46,16 @@ allprojects {
 }
 ```
 
-# Dependency breakdown starting in Arrow 0.9.0 
+# Dependency breakdown starting in Arrow 0.9.1
 
-Starting in 0.9.0, Arrow follows the following convention for artifact publication.
+Starting in 0.9.1, Arrow follows the following convention for artifact publication.
 
 The arrow modules are Core, Effects, Optics, Recursion, etc.
 
 An Arrow module is composed of data types and type classes.
 Arrow modules are exported and published with the following semantics.
 
-If we take for example `arrow-core`. 
+If we take for example `arrow-core`.
 
 Arrow core contains the basic arrow type classes and data types and it's composed of 3 main artifacts that may be used a la carte:
 
@@ -68,48 +68,50 @@ Trimmed down versions:
 - `arrow-core-data` (Only data types)
 - `arrow-core-extensions` (Only type class extensions)
 
-# Current stable version 0.8.2
+# Current stable version 0.9.0
 
-You can find the dependencies necessary in the Basic Setup of the README at the 0.8.2 tag clicking [here](https://github.com/arrow-kt/arrow/blob/0.8.2/README.md#basic-setup).
+```groovy
+def arrow_version = "0.9.0"
+```
 
-# Next development version 0.9.0
+You can find the dependencies necessary in the Basic Setup of the README at the 0.9.0 tag clicking [here](https://github.com/arrow-kt/arrow/blob/0.9.0/README.md#next-development-version-090).
+
+# Next development version 0.9.1
 
 Add the dependencies into the project's `build.gradle`
 
 ```groovy
-apply plugin: 'kotlin'
-apply plugin: 'kotlin-kapt'
-def arrow_version = "0.9.0-SNAPSHOT"
+def arrow_version = "0.9.1-SNAPSHOT"
 dependencies {
     compile "io.arrow-kt:arrow-core-data:$arrow_version"
+    compile "io.arrow-kt:arrow-core-extensions:$arrow_version"
     compile "io.arrow-kt:arrow-syntax:$arrow_version"
     compile "io.arrow-kt:arrow-typeclasses:$arrow_version"
-    compile "io.arrow-kt:arrow-extras:$arrow_version"
-    compile "io.arrow-kt:arrow-core-extensions:$arrow_version"
+    compile "io.arrow-kt:arrow-extras-data:$arrow_version"
     compile "io.arrow-kt:arrow-extras-extensions:$arrow_version"
     kapt    "io.arrow-kt:arrow-meta:$arrow_version"
 
-    compile "io.arrow-kt:arrow-free:$arrow_version" //optional
+    compile "io.arrow-kt:arrow-query-language:$arrow_version" //optional
+    compile "io.arrow-kt:arrow-free-data:$arrow_version" //optional
     compile "io.arrow-kt:arrow-free-extensions:$arrow_version" //optional
     compile "io.arrow-kt:arrow-mtl:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-effects:$arrow_version" //optional
+    compile "io.arrow-kt:arrow-effects-data:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects-extensions:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects-io-extensions:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-effects-rx2:$arrow_version" //optional
+    compile "io.arrow-kt:arrow-effects-rx2-data:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects-rx2-extensions:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-effects-reactor:$arrow_version" //optional
+    compile "io.arrow-kt:arrow-effects-reactor-data:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects-reactor-extensions:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-effects-kotlinx-coroutines:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-effects-kotlinx-coroutines-extensions:$arrow_version" //optional
     compile "io.arrow-kt:arrow-optics:$arrow_version" //optional
     compile "io.arrow-kt:arrow-generic:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-recursion:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-extensions-recursion:$arrow_version" //optional
+    compile "io.arrow-kt:arrow-recursion-data:$arrow_version" //optional
+    compile "io.arrow-kt:arrow-recursion-extensions:$arrow_version" //optional
+    compile "io.arrow-kt:arrow-query-language:$arrow_version" //optional
     compile "io.arrow-kt:arrow-integration-retrofit-adapter:$arrow_version" //optional
 }
 ```
 
-## Additional Setup
+# Additional Setup
 
 For projects that wish to use their own `@higherkind`, `@optics` and other meta programming facilities provided by Λrrow
 the setup below is also required:
@@ -120,7 +122,7 @@ Add the dependencies into the project's `build.gradle`
 apply plugin: 'kotlin-kapt' //optional
 apply from: rootProject.file('gradle/generated-kotlin-sources.gradle') //only for Android projects
 
-def arrow_version = "0.8.2"
+def arrow_version = "0.9.0"
 dependencies {
     ...
     kapt    'io.arrow-kt:arrow-meta:$arrow_version' //optional
@@ -169,7 +171,7 @@ Add the dependencies that you want to use
 ```
 <dependency>
     <groupId>io.arrow-kt</groupId>
-    <artifactId>arrow-core</artifactId>
+    <artifactId>arrow-core-extensions</artifactId>
     <version>${arrow.version}</version>
 </dependency>
 <dependency>
@@ -184,17 +186,7 @@ Add the dependencies that you want to use
 </dependency>
 <dependency>
     <groupId>io.arrow-kt</groupId>
-    <artifactId>arrow-data</artifactId>
-    <version>${arrow.version}</version>
-</dependency>
-<dependency>
-    <groupId>io.arrow-kt</groupId>
-    <artifactId>arrow-extensions-core</artifactId>
-    <version>${arrow.version}</version>
-</dependency>
-<dependency>
-    <groupId>io.arrow-kt</groupId>
-    <artifactId>arrow-extensions-data</artifactId>
+    <artifactId>arrow-extras-extensions</artifactId>
     <version>${arrow.version}</version>
 </dependency>
 ```
@@ -220,7 +212,7 @@ Enable annotaton processing using kotlin plugin
                 <annotationProcessorPaths>
                     <annotationProcessorPath>
                         <groupId>io.arrow-kt</groupId>
-                        <artifactId>arrow-annotations-processor</artifactId>
+                        <artifactId>arrow-meta</artifactId>
                         <version>${arrow.version}</version>
                     </annotationProcessorPath>
                 </annotationProcessorPaths>

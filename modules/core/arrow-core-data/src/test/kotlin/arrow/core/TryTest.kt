@@ -55,19 +55,19 @@ class TryTest : UnitSpec() {
       }
     }
 
-    "combine two Failures should return the second failure" {
+    "combine two Failures should return the first failure" {
       val throwable1 = Exception("foo")
-      val throwable2 = Exception("foo")
+      val throwable2 = Exception("bar")
 
-      Try.raise<String>(throwable2) == Try.raise<String>(throwable1).combine(String.monoid(), Try.raise(throwable2))
+      Try.raise(throwable1) shouldBe Try.raise(throwable1).combine(String.monoid(), Try.raise(throwable2))
     }
 
     "combine a Success and a Failure should return Failure" {
       val throwable = Exception("foo")
       val string = "String"
 
-      Try.raise<String>(throwable) == Try.raise<String>(throwable).combine(String.monoid(), Try.just(string))
-      Try.raise<String>(throwable) == Try.just(string).combine(String.monoid(), Try.raise(throwable))
+      Try.raise(throwable) shouldBe Try.raise(throwable).combine(String.monoid(), Try.just(string))
+      Try.raise(throwable) shouldBe Try.just(string).combine(String.monoid(), Try.raise(throwable))
     }
 
     "invoke of any should be success" {
@@ -122,7 +122,7 @@ class TryTest : UnitSpec() {
     "getOrElse returns default if Failure" {
       val e: Throwable = Exception()
 
-      Success(1).getOrElse { _: Throwable -> 2 } shouldBe 1
+      Success(1).getOrElse { 2 } shouldBe 1
       Failure(e).getOrElse { (it shouldBe e); 2 } shouldBe 2
     }
 
@@ -233,7 +233,7 @@ class TryTest : UnitSpec() {
 
     "failure" {
       val ex = NumberFormatException()
-      ex.failure<Int>() shouldBe Failure(ex)
+      ex.failure() shouldBe Failure(ex)
     }
 
     "flatten" {

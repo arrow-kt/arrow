@@ -1,5 +1,6 @@
 package arrow.data.extensions
 
+import arrow.Kind
 import arrow.core.*
 import arrow.data.*
 
@@ -116,6 +117,75 @@ interface StateTMonadError<F, S, E> : MonadError<StateTPartialOf<F, S>, E>, Stat
 @undocumented
 interface StateTMonadThrow<F, S> : MonadThrow<StateTPartialOf<F, S>>, StateTMonadError<F, S, Throwable> {
   override fun ME(): MonadError<F, Throwable>
+}
+
+@extension
+@undocumented
+interface StateTContravariantInstance<F, S> : Contravariant<StateTPartialOf<F, S>> {
+
+  fun CF(): Contravariant<F>
+
+  fun MF(): Monad<F>
+
+  override fun <A, B> Kind<StateTPartialOf<F, S>, A>.contramap(f: (B) -> A): Kind<StateTPartialOf<F, S>, B> =
+    StateT(MF()) { s ->
+      CF().run {
+        runM(MF(), s).contramap { (s, b) ->
+          s toT f(b)
+        }
+      }
+    }
+}
+
+@extension
+@undocumented
+interface StateTDivideInstance<F, S> : Divide<StateTPartialOf<F, S>>, StateTContravariantInstance<F, S> {
+
+  fun DF(): Divide<F>
+  override fun CF(): Contravariant<F> = DF()
+
+  fun MFF(): Monad<F>
+  override fun MF(): Monad<F> = MFF()
+
+  override fun <A, B, Z> divide(fa: Kind<StateTPartialOf<F, S>, A>, fb: Kind<StateTPartialOf<F, S>, B>, f: (Z) -> Tuple2<A, B>): Kind<StateTPartialOf<F, S>, Z> =
+    StateT(MF()) { s ->
+      DF().divide(fa.runM(MF(), s), fb.runM(MF(), s)) { (s, z) ->
+        val (a, b) = f(z)
+        (s toT a) toT (s toT b)
+      }
+    }
+}
+
+@extension
+@undocumented
+interface StateTDivisibleInstance<F, S> : Divisible<StateTPartialOf<F, S>>, StateTDivideInstance<F, S> {
+  fun DFF(): Divisible<F>
+  override fun DF(): Divide<F> = DFF()
+  fun MFFF(): Monad<F>
+  override fun MFF(): Monad<F> = MFFF()
+
+  override fun <A> conquer(): Kind<StateTPartialOf<F, S>, A> =
+    StateT(MF()) { DFF().conquer() }
+}
+
+@extension
+@undocumented
+interface StateTDecidableInstante<F, S> : Decidable<StateTPartialOf<F, S>>, StateTDivisibleInstance<F, S> {
+  fun DFFF(): Decidable<F>
+  override fun DFF(): Divisible<F> = DFFF()
+  fun MFFFF(): Monad<F>
+  override fun MFFF(): Monad<F> = MFFFF()
+
+  override fun <A, B, Z> choose(fa: Kind<StateTPartialOf<F, S>, A>, fb: Kind<StateTPartialOf<F, S>, B>, f: (Z) -> Either<A, B>): Kind<StateTPartialOf<F, S>, Z> =
+    StateT(MF()) { s ->
+      DFFF().choose(fa.runM(MF(), s), fb.runM(MF(), s)) { (s, z) ->
+        f(z).fold({ a ->
+          (s toT a).left()
+        }, { b ->
+          (s toT b).right()
+        })
+      }
+    }
 }
 
 /**

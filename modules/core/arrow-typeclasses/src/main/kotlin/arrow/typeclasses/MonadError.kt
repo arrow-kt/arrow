@@ -126,6 +126,10 @@ interface MonadThrow<F> : MonadError<F, Throwable> {
    * ```
    *
    */
+  @Deprecated(
+    "`bindingCatch` is getting renamed to `fx` for consistency with the Arrow Fx system. Use the Fx extensions for comprehensions",
+    ReplaceWith("fx")
+  )
   fun <B> bindingCatch(c: suspend MonadErrorContinuation<F, *>.() -> B): Kind<F, B> {
     val continuation = MonadErrorContinuation<F, B>(this)
     val wrapReturn: suspend MonadErrorContinuation<F, *>.() -> Kind<F, B> = { just(c()) }
@@ -135,12 +139,6 @@ interface MonadThrow<F> : MonadError<F, Throwable> {
 
   override fun <B> binding(c: suspend MonadContinuation<F, *>.() -> B): Kind<F, B> =
     bindingCatch { c() }
-
-  override fun <A> fx(f: suspend MonadContinuation<F, *>.() -> A): Kind<F, A> =
-    bindingCatch { f() }
-
-  fun <A> fx(f: suspend MonadErrorContinuation<F, *>.() -> A, unit: Unit = Unit): Kind<F, A> =
-    bindingCatch { f() }
 
   fun <A> Throwable.raiseNonFatal(): Kind<F, A> =
     if (NonFatal(this)) raiseError(this) else throw this
