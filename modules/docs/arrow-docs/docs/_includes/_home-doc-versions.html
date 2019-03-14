@@ -2,7 +2,7 @@
   <ul>
     <li>
       <a class="masthead-button secondary-button button"
-        href="{{ previous_version.url }}">
+        href="{{ previous_version.url | append: 'docs/' }}">
         <span>{{ previous_version.title }}</span>
         <span class="secondary-doc-version-text">
           {{ site.data.doc-versions.previous }}
@@ -11,7 +11,8 @@
     </li>
 
     <li>
-      <a class="masthead-button button" href="{{ stable_version.url }}">
+      <a class="masthead-button button"
+        href="{{ stable_version.url | append: 'docs/' }}">
         <span>{{ stable_version.title }}</span>
         <span class="secondary-doc-version-text">
           {{ site.data.doc-versions.stable }}
@@ -21,7 +22,7 @@
 
     <li>
       <a class="masthead-button secondary-button button"
-        href="{{ next_version.url }}">
+        href="{{ next_version.url | append: 'docs/' }}">
         <span>{{ next_version.title }}</span>
         <span class="secondary-doc-version-text">
           {{ site.data.doc-versions.next }}

@@ -1,4 +1,4 @@
-<div class="navigation-menu-item dropdown">
+<div id="dropDownDiv" tabindex="0" class="navigation-menu-item dropdown">
    {% for item in site.data.doc-versions.docMenu %}
         <li onclick="displayToogle()"
           class="dropbtn dropbutton navigation-menu-item
@@ -19,14 +19,14 @@
             </span>
         </a>
 
-        <a href="{{ next_version.url |append: 'docs/' }}">
+        <a href="{{ next_version.url | append: 'docs/' }}">
             <span>
               {{ next_version.title }} -
               {{ site.data.doc-versions.next }}
             </span>
         </a>
 
-        <a href="{{ previous_version.url |append: 'docs/' }}">
+        <a href="{{ previous_version.url | append: 'docs/' }}">
             <span>
               {{ previous_version.title }} -
               {{ site.data.doc-versions.previous }}

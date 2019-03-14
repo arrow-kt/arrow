@@ -5,21 +5,24 @@ function displayToogle() {
 }
 
 // Close the dropdown if the user clicks outside of it
-window.onclick = function(event) {
-  if (!event.target.matches(".dropbutton")) {
-    var dropdowns = document.getElementsByClassName("dropdown-content");
-    var i;
-    for (i = 0; i < dropdowns.length; i++) {
-      var openDropdown = dropdowns[i];
-      if (openDropdown.classList.contains("show")) {
-        openDropdown.classList.remove("show");
-      }
+function closeDropdown(event) {
+  var dropdowns = document.getElementsByClassName("dropdown-content");
+  var i;
+  for (i = 0; i < dropdowns.length; i++) {
+    var openDropdown = dropdowns[i];
+    if (openDropdown.classList.contains("show")) {
+      openDropdown.classList.remove("show");
     }
   }
 };
 
-// Check the Arrow version and remark the version in wich we are
-function highlightDocVersion() {
+/* Check the Arrow version and remark the version in wich we are.
+Also initializes addEventListener ​​to handle the documentation
+nav dropdown behaviour */
+function initializeDocVersion() {
+
+  document.getElementById("dropDownDiv").addEventListener("blur", closeDropdown);
+
   if( !sessionStorage.getItem('showTopWarning')) {
 
         document.getElementById("topWarning").style.display = "block";
@@ -37,13 +40,13 @@ function highlightDocVersion() {
         }
   }
   else {
-    document.getElementById("topWarning").style.display = "none";
+    document.getElementById("topWarning").remove();
   }
 }
 
 function closeTop() {
-  document.getElementById("topWarning").style.display = "none";
+  document.getElementById("topWarning").remove();
   sessionStorage.setItem('showTopWarning', 1);
 }
 
-window.onload = highlightDocVersion;
+document.addEventListener("DOMContentLoaded", initializeDocVersion);
