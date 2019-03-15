@@ -195,8 +195,8 @@ import arrow.data.extensions.list.fx.fx
 //sampleStart
 val result1 = unsafe { 
   fx {
-    val (a) = listOf(1, 2)
-    val (b) = listOf(true, false)
+    val (a) = listOf(1, 2)          // This is destructuring the list and is obtaining the first element,
+    val (b) = listOf(true, false)   // that's why the output is `ListK(list=[Tuple2(a=1, b=true)])`
     a toT b
   }
 }
