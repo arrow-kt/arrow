@@ -71,7 +71,7 @@ Trimmed down versions:
 # Current stable version 0.9.0
 
 ```groovy
-def arrow_version = "0.9.0"
+def arrow_version = "0.9.0-SNAPSHOT"
 ```
 
 You can find the dependencies necessary in the Basic Setup of the README at the 0.9.0 tag clicking [here](https://github.com/arrow-kt/arrow/blob/0.9.0/README.md#next-development-version-090).
