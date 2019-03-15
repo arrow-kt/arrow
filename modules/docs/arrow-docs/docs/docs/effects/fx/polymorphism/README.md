@@ -19,12 +19,19 @@ In the following example, the program is declared polymorphic and then made conc
 ```kotlin:ank:playground
 import arrow.effects.IO
 import arrow.unsafe
+import arrow.Kind
 import arrow.effects.extensions.io.unsafeRun.runBlocking
+import arrow.effects.extensions.io.unsafeRun.unsafeRun
 import arrow.effects.extensions.io.fx.fx
+import arrow.effects.typeclasses.UnsafeRun
+import arrow.effects.typeclasses.suspended.concurrent.Fx
 //sampleStart
 /* a side effect */
-suspend fun printThreadName(): Unit =
+val const = 1
+suspend fun sideEffect(): Int {
   println(Thread.currentThread().name)
+  return const
+}
 
 /* for all `F` that provide an `Fx` extension define a program function */
 fun <F> Fx<F>.program(): Kind<F, Int> =

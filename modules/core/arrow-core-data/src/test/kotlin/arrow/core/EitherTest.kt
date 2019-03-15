@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.Kind2
 import arrow.core.extensions.*
 import arrow.core.extensions.either.applicative.applicative
+import arrow.core.extensions.either.applicativeError.handleErrorWith
 import arrow.core.extensions.either.bifunctor.bifunctor
 import arrow.core.extensions.either.eq.eq
 import arrow.core.extensions.either.hash.hash
@@ -68,7 +69,7 @@ class EitherTest : UnitSpec() {
     "combine a right and a left should return left" {
       forAll { a: String, b: String ->
         Either.left(a) == Either.left(a).combine(String.monoid(), String.monoid(), Either.right(b)) &&
-        Either.left(a) == Either.right(b).combine(String.monoid(), String.monoid(), Either.left(a))
+          Either.left(a) == Either.right(b).combine(String.monoid(), String.monoid(), Either.left(a))
       }
     }
 
@@ -166,6 +167,13 @@ class EitherTest : UnitSpec() {
       forAll { t: Boolean, i: Int, s: String ->
         val expected = if (t) Right(i) else Left(s)
         Either.cond(t, { i }, { s }) == expected
+      }
+    }
+
+    "handleErrorWith should handle left instance otherwise return Right" {
+      forAll { a: Int, b: Int ->
+        Left(a).handleErrorWith { Right(b) } == Right(b)
+          && Right(a).handleErrorWith { Right(b) } == Right(a)
       }
     }
 

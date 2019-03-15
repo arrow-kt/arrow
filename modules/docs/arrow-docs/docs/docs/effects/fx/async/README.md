@@ -242,7 +242,7 @@ suspend fun printThreadName(): Unit =
   println(Thread.currentThread().name)
 
 suspend fun program() = 
-  async { printThreadName() } //XXX This doesn't execute: "IllegalAccessError: tried to access field kotlinx.coroutines.Dispatchers.Default from class kotlinx.coroutines.DeferredKt"
+  GlobalScope.async { printThreadName() }
 
 fun main() { 
   runBlocking<Unit> { program().await() }
@@ -262,7 +262,7 @@ suspend fun printThreadName(): Unit =
   println(Thread.currentThread().name)
 
 suspend fun program() = 
-  async(start = CoroutineStart.LAZY) { printThreadName() }  //XXX This doesn't execute: same as above
+  GlobalScope.async(start = CoroutineStart.LAZY) { printThreadName() }
 
 fun main() { 
   runBlocking<Unit> { program().await() }

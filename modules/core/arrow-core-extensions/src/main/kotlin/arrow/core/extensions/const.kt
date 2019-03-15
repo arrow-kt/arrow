@@ -2,6 +2,7 @@ package arrow.core.extensions
 
 import arrow.Kind
 import arrow.core.Eval
+import arrow.core.Tuple2
 import arrow.extension
 import arrow.typeclasses.*
 import arrow.typeclasses.ap as constAp
@@ -17,6 +18,24 @@ interface ConstInvariant<A> : Invariant<ConstPartialOf<A>> {
 interface ConstContravariant<A> : Contravariant<ConstPartialOf<A>> {
   override fun <T, U> ConstOf<A, T>.contramap(f: (U) -> T): Const<A, U> =
     fix().retag()
+}
+
+@extension
+interface ConstDivideInstance<O> : Divide<ConstPartialOf<O>>, ConstContravariant<O> {
+  fun MO(): Monoid<O>
+  override fun <A, B, Z> divide(fa: Kind<ConstPartialOf<O>, A>, fb: Kind<ConstPartialOf<O>, B>, f: (Z) -> Tuple2<A, B>): Kind<ConstPartialOf<O>, Z> =
+    Const(
+      MO().run { fa.value() + fb.value() }
+    )
+}
+
+@extension
+interface ConstDivisibleInstance<O> : Divisible<ConstPartialOf<O>>, ConstDivideInstance<O> {
+  fun MOO(): Monoid<O>
+  override fun MO(): Monoid<O> = MOO()
+
+  override fun <A> conquer(): Kind<ConstPartialOf<O>, A> =
+    Const(MOO().empty())
 }
 
 @extension

@@ -7,6 +7,17 @@ import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadContinuation
 import arrow.unsafe
 
+/**
+ * Fx allows you to run pure sequential code as if it was imperative.
+ *
+ * @see [arrow.typeclasses.suspended.BindSyntax]
+ * @see [arrow.typeclasses.suspended.monad.Fx]
+ * @see [arrow.typeclasses.suspended.monaderror.Fx]
+ * @see [arrow.effects.typeclasses.suspended.monaddefer.Fx]
+ * @see [arrow.effects.typeclasses.suspended.concurrent.Fx]
+ * @see [arrow.typeclasses.suspended.monad.commutative.safe.Fx]
+ * @see [arrow.typeclasses.suspended.monad.commutative.unsafe.Fx]
+ */
 interface Fx<F> {
 
   fun monad(): Monad<F>
@@ -31,7 +42,7 @@ interface Fx<F> {
   suspend fun <A> unsafe.fx(
     f: suspend MonadContinuation<F, *>.() -> A
   ): Kind<F, A> =
-    monad().fx(f)
+    monad().binding(f)
 
 }
 

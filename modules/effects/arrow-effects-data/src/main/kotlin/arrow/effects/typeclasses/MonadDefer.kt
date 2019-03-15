@@ -58,6 +58,10 @@ interface MonadDefer<F> : MonadThrow<F>, Bracket<F, Throwable> {
    * This operation is cancellable by calling invoke on the [Disposable] return.
    * If [Disposable.invoke] is called the binding result will become a lifted [BindingCancellationException].
    */
+  @Deprecated(
+    "`bindingCancellable` is getting renamed to `fxCancellable` for consistency with the Arrow Fx system. Use the Fx extensions for comprehensions",
+    ReplaceWith("fxCancellable")
+  )
   fun <B> bindingCancellable(c: suspend MonadDeferCancellableContinuation<F, *>.() -> B): Tuple2<Kind<F, B>, Disposable> {
     val continuation = MonadDeferCancellableContinuation<F, B>(this)
     val wrapReturn: suspend MonadDeferCancellableContinuation<F, *>.() -> Kind<F, B> = { just(c()) }
@@ -68,22 +72,6 @@ interface MonadDefer<F> : MonadThrow<F>, Bracket<F, Throwable> {
   override fun <B> binding(c: suspend MonadContinuation<F, *>.() -> B): Kind<F, B> =
     bindingCancellable { c() }.a
 
-  fun <A> fx(
-    f: suspend MonadDeferCancellableContinuation<F, *>.() -> A,
-    unit: Unit = Unit,
-    unit1: Unit = Unit
-  ): Kind<F, A> =
-    fxCancelable(f).a
-
-  fun <A> fxCancelable(f: suspend MonadDeferCancellableContinuation<F, *>.() -> A, unit: Unit = Unit): Tuple2<Kind<F, A>, Disposable> =
-    bindingCancellable { f() }
-
   override fun <B> bindingCatch(c: suspend MonadErrorContinuation<F, *>.() -> B): Kind<F, B> =
     bindingCancellable { c() }.a
-
-  override fun <A> fx(f: suspend MonadContinuation<F, *>.() -> A): Kind<F, A> =
-    fxCancelable(f).a
-
-  override fun <A> fx(f: suspend MonadErrorContinuation<F, *>.() -> A, unit: Unit): Kind<F, A> =
-    fxCancelable(f).a
 }

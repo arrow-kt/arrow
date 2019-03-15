@@ -13,7 +13,7 @@ video: TC6IzE61OyE
 beginner
 
 `NonEmptyList` is a data type used in __Λrrow__ to model ordered lists that guarantee to have at least one value.
-`NonEmptyList` is available in the `arrow-data` module under the `import arrow.data.NonEmptyList`
+`NonEmptyList` is available in the `arrow-extras` module under the `import arrow.data.NonEmptyList`
 
 ```groovy
 // gradle

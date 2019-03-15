@@ -5,7 +5,7 @@ import arrow.Kind2
 import arrow.core.Eval
 
 /**
- * A type to represent λ[α => Kind[F, C, α]]
+ * A type to represent λ[α => Kind[F, G, α]]
  *
  * Use unnest to expand it, nest to re-compose it
  */
