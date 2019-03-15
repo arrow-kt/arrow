@@ -57,7 +57,7 @@ val program = fx {
   val fiberA = !NonBlocking.startFiber(effect { threadName() })
   val fiberB = !NonBlocking.startFiber(effect { threadName() })
   val threadA = !fiberA.join()
-  val threadB = !fiberA.join()
+  val threadB = !fiberB.join()
   !effect { println(threadA) }
   !effect { println(threadB) }
 }
