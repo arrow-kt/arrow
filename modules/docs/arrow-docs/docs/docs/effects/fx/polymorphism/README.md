@@ -35,15 +35,16 @@ suspend fun sideEffect(): Int {
 
 /* for all `F` that provide an `Fx` extension define a program function */
 fun <F> Fx<F>.program(): Kind<F, Int> =
-  fx { !effect { printThreadName() } }
+  fx { !effect { sideEffect() } }
 
 /* for all `F` that provide an `UnsafeRun` extension define a main function */
 fun <F> UnsafeRun<F>.main(fx: Fx<F>): Int =
   unsafe { runBlocking { fx.program() } }
 
 /* Run program in the IO monad */
-fun main() =
-  IO.unsafeRun().main(IO.fx()) //XXX This doesn't compile
+fun main(args: Array<String>) {
+    IO.unsafeRun().main(IO.fx())
+}
 //sampleEnd
 ```
 
@@ -226,20 +227,18 @@ import arrow.effects.extensions.io.fx.fx
 import arrow.core.toT
 
 //sampleStart
-val result1 = unsafe { runBlocking {
+val result1 =
   fx {
     val a = !effect { 1 }
     val b = !effect { 2 }
     a toT b
   }
-}}
 
-val result2 = unsafe { runBlocking {
+val result2 =
   fx {
     val b = !effect { 2 }
     !effect { 1 } toT b
   }
-}}
 //sampleEnd
 
 fun main() {
