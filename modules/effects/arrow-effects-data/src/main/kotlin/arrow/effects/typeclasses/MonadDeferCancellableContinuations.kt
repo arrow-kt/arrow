@@ -38,7 +38,7 @@ open class MonadDeferCancellableContinuation<F, A>(val SC: MonadDefer<F>, overri
     defer { bindingCatch { bindIn(context, f) } }.bind()
 
   suspend fun <B> bindDeferUnsafe(f: () -> Either<Throwable, B>): B =
-    deferUnsafe(f).bind()
+    delayUnsafe(f).bind()
 
   override fun <B> bindingCatch(c: suspend MonadErrorContinuation<F, *>.() -> B): Kind<F, B> =
     bindingCancellable(c).a

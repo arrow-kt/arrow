@@ -44,6 +44,11 @@ interface MonadDefer<F> : MonadThrow<F>, Bracket<F, Throwable> {
 
   fun lazy(): Kind<F, Unit> = delay { }
 
+  fun <A> delayUnsafe(f: () -> Either<Throwable, A>): Kind<F, A> =
+    defer { f().fold({ raiseError<A>(it) }, { just(it) }) }
+
+  @Deprecated("Use delayUnsafe instead",
+          ReplaceWith("delayUnsafe(f)", "arrow.effects.typeclasses.MonadDefer"))
   fun <A> deferUnsafe(f: () -> Either<Throwable, A>): Kind<F, A> =
     defer { f().fold({ raiseError<A>(it) }, { just(it) }) }
 
