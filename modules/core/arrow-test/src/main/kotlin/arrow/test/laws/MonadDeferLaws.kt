@@ -192,9 +192,9 @@ object MonadDeferLaws {
   fun <F> MonadDefer<F>.asyncBindUnsafe(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.intSmall(), Gen.intSmall(), Gen.intSmall()) { x: Int, y: Int, z: Int ->
       val (bound, _) = bindingCancellable {
-        val a = bindDeferUnsafe { Right(x) }
-        val b = bindDeferUnsafe { Right(a + y) }
-        val c = bindDeferUnsafe { Right(b + z) }
+        val a = bindDelayUnsafe { Right(x) }
+        val b = bindDelayUnsafe { Right(a + y) }
+        val c = bindDelayUnsafe { Right(b + z) }
         c
       }
       bound.equalUnderTheLaw(just<Int>(x + y + z), EQ)
@@ -203,7 +203,7 @@ object MonadDeferLaws {
   fun <F> MonadDefer<F>.asyncBindUnsafeError(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.throwable()) { e: Throwable ->
       val (bound: Kind<F, Int>, _) = bindingCancellable<Int> {
-        bindDeferUnsafe { Left(e) }
+          bindDelayUnsafe { Left(e) }
       }
       bound.equalUnderTheLaw(raiseError(e), EQ)
     }
