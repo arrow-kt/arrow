@@ -67,3 +67,34 @@
         }
     }
 }
+
+.sidebar-doc-versions {
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+
+    .sidebar-nav-item {
+       &.active {
+           > a {
+             border-color: transparent;
+           }
+         }
+       ul {
+         position: absolute;
+         width: 100%;
+         z-index: 1;
+         box-shadow: rgba(0, 0, 0, 0.3) 0px 8px 16px 0px;
+         background: $brand-primary;
+
+         li {
+           a {
+             font-size: 0.800rem;
+           }
+         }
+
+         li:nth-child(4) {
+           border-top: solid 1px rgba(255, 255, 255, 0.5);
+         }
+       }
+    }
+}
