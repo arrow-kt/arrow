@@ -34,5 +34,6 @@
 @import "components/blog";
 @import "components/footer";
 @import "components/dropdown";
+@import "components/top-warning";
 
 @include dropdown($dropdown-config...);
