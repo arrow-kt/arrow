@@ -188,9 +188,10 @@ Arrow identifies non-blocking binding in these non-commutative monads as unsafe 
 For consistency, if you want to shoot yourself in the foot, performing free environmental effect application for these non-commutative types requires the user to give explicit permission to activate the unsafe `fx` block.
 
 ```kotlin:ank:playground
-import arrow.unsafe
 import arrow.core.toT
 import arrow.data.extensions.list.fx.fx
+import arrow.data.k
+import arrow.unsafe
 
 //sampleStart
 val result1 = unsafe {
