@@ -70,17 +70,13 @@
 
 .sidebar-doc-versions {
     position: relative;
-    width: 93%;
     margin-left: auto;
     margin-right: auto;
 
     .sidebar-nav-item {
-       a {
-         padding-left: 18px;
-       }
        &.active {
            > a {
-             border-left: none;
+             border-color: transparent;
            }
          }
        ul {

@@ -2,20 +2,37 @@
 // -----------------------------------------------
 // -----------------------------------------------
 .top-warning {
-    height: 43px;
+    height: 0px;
     background-color: $top-warning-base;
     color: $white;
     position: sticky;
     top: 0px;
     width: 100%;
     z-index: 2;
-    display: none;
+    display: block;
     overflow: hidden;
     text-align: center;
-    padding: 8px 0;
+    padding: 0;
+    opacity: 0;
+    transition: opacity ease 1200ms, height ease 1600ms, padding ease 1600ms;
+
+    &.show {
+      height: 43px;
+      opacity: 1;
+      padding: 8px 0;
+
+
+      .top-container {
+          transform: rotate3d(1, 0, 0, 0deg);
+      }
+    }
 
     .top-container {
         display: inline-block;
+        transform: rotate3d(1, 0 ,0 , 90deg);
+        transform-origin: top;
+        transform-style: preserve-3d;
+        transition: transform ease 1600ms;
 
         a {
           color: #92b6eb;

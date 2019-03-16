@@ -1,31 +1,29 @@
-<div id="dropDownDiv" tabindex="0" class="navigation-menu-item dropdown">
-   {% for item in site.data.doc-versions.docMenu %}
-        <li onclick="displayToogle()"
-          class="dropbtn dropbutton navigation-menu-item
-           {% if item.url == category.url %} active {% endif %}">
-          {% if item.icon != "" %}
-              <i class="nav-item-icon fa fa-lg {{ item.icon }} dropbutton" aria-hidden="true"></i>
-              <span class="nav-item-text dropbutton">{{ item.title }}</span>
-           {% else %}
-              <span class="dropbutton">{{ item.title }}</span>
-           {% endif %}
-        </li>
-   {% endfor %}
-    <div id="docVersionDropdown" class="dropdown-content">
-        <a href="{{ site.data.commons.stable_version |append: 'docs/' }}">
+<li id="version-dropdown" class="navigation-menu-item
+    {% if site.data.doc-versions.docMenu.url == category.url %}active {% endif %}">
+
+    <a href="#" onclick="displayToggle(event)" title="{{ site.data.doc-versions.docMenu.title }}" alt="{{ item.title }}">
+      {% if site.data.doc-versions.docMenu.icon != "" %}
+        <i class="nav-item-icon fa fa-lg {{ site.data.doc-versions.docMenu.icon }}" aria-hidden="true"></i>
+        <span class="nav-item-text">{{ site.data.doc-versions.docMenu.title }}</span>
+      {% else %}
+        <span>{{ site.data.doc-versions.docMenu.title }}</span>
+      {% endif %}
+    </a>
+
+    <div class="dropdown dropdown-content">
+
+        <a href="{{ site.data.commons.stable_version | append: 'docs/' }}">
             <span>
               {{ stable_version.title }} -
               {{ site.data.doc-versions.stable }}
             </span>
         </a>
-
         <a href="{{ next_version.url | append: 'docs/' }}">
             <span>
               {{ next_version.title }} -
               {{ site.data.doc-versions.next }}
             </span>
         </a>
-
         <a href="{{ previous_version.url | append: 'docs/' }}">
             <span>
               {{ previous_version.title }} -
@@ -34,14 +32,13 @@
         </a>
 
         {% for item in site.data.doc-versions.docVersions %}
-          {% if item.url != stable_version.url
-             and item.url != next_version.url
+            {% if item.url != stable_version.url
+              and item.url != next_version.url
               and item.url != previous_version.url %}
               <a href="{{ item.url | append: 'docs/' }}">
                   <span>{{ item.title }}</span>
               </a>
-          {% endif %}
+            {% endif %}
         {% endfor %}
-
     </div>
-</div>
+</li>

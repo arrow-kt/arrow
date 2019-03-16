@@ -4,7 +4,7 @@
     </div>
     <ul class="navigation-menu">
         {% include _navigation-doc-versions.html %}
-          {% for item in site.data.menu.nav %}
+        {% for item in site.data.menu.nav %}
         <li class="navigation-menu-item {% if item.url == category.url %}active {% endif %}">
             <a href="{{ item.url }}" title="{{ item.title }}" alt="{{ item.title }}">
               {% if item.icon != "" %}

@@ -68,7 +68,6 @@
         /* Documentation Dropdown Content (Hidden by Default) */
         .dropdown-content {
           font-size: 0.800rem;
-          display: none;
           position: absolute;
           min-width: 145px;
           overflow: auto;
@@ -76,6 +75,10 @@
           z-index: 1;
           margin-left: -8px;
           background: rgba($brand-primary, 0.95);
+          opacity: 0.5;
+          transform: rotate3d(1, 0, 0, 90deg);
+          transition: transform ease 250ms, opacity ease 100ms;
+          transform-origin: top;
 
           a {
             padding: 12px 9px;
@@ -92,7 +95,8 @@
           to the .dropdown-content container when the user clicks on
           the dropdown button) */
         .show {
-          display: block;
+          transform: rotate3d(1,0,0,0);
+          opacity: 1;
         }
     }
 
