@@ -95,7 +95,7 @@ suspend fun threadName(): String =
   Thread.currentThread().name
   
 data class ThreadInfo(
-  val threadA : String, 
+  val threadA: String,
   val threadB: String
 )
 
@@ -187,12 +187,13 @@ import arrow.effects.IO
 import arrow.unsafe
 import arrow.effects.extensions.io.unsafeRun.runBlocking
 import arrow.effects.extensions.io.fx.fxCancellable
-//sampleStart
-val (_, disposable) = fxCancellable {
-  !effect { println("BOOM!") }
-}
-//sampleEnd
+
 fun main() { // The edge of our world
+//sampleStart
+  val (_, disposable) = fxCancellable {
+    !effect { println("BOOM!") }
+  }
+//sampleEnd
   println(disposable)
 }
 ```
