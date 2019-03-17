@@ -37,7 +37,7 @@ abstract class AbstractProcessor : KotlinAbstractProcessor(), ProcessorUtils, Ko
         .readLines().joinToString("\n") {
           val line = it.substringAfter(" * ")
           if (line.trim() == "*") ""
-          else line
+          else line.replace(" ", "·")
         } + "\n"
     } catch (e: Exception) {
       null

@@ -46,4 +46,4 @@ data class Id<out A>(private val value: A) : IdOf<A> {
 }
 
 fun <A, B> Id<Either<A, B>>.select(f: IdOf<(A) -> B>): Id<B> =
-  flatMap { it.fold({ l -> just(l).ap(f) }, { r -> just(identity(r)) }) }
+  flatMap { it.fold({ l -> just(l).ap(f) }, { r -> just(r) }) }

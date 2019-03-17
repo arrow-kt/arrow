@@ -1,6 +1,7 @@
 package arrow.data.extensions
 
 import arrow.Kind
+import arrow.core.Either
 import arrow.core.Eval
 import arrow.data.*
 
@@ -26,6 +27,15 @@ interface ValidatedApplicative<E> : Applicative<ValidatedPartialOf<E>>, Validate
 
   override fun <A, B> Kind<ValidatedPartialOf<E>, A>.ap(ff: Kind<ValidatedPartialOf<E>, (A) -> B>): Validated<E, B> = fix().ap(SE(), ff.fix())
 
+}
+
+@extension
+interface ValidatedSelective<E> : Selective<ValidatedPartialOf<E>>, ValidatedApplicative<E> {
+
+  override fun SE(): Semigroup<E>
+
+   override fun <A, B> Kind<ValidatedPartialOf<E>, Either<A, B>>.select(f: Kind<ValidatedPartialOf<E>, (A) -> B>): Kind<ValidatedPartialOf<E>, B> =
+    fix().fold({Invalid(it)}, { it.fold({ l -> f.map { ff -> ff(l) } }, { r -> just(r) })})
 }
 
 @extension

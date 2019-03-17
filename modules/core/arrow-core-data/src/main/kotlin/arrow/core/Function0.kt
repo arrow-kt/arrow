@@ -39,4 +39,4 @@ data class Function0<out A>(internal val f: () -> A) : Function0Of<A> {
 }
 
 fun <A, B> Function0<Either<A, B>>.select(f: Function0Of<(A) -> B>): Function0<B> =
-  flatMap  { it.fold({l -> just(l).ap(f)}, {r -> just(identity(r))})}
+  flatMap  { it.fold({l -> just(l).ap(f)}, {r -> just(r)})}

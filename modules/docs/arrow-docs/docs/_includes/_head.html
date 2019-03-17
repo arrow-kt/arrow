@@ -31,11 +31,14 @@
     <!-- Arrow main css -->
     <link rel="stylesheet" type="text/css" href="{{ '/css/arrow.css' | relative_url }}">
 
+    <!-- Code to manage version information -->
+    <script src="{{ '/js/docVersions.js' | relative_url }}" defer></script>
+
     <!-- Diagrams support -->
     <script src="{{ '/js/dagre.min.js' | relative_url }}"></script>
     <script src="{{ '/js/lodash.min.js' | relative_url }}"></script>
     <script src="{{ '/js/nomnoml.js' | relative_url }}"></script>
-    <script src="{{ '/js/diagrams.js' | relative_url }}"></script>
+    <script src="{{ '/js/diagrams.js' | relative_url }}" async></script>
 
     {% if jekyll.environment == 'production' and site.data.commons.google_analytics %}
         {% include _google-tag-manager.html %}
