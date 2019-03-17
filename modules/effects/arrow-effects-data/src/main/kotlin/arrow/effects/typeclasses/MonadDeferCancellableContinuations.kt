@@ -43,7 +43,7 @@ open class MonadDeferCancellableContinuation<F, A>(val SC: MonadDefer<F>, overri
   @Deprecated("Use bindDelayUnsafe instead",
           ReplaceWith("bindDelayUnsafe(f)", "arrow.effects.typeclasses.MonadDeferCancellableContinuations"))
   suspend fun <B> bindDeferUnsafe(f: () -> Either<Throwable, B>): B =
-    deferUnsafe(f).bind()
+    delayUnsafe(f).bind()
 
   override fun <B> bindingCatch(c: suspend MonadErrorContinuation<F, *>.() -> B): Kind<F, B> =
     bindingCancellable(c).a
