@@ -16,6 +16,8 @@ import arrow.effects.IODispatchers as IOD
 interface IODispatchers : Dispatchers<ForIO> {
   override fun default(): CoroutineContext =
     IOD.CommonPool
+  override fun trampoline(): CoroutineContext =
+    IOD.TrampolinePool
 }
 
 @extension
