@@ -7,7 +7,7 @@ sourceSets {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$parent.ext.kotlinVersion"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$ankKotlinVersion"
     testImplementation 'junit:junit:4.12'
 }
 

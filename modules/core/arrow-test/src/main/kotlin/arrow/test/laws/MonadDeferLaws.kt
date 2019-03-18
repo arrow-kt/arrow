@@ -40,8 +40,8 @@ object MonadDeferLaws {
       Law("MonadDefer laws: delay constant equals pure") { SC.delayConstantEqualsPure(EQ) },
       Law("MonadDefer laws: delay throw equals raiseError") { SC.delayThrowEqualsRaiseError(EQERR) },
       Law("MonadDefer laws: defer constant equals pure") { SC.deferConstantEqualsPure(EQ) },
-      Law("MonadDefer laws: deferUnsafe constant right equals pure") { SC.deferUnsafeConstantRightEqualsPure(EQ) },
-      Law("MonadDefer laws: deferUnsafe constant left equals raiseError") { SC.deferUnsafeConstantLeftEqualsRaiseError(EQERR) },
+      Law("MonadDefer laws: delayUnsafe constant right equals pure") { SC.delayUnsafeConstantRightEqualsPure(EQ) },
+      Law("MonadDefer laws: delayUnsafe constant left equals raiseError") { SC.delayUnsafeConstantLeftEqualsRaiseError(EQERR) },
       Law("MonadDefer laws: propagate error through bind") { SC.propagateErrorsThroughBind(EQERR) },
       Law("MonadDefer laws: defer suspens evaluation") { SC.deferSuspendsEvaluation(EQ) },
       Law("MonadDefer laws: delay suspends evaluation") { SC.delaySuspendsEvaluation(EQ) },
@@ -71,15 +71,15 @@ object MonadDeferLaws {
     }
   }
 
-  fun <F> MonadDefer<F>.deferUnsafeConstantRightEqualsPure(EQ: Eq<Kind<F, Int>>): Unit {
+  fun <F> MonadDefer<F>.delayUnsafeConstantRightEqualsPure(EQ: Eq<Kind<F, Int>>): Unit {
     forAll(Gen.intSmall()) { x ->
-      deferUnsafe { x.right() }.equalUnderTheLaw(just(x), EQ)
+      delayUnsafe { x.right() }.equalUnderTheLaw(just(x), EQ)
     }
   }
 
-  fun <F> MonadDefer<F>.deferUnsafeConstantLeftEqualsRaiseError(EQERR: Eq<Kind<F, Int>>): Unit {
+  fun <F> MonadDefer<F>.delayUnsafeConstantLeftEqualsRaiseError(EQERR: Eq<Kind<F, Int>>): Unit {
     forFew(5, Gen.throwable()) { t ->
-      deferUnsafe { t.left() }.equalUnderTheLaw(raiseError(t), EQERR)
+        delayUnsafe { t.left() }.equalUnderTheLaw(raiseError(t), EQERR)
     }
   }
 
@@ -192,9 +192,9 @@ object MonadDeferLaws {
   fun <F> MonadDefer<F>.asyncBindUnsafe(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.intSmall(), Gen.intSmall(), Gen.intSmall()) { x: Int, y: Int, z: Int ->
       val (bound, _) = bindingCancellable {
-        val a = bindDeferUnsafe { Right(x) }
-        val b = bindDeferUnsafe { Right(a + y) }
-        val c = bindDeferUnsafe { Right(b + z) }
+        val a = bindDelayUnsafe { Right(x) }
+        val b = bindDelayUnsafe { Right(a + y) }
+        val c = bindDelayUnsafe { Right(b + z) }
         c
       }
       bound.equalUnderTheLaw(just<Int>(x + y + z), EQ)
@@ -203,7 +203,7 @@ object MonadDeferLaws {
   fun <F> MonadDefer<F>.asyncBindUnsafeError(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.throwable()) { e: Throwable ->
       val (bound: Kind<F, Int>, _) = bindingCancellable<Int> {
-        bindDeferUnsafe { Left(e) }
+          bindDelayUnsafe { Left(e) }
       }
       bound.equalUnderTheLaw(raiseError(e), EQ)
     }
