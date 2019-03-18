@@ -56,6 +56,16 @@ workflows:
             apt remove -y awscli
             pip install awscli
             /usr/local/bin/aws --version
+            bundle check
+            BUNDLE_CHECK_RESULT=$?
+            if [[ BUNDLE_CHECK_RESULT -eq 0 ]]; then
+                echo "All fine, all good with bundler"
+            else
+                echo "Updating bundler"
+                gem uninstall bundler --force
+                gem install bundler --force
+                echo "$( gem list | grep bundler )"
+            fi
             bundle install --gemfile modules/docs/arrow-docs/Gemfile --path vendor/bundle
             export BUNDLE_GEMFILE=modules/docs/arrow-docs/Gemfile
             export JEKYLL_ENV=production

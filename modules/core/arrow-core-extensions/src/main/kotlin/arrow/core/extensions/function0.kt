@@ -1,6 +1,8 @@
 package arrow.core.extensions
 
+import arrow.Kind
 import arrow.core.*
+import arrow.core.select as fun0Select
 import arrow.core.extensions.function0.monad.monad
 import arrow.extension
 import arrow.typeclasses.*
@@ -43,6 +45,12 @@ interface Function0Applicative : Applicative<ForFunction0> {
 }
 
 @extension
+interface Function0Selective : Selective<ForFunction0>, Function0Applicative {
+  override fun <A, B> Function0Of<Either<A, B>>.select(f: Kind<ForFunction0, (A) -> B>): Kind<ForFunction0, B> =
+    fix().fun0Select(f)
+}
+
+@extension
 interface Function0Monad : Monad<ForFunction0> {
   override fun <A, B> Function0Of<A>.ap(ff: Function0Of<(A) -> B>): Function0<B> =
     fix().ap(ff)
@@ -58,6 +66,9 @@ interface Function0Monad : Monad<ForFunction0> {
 
   override fun <A> just(a: A): Function0<A> =
     Function0.just(a)
+
+  override fun <A, B> Function0Of<Either<A, B>>.select(f: Kind<ForFunction0, (A) -> B>): Kind<ForFunction0, B> =
+    fix().fun0Select(f)
 }
 
 @extension

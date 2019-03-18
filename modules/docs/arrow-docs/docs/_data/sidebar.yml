@@ -239,6 +239,12 @@ options:
       - title: Semigroup
         url: /docs/arrow/typeclasses/semigroup/
 
+      - title: Semigroupal
+        url: /docs/apidocs/arrow-typeclasses/arrow.typeclasses/-semigroupal/
+
+      - title: Monoidal
+        url: /docs/apidocs/arrow-typeclasses/arrow.typeclasses/-monoidal/
+
       - title: Monoid
         url: /docs/arrow/typeclasses/monoid/
 
@@ -271,6 +277,9 @@ options:
 
       - title: ApplicativeError
         url: /docs/arrow/typeclasses/applicativeerror/
+
+      - title: Selective
+        url: /docs/arrow/typeclasses/selective/
 
       - title: Monad
         url: /docs/arrow/typeclasses/monad/

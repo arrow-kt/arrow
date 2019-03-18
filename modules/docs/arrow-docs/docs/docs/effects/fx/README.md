@@ -74,8 +74,7 @@ Applying and composing suspended side effects is allowed in the presence of othe
 
 In the example below, `sayHello` and `sayGoodBye` are valid inside `greet` because they are all suspended functions.
 
-```kotlin:ank:playground
-//sampleStart
+```kotlin
 suspend fun sayGoodBye(): Unit =
   println("Good bye World!")
   
@@ -86,7 +85,6 @@ suspend fun greet(): Unit {
   sayHello() // this is ok because
   sayGoodBye() // `greet` is also `suspend`
 }
-//sampleEnd  
 ```
 
 #### `fx` composition

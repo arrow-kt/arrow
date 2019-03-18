@@ -14,24 +14,27 @@
  * limitations under the License.
  */
 
+import com.github.benmanes.gradle.versions.reporter.PlainTextReporter
+
 buildscript {
     ext {
         // Constants
-        gradleVersion = '4.10'
-        gradleVersionsPluginVersion = '0.20.0'
-        javaVersion = JavaVersion.VERSION_1_7
-        jUnitVersion = '4.12'
-        jUnitVintageVersion = '5.2.0'
-        kotlinTestVersion = '3.1.5'
-        kotlinVersion = '1.3.11'
-        daggerVersion = '2.17'
-        kotlinxCoroutinesVersion = '1.1.0'
-        kotlinxCollectionsImmutableVersion = '0.1'
-        kotlinPoetVersion = '1.0.0-RC1'
-        projectReactorVersion = '3.1.8.RELEASE'
-        rxJavaVersion = '2.2.1'
-        dokka_version = '0.9.17'
+        ankKotlinVersion = '1.3.11'
+        daggerVersion = '2.21'
         detekt_version = '1.0.0-RC12'
+        dokka_version = '0.9.17'
+        gradleVersionsPluginVersion = '0.21.0'
+        jUnitVersion = '4.12'
+        jUnitVintageVersion = '5.4.0'
+        javaVersion = JavaVersion.VERSION_1_7
+        kotlinPoetVersion = '1.1.0'
+        kotlinTestVersion = '3.3.1'
+        kotlinVersion = '1.3.21'
+        kotlinxCollectionsImmutableVersion = '0.1'
+        kotlinxCoroutinesVersion = '1.1.1'
+        projectReactorVersion = '3.2.6.RELEASE'
+        retrofitVersion = '2.5.0'
+        rxJavaVersion = '2.2.7'
     }
 
     repositories {
@@ -49,7 +52,7 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
         classpath 'io.arrow-kt:ank-gradle-plugin:0.7.1'
-        classpath 'org.ajoberstar:gradle-git-publish:1.0.1'
+        classpath 'org.ajoberstar:gradle-git-publish:2.0.0'
         classpath "net.rdrei.android.buildtimetracker:gradle-plugin:0.11.1"
         classpath "org.jetbrains.dokka:dokka-gradle-plugin:$dokka_version"
         classpath "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:$detekt_version"
@@ -214,6 +217,11 @@ tasks.create('repl') {
     }
 }
 
+tasks.wrapper {
+    gradleVersion = "5.0"
+    distributionType = Wrapper.DistributionType.ALL
+}
+
 apply plugin: 'com.github.ben-manes.versions'
 
 configurations.all {
@@ -236,6 +244,9 @@ dependencyUpdates {
             .plus(result.exceeded.dependencies)
             .plus(result.unresolved.dependencies)
             .findAll { dependency -> dependenciesToCheck.any { it == "${dependency.group}:${dependency.name}" } }
+
+        def plainTextReporter = new PlainTextReporter(project, revision, gradleReleaseChannel)
+        plainTextReporter.write(System.out, result)
 
         final isRejected = dependencies
                 .any { dependency -> disallowedQualifiers.any(isDisallowed(dependency)) }

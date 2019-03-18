@@ -1,5 +1,7 @@
+apply plugin: 'kotlin-kapt'
+
 dependencies {
-    compile project(':arrow-extras')
+    compile project(':arrow-extras-data')
 
     kapt project(':arrow-meta')
     kaptTest project(':arrow-meta')
@@ -14,4 +16,3 @@ dependencies {
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
-apply plugin: 'kotlin-kapt'
