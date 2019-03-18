@@ -12,8 +12,8 @@ import arrow.effects.typeclasses.*
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Monad
 import arrow.typeclasses.suspended.BindSyntax
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.startCoroutine
+import java.util.concurrent.ForkJoinPool
+import kotlin.coroutines.*
 
 interface FxSyntax<F> : Concurrent<F>, BindSyntax<F> {
 
@@ -37,7 +37,7 @@ interface FxSyntax<F> : Concurrent<F>, BindSyntax<F> {
 
   fun <A> effect(fa: suspend () -> A): Kind<F, A> =
     async { cb ->
-      fa.startCoroutine(asyncContinuation(NonBlocking, cb))
+      fa.startCoroutine(asyncContinuation(Trampoline, cb))
     }
 
   fun <A> ensure(fa: suspend () -> A, error: () -> Throwable, predicate: (A) -> Boolean): Kind<F, A> =
@@ -128,5 +128,38 @@ interface FxSyntax<F> : Concurrent<F>, BindSyntax<F> {
   fun <A> Iterable<Iterable<suspend () -> A>>.flatSequence(): Kind<F, List<A>> =
     flatten().sequence()
 
+}
 
+val Trampoline: CoroutineContext = EmptyCoroutineContext + TrampolinePool(ForkJoinPool())
+
+val iterations: ThreadLocal<Int> = ThreadLocal.withInitial { 0 }
+
+private class TrampolinePool(
+  val pool: ForkJoinPool,
+  val asyncBoundaryAfter: Int = 127
+) : AbstractCoroutineContextElement(ContinuationInterceptor), ContinuationInterceptor {
+
+  override fun <T> interceptContinuation(continuation: Continuation<T>): Continuation<T> =
+    TrampolinedContinuation(pool, continuation.context.fold(continuation) { cont, element ->
+      if (element != this@TrampolinePool && element is ContinuationInterceptor)
+        element.interceptContinuation(cont) else cont
+    }, asyncBoundaryAfter)
+}
+
+private class TrampolinedContinuation<T>(
+  val pool: ForkJoinPool,
+  val cont: Continuation<T>,
+  val asyncBoundaryAfter: Int
+) : Continuation<T> {
+  override val context: CoroutineContext = cont.context
+
+  override fun resumeWith(result: Result<T>) {
+    if (iterations.get() > asyncBoundaryAfter) {
+      iterations.set(0)
+      pool.execute { cont.resumeWith(result) }
+    } else {
+      iterations.set(iterations.get() + 1)
+      cont.resumeWith(result)
+    }
+  }
 }
