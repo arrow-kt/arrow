@@ -55,8 +55,8 @@
 
         .dropdown {
           position: relative;
-          display: inline-block;
-          outline: 0px;
+          display: block;
+          outline: 0;
 
           a {
             &:hover {
