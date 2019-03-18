@@ -88,7 +88,7 @@ lazyResult
 //Print: lazy
 ```
 
-#### delayUnsafe
+#### delayOrRaise
 
 Takes as a parameter a function that returns `Either<Throwable, A>`.
 The left side of the [`Either`]({{ '/docs/arrow/core/either' | relative_url }}) represents an error in the execution.
@@ -96,12 +96,12 @@ This function is assumed to never throw any internal exceptions.
 
 ```kotlin
 IO.async()
-  .delayUnsafe { throw RuntimeException() }
+  .delayOrRaise { throw RuntimeException() }
   .unsafeRunSync()
 // ERROR!! The program crashes
 ```
 
-> delayUnsafe() exists for performance purposes when throwing can be avoided.
+> delayOrRaise() exists for performance purposes when throwing can be avoided.
 
 ### Laws
 
