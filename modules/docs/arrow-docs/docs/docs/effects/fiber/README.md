@@ -26,9 +26,9 @@ fun <A, B, C> parallelMap(first: IO<A>,
                      second: IO<B>,
                      f: (A, B) -> C): IO<C> =
   fx {
-    val (fiberOne: Fiber<ForIO, A>) = Default.startfiber(first)
+    val (fiberOne: Fiber<ForIO, A>) = Default.startFiber(first)
     val (fiberTwo: Fiber<ForIO, B>) = Default.startFiber(second)
-    f(!fiberOne.join, !fiberTwo.join)
+    f(!fiberOne.join(), !fiberTwo.join())
   }
 
 val first = IO.sleep(5000).map {
