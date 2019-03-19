@@ -21,22 +21,28 @@ import arrow.effects.*
 import kotlinx.coroutines.Dispatchers.Default
 import arrow.effects.extensions.io.fx.fx
 import arrow.effects.typeclasses.Fiber
+import arrow.effects.IO
+import arrow.effects.extensions.io.concurrent.startFiber
+import arrow.effects.extensions.io.dispatchers.dispatchers
+import arrow.effects.extensions.io.monad.flatMap
+import arrow.effects.extensions.io.monad.map
+import kotlin.coroutines.CoroutineContext
 
 fun <A, B, C> parallelMap(first: IO<A>,
                      second: IO<B>,
                      f: (A, B) -> C): IO<C> =
   fx {
-    val (fiberOne: Fiber<ForIO, A>) = Default.startfiber(first)
+    val (fiberOne: Fiber<ForIO, A>) = Default.startFiber(first)
     val (fiberTwo: Fiber<ForIO, B>) = Default.startFiber(second)
-    f(!fiberOne.join, !fiberTwo.join)
+    f(!fiberOne.join(), !fiberTwo.join())
   }
 
-val first = IO.sleep(5000).map {
+val first = IO<Unit> { Thread.sleep(5000) }.map {
   println("Hi, I am first")
   1
 }
 
-val second = IO.sleep(3000).map {
+val second = IO<Unit> { Thread.sleep(5000) }.map {
   println("Hi, I am second")
   2
 }
