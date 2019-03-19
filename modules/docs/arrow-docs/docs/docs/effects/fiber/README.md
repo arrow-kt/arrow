@@ -31,12 +31,12 @@ fun <A, B, C> parallelMap(first: IO<A>,
     f(!fiberOne.join(), !fiberTwo.join())
   }
 
-val first = IO.sleep(5000).map {
+val first = IO<Unit> { Thread.sleep(5000) }.map {
   println("Hi, I am first")
   1
 }
 
-val second = IO.sleep(3000).map {
+val second = IO<Unit> { Thread.sleep(5000) }.map {
   println("Hi, I am second")
   2
 }
@@ -45,9 +45,9 @@ val second = IO.sleep(3000).map {
 ```kotlin
 parallelMap(first, second, Int::plus).await()
 
-//Hi, I am second
-//Hi, I am first
-//3
+Hi, I am second
+Hi, I am first
+3
 ```
 
 We could fix this snippet to support proper cancellation by using `bracket` instead of `flatMap`,
