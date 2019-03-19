@@ -434,6 +434,16 @@ class IOTest : UnitSpec() {
       }.unsafeRunSync()
     }
 
+    "Fx should stay within same context" {
+      fx {
+        continueOn(newSingleThreadContext("start"))
+        val initialThread = !effect { Thread.currentThread().name }
+        (0..130).forEach { !effect { it } }
+        val continuedThread = !effect { Thread.currentThread().name }
+        continuedThread shouldBe initialThread
+      }.unsafeRunSync()
+    }
+
   }
 }
 
