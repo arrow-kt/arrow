@@ -2,7 +2,7 @@
 title: From Imperative to Functional Programming using Arrow
 icon: /img/icon-news.svg
 version: version 0.8.2
-header-image: /img/blog-image-header.png
+header-image: https://blog.frankel.ch/assets/resources/imperative-functional-programming/arrow-brand.svg
 category: news
 link: https://blog.frankel.ch/imperative-functional-programming/1/
 ---
