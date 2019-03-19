@@ -51,9 +51,9 @@ val second = IO<Unit> { Thread.sleep(5000) }.map {
 ```kotlin
 parallelMap(first, second, Int::plus).await()
 
-Hi, I am second
-Hi, I am first
-3
+//Hi, I am second
+//Hi, I am first
+//3
 ```
 
 We could fix this snippet to support proper cancellation by using `bracket` instead of `flatMap`,
