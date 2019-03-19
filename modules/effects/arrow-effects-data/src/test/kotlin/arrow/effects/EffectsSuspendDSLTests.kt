@@ -57,6 +57,20 @@ class EffectsSuspendDSLTests : UnitSpec() {
       unsafe { runBlocking { program } } shouldBe helloWorld
     }
 
+    "Fx stack safe on `!effect`" {
+      val program = fx {
+        val rs: List<Int> = (1..50000).toList()
+        rs.forEach { r ->
+          val name: String = r.toString()
+          val ins = !effect { r }
+          val contents = !effect { ins + 1 }
+          val jsonNode = !effect { contents + 2 }
+          !effect { Unit }
+        }
+      }
+      unsafe { runBlocking { program } }
+    }
+
     "Direct syntax for concurrent operations" {
       suspend fun getThreadName(): String =
         Thread.currentThread().name
