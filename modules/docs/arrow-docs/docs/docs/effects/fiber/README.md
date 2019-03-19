@@ -21,6 +21,12 @@ import arrow.effects.*
 import kotlinx.coroutines.Dispatchers.Default
 import arrow.effects.extensions.io.fx.fx
 import arrow.effects.typeclasses.Fiber
+import arrow.effects.IO
+import arrow.effects.extensions.io.concurrent.startFiber
+import arrow.effects.extensions.io.dispatchers.dispatchers
+import arrow.effects.extensions.io.monad.flatMap
+import arrow.effects.extensions.io.monad.map
+import kotlin.coroutines.CoroutineContext
 
 fun <A, B, C> parallelMap(first: IO<A>,
                      second: IO<B>,
