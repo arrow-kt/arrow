@@ -97,5 +97,10 @@
 }
 
 #doc-wrapper {
+    min-height: 100vh;
     width: 100%;
+}
+
+#topWarning ~ #wrapper #doc-wrapper {
+    min-height: calc(100vh - 43px);
 }
