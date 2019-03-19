@@ -1,10 +1,12 @@
 package arrow.effects.suspended.error
 
 import arrow.core.*
+import arrow.effects.IO
 import arrow.effects.KindConnection
 import arrow.effects.internal.Platform
 import arrow.effects.internal.UnsafePromise
 import arrow.effects.internal.asyncContinuation
+import arrow.effects.suspended.TrampolinePool
 import arrow.effects.suspended.error.catchfx.monad.flatMap
 import arrow.effects.suspended.fx.*
 import arrow.effects.typeclasses.*
@@ -294,6 +296,9 @@ interface CatchFxAsync<E> : Async<CatchFxPartialOf<E>>, CatchFxMonadDefer<E> {
 interface CatchFxDispatchers<E> : Dispatchers<CatchFxPartialOf<E>> {
   override fun default(): CoroutineContext =
     NonBlocking
+
+  override fun trampoline(): CoroutineContext =
+    TrampolinePool
 }
 
 @extension

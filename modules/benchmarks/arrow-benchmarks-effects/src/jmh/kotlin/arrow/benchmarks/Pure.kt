@@ -1,4 +1,4 @@
-package arrow.benchmarks.effects
+package arrow.benchmarks
 
 import arrow.core.Either
 import arrow.core.getOrHandle
@@ -12,7 +12,6 @@ import arrow.effects.suspended.fx.Fx
 import arrow.effects.suspended.fx.invoke
 import arrow.effects.suspended.fx.not
 import arrow.unsafe
-import kotlinx.coroutines.runBlocking
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
 import arrow.effects.extensions.io.unsafeRun.runBlocking as ioRunBlocking
@@ -28,18 +27,7 @@ open class Pure {
   @Param("50000")
   var size: Int = 0
 
-  tailrec suspend fun fxDirectPureLoop(i: Int): Int =
-    if (i > size) i else fxDirectPureLoop(i + 1)
-
-  @Benchmark
-  fun fx_direct(): Int =
-    unsafe { fxRunBlocking { Fx { fxDirectPureLoop(0) } } }
-
-  @Benchmark
-  fun kotlinx_coroutines(): Int =
-    runBlocking { fxDirectPureLoop(0) }
-
-  tailrec suspend fun fxPureLoop(i: Int): suspend () -> Int {
+  private tailrec suspend fun fxPureLoop(i: Int): suspend () -> Int {
     val j = !arrow.effects.suspended.fx.just(i)
     return if (j > size) arrow.effects.suspended.fx.just(j) else fxPureLoop(j + 1)
   }
@@ -48,29 +36,29 @@ open class Pure {
   fun fx(): Int =
     unsafe { fxRunBlocking { Fx { !fxPureLoop(0) } } }
 
-  tailrec suspend fun <E> bioPureLoop(i: Int): Either<E, Int> {
+  private tailrec suspend fun <E> catchFxPureLoop(i: Int): Either<E, Int> {
     val j = !arrow.effects.suspended.fx.just(i)
-    return if (j > size) j.right() else bioPureLoop(j + 1)
+    return if (j > size) j.right() else catchFxPureLoop(j + 1)
   }
 
   @Benchmark
-  fun fx_bio(): Int =
-    unsafe { fxRunBlocking { CatchFx { bioPureLoop<String>(0) }.toFx() }.getOrHandle { 0 } }
+  fun catchFx(): Int =
+    unsafe { fxRunBlocking { CatchFx { catchFxPureLoop<String>(0) }.toFx() }.getOrHandle { 0 } }
 
-  tailrec suspend fun <R, E> rioPureLoop(i: Int): EnvFx<R, E, Int> {
+  private tailrec suspend fun <R, E> envFxPureLoop(i: Int): EnvFx<R, E, Int> {
     val j = (arrow.effects.suspended.fx.just(i))()
-    return if (j > size) EnvFx { j.right() } else rioPureLoop(j + 1)
+    return if (j > size) EnvFx { j.right() } else envFxPureLoop(j + 1)
   }
 
   @Benchmark
-  fun fx_rio(): Int =
+  fun envFx(): Int =
     unsafe {
       fxRunBlocking {
-        Fx { rioPureLoop<Int, Int>(0).toFx(0)() }
+        Fx { envFxPureLoop<Int, Int>(0).toFx(0)() }
       }.getOrHandle { 0 }
     }
 
-  fun ioPureLoop(i: Int): IO<Int> =
+  private fun ioPureLoop(i: Int): IO<Int> =
     IO.just(i).flatMap { j ->
       if (j > size) IO.just(j) else ioPureLoop(j + 1)
     }
@@ -80,11 +68,11 @@ open class Pure {
     unsafe { ioRunBlocking { ioPureLoop(0) } }
 
   @Benchmark
-  fun cats_io(): Int =
+  fun catsIO(): Int =
     arrow.benchmarks.effects.scala.cats.`Pure$`.`MODULE$`.unsafeIOPureLoop(size, 0)
 
   @Benchmark
-  fun zio(): Int =
+  fun scalazZio(): Int =
     arrow.benchmarks.effects.scala.zio.`Pure$`.`MODULE$`.unsafeIOPureLoop(size, 0)
 
 }

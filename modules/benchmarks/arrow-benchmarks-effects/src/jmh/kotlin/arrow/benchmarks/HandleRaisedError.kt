@@ -1,4 +1,4 @@
-package arrow.benchmarks.effects
+package arrow.benchmarks
 
 import arrow.effects.IO
 import arrow.effects.extensions.io.applicativeError.handleErrorWith
@@ -22,9 +22,9 @@ open class HandleRaisedError {
   @Param("10000")
   var size: Int = 0
 
-  val dummy = RuntimeException("dummy")
+  private val dummy = RuntimeException("dummy")
 
-  fun ioErrorRaisedloop(i: Int): IO<Int> =
+  private fun ioErrorRaisedloop(i: Int): IO<Int> =
     if (i < size)
       IO.raiseError<Int>(dummy)
         .flatMap { x -> IO.just(x + 1) }
@@ -50,7 +50,7 @@ open class HandleRaisedError {
   fun fx(): Int =
     unsafe { runBlocking { Fx { fxErrorRaisedloop(0) } } }
 
-  tailrec suspend fun fxDirectErrorRaisedloop(i: Int): Int =
+  private tailrec suspend fun fxDirectErrorRaisedLoop(i: Int): Int =
     if (i < size) {
       val result = try {
         val n: Int = throw dummy
@@ -58,15 +58,15 @@ open class HandleRaisedError {
       } catch (t: Throwable) {
         i + 1
       }
-      fxDirectErrorRaisedloop(result)
+      fxDirectErrorRaisedLoop(result)
     } else i
 
   @Benchmark
-  fun fx_direct(): Int =
-    unsafe { runBlocking { Fx { fxDirectErrorRaisedloop(0) } } }
+  fun fxDirect(): Int =
+    unsafe { runBlocking { Fx { fxDirectErrorRaisedLoop(0) } } }
 
   @Benchmark
-  fun kotlinx_coroutines(): Int =
-    runBlocking { fxDirectErrorRaisedloop(0) }
+  fun kotlinXCoroutinesDirect(): Int =
+    runBlocking { fxDirectErrorRaisedLoop(0) }
 
 }

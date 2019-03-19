@@ -1,4 +1,4 @@
-package arrow.benchmarks.effects
+package arrow.benchmarks
 
 import arrow.core.getOrHandle
 import arrow.core.right
@@ -29,55 +29,55 @@ open class Delay {
   @Param("50000")
   var size: Int = 0
 
-  tailrec suspend fun fxDirectDelayLoop(i: Int): Int =
+  private tailrec suspend fun fxDirectDelayLoop(i: Int): Int =
     if (i > size) i else fxDirectDelayLoop(i + 1)
 
-  @Benchmark
-  fun fx_direct(): Int =
-    unsafe { fxRunBlocking { Fx { fxDirectDelayLoop(0) } } }
-
-  @Benchmark
-  fun kotlinx_coroutines(): Int =
-    runBlocking { fxDirectDelayLoop(0) }
-
-  tailrec suspend fun fxDelayLoop(i: Int): suspend () -> Int {
+  private tailrec suspend fun fxDelayLoop(i: Int): suspend () -> Int {
     val j = !arrow.effects.suspended.fx.fx { i }
     return if (j > size) arrow.effects.suspended.fx.fx { j } else fxDelayLoop(j + 1)
   }
+
+  private fun ioDelayLoop(i: Int): IO<Int> =
+    IO {i }.flatMap { j ->
+      if (j > size) IO { j } else ioDelayLoop(j + 1)
+    }
+
+  private fun bioDelayLoop(i: Int): CatchFx<Int, Int> =
+    CatchFx { i.right() }.flatMap { j ->
+      if (j > size) CatchFx { j.right() } else bioDelayLoop(j + 1)
+    }
+
+  private fun envFxDelayLoop(i: Int): EnvFx<Int, Int, Int> =
+    EnvFx<Int, Int, Int> { i.right() }.flatMap { j ->
+      if (j > size) EnvFx { j.right() } else envFxDelayLoop(j + 1)
+    }
+
+  @Benchmark
+  fun fxDirect(): Int =
+    unsafe { fxRunBlocking { Fx { fxDirectDelayLoop(0) } } }
+
+  @Benchmark
+  fun kotlinXCoroutinesDirect(): Int =
+    runBlocking { fxDirectDelayLoop(0) }
 
   @Benchmark
   fun fx(): Int =
     unsafe { fxRunBlocking { Fx { !fxDelayLoop(0) } } }
 
-  fun ioDelayLoop(i: Int): IO<Int> =
-    IO {i }.flatMap { j ->
-      if (j > size) IO { j } else ioDelayLoop(j + 1)
-    }
-
   @Benchmark
   fun io(): Int =
     unsafe { ioRunBlocking { ioDelayLoop(0) } }
 
-  fun bioDelayLoop(i: Int): CatchFx<Int, Int> =
-    CatchFx { i.right() }.flatMap { j ->
-      if (j > size) CatchFx { j.right() } else bioDelayLoop(j + 1)
-    }
+  @Benchmark
+  fun envFx(): Int =
+    unsafe { fxRunBlocking { envFxDelayLoop(0).toFx(0) }.getOrHandle { 0 } }
 
   @Benchmark
-  fun fx_rio(): Int =
-    unsafe { fxRunBlocking { rioDelayLoop(0).toFx(0) }.getOrHandle { 0 } }
-
-  fun rioDelayLoop(i: Int): EnvFx<Int, Int, Int> =
-    EnvFx<Int, Int, Int> { i.right() }.flatMap { j ->
-      if (j > size) EnvFx { j.right() } else rioDelayLoop(j + 1)
-    }
-
-  @Benchmark
-  fun fx_bio(): Int =
+  fun catchFx(): Int =
     unsafe { fxRunBlocking { bioDelayLoop(0).toFx() }.getOrHandle { 0 } }
 
   @Benchmark
-  fun cats_io(): Int =
+  fun catsIO(): Int =
     arrow.benchmarks.effects.scala.cats.`Delay$`.`MODULE$`.unsafeIODelayLoop(size, 0)
 
 }

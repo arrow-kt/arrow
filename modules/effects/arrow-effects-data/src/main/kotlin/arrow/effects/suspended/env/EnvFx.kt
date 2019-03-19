@@ -5,6 +5,7 @@ import arrow.effects.KindConnection
 import arrow.effects.internal.Platform
 import arrow.effects.internal.UnsafePromise
 import arrow.effects.internal.asyncContinuation
+import arrow.effects.suspended.TrampolinePool
 import arrow.effects.suspended.error.mapLeft
 import arrow.effects.suspended.fx.*
 import arrow.effects.typeclasses.*
@@ -318,6 +319,9 @@ interface EnvFxAsync<R, E> : Async<EnvFxPartialOf<R, E>>, EnvFxMonadDefer<R, E> 
 interface EnvFxDispatchers<R, E> : Dispatchers<EnvFxPartialOf<R, E>> {
   override fun default(): CoroutineContext =
     NonBlocking
+
+  override fun trampoline(): CoroutineContext =
+    TrampolinePool
 }
 
 @extension

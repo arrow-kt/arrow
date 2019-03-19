@@ -1,4 +1,3 @@
-
 dependencies {
     compile project(":arrow-effects-data")
     compile project(":arrow-effects-extensions")
@@ -15,11 +14,21 @@ apply plugin: "io.morethan.jmhreport"
 
 jmh {
     include = [
-            'arrow.benchmarks.effects.Pure',
-//            'arrow.benchmarks.effects.Delay',
-            'arrow.benchmarks.effects.Async'
-//            'arrow.benchmarks.effects.HandleNonRaised',
-//            'arrow.benchmarks.effects.HandleRaisedError'
+            'arrow.benchmarks.Async',
+            'arrow.benchmarks.AttemptNonRaised',
+            'arrow.benchmarks.AttemptRaisedError',
+            'arrow.benchmarks.Bracket',
+            'arrow.benchmarks.Cancellable',
+            'arrow.benchmarks.Delay',
+            'arrow.benchmarks.ForkFiber',
+            'arrow.benchmarks.HandleNonRaised',
+            'arrow.benchmarks.HandleRaisedError',
+            'arrow.benchmarks.Map',
+            'arrow.benchmarks.MapStream',
+            'arrow.benchmarks.ParMap',
+            'arrow.benchmarks.Pure',
+            'arrow.benchmarks.RacePair',
+            'arrow.benchmarks.Uncancellable'
     ]
     resultFormat = 'json'
     resultsFile = file('build/reports/benchmarks.json')

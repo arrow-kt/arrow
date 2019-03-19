@@ -1,4 +1,4 @@
-package arrow.benchmarks.effects
+package arrow.benchmarks
 
 import arrow.core.None
 import arrow.core.Option
@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit
 @Warmup(iterations = 10, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 10)
 @CompilerControl(CompilerControl.Mode.DONT_INLINE)
-open class IOMapStreamBenchmark {
+open class MapStream {
 
   private fun streamTest(times: Int, batchSize: Int): Long {
     var stream = range(0, times)
@@ -44,12 +44,12 @@ open class IOMapStreamBenchmark {
     }
 
   @Benchmark
-  fun one(): Long = streamTest(12000, 1)
+  fun ioOne(): Long = streamTest(12000, 1)
 
   @Benchmark
-  fun batch30(): Long = streamTest(1000, 30)
+  fun ioBatch30(): Long = streamTest(1000, 30)
 
   @Benchmark
-  fun batch120(): Long = streamTest(100, 120)
+  fun ioBatch120(): Long = streamTest(100, 120)
 
 }

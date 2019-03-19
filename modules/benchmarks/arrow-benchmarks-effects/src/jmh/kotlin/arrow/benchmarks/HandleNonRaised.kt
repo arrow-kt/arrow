@@ -1,4 +1,4 @@
-package arrow.benchmarks.effects
+package arrow.benchmarks
 
 import arrow.effects.IO
 import arrow.effects.extensions.io.applicativeError.handleErrorWith
@@ -21,28 +21,20 @@ open class HandleNonRaised {
   @Param("10000")
   var size: Int = 0
 
-  fun ioHappyPathLoop(i: Int): IO<Int> = if (i < size)
+  private fun ioHappyPathLoop(i: Int): IO<Int> = if (i < size)
     IO.just(i + 1)
       .handleErrorWith { IO.raiseError(it) }
       .flatMap { ioHappyPathLoop(it) }
   else
     IO.just(i)
 
-  @Benchmark
-  fun io(): Int =
-    ioHappyPathLoop(0).unsafeRunSync()
-
-  tailrec suspend fun fxHappyPathLoop(i: Int): Int =
+  private tailrec suspend fun fxHappyPathLoop(i: Int): Int =
     if (i < size) {
       val n = !arrow.effects.suspended.fx.just(i + 1).handleErrorWith { arrow.effects.suspended.fx.raiseError(it) }
       fxHappyPathLoop(n)
     } else i
 
-  @Benchmark
-  fun fx(): Int =
-    unsafe { runBlocking { Fx { fxHappyPathLoop(0) } } }
-
-  tailrec suspend fun fxDirectHappyPathLoop(i: Int): Int =
+  private tailrec suspend fun fxDirectHappyPathLoop(i: Int): Int =
     if (i < size) {
       val n = try {
         i + 1
@@ -53,11 +45,19 @@ open class HandleNonRaised {
     } else i
 
   @Benchmark
-  fun fx_direct(): Int =
+  fun io(): Int =
+    ioHappyPathLoop(0).unsafeRunSync()
+
+  @Benchmark
+  fun fx(): Int =
+    unsafe { runBlocking { Fx { fxHappyPathLoop(0) } } }
+
+  @Benchmark
+  fun fxDirect(): Int =
     unsafe { runBlocking { Fx { fxDirectHappyPathLoop(0) } } }
 
   @Benchmark
-  fun kotlinx_coroutines(): Int =
+  fun kotlinXCoroutines(): Int =
     runBlocking { fxDirectHappyPathLoop(0) }
 
 }

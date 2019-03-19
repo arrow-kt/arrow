@@ -6,6 +6,7 @@ import arrow.effects.KindConnection
 import arrow.effects.internal.Platform
 import arrow.effects.internal.UnsafePromise
 import arrow.effects.internal.asyncContinuation
+import arrow.effects.suspended.TrampolinePool
 import arrow.effects.suspended.fx.fx.dispatchers.dispatchers
 import arrow.effects.typeclasses.*
 import arrow.extension
@@ -141,6 +142,9 @@ val NonBlocking: CoroutineContext = EmptyCoroutineContext + Pool(ForkJoinPool())
 interface FxDispatchers : Dispatchers<ForFx> {
   override fun default(): CoroutineContext =
     NonBlocking
+
+  override fun trampoline(): CoroutineContext =
+    TrampolinePool
 }
 
 @extension
