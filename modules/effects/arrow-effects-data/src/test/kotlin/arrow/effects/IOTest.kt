@@ -438,7 +438,7 @@ class IOTest : UnitSpec() {
       fx {
         continueOn(newSingleThreadContext("start"))
         val initialThread = !effect { Thread.currentThread().name }
-        (0..130).forEach { !effect { it } }
+        !(0..130).map { i ->  suspend { i } }.sequence()
         val continuedThread = !effect { Thread.currentThread().name }
         continuedThread shouldBe initialThread
       }.unsafeRunSync()

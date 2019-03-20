@@ -2,7 +2,6 @@ package arrow.effects.internal
 
 import arrow.core.nonFatalOrThrow
 import java.util.concurrent.Executor
-import java.util.concurrent.ExecutorService
 
 /**
  * Trampoline implementation, meant to be stored in a `ThreadLocal`.
@@ -52,7 +51,7 @@ internal class Trampoline(val underlying: Executor) {
       task.run()
     } catch (ex: Throwable) {
       forkTheRest()
-      throw ex.nonFatalOrThrow()
+      ex.nonFatalOrThrow()
     }
 
     val next = immediateQueue.pop()
