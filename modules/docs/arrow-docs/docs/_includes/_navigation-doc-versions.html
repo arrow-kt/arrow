@@ -1,7 +1,7 @@
 <li id="version-dropdown" class="navigation-menu-item
     {% if site.data.doc-versions.docMenu.url == category.url %}active {% endif %}">
 
-    <a href="#" onclick="displayToggle(event)" title="{{ site.data.doc-versions.docMenu.title }}" alt="{{ item.title }}">
+    <a href="#" tabindex="0" onclick="displayToggle(event)" title="{{ site.data.doc-versions.docMenu.title }}" alt="{{ item.title }}">
       {% if site.data.doc-versions.docMenu.icon != "" %}
         <i class="nav-item-icon fa fa-lg {{ site.data.doc-versions.docMenu.icon }}" aria-hidden="true"></i>
         <span class="nav-item-text">{{ site.data.doc-versions.docMenu.title }}</span>
