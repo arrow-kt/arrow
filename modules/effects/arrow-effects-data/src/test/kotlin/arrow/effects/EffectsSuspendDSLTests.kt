@@ -78,11 +78,11 @@ class EffectsSuspendDSLTests : UnitSpec() {
       val program = fx {
         // note how the receiving value is typed in the environment and not inside IO despite being effectful and
         // non-blocking parallel computations
-        val result: List<String> = ! NonBlocking.parMapN(
+        val result: List<String> = !NonBlocking.parMapN(
           effect { getThreadName() },
           effect { getThreadName() }
         ) { a, b -> listOf(a, b) }
-        effect { println(result) }
+        !effect { println(result) }
         result
       }
       unsafe { runBlocking { program } }.distinct().size shouldBe 2
@@ -251,6 +251,16 @@ class EffectsSuspendDSLTests : UnitSpec() {
         }
       }
       msg.get() shouldBe const
+    }
+
+    "Fx should stay within same context" {
+      fx {
+        continueOn(newSingleThreadContext("start"))
+        val initialThread = !effect { Thread.currentThread().name }
+        (0..130).forEach { !effect { it } }
+        val continuedThread = !effect { Thread.currentThread().name }
+        continuedThread shouldBe initialThread
+      }.unsafeRunSync()
     }
 
     "startFiber" {
