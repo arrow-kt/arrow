@@ -29,6 +29,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
      * explicitly user denoted unsafe blocks.
      */
     "Running effects requires an explicit `unsafe` context" {
+
       /**
        * A pure expression is defined in the environment
        */

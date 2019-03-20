@@ -2,6 +2,7 @@ package arrow.effects
 
 import arrow.effects.internal.Trampoline
 import arrow.undocumented
+import java.util.concurrent.Executor
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.ForkJoinPool
 import kotlin.concurrent.getOrSet
@@ -32,14 +33,14 @@ object IODispatchers {
     }
   }
 
-  fun TrampolinePool(executorService: ExecutorService): CoroutineContext =
+  fun TrampolinePool(executorService: Executor): CoroutineContext =
     TrampolinePoolElement(executorService)
 
   private val iterations: ThreadLocal<Int> = ThreadLocal.withInitial { 0 }
   private val threadTrampoline = ThreadLocal<Trampoline>()
 
   private class TrampolinePoolElement(
-    val executionService: ExecutorService,
+    val executionService: Executor,
     val asyncBoundaryAfter: Int = 127
   ) : AbstractCoroutineContextElement(ContinuationInterceptor), ContinuationInterceptor {
 
@@ -52,7 +53,7 @@ object IODispatchers {
   }
 
   private class TrampolinedContinuation<T>(
-    val executionService: ExecutorService,
+    val executionService: Executor,
     val cont: Continuation<T>,
     val asyncBoundaryAfter: Int
   ) : Continuation<T> {

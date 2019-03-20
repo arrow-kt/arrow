@@ -1,6 +1,7 @@
 package arrow.effects.internal
 
 import arrow.core.nonFatalOrThrow
+import java.util.concurrent.Executor
 import java.util.concurrent.ExecutorService
 
 /**
@@ -9,7 +10,7 @@ import java.util.concurrent.ExecutorService
  *
  * INTERNAL API.
  */
-internal class Trampoline(val underlying: ExecutorService) {
+internal class Trampoline(val underlying: Executor) {
   private var immediateQueue = Platform.ArrayStack<Runnable>()
   private var withinLoop = false
 
