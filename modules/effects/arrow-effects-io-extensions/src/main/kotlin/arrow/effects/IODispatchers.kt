@@ -3,7 +3,6 @@ package arrow.effects
 import arrow.effects.internal.Trampoline
 import arrow.undocumented
 import java.util.concurrent.Executor
-import java.util.concurrent.ExecutorService
 import java.util.concurrent.ForkJoinPool
 import kotlin.concurrent.getOrSet
 import kotlin.coroutines.*
@@ -12,7 +11,7 @@ import kotlin.coroutines.*
 // FIXME use expected and actual for multiplatform
 object IODispatchers {
   // FIXME use ForkJoinPool.commonPool() in Java 8
-  val CommonPool: CoroutineContext = EmptyCoroutineContext + Pool(ForkJoinPool())
+  val CommonPool: CoroutineContext = Pool(ForkJoinPool())
 
   private class Pool(val pool: ForkJoinPool) : AbstractCoroutineContextElement(ContinuationInterceptor), ContinuationInterceptor {
     override fun <T> interceptContinuation(continuation: Continuation<T>): Continuation<T> =

@@ -10,7 +10,6 @@ import arrow.effects.typeclasses.Environment
 import arrow.effects.typeclasses.suspended.concurrent.Fx
 import arrow.extension
 import java.util.concurrent.Executor
-import java.util.concurrent.ExecutorService
 import kotlin.coroutines.CoroutineContext
 import arrow.effects.IODispatchers as IOD
 

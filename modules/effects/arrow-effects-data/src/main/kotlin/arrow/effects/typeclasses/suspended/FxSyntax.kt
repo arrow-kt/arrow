@@ -14,13 +14,15 @@ import kotlin.coroutines.startCoroutine
 
 interface FxSyntax<F> : Concurrent<F>, BindSyntax<F> {
 
-  abstract val context: CoroutineContext
+  val context: CoroutineContext
 
   suspend fun <A> effectIdentity(a: A): A = a
 
+  @Suppress("PropertyName")
   val NonBlocking: CoroutineContext
     get() = dispatchers().default()
 
+  @Suppress("PropertyName")
   val Trampoline: CoroutineContext
     get() = dispatchers().trampoline()
 
