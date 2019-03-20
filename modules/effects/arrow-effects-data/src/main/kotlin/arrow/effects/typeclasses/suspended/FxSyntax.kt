@@ -1,10 +1,7 @@
 package arrow.effects.typeclasses.suspended
 
 import arrow.Kind
-import arrow.core.Either
-import arrow.core.OptionOf
-import arrow.core.TryOf
-import arrow.core.identity
+import arrow.core.*
 import arrow.data.extensions.list.traverse.traverse
 import arrow.data.fix
 import arrow.effects.internal.asyncContinuation
@@ -16,6 +13,8 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine
 
 interface FxSyntax<F> : Concurrent<F>, BindSyntax<F> {
+
+  abstract val context: CoroutineContext
 
   suspend fun <A> effectIdentity(a: A): A = a
 

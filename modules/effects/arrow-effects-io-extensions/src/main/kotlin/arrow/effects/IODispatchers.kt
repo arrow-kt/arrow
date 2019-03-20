@@ -1,7 +1,11 @@
 package arrow.effects
 
+import arrow.effects.internal.Trampoline
 import arrow.undocumented
+import java.util.concurrent.Executor
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.ForkJoinPool
+import kotlin.concurrent.getOrSet
 import kotlin.coroutines.*
 
 @undocumented
@@ -29,24 +33,27 @@ object IODispatchers {
     }
   }
 
-  val TrampolinePool: CoroutineContext = EmptyCoroutineContext + TrampolinePoolElement(ForkJoinPool())
+  fun TrampolinePool(executorService: Executor): CoroutineContext =
+    TrampolinePoolElement(executorService)
 
-  val iterations: ThreadLocal<Int> = ThreadLocal.withInitial { 0 }
+  private val iterations: ThreadLocal<Int> = ThreadLocal.withInitial { 0 }
+  private val threadTrampoline = ThreadLocal<Trampoline>()
 
   private class TrampolinePoolElement(
-    val pool: ForkJoinPool,
+    val executionService: Executor,
     val asyncBoundaryAfter: Int = 127
   ) : AbstractCoroutineContextElement(ContinuationInterceptor), ContinuationInterceptor {
 
     override fun <T> interceptContinuation(continuation: Continuation<T>): Continuation<T> =
-      TrampolinedContinuation(pool, continuation.context.fold(continuation) { cont, element ->
+      TrampolinedContinuation(executionService, continuation.context.fold(continuation) { cont, element ->
         if (element != this@TrampolinePoolElement && element is ContinuationInterceptor)
-          element.interceptContinuation(cont) else cont
+          element.interceptContinuation(cont)
+        else cont
       }, asyncBoundaryAfter)
   }
 
   private class TrampolinedContinuation<T>(
-    val pool: ForkJoinPool,
+    val executionService: Executor,
     val cont: Continuation<T>,
     val asyncBoundaryAfter: Int
   ) : Continuation<T> {
@@ -55,7 +62,12 @@ object IODispatchers {
     override fun resumeWith(result: Result<T>) {
       if (iterations.get() > asyncBoundaryAfter) {
         iterations.set(0)
-        pool.execute { cont.resumeWith(result) }
+        println("Jumping async. cont.context: $context")
+        threadTrampoline
+          .getOrSet { Trampoline(executionService) }
+          .execute(Runnable {
+            cont.resumeWith(result)
+          })
       } else {
         iterations.set(iterations.get() + 1)
         cont.resumeWith(result)
