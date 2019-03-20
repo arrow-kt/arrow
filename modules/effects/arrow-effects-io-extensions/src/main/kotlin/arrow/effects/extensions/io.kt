@@ -18,11 +18,7 @@ interface IODispatchers : Dispatchers<ForIO> {
   override fun default(): CoroutineContext =
     IOD.CommonPool
   override fun trampoline(): CoroutineContext =
-    IOD.TrampolinePool(object : Executor {
-      override fun execute(command: Runnable?) {
-        command?.run()
-      }
-    })
+    IOD.TrampolinePool(Executor { command -> command?.run() })
 }
 
 @extension
