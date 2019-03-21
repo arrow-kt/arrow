@@ -3,20 +3,20 @@ package arrow.benchmarks
 import arrow.core.getOrHandle
 import arrow.core.right
 import arrow.effects.IO
+import arrow.effects.extensions.catchfx.monad.flatMap
+import arrow.effects.extensions.envfx.monad.flatMap
 import arrow.effects.suspended.env.EnvFx
 import arrow.effects.suspended.env.toFx
 import arrow.effects.suspended.error.CatchFx
 import arrow.effects.suspended.error.toFx
 import arrow.effects.suspended.fx.Fx
 import arrow.effects.suspended.fx.not
-import arrow.effects.extensions.io.unsafeRun.runBlocking as ioRunBlocking
-import arrow.effects.suspended.error.catchfx.monad.flatMap
-import arrow.effects.suspended.env.envfx.monad.flatMap
-import arrow.effects.suspended.fx.fx.unsafeRun.runBlocking as fxRunBlocking
 import arrow.unsafe
 import kotlinx.coroutines.runBlocking
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
+import arrow.effects.extensions.fx.unsafeRun.runBlocking as fxRunBlocking
+import arrow.effects.extensions.io.unsafeRun.runBlocking as ioRunBlocking
 
 
 @State(Scope.Thread)
@@ -38,7 +38,7 @@ open class Delay {
   }
 
   private fun ioDelayLoop(i: Int): IO<Int> =
-    IO {i }.flatMap { j ->
+    IO { i }.flatMap { j ->
       if (j > size) IO { j } else ioDelayLoop(j + 1)
     }
 
@@ -79,5 +79,9 @@ open class Delay {
   @Benchmark
   fun catsIO(): Int =
     arrow.benchmarks.effects.scala.cats.`Delay$`.`MODULE$`.unsafeIODelayLoop(size, 0)
+
+  @Benchmark
+  fun scalaZIO(): Int =
+    arrow.benchmarks.effects.scala.zio.`Delay$`.`MODULE$`.unsafeIODelayLoop(size, 0)
 
 }

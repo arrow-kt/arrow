@@ -1,18 +1,18 @@
 package arrow.benchmarks
 
 import arrow.effects.IO
+import arrow.effects.extensions.NonBlocking
 import arrow.effects.suspended.fx.Fx
-import arrow.effects.extensions.io.unsafeRun.runBlocking as ioRunBlocking
-import arrow.effects.suspended.fx.NonBlocking
-import arrow.effects.suspended.fx.fx.unsafeRun.runBlocking
 import arrow.effects.suspended.fx.invoke
 import arrow.effects.suspended.fx.not
-import arrow.effects.suspended.fx.startFiber as fxStartFiber
 import arrow.unsafe
 import kotlinx.coroutines.runBlocking
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
 import arrow.effects.extensions.io.fx.fx as ioFx
+import arrow.effects.extensions.io.unsafeRun.runBlocking as ioRunBlocking
+import arrow.effects.extensions.startFiber as fxStartFiber
+import arrow.effects.extensions.fx.unsafeRun.runBlocking as fxRunBlocking
 
 @State(Scope.Thread)
 @Fork(2)
@@ -44,7 +44,7 @@ open class ForkFiber {
   @Benchmark
   fun fx(): Int =
     unsafe {
-      runBlocking {
+      fxRunBlocking {
         Fx { startLoop(0) }
       }
     }

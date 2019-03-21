@@ -246,6 +246,6 @@ interface Async<F> : MonadDefer<F> {
 
 }
 
-internal val mapUnit: (Any?) -> Unit = { Unit }
+val mapUnit: (Any?) -> Unit = { Unit }
 internal val rightUnit = Right(Unit)
 internal val unitCallback = { cb: (Either<Throwable, Unit>) -> Unit -> cb(rightUnit) }

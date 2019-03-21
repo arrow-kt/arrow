@@ -1,9 +1,9 @@
 package arrow.benchmarks
 
 import arrow.effects.IO
+import arrow.effects.extensions.fx.unsafeRun.runBlocking
 import arrow.effects.suspended.fx.Fx
 import arrow.effects.suspended.fx.bracketCase
-import arrow.effects.suspended.fx.fx.unsafeRun.runBlocking
 import arrow.effects.suspended.fx.not
 import arrow.effects.suspended.fx.unit
 import arrow.unsafe

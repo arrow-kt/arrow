@@ -5,14 +5,14 @@ import arrow.core.getOrHandle
 import arrow.core.left
 import arrow.core.nonFatalOrThrow
 import arrow.core.right
+import arrow.effects.extensions.catchfx.concurrent.concurrent
+import arrow.effects.extensions.catchfx.fx.fx
+import arrow.effects.extensions.fx.unsafeRun.runBlocking
 import arrow.effects.suspended.error.CatchFx
 import arrow.effects.suspended.error.CatchFxPartialOf
 import arrow.effects.suspended.error.catchfx.applicativeError.attempt
 import arrow.effects.suspended.error.catchfx.applicativeError.raiseError
-import arrow.effects.suspended.error.catchfx.concurrent.concurrent
-import arrow.effects.suspended.error.catchfx.fx.fx
 import arrow.effects.suspended.error.toFx
-import arrow.effects.suspended.fx.fx.unsafeRun.runBlocking
 import arrow.effects.suspended.error.fix
 import arrow.test.UnitSpec
 import arrow.test.laws.ConcurrentLaws

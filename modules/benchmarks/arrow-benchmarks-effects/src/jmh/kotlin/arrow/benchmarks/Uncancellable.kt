@@ -1,16 +1,6 @@
 package arrow.benchmarks
 
-import arrow.core.Either
-import arrow.core.Right
-import arrow.data.extensions.list.foldable.foldLeft
 import arrow.effects.IO
-import arrow.effects.extensions.io.applicative.map
-import arrow.effects.extensions.io.concurrent.concurrent
-import arrow.effects.extensions.io.concurrent.parMapN
-import arrow.effects.fix
-import arrow.effects.racePair
-import arrow.effects.startFiber
-import arrow.effects.suspended.fx.NonBlocking
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
 

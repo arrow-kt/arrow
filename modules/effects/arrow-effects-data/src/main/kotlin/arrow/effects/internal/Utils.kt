@@ -124,7 +124,7 @@ private class OneShotLatch : AbstractQueuedSynchronizer() {
  * [arrow.core.Continuation] to run coroutine on `ctx` and link result to callback [cc].
  * Use [asyncContinuation] to run suspended functions within a context `ctx` and pass the result to [cc].
  */
-internal fun <A> asyncContinuation(
+fun <A> asyncContinuation(
   ctx: CoroutineContext,
   cc: (Either<Throwable, A>) -> Unit
 ): arrow.core.Continuation<A> =

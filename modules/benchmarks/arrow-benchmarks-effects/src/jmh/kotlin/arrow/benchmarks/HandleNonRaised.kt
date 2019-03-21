@@ -4,12 +4,13 @@ import arrow.effects.IO
 import arrow.effects.extensions.io.applicativeError.handleErrorWith
 import arrow.effects.suspended.fx.Fx
 import arrow.effects.suspended.fx.handleErrorWith
+import arrow.effects.suspended.fx.invoke
 import arrow.effects.suspended.fx.not
-import arrow.effects.suspended.fx.fx.unsafeRun.runBlocking
 import arrow.unsafe
 import kotlinx.coroutines.runBlocking
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
+import arrow.effects.extensions.fx.unsafeRun.runBlocking as fxRunBlocking
 
 @State(Scope.Thread)
 @Fork(2)
@@ -38,7 +39,7 @@ open class HandleNonRaised {
     if (i < size) {
       val n = try {
         i + 1
-      } catch (t : Throwable) {
+      } catch (t: Throwable) {
         throw t
       }
       fxDirectHappyPathLoop(n)
@@ -50,11 +51,11 @@ open class HandleNonRaised {
 
   @Benchmark
   fun fx(): Int =
-    unsafe { runBlocking { Fx { fxHappyPathLoop(0) } } }
+    unsafe { fxRunBlocking { Fx { fxHappyPathLoop(0) } } }
 
   @Benchmark
   fun fxDirect(): Int =
-    unsafe { runBlocking { Fx { fxDirectHappyPathLoop(0) } } }
+    unsafe { fxRunBlocking { Fx { fxDirectHappyPathLoop(0) } } }
 
   @Benchmark
   fun kotlinXCoroutines(): Int =

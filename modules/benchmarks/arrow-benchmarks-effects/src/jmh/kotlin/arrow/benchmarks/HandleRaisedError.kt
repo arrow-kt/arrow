@@ -6,11 +6,11 @@ import arrow.effects.suspended.fx.Fx
 import arrow.effects.suspended.fx.flatMap
 import arrow.effects.suspended.fx.handleError
 import arrow.effects.suspended.fx.not
-import arrow.effects.suspended.fx.fx.unsafeRun.runBlocking
 import arrow.unsafe
 import kotlinx.coroutines.runBlocking
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
+import arrow.effects.extensions.fx.unsafeRun.runBlocking as fxRunBlocking
 
 @State(Scope.Thread)
 @Fork(2)
@@ -48,7 +48,7 @@ open class HandleRaisedError {
 
   @Benchmark
   fun fx(): Int =
-    unsafe { runBlocking { Fx { fxErrorRaisedloop(0) } } }
+    unsafe { fxRunBlocking { Fx { fxErrorRaisedloop(0) } } }
 
   private tailrec suspend fun fxDirectErrorRaisedLoop(i: Int): Int =
     if (i < size) {
@@ -63,7 +63,7 @@ open class HandleRaisedError {
 
   @Benchmark
   fun fxDirect(): Int =
-    unsafe { runBlocking { Fx { fxDirectErrorRaisedLoop(0) } } }
+    unsafe { fxRunBlocking { Fx { fxDirectErrorRaisedLoop(0) } } }
 
   @Benchmark
   fun kotlinXCoroutinesDirect(): Int =

@@ -2,14 +2,14 @@ package arrow.benchmarks
 
 import arrow.data.extensions.list.foldable.foldLeft
 import arrow.effects.IO
+import arrow.effects.extensions.NonBlocking
+import arrow.effects.extensions.fx.concurrent.parMapN
 import arrow.effects.extensions.io.concurrent.parMapN
 import arrow.effects.suspended.fx.Fx
-import arrow.effects.suspended.fx.NonBlocking
-import arrow.effects.suspended.fx.fx.concurrent.parMapN
-import arrow.effects.suspended.fx.fx.unsafeRun.runBlocking
 import arrow.unsafe
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
+import arrow.effects.extensions.fx.unsafeRun.runBlocking as fxRunBlocking
 import arrow.effects.extensions.io.fx.fx as ioFx
 import arrow.effects.extensions.io.unsafeRun.runBlocking as ioRunBlocking
 
@@ -35,7 +35,7 @@ open class ParMap {
   @Benchmark
   fun fx(): Int =
     unsafe {
-      runBlocking {
+      fxRunBlocking {
         fxHelper()
       }
     }
