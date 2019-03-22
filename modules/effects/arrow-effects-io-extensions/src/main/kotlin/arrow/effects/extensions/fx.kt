@@ -26,18 +26,16 @@ interface FxDispatchers : Dispatchers<ForFx> {
     IODispatchers.CommonPool
 
   override fun trampoline(): CoroutineContext =
-    IODispatchers.TrampolinePool(Executor { command -> command?.run() })
+    TrampolinePool(Executor { command -> command?.run() })
 }
 
 val NonBlocking: CoroutineContext = Fx.dispatchers().default()
-
-val Trampoline: CoroutineContext = Fx.dispatchers().trampoline()
 
 @extension
 interface FxUnsafeRun : UnsafeRun<ForFx> {
 
   override suspend fun <A> unsafe.runBlocking(fa: () -> FxOf<A>): A =
-    BlockingCoroutine<A>(Trampoline).also { fa().fix().fa.startCoroutine(it) }.value
+    fa().fix().fa.foldContinuation(arrow.effects.suspended.fx.Trampoline) { throw it }
 
   override suspend fun <A> unsafe.runNonBlocking(fa: () -> FxOf<A>, cb: (Either<Throwable, A>) -> Unit) =
     fa().fix().fa.startCoroutine(asyncContinuation(NonBlocking, cb))
@@ -460,4 +458,3 @@ fun <A> fromAsyncF(fa: FxProcF<A>): suspend () -> A = {
 }
 
 fun <P1, P2, R> ((P1) -> (P2) -> R).uncurried(): (P1, P2) -> R = { p1: P1, p2: P2 -> this(p1)(p2) }
-

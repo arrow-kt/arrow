@@ -3,6 +3,7 @@ package arrow.effects.extensions
 import arrow.effects.*
 import arrow.effects.extensions.io.concurrent.concurrent
 import arrow.effects.extensions.io.dispatchers.dispatchers
+import arrow.effects.suspended.fx.TrampolinePool
 import arrow.effects.typeclasses.Concurrent
 import arrow.effects.typeclasses.ConcurrentEffect
 import arrow.effects.typeclasses.Dispatchers
@@ -18,7 +19,7 @@ interface IODispatchers : Dispatchers<ForIO> {
   override fun default(): CoroutineContext =
     IOD.CommonPool
   override fun trampoline(): CoroutineContext =
-    IOD.TrampolinePool(Executor { command -> command?.run() })
+    TrampolinePool(Executor { command -> command?.run() })
 }
 
 @extension

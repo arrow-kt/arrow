@@ -3,11 +3,11 @@ package arrow.effects
 import arrow.Kind
 import arrow.core.*
 import arrow.effects.suspended.env.*
-import arrow.effects.suspended.env.envfx.applicativeError.attempt
-import arrow.effects.suspended.env.envfx.applicativeError.raiseError
-import arrow.effects.suspended.env.envfx.concurrent.concurrent
-import arrow.effects.suspended.env.envfx.fx.fx
-import arrow.effects.suspended.fx.fx.unsafeRun.runBlocking
+import arrow.effects.extensions.envfx.applicativeError.attempt
+import arrow.effects.extensions.envfx.applicativeError.raiseError
+import arrow.effects.extensions.envfx.concurrent.concurrent
+import arrow.effects.extensions.envfx.fx.fx
+import arrow.effects.extensions.fx.unsafeRun.runBlocking
 import arrow.test.UnitSpec
 import arrow.test.laws.ConcurrentLaws
 import arrow.typeclasses.Eq

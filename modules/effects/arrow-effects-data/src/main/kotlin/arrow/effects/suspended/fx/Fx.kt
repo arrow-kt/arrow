@@ -3,15 +3,16 @@ package arrow.effects.suspended.fx
 import arrow.Kind
 import arrow.core.*
 import arrow.effects.internal.Platform
+import arrow.effects.internal.asyncContinuation
 import arrow.effects.typeclasses.ConnectedProc
 import arrow.effects.typeclasses.ConnectedProcF
 import arrow.effects.typeclasses.ExitCase
 import arrow.typeclasses.Continuation
 import java.util.concurrent.CancellationException
+import java.util.concurrent.Executor
 import java.util.concurrent.atomic.AtomicReference
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
-import kotlin.coroutines.startCoroutine
+import kotlin.concurrent.getOrSet
+import kotlin.coroutines.*
 
 class ForFx private constructor() {
   companion object
@@ -30,17 +31,20 @@ inline class Fx<A>(val fa: suspend () -> A) : FxOf<A> {
   companion object
 }
 
-fun <A> fx(f: suspend () -> A): suspend () -> A =
+fun <A> fx(f: suspend () -> A): Fx<A> =
+  Fx(f)
+
+fun <A> effect(f: suspend () -> A): suspend () -> A =
   f
 
 suspend inline operator fun <A> (suspend () -> A).not(): A =
-  this()
+  trampoline(this)()
 
 suspend inline fun <A> (suspend () -> A).bind(): A =
-  this()
+  !this
 
 suspend inline operator fun <A> (suspend () -> A).component1(): A =
-  this()
+  !this
 
 /**
  * Avoid recalculating stack traces on rethrows
@@ -63,8 +67,18 @@ class RaisedError(val exception: Throwable) : Throwable() {
 inline fun <A> Throwable.raiseError(): suspend () -> A =
   { throw RaisedError(this) }
 
+object Trampoline : TrampolinePoolElement(Executor { it.run() }), CoroutineContext
+
+suspend fun <A> trampoline(f: suspend () -> A): suspend () -> A =
+  suspendCoroutine { c ->
+    f.startCoroutine(asyncContinuation(Trampoline) {
+      it.fold(c::resumeWithException) { c.resume { it } }
+    })
+  }
+
+
 suspend fun <A, B> (suspend () -> A).map(f: (A) -> B): suspend () -> B =
-  { f(this()) }
+  { f(!this@map) }
 
 fun <A> just(a: A): suspend () -> A =
   { a }
@@ -73,12 +87,12 @@ val <A> A.just: suspend () -> A
   get() = { this }
 
 suspend fun <A, B> (suspend () -> A).ap(ff: suspend () -> (A) -> B): suspend () -> B =
-  map(ff())
+  map(!ff)
 
 suspend fun <A, B> (suspend () -> A).flatMap(f: (A) -> suspend () -> B): suspend () -> B =
   {
     try {
-      !f(this())
+      !f(!this)
     } catch (e: Throwable) {
       if (NonFatal(e)) {
         !raiseError<B>(e)
@@ -92,7 +106,7 @@ suspend inline fun <A> (suspend () -> A).attempt(unit: Unit = Unit): suspend () 
 suspend inline fun <A> attempt(crossinline f: suspend () -> A): suspend () -> Either<Throwable, A> =
   {
     try {
-      f().right()
+      (!f).right()
     } catch (e: Throwable) {
       e.left()
     }
@@ -106,7 +120,7 @@ fun <A> raiseError(e: Throwable, unit: Unit = Unit): suspend () -> A =
 inline fun <A> (suspend () -> A).handleErrorWith(crossinline f: (Throwable) -> suspend () -> A): suspend () -> A =
   {
     try {
-      this()
+      !this
     } catch (r: RaisedError) {
       !f(r.exception)
     } catch (e: Throwable) {
@@ -117,7 +131,7 @@ inline fun <A> (suspend () -> A).handleErrorWith(crossinline f: (Throwable) -> s
 inline fun <A> (suspend () -> A).handleError(crossinline f: (Throwable) -> A): suspend () -> A =
   {
     try {
-      this()
+      !this
     } catch (r: RaisedError) {
       f(r.exception)
     } catch (e: Throwable) {
@@ -126,15 +140,12 @@ inline fun <A> (suspend () -> A).handleError(crossinline f: (Throwable) -> A): s
     }
   }
 
-suspend inline fun <A> defer(noinline fa: suspend () -> A): suspend () -> A =
-  unit.flatMap { fa }
-
 inline fun <A> (suspend () -> A).ensure(
   crossinline error: () -> Throwable,
   crossinline predicate: (A) -> Boolean
 ): suspend () -> A =
   {
-    val result = this()
+    val result = !this
     if (!predicate(result)) throw error()
     else result
   }
@@ -143,7 +154,7 @@ suspend fun <A, B> (suspend () -> A).bracketCase(
   release: (A, ExitCase<Throwable>) -> suspend () -> Unit,
   use: (A) -> suspend () -> B
 ): suspend () -> B = {
-  val a = invoke()
+  val a = !this
 
   val fxB = try {
     use(a)
@@ -187,4 +198,107 @@ fun <A> (suspend () -> A).foldContinuation(
       get() = context
   })
   return result.get()
+}
+
+fun TrampolinePool(executorService: Executor): CoroutineContext =
+  TrampolinePoolElement(executorService)
+
+private val iterations: ThreadLocal<Int> = ThreadLocal.withInitial { 0 }
+private val threadTrampoline = ThreadLocal<TrampolineExecutor>()
+
+open class TrampolinePoolElement(
+  val executionService: Executor,
+  val asyncBoundaryAfter: Int = 127
+) : AbstractCoroutineContextElement(ContinuationInterceptor), ContinuationInterceptor {
+
+  override fun <T> interceptContinuation(continuation: kotlin.coroutines.Continuation<T>): kotlin.coroutines.Continuation<T> =
+    TrampolinedContinuation(executionService, continuation.context.fold(continuation) { cont, element ->
+      if (element != this@TrampolinePoolElement && element is ContinuationInterceptor)
+        element.interceptContinuation(cont)
+      else cont
+    }, asyncBoundaryAfter)
+}
+
+private class TrampolinedContinuation<T>(
+  val executionService: Executor,
+  val cont: kotlin.coroutines.Continuation<T>,
+  val asyncBoundaryAfter: Int
+) : kotlin.coroutines.Continuation<T> {
+  override val context: CoroutineContext = cont.context
+
+  override fun resumeWith(result: Result<T>) {
+    val currentIterations = iterations.get()
+    if (currentIterations > asyncBoundaryAfter) {
+      iterations.set(0)
+      threadTrampoline
+        .getOrSet { TrampolineExecutor(executionService) }
+        .execute(Runnable {
+          cont.resumeWith(result)
+        })
+    } else {
+      //println("Blocking: currentIterations: $currentIterations, cont.context: $context")
+      iterations.set(currentIterations + 1)
+      cont.resumeWith(result)
+    }
+  }
+}
+
+/**
+ * Trampoline implementation, meant to be stored in a `ThreadLocal`.
+ * See `TrampolineEC`.
+ *
+ * INTERNAL API.
+ */
+internal class TrampolineExecutor(val underlying: Executor) {
+  private var immediateQueue = Platform.ArrayStack<Runnable>()
+  private var withinLoop = false
+
+  fun startLoop(runnable: Runnable): Unit {
+    withinLoop = true
+    try {
+      immediateLoop(runnable)
+    } finally {
+      withinLoop = false
+    }
+  }
+
+  fun execute(runnable: Runnable): Unit {
+    if (!withinLoop) {
+      startLoop(runnable)
+    } else {
+      immediateQueue.push(runnable)
+    }
+  }
+
+  private fun forkTheRest(): Unit {
+    class ResumeRun(val head: Runnable, val rest: Platform.ArrayStack<Runnable>) : Runnable {
+      override fun run(): Unit {
+        immediateQueue.addAll(rest)
+        immediateLoop(head)
+      }
+    }
+
+    val head = immediateQueue.firstOrNull()
+    if (head != null) {
+      immediateQueue.pop()
+      val rest = immediateQueue
+      immediateQueue = Platform.ArrayStack<Runnable>()
+      underlying.execute(ResumeRun(head, rest))
+    }
+  }
+
+  private tailrec fun immediateLoop(task: Runnable): Unit {
+    try {
+      task.run()
+    } catch (ex: Throwable) {
+      forkTheRest()
+      ex.nonFatalOrThrow()
+    }
+
+    val next = immediateQueue.firstOrNull()
+    if (next != null) {
+      immediateQueue.pop()
+      immediateLoop(next)
+    }
+  }
 }

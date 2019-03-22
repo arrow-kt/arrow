@@ -8,12 +8,12 @@
 package arrow.effects
 
 import arrow.core.Either
+import arrow.effects.extensions.envfx.applicativeError.raiseError
+import arrow.effects.extensions.envfx.fx.fx
+import arrow.effects.extensions.fx.unsafeRun.runBlocking
 import arrow.effects.suspended.env.EnvFx
 import arrow.effects.suspended.env.env
-import arrow.effects.suspended.env.envfx.applicativeError.raiseError
-import arrow.effects.suspended.env.envfx.fx.fx
 import arrow.effects.suspended.env.toFx
-import arrow.effects.suspended.fx.fx.unsafeRun.runBlocking
 import arrow.unsafe
 
 /** user algebra **/

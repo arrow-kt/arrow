@@ -9,6 +9,7 @@ import arrow.effects.internal.UnsafePromise
 import arrow.effects.internal.asyncContinuation
 import arrow.effects.suspended.error.*
 import arrow.effects.suspended.fx.RaisedError
+import arrow.effects.suspended.fx.TrampolinePool
 import arrow.effects.suspended.fx.foldContinuation
 import arrow.effects.typeclasses.*
 import arrow.extension
@@ -170,7 +171,7 @@ interface CatchFxDispatchers<E> : Dispatchers<CatchFxPartialOf<E>> {
     IODispatchers.CommonPool
 
   override fun trampoline(): CoroutineContext =
-    IODispatchers.TrampolinePool(Executor { command -> command?.run() })
+    TrampolinePool(Executor { command -> command?.run() })
 }
 
 @extension

@@ -1,9 +1,9 @@
 package arrow.effects
 
+import arrow.effects.extensions.fx.concurrent.concurrent
+import arrow.effects.extensions.fx.unsafeRun.runBlocking
 import arrow.effects.suspended.fx.Fx
 import arrow.effects.suspended.fx.FxOf
-import arrow.effects.suspended.fx.fx.concurrent.concurrent
-import arrow.effects.suspended.fx.fx.unsafeRun.runBlocking
 import arrow.effects.suspended.fx.invoke
 import arrow.test.UnitSpec
 import arrow.test.laws.ConcurrentLaws

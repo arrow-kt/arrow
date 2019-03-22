@@ -33,7 +33,4 @@ object unsafe {
     return c.ref!!
   }
 
-  suspend fun <A> suspendCoroutine(cont: (kotlin.coroutines.Continuation<A>) -> Unit): A =
-    kotlin.coroutines.suspendCoroutine(cont)
-
 }
