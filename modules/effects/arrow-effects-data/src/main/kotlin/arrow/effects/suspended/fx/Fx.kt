@@ -27,7 +27,7 @@ inline fun <A> FxOf<A>.fix(): Fx<A> =
 
 suspend operator fun <A> FxOf<A>.invoke(): A = fix().fa.invoke()
 
-inline class Fx<A>(val fa: suspend () -> A) : FxOf<A> {
+class Fx<A>(val fa: suspend () -> A) : FxOf<A> {
   companion object
 }
 
@@ -37,8 +37,18 @@ fun <A> fx(f: suspend () -> A): Fx<A> =
 fun <A> effect(f: suspend () -> A): suspend () -> A =
   f
 
-suspend inline operator fun <A> (suspend () -> A).not(): A =
-  trampoline(this)()
+val threadInvocations: ThreadLocal<Int> = ThreadLocal.withInitial { 0 }
+
+suspend inline operator fun <A> (suspend () -> A).not(): A {
+  val currentIters = threadInvocations.get()
+  return if (currentIters < 127) {
+    threadInvocations.set(currentIters + 1)
+    this()
+  } else {
+    threadInvocations.set(0)
+    trampoline(this)()
+  }
+}
 
 suspend inline fun <A> (suspend () -> A).bind(): A =
   !this
@@ -100,10 +110,10 @@ suspend fun <A, B> (suspend () -> A).flatMap(f: (A) -> suspend () -> B): suspend
     }
   }
 
-suspend inline fun <A> (suspend () -> A).attempt(unit: Unit = Unit): suspend () -> Either<Throwable, A> =
+suspend fun <A> (suspend () -> A).attempt(unit: Unit = Unit): suspend () -> Either<Throwable, A> =
   attempt(this)
 
-suspend inline fun <A> attempt(crossinline f: suspend () -> A): suspend () -> Either<Throwable, A> =
+suspend fun <A> attempt(f: suspend () -> A): suspend () -> Either<Throwable, A> =
   {
     try {
       (!f).right()
@@ -117,7 +127,7 @@ val unit: suspend () -> Unit = { Unit }
 fun <A> raiseError(e: Throwable, unit: Unit = Unit): suspend () -> A =
   { if (NonFatal(e)) throw RaisedError(e) else throw e }
 
-inline fun <A> (suspend () -> A).handleErrorWith(crossinline f: (Throwable) -> suspend () -> A): suspend () -> A =
+fun <A> (suspend () -> A).handleErrorWith(f: (Throwable) -> suspend () -> A): suspend () -> A =
   {
     try {
       !this
@@ -128,7 +138,7 @@ inline fun <A> (suspend () -> A).handleErrorWith(crossinline f: (Throwable) -> s
     }
   }
 
-inline fun <A> (suspend () -> A).handleError(crossinline f: (Throwable) -> A): suspend () -> A =
+fun <A> (suspend () -> A).handleError(f: (Throwable) -> A): suspend () -> A =
   {
     try {
       !this
@@ -140,9 +150,9 @@ inline fun <A> (suspend () -> A).handleError(crossinline f: (Throwable) -> A): s
     }
   }
 
-inline fun <A> (suspend () -> A).ensure(
-  crossinline error: () -> Throwable,
-  crossinline predicate: (A) -> Boolean
+fun <A> (suspend () -> A).ensure(
+  error: () -> Throwable,
+  predicate: (A) -> Boolean
 ): suspend () -> A =
   {
     val result = !this
