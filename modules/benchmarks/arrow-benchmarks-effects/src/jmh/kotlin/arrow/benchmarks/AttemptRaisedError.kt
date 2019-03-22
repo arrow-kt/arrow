@@ -1,8 +1,9 @@
 package arrow.benchmarks
 
 import arrow.core.Either
+import arrow.effects.extensions.fx.unsafeRun.runBlocking
 import arrow.effects.suspended.fx.*
-import kotlinx.coroutines.runBlocking
+import arrow.unsafe
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
 
@@ -23,9 +24,10 @@ open class AttemptRaisedError {
 
   suspend fun loopNotHappy(size: Int, i: Int): Int =
     if (i < size) {
-      val attempted = !dummy.raiseError<Int>()
-        .map { it + 1 }
-        .attempt()
+      val attempted = !attempt {
+        !dummy.raiseError<Int>()
+          .map { it + 1 }
+      }
       when (attempted) {
         is Either.Left -> loopNotHappy(size, i + 1)
         is Either.Right -> attempted.b
@@ -34,6 +36,6 @@ open class AttemptRaisedError {
 
   @Benchmark
   fun fx(): Int =
-    runBlocking { !fx { loopNotHappy(size, 0) } }
+    unsafe { runBlocking { Fx { loopNotHappy(size, 0) } } }
 
 }

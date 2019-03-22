@@ -1,8 +1,9 @@
 package arrow.benchmarks
 
 import arrow.core.Either
+import arrow.effects.extensions.fx.unsafeRun.runBlocking
 import arrow.effects.suspended.fx.*
-import kotlinx.coroutines.runBlocking
+import arrow.unsafe
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
 
@@ -28,6 +29,6 @@ open class AttemptNonRaised {
 
   @Benchmark
   fun fx(): Int =
-    runBlocking { !fx { loopHappy(size, 0) } }
+    unsafe { runBlocking { Fx { loopHappy(size, 0) } } }
 
 }
