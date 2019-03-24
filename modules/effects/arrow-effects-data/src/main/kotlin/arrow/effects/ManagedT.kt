@@ -10,17 +10,17 @@ import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 
 @higherkind
-abstract class ManagedT<F, E, R> : ManagedTOf<F, E, R> {
+interface ManagedT<F, E, R> : ManagedTOf<F, E, R> {
 
-  abstract val BR: Bracket<F, E>
+  val BR: Bracket<F, E>
 
-  abstract operator fun <A> invoke(use: (R) -> Kind<F, A>): Kind<F, A>
+  operator fun <A> invoke(use: (R) -> Kind<F, A>): Kind<F, A>
 
   fun <R2> map(f: (R) -> R2): ManagedT<F, E, R2> = flatMap(f andThen { just(it, BR) })
 
   fun <R2> ap(ff: ManagedT<F, E, (R) -> R2>): ManagedT<F, E, R2> = flatMap { res -> ff.map { it(res) } }
 
-  fun <R2> flatMap(f: (R) -> ManagedT<F, E, R2>): ManagedT<F, E, R2> = object : ManagedT<F, E, R2>() {
+  fun <R2> flatMap(f: (R) -> ManagedT<F, E, R2>): ManagedT<F, E, R2> = object : ManagedT<F, E, R2> {
     override fun <A> invoke(use: (R2) -> Kind<F, A>): Kind<F, A> = this@ManagedT { r ->
       f(r).invoke { r2 ->
         use(r2)
@@ -45,7 +45,7 @@ abstract class ManagedT<F, E, R> : ManagedTOf<F, E, R> {
       acquire: () -> Kind<F, R>,
       release: (R, ExitCase<E>) -> Kind<F, Unit>,
       BR: Bracket<F, E>
-    ): ManagedT<F, E, R> = object : ManagedT<F, E, R>() {
+    ): ManagedT<F, E, R> = object : ManagedT<F, E, R> {
       override operator fun <A> invoke(use: (R) -> Kind<F, A>): Kind<F, A> =
         BR.run { acquire().bracketCase(release, use) }
       
