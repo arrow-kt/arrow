@@ -37,7 +37,7 @@ interface DataSource {
 
 Здесь для простоты мы возвращаем`Observable`, но это может быть`Single`, `Maybe`, `Flowable`, `Deferred`, что угодно, подходящее для достижения цели.
 
-Добавим пару моковых имплементаций источников данных, один для **локального**,  второй для **дистанционного**.
+Добавим пару моковых имплементаций источников данных, одну для **локального**, вторую для **дистанционного**.
 
 ```Kotlin
 class LocalDataSource : DataSource {
@@ -71,9 +71,9 @@ class RemoteDataSource : DataSource {
 }
 ```
 
-It's clearly rusty and both implementations are actually the same. It's simply a mocked version of both data sources that would ideally retrieve the data from a local cache or a network API. We're using an in memory `Map<User, List<Task>>` for each one to hold the data.
+Имплементации обоих источников данных на самом деле идентичны. Это просто мокированные версии обоих источников данных, которые в идеальном случае достают данные из локального хранилища или сетевого API. В обоих случаях для хранения данных используется сохраненный в память `Map<User, List<Task>>`.
 
-Since we got two `DataSources`, we'll need a way to coordinate both. Let's add the following `Repository`:
+Т.к. у нас два `Источника данных` нам надо как-то их координировать. Давай создадим `Репозиторий`:
 
 ```kotlin
 class TaskRepository(private val localDS: DataSource, 
@@ -87,10 +87,10 @@ class TaskRepository(private val localDS: DataSource,
 }
 ```
 
-It basically tries to load the `List<Task>` from the `LocalDataSource`, and if it's not found, it will try to fetch it from Network using the `RemoteDataSource`, as required by our specs.
+Он просто пытается загрузить `List<Task>` из `LocalDataSource`, и если тот не найден — пробует запросить их из Сети с помощь ю `RemoteDataSource`.
 
-Let's add a simple dependency provisioning Module. We'll use it to get all our instances up and running in a nested way. 
-We'll avoid using any Dependency Injection frameworks :
+Давай создадим простой модуль для предоставления зависимостей. Он будет использоваться для предоставления всех инстансев в nested way. 
+Мы не будем использовать никаких фреймворков для иньекции зависимостей:
 
 ```kotlin
 class Module {
@@ -100,7 +100,7 @@ class Module {
 }
 ```
 
-And finally, we'll need a simple test to run the whole stack of operations:
+И наконец, нам нужен простой тест, прогоняющий весь стек операций:
 
 ```kotlin
 object test {
@@ -121,15 +121,15 @@ object test {
 }
 ```
 
-[Here you have all the pieces together](https://gist.github.com/JorgeCastilloPrz/05793f11497e0e31f207d2a3e6522bdb), just in case you want to copy/paste the complete program.
+[Здесь можно найти весь вышеобозначенный код](https://gist.github.com/JorgeCastilloPrz/05793f11497e0e31f207d2a3e6522bdb).
 
-This program composes the execution chain for three different users, and then subscribes to the resulting [`Observable`]({{ '/docs/integrations/rx2' | relative_url }}).
+Эта программа композирует цепочку выполнения для трех пользователей, затем подписывается на полученный в результате [`Observable`]({{ '/docs/integrations/rx2' | relative_url }}).
 
-The first two `Users` are available, lucky of us. `User1` is available on the local DataSource, and `User2` is available on the remote one.
+Первые два объекта `Users` доступны, с этим нам повезло. `User1` доступен в местном DataSource, и `User2` доступен на дистанционном.
 
-We're not so lucky for `User3`, since it's not found on the local one. The program will try to load it from the remote service, where it's not found either. The search will fail and we'll print the corresponding error on the subscription.
+Но есть проблема с `User3`, т.к., он недоступен в локальном хранилище. Программа попытается загрузить его из дистанционного сервиса - но там его тоже нет. Поиск закончится неудачей и мы выведем в консоль сообщение о ошибке.
 
-This is what we get printed for the three cases:
+Вот что будет выведено в консоль для всех трех случаев:
 
 ```
 > [Task(value=LocalTask assigned to user1)]
@@ -137,11 +137,11 @@ This is what we get printed for the three cases:
 > UserNotInRemoteStorage(user=User(userId=UserId(value=unknown user)))
 ```
 
-This is all what is worth for our canonical example. Let's try to encode it now using a **Functional Programming polymorphic style**.
+Мы закончили с примером. Давай теперь попробуем запрогроммировать эту логику в стиле **ФП-полиморфизма**
 
-### Abstracting out the data types
+### Абстрагирование типов данных
 
-Our `DataSource` contract interface will look like this from now on:
+Теперь контракт для интерфеса `DataSource` будет выглядеть так:
 
 ```kotlin
 interface DataSource<F> {
@@ -149,28 +149,27 @@ interface DataSource<F> {
 }
 ```
 
-It's fairly similar, but it has two important differences:
+Всё вроде бы похоже, но есть два важных отличия:
  
- * It depends on an `F` generic type. 
- * The return type is `Kind<F, List<Task>>`.
+ * Появилось зависимость на параметризированный тип `F`. 
+ * Тип, возвращаемый функцией теперь `Kind<F, List<Task>>`.
 
 
-`Kind` is basically [the way Arrow encodes something called **Higher Kinded Types**]({{ '/docs/patterns/glossary/#type-constructors' | relative_url }}). 
-Let's learn the concept pretty rapidly with a very basic example.
+`Kind` это [то, как Arrow кодирует то, что обычно называеют **Высшим типом**]({{ '/docs/patterns/glossary/#type-constructors' | relative_url }}). 
+Давай выучим этот концепт очень быстро и на простом примере.
 
-On `Observable<A>`, we have 2 parts:
+У `Observable<A>` есть 2 части:
 
-* `Observable`: The "witness" type, the container. A fixed type.
-* `A`: The generic type argument. An abstraction, and we can pass any types for it.
+* `Observable`: контейнер, фиксированный тип.
+* `A`: аргумент обобщенного типа. Абстракция в которую можно передать другие типы.
 
-We're used to abstract over generic types, like `A`. We are familiarized with it. Truth is we can also abstract over 
-type containers like `Observable`. That's why "**Higher Kinds**" (Higher Kinded Types) exist.
+Мы привыкли воспринимать обобщенные типы вроде `A` как абстракции. Нам это знакомо. Но правда в том, что мы можем также абстрагировать типы контейнеров вроде `Observable`. Для этого и существуют **Высшие типы**.
 
-The overall idea is that we can have constructs as `F<A>` , where both `F` and `A` can be generics. That syntax is not supported by the Kotlin compiler ([yet?](https://github.com/Kotlin/KEEP/pull/87)), so we need to mimic it by using a different approach.
+Идея в том, что у нас может быть конструктор вроде `F<A>` в котором и `F` и `A` могут быть параметризированным типом (generic). Этот синтаксис ещще не поддерживается компайлером Kotlin ([всё ещё?](https://github.com/Kotlin/KEEP/pull/87)), поэтому мы мимикрируем его подобным подходом.
 
-Arrow adds support to this by [using an intermediate meta interface called `Kind<F, A>`]({{ '/docs/patterns/glossary/#type-constructors' | relative_url }}) that holds references to both types and also generates converters at compile time on both directions, so we can go from `Kind<Observable, List<Task>>` to `Observable<List<Task>>` and vice versa. Not ideal, but works for what it's worth.
+Arrow поддерживает подобное через [использование посреднического (intermediate) мета интерфейса под названием `Kind<F, A>`]({{ '/docs/patterns/glossary/#type-constructors' | relative_url }}), который держит в себе ссылки на ооба типа и также генерирует конвертеры во времф компиляции в обоих направлениям таким образом, чтобы можно было проделать путь от `Kind<Observable, List<Task>>` до `Observable<List<Task>>` и наоборот. Не идеальная решение, зато рабочее. 
 
-So, if we take a look at our snippet again:
+Поэтому если мы снова посмотрим на следующий код:
 
 ```kotlin
 interface DataSource<F> {
@@ -178,11 +177,11 @@ interface DataSource<F> {
 }
 ```
 
-The `DataSource` function **returns a higher kind**: `Kind<F, List<Task>>` . It translates to `F<List<Task>>`, where `F` remains generic.
+Функция `DataSource` **возвращает высший тип**: `Kind<F, List<Task>>`. Он транслируется в `F<List<Task>>`, где `F` остается обобщенным.
 
-We're just fixing the `List<Task>` type here, which is already concrete. In other words, we don't care about what's the container type (`F`), as long as it keeps  a `List<Task>` inside. a.k.a: We leave the slot open **for passing in different containers**. Clear enough? Let's keep moving.
+Мы фиксируем в сигнатуре только`List<Task>`. Другими словами, нам всё равно, какой будет использован контейнер типа `F`, до тех пор, пока он содержит в себе `List<Task>`. Мы можем **передавать в функцию разные контейнеры данных**. Уже понятней? Идем дальше. 
 
-Let's take a look at the `DataSource` implementations, but this time separately for a more gradual learning. The local one first:
+Давай взглянем на имплементированные таким образом `DataSource`, но на этот раз на каждый по отдельности. Сначала на локальный: 
 
 ```kotlin
 class LocalDataSource<F>(A: ApplicativeError<F, Throwable>) : DataSource<F>, ApplicativeError<F, Throwable> by A {
@@ -198,12 +197,11 @@ class LocalDataSource<F>(A: ApplicativeError<F, Throwable>) : DataSource<F>, App
 }
 ```
 
-Bunch of new things? Don't be scared, let's go **step by step**.
+Добавилось много нового, разберем все **шаг за шагом**.
 
-This `DataSource` keeps the generic `F` since it implements `DataSource<F>` . We wanna be able to pass that type from 
-the outside, all the way down.
+Этот `DataSource` сохраняет обобщенный тип `F` т.к., имплементирует `DataSource<F>`. Мы хотим сохранить возможность передачи этого типа извне.
 
-Now, forget about that probably unfamiliar [`ApplicativeError`]({{ '/docs/arrow/typeclasses/applicativeerror' | relative_url }}) thing on the constructor, and focus on the `allTasksByUser()` function, just for now. We'll get back to that.
+Теперь, забудь о возможно незнакомой [`ApplicativeError`]({{ '/docs/arrow/typeclasses/applicativeerror' | relative_url }}) в конструкторе и сфокусируйся на функции `allTasksByUser()`. А к `ApplicativeError` мы еще вернемся.
 
 ```kotlin
 override fun allTasksByUser(user: User): Kind<F, List<Task>> =
@@ -213,15 +211,15 @@ override fun allTasksByUser(user: User): Kind<F, List<Task>> =
     )
 ```
 
-As you see, it returns (one more time) `Kind<F, List<Task>>`. So we still don't care about what the container `F` is, as long as it contains a `List<Task>`.
+Как видишь она возвращает `Kind<F, List<Task>>`. Нам по прежнему все равно какой контейнер `F` если он содержит `List<Task>`.
 
-But we have a problem. Depending on whether we can find the `Tasks` for the given user on the local cache or not, we might want to **notify an error** (`Tasks` not found), or **return the Tasks already wrapped into `F`** (`Tasks` found).
+Но есть проблема. В зависимости от того, можем ли мы найти `Tasks` для нужного пользователя в локальном хранилище или нет, мы хотим **сообщить о ошибке** (`Tasks` не найдены) или **вернуть `Tasks` уже обернутыми в `F` (`Tasks` найдены). 
 
-And for both things we must return: `Kind<F, List<Task>>`.
+И для обоих случаем нам надо вернуть: `Kind<F, List<Task>>`.
 
-In other words: there's a type **we still don't know anything about: `F`** and we need a way to return an error wrapped into it, and also a way to construct an instance of it wrapping a successful value. Sounds impossible?. 
+Другими словами: есть тип **о котором мы ничего не знаем: `F`** и нам нужен способ возвращения ошибки, завернутой в этот тип и нам нужен способ создания инстанса этого типа, в который будет завернуто значение, полученное после успешного заверщения функции. Звучит как что-то невозможное?
 
-Let's go back to the class declaration and find that [`ApplicativeError`]({{ '/docs/arrow/typeclasses/applicativeerror' | relative_url }}) being passed on construction and then used as a delegate for the class (`by A`).
+Давай вернемся к декларации класса и обратим внимание что [`ApplicativeError`]({{ '/docs/arrow/typeclasses/applicativeerror' | relative_url }}) передается в конструктор и потом используется как делегат для класса (`by A`).
 
 ```kotlin
 class LocalDataSource<F>(A: ApplicativeError<F, Throwable>) : DataSource<F>, ApplicativeError<F, Throwable> by A {
@@ -229,26 +227,25 @@ class LocalDataSource<F>(A: ApplicativeError<F, Throwable>) : DataSource<F>, App
 }
 ```
 
-[`ApplicativeError`]({{ '/docs/arrow/typeclasses/applicativeerror' | relative_url }}) extends from [`Applicative`]({{ '/docs/arrow/typeclasses/applicative' | relative_url }}), and both are [**Typeclasses**]({{ '/docs/typeclasses/intro' | relative_url }}).
+[`ApplicativeError`]({{ '/docs/arrow/typeclasses/applicativeerror' | relative_url }}) наследуется от [`Applicative`]({{ '/docs/arrow/typeclasses/applicative' | relative_url }}), они оба - [**Классы типа**]({{ '/docs/typeclasses/intro' | relative_url }}).
 
-**Typeclasses define behaviors (contracts)**. They're basically encoded as interfaces that work over a generic argument, as in [`Monad<F>`]({{ '/docs/arrow/typeclasses/monad' | relative_url }}) , [`Functor<F>`]({{ '/docs/arrow/typeclasses/functor' | relative_url }}) and many more. That `F` is the data type. So we will be able to pass types like [`Either`]({{ '/docs/arrow/core/either' |  relative_url }}), [`Option`]({{ '/docs/arrow/core/option' | relative_url }}), [`IO`]({{ '/docs/effects/io' | relative_url }}), [`Observable`]({{ '/docs/integrations/rx2' | relative_url }}),
-[`Flowable`]({{ '/docs/integrations/rx2' | relative_url }}) and many more for it.
+**Классы типа определяют поведения (контракты)**. Они в общем-то закодированы как интерфейсы которые работают с аргументами в виде обобщенных типов, как в [`Monad<F>`]({{ '/docs/arrow/typeclasses/monad' | relative_url }}) , [`Functor<F>`]({{ '/docs/arrow/typeclasses/functor' | relative_url }}) и многих других. Этот `F` является типом данных. Таким образом мы можем передать типы вроде [`Either`]({{ '/docs/arrow/core/either' |  relative_url }}), [`Option`]({{ '/docs/arrow/core/option' | relative_url }}), [`IO`]({{ '/docs/effects/io' | relative_url }}), [`Observable`]({{ '/docs/integrations/rx2' | relative_url }}), [`Flowable`]({{ '/docs/integrations/rx2' | relative_url }}) и множество других.
 
-Don't worry if you don't know about some of them yet. Data types like `Either`, `Option` or `IO` are particular from Functional Programming and you probably don't need to know more about them yet.
+Не беспокойся, если какие-то из них тебе еще не известны. Типы данных вроде `Either`, `Option` или `IO` пришли из функционального программирования и это нормально, если ты о них еще не слышал.
 
-So, back to our two problems:
+Итак, вернемся к двум нашим проблемам:
 
-* **Wrapping a successful value into an instance of `Kind<F, List<Task>>`**
+* **Обернуть значение, полученное после успешного завершения функции в `Kind<F, List<Task>>`**
 
-We can rely on a typeclass for this: [`Applicative`]({{ '/docs/arrow/typeclasses/applicative' | relative_url }}). Since [`ApplicativeError`]({{ '/docs/arrow/typeclasses/applicativeerror' | relative_url }}) extends from it, we can delegate to it. We're delegating our class on it, so we can use its features out of the box.
+Для этого мы можем использовать класс типа [`Applicative`]({{ '/docs/arrow/typeclasses/applicative' | relative_url }}). Т.к., [`ApplicativeError`]({{ '/docs/arrow/typeclasses/applicativeerror' | relative_url }}) наследутеся от него, мы можем сделать его делегатом delegate to it. Мы делегируем наш класс в него, чтобы использовать его свойства out of the box.
 
-[`Applicative`]({{ '/docs/arrow/typeclasses/applicative' | relative_url }}) provides the `just(a)` function. `just(a)` **wraps a value into the context of any Higher Kind**. So If we have an `Applicative<F>`, it could call `just(a)` to wrap the value into the container `F`, regardless of which one is it. Let's say it's `Observable`, we'll have an `Applicative<Observable>`, which will know how to wrap `a` into an `Observable` like `Observable.just(a)`.
+[`Applicative`]({{ '/docs/arrow/typeclasses/applicative' | relative_url }}) просто предоставляет функцию `just(a)`. `just(a)` **оборачивает значение в контекст любого высшего типа**. Таким образом, если у нас есть `Applicative<F>`, он может вызвать `just(a)`, чтобы обернуть значение в контейнер `F`, каким бы это значение не было. Допустим, мы используем `Observable`, у нас будет `Applicative<Observable>`, который знает, как обернуть `a` в `Observable`, чтобы в итоге получить `Observable.just(a)`.
 
-* **Wrapping an error into an instance of `Kind<F, List<Task>>`**
+* **Обернуть ошибку в инстанс `Kind<F, List<Task>>`**
 
-We can use [`ApplicativeError`]({{ '/docs/arrow/typeclasses/applicativeerror' | relative_url }}) for that. It brings the function `raiseError(e)` into scope. `raiseError(e)` basically wraps an error into the `F` container. For the `Observable` example, raising the error would end up doing something like `Observable.error<A>(t)`, where `t` is a `Throwable`, since we're declaring our error type when we declare the typeclass as `ApplicativeError<F, Throwable>`.
+Для этого мы можем использовать [`ApplicativeError`]({{ '/docs/arrow/typeclasses/applicativeerror' | relative_url }}). Он предоставляет функцию `raiseError(e)`, которая оборачивает ошибку в контейнер типа `F`. Для примера с `Observable`, появление ошибки создаст что-то вроде `Observable.error<A>(t)`, где `t` это `Throwable`, раз мы задекларировали наштип ошибки в виде класса типа `ApplicativeError<F, Throwable>`.
 
-Let's get back to our abstracted `LocalDataSource<F>` implementation.
+Посмотрим на нашу абстрактную имплементацию `LocalDataSource<F>`.
 
 ```kotlin
 class LocalDataSource<F>(A: ApplicativeError<F, Throwable>) : 
@@ -265,16 +262,15 @@ class LocalDataSource<F>(A: ApplicativeError<F, Throwable>) :
 }
 ```
 
-The in memory map remains the same, but the function does a couple things probably new to you:
+Сохраненная в память map осталась той же, но теперь функция делает пару вещей, которые могут быть для тебя новыми:
 
-* It tries to load the `Tasks` from the local cache, and since that returns a nullable (because the `Tasks` could not be found), we are going to model that using an [`Option`]({{ '/docs/arrow/core/option' | relative_url }}). In case you're not aware of how [`Option`]({{ '/docs/arrow/core/option' | relative_url }}) works, it models presence vs absence of a value. A value that is wrapped inside of it.
+* Она прообует загрузить `Tasks` из локального кэша и т.к., возвращаемое значение может быть null (`Tasks` могут быть не найдены), мы моделируем это через использование [`Option`]({{ '/docs/arrow/core/option/ru' | relative_url }}). Если непонятно, как работает [`Option`]({{ '/docs/arrow/core/option/ru' | relative_url }}), то он моделирует присутствие или отсутствие значения, которое в него завернуто.
 
-* After getting our optional value, we `fold` over it. Folding is just equivalent to a when statement over the optional value. When it's **absent**, it wraps an error into the `F` data type (first lambda passed in). And when it's **present** it constructs an instance of the `F` data type wrapping it (second lambda). For both cases, it uses the [`ApplicativeError`]({{ '/docs/arrow/typeclasses/applicativeerror' | relative_url }}) features mentioned before:
-`raiseError()` and `just()`.
+* После получения опционального значения, мы вызываем поверх него `fold`. Это эквивалент when statement над опциональным значением. Если значение **отсутствует**, то `Option` оборвачивает ошибку в тип данных `F` (первая переданная лямбда). А если значение **присутствует** `Option` создает инстанс обертки для типа данных `F` (вторая лямбда). В обоих случаях используются свойства [`ApplicativeError`]({{ '/docs/arrow/typeclasses/applicativeerror' | relative_url }}) упомянутые до этого: `raiseError()` and `just()`.
 
-With this, we've basically abstracted away our data source implementation so it doesn't know about which container it's using for the type `F`. And we have been able to do it thanks to the abstractions defined by the typeclasses.
+Таким образом мы абстрагировали имплементации источников данных с помощью классов типа таким образом, что они не знают какой контейнер будет использован для используемого типа `F`. 
 
-The network `DataSource` implementation would look similar:
+Имплеметация сетевого `DataSource` выглядит схожим образом:
 
 ```kotlin
 class RemoteDataSource<F>(A: Async<F>) : DataSource<F>, Async<F> by A {
@@ -291,13 +287,13 @@ class RemoteDataSource<F>(A: Async<F>) : DataSource<F>, Async<F> by A {
 }
 ```
 
-This time there's a subtle difference: Instead of delegating into an instance of [`ApplicativeError`]({{ '/docs/arrow/typeclasses/applicativeerror' | relative_url }}) as before, we'll use a different typeclass: [`Async`]({{ '/docs/effects/async/' | relative_url }}).
+Но есть одно небольшое различие: вместо делегирования в инстанс [`ApplicativeError`]({{ '/docs/arrow/typeclasses/applicativeerror' | relative_url }}) как прежде, мы используем другой класс типа: [`Async`]({{ '/docs/effects/async/' | relative_url }}).
 
-That's because of the asynchronous nature of a network call. We want to code it in an asynchronous way, so we'll delegate its async requirements into a typeclass that is thought for it.
+Это делается из-за того, что сетевые вызовы асинхронны по своей природе. Мы хотим написать код, который будет исполняться асинхронно, чтобы делегировать асинхронные требования в класс типа, предназначенный для этого.
 
-[`Async`]({{ '/docs/effects/async/' | relative_url }}) models asynchronous operations. So it's able to model any operations that are based on callbacks. Note that we still don't know about the concrete data types to use, but about the problem, which **is asynchronous by nature**. Therefore we use a Typeclass that encodes that problematic to solve it.
+[`Async`]({{ '/docs/effects/async/' | relative_url }}) используется для моделирвоания асинхронных операция. Он может моделировать любую операцию основанную на колбеках. Заметим, что нам все еще неизвестны конкретные типы данных, которые будут использоваться, но мы решили задачу **асинхронную по природе**.  
 
-So, zooming in a bit into the function:
+Ближе рассмотрим следующую функцию:
 
 ```kotlin
 override fun allTasksByUser(user: User): Kind<F, List<Task>> =
@@ -309,15 +305,15 @@ override fun allTasksByUser(user: User): Kind<F, List<Task>> =
     }
 ```
 
-We can use the `async {}` function provided by the [`Async`]({{ '/docs/effects/async/' | relative_url }}) typeclass to model our operation and create an instance of the type `Kind<F, List<Task>>` that will be resolved asynchronously.
+Мы можем использовать функцию `async {}`, которую нам предоставляет класс типа [`Async`]({{ '/docs/effects/async/' | relative_url }}) для моделирования операции и создать инстанс типа `Kind<F, List<Task>>` который будет создан асинхронно.
 
-If we were using a fixed data type like `Observable`, `Async.async {}` would be equivalent to `Observable.create()`, in terms of building up an operation that can be bridged from synchronous or asynchronous code, i.e. `Thread` or `AsyncTask`.
+Если бы мы использовали фиксированных тип данных вроде `Observable`, `Async.async {}` был бы эквивалентен `Observable.create()`, создание операции которая может быть вызвана из синхронного или асинхронного кода, например `Thread` или `AsyncTask`.
 
-The `callback` parameter is used to wire back the real resulting callbacks into the `F` container (higher kind type) context.
+Параметр `callback` используется для связки результирующих колбеков в контекст контейнера `F`, который является высшим типом.
 
-With this we have our `RemoteDataSource` also abstracted away and depending on a still unknown container type `F`.
+Таким образом наш `RemoteDataSource` абстрагирован и зависит от всё ещё неизвестного контейнера типа `F`.
 
-Let's go up one level to take a look at the repo. If you can remember, we need to search for the user `Tasks` on the `LocalDataSource` first, and if they're not available, try to fetch them from the `RemoteLocalDataSource`.
+Поднимемся на уровень выше при взгляде на наш репозиторий. Если ты помнишшь, сначала нам необохдимо выполнить поиск объектов `Tasks` в `LocalDataSource`, и только затем (если их не было найдено локально) запросить их из `RemoteLocalDataSource`.
 
 ```kotlin
 class TaskRepository<F>(
@@ -335,17 +331,17 @@ class TaskRepository<F>(
 }
 ```
 
-[`ApplicativeError<F, Throwable>`]({{ '/docs/arrow/typeclasses/applicativeerror/' | relative_url }}) is back! It also brings an extension function into scope called `handleErrorWith()` that works over any Higher Kind receiver.
+[`ApplicativeError<F, Throwable>`]({{ '/docs/arrow/typeclasses/applicativeerror/' | relative_url }}) снова с нами! Он также предоставляет функцию `handleErrorWith()`, которая работает поверх любого ресивера высшего типа.
 
-It's encoded like:
+Выглядит так:
 
 ```kotlin
 fun <A> Kind<F, A>.handleErrorWith(f: (E) -> Kind<F, A>): Kind<F, A>
 ```
 
-Since the call `localDS.allTasksByUser(user)` returns `Kind<F, List<Task>>`, which would stand for `F<List<Task>>` where `F` remains generic, we can call the `handleErrorWith()` function on top of it.
+Т.к., `localDS.allTasksByUser(user)` возвращает `Kind<F, List<Task>>`, который можно рассматривать как `F<List<Task>>`, где `F` остается обобщенным типом, мы можем вызвать `handleErrorWith()` поверх него.
 
-`handleErrorWith()` allows you to react to errors using the passed in lambda. Let's zoom in to the function:
+`handleErrorWith()` позволяет реагировать на ошибки используя переданную лямбду. Рассмотрим функцию поближе:
 
 ```kotlin
 fun allTasksByUser(user: User): Kind<F, List<Task>> =
@@ -357,9 +353,9 @@ fun allTasksByUser(user: User): Kind<F, List<Task>> =
     }
 ```
 
-So we basically get back the result of the first operation unless it throws an exception, which will be handled by the lambda block. In case the error has the type `UserNotInLocalStorage`, we try to search for the `Tasks` on the remote `DataSource`. In any other cases, we raise (wrap) an unknown error into the `F` container type.
+Таким образом мы получаем результат первой операции за исключением случаев, когда было брошено исключение. Исключение будет обработано лямбдой. В случае если ошибка принадлежит к типу `UserNotInLocalStorage`, мы попробуем найти объекты типа `Tasks` в дистанционном `DataSource`. Во всех остальных случаях мы оборачиваем неизвестную ошибку в контейнер типа `F`.
 
-The dependency provisioning module remains very similar:
+Модуль предоставлени зависимости остается очень похожим на прошлую версию:
 
 ```kotlin
 class Module<F>(A: Async<F>) {
@@ -370,15 +366,15 @@ class Module<F>(A: Async<F>) {
 }
 ```
 
-The only difference is that now it's abstracted away and depends on `F`, which stays polymorphic. I've intentionally obviated this before to avoid noise, but [`Async`]({{ '/docs/effects/async/' | relative_url }}) ultimately extends from [`ApplicativeError`]({{ '/docs/arrow/typeclasses/applicativeerror/' | relative_url }}), so we can use an instance of it to solve the concerns we have at all the nested levels, and pass it all the way down as you can see on the module.
+Единественное отличие — теперь он абстрактен и зависит от `F`, которая остается полиморфной. Я осознанно не уделил этому внимание, чтобы снизить уровень шума, но [`Async`]({{ '/docs/effects/async/' | relative_url }}) наследуется от [`ApplicativeError`]({{ '/docs/arrow/typeclasses/applicativeerror/' | relative_url }}), поэтому может быть использован как его инстанс для разрешения concerns на всех вложенных уровнях и передать it all the way down as you can see on the module.
 
-### Testing polymorphism
+### Тестируя полиморфизм
 
-We have finally got to the point where **our complete app is abstracted away from any concrete data type containers** (`F`) and we can focus on testing its polymorphism using the runtime. We'll test the same code passing in different data types for the type `F`. The scenario is the same we had when we were plainly using `Observable`.
+Наконец-то наше приложение **полностью абстрагировано от использования конкрентных типов данных для контейнеров (`F`) и мы можем сфокусироваться на тестировании полиформизма в рантайме. Мы протестируем один и тот же участок кода передавая в него различные типы данных для типа `F`. Сценарий тот же самый, как когда мы испльзовали `Observable`.
 
-We're now in the program's edge, where we are already out of any abstraction boundaries, and where we are in charge to pass in the implementation details.
+Программа написана таким образом, что мы полностью избавились от границ абстракций и можем передавать детали имплементации, как пожелается.
 
-Let's use RxJava `Single` as the container `F` to start with.
+Для начала давай использовать `Single` из RxJava в качестве контейнера для `F`.
 
 ```kotlin
 object test {
@@ -399,9 +395,9 @@ object test {
 }
 ```
 
-Arrow provides wrappers over some well known library data types for compatibility, so there's a handy [`SingleK`]({{ '/docs/integrations/rx2/' | relative_url }}) wrapper available for it. These wrappers **enable the data types as Higher Kinds** to be able to use them with typeclasses.
+Совместимости ради Arrow предоставляет обертки для известных библиотечных типов данных. Например, есть удобная обертка [`SingleK`]({{ '/docs/integrations/rx2/' | relative_url }}). Эти обертки **позволяют использовать классы типа совместно с типами данных как высшими типами**.
 
-This test will print:
+На консоль будет выведено следующее:
 
 ```
 [Task(value=LocalTask assigned to user1)]
@@ -409,9 +405,9 @@ This test will print:
 UserNotInRemoteStorage(user=User(userId=UserId(value=unknown user)))
 ```
 
-Same results than the one using a fixed `Observable`. 🎉
+Тот же результат будет, если использовать `Observable`. 🎉
 
-Let's move on to `Maybe`, for which we have a [`MaybeK`]({{ '/docs/integrations/rx2/' | relative_url }}) wrapper also:
+Теперь поработаем с `Maybe`, для которой доступна обертка [`MaybeK`]({{ '/docs/integrations/rx2/' | relative_url }}):
 
 ```kotlin
 @JvmStatic
@@ -429,7 +425,7 @@ fun main(args: Array<String>): Unit {
 }
 ```
 
-Same result is printed, but this time running using a different data type:
+На консоль будет выведен тот же результат, но теперь с использованее другого типа данных:
 
 ```kotlin
 [Task(value=LocalTask assigned to user1)]
@@ -437,8 +433,8 @@ Same result is printed, but this time running using a different data type:
 UserNotInRemoteStorage(user=User(userId=UserId(value=unknown user)))
 ```
 
-What about [`ObservableK`]({{ '/docs/integrations/rx2/' | relative_url }}) / [`FlowableK`]({{ '/docs/integrations/rx2/' | relative_url }})
-? Let's try:
+Что насчет [`ObservableK`]({{ '/docs/integrations/rx2/' | relative_url }}) / [`FlowableK`]({{ '/docs/integrations/rx2/' | relative_url }})? 
+Давай попробуем:
 
 ```kotlin
 object test {
@@ -466,7 +462,7 @@ object test {
 }
 ```
 
-Printing:
+Увидим в консоли:
 
 ```
 [Task(value=LocalTask assigned to user1)]
@@ -478,10 +474,10 @@ UserNotInRemoteStorage(user=User(userId=UserId(value=unknown user)))
 UserNotInRemoteStorage(user=User(userId=UserId(value=unknown user)))
 ```
 
-Everything working as expected. 💪
+всё работает, как и ожидалось. 💪
 
-Let's try the [`DeferredK`]({{ '/docs/integrations/kotlinxcoroutines/' | relative_url }}) wrapper for the 
-`kotlinx.coroutines.Deferred` type:
+Давай попробуем использовать [`DeferredK`]({{ '/docs/integrations/kotlinxcoroutines/' | relative_url }}) обертку для типа 
+`kotlinx.coroutines.Deferred`:
 
 ```kotlin
 object test {
@@ -508,9 +504,9 @@ object test {
 }
 ```
 
-As you know, you're in charge to catch exceptions on coroutines. As you can see, implementation details as this catch, or the observable subscriptions from previous examples, are implementation details related to the given data types being used for each case, so those must live here, in the program's edge.
+Как известно, за обработку исключений в корутинах ответственнен программист. Как видишь такие детали имплементации (такие, как обработка исключения) зависят от используемого типа данных, а поэтому и определяются на высшем уровне абстракции.
 
-Same result one more time:
+Еще раз — тот же результат:
 
 ```
 [Task(value=LocalTask assigned to user1)]
@@ -518,7 +514,7 @@ Same result one more time:
 UserNotInRemoteStorage(user=User(userId=UserId(value=unknown user)))
 ```
 
-There's also an alternative api provided by Arrow a bit more fancier for [`DeferredK`]({{ '/docs/integrations/kotlinxcoroutines/' | relative_url }}). It takes care of runBlocking and awaiting on the operations for you:
+В Arrow есть альтернжативное api для более утонченного использования [`DeferredK`]({{ '/docs/integrations/kotlinxcoroutines/' | relative_url }}). Оно берет заботу о `runBlocking` и отложенных операций на себя:
 
 ```kotlin
 object test {
@@ -539,7 +535,7 @@ object test {
 }
 ```
 
-This one wraps the result into [`Try`]({{ '/docs/arrow/core/try' | relative_url }}) (which can be `Success` or `Failure`).
+Пример выше оборачивает результат в [`Try`]({{ '/docs/arrow/core/try/ru' | relative_url }}) (т.е., может быть`Success` или  `Failure`).
 
 ```
 Success(value=[Task(value=LocalTask assigned to user1)])
@@ -547,8 +543,8 @@ Success(value=[Task(value=Remote Task assigned to user2)])
 Failure(exception=UserNotInRemoteStorage(user=User(userId=UserId(value=unknown user))))
 ```
 
-Finally, let's use a more fancy data type related to Functional Programming: [`IO`]({{ '/docs/effects/io' | relative_url }}). 
-`IO` exists to wrap an in/out operation that causes side effects and make it pure.
+Напоследок, давай попробуем использовать известный в мире ФП тип данных [`IO`]({{ '/docs/effects/io' | relative_url }}). 
+`IO` существует, чтобы оборачивать in/out операции, которые привносят в код эффекты и делать эти операции чистыми.
 
 ```kotlin
 object test {
@@ -575,46 +571,42 @@ Right(b=[Task(value=Remote Task assigned to user2)])
 Left(a=UserNotInRemoteStorage(user=User(userId=UserId(value=unknown user))))
 ```
 
-[`IO`]({{ '/docs/effects/io' | relative_url }}) is a bit special. It returns the errors / successful results using [`Either<L,R>`]({{ '/docs/arrow/core/either' | relative_url }}) (which is another data type). By convention, the "left" side of an either (`L`) stores the errors, and the right side (`R`) stores the successful data. That's why successful results are printed as `Right(...)` and the failing one is printed as `Left(...)`.
+[`IO`]({{ '/docs/effects/io' | relative_url }}) - особенный случай. Он возвращает ошибки или результат успешного выполнения с помощью [`Either<L,R>`]({{ '/docs/arrow/core/either' | relative_url }}) (это другой тип данных). По конвенции, "левая" сторона `Either` содержит в себе ошибки, а "правая" хранит в себе данные, полученные в случае успеха. Именно поэтому результат успеха будет выведен в консоли как `Right(...)`, а неудача, как `Left(...)`.
 
-But the result is conceptually the same.
+Но концептуально результат будет тем же.
 
-And with this, we are done with all the testing. As you can see we are able to run the same code stack using different data types, so our program has become complete agnostic of those.
+Всё, с тестированием покончено. Как ты видишь, мы смогли переиспользовать один и тот же участок кода, передавая в него различные типы данных, что сделало нашу программу полностью независимой от использования конкретного типа данных. 
 
-[Here you have the polymorphic app all together](https://gist.github.com/JorgeCastilloPrz/c0a4604b9a5dedc89be82b13cfcc1315) for copy / paste purposes.
+[Код полностью полиморфического приложения можно найти здесь](https://gist.github.com/JorgeCastilloPrz/c0a4604b9a5dedc89be82b13cfcc1315).
 
-### This is cool but... why should I?
+### Всё это отлично звучит...но стоит ли оно того?
 
-That's always your choice, but there are some important benefits that FP brings to the table that you'll need to know when the time comes.
+Выбор всегда за тобой, но есть определенные преимущества, которые ФП привносит в кодовую базу. И о них полезно знать.
 
-* You have a really clear separation of concerns: How the data is operated and composed (your actual program) vs the runtime. This means **better testability**.
+* В итоге мы получаем полное разделение ответственностей: то, как дата обрабатывается и композируется (собственно, твоя программа) и отдельно — рантайм. Это означает **упрощение тестирования**.
 
-* Your programs would ideally target abstractions so you have the choice on how to implement them depending on your needs / environments (i.e: testing). That's ultimately a DI related concept, so for sure you can do that without the need for FP. Said that, the FP approach leads you to program in such a way that is less prone to break this "principle".
-That's because there's a clearly defined boundary between the declarative algebras (operations) and the runtime (types 
-used to run it), where the details are.
+* Твоя программа так или иначе будет подразумевать использование абстракций, подоходящих под её задачи. Поэтому естественно она может быть написана без использования ФП. Но средства ФП позволяют разделить декларативные вычисления (операции) от рантайма и типов, им используемых, именно там, где важны детали. 
 
-* Composing your program algebras (operations) based on abstractions allows to keep your codebase deterministic and free of unexpected effects (pure). If you want to know more about purity and why pure code is less prone to errors or unexpected behaviours, [take a look at this post](https://medium.com/@JorgeCastilloPr/kotlin-functional-programming-does-it-make-sense-36ad07e6bacf).
+* Композирование твоей программы с помощью алгебр (операций) основанных на абстракциях позволяет твоей сохранить твою кодовую базу детерминированной и свободной от эффектов (чистота). Если хочется узнать больше о чистоте кода и тому, как это помогает избежать ошибок или неожиданного поведения [можно взглянуть на этот пост](https://medium.com/@JorgeCastilloPr/kotlin-functional-programming-does-it-make-sense-36ad07e6bacf).
 
-* Following the previous point, your program side effects are controlled at the edge. Effects are caused by implementation details passed from a single point on the system. (Anything beyond the edge boundaries remains pure).
+* В продолжение сказанного, все сторонние эффекты твоей программы контролируются на высшем уровне абстракции. Эффекты, вызванные деталями имплементации приходят в исполнение программы из единой точки системы (вне высшего уровня программы всё остается чистым). 
 
-* If you chose to just work with [Typeclasses]({{ '/docs/typeclasses/intro' | relative_url }}), you'll get a unified API for all the data types. Repeatability helps to get familiarized with the concepts. (Repeatability as in just using operations like `map`, `flatMap`, `fold`, all the way, regardless of the problem you're solving. Of course that's constrained to using some libraries that enable pure FP over Kotlin and provide those operations and constructs, like
-Arrow.
+* Если ты решишь работать с [классами типа]({{ '/docs/typeclasses/intro' | relative_url }}), то итогом этого станет унифицированное API для всех возможных типов данных. Воспроизводимость способствует глубокому пониманию изначальных концептов (воспроизводимость в данном случае это использование операций вроде `map`, `flatMap`, `fold`, во всех случаях вне зависимости от решаемой проблемы). Естественно, тут многое зависит от билиотек, которые позволяют писать функциональные программы средствами Kotlin, и Arrow - одна из них.
 
-* These patterns **remove the need for specific DI frameworks**, since they're based on the same concepts of Dependency Injection out of the box. You're always able to provide implementation details later on and switch them transparently, and before that moment your program is not tied to any "side-effecty" details. This approach could be considered DI by itself actually, since it's based on targeting abstractions leaving details to be passed form a single point in the
-edge.
+* Эти паттерны **убирают нужду в конкретном фреймворке для реализации DI (инъекции зависимостей)**, т.к., поддерживают все концепци DI "из коробки". За тобой оставется свобода предоставления деталей имплементации чуть позже, эти же детали могут быть заменены с большей прозрачностью, и до этого момента твоя программа не привязана ни к каким деталям сторонним эффектам. Этот подход можно рассматривать как собственно говоря DI, т.к., он основан на предоставлении абстракций, детали имплементации которых предоставляются из верхнего уровня абстракции. 
 
-* As a final conclusion, I'd suggest you to use the approach that fits better your needs. Functional Programming is not going to solve all your problems, since there are not silver bullets, but it's a totally legit choice which brings a bunch of key benefits.
+* В качестве заключения, я бы предложил использовать подход, более подходящий под конкретную задачу. ФП не решит всех твоих проблем, т.к., не существует серебрянной пули, но оно является проверенным временем подходом с кучей преимуществ.
 
-### Related links
+### Дополнительно
 
-If you want to move further on **typeclasses**, you can [read the docs section about them]({{ '/docs/typeclasses/intro' | relative_url }}). 
-Still I'll be happy if you got to understand that **they're used as contracts to compose our polymorphic programs based on abstraction** thanks to this post.
+Если хочется ближе ознакомиться с **классами типа**, это можно сделать [в документации по ним]({{ '/docs/typeclasses/intro' | relative_url }}). 
+Я буду рад, если после прочтения статьи у тебя уложиться в голове, что **они используются как контакрыт для композиции полиморфических программ основанных на абстракции**.
 
-If you still have any doubts, please don't hesitate to contact me. The fastest way to do it is my Twitter handle: [@JorgeCastilloPR](https://www.twitter.com/JorgeCastilloPR).
+Если есть сомнения, незамедлительно связывайся со мной. Наиболее быстрый способ связи - через мой Twitter: [@JorgeCastilloPR](https://www.twitter.com/JorgeCastilloPR).
 
-Some of the mentioned concepts like purity are described in the following blogposts:
+Некоторые из озвученных концепций (например, чистота функций) описаны в следующих постах:
 
-* [Kotlin Functional Programming: Does it make sense?](https://medium.com/@JorgeCastilloPr/kotlin-functional-programming-does-it-make-sense-36ad07e6bacf) by [Jorge Castillo](https://www.twitter.com/JorgeCastilloPR))
-* [Kotlin purity and Function Memoization](https://medium.com/@JorgeCastilloPr/kotlin-purity-and-function-memoization-b12ab35d70a5) by [Jorge Castillo](https://www.twitter.com/JorgeCastilloPR))
+* [Kotlin Functional Programming: Does it make sense?](https://medium.com/@JorgeCastilloPr/kotlin-functional-programming-does-it-make-sense-36ad07e6bacf) от [Jorge Castillo](https://www.twitter.com/JorgeCastilloPR))
+* [Kotlin purity and Function Memoization](https://medium.com/@JorgeCastilloPr/kotlin-purity-and-function-memoization-b12ab35d70a5) от [Jorge Castillo](https://www.twitter.com/JorgeCastilloPR))
 
-Also, consider watching [FP to the max](https://youtu.be/sxudIMiOo68) by [John De Goes](https://twitter.com/jdegoes) and the related `FpToTheMax.kt` example located in the `arrow-examples` module. This technique may seem to be a huge overhead on such a small example, but it is meant to be used at scale.
+Также советую посмотреть видео [FP to the max](https://youtu.be/sxudIMiOo68) от [John De Goes](https://twitter.com/jdegoes) и ознакомиться с примером `FpToTheMax.kt`, расположенным в модуле `arrow-examples`. Использование данной техники может показаться чрезмерным для такого простого примера, но это потмоу, что она должна быть использована на праграммах намного большего масштаба.
