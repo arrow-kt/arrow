@@ -74,12 +74,13 @@ sealed class Eval<out A> : EvalOf<A> {
      * @param a is an already computed value of type [A]
      *
      * ```kotlin:ank
-     * import arrow.*
      * import arrow.core.*
      *
      * val eager = Eval.now(1).map { it + 1 }
      * eager.value()
      * ```
+     *
+     * It will return 2.
      */
     fun <A> now(a: A) = Now(a)
     /**
@@ -88,7 +89,6 @@ sealed class Eval<out A> : EvalOf<A> {
      * @param f is a function or computation that will be called only once when `.value()` is invoked for the first time.
      *
      * ```kotlin:ank
-     * import arrow.*
      * import arrow.core.*
      *
      * val lazyEvaled = Eval.later { "expensive computation" }
@@ -104,13 +104,13 @@ sealed class Eval<out A> : EvalOf<A> {
      * @param f is a function or computation that will be called every time `.value()` is invoked.
      *
      * ```kotlin:ank
-     * import arrow.*
      * import arrow.core.*
      *
      * val alwaysEvaled = Eval.always { "expensive computation" }
      * alwaysEvaled.value()
      * ```
      *
+     * "expensive computation" is computed every time `value()` is invoked.
      */
     fun <A> always(f: () -> A) = Always(f)
 
