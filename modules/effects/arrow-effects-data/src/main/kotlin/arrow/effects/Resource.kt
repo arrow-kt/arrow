@@ -15,7 +15,6 @@ import arrow.typeclasses.Semigroup
  * When a resource is created one can make use of [invoke] to run a computation with the resource. The finalizers are then
  *  guaranteed to run afterwards in reverse order of acquisition.
  **/
-@documented
 @higherkind
 interface Resource<F, E, A> : ResourceOf<F, E, A> {
 
