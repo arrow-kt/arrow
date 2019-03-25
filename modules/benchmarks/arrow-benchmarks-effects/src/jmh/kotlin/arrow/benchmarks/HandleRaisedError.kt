@@ -11,6 +11,7 @@ import kotlinx.coroutines.runBlocking
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
 import arrow.effects.extensions.fx.unsafeRun.runBlocking as fxRunBlocking
+import arrow.effects.extensions.fx2.fx.unsafeRun.runBlocking as fx2RunBlocking
 
 @State(Scope.Thread)
 @Fork(2)
@@ -50,6 +51,16 @@ open class HandleRaisedError {
   fun fx(): Int =
     unsafe { fxRunBlocking { Fx { fxErrorRaisedloop(0) } } }
 
+  @Benchmark
+  fun fx2(): Int =
+    unsafe {
+      fx2RunBlocking {
+        arrow.effects.suspended.fx2.Fx {
+          fxErrorRaisedloop(0)
+        }
+      }
+    }
+
   private tailrec suspend fun fxDirectErrorRaisedLoop(i: Int): Int =
     if (i < size) {
       val result = try {
@@ -64,6 +75,16 @@ open class HandleRaisedError {
   @Benchmark
   fun fxDirect(): Int =
     unsafe { fxRunBlocking { Fx { fxDirectErrorRaisedLoop(0) } } }
+
+  @Benchmark
+  fun fx2Direct(): Int =
+    unsafe {
+      fx2RunBlocking {
+        arrow.effects.suspended.fx2.Fx {
+          fxDirectErrorRaisedLoop(0)
+        }
+      }
+    }
 
   @Benchmark
   fun kotlinXCoroutinesDirect(): Int =

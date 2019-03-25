@@ -10,6 +10,7 @@ import arrow.unsafe
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
 import arrow.effects.extensions.io.unsafeRun.runBlocking as ioRunBlocking
+import arrow.effects.extensions.fx2.fx.unsafeRun.runBlocking as fx2RunBlocking
 
 @State(Scope.Thread)
 @Fork(2)
@@ -41,6 +42,14 @@ open class Bracket {
     unsafe {
       runBlocking {
         Fx { bracketLoop(0) }
+      }
+    }
+
+  @Benchmark
+  fun fx2() =
+    unsafe {
+      fx2RunBlocking {
+        arrow.effects.suspended.fx2.Fx { bracketLoop(0) }
       }
     }
 

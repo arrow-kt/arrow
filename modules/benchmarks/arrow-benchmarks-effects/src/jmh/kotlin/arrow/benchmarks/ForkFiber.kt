@@ -13,6 +13,7 @@ import arrow.effects.extensions.io.fx.fx as ioFx
 import arrow.effects.extensions.io.unsafeRun.runBlocking as ioRunBlocking
 import arrow.effects.extensions.startFiber as fxStartFiber
 import arrow.effects.extensions.fx.unsafeRun.runBlocking as fxRunBlocking
+import arrow.effects.extensions.fx2.fx.unsafeRun.runBlocking as fx2RunBlocking
 
 @State(Scope.Thread)
 @Fork(2)
@@ -46,6 +47,16 @@ open class ForkFiber {
     unsafe {
       fxRunBlocking {
         Fx { startLoop(0) }
+      }
+    }
+
+  @Benchmark
+  fun fx2(): Int =
+    unsafe {
+      fx2RunBlocking {
+        arrow.effects.suspended.fx2.Fx {
+          startLoop(0)
+        }
       }
     }
 

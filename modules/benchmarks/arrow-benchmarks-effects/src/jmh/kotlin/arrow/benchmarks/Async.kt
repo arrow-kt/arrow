@@ -7,6 +7,7 @@ import arrow.effects.extensions.NonBlocking
 import arrow.effects.extensions.catchfx.monad.followedBy
 import arrow.effects.extensions.continueOn
 import arrow.effects.extensions.envfx.monad.followedBy
+import arrow.effects.extensions.fx2.fx.monad.followedBy
 import arrow.effects.extensions.io.monad.followedBy
 import arrow.effects.suspended.env.EnvFx
 import arrow.effects.suspended.env.toFx
@@ -20,7 +21,9 @@ import arrow.effects.extensions.catchfx.async.shift as bioShift
 import arrow.effects.extensions.envfx.async.shift as rioShift
 import arrow.effects.extensions.fx.async.shift as fxShift
 import arrow.effects.extensions.fx.unsafeRun.runBlocking as fxRunBlocking
+import arrow.effects.extensions.fx2.fx.unsafeRun.runBlocking as fx2RunBlocking
 import arrow.effects.extensions.io.async.shift as ioShift
+import arrow.effects.extensions.fx2.fx.async.shift as fx2Shift
 import arrow.effects.extensions.io.unsafeRun.runBlocking as ioRunBlocking
 
 
@@ -44,10 +47,18 @@ open class Async {
       if (i > size) IO { i } else ioAsyncLoop(i + 1)
     )
 
+  private fun fx2AsyncLoop(i: Int): arrow.effects.suspended.fx2.Fx<Int> =
+    NonBlocking.fx2Shift().followedBy(
+      if (1 > size) arrow.effects.suspended.fx2.Fx { 1 } else fx2AsyncLoop(i + 1)
+    )
 
   @Benchmark
   fun fx(): Int =
     unsafe { fxRunBlocking { Fx { fxAsyncLoop(0)() } } }
+
+  @Benchmark
+  fun fx2(): Int =
+    unsafe { fx2RunBlocking { fx2AsyncLoop(0) } }
 
   @Benchmark
   fun io(): Int =

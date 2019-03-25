@@ -7,6 +7,7 @@ import arrow.unsafe
 import kotlinx.coroutines.runBlocking
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
+import arrow.effects.extensions.fx2.fx.unsafeRun.runBlocking as fx2RunBlocking
 
 @State(Scope.Thread)
 @Fork(2)
@@ -35,6 +36,18 @@ open class Map {
   @Benchmark
   fun fxBatch120(): Long =
     unsafe { runBlocking { fxTest(12000 / 120, 120) } }
+
+  @Benchmark
+  fun fx2One(): Long =
+    unsafe { fx2RunBlocking { arrow.effects.suspended.fx2.Fx { fxTest(12000, 1) } } }
+
+  @Benchmark
+  fun fx2Batch30(): Long =
+    unsafe { fx2RunBlocking { arrow.effects.suspended.fx2.Fx { fxTest(12000 / 30, 30) } } }
+
+  @Benchmark
+  fun fx2Batch120(): Long =
+    unsafe { fx2RunBlocking { arrow.effects.suspended.fx2.Fx { fxTest(12000 / 120, 120) } } }
 
   @Benchmark
   fun kotlinxCoroutinesOne(): Long =

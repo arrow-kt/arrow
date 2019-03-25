@@ -1,15 +1,8 @@
 package arrow.benchmarks
 
-import arrow.core.getOrHandle
-import arrow.core.right
 import arrow.effects.IO
-import arrow.effects.extensions.catchfx.monad.flatMap
-import arrow.effects.extensions.envfx.monad.flatMap
-import arrow.effects.suspended.env.EnvFx
-import arrow.effects.suspended.env.toFx
-import arrow.effects.suspended.error.CatchFx
-import arrow.effects.suspended.error.toFx
 import arrow.effects.suspended.fx.Fx
+import arrow.effects.suspended.fx2.Fx as Fx2
 import arrow.effects.suspended.fx.effect
 import arrow.effects.suspended.fx.not
 import arrow.unsafe
@@ -17,6 +10,7 @@ import kotlinx.coroutines.runBlocking
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
 import arrow.effects.extensions.fx.unsafeRun.runBlocking as fxRunBlocking
+import arrow.effects.extensions.fx2.fx.unsafeRun.runBlocking as fx2RunBlocking
 import arrow.effects.extensions.io.unsafeRun.runBlocking as ioRunBlocking
 
 
@@ -48,12 +42,20 @@ open class Delay {
     unsafe { fxRunBlocking { Fx { fxDirectDelayLoop(0) } } }
 
   @Benchmark
+  fun fx2Direct(): Int =
+    unsafe { fx2RunBlocking { Fx2 { fxDirectDelayLoop(0) } } }
+
+  @Benchmark
   fun kotlinXCoroutinesDirect(): Int =
     runBlocking { fxDirectDelayLoop(0) }
 
   @Benchmark
   fun fx(): Int =
     unsafe { fxRunBlocking { Fx { !fxDelayLoop(0) } } }
+
+  @Benchmark
+  fun fx2(): Int =
+    unsafe { fx2RunBlocking { Fx2 { !fxDelayLoop(0) } } }
 
   @Benchmark
   fun io(): Int =

@@ -6,6 +6,7 @@ import arrow.effects.suspended.fx.*
 import arrow.unsafe
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
+import arrow.effects.extensions.fx2.fx.unsafeRun.runBlocking as fx2RunBlocking
 
 @State(Scope.Thread)
 @Fork(2)
@@ -26,9 +27,12 @@ open class AttemptNonRaised {
       }
     } else 1
 
-
   @Benchmark
   fun fx(): Int =
     unsafe { runBlocking { Fx { loopHappy(size, 0) } } }
+
+  @Benchmark
+  fun fx2(): Int =
+    unsafe { fx2RunBlocking { arrow.effects.suspended.fx2.Fx { loopHappy(size, 0) } } }
 
 }

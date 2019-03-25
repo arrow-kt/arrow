@@ -6,6 +6,7 @@ import arrow.effects.suspended.fx.*
 import arrow.unsafe
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
+import arrow.effects.extensions.fx2.fx.unsafeRun.runBlocking as fx2RunBlocking
 
 val dummy = object : RuntimeException("dummy") {
   override fun fillInStackTrace(): Throwable =
@@ -37,5 +38,9 @@ open class AttemptRaisedError {
   @Benchmark
   fun fx(): Int =
     unsafe { runBlocking { Fx { loopNotHappy(size, 0) } } }
+
+  @Benchmark
+  fun fx2(): Int =
+    unsafe { fx2RunBlocking { arrow.effects.suspended.fx2.Fx { loopNotHappy(size, 0) } } }
 
 }
