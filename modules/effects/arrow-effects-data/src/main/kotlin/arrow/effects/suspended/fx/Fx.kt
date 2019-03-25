@@ -17,7 +17,8 @@ import kotlin.coroutines.*
 class ForFx private constructor() {
   companion object
 }
-typealias FxOf<A> = Kind<ForFx, A>
+typealias
+  FxOf<A> = Kind<ForFx, A>
 typealias FxProc<A> = ConnectedProc<ForFx, A>
 typealias FxProcF<A> = ConnectedProcF<ForFx, A>
 
