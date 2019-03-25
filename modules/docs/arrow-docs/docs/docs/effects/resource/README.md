@@ -1,15 +1,15 @@
 ---
 layout: docs
-title: ManagedT
-permalink: /docs/effects/managedt/
+title: Resource
+permalink: /docs/effects/resource/
 ---
 
-## ManagedT
+## Resource
 
 {:.intermediate}
 intermediate
 
-`ManagedT` is a data-type that handles acquiring and releasing resources in correct order.
+`Resource` is a data-type that handles acquiring and releasing resources in correct order.
 
 Consider the following use case:
 ```kotlin:ank:playground
@@ -74,13 +74,13 @@ fun main() {
 
 This is already much better. Now our services are guaranteed to close properly and also in order. However this pattern gets worse and worse the more resources you add because you need to nest deeper and deeper.
 
-That is where `ManagedT` comes in:
+That is where `Resource` comes in:
 ```kotlin:ank:playground
 //sampleStart
-val managedTProgram = ManagedT.monad(IO.bracket()).binding {
-  val consumer = ManagedT(::createConsumer, ::closeConsumer, IO.bracket()).bind()
-  val handle = ManagedT(::createDBHandle, ::closeDBHandle, IO.bracket()).bind()
-  ManagedT({ createFancyService(consumer, handle) }, ::shutDownFanceService, IO.bracket()).bind()
+val managedTProgram = Resource.monad(IO.bracket()).binding {
+  val consumer = Resource(::createConsumer, ::closeConsumer, IO.bracket()).bind()
+  val handle = Resource(::createDBHandle, ::closeDBHandle, IO.bracket()).bind()
+  Resource({ createFancyService(consumer, handle) }, ::shutDownFanceService, IO.bracket()).bind()
 }.fix().invoke { service ->
   // use service
   // <...>
@@ -94,9 +94,27 @@ fun main() {
 }
 ```
 
-All three programs do exactly the same with varying levels of simplicity and overhead. `ManagedT` uses `Bracket` under the hood but provides a nicer monadic interface for creating and releasing resources in order, whereas bracket is great for one-off acquisitions but becomes more complex with nested resources.
+All three programs do exactly the same with varying levels of simplicity and overhead. `Resource` uses `Bracket` under the hood but provides a nicer monadic interface for creating and releasing resources in order, whereas bracket is great for one-off acquisitions but becomes more complex with nested resources.
 
+## Constructing a Resource
 
+The primary way of constructing a resource is using its invoke constructor:
+```kotlin:ank
+val resource = Resource(::createConsumer, ::closeConsumer, IO.bracket())
+```
+
+There are other ways of constructing a `Resource`, more specifically you can construct one using either its `Monad` or `Monoid` instance. (Using `just` or `empty`). However this is reserved for special usecases and generally should not be used as they add no finalizers.
+You can also lift values of `Kind<F, A>` into `Resource<F, E, A>` using the extension function `liftF`. This has the same drawbacks as `just` and `empty`.
+
+## Using a Resource
+
+To use a `Resource` simply call the `invoke` Method.
+```kotlin:ank
+val resource = Resource(::createConsumer, ::closeConsumer, IO.bracket())
+
+resource.invoke { consumer -> IO { println(consumer) } }
+  .fix().unsafeRunSync()
+```
 
 ### Supported Type Classes
 
@@ -104,6 +122,6 @@ All three programs do exactly the same with varying levels of simplicity and ove
 import arrow.reflect.*
 import arrow.effects.*
 
-DataType(ManagedT::class).tcMarkdownList()
+DataType(Resource::class).tcMarkdownList()
 ```
 
