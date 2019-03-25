@@ -1,0 +1,46 @@
+<ul class="sidebar-nav sidebar-doc-versions">
+  <li class="sidebar-nav-item">
+    <a href="#">
+      <span>Arrow version</span>
+      <span id="arrow-version"></span>
+    </a>
+    <ul>
+      <li>
+        <a href="{{ site.data.commons.stable_version | append: 'docs/' }}">
+          <span>
+            {{ stable_version.title }} - {{ site.data.doc-versions.stable }}
+          </span>
+        </a>
+      </li>
+
+      <li>
+        <a href="{{ next_version.url | append: 'docs/' }}">
+            <span>
+              {{ next_version.title }} - {{ site.data.doc-versions.next }}
+            </span>
+        </a>
+      </li>
+
+      <li>
+        <a href="{{ previous_version.url | append: 'docs/' }}">
+            <span>
+              {{ previous_version.title }} -
+              {{ site.data.doc-versions.previous }}
+            </span>
+        </a>
+      </li>
+
+      {% for item in site.data.doc-versions.docVersions %}
+        {% if item.url != stable_version.url
+          and item.url != next_version.url
+          and item.url != previous_version.url %}
+          <li>
+              <a href="{{ item.url | append: 'docs/' }}">
+                  <span>{{ item.title }}</span>
+              </a>
+          </li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+  </li>
+</ul>
