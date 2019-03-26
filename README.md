@@ -1,6 +1,6 @@
 <img height="100" src="https://avatars2.githubusercontent.com/u/29458023?v=4&amp;s=200" width="100">
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core-data/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core)
 [![Build Status](https://travis-ci.org/arrow-kt/arrow.svg?branch=master)](https://travis-ci.org/arrow-kt/arrow/)
 [![Kotlin version badge](https://img.shields.io/badge/kotlin-1.3-blue.svg)](https://kotlinlang.org/docs/reference/whatsnew13.html)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
@@ -96,8 +96,6 @@ dependencies {
     compile "io.arrow-kt:arrow-effects-rx2-extensions:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects-reactor-data:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects-reactor-extensions:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-effects-kotlinx-coroutines-data:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-effects-kotlinx-coroutines-extensions:$arrow_version" //optional
     compile "io.arrow-kt:arrow-optics:$arrow_version" //optional
     compile "io.arrow-kt:arrow-generic:$arrow_version" //optional
     compile "io.arrow-kt:arrow-recursion-data:$arrow_version" //optional

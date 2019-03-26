@@ -242,6 +242,9 @@ options:
       - title: Semigroupal
         url: /docs/apidocs/arrow-typeclasses/arrow.typeclasses/-semigroupal/
 
+      - title: Monoidal
+        url: /docs/apidocs/arrow-typeclasses/arrow.typeclasses/-monoidal/
+
       - title: Monoid
         url: /docs/arrow/typeclasses/monoid/
 

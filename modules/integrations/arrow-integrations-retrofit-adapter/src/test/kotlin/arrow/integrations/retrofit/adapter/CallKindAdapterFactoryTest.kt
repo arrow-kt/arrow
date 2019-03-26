@@ -3,7 +3,7 @@ package arrow.integrations.retrofit.adapter
 import arrow.effects.IO
 import arrow.integrations.retrofit.adapter.retrofit.retrofit
 import arrow.test.UnitSpec
-import com.google.common.reflect.TypeToken
+import com.google.gson.reflect.TypeToken
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldThrow

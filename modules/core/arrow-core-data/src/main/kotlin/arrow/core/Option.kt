@@ -234,4 +234,4 @@ fun <T> Iterable<T>.lastOrNone(predicate: (T) -> Boolean): Option<T> = this.last
 fun <T> Iterable<T>.elementAtOrNone(index: Int): Option<T> = this.elementAtOrNull(index).toOption()
 
 fun <A, B> Option<Either<A, B>>.select(f: OptionOf<(A) -> B>): Option<B> =
-  flatMap { it.fold({ l -> Option.just(l).ap(f) }, { r -> Option.just(identity(r)) }) }
+  flatMap { it.fold({ l -> Option.just(l).ap(f) }, { r -> Option.just(r) }) }

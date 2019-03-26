@@ -35,9 +35,12 @@ interface ListKEq<A> : Eq<ListKOf<A>> {
   fun EQ(): Eq<A>
 
   override fun ListKOf<A>.eqv(b: ListKOf<A>): Boolean =
-    fix().zip(b.fix()) { aa, bb -> EQ().run { aa.eqv(bb) } }.fold(true) { acc, bool ->
+    if (fix().size == b.fix().size) fix().zip(b.fix()) { aa, bb ->
+      EQ().run { aa.eqv(bb) }
+    }.fold(true) { acc, bool ->
       acc && bool
     }
+    else false
 }
 
 @extension
@@ -130,6 +133,11 @@ interface ListKSemigroupK : SemigroupK<ForListK> {
 interface ListKSemigroupal : Semigroupal<ForListK> {
   override fun <A, B> Kind<ForListK, A>.product(fb: Kind<ForListK, B>): Kind<ForListK, Tuple2<A, B>> =
     fb.fix().ap(this.map { a:A -> { b: B -> Tuple2(a,b)} })
+}
+
+@extension
+interface ListKMonoidal : Monoidal<ForListK>, ListKSemigroupal {
+  override fun <A> identity(): Kind<ForListK, A> = ListK.empty()
 }
 
 @extension
