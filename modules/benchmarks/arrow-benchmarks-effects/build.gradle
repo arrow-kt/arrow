@@ -19,14 +19,14 @@ jmh {
 //            'arrow.benchmarks.AttemptRaisedError'
 //            'arrow.benchmarks.Bracket',
 //            'arrow.benchmarks.Cancellable',
-            'arrow.benchmarks.Delay',
+//            'arrow.benchmarks.Delay',
 //            'arrow.benchmarks.ForkFiber',
 //            'arrow.benchmarks.HandleNonRaised',
 //            'arrow.benchmarks.HandleRaisedError',
             'arrow.benchmarks.Map',
 //            'arrow.benchmarks.MapStream',
 //            'arrow.benchmarks.ParMap',
-            'arrow.benchmarks.Pure'
+//            'arrow.benchmarks.Pure'
 //            'arrow.benchmarks.RacePair',
 //            'arrow.benchmarks.Uncancellable'
     ]

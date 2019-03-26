@@ -48,11 +48,11 @@ sealed class Fx<A> : FxOf<A> {
   private fun <B> andThenF(right: (A) -> FxOf<B>): Fx<B> =
     Fx.FlatMap(this, right)
 
-  suspend operator fun not(): A =
+  suspend inline operator fun not(): A =
     invokeLoop(this as Fx<Any?>) as A
 
-  private tailrec suspend fun invokeLoop(fa: Fx<Any?>): Any? = when (fa) {
-    is Single -> fa.invoke()
+  tailrec suspend fun invokeLoop(fa: Fx<Any?>): Any? = when (fa) {
+    is Single -> fa.fa()
     is FlatMap<*, *> -> {
       val left: Fx<Any?> = fa.left.fix()
       val fb: (Any?) -> Fx<Any?> = fa.fb as (Any?) -> Fx<Any?>
@@ -60,14 +60,14 @@ sealed class Fx<A> : FxOf<A> {
     }
   }
 
-  suspend operator fun invoke(): A =
-    fa()
+  suspend inline operator fun invoke(): A =
+    !this
 
-  suspend operator fun component1(): A =
-    fa()
+  suspend inline operator fun component1(): A =
+    !this
 
-  suspend fun bind(): A =
-    fa()
+  suspend inline fun bind(): A =
+    !this
 
   fun <B> map(f: (A) -> B): Fx<B> =
     flatMap { a -> Fx { f(a) } }

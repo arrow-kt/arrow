@@ -1,8 +1,8 @@
 package arrow.benchmarks
 
 import arrow.effects.IO
-import arrow.effects.suspended.fx.just
-import arrow.effects.suspended.fx.map
+import arrow.effects.suspended.fx.just as fxJust
+import arrow.effects.suspended.fx.map as fxMap
 import arrow.unsafe
 import kotlinx.coroutines.runBlocking
 import org.openjdk.jmh.annotations.*
@@ -39,31 +39,19 @@ open class Map {
 
   @Benchmark
   fun fx2One(): Long =
-    unsafe { fx2RunBlocking { arrow.effects.suspended.fx2.Fx { fxTest(12000, 1) } } }
+    unsafe { fx2RunBlocking { arrow.effects.suspended.fx2.Fx { fx2Test(12000, 1) } } }
 
   @Benchmark
   fun fx2Batch30(): Long =
-    unsafe { fx2RunBlocking { arrow.effects.suspended.fx2.Fx { fxTest(12000 / 30, 30) } } }
+    unsafe { fx2RunBlocking { arrow.effects.suspended.fx2.Fx { fx2Test(12000 / 30, 30) } } }
 
   @Benchmark
   fun fx2Batch120(): Long =
-    unsafe { fx2RunBlocking { arrow.effects.suspended.fx2.Fx { fxTest(12000 / 120, 120) } } }
-
-  @Benchmark
-  fun kotlinxCoroutinesOne(): Long =
-    runBlocking { fxTest(12000, 1) }
-
-  @Benchmark
-  fun kotlinxCoroutinesBatch30(): Long =
-    runBlocking { fxTest(12000 / 30, 30) }
-
-  @Benchmark
-  fun kotlinxCoroutinesBatch120(): Long =
-    runBlocking { fxTest(12000 / 120, 120) }
+    unsafe { fx2RunBlocking { arrow.effects.suspended.fx2.Fx { fx2Test(12000 / 120, 120) } } }
 
   private fun ioTest(iterations: Int, batch: Int): Long {
     val f = { x: Int -> x + 1 }
-    var io = IO { 0 }
+    var io = IO.just(0)
 
     var j = 0
     while (j < batch) {
@@ -81,7 +69,25 @@ open class Map {
 
   private suspend fun fxTest(iterations: Int, batch: Int): Long {
     val f = { x: Int -> x + 1 }
-    var fx = just(0)
+    var fx = fxJust(0)
+
+    var j = 0
+    while (j < batch) {
+      fx = fx.fxMap(f); j += 1
+    }
+
+    var sum = 0L
+    var i = 0
+    while (i < iterations) {
+      sum += fx()
+      i += 1
+    }
+    return sum
+  }
+
+  private suspend fun fx2Test(iterations: Int, batch: Int): Long {
+    val f = { x: Int -> x + 1 }
+    var fx = arrow.effects.suspended.fx2.Fx.just(0)
 
     var j = 0
     while (j < batch) {
@@ -91,7 +97,7 @@ open class Map {
     var sum = 0L
     var i = 0
     while (i < iterations) {
-      sum += fx()
+      sum += !fx
       i += 1
     }
     return sum
