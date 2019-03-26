@@ -29,18 +29,20 @@ sealed class Fx<A> : FxOf<A> {
   abstract fun <B> map(f: (A) -> B): Fx<B>
   abstract fun <B> flatMap(f: (A) -> FxOf<B>): Fx<B>
 
+  internal class Pure<A>(val value: A) : Fx<A>() {
+    override val fa: suspend () -> A = { value }
+    override fun <B> map(f: (A) -> B): Fx<B> = Fx.Mapped(this, f, 0)
+    override fun <B> flatMap(f: (A) -> FxOf<B>): Fx<B> = Fx.FlatMap(this, f, 0)
+    override fun toString(): String = "Fx.Pure(value = $value)"
+  }
+
   //Purely wrapped suspend function.
   //Should wrap a singular suspension point otherwise stack safety cannot be guaranteed.
   //This is not an issue if you guarantee stack safety yourself for your suspended program. i.e. using `tailrec`
   internal class Single<A>(val source: suspend () -> A) : Fx<A>() {
     override val fa: suspend () -> A = source
-
-    override fun <B> map(f: (A) -> B): Fx<B> =
-      Fx.Mapped(this, f, 1)
-
-    override fun <B> flatMap(f: (A) -> FxOf<B>): Fx<B> =
-      Fx.FlatMap(this, f, 1)
-
+    override fun <B> map(f: (A) -> B): Fx<B> = Fx.Mapped(this, f, 1)
+    override fun <B> flatMap(f: (A) -> FxOf<B>): Fx<B> = Fx.FlatMap(this, f, 1)
     override fun toString(): String = "Fx.Single"
   }
 
@@ -56,8 +58,7 @@ sealed class Fx<A> : FxOf<A> {
       else Fx.Mapped(this, f, 0)
 
     //We can do fusion between an map-flatMap boundary
-    override fun <C> flatMap(f: (B) -> FxOf<C>): Fx<C> =
-      Fx.FlatMap(source, { a: A -> f(g(a)) }, 1)
+    override fun <C> flatMap(f: (B) -> FxOf<C>): Fx<C> = Fx.FlatMap(source, { a: A -> f(g(a)) }, 1)
 
     override fun toString(): String = "Fx.Mapped(..., index = $index)"
   }
@@ -90,6 +91,7 @@ sealed class Fx<A> : FxOf<A> {
 
   @PublishedApi
   internal tailrec suspend fun invokeLoop(fa: Fx<Any?>): Any? = when (fa) {
+    is Pure -> fa.value
     is Single -> fa.fa()
     is Mapped<*, *> -> {
       val source: Any? = fa.source.invoke()
@@ -190,21 +192,19 @@ sealed class Fx<A> : FxOf<A> {
 
     operator fun <A> invoke(fa: suspend () -> A): Fx<A> = Fx.Single(fa)
 
-    fun <A> just(a: A): Fx<A> =
-      Fx { a }
+    fun <A> just(a: A): Fx<A> = Fx.Pure(a)
 
-    fun unit(): Fx<Unit> =
-      Fx { Unit }
+    fun unit(): Fx<Unit> = Fx.Pure(Unit)
 
     fun <A> raiseError(e: Throwable): Fx<A> = Fx { throw e }
 
     fun <A> defer(fa: () -> FxOf<A>): Fx<A> =
-      Fx { Unit }.flatMap { fa() }
+      Fx.FlatMap(Fx.Pure(Unit), { fa() }, 0)
 
     fun <A, B> tailRecM(a: A, f: (A) -> FxOf<Either<A, B>>): Fx<B> =
-      f(a).fix().flatMap { result ->
+      Fx.FlatMap(f(a), { result ->
         result.fold({ tailRecM(it, f) }, { just(it) })
-      }
+      }, 0)
 
     /** Hide member because it's discouraged to use uncancelable builder for cancelable concrete type **/
     internal fun <A> async(fa: Proc<A>): Fx<A> = Fx<A> {

@@ -16,7 +16,7 @@ jmh {
     include = [
 //            'arrow.benchmarks.Async'
 //            'arrow.benchmarks.AttemptNonRaised',
-//            'arrow.benchmarks.AttemptRaisedError'
+//            'arrow.benchmarks.AttemptRaisedError',
 //            'arrow.benchmarks.Bracket',
 //            'arrow.benchmarks.Cancellable',
 //            'arrow.benchmarks.Delay',
@@ -26,7 +26,7 @@ jmh {
             'arrow.benchmarks.Map',
 //            'arrow.benchmarks.MapStream',
 //            'arrow.benchmarks.ParMap',
-//            'arrow.benchmarks.Pure'
+            'arrow.benchmarks.Pure'
 //            'arrow.benchmarks.RacePair',
 //            'arrow.benchmarks.Uncancellable'
     ]

@@ -1,11 +1,9 @@
 package arrow.effects
 
 import arrow.effects.extensions.fx2.fx.unsafeRun.runBlocking
-import arrow.effects.extensions.io.monad.flatMap
 import arrow.effects.internal.Platform
 import arrow.effects.suspended.fx2.Fx
 import arrow.test.UnitSpec
-import arrow.test.laws.equalUnderTheLaw
 import arrow.unsafe
 import io.kotlintest.Result
 import io.kotlintest.runner.junit4.KotlinTestRunner
