@@ -26,39 +26,79 @@ suspend operator fun <A> FxOf<A>.invoke(): A = fix().invoke()
 sealed class Fx<A> : FxOf<A> {
 
   abstract val fa: suspend () -> A
+  abstract fun <B> map(f: (A) -> B): Fx<B>
+  abstract fun <B> flatMap(f: (A) -> FxOf<B>): Fx<B>
 
-  internal class Single<A>(override val fa: suspend () -> A, val index: Int) : Fx<A>()
+  //Purely wrapped suspend function.
+  //Should wrap a singular suspension point otherwise stack safety cannot be guaranteed.
+  //This is not an issue if you guarantee stack safety yourself for your suspended program. i.e. using `tailrec`
+  internal class Single<A>(val source: suspend () -> A) : Fx<A>() {
+    override val fa: suspend () -> A = source
 
-  internal class FlatMap<A, B>(val left: FxOf<A>, val fb: (A) -> FxOf<B>) : Fx<B>() {
+    override fun <B> map(f: (A) -> B): Fx<B> =
+      Fx.Mapped(this, f, 1)
+
+    override fun <B> flatMap(f: (A) -> FxOf<B>): Fx<B> =
+      Fx.FlatMap(this, f, 1)
+
+    override fun toString(): String = "Fx.Single"
+  }
+
+  internal class Mapped<A, B>(val source: FxOf<A>, val g: (A) -> B, val index: Int) : Fx<B>() {
+    override val fa: suspend () -> B = suspend {
+      invokeLoop(this@Mapped as Fx<Any?>) as B
+    }
+
+    override fun <C> map(f: (B) -> C): Fx<C> =
+    // Allowed to do maxStackDepthSize map operations in sequence before
+    // starting a new Map fusion in order to avoid stack overflows
+      if (index != Platform.maxStackDepthSize) Fx.Mapped(source, g andThen f, index + 1)
+      else Fx.Mapped(this, f, 0)
+
+    //We can do fusion between an map-flatMap boundary
+    override fun <C> flatMap(f: (B) -> FxOf<C>): Fx<C> =
+      Fx.FlatMap(source, { a: A -> f(g(a)) }, 1)
+
+    override fun toString(): String = "Fx.Mapped(..., index = $index)"
+  }
+
+  internal class FlatMap<A, B>(val source: FxOf<A>, val fb: (A) -> FxOf<B>, val index: Int) : Fx<B>() {
     override val fa: suspend () -> B = suspend {
       invokeLoop(this@FlatMap as Fx<Any?>) as B
     }
-    override fun toString(): String = "Fx.FlatMap(...)"
+
+    //If we reach the maxStackDepth then we can fold the current FlatMap and return a Mapped case
+    //If we haven't reached the maxStackDepth we fuse the map operator within the flatMap stack.
+    override fun <C> map(f: (B) -> C): Fx<C> =
+      if (index != Platform.maxStackDepthSize) Fx.Mapped(this, f, 0)
+      else Fx.FlatMap(source, { a -> Fx { f(fb(a)()) } }, index + 1)
+
+    override fun <C> flatMap(f: (B) -> FxOf<C>): Fx<C> =
+      if (index != Platform.maxStackDepthSize) Fx.FlatMap(this, f, 0)
+      else Fx.FlatMap(source, { a ->
+        Fx.FlatMap(fb(a), { b -> f(b) }, 0)
+      }, index + 1)
+
+    override fun toString(): String = "Fx.FlatMap(..., index = $index)"
   }
 
   private infix fun <A, B> (suspend () -> A).andThen(g: (A) -> FxOf<B>): suspend () -> B =
     suspend { g(this.invoke()).invoke() }
-
-  private fun <B> andThen(g: (A) -> FxOf<B>): Fx<B> =
-    when (this) {
-      is Single ->
-        if (index != Platform.maxStackDepthSize) Single(fa andThen g, index + 1)
-        else andThenF(g)
-      is FlatMap<*, *> -> andThenF(g)
-    }
-
-  private fun <B> andThenF(right: (A) -> FxOf<B>): Fx<B> =
-    Fx.FlatMap(this, right)
 
   suspend inline operator fun not(): A =
     invokeLoop(this as Fx<Any?>) as A
 
   tailrec suspend fun invokeLoop(fa: Fx<Any?>): Any? = when (fa) {
     is Single -> fa.fa()
+    is Mapped<*, *> -> {
+      val source: Any? = fa.source.invoke()
+      val f: (Any?) -> Any? = fa.g as (Any?) -> Any?
+      f(source)
+    }
     is FlatMap<*, *> -> {
-      val left: Any? = fa.left.fix().invoke()
+      val source: Any? = fa.source.fix().invoke()
       val fb: (Any?) -> Fx<Any?> = fa.fb as (Any?) -> Fx<Any?>
-      invokeLoop(fb(left))
+      invokeLoop(fb(source))
     }
   }
 
@@ -70,12 +110,6 @@ sealed class Fx<A> : FxOf<A> {
 
   suspend inline fun bind(): A =
     !this
-
-  fun <B> map(f: (A) -> B): Fx<B> =
-    flatMap { a -> Fx { f(a) } }
-
-  fun <B> flatMap(f: (A) -> FxOf<B>): Fx<B> =
-    andThen(f)
 
   fun <B> ap(ff: Fx<(A) -> B>): Fx<B> =
     ff.flatMap { map(it) }
@@ -153,7 +187,7 @@ sealed class Fx<A> : FxOf<A> {
   @RestrictsSuspension
   companion object {
 
-    operator fun <A> invoke(fa: suspend () -> A): Fx<A> = Fx.Single(fa, 0)
+    operator fun <A> invoke(fa: suspend () -> A): Fx<A> = Fx.Single(fa)
 
     fun <A> just(a: A): Fx<A> =
       Fx { a }

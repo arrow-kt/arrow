@@ -34,7 +34,7 @@ class Fx2Test : UnitSpec() {
 
     "Simple map fusion works" {
       mapFusion(2) should Matcher { fx: Fx<Int> ->
-        fx is Fx.Single && fx.index == 2
+        fx is Fx.Mapped<*, *> && fx.index == 2
       }
     }
 
@@ -46,7 +46,9 @@ class Fx2Test : UnitSpec() {
 
     "1 stack depth deep map fusion" {
       mapFusion(Platform.maxStackDepthSize + 1) should Matcher { fx ->
-        fx is Fx.FlatMap<*, *> && fx.left is Fx.Single && fx.left.index == 127
+        fx is Fx.Mapped<*, *> && fx.index == 0 &&
+          fx.source is Fx.Mapped<*, *> && fx.source.index == 127 &&
+          fx.source.source is Fx.Single
       }
     }
 
@@ -58,7 +60,10 @@ class Fx2Test : UnitSpec() {
 
     "multiple level stack depth deep map fusion" {
       mapFusion(2 * (Platform.maxStackDepthSize + 1)) should Matcher { fx ->
-        fx is Fx.FlatMap<*, *> && fx.left is Fx.FlatMap<*, *>
+        fx is Fx.Mapped<*, *> && fx.index == 0 &&
+          fx.source is Fx.Mapped<*, *> && fx.source.index == 127 &&
+          fx.source.source is Fx.Mapped<*, *> && fx.source.source.index == 127 &&
+          fx.source.source.source is Fx.Single
       }
     }
 
