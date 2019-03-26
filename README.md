@@ -1,6 +1,6 @@
 <img height="100" src="https://avatars2.githubusercontent.com/u/29458023?v=4&amp;s=200" width="100">
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core-data/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core)
 [![Build Status](https://travis-ci.org/arrow-kt/arrow.svg?branch=master)](https://travis-ci.org/arrow-kt/arrow/)
 [![Kotlin version badge](https://img.shields.io/badge/kotlin-1.3-blue.svg)](https://kotlinlang.org/docs/reference/whatsnew13.html)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
@@ -76,6 +76,16 @@ Trimmed down versions:
 
 ```groovy
 def arrow_version = "0.9.0"
+```
+
+You can find the dependencies necessary in the Basic Setup of the README at the 0.9.0 tag clicking [here](https://github.com/arrow-kt/arrow/blob/0.9.0/README.md#next-development-version-090).
+
+# Next development version 0.9.1
+
+Add the dependencies into the project's `build.gradle`
+
+```groovy
+def arrow_version = "0.9.1-SNAPSHOT"
 dependencies {
     compile "io.arrow-kt:arrow-core-data:$arrow_version"
     compile "io.arrow-kt:arrow-core-extensions:$arrow_version"
@@ -96,8 +106,6 @@ dependencies {
     compile "io.arrow-kt:arrow-effects-rx2-extensions:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects-reactor-data:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects-reactor-extensions:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-effects-kotlinx-coroutines-data:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-effects-kotlinx-coroutines-extensions:$arrow_version" //optional
     compile "io.arrow-kt:arrow-optics:$arrow_version" //optional
     compile "io.arrow-kt:arrow-generic:$arrow_version" //optional
     compile "io.arrow-kt:arrow-recursion-data:$arrow_version" //optional
@@ -105,7 +113,6 @@ dependencies {
     compile "io.arrow-kt:arrow-query-language:$arrow_version" //optional
     compile "io.arrow-kt:arrow-integration-retrofit-adapter:$arrow_version" //optional
 }
-
 ```
 
 # Additional Setup
