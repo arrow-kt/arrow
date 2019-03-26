@@ -88,7 +88,8 @@ sealed class Fx<A> : FxOf<A> {
   suspend inline operator fun not(): A =
     invokeLoop(this as Fx<Any?>) as A
 
-  tailrec suspend fun invokeLoop(fa: Fx<Any?>): Any? = when (fa) {
+  @PublishedApi
+  internal tailrec suspend fun invokeLoop(fa: Fx<Any?>): Any? = when (fa) {
     is Single -> fa.fa()
     is Mapped<*, *> -> {
       val source: Any? = fa.source.invoke()

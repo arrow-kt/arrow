@@ -1,9 +1,11 @@
 package arrow.effects
 
 import arrow.effects.extensions.fx2.fx.unsafeRun.runBlocking
+import arrow.effects.extensions.io.monad.flatMap
 import arrow.effects.internal.Platform
 import arrow.effects.suspended.fx2.Fx
 import arrow.test.UnitSpec
+import arrow.test.laws.equalUnderTheLaw
 import arrow.unsafe
 import io.kotlintest.Result
 import io.kotlintest.runner.junit4.KotlinTestRunner
@@ -65,6 +67,17 @@ class Fx2Test : UnitSpec() {
           fx.source.source is Fx.Mapped<*, *> && fx.source.source.index == 127 &&
           fx.source.source.source is Fx.Single
       }
+    }
+
+    "Fx should be stack safe" {
+      fun Fx<Int>.loop(count: Int): Fx<Int> =
+        flatMap { i ->
+          if (i == count) Fx.just(i)
+          else Fx.just(i + 1).loop(count)
+        }
+
+      val count = 10000
+      Fx.just(0).loop(count).invoke() shouldBe count
     }
 
   }
