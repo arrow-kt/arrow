@@ -44,8 +44,12 @@ interface MonadDefer<F> : MonadThrow<F>, Bracket<F, Throwable> {
 
   fun lazy(): Kind<F, Unit> = delay { }
 
-  fun <A> deferUnsafe(f: () -> Either<Throwable, A>): Kind<F, A> =
+  fun <A> delayOrRaise(f: () -> Either<Throwable, A>): Kind<F, A> =
     defer { f().fold({ raiseError<A>(it) }, { just(it) }) }
+
+  @Deprecated("Use delayOrRaise instead",
+          ReplaceWith("delayOrRaise(f)", "arrow.effects.typeclasses.MonadDefer"))
+  fun <A> deferUnsafe(f: () -> Either<Throwable, A>): Kind<F, A> = delayOrRaise(f)
 
   /**
    * Entry point for monad bindings which enables for comprehensions. The underlying impl is based on coroutines.

@@ -24,6 +24,11 @@ interface SequenceKSemigroupal : Semigroupal<ForSequenceK> {
 }
 
 @extension
+interface SequenceKMonoidal : Monoidal<ForSequenceK>, SequenceKSemigroupal {
+  override fun <A> identity(): Kind<ForSequenceK, A> = SequenceK.empty()
+}
+
+@extension
 interface SequenceKMonoid<A> : Monoid<SequenceK<A>> {
   override fun SequenceK<A>.combine(b: SequenceK<A>): SequenceK<A> = (this.sequence + b.sequence).k()
 

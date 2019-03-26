@@ -13,5 +13,7 @@ data class Moore<E, V>(val view: V, val handle: (E) -> Moore<E, V>) : MooreOf<E,
 
   fun extract(): V = view
 
+  override fun toString() = "Moore(view=$view, handle=(E) -> Moore<E, V>)"
+
   companion object
 }

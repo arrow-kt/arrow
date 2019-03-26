@@ -64,14 +64,14 @@ interface KotlinPoetEncoder {
     )
 
   fun com.squareup.kotlinpoet.AnnotationSpec.toMeta(): Annotation =
-    Annotation(type.toMeta(), members = members.map { it.toMeta() }, useSiteTarget = useSiteTarget?.toMeta())
+    Annotation(className.toMeta(), members = members.map { it.toMeta() }, useSiteTarget = useSiteTarget?.toMeta())
 
   private fun com.squareup.kotlinpoet.WildcardTypeName.toMeta(): TypeName.WildcardType =
     TypeName.WildcardType(
       name = toString().removeVariance().asKotlin(),
-      upperBounds = upperBounds.map { it.toMeta() },
-      lowerBounds = lowerBounds.map { it.toMeta() },
-      nullable = nullable,
+      upperBounds = outTypes.map { it.toMeta() },
+      lowerBounds = inTypes.map { it.toMeta() },
+      nullable = isNullable,
       annotations = annotations.map { it.toMeta() }
     )
 
@@ -80,14 +80,14 @@ interface KotlinPoetEncoder {
       simpleName = simpleName.asKotlin(),
       fqName = canonicalName.asKotlin(),
       annotations = annotations.map { it.toMeta() },
-      nullable = nullable,
+      nullable = isNullable,
       pckg = PackageName(packageName.asKotlin())
     )
 
   private fun com.squareup.kotlinpoet.ParameterizedTypeName.toMeta(): TypeName =
     TypeName.ParameterizedType(
       name = toString().removeVariance().asKotlin(),
-      nullable = nullable,
+      nullable = isNullable,
       annotations = annotations.map { it.toMeta() },
       enclosingType = null,
       rawType = rawType.toMeta(),
@@ -136,8 +136,8 @@ interface KotlinPoetEncoder {
       { metaApi().run { it.toMeta().removeConstrains() } },
       annotations = annotations.map
       { it.toMeta() },
-      nullable = nullable,
-      reified = reified,
+      nullable = isNullable,
+      reified = isReified,
       variance = variance?.toMeta()
     )
 
