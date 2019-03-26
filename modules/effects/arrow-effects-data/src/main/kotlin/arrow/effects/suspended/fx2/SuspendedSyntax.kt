@@ -30,7 +30,9 @@ sealed class Fx<A> : FxOf<A> {
   internal class Single<A>(override val fa: suspend () -> A, val index: Int) : Fx<A>()
 
   internal class FlatMap<A, B>(val left: FxOf<A>, val fb: (A) -> FxOf<B>) : Fx<B>() {
-    override val fa: suspend () -> B = suspend { fb(left.invoke()).invoke() }
+    override val fa: suspend () -> B = suspend {
+      invokeLoop(this@FlatMap as Fx<Any?>) as B
+    }
     override fun toString(): String = "Fx.FlatMap(...)"
   }
 
@@ -54,7 +56,7 @@ sealed class Fx<A> : FxOf<A> {
   tailrec suspend fun invokeLoop(fa: Fx<Any?>): Any? = when (fa) {
     is Single -> fa.fa()
     is FlatMap<*, *> -> {
-      val left: Fx<Any?> = fa.left.fix()
+      val left: Any? = fa.left.fix().invoke()
       val fb: (Any?) -> Fx<Any?> = fa.fb as (Any?) -> Fx<Any?>
       invokeLoop(fb(left))
     }
