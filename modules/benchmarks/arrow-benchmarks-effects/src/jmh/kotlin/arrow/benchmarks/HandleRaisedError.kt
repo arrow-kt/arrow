@@ -47,6 +47,15 @@ open class HandleRaisedError {
       fxErrorRaisedloop(result)
     } else i
 
+  tailrec suspend fun fx2ErrorRaisedloop(i: Int): Int =
+    if (i < size) {
+      val result = !arrow.effects.suspended.fx2.Fx.raiseError<Int>(dummy)
+        .flatMap { x -> arrow.effects.suspended.fx2.Fx.just(x + 1) }
+        .flatMap { x -> arrow.effects.suspended.fx2.Fx.just(x + 1) }
+        .handleError { i + 1 }
+      fx2ErrorRaisedloop(result)
+    } else i
+
   @Benchmark
   fun fx(): Int =
     unsafe { fxRunBlocking { Fx { fxErrorRaisedloop(0) } } }
@@ -56,7 +65,7 @@ open class HandleRaisedError {
     unsafe {
       fx2RunBlocking {
         arrow.effects.suspended.fx2.Fx {
-          fxErrorRaisedloop(0)
+          fx2ErrorRaisedloop(0)
         }
       }
     }

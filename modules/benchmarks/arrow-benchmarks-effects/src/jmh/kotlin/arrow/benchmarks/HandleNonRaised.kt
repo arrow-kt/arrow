@@ -6,7 +6,6 @@ import arrow.effects.suspended.fx.Fx
 import arrow.effects.suspended.fx.handleErrorWith
 import arrow.effects.suspended.fx.not
 import arrow.unsafe
-import kotlinx.coroutines.runBlocking
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
 import arrow.effects.extensions.fx.unsafeRun.runBlocking as fxRunBlocking
@@ -35,6 +34,12 @@ open class HandleNonRaised {
       fxHappyPathLoop(n)
     } else i
 
+  private tailrec suspend fun fx2HappyPathLoop(i: Int): Int =
+    if (i < size) {
+      val n = !arrow.effects.suspended.fx2.Fx.just(i + 1).handleErrorWith { arrow.effects.suspended.fx2.Fx.raiseError(it) }
+      fx2HappyPathLoop(n)
+    } else i
+
   private tailrec suspend fun fxDirectHappyPathLoop(i: Int): Int =
     if (i < size) {
       val n = try {
@@ -55,7 +60,7 @@ open class HandleNonRaised {
 
   @Benchmark
   fun fx2(): Int =
-    unsafe { fx2RunBlocking { arrow.effects.suspended.fx2.Fx { fxHappyPathLoop(0) } } }
+    unsafe { fx2RunBlocking { arrow.effects.suspended.fx2.Fx { fx2HappyPathLoop(0) } } }
 
   @Benchmark
   fun fxDirect(): Int =
@@ -70,9 +75,5 @@ open class HandleNonRaised {
         }
       }
     }
-
-  @Benchmark
-  fun kotlinXCoroutines(): Int =
-    runBlocking { fxDirectHappyPathLoop(0) }
 
 }

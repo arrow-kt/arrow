@@ -20,7 +20,7 @@ val dummy = object : RuntimeException("dummy") {
 @CompilerControl(CompilerControl.Mode.DONT_INLINE)
 open class AttemptRaisedError {
 
-  @Param("100")
+  @Param("10000")
   var size: Int = 0
 
   suspend fun loopNotHappy(size: Int, i: Int): Int =

@@ -9,8 +9,8 @@ import arrow.effects.suspended.fx.unit
 import arrow.unsafe
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
-import arrow.effects.extensions.io.unsafeRun.runBlocking as ioRunBlocking
 import arrow.effects.extensions.fx2.fx.unsafeRun.runBlocking as fx2RunBlocking
+import arrow.effects.extensions.io.unsafeRun.runBlocking as ioRunBlocking
 
 @State(Scope.Thread)
 @Fork(2)

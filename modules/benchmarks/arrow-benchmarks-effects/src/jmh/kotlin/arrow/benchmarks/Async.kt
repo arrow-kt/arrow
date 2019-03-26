@@ -1,19 +1,12 @@
 package arrow.benchmarks
 
-import arrow.core.getOrHandle
-import arrow.core.right
 import arrow.effects.IO
 import arrow.effects.extensions.NonBlocking
-import arrow.effects.extensions.catchfx.monad.followedBy
 import arrow.effects.extensions.continueOn
-import arrow.effects.extensions.envfx.monad.followedBy
 import arrow.effects.extensions.fx2.fx.monad.followedBy
 import arrow.effects.extensions.io.monad.followedBy
-import arrow.effects.suspended.env.EnvFx
-import arrow.effects.suspended.env.toFx
-import arrow.effects.suspended.error.CatchFx
-import arrow.effects.suspended.error.toFx
 import arrow.effects.suspended.fx.Fx
+import arrow.effects.suspended.fx.not
 import arrow.unsafe
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
@@ -21,9 +14,9 @@ import arrow.effects.extensions.catchfx.async.shift as bioShift
 import arrow.effects.extensions.envfx.async.shift as rioShift
 import arrow.effects.extensions.fx.async.shift as fxShift
 import arrow.effects.extensions.fx.unsafeRun.runBlocking as fxRunBlocking
+import arrow.effects.extensions.fx2.fx.async.shift as fx2Shift
 import arrow.effects.extensions.fx2.fx.unsafeRun.runBlocking as fx2RunBlocking
 import arrow.effects.extensions.io.async.shift as ioShift
-import arrow.effects.extensions.fx2.fx.async.shift as fx2Shift
 import arrow.effects.extensions.io.unsafeRun.runBlocking as ioRunBlocking
 
 
@@ -34,7 +27,7 @@ import arrow.effects.extensions.io.unsafeRun.runBlocking as ioRunBlocking
 @CompilerControl(CompilerControl.Mode.DONT_INLINE)
 open class Async {
 
-  @Param("50000")
+  @Param("3000")
   var size: Int = 0
 
   private suspend fun fxAsyncLoop(i: Int): suspend () -> Int =
@@ -54,7 +47,7 @@ open class Async {
 
   @Benchmark
   fun fx(): Int =
-    unsafe { fxRunBlocking { Fx { fxAsyncLoop(0)() } } }
+    unsafe { fxRunBlocking { Fx { !fxAsyncLoop(0) } } }
 
   @Benchmark
   fun fx2(): Int =

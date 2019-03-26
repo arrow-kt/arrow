@@ -2,7 +2,9 @@ package arrow.benchmarks
 
 import arrow.core.Either
 import arrow.effects.extensions.fx.unsafeRun.runBlocking
-import arrow.effects.suspended.fx.*
+import arrow.effects.suspended.fx.Fx
+import arrow.effects.suspended.fx.not
+import arrow.effects.suspended.fx.raiseError
 import arrow.unsafe
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
@@ -15,7 +17,7 @@ import arrow.effects.extensions.fx2.fx.unsafeRun.runBlocking as fx2RunBlocking
 @CompilerControl(CompilerControl.Mode.DONT_INLINE)
 open class AttemptNonRaised {
 
-  @Param("100")
+  @Param("10000")
   var size: Int = 0
 
   tailrec suspend fun loopHappy(size: Int, i: Int): Int =

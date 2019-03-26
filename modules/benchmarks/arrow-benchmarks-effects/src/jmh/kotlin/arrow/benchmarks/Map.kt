@@ -1,13 +1,13 @@
 package arrow.benchmarks
 
 import arrow.effects.IO
-import arrow.effects.suspended.fx.just as fxJust
-import arrow.effects.suspended.fx.map as fxMap
 import arrow.unsafe
 import kotlinx.coroutines.runBlocking
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
 import arrow.effects.extensions.fx2.fx.unsafeRun.runBlocking as fx2RunBlocking
+import arrow.effects.suspended.fx.just as fxJust
+import arrow.effects.suspended.fx.map as fxMap
 
 @State(Scope.Thread)
 @Fork(2)
