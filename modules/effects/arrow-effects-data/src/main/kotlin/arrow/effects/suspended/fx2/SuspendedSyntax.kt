@@ -29,6 +29,13 @@ sealed class Fx<A> : FxOf<A> {
   abstract fun <B> map(f: (A) -> B): Fx<B>
   abstract fun <B> flatMap(f: (A) -> FxOf<B>): Fx<B>
 
+  internal class RaiseError<A>(val error: Throwable) : Fx<A>() {
+    override val fa: suspend () -> A = throw error
+    override fun <B> map(f: (A) -> B): Fx<B> = this as Fx<B>
+    override fun <B> flatMap(f: (A) -> FxOf<B>): Fx<B> = this as Fx<B>
+    override fun toString(): String = "Fx.RaiseError(error = $error)"
+  }
+
   internal class Pure<A>(val value: A) : Fx<A>() {
     override val fa: suspend () -> A = { value }
     override fun <B> map(f: (A) -> B): Fx<B> = Fx.Mapped(this, f, 0)
@@ -58,7 +65,7 @@ sealed class Fx<A> : FxOf<A> {
       else Fx.Mapped(this, f, 0)
 
     //We can do fusion between an map-flatMap boundary
-    override fun <C> flatMap(f: (B) -> FxOf<C>): Fx<C> = Fx.FlatMap(source, { a: A -> f(g(a)) }, 1)
+    override fun <C> flatMap(f: (B) -> FxOf<C>): Fx<C> = Fx.FlatMap(source, g andThen f, 1)
 
     override fun toString(): String = "Fx.Mapped(..., index = $index)"
   }
@@ -83,9 +90,6 @@ sealed class Fx<A> : FxOf<A> {
     override fun toString(): String = "Fx.FlatMap(..., index = $index)"
   }
 
-  private infix fun <A, B> (suspend () -> A).andThen(g: (A) -> FxOf<B>): suspend () -> B =
-    suspend { g(this.invoke()).invoke() }
-
   suspend inline operator fun not(): A =
     invokeLoop(this as Fx<Any?>) as A
 
@@ -93,6 +97,7 @@ sealed class Fx<A> : FxOf<A> {
   internal tailrec suspend fun invokeLoop(fa: Fx<Any?>): Any? = when (fa) {
     is Pure -> fa.value
     is Single -> fa.fa()
+    is RaiseError -> throw fa.error
     is Mapped<*, *> -> {
       val source: Any? = fa.source.invoke()
       val f: (Any?) -> Any? = fa.g as (Any?) -> Any?
@@ -117,42 +122,54 @@ sealed class Fx<A> : FxOf<A> {
   fun <B> ap(ff: Fx<(A) -> B>): Fx<B> =
     ff.flatMap { map(it) }
 
-  fun handleErrorWith(f: (Throwable) -> Fx<A>): Fx<A> =
-    Fx {
+  fun handleErrorWith(f: (Throwable) -> Fx<A>): Fx<A> = when (this) {
+    is RaiseError -> f(error)
+    is Pure -> this
+    else -> Fx {
       try {
         fa()
       } catch (e: Throwable) {
         f(e)()
       }
     }
+  }
 
-  fun handleError(f: (Throwable) -> A): Fx<A> =
-    Fx {
+  fun handleError(f: (Throwable) -> A): Fx<A> = when (this) {
+    is RaiseError -> Fx { f(error) }
+    is Pure -> this
+    else -> Fx {
       try {
         fa()
       } catch (e: Throwable) {
         f(e)
       }
     }
+  }
 
   fun ensure(
     error: () -> Throwable,
     predicate: (A) -> Boolean
-  ): Fx<A> =
-    Fx {
+  ): Fx<A> = when (this) {
+    is RaiseError -> this
+    is Pure -> if (!predicate(value)) Fx.RaiseError(error()) else this
+    else -> Fx {
       val result = fa()
       if (!predicate(result)) throw error()
       else result
     }
+  }
 
-  fun attempt(): Fx<Either<Throwable, A>> =
-    Fx {
+  fun attempt(): Fx<Either<Throwable, A>> = when (this) {
+    is RaiseError -> Fx.Pure(Left(error))
+    is Pure -> Fx.Pure(Right(value))
+    else -> Fx {
       try {
-        fa().right()
+        Right(fa())
       } catch (e: Throwable) {
-        e.left()
+        Left(e)
       }
     }
+  }
 
   fun <B> bracketCase(
     release: (A, ExitCase<Throwable>) -> FxOf<Unit>,
@@ -196,7 +213,7 @@ sealed class Fx<A> : FxOf<A> {
 
     fun unit(): Fx<Unit> = Fx.Pure(Unit)
 
-    fun <A> raiseError(e: Throwable): Fx<A> = Fx { throw e }
+    fun <A> raiseError(e: Throwable): Fx<A> = Fx.RaiseError(e)
 
     fun <A> defer(fa: () -> FxOf<A>): Fx<A> =
       Fx.FlatMap(Fx.Pure(Unit), { fa() }, 0)
