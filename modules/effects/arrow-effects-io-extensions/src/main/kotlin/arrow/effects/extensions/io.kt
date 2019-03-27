@@ -3,7 +3,6 @@ package arrow.effects.extensions
 import arrow.effects.*
 import arrow.effects.extensions.io.concurrent.concurrent
 import arrow.effects.extensions.io.dispatchers.dispatchers
-import arrow.effects.suspended.fx.TrampolinePool
 import arrow.effects.typeclasses.Concurrent
 import arrow.effects.typeclasses.ConcurrentEffect
 import arrow.effects.typeclasses.Dispatchers

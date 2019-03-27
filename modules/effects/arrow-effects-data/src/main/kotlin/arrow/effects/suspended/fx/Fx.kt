@@ -3,22 +3,17 @@ package arrow.effects.suspended.fx
 import arrow.Kind
 import arrow.core.*
 import arrow.effects.internal.Platform
-import arrow.effects.internal.asyncContinuation
-import arrow.effects.typeclasses.ConnectedProc
-import arrow.effects.typeclasses.ConnectedProcF
-import arrow.effects.typeclasses.ExitCase
+import arrow.effects.typeclasses.*
 import arrow.typeclasses.Continuation
+import arrow.unsafe
 import java.util.concurrent.CancellationException
-import java.util.concurrent.Executor
 import java.util.concurrent.atomic.AtomicReference
-import kotlin.concurrent.getOrSet
 import kotlin.coroutines.*
 
 class ForFx private constructor() {
   companion object
 }
-typealias
-  FxOf<A> = Kind<ForFx, A>
+typealias FxOf<A> = Kind<ForFx, A>
 typealias FxProc<A> = ConnectedProc<ForFx, A>
 typealias FxProcF<A> = ConnectedProcF<ForFx, A>
 
@@ -26,177 +21,252 @@ typealias FxProcF<A> = ConnectedProcF<ForFx, A>
 inline fun <A> FxOf<A>.fix(): Fx<A> =
   this as Fx<A>
 
-suspend operator fun <A> FxOf<A>.invoke(): A = fix().fa.invoke()
+suspend operator fun <A> FxOf<A>.invoke(): A = fix().invoke()
 
-class Fx<A>(val fa: suspend () -> A) : FxOf<A> {
-  companion object
-}
+sealed class Fx<A> : FxOf<A> {
 
-fun <A> fx(f: suspend () -> A): Fx<A> =
-  Fx(f)
+  abstract val fa: suspend () -> A
+  abstract fun <B> map(f: (A) -> B): Fx<B>
+  abstract fun <B> flatMap(f: (A) -> FxOf<B>): Fx<B>
 
-fun <A> effect(f: suspend () -> A): suspend () -> A =
-  f
-
-val threadInvocations: ThreadLocal<Int> = ThreadLocal.withInitial { 0 }
-
-suspend inline operator fun <A> (suspend () -> A).not(): A {
-  val currentIters = threadInvocations.get()
-  return if (currentIters < 127) {
-    threadInvocations.set(currentIters + 1)
-    this()
-  } else {
-    threadInvocations.set(0)
-    trampoline(this)()
+  internal class RaiseError<A>(val error: Throwable) : Fx<A>() {
+    override val fa: suspend () -> A = throw error
+    override fun <B> map(f: (A) -> B): Fx<B> = this as Fx<B>
+    override fun <B> flatMap(f: (A) -> FxOf<B>): Fx<B> = this as Fx<B>
+    override fun toString(): String = "Fx.RaiseError(error = $error)"
   }
-}
 
-suspend inline fun <A> (suspend () -> A).bind(): A =
-  !this
+  internal class Pure<A>(val value: A) : Fx<A>() {
+    override val fa: suspend () -> A = { value }
+    override fun <B> map(f: (A) -> B): Fx<B> = Fx.Mapped(this, f, 0)
+    override fun <B> flatMap(f: (A) -> FxOf<B>): Fx<B> = Fx.FlatMap(this, f, 0)
+    override fun toString(): String = "Fx.Pure(value = $value)"
+  }
 
-suspend inline operator fun <A> (suspend () -> A).component1(): A =
-  !this
+  //Purely wrapped suspend function.
+  //Should wrap a singular suspension point otherwise stack safety cannot be guaranteed.
+  //This is not an issue if you guarantee stack safety yourself for your suspended program. i.e. using `tailrec`
+  internal class Single<A>(val source: suspend () -> A) : Fx<A>() {
+    override val fa: suspend () -> A = source
+    override fun <B> map(f: (A) -> B): Fx<B> = Fx.Mapped(this, f, 1)
+    override fun <B> flatMap(f: (A) -> FxOf<B>): Fx<B> = Fx.FlatMap(this, f, 1)
+    override fun toString(): String = "Fx.Single"
+  }
 
-/**
- * Avoid recalculating stack traces on rethrows
- */
-class RaisedError(val exception: Throwable) : Throwable() {
-  override fun fillInStackTrace(): Throwable =
-    this
-
-  override val cause: Throwable?
-    get() = exception
-
-  override fun equals(other: Any?): Boolean =
-    when (other) {
-      is RaisedError -> exception.message == other.exception.message
-      is Throwable -> exception.message == other.message
-      else -> exception == other
+  internal class Mapped<A, B>(val source: FxOf<A>, val g: (A) -> B, val index: Int) : Fx<B>() {
+    override val fa: suspend () -> B = suspend {
+      invokeLoop(this@Mapped as Fx<Any?>) as B
     }
-}
 
-inline fun <A> Throwable.raiseError(): suspend () -> A =
-  { throw RaisedError(this) }
+    override fun <C> map(f: (B) -> C): Fx<C> =
+    // Allowed to do maxStackDepthSize map operations in sequence before
+    // starting a new Map fusion in order to avoid stack overflows
+      if (index != Platform.maxStackDepthSize) Fx.Mapped(source, g andThen f, index + 1)
+      else Fx.Mapped(this, f, 0)
 
-object Trampoline : TrampolinePoolElement(Executor { it.run() }), CoroutineContext
+    //We can do fusion between an map-flatMap boundary
+    override fun <C> flatMap(f: (B) -> FxOf<C>): Fx<C> = Fx.FlatMap(source, g andThen f, 1)
 
-suspend fun <A> trampoline(f: suspend () -> A): suspend () -> A =
-  suspendCoroutine { c ->
-    f.startCoroutine(asyncContinuation(Trampoline) {
-      it.fold(c::resumeWithException) { c.resume { it } }
-    })
+    override fun toString(): String = "Fx.Mapped(..., index = $index)"
   }
 
-
-suspend fun <A, B> (suspend () -> A).map(f: (A) -> B): suspend () -> B =
-  { f(!this@map) }
-
-fun <A> just(a: A): suspend () -> A =
-  { a }
-
-val <A> A.just: suspend () -> A
-  get() = { this }
-
-suspend fun <A, B> (suspend () -> A).ap(ff: suspend () -> (A) -> B): suspend () -> B =
-  map(!ff)
-
-suspend fun <A, B> (suspend () -> A).flatMap(f: (A) -> suspend () -> B): suspend () -> B =
-  {
-    try {
-      !f(!this)
-    } catch (e: Throwable) {
-      if (NonFatal(e)) {
-        !raiseError<B>(e)
-      } else throw e
+  internal class FlatMap<A, B>(val source: FxOf<A>, val fb: (A) -> FxOf<B>, val index: Int) : Fx<B>() {
+    override val fa: suspend () -> B = suspend {
+      invokeLoop(this@FlatMap as Fx<Any?>) as B
     }
+
+    //If we reach the maxStackDepth then we can fold the current FlatMap and return a Mapped case
+    //If we haven't reached the maxStackDepth we fuse the map operator within the flatMap stack.
+    override fun <C> map(f: (B) -> C): Fx<C> =
+      if (index != Platform.maxStackDepthSize) Fx.Mapped(this, f, 0)
+      else Fx.FlatMap(source, { a -> Fx { f(fb(a)()) } }, index + 1)
+
+    override fun <C> flatMap(f: (B) -> FxOf<C>): Fx<C> =
+      if (index != Platform.maxStackDepthSize) Fx.FlatMap(this, f, 0)
+      else Fx.FlatMap(source, { a ->
+        Fx.FlatMap(fb(a), { b -> f(b) }, 0)
+      }, index + 1)
+
+    override fun toString(): String = "Fx.FlatMap(..., index = $index)"
   }
 
-suspend fun <A> (suspend () -> A).attempt(unit: Unit = Unit): suspend () -> Either<Throwable, A> =
-  attempt(this)
+  suspend inline operator fun not(): A =
+    invokeLoop(this as Fx<Any?>) as A
 
-suspend fun <A> attempt(f: suspend () -> A): suspend () -> Either<Throwable, A> =
-  {
-    try {
-      (!f).right()
-    } catch (e: Throwable) {
-      e.left()
+  @PublishedApi
+  internal tailrec suspend fun invokeLoop(fa: Fx<Any?>): Any? = when (fa) {
+    is Pure -> fa.value
+    is Single -> fa.fa()
+    is RaiseError -> throw fa.error
+    is Mapped<*, *> -> {
+      val source: Any? = fa.source.invoke()
+      val f: (Any?) -> Any? = fa.g as (Any?) -> Any?
+      f(source)
+    }
+    is FlatMap<*, *> -> {
+      val source: Any? = fa.source.fix().invoke()
+      val fb: (Any?) -> Fx<Any?> = fa.fb as (Any?) -> Fx<Any?>
+      invokeLoop(fb(source))
     }
   }
 
-val unit: suspend () -> Unit = { Unit }
+  suspend inline operator fun invoke(): A =
+    !this
 
-fun <A> raiseError(e: Throwable, unit: Unit = Unit): suspend () -> A =
-  { if (NonFatal(e)) throw RaisedError(e) else throw e }
+  suspend inline operator fun component1(): A =
+    !this
 
-fun <A> (suspend () -> A).handleErrorWith(f: (Throwable) -> suspend () -> A): suspend () -> A =
-  {
-    try {
-      !this
-    } catch (r: RaisedError) {
-      !f(r.exception)
-    } catch (e: Throwable) {
-      !f(e.nonFatalOrThrow())
-    }
-  }
+  suspend inline fun bind(): A =
+    !this
 
-fun <A> (suspend () -> A).handleError(f: (Throwable) -> A): suspend () -> A =
-  {
-    try {
-      !this
-    } catch (r: RaisedError) {
-      f(r.exception)
-    } catch (e: Throwable) {
-      if (NonFatal(e)) f(e)
-      else throw e
-    }
-  }
+  fun <B> ap(ff: Fx<(A) -> B>): Fx<B> =
+    ff.flatMap { map(it) }
 
-fun <A> (suspend () -> A).ensure(
-  error: () -> Throwable,
-  predicate: (A) -> Boolean
-): suspend () -> A =
-  {
-    val result = !this
-    if (!predicate(result)) throw error()
-    else result
-  }
-
-suspend fun <A, B> (suspend () -> A).bracketCase(
-  release: (A, ExitCase<Throwable>) -> suspend () -> Unit,
-  use: (A) -> suspend () -> B
-): suspend () -> B = {
-  val a = !this
-
-  val fxB = try {
-    use(a)
-  } catch (e: Throwable) {
-    release(a, ExitCase.Error(e)).foldContinuation { e2 ->
-      throw Platform.composeErrors(e, e2)
-    }
-    throw e
-  }
-
-  val b = fxB.foldContinuation { e ->
-    when (e) {
-      is CancellationException -> release(a, ExitCase.Canceled).foldContinuation { e2 ->
-        throw Platform.composeErrors(e, e2)
-      }
-      else -> release(a, ExitCase.Error(e)).foldContinuation { e2 ->
-        throw Platform.composeErrors(e, e2)
+  fun handleErrorWith(f: (Throwable) -> Fx<A>): Fx<A> = when (this) {
+    is RaiseError -> f(error)
+    is Pure -> this
+    else -> Fx {
+      try {
+        fa()
+      } catch (e: Throwable) {
+        f(e)()
       }
     }
-    throw e
   }
-  release(a, ExitCase.Completed).invoke()
-  b
+
+  fun handleError(f: (Throwable) -> A): Fx<A> = when (this) {
+    is RaiseError -> Fx { f(error) }
+    is Pure -> this
+    else -> Fx {
+      try {
+        fa()
+      } catch (e: Throwable) {
+        f(e)
+      }
+    }
+  }
+
+  fun ensure(
+    error: () -> Throwable,
+    predicate: (A) -> Boolean
+  ): Fx<A> = when (this) {
+    is RaiseError -> this
+    is Pure -> if (!predicate(value)) Fx.RaiseError(error()) else this
+    else -> Fx {
+      val result = fa()
+      if (!predicate(result)) throw error()
+      else result
+    }
+  }
+
+  fun attempt(): Fx<Either<Throwable, A>> = when (this) {
+    is RaiseError -> Fx.Pure(Left(error))
+    is Pure -> Fx.Pure(Right(value))
+    else -> Fx {
+      try {
+        Right(fa())
+      } catch (e: Throwable) {
+        Left(e)
+      }
+    }
+  }
+
+  fun <B> bracketCase(
+    release: (A, ExitCase<Throwable>) -> FxOf<Unit>,
+    use: (A) -> FxOf<B>
+  ): Fx<B> = Fx {
+    val a = invoke()
+
+    val fxB: Fx<B> = try {
+      use(a).fix()
+    } catch (e: Throwable) {
+      release(a, ExitCase.Error(e)).fix().foldContinuation { e2 ->
+        throw Platform.composeErrors(e, e2)
+      }
+      throw e
+    }
+
+    val b = fxB.foldContinuation { e ->
+      when (e) {
+        is CancellationException -> release(a, ExitCase.Canceled).fix().foldContinuation { e2 ->
+          throw Platform.composeErrors(e, e2)
+        }
+        else -> release(a, ExitCase.Error(e)).fix().foldContinuation { e2 ->
+          throw Platform.composeErrors(e, e2)
+        }
+      }
+      throw e
+    }
+    release(a, ExitCase.Completed).fix().invoke()
+    b
+  }
+
+  fun continueOn(ctx: CoroutineContext): Fx<A> =
+    unit().map { foldContinuation(ctx) { throw it } }
+
+  @RestrictsSuspension
+  companion object {
+
+    operator fun <A> invoke(fa: suspend () -> A): Fx<A> = Fx.Single(fa)
+
+    fun <A> just(a: A): Fx<A> = Fx.Pure(a)
+
+    fun unit(): Fx<Unit> = Fx.Pure(Unit)
+
+    fun <A> raiseError(e: Throwable): Fx<A> = Fx.RaiseError(e)
+
+    fun <A> defer(fa: () -> FxOf<A>): Fx<A> =
+      Fx.FlatMap(Fx.Pure(Unit), { fa() }, 0)
+
+    fun <A, B> tailRecM(a: A, f: (A) -> FxOf<Either<A, B>>): Fx<B> =
+      Fx.FlatMap(f(a), { result ->
+        result.fold({ tailRecM(it, f) }, { just(it) })
+      }, 0)
+
+    /** Hide member because it's discouraged to use uncancelable builder for cancelable concrete type **/
+    fun <A> async(fa: Proc<A>): Fx<A> = Fx<A> {
+      suspendCoroutine { continuation ->
+        fa { either ->
+          continuation.resumeWith(either.fold(Result.Companion::failure, Result.Companion::success))
+        }
+      }
+    }
+
+    fun <A> unsafe.runBlocking(fa: Fx<A>): A {
+      val value = AtomicReference<A>()
+      fa.fa.startCoroutine(object : kotlin.coroutines.Continuation<A> {
+        override val context: CoroutineContext
+          get() = EmptyCoroutineContext
+
+        override fun resumeWith(result: Result<A>) {
+          value.set(result.getOrThrow())
+        }
+      })
+      return value.get()
+    }
+
+  }
+
+  override fun toString(): String = "Fx(...)"
+
 }
 
-fun <A> (suspend () -> A).foldContinuation(
+fun helloWorld(): String =
+  "Hello World"
+
+suspend fun printHelloWorld(): Unit =
+  println(helloWorld())
+
+val program: Fx<Unit> = Fx {
+  !Fx { printHelloWorld() }
+}
+
+fun <A> Fx<A>.foldContinuation(
   context: CoroutineContext = EmptyCoroutineContext,
   onError: (Throwable) -> A
 ): A {
   val result: AtomicReference<A> = AtomicReference()
-  startCoroutine(object : Continuation<A> {
+  fa.startCoroutine(object : Continuation<A> {
     override fun resume(value: A) {
       result.set(value)
     }
@@ -209,107 +279,4 @@ fun <A> (suspend () -> A).foldContinuation(
       get() = context
   })
   return result.get()
-}
-
-fun TrampolinePool(executorService: Executor): CoroutineContext =
-  TrampolinePoolElement(executorService)
-
-private val iterations: ThreadLocal<Int> = ThreadLocal.withInitial { 0 }
-private val threadTrampoline = ThreadLocal<TrampolineExecutor>()
-
-open class TrampolinePoolElement(
-  val executionService: Executor,
-  val asyncBoundaryAfter: Int = 127
-) : AbstractCoroutineContextElement(ContinuationInterceptor), ContinuationInterceptor {
-
-  override fun <T> interceptContinuation(continuation: kotlin.coroutines.Continuation<T>): kotlin.coroutines.Continuation<T> =
-    TrampolinedContinuation(executionService, continuation.context.fold(continuation) { cont, element ->
-      if (element != this@TrampolinePoolElement && element is ContinuationInterceptor)
-        element.interceptContinuation(cont)
-      else cont
-    }, asyncBoundaryAfter)
-}
-
-private class TrampolinedContinuation<T>(
-  val executionService: Executor,
-  val cont: kotlin.coroutines.Continuation<T>,
-  val asyncBoundaryAfter: Int
-) : kotlin.coroutines.Continuation<T> {
-  override val context: CoroutineContext = cont.context
-
-  override fun resumeWith(result: Result<T>) {
-    val currentIterations = iterations.get()
-    if (currentIterations > asyncBoundaryAfter) {
-      iterations.set(0)
-      threadTrampoline
-        .getOrSet { TrampolineExecutor(executionService) }
-        .execute(Runnable {
-          cont.resumeWith(result)
-        })
-    } else {
-      //println("Blocking: currentIterations: $currentIterations, cont.context: $context")
-      iterations.set(currentIterations + 1)
-      cont.resumeWith(result)
-    }
-  }
-}
-
-/**
- * Trampoline implementation, meant to be stored in a `ThreadLocal`.
- * See `TrampolineEC`.
- *
- * INTERNAL API.
- */
-internal class TrampolineExecutor(val underlying: Executor) {
-  private var immediateQueue = Platform.ArrayStack<Runnable>()
-  private var withinLoop = false
-
-  fun startLoop(runnable: Runnable): Unit {
-    withinLoop = true
-    try {
-      immediateLoop(runnable)
-    } finally {
-      withinLoop = false
-    }
-  }
-
-  fun execute(runnable: Runnable): Unit {
-    if (!withinLoop) {
-      startLoop(runnable)
-    } else {
-      immediateQueue.push(runnable)
-    }
-  }
-
-  private fun forkTheRest(): Unit {
-    class ResumeRun(val head: Runnable, val rest: Platform.ArrayStack<Runnable>) : Runnable {
-      override fun run(): Unit {
-        immediateQueue.addAll(rest)
-        immediateLoop(head)
-      }
-    }
-
-    val head = immediateQueue.firstOrNull()
-    if (head != null) {
-      immediateQueue.pop()
-      val rest = immediateQueue
-      immediateQueue = Platform.ArrayStack<Runnable>()
-      underlying.execute(ResumeRun(head, rest))
-    }
-  }
-
-  private tailrec fun immediateLoop(task: Runnable): Unit {
-    try {
-      task.run()
-    } catch (ex: Throwable) {
-      forkTheRest()
-      ex.nonFatalOrThrow()
-    }
-
-    val next = immediateQueue.firstOrNull()
-    if (next != null) {
-      immediateQueue.pop()
-      immediateLoop(next)
-    }
-  }
 }

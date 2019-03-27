@@ -4,7 +4,9 @@ import arrow.Kind
 import arrow.core.*
 import arrow.effects.IODispatchers
 import arrow.effects.KindConnection
+import arrow.effects.extensions.*
 import arrow.effects.extensions.fx.dispatchers.dispatchers
+import arrow.effects.extensions.fx.monadDefer.monadDefer
 import arrow.effects.internal.Platform
 import arrow.effects.internal.UnsafePromise
 import arrow.effects.internal.asyncContinuation
@@ -12,16 +14,19 @@ import arrow.effects.suspended.fx.*
 import arrow.effects.typeclasses.*
 import arrow.extension
 import arrow.typeclasses.*
+import arrow.typeclasses.Continuation
 import arrow.unsafe
 import java.util.concurrent.CancellationException
 import java.util.concurrent.Executor
 import java.util.concurrent.ForkJoinPool
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
+import kotlin.concurrent.getOrSet
 import kotlin.coroutines.*
 
+
 @extension
-interface FxDispatchers : Dispatchers<ForFx> {
+interface Fx2Dispatchers : Dispatchers<ForFx> {
   override fun default(): CoroutineContext =
     IODispatchers.CommonPool
 
@@ -30,19 +35,20 @@ interface FxDispatchers : Dispatchers<ForFx> {
 }
 
 val NonBlocking: CoroutineContext = Fx.dispatchers().default()
+val Trampoline: CoroutineContext = Fx.dispatchers().trampoline()
 
 @extension
-interface FxUnsafeRun : UnsafeRun<ForFx> {
+interface Fx2UnsafeRun : UnsafeRun<ForFx> {
 
   override suspend fun <A> unsafe.runBlocking(fa: () -> FxOf<A>): A =
-    fa().fix().fa.foldContinuation(arrow.effects.suspended.fx.Trampoline) { throw it }
+    fa().fix().foldContinuation(Trampoline) { throw it }
 
   override suspend fun <A> unsafe.runNonBlocking(fa: () -> FxOf<A>, cb: (Either<Throwable, A>) -> Unit) =
     fa().fix().fa.startCoroutine(asyncContinuation(NonBlocking, cb))
 }
 
 @extension
-interface FxEnvironment : Environment<ForFx> {
+interface Fx2Environment : Environment<ForFx> {
   override fun dispatchers(): Dispatchers<ForFx> =
     Fx.dispatchers()
 
@@ -52,94 +58,92 @@ interface FxEnvironment : Environment<ForFx> {
 
 
 @extension
-interface FxFunctor : Functor<ForFx> {
+interface Fx2Functor : Functor<ForFx> {
   override fun <A, B> FxOf<A>.map(f: (A) -> B): Fx<B> =
-    Fx { fix().fa.map(f)() }
+    fix().map(f)
 }
 
 @extension
-interface FxApplicative : Applicative<ForFx>, FxFunctor {
+interface Fx2Applicative : Applicative<ForFx>, Fx2Functor {
   override fun <A> just(a: A): Fx<A> =
-    Fx { a }
+    Fx.just(a)
 
   override fun <A, B> FxOf<A>.ap(ff: FxOf<(A) -> B>): Fx<B> =
-    Fx { fix().fa.ap(ff.fix().fa)() }
+    fix().ap(ff.fix())
 
   override fun <A, B> FxOf<A>.map(f: (A) -> B): Fx<B> =
-    Fx { fix().fa.map(f)() }
+    fix().map(f)
 }
 
 @extension
-interface FxApplicativeError : ApplicativeError<ForFx, Throwable>, FxApplicative {
+interface Fx2ApplicativeError : ApplicativeError<ForFx, Throwable>, Fx2Applicative {
   override fun <A> raiseError(e: Throwable): Fx<A> =
-    Fx { throw e }
+    Fx.raiseError(e)
 
   override fun <A> FxOf<A>.handleErrorWith(f: (Throwable) -> FxOf<A>): Fx<A> =
-    Fx { fix().fa.handleErrorWith { f(it).fix().fa }() }
+    fix().handleErrorWith { f(it).fix() }
 }
 
 @extension
-interface FxMonad : Monad<ForFx>, FxApplicative {
+interface Fx2Monad : Monad<ForFx>, Fx2Applicative {
 
   override fun <A, B> FxOf<A>.flatMap(f: (A) -> FxOf<B>): Fx<B> =
-    Fx { fix().fa.flatMap { f(it).fix().fa }() }
+    fix().flatMap { f(it).fix() }
 
   override fun <A, B> tailRecM(a: A, f: (A) -> Kind<ForFx, Either<A, B>>): FxOf<B> =
-    Fx { tailRecLoop(a, f.andThen { it.fix().fa })() }
+    Fx.tailRecM(a, f)
 
   override fun <A, B> FxOf<A>.map(f: (A) -> B): Fx<B> =
-    Fx { fix().fa.map(f)() }
+    fix().map(f)
 
   override fun <A, B> FxOf<A>.ap(ff: FxOf<(A) -> B>): Fx<B> =
-    Fx { fix().fa.ap(ff.fix().fa)() }
+    fix().ap(ff.fix())
 
 }
 
 @extension
-interface FxMonadError : MonadError<ForFx, Throwable>, FxApplicativeError, FxMonad
+interface Fx2MonadError : MonadError<ForFx, Throwable>, Fx2ApplicativeError, Fx2Monad
 
 @extension
-interface FxMonadThrow : MonadThrow<ForFx>, FxMonadError
+interface Fx2MonadThrow : MonadThrow<ForFx>, Fx2MonadError
 
 @extension
-interface FxBracket : Bracket<ForFx, Throwable>, FxMonadThrow {
+interface Fx2Bracket : Bracket<ForFx, Throwable>, Fx2MonadThrow {
   override fun <A, B> FxOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> FxOf<Unit>, use: (A) -> FxOf<B>): Fx<B> =
-    Fx {
-      fix().fa.bracketCase(
-        release.curry().andThen { a -> a.andThen { b -> b.fix().fa } }.uncurried(),
-        use.andThen { a -> a.fix().fa }
-      )()
-    }
+    fix().bracketCase(
+      release.curry().andThen { a -> a.andThen { b -> b.fix() } }.uncurried(),
+      use.andThen { a -> a.fix() }
+    )
 }
 
 @extension
-interface FxMonadDefer : MonadDefer<ForFx>, FxBracket {
+interface Fx2MonadDefer : MonadDefer<ForFx>, Fx2Bracket {
   override fun <A> defer(fa: () -> FxOf<A>): Fx<A> =
     unit().flatMap { fa() }
 }
 
 @extension
-interface FxAsync : Async<ForFx>, FxMonadDefer {
+interface Fx2Async : Async<ForFx>, Fx2MonadDefer {
 
   override fun <A> async(fa: Proc<A>): Fx<A> =
-    Fx { fromAsync(fa)() }
+    Fx.async(fa)
 
   override fun <A> asyncF(k: ProcF<ForFx, A>): Fx<A> =
-    Fx { fromAsyncF(k)() }
+    Fx.asyncF(k)
 
   override fun <A> FxOf<A>.continueOn(ctx: CoroutineContext): Fx<A> =
-    Fx { ctx.continueOn(fix().fa)() }
+    ctx.shift().followedBy(fix()).fix()
 }
 
-private class Pool(val pool: ForkJoinPool) : AbstractCoroutineContextElement(ContinuationInterceptor), ContinuationInterceptor {
+private class Pool2(val pool: ForkJoinPool) : AbstractCoroutineContextElement(ContinuationInterceptor), ContinuationInterceptor {
   override fun <T> interceptContinuation(continuation: kotlin.coroutines.Continuation<T>): kotlin.coroutines.Continuation<T> =
-    PoolContinuation(pool, continuation.context.fold(continuation) { cont, element ->
-      if (element != this@Pool && element is ContinuationInterceptor)
+    Pool2Continuation(pool, continuation.context.fold(continuation) { cont, element ->
+      if (element != this@Pool2 && element is ContinuationInterceptor)
         element.interceptContinuation(cont) else cont
     })
 }
 
-private class PoolContinuation<T>(
+private class Pool2Continuation<T>(
   val pool: ForkJoinPool,
   val cont: kotlin.coroutines.Continuation<T>
 ) : kotlin.coroutines.Continuation<T> {
@@ -151,20 +155,20 @@ private class PoolContinuation<T>(
 }
 
 @extension
-interface FxConcurrent : Concurrent<ForFx>, FxAsync {
+interface Fx2Concurrent : Concurrent<ForFx>, Fx2Async {
 
   override fun dispatchers(): Dispatchers<ForFx> =
     Fx.dispatchers()
 
   override fun <A> async(fa: FxProc<A>): Fx<A> =
-    Fx { fromAsync(fa)() }
+    Fx.async(fa)
 
   override fun <A> asyncF(fa: FxProcF<A>): Fx<A> =
-    Fx { fromAsyncF(fa)() }
+    Fx.asyncF(fa)
 
   override fun <A> CoroutineContext.startFiber(fa: FxOf<A>): Fx<Fiber<ForFx, A>> {
     val promise = UnsafePromise<A>()
-    val conn = FxConnection()
+    val conn = Fx2Connection()
     fa.fix().fa.startCoroutine(asyncContinuation(this) { either ->
       either.fold(
         { promise.complete(it.left()) },
@@ -172,24 +176,24 @@ interface FxConcurrent : Concurrent<ForFx>, FxAsync {
       )
     })
     return Fx {
-      FxFiber(promise, conn)
+      Fx2Fiber(promise, conn)
     }
   }
 
   override fun <A, B> CoroutineContext.racePair(fa: FxOf<A>, fb: FxOf<B>): Fx<RacePair<ForFx, A, B>> =
-    Fx { racePair(fa.fix().fa, fb.fix().fa)() }
+    Fx.racePair(this@racePair, fa, fb)
 
   override fun <A, B, C> CoroutineContext.raceTriple(fa: FxOf<A>, fb: FxOf<B>, fc: FxOf<C>): Fx<RaceTriple<ForFx, A, B, C>> =
-    Fx { raceTriple(fa.fix().fa, fb.fix().fa, fc.fix().fa)() }
+    Fx.raceTriple(this@raceTriple, fa, fb, fc)
 
   override fun <A> asyncF(k: ProcF<ForFx, A>): Fx<A> =
-    Fx { fromAsyncF(k)() }
+    Fx.asyncF(k)
 
   override fun <A> async(fa: Proc<A>): Fx<A> =
-    Fx { fromAsync(fa)() }
+    Fx.async(fa)
 }
 
-class BlockingCoroutine<T>(override val context: CoroutineContext) : kotlin.coroutines.Continuation<T> {
+class BlockingCoroutine2<T>(override val context: CoroutineContext) : kotlin.coroutines.Continuation<T> {
 
   private val retVal: AtomicReference<T> = AtomicReference()
 
@@ -202,51 +206,110 @@ class BlockingCoroutine<T>(override val context: CoroutineContext) : kotlin.coro
 
 }
 
+fun <A> Fx.Companion.async(fa: FxProc<A>): Fx<A> = Fx<A> {
+  suspendCoroutine { continuation ->
+    val conn = Fx2Connection()
+    //Is CancellationException from kotlin in kotlinx package???
+    conn.push(Fx { continuation.resumeWith(Result.failure(CancellationException())) })
+    fa(conn) { either ->
+      continuation.resumeWith(either.fold(Result.Companion::failure, Result.Companion::success))
+    }
+  }
+}
 
-@extension
-interface FxFx : arrow.effects.typeclasses.suspended.concurrent.Fx<ForFx> {
-  override fun concurrent(): Concurrent<ForFx> =
-    object : FxConcurrent {}
+/** Hide member because it's discouraged to use uncancelable builder for cancelable concrete type **/
+internal fun <A> Fx.Companion.asyncF(fa: ProcF<ForFx, A>): Fx<A> = Fx<A> {
+  suspendCoroutine { continuation ->
+    fa { either ->
+      continuation.resumeWith(either.fold(Result.Companion::failure, Result.Companion::success))
+    }.fix().foldContinuation(EmptyCoroutineContext, mapUnit)
+  }
+}
+
+fun <A> Fx.Companion.asyncF(fa: FxProcF<A>): Fx<A> = Fx<A> {
+  suspendCoroutine { continuation ->
+    val conn = Fx2Connection()
+    //Is CancellationException from kotlin in kotlinx package???
+    conn.push(Fx { continuation.resumeWith(Result.failure(CancellationException())) })
+    fa(conn) { either ->
+      continuation.resumeWith(either.fold(Result.Companion::failure, Result.Companion::success))
+    }.fix().foldContinuation(EmptyCoroutineContext, mapUnit)
+  }
 }
 
 
-fun FxConnection(): KindConnection<ForFx> =
-  KindConnection(object : FxMonadDefer {}) { it.fix().fa.foldContinuation { e -> throw e } }
+@extension
+interface Fx2Fx : arrow.effects.typeclasses.suspended.concurrent.Fx<ForFx> {
+  override fun concurrent(): Concurrent<ForFx> =
+    object : Fx2Concurrent {}
+}
 
-internal fun <A> FxFiber(promise: UnsafePromise<A>, conn: KindConnection<ForFx>): Fiber<ForFx, A> {
-  val join: Fx<A> = Fx {
-    fromAsync<A> { conn2, cb ->
-      conn2.push(Fx { promise.remove(cb) })
-      conn.push(conn2.cancel())
-      promise.get { a ->
-        cb(a)
-        conn2.pop()
-        conn.pop()
-      }
-    }()
+fun <A> FxOf<A>.startOn(ctx: CoroutineContext): Fx<Fiber<ForFx, A>> =
+  Fx {
+    val promise = UnsafePromise<A>()
+    val conn = Fx2Connection()
+    fix().fa.startCoroutine(asyncContinuation(ctx) { either ->
+      either.fold(
+        { promise.complete(it.left()) },
+        { promise.complete(it.right()) }
+      )
+    })
+
+    Fx2Fiber(promise, conn)
+  }
+
+fun <A> Fx<A>.foldContinuation(
+  context: CoroutineContext = EmptyCoroutineContext,
+  onError: (Throwable) -> A
+): A {
+  val result: AtomicReference<A> = AtomicReference()
+  fa.startCoroutine(object : Continuation<A> {
+    override fun resume(value: A) {
+      result.set(value)
+    }
+
+    override fun resumeWithException(exception: Throwable) {
+      result.set(onError(exception))
+    }
+
+    override val context: CoroutineContext
+      get() = context
+  })
+  return result.get()
+}
+
+fun Fx2Connection(): KindConnection<ForFx> =
+  KindConnection(Fx.monadDefer()) { it.fix().foldContinuation { e -> throw e } }
+
+internal fun <A> Fx2Fiber(promise: UnsafePromise<A>, conn: KindConnection<ForFx>): Fiber<ForFx, A> {
+  val join: Fx<A> = Fx.async { conn2, cb ->
+    conn2.push(Fx { promise.remove(cb) })
+    conn.push(conn2.cancel())
+    promise.get { a ->
+      cb(a)
+      conn2.pop()
+      conn.pop()
+    }
   }
   return Fiber(join, conn.cancel())
 }
 
-suspend fun <A, B> CoroutineContext.racePair(
-  fa: suspend () -> A,
-  fb: suspend () -> B
-): suspend () -> Either<Tuple2<A, Fiber<ForFx, B>>, Tuple2<Fiber<ForFx, A>, B>> = {
-  fromAsync<Either<Tuple2<A, Fiber<ForFx, B>>, Tuple2<Fiber<ForFx, A>, B>>> { conn, cb ->
+fun <A, B> Fx.Companion.racePair(ctx: CoroutineContext, fa: FxOf<A>, fb: FxOf<B>): Fx<Either<Tuple2<A, Fiber<ForFx, B>>, Tuple2<Fiber<ForFx, A>, B>>> =
+  Fx.async { conn, cb ->
     val active = AtomicBoolean(true)
-    val upstreamCancelToken: Fx<Unit> = Fx { if (conn.isCanceled()) Fx { Unit }() else conn.cancel()() }
+    val upstreamCancelToken = Fx.defer { if (conn.isCanceled()) Fx { Unit } else conn.cancel() }
 
-    val connA = FxConnection()
+    val connA = Fx2Connection()
     connA.push(upstreamCancelToken)
     val promiseA = UnsafePromise<A>()
 
-    val connB = FxConnection()
+    val connB = Fx2Connection()
     connB.push(upstreamCancelToken)
     val promiseB = UnsafePromise<B>()
 
     conn.pushPair(connA, connB)
 
-    fa.startCoroutine(asyncContinuation(this) { either ->
+    fa.fix().fa.startCoroutine(asyncContinuation(ctx) { either ->
       either.fold({ error ->
         if (active.getAndSet(false)) { //if an error finishes first, stop the race.
           connB.cancel().fix().fa.startCoroutine(Continuation(EmptyCoroutineContext) { result ->
@@ -262,14 +325,14 @@ suspend fun <A, B> CoroutineContext.racePair(
       }, { a ->
         if (active.getAndSet(false)) {
           conn.pop()
-          cb(Right(Left(Tuple2(a, FxFiber(promiseB, connB)))))
+          cb(Right(Left(Tuple2(a, Fx2Fiber(promiseB, connB)))))
         } else {
           promiseA.complete(Right(a))
         }
       })
     })
 
-    fb.startCoroutine(asyncContinuation(this) { either ->
+    fb.fix().fa.startCoroutine(asyncContinuation(ctx) { either ->
       either.fold({ error ->
         if (active.getAndSet(false)) { //if an error finishes first, stop the race.
           connA.cancel().fix().fa.startCoroutine(Continuation(EmptyCoroutineContext) { result ->
@@ -285,36 +348,35 @@ suspend fun <A, B> CoroutineContext.racePair(
       }, { b ->
         if (active.getAndSet(false)) {
           conn.pop()
-          cb(Right(Right(Tuple2(FxFiber(promiseA, connA), b))))
+          cb(Right(Right(Tuple2(Fx2Fiber(promiseA, connA), b))))
         } else {
           promiseB.complete(Right(b))
         }
       })
     })
-  }()
-}
+  }
 
-suspend fun <A, B, C> CoroutineContext.raceTriple(fa: suspend () -> A, fb: suspend () -> B, fc: suspend () -> C): suspend () -> RaceTriple<ForFx, A, B, C> =
-  fromAsync<RaceTriple<ForFx, A, B, C>> { conn, cb ->
+fun <A, B, C> Fx.Companion.raceTriple(ctx: CoroutineContext, fa: FxOf<A>, fb: FxOf<B>, fc: FxOf<C>): Fx<RaceTriple<ForFx, A, B, C>> =
+  Fx.async { conn, cb ->
     val active = AtomicBoolean(true)
 
-    val upstreamCancelToken = Fx { if (conn.isCanceled()) Fx { Unit }() else conn.cancel()() }
+    val upstreamCancelToken = Fx.defer { if (conn.isCanceled()) Fx { Unit } else conn.cancel() }
 
-    val connA = FxConnection()
+    val connA = Fx2Connection()
     connA.push(upstreamCancelToken)
     val promiseA = UnsafePromise<A>()
 
-    val connB = FxConnection()
+    val connB = Fx2Connection()
     connB.push(upstreamCancelToken)
     val promiseB = UnsafePromise<B>()
 
-    val connC = FxConnection()
+    val connC = Fx2Connection()
     connC.push(upstreamCancelToken)
     val promiseC = UnsafePromise<C>()
 
     conn.push(connA.cancel(), connB.cancel(), connC.cancel())
 
-    fa.startCoroutine(asyncContinuation(this) { either ->
+    fa.fix().fa.startCoroutine(asyncContinuation(ctx) { either ->
       either.fold({ error ->
         if (active.getAndSet(false)) { //if an error finishes first, stop the race.
           connB.cancel().fix().fa.startCoroutine(Continuation(EmptyCoroutineContext) { r2 ->
@@ -334,14 +396,14 @@ suspend fun <A, B, C> CoroutineContext.raceTriple(fa: suspend () -> A, fb: suspe
       }, { a ->
         if (active.getAndSet(false)) {
           conn.pop()
-          cb(Right(Left(Tuple3(a, FxFiber(promiseB, connB), FxFiber(promiseC, connC)))))
+          cb(Right(Left(Tuple3(a, Fx2Fiber(promiseB, connB), Fx2Fiber(promiseC, connC)))))
         } else {
           promiseA.complete(Right(a))
         }
       })
     })
 
-    fb.startCoroutine(asyncContinuation(this) { either ->
+    fb.fix().fa.startCoroutine(asyncContinuation(ctx) { either ->
       either.fold({ error ->
         if (active.getAndSet(false)) { //if an error finishes first, stop the race.
           connA.cancel().fix().fa.startCoroutine(Continuation(EmptyCoroutineContext) { r2 ->
@@ -361,14 +423,14 @@ suspend fun <A, B, C> CoroutineContext.raceTriple(fa: suspend () -> A, fb: suspe
       }, { b ->
         if (active.getAndSet(false)) {
           conn.pop()
-          cb(Right(Right(Left(Tuple3(FxFiber(promiseA, connA), b, FxFiber(promiseC, connC))))))
+          cb(Right(Right(Left(Tuple3(Fx2Fiber(promiseA, connA), b, Fx2Fiber(promiseC, connC))))))
         } else {
           promiseB.complete(Right(b))
         }
       })
     })
 
-    fc.startCoroutine(asyncContinuation(this) { either ->
+    fc.fix().fa.startCoroutine(asyncContinuation(ctx) { either ->
       either.fold({ error ->
         if (active.getAndSet(false)) { //if an error finishes first, stop the race.
           connA.cancel().fix().fa.startCoroutine(Continuation(EmptyCoroutineContext) { r2 ->
@@ -388,7 +450,7 @@ suspend fun <A, B, C> CoroutineContext.raceTriple(fa: suspend () -> A, fb: suspe
       }, { c ->
         if (active.getAndSet(false)) {
           conn.pop()
-          cb(Right(Right(Right(Tuple3(FxFiber(promiseA, connA), FxFiber(promiseB, connB), c)))))
+          cb(Right(Right(Right(Tuple3(Fx2Fiber(promiseA, connA), Fx2Fiber(promiseB, connB), c)))))
         } else {
           promiseC.complete(Right(c))
         }
@@ -397,64 +459,107 @@ suspend fun <A, B, C> CoroutineContext.raceTriple(fa: suspend () -> A, fb: suspe
 
   }
 
-suspend fun <A> CoroutineContext.continueOn(fa: suspend () -> A): suspend () -> A =
-  { !startFiber(fa) }
+fun TrampolinePool(executorService: Executor): CoroutineContext =
+  TrampolinePoolElement(executorService)
 
-tailrec suspend fun <A, B> tailRecLoop(a: A, f: (A) -> suspend () -> Either<A, B>): suspend () -> B =
-  when (val result = f(a)()) {
-    is Either.Left -> tailRecLoop(result.a, f)
-    is Either.Right -> result.b.just
-  }
+private val iterations: ThreadLocal<Int> = ThreadLocal.withInitial { 0 }
+private val threadTrampoline = ThreadLocal<TrampolineExecutor>()
 
-suspend fun <A> CoroutineContext.startFiber(fa: suspend () -> A): suspend () -> A = {
-  val promise = UnsafePromise<A>()
-  fa.startCoroutine(asyncContinuation(this) { either ->
-    either.fold(
-      { promise.complete(it.left()) },
-      { promise.complete(it.right()) }
-    )
-  })
-  FxFiber(promise, FxConnection()).join().fix().fa()
+open class TrampolinePoolElement(
+  val executionService: Executor,
+  val asyncBoundaryAfter: Int = 127
+) : AbstractCoroutineContextElement(ContinuationInterceptor), ContinuationInterceptor {
+
+  override fun <T> interceptContinuation(continuation: kotlin.coroutines.Continuation<T>): kotlin.coroutines.Continuation<T> =
+    TrampolinedContinuation(executionService, continuation.context.fold(continuation) { cont, element ->
+      if (element != this@TrampolinePoolElement && element is ContinuationInterceptor)
+        element.interceptContinuation(cont)
+      else cont
+    }, asyncBoundaryAfter)
 }
 
-/** Hide member because it's discouraged to use uncancelable builder for cancelable concrete type **/
-fun <A> fromAsync(fa: Proc<A>): suspend () -> A = {
-  suspendCoroutine { continuation ->
-    fa { either ->
-      continuation.resumeWith(either.fold({ Result.failure<A>(it) }, { Result.success(it) }))
+private class TrampolinedContinuation<T>(
+  val executionService: Executor,
+  val cont: kotlin.coroutines.Continuation<T>,
+  val asyncBoundaryAfter: Int
+) : kotlin.coroutines.Continuation<T> {
+  override val context: CoroutineContext = cont.context
+
+  override fun resumeWith(result: Result<T>) {
+    val currentIterations = iterations.get()
+    if (currentIterations > asyncBoundaryAfter) {
+      iterations.set(0)
+      threadTrampoline
+        .getOrSet { TrampolineExecutor(executionService) }
+        .execute(Runnable {
+          cont.resumeWith(result)
+        })
+    } else {
+      //println("Blocking: currentIterations: $currentIterations, cont.context: $context")
+      iterations.set(currentIterations + 1)
+      cont.resumeWith(result)
     }
   }
 }
 
-suspend fun <A> fromAsync(fa: FxProc<A>): suspend () -> A = {
-  suspendCoroutine { continuation ->
-    val conn = FxConnection()
-    //Is CancellationException from kotlin in kotlinx package???
-    conn.push(Fx { continuation.resumeWith(Result.failure(CancellationException())) })
-    fa(conn) { either ->
-      continuation.resumeWith(either.fold({ Result.failure<A>(it) }, { Result.success(it) }))
+/**
+ * Trampoline implementation, meant to be stored in a `ThreadLocal`.
+ * See `TrampolineEC`.
+ *
+ * INTERNAL API.
+ */
+internal class TrampolineExecutor(val underlying: Executor) {
+  private var immediateQueue = Platform.ArrayStack<Runnable>()
+  private var withinLoop = false
+
+  fun startLoop(runnable: Runnable): Unit {
+    withinLoop = true
+    try {
+      immediateLoop(runnable)
+    } finally {
+      withinLoop = false
+    }
+  }
+
+  fun execute(runnable: Runnable): Unit {
+    if (!withinLoop) {
+      startLoop(runnable)
+    } else {
+      immediateQueue.push(runnable)
+    }
+  }
+
+  private fun forkTheRest(): Unit {
+    class ResumeRun(val head: Runnable, val rest: Platform.ArrayStack<Runnable>) : Runnable {
+      override fun run(): Unit {
+        immediateQueue.addAll(rest)
+        immediateLoop(head)
+      }
+    }
+
+    val head = immediateQueue.firstOrNull()
+    if (head != null) {
+      immediateQueue.pop()
+      val rest = immediateQueue
+      immediateQueue = Platform.ArrayStack<Runnable>()
+      underlying.execute(ResumeRun(head, rest))
+    }
+  }
+
+  private tailrec fun immediateLoop(task: Runnable): Unit {
+    try {
+      task.run()
+    } catch (ex: Throwable) {
+      forkTheRest()
+      ex.nonFatalOrThrow()
+    }
+
+    val next = immediateQueue.firstOrNull()
+    if (next != null) {
+      immediateQueue.pop()
+      immediateLoop(next)
     }
   }
 }
 
-/** Hide member because it's discouraged to use uncancelable builder for cancelable concrete type **/
-internal fun <A> fromAsyncF(fa: ProcF<ForFx, A>): suspend () -> A = {
-  suspendCoroutine { continuation ->
-    fa { either ->
-      continuation.resumeWith(either.fold({ Result.failure<A>(it) }, { Result.success(it) }))
-    }.fix().fa.foldContinuation(EmptyCoroutineContext, mapUnit)
-  }
-}
-
-fun <A> fromAsyncF(fa: FxProcF<A>): suspend () -> A = {
-  suspendCoroutine { continuation ->
-    val conn = FxConnection()
-    //Is CancellationException from kotlin in kotlinx package???
-    conn.push(Fx { continuation.resumeWith(Result.failure(CancellationException())) })
-    fa(conn) { either ->
-      continuation.resumeWith(either.fold({ Result.failure<A>(it) }, { Result.success(it) }))
-    }.fix().fa.foldContinuation(EmptyCoroutineContext, mapUnit)
-  }
-}
-
-fun <P1, P2, R> ((P1) -> (P2) -> R).uncurried(): (P1, P2) -> R = { p1: P1, p2: P2 -> this(p1)(p2) }
+private fun <P1, P2, R> ((P1) -> (P2) -> R).uncurried(): (P1, P2) -> R = { p1: P1, p2: P2 -> this(p1)(p2) }

@@ -24,9 +24,6 @@ open class Delay {
   @Param("3000")
   var size: Int = 0
 
-  private tailrec suspend fun fxDirectDelayLoop(i: Int): Int =
-    if (i > size) i else fxDirectDelayLoop(i + 1)
-
   private tailrec suspend fun fxDelayLoop(i: Int): suspend () -> Int {
     val j = !effect { i }
     return if (j > size) effect { j } else fxDelayLoop(j + 1)
@@ -41,18 +38,6 @@ open class Delay {
     IO { i }.flatMap { j ->
       if (j > size) IO { j } else ioDelayLoop(j + 1)
     }
-
-  @Benchmark
-  fun fxDirect(): Int =
-    unsafe { fxRunBlocking { Fx { fxDirectDelayLoop(0) } } }
-
-  @Benchmark
-  fun fx2Direct(): Int =
-    unsafe { fx2RunBlocking { Fx2 { fxDirectDelayLoop(0) } } }
-
-  @Benchmark
-  fun kotlinXCoroutinesDirect(): Int =
-    runBlocking { fxDirectDelayLoop(0) }
 
   @Benchmark
   fun fx(): Int =

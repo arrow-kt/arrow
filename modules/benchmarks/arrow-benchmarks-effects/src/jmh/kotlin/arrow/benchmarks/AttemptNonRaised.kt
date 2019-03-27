@@ -3,12 +3,9 @@ package arrow.benchmarks
 import arrow.core.Either
 import arrow.effects.extensions.fx.unsafeRun.runBlocking
 import arrow.effects.suspended.fx.Fx
-import arrow.effects.suspended.fx.not
-import arrow.effects.suspended.fx.raiseError
 import arrow.unsafe
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
-import arrow.effects.extensions.fx2.fx.unsafeRun.runBlocking as fx2RunBlocking
 
 @State(Scope.Thread)
 @Fork(2)
@@ -20,14 +17,14 @@ open class AttemptNonRaised {
   @Param("10000")
   var size: Int = 0
 
-  tailrec suspend fun loopHappy(size: Int, i: Int): Int =
+  tailrec suspend fun loopHappy(size: Int, i: Int): Fx<Int> =
     if (i < size) {
-      val attempted = !arrow.effects.suspended.fx.attempt { i + 1 }
+      val attempted = !Fx.att { i + 1 }
       when (attempted) {
         is Either.Left -> !attempted.a.raiseError<Int>()
         is Either.Right -> loopHappy(size, attempted.b)
       }
-    } else 1
+    } else Fx.just(1)
 
   @Benchmark
   fun fx(): Int =
