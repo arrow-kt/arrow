@@ -3,9 +3,6 @@ package arrow.effects
 
 import arrow.effects.extensions.fx.unsafeRun.runBlocking
 import arrow.effects.suspended.fx.Fx
-import arrow.effects.suspended.fx.flatMap
-import arrow.effects.suspended.fx.just
-import arrow.effects.suspended.fx.map
 import arrow.test.UnitSpec
 import arrow.unsafe
 import io.kotlintest.runner.junit4.KotlinTestRunner
@@ -22,15 +19,15 @@ class SuspendedFxTests : UnitSpec() {
 
     "Fx `map` stack safe" {
       val size = 500000
-      suspend fun mapStackSafe(): suspend () -> Int =
-        (0 until size).fold(suspend { 0 }) { acc, _ -> acc.map { it + 1 } }
+      fun mapStackSafe(): Fx<Int> =
+        (0 until size).fold(Fx { 0 }) { acc, _ -> acc.map { it + 1 } }
       unsafe { runBlocking { Fx { mapStackSafe()() } } } shouldBe size
     }
 
     "Fx `flatMap` stack safe" {
       val size = 500000
-      suspend fun flatMapStackSafe(): suspend () -> Int =
-        (0 until size).fold(suspend { 0 }) { acc, _ -> acc.flatMap { just(it + 1) } }
+      fun flatMapStackSafe(): Fx<Int> =
+        (0 until size).fold(Fx { 0 }) { acc, _ -> acc.flatMap { Fx.just(it + 1) } }
       unsafe { runBlocking { Fx { flatMapStackSafe()() } } } shouldBe size
     }
 

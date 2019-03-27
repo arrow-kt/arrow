@@ -1,15 +1,12 @@
 package arrow.benchmarks
 
 import arrow.effects.IO
+import arrow.effects.extensions.fx.bracket.bracket
 import arrow.effects.extensions.fx.unsafeRun.runBlocking
 import arrow.effects.suspended.fx.Fx
-import arrow.effects.suspended.fx.bracketCase
-import arrow.effects.suspended.fx.not
-import arrow.effects.suspended.fx.unit
 import arrow.unsafe
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
-import arrow.effects.extensions.fx2.fx.unsafeRun.runBlocking as fx2RunBlocking
 import arrow.effects.extensions.io.unsafeRun.runBlocking as ioRunBlocking
 
 @State(Scope.Thread)
@@ -22,13 +19,11 @@ open class Bracket {
   @Param("100")
   var size: Int = 0
 
-  private tailrec suspend fun bracketLoop(i: Int): Int =
-    if (i < size) bracketLoop(!suspend { i }
-      .bracketCase(
-        { _, _ -> { unit } },
-        { ib: Int -> suspend { ib + 1 } }
-      ))
-    else i
+  private fun fxBracketLoop(i: Int): Fx<Int> =
+    if (i < size)
+      Fx.just(i).bracket({ Fx.unit() }, { ib -> Fx { ib + 1 } }).flatMap { fxBracketLoop(it) }
+    else
+      Fx.just(i)
 
   private fun ioBracketLoop(i: Int): IO<Int> =
     if (i < size)
@@ -41,15 +36,7 @@ open class Bracket {
   fun fx() =
     unsafe {
       runBlocking {
-        Fx { bracketLoop(0) }
-      }
-    }
-
-  @Benchmark
-  fun fx2() =
-    unsafe {
-      fx2RunBlocking {
-        arrow.effects.suspended.fx2.Fx { bracketLoop(0) }
+        fxBracketLoop(0)
       }
     }
 

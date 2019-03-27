@@ -3,15 +3,10 @@ package arrow.benchmarks
 import arrow.effects.IO
 import arrow.effects.extensions.io.applicativeError.handleErrorWith
 import arrow.effects.suspended.fx.Fx
-import arrow.effects.suspended.fx.flatMap
-import arrow.effects.suspended.fx.handleError
-import arrow.effects.suspended.fx.not
 import arrow.unsafe
-import kotlinx.coroutines.runBlocking
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
 import arrow.effects.extensions.fx.unsafeRun.runBlocking as fxRunBlocking
-import arrow.effects.extensions.fx2.fx.unsafeRun.runBlocking as fx2RunBlocking
 
 @State(Scope.Thread)
 @Fork(2)
@@ -34,69 +29,22 @@ open class HandleRaisedError {
     else
       IO.just(i)
 
+  private fun fxErrorRaisedloop(i: Int): Fx<Int> =
+    if (i < size)
+      Fx.raiseError<Int>(dummy)
+        .flatMap { x -> Fx.just(x + 1) }
+        .flatMap { x -> Fx.just(x + 1) }
+        .handleErrorWith { fxErrorRaisedloop(i + 1) }
+    else
+      Fx.just(i)
+
+
   @Benchmark
   fun io(): Int =
     ioErrorRaisedloop(0).unsafeRunSync()
 
-  tailrec suspend fun fxErrorRaisedloop(i: Int): Int =
-    if (i < size) {
-      val result = !arrow.effects.suspended.fx.raiseError<Int>(dummy)
-        .flatMap { x -> arrow.effects.suspended.fx.just(x + 1) }
-        .flatMap { x -> arrow.effects.suspended.fx.just(x + 1) }
-        .handleError { i + 1 }
-      fxErrorRaisedloop(result)
-    } else i
-
-  tailrec suspend fun fx2ErrorRaisedloop(i: Int): Int =
-    if (i < size) {
-      val result = !arrow.effects.suspended.fx2.Fx.raiseError<Int>(dummy)
-        .flatMap { x -> arrow.effects.suspended.fx2.Fx.just(x + 1) }
-        .flatMap { x -> arrow.effects.suspended.fx2.Fx.just(x + 1) }
-        .handleError { i + 1 }
-      fx2ErrorRaisedloop(result)
-    } else i
-
   @Benchmark
   fun fx(): Int =
-    unsafe { fxRunBlocking { Fx { fxErrorRaisedloop(0) } } }
-
-  @Benchmark
-  fun fx2(): Int =
-    unsafe {
-      fx2RunBlocking {
-        arrow.effects.suspended.fx2.Fx {
-          fx2ErrorRaisedloop(0)
-        }
-      }
-    }
-
-  private tailrec suspend fun fxDirectErrorRaisedLoop(i: Int): Int =
-    if (i < size) {
-      val result = try {
-        val n: Int = throw dummy
-        n + 1 + 1
-      } catch (t: Throwable) {
-        i + 1
-      }
-      fxDirectErrorRaisedLoop(result)
-    } else i
-
-  @Benchmark
-  fun fxDirect(): Int =
-    unsafe { fxRunBlocking { Fx { fxDirectErrorRaisedLoop(0) } } }
-
-  @Benchmark
-  fun fx2Direct(): Int =
-    unsafe {
-      fx2RunBlocking {
-        arrow.effects.suspended.fx2.Fx {
-          fxDirectErrorRaisedLoop(0)
-        }
-      }
-    }
-
-  @Benchmark
-  fun kotlinXCoroutinesDirect(): Int =
-    runBlocking { fxDirectErrorRaisedLoop(0) }
+    unsafe { fxRunBlocking { fxErrorRaisedloop(0) } }
 
 }

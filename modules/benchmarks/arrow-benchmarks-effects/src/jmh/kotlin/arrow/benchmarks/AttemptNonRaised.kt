@@ -19,19 +19,16 @@ open class AttemptNonRaised {
 
   tailrec suspend fun loopHappy(size: Int, i: Int): Fx<Int> =
     if (i < size) {
-      val attempted = !Fx.att { i + 1 }
+      val attempted = !Fx { i + 1 }.attempt()
       when (attempted) {
-        is Either.Left -> !attempted.a.raiseError<Int>()
+        is Either.Left -> Fx.raiseError(attempted.a)
         is Either.Right -> loopHappy(size, attempted.b)
       }
     } else Fx.just(1)
 
   @Benchmark
   fun fx(): Int =
-    unsafe { runBlocking { Fx { loopHappy(size, 0) } } }
+    unsafe { runBlocking { Fx { loopHappy(size, 0)() } } }
 
-  @Benchmark
-  fun fx2(): Int =
-    unsafe { fx2RunBlocking { arrow.effects.suspended.fx2.Fx { loopHappy(size, 0) } } }
 
 }

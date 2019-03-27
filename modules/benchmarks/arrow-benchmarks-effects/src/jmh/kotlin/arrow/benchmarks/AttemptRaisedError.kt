@@ -6,7 +6,6 @@ import arrow.effects.suspended.fx.*
 import arrow.unsafe
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
-import arrow.effects.extensions.fx2.fx.unsafeRun.runBlocking as fx2RunBlocking
 
 val dummy = object : RuntimeException("dummy") {
   override fun fillInStackTrace(): Throwable =
@@ -23,24 +22,20 @@ open class AttemptRaisedError {
   @Param("10000")
   var size: Int = 0
 
-  suspend fun loopNotHappy(size: Int, i: Int): Int =
+  suspend fun loopNotHappy(size: Int, i: Int): Fx<Int> =
     if (i < size) {
-      val attempted = !attempt {
-        !dummy.raiseError<Int>()
-          .map { it + 1 }
-      }
+      val attempted = !Fx {
+        !Fx.raiseError<Int>(dummy).map { it + 1 }
+      }.attempt()
       when (attempted) {
         is Either.Left -> loopNotHappy(size, i + 1)
-        is Either.Right -> attempted.b
+        is Either.Right -> Fx.just(attempted.b)
       }
-    } else 1
+    } else Fx.just(1)
 
   @Benchmark
   fun fx(): Int =
-    unsafe { runBlocking { Fx { loopNotHappy(size, 0) } } }
+    unsafe { runBlocking { Fx { loopNotHappy(size, 0)() } } }
 
-  @Benchmark
-  fun fx2(): Int =
-    unsafe { fx2RunBlocking { arrow.effects.suspended.fx2.Fx { loopNotHappy(size, 0) } } }
 
 }

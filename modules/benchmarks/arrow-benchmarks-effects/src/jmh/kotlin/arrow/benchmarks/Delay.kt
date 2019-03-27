@@ -2,16 +2,11 @@ package arrow.benchmarks
 
 import arrow.effects.IO
 import arrow.effects.suspended.fx.Fx
-import arrow.effects.suspended.fx.effect
-import arrow.effects.suspended.fx.not
 import arrow.unsafe
-import kotlinx.coroutines.runBlocking
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
 import arrow.effects.extensions.fx.unsafeRun.runBlocking as fxRunBlocking
-import arrow.effects.extensions.fx2.fx.unsafeRun.runBlocking as fx2RunBlocking
 import arrow.effects.extensions.io.unsafeRun.runBlocking as ioRunBlocking
-import arrow.effects.suspended.fx2.Fx as Fx2
 
 
 @State(Scope.Thread)
@@ -24,15 +19,10 @@ open class Delay {
   @Param("3000")
   var size: Int = 0
 
-  private tailrec suspend fun fxDelayLoop(i: Int): suspend () -> Int {
-    val j = !effect { i }
-    return if (j > size) effect { j } else fxDelayLoop(j + 1)
-  }
-
-  private tailrec suspend fun fx2DelayLoop(i: Int): suspend () -> Int {
-    val j = !Fx2 { i }
-    return if (j > size) Fx2 { j }.fa else fx2DelayLoop(j + 1)
-  }
+  private fun fxDelayLoop(i: Int): Fx<Int> =
+    Fx { i }.flatMap { j ->
+      if (j > size) Fx { j } else fxDelayLoop(j + 1)
+    }
 
   private fun ioDelayLoop(i: Int): IO<Int> =
     IO { i }.flatMap { j ->
@@ -42,10 +32,6 @@ open class Delay {
   @Benchmark
   fun fx(): Int =
     unsafe { fxRunBlocking { Fx { !fxDelayLoop(0) } } }
-
-  @Benchmark
-  fun fx2(): Int =
-    unsafe { fx2RunBlocking { Fx2 { !fx2DelayLoop(0) } } }
 
   @Benchmark
   fun io(): Int =
