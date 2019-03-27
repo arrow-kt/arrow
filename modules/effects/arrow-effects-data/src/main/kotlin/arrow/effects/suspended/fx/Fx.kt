@@ -38,7 +38,7 @@ sealed class Fx<A> : FxOf<A> {
 
   internal class Pure<A>(val value: A) : Fx<A>() {
     override val fa: suspend () -> A = { value }
-    override fun <B> map(f: (A) -> B): Fx<B> = Fx.Mapped(this, f, 0)
+    override fun <B> map(f: (A) -> B): Fx<B> = Fx.Map(this, f, 0)
     override fun <B> flatMap(f: (A) -> FxOf<B>): Fx<B> = Fx.FlatMap(this, f, 0)
     override fun toString(): String = "Fx.Pure(value = $value)"
   }
@@ -48,26 +48,26 @@ sealed class Fx<A> : FxOf<A> {
   //This is not an issue if you guarantee stack safety yourself for your suspended program. i.e. using `tailrec`
   internal class Single<A>(val source: suspend () -> A) : Fx<A>() {
     override val fa: suspend () -> A = source
-    override fun <B> map(f: (A) -> B): Fx<B> = Fx.Mapped(this, f, 1)
-    override fun <B> flatMap(f: (A) -> FxOf<B>): Fx<B> = Fx.FlatMap(this, f, 1)
+    override fun <B> map(f: (A) -> B): Fx<B> = Fx.Map(this, f, 0)
+    override fun <B> flatMap(f: (A) -> FxOf<B>): Fx<B> = Fx.FlatMap(this, f, 0)
     override fun toString(): String = "Fx.Single"
   }
 
-  internal class Mapped<A, B>(val source: FxOf<A>, val g: (A) -> B, val index: Int) : Fx<B>() {
+  internal class Map<A, B>(val source: FxOf<A>, val g: (A) -> B, val index: Int) : Fx<B>() {
     override val fa: suspend () -> B = suspend {
-      invokeLoop(this@Mapped as Fx<Any?>) as B
+      invokeLoop(this@Map as Fx<Any?>) as B
     }
 
     override fun <C> map(f: (B) -> C): Fx<C> =
     // Allowed to do maxStackDepthSize map operations in sequence before
     // starting a new Map fusion in order to avoid stack overflows
-      if (index != Platform.maxStackDepthSize) Fx.Mapped(source, g andThen f, index + 1)
-      else Fx.Mapped(this, f, 0)
+      if (index != Platform.maxStackDepthSize) Fx.Map(source, g andThen f, index + 1)
+      else Fx.Map(this, f, 0)
 
     //We can do fusion between an map-flatMap boundary
     override fun <C> flatMap(f: (B) -> FxOf<C>): Fx<C> = Fx.FlatMap(source, g andThen f, 1)
 
-    override fun toString(): String = "Fx.Mapped(..., index = $index)"
+    override fun toString(): String = "Fx.Map(..., index = $index)"
   }
 
   internal class FlatMap<A, B>(val source: FxOf<A>, val fb: (A) -> FxOf<B>, val index: Int) : Fx<B>() {
@@ -75,16 +75,19 @@ sealed class Fx<A> : FxOf<A> {
       invokeLoop(this@FlatMap as Fx<Any?>) as B
     }
 
-    //If we reach the maxStackDepth then we can fold the current FlatMap and return a Mapped case
+    //If we reach the maxStackDepth then we can fold the current FlatMap and return a Map case
     //If we haven't reached the maxStackDepth we fuse the map operator within the flatMap stack.
     override fun <C> map(f: (B) -> C): Fx<C> =
-      if (index != Platform.maxStackDepthSize) Fx.Mapped(this, f, 0)
+      if (index != Platform.maxStackDepthSize) Fx.Map(this, f, 0)
       else Fx.FlatMap(source, { a -> Fx { f(fb(a)()) } }, index + 1)
 
     override fun <C> flatMap(f: (B) -> FxOf<C>): Fx<C> =
       if (index != Platform.maxStackDepthSize) Fx.FlatMap(this, f, 0)
       else Fx.FlatMap(source, { a ->
-        Fx.FlatMap(fb(a), { b -> f(b) }, 0)
+        Fx.Single {
+          val b = fb(a)()
+          f(b)()
+        }
       }, index + 1)
 
     override fun toString(): String = "Fx.FlatMap(..., index = $index)"
@@ -98,7 +101,7 @@ sealed class Fx<A> : FxOf<A> {
     is Pure -> fa.value
     is Single -> fa.fa()
     is RaiseError -> throw fa.error
-    is Mapped<*, *> -> {
+    is Map<*, *> -> {
       val source: Any? = fa.source.invoke()
       val f: (Any?) -> Any? = fa.g as (Any?) -> Any?
       f(source)
