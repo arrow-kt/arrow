@@ -361,6 +361,9 @@ options:
       - title: Ref
         url: /docs/effects/ref/
 
+      - title: Fiber
+        url: /docs/effects/fiber/
+
   - title: Optics
 
     nested_options:
