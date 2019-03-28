@@ -36,17 +36,17 @@ import arrow.typeclasses.Semigroup
  *
  * //sampleStart
  * val program = fx {
- *   val consumer = createConsumer().bind()
- *   val handle = createDBHandle().bind()
- *   val service = createFancyService(consumer, handle).bind()
+ *   val consumer = !createConsumer()
+ *   val handle = !createDBHandle()
+ *   val service = !createFancyService(consumer, handle)
  *
  *   // use service
  *   // <...>
  *
  *   // we are done, now onto releasing resources
- *   shutDownFanceService(service).bind()
- *   closeDBHandle(handle).bind()
- *   closeConsumer(consumer).bind()
+ *   !shutDownFanceService(service)
+ *   !closeDBHandle(handle)
+ *   !closeConsumer(consumer)
  * }
  * // sampleEnd
  *
