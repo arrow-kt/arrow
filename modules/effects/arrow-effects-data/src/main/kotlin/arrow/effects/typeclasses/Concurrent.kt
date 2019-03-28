@@ -145,7 +145,7 @@ interface Concurrent<F> : Async<F> {
    *   //sampleStart
    *   binding {
    *     val promise = Promise.uncancelable<ForIO, Int>(IO.async()).bind()
-   *     val fiber = promise.get().startFiber(Dispatchers.Default).bind()
+   *     val fiber = promise.get().fork(Dispatchers.Default).bind()
    *     promise.complete(1).bind()
    *     fiber.join().bind()
    *   }.unsafeRunSync() == 1
@@ -157,7 +157,7 @@ interface Concurrent<F> : Async<F> {
    * @param this@startF [CoroutineContext] to execute the source [F] on.
    * @return [F] with suspended execution of source [F] on context [this@startF].
    */
-  fun <A> CoroutineContext.startFiber(kind: Kind<F, A>): Kind<F, Fiber<F, A>>
+  fun <A> CoroutineContext.fork(kind: Kind<F, A>): Kind<F, Fiber<F, A>>
 
   /**
    * Race two tasks concurrently within a new [F].

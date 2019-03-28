@@ -22,7 +22,7 @@ import kotlinx.coroutines.Dispatchers.Default
 import arrow.effects.extensions.io.fx.fx
 import arrow.effects.typeclasses.Fiber
 import arrow.effects.IO
-import arrow.effects.extensions.io.concurrent.startFiber
+import arrow.effects.extensions.io.concurrent.fork
 import arrow.effects.extensions.io.dispatchers.dispatchers
 import arrow.effects.extensions.io.monad.flatMap
 import arrow.effects.extensions.io.monad.map
@@ -32,8 +32,8 @@ fun <A, B, C> parallelMap(first: IO<A>,
                      second: IO<B>,
                      f: (A, B) -> C): IO<C> =
   fx {
-    val (fiberOne: Fiber<ForIO, A>) = Default.startFiber(first)
-    val (fiberTwo: Fiber<ForIO, B>) = Default.startFiber(second)
+    val (fiberOne: Fiber<ForIO, A>) = Default.fork(first)
+    val (fiberTwo: Fiber<ForIO, B>) = Default.fork(second)
     f(!fiberOne.join(), !fiberTwo.join())
   }
 
@@ -63,8 +63,8 @@ which allows us to register an operation to run on cancelation, error or complet
 fun <A, B, C> parallelMap2(first: IO<A>,
                           second: IO<B>,
                           f: (A, B) -> C): IO<C> =
-      Default.startFiber(first).bracket(use = { (joinA, _) ->
-          Default.startFiber(second).bracket(use = { (joinB, _) ->
+      Default.fork(first).bracket(use = { (joinA, _) ->
+          Default.fork(second).bracket(use = { (joinB, _) ->
             joinA.flatMap { a ->
               joinB.map { b -> f(a, b) }
             }

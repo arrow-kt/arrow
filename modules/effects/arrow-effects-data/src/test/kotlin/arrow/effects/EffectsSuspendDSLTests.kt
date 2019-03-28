@@ -264,11 +264,11 @@ class EffectsSuspendDSLTests : UnitSpec() {
       }.unsafeRunSync()
     }
 
-    "startFiber" {
+    "fork" {
       val const = 1
       fxTest {
         fx {
-          val fiber = !NonBlocking.startFiber(effect { const })
+          val fiber = !NonBlocking.fork(effect { const })
           val (n) = fiber.join()
           n
         }

@@ -10,7 +10,7 @@ import arrow.unsafe
 import kotlin.coroutines.CoroutineContext
 import arrow.effects.ap as ioAp
 import arrow.effects.handleErrorWith as ioHandleErrorWith
-import arrow.effects.startFiber as ioStart
+import arrow.effects.fork as ioStart
 
 @extension
 interface IOFunctor : Functor<ForIO> {
@@ -119,7 +119,7 @@ interface IOAsync : Async<ForIO>, IOMonadDefer {
 // FIXME default @extension are temporarily declared in arrow-effects-io-extensions due to multiplatform needs
 interface IOConcurrent : Concurrent<ForIO>, IOAsync {
 
-  override fun <A> CoroutineContext.startFiber(fa: IOOf<A>): IO<Fiber<ForIO, A>> =
+  override fun <A> CoroutineContext.fork(fa: IOOf<A>): IO<Fiber<ForIO, A>> =
     fa.ioStart(this)
 
   override fun <A> asyncF(fa: ConnectedProcF<ForIO, A>): IO<A> =

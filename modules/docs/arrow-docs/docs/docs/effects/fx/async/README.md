@@ -54,8 +54,8 @@ suspend fun threadName(): String =
   Thread.currentThread().name
 
 val program = fx {
-  val fiberA = !NonBlocking.startFiber(effect { threadName() })
-  val fiberB = !NonBlocking.startFiber(effect { threadName() })
+  val fiberA = !NonBlocking.fork(effect { threadName() })
+  val fiberB = !NonBlocking.fork(effect { threadName() })
   val threadA = !fiberA.join()
   val threadB = !fiberB.join()
   !effect { println(threadA) }

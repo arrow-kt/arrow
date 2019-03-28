@@ -8,9 +8,9 @@ import arrow.effects.suspended.fx.fix
 import arrow.unsafe
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
-import arrow.effects.extensions.fx.concurrent.startFiber as fxStartFiber
+import arrow.effects.extensions.fx.concurrent.fork as fxfork
 import arrow.effects.extensions.fx.unsafeRun.runBlocking as fxRunBlocking
-import arrow.effects.extensions.io.concurrent.startFiber as ioStartFiber
+import arrow.effects.extensions.io.concurrent.fork as iofork
 import arrow.effects.extensions.io.fx.fx as ioFx
 import arrow.effects.extensions.io.unsafeRun.runBlocking as ioRunBlocking
 
@@ -26,14 +26,14 @@ open class ForkFiber {
 
   private fun fxStartLoop(i: Int): Fx<Int> =
     if (i < size) {
-      NonBlocking.fxStartFiber(Fx { i + 1 }).flatMap {
+      NonBlocking.fxfork(Fx { i + 1 }).flatMap {
         it.join().fix().flatMap(::fxStartLoop)
       }
     } else Fx.just(i)
 
   private fun ioStartLoop(i: Int): IO<Int> =
     if (i < size) {
-      NonBlocking.ioStartFiber(IO { i + 1 }).flatMap {
+      NonBlocking.iofork(IO { i + 1 }).flatMap {
         it.join().flatMap(::ioStartLoop)
       }
     } else IO.just(i)

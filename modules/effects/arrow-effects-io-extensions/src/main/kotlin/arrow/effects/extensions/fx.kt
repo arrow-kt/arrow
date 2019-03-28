@@ -166,7 +166,7 @@ interface Fx2Concurrent : Concurrent<ForFx>, Fx2Async {
   override fun <A> asyncF(fa: FxProcF<A>): Fx<A> =
     Fx.asyncF(fa)
 
-  override fun <A> CoroutineContext.startFiber(fa: FxOf<A>): Fx<Fiber<ForFx, A>> {
+  override fun <A> CoroutineContext.fork(fa: FxOf<A>): Fx<Fiber<ForFx, A>> {
     val promise = UnsafePromise<A>()
     val conn = Fx2Connection()
     fa.fix().fa.startCoroutine(asyncContinuation(this) { either ->
