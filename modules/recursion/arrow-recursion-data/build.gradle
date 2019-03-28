@@ -1,6 +1,7 @@
 apply plugin: 'kotlin-kapt'
 
 dependencies {
+    compile project(':arrow-free-extensions')
     compile project(':arrow-extras-extensions')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     compile project(':arrow-annotations')
