@@ -1,8 +1,10 @@
 package arrow.recursion
 
 import arrow.Kind
-import arrow.core.*
-import arrow.core.extensions.eval.monad.binding
+import arrow.core.Either
+import arrow.core.Eval
+import arrow.core.FunctionK
+import arrow.core.Tuple2
 import arrow.free.Cofree
 import arrow.recursion.typeclasses.Corecursive
 import arrow.recursion.typeclasses.Recursive
@@ -30,7 +32,7 @@ typealias MAlgebra<F, M, A> = (A) -> Kind<F, Kind<M, A>>
 
 typealias WAlgebra<F, W, A> = (Kind<F, Kind<W, A>>) -> A
 
-typealias DistFunc<F, W, A> = (Kind<F, Kind<W, Kind<W, A>>>) -> Kind<W, Kind<F, Kind<W, A>>>
+typealias DistFunc<F, W, A> = (Kind<F, Eval<Kind<W, Kind<W, A>>>>) -> Eval<Kind<W, Kind<F, Kind<W, A>>>>
 
 typealias DistFuncM<F, M, A> = (Kind<M, Kind<F, Kind<M, A>>>) -> Kind<F, Kind<M, Kind<M, A>>>
 
@@ -48,12 +50,4 @@ fun <F, A, B> A.hylo(
 
 fun <S, F, T, G> S.hoist(SR: Recursive<S, F>, SC: Corecursive<T, G>, f: FunctionK<F, G>): T = SR.run {
   cata { SC.run { f(it).embedT() } }
-}
-
-fun <F, B, A> distZygo(FF: Functor<F>, alg: Algebra<F, B>, fa: Kind<F, Tuple2<B, A>>): Tuple2<B, Kind<F, A>> = FF.run {
-  Tuple2(alg(fa.map { it.a }), fa.map { it.b })
-}
-
-fun <F, A> distHisto(FF: Functor<F>, fa: Kind<F, Cofree<F, A>>): Cofree<F, Kind<F, A>> = FF.run {
-  Cofree(FF, fa.map { it.extract() }, binding { fa.map { distHisto(FF, it.tail.value()) } })
 }

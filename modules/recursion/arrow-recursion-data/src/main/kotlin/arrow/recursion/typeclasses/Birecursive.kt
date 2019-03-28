@@ -26,14 +26,13 @@ interface Birecursive<T, F> : Recursive<T, F>, Corecursive<T, F> {
     return c(this).value()
   }
 
+
   fun <A, W> T.gprepro(CW: Comonad<W>, dist: DistFunc<F, W, A>, trans: FunctionK<F, F>, alg: WAlgebra<F, W, A>): A {
     fun c(x: T): Eval<Kind<W, A>> = FF().run {
-      Eval.later {
-        CW.run {
-          dist(
-            x.projectT().map { c(it.hoist(this@Birecursive, this@Birecursive, trans)).value().duplicate() }
-          ).map(alg)
-        }
+      CW.run {
+        dist(
+          x.projectT().map { c(it.hoist(this@Birecursive, this@Birecursive, trans)).map { it.duplicate() } }
+        ).map { it.map(alg) }
       }
     }
     return CW.run { c(this@gprepro).value().extract() }
