@@ -49,7 +49,7 @@ interface Recursive<T, F> {
 
   // TODO gpara
 
-  fun <A, W> T.gcata(CW: Comonad<W>, dist: (Kind<F, Kind<W, Kind<W, A>>>) -> Kind<W, Kind<F, Kind<W, A>>>, alg: WAlgebra<F, W, A>): A {
+  fun <A, W> T.gcata(CW: Comonad<W>, dist: DistFunc<F, W, A>, alg: WAlgebra<F, W, A>): A {
     fun c(x: T): Eval<Kind<W, Kind<F, Kind<W, A>>>> = FF().run {
       Eval.later {
         dist(
@@ -62,7 +62,7 @@ interface Recursive<T, F> {
     return CW.run { alg(c(this@gcata).value().extract()) }
   }
 
-  fun <A, W> T.gfold(CW: Comonad<W>, dist: (Kind<F, Kind<W, Kind<W, A>>>) -> Kind<W, Kind<F, Kind<W, A>>>, alg: WAlgebra<F, W, A>): A =
+  fun <A, W> T.gfold(CW: Comonad<W>, dist: DistFunc<F, W, A>, alg: WAlgebra<F, W, A>): A =
     gcata(CW, dist, alg)
 
   fun <A, B> T.zygo(alg: Algebra<F, B>, f: (Kind<F, Tuple2<B, A>>) -> A): A =

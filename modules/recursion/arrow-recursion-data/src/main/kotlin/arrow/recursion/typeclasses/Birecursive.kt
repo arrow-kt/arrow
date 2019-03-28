@@ -15,9 +15,9 @@ import arrow.typeclasses.Monad
  */
 interface Birecursive<T, F> : Recursive<T, F>, Corecursive<T, F> {
 
-  fun T.lambek() = cata<Kind<F, T>> { fa -> Eval.now(FF().run { fa.map { it.value().map { Eval.now(it) }.embedT().value() } }) }
+  fun T.lambek() = cata<Kind<F, T>> { fa -> Eval.later { FF().run { fa.map { it.value().map { Eval.now(it) }.embedT().value() } } } }
 
-  fun Kind<F, Eval<T>>.colambek() = ana<Kind<F, Eval<T>>> { fa -> FF().run { fa.map { it.value().projectT().map { Eval.now(it) } } } }
+  fun Kind<F, Eval<T>>.colambek() = ana { fa -> FF().run { fa.map { it.value().projectT().map { Eval.now(it) } } } }
 
   fun <A> T.prepro(trans: FunctionK<F, F>, alg: Algebra<F, Eval<A>>): A {
     fun c(x: T): Eval<A> = FF().run {
@@ -26,7 +26,7 @@ interface Birecursive<T, F> : Recursive<T, F>, Corecursive<T, F> {
     return c(this).value()
   }
 
-  fun <A, W> T.gprepro(CW: Comonad<W>, dist: (Kind<F, Kind<W, Kind<W, A>>>) -> Kind<W, Kind<F, Kind<W, A>>>, trans: FunctionK<F, F>, alg: WAlgebra<F, W, A>): A {
+  fun <A, W> T.gprepro(CW: Comonad<W>, dist: DistFunc<F, W, A>, trans: FunctionK<F, F>, alg: WAlgebra<F, W, A>): A {
     fun c(x: T): Eval<Kind<W, A>> = FF().run {
       Eval.later {
         CW.run {
@@ -46,7 +46,7 @@ interface Birecursive<T, F> : Recursive<T, F>, Corecursive<T, F> {
     return a(this).value()
   }
 
-  fun <A, M> A.gpostpro(MM: Monad<M>, dist: (Kind<M, Kind<F, Kind<M, A>>>) -> Kind<F, Kind<M, Kind<M, A>>>, trans: FunctionK<F, F>, alg: MAlgebra<F, M, A>): T {
+  fun <A, M> A.gpostpro(MM: Monad<M>, dist: DistFuncM<F, M, A>, trans: FunctionK<F, F>, alg: MAlgebra<F, M, A>): T {
     fun c(a: Kind<M, A>): Eval<T> = MM.run {
       FF().run {
         dist(

@@ -37,7 +37,7 @@ interface Corecursive<T, F> {
     return a(this).value()
   }
 
-  fun <A, M> A.gana(MM: Monad<M>, dist: (Kind<M, Kind<F, Kind<M, A>>>) -> Kind<F, Kind<M, Kind<M, A>>>, alg: MAlgebra<F, M, A>): T {
+  fun <A, M> A.gana(MM: Monad<M>, dist: DistFuncM<F, M, A>, alg: MAlgebra<F, M, A>): T {
     fun a(s: Kind<M, Kind<F, Kind<M, A>>>): Eval<T> = MM.run {
       FF().run {
         dist(s).map { a(MM.lift(alg).invoke(it.flatten())) }.embedT()
@@ -46,7 +46,7 @@ interface Corecursive<T, F> {
     return a(MM.just(alg(this))).value()
   }
 
-  fun <A, M> A.gunfold(MM: Monad<M>, dist: (Kind<M, Kind<F, Kind<M, A>>>) -> Kind<F, Kind<M, Kind<M, A>>>, alg: MAlgebra<F, M, A>): T =
+  fun <A, M> A.gunfold(MM: Monad<M>, dist: DistFuncM<F, M, A>, alg: MAlgebra<F, M, A>): T =
     gana(MM, dist, alg)
 
   fun <A, B> A.coelgot(f: (Tuple2<A, Kind<F, B>>) -> B, coalg: Coalgebra<F, A>): B {

@@ -30,6 +30,10 @@ typealias MAlgebra<F, M, A> = (A) -> Kind<F, Kind<M, A>>
 
 typealias WAlgebra<F, W, A> = (Kind<F, Kind<W, A>>) -> A
 
+typealias DistFunc<F, W, A> = (Kind<F, Kind<W, Kind<W, A>>>) -> Kind<W, Kind<F, Kind<W, A>>>
+
+typealias DistFuncM<F, M, A> = (Kind<M, Kind<F, Kind<M, A>>>) -> Kind<F, Kind<M, Kind<M, A>>>
+
 /**
  * The composition of cata and ana.
  */
