@@ -17,9 +17,9 @@ interface MuBirecursive<F> : Birecursive<Mu<F>, F> {
   override fun FF(): Functor<F>
 
   override fun Kind<F, Eval<Mu<F>>>.embedT(): Eval<Mu<F>> =
-    Eval.now(object : Mu<F>() {
-      override fun <A> unMu(fa: Algebra<F, Eval<A>>) = FF().run {
-        fa(map { it.flatMap { it.fix().unMu(fa) } })
+    Eval.now(object : Mu<F> {
+      override fun <A> unMu(alg: Algebra<F, Eval<A>>) = FF().run {
+        alg(map { it.flatMap { it.fix().unMu(alg) } })
       }
     })
 

@@ -12,8 +12,8 @@ import arrow.recursion.typeclasses.Birecursive
 import arrow.typeclasses.Functor
 
 @extension
-interface CofreeFFunctor<F, A> : Functor<CofreeFPartialOf<F, A>> {
-  override fun <B, C> Kind<CofreeFPartialOf<F, A>, B>.map(f: (B) -> C): Kind<CofreeFPartialOf<F, A>, C> =
+interface CofreeFFunctor<F, I> : Functor<CofreeFPartialOf<F, I>> {
+  override fun <B, C> Kind<CofreeFPartialOf<F, I>, B>.map(f: (B) -> C): Kind<CofreeFPartialOf<F, I>, C> =
     fix().map(f)
 }
 
