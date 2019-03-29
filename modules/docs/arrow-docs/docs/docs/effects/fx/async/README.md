@@ -57,7 +57,7 @@ val program = fx {
   val fiberA = !NonBlocking.startFiber(effect { threadName() })
   val fiberB = !NonBlocking.startFiber(effect { threadName() })
   val threadA = !fiberA.join()
-  val threadB = !fiberA.join()
+  val threadB = !fiberB.join()
   !effect { println(threadA) }
   !effect { println(threadB) }
 }
@@ -95,7 +95,7 @@ suspend fun threadName(): String =
   Thread.currentThread().name
   
 data class ThreadInfo(
-  val threadA : String, 
+  val threadA: String,
   val threadB: String
 )
 
@@ -187,12 +187,13 @@ import arrow.effects.IO
 import arrow.unsafe
 import arrow.effects.extensions.io.unsafeRun.runBlocking
 import arrow.effects.extensions.io.fx.fxCancellable
-//sampleStart
-val (_, disposable) = fxCancellable {
-  !effect { println("BOOM!") }
-}
-//sampleEnd
+
 fun main() { // The edge of our world
+//sampleStart
+  val (_, disposable) = fxCancellable {
+    !effect { println("BOOM!") }
+  }
+//sampleEnd
   println(disposable)
 }
 ```

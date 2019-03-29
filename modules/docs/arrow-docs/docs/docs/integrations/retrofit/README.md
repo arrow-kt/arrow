@@ -9,7 +9,7 @@ permalink: /docs/integrations/retrofit/
 {:.advanced}
 advanced
 
-Arrow contains a integration module for Retrofit so you can use any synchronous or asynchronous datatype of your choice, like [`Try`]({{ '/docs/arrow/core/try' | relative_url }}), [`ObservableK`]({{ '/docs/integrations/rx2' | relative_url }}), [`IO`]({{ '/docs/effects/io' | relative_url }}) or [`DeferredK`]({{ '/docs/integrations/kotlinxcoroutines' | relative_url }}).
+Arrow contains a integration module for Retrofit so you can use any synchronous or asynchronous datatype of your choice, like [`Try`]({{ '/docs/arrow/core/try' | relative_url }}), [`ObservableK`]({{ '/docs/integrations/rx2' | relative_url }}) or [`IO`]({{ '/docs/effects/io' | relative_url }}).
 
 
 ### Using `Call` directly with extensions functions
@@ -71,15 +71,6 @@ createApiClientTest(baseUrl)
   .testCallK() // CallK
   .async(ObservableK.async()) // Kind<ForObservableK, Response<ResponseMock>>
   .fix() // ObservableK<Response<ResponseMock>>
-```
-
-### Using `CallK` with `DeferredK`
-
-```kotlin
-createApiClientTest(baseUrl)
-  .testCallK() // CallK
-  .async(DeferredK.async()) // Kind<ForDeferredK, Response<ResponseMock>>
-  .fix() // DeferredK<Response<ResponseMock>>
 ```
 
 ### Handling `Response` with Arrow
