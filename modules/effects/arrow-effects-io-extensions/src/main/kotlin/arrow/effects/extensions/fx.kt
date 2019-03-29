@@ -4,7 +4,6 @@ import arrow.Kind
 import arrow.core.*
 import arrow.effects.IODispatchers
 import arrow.effects.KindConnection
-import arrow.effects.extensions.*
 import arrow.effects.extensions.fx.dispatchers.dispatchers
 import arrow.effects.extensions.fx.monadDefer.monadDefer
 import arrow.effects.internal.Platform
@@ -18,7 +17,6 @@ import arrow.typeclasses.Continuation
 import arrow.unsafe
 import java.util.concurrent.CancellationException
 import java.util.concurrent.Executor
-import java.util.concurrent.ForkJoinPool
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.concurrent.getOrSet
@@ -37,14 +35,35 @@ interface Fx2Dispatchers : Dispatchers<ForFx> {
 val NonBlocking: CoroutineContext = Fx.dispatchers().default()
 val Trampoline: CoroutineContext = Fx.dispatchers().trampoline()
 
+
+fun <A> FxOf<A>.runNonBlockingCancellable(cb: (Either<Throwable, A>) -> Unit): Disposable {
+  val token = CancelToken()
+  FxRunLoop(fix()).startCoroutine(asyncContinuation(NonBlocking + token, cb))
+  return { token.connection.cancel().fix().fa.startCoroutine(asyncContinuation(NonBlocking, mapUnit)) }
+}
+
 @extension
 interface Fx2UnsafeRun : UnsafeRun<ForFx> {
 
-  override suspend fun <A> unsafe.runBlocking(fa: () -> FxOf<A>): A =
-    fa().fix().foldContinuation(Trampoline) { throw it }
+  override suspend fun <A> unsafe.runBlocking(fa: () -> FxOf<A>): A {
+    val result: AtomicReference<A> = AtomicReference()
+
+    FxRunLoop(fa().fix()).startCoroutine(object : Continuation<A> {
+      override fun resume(value: A) {
+        result.set(value)
+      }
+
+      override fun resumeWithException(exception: Throwable) = throw exception
+
+      override val context: CoroutineContext
+        get() = Trampoline
+    })
+
+    return result.get()
+  }
 
   override suspend fun <A> unsafe.runNonBlocking(fa: () -> FxOf<A>, cb: (Either<Throwable, A>) -> Unit) =
-    fa().fix().fa.startCoroutine(asyncContinuation(NonBlocking, cb))
+    FxRunLoop(fa().fix()).startCoroutine(asyncContinuation(NonBlocking, cb))
 }
 
 @extension
@@ -135,25 +154,6 @@ interface Fx2Async : Async<ForFx>, Fx2MonadDefer {
     ctx.shift().followedBy(fix()).fix()
 }
 
-private class Pool2(val pool: ForkJoinPool) : AbstractCoroutineContextElement(ContinuationInterceptor), ContinuationInterceptor {
-  override fun <T> interceptContinuation(continuation: kotlin.coroutines.Continuation<T>): kotlin.coroutines.Continuation<T> =
-    Pool2Continuation(pool, continuation.context.fold(continuation) { cont, element ->
-      if (element != this@Pool2 && element is ContinuationInterceptor)
-        element.interceptContinuation(cont) else cont
-    })
-}
-
-private class Pool2Continuation<T>(
-  val pool: ForkJoinPool,
-  val cont: kotlin.coroutines.Continuation<T>
-) : kotlin.coroutines.Continuation<T> {
-  override val context: CoroutineContext = cont.context
-
-  override fun resumeWith(result: kotlin.Result<T>) {
-    pool.execute { cont.resumeWith(result) }
-  }
-}
-
 @extension
 interface Fx2Concurrent : Concurrent<ForFx>, Fx2Async {
 
@@ -191,19 +191,6 @@ interface Fx2Concurrent : Concurrent<ForFx>, Fx2Async {
 
   override fun <A> async(fa: Proc<A>): Fx<A> =
     Fx.async(fa)
-}
-
-class BlockingCoroutine2<T>(override val context: CoroutineContext) : kotlin.coroutines.Continuation<T> {
-
-  private val retVal: AtomicReference<T> = AtomicReference()
-
-  override fun resumeWith(result: Result<T>) {
-    retVal.set(result.getOrThrow())
-  }
-
-  val value: T
-    get() = retVal.get()
-
 }
 
 fun <A> Fx.Companion.async(fa: FxProc<A>): Fx<A> = Fx<A> {

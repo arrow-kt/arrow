@@ -2,6 +2,7 @@ package arrow.effects.suspended.fx
 
 import arrow.Kind
 import arrow.core.*
+import arrow.effects.*
 import arrow.effects.internal.Platform
 import arrow.effects.typeclasses.*
 import arrow.typeclasses.Continuation
@@ -53,9 +54,11 @@ sealed class Fx<A> : FxOf<A> {
     override fun toString(): String = "Fx.Single"
   }
 
-  internal class Map<A, B>(val source: FxOf<A>, val g: (A) -> B, val index: Int) : Fx<B>() {
+  internal class Map<A, B>(val source: FxOf<A>, val g: (A) -> B, val index: Int) : Fx<B>(), (A) -> Fx<B> {
+    override fun invoke(value: A): Fx<B> = Fx.Pure(g(value))
     override val fa: suspend () -> B = suspend {
-      invokeLoop(this@Map as Fx<Any?>) as B
+      val a = source.fix().fa()
+      g(a)
     }
 
     override fun <C> map(f: (B) -> C): Fx<C> =
@@ -72,7 +75,8 @@ sealed class Fx<A> : FxOf<A> {
 
   internal class FlatMap<A, B>(val source: FxOf<A>, val fb: (A) -> FxOf<B>, val index: Int) : Fx<B>() {
     override val fa: suspend () -> B = suspend {
-      invokeLoop(this@FlatMap as Fx<Any?>) as B
+      val a = source.fix().fa()
+      fb(a)()
     }
 
     //If we reach the maxStackDepth then we can fold the current FlatMap and return a Map case
@@ -94,24 +98,7 @@ sealed class Fx<A> : FxOf<A> {
   }
 
   suspend inline operator fun not(): A =
-    invokeLoop(this as Fx<Any?>) as A
-
-  @PublishedApi
-  internal tailrec suspend fun invokeLoop(fa: Fx<Any?>): Any? = when (fa) {
-    is Pure -> fa.value
-    is Single -> fa.fa()
-    is RaiseError -> throw fa.error
-    is Map<*, *> -> {
-      val source: Any? = fa.source.invoke()
-      val f: (Any?) -> Any? = fa.g as (Any?) -> Any?
-      f(source)
-    }
-    is FlatMap<*, *> -> {
-      val source: Any? = fa.source.fix().invoke()
-      val fb: (Any?) -> Fx<Any?> = fa.fb as (Any?) -> Fx<Any?>
-      invokeLoop(fb(source))
-    }
-  }
+    FxRunLoop(this).invoke()
 
   suspend inline operator fun invoke(): A =
     !this
@@ -125,8 +112,8 @@ sealed class Fx<A> : FxOf<A> {
   fun <B> ap(ff: Fx<(A) -> B>): Fx<B> =
     ff.flatMap { map(it) }
 
-  fun handleErrorWith(f: (Throwable) -> Fx<A>): Fx<A> = when (this) {
-    is RaiseError -> f(error)
+  fun handleErrorWith(f: (Throwable) -> FxOf<A>): Fx<A> = when (this) {
+    is RaiseError -> f(error).fix()
     is Pure -> this
     else -> Fx {
       try {
@@ -282,4 +269,22 @@ fun <A> Fx<A>.foldContinuation(
       get() = context
   })
   return result.get()
+}
+
+//Can we somehow share this across arrow-effects-data and arrow-effects-io-extensions..
+class CancelToken : AbstractCoroutineContextElement(CancelToken) {
+  companion object Key : CoroutineContext.Key<CancelToken>
+
+  val connection: KindConnection<ForFx> = KindConnection.invoke(object : MonadDefer<ForFx> {
+    override fun <A> defer(fa: () -> FxOf<A>): Fx<A> = Fx.defer(fa)
+    override fun <A> raiseError(e: Throwable): Fx<A> = Fx.RaiseError(e)
+    override fun <A> FxOf<A>.handleErrorWith(f: (Throwable) -> FxOf<A>): Fx<A> = fix().handleErrorWith(f)
+    override fun <A> just(a: A): Fx<A> = Fx.just(a)
+    override fun <A, B> FxOf<A>.flatMap(f: (A) -> FxOf<B>): Fx<B> = fix().flatMap(f)
+    override fun <A, B> tailRecM(a: A, f: (A) -> FxOf<Either<A, B>>): Fx<B> = Fx.tailRecM(a, f)
+    override fun <A, B> FxOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> FxOf<Unit>, use: (A) -> FxOf<B>): Fx<B> = fix().bracketCase(release, use)
+
+  }) {
+    it.fix().fa.startCoroutine(Continuation(EmptyCoroutineContext) { })
+  }
 }
