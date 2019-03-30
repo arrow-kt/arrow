@@ -61,6 +61,20 @@ import arrow.typeclasses.Semigroup
  * ```kotlin:ank:playground
  * import arrow.effects.IO
  * import arrow.effects.extensions.io.fx.fx
+ * import arrow.effects.extensions.io.bracket.bracket
+ *
+ * object Consumer
+ * object Handle
+ *
+ * class Service(val handle: Handle, val consumer: Consumer)
+ *
+ * fun createConsumer(): IO<Consumer> = IO { println("Creating consumer"); Consumer }
+ * fun createDBHandle(): IO<Handle> = IO { println("Creating db handle"); Handle }
+ * fun createFancyService(consumer: Consumer, handle: Handle): IO<Service> = IO { println("Creating service"); Service(handle, consumer) }
+ *
+ * fun closeConsumer(consumer: Consumer): IO<Unit> = IO { println("Closed consumer") }
+ * fun closeDBHandle(handle: Handle): IO<Unit> = IO { println("Closed db handle") }
+ * fun shutDownFanceService(service: Service): IO<Unit> = IO { println("Closed service") }
  *
  * //sampleStart
  * val bracketProgram =
@@ -90,6 +104,19 @@ import arrow.typeclasses.Semigroup
  * import arrow.effects.extensions.io.bracket.bracket
  * import arrow.effects.extensions.io.fx.fx
  * import arrow.effects.fix
+ *
+ * object Consumer
+ * object Handle
+ *
+ * class Service(val handle: Handle, val consumer: Consumer)
+ *
+ * fun createConsumer(): IO<Consumer> = IO { println("Creating consumer"); Consumer }
+ * fun createDBHandle(): IO<Handle> = IO { println("Creating db handle"); Handle }
+ * fun createFancyService(consumer: Consumer, handle: Handle): IO<Service> = IO { println("Creating service"); Service(handle, consumer) }
+ *
+ * fun closeConsumer(consumer: Consumer): IO<Unit> = IO { println("Closed consumer") }
+ * fun closeDBHandle(handle: Handle): IO<Unit> = IO { println("Closed db handle") }
+ * fun shutDownFanceService(service: Service): IO<Unit> = IO { println("Closed service") }
  *
  * //sampleStart
  * val managedTProgram = Resource.monad(IO.bracket()).binding {
