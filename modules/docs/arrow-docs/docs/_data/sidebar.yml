@@ -364,6 +364,9 @@ options:
       - title: Fiber
         url: /docs/effects/fiber/
 
+      - title: Resource
+        url: /docs/apidocs/arrow-effects-data/resource
+
   - title: Optics
 
     nested_options:
