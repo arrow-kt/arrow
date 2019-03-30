@@ -3,10 +3,11 @@ package arrow.recursion.typeclasses
 import arrow.Kind
 import arrow.core.Eval
 import arrow.core.Tuple2
-import arrow.core.identity
-import arrow.recursion.*
+import arrow.recursion.Algebra
+import arrow.recursion.Coalgebra
+import arrow.recursion.RCoalgebra
+import arrow.recursion.hylo
 import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
 
 /**
  * ank_macro_hierarchy(arrow.recursion.typeclasses.Corecursive)
@@ -33,30 +34,19 @@ interface Corecursive<T, F> {
   fun <A> A.ana(coalg: Coalgebra<F, A>): T = hylo(embed(), coalg, FF())
 
   fun <A> A.apo(coalg: RCoalgebra<F, T, A>): T {
-    fun a(s: A): Eval<T> = FF().run { coalg(s).map { Eval.later { it.fold(::identity) { a(it).value() } } }.embedT() }
-    return a(this).value()
-  }
-
-  fun <A, M> A.gana(MM: Monad<M>, dist: DistFuncM<F, M, A>, alg: MAlgebra<F, M, A>): T {
-    fun a(s: Kind<M, Kind<F, Kind<M, A>>>): Eval<T> = MM.run {
-      FF().run {
-        dist(s).map { a(MM.lift(alg).invoke(it.flatten())) }.embedT()
-      }
+    fun a(s: Eval<A>): Eval<T> = FF().run {
+      s.flatMap { coalg(it).map { it.fold({ Eval.now(it) }, { a(Eval.now(it)) }) }.embedT() }
     }
-    return a(MM.just(alg(this))).value()
+    return a(Eval.now(this)).value()
   }
 
-  fun <A, M> A.gunfold(MM: Monad<M>, dist: DistFuncM<F, M, A>, alg: MAlgebra<F, M, A>): T =
-    gana(MM, dist, alg)
-
-  fun <A, B> A.coelgot(f: (Tuple2<A, Kind<F, B>>) -> B, coalg: Coalgebra<F, A>): B {
-    fun h(a: A): Eval<B> = Eval.later {
+  fun <A, B> A.coelgot(f: (Tuple2<A, Eval<Kind<F, Eval<B>>>>) -> Eval<B>, coalg: Coalgebra<F, A>): B {
+    fun h(a: A): Eval<B> =
       FF().run {
         f(
-          Tuple2(a, coalg(a).map { h(it).value() })
+          Tuple2(a, Eval.later { coalg(a).map { Eval.defer { h(it) } } })
         )
       }
-    }
     return h(this).value()
   }
 }

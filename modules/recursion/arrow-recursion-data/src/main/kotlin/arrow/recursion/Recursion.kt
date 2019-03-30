@@ -28,14 +28,6 @@ typealias RAlgebra<F, T, A> = (Kind<F, Tuple2<T, A>>) -> A
 
 typealias RCoalgebra<F, T, A> = (A) -> Kind<F, Either<T, A>>
 
-typealias MAlgebra<F, M, A> = (A) -> Kind<F, Kind<M, A>>
-
-typealias WAlgebra<F, W, A> = (Kind<F, Kind<W, A>>) -> A
-
-typealias DistFunc<F, W, A> = (Kind<F, Eval<Kind<W, Kind<W, A>>>>) -> Eval<Kind<W, Kind<F, Kind<W, A>>>>
-
-typealias DistFuncM<F, M, A> = (Kind<M, Kind<F, Kind<M, A>>>) -> Kind<F, Kind<M, Kind<M, A>>>
-
 /**
  * The composition of cata and ana.
  */

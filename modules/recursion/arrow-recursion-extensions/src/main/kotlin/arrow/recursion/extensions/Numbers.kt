@@ -26,9 +26,7 @@ fun Int.Companion.birecursive(): Birecursive<Int, ForOption> = object : IntBirec
 interface LongBirecursive : Birecursive<Long, ForOption> {
   override fun FF(): Functor<ForOption> = Option.functor()
 
-  override fun Kind<ForOption, Eval<Long>>.embedT(): Eval<Long> = binding {
-    fix().fold({ 0L }, { it.bind() + 1L })
-  }
+  override fun Kind<ForOption, Eval<Long>>.embedT(): Eval<Long> = fix().fold({ Eval.now(0L) }, { it.map { it + 1 } })
 
   override fun Long.projectT(): Kind<ForOption, Long> = when {
     this < 0 -> throw IllegalArgumentException("IntBirecursive only works on natural numbers")
