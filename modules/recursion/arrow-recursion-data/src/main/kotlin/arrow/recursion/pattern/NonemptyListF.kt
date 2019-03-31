@@ -2,6 +2,7 @@ package arrow.recursion.pattern
 
 import arrow.core.Option
 import arrow.higherkind
+import arrow.recursion.data.Fix
 
 @higherkind
 data class NonEmptyListF<A, B>(val head: A, val tail: Option<B>) : NonEmptyListFOf<A, B> {
@@ -10,3 +11,5 @@ data class NonEmptyListF<A, B>(val head: A, val tail: Option<B>) : NonEmptyListF
 
   companion object
 }
+
+typealias NonEmptyListR<A> = Fix<NonEmptyListFPartialOf<A>>
