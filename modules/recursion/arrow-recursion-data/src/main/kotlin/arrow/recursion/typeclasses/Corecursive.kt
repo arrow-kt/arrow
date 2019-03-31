@@ -5,9 +5,10 @@ import arrow.core.Eval
 import arrow.core.Tuple2
 import arrow.core.fix
 import arrow.recursion.*
-import arrow.recursion.data.FreeF
-import arrow.recursion.data.FreeR
 import arrow.recursion.data.fix
+import arrow.recursion.pattern.FreeF
+import arrow.recursion.pattern.FreeR
+import arrow.recursion.pattern.fix
 import arrow.typeclasses.Functor
 
 /**

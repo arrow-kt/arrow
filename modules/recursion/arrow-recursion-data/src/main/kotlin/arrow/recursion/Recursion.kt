@@ -6,9 +6,7 @@ import arrow.core.Eval
 import arrow.core.FunctionK
 import arrow.core.Tuple2
 import arrow.free.Cofree
-import arrow.free.Free
-import arrow.recursion.data.Fix
-import arrow.recursion.data.FreeR
+import arrow.recursion.pattern.FreeR
 import arrow.recursion.typeclasses.Corecursive
 import arrow.recursion.typeclasses.Recursive
 import arrow.typeclasses.Functor

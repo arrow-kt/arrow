@@ -4,8 +4,6 @@ import arrow.Kind
 import arrow.core.*
 import arrow.core.extensions.eval.monad.binding
 import arrow.core.extensions.option.functor.functor
-import arrow.recursion.data.FreeF
-import arrow.recursion.data.FreeR
 import arrow.recursion.typeclasses.Birecursive
 import arrow.typeclasses.Functor
 

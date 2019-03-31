@@ -1,6 +1,7 @@
-package arrow.recursion.data
+package arrow.recursion.pattern
 
 import arrow.higherkind
+import arrow.recursion.data.Fix
 
 @higherkind
 sealed class ListF<A, B> : ListFOf<A, B> {
@@ -14,3 +15,5 @@ sealed class ListF<A, B> : ListFOf<A, B> {
 
   companion object
 }
+
+typealias ListR<A> = Fix<ListFPartialOf<A>>
