@@ -4,10 +4,7 @@ import arrow.Kind
 import arrow.core.*
 import arrow.core.extensions.eval.applicative.applicative
 import arrow.free.Cofree
-import arrow.recursion.Algebra
-import arrow.recursion.Coalgebra
-import arrow.recursion.RAlgebra
-import arrow.recursion.hylo
+import arrow.recursion.*
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Traverse
 
@@ -47,7 +44,7 @@ interface Recursive<T, F> {
     return p(this).value()
   }
 
-  fun <A> T.histo(alg: (Kind<F, Cofree<F, A>>) -> A): A {
+  fun <A> T.histo(alg: CVAlgebra<F, A>): A {
     fun go(t: T): Cofree<F, A> = FF().run {
       t.projectT().map { go(it) }.let {
         Cofree(FF(), alg(it), Eval.now(it))
@@ -56,7 +53,7 @@ interface Recursive<T, F> {
     return go(this).extract()
   }
 
-  fun <A> T.histoStackSafe(TF: Traverse<F>, alg: (Kind<F, Cofree<F, A>>) -> A): A {
+  fun <A> T.histoStackSafe(TF: Traverse<F>, alg: CVAlgebra<F, A>): A {
     fun go(t: T): Eval<Cofree<F, A>> = TF.run {
       t.projectT().traverse(Eval.applicative()) { Eval.defer { go(it) } }.fix().map {
         Cofree(FF(), alg(it), Eval.now(it))

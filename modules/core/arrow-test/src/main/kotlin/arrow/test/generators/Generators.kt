@@ -130,20 +130,3 @@ fun Gen.Companion.char(): Gen<Char> =
 fun <A> Gen.Companion.genSetK(genA: Gen<A>): Gen<SetK<A>> = Gen.set(genA).map { it.k() }
 
 // For generating recursive data structures with recursion schemes
-
-typealias NatPattern = ForOption
-typealias GNat<T> = Kind<T, NatPattern>
-
-fun toGNatCoalgebra(): Coalgebra<NatPattern, Int> = Coalgebra {
-  if (it == 0) None else Some(it - 1)
-}
-
-fun fromGNatAlgebra(): Algebra<NatPattern, Eval<Int>> = Algebra {
-  it.fix().fold({ Eval.Zero }, { it.map { it + 1 } })
-}
-
-inline fun <reified T> Corecursive<T>.toGNat(i: Int): GNat<T> =
-  Option.functor().ana(i, toGNatCoalgebra())
-
-inline fun <reified T> Recursive<T>.toInt(i: GNat<T>): Int =
-  Option.functor().cata(i, fromGNatAlgebra())

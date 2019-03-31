@@ -4,6 +4,8 @@ import arrow.Kind
 import arrow.core.*
 import arrow.core.extensions.eval.monad.binding
 import arrow.core.extensions.option.functor.functor
+import arrow.recursion.data.FreeF
+import arrow.recursion.data.FreeR
 import arrow.recursion.typeclasses.Birecursive
 import arrow.typeclasses.Functor
 
@@ -29,7 +31,7 @@ interface LongBirecursive : Birecursive<Long, ForOption> {
   override fun Kind<ForOption, Eval<Long>>.embedT(): Eval<Long> = fix().fold({ Eval.now(0L) }, { it.map { it + 1 } })
 
   override fun Long.projectT(): Kind<ForOption, Long> = when {
-    this < 0 -> throw IllegalArgumentException("IntBirecursive only works on natural numbers")
+    this < 0 -> throw IllegalArgumentException("LongBirecursive only works on natural numbers")
     this == 0L -> none()
     else -> (this - 1).some()
   }

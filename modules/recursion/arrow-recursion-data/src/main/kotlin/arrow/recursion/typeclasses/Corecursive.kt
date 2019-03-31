@@ -3,10 +3,11 @@ package arrow.recursion.typeclasses
 import arrow.Kind
 import arrow.core.Eval
 import arrow.core.Tuple2
-import arrow.recursion.Algebra
-import arrow.recursion.Coalgebra
-import arrow.recursion.RCoalgebra
-import arrow.recursion.hylo
+import arrow.core.fix
+import arrow.recursion.*
+import arrow.recursion.data.FreeF
+import arrow.recursion.data.FreeR
+import arrow.recursion.data.fix
 import arrow.typeclasses.Functor
 
 /**
@@ -34,11 +35,14 @@ interface Corecursive<T, F> {
   fun <A> A.ana(coalg: Coalgebra<F, A>): T = hylo(embed(), coalg, FF())
 
   fun <A> A.apo(coalg: RCoalgebra<F, T, A>): T {
-    fun a(s: Eval<A>): Eval<T> = FF().run {
-      s.flatMap { coalg(it).map { it.fold({ Eval.now(it) }, { a(Eval.now(it)) }) }.embedT() }
+    fun go(v: Eval<A>): Eval<T> = FF().run {
+      v.flatMap { coalg(it).map { it.fold({ Eval.now(it) }, { go(Eval.now(it)) }) }.embedT() }
     }
-    return a(Eval.now(this)).value()
+    return go(Eval.now(this)).value()
   }
+
+  fun <A> A.futu(coalg: CVCoalgebra<F, A>): T =
+    futuFGo(this@Corecursive, this, coalg).extract()
 
   fun <A, B> A.coelgot(f: (Tuple2<A, Eval<Kind<F, Eval<B>>>>) -> Eval<B>, coalg: Coalgebra<F, A>): B {
     fun h(a: A): Eval<B> =
@@ -48,5 +52,17 @@ interface Corecursive<T, F> {
         )
       }
     return h(this).value()
+  }
+}
+
+// Futu helpers
+private fun <F, T, A> futuFGo(CR: Corecursive<T, F>, a: A, coalg: CVCoalgebra<F, A>): Eval<T> = CR.FF().run {
+  CR.run { coalg(a).map { futuFWorker(CR, Eval.now(it), coalg) }.embedT() }
+}
+
+private fun <F, T, A> futuFWorker(CR: Corecursive<T, F>, f: Eval<FreeR<F, A>>, coalg: CVCoalgebra<F, A>): Eval<T> = f.flatMap { f ->
+  when (val f = f.unfix.fix()) {
+    is FreeF.Pure -> futuFGo(CR, f.e, coalg)
+    is FreeF.Impure -> CR.run { CR.FF().run { f.fa.map { futuFWorker(CR, it.fix().map { it.fix() }, coalg) }.embedT() } }
   }
 }
