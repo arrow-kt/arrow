@@ -89,17 +89,17 @@ object FxRunLoop {
    * but filters out `IOFrame.ErrorHandler` references, because we know they won't do anything — an optimization for `handleError`.
    */
   private fun popNextBind(bFirst: ((Any?) -> Fx<Any?>)?, bRest: Platform.ArrayStack<(Any?) -> Fx<Any?>>?): ((Any?) -> Fx<Any?>)? =
-    if ((bFirst != null) /*&& bFirst !is IOFrame.Companion.ErrorHandler*/)
-      bFirst
-    else if (bRest != null) {
-      var cursor: ((Any?) -> Fx<Any?>)? = null
-      while (cursor == null && bRest.isNotEmpty()) {
-        val ref = bRest.pop()
-        /*if (ref !is IOFrame.Companion.ErrorHandler) */cursor = ref
+    when {
+      bFirst != null /*&& bFirst !is IOFrame.Companion.ErrorHandler*/ -> bFirst
+      bRest != null -> {
+        var cursor: ((Any?) -> Fx<Any?>)? = null
+        while (cursor == null && bRest.isNotEmpty()) {
+          val ref = bRest.pop()
+          /*if (ref !is IOFrame.Companion.ErrorHandler) */cursor = ref
+        }
+        cursor
       }
-      cursor
-    } else {
-      null
+      else -> null
     }
 
 }

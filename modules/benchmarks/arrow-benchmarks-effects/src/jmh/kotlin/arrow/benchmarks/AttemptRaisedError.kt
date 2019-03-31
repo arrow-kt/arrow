@@ -35,7 +35,7 @@ open class AttemptRaisedError {
 
   @Benchmark
   fun fx(): Int =
-    unsafe { runBlocking { Fx { loopNotHappy(size, 0)() } } }
+    unsafe { runBlocking { Fx { !loopNotHappy(size, 0) } } }
 
 
 }

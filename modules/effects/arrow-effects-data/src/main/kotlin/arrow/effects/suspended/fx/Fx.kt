@@ -22,7 +22,7 @@ typealias FxProcF<A> = ConnectedProcF<ForFx, A>
 inline fun <A> FxOf<A>.fix(): Fx<A> =
   this as Fx<A>
 
-suspend operator fun <A> FxOf<A>.invoke(): A = fix().invoke()
+suspend inline operator fun <A> FxOf<A>.not(): A = !fix()
 
 sealed class Fx<A> : FxOf<A> {
 
@@ -47,6 +47,7 @@ sealed class Fx<A> : FxOf<A> {
   //Purely wrapped suspend function.
   //Should wrap a singular suspension point otherwise stack safety cannot be guaranteed.
   //This is not an issue if you guarantee stack safety yourself for your suspended program. i.e. using `tailrec`
+  @PublishedApi
   internal class Single<A>(val source: suspend () -> A) : Fx<A>() {
     override val fa: suspend () -> A = source
     override fun <B> map(f: (A) -> B): Fx<B> = Fx.Map(this, f, 0)
@@ -57,7 +58,7 @@ sealed class Fx<A> : FxOf<A> {
   internal class Map<A, B>(val source: FxOf<A>, val g: (A) -> B, val index: Int) : Fx<B>(), (A) -> Fx<B> {
     override fun invoke(value: A): Fx<B> = Fx.Pure(g(value))
     override val fa: suspend () -> B = suspend {
-      val a = source.fix().fa()
+      val a = !source.fix()
       g(a)
     }
 
@@ -75,22 +76,22 @@ sealed class Fx<A> : FxOf<A> {
 
   internal class FlatMap<A, B>(val source: FxOf<A>, val fb: (A) -> FxOf<B>, val index: Int) : Fx<B>() {
     override val fa: suspend () -> B = suspend {
-      val a = source.fix().fa()
-      fb(a)()
+      val a = !source.fix()
+      !fb(a).fix()
     }
 
     //If we reach the maxStackDepth then we can fold the current FlatMap and return a Map case
     //If we haven't reached the maxStackDepth we fuse the map operator within the flatMap stack.
     override fun <C> map(f: (B) -> C): Fx<C> =
       if (index != Platform.maxStackDepthSize) Fx.Map(this, f, 0)
-      else Fx.FlatMap(source, { a -> Fx { f(fb(a)()) } }, index + 1)
+      else Fx.FlatMap(source, { a -> Fx { f(!fb(a).fix()) } }, index + 1)
 
     override fun <C> flatMap(f: (B) -> FxOf<C>): Fx<C> =
       if (index != Platform.maxStackDepthSize) Fx.FlatMap(this, f, 0)
       else Fx.FlatMap(source, { a ->
         Fx.Single {
-          val b = fb(a)()
-          f(b)()
+          val b = !fb(a).fix()
+          !f(b).fix()
         }
       }, index + 1)
 
@@ -98,10 +99,7 @@ sealed class Fx<A> : FxOf<A> {
   }
 
   suspend inline operator fun not(): A =
-    FxRunLoop(this).invoke()
-
-  suspend inline operator fun invoke(): A =
-    !this
+    FxRunLoop(this)()
 
   suspend inline operator fun component1(): A =
     !this
@@ -119,7 +117,7 @@ sealed class Fx<A> : FxOf<A> {
       try {
         fa()
       } catch (e: Throwable) {
-        f(e)()
+        !f(e).fix()
       }
     }
   }
@@ -165,7 +163,7 @@ sealed class Fx<A> : FxOf<A> {
     release: (A, ExitCase<Throwable>) -> FxOf<Unit>,
     use: (A) -> FxOf<B>
   ): Fx<B> = Fx {
-    val a = invoke()
+    val a = !this
 
     val fxB: Fx<B> = try {
       use(a).fix()
@@ -187,7 +185,7 @@ sealed class Fx<A> : FxOf<A> {
       }
       throw e
     }
-    release(a, ExitCase.Completed).fix().invoke()
+    !release(a, ExitCase.Completed).fix()
     b
   }
 

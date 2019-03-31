@@ -31,7 +31,7 @@ open class Delay {
 
   @Benchmark
   fun fx(): Int =
-    unsafe { fxRunBlocking { Fx { !fxDelayLoop(0) } } }
+    unsafe { fxRunBlocking { fxDelayLoop(0) } }
 
   @Benchmark
   fun io(): Int =

@@ -16,10 +16,8 @@ import arrow.typeclasses.*
 import arrow.typeclasses.Continuation
 import arrow.unsafe
 import java.util.concurrent.CancellationException
-import java.util.concurrent.Executor
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
-import kotlin.concurrent.getOrSet
 import kotlin.coroutines.*
 
 
@@ -27,14 +25,9 @@ import kotlin.coroutines.*
 interface Fx2Dispatchers : Dispatchers<ForFx> {
   override fun default(): CoroutineContext =
     IODispatchers.CommonPool
-
-  override fun trampoline(): CoroutineContext =
-    TrampolinePool(Executor { command -> command?.run() })
 }
 
 val NonBlocking: CoroutineContext = Fx.dispatchers().default()
-val Trampoline: CoroutineContext = Fx.dispatchers().trampoline()
-
 
 fun <A> FxOf<A>.runNonBlockingCancellable(cb: (Either<Throwable, A>) -> Unit): Disposable {
   val token = CancelToken()
@@ -48,7 +41,7 @@ interface Fx2UnsafeRun : UnsafeRun<ForFx> {
   override suspend fun <A> unsafe.runBlocking(fa: () -> FxOf<A>): A {
     val result: AtomicReference<A> = AtomicReference()
 
-    FxRunLoop(fa().fix()).startCoroutine(object : Continuation<A> {
+    fa().fix().fa.startCoroutine(object : Continuation<A> {
       override fun resume(value: A) {
         result.set(value)
       }
@@ -56,7 +49,7 @@ interface Fx2UnsafeRun : UnsafeRun<ForFx> {
       override fun resumeWithException(exception: Throwable) = throw exception
 
       override val context: CoroutineContext
-        get() = Trampoline
+        get() = EmptyCoroutineContext
     })
 
     return result.get()
@@ -446,107 +439,6 @@ fun <A, B, C> Fx.Companion.raceTriple(ctx: CoroutineContext, fa: FxOf<A>, fb: Fx
 
   }
 
-fun TrampolinePool(executorService: Executor): CoroutineContext =
-  TrampolinePoolElement(executorService)
 
-private val iterations: ThreadLocal<Int> = ThreadLocal.withInitial { 0 }
-private val threadTrampoline = ThreadLocal<TrampolineExecutor>()
-
-open class TrampolinePoolElement(
-  val executionService: Executor,
-  val asyncBoundaryAfter: Int = 127
-) : AbstractCoroutineContextElement(ContinuationInterceptor), ContinuationInterceptor {
-
-  override fun <T> interceptContinuation(continuation: kotlin.coroutines.Continuation<T>): kotlin.coroutines.Continuation<T> =
-    TrampolinedContinuation(executionService, continuation.context.fold(continuation) { cont, element ->
-      if (element != this@TrampolinePoolElement && element is ContinuationInterceptor)
-        element.interceptContinuation(cont)
-      else cont
-    }, asyncBoundaryAfter)
-}
-
-private class TrampolinedContinuation<T>(
-  val executionService: Executor,
-  val cont: kotlin.coroutines.Continuation<T>,
-  val asyncBoundaryAfter: Int
-) : kotlin.coroutines.Continuation<T> {
-  override val context: CoroutineContext = cont.context
-
-  override fun resumeWith(result: Result<T>) {
-    val currentIterations = iterations.get()
-    if (currentIterations > asyncBoundaryAfter) {
-      iterations.set(0)
-      threadTrampoline
-        .getOrSet { TrampolineExecutor(executionService) }
-        .execute(Runnable {
-          cont.resumeWith(result)
-        })
-    } else {
-      //println("Blocking: currentIterations: $currentIterations, cont.context: $context")
-      iterations.set(currentIterations + 1)
-      cont.resumeWith(result)
-    }
-  }
-}
-
-/**
- * Trampoline implementation, meant to be stored in a `ThreadLocal`.
- * See `TrampolineEC`.
- *
- * INTERNAL API.
- */
-internal class TrampolineExecutor(val underlying: Executor) {
-  private var immediateQueue = Platform.ArrayStack<Runnable>()
-  private var withinLoop = false
-
-  fun startLoop(runnable: Runnable): Unit {
-    withinLoop = true
-    try {
-      immediateLoop(runnable)
-    } finally {
-      withinLoop = false
-    }
-  }
-
-  fun execute(runnable: Runnable): Unit {
-    if (!withinLoop) {
-      startLoop(runnable)
-    } else {
-      immediateQueue.push(runnable)
-    }
-  }
-
-  private fun forkTheRest(): Unit {
-    class ResumeRun(val head: Runnable, val rest: Platform.ArrayStack<Runnable>) : Runnable {
-      override fun run(): Unit {
-        immediateQueue.addAll(rest)
-        immediateLoop(head)
-      }
-    }
-
-    val head = immediateQueue.firstOrNull()
-    if (head != null) {
-      immediateQueue.pop()
-      val rest = immediateQueue
-      immediateQueue = Platform.ArrayStack<Runnable>()
-      underlying.execute(ResumeRun(head, rest))
-    }
-  }
-
-  private tailrec fun immediateLoop(task: Runnable): Unit {
-    try {
-      task.run()
-    } catch (ex: Throwable) {
-      forkTheRest()
-      ex.nonFatalOrThrow()
-    }
-
-    val next = immediateQueue.firstOrNull()
-    if (next != null) {
-      immediateQueue.pop()
-      immediateLoop(next)
-    }
-  }
-}
 
 private fun <P1, P2, R> ((P1) -> (P2) -> R).uncurried(): (P1, P2) -> R = { p1: P1, p2: P2 -> this(p1)(p2) }

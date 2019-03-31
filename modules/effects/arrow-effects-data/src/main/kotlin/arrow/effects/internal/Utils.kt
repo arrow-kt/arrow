@@ -17,7 +17,94 @@ class ArrowInternalException(override val message: String =
 
 object Platform {
 
-  class ArrayStack<A> : ArrayDeque<A>()
+  class ArrayStack<A>(
+    initialArray: Array<Any?>,
+    val chunkSize: Int,
+    initialIndex: Int) {
+
+    private val modulo = chunkSize - 1
+    private var array = initialArray
+    private var index = initialIndex
+
+    constructor(chunkSize: Int) : this(arrayOfNulls<Any?>(chunkSize), chunkSize, 0)
+    constructor() : this(13)
+
+    /** Returns `true` if the stack is empty. */
+    fun isEmpty(): Boolean =
+      index == 0 && (array.getOrNull(0) == null)
+
+    /** Pushes an item on the stack. */
+    fun push(a: A): Unit {
+      if (index == modulo) {
+        val newArray = arrayOfNulls<Any?>(chunkSize)
+        newArray[0] = array
+        array = newArray
+        index = 1
+      } else {
+        index += 1
+      }
+      array[index] = a
+    }
+
+    /** Pushes an entire iterator on the stack. */
+    fun pushAll(cursor: Iterator<A>): Unit {
+      while (cursor.hasNext()) push(cursor.next())
+    }
+
+    /** Pushes an entire iterable on the stack. */
+    fun pushAll(seq: Iterable<A>): Unit {
+      pushAll(seq.iterator())
+    }
+
+    /** Pushes the contents of another stack on this stack. */
+    fun pushAll(stack: ArrayStack<A>): Unit {
+      pushAll(stack.iteratorReversed())
+    }
+
+    /** Pops an item from the stack (in LIFO order).
+     *
+     * Returns `null` in case the stack is empty.
+     */
+    fun pop(): A? {
+      if (index == 0) {
+        if (array.getOrNull(0) != null) {
+          array = array[0] as Array<Any?>
+          index = modulo
+        } else {
+          return null
+        }
+      }
+      val result = array[index] as A
+      // GC purposes
+      array[index] = null
+      index -= 1
+      return result
+    }
+
+    /** Builds an iterator out of this stack. */
+    fun iteratorReversed(): Iterator<A> =
+      object : Iterator<A> {
+        private var array = this@ArrayStack.array
+        private var index = this@ArrayStack.index
+
+        override fun hasNext(): Boolean =
+          index > 0 || (array.getOrNull(0) != null)
+
+
+        override fun next(): A {
+          if (index == 0) {
+            array = array[0] as Array<Any?>
+            index = modulo
+          }
+          val result = array[index] as A
+          index -= 1
+          return result
+        }
+      }
+
+    fun isNotEmpty(): Boolean =
+      !isEmpty()
+  }
 
   /**
    * Establishes the maximum stack depth for `IO#map` operations.

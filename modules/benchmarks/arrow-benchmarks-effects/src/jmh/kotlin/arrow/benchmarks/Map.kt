@@ -3,9 +3,10 @@ package arrow.benchmarks
 import arrow.effects.IO
 import arrow.effects.suspended.fx.Fx
 import arrow.unsafe
-import kotlinx.coroutines.runBlocking
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
+import arrow.effects.extensions.fx.unsafeRun.runBlocking as fxRunBlocking
+import arrow.effects.extensions.io.unsafeRun.runBlocking as ioRunBlocking
 
 @State(Scope.Thread)
 @Fork(2)
@@ -25,15 +26,15 @@ open class Map {
 
   @Benchmark
   fun fxOne(): Long =
-    unsafe { runBlocking { fxTest(12000, 1) } }
+    fxTest(12000, 1)
 
   @Benchmark
   fun fxBatch30(): Long =
-    unsafe { runBlocking { fxTest(12000 / 30, 30) } }
+    fxTest(12000 / 30, 30)
 
   @Benchmark
   fun fxBatch120(): Long =
-    unsafe { runBlocking { fxTest(12000 / 120, 120) } }
+    fxTest(12000 / 120, 120)
 
   private fun ioTest(iterations: Int, batch: Int): Long {
     val f = { x: Int -> x + 1 }
@@ -47,13 +48,13 @@ open class Map {
     var sum = 0L
     var i = 0
     while (i < iterations) {
-      sum += io.unsafeRunSync()
+      sum += unsafe { ioRunBlocking { io } }
       i += 1
     }
     return sum
   }
 
-  private suspend fun fxTest(iterations: Int, batch: Int): Long {
+  private fun fxTest(iterations: Int, batch: Int): Long {
     val f = { x: Int -> x + 1 }
     var fx = Fx.just(0)
 
@@ -65,7 +66,7 @@ open class Map {
     var sum = 0L
     var i = 0
     while (i < iterations) {
-      sum += fx()
+      sum += unsafe { fxRunBlocking { fx } }
       i += 1
     }
     return sum
