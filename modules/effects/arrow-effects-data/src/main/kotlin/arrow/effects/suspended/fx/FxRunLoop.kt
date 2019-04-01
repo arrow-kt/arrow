@@ -11,21 +11,21 @@ import kotlin.coroutines.*
 @Suppress("UNCHECKED_CAST")
 object FxRunLoop {
 
-  @JvmStatic suspend inline operator fun <A> invoke(source: FxOf<A>): A =
+  suspend inline operator fun <A> invoke(source: FxOf<A>): A =
     loop(source, coroutineContext[CancelToken] ?: NonCancelable)() as A
 
-  @JvmStatic fun <A> start(source: FxOf<A>,
+  @JvmStatic inline fun <A> start(source: FxOf<A>,
                 ctx: CoroutineContext = EmptyCoroutineContext,
-                cb: (Either<Throwable, A>) -> Unit): Unit =
+                crossinline cb: (Either<Throwable, A>) -> Unit): Unit =
     loop(source, NonCancelable)
       .startCoroutine(Continuation(ctx) { r ->
         r.fold({ cb(Right(it as A)) }, { cb(Left(it)) })
       })
 
-  @JvmStatic fun <A> startCancelable(fa: FxOf<A>,
+  @JvmStatic inline fun <A> startCancelable(fa: FxOf<A>,
                           token: CancelToken,
                           ctx: CoroutineContext = EmptyCoroutineContext,
-                          cb: (Either<Throwable, A>) -> Unit): Unit {
+                          crossinline cb: (Either<Throwable, A>) -> Unit): Unit {
     loop(fa, token)
       .startCoroutine(Continuation(ctx + token) { r ->
         r.fold({ cb(Right(it as A)) }, { cb(Left(it)) })
@@ -33,7 +33,7 @@ object FxRunLoop {
   }
 
   @PublishedApi
-  internal fun <A> loop(fa: FxOf<A>, token: CancelToken): suspend () -> Any? = suspend {
+  @JvmStatic internal fun <A> loop(fa: FxOf<A>, token: CancelToken): suspend () -> Any? = suspend {
     val conn = token.connection
     var source: Fx<Any?>? = fa as Fx<Any?>
     var bFirst: ((Any?) -> Fx<Any?>)? = null
@@ -104,7 +104,10 @@ object FxRunLoop {
     result
   }
 
-  private fun findErrorHandlerInCallStack(bFirst: ((Any?) -> Fx<Any?>)?, bRest: Platform.ArrayStack<(Any?) -> Fx<Any?>>?): FxFrame<Any?, Fx<Any?>>? =
+  private fun findErrorHandlerInCallStack(
+    bFirst: ((Any?) -> Fx<Any?>)?,
+    bRest: Platform.ArrayStack<(Any?) -> Fx<Any?>>?
+  ): FxFrame<Any?, Fx<Any?>>? =
     if (bFirst != null && bFirst is FxFrame) {
       bFirst
     } else if (bRest == null) {
@@ -144,7 +147,10 @@ object FxRunLoop {
    * Pops the next bind function from the stack,
    * but filters out `IOFrame.ErrorHandler` references, because we know they won't do anything — an optimization for `handleError`.
    */
-  @JvmStatic private fun popNextBind(bFirst: ((Any?) -> Fx<Any?>)?, bRest: Platform.ArrayStack<(Any?) -> Fx<Any?>>?): ((Any?) -> Fx<Any?>)? =
+  @JvmStatic private fun popNextBind(
+    bFirst: ((Any?) -> Fx<Any?>)?,
+    bRest: Platform.ArrayStack<(Any?) -> Fx<Any?>>?
+  ): ((Any?) -> Fx<Any?>)? =
     when {
       bFirst != null && bFirst !is FxFrame.Companion.ErrorHandler -> bFirst
       bRest != null -> {
