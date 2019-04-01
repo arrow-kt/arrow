@@ -17,19 +17,6 @@ class SuspendedFxTests : UnitSpec() {
 
   init {
 
-    "Fx `map` stack safe" {
-      val size = 500000
-      fun mapStackSafe(): Fx<Int> =
-        (0 until size).fold(Fx { 0 }) { acc, _ -> acc.map { it + 1 } }
-      unsafe { runBlocking { Fx { mapStackSafe()() } } } shouldBe size
-    }
-
-    "Fx `flatMap` stack safe" {
-      val size = 500000
-      fun flatMapStackSafe(): Fx<Int> =
-        (0 until size).fold(Fx { 0 }) { acc, _ -> acc.flatMap { Fx.just(it + 1) } }
-      unsafe { runBlocking { Fx { flatMapStackSafe()() } } } shouldBe size
-    }
 
   }
 

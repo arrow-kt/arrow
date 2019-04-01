@@ -15,6 +15,7 @@ import arrow.extension
 import arrow.typeclasses.*
 import arrow.typeclasses.Continuation
 import arrow.unsafe
+import java.lang.RuntimeException
 import java.util.concurrent.CancellationException
 import java.util.concurrent.Executor
 import java.util.concurrent.atomic.AtomicBoolean
@@ -192,38 +193,6 @@ interface Fx2Concurrent : Concurrent<ForFx>, Fx2Async {
   override fun <A> async(fa: Proc<A>): Fx<A> =
     Fx.async(fa)
 }
-
-fun <A> Fx.Companion.async(fa: FxProc<A>): Fx<A> = Fx<A> {
-  suspendCoroutine { continuation ->
-    val conn = Fx2Connection()
-    //Is CancellationException from kotlin in kotlinx package???
-    conn.push(Fx { continuation.resumeWith(Result.failure(CancellationException())) })
-    fa(conn) { either ->
-      continuation.resumeWith(either.fold(Result.Companion::failure, Result.Companion::success))
-    }
-  }
-}
-
-/** Hide member because it's discouraged to use uncancelable builder for cancelable concrete type **/
-internal fun <A> Fx.Companion.asyncF(fa: ProcF<ForFx, A>): Fx<A> = Fx<A> {
-  suspendCoroutine { continuation ->
-    fa { either ->
-      continuation.resumeWith(either.fold(Result.Companion::failure, Result.Companion::success))
-    }.fix().foldContinuation(EmptyCoroutineContext, mapUnit)
-  }
-}
-
-fun <A> Fx.Companion.asyncF(fa: FxProcF<A>): Fx<A> = Fx<A> {
-  suspendCoroutine { continuation ->
-    val conn = Fx2Connection()
-    //Is CancellationException from kotlin in kotlinx package???
-    conn.push(Fx { continuation.resumeWith(Result.failure(CancellationException())) })
-    fa(conn) { either ->
-      continuation.resumeWith(either.fold(Result.Companion::failure, Result.Companion::success))
-    }.fix().foldContinuation(EmptyCoroutineContext, mapUnit)
-  }
-}
-
 
 @extension
 interface Fx2Fx : arrow.effects.typeclasses.suspended.concurrent.Fx<ForFx> {

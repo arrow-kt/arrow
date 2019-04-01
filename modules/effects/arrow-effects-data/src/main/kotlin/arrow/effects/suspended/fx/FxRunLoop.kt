@@ -1,18 +1,30 @@
 package arrow.effects.suspended.fx
 
+import arrow.Kind
+import arrow.core.Either
 import arrow.core.NonFatal
 import arrow.effects.KindConnection
+import arrow.effects.OnCancel
 import arrow.effects.internal.Platform
-import java.util.concurrent.CancellationException
+import arrow.typeclasses.Applicative
 import kotlin.coroutines.coroutineContext
+
+internal val FxAP: Applicative<ForFx> = object : Applicative<ForFx> {
+  override fun <A> just(a: A): Fx<A> = Fx.just(a)
+  override fun <A, B> FxOf<A>.ap(ff: FxOf<(A) -> B>): Fx<B> = fix().ap(ff)
+}
 
 object FxRunLoop {
 
-  operator fun <A> invoke(fa: Fx<A>): suspend () -> A = {
-    runLoop(fa as Fx<Any?>) as A
+  operator fun <A> invoke(fa: FxOf<A>): suspend () -> A = {
+    val conn: KindConnection<ForFx> = coroutineContext[CancelToken]?.connection ?: KindConnection.uncancelable(FxAP)
+    runLoop(fa as Fx<Any?>, conn) as A
   }
 
-  private suspend fun runLoop(fa: Fx<Any?>): Any? {
+  suspend fun <A> start(fa: FxOf<A>, conn: KindConnection<ForFx> = KindConnection.uncancelable(FxAP)): A =
+    runLoop(fa as Fx<Any?>, conn) as A
+
+  private suspend fun runLoop(fa: Fx<Any?>, conn: KindConnection<ForFx>): Any? {
     var source: Fx<Any?>? = fa
     var bFirst: ((Any?) -> Fx<Any?>)? = null
     var bRest: Platform.ArrayStack<(Any?) -> Fx<Any?>>? = null
@@ -20,15 +32,13 @@ object FxRunLoop {
     var hasResult = false
     var result: Any? = null
 
-    val conn: KindConnection<ForFx>? = coroutineContext[CancelToken]?.connection
-
     while (true) {
       val isCancelled = conn?.isCanceled() ?: false
 //      println("I am checking isCancelled: $isCancelled")
-      if (isCancelled) throw CancellationException()
+      if (isCancelled) throw OnCancel.CancellationException
 
       when (source) {
-        is Fx.RaiseError -> throw source.error //An alternative to throwing would be nice..
+        is Fx.RaiseError -> throw source.error
         is Fx.Pure -> {
           result = source.value
           hasResult = true

@@ -57,7 +57,7 @@ sealed class Fx<A> : FxOf<A> {
   internal class Map<A, B>(val source: FxOf<A>, val g: (A) -> B, val index: Int) : Fx<B>(), (A) -> Fx<B> {
     override fun invoke(value: A): Fx<B> = Fx.Pure(g(value))
     override val fa: suspend () -> B = suspend {
-      val a = source.fix().fa()
+      val a = source.fix().fa.invoke()
       g(a)
     }
 
@@ -109,8 +109,8 @@ sealed class Fx<A> : FxOf<A> {
   suspend inline fun bind(): A =
     !this
 
-  fun <B> ap(ff: Fx<(A) -> B>): Fx<B> =
-    ff.flatMap { map(it) }
+  fun <B> ap(ff: FxOf<(A) -> B>): Fx<B> =
+    ff.fix().flatMap { map(it) }
 
   fun handleErrorWith(f: (Throwable) -> FxOf<A>): Fx<A> = when (this) {
     is RaiseError -> f(error).fix()
@@ -194,7 +194,6 @@ sealed class Fx<A> : FxOf<A> {
   fun continueOn(ctx: CoroutineContext): Fx<A> =
     unit().map { foldContinuation(ctx) { throw it } }
 
-  @RestrictsSuspension
   companion object {
 
     operator fun <A> invoke(fa: suspend () -> A): Fx<A> = Fx.Single(fa)
@@ -219,6 +218,37 @@ sealed class Fx<A> : FxOf<A> {
         fa { either ->
           continuation.resumeWith(either.fold(Result.Companion::failure, Result.Companion::success))
         }
+      }
+    }
+
+    fun <A> async(fa: FxProc<A>): Fx<A> = Fx<A> {
+      suspendCoroutine { continuation ->
+        val conn = continuation.context[CancelToken]?.connection ?: KindConnection.uncancelable(FxAP)
+        //Is CancellationException from kotlin in kotlinx package???
+        conn.push(Fx { continuation.resumeWith(Result.failure(CancellationException())) })
+        fa(conn) { either ->
+          continuation.resumeWith(either.fold(Result.Companion::failure, Result.Companion::success))
+        }
+      }
+    }
+
+    /** Hide member because it's discouraged to use uncancelable builder for cancelable concrete type **/
+    internal fun <A> asyncF(fa: ProcF<ForFx, A>): Fx<A> = Fx<A> {
+      suspendCoroutine { continuation ->
+        fa { either ->
+          continuation.resumeWith(either.fold(Result.Companion::failure, Result.Companion::success))
+        }.fix().foldContinuation(EmptyCoroutineContext, mapUnit)
+      }
+    }
+
+    fun <A> asyncF(fa: FxProcF<A>): Fx<A> = Fx<A> {
+      suspendCoroutine { continuation ->
+        val conn = continuation.context[CancelToken]?.connection ?: KindConnection.uncancelable(FxAP)
+        //Is CancellationException from kotlin in kotlinx package???
+        conn.push(Fx { continuation.resumeWith(Result.failure(CancellationException())) })
+        fa(conn) { either ->
+          continuation.resumeWith(either.fold(Result.Companion::failure, Result.Companion::success))
+        }.fix().foldContinuation(EmptyCoroutineContext, mapUnit)
       }
     }
 
