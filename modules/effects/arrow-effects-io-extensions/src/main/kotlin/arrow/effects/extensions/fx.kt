@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.*
 import arrow.effects.IODispatchers
 import arrow.effects.KindConnection
+import arrow.effects.extensions.fx.applicative.applicative
 import arrow.effects.extensions.fx.dispatchers.dispatchers
 import arrow.effects.extensions.fx.monadDefer.monadDefer
 import arrow.effects.internal.Platform
@@ -15,8 +16,6 @@ import arrow.extension
 import arrow.typeclasses.*
 import arrow.typeclasses.Continuation
 import arrow.unsafe
-import java.lang.RuntimeException
-import java.util.concurrent.CancellationException
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.*
@@ -31,9 +30,9 @@ interface Fx2Dispatchers : Dispatchers<ForFx> {
 val NonBlocking: CoroutineContext = Fx.dispatchers().default()
 
 fun <A> FxOf<A>.runNonBlockingCancellable(cb: (Either<Throwable, A>) -> Unit): Disposable {
-  val token = CancelToken()
-  FxRunLoop(fix()).startCoroutine(asyncContinuation(NonBlocking + token, cb))
-  return { token.connection.cancel().fix().fa.startCoroutine(asyncContinuation(NonBlocking, mapUnit)) }
+  val conn = FxConnection()
+  FxRunLoop.startCancelable(fix(), KindConnection.uncancelable(Fx.applicative()), NonBlocking, cb)
+  return { conn.cancel().startOn(NonBlocking) }
 }
 
 @extension
@@ -43,7 +42,7 @@ interface Fx2UnsafeRun : UnsafeRun<ForFx> {
     Fx.unsafeRunBlocking(fa().fix())
 
   override suspend fun <A> unsafe.runNonBlocking(fa: () -> FxOf<A>, cb: (Either<Throwable, A>) -> Unit) =
-    FxRunLoop(fa().fix()).startCoroutine(asyncContinuation(NonBlocking, cb))
+    FxRunLoop.start(fa().fix(), NonBlocking, cb)
 }
 
 @extension
@@ -148,7 +147,7 @@ interface Fx2Concurrent : Concurrent<ForFx>, Fx2Async {
 
   override fun <A> CoroutineContext.fork(fa: FxOf<A>): Fx<Fiber<ForFx, A>> {
     val promise = UnsafePromise<A>()
-    val conn = Fx2Connection()
+    val conn = FxConnection()
     fa.fix().fa.startCoroutine(asyncContinuation(this) { either ->
       either.fold(
         { promise.complete(it.left()) },
@@ -156,7 +155,7 @@ interface Fx2Concurrent : Concurrent<ForFx>, Fx2Async {
       )
     })
     return Fx {
-      Fx2Fiber(promise, conn)
+      FxFiber(promise, conn)
     }
   }
 
@@ -182,7 +181,7 @@ interface Fx2Fx : arrow.effects.typeclasses.suspended.concurrent.Fx<ForFx> {
 fun <A> FxOf<A>.startOn(ctx: CoroutineContext): Fx<Fiber<ForFx, A>> =
   Fx {
     val promise = UnsafePromise<A>()
-    val conn = Fx2Connection()
+    val conn = FxConnection()
     fix().fa.startCoroutine(asyncContinuation(ctx) { either ->
       either.fold(
         { promise.complete(it.left()) },
@@ -190,41 +189,25 @@ fun <A> FxOf<A>.startOn(ctx: CoroutineContext): Fx<Fiber<ForFx, A>> =
       )
     })
 
-    Fx2Fiber(promise, conn)
+    FxFiber(promise, conn)
   }
 
-fun <A> Fx<A>.foldContinuation(
-  context: CoroutineContext = EmptyCoroutineContext,
-  onError: (Throwable) -> A
-): A {
-  val result: AtomicReference<A> = AtomicReference()
-  fa.startCoroutine(object : Continuation<A> {
-    override fun resume(value: A) {
-      result.set(value)
-    }
+@Suppress("FunctionName")
+fun FxConnection(): KindConnection<ForFx> =
+  KindConnection(Fx.monadDefer()) { it.fix().fa.startCoroutine(Continuation(NonBlocking, mapUnit)) }
 
-    override fun resumeWithException(exception: Throwable) {
-      result.set(onError(exception))
-    }
-
-    override val context: CoroutineContext
-      get() = context
-  })
-  return result.get()
-}
-
-fun Fx2Connection(): KindConnection<ForFx> =
-  KindConnection(Fx.monadDefer()) { it.fix().foldContinuation { e -> throw e } }
-
-internal fun <A> Fx2Fiber(promise: UnsafePromise<A>, conn: KindConnection<ForFx>): Fiber<ForFx, A> {
+@Suppress("FunctionName")
+internal fun <A> FxFiber(promise: UnsafePromise<A>, conn: KindConnection<ForFx>): Fiber<ForFx, A> {
   val join: Fx<A> = Fx.async { conn2, cb ->
-    conn2.push(Fx { promise.remove(cb) })
-    conn.push(conn2.cancel())
-    promise.get { a ->
-      cb(a)
+    val cb2: (Either<Throwable, A>) -> Unit = {
+      cb(it)
       conn2.pop()
       conn.pop()
     }
+
+    conn2.push(Fx { promise.remove(cb2) })
+    conn.push(conn2.cancel())
+    promise.get(cb2)
   }
   return Fiber(join, conn.cancel())
 }
@@ -234,11 +217,11 @@ fun <A, B> Fx.Companion.racePair(ctx: CoroutineContext, fa: FxOf<A>, fb: FxOf<B>
     val active = AtomicBoolean(true)
     val upstreamCancelToken = Fx.defer { if (conn.isCanceled()) Fx { Unit } else conn.cancel() }
 
-    val connA = Fx2Connection()
+    val connA = FxConnection()
     connA.push(upstreamCancelToken)
     val promiseA = UnsafePromise<A>()
 
-    val connB = Fx2Connection()
+    val connB = FxConnection()
     connB.push(upstreamCancelToken)
     val promiseB = UnsafePromise<B>()
 
@@ -260,7 +243,7 @@ fun <A, B> Fx.Companion.racePair(ctx: CoroutineContext, fa: FxOf<A>, fb: FxOf<B>
       }, { a ->
         if (active.getAndSet(false)) {
           conn.pop()
-          cb(Right(Left(Tuple2(a, Fx2Fiber(promiseB, connB)))))
+          cb(Right(Left(Tuple2(a, FxFiber(promiseB, connB)))))
         } else {
           promiseA.complete(Right(a))
         }
@@ -283,7 +266,7 @@ fun <A, B> Fx.Companion.racePair(ctx: CoroutineContext, fa: FxOf<A>, fb: FxOf<B>
       }, { b ->
         if (active.getAndSet(false)) {
           conn.pop()
-          cb(Right(Right(Tuple2(Fx2Fiber(promiseA, connA), b))))
+          cb(Right(Right(Tuple2(FxFiber(promiseA, connA), b))))
         } else {
           promiseB.complete(Right(b))
         }
@@ -297,15 +280,15 @@ fun <A, B, C> Fx.Companion.raceTriple(ctx: CoroutineContext, fa: FxOf<A>, fb: Fx
 
     val upstreamCancelToken = Fx.defer { if (conn.isCanceled()) Fx { Unit } else conn.cancel() }
 
-    val connA = Fx2Connection()
+    val connA = FxConnection()
     connA.push(upstreamCancelToken)
     val promiseA = UnsafePromise<A>()
 
-    val connB = Fx2Connection()
+    val connB = FxConnection()
     connB.push(upstreamCancelToken)
     val promiseB = UnsafePromise<B>()
 
-    val connC = Fx2Connection()
+    val connC = FxConnection()
     connC.push(upstreamCancelToken)
     val promiseC = UnsafePromise<C>()
 
@@ -331,7 +314,7 @@ fun <A, B, C> Fx.Companion.raceTriple(ctx: CoroutineContext, fa: FxOf<A>, fb: Fx
       }, { a ->
         if (active.getAndSet(false)) {
           conn.pop()
-          cb(Right(Left(Tuple3(a, Fx2Fiber(promiseB, connB), Fx2Fiber(promiseC, connC)))))
+          cb(Right(Left(Tuple3(a, FxFiber(promiseB, connB), FxFiber(promiseC, connC)))))
         } else {
           promiseA.complete(Right(a))
         }
@@ -358,7 +341,7 @@ fun <A, B, C> Fx.Companion.raceTriple(ctx: CoroutineContext, fa: FxOf<A>, fb: Fx
       }, { b ->
         if (active.getAndSet(false)) {
           conn.pop()
-          cb(Right(Right(Left(Tuple3(Fx2Fiber(promiseA, connA), b, Fx2Fiber(promiseC, connC))))))
+          cb(Right(Right(Left(Tuple3(FxFiber(promiseA, connA), b, FxFiber(promiseC, connC))))))
         } else {
           promiseB.complete(Right(b))
         }
@@ -385,7 +368,7 @@ fun <A, B, C> Fx.Companion.raceTriple(ctx: CoroutineContext, fa: FxOf<A>, fb: Fx
       }, { c ->
         if (active.getAndSet(false)) {
           conn.pop()
-          cb(Right(Right(Right(Tuple3(Fx2Fiber(promiseA, connA), Fx2Fiber(promiseB, connB), c)))))
+          cb(Right(Right(Right(Tuple3(FxFiber(promiseA, connA), FxFiber(promiseB, connB), c)))))
         } else {
           promiseC.complete(Right(c))
         }

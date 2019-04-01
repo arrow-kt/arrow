@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
+import arrow.core.identity
 import arrow.effects.KindConnection
 import arrow.effects.internal.Platform
 import arrow.effects.typeclasses.*
@@ -248,7 +249,7 @@ sealed class Fx<A> : FxOf<A> {
 
     @JvmStatic fun <A> async(fa: FxProc<A>): Fx<A> = Fx<A> {
       suspendCoroutine { continuation ->
-        val conn = continuation.context[CancelToken]?.connection ?: KindConnection.uncancelable(FxAP)
+        val conn = continuation.context[CancelToken]?.connection ?: KindConnection.uncancelable
         //Is CancellationException from kotlin in kotlinx package???
         conn.push(Fx { continuation.resumeWith(Result.failure(CancellationException())) })
         fa(conn) { either ->
@@ -258,7 +259,7 @@ sealed class Fx<A> : FxOf<A> {
     }
 
     /** Hide member because it's discouraged to use uncancelable builder for cancelable concrete type **/
-    @JvmStatic internal fun <A> asyncF(fa: ProcF<ForFx, A>): Fx<A> = Fx<A> {
+    @JvmStatic fun <A> asyncF(fa: ProcF<ForFx, A>): Fx<A> = Fx<A> {
       suspendCoroutine { continuation ->
         fa { either ->
           continuation.resumeWith(either.fold(Result.Companion::failure, Result.Companion::success))
@@ -268,7 +269,7 @@ sealed class Fx<A> : FxOf<A> {
 
     @JvmStatic fun <A> asyncF(fa: FxProcF<A>): Fx<A> = Fx<A> {
       suspendCoroutine { continuation ->
-        val conn = continuation.context[CancelToken]?.connection ?: KindConnection.uncancelable(FxAP)
+        val conn = continuation.context[CancelToken]?.connection ?: KindConnection.uncancelable
         //Is CancellationException from kotlin in kotlinx package???
         conn.push(Fx { continuation.resumeWith(Result.failure(CancellationException())) })
         fa(conn) { either ->
@@ -279,14 +280,14 @@ sealed class Fx<A> : FxOf<A> {
 
     @JvmStatic fun <A> unsafeRunBlocking(fa: Fx<A>): A {
       var loop = true
-      var result: A? = null
-      fa.fa.startCoroutine(Continuation(EmptyCoroutineContext) {
-        result = it.getOrThrow()
+      var result: Either<Throwable, A>? = null
+      FxRunLoop.start(fa) { r: Either<Throwable, A> ->
+        result = r
         loop = false
-      })
+      }
       while (loop) {
       }
-      return result!!
+      return result!!.fold({ throw it }, ::identity)
     }
 
   }
