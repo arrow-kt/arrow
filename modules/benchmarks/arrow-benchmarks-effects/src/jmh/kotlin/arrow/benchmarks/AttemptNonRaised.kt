@@ -28,7 +28,7 @@ open class AttemptNonRaised {
 
   @Benchmark
   fun fx(): Int =
-    unsafe { runBlocking { Fx { loopHappy(size, 0)() } } }
+    unsafe { runBlocking { Fx { !loopHappy(size, 0) } } }
 
 
 }

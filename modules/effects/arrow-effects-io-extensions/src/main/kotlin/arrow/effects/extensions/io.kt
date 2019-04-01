@@ -9,7 +9,6 @@ import arrow.effects.typeclasses.Dispatchers
 import arrow.effects.typeclasses.Environment
 import arrow.effects.typeclasses.suspended.concurrent.Fx
 import arrow.extension
-import java.util.concurrent.Executor
 import kotlin.coroutines.CoroutineContext
 import arrow.effects.IODispatchers as IOD
 
@@ -17,8 +16,6 @@ import arrow.effects.IODispatchers as IOD
 interface IODispatchers : Dispatchers<ForIO> {
   override fun default(): CoroutineContext =
     IOD.CommonPool
-  override fun trampoline(): CoroutineContext =
-    TrampolinePool(Executor { command -> command?.run() })
 }
 
 @extension

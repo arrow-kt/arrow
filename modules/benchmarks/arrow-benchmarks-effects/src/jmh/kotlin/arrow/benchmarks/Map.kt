@@ -2,8 +2,6 @@ package arrow.benchmarks
 
 import arrow.effects.IO
 import arrow.effects.suspended.fx.Fx
-import arrow.unsafe
-import kotlinx.coroutines.runBlocking
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
 
@@ -13,6 +11,30 @@ import java.util.concurrent.TimeUnit
 @Measurement(iterations = 10)
 @CompilerControl(CompilerControl.Mode.DONT_INLINE)
 open class Map {
+
+  @Benchmark
+  fun zioOne(): Long =
+    arrow.benchmarks.effects.scala.zio.`Map$`.`MODULE$`.zioMapTest(12000, 1)
+
+  @Benchmark
+  fun zioBatch30(): Long =
+    arrow.benchmarks.effects.scala.zio.`Map$`.`MODULE$`.zioMapTest(12000 / 30, 30)
+
+  @Benchmark
+  fun zioBatch120(): Long =
+    arrow.benchmarks.effects.scala.zio.`Map$`.`MODULE$`.zioMapTest(12000 / 120, 120)
+
+  @Benchmark
+  fun catsOne(): Long =
+    arrow.benchmarks.effects.scala.cats.`Map$`.`MODULE$`.catsIOMapTest(12000, 1)
+
+  @Benchmark
+  fun catsBatch30(): Long =
+    arrow.benchmarks.effects.scala.cats.`Map$`.`MODULE$`.catsIOMapTest(12000 / 30, 30)
+
+  @Benchmark
+  fun catsBatch120(): Long =
+    arrow.benchmarks.effects.scala.cats.`Map$`.`MODULE$`.catsIOMapTest(12000 / 120, 120)
 
   @Benchmark
   fun ioOne(): Long = ioTest(12000, 1)
@@ -25,15 +47,15 @@ open class Map {
 
   @Benchmark
   fun fxOne(): Long =
-    unsafe { runBlocking { fxTest(12000, 1) } }
+    fxTest(12000, 1)
 
   @Benchmark
   fun fxBatch30(): Long =
-    unsafe { runBlocking { fxTest(12000 / 30, 30) } }
+    fxTest(12000 / 30, 30)
 
   @Benchmark
   fun fxBatch120(): Long =
-    unsafe { runBlocking { fxTest(12000 / 120, 120) } }
+    fxTest(12000 / 120, 120)
 
   private fun ioTest(iterations: Int, batch: Int): Long {
     val f = { x: Int -> x + 1 }
@@ -53,7 +75,7 @@ open class Map {
     return sum
   }
 
-  private suspend fun fxTest(iterations: Int, batch: Int): Long {
+  private fun fxTest(iterations: Int, batch: Int): Long {
     val f = { x: Int -> x + 1 }
     var fx = Fx.just(0)
 
@@ -65,7 +87,7 @@ open class Map {
     var sum = 0L
     var i = 0
     while (i < iterations) {
-      sum += fx()
+      sum += Fx.unsafeRunBlocking(fx)
       i += 1
     }
     return sum

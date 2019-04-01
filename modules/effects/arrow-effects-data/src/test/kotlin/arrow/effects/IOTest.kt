@@ -434,6 +434,13 @@ class IOTest : UnitSpec() {
       }.unsafeRunSync()
     }
 
+    "IO `map` stack safe" {
+      val size = 500000
+      fun mapStackSafe(): IO<Int> =
+        (0 until size).fold(IO.just(0)) { acc, _ -> acc.map { it + 1 } }
+      mapStackSafe().unsafeRunSync() shouldBe size
+    }
+
     "Fx should stay within same context" {
       fx {
         continueOn(newSingleThreadContext("start"))

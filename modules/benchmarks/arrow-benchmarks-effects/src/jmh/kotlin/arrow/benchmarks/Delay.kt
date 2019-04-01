@@ -2,7 +2,6 @@ package arrow.benchmarks
 
 import arrow.effects.IO
 import arrow.effects.suspended.fx.Fx
-import arrow.unsafe
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
 import arrow.effects.extensions.fx.unsafeRun.runBlocking as fxRunBlocking
@@ -31,11 +30,11 @@ open class Delay {
 
   @Benchmark
   fun fx(): Int =
-    unsafe { fxRunBlocking { Fx { !fxDelayLoop(0) } } }
+    Fx.unsafeRunBlocking(fxDelayLoop(0))
 
   @Benchmark
   fun io(): Int =
-    unsafe { ioRunBlocking { ioDelayLoop(0) } }
+    ioDelayLoop(0).unsafeRunSync()
 
   @Benchmark
   fun catsIO(): Int =

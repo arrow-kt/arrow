@@ -10,6 +10,7 @@ import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Monad
 import arrow.typeclasses.suspended.BindSyntax
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.startCoroutine
 
 interface FxSyntax<F> : Concurrent<F>, BindSyntax<F> {
@@ -21,10 +22,6 @@ interface FxSyntax<F> : Concurrent<F>, BindSyntax<F> {
   @Suppress("PropertyName")
   val NonBlocking: CoroutineContext
     get() = dispatchers().default()
-
-  @Suppress("PropertyName")
-  val Trampoline: CoroutineContext
-    get() = dispatchers().trampoline()
 
   fun <A, B> CoroutineContext.parTraverse(
     effects: Iterable<Kind<F, A>>,
@@ -41,7 +38,7 @@ interface FxSyntax<F> : Concurrent<F>, BindSyntax<F> {
 
   fun <A> effect(fa: suspend () -> A): Kind<F, A> =
     async { cb ->
-      fa.startCoroutine(asyncContinuation(Trampoline, cb))
+      fa.startCoroutine(asyncContinuation(EmptyCoroutineContext, cb))
     }
 
   fun <A> ensure(fa: suspend () -> A, error: () -> Throwable, predicate: (A) -> Boolean): Kind<F, A> =

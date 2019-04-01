@@ -1,12 +1,13 @@
 package arrow.effects.suspended.fx
 
 import arrow.Kind
-import arrow.core.*
-import arrow.effects.*
+import arrow.core.Either
+import arrow.core.Left
+import arrow.core.Right
+import arrow.effects.KindConnection
 import arrow.effects.internal.Platform
 import arrow.effects.typeclasses.*
 import arrow.typeclasses.Continuation
-import arrow.unsafe
 import java.util.concurrent.CancellationException
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.*
@@ -22,22 +23,38 @@ typealias FxProcF<A> = ConnectedProcF<ForFx, A>
 inline fun <A> FxOf<A>.fix(): Fx<A> =
   this as Fx<A>
 
-suspend operator fun <A> FxOf<A>.invoke(): A = fix().invoke()
+suspend inline operator fun <A> FxOf<A>.not(): A = !fix()
+
+const val UnknownTag = -1
+const val RaiseErrorTag = 0
+const val PureTag = 1
+const val SingleTag = 2
+const val MapTag = 3
+const val FlatMapTag = 4
 
 sealed class Fx<A> : FxOf<A> {
 
+  abstract val tag: Int
   abstract val fa: suspend () -> A
   abstract fun <B> map(f: (A) -> B): Fx<B>
   abstract fun <B> flatMap(f: (A) -> FxOf<B>): Fx<B>
+  abstract suspend operator fun not(): A
+  suspend inline fun bind(): A = !this
 
-  internal class RaiseError<A>(val error: Throwable) : Fx<A>() {
+  @PublishedApi
+  internal class RaiseError<A>(@JvmField internal val error: Throwable) : Fx<A>() {
+    override val tag: Int = RaiseErrorTag
+    override suspend operator fun not(): A = throw error
     override val fa: suspend () -> A = throw error
     override fun <B> map(f: (A) -> B): Fx<B> = this as Fx<B>
     override fun <B> flatMap(f: (A) -> FxOf<B>): Fx<B> = this as Fx<B>
     override fun toString(): String = "Fx.RaiseError(error = $error)"
   }
 
-  internal class Pure<A>(val value: A) : Fx<A>() {
+  @PublishedApi
+  internal class Pure<A>(@JvmField internal val value: A) : Fx<A>() {
+    override val tag: Int = PureTag
+    override suspend operator fun not(): A = value
     override val fa: suspend () -> A = { value }
     override fun <B> map(f: (A) -> B): Fx<B> = Fx.Map(this, f, 0)
     override fun <B> flatMap(f: (A) -> FxOf<B>): Fx<B> = Fx.FlatMap(this, f, 0)
@@ -47,66 +64,74 @@ sealed class Fx<A> : FxOf<A> {
   //Purely wrapped suspend function.
   //Should wrap a singular suspension point otherwise stack safety cannot be guaranteed.
   //This is not an issue if you guarantee stack safety yourself for your suspended program. i.e. using `tailrec`
-  internal class Single<A>(val source: suspend () -> A) : Fx<A>() {
+  @PublishedApi
+  internal class Single<A>(@JvmField internal val source: suspend () -> A) : Fx<A>() {
+    override val tag: Int = SingleTag
+    override suspend operator fun not(): A = source()
     override val fa: suspend () -> A = source
     override fun <B> map(f: (A) -> B): Fx<B> = Fx.Map(this, f, 0)
     override fun <B> flatMap(f: (A) -> FxOf<B>): Fx<B> = Fx.FlatMap(this, f, 0)
     override fun toString(): String = "Fx.Single"
   }
 
-  internal class Map<A, B>(val source: FxOf<A>, val g: (A) -> B, val index: Int) : Fx<B>(), (A) -> Fx<B> {
+  @PublishedApi
+  internal class Map<A, B>(
+    @JvmField internal val source: FxOf<A>,
+    @JvmField private val g: (A) -> B,
+    @JvmField private val index: Int
+  ) : Fx<B>(), (A) -> Fx<B> {
+    override val tag: Int = MapTag
     override fun invoke(value: A): Fx<B> = Fx.Pure(g(value))
+    override suspend operator fun not(): B = FxRunLoop(this)()
     override val fa: suspend () -> B = suspend {
-      val a = source.fix().fa.invoke()
+      val a = !source
       g(a)
     }
 
     override fun <C> map(f: (B) -> C): Fx<C> =
     // Allowed to do maxStackDepthSize map operations in sequence before
     // starting a new Map fusion in order to avoid stack overflows
-      if (index != Platform.maxStackDepthSize) Fx.Map(source, g andThen f, index + 1)
+      if (index != Platform.maxStackDepthSize) Fx.Map(source, { f(g(it)) }, index + 1)
       else Fx.Map(this, f, 0)
 
     //We can do fusion between an map-flatMap boundary
-    override fun <C> flatMap(f: (B) -> FxOf<C>): Fx<C> = Fx.FlatMap(source, g andThen f, 1)
+    override fun <C> flatMap(f: (B) -> FxOf<C>): Fx<C> = Fx.FlatMap(source, { f(g(it)) }, 1)
 
     override fun toString(): String = "Fx.Map(..., index = $index)"
   }
 
-  internal class FlatMap<A, B>(val source: FxOf<A>, val fb: (A) -> FxOf<B>, val index: Int) : Fx<B>() {
-    override val fa: suspend () -> B = suspend {
-      val a = source.fix().fa()
-      fb(a)()
-    }
+  @PublishedApi
+  internal class FlatMap<A, B>(
+    @JvmField internal val source: FxOf<A>,
+    @JvmField internal val fb: (A) -> FxOf<B>,
+    @JvmField private val index: Int
+  ) : Fx<B>() {
+    override val tag: Int = FlatMapTag
+    override suspend operator fun not(): B = FxRunLoop(this)()
+    override val fa: suspend () -> B = suspend { !fb(!source) }
 
     //If we reach the maxStackDepth then we can fold the current FlatMap and return a Map case
     //If we haven't reached the maxStackDepth we fuse the map operator within the flatMap stack.
     override fun <C> map(f: (B) -> C): Fx<C> =
       if (index != Platform.maxStackDepthSize) Fx.Map(this, f, 0)
-      else Fx.FlatMap(source, { a -> Fx { f(fb(a)()) } }, index + 1)
+      else Fx.FlatMap(source, { a -> Fx { f(!fb(a)) } }, index + 1)
 
     override fun <C> flatMap(f: (B) -> FxOf<C>): Fx<C> =
       if (index != Platform.maxStackDepthSize) Fx.FlatMap(this, f, 0)
       else Fx.FlatMap(source, { a ->
         Fx.Single {
-          val b = fb(a)()
-          f(b)()
+          val b = !fb(a)
+          !f(b)
         }
       }, index + 1)
 
     override fun toString(): String = "Fx.FlatMap(..., index = $index)"
   }
 
-  suspend inline operator fun not(): A =
-    FxRunLoop(this).invoke()
-
   suspend inline operator fun invoke(): A =
     !this
 
   suspend inline operator fun component1(): A =
-    !this
-
-  suspend inline fun bind(): A =
     !this
 
   fun <B> ap(ff: FxOf<(A) -> B>): Fx<B> =
@@ -119,7 +144,7 @@ sealed class Fx<A> : FxOf<A> {
       try {
         fa()
       } catch (e: Throwable) {
-        f(e)()
+        !f(e).fix()
       }
     }
   }
@@ -165,7 +190,7 @@ sealed class Fx<A> : FxOf<A> {
     release: (A, ExitCase<Throwable>) -> FxOf<Unit>,
     use: (A) -> FxOf<B>
   ): Fx<B> = Fx {
-    val a = invoke()
+    val a = !this
 
     val fxB: Fx<B> = try {
       use(a).fix()
@@ -187,7 +212,7 @@ sealed class Fx<A> : FxOf<A> {
       }
       throw e
     }
-    release(a, ExitCase.Completed).fix().invoke()
+    !release(a, ExitCase.Completed).fix()
     b
   }
 
@@ -196,24 +221,24 @@ sealed class Fx<A> : FxOf<A> {
 
   companion object {
 
-    operator fun <A> invoke(fa: suspend () -> A): Fx<A> = Fx.Single(fa)
+    @JvmStatic operator fun <A> invoke(fa: suspend () -> A): Fx<A> = Fx.Single(fa)
 
-    fun <A> just(a: A): Fx<A> = Fx.Pure(a)
+    @JvmStatic fun <A> just(a: A): Fx<A> = Fx.Pure(a)
 
-    fun unit(): Fx<Unit> = Fx.Pure(Unit)
+    @JvmStatic fun unit(): Fx<Unit> = Fx.Pure(Unit)
 
-    fun <A> raiseError(e: Throwable): Fx<A> = Fx.RaiseError(e)
+    @JvmStatic fun <A> raiseError(e: Throwable): Fx<A> = Fx.RaiseError(e)
 
-    fun <A> defer(fa: () -> FxOf<A>): Fx<A> =
+    @JvmStatic fun <A> defer(fa: () -> FxOf<A>): Fx<A> =
       Fx.FlatMap(Fx.Pure(Unit), { fa() }, 0)
 
-    fun <A, B> tailRecM(a: A, f: (A) -> FxOf<Either<A, B>>): Fx<B> =
+    @JvmStatic fun <A, B> tailRecM(a: A, f: (A) -> FxOf<Either<A, B>>): Fx<B> =
       Fx.FlatMap(f(a), { result ->
         result.fold({ tailRecM(it, f) }, { just(it) })
       }, 0)
 
     /** Hide member because it's discouraged to use uncancelable builder for cancelable concrete type **/
-    fun <A> async(fa: Proc<A>): Fx<A> = Fx<A> {
+    @JvmStatic fun <A> async(fa: Proc<A>): Fx<A> = Fx<A> {
       suspendCoroutine { continuation ->
         fa { either ->
           continuation.resumeWith(either.fold(Result.Companion::failure, Result.Companion::success))
@@ -221,7 +246,7 @@ sealed class Fx<A> : FxOf<A> {
       }
     }
 
-    fun <A> async(fa: FxProc<A>): Fx<A> = Fx<A> {
+    @JvmStatic fun <A> async(fa: FxProc<A>): Fx<A> = Fx<A> {
       suspendCoroutine { continuation ->
         val conn = continuation.context[CancelToken]?.connection ?: KindConnection.uncancelable(FxAP)
         //Is CancellationException from kotlin in kotlinx package???
@@ -233,7 +258,7 @@ sealed class Fx<A> : FxOf<A> {
     }
 
     /** Hide member because it's discouraged to use uncancelable builder for cancelable concrete type **/
-    internal fun <A> asyncF(fa: ProcF<ForFx, A>): Fx<A> = Fx<A> {
+    @JvmStatic internal fun <A> asyncF(fa: ProcF<ForFx, A>): Fx<A> = Fx<A> {
       suspendCoroutine { continuation ->
         fa { either ->
           continuation.resumeWith(either.fold(Result.Companion::failure, Result.Companion::success))
@@ -241,7 +266,7 @@ sealed class Fx<A> : FxOf<A> {
       }
     }
 
-    fun <A> asyncF(fa: FxProcF<A>): Fx<A> = Fx<A> {
+    @JvmStatic fun <A> asyncF(fa: FxProcF<A>): Fx<A> = Fx<A> {
       suspendCoroutine { continuation ->
         val conn = continuation.context[CancelToken]?.connection ?: KindConnection.uncancelable(FxAP)
         //Is CancellationException from kotlin in kotlinx package???
@@ -252,33 +277,22 @@ sealed class Fx<A> : FxOf<A> {
       }
     }
 
-    fun <A> unsafe.runBlocking(fa: Fx<A>): A {
-      val value = AtomicReference<A>()
-      fa.fa.startCoroutine(object : kotlin.coroutines.Continuation<A> {
-        override val context: CoroutineContext
-          get() = EmptyCoroutineContext
-
-        override fun resumeWith(result: Result<A>) {
-          value.set(result.getOrThrow())
-        }
+    @JvmStatic fun <A> unsafeRunBlocking(fa: Fx<A>): A {
+      var loop = true
+      var result: A? = null
+      fa.fa.startCoroutine(Continuation(EmptyCoroutineContext) {
+        result = it.getOrThrow()
+        loop = false
       })
-      return value.get()
+      while (loop) {
+      }
+      return result!!
     }
 
   }
 
   override fun toString(): String = "Fx(...)"
 
-}
-
-fun helloWorld(): String =
-  "Hello World"
-
-suspend fun printHelloWorld(): Unit =
-  println(helloWorld())
-
-val program: Fx<Unit> = Fx {
-  !Fx { printHelloWorld() }
 }
 
 fun <A> Fx<A>.foldContinuation(

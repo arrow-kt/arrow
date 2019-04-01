@@ -4,7 +4,7 @@ import arrow.effects.extensions.fx.concurrent.concurrent
 import arrow.effects.extensions.fx.unsafeRun.runBlocking
 import arrow.effects.suspended.fx.Fx
 import arrow.effects.suspended.fx.FxOf
-import arrow.effects.suspended.fx.invoke
+import arrow.effects.suspended.fx.not
 import arrow.test.UnitSpec
 import arrow.test.laws.ConcurrentLaws
 import arrow.typeclasses.Eq
@@ -40,16 +40,16 @@ class FxTest : UnitSpec() {
       runBlocking {
         Fx {
           try {
-            a() == b()
+            !a == !b
           } catch (e: Throwable) {
             val errA = try {
-              a()
+              !a
               throw IllegalArgumentException()
             } catch (err: Throwable) {
               err
             }
             val errB = try {
-              b()
+              !b
               throw IllegalStateException()
             } catch (err: Throwable) {
               err
