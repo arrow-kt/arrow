@@ -15,7 +15,9 @@ enum class OnCancel { ThrowCancellationException, Silent;
   }
 }
 
-object ConnectionCancellationException : JavaCancellationException("User cancellation")
+object ConnectionCancellationException : JavaCancellationException("User cancellation") {
+  override fun fillInStackTrace(): Throwable = this
+}
 
 /**
  * Connection for kinded type [F].
