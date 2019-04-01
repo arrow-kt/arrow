@@ -11,7 +11,7 @@ import kotlin.coroutines.*
 @Suppress("UNCHECKED_CAST")
 object FxRunLoop {
 
-  @JvmStatic suspend operator fun <A> invoke(source: FxOf<A>): A =
+  @JvmStatic suspend inline operator fun <A> invoke(source: FxOf<A>): A =
     loop(source, coroutineContext[CancelToken] ?: NonCancelable)() as A
 
   @JvmStatic fun <A> start(source: FxOf<A>,
@@ -22,7 +22,7 @@ object FxRunLoop {
         r.fold({ cb(Right(it as A)) }, { cb(Left(it)) })
       })
 
-  fun <A> startCancelable(fa: FxOf<A>,
+  @JvmStatic fun <A> startCancelable(fa: FxOf<A>,
                           token: CancelToken,
                           ctx: CoroutineContext = EmptyCoroutineContext,
                           cb: (Either<Throwable, A>) -> Unit): Unit {
@@ -32,7 +32,8 @@ object FxRunLoop {
       })
   }
 
-  private fun <A> loop(fa: FxOf<A>, token: CancelToken): suspend () -> Any? = suspend {
+  @PublishedApi
+  internal fun <A> loop(fa: FxOf<A>, token: CancelToken): suspend () -> Any? = suspend {
     val conn = token.connection
     var source: Fx<Any?>? = fa as Fx<Any?>
     var bFirst: ((Any?) -> Fx<Any?>)? = null

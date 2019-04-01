@@ -73,9 +73,17 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
       MapTag -> {
         // Allowed to do maxStackDepthSize map operations in sequence before
         // starting a new Map fusion in order to avoid stack overflows
-        this as Fx.Map<B, A>
-        if (index != Platform.maxStackDepthSize) Fx.Map(source, { f(g(it)) }, index + 1)
-        else Fx.Map(this, f, 0)
+        this as Fx.Map<Any?, Any?>
+        if (index != Platform.maxStackDepthSize) {
+          val ff = f as (Any?) -> Any?
+          this.g = { ff(g(it)) }
+          this.index += 1
+          this as Fx<B>
+        } else Fx.Map(this, f, 0)
+
+
+        //if (index != Platform.maxStackDepthSize) Fx.Map(source, { f(g(it)) }, index + 1)
+        //else Fx.Map(this, f, 0)
       }
       FlatMapTag -> {
         //If we reach the maxStackDepthSize then we can fold the current FlatMap and return a Map case
@@ -93,8 +101,8 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
       RaiseErrorTag -> throw (this as Fx.RaiseError<*>).error
       PureTag -> (this as Fx.Pure<A>).value
       SingleTag -> (this as Fx.Single<A>).source()
-      MapTag -> FxRunLoop(this)()
-      FlatMapTag -> FxRunLoop(this)()
+      MapTag -> FxRunLoop(this)
+      FlatMapTag -> FxRunLoop(this)
       else -> throw Impossible
     }
 
