@@ -8,11 +8,11 @@ import kotlin.coroutines.coroutineContext
 
 object FxRunLoop {
 
-  operator fun <A> invoke(fa: Fx<A>): suspend () -> A = {
+  @JvmStatic operator fun <A> invoke(fa: Fx<A>): suspend () -> A = {
     runLoop(fa as Fx<Any?>) as A
   }
 
-  private suspend inline fun runLoop(fa: Fx<Any?>): Any? {
+  @JvmStatic private suspend inline fun runLoop(fa: Fx<Any?>): Any? {
     var source: Fx<Any?>? = fa
     var bFirst: ((Any?) -> Fx<Any?>)? = null
     var bRest: Platform.ArrayStack<(Any?) -> Fx<Any?>>? = null
@@ -76,7 +76,7 @@ object FxRunLoop {
     }
   }
 
-  private inline fun executeSafe(crossinline f: () -> FxOf<Any?>): Fx<Any?> =
+  @JvmStatic private inline fun executeSafe(crossinline f: () -> FxOf<Any?>): Fx<Any?> =
     try {
       f().fix()
     } catch (e: Throwable) {
@@ -91,7 +91,7 @@ object FxRunLoop {
    * Pops the next bind function from the stack,
    * but filters out `IOFrame.ErrorHandler` references, because we know they won't do anything — an optimization for `handleError`.
    */
-  private fun popNextBind(bFirst: ((Any?) -> Fx<Any?>)?, bRest: Platform.ArrayStack<(Any?) -> Fx<Any?>>?): ((Any?) -> Fx<Any?>)? =
+  @JvmStatic private fun popNextBind(bFirst: ((Any?) -> Fx<Any?>)?, bRest: Platform.ArrayStack<(Any?) -> Fx<Any?>>?): ((Any?) -> Fx<Any?>)? =
     when {
       bFirst != null /*&& bFirst !is IOFrame.Companion.ErrorHandler*/ -> bFirst
       bRest != null -> {
