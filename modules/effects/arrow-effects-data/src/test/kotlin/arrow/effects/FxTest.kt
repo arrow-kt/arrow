@@ -7,6 +7,7 @@ import arrow.effects.suspended.fx.FxOf
 import arrow.effects.suspended.fx.not
 import arrow.test.UnitSpec
 import arrow.test.generators.throwable
+import arrow.test.laws.ConcurrentLaws
 import arrow.typeclasses.Eq
 import arrow.unsafe
 import io.kotlintest.properties.Gen
@@ -22,28 +23,28 @@ class FxTest : UnitSpec() {
   init {
 //    testLaws(ConcurrentLaws.laws(Fx.concurrent(), EQ(), EQ(), EQ()))
 
-//    "Fx `map` stack safe" {
-//      val size = 500000
-//      fun mapStackSafe(): Fx<Int> =
-//        (0 until size).fold(Fx { 0 }) { acc, _ -> acc.map { it + 1 } }
-//      unsafe { runBlocking { Fx { mapStackSafe()() } } } shouldBe size
-//    }
+    "Fx `map` stack safe" {
+      val size = 500000
+      fun mapStackSafe(): Fx<Int> =
+        (0 until size).fold(Fx { 0 }) { acc, _ -> acc.map { it + 1 } }
+      unsafe { runBlocking { Fx { mapStackSafe()() } } } shouldBe size
+    }
 
-//    "Fx `flatMap` stack safe" {
-//      val size = 500000
-//      fun flatMapStackSafe(): Fx<Int> =
-//        (0 until size).fold(Fx { 0 }) { acc, _ -> acc.flatMap { Fx.just(it + 1) } }
-//      unsafe { runBlocking { Fx { flatMapStackSafe()() } } } shouldBe size
-//    }
+    "Fx `flatMap` stack safe" {
+      val size = 500000
+      fun flatMapStackSafe(): Fx<Int> =
+        (0 until size).fold(Fx { 0 }) { acc, _ -> acc.flatMap { Fx.just(it + 1) } }
+      unsafe { runBlocking { Fx { flatMapStackSafe()() } } } shouldBe size
+    }
 
-//    "Fx should be able to recover from error" {
-//      val e = RuntimeException("Boom!")
-//      unsafe {
-//        runBlocking {
-//          Fx.raiseError<String>(e).attempt()
-//        }
-//      } shouldBe Either.Left(e)
-//    }
+    "Fx should be able to be attempted" {
+      val e = RuntimeException("Boom!")
+      unsafe {
+        runBlocking {
+          Fx.raiseError<String>(e).attempt()
+        }
+      } shouldBe Either.Left(e)
+    }
 
     "Fx should be able to handle error" {
       val e = RuntimeException("Boom!")

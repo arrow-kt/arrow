@@ -31,7 +31,7 @@ val NonBlocking: CoroutineContext = Fx.dispatchers().default()
 
 fun <A> FxOf<A>.runNonBlockingCancellable(cb: (Either<Throwable, A>) -> Unit): Disposable {
   val conn = FxConnection()
-  FxRunLoop.startCancelable(fix(), KindConnection.uncancelable(Fx.applicative()), NonBlocking, cb)
+  FxRunLoop.startCancelable(fix(), CancelToken(conn), NonBlocking, cb)
   return { conn.cancel().startOn(NonBlocking) }
 }
 
@@ -145,19 +145,22 @@ interface Fx2Concurrent : Concurrent<ForFx>, Fx2Async {
   override fun <A> asyncF(fa: FxProcF<A>): Fx<A> =
     Fx.asyncF(fa)
 
-  override fun <A> CoroutineContext.fork(fa: FxOf<A>): Fx<Fiber<ForFx, A>> {
+  override fun <A> CoroutineContext.fork(fa: FxOf<A>): Fx<Fiber<ForFx, A>> = Fx {
     val promise = UnsafePromise<A>()
     val conn = FxConnection()
-    fa.fix().fa.startCoroutine(asyncContinuation(this) { either ->
+
+    coroutineContext[CancelToken]?.connection?.push(conn.cancel())
+    conn.push(conn.cancel())
+
+    FxRunLoop.startCancelable(fa, CancelToken(conn), this) { either ->
       either.fold(
         { promise.complete(it.left()) },
         { promise.complete(it.right()) }
       )
-    })
-    return Fx {
+    }
+
       FxFiber(promise, conn)
     }
-  }
 
   override fun <A, B> CoroutineContext.racePair(fa: FxOf<A>, fb: FxOf<B>): Fx<RacePair<ForFx, A, B>> =
     Fx.racePair(this@racePair, fa, fb)
@@ -178,19 +181,22 @@ interface Fx2Fx : arrow.effects.typeclasses.suspended.concurrent.Fx<ForFx> {
     object : Fx2Concurrent {}
 }
 
-fun <A> FxOf<A>.startOn(ctx: CoroutineContext): Fx<Fiber<ForFx, A>> =
-  Fx {
-    val promise = UnsafePromise<A>()
-    val conn = FxConnection()
-    fix().fa.startCoroutine(asyncContinuation(ctx) { either ->
-      either.fold(
-        { promise.complete(it.left()) },
-        { promise.complete(it.right()) }
-      )
-    })
+fun <A> FxOf<A>.startOn(ctx: CoroutineContext): Fx<Fiber<ForFx, A>> = Fx {
+  val promise = UnsafePromise<A>()
+  val conn = FxConnection()
 
-    FxFiber(promise, conn)
+  coroutineContext[CancelToken]?.connection?.push(conn.cancel())
+  conn.push(conn.cancel())
+
+  FxRunLoop.startCancelable(this, CancelToken(conn), ctx) { either ->
+    either.fold(
+      { promise.complete(it.left()) },
+      { promise.complete(it.right()) }
+    )
   }
+
+  FxFiber(promise, conn)
+}
 
 @Suppress("FunctionName")
 fun FxConnection(): KindConnection<ForFx> =

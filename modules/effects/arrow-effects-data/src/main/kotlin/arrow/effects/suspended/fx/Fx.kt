@@ -48,7 +48,7 @@ sealed class Fx<A> : FxOf<A> {
   internal class RaiseError<A>(@JvmField internal val error: Throwable) : Fx<A>() {
     override val tag: Int = RaiseErrorTag
     override suspend operator fun not(): A = throw error
-    override val fa: suspend () -> A = throw error
+    override val fa: suspend () -> A = { throw error }
     override fun <B> map(f: (A) -> B): Fx<B> = this as Fx<B>
     override fun <B> flatMap(f: (A) -> FxOf<B>): Fx<B> = this as Fx<B>
     override fun toString(): String = "Fx.RaiseError(error = $error)"
@@ -140,17 +140,8 @@ sealed class Fx<A> : FxOf<A> {
   fun <B> ap(ff: FxOf<(A) -> B>): Fx<B> =
     ff.fix().flatMap { map(it) }
 
-  fun handleErrorWith(f: (Throwable) -> FxOf<A>): Fx<A> = when (this) {
-    is RaiseError -> f(error).fix()
-    is Pure -> this
-    else -> Fx {
-      try {
-        fa()
-      } catch (e: Throwable) {
-        !f(e).fix()
-      }
-    }
-  }
+  fun handleErrorWith(f: (Throwable) -> FxOf<A>): Fx<A> =
+    Fx.FlatMap(this, FxFrame.errorHandler(f), 0)
 
   fun handleError(f: (Throwable) -> A): Fx<A> = when (this) {
     is RaiseError -> Fx { f(error) }
@@ -177,17 +168,8 @@ sealed class Fx<A> : FxOf<A> {
     }
   }
 
-  fun attempt(): Fx<Either<Throwable, A>> = when (tag) {
-    RaiseErrorTag -> Fx.Pure(Left((this as Fx.RaiseError<A>).error))
-    PureTag -> Fx.Pure(Right((this as Fx.Pure<A>).value))
-    else -> Fx {
-      try {
-        Right(fa())
-      } catch (e: Throwable) {
-        Left(e)
-      }
-    }
-  }
+  fun attempt(): Fx<Either<Throwable, A>> =
+    Fx.FlatMap(this, FxFrame.any(), 0)
 
   fun <B> bracketCase(
     release: (A, ExitCase<Throwable>) -> FxOf<Unit>,

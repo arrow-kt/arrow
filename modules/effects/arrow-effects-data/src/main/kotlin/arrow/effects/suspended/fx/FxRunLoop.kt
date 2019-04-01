@@ -105,7 +105,7 @@ object FxRunLoop {
 
   private fun findErrorHandlerInCallStack(bFirst: ((Any?) -> Fx<Any?>)?, bRest: Platform.ArrayStack<(Any?) -> Fx<Any?>>?): FxFrame<Any?, Fx<Any?>>? =
     if (bFirst != null && bFirst is FxFrame) {
-      null
+      bFirst
     } else if (bRest == null) {
       null
     } else {
