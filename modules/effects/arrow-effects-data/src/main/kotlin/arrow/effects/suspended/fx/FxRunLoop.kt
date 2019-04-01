@@ -2,12 +2,14 @@ package arrow.effects.suspended.fx
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.core.Left
 import arrow.core.NonFatal
+import arrow.core.Right
 import arrow.effects.KindConnection
 import arrow.effects.OnCancel
 import arrow.effects.internal.Platform
 import arrow.typeclasses.Applicative
-import kotlin.coroutines.coroutineContext
+import kotlin.coroutines.*
 
 internal val FxAP: Applicative<ForFx> = object : Applicative<ForFx> {
   override fun <A> just(a: A): Fx<A> = Fx.just(a)
@@ -17,12 +19,17 @@ internal val FxAP: Applicative<ForFx> = object : Applicative<ForFx> {
 object FxRunLoop {
 
   operator fun <A> invoke(fa: FxOf<A>): suspend () -> A = {
-    val conn: KindConnection<ForFx> = coroutineContext[Fx.Companion.CancelToken]?.connection ?: KindConnection.uncancelable(FxAP)
+    val conn: KindConnection<ForFx> = coroutineContext[CancelToken]?.connection ?: KindConnection.uncancelable(FxAP)
     runLoop(fa as Fx<Any?>, conn) as A
   }
 
   suspend fun <A> start(fa: FxOf<A>, conn: KindConnection<ForFx> = KindConnection.uncancelable(FxAP)): A =
     runLoop(fa as Fx<Any?>, conn) as A
+
+  suspend fun <A> start(fa: FxOf<A>, conn: KindConnection<ForFx>, ctx: CoroutineContext = EmptyCoroutineContext, cb: (Either<Throwable, A>) -> Unit): Unit =
+    suspend { runLoop(fa as Fx<Any?>, conn) as A }.startCoroutine(Continuation(ctx) { r ->
+      r.fold({ cb(Right(it)) }, { cb(Left(it)) })
+    })
 
   private suspend fun runLoop(fa: Fx<Any?>, conn: KindConnection<ForFx>): Any? {
     var source: Fx<Any?>? = fa

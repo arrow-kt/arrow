@@ -1,4 +1,4 @@
-package arrow.effects.internal
+package arrow.effects.suspended.fx
 
 import arrow.core.Either
 import arrow.core.Left
@@ -6,7 +6,7 @@ import arrow.core.NonFatal
 import arrow.core.Right
 import arrow.effects.*
 import arrow.effects.CancelToken
-import arrow.effects.suspended.fx.*
+import arrow.effects.internal.Platform
 import java.util.concurrent.atomic.AtomicReference
 
 /**
