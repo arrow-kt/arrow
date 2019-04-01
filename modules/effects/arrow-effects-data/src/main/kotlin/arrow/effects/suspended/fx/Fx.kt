@@ -8,6 +8,7 @@ import arrow.core.identity
 import arrow.effects.KindConnection
 import arrow.effects.internal.Platform
 import arrow.effects.typeclasses.*
+import arrow.typeclasses.Applicative
 import arrow.typeclasses.Continuation
 import java.util.concurrent.CancellationException
 import java.util.concurrent.atomic.AtomicReference
@@ -43,6 +44,7 @@ sealed class Fx<A> : FxOf<A> {
   suspend inline fun bind(): A = !this
 
   @PublishedApi
+  @Suppress("UNCHECKED_CAST")
   internal class RaiseError<A>(@JvmField internal val error: Throwable) : Fx<A>() {
     override val tag: Int = RaiseErrorTag
     override suspend operator fun not(): A = throw error
@@ -83,7 +85,7 @@ sealed class Fx<A> : FxOf<A> {
   ) : Fx<B>(), (A) -> Fx<B> {
     override val tag: Int = MapTag
     override fun invoke(value: A): Fx<B> = Fx.Pure(g(value))
-    override suspend operator fun not(): B = FxRunLoop(this)()
+    override suspend operator fun not(): B = FxRunLoop(this)
     override val fa: suspend () -> B = suspend {
       val a = !source
       g(a)
@@ -108,7 +110,7 @@ sealed class Fx<A> : FxOf<A> {
     @JvmField private val index: Int
   ) : Fx<B>() {
     override val tag: Int = FlatMapTag
-    override suspend operator fun not(): B = FxRunLoop(this)()
+    override suspend operator fun not(): B = FxRunLoop(this)
     override val fa: suspend () -> B = suspend { !fb(!source) }
 
     //If we reach the maxStackDepth then we can fold the current FlatMap and return a Map case
@@ -126,7 +128,7 @@ sealed class Fx<A> : FxOf<A> {
         }
       }, index + 1)
 
-    override fun toString(): String = "Fx.FlatMap(..., index = $index)"
+    override fun toString(): String = "Fx.FlatMap(..., index = index)"
   }
 
   suspend inline operator fun invoke(): A =
@@ -169,15 +171,15 @@ sealed class Fx<A> : FxOf<A> {
     is RaiseError -> this
     is Pure -> if (!predicate(value)) Fx.RaiseError(error()) else this
     else -> Fx {
-      val result = fa()
+      val result = !this
       if (!predicate(result)) throw error()
       else result
     }
   }
 
-  fun attempt(): Fx<Either<Throwable, A>> = when (this) {
-    is RaiseError -> Fx.Pure(Left(error))
-    is Pure -> Fx.Pure(Right(value))
+  fun attempt(): Fx<Either<Throwable, A>> = when (tag) {
+    RaiseErrorTag -> Fx.Pure(Left((this as Fx.RaiseError<A>).error))
+    PureTag -> Fx.Pure(Right((this as Fx.Pure<A>).value))
     else -> Fx {
       try {
         Right(fa())
@@ -239,17 +241,17 @@ sealed class Fx<A> : FxOf<A> {
       }, 0)
 
     /** Hide member because it's discouraged to use uncancelable builder for cancelable concrete type **/
-    @JvmStatic fun <A> async(fa: Proc<A>): Fx<A> = Fx<A> {
-      suspendCoroutine { continuation ->
+    @JvmStatic fun <A> async(fa: Proc<A>): Fx<A> = Fx {
+      suspendCoroutine<A> { continuation ->
         fa { either ->
           continuation.resumeWith(either.fold(Result.Companion::failure, Result.Companion::success))
         }
       }
     }
 
-    @JvmStatic fun <A> async(fa: FxProc<A>): Fx<A> = Fx<A> {
-      suspendCoroutine { continuation ->
-        val conn = continuation.context[CancelToken]?.connection ?: KindConnection.uncancelable
+    @JvmStatic fun <A> async(fa: FxProc<A>): Fx<A> = Fx {
+      suspendCoroutine<A> { continuation ->
+        val conn = (continuation.context[CancelToken] ?: NonCancelable).connection
         //Is CancellationException from kotlin in kotlinx package???
         conn.push(Fx { continuation.resumeWith(Result.failure(CancellationException())) })
         fa(conn) { either ->
@@ -259,17 +261,17 @@ sealed class Fx<A> : FxOf<A> {
     }
 
     /** Hide member because it's discouraged to use uncancelable builder for cancelable concrete type **/
-    @JvmStatic fun <A> asyncF(fa: ProcF<ForFx, A>): Fx<A> = Fx<A> {
-      suspendCoroutine { continuation ->
+    @JvmStatic fun <A> asyncF(fa: ProcF<ForFx, A>): Fx<A> = Fx {
+      suspendCoroutine<A> { continuation ->
         fa { either ->
           continuation.resumeWith(either.fold(Result.Companion::failure, Result.Companion::success))
         }.fix().foldContinuation(EmptyCoroutineContext, mapUnit)
       }
     }
 
-    @JvmStatic fun <A> asyncF(fa: FxProcF<A>): Fx<A> = Fx<A> {
-      suspendCoroutine { continuation ->
-        val conn = continuation.context[CancelToken]?.connection ?: KindConnection.uncancelable
+    @JvmStatic fun <A> asyncF(fa: FxProcF<A>): Fx<A> = Fx {
+      suspendCoroutine<A> { continuation ->
+        val conn = (continuation.context[CancelToken] ?: NonCancelable).connection
         //Is CancellationException from kotlin in kotlinx package???
         conn.push(Fx { continuation.resumeWith(Result.failure(CancellationException())) })
         fa(conn) { either ->
@@ -317,19 +319,12 @@ fun <A> Fx<A>.foldContinuation(
 }
 
 //Can we somehow share this across arrow-effects-data and arrow-effects-io-extensions..
-class CancelToken : AbstractCoroutineContextElement(CancelToken) {
+class CancelToken(val connection: KindConnection<ForFx>) : AbstractCoroutineContextElement(CancelToken) {
   companion object Key : CoroutineContext.Key<CancelToken>
-
-  val connection: KindConnection<ForFx> = KindConnection.invoke(object : MonadDefer<ForFx> {
-    override fun <A> defer(fa: () -> FxOf<A>): Fx<A> = Fx.defer(fa)
-    override fun <A> raiseError(e: Throwable): Fx<A> = Fx.RaiseError(e)
-    override fun <A> FxOf<A>.handleErrorWith(f: (Throwable) -> FxOf<A>): Fx<A> = fix().handleErrorWith(f)
-    override fun <A> just(a: A): Fx<A> = Fx.just(a)
-    override fun <A, B> FxOf<A>.flatMap(f: (A) -> FxOf<B>): Fx<B> = fix().flatMap(f)
-    override fun <A, B> tailRecM(a: A, f: (A) -> FxOf<Either<A, B>>): Fx<B> = Fx.tailRecM(a, f)
-    override fun <A, B> FxOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> FxOf<Unit>, use: (A) -> FxOf<B>): Fx<B> = fix().bracketCase(release, use)
-
-  }) {
-    it.fix().fa.startCoroutine(Continuation(EmptyCoroutineContext) { })
-  }
 }
+
+//Considering reorganizing this and creating this into a typeclass.
+val NonCancelable: CancelToken = CancelToken(KindConnection.uncancelable(object : Applicative<ForFx> {
+  override fun <A> just(a: A): Fx<A> = Fx.just(a)
+  override fun <A, B> FxOf<A>.ap(ff: FxOf<(A) -> B>): Fx<B> = fix().ap(ff)
+}))

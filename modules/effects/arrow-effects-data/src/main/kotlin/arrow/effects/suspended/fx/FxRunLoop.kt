@@ -1,41 +1,42 @@
 package arrow.effects.suspended.fx
 
-import arrow.Kind
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.NonFatal
 import arrow.core.Right
-import arrow.effects.KindConnection
-import arrow.effects.OnCancel
+import arrow.effects.*
 import arrow.effects.internal.Platform
-import arrow.typeclasses.Applicative
 import kotlin.coroutines.*
 
-internal val FxAP: Applicative<ForFx> = object : Applicative<ForFx> {
-  override fun <A> just(a: A): Fx<A> = Fx.just(a)
-  override fun <A, B> FxOf<A>.ap(ff: FxOf<(A) -> B>): Fx<B> = fix().ap(ff)
-}
-
+@Suppress("UNCHECKED_CAST")
 object FxRunLoop {
 
-  operator fun <A> invoke(fa: FxOf<A>): suspend () -> A = {
-    val conn: KindConnection<ForFx> = coroutineContext[CancelToken]?.connection ?: KindConnection.uncancelable(FxAP)
-    runLoop(fa as Fx<Any?>, conn) as A
+  suspend operator fun <A> invoke(source: FxOf<A>): A =
+    loop(source, coroutineContext[CancelToken] ?: NonCancelable)() as A
+
+  fun <A> start(source: FxOf<A>,
+                ctx: CoroutineContext = EmptyCoroutineContext,
+                cb: (Either<Throwable, A>) -> Unit): Unit =
+    loop(source, NonCancelable)
+      .startCoroutine(Continuation(ctx) { r ->
+        r.fold({ cb(Right(it as A)) }, { cb(Left(it)) })
+      })
+
+  fun <A> startCancelable(fa: FxOf<A>,
+                          token: CancelToken,
+                          ctx: CoroutineContext = EmptyCoroutineContext,
+                          cb: (Either<Throwable, A>) -> Unit): Unit {
+    loop(fa, token)
+      .startCoroutine(Continuation(ctx + token) { r ->
+        r.fold({ cb(Right(it as A)) }, { cb(Left(it)) })
+      })
   }
 
-  suspend fun <A> start(fa: FxOf<A>, conn: KindConnection<ForFx> = KindConnection.uncancelable(FxAP)): A =
-    runLoop(fa as Fx<Any?>, conn) as A
-
-  suspend fun <A> start(fa: FxOf<A>, conn: KindConnection<ForFx>, ctx: CoroutineContext = EmptyCoroutineContext, cb: (Either<Throwable, A>) -> Unit): Unit =
-    suspend { runLoop(fa as Fx<Any?>, conn) as A }.startCoroutine(Continuation(ctx) { r ->
-      r.fold({ cb(Right(it)) }, { cb(Left(it)) })
-    })
-
-  private suspend fun runLoop(fa: Fx<Any?>, conn: KindConnection<ForFx>): Any? {
-    var source: Fx<Any?>? = fa
+  private fun <A> loop(fa: FxOf<A>, token: CancelToken): suspend () -> Any? = suspend {
+    val conn = token.connection
+    var source: Fx<Any?>? = fa as Fx<Any?>
     var bFirst: ((Any?) -> Fx<Any?>)? = null
     var bRest: Platform.ArrayStack<(Any?) -> Fx<Any?>>? = null
-
     var hasResult = false
     var result: Any? = null
 
@@ -45,8 +46,16 @@ object FxRunLoop {
       val tag = source?.tag ?: UnknownTag
       when (tag) {
         RaiseErrorTag -> {
-          throw (source as Fx.RaiseError<Any?>).error
-        } //An alternative to throwing would be nice..
+          val errorHandler: FxFrame<Any?, Fx<Any?>>? = findErrorHandlerInCallStack(bFirst, bRest)
+          when (errorHandler) {
+            null -> throw (source as Fx.RaiseError<Any?>).error //An alternative to throwing would be nice..
+            else -> {
+              val error = (source as Fx.RaiseError<Any?>).error
+              source = executeSafe { errorHandler.recover(error) }
+              bFirst = null
+            }
+          }
+        }
         PureTag -> {
           result = (source as Fx.Pure<Any?>).value
           hasResult = true
@@ -81,7 +90,7 @@ object FxRunLoop {
         val nextBind = popNextBind(bFirst, bRest)
 
         if (nextBind == null) {
-          return result
+          break
         } else {
           source = executeSafe { nextBind(result) }
           hasResult = false
@@ -90,7 +99,34 @@ object FxRunLoop {
         }
       }
     }
+
+    result
   }
+
+  private fun findErrorHandlerInCallStack(bFirst: ((Any?) -> Fx<Any?>)?, bRest: Platform.ArrayStack<(Any?) -> Fx<Any?>>?): FxFrame<Any?, Fx<Any?>>? =
+    if (bFirst != null && bFirst is FxFrame) {
+      null
+    } else if (bRest == null) {
+      null
+    } else {
+      var result: FxFrame<Any?, Fx<Any?>>? = null
+      var cursor: ((Any?) -> Fx<Any?>)? = bFirst
+
+      while (true) {
+        if (cursor != null && cursor is FxFrame) {
+          result = cursor
+          break
+        } else {
+          cursor = if (bRest.isNotEmpty()) {
+            bRest.pop()
+          } else {
+            break
+          }
+        }
+      }
+
+      result
+    }
 
   private inline fun executeSafe(crossinline f: () -> FxOf<Any?>): Fx<Any?> =
     try {
@@ -109,12 +145,12 @@ object FxRunLoop {
    */
   private fun popNextBind(bFirst: ((Any?) -> Fx<Any?>)?, bRest: Platform.ArrayStack<(Any?) -> Fx<Any?>>?): ((Any?) -> Fx<Any?>)? =
     when {
-      bFirst != null /*&& bFirst !is IOFrame.Companion.ErrorHandler*/ -> bFirst
+      bFirst != null && bFirst !is FxFrame.Companion.ErrorHandler -> bFirst
       bRest != null -> {
         var cursor: ((Any?) -> Fx<Any?>)? = null
         while (cursor == null && bRest.isNotEmpty()) {
           val ref = bRest.pop()
-          /*if (ref !is IOFrame.Companion.ErrorHandler) */cursor = ref
+          if (ref !is FxFrame.Companion.ErrorHandler) cursor = ref
         }
         cursor
       }
