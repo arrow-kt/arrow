@@ -15,26 +15,24 @@ class ArrowInternalException(override val message: String =
     "Arrow-kt internal error. Please let us know and create a ticket at https://github.com/arrow-kt/arrow/issues/new/choose"
 ) : RuntimeException(message)
 
+private const val initialIndex: Int = 0
+private const val chunkSize: Int = 8
+
 object Platform {
 
-  class ArrayStack<A>(
-    initialArray: Array<Any?>,
-    val chunkSize: Int,
-    initialIndex: Int) {
+  class ArrayStack<A> {
 
+    private val initialArray: Array<Any?> = arrayOfNulls<Any?>(chunkSize)
     private val modulo = chunkSize - 1
     private var array = initialArray
     private var index = initialIndex
-
-    constructor(chunkSize: Int) : this(arrayOfNulls<Any?>(chunkSize), chunkSize, 0)
-    constructor() : this(13)
 
     /** Returns `true` if the stack is empty. */
     fun isEmpty(): Boolean =
       index == 0 && (array.getOrNull(0) == null)
 
     /** Pushes an item on the stack. */
-    fun push(a: A): Unit {
+    fun push(a: A) {
       if (index == modulo) {
         val newArray = arrayOfNulls<Any?>(chunkSize)
         newArray[0] = array
@@ -47,17 +45,17 @@ object Platform {
     }
 
     /** Pushes an entire iterator on the stack. */
-    fun pushAll(cursor: Iterator<A>): Unit {
+    fun pushAll(cursor: Iterator<A>) {
       while (cursor.hasNext()) push(cursor.next())
     }
 
     /** Pushes an entire iterable on the stack. */
-    fun pushAll(seq: Iterable<A>): Unit {
+    fun pushAll(seq: Iterable<A>) {
       pushAll(seq.iterator())
     }
 
     /** Pushes the contents of another stack on this stack. */
-    fun pushAll(stack: ArrayStack<A>): Unit {
+    fun pushAll(stack: ArrayStack<A>) {
       pushAll(stack.iteratorReversed())
     }
 

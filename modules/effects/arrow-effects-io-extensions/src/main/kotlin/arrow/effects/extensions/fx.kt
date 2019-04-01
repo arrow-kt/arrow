@@ -38,22 +38,8 @@ fun <A> FxOf<A>.runNonBlockingCancellable(cb: (Either<Throwable, A>) -> Unit): D
 @extension
 interface Fx2UnsafeRun : UnsafeRun<ForFx> {
 
-  override suspend fun <A> unsafe.runBlocking(fa: () -> FxOf<A>): A {
-    val result: AtomicReference<A> = AtomicReference()
-
-    fa().fix().fa.startCoroutine(object : Continuation<A> {
-      override fun resume(value: A) {
-        result.set(value)
-      }
-
-      override fun resumeWithException(exception: Throwable) = throw exception
-
-      override val context: CoroutineContext
-        get() = EmptyCoroutineContext
-    })
-
-    return result.get()
-  }
+  override suspend fun <A> unsafe.runBlocking(fa: () -> FxOf<A>): A =
+    Fx.unsafeRunBlocking(fa().fix())
 
   override suspend fun <A> unsafe.runNonBlocking(fa: () -> FxOf<A>, cb: (Either<Throwable, A>) -> Unit) =
     FxRunLoop(fa().fix()).startCoroutine(asyncContinuation(NonBlocking, cb))

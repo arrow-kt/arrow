@@ -2,11 +2,8 @@ package arrow.benchmarks
 
 import arrow.effects.IO
 import arrow.effects.suspended.fx.Fx
-import arrow.unsafe
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
-import arrow.effects.extensions.fx.unsafeRun.runBlocking as fxRunBlocking
-import arrow.effects.extensions.io.unsafeRun.runBlocking as ioRunBlocking
 
 @State(Scope.Thread)
 @Fork(2)
@@ -14,6 +11,30 @@ import arrow.effects.extensions.io.unsafeRun.runBlocking as ioRunBlocking
 @Measurement(iterations = 10)
 @CompilerControl(CompilerControl.Mode.DONT_INLINE)
 open class Map {
+
+  @Benchmark
+  fun zioOne(): Long =
+    arrow.benchmarks.effects.scala.zio.`Map$`.`MODULE$`.zioMapTest(12000, 1)
+
+  @Benchmark
+  fun zioBatch30(): Long =
+    arrow.benchmarks.effects.scala.zio.`Map$`.`MODULE$`.zioMapTest(12000 / 30, 30)
+
+  @Benchmark
+  fun zioBatch120(): Long =
+    arrow.benchmarks.effects.scala.zio.`Map$`.`MODULE$`.zioMapTest(12000 / 120, 120)
+
+  @Benchmark
+  fun catsOne(): Long =
+    arrow.benchmarks.effects.scala.cats.`Map$`.`MODULE$`.catsIOMapTest(12000, 1)
+
+  @Benchmark
+  fun catsBatch30(): Long =
+    arrow.benchmarks.effects.scala.cats.`Map$`.`MODULE$`.catsIOMapTest(12000 / 30, 30)
+
+  @Benchmark
+  fun catsBatch120(): Long =
+    arrow.benchmarks.effects.scala.cats.`Map$`.`MODULE$`.catsIOMapTest(12000 / 120, 120)
 
   @Benchmark
   fun ioOne(): Long = ioTest(12000, 1)
@@ -48,7 +69,7 @@ open class Map {
     var sum = 0L
     var i = 0
     while (i < iterations) {
-      sum += unsafe { ioRunBlocking { io } }
+      sum += io.unsafeRunSync()
       i += 1
     }
     return sum
@@ -66,7 +87,7 @@ open class Map {
     var sum = 0L
     var i = 0
     while (i < iterations) {
-      sum += unsafe { fxRunBlocking { fx } }
+      sum += Fx.unsafeRunBlocking(fx)
       i += 1
     }
     return sum

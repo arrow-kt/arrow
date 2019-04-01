@@ -12,7 +12,7 @@ object FxRunLoop {
     runLoop(fa as Fx<Any?>) as A
   }
 
-  private suspend fun runLoop(fa: Fx<Any?>): Any? {
+  private suspend inline fun runLoop(fa: Fx<Any?>): Any? {
     var source: Fx<Any?>? = fa
     var bFirst: ((Any?) -> Fx<Any?>)? = null
     var bRest: Platform.ArrayStack<(Any?) -> Fx<Any?>>? = null
@@ -26,18 +26,20 @@ object FxRunLoop {
       val isCancelled = conn?.isCanceled() ?: false
 //      println("I am checking isCancelled: $isCancelled")
       if (isCancelled) throw CancellationException()
-
-      when (source) {
-        is Fx.RaiseError -> throw source.error //An alternative to throwing would be nice..
-        is Fx.Pure -> {
-          result = source.value
+      val tag = source?.tag ?: UnknownTag
+      when (tag) {
+        RaiseErrorTag -> {
+          throw (source as Fx.RaiseError<Any?>).error
+        } //An alternative to throwing would be nice..
+        PureTag -> {
+          result = (source as Fx.Pure<Any?>).value
           hasResult = true
         }
-        is Fx.Single -> {
-          result = source.source.invoke() //Stack safe since wraps single stack-safe suspend function.
+        SingleTag -> {
+          result = (source as Fx.Single<Any?>).source.invoke() //Stack safe since wraps single stack-safe suspend function.
           hasResult = true
         }
-        is Fx.Map<*, *> -> {
+        MapTag -> {
           if (bFirst != null) {
             if (bRest == null) {
               bRest = Platform.ArrayStack()
@@ -45,17 +47,18 @@ object FxRunLoop {
             bRest.push(bFirst)
           }
           bFirst = source as ((Any?) -> Fx<Any?>)?
-          source = source.source.fix()
+          source = (source as Fx.Map<Any?, Any?>).source.fix()
         }
-        is Fx.FlatMap<*, *> -> {
+        FlatMapTag -> {
           if (bFirst != null) {
             if (bRest == null) bRest = Platform.ArrayStack()
             bRest.push(bFirst)
           }
+          source as Fx.FlatMap<Any?, Any?>
           bFirst = source.fb as ((Any?) -> Fx<Any?>)?
           source = source.source.fix()
         }
-        null -> source = Fx.RaiseError(NullPointerException("Looping on null Fx")) //Improve message
+        UnknownTag -> source = Fx.RaiseError(NullPointerException("Looping on null Fx")) //Improve message
       }
 
       if (hasResult) {
