@@ -2,13 +2,10 @@ package arrow.effects.suspended.fx
 
 import arrow.Kind
 import arrow.core.Either
-import arrow.core.Left
-import arrow.core.Right
 import arrow.core.identity
-import arrow.effects.KindConnection
+import arrow.effects.IO
 import arrow.effects.internal.Platform
 import arrow.effects.typeclasses.*
-import arrow.typeclasses.Applicative
 import arrow.typeclasses.Continuation
 import java.util.concurrent.CancellationException
 import java.util.concurrent.atomic.AtomicReference
@@ -33,6 +30,7 @@ const val PureTag = 1
 const val SingleTag = 2
 const val MapTag = 3
 const val FlatMapTag = 4
+const val ConnectionSwitchTag = 5
 
 object Impossible : RuntimeException("Fx bug, please contact support! https://arrow-kt.io") {
   override fun fillInStackTrace(): Throwable = this
@@ -44,7 +42,9 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
   inline val fa: suspend () -> A
     get() =
       when (tag) {
-        RaiseErrorTag -> { throw (this as Fx.RaiseError<*>).error }
+        RaiseErrorTag -> {
+          throw (this as Fx.RaiseError<*>).error
+        }
         PureTag -> suspend { (this as Fx.Pure<A>).value }
         SingleTag -> (this as Fx.Single<A>).source
         MapTag -> {
@@ -172,6 +172,30 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
     override fun toString(): String = "Fx.FlatMap(..., index = $index)"
   }
 
+  /**
+   * [ConnectionSwitch] is used to temporally switch the `KindConnection` attached to the computation.
+   * i.e. Switch to `KindConnection` to `KindConnection.uncancelable` and later switch back to the original connection.
+   * This is what [bracketCase] uses to make `acquire` and `release` uncancelable and disconnect it from the cancel stack.
+   *
+   * This node nor its combinators are useful outside of Fx's internals.
+   * Instead we expose features explicitly like [bracketCase] and [uncancelable].
+   */
+  @PublishedApi
+  internal class ConnectionSwitch<A>(
+    val source: FxOf<A>,
+    val modify: (FxConnection) -> FxConnection,
+    val restore: ((Any?, Throwable?, FxConnection, FxConnection) -> FxConnection)?) : Fx<A>(ConnectionSwitchTag) {
+
+    companion object {
+      //Internal reusable reference.
+      val makeUncancelable: (FxConnection) -> FxConnection = { NonCancelable.connection }
+      val disableUncancelableAndPop: (Any?, Throwable?, FxConnection, FxConnection) -> FxConnection = { _, _, old, _ ->
+        old.pop()
+        old
+      }
+    }
+  }
+
   suspend inline operator fun invoke(): A =
     !this
 
@@ -243,7 +267,11 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
   }
 
   fun continueOn(ctx: CoroutineContext): Fx<A> =
-    unit().map { foldContinuation(ctx) { throw it } }
+    unit.map { foldContinuation(ctx) { throw it } }
+
+  /** Makes the source [IO] uncancelable such that a [Fiber.cancel] signal has no effect. */
+  fun uncancelable(): Fx<A> =
+    Fx.ConnectionSwitch(this, Fx.ConnectionSwitch.makeUncancelable, { _, _, old, _ -> old })
 
   inline fun foldContinuation(
     context: CoroutineContext = EmptyCoroutineContext,
@@ -275,7 +303,7 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
     fun <A> just(a: A): Fx<A> = Fx.Pure(a)
 
     @JvmStatic
-    fun unit(): Fx<Unit> = Fx.Pure(Unit)
+    val unit: Fx<Unit> = Fx.Pure(Unit)
 
     @JvmStatic
     fun <A> raiseError(e: Throwable): Fx<A> = Fx.RaiseError(e)
@@ -301,7 +329,7 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
 
     @JvmStatic fun <A> async(fa: FxProc<A>): Fx<A> = Fx {
       suspendCoroutine<A> { continuation ->
-        val conn = (continuation.context[CancelToken] ?: NonCancelable).connection
+        val conn = (continuation.context[CancelContext] ?: NonCancelable).connection
         //Is CancellationException from kotlin in kotlinx package???
         conn.push(Fx { continuation.resumeWith(Result.failure(CancellationException())) })
         fa(conn) { either ->
@@ -321,7 +349,7 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
 
     @JvmStatic fun <A> asyncF(fa: FxProcF<A>): Fx<A> = Fx {
       suspendCoroutine<A> { continuation ->
-        val conn = (continuation.context[CancelToken] ?: NonCancelable).connection
+        val conn = (continuation.context[CancelContext] ?: NonCancelable).connection
         //Is CancellationException from kotlin in kotlinx package???
         conn.push(Fx { continuation.resumeWith(Result.failure(CancellationException())) })
         fa(conn) { either ->
@@ -348,14 +376,3 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
   override fun toString(): String = "Fx(...)"
 
 }
-
-//Can we somehow share this across arrow-effects-data and arrow-effects-io-extensions..
-class CancelToken(val connection: KindConnection<ForFx>) : AbstractCoroutineContextElement(CancelToken) {
-  companion object Key : CoroutineContext.Key<CancelToken>
-}
-
-//Considering reorganizing this and creating this into a typeclass.
-val NonCancelable: CancelToken = CancelToken(KindConnection.uncancelable(object : Applicative<ForFx> {
-  override fun <A> just(a: A): Fx<A> = Fx.just(a)
-  override fun <A, B> FxOf<A>.ap(ff: FxOf<(A) -> B>): Fx<B> = fix().ap(ff)
-}))

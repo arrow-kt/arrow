@@ -16,7 +16,9 @@ sealed class ExitCase<out E> {
     override fun toString() = "ExitCase.Canceled"
   }
 
-  data class Error<out E>(val e: E) : ExitCase<E>()
+  data class Error<out E>(val e: E) : ExitCase<E>() {
+    override fun toString(): String = "ExitCase.Error(e=$e)"
+  }
 }
 
 fun <E> Either<E, *>.toExitCase() =

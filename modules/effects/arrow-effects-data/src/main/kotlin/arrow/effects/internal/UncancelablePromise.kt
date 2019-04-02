@@ -100,4 +100,6 @@ internal class UncancelablePromise<F, A>(private val AS: Async<F>) : Promise<F, 
     this@map.map(f)
   }
 
+  override fun toString(): String = "UncancelablePromise(state=$state)"
+
 }

@@ -2,7 +2,6 @@ package arrow.effects.suspended.fx
 
 import arrow.core.Either
 import arrow.core.NonFatal
-import arrow.effects.*
 import arrow.effects.CancelToken
 import arrow.effects.internal.Platform
 import arrow.effects.typeclasses.mapUnit
@@ -20,18 +19,18 @@ class FxForwardCancelable {
       Fx { loop(conn, cb) }
     }
 
-  suspend fun loop(conn: KindConnection<ForFx>, cb: (Either<Throwable, Unit>) -> Unit): Unit = state.get().let { current ->
+  private fun loop(conn: FxConnection, cb: (Either<Throwable, Unit>) -> Unit): Unit = state.get().let { current ->
     when (current) {
       is State.Empty -> if (!state.compareAndSet(current, State.Empty(listOf(cb) + current.stack))) loop(conn, cb)
       is State.Active -> {
         state.lazySet(finished) // GC purposes
         // TODO this runs in an immediate execution context in cats-effect
-        FxRunLoop.startCancelable(current.token, token = CancelToken(conn), cb = cb)
+        FxRunLoop.startCancelable(current.token, token = CancelContext(conn), cb = cb)
       }
     }
   }
 
-  suspend fun complete(value: CancelToken<ForFx>): Unit = state.get().let { current ->
+  fun complete(value: CancelToken<ForFx>): Unit = state.get().let { current ->
     when (current) {
       is State.Active -> {
         FxRunLoop.start(value, cb = mapUnit)
@@ -67,7 +66,7 @@ class FxForwardCancelable {
     }
 
     private val init: State = State.Empty(listOf())
-    private val finished: State = State.Active(Fx.unit())
+    private val finished: State = State.Active(Fx.unit)
 
     private fun execute(token: CancelToken<ForFx>, stack: List<(Either<Throwable, Unit>) -> Unit>): Unit =
     // TODO this runs in an immediate execution context in cats-effect

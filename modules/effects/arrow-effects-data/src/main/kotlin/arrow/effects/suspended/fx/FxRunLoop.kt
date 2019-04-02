@@ -12,20 +12,20 @@ import kotlin.coroutines.*
 object FxRunLoop {
 
   suspend inline operator fun <A> invoke(source: FxOf<A>): A =
-    loop(source, coroutineContext[CancelToken] ?: NonCancelable)() as A
+    loop(source, coroutineContext[CancelContext] ?: NonCancelable)() as A
 
   @JvmStatic inline fun <A> start(source: FxOf<A>,
-                ctx: CoroutineContext = EmptyCoroutineContext,
-                crossinline cb: (Either<Throwable, A>) -> Unit): Unit =
+                                  ctx: CoroutineContext = EmptyCoroutineContext,
+                                  crossinline cb: (Either<Throwable, A>) -> Unit): Unit =
     loop(source, NonCancelable)
       .startCoroutine(Continuation(ctx) { r ->
         r.fold({ cb(Right(it as A)) }, { cb(Left(it)) })
       })
 
   @JvmStatic inline fun <A> startCancelable(fa: FxOf<A>,
-                          token: CancelToken,
-                          ctx: CoroutineContext = EmptyCoroutineContext,
-                          crossinline cb: (Either<Throwable, A>) -> Unit): Unit {
+                                            token: CancelContext,
+                                            ctx: CoroutineContext = EmptyCoroutineContext,
+                                            crossinline cb: (Either<Throwable, A>) -> Unit): Unit {
     loop(fa, token)
       .startCoroutine(Continuation(ctx + token) { r ->
         r.fold({ cb(Right(it as A)) }, { cb(Left(it)) })
@@ -33,8 +33,8 @@ object FxRunLoop {
   }
 
   @PublishedApi
-  @JvmStatic internal fun <A> loop(fa: FxOf<A>, token: CancelToken): suspend () -> Any? = suspend {
-    val conn = token.connection
+  @JvmStatic internal fun <A> loop(fa: FxOf<A>, currToken: CancelContext): suspend () -> Any? = suspend {
+    val token: CancelContext = currToken
     var source: Fx<Any?>? = fa as Fx<Any?>
     var bFirst: ((Any?) -> Fx<Any?>)? = null
     var bRest: Platform.ArrayStack<(Any?) -> Fx<Any?>>? = null
@@ -42,7 +42,7 @@ object FxRunLoop {
     var result: Any? = null
 
     while (true) {
-      val isCancelled = conn.isCanceled()
+      val isCancelled = token.connection.isCanceled()
       if (isCancelled) throw OnCancel.CancellationException
       val tag = source?.tag ?: UnknownTag
       when (tag) {
@@ -83,6 +83,23 @@ object FxRunLoop {
           source as Fx.FlatMap<Any?, Any?>
           bFirst = source.fb as ((Any?) -> Fx<Any?>)?
           source = source.source.fix()
+        }
+        ConnectionSwitchTag -> {
+          source as Fx.ConnectionSwitch<Any?>
+          val next = source.source
+          val modify = source.modify
+          val restore = source.restore
+
+          val old = token.connection
+          token.connection = modify(old)
+          source = next as? Fx<Any?>
+          if (token.connection != old) {
+            //We don't have this yet... RestartCallback is used to eliminate the need of Async boundary allocations.
+//            rcb.contextSwitch(conn)
+            if (restore != null) {
+              source = Fx.FlatMap(next, FxRunLoop.RestoreContext(old, restore), 0)
+            }
+          }
         }
         UnknownTag -> source = Fx.RaiseError(NullPointerException("Looping on null Fx")) //Improve message
       }
@@ -163,5 +180,19 @@ object FxRunLoop {
       }
       else -> null
     }
+
+  private class RestoreContext(
+    val old: FxConnection,
+    val restore: (Any?, Throwable?, FxConnection, FxConnection) -> FxConnection) : IOFrame<Any?, Fx<Any?>> {
+
+    override fun invoke(a: Any?): Fx<Any?> = Fx.ConnectionSwitch(Fx.Pure(a), { current ->
+      restore(a, null, old, current)
+    }, null)
+
+    override fun recover(e: Throwable): Fx<Any?> =
+      Fx.ConnectionSwitch(Fx.RaiseError(e), { current ->
+        restore(null, e, old, current)
+      }, null)
+  }
 
 }

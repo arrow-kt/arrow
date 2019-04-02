@@ -124,4 +124,6 @@ internal class CancelablePromise<F, A>(private val CF: Concurrent<F>) : Promise<
     this@map.map(f)
   }
 
+  override fun toString(): String = "CancelablePromise(state=$state)"
+
 }

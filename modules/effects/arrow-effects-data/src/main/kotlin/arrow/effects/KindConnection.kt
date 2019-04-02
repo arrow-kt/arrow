@@ -281,7 +281,7 @@ sealed class KindConnection<F> {
   /**
    * [KindConnection] reference that cannot be canceled.
    */
-  private class Uncancelable<F>(FA: Applicative<F>) : KindConnection<F>(), Applicative<F> by FA {
+  internal class Uncancelable<F>(FA: Applicative<F>) : KindConnection<F>(), Applicative<F> by FA {
     override fun cancel(): CancelToken<F> = unit()
     override fun isCanceled(): Boolean = false
     override fun push(token: CancelToken<F>) = Unit
@@ -294,7 +294,7 @@ sealed class KindConnection<F> {
   /**
    * Default [KindConnection] implementation.
    */
-  private class DefaultKindConnection<F>(private val MD: MonadDefer<F>, val run: (CancelToken<F>) -> Unit) : KindConnection<F>(), MonadDefer<F> by MD {
+  internal class DefaultKindConnection<F>(private val MD: MonadDefer<F>, val run: (CancelToken<F>) -> Unit) : KindConnection<F>(), MonadDefer<F> by MD {
     private val state: AtomicReference<List<CancelToken<F>>?> = AtomicReference(emptyList())
 
     override fun cancel(): CancelToken<F> = defer {
