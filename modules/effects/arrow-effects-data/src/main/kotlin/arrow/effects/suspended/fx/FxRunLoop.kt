@@ -11,7 +11,7 @@ import kotlin.coroutines.Continuation
 object FxRunLoop {
 
   suspend inline operator fun <A> invoke(source: FxOf<A>): A = suspendCoroutine { cont ->
-    loop(source, cont.context[CancelContext] ?: NonCancelable) {
+    FxRunLoop.start(source) {
       it.fold(cont::resumeWithException, cont::resume)
     }
   }

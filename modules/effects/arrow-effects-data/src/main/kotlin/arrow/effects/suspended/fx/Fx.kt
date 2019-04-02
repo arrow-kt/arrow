@@ -3,6 +3,7 @@ package arrow.effects.suspended.fx
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.identity
+import arrow.data.AndThen
 import arrow.effects.IO
 import arrow.effects.internal.Platform
 import arrow.effects.typeclasses.*
@@ -75,7 +76,7 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
         this as Fx.Map<Any?, Any?>
         if (index != Platform.maxStackDepthSize) {
           val ff = f as (Any?) -> Any?
-          this.g = { ff(g(it)) }
+          this.g = AndThen(g).andThen(ff)
           this.index += 1
           this as Fx<B>
         } else Fx.Map(this, f, 0)
