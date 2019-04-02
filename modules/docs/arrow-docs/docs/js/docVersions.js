@@ -18,15 +18,12 @@ function closeDropdown(e) {
  */
 function initializeDocVersion() {
   const currentHost = window.location.host;
-  const currentUrl = "https://" + currentHost + "/";
   const subdomain = currentHost.split('.')[0];
 
-  const previousVersionNode = document.getElementById("top-previous");
-  const stableVersionNode = document.getElementById("top-stable");
-  const nextVersionNode = document.getElementById("top-next");
+  const stableVersionNode = document.head.querySelector("meta[name='stable-version']");
+  const nextVersionNode = document.head.querySelector("meta[name='next-version']");
 
   const arrowVersionIndicator = document.querySelector("#arrow-version");
-  const dropdownButton = document.querySelector("#version-dropdown > a");
 
   // Returns numeric version based on received subdomain
   const detectedVersion = (function detectVersion(subdomain) {
@@ -42,21 +39,6 @@ function initializeDocVersion() {
   })(subdomain);
 
   if (arrowVersionIndicator && detectedVersion) arrowVersionIndicator.textContent = detectedVersion;
-
-  if (dropdownButton) dropdownButton.addEventListener("blur", closeDropdown);
-
-  if (!sessionStorage.getItem("showTopWarning") && !currentUrl.includes(stableVersionNode.dataset.url)) {
-    document.getElementById("topWarning").classList.add("show");
-
-    if (currentUrl.includes(previousVersionNode.dataset.url)) {
-      previousVersionNode.style.color = "white";
-    }
-    else if (currentUrl.includes(nextVersionNode.dataset.url)) {
-      nextVersionNode.style.color = "white";
-    }
-  } else {
-    document.getElementById("topWarning").remove();
-  }
 }
 
 
