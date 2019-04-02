@@ -57,6 +57,7 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
           this as Fx.FlatMap<A, *>
           suspend { !fb(!source) } as (suspend () -> A)
         }
+        ConnectionSwitchTag -> suspend { FxRunLoop(this) }
         else -> throw Impossible
       }
 
@@ -65,11 +66,9 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
   inline fun <B> map(noinline f: (A) -> B): Fx<B> =
     when (tag) {
       RaiseErrorTag -> this as Fx<B>
-      PureTag -> {
-        this as Fx.Pure<A>
-        Fx.Single { f(value) }
-      }
+      PureTag -> Fx.Single { f((this as Fx.Pure<A>).value) }
       SingleTag -> Fx.Map(this, f, 0)
+      ConnectionSwitchTag -> Fx.Map(this, f, 0)
       MapTag -> {
         // Allowed to do maxStackDepthSize map operations in sequence before
         // starting a new Map fusion in order to avoid stack overflows
@@ -103,6 +102,7 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
       SingleTag -> (this as Fx.Single<A>).source()
       MapTag -> FxRunLoop(this)
       FlatMapTag -> FxRunLoop(this)
+      ConnectionSwitchTag -> FxRunLoop(this)
       else -> throw Impossible
     }
 
@@ -115,6 +115,7 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
         f(value).fix()
       }
       SingleTag -> Fx.FlatMap(this, f, 0)
+      ConnectionSwitchTag -> Fx.FlatMap(this, f, 0)
       MapTag -> {
         this as Fx.Map<B, A>
         //We can do fusion between an map-flatMap boundary
@@ -236,35 +237,8 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
   fun attempt(): Fx<Either<Throwable, A>> =
     Fx.FlatMap(this, FxFrame.any(), 0)
 
-  fun <B> bracketCase(
-    release: (A, ExitCase<Throwable>) -> FxOf<Unit>,
-    use: (A) -> FxOf<B>
-  ): Fx<B> = Fx {
-    val a = !this
-
-    val fxB: Fx<B> = try {
-      use(a).fix()
-    } catch (e: Throwable) {
-      release(a, ExitCase.Error(e)).fix().foldContinuation { e2 ->
-        throw Platform.composeErrors(e, e2)
-      }
-      throw e
-    }
-
-    val b = fxB.foldContinuation { e ->
-      when (e) {
-        is CancellationException -> release(a, ExitCase.Canceled).fix().foldContinuation { e2 ->
-          throw Platform.composeErrors(e, e2)
-        }
-        else -> release(a, ExitCase.Error(e)).fix().foldContinuation { e2 ->
-          throw Platform.composeErrors(e, e2)
-        }
-      }
-      throw e
-    }
-    !release(a, ExitCase.Completed).fix()
-    b
-  }
+  fun <B> bracketCase(release: (A, ExitCase<Throwable>) -> FxOf<Unit>, use: (A) -> FxOf<B>): Fx<B> =
+    FxBracket(this, release, use)
 
   fun continueOn(ctx: CoroutineContext): Fx<A> =
     unit.map { foldContinuation(ctx) { throw it } }

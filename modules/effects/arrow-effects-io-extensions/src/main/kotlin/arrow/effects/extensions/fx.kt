@@ -27,7 +27,7 @@ val NonBlocking: CoroutineContext = Fx.dispatchers().default()
 fun <A> FxOf<A>.runNonBlockingCancellable(cb: (Either<Throwable, A>) -> Unit): Disposable {
   val conn = FxConnection()
   FxRunLoop.startCancelable(fix(), CancelContext(conn), NonBlocking, cb)
-  return { conn.cancel().startOn(NonBlocking) }
+  return { FxRunLoop.start(conn.cancel(), cb = mapUnit) }
 }
 
 @extension
@@ -154,8 +154,8 @@ interface Fx2Concurrent : Concurrent<ForFx>, Fx2Async {
       )
     }
 
-      FxFiber(promise, conn)
-    }
+    FxFiber(promise, conn)
+  }
 
   override fun <A, B> CoroutineContext.racePair(fa: FxOf<A>, fb: FxOf<B>): Fx<RacePair<ForFx, A, B>> =
     Fx.racePair(this@racePair, fa, fb)
@@ -373,7 +373,5 @@ fun <A, B, C> Fx.Companion.raceTriple(ctx: CoroutineContext, fa: FxOf<A>, fb: Fx
     })
 
   }
-
-
 
 private fun <P1, P2, R> ((P1) -> (P2) -> R).uncurried(): (P1, P2) -> R = { p1: P1, p2: P2 -> this(p1)(p2) }

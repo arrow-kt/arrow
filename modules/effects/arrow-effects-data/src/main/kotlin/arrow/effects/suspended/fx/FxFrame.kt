@@ -17,15 +17,15 @@ import arrow.effects.handleErrorWith
  *
  * It's used to implement [attempt], [handleErrorWith] and [arrow.effects.internal.IOBracket]
  */
+@PublishedApi
 internal interface FxFrame<in A, out B> : (A) -> B {
   override operator fun invoke(a: A): B
   fun recover(e: Throwable): B
 
-  fun fold(value: Either<Throwable, A>): B =
-    when (value) {
-      is Either.Right -> invoke(value.b)
-      is Either.Left -> recover(value.a)
-    }
+  fun fold(value: Either<Throwable, A>): B = when (value) {
+    is Either.Right -> invoke(value.b)
+    is Either.Left -> recover(value.a)
+  }
 
   companion object {
 

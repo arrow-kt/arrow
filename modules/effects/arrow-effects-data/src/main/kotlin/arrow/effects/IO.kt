@@ -211,7 +211,11 @@ sealed class IO<out A> : IOOf<A> {
     companion object {
       //Internal reusable reference.
       internal val makeUncancelable: (IOConnection) -> IOConnection = { IOConnection.uncancelable }
-
+      internal val disableUncancelableAndPop: (Any?, Throwable?, IOConnection, IOConnection) -> IOConnection =
+        { _, _, old, _ ->
+          old.pop()
+          old
+        }
       internal fun <A> disableUncancelable(): (A, Throwable?, IOConnection, IOConnection) -> IOConnection =
         { _, _, old, _ -> old }
     }

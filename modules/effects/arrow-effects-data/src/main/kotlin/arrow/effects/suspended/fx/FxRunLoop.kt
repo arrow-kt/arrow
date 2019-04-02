@@ -1,39 +1,36 @@
 package arrow.effects.suspended.fx
 
-import arrow.core.Either
-import arrow.core.Left
-import arrow.core.NonFatal
-import arrow.core.Right
+import arrow.core.*
 import arrow.effects.*
 import arrow.effects.internal.Platform
+import arrow.effects.typeclasses.mapUnit
 import kotlin.coroutines.*
+import kotlin.coroutines.Continuation
 
 @Suppress("UNCHECKED_CAST")
 object FxRunLoop {
 
-  suspend inline operator fun <A> invoke(source: FxOf<A>): A =
-    loop(source, coroutineContext[CancelContext] ?: NonCancelable)() as A
+  suspend inline operator fun <A> invoke(source: FxOf<A>): A = suspendCoroutine { cont ->
+    loop(source, cont.context[CancelContext] ?: NonCancelable) {
+      it.fold(cont::resumeWithException, cont::resume)
+    }
+  }
 
   @JvmStatic inline fun <A> start(source: FxOf<A>,
                                   ctx: CoroutineContext = EmptyCoroutineContext,
                                   crossinline cb: (Either<Throwable, A>) -> Unit): Unit =
-    loop(source, NonCancelable)
-      .startCoroutine(Continuation(ctx) { r ->
-        r.fold({ cb(Right(it as A)) }, { cb(Left(it)) })
-      })
+    loop(source, NonCancelable, cb)
+      .startCoroutine(Continuation(ctx, mapUnit))
 
   @JvmStatic inline fun <A> startCancelable(fa: FxOf<A>,
                                             token: CancelContext,
                                             ctx: CoroutineContext = EmptyCoroutineContext,
-                                            crossinline cb: (Either<Throwable, A>) -> Unit): Unit {
-    loop(fa, token)
-      .startCoroutine(Continuation(ctx + token) { r ->
-        r.fold({ cb(Right(it as A)) }, { cb(Left(it)) })
-      })
-  }
+                                            crossinline cb: (Either<Throwable, A>) -> Unit): Unit =
+    loop(fa, token, cb).startCoroutine(Continuation(ctx + token, mapUnit))
 
   @PublishedApi
-  @JvmStatic internal fun <A> loop(fa: FxOf<A>, currToken: CancelContext): suspend () -> Any? = suspend {
+  @JvmStatic
+  internal inline fun <A> loop(fa: FxOf<A>, currToken: CancelContext, crossinline cb2: (Either<Throwable, A>) -> Unit): suspend () -> Unit = suspend {
     val token: CancelContext = currToken
     var source: Fx<Any?>? = fa as Fx<Any?>
     var bFirst: ((Any?) -> Fx<Any?>)? = null
@@ -41,7 +38,12 @@ object FxRunLoop {
     var hasResult = false
     var result: Any? = null
 
-    while (true) {
+    val cb = { a: Either<Throwable, A> ->
+      println("Cb was called with $a")
+      cb2(a)
+    }
+
+    runLoop@ while (true) {
       val isCancelled = token.connection.isCanceled()
       if (isCancelled) throw OnCancel.CancellationException
       val tag = source?.tag ?: UnknownTag
@@ -49,7 +51,10 @@ object FxRunLoop {
         RaiseErrorTag -> {
           val errorHandler: FxFrame<Any?, Fx<Any?>>? = findErrorHandlerInCallStack(bFirst, bRest)
           when (errorHandler) {
-            null -> throw (source as Fx.RaiseError<Any?>).error //An alternative to throwing would be nice..
+            null -> {
+              cb(Left((source as Fx.RaiseError<Any?>).error))
+              break@runLoop
+            } //An alternative to throwing would be nice..
             else -> {
               val error = (source as Fx.RaiseError<Any?>).error
               source = executeSafe { errorHandler.recover(error) }
@@ -108,7 +113,9 @@ object FxRunLoop {
         val nextBind = popNextBind(bFirst, bRest)
 
         if (nextBind == null) {
-          break
+          println("Got result")
+          cb(Right(result as A))
+          break@runLoop
         } else {
           source = executeSafe { nextBind(result) }
           hasResult = false
@@ -118,38 +125,38 @@ object FxRunLoop {
       }
     }
 
-    result
+    Unit
   }
 
-  private fun findErrorHandlerInCallStack(
-    bFirst: ((Any?) -> Fx<Any?>)?,
-    bRest: Platform.ArrayStack<(Any?) -> Fx<Any?>>?
-  ): FxFrame<Any?, Fx<Any?>>? =
+  @PublishedApi
+  internal fun findErrorHandlerInCallStack(bFirst: ((Any?) -> Fx<Any?>)?, bRest: Platform.ArrayStack<(Any?) -> Fx<Any?>>?): FxFrame<Any?, Fx<Any?>>? {
     if (bFirst != null && bFirst is FxFrame) {
-      bFirst
+      return bFirst
     } else if (bRest == null) {
-      null
-    } else {
-      var result: FxFrame<Any?, Fx<Any?>>? = null
-      var cursor: ((Any?) -> Fx<Any?>)? = bFirst
-
-      while (true) {
-        if (cursor != null && cursor is FxFrame) {
-          result = cursor
-          break
-        } else {
-          cursor = if (bRest.isNotEmpty()) {
-            bRest.pop()
-          } else {
-            break
-          }
-        }
-      }
-
-      result
+      return null
     }
 
-  @JvmStatic private inline fun executeSafe(crossinline f: () -> FxOf<Any?>): Fx<Any?> =
+    var result: FxFrame<Any?, Fx<Any?>>? = null
+    var cursor: ((Any?) -> Fx<Any?>)? = bFirst
+
+    @Suppress("LoopWithTooManyJumpStatements")
+    do {
+      if (cursor != null && cursor is FxFrame) {
+        result = cursor
+        break
+      } else {
+        cursor = if (bRest.isNotEmpty()) {
+          bRest.pop()
+        } else {
+          break
+        }
+      }
+    } while (true)
+    return result
+  }
+
+  @JvmStatic @PublishedApi
+  internal inline fun executeSafe(crossinline f: () -> FxOf<Any?>): Fx<Any?> =
     try {
       f().fix()
     } catch (e: Throwable) {
@@ -164,7 +171,8 @@ object FxRunLoop {
    * Pops the next bind function from the stack,
    * but filters out `IOFrame.ErrorHandler` references, because we know they won't do anything — an optimization for `handleError`.
    */
-  @JvmStatic private fun popNextBind(
+  @JvmStatic @PublishedApi
+  internal fun popNextBind(
     bFirst: ((Any?) -> Fx<Any?>)?,
     bRest: Platform.ArrayStack<(Any?) -> Fx<Any?>>?
   ): ((Any?) -> Fx<Any?>)? =
@@ -181,7 +189,8 @@ object FxRunLoop {
       else -> null
     }
 
-  private class RestoreContext(
+  @PublishedApi
+  internal class RestoreContext(
     val old: FxConnection,
     val restore: (Any?, Throwable?, FxConnection, FxConnection) -> FxConnection) : IOFrame<Any?, Fx<Any?>> {
 
