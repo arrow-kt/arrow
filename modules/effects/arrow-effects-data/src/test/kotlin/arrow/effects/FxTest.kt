@@ -2,6 +2,7 @@ package arrow.effects
 
 import arrow.core.Either
 import arrow.core.Right
+import arrow.core.left
 import arrow.effects.extensions.fx.applicative.applicative
 import arrow.effects.extensions.fx.async.async
 import arrow.effects.extensions.fx.bracket.bracket
@@ -64,6 +65,33 @@ class FxTest : UnitSpec() {
             .handleErrorWith { Fx { it.message!! } }
         }
       } shouldBe e.message
+    }
+
+    "Fx attempt - value" {
+      val value = 1
+      val f = { i: Int -> i + 1 }
+      Fx.just(value).map(f).attempt()
+        .unsafeRunBlocking() shouldBe Right(f(value))
+    }
+
+    "Fx attempt - error" {
+      val e = RuntimeException("Boom!")
+
+      Fx.raiseError<String>(e)
+        .map { it.toUpperCase() }
+        .flatMap { Fx { it } }
+        .attempt()
+        .unsafeRunBlocking() shouldBe e.left()
+    }
+
+    "Fx handleErrorW - error" {
+      val e = RuntimeException("Boom!")
+
+      Fx.raiseError<String>(e)
+        .map { it.toUpperCase() }
+        .flatMap { Fx { it } }
+        .handleErrorWith { Fx { it.message!! } }
+        .unsafeRunBlocking() shouldBe "Boom!"
     }
 
     "Fx should be able to become uncancelable" {

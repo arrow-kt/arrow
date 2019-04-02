@@ -26,13 +26,11 @@ internal object FxBracket {
     val cb: (Either<Throwable, B>) -> Unit) : (Either<Throwable, A>) -> Unit {
     //, Runnable // TODO this runs in cats-effect in a trampolined execution context for stack safety.
 
-    val called = AtomicBoolean(false)
+    private val called = AtomicBoolean(false)
 
     override fun invoke(ea: Either<Throwable, A>) {
       if (called.getAndSet(true)) throw IllegalStateException("callback called multiple times!")
 
-      // Introducing a light async boundary, otherwise executing the required
-      // logic directly will yield a StackOverflowException
       when (ea) {
         is Either.Right -> {
           val a = ea.b
@@ -54,7 +52,6 @@ internal object FxBracket {
           FxRunLoop.startCancelable(onNext(), CancelContext(conn), cb = cb)
         }
         is Either.Left -> cb(ea)
-
       }
     }
   }
@@ -101,15 +98,15 @@ internal object FxBracket {
     override fun release(c: ExitCase<Throwable>): CancelToken<ForFx> = releaseFn(a, c)
   }
 
-  private class EnsureReleaseFrame<A>(val releaseFn: (ExitCase<Throwable>) -> FxOf<Unit>) : FxBracket.BaseReleaseFrame<Unit, A>() {
+  private class GuaranteeReleaseFrame<A>(val releaseFn: (ExitCase<Throwable>) -> FxOf<Unit>) : FxBracket.BaseReleaseFrame<Unit, A>() {
     override fun release(c: ExitCase<Throwable>): CancelToken<ForFx> = releaseFn(c)
   }
 
-  fun <A> guaranteeCase(source: Fx<A>, release: (ExitCase<Throwable>) -> FxOf<Unit>): Fx<A> =
+  fun <A> FxOf<A>.guaranteeCase(release: (ExitCase<Throwable>) -> FxOf<Unit>): Fx<A> =
     Fx.async { conn, cb ->
       // TODO on cats-effect all this block is run using an immediate ExecutionContext for stack safety.
-      val frame = FxBracket.EnsureReleaseFrame<A>(release)
-      val onNext = Fx.FlatMap(source, frame, 0)
+      val frame = FxBracket.GuaranteeReleaseFrame<A>(release)
+      val onNext = Fx.FlatMap(this, frame, 0)
       // Registering our cancelable token ensures that in case
       // cancellation is detected, `release` gets called
       conn.push(frame.cancel)
@@ -120,6 +117,3 @@ internal object FxBracket {
       if (conn.isNotCanceled()) FxRunLoop.startCancelable(onNext, CancelContext(conn), cb = cb)
       else Unit
     }
-
-
-}

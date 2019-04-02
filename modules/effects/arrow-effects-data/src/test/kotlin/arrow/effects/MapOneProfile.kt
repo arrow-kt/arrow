@@ -1,6 +1,7 @@
 package arrow.effects
 
 import arrow.effects.suspended.fx.Fx
+import arrow.effects.suspended.fx.unsafeRunBlocking
 
 private fun fxTest(iterations: Int, batch: Int): Long {
   val f = { x: Int -> x + 1 }
@@ -14,7 +15,7 @@ private fun fxTest(iterations: Int, batch: Int): Long {
   var sum = 0L
   var i = 0
   while (i < iterations) {
-    sum += Fx.unsafeRunBlocking(fx)
+    sum += fx.unsafeRunBlocking()
     i += 1
   }
   return sum

@@ -14,7 +14,7 @@ import arrow.typeclasses.*
 import arrow.unsafe
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.*
-
+import  arrow.effects.suspended.fx.guaranteeCase as guaranteeC
 
 @extension
 interface Fx2Dispatchers : Dispatchers<ForFx> {
@@ -34,7 +34,7 @@ fun <A> FxOf<A>.runNonBlockingCancellable(cb: (Either<Throwable, A>) -> Unit): D
 interface Fx2UnsafeRun : UnsafeRun<ForFx> {
 
   override suspend fun <A> unsafe.runBlocking(fa: () -> FxOf<A>): A =
-    Fx.unsafeRunBlocking(fa().fix())
+    fa().unsafeRunBlocking()
 
   override suspend fun <A> unsafe.runNonBlocking(fa: () -> FxOf<A>, cb: (Either<Throwable, A>) -> Unit) =
     FxRunLoop.start(fa().fix(), NonBlocking, cb)
@@ -62,7 +62,7 @@ interface Fx2Applicative : Applicative<ForFx>, Fx2Functor {
     Fx.just(a)
 
   override fun <A, B> FxOf<A>.ap(ff: FxOf<(A) -> B>): Fx<B> =
-    fix().ap(ff.fix())
+    fix().ap(ff)
 
   override fun <A, B> FxOf<A>.map(f: (A) -> B): Fx<B> =
     fix().map(f)
@@ -81,7 +81,7 @@ interface Fx2ApplicativeError : ApplicativeError<ForFx, Throwable>, Fx2Applicati
 interface Fx2Monad : Monad<ForFx>, Fx2Applicative {
 
   override fun <A, B> FxOf<A>.flatMap(f: (A) -> FxOf<B>): Fx<B> =
-    fix().flatMap { f(it).fix() }
+    fix().flatMap { f(it) }
 
   override fun <A, B> tailRecM(a: A, f: (A) -> Kind<ForFx, Either<A, B>>): FxOf<B> =
     Fx.tailRecM(a, f)
@@ -90,7 +90,7 @@ interface Fx2Monad : Monad<ForFx>, Fx2Applicative {
     fix().map(f)
 
   override fun <A, B> FxOf<A>.ap(ff: FxOf<(A) -> B>): Fx<B> =
-    fix().ap(ff.fix())
+    fix().ap(ff)
 
 }
 
@@ -103,16 +103,16 @@ interface Fx2MonadThrow : MonadThrow<ForFx>, Fx2MonadError
 @extension
 interface Fx2Bracket : Bracket<ForFx, Throwable>, Fx2MonadThrow {
   override fun <A, B> FxOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> FxOf<Unit>, use: (A) -> FxOf<B>): Fx<B> =
-    fix().bracketCase(
-      release.curry().andThen { a -> a.andThen { b -> b.fix() } }.uncurried(),
-      use.andThen { a -> a.fix() }
-    )
+    fix().bracketCase(release, use)
+
+  override fun <A> FxOf<A>.guaranteeCase(finalizer: (ExitCase<Throwable>) -> FxOf<Unit>): Fx<A> =
+    guaranteeC(finalizer)
 }
 
 @extension
 interface Fx2MonadDefer : MonadDefer<ForFx>, Fx2Bracket {
   override fun <A> defer(fa: () -> FxOf<A>): Fx<A> =
-    unit().flatMap { fa() }
+    Fx.unit.flatMap { fa() }
 }
 
 @extension
@@ -143,9 +143,9 @@ interface Fx2Concurrent : Concurrent<ForFx>, Fx2Async {
   override fun <A> CoroutineContext.fork(fa: FxOf<A>): Fx<Fiber<ForFx, A>> = Fx {
     val promise = UnsafePromise<A>()
     val conn = FxConnection()
-
-    coroutineContext[CancelContext]?.connection?.push(conn.cancel())
-    conn.push(conn.cancel())
+    val oldConn = coroutineContext[CancelContext]?.connection
+    oldConn?.push(conn.cancel())
+    conn.push(oldConn?.cancel() ?: Fx.unit)
 
     FxRunLoop.startCancelable(fa, CancelContext(conn), this) { either ->
       either.fold(
@@ -174,23 +174,6 @@ interface Fx2Concurrent : Concurrent<ForFx>, Fx2Async {
 interface Fx2Fx : arrow.effects.typeclasses.suspended.concurrent.Fx<ForFx> {
   override fun concurrent(): Concurrent<ForFx> =
     object : Fx2Concurrent {}
-}
-
-fun <A> FxOf<A>.startOn(ctx: CoroutineContext): Fx<Fiber<ForFx, A>> = Fx {
-  val promise = UnsafePromise<A>()
-  val conn = FxConnection()
-
-  coroutineContext[CancelContext]?.connection?.push(conn.cancel())
-  conn.push(conn.cancel())
-
-  FxRunLoop.startCancelable(this, CancelContext(conn), ctx) { either ->
-    either.fold(
-      { promise.complete(it.left()) },
-      { promise.complete(it.right()) }
-    )
-  }
-
-  FxFiber(promise, conn)
 }
 
 @Suppress("FunctionName")
@@ -373,5 +356,3 @@ fun <A, B, C> Fx.Companion.raceTriple(ctx: CoroutineContext, fa: FxOf<A>, fb: Fx
     })
 
   }
-
-private fun <P1, P2, R> ((P1) -> (P2) -> R).uncurried(): (P1, P2) -> R = { p1: P1, p2: P2 -> this(p1)(p2) }

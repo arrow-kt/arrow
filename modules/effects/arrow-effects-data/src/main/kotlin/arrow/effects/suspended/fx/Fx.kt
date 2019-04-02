@@ -333,21 +333,20 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
       }
     }
 
-    @JvmStatic
-    fun <A> unsafeRunBlocking(fa: Fx<A>): A {
-      var loop = true
-      var result: Either<Throwable, A>? = null
-      FxRunLoop.start(fa) { r: Either<Throwable, A> ->
-        result = r
-        loop = false
-      }
-      while (loop) {
-      }
-      return result!!.fold({ throw it }, ::identity)
-    }
-
   }
 
   override fun toString(): String = "Fx(...)"
 
+}
+
+fun <A> FxOf<A>.unsafeRunBlocking(): A {
+  var loop = true
+  var result: Either<Throwable, A>? = null
+  FxRunLoop.start(this) { r: Either<Throwable, A> ->
+    result = r
+    loop = false
+  }
+  while (loop) {
+  }
+  return result!!.fold({ throw it }, ::identity)
 }
