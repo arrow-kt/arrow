@@ -61,10 +61,9 @@ internal object FxBracket {
     override fun invoke(a: Unit): Fx<Nothing> = Fx.raiseError(error)
   }
 
-  private abstract class BaseReleaseFrame<A, B> : FxFrame<B, Fx<B>> {
+  internal abstract class BaseReleaseFrame<A, B> : FxFrame<B, Fx<B>> {
 
-    // Guard used for thread-safety, to ensure the idempotency
-    // of the release; otherwise `release` can be called twice
+    // Guard used for thread-safety, to ensure the idempotency  of the release; otherwise `release` can be called twice
     private val waitsForResult = AtomicBoolean(true)
 
     abstract fun release(c: ExitCase<Throwable>): CancelToken<ForFx>
@@ -76,44 +75,40 @@ internal object FxBracket {
 
     val cancel: CancelToken<ForFx> = applyRelease(ExitCase.Canceled).fix().uncancelable()
 
-    // Unregistering cancel token, otherwise we can have a memory leak;
-    // N.B. conn.pop() happens after the evaluation of `release`, because
+    // Unregistering cancel token, otherwise we can have a memory leak; N.B. conn.pop() happens after the evaluation of `release`, because
     // otherwise we might have a conflict with the auto-cancellation logic
-    override fun recover(e: Throwable): Fx<B> =
-      Fx.FlatMap(
-        Fx.ConnectionSwitch(applyRelease(ExitCase.Error(e)), Fx.ConnectionSwitch.makeUncancelable, Fx.ConnectionSwitch.disableUncancelableAndPop),
-        FxBracket.ReleaseRecover(e),
-        0
-      )
+    override fun recover(e: Throwable): Fx<B> = Fx.FlatMap(
+      Fx.ConnectionSwitch(applyRelease(ExitCase.Error(e)), Fx.ConnectionSwitch.makeUncancelable, Fx.ConnectionSwitch.disableUncancelableAndPop),
+      FxBracket.ReleaseRecover(e),
+      0
+    )
 
-    override operator fun invoke(a: B): Fx<B> =
-    // Unregistering cancel token, otherwise we can have a memory leak
-    // N.B. conn.pop() happens after the evaluation of `release`, because
-    // otherwise we might have a conflict with the auto-cancellation logic
-      Fx.ConnectionSwitch(applyRelease(ExitCase.Completed), Fx.ConnectionSwitch.makeUncancelable, Fx.ConnectionSwitch.disableUncancelableAndPop)
-        .map { a }
+    override operator fun invoke(a: B): Fx<B> = Fx.Map(
+      Fx.ConnectionSwitch(applyRelease(ExitCase.Completed), Fx.ConnectionSwitch.makeUncancelable, Fx.ConnectionSwitch.disableUncancelableAndPop),
+      { a },
+      0
+    )
   }
 
-  private class BracketReleaseFrame<A, B>(val a: A, val releaseFn: (A, ExitCase<Throwable>) -> FxOf<Unit>) : FxBracket.BaseReleaseFrame<A, B>() {
+  internal class BracketReleaseFrame<A, B>(val a: A, val releaseFn: (A, ExitCase<Throwable>) -> FxOf<Unit>) : FxBracket.BaseReleaseFrame<A, B>() {
     override fun release(c: ExitCase<Throwable>): CancelToken<ForFx> = releaseFn(a, c)
   }
 
-  private class GuaranteeReleaseFrame<A>(val releaseFn: (ExitCase<Throwable>) -> FxOf<Unit>) : FxBracket.BaseReleaseFrame<Unit, A>() {
+  internal class GuaranteeReleaseFrame<A>(val releaseFn: (ExitCase<Throwable>) -> FxOf<Unit>) : FxBracket.BaseReleaseFrame<Unit, A>() {
     override fun release(c: ExitCase<Throwable>): CancelToken<ForFx> = releaseFn(c)
   }
+}
 
-  fun <A> FxOf<A>.guaranteeCase(release: (ExitCase<Throwable>) -> FxOf<Unit>): Fx<A> =
-    Fx.async { conn, cb ->
-      // TODO on cats-effect all this block is run using an immediate ExecutionContext for stack safety.
-      val frame = FxBracket.GuaranteeReleaseFrame<A>(release)
-      val onNext = Fx.FlatMap(this, frame, 0)
-      // Registering our cancelable token ensures that in case
-      // cancellation is detected, `release` gets called
-      conn.push(frame.cancel)
+fun <A> FxOf<A>.guaranteeCase(release: (ExitCase<Throwable>) -> FxOf<Unit>): Fx<A> =
+  Fx.async { conn, cb ->
+    // TODO on cats-effect all this block is run using an immediate ExecutionContext for stack safety.
+    val frame = FxBracket.GuaranteeReleaseFrame<A>(release)
+    val onNext = Fx.FlatMap(this, frame, 0)
+    // Registering our cancelable token ensures that in case cancellation is detected, `release` gets called
+    conn.push(frame.cancel)
 
-      // Race condition check, avoiding starting `source` in case
-      // the connection was already cancelled — n.b. we don't need
-      // to trigger `release` otherwise, because it already happened
-      if (conn.isNotCanceled()) FxRunLoop.startCancelable(onNext, CancelContext(conn), cb = cb)
-      else Unit
-    }
+    // Race condition check, avoiding starting `source` in case the connection was already cancelled — n.b. we don't need
+    // to trigger `release` otherwise, because it already happened
+    if (conn.isNotCanceled()) FxRunLoop.startCancelable(onNext, CancelContext(conn), cb = cb)
+    else Unit
+  }
