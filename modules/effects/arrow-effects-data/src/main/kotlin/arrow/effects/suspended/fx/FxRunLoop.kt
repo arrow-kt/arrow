@@ -160,7 +160,7 @@ object FxRunLoop {
 
   /**
    * Pops the next bind function from the stack,
-   * but filters out `IOFrame.ErrorHandler` references, because we know they won't do anything — an optimization for `handleError`.
+   * but filters out `IOFrame.ErrorHandler` references, because we know they won't do anything — an optimization for [handleErrorWith].
    */
   @JvmStatic private fun popNextBind(
     bFirst: ((Any?) -> Fx<Any?>)?,
@@ -187,10 +187,9 @@ object FxRunLoop {
       restore(a, null, old, current)
     }, null)
 
-    override fun recover(e: Throwable): Fx<Any?> =
-      Fx.ConnectionSwitch(Fx.RaiseError(e), { current ->
-        restore(null, e, old, current)
-      }, null)
+    override fun recover(e: Throwable): Fx<Any?> = Fx.ConnectionSwitch(Fx.RaiseError(e), { current ->
+      restore(null, e, old, current)
+    }, null)
   }
 
 }

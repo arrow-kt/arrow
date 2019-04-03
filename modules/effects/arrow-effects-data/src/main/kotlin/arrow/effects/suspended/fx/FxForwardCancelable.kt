@@ -9,15 +9,20 @@ import java.util.concurrent.atomic.AtomicReference
 
 /**
  * A placeholder for a [CancelToken] that will be set at a later time, the equivalent of a `Promise<ForFx, CancelToken<ForFx>>`.
+ *
+ * [ForwardCancelable] can take care of forwarding cancellation when you temporally switch contexts.
+ *
+ * i.e. when cancellation occurs during uncancellable resource acquisition, we need to forward the cancellation event
+ * until after the resource acquisition is completed so we can cancel and call the release function.
+ * @see [FxBracket.invoke]
  */
 class FxForwardCancelable {
 
   private val state = AtomicReference<State>(init)
 
-  fun cancel(): CancelToken<ForFx> =
-    Fx.asyncF { conn, cb ->
-      Fx { loop(conn, cb) }
-    }
+  fun cancel(): CancelToken<ForFx> = Fx.asyncF { conn, cb ->
+    Fx { loop(conn, cb) }
+  }
 
   private fun loop(conn: FxConnection, cb: (Either<Throwable, Unit>) -> Unit): Unit = state.get().let { current ->
     when (current) {
@@ -68,9 +73,9 @@ class FxForwardCancelable {
     private val init: State = State.Empty(listOf())
     private val finished: State = State.Active(Fx.unit)
 
-    private fun execute(token: CancelToken<ForFx>, stack: List<(Either<Throwable, Unit>) -> Unit>): Unit =
     // TODO this runs in an immediate execution context in cats-effect
-      FxRunLoop.start(token.fix()) { r ->
+    private fun execute(token: CancelToken<ForFx>, stack: List<(Either<Throwable, Unit>) -> Unit>): Unit =
+      FxRunLoop.start(token) { r ->
         val errors = stack.fold(emptyList<Throwable>()) { acc, cb ->
           try {
             cb(r)
