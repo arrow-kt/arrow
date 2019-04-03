@@ -162,7 +162,7 @@ interface Schedule<F, State, Input, Output> : ScheduleOf<F, State, Input, Output
   fun delayed(f: (Duration) -> Duration): Schedule<F, State, Input, Output> =
     modifyDelay { _, duration -> MF().run { just(f(duration)) } }
 
-  fun jittered(min: Double = 0.0, max: Double = 0.0, MF: MonadDefer<F>): Schedule<F, State, Input, Output> =
+  fun jittered(MF: MonadDefer<F>, min: Double = 0.0, max: Double = 0.0): Schedule<F, State, Input, Output> =
     modifyDelay { _, duration ->
       MF.delay { (duration.nanoseconds * Random.nextDouble(min, max)).roundToLong().nanoseconds }
     }
