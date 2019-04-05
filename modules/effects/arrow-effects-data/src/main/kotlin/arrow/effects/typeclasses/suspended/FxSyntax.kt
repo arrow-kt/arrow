@@ -50,6 +50,9 @@ interface FxSyntax<F> : Concurrent<F>, BindSyntax<F> {
   fun <A> CoroutineContext.effect(f: suspend () -> A): Kind<F, A> =
     asyncOp { defer(this@effect) { f.effect() } }
 
+  fun <A> CoroutineContext.effectAnd(continueOn: CoroutineContext, f: suspend () -> A): Kind<F, A> =
+    asyncOp { defer(this@effectAnd) { f.effect() } }.continueOn(continueOn)
+
   fun <A> (suspend () -> A).effect(unit: Unit = Unit): Kind<F, A> = effect(this)
 
   fun <A, B> (suspend (A) -> B).effect(): (Kind<F, A>) -> Kind<F, B> =
