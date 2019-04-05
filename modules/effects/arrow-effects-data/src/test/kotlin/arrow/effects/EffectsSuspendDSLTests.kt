@@ -64,7 +64,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
       val program = fx {
         // note how the receiving value is typed in the environment and not inside IO despite being effectful and
         // non-blocking parallel computations
-        val result: List<String> = ! NonBlocking.parMapN(
+        val result: List<String> = !NonBlocking.parMapN(
           effect { getThreadName() },
           effect { getThreadName() }
         ) { a, b -> listOf(a, b) }
@@ -204,6 +204,28 @@ class EffectsSuspendDSLTests : UnitSpec() {
           contextA != contextB
         }
       } shouldBe true
+    }
+
+    "CoroutineContext.defer with context change" {
+      fxTest {
+        fx {
+          val expectedExecutionContextName = "A"
+          val expectedContinueOnContextName = "B"
+          val executionContext = newSingleThreadContext("A")
+          val continueOnContext = newSingleThreadContext("B")
+
+          val originalContextName = !effect { Thread.currentThread().name }
+          val actualExecutionContextName = !executionContext.effectAnd(continueOn = continueOnContext) { Thread.currentThread().name }
+          val actualContinueOnContextName = !effect { Thread.currentThread().name }
+
+          listOf(
+            actualExecutionContextName == expectedExecutionContextName,
+            actualExecutionContextName != originalContextName,
+            actualContinueOnContextName == expectedContinueOnContextName,
+            actualContinueOnContextName != originalContextName
+          )
+        }
+      } shouldBe List(4) { true }
     }
 
     "bracketCase success" {
