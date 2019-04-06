@@ -31,9 +31,9 @@ Let's define a typeclass for the behavior of equality between two objects, and w
 
 ```kotlin
 interface Eq<T> {
-   fun T.eqv(b: T)
+   fun T.eqv(b: T): Boolean
 
-   fun T.neqv(b: T) =
+   fun T.neqv(b: T): Boolean =
     !eqv(b)
 }
 ```
