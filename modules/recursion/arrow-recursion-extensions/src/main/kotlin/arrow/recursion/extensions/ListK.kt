@@ -3,7 +3,6 @@ package arrow.recursion.extensions
 import arrow.Kind
 import arrow.Kind2
 import arrow.core.Eval
-import arrow.core.extensions.eval.monad.binding
 import arrow.data.ListK
 import arrow.data.combineK
 import arrow.data.k
@@ -60,10 +59,10 @@ interface ListKBirecursive<A> : Birecursive<ListK<A>, ListFPartialOf<A>> {
     else -> ListF.ConsF(first(), drop(1).k())
   }
 
-  override fun Kind<ListFPartialOf<A>, Eval<ListK<A>>>.embedT(): Eval<ListK<A>> =
+  override fun Kind<ListFPartialOf<A>, ListK<A>>.embedT(): ListK<A> =
     when (val ls = fix()) {
-      is ListF.NilF -> Eval.now(ListK.empty())
-      is ListF.ConsF -> binding { ListK.just(ls.a).combineK(ls.tail.bind()) }
+      is ListF.NilF -> ListK.empty()
+      is ListF.ConsF -> ListK.just(ls.a).combineK(ls.tail)
     }
 }
 

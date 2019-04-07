@@ -2,14 +2,15 @@ package arrow.recursion.extensions
 
 import arrow.Kind
 import arrow.Kind2
-import arrow.core.Eval
+import arrow.core.*
+import arrow.core.extensions.eval.monad.monad
 import arrow.extension
 import arrow.free.Free
-import arrow.free.extensions.free.monad.flatten
 import arrow.free.step
-import arrow.recursion.Algebra
+import arrow.recursion.AlgebraM
 import arrow.recursion.extensions.free.birecursive.birecursive
 import arrow.recursion.extensions.freef.functor.functor
+import arrow.recursion.extensions.freef.traverse.traverse
 import arrow.recursion.pattern.ForFreeF
 import arrow.recursion.pattern.FreeF
 import arrow.recursion.pattern.FreeFPartialOf
@@ -81,18 +82,8 @@ interface FreeBirecursive<S, A> : Birecursive<Free<S, A>, FreeFPartialOf<S, A>> 
     }
   }
 
-  override fun Kind<FreeFPartialOf<S, A>, Eval<Free<S, A>>>.embedT(): Eval<Free<S, A>> = when (val fa = fix()) {
-    is FreeF.Pure -> Eval.now(Free.Pure(fa.e))
-    is FreeF.Impure -> Eval.later { Free.liftF(SF().run { fa.fa.map { it.value() } }).flatten() }
+  override fun Kind<FreeFPartialOf<S, A>, Free<S, A>>.embedT(): Free<S, A> = when (val fa = fix()) {
+    is FreeF.Pure -> Free.Pure(fa.e)
+    is FreeF.Impure -> Free.FlatMapped(Free.liftF(fa.fa), ::identity)
   }
 }
-
-fun <S, A, B> Free<S, A>.interpret(SF: Functor<S>, base: (A) -> B, alg: Algebra<S, Eval<B>>): B =
-  Free.birecursive<S, A>(SF).run {
-    cata {
-      when (val fa = it.fix()) {
-        is FreeF.Pure -> Eval.now(base(fa.e))
-        is FreeF.Impure -> alg(fa.fa)
-      }
-    }
-  }

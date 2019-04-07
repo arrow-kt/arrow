@@ -15,6 +15,6 @@ import arrow.typeclasses.value
 interface IdBirecursive<A> : Birecursive<Id<A>, ConstPartialOf<Id<A>>> {
   override fun FF(): Functor<ConstPartialOf<Id<A>>> = Const.functor()
 
-  override fun Kind<ConstPartialOf<Id<A>>, Eval<Id<A>>>.embedT(): Eval<Id<A>> = Eval.now(value())
+  override fun Kind<ConstPartialOf<Id<A>>, Id<A>>.embedT(): Id<A> = value()
   override fun Id<A>.projectT(): Kind<ConstPartialOf<Id<A>>, Id<A>> = Const(this)
 }

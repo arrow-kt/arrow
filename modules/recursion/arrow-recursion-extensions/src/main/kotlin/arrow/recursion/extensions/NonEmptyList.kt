@@ -59,9 +59,9 @@ interface NonEmptyListBirecursive<A> : Birecursive<NonEmptyList<A>, NonEmptyList
   override fun NonEmptyList<A>.projectT(): Kind<NonEmptyListFPartialOf<A>, NonEmptyList<A>> =
     NonEmptyListF(head, Nel.fromList(tail))
 
-  override fun Kind<NonEmptyListFPartialOf<A>, Eval<NonEmptyList<A>>>.embedT(): Eval<NonEmptyList<A>> =
+  override fun Kind<NonEmptyListFPartialOf<A>, NonEmptyList<A>>.embedT(): NonEmptyList<A> =
     fix().let {
-      Eval.later { NonEmptyList(it.head, it.tail.map { it.value().all }.getOrElse { emptyList() }) }
+      NonEmptyList(it.head, it.tail.map { it.all }.getOrElse { emptyList() })
     }
 }
 

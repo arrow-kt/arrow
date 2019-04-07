@@ -1,7 +1,7 @@
 package arrow.recursion.extensions
 
 import arrow.Kind
-import arrow.core.Eval
+import arrow.core.Eval.Companion.now
 import arrow.extension
 import arrow.recursion.data.Fix
 import arrow.recursion.data.fix
@@ -18,8 +18,8 @@ interface FixBirecursive<F> : Birecursive<Fix<F>, F> {
     unfix.map { it.value().fix() }
   }
 
-  override fun Kind<F, Eval<Fix<F>>>.embedT(): Eval<Fix<F>> = FF().run {
-    Eval.later { Fix(this@embedT) }
+  override fun Kind<F, Fix<F>>.embedT(): Fix<F> = FF().run {
+    Fix(this@embedT.map(::now))
   }
 }
 

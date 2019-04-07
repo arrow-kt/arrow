@@ -69,7 +69,7 @@ interface CofreeBirecursive<S, A> : Birecursive<Cofree<S, A>, CofreeFPartialOf<S
   override fun Cofree<S, A>.projectT(): Kind<CofreeFPartialOf<S, A>, Cofree<S, A>> =
     CofreeF(SF(), head, tail.value())
 
-  override fun Kind<CofreeFPartialOf<S, A>, Eval<Cofree<S, A>>>.embedT(): Eval<Cofree<S, A>> = fix().run {
-    Eval.later { Cofree(SF(), head, SF().run { Eval.later { tail.map { it.value() } } }) }
+  override fun Kind<CofreeFPartialOf<S, A>, Cofree<S, A>>.embedT(): Cofree<S, A> = fix().run {
+    Cofree(SF(), head, Eval.now(tail))
   }
 }

@@ -1,8 +1,6 @@
 package arrow.recursion.extensions
 
 import arrow.Kind
-import arrow.core.Eval
-import arrow.core.Eval.Now
 import arrow.extension
 import arrow.recursion.Coalgebra
 import arrow.recursion.data.Nu
@@ -19,8 +17,8 @@ interface NuBirecursive<F> : Birecursive<Nu<F>, F> {
     unNu(a).map { Nu(it, unNu) }
   }
 
-  override fun Kind<F, Eval<Nu<F>>>.embedT(): Eval<Nu<F>> =
-    Eval.later { Nu.invoke(this) { f -> FF().run { f.map { nu -> nu.value().projectT().map(::Now) } } } }
+  override fun Kind<F, Nu<F>>.embedT(): Nu<F> =
+    Nu.invoke(this) { f -> FF().run { f.map { nu -> nu.projectT() } } }
 
   override fun <A> A.ana(coalg: Coalgebra<F, A>): Nu<F> = Nu(this, coalg)
 }

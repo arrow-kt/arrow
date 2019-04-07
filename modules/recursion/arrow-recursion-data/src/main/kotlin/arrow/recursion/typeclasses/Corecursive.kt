@@ -1,15 +1,17 @@
 package arrow.recursion.typeclasses
 
 import arrow.Kind
-import arrow.core.Eval
-import arrow.core.Tuple2
-import arrow.core.fix
+import arrow.core.*
+import arrow.core.extensions.either.applicative.applicative
+import arrow.core.extensions.either.functor.functor
+import arrow.core.extensions.either.traverse.traverse
 import arrow.recursion.*
 import arrow.recursion.data.fix
 import arrow.recursion.pattern.FreeF
-import arrow.recursion.pattern.FreeR
 import arrow.recursion.pattern.fix
 import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
+import arrow.typeclasses.Traverse
 
 /**
  * ank_macro_hierarchy(arrow.recursion.typeclasses.Corecursive)
@@ -23,47 +25,71 @@ interface Corecursive<T, F> {
   /**
    * Implementation for embed.
    */
-  fun Kind<F, Eval<T>>.embedT(): Eval<T>
+  fun Kind<F, T>.embedT(): T
 
   /**
    * Creates a algebra given a functor.
    */
-  fun embed(): Algebra<F, Eval<T>> = { it.embedT() }
+  fun embed(): Algebra<F, T> = { it.embedT() }
 
   /**
    * Unfold into any recursive type.
    */
   fun <A> A.ana(coalg: Coalgebra<F, A>): T = hylo(embed(), coalg, FF())
 
-  fun <A> A.apo(coalg: RCoalgebra<F, T, A>): T {
-    fun go(v: Eval<A>): Eval<T> = FF().run {
-      v.flatMap { coalg(it).map { it.fold({ Eval.now(it) }, { go(Eval.now(it)) }) }.embedT() }
-    }
-    return go(Eval.now(this)).value()
-  }
+  fun <M, A> A.anaM(TF: Traverse<F>, MM: Monad<M>, coalg: CoalgebraM<F, M, A>): Kind<M, T> =
+    hyloM(embed() andThen MM::just, coalg, TF, MM)
+
+  fun <A> A.apo(coalg: RCoalgebra<F, T, A>): T =
+    hyloC({
+      FF().run { it.map { it.fix().fold(::identity, ::identity) } }.embedT()
+    }, coalg, FF(), Either.functor())
+
+  fun <M, A> A.apoM(TF: Traverse<F>, MM: Monad<M>, coalg: RCoalgebraM<F, M, T, A>): Kind<M, T> =
+    hyloMC({
+      FF().run { MM.just(it.map { it.fix().fold(::identity, ::identity) }.embedT()) }
+    }, coalg, TF, Either.traverse(), Either.applicative(), MM)
 
   fun <A> A.futu(coalg: CVCoalgebra<F, A>): T =
-    futuFGo(this@Corecursive, this, coalg).extract()
+    FreeF.pure<F, A>(this).hylo(
+      embed(),
+      {
+        when (val fa = it.unfix.fix()) {
+          is FreeF.Pure -> coalg(fa.e)
+          is FreeF.Impure -> FF().run { fa.fa.map { it.value().fix() } }
+        }
+      },
+      FF()
+    )
 
-  fun <A, B> A.coelgot(f: (Tuple2<A, Eval<Kind<F, Eval<B>>>>) -> Eval<B>, coalg: Coalgebra<F, A>): B {
-    fun h(a: A): Eval<B> =
+  fun <M, A> A.futuM(TF: Traverse<F>, MM: Monad<M>, coalg: CVCoalgebraM<F, M, A>): Kind<M, T> =
+    FreeF.pure<F, A>(this).hyloM(embed() andThen MM::just, {
+      when (val fa = it.unfix.fix()) {
+        is FreeF.Pure -> coalg(fa.e)
+        is FreeF.Impure -> MM.just(TF.run { fa.fa.map { it.value().fix() } })
+      }
+    }, TF, MM)
+
+  fun <A> A.coelgot(f: (Tuple2<A, Eval<Kind<F, T>>>) -> T, coalg: Coalgebra<F, A>): T {
+    fun h(a: A): T =
       FF().run {
         f(
-          Tuple2(a, Eval.later { coalg(a).map { Eval.defer { h(it) } } })
+          Tuple2(a, Eval.later { coalg(a).map(::h) })
         )
       }
-    return h(this).value()
+    return h(this)
   }
-}
 
-// Futu helpers
-private fun <F, T, A> futuFGo(CR: Corecursive<T, F>, a: A, coalg: CVCoalgebra<F, A>): Eval<T> = CR.FF().run {
-  CR.run { coalg(a).map { futuFWorker(CR, Eval.now(it), coalg) }.embedT() }
-}
+  fun <M, A> A.coelgotM(TF: Traverse<F>, MM: Monad<M>, f: (Tuple2<A, Eval<Kind<M, Kind<F, T>>>>) -> Kind<M, T>, coalg: CoalgebraM<F, M, A>): Kind<M, T> {
+    fun h(a: A): Kind<M, T> =
+      TF.run {
+        MM.run {
+          f(
+            Tuple2(a, Eval.later { coalg(a).flatMap { it.map(::h).sequence(MM) } })
+          )
+        }
+      }
 
-private fun <F, T, A> futuFWorker(CR: Corecursive<T, F>, f: Eval<FreeR<F, A>>, coalg: CVCoalgebra<F, A>): Eval<T> = f.flatMap { f ->
-  when (val f = f.unfix.fix()) {
-    is FreeF.Pure -> futuFGo(CR, f.e, coalg)
-    is FreeF.Impure -> CR.run { CR.FF().run { f.fa.map { futuFWorker(CR, it.fix().map { it.fix() }, coalg) }.embedT() } }
+    return h(this)
   }
 }

@@ -2,17 +2,16 @@ package arrow.recursion.extensions
 
 import arrow.Kind
 import arrow.core.*
-import arrow.core.extensions.eval.monad.binding
+import arrow.core.extensions.eval.monad.monad
 import arrow.core.extensions.option.functor.functor
+import arrow.core.extensions.option.traverse.traverse
 import arrow.recursion.typeclasses.Birecursive
 import arrow.typeclasses.Functor
 
 interface IntBirecursive : Birecursive<Int, ForOption> {
   override fun FF(): Functor<ForOption> = Option.functor()
 
-  override fun Kind<ForOption, Eval<Int>>.embedT(): Eval<Int> = binding {
-    fix().fold({ 0 }, { it.bind() + 1 })
-  }
+  override fun Kind<ForOption, Int>.embedT(): Int = fix().fold({ 0 }, { it + 1 })
 
   override fun Int.projectT(): Kind<ForOption, Int> = when {
     this < 0 -> throw IllegalArgumentException("IntBirecursive only works on natural numbers")
@@ -26,7 +25,7 @@ fun Int.Companion.birecursive(): Birecursive<Int, ForOption> = object : IntBirec
 interface LongBirecursive : Birecursive<Long, ForOption> {
   override fun FF(): Functor<ForOption> = Option.functor()
 
-  override fun Kind<ForOption, Eval<Long>>.embedT(): Eval<Long> = fix().fold({ Eval.now(0L) }, { it.map { it + 1 } })
+  override fun Kind<ForOption, Long>.embedT(): Long = fix().fold({ 0L }, { it + 1 })
 
   override fun Long.projectT(): Kind<ForOption, Long> = when {
     this < 0 -> throw IllegalArgumentException("LongBirecursive only works on natural numbers")

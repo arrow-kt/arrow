@@ -1,6 +1,5 @@
 package arrow.recursion.data
 
-import arrow.core.Eval
 import arrow.higherkind
 import arrow.recursion.Algebra
 
@@ -10,7 +9,7 @@ import arrow.recursion.Algebra
  */
 @higherkind
 interface Mu<F> : MuOf<F> {
-  fun <A> unMu(alg: Algebra<F, Eval<A>>): Eval<A>
+  fun <A> unMu(alg: Algebra<F, A>): A
 
   companion object
 }
