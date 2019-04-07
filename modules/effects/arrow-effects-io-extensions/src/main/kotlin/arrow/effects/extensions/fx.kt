@@ -34,7 +34,7 @@ fun <A> FxOf<A>.runNonBlockingCancellable(cb: (Either<Throwable, A>) -> Unit): D
 interface Fx2UnsafeRun : UnsafeRun<ForFx> {
 
   override suspend fun <A> unsafe.runBlocking(fa: () -> FxOf<A>): A =
-    fa().unsafeRunBlocking()
+    Fx.unsafeRunBlocking(fa())
 
   override suspend fun <A> unsafe.runNonBlocking(fa: () -> FxOf<A>, cb: (Either<Throwable, A>) -> Unit) =
     FxRunLoop.start(fa().fix(), NonBlocking, cb)

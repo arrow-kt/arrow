@@ -67,7 +67,13 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
   inline fun <B> map(noinline f: (A) -> B): Fx<B> =
     when (tag) {
       RaiseErrorTag -> this as Fx<B>
-      PureTag -> Fx.Single { f((this as Fx.Pure<A>).value) }
+      PureTag -> {
+        //Fx.Single { f((this as Fx.Pure<A>).value) }
+        this as Fx.Pure<A>
+        val b: B = Fx.unsafeRunBlocking(Fx.Single { f((this as Fx.Pure<A>).value) })
+        (this as Fx.Pure<B>).value = b
+        this as Fx<B>
+      }
       SingleTag -> Fx.Map(this, f, 0)
       ConnectionSwitchTag -> Fx.Map(this, f, 0)
       MapTag -> {
@@ -143,7 +149,7 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
   }
 
   @PublishedApi
-  internal class Pure<A>(@JvmField val value: A) : Fx<A>(PureTag) {
+  internal class Pure<A>(@JvmField var value: A) : Fx<A>(PureTag) {
     override fun toString(): String = "Fx.Pure(value = $value)"
   }
 
@@ -333,20 +339,20 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
       }
     }
 
+    @JvmStatic fun <A> unsafeRunBlocking(fx: FxOf<A>): A {
+      var loop = true
+      var result: Either<Throwable, A>? = null
+      FxRunLoop.start(fx) { r: Either<Throwable, A> ->
+        result = r
+        loop = false
+      }
+      while (loop) {
+      }
+      return result!!.fold({ throw it }, ::identity)
+    }
+
   }
 
   override fun toString(): String = "Fx(...)"
 
-}
-
-fun <A> FxOf<A>.unsafeRunBlocking(): A {
-  var loop = true
-  var result: Either<Throwable, A>? = null
-  FxRunLoop.start(this) { r: Either<Throwable, A> ->
-    result = r
-    loop = false
-  }
-  while (loop) {
-  }
-  return result!!.fold({ throw it }, ::identity)
 }

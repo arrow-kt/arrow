@@ -9,9 +9,7 @@ import arrow.effects.typeclasses.*
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Monad
 import arrow.typeclasses.suspended.BindSyntax
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
-import kotlin.coroutines.startCoroutine
+import kotlin.coroutines.*
 
 interface FxSyntax<F> : Concurrent<F>, BindSyntax<F> {
 
