@@ -14,7 +14,7 @@ apply plugin: "io.morethan.jmhreport"
 
 jmh {
     include = [
-            'arrow.benchmarks.AttemptRaisedError'
+            'arrow.benchmarks.DeepBind'
     ]
     resultFormat = 'json'
     resultsFile = file('build/reports/benchmarks.json')
