@@ -136,14 +136,24 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
         Fx.FlatMap(source, { f(g(it)) }, 1)
       }
       FlatMapTag -> {
-        this as Fx.FlatMap<B, A>
-        if (index != Platform.maxStackDepthSize) Fx.FlatMap(this, f, 0)
-        else Fx.FlatMap(source, { a ->
-          Fx.Single {
-            val b = !fb(a)
-            !f(b)
-          }
-        }, index + 1)
+
+        this as Fx.FlatMap<Any?, Any?>
+        val ff = f as (Any?) -> Fx<Any?>
+        //AndThen composes the functions in a stack-safe way by running them in a while loop.
+        this.fb = AndThen(this.fb).andThen(ff)
+        this as Fx<B>
+        this
+//
+//
+//
+//        if (index != Platform.maxStackDepthSize) Fx.FlatMap(this, f, 0)
+//        else Fx.FlatMap(source, { a ->
+//          println("async jump on flatMap fx")
+//          Fx.Single {
+//            val b = !fb(a)
+//            !f(b)
+//          }
+//        }, index + 1)
       }
       else -> throw Impossible
     }
@@ -179,9 +189,9 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
 
   @PublishedApi
   internal class FlatMap<A, B>(
-    @JvmField val source: FxOf<A>,
-    @JvmField val fb: (A) -> FxOf<B>,
-    @JvmField val index: Int
+    @JvmField var source: FxOf<A>,
+    @JvmField var fb: (A) -> FxOf<B>,
+    @JvmField var index: Int
   ) : Fx<B>(FlatMapTag) {
     override fun toString(): String = "Fx.FlatMap(..., index = $index)"
   }

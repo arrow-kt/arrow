@@ -44,13 +44,17 @@ object Impossible : RuntimeException("AndThen bug, please contact support! https
  *
  */
 @higherkind
-sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
+sealed class AndThen<A, B>(@JvmField private val tag: Int) : (A) -> B, AndThenOf<A, B> {
 
-  abstract val tag: Int
+  private data class Single<A, B>(
+    @JvmField val f: (A) -> B,
+    @JvmField val index: Int
+  ) : AndThen<A, B>(SingleTag)
 
-  private data class Single<A, B>(val f: (A) -> B, val index: Int, override val tag: Int = SingleTag) : AndThen<A, B>()
-
-  private data class Concat<A, E, B>(val left: AndThen<A, E>, val right: AndThen<E, B>, override val tag: Int = ConcatTag) : AndThen<A, B>() {
+  private data class Concat<A, E, B>(
+    @JvmField val left: AndThen<A, E>,
+    @JvmField val right: AndThen<E, B>
+  ) : AndThen<A, B>(ConcatTag) {
     override fun toString(): String = "AndThen.Concat(...)"
   }
 
@@ -175,7 +179,7 @@ sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
       AndThen { b }
 
     fun <A> id(): AndThen<A, A> =
-      AndThen(::identity)
+      AndThen.invoke(::identity)
 
     /**
      * Wraps a function in [AndThen].
