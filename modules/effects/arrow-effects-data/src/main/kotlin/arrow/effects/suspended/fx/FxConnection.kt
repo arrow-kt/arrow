@@ -11,7 +11,7 @@ import kotlin.coroutines.CoroutineContext
 
 //Can we somehow share this across arrow-effects-data and arrow-effects-io-extensions..
 @Suppress("EqualsWithHashCodeExist")
-internal class CancelContext(var connection: FxConnection) : AbstractCoroutineContextElement(CancelContext) {
+class CancelContext(var connection: FxConnection) : AbstractCoroutineContextElement(CancelContext) {
   companion object Key : CoroutineContext.Key<CancelContext>
 
   override fun equals(other: Any?): Boolean = when (other) {

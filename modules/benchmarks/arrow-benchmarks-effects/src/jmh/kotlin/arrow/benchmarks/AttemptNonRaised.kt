@@ -1,9 +1,8 @@
 package arrow.benchmarks
 
-import arrow.core.Either
-import arrow.effects.extensions.fx.unsafeRun.runBlocking
+import arrow.benchmarks.effects.scala.zio.ZIORTS
+import arrow.effects.IO
 import arrow.effects.suspended.fx.Fx
-import arrow.unsafe
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
 
@@ -17,18 +16,36 @@ open class AttemptNonRaised {
   @Param("10000")
   var size: Int = 0
 
-  tailrec suspend fun loopHappy(size: Int, i: Int): Fx<Int> =
+  private fun fxLoopHappy(size: Int, i: Int): Fx<Int> =
     if (i < size) {
-      val attempted = !Fx { i + 1 }.attempt()
-      when (attempted) {
-        is Either.Left -> Fx.raiseError(attempted.a)
-        is Either.Right -> loopHappy(size, attempted.b)
+      Fx { i + 1 }.attempt().flatMap {
+        it.fold(Fx.Companion::raiseError) { n -> fxLoopHappy(size, n) }
       }
     } else Fx.just(1)
 
+  private fun ioLoopHappy(size: Int, i: Int): IO<Int> =
+    if (i < size) {
+      IO { i + 1 }.attempt().flatMap {
+        it.fold(IO.Companion::raiseError) { n -> ioLoopHappy(size, n) }
+      }
+    } else IO.just(1)
+
   @Benchmark
   fun fx(): Int =
-    unsafe { runBlocking { Fx { !loopHappy(size, 0) } } }
+    Fx.unsafeRunBlocking(fxLoopHappy(size, 0))
 
+  @Benchmark
+  fun io(): Int =
+    ioLoopHappy(size, 0).unsafeRunSync()
+
+  @Benchmark
+  fun cats(): Any =
+    arrow.benchmarks.effects.scala.cats.AttemptNonRaised.ioLoopHappy(size, 0).unsafeRunSync()
+
+  @Benchmark
+  fun zio(): Any =
+    ZIORTS.unsafeRun(
+      arrow.benchmarks.effects.scala.zio.AttemptNonRaised.ioLoopHappy(size, 0)
+    )
 
 }

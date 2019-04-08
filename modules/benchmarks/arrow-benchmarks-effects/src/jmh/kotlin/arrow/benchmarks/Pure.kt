@@ -2,7 +2,6 @@ package arrow.benchmarks
 
 import arrow.effects.IO
 import arrow.effects.suspended.fx.Fx
-import arrow.unsafe
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
 import arrow.effects.extensions.fx.unsafeRun.runBlocking as fxRunBlocking
@@ -23,7 +22,7 @@ open class Pure {
       if (j > size) IO.just(j) else ioPureLoop(j + 1)
     }
 
-  private fun fxPureLoop(i: Int): Fx<Int> =
+  fun fxPureLoop(i: Int): Fx<Int> =
     Fx.just(i).flatMap { j ->
       if (j > size) Fx.just(j) else fxPureLoop(j + 1)
     }
