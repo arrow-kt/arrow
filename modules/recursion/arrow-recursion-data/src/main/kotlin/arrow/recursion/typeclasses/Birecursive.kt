@@ -12,11 +12,4 @@ import arrow.recursion.hylo
  *
  * Typeclass for types that can be generically folded and unfolded with algebras and coalgebras.
  */
-interface Birecursive<T, F> : Recursive<T, F>, Corecursive<T, F> {
-
-  fun <A> T.prepro(trans: FunctionK<F, F>, alg: Algebra<F, A>): A =
-    hylo(alg compose trans::invoke, project(), FF())
-
-  fun <A> A.postPro(trans: FunctionK<F, F>, coalg: Coalgebra<F, A>): T =
-    hylo(embed(), coalg andThen trans::invoke, FF())
-}
+interface Birecursive<T, F> : Recursive<T, F>, Corecursive<T, F>

@@ -15,6 +15,8 @@ import arrow.recursion.pattern.NonEmptyListF
 import arrow.recursion.pattern.NonEmptyListFPartialOf
 import arrow.recursion.pattern.fix
 import arrow.recursion.typeclasses.Birecursive
+import arrow.recursion.typeclasses.Corecursive
+import arrow.recursion.typeclasses.Recursive
 import arrow.typeclasses.*
 
 @extension
@@ -64,4 +66,10 @@ interface NonEmptyListBirecursive<A> : Birecursive<NonEmptyList<A>, NonEmptyList
       NonEmptyList(it.head, it.tail.map { it.all }.getOrElse { emptyList() })
     }
 }
+
+@extension
+interface NonEmptyListRecursive<A> : Recursive<NonEmptyList<A>, NonEmptyListFPartialOf<A>>, NonEmptyListBirecursive<A>
+
+@extension
+interface NonEmptyListCorecursive<A> : Corecursive<NonEmptyList<A>, NonEmptyListFPartialOf<A>>, NonEmptyListBirecursive<A>
 

@@ -2,10 +2,10 @@ package arrow.recursion.extensions
 
 import arrow.Kind
 import arrow.core.*
-import arrow.core.extensions.eval.monad.monad
 import arrow.core.extensions.option.functor.functor
-import arrow.core.extensions.option.traverse.traverse
 import arrow.recursion.typeclasses.Birecursive
+import arrow.recursion.typeclasses.Corecursive
+import arrow.recursion.typeclasses.Recursive
 import arrow.typeclasses.Functor
 
 interface IntBirecursive : Birecursive<Int, ForOption> {
@@ -22,6 +22,10 @@ interface IntBirecursive : Birecursive<Int, ForOption> {
 
 fun Int.Companion.birecursive(): Birecursive<Int, ForOption> = object : IntBirecursive {}
 
+fun Int.Companion.recursive(): Recursive<Int, ForOption> = object : IntBirecursive {}
+
+fun Int.Companion.corecursive(): Corecursive<Int, ForOption> = object : IntBirecursive {}
+
 interface LongBirecursive : Birecursive<Long, ForOption> {
   override fun FF(): Functor<ForOption> = Option.functor()
 
@@ -35,3 +39,7 @@ interface LongBirecursive : Birecursive<Long, ForOption> {
 }
 
 fun Long.Companion.birecursive(): Birecursive<Long, ForOption> = object : LongBirecursive {}
+
+fun Long.Companion.recursive(): Recursive<Long, ForOption> = object : LongBirecursive {}
+
+fun Long.Companion.corecursive(): Corecursive<Long, ForOption> = object : LongBirecursive {}

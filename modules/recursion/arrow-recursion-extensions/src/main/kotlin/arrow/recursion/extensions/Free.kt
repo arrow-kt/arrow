@@ -2,20 +2,19 @@ package arrow.recursion.extensions
 
 import arrow.Kind
 import arrow.Kind2
-import arrow.core.*
-import arrow.core.extensions.eval.monad.monad
+import arrow.core.Eval
+import arrow.core.identity
 import arrow.extension
 import arrow.free.Free
 import arrow.free.step
-import arrow.recursion.AlgebraM
-import arrow.recursion.extensions.free.birecursive.birecursive
 import arrow.recursion.extensions.freef.functor.functor
-import arrow.recursion.extensions.freef.traverse.traverse
 import arrow.recursion.pattern.ForFreeF
 import arrow.recursion.pattern.FreeF
 import arrow.recursion.pattern.FreeFPartialOf
 import arrow.recursion.pattern.fix
 import arrow.recursion.typeclasses.Birecursive
+import arrow.recursion.typeclasses.Corecursive
+import arrow.recursion.typeclasses.Recursive
 import arrow.typeclasses.*
 
 @extension
@@ -86,4 +85,14 @@ interface FreeBirecursive<S, A> : Birecursive<Free<S, A>, FreeFPartialOf<S, A>> 
     is FreeF.Pure -> Free.Pure(fa.e)
     is FreeF.Impure -> Free.FlatMapped(Free.liftF(fa.fa), ::identity)
   }
+}
+
+@extension
+interface FreeRecursive<S, A> : Recursive<Free<S, A>, FreeFPartialOf<S, A>>, FreeBirecursive<S, A> {
+  override fun SF(): Functor<S>
+}
+
+@extension
+interface FreeCorecursive<S, A> : Corecursive<Free<S, A>, FreeFPartialOf<S, A>>, FreeBirecursive<S, A> {
+  override fun SF(): Functor<S>
 }

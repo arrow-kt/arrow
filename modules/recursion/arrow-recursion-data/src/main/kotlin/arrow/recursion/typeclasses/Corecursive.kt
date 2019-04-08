@@ -32,9 +32,6 @@ interface Corecursive<T, F> {
    */
   fun embed(): Algebra<F, T> = { it.embedT() }
 
-  /**
-   * Unfold into any recursive type.
-   */
   fun <A> A.ana(coalg: Coalgebra<F, A>): T = hylo(embed(), coalg, FF())
 
   fun <M, A> A.anaM(TF: Traverse<F>, MM: Monad<M>, coalg: CoalgebraM<F, M, A>): Kind<M, T> =
@@ -50,6 +47,7 @@ interface Corecursive<T, F> {
       FF().run { MM.just(it.map { it.fix().fold(::identity, ::identity) }.embedT()) }
     }, coalg, TF, Either.traverse(), Either.applicative(), MM)
 
+  /* Also causes compiler error wtf!
   fun <A> A.futu(coalg: CVCoalgebra<F, A>): T =
     FreeF.pure<F, A>(this).hylo(
       embed(),
@@ -61,7 +59,9 @@ interface Corecursive<T, F> {
       },
       FF()
     )
+    */
 
+  /*
   fun <M, A> A.futuM(TF: Traverse<F>, MM: Monad<M>, coalg: CVCoalgebraM<F, M, A>): Kind<M, T> =
     FreeF.pure<F, A>(this).hyloM(embed() andThen MM::just, {
       when (val fa = it.unfix.fix()) {
@@ -69,6 +69,10 @@ interface Corecursive<T, F> {
         is FreeF.Impure -> MM.just(TF.run { fa.fa.map { it.value().fix() } })
       }
     }, TF, MM)
+  */
+
+  fun <A> A.postPro(trans: FunctionK<F, F>, coalg: Coalgebra<F, A>): T =
+    hylo(embed(), coalg andThen trans::invoke, FF())
 
   fun <A> A.coelgot(f: (Tuple2<A, Eval<Kind<F, T>>>) -> T, coalg: Coalgebra<F, A>): T {
     fun h(a: A): T =

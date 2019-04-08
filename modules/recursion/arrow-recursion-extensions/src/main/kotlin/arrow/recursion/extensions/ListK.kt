@@ -13,6 +13,8 @@ import arrow.recursion.pattern.ListF
 import arrow.recursion.pattern.ListFPartialOf
 import arrow.recursion.pattern.fix
 import arrow.recursion.typeclasses.Birecursive
+import arrow.recursion.typeclasses.Corecursive
+import arrow.recursion.typeclasses.Recursive
 import arrow.typeclasses.*
 
 @extension
@@ -65,4 +67,10 @@ interface ListKBirecursive<A> : Birecursive<ListK<A>, ListFPartialOf<A>> {
       is ListF.ConsF -> ListK.just(ls.a).combineK(ls.tail)
     }
 }
+
+@extension
+interface ListKRecursive<A> : Recursive<ListK<A>, ListFPartialOf<A>>, ListKBirecursive<A>
+
+@extension
+interface ListKCorecursive<A> : Corecursive<ListK<A>, ListFPartialOf<A>>, ListKBirecursive<A>
 

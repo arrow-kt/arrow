@@ -11,6 +11,8 @@ import arrow.recursion.pattern.CofreeFPartialOf
 import arrow.recursion.pattern.ForCofreeF
 import arrow.recursion.pattern.fix
 import arrow.recursion.typeclasses.Birecursive
+import arrow.recursion.typeclasses.Corecursive
+import arrow.recursion.typeclasses.Recursive
 import arrow.typeclasses.*
 
 @extension
@@ -62,14 +64,26 @@ interface CofreeFBifunctor<F> : Bifunctor<Kind<ForCofreeF, F>> {
 }
 
 @extension
-interface CofreeBirecursive<S, A> : Birecursive<Cofree<S, A>, CofreeFPartialOf<S, A>> {
+interface CofreeRecursive<S, A> : Recursive<Cofree<S, A>, CofreeFPartialOf<S, A>> {
   fun SF(): Functor<S>
   override fun FF(): Functor<CofreeFPartialOf<S, A>> = CofreeF.functor()
 
   override fun Cofree<S, A>.projectT(): Kind<CofreeFPartialOf<S, A>, Cofree<S, A>> =
     CofreeF(SF(), head, tail.value())
+}
+
+@extension
+interface CofreeCorecursive<S, A> : Corecursive<Cofree<S, A>, CofreeFPartialOf<S, A>> {
+  fun SF(): Functor<S>
+  override fun FF(): Functor<CofreeFPartialOf<S, A>> = CofreeF.functor()
 
   override fun Kind<CofreeFPartialOf<S, A>, Cofree<S, A>>.embedT(): Cofree<S, A> = fix().run {
     Cofree(SF(), head, Eval.now(tail))
   }
+}
+
+@extension
+interface CofreeBirecursive<S, A> : Birecursive<Cofree<S, A>, CofreeFPartialOf<S, A>>, CofreeRecursive<S, A>, CofreeCorecursive<S, A> {
+  override fun SF(): Functor<S>
+  override fun FF(): Functor<CofreeFPartialOf<S, A>> = CofreeF.functor()
 }
