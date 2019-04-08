@@ -3,35 +3,27 @@ package arrow.effects
 import arrow.core.Either
 import arrow.core.Right
 import arrow.core.left
-import arrow.effects.extensions.fx.applicative.applicative
-import arrow.effects.extensions.fx.async.async
 import arrow.effects.extensions.fx.bracket.bracket
 import arrow.effects.extensions.fx.monad.flatMap
 import arrow.effects.extensions.fx.unsafeRun.runBlocking
 import arrow.effects.extensions.runNonBlockingCancellable
-import arrow.effects.internal.UnsafePromise
 import arrow.effects.suspended.fx.*
 import arrow.test.UnitSpec
-import arrow.test.generators.throwable
 import arrow.test.laws.BracketLaws
-import arrow.test.laws.ConcurrentLaws
 import arrow.typeclasses.Eq
 import arrow.unsafe
-import io.kotlintest.properties.Gen
-import io.kotlintest.properties.forAll
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
 import java.lang.RuntimeException
 import java.util.concurrent.CountDownLatch
-import kotlin.coroutines.CoroutineContext
 import kotlin.properties.Delegates
 
 @RunWith(KotlinTestRunner::class)
 class FxTest : UnitSpec() {
 
   init {
-    //testLaws(BracketLaws.laws(Fx.bracket(), FX_EQ(), FX_EQ(), FX_EQ()))
+    testLaws(BracketLaws.laws(Fx.bracket(), FX_EQ(), FX_EQ(), FX_EQ()))
 
     "Fx `map` stack safe" {
       val size = 500000

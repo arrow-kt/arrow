@@ -107,8 +107,7 @@ internal object FxBracket {
 
     override operator fun invoke(a: B): Fx<B> = Fx.Map(
       Fx.ConnectionSwitch(applyRelease(ExitCase.Completed), Fx.ConnectionSwitch.makeUncancelable, Fx.ConnectionSwitch.disableUncancelableAndPop),
-      { a },
-      0
+      { a }
     )
   }
 

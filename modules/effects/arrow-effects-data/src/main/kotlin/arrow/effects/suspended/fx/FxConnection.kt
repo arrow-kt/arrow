@@ -9,15 +9,16 @@ import arrow.effects.typeclasses.mapUnit
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.CoroutineContext
 
-
 //Can we somehow share this across arrow-effects-data and arrow-effects-io-extensions..
-class CancelContext(var connection: FxConnection) : AbstractCoroutineContextElement(CancelContext) {
+@Suppress("EqualsWithHashCodeExist")
+internal class CancelContext(var connection: FxConnection) : AbstractCoroutineContextElement(CancelContext) {
   companion object Key : CoroutineContext.Key<CancelContext>
 
-  override fun equals(other: Any?): Boolean = when(other) {
+  override fun equals(other: Any?): Boolean = when (other) {
     is CancelContext -> connection == other.connection
     else -> false
   }
+
   override fun toString(): String = "CancelContext(connection=$connection)"
 }
 
@@ -27,6 +28,7 @@ typealias FxConnection = KindConnection<ForFx>
 @Suppress("UNUSED_PARAMETER", "FunctionName")
 fun FxConnection(dummy: Unit = Unit): FxConnection = KindConnection(MD) { FxRunLoop.start(it, cb = mapUnit) }
 
+@Suppress("ObjectPropertyName")
 private val _uncancelable = KindConnection.uncancelable(MD)
 val NonCancelable: CancelContext = CancelContext(_uncancelable)
 
@@ -37,6 +39,5 @@ private object MD : MonadDefer<ForFx> {
   override fun <A> just(a: A): Fx<A> = Fx.just(a)
   override fun <A, B> FxOf<A>.flatMap(f: (A) -> FxOf<B>): Fx<B> = fix().flatMap(f)
   override fun <A, B> tailRecM(a: A, f: (A) -> FxOf<Either<A, B>>): Fx<B> = Fx.tailRecM(a, f)
-  override fun <A, B> FxOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> FxOf<Unit>, use: (A) -> FxOf<B>): Fx<B> =
-    fix().bracketCase(release = { a, e -> release(a, e).fix() }, use = { use(it).fix() })
+  override fun <A, B> FxOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> FxOf<Unit>, use: (A) -> FxOf<B>): Fx<B> = fix().bracketCase(release, use)
 }

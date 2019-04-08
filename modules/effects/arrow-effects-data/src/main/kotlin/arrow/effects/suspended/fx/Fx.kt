@@ -3,6 +3,7 @@ package arrow.effects.suspended.fx
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.identity
+import arrow.core.nonFatalOrThrow
 import arrow.data.AndThen
 import arrow.effects.IO
 import arrow.effects.internal.Platform
@@ -62,7 +63,6 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
         else -> throw Impossible
       }
 
-
   @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
   inline fun <B> map(noinline f: (A) -> B): Fx<B> =
     when (tag) {
@@ -70,32 +70,36 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
       PureTag -> {
         //Fx.Single { f((this as Fx.Pure<A>).value) }
         this as Fx.Pure<A>
-        val b: B = Fx.unsafeRunBlocking(Fx.Single { f((this as Fx.Pure<A>).value) })
-        (this as Fx.Pure<B>).value = b
-        this as Fx<B>
+        if (this.index != Platform.maxStackDepthSize) {
+          try {
+            Fx.Pure(f(this.value), index + 1)
+          } catch (e: Throwable) {
+            Fx.RaiseError<B>(e.nonFatalOrThrow())
+          }
+        } else {
+          try {
+            val b: B = Fx.unsafeRunBlocking(Fx.Single { f(this.value) })
+            (this as Fx.Pure<B>).value = b
+            this as Fx<B>
+          } catch (e: Throwable) {
+            Fx.RaiseError<B>(e.nonFatalOrThrow())
+          }
+        }
       }
-      SingleTag -> Fx.Map(this, f, 0)
-      ConnectionSwitchTag -> Fx.Map(this, f, 0)
+      SingleTag -> Fx.Map(this, f)
+      ConnectionSwitchTag -> Fx.Map(this, f)
       MapTag -> {
-        // Allowed to do maxStackDepthSize map operations in sequence before
-        // starting a new Map fusion in order to avoid stack overflows
         this as Fx.Map<Any?, Any?>
-        if (index != Platform.maxStackDepthSize) {
-          val ff = f as (Any?) -> Any?
-          this.g = AndThen(g).andThen(ff)
-          this.index += 1
-          this as Fx<B>
-        } else Fx.Map(this, f, 0)
-
-
-        //if (index != Platform.maxStackDepthSize) Fx.Map(source, { f(g(it)) }, index + 1)
-        //else Fx.Map(this, f, 0)
+        val ff = f as (Any?) -> Any?
+        //AndThen composes the functions in a stack-safe way by running them in a while loop.
+        this.g = AndThen(g).andThen(ff)
+        this as Fx<B>
       }
       FlatMapTag -> {
         //If we reach the maxStackDepthSize then we can fold the current FlatMap and return a Map case
         //If we haven't reached the maxStackDepthSize we fuse the map operator within the flatMap stack.
         this as Fx.FlatMap<B, A>
-        if (index != Platform.maxStackDepthSize) Fx.Map(this, f, 0)
+        if (index != Platform.maxStackDepthSize) Fx.Map(this, f)
         else Fx.FlatMap(source, { a -> Fx { f(!fb(a)) } }, index + 1)
       }
       else -> throw Impossible
@@ -113,13 +117,16 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
       else -> throw Impossible
     }
 
+
   @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
   inline fun <B> flatMap(noinline f: (A) -> FxOf<B>): Fx<B> =
     when (tag) {
       RaiseErrorTag -> this as Fx<B>
       PureTag -> {
         this as Fx.Pure<A>
-        f(value).fix()
+//        if(index != Platform.maxStackDepthSize) Fx.Pure(FxRunLoop(f(value).fix()), index + 1)
+//        else
+          Fx.FlatMap(this, f, 0)
       }
       SingleTag -> Fx.FlatMap(this, f, 0)
       ConnectionSwitchTag -> Fx.FlatMap(this, f, 0)
@@ -149,7 +156,7 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
   }
 
   @PublishedApi
-  internal class Pure<A>(@JvmField var value: A) : Fx<A>(PureTag) {
+  internal class Pure<A>(@JvmField var value: A, var index: Int) : Fx<A>(PureTag) {
     override fun toString(): String = "Fx.Pure(value = $value)"
   }
 
@@ -164,11 +171,10 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
   @PublishedApi
   internal class Map<A, B>(
     @JvmField var source: FxOf<A>,
-    @JvmField var g: (A) -> B,
-    @JvmField var index: Int
+    @JvmField var g: (A) -> B
   ) : Fx<B>(MapTag), (A) -> Fx<B> {
-    override fun invoke(value: A): Fx<B> = Fx.Pure(g(value))
-    override fun toString(): String = "Fx.Map(..., index = $index)"
+    override fun invoke(value: A): Fx<B> = Fx.Pure(g(value), 0)
+    override fun toString(): String = "Fx.Map(...)"
   }
 
   @PublishedApi
@@ -281,17 +287,17 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
     operator fun <A> invoke(fa: suspend () -> A): Fx<A> = Fx.Single(fa)
 
     @JvmStatic
-    fun <A> just(a: A): Fx<A> = Fx.Pure(a)
+    fun <A> just(a: A): Fx<A> = Fx.Pure(a, 0)
 
     @JvmStatic
-    val unit: Fx<Unit> = Fx.Pure(Unit)
+    val unit: Fx<Unit> = Fx.Pure(Unit, 0)
 
     @JvmStatic
     fun <A> raiseError(e: Throwable): Fx<A> = Fx.RaiseError(e)
 
     @JvmStatic
     fun <A> defer(fa: () -> FxOf<A>): Fx<A> =
-      Fx.FlatMap(Fx.Pure(Unit), { fa() }, 0)
+      Fx.FlatMap(Fx.Pure(Unit, 0), { fa() }, 0)
 
     @JvmStatic
     fun <A, B> tailRecM(a: A, f: (A) -> FxOf<Either<A, B>>): Fx<B> =
@@ -339,20 +345,24 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
       }
     }
 
-    @JvmStatic fun <A> unsafeRunBlocking(fx: FxOf<A>): A {
-      var loop = true
-      var result: Either<Throwable, A>? = null
-      FxRunLoop.start(fx) { r: Either<Throwable, A> ->
-        result = r
-        loop = false
+    //TODO
+    @JvmStatic fun <A> unsafeRunBlocking(fx: FxOf<A>): A = when (val fa = fx.fix()) {
+      is Pure -> fa.value
+      else -> {
+        var loop = true
+        var result: Either<Throwable, A>? = null
+        FxRunLoop.start(fx) { r: Either<Throwable, A> ->
+          result = r
+          loop = false
+        }
+        while (loop) {
+        }
+        result!!.fold({ throw it }, ::identity)
       }
-      while (loop) {
-      }
-      return result!!.fold({ throw it }, ::identity)
     }
 
-  }
+    override fun toString(): String = "Fx(...)"
 
-  override fun toString(): String = "Fx(...)"
+  }
 
 }

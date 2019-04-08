@@ -80,6 +80,7 @@ object Platform {
     }
 
     /** Builds an iterator out of this stack. */
+    @Suppress("IteratorNotThrowingNoSuchElementException")
     fun iteratorReversed(): Iterator<A> =
       object : Iterator<A> {
         private var array = this@ArrayStack.array
@@ -87,7 +88,6 @@ object Platform {
 
         override fun hasNext(): Boolean =
           index > 0 || (array.getOrNull(0) != null)
-
 
         override fun next(): A {
           if (index == 0) {

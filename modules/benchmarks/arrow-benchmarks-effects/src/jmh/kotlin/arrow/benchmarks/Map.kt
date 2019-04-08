@@ -6,9 +6,9 @@ import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
 
 @State(Scope.Thread)
-@Fork(2)
-@Warmup(iterations = 10, time = 1, timeUnit = TimeUnit.SECONDS)
-@Measurement(iterations = 10)
+@Fork(1)
+@Warmup(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
+@Measurement(iterations = 5)
 @CompilerControl(CompilerControl.Mode.DONT_INLINE)
 open class Map {
 
@@ -24,26 +24,26 @@ open class Map {
   fun zioBatch120(): Long =
     arrow.benchmarks.effects.scala.zio.`Map$`.`MODULE$`.zioMapTest(12000 / 120, 120)
 
-  @Benchmark
-  fun catsOne(): Long =
-    arrow.benchmarks.effects.scala.cats.`Map$`.`MODULE$`.catsIOMapTest(12000, 1)
-
-  @Benchmark
-  fun catsBatch30(): Long =
-    arrow.benchmarks.effects.scala.cats.`Map$`.`MODULE$`.catsIOMapTest(12000 / 30, 30)
-
-  @Benchmark
-  fun catsBatch120(): Long =
-    arrow.benchmarks.effects.scala.cats.`Map$`.`MODULE$`.catsIOMapTest(12000 / 120, 120)
-
-  @Benchmark
-  fun ioOne(): Long = ioTest(12000, 1)
-
-  @Benchmark
-  fun ioBatch30(): Long = ioTest(12000 / 30, 30)
-
-  @Benchmark
-  fun ioBatch120(): Long = ioTest(12000 / 120, 120)
+//  @Benchmark
+//  fun catsOne(): Long =
+//    arrow.benchmarks.effects.scala.cats.`Map$`.`MODULE$`.catsIOMapTest(12000, 1)
+//
+//  @Benchmark
+//  fun catsBatch30(): Long =
+//    arrow.benchmarks.effects.scala.cats.`Map$`.`MODULE$`.catsIOMapTest(12000 / 30, 30)
+//
+//  @Benchmark
+//  fun catsBatch120(): Long =
+//    arrow.benchmarks.effects.scala.cats.`Map$`.`MODULE$`.catsIOMapTest(12000 / 120, 120)
+//
+//  @Benchmark
+//  fun ioOne(): Long = ioTest(12000, 1)
+//
+//  @Benchmark
+//  fun ioBatch30(): Long = ioTest(12000 / 30, 30)
+//
+//  @Benchmark
+//  fun ioBatch120(): Long = ioTest(12000 / 120, 120)
 
   @Benchmark
   fun fxOne(): Long =

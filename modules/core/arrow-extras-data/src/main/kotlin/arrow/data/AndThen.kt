@@ -71,7 +71,7 @@ sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
   fun <X> andThen(g: (B) -> X): AndThen<A, X> =
     when (this) {
       // Fusing calls up to a certain threshold, using the fusion technique implemented for `IO#map`
-      is Single -> if (index != maxStackDepthSize) Single(f andThen g, index + 1)
+      is Single -> if (index != maxStackDepthSize) Single({ a: A -> g(f(a)) }, index + 1)
       else andThenF(AndThen(g))
       else -> andThenF(AndThen(g))
     }

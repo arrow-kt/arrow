@@ -83,7 +83,7 @@ interface FxSyntax<F> : Concurrent<F>, BindSyntax<F> {
   suspend fun <A> attempt(fa: suspend () -> A): Kind<F, Either<Throwable, A>> =
     run<ApplicativeError<F, Throwable>, Kind<F, Either<Throwable, A>>> { fa.effect().attempt() }
 
-  private fun <A> bracketing(fb: Bracket<F, Throwable>.() -> Kind<F, A>): Kind<F, A> =
+  private fun <A>  bracketing(fb: Bracket<F, Throwable>.() -> Kind<F, A>): Kind<F, A> =
     run<Bracket<F, Throwable>, Kind<F, A>> { fb(this) }
 
   fun <A, B> bracketCase(

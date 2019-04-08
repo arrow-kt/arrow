@@ -1,6 +1,5 @@
 package arrow.effects
 
-
 import arrow.effects.extensions.fx.unsafeRun.runBlocking
 import arrow.effects.suspended.fx.Fx
 import arrow.test.UnitSpec

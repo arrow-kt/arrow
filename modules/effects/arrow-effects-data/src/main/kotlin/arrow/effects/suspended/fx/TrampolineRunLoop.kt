@@ -8,6 +8,7 @@ import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.startCoroutine
 import kotlin.coroutines.suspendCoroutine
 
+//TODO REMOVE
 object TrampolineRunLoop {
 
   @PublishedApi
@@ -77,6 +78,7 @@ object TrampolineRunLoop {
       }
     }
 
+    @Suppress("SwallowedException")
     private tailrec fun immediateLoop(task: Runnable): Unit {
       try {
         task.run()

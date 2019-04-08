@@ -30,11 +30,11 @@ open class Pure {
 
   @Benchmark
   fun fx(): Int =
-    unsafe { fxRunBlocking { fxPureLoop(0) } }
+    Fx.unsafeRunBlocking(fxPureLoop(0))
 
   @Benchmark
   fun io(): Int =
-    unsafe { ioRunBlocking { ioPureLoop(0) } }
+    ioPureLoop(0).unsafeRunSync()
 
   @Benchmark
   fun catsIO(): Int =
