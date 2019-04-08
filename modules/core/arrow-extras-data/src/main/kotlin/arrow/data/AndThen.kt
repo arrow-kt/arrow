@@ -245,16 +245,17 @@ sealed class AndThen<A, B>(@JvmField private val tag: Int) : (A) -> B, AndThenOf
       }
       ConcatTag -> {
         self as Concat<*, *, *>
-        when (val oldLeft = self.left) {
-          is Single<*, *> -> {
-            val left = oldLeft as Single<Any?, Any?>
+        when (self.left.tag) {
+          SingleTag -> {
+            val left = self.left as Single<Any?, Any?>
             val newSelf = self.right as AndThen<Any?, Any?>
             loop(newSelf, left.f(current))
           }
-          is Concat<*, *, *> -> loop(
+          ConcatTag -> loop(
             rotateAccumulate(self.left as AndThen<Any?, Any?>, self.right as AndThen<Any?, Any?>),
             current
           )
+          else -> throw Impossible
         }
       }
       else -> throw Impossible
