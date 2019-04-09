@@ -353,7 +353,7 @@ internal object IORunLoop {
    * A `RestartCallback` gets created only once, per [startCancelable] (`unsafeRunAsync`) invocation, once an `Async`
    * state is hit, its job being to resume the loop after the boundary, but with the bind call-stack restored.
    */
-  private data class RestartCallback(val connInit: IOConnection, val cb: Callback) : Callback {
+  private class RestartCallback(connInit: IOConnection, val cb: Callback) : Callback {
 
     private var conn: IOConnection = connInit
     private var canCall = false

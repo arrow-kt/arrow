@@ -56,11 +56,8 @@ sealed class IO<out A> : IOOf<A> {
           val fa = try {
             k(conn2, callback)
           } catch (t: Throwable) {
-            if (NonFatal(t)) {
-              IO { callback(Left(t)) }
-            } else {
-              throw t
-            }
+            if (NonFatal(t)) IO { callback(Left(t)) }
+            else throw t
           }
 
           IORunLoop.startCancelable(fa, conn2) { result ->

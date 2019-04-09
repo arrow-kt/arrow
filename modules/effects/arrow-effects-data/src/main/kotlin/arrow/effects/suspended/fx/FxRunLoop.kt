@@ -1,12 +1,14 @@
 package arrow.effects.suspended.fx
 
 import arrow.core.Either
-import arrow.core.NonFatal
 import arrow.core.nonFatalOrThrow
+import arrow.core.*
 import arrow.effects.*
 import arrow.effects.IORunLoop.startCancelable
 import arrow.effects.internal.Platform
+import arrow.effects.suspended.fx.FxRunLoop.startCancelable
 import kotlin.coroutines.*
+import kotlin.coroutines.Continuation
 
 @Suppress("UNCHECKED_CAST")
 @PublishedApi
@@ -56,7 +58,7 @@ internal object FxRunLoop {
             null -> {
               cb(Either.Left((source as Fx.RaiseError<Any?>).error))
               return
-            } //An alternative to throwing would be nice..
+            }
             else -> {
               val error = (source as Fx.RaiseError<Any?>).error
               source = executeSafe { errorHandler.recover(error) }
@@ -97,6 +99,17 @@ internal object FxRunLoop {
           bFirst = source.fb as ((Any?) -> Fx<Any?>)?
           source = source.source.fix()
         }
+        AsyncTag -> {
+          if (restartCallback == null) {
+            restartCallback = RestartCallback(token.connection, cb)
+          }
+
+          restartCallback.prepare(bFirst, bRest)
+          // Return case for Async operations
+          source as Fx.Async<Any?>
+          source.proc(token.connection, restartCallback)
+          return
+        }
         ConnectionSwitchTag -> {
           source as Fx.ConnectionSwitch<Any?>
           val next = source.source
@@ -106,8 +119,8 @@ internal object FxRunLoop {
           val old = token.connection
           token.connection = modify(old)
           source = next as? Fx<Any?>
+
           if (token.connection != old) {
-            //We don't have this yet... RestartCallback is used to eliminate the need of Async boundary allocations.
             restartCallback?.contextSwitch(token.connection)
             if (restore != null) {
               source = Fx.FlatMap(next, FxRunLoop.RestoreContext(old, restore), 0)

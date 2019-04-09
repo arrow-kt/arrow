@@ -3,7 +3,7 @@ package arrow.effects.suspended.fx
 import arrow.Kind
 import arrow.core.*
 import arrow.data.AndThen
-import arrow.effects.IO
+import arrow.effects.*
 import arrow.effects.internal.Platform
 import arrow.effects.internal.UnsafePromise
 import arrow.effects.typeclasses.*
@@ -32,6 +32,7 @@ const val SingleTag = 2
 const val MapTag = 3
 const val FlatMapTag = 4
 const val ConnectionSwitchTag = 5
+const val AsyncTag = 6
 
 object Impossible : RuntimeException("Fx bug, please contact support! https://arrow-kt.io") {
   override fun fillInStackTrace(): Throwable = this
@@ -87,6 +88,7 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
       }
       SingleTag -> Fx.Map(this, f)
       ConnectionSwitchTag -> Fx.Map(this, f)
+      AsyncTag -> Fx.Map(this, f)
       MapTag -> {
         this as Fx.Map<Any?, Any?>
         val ff = f as (Any?) -> Any?
@@ -113,6 +115,7 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
       MapTag -> FxRunLoop(this)
       FlatMapTag -> FxRunLoop(this)
       ConnectionSwitchTag -> FxRunLoop(this)
+      AsyncTag -> FxRunLoop(this)
       else -> throw Impossible
     }
 
@@ -124,10 +127,11 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
         this as Fx.Pure<A>
 //        if(index != Platform.maxStackDepthSize) Fx.Pure(FxRunLoop(f(value).fix()), index + 1)
 //        else
-          Fx.FlatMap(this, f, 0)
+        Fx.FlatMap(this, f, 0)
       }
       SingleTag -> Fx.FlatMap(this, f, 0)
       ConnectionSwitchTag -> Fx.FlatMap(this, f, 0)
+      AsyncTag -> Fx.FlatMap(this, f, 0)
       MapTag -> {
         this as Fx.Map<B, A>
         //We can do fusion between an map-flatMap boundary
@@ -198,6 +202,8 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
     val modify: (FxConnection) -> FxConnection,
     val restore: ((Any?, Throwable?, FxConnection, FxConnection) -> FxConnection)?) : Fx<A>(ConnectionSwitchTag) {
 
+    override fun toString(): String = "Fx.ConnectionSwitch(...)"
+
     companion object {
       //Internal reusable reference.
       val makeUncancelable: (FxConnection) -> FxConnection = { NonCancelable.connection }
@@ -206,6 +212,11 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
         old
       }
     }
+  }
+
+  @PublishedApi
+  internal class Async<A>(val proc: FxProc<A>) : Fx<A>(AsyncTag) {
+    override fun toString(): String = "Fx.Async(..)"
   }
 
   suspend inline operator fun invoke(): A =
@@ -322,44 +333,48 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
       }, 0)
 
     /** Hide member because it's discouraged to use uncancelable builder for cancelable concrete type **/
-    @JvmStatic fun <A> async(fa: Proc<A>): Fx<A> = Fx {
-      suspendCoroutine<A> { continuation ->
-        fa { either ->
-          continuation.resumeWith(either.fold(Result.Companion::failure, Result.Companion::success))
-        }
-      }
-    }
+    @JvmStatic fun <A> async(fa: Proc<A>): Fx<A> = async { _, cb -> fa(cb) }
 
-    @JvmStatic fun <A> async(fa: FxProc<A>): Fx<A> = Fx {
-      suspendCoroutine<A> { continuation ->
-        val conn = (continuation.context[CancelContext] ?: NonCancelable).connection
-        //Is CancellationException from kotlin in kotlinx package???
-        conn.push(Fx { continuation.resumeWith(Result.failure(CancellationException())) })
-        fa(conn) { either ->
-          continuation.resumeWith(either.fold(Result.Companion::failure, Result.Companion::success))
+    @JvmStatic fun <A> async(fa: FxProc<A>): Fx<A> =
+      Fx.Async { conn: FxConnection, ff: (Either<Throwable, A>) -> Unit ->
+        Platform.onceOnly(ff).let { callback: (Either<Throwable, A>) -> Unit ->
+          try {
+            fa(conn, callback)
+          } catch (throwable: Throwable) {
+            if (NonFatal(throwable)) {
+              callback(Either.Left(throwable))
+            } else {
+              throw throwable
+            }
+          }
         }
       }
-    }
+
 
     /** Hide member because it's discouraged to use uncancelable builder for cancelable concrete type **/
-    @JvmStatic fun <A> asyncF(fa: ProcF<ForFx, A>): Fx<A> = Fx {
-      suspendCoroutine<A> { continuation ->
-        fa { either ->
-          continuation.resumeWith(either.fold(Result.Companion::failure, Result.Companion::success))
-        }.fix().foldContinuation(EmptyCoroutineContext, mapUnit)
-      }
-    }
+    @JvmStatic fun <A> asyncF(fa: ProcF<ForFx, A>): Fx<A> = asyncF { _, cb -> fa(cb) }
 
-    @JvmStatic fun <A> asyncF(fa: FxProcF<A>): Fx<A> = Fx {
-      suspendCoroutine<A> { continuation ->
-        val conn = (continuation.context[CancelContext] ?: NonCancelable).connection
-        //Is CancellationException from kotlin in kotlinx package???
-        conn.push(Fx { continuation.resumeWith(Result.failure(CancellationException())) })
-        fa(conn) { either ->
-          continuation.resumeWith(either.fold(Result.Companion::failure, Result.Companion::success))
-        }.fix().foldContinuation(EmptyCoroutineContext, mapUnit)
+    @JvmStatic fun <A> asyncF(fa: FxProcF<A>): Fx<A> =
+      Fx.Async { conn: FxConnection, ff: (Either<Throwable, A>) -> Unit ->
+        val conn2 = FxConnection()
+        conn.push(conn2.cancel())
+        Platform.onceOnly(conn, ff).let { callback: (Either<Throwable, A>) -> Unit ->
+          val fx = try {
+            fa(conn2, callback)
+          } catch (t: Throwable) {
+            if (NonFatal(t)) Fx { callback(Either.Left(t)) }
+            else throw t
+          }
+
+          FxRunLoop.startCancelable(fx, CancelContext(conn2)) { result ->
+            // DEV: If fa cancels conn2 like so `conn.cancel().map { cb(Right(Unit)) }`
+            // It doesn't run the stack of conn2, instead the result is seen in the cb of startCancelable.
+            val resultCancelled = result.fold({ e -> e == OnCancel.CancellationException }, { false })
+            if (resultCancelled && conn.isNotCanceled()) FxRunLoop.start(conn.cancel(), cb = mapUnit)
+            else Unit
+          }
+        }
       }
-    }
 
     @JvmStatic fun <A> unsafeRunBlocking(fx: FxOf<A>): A = when (val fa = fx.fix()) {
       is Pure -> fa.value
@@ -386,9 +401,9 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
     @JvmStatic fun <A> runNonBlocking(fx: FxOf<A>, cb: (Either<Throwable, A>) -> Unit): Unit =
       FxRunLoop.start(fx, cb)
 
-    override fun toString(): String = "Fx(...)"
-
   }
+
+  override fun toString(): String = "Fx(...)"
 
 }
 
