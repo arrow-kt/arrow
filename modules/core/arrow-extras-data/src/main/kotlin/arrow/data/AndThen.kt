@@ -5,6 +5,13 @@ import arrow.higherkind
 
 operator fun <A, B> AndThenOf<A, B>.invoke(a: A): B = fix().invoke(a)
 
+const val SingleTag: Int = 0
+const val ConcatTag: Int = 1
+
+object Impossible : RuntimeException("AndThen bug, please contact support! https://arrow-kt.io") {
+  override fun fillInStackTrace(): Throwable = this
+}
+
 /**
  * [AndThen] wraps a function of shape `(A) -> B` and can be used to do function composition.
  * It's similar to [arrow.core.andThen] and [arrow.core.compose] and can be used to build stack safe
@@ -37,11 +44,17 @@ operator fun <A, B> AndThenOf<A, B>.invoke(a: A): B = fix().invoke(a)
  *
  */
 @higherkind
-sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
+sealed class AndThen<A, B>(@JvmField private val tag: Int) : (A) -> B, AndThenOf<A, B> {
 
-  private data class Single<A, B>(val f: (A) -> B, val index: Int) : AndThen<A, B>()
+  private data class Single<A, B>(
+    @JvmField val f: (A) -> B,
+    @JvmField val index: Int
+  ) : AndThen<A, B>(SingleTag)
 
-  private data class Concat<A, E, B>(val left: AndThen<A, E>, val right: AndThen<E, B>) : AndThen<A, B>() {
+  private data class Concat<A, E, B>(
+    @JvmField val left: AndThen<A, E>,
+    @JvmField val right: AndThen<E, B>
+  ) : AndThen<A, B>(ConcatTag) {
     override fun toString(): String = "AndThen.Concat(...)"
   }
 
@@ -69,10 +82,12 @@ sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
    * and then applies [g] to the result.
    */
   fun <X> andThen(g: (B) -> X): AndThen<A, X> =
-    when (this) {
+    when (tag) {
       // Fusing calls up to a certain threshold, using the fusion technique implemented for `IO#map`
-      is Single -> if (index != maxStackDepthSize) Single({ a: A -> g(f(a)) }, index + 1)
-      else andThenF(AndThen(g))
+      SingleTag -> {
+        this as Single<A, B>
+        if (index != maxStackDepthSize) Single({ a: A -> g(f(a)) }, index + 1) else andThenF(AndThen(g))
+      }
       else -> andThenF(AndThen(g))
     }
 
@@ -100,10 +115,13 @@ sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
    * and then applies this function to the result.
    */
   infix fun <C> compose(g: (C) -> A): AndThen<C, B> =
-    when (this) {
+    when (tag) {
       // Fusing calls up to a certain threshold, using the fusion technique implemented for `IO#map`
-      is Single -> if (index != maxStackDepthSize) Single(f compose g, index + 1)
-      else composeF(AndThen(g))
+      SingleTag -> {
+        this as Single<A, B>
+        if (index != maxStackDepthSize) Single(f compose g, index + 1)
+        else composeF(AndThen(g))
+      }
       else -> composeF(AndThen(g))
     }
 
@@ -161,7 +179,7 @@ sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
       AndThen { b }
 
     fun <A> id(): AndThen<A, A> =
-      AndThen(::identity)
+      AndThen.invoke(::identity)
 
     /**
      * Wraps a function in [AndThen].
@@ -219,32 +237,43 @@ sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
   private fun <X> composeF(right: AndThen<X, A>): AndThen<X, B> = Concat(right, this)
 
   @Suppress("UNCHECKED_CAST")
-  private tailrec fun loop(self: AndThen<Any?, Any?>, current: Any?): B = when (self) {
-    is Single -> self.f(current) as B
-    is Concat<*, *, *> -> {
-      when (val oldLeft = self.left) {
-        is Single<*, *> -> {
-          val left = oldLeft as Single<Any?, Any?>
-          val newSelf = self.right as AndThen<Any?, Any?>
-          loop(newSelf, left.f(current))
-        }
-        is Concat<*, *, *> -> loop(
-          rotateAccumulate(self.left as AndThen<Any?, Any?>, self.right as AndThen<Any?, Any?>),
-          current
-        )
+  private tailrec fun loop(self: AndThen<Any?, Any?>, current: Any?): B =
+    when (self.tag) {
+      SingleTag -> {
+        self as Single<Any?, *>
+        self.f(current) as B
       }
+      ConcatTag -> {
+        self as Concat<*, *, *>
+        when (self.left.tag) {
+          SingleTag -> {
+            val left = self.left as Single<Any?, Any?>
+            val newSelf = self.right as AndThen<Any?, Any?>
+            loop(newSelf, left.f(current))
+          }
+          ConcatTag -> loop(
+            rotateAccumulate(self.left as AndThen<Any?, Any?>, self.right as AndThen<Any?, Any?>),
+            current
+          )
+          else -> throw Impossible
+        }
+      }
+      else -> throw Impossible
     }
-  }
 
   @Suppress("UNCHECKED_CAST")
   private tailrec fun rotateAccumulate(
     left: AndThen<Any?, Any?>,
-    right: AndThen<Any?, Any?>): AndThen<Any?, Any?> = when (left) {
-    is Concat<*, *, *> -> rotateAccumulate(
-      left.left as AndThen<Any?, Any?>,
-      (left.right as AndThen<Any?, Any?>).andThenF(right)
-    )
-    is Single<*, *> -> left.andThenF(right)
+    right: AndThen<Any?, Any?>): AndThen<Any?, Any?> = when (left.tag) {
+    ConcatTag -> {
+      left as Concat<*, *, *>
+      rotateAccumulate(
+        left.left as AndThen<Any?, Any?>,
+        (left.right as AndThen<Any?, Any?>).andThenF(right)
+      )
+    }
+    SingleTag -> left.andThenF(right)
+    else -> throw Impossible
   }
 
 }
