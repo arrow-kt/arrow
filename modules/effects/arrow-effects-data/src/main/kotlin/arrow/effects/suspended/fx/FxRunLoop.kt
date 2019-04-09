@@ -2,13 +2,15 @@ package arrow.effects.suspended.fx
 
 import arrow.core.Either
 import arrow.core.NonFatal
+import arrow.core.nonFatalOrThrow
 import arrow.effects.*
 import arrow.effects.IORunLoop.startCancelable
 import arrow.effects.internal.Platform
 import kotlin.coroutines.*
 
 @Suppress("UNCHECKED_CAST")
-object FxRunLoop {
+@PublishedApi
+internal object FxRunLoop {
 
   suspend operator fun <A> invoke(source: FxOf<A>): A = suspendCoroutine { cont ->
     FxRunLoop.start(source) {
@@ -24,9 +26,8 @@ object FxRunLoop {
                           cb: (Either<Throwable, A>) -> Unit): Unit =
     FxRunLoop.loop(fa, token, cb as (Either<Throwable, Any?>) -> Unit, null, null, null)
 
-  @PublishedApi
   @Suppress("CollapsibleIfStatements", "ReturnCount")
-  internal fun loop(fa: FxOf<Any?>,
+  fun loop(fa: FxOf<Any?>,
                     currToken: CancelContext,
                     cb: (Either<Throwable, Any?>) -> Unit,
                     rcbRef: RestartCallback?,
@@ -132,9 +133,8 @@ object FxRunLoop {
     }
   }
 
-  @PublishedApi
   @Suppress("ReturnCount")
-  internal fun findErrorHandlerInCallStack(bFirst: ((Any?) -> Fx<Any?>)?, bRest: Platform.ArrayStack<(Any?) -> Fx<Any?>>?): FxFrame<Any?, Fx<Any?>>? {
+  fun findErrorHandlerInCallStack(bFirst: ((Any?) -> Fx<Any?>)?, bRest: Platform.ArrayStack<(Any?) -> Fx<Any?>>?): FxFrame<Any?, Fx<Any?>>? {
     if (bFirst != null && bFirst is FxFrame) {
       return bFirst
     } else if (bRest == null) {
@@ -160,16 +160,11 @@ object FxRunLoop {
     return result
   }
 
-  @PublishedApi
-  internal inline fun executeSafe(crossinline f: () -> FxOf<Any?>): Fx<Any?> =
+  private inline fun executeSafe(crossinline f: () -> FxOf<Any?>): Fx<Any?> =
     try {
       f().fix()
     } catch (e: Throwable) {
-      if (NonFatal(e)) {
-        Fx.RaiseError(e)
-      } else {
-        throw e
-      }
+      Fx.RaiseError(e.nonFatalOrThrow())
     }
 
   /**

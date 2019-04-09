@@ -1,12 +1,11 @@
 package arrow.effects.suspended.fx
 
 import arrow.Kind
-import arrow.core.Either
-import arrow.core.identity
-import arrow.core.nonFatalOrThrow
+import arrow.core.*
 import arrow.data.AndThen
 import arrow.effects.IO
 import arrow.effects.internal.Platform
+import arrow.effects.internal.UnsafePromise
 import arrow.effects.typeclasses.*
 import arrow.typeclasses.Continuation
 import java.util.concurrent.CancellationException
@@ -117,7 +116,6 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
       else -> throw Impossible
     }
 
-
   @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
   inline fun <B> flatMap(noinline f: (A) -> FxOf<B>): Fx<B> =
     when (tag) {
@@ -136,24 +134,14 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
         Fx.FlatMap(source, { f(g(it)) }, 1)
       }
       FlatMapTag -> {
-
-        this as Fx.FlatMap<Any?, Any?>
-        val ff = f as (Any?) -> Fx<Any?>
-        //AndThen composes the functions in a stack-safe way by running them in a while loop.
-        this.fb = AndThen(this.fb).andThen(ff)
-        this as Fx<B>
-        this
-//
-//
-//
-//        if (index != Platform.maxStackDepthSize) Fx.FlatMap(this, f, 0)
-//        else Fx.FlatMap(source, { a ->
-//          println("async jump on flatMap fx")
-//          Fx.Single {
-//            val b = !fb(a)
-//            !f(b)
-//          }
-//        }, index + 1)
+        this as Fx.FlatMap<B, A>
+        if (index != Platform.maxStackDepthSize) Fx.FlatMap(this, f, 0)
+        else Fx.FlatMap(source, { a ->
+          Fx.Single {
+            val b = !fb(a)
+            !f(b)
+          }
+        }, index + 1)
       }
       else -> throw Impossible
     }
@@ -266,6 +254,24 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
   fun continueOn(ctx: CoroutineContext): Fx<A> =
     unit.map { foldContinuation(ctx) { throw it } }
 
+  fun <A> fork(ctx: CoroutineContext): Fx<Fiber<ForFx, A>> = Fx {
+    val promise = UnsafePromise<A>()
+    val conn = FxConnection()
+    val oldConn = coroutineContext[CancelContext]?.connection
+    oldConn?.push(conn.cancel())
+    conn.push(oldConn?.cancel() ?: Fx.unit)
+
+
+    FxRunLoop.startCancelable(unit.continueOn(ctx).flatMap { this }, CancelContext(conn)) { either ->
+      either.fold(
+        { promise.complete(Either.Left(it)) },
+        { promise.complete(Either.Right(it) as Either<Throwable, A>) }
+      )
+    }
+
+    FxFiber(promise, conn)
+  }
+
   /** Makes the source [IO] uncancelable such that a [Fiber.cancel] signal has no effect. */
   fun uncancelable(): Fx<A> =
     Fx.ConnectionSwitch(this, Fx.ConnectionSwitch.makeUncancelable, { _, _, old, _ -> old })
@@ -355,9 +361,9 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
       }
     }
 
-    //TODO
     @JvmStatic fun <A> unsafeRunBlocking(fx: FxOf<A>): A = when (val fa = fx.fix()) {
       is Pure -> fa.value
+      is RaiseError -> throw fa.error
       else -> {
         var loop = true
         var result: Either<Throwable, A>? = null
@@ -371,8 +377,33 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
       }
     }
 
+    @JvmStatic fun <A> runNonBlockingCancellable(fx: FxOf<A>, cb: (Either<Throwable, A>) -> Unit): Disposable {
+      val conn = FxConnection()
+      FxRunLoop.startCancelable(fx, CancelContext(conn), cb)
+      return conn.toDisposable()
+    }
+
+    @JvmStatic fun <A> runNonBlocking(fx: FxOf<A>, cb: (Either<Throwable, A>) -> Unit): Unit =
+      FxRunLoop.start(fx, cb)
+
     override fun toString(): String = "Fx(...)"
 
   }
 
+}
+
+@Suppress("FunctionName")
+internal fun <A> FxFiber(promise: UnsafePromise<A>, conn: FxConnection): Fiber<ForFx, A> {
+  val join: Fx<A> = Fx.async { conn2, cb ->
+    val cb2: (Either<Throwable, A>) -> Unit = {
+      cb(it)
+      conn2.pop()
+      conn.pop()
+    }
+
+    conn2.push(Fx { promise.remove(cb2) })
+    conn.push(conn2.cancel())
+    promise.get(cb2)
+  }
+  return Fiber(join, conn.cancel())
 }

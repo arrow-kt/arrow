@@ -26,12 +26,6 @@ interface Fx2Dispatchers : Dispatchers<ForFx> {
 
 val NonBlocking: CoroutineContext = Fx.dispatchers().default()
 
-fun <A> FxOf<A>.runNonBlockingCancellable(cb: (Either<Throwable, A>) -> Unit): Disposable {
-  val conn = FxConnection()
-  FxRunLoop.startCancelable(fix(), CancelContext(conn), cb)
-  return { FxRunLoop.start(conn.cancel(), mapUnit) }
-}
-
 @extension
 interface Fx2UnsafeRun : UnsafeRun<ForFx> {
 
@@ -39,7 +33,7 @@ interface Fx2UnsafeRun : UnsafeRun<ForFx> {
     Fx.unsafeRunBlocking(fa())
 
   override suspend fun <A> unsafe.runNonBlocking(fa: () -> FxOf<A>, cb: (Either<Throwable, A>) -> Unit) =
-    FxRunLoop.start(fa(), cb)
+    Fx.runNonBlocking(fa(), cb)
 }
 
 @extension
@@ -143,22 +137,8 @@ interface Fx2Concurrent : Concurrent<ForFx>, Fx2Async {
   override fun <A> asyncF(fa: FxProcF<A>): Fx<A> =
     Fx.asyncF(fa)
 
-  override fun <A> CoroutineContext.fork(fa: FxOf<A>): Fx<Fiber<ForFx, A>> = Fx {
-    val promise = UnsafePromise<A>()
-    val conn = FxConnection()
-    val oldConn = coroutineContext[CancelContext]?.connection
-    oldConn?.push(conn.cancel())
-    conn.push(oldConn?.cancel() ?: Fx.unit)
-
-    FxRunLoop.startCancelable(shift().followedBy(fa), CancelContext(conn)) { either ->
-      either.fold(
-        { promise.complete(it.left()) },
-        { promise.complete(it.right()) }
-      )
-    }
-
-    FxFiber(promise, conn)
-  }
+  override fun <A> CoroutineContext.fork(fa: FxOf<A>): Fx<Fiber<ForFx, A>> =
+    fa.fix().fork(this)
 
   override fun <A, B> CoroutineContext.racePair(fa: FxOf<A>, fb: FxOf<B>): Fx<RacePair<ForFx, A, B>> =
     Fx.racePair(this@racePair, fa, fb)

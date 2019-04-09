@@ -22,7 +22,7 @@ class CancelContext(var connection: FxConnection) : AbstractCoroutineContextElem
   override fun toString(): String = "CancelContext(connection=$connection)"
 }
 
-fun FxConnection.toDisposable(): Disposable = { FxRunLoop.start(cancel(), cb = mapUnit) }
+fun FxConnection.toDisposable(): Disposable = { FxRunLoop.start(cancel(), mapUnit) }
 typealias FxConnection = KindConnection<ForFx>
 
 @Suppress("UNUSED_PARAMETER", "FunctionName")

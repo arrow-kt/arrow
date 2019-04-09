@@ -5,7 +5,6 @@ import arrow.core.Right
 import arrow.core.left
 import arrow.effects.extensions.fx.bracket.bracket
 import arrow.effects.extensions.fx.unsafeRun.runBlocking
-import arrow.effects.extensions.runNonBlockingCancellable
 import arrow.effects.suspended.fx.*
 import arrow.test.UnitSpec
 import arrow.test.laws.BracketLaws
@@ -89,14 +88,15 @@ class FxTest : UnitSpec() {
       val latch = CountDownLatch(1)
       var result: Either<Throwable, Boolean>? = null
 
-      Fx { ctxA = kotlin.coroutines.coroutineContext[CancelContext]!!.connection }
-        .flatMap { Fx { ctxB = kotlin.coroutines.coroutineContext[CancelContext]!!.connection }.uncancelable() }
-        .flatMap { Fx { ctxC = kotlin.coroutines.coroutineContext[CancelContext]!!.connection } }
-        .flatMap { Fx { ctxA == ctxC && ctxA != ctxB && ctxB is KindConnection.Uncancelable } }
-        .runNonBlockingCancellable {
-          result = it
-          latch.countDown()
-        }
+      Fx.runNonBlockingCancellable(
+        Fx { ctxA = kotlin.coroutines.coroutineContext[CancelContext]!!.connection }
+          .flatMap { Fx { ctxB = kotlin.coroutines.coroutineContext[CancelContext]!!.connection }.uncancelable() }
+          .flatMap { Fx { ctxC = kotlin.coroutines.coroutineContext[CancelContext]!!.connection } }
+          .flatMap { Fx { ctxA == ctxC && ctxA != ctxB && ctxB is KindConnection.Uncancelable } }
+      ) {
+        result = it
+        latch.countDown()
+      }
 
       latch.await()
       result shouldBe Right(true)
