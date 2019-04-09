@@ -27,14 +27,14 @@ open class AttemptRaisedError {
   private fun fxLoopNotHappy(size: Int, i: Int): Fx<Int> =
     if (i < size) {
       Fx { throw dummy }.attempt().flatMap {
-        it.fold({ fxLoopNotHappy(size, i + 1) }) { n -> Fx.just(n) }
+        it.fold({ fxLoopNotHappy(size, i + 1) }, Fx.Companion::just)
       }
     } else Fx.just(1)
 
   private fun ioLoopNotHappy(size: Int, i: Int): IO<Int> =
     if (i < size) {
       IO { throw dummy }.attempt().flatMap {
-        it.fold({ ioLoopNotHappy(size, i + 1) }) { n -> IO.just(n) }
+        it.fold({ ioLoopNotHappy(size, i + 1) }, IO.Companion::just)
       }
     } else IO.just(1)
 

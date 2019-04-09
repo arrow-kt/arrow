@@ -4,7 +4,6 @@ import arrow.core.Either
 import arrow.core.Right
 import arrow.core.left
 import arrow.effects.extensions.fx.bracket.bracket
-import arrow.effects.extensions.fx.monad.flatMap
 import arrow.effects.extensions.fx.unsafeRun.runBlocking
 import arrow.effects.extensions.runNonBlockingCancellable
 import arrow.effects.suspended.fx.*

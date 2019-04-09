@@ -172,7 +172,7 @@ interface Async<F> : MonadDefer<F> {
    * ```
    */
   fun <A> defer(ctx: CoroutineContext, f: () -> Kind<F, A>): Kind<F, A> =
-    just(Unit).continueOn(ctx).flatMap { defer(f) }
+    just(Unit).continueOn(ctx).flatMap { f() }
 
   /**
    * Shift evaluation to provided [CoroutineContext].

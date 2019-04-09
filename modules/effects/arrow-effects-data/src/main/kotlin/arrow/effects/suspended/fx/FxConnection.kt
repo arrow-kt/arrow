@@ -9,7 +9,7 @@ import arrow.effects.typeclasses.mapUnit
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.CoroutineContext
 
-//Can we somehow share this across arrow-effects-data and arrow-effects-io-extensions..
+//TODO consider if we really need to compared to just a connection in the runloop. Does this have any extra benefits?
 @Suppress("EqualsWithHashCodeExist")
 class CancelContext(var connection: FxConnection) : AbstractCoroutineContextElement(CancelContext) {
   companion object Key : CoroutineContext.Key<CancelContext>

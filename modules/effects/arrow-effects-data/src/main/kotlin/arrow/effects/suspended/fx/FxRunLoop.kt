@@ -1,12 +1,10 @@
 package arrow.effects.suspended.fx
 
 import arrow.core.Either
-import arrow.core.Left
 import arrow.core.NonFatal
-import arrow.core.Right
 import arrow.effects.*
+import arrow.effects.IORunLoop.startCancelable
 import arrow.effects.internal.Platform
-import arrow.effects.typeclasses.mapUnit
 import kotlin.coroutines.*
 
 @Suppress("UNCHECKED_CAST")
@@ -18,40 +16,45 @@ object FxRunLoop {
     }
   }
 
-  fun <A> start(source: FxOf<A>,
-                           ctx: CoroutineContext = EmptyCoroutineContext,
-                           cb: (Either<Throwable, A>) -> Unit): Unit =
-    suspend {
-    loop(source, NonCancelable, cb)
-  }.startCoroutine(Continuation(ctx, mapUnit))
+  fun <A> start(source: FxOf<A>, cb: (Either<Throwable, A>) -> Unit): Unit =
+    FxRunLoop.loop(source, NonCancelable, cb as (Either<Throwable, Any?>) -> Unit, null, null, null)
 
   fun <A> startCancelable(fa: FxOf<A>,
-                                     token: CancelContext,
-                                     ctx: CoroutineContext = EmptyCoroutineContext,
-                                     cb: (Either<Throwable, A>) -> Unit): Unit = suspend {
-    loop(fa, token, cb)
-  }.startCoroutine(Continuation(ctx + token, mapUnit))
+                          token: CancelContext,
+                          cb: (Either<Throwable, A>) -> Unit): Unit =
+    FxRunLoop.loop(fa, token, cb as (Either<Throwable, Any?>) -> Unit, null, null, null)
 
   @PublishedApi
   @Suppress("CollapsibleIfStatements", "ReturnCount")
-  internal suspend fun <A> loop(fa: FxOf<A>, currToken: CancelContext, cb: (Either<Throwable, A>) -> Unit): Unit {
+  internal fun loop(fa: FxOf<Any?>,
+                    currToken: CancelContext,
+                    cb: (Either<Throwable, Any?>) -> Unit,
+                    rcbRef: RestartCallback?,
+                    bFirstRef: ((Any?) -> Fx<Any?>)?,
+                    bRestRef: Platform.ArrayStack<(Any?) -> Fx<Any?>>?): Unit {
+
     val token: CancelContext = currToken
     var source: Fx<Any?>? = fa as Fx<Any?>
-    var bFirst: ((Any?) -> Fx<Any?>)? = null
-    var bRest: Platform.ArrayStack<(Any?) -> Fx<Any?>>? = null
+    var restartCallback: RestartCallback? = rcbRef
+    var bFirst: ((Any?) -> Fx<Any?>)? = bFirstRef
+    var bRest: Platform.ArrayStack<(Any?) -> Fx<Any?>>? = bRestRef
     var hasResult = false
     var result: Any? = null
 
     while (true) {
       val isCancelled = token.connection.isCanceled()
-      if (isCancelled) cb(Left(OnCancel.CancellationException))
+      if (isCancelled) {
+        cb(Either.Left(OnCancel.CancellationException))
+        return
+      }
       val tag = source?.tag ?: UnknownTag
       when (tag) {
         RaiseErrorTag -> {
           val errorHandler: FxFrame<Any?, Fx<Any?>>? = findErrorHandlerInCallStack(bFirst, bRest)
           when (errorHandler) {
             null -> {
-              cb(Left((source as Fx.RaiseError<Any?>).error))
+              cb(Either.Left((source as Fx.RaiseError<Any?>).error))
+              return
             } //An alternative to throwing would be nice..
             else -> {
               val error = (source as Fx.RaiseError<Any?>).error
@@ -65,8 +68,14 @@ object FxRunLoop {
           hasResult = true
         }
         SingleTag -> {
-          result = (source as Fx.Single<Any?>).source.invoke() //Stack safe since wraps single stack-safe suspend function.
-          hasResult = true
+          if (restartCallback == null) {
+            restartCallback = RestartCallback(token.connection, cb)
+          }
+          restartCallback.prepare(bFirst, bRest)
+
+          //Run the suspend function in the async boundary and return
+          (source as Fx.Single<Any?>).source.startCoroutine(restartCallback)
+          return
         }
         MapTag -> {
           if (bFirst != null) {
@@ -98,7 +107,7 @@ object FxRunLoop {
           source = next as? Fx<Any?>
           if (token.connection != old) {
             //We don't have this yet... RestartCallback is used to eliminate the need of Async boundary allocations.
-//            rcb.contextSwitch(conn)
+            restartCallback?.contextSwitch(token.connection)
             if (restore != null) {
               source = Fx.FlatMap(next, FxRunLoop.RestoreContext(old, restore), 0)
             }
@@ -111,8 +120,8 @@ object FxRunLoop {
         val nextBind = popNextBind(bFirst, bRest)
 
         if (nextBind == null) {
-          cb(Right(result as A))
-          break
+          cb(Either.Right(result))
+          return
         } else {
           source = executeSafe { nextBind(result) }
           hasResult = false
@@ -198,6 +207,57 @@ object FxRunLoop {
     override fun recover(e: Throwable): Fx<Any?> = Fx.ConnectionSwitch(Fx.RaiseError(e), { current ->
       restore(null, e, old, current)
     }, null)
+  }
+
+  /**
+   * A `RestartCallback` gets created only once, per [startCancelable] (`unsafeRunAsync`) invocation, once an `Async`
+   * state is hit, its job being to resume the loop after the boundary, but with the bind call-stack restored.
+   */
+  //TODO double check that `EmptyCoroutineContext + CancelContext(conn)` is actually what we want here.
+  @PublishedApi
+  internal class RestartCallback(connInit: FxConnection, val cb: (Either<Throwable, Any?>) -> Unit) : (Either<Throwable, Any?>) -> Unit, Continuation<Any?> {
+
+    private var conn: FxConnection = connInit
+    private var canCall = false
+    private var bFirst: ((Any?) -> Fx<Any?>)? = null
+    private var bRest: (Platform.ArrayStack<(Any?) -> Fx<Any?>>)? = null
+
+    fun contextSwitch(conn: FxConnection): Unit {
+      this.conn = conn
+    }
+
+    fun prepare(bFirst: ((Any?) -> Fx<Any?>)?, bRest: (Platform.ArrayStack<(Any?) -> Fx<Any?>>)?): Unit {
+      canCall = true
+      this.bFirst = bFirst
+      this.bRest = bRest
+    }
+
+    override val context: CoroutineContext
+      get() = EmptyCoroutineContext + CancelContext(conn)
+
+    override fun resumeWith(result: Result<Any?>) {
+      if (canCall) {
+        canCall = false
+        val source = result.fold(
+          onSuccess = { Fx.Pure(it, 0) },
+          onFailure = { Fx.RaiseError<Any?>(it) }
+        )
+
+        FxRunLoop.loop(source, CancelContext(conn), cb, this, bFirst, bRest)
+      }
+    }
+
+    override operator fun invoke(either: Either<Throwable, Any?>): Unit {
+      if (canCall) {
+        canCall = false
+        val source: Fx<Any?> = when (either) {
+          is Either.Left -> Fx.RaiseError(either.a)
+          is Either.Right -> Fx.Pure(either.b, 0)
+        }
+
+        FxRunLoop.loop(source, CancelContext(conn), cb, this, bFirst, bRest)
+      }
+    }
   }
 
 }

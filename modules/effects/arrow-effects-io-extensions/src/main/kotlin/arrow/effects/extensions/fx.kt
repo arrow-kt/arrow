@@ -3,7 +3,9 @@ package arrow.effects.extensions
 import arrow.Kind
 import arrow.core.*
 import arrow.effects.IODispatchers
+import arrow.effects.extensions.fx.async.shift
 import arrow.effects.extensions.fx.dispatchers.dispatchers
+import arrow.effects.extensions.fx.monad.followedBy
 import arrow.effects.internal.Platform
 import arrow.effects.internal.UnsafePromise
 import arrow.effects.internal.asyncContinuation
@@ -26,8 +28,8 @@ val NonBlocking: CoroutineContext = Fx.dispatchers().default()
 
 fun <A> FxOf<A>.runNonBlockingCancellable(cb: (Either<Throwable, A>) -> Unit): Disposable {
   val conn = FxConnection()
-  FxRunLoop.startCancelable(fix(), CancelContext(conn), NonBlocking, cb)
-  return { FxRunLoop.start(conn.cancel(), cb = mapUnit) }
+  FxRunLoop.startCancelable(fix(), CancelContext(conn), cb)
+  return { FxRunLoop.start(conn.cancel(), mapUnit) }
 }
 
 @extension
@@ -37,7 +39,7 @@ interface Fx2UnsafeRun : UnsafeRun<ForFx> {
     Fx.unsafeRunBlocking(fa())
 
   override suspend fun <A> unsafe.runNonBlocking(fa: () -> FxOf<A>, cb: (Either<Throwable, A>) -> Unit) =
-    FxRunLoop.start(fa().fix(), NonBlocking, cb)
+    FxRunLoop.start(fa(), cb)
 }
 
 @extension
@@ -125,7 +127,8 @@ interface Fx2Async : Async<ForFx>, Fx2MonadDefer {
     Fx.asyncF(k)
 
   override fun <A> FxOf<A>.continueOn(ctx: CoroutineContext): Fx<A> =
-    ctx.shift().followedBy(fix()).fix()
+    fix().continueOn(ctx)
+
 }
 
 @extension
@@ -147,7 +150,7 @@ interface Fx2Concurrent : Concurrent<ForFx>, Fx2Async {
     oldConn?.push(conn.cancel())
     conn.push(oldConn?.cancel() ?: Fx.unit)
 
-    FxRunLoop.startCancelable(fa, CancelContext(conn), this) { either ->
+    FxRunLoop.startCancelable(shift().followedBy(fa), CancelContext(conn)) { either ->
       either.fold(
         { promise.complete(it.left()) },
         { promise.complete(it.right()) }
