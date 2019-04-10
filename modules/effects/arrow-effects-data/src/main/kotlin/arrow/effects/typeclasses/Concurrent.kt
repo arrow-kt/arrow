@@ -133,7 +133,7 @@ interface Concurrent<F> : Async<F> {
   fun <A> asyncF(fa: ConnectedProcF<F, A>): Kind<F, A>
 
   /**
-   * Create a new [F] that upon execution starts the receiver [F] within a [Fiber] on [this@startF].
+   * Create a new [F] that upon execution starts the receiver [F] within a [Fiber] on [this@startFiber].
    *
    * ```kotlin:ank:playground
    * import arrow.effects.*
@@ -153,9 +153,9 @@ interface Concurrent<F> : Async<F> {
    * }
    * ```
    *
-   * @receiver [F] to execute on [this@startF] within a new suspended [F].
-   * @param this@startF [CoroutineContext] to execute the source [F] on.
-   * @return [F] with suspended execution of source [F] on context [this@startF].
+   * @receiver [F] to execute on [this@startFiber] within a new suspended [F].
+   * @param this@startFiber [CoroutineContext] to execute the source [F] on.
+   * @return [F] with suspended execution of source [F] on context [this@startFiber].
    */
   fun <A> CoroutineContext.startFiber(kind: Kind<F, A>): Kind<F, Fiber<F, A>>
 
