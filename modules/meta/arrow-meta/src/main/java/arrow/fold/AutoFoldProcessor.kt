@@ -28,7 +28,7 @@ class AutoFoldProcessor : AbstractProcessor() {
       .getElementsAnnotatedWith(foldAnnotationClass)
       .map { element ->
         when {
-          element.let { it.kotlinMetadata as? KotlinClassMetadata }?.data?.classProto?.isSealed == true && !elementUtils.getPackageOf(element).isUnnamed -> {
+          element.let { it.kotlinMetadata as? KotlinClassMetadata }?.data?.classProto?.isSealed == true -> {
             val (nameResolver, classProto) = element.kotlinMetadata.let { it as KotlinClassMetadata }.data
 
             AnnotatedFold(
@@ -51,7 +51,7 @@ class AutoFoldProcessor : AbstractProcessor() {
 
           else -> knownError("""
             |$this is an invalid target for @autofold.
-            |Generation of fold is only supported for sealed classes within packages.
+            |Generation of fold is only supported for sealed classes.
             """.trimMargin())
         }
       }
