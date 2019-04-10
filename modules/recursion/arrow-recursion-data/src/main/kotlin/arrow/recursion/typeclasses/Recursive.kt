@@ -69,8 +69,7 @@ interface Recursive<T, F> {
    *
    * ```kotlin:ank:playground
    * import arrow.Kind
-   * import arrow.core.Eval
-   * import arrow.core.ForEval
+   * import arrow.core.*
    * import arrow.core.extensions.eval.monad.monad
    * import arrow.data.ListK
    * import arrow.data.k
@@ -79,6 +78,7 @@ interface Recursive<T, F> {
    * import arrow.recursion.pattern.ListF
    * import arrow.recursion.pattern.ListFPartialOf
    * import arrow.recursion.pattern.fix
+   * import arrow.recursion.extensions.listf.traverse.traverse
    *
    * fun main() {
    *  val sumAlgebra: AlgebraM<ListFPartialOf<Int>, ForEval, Int> = { list: Kind<ListFPartialOf<Int>, Int> ->
@@ -217,6 +217,12 @@ interface Recursive<T, F> {
    * The following example is shows stack-safety but since the 5000's fibonacci-number is higher than
    *  Long.MAX_VALUE the result is bullshit.
    * ```kotlin:ank:playground
+   * import arrow.recursion.CVAlgebraM
+   * import arrow.recursion.extensions.recursive
+   * import arrow.core.*
+   * import arrow.core.extensions.eval.monad.monad
+   * import arrow.core.extensions.option.traverse.traverse
+   *
    * fun main() {
    *  // fib 0 = 0
    *  // fib 1 = 1

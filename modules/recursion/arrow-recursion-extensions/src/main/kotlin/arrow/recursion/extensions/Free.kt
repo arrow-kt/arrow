@@ -16,8 +16,10 @@ import arrow.recursion.typeclasses.Birecursive
 import arrow.recursion.typeclasses.Corecursive
 import arrow.recursion.typeclasses.Recursive
 import arrow.typeclasses.*
+import arrow.undocumented
 
 @extension
+@undocumented
 interface FreeFFunctor<F, E> : Functor<FreeFPartialOf<F, E>> {
   fun FF(): Functor<F>
 

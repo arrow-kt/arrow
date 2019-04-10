@@ -16,8 +16,10 @@ import arrow.recursion.typeclasses.Birecursive
 import arrow.recursion.typeclasses.Corecursive
 import arrow.recursion.typeclasses.Recursive
 import arrow.typeclasses.*
+import arrow.undocumented
 
 @extension
+@undocumented
 interface ListFFunctor<I> : Functor<ListFPartialOf<I>> {
   override fun <R, S> Kind<ListFPartialOf<I>, R>.map(f: (R) -> S): Kind<ListFPartialOf<I>, S> =
     fix().map(f)

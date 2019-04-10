@@ -18,8 +18,10 @@ import arrow.recursion.typeclasses.Birecursive
 import arrow.recursion.typeclasses.Corecursive
 import arrow.recursion.typeclasses.Recursive
 import arrow.typeclasses.*
+import arrow.undocumented
 
 @extension
+@undocumented
 interface NonEmptyListFFunctor<I> : Functor<NonEmptyListFPartialOf<I>> {
   override fun <C, B> Kind<NonEmptyListFPartialOf<I>, C>.map(f: (C) -> B): Kind<NonEmptyListFPartialOf<I>, B> =
     fix().map(f)

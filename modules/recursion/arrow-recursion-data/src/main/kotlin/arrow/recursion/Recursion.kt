@@ -51,7 +51,7 @@ typealias CVCoalgebraM<F, M, A> = (A) -> Kind<M, Kind<F, FreeR<F, A>>>
  * typealias BinaryTreeFPartialOf<A> = Kind<ForBinaryTreeF, A>
  * typealias BinaryTreeOf<A, R> = Kind<BinaryTreeFPartialOf<A>, R>
  *
- * fun <A, R> BinaryTreeOf<A, R>.fix() = this as BinaryTreeF<A, R>
+ * fun <A, R> BinaryTreeOf<A, R>.fix(): BinaryTreeF<A, R> = this as BinaryTreeF<A, R>
  *
  * sealed class BinaryTreeF<A, R> : BinaryTreeOf<A, R> {
  *  class Empty<A, R> : BinaryTreeF<A, R>()
@@ -67,7 +67,7 @@ typealias CVCoalgebraM<F, M, A> = (A) -> Kind<M, Kind<F, FreeR<F, A>>>
  *  companion object {
  *    fun <A> functor() = object : Functor<BinaryTreeFPartialOf<A>> {
  *      override fun <B, C> Kind<BinaryTreeFPartialOf<A>, B>.map(f: (B) -> C): Kind<BinaryTreeFPartialOf<A>, C> =
- *        fix().map(f)
+ *        (this as BinaryTreeF<A, B>).map(f)
  *    }
  *
  *    fun <A> empty(): BinaryTree<A> = Fix(Empty())
@@ -87,6 +87,7 @@ typealias CVCoalgebraM<F, M, A> = (A) -> Kind<M, Kind<F, FreeR<F, A>>>
  *  }
  *
  * fun main() {
+ *   //sampleStart
  *  val unfold: Coalgebra<BinaryTreeFPartialOf<Int>, ListK<Int>> = {
  *    when {
  *      it.isEmpty() -> BinaryTreeF.Empty()
@@ -106,8 +107,9 @@ typealias CVCoalgebraM<F, M, A> = (A) -> Kind<M, Kind<F, FreeR<F, A>>>
  *    }
  *  }
  *
- * (0..100).shuffled().also(::println).k().hylo(fold, unfold, BinaryTreeF.functor())
- *  .toList().also(::println)
+ *  (0..100).shuffled().also(::println).k().hylo(fold, unfold, BinaryTreeF.functor())
+ *    .toList().also(::println)
+ *  //sampleEnd
  * }
  * ```
  *
