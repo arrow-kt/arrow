@@ -1,7 +1,7 @@
 package arrow.core
 
 import arrow.core.extensions.*
-import arrow.core.extensions.`try`.applicative.map
+import arrow.core.extensions.`try`.apply.map
 import arrow.core.extensions.`try`.eq.eq
 import arrow.core.extensions.`try`.functor.functor
 import arrow.core.extensions.`try`.hash.hash
