@@ -4,6 +4,7 @@ package arrow.core
  * Extractor of non-fatal Throwables. Will not match fatal errors like `VirtualMachineError`
  * (for example, `OutOfMemoryError` and `StackOverflowError`, subclasses of `VirtualMachineError`), `ThreadDeath`,
  * `LinkageError`, `InterruptedException`.
+ *
  * Checks whether the passed [t] Throwable is NonFatal.
  *
  * @param t the Throwable to check
