@@ -11,7 +11,7 @@ import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.undocumented
 
-//import arrow.higherkind
+// import arrow.higherkind
 
 class ForBox private constructor() {
   companion object
@@ -22,7 +22,7 @@ typealias BoxOf<A> = arrow.Kind<ForBox, A>
 inline fun <A> BoxOf<A>.fix(): Box<A> =
   this as Box<A>
 
-//@higherkind
+// @higherkind
 sealed class Box<out A> : BoxOf<A> {
 
   object Empty : Box<Nothing>()
@@ -32,7 +32,6 @@ sealed class Box<out A> : BoxOf<A> {
   companion object {
     fun <A> empty(): Box<A> = Empty
   }
-
 }
 
 @extension

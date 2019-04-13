@@ -42,7 +42,6 @@ data class Id<out A>(private val value: A) : IdOf<A> {
     }
 
   override fun hashCode(): Int = value.hashCode()
-
 }
 
 fun <A, B> Id<Either<A, B>>.select(f: IdOf<(A) -> B>): Id<B> =

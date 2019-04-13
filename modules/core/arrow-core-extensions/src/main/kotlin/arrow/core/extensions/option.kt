@@ -29,7 +29,7 @@ interface OptionSemigroup<A> : Semigroup<Option<A>> {
 @extension
 interface OptionSemigroupal : Semigroupal<ForOption> {
   override fun <A, B> Kind<ForOption, A>.product(fb: Kind<ForOption, B>): Kind<ForOption, Tuple2<A, B>> =
-    fb.fix().ap(this.map { a:A -> { b: B -> Tuple2(a,b)} })
+    fb.fix().ap(this.map { a: A -> { b: B -> Tuple2(a, b) } })
 }
 
 @extension
@@ -70,7 +70,7 @@ interface OptionSemiring<A> : Semiring<Option<A>> {
 }
 
 @extension
-interface OptionApplicativeError: ApplicativeError<ForOption, Unit>, OptionApplicative {
+interface OptionApplicativeError : ApplicativeError<ForOption, Unit>, OptionApplicative {
   override fun <A> raiseError(e: Unit): Option<A> =
     None
 
@@ -79,7 +79,7 @@ interface OptionApplicativeError: ApplicativeError<ForOption, Unit>, OptionAppli
 }
 
 @extension
-interface OptionMonadError: MonadError<ForOption, Unit>, OptionMonad {
+interface OptionMonadError : MonadError<ForOption, Unit>, OptionMonad {
   override fun <A> raiseError(e: Unit): OptionOf<A> =
     None
 
@@ -102,7 +102,6 @@ interface OptionEq<A> : Eq<Option<A>> {
       is Some -> false
     }
   }
-
 }
 
 @extension

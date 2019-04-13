@@ -27,7 +27,6 @@ abstract class EitherInstances<L> {
 
   @Provides
   fun eitherSemigroupK(ev: DaggerEitherSemigroupK<L>): SemigroupK<EitherPartialOf<L>> = ev
-
 }
 
 class DaggerEitherFunctor<F> @Inject constructor() : EitherFunctor<F>

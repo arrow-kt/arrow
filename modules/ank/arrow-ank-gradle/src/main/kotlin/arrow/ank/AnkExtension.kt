@@ -6,4 +6,5 @@ import java.io.File
 data class AnkExtension(
   var source: File? = null,
   var target: File? = null,
-  var classpath: FileCollection? = null)
+  var classpath: FileCollection? = null
+)

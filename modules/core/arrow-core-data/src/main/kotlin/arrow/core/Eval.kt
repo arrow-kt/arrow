@@ -79,7 +79,7 @@ sealed class Eval<out A> : EvalOf<A> {
         else -> fa
       }
 
-    //Enforce tailrec call to collapse inside compute loop
+    // Enforce tailrec call to collapse inside compute loop
     private fun <A> collapse1(fa: Eval<A>): Eval<A> = collapse(fa)
 
     @Suppress("UNCHECKED_CAST")

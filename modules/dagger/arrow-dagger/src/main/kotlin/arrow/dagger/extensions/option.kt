@@ -31,5 +31,4 @@ class OptionInstances {
 
   @Provides
   fun optionTraverse(): Traverse<ForOption> = Option.traverse()
-
 }

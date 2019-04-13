@@ -7,42 +7,42 @@ interface StringSemigroup : Semigroup<String> {
 }
 
 fun String.Companion.semigroup(): Semigroup<String> =
-  object : StringSemigroup{}
+  object : StringSemigroup {}
 
-interface StringMonoid: Monoid<String>, StringSemigroup {
+interface StringMonoid : Monoid<String>, StringSemigroup {
   override fun empty(): String = ""
 }
 
 fun String.Companion.monoid(): Monoid<String> =
-  object : StringMonoid{}
+  object : StringMonoid {}
 
 interface StringEq : Eq<String> {
   override fun String.eqv(b: String): Boolean = this == b
 }
 
 fun String.Companion.eq(): Eq<String> =
-  object : StringEq{}
+  object : StringEq {}
 
 interface StringShow : Show<String> {
   override fun String.show(): String = this
 }
 
 fun String.Companion.show(): Show<String> =
-  object : StringShow{}
+  object : StringShow {}
 
 interface StringOrder : Order<String> {
   override fun String.compare(b: String): Int = this.compareTo(b)
 }
 
 fun String.Companion.order(): Order<String> =
-  object : StringOrder{}
+  object : StringOrder {}
 
-interface StringHash: Hash<String>, StringEq {
+interface StringHash : Hash<String>, StringEq {
   override fun String.hash(): Int = hashCode()
 }
 
 fun String.Companion.hash(): Hash<String> =
-  object : StringHash{}
+  object : StringHash {}
 
 object StringContext : StringShow, StringOrder, StringMonoid
 

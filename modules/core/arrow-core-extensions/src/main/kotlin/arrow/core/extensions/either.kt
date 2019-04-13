@@ -141,7 +141,6 @@ interface EitherEq<in L, in R> : Eq<Either<L, R>> {
       is Either.Right -> EQR().run { this@eqv.b.eqv(b.b) }
     }
   }
-
 }
 
 @extension

@@ -33,7 +33,6 @@ abstract class EitherTInstances<F, L> {
 
   @Provides
   fun eitherTSemigroupK(ev: DaggerEitherTSemigroupK<F, L>): SemigroupK<EitherTPartialOf<F, L>> = ev
-
 }
 
 class DaggerEitherTFunctor<F, L> @Inject constructor(val FF: Functor<F>) : EitherTFunctor<F, L> {

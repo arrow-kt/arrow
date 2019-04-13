@@ -15,7 +15,6 @@ infix fun <A, B> PartialFunction<A, B>.orElse(f: PartialFunction<A, B>): Partial
       } else {
         f(x)
       }
-
   }
 
 fun <A, B> PartialFunction(definedAt: (A) -> Boolean, ifDefined: (A) -> B): PartialFunction<A, B> =

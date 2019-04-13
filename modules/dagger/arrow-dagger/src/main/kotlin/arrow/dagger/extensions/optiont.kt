@@ -30,7 +30,6 @@ abstract class OptionTInstances<F> {
 
   @Provides
   fun optionTMonoidK(ev: DaggerOptionTMonoidK<F>): MonoidK<OptionTPartialOf<F>> = ev
-
 }
 
 class DaggerOptionTFunctor<F> @Inject constructor(val FF: Functor<F>) : OptionTFunctor<F> {
@@ -47,7 +46,7 @@ class DaggerOptionTMonad<F> @Inject constructor(val FF: Monad<F>) : OptionTMonad
   override fun MF(): Monad<F> = FF
 }
 
-class DaggerOptionTApplicativeError<F, E> @Inject constructor(val AE: ApplicativeError<F, E> ) : OptionTApplicativeError<F, E> {
+class DaggerOptionTApplicativeError<F, E> @Inject constructor(val AE: ApplicativeError<F, E>) : OptionTApplicativeError<F, E> {
   override fun FF(): Functor<F> = AE
   override fun AF(): Applicative<F> = AE
   override fun AE(): ApplicativeError<F, E> = AE

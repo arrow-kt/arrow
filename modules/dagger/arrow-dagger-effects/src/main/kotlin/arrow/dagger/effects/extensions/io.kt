@@ -50,7 +50,6 @@ class IOInstances {
 
   @Provides
   fun ioEffect(): Effect<ForIO> = IO.effect()
-
 }
 
 class DaggerIOSemigroup<A> @Inject constructor(val monoidA: Monoid<A>) : IOSemigroup<A> {

@@ -140,9 +140,9 @@ private const val INT_MAX_POWER_OF_TWO: Int = Int.MAX_VALUE / 2 + 1
 
 infix fun <A, B> A.toT(b: B): Tuple2<A, B> = Tuple2(this, b)
 
-fun <K, V> Tuple2<K, V>.toPair() : Pair<K, V> = Pair(this.a, this.b)
+fun <K, V> Tuple2<K, V>.toPair(): Pair<K, V> = Pair(this.a, this.b)
 
-fun <K, V> Pair<K, V>.toTuple2() : Tuple2<K, V> = Tuple2(this.first, this.second)
+fun <K, V> Pair<K, V>.toTuple2(): Tuple2<K, V> = Tuple2(this.first, this.second)
 
 fun <K, V> mapOf(vararg tuples: Tuple2<K, V>): Map<K, V> =
   if (tuples.isNotEmpty()) tuples.toMap(LinkedHashMap(mapCapacity(tuples.size))) else emptyMap()

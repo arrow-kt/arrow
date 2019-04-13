@@ -20,5 +20,4 @@ class StringInstances {
 
   @Provides
   fun stringEq(): Eq<String> = String.eq()
-
 }

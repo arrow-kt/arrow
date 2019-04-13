@@ -39,5 +39,4 @@ class NonEmptyListInstances {
 
   @Provides
   fun nonEmptyListBimonad(): Bimonad<ForNonEmptyList> = NonEmptyList.bimonad()
-
 }

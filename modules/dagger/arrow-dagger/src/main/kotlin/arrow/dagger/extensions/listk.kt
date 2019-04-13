@@ -35,5 +35,4 @@ class ListKInstances {
 
   @Provides
   fun listKMonoidK(): MonoidK<ForListK> = ListK.monoidK()
-
 }

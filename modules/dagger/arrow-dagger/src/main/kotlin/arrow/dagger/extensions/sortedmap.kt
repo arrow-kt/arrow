@@ -21,7 +21,6 @@ abstract class SortedMapKInstances<K : Comparable<K>> {
 
   @Provides
   fun sortedMapKTraverse(ev: DaggerSortedMapKTraverse<K>): Traverse<SortedMapKPartialOf<K>> = ev
-
 }
 
 class DaggerSortedMapKFunctor<K : Comparable<K>> @Inject constructor() : SortedMapKFunctor<K>

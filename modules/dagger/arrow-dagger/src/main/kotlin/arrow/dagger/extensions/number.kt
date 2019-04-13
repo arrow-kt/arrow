@@ -97,5 +97,4 @@ class NumberInstances {
 
   @Provides
   fun floatHash(): Hash<Float> = Float.hash()
-
 }

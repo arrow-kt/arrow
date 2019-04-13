@@ -40,7 +40,6 @@ interface TryApplicativeError : ApplicativeError<ForTry, Throwable>, TryApplicat
 
   override fun <A> TryOf<A>.handleErrorWith(f: (Throwable) -> TryOf<A>): Try<A> =
     fix().recoverWith { f(it).fix() }
-
 }
 
 @extension
@@ -72,7 +71,6 @@ interface TryEq<A> : Eq<Try<A>> {
       is Success -> false
     }
   }
-
 }
 
 @extension

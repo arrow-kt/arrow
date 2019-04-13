@@ -27,5 +27,4 @@ class EvalInstances {
 
   @Provides
   fun evalBimonad(): Bimonad<ForEval> = Eval.bimonad()
-
 }

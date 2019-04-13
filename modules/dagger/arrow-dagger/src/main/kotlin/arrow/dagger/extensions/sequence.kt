@@ -35,5 +35,4 @@ class SequenceKInstances {
 
   @Provides
   fun sequenceKSemigroupK(): SemigroupK<ForSequenceK> = SequenceK.semigroupK()
-
 }
