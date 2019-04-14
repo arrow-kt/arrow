@@ -1,15 +1,28 @@
 package arrow.optics.extensions
 
 import arrow.Kind
-import arrow.core.*
-import arrow.data.k
+import arrow.core.Either
+import arrow.core.ListExtensions
+import arrow.core.Option
+import arrow.core.Try
+import arrow.core.Tuple2
+import arrow.core.identity
+import arrow.core.left
+import arrow.core.right
+import arrow.core.toOption
+import arrow.core.toT
 import arrow.core.extensions.option.applicative.applicative
-import arrow.optics.*
-import arrow.optics.typeclasses.*
+import arrow.data.k
+import arrow.optics.Optional
+import arrow.optics.POptional
+import arrow.optics.PPrism
+import arrow.optics.Prism
+import arrow.optics.Traversal
 import arrow.optics.typeclasses.Cons
 import arrow.optics.typeclasses.Each
 import arrow.optics.typeclasses.FilterIndex
 import arrow.optics.typeclasses.Index
+import arrow.optics.typeclasses.Snoc
 import arrow.typeclasses.Applicative
 
 fun <A> ListExtensions.traversal(): Traversal<List<A>, A> = ListTraversal()
@@ -61,7 +74,7 @@ interface ListFilterIndex<A> : FilterIndex<List<A>, Int, A> {
       s.mapIndexed { index, a -> a toT index }.k().traverse(FA) { (a, j) ->
         if (p(j)) f(a) else FA.just(a)
       }
-    }
+  }
 
   companion object {
     /**

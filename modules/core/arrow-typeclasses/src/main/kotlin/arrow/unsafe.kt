@@ -22,7 +22,6 @@ private class UnsafeContinuation<A>(
   override val context: CoroutineContext = EmptyCoroutineContext
 }
 
-
 @RestrictsSuspension
 object unsafe {
 
@@ -31,5 +30,4 @@ object unsafe {
     f.startCoroutine(this, c)
     return c.result.get()
   }
-
 }

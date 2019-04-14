@@ -115,7 +115,5 @@ interface Order<F> : Eq<F> {
     fun <F> allEqual(): Order<F> = object : Order<F> {
       override fun F.compare(b: F): Int = 0
     }
-
   }
-
 }

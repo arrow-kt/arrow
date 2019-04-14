@@ -1,7 +1,11 @@
 package arrow.typeclasses
 
 import arrow.Kind2
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Eval
+import arrow.core.ForEither
+import arrow.core.Right
+import arrow.core.fix
 import arrow.test.UnitSpec
 import arrow.test.laws.BifoldableLaws
 import io.kotlintest.runner.junit4.KotlinTestRunner

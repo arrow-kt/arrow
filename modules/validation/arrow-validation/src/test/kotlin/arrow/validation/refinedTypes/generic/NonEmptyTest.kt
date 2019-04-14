@@ -21,5 +21,4 @@ class NonEmptyTest : UnitSpec() {
       "".nonEmpty("").isInvalid
     }
   }
-
 }

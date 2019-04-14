@@ -1,7 +1,11 @@
 package arrow.data
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.value
 import arrow.core.extensions.const.divisible.divisible
 import arrow.core.extensions.monoid
 import arrow.effects.ForIO
@@ -20,8 +24,16 @@ import arrow.mtl.extensions.option.traverseFilter.traverseFilter
 import arrow.mtl.extensions.optiont.functorFilter.functorFilter
 import arrow.mtl.extensions.optiont.traverseFilter.traverseFilter
 import arrow.test.UnitSpec
-import arrow.test.laws.*
-import arrow.typeclasses.*
+import arrow.test.laws.AsyncLaws
+import arrow.test.laws.DivisibleLaws
+import arrow.test.laws.FunctorFilterLaws
+import arrow.test.laws.MonoidKLaws
+import arrow.test.laws.SemigroupKLaws
+import arrow.test.laws.TraverseFilterLaws
+import arrow.typeclasses.Const
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Monad
+import arrow.typeclasses.const
 import io.kotlintest.properties.forAll
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith

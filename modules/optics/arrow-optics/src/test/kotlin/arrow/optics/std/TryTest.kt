@@ -3,19 +3,23 @@ package arrow.optics
 import arrow.core.Either
 import arrow.core.Right
 import arrow.core.Try
+import arrow.core.extensions.either.applicative.applicative
+import arrow.core.fix
 import arrow.data.Invalid
 import arrow.data.Valid
 import arrow.data.Validated
-import arrow.core.extensions.either.applicative.applicative
-import arrow.core.fix
 import arrow.test.UnitSpec
-import arrow.test.generators.*
+import arrow.test.generators.`try`
+import arrow.test.generators.either
+import arrow.test.generators.functionAToB
+import arrow.test.generators.throwable
+import arrow.test.generators.validated
 import arrow.test.laws.IsoLaws
 import arrow.test.laws.PrismLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.properties.Gen
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
 @RunWith(KotlinTestRunner::class)
@@ -82,6 +86,5 @@ class TryTest : UnitSpec() {
         override fun empty() = Valid(0)
       }
     ))
-
   }
 }

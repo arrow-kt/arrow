@@ -1,6 +1,11 @@
 package arrow.optics
 
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Right
+import arrow.core.Some
+import arrow.core.identity
 
 /**
  * [PIso] that defines the equality between [Option] and the nullable platform type.

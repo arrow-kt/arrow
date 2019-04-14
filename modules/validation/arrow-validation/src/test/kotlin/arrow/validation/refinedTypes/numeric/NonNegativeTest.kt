@@ -25,6 +25,5 @@ class NonNegativeTest : UnitSpec() {
         x.nonNegative(Int.order()).isInvalid
       }
     }
-
   }
 }

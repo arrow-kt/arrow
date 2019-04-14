@@ -13,7 +13,7 @@ object HashLaws {
       Law("Hash Laws: Multiple calls to hash should result in the same hash") { equalHashM(HF, cf) }
     )
 
-  fun <F> equalHash(HF: Hash<F>, EQ: Eq<F>, cf: (Int) -> F): Unit {
+  fun <F> equalHash(HF: Hash<F>, EQ: Eq<F>, cf: (Int) -> F) {
     forAll(Gen.int()) { f ->
       val a = cf(f)
       val b = cf(f)
@@ -21,7 +21,7 @@ object HashLaws {
     }
   }
 
-  fun <F> equalHashM(HF: Hash<F>, cf: (Int) -> F): Unit {
+  fun <F> equalHashM(HF: Hash<F>, cf: (Int) -> F) {
     forAll(Gen.int()) { f ->
       val a = cf(f)
       HF.run { a.hash() == a.hash() }

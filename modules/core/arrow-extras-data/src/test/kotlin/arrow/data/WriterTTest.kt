@@ -1,7 +1,11 @@
 package arrow.data
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.ForOption
+import arrow.core.Option
+import arrow.core.Tuple2
+import arrow.core.value
 import arrow.core.extensions.const.divisible.divisible
 import arrow.core.extensions.monoid
 import arrow.effects.ForIO
@@ -22,8 +26,14 @@ import arrow.mtl.extensions.writert.monadWriter.monadWriter
 import arrow.test.UnitSpec
 import arrow.test.generators.intSmall
 import arrow.test.generators.tuple2
-import arrow.test.laws.*
-import arrow.typeclasses.*
+import arrow.test.laws.AsyncLaws
+import arrow.test.laws.DivisibleLaws
+import arrow.test.laws.MonadFilterLaws
+import arrow.test.laws.MonadWriterLaws
+import arrow.test.laws.MonoidKLaws
+import arrow.typeclasses.Const
+import arrow.typeclasses.Eq
+import arrow.typeclasses.const
 import io.kotlintest.properties.Gen
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith

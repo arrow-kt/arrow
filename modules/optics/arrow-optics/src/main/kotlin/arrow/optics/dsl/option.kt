@@ -1,7 +1,14 @@
 package arrow.optics.dsl
 
 import arrow.core.Option
-import arrow.optics.*
+import arrow.optics.Fold
+import arrow.optics.Iso
+import arrow.optics.Lens
+import arrow.optics.Optional
+import arrow.optics.Prism
+import arrow.optics.Setter
+import arrow.optics.Traversal
+import arrow.optics.some
 
 /**
  * DSL to compose a [Prism] with focus [arrow.core.Some] with a [Lens] with a focus of [Option]<[S]>

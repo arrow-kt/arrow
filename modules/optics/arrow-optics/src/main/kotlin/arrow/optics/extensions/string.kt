@@ -1,15 +1,23 @@
 package arrow.optics.extensions
 
-import arrow.*
+import arrow.Kind
 import arrow.core.Tuple2
 import arrow.core.left
 import arrow.core.right
-import arrow.data.*
-import arrow.typeclasses.*
-import arrow.optics.*
+import arrow.data.ListK
+import arrow.data.k
+import arrow.optics.Optional
+import arrow.optics.Prism
+import arrow.optics.Traversal
+import arrow.optics.toListK
+import arrow.optics.typeclasses.Cons
+import arrow.optics.typeclasses.Each
+import arrow.optics.typeclasses.FilterIndex
+import arrow.optics.typeclasses.Index
+import arrow.optics.typeclasses.Snoc
 import arrow.optics.extensions.listk.filterIndex.filterIndex
 import arrow.optics.extensions.listk.index.index
-import arrow.optics.typeclasses.*
+import arrow.typeclasses.Applicative
 
 /**
  * [Traversal] for [String] that focuses in each [Char] of the source [String].

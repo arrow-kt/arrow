@@ -1,7 +1,14 @@
 package arrow.optics.dsl
 
-import arrow.optics.*
-import arrow.optics.typeclasses.*
+import arrow.optics.Fold
+import arrow.optics.Getter
+import arrow.optics.Iso
+import arrow.optics.Lens
+import arrow.optics.Optional
+import arrow.optics.Prism
+import arrow.optics.Setter
+import arrow.optics.Traversal
+import arrow.optics.typeclasses.At
 
 /**
  * DSL to compose [At] with a [Lens] for a structure [S] to focus in on [A] at given index [I].

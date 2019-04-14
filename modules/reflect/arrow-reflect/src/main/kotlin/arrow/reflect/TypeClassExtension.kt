@@ -56,9 +56,9 @@ internal val classPathExtensions: List<TypeClassExtension> =
 private fun TypeArgument.unKind(): DataType =
     Class.forName(toString()
       .replace("arrow.Kind<? extends", "")
-      //order is important for next 2 since `*?` removes pattern for `*\w`
-      .replace(", \\? extends \\w.*\\w".toRegex(), "") //? extends java.lang.Throwable
-      .replace(", \\? extends \\w.*?".toRegex(), "") //? extends F
+      // order is important for next 2 since `*?` removes pattern for `*\w`
+      .replace(", \\? extends \\w.*\\w".toRegex(), "") // ? extends java.lang.Throwable
+      .replace(", \\? extends \\w.*?".toRegex(), "") // ? extends F
       .replace("<.*".toRegex(), "")
       .replace(">", "")
       .replace(".For", ".")

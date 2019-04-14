@@ -11,7 +11,6 @@ class Validation<out E : Any>(vararg disjunctionSequence: Either<E, *>) {
   val failures: List<E> = disjunctionSequence.filter { it.isLeft() }.map { it.swap().get() }
 
   val hasFailures: Boolean = failures.isNotEmpty()
-
 }
 
 fun <L : Any, R : Any, R1 : Any, R2 : Any> validate(
@@ -496,4 +495,3 @@ fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : An
     Either.Right(ifValid(p1.get(), p2.get(), p3.get(), p4.get(), p5.get(), p6.get(), p7.get(), p8.get(), p9.get(), p10.get(), p11.get(), p12.get(), p13.get(), p14.get(), p15.get(), p16.get(), p17.get(), p18.get(), p19.get(), p20.get(), p21.get(), p22.get()))
   }
 }
-

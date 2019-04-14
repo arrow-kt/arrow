@@ -27,7 +27,5 @@ class LessEqualTest : UnitSpec() {
         x.lessEqual(Int.order(), max).isInvalid
       }
     }
-
   }
-
 }

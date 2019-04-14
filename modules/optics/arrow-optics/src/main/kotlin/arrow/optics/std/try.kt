@@ -1,8 +1,14 @@
 package arrow.optics
 
-import arrow.core.*
-import arrow.core.Either.Left
-import arrow.data.*
+import arrow.core.Either
+import arrow.core.Failure
+import arrow.core.Left
+import arrow.core.Right
+import arrow.core.Success
+import arrow.core.Try
+import arrow.data.Invalid
+import arrow.data.Valid
+import arrow.data.Validated
 
 /**
  * [PPrism] to focus into an [arrow.core.Try.Success]

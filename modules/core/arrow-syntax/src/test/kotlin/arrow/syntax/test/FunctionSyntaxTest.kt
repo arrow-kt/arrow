@@ -1,11 +1,29 @@
 package arrow.syntax.test
 
-import arrow.syntax.function.*
+import arrow.syntax.function.andThen
+import arrow.syntax.function.bind
+import arrow.syntax.function.complement
+import arrow.syntax.function.compose
+import arrow.syntax.function.curried
+import arrow.syntax.function.forwardCompose
+import arrow.syntax.function.invoke
+import arrow.syntax.function.memoize
+import arrow.syntax.function.paired
+import arrow.syntax.function.partially1
+import arrow.syntax.function.partially2
+import arrow.syntax.function.partially3
+import arrow.syntax.function.partially4
+import arrow.syntax.function.partially5
+import arrow.syntax.function.reverse
+import arrow.syntax.function.tripled
+import arrow.syntax.function.uncurried
+import arrow.syntax.function.unpaired
+import arrow.syntax.function.untripled
 import arrow.test.UnitSpec
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
-import java.util.*
+import java.util.Random
 
 @RunWith(KotlinTestRunner::class)
 class FunctionSyntaxTest : UnitSpec() {
@@ -81,7 +99,7 @@ class FunctionSyntaxTest : UnitSpec() {
       val sum2ints: (Int, Int) -> Int = { x, y -> x + y }
       val curried: (Int) -> (Int) -> Int = sum2ints.curried()
       curried(2)(4) shouldBe 6
-      //same type as sum2ints,
+      // same type as sum2ints,
       curried.uncurried()(2, 4) shouldBe 6
       sum2ints(2, 4) shouldBe 6
     }
@@ -93,13 +111,11 @@ class FunctionSyntaxTest : UnitSpec() {
       val a = { _: Int -> counterA++ }
       val b = { _: Int -> counterB++ }.memoize()
 
-
       repeat(5) { a(1) }
       repeat(5) { b(1) }
 
       counterA shouldBe 5
       counterB shouldBe 1 // calling several times a memoized function with the same parameter is computed just once
-
     }
 
     "memoizeEmpty" {
@@ -109,13 +125,11 @@ class FunctionSyntaxTest : UnitSpec() {
       val a = { counterA++ }
       val b = { counterB++ }.memoize()
 
-
       repeat(5) { a() }
       repeat(5) { b() }
 
       counterA shouldBe 5
       counterB shouldBe 1 // calling several times a memoized function with the same parameter is computed just once
-
     }
 
     "testPaired" {

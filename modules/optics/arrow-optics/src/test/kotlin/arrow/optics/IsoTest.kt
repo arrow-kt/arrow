@@ -3,16 +3,21 @@ package arrow.optics
 import arrow.core.Either
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.toT
-import arrow.data.ListK
-import arrow.data.k
 import arrow.core.extensions.monoid
 import arrow.data.extensions.listk.eq.eq
 import arrow.core.extensions.option.eq.eq
 import arrow.core.extensions.option.functor.functor
+import arrow.core.toT
+import arrow.data.ListK
+import arrow.data.k
 import arrow.test.UnitSpec
 import arrow.test.generators.functionAToB
-import arrow.test.laws.*
+import arrow.test.laws.IsoLaws
+import arrow.test.laws.LensLaws
+import arrow.test.laws.OptionalLaws
+import arrow.test.laws.PrismLaws
+import arrow.test.laws.SetterLaws
+import arrow.test.laws.TraversalLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -191,7 +196,7 @@ class IsoTest : UnitSpec() {
       val left = tokenIso.left<Int>()
       forAll(genToken, Gen.int()) { token: Token, int: Int ->
         left.get(Either.Left(token)) == Either.Left(token.value) &&
-            left.get(Either.Right(int)) == Either.Right(int)
+          left.get(Either.Right(int)) == Either.Right(int)
       }
     }
 
@@ -199,7 +204,7 @@ class IsoTest : UnitSpec() {
       val left = tokenIso.right<Int>()
       forAll(genToken, Gen.int()) { token: Token, int: Int ->
         left.get(Either.Left(int)) == Either.Left(int) &&
-            left.get(Either.Right(token)) == Either.Right(token.value)
+          left.get(Either.Right(token)) == Either.Right(token.value)
       }
     }
 
@@ -235,5 +240,4 @@ class IsoTest : UnitSpec() {
       }
     }
   }
-
 }

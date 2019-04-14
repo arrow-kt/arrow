@@ -3,12 +3,13 @@ package arrow.optics
 import arrow.Kind
 import arrow.core.Option
 import arrow.core.extensions.monoid
-import arrow.core.extensions.option.eq.eq
 import arrow.core.toOption
 import arrow.core.toT
-import arrow.data.*
-import arrow.data.extensions.listk.eq.eq
-import arrow.data.extensions.listk.traverse.traverse
+import arrow.data.ListK
+import arrow.data.State
+import arrow.data.k
+import arrow.data.map
+import arrow.data.run
 import arrow.test.UnitSpec
 import arrow.test.generators.functionAToB
 import arrow.test.generators.listK
@@ -217,9 +218,6 @@ class TraversalTest : UnitSpec() {
             }.run(ints)
         }
       }
-
     }
-
   }
-
 }

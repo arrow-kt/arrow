@@ -9,10 +9,12 @@ import io.kotlintest.properties.forAll
 
 object AlternativeLaws {
 
-  fun <F> laws(AF: Alternative<F>,
-                      cf: (Int) -> Kind<F, Int>,
-                      cff: (Int) -> Kind<F, (Int) -> Int>,
-                      EQ: Eq<Kind<F, Int>>): List<Law> =
+  fun <F> laws(
+    AF: Alternative<F>,
+    cf: (Int) -> Kind<F, Int>,
+    cff: (Int) -> Kind<F, (Int) -> Int>,
+    EQ: Eq<Kind<F, Int>>
+  ): List<Law> =
     ApplicativeLaws.laws(AF, EQ) + MonoidKLaws.laws(AF, AF, EQ) + listOf(
       Law("Alternative Laws: Right Absorption") { AF.alternativeRightAbsorption(cff, EQ) },
       Law("Alternative Laws: Left Distributivity") { AF.alternativeLeftDistributivity(cf, EQ) },
@@ -29,9 +31,11 @@ object AlternativeLaws {
       fa.combineK(fa2).map(f).equalUnderTheLaw(fa.map(f).combineK(fa2.map(f)), EQ)
     }
 
-  fun <F> Alternative<F>.alternativeRightDistributivity(cf: (Int) -> Kind<F, Int>,
-                                                        cff: (Int) -> Kind<F, (Int) -> Int>,
-                                                        EQ: Eq<Kind<F, Int>>): Unit =
+  fun <F> Alternative<F>.alternativeRightDistributivity(
+    cf: (Int) -> Kind<F, Int>,
+    cff: (Int) -> Kind<F, (Int) -> Int>,
+    EQ: Eq<Kind<F, Int>>
+  ): Unit =
     forAll(Gen.int().map(cf), Gen.int().map(cff), Gen.int().map(cff)
     ) { fa: Kind<F, Int>, ff: Kind<F, (Int) -> Int>, fg: Kind<F, (Int) -> Int> ->
       fa.ap(ff.combineK(fg)).equalUnderTheLaw(fa.ap(ff).combineK(fa.ap(fg)), EQ)

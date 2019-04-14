@@ -7,5 +7,4 @@ interface Continuation<in T> : kotlin.coroutines.Continuation<T> {
 
   override fun resumeWith(result: Result<T>) =
     result.fold(::resume, ::resumeWithException)
-
 }

@@ -3,9 +3,19 @@ package arrow.reflect.tests
 import arrow.core.Option
 import arrow.core.Try
 import arrow.core.extensions.TryMonadError
-import arrow.reflect.*
+import arrow.reflect.DataType
+import arrow.reflect.Extension
+import arrow.reflect.TypeClass
+import arrow.reflect.TypeClassExtension
+import arrow.reflect.extends
+import arrow.reflect.extensions
+import arrow.reflect.hierarchy
+import arrow.reflect.supportedDataTypes
+import arrow.reflect.supportedTypeClasses
 import arrow.test.UnitSpec
-import arrow.typeclasses.*
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Invariant
+import arrow.typeclasses.MonadError
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
@@ -62,7 +72,5 @@ class ReflectionTests : UnitSpec() {
         TypeClass(Functor::class).extends(TypeClass(Invariant::class))
       )
     }
-
   }
-
 }

@@ -10,5 +10,4 @@ object SemigroupLaws {
 
   fun <F> Semigroup<F>.semigroupAssociative(A: F, B: F, C: F, EQ: Eq<F>): Boolean =
     A.combine(B).combine(C).equalUnderTheLaw(A.combine(B.combine(C)), EQ)
-
 }

@@ -21,7 +21,7 @@ interface FixBirecursive : Birecursive<ForFix> {
 }
 
 @extension
-interface FixRecursive: Recursive<ForFix>, FixBirecursive
+interface FixRecursive : Recursive<ForFix>, FixBirecursive
 
 @extension
-interface FixCorecursive: Corecursive<ForFix>, FixBirecursive
+interface FixCorecursive : Corecursive<ForFix>, FixBirecursive

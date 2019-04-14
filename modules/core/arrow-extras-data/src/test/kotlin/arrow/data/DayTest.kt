@@ -1,6 +1,9 @@
 package arrow.data
 
-import arrow.core.*
+import arrow.core.ForId
+import arrow.core.Id
+import arrow.core.Tuple2
+import arrow.core.Tuple2Of
 import arrow.data.extensions.day.applicative.applicative
 import arrow.data.extensions.day.comonad.comonad
 import arrow.core.extensions.id.applicative.applicative

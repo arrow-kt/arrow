@@ -27,5 +27,4 @@ class GreaterTest : UnitSpec() {
       }
     }
   }
-
 }

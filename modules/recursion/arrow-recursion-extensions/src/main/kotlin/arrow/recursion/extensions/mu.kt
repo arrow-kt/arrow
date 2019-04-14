@@ -30,7 +30,7 @@ interface MuBirecursive : Birecursive<ForMu> {
 }
 
 @extension
-interface MuRecursive: Recursive<ForMu>, MuBirecursive
+interface MuRecursive : Recursive<ForMu>, MuBirecursive
 
 @extension
-interface MuCorecursive: Corecursive<ForMu>, MuBirecursive
+interface MuCorecursive : Corecursive<ForMu>, MuBirecursive

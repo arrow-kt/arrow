@@ -7,10 +7,18 @@ import arrow.data.ListK
 import arrow.data.extensions.listk.eq.eq
 import arrow.core.extensions.option.eq.eq
 import arrow.core.extensions.tuple2.eq.eq
-import arrow.optics.extensions.*
+import arrow.optics.extensions.cons
+import arrow.optics.extensions.each
+import arrow.optics.extensions.filterIndex
+import arrow.optics.extensions.index
+import arrow.optics.extensions.snoc
 import arrow.test.UnitSpec
-import arrow.test.generators.*
-import arrow.test.laws.*
+import arrow.test.generators.char
+import arrow.test.generators.functionAToB
+import arrow.test.generators.tuple2
+import arrow.test.laws.OptionalLaws
+import arrow.test.laws.PrismLaws
+import arrow.test.laws.TraversalLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.runner.junit4.KotlinTestRunner
@@ -77,6 +85,5 @@ class StringInstanceTest : UnitSpec() {
         EQOptionB = Option.eq(Tuple2.eq(String.eq(), Char.eq()))
       )
     )
-
   }
 }

@@ -11,6 +11,5 @@ interface Not<F, B> : Refinement<F, B> {
 
   fun B.not(): Kind<F, B> = refine(this)
 
-  fun <A> B.not(f: (B) -> A): Kind<F, A> = refine(this ,f)
-
+  fun <A> B.not(f: (B) -> A): Kind<F, A> = refine(this, f)
 }

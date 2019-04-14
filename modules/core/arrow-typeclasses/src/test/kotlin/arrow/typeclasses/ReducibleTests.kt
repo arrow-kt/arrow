@@ -4,7 +4,8 @@ import arrow.Kind
 import arrow.core.Tuple2
 import arrow.core.extensions.monoid
 import arrow.core.extensions.semigroup
-import arrow.data.*
+import arrow.data.ListK
+import arrow.data.NonEmptyList
 import arrow.data.extensions.listk.foldable.foldable
 import arrow.test.UnitSpec
 import arrow.test.laws.ReducibleLaws

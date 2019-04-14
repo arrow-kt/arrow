@@ -22,5 +22,4 @@ abstract class UnitSpec : AbstractStringSpec() {
     }
 
   override fun testCases(): List<TestCase> = super.testCases() + lawTestCases
-
 }

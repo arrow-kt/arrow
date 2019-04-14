@@ -1,16 +1,22 @@
 package arrow.optics
 
-import arrow.core.*
-import arrow.data.Validated
+import arrow.core.Either
+import arrow.core.Right
+import arrow.core.Try
 import arrow.core.extensions.`try`.applicative.applicative
 import arrow.core.extensions.either.applicative.applicative
+import arrow.data.Validated
 import arrow.test.UnitSpec
-import arrow.test.generators.*
+import arrow.test.generators.`try`
+import arrow.test.generators.either
+import arrow.test.generators.functionAToB
+import arrow.test.generators.throwable
+import arrow.test.generators.validated
 import arrow.test.laws.IsoLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.properties.Gen
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
 @RunWith(KotlinTestRunner::class)
@@ -46,7 +52,5 @@ class ValidatedTest : UnitSpec() {
           override fun empty(): Try<Int> = Try.Success(0)
         })
     )
-
   }
-
 }

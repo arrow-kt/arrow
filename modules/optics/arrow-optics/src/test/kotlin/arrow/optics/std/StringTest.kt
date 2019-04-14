@@ -18,7 +18,7 @@ class StringTest : UnitSpec() {
       iso = String.toList(),
       aGen = Gen.string(),
       bGen = Gen.list(Gen.char()),
-      funcGen = Gen.list(Gen.char()).map { list -> { chars:List<Char> -> list + chars} },
+      funcGen = Gen.list(Gen.char()).map { list -> { chars: List<Char> -> list + chars } },
       EQA = Eq.any(),
       EQB = Eq.any(),
       bMonoid = object : Monoid<List<Char>> {
@@ -26,7 +26,5 @@ class StringTest : UnitSpec() {
         override fun empty(): List<Char> = emptyList()
       }
     ))
-
   }
-
 }

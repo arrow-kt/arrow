@@ -1,14 +1,28 @@
 package arrow.optics
 
-import arrow.core.*
+import arrow.core.Left
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Right
+import arrow.core.Try
+import arrow.core.getOrElse
+import arrow.core.identity
+import arrow.core.toOption
+import arrow.core.toT
 import arrow.core.extensions.`try`.applicative.applicative
 import arrow.core.extensions.monoid
 import arrow.core.extensions.option.eq.eq
-import arrow.data.*
 import arrow.data.extensions.list.foldable.nonEmpty
 import arrow.data.extensions.listk.eq.eq
+import arrow.data.ListK
+import arrow.data.State
+import arrow.data.k
+import arrow.data.map
+import arrow.data.run
 import arrow.test.UnitSpec
-import arrow.test.generators.*
+import arrow.test.generators.`try`
+import arrow.test.generators.functionAToB
+import arrow.test.generators.tuple2
 import arrow.test.laws.OptionalLaws
 import arrow.test.laws.SetterLaws
 import arrow.test.laws.TraversalLaws
@@ -191,7 +205,7 @@ class OptionalTest : UnitSpec() {
 
     "Checking satisfaction of predicate over the target should result in opposite result as predicate" {
       forAll(Gen.list(Gen.int()), Gen.bool()) { list, predicate ->
-        ListK.head<Int>().all(list) { predicate } == if(list.isEmpty()) true else predicate
+        ListK.head<Int>().all(list) { predicate } == if (list.isEmpty()) true else predicate
       }
     }
 
@@ -281,6 +295,5 @@ class OptionalTest : UnitSpec() {
           }.run(x)
       }
     }
-
   }
 }

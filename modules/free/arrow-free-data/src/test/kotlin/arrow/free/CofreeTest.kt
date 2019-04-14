@@ -1,7 +1,15 @@
 package arrow.free
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Eval
+import arrow.core.ForEval
+import arrow.core.ForId
+import arrow.core.ForOption
+import arrow.core.FunctionK
+import arrow.core.Id
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
 import arrow.data.ListK
 import arrow.data.NonEmptyList
 import arrow.data.OptionT
@@ -22,10 +30,7 @@ import arrow.typeclasses.Eq
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
-import kotlin.AssertionError
-import kotlin.Int
 import kotlin.run
-import kotlin.with
 
 @RunWith(KotlinTestRunner::class)
 class CofreeTest : UnitSpec() {

@@ -1,6 +1,8 @@
 package arrow.aql
 
-import arrow.core.*
+import arrow.core.Id
+import arrow.core.identity
+import arrow.core.toT
 import arrow.data.ForListK
 import arrow.data.fix
 import arrow.data.mapOf

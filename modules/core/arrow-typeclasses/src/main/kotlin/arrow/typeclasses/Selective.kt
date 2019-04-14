@@ -1,7 +1,12 @@
 package arrow.typeclasses
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Left
+import arrow.core.Right
+import arrow.core.andThen
+import arrow.core.left
+import arrow.core.right
 
 /**
  * ank_macro_hierarchy(arrow.typeclasses.Selective)
@@ -22,12 +27,11 @@ interface Selective<F> : Applicative<F> {
     selector().select(x.map { f -> { _: Unit -> f() } })
 
   fun <A> Kind<F, Boolean>.ifS(fl: Kind<F, A>, fr: Kind<F, A>): Kind<F, A> =
-    selector().branch( fl.map {{ _: Unit -> it }} , fr.map {{ _: Unit -> it }} )
+    selector().branch(fl.map { { _: Unit -> it } }, fr.map { { _: Unit -> it } })
 
   fun <A> Kind<F, Boolean>.orS(f: Kind<F, Boolean>): Kind<F, Boolean> =
     ifS(just(true), f)
 
   fun <A> Kind<F, Boolean>.andS(f: Kind<F, Boolean>): Kind<F, Boolean> =
     ifS(f, just(false))
-
 }

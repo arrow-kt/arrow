@@ -1,14 +1,25 @@
 package arrow.optics
 
 import arrow.Kind
-import arrow.core.*
-import arrow.data.*
-import arrow.higherkind
+import arrow.core.Either
+import arrow.core.Id
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.Tuple2
 import arrow.core.extensions.monoid
 import arrow.core.extensions.const.applicative.applicative
 import arrow.core.extensions.id.applicative.applicative
 import arrow.data.extensions.listk.monoid.monoid
-import arrow.typeclasses.*
+import arrow.core.identity
+import arrow.data.ListK
+import arrow.data.State
+import arrow.data.map
+import arrow.higherkind
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Const
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.Traverse
 
 /**
  * [Traversal] is a type alias for [PTraversal] which fixes the type arguments

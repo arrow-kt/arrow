@@ -5,7 +5,10 @@ import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
 import arrow.core.identity
-import arrow.test.generators.*
+import arrow.test.generators.applicativeError
+import arrow.test.generators.either
+import arrow.test.generators.functionAToB
+import arrow.test.generators.throwable
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen

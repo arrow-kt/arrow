@@ -1,6 +1,12 @@
 package arrow.optics.dsl
 
-import arrow.optics.*
+import arrow.optics.Fold
+import arrow.optics.Iso
+import arrow.optics.Lens
+import arrow.optics.Optional
+import arrow.optics.Prism
+import arrow.optics.Setter
+import arrow.optics.Traversal
 import arrow.optics.typeclasses.Index
 
 /**

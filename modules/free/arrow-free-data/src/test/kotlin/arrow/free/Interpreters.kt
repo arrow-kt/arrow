@@ -1,7 +1,12 @@
 package arrow.free
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.ForId
+import arrow.core.ForOption
+import arrow.core.FunctionK
+import arrow.core.Id
+import arrow.core.Option
+import arrow.core.Some
 import arrow.data.NonEmptyList
 import arrow.data.k
 

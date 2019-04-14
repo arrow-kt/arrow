@@ -1,7 +1,16 @@
 package arrow.optics
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.PartialFunction
+import arrow.core.Some
+import arrow.core.Tuple2
+import arrow.core.getOrElse
+import arrow.core.identity
+import arrow.core.lift
+import arrow.core.toT
 import arrow.data.State
 import arrow.data.map
 import arrow.higherkind

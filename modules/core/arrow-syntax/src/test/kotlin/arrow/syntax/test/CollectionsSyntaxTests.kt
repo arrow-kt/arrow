@@ -42,6 +42,5 @@ class CollectionsSyntaxTests : UnitSpec() {
       head shouldBe 1
       tail shouldBe listOf(2, 3)
     }
-
   }
 }

@@ -1,7 +1,6 @@
 package arrow.data
 
 import arrow.Kind
-import arrow.core.*
 import arrow.core.extensions.monoid
 import arrow.data.extensions.andthen.category.category
 import arrow.data.extensions.andthen.contravariant.contravariant
@@ -11,15 +10,20 @@ import arrow.data.extensions.andthen.profunctor.profunctor
 import arrow.data.extensions.list.foldable.foldLeft
 import arrow.test.UnitSpec
 import arrow.test.generators.functionAToB
-import arrow.test.laws.*
 import arrow.typeclasses.Conested
 import arrow.typeclasses.Eq
 import arrow.typeclasses.conest
 import arrow.typeclasses.counnest
+import arrow.core.identity
+import arrow.test.laws.CategoryLaws
+import arrow.test.laws.ContravariantLaws
+import arrow.test.laws.MonadLaws
+import arrow.test.laws.MonoidLaws
+import arrow.test.laws.ProfunctorLaws
+import io.kotlintest.shouldBe
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.runner.junit4.KotlinTestRunner
-import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
 
 @RunWith(KotlinTestRunner::class)

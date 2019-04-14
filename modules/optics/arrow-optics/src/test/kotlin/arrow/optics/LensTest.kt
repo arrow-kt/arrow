@@ -1,14 +1,27 @@
 package arrow.optics
 
-import arrow.core.*
-import arrow.data.*
+import arrow.core.Left
+import arrow.core.Option
+import arrow.core.Right
+import arrow.core.Some
+import arrow.core.Tuple2
 import arrow.core.extensions.monoid
 import arrow.data.extensions.listk.eq.eq
 import arrow.core.extensions.option.eq.eq
 import arrow.core.extensions.option.functor.functor
+import arrow.core.toT
+import arrow.data.ListK
+import arrow.data.State
+import arrow.data.k
+import arrow.data.map
+import arrow.data.run
+import arrow.data.runId
 import arrow.test.UnitSpec
 import arrow.test.generators.functionAToB
-import arrow.test.laws.*
+import arrow.test.laws.LensLaws
+import arrow.test.laws.OptionalLaws
+import arrow.test.laws.SetterLaws
+import arrow.test.laws.TraversalLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -215,9 +228,9 @@ class LensTest : UnitSpec() {
     "Extract should extract the focus from the state" {
       forAll(genToken) { generatedToken ->
         tokenLens.extract().run(generatedToken) ==
-            State { token: Token ->
-              token toT tokenLens.get(token)
-            }.run(generatedToken)
+          State { token: Token ->
+            token toT tokenLens.get(token)
+          }.run(generatedToken)
       }
     }
 
@@ -236,59 +249,57 @@ class LensTest : UnitSpec() {
     "update f should be same modify f within State and returning new state" {
       forAll(genToken, Gen.functionAToB<String, String>(Gen.string())) { generatedToken, f ->
         tokenLens.update(f).run(generatedToken) ==
-            State { token: Token ->
-              tokenLens.modify(token, f)
-                .let { it toT it.value }
-            }.run(generatedToken)
+          State { token: Token ->
+            tokenLens.modify(token, f)
+              .let { it toT it.value }
+          }.run(generatedToken)
       }
     }
 
     "updateOld f should be same as modify f within State and returning old state" {
       forAll(genToken, Gen.functionAToB<String, String>(Gen.string())) { generatedToken, f ->
         tokenLens.updateOld(f).run(generatedToken) ==
-            State { token: Token ->
-              tokenLens.modify(token, f) toT tokenLens.get(token)
-            }.run(generatedToken)
+          State { token: Token ->
+            tokenLens.modify(token, f) toT tokenLens.get(token)
+          }.run(generatedToken)
       }
     }
 
     "update_ f should be as modify f within State and returning Unit" {
       forAll(genToken, Gen.functionAToB<String, String>(Gen.string())) { generatedToken, f ->
         tokenLens.update_(f).run(generatedToken) ==
-            State { token: Token ->
-              tokenLens.modify(token, f) toT Unit
-            }.run(generatedToken)
+          State { token: Token ->
+            tokenLens.modify(token, f) toT Unit
+          }.run(generatedToken)
       }
     }
 
     "assign a should be same set a within State and returning new value" {
       forAll(genToken, Gen.string()) { generatedToken, string ->
         tokenLens.assign(string).run(generatedToken) ==
-            State { token: Token ->
-              tokenLens.set(token, string)
-                .let { it toT it.value }
-            }.run(generatedToken)
+          State { token: Token ->
+            tokenLens.set(token, string)
+              .let { it toT it.value }
+          }.run(generatedToken)
       }
     }
 
     "assignOld f should be same as modify f within State and returning old state" {
       forAll(genToken, Gen.string()) { generatedToken, string ->
         tokenLens.assignOld(string).run(generatedToken) ==
-            State { token: Token ->
-              tokenLens.set(token, string) toT tokenLens.get(token)
-            }.run(generatedToken)
+          State { token: Token ->
+            tokenLens.set(token, string) toT tokenLens.get(token)
+          }.run(generatedToken)
       }
     }
 
     "assign_ f should be as modify f within State and returning Unit" {
       forAll(genToken, Gen.string()) { generatedToken, string ->
         tokenLens.assign_(string).run(generatedToken) ==
-            State { token: Token ->
-              tokenLens.set(token, string) toT Unit
-            }.run(generatedToken)
+          State { token: Token ->
+            tokenLens.set(token, string) toT Unit
+          }.run(generatedToken)
       }
     }
-
   }
-
 }

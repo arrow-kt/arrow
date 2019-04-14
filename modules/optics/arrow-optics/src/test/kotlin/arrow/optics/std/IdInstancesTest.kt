@@ -24,5 +24,4 @@ class IdInstancesTest : UnitSpec() {
       bMonoid = Int.monoid()
     ))
   }
-
 }

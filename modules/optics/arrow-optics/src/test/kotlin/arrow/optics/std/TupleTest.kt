@@ -1,17 +1,35 @@
 package arrow.optics
 
-import arrow.core.*
-import arrow.data.ListK
+import arrow.core.Option
+import arrow.core.Tuple10
+import arrow.core.Tuple2
+import arrow.core.Tuple3
+import arrow.core.Tuple4
+import arrow.core.Tuple5
+import arrow.core.Tuple6
+import arrow.core.Tuple7
+import arrow.core.Tuple8
+import arrow.core.Tuple9
 import arrow.core.extensions.monoid
 import arrow.data.extensions.listk.eq.eq
 import arrow.core.extensions.option.eq.eq
+import arrow.data.ListK
 import arrow.test.UnitSpec
-import arrow.test.generators.*
+import arrow.test.generators.functionAToB
+import arrow.test.generators.tuple10
+import arrow.test.generators.tuple2
+import arrow.test.generators.tuple3
+import arrow.test.generators.tuple4
+import arrow.test.generators.tuple5
+import arrow.test.generators.tuple6
+import arrow.test.generators.tuple7
+import arrow.test.generators.tuple8
+import arrow.test.generators.tuple9
 import arrow.test.laws.LensLaws
 import arrow.test.laws.TraversalLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.properties.Gen
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
 @RunWith(KotlinTestRunner::class)
@@ -207,7 +225,5 @@ class TupleTest : UnitSpec() {
         EQListB = ListK.eq(Eq.any())
       )
     )
-
   }
-
 }

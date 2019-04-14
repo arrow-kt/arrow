@@ -106,5 +106,4 @@ object LensLaws {
           .equalUnderTheLaw(modifyF(Const.applicative(MA), a, ::Const).value(), EQB)
       }
     }
-
 }
