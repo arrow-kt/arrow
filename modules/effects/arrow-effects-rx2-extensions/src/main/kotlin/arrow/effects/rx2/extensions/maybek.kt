@@ -6,9 +6,21 @@ import arrow.effects.rx2.ForMaybeK
 import arrow.effects.rx2.MaybeK
 import arrow.effects.rx2.MaybeKOf
 import arrow.effects.rx2.fix
-import arrow.effects.typeclasses.*
+import arrow.effects.typeclasses.Async
+import arrow.effects.typeclasses.Bracket
+import arrow.effects.typeclasses.Effect
+import arrow.effects.typeclasses.ExitCase
+import arrow.effects.typeclasses.MonadDefer
+import arrow.effects.typeclasses.Proc
+import arrow.effects.typeclasses.ProcF
 import arrow.extension
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadError
+import arrow.typeclasses.MonadThrow
 import kotlin.coroutines.CoroutineContext
 
 @extension
@@ -72,7 +84,7 @@ interface MaybeKFoldable : Foldable<ForMaybeK> {
 @extension
 interface MaybeKApplicativeError :
   ApplicativeError<ForMaybeK, Throwable>,
-  MaybeKApplicative{
+  MaybeKApplicative {
   override fun <A> raiseError(e: Throwable): MaybeK<A> =
     MaybeK.raiseError(e)
 
@@ -83,7 +95,7 @@ interface MaybeKApplicativeError :
 @extension
 interface MaybeKMonadError :
   MonadError<ForMaybeK, Throwable>,
-  MaybeKMonad{
+  MaybeKMonad {
   override fun <A> raiseError(e: Throwable): MaybeK<A> =
     MaybeK.raiseError(e)
 
@@ -92,22 +104,22 @@ interface MaybeKMonadError :
 }
 
 @extension
-interface MaybeKMonadThrow: MonadThrow<ForMaybeK>, MaybeKMonadError
+interface MaybeKMonadThrow : MonadThrow<ForMaybeK>, MaybeKMonadError
 
 @extension
-interface MaybeKBracket: Bracket<ForMaybeK, Throwable>, MaybeKMonadThrow {
+interface MaybeKBracket : Bracket<ForMaybeK, Throwable>, MaybeKMonadThrow {
   override fun <A, B> MaybeKOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> MaybeKOf<Unit>, use: (A) -> MaybeKOf<B>): MaybeK<B> =
     fix().bracketCase({ use(it) }, { a, e -> release(a, e) })
 }
 
 @extension
-interface MaybeKMonadDefer: MonadDefer<ForMaybeK>, MaybeKBracket {
+interface MaybeKMonadDefer : MonadDefer<ForMaybeK>, MaybeKBracket {
   override fun <A> defer(fa: () -> MaybeKOf<A>): MaybeK<A> =
     MaybeK.defer(fa)
 }
 
 @extension
-interface MaybeKAsync: Async<ForMaybeK>, MaybeKMonadDefer {
+interface MaybeKAsync : Async<ForMaybeK>, MaybeKMonadDefer {
   override fun <A> async(fa: Proc<A>): MaybeK<A> =
     MaybeK.async { _, cb -> fa(cb) }
 
@@ -121,7 +133,7 @@ interface MaybeKAsync: Async<ForMaybeK>, MaybeKMonadDefer {
 @extension
 interface MaybeKEffect :
   Effect<ForMaybeK>,
-  MaybeKAsync{
+  MaybeKAsync {
   override fun <A> MaybeKOf<A>.runAsync(cb: (Either<Throwable, A>) -> MaybeKOf<Unit>): MaybeK<Unit> =
     fix().runAsync(cb)
 }

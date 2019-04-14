@@ -16,7 +16,13 @@ import arrow.mtl.extensions.option.traverseFilter.traverseFilter
 import arrow.syntax.collections.firstOption
 import arrow.test.UnitSpec
 import arrow.test.generators.option
-import arrow.test.laws.*
+import arrow.test.laws.FunctorFilterLaws
+import arrow.test.laws.HashLaws
+import arrow.test.laws.MonadFilterLaws
+import arrow.test.laws.MonoidLaws
+import arrow.test.laws.MonoidalLaws
+import arrow.test.laws.ShowLaws
+import arrow.test.laws.TraverseFilterLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -33,10 +39,10 @@ class OptionTest : UnitSpec() {
 
   val associativeSemigroupalEq = object : Eq<Kind<ForOption, Tuple2<Int, Tuple2<Int, Int>>>> {
     override fun Kind<ForOption, Tuple2<Int, Tuple2<Int, Int>>>.eqv(b: Kind<ForOption, Tuple2<Int, Tuple2<Int, Int>>>): Boolean {
-        return Option.eq(Tuple2.eq(Int.eq(), Tuple2.eq(Int.eq(), Int.eq()))).run {
-          this@eqv.fix().eqv(b.fix())
-        }
+      return Option.eq(Tuple2.eq(Int.eq(), Tuple2.eq(Int.eq(), Int.eq()))).run {
+        this@eqv.fix().eqv(b.fix())
       }
+    }
   }
 
   init {
@@ -44,7 +50,7 @@ class OptionTest : UnitSpec() {
     testLaws(
       ShowLaws.laws(Option.show(), Option.eq(Int.eq())) { Some(it) },
       MonoidLaws.laws(Option.monoid(Int.monoid()), Gen.option(Gen.int()), Option.eq(Int.eq())),
-      //testLaws(MonadErrorLaws.laws(monadError<ForOption, Unit>(), Eq.any(), EQ_EITHER)) TODO reenable once the MonadErrorLaws are parametric to `E`
+      // testLaws(MonadErrorLaws.laws(monadError<ForOption, Unit>(), Eq.any(), EQ_EITHER)) TODO reenable once the MonadErrorLaws are parametric to `E`
       FunctorFilterLaws.laws(Option.traverseFilter(), { Option(it) }, Eq.any()),
       TraverseFilterLaws.laws(Option.traverseFilter(), Option.applicative(), ::Some, Eq.any()),
       MonadFilterLaws.laws(Option.monadFilter(), ::Some, Eq.any()),
@@ -137,7 +143,6 @@ class OptionTest : UnitSpec() {
       x and None shouldBe None
       None and x shouldBe None
       None and None shouldBe None
-
     }
 
     "or" {
@@ -148,12 +153,10 @@ class OptionTest : UnitSpec() {
       None or x shouldBe Some(2)
       None or None shouldBe None
     }
-
   }
 
   private fun bijection(from: Kind<ForOption, Tuple2<Tuple2<Int, Int>, Int>>): Option<Tuple2<Int, Tuple2<Int, Int>>> {
     val ot = (from as Some<Tuple2<Tuple2<Int, Int>, Int>>)
     return Tuple2(ot.t.a.a, Tuple2(ot.t.a.b, ot.t.b)).toOption()
   }
-
 }

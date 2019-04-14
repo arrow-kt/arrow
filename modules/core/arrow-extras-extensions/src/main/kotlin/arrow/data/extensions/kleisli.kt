@@ -136,7 +136,6 @@ interface KleisliMonadError<F, D, E> : MonadError<KleisliPartialOf<F, D>, E>, Kl
   override fun AE(): ApplicativeError<F, E> = ME()
 
   override fun AF(): Applicative<F> = ME()
-
 }
 
 @extension
@@ -168,5 +167,4 @@ interface KleisliFx<F, D> : Fx<KleisliPartialOf<F, D>> {
 
   override fun monad(): Monad<KleisliPartialOf<F, D>> =
     Kleisli.monad(MF())
-
 }

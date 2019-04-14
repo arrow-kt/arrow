@@ -35,7 +35,6 @@ class NonFatalTest : UnitSpec() {
         OutOfMemoryError(),
         LinkageError(),
         object : VirtualMachineError() {
-
         }
       )
 

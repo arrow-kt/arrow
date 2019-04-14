@@ -45,7 +45,6 @@ data class OptionT<F, A>(private val value: Kind<F, Option<A>>) : OptionTOf<F, A
     fun <F, A> liftF(FF: Functor<F>, fa: Kind<F, A>): OptionT<F, A> = FF.run {
       OptionT(fa.map { Some(it) })
     }
-
   }
 
   fun value(): Kind<F, Option<A>> = value

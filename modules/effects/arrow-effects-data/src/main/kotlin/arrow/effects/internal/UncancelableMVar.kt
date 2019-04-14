@@ -13,7 +13,7 @@ import arrow.effects.typeclasses.rightUnit
 import arrow.effects.typeclasses.unitCallback
 import java.util.concurrent.atomic.AtomicReference
 
-//[MVar] implementation for [Async] data types.
+// [MVar] implementation for [Async] data types.
 internal class UncancelableMVar<F, A> private constructor(initial: State<A>, private val AS: Async<F>) : MVar<F, A>, Async<F> by AS {
 
   private val stateRef = AtomicReference<State<A>>(initial)
@@ -218,6 +218,5 @@ internal class UncancelableMVar<F, A> private constructor(initial: State<A>, pri
        */
       data class WaitForTake<A>(val value: A, val puts: List<Tuple2<A, (Either<Throwable, Unit>) -> Unit>>) : State<A>()
     }
-
   }
 }

@@ -19,6 +19,5 @@ class NumberHashTest : UnitSpec() {
       HashLaws.laws(Byte.hash(), Byte.eq()) { it.toByte() },
       HashLaws.laws(Short.hash(), Short.eq()) { it.toShort() }
     )
-
   }
 }

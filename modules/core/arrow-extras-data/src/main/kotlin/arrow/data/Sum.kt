@@ -10,7 +10,7 @@ data class Sum<F, G, V>(
   val left: Kind<F, V>,
   val right: Kind<G, V>,
   val side: Side = Side.Left
-) : SumOf<F, G, V>, SumKindedJ<F, G ,V> {
+) : SumOf<F, G, V>, SumKindedJ<F, G, V> {
 
   sealed class Side {
     object Left : Side()

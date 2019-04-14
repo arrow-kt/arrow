@@ -128,5 +128,4 @@ internal class CancelablePromise<F, A>(private val CF: Concurrent<F>) : Promise<
   override fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B> = CF.run {
     this@map.map(f)
   }
-
 }

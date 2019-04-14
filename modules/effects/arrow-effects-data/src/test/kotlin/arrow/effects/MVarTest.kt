@@ -1,6 +1,12 @@
 package arrow.effects
 
-import arrow.core.*
+import arrow.core.None
+import arrow.core.Some
+import arrow.core.Tuple3
+import arrow.core.Tuple4
+import arrow.core.Tuple7
+import arrow.core.flatMap
+import arrow.core.toT
 import arrow.effects.extensions.io.async.async
 import arrow.effects.extensions.io.concurrent.concurrent
 import arrow.effects.extensions.io.monad.binding
@@ -19,7 +25,7 @@ class MVarTest : UnitSpec() {
 
   init {
 
-    fun tests(label: String, mvar: MVarPartialOf<ForIO>): Unit {
+    fun tests(label: String, mvar: MVarPartialOf<ForIO>) {
       "$label - empty; put; isNotEmpty; take; put; take" {
         forAll(Gen.int(), Gen.int()) { a, b ->
           binding {
@@ -157,7 +163,5 @@ class MVarTest : UnitSpec() {
 
     tests("UncancelableMVar", MVar(IO.async()))
     tests("CancelableMVar", MVar(IO.concurrent()))
-
   }
-
 }

@@ -4,7 +4,20 @@ import arrow.Kind
 import arrow.core.Eval
 import arrow.core.Tuple2
 import arrow.extension
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Const
+import arrow.typeclasses.Contravariant
+import arrow.typeclasses.Divide
+import arrow.typeclasses.Divisible
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Hash
+import arrow.typeclasses.Invariant
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.Semigroup
+import arrow.typeclasses.Show
+import arrow.typeclasses.Traverse
 import arrow.typeclasses.ap as constAp
 import arrow.typeclasses.combine as combineAp
 

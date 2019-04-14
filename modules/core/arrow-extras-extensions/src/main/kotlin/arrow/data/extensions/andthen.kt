@@ -14,7 +14,6 @@ interface AndThenSemigroup<A, B> : Semigroup<AndThen<A, B>> {
   override fun AndThen<A, B>.combine(b: AndThen<A, B>): AndThen<A, B> = SB().run {
     AndThen { a: A -> invoke(a).combine(b.invoke(a)) }
   }
-
 }
 
 @extension
@@ -26,7 +25,6 @@ interface AndThenMonoid<A, B> : Monoid<AndThen<A, B>>, AndThenSemigroup<A, B> {
 
   override fun empty(): AndThen<A, B> =
     AndThen { MB().empty() }
-
 }
 
 @extension
@@ -45,7 +43,6 @@ interface AndThenApplicative<X> : Applicative<AndThenPartialOf<X>>, AndThenFunct
 
   override fun <A, B> AndThenOf<X, A>.map(f: (A) -> B): AndThen<X, B> =
     fix().map(f)
-
 }
 
 @extension
@@ -61,7 +58,6 @@ interface AndThenMonad<X> : Monad<AndThenPartialOf<X>>, AndThenApplicative<X> {
 
   override fun <A, B> AndThenOf<X, A>.ap(ff: AndThenOf<X, (A) -> B>): AndThen<X, B> =
     fix().ap(ff)
-
 }
 
 @extension
@@ -71,7 +67,6 @@ interface AndThenCategory : Category<ForAndThen> {
 
   override fun <A, B, C> AndThenOf<B, C>.compose(arr: Kind2<ForAndThen, A, B>): AndThen<A, C> =
     fix().compose(arr::invoke)
-
 }
 
 @extension
@@ -79,7 +74,6 @@ interface AndThenContravariant<O> : Contravariant<Conested<ForAndThen, O>> {
 
   override fun <A, B> Kind<Conested<ForAndThen, O>, A>.contramap(f: (B) -> A): Kind<Conested<ForAndThen, O>, B> =
     counnest().fix().contramap(f).conest()
-
 }
 
 @extension

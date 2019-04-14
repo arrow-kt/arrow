@@ -41,5 +41,4 @@ internal class UnsafePromise<A> {
     is State.Waiting -> state.set(State.Waiting(oldState.joiners - cb))
     is State.Full -> Unit
   }
-
 }

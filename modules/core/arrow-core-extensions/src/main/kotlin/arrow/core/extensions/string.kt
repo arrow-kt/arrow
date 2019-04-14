@@ -1,6 +1,11 @@
 package arrow.core.extensions
 
-import arrow.typeclasses.*
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Hash
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.Order
+import arrow.typeclasses.Semigroup
+import arrow.typeclasses.Show
 
 interface StringSemigroup : Semigroup<String> {
   override fun String.combine(b: String): String = "${this}$b"

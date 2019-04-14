@@ -51,7 +51,8 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
       tailrec fun <A, B> go(
         buf: MutableList<B>,
         f: (A) -> SequenceKOf<Either<A, B>>,
-        v: SequenceK<Either<A, B>>) {
+        v: SequenceK<Either<A, B>>
+      ) {
         if (!(v.toList().isEmpty())) {
           val head: Either<A, B> = v.first()
           when (head) {
@@ -73,7 +74,6 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
       go(buf, f, f(a).fix())
       return SequenceK(buf.asSequence())
     }
-
   }
 }
 

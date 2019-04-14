@@ -32,7 +32,6 @@ class ComonadicUisTest : FreeSpec() {
         .extract() shouldBe "Counter value: 10"
     }
 
-
     "Day of two Ids" {
       val renderHtml = { left: String, right: Int -> """
           |<div>
@@ -44,9 +43,6 @@ class ComonadicUisTest : FreeSpec() {
       val day = Day(Id.just("Hello"), Id.just(0), renderHtml)
 
       day.extract(Id.comonad(), Id.comonad()) shouldBe renderHtml("Hello", 0)
-
     }
-
   }
-
 }

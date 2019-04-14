@@ -1,15 +1,39 @@
 @file:Suppress("UnusedImports")
+
 package arrow.core.extensions
 
 import arrow.Kind
-import arrow.core.*
-import arrow.core.select as optionSelect
-import arrow.core.extensions.option.monad.map
-import arrow.core.extensions.option.monad.monad
+import arrow.core.Either
+import arrow.core.Eval
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.Tuple2
 import arrow.extension
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Hash
+import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadError
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.MonoidK
+import arrow.typeclasses.Monoidal
+import arrow.typeclasses.Selective
+import arrow.typeclasses.Semigroup
+import arrow.typeclasses.SemigroupK
+import arrow.typeclasses.Semigroupal
+import arrow.typeclasses.Semiring
+import arrow.typeclasses.Show
+import arrow.typeclasses.Traverse
+import arrow.typeclasses.fix
 import arrow.typeclasses.suspended.monad.Fx
 import arrow.core.extensions.traverse as optionTraverse
+import arrow.core.extensions.option.monad.map
+import arrow.core.extensions.option.monad.monad
+import arrow.core.select as optionSelect
 
 @extension
 interface OptionSemigroup<A> : Semigroup<Option<A>> {
@@ -51,22 +75,22 @@ interface OptionSemiring<A> : Semiring<Option<A>> {
   override fun one(): Option<A> = None
 
   override fun Option<A>.combine(b: Option<A>): Option<A> =
-          when (this) {
-            is Some<A> -> when (b) {
-              is Some<A> -> Some(SG().run { t.combine(b.t) })
-              None -> this
-            }
-            None -> b
-          }
+    when (this) {
+      is Some<A> -> when (b) {
+        is Some<A> -> Some(SG().run { t.combine(b.t) })
+        None -> this
+      }
+      None -> b
+    }
 
   override fun Option<A>.combineMultiplicate(b: Option<A>): Option<A> =
-          when (this) {
-            is Some<A> -> when (b) {
-              is Some<A> -> Some(SG().run { t.combineMultiplicate(b.t) })
-              None -> this
-            }
-            None -> b
-          }
+    when (this) {
+      is Some<A> -> when (b) {
+        is Some<A> -> Some(SG().run { t.combineMultiplicate(b.t) })
+        None -> this
+      }
+      None -> b
+    }
 }
 
 @extension

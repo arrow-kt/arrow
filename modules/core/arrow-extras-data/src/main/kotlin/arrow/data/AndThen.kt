@@ -239,12 +239,12 @@ sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
   @Suppress("UNCHECKED_CAST")
   private tailrec fun rotateAccumulate(
     left: AndThen<Any?, Any?>,
-    right: AndThen<Any?, Any?>): AndThen<Any?, Any?> = when (left) {
+    right: AndThen<Any?, Any?>
+  ): AndThen<Any?, Any?> = when (left) {
     is Concat<*, *, *> -> rotateAccumulate(
       left.left as AndThen<Any?, Any?>,
       (left.right as AndThen<Any?, Any?>).andThenF(right)
     )
     is Single<*, *> -> left.andThenF(right)
   }
-
 }

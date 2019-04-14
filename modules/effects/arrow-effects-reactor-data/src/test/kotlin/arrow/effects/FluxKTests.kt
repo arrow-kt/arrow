@@ -181,6 +181,5 @@ class FluxKTest : UnitSpec() {
         .test()
         .expectError(ConnectionCancellationException::class)
     }
-
   }
 }

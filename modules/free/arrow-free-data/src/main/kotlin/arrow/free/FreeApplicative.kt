@@ -28,7 +28,6 @@ sealed class FreeApplicative<F, out A> : FreeApplicativeOf<F, A> {
       object : FunctionK<F, FreeApplicativePartialOf<G>> {
         override fun <A> invoke(fa: Kind<F, A>): FreeApplicative<G, A> =
           liftF(f(fa))
-
       }
 
     internal fun <F> applicativeF(): Applicative<FreeApplicativePartialOf<F>> = object : Applicative<FreeApplicativePartialOf<F>> {
@@ -111,11 +110,10 @@ sealed class FreeApplicative<F, out A> : FreeApplicativeOf<F, A> {
             fns = listOf(CurriedFunction(res as Kind<G, (Any?) -> Any?>, fn.remaining - 1)) + fns
             fnsLength += 1
             loop()
-
           } else {
             if (fnsLength > 0) {
 
-              tailrec fun innerLoop(): Unit {
+              tailrec fun innerLoop() {
                 fn = fns.first()
                 fns = fns.drop(1)
                 fnsLength -= 1

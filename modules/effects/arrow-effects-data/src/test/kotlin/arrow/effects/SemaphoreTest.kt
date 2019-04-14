@@ -22,10 +22,9 @@ import org.junit.runner.RunWith
 @RunWith(KotlinTestRunner::class)
 class SemaphoreTest : UnitSpec() {
 
-
   init {
 
-    fun tests(label: String, semaphore: (Long) -> IOOf<Semaphore<ForIO>>): Unit {
+    fun tests(label: String, semaphore: (Long) -> IOOf<Semaphore<ForIO>>) {
       "$label - acquire n synchronously" {
         val n = 20L
         semaphore(n).flatMap { s ->
@@ -98,7 +97,6 @@ class SemaphoreTest : UnitSpec() {
         }.equalUnderTheLaw(IO.just(0L), EQ())
       }
 
-
       "$label - negative number of permits" {
         forAll(Gen.negativeIntegers().map(Int::toLong)) { i ->
           semaphore(i)
@@ -124,7 +122,6 @@ class SemaphoreTest : UnitSpec() {
         }
       }
 
-
       "$label - offsetting acquires/releases - acquires parallel with releases" {
         val permits: List<Long> = listOf(1, 0, 20, 4, 0, 5, 2, 1, 1, 3)
         semaphore(0).flatMap { s ->
@@ -138,7 +135,6 @@ class SemaphoreTest : UnitSpec() {
         }.map { count -> count.equalUnderTheLaw(0L, Long.eq()) }
           .unsafeRunSync()
       }
-
     }
 
     tests("UncancelableSemaphore") { Semaphore.uncancelable(it, IO.async()) }
@@ -150,7 +146,5 @@ class SemaphoreTest : UnitSpec() {
       }.unsafeRunAsyncCancellable { }
         .invoke()
     }
-
   }
-
 }

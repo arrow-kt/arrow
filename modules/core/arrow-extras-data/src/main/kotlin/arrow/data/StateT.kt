@@ -148,7 +148,6 @@ class StateT<F, S, A>(
       })
       )
     }
-
   }
 
   /**

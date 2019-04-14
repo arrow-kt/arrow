@@ -60,7 +60,6 @@ data class EitherT<F, A, B>(private val value: Kind<F, Either<A, B>>) : EitherTO
     fun <F, A, B> liftF(FF: Functor<F>, fa: Kind<F, B>): EitherT<F, A, B> = FF.run {
       EitherT(fa.map(::Right))
     }
-
   }
 
   fun value(): Kind<F, Either<A, B>> = value
@@ -124,5 +123,4 @@ data class EitherT<F, A, B>(private val value: Kind<F, Either<A, B>>) : EitherTO
         a.map { f -> f(bb) }
       }
     })
-
 }

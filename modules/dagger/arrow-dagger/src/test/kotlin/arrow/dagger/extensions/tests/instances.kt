@@ -202,7 +202,3 @@ object test {
     println(Arrow.instances.optionApplicative().just(1))
   }
 }
-
-
-
-

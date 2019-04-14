@@ -42,7 +42,7 @@ class Function0Test : UnitSpec() {
     }
 
     "Function0<A>.empty() is Function0{A.empty()}" {
-      Function0.monoid(Int.monoid()).run { empty() }.invoke() == Function0({ Int.monoid().run { empty() }}).invoke()
+      Function0.monoid(Int.monoid()).run { empty() }.invoke() == Function0({ Int.monoid().run { empty() } }).invoke()
     }
   }
 }

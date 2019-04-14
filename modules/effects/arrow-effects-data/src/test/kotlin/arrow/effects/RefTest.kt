@@ -146,6 +146,5 @@ class RefTest : UnitSpec() {
         accessMap.equalUnderTheLaw(tryUpdate, EQ())
       }
     }
-
   }
 }

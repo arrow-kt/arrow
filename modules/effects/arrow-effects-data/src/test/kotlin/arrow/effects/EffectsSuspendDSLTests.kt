@@ -1,7 +1,15 @@
 package arrow.effects
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Failure
+import arrow.core.Left
+import arrow.core.Option
+import arrow.core.Right
+import arrow.core.Try
+import arrow.core.identity
+import arrow.core.left
+import arrow.core.none
+import arrow.core.right
 import arrow.effects.extensions.io.fx.fx
 import arrow.effects.extensions.io.unsafeRun.runBlocking
 import arrow.effects.extensions.io.unsafeRun.unsafeRun
@@ -64,7 +72,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
       val program = fx {
         // note how the receiving value is typed in the environment and not inside IO despite being effectful and
         // non-blocking parallel computations
-        val result: List<String> = ! NonBlocking.parMapN(
+        val result: List<String> = !NonBlocking.parMapN(
           effect { getThreadName() },
           effect { getThreadName() }
         ) { a, b -> listOf(a, b) }
@@ -354,11 +362,9 @@ class EffectsSuspendDSLTests : UnitSpec() {
       } shouldBe done
     }
   }
-
 }
 
 fun <A> fxTest(f: () -> IO<A>): A =
   unsafe { runBlocking(f) }
 
 object TestError : Throwable()
-

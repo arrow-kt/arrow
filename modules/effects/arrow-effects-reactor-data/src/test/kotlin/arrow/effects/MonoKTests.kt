@@ -1,6 +1,6 @@
 package arrow.effects
 
-import arrow.effects.reactor.*
+import arrow.effects.reactor.MonoK
 import arrow.effects.reactor.extensions.monok.async.async
 import arrow.effects.reactor.extensions.monok.monad.flatMap
 import arrow.effects.reactor.extensions.monok.monadThrow.bindingCatch
@@ -170,6 +170,5 @@ class MonoKTest : UnitSpec() {
         .test()
         .expectError(ConnectionCancellationException::class)
     }
-
   }
 }

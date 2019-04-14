@@ -1,6 +1,7 @@
 package arrow.effects
 
-import arrow.effects.rx2.*
+import arrow.effects.rx2.MaybeK
+import arrow.effects.rx2.k
 import arrow.effects.rx2.extensions.maybek.applicative.applicative
 import arrow.effects.rx2.extensions.maybek.applicativeError.applicativeError
 import arrow.effects.rx2.extensions.maybek.async.async
@@ -14,7 +15,14 @@ import arrow.effects.rx2.extensions.maybek.monadError.monadError
 import arrow.effects.rx2.extensions.maybek.monadThrow.bindingCatch
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
-import arrow.test.laws.*
+import arrow.test.laws.ApplicativeErrorLaws
+import arrow.test.laws.ApplicativeLaws
+import arrow.test.laws.AsyncLaws
+import arrow.test.laws.FoldableLaws
+import arrow.test.laws.FunctorLaws
+import arrow.test.laws.MonadDeferLaws
+import arrow.test.laws.MonadErrorLaws
+import arrow.test.laws.MonadLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
@@ -48,7 +56,6 @@ class MaybeKTests : UnitSpec() {
         }
         errA == errB
       }
-
   }
 
   init {
@@ -180,7 +187,5 @@ class MaybeKTests : UnitSpec() {
         .test()
         .assertError(ConnectionCancellationException)
     }
-
   }
-
 }

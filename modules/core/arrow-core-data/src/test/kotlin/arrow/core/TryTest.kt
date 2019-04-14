@@ -1,6 +1,10 @@
 package arrow.core
 
-import arrow.core.extensions.*
+import arrow.core.extensions.combine
+import arrow.core.extensions.eq
+import arrow.core.extensions.hash
+import arrow.core.extensions.monoid
+import arrow.core.extensions.semigroup
 import arrow.core.extensions.`try`.applicative.map
 import arrow.core.extensions.`try`.eq.eq
 import arrow.core.extensions.`try`.functor.functor
@@ -13,7 +17,13 @@ import arrow.core.extensions.`try`.traverse.traverse
 import arrow.mtl.extensions.`try`.functorFilter.functorFilter
 import arrow.test.UnitSpec
 import arrow.test.generators.`try`
-import arrow.test.laws.*
+import arrow.test.laws.FunctorFilterLaws
+import arrow.test.laws.HashLaws
+import arrow.test.laws.MonadErrorLaws
+import arrow.test.laws.MonoidLaws
+import arrow.test.laws.SemigroupLaws
+import arrow.test.laws.ShowLaws
+import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Hash
 import io.kotlintest.fail
@@ -241,6 +251,5 @@ class TryTest : UnitSpec() {
       (Try { failure }.flatten().isFailure()) shouldBe true
       (Try<Try<Int>> { throw RuntimeException("") }.flatten().isFailure()) shouldBe true
     }
-
   }
 }

@@ -163,9 +163,7 @@ class Kleisli<F, D, A>(val run: KleisliFun<F, D, A>) : KleisliOf<F, D, A>, Kleis
      */
     fun <F, D, A> liftF(fa: Kind<F, A>): Kleisli<F, D, A> =
       Kleisli { _ -> fa }
-
   }
-
 }
 
 /**

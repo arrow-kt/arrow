@@ -43,7 +43,6 @@ interface MapKSemigroup<K, A> : Semigroup<MapK<K, A>> {
     if (fix().size < b.fix().size) fix().foldLeft<A>(b.fix()) { my, (k, b) -> my.updated(k, b.maybeCombine(my[k])) }
     else b.fix().foldLeft<A>(fix()) { my, (k, a) -> my.updated(k, a.maybeCombine(my[k])) }
   }
-
 }
 
 @extension
@@ -69,7 +68,6 @@ interface MapKEq<K, A> : Eq<MapK<K, A>> {
         } ?: false
       }.fold(true) { b1, b2 -> b1 && b2 }
     } else false
-
 }
 
 @extension

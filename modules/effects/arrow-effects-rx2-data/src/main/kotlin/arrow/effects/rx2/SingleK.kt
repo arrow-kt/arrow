@@ -166,8 +166,8 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
     fun <A> async(fa: SingleKProc<A>): SingleK<A> =
       SingleK(Single.create<A> { emitter ->
         val conn = SingleKConnection()
-        //On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
-        //on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
+        // On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
+        // on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
         conn.push(SingleK { if (!emitter.isDisposed) emitter.onError(OnCancel.CancellationException) })
         emitter.setCancellable { conn.cancel().value().subscribe() }
 
@@ -183,8 +183,8 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
     fun <A> asyncF(fa: SingleKProcF<A>): SingleK<A> =
       SingleK(Single.create { emitter: SingleEmitter<A> ->
         val conn = SingleKConnection()
-        //On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
-        //on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
+        // On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
+        // on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
         conn.push(SingleK { if (!emitter.isDisposed) emitter.onError(OnCancel.CancellationException) })
         emitter.setCancellable { conn.cancel().value().subscribe() }
 

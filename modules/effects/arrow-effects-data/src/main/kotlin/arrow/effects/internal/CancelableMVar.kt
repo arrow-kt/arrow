@@ -237,5 +237,4 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, priva
   override fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B> = CF.run {
     this@map.map(f)
   }
-
 }

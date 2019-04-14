@@ -32,7 +32,5 @@ data class Coyoneda<F, P, A>(val pivot: Kind<F, P>, internal val ks: List<AnyFun
     operator fun <U, A, B> invoke(fa: Kind<U, A>, f: (A) -> B): Coyoneda<U, A, B> = unsafeApply(fa, listOf(f as AnyFunc))
 
     fun <U, A, B> unsafeApply(fa: Kind<U, A>, f: List<AnyFunc>): Coyoneda<U, A, B> = Coyoneda(fa, f)
-
   }
-
 }

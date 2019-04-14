@@ -69,7 +69,8 @@ data class ListK<out A>(private val list: List<A>) : ListKOf<A>, List<A> by list
     private tailrec fun <A, B> go(
       buf: ArrayList<B>,
       f: (A) -> Kind<ForListK, Either<A, B>>,
-      v: ListK<Either<A, B>>) {
+      v: ListK<Either<A, B>>
+    ) {
       if (!v.isEmpty()) {
         val head: Either<A, B> = v.first()
         when (head) {
@@ -88,7 +89,6 @@ data class ListK<out A>(private val list: List<A>) : ListKOf<A>, List<A> by list
       return ListK(buf)
     }
   }
-
 }
 
 fun <A> ListKOf<A>.combineK(y: ListKOf<A>): ListK<A> =

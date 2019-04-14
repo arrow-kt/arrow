@@ -10,10 +10,14 @@ import arrow.core.extensions.function1.semigroup.semigroup
 import arrow.core.extensions.monoid
 import arrow.core.extensions.semigroup
 import arrow.test.UnitSpec
-import arrow.test.laws.*
+import arrow.test.laws.CategoryLaws
+import arrow.test.laws.DivisibleLaws
+import arrow.test.laws.MonadLaws
+import arrow.test.laws.MonoidLaws
+import arrow.test.laws.ProfunctorLaws
+import arrow.test.laws.SemigroupLaws
 import arrow.typeclasses.Conested
 import arrow.typeclasses.Eq
-import arrow.typeclasses.conest
 import arrow.typeclasses.counnest
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll

@@ -89,8 +89,6 @@ interface ListKMonad : Monad<ForListK> {
 
   override fun <A> just(a: A): ListK<A> =
     ListK.just(a)
-
-
 }
 
 @extension
@@ -132,7 +130,7 @@ interface ListKSemigroupK : SemigroupK<ForListK> {
 @extension
 interface ListKSemigroupal : Semigroupal<ForListK> {
   override fun <A, B> Kind<ForListK, A>.product(fb: Kind<ForListK, B>): Kind<ForListK, Tuple2<A, B>> =
-    fb.fix().ap(this.map { a:A -> { b: B -> Tuple2(a,b)} })
+    fb.fix().ap(this.map { a: A -> { b: B -> Tuple2(a, b) } })
 }
 
 @extension
@@ -166,5 +164,4 @@ interface ListKFx : Fx<ForListK> {
 
   override fun monad(): Monad<ForListK> =
     ListK.monad()
-
 }

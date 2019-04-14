@@ -25,7 +25,6 @@ sealed class Free<S, out A> : FreeOf<S, A> {
       object : FunctionK<F, FreePartialOf<F>> {
         override fun <A> invoke(fa: Kind<F, A>): Free<F, A> =
           liftF(fa)
-
       }
 
     internal fun <F> applicativeF(applicative: Applicative<FreePartialOf<F>>): Applicative<FreePartialOf<F>> =

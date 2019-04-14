@@ -41,7 +41,6 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
         { Invalid(ifNone()) },
         { Valid(it) }
       )
-
   }
 
   data class Valid<out A>(val a: A) : Validated<Nothing, A>()
@@ -190,9 +189,11 @@ fun <G, E, A, B> ValidatedOf<E, A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G
 fun <G, E, A> ValidatedOf<E, Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, Validated<E, A>> =
   fix().traverse(GA, ::identity)
 
-fun <E, A> ValidatedOf<E, A>.combine(SE: Semigroup<E>,
-                                            SA: Semigroup<A>,
-                                            y: ValidatedOf<E, A>): Validated<E, A> =
+fun <E, A> ValidatedOf<E, A>.combine(
+  SE: Semigroup<E>,
+  SA: Semigroup<A>,
+  y: ValidatedOf<E, A>
+): Validated<E, A> =
   y.fix().let { that ->
     when {
       this is Valid && that is Valid -> Valid(SA.run { a.combine(that.a) })

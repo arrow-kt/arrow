@@ -49,7 +49,6 @@ interface CoproductComonad<F, G> : Comonad<CoproductPartialOf<F, G>> {
   override fun <A> Kind<CoproductPartialOf<F, G>, A>.extract(): A = fix().extract(CF(), CG())
 
   override fun <A, B> Kind<CoproductPartialOf<F, G>, A>.map(f: (A) -> B): Coproduct<F, G, B> = fix().map(CF(), CG(), f)
-
 }
 
 @extension
@@ -65,7 +64,6 @@ interface CoproductFoldable<F, G> : Foldable<CoproductPartialOf<F, G>> {
 
   override fun <A, B> Kind<CoproductPartialOf<F, G>, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
     fix().foldRight(lb, f, FF(), FG())
-
 }
 
 @extension
