@@ -18,6 +18,5 @@ class IterableTests : UnitSpec() {
         case({ n: Int -> n % 2 == 0 } then { (it * 2).toString() })
       ) shouldBe listOf("4", "8")
     }
-
   }
 }

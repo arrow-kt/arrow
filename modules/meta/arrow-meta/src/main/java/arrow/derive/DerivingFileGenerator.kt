@@ -64,7 +64,7 @@ fun retTypeAsSeenFromReceiver(typeClassFirstTypeArg: String, abstractType: Strin
   val extraTypeArgs = invariantTypeArgs.prependTypeArgs()
   val receiverType = recType.fullName.asKotlin()
   return when {
-  //abstractType.matches("arrow.Kind<(.*?), arrow.Kind<$typeClassFirstTypeArg, (.*?)>>".toRegex()) -> abstractType.replace(kindedRegex(typeClassFirstTypeArg), "$receiverType$KindPostFix<$extraTypeArgs")
+  // abstractType.matches("arrow.Kind<(.*?), arrow.Kind<$typeClassFirstTypeArg, (.*?)>>".toRegex()) -> abstractType.replace(kindedRegex(typeClassFirstTypeArg), "$receiverType$KindPostFix<$extraTypeArgs")
     abstractType.startsWith("arrow.Kind<") -> abstractType.replace(kindedRegex(typeClassFirstTypeArg), "$receiverType<$extraTypeArgs")
     else -> abstractType.replace(kindedRegex(typeClassFirstTypeArg), "$receiverType$KindPostFix<$extraTypeArgs")
   }.applyUnappliedTypeArgs(unappliedTypeArgs)
@@ -105,11 +105,12 @@ data class FunctionSignature(
 
   companion object {
 
-    fun from(recType: ClassOrPackageDataWrapper.Class,
-             typeClass: ClassOrPackageDataWrapper,
-             f: ProtoBuf.Function,
-             invariantTypeArgs: List<String> = emptyList(),
-             unappliedTypeArgs: List<Pair<String, String>> = emptyList()): FunctionSignature {
+    fun from(
+      recType: ClassOrPackageDataWrapper.Class,
+      typeClass: ClassOrPackageDataWrapper,
+      f: ProtoBuf.Function,
+      invariantTypeArgs: List<String> = emptyList(),
+      unappliedTypeArgs: List<Pair<String, String>> = emptyList()): FunctionSignature {
       fun Int.get() =
         typeClass.nameResolver.getString(this)
 
@@ -154,7 +155,8 @@ data class FunctionSignature(
 
 class TypeclassInstanceGenerator(
   val targetType: AnnotatedDeriving,
-  val typeClass: ClassOrPackageDataWrapper.Class) {
+  val typeClass: ClassOrPackageDataWrapper.Class
+) {
 
   val target: ClassOrPackageDataWrapper.Class = targetType.classOrPackageProto as ClassOrPackageDataWrapper.Class
 
@@ -184,7 +186,7 @@ class TypeclassInstanceGenerator(
 
   val companionFactoryName: String = typeClassName[0].toLowerCase() + typeClassName.drop(1)
 
-  val instanceName: String = "$receiverSimpleName${typeClassName}"
+  val instanceName: String = "$receiverSimpleName$typeClassName"
 
   fun targetHasFunction(f: FunctionSignature, c: ClassOrPackageDataWrapper): Boolean =
     c.functionList.any {
@@ -235,5 +237,4 @@ class DerivingFileGenerator(
     c.derivingTypeclasses.filter { it is ClassOrPackageDataWrapper.Class }.joinToString("\n\n") {
       TypeclassInstanceGenerator(c, it as ClassOrPackageDataWrapper.Class).generate()
     }
-
 }

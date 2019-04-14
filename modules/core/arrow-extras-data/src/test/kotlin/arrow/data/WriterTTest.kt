@@ -83,6 +83,5 @@ class WriterTTest : UnitSpec() {
             }
         })
     )
-
   }
 }

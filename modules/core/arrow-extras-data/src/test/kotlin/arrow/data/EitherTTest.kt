@@ -61,6 +61,5 @@ class EitherTTest : UnitSpec() {
           EitherT(Option.empty<Either<Int, Int>>()).mapLeft(Option.functor()) { it + 1 } == EitherT(Option.empty<Either<Int, Int>>())
       }
     }
-
   }
 }

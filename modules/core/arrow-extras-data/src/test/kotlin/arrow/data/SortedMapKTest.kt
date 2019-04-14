@@ -40,7 +40,5 @@ class SortedMapKTest : UnitSpec() {
         SortedMapK.functor<String>(),
         { a: Int -> sortedMapOf("key" to a).k() },
         EQ))
-
   }
-
 }

@@ -1,6 +1,8 @@
 package arrow.data
 
-import arrow.core.*
+import arrow.core.Id
+import arrow.core.Tuple2
+import arrow.core.andThen
 import arrow.typeclasses.internal.IdBimonad
 
 /**

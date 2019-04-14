@@ -3,23 +3,42 @@ package arrow.meta.encoder.jvm
 import arrow.common.utils.ClassOrPackageDataWrapper
 import arrow.common.utils.ProcessorUtils
 import arrow.meta.Either
-import arrow.meta.ast.*
 import arrow.meta.ast.Annotation
+import arrow.meta.ast.Code
+import arrow.meta.ast.Func
+import arrow.meta.ast.PackageName
+import arrow.meta.ast.Parameter
+import arrow.meta.ast.Property
+import arrow.meta.ast.Tree
+import arrow.meta.ast.Type
+import arrow.meta.ast.TypeName
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.asTypeName
 import com.squareup.kotlinpoet.asTypeVariableName
-import me.eugeniomarletti.kotlin.metadata.*
+import me.eugeniomarletti.kotlin.metadata.getterModality
+import me.eugeniomarletti.kotlin.metadata.getterVisibility
+import me.eugeniomarletti.kotlin.metadata.isDelegated
+import me.eugeniomarletti.kotlin.metadata.isPrimary
+import me.eugeniomarletti.kotlin.metadata.isSuspend
+import me.eugeniomarletti.kotlin.metadata.isVar
 import me.eugeniomarletti.kotlin.metadata.jvm.getJvmConstructorSignature
 import me.eugeniomarletti.kotlin.metadata.jvm.getJvmFieldSignature
 import me.eugeniomarletti.kotlin.metadata.jvm.getJvmMethodSignature
 import me.eugeniomarletti.kotlin.metadata.jvm.jvmPropertySignature
+import me.eugeniomarletti.kotlin.metadata.modality
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.TypeTable
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.hasReceiver
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.jvm.JvmProtoBuf
-import javax.lang.model.element.*
+import me.eugeniomarletti.kotlin.metadata.visibility
+import javax.lang.model.element.Element
+import javax.lang.model.element.ElementKind
+import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.Modifier
+import javax.lang.model.element.PackageElement
+import javax.lang.model.element.TypeElement
+import javax.lang.model.element.VariableElement
 import javax.lang.model.type.NoType
 import javax.lang.model.util.ElementFilter
 import javax.lang.model.util.Elements
@@ -41,7 +60,7 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
     when (this) {
       is PackageElement -> Either.Right(PackageName(qualifiedName.toString()))
       else -> Either.Left(
-        EncodingError.UnsupportedElementType("Unsupported ${this}, as ($kind) to PackageName", this)
+        EncodingError.UnsupportedElementType("Unsupported $this, as ($kind) to PackageName", this)
       )
     }
 
@@ -158,14 +177,14 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
     } else this
 
   private fun Func.fixSuspendedParameters(): Func =
-      copy(
-        parameters = parameters.map { p ->
-          val t = p.type
-          val result = if (t is TypeName.ParameterizedType) t.asSuspendedContinuation()
-          else t
-          p.copy(type = result)
-        }
-      )
+    copy(
+      parameters = parameters.map { p ->
+        val t = p.type
+        val result = if (t is TypeName.ParameterizedType) t.asSuspendedContinuation()
+        else t
+        p.copy(type = result)
+      }
+    )
 
   fun TypeName.ParameterizedType.isSimpleContinuation(): Boolean =
     (rawType.fqName == Function1::class.qualifiedName && typeArguments.size == 2 && {
@@ -319,7 +338,7 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
             } else function
           result.fixSuspendedParameters()
         } catch (e: IllegalArgumentException) {
-          //some public final functions can't be seen as overridden
+          // some public final functions can't be seen as overridden
           templateFunction?.second?.toMeta(templateFunction.first, member)
         }
       }.toList()
@@ -423,5 +442,4 @@ interface TypeElementEncoder : KotlinMetatadataEncoder, KotlinPoetEncoder, Proce
 
   fun TypeElement.asMetaType(): Type? =
     type().fold({ null }, { it })
-
 }

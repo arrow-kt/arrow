@@ -1,7 +1,12 @@
 package arrow.optics.typeclasses
 
-import arrow.core.*
-import arrow.optics.*
+import arrow.core.Option
+import arrow.core.Tuple2
+import arrow.optics.Iso
+import arrow.optics.Optional
+import arrow.optics.Prism
+import arrow.optics.first
+import arrow.optics.second
 
 typealias Conj<S, A> = Snoc<S, A>
 
@@ -65,5 +70,4 @@ interface Snoc<S, A> {
       override fun snoc(): Prism<S, Tuple2<S, A>> = prism
     }
   }
-
 }

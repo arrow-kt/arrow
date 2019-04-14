@@ -22,5 +22,4 @@ interface From<F> {
         from = from.product(query.from)
       )
     }
-
 }

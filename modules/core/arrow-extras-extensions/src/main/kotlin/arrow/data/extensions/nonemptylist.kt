@@ -3,11 +3,25 @@ package arrow.data.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
-import arrow.data.*
+import arrow.data.Nel
+import arrow.data.NonEmptyList
 import arrow.data.extensions.listk.monad.monad
 import arrow.data.extensions.nonemptylist.monad.monad
 import arrow.extension
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Bimonad
+import arrow.typeclasses.Comonad
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Hash
+import arrow.typeclasses.Monad
+import arrow.typeclasses.Reducible
+import arrow.typeclasses.Semigroup
+import arrow.typeclasses.SemigroupK
+import arrow.typeclasses.Show
+import arrow.typeclasses.Traverse
+import arrow.typeclasses.fix
 import arrow.typeclasses.suspended.monad.Fx
 import arrow.data.combineK as nelCombineK
 
@@ -162,5 +176,4 @@ interface NelFx : Fx<ForNonEmptyList> {
 
   override fun monad(): Monad<ForNonEmptyList> =
     Nel.monad()
-
 }

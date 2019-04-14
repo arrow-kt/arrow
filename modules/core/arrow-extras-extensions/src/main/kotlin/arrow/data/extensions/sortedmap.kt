@@ -2,9 +2,16 @@ package arrow.data.extensions
 
 import arrow.Kind
 import arrow.core.Eval
-import arrow.data.*
-
-import arrow.typeclasses.*
+import arrow.data.SortedMapK
+import arrow.data.k
+import arrow.data.updated
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.Semigroup
+import arrow.typeclasses.Show
+import arrow.typeclasses.Traverse
 
 interface SortedMapKFunctor<A : Comparable<A>> : Functor<SortedMapKPartialOf<A>> {
   override fun <B, C> SortedMapKOf<A, B>.map(f: (B) -> C): SortedMapK<A, C> =

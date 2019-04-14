@@ -2,7 +2,9 @@ package arrow.free
 
 import arrow.Kind
 import arrow.core.*
-import arrow.data.*
+import arrow.data.ListK
+import arrow.data.NonEmptyList
+import arrow.data.OptionT
 import arrow.free.Cofree.Companion.unfold
 import arrow.free.extensions.cofree.comonad.comonad
 import arrow.core.extensions.eval.applicative.applicative
@@ -17,10 +19,13 @@ import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.laws.ComonadLaws
 import arrow.typeclasses.Eq
-import arrow.core.FunctionK
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
+import kotlin.AssertionError
+import kotlin.Int
+import kotlin.run
+import kotlin.with
 
 @RunWith(KotlinTestRunner::class)
 class CofreeTest : UnitSpec() {
@@ -154,7 +159,6 @@ class CofreeTest : UnitSpec() {
         cataHundredOne shouldBe None
       }
     }
-
   }
 }
 

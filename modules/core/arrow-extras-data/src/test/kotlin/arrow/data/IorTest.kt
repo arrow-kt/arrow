@@ -124,14 +124,12 @@ class IorTest : UnitSpec() {
       }
     }
 
-
     "getOrElse() should return value" {
       forAll { a: Int, b: Int ->
         Ior.Right<Int, Int>(a).getOrElse { b } == a &&
           Ior.Left<Int, Int>(a).getOrElse { b } == b &&
           Ior.Both(a, b).getOrElse { a * 2 } == b
       }
-
     }
 
     "Ior.monad.flatMap should combine left values" {
@@ -139,6 +137,5 @@ class IorTest : UnitSpec() {
       val iorResult = intIorMonad.run { ior1.flatMap { Ior.Left<Int, String>(7) } }
       iorResult shouldBe Ior.Left<Int, String>(10)
     }
-
   }
 }

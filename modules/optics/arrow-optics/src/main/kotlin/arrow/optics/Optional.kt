@@ -85,7 +85,6 @@ interface POptional<S, T, A, B> : POptionalOf<S, T, A, B> {
       { Either.Left(it) },
       { s, _ -> s }
     )
-
   }
 
   /**
@@ -281,7 +280,6 @@ interface POptional<S, T, A, B> : POptionalOf<S, T, A, B> {
    * Extract and map the focus [A] viewed through the [POptional] and applies [f] to it.
    */
   fun <C> extractMap(f: (A) -> C): State<S, Option<C>> = extract().map { it.map(f) }
-
 }
 
 /**

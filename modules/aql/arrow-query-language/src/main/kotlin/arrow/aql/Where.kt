@@ -31,5 +31,4 @@ interface Where<F> {
         else None
       })
     }
-
 }

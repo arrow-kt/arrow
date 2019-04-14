@@ -3,9 +3,11 @@ package arrow.data
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Tuple2
-import arrow.core.identity
 import arrow.higherkind
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
 
 /**
  * Alias that represents a function from [D] to a monadic value `Kind<F, A>`

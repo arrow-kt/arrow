@@ -1,6 +1,6 @@
 package arrow.free
 
-import arrow.core.*
+import arrow.core.Function0
 import arrow.core.FunctionK
 import arrow.core.extensions.function0.monad.monad
 

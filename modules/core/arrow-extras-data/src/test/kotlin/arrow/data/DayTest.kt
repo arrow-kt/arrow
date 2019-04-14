@@ -42,7 +42,6 @@ class DayTest : UnitSpec() {
       day.extract(Id.comonad(), Id.comonad()) shouldBe Tuple2(1, 1)
     }
 
-
     @Suppress("ExplicitItLambdaParameter") // Required at runtime or else test fails
     "Day coflatmap should transform result type" {
       val d = day.coflatMap(Id.comonad(), Id.comonad()) { it: DayOf<ForId, ForId, Tuple2Of<Int, Int>> ->
@@ -51,9 +50,7 @@ class DayTest : UnitSpec() {
       }
 
       d.extract(Id.comonad(), Id.comonad()) shouldBe "Both sides are equal"
-
     }
-
 
     "Day map should transform result type" {
       val d = day.map {
@@ -72,7 +69,6 @@ class DayTest : UnitSpec() {
       }
 
       d.extract(Id.comonad(), Id.comonad()) shouldBe "Both sides are equal"
-
     }
 
     "Day mapLazy should transform result type" {
@@ -83,6 +79,5 @@ class DayTest : UnitSpec() {
 
       d.extract(Id.comonad(), Id.comonad()) shouldBe "Both sides are equal"
     }
-
   }
 }

@@ -23,7 +23,7 @@ class ProductFileGenerator(
 
   fun generate() {
     buildProduct(annotatedList)
-    //buildInstances(annotatedList)
+    // buildInstances(annotatedList)
   }
 
   private fun buildProduct(products: Collection<AnnotatedGeneric>) =
@@ -161,7 +161,7 @@ class ProductFileGenerator(
                 |  ${product.sourceSimpleName}Eq.defaultInstance
                 |""".trimMargin()
 
-  //TODO instance imports are hardcoded
+  // TODO instance imports are hardcoded
   private fun processElement(product: AnnotatedGeneric): Pair<AnnotatedGeneric, String> = product to """
             |package ${product.classData.`package`.escapedClassName}
             |
@@ -408,4 +408,3 @@ class ProductFileGenerator(
                 |""".trimMargin()
     else ""
 }
-

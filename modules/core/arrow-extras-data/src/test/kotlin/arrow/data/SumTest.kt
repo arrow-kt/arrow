@@ -82,6 +82,5 @@ class SumTest : UnitSpec() {
 
       sum.extract(Id.comonad(), Id.comonad()) shouldBe 65
     }
-
   }
 }

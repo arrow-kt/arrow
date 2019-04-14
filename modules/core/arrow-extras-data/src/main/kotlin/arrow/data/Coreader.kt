@@ -1,6 +1,7 @@
 package arrow.data
 
-import arrow.core.*
+import arrow.core.Id
+import arrow.core.ForId
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.internal.IdBimonad
 

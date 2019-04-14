@@ -72,6 +72,4 @@ class AutoFoldFileGenerator(
       |${variant.fullName.escapedClassName.removeBackticks()}${typeParams(variant.typeParams)}
       |${" ".repeat(variant.fullName.escapedClassName.removeBackticks().length)} ^
       """.trimMargin(), annotatedFold.type)
-
 }
-

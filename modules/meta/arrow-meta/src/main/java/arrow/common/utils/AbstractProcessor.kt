@@ -51,13 +51,13 @@ abstract class AbstractProcessor : KotlinAbstractProcessor(), ProcessorUtils, Ko
       try {
         val path = kDocLocation.toPath()
         @Suppress("SwallowedException")
-        try { Files.createDirectories(path.parent) } catch (e : IOException) {
+        try { Files.createDirectories(path.parent) } catch (e: IOException) {
         }
         @Suppress("SwallowedException")
-        try { Files.delete(path) } catch (e : IOException) {
+        try { Files.delete(path) } catch (e: IOException) {
         }
         @Suppress("SwallowedException")
-        try { Files.createFile(path) } catch (e : IOException) {
+        try { Files.createFile(path) } catch (e: IOException) {
         }
         kDocLocation.writeText(doc)
       } catch (x: IOException) {
@@ -104,7 +104,6 @@ abstract class AbstractProcessor : KotlinAbstractProcessor(), ProcessorUtils, Ko
   }
 
   protected abstract fun onProcess(annotations: Set<TypeElement>, roundEnv: RoundEnvironment)
-
 }
 
 private val userDir get() = System.getProperty("user.dir")

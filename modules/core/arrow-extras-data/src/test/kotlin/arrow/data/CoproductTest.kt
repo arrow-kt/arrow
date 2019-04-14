@@ -46,6 +46,5 @@ class CoproductTest : UnitSpec() {
       ComonadLaws.laws(CM, { Coproduct(Right(Id(it))) }, EQ),
       HashLaws.laws(Coproduct.hash(IDH, IDH), Coproduct.eq(IDEQ, IDEQ)) { Coproduct(Right(Id(it))) }
     )
-
   }
 }

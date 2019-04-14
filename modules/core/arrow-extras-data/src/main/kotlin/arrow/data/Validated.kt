@@ -1,7 +1,16 @@
 package arrow.data
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Eval
+import arrow.core.Left
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Right
+import arrow.core.Some
+import arrow.core.Try
+import arrow.core.identity
+import arrow.core.orElse
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Semigroup
@@ -128,7 +137,7 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
  * Return the Valid value, or the default if Invalid
  */
 fun <E, B> ValidatedOf<E, B>.getOrElse(default: () -> B): B =
-    fix().fold({ default() }, ::identity)
+  fix().fold({ default() }, ::identity)
 
 /**
  * Return the Valid value, or null if Invalid

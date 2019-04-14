@@ -25,5 +25,4 @@ interface GroupBy<F> {
     foldable().run {
       this@value.from.fix().firstOrNone().getOrElse { emptyMap() }
     }
-
 }

@@ -2,10 +2,16 @@ package arrow.optics
 
 import arrow.common.utils.AbstractProcessor
 import arrow.common.utils.isSealed
-import arrow.optics.OpticsTarget.*
-import arrow.optics.OpticsProcessor.ClassType.*
 import arrow.common.utils.knownError
 import arrow.common.utils.removeBackticks
+import arrow.optics.OpticsProcessor.ClassType.DATA_CLASS
+import arrow.optics.OpticsProcessor.ClassType.OTHER
+import arrow.optics.OpticsProcessor.ClassType.SEALED_CLASS
+import arrow.optics.OpticsTarget.DSL
+import arrow.optics.OpticsTarget.ISO
+import arrow.optics.OpticsTarget.LENS
+import arrow.optics.OpticsTarget.OPTIONAL
+import arrow.optics.OpticsTarget.PRISM
 import com.google.auto.service.AutoService
 import me.eugeniomarletti.kotlin.metadata.KotlinClassMetadata
 import me.eugeniomarletti.kotlin.metadata.isDataClass
@@ -125,5 +131,4 @@ class OpticsProcessor : AbstractProcessor() {
       (kotlinMetadata as? KotlinClassMetadata)?.data?.classProto?.isSealed == true -> SEALED_CLASS
       else -> OTHER
     }
-
 }

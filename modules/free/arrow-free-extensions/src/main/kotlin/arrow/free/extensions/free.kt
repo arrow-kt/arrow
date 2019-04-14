@@ -3,9 +3,8 @@ package arrow.free.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.FunctionK
-
-import arrow.free.*
 import arrow.extension
+import arrow.free.Free
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Functor

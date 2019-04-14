@@ -29,7 +29,7 @@ open class MonadFilterContinuation<F, A>(val MF: MonadFilter<F>, override val co
    * Short circuits monadic bind if `predicate == false` return the
    * monad `empty` value.
    */
-  fun continueIf(predicate: Boolean): Unit {
+  fun continueIf(predicate: Boolean) {
     if (!predicate) throw PredicateInterrupted
   }
 
@@ -41,5 +41,4 @@ open class MonadFilterContinuation<F, A>(val MF: MonadFilter<F>, override val co
     val b: B = bind { this }
     return if (f(b)) b else bind { MF.empty<B>() }
   }
-
 }

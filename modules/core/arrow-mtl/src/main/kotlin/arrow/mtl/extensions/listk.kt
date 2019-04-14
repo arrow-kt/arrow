@@ -4,7 +4,7 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Option
 import arrow.core.Tuple2
-import arrow.data.*
+import arrow.data.ListK
 import arrow.extension
 import arrow.mtl.typeclasses.FunctorFilter
 import arrow.mtl.typeclasses.MonadCombine
@@ -76,4 +76,3 @@ interface ListKMonadFilter : MonadFilter<ForListK> {
   override fun <A> just(a: A): ListK<A> =
     ListK.just(a)
 }
-

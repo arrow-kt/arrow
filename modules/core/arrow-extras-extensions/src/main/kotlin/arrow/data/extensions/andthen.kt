@@ -3,9 +3,18 @@ package arrow.data.extensions
 import arrow.Kind
 import arrow.Kind2
 import arrow.core.Either
-import arrow.data.*
+import arrow.data.AndThen
 import arrow.extension
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Category
+import arrow.typeclasses.Conested
+import arrow.typeclasses.Contravariant
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.Profunctor
+import arrow.typeclasses.Semigroup
+import arrow.typeclasses.counnest
 
 @extension
 interface AndThenSemigroup<A, B> : Semigroup<AndThen<A, B>> {

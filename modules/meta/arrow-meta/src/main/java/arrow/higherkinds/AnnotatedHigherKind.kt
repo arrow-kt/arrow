@@ -5,4 +5,5 @@ import javax.lang.model.element.TypeElement
 
 class AnnotatedHigherKind(
   val classElement: TypeElement,
-  val classOrPackageProto: ClassOrPackageDataWrapper)
+  val classOrPackageProto: ClassOrPackageDataWrapper
+)

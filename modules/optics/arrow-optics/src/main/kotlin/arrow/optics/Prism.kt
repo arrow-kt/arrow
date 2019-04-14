@@ -70,7 +70,6 @@ interface PPrism<S, T, A, B> : PPrismOf<S, T, A, B> {
       getOrModify = { a2 -> (if (EQA.run { a.eqv(a2) }) Either.Left(a) else Either.Right(Unit)) },
       reverseGet = { a }
     )
-
   }
 
   /**

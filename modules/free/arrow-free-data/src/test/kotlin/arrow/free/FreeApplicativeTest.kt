@@ -1,7 +1,11 @@
 package arrow.free
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.ForId
+import arrow.core.Id
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.Tuple3
 import arrow.data.NonEmptyList
 import arrow.data.fix
 import arrow.free.extensions.FreeApplicativeApplicative

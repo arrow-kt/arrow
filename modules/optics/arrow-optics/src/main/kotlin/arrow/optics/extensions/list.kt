@@ -30,7 +30,6 @@ interface ListTraversal<A> : Traversal<List<A>, A> {
      */
     operator fun <A> invoke() = object : ListTraversal<A> {}
   }
-
 }
 
 fun <A> ListExtensions.each(): Each<List<A>, A> = ListEach()
@@ -129,5 +128,4 @@ interface ListSnoc<A> : Snoc<List<A>, A> {
 
     operator fun <A> invoke() = object : ListSnoc<A> {}
   }
-
 }

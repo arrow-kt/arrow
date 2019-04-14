@@ -56,5 +56,4 @@ interface OrderBy<F> {
 
   fun <Z, X> Query<ForId, Map<X, List<Z>>, Map<X, List<Z>>>.value(dummy: Unit = Unit): Map<X, List<Z>> =
     this@value.from.value()
-
 }

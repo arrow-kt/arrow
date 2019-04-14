@@ -42,7 +42,6 @@ class ValidatedTest : UnitSpec() {
         Eq.any())
     )
 
-
     "fold should call function on Invalid" {
       val exception = Exception("My Exception")
       val result: Validated<Throwable, String> = Invalid(exception)

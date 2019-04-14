@@ -19,5 +19,4 @@ interface Union<F> {
       val result: ListK<Z> = la.combineK(lb).k()
       Query(select = ::identity, from = result)
     }
-
 }

@@ -6,7 +6,11 @@ import arrow.data.CokleisliOf
 import arrow.data.ForCokleisli
 import arrow.data.fix
 import arrow.extension
-import arrow.typeclasses.*
+import arrow.typeclasses.Conested
+import arrow.typeclasses.Contravariant
+import arrow.typeclasses.Profunctor
+import arrow.typeclasses.counnest
+import arrow.typeclasses.fix
 
 @extension
 interface CokleisliContravariant<F, D> : Contravariant<Conested<Kind<ForCokleisli, F>, D>> {

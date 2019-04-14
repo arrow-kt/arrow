@@ -47,10 +47,8 @@ class ListKTest : UnitSpec() {
     "List exports a commutative Fx instance" {
       fx(listOf(1), listOf(2), ::identity) shouldBe listOf(1 toT 2)
     }
-
   }
 
   private fun bijection(from: Kind<ForListK, Tuple2<Tuple2<Int, Int>, Int>>): ListK<Tuple2<Int, Tuple2<Int, Int>>> =
           from.fix().map { Tuple2(it.a.a, Tuple2(it.a.b, it.b)) }.k()
-
 }

@@ -1,6 +1,7 @@
 package arrow.effects
 
-import arrow.effects.reactor.*
+import arrow.effects.reactor.FluxK
+import arrow.effects.reactor.k
 import arrow.effects.reactor.extensions.fluxk.async.async
 import arrow.effects.reactor.extensions.fluxk.foldable.foldable
 import arrow.effects.reactor.extensions.fluxk.functor.functor
@@ -21,9 +22,9 @@ import org.hamcrest.CoreMatchers.not
 import org.hamcrest.CoreMatchers.startsWith
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.runner.RunWith
+import reactor.test.expectError
 import reactor.core.publisher.Flux
 import reactor.core.scheduler.Schedulers
-import reactor.test.expectError
 import reactor.test.test
 import java.time.Duration
 import java.util.concurrent.CountDownLatch

@@ -276,5 +276,4 @@ interface PIso<S, T, A, B> : PIsoOf<S, T, A, B> {
    */
   fun <F> liftF(FF: Functor<F>, dummy: Unit = Unit, f: (A) -> Kind<F, B>): (S) -> Kind<F, T> =
     liftF(FF) { a -> f(a) }
-
 }

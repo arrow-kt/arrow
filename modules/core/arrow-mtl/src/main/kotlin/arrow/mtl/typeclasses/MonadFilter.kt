@@ -26,5 +26,4 @@ interface MonadFilter<F> : Monad<F>, FunctorFilter<F> {
     wrapReturn.startCoroutine(continuation, continuation)
     return continuation.returnedMonad()
   }
-
 }

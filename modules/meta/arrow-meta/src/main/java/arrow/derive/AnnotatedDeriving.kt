@@ -8,4 +8,5 @@ class AnnotatedDeriving(
   val classOrPackageProto: ClassOrPackageDataWrapper,
   val companionClassProto: ClassOrPackageDataWrapper,
   val derivingTypeclasses: List<ClassOrPackageDataWrapper>,
-  val typeclassSuperTypes: Map<ClassOrPackageDataWrapper.Class, List<ClassOrPackageDataWrapper>>)
+  val typeclassSuperTypes: Map<ClassOrPackageDataWrapper.Class, List<ClassOrPackageDataWrapper>>
+)

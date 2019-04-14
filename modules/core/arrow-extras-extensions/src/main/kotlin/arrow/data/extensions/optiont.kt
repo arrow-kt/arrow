@@ -1,15 +1,41 @@
 package arrow.data.extensions
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Eval
 import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.option.foldable.foldable
 import arrow.core.extensions.option.traverse.traverse
-import arrow.data.*
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Tuple2
+import arrow.core.left
+import arrow.core.none
+import arrow.core.right
+import arrow.core.some
+import arrow.core.toT
 import arrow.data.extensions.optiont.monad.monad
+import arrow.data.OptionT
 import arrow.extension
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Contravariant
+import arrow.typeclasses.Decidable
+import arrow.typeclasses.Divide
+import arrow.typeclasses.Divisible
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadError
+import arrow.typeclasses.MonadThrow
+import arrow.typeclasses.MonoidK
+import arrow.typeclasses.Nested
+import arrow.typeclasses.SemigroupK
+import arrow.typeclasses.Traverse
+import arrow.typeclasses.compose
+import arrow.typeclasses.fix
 import arrow.typeclasses.suspended.monad.Fx
+import arrow.typeclasses.unnest
 import arrow.undocumented
 
 @extension
@@ -18,7 +44,6 @@ interface OptionTFunctor<F> : Functor<OptionTPartialOf<F>> {
   fun FF(): Functor<F>
 
   override fun <A, B> OptionTOf<F, A>.map(f: (A) -> B): OptionT<F, B> = fix().map(FF(), f)
-
 }
 
 @extension
@@ -52,7 +77,6 @@ interface OptionTMonad<F> : Monad<OptionTPartialOf<F>>, OptionTApplicative<F> {
 
   override fun <A, B> tailRecM(a: A, f: (A) -> OptionTOf<F, Either<A, B>>): OptionT<F, B> =
     OptionT.tailRecM(MF(), a, f)
-
 }
 
 @extension
@@ -68,7 +92,6 @@ interface OptionTApplicativeError<F, E> : ApplicativeError<OptionTPartialOf<F>, 
   override fun <A> OptionTOf<F, A>.handleErrorWith(f: (E) -> OptionTOf<F, A>): OptionT<F, A> = AE().run {
     OptionT(value().handleErrorWith { f(it).value() })
   }
-
 }
 
 @extension
@@ -114,7 +137,6 @@ interface OptionTFoldable<F> : Foldable<OptionTPartialOf<F>> {
 
   override fun <A, B> OptionTOf<F, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
     fix().foldRight(FFF(), lb, f)
-
 }
 
 @extension
@@ -126,7 +148,6 @@ interface OptionTTraverse<F> : Traverse<OptionTPartialOf<F>>, OptionTFoldable<F>
 
   override fun <G, A, B> OptionTOf<F, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, OptionT<F, B>> =
     fix().traverse(FFT(), AP, f)
-
 }
 
 @extension
@@ -209,5 +230,4 @@ interface OptionTFx<F> : Fx<OptionTPartialOf<F>> {
 
   override fun monad(): Monad<OptionTPartialOf<F>> =
     OptionT.monad(M())
-
 }
