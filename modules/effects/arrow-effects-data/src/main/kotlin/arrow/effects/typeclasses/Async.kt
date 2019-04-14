@@ -252,7 +252,6 @@ interface Async<F> : MonadDefer<F> {
    */
   fun <A> never(): Kind<F, A> =
     async { }
-
 }
 
 internal val mapUnit: (Any?) -> Unit = { Unit }

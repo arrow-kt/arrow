@@ -1,14 +1,22 @@
 package arrow.effects.extensions
 
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Option
 import arrow.core.extensions.either.monad.flatten
 import arrow.data.EitherT
 import arrow.data.EitherTOf
 import arrow.data.EitherTPartialOf
 import arrow.data.extensions.EitherTMonadThrow
-import arrow.data.value
 import arrow.effects.Ref
-import arrow.effects.typeclasses.*
+import arrow.effects.typeclasses.Async
+import arrow.effects.typeclasses.Bracket
+import arrow.effects.typeclasses.ConcurrentEffect
+import arrow.effects.typeclasses.Disposable
+import arrow.effects.typeclasses.Effect
+import arrow.effects.typeclasses.ExitCase
+import arrow.effects.typeclasses.MonadDefer
+import arrow.effects.typeclasses.Proc
+import arrow.effects.typeclasses.ProcF
 import arrow.extension
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Monad
@@ -27,7 +35,8 @@ interface EitherTBracket<F> : Bracket<EitherTPartialOf<F, Throwable>, Throwable>
 
   override fun <A, B> EitherTOf<F, Throwable, A>.bracketCase(
     release: (A, ExitCase<Throwable>) -> EitherTOf<F, Throwable, Unit>,
-    use: (A) -> EitherTOf<F, Throwable, B>): EitherT<F, Throwable, B> = MDF().run {
+    use: (A) -> EitherTOf<F, Throwable, B>
+  ): EitherT<F, Throwable, B> = MDF().run {
 
     EitherT.liftF<F, Throwable, Ref<F, Option<Throwable>>>(this, Ref.of(None, this)).flatMap(this) { ref ->
       EitherT(
@@ -63,7 +72,6 @@ interface EitherTBracket<F> : Bracket<EitherTPartialOf<F, Throwable>, Throwable>
         })
     }
   }
-
 }
 
 @extension
@@ -74,7 +82,6 @@ interface EitherTMonadDefer<F> : MonadDefer<EitherTPartialOf<F, Throwable>>, Eit
 
   override fun <A> defer(fa: () -> EitherTOf<F, Throwable, A>): EitherT<F, Throwable, A> =
     EitherT(MDF().defer { fa().value() })
-
 }
 
 @extension
@@ -96,7 +103,6 @@ interface EitherTAsync<F> : Async<EitherTPartialOf<F, Throwable>>, EitherTMonadD
   override fun <A> EitherTOf<F, Throwable, A>.continueOn(ctx: CoroutineContext): EitherT<F, Throwable, A> = ASF().run {
     EitherT(value().continueOn(ctx))
   }
-
 }
 
 @extension
@@ -114,7 +120,6 @@ interface EitherTEffect<F> : Effect<EitherTPartialOf<F, Throwable>>, EitherTAsyn
         .unit()
     }.attempt())
   }
-
 }
 
 @extension
@@ -132,5 +137,4 @@ interface EitherTConcurrentEffect<F> : ConcurrentEffect<EitherTPartialOf<F, Thro
         .unit()
     }.attempt())
   }
-
 }

@@ -1,6 +1,6 @@
 package arrow.effects.extensions
 
-import arrow.effects.*
+import arrow.effects.IO
 import arrow.effects.extensions.io.concurrent.concurrent
 import arrow.effects.extensions.io.dispatchers.dispatchers
 import arrow.effects.typeclasses.Concurrent

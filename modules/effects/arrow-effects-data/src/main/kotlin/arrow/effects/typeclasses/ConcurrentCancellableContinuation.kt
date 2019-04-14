@@ -14,5 +14,4 @@ open class ConcurrentCancellableContinuation<F, A>(CF: Concurrent<F>, override v
 
   override fun <B> binding(c: suspend MonadContinuation<F, *>.() -> B): Kind<F, B> =
     bindingCancellable { c() }.a
-
 }

@@ -2,7 +2,10 @@ package arrow.effects.internal
 
 import arrow.core.Either
 import arrow.core.NonFatal
-import arrow.effects.*
+import arrow.effects.CancelToken
+import arrow.effects.IO
+import arrow.effects.IOConnection
+import arrow.effects.IORunLoop
 import arrow.effects.internal.ForwardCancelable.Companion.State.Active
 import arrow.effects.internal.ForwardCancelable.Companion.State.Empty
 import java.util.concurrent.atomic.AtomicReference
@@ -80,7 +83,7 @@ class ForwardCancelable {
             cb(r)
             acc
           } catch (t: Throwable) {
-            if (NonFatal(t))  {
+            if (NonFatal(t)) {
               acc + t
             } else {
               throw t

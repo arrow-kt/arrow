@@ -305,9 +305,7 @@ interface MVar<F, A> {
       override fun <A> empty(): Kind<F, MVar<F, A>> =
         CancelableMVar.empty(CF)
     }
-
   }
-
 }
 
 /**
@@ -362,5 +360,4 @@ interface MVarPartialOf<F> {
    * ```
    */
   fun <A> empty(): Kind<F, MVar<F, A>>
-
 }

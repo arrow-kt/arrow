@@ -1,12 +1,16 @@
 package arrow.dagger.extensions
 
-import arrow.core.*
+import arrow.core.Function0
 import arrow.core.extensions.function0.applicative.applicative
 import arrow.core.extensions.function0.bimonad.bimonad
 import arrow.core.extensions.function0.comonad.comonad
 import arrow.core.extensions.function0.functor.functor
 import arrow.core.extensions.function0.monad.monad
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Bimonad
+import arrow.typeclasses.Comonad
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
 import dagger.Module
 import dagger.Provides
 

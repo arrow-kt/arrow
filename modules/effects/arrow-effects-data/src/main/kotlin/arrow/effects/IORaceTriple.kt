@@ -109,7 +109,7 @@ fun <A, B, C> IO.Companion.raceTriple(ctx: CoroutineContext, ioA: IOOf<A>, ioB: 
 
     a.startCoroutine(asyncContinuation(ctx) { either ->
       either.fold({ error ->
-        if (active.getAndSet(false)) { //if an error finishes first, stop the race.
+        if (active.getAndSet(false)) { // if an error finishes first, stop the race.
           connB.cancel().fix().unsafeRunAsync { r2 ->
             connC.cancel().fix().unsafeRunAsync { r3 ->
               conn.pop()
@@ -134,10 +134,9 @@ fun <A, B, C> IO.Companion.raceTriple(ctx: CoroutineContext, ioA: IOOf<A>, ioB: 
       })
     })
 
-
     b.startCoroutine(asyncContinuation(ctx) { either ->
       either.fold({ error ->
-        if (active.getAndSet(false)) { //if an error finishes first, stop the race.
+        if (active.getAndSet(false)) { // if an error finishes first, stop the race.
           connA.cancel().fix().unsafeRunAsync { r2 ->
             connC.cancel().fix().unsafeRunAsync { r3 ->
               conn.pop()
@@ -164,7 +163,7 @@ fun <A, B, C> IO.Companion.raceTriple(ctx: CoroutineContext, ioA: IOOf<A>, ioB: 
 
     c.startCoroutine(asyncContinuation(ctx) { either ->
       either.fold({ error ->
-        if (active.getAndSet(false)) { //if an error finishes first, stop the race.
+        if (active.getAndSet(false)) { // if an error finishes first, stop the race.
           connA.cancel().fix().unsafeRunAsync { r2 ->
             connB.cancel().fix().unsafeRunAsync { r3 ->
               conn.pop()
@@ -188,5 +187,4 @@ fun <A, B, C> IO.Companion.raceTriple(ctx: CoroutineContext, ioA: IOOf<A>, ioB: 
         }
       })
     })
-
   }

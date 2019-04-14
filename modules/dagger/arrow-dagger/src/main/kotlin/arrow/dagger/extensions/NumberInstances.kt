@@ -1,7 +1,15 @@
 package arrow.dagger.extensions
 
-import arrow.core.extensions.*
-import arrow.typeclasses.*
+import arrow.core.extensions.eq
+import arrow.core.extensions.hash
+import arrow.core.extensions.monoid
+import arrow.core.extensions.order
+import arrow.core.extensions.semigroup
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Hash
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.Order
+import arrow.typeclasses.Semigroup
 import dagger.Module
 import dagger.Provides
 

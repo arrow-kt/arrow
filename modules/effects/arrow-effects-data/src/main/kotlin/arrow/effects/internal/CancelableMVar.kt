@@ -1,7 +1,12 @@
 package arrow.effects.internal
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Right
+import arrow.core.Some
+import arrow.core.Tuple2
 import arrow.effects.CancelToken
 import arrow.effects.MVar
 import arrow.effects.typeclasses.Concurrent

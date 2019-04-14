@@ -2,7 +2,11 @@ package arrow.effects
 
 import arrow.undocumented
 import java.util.concurrent.ForkJoinPool
-import kotlin.coroutines.*
+import kotlin.coroutines.AbstractCoroutineContextElement
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.ContinuationInterceptor
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 @undocumented
 // FIXME use expected and actual for multiplatform

@@ -13,7 +13,11 @@ import arrow.effects.rx2.extensions.observablek.monadError.monadError
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Effect
 import arrow.effects.typeclasses.MonadDefer
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadError
 import dagger.Module
 import dagger.Provides
 

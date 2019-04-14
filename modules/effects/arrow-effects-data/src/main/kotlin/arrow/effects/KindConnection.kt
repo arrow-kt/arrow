@@ -307,7 +307,7 @@ sealed class KindConnection<F> {
     override fun isCanceled(): Boolean = state.get() == null
 
     override tailrec fun push(token: CancelToken<F>): Unit = when (val list = state.get()) {
-      null -> run(token) //If connection is already cancelled cancel token immediately.
+      null -> run(token) // If connection is already cancelled cancel token immediately.
       else -> if (!state.compareAndSet(list, listOf(token) + list)) push(token) else Unit
     }
 
@@ -327,7 +327,7 @@ sealed class KindConnection<F> {
       state.compareAndSet(null, emptyList())
 
     private fun List<CancelToken<F>>.cancelAll(): CancelToken<F> = defer {
-      //TODO this blocks forever if any `CancelToken<F>` doesn't terminate. Requires `fork`/`start` to avoid.
+      // TODO this blocks forever if any `CancelToken<F>` doesn't terminate. Requires `fork`/`start` to avoid.
       fold(unit()) { acc, f -> f.flatMap { acc } }
     }
 
@@ -339,7 +339,6 @@ sealed class KindConnection<F> {
       this@map.map(f)
     }
 
-    override fun toString(): String = "KindConnection(state = ${state.get().toString()})"
+    override fun toString(): String = "KindConnection(state = ${state.get()})"
   }
-
 }

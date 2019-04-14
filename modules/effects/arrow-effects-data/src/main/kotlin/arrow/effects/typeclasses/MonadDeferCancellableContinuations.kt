@@ -89,5 +89,4 @@ open class MonadDeferCancellableContinuation<F, A>(val SC: MonadDefer<F>, overri
     }
     COROUTINE_SUSPENDED
   }
-
 }

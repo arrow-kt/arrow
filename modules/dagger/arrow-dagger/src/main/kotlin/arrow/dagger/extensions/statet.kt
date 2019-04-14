@@ -1,8 +1,15 @@
 package arrow.dagger.extensions
 
 import arrow.data.StateTPartialOf
-import arrow.data.extensions.*
-import arrow.typeclasses.*
+import arrow.data.extensions.StateTApplicative
+import arrow.data.extensions.StateTFunctor
+import arrow.data.extensions.StateTMonad
+import arrow.data.extensions.StateTMonadError
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadError
 import dagger.Module
 import dagger.Provides
 import javax.inject.Inject

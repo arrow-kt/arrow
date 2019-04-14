@@ -1,6 +1,13 @@
 package arrow.ank
 
-import arrow.core.*
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.Try
+import arrow.core.Tuple2
+import arrow.core.Tuple3
+import arrow.core.some
+import arrow.core.toT
 import arrow.data.extensions.sequence.foldable.foldLeft
 import java.io.PrintWriter
 import java.io.StringWriter

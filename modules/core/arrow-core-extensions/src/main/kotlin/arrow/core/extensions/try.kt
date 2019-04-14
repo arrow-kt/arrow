@@ -3,11 +3,26 @@
 package arrow.core.extensions
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Eval
+import arrow.core.Success
+import arrow.core.Try
 import arrow.core.Try.Failure
 import arrow.core.extensions.`try`.monadThrow.monadThrow
 import arrow.extension
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Hash
+import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadError
+import arrow.typeclasses.MonadThrow
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.Semigroup
+import arrow.typeclasses.Show
+import arrow.typeclasses.Traverse
 import arrow.core.extensions.traverse as tryTraverse
 
 fun <A> Try<A>.combine(SG: Semigroup<A>, b: Try<A>): Try<A> =

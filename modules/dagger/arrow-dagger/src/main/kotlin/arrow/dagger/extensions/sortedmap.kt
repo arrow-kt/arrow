@@ -1,7 +1,11 @@
 package arrow.dagger.extensions
 
 import arrow.data.SortedMapKPartialOf
-import arrow.data.extensions.*
+import arrow.data.extensions.SortedMapKFoldable
+import arrow.data.extensions.SortedMapKFunctor
+import arrow.data.extensions.SortedMapKMonoid
+import arrow.data.extensions.SortedMapKSemigroup
+import arrow.data.extensions.SortedMapKTraverse
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Semigroup

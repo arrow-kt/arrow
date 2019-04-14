@@ -1,8 +1,21 @@
 package arrow.dagger.extensions
 
 import arrow.data.EitherTPartialOf
-import arrow.data.extensions.*
-import arrow.typeclasses.*
+import arrow.data.extensions.EitherTApplicative
+import arrow.data.extensions.EitherTFoldable
+import arrow.data.extensions.EitherTFunctor
+import arrow.data.extensions.EitherTMonad
+import arrow.data.extensions.EitherTMonadError
+import arrow.data.extensions.EitherTSemigroupK
+import arrow.data.extensions.EitherTTraverse
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadError
+import arrow.typeclasses.SemigroupK
+import arrow.typeclasses.Traverse
 import dagger.Module
 import dagger.Provides
 import javax.inject.Inject

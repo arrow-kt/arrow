@@ -1,7 +1,8 @@
 package arrow.core
 
-import arrow.*
-import java.util.*
+import arrow.higherkind
+import java.util.Collections
+import java.util.LinkedHashMap
 
 @higherkind
 data class Tuple2<out A, out B>(val a: A, val b: B) : Tuple2Of<A, B> {

@@ -1,8 +1,24 @@
 package arrow.dagger.extensions
 
-import arrow.core.*
-import arrow.core.extensions.*
-import arrow.typeclasses.*
+import arrow.core.Tuple10
+import arrow.core.Tuple2
+import arrow.core.Tuple3
+import arrow.core.Tuple4
+import arrow.core.Tuple5
+import arrow.core.Tuple6
+import arrow.core.Tuple7
+import arrow.core.Tuple8
+import arrow.core.Tuple9
+import arrow.core.extensions.Tuple10Eq
+import arrow.core.extensions.Tuple2Eq
+import arrow.core.extensions.Tuple3Eq
+import arrow.core.extensions.Tuple4Eq
+import arrow.core.extensions.Tuple5Eq
+import arrow.core.extensions.Tuple6Eq
+import arrow.core.extensions.Tuple7Eq
+import arrow.core.extensions.Tuple8Eq
+import arrow.core.extensions.Tuple9Eq
+import arrow.typeclasses.Eq
 import dagger.Module
 import dagger.Provides
 import javax.inject.Inject

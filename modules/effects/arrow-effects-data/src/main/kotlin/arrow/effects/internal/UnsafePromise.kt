@@ -13,7 +13,7 @@ internal class UnsafePromise<A> {
 
   private val state: AtomicReference<State<A>> = AtomicReference(State.Empty)
 
-  fun get(cb: (Either<Throwable, A>) -> Unit): Unit {
+  fun get(cb: (Either<Throwable, A>) -> Unit) {
     tailrec fun go(): Unit = when (val oldState = state.get()) {
       State.Empty -> if (state.compareAndSet(oldState, State.Waiting(listOf(cb)))) Unit else go()
       is State.Waiting -> if (state.compareAndSet(oldState, State.Waiting(oldState.joiners + cb))) Unit else go()
@@ -23,7 +23,7 @@ internal class UnsafePromise<A> {
     go()
   }
 
-  fun complete(value: Either<Throwable, A>): Unit {
+  fun complete(value: Either<Throwable, A>) {
     tailrec fun go(): Unit = when (val oldState = state.get()) {
       State.Empty -> if (state.compareAndSet(oldState, State.Full(value))) Unit else go()
       is State.Waiting -> {

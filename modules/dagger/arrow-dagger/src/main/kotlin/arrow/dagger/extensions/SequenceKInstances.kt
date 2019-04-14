@@ -1,6 +1,6 @@
 package arrow.dagger.extensions
 
-import arrow.data.*
+import arrow.data.SequenceK
 import arrow.data.extensions.sequencek.applicative.applicative
 import arrow.data.extensions.sequencek.foldable.foldable
 import arrow.data.extensions.sequencek.functor.functor
@@ -8,7 +8,13 @@ import arrow.data.extensions.sequencek.monad.monad
 import arrow.data.extensions.sequencek.monoidK.monoidK
 import arrow.data.extensions.sequencek.semigroupK.semigroupK
 import arrow.data.extensions.sequencek.traverse.traverse
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
+import arrow.typeclasses.MonoidK
+import arrow.typeclasses.SemigroupK
+import arrow.typeclasses.Traverse
 import dagger.Module
 import dagger.Provides
 

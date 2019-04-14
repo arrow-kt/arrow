@@ -1,8 +1,24 @@
 package arrow.dagger.extensions
 
 import arrow.data.OptionTPartialOf
-import arrow.data.extensions.*
-import arrow.typeclasses.*
+import arrow.data.extensions.OptionTApplicative
+import arrow.data.extensions.OptionTApplicativeError
+import arrow.data.extensions.OptionTFoldable
+import arrow.data.extensions.OptionTFunctor
+import arrow.data.extensions.OptionTMonad
+import arrow.data.extensions.OptionTMonadError
+import arrow.data.extensions.OptionTMonoidK
+import arrow.data.extensions.OptionTSemigroupK
+import arrow.data.extensions.OptionTTraverse
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadError
+import arrow.typeclasses.MonoidK
+import arrow.typeclasses.SemigroupK
+import arrow.typeclasses.Traverse
 import dagger.Module
 import dagger.Provides
 import javax.inject.Inject
