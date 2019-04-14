@@ -7,6 +7,8 @@ import arrow.extension
 import arrow.mtl.typeclasses.TraverseFilter
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Const
+import arrow.typeclasses.ConstOf
+import arrow.typeclasses.ConstPartialOf
 import arrow.typeclasses.fix
 
 @extension

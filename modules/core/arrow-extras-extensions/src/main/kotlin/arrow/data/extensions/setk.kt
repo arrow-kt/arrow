@@ -3,7 +3,9 @@ package arrow.data.extensions
 import arrow.Kind
 import arrow.core.Eval
 import arrow.core.Tuple2
+import arrow.data.ForSetK
 import arrow.data.SetK
+import arrow.data.fix
 import arrow.data.k
 import arrow.extension
 import arrow.typeclasses.Eq

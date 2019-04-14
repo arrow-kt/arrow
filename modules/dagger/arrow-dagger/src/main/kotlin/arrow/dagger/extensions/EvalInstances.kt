@@ -1,6 +1,7 @@
 package arrow.dagger.extensions
 
 import arrow.core.Eval
+import arrow.core.ForEval
 import arrow.core.extensions.eval.applicative.applicative
 import arrow.core.extensions.eval.bimonad.bimonad
 import arrow.core.extensions.eval.comonad.comonad

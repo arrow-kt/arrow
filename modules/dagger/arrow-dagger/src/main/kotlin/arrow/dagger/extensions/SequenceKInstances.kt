@@ -1,5 +1,6 @@
 package arrow.dagger.extensions
 
+import arrow.data.ForSequenceK
 import arrow.data.SequenceK
 import arrow.data.extensions.sequencek.applicative.applicative
 import arrow.data.extensions.sequencek.foldable.foldable

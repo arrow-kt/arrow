@@ -1,5 +1,6 @@
 package arrow.dagger.effects.extensions
 
+import arrow.effects.ForIO
 import arrow.effects.IO
 import arrow.effects.extensions.IOMonoid
 import arrow.effects.extensions.IOSemigroup

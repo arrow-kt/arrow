@@ -2,8 +2,11 @@ package arrow.core.extensions
 
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.core.EvalOf
+import arrow.core.ForEval
 import arrow.core.extensions.either.monad.monad
 import arrow.core.extensions.eval.monad.monad
+import arrow.core.fix
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Bimonad

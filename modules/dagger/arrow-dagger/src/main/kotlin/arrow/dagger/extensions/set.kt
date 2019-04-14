@@ -1,5 +1,6 @@
 package arrow.dagger.extensions
 
+import arrow.data.ForSetK
 import arrow.data.SetK
 import arrow.data.extensions.SetKEq
 import arrow.data.extensions.SetKMonoid

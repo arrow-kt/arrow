@@ -1,5 +1,6 @@
 package arrow.dagger.extensions
 
+import arrow.core.ForFunction0
 import arrow.core.Function0
 import arrow.core.extensions.function0.applicative.applicative
 import arrow.core.extensions.function0.bimonad.bimonad

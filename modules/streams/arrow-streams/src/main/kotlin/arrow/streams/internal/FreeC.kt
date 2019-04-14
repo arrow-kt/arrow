@@ -9,6 +9,7 @@ import arrow.core.Option
 import arrow.core.Right
 import arrow.core.Some
 import arrow.core.flatMap
+import arrow.core.orElse
 import arrow.core.some
 import arrow.effects.typeclasses.ExitCase
 import arrow.streams.CompositeFailure

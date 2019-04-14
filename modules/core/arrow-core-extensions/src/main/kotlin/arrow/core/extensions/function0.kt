@@ -2,9 +2,13 @@ package arrow.core.extensions
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.core.ForFunction0
 import arrow.core.Function0
+import arrow.core.Function0Of
 import arrow.core.k
 import arrow.core.extensions.function0.monad.monad
+import arrow.core.fix
+import arrow.core.invoke
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Bimonad

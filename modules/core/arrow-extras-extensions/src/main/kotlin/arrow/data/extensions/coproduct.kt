@@ -18,7 +18,6 @@ import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Traverse
-import arrow.typeclasses.fix
 import arrow.undocumented
 
 @extension

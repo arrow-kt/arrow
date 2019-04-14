@@ -8,6 +8,7 @@ import arrow.core.toT
 import arrow.core.extensions.`try`.applicative.applicative
 import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.option.monoid.monoid
+import arrow.core.some
 import arrow.product
 import arrow.test.UnitSpec
 import arrow.test.generators.nonEmptyList

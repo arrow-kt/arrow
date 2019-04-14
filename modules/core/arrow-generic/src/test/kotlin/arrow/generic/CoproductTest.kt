@@ -11,9 +11,19 @@ import arrow.generic.coproduct2.coproductOf
 import arrow.generic.coproduct2.fold
 import arrow.generic.coproduct2.select
 import arrow.generic.coproduct22.Coproduct22
-// import arrow.generic.coproduct3.*
+import arrow.generic.coproduct3.Coproduct3
+import arrow.generic.coproduct3.First
+import arrow.generic.coproduct3.Second
+import arrow.generic.coproduct3.Third
+import arrow.generic.coproduct3.cop
+import arrow.generic.coproduct3.first
+import arrow.generic.coproduct3.fold
+import arrow.generic.coproduct3.second
+import arrow.generic.coproduct3.select
+import arrow.generic.coproduct3.third
 import arrow.test.UnitSpec
 import io.kotlintest.runner.junit4.KotlinTestRunner
+import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
 
 @RunWith(KotlinTestRunner::class)

@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package arrow.dagger.extensions.tests
 
 import arrow.core.EitherPartialOf
@@ -17,6 +19,17 @@ import arrow.dagger.extensions.MapKInstances
 import arrow.dagger.extensions.OptionTInstances
 import arrow.dagger.extensions.SortedMapKInstances
 import arrow.dagger.extensions.StateTInstances
+import arrow.data.CoproductPartialOf
+import arrow.data.EitherTPartialOf
+import arrow.data.ForListK
+import arrow.data.ForNonEmptyList
+import arrow.data.ForSequenceK
+import arrow.data.ForSetK
+import arrow.data.KleisliPartialOf
+import arrow.data.MapKPartialOf
+import arrow.data.OptionTPartialOf
+import arrow.data.SortedMapKPartialOf
+import arrow.data.StateTPartialOf
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Bimonad
@@ -227,7 +240,7 @@ object Arrow {
 
 object test {
   @JvmStatic
-  fun main(args: Array<String>) {
+  fun main() {
     println(Arrow.instances.optionApplicative().just(1))
   }
 }

@@ -1,9 +1,11 @@
 package arrow.data
 
+import arrow.core.ForId
 import arrow.core.Id
 import arrow.core.Tuple2
 import arrow.core.andThen
 import arrow.core.identity
+import arrow.core.value
 import arrow.typeclasses.internal.IdBimonad
 
 /**

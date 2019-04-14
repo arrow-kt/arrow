@@ -2,6 +2,7 @@ package arrow.typeclasses
 
 import arrow.Kind
 import arrow.core.Eval
+import arrow.core.ForEither
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some

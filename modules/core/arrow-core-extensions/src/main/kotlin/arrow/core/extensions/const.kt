@@ -6,6 +6,8 @@ import arrow.core.Tuple2
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Const
+import arrow.typeclasses.ConstOf
+import arrow.typeclasses.ConstPartialOf
 import arrow.typeclasses.Contravariant
 import arrow.typeclasses.Divide
 import arrow.typeclasses.Divisible
@@ -18,6 +20,8 @@ import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
+import arrow.typeclasses.fix
+import arrow.typeclasses.value
 import arrow.typeclasses.ap as constAp
 import arrow.typeclasses.combine as combineAp
 

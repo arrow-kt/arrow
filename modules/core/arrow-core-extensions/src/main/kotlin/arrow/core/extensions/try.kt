@@ -5,10 +5,15 @@ package arrow.core.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.core.ForTry
 import arrow.core.Success
 import arrow.core.Try
 import arrow.core.Try.Failure
+import arrow.core.TryOf
 import arrow.core.extensions.`try`.monadThrow.monadThrow
+import arrow.core.fix
+import arrow.core.handleErrorWith
+import arrow.core.identity
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
@@ -54,7 +59,7 @@ interface TryApplicativeError : ApplicativeError<ForTry, Throwable>, TryApplicat
     Failure(e)
 
   override fun <A> TryOf<A>.handleErrorWith(f: (Throwable) -> TryOf<A>): Try<A> =
-    fix().recoverWith { f(it).fix() }
+    fix().handleErrorWith { f(it).fix() }
 }
 
 @extension
@@ -63,7 +68,7 @@ interface TryMonadError : MonadError<ForTry, Throwable>, TryMonad {
     Failure(e)
 
   override fun <A> TryOf<A>.handleErrorWith(f: (Throwable) -> TryOf<A>): Try<A> =
-    fix().recoverWith { f(it).fix() }
+    fix().handleErrorWith { f(it).fix() }
 }
 
 @extension

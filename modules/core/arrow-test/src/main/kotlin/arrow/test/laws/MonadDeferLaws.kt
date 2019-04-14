@@ -6,6 +6,7 @@ import arrow.core.Left
 import arrow.core.Right
 import arrow.core.Try
 import arrow.core.left
+import arrow.core.recover
 import arrow.core.right
 import arrow.data.k
 import arrow.data.extensions.list.foldable.foldLeft

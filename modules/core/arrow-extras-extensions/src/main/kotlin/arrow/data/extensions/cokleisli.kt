@@ -9,6 +9,7 @@ import arrow.extension
 import arrow.typeclasses.Conested
 import arrow.typeclasses.Contravariant
 import arrow.typeclasses.Profunctor
+import arrow.typeclasses.conest
 import arrow.typeclasses.counnest
 import arrow.typeclasses.fix
 

@@ -14,6 +14,7 @@ import arrow.data.ListK
 import arrow.data.k
 import arrow.extension
 import arrow.core.extensions.option.applicative.applicative
+import arrow.core.fix
 import arrow.optics.Optional
 import arrow.optics.POptional
 import arrow.optics.PPrism

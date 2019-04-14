@@ -4,11 +4,14 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Tuple2
+import arrow.data.ForListK
 import arrow.data.ListK
+import arrow.data.ListKOf
 import arrow.data.k
 import arrow.data.extensions.listk.foldable.foldLeft
 import arrow.data.extensions.listk.monad.map
 import arrow.data.extensions.listk.monad.monad
+import arrow.data.fix
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Eq

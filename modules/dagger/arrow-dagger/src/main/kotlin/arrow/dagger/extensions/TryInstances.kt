@@ -1,5 +1,6 @@
 package arrow.dagger.extensions
 
+import arrow.core.ForTry
 import arrow.core.Try
 import arrow.core.extensions.`try`.applicative.applicative
 import arrow.core.extensions.`try`.foldable.foldable

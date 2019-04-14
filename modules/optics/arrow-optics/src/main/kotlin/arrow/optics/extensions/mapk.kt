@@ -5,6 +5,8 @@ import arrow.core.Option
 import arrow.core.left
 import arrow.core.right
 import arrow.data.MapK
+import arrow.data.fix
+import arrow.data.getOption
 import arrow.data.k
 import arrow.extension
 import arrow.optics.Lens

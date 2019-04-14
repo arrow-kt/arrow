@@ -5,6 +5,7 @@ import arrow.core.Either
 import arrow.core.Left
 import arrow.core.None
 import arrow.core.Option
+import arrow.core.OptionOf
 import arrow.core.Right
 import arrow.core.Some
 import arrow.core.getOrElse

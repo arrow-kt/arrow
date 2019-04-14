@@ -1,5 +1,6 @@
 package arrow.dagger.extensions
 
+import arrow.data.ValidatedPartialOf
 import arrow.data.extensions.ValidatedApplicative
 import arrow.data.extensions.ValidatedEq
 import arrow.data.extensions.ValidatedFoldable

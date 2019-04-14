@@ -1,12 +1,16 @@
 package arrow.effects.extensions
 
 import arrow.core.Either
+import arrow.core.None
 import arrow.core.Option
+import arrow.core.Some
 import arrow.core.extensions.either.monad.flatten
+import arrow.core.left
 import arrow.data.EitherT
 import arrow.data.EitherTOf
 import arrow.data.EitherTPartialOf
 import arrow.data.extensions.EitherTMonadThrow
+import arrow.data.value
 import arrow.effects.Ref
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Bracket

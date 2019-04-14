@@ -1,6 +1,8 @@
 package arrow.effects
 
+import arrow.effects.rx2.ForMaybeK
 import arrow.effects.rx2.MaybeK
+import arrow.effects.rx2.MaybeKOf
 import arrow.effects.rx2.k
 import arrow.effects.rx2.extensions.maybek.applicative.applicative
 import arrow.effects.rx2.extensions.maybek.applicativeError.applicativeError
@@ -13,6 +15,7 @@ import arrow.effects.rx2.extensions.maybek.monad.monad
 import arrow.effects.rx2.extensions.maybek.monadDefer.monadDefer
 import arrow.effects.rx2.extensions.maybek.monadError.monadError
 import arrow.effects.rx2.extensions.maybek.monadThrow.bindingCatch
+import arrow.effects.rx2.value
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
 import arrow.test.laws.ApplicativeErrorLaws

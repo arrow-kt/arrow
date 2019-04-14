@@ -3,6 +3,9 @@ package arrow.data.extensions
 import arrow.Kind
 import arrow.core.Eval
 import arrow.data.SortedMapK
+import arrow.data.SortedMapKOf
+import arrow.data.SortedMapKPartialOf
+import arrow.data.fix
 import arrow.data.k
 import arrow.data.updated
 import arrow.typeclasses.Applicative

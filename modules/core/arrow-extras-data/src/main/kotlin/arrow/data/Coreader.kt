@@ -2,6 +2,8 @@ package arrow.data
 
 import arrow.core.Id
 import arrow.core.ForId
+import arrow.core.IdOf
+import arrow.core.value
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.internal.IdBimonad
 

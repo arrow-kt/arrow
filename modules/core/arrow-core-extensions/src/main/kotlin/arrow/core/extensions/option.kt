@@ -5,8 +5,10 @@ package arrow.core.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.core.ForOption
 import arrow.core.None
 import arrow.core.Option
+import arrow.core.OptionOf
 import arrow.core.Some
 import arrow.core.Tuple2
 import arrow.extension
@@ -28,11 +30,13 @@ import arrow.typeclasses.Semigroupal
 import arrow.typeclasses.Semiring
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
-import arrow.typeclasses.fix
 import arrow.typeclasses.suspended.monad.Fx
 import arrow.core.extensions.traverse as optionTraverse
 import arrow.core.extensions.option.monad.map
 import arrow.core.extensions.option.monad.monad
+import arrow.core.fix
+import arrow.core.identity
+import arrow.core.orElse
 import arrow.core.select as optionSelect
 
 @extension

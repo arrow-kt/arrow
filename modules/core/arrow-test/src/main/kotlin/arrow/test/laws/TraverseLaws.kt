@@ -23,6 +23,7 @@ import arrow.typeclasses.Traverse
 import arrow.typeclasses.const
 import arrow.typeclasses.nest
 import arrow.typeclasses.unnest
+import arrow.typeclasses.value
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

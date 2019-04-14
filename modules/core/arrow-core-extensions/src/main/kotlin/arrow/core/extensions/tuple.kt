@@ -7,8 +7,11 @@ import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.core.Eval
+import arrow.core.ForTuple2
 import arrow.core.Tuple10
 import arrow.core.Tuple2
+import arrow.core.Tuple2Of
+import arrow.core.Tuple2PartialOf
 import arrow.core.Tuple3
 import arrow.core.Tuple4
 import arrow.core.Tuple5
@@ -16,6 +19,8 @@ import arrow.core.Tuple6
 import arrow.core.Tuple7
 import arrow.core.Tuple8
 import arrow.core.Tuple9
+import arrow.core.fix
+import arrow.core.identity
 import arrow.core.toT
 import arrow.extension
 import arrow.typeclasses.Applicative

@@ -1,5 +1,6 @@
 package arrow.dagger.extensions
 
+import arrow.core.ForId
 import arrow.core.Id
 import arrow.core.extensions.id.applicative.applicative
 import arrow.core.extensions.id.bimonad.bimonad

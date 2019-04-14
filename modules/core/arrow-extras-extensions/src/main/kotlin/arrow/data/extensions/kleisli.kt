@@ -11,10 +11,15 @@ import arrow.extension
 import arrow.core.extensions.id.applicative.applicative
 import arrow.core.extensions.id.functor.functor
 import arrow.core.extensions.id.monad.monad
+import arrow.data.ForKleisli
+import arrow.data.KleisliOf
+import arrow.data.KleisliPartialOf
 import arrow.data.extensions.ior.monad.monad
 import arrow.data.extensions.kleisli.applicative.applicative
 import arrow.data.extensions.kleisli.functor.functor
 import arrow.data.extensions.kleisli.monad.monad
+import arrow.data.fix
+import arrow.data.run
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Conested
@@ -26,6 +31,7 @@ import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
+import arrow.typeclasses.conest
 import arrow.typeclasses.counnest
 import arrow.typeclasses.fix
 import arrow.typeclasses.suspended.monad.Fx

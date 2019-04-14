@@ -6,6 +6,7 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.Tuple2
+import arrow.core.identity
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Foldable

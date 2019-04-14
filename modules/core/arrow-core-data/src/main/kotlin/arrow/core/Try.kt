@@ -196,6 +196,7 @@ fun <B> TryOf<B>.handleError(f: (Throwable) -> B): Try<B> = fix().fold({ Success
  */
 fun <B> TryOf<B>.handleErrorWith(f: (Throwable) -> TryOf<B>): Try<B> = fix().fold({ f(it).fix() }, { Success(it) })
 
+@Suppress("DEPRECATION")
 @Deprecated(DeprecatedAmbiguity, ReplaceWith("handleErrorWith(f)"))
 fun <A> TryOf<A>.rescue(f: (Throwable) -> TryOf<A>): Try<A> = fix().recoverWith(f)
 

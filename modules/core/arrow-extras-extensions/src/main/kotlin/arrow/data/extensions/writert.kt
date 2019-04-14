@@ -3,10 +3,16 @@ package arrow.data.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Tuple2
+import arrow.core.left
+import arrow.core.right
 import arrow.core.toT
 import arrow.data.WriterT
+import arrow.data.WriterTOf
+import arrow.data.WriterTPartialOf
 import arrow.data.extensions.statet.monad.monad
 import arrow.data.extensions.writert.monad.monad
+import arrow.data.fix
+import arrow.data.value
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError

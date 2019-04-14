@@ -5,7 +5,10 @@ package arrow.core.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.core.ForId
 import arrow.core.Id
+import arrow.core.IdOf
+import arrow.core.value
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Bimonad
@@ -23,6 +26,8 @@ import arrow.typeclasses.Traverse
 import arrow.typeclasses.suspended.monad.Fx
 import arrow.core.extensions.traverse as idTraverse
 import arrow.core.extensions.id.monad.monad
+import arrow.core.fix
+import arrow.core.identity
 import arrow.core.select as idSelect
 
 @extension

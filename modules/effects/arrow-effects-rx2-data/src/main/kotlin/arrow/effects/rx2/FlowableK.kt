@@ -6,6 +6,7 @@ import arrow.core.Eval
 import arrow.core.Left
 import arrow.core.NonFatal
 import arrow.core.Right
+import arrow.core.identity
 import arrow.effects.OnCancel
 import arrow.effects.internal.Platform
 import arrow.effects.rx2.CoroutineContextRx2Scheduler.asScheduler

@@ -3,6 +3,8 @@ package arrow.free.extensions
 import arrow.Kind
 import arrow.extension
 import arrow.free.Yoneda
+import arrow.free.YonedaPartialOf
+import arrow.free.fix
 import arrow.typeclasses.Functor
 import arrow.undocumented
 

@@ -3,12 +3,16 @@ package arrow.data.extensions
 import arrow.Kind
 import arrow.core.Eval
 import arrow.data.MapK
+import arrow.data.MapKOf
+import arrow.data.MapKPartialOf
 import arrow.data.SetK
 import arrow.data.k
 import arrow.extension
 import arrow.data.extensions.mapk.foldable.fold
 import arrow.data.extensions.setk.eq.eq
 import arrow.data.extensions.setk.hash.hash
+import arrow.data.fix
+import arrow.data.updated
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Foldable

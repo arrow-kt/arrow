@@ -2,10 +2,13 @@ package arrow.data
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.core.EitherOf
 import arrow.core.Eval
 import arrow.core.FunctionK
 import arrow.core.Left
 import arrow.core.Right
+import arrow.core.fix
+import arrow.core.identity
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Comonad

@@ -1,5 +1,6 @@
 package arrow.dagger.extensions
 
+import arrow.core.ForOption
 import arrow.core.Option
 import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.option.foldable.foldable

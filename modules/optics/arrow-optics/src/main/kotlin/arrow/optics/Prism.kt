@@ -8,6 +8,7 @@ import arrow.core.PartialFunction
 import arrow.core.Some
 import arrow.core.Tuple2
 import arrow.core.compose
+import arrow.core.flatMap
 import arrow.core.getOrElse
 import arrow.core.identity
 import arrow.core.lift

@@ -1,5 +1,6 @@
 package arrow.dagger.extensions
 
+import arrow.data.ForListK
 import arrow.data.ListK
 import arrow.data.extensions.listk.applicative.applicative
 import arrow.data.extensions.listk.foldable.foldable

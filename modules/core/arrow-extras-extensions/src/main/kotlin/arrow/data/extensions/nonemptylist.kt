@@ -3,10 +3,13 @@ package arrow.data.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.data.ForNonEmptyList
 import arrow.data.Nel
 import arrow.data.NonEmptyList
+import arrow.data.NonEmptyListOf
 import arrow.data.extensions.listk.monad.monad
 import arrow.data.extensions.nonemptylist.monad.monad
+import arrow.data.fix
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Bimonad

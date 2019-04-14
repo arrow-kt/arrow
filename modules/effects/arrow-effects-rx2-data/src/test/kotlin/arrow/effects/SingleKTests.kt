@@ -1,6 +1,8 @@
 package arrow.effects
 
+import arrow.effects.rx2.ForSingleK
 import arrow.effects.rx2.SingleK
+import arrow.effects.rx2.SingleKOf
 import arrow.effects.rx2.k
 import arrow.effects.rx2.extensions.singlek.applicative.applicative
 import arrow.effects.rx2.extensions.singlek.applicativeError.applicativeError
@@ -11,6 +13,7 @@ import arrow.effects.rx2.extensions.singlek.monad.flatMap
 import arrow.effects.rx2.extensions.singlek.monad.monad
 import arrow.effects.rx2.extensions.singlek.monadError.monadError
 import arrow.effects.rx2.extensions.singlek.monadThrow.bindingCatch
+import arrow.effects.rx2.value
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
 import arrow.test.laws.ApplicativeErrorLaws

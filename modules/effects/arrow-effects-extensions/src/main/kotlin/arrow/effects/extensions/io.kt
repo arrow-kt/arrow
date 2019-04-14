@@ -2,7 +2,11 @@ package arrow.effects.extensions
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.effects.ForIO
 import arrow.effects.IO
+import arrow.effects.IOOf
+import arrow.effects.OnCancel
+import arrow.effects.fix
 import arrow.effects.racePair
 import arrow.effects.raceTriple
 import arrow.effects.toIOProc
@@ -147,8 +151,8 @@ interface IOAsync : Async<ForIO>, IOMonadDefer {
 // FIXME default @extension are temporarily declared in arrow-effects-io-extensions due to multiplatform needs
 interface IOConcurrent : Concurrent<ForIO>, IOAsync {
 
-  override fun <A> CoroutineContext.startFiber(fa: IOOf<A>): IO<Fiber<ForIO, A>> =
-    fa.ioStart(this)
+  override fun <A> CoroutineContext.startFiber(kind: IOOf<A>): IO<Fiber<ForIO, A>> =
+    kind.ioStart(this)
 
   override fun <A> asyncF(fa: ConnectedProcF<ForIO, A>): IO<A> =
     IO.asyncF(fa)

@@ -1,9 +1,12 @@
 package arrow.effects.extensions
 
+import arrow.core.None
 import arrow.data.OptionT
 import arrow.data.OptionTOf
 import arrow.data.OptionTPartialOf
 import arrow.data.extensions.OptionTMonadError
+import arrow.data.value
+import arrow.effects.Ref
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Bracket
 import arrow.effects.typeclasses.ExitCase

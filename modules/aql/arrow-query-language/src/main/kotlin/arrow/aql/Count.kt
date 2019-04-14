@@ -1,6 +1,8 @@
 package arrow.aql
 
 import arrow.core.extensions.monoid
+import arrow.core.firstOrNone
+import arrow.core.getOrElse
 import arrow.core.identity
 import arrow.data.ForListK
 import arrow.data.fix

@@ -1,6 +1,8 @@
 package arrow.effects
 
 import arrow.effects.reactor.FluxK
+import arrow.effects.reactor.FluxKOf
+import arrow.effects.reactor.ForFluxK
 import arrow.effects.reactor.k
 import arrow.effects.reactor.extensions.fluxk.async.async
 import arrow.effects.reactor.extensions.fluxk.foldable.foldable
@@ -9,6 +11,7 @@ import arrow.effects.reactor.extensions.fluxk.fx.fx
 import arrow.effects.reactor.extensions.fluxk.monad.flatMap
 import arrow.effects.reactor.extensions.fluxk.monadThrow.bindingCatch
 import arrow.effects.reactor.extensions.fluxk.traverse.traverse
+import arrow.effects.reactor.value
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws

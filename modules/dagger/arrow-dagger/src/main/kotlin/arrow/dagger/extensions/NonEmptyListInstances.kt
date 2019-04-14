@@ -1,5 +1,6 @@
 package arrow.dagger.extensions
 
+import arrow.data.ForNonEmptyList
 import arrow.data.NonEmptyList
 import arrow.data.extensions.nonemptylist.applicative.applicative
 import arrow.data.extensions.nonemptylist.bimonad.bimonad
