@@ -1,8 +1,6 @@
 package arrow.effects
 
-import arrow.core.Either
-import arrow.core.Right
-import arrow.core.left
+import arrow.core.*
 import arrow.effects.extensions.fx.bracket.bracket
 import arrow.effects.extensions.fx.unsafeRun.runBlocking
 import arrow.effects.suspended.fx.*
@@ -10,8 +8,10 @@ import arrow.test.UnitSpec
 import arrow.test.laws.BracketLaws
 import arrow.typeclasses.Eq
 import arrow.unsafe
+import io.kotlintest.fail
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
+import io.kotlintest.shouldThrow
 import org.junit.runner.RunWith
 import java.lang.RuntimeException
 import java.util.concurrent.CountDownLatch
@@ -22,6 +22,98 @@ class FxTest : UnitSpec() {
 
   init {
     testLaws(BracketLaws.laws(Fx.bracket(), FX_EQ(), FX_EQ(), FX_EQ()))
+
+    class MyException : Exception() {
+      override fun fillInStackTrace(): Throwable = this
+    }
+
+    "just should yield immediately" {
+      val expected = 1
+      val run = Fx.unsafeRunBlocking(Fx.just(expected))
+      run shouldBe expected
+    }
+
+    "just - can return a null value from unsafeRunBlocking" {
+      val never = Fx.just<Int?>(null)
+      val received = Fx.unsafeRunBlocking(never)
+      received shouldBe null
+    }
+
+    "invoke - should yield invoke value" {
+      val expected = 1
+      val run = Fx.unsafeRunBlocking(Fx { expected })
+      run shouldBe expected
+    }
+
+    "invoke - should defer evaluation until run" {
+      var run = false
+      val ioa = Fx { run = true }
+      run shouldBe false
+      Fx.unsafeRunBlocking(ioa)
+      run shouldBe true
+    }
+
+    "invoke - should throw exceptions within main block" {
+      val exception = MyException()
+
+      shouldThrow<MyException> {
+        Fx.unsafeRunBlocking(Fx { throw exception })
+      } shouldBe exception
+    }
+
+    "raiseError - should throw immediate failure" {
+      val exception = MyException()
+
+      shouldThrow<MyException> {
+        Fx.unsafeRunBlocking(Fx.raiseError<Int>(exception))
+      } shouldBe exception
+    }
+
+    "unsafeRunNonBlocking should return a pure value" {
+      val expected = 1
+      Fx.unsafeRunNonBlocking(Fx.just(expected)) { either ->
+        either.fold({ fail("unsafeRunNonBlocking should not receive $it for a pure value") }, { it shouldBe expected })
+      }
+    }
+
+    "unsafeRunNonBlocking should return a suspended value" {
+      val expected = 1
+      Fx.unsafeRunNonBlocking(Fx { expected }) { either ->
+        either.fold({ fail("unsafeRunNonBlocking should not receive $it for a pure value") }, { it shouldBe expected })
+      }
+    }
+
+    "unsafeRunNonBlocking should return an error when running raiseError" {
+      val exception = MyException()
+
+      Fx.unsafeRunNonBlocking(Fx.raiseError<Int>(exception)) { either ->
+        either.fold({
+          when (it) {
+            is MyException -> it shouldBe exception
+            else -> fail("Should only throw MyException")
+          }
+        }, { fail("") })
+      }
+    }
+
+    "unsafeRunNonBlocking should return an error when running a suspended exception" {
+      val exception = MyException()
+      val ioa = Fx<Int> { throw exception }
+      Fx.unsafeRunNonBlocking(ioa) { either ->
+        either.fold({ it shouldBe exception }, { fail("") })
+      }
+    }
+
+    "unsafeRunNonBlocking should not catch exceptions after it ran" {
+      val exception = MyException()
+      val fx = Fx<Int> { throw exception }
+
+      shouldThrow<MyException> {
+        Fx.unsafeRunNonBlocking(fx) { either ->
+          either.fold({ throw it }, { fail("unsafeRunNonBlocking should not receive $it for a suspended exception") })
+        }
+      } shouldBe exception
+    }
 
     "Fx `map` stack safe" {
       val size = 500000
@@ -88,7 +180,7 @@ class FxTest : UnitSpec() {
       val latch = CountDownLatch(1)
       var result: Either<Throwable, Boolean>? = null
 
-      Fx.runNonBlockingCancellable(
+      Fx.unsafeRunNonBlockingCancellable(
         Fx { ctxA = kotlin.coroutines.coroutineContext[CancelContext]!!.connection }
           .flatMap { Fx { ctxB = kotlin.coroutines.coroutineContext[CancelContext]!!.connection }.uncancelable() }
           .flatMap { Fx { ctxC = kotlin.coroutines.coroutineContext[CancelContext]!!.connection } }

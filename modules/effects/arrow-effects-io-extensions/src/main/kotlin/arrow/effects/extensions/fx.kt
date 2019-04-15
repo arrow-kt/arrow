@@ -3,9 +3,7 @@ package arrow.effects.extensions
 import arrow.Kind
 import arrow.core.*
 import arrow.effects.IODispatchers
-import arrow.effects.extensions.fx.async.shift
 import arrow.effects.extensions.fx.dispatchers.dispatchers
-import arrow.effects.extensions.fx.monad.followedBy
 import arrow.effects.internal.Platform
 import arrow.effects.internal.UnsafePromise
 import arrow.effects.internal.asyncContinuation
@@ -33,7 +31,7 @@ interface Fx2UnsafeRun : UnsafeRun<ForFx> {
     Fx.unsafeRunBlocking(fa())
 
   override suspend fun <A> unsafe.runNonBlocking(fa: () -> FxOf<A>, cb: (Either<Throwable, A>) -> Unit) =
-    Fx.runNonBlocking(fa(), cb)
+    Fx.unsafeRunNonBlocking(fa(), cb)
 }
 
 @extension
