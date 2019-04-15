@@ -1,10 +1,5 @@
 package arrow.core
 
-import arrow.core.extensions.combine
-import arrow.core.extensions.eq
-import arrow.core.extensions.hash
-import arrow.core.extensions.monoid
-import arrow.core.extensions.semigroup
 import arrow.core.extensions.`try`.applicative.map
 import arrow.core.extensions.`try`.eq.eq
 import arrow.core.extensions.`try`.functor.functor
@@ -14,6 +9,11 @@ import arrow.core.extensions.`try`.monoid.monoid
 import arrow.core.extensions.`try`.semigroup.semigroup
 import arrow.core.extensions.`try`.show.show
 import arrow.core.extensions.`try`.traverse.traverse
+import arrow.core.extensions.combine
+import arrow.core.extensions.eq
+import arrow.core.extensions.hash
+import arrow.core.extensions.monoid
+import arrow.core.extensions.semigroup
 import arrow.mtl.extensions.`try`.functorFilter.functorFilter
 import arrow.test.UnitSpec
 import arrow.test.generators.`try`
