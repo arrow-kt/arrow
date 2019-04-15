@@ -40,7 +40,7 @@ class IdTest : UnitSpec() {
       HashLaws.laws(Id.hash(Int.hash()), Id.eq(Int.eq())) { Id(it) }
     )
 
-    "Semigroup of Id<A> is Id<Semigroup<A>>"() {
+    "Semigroup of Id<A> is Id<Semigroup<A>>" {
       forAll { a: Int ->
         val left = Id.semigroup(Int.semigroup()).run {
           Id(a).combine(Id(a))
