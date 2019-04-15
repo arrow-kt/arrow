@@ -60,7 +60,6 @@ sealed class Focus {
   }
 
   data class NonNull(override val className: String, override val paramName: String) : Focus()
-
 }
 
 const val Lens = "arrow.optics.Lens"

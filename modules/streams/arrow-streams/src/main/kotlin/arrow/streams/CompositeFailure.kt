@@ -1,6 +1,10 @@
 package arrow.streams
 
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Left
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
 import arrow.data.Nel
 import arrow.data.NonEmptyList
 
@@ -31,8 +35,10 @@ data class CompositeFailure(
      * - When both results succeeds then Right(()) is returned
      *
      */
-    fun fromResults(first: Either<Throwable, Unit>,
-                    second: Either<Throwable, Unit>): Either<Throwable, Unit> = when (first) {
+    fun fromResults(
+      first: Either<Throwable, Unit>,
+      second: Either<Throwable, Unit>
+    ): Either<Throwable, Unit> = when (first) {
       is Either.Right -> second
       is Either.Left -> when (second) {
         is Either.Left -> Left(CompositeFailure(first.a, second.a, emptyList()))
@@ -41,4 +47,3 @@ data class CompositeFailure(
     }
   }
 }
-

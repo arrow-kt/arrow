@@ -1,15 +1,43 @@
 @file:Suppress("UnusedImports")
+
 package arrow.core.extensions
 
 import arrow.Kind
-import arrow.core.*
-import arrow.core.select as optionSelect
-import arrow.core.extensions.option.monad.map
-import arrow.core.extensions.option.monad.monad
+import arrow.core.Either
+import arrow.core.Eval
+import arrow.core.ForOption
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.OptionOf
+import arrow.core.Some
+import arrow.core.Tuple2
 import arrow.extension
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Hash
+import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadError
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.MonoidK
+import arrow.typeclasses.Monoidal
+import arrow.typeclasses.Selective
+import arrow.typeclasses.Semigroup
+import arrow.typeclasses.SemigroupK
+import arrow.typeclasses.Semigroupal
+import arrow.typeclasses.Semiring
+import arrow.typeclasses.Show
+import arrow.typeclasses.Traverse
 import arrow.typeclasses.suspended.monad.Fx
 import arrow.core.extensions.traverse as optionTraverse
+import arrow.core.extensions.option.monad.map
+import arrow.core.extensions.option.monad.monad
+import arrow.core.fix
+import arrow.core.identity
+import arrow.core.orElse
+import arrow.core.select as optionSelect
 
 @extension
 interface OptionSemigroup<A> : Semigroup<Option<A>> {
@@ -29,7 +57,7 @@ interface OptionSemigroup<A> : Semigroup<Option<A>> {
 @extension
 interface OptionSemigroupal : Semigroupal<ForOption> {
   override fun <A, B> Kind<ForOption, A>.product(fb: Kind<ForOption, B>): Kind<ForOption, Tuple2<A, B>> =
-    fb.fix().ap(this.map { a:A -> { b: B -> Tuple2(a,b)} })
+    fb.fix().ap(this.map { a: A -> { b: B -> Tuple2(a, b) } })
 }
 
 @extension
@@ -51,26 +79,26 @@ interface OptionSemiring<A> : Semiring<Option<A>> {
   override fun one(): Option<A> = None
 
   override fun Option<A>.combine(b: Option<A>): Option<A> =
-          when (this) {
-            is Some<A> -> when (b) {
-              is Some<A> -> Some(SG().run { t.combine(b.t) })
-              None -> this
-            }
-            None -> b
-          }
+    when (this) {
+      is Some<A> -> when (b) {
+        is Some<A> -> Some(SG().run { t.combine(b.t) })
+        None -> this
+      }
+      None -> b
+    }
 
   override fun Option<A>.combineMultiplicate(b: Option<A>): Option<A> =
-          when (this) {
-            is Some<A> -> when (b) {
-              is Some<A> -> Some(SG().run { t.combineMultiplicate(b.t) })
-              None -> this
-            }
-            None -> b
-          }
+    when (this) {
+      is Some<A> -> when (b) {
+        is Some<A> -> Some(SG().run { t.combineMultiplicate(b.t) })
+        None -> this
+      }
+      None -> b
+    }
 }
 
 @extension
-interface OptionApplicativeError: ApplicativeError<ForOption, Unit>, OptionApplicative {
+interface OptionApplicativeError : ApplicativeError<ForOption, Unit>, OptionApplicative {
   override fun <A> raiseError(e: Unit): Option<A> =
     None
 
@@ -79,7 +107,7 @@ interface OptionApplicativeError: ApplicativeError<ForOption, Unit>, OptionAppli
 }
 
 @extension
-interface OptionMonadError: MonadError<ForOption, Unit>, OptionMonad {
+interface OptionMonadError : MonadError<ForOption, Unit>, OptionMonad {
   override fun <A> raiseError(e: Unit): OptionOf<A> =
     None
 
@@ -102,7 +130,6 @@ interface OptionEq<A> : Eq<Option<A>> {
       is Some -> false
     }
   }
-
 }
 
 @extension

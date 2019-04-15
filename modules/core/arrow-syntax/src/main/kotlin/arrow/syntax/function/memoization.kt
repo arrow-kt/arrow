@@ -217,4 +217,3 @@ private class MemoizedHandler<F, in K : MemoizedCall<F, R>, out R>(val f: F) {
   private val m = newConcurrentMap<K, R>()
   operator fun invoke(k: K): R = m[k] ?: run { m.putSafely(k, k(f)) }
 }
-

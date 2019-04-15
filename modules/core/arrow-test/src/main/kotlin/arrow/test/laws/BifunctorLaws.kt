@@ -31,5 +31,4 @@ object BifunctorLaws {
         ) { fa: Kind2<F, Int, Int>, ff, g, x, y ->
             fa.bimap(ff, g).bimap(x, y).equalUnderTheLaw(fa.bimap(ff andThen x, g andThen y), EQ)
         }
-
 }

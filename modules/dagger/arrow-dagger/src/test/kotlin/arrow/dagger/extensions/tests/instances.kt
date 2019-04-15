@@ -1,9 +1,51 @@
+@file:Suppress("unused")
+
 package arrow.dagger.extensions.tests
 
-import arrow.core.*
-import arrow.dagger.extensions.*
-import arrow.data.*
-import arrow.typeclasses.*
+import arrow.core.EitherPartialOf
+import arrow.core.ForEval
+import arrow.core.ForFunction0
+import arrow.core.ForId
+import arrow.core.ForOption
+import arrow.core.ForTry
+import arrow.core.Function1PartialOf
+import arrow.dagger.extensions.ArrowInstances
+import arrow.dagger.extensions.CoproductInstances
+import arrow.dagger.extensions.EitherInstances
+import arrow.dagger.extensions.EitherTInstances
+import arrow.dagger.extensions.Function1Instances
+import arrow.dagger.extensions.KleisliInstances
+import arrow.dagger.extensions.MapKInstances
+import arrow.dagger.extensions.OptionTInstances
+import arrow.dagger.extensions.SortedMapKInstances
+import arrow.dagger.extensions.StateTInstances
+import arrow.data.CoproductPartialOf
+import arrow.data.EitherTPartialOf
+import arrow.data.ForListK
+import arrow.data.ForNonEmptyList
+import arrow.data.ForSequenceK
+import arrow.data.ForSetK
+import arrow.data.KleisliPartialOf
+import arrow.data.MapKPartialOf
+import arrow.data.OptionTPartialOf
+import arrow.data.SortedMapKPartialOf
+import arrow.data.StateTPartialOf
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Bimonad
+import arrow.typeclasses.Comonad
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Hash
+import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadError
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.MonoidK
+import arrow.typeclasses.Order
+import arrow.typeclasses.Semigroup
+import arrow.typeclasses.SemigroupK
+import arrow.typeclasses.Traverse
 import dagger.Component
 import dagger.Module
 import javax.inject.Singleton
@@ -198,11 +240,7 @@ object Arrow {
 
 object test {
   @JvmStatic
-  fun main(args: Array<String>) {
+  fun main() {
     println(Arrow.instances.optionApplicative().just(1))
   }
 }
-
-
-
-

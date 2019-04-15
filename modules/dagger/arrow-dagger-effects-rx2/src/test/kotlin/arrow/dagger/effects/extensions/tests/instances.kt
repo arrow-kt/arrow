@@ -6,7 +6,11 @@ import arrow.effects.rx2.ForObservableK
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Effect
 import arrow.effects.typeclasses.MonadDefer
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadError
 import dagger.Component
 import javax.inject.Singleton
 
@@ -41,6 +45,3 @@ interface Runtime {
 object Arrow {
   val instances = DaggerRuntime.builder().build()
 }
-
-
-

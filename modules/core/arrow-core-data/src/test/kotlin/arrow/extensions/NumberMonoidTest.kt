@@ -42,7 +42,7 @@ class NumberMonoidTest : UnitSpec() {
 
     "should semigroup with the instance passed - long" {
       forAll { value: Long ->
-        val seen = Long.monoid().run  { value.combine(value) }
+        val seen = Long.monoid().run { value.combine(value) }
         val expected = value + value
 
         expected == seen
@@ -51,7 +51,7 @@ class NumberMonoidTest : UnitSpec() {
 
     "should semigroup with the instance passed - short" {
       forAll(Gen.short()) { value: Short ->
-        val seen = Short.monoid().run  { value.combine(value) }
+        val seen = Short.monoid().run { value.combine(value) }
         val expected = (value + value).toShort()
 
         expected == seen

@@ -31,18 +31,18 @@ interface CharOrder : Order<Char> {
   override fun Char.neqv(b: Char): Boolean = this != b
 }
 
-interface CharHash: Hash<Char>, CharEq {
+interface CharHash : Hash<Char>, CharEq {
   override fun Char.hash(): Int = this.hashCode()
 }
 
 fun Char.Companion.show(): Show<Char> =
-  object : CharShow{}
+  object : CharShow {}
 
 fun Char.Companion.eq(): Eq<Char> =
-  object : CharEq{}
+  object : CharEq {}
 
 fun Char.Companion.order(): Order<Char> =
-  object : CharOrder{}
+  object : CharOrder {}
 
 fun Char.Companion.hash(): Hash<Char> =
-  object : CharHash{}
+  object : CharHash {}

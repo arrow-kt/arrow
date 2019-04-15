@@ -10,7 +10,12 @@ import arrow.core.extensions.function1.semigroup.semigroup
 import arrow.core.extensions.monoid
 import arrow.core.extensions.semigroup
 import arrow.test.UnitSpec
-import arrow.test.laws.*
+import arrow.test.laws.CategoryLaws
+import arrow.test.laws.DivisibleLaws
+import arrow.test.laws.MonadLaws
+import arrow.test.laws.MonoidLaws
+import arrow.test.laws.ProfunctorLaws
+import arrow.test.laws.SemigroupLaws
 import arrow.typeclasses.Conested
 import arrow.typeclasses.Eq
 import arrow.typeclasses.conest
@@ -40,13 +45,13 @@ class Function1Test : UnitSpec() {
       CategoryLaws.laws(Function1.category(), { Function1.just(it) }, EQ)
     )
 
-    "Semigroup of Function1<A> is Function1<Semigroup<A>>"() {
+    "Semigroup of Function1<A> is Function1<Semigroup<A>>" {
       forAll { a: Int ->
         val left = Function1.semigroup<Int, Int>(Int.semigroup()).run {
-          Function1<Int, Int>({ it }).combine(Function1<Int, Int>({ it }))
+          Function1<Int, Int> { it }.combine(Function1 { it })
         }
 
-        val right = Function1<Int, Int>({ Int.monoid().run { it.combine(it) } })
+        val right = Function1<Int, Int> { Int.monoid().run { it.combine(it) } }
 
         left.invoke(a) == right.invoke(a)
       }
@@ -55,7 +60,7 @@ class Function1Test : UnitSpec() {
     "Function1<A>.empty() is Function1{A.empty()}" {
       forAll { a: Int, b: Int ->
         val left = Function1.monoid<Int, Int>(Int.monoid()).run { empty() }
-        val right = Function1<Int, Int>({ Int.monoid().run { empty() } })
+        val right = Function1<Int, Int> { Int.monoid().run { empty() } }
         left.invoke(a) == right.invoke(b)
       }
     }

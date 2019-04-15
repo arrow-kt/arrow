@@ -1,8 +1,16 @@
 package arrow.typeclasses
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Eval
 import arrow.core.Eval.Companion.always
+import arrow.core.ForEither
+import arrow.core.Left
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Right
+import arrow.core.Some
+import arrow.core.fix
+import arrow.core.identity
 
 /**
  * ank_macro_hierarchy(arrow.typeclasses.Foldable)

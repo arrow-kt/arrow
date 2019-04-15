@@ -1,8 +1,19 @@
 package arrow.dagger.extensions
 
-import arrow.data.*
-import arrow.data.extensions.*
-import arrow.typeclasses.*
+import arrow.data.ValidatedPartialOf
+import arrow.data.extensions.ValidatedApplicative
+import arrow.data.extensions.ValidatedEq
+import arrow.data.extensions.ValidatedFoldable
+import arrow.data.extensions.ValidatedFunctor
+import arrow.data.extensions.ValidatedSemigroupK
+import arrow.data.extensions.ValidatedTraverse
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Semigroup
+import arrow.typeclasses.SemigroupK
+import arrow.typeclasses.Traverse
 import dagger.Module
 import dagger.Provides
 import javax.inject.Inject
@@ -24,7 +35,6 @@ abstract class ValidatedInstances<L> {
 
   @Provides
   fun validatedSemigroupK(ev: DaggerValidatedSemigroupK<L>): SemigroupK<ValidatedPartialOf<L>> = ev
-
 }
 
 class DaggerValidatedFunctor<F> @Inject constructor() : ValidatedFunctor<F>

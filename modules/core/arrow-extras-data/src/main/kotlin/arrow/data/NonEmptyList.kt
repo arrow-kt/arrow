@@ -1,7 +1,12 @@
 package arrow.data
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Eval
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.identity
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 
@@ -14,7 +19,8 @@ typealias Nel<A> = NonEmptyList<A>
 class NonEmptyList<out A> private constructor(
   val head: A,
   val tail: List<A>,
-  val all: List<A>) : NonEmptyListOf<A> {
+  val all: List<A>
+) : NonEmptyListOf<A> {
 
   constructor(head: A, tail: List<A>) : this(head, tail, listOf(head) + tail)
   private constructor(list: List<A>) : this(list[0], list.drop(1), list)
@@ -97,7 +103,8 @@ class NonEmptyList<out A> private constructor(
     private tailrec fun <A, B> go(
       buf: ArrayList<B>,
       f: (A) -> Kind<ForNonEmptyList, Either<A, B>>,
-      v: NonEmptyList<Either<A, B>>) {
+      v: NonEmptyList<Either<A, B>>
+    ) {
       val head: Either<A, B> = v.head
       when (head) {
         is Either.Right -> {
@@ -117,7 +124,6 @@ class NonEmptyList<out A> private constructor(
       go(buf, f, f(a).fix())
       return fromListUnsafe(buf)
     }
-
   }
 }
 

@@ -1,12 +1,19 @@
 package arrow.test.laws
 
-import arrow.core.*
+import arrow.core.Id
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.compose
+import arrow.core.identity
+import arrow.core.value
 import arrow.core.extensions.const.applicative.applicative
 import arrow.core.extensions.id.applicative.applicative
-import arrow.typeclasses.*
 import arrow.optics.Optional
+import arrow.typeclasses.Const
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
+import arrow.typeclasses.value
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
@@ -125,7 +132,7 @@ object OptionalLaws {
     optionalGen: Gen<Optional<A, B>>,
     aGen: Gen<A>,
     EQOptionB: Eq<Option<B>>
-  ): Unit {
+  ) {
     val firstMonoid = object : Monoid<FirstOption<B>> {
       override fun empty(): FirstOption<B> = FirstOption(None)
       override fun FirstOption<B>.combine(b: FirstOption<B>): FirstOption<B> =
@@ -143,5 +150,4 @@ object OptionalLaws {
 
   @PublishedApi
   internal data class FirstOption<A>(val option: Option<A>)
-
 }

@@ -20,9 +20,13 @@ import arrow.test.UnitSpec
 import arrow.test.laws.ComonadLaws
 import arrow.test.laws.DivisibleLaws
 import arrow.test.laws.HashLaws
-import arrow.typeclasses.*
-import io.kotlintest.runner.junit4.KotlinTestRunner
+import arrow.typeclasses.Const
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Hash
+import arrow.typeclasses.fix
+import arrow.typeclasses.value
 import io.kotlintest.shouldBe
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
 @RunWith(KotlinTestRunner::class)
@@ -82,6 +86,5 @@ class SumTest : UnitSpec() {
 
       sum.extract(Id.comonad(), Id.comonad()) shouldBe 65
     }
-
   }
 }

@@ -4,7 +4,9 @@ import arrow.Kind
 import arrow.core.Option
 import arrow.core.Some
 import arrow.mtl.typeclasses.FunctorFilter
-import arrow.test.generators.*
+import arrow.test.generators.functionAToB
+import arrow.test.generators.intSmall
+import arrow.test.generators.option
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
