@@ -247,11 +247,25 @@ class FxTest : UnitSpec() {
       unsafe { runBlocking { Fx { mapStackSafe()() } } } shouldBe size
     }
 
-    "Fx `flatMap` stack safe" {
+    "Fx `flatMap` stack safe on right bind" {
       val size = 500000
       fun flatMapStackSafe(): Fx<Int> =
         (0 until size).fold(Fx { 0 }) { acc, _ -> acc.flatMap { Fx.just(it + 1) } }
       unsafe { runBlocking { Fx { flatMapStackSafe()() } } } shouldBe size
+    }
+
+    "Fx `flatMap` stackSafe on left bind" {
+      val size = 500000
+      val dummy = MyException()
+
+      fun fxLoopNotHappy(size: Int, i: Int): Fx<Int> =
+        if (i < size) {
+          Fx { throw dummy }.attempt().flatMap {
+            it.fold({ fxLoopNotHappy(size, i + 1) }, Fx.Companion::just)
+          }
+        } else Fx.just(1)
+
+      Fx.unsafeRunBlocking(fxLoopNotHappy(size, 0))
     }
 
     "invoke is called on every run call" {
