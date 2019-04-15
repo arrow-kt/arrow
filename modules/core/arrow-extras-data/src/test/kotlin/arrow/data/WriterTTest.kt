@@ -16,6 +16,7 @@ import arrow.effects.extensions.writert.async.async
 import arrow.data.extensions.listk.monad.monad
 import arrow.data.extensions.listk.monoidK.monoidK
 import arrow.core.extensions.option.monad.monad
+import arrow.core.fix
 import arrow.data.extensions.writert.applicative.applicative
 import arrow.data.extensions.writert.divisible.divisible
 import arrow.data.extensions.writert.monad.monad
@@ -32,8 +33,10 @@ import arrow.test.laws.MonadFilterLaws
 import arrow.test.laws.MonadWriterLaws
 import arrow.test.laws.MonoidKLaws
 import arrow.typeclasses.Const
+import arrow.typeclasses.ConstPartialOf
 import arrow.typeclasses.Eq
 import arrow.typeclasses.const
+import arrow.typeclasses.value
 import io.kotlintest.properties.Gen
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith

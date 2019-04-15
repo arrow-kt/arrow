@@ -20,6 +20,9 @@ import arrow.core.extensions.`try`.applicative.applicative
 import arrow.core.extensions.`try`.functor.functor
 import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.option.fx.fx
+import arrow.core.flatMap
+import arrow.core.recover
+import arrow.core.recoverWith
 import io.kotlintest.Matcher
 import io.kotlintest.Result
 import io.kotlintest.shouldBe

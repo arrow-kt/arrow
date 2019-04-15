@@ -22,7 +22,12 @@ import arrow.core.extensions.id.functor.functor
 import arrow.data.extensions.listk.functor.functor
 import arrow.core.extensions.option.functor.functor
 import arrow.core.extensions.option.traverse.traverse
+import arrow.core.fix
+import arrow.core.value
+import arrow.data.OptionTOf
+import arrow.data.OptionTPartialOf
 import arrow.data.extensions.optiont.monad.monad
+import arrow.data.value
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.laws.ComonadLaws

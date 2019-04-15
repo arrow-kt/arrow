@@ -4,7 +4,9 @@ package com.pacoworks.typeclasses.basics.solved
 
 import arrow.Kind
 import arrow.effects.IO
+import arrow.effects.ForIO
 import arrow.effects.extensions.io.async.async
+import arrow.effects.fix
 import arrow.effects.typeclasses.Async
 import arrow.typeclasses.DaoDatabase
 import arrow.typeclasses.Index

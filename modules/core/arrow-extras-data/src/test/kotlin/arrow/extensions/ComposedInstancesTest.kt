@@ -34,6 +34,11 @@ import arrow.core.extensions.option.foldable.foldable
 import arrow.core.extensions.option.functor.functor
 import arrow.core.extensions.option.traverse.traverse
 import arrow.core.extensions.tuple2.bifunctor.bifunctor
+import arrow.data.ForListK
+import arrow.data.ForNonEmptyList
+import arrow.data.OptionTPartialOf
+import arrow.data.fix
+import arrow.data.value
 import arrow.test.UnitSpec
 import arrow.mtl.extensions.ComposedFunctorFilter
 import arrow.mtl.extensions.optiont.functorFilter.functorFilter
@@ -59,8 +64,11 @@ import arrow.typeclasses.Conested
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Nested
 import arrow.typeclasses.NestedType
+import arrow.typeclasses.binest
 import arrow.typeclasses.biunnest
+import arrow.typeclasses.conest
 import arrow.typeclasses.counnest
+import arrow.typeclasses.nest
 import arrow.typeclasses.unnest
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith

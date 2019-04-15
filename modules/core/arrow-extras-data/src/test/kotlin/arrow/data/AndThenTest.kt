@@ -1,6 +1,8 @@
 package arrow.data
 
 import arrow.Kind
+import arrow.core.andThen
+import arrow.core.compose
 import arrow.core.extensions.monoid
 import arrow.data.extensions.andthen.category.category
 import arrow.data.extensions.andthen.contravariant.contravariant

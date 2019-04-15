@@ -16,6 +16,7 @@ import arrow.core.extensions.id.applicative.applicative
 import arrow.core.extensions.id.monad.monad
 import arrow.data.extensions.nonemptylist.applicative.applicative
 import arrow.core.extensions.option.applicative.applicative
+import arrow.core.fix
 import arrow.test.UnitSpec
 import arrow.test.laws.ApplicativeLaws
 import arrow.test.laws.EqLaws

@@ -7,6 +7,7 @@ import arrow.core.left
 import arrow.core.right
 import arrow.core.toT
 import arrow.core.extensions.option.functor.functor
+import arrow.core.getOrElse
 import arrow.data.State
 import arrow.data.run
 import arrow.test.UnitSpec

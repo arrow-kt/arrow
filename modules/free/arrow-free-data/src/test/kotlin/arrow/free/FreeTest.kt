@@ -15,6 +15,7 @@ import arrow.higherkind
 import arrow.core.extensions.id.monad.monad
 import arrow.data.extensions.nonemptylist.monad.monad
 import arrow.core.extensions.option.monad.monad
+import arrow.core.fix
 import arrow.test.UnitSpec
 import arrow.test.laws.EqLaws
 import arrow.test.laws.MonadLaws

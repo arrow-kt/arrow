@@ -10,6 +10,8 @@ import arrow.data.StatePartialOf
 import arrow.data.StateT
 import arrow.data.extensions.statet.monad.monad
 import arrow.core.extensions.id.monad.monad
+import arrow.data.fix
+import arrow.data.run
 import arrow.effects.IO
 import arrow.effects.extensions.io.monadDefer.monadDefer
 import arrow.effects.fix

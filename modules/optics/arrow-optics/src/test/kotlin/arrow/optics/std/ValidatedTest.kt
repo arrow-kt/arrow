@@ -5,6 +5,7 @@ import arrow.core.Right
 import arrow.core.Try
 import arrow.core.extensions.`try`.applicative.applicative
 import arrow.core.extensions.either.applicative.applicative
+import arrow.core.fix
 import arrow.data.Validated
 import arrow.test.UnitSpec
 import arrow.test.generators.`try`

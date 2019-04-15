@@ -34,6 +34,7 @@ import arrow.typeclasses.Const
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monad
 import arrow.typeclasses.const
+import arrow.typeclasses.value
 import io.kotlintest.properties.forAll
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith

@@ -8,6 +8,7 @@ import arrow.data.extensions.day.applicative.applicative
 import arrow.data.extensions.day.comonad.comonad
 import arrow.core.extensions.id.applicative.applicative
 import arrow.core.extensions.id.comonad.comonad
+import arrow.core.fix
 import arrow.test.UnitSpec
 import arrow.test.laws.ApplicativeLaws
 import arrow.test.laws.ComonadLaws

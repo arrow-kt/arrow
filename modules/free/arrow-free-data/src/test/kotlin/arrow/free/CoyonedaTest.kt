@@ -9,6 +9,7 @@ import arrow.core.identity
 import arrow.free.extensions.coyoneda.functor.functor
 import arrow.core.extensions.id.functor.functor
 import arrow.core.extensions.option.functor.functor
+import arrow.core.fix
 import arrow.test.UnitSpec
 import arrow.test.laws.FunctorLaws
 import arrow.typeclasses.Eq
