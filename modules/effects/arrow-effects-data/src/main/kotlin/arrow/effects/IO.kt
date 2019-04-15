@@ -122,7 +122,7 @@ sealed class IO<out A> : IOOf<A> {
       val onCancelCb =
         when (onCancel) {
           ThrowCancellationException ->
-            cb andThen { it.fix().unsafeRunAsync { } }
+            cb andThen { it.fix().unsafeRunAsync(mapUnit) }
           Silent ->
             { either -> either.fold({ if (!conn.isCanceled() || it != CancellationException) cb(either) }, { cb(either) }) }
         }

@@ -323,10 +323,26 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
     operator fun <A> invoke(fa: suspend () -> A): Fx<A> = Fx.Single(fa)
 
     @JvmStatic
+    operator fun <A> invoke(ctx: CoroutineContext, f: () -> A): Fx<A> =
+      unit.continueOn(ctx).map { _ -> f() }
+
+    @JvmStatic
     fun <A> just(a: A): Fx<A> = Fx.Pure(a, 0)
 
     @JvmStatic
     val unit: Fx<Unit> = Fx.Pure(Unit, 0)
+
+    @JvmStatic
+    val lazy: Fx<Unit> = Fx.Single { Unit }
+
+    @JvmStatic
+    val never: Fx<Nothing> = Fx.async(mapUnit)
+
+    @JvmStatic
+    fun <A> eval(eval: Eval<A>): Fx<A> = when (eval) {
+      is Eval.Now -> Fx.just(eval.value)
+      else -> Fx.Single { eval.value() }
+    }
 
     @JvmStatic
     fun <A> raiseError(e: Throwable): Fx<A> = Fx.RaiseError(e)
@@ -346,20 +362,19 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
     fun <A> async(fa: Proc<A>): Fx<A> = async { _, cb -> fa(cb) }
 
     @JvmStatic
-    fun <A> async(fa: FxProc<A>): Fx<A> =
-      Fx.Async { conn: FxConnection, ff: (Either<Throwable, A>) -> Unit ->
-        Platform.onceOnly(ff).let { callback: (Either<Throwable, A>) -> Unit ->
-          try {
-            fa(conn, callback)
-          } catch (throwable: Throwable) {
-            if (NonFatal(throwable)) {
-              callback(Either.Left(throwable))
-            } else {
-              throw throwable
-            }
+    fun <A> async(fa: FxProc<A>): Fx<A> = Async { conn: FxConnection, ff: (Either<Throwable, A>) -> Unit ->
+      Platform.onceOnly(ff).let { callback: (Either<Throwable, A>) -> Unit ->
+        try {
+          fa(conn, callback)
+        } catch (throwable: Throwable) {
+          if (NonFatal(throwable)) {
+            callback(Either.Left(throwable))
+          } else {
+            throw throwable
           }
         }
       }
+    }
 
 
     /** Hide member because it's discouraged to use uncancelable builder for cancelable concrete type **/
@@ -367,30 +382,29 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
     fun <A> asyncF(fa: ProcF<ForFx, A>): Fx<A> = asyncF { _, cb -> fa(cb) }
 
     @JvmStatic
-    fun <A> asyncF(fa: FxProcF<A>): Fx<A> =
-      Fx.Async { conn: FxConnection, ff: (Either<Throwable, A>) -> Unit ->
-        val conn2 = FxConnection()
-        conn.push(conn2.cancel())
-        Platform.onceOnly(conn, ff).let { callback: (Either<Throwable, A>) -> Unit ->
-          val fx = try {
-            fa(conn2, callback)
-          } catch (t: Throwable) {
-            if (NonFatal(t)) Fx { callback(Either.Left(t)) }
-            else throw t
-          }
+    fun <A> asyncF(fa: FxProcF<A>): Fx<A> = Async { conn: FxConnection, ff: (Either<Throwable, A>) -> Unit ->
+      val conn2 = FxConnection()
+      conn.push(conn2.cancel())
+      Platform.onceOnly(conn, ff).let { callback: (Either<Throwable, A>) -> Unit ->
+        val fx = try {
+          fa(conn2, callback)
+        } catch (t: Throwable) {
+          if (NonFatal(t)) Fx { callback(Either.Left(t)) }
+          else throw t
+        }
 
-          FxRunLoop.startCancelable(fx, CancelContext(conn2)) { result ->
-            // DEV: If fa cancels conn2 like so `conn.cancel().map { cb(Right(Unit)) }`
-            // It doesn't run the stack of conn2, instead the result is seen in the cb of startCancelable.
-            val resultCancelled = result.fold({ e -> e == OnCancel.CancellationException }, { false })
-            if (resultCancelled && conn.isNotCanceled()) FxRunLoop.start(conn.cancel(), cb = mapUnit)
-            else Unit
-          }
+        FxRunLoop.startCancelable(fx, CancelContext(conn2)) { result ->
+          // DEV: If fa cancels conn2 like so `conn.cancel().map { cb(Right(Unit)) }`
+          // It doesn't run the stack of conn2, instead the result is seen in the cb of startCancelable.
+          val resultCancelled = result.fold({ e -> e == OnCancel.CancellationException }, { false })
+          if (resultCancelled && conn.isNotCanceled()) FxRunLoop.start(conn.cancel(), cb = mapUnit)
+          else Unit
         }
       }
+    }
 
     /**
-     * [unsafeRunBlocking] allows you to run any [Fx] to it's wrapped value [A].
+     * [unsafeRunBlocking] allows you to run any [Fx] to its wrapped value [A].
      *
      * It's called unsafe because it immediately runs the effects wrapped in [Fx],
      * and thus is **not** referentially transparent.
@@ -400,8 +414,10 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
      * @param fx the [Fx] to run
      * @return the resulting value
      * @see [unsafeRunBlocking] or [unsafeRunNonBlockingCancellable] that run the value as [Either].
+     * @see [runNonBlocking] to run in a referential transparent manner.
      */
-    @JvmStatic fun <A> unsafeRunBlocking(fx: FxOf<A>): A = when (val fa = fx.fix()) {
+    @JvmStatic
+    fun <A> unsafeRunBlocking(fx: FxOf<A>): A = when (val fa = fx.fix()) {
       is Pure -> fa.value
       is RaiseError -> throw fa.error
       else -> {
@@ -418,7 +434,7 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
     }
 
     /**
-     * [unsafeRunNonBlocking] allows you to run any [Fx] to it's wrapped value [A].
+     * [unsafeRunNonBlocking] allows you to run any [Fx] to its wrapped value [A].
      *
      * It receives the values in a callback [cb] and thus **has** the ability to run `NonBlocking` but that depends on the implementation.
      * When the underlying effects/program runs blocking on the callers thread this method will run blocking.
@@ -428,26 +444,64 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
      * @param fx the [Fx] to run
      * @param cb the callback that is called with the computations result represented as an [Either].
      * @see [unsafeRunNonBlockingCancellable] to run in a cancellable manner.
+     * @see [runNonBlocking] to run in a referential transparent manner.
      */
-    @JvmStatic fun <A> unsafeRunNonBlocking(fx: FxOf<A>, cb: (Either<Throwable, A>) -> Unit): Unit =
+    @JvmStatic
+    fun <A> unsafeRunNonBlocking(fx: FxOf<A>, cb: (Either<Throwable, A>) -> Unit): Unit =
       FxRunLoop.start(fx, cb)
 
     /**
-     * [unsafeRunNonBlockingCancellable] allows you to run any [Fx] to it's wrapped value [A] in a cancellable manner.
+     * [runNonBlocking] allows you to run any [Fx] to its wrapped value [A] in a referential transparent manner.
+     *
+     * Reason it can happen in a referential transparent manner is because nothing is actually running when this method is invoked.
+     * The combinator can be used to define how several programs have to run in a safe manner.
+     *
+     * ```
+     * val programOne = Fx { 1 }
+     * val programTwo = Fx { 2 }
+     * val programThree = Fx { 3 }
+     *
+     * Fx.runNonBlocking(programOne, cb)
+     * ```
+     */
+    @JvmStatic
+    fun <A> runNonBlocking(fx: FxOf<A>, cb: (Either<Throwable, A>) -> Fx<Unit>): Fx<Unit> = Fx {
+      FxRunLoop.start(fx, cb.andThen { Fx.unsafeRunBlocking(it) })
+    }
+
+    /**
+     * [unsafeRunNonBlockingCancellable] allows you to run any [Fx] to its wrapped value [A] in a cancellable manner.
      *
      * It receives the values in a callback [cb] and thus **has** the ability to run `NonBlocking` but that depends on the implementation.
      * When the underlying effects/program runs blocking on the callers thread this method will run blocking.
      *
      * @param fx the [Fx] to run
      * @param cb the callback that is called with the computations result represented as an [Either].
-     * @see [unsafeRunNonBlocking] to run in a non-cancellable manner.
      * @return a [Disposable] that can be used to cancel the computation.
+     * @see [unsafeRunNonBlocking] to run in a non-cancellable manner.
+     * @see [runNonBlockingCancellable] to run in a referential transparent manner.
      */
-    @JvmStatic fun <A> unsafeRunNonBlockingCancellable(fx: FxOf<A>, cb: (Either<Throwable, A>) -> Unit): Disposable {
-      val conn = FxConnection()
-      FxRunLoop.startCancelable(fx, CancelContext(conn), cb)
-      return conn.toDisposable()
-    }
+    @JvmStatic
+    fun <A> unsafeRunNonBlockingCancellable(fx: FxOf<A>, onCancel: OnCancel = OnCancel.Silent, cb: (Either<Throwable, A>) -> Unit): Disposable =
+      Fx.unsafeRunBlocking(runNonBlockingCancellable(fx, onCancel, cb.andThen { Fx.unit }))
+
+    @JvmStatic
+    fun <A> runNonBlockingCancellable(fx: FxOf<A>, onCancel: OnCancel = OnCancel.Silent, cb: (Either<Throwable, A>) -> Fx<Unit>): Fx<Disposable> =
+      Fx.async { _ /* The start of this execution is immediate and uncancellable */, cbb ->
+        val conn = FxConnection()
+        val onCancelCb =
+          when (onCancel) {
+            OnCancel.ThrowCancellationException -> cb.andThen { unsafeRunNonBlocking(fx, mapUnit) }
+            OnCancel.Silent -> { either ->
+              either.fold(
+                { if (conn.isNotCanceled() || it != OnCancel.CancellationException) cb(either) },
+                { cb(either) })
+            }
+          }
+
+        cbb(Right(conn.toDisposable()))
+        FxRunLoop.startCancelable(fx, CancelContext(conn), onCancelCb)
+      }
 
   }
 
