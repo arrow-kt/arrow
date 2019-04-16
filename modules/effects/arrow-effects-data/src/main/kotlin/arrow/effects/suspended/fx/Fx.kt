@@ -8,7 +8,7 @@ import arrow.effects.internal.Platform
 import arrow.effects.internal.UnsafePromise
 import arrow.effects.typeclasses.*
 import arrow.typeclasses.Continuation
-import java.util.concurrent.CancellationException
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.*
 
@@ -33,6 +33,7 @@ const val MapTag = 3
 const val FlatMapTag = 4
 const val ConnectionSwitchTag = 5
 const val AsyncTag = 6
+const val ContinueOnTag = 7
 
 object Impossible : RuntimeException("Fx bug, please contact support! https://arrow-kt.io") {
   override fun fillInStackTrace(): Throwable = this
@@ -44,7 +45,7 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
   inline val fa: suspend () -> A
     get() =
       when (tag) {
-        RaiseErrorTag -> {
+        RaiseErrorTag -> suspend {
           throw (this as Fx.RaiseError<*>).error
         }
         PureTag -> suspend { (this as Fx.Pure<A>).value }
@@ -59,6 +60,7 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
           this as Fx.FlatMap<A, *>
           suspend { !fb(!source) } as (suspend () -> A)
         }
+        ContinueOnTag -> suspend { FxRunLoop(this) }
         ConnectionSwitchTag -> suspend { FxRunLoop(this) }
         else -> throw Impossible
       }
@@ -88,6 +90,7 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
       }
       SingleTag -> Fx.Map(this, f)
       ConnectionSwitchTag -> Fx.Map(this, f)
+      ContinueOnTag -> Fx.Map(this, f)
       AsyncTag -> Fx.Map(this, f)
       MapTag -> {
         this as Fx.Map<Any?, Any?>
@@ -115,6 +118,7 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
       MapTag -> FxRunLoop(this)
       FlatMapTag -> FxRunLoop(this)
       ConnectionSwitchTag -> FxRunLoop(this)
+      ContinueOnTag -> FxRunLoop(this)
       AsyncTag -> FxRunLoop(this)
       else -> throw Impossible
     }
@@ -131,6 +135,7 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
       }
       SingleTag -> Fx.FlatMap(this, f, 0)
       ConnectionSwitchTag -> Fx.FlatMap(this, f, 0)
+      ContinueOnTag -> Fx.FlatMap(this, f, 0)
       AsyncTag -> Fx.FlatMap(this, f, 0)
       MapTag -> {
         this as Fx.Map<B, A>
@@ -188,6 +193,14 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
     override fun toString(): String = "Fx.FlatMap(..., index = $index)"
   }
 
+  @PublishedApi
+  internal class ContinueOn<A>(
+    @JvmField var source: FxOf<A>,
+    @JvmField var ctx: CoroutineContext
+  ) : Fx<A>(ContinueOnTag) {
+    override fun toString(): String = "Fx.ContinueOn(..., ctx = $ctx)"
+  }
+
   /**
    * [ConnectionSwitch] is used to temporally switch the `KindConnection` attached to the computation.
    * i.e. Switch to `KindConnection` to `KindConnection.uncancelable` and later switch back to the original connection.
@@ -206,7 +219,7 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
 
     companion object {
       //Internal reusable reference.
-      val makeUncancelable: (FxConnection) -> FxConnection = { NonCancelable.connection }
+      val makeUncancelable: (FxConnection) -> FxConnection = { FxNonCancelable }
       val makeCancelable: (FxConnection) -> FxConnection = {
         when (it) {
           is KindConnection.Uncancelable -> FxConnection()
@@ -271,25 +284,27 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
   fun <B> bracketCase(release: (A, ExitCase<Throwable>) -> FxOf<Unit>, use: (A) -> FxOf<B>): Fx<B> =
     FxBracket(this, release, use)
 
-  fun continueOn(ctx: CoroutineContext): Fx<A> =
-    unit.map { foldContinuation(ctx) { throw it } }
+  fun continueOn(ctx: CoroutineContext): Fx<A> = when (tag) {
+    ContinueOnTag -> (this as Fx.ContinueOn<A>).apply {
+      this.ctx = ctx
+    }
+    else -> ContinueOn(this, ctx)
+  }
 
-  fun <A> fork(ctx: CoroutineContext): Fx<Fiber<ForFx, A>> = Fx {
+  fun <A> fork(ctx: CoroutineContext): Fx<Fiber<ForFx, A>> = Fx.async { oldConn, cb ->
     val promise = UnsafePromise<A>()
     val conn = FxConnection()
-    val oldConn = coroutineContext[CancelContext]?.connection
-    oldConn?.push(conn.cancel())
-    conn.push(oldConn?.cancel() ?: Fx.unit)
+    oldConn.push(conn.cancel())
+    conn.push(oldConn.cancel())
 
-
-    FxRunLoop.startCancelable(unit.continueOn(ctx).flatMap { this }, CancelContext(conn)) { either ->
+    FxRunLoop.startCancelable(this, conn, ctx) { either ->
       either.fold(
         { promise.complete(Either.Left(it)) },
         { promise.complete(Either.Right(it) as Either<Throwable, A>) }
       )
     }
 
-    FxFiber(promise, conn)
+    cb(Right(FxFiber(promise, conn)))
   }
 
   /** Makes the source [IO] uncancelable such that a [Fiber.cancel] signal has no effect. */
@@ -324,7 +339,7 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
 
     @JvmStatic
     operator fun <A> invoke(ctx: CoroutineContext, f: () -> A): Fx<A> =
-      unit.continueOn(ctx).map { _ -> f() }
+      Fx.Map(ContinueOn(unit, ctx)) { f() }
 
     @JvmStatic
     fun <A> just(a: A): Fx<A> = Fx.Pure(a, 0)
@@ -393,7 +408,7 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
           else throw t
         }
 
-        FxRunLoop.startCancelable(fx, CancelContext(conn2)) { result ->
+        FxRunLoop.startCancelable(fx, conn2) { result ->
           // DEV: If fa cancels conn2 like so `conn.cancel().map { cb(Right(Unit)) }`
           // It doesn't run the stack of conn2, instead the result is seen in the cb of startCancelable.
           val resultCancelled = result.fold({ e -> e == OnCancel.CancellationException }, { false })
@@ -421,14 +436,15 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
       is Pure -> fa.value
       is RaiseError -> throw fa.error
       else -> {
-        var loop = true
+        val loop = AtomicBoolean(true)
         var result: Either<Throwable, A>? = null
         FxRunLoop.start(fx) { r: Either<Throwable, A> ->
           result = r
-          loop = false
+          loop.compareAndSet(true, false)
         }
-        while (loop) {
+        while (loop.get()) {
         }
+
         result!!.fold({ throw it }, ::identity)
       }
     }
@@ -448,7 +464,7 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
      */
     @JvmStatic
     fun <A> unsafeRunNonBlocking(fx: FxOf<A>, cb: (Either<Throwable, A>) -> Unit): Unit =
-      FxRunLoop.start(fx, cb)
+      FxRunLoop.start(fx, cb = cb)
 
     /**
      * [runNonBlocking] allows you to run any [Fx] to its wrapped value [A] in a referential transparent manner.
@@ -466,7 +482,7 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
      */
     @JvmStatic
     fun <A> runNonBlocking(fx: FxOf<A>, cb: (Either<Throwable, A>) -> Fx<Unit>): Fx<Unit> = Fx {
-      FxRunLoop.start(fx, cb.andThen { Fx.unsafeRunBlocking(it) })
+      FxRunLoop.start(fx, cb = cb.andThen { Fx.unsafeRunBlocking(it) })
     }
 
     /**
@@ -489,18 +505,19 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
     fun <A> runNonBlockingCancellable(fx: FxOf<A>, onCancel: OnCancel = OnCancel.Silent, cb: (Either<Throwable, A>) -> Fx<Unit>): Fx<Disposable> =
       Fx.async { _ /* The start of this execution is immediate and uncancellable */, cbb ->
         val conn = FxConnection()
+        conn.push(Fx { println("I got cancelled!") })
         val onCancelCb =
           when (onCancel) {
-            OnCancel.ThrowCancellationException -> cb.andThen { unsafeRunNonBlocking(fx, mapUnit) }
+            OnCancel.ThrowCancellationException -> cb.andThen { unsafeRunNonBlocking(it, mapUnit) }
             OnCancel.Silent -> { either ->
               either.fold(
-                { if (conn.isNotCanceled() || it != OnCancel.CancellationException) cb(either) },
-                { cb(either) })
+                { if (conn.isNotCanceled() || it != OnCancel.CancellationException) unsafeRunNonBlocking(cb(either), mapUnit) },
+                { unsafeRunNonBlocking(cb(either), mapUnit) })
             }
           }
 
         cbb(Right(conn.toDisposable()))
-        FxRunLoop.startCancelable(fx, CancelContext(conn), onCancelCb)
+        FxRunLoop.startCancelable(fx, conn, cb = onCancelCb)
       }
 
   }

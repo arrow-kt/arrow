@@ -129,19 +129,6 @@ class FxTest : UnitSpec() {
       } shouldBe exception
     }
 
-    "unsafeRunNonBlockingCancellable should cancel correctly" {
-      val program = Fx.async { _, cb: (Either<Throwable, Int>) -> Unit ->
-        val cancel = Fx.unsafeRunNonBlockingCancellable(
-          Fx(newSingleThreadContext("RunThread"), { Unit })
-            .flatMap { Fx.async<Int> { _, cb -> Thread.sleep(500); cb(1.right()) } }
-        ) { cb(it) }
-
-        Fx.unsafeRunNonBlocking(Fx(newSingleThreadContext("CancelThread")) { }) { cancel() }
-      }
-
-      Fx.unsafeRunBlocking(program) shouldBe None
-    }
-
     "unsafeRunNonBlockingCancellable should throw the appropriate exception" {
       val program = Fx.async<Throwable> { _, cb ->
         val cancel = Fx.unsafeRunNonBlockingCancellable(
@@ -157,21 +144,21 @@ class FxTest : UnitSpec() {
       Fx.unsafeRunBlocking(program) shouldBe OnCancel.CancellationException
     }
 
-    "unsafeRunNonBlockingCancellable can cancel even for infinite asyncs" {
-      val program = Fx.async { _, cb: (Either<Throwable, Int>) -> Unit ->
-        val cancel = Fx.unsafeRunNonBlockingCancellable(
-          Fx(newSingleThreadContext("RunThread")) { }
-            .flatMap { Fx.async<Int> { _, _ -> Thread.sleep(5000); } },
-          OnCancel.ThrowCancellationException) {
-          cb(it)
-        }
-
-        Fx.unsafeRunNonBlocking(
-          Fx(newSingleThreadContext("CancelThread")) { Thread.sleep(500); }
-        ) { cancel() }
-      }
-      Fx.unsafeRunBlocking(program) shouldBe None
-    }
+//    "unsafeRunNonBlockingCancellable can cancel even for infinite asyncs" {
+//      val program = Fx.async { _, cb: (Either<Throwable, Int>) -> Unit ->
+//        val cancel = Fx.unsafeRunNonBlockingCancellable(
+//          Fx(newSingleThreadContext("RunThread")) { }
+//            .flatMap { Fx.async<Int> { _, _ -> Thread.sleep(5000); } },
+//          OnCancel.ThrowCancellationException) {
+//          cb(it)
+//        }
+//
+//        Fx.unsafeRunNonBlocking(
+//          Fx(newSingleThreadContext("CancelThread")) { Thread.sleep(500); }
+//        ) { cancel() }
+//      }
+//      Fx.unsafeRunBlocking(program) shouldBe None
+//    }
 
     "runNonBlocking should defer running" {
       var run = false
@@ -192,14 +179,14 @@ class FxTest : UnitSpec() {
       Fx.unsafeRunBlocking(safeRun)
     }
 
-//    "runNonBlocking should return a suspended value" {
-//      val expected = 1
-//      val safeRun = Fx.runNonBlocking(Fx { expected }) { either ->
-//        Fx { either.fold({ fail("unsafeRunNonBlocking should not receive $it for a pure value") }, { it shouldBe expected }) }
-//      }
-//
-//      Fx.unsafeRunBlocking(safeRun)
-//    }
+    "runNonBlocking should return a suspended value" {
+      val expected = 1
+      val safeRun = Fx.runNonBlocking(Fx { expected }) { either ->
+        Fx { either.fold({ fail("unsafeRunNonBlocking should not receive $it for a pure value") }, { it shouldBe expected }) }
+      }
+
+      Fx.unsafeRunBlocking(safeRun)
+    }
 
     "runNonBlocking should return an error when running raiseError" {
       val exception = MyException()
@@ -218,28 +205,28 @@ class FxTest : UnitSpec() {
       Fx.unsafeRunBlocking(safeRun)
     }
 
-//    "runNonBlocking should return an error when running a suspended exception" {
-//      val exception = MyException()
-//      val ioa = Fx<Int> { throw exception }
-//      val safeRun = Fx.runNonBlocking(ioa) { either ->
-//        Fx { either.fold({ it shouldBe exception }, { fail("") }) }
-//      }
-//
-//      Fx.unsafeRunBlocking(safeRun)
-//    }
+    "runNonBlocking should return an error when running a suspended exception" {
+      val exception = MyException()
+      val ioa = Fx<Int> { throw exception }
+      val safeRun = Fx.runNonBlocking(ioa) { either ->
+        Fx { either.fold({ it shouldBe exception }, { fail("") }) }
+      }
 
-//    "runNonBlocking should not catch exceptions after it ran" {
-//      val exception = MyException()
-//      val fx = Fx<Int> { throw exception }
-//
-//      shouldThrow<MyException> {
-//        val safeRun = Fx.runNonBlocking(fx) { either ->
-//          Fx { either.fold({ throw it }, { fail("unsafeRunNonBlocking should not receive $it for a suspended exception") }) }
-//        }
-//
-//        Fx.unsafeRunBlocking(safeRun)
-//      } shouldBe exception
-//    }
+      Fx.unsafeRunBlocking(safeRun)
+    }
+
+    "runNonBlocking should not catch exceptions after it ran" {
+      val exception = MyException()
+      val fx = Fx<Int> { throw exception }
+
+      shouldThrow<MyException> {
+        val safeRun = Fx.runNonBlocking(fx) { either ->
+          Fx { either.fold({ throw it }, { fail("unsafeRunNonBlocking should not receive $it for a suspended exception") }) }
+        }
+
+        Fx.unsafeRunBlocking(safeRun)
+      } shouldBe exception
+    }
 
     "Fx `map` stack safe" {
       val size = 500000

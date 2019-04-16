@@ -30,7 +30,7 @@ class FxForwardCancelable {
       is State.Active -> {
         state.lazySet(finished) // GC purposes
         // TODO this runs in an immediate execution context in cats-effect
-        FxRunLoop.startCancelable(current.token, token = CancelContext(conn), cb = cb)
+        FxRunLoop.startCancelable(current.token, token = conn, cb = cb)
       }
     }
   }

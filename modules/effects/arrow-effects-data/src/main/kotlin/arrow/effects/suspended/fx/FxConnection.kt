@@ -6,31 +6,13 @@ import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.mapUnit
-import kotlin.coroutines.AbstractCoroutineContextElement
-import kotlin.coroutines.CoroutineContext
 
-//TODO consider if we really need to compared to just a connection in the runloop. Does this have any extra benefits?
-@Suppress("EqualsWithHashCodeExist")
-class CancelContext(var connection: FxConnection) : AbstractCoroutineContextElement(CancelContext) {
-  companion object Key : CoroutineContext.Key<CancelContext>
-
-  override fun equals(other: Any?): Boolean = when (other) {
-    is CancelContext -> connection == other.connection
-    else -> false
-  }
-
-  override fun toString(): String = "CancelContext(connection=$connection)"
-}
-
-fun FxConnection.toDisposable(): Disposable = { FxRunLoop.start(cancel(), mapUnit) }
+fun FxConnection.toDisposable(): Disposable = { FxRunLoop.start(cancel(), cb = mapUnit) }
 typealias FxConnection = KindConnection<ForFx>
 
 @Suppress("UNUSED_PARAMETER", "FunctionName")
 fun FxConnection(dummy: Unit = Unit): FxConnection = KindConnection(MD) { FxRunLoop.start(it, cb = mapUnit) }
-
-@Suppress("ObjectPropertyName")
-private val _uncancelable = KindConnection.uncancelable(MD)
-val NonCancelable: CancelContext = CancelContext(_uncancelable)
+val FxNonCancelable = KindConnection.uncancelable(MD)
 
 private object MD : MonadDefer<ForFx> {
   override fun <A> defer(fa: () -> FxOf<A>): Fx<A> = Fx.defer(fa)

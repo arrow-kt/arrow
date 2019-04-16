@@ -71,7 +71,7 @@ internal object FxBracket {
           // Registering our cancelable token ensures that in case cancellation is detected, release gets called
           forwardCancel.complete(frame.cancel)
           // Actual execution
-          FxRunLoop.startCancelable(Fx.FlatMap(fb, frame, 0), CancelContext(conn), cb = cb)
+          FxRunLoop.startCancelable(Fx.FlatMap(fb, frame, 0), conn, cb = cb)
         }
         is Either.Left -> cb(ea)
       }
@@ -129,6 +129,6 @@ fun <A> FxOf<A>.guaranteeCase(release: (ExitCase<Throwable>) -> FxOf<Unit>): Fx<
 
   // Race condition check, avoiding starting `source` in case the connection was already cancelled — n.b. we don't need
   // to trigger `release` otherwise, because it already happened
-  if (conn.isNotCanceled()) FxRunLoop.startCancelable(onNext, CancelContext(conn), cb = cb)
+  if (conn.isNotCanceled()) FxRunLoop.startCancelable(onNext, conn, cb = cb)
   else Unit
 }
