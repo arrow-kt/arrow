@@ -7,13 +7,19 @@ import arrow.effects.*
 import arrow.effects.IORunLoop.startCancelable
 import arrow.effects.internal.Platform
 import arrow.effects.suspended.fx.FxRunLoop.startCancelable
+import arrow.effects.typeclasses.suspendMapUnit
 import kotlin.coroutines.*
 import kotlin.coroutines.Continuation
 
+/**
+ * This is the internal API for all methods that run the effect,
+ * this includes all unsafe/safe run methods, [Fx.not], fibers and races.
+ */
 @Suppress("UNCHECKED_CAST")
 @PublishedApi
 internal object FxRunLoop {
 
+  /** Internal API for [Fx.not] */
   suspend operator fun <A> invoke(source: FxOf<A>): A = suspendCoroutine { cont ->
     FxRunLoop.start(source) {
       it.fold(cont::resumeWithException, cont::resume)
@@ -29,9 +35,27 @@ internal object FxRunLoop {
                           cb: (Either<Throwable, A>) -> Unit): Unit =
     loop(fa, token, ctx, cb as (Either<Throwable, Any?>) -> Unit, null, null, null)
 
+  /**
+   * This is the **only** main entry point to running an [Fx] value.
+   *
+   * @param currToken [FxConnection] is an important detail because misuse can result in hard to debug code.
+   * When started by [start] or [startCancelable] it's decided whether the loop will be cancelable or not.
+   * Once a job is started uncancelable it can never become cancelable again,
+   * only a cancelable job can become uncancelable temporary or permanently behind a certain point.
+   * This is done using [Fx.ConnectionSwitch].
+   *
+   * @param ctxRef [CoroutineContext] that is visible throughout the suspended program `Fx { coroutineContext }`.
+   * This is very important to keep compatibility with kotlins vision of [CoroutineContext] and [suspend].
+   * [this](https://github.com/Kotlin/kotlin-coroutines-examples/blob/master/examples/context/auth-example.kt) has to work across any async boundary.
+   *
+   * @param cb the callback that will be called with the result as [Either].
+   * @param rcbRef [AsyncBoundary] helper class instance that is shared across async boundaries
+   * @param bFirstRef first [Fx.FlatMap] on the stack to restore to the state
+   * @param bRestRef remaining [Fx.FlatMap] stack to restore to the state
+   */
   @Suppress("CollapsibleIfStatements", "ReturnCount")
-  fun loop(fa: FxOf<Any?>,
-           currToken: KindConnection<ForFx>,
+  private fun loop(fa: FxOf<Any?>,
+           currToken: FxConnection,
            ctxRef: CoroutineContext,
            cb: (Either<Throwable, Any?>) -> Unit,
            rcbRef: AsyncBoundary?,
@@ -74,7 +98,7 @@ internal object FxRunLoop {
             asyncBoundary = AsyncBoundary(conn, cb)
           }
 
-          asyncBoundary.continueOn(source as Fx.ContinueOn<Any?>, ctx, bFirst, bRest)
+          asyncBoundary.start(source as Fx.ContinueOn<Any?>, ctx, bFirst, bRest)
           return
         }
         PureTag -> {
@@ -85,10 +109,8 @@ internal object FxRunLoop {
           if (asyncBoundary == null) {
             asyncBoundary = AsyncBoundary(conn, cb)
           }
-          asyncBoundary.prepare(ctx, bFirst, bRest)
-
           //Run the suspend function in the async boundary and return
-          (source as Fx.Single<Any?>).source.startCoroutine(asyncBoundary)
+          asyncBoundary.start(source as Fx.Single<Any?>, ctx, bFirst, bRest)
           return
         }
         MapTag -> {
@@ -114,11 +136,8 @@ internal object FxRunLoop {
           if (asyncBoundary == null) {
             asyncBoundary = AsyncBoundary(conn, cb)
           }
-
-          asyncBoundary.prepare(ctx, bFirst, bRest)
           // Return case for Async operations
-          source as Fx.Async<Any?>
-          source.proc(conn, asyncBoundary)
+          asyncBoundary.start(source as Fx.Async<Any?>, ctx, bFirst, bRest)
           return
         }
         ConnectionSwitchTag -> {
@@ -192,14 +211,11 @@ internal object FxRunLoop {
     }
 
   /**
-   * Pops the next bind function from the stack,
-   * but filters out `IOFrame.ErrorHandler` references, because we know they won't do anything — an optimization for [handleErrorWith].
+   * Pops the next bind function from the stack, but filters out [FxFrame.ErrorHandler] references,
+   * because we know they won't do anything since no error occurred — an optimization for skipping [handleErrorWith].
    */
   @PublishedApi
-  internal fun popNextBind(
-    bFirst: ((Any?) -> Fx<Any?>)?,
-    bRest: Platform.ArrayStack<(Any?) -> Fx<Any?>>?
-  ): ((Any?) -> Fx<Any?>)? =
+  internal fun popNextBind(bFirst: ((Any?) -> Fx<Any?>)?, bRest: Platform.ArrayStack<(Any?) -> Fx<Any?>>?): ((Any?) -> Fx<Any?>)? =
     when {
       bFirst != null && bFirst !is FxFrame.Companion.ErrorHandler -> bFirst
       bRest != null -> {
@@ -213,6 +229,7 @@ internal object FxRunLoop {
       else -> null
     }
 
+  /** Specialisation of [FxFrame] to restore the old context regardless of success or failure. */
   //TODO write law in ConcurrentLaws to check if is cancelable after bracket.
   @PublishedApi
   internal class RestoreContext(
@@ -221,11 +238,11 @@ internal object FxRunLoop {
 
     override fun invoke(a: Any?): Fx<Any?> = Fx.ConnectionSwitch(Fx.Pure(a, 0), { current ->
       restore(a, null, old, current)
-    }, null)
+    })
 
     override fun recover(e: Throwable): Fx<Any?> = Fx.ConnectionSwitch(Fx.RaiseError(e), { current ->
       restore(null, e, old, current)
-    }, null)
+    })
   }
 
   /**
@@ -233,22 +250,30 @@ internal object FxRunLoop {
    * The job of the [AsyncBoundary] is to provide a means of jumping in -and out of the run loop when awaiting an async result.
    *
    * To be able to do this it needs to have following capabilities:
-   *   - It needs to save the state of the run loop and restore it when jumping back. See [bFirst], [bRest].
+   *   - It needs to save the state of the run loop and restore it when jumping back.
+   *   State consist of the first [Fx.FlatMap.fb] [bFirst] and the following [Fx.FlatMap.fb] as an [Platform.ArrayStack] [bRest].
    *
    *   - It needs to act as a callback itself, so it can be called from outside.
-   *     So it implements `(Either<Throwable, Any?>) -> Unit` which can model any callback.
+   *   So it implements `(Either<Throwable, Any?>) -> Unit` which can model any callback.
    *
    *   - Bridge between `Kotlin`'s suspended world and the normal world.
-   *     So we implement `Continuation<Any?>`, which has shape `(Result<Any?>) -> Unit` so we handle it like any other generic callback.
+   *   So we implement `Continuation<Any?>`, which has shape `(Result<Any?>) -> Unit` so we handle it like any other generic callback.
    *
    *   - Trampoline between consecutive async boundaries.
-   *     It fills the stack by calling `loop` to jump back to the run loop and needs to be trampolined every [Platform.maxStackDepthSize] frames.
+   *   It fills the stack by calling `loop` to jump back to the run loop and needs to be trampolined every [Platform.maxStackDepthSize] frames.
    *
-   * This instance is shared across a single  [startCancelable] or [start] invocation to avoid an allocation / async boundary.
+   *   - Modify the running [CoroutineContext]
+   *   This is necessary because we need to maintain the state within [kotlin.coroutines.coroutineContext].
+   *
+   * This instance is shared across a single [startCancelable] or [start] invocation to avoid an allocation / async boundary.
+   *
+   * The required capabilities are achieved by the help of 3 [Fx] cases, [Fx.Async], [Fx.ContinueOn], [Fx.Single].
+   * They all have their respective [start] method.
    *
    * **IMPORTANT** this mechanism is essential to [Fx] and its [FxRunLoop] because this allows us to go from `suspend () -> A` to `A`.
    * Using that power we can write the `loop` in such a way that it is not suspended and as a result we have full control over the `Continuation`
    * This means it cannot sneak up on us and throw us out of the loop and thus adds support for pattern promoted by kotlinx. i.e.
+   *
    * ```
    * Fx {
    *   suspendCoroutine<A> { cont ->
@@ -279,33 +304,51 @@ internal object FxRunLoop {
       this.conn = conn
     }
 
-    fun prepare(ctx: CoroutineContext, bFirst: ((Any?) -> Fx<Any?>)?, bRest: (Platform.ArrayStack<(Any?) -> Fx<Any?>>)?): Unit {
+    fun start(fx: Fx.Async<Any?>, ctx: CoroutineContext, bFirst: ((Any?) -> Fx<Any?>)?, bRest: (Platform.ArrayStack<(Any?) -> Fx<Any?>>)?): Unit {
       contIndex++
       _context = ctx
       canCall = true
       this.bFirst = bFirst
       this.bRest = bRest
+
+      // Run the users FFI function provided with the connection for cancellation support and [AsyncBoundary] as a generic callback.
+      fx.proc(conn, this)
     }
 
-    fun continueOn(fx: Fx.ContinueOn<Any?>, ctx: CoroutineContext, bFirst: ((Any?) -> Fx<Any?>)?, bRest: (Platform.ArrayStack<(Any?) -> Fx<Any?>>)?): Unit {
-      contIndex = 0
-      _context = ctx + fx.ctx
+    fun start(fx: Fx.Single<Any?>, ctx: CoroutineContext, bFirst: ((Any?) -> Fx<Any?>)?, bRest: (Platform.ArrayStack<(Any?) -> Fx<Any?>>)?): Unit {
+      contIndex++
       canCall = true
-      jumpingContext = true
+      this.bFirst = bFirst
+      this.bRest = bRest
+      _context = ctx
+
+      //Run `suspend () -> A` with `AsyncBoundary` as `Continuation`
+      fx.source.startCoroutine(this)
+    }
+
+    fun start(fx: Fx.ContinueOn<Any?>, ctx: CoroutineContext, bFirst: ((Any?) -> Fx<Any?>)?, bRest: (Platform.ArrayStack<(Any?) -> Fx<Any?>>)?): Unit {
+      contIndex = 0
+      canCall = true
       this.bFirst = bFirst
       this.bRest = bRest
       result = fx.source as Fx<Any?>
-      //We have to trigger `resumeWith` on a certain context to make the switch
-      //Similarly on how you can switch context by intercepting a continuation and calling `resume` on a certain thread to trampoline.
-      suspend { Unit }.startCoroutine(this)
+      jumpingContext = true
+
+      // Store the modified `CoroutineContext` and run it.
+      // This will result in the correct state in a following suspend function. See `FxTest`.
+      _context = ctx + fx.ctx
+      suspendMapUnit.startCoroutine(this)
     }
 
+    //NASTY TRICK!!!! Overwrite getter to var mutable backing field.
+    // This allows us to reuse this instance across multiple context switches which allows us to stay more lightweight.
     private var _context: CoroutineContext = EmptyCoroutineContext
     override val context: CoroutineContext
       get() = _context
 
     override fun resumeWith(a: Result<Any?>): Unit {
-      if (jumpingContext) {
+      if (jumpingContext) { //If we're doing a context switch we already provided the result.
+        jumpingContext = false
         if (result == null) throw Impossible
       } else {
         result = a.fold(

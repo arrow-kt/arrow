@@ -178,7 +178,7 @@ internal fun <A> FxFiber(promise: UnsafePromise<A>, conn: FxConnection): Fiber<F
 fun <A, B> Fx.Companion.racePair(ctx: CoroutineContext, fa: FxOf<A>, fb: FxOf<B>): Fx<Either<Tuple2<A, Fiber<ForFx, B>>, Tuple2<Fiber<ForFx, A>, B>>> =
   Fx.async { conn, cb ->
     val active = AtomicBoolean(true)
-    val upstreamCancelToken = Fx.defer { if (conn.isCanceled()) Fx { Unit } else conn.cancel() }
+    val upstreamCancelToken = Fx.defer { if (conn.isCanceled()) Fx(suspendMapUnit) else conn.cancel() }
 
     val connA = FxConnection()
     connA.push(upstreamCancelToken)
@@ -241,7 +241,7 @@ fun <A, B, C> Fx.Companion.raceTriple(ctx: CoroutineContext, fa: FxOf<A>, fb: Fx
   Fx.async { conn, cb ->
     val active = AtomicBoolean(true)
 
-    val upstreamCancelToken = Fx.defer { if (conn.isCanceled()) Fx { Unit } else conn.cancel() }
+    val upstreamCancelToken = Fx.defer { if (conn.isCanceled()) Fx(suspendMapUnit) else conn.cancel() }
 
     val connA = FxConnection()
     connA.push(upstreamCancelToken)

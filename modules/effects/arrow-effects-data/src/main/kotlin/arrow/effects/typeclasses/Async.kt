@@ -224,7 +224,7 @@ interface Async<F> : MonadDefer<F> {
    * ```
    */
   fun CoroutineContext.shift(): Kind<F, Unit> =
-    delay(this) { Unit }
+    delay(this, mapUnit0)
 
   /**
    * Task that never finishes evaluating.
@@ -246,6 +246,8 @@ interface Async<F> : MonadDefer<F> {
 
 }
 
+val suspendMapUnit: suspend () -> Unit = { Unit }
+val mapUnit0: () -> Unit = { Unit }
 val mapUnit: (Any?) -> Unit = { Unit }
 internal val rightUnit = Right(Unit)
 internal val unitCallback = { cb: (Either<Throwable, Unit>) -> Unit -> cb(rightUnit) }

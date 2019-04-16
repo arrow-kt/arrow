@@ -106,9 +106,8 @@ internal object FxBracket {
     )
 
     override operator fun invoke(a: B): Fx<B> = Fx.Map(
-      Fx.ConnectionSwitch(applyRelease(ExitCase.Completed), Fx.ConnectionSwitch.makeUncancelable, Fx.ConnectionSwitch.disableUncancelableAndPop),
-      { a }
-    )
+      Fx.ConnectionSwitch(applyRelease(ExitCase.Completed), Fx.ConnectionSwitch.makeUncancelable, Fx.ConnectionSwitch.disableUncancelableAndPop)
+    ) { a }
   }
 
   internal class BracketReleaseFrame<A, B>(val a: A, val releaseFn: (A, ExitCase<Throwable>) -> FxOf<Unit>) : FxBracket.BaseReleaseFrame<A, B>() {
