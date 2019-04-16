@@ -38,8 +38,9 @@ internal object FxRunLoop {
            bFirstRef: ((Any?) -> Fx<Any?>)?,
            bRestRef: Platform.ArrayStack<(Any?) -> Fx<Any?>>?): Unit {
 
+    //Once a loop is started it context doesn't change. You can only modify the context through `startCoroutine`.
+    val ctx: CoroutineContext = ctxRef
     var conn: KindConnection<ForFx> = currToken
-    var ctx: CoroutineContext = ctxRef
     var source: Fx<Any?>? = fa as Fx<Any?>
     var asyncBoundary: AsyncBoundary? = rcbRef
     var bFirst: ((Any?) -> Fx<Any?>)? = bFirstRef

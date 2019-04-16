@@ -1,8 +1,6 @@
 package arrow.effects.suspended.fx
 
 import arrow.effects.internal.Platform
-import java.util.concurrent.Executor
-import kotlin.concurrent.getOrSet
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.startCoroutine

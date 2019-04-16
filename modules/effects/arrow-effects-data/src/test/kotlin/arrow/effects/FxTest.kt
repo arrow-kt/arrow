@@ -2,23 +2,18 @@ package arrow.effects
 
 import arrow.core.*
 import arrow.effects.extensions.fx.async.async
-import arrow.effects.extensions.fx.bracket.bracket
 import arrow.effects.extensions.fx.fx.fx
 import arrow.effects.extensions.fx.monad.flatMap
 import arrow.effects.extensions.fx.unsafeRun.runBlocking
 import arrow.effects.extensions.io.async.async
-import arrow.effects.extensions.io.concurrent.concurrent
 import arrow.effects.extensions.io.monad.flatMap
 import arrow.effects.suspended.fx.*
 import arrow.effects.typeclasses.ExitCase
-import arrow.effects.typeclasses.seconds
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.laws.AsyncLaws
-import arrow.test.laws.BracketLaws
 import arrow.typeclasses.Eq
 import arrow.unsafe
-import io.kotlintest.TestContext
 import io.kotlintest.fail
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -28,8 +23,6 @@ import io.kotlintest.shouldThrow
 import kotlinx.coroutines.newSingleThreadContext
 import org.junit.runner.RunWith
 import java.lang.RuntimeException
-import java.util.concurrent.CountDownLatch
-import kotlin.properties.Delegates
 
 @RunWith(KotlinTestRunner::class)
 class FxTest : UnitSpec() {

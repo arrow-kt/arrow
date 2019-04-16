@@ -6,7 +6,6 @@ import arrow.data.k
 import arrow.effects.data.internal.BindingCancellationException
 import arrow.effects.typeclasses.MonadDefer
 import arrow.data.extensions.list.foldable.foldLeft
-import arrow.effects.suspended.fx.Fx
 import arrow.test.concurrency.SideEffect
 import arrow.test.generators.intSmall
 import arrow.test.generators.throwable
