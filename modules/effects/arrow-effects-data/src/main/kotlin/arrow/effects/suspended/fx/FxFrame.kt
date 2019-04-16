@@ -28,15 +28,13 @@ internal interface FxFrame<in A, out B> : (A) -> B {
 
   companion object {
 
-    fun <A> errorHandler(fe: (Throwable) -> FxOf<A>): FxFrame<A, Fx<A>> = ErrorHandler(fe)
-
     internal class ErrorHandler<A>(val fe: (Throwable) -> FxOf<A>) : FxFrame<A, Fx<A>> {
       override fun invoke(a: A): Fx<A> = Fx.Pure(a, 0)
       override fun recover(e: Throwable): Fx<A> = fe(e).fix()
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun <A> any(): (A) -> Fx<Either<Throwable, A>> = AttemptFx as (A) -> Fx<Either<Throwable, A>>
+    fun <A> attempt(): (A) -> Fx<Either<Throwable, A>> = AttemptFx as (A) -> Fx<Either<Throwable, A>>
 
     private object AttemptFx : FxFrame<Any?, Fx<Either<Throwable, Any?>>> {
       override fun invoke(a: Any?): Fx<Either<Throwable, Any?>> = Fx.Pure(Either.Right(a), 0)

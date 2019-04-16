@@ -238,7 +238,7 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
     ff.fix().flatMap { map(it) }
 
   fun handleErrorWith(f: (Throwable) -> FxOf<A>): Fx<A> =
-    Fx.FlatMap(this, FxFrame.errorHandler(f), 0)
+    Fx.FlatMap(this, FxFrame.Companion.ErrorHandler(f), 0)
 
   fun handleError(f: (Throwable) -> A): Fx<A> = when (this) {
     is RaiseError -> Fx { f(error) }
@@ -266,7 +266,7 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
   }
 
   fun attempt(): Fx<Either<Throwable, A>> =
-    Fx.FlatMap(this, FxFrame.any(), 0)
+    Fx.FlatMap(this, FxFrame.attempt(), 0)
 
   fun <B> bracketCase(release: (A, ExitCase<Throwable>) -> FxOf<Unit>, use: (A) -> FxOf<B>): Fx<B> =
     FxBracket(this, release, use)

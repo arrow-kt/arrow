@@ -55,6 +55,8 @@ interface Fx2Applicative : Applicative<ForFx>, Fx2Functor {
   override fun <A> just(a: A): Fx<A> =
     Fx.just(a)
 
+  override fun unit(): Fx<Unit> = Fx.unit
+
   override fun <A, B> FxOf<A>.ap(ff: FxOf<(A) -> B>): Fx<B> =
     fix().ap(ff)
 

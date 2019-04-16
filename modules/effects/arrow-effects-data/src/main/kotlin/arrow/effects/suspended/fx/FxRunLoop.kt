@@ -7,6 +7,7 @@ import arrow.effects.*
 import arrow.effects.IORunLoop.startCancelable
 import arrow.effects.internal.Platform
 import arrow.effects.suspended.fx.FxRunLoop.startCancelable
+import java.util.concurrent.Executor
 import kotlin.coroutines.*
 import kotlin.coroutines.Continuation
 
@@ -21,24 +22,24 @@ internal object FxRunLoop {
   }
 
   fun <A> start(source: FxOf<A>, cb: (Either<Throwable, A>) -> Unit): Unit =
-    FxRunLoop.loop(source, NonCancelable, cb as (Either<Throwable, Any?>) -> Unit, null, null, null)
+    loop(source, NonCancelable, cb as (Either<Throwable, Any?>) -> Unit, null, null, null)
 
   fun <A> startCancelable(fa: FxOf<A>,
                           token: CancelContext,
                           cb: (Either<Throwable, A>) -> Unit): Unit =
-    FxRunLoop.loop(fa, token, cb as (Either<Throwable, Any?>) -> Unit, null, null, null)
+    loop(fa, token, cb as (Either<Throwable, Any?>) -> Unit, null, null, null)
 
   @Suppress("CollapsibleIfStatements", "ReturnCount")
   fun loop(fa: FxOf<Any?>,
-                    currToken: CancelContext,
-                    cb: (Either<Throwable, Any?>) -> Unit,
-                    rcbRef: RestartCallback?,
-                    bFirstRef: ((Any?) -> Fx<Any?>)?,
-                    bRestRef: Platform.ArrayStack<(Any?) -> Fx<Any?>>?): Unit {
+           currToken: CancelContext,
+           cb: (Either<Throwable, Any?>) -> Unit,
+           rcbRef: AsyncBoundary?,
+           bFirstRef: ((Any?) -> Fx<Any?>)?,
+           bRestRef: Platform.ArrayStack<(Any?) -> Fx<Any?>>?): Unit {
 
     val token: CancelContext = currToken
     var source: Fx<Any?>? = fa as Fx<Any?>
-    var restartCallback: RestartCallback? = rcbRef
+    var asyncBoundary: AsyncBoundary? = rcbRef
     var bFirst: ((Any?) -> Fx<Any?>)? = bFirstRef
     var bRest: Platform.ArrayStack<(Any?) -> Fx<Any?>>? = bRestRef
     var hasResult = false
@@ -71,13 +72,13 @@ internal object FxRunLoop {
           hasResult = true
         }
         SingleTag -> {
-          if (restartCallback == null) {
-            restartCallback = RestartCallback(token.connection, cb)
+          if (asyncBoundary == null) {
+            asyncBoundary = AsyncBoundary(token.connection, cb)
           }
-          restartCallback.prepare(bFirst, bRest)
+          asyncBoundary.prepare(bFirst, bRest)
 
           //Run the suspend function in the async boundary and return
-          (source as Fx.Single<Any?>).source.startCoroutine(restartCallback)
+          (source as Fx.Single<Any?>).source.startCoroutine(asyncBoundary)
           return
         }
         MapTag -> {
@@ -100,14 +101,14 @@ internal object FxRunLoop {
           source = source.source.fix()
         }
         AsyncTag -> {
-          if (restartCallback == null) {
-            restartCallback = RestartCallback(token.connection, cb)
+          if (asyncBoundary == null) {
+            asyncBoundary = AsyncBoundary(token.connection, cb)
           }
 
-          restartCallback.prepare(bFirst, bRest)
+          asyncBoundary.prepare(bFirst, bRest)
           // Return case for Async operations
           source as Fx.Async<Any?>
-          source.proc(token.connection, restartCallback)
+          source.proc(token.connection, asyncBoundary)
           return
         }
         ConnectionSwitchTag -> {
@@ -121,7 +122,7 @@ internal object FxRunLoop {
           source = next as? Fx<Any?>
 
           if (token.connection != old) {
-            restartCallback?.contextSwitch(token.connection)
+            asyncBoundary?.contextSwitch(token.connection)
             if (restore != null) {
               source = Fx.FlatMap(next, FxRunLoop.RestoreContext(old, restore), 0)
             }
@@ -218,23 +219,52 @@ internal object FxRunLoop {
   }
 
   /**
-   * A `RestartCallback` gets created only once, per [startCancelable] (`unsafeRunAsync`) invocation, once an `Async`
-   * state is hit, its job being to resume the loop after the boundary, but with the bind call-stack restored.
+   * An [AsyncBoundary] gets created only once, per [startCancelable] or [start] invocation.
+   * The job of the [AsyncBoundary] is to provide a means of jumping in -and out of the run loop when awaiting an async result.
+   *
+   * To be able to do this it needs to have following capabilities:
+   *   - It needs to save the state of the run loop and restore it when jumping back. See [bFirst], [bRest].
+   *
+   *   - It needs to act as a callback itself, so it can be called from outside.
+   *     So it implements `(Either<Throwable, Any?>) -> Unit` which can model any callback.
+   *
+   *   - Bridge between `Kotlin`'s suspended world and the normal world.
+   *     So we implement `Continuation<Any?>`, which has shape `(Result<Any?>) -> Unit` so we handle it like any other generic callback.
+   *
+   *   - Trampoline between consecutive async boundaries.
+   *     It fills the stack by calling `loop` to jump back to the run loop and needs to be trampolined every [Platform.maxStackDepthSize] frames.
+   *
+   * This instance is shared across a single  [startCancelable] or [start] invocation to avoid an allocation / async boundary.
+   *
+   * **IMPORTANT** this mechanism is essential to [Fx] and its [FxRunLoop] because this allows us to go from `suspend () -> A` to `A`.
+   * Using that power we can write the `loop` in such a way that it is not suspended and as a result we have full control over the `Continuation`
+   * This means it cannot sneak up on us and throw us out of the loop and thus adds support for pattern promoted by kotlinx. i.e.
+   * ```
+   * Fx {
+   *   suspendCoroutine<A> { cont ->
+   *     cont.resumeWithException(RuntimeException("When I occur in a suspended runloop I exit/throw immediately"))
+   *   }
+   * }
+   * ```
    */
   //TODO double check that `EmptyCoroutineContext + CancelContext(conn)` is actually what we want here.
   @PublishedApi
-  internal class RestartCallback(connInit: FxConnection, val cb: (Either<Throwable, Any?>) -> Unit) : (Either<Throwable, Any?>) -> Unit, Continuation<Any?> {
+  internal class AsyncBoundary(connInit: FxConnection, val cb: (Either<Throwable, Any?>) -> Unit) : (Either<Throwable, Any?>) -> Unit, Continuation<Any?>, () -> Unit {
 
     private var conn: FxConnection = connInit
     private var canCall = false
+    private inline val shouldTrampoline inline get() = contIndex == Platform.maxStackDepthSize
     private var bFirst: ((Any?) -> Fx<Any?>)? = null
     private var bRest: (Platform.ArrayStack<(Any?) -> Fx<Any?>>)? = null
+    private var contIndex: Int = 1
+    private var result: Fx<Any?>? = null
 
     fun contextSwitch(conn: FxConnection): Unit {
       this.conn = conn
     }
 
     fun prepare(bFirst: ((Any?) -> Fx<Any?>)?, bRest: (Platform.ArrayStack<(Any?) -> Fx<Any?>>)?): Unit {
+      contIndex++
       canCall = true
       this.bFirst = bFirst
       this.bRest = bRest
@@ -243,29 +273,136 @@ internal object FxRunLoop {
     override val context: CoroutineContext
       get() = EmptyCoroutineContext + CancelContext(conn)
 
-    override fun resumeWith(result: Result<Any?>) {
-      if (canCall) {
-        canCall = false
-        val source = result.fold(
-          onSuccess = { Fx.Pure(it, 0) },
-          onFailure = { Fx.RaiseError<Any?>(it) }
-        )
-
-        FxRunLoop.loop(source, CancelContext(conn), cb, this, bFirst, bRest)
-      }
+    override fun resumeWith(a: Result<Any?>): Unit {
+      result = a.fold(
+        onSuccess = { Fx.Pure(it, 0) },
+        onFailure = { Fx.RaiseError(it) }
+      )
+      if (shouldTrampoline) {
+        contIndex = 1
+        Platform.trampoline(this)
+      } else invoke()
     }
 
     override operator fun invoke(either: Either<Throwable, Any?>): Unit {
+      result = when (either) {
+        is Either.Left -> Fx.RaiseError(either.a)
+        is Either.Right -> Fx.Pure(either.b, 0)
+      }
+      if (shouldTrampoline) {
+        contIndex = 1
+        Platform.trampoline(this)
+      } else invoke()
+    }
+
+    override fun invoke(): Unit {
       if (canCall) {
         canCall = false
-        val source: Fx<Any?> = when (either) {
-          is Either.Left -> Fx.RaiseError(either.a)
-          is Either.Right -> Fx.Pure(either.b, 0)
-        }
-
-        FxRunLoop.loop(source, CancelContext(conn), cb, this, bFirst, bRest)
+        val bFirst = bFirst
+        val bRest = bRest
+        this.bFirst = null //We need to clear the state so GC can cleanup if it wants to.
+        this.bRest = null
+        loop(requireNotNull(result) { "Fx bug, please contact support! https://arrow-kt.io" }, CancelContext(conn), cb, this, bFirst, bRest)
       }
     }
   }
 
 }
+
+private val trampolineExecutor = Platform.TrampolineExecutor(Executor { it.run() })
+
+///**
+// * A `AsyncBoundary` gets created only once, per [[startCancelable]]
+// * (`unsafeRunAsync`) invocation, once an `Async` state is hit,
+// * its job being to resume the loop after the boundary, but with
+// * the bind call-stack restored
+// *
+// * This is a trick the implementation is using to avoid creating
+// * extraneous callback references on asynchronous boundaries, in
+// * order to reduce memory pressure.
+// *
+// * It's an ugly, mutable implementation.
+// * For internal use only, here be dragons!
+// */
+//private class AsyncBoundary(connInit: FxConnection, val cb: (Either<Throwable, Any?>) -> Unit) : (Either<Throwable, Any?>) -> Unit, () -> Unit, Continuation<Any?> {
+//
+////  import TrampolineEC.{immediate => ec}
+//
+//  // can change on a ContextSwitch
+//  private var conn: FxConnection = connInit
+//
+//  //State changes on prepareAsync or prepareContinuation
+//  private var canCall = false
+//  private var trampolineAfter = true
+//  private var bFirst: ((Any?) -> Fx<Any?>)? = null
+//  private var bRest: Platform.ArrayStack<(Any?) -> Fx<Any?>>? = null
+//
+//  // Used in combination with trampolineAfter = true
+//  private var value: Either<Throwable, Any?>? = null
+//
+//  fun contextSwitch(conn: FxConnection): Unit {
+//    this.conn = conn
+//  }
+//
+//  fun start(task: Fx.Async<Any?>, bFirstRef: (Any?) -> Fx<Any?>, bRestRef: Platform.ArrayStack<(Any?) -> Fx<Any?>>): Unit {
+//    canCall = true
+//    this.bFirst = bFirstRef
+//    this.bRest = bRestRef
+//    //This seems to be **always** true in cats-effects... This should occur maxStackDepthSize only, right?
+////    this.trampolineAfter = task.trampolineAfter
+//    // Go, go, go
+//    task.proc(conn, this)
+//  }
+//
+//  private fun signal(either: Either<Throwable, Any?>?): Unit {
+//    // Allow GC to collect
+//    val bFirst = this.bFirst
+//    val bRest = this.bRest
+//    this.bFirst = null
+//    this.bRest = null
+//
+//    // Auto-cancelable logic: in case the connection was cancelled, we interrupt the bind continuation
+//    //TODO SIMON This can potentially be removed. Compare cancellation in the loop with cats-effects to double check if the semantics are the same.
+//    if (conn.isNotCanceled()) when (either) {
+//      is Either.Right -> TODO() //loop(Fx.Pure(either.b, 0), CancelContext(conn), cb, this, bFirst, bRest)
+//      is Either.Left -> TODO() //loop(Fx.RaiseError(either.a), CancelContext(conn), cb, this, bFirst, bRest)
+//      null -> throw Impossible
+//    } else Unit
+//  }
+//
+//  override fun invoke() {
+//    // N.B. this has to be set to null *before* the signal
+//    // otherwise a race condition can happen ;-)
+//    val v = value
+//    value = null
+//    signal(v)
+//  }
+//
+//  override fun invoke(either: Either<Throwable, Any?>): Unit {
+//    if (canCall) {
+//      canCall = false
+//      if (trampolineAfter) {
+//        this.value = either
+//        trampolineExecutor.execute(this)
+//      } else {
+//        signal(either)
+//      }
+//    }
+//  }
+//
+//  override val context: CoroutineContext
+//    get() = EmptyCoroutineContext
+//
+//  override fun resumeWith(result: Result<Any?>) {
+//    if (canCall) {
+//      canCall = false
+//      val either = result.fold({ Right(it) }, { Left(it) })
+//      if (trampolineAfter) {
+//        this.value = either
+//        trampolineExecutor.execute(this)
+//      } else {
+//        signal(either)
+//      }
+//    }
+//  }
+//}

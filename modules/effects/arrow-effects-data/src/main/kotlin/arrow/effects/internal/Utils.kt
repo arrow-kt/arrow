@@ -5,6 +5,7 @@ import arrow.effects.IO
 import arrow.effects.KindConnection
 import arrow.effects.typeclasses.Duration
 import java.util.*
+import java.util.concurrent.Executor
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.locks.AbstractQueuedSynchronizer
 import kotlin.coroutines.CoroutineContext
@@ -186,6 +187,66 @@ object Platform {
   fun composeErrors(first: Throwable, rest: List<Throwable>): Throwable {
     rest.forEach { if (it != first) first.addSuppressed(it) }
     return first
+  }
+
+  @PublishedApi
+  internal val trampolineExecutor = TrampolineExecutor(Executor { it.run() })
+
+  inline fun trampoline(crossinline f: () -> Unit): Unit =
+    trampolineExecutor.execute(Runnable { f() })
+
+  @PublishedApi
+  internal class TrampolineExecutor(val underlying: Executor) {
+    private var immediateQueue = Platform.ArrayStack<Runnable>()
+    private var withinLoop = false
+
+    fun startLoop(runnable: Runnable): Unit {
+      withinLoop = true
+      try {
+        immediateLoop(runnable)
+      } finally {
+        withinLoop = false
+      }
+    }
+
+    fun execute(runnable: Runnable): Unit {
+      if (!withinLoop) {
+        startLoop(runnable)
+      } else {
+        immediateQueue.push(runnable)
+      }
+    }
+
+    private fun forkTheRest(): Unit {
+      class ResumeRun(val head: Runnable, val rest: Platform.ArrayStack<Runnable>) : Runnable {
+        override fun run(): Unit {
+          immediateQueue.pushAll(rest)
+          immediateLoop(head)
+        }
+      }
+
+      val head = immediateQueue.pop()
+      if (head != null) {
+        val rest = immediateQueue
+        immediateQueue = Platform.ArrayStack()
+        underlying.execute(ResumeRun(head, rest))
+      }
+    }
+
+    @Suppress("SwallowedException")
+    private tailrec fun immediateLoop(task: Runnable): Unit {
+      try {
+        task.run()
+      } catch (ex: Throwable) {
+        forkTheRest()
+        //ex.nonFatalOrThrow()
+      }
+
+      val next = immediateQueue.pop()
+      if (next != null) {
+        immediateLoop(next)
+      }
+    }
   }
 
 }

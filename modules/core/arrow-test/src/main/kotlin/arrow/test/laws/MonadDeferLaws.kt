@@ -6,6 +6,7 @@ import arrow.data.k
 import arrow.effects.data.internal.BindingCancellationException
 import arrow.effects.typeclasses.MonadDefer
 import arrow.data.extensions.list.foldable.foldLeft
+import arrow.effects.suspended.fx.Fx
 import arrow.test.concurrency.SideEffect
 import arrow.test.generators.intSmall
 import arrow.test.generators.throwable
@@ -142,28 +143,28 @@ object MonadDeferLaws {
     df.flatMap { df }.flatMap { df }.equalUnderTheLaw(just(3), EQ) shouldBe true
   }
 
-  fun <F> MonadDefer<F>.stackSafetyOverRepeatedLeftBinds(iterations: Int = 5000, EQ: Eq<Kind<F, Int>>): Unit =
+  fun <F> MonadDefer<F>.stackSafetyOverRepeatedLeftBinds(iterations: Int = 10_000, EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.create { Unit }) {
       (0..iterations).toList().k().foldLeft(just(0)) { def, x ->
         def.flatMap { just(x) }
       }.equalUnderTheLaw(just(iterations), EQ)
     }
 
-  fun <F> MonadDefer<F>.stackSafetyOverRepeatedRightBinds(iterations: Int = 5000, EQ: Eq<Kind<F, Int>>): Unit =
+  fun <F> MonadDefer<F>.stackSafetyOverRepeatedRightBinds(iterations: Int = 10_000, EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.create { Unit }) {
       (0..iterations).toList().foldRight(just(iterations)) { x, def ->
         lazy().flatMap { def }
       }.equalUnderTheLaw(just(iterations), EQ)
     }
 
-  fun <F> MonadDefer<F>.stackSafetyOverRepeatedAttempts(iterations: Int = 5000, EQ: Eq<Kind<F, Int>>): Unit =
+  fun <F> MonadDefer<F>.stackSafetyOverRepeatedAttempts(iterations: Int = 10_000, EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.create { Unit }) {
       (0..iterations).toList().foldLeft(just(0)) { def, x ->
         def.attempt().map { x }
       }.equalUnderTheLaw(just(iterations), EQ)
     }
 
-  fun <F> MonadDefer<F>.stackSafetyOnRepeatedMaps(iterations: Int = 5000, EQ: Eq<Kind<F, Int>>): Unit =
+  fun <F> MonadDefer<F>.stackSafetyOnRepeatedMaps(iterations: Int = 10_000, EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.create { Unit }) {
       (0..iterations).toList().foldLeft(just(0)) { def, x ->
         def.map { x }
