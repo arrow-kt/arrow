@@ -20,9 +20,13 @@ import io.kotlintest.properties.forAll
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldThrow
+import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.newSingleThreadContext
 import org.junit.runner.RunWith
 import java.lang.RuntimeException
+import kotlin.coroutines.AbstractCoroutineContextElement
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 @RunWith(KotlinTestRunner::class)
 class FxTest : UnitSpec() {
@@ -74,6 +78,24 @@ class FxTest : UnitSpec() {
       shouldThrow<MyException> {
         Fx.unsafeRunBlocking(Fx.raiseError<Int>(exception))
       } shouldBe exception
+    }
+
+    "unsafeRunBlocking should run in EmptyCoroutineContext" {
+      //I was surprised by this behavior but nested suspend scopes inherit the coroutineContext from the outer scope.
+      Fx.unsafeRunBlocking(Fx {
+        kotlin.coroutines.coroutineContext shouldBe EmptyCoroutineContext
+      })
+    }
+
+    "CoroutineContext state should be correctly managed between boundaries" {
+      val ctxA = TestContext()
+      val ctxB = CoroutineName("ctxB")
+      //We have to explicitly reference kotlin.coroutines.coroutineContext since `TestContext` overrides this property.
+      Fx.unsafeRunBlocking(Fx { kotlin.coroutines.coroutineContext shouldBe EmptyCoroutineContext }
+        .continueOn(ctxA)
+        .flatMap { Fx { kotlin.coroutines.coroutineContext shouldBe ctxA } }
+        .continueOn(ctxB)
+        .flatMap { Fx { kotlin.coroutines.coroutineContext shouldBe (ctxA + ctxB) } })
     }
 
     "unsafeRunNonBlocking should return a pure value" {
@@ -388,6 +410,10 @@ class FxTest : UnitSpec() {
 
   }
 
+}
+
+class TestContext : AbstractCoroutineContextElement(TestContext) {
+  companion object Key : kotlin.coroutines.CoroutineContext.Key<CoroutineName>
 }
 
 fun <A> FX_EQ(): Eq<FxOf<A>> = Eq { a, b ->
