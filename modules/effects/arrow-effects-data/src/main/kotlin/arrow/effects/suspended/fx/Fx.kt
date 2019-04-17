@@ -237,11 +237,12 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
   }
 
   @PublishedApi
-  internal class Async<A> private constructor(val proc: FxProc<A>) : Fx<A>(AsyncTag) {
+  internal class Async<A> private constructor(val ctx: CoroutineContext = EmptyCoroutineContext, val proc: FxProc<A>) : Fx<A>(AsyncTag) {
 
     companion object {
+
       @JvmStatic
-      operator fun <A> invoke(proc: FxProc<A>): Fx<A> = Async { conn: FxConnection, ff: (Either<Throwable, A>) -> Unit ->
+      operator fun <A> invoke(ctx: CoroutineContext = EmptyCoroutineContext, proc: FxProc<A>): Fx<A> = Async(ctx) { conn: FxConnection, ff: (Either<Throwable, A>) -> Unit ->
         Platform.onceOnly(ff).let { callback: (Either<Throwable, A>) -> Unit ->
           try {
             proc(conn, callback)
@@ -397,7 +398,7 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
     fun <A> async(fa: Proc<A>): Fx<A> = async { _, cb -> fa(cb) }
 
     @JvmStatic
-    fun <A> async(fa: FxProc<A>): Fx<A> = Async(fa)
+    fun <A> async(fa: FxProc<A>): Fx<A> = Async(proc = fa)
 
 
     /** Hide member because it's discouraged to use uncancelable builder for cancelable concrete type **/

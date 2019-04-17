@@ -55,12 +55,12 @@ internal object FxRunLoop {
    */
   @Suppress("CollapsibleIfStatements", "ReturnCount")
   private fun loop(fa: FxOf<Any?>,
-           currToken: FxConnection,
-           ctxRef: CoroutineContext,
-           cb: (Either<Throwable, Any?>) -> Unit,
-           rcbRef: AsyncBoundary?,
-           bFirstRef: ((Any?) -> Fx<Any?>)?,
-           bRestRef: Platform.ArrayStack<(Any?) -> Fx<Any?>>?): Unit {
+                   currToken: FxConnection,
+                   ctxRef: CoroutineContext,
+                   cb: (Either<Throwable, Any?>) -> Unit,
+                   rcbRef: AsyncBoundary?,
+                   bFirstRef: ((Any?) -> Fx<Any?>)?,
+                   bRestRef: Platform.ArrayStack<(Any?) -> Fx<Any?>>?): Unit {
 
     //Once a loop is started it context doesn't change. You can only modify the context through `startCoroutine`.
     val ctx: CoroutineContext = ctxRef
@@ -94,12 +94,15 @@ internal object FxRunLoop {
           }
         }
         ContinueOnTag -> {
-          if (asyncBoundary == null) {
-            asyncBoundary = AsyncBoundary(conn, cb)
-          }
+          val localCurrent = (source as Fx.ContinueOn<Any?>)
+          val nextCC = ctx + localCurrent.ctx
+          val next = localCurrent.source
 
-          asyncBoundary.start(source as Fx.ContinueOn<Any?>, ctx, bFirst, bRest)
-          return
+          source = Fx.FlatMap(next, { a ->    //ContinueOn is the current op followed by an async jump that updates the context.
+            Fx.Async<Any?>(nextCC) { _, cb ->
+              cb(Right(a))
+            }
+          }, 0)
         }
         PureTag -> {
           result = (source as Fx.Pure<Any?>).value
@@ -137,7 +140,7 @@ internal object FxRunLoop {
             asyncBoundary = AsyncBoundary(conn, cb)
           }
           // Return case for Async operations
-          asyncBoundary.start(source as Fx.Async<Any?>, ctx, bFirst, bRest)
+          asyncBoundary.start(source as Fx.Async<Any?>, ctx + source.ctx, bFirst, bRest)
           return
         }
         ConnectionSwitchTag -> {

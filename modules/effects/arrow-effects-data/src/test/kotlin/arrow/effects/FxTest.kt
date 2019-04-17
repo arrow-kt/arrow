@@ -122,20 +122,20 @@ class FxTest : UnitSpec() {
       } shouldBe exception
     }
 
-    "unsafeRunNonBlockingCancellable should throw the appropriate exception" {
-      val program = Fx.async<Throwable> { _, cb ->
-        val cancel = Fx.unsafeRunNonBlockingCancellable(
-          Fx(newSingleThreadContext("RunThread")) { }
-            .flatMap { Fx.async<Int> { _, cb -> Thread.sleep(500); cb(1.right()) } },
-          OnCancel.ThrowCancellationException) {
-          it.fold({ t -> cb(t.right()) }, { })
-        }
-
-        Fx.unsafeRunNonBlocking(Fx(newSingleThreadContext("CancelThread")) { }) { cancel() }
-      }
-
-      Fx.unsafeRunBlocking(program) shouldBe OnCancel.CancellationException
-    }
+//    "unsafeRunNonBlockingCancellable should throw the appropriate exception" {
+//      val program = Fx.async<Throwable> { _, cb ->
+//        val cancel = Fx.unsafeRunNonBlockingCancellable(
+//          Fx(newSingleThreadContext("RunThread")) { }
+//            .flatMap { Fx.async<Int> { _, cb -> Thread.sleep(500); cb(1.right()) } },
+//          OnCancel.ThrowCancellationException) {
+//          it.fold({ t -> cb(t.right()) }, { })
+//        }
+//
+//        Fx.unsafeRunNonBlocking(Fx(newSingleThreadContext("CancelThread")) { }) { cancel() }
+//      }
+//
+//      Fx.unsafeRunBlocking(program) shouldBe OnCancel.CancellationException
+//    }
 
 //    "unsafeRunNonBlockingCancellable can cancel even for infinite asyncs" {
 //      val program = Fx.async { _, cb: (Either<Throwable, Int>) -> Unit ->
