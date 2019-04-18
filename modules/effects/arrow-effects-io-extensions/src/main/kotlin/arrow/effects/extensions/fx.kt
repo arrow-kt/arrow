@@ -15,6 +15,7 @@ import arrow.unsafe
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.*
 import  arrow.effects.suspended.fx.guaranteeCase as guaranteeC
+import  arrow.effects.suspended.fx.bracketCase as bracketC
 
 @extension
 interface Fx2Dispatchers : Dispatchers<ForFx> {
@@ -99,7 +100,7 @@ interface Fx2MonadThrow : MonadThrow<ForFx>, Fx2MonadError
 @extension
 interface Fx2Bracket : Bracket<ForFx, Throwable>, Fx2MonadThrow {
   override fun <A, B> FxOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> FxOf<Unit>, use: (A) -> FxOf<B>): Fx<B> =
-    bracketCase(release, use)
+    bracketC(release, use)
 
   override fun <A> FxOf<A>.guaranteeCase(finalizer: (ExitCase<Throwable>) -> FxOf<Unit>): Fx<A> =
     guaranteeC(finalizer)

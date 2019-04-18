@@ -127,7 +127,7 @@ object MonadDeferLaws {
 
   fun <F> MonadDefer<F>.mapSuspendsEvaluation(EQ: Eq<Kind<F, Int>>): Unit {
     val sideEffect = SideEffect(counter = 0)
-    val df = just(0).map { sideEffect.increment(); sideEffect.counter }
+    val df = delay { 0 }.map { sideEffect.increment(); sideEffect.counter }
 
     Thread.sleep(10)
 

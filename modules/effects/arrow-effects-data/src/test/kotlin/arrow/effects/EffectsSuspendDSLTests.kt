@@ -2,11 +2,12 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.core.*
-import arrow.effects.extensions.io.fx.fx
-import arrow.effects.extensions.io.unsafeRun.runBlocking
-import arrow.effects.extensions.io.unsafeRun.unsafeRun
+import arrow.effects.extensions.fx.fx.fx
+import arrow.effects.extensions.fx.unsafeRun.runBlocking
+import arrow.effects.extensions.fx.unsafeRun.unsafeRun
+import arrow.effects.suspended.fx.Fx
+import arrow.effects.suspended.fx.FxOf
 import arrow.effects.typeclasses.UnsafeRun
-import arrow.effects.typeclasses.suspended.concurrent.Fx
 import arrow.test.UnitSpec
 import arrow.unsafe
 import io.kotlintest.runner.junit4.KotlinTestRunner
@@ -52,7 +53,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
        * Effect blocks suspend side effect in the monadic computation of the runtime
        * data type which it needs to be at least able to provide a `MonadDefer` extension.
        */
-      val program: IO<String> = fx {
+      val program: Fx<String> = fx {
         helloWorld
       }
       unsafe { runBlocking { program } } shouldBe helloWorld
@@ -77,7 +78,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
         Thread.currentThread().name
 
       val program = fx {
-        // note how the receiving value is typed in the environment and not inside IO despite being effectful and
+        // note how the receiving value is typed in the environment and not inside Fx despite being effectful and
         // non-blocking parallel computations
         val result: List<String> = !NonBlocking.parMapN(
           effect { getThreadName() },
@@ -181,8 +182,8 @@ class EffectsSuspendDSLTests : UnitSpec() {
       fxTest {
         fx {
           val (suspendedValue) = suspend { 1 }.effect()
-          val (ioValue) = IO.just(1)
-          suspendedValue == ioValue
+          val fxValue = Fx.just(1).component1()
+          suspendedValue == fxValue
         }
       } shouldBe true
     }
@@ -255,13 +256,15 @@ class EffectsSuspendDSLTests : UnitSpec() {
     }
 
     "Fx should stay within same context" {
-      fx {
-        continueOn(newSingleThreadContext("start"))
-        val initialThread = !effect { Thread.currentThread().name }
-        !(0..130).map { i -> suspend { i } }.sequence()
-        val continuedThread = !effect { Thread.currentThread().name }
-        continuedThread shouldBe initialThread
-      }.unsafeRunSync()
+      Fx.unsafeRunBlocking(
+        fx {
+          continueOn(newSingleThreadContext("start"))
+          val initialThread = !effect { Thread.currentThread().name }
+          !(0..130).map { i -> suspend { i } }.sequence()
+          val continuedThread = !effect { Thread.currentThread().name }
+          continuedThread shouldBe initialThread
+        }
+      )
     }
 
     "fork" {
@@ -316,7 +319,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
             suspend { 1 },
             suspend { 2 },
             suspend { 3 }
-          ).traverse(::effectIdentity)
+          ).traverse<Int, Int>(::effectIdentity)
         }
       } shouldBe listOf(1, 2, 3)
     }
@@ -374,13 +377,13 @@ class EffectsSuspendDSLTests : UnitSpec() {
       suspend fun sideEffect(): Int =
         const
 
-      fun <F> Fx<F>.program(): Kind<F, Int> =
+      fun <F> arrow.effects.typeclasses.suspended.concurrent.Fx<F>.program(): Kind<F, Int> =
         fx { !effect { sideEffect() } }
 
-      fun <F> UnsafeRun<F>.main(fx: Fx<F>): Int =
+      fun <F> UnsafeRun<F>.main(fx: arrow.effects.typeclasses.suspended.concurrent.Fx<F>): Int =
         unsafe { runBlocking { fx.program() } }
 
-      IO.unsafeRun().main(IO.fx()) shouldBe const
+      Fx.unsafeRun().main(Fx.fx()) shouldBe const
     }
 
     "(suspend () -> A) <-> Kind<F, A>" {
@@ -401,7 +404,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
 
 }
 
-fun <A> fxTest(f: () -> IO<A>): A =
+fun <A> fxTest(f: () -> FxOf<A>): A =
   unsafe { runBlocking(f) }
 
 object TestError : Throwable()

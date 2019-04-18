@@ -34,7 +34,12 @@ const val AsyncTag = 6
 const val ModifyContextTag = 7
 const val ContinueOnTag = 9
 
-object Impossible : RuntimeException("Fx bug, please contact support! https://arrow-kt.io") {
+sealed class FxImpossibleBugs(message: String) : RuntimeException(message) {
+  object Fxfa : FxImpossibleBugs("Fx.fa bug, please contact support with this message! https://arrow-kt.io")
+  object FxMap: FxImpossibleBugs("FxMap bug, please contact support with this message! https://arrow-kt.io")
+  object FxNot: FxImpossibleBugs("FxNot bug, please contact support with this message! https://arrow-kt.io")
+  object FxFlatMap: FxImpossibleBugs("FxFlatMap bug, please contact support with this message! https://arrow-kt.io")
+
   override fun fillInStackTrace(): Throwable = this
 }
 
@@ -62,7 +67,8 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
         ModifyContextTag -> suspend { FxRunLoop(this) }
         ContinueOnTag -> suspend { FxRunLoop(this) }
         ConnectionSwitchTag -> suspend { FxRunLoop(this) }
-        else -> throw Impossible
+        AsyncTag -> suspend { FxRunLoop(this) }
+        else -> throw FxImpossibleBugs.Fxfa
       }
 
   @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
@@ -107,7 +113,7 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
         if (index != Platform.maxStackDepthSize) Map(this, f)
         else FlatMap(source, { a -> Fx { f(!fb(a)) } }, index + 1)
       }
-      else -> throw Impossible
+      else -> throw FxImpossibleBugs.FxMap
     }
 
   @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
@@ -122,7 +128,7 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
       ModifyContextTag -> FxRunLoop(this)
       AsyncTag -> FxRunLoop(this)
       ContinueOnTag -> FxRunLoop(this)
-      else -> throw Impossible
+      else -> throw FxImpossibleBugs.FxNot
     }
 
   @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
@@ -155,7 +161,7 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
           }
         }, index + 1)
       }
-      else -> throw Impossible
+      else -> throw FxImpossibleBugs.FxFlatMap
     }
 
   suspend inline fun bind(): A = !this
@@ -297,8 +303,8 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
   suspend inline operator fun invoke(): A =
     !this
 
-  suspend inline operator fun component1(): A =
-    !this
+//  suspend inline operator fun component1(): A =
+//    !this
 
   fun <B> ap(ff: FxOf<(A) -> B>): Fx<B> =
     ff.fix().flatMap { map(it) }

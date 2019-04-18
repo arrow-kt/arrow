@@ -301,7 +301,6 @@ internal object FxRunLoop {
     private var conn: FxConnection = connInit
     private var canCall = false
     private var contIndex: Int = 1
-    private var jumpingContext = false
 
     //loop state
     private var bFirst: ((Any?) -> Fx<Any?>)? = null
@@ -345,15 +344,10 @@ internal object FxRunLoop {
       get() = _context
 
     override fun resumeWith(a: Result<Any?>): Unit {
-      if (jumpingContext) { //If we're doing a context switch we already provided the result.
-        jumpingContext = false
-        if (result == null) throw Impossible
-      } else {
-        result = a.fold(
-          onSuccess = { Fx.Pure(it, 0) },
-          onFailure = { Fx.RaiseError(it) }
-        )
-      }
+      result = a.fold(
+        onSuccess = { Fx.Pure(it, 0) },
+        onFailure = { Fx.RaiseError(it) }
+      )
 
       if (shouldTrampoline) {
         contIndex = 1
