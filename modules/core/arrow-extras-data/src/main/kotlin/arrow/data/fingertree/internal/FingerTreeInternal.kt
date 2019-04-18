@@ -53,35 +53,28 @@ internal sealed class FingerTreeInternal<T> {
     }
   }
 
-  fun asList(): List<T> = this.asListHelper(emptyList(), this)
+  fun viewL(): Option<Tuple2<T, FingerTreeInternal<T>>> = when (this) {
+    is Empty -> Option.empty()
+    is Single -> Option.just(Tuple2(this.a, Empty()))
+    is Deep -> when (this.prefix) {
+      is Affix.One -> {
 
-  fun viewL(): Option<Tuple2<T, FingerTreeInternal<T>>> {
-
-    return when (this) {
-      is Empty -> Option.empty()
-      is Single -> Option.just(Tuple2(this.a, Empty()))
-      is Deep -> when (this.prefix) {
-        is Affix.One -> {
-
-          this.deeper.viewL().fold(
-            { Option.just(Tuple2(this.prefix.a, suffix.toFingerTree())) },
-            { (node, tree) -> Option.just(Tuple2(this.prefix.a, Deep(Affix.fromList(node.toList()), tree, this.suffix))) }
-          )
-        }
-
-        else -> Option.just(
-          Tuple2(this.prefix.toList()[0],
-            Deep(Affix.fromList(this.prefix.toList().drop(1)), this.deeper, this.suffix)
-          ))
+        this.deeper.viewL().fold(
+          { Option.just(Tuple2(this.prefix.a, suffix.toFingerTree())) },
+          { (node, tree) -> Option.just(Tuple2(this.prefix.a, Deep(Affix.fromList(node.toList()), tree, this.suffix))) }
+        )
       }
 
+      else -> Option.just(
+        Tuple2(this.prefix.toList()[0],
+          Deep(Affix.fromList(this.prefix.toList().drop(1)), this.deeper, this.suffix)
+        ))
     }
+
   }
 
 
-  fun viewR(): Option<Tuple2<T, FingerTreeInternal<T>>> {
-
-    return when (this) {
+  fun viewR(): Option<Tuple2<T, FingerTreeInternal<T>>> = when (this) {
       is Empty -> Option.empty()
       is Single -> Option.just(Tuple2(this.a, Empty()))
       is Deep -> when (this.suffix) {
@@ -99,7 +92,10 @@ internal sealed class FingerTreeInternal<T> {
           ))
       }
     }
-  }
+
+  fun asList(): List<T> = this.asListHelper(emptyList(), this)
+
+  fun asSequence(): Sequence<T> = TODO()
 
   private tailrec fun asListHelper(soFar: List<T>, tree: FingerTreeInternal<T>): List<T> {
     return when (val res = tree.viewL()) {

@@ -39,6 +39,8 @@ class FingerTree<T> internal constructor(internal: FingerTreeInternal<T> = Finge
 
   fun asList(): List<T> = this.fingerTreeInternal.asList()
 
+  fun asSequence(): Sequence<T> = this.fingerTreeInternal.asSequence()
+
   companion object {
 
     fun <A> empty(): FingerTree<A> = FingerTree()
