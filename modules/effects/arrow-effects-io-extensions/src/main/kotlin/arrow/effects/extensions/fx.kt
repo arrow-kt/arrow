@@ -99,7 +99,7 @@ interface Fx2MonadThrow : MonadThrow<ForFx>, Fx2MonadError
 @extension
 interface Fx2Bracket : Bracket<ForFx, Throwable>, Fx2MonadThrow {
   override fun <A, B> FxOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> FxOf<Unit>, use: (A) -> FxOf<B>): Fx<B> =
-    fix().bracketCase(release, use)
+    bracketCase(release, use)
 
   override fun <A> FxOf<A>.guaranteeCase(finalizer: (ExitCase<Throwable>) -> FxOf<Unit>): Fx<A> =
     guaranteeC(finalizer)

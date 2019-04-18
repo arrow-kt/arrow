@@ -334,70 +334,6 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
   fun attempt(): Fx<Either<Throwable, A>> =
     FlatMap(this, FxFrame.attempt(), 0)
 
-  /**
-   * A way to safely acquire a resource and release in the face of errors and cancellation.
-   * It uses [ExitCase] to distinguish between different exit cases when releasing the acquired resource.
-   *
-   * [Bracket] exists out of a three stages:
-   *   1. acquisition
-   *   2. consumption
-   *   3. releasing
-   *
-   * 1. Resource acquisition is **NON CANCELABLE**, and this is the trickiest to implement and test
-   *   because we cannot incorporate it into [BracketLaws] since cancellation is introduced in [Concurrent].
-   *   If resource acquisition fails, meaning no resource was actually successfully acquired then we short-circuit the effect.
-   *   Reason being, we cannot [release] what we did not [acquire] first. Same reason we cannot call [use].
-   *   If it is successful we pass the result to stage 2 [use].
-   *
-   * 2. Resource consumption is like any other [Fx] effect. The key difference here is that it's wired in such a way that
-   *   [release] **will always** be called either on [ExitCase.Canceled], [ExitCase.Error] or [ExitCase.Completed].
-   *   If it failed than the resulting [Fx] from [FxBracket] will be `Fx.raiseError(e)`, otherwise the result of [use].
-   *
-   * 3. Resource releasing is **NON CANCELABLE** otherwise it could result in leaks.
-   *   In the case it throws the resulting [Fx] will be either the error or a composed error if one occurred in the [use] stage.
-   *
-   * @param use is the action to consume the resource and produce an [Fx] with the result.
-   * Once the resulting [Fx] terminates, either successfully, error or disposed,
-   * the [release] function will run to clean up the resources.
-   *
-   * @param release the allocated resource after the resulting [Fx] of [use] is terminates.
-   *
-   * ```kotlin:ank:playground
-   * import arrow.effects.*
-   * import arrow.effects.suspended.fx.*
-   * import arrow.effects.typeclasses.ExitCase
-   *
-   * class File(url: String) {
-   *   fun open(): File = this
-   *   fun close(): Unit {}
-   *   fun content(): Fx<String> =
-   *     Fx.just("This file contains some interesting content!")
-   * }
-   *
-   * fun openFile(uri: String): Fx<File> = Fx { File(uri).open() }
-   * fun closeFile(file: File): Fx<Unit> = Fx { file.close() }
-   *
-   * fun main(args: Array<String>) {
-   *   //sampleStart
-   *   val safeComputation = openFile("data.json").bracketCase(
-   *     release = { file, exitCase ->
-   *       when (exitCase) {
-   *         is ExitCase.Completed -> { /* do something */ }
-   *         is ExitCase.Canceled -> { /* do something */ }
-   *         is ExitCase.Error -> { /* do something */ }
-   *       }
-   *       closeFile(file)
-   *     },
-   *     use = { file -> file.content() }
-   *   )
-   *   //sampleEnd
-   *   println(safeComputation)
-   * }
-   *  ```
-   */
-  fun <B> bracketCase(release: (A, ExitCase<Throwable>) -> FxOf<Unit>, use: (A) -> FxOf<B>): Fx<B> =
-    FxBracket(this, release, use)
-
   fun updateContext(f: (CoroutineContext) -> CoroutineContext): Fx<A> =
     UpdateContext(this, f)
 
@@ -417,7 +353,7 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
     FxRunLoop.startCancelable(this, conn, ctx) { either ->
       either.fold(
         { promise.complete(Either.Left(it)) },
-        { promise.complete(Either.Right(it) }
+        { promise.complete(Either.Right(it)) }
       )
     }
 
