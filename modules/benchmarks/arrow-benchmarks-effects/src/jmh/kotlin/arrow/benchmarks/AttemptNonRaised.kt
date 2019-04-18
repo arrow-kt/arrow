@@ -44,8 +44,6 @@ open class AttemptNonRaised {
 
   @Benchmark
   fun zio(): Any =
-    ZIORTS.unsafeRun(
-      arrow.benchmarks.effects.scala.zio.AttemptNonRaised.ioLoopHappy(size, 0)
-    )
+    arrow.benchmarks.effects.scala.zio.AttemptNonRaised.run(size)
 
 }

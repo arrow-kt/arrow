@@ -24,23 +24,23 @@ open class Async {
   @Param("3000")
   var size: Int = 0
 
-  private suspend fun fxAsyncLoop(i: Int): Fx<Int> =
-    NonBlocking.fxShift().followedBy(
+  private fun fxAsyncLoop(i: Int): Fx<Int> =
+    Fx.unit.continueOn(NonBlocking).followedBy(
       if (i > size) Fx.just(i) else fxAsyncLoop(i + 1)
     )
 
   private fun ioAsyncLoop(i: Int): IO<Int> =
-    NonBlocking.ioShift().followedBy(
-      if (i > size) IO { i } else ioAsyncLoop(i + 1)
+    IO.unit.continueOn(NonBlocking).followedBy(
+      if (i > size) IO.just(i) else ioAsyncLoop(i + 1)
     )
 
   @Benchmark
   fun fx(): Int =
-    unsafe { fxRunBlocking { Fx { !fxAsyncLoop(0) } } }
+    Fx.unsafeRunBlocking(fxAsyncLoop(0))
 
   @Benchmark
   fun io(): Int =
-    unsafe { ioRunBlocking { ioAsyncLoop(0) } }
+    ioAsyncLoop(0).unsafeRunSync()
 
   @Benchmark
   fun catsIO(): Int =

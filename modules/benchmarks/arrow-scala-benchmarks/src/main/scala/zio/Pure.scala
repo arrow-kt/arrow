@@ -2,7 +2,7 @@ package arrow.benchmarks.effects.scala.zio
 
 import scalaz.zio._
 
-object Pure extends RTS {
+object Pure {
 
   def ioPureLoop(size: Int, i: Int): IO[Nothing, Int] =
     IO.succeed(i).flatMap { j =>
@@ -10,6 +10,6 @@ object Pure extends RTS {
     }
 
   def unsafeIOPureLoop(size: Int, i: Int): Int =
-    unsafeRun(ioPureLoop(size, i))
+    ZIORTS.unsafeRun(ioPureLoop(size, i))
 
 }

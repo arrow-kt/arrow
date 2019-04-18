@@ -10,11 +10,13 @@ object AttemptRaisedError {
 
   def ioLoopNotHappy(size: Int, i: Int): IO[Nothing, Int] =
     if (i < size) {
-      IO.sync {
+      IO.effect {
         throw dummy
-      }.attempt.flatMap { it =>
+      }.either.flatMap { it =>
         it.fold(_ => ioLoopNotHappy(size, i + 1), IO.succeed)
       }
     } else IO.succeed(1)
+
+  def run(size: Int) = ZIORTS.unsafeRun(ioLoopNotHappy(size, 0))
 
 }

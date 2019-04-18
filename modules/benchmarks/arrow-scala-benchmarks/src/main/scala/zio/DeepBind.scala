@@ -4,11 +4,12 @@ import scalaz.zio._
 
 object DeepBind {
 
-  def fib(n: Int): IO[Nothing, BigInt] =
-    if (n <= 1) IO.succeedLazy[BigInt](n)
+  def loop(n: Int): Task[BigInt] =
+    if (n <= 1) ZIO.effect[BigInt](n)
     else
-      fib(n - 1).flatMap { a =>
-        fib(n - 2).flatMap(b => IO.succeedLazy(a + b))
+      loop(n - 1).flatMap { a =>
+        loop(n - 2).flatMap(b => ZIO.effect(a + b))
       }
 
+  def fib(depth: Int): BigInt = ZIORTS.unsafeRun(loop(depth))
 }
