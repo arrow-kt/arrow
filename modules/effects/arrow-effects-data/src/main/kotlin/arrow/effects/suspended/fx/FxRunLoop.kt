@@ -94,12 +94,11 @@ internal object FxRunLoop {
         }
         ModifyContextTag -> {
           source as Fx.UpdateContext<Any?>
-
           val modify = source.modify
           val next = source.source
 
           source = Fx.FlatMap(next, { a ->
-            //UpdateContext is the current op followed by an async jump that updates the context.
+            //We need to schedule running the function because at this point we don't know what the correct CC will be to call modify with.
             Fx.Async<Any?>(updateContext = modify) { _, cb ->
               cb(Right(a))
             }
@@ -168,6 +167,7 @@ internal object FxRunLoop {
 
           if (conn != old) {
             asyncBoundary?.contextSwitch(conn)
+
             if (restore != null) {
               source = Fx.FlatMap(next, FxRunLoop.RestoreContext(old, restore), 0)
             }
@@ -262,8 +262,9 @@ internal object FxRunLoop {
   }
 
   /**
-   * An [AsyncBoundary] gets created only once, per [startCancelable] or [start] invocation.
-   * The job of the [AsyncBoundary] is to provide a means of jumping in -and out of the run loop when awaiting an async result.
+   * An [AsyncBoundary] gets created only once to avoid an allocation / async boundary, per [startCancelable] or [start] invocation and is responsible for two tasks:
+   *  - Jumping in -and out of the run loop when awaiting an async result, see [Fx.Single] & [Fx.Async].
+   *  - Scheduling a context switch at a certain point in the loop, see [Fx.ContinueOn] & [Fx.UpdateContext].
    *
    * To be able to do this it needs to have following capabilities:
    *   - It needs to save the state of the run loop and restore it when jumping back.
@@ -278,13 +279,8 @@ internal object FxRunLoop {
    *   - Trampoline between consecutive async boundaries.
    *   It fills the stack by calling `loop` to jump back to the run loop and needs to be trampolined every [Platform.maxStackDepthSize] frames.
    *
-   *   - Modify the running [CoroutineContext]
-   *   This is necessary because we need to maintain the state within [kotlin.coroutines.coroutineContext].
-   *
-   * This instance is shared across a single [startCancelable] or [start] invocation to avoid an allocation / async boundary.
-   *
-   * The required capabilities are achieved by the help of 3 [Fx] cases, [Fx.Async], [Fx.UpdateContext], [Fx.Single].
-   * They all have their respective [start] method.
+   *   - Switch, and modify to the correct [CoroutineContext]
+   *   This is necessary because we need to maintain the correct state within [kotlin.coroutines.coroutineContext] and to do thread switching using [CoroutineContext].
    *
    * **IMPORTANT** this mechanism is essential to [Fx] and its [FxRunLoop] because this allows us to go from `suspend () -> A` to `A`.
    * Using that power we can write the `loop` in such a way that it is not suspended and as a result we have full control over the `Continuation`
@@ -322,7 +318,7 @@ internal object FxRunLoop {
 
     fun start(fx: Fx.Async<Any?>, ctx: CoroutineContext, bFirst: ((Any?) -> Fx<Any?>)?, bRest: (Platform.ArrayStack<(Any?) -> Fx<Any?>>)?): Unit {
       contIndex++
-      _context = fx.updateContext?.invoke(ctx) ?: ctx
+      _context = fx.updateContext?.invoke(ctx) ?: ctx //Swap or update the contexts.
       canCall = true
       this.bFirst = bFirst
       this.bRest = bRest

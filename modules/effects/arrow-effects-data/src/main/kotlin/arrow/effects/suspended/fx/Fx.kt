@@ -213,12 +213,11 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
   }
 
   /**
-   * [ConnectionSwitch] is used to temporally switch the `KindConnection` attached to the computation.
-   * i.e. Switch to `KindConnection` to `KindConnection.uncancelable` and later switch back to the original connection.
+   * [ConnectionSwitch] is used to temporally switch the [KindConnection] attached to the computation.
+   * i.e. Switch from a cancellable [KindConnection.DefaultKindConnection] to [KindConnection.uncancelable] and later switch back to the original connection.
    * This is what [bracketCase] uses to make `acquire` and `release` uncancelable and disconnect it from the cancel stack.
    *
-   * This node nor its combinators are useful outside of Fx's internals.
-   * Instead we expose features explicitly see [bracketCase] and [uncancelable].
+   * This node nor its combinators are useful outside of Fx's internals and is instead used to write features like [bracketCase] and [uncancelable].
    */
   @PublishedApi
   internal class ConnectionSwitch<A>(
@@ -335,15 +334,73 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
   fun attempt(): Fx<Either<Throwable, A>> =
     FlatMap(this, FxFrame.attempt(), 0)
 
+  /**
+   * A way to safely acquire a resource and release in the face of errors and cancellation.
+   * It uses [ExitCase] to distinguish between different exit cases when releasing the acquired resource.
+   *
+   * [Bracket] exists out of a three stages:
+   *   1. acquisition
+   *   2. consumption
+   *   3. releasing
+   *
+   * 1. Resource acquisition is **NON CANCELABLE**, and this is the trickiest to implement and test
+   *   because we cannot incorporate it into [BracketLaws] since cancellation is introduced in [Concurrent].
+   *   If resource acquisition fails, meaning no resource was actually successfully acquired then we short-circuit the effect.
+   *   Reason being, we cannot [release] what we did not [acquire] first. Same reason we cannot call [use].
+   *   If it is successful we pass the result to stage 2 [use].
+   *
+   * 2. Resource consumption is like any other [Fx] effect. The key difference here is that it's wired in such a way that
+   *   [release] **will always** be called either on [ExitCase.Canceled], [ExitCase.Error] or [ExitCase.Completed].
+   *   If it failed than the resulting [Fx] from [FxBracket] will be `Fx.raiseError(e)`, otherwise the result of [use].
+   *
+   * 3. Resource releasing is **NON CANCELABLE** otherwise it could result in leaks.
+   *   In the case it throws the resulting [Fx] will be either the error or a composed error if one occurred in the [use] stage.
+   *
+   * @param use is the action to consume the resource and produce an [Fx] with the result.
+   * Once the resulting [Fx] terminates, either successfully, error or disposed,
+   * the [release] function will run to clean up the resources.
+   *
+   * @param release the allocated resource after the resulting [Fx] of [use] is terminates.
+   *
+   * ```kotlin:ank:playground
+   * import arrow.effects.*
+   * import arrow.effects.suspended.fx.*
+   * import arrow.effects.typeclasses.ExitCase
+   *
+   * class File(url: String) {
+   *   fun open(): File = this
+   *   fun close(): Unit {}
+   *   fun content(): Fx<String> =
+   *     Fx.just("This file contains some interesting content!")
+   * }
+   *
+   * fun openFile(uri: String): Fx<File> = Fx { File(uri).open() }
+   * fun closeFile(file: File): Fx<Unit> = Fx { file.close() }
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val safeComputation = openFile("data.json").bracketCase(
+   *     release = { file, exitCase ->
+   *       when (exitCase) {
+   *         is ExitCase.Completed -> { /* do something */ }
+   *         is ExitCase.Canceled -> { /* do something */ }
+   *         is ExitCase.Error -> { /* do something */ }
+   *       }
+   *       closeFile(file)
+   *     },
+   *     use = { file -> file.content() }
+   *   )
+   *   //sampleEnd
+   *   println(safeComputation)
+   * }
+   *  ```
+   */
   fun <B> bracketCase(release: (A, ExitCase<Throwable>) -> FxOf<Unit>, use: (A) -> FxOf<B>): Fx<B> =
     FxBracket(this, release, use)
 
   fun updateContext(f: (CoroutineContext) -> CoroutineContext): Fx<A> =
     UpdateContext(this, f)
 
-  /**
-   *
-   */
   fun continueOn(ctx: CoroutineContext): Fx<A> = when (tag) {
     ContinueOnTag -> (this as Fx.ContinueOn<A>).apply {
       this.ctx = ctx
@@ -351,7 +408,7 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
     else -> ContinueOn(this, ctx)
   }
 
-  fun <A> fork(ctx: CoroutineContext): Fx<Fiber<ForFx, A>> = Fx.async { oldConn, cb ->
+  fun fork(ctx: CoroutineContext): Fx<Fiber<ForFx, A>> = Fx.async { oldConn, cb ->
     val promise = UnsafePromise<A>()
     val conn = FxConnection()
     oldConn.push(conn.cancel())
@@ -360,14 +417,16 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
     FxRunLoop.startCancelable(this, conn, ctx) { either ->
       either.fold(
         { promise.complete(Either.Left(it)) },
-        { promise.complete(Either.Right(it) as Either<Throwable, A>) }
+        { promise.complete(Either.Right(it) }
       )
     }
 
     cb(Right(FxFiber(promise, conn)))
   }
 
-  /** Makes the source [IO] uncancelable such that a [Fiber.cancel] signal has no effect. */
+  /**
+   * Makes the source [Fx] uncancelable and switches back to the original cancellation connection after running [this].
+   */
   fun uncancelable(): Fx<A> =
     Fx.ConnectionSwitch(this, Fx.ConnectionSwitch.makeUncancelable, { _, _, old, _ -> old })
 
