@@ -45,6 +45,9 @@ sealed class FxImpossibleBugs(message: String) : RuntimeException(message) {
 
 sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
 
+  fun <B> followedBy(fa: FxOf<B>): Fx<B> =
+    flatMap { fa }
+
   @Suppress("UNCHECKED_CAST")
   inline val fa: suspend () -> A
     get() =

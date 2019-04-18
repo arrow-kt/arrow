@@ -2,7 +2,6 @@ package arrow.benchmarks
 
 import arrow.effects.IO
 import arrow.effects.extensions.NonBlocking
-import arrow.effects.extensions.fx.monad.followedBy
 import arrow.effects.extensions.io.monad.followedBy
 import arrow.effects.suspended.fx.Fx
 import arrow.unsafe

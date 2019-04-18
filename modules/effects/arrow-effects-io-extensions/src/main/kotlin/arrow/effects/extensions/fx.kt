@@ -90,6 +90,8 @@ interface FxMonad : Monad<ForFx>, FxApplicative {
   override fun <A, B> FxOf<A>.ap(ff: FxOf<(A) -> B>): Fx<B> =
     fix().ap(ff)
 
+  override fun <A, B> FxOf<A>.followedBy(fb: FxOf<B>): Fx<B> =
+    fix().followedBy(fb)
 }
 
 @extension
