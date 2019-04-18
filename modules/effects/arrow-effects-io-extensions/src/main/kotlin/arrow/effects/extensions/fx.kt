@@ -19,7 +19,7 @@ import  arrow.effects.suspended.fx.guaranteeCase as guaranteeC
 import  arrow.effects.suspended.fx.bracketCase as bracketC
 
 @extension
-interface Fx2Dispatchers : Dispatchers<ForFx> {
+interface FxDispatchers : Dispatchers<ForFx> {
   override fun default(): CoroutineContext =
     IODispatchers.CommonPool
 }
@@ -27,7 +27,7 @@ interface Fx2Dispatchers : Dispatchers<ForFx> {
 val NonBlocking: CoroutineContext = Fx.dispatchers().default()
 
 @extension
-interface Fx2UnsafeRun : UnsafeRun<ForFx> {
+interface FxUnsafeRun : UnsafeRun<ForFx> {
 
   override suspend fun <A> unsafe.runBlocking(fa: () -> FxOf<A>): A =
     Fx.unsafeRunBlocking(fa())
@@ -37,7 +37,7 @@ interface Fx2UnsafeRun : UnsafeRun<ForFx> {
 }
 
 @extension
-interface Fx2Environment : Environment<ForFx> {
+interface FxEnvironment : Environment<ForFx> {
   override fun dispatchers(): Dispatchers<ForFx> =
     Fx.dispatchers()
 
@@ -47,13 +47,13 @@ interface Fx2Environment : Environment<ForFx> {
 
 
 @extension
-interface Fx2Functor : Functor<ForFx> {
+interface FxFunctor : Functor<ForFx> {
   override fun <A, B> FxOf<A>.map(f: (A) -> B): Fx<B> =
     fix().map(f)
 }
 
 @extension
-interface Fx2Applicative : Applicative<ForFx>, Fx2Functor {
+interface FxApplicative : Applicative<ForFx>, FxFunctor {
   override fun <A> just(a: A): Fx<A> =
     Fx.just(a)
 
@@ -67,7 +67,7 @@ interface Fx2Applicative : Applicative<ForFx>, Fx2Functor {
 }
 
 @extension
-interface Fx2ApplicativeError : ApplicativeError<ForFx, Throwable>, Fx2Applicative {
+interface FxApplicativeError : ApplicativeError<ForFx, Throwable>, FxApplicative {
   override fun <A> raiseError(e: Throwable): Fx<A> =
     Fx.raiseError(e)
 
@@ -76,7 +76,7 @@ interface Fx2ApplicativeError : ApplicativeError<ForFx, Throwable>, Fx2Applicati
 }
 
 @extension
-interface Fx2Monad : Monad<ForFx>, Fx2Applicative {
+interface FxMonad : Monad<ForFx>, FxApplicative {
 
   override fun <A, B> FxOf<A>.flatMap(f: (A) -> FxOf<B>): Fx<B> =
     fix().flatMap { f(it) }
@@ -93,13 +93,13 @@ interface Fx2Monad : Monad<ForFx>, Fx2Applicative {
 }
 
 @extension
-interface Fx2MonadError : MonadError<ForFx, Throwable>, Fx2ApplicativeError, Fx2Monad
+interface FxMonadError : MonadError<ForFx, Throwable>, FxApplicativeError, FxMonad
 
 @extension
-interface Fx2MonadThrow : MonadThrow<ForFx>, Fx2MonadError
+interface FxMonadThrow : MonadThrow<ForFx>, FxMonadError
 
 @extension
-interface Fx2Bracket : Bracket<ForFx, Throwable>, Fx2MonadThrow {
+interface FxBracket : Bracket<ForFx, Throwable>, FxMonadThrow {
   override fun <A, B> FxOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> FxOf<Unit>, use: (A) -> FxOf<B>): Fx<B> =
     bracketC(release, use)
 
@@ -108,13 +108,13 @@ interface Fx2Bracket : Bracket<ForFx, Throwable>, Fx2MonadThrow {
 }
 
 @extension
-interface Fx2MonadDefer : MonadDefer<ForFx>, Fx2Bracket {
+interface FxMonadDefer : MonadDefer<ForFx>, FxBracket {
   override fun <A> defer(fa: () -> FxOf<A>): Fx<A> =
     Fx.unit.flatMap { fa() }
 }
 
 @extension
-interface Fx2Async : Async<ForFx>, Fx2MonadDefer {
+interface FxAsync : Async<ForFx>, FxMonadDefer {
 
   override fun <A> async(fa: Proc<A>): Fx<A> =
     Fx.async { _, cb -> fa(cb) }
@@ -128,7 +128,7 @@ interface Fx2Async : Async<ForFx>, Fx2MonadDefer {
 }
 
 @extension
-interface Fx2Concurrent : Concurrent<ForFx>, Fx2Async {
+interface FxConcurrent : Concurrent<ForFx>, FxAsync {
 
   override fun dispatchers(): Dispatchers<ForFx> =
     Fx.dispatchers()
@@ -156,23 +156,6 @@ interface Fx2Concurrent : Concurrent<ForFx>, Fx2Async {
 }
 
 @extension
-interface Fx2Fx : arrow.effects.typeclasses.suspended.concurrent.Fx<ForFx> {
-  override fun concurrent(): Concurrent<ForFx> =
-    object : Fx2Concurrent {}
-}
-
-@Suppress("FunctionName")
-internal fun <A> FxFiber(promise: UnsafePromise<A>, conn: FxConnection): Fiber<ForFx, A> {
-  val join: Fx<A> = Fx.async { conn2, cb ->
-    val cb2: (Either<Throwable, A>) -> Unit = {
-      cb(it)
-      conn2.pop()
-      conn.pop()
-    }
-
-    conn2.push(Fx { promise.remove(cb2) })
-    conn.push(conn2.cancel())
-    promise.get(cb2)
-  }
-  return Fiber(join, conn.cancel())
+interface FxFx : arrow.effects.typeclasses.suspended.concurrent.Fx<ForFx> {
+  override fun concurrent(): Concurrent<ForFx> = object : FxConcurrent {}
 }
