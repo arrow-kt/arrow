@@ -350,6 +350,13 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
     else -> ContinueOn(this, ctx)
   }
 
+  /**
+   * [fork] runs this [Fx] value concurrently in a [Fiber] within a safe [Fx] environment.
+   * A [Fiber] is a function pair that you can use to [Fiber.join] or [Fiber.cancel] a concurrently running [Fx].
+   *
+   * @see Fx.Companion.racePair for another combinator using [Fiber]
+   * @see Concurrent a tagless version of this operators derived and build from [fork].
+   */
   fun fork(ctx: CoroutineContext): Fx<Fiber<ForFx, A>> = Fx.async { oldConn, cb ->
     val promise = UnsafePromise<A>()
     val conn = FxConnection()

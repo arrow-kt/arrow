@@ -2,6 +2,7 @@ package arrow.effects
 
 import arrow.core.*
 import arrow.effects.extensions.fx.async.async
+import arrow.effects.extensions.fx.concurrent.concurrent
 import arrow.effects.extensions.fx.fx.fx
 import arrow.effects.extensions.fx.monad.flatMap
 import arrow.effects.extensions.fx.unsafeRun.runBlocking
@@ -12,6 +13,7 @@ import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.laws.AsyncLaws
+import arrow.test.laws.ConcurrentLaws
 import arrow.typeclasses.Eq
 import arrow.unsafe
 import io.kotlintest.fail
@@ -32,7 +34,7 @@ import kotlin.coroutines.EmptyCoroutineContext
 class FxTest : UnitSpec() {
 
   init {
-    testLaws(AsyncLaws.laws(Fx.async(), FX_EQ(), FX_EQ()))
+    testLaws(ConcurrentLaws.laws(Fx.concurrent(), FX_EQ(), FX_EQ(), FX_EQ()))
 
     class MyException : Exception() {
       override fun fillInStackTrace(): Throwable = this
@@ -467,7 +469,6 @@ fun <A> FX_EQ(): Eq<FxOf<A>> = Eq { a, b ->
           } catch (err: Throwable) {
             err
           }
-          println("Found errors: $errA and $errB")
           errA == errB
         }
       }
