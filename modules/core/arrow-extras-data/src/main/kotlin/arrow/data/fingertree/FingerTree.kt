@@ -20,7 +20,7 @@ class FingerTree<T> internal constructor(internal: FingerTreeInternal<T> = Finge
     Option.just(it.a)
   }
 
-  fun tail(): Option<FingerTree<T>> = this.fingerTreeInternal.viewR().flatMap {
+  fun tail(): Option<FingerTree<T>> = this.fingerTreeInternal.viewL().flatMap {
     this.fingerTreeInternal = it.b
     Option.just(FingerTree(it.b))
   }
