@@ -11,13 +11,13 @@ fun <A> Gen.Companion.fx(genA: Gen<A>): Gen<Fx<A>> = Gen.oneOf(
   genA.map(Fx.Companion::just), //Just
   genA.map { Fx { it } }, //Invoke
   Gen.throwable().map(Fx.Companion::raiseError), //RaiseError
-  Gen.either(Gen.throwable(), genA).map { Fx.async<A> { cb -> cb(it) } }, //Fx.Async
-  Gen.either(Gen.throwable(), genA).map { Fx.asyncF<A> { cb -> Fx { cb(it) } } }, //Fx.AsyncF
+  Gen.either(Gen.throwable(), genA).map { Fx.async<A> { _, cb -> cb(it) } }, //Fx.Async
+  Gen.either(Gen.throwable(), genA).map { Fx.asyncF<A> { _, cb -> Fx { cb(it) } } }, //Fx.AsyncF
   fx(genA).map { fx -> //Single cancellable Fx
     Fx.ConnectionSwitch(fx, Fx.ConnectionSwitch.makeCancelable, Fx.ConnectionSwitch.revertToOld)
   },
   Gen.either(Gen.throwable(), fx(genA)).map { //NestedAsync
-    Fx.async<Fx<A>> { cb -> cb(it) }.flatMap { x -> x }
+    Fx.async<Fx<A>> { _, cb -> cb(it) }.flatMap { x -> x }
   },
   genA.map { Fx { it }.flatMap { Fx.just(it) } }, //BindSuspend
   Gen.bind(fx(genA), Gen.functionAToB<A, Fx<A>>(fx(genA))) { fx, f -> fx.flatMap(f) }, //FlatMapOne

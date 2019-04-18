@@ -115,10 +115,10 @@ interface Fx2MonadDefer : MonadDefer<ForFx>, Fx2Bracket {
 interface Fx2Async : Async<ForFx>, Fx2MonadDefer {
 
   override fun <A> async(fa: Proc<A>): Fx<A> =
-    Fx.async(fa)
+    Fx.async { _, cb -> fa(cb) }
 
   override fun <A> asyncF(k: ProcF<ForFx, A>): Fx<A> =
-    Fx.asyncF(k)
+    Fx.asyncF { _, cb -> k(cb) }
 
   override fun <A> FxOf<A>.continueOn(ctx: CoroutineContext): Fx<A> =
     fix().continueOn(ctx)
@@ -135,7 +135,7 @@ interface Fx2Concurrent : Concurrent<ForFx>, Fx2Async {
     Fx.async(fa)
 
   override fun <A> asyncF(fa: FxProcF<A>): Fx<A> =
-    Fx.asyncF(fa)
+    Fx.asyncF(fa = fa)
 
   override fun <A> CoroutineContext.fork(fa: FxOf<A>): Fx<Fiber<ForFx, A>> =
     fa.fix().fork(this)
@@ -147,10 +147,10 @@ interface Fx2Concurrent : Concurrent<ForFx>, Fx2Async {
     Fx.raceTriple(this@raceTriple, fa, fb, fc)
 
   override fun <A> asyncF(k: ProcF<ForFx, A>): Fx<A> =
-    Fx.asyncF(k)
+    Fx.asyncF { _, cb -> k(cb) }
 
   override fun <A> async(fa: Proc<A>): Fx<A> =
-    Fx.async(fa)
+    Fx.async { _, cb -> fa(cb) }
 }
 
 @extension

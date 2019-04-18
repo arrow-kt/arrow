@@ -7,7 +7,6 @@ import arrow.effects.*
 import arrow.effects.IORunLoop.startCancelable
 import arrow.effects.internal.Platform
 import arrow.effects.suspended.fx.FxRunLoop.startCancelable
-import arrow.effects.typeclasses.suspendMapUnit
 import kotlin.coroutines.*
 import kotlin.coroutines.Continuation
 
@@ -93,13 +92,27 @@ internal object FxRunLoop {
             }
           }
         }
-        ContinueOnTag -> {
-          val localCurrent = (source as Fx.ContinueOn<Any?>)
-          val nextCC = ctx + localCurrent.ctx
-          val next = localCurrent.source
+        ModifyContextTag -> {
+          source as Fx.UpdateContext<Any?>
 
-          source = Fx.FlatMap(next, { a ->    //ContinueOn is the current op followed by an async jump that updates the context.
-            Fx.Async<Any?>(nextCC) { _, cb ->
+          val modify = source.modify
+          val next = source.source
+
+          source = Fx.FlatMap(next, { a ->
+            //UpdateContext is the current op followed by an async jump that updates the context.
+            Fx.Async<Any?>(updateContext = modify) { _, cb ->
+              cb(Right(a))
+            }
+          }, 0)
+        }
+        ContinueOnTag -> {
+          source as Fx.ContinueOn<Any?>
+
+          val nextCC = source.ctx
+          val next = source.source
+
+          source = Fx.FlatMap(next, { a ->
+            Fx.Async<Any?>(ctx = nextCC) { _, cb ->
               cb(Right(a))
             }
           }, 0)
@@ -139,8 +152,8 @@ internal object FxRunLoop {
           if (asyncBoundary == null) {
             asyncBoundary = AsyncBoundary(conn, cb)
           }
-          // Return case for Async operations
-          asyncBoundary.start(source as Fx.Async<Any?>, ctx + source.ctx, bFirst, bRest)
+
+          asyncBoundary.start(source as Fx.Async<Any?>, source.ctx ?: ctx, bFirst, bRest)
           return
         }
         ConnectionSwitchTag -> {
@@ -270,7 +283,7 @@ internal object FxRunLoop {
    *
    * This instance is shared across a single [startCancelable] or [start] invocation to avoid an allocation / async boundary.
    *
-   * The required capabilities are achieved by the help of 3 [Fx] cases, [Fx.Async], [Fx.ContinueOn], [Fx.Single].
+   * The required capabilities are achieved by the help of 3 [Fx] cases, [Fx.Async], [Fx.UpdateContext], [Fx.Single].
    * They all have their respective [start] method.
    *
    * **IMPORTANT** this mechanism is essential to [Fx] and its [FxRunLoop] because this allows us to go from `suspend () -> A` to `A`.
@@ -309,7 +322,7 @@ internal object FxRunLoop {
 
     fun start(fx: Fx.Async<Any?>, ctx: CoroutineContext, bFirst: ((Any?) -> Fx<Any?>)?, bRest: (Platform.ArrayStack<(Any?) -> Fx<Any?>>)?): Unit {
       contIndex++
-      _context = ctx
+      _context = fx.updateContext?.invoke(ctx) ?: ctx
       canCall = true
       this.bFirst = bFirst
       this.bRest = bRest
@@ -327,20 +340,6 @@ internal object FxRunLoop {
 
       //Run `suspend () -> A` with `AsyncBoundary` as `Continuation`
       fx.source.startCoroutine(this)
-    }
-
-    fun start(fx: Fx.ContinueOn<Any?>, ctx: CoroutineContext, bFirst: ((Any?) -> Fx<Any?>)?, bRest: (Platform.ArrayStack<(Any?) -> Fx<Any?>>)?): Unit {
-      contIndex = 0
-      canCall = true
-      this.bFirst = bFirst
-      this.bRest = bRest
-      result = fx.source as Fx<Any?>
-      jumpingContext = true
-
-      // Store the modified `CoroutineContext` and run it.
-      // This will result in the correct state in a following suspend function. See `FxTest`.
-      _context = ctx + fx.ctx
-      suspendMapUnit.startCoroutine(this)
     }
 
     //NASTY TRICK!!!! Overwrite getter to var mutable backing field.

@@ -87,6 +87,14 @@ class FxTest : UnitSpec() {
       })
     }
 
+    "ContinueOn should switch threads" {
+      Fx.unsafeRunBlocking(
+        Fx.unit
+          .continueOn(newSingleThreadContext("test"))
+          .flatMap { Fx { Thread.currentThread().name shouldBe "test" } }
+      )
+    }
+
     "CoroutineContext state should be correctly managed between boundaries" {
       val ctxA = TestContext()
       val ctxB = CoroutineName("ctxB")
@@ -95,7 +103,43 @@ class FxTest : UnitSpec() {
         .continueOn(ctxA)
         .flatMap { Fx { kotlin.coroutines.coroutineContext shouldBe ctxA } }
         .continueOn(ctxB)
-        .flatMap { Fx { kotlin.coroutines.coroutineContext shouldBe (ctxA + ctxB) } })
+        .flatMap { Fx { kotlin.coroutines.coroutineContext shouldBe ctxB } })
+    }
+
+    "updateContext can update and overwrite context" {
+      val ctxA = TestContext()
+      val ctxB = CoroutineName("ctxB")
+
+      Fx.unsafeRunBlocking(Fx { kotlin.coroutines.coroutineContext shouldBe EmptyCoroutineContext }
+        .updateContext { ctxA }
+        .flatMap { Fx { kotlin.coroutines.coroutineContext shouldBe ctxA } }
+        .updateContext { it + ctxB }
+        .flatMap { Fx { kotlin.coroutines.coroutineContext shouldBe (ctxA + ctxB) } }
+      )
+    }
+
+    "fx will not pass context state across not/bind" {
+      val program = fx {
+        val ctx = !effect { kotlin.coroutines.coroutineContext }
+        !effect { ctx shouldBe EmptyCoroutineContext }
+        continueOn(CoroutineName("Simon")) //this is immediately lost and useless.
+        val ctx2 = !effect { kotlin.coroutines.coroutineContext }
+        !effect { ctx2 shouldBe EmptyCoroutineContext }
+      }
+
+      Fx.unsafeRunBlocking(program)
+    }
+
+    "fx will respect thread switching across not/bind" {
+      val program = fx {
+        continueOn(newSingleThreadContext("start"))
+        val initialThread = !effect { Thread.currentThread().name }
+        !(0..130).map { i -> suspend { i } }.sequence()
+        val continuedThread = !effect { Thread.currentThread().name }
+        continuedThread shouldBe initialThread
+      }
+
+      Fx.unsafeRunBlocking(program)
     }
 
     "unsafeRunNonBlocking should return a pure value" {
@@ -391,18 +435,6 @@ class FxTest : UnitSpec() {
         ) { }
 
         latch.get()
-      }
-
-      Fx.unsafeRunBlocking(program)
-    }
-
-    "fx should stay within same context" {
-      val program = fx {
-        continueOn(newSingleThreadContext("start"))
-        val initialThread = !effect { Thread.currentThread().name }
-        !(0..130).map { i -> suspend { i } }.sequence()
-        val continuedThread = !effect { Thread.currentThread().name }
-        continuedThread shouldBe initialThread
       }
 
       Fx.unsafeRunBlocking(program)

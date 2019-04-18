@@ -7,9 +7,7 @@ import arrow.effects.*
 import arrow.effects.internal.Platform
 import arrow.effects.internal.UnsafePromise
 import arrow.effects.typeclasses.*
-import arrow.typeclasses.Continuation
 import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.*
 
 class ForFx private constructor() {
@@ -33,7 +31,8 @@ const val MapTag = 3
 const val FlatMapTag = 4
 const val ConnectionSwitchTag = 5
 const val AsyncTag = 6
-const val ContinueOnTag = 7
+const val ModifyContextTag = 7
+const val ContinueOnTag = 9
 
 object Impossible : RuntimeException("Fx bug, please contact support! https://arrow-kt.io") {
   override fun fillInStackTrace(): Throwable = this
@@ -60,6 +59,7 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
           this as Fx.FlatMap<A, *>
           suspend { !fb(!source) } as (suspend () -> A)
         }
+        ModifyContextTag -> suspend { FxRunLoop(this) }
         ContinueOnTag -> suspend { FxRunLoop(this) }
         ConnectionSwitchTag -> suspend { FxRunLoop(this) }
         else -> throw Impossible
@@ -90,8 +90,9 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
       }
       SingleTag -> Map(this, f)
       ConnectionSwitchTag -> Map(this, f)
-      ContinueOnTag -> Map(this, f)
+      ModifyContextTag -> Map(this, f)
       AsyncTag -> Map(this, f)
+      ContinueOnTag -> Map(this, f)
       MapTag -> {
         this as Fx.Map<Any?, Any?>
         val ff = f as (Any?) -> Any?
@@ -118,8 +119,9 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
       MapTag -> FxRunLoop(this)
       FlatMapTag -> FxRunLoop(this)
       ConnectionSwitchTag -> FxRunLoop(this)
-      ContinueOnTag -> FxRunLoop(this)
+      ModifyContextTag -> FxRunLoop(this)
       AsyncTag -> FxRunLoop(this)
+      ContinueOnTag -> FxRunLoop(this)
       else -> throw Impossible
     }
 
@@ -135,8 +137,9 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
       }
       SingleTag -> FlatMap(this, f, 0)
       ConnectionSwitchTag -> FlatMap(this, f, 0)
-      ContinueOnTag -> FlatMap(this, f, 0)
+      ModifyContextTag -> FlatMap(this, f, 0)
       AsyncTag -> FlatMap(this, f, 0)
+      ContinueOnTag -> FlatMap(this, f, 0)
       MapTag -> {
         this as Fx.Map<B, A>
         //We can do fusion between an map-flatMap boundary
@@ -147,7 +150,7 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
         if (index != Platform.maxStackDepthSize) FlatMap(this, f, 0)
         else FlatMap(source, { a ->
           Single {
-            val b = !fb(a)
+            val b = !fb(a) //Don't we lose the runloop state here?
             !f(b)
           }
         }, index + 1)
@@ -194,11 +197,19 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
   }
 
   @PublishedApi
+  internal class UpdateContext<A>(
+    @JvmField var source: FxOf<A>,
+    @JvmField var modify: (CoroutineContext) -> CoroutineContext
+  ) : Fx<A>(ModifyContextTag) {
+    override fun toString(): String = "Fx.UpdateContext(...)"
+  }
+
+  @PublishedApi
   internal class ContinueOn<A>(
     @JvmField var source: FxOf<A>,
     @JvmField var ctx: CoroutineContext
   ) : Fx<A>(ContinueOnTag) {
-    override fun toString(): String = "Fx.ContinueOn(..., ctx = $ctx)"
+    override fun toString(): String = "Fx.ContinueOn(...)"
   }
 
   /**
@@ -237,12 +248,14 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
   }
 
   @PublishedApi
-  internal class Async<A> private constructor(val ctx: CoroutineContext = EmptyCoroutineContext, val proc: FxProc<A>) : Fx<A>(AsyncTag) {
+  internal class Async<A> internal constructor(val ctx: CoroutineContext? = null,
+                                               val updateContext: ((CoroutineContext) -> CoroutineContext)? = null,
+                                               val proc: FxProc<A>) : Fx<A>(AsyncTag) {
 
     companion object {
 
       @JvmStatic
-      operator fun <A> invoke(ctx: CoroutineContext = EmptyCoroutineContext, proc: FxProc<A>): Fx<A> = Async(ctx) { conn: FxConnection, ff: (Either<Throwable, A>) -> Unit ->
+      operator fun <A> invoke(proc: FxProc<A>): Fx<A> = Async { conn: FxConnection, ff: (Either<Throwable, A>) -> Unit ->
         Platform.onceOnly(ff).let { callback: (Either<Throwable, A>) -> Unit ->
           try {
             proc(conn, callback)
@@ -325,6 +338,12 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
   fun <B> bracketCase(release: (A, ExitCase<Throwable>) -> FxOf<Unit>, use: (A) -> FxOf<B>): Fx<B> =
     FxBracket(this, release, use)
 
+  fun updateContext(f: (CoroutineContext) -> CoroutineContext): Fx<A> =
+    UpdateContext(this, f)
+
+  /**
+   *
+   */
   fun continueOn(ctx: CoroutineContext): Fx<A> = when (tag) {
     ContinueOnTag -> (this as Fx.ContinueOn<A>).apply {
       this.ctx = ctx
@@ -360,7 +379,7 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
 
     @JvmStatic
     operator fun <A> invoke(ctx: CoroutineContext, f: () -> A): Fx<A> =
-      Map(ContinueOn(unit, ctx)) { f() }
+      Map(UpdateContext(unit) { ctx }) { f() }
 
     @JvmStatic
     fun <A> just(a: A): Fx<A> = Pure(a, 0)
@@ -372,7 +391,7 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
     val lazy: Fx<Unit> = Single(suspendMapUnit)
 
     @JvmStatic
-    val never: Fx<Nothing> = Fx.async(mapUnit)
+    val never: Fx<Nothing> = async { _, _ -> Unit }
 
     @JvmStatic
     fun <A> eval(eval: Eval<A>): Fx<A> = when (eval) {
@@ -393,17 +412,8 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
         result.fold({ tailRecM(it, f) }, { just(it) })
       }, 0)
 
-    /** Hide member because it's discouraged to use uncancelable builder for cancelable concrete type **/
     @JvmStatic
-    fun <A> async(fa: Proc<A>): Fx<A> = async { _, cb -> fa(cb) }
-
-    @JvmStatic
-    fun <A> async(fa: FxProc<A>): Fx<A> = Async(proc = fa)
-
-
-    /** Hide member because it's discouraged to use uncancelable builder for cancelable concrete type **/
-    @JvmStatic
-    fun <A> asyncF(fa: ProcF<ForFx, A>): Fx<A> = asyncF { _, cb -> fa(cb) }
+    fun <A> async(fa: FxProc<A>): Fx<A> = Async(fa)
 
     @JvmStatic
     fun <A> asyncF(fa: FxProcF<A>): Fx<A> = Async.invokeF(fa)
