@@ -2,11 +2,13 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.core.*
+import arrow.effects.extensions.NonBlocking
 import arrow.effects.extensions.fx.fx.fx
 import arrow.effects.extensions.fx.unsafeRun.runBlocking
 import arrow.effects.extensions.fx.unsafeRun.unsafeRun
 import arrow.effects.suspended.fx.Fx
 import arrow.effects.suspended.fx.FxOf
+import arrow.effects.suspended.fx.fix
 import arrow.effects.typeclasses.UnsafeRun
 import arrow.test.UnitSpec
 import arrow.unsafe
@@ -71,6 +73,17 @@ class EffectsSuspendDSLTests : UnitSpec() {
         }
       }
       unsafe { runBlocking { program } }
+    }
+
+    "Fx startfiber does not hang forever" {
+      val size = 100
+      fun fxStartLoop(i: Int): Fx<Int> =
+        if (i < size) {
+          Fx { i + 1 }.fork(NonBlocking).flatMap {
+            it.join().fix().flatMap(::fxStartLoop)
+          }
+        } else Fx.just(i)
+      Fx.unsafeRunBlocking(fxStartLoop(0)) shouldBe size
     }
 
     "Direct syntax for concurrent operations" {
