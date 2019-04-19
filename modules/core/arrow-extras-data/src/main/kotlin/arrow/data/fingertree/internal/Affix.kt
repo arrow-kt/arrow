@@ -23,6 +23,30 @@ internal sealed class Affix<A> {
     is Four -> FingerTreeInternal.Deep(Three(this.a, this.b, this.c), FingerTreeInternal.Empty(), One(this.d))
   }
 
+  fun head(): A =
+    when (this) {
+      is One -> this.a
+      is Two -> this.a
+      is Three -> this.a
+      is Four -> this.a
+    }
+
+  fun dropHead(): Affix<A> =
+    when (this) {
+      is One -> throw RuntimeException("Cannot drop head")
+      is Two -> One(this.b)
+      is Three -> Two(this.b, this.c)
+      is Four -> Three(this.b, this.c, this.d)
+    }
+
+  fun dropLast(): Affix<A> =
+    when (this) {
+      is One -> throw RuntimeException("Cannot drop head")
+      is Two -> One(this.a)
+      is Three -> Two(this.a, this.b)
+      is Four -> Three(this.a, this.b, this.c)
+    }
+
   companion object {
     fun <B> fromList(xs: List<B>): Affix<B> = when (xs.size) {
       1 -> One(xs[0])

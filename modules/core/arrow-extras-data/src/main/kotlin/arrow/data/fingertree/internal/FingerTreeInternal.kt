@@ -66,8 +66,8 @@ internal sealed class FingerTreeInternal<T> {
       }
 
       else -> Option.just(
-        Tuple2(this.prefix.toList()[0],
-          Deep(Affix.fromList(this.prefix.toList().drop(1)), this.deeper, this.suffix)
+        Tuple2(this.prefix.head(),
+          Deep(this.prefix.dropHead(), this.deeper, this.suffix)
         ))
     }
 
@@ -88,7 +88,7 @@ internal sealed class FingerTreeInternal<T> {
 
         else -> Option.just(
           Tuple2(this.suffix.toList().last(),
-            Deep(this.prefix, this.deeper, Affix.fromList(this.suffix.toList().dropLast(1)))
+            Deep(this.prefix, this.deeper, this.suffix.dropLast())
           ))
       }
     }
