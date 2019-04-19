@@ -6,22 +6,36 @@ internal sealed class Affix<A> {
   data class Three<A>(val a: A, val b: A, val c: A) : Affix<A>()
   data class Four<A>(val a: A, val b: A, val c: A, val d: A) : Affix<A>()
 
-  fun append(item: A): Affix<A> = fromList(this.toList() + listOf(item))
-  fun prepend(item: A): Affix<A> = fromList(listOf(item) + this.toList())
+  fun append(item: A): Affix<A> =
+    when (this) {
+      is One -> Two(item, this.a)
+      is Two -> Three(item, this.a, this.b)
+      is Three -> Four(item, this.a, this.b, this.c)
+      is Four -> throw RuntimeException("Cannot append to affix four")
+    }
 
-  fun toList(): List<A> = when (this) {
+  fun prepend(item: A): Affix<A> =
+    when (this) {
+      is One -> Two(this.a, item)
+      is Two -> Three(this.a, this.b, item)
+      is Three -> Four(this.a, this.b, this.c, item)
+      is Four -> throw RuntimeException("Cannot append to affix four")
+    }
+
+  fun toArray(): List<A> = when (this) {
     is One -> listOf(this.a)
     is Two -> listOf(this.a, this.b)
     is Three -> listOf(this.a, this.b, this.c)
     is Four -> listOf(this.a, this.b, this.c, this.d)
   }
 
-  fun toFingerTree(): FingerTreeInternal<A> = when (this) {
-    is One -> FingerTreeInternal.Single(this.a)
-    is Two -> FingerTreeInternal.Deep(One(this.a), FingerTreeInternal.Empty(), One(this.b))
-    is Three -> FingerTreeInternal.Deep(Two(this.a, this.b), FingerTreeInternal.Empty(), One(this.c))
-    is Four -> FingerTreeInternal.Deep(Three(this.a, this.b, this.c), FingerTreeInternal.Empty(), One(this.d))
-  }
+  fun toFingerTree(): FingerTreeInternal<A> =
+    when (this) {
+      is One -> FingerTreeInternal.Single(this.a)
+      is Two -> FingerTreeInternal.Deep(One(this.a), FingerTreeInternal.Empty(), One(this.b))
+      is Three -> FingerTreeInternal.Deep(Two(this.a, this.b), FingerTreeInternal.Empty(), One(this.c))
+      is Four -> FingerTreeInternal.Deep(Three(this.a, this.b, this.c), FingerTreeInternal.Empty(), One(this.d))
+    }
 
   fun head(): A =
     when (this) {
@@ -29,6 +43,14 @@ internal sealed class Affix<A> {
       is Two -> this.a
       is Three -> this.a
       is Four -> this.a
+    }
+
+  fun last(): A =
+    when (this) {
+      is One -> this.a
+      is Two -> this.b
+      is Three -> this.c
+      is Four -> this.d
     }
 
   fun dropHead(): Affix<A> =

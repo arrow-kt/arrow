@@ -87,7 +87,7 @@ internal sealed class FingerTreeInternal<T> {
         }
 
         else -> Option.just(
-          Tuple2(this.suffix.toList().last(),
+          Tuple2(this.suffix.last(),
             Deep(this.prefix, this.deeper, this.suffix.dropLast())
           ))
       }
