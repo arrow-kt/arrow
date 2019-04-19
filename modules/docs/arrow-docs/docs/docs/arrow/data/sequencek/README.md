@@ -45,7 +45,7 @@ fibonacci.map { it * 2 }.takeWhile { it < 10 }.toList()
 Applying a sequence of functions to a sequence:
 ```kotlin:ank
 import arrow.data.extensions.*
-import arrow.data.extensions.sequence.applicative.ap
+import arrow.data.extensions.sequence.apply.ap
 
 sequenceOf(1, 2, 3)
  .ap(sequenceOf({ x: Int -> x + 1}, { x: Int -> x * 2}))

@@ -23,7 +23,6 @@ import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
-import arrow.typeclasses.fix
 import arrow.undocumented
 import arrow.data.traverse as validatedTraverse
 

@@ -157,7 +157,7 @@ binding {
 ```
 
 ```kotlin:ank
-import arrow.core.extensions.option.applicative.map
+import arrow.core.extensions.option.apply.map
 
 map(Option(1), Option(2), Option(3)) { (one, two, three) ->
   one + two + three
@@ -182,7 +182,7 @@ binding {
 ```
 
 ```kotlin:ank:silent
-import arrow.core.extensions.`try`.applicative.map
+import arrow.core.extensions.`try`.apply.map
 
 map(Try { 1 }, Try { 2 }, Try { 3 }) { (one, two, three) ->
   one + two + three

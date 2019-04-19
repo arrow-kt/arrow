@@ -14,6 +14,7 @@ import arrow.data.fix
 import arrow.data.flatMap
 import arrow.extension
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Bifunctor
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Foldable
@@ -36,6 +37,17 @@ interface IorFunctor<L> : Functor<IorPartialOf<L>> {
 interface IorBifunctor : Bifunctor<ForIor> {
   override fun <A, B, C, D> Kind2<ForIor, A, B>.bimap(fl: (A) -> C, fr: (B) -> D): Kind2<ForIor, C, D> =
     fix().bimap(fl, fr)
+}
+
+@extension
+interface IorApply<L> : Apply<IorPartialOf<L>>, IorFunctor<L> {
+
+  fun SL(): Semigroup<L>
+
+  override fun <A, B> Kind<IorPartialOf<L>, A>.map(f: (A) -> B): Ior<L, B> = fix().map(f)
+
+  override fun <A, B> Kind<IorPartialOf<L>, A>.ap(ff: Kind<IorPartialOf<L>, (A) -> B>): Ior<L, B> =
+    fix().ap(SL(), ff)
 }
 
 @extension

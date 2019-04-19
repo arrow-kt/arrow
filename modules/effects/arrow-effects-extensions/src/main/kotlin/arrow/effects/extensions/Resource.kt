@@ -2,7 +2,6 @@ package arrow.effects.extensions
 
 import arrow.Kind
 import arrow.core.Either
-import arrow.core.Tuple2
 import arrow.effects.Resource
 import arrow.effects.ResourcePartialOf
 import arrow.effects.fix
