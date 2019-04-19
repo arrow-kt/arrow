@@ -37,8 +37,8 @@ open class ForkFiber {
   fun io(): Int =
     ioStartLoop(0).unsafeRunSync()
 
-//  @Benchmark
-//  fun fx(): Int =
-//    Fx.unsafeRunBlocking(fxStartLoop(0))
+  @Benchmark
+  fun fx(): Int =
+    Fx.unsafeRunBlocking(fxStartLoop(0))
 
 }
