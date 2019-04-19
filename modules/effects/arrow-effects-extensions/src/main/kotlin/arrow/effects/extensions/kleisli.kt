@@ -6,7 +6,12 @@ import arrow.data.KleisliOf
 import arrow.data.KleisliPartialOf
 import arrow.data.extensions.KleisliMonadError
 import arrow.data.run
-import arrow.effects.typeclasses.*
+import arrow.effects.typeclasses.Async
+import arrow.effects.typeclasses.Bracket
+import arrow.effects.typeclasses.ExitCase
+import arrow.effects.typeclasses.MonadDefer
+import arrow.effects.typeclasses.Proc
+import arrow.effects.typeclasses.ProcF
 import arrow.extension
 import arrow.typeclasses.MonadError
 import arrow.undocumented
@@ -38,7 +43,7 @@ interface KleisliBracket<F, R, E> : Bracket<KleisliPartialOf<F, R>, E>, KleisliM
     Kleisli { r -> BF().run { this@uncancelable.run(r).uncancelable() } }
 }
 
-//TODO fix stack safety issue. AsyncLaws#stack safety over repeated attempts fails.
+// TODO fix stack safety issue. AsyncLaws#stack safety over repeated attempts fails.
 internal interface KleisliMonadDefer<F, R> : MonadDefer<KleisliPartialOf<F, R>>, KleisliBracket<F, R, Throwable> {
 
   fun MDF(): MonadDefer<F>
@@ -48,7 +53,6 @@ internal interface KleisliMonadDefer<F, R> : MonadDefer<KleisliPartialOf<F, R>>,
   override fun <A> defer(fa: () -> KleisliOf<F, R, A>): Kleisli<F, R, A> = MDF().run {
     Kleisli { r -> defer { fa().run(r) } }
   }
-
 }
 
 internal interface KleisliAsync<F, R> : Async<KleisliPartialOf<F, R>>, KleisliMonadDefer<F, R> {
@@ -66,5 +70,4 @@ internal interface KleisliAsync<F, R> : Async<KleisliPartialOf<F, R>>, KleisliMo
   override fun <A> KleisliOf<F, R, A>.continueOn(ctx: CoroutineContext): Kleisli<F, R, A> = ASF().run {
     Kleisli { r -> run(r).continueOn(ctx) }
   }
-
 }

@@ -47,7 +47,5 @@ class StoreTest : UnitSpec() {
 
       store.extract() shouldBe "HI COTEL!"
     }
-
   }
-
 }

@@ -4,10 +4,25 @@ import arrow.Kind
 import arrow.Kind2
 import arrow.core.Either
 import arrow.core.Eval
-import arrow.data.*
+import arrow.data.ForIor
+import arrow.data.Ior
+import arrow.data.IorOf
+import arrow.data.IorPartialOf
 import arrow.data.extensions.ior.monad.monad
+import arrow.data.ap
+import arrow.data.fix
+import arrow.data.flatMap
 import arrow.extension
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Bifunctor
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Hash
+import arrow.typeclasses.Monad
+import arrow.typeclasses.Semigroup
+import arrow.typeclasses.Show
+import arrow.typeclasses.Traverse
 import arrow.typeclasses.suspended.monad.Fx
 import arrow.undocumented
 
@@ -51,7 +66,6 @@ interface IorMonad<L> : Monad<IorPartialOf<L>>, IorApplicative<L> {
 
   override fun <A, B> tailRecM(a: A, f: (A) -> IorOf<L, Either<A, B>>): Ior<L, B> =
     Ior.tailRecM(a, f, SL())
-
 }
 
 @extension
@@ -61,7 +75,6 @@ interface IorFoldable<L> : Foldable<IorPartialOf<L>> {
 
   override fun <B, C> Kind<IorPartialOf<L>, B>.foldRight(lb: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> =
     fix().foldRight(lb, f)
-
 }
 
 @extension
@@ -69,7 +82,6 @@ interface IorTraverse<L> : Traverse<IorPartialOf<L>>, IorFoldable<L> {
 
   override fun <G, B, C> IorOf<L, B>.traverse(AP: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, Ior<L, C>> =
     fix().traverse(AP, f)
-
 }
 
 @extension
@@ -95,7 +107,6 @@ interface IorEq<L, R> : Eq<Ior<L, R>> {
       is Ior.Both -> false
       is Ior.Right -> EQR().run { value.eqv(b.value) }
     }
-
   }
 }
 
@@ -129,5 +140,4 @@ interface IorFx<A> : Fx<IorPartialOf<A>> {
 
   override fun monad(): Monad<IorPartialOf<A>> =
     Ior.monad(SL())
-
 }

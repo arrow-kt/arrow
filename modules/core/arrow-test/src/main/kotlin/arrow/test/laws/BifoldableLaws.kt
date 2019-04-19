@@ -3,7 +3,8 @@ package arrow.test.laws
 import arrow.Kind2
 import arrow.core.Eval
 import arrow.core.extensions.monoid
-import arrow.test.generators.*
+import arrow.test.generators.functionAToB
+import arrow.test.generators.intSmall
 import arrow.typeclasses.Bifoldable
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen

@@ -20,7 +20,6 @@ data class Duration(val amount: Long, val timeUnit: TimeUnit) {
       else -> d + this // Swap this and d to add to the smaller unit
     }
   }
-
 }
 
 operator fun Int.times(d: Duration) = d * this

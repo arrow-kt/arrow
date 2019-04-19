@@ -1,14 +1,20 @@
 package arrow.free
 
-import arrow.core.*
+import arrow.core.ForId
+import arrow.core.ForOption
+import arrow.core.Id
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.identity
 import arrow.free.extensions.coyoneda.functor.functor
 import arrow.core.extensions.id.functor.functor
 import arrow.core.extensions.option.functor.functor
+import arrow.core.fix
 import arrow.test.UnitSpec
 import arrow.test.laws.FunctorLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.properties.forAll
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
 
@@ -20,7 +26,7 @@ class CoyonedaTest : UnitSpec() {
 
   init {
 
-      testLaws(FunctorLaws.laws(Coyoneda.functor(), { _ -> Coyoneda(Id(0)) { it } }, EQ))
+    testLaws(FunctorLaws.laws(Coyoneda.functor(), { _ -> Coyoneda(Id(0)) { it } }, EQ))
 
     "map should be stack-safe" {
       val loops = 10000

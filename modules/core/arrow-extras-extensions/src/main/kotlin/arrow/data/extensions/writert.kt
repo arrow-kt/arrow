@@ -1,13 +1,33 @@
 package arrow.data.extensions
 
 import arrow.Kind
-import arrow.core.*
-import arrow.data.*
+import arrow.core.Either
+import arrow.core.Tuple2
+import arrow.core.left
+import arrow.core.right
+import arrow.core.toT
+import arrow.data.WriterT
+import arrow.data.WriterTOf
+import arrow.data.WriterTPartialOf
 import arrow.data.extensions.statet.monad.monad
 import arrow.data.extensions.writert.monad.monad
-
+import arrow.data.fix
+import arrow.data.value
 import arrow.extension
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Contravariant
+import arrow.typeclasses.Decidable
+import arrow.typeclasses.Divide
+import arrow.typeclasses.Divisible
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadError
+import arrow.typeclasses.MonadThrow
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.MonoidK
+import arrow.typeclasses.SemigroupK
+import arrow.typeclasses.fix
 import arrow.typeclasses.suspended.monad.Fx
 import arrow.undocumented
 
@@ -78,7 +98,6 @@ interface WriterTApplicativeError<F, W, E> : ApplicativeError<WriterTPartialOf<F
   override fun <A> WriterTOf<F, W, A>.handleErrorWith(f: (E) -> WriterTOf<F, W, A>): WriterT<F, W, A> = AE().run {
     WriterT(value().handleErrorWith { e -> f(e).value() })
   }
-
 }
 
 @extension
@@ -94,7 +113,6 @@ interface WriterTMonadError<F, W, E> : MonadError<WriterTPartialOf<F, W>, E>, Wr
   override fun AF(): Applicative<F> = ME()
 
   override fun AE(): ApplicativeError<F, E> = ME()
-
 }
 
 @extension
@@ -185,11 +203,10 @@ interface WriterTDecidableInstance<F, W> : Decidable<WriterTPartialOf<F, W>>, Wr
 @undocumented
 interface WriterTFx<F, W> : Fx<WriterTPartialOf<F, W>> {
 
-  fun M() : Monad<F>
+  fun M(): Monad<F>
 
   fun MW(): Monoid<W>
 
   override fun monad(): Monad<WriterTPartialOf<F, W>> =
     WriterT.monad(M(), MW())
-
 }

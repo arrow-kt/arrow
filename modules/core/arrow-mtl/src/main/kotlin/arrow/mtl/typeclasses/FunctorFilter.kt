@@ -1,7 +1,12 @@
 package arrow.mtl.typeclasses
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.PartialFunction
+import arrow.core.Some
+import arrow.core.identity
+import arrow.core.lift
 import arrow.typeclasses.Functor
 
 /**
@@ -34,5 +39,4 @@ interface FunctorFilter<F> : Functor<F> {
    */
   fun <A> Kind<F, A>.filter(f: (A) -> Boolean): Kind<F, A> =
     mapFilter { a -> if (f(a)) Some(a) else None }
-
 }

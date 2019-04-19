@@ -4,7 +4,14 @@ import arrow.Kind
 import arrow.core.Option
 import arrow.mtl.typeclasses.FunctorFilter
 import arrow.mtl.typeclasses.TraverseFilter
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.ComposedFunctor
+import arrow.typeclasses.ComposedTraverse
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Nested
+import arrow.typeclasses.Traverse
+import arrow.typeclasses.nest
+import arrow.typeclasses.unnest
 
 interface ComposedFunctorFilter<F, G> : FunctorFilter<Nested<F, G>>, ComposedFunctor<F, G> {
 
@@ -49,7 +56,8 @@ interface ComposedTraverseFilter<F, G> :
     operator fun <F, G> invoke(
       FF: Traverse<F>,
       GF: TraverseFilter<G>,
-      GA: Applicative<G>): ComposedTraverseFilter<F, G> =
+      GA: Applicative<G>
+    ): ComposedTraverseFilter<F, G> =
       object : ComposedTraverseFilter<F, G> {
         override fun FT(): Traverse<F> = FF
 

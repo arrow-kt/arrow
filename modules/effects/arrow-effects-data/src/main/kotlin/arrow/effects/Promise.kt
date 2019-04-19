@@ -267,10 +267,7 @@ interface Promise<F, A> {
      * ```
      */
     fun <F, A> unsafeUncancelable(AS: Async<F>): Promise<F, A> = UncancelablePromise(AS)
-
   }
 
   object AlreadyFulfilled : Throwable(message = "Promise was already fulfilled")
-
 }
-

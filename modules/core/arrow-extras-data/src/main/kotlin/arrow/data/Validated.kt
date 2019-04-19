@@ -1,7 +1,16 @@
 package arrow.data
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Eval
+import arrow.core.Left
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Right
+import arrow.core.Some
+import arrow.core.Try
+import arrow.core.identity
+import arrow.core.orElse
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Semigroup
@@ -41,7 +50,6 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
         { Invalid(ifNone()) },
         { Valid(it) }
       )
-
   }
 
   data class Valid<out A>(val a: A) : Validated<Nothing, A>()
@@ -129,7 +137,7 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
  * Return the Valid value, or the default if Invalid
  */
 fun <E, B> ValidatedOf<E, B>.getOrElse(default: () -> B): B =
-    fix().fold({ default() }, ::identity)
+  fix().fold({ default() }, ::identity)
 
 /**
  * Return the Valid value, or null if Invalid
@@ -190,9 +198,11 @@ fun <G, E, A, B> ValidatedOf<E, A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G
 fun <G, E, A> ValidatedOf<E, Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, Validated<E, A>> =
   fix().traverse(GA, ::identity)
 
-fun <E, A> ValidatedOf<E, A>.combine(SE: Semigroup<E>,
-                                            SA: Semigroup<A>,
-                                            y: ValidatedOf<E, A>): Validated<E, A> =
+fun <E, A> ValidatedOf<E, A>.combine(
+  SE: Semigroup<E>,
+  SA: Semigroup<A>,
+  y: ValidatedOf<E, A>
+): Validated<E, A> =
   y.fix().let { that ->
     when {
       this is Valid && that is Valid -> Valid(SA.run { a.combine(that.a) })

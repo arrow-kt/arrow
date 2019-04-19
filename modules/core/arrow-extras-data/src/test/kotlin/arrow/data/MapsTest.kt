@@ -34,6 +34,5 @@ class MapsTest : UnitSpec() {
       val mapOfPair = mapOf("one" to 1)
       Assert.assertEquals(mapOfPair, mapOfTuple)
     }
-
   }
 }

@@ -4,11 +4,29 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Tuple2
-import arrow.data.*
+import arrow.data.ForSequenceK
+import arrow.data.SequenceK
+import arrow.data.SequenceKOf
+import arrow.data.k
 import arrow.data.extensions.sequencek.monad.map
 import arrow.data.extensions.sequencek.monad.monad
+import arrow.data.fix
 import arrow.extension
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Hash
+import arrow.typeclasses.Monad
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.MonoidK
+import arrow.typeclasses.Monoidal
+import arrow.typeclasses.Semigroup
+import arrow.typeclasses.SemigroupK
+import arrow.typeclasses.Semigroupal
+import arrow.typeclasses.Show
+import arrow.typeclasses.Traverse
+import arrow.typeclasses.fix
 import arrow.typeclasses.suspended.monad.Fx
 import arrow.data.combineK as sequenceCombineK
 
@@ -20,7 +38,7 @@ interface SequenceKSemigroup<A> : Semigroup<SequenceK<A>> {
 @extension
 interface SequenceKSemigroupal : Semigroupal<ForSequenceK> {
   override fun <A, B> Kind<ForSequenceK, A>.product(fb: Kind<ForSequenceK, B>): Kind<ForSequenceK, Tuple2<A, B>> =
-    fb.fix().ap(this.map { a: A -> { b: B -> Tuple2(a, b)} })
+    fb.fix().ap(this.map { a: A -> { b: B -> Tuple2(a, b) } })
 }
 
 @extension
@@ -44,7 +62,6 @@ interface SequenceKEq<A> : Eq<SequenceK<A>> {
     zip(b) { aa, bb -> EQ().run { aa.eqv(bb) } }.fold(true) { acc, bool ->
       acc && bool
     }
-
 }
 
 @extension
@@ -150,5 +167,4 @@ interface SequenceKFx<F> : Fx<ForSequenceK> {
 
   override fun monad(): Monad<ForSequenceK> =
     SequenceK.monad()
-
 }

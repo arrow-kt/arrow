@@ -1,6 +1,9 @@
 package arrow.effects
 
-import arrow.effects.rx2.*
+import arrow.effects.rx2.FlowableK
+import arrow.effects.rx2.FlowableKOf
+import arrow.effects.rx2.ForFlowableK
+import arrow.effects.rx2.k
 import arrow.effects.rx2.extensions.asyncDrop
 import arrow.effects.rx2.extensions.asyncError
 import arrow.effects.rx2.extensions.asyncLatest
@@ -10,6 +13,7 @@ import arrow.effects.rx2.extensions.flowablek.functor.functor
 import arrow.effects.rx2.extensions.flowablek.monad.flatMap
 import arrow.effects.rx2.extensions.flowablek.monadThrow.bindingCatch
 import arrow.effects.rx2.extensions.flowablek.traverse.traverse
+import arrow.effects.rx2.value
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
@@ -47,35 +51,34 @@ class FlowableKTests : UnitSpec() {
         }
         errA == errB
       }
-
   }
 
   init {
 
     testLaws(AsyncLaws.laws(FlowableK.async(), EQ(), EQ(), testStackSafety = false))
     // FIXME(paco) #691
-    //testLaws(AsyncLaws.laws(FlowableK.async(), EQ(), EQ()))
-    //testLaws(AsyncLaws.laws(FlowableK.async(), EQ(), EQ()))
+    // testLaws(AsyncLaws.laws(FlowableK.async(), EQ(), EQ()))
+    // testLaws(AsyncLaws.laws(FlowableK.async(), EQ(), EQ()))
 
     testLaws(AsyncLaws.laws(FlowableK.asyncDrop(), EQ(), EQ(), testStackSafety = false))
     // FIXME(paco) #691
-    //testLaws(AsyncLaws.laws(FlowableK.asyncDrop(), EQ(), EQ()))
-    //testLaws(AsyncLaws.laws(FlowableK.asyncDrop(), EQ(), EQ()))
+    // testLaws(AsyncLaws.laws(FlowableK.asyncDrop(), EQ(), EQ()))
+    // testLaws(AsyncLaws.laws(FlowableK.asyncDrop(), EQ(), EQ()))
 
     testLaws(AsyncLaws.laws(FlowableK.asyncError(), EQ(), EQ(), testStackSafety = false))
     // FIXME(paco) #691
-    //testLaws(AsyncLaws.laws(FlowableK.asyncError(), EQ(), EQ()))
-    //testLaws(AsyncLaws.laws(FlowableK.asyncError(), EQ(), EQ()))
+    // testLaws(AsyncLaws.laws(FlowableK.asyncError(), EQ(), EQ()))
+    // testLaws(AsyncLaws.laws(FlowableK.asyncError(), EQ(), EQ()))
 
     testLaws(AsyncLaws.laws(FlowableK.asyncLatest(), EQ(), EQ(), testStackSafety = false))
     // FIXME(paco) #691
-    //testLaws(AsyncLaws.laws(FlowableK.asyncLatest(), EQ(), EQ()))
-    //testLaws(AsyncLaws.laws(FlowableK.asyncLatest(), EQ(), EQ()))
+    // testLaws(AsyncLaws.laws(FlowableK.asyncLatest(), EQ(), EQ()))
+    // testLaws(AsyncLaws.laws(FlowableK.asyncLatest(), EQ(), EQ()))
 
     testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), EQ(), EQ(), testStackSafety = false))
     // FIXME(paco) #691
-    //testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), EQ(), EQ()))
-    //testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), EQ(), EQ()))
+    // testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), EQ(), EQ()))
+    // testLaws(AsyncLaws.laws(FlowableK.asyncMissing(), EQ(), EQ()))
 
     testLaws(TraverseLaws.laws(FlowableK.traverse(), FlowableK.functor(), { FlowableK.just(it) }, EQ()))
 
@@ -176,6 +179,5 @@ class FlowableKTests : UnitSpec() {
         .test()
         .assertError(ConnectionCancellationException)
     }
-
   }
 }

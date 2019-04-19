@@ -30,7 +30,7 @@ class PromiseTest : UnitSpec() {
       label: String,
       ctx: CoroutineContext = Dispatchers.Default,
       promise: IO<Promise<ForIO, Int>>
-    ): Unit {
+    ) {
 
       "$label - complete" {
         forAll(Gen.int()) { a ->
@@ -154,7 +154,5 @@ class PromiseTest : UnitSpec() {
 
     tests("CancelablePromise", promise = Promise<ForIO, Int>(IO.concurrent()).fix())
     tests("UncancelablePromise", promise = Promise.uncancelable<ForIO, Int>(IO.async()).fix())
-
   }
-
 }

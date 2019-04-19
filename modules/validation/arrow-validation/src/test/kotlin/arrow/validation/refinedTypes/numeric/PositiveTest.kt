@@ -25,6 +25,5 @@ class PositiveTest : UnitSpec() {
         x.positive(Int.order()).isInvalid
       }
     }
-
   }
 }

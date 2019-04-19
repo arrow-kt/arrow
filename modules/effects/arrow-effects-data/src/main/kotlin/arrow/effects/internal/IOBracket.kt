@@ -2,8 +2,16 @@ package arrow.effects.internal
 
 import arrow.core.Either
 import arrow.core.NonFatal
-import arrow.effects.*
+import arrow.effects.CancelToken
+import arrow.effects.ForIO
+import arrow.effects.IO
+import arrow.effects.IOConnection
+import arrow.effects.IOFrame
+import arrow.effects.IOOf
+import arrow.effects.IORunLoop
+import arrow.effects.fix
 import arrow.effects.typeclasses.ExitCase
+import arrow.effects.uncancelable
 import java.util.concurrent.atomic.AtomicBoolean
 
 internal object IOBracket {
@@ -35,14 +43,15 @@ internal object IOBracket {
     val release: (A, ExitCase<Throwable>) -> IOOf<Unit>,
     val conn: IOConnection,
     val deferredRelease: ForwardCancelable,
-    val cb: (Either<Throwable, B>) -> Unit) : (Either<Throwable, A>) -> Unit, Runnable {
+    val cb: (Either<Throwable, B>) -> Unit
+  ) : (Either<Throwable, A>) -> Unit, Runnable {
 
     // This runnable is a dirty optimization to avoid some memory allocations;
     // This class switches from being a Callback to a Runnable, but relies on the internal IO callback protocol to be
     // respected (called at most once).
     private var result: Either<Throwable, A>? = null
 
-    override fun invoke(ea: Either<Throwable, A>): Unit {
+    override fun invoke(ea: Either<Throwable, A>) {
       if (result != null) {
         throw IllegalStateException("callback called multiple times!")
       }

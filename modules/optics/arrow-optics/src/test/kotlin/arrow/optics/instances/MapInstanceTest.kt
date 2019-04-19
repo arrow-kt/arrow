@@ -18,7 +18,11 @@ import arrow.optics.extensions.mapk.each.each
 import arrow.optics.extensions.mapk.filterIndex.filterIndex
 import arrow.optics.extensions.mapk.index.index
 import arrow.test.UnitSpec
-import arrow.test.generators.*
+import arrow.test.generators.char
+import arrow.test.generators.functionAToB
+import arrow.test.generators.intSmall
+import arrow.test.generators.mapK
+import arrow.test.generators.option
 import arrow.test.laws.LensLaws
 import arrow.test.laws.OptionalLaws
 import arrow.test.laws.TraversalLaws
@@ -125,6 +129,5 @@ class MapInstanceTest : UnitSpec() {
         MB = Option.monoid(Int.semigroup())
       )
     )
-
   }
 }

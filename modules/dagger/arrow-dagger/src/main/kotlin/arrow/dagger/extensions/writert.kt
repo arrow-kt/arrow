@@ -1,8 +1,21 @@
 package arrow.dagger.extensions
 
 import arrow.data.WriterTPartialOf
-import arrow.data.extensions.*
-import arrow.typeclasses.*
+import arrow.data.extensions.WriterTApplicative
+import arrow.data.extensions.WriterTApplicativeError
+import arrow.data.extensions.WriterTFunctor
+import arrow.data.extensions.WriterTMonad
+import arrow.data.extensions.WriterTMonadError
+import arrow.data.extensions.WriterTMonoidK
+import arrow.data.extensions.WriterTSemigroupK
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadError
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.MonoidK
+import arrow.typeclasses.SemigroupK
 import dagger.Module
 import dagger.Provides
 import javax.inject.Inject
@@ -24,7 +37,6 @@ abstract class WriterTInstances<F, W> {
 
   @Provides
   fun writerTMonoidK(ev: DaggerWriterTSemigroupK<F, W>): SemigroupK<WriterTPartialOf<F, W>> = ev
-
 }
 
 class DaggerWriterTFunctor<F, W> @Inject constructor(val FF: Functor<F>) : WriterTFunctor<F, W> {

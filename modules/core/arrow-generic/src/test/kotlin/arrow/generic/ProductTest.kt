@@ -1,9 +1,14 @@
 package arrow.generic
 
-import arrow.core.*
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Try
+import arrow.core.Tuple3
+import arrow.core.toT
 import arrow.core.extensions.`try`.applicative.applicative
 import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.option.monoid.monoid
+import arrow.core.some
 import arrow.product
 import arrow.test.UnitSpec
 import arrow.test.generators.nonEmptyList
@@ -127,7 +132,7 @@ class ProductTest : UnitSpec() {
       emptyPerson() shouldBe Person("", 0, None)
     }
 
-    val getPersonWithAge: (Int) -> Person = { age: Int -> Person("", age, None)}
+    val getPersonWithAge: (Int) -> Person = { age: Int -> Person("", age, None) }
 
     testLaws(
       EqLaws.laws(Person.eq(), getPersonWithAge),

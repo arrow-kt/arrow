@@ -3,8 +3,6 @@
 package arrow.typeclasses
 
 import arrow.Kind
-import arrow.core.*
-import java.math.BigDecimal
 
 /**
  * ank_macro_hierarchy(arrow.typeclasses.Applicative)
@@ -20,5 +18,4 @@ interface Applicative<F> : Apply<F> {
 
   override fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B> =
     ap(just(f))
-
 }

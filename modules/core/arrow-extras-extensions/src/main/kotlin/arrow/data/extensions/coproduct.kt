@@ -10,7 +10,14 @@ import arrow.data.fix
 import arrow.extension
 import arrow.core.extensions.either.eq.eq
 import arrow.core.extensions.either.hash.hash
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Comonad
+import arrow.typeclasses.Contravariant
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Hash
+import arrow.typeclasses.Traverse
 import arrow.undocumented
 
 @extension
@@ -49,7 +56,6 @@ interface CoproductComonad<F, G> : Comonad<CoproductPartialOf<F, G>> {
   override fun <A> Kind<CoproductPartialOf<F, G>, A>.extract(): A = fix().extract(CF(), CG())
 
   override fun <A, B> Kind<CoproductPartialOf<F, G>, A>.map(f: (A) -> B): Coproduct<F, G, B> = fix().map(CF(), CG(), f)
-
 }
 
 @extension
@@ -65,7 +71,6 @@ interface CoproductFoldable<F, G> : Foldable<CoproductPartialOf<F, G>> {
 
   override fun <A, B> Kind<CoproductPartialOf<F, G>, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
     fix().foldRight(lb, f, FF(), FG())
-
 }
 
 @extension
