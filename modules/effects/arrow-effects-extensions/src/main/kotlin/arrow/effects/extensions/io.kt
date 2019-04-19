@@ -38,7 +38,6 @@ import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
-import arrow.typeclasses.fix
 import arrow.unsafe
 import kotlin.coroutines.CoroutineContext
 import arrow.effects.ap as ioAp

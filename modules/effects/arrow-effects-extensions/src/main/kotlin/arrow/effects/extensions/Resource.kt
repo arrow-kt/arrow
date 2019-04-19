@@ -2,6 +2,7 @@ package arrow.effects.extensions
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.core.Tuple2
 import arrow.effects.Resource
 import arrow.effects.ResourcePartialOf
 import arrow.effects.fix
@@ -21,15 +22,6 @@ interface ResourceFunctor<F, E> : Functor<ResourcePartialOf<F, E>> {
   fun BR(): Bracket<F, E>
   override fun <A, B> Kind<ResourcePartialOf<F, E>, A>.map(f: (A) -> B): Kind<ResourcePartialOf<F, E>, B> =
     fix().map(BR(), f)
-}
-
-@extension
-interface ResourceApply<F, E> : Applicative<ResourcePartialOf<F, E>> {
-  fun BR(): Bracket<F, E>
-  override fun <A, B> Kind<ResourcePartialOf<F, E>, A>.ap(ff: Kind<ResourcePartialOf<F, E>, (A) -> B>): Kind<ResourcePartialOf<F, E>, B> =
-    fix().ap(BR(), ff.fix())
-
-  override fun <A> just(a: A): Kind<ResourcePartialOf<F, E>, A> = Resource.just(a, BR())
 }
 
 @extension
