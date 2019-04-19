@@ -24,6 +24,15 @@ interface ResourceFunctor<F, E> : Functor<ResourcePartialOf<F, E>> {
 }
 
 @extension
+interface ResourceApply<F, E> : Applicative<ResourcePartialOf<F, E>> {
+  fun BR(): Bracket<F, E>
+  override fun <A, B> Kind<ResourcePartialOf<F, E>, A>.ap(ff: Kind<ResourcePartialOf<F, E>, (A) -> B>): Kind<ResourcePartialOf<F, E>, B> =
+    fix().ap(BR(), ff.fix())
+
+  override fun <A> just(a: A): Kind<ResourcePartialOf<F, E>, A> = Resource.just(a, BR())
+}
+
+@extension
 interface ResourceApplicative<F, E> : Applicative<ResourcePartialOf<F, E>> {
   fun BR(): Bracket<F, E>
   override fun <A, B> Kind<ResourcePartialOf<F, E>, A>.ap(ff: Kind<ResourcePartialOf<F, E>, (A) -> B>): Kind<ResourcePartialOf<F, E>, B> =

@@ -12,24 +12,6 @@ import arrow.core.OptionOf
 import arrow.core.Some
 import arrow.core.Tuple2
 import arrow.extension
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.ApplicativeError
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Foldable
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Hash
-import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadError
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.MonoidK
-import arrow.typeclasses.Monoidal
-import arrow.typeclasses.Selective
-import arrow.typeclasses.Semigroup
-import arrow.typeclasses.SemigroupK
-import arrow.typeclasses.Semigroupal
-import arrow.typeclasses.Semiring
-import arrow.typeclasses.Show
-import arrow.typeclasses.Traverse
 import arrow.typeclasses.suspended.monad.Fx
 import arrow.core.extensions.traverse as optionTraverse
 import arrow.core.extensions.option.monad.map
@@ -38,6 +20,25 @@ import arrow.core.fix
 import arrow.core.identity
 import arrow.core.orElse
 import arrow.core.select as optionSelect
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Apply
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.Semigroup
+import arrow.typeclasses.Show
+import arrow.typeclasses.Selective
+import arrow.typeclasses.Monad
+import arrow.typeclasses.Semigroupal
+import arrow.typeclasses.Monoidal
+import arrow.typeclasses.Semiring
+import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.MonadError
+import arrow.typeclasses.MonoidK
+import arrow.typeclasses.SemigroupK
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Traverse
+import arrow.typeclasses.Hash
 
 @extension
 interface OptionSemigroup<A> : Semigroup<Option<A>> {
@@ -140,6 +141,15 @@ interface OptionShow<A> : Show<Option<A>> {
 
 @extension
 interface OptionFunctor : Functor<ForOption> {
+  override fun <A, B> OptionOf<A>.map(f: (A) -> B): Option<B> =
+    fix().map(f)
+}
+
+@extension
+interface OptionApply : Apply<ForOption> {
+  override fun <A, B> OptionOf<A>.ap(ff: OptionOf<(A) -> B>): Option<B> =
+    fix().ap(ff)
+
   override fun <A, B> OptionOf<A>.map(f: (A) -> B): Option<B> =
     fix().map(f)
 }

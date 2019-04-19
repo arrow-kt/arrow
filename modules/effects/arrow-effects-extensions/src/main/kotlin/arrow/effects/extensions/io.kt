@@ -30,6 +30,7 @@ import arrow.effects.typeclasses.RaceTriple
 import arrow.effects.typeclasses.UnsafeRun
 import arrow.extension
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.Apply
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
@@ -48,6 +49,15 @@ import arrow.effects.startFiber as ioStart
 interface IOFunctor : Functor<ForIO> {
   override fun <A, B> IOOf<A>.map(f: (A) -> B): IO<B> =
     fix().map(f)
+}
+
+@extension
+interface IOApply : Apply<ForIO> {
+  override fun <A, B> IOOf<A>.map(f: (A) -> B): IO<B> =
+    fix().map(f)
+
+  override fun <A, B> IOOf<A>.ap(ff: IOOf<(A) -> B>): IO<B> =
+    ioAp(ff)
 }
 
 @extension

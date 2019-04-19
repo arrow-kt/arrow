@@ -14,6 +14,7 @@ import arrow.core.extensions.either.monad.monad
 import arrow.core.fix
 import arrow.extension
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.Apply
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Bifunctor
 import arrow.typeclasses.Eq
@@ -78,6 +79,15 @@ interface EitherFunctor<L> : Functor<EitherPartialOf<L>> {
 interface EitherBifunctor : Bifunctor<ForEither> {
   override fun <A, B, C, D> EitherOf<A, B>.bimap(fl: (A) -> C, fr: (B) -> D): Either<C, D> =
     fix().bimap(fl, fr)
+}
+
+@extension
+interface EitherApply<L> : Apply<EitherPartialOf<L>>, EitherFunctor<L> {
+
+  override fun <A, B> EitherOf<L, A>.map(f: (A) -> B): Either<L, B> = fix().map(f)
+
+  override fun <A, B> EitherOf<L, A>.ap(ff: EitherOf<L, (A) -> B>): Either<L, B> =
+    fix().eitherAp(ff)
 }
 
 @extension
