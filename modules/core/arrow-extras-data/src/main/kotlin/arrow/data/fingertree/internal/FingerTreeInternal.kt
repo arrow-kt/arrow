@@ -61,7 +61,7 @@ internal sealed class FingerTreeInternal<T> {
 
         this.deeper.viewL().fold(
           { Option.just(Tuple2(this.prefix.a, suffix.toFingerTree())) },
-          { (node, tree) -> Option.just(Tuple2(this.prefix.a, Deep(Affix.fromList(node.toList()), tree, this.suffix))) }
+          { (node, tree) -> Option.just(Tuple2(this.prefix.a, Deep(node.toAffix(), tree, this.suffix))) }
         )
       }
 
@@ -82,7 +82,7 @@ internal sealed class FingerTreeInternal<T> {
 
           this.deeper.viewR().fold(
             { Option.just(Tuple2(this.suffix.a, prefix.toFingerTree())) },
-            { (node, tree) -> Option.just(Tuple2(this.suffix.a, Deep(this.prefix, tree, Affix.fromList(node.toList())))) }
+            { (node, tree) -> Option.just(Tuple2(this.suffix.a, Deep(this.prefix, tree, node.toAffix()))) }
           )
         }
 

@@ -22,11 +22,11 @@ internal sealed class Affix<A> {
       is Four -> throw RuntimeException("Cannot append to affix four")
     }
 
-  fun toArray(): List<A> = when (this) {
-    is One -> listOf(this.a)
-    is Two -> listOf(this.a, this.b)
-    is Three -> listOf(this.a, this.b, this.c)
-    is Four -> listOf(this.a, this.b, this.c, this.d)
+  fun toArray(): Array<A> = when (this) {
+    is One -> arrayOf<Any?>(this.a) as Array<A>
+    is Two -> arrayOf<Any?>(this.a, this.b) as Array<A>
+    is Three -> arrayOf<Any?>(this.a, this.b, this.c) as Array<A>
+    is Four -> arrayOf<Any?>(this.a, this.b, this.c, this.d) as Array<A>
   }
 
   fun toFingerTree(): FingerTreeInternal<A> =
@@ -70,7 +70,7 @@ internal sealed class Affix<A> {
     }
 
   companion object {
-    fun <B> fromList(xs: List<B>): Affix<B> = when (xs.size) {
+    fun <B> fromArray(xs: Array<B>): Affix<B> = when (xs.size) {
       1 -> One(xs[0])
       2 -> Two(xs[0], xs[1])
       3 -> Three(xs[0], xs[1], xs[2])
