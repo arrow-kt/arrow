@@ -2,7 +2,7 @@ package arrow.benchmarks.effects.scala.zio
 
 import scalaz.zio._
 
-object Map extends RTS {
+object Map {
 
   def zioMapTest(iterations: Int, batch: Int): Long = {
     val f = { x: Int => x + 1 }
@@ -17,7 +17,7 @@ object Map extends RTS {
     var sum = 0L
     var i = 0
     while (i < iterations) {
-      sum += unsafeRun(fx)
+      sum += ZIORTS.unsafeRun(fx)
       i += 1
     }
     sum

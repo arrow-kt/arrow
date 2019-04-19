@@ -4,13 +4,15 @@ import scalaz.zio._
 
 object AttemptNonRaised {
 
-  def ioLoopHappy(size: Int, i: Int): IO[Nothing, Int] =
+  def ioLoopHappy(size: Int, i: Int): Task[Int] =
     if (i < size) {
-      IO.sync {
+      IO.effect {
         i + 1
-      }.attempt.flatMap { result =>
-          result.fold[IO[Nothing, Int]](IO.fail, ioLoopHappy(size, _))
+      }.either.flatMap { result =>
+          result.fold[Task[Int]](IO.fail, ioLoopHappy(size, _))
         }
     } else IO.succeed(1)
+
+  def run(size: Int) = ZIORTS.unsafeRun(ioLoopHappy(size, 0))
 
 }

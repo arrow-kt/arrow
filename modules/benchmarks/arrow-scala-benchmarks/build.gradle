@@ -9,5 +9,5 @@ repositories {
 dependencies {
     implementation 'org.scala-lang:scala-library:2.12.8'
     implementation 'org.typelevel:cats-effect_2.12:1.2.0'
-    implementation 'org.scalaz:scalaz-zio_2.12:0.6.3'
+    implementation 'org.scalaz:scalaz-zio_2.12:1.0-RC4'
 }

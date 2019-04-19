@@ -45,6 +45,9 @@ sealed class FxImpossibleBugs(message: String) : RuntimeException(message) {
 
 sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
 
+  fun <B> followedBy(fa: FxOf<B>): Fx<B> =
+    flatMap { fa }
+
   @Suppress("UNCHECKED_CAST")
   inline val fa: suspend () -> A
     get() =
@@ -120,8 +123,8 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
   suspend inline operator fun not(): A =
     when (tag) {
       RaiseErrorTag -> throw (this as Fx.RaiseError<*>).error
-      PureTag -> (this as Fx.Pure<A>).value
-      SingleTag -> (this as Fx.Single<A>).source()
+      PureTag -> (this as Pure<A>).value
+      SingleTag -> (this as Single<A>).source()
       MapTag -> FxRunLoop(this)
       FlatMapTag -> FxRunLoop(this)
       ConnectionSwitchTag -> FxRunLoop(this)
@@ -135,12 +138,7 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
   inline fun <B> flatMap(noinline f: (A) -> FxOf<B>): Fx<B> =
     when (tag) {
       RaiseErrorTag -> this as Fx<B>
-      PureTag -> {
-        this as Fx.Pure<A>
-//        if(index != Platform.maxStackDepthSize) Fx.Pure(FxRunLoop(f(value).fix()), index + 1)
-//        else
-        FlatMap(this, f, 0)
-      }
+      PureTag -> FlatMap(this, f, 0)
       SingleTag -> FlatMap(this, f, 0)
       ConnectionSwitchTag -> FlatMap(this, f, 0)
       ModifyContextTag -> FlatMap(this, f, 0)

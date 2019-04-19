@@ -2,14 +2,14 @@ package arrow.benchmarks.effects.scala.zio
 
 import scalaz.zio._
 
-object Delay extends RTS {
+object Delay {
 
-  def ioDelayLoop(size: Int, i: Int): IO[Nothing, Int] =
-    IO.sync(i).flatMap { j =>
-      if (j > size) IO.sync(j) else ioDelayLoop(size, j + 1)
+  def ioDelayLoop(size: Int, i: Int): Task[Int] =
+    ZIO.effect { i } .flatMap { j =>
+      if (j > size) ZIO.effect { j } else ioDelayLoop(size, j + 1)
     }
 
   def unsafeIODelayLoop(size: Int, i: Int): Int =
-    unsafeRun(ioDelayLoop(size, i))
+    ZIORTS.unsafeRun(ioDelayLoop(size, i))
 
 }

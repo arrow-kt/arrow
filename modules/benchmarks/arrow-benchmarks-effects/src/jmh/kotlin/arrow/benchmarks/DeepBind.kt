@@ -45,8 +45,6 @@ open class DeepBind {
 
   @Benchmark
   fun zio(): Any =
-    ZIORTS.unsafeRun(
-      arrow.benchmarks.effects.scala.zio.`DeepBind$`.`MODULE$`.fib(depth)
-    )
+    arrow.benchmarks.effects.scala.zio.`DeepBind$`.`MODULE$`.fib(depth)
 
 }

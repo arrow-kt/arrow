@@ -8,6 +8,7 @@ import arrow.effects.IORunLoop.startCancelable
 import arrow.effects.internal.Platform
 import arrow.effects.suspended.fx.FxRunLoop.startCancelable
 import kotlin.coroutines.*
+import kotlin.coroutines.intrinsics.*
 import kotlin.coroutines.Continuation
 
 /**
