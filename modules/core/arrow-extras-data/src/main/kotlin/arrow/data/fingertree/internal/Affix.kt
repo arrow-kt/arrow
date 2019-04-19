@@ -8,17 +8,17 @@ internal sealed class Affix<A> {
 
   fun append(item: A): Affix<A> =
     when (this) {
-      is One -> Two(item, this.a)
-      is Two -> Three(item, this.a, this.b)
-      is Three -> Four(item, this.a, this.b, this.c)
+      is One -> Two(this.a, item)
+      is Two -> Three(this.a, this.b, item)
+      is Three -> Four(this.a, this.b, this.c, item)
       is Four -> throw RuntimeException("Cannot append to affix four")
     }
 
   fun prepend(item: A): Affix<A> =
     when (this) {
-      is One -> Two(this.a, item)
-      is Two -> Three(this.a, this.b, item)
-      is Three -> Four(this.a, this.b, this.c, item)
+      is One -> Two(item, this.a)
+      is Two -> Three(item, this.a, this.b)
+      is Three -> Four(item, this.a, this.b, this.c)
       is Four -> throw RuntimeException("Cannot append to affix four")
     }
 
