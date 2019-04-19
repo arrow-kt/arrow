@@ -25,6 +25,8 @@ interface Concurrent<F> : Async<F> {
 
   fun dispatchers(): Dispatchers<F>
 
+  fun <A> effect(fa: suspend () -> A): Kind<F, A>
+
   /**
    * Creates a cancelable instance of [F] that executes an asynchronous process on evaluation.
    * This combinator can be used to wrap callbacks or other similar impure code that requires cancellation code.

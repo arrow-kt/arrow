@@ -12,7 +12,6 @@ import arrow.effects.suspended.fx.*
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
-import arrow.test.laws.AsyncLaws
 import arrow.test.laws.ConcurrentLaws
 import arrow.typeclasses.Eq
 import arrow.unsafe
@@ -120,13 +119,13 @@ class FxTest : UnitSpec() {
       )
     }
 
-    "fx will not pass context state across not/bind" {
+    "fx can pass context state across not/bind" {
       val program = fx {
         val ctx = !effect { kotlin.coroutines.coroutineContext }
         !effect { ctx shouldBe EmptyCoroutineContext }
         continueOn(CoroutineName("Simon")) //this is immediately lost and useless.
         val ctx2 = !effect { kotlin.coroutines.coroutineContext }
-        !effect { ctx2 shouldBe EmptyCoroutineContext }
+        !effect { ctx2 shouldBe CoroutineName("Simon") }
       }
 
       Fx.unsafeRunBlocking(program)
@@ -193,8 +192,7 @@ class FxTest : UnitSpec() {
 //    "unsafeRunNonBlockingCancellable should throw the appropriate exception" {
 //      val program = Fx.async<Throwable> { _, cb ->
 //        val cancel = Fx.unsafeRunNonBlockingCancellable(
-//          Fx(newSingleThreadContext("RunThread")) { }
-//            .flatMap { Fx.async<Int> { _, cb -> Thread.sleep(500); cb(1.right()) } },
+//          Fx(newSingleThreadContext("RunThread")) { }.flatMap { Fx.never },
 //          OnCancel.ThrowCancellationException) {
 //          it.fold({ t -> cb(t.right()) }, { })
 //        }

@@ -3,11 +3,14 @@ package arrow.effects.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.effects.*
+import arrow.effects.internal.asyncContinuation
 import arrow.effects.typeclasses.*
 import arrow.extension
 import arrow.typeclasses.*
 import arrow.unsafe
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.coroutines.startCoroutine
 import arrow.effects.ap as ioAp
 import arrow.effects.handleErrorWith as ioHandleErrorWith
 import arrow.effects.fork as ioStart
@@ -118,6 +121,10 @@ interface IOAsync : Async<ForIO>, IOMonadDefer {
 
 // FIXME default @extension are temporarily declared in arrow-effects-io-extensions due to multiplatform needs
 interface IOConcurrent : Concurrent<ForIO>, IOAsync {
+
+  override fun <A> effect(fa: suspend () -> A): IO<A> = async { _, cb ->
+    fa.startCoroutine(asyncContinuation(EmptyCoroutineContext, cb))
+  }
 
   override fun <A> CoroutineContext.fork(fa: IOOf<A>): IO<Fiber<ForIO, A>> =
     fa.ioStart(this)

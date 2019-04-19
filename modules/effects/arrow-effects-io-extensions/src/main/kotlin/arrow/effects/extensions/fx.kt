@@ -4,16 +4,11 @@ import arrow.Kind
 import arrow.core.*
 import arrow.effects.IODispatchers
 import arrow.effects.extensions.fx.dispatchers.dispatchers
-import arrow.effects.internal.Platform
-import arrow.effects.internal.UnsafePromise
-import arrow.effects.internal.asyncContinuation
 import arrow.effects.suspended.fx.*
 import arrow.effects.typeclasses.*
-import arrow.effects.typeclasses.suspended.FxSyntax
 import arrow.extension
 import arrow.typeclasses.*
 import arrow.unsafe
-import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.*
 import  arrow.effects.suspended.fx.guaranteeCase as guaranteeC
 import  arrow.effects.suspended.fx.bracketCase as bracketC
@@ -132,6 +127,8 @@ interface FxConcurrent : Concurrent<ForFx>, FxAsync {
 
   override fun dispatchers(): Dispatchers<ForFx> =
     Fx.dispatchers()
+
+  override fun <A> effect(fa: suspend () -> A): Fx<A> = Fx(fa)
 
   override fun <A> async(fa: FxProc<A>): Fx<A> =
     Fx.async(fa)
