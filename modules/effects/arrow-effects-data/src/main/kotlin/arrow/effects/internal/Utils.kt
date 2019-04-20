@@ -12,9 +12,10 @@ import kotlin.coroutines.CoroutineContext
 
 typealias JavaCancellationException = java.util.concurrent.CancellationException
 
-class ArrowInternalException(override val message: String =
-    "Arrow-kt internal error. Please let us know and create a ticket at https://github.com/arrow-kt/arrow/issues/new/choose"
-) : RuntimeException(message)
+object ArrowInternalException :
+  RuntimeException("Arrow-kt internal error. Please let us know and create a ticket at https://github.com/arrow-kt/arrow/issues/new/choose") {
+  override fun fillInStackTrace(): Throwable = this
+}
 
 private const val initialIndex: Int = 0
 private const val chunkSize: Int = 8
@@ -189,18 +190,24 @@ object Platform {
     return first
   }
 
-  @PublishedApi
-  internal val trampolineExecutor = TrampolineExecutor(Executor { it.run() })
 
   inline fun trampoline(crossinline f: () -> Unit): Unit =
-    trampolineExecutor.execute(Runnable { f() })
+    trampoline.get().execute(Runnable { f() })
+
+  private val underlying = Executor { it.run() }
+
+  @PublishedApi
+  internal val trampoline = ThreadLocal.withInitial {
+    TrampolineExecutor(underlying)
+  }
 
   @PublishedApi
   internal class TrampolineExecutor(val underlying: Executor) {
     private var immediateQueue = Platform.ArrayStack<Runnable>()
+    @Volatile
     private var withinLoop = false
 
-    fun startLoop(runnable: Runnable): Unit {
+    private fun startLoop(runnable: Runnable): Unit {
       withinLoop = true
       try {
         immediateLoop(runnable)
@@ -209,13 +216,9 @@ object Platform {
       }
     }
 
-    fun execute(runnable: Runnable): Unit {
-      if (!withinLoop) {
-        startLoop(runnable)
-      } else {
-        immediateQueue.push(runnable)
-      }
-    }
+    fun execute(runnable: Runnable): Unit =
+      if (!withinLoop) startLoop(runnable)
+      else immediateQueue.push(runnable)
 
     private fun forkTheRest(): Unit {
       class ResumeRun(val head: Runnable, val rest: Platform.ArrayStack<Runnable>) : Runnable {
@@ -233,19 +236,18 @@ object Platform {
       }
     }
 
-    @Suppress("SwallowedException")
+    @Suppress("SwallowedException") //Should we rewrite with while??
     private tailrec fun immediateLoop(task: Runnable): Unit {
       try {
         task.run()
       } catch (ex: Throwable) {
         forkTheRest()
-        //ex.nonFatalOrThrow()
+        //ex.nonFatalOrThrow() //not required???
       }
 
       val next = immediateQueue.pop()
-      if (next != null) {
-        immediateLoop(next)
-      }
+      return if (next != null) immediateLoop(next)
+      else Unit
     }
   }
 
@@ -268,7 +270,7 @@ private class OneShotLatch : AbstractQueuedSynchronizer() {
 
 /**
  * [arrow.core.Continuation] to run coroutine on `ctx` and link result to callback [cc].
- * Use [asyncContinuation] to run suspended functions within a context `ctx` and pass the result to [cc].
+ * Use [asyncContinuation] to construct a [Continuation] that uses [Either] instead of [Result].
  */
 fun <A> asyncContinuation(
   ctx: CoroutineContext,
@@ -278,11 +280,11 @@ fun <A> asyncContinuation(
     override val context: CoroutineContext = ctx
 
     override fun resume(value: A) {
-      cc(value.right())
+      cc(Either.Right(value))
     }
 
     override fun resumeWithException(exception: Throwable) {
-      cc(exception.left())
+      cc(Either.Left(exception))
     }
 
   }

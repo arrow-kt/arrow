@@ -9,7 +9,6 @@ import arrow.effects.fork
 import arrow.effects.internal.Platform
 import arrow.effects.internal.UnsafePromise
 import arrow.effects.typeclasses.*
-import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.RestrictsSuspension
 
@@ -39,9 +38,9 @@ const val ContinueOnTag = 9
 
 sealed class FxImpossibleBugs(message: String) : RuntimeException(message) {
   object Fxfa : FxImpossibleBugs("Fx.fa bug, please contact support with this message! https://arrow-kt.io")
-  object FxMap: FxImpossibleBugs("FxMap bug, please contact support with this message! https://arrow-kt.io")
-  object FxNot: FxImpossibleBugs("FxNot bug, please contact support with this message! https://arrow-kt.io")
-  object FxFlatMap: FxImpossibleBugs("FxFlatMap bug, please contact support with this message! https://arrow-kt.io")
+  object FxMap : FxImpossibleBugs("FxMap bug, please contact support with this message! https://arrow-kt.io")
+  object FxNot : FxImpossibleBugs("FxNot bug, please contact support with this message! https://arrow-kt.io")
+  object FxFlatMap : FxImpossibleBugs("FxFlatMap bug, please contact support with this message! https://arrow-kt.io")
 
   override fun fillInStackTrace(): Throwable = this
 }
@@ -364,12 +363,7 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
     oldConn.push(conn.cancel())
     conn.push(oldConn.cancel())
 
-    FxRunLoop.startCancelable(this, conn, ctx) { either ->
-      either.fold(
-        { promise.complete(Either.Left(it)) },
-        { promise.complete(Either.Right(it)) }
-      )
-    }
+    FxRunLoop.startCancelable(this, conn, ctx, promise::complete)
 
     cb(Right(FxFiber(promise, conn)))
   }
@@ -444,17 +438,9 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
     fun <A> unsafeRunBlocking(fx: FxOf<A>): A = when (val fa = fx.fix()) {
       is Pure -> fa.value
       is RaiseError -> throw fa.error
-      else -> {
-        val loop = AtomicBoolean(true)
-        var result: Either<Throwable, A>? = null
-        FxRunLoop.start(fx) { r: Either<Throwable, A> ->
-          result = r
-          loop.compareAndSet(true, false)
-        }
-        while (loop.get()) {
-        }
-
-        result!!.fold({ throw it }, ::identity)
+      else -> UnsafePromise<A>().run {
+        FxRunLoop.start(fx, cb = ::complete)
+        await()
       }
     }
 

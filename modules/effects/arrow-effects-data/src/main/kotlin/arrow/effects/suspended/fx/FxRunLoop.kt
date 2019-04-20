@@ -302,7 +302,7 @@ internal object FxRunLoop {
     //Instance state
     private var conn: FxConnection = connInit
     private var canCall = false
-    private var contIndex: Int = 1
+    private var contIndex: Int = 0
 
     //loop state
     private var bFirst: ((Any?) -> Fx<Any?>)? = null
@@ -366,7 +366,7 @@ internal object FxRunLoop {
       }
 
       if (shouldTrampoline) {
-        contIndex = 1
+        contIndex = 0
         Platform.trampoline(this)
       } else invoke()
     }
