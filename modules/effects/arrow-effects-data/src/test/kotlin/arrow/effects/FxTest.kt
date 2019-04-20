@@ -3,6 +3,7 @@ package arrow.effects
 import arrow.core.Either
 import arrow.core.Right
 import arrow.core.left
+import arrow.core.right
 import arrow.effects.extensions.fx.async.async
 import arrow.effects.extensions.fx.concurrent.concurrent
 import arrow.effects.extensions.fx.fx.fx
@@ -214,7 +215,7 @@ class FxTest : UnitSpec() {
           Fx(newSingleThreadContext("CancelThread")) { Thread.sleep(500); }
         ) { cancel() }
       }
-      Fx.unsafeRunBlocking(program) shouldBe None
+      Fx.unsafeRunBlocking(program) shouldBe OnCancel.CancellationException
     }
 
     "runNonBlocking should defer running" {
