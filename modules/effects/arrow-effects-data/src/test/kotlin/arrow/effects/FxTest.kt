@@ -215,7 +215,7 @@ class FxTest : UnitSpec() {
           Fx(newSingleThreadContext("CancelThread")) { Thread.sleep(500); }
         ) { cancel() }
       }
-      Fx.unsafeRunBlocking(program) shouldBe OnCancel.CancellationException
+      Fx.unsafeRunBlocking(program.attempt()).fold({ it shouldBe OnCancel.CancellationException }, { fail("Should fail, got $it instead") })
     }
 
     "runNonBlocking should defer running" {
