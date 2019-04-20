@@ -86,23 +86,6 @@ class EffectsSuspendDSLTests : UnitSpec() {
       Fx.unsafeRunBlocking(fxStartLoop(0)) shouldBe size
     }
 
-    "Direct syntax for concurrent operations" {
-      suspend fun getThreadName(): String =
-        Thread.currentThread().name
-
-      val program = fx {
-        // note how the receiving value is typed in the environment and not inside Fx despite being effectful and
-        // non-blocking parallel computations
-        val result: List<String> = !NonBlocking.parMapN(
-          effect { getThreadName() },
-          effect { getThreadName() }
-        ) { a, b -> listOf(a, b) }
-        !effect { println(result) }
-        result
-      }
-      unsafe { runBlocking { program } }.distinct().size shouldBe 2
-    }
-
     "raiseError" {
       shouldThrow<TestError> {
         fxTest {

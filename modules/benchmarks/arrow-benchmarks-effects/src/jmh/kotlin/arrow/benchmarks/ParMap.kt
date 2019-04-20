@@ -6,12 +6,8 @@ import arrow.effects.extensions.NonBlocking
 import arrow.effects.extensions.fx.concurrent.parMapN
 import arrow.effects.extensions.io.concurrent.parMapN
 import arrow.effects.suspended.fx.Fx
-import arrow.unsafe
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
-import arrow.effects.extensions.fx.unsafeRun.runBlocking as fxRunBlocking
-import arrow.effects.extensions.io.fx.fx as ioFx
-import arrow.effects.extensions.io.unsafeRun.runBlocking as ioRunBlocking
 
 @State(Scope.Thread)
 @Fork(2)
@@ -23,9 +19,10 @@ open class ParMap {
   @Param("100")
   var size: Int = 0
 
-  private fun fxHelper(): Fx<Int> = (0 until size).toList().foldLeft(Fx { 0 }) { acc, i ->
-    NonBlocking.parMapN(acc, Fx { i }) { a, b -> a + b }
-  }
+  private fun fxHelper(): Fx<Int> =
+    (0 until size).toList().foldLeft(Fx { 0 }) { acc, i ->
+      NonBlocking.parMapN(acc, Fx { i }) { a, b -> a + b }
+    }
 
   private fun ioHelper(): IO<Int> =
     (0 until size).toList().foldLeft(IO { 0 }) { acc, i ->
@@ -34,18 +31,10 @@ open class ParMap {
 
   @Benchmark
   fun fx(): Int =
-    unsafe {
-      fxRunBlocking {
-        fxHelper()
-      }
-    }
+    Fx.unsafeRunBlocking(fxHelper())
 
   @Benchmark
   fun io(): Int =
-    unsafe {
-      ioRunBlocking {
-        ioHelper()
-      }
-    }
+    ioHelper().unsafeRunSync()
 
 }
