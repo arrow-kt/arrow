@@ -1,15 +1,16 @@
 package arrow.effects.suspended.fx
 
 import arrow.core.Either
+import arrow.core.Right
+import arrow.core.handleErrorWith
 import arrow.core.nonFatalOrThrow
-import arrow.core.*
-import arrow.effects.*
 import arrow.effects.IORunLoop.startCancelable
+import arrow.effects.KindConnection
+import arrow.effects.OnCancel
+import arrow.effects.handleErrorWith
 import arrow.effects.internal.Platform
 import arrow.effects.suspended.fx.FxRunLoop.startCancelable
 import kotlin.coroutines.*
-import kotlin.coroutines.intrinsics.*
-import kotlin.coroutines.Continuation
 
 /**
  * This is the internal API for all methods that run the effect,
@@ -322,6 +323,8 @@ internal object FxRunLoop {
       canCall = true
       this.bFirst = bFirst
       this.bRest = bRest
+
+      conn.push(Fx { resumeWith(Result.failure(OnCancel.CancellationException)) })
 
       // Run the users FFI function provided with the connection for cancellation support and [AsyncBoundary] as a generic callback.
       fx.proc(conn, this)

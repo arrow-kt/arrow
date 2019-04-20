@@ -3,12 +3,15 @@ package arrow.effects.suspended.fx
 import arrow.Kind
 import arrow.core.*
 import arrow.data.AndThen
-import arrow.effects.*
+import arrow.effects.KindConnection
+import arrow.effects.OnCancel
+import arrow.effects.fork
 import arrow.effects.internal.Platform
 import arrow.effects.internal.UnsafePromise
 import arrow.effects.typeclasses.*
 import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.coroutines.*
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.RestrictsSuspension
 
 class ForFx private constructor() {
   companion object

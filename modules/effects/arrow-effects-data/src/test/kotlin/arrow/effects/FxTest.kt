@@ -1,13 +1,13 @@
 package arrow.effects
 
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Right
+import arrow.core.left
 import arrow.effects.extensions.fx.async.async
 import arrow.effects.extensions.fx.concurrent.concurrent
 import arrow.effects.extensions.fx.fx.fx
 import arrow.effects.extensions.fx.monad.flatMap
 import arrow.effects.extensions.fx.unsafeRun.runBlocking
-import arrow.effects.extensions.io.async.async
-import arrow.effects.extensions.io.monad.flatMap
 import arrow.effects.suspended.fx.*
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
@@ -24,9 +24,7 @@ import io.kotlintest.shouldThrow
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.newSingleThreadContext
 import org.junit.runner.RunWith
-import java.lang.RuntimeException
 import kotlin.coroutines.AbstractCoroutineContextElement
-import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
 @RunWith(KotlinTestRunner::class)
@@ -189,35 +187,35 @@ class FxTest : UnitSpec() {
       } shouldBe exception
     }
 
-//    "unsafeRunNonBlockingCancellable should throw the appropriate exception" {
-//      val program = Fx.async<Throwable> { _, cb ->
-//        val cancel = Fx.unsafeRunNonBlockingCancellable(
-//          Fx(newSingleThreadContext("RunThread")) { }.flatMap { Fx.never },
-//          OnCancel.ThrowCancellationException) {
-//          it.fold({ t -> cb(t.right()) }, { })
-//        }
-//
-//        Fx.unsafeRunNonBlocking(Fx(newSingleThreadContext("CancelThread")) { }) { cancel() }
-//      }
-//
-//      Fx.unsafeRunBlocking(program) shouldBe OnCancel.CancellationException
-//    }
+    "unsafeRunNonBlockingCancellable should throw the appropriate exception" {
+      val program = Fx.async<Throwable> { _, cb ->
+        val cancel = Fx.unsafeRunNonBlockingCancellable(
+          Fx(newSingleThreadContext("RunThread")) { }.flatMap { Fx.never },
+          OnCancel.ThrowCancellationException) {
+          it.fold({ t -> cb(t.right()) }, { })
+        }
 
-//    "unsafeRunNonBlockingCancellable can cancel even for infinite asyncs" {
-//      val program = Fx.async { _, cb: (Either<Throwable, Int>) -> Unit ->
-//        val cancel = Fx.unsafeRunNonBlockingCancellable(
-//          Fx(newSingleThreadContext("RunThread")) { }
-//            .flatMap { Fx.async<Int> { _, _ -> Thread.sleep(5000); } },
-//          OnCancel.ThrowCancellationException) {
-//          cb(it)
-//        }
-//
-//        Fx.unsafeRunNonBlocking(
-//          Fx(newSingleThreadContext("CancelThread")) { Thread.sleep(500); }
-//        ) { cancel() }
-//      }
-//      Fx.unsafeRunBlocking(program) shouldBe None
-//    }
+        Fx.unsafeRunNonBlocking(Fx(newSingleThreadContext("CancelThread")) { }) { cancel() }
+      }
+
+      Fx.unsafeRunBlocking(program) shouldBe OnCancel.CancellationException
+    }
+
+    "unsafeRunNonBlockingCancellable can cancel even for infinite asyncs" {
+      val program = Fx.async { _, cb: (Either<Throwable, Int>) -> Unit ->
+        val cancel = Fx.unsafeRunNonBlockingCancellable(
+          Fx(newSingleThreadContext("RunThread")) { }
+            .flatMap { Fx.async<Int> { _, _ -> Thread.sleep(5000); } },
+          OnCancel.ThrowCancellationException) {
+          cb(it)
+        }
+
+        Fx.unsafeRunNonBlocking(
+          Fx(newSingleThreadContext("CancelThread")) { Thread.sleep(500); }
+        ) { cancel() }
+      }
+      Fx.unsafeRunBlocking(program) shouldBe None
+    }
 
     "runNonBlocking should defer running" {
       var run = false
