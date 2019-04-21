@@ -47,6 +47,9 @@ sealed class FxImpossibleBugs(message: String) : RuntimeException(message) {
 
 sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
 
+  @PublishedApi
+  internal inline fun <B> unsafeRetag(): Fx<B> = this as Fx<B>
+
   fun <B> followedBy(fa: FxOf<B>): Fx<B> =
     flatMap { fa }
 
@@ -79,7 +82,7 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
   @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
   inline fun <B> map(noinline f: (A) -> B): Fx<B> =
     when (tag) {
-      RaiseErrorTag -> this as Fx<B>
+      RaiseErrorTag -> unsafeRetag()
       PureTag -> {
         //Fx.Single { f((this as Fx.Pure<A>).value) }
         this as Fx.Pure<A>
@@ -93,7 +96,7 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
           try {
             val b: B = unsafeRunBlocking(Single { f(this.value) })
             (this as Fx.Pure<B>).value = b
-            this as Fx<B>
+            unsafeRetag<B>()
           } catch (e: Throwable) {
             RaiseError<B>(e.nonFatalOrThrow())
           }
@@ -109,7 +112,7 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
         val ff = f as (Any?) -> Any?
         //AndThen composes the functions in a stack-safe way by running them in a while loop.
         this.g = AndThen(g).andThen(ff)
-        this as Fx<B>
+        unsafeRetag()
       }
       FlatMapTag -> {
         //If we reach the maxStackDepthSize then we can fold the current FlatMap and return a Map case
@@ -139,7 +142,7 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
   @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
   inline fun <B> flatMap(noinline f: (A) -> FxOf<B>): Fx<B> =
     when (tag) {
-      RaiseErrorTag -> this as Fx<B>
+      RaiseErrorTag -> unsafeRetag()
       PureTag -> FlatMap(this, f, 0)
       SingleTag -> FlatMap(this, f, 0)
       ConnectionSwitchTag -> FlatMap(this, f, 0)
