@@ -150,7 +150,10 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
   inline fun <B> flatMap(noinline f: (A) -> FxOf<B>): Fx<B> =
     when (tag) {
       RaiseErrorTag -> unsafeRetag()
-      PureTag -> FlatMap(this, f, 0)
+      PureTag -> {
+        val value = (this as Fx.Pure<A>).value
+        Defer { f(value) }
+      }
       SingleTag -> FlatMap(this, f, 0)
       DeferTag -> FlatMap(this, f, 0)
       ConnectionSwitchTag -> FlatMap(this, f, 0)
