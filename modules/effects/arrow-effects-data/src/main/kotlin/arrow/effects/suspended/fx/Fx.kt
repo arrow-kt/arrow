@@ -45,7 +45,7 @@ sealed class FxImpossibleBugs(message: String) : RuntimeException(message) {
   override fun fillInStackTrace(): Throwable = this
 }
 
-sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
+sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
 
   @PublishedApi
   internal inline fun <B> unsafeRetag(): Fx<B> = this as Fx<B>
@@ -318,21 +318,6 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
   fun <B> ap(ff: FxOf<(A) -> B>): Fx<B> =
     ff.fix().flatMap { map(it) }
 
-  fun handleErrorWith(f: (Throwable) -> FxOf<A>): Fx<A> =
-    FlatMap(this, FxFrame.Companion.ErrorHandler(f), 0)
-
-  fun handleError(f: (Throwable) -> A): Fx<A> = when (this) {
-    is RaiseError -> Fx { f(error) }
-    is Pure -> this
-    else -> Fx {
-      try {
-        fa()
-      } catch (e: Throwable) {
-        f(e)
-      }
-    }
-  }
-
   fun ensure(
     error: () -> Throwable,
     predicate: (A) -> Boolean
@@ -527,6 +512,21 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
 
   override fun toString(): String = "Fx(...)"
 
+}
+
+fun <A> FxOf<A>.handleErrorWith(f: (Throwable) -> FxOf<A>): Fx<A> =
+  Fx.FlatMap(this, FxFrame.Companion.ErrorHandler(f), 0)
+
+fun <A> FxOf<A>.handleError(f: (Throwable) -> A): Fx<A> = when (this) {
+  is Fx.RaiseError -> Fx { f(error) }
+  is Fx.Pure -> this
+  else -> Fx {
+    try {
+      fix().fa()
+    } catch (e: Throwable) {
+      f(e)
+    }
+  }
 }
 
 @Suppress("FunctionName")
