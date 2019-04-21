@@ -88,14 +88,17 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
         this as Fx.Pure<A>
         if (this.index != Platform.maxStackDepthSize) {
           try {
-            Pure(f(this.value), index + 1)
+            internalValue = f(this.value)
+            index += 1
+            unsafeRetag<B>()
           } catch (e: Throwable) {
             RaiseError<B>(e.nonFatalOrThrow())
           }
         } else {
           try {
             val b: B = unsafeRunBlocking(Single { f(this.value) })
-            (this as Fx.Pure<B>).value = b
+            internalValue = b
+            index = 0
             unsafeRetag<B>()
           } catch (e: Throwable) {
             RaiseError<B>(e.nonFatalOrThrow())
@@ -175,7 +178,10 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
   }
 
   @PublishedApi
-  internal class Pure<A>(@JvmField var value: A, var index: Int) : Fx<A>(PureTag) {
+  internal class Pure<A>(@JvmField var internalValue: Any?, var index: Int) : Fx<A>(PureTag) {
+    inline val value: A
+     get() = internalValue as A
+
     override fun toString(): String = "Fx.Pure(value = $value)"
   }
 
@@ -410,7 +416,7 @@ sealed class Fx<A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
 
     @JvmStatic
     fun <A> defer(fa: () -> FxOf<A>): Fx<A> =
-      FlatMap(Pure(Unit, 0), { fa() }, 0)
+      FlatMap(Pure<Unit>(Unit, 0), { fa() }, 0)
 
     @JvmStatic
     fun <A, B> tailRecM(a: A, f: (A) -> FxOf<Either<A, B>>): Fx<B> =
