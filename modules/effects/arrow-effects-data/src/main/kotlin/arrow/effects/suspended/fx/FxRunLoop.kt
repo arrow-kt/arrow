@@ -122,6 +122,16 @@ internal object FxRunLoop {
           result = (source as Fx.Pure<Any?>).value
           hasResult = true
         }
+        LazyTag -> {
+          source as Fx.Lazy<Any?>
+          try {
+            result = source.source()
+            hasResult = true
+            source = null
+          } catch (t: Throwable) {
+            source = Fx.RaiseError(t.nonFatalOrThrow())
+          }
+        }
         SingleTag -> {
           if (asyncBoundary == null) {
             asyncBoundary = AsyncBoundary(conn, cb)

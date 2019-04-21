@@ -36,6 +36,7 @@ const val AsyncTag = 6
 const val ModifyContextTag = 7
 const val ContinueOnTag = 9
 const val DeferTag = 10
+const val LazyTag = 11
 
 sealed class FxImpossibleBugs(message: String) : RuntimeException(message) {
   object Fxfa : FxImpossibleBugs("Fx.fa bug, please contact support with this message! https://arrow-kt.io")
@@ -63,6 +64,7 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
         }
         PureTag -> suspend { (this as Fx.Pure<A>).value }
         SingleTag -> (this as Fx.Single<A>).source
+        LazyTag -> suspend { (this as Fx.Lazy<A>).source() }
         DeferTag -> suspend { !(this as Fx.Defer<A>).thunk() }
         MapTag -> {
           this as Fx.Map<A, *>
@@ -98,7 +100,7 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
           }
         } else {
           try {
-            val b: B = unsafeRunBlocking(Single { f(this.value) })
+            val b: B = f(this.value)
             internalValue = b
             index = 0
             unsafeRetag<B>()
@@ -109,6 +111,7 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
       }
       SingleTag -> Map(this, f)
       DeferTag -> Map(this, f)
+      LazyTag -> Map(this, f)
       ConnectionSwitchTag -> Map(this, f)
       ModifyContextTag -> Map(this, f)
       AsyncTag -> Map(this, f)
@@ -136,6 +139,7 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
       RaiseErrorTag -> throw (this as Fx.RaiseError<*>).error
       PureTag -> (this as Pure<A>).value
       SingleTag -> (this as Single<A>).source()
+      LazyTag -> FxRunLoop(this)
       DeferTag -> FxRunLoop(this)
       MapTag -> FxRunLoop(this)
       FlatMapTag -> FxRunLoop(this)
@@ -155,6 +159,7 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
         Defer { f(value) }
       }
       SingleTag -> FlatMap(this, f, 0)
+      LazyTag -> FlatMap(this, f, 0)
       DeferTag -> FlatMap(this, f, 0)
       ConnectionSwitchTag -> FlatMap(this, f, 0)
       ModifyContextTag -> FlatMap(this, f, 0)
@@ -199,6 +204,14 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
   @PublishedApi
   internal class Single<A>(@JvmField val source: suspend () -> A) : Fx<A>(SingleTag) {
     override fun toString(): String = "Fx.Single"
+  }
+
+  /**
+   * Internal only effect declaration to bypass suspension overhead
+   */
+  @PublishedApi
+  internal class Lazy<A>(@JvmField val source: () -> A) : Fx<A>(LazyTag) {
+    override fun toString(): String = "Fx.Lazy"
   }
 
   @PublishedApi
@@ -398,7 +411,10 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
     val unit: Fx<Unit> = Pure(Unit, 0)
 
     @JvmStatic
-    val lazy: Fx<Unit> = Single(suspendMapUnit)
+    val lazy: Fx<Unit> = Lazy { Unit }
+
+    @JvmStatic
+    fun <A> lazy(f: () -> A): Fx<A> = Lazy(f)
 
     @JvmStatic
     val never: Fx<Nothing> = async { _, _ -> Unit }
@@ -406,7 +422,7 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
     @JvmStatic
     fun <A> eval(eval: Eval<A>): Fx<A> = when (eval) {
       is Eval.Now -> Fx.just(eval.value)
-      else -> Single { eval.value() }
+      else -> Lazy { eval.value() }
     }
 
     @JvmStatic
@@ -445,6 +461,7 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
     fun <A> unsafeRunBlocking(fx: FxOf<A>): A = when (val fa = fx.fix()) {
       is Pure -> fa.value
       is RaiseError -> throw fa.error
+      is Lazy -> fa.source()
       else -> UnsafePromise<A>().run {
         FxRunLoop.start(fx, cb = ::complete)
         await()
@@ -551,7 +568,7 @@ internal fun <A> FxFiber(promise: UnsafePromise<A>, conn: FxConnection): Fiber<F
       conn.pop()
     }
 
-    conn2.push(Fx.Single { promise.remove(cb2) })
+    conn2.push(Fx.Lazy { promise.remove(cb2) })
     conn.push(conn2.cancel())
     promise.get(cb2)
   }
