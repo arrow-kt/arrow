@@ -4,9 +4,13 @@ import arrow.Kind
 import arrow.core.Continuation
 import arrow.core.identity
 import java.io.Serializable
-import kotlin.coroutines.*
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.coroutines.RestrictsSuspension
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
+import kotlin.coroutines.resume
+import kotlin.coroutines.startCoroutine
 
 /**
  * ank_macro_hierarchy(arrow.typeclasses.Comonad)

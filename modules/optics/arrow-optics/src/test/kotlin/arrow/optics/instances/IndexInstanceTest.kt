@@ -1,15 +1,16 @@
 package arrow.optics.instances
 
 import arrow.core.extensions.eq
-import arrow.data.*
+import arrow.data.SequenceK
 import arrow.data.extensions.sequencek.eq.eq
 import arrow.optics.extensions.sequencek.index.index
 import arrow.test.UnitSpec
-import arrow.test.generators.*
+import arrow.test.generators.functionAToB
+import arrow.test.generators.sequenceK
 import arrow.test.laws.OptionalLaws
 import arrow.typeclasses.Eq
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.properties.Gen
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
 @RunWith(KotlinTestRunner::class)
@@ -27,6 +28,5 @@ class IndexInstanceTest : UnitSpec() {
         EQA = SequenceK.eq(String.eq())
       )
     )
-
   }
 }

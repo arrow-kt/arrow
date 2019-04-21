@@ -7,7 +7,9 @@ import arrow.core.extensions.id.comonad.extract
 import arrow.core.extensions.id.monad.monad
 import arrow.core.extensions.monoid
 import arrow.test.concurrency.SideEffect
-import arrow.test.generators.*
+import arrow.test.generators.functionAToB
+import arrow.test.generators.intPredicate
+import arrow.test.generators.intSmall
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Foldable
 import io.kotlintest.properties.Gen

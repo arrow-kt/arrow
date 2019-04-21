@@ -10,7 +10,15 @@ import arrow.data.WriterTPartialOf
 import arrow.data.extensions.WriterTMonadThrow
 import arrow.data.value
 import arrow.effects.Ref
-import arrow.effects.typeclasses.*
+import arrow.effects.typeclasses.Async
+import arrow.effects.typeclasses.Bracket
+import arrow.effects.typeclasses.ConcurrentEffect
+import arrow.effects.typeclasses.Disposable
+import arrow.effects.typeclasses.Effect
+import arrow.effects.typeclasses.ExitCase
+import arrow.effects.typeclasses.MonadDefer
+import arrow.effects.typeclasses.Proc
+import arrow.effects.typeclasses.ProcF
 import arrow.extension
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.Monoid
@@ -29,7 +37,8 @@ interface WriterTBracket<F, W> : Bracket<WriterTPartialOf<F, W>, Throwable>, Wri
 
   override fun <A, B> WriterTOf<F, W, A>.bracketCase(
     release: (A, ExitCase<Throwable>) -> WriterTOf<F, W, Unit>,
-    use: (A) -> WriterTOf<F, W, B>): WriterT<F, W, B> = MM().run {
+    use: (A) -> WriterTOf<F, W, B>
+  ): WriterT<F, W, B> = MM().run {
     MD().run {
       WriterT(Ref.of(empty(), this).flatMap { ref ->
         value().bracketCase(use = { wa ->
@@ -46,7 +55,6 @@ interface WriterTBracket<F, W> : Bracket<WriterTPartialOf<F, W>, Throwable>, Wri
       })
     }
   }
-
 }
 
 @extension
@@ -59,7 +67,6 @@ interface WriterTMonadDefer<F, W> : MonadDefer<WriterTPartialOf<F, W>>, WriterTB
 
   override fun <A> defer(fa: () -> Kind<WriterTPartialOf<F, W>, A>): Kind<WriterTPartialOf<F, W>, A> =
     WriterT(MD().defer { fa().value() })
-
 }
 
 @extension
@@ -83,7 +90,6 @@ interface WriterTAsync<F, W> : Async<WriterTPartialOf<F, W>>, WriterTMonadDefer<
   override fun <A> WriterTOf<F, W, A>.continueOn(ctx: CoroutineContext): WriterT<F, W, A> = AS().run {
     WriterT(value().continueOn(ctx))
   }
-
 }
 
 @extension
@@ -102,7 +108,6 @@ interface WriterTEffect<F, W> : Effect<WriterTPartialOf<F, W>>, WriterTAsync<F, 
       f(r).value().unit()
     }, MM(), this)
   }
-
 }
 
 @extension
@@ -121,5 +126,4 @@ interface WriterTConcurrentEffect<F, W> : ConcurrentEffect<WriterTPartialOf<F, W
       f(r).value().unit()
     }, MM(), this)
   }
-
 }

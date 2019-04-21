@@ -29,6 +29,5 @@ class EitherInstanceTest : UnitSpec() {
       EQOptionB = Option.eq(Eq.any()),
       EQListB = ListK.eq(Eq.any())
     ))
-
   }
 }

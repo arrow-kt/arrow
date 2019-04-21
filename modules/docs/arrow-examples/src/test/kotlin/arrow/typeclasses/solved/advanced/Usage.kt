@@ -2,9 +2,11 @@
 
 package com.pacoworks.typeclasses.basics.solved.advanced
 
+import arrow.effects.ForIO
 import arrow.Kind
-import arrow.effects.*
+import arrow.effects.IO
 import arrow.effects.extensions.io.async.async
+import arrow.effects.fix
 import arrow.effects.typeclasses.Async
 import arrow.typeclasses.DaoDatabase
 import arrow.typeclasses.Index

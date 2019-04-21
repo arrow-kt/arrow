@@ -40,7 +40,6 @@ fun <F> Fx<F>.ank(source: Path, target: Path, compilerArgs: List<String>, ankOps
       }.toList().sequence()
     }
 
-
     val message = "Ank Processed ${paths.size} files"
     !effect { printConsole(colored(ANSI_GREEN, message)) }
   }

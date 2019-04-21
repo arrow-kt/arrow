@@ -5,7 +5,9 @@ import arrow.data.Invalid
 import arrow.data.Valid
 import arrow.data.Validated
 import arrow.test.UnitSpec
-import arrow.test.generators.*
+import arrow.test.generators.either
+import arrow.test.generators.functionAToB
+import arrow.test.generators.validated
 import arrow.test.laws.IsoLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
@@ -35,7 +37,6 @@ class EitherTest : UnitSpec() {
             }
           }
         }
-
     }
     testLaws(IsoLaws.laws(
       iso = Either.toValidated(),
@@ -47,5 +48,4 @@ class EitherTest : UnitSpec() {
       bMonoid = VAL_MONOID
     ))
   }
-
 }

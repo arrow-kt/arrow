@@ -1,8 +1,12 @@
 package arrow.mtl.typeclasses
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Id
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
 import arrow.core.extensions.id.applicative.applicative
+import arrow.core.value
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Traverse
 

@@ -3,9 +3,24 @@ package arrow.data.extensions
 import arrow.Kind
 import arrow.Kind2
 import arrow.core.Either
-import arrow.data.*
+import arrow.data.AndThen
+import arrow.data.AndThenOf
+import arrow.data.AndThenPartialOf
+import arrow.data.ForAndThen
+import arrow.data.fix
+import arrow.data.invoke
 import arrow.extension
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Category
+import arrow.typeclasses.Conested
+import arrow.typeclasses.Contravariant
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.Profunctor
+import arrow.typeclasses.Semigroup
+import arrow.typeclasses.conest
+import arrow.typeclasses.counnest
 
 @extension
 interface AndThenSemigroup<A, B> : Semigroup<AndThen<A, B>> {
@@ -14,7 +29,6 @@ interface AndThenSemigroup<A, B> : Semigroup<AndThen<A, B>> {
   override fun AndThen<A, B>.combine(b: AndThen<A, B>): AndThen<A, B> = SB().run {
     AndThen { a: A -> invoke(a).combine(b.invoke(a)) }
   }
-
 }
 
 @extension
@@ -26,7 +40,6 @@ interface AndThenMonoid<A, B> : Monoid<AndThen<A, B>>, AndThenSemigroup<A, B> {
 
   override fun empty(): AndThen<A, B> =
     AndThen { MB().empty() }
-
 }
 
 @extension
@@ -45,7 +58,6 @@ interface AndThenApplicative<X> : Applicative<AndThenPartialOf<X>>, AndThenFunct
 
   override fun <A, B> AndThenOf<X, A>.map(f: (A) -> B): AndThen<X, B> =
     fix().map(f)
-
 }
 
 @extension
@@ -61,7 +73,6 @@ interface AndThenMonad<X> : Monad<AndThenPartialOf<X>>, AndThenApplicative<X> {
 
   override fun <A, B> AndThenOf<X, A>.ap(ff: AndThenOf<X, (A) -> B>): AndThen<X, B> =
     fix().ap(ff)
-
 }
 
 @extension
@@ -71,7 +82,6 @@ interface AndThenCategory : Category<ForAndThen> {
 
   override fun <A, B, C> AndThenOf<B, C>.compose(arr: Kind2<ForAndThen, A, B>): AndThen<A, C> =
     fix().compose(arr::invoke)
-
 }
 
 @extension
@@ -79,7 +89,6 @@ interface AndThenContravariant<O> : Contravariant<Conested<ForAndThen, O>> {
 
   override fun <A, B> Kind<Conested<ForAndThen, O>, A>.contramap(f: (B) -> A): Kind<Conested<ForAndThen, O>, B> =
     counnest().fix().contramap(f).conest()
-
 }
 
 @extension

@@ -3,9 +3,13 @@ package arrow.dagger.extensions
 import arrow.data.KleisliPartialOf
 import arrow.data.extensions.KleisliApplicative
 import arrow.data.extensions.KleisliFunctor
-import arrow.data.extensions.KleisliMonadError
 import arrow.data.extensions.KleisliMonad
-import arrow.typeclasses.*
+import arrow.data.extensions.KleisliMonadError
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadError
 import dagger.Module
 import dagger.Provides
 import javax.inject.Inject

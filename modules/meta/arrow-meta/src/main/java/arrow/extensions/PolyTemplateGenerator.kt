@@ -198,5 +198,4 @@ interface PolyTemplateGenerator : MetaApi {
   private fun TypeClassInstance.invocationTypeArgs(): List<String> =
     if (dataType.typeVariables.size < 2) emptyList()
     else (0 until dataType.typeVariables.size - 1).typeArgs(this)
-
 }

@@ -24,7 +24,6 @@ data class Const<A, out T>(private val value: A) : ConstOf<A, T> {
   }
 
   fun value(): A = value
-
 }
 
 fun <A, T> ConstOf<A, T>.combine(SG: Semigroup<A>, that: ConstOf<A, T>): Const<A, T> = Const(SG.run { value().combine(that.value()) })

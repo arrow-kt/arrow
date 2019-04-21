@@ -3,15 +3,42 @@
 package arrow.core.extensions
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
+import arrow.core.Eval
+import arrow.core.ForTuple2
+import arrow.core.Tuple10
+import arrow.core.Tuple2
+import arrow.core.Tuple2Of
+import arrow.core.Tuple2PartialOf
+import arrow.core.Tuple3
+import arrow.core.Tuple4
+import arrow.core.Tuple5
+import arrow.core.Tuple6
+import arrow.core.Tuple7
+import arrow.core.Tuple8
+import arrow.core.Tuple9
+import arrow.core.fix
+import arrow.core.identity
+import arrow.core.toT
 import arrow.extension
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Bifunctor
+import arrow.typeclasses.Comonad
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Hash
+import arrow.typeclasses.Monad
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.Semigroup
+import arrow.typeclasses.Show
+import arrow.typeclasses.Traverse
 import arrow.core.extensions.traverse as tuple2Traverse
 
-//TODO this should be user driven allowing consumers to generate the tuple arities on demand to avoid cluttering arrow dependents with unused code
-//TODO @arities(fromTupleN = 2, toTupleN = 22 | fromHListN = 1, toHListN = 22)
+// TODO this should be user driven allowing consumers to generate the tuple arities on demand to avoid cluttering arrow dependents with unused code
+// TODO @arities(fromTupleN = 2, toTupleN = 22 | fromHListN = 1, toHListN = 22)
 
 @extension
 interface Tuple2Functor<F> : Functor<Tuple2PartialOf<F>> {
@@ -165,9 +192,9 @@ interface Tuple3Eq<A, B, C> : Eq<Tuple3<A, B, C>> {
   fun EQC(): Eq<C>
 
   override fun Tuple3<A, B, C>.eqv(b: Tuple3<A, B, C>): Boolean =
-    EQA().run { a.eqv(b.a) }
-      && EQB().run { this@eqv.b.eqv(b.b) }
-      && EQC().run { c.eqv(b.c) }
+    EQA().run { a.eqv(b.a) } &&
+      EQB().run { this@eqv.b.eqv(b.b) } &&
+      EQC().run { c.eqv(b.c) }
 }
 
 @extension
@@ -205,10 +232,10 @@ interface Tuple4Eq<A, B, C, D> : Eq<Tuple4<A, B, C, D>> {
   fun EQD(): Eq<D>
 
   override fun Tuple4<A, B, C, D>.eqv(b: Tuple4<A, B, C, D>): Boolean =
-    EQA().run { a.eqv(b.a) }
-      && EQB().run { this@eqv.b.eqv(b.b) }
-      && EQC().run { c.eqv(b.c) }
-      && EQD().run { d.eqv(b.d) }
+    EQA().run { a.eqv(b.a) } &&
+      EQB().run { this@eqv.b.eqv(b.b) } &&
+      EQC().run { c.eqv(b.c) } &&
+      EQD().run { d.eqv(b.d) }
 }
 
 @extension
@@ -251,12 +278,11 @@ interface Tuple5Eq<A, B, C, D, E> : Eq<Tuple5<A, B, C, D, E>> {
   fun EQE(): Eq<E>
 
   override fun Tuple5<A, B, C, D, E>.eqv(b: Tuple5<A, B, C, D, E>): Boolean =
-    EQA().run { a.eqv(b.a) }
-      && EQB().run { this@eqv.b.eqv(b.b) }
-      && EQC().run { c.eqv(b.c) }
-      && EQD().run { d.eqv(b.d) }
-      && EQE().run { e.eqv(b.e) }
-
+    EQA().run { a.eqv(b.a) } &&
+      EQB().run { this@eqv.b.eqv(b.b) } &&
+      EQC().run { c.eqv(b.c) } &&
+      EQD().run { d.eqv(b.d) } &&
+      EQE().run { e.eqv(b.e) }
 }
 
 @extension
@@ -304,13 +330,12 @@ interface Tuple6Eq<A, B, C, D, E, F> : Eq<Tuple6<A, B, C, D, E, F>> {
   fun EQF(): Eq<F>
 
   override fun Tuple6<A, B, C, D, E, F>.eqv(b: Tuple6<A, B, C, D, E, F>): Boolean =
-    EQA().run { a.eqv(b.a) }
-      && EQB().run { this@eqv.b.eqv(b.b) }
-      && EQC().run { c.eqv(b.c) }
-      && EQD().run { d.eqv(b.d) }
-      && EQE().run { e.eqv(b.e) }
-      && EQF().run { f.eqv(b.f) }
-
+    EQA().run { a.eqv(b.a) } &&
+      EQB().run { this@eqv.b.eqv(b.b) } &&
+      EQC().run { c.eqv(b.c) } &&
+      EQD().run { d.eqv(b.d) } &&
+      EQE().run { e.eqv(b.e) } &&
+      EQF().run { f.eqv(b.f) }
 }
 
 @extension
@@ -363,14 +388,13 @@ interface Tuple7Eq<A, B, C, D, E, F, G> : Eq<Tuple7<A, B, C, D, E, F, G>> {
   fun EQG(): Eq<G>
 
   override fun Tuple7<A, B, C, D, E, F, G>.eqv(b: Tuple7<A, B, C, D, E, F, G>): Boolean =
-    EQA().run { a.eqv(b.a) }
-      && EQB().run { this@eqv.b.eqv(b.b) }
-      && EQC().run { c.eqv(b.c) }
-      && EQD().run { d.eqv(b.d) }
-      && EQE().run { e.eqv(b.e) }
-      && EQF().run { f.eqv(b.f) }
-      && EQG().run { g.eqv(b.g) }
-
+    EQA().run { a.eqv(b.a) } &&
+      EQB().run { this@eqv.b.eqv(b.b) } &&
+      EQC().run { c.eqv(b.c) } &&
+      EQD().run { d.eqv(b.d) } &&
+      EQE().run { e.eqv(b.e) } &&
+      EQF().run { f.eqv(b.f) } &&
+      EQG().run { g.eqv(b.g) }
 }
 
 @extension
@@ -428,15 +452,14 @@ interface Tuple8Eq<A, B, C, D, E, F, G, H> : Eq<Tuple8<A, B, C, D, E, F, G, H>> 
   fun EQH(): Eq<H>
 
   override fun Tuple8<A, B, C, D, E, F, G, H>.eqv(b: Tuple8<A, B, C, D, E, F, G, H>): Boolean =
-    EQA().run { a.eqv(b.a) }
-      && EQB().run { this@eqv.b.eqv(b.b) }
-      && EQC().run { c.eqv(b.c) }
-      && EQD().run { d.eqv(b.d) }
-      && EQE().run { e.eqv(b.e) }
-      && EQF().run { f.eqv(b.f) }
-      && EQG().run { g.eqv(b.g) }
-      && EQH().run { h.eqv(b.h) }
-
+    EQA().run { a.eqv(b.a) } &&
+      EQB().run { this@eqv.b.eqv(b.b) } &&
+      EQC().run { c.eqv(b.c) } &&
+      EQD().run { d.eqv(b.d) } &&
+      EQE().run { e.eqv(b.e) } &&
+      EQF().run { f.eqv(b.f) } &&
+      EQG().run { g.eqv(b.g) } &&
+      EQH().run { h.eqv(b.h) }
 }
 
 @extension
@@ -499,16 +522,15 @@ interface Tuple9Eq<A, B, C, D, E, F, G, H, I> : Eq<Tuple9<A, B, C, D, E, F, G, H
   fun EQI(): Eq<I>
 
   override fun Tuple9<A, B, C, D, E, F, G, H, I>.eqv(b: Tuple9<A, B, C, D, E, F, G, H, I>): Boolean =
-    EQA().run { a.eqv(b.a) }
-      && EQB().run { this@eqv.b.eqv(b.b) }
-      && EQC().run { c.eqv(b.c) }
-      && EQD().run { d.eqv(b.d) }
-      && EQE().run { e.eqv(b.e) }
-      && EQF().run { f.eqv(b.f) }
-      && EQG().run { g.eqv(b.g) }
-      && EQH().run { h.eqv(b.h) }
-      && EQI().run { i.eqv(b.i) }
-
+    EQA().run { a.eqv(b.a) } &&
+      EQB().run { this@eqv.b.eqv(b.b) } &&
+      EQC().run { c.eqv(b.c) } &&
+      EQD().run { d.eqv(b.d) } &&
+      EQE().run { e.eqv(b.e) } &&
+      EQF().run { f.eqv(b.f) } &&
+      EQG().run { g.eqv(b.g) } &&
+      EQH().run { h.eqv(b.h) } &&
+      EQI().run { i.eqv(b.i) }
 }
 
 @extension
@@ -576,17 +598,16 @@ interface Tuple10Eq<A, B, C, D, E, F, G, H, I, J> : Eq<Tuple10<A, B, C, D, E, F,
   fun EQJ(): Eq<J>
 
   override fun Tuple10<A, B, C, D, E, F, G, H, I, J>.eqv(b: Tuple10<A, B, C, D, E, F, G, H, I, J>): Boolean =
-    EQA().run { a.eqv(b.a) }
-      && EQB().run { this@eqv.b.eqv(b.b) }
-      && EQC().run { c.eqv(b.c) }
-      && EQD().run { d.eqv(b.d) }
-      && EQE().run { e.eqv(b.e) }
-      && EQF().run { f.eqv(b.f) }
-      && EQG().run { g.eqv(b.g) }
-      && EQH().run { h.eqv(b.h) }
-      && EQI().run { i.eqv(b.i) }
-      && EQJ().run { j.eqv(b.j) }
-
+    EQA().run { a.eqv(b.a) } &&
+      EQB().run { this@eqv.b.eqv(b.b) } &&
+      EQC().run { c.eqv(b.c) } &&
+      EQD().run { d.eqv(b.d) } &&
+      EQE().run { e.eqv(b.e) } &&
+      EQF().run { f.eqv(b.f) } &&
+      EQG().run { g.eqv(b.g) } &&
+      EQH().run { h.eqv(b.h) } &&
+      EQI().run { i.eqv(b.i) } &&
+      EQJ().run { j.eqv(b.j) }
 }
 
 @extension

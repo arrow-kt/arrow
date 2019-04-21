@@ -1,9 +1,15 @@
 package arrow.effects.rx2
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Eval
+import arrow.core.Left
+import arrow.core.NonFatal
+import arrow.core.Right
+import arrow.core.identity
 import arrow.effects.OnCancel
 import arrow.effects.internal.Platform
+import arrow.effects.rx2.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
 import arrow.higherkind
@@ -12,7 +18,6 @@ import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.FlowableEmitter
 import kotlin.coroutines.CoroutineContext
-import arrow.effects.rx2.CoroutineContextRx2Scheduler.asScheduler
 
 fun <A> Flowable<A>.k(): FlowableK<A> = FlowableK(this)
 
@@ -188,8 +193,8 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
     fun <A> async(fa: FlowableKProc<A>, mode: BackpressureStrategy = BackpressureStrategy.BUFFER): FlowableK<A> =
       Flowable.create<A>({ emitter ->
         val conn = FlowableKConnection()
-        //On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
-        //on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
+        // On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
+        // on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
         conn.push(FlowableK { if (!emitter.isCancelled) emitter.onError(OnCancel.CancellationException) })
         emitter.setCancellable { conn.cancel().value().subscribe() }
 
@@ -206,8 +211,8 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
     fun <A> asyncF(fa: FlowableKProcF<A>, mode: BackpressureStrategy = BackpressureStrategy.BUFFER): FlowableK<A> =
       Flowable.create({ emitter: FlowableEmitter<A> ->
         val conn = FlowableKConnection()
-        //On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
-        //on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
+        // On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
+        // on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
         conn.push(FlowableK { if (!emitter.isCancelled) emitter.onError(OnCancel.CancellationException) })
         emitter.setCancellable { conn.cancel().value().subscribe() }
 

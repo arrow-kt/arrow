@@ -79,7 +79,6 @@ class KindConnectionTests : UnitSpec() {
       effect shouldBe 1
     }
 
-
     "push two, pop two" {
       var effect = 0
       val initial1 = IO { effect += 1 }

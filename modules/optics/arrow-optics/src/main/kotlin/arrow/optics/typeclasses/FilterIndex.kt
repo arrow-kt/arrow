@@ -49,7 +49,5 @@ interface FilterIndex<S, I, A> {
           }
       }
     }
-
   }
-
 }

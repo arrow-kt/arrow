@@ -1,10 +1,15 @@
 package arrow.optics
 
-import arrow.core.*
+import arrow.core.ListExtensions
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.case
+import arrow.core.identity
+import arrow.core.toT
 import arrow.data.ListK
 import arrow.data.NonEmptyList
 import arrow.data.k
-import arrow.core.ListExtensions
 
 /**
  * [Optional] to safely operate on the head of a list

@@ -1,7 +1,14 @@
 package arrow.mtl.extensions
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Eval
+import arrow.core.ForOption
+import arrow.core.Option
+import arrow.core.OptionOf
+import arrow.core.Tuple2
+import arrow.core.fix
+import arrow.core.orElse
 import arrow.extension
 import arrow.mtl.typeclasses.FunctorFilter
 import arrow.mtl.typeclasses.MonadCombine

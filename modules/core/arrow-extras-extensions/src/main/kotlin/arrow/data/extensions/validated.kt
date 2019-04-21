@@ -3,10 +3,27 @@ package arrow.data.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
-import arrow.data.*
-
+import arrow.data.Invalid
+import arrow.data.Valid
+import arrow.data.Validated
+import arrow.data.ValidatedPartialOf
+import arrow.data.ap
+import arrow.data.combineK
+import arrow.data.fix
+import arrow.data.handleLeftWith
 import arrow.extension
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Hash
+import arrow.typeclasses.Selective
+import arrow.typeclasses.Semigroup
+import arrow.typeclasses.SemigroupK
+import arrow.typeclasses.Show
+import arrow.typeclasses.Traverse
+import arrow.typeclasses.fix
 import arrow.undocumented
 import arrow.data.traverse as validatedTraverse
 
@@ -26,7 +43,6 @@ interface ValidatedApplicative<E> : Applicative<ValidatedPartialOf<E>>, Validate
   override fun <A, B> Kind<ValidatedPartialOf<E>, A>.map(f: (A) -> B): Validated<E, B> = fix().map(f)
 
   override fun <A, B> Kind<ValidatedPartialOf<E>, A>.ap(ff: Kind<ValidatedPartialOf<E>, (A) -> B>): Validated<E, B> = fix().ap(SE(), ff.fix())
-
 }
 
 @extension
@@ -34,8 +50,8 @@ interface ValidatedSelective<E> : Selective<ValidatedPartialOf<E>>, ValidatedApp
 
   override fun SE(): Semigroup<E>
 
-   override fun <A, B> Kind<ValidatedPartialOf<E>, Either<A, B>>.select(f: Kind<ValidatedPartialOf<E>, (A) -> B>): Kind<ValidatedPartialOf<E>, B> =
-    fix().fold({Invalid(it)}, { it.fold({ l -> f.map { ff -> ff(l) } }, { r -> just(r) })})
+  override fun <A, B> Kind<ValidatedPartialOf<E>, Either<A, B>>.select(f: Kind<ValidatedPartialOf<E>, (A) -> B>): Kind<ValidatedPartialOf<E>, B> =
+    fix().fold({ Invalid(it) }, { it.fold({ l -> f.map { ff -> ff(l) } }, { r -> just(r) }) })
 }
 
 @extension
@@ -47,7 +63,6 @@ interface ValidatedApplicativeError<E> : ApplicativeError<ValidatedPartialOf<E>,
 
   override fun <A> Kind<ValidatedPartialOf<E>, A>.handleErrorWith(f: (E) -> Kind<ValidatedPartialOf<E>, A>): Validated<E, A> =
     fix().handleLeftWith(f)
-
 }
 
 @extension
