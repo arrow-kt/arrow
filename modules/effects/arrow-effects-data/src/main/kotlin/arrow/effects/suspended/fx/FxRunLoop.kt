@@ -130,6 +130,10 @@ internal object FxRunLoop {
           asyncBoundary.start(source as Fx.Single<Any?>, ctx, bFirst, bRest)
           return
         }
+        DeferTag -> {
+          val thunk: () -> FxOf<Any?> = (source as Fx.Defer).thunk
+          source = executeSafe { thunk() }
+        }
         MapTag -> {
           if (bFirst != null) {
             if (bRest == null) {

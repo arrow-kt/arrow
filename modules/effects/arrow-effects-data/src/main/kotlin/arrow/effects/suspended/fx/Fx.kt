@@ -35,6 +35,7 @@ const val ConnectionSwitchTag = 5
 const val AsyncTag = 6
 const val ModifyContextTag = 7
 const val ContinueOnTag = 9
+const val DeferTag = 10
 
 sealed class FxImpossibleBugs(message: String) : RuntimeException(message) {
   object Fxfa : FxImpossibleBugs("Fx.fa bug, please contact support with this message! https://arrow-kt.io")
@@ -62,6 +63,7 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
         }
         PureTag -> suspend { (this as Fx.Pure<A>).value }
         SingleTag -> (this as Fx.Single<A>).source
+        DeferTag -> suspend { !(this as Fx.Defer<A>).thunk() }
         MapTag -> {
           this as Fx.Map<A, *>
           suspend {
@@ -106,6 +108,7 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
         }
       }
       SingleTag -> Map(this, f)
+      DeferTag -> Map(this, f)
       ConnectionSwitchTag -> Map(this, f)
       ModifyContextTag -> Map(this, f)
       AsyncTag -> Map(this, f)
@@ -133,6 +136,7 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
       RaiseErrorTag -> throw (this as Fx.RaiseError<*>).error
       PureTag -> (this as Pure<A>).value
       SingleTag -> (this as Single<A>).source()
+      DeferTag -> FxRunLoop(this)
       MapTag -> FxRunLoop(this)
       FlatMapTag -> FxRunLoop(this)
       ConnectionSwitchTag -> FxRunLoop(this)
@@ -148,6 +152,7 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
       RaiseErrorTag -> unsafeRetag()
       PureTag -> FlatMap(this, f, 0)
       SingleTag -> FlatMap(this, f, 0)
+      DeferTag -> FlatMap(this, f, 0)
       ConnectionSwitchTag -> FlatMap(this, f, 0)
       ModifyContextTag -> FlatMap(this, f, 0)
       AsyncTag -> FlatMap(this, f, 0)
@@ -191,6 +196,11 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
   @PublishedApi
   internal class Single<A>(@JvmField val source: suspend () -> A) : Fx<A>(SingleTag) {
     override fun toString(): String = "Fx.Single"
+  }
+
+  @PublishedApi
+  internal class Defer<out A>(val thunk: () -> FxOf<A>) : Fx<A>(DeferTag) {
+    override fun toString(): String = "Fx.Defer"
   }
 
   @PublishedApi
@@ -401,7 +411,7 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
 
     @JvmStatic
     fun <A> defer(fa: () -> FxOf<A>): Fx<A> =
-      FlatMap(Pure<Unit>(Unit, 0), { fa() }, 0)
+      Defer(fa)
 
     @JvmStatic
     fun <A, B> tailRecM(a: A, f: (A) -> FxOf<Either<A, B>>): Fx<B> =
