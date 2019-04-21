@@ -19,8 +19,8 @@ open class Delay {
   var size: Int = 0
 
   private fun fxDelayLoop(i: Int): Fx<Int> =
-    Fx { i }.flatMap { j ->
-      if (j > size) Fx { j } else fxDelayLoop(j + 1)
+    Fx.lazy { i }.flatMap { j ->
+      if (j > size) Fx.lazy { j } else fxDelayLoop(j + 1)
     }
 
   private fun ioDelayLoop(i: Int): IO<Int> =
