@@ -1,7 +1,7 @@
 package arrow.effects.extensions
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
 import arrow.effects.IODispatchers
 import arrow.effects.extensions.fx.dispatchers.dispatchers
 import arrow.effects.suspended.fx.*
@@ -9,9 +9,11 @@ import arrow.effects.typeclasses.*
 import arrow.extension
 import arrow.typeclasses.*
 import arrow.unsafe
-import kotlin.coroutines.*
-import  arrow.effects.suspended.fx.guaranteeCase as guaranteeC
-import  arrow.effects.suspended.fx.bracketCase as bracketC
+import kotlin.coroutines.CoroutineContext
+import arrow.effects.suspended.fx.bracketCase as bracketC
+import arrow.effects.suspended.fx.guaranteeCase as guaranteeC
+import arrow.effects.suspended.fx.handleErrorWith as fxHandleErrorWith
+
 
 @extension
 interface FxDispatchers : Dispatchers<ForFx> {
@@ -67,7 +69,7 @@ interface FxApplicativeError : ApplicativeError<ForFx, Throwable>, FxApplicative
     Fx.raiseError(e)
 
   override fun <A> FxOf<A>.handleErrorWith(f: (Throwable) -> FxOf<A>): Fx<A> =
-    fix().handleErrorWith { f(it).fix() }
+    fix().fxHandleErrorWith { f(it).fix() }
 }
 
 @extension

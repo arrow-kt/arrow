@@ -1,12 +1,13 @@
 package arrow.benchmarks
 
 import arrow.effects.IO
-import arrow.effects.extensions.io.applicativeError.handleErrorWith
 import arrow.effects.suspended.fx.Fx
 import arrow.unsafe
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
 import arrow.effects.extensions.fx.unsafeRun.runBlocking as fxRunBlocking
+import arrow.effects.handleErrorWith as ioHandleErrorWith
+import arrow.effects.suspended.fx.handleErrorWith as fxHandleErrorWith
 
 @State(Scope.Thread)
 @Fork(2)
@@ -21,7 +22,7 @@ open class HandleNonRaised {
   private fun ioHappyPathLoop(i: Int): IO<Int> =
     if (i < size)
       IO.just(i + 1)
-        .handleErrorWith { IO.raiseError(it) }
+        .ioHandleErrorWith { IO.raiseError(it) }
         .flatMap { ioHappyPathLoop(it) }
     else
       IO.just(i)
@@ -29,7 +30,7 @@ open class HandleNonRaised {
   private fun fxHappyPathLoop(i: Int): Fx<Int> =
     if (i < size)
       Fx.just(i + 1)
-        .handleErrorWith { Fx.raiseError(it) }
+        .fxHandleErrorWith { Fx.raiseError(it) }
         .flatMap { fxHappyPathLoop(it) }
     else
       Fx.just(i)
