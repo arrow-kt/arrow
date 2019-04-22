@@ -9,7 +9,6 @@ import arrow.core.toT
 import arrow.data.WriterT
 import arrow.data.WriterTOf
 import arrow.data.WriterTPartialOf
-import arrow.data.extensions.statet.monad.monad
 import arrow.data.extensions.writert.monad.monad
 import arrow.data.fix
 import arrow.data.value
@@ -27,7 +26,6 @@ import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.MonoidK
 import arrow.typeclasses.SemigroupK
-import arrow.typeclasses.fix
 import arrow.typeclasses.suspended.monad.Fx
 import arrow.undocumented
 

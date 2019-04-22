@@ -5,6 +5,7 @@ import arrow.core.Eval
 import arrow.core.Tuple2
 import arrow.extension
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Const
 import arrow.typeclasses.ConstOf
 import arrow.typeclasses.ConstPartialOf
@@ -59,6 +60,17 @@ interface ConstDivisibleInstance<O> : Divisible<ConstPartialOf<O>>, ConstDivideI
 interface ConstFunctor<A> : Functor<ConstPartialOf<A>> {
   override fun <T, U> ConstOf<A, T>.map(f: (T) -> U): Const<A, U> =
     fix().retag()
+}
+
+@extension
+interface ConstApply<A> : Apply<ConstPartialOf<A>> {
+
+  fun MA(): Monoid<A>
+
+  override fun <T, U> ConstOf<A, T>.map(f: (T) -> U): Const<A, U> = fix().retag()
+
+  override fun <T, U> ConstOf<A, T>.ap(ff: ConstOf<A, (T) -> U>): Const<A, U> =
+    constAp(MA(), ff)
 }
 
 @extension
