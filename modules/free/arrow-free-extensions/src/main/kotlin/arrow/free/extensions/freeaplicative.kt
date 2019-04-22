@@ -8,6 +8,7 @@ import arrow.free.FreeApplicativePartialOf
 import arrow.free.fix
 import arrow.extension
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
@@ -16,6 +17,16 @@ import arrow.undocumented
 @extension
 @undocumented
 interface FreeApplicativeFunctor<S> : Functor<FreeApplicativePartialOf<S>> {
+  override fun <A, B> Kind<FreeApplicativePartialOf<S>, A>.map(f: (A) -> B): FreeApplicative<S, B> = fix().map(f)
+}
+
+@extension
+@undocumented
+interface FreeApplicativeApply<S> : Apply<FreeApplicativePartialOf<S>>, FreeApplicativeFunctor<S> {
+
+  override fun <A, B> Kind<FreeApplicativePartialOf<S>, A>.ap(ff: Kind<FreeApplicativePartialOf<S>, (A) -> B>): FreeApplicative<S, B> =
+    fix().ap(ff.fix())
+
   override fun <A, B> Kind<FreeApplicativePartialOf<S>, A>.map(f: (A) -> B): FreeApplicative<S, B> = fix().map(f)
 }
 

@@ -11,6 +11,7 @@ import arrow.data.fix
 import arrow.data.invoke
 import arrow.extension
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Category
 import arrow.typeclasses.Conested
 import arrow.typeclasses.Contravariant
@@ -44,6 +45,15 @@ interface AndThenMonoid<A, B> : Monoid<AndThen<A, B>>, AndThenSemigroup<A, B> {
 
 @extension
 interface AndThenFunctor<X> : Functor<AndThenPartialOf<X>> {
+  override fun <A, B> AndThenOf<X, A>.map(f: (A) -> B): AndThen<X, B> =
+    fix().map(f)
+}
+
+@extension
+interface AndThenApply<X> : Apply<AndThenPartialOf<X>>, AndThenFunctor<X> {
+  override fun <A, B> AndThenOf<X, A>.ap(ff: AndThenOf<X, (A) -> B>): AndThen<X, B> =
+    fix().ap(ff)
+
   override fun <A, B> AndThenOf<X, A>.map(f: (A) -> B): AndThen<X, B> =
     fix().map(f)
 }

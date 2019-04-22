@@ -23,6 +23,7 @@ import arrow.data.value
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Apply
 import arrow.typeclasses.ComposedTraverse
 import arrow.typeclasses.Contravariant
 import arrow.typeclasses.Decidable
@@ -48,6 +49,21 @@ interface EitherTFunctor<F, L> : Functor<EitherTPartialOf<F, L>> {
 
   override fun <A, B> EitherTOf<F, L, A>.map(f: (A) -> B): EitherT<F, L, B> =
     fix().map(FF(), f)
+}
+
+@extension
+@undocumented
+interface EitherTApply<F, L> : Apply<EitherTPartialOf<F, L>>, EitherTFunctor<F, L> {
+
+  fun AF(): Applicative<F>
+
+  override fun FF(): Functor<F> = AF()
+
+  override fun <A, B> EitherTOf<F, L, A>.map(f: (A) -> B): EitherT<F, L, B> =
+    fix().map(AF(), f)
+
+  override fun <A, B> EitherTOf<F, L, A>.ap(ff: EitherTOf<F, L, (A) -> B>): EitherT<F, L, B> =
+    fix().ap(AF(), ff)
 }
 
 @extension

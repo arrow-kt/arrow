@@ -13,6 +13,7 @@ import arrow.data.extensions.sequencek.monad.monad
 import arrow.data.fix
 import arrow.extension
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
@@ -74,6 +75,18 @@ interface SequenceKShow<A> : Show<SequenceK<A>> {
 interface SequenceKFunctor : Functor<ForSequenceK> {
   override fun <A, B> Kind<ForSequenceK, A>.map(f: (A) -> B): SequenceK<B> =
     fix().map(f)
+}
+
+@extension
+interface SequenceKApply : Apply<ForSequenceK> {
+  override fun <A, B> Kind<ForSequenceK, A>.ap(ff: Kind<ForSequenceK, (A) -> B>): SequenceK<B> =
+    fix().ap(ff)
+
+  override fun <A, B> Kind<ForSequenceK, A>.map(f: (A) -> B): SequenceK<B> =
+    fix().map(f)
+
+  override fun <A, B, Z> Kind<ForSequenceK, A>.map2(fb: Kind<ForSequenceK, B>, f: (Tuple2<A, B>) -> Z): SequenceK<Z> =
+    fix().map2(fb, f)
 }
 
 @extension

@@ -22,6 +22,7 @@ import arrow.data.fix
 import arrow.data.run
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Conested
 import arrow.typeclasses.Contravariant
 import arrow.typeclasses.Decidable
@@ -92,6 +93,23 @@ interface KleisliDecidableInstance<F, D> : Decidable<KleisliPartialOf<F, D>>, Kl
 
   override fun <A, B, Z> choose(fa: Kind<KleisliPartialOf<F, D>, A>, fb: Kind<KleisliPartialOf<F, D>, B>, f: (Z) -> Either<A, B>): Kind<KleisliPartialOf<F, D>, Z> =
     Kleisli { d -> DFFF().choose(fa.fix().run(d), fb.fix().run(d), f) }
+}
+
+@extension
+interface KleisliApply<F, D> : Apply<KleisliPartialOf<F, D>>, KleisliFunctor<F, D> {
+
+  fun AF(): Applicative<F>
+
+  override fun FF(): Functor<F> = AF()
+
+  override fun <A, B> KleisliOf<F, D, A>.map(f: (A) -> B): Kleisli<F, D, B> =
+    fix().map(AF(), f)
+
+  override fun <A, B> KleisliOf<F, D, A>.ap(ff: KleisliOf<F, D, (A) -> B>): Kleisli<F, D, B> =
+    fix().ap(AF(), ff)
+
+  override fun <A, B> KleisliOf<F, D, A>.product(fb: KleisliOf<F, D, B>): Kleisli<F, D, Tuple2<A, B>> =
+    Kleisli { AF().run { run(it).product(fb.run(it)) } }
 }
 
 @extension

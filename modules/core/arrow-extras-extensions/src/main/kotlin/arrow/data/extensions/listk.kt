@@ -14,6 +14,7 @@ import arrow.data.extensions.listk.monad.monad
 import arrow.data.fix
 import arrow.extension
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
@@ -27,7 +28,6 @@ import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Semigroupal
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
-import arrow.typeclasses.fix
 import arrow.typeclasses.suspended.monad.commutative.safe.Fx
 import kotlin.collections.emptyList
 import kotlin.collections.fold
@@ -71,6 +71,18 @@ interface ListKShow<A> : Show<ListKOf<A>> {
 interface ListKFunctor : Functor<ForListK> {
   override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B> =
     fix().map(f)
+}
+
+@extension
+interface ListKApply : Apply<ForListK> {
+  override fun <A, B> Kind<ForListK, A>.ap(ff: Kind<ForListK, (A) -> B>): ListK<B> =
+    fix().ap(ff)
+
+  override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B> =
+    fix().map(f)
+
+  override fun <A, B, Z> Kind<ForListK, A>.map2(fb: Kind<ForListK, B>, f: (Tuple2<A, B>) -> Z): ListK<Z> =
+    fix().map2(fb, f)
 }
 
 @extension

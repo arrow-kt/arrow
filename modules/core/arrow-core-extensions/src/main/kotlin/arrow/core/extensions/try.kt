@@ -15,6 +15,7 @@ import arrow.core.fix
 import arrow.core.identity
 import arrow.core.recoverWith
 import arrow.extension
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Eq
@@ -101,6 +102,15 @@ interface TryShow<A> : Show<Try<A>> {
 
 @extension
 interface TryFunctor : Functor<ForTry> {
+  override fun <A, B> TryOf<A>.map(f: (A) -> B): Try<B> =
+    fix().map(f)
+}
+
+@extension
+interface TryApply : Apply<ForTry> {
+  override fun <A, B> TryOf<A>.ap(ff: TryOf<(A) -> B>): Try<B> =
+    fix().ap(ff)
+
   override fun <A, B> TryOf<A>.map(f: (A) -> B): Try<B> =
     fix().map(f)
 }
