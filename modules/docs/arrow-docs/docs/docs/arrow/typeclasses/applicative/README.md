@@ -100,7 +100,7 @@ Option.applicative().run { Some(1).map2Eval(Eval.later { Some("x") }, { z: Tuple
 
 ### Apply
 
-A closely related type class is Apply which is identical to Applicative, modulo the pure method. Indeed Applicative is a subclass of Apply with the addition of this method.
+A closely related type class is Apply which is identical to Applicative, modulo the ``just`` method. Indeed Applicative is a subclass of Apply with the addition of this method.
 
 ```kotlin:ank
 import arrow.typeclasses.Functor 

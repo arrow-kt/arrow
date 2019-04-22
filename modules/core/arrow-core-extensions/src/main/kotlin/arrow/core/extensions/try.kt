@@ -109,10 +109,10 @@ interface TryFunctor : Functor<ForTry> {
 @extension
 interface TryApply : Apply<ForTry> {
   override fun <A, B> TryOf<A>.ap(ff: TryOf<(A) -> B>): Try<B> =
-          fix().ap(ff)
+    fix().ap(ff)
 
   override fun <A, B> TryOf<A>.map(f: (A) -> B): Try<B> =
-          fix().map(f)
+    fix().map(f)
 }
 
 @extension
