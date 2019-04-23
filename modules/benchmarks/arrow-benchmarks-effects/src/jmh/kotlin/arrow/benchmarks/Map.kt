@@ -24,26 +24,26 @@ open class Map {
   fun zioBatch120(): Long =
     arrow.benchmarks.effects.scala.zio.`Map$`.`MODULE$`.zioMapTest(12000 / 120, 120)
 
-//  @Benchmark
-//  fun catsOne(): Long =
-//    arrow.benchmarks.effects.scala.cats.`Map$`.`MODULE$`.catsIOMapTest(12000, 1)
-//
-//  @Benchmark
-//  fun catsBatch30(): Long =
-//    arrow.benchmarks.effects.scala.cats.`Map$`.`MODULE$`.catsIOMapTest(12000 / 30, 30)
-//
-//  @Benchmark
-//  fun catsBatch120(): Long =
-//    arrow.benchmarks.effects.scala.cats.`Map$`.`MODULE$`.catsIOMapTest(12000 / 120, 120)
-//
-//  @Benchmark
-//  fun ioOne(): Long = ioTest(12000, 1)
-//
-//  @Benchmark
-//  fun ioBatch30(): Long = ioTest(12000 / 30, 30)
-//
-//  @Benchmark
-//  fun ioBatch120(): Long = ioTest(12000 / 120, 120)
+  @Benchmark
+  fun catsOne(): Long =
+    arrow.benchmarks.effects.scala.cats.`Map$`.`MODULE$`.catsIOMapTest(12000, 1)
+
+  @Benchmark
+  fun catsBatch30(): Long =
+    arrow.benchmarks.effects.scala.cats.`Map$`.`MODULE$`.catsIOMapTest(12000 / 30, 30)
+
+  @Benchmark
+  fun catsBatch120(): Long =
+    arrow.benchmarks.effects.scala.cats.`Map$`.`MODULE$`.catsIOMapTest(12000 / 120, 120)
+
+  @Benchmark
+  fun ioOne(): Long = ioTest(12000, 1)
+
+  @Benchmark
+  fun ioBatch30(): Long = ioTest(12000 / 30, 30)
+
+  @Benchmark
+  fun ioBatch120(): Long = ioTest(12000 / 120, 120)
 
   @Benchmark
   fun fxOne(): Long =

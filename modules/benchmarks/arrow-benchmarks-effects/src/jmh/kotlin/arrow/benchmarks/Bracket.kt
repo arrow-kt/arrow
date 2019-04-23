@@ -21,7 +21,7 @@ open class Bracket {
 
   private fun fxBracketLoop(i: Int): Fx<Int> =
     if (i < size)
-      Fx.just(i).bracket({ Fx.unit }, { ib -> Fx { ib + 1 } }).flatMap { fxBracketLoop(it) }
+      Fx.just(i).bracket({ Fx.unit }, { ib -> Fx.lazy { ib + 1 } }).flatMap { fxBracketLoop(it) }
     else
       Fx.just(i)
 

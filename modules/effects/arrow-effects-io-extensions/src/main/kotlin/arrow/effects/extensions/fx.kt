@@ -14,7 +14,6 @@ import arrow.effects.suspended.fx.bracketCase as bracketC
 import arrow.effects.suspended.fx.guaranteeCase as guaranteeC
 import arrow.effects.suspended.fx.handleErrorWith as fxHandleErrorWith
 
-
 @extension
 interface FxDispatchers : Dispatchers<ForFx> {
   override fun default(): CoroutineContext =

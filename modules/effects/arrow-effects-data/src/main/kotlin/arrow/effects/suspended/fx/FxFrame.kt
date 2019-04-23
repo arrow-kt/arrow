@@ -34,9 +34,10 @@ internal interface FxFrame<in A, out B> : (A) -> B {
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun <A> attempt(): (A) -> Fx<Either<Throwable, A>> = AttemptFx as (A) -> Fx<Either<Throwable, A>>
+    inline fun <A> attempt(): (A) -> Fx<Either<Throwable, A>> = AttemptFx as (A) -> Fx<Either<Throwable, A>>
 
-    private object AttemptFx : FxFrame<Any?, Fx<Either<Throwable, Any?>>> {
+    @PublishedApi
+    internal object AttemptFx : FxFrame<Any?, Fx<Either<Throwable, Any?>>> {
       override fun invoke(a: Any?): Fx<Either<Throwable, Any?>> = Fx.Pure(Either.Right(a), 0)
       override fun recover(e: Throwable): Fx<Either<Throwable, Any?>> = Fx.Pure(Either.Left(e), 0)
     }

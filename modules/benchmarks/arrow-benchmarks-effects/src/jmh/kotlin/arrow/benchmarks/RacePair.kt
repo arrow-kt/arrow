@@ -5,7 +5,10 @@ import arrow.data.extensions.list.foldable.foldLeft
 import arrow.effects.IO
 import arrow.effects.extensions.NonBlocking
 import arrow.effects.extensions.io.applicative.map
+import arrow.effects.extensions.fx.applicative.map
 import arrow.effects.racePair
+import arrow.effects.suspended.fx.Fx
+import arrow.effects.suspended.fx.racePair
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
 
@@ -28,8 +31,19 @@ open class RacePair {
     }
   }
 
+  private fun fxRacePairHelper(): Fx<Int> = (0 until size).toList().foldLeft(Fx.lazy { 0 }) { acc, _ ->
+    Fx.racePair(NonBlocking, acc, Fx.lazy { 1 }).flatMap { ei ->
+      when (ei) {
+        is Either.Left -> ei.a.b.cancel().map { ei.a.a }
+        is Either.Right -> ei.b.a.cancel().map { ei.b.b }
+      }
+    }
+  }
+
   @Benchmark
-  fun io(): Int =
-    racePairHelper().unsafeRunSync()
+  fun io(): Int = racePairHelper().unsafeRunSync()
+
+  @Benchmark
+  fun fx(): Int = Fx.unsafeRunBlocking(fxRacePairHelper())
 
 }

@@ -26,7 +26,7 @@ open class AttemptRaisedError {
 
   private fun fxLoopNotHappy(size: Int, i: Int): Fx<Int> =
     if (i < size) {
-      Fx { throw dummy }.attempt().flatMap {
+      Fx.lazy { throw dummy }.attempt().flatMap {
         it.fold({ fxLoopNotHappy(size, i + 1) }, Fx.Companion::just)
       }
     } else Fx.just(1)

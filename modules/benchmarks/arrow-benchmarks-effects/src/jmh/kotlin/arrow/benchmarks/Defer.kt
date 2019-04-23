@@ -27,9 +27,6 @@ open class Defer {
       if (j > size) Fx.defer { Fx.just(j) } else fxDeferLoop(j + 1)
     }
 
-  suspend fun kxDeferLoop(i: Int): Int =
-    suspend { if (i > size) { suspend { i }() } else { kxDeferLoop(i + 1) } }()
-
   @Benchmark
   fun fx(): Int =
     Fx.unsafeRunBlocking(fxDeferLoop(0))
@@ -38,7 +35,4 @@ open class Defer {
   fun io(): Int =
     ioDeferLoop(0).unsafeRunSync()
 
-  @Benchmark
-  fun kx(): Int =
-    ioDeferLoop(0).unsafeRunSync()
 }

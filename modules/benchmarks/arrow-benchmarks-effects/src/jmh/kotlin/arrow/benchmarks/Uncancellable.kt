@@ -1,6 +1,7 @@
 package arrow.benchmarks
 
 import arrow.effects.IO
+import arrow.effects.suspended.fx.Fx
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
 
@@ -14,15 +15,18 @@ open class Uncancellable {
   @Param("100")
   var size: Int = 0
 
-  fun uncancelableLoop(i: Int): IO<Int> =
-    if (i < size)
-      IO { i + 1 }.uncancelable().flatMap { uncancelableLoop(it) }
-    else
-      IO.just(i)
+  fun ioUncancelableLoop(i: Int): IO<Int> =
+    if (i < size) IO { i + 1 }.uncancelable().flatMap { ioUncancelableLoop(it) }
+    else IO.just(i)
+
+  fun fxUncancelableLoop(i: Int): Fx<Int> =
+    if (i < size) Fx.lazy { i + 1 }.uncancelable().flatMap { fxUncancelableLoop(it) }
+    else Fx.just(i)
 
   @Benchmark
-  fun io(): Int =
-    uncancelableLoop(0).unsafeRunSync()
+  fun io(): Int = ioUncancelableLoop(0).unsafeRunSync()
 
+  @Benchmark
+  fun fx(): Int = Fx.unsafeRunBlocking(fxUncancelableLoop(0))
 
 }

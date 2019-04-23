@@ -20,8 +20,8 @@ open class ParMap {
   var size: Int = 0
 
   private fun fxHelper(): Fx<Int> =
-    (0 until size).toList().foldLeft(Fx { 0 }) { acc, i ->
-      NonBlocking.parMapN(acc, Fx { i }) { a, b -> a + b }
+    (0 until size).toList().foldLeft(Fx.lazy { 0 }) { acc, i ->
+      NonBlocking.parMapN(acc, Fx.lazy { i }) { a, b -> a + b }
     }
 
   private fun ioHelper(): IO<Int> =

@@ -1,6 +1,5 @@
 package arrow.benchmarks
 
-import arrow.benchmarks.effects.scala.zio.ZIORTS
 import arrow.effects.IO
 import arrow.effects.suspended.fx.Fx
 import org.openjdk.jmh.annotations.*
@@ -18,7 +17,7 @@ open class AttemptNonRaised {
 
   private fun fxLoopHappy(size: Int, i: Int): Fx<Int> =
     if (i < size) {
-      Fx { i + 1 }.attempt().flatMap {
+      Fx.lazy { i + 1 }.attempt().flatMap {
         it.fold(Fx.Companion::raiseError) { n -> fxLoopHappy(size, n) }
       }
     } else Fx.just(1)

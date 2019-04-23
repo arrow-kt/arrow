@@ -137,8 +137,7 @@ object FxRunLoop {
           return
         }
         DeferTag -> {
-          val thunk: () -> FxOf<Any?> = (source as Fx.Defer).thunk
-          source = executeSafe { thunk() }
+          source = executeSafe((source as Fx.Defer).thunk)
         }
         MapTag -> {
           if (bFirst != null) {
@@ -408,6 +407,7 @@ object FxRunLoop {
   /**
    * Evaluates the given `Fx` reference, calling the given callback with the result when completed.
    */
+  @Suppress("ReturnCount")
   fun <A> step(source: FxOf<A>): Fx<A> {
     var current: Current? = source
     var bFirst: BindF? = null
@@ -436,7 +436,7 @@ object FxRunLoop {
           }
         }
         DeferTag -> {
-          //TODO check if passing thunk directly is more efficient than `{ thunk() }`
+          //TODO check if passing thunk executeSafe(thunk) directly is more efficient than `{ thunk() }`
           current = executeSafe((current as Fx.Defer<Any?>).thunk)
         }
         LazyTag -> {

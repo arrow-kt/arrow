@@ -63,22 +63,18 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
   inline val fa: suspend () -> A
     get() =
       when (tag) {
-        RaiseErrorTag -> suspend {
-          throw (this as Fx.RaiseError<*>).error
+        RaiseErrorTag -> suspend { throw (this as RaiseError<*>).error }
+        PureTag -> suspend { (this as Pure<A>).value }
+        SingleTag -> (this as Single<A>).source
+        LazyTag -> suspend { (this as Lazy<A>).source(Unit) }
+        DeferTag -> suspend { FxRunLoop((this as Defer<A>).thunk()) }
+        MapTag -> suspend {
+          (this as Map<Any?, A>)
+          g(FxRunLoop(source))
         }
-        PureTag -> suspend { (this as Fx.Pure<A>).value }
-        SingleTag -> (this as Fx.Single<A>).source
-        LazyTag -> suspend { (this as Fx.Lazy<A>).source(Unit) }
-        DeferTag -> suspend { !(this as Fx.Defer<A>).thunk() }
-        MapTag -> {
-          this as Fx.Map<A, *>
-          suspend {
-            g(!source.fix())
-          } as (suspend () -> A)
-        }
-        FlatMapTag -> {
-          this as Fx.FlatMap<A, *>
-          suspend { !fb(!source) } as (suspend () -> A)
+        FlatMapTag -> suspend {
+          this as FlatMap<Any?, A>
+          FxRunLoop(this) //This is always faster than calling `not` twice.
         }
         ModifyContextTag -> suspend { FxRunLoop(this) }
         ContinueOnTag -> suspend { FxRunLoop(this) }
@@ -116,7 +112,7 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
       FlatMapTag -> {
         //If we reach the maxStackDepthSize then we can fold the current FlatMap and return a Map case
         //If we haven't reached the maxStackDepthSize we fuse the map operator within the flatMap stack.
-        this as FlatMap<B, A>
+        (this as FlatMap<B, A>)
         if (index != Platform.maxStackDepthSize) Map(this, f)
         else FlatMap(source, { a -> Fx { f(!fb(a)) } }, index + 1)
       }
@@ -145,23 +141,24 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
     when (tag) {
       RaiseErrorTag -> unsafeRecast()
       PureTag -> {
-        val value = (this as Fx.Pure<A>).value
+        val value = (this as Pure<A>).value
         Defer { f(value) }
       }
       SingleTag -> FlatMap(this, f, 0)
-      LazyTag -> FlatMap(this, f, 0)
+      LazyTag -> Defer {
+        f((this as Lazy<A>).source(Unit))
+      }
       DeferTag -> FlatMap(this, f, 0)
       ConnectionSwitchTag -> FlatMap(this, f, 0)
       ModifyContextTag -> FlatMap(this, f, 0)
       AsyncTag -> FlatMap(this, f, 0)
       ContinueOnTag -> FlatMap(this, f, 0)
       MapTag -> {
-        this as Fx.Map<B, A>
-        //We can do fusion between an map-flatMap boundary
+        (this as Map<B, A>)
         FlatMap(source, { f(g(it)) }, 1)
       }
       FlatMapTag -> {
-        this as Fx.FlatMap<B, A>
+        (this as FlatMap<B, A>)
 
         if (index != Platform.maxStackDepthSize) FlatMap(this, f, 0)
         else FlatMap(source, { a ->
@@ -216,7 +213,7 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
   }
 
   @PublishedApi
-  internal class Defer<out A>(val thunk: () -> FxOf<A>) : Fx<A>(DeferTag) {
+  internal class Defer<A>(@JvmField var thunk: () -> FxOf<A>) : Fx<A>(DeferTag) {
     override fun toString(): String = "Fx.Defer"
   }
 
@@ -348,13 +345,12 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
   fun ensure(
     error: () -> Throwable,
     predicate: (A) -> Boolean
-  ): Fx<A> = when (this) {
-    is RaiseError -> this
-    is Pure -> if (!predicate(value)) RaiseError(error()) else this
-    else -> Fx {
-      val result = !this
-      if (!predicate(result)) throw error()
-      else result
+  ): Fx<A> = when (tag) {
+    RaiseErrorTag -> this
+    PureTag -> if (!predicate((this as Pure<A>).value)) RaiseError(error()) else this
+    else -> flatMap { result ->
+      if (!predicate(result)) RaiseError<A>(error())
+      else Pure<A>(result, 0)
     }
   }
 
@@ -365,7 +361,7 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
     UpdateContext(this, f)
 
   fun continueOn(ctx: CoroutineContext): Fx<A> = when (tag) {
-    ContinueOnTag -> (this as Fx.ContinueOn<A>).apply {
+    ContinueOnTag -> (this as ContinueOn<A>).apply {
       this.ctx = ctx
     }
     else -> ContinueOn(this, ctx)
@@ -378,13 +374,15 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
    * @see Fx.Companion.racePair for another combinator using [Fiber]
    * @see Concurrent a tagless version of this operators derived and build from [fork].
    */
-  fun fork(ctx: CoroutineContext): Fx<Fiber<ForFx, A>> = Fx.async { oldConn, cb ->
+  fun fork(ctx: CoroutineContext): Fx<Fiber<ForFx, A>> = async { oldConn, cb ->
     val promise = UnsafePromise<A>()
     val conn = FxConnection()
     oldConn.push(conn.cancel())
     conn.push(oldConn.cancel())
 
-    FxRunLoop.startCancelable(this, conn, ctx, promise::complete)
+    FxRunLoop.startCancelable(this, conn, ctx) {
+      promise.complete(it)
+    }
 
     cb(Right(FxFiber(promise, conn)))
   }
@@ -393,7 +391,7 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
    * Makes the source [Fx] uncancelable and switches back to the original cancellation connection after running [this].
    */
   fun uncancelable(): Fx<A> =
-    Fx.ConnectionSwitch(this, Fx.ConnectionSwitch.makeUncancelable, { _, _, old, _ -> old })
+    ConnectionSwitch(this, ConnectionSwitch.makeUncancelable, { _, _, old, _ -> old })
 
   @RestrictsSuspension
   companion object {
@@ -422,7 +420,7 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
 
     @JvmStatic
     fun <A> eval(eval: Eval<A>): Fx<A> = when (eval) {
-      is Eval.Now -> Fx.just(eval.value)
+      is Eval.Now -> just(eval.value)
       else -> Lazy { eval.value() }
     }
 
@@ -459,7 +457,7 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
      * @see [runNonBlocking] to run in a referential transparent manner.
      */
     @JvmStatic //TODO convert to TABLESWITCH from LOOKUP_SWITCH.
-    fun <A> unsafeRunBlocking(fx: FxOf<A>): A = when (val tag: Int = fx.fix().tag) {
+    fun <A> unsafeRunBlocking(fx: FxOf<A>): A = when (fx.fix().tag) {
       PureTag -> (fx as Pure<A>).value
       RaiseErrorTag -> throw (fx as Fx.RaiseError<A>).error
       LazyTag -> (fx as Lazy<A>).source(Unit)
@@ -543,7 +541,7 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
 
     @JvmStatic
     fun <A> runNonBlockingCancellable(fx: FxOf<A>, onCancel: OnCancel = OnCancel.Silent, cb: (Either<Throwable, A>) -> Fx<Unit>): Fx<Disposable> =
-      Fx.Async { _ /* The start of this execution is immediate and uncancellable */, cbb ->
+      async { _ /* The start of this execution is immediate and uncancellable */, cbb ->
         val conn = FxConnection()
         val onCancelCb =
           when (onCancel) {
@@ -571,13 +569,7 @@ fun <A> FxOf<A>.handleErrorWith(f: (Throwable) -> FxOf<A>): Fx<A> =
 fun <A> FxOf<A>.handleError(f: (Throwable) -> A): Fx<A> = when (this) {
   is Fx.RaiseError -> Fx { f(error) }
   is Fx.Pure -> this
-  else -> Fx {
-    try {
-      fix().fa()
-    } catch (e: Throwable) {
-      f(e)
-    }
-  }
+  else -> Fx.FlatMap(this, FxFrame.Companion.ErrorHandler(f.andThen { Fx.Pure<A>(it, 0) }), 0)
 }
 
 @Suppress("FunctionName")

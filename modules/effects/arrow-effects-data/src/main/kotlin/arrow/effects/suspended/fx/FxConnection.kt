@@ -15,7 +15,7 @@ fun FxConnection(dummy: Unit = Unit): FxConnection = KindConnection(MD) { FxRunL
 val FxNonCancelable = KindConnection.uncancelable(MD)
 
 private object MD : MonadDefer<ForFx> {
-  override fun <A> defer(fa: () -> FxOf<A>): Fx<A> = Fx.defer(fa)
+  override fun <A> defer(fa: () -> FxOf<A>): Fx<A> = Fx.defer { fa() }
   override fun <A> raiseError(e: Throwable): Fx<A> = Fx.raiseError(e)
   override fun <A> FxOf<A>.handleErrorWith(f: (Throwable) -> FxOf<A>): Fx<A> = fix().handleErrorWith(f)
   override fun <A> just(a: A): Fx<A> = Fx.just(a)
