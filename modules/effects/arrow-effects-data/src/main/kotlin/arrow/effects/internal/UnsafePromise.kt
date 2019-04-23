@@ -3,7 +3,8 @@ package arrow.effects.internal
 import arrow.core.Either
 import java.util.concurrent.atomic.AtomicReference
 
-class UnsafePromise<A> {
+@PublishedApi
+internal class UnsafePromise<A> {
 
   private sealed class State<out A> {
     object Empty : State<Nothing>()

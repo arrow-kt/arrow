@@ -8,9 +8,12 @@ import arrow.effects.OnCancel
 import arrow.effects.fork
 import arrow.effects.internal.Platform
 import arrow.effects.internal.UnsafePromise
+import arrow.effects.internal.asyncContinuation
 import arrow.effects.typeclasses.*
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.RestrictsSuspension
+import kotlin.coroutines.startCoroutine
 
 class ForFx private constructor() {
   companion object
@@ -43,6 +46,7 @@ sealed class FxImpossibleBugs(message: String) : RuntimeException(message) {
   object FxMap : FxImpossibleBugs("FxMap bug, please contact support with this message! https://arrow-kt.io")
   object FxNot : FxImpossibleBugs("FxNot bug, please contact support with this message! https://arrow-kt.io")
   object FxFlatMap : FxImpossibleBugs("FxFlatMap bug, please contact support with this message! https://arrow-kt.io")
+  object FxStep : FxImpossibleBugs("FxStep bug, please contact support with this message! https://arrow-kt.io")
 
   override fun fillInStackTrace(): Throwable = this
 }
@@ -50,7 +54,7 @@ sealed class FxImpossibleBugs(message: String) : RuntimeException(message) {
 sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
 
   @PublishedApi
-  internal inline fun <B> unsafeRetag(): Fx<B> = this as Fx<B>
+  internal inline fun <B> unsafeRecast(): Fx<B> = this as Fx<B>
 
   fun <B> followedBy(fa: FxOf<B>): Fx<B> =
     flatMap { fa }
@@ -86,7 +90,7 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
   @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
   inline fun <B> map(noinline f: (A) -> B): Fx<B> =
     when (tag) {
-      RaiseErrorTag -> unsafeRetag()
+      RaiseErrorTag -> unsafeRecast()
       PureTag -> {
         //Fx.Single { f((this as Fx.Pure<A>).value) }
         this as Fx.Pure<A>
@@ -94,7 +98,7 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
           try {
             internalValue = f(this.value)
             index += 1
-            unsafeRetag<B>()
+            unsafeRecast<B>()
           } catch (e: Throwable) {
             RaiseError<B>(e.nonFatalOrThrow())
           }
@@ -103,7 +107,7 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
             val b: B = f(this.value)
             internalValue = b
             index = 0
-            unsafeRetag<B>()
+            unsafeRecast<B>()
           } catch (e: Throwable) {
             RaiseError<B>(e.nonFatalOrThrow())
           }
@@ -121,7 +125,7 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
         val ff = f as (Any?) -> Any?
         //AndThen composes the functions in a stack-safe way by running them in a while loop.
         this.g = AndThen(g).andThen(ff)
-        unsafeRetag()
+        unsafeRecast()
       }
       FlatMapTag -> {
         //If we reach the maxStackDepthSize then we can fold the current FlatMap and return a Map case
@@ -153,7 +157,7 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
   @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
   inline fun <B> flatMap(noinline f: (A) -> FxOf<B>): Fx<B> =
     when (tag) {
-      RaiseErrorTag -> unsafeRetag()
+      RaiseErrorTag -> unsafeRecast()
       PureTag -> {
         val value = (this as Fx.Pure<A>).value
         Defer { f(value) }
@@ -193,7 +197,7 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
   @PublishedApi
   internal class Pure<A>(@JvmField var internalValue: Any?, var index: Int) : Fx<A>(PureTag) {
     inline val value: A
-     get() = internalValue as A
+      get() = internalValue as A
 
     override fun toString(): String = "Fx.Pure(value = $value)"
   }
@@ -457,16 +461,36 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
      * @see [unsafeRunBlocking] or [unsafeRunNonBlockingCancellable] that run the value as [Either].
      * @see [runNonBlocking] to run in a referential transparent manner.
      */
-    @JvmStatic
-    fun <A> unsafeRunBlocking(fx: FxOf<A>): A = when (val fa = fx.fix()) {
-      is Pure -> fa.value
-      is RaiseError -> throw fa.error
-      is Lazy -> fa.source()
-      else -> UnsafePromise<A>().run {
-        FxRunLoop.start(fx, cb = ::complete)
-        await()
+    @JvmStatic //TODO convert to TABLESWITCH from LOOKUP_SWITCH.
+    fun <A> unsafeRunBlocking(fx: FxOf<A>): A = when (val tag: Int = fx.fix().tag) {
+        PureTag -> (fx as Pure<A>).value
+        RaiseErrorTag -> throw (fx as Fx.RaiseError<A>).error
+        LazyTag -> (fx as Lazy<A>).source()
+        SingleTag -> UnsafePromise<A>().run {
+          (fx as Single<A>).source.startCoroutine(asyncContinuation(EmptyCoroutineContext) {
+            complete(it)
+          })
+          await()
+        }
+        else -> {
+          val result = FxRunLoop.step(fx.fix())
+          when (result.tag) {
+            PureTag -> (result as Pure<A>).value
+            RaiseErrorTag -> throw (result as RaiseError<A>).error
+            LazyTag -> (result as Lazy<A>).source()
+            SingleTag -> UnsafePromise<A>().run {
+              (result as Single<A>).source.startCoroutine(asyncContinuation(EmptyCoroutineContext) {
+                complete(it)
+              })
+              await()
+            }
+            else -> UnsafePromise<A>().run {
+              FxRunLoop.start(fx) { complete(it) }
+              await()
+            }
+          }
+        }
       }
-    }
 
     /**
      * [unsafeRunNonBlocking] allows you to run any [Fx] to its wrapped value [A].

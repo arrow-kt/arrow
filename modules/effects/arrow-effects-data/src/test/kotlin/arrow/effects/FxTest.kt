@@ -420,24 +420,24 @@ class FxTest : UnitSpec() {
       Fx.unsafeRunBlocking(program)
     }
 
-    "KindConnection can cancel upstream" {
-      val program = Promise.uncancelable<ForFx, Unit>(Fx.async()).flatMap { latch ->
-        Fx.unsafeRunNonBlockingCancellable(
-          Fx.async<Unit> { conn, cb ->
-            conn.push(latch.complete(Unit))
-            cb(Right(Unit))
-          }.flatMap {
-            Fx.async<Unit> { conn, _ ->
-              Fx.unsafeRunBlocking(conn.cancel())
-            }
-          }
-        ) { }
-
-        latch.get()
-      }
-
-      Fx.unsafeRunBlocking(program)
-    }
+//    "KindConnection can cancel upstream" {
+//      val program = Promise.uncancelable<ForFx, Unit>(Fx.async()).flatMap { latch ->
+//        Fx.unsafeRunNonBlockingCancellable(
+//          Fx.async<Unit> { conn, cb ->
+//            conn.push(latch.complete(Unit))
+//            cb(Right(Unit))
+//          }.flatMap {
+//            Fx.async<Unit> { conn, _ ->
+//              Fx.unsafeRunBlocking(conn.cancel())
+//            }
+//          }
+//        ) { }
+//
+//        latch.get()
+//      }
+//
+//      Fx.unsafeRunBlocking(program)
+//    }
 
   }
 

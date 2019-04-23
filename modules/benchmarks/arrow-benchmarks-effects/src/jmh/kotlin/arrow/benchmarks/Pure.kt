@@ -28,9 +28,6 @@ open class Pure {
       if (j > size) Fx.just(j) else fxPureLoop(j + 1)
     }
 
-  suspend fun kxPureLoop(i: Int): Int =
-    if (i > size) { i } else { kxPureLoop(i + 1) }
-
   @Benchmark
   fun fx(): Int =
     Fx.unsafeRunBlocking(fxPureLoop(0))
@@ -46,9 +43,5 @@ open class Pure {
   @Benchmark
   fun scalazZio(): Int =
     arrow.benchmarks.effects.scala.zio.`Pure$`.`MODULE$`.unsafeIOPureLoop(size, 0)
-
-  @Benchmark
-  fun kx(): Int =
-    runBlocking { kxPureLoop(size) }
 
 }

@@ -4,10 +4,7 @@ import arrow.core.Either
 import arrow.core.Right
 import arrow.core.handleErrorWith
 import arrow.core.nonFatalOrThrow
-import arrow.effects.IORunLoop.startCancelable
-import arrow.effects.KindConnection
-import arrow.effects.OnCancel
-import arrow.effects.handleErrorWith
+import arrow.effects.*
 import arrow.effects.internal.Platform
 import arrow.effects.suspended.fx.FxRunLoop.startCancelable
 import kotlin.coroutines.*
@@ -17,8 +14,8 @@ import kotlin.coroutines.*
  * this includes all unsafe/safe run methods, [Fx.not], fibers and races.
  */
 @Suppress("UNCHECKED_CAST")
-@PublishedApi
-internal object FxRunLoop {
+//@PublishedApi
+object FxRunLoop {
 
   /** Internal API for [Fx.not] */
   suspend operator fun <A> invoke(source: FxOf<A>): A = suspendCoroutine { cont ->
@@ -78,8 +75,11 @@ internal object FxRunLoop {
         cb(Either.Left(OnCancel.CancellationException))
         return
       }
-      val tag = source?.tag ?: UnknownTag
-      when (tag) {
+      when (source?.tag ?: UnknownTag) {
+        PureTag -> {
+          result = (source as Fx.Pure<Any?>).value
+          hasResult = true
+        }
         RaiseErrorTag -> {
           val errorHandler: FxFrame<Any?, Fx<Any?>>? = findErrorHandlerInCallStack(bFirst, bRest)
           when (errorHandler) {
@@ -117,10 +117,6 @@ internal object FxRunLoop {
               cb(Right(a))
             }
           }, 0)
-        }
-        PureTag -> {
-          result = (source as Fx.Pure<Any?>).value
-          hasResult = true
         }
         LazyTag -> {
           source as Fx.Lazy<Any?>
@@ -208,8 +204,9 @@ internal object FxRunLoop {
     }
   }
 
+  @PublishedApi
   @Suppress("ReturnCount")
-  fun findErrorHandlerInCallStack(bFirst: ((Any?) -> Fx<Any?>)?, bRest: Platform.ArrayStack<(Any?) -> Fx<Any?>>?): FxFrame<Any?, Fx<Any?>>? {
+  internal fun findErrorHandlerInCallStack(bFirst: ((Any?) -> Fx<Any?>)?, bRest: Platform.ArrayStack<(Any?) -> Fx<Any?>>?): FxFrame<Any?, Fx<Any?>>? {
     if (bFirst != null && bFirst is FxFrame) {
       return bFirst
     } else if (bRest == null) {
@@ -331,9 +328,19 @@ internal object FxRunLoop {
       this.conn = conn
     }
 
+    fun prepare(ctx: CoroutineContext?,
+                updateContext: ((CoroutineContext) -> CoroutineContext)?,
+                bFirst: ((Any?) -> Fx<Any?>)?,
+                bRest: (Platform.ArrayStack<(Any?) -> Fx<Any?>>)?): Unit {
+      _context = updateContext?.invoke(_context) ?: ctx ?: EmptyCoroutineContext //Swap or update the contexts.
+      canCall = true
+      this.bFirst = bFirst
+      this.bRest = bRest
+    }
+
     fun start(fx: Fx.Async<Any?>, ctx: CoroutineContext, bFirst: ((Any?) -> Fx<Any?>)?, bRest: (Platform.ArrayStack<(Any?) -> Fx<Any?>>)?): Unit {
       contIndex++
-      _context = fx.updateContext?.invoke(ctx) ?: ctx //Swap or update the contexts.
+      _context = fx.updateContext?.invoke(_context) ?: ctx //Swap or update the contexts.
       canCall = true
       this.bFirst = bFirst
       this.bRest = bRest
@@ -398,4 +405,161 @@ internal object FxRunLoop {
     }
   }
 
+  /**
+   * Evaluates the given `Fx` reference, calling the given callback with the result when completed.
+   */
+  fun <A> step(source: FxOf<A>): Fx<A> {
+    var current: Current? = source
+    var bFirst: BindF? = null
+    var bRest: CallStack? = null
+    var hasResult: Boolean = false
+    var result: Any? = null
+
+    while (true) {
+      when ((current as? Fx<A>)?.tag ?: UnknownTag) {
+        PureTag -> {
+          result = (current as Fx.Pure<Any?>).value
+          hasResult = true
+          //current = null ??? see LazyTag
+        }
+        RaiseErrorTag -> {
+          val errorHandler: FxFrame<Any?, Fx<Any?>>? = findErrorHandlerInCallStack(bFirst, bRest)
+          when (errorHandler) {
+            // Return case for unhandled errors
+            null -> return current as Fx<A>
+            else -> {
+              (current as Fx.RaiseError<Any?>)
+              val exception: Throwable = current.error
+              current = executeSafe { errorHandler.recover(exception) }
+              bFirst = null
+            }
+          }
+        }
+        DeferTag -> {
+          //TODO check if passing thunk directly is more efficient than `{ thunk() }`
+          current = executeSafe((current as Fx.Defer<Any?>).thunk)
+        }
+        LazyTag -> {
+          (current as Fx.Lazy<Any?>)
+          try {
+            result = current.source()
+            hasResult = true
+            current = null
+          } catch (t: Throwable) {
+            current = Fx.RaiseError(t.nonFatalOrThrow())
+          }
+        }
+        FlatMapTag -> {
+          (current as Fx.FlatMap<Any?, Any?>)
+          if (bFirst != null) {
+            if (bRest == null) bRest = Platform.ArrayStack()
+            bRest.push(bFirst)
+          }
+
+          bFirst = current.fb as BindF
+          current = current.source
+        }
+        MapTag -> {
+          (current as Fx.Map<Any?, Any?>)
+
+          if (bFirst != null) {
+            if (bRest == null) {
+              bRest = Platform.ArrayStack()
+            }
+            bRest.push(bFirst)
+          }
+
+          bFirst = current //Fx.Map implements (A) -> Fx<B>
+          current = current.source
+        }
+        ModifyContextTag -> {
+          current as Fx.UpdateContext<Any?>
+          val modify = current.modify
+          val next = current.source
+
+          current = Fx.FlatMap(next, { a ->
+            //We need to schedule running the function because at this point we don't know what the correct CC will be to call modify with.
+            Fx.Async<Any?>(updateContext = modify) { _, cb ->
+              cb(Right(a))
+            }
+          }, 0)
+        }
+        ContinueOnTag -> {
+          current as Fx.ContinueOn<Any?>
+
+          val nextCC = current.ctx
+          val next = current.source
+
+          current = Fx.FlatMap(next, { a ->
+            Fx.Async<Any?>(ctx = nextCC) { _, cb ->
+              cb(Right(a))
+            }
+          }, 0)
+        }
+        SingleTag -> {
+          return FxRunLoop.suspendInAsync(current as Fx.Single<A>, bFirst, bRest)
+        }
+        AsyncTag -> {
+          // Return case for Async operations
+          return suspendInAsync(current as Fx.Async<A>, bFirst, bRest, current.proc)
+        }
+        else -> throw FxImpossibleBugs.FxStep
+      }
+
+      if (hasResult) {
+
+        val nextBind: BindF? = popNextBind(bFirst, bRest)
+
+        // Return case when no there are no more binds left
+        if (nextBind == null) {
+          return sanitizedCurrentFx(current, result)
+        } else {
+          current = executeSafe { nextBind(result) }
+          hasResult = false
+          result = null
+          bFirst = null
+        }
+      }
+
+    }
+  }
+
+  private fun <A> sanitizedCurrentFx(current: Current?, unboxed: Any?): Fx<A> =
+    (current ?: IO.Pure(unboxed)) as Fx<A>
+
+  private fun <A> suspendInAsync(
+    currentIO: Fx.Async<A>,
+    bFirst: BindF?,
+    bRest: CallStack?,
+    register: FxProc<Any?>): Fx<A> =
+  // Hitting an async boundary means we have to stop, however
+  // if we had previous `flatMap` operations then we need to resume
+    // the loop with the collected stack
+    when {
+      bFirst != null || (bRest != null && bRest.isNotEmpty()) ->
+        Fx.async { conn, cb ->
+          val rcb = FxRunLoop.AsyncBoundary(conn, cb as (Either<Throwable, Any?>) -> Unit)
+          rcb.prepare(currentIO.ctx, currentIO.updateContext, bFirst, bRest)
+          register(conn, rcb)
+        }
+      else -> currentIO
+    }
+
+  private fun <A> suspendInAsync(
+    currentIO: Fx.Single<A>,
+    bFirst: BindF?,
+    bRest: CallStack?): Fx<A> =
+  // Hitting an async boundary means we have to stop, however
+  // if we had previous `flatMap` operations then we need to resume
+    // the loop with the collected stack
+    Fx.async { conn, cb ->
+      val rcb = FxRunLoop.AsyncBoundary(conn, cb as (Either<Throwable, Any?>) -> Unit)
+      rcb.prepare(null, null, bFirst, bRest)
+      currentIO.source.startCoroutine(rcb)
+    }
+
 }
+
+private typealias Current = FxOf<Any?>
+private typealias BindF = (Any?) -> Fx<Any?>
+private typealias CallStack = Platform.ArrayStack<BindF>
