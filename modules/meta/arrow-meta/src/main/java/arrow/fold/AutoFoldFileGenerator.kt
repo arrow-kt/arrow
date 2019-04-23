@@ -42,7 +42,7 @@ class AutoFoldFileGenerator(
   }, separator = ",\n")
 
   private fun fileHeader(packageName: String) = """
-    |${if(packageName != "`unnamed package`") "package $packageName" else ""}
+    |${if (packageName != "`unnamed package`") "package $packageName" else ""}
     |
     |""".trimMargin()
 

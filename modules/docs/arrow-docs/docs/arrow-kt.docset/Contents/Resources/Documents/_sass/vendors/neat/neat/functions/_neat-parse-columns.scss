@@ -1,0 +1,22 @@
+@charset "UTF-8";
+/// Parse a column count like `3 of 5` and retur the total coloumn count.
+/// This is to allow a shorthand for custom grids without using a settings map.
+///
+///
+/// @argument {list} $span
+///
+/// @return {number}
+///
+/// @example scss
+///   _neat-parse-columns(3 of 5)
+///
+/// @access private
+
+@function _neat-parse-columns($span) {
+  @if length($span) == 3 {
+    $_total-columns: nth($span, 3);
+    @return $_total-columns;
+  } @else if length($span) == 2 or if length($span) >= 3 {
+    @error "`$column` should contain 2 values, seperated by an `of`";
+  }
+}

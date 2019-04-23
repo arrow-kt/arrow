@@ -1,0 +1,74 @@
+@charset "UTF-8";
+/// This variable is a sass map that overrides Neat's default grid settings.
+/// Use this to define your project's grid properties incluting gutters and
+/// total column count.
+///
+/// @type map
+///
+/// @group settings
+///
+/// @name Neat grid
+///
+/// @property {number (unitless)} columns [12]
+///   Default number of the total grid columns.
+///
+/// @property {number (with unit)} gutter [20px]
+///   Default grid gutter width between columns.
+///
+/// @example scss
+///   $neat-grid: (
+///     columns: 12,
+///     gutter: 20px,
+///   );
+
+$neat-grid: () !default;
+
+/// If you need multiple grids in a single project, you can do
+/// this by defining a new map stored within a variable of your choosing. This
+/// variable can then be passed directly in to any of Neat's mixins like
+/// [`grid-column(12, $my-custom-grid)`](#grid-column).
+///
+/// Custom grids are especially useful with [`grid-media`](#grid-media). By
+/// defining a `media` attribute within your custom grid, you are able to easily
+/// define gutter width and total column count as well the breakpoint at which
+/// they should activate.
+///
+/// @type map
+///
+/// @group settings
+///
+/// @name Custom grids
+///
+/// @property {number (unitless)} columns [12]
+///   Number of the total grid columns.
+///
+/// @property {number (with unit)} gutter [20px]
+///   Grid gutter width between columns.
+///
+/// @property {number (with unit) | string | null} media [null]
+///   The `@media` definition that is used by the [`grid-media`](#grid-media)
+///   mixin to detirmine the media properties.
+///
+/// @property {color} color [null]
+///   The color used by [`grid-visual`](#grid-visual) to create the guides.
+///
+/// @property {string} direction [ltr]
+///   The float direction used throughout the grid.
+///
+/// @example scss
+///   $my-custom-grid: (
+///     columns: 12,
+///     gutter: 20px,
+///     media: 1200px,
+///     color: rgba(#00d4ff, 0.25),
+///     direction: ltr,
+///   );
+///
+///   $other-custom-grid-for-print: (
+///     columns: 14,
+///     gutter: 1.5rem,
+///     media: print,
+///   );
+///
+
+$neat-custom-grid: () !default;

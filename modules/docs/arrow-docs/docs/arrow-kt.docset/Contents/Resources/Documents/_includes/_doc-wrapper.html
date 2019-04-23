@@ -1,0 +1,21 @@
+<html><head></head><body><div id="doc-wrapper">
+    <div class="doc-header">
+        <button type="button" id="main-toggle" class="sidebar-toggle">
+            <i class="fa fa-lg fa-bars menu-icon"></i>
+        </button>
+        <div class="search-wrapper">
+          <input id="docsearch" class="search" placeholder="Search documentation..." type="search"/>
+        </div>
+        <a target="_blank" href="{{site.data.commons.github_repository}}/edit/master/modules/docs/arrow-docs/docs{{page.url | replace: &#39;_&#39;, &#39;&#39;}}README.md">
+          <i class="fa fa-pencil"></i>
+            Edit
+        </a>
+    </div>
+    <div class="doc-content">
+        {% if page.video %}
+        {% include _media-wrapper.html id=page.video %}
+        {% endif %}
+        {{ content }}
+    </div>
+</div>
+</body></html>

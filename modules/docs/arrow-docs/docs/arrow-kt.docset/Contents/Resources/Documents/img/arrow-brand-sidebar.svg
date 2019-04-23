@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="42px" height="42px" viewBox="0 0 42 42" version="1.1" xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 48.2 (47327) - http://www.bohemiancoding.com/sketch -->
+    <title>arrow-brand-sidebar</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-1">
+            <stop stop-color="#F99409" offset="0%"></stop>
+            <stop stop-color="#E37A73" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-2">
+            <stop stop-color="#05CDFF" offset="0%"></stop>
+            <stop stop-color="#6A8EFF" offset="100%"></stop>
+        </linearGradient>
+        <path d="M19.4727273,29.9278756 L19.4727273,0.0796348461 L38.9454545,41.1594301 L19.4740078,29.927137 Z"
+              id="path-3"></path>
+        <filter x="-2.6%" y="-1.2%" width="105.1%" height="104.9%" filterUnits="objectBoundingBox" id="filter-4">
+            <feOffset dx="0" dy="1" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feColorMatrix values="0 0 0 0 0.0549019608   0 0 0 0 0.145098039   0 0 0 0 0.317647059  0 0 0 0.11 0"
+                           type="matrix" in="shadowOffsetOuter1"></feColorMatrix>
+        </filter>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-5">
+            <stop stop-color="#00B5E2" offset="0%"></stop>
+            <stop stop-color="#4D72E5" offset="100%"></stop>
+        </linearGradient>
+        <path d="M0,29.9278705 L0,0.0776720806 L19.4727273,41.0824966 L0.00128049075,29.927137 Z" id="path-6"></path>
+        <filter x="-2.6%" y="-1.2%" width="105.1%" height="104.9%" filterUnits="objectBoundingBox" id="filter-7">
+            <feOffset dx="0" dy="1" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feColorMatrix values="0 0 0 0 0.0549019608   0 0 0 0 0.145098039   0 0 0 0 0.317647059  0 0 0 0.11 0"
+                           type="matrix" in="shadowOffsetOuter1"></feColorMatrix>
+        </filter>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="arrow-brand-sidebar">
+            <g id="logo" transform="translate(1.527273, 0.381818)">
+                <polygon id="path" fill="url(#linearGradient-1)" opacity="0.8"
+                         points="19.4730951 29.8502035 25.9636364 33.5430122 19.4727273 37.2358209 12.9818182 33.5430122"></polygon>
+                <polygon id="path" fill="url(#linearGradient-1)"
+                         points="19.4730951 29.77327 25.9636364 33.4660787 19.4727273 37.1588874"></polygon>
+                <g id="path">
+                    <use fill="black" fill-opacity="1" filter="url(#filter-4)" xlink:href="#path-3"></use>
+                    <use fill="url(#linearGradient-2)" fill-rule="evenodd" xlink:href="#path-3"></use>
+                </g>
+                <g id="path" opacity="0.9"
+                   transform="translate(9.736364, 20.579715) scale(-1, 1) translate(-9.736364, -20.579715) ">
+                    <use fill="black" fill-opacity="1" filter="url(#filter-7)" xlink:href="#path-6"></use>
+                    <use fill="url(#linearGradient-5)" fill-rule="evenodd" xlink:href="#path-6"></use>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

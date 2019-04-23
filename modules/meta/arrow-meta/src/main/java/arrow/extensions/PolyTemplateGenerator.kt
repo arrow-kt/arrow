@@ -103,7 +103,7 @@ interface PolyTemplateGenerator : MetaApi {
     val monoidImports = if (info.applicativeRequiresMonoid()) "\nimport arrow.core.extensions.monoid" else ""
     return replace(
       "_imports_applicative_",
- "import ${applicativePackageName.value.quote()}.just$monoidImports"
+      "import ${applicativePackageName.value.quote()}.just$monoidImports"
     )
   }
 

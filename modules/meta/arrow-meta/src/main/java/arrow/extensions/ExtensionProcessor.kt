@@ -168,11 +168,11 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class), PolyTempl
             kdoc = func.kdoc?.eval(this),
             modifiers =
             func.modifiers.filter { it == Modifier.Suspend } +
-            when {
-              allArgs.size > 1 -> emptyList()
-              func.receiverType == null -> emptyList()
-              else -> func.modifiers
-            }, //remove infix and operator mods
+              when {
+                allArgs.size > 1 -> emptyList()
+                func.receiverType == null -> emptyList()
+                else -> func.modifiers
+              }, //remove infix and operator mods
             typeVariables = typeVariables,
             annotations = listOf(
               JvmName(func.name + if (dummyArgsCount > 0) dummyArgsCount else ""),

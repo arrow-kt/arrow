@@ -1,0 +1,35 @@
+// Browser
+// -----------------------------------------------
+// -----------------------------------------------
+.browser {
+    background: $white;
+    @include box-shadow($box-shadow-item);
+
+    ul.action {
+        height: 34px;
+        @include flexbox;
+        @include justify-content(flex-start);
+        @include align-items(center);
+        background: rgba($brand-tertiary, 0.34);
+
+        li {
+            height: 10px;
+            width: 10px;
+            margin-right: 6px;
+            @include border-radius (100%);
+            background: rgba($brand-primary, 0.30);
+
+            &:first-child {
+                margin-left: 12px;
+                background: rgba($brand-primary, 0.55);
+            }
+
+            &:last-child {
+                background: rgba($brand-primary, 0.20);
+            }
+        }
+    }
+    pre {
+        margin-bottom: 0;
+    }
+}

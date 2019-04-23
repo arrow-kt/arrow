@@ -1,0 +1,88 @@
+// MEDIA-CONTENT
+// -----------------------------------------------
+// -----------------------------------------------
+.doc-content {
+    .video-panel {
+        display: none;
+        h2 {
+            margin-top: ($base-point-grid * 4);
+            
+            .fa {
+                margin-right: 7px;
+                font-size: 1.75rem;
+                color: rgba($brand-primary, 0.8);
+            }
+        }
+
+        &.toggled {
+            display: block;
+        }
+        .bg-video {
+            // border-top: 1px solid rgba($brand-primary, 0.2);
+            // border-bottom: 1px solid rgba($brand-primary, 0.2);
+            background: #fff;
+            padding: ($base-point-grid * 3);
+            
+            @include bp(large) {
+                padding: 0;
+            }
+            .wrapper-video {
+                max-width: 900px;
+                margin: 0 auto;
+                .video-container {
+                    position: relative;
+                    padding-bottom: 56.25%;
+                    height: 0;
+                    
+                    iframe {
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.button-video {
+    padding: $base-point-grid ($base-point-grid * 4);
+    position: absolute;
+    right: ($base-point-grid * 4);
+    top: ($base-point-grid * 7);
+    font-size: 1.063rem;
+    color: #fff;
+    background: $brand-tertiary;
+    box-shadow: 0px 0px 20px rgba($brand-secondary, 0.3);
+    z-index: 10;
+
+    @include bp(large) {
+        @include grid-column(12, $base-grid);
+        position: relative;
+        display: block;
+        top: 0;
+        right: 0;
+        margin-bottom: 20px;
+        margin-left: 0;
+        width: 100%;
+    }
+
+    &:hover {
+        text-decoration: none;
+        background: lighten($brand-tertiary, 5%);
+        box-shadow: 0px 0px 20px rgba($brand-secondary, 0.5);
+        color: #fff;
+        cursor: pointer;
+    }
+
+    i {
+        margin-right: 6px;
+        font-size: 1.125rem;
+    }
+
+    &.beta {
+        background: #765;
+    }
+}

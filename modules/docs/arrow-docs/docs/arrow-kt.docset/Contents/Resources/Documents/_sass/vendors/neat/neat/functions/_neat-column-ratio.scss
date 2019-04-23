@@ -1,0 +1,24 @@
+@charset "UTF-8";
+/// Determine the ratio of `$columns` to the total column count.
+/// If `$columns` is more than one value, they are handed to
+/// `_neat-parse-columns()` which will detirmine the total columns and use this
+/// value instead of `total-columns`.
+///
+/// @argument {map} $grid
+///
+/// @argument {number | list} $columns
+///
+/// @return {number}
+///
+/// @example scss
+///   _neat-column-ratio($grid, 3)
+///
+/// @access private
+
+@function _neat-column-ratio($grid, $columns) {
+  @if length($columns) > 1 {
+    @return nth($columns, 1) / _neat-parse-columns($columns);
+  } @else if $columns {
+    @return $columns / _retrieve-neat-setting($grid, columns);
+  }
+}
