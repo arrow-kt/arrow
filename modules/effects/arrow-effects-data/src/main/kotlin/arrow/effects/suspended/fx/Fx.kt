@@ -598,6 +598,12 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
 
 }
 
+fun <A, B> FxOf<A>.redeem(fe: (Throwable) -> B, fs: (A) -> B): Fx<B> =
+  Fx.FlatMap(this, FxFrame.Companion.Redeem(fe, fs), 0)
+
+fun <A, B> FxOf<A>.redeemWith(fe: (Throwable) -> FxOf<B>, fs: (A) -> FxOf<B>): Fx<B> =
+  Fx.FlatMap(this, FxFrame.Companion.RedeemWith(fe, fs), 0)
+
 fun <A> FxOf<A>.handleErrorWith(f: (Throwable) -> FxOf<A>): Fx<A> =
   Fx.FlatMap(this, FxFrame.Companion.ErrorHandler(f), 0)
 

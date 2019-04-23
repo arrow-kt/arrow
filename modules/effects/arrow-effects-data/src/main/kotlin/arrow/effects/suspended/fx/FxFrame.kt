@@ -33,6 +33,16 @@ internal interface FxFrame<in A, out B> : (A) -> B {
       override fun recover(e: Throwable): Fx<A> = fe(e).fix()
     }
 
+    internal class Redeem<A, B>(val fe: (Throwable) -> B, val fs: (A) -> B): FxFrame<A, FxOf<B>> {
+      override fun invoke(a: A): FxOf<B> = Fx.Pure(fs(a), 0)
+      override fun recover(e: Throwable): Fx<B> = Fx.Pure(fe(e), 0)
+    }
+
+    internal class RedeemWith<A, B>(val fe: (Throwable) -> FxOf<B>, val fs: (A) -> FxOf<B>) : FxFrame<A, FxOf<B>> {
+      override fun invoke(a: A): FxOf<B> = fs(a)
+      override fun recover(e: Throwable): FxOf<B> = fe(e)
+    }
+
     @Suppress("UNCHECKED_CAST")
     inline fun <A> attempt(): (A) -> Fx<Either<Throwable, A>> = AttemptFx as (A) -> Fx<Either<Throwable, A>>
 
