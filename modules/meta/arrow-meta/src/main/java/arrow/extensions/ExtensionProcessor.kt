@@ -177,11 +177,7 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class), PolyTempl
                 allArgs.size > 1 -> emptyList()
                 func.receiverType == null -> emptyList()
                 else -> func.modifiers
-<<<<<<< HEAD
-              }, //remove infix and operator mods
-=======
               }, // remove infix and operator mods
->>>>>>> 61aa0c78ed950ebe8ff6eaad6f43c0827b01e709
             typeVariables = typeVariables,
             annotations = listOf(
               JvmName(func.name + if (dummyArgsCount > 0) dummyArgsCount else ""),
