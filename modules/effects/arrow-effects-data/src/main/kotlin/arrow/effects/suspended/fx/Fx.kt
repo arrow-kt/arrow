@@ -458,31 +458,43 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
      */
     @JvmStatic //TODO convert to TABLESWITCH from LOOKUP_SWITCH.
     fun <A> unsafeRunBlocking(fx: FxOf<A>): A = when (fx.fix().tag) {
-      PureTag -> (fx as Pure<A>).value
       RaiseErrorTag -> throw (fx as Fx.RaiseError<A>).error
-      LazyTag -> (fx as Lazy<A>).source(Unit)
+      PureTag -> (fx as Pure<A>).value
+      6 -> _unsafeRunBlocking(fx)
+      8 -> _unsafeRunBlocking(fx)
       SingleTag -> UnsafePromise<A>().run {
         (fx as Single<A>).source.startCoroutine(asyncContinuation(EmptyCoroutineContext) {
           complete(it)
         })
         await()
       }
-      else -> {
-        val result = FxRunLoop.step(fx.fix())
-        when (result.tag) {
-          PureTag -> (result as Pure<A>).value
-          RaiseErrorTag -> throw (result as RaiseError<A>).error
-          LazyTag -> (result as Lazy<A>).source(Unit)
-          SingleTag -> UnsafePromise<A>().run {
-            (result as Single<A>).source.startCoroutine(asyncContinuation(EmptyCoroutineContext) {
-              complete(it)
-            })
-            await()
-          }
-          else -> UnsafePromise<A>().run {
-            FxRunLoop.start(fx) { complete(it) }
-            await()
-          }
+      LazyTag -> (fx as Lazy<A>).source(Unit)
+      else -> _unsafeRunBlocking(fx)
+    }
+
+    inline fun <A> _unsafeRunBlocking(fx: FxOf<A>): A {
+      val result = FxRunLoop.step(fx.fix())
+      return when (result.tag) {
+        PureTag -> (result as Pure<A>).value
+        RaiseErrorTag -> throw (result as RaiseError<A>).error
+        LazyTag -> (result as Lazy<A>).source(Unit)
+        6 -> UnsafePromise<A>().run {
+          FxRunLoop.start(fx) { complete(it) }
+          await()
+        }
+        8 -> UnsafePromise<A>().run {
+          FxRunLoop.start(fx) { complete(it) }
+          await()
+        }
+        SingleTag -> UnsafePromise<A>().run {
+          (result as Single<A>).source.startCoroutine(asyncContinuation(EmptyCoroutineContext) {
+            complete(it)
+          })
+          await()
+        }
+        else -> UnsafePromise<A>().run {
+          FxRunLoop.start(fx) { complete(it) }
+          await()
         }
       }
     }
