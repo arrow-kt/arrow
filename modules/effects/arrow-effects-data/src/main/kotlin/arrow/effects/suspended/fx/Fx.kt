@@ -112,9 +112,32 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
       FlatMapTag -> {
         //If we reach the maxStackDepthSize then we can fold the current FlatMap and return a Map case
         //If we haven't reached the maxStackDepthSize we fuse the map operator within the flatMap stack.
-        (this as FlatMap<B, A>)
+        (this as FlatMap<Any?, Any?>)
         if (index != Platform.maxStackDepthSize) Map(this, f)
-        else FlatMap(source, { a -> Fx { f(!fb(a)) } }, index + 1)
+        else {
+          this.fb = { a ->
+            val fa = fb(a).fix()
+            when(fa.tag) {
+              PureTag -> {
+                (fa as Pure<A>).internalValue = f(fa.value)
+                fa.unsafeRecast<B>()
+              }
+              RaiseErrorTag -> fa.unsafeRecast()
+              LazyTag -> {
+                try {
+                  (fa as Lazy<Any?>).source = {
+                    f(fa.source(Unit) as A)
+                  }
+                  fa
+                } catch (e: Throwable) {
+                  RaiseError<B>(e.nonFatalOrThrow())
+                }
+              }
+              else -> Map(fb(a), f as (Any?) -> B)
+            }
+          }
+          unsafeRecast()
+        }
       }
       else -> throw FxImpossibleBugs.FxMap
     }
