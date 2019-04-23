@@ -22,8 +22,8 @@ class NonEmptyList<out A> private constructor(
   val all: List<A>
 ) : NonEmptyListOf<A> {
 
-  constructor(head: A, tail: List<A>) : this(head, tail, listOf(head) + tail)
-  private constructor(list: List<A>) : this(list[0], list.drop(1), list)
+  constructor(head: A, tail: List<A>) : this(head, tail.toList(), listOf(head) + tail.toList())
+  private constructor(list: List<A>) : this(list[0], list.drop(1), list.toList())
 
   val size: Int = all.size
 
