@@ -7,6 +7,7 @@ import arrow.data.DayPartialOf
 import arrow.data.fix
 import arrow.extension
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Functor
 import arrow.undocumented
@@ -34,6 +35,20 @@ interface DayFunctor<F, G> : Functor<DayPartialOf<F, G>> {
 
   override fun <A, B> DayOf<F, G, A>.map(f: (A) -> B): Day<F, G, B> =
     fix().mapLazy(f)
+}
+
+@extension
+@undocumented
+interface DayApply<F, G> : Apply<DayPartialOf<F, G>> {
+  fun AF(): Applicative<F>
+
+  fun AG(): Applicative<G>
+
+  override fun <A, B> DayOf<F, G, A>.map(f: (A) -> B): Day<F, G, B> =
+    fix().mapLazy(f)
+
+  override fun <A, B> Kind<DayPartialOf<F, G>, A>.ap(ff: Kind<DayPartialOf<F, G>, (A) -> B>): Day<F, G, B> =
+    fix().ap(AF(), AG(), ff)
 }
 
 @extension

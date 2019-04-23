@@ -4,7 +4,25 @@ import arrow.Kind
 import arrow.core.Eval
 import arrow.core.Tuple2
 import arrow.extension
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Apply
+import arrow.typeclasses.Const
+import arrow.typeclasses.ConstOf
+import arrow.typeclasses.ConstPartialOf
+import arrow.typeclasses.Contravariant
+import arrow.typeclasses.Divide
+import arrow.typeclasses.Divisible
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Hash
+import arrow.typeclasses.Invariant
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.Semigroup
+import arrow.typeclasses.Show
+import arrow.typeclasses.Traverse
+import arrow.typeclasses.fix
+import arrow.typeclasses.value
 import arrow.typeclasses.ap as constAp
 import arrow.typeclasses.combine as combineAp
 
@@ -45,6 +63,17 @@ interface ConstFunctor<A> : Functor<ConstPartialOf<A>> {
 }
 
 @extension
+interface ConstApply<A> : Apply<ConstPartialOf<A>> {
+
+  fun MA(): Monoid<A>
+
+  override fun <T, U> ConstOf<A, T>.map(f: (T) -> U): Const<A, U> = fix().retag()
+
+  override fun <T, U> ConstOf<A, T>.ap(ff: ConstOf<A, (T) -> U>): Const<A, U> =
+    constAp(MA(), ff)
+}
+
+@extension
 interface ConstApplicative<A> : Applicative<ConstPartialOf<A>> {
 
   fun MA(): Monoid<A>
@@ -66,7 +95,6 @@ interface ConstFoldable<A> : Foldable<ConstPartialOf<A>> {
   override fun <T, U> ConstOf<A, T>.foldLeft(b: U, f: (U, T) -> U): U = b
 
   override fun <T, U> ConstOf<A, T>.foldRight(lb: Eval<U>, f: (T, Eval<U>) -> Eval<U>): Eval<U> = lb
-
 }
 
 @extension
@@ -95,7 +123,6 @@ interface ConstMonoid<A, T> : Monoid<ConstOf<A, T>>, ConstSemigroup<A, T> {
   override fun SA(): Semigroup<A> = MA()
 
   override fun empty(): Const<A, T> = Const(MA().empty())
-
 }
 
 @extension

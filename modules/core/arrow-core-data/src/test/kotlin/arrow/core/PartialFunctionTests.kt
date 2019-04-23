@@ -1,9 +1,11 @@
 package arrow.core
 
 import arrow.test.UnitSpec
-import io.kotlintest.*
 import io.kotlintest.matchers.startWith
 import io.kotlintest.runner.junit4.KotlinTestRunner
+import io.kotlintest.should
+import io.kotlintest.shouldBe
+import io.kotlintest.shouldThrow
 import org.junit.runner.RunWith
 
 @RunWith(KotlinTestRunner::class)
@@ -35,7 +37,7 @@ class PartialFunctionTests : UnitSpec() {
       isEven(2) shouldBe bodyContent
     }
 
-    "toPartialFunction"{
+    "toPartialFunction" {
       val isEven = body.toPartialFunction(definetAt)
       (isEven.isDefinedAt(2)) shouldBe true
       isEven(2) shouldBe bodyContent
@@ -60,6 +62,5 @@ class PartialFunctionTests : UnitSpec() {
       }
       iae.message!! should startWith("Value: (null)")
     }
-
   }
 }

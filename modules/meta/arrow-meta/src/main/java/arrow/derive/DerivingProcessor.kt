@@ -68,5 +68,4 @@ class DerivingProcessor : AbstractProcessor() {
     val companionProto = getClassOrPackageDataWrapper(typeClassElement)
     return AnnotatedDeriving(element, proto, companionProto, typeClasses, typeclassSuperTypes)
   }
-
 }

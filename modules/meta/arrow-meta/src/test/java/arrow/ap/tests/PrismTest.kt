@@ -31,7 +31,5 @@ class PrismTest : APTest("arrow.ap.objects.prism") {
       destFile = "Prism.kt",
       processor = OpticsProcessor()
     ))
-
   }
-
 }

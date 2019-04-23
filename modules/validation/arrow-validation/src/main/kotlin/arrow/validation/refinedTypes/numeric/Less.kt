@@ -15,7 +15,7 @@ import arrow.typeclasses.Order
 import arrow.validation.RefinedPredicateException
 import arrow.validation.Refinement
 
-internal fun <A: Number> isLessThan(ORD: Order<A>, a: A, max: A): Boolean =
+internal fun <A : Number> isLessThan(ORD: Order<A>, a: A, max: A): Boolean =
   ORD.run { a.lt(max) }
 
 /**

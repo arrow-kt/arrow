@@ -40,5 +40,4 @@ object SemiringLaws {
 
     fun <F> Semiring<F>.semiringMultiplicativeRightAbsorption(A: F, C: F) =
             A.combineMultiplicate(zero()).shouldBe(zero())
-
 }

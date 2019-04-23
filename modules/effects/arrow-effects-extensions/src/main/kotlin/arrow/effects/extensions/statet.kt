@@ -1,10 +1,23 @@
 package arrow.effects.extensions
 
-import arrow.core.*
-import arrow.data.*
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.Tuple2
+import arrow.core.getOrElse
+import arrow.data.StateT
+import arrow.data.StateTOf
+import arrow.data.StateTPartialOf
 import arrow.data.extensions.StateTMonadThrow
+import arrow.data.fix
+import arrow.data.runM
 import arrow.effects.Ref
-import arrow.effects.typeclasses.*
+import arrow.effects.typeclasses.Async
+import arrow.effects.typeclasses.Bracket
+import arrow.effects.typeclasses.ExitCase
+import arrow.effects.typeclasses.MonadDefer
+import arrow.effects.typeclasses.Proc
+import arrow.effects.typeclasses.ProcF
 import arrow.extension
 import arrow.typeclasses.MonadError
 import arrow.undocumented
@@ -20,7 +33,8 @@ interface StateTBracket<F, S> : Bracket<StateTPartialOf<F, S>, Throwable>, State
 
   override fun <A, B> StateTOf<F, S, A>.bracketCase(
     release: (A, ExitCase<Throwable>) -> StateTOf<F, S, Unit>,
-    use: (A) -> StateTOf<F, S, B>): StateT<F, S, B> = MD().run {
+    use: (A) -> StateTOf<F, S, B>
+  ): StateT<F, S, B> = MD().run {
 
     StateT.liftF<F, S, Ref<F, Option<S>>>(this, Ref.of(None, this)).flatMap { ref ->
       StateT<F, S, B>(this) { startS ->
@@ -42,7 +56,6 @@ interface StateTBracket<F, S> : Bracket<StateTPartialOf<F, S>, Throwable>, State
       }
     }
   }
-
 }
 
 @extension
@@ -54,7 +67,6 @@ interface StateTMonadDefer<F, S> : MonadDefer<StateTPartialOf<F, S>>, StateTBrac
   override fun <A> defer(fa: () -> StateTOf<F, S, A>): StateT<F, S, A> = MD().run {
     StateT(this) { s -> defer { fa().runM(this, s) } }
   }
-
 }
 
 @extension
@@ -79,5 +91,4 @@ interface StateTAsyncInstane<F, S> : Async<StateTPartialOf<F, S>>, StateTMonadDe
   override fun <A> StateTOf<F, S, A>.continueOn(ctx: CoroutineContext): StateT<F, S, A> = AS().run {
     StateT(this) { s -> runM(this, s).continueOn(ctx) }
   }
-
 }

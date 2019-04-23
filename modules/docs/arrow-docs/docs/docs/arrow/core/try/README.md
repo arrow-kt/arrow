@@ -182,7 +182,7 @@ Try { "3".toInt() }.map { it + 1 }
 Computing over independent values:
 
 ```kotlin:ank
-import arrow.core.extensions.`try`.applicative.tupled
+import arrow.core.extensions.`try`.apply.tupled
   
 tupled(Try { "3".toInt() }, Try { "5".toInt() }, Try { "nope".toInt() })
 ```

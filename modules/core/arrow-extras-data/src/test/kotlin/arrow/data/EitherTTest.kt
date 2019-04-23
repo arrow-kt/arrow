@@ -1,7 +1,13 @@
 package arrow.data
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.ForId
+import arrow.core.Id
+import arrow.core.Left
+import arrow.core.Option
+import arrow.core.Right
+import arrow.core.value
 import arrow.core.extensions.const.divisible.divisible
 import arrow.core.extensions.id.functor.functor
 import arrow.effects.ForIO
@@ -24,9 +30,13 @@ import arrow.test.laws.AsyncLaws
 import arrow.test.laws.DivisibleLaws
 import arrow.test.laws.SemigroupKLaws
 import arrow.test.laws.TraverseLaws
-import arrow.typeclasses.*
-import io.kotlintest.runner.junit4.KotlinTestRunner
+import arrow.typeclasses.Const
+import arrow.typeclasses.ConstPartialOf
+import arrow.typeclasses.Eq
+import arrow.typeclasses.const
+import arrow.typeclasses.value
 import io.kotlintest.properties.forAll
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
 @RunWith(KotlinTestRunner::class)
@@ -61,6 +71,5 @@ class EitherTTest : UnitSpec() {
           EitherT(Option.empty<Either<Int, Int>>()).mapLeft(Option.functor()) { it + 1 } == EitherT(Option.empty<Either<Int, Int>>())
       }
     }
-
   }
 }

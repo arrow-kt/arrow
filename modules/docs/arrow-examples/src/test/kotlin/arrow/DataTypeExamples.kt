@@ -1,11 +1,28 @@
 package arrow
 
-import arrow.Problem.*
-import arrow.core.*
+import arrow.Problem.invalidInt
+import arrow.Problem.noReciprocal
+import arrow.Problem.somethingExploded
+import arrow.Problem.somethingWentWRong
+import arrow.core.Either
+import arrow.core.Failure
+import arrow.core.Left
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Right
+import arrow.core.Some
+import arrow.core.Success
+import arrow.core.Try
+import arrow.core.TryException
+import arrow.core.Tuple3
+import arrow.core.getOrElse
 import arrow.core.extensions.`try`.applicative.applicative
 import arrow.core.extensions.`try`.functor.functor
 import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.option.fx.fx
+import arrow.core.flatMap
+import arrow.core.recover
+import arrow.core.recoverWith
 import io.kotlintest.Matcher
 import io.kotlintest.Result
 import io.kotlintest.shouldBe
@@ -59,7 +76,6 @@ class DataTypeExamples : FreeSpec() { init {
       // Computing over independent values
       val tuple = Option.applicative().tupled(Option(1), Option("Hello"), Option(20.0))
       tuple shouldBe Some(Tuple3(a = 1, b = "Hello", c = 20.0))
-
     }
 
     "Monad" {
@@ -80,7 +96,6 @@ class DataTypeExamples : FreeSpec() { init {
       }
       none shouldBe None
     }
-
   }
 
   // http://arrow-kt.io/docs/arrow/core/try/
@@ -102,7 +117,6 @@ class DataTypeExamples : FreeSpec() { init {
       gain shouldBe aFailureOfType(AuthorizationException::class)
 
       gain.getOrElse { 0 } shouldBe 0
-
     }
 
     "filter" {
@@ -145,7 +159,6 @@ class DataTypeExamples : FreeSpec() { init {
         Try { "nope".toInt() }
       )
       tryHarder shouldBe aFailureOfType(NumberFormatException::class)
-
     }
   }
 
@@ -178,7 +191,6 @@ class DataTypeExamples : FreeSpec() { init {
       either.getOrElse { 0 } shouldBe 0
       either.map { it + 1 } shouldBe either
       either.flatMap { Left(somethingExploded) } shouldBe either
-
     }
 
     "Either rather than exception" {

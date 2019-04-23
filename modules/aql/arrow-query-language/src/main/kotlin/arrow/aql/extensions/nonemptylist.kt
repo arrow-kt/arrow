@@ -1,6 +1,13 @@
 package arrow.aql.extensions
 
-import arrow.aql.*
+import arrow.aql.Count
+import arrow.aql.From
+import arrow.aql.GroupBy
+import arrow.aql.OrderBy
+import arrow.aql.Select
+import arrow.aql.Sum
+import arrow.aql.Union
+import arrow.aql.Where
 import arrow.data.ForNonEmptyList
 import arrow.data.NonEmptyList
 import arrow.extension

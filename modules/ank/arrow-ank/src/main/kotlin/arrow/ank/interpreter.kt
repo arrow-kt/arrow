@@ -1,6 +1,13 @@
 package arrow.ank
 
-import arrow.core.*
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.Try
+import arrow.core.Tuple2
+import arrow.core.Tuple3
+import arrow.core.some
+import arrow.core.toT
 import arrow.data.extensions.sequence.foldable.foldLeft
 import java.io.PrintWriter
 import java.io.StringWriter
@@ -36,7 +43,8 @@ data class CompilationException(
   val path: Path,
   val snippet: Snippet,
   val underlying: Throwable,
-  val msg: String) : NoStackTrace(msg) {
+  val msg: String
+) : NoStackTrace(msg) {
   override fun toString(): String = msg
 }
 
@@ -123,7 +131,7 @@ val interpreter: AnkOps = object : AnkOps {
           when (state) {
             is SnippetParserState.Searching -> {
               val startMatch = fenceRegexStart.matchEntire(line)
-              if (startMatch != null) { //found a fence start
+              if (startMatch != null) { // found a fence start
                 val lang = startMatch.groupValues[1].trim()
                 val snippet = Snippet(line, lang, "")
                 Tuple3(SnippetParserState.CollectingCode(snippet), lines + line, snippets)
@@ -133,7 +141,7 @@ val interpreter: AnkOps = object : AnkOps {
               val endMatch = fenceRegexEnd.matchEntire(line)
               if (endMatch != null) { // found a fence end
                 Tuple3(SnippetParserState.Searching, lines + line, snippets + state.snippet.copy(fence = state.snippet.fence + "\n" + line))
-              } else { //accumulating code inside a fence
+              } else { // accumulating code inside a fence
                 val modifiedSnippet = state.snippet.copy(
                   fence = state.snippet.fence + "\n" + line,
                   code = state.snippet.code + "\n" + line
@@ -233,7 +241,7 @@ val interpreter: AnkOps = object : AnkOps {
 
   private fun getEngineCache(snippets: Sequence<Snippet>, compilerArgs: List<String>): Map<String, ScriptEngine> {
     val cache = engineCache[compilerArgs]
-    return if (cache == null) { //create a new engine
+    return if (cache == null) { // create a new engine
       val classLoader = URLClassLoader(compilerArgs.map { URL(it) }.toTypedArray())
       val seManager = ScriptEngineManager(classLoader)
       val langs = snippets.map { it.lang }.distinct()
@@ -241,7 +249,7 @@ val interpreter: AnkOps = object : AnkOps {
         it to seManager.getEngineByExtension(extensionMappings.getOrDefault(it, "kts"))
       }.toMap()
       engineCache.putIfAbsent(compilerArgs, engines) ?: engines
-    } else { //reset an engine. Non thread-safe
+    } else { // reset an engine. Non thread-safe
       cache.forEach { _, engine ->
         engine.setBindings(engine.createBindings(), ScriptContext.ENGINE_SCOPE)
       }
@@ -249,9 +257,9 @@ val interpreter: AnkOps = object : AnkOps {
     }
   }
 
-  //TODO Try by overriding dokka settings for packages so it does not create it's markdown package file, then for regular type classes pages we only check the first result with the comment but remove them all regardless
+  // TODO Try by overriding dokka settings for packages so it does not create it's markdown package file, then for regular type classes pages we only check the first result with the comment but remove them all regardless
   private fun generateMixedHierarchyDiagramCode(classes: List<String>): Sequence<String> {
-    //careful meta-meta-programming ahead
+    // careful meta-meta-programming ahead
     val hierarchyGraphsJoined =
       "listOf(" + classes
         .map { "TypeClass($it::class)" }

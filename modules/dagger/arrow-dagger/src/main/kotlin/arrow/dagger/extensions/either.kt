@@ -1,8 +1,18 @@
 package arrow.dagger.extensions
 
 import arrow.core.EitherPartialOf
-import arrow.core.extensions.*
-import arrow.typeclasses.*
+import arrow.core.extensions.EitherApplicative
+import arrow.core.extensions.EitherFoldable
+import arrow.core.extensions.EitherFunctor
+import arrow.core.extensions.EitherMonad
+import arrow.core.extensions.EitherSemigroupK
+import arrow.core.extensions.EitherTraverse
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
+import arrow.typeclasses.SemigroupK
+import arrow.typeclasses.Traverse
 import dagger.Module
 import dagger.Provides
 import javax.inject.Inject
@@ -27,7 +37,6 @@ abstract class EitherInstances<L> {
 
   @Provides
   fun eitherSemigroupK(ev: DaggerEitherSemigroupK<L>): SemigroupK<EitherPartialOf<L>> = ev
-
 }
 
 class DaggerEitherFunctor<F> @Inject constructor() : EitherFunctor<F>

@@ -6,7 +6,6 @@ import arrow.core.None
 import arrow.core.Some
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
-import arrow.data.Ior.Right
 import arrow.core.extensions.semigroup
 import arrow.data.extensions.ior.applicative.applicative
 import arrow.data.extensions.ior.bifunctor.bifunctor
@@ -15,13 +14,19 @@ import arrow.data.extensions.ior.hash.hash
 import arrow.data.extensions.ior.monad.monad
 import arrow.data.extensions.ior.show.show
 import arrow.data.extensions.ior.traverse.traverse
+import arrow.data.Ior.Right
 import arrow.test.UnitSpec
-import arrow.test.laws.*
+import arrow.test.laws.BifunctorLaws
+import arrow.test.laws.HashLaws
+import arrow.test.laws.MonadLaws
+import arrow.test.laws.ShowLaws
+import arrow.test.laws.TraverseLaws
+import arrow.test.laws.fix
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.properties.forAll
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
 
@@ -124,14 +129,12 @@ class IorTest : UnitSpec() {
       }
     }
 
-
     "getOrElse() should return value" {
       forAll { a: Int, b: Int ->
         Ior.Right<Int, Int>(a).getOrElse { b } == a &&
           Ior.Left<Int, Int>(a).getOrElse { b } == b &&
           Ior.Both(a, b).getOrElse { a * 2 } == b
       }
-
     }
 
     "Ior.monad.flatMap should combine left values" {
@@ -139,6 +142,5 @@ class IorTest : UnitSpec() {
       val iorResult = intIorMonad.run { ior1.flatMap { Ior.Left<Int, String>(7) } }
       iorResult shouldBe Ior.Left<Int, String>(10)
     }
-
   }
 }

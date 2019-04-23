@@ -1,10 +1,19 @@
 package arrow.optics.extensions
 
 import arrow.Kind
-import arrow.core.*
-import arrow.data.*
+import arrow.core.Option
+import arrow.core.left
+import arrow.core.right
+import arrow.data.MapK
+import arrow.data.fix
+import arrow.data.getOption
+import arrow.data.k
 import arrow.extension
-import arrow.optics.*
+import arrow.optics.Lens
+import arrow.optics.Optional
+import arrow.optics.PLens
+import arrow.optics.POptional
+import arrow.optics.Traversal
 import arrow.optics.typeclasses.At
 import arrow.optics.typeclasses.Each
 import arrow.optics.typeclasses.FilterIndex

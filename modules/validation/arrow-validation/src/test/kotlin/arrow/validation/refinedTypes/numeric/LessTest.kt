@@ -26,6 +26,5 @@ class LessTest : UnitSpec() {
         x.less(Int.order(), max).isInvalid
       }
     }
-
   }
 }

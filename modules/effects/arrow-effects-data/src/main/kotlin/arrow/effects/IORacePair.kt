@@ -94,7 +94,7 @@ fun <A, B> IO.Companion.racePair(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<
 
     a.startCoroutine(asyncContinuation(ctx) { either ->
       either.fold({ error ->
-        if (active.getAndSet(false)) { //if an error finishes first, stop the race.
+        if (active.getAndSet(false)) { // if an error finishes first, stop the race.
           connB.cancel().fix().unsafeRunAsync { r2 ->
             conn.pop()
             cb(Left(r2.fold({ Platform.composeErrors(error, it) }, { error })))
@@ -112,10 +112,9 @@ fun <A, B> IO.Companion.racePair(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<
       })
     })
 
-
     b.startCoroutine(asyncContinuation(ctx) { either ->
       either.fold({ error ->
-        if (active.getAndSet(false)) { //if an error finishes first, stop the race.
+        if (active.getAndSet(false)) { // if an error finishes first, stop the race.
           connA.cancel().fix().unsafeRunAsync { r2 ->
             conn.pop()
             cb(Left(r2.fold({ Platform.composeErrors(error, it) }, { error })))
@@ -132,5 +131,4 @@ fun <A, B> IO.Companion.racePair(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<
         }
       })
     })
-
   }

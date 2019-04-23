@@ -5,7 +5,13 @@ import arrow.core.Either
 import arrow.core.Tuple2
 import arrow.core.toT
 import arrow.higherkind
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.MonoidK
+import arrow.typeclasses.Semigroup
+import arrow.typeclasses.SemigroupK
 
 fun <F, W, A> WriterTOf<F, W, A>.value(): Kind<F, Tuple2<W, A>> = this.fix().value()
 
@@ -75,7 +81,6 @@ data class WriterT<F, W, A>(private val value: Kind<F, Tuple2<W, A>>) : WriterTO
     fun <F, W, A> liftF(fa: Kind<F, A>, MM: Monoid<W>, AF: Applicative<F>): WriterT<F, W, A> = AF.run {
       WriterT(fa.map { a -> Tuple2(MM.empty(), a) })
     }
-
   }
 
   fun value(): Kind<F, Tuple2<W, A>> = value
@@ -136,5 +141,4 @@ data class WriterT<F, W, A>(private val value: Kind<F, Tuple2<W, A>>) : WriterTO
   fun combineK(SF: SemigroupK<F>, y: WriterTOf<F, W, A>): WriterT<F, W, A> = SF.run {
     WriterT(value.combineK(y.value()))
   }
-
 }

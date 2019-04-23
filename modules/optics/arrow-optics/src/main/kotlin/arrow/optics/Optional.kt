@@ -1,7 +1,17 @@
 package arrow.optics
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.PartialFunction
+import arrow.core.Some
+import arrow.core.Tuple2
+import arrow.core.flatMap
+import arrow.core.getOrElse
+import arrow.core.identity
+import arrow.core.lift
+import arrow.core.toT
 import arrow.data.State
 import arrow.data.map
 import arrow.higherkind
@@ -85,7 +95,6 @@ interface POptional<S, T, A, B> : POptionalOf<S, T, A, B> {
       { Either.Left(it) },
       { s, _ -> s }
     )
-
   }
 
   /**
@@ -281,7 +290,6 @@ interface POptional<S, T, A, B> : POptionalOf<S, T, A, B> {
    * Extract and map the focus [A] viewed through the [POptional] and applies [f] to it.
    */
   fun <C> extractMap(f: (A) -> C): State<S, Option<C>> = extract().map { it.map(f) }
-
 }
 
 /**

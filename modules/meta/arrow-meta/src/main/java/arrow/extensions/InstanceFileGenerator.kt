@@ -20,7 +20,8 @@ data class FunctionMapping(
   val name: String,
   val typeClass: ClassOrPackageDataWrapper.Class,
   val function: ProtoBuf.Function,
-  val retTypeName: String)
+  val retTypeName: String
+)
 
 data class Instance(
   val `package`: Package,
@@ -69,8 +70,8 @@ data class Instance(
       val retType = func.function.returnType.extractFullName(func.typeClass).asKotlin()
       val existingParamInfo = getParamInfo(func.name to retType)
       when {
-        acc.contains(func) -> acc //if the same param was already added ignore it
-        else -> { //remove accumulated functions whose return types  supertypes of the current evaluated one and add the current one
+        acc.contains(func) -> acc // if the same param was already added ignore it
+        else -> { // remove accumulated functions whose return types  supertypes of the current evaluated one and add the current one
           val remove = acc.find { av ->
             val avRetType = av.function.returnType.extractFullName(av.typeClass)
               .asKotlin().substringBefore("<")
@@ -141,7 +142,8 @@ data class Instance(
     val param: Pair<String, String>,
     val superTypes: List<String>,
     val paramTypeName: String,
-    val typeVarName: String)
+    val typeVarName: String
+  )
 
   private fun getParamInfo(param: Pair<String, String>): ParamInfo {
     val typeVarName = param.second.substringAfter("<").substringBefore(">")
@@ -174,7 +176,6 @@ data class Instance(
     },
     postfix = "}"
   )
-
 }
 
 class InstanceFileGenerator(
@@ -266,18 +267,18 @@ class InstanceFileGenerator(
       if (sg.hkArgs is HKArgs.First) {
         """|
          |@Suppress("UNCHECKED_CAST")
-         |fun ${biasedTypeArgs} ${sg.hkArgs.receiver.removeBackticks()}.`${fm.name}`(${args.joinToString(",") { "\n\t${it.first}: ${it.second.removeBackticks()}" }}): $retType =
+         |fun $biasedTypeArgs ${sg.hkArgs.receiver.removeBackticks()}.`${fm.name}`(${args.joinToString(",") { "\n\t${it.first}: ${it.second.removeBackticks()}" }}): $retType =
          |  ${i.receiverTypeName}.${i.companionFactoryName}${i.expandedTypeArgs()}(${i.args.joinToString(", ") { it.first }}).run {
-         |    this@`${fm.name}`.`${fm.name}`${typeArgs}(${sg.args.joinToString(", ") { it.first }}) as $retType
+         |    this@`${fm.name}`.`${fm.name}`$typeArgs(${sg.args.joinToString(", ") { it.first }}) as $retType
          |  }
          |
          |""".trimMargin()
       } else {
         """|
          |@Suppress("UNCHECKED_CAST")
-         |fun ${biasedTypeArgs} ${i.receiverTypeName}.Companion.`${fm.name}`(${args.joinToString(",") { "\n\t${it.first}: ${it.second.removeBackticks()}" }}): $retType =
+         |fun $biasedTypeArgs ${i.receiverTypeName}.Companion.`${fm.name}`(${args.joinToString(",") { "\n\t${it.first}: ${it.second.removeBackticks()}" }}): $retType =
          |  ${i.receiverTypeName}.${i.companionFactoryName}${i.expandedTypeArgs()}(${i.args.joinToString(", ") { it.first }}).run {
-         |    this.`${fm.name}`${typeArgs}(${sg.args.joinToString(", ") { it.first }}) as $retType
+         |    this.`${fm.name}`$typeArgs(${sg.args.joinToString(", ") { it.first }}) as $retType
          |  }
          |""".trimMargin()
       }
@@ -286,5 +287,4 @@ class InstanceFileGenerator(
       ""
     }
   })
-
 }

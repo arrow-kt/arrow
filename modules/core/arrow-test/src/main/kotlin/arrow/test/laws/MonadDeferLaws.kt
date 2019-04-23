@@ -1,11 +1,17 @@
 package arrow.test.laws
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Left
+import arrow.core.Right
+import arrow.core.Try
+import arrow.core.left
+import arrow.core.recover
+import arrow.core.right
 import arrow.data.k
+import arrow.data.extensions.list.foldable.foldLeft
 import arrow.effects.data.internal.BindingCancellationException
 import arrow.effects.typeclasses.MonadDefer
-import arrow.data.extensions.list.foldable.foldLeft
 import arrow.test.concurrency.SideEffect
 import arrow.test.generators.intSmall
 import arrow.test.generators.throwable
@@ -59,43 +65,43 @@ object MonadDeferLaws {
       emptyList()
     }
 
-  fun <F> MonadDefer<F>.delayConstantEqualsPure(EQ: Eq<Kind<F, Int>>): Unit {
+  fun <F> MonadDefer<F>.delayConstantEqualsPure(EQ: Eq<Kind<F, Int>>) {
     forAll(Gen.intSmall()) { x ->
       delay { x }.equalUnderTheLaw(just(x), EQ)
     }
   }
 
-  fun <F> MonadDefer<F>.deferConstantEqualsPure(EQ: Eq<Kind<F, Int>>): Unit {
+  fun <F> MonadDefer<F>.deferConstantEqualsPure(EQ: Eq<Kind<F, Int>>) {
     forAll(Gen.intSmall()) { x ->
       defer { just(x) }.equalUnderTheLaw(just(x), EQ)
     }
   }
 
-  fun <F> MonadDefer<F>.delayOrRaiseConstantRightEqualsPure(EQ: Eq<Kind<F, Int>>): Unit {
+  fun <F> MonadDefer<F>.delayOrRaiseConstantRightEqualsPure(EQ: Eq<Kind<F, Int>>) {
     forAll(Gen.intSmall()) { x ->
-        delayOrRaise { x.right() }.equalUnderTheLaw(just(x), EQ)
+      delayOrRaise { x.right() }.equalUnderTheLaw(just(x), EQ)
     }
   }
 
-  fun <F> MonadDefer<F>.delayOrRaiseConstantLeftEqualsRaiseError(EQERR: Eq<Kind<F, Int>>): Unit {
+  fun <F> MonadDefer<F>.delayOrRaiseConstantLeftEqualsRaiseError(EQERR: Eq<Kind<F, Int>>) {
     forFew(5, Gen.throwable()) { t ->
-        delayOrRaise { t.left() }.equalUnderTheLaw(raiseError(t), EQERR)
+      delayOrRaise { t.left() }.equalUnderTheLaw(raiseError(t), EQERR)
     }
   }
 
-  fun <F> MonadDefer<F>.delayThrowEqualsRaiseError(EQERR: Eq<Kind<F, Int>>): Unit {
+  fun <F> MonadDefer<F>.delayThrowEqualsRaiseError(EQERR: Eq<Kind<F, Int>>) {
     forFew(5, Gen.throwable()) { t ->
       delay { throw t }.equalUnderTheLaw(raiseError(t), EQERR)
     }
   }
 
-  fun <F> MonadDefer<F>.propagateErrorsThroughBind(EQERR: Eq<Kind<F, Int>>): Unit {
+  fun <F> MonadDefer<F>.propagateErrorsThroughBind(EQERR: Eq<Kind<F, Int>>) {
     forFew(5, Gen.throwable()) { t ->
       delay { throw t }.flatMap<Int, Int> { a: Int -> just(a) }.equalUnderTheLaw(raiseError(t), EQERR)
     }
   }
 
-  fun <F> MonadDefer<F>.deferSuspendsEvaluation(EQ: Eq<Kind<F, Int>>): Unit {
+  fun <F> MonadDefer<F>.deferSuspendsEvaluation(EQ: Eq<Kind<F, Int>>) {
     val sideEffect = SideEffect(counter = 0)
     val df = defer { sideEffect.increment(); just(sideEffect.counter) }
 
@@ -105,7 +111,7 @@ object MonadDeferLaws {
     df.equalUnderTheLaw(just(1), EQ) shouldBe true
   }
 
-  fun <F> MonadDefer<F>.delaySuspendsEvaluation(EQ: Eq<Kind<F, Int>>): Unit {
+  fun <F> MonadDefer<F>.delaySuspendsEvaluation(EQ: Eq<Kind<F, Int>>) {
     val sideEffect = SideEffect(counter = 0)
     val df = delay { sideEffect.increment(); sideEffect.counter }
 
@@ -115,7 +121,7 @@ object MonadDeferLaws {
     df.equalUnderTheLaw(just(1), EQ) shouldBe true
   }
 
-  fun <F> MonadDefer<F>.flatMapSuspendsEvaluation(EQ: Eq<Kind<F, Int>>): Unit {
+  fun <F> MonadDefer<F>.flatMapSuspendsEvaluation(EQ: Eq<Kind<F, Int>>) {
     val sideEffect = SideEffect(counter = 0)
     val df = just(0).flatMap { sideEffect.increment(); just(sideEffect.counter) }
 
@@ -125,7 +131,7 @@ object MonadDeferLaws {
     df.equalUnderTheLaw(just(1), EQ) shouldBe true
   }
 
-  fun <F> MonadDefer<F>.mapSuspendsEvaluation(EQ: Eq<Kind<F, Int>>): Unit {
+  fun <F> MonadDefer<F>.mapSuspendsEvaluation(EQ: Eq<Kind<F, Int>>) {
     val sideEffect = SideEffect(counter = 0)
     val df = just(0).map { sideEffect.increment(); sideEffect.counter }
 
@@ -135,7 +141,7 @@ object MonadDeferLaws {
     df.equalUnderTheLaw(just(1), EQ) shouldBe true
   }
 
-  fun <F> MonadDefer<F>.repeatedSyncEvaluationNotMemoized(EQ: Eq<Kind<F, Int>>): Unit {
+  fun <F> MonadDefer<F>.repeatedSyncEvaluationNotMemoized(EQ: Eq<Kind<F, Int>>) {
     val sideEffect = SideEffect()
     val df = delay { sideEffect.increment(); sideEffect.counter }
 
@@ -203,7 +209,7 @@ object MonadDeferLaws {
   fun <F> MonadDefer<F>.asyncBindUnsafeError(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.throwable()) { e: Throwable ->
       val (bound: Kind<F, Int>, _) = bindingCancellable<Int> {
-          bindDelayOrRaise { Left(e) }
+        bindDelayOrRaise { Left(e) }
       }
       bound.equalUnderTheLaw(raiseError(e), EQ)
     }
@@ -241,8 +247,8 @@ object MonadDeferLaws {
         b
       }
       Try { Thread.sleep(10); dispose() }.recover { throw it }
-      binding.equalUnderTheLaw(raiseError(BindingCancellationException()), EQ)
-        && sideEffect.counter == 0
+      binding.equalUnderTheLaw(raiseError(BindingCancellationException()), EQ) &&
+        sideEffect.counter == 0
     }
 
   fun <F> MonadDefer<F>.inContextCancellationBefore(EQ: Eq<Kind<F, Int>>): Unit =
@@ -269,8 +275,8 @@ object MonadDeferLaws {
         b
       }
       Try { Thread.sleep(10); dispose() }.recover { throw it }
-      binding.equalUnderTheLaw(raiseError(BindingCancellationException()), EQ)
-        && sideEffect.counter == 0
+      binding.equalUnderTheLaw(raiseError(BindingCancellationException()), EQ) &&
+        sideEffect.counter == 0
     }
 
   @Suppress("UNREACHABLE_CODE")

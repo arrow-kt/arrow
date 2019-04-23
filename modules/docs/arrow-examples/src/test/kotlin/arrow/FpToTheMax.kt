@@ -1,15 +1,23 @@
 package arrow
 
-import arrow.core.*
-import arrow.core.extensions.id.monad.monad
-import arrow.data.*
+import arrow.core.Id
+import arrow.core.Option
+import arrow.core.Try
+import arrow.core.Tuple2
+import arrow.core.toT
+import arrow.data.State
+import arrow.data.StatePartialOf
+import arrow.data.StateT
 import arrow.data.extensions.statet.monad.monad
+import arrow.core.extensions.id.monad.monad
+import arrow.data.fix
+import arrow.data.run
 import arrow.effects.IO
 import arrow.effects.extensions.io.monadDefer.monadDefer
 import arrow.effects.fix
 import arrow.effects.typeclasses.MonadDefer
 import arrow.typeclasses.Monad
-import java.util.*
+import java.util.Random
 
 /**
  * This sample is a simple translation in Kotlin (using arrow, of course) of this talk: https://youtu.be/sxudIMiOo68
@@ -42,7 +50,6 @@ data class TestData(val input: List<String>, val output: List<String>, val nums:
   fun nextInt(@Suppress("UNUSED_PARAMETER") upper: Int): Tuple2<TestData, Int> = copy(nums = nums.drop(1)) toT nums[0]
 }
 
-
 typealias ForTestIO = StatePartialOf<TestData>
 
 // Helper to make it clearer.
@@ -56,7 +63,6 @@ class TestIOConsole : Console<ForTestIO> {
   override fun putStrLn(s: String): Kind<ForTestIO, Unit> = TestIO { it.putStrLn(s) }
   override fun getStrLn(): Kind<ForTestIO, String> = TestIO { it.getStrLn() }
 }
-
 
 object FpToTheMax {
 
@@ -108,6 +114,4 @@ object FpToTheMax {
 
     module.fMain().fix().run(testData).a.output
   }
-
 }
-

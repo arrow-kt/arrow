@@ -606,7 +606,7 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
               if (dataTypeTypeArg is TypeName.TypeVariable && dataTypeTypeArg.name.contains("PartialOf<"))
                 TypeName.TypeVariable(dataTypeTypeArg.name.substringBefore("PartialOf<").substringAfter("<"))
               else dataTypeTypeArg
-            //profunctor and other cases are parametric to Kind2 values or Conested
+            // profunctor and other cases are parametric to Kind2 values or Conested
             val projectedCompanion = dataTypeName.projectedCompanion
             val dataTypeDownKinded = dataTypeName.downKind
             val dataType = dataTypeDownKinded.type

@@ -1,7 +1,8 @@
 package arrow.typeclasses
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Option
+import arrow.core.Tuple2
 import arrow.documented
 
 /**
@@ -94,14 +95,14 @@ import arrow.documented
 @documented
 interface Semigroupal<F> {
 
-    /**
-     * Multiplicatively combine F<A> and F<B> into F<Tuple2<A, B>>
-     */
-    fun <A, B> Kind<F, A>.product(fb: Kind<F, B>): Kind<F, Tuple2<A, B>>
+  /**
+   * Multiplicatively combine F<A> and F<B> into F<Tuple2<A, B>>
+   */
+  fun <A, B> Kind<F, A>.product(fb: Kind<F, B>): Kind<F, Tuple2<A, B>>
 
-    /**
-     * Add support for the * syntax
-     */
-    operator fun <A, B> Kind<F, A>.times(fb: Kind<F, B>): Kind<F, Tuple2<A, B>> =
-            this.product(fb)
+  /**
+   * Add support for the * syntax
+   */
+  operator fun <A, B> Kind<F, A>.times(fb: Kind<F, B>): Kind<F, Tuple2<A, B>> =
+    this.product(fb)
 }

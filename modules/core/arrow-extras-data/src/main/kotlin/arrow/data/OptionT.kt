@@ -1,7 +1,14 @@
 package arrow.data
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Left
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.OptionOf
+import arrow.core.Right
+import arrow.core.Some
+import arrow.core.getOrElse
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Functor
@@ -45,7 +52,6 @@ data class OptionT<F, A>(private val value: Kind<F, Option<A>>) : OptionTOf<F, A
     fun <F, A> liftF(FF: Functor<F>, fa: Kind<F, A>): OptionT<F, A> = FF.run {
       OptionT(fa.map { Some(it) })
     }
-
   }
 
   fun value(): Kind<F, Option<A>> = value

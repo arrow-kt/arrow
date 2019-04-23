@@ -77,7 +77,7 @@ Or you can apply a list of transformations using `ap` from [`Applicative`](/docs
 
 ```kotlin:ank
 import arrow.data.extensions.*
-import arrow.data.extensions.list.applicative.*
+import arrow.data.extensions.list.apply.*
 
 listOf(1, 2, 3).ap(listOf({ x: Int -> x + 10}, { x: Int -> x * 2}))
 ```

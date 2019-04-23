@@ -14,7 +14,14 @@ import arrow.data.extensions.sequencek.monoidal.monoidal
 import arrow.data.extensions.sequencek.traverse.traverse
 import arrow.test.UnitSpec
 import arrow.test.generators.sequenceK
-import arrow.test.laws.*
+import arrow.test.laws.HashLaws
+import arrow.test.laws.MonadLaws
+import arrow.test.laws.MonoidKLaws
+import arrow.test.laws.MonoidLaws
+import arrow.test.laws.MonoidalLaws
+import arrow.test.laws.ShowLaws
+import arrow.test.laws.TraverseLaws
+import arrow.test.laws.fix
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Show
 import io.kotlintest.properties.Gen
@@ -38,7 +45,7 @@ class SequenceKTest : UnitSpec() {
 
     val tuple2Eq: Eq<Kind<ForSequenceK, Tuple2<Int, Int>>> = object : Eq<Kind<ForSequenceK, Tuple2<Int, Int>>> {
       override fun Kind<ForSequenceK, Tuple2<Int, Int>>.eqv(b: Kind<ForSequenceK, Tuple2<Int, Int>>): Boolean =
-              toList() == b.toList()
+        toList() == b.toList()
     }
 
     val show: Show<Kind<ForSequenceK, Int>> = object : Show<Kind<ForSequenceK, Int>> {
@@ -58,5 +65,5 @@ class SequenceKTest : UnitSpec() {
   }
 
   private fun bijection(from: Kind<ForSequenceK, Tuple2<Tuple2<Int, Int>, Int>>): SequenceK<Tuple2<Int, Tuple2<Int, Int>>> =
-          from.fix().toList().map { Tuple2(it.a.a, Tuple2(it.a.b, it.b)) }.asSequence().k()
+    from.fix().toList().map { Tuple2(it.a.a, Tuple2(it.a.b, it.b)) }.asSequence().k()
 }

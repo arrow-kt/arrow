@@ -13,7 +13,13 @@ import arrow.data.extensions.setk.monoidal.monoidal
 import arrow.data.extensions.setk.semigroupK.semigroupK
 import arrow.data.extensions.setk.show.show
 import arrow.test.UnitSpec
-import arrow.test.laws.*
+import arrow.test.laws.FoldableLaws
+import arrow.test.laws.HashLaws
+import arrow.test.laws.MonoidKLaws
+import arrow.test.laws.MonoidalLaws
+import arrow.test.laws.SemigroupKLaws
+import arrow.test.laws.ShowLaws
+import arrow.test.laws.fix
 import arrow.typeclasses.Eq
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
@@ -44,5 +50,5 @@ class SetKTest : UnitSpec() {
   }
 
   private fun bijection(from: Kind<ForSetK, Tuple2<Tuple2<Int, Int>, Int>>): SetK<Tuple2<Int, Tuple2<Int, Int>>> =
-          from.fix().map { Tuple2(it.a.a, Tuple2(it.a.b, it.b)) }.toSet().k()
+    from.fix().map { Tuple2(it.a.a, Tuple2(it.a.b, it.b)) }.toSet().k()
 }

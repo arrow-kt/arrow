@@ -27,12 +27,14 @@ import kotlin.coroutines.CoroutineContext
 @Suppress("LargeClass")
 object ConcurrentLaws {
 
-  fun <F> laws(CF: Concurrent<F>,
-               EQ: Eq<Kind<F, Int>>,
-               EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>,
-               EQ_UNIT: Eq<Kind<F, Unit>>,
-               ctx: CoroutineContext = Dispatchers.Default,
-               testStackSafety: Boolean = true): List<Law> =
+  fun <F> laws(
+    CF: Concurrent<F>,
+    EQ: Eq<Kind<F, Int>>,
+    EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>,
+    EQ_UNIT: Eq<Kind<F, Unit>>,
+    ctx: CoroutineContext = Dispatchers.Default,
+    testStackSafety: Boolean = true
+  ): List<Law> =
     AsyncLaws.laws(CF, EQ, EQ_EITHER, testStackSafety) + listOf(
       Law("Concurrent Laws: cancel on bracket releases") { CF.cancelOnBracketReleases(EQ, ctx) },
       Law("Concurrent Laws: acquire is not cancelable") { CF.acquireBracketIsNotCancelable(EQ, ctx) },
@@ -86,14 +88,14 @@ object ConcurrentLaws {
           use = { a -> startLatch.complete(a).flatMap { never<Int>() } },
           release = { r, exitCase ->
             when (exitCase) {
-              is ExitCase.Canceled -> exitLatch.complete(r) //Fulfil promise that `release` was executed with Canceled
+              is ExitCase.Canceled -> exitLatch.complete(r) // Fulfil promise that `release` was executed with Canceled
               else -> just(Unit)
             }
           }
         )).bind() // Fork execution, allowing us to cancel it later
 
-        val waitStart = startLatch.get().bind() //Waits on promise of `use`
-        ctx.startFiber(cancel).bind() //Cancel bracketCase
+        val waitStart = startLatch.get().bind() // Waits on promise of `use`
+        ctx.startFiber(cancel).bind() // Cancel bracketCase
         val waitExit = exitLatch.get().bind() // Observes cancellation via bracket's `release`
 
         waitStart + waitExit
@@ -183,7 +185,6 @@ object ConcurrentLaws {
       }.a.equalUnderTheLaw(just(i), EQ)
     }
 
-
   fun <F> Concurrent<F>.asyncCanCancelUpstream(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
     forAll(Gen.int()) { i ->
       bindingCancellable {
@@ -272,7 +273,7 @@ object ConcurrentLaws {
 
         val (_, cancel) = ctx.startFiber(asyncF<Unit> { conn, _ ->
           conn.push(latch.complete(i))
-          //Wait with cancellation until it is run, if it doesn't run its cancellation is also doesn't run.
+          // Wait with cancellation until it is run, if it doesn't run its cancellation is also doesn't run.
           startLatch.complete(Unit)
         }).bind()
 
@@ -359,7 +360,7 @@ object ConcurrentLaws {
         val startLatch = Promise<F, Unit>(this@raceCanBeCancelledByParticipants).bind()
 
         val cancel = asyncF<Unit> { conn, cb -> startLatch.get().flatMap { conn.cancel().map { cb(Right(Unit)) } } }
-        val loser = startLatch.complete(Unit) //guarantees that both cancel & loser started
+        val loser = startLatch.complete(Unit) // guarantees that both cancel & loser started
           .bracket(use = { never<Int>() }, release = { endLatch.complete(i) })
 
         if (shouldLeftCancel) ctx.startFiber(ctx.raceN(cancel, loser)).bind()
@@ -466,7 +467,7 @@ object ConcurrentLaws {
 
         val cancel = asyncF<Unit> { conn, cb -> startLatch.get().flatMap { conn.cancel().map { cb(Right(Unit)) } } }
 
-        val loser = startLatch.complete(Unit) //guarantees that both cancel & loser actually started
+        val loser = startLatch.complete(Unit) // guarantees that both cancel & loser actually started
           .bracket(use = { never<Int>() }, release = { endLatch.complete(i) })
 
         if (shouldLeftCancel) ctx.startFiber(ctx.racePair(cancel, loser)).bind()
@@ -603,9 +604,9 @@ object ConcurrentLaws {
             .flatMap { conn.cancel().map { cb(Right(Unit)) } }
         }
 
-        val loser = startLatch.complete(Unit) //guarantees that both cancel & loser actually started
+        val loser = startLatch.complete(Unit) // guarantees that both cancel & loser actually started
           .bracket(use = { never<Int>() }, release = { endLatch.complete(i) })
-        val loser2 = start2Latch.complete(Unit) //guarantees that both cancel & loser actually started
+        val loser2 = start2Latch.complete(Unit) // guarantees that both cancel & loser actually started
           .bracket(use = { never<Int>() }, release = { endLatch.complete(i) })
 
         when (shouldCancel) {
@@ -677,5 +678,4 @@ object ConcurrentLaws {
         }
       }.equalUnderTheLaw(just(i), EQ)
     }
-
 }
