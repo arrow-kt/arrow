@@ -68,7 +68,7 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
         }
         PureTag -> suspend { (this as Fx.Pure<A>).value }
         SingleTag -> (this as Fx.Single<A>).source
-        LazyTag -> suspend { (this as Fx.Lazy<A>).source() }
+        LazyTag -> suspend { (this as Fx.Lazy<A>).source(Unit) }
         DeferTag -> suspend { !(this as Fx.Defer<A>).thunk() }
         MapTag -> {
           this as Fx.Map<A, *>
@@ -91,37 +91,23 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
   inline fun <B> map(noinline f: (A) -> B): Fx<B> =
     when (tag) {
       RaiseErrorTag -> unsafeRecast()
-      PureTag -> {
-        //Fx.Single { f((this as Fx.Pure<A>).value) }
-        this as Fx.Pure<A>
-        if (this.index != Platform.maxStackDepthSize) {
-          try {
-            internalValue = f(this.value)
-            index += 1
-            unsafeRecast<B>()
-          } catch (e: Throwable) {
-            RaiseError<B>(e.nonFatalOrThrow())
-          }
-        } else {
-          try {
-            val b: B = f(this.value)
-            internalValue = b
-            index = 0
-            unsafeRecast<B>()
-          } catch (e: Throwable) {
-            RaiseError<B>(e.nonFatalOrThrow())
-          }
-        }
+      PureTag -> Lazy {
+        f((this as Pure<A>).value)
       }
       SingleTag -> Map(this, f)
       DeferTag -> Map(this, f)
-      LazyTag -> Map(this, f)
+      LazyTag -> {
+        this as Lazy<Any?>
+        val ff = f as (Any?) -> Any?
+        this.source = AndThen(source).andThen(ff)
+        unsafeRecast()
+      }
       ConnectionSwitchTag -> Map(this, f)
       ModifyContextTag -> Map(this, f)
       AsyncTag -> Map(this, f)
       ContinueOnTag -> Map(this, f)
       MapTag -> {
-        this as Fx.Map<Any?, Any?>
+        this as Map<A, Any?>
         val ff = f as (Any?) -> Any?
         //AndThen composes the functions in a stack-safe way by running them in a while loop.
         this.g = AndThen(g).andThen(ff)
@@ -130,7 +116,7 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
       FlatMapTag -> {
         //If we reach the maxStackDepthSize then we can fold the current FlatMap and return a Map case
         //If we haven't reached the maxStackDepthSize we fuse the map operator within the flatMap stack.
-        this as Fx.FlatMap<B, A>
+        this as FlatMap<B, A>
         if (index != Platform.maxStackDepthSize) Map(this, f)
         else FlatMap(source, { a -> Fx { f(!fb(a)) } }, index + 1)
       }
@@ -176,13 +162,24 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
       }
       FlatMapTag -> {
         this as Fx.FlatMap<B, A>
+
         if (index != Platform.maxStackDepthSize) FlatMap(this, f, 0)
         else FlatMap(source, { a ->
-          Single {
-            val b = !fb(a) //Don't we lose the runloop state here?
-            !f(b)
-          }
+          val fx: Fx<A> = fb(a).fix()
+          when (fx.tag) {
+            PureTag -> f((fx as Pure<A>).value)
+            RaiseErrorTag -> fx.unsafeRecast()
+            LazyTag -> {
+              try {
+                f((fx as Lazy<A>).source(Unit))
+              } catch (e: Throwable) {
+                RaiseError<B>(e.nonFatalOrThrow())
+              }
+            }
+            else -> FlatMap(fx, f, 0)
+          }.fix()
         }, index + 1)
+
       }
       else -> throw FxImpossibleBugs.FxFlatMap
     }
@@ -214,7 +211,7 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
    * Internal only effect declaration to bypass suspension overhead
    */
   @PublishedApi
-  internal class Lazy<A>(@JvmField val source: () -> A) : Fx<A>(LazyTag) {
+  internal class Lazy<A>(@JvmField var source: (Unit) -> A) : Fx<A>(LazyTag) {
     override fun toString(): String = "Fx.Lazy"
   }
 
@@ -418,7 +415,7 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
     val lazy: Fx<Unit> = Lazy { Unit }
 
     @JvmStatic
-    fun <A> lazy(f: () -> A): Fx<A> = Lazy(f)
+    fun <A> lazy(f: (Unit) -> A): Fx<A> = Lazy(f)
 
     @JvmStatic
     val never: Fx<Nothing> = async { _, _ -> Unit }
@@ -463,34 +460,34 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
      */
     @JvmStatic //TODO convert to TABLESWITCH from LOOKUP_SWITCH.
     fun <A> unsafeRunBlocking(fx: FxOf<A>): A = when (val tag: Int = fx.fix().tag) {
-        PureTag -> (fx as Pure<A>).value
-        RaiseErrorTag -> throw (fx as Fx.RaiseError<A>).error
-        LazyTag -> (fx as Lazy<A>).source()
-        SingleTag -> UnsafePromise<A>().run {
-          (fx as Single<A>).source.startCoroutine(asyncContinuation(EmptyCoroutineContext) {
-            complete(it)
-          })
-          await()
-        }
-        else -> {
-          val result = FxRunLoop.step(fx.fix())
-          when (result.tag) {
-            PureTag -> (result as Pure<A>).value
-            RaiseErrorTag -> throw (result as RaiseError<A>).error
-            LazyTag -> (result as Lazy<A>).source()
-            SingleTag -> UnsafePromise<A>().run {
-              (result as Single<A>).source.startCoroutine(asyncContinuation(EmptyCoroutineContext) {
-                complete(it)
-              })
-              await()
-            }
-            else -> UnsafePromise<A>().run {
-              FxRunLoop.start(fx) { complete(it) }
-              await()
-            }
+      PureTag -> (fx as Pure<A>).value
+      RaiseErrorTag -> throw (fx as Fx.RaiseError<A>).error
+      LazyTag -> (fx as Lazy<A>).source(Unit)
+      SingleTag -> UnsafePromise<A>().run {
+        (fx as Single<A>).source.startCoroutine(asyncContinuation(EmptyCoroutineContext) {
+          complete(it)
+        })
+        await()
+      }
+      else -> {
+        val result = FxRunLoop.step(fx.fix())
+        when (result.tag) {
+          PureTag -> (result as Pure<A>).value
+          RaiseErrorTag -> throw (result as RaiseError<A>).error
+          LazyTag -> (result as Lazy<A>).source(Unit)
+          SingleTag -> UnsafePromise<A>().run {
+            (result as Single<A>).source.startCoroutine(asyncContinuation(EmptyCoroutineContext) {
+              complete(it)
+            })
+            await()
+          }
+          else -> UnsafePromise<A>().run {
+            FxRunLoop.start(fx) { complete(it) }
+            await()
           }
         }
       }
+    }
 
     /**
      * [unsafeRunNonBlocking] allows you to run any [Fx] to its wrapped value [A].

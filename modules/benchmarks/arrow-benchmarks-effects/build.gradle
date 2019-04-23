@@ -14,7 +14,10 @@ apply plugin: "io.morethan.jmhreport"
 
 jmh {
     include = [
-            'arrow.benchmarks.Delay'
+            'arrow.benchmarks.Pure',
+            'arrow.benchmarks.Delay',
+            'arrow.benchmarks.DeepBind',
+            'arrow.benchmarks.Map'
     ]
     resultFormat = 'json'
     resultsFile = file('build/reports/benchmarks.json')

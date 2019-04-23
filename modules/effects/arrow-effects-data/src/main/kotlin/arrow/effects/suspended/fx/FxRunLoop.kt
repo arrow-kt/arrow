@@ -121,7 +121,7 @@ object FxRunLoop {
         LazyTag -> {
           source as Fx.Lazy<Any?>
           try {
-            result = source.source()
+            result = source.source(Unit)
             hasResult = true
             source = null
           } catch (t: Throwable) {
@@ -442,7 +442,7 @@ object FxRunLoop {
         LazyTag -> {
           (current as Fx.Lazy<Any?>)
           try {
-            result = current.source()
+            result = current.source(Unit)
             hasResult = true
             current = null
           } catch (t: Throwable) {
@@ -525,7 +525,7 @@ object FxRunLoop {
   }
 
   private fun <A> sanitizedCurrentFx(current: Current?, unboxed: Any?): Fx<A> =
-    (current ?: IO.Pure(unboxed)) as Fx<A>
+    (current ?: Fx.Pure(unboxed, 0)) as Fx<A>
 
   private fun <A> suspendInAsync(
     currentIO: Fx.Async<A>,

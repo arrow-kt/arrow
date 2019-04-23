@@ -73,13 +73,13 @@ object MonadDeferLaws {
 
   fun <F> MonadDefer<F>.delayOrRaiseConstantRightEqualsPure(EQ: Eq<Kind<F, Int>>): Unit {
     forAll(Gen.intSmall()) { x ->
-        delayOrRaise { x.right() }.equalUnderTheLaw(just(x), EQ)
+      delayOrRaise { x.right() }.equalUnderTheLaw(just(x), EQ)
     }
   }
 
   fun <F> MonadDefer<F>.delayOrRaiseConstantLeftEqualsRaiseError(EQERR: Eq<Kind<F, Int>>): Unit {
     forFew(5, Gen.throwable()) { t ->
-        delayOrRaise { t.left() }.equalUnderTheLaw(raiseError(t), EQERR)
+      delayOrRaise { t.left() }.equalUnderTheLaw(raiseError(t), EQERR)
     }
   }
 
@@ -127,7 +127,7 @@ object MonadDeferLaws {
 
   fun <F> MonadDefer<F>.mapSuspendsEvaluation(EQ: Eq<Kind<F, Int>>): Unit {
     val sideEffect = SideEffect(counter = 0)
-    val df = delay { 0 }.map { sideEffect.increment(); sideEffect.counter }
+    val df = just(0).map { sideEffect.increment(); sideEffect.counter }
 
     Thread.sleep(10)
 
@@ -203,7 +203,7 @@ object MonadDeferLaws {
   fun <F> MonadDefer<F>.asyncBindUnsafeError(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.throwable()) { e: Throwable ->
       val (bound: Kind<F, Int>, _) = bindingCancellable<Int> {
-          bindDelayOrRaise { Left(e) }
+        bindDelayOrRaise { Left(e) }
       }
       bound.equalUnderTheLaw(raiseError(e), EQ)
     }
