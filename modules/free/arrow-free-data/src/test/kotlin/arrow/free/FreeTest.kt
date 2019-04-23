@@ -1,6 +1,10 @@
 package arrow.free
 
-import arrow.core.*
+import arrow.core.ForId
+import arrow.core.Id
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.value
 import arrow.data.NonEmptyList
 import arrow.data.fix
 import arrow.free.extensions.FreeEq
@@ -11,6 +15,7 @@ import arrow.higherkind
 import arrow.core.extensions.id.monad.monad
 import arrow.data.extensions.nonemptylist.monad.monad
 import arrow.core.extensions.option.monad.monad
+import arrow.core.fix
 import arrow.test.UnitSpec
 import arrow.test.laws.EqLaws
 import arrow.test.laws.MonadLaws
@@ -70,6 +75,5 @@ class FreeTest : UnitSpec() {
       val hugeProg = stackSafeTestProgram(0, n)
       hugeProg.foldMap(idInterpreter, IdMonad).value() shouldBe n
     }
-
   }
 }

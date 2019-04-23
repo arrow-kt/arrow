@@ -10,4 +10,5 @@ class AnnotatedInstance(
   val superTypes: List<ClassOrPackageDataWrapper.Class>,
   val processor: AbstractProcessor,
   val dataType: ClassOrPackageDataWrapper.Class,
-  val typeClass: ClassOrPackageDataWrapper.Class)
+  val typeClass: ClassOrPackageDataWrapper.Class
+)

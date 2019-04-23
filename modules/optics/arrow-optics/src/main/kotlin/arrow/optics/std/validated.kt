@@ -1,8 +1,10 @@
 package arrow.optics
 
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Failure
+import arrow.core.Success
+import arrow.core.Try
 import arrow.data.Validated
-import arrow.data.Validated.Companion.fromEither
 
 /**
  * [PIso] that defines equality between [Validated] and [Either]

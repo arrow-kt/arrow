@@ -41,7 +41,6 @@ open class StackSafeMonadContinuation<F, A>(M: Monad<F>, override val context: C
     }
     COROUTINE_SUSPENDED
   }
-
 }
 
 /**

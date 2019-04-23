@@ -3,10 +3,14 @@ package arrow.free.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.FunctionK
-
-import arrow.free.*
 import arrow.extension
+import arrow.free.Free
+import arrow.free.FreeOf
+import arrow.free.FreePartialOf
+import arrow.free.fix
+import arrow.free.foldMap
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
@@ -21,6 +25,17 @@ interface FreeFunctor<S> : Functor<FreePartialOf<S>> {
 
   override fun <A, B> Kind<FreePartialOf<S>, A>.map(f: (A) -> B): Free<S, B> =
     fix().freeMap(f)
+}
+
+@extension
+@undocumented
+interface FreeApply<S> : Apply<FreePartialOf<S>>, FreeFunctor<S> {
+
+  override fun <A, B> Kind<FreePartialOf<S>, A>.map(f: (A) -> B): Free<S, B> =
+    fix().freeMap(f)
+
+  override fun <A, B> Kind<FreePartialOf<S>, A>.ap(ff: Kind<FreePartialOf<S>, (A) -> B>): Free<S, B> =
+    fix().freeAp(ff)
 }
 
 @extension

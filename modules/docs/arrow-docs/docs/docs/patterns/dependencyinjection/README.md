@@ -261,7 +261,7 @@ You can define multiple clauses for a single generic parameter that will be the 
 Let's see one example of a function that depends on both `Applicative` and `Show`:
 
 ```kotlin
-fun <F> Applicative<F>.findUserName(S: Show<User>, id: Kind<F, UserId>): Kind<F, Int> = S.run {
+fun <F> Applicative<F>.findUserName(S: Show<User>, id: Kind<F, UserId>): Kind<F, String> = S.run {
   id.map { fetchUser(it) }.map { it.show() }
 }
 ```

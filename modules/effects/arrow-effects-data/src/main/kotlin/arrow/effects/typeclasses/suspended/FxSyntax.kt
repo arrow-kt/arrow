@@ -8,7 +8,11 @@ import arrow.core.identity
 import arrow.data.extensions.list.traverse.traverse
 import arrow.data.fix
 import arrow.effects.internal.asyncContinuation
-import arrow.effects.typeclasses.*
+import arrow.effects.typeclasses.Async
+import arrow.effects.typeclasses.Bracket
+import arrow.effects.typeclasses.Concurrent
+import arrow.effects.typeclasses.ExitCase
+import arrow.effects.typeclasses.Fiber
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Monad
 import arrow.typeclasses.suspended.BindSyntax
@@ -131,6 +135,4 @@ interface FxSyntax<F> : Concurrent<F>, BindSyntax<F> {
 
   fun <A> Iterable<Iterable<suspend () -> A>>.flatSequence(): Kind<F, List<A>> =
     flatten().sequence()
-
-
 }

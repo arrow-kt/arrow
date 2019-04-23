@@ -3,7 +3,12 @@ package arrow.extensions
 import arrow.common.messager.log
 import arrow.common.utils.knownError
 import arrow.extension
-import arrow.meta.ast.*
+import arrow.meta.ast.Code
+import arrow.meta.ast.Func
+import arrow.meta.ast.Modifier
+import arrow.meta.ast.PackageName
+import arrow.meta.ast.Type
+import arrow.meta.ast.TypeName
 import arrow.meta.encoder.TypeClassInstance
 import arrow.meta.processor.MetaProcessor
 import com.google.auto.service.AutoService
@@ -168,11 +173,11 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class), PolyTempl
             kdoc = func.kdoc?.eval(this),
             modifiers =
             func.modifiers.filter { it == Modifier.Suspend } +
-            when {
-              allArgs.size > 1 -> emptyList()
-              func.receiverType == null -> emptyList()
-              else -> func.modifiers
-            }, //remove infix and operator mods
+              when {
+                allArgs.size > 1 -> emptyList()
+                func.receiverType == null -> emptyList()
+                else -> func.modifiers
+              }, // remove infix and operator mods
             typeVariables = typeVariables,
             annotations = listOf(
               JvmName(func.name + if (dummyArgsCount > 0) dummyArgsCount else ""),
@@ -193,8 +198,8 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class), PolyTempl
                     else Code(it.name)
                   }
                 } else func.parameters.codeNames()
-              //Const is a special case because it uses a phantom type arg and the Kotlin compiler chooses to
-              //recursively call the extension if you ascribe the call types
+              // Const is a special case because it uses a phantom type arg and the Kotlin compiler chooses to
+              // recursively call the extension if you ascribe the call types
               val typeVars =
                 if (instance.name.simpleName == "ConstFunctor") emptyList()
                 else func.typeVariables
@@ -208,7 +213,6 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class), PolyTempl
             })
       }
       .toList()
-
   }
 
   private fun TypeClassInstance.extensionTypeVariables(func: Func): List<TypeName.TypeVariable> = (instance.typeVariables + func.typeVariables)
@@ -261,6 +265,4 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class), PolyTempl
       PackageName("${instance.packageName.value}.${wrappedSimpleName.toLowerCase()}.${typeClass.name.simpleName.decapitalize()}")
     )
   } else projectedCompanion
-
 }
-

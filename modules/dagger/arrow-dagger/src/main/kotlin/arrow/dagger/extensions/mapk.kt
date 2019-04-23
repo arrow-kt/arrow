@@ -1,8 +1,17 @@
 package arrow.dagger.extensions
 
 import arrow.data.MapKPartialOf
-import arrow.data.extensions.*
-import arrow.typeclasses.*
+import arrow.data.extensions.MapKEq
+import arrow.data.extensions.MapKFoldable
+import arrow.data.extensions.MapKFunctor
+import arrow.data.extensions.MapKMonoid
+import arrow.data.extensions.MapKSemigroup
+import arrow.data.extensions.MapKTraverse
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Semigroup
+import arrow.typeclasses.Traverse
 import dagger.Module
 import dagger.Provides
 import javax.inject.Inject
@@ -18,7 +27,6 @@ abstract class MapKInstances<L> {
 
   @Provides
   fun mapKTraverse(ev: DaggerMapKTraverse<L>): Traverse<MapKPartialOf<L>> = ev
-
 }
 
 class DaggerMapKFunctor<K> @Inject constructor() : MapKFunctor<K>

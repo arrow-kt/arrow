@@ -1,11 +1,22 @@
 package arrow.test.laws
 
-import arrow.core.*
+import arrow.core.Id
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.compose
+import arrow.core.identity
 import arrow.core.extensions.const.applicative.applicative
 import arrow.core.extensions.id.applicative.applicative
-import arrow.typeclasses.*
+import arrow.core.orElse
+import arrow.core.value
+import arrow.data.value
 import arrow.optics.Prism
 import arrow.optics.modify
+import arrow.typeclasses.Const
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.value
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
@@ -61,5 +72,4 @@ object PrismLaws {
         override fun empty(): Option<B> = None
       }), a) { Const(Some(it)) }.value().equalUnderTheLaw(getOption(a), EQOptionB)
     }
-
 }

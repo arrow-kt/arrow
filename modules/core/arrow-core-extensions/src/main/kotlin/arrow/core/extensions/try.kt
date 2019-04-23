@@ -3,11 +3,32 @@
 package arrow.core.extensions
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Eval
+import arrow.core.ForTry
+import arrow.core.Success
+import arrow.core.Try
 import arrow.core.Try.Failure
+import arrow.core.TryOf
 import arrow.core.extensions.`try`.monadThrow.monadThrow
+import arrow.core.fix
+import arrow.core.identity
+import arrow.core.recoverWith
 import arrow.extension
-import arrow.typeclasses.*
+import arrow.typeclasses.Apply
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Hash
+import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadError
+import arrow.typeclasses.MonadThrow
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.Semigroup
+import arrow.typeclasses.Show
+import arrow.typeclasses.Traverse
 import arrow.core.extensions.traverse as tryTraverse
 
 fun <A> Try<A>.combine(SG: Semigroup<A>, b: Try<A>): Try<A> =
@@ -40,7 +61,6 @@ interface TryApplicativeError : ApplicativeError<ForTry, Throwable>, TryApplicat
 
   override fun <A> TryOf<A>.handleErrorWith(f: (Throwable) -> TryOf<A>): Try<A> =
     fix().recoverWith { f(it).fix() }
-
 }
 
 @extension
@@ -72,7 +92,6 @@ interface TryEq<A> : Eq<Try<A>> {
       is Success -> false
     }
   }
-
 }
 
 @extension
@@ -83,6 +102,15 @@ interface TryShow<A> : Show<Try<A>> {
 
 @extension
 interface TryFunctor : Functor<ForTry> {
+  override fun <A, B> TryOf<A>.map(f: (A) -> B): Try<B> =
+    fix().map(f)
+}
+
+@extension
+interface TryApply : Apply<ForTry> {
+  override fun <A, B> TryOf<A>.ap(ff: TryOf<(A) -> B>): Try<B> =
+    fix().ap(ff)
+
   override fun <A, B> TryOf<A>.map(f: (A) -> B): Try<B> =
     fix().map(f)
 }

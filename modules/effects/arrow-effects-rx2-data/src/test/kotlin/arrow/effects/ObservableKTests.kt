@@ -1,11 +1,15 @@
 package arrow.effects
 
-import arrow.effects.rx2.*
+import arrow.effects.rx2.ForObservableK
+import arrow.effects.rx2.ObservableK
+import arrow.effects.rx2.ObservableKOf
+import arrow.effects.rx2.k
 import arrow.effects.rx2.extensions.observablek.async.async
 import arrow.effects.rx2.extensions.observablek.functor.functor
 import arrow.effects.rx2.extensions.observablek.monad.flatMap
 import arrow.effects.rx2.extensions.observablek.monadThrow.bindingCatch
 import arrow.effects.rx2.extensions.observablek.traverse.traverse
+import arrow.effects.rx2.value
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
@@ -155,6 +159,5 @@ class ObservableKTests : UnitSpec() {
         .test()
         .assertError(ConnectionCancellationException)
     }
-
   }
 }

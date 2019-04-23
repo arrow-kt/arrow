@@ -22,7 +22,6 @@ abstract class Function1Instances<F> {
 
   @Provides
   fun function1Monad(ev: DaggerFunction1Monad<F>): Monad<Function1PartialOf<F>> = ev
-
 }
 
 class DaggerFunction1Functor<F> @Inject constructor(val FF: Functor<F>) : Function1Functor<F>

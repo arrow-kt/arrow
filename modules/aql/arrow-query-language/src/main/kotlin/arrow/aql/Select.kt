@@ -46,5 +46,4 @@ interface Select<F> {
 
   fun <A, Z> Query<F, A, Z>.value(): Source<F, Z> =
     functor().run { from.map(select) }
-
 }

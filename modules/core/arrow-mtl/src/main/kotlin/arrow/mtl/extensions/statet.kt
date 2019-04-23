@@ -20,7 +20,6 @@ interface StateTMonadState<F, S> : MonadState<StateTPartialOf<F, S>, S>, StateTM
   override fun get(): StateT<F, S, S> = StateT.get(MF())
 
   override fun set(s: S): StateT<F, S, Unit> = StateT.set(MF(), s)
-
 }
 
 @extension

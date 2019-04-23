@@ -98,6 +98,24 @@ Computation happens when `.value()` is invoked.
 Option.applicative().run { Some(1).map2Eval(Eval.later { Some("x") }, { z: Tuple2<Int, String> ->  "${z.a}${z.b}" }).value() }
 ```
 
+### Apply
+
+A closely related type class is Apply which is identical to Applicative, modulo the ``just`` method. Indeed Applicative is a subclass of Apply with the addition of this method.
+
+```kotlin:ank
+import arrow.typeclasses.Functor 
+
+interface Apply<F> : Functor<F> {
+  fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B>
+}
+
+interface Applicative<F> : Apply<F> {
+  fun <A> just(a: A): Kind<F, A> 
+}
+```
+
+One of the motivations for Apply’s existence is that some types have Apply instances but not Applicative.
+
 ### Laws
 
 Arrow provides [`ApplicativeLaws`][applicative_law_source]{:target="_blank"} in the form of test cases for internal verification of lawful instances and third party apps creating their own Applicative instances.

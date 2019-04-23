@@ -4,12 +4,30 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Tuple2
-import arrow.data.*
+import arrow.data.ForListK
+import arrow.data.ListK
+import arrow.data.ListKOf
+import arrow.data.k
 import arrow.data.extensions.listk.foldable.foldLeft
 import arrow.data.extensions.listk.monad.map
 import arrow.data.extensions.listk.monad.monad
+import arrow.data.fix
 import arrow.extension
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Apply
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Hash
+import arrow.typeclasses.Monad
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.MonoidK
+import arrow.typeclasses.Monoidal
+import arrow.typeclasses.Semigroup
+import arrow.typeclasses.SemigroupK
+import arrow.typeclasses.Semigroupal
+import arrow.typeclasses.Show
+import arrow.typeclasses.Traverse
 import arrow.typeclasses.suspended.monad.commutative.safe.Fx
 import kotlin.collections.emptyList
 import kotlin.collections.fold
@@ -56,6 +74,18 @@ interface ListKFunctor : Functor<ForListK> {
 }
 
 @extension
+interface ListKApply : Apply<ForListK> {
+  override fun <A, B> Kind<ForListK, A>.ap(ff: Kind<ForListK, (A) -> B>): ListK<B> =
+    fix().ap(ff)
+
+  override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B> =
+    fix().map(f)
+
+  override fun <A, B, Z> Kind<ForListK, A>.map2(fb: Kind<ForListK, B>, f: (Tuple2<A, B>) -> Z): ListK<Z> =
+    fix().map2(fb, f)
+}
+
+@extension
 interface ListKApplicative : Applicative<ForListK> {
   override fun <A, B> Kind<ForListK, A>.ap(ff: Kind<ForListK, (A) -> B>): ListK<B> =
     fix().ap(ff)
@@ -89,8 +119,6 @@ interface ListKMonad : Monad<ForListK> {
 
   override fun <A> just(a: A): ListK<A> =
     ListK.just(a)
-
-
 }
 
 @extension
@@ -132,7 +160,7 @@ interface ListKSemigroupK : SemigroupK<ForListK> {
 @extension
 interface ListKSemigroupal : Semigroupal<ForListK> {
   override fun <A, B> Kind<ForListK, A>.product(fb: Kind<ForListK, B>): Kind<ForListK, Tuple2<A, B>> =
-    fb.fix().ap(this.map { a:A -> { b: B -> Tuple2(a,b)} })
+    fb.fix().ap(this.map { a: A -> { b: B -> Tuple2(a, b) } })
 }
 
 @extension
@@ -166,5 +194,4 @@ interface ListKFx : Fx<ForListK> {
 
   override fun monad(): Monad<ForListK> =
     ListK.monad()
-
 }

@@ -83,7 +83,8 @@ interface ProcessorUtils : KotlinMetadataUtils {
   fun ProtoBuf.Function.overrides(o: ProtoBuf.Function): Boolean = false
 
   fun ClassOrPackageDataWrapper.Class.declaredTypeClassInterfaces(
-    typeTable: TypeTable): List<ClassOrPackageDataWrapper> {
+    typeTable: TypeTable
+  ): List<ClassOrPackageDataWrapper> {
     val interfaces = this.classProto.supertypes(typeTable).map {
       it.extractFullName(this)
     }.filter {
@@ -96,7 +97,6 @@ interface ProcessorUtils : KotlinMetadataUtils {
       parentInterface as ClassOrPackageDataWrapper.Class
     }
   }
-
 }
 
 private val ProtoBuf.ConstructorOrBuilder.isPrimary: Boolean get() = !isSecondary

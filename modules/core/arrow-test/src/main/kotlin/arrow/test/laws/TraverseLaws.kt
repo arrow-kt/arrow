@@ -1,16 +1,31 @@
 package arrow.test.laws
 
 import arrow.Kind
-import arrow.core.*
-import io.kotlintest.properties.forAll
+import arrow.core.ForId
+import arrow.core.Id
+import arrow.core.IdOf
+import arrow.core.Tuple2
+import arrow.core.extensions.monoid
+import arrow.core.fix
+import arrow.core.toT
+import arrow.core.value
 import arrow.core.extensions.const.applicative.applicative
 import arrow.core.extensions.id.applicative.applicative
 import arrow.core.extensions.id.comonad.extract
-import arrow.core.extensions.monoid
-import arrow.core.toT
-import arrow.test.generators.*
-import arrow.typeclasses.*
+import arrow.test.generators.functionAToB
+import arrow.test.generators.intSmall
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.ComposedApplicative
+import arrow.typeclasses.Const
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Traverse
+import arrow.typeclasses.const
+import arrow.typeclasses.nest
+import arrow.typeclasses.unnest
+import arrow.typeclasses.value
 import io.kotlintest.properties.Gen
+import io.kotlintest.properties.forAll
 
 typealias TI<A> = Tuple2<IdOf<A>, IdOf<A>>
 
@@ -77,7 +92,6 @@ object TraverseLaws {
           val (fm, fn) = ff.fix().ti
           return TIC(Id.applicative().run { fam.ap(fm) toT fan.ap(fn) })
         }
-
       }
 
       val TIEQ: Eq<TI<Kind<F, Int>>> = Eq { a, b ->

@@ -47,7 +47,6 @@ interface NonZero<F, A : Number> : Refinement<F, A> {
   companion object {
     fun errorMsg(x: Number): String = "$x cannot be 0"
   }
-
 }
 
 @extension

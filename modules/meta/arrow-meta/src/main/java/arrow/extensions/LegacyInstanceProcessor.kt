@@ -1,6 +1,11 @@
 package arrow.extensions
 
-import arrow.common.utils.*
+import arrow.common.utils.AbstractProcessor
+import arrow.common.utils.ClassOrPackageDataWrapper
+import arrow.common.utils.extractFullName
+import arrow.common.utils.fullName
+import arrow.common.utils.knownError
+import arrow.common.utils.removeBackticks
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.TypeTable
 import java.io.File
 import javax.annotation.processing.RoundEnvironment
@@ -13,7 +18,7 @@ import javax.lang.model.element.TypeElement
  */
 @Deprecated(
   "LegacyInstanceProcessor is no longer the @instance processor. " +
-  "The @extension annotation is now handled by the ExtensionProcessor")
+    "The @extension annotation is now handled by the ExtensionProcessor")
 class LegacyInstanceProcessor : AbstractProcessor() {
 
   private val annotatedList = mutableListOf<AnnotatedInstance>()
@@ -81,5 +86,4 @@ class LegacyInstanceProcessor : AbstractProcessor() {
       )
     }
   }
-
 }

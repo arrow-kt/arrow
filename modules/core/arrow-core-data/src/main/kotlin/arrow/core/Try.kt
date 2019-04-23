@@ -30,7 +30,6 @@ sealed class Try<out A> : TryOf<A> {
           }
         }
       }
-
     }
 
     inline operator fun <A> invoke(f: () -> A): Try<A> =
@@ -48,7 +47,6 @@ sealed class Try<out A> : TryOf<A> {
     fun raise(e: Throwable): Try<Nothing> = Failure(e)
 
     fun raiseError(e: Throwable): Try<Nothing> = Failure(e)
-
   }
 
   fun <B> ap(ff: TryOf<(A) -> B>): Try<B> = ff.fix().flatMap { f -> map(f) }.fix()
@@ -198,6 +196,7 @@ fun <B> TryOf<B>.handleError(f: (Throwable) -> B): Try<B> = fix().fold({ Success
  */
 fun <B> TryOf<B>.handleErrorWith(f: (Throwable) -> TryOf<B>): Try<B> = fix().fold({ f(it).fix() }, { Success(it) })
 
+@Suppress("DEPRECATION")
 @Deprecated(DeprecatedAmbiguity, ReplaceWith("handleErrorWith(f)"))
 fun <A> TryOf<A>.rescue(f: (Throwable) -> TryOf<A>): Try<A> = fix().recoverWith(f)
 

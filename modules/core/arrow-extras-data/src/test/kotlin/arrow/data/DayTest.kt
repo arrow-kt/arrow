@@ -1,10 +1,14 @@
 package arrow.data
 
-import arrow.core.*
+import arrow.core.ForId
+import arrow.core.Id
+import arrow.core.Tuple2
+import arrow.core.Tuple2Of
 import arrow.data.extensions.day.applicative.applicative
 import arrow.data.extensions.day.comonad.comonad
 import arrow.core.extensions.id.applicative.applicative
 import arrow.core.extensions.id.comonad.comonad
+import arrow.core.fix
 import arrow.test.UnitSpec
 import arrow.test.laws.ApplicativeLaws
 import arrow.test.laws.ComonadLaws
@@ -42,7 +46,6 @@ class DayTest : UnitSpec() {
       day.extract(Id.comonad(), Id.comonad()) shouldBe Tuple2(1, 1)
     }
 
-
     @Suppress("ExplicitItLambdaParameter") // Required at runtime or else test fails
     "Day coflatmap should transform result type" {
       val d = day.coflatMap(Id.comonad(), Id.comonad()) { it: DayOf<ForId, ForId, Tuple2Of<Int, Int>> ->
@@ -51,9 +54,7 @@ class DayTest : UnitSpec() {
       }
 
       d.extract(Id.comonad(), Id.comonad()) shouldBe "Both sides are equal"
-
     }
-
 
     "Day map should transform result type" {
       val d = day.map {
@@ -72,7 +73,6 @@ class DayTest : UnitSpec() {
       }
 
       d.extract(Id.comonad(), Id.comonad()) shouldBe "Both sides are equal"
-
     }
 
     "Day mapLazy should transform result type" {
@@ -83,6 +83,5 @@ class DayTest : UnitSpec() {
 
       d.extract(Id.comonad(), Id.comonad()) shouldBe "Both sides are equal"
     }
-
   }
 }

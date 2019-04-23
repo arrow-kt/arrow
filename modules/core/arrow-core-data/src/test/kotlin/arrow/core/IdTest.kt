@@ -14,7 +14,13 @@ import arrow.core.extensions.id.traverse.traverse
 import arrow.core.extensions.monoid
 import arrow.core.extensions.semigroup
 import arrow.test.UnitSpec
-import arrow.test.laws.*
+import arrow.test.laws.ComonadLaws
+import arrow.test.laws.HashLaws
+import arrow.test.laws.MonadLaws
+import arrow.test.laws.MonoidLaws
+import arrow.test.laws.SemigroupLaws
+import arrow.test.laws.ShowLaws
+import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -34,7 +40,7 @@ class IdTest : UnitSpec() {
       HashLaws.laws(Id.hash(Int.hash()), Id.eq(Int.eq())) { Id(it) }
     )
 
-    "Semigroup of Id<A> is Id<Semigroup<A>>"() {
+    "Semigroup of Id<A> is Id<Semigroup<A>>" {
       forAll { a: Int ->
         val left = Id.semigroup(Int.semigroup()).run {
           Id(a).combine(Id(a))

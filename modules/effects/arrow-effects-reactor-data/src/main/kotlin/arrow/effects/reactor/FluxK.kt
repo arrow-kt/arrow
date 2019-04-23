@@ -1,7 +1,12 @@
 package arrow.effects.reactor
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Eval
+import arrow.core.Left
+import arrow.core.NonFatal
+import arrow.core.Right
+import arrow.core.identity
 import arrow.effects.OnCancel
 import arrow.effects.internal.Platform
 import arrow.effects.reactor.CoroutineContextReactorScheduler.asScheduler
@@ -194,8 +199,8 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
     fun <A> async(fa: FluxKProc<A>): FluxK<A> =
       Flux.create<A> { sink ->
         val conn = FluxKConnection()
-        //On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
-        //on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
+        // On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
+        // on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
         conn.push(FluxK { if (!sink.isCancelled) sink.error(OnCancel.CancellationException) })
         sink.onCancel { conn.cancel().value().subscribe() }
 
@@ -212,8 +217,8 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
     fun <A> asyncF(fa: FluxKProcF<A>): FluxK<A> =
       Flux.create { sink: FluxSink<A> ->
         val conn = FluxKConnection()
-        //On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
-        //on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
+        // On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
+        // on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
         conn.push(FluxK { if (!sink.isCancelled) sink.error(OnCancel.CancellationException) })
         sink.onCancel { conn.cancel().value().subscribe() }
 
@@ -234,7 +239,6 @@ data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
         is Either.Right -> Flux.just(either.b).k()
       }
     }
-
   }
 }
 

@@ -57,6 +57,5 @@ class NonEmptyListInstanceTest : UnitSpec() {
         EQA = Eq.any()
       )
     )
-
   }
 }

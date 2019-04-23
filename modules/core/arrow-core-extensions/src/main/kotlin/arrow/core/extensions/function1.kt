@@ -1,10 +1,33 @@
 package arrow.core.extensions
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.ForFunction1
+import arrow.core.Function1
+import arrow.core.Function1Of
+import arrow.core.Function1PartialOf
+import arrow.core.Tuple2
+import arrow.core.compose
+import arrow.core.k
 import arrow.core.extensions.function1.monad.monad
+import arrow.core.fix
+import arrow.core.invoke
 import arrow.extension
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Apply
+import arrow.typeclasses.Category
+import arrow.typeclasses.Conested
+import arrow.typeclasses.Contravariant
+import arrow.typeclasses.Decidable
+import arrow.typeclasses.Divide
+import arrow.typeclasses.Divisible
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.Profunctor
+import arrow.typeclasses.Semigroup
+import arrow.typeclasses.conest
+import arrow.typeclasses.counnest
 import arrow.typeclasses.suspended.monad.Fx
 
 @extension
@@ -92,6 +115,16 @@ interface Function1Decidable<O> : Decidable<Conested<ForFunction1, O>>, Function
 interface Function1Profunctor : Profunctor<ForFunction1> {
   override fun <A, B, C, D> Function1Of<A, B>.dimap(fl: (C) -> A, fr: (B) -> D): Function1<C, D> =
     (fr compose fix().f compose fl).k()
+}
+
+@extension
+interface Function1Apply<I> : Apply<Function1PartialOf<I>>, Function1Functor<I> {
+
+  override fun <A, B> Function1Of<I, A>.map(f: (A) -> B): Function1<I, B> =
+    fix().map(f)
+
+  override fun <A, B> Function1Of<I, A>.ap(ff: Function1Of<I, (A) -> B>): Function1<I, B> =
+    fix().ap(ff)
 }
 
 @extension

@@ -26,7 +26,5 @@ class SetTest : UnitSpec() {
       EQB = Eq.any(),
       bMonoid = SetK.monoid()
     ))
-
   }
-
 }

@@ -41,7 +41,5 @@ class NonEmptyListTest : UnitSpec() {
         override fun List<String>.combine(b: List<String>): List<String> = this + b
       }
     ))
-
   }
-
 }
