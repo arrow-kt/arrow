@@ -80,15 +80,6 @@ interface POptional<S, T, A, B> : POptionalOf<S, T, A, B> {
     }
 
     /**
-     * Invoke operator overload to create a [POptional] of type `S` with focus `A`.
-     * Can also be used to construct [Optional]
-     */
-    operator fun <S, A> invoke(partialFunction: PartialFunction<S, A>, set: (S, A) -> S): Optional<S, A> = Optional(
-      getOrModify = { s -> partialFunction.lift()(s).fold({ Either.Left(s) }, { Either.Right(it) }) },
-      set = set
-    )
-
-    /**
      * [POptional] that never sees its focus
      */
     fun <A, B> void(): Optional<A, B> = Optional(

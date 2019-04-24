@@ -23,12 +23,6 @@ interface FunctorFilter<F> : Functor<F> {
   fun <A, B> Kind<F, A>.mapFilter(f: (A) -> Option<B>): Kind<F, B>
 
   /**
-   * Similar to mapFilter but uses a partial function instead of a function that returns an Option.
-   */
-  fun <A, B> Kind<F, A>.collect(f: PartialFunction<A, B>): Kind<F, B> =
-    mapFilter(f.lift())
-
-  /**
    * "Flatten" out a structure by collapsing Options.
    */
   fun <A> Kind<F, Option<A>>.flattenOption(): Kind<F, A> = mapFilter(::identity)

@@ -66,15 +66,6 @@ interface PPrism<S, T, A, B> : PPrismOf<S, T, A, B> {
     }
 
     /**
-     * Invoke operator overload to create a [PPrism] of type `S` with focus `A` with a [PartialFunction]
-     * Can also be used to construct [Prism]
-     */
-    operator fun <S, A> invoke(partialFunction: PartialFunction<S, A>, reverseGet: (A) -> S): Prism<S, A> = Prism(
-      getOrModify = { s -> partialFunction.lift()(s).fold({ Either.Left(s) }, { Either.Right(it) }) },
-      reverseGet = reverseGet
-    )
-
-    /**
      * A [PPrism] that checks for equality with a given value [a]
      */
     fun <A> only(a: A, EQA: Eq<A>): Prism<A, Unit> = Prism(
