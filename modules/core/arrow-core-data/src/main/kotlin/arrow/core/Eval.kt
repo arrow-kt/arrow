@@ -34,7 +34,7 @@ fun <A> EvalOf<A>.value(): A = this.fix().value()
  *
  * Example of stack safety:
  *
- * ```kotlin:ank
+ * ```kotlin:ank:playground
  * import arrow.core.Eval
  *
  * fun even(n: Int): Eval<Boolean> =
@@ -73,7 +73,7 @@ sealed class Eval<out A> : EvalOf<A> {
      *
      * @param a is an already computed value of type [A]
      *
-     * ```kotlin:ank
+     * ```kotlin:ank:playground
      * import arrow.core.*
      *
      * val eager = Eval.now(1).map { it + 1 }
@@ -88,7 +88,7 @@ sealed class Eval<out A> : EvalOf<A> {
      *
      * @param f is a function or computation that will be called only once when `.value()` is invoked for the first time.
      *
-     * ```kotlin:ank
+     * ```kotlin:ank:playground
      * import arrow.core.*
      *
      * val lazyEvaled = Eval.later { "expensive computation" }
@@ -103,7 +103,7 @@ sealed class Eval<out A> : EvalOf<A> {
      *
      * @param f is a function or computation that will be called every time `.value()` is invoked.
      *
-     * ```kotlin:ank
+     * ```kotlin:ank:playground
      * import arrow.core.*
      *
      * val alwaysEvaled = Eval.always { "expensive computation" }
