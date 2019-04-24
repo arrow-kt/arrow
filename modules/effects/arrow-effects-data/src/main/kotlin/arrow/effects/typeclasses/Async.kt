@@ -175,6 +175,15 @@ interface Async<F> : MonadDefer<F> {
     unit().continueOn(ctx).flatMap { f() }
 
   /**
+   * Delay a computation on provided [CoroutineContext].
+   *
+   * @param ctx [CoroutineContext] to run evaluation on.
+   *
+   */
+  fun <A> delayOrRaise(ctx: CoroutineContext, f: () -> Either<Throwable, A>): Kind<F, A> =
+    defer(ctx) { f().fold({ raiseError<A>(it) }, { just(it) }) }
+
+  /**
    * Shift evaluation to provided [CoroutineContext].
    *
    * @param ctx [CoroutineContext] to run evaluation on.
