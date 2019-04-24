@@ -3,6 +3,7 @@ dependencies {
     compile project(":arrow-effects-extensions")
     compile project(":arrow-effects-io-extensions")
     compile project(":arrow-effects-rx2-extensions")
+    compile project(":arrow-effects-reactor-extensions")
     compile project(":arrow-scala-benchmarks")
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
@@ -14,10 +15,10 @@ apply plugin: "io.morethan.jmhreport"
 
 jmh {
     include = [
-            'arrow.benchmarks.Pure',
-            'arrow.benchmarks.Delay',
-            'arrow.benchmarks.DeepBind',
-            'arrow.benchmarks.Map'
+//            'arrow.benchmarks.Pure',
+//            'arrow.benchmarks.Delay',
+//            'arrow.benchmarks.DeepBind',
+            'arrow.benchmarks.MapStream'
     ]
     resultFormat = 'json'
     resultsFile = file('build/reports/benchmarks.json')
