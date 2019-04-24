@@ -180,7 +180,7 @@ object FxRunLoop {
             asyncBoundary?.contextSwitch(conn)
 
             if (restore != null) {
-              source = Fx.FlatMap(next, FxRunLoop.RestoreContext(old, restore), 0)
+              source = Fx.FlatMap(next, RestoreContext(old, restore), 0)
             }
           }
         }
@@ -527,33 +527,23 @@ object FxRunLoop {
   private fun <A> sanitizedCurrentFx(current: Current?, unboxed: Any?): Fx<A> =
     (current ?: Fx.Pure(unboxed, 0)) as Fx<A>
 
-  private fun <A> suspendInAsync(
-    currentIO: Fx.Async<A>,
-    bFirst: BindF?,
-    bRest: CallStack?,
-    register: FxProc<Any?>): Fx<A> =
-  // Hitting an async boundary means we have to stop, however
-  // if we had previous `flatMap` operations then we need to resume
+  private fun <A> suspendInAsync(currentIO: Fx.Async<A>, bFirst: BindF?, bRest: CallStack?, register: FxProc<Any?>): Fx<A> =
+    // Hitting an async boundary means we have to stop, however
+    // if we had previous `flatMap` operations then we need to resume
     // the loop with the collected stack
     when {
       bFirst != null || (bRest != null && bRest.isNotEmpty()) ->
         Fx.async { conn, cb ->
-          val rcb = FxRunLoop.AsyncBoundary(conn, cb as (Either<Throwable, Any?>) -> Unit)
+          val rcb = AsyncBoundary(conn, cb as (Either<Throwable, Any?>) -> Unit)
           rcb.prepare(currentIO.ctx, currentIO.updateContext, bFirst, bRest)
           register(conn, rcb)
         }
       else -> currentIO
     }
 
-  private fun <A> suspendInAsync(
-    currentIO: Fx.Single<A>,
-    bFirst: BindF?,
-    bRest: CallStack?): Fx<A> =
-  // Hitting an async boundary means we have to stop, however
-  // if we had previous `flatMap` operations then we need to resume
-    // the loop with the collected stack
+  private fun <A> suspendInAsync(currentIO: Fx.Single<A>, bFirst: BindF?, bRest: CallStack?): Fx<A> =
     Fx.async { conn, cb ->
-      val rcb = FxRunLoop.AsyncBoundary(conn, cb as (Either<Throwable, Any?>) -> Unit)
+      val rcb = AsyncBoundary(conn, cb as (Either<Throwable, Any?>) -> Unit)
       rcb.prepare(null, null, bFirst, bRest)
       currentIO.source.startCoroutine(rcb)
     }

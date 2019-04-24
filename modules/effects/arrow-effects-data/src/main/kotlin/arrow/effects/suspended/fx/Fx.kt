@@ -28,18 +28,21 @@ inline fun <A> FxOf<A>.fix(): Fx<A> =
 
 suspend inline operator fun <A> FxOf<A>.not(): A = !fix()
 
+// Take care because changing order might result in a bunch of TABLESWITCH to turn into LOOKUPSWITCH.
+// In most cases we use all or the top cases, this results in TABLESWITCHs for both these scenarios.
+// https://stackoverflow.com/questions/10287700/difference-between-jvms-lookupswitch-and-tableswitch
 const val UnknownTag = -1
 const val RaiseErrorTag = 0
 const val PureTag = 1
-const val SingleTag = 2
-const val MapTag = 3
-const val FlatMapTag = 4
-const val ConnectionSwitchTag = 5
-const val AsyncTag = 6
-const val ModifyContextTag = 7
+const val LazyTag = 2
+const val SingleTag = 3
+const val MapTag = 4
+const val FlatMapTag = 5
+const val ConnectionSwitchTag = 6
+const val AsyncTag = 7
+const val ModifyContextTag = 8
 const val ContinueOnTag = 9
 const val DeferTag = 10
-const val LazyTag = 11
 
 sealed class FxImpossibleBugs(message: String) : RuntimeException(message) {
   object Fxfa : FxImpossibleBugs("Fx.fa bug, please contact support with this message! https://arrow-kt.io")
@@ -65,8 +68,8 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
       when (tag) {
         RaiseErrorTag -> suspend { throw (this as RaiseError<*>).error }
         PureTag -> suspend { (this as Pure<A>).value }
-        SingleTag -> (this as Single<A>).source
         LazyTag -> suspend { (this as Lazy<A>).source(Unit) }
+        SingleTag -> (this as Single<A>).source
         DeferTag -> suspend { FxRunLoop((this as Defer<A>).thunk()) }
         MapTag -> suspend {
           (this as Map<Any?, A>)
@@ -90,14 +93,14 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
       PureTag -> Lazy {
         f((this as Pure<A>).value)
       }
-      SingleTag -> Map(this, f)
-      DeferTag -> Map(this, f)
       LazyTag -> {
         this as Lazy<Any?>
         val ff = f as (Any?) -> Any?
         this.source = AndThen(source).andThen(ff)
         unsafeRecast()
       }
+      SingleTag -> Map(this, f)
+      DeferTag -> Map(this, f)
       ConnectionSwitchTag -> Map(this, f)
       ModifyContextTag -> Map(this, f)
       AsyncTag -> Map(this, f)
@@ -117,7 +120,7 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
         else {
           this.fb = { a ->
             val fa = fb(a).fix()
-            when(fa.tag) {
+            when (fa.tag) {
               PureTag -> {
                 (fa as Pure<A>).internalValue = f(fa.value)
                 fa.unsafeRecast<B>()
@@ -145,10 +148,10 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
   @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
   suspend inline operator fun not(): A =
     when (tag) {
-      RaiseErrorTag -> throw (this as Fx.RaiseError<*>).error
+      RaiseErrorTag -> throw (this as RaiseError<*>).error
       PureTag -> (this as Pure<A>).value
-      SingleTag -> (this as Single<A>).source()
       LazyTag -> FxRunLoop(this)
+      SingleTag -> (this as Single<A>).source()
       DeferTag -> FxRunLoop(this)
       MapTag -> FxRunLoop(this)
       FlatMapTag -> FxRunLoop(this)
@@ -479,45 +482,33 @@ sealed class Fx<out A>(@JvmField var tag: Int = UnknownTag) : FxOf<A> {
      * @see [unsafeRunBlocking] or [unsafeRunNonBlockingCancellable] that run the value as [Either].
      * @see [runNonBlocking] to run in a referential transparent manner.
      */
-    @JvmStatic //TODO convert to TABLESWITCH from LOOKUP_SWITCH.
+    @JvmStatic
     fun <A> unsafeRunBlocking(fx: FxOf<A>): A = when (fx.fix().tag) {
-      RaiseErrorTag -> throw (fx as Fx.RaiseError<A>).error
+      RaiseErrorTag -> throw (fx as RaiseError<A>).error
       PureTag -> (fx as Pure<A>).value
-      6 -> _unsafeRunBlocking(fx)
-      8 -> _unsafeRunBlocking(fx)
+      LazyTag -> (fx as Lazy<A>).source(Unit)
       SingleTag -> UnsafePromise<A>().run {
         (fx as Single<A>).source.startCoroutine(asyncContinuation(EmptyCoroutineContext) {
           complete(it)
         })
         await()
       }
-      LazyTag -> (fx as Lazy<A>).source(Unit)
-      else -> _unsafeRunBlocking(fx)
-    }
-
-    inline fun <A> _unsafeRunBlocking(fx: FxOf<A>): A {
-      val result = FxRunLoop.step(fx.fix())
-      return when (result.tag) {
-        PureTag -> (result as Pure<A>).value
-        RaiseErrorTag -> throw (result as RaiseError<A>).error
-        LazyTag -> (result as Lazy<A>).source(Unit)
-        6 -> UnsafePromise<A>().run {
-          FxRunLoop.start(fx) { complete(it) }
-          await()
-        }
-        8 -> UnsafePromise<A>().run {
-          FxRunLoop.start(fx) { complete(it) }
-          await()
-        }
-        SingleTag -> UnsafePromise<A>().run {
-          (result as Single<A>).source.startCoroutine(asyncContinuation(EmptyCoroutineContext) {
-            complete(it)
-          })
-          await()
-        }
-        else -> UnsafePromise<A>().run {
-          FxRunLoop.start(fx) { complete(it) }
-          await()
+      else -> {
+        val result = FxRunLoop.step(fx.fix())
+        when (result.tag) {
+          PureTag -> (result as Pure<A>).value
+          RaiseErrorTag -> throw (result as RaiseError<A>).error
+          LazyTag -> (result as Lazy<A>).source(Unit)
+          SingleTag -> UnsafePromise<A>().run {
+            (result as Single<A>).source.startCoroutine(asyncContinuation(EmptyCoroutineContext) {
+              complete(it)
+            })
+            await()
+          }
+          else -> UnsafePromise<A>().run {
+            FxRunLoop.start(fx) { complete(it) }
+            await()
+          }
         }
       }
     }
