@@ -3,6 +3,9 @@ package arrow.benchmarks
 import arrow.effects.IO
 import arrow.effects.suspended.fx.Fx
 import org.openjdk.jmh.annotations.*
+import io.reactivex.Single
+import org.openjdk.jmh.annotations.*
+import reactor.core.publisher.Mono
 import java.util.concurrent.TimeUnit
 
 @State(Scope.Thread)
@@ -27,7 +30,7 @@ open class LeftBind {
     if (i % depth == 0) IO { i + 1 }.flatMap { ioLoop(it) }
     else if (i < size) ioLoop(i + 1).flatMap { i -> IO.just(i) }
     else IO.just(i)
-
+  
   @Benchmark
   fun fx(): Int =
     Fx.unsafeRunBlocking(Fx.just(0).flatMap { fxLoop(it) })
@@ -35,7 +38,7 @@ open class LeftBind {
   @Benchmark
   fun io(): Int =
     IO.just(0).flatMap { ioLoop(it) }.unsafeRunSync()
-
+  
   @Benchmark
   fun catsIO(): Int =
     arrow.benchmarks.effects.scala.cats.`LeftBind$`.`MODULE$`.unsafeIOLeftBindLoop(depth, size, 0)
