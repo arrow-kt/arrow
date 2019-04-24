@@ -163,7 +163,7 @@ class ProductFileGenerator(
 
   // TODO instance imports are hardcoded
   private fun processElement(product: AnnotatedGeneric): Pair<AnnotatedGeneric, String> = product to """
-            |package ${product.classData.`package`.escapedClassName}
+            |${if (product.classData.`package`.escapedClassName != "`unnamed package`") "package ${product.classData.`package`.escapedClassName}" else ""}
             |
             |import arrow.typeclasses.*
             |import arrow.core.*
