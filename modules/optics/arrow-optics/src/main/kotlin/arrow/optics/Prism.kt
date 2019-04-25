@@ -1,18 +1,7 @@
 package arrow.optics
 
 import arrow.Kind
-import arrow.core.Either
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.PartialFunction
-import arrow.core.Some
-import arrow.core.Tuple2
-import arrow.core.compose
-import arrow.core.flatMap
-import arrow.core.getOrElse
-import arrow.core.identity
-import arrow.core.lift
-import arrow.core.toT
+import arrow.core.*
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Eq
@@ -69,6 +58,7 @@ interface PPrism<S, T, A, B> : PPrismOf<S, T, A, B> {
      * Invoke operator overload to create a [PPrism] of type `S` with focus `A` with a [PartialFunction]
      * Can also be used to construct [Prism]
      */
+    @Deprecated("PartialFunction is an incomplete experiment due for removal. See https://github.com/arrow-kt/arrow/pull/1419#issue-273308228")
     operator fun <S, A> invoke(partialFunction: PartialFunction<S, A>, reverseGet: (A) -> S): Prism<S, A> = Prism(
       getOrModify = { s -> partialFunction.lift()(s).fold({ Either.Left(s) }, { Either.Right(it) }) },
       reverseGet = reverseGet
