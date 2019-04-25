@@ -236,7 +236,7 @@ sealed class IO<out A> : IOOf<A> {
 
     override fun <B> map(f: (A) -> B): IO<B> =
     // Allowed to do maxStackDepthSize map operations in sequence before
-      // starting a new Map fusion in order to avoid stack overflows
+    // starting a new Map fusion in order to avoid stack overflows
       if (index != maxStackDepthSize) Map(source, g.andThen(f), index + 1)
       else Map(this, f, 0)
 
