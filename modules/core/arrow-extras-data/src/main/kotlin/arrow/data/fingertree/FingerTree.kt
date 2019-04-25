@@ -1,26 +1,28 @@
-package arrow.data.fingertree.internal
+package arrow.data.fingertree
 
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.Tuple2
+import arrow.data.fingertree.internal.Affix
+import arrow.data.fingertree.internal.Node
 
-sealed class FingerTreeInternal<T> {
+sealed class FingerTree<T> {
 
-  internal class Empty<T> : FingerTreeInternal<T>() {
+  internal class Empty<T> : FingerTree<T>() {
     override fun toString(): String = "Empty()"
   }
 
-  internal data class Single<T>(val a: T) : FingerTreeInternal<T>()
+  internal data class Single<T>(val a: T) : FingerTree<T>()
 
   internal data class Deep<T>(
     val prefix: Affix<T>,
-    val deeper: FingerTreeInternal<Node<T>>,
+    val deeper: FingerTree<Node<T>>,
     val suffix: Affix<T>
-  ) : FingerTreeInternal<T>()
+  ) : FingerTree<T>()
 
 
-  fun prepend(item: T): FingerTreeInternal<T> =
+  fun prepend(item: T): FingerTree<T> =
     when (val tree = this) {
 
       is Empty -> Single(item)
@@ -38,7 +40,7 @@ sealed class FingerTreeInternal<T> {
       }
     }
 
-  fun append(item: T): FingerTreeInternal<T> =
+  fun append(item: T): FingerTree<T> =
     when (val tree = this) {
 
       is Empty -> Single(item)
@@ -57,7 +59,7 @@ sealed class FingerTreeInternal<T> {
       }
     }
 
-  fun viewL(): Option<Tuple2<T, FingerTreeInternal<T>>> =
+  fun viewL(): Option<Tuple2<T, FingerTree<T>>> =
     when (this) {
       is Empty -> Option.empty()
       is Single -> Option.just(Tuple2(this.a, Empty()))
@@ -78,7 +80,7 @@ sealed class FingerTreeInternal<T> {
 
     }
 
-  fun viewR(): Option<Tuple2<T, FingerTreeInternal<T>>> =
+  fun viewR(): Option<Tuple2<T, FingerTree<T>>> =
     when (this) {
       is Empty -> Option.empty()
       is Single -> Option.just(Tuple2(this.a, Empty()))
@@ -101,11 +103,11 @@ sealed class FingerTreeInternal<T> {
   fun asList(): List<T> = this.asListHelper(emptyList(), this)
 
   fun asSequence(): Sequence<T> = sequence {
-    this.asSequenceHelper(this@FingerTreeInternal)
+    this.asSequenceHelper(this@FingerTree)
   }
 
-  fun rotateClockwise(times: Int): FingerTreeInternal<T> {
-    var tree: FingerTreeInternal<T> = this
+  fun rotateClockwise(times: Int): FingerTree<T> {
+    var tree: FingerTree<T> = this
 
     repeat(times) {
       when (val head = tree.viewL()) {
@@ -118,8 +120,8 @@ sealed class FingerTreeInternal<T> {
     return tree
   }
 
-  fun rotateCounterClockwise(times: Int): FingerTreeInternal<T> {
-    var tree: FingerTreeInternal<T> = this
+  fun rotateCounterClockwise(times: Int): FingerTree<T> {
+    var tree: FingerTree<T> = this
     repeat(times) {
 
       when (val head = tree.viewR()) {
@@ -142,14 +144,14 @@ sealed class FingerTreeInternal<T> {
     return javaClass.hashCode()
   }
 
-  private tailrec fun asListHelper(soFar: List<T>, tree: FingerTreeInternal<T>): List<T> {
+  private tailrec fun asListHelper(soFar: List<T>, tree: FingerTree<T>): List<T> {
     return when (val res = tree.viewL()) {
       is None -> soFar
       is Some -> asListHelper(soFar + listOf(res.t.a), res.t.b)
     }
   }
 
-  private tailrec suspend fun SequenceScope<T>.asSequenceHelper(fingerTree: FingerTreeInternal<T>) {
+  private tailrec suspend fun SequenceScope<T>.asSequenceHelper(fingerTree: FingerTree<T>) {
     when (val res = fingerTree.viewL()) {
       is Some -> {
         yield(res.t.a)
@@ -161,20 +163,20 @@ sealed class FingerTreeInternal<T> {
 
   companion object {
 
-    fun <A> empty(): FingerTreeInternal<A> = Empty()
+    fun <A> empty(): FingerTree<A> = Empty()
 
-    fun <A> single(item: A): FingerTreeInternal<A> = Single(item)
+    fun <A> single(item: A): FingerTree<A> = Single(item)
 
-    fun <A> fromList(list: List<A>): FingerTreeInternal<A> {
-      var fingerTree = FingerTreeInternal.empty<A>()
+    fun <A> fromList(list: List<A>): FingerTree<A> {
+      var fingerTree = empty<A>()
       list.forEach {
         fingerTree = fingerTree.append(it)
       }
       return fingerTree
     }
 
-    fun <A> fromArgs(vararg items: A): FingerTreeInternal<A> =
-      FingerTreeInternal.fromList(items.toList())
+    fun <A> fromArgs(vararg items: A): FingerTree<A> =
+      fromList(items.toList())
   }
 
 }

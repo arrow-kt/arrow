@@ -4,8 +4,8 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.Tuple2
 import arrow.data.fingertree.internal.Affix.*
-import arrow.data.fingertree.internal.FingerTreeInternal
-import arrow.data.fingertree.internal.FingerTreeInternal.*
+import arrow.data.fingertree.FingerTree
+import arrow.data.fingertree.FingerTree.*
 import arrow.data.fingertree.internal.Node
 import arrow.data.fingertree.internal.Node.Branch2
 import arrow.data.fingertree.internal.Node.Branch3
@@ -15,7 +15,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 
-class FingerTreeInternalTest : StringSpec() {
+class FingerTreeTest : StringSpec() {
 
   init {
 
@@ -42,10 +42,10 @@ class FingerTreeInternalTest : StringSpec() {
     }
 
     "prepend() should create a finger tree with the new affix, the result of the prepend on the deeper tree and the same suffix when the prefix has four elements" {
-      val mockDeeperFingerTree = mockk<FingerTreeInternal<Node<Int>>>(relaxed = true)
+      val mockDeeperFingerTree = mockk<FingerTree<Node<Int>>>(relaxed = true)
       val fingerTree = Deep(Four(1, 2, 3, 4), mockDeeperFingerTree, One(5))
 
-      val dummyDeeperFingerTree: FingerTreeInternal<Node<Int>> = Single(Branch3(2, 3, 4))
+      val dummyDeeperFingerTree: FingerTree<Node<Int>> = Single(Branch3(2, 3, 4))
       every { mockDeeperFingerTree.prepend(any()) } returns dummyDeeperFingerTree
 
       fingerTree.prepend(6) shouldBe Deep(Two(6, 1), dummyDeeperFingerTree, One(5))
@@ -74,10 +74,10 @@ class FingerTreeInternalTest : StringSpec() {
     }
 
     "append() should create a finger tree with the same prefix, the result of the append on the deeper tree and the new suffix when the prefix has four elements" {
-      val mockDeeperFingerTree = mockk<FingerTreeInternal<Node<Int>>>(relaxed = true)
+      val mockDeeperFingerTree = mockk<FingerTree<Node<Int>>>(relaxed = true)
       val fingerTree = Deep(One(1), mockDeeperFingerTree, Four(2, 3, 4, 5))
 
-      val dummyDeeperFingerTree: FingerTreeInternal<Node<Int>> = Single(Branch3(2, 3, 4))
+      val dummyDeeperFingerTree: FingerTree<Node<Int>> = Single(Branch3(2, 3, 4))
       every { mockDeeperFingerTree.append(any()) } returns dummyDeeperFingerTree
 
       fingerTree.append(6) shouldBe Deep(One(1), dummyDeeperFingerTree, Two(5, 6))
@@ -106,7 +106,7 @@ class FingerTreeInternalTest : StringSpec() {
     }
 
     "viewL() should call viewL() on the deeper finger tree when the finger tree has one prefix element" {
-      val mockDeeperFingerTree = mockk<FingerTreeInternal<Node<Int>>>()
+      val mockDeeperFingerTree = mockk<FingerTree<Node<Int>>>()
       val fingerTree = Deep(One(1), mockDeeperFingerTree, One(2))
 
       every { mockDeeperFingerTree.viewL() } returns Option.empty()
@@ -117,7 +117,7 @@ class FingerTreeInternalTest : StringSpec() {
     }
 
     "viewL() should return the first element of the prefix and the suffix as the remaining finger tree when the prefix has one element and viewL() on the deeper finger tree returns None" {
-      val mockDeeperFingerTree = mockk<FingerTreeInternal<Node<Int>>>()
+      val mockDeeperFingerTree = mockk<FingerTree<Node<Int>>>()
       val fingerTree = Deep(One(1), mockDeeperFingerTree, One(2))
 
       every { mockDeeperFingerTree.viewL() } returns Option.empty()
@@ -126,7 +126,7 @@ class FingerTreeInternalTest : StringSpec() {
     }
 
     "viewL() should return the first element of the prefix and the result of viewL() on the deeper finger tree when the prefix has one element and viewL() on the deeper finger tree returns a non empty result" {
-      val mockDeeperFingerTree = mockk<FingerTreeInternal<Node<Int>>>()
+      val mockDeeperFingerTree = mockk<FingerTree<Node<Int>>>()
       val fingerTree = Deep(One(1), mockDeeperFingerTree, One(2))
 
       val remainingTree = Deep<Node<Int>>(One(Branch2(5, 6)), Empty(), One(Branch2(7, 8)))
@@ -158,7 +158,7 @@ class FingerTreeInternalTest : StringSpec() {
     }
 
     "viewR() should call viewR() on the deeper finger tree when the finger tree has one suffix element" {
-      val mockDeeperFingerTree = mockk<FingerTreeInternal<Node<Int>>>()
+      val mockDeeperFingerTree = mockk<FingerTree<Node<Int>>>()
       val fingerTree = Deep(One(1), mockDeeperFingerTree, One(2))
 
       every { mockDeeperFingerTree.viewR() } returns Option.empty()
@@ -169,7 +169,7 @@ class FingerTreeInternalTest : StringSpec() {
     }
 
     "viewR() should return the last element of the suffix and the prefix as the remaining finger tree when the suffix has one element and viewR() on the deeper finger tree returns None" {
-      val mockDeeperFingerTree = mockk<FingerTreeInternal<Node<Int>>>()
+      val mockDeeperFingerTree = mockk<FingerTree<Node<Int>>>()
       val fingerTree = Deep(One(1), mockDeeperFingerTree, One(2))
 
       every { mockDeeperFingerTree.viewR() } returns Option.empty()
@@ -178,7 +178,7 @@ class FingerTreeInternalTest : StringSpec() {
     }
 
     "viewR() should return the last element of the suffix and the result of viewR() on the deeper finger tree when the suffix has one element and viewR() on the deeper finger tree returns a non empty result" {
-      val mockDeeperFingerTree = mockk<FingerTreeInternal<Node<Int>>>()
+      val mockDeeperFingerTree = mockk<FingerTree<Node<Int>>>()
       val fingerTree = Deep(One(1), mockDeeperFingerTree, One(2))
 
       val remainingTree = Deep<Node<Int>>(One(Branch2(5, 6)), Empty(), One(Branch2(7, 8)))

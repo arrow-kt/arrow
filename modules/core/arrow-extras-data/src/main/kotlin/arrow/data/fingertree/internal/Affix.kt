@@ -1,5 +1,7 @@
 package arrow.data.fingertree.internal
 
+import arrow.data.fingertree.FingerTree
+
 internal sealed class Affix<A> {
   data class One<A>(val a: A) : Affix<A>()
   data class Two<A>(val a: A, val b: A) : Affix<A>()
@@ -22,12 +24,12 @@ internal sealed class Affix<A> {
       is Four -> throw RuntimeException("Cannot append to affix four")
     }
 
-  fun toFingerTree(): FingerTreeInternal<A> =
+  fun toFingerTree(): FingerTree<A> =
     when (this) {
-      is One -> FingerTreeInternal.Single(this.a)
-      is Two -> FingerTreeInternal.Deep(One(this.a), FingerTreeInternal.Empty(), One(this.b))
-      is Three -> FingerTreeInternal.Deep(Two(this.a, this.b), FingerTreeInternal.Empty(), One(this.c))
-      is Four -> FingerTreeInternal.Deep(Three(this.a, this.b, this.c), FingerTreeInternal.Empty(), One(this.d))
+      is One -> FingerTree.Single(this.a)
+      is Two -> FingerTree.Deep(One(this.a), FingerTree.Empty(), One(this.b))
+      is Three -> FingerTree.Deep(Two(this.a, this.b), FingerTree.Empty(), One(this.c))
+      is Four -> FingerTree.Deep(Three(this.a, this.b, this.c), FingerTree.Empty(), One(this.d))
     }
 
   fun head(): A =
