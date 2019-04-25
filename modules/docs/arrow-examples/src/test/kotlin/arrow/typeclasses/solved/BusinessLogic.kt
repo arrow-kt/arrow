@@ -2,7 +2,7 @@ package com.pacoworks.typeclasses.basics.solved
 
 import arrow.Kind
 import arrow.core.Try
-import arrow.core.recoverWith
+import arrow.core.handleErrorWith
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.MonadDefer
 import arrow.typeclasses.Index
@@ -14,7 +14,7 @@ import kotlin.coroutines.CoroutineContext
 interface RequestOperations : DaoOperations, NetworkOperations, DomainMapper {
   fun Index.fetchUser(): Try<User> =
     queryUser().toUserFromDatabase()
-      .recoverWith { requestUser().toUserFromNetwork() }
+      .handleErrorWith { requestUser().toUserFromNetwork() }
 }
 
 // So far so good. Let's get rid of Try! Back to the Framework

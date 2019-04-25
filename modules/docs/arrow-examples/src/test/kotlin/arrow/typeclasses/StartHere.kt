@@ -1,7 +1,7 @@
 package arrow.typeclasses
 
 import arrow.core.Try
-import arrow.core.recoverWith
+import arrow.core.handleErrorWith
 
 // This code is explained in "Simple dependency management in Kotlin"
 // Video: https://skillsmatter.com/skillscasts/12907-simple-dependency-management-in-kotlin
@@ -16,7 +16,7 @@ data class User(val id: Index)
 
 fun fetchUser(i: Index, network: NetworkModule, dao: DaoDatabase): Try<User> =
   Try { dao.query("SELECT * FROM Users where id = $i").toUserFromDatabase() }
-    .recoverWith {
+    .handleErrorWith {
       Try { network.fetch(i, mapOf()).toUserFromNetwork() }
     }
 
