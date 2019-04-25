@@ -31,7 +31,7 @@ class ResourceTest : UnitSpec() {
       MonoidLaws.laws(Resource.monoid(Int.monoid(), IO.bracket()), Gen.int().map { Resource.just(it, IO.bracket()) }, EQ)
     )
 
-    "Resource releases resources in reverse order of acquisation" {
+    "Resource releases resources in reverse order of acquisition" {
       forFew(5, Gen.list(Gen.string())) { l ->
         val released = mutableListOf<String>()
         l.traverse(Resource.applicative(IO.bracket())) {

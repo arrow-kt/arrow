@@ -435,6 +435,31 @@ class IOTest : UnitSpec() {
         latch.get()
       }.unsafeRunSync()
     }
+
+    "Bracket should be stack safe" {
+      val size = 5000
+
+      fun ioBracketLoop(i: Int): IO<Int> =
+        IO.unit.bracket(use = { just(i + 1) }, release = { IO.unit }).flatMap { ii ->
+          if (ii < size) ioBracketLoop(ii)
+          else just(ii)
+        }
+
+      IO.just(1).flatMap { ioBracketLoop(0) }.unsafeRunSync() shouldBe size
+    }
+
+    "GuaranteeCase should be stack safe" {
+      val size = 5000
+
+      fun ioGuaranteeCase(i: Int): IO<Int> =
+        IO.unit.guaranteeCase { IO.unit }.flatMap {
+          val ii = i + 1
+          if (ii < size) ioGuaranteeCase(ii)
+          else just(ii)
+        }
+
+      IO.just(1).flatMap { ioGuaranteeCase(0) }.unsafeRunSync() shouldBe size
+    }
   }
 }
 
