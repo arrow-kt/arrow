@@ -42,6 +42,7 @@ import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.Traverse
 import io.reactivex.Observable
+import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.ReplaySubject
 import kotlin.coroutines.CoroutineContext
 import io.reactivex.disposables.Disposable as rxDisposable
@@ -172,52 +173,58 @@ interface ObservableKConcurrent : Concurrent<ForObservableK>, ObservableKAsync {
     Companion.asyncF(fa)
 
   override fun <A> CoroutineContext.startFiber(kind: ObservableKOf<A>): ObservableK<Fiber<ForObservableK, A>> =
-    Observable.create<Fiber<ForObservableK, A>> {
-      val s: ReplaySubject<A> = ReplaySubject.create()
-      val conn: rxDisposable = kind.value().subscribeOn(asScheduler()).subscribe(s::onNext, s::onError, s::onComplete)
-      it.setDisposable(conn)
-      it.onNext(Fiber(s.k(), ObservableK { conn.dispose() }))
-    }.k()
+    asScheduler().let { scheduler ->
+      Observable.create<Fiber<ForObservableK, A>> { emitter ->
+        val s: ReplaySubject<A> = ReplaySubject.create()
+        val conn: rxDisposable = kind.value().subscribeOn(scheduler).subscribe(s::onNext, s::onError)
+        emitter.setDisposable(conn)
+        emitter.onNext(Fiber(s.k(), ObservableK { conn.dispose() }))
+      }.k()
+    }
 
   override fun <A, B> CoroutineContext.racePair(fa: ObservableKOf<A>, fb: ObservableKOf<B>): ObservableK<RacePair<ForObservableK, A, B>> =
-    Observable.create<RacePair<ForObservableK, A, B>> { emitter ->
-      val sa = ReplaySubject.create<A>()
-      val sb = ReplaySubject.create<B>()
-      val dda = fa.value().subscribeOn(asScheduler()).subscribe(sa::onNext, sa::onError, sa::onComplete)
-      val ddb = fb.value().subscribeOn(asScheduler()).subscribe(sb::onNext, sb::onError, sb::onComplete)
-      emitter.setCancellable { dda.dispose(); ddb.dispose() }
-      val ffa = Fiber(sa.k(), ObservableK { dda.dispose() })
-      val ffb = Fiber(sb.k(), ObservableK { ddb.dispose() })
-      sa.subscribe({
-        emitter.onNext(Either.Left(it toT ffb))
-      }, emitter::onError, emitter::onComplete)
-      sb.subscribe({
-        emitter.onNext(Either.Right(ffa toT it))
-      }, emitter::onError, emitter::onComplete)
-    }.k()
+    asScheduler().let { scheduler ->
+      Observable.create<RacePair<ForObservableK, A, B>> { emitter ->
+        val sa = ReplaySubject.create<A>()
+        val sb = ReplaySubject.create<B>()
+        val dda = fa.value().subscribeOn(scheduler).subscribe(sa::onNext, sa::onError)
+        val ddb = fb.value().subscribeOn(scheduler).subscribe(sb::onNext, sb::onError)
+        emitter.setCancellable { dda.dispose(); ddb.dispose() }
+        val ffa = Fiber(sa.k(), ObservableK { dda.dispose() })
+        val ffb = Fiber(sb.k(), ObservableK { ddb.dispose() })
+        sa.subscribe({
+          emitter.onNext(Either.Left(it toT ffb))
+        }, emitter::onError, emitter::onComplete)
+        sb.subscribe({
+          emitter.onNext(Either.Right(ffa toT it))
+        }, emitter::onError, emitter::onComplete)
+      }.k()
+    }
 
   override fun <A, B, C> CoroutineContext.raceTriple(fa: ObservableKOf<A>, fb: ObservableKOf<B>, fc: ObservableKOf<C>): ObservableK<RaceTriple<ForObservableK, A, B, C>> =
-    Observable.create<RaceTriple<ForObservableK, A, B, C>> { emitter ->
-      val sa = ReplaySubject.create<A>()
-      val sb = ReplaySubject.create<B>()
-      val sc = ReplaySubject.create<C>()
-      val dda = fa.value().subscribeOn(asScheduler()).subscribe(sa::onNext, sa::onError, sa::onComplete)
-      val ddb = fb.value().subscribeOn(asScheduler()).subscribe(sb::onNext, sb::onError, sb::onComplete)
-      val ddc = fc.value().subscribeOn(asScheduler()).subscribe(sc::onNext, sc::onError, sc::onComplete)
-      emitter.setCancellable { dda.dispose(); ddb.dispose(); ddc.dispose() }
-      val ffa = Fiber(sa.k(), ObservableK { dda.dispose() })
-      val ffb = Fiber(sb.k(), ObservableK { ddb.dispose() })
-      val ffc = Fiber(sc.k(), ObservableK { ddc.dispose() })
-      sa.subscribe({
-        emitter.onNext(Either.Left(Tuple3(it, ffb, ffc)))
-      }, emitter::onError, emitter::onComplete)
-      sb.subscribe({
-        emitter.onNext(Either.Right(Either.Left(Tuple3(ffa, it, ffc))))
-      }, emitter::onError, emitter::onComplete)
-      sc.subscribe({
-        emitter.onNext(Either.Right(Either.Right(Tuple3(ffa, ffb, it))))
-      }, emitter::onError, emitter::onComplete)
-    }.k()
+    asScheduler().let { scheduler ->
+      Observable.create<RaceTriple<ForObservableK, A, B, C>> { emitter ->
+        val sa = ReplaySubject.create<A>()
+        val sb = ReplaySubject.create<B>()
+        val sc = ReplaySubject.create<C>()
+        val dda = fa.value().subscribeOn(scheduler).subscribe(sa::onNext, sa::onError, sa::onComplete)
+        val ddb = fb.value().subscribeOn(scheduler).subscribe(sb::onNext, sb::onError, sb::onComplete)
+        val ddc = fc.value().subscribeOn(scheduler).subscribe(sc::onNext, sc::onError, sc::onComplete)
+        emitter.setCancellable { dda.dispose(); ddb.dispose(); ddc.dispose() }
+        val ffa = Fiber(sa.k(), ObservableK { dda.dispose() })
+        val ffb = Fiber(sb.k(), ObservableK { ddb.dispose() })
+        val ffc = Fiber(sc.k(), ObservableK { ddc.dispose() })
+        sa.subscribe({
+          emitter.onNext(Either.Left(Tuple3(it, ffb, ffc)))
+        }, emitter::onError, emitter::onComplete)
+        sb.subscribe({
+          emitter.onNext(Either.Right(Either.Left(Tuple3(ffa, it, ffc))))
+        }, emitter::onError, emitter::onComplete)
+        sc.subscribe({
+          emitter.onNext(Either.Right(Either.Right(Tuple3(ffa, ffb, it))))
+        }, emitter::onError, emitter::onComplete)
+      }.subscribeOn(Schedulers.newThread()).k()
+    }
 }
 
 fun ObservableK.Companion.concurrent(dispatchers: Dispatchers<ForObservableK>): Concurrent<ForObservableK> = object : ObservableKConcurrent {
