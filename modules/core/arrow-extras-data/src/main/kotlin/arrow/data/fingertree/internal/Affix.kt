@@ -22,13 +22,6 @@ internal sealed class Affix<A> {
       is Four -> throw RuntimeException("Cannot append to affix four")
     }
 
-  fun toArray(): Array<A> = when (this) {
-    is One -> arrayOf<Any?>(this.a) as Array<A>
-    is Two -> arrayOf<Any?>(this.a, this.b) as Array<A>
-    is Three -> arrayOf<Any?>(this.a, this.b, this.c) as Array<A>
-    is Four -> arrayOf<Any?>(this.a, this.b, this.c, this.d) as Array<A>
-  }
-
   fun toFingerTree(): FingerTreeInternal<A> =
     when (this) {
       is One -> FingerTreeInternal.Single(this.a)
@@ -68,14 +61,4 @@ internal sealed class Affix<A> {
       is Three -> Two(this.a, this.b)
       is Four -> Three(this.a, this.b, this.c)
     }
-
-  companion object {
-    fun <B> fromArray(xs: Array<B>): Affix<B> = when (xs.size) {
-      1 -> One(xs[0])
-      2 -> Two(xs[0], xs[1])
-      3 -> Three(xs[0], xs[1], xs[2])
-      4 -> Four(xs[0], xs[1], xs[2], xs[3])
-      else -> throw IllegalArgumentException("TODO")
-    }
-  }
 }
