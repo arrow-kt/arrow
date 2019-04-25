@@ -460,8 +460,6 @@ class IOTest : UnitSpec() {
 
       IO.just(1).flatMap { ioGuaranteeCase(0) }.unsafeRunSync() shouldBe size
     }
-
-
   }
 }
 

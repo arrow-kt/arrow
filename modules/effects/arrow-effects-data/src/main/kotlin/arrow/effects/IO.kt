@@ -16,6 +16,7 @@ import arrow.effects.internal.IOBracket
 import arrow.effects.internal.Platform.maxStackDepthSize
 import arrow.effects.internal.Platform.onceOnly
 import arrow.effects.internal.Platform.unsafeResync
+import arrow.effects.internal.guaranteeCase
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.Duration
 import arrow.effects.typeclasses.ExitCase
@@ -159,7 +160,7 @@ sealed class IO<out A> : IOOf<A> {
 
   /** Makes the source [IO] uncancelable such that a [Fiber.cancel] signal has no effect. */
   fun uncancelable(): IO<A> =
-    IO.ContextSwitch(this, ContextSwitch.makeUncancelable, ContextSwitch.disableUncancelable())
+    IO.ContextSwitch(this, ContextSwitch.makeUncancelable, ContextSwitch.disableUncancelable)
 
   fun <B> bracket(release: (A) -> IOOf<Unit>, use: (A) -> IOOf<B>): IO<B> =
     bracketCase({ a, _ -> release(a) }, use)
@@ -170,7 +171,7 @@ sealed class IO<out A> : IOOf<A> {
   fun guarantee(finalizer: IOOf<Unit>): IO<A> = guaranteeCase { finalizer }
 
   fun guaranteeCase(finalizer: (ExitCase<Throwable>) -> IOOf<Unit>): IO<A> =
-    IOBracket.guaranteeCase(this, finalizer)
+    guaranteeCase(this, finalizer)
 
   internal data class Pure<out A>(val a: A) : IO<A>() {
     // Pure can be replaced by its value
@@ -226,7 +227,7 @@ sealed class IO<out A> : IOOf<A> {
       // Internal reusable reference.
       internal val makeUncancelable: (IOConnection) -> IOConnection = { IOConnection.uncancelable }
 
-      internal fun <A> disableUncancelable(): (A, Throwable?, IOConnection, IOConnection) -> IOConnection =
+      internal val disableUncancelable: (Any?, Throwable?, IOConnection, IOConnection) -> IOConnection =
         { _, _, old, _ -> old }
     }
   }
@@ -236,7 +237,7 @@ sealed class IO<out A> : IOOf<A> {
 
     override fun <B> map(f: (A) -> B): IO<B> =
     // Allowed to do maxStackDepthSize map operations in sequence before
-    // starting a new Map fusion in order to avoid stack overflows
+      // starting a new Map fusion in order to avoid stack overflows
       if (index != maxStackDepthSize) Map(source, g.andThen(f), index + 1)
       else Map(this, f, 0)
 

@@ -1,7 +1,7 @@
 package arrow.effects.internal
 
 import arrow.core.Either
-import arrow.core.NonFatal
+import arrow.core.nonFatalOrThrow
 import arrow.effects.CancelToken
 import arrow.effects.ForIO
 import arrow.effects.IO
@@ -11,7 +11,6 @@ import arrow.effects.IOOf
 import arrow.effects.IORunLoop
 import arrow.effects.fix
 import arrow.effects.typeclasses.ExitCase
-import arrow.effects.uncancelable
 import java.util.concurrent.atomic.AtomicBoolean
 
 internal object IOBracket {
@@ -44,7 +43,7 @@ internal object IOBracket {
     val conn: IOConnection,
     val deferredRelease: ForwardCancelable,
     val cb: (Either<Throwable, B>) -> Unit
-  ) : (Either<Throwable, A>) -> Unit, Runnable {
+  ) : (Either<Throwable, A>) -> Unit {
 
     // This runnable is a dirty optimization to avoid some memory allocations;
     // This class switches from being a Callback to a Runnable, but relies on the internal IO callback protocol to be
@@ -52,30 +51,20 @@ internal object IOBracket {
     private var result: Either<Throwable, A>? = null
 
     override fun invoke(ea: Either<Throwable, A>) {
-      if (result != null) {
-        throw IllegalStateException("callback called multiple times!")
-      }
+      if (result != null) throw IllegalStateException("callback called multiple times!")
+
       // Introducing a light async boundary, otherwise executing the required
       // logic directly will yield a StackOverflowException
-      result = ea
-      this.run() // TODO this runs in cats-effect in a trampolined execution context for stack safety.
-    }
-
-    override fun run() {
-      result!!.let { result ->
-        when (result) {
+      Platform.trampoline {
+        when (ea) {
           is Either.Right -> {
-            val a = result.b
+            val a = ea.b
             val frame = BracketReleaseFrame<A, B>(a, release)
             val onNext = {
               val fb = try {
                 use(a)
               } catch (e: Throwable) {
-                if (NonFatal(e)) {
-                  IO.raiseError<B>(e)
-                } else {
-                  throw e
-                }
+                IO.raiseError<B>(e.nonFatalOrThrow())
               }
 
               IO.Bind(fb.fix(), frame)
@@ -86,7 +75,7 @@ internal object IOBracket {
             // Actual execution
             IORunLoop.startCancelable(onNext(), conn, cb)
           }
-          is Either.Left -> cb(result)
+          is Either.Left -> cb(ea)
         }
       }
     }
@@ -94,19 +83,17 @@ internal object IOBracket {
 
   fun <A> guaranteeCase(source: IO<A>, release: (ExitCase<Throwable>) -> IOOf<Unit>): IO<A> =
     IO.async { conn, cb ->
-      // TODO on cats-effect all this block is run using an immediate ExecutionContext for stack safety.
+      Platform.trampoline {
+        val frame = EnsureReleaseFrame<A>(release)
+        val onNext = source.flatMap(frame)
+        // Registering our cancelable token ensures that in case
+        // cancellation is detected, `release` gets called
+        conn.push(frame.cancel)
 
-      val frame = EnsureReleaseFrame<A>(release)
-      val onNext = source.flatMap(frame)
-      // Registering our cancelable token ensures that in case
-      // cancellation is detected, `release` gets called
-      conn.push(frame.cancel)
-
-      // Race condition check, avoiding starting `source` in case
-      // the connection was already cancelled — n.b. we don't need
-      // to trigger `release` otherwise, because it already happened
-      if (!conn.isCanceled()) {
-        IORunLoop.startCancelable(onNext, conn, cb)
+        // Race condition check, avoiding starting `source` in case
+        // the connection was already cancelled — n.b. we don't need
+        // to trigger `release` otherwise, because it already happened
+        if (!conn.isCanceled()) IORunLoop.startCancelable(onNext, conn, cb)
       }
     }
 
@@ -143,14 +130,14 @@ internal object IOBracket {
     // Unregistering cancel token, otherwise we can have a memory leak;
     // N.B. conn.pop() happens after the evaluation of `release`, because
     // otherwise we might have a conflict with the auto-cancellation logic
-    override fun recover(e: Throwable): IO<B> = IO.ContextSwitch(applyRelease(ExitCase.Error(e)), makeUncancelable, disableUncancelableAndPop)
+    override fun recover(e: Throwable): IO<B> = IO.ContextSwitch(applyRelease(ExitCase.Error(e)), IO.ContextSwitch.makeUncancelable, disableUncancelableAndPop)
       .flatMap(ReleaseRecover(e))
 
     override operator fun invoke(a: B): IO<B> =
     // Unregistering cancel token, otherwise we can have a memory leak
     // N.B. conn.pop() happens after the evaluation of `release`, because
-    // otherwise we might have a conflict with the auto-cancellation logic
-      IO.ContextSwitch(applyRelease(ExitCase.Completed), makeUncancelable, disableUncancelableAndPop)
+      // otherwise we might have a conflict with the auto-cancellation logic
+      IO.ContextSwitch(applyRelease(ExitCase.Completed), IO.ContextSwitch.makeUncancelable, disableUncancelableAndPop)
         .map { a }
   }
 
@@ -162,11 +149,10 @@ internal object IOBracket {
     override fun invoke(a: Unit): IO<Nothing> = IO.raiseError(error)
   }
 
-  private val makeUncancelable: (IOConnection) -> IOConnection = { IOConnection.uncancelable }
-
   private val disableUncancelableAndPop: (Any?, Throwable?, IOConnection, IOConnection) -> IOConnection =
     { _, _, old, _ ->
       old.pop()
       old
     }
+
 }
