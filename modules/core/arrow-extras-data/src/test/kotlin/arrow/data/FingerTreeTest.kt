@@ -271,6 +271,21 @@ class FingerTreeTest : StringSpec() {
       fingerTree.rotateCounterClockwise(11).asList() shouldBe listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
     }
 
+    /**
+     * isEmpty()
+     */
+
+    "isEmpty() should return true when the finger tree has no elements" {
+      Empty<Int>().isEmpty() shouldBe true
+    }
+
+    "isEmpty() shoudl return false when the finger tree has one element" {
+      Single(1).isEmpty() shouldBe false
+    }
+
+    "isEmpty() should return false when the finger tree has more than one element" {
+      Deep(One(1), Empty(), One(2)).isEmpty() shouldBe false
+    }
 
   }
 }

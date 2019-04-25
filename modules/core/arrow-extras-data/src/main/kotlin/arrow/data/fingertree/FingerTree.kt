@@ -100,6 +100,8 @@ sealed class FingerTree<T> {
       }
     }
 
+  fun isEmpty() = this is Empty
+
   fun asList(): List<T> = this.asListHelper(emptyList(), this)
 
   fun asSequence(): Sequence<T> = sequence {
