@@ -65,17 +65,15 @@ object MonadLaws {
       fa.flatMap { just(f(it)) }.equalUnderTheLaw(fa.map(f), EQ)
     }
 
-  fun <F> Monad<F>.stackSafety(iterations: Int = 5000, EQ: Eq<Kind<F, Int>>): Unit =
-    forFew(1, Gen.from(listOf(iterations))) { iter ->
-      val res = tailRecM(0) { i -> just(if (i < iter) Left(i + 1) else Right(i)) }
-      res.equalUnderTheLaw(just(iter), EQ)
-    }
+  fun <F> Monad<F>.stackSafety(iter: Int = 5000, EQ: Eq<Kind<F, Int>>) {
+    val res = tailRecM(0) { i -> just(if (i < iter) Left(i + 1) else Right(i)) }
+    res.equalUnderTheLaw(just(iter), EQ)
+  }
 
-  fun <F> Monad<F>.stackSafetyComprehensions(iterations: Int = 5000, EQ: Eq<Kind<F, Int>>): Unit =
-    forFew(1, Gen.from(listOf(iterations))) { iter ->
-      val res = stackSafeTestProgram(0, iter)
-      res.run(this).equalUnderTheLaw(just(iter), EQ)
-    }
+  fun <F> Monad<F>.stackSafetyComprehensions(iter: Int = 5000, EQ: Eq<Kind<F, Int>>) {
+    val res = stackSafeTestProgram(0, iter)
+    res.run(this).equalUnderTheLaw(just(iter), EQ)
+  }
 
   fun <F> Monad<F>.equivalentComprehensions(EQ: Eq<Kind<F, Int>>) {
     val M = this
