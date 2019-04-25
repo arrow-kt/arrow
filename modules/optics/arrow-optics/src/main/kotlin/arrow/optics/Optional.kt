@@ -284,6 +284,15 @@ interface POptional<S, T, A, B> : POptionalOf<S, T, A, B> {
 }
 
 /**
+ * Invoke operator overload to create a [PPrism] of type `S` with a focus `A` where `A` is a subtype of `S`
+ * Can also be used to construct [Prism]
+ */
+operator fun <S, A> POptional.Companion.invoke(getOption: (S) -> Option<A>, set: (S, A) -> S): Optional<S, A> = Optional(
+  getOrModify = { getOption(it).toEither { it } },
+  set = set
+)
+
+/**
  * Update the focus [A] viewed through the [Optional] and returns its *new* value.
  */
 fun <S, A> Optional<S, A>.update(f: (A) -> A): State<S, Option<A>> =

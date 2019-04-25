@@ -1,5 +1,7 @@
 package arrow.data
 
+import arrow.core.None
+import arrow.core.Some
 import arrow.core.case
 import arrow.core.then
 import arrow.syntax.collections.collect
@@ -15,7 +17,7 @@ class IterableTests : UnitSpec() {
 
     "Iterable.collect can filter and transform" {
       listOf(1, 2, 3, 4, 5).collect(
-        case({ n: Int -> n % 2 == 0 } then { (it * 2).toString() })
+        { i ->  if (i % 2 == 0) Some((i * 2).toString()) else None }
       ) shouldBe listOf("4", "8")
     }
   }
