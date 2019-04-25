@@ -3,7 +3,14 @@ package arrow.benchmarks
 import arrow.effects.IO
 import arrow.effects.suspended.fx.Fx
 import arrow.unsafe
-import org.openjdk.jmh.annotations.*
+import org.openjdk.jmh.annotations.Benchmark
+import org.openjdk.jmh.annotations.CompilerControl
+import org.openjdk.jmh.annotations.Fork
+import org.openjdk.jmh.annotations.Measurement
+import org.openjdk.jmh.annotations.Param
+import org.openjdk.jmh.annotations.Scope
+import org.openjdk.jmh.annotations.State
+import org.openjdk.jmh.annotations.Warmup
 import java.util.concurrent.TimeUnit
 import arrow.effects.extensions.fx.unsafeRun.runBlocking as fxRunBlocking
 import arrow.effects.extensions.io.applicativeError.handleErrorWith as ioHandleError
@@ -46,5 +53,4 @@ open class HandleRaisedError {
   @Benchmark
   fun fx(): Int =
     unsafe { fxRunBlocking { fxErrorRaisedloop(0) } }
-
 }

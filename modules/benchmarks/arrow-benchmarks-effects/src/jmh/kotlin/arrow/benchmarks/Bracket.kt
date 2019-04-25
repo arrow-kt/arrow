@@ -5,7 +5,14 @@ import arrow.effects.extensions.fx.bracket.bracket
 import arrow.effects.extensions.fx.unsafeRun.runBlocking
 import arrow.effects.suspended.fx.Fx
 import arrow.unsafe
-import org.openjdk.jmh.annotations.*
+import org.openjdk.jmh.annotations.Benchmark
+import org.openjdk.jmh.annotations.CompilerControl
+import org.openjdk.jmh.annotations.Fork
+import org.openjdk.jmh.annotations.Measurement
+import org.openjdk.jmh.annotations.Param
+import org.openjdk.jmh.annotations.Scope
+import org.openjdk.jmh.annotations.State
+import org.openjdk.jmh.annotations.Warmup
 import java.util.concurrent.TimeUnit
 import arrow.effects.extensions.io.unsafeRun.runBlocking as ioRunBlocking
 
@@ -31,7 +38,6 @@ open class Bracket {
     else
       IO.just(i)
 
-
   @Benchmark
   fun fx() =
     unsafe {
@@ -47,5 +53,4 @@ open class Bracket {
         ioBracketLoop(0)
       }
     }
-
 }

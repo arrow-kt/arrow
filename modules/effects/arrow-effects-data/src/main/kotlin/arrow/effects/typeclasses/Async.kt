@@ -252,7 +252,6 @@ interface Async<F> : MonadDefer<F> {
    */
   fun <A> never(): Kind<F, A> =
     async { }
-
 }
 
 val suspendMapUnit: suspend () -> Unit = { Unit }

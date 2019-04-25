@@ -1,7 +1,6 @@
 package arrow.effects
 
 import arrow.Kind
-import arrow.core.*
 import arrow.effects.extensions.NonBlocking
 import arrow.effects.extensions.fx.fx.fx
 import arrow.effects.extensions.fx.unsafeRun.runBlocking
@@ -9,6 +8,18 @@ import arrow.effects.extensions.fx.unsafeRun.unsafeRun
 import arrow.effects.suspended.fx.Fx
 import arrow.effects.suspended.fx.FxOf
 import arrow.effects.suspended.fx.fix
+import arrow.core.Failure
+import arrow.core.Left
+import arrow.core.Option
+import arrow.core.Right
+import arrow.core.Try
+import arrow.core.identity
+import arrow.core.left
+import arrow.core.none
+import arrow.core.right
+import arrow.effects.extensions.io.fx.fx
+import arrow.effects.extensions.io.unsafeRun.runBlocking
+import arrow.effects.extensions.io.unsafeRun.unsafeRun
 import arrow.effects.typeclasses.UnsafeRun
 import arrow.test.UnitSpec
 import arrow.unsafe
@@ -71,6 +82,14 @@ class EffectsSuspendDSLTests : UnitSpec() {
           val jsonNode = !effect { contents + 2 }
           !effect { Unit }
         }
+        // note how the receiving value is typed in the environment and not inside IO despite being effectful and
+        // non-blocking parallel computations
+        val result: List<String> = !NonBlocking.parMapN(
+          effect { getThreadName() },
+          effect { getThreadName() }
+        ) { a, b -> listOf(a, b) }
+        effect { println(result) }
+        result
       }
       unsafe { runBlocking { program } }
     }
@@ -397,11 +416,9 @@ class EffectsSuspendDSLTests : UnitSpec() {
       } shouldBe done
     }
   }
-
 }
 
 fun <A> fxTest(f: () -> FxOf<A>): A =
   unsafe { runBlocking(f) }
 
 object TestError : Throwable()
-

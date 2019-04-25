@@ -29,7 +29,7 @@ interface NuBirecursive : Birecursive<ForNu> {
 }
 
 @extension
-interface NuRecursive: Recursive<ForNu>, NuBirecursive
+interface NuRecursive : Recursive<ForNu>, NuBirecursive
 
 @extension
-interface NuCorecursive: Corecursive<ForNu>, NuBirecursive
+interface NuCorecursive : Corecursive<ForNu>, NuBirecursive

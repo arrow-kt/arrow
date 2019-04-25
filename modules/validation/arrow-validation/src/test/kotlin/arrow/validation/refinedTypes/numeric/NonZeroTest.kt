@@ -21,7 +21,5 @@ class NonZeroTest : UnitSpec() {
     "Can not create NonZero from 0" {
       0.nonZero().isInvalid
     }
-
   }
-
 }

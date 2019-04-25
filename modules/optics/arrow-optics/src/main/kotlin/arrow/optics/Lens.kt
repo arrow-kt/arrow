@@ -1,8 +1,16 @@
 package arrow.optics
 
 import arrow.Kind
-import arrow.core.*
-import arrow.data.*
+import arrow.core.Either
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.Tuple2
+import arrow.core.identity
+import arrow.core.toT
+import arrow.data.Reader
+import arrow.data.State
+import arrow.data.map
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Functor
@@ -98,7 +106,7 @@ interface PLens<S, T, A, B> : PLensOf<S, T, A, B> {
    */
   fun <C> first(): PLens<Tuple2<S, C>, Tuple2<T, C>, Tuple2<A, C>, Tuple2<B, C>> = PLens(
     { (s, c) -> get(s) toT c },
-    { (s, _) , (b, c) -> set(s, b) toT c }
+    { (s, _), (b, c) -> set(s, b) toT c }
   )
 
   /**
@@ -106,7 +114,7 @@ interface PLens<S, T, A, B> : PLensOf<S, T, A, B> {
    */
   fun <C> second(): PLens<Tuple2<C, S>, Tuple2<C, T>, Tuple2<C, A>, Tuple2<C, B>> = PLens(
     { (c, s) -> c toT get(s) },
-    { (_, s) , (c, b) -> c toT set(s, b) }
+    { (_, s), (c, b) -> c toT set(s, b) }
   )
 
   /**
@@ -259,7 +267,6 @@ interface PLens<S, T, A, B> : PLensOf<S, T, A, B> {
    * Extracts and maps the focus [A] viewed through the [PLens] and applies [f] to it.
    */
   fun <C> extractMap(f: (A) -> C): State<S, C> = extract().map(f)
-
 }
 
 /**

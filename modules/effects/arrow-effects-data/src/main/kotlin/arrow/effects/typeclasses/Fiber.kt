@@ -43,5 +43,4 @@ interface Fiber<F, out A> {
       override fun toString(): String = "Fiber(join= ${join()}, cancel= ${cancel()})"
     }
   }
-
 }

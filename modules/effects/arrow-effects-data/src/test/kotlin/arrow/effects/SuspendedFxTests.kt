@@ -29,7 +29,5 @@ class SuspendedFxTests : UnitSpec() {
         (0 until size).fold(Fx { 0 }) { acc, _ -> acc.flatMap { Fx.just(it + 1) } }
       unsafe { runBlocking { flatMapStackSafe() } } shouldBe size
     }
-
   }
-
 }

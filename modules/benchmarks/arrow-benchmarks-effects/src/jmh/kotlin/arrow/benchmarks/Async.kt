@@ -4,14 +4,15 @@ import arrow.effects.IO
 import arrow.effects.extensions.NonBlocking
 import arrow.effects.extensions.io.monad.followedBy
 import arrow.effects.suspended.fx.Fx
-import arrow.unsafe
-import org.openjdk.jmh.annotations.*
+import org.openjdk.jmh.annotations.Benchmark
+import org.openjdk.jmh.annotations.CompilerControl
+import org.openjdk.jmh.annotations.Fork
+import org.openjdk.jmh.annotations.Measurement
+import org.openjdk.jmh.annotations.Param
+import org.openjdk.jmh.annotations.Scope
+import org.openjdk.jmh.annotations.State
+import org.openjdk.jmh.annotations.Warmup
 import java.util.concurrent.TimeUnit
-import arrow.effects.extensions.fx.async.shift as fxShift
-import arrow.effects.extensions.fx.unsafeRun.runBlocking as fxRunBlocking
-import arrow.effects.extensions.io.async.shift as ioShift
-import arrow.effects.extensions.io.unsafeRun.runBlocking as ioRunBlocking
-
 
 @State(Scope.Thread)
 @Fork(2)
@@ -48,5 +49,4 @@ open class Async {
   @Benchmark
   fun scalazZIO(): Int =
     arrow.benchmarks.effects.scala.zio.`Async$`.`MODULE$`.unsafeIOAsyncLoop(size, 0)
-
 }

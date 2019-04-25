@@ -3,11 +3,27 @@ package arrow.data.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
-import arrow.data.*
-import arrow.data.extensions.listk.monad.monad
+import arrow.data.ForNonEmptyList
+import arrow.data.Nel
+import arrow.data.NonEmptyList
+import arrow.data.NonEmptyListOf
 import arrow.data.extensions.nonemptylist.monad.monad
+import arrow.data.fix
 import arrow.extension
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Apply
+import arrow.typeclasses.Bimonad
+import arrow.typeclasses.Comonad
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Hash
+import arrow.typeclasses.Monad
+import arrow.typeclasses.Reducible
+import arrow.typeclasses.Semigroup
+import arrow.typeclasses.SemigroupK
+import arrow.typeclasses.Show
+import arrow.typeclasses.Traverse
 import arrow.typeclasses.suspended.monad.Fx
 import arrow.data.combineK as nelCombineK
 
@@ -35,6 +51,15 @@ interface NonEmptyListShow<A> : Show<NonEmptyList<A>> {
 
 @extension
 interface NonEmptyListFunctor : Functor<ForNonEmptyList> {
+  override fun <A, B> Kind<ForNonEmptyList, A>.map(f: (A) -> B): NonEmptyList<B> =
+    fix().map(f)
+}
+
+@extension
+interface NonEmptyListApply : Apply<ForNonEmptyList> {
+  override fun <A, B> Kind<ForNonEmptyList, A>.ap(ff: Kind<ForNonEmptyList, (A) -> B>): NonEmptyList<B> =
+    fix().ap(ff)
+
   override fun <A, B> Kind<ForNonEmptyList, A>.map(f: (A) -> B): NonEmptyList<B> =
     fix().map(f)
 }
@@ -162,5 +187,4 @@ interface NelFx : Fx<ForNonEmptyList> {
 
   override fun monad(): Monad<ForNonEmptyList> =
     Nel.monad()
-
 }

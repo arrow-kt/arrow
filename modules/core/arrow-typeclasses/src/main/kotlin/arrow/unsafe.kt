@@ -32,5 +32,4 @@ object unsafe {
     c.latch.await()
     return c.ref!!
   }
-
 }

@@ -2,10 +2,15 @@ package arrow.benchmarks
 
 import arrow.effects.IO
 import arrow.effects.suspended.fx.Fx
-import org.openjdk.jmh.annotations.*
+import org.openjdk.jmh.annotations.Benchmark
+import org.openjdk.jmh.annotations.CompilerControl
+import org.openjdk.jmh.annotations.Fork
+import org.openjdk.jmh.annotations.Measurement
+import org.openjdk.jmh.annotations.Param
+import org.openjdk.jmh.annotations.Scope
+import org.openjdk.jmh.annotations.State
+import org.openjdk.jmh.annotations.Warmup
 import java.util.concurrent.TimeUnit
-import arrow.effects.extensions.fx.unsafeRun.runBlocking as fxRunBlocking
-import arrow.effects.extensions.io.unsafeRun.runBlocking as ioRunBlocking
 
 @State(Scope.Thread)
 @Fork(2)
@@ -34,5 +39,4 @@ open class Defer {
   @Benchmark
   fun io(): Int =
     ioDeferLoop(0).unsafeRunSync()
-
 }

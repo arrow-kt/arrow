@@ -1,7 +1,12 @@
 package arrow.effects.internal
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Left
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Right
+import arrow.core.Some
 import arrow.effects.Promise
 import arrow.effects.typeclasses.Async
 import java.util.concurrent.atomic.AtomicReference
@@ -101,5 +106,4 @@ internal class UncancelablePromise<F, A>(private val AS: Async<F>) : Promise<F, 
   }
 
   override fun toString(): String = "UncancelablePromise(state=$state)"
-
 }

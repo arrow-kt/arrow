@@ -1,7 +1,7 @@
 package arrow.effects.suspended.fx
 
 import arrow.core.Either
-import arrow.effects.*
+import arrow.effects.KindConnection
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.MonadDefer

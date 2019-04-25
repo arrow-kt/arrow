@@ -1,6 +1,9 @@
 package arrow.data
 
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.andThen
+import arrow.core.compose
+import arrow.core.identity
 import arrow.higherkind
 
 operator fun <A, B> AndThenOf<A, B>.invoke(a: A): B = fix().invoke(a)
@@ -264,7 +267,8 @@ sealed class AndThen<A, B>(@JvmField private val tag: Int) : (A) -> B, AndThenOf
   @Suppress("UNCHECKED_CAST")
   private tailrec fun rotateAccumulate(
     left: AndThen<Any?, Any?>,
-    right: AndThen<Any?, Any?>): AndThen<Any?, Any?> = when (left.tag) {
+    right: AndThen<Any?, Any?>
+  ): AndThen<Any?, Any?> = when (left.tag) {
     ConcatTag -> {
       left as Concat<*, *, *>
       rotateAccumulate(
@@ -275,5 +279,4 @@ sealed class AndThen<A, B>(@JvmField private val tag: Int) : (A) -> B, AndThenOf
     SingleTag -> left.andThenF(right)
     else -> throw Impossible
   }
-
 }

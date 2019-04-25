@@ -1,7 +1,12 @@
 package arrow.effects.internal
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Left
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Right
+import arrow.core.Some
 import arrow.effects.Promise
 import arrow.effects.typeclasses.Concurrent
 import arrow.effects.typeclasses.Fiber
@@ -125,5 +130,4 @@ internal class CancelablePromise<F, A>(private val CF: Concurrent<F>) : Promise<
   }
 
   override fun toString(): String = "CancelablePromise(state=$state)"
-
 }

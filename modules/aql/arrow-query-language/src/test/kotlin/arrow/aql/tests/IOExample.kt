@@ -10,7 +10,7 @@ data class UserId(val value: String)
 data class User(val userId: UserId)
 data class Task(val value: String)
 
-sealed class UserLookupError : RuntimeException() //assuming you are using exceptions
+sealed class UserLookupError : RuntimeException() // assuming you are using exceptions
 data class UserNotInLocalStorage(val user: User) : UserLookupError()
 data class UserNotInRemoteStorage(val user: User) : UserLookupError()
 data class UnknownError(val underlying: Throwable) : UserLookupError()
@@ -23,7 +23,7 @@ interface Repository {
   fun allTasksByUser(user: User): IO<List<Task>>
 }
 
-class LocalDataSource: DataSource {
+class LocalDataSource : DataSource {
   private val localCache: Map<User, List<Task>> =
     mapOf(User(UserId("user1")) to listOf(Task("LocalTask asssigned to user1")))
 
@@ -40,7 +40,7 @@ class RemoteDataSource : DataSource {
 
   override fun allTasksByUser(user: User): IO<List<Task>> =
     IO.async { _, cb ->
-      //allows you to take values from callbacks and place them back in the context of `F`
+      // allows you to take values from callbacks and place them back in the context of `F`
       Option.fromNullable(internetStorage[user]).fold(
         { cb(UserNotInRemoteStorage(user).left()) },
         { cb(it.right()) }
@@ -50,7 +50,8 @@ class RemoteDataSource : DataSource {
 
 class DefaultRepository(
   val localDS: DataSource,
-  val remoteDS: RemoteDataSource) : Repository {
+  val remoteDS: RemoteDataSource
+) : Repository {
 
   override fun allTasksByUser(user: User): IO<List<Task>> =
     localDS.allTasksByUser(user).handleErrorWith {
@@ -59,7 +60,6 @@ class DefaultRepository(
         else -> IO.raiseError(UnknownError(it))
       }
     }
-
 }
 
 class Module {
@@ -70,20 +70,20 @@ class Module {
 
 object test {
   @JvmStatic
-  fun main(args: Array<String>): Unit {
+  fun main(args: Array<String>) {
     val user1 = User(UserId("user1"))
     val user2 = User(UserId("user2"))
     val user3 = User(UserId("unknown user"))
     val ioModule = Module()
     ioModule.run {
       println(repository.allTasksByUser(user1).attempt().unsafeRunSync())
-      //Right(b=[Task(value=LocalTask asssigned to user1)])
+      // Right(b=[Task(value=LocalTask asssigned to user1)])
 
       println(repository.allTasksByUser(user2).attempt().unsafeRunSync())
-      //Right(b=[Task(value=Remote Task assigned to user2)])
+      // Right(b=[Task(value=Remote Task assigned to user2)])
 
       println(repository.allTasksByUser(user3).attempt().unsafeRunSync())
-      //Left(a=UserNotInRemoteStorage(user=User(userId=UserId(value=unknown user))))
+      // Left(a=UserNotInRemoteStorage(user=User(userId=UserId(value=unknown user))))
     }
   }
 }

@@ -173,7 +173,7 @@ interface MetaApi {
    * constrains to not explicitly include implicit types such as `java.lang.Object`.
    * Preserves all modifiers [keepModifiers]
    */
-  fun Func.removeConstrains(keepModifiers : Set<Modifier> = emptySet()): Func
+  fun Func.removeConstrains(keepModifiers: Set<Modifier> = emptySet()): Func
 
   /**
    * Performs a type application transforming all parameter types in this function
@@ -259,5 +259,4 @@ interface MetaApi {
    * A instance of @SuppressAnnotation in the Arrow Meta AST
    */
   fun SuppressAnnotation(vararg names: String): Annotation
-
 }

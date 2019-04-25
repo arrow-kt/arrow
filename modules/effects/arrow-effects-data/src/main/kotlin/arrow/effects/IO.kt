@@ -1,7 +1,14 @@
 package arrow.effects
 
-import arrow.core.*
+import arrow.core.Either
 import arrow.core.Either.Left
+import arrow.core.Eval
+import arrow.core.NonFatal
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.andThen
+import arrow.core.identity
+import arrow.core.right
 import arrow.effects.OnCancel.Companion.CancellationException
 import arrow.effects.OnCancel.Silent
 import arrow.effects.OnCancel.ThrowCancellationException
@@ -9,7 +16,13 @@ import arrow.effects.internal.IOBracket
 import arrow.effects.internal.Platform.maxStackDepthSize
 import arrow.effects.internal.Platform.onceOnly
 import arrow.effects.internal.Platform.unsafeResync
-import arrow.effects.typeclasses.*
+import arrow.effects.typeclasses.Disposable
+import arrow.effects.typeclasses.Duration
+import arrow.effects.typeclasses.ExitCase
+import arrow.effects.typeclasses.Fiber
+import arrow.effects.typeclasses.Proc
+import arrow.effects.typeclasses.ProcF
+import arrow.effects.typeclasses.mapUnit
 import arrow.higherkind
 import kotlin.coroutines.CoroutineContext
 
@@ -143,7 +156,7 @@ sealed class IO<out A> : IOOf<A> {
 
   /** Makes the source [IO] uncancelable such that a [Fiber.cancel] signal has no effect. */
   fun uncancelable(): IO<A> =
-    IO.ContextSwitch(this, ContextSwitch.makeUncancelable, ContextSwitch.disableUncancelable())
+    IO.ContextSwitch(this, ContextSwitch.makeUncancelable, ContextSwitch.disableUncancelable)
 
   fun <B> bracket(release: (A) -> IOOf<Unit>, use: (A) -> IOOf<B>): IO<B> =
     bracketCase({ a, _ -> release(a) }, use)
@@ -202,18 +215,19 @@ sealed class IO<out A> : IOOf<A> {
   internal data class ContextSwitch<A>(
     val source: IO<A>,
     val modify: (IOConnection) -> IOConnection,
-    val restore: ((Any?, Throwable?, IOConnection, IOConnection) -> IOConnection)?) : IO<A>() {
+    val restore: ((Any?, Throwable?, IOConnection, IOConnection) -> IOConnection)?
+  ) : IO<A>() {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
 
     companion object {
-      //Internal reusable reference.
+      // Internal reusable reference.
       internal val makeUncancelable: (IOConnection) -> IOConnection = { IOConnection.uncancelable }
       internal val disableUncancelableAndPop: (Any?, Throwable?, IOConnection, IOConnection) -> IOConnection =
         { _, _, old, _ ->
           old.pop()
           old
         }
-      internal fun <A> disableUncancelable(): (A, Throwable?, IOConnection, IOConnection) -> IOConnection =
+      internal val disableUncancelable: (Any?, Throwable?, IOConnection, IOConnection) -> IOConnection =
         { _, _, old, _ -> old }
     }
   }

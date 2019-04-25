@@ -31,7 +31,7 @@ fun <A, B, C> Fx.Companion.raceTriple(ctx: CoroutineContext, fa: FxOf<A>, fb: Fx
 
     FxRunLoop.startCancelable(fa, connA, ctx) { either ->
       either.fold({ error ->
-        if (active.getAndSet(false)) { //if an error finishes first, stop the race.
+        if (active.getAndSet(false)) { // if an error finishes first, stop the race.
           FxRunLoop.start(connB.cancel()) { r2 ->
             FxRunLoop.start(connC.cancel()) { r3 ->
               conn.pop()
@@ -58,7 +58,7 @@ fun <A, B, C> Fx.Companion.raceTriple(ctx: CoroutineContext, fa: FxOf<A>, fb: Fx
 
     FxRunLoop.startCancelable(fb, connB) { either ->
       either.fold({ error ->
-        if (active.getAndSet(false)) { //if an error finishes first, stop the race.
+        if (active.getAndSet(false)) { // if an error finishes first, stop the race.
           FxRunLoop.start(connA.cancel()) { r2 ->
             FxRunLoop.start(connC.cancel()) { r3 ->
               conn.pop()
@@ -85,7 +85,7 @@ fun <A, B, C> Fx.Companion.raceTriple(ctx: CoroutineContext, fa: FxOf<A>, fb: Fx
 
     FxRunLoop.startCancelable(fc, connC) { either ->
       either.fold({ error ->
-        if (active.getAndSet(false)) { //if an error finishes first, stop the race.
+        if (active.getAndSet(false)) { // if an error finishes first, stop the race.
           FxRunLoop.start(connA.cancel()) { r2 ->
             FxRunLoop.start(connB.cancel()) { r3 ->
               conn.pop()
@@ -109,5 +109,4 @@ fun <A, B, C> Fx.Companion.raceTriple(ctx: CoroutineContext, fa: FxOf<A>, fb: Fx
         }
       })
     }
-
   }

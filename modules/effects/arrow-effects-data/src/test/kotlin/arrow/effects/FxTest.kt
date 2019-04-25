@@ -9,7 +9,10 @@ import arrow.effects.extensions.fx.concurrent.concurrent
 import arrow.effects.extensions.fx.fx.fx
 import arrow.effects.extensions.fx.monad.flatMap
 import arrow.effects.extensions.fx.unsafeRun.runBlocking
-import arrow.effects.suspended.fx.*
+import arrow.effects.suspended.fx.ForFx
+import arrow.effects.suspended.fx.Fx
+import arrow.effects.suspended.fx.FxFrame
+import arrow.effects.suspended.fx.FxOf
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
@@ -81,7 +84,7 @@ class FxTest : UnitSpec() {
     }
 
     "unsafeRunBlocking should run in EmptyCoroutineContext" {
-      //I was surprised by this behavior but nested suspend scopes inherit the coroutineContext from the outer scope.
+      // I was surprised by this behavior but nested suspend scopes inherit the coroutineContext from the outer scope.
       Fx.unsafeRunBlocking(Fx {
         kotlin.coroutines.coroutineContext shouldBe EmptyCoroutineContext
       })
@@ -98,7 +101,7 @@ class FxTest : UnitSpec() {
     "CoroutineContext state should be correctly managed between boundaries" {
       val ctxA = TestContext()
       val ctxB = CoroutineName("ctxB")
-      //We have to explicitly reference kotlin.coroutines.coroutineContext since `TestContext` overrides this property.
+      // We have to explicitly reference kotlin.coroutines.coroutineContext since `TestContext` overrides this property.
       Fx.unsafeRunBlocking(Fx { kotlin.coroutines.coroutineContext shouldBe EmptyCoroutineContext }
         .continueOn(ctxA)
         .flatMap { Fx { kotlin.coroutines.coroutineContext shouldBe ctxA } }
@@ -122,7 +125,7 @@ class FxTest : UnitSpec() {
       val program = fx {
         val ctx = !effect { kotlin.coroutines.coroutineContext }
         !effect { ctx shouldBe EmptyCoroutineContext }
-        continueOn(CoroutineName("Simon")) //this is immediately lost and useless.
+        continueOn(CoroutineName("Simon")) // this is immediately lost and useless.
         val ctx2 = !effect { kotlin.coroutines.coroutineContext }
         !effect { ctx2 shouldBe CoroutineName("Simon") }
       }
@@ -332,7 +335,6 @@ class FxTest : UnitSpec() {
       val ThrowableAsStringFrame = object : FxFrame<Any?, FxOf<String>> {
         override fun invoke(a: Any?) = fail("FxFrame should never call invoke on a failed value")
         override fun recover(e: Throwable) = Fx.just(e.message ?: "")
-
       }
 
       forAll(Gen.string()) { message ->
@@ -346,7 +348,6 @@ class FxTest : UnitSpec() {
       val ThrowableAsStringFrame = object : FxFrame<Int, FxOf<Int>> {
         override fun invoke(a: Int) = Fx { a + 1 }
         override fun recover(e: Throwable) = fail("FxFrame should never call recover on succesful value")
-
       }
 
       Fx.unsafeRunBlocking(
@@ -398,7 +399,7 @@ class FxTest : UnitSpec() {
               release = { _, exitCase -> p.complete(exitCase) }
             )
         ) {}
-          .invoke() //cancel immediately
+          .invoke() // cancel immediately
 
         p.get()
       }
@@ -438,9 +439,7 @@ class FxTest : UnitSpec() {
 //
 //      Fx.unsafeRunBlocking(program)
 //    }
-
   }
-
 }
 
 class TestContext : AbstractCoroutineContextElement(TestContext) {

@@ -1,7 +1,17 @@
 package arrow.optics
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.PartialFunction
+import arrow.core.Some
+import arrow.core.Tuple2
+import arrow.core.flatMap
+import arrow.core.getOrElse
+import arrow.core.identity
+import arrow.core.lift
+import arrow.core.toT
 import arrow.data.State
 import arrow.data.map
 import arrow.higherkind
@@ -73,6 +83,7 @@ interface POptional<S, T, A, B> : POptionalOf<S, T, A, B> {
      * Invoke operator overload to create a [POptional] of type `S` with focus `A`.
      * Can also be used to construct [Optional]
      */
+    @Deprecated("PartialFunction is an incomplete experiment due for removal. See https://github.com/arrow-kt/arrow/pull/1419#issue-273308228")
     operator fun <S, A> invoke(partialFunction: PartialFunction<S, A>, set: (S, A) -> S): Optional<S, A> = Optional(
       getOrModify = { s -> partialFunction.lift()(s).fold({ Either.Left(s) }, { Either.Right(it) }) },
       set = set
@@ -85,7 +96,6 @@ interface POptional<S, T, A, B> : POptionalOf<S, T, A, B> {
       { Either.Left(it) },
       { s, _ -> s }
     )
-
   }
 
   /**
@@ -281,7 +291,6 @@ interface POptional<S, T, A, B> : POptionalOf<S, T, A, B> {
    * Extract and map the focus [A] viewed through the [POptional] and applies [f] to it.
    */
   fun <C> extractMap(f: (A) -> C): State<S, Option<C>> = extract().map { it.map(f) }
-
 }
 
 /**

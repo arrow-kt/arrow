@@ -92,6 +92,5 @@ class FxForwardCancelable {
         if (errors.isNotEmpty()) throw Platform.composeErrors(errors.first(), errors.drop(1))
         else Unit
       }
-
   }
 }

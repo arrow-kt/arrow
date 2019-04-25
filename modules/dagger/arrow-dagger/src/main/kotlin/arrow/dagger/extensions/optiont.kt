@@ -1,8 +1,24 @@
 package arrow.dagger.extensions
 
 import arrow.data.OptionTPartialOf
-import arrow.data.extensions.*
-import arrow.typeclasses.*
+import arrow.data.extensions.OptionTApplicative
+import arrow.data.extensions.OptionTApplicativeError
+import arrow.data.extensions.OptionTFoldable
+import arrow.data.extensions.OptionTFunctor
+import arrow.data.extensions.OptionTMonad
+import arrow.data.extensions.OptionTMonadError
+import arrow.data.extensions.OptionTMonoidK
+import arrow.data.extensions.OptionTSemigroupK
+import arrow.data.extensions.OptionTTraverse
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadError
+import arrow.typeclasses.MonoidK
+import arrow.typeclasses.SemigroupK
+import arrow.typeclasses.Traverse
 import dagger.Module
 import dagger.Provides
 import javax.inject.Inject
@@ -30,7 +46,6 @@ abstract class OptionTInstances<F> {
 
   @Provides
   fun optionTMonoidK(ev: DaggerOptionTMonoidK<F>): MonoidK<OptionTPartialOf<F>> = ev
-
 }
 
 class DaggerOptionTFunctor<F> @Inject constructor(val FF: Functor<F>) : OptionTFunctor<F> {
@@ -47,7 +62,7 @@ class DaggerOptionTMonad<F> @Inject constructor(val FF: Monad<F>) : OptionTMonad
   override fun MF(): Monad<F> = FF
 }
 
-class DaggerOptionTApplicativeError<F, E> @Inject constructor(val AE: ApplicativeError<F, E> ) : OptionTApplicativeError<F, E> {
+class DaggerOptionTApplicativeError<F, E> @Inject constructor(val AE: ApplicativeError<F, E>) : OptionTApplicativeError<F, E> {
   override fun FF(): Functor<F> = AE
   override fun AF(): Applicative<F> = AE
   override fun AE(): ApplicativeError<F, E> = AE

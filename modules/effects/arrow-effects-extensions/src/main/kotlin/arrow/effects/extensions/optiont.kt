@@ -7,7 +7,12 @@ import arrow.data.OptionTPartialOf
 import arrow.data.extensions.OptionTMonadError
 import arrow.data.value
 import arrow.effects.Ref
-import arrow.effects.typeclasses.*
+import arrow.effects.typeclasses.Async
+import arrow.effects.typeclasses.Bracket
+import arrow.effects.typeclasses.ExitCase
+import arrow.effects.typeclasses.MonadDefer
+import arrow.effects.typeclasses.Proc
+import arrow.effects.typeclasses.ProcF
 import arrow.extension
 import arrow.typeclasses.MonadError
 import arrow.undocumented
@@ -48,7 +53,6 @@ interface OptionTBracket<F> : Bracket<OptionTPartialOf<F>, Throwable>, OptionTMo
       }
     })
   }
-
 }
 
 @extension
@@ -59,7 +63,6 @@ interface OptionTMonadDefer<F> : MonadDefer<OptionTPartialOf<F>>, OptionTBracket
 
   override fun <A> defer(fa: () -> OptionTOf<F, A>): OptionT<F, A> =
     OptionT(MD().defer { fa().value() })
-
 }
 
 @extension
@@ -81,5 +84,4 @@ interface OptionTAsync<F> : Async<OptionTPartialOf<F>>, OptionTMonadDefer<F> {
   override fun <A> OptionTOf<F, A>.continueOn(ctx: CoroutineContext): OptionT<F, A> = AS().run {
     OptionT(value().continueOn(ctx))
   }
-
 }

@@ -33,7 +33,7 @@ internal interface FxFrame<in A, out B> : (A) -> B {
       override fun recover(e: Throwable): Fx<A> = fe(e).fix()
     }
 
-    internal class Redeem<A, B>(val fe: (Throwable) -> B, val fs: (A) -> B): FxFrame<A, FxOf<B>> {
+    internal class Redeem<A, B>(val fe: (Throwable) -> B, val fs: (A) -> B) : FxFrame<A, FxOf<B>> {
       override fun invoke(a: A): FxOf<B> = Fx.Pure(fs(a), 0)
       override fun recover(e: Throwable): Fx<B> = Fx.Pure(fe(e), 0)
     }
@@ -52,5 +52,4 @@ internal interface FxFrame<in A, out B> : (A) -> B {
       override fun recover(e: Throwable): Fx<Either<Throwable, Any?>> = Fx.Pure(Either.Left(e), 0)
     }
   }
-
 }

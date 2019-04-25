@@ -2,10 +2,14 @@ package arrow.benchmarks
 
 import arrow.effects.IO
 import arrow.effects.suspended.fx.Fx
-import org.openjdk.jmh.annotations.*
-import io.reactivex.Single
-import org.openjdk.jmh.annotations.*
-import reactor.core.publisher.Mono
+import org.openjdk.jmh.annotations.Benchmark
+import org.openjdk.jmh.annotations.CompilerControl
+import org.openjdk.jmh.annotations.Fork
+import org.openjdk.jmh.annotations.Measurement
+import org.openjdk.jmh.annotations.Param
+import org.openjdk.jmh.annotations.Scope
+import org.openjdk.jmh.annotations.State
+import org.openjdk.jmh.annotations.Warmup
 import java.util.concurrent.TimeUnit
 
 @State(Scope.Thread)
@@ -30,7 +34,7 @@ open class LeftBind {
     if (i % depth == 0) IO { i + 1 }.flatMap { ioLoop(it) }
     else if (i < size) ioLoop(i + 1).flatMap { i -> IO.just(i) }
     else IO.just(i)
-  
+
   @Benchmark
   fun fx(): Int =
     Fx.unsafeRunBlocking(Fx.just(0).flatMap { fxLoop(it) })
@@ -38,7 +42,7 @@ open class LeftBind {
   @Benchmark
   fun io(): Int =
     IO.just(0).flatMap { ioLoop(it) }.unsafeRunSync()
-  
+
   @Benchmark
   fun catsIO(): Int =
     arrow.benchmarks.effects.scala.cats.`LeftBind$`.`MODULE$`.unsafeIOLeftBindLoop(depth, size, 0)
@@ -66,6 +70,4 @@ open class LeftBind {
 //  @Benchmark
 //  fun single(): Int =
 //    Single.just(0).flatMap { singleLoop(it) }.blockingGet()
-
-
 }

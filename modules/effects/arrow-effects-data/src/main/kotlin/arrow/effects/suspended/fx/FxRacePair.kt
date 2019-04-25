@@ -28,7 +28,7 @@ fun <A, B> Fx.Companion.racePair(ctx: CoroutineContext, fa: FxOf<A>, fb: FxOf<B>
 
     FxRunLoop.startCancelable(fa, connA, ctx) { either ->
       either.fold({ error ->
-        if (active.getAndSet(false)) { //if an error finishes first, stop the race.
+        if (active.getAndSet(false)) { // if an error finishes first, stop the race.
           FxRunLoop.start(connB.cancel()) { r2 ->
             conn.pop()
             cb(Left(r2.fold({ Platform.composeErrors(error, it) }, { error })))
@@ -48,7 +48,7 @@ fun <A, B> Fx.Companion.racePair(ctx: CoroutineContext, fa: FxOf<A>, fb: FxOf<B>
 
     FxRunLoop.startCancelable(fb, connB, ctx) { either ->
       either.fold({ error ->
-        if (active.getAndSet(false)) { //if an error finishes first, stop the race.
+        if (active.getAndSet(false)) { // if an error finishes first, stop the race.
           FxRunLoop.start(connA.cancel()) { r2 ->
             conn.pop()
             cb(Left(r2.fold({ Platform.composeErrors(error, it) }, { error })))
@@ -65,5 +65,4 @@ fun <A, B> Fx.Companion.racePair(ctx: CoroutineContext, fa: FxOf<A>, fb: FxOf<B>
         }
       })
     }
-
   }

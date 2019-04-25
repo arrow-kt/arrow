@@ -2,7 +2,7 @@ package arrow.effects.suspended.fx
 
 import arrow.core.Either
 import arrow.core.nonFatalOrThrow
-import arrow.effects.*
+import arrow.effects.CancelToken
 import arrow.effects.internal.Platform
 import arrow.effects.typeclasses.Bracket
 import arrow.effects.typeclasses.Concurrent
@@ -70,11 +70,11 @@ import java.util.concurrent.atomic.AtomicBoolean
  * }
  *  ```
  */
-fun <A, B> FxOf<A>.
-  bracketCase(release: (A, ExitCase<Throwable>) -> FxOf<Unit>, use: (A) -> FxOf<B>): Fx<B> =
+fun <A, B> FxOf<A>
+  .bracketCase(release: (A, ExitCase<Throwable>) -> FxOf<Unit>, use: (A) -> FxOf<B>): Fx<B> =
   Fx.async { conn, cb ->
     val forwardCancel = FxForwardCancelable()
-    conn.push(forwardCancel.cancel()) //Connect ForwardCancelable to existing connection.
+    conn.push(forwardCancel.cancel()) // Connect ForwardCancelable to existing connection.
 
     if (conn.isNotCanceled()) FxRunLoop.start(fix(), cb = BracketStart(use, release, conn, forwardCancel, cb))
     else forwardCancel.complete(Fx.unit)
@@ -86,7 +86,8 @@ internal class BracketStart<A, B>(
   val release: (A, ExitCase<Throwable>) -> FxOf<Unit>,
   val conn: FxConnection,
   val forwardCancel: FxForwardCancelable,
-  val cb: (Either<Throwable, B>) -> Unit) : (Either<Throwable, A>) -> Unit {
+  val cb: (Either<Throwable, B>) -> Unit
+) : (Either<Throwable, A>) -> Unit {
 
   private val called = AtomicBoolean(false)
 

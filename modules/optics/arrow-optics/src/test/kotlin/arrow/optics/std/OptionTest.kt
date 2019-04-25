@@ -1,17 +1,22 @@
 package arrow.optics
 
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Option
+import arrow.core.Right
 import arrow.core.extensions.monoid
 import arrow.core.extensions.either.applicative.applicative
 import arrow.core.extensions.option.monoid.monoid
+import arrow.core.fix
 import arrow.test.UnitSpec
-import arrow.test.generators.*
+import arrow.test.generators.either
+import arrow.test.generators.functionAToB
+import arrow.test.generators.option
 import arrow.test.laws.IsoLaws
 import arrow.test.laws.PrismLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.properties.Gen
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
 @RunWith(KotlinTestRunner::class)
@@ -61,6 +66,5 @@ class OptionTest : UnitSpec() {
         override fun empty(): Either<Unit, Int> = Right(0)
       }
     ))
-
   }
 }

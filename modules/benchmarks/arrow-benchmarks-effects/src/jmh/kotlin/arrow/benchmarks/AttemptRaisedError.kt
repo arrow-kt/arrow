@@ -1,12 +1,15 @@
 package arrow.benchmarks
 
-import arrow.benchmarks.effects.scala.zio.ZIORTS
-import arrow.core.Either
 import arrow.effects.IO
-import arrow.effects.extensions.fx.unsafeRun.runBlocking
-import arrow.effects.suspended.fx.*
-import arrow.unsafe
-import org.openjdk.jmh.annotations.*
+import arrow.effects.suspended.fx.Fx
+import org.openjdk.jmh.annotations.Benchmark
+import org.openjdk.jmh.annotations.CompilerControl
+import org.openjdk.jmh.annotations.Fork
+import org.openjdk.jmh.annotations.Measurement
+import org.openjdk.jmh.annotations.Param
+import org.openjdk.jmh.annotations.Scope
+import org.openjdk.jmh.annotations.State
+import org.openjdk.jmh.annotations.Warmup
 import java.util.concurrent.TimeUnit
 
 val dummy = object : RuntimeException("dummy") {
@@ -53,6 +56,4 @@ open class AttemptRaisedError {
   @Benchmark
   fun zio(): Any =
     arrow.benchmarks.effects.scala.zio.AttemptRaisedError.run(size)
-
-
 }

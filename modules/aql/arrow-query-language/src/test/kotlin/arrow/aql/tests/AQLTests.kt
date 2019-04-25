@@ -109,7 +109,7 @@ class AQLTests : UnitSpec() {
       }.value() shouldBe listOf(30, 20, 10)
     }
 
-    "AQL is able to `groupBy` and then orderBy `keys`"{
+    "AQL is able to `groupBy` and then orderBy `keys`" {
       listOf(john, jane, jack).query {
         selectAll() where { age > 30 } groupBy { age } orderMap Ord.Desc(Int.order())
       }.value() shouldBe mapOf(32 to listOf(jane, jack))

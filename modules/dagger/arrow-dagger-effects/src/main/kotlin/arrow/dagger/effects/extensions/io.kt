@@ -1,6 +1,7 @@
 package arrow.dagger.effects.extensions
 
-import arrow.effects.*
+import arrow.effects.ForIO
+import arrow.effects.IO
 import arrow.effects.extensions.IOMonoid
 import arrow.effects.extensions.IOSemigroup
 import arrow.effects.extensions.io.applicative.applicative
@@ -16,7 +17,13 @@ import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Bracket
 import arrow.effects.typeclasses.Effect
 import arrow.effects.typeclasses.MonadDefer
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadError
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.Semigroup
 import dagger.Module
 import dagger.Provides
 import javax.inject.Inject
@@ -50,7 +57,6 @@ class IOInstances {
 
   @Provides
   fun ioEffect(): Effect<ForIO> = IO.effect()
-
 }
 
 class DaggerIOSemigroup<A> @Inject constructor(val monoidA: Monoid<A>) : IOSemigroup<A> {

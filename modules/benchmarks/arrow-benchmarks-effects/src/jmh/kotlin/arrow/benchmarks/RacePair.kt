@@ -9,7 +9,14 @@ import arrow.effects.extensions.fx.applicative.map
 import arrow.effects.racePair
 import arrow.effects.suspended.fx.Fx
 import arrow.effects.suspended.fx.racePair
-import org.openjdk.jmh.annotations.*
+import org.openjdk.jmh.annotations.Benchmark
+import org.openjdk.jmh.annotations.CompilerControl
+import org.openjdk.jmh.annotations.Fork
+import org.openjdk.jmh.annotations.Measurement
+import org.openjdk.jmh.annotations.Param
+import org.openjdk.jmh.annotations.Scope
+import org.openjdk.jmh.annotations.State
+import org.openjdk.jmh.annotations.Warmup
 import java.util.concurrent.TimeUnit
 
 @State(Scope.Thread)
@@ -45,5 +52,4 @@ open class RacePair {
 
   @Benchmark
   fun fx(): Int = Fx.unsafeRunBlocking(fxRacePairHelper())
-
 }

@@ -189,7 +189,7 @@ Some(1).map { it + 1 }
 Вычисление с использованиеми независимых друг от друга значений
 
 ```kotlin:ank
-import arrow.core.extensions.option.applicative.*
+import arrow.core.extensions.option.apply.*
 
 tupled(Some(1), Some("Hello"), Some(20.0))
 ```

@@ -5,7 +5,13 @@ import arrow.core.Option
 import arrow.core.Some
 import arrow.effects.IO
 import arrow.effects.suspended.fx.Fx
-import org.openjdk.jmh.annotations.*
+import org.openjdk.jmh.annotations.Benchmark
+import org.openjdk.jmh.annotations.CompilerControl
+import org.openjdk.jmh.annotations.Fork
+import org.openjdk.jmh.annotations.Measurement
+import org.openjdk.jmh.annotations.Scope
+import org.openjdk.jmh.annotations.State
+import org.openjdk.jmh.annotations.Warmup
 import java.util.concurrent.TimeUnit
 
 @State(Scope.Thread)
@@ -56,7 +62,6 @@ open class MapStream {
   @Benchmark
   fun catsBatch120(): Long =
     arrow.benchmarks.effects.scala.cats.`MapStream$`.`MODULE$`.test(12000 / 120, 120)
-
 }
 
 object FxStream {

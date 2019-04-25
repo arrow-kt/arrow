@@ -2,11 +2,43 @@ package arrow.effects.extensions
 
 import arrow.Kind
 import arrow.core.Either
-import arrow.effects.*
 import arrow.effects.internal.asyncContinuation
-import arrow.effects.typeclasses.*
+import arrow.effects.ForIO
+import arrow.effects.IO
+import arrow.effects.IOOf
+import arrow.effects.OnCancel
+import arrow.effects.fix
+import arrow.effects.racePair
+import arrow.effects.raceTriple
+import arrow.effects.toIOProc
+import arrow.effects.toIOProcF
+import arrow.effects.typeclasses.Async
+import arrow.effects.typeclasses.Bracket
+import arrow.effects.typeclasses.Concurrent
+import arrow.effects.typeclasses.ConcurrentEffect
+import arrow.effects.typeclasses.ConnectedProc
+import arrow.effects.typeclasses.ConnectedProcF
+import arrow.effects.typeclasses.Dispatchers
+import arrow.effects.typeclasses.Disposable
+import arrow.effects.typeclasses.Effect
+import arrow.effects.typeclasses.ExitCase
+import arrow.effects.typeclasses.Fiber
+import arrow.effects.typeclasses.MonadDefer
+import arrow.effects.typeclasses.Proc
+import arrow.effects.typeclasses.ProcF
+import arrow.effects.typeclasses.RacePair
+import arrow.effects.typeclasses.RaceTriple
+import arrow.effects.typeclasses.UnsafeRun
 import arrow.extension
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Apply
+import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadError
+import arrow.typeclasses.MonadThrow
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.Semigroup
 import arrow.unsafe
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -19,6 +51,15 @@ import arrow.effects.fork as ioStart
 interface IOFunctor : Functor<ForIO> {
   override fun <A, B> IOOf<A>.map(f: (A) -> B): IO<B> =
     fix().map(f)
+}
+
+@extension
+interface IOApply : Apply<ForIO> {
+  override fun <A, B> IOOf<A>.map(f: (A) -> B): IO<B> =
+    fix().map(f)
+
+  override fun <A, B> IOOf<A>.ap(ff: IOOf<(A) -> B>): IO<B> =
+    ioAp(ff)
 }
 
 @extension
@@ -146,7 +187,6 @@ interface IOConcurrent : Concurrent<ForIO>, IOAsync {
 
   override fun <A, B, C> CoroutineContext.raceTriple(fa: Kind<ForIO, A>, fb: Kind<ForIO, B>, fc: Kind<ForIO, C>): IO<RaceTriple<ForIO, A, B, C>> =
     IO.raceTriple(this, fa, fb, fc)
-
 }
 
 fun IO.Companion.concurrent(dispatchers: Dispatchers<ForIO>): Concurrent<ForIO> = object : IOConcurrent {
@@ -187,7 +227,6 @@ interface IOMonoid<A> : Monoid<IO<A>>, IOSemigroup<A> {
   fun SM(): Monoid<A>
 
   override fun empty(): IO<A> = IO.just(SM().empty())
-
 }
 
 @extension
@@ -197,5 +236,4 @@ interface IOUnsafeRun : UnsafeRun<ForIO> {
 
   override suspend fun <A> unsafe.runNonBlocking(fa: () -> Kind<ForIO, A>, cb: (Either<Throwable, A>) -> Unit) =
     fa().fix().unsafeRunAsync(cb)
-
 }

@@ -1,10 +1,12 @@
 package arrow.effects.internal
 
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
 import arrow.effects.IO
 import arrow.effects.KindConnection
 import arrow.effects.typeclasses.Duration
-import java.util.*
 import java.util.concurrent.Executor
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.locks.AbstractQueuedSynchronizer
@@ -22,6 +24,7 @@ private const val chunkSize: Int = 8
 
 object Platform {
 
+  @Suppress("UNCHECKED_CAST")
   class ArrayStack<A> {
 
     private val initialArray: Array<Any?> = arrayOfNulls<Any?>(chunkSize)
@@ -190,14 +193,13 @@ object Platform {
     return first
   }
 
-
   inline fun trampoline(crossinline f: () -> Unit): Unit =
-    trampoline.get().execute(Runnable { f() })
+    _trampoline.get().execute(Runnable { f() })
 
   private val underlying = Executor { it.run() }
 
   @PublishedApi
-  internal val trampoline = ThreadLocal.withInitial {
+  internal val _trampoline = ThreadLocal.withInitial {
     TrampolineExecutor(underlying)
   }
 
@@ -207,7 +209,7 @@ object Platform {
     @Volatile
     private var withinLoop = false
 
-    private fun startLoop(runnable: Runnable): Unit {
+    private fun startLoop(runnable: Runnable) {
       withinLoop = true
       try {
         immediateLoop(runnable)
@@ -220,9 +222,9 @@ object Platform {
       if (!withinLoop) startLoop(runnable)
       else immediateQueue.push(runnable)
 
-    private fun forkTheRest(): Unit {
+    private fun forkTheRest() {
       class ResumeRun(val head: Runnable, val rest: Platform.ArrayStack<Runnable>) : Runnable {
-        override fun run(): Unit {
+        override fun run() {
           immediateQueue.pushAll(rest)
           immediateLoop(head)
         }
@@ -236,13 +238,13 @@ object Platform {
       }
     }
 
-    @Suppress("SwallowedException") //Should we rewrite with while??
-    private tailrec fun immediateLoop(task: Runnable): Unit {
+    @Suppress("SwallowedException") // Should we rewrite with while??
+    private tailrec fun immediateLoop(task: Runnable) {
       try {
         task.run()
       } catch (ex: Throwable) {
         forkTheRest()
-        //ex.nonFatalOrThrow() //not required???
+        // ex.nonFatalOrThrow() //not required???
       }
 
       val next = immediateQueue.pop()
@@ -250,7 +252,6 @@ object Platform {
       else Unit
     }
   }
-
 }
 
 private class OneShotLatch : AbstractQueuedSynchronizer() {
@@ -266,7 +267,6 @@ private class OneShotLatch : AbstractQueuedSynchronizer() {
     return true
   }
 }
-
 
 /**
  * [arrow.core.Continuation] to run coroutine on `ctx` and link result to callback [cc].
@@ -286,5 +286,4 @@ fun <A> asyncContinuation(
     override fun resumeWithException(exception: Throwable) {
       cc(Either.Left(exception))
     }
-
   }

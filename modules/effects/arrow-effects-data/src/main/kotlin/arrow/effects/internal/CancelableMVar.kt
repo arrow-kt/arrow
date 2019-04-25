@@ -1,7 +1,12 @@
 package arrow.effects.internal
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Right
+import arrow.core.Some
+import arrow.core.Tuple2
 import arrow.effects.CancelToken
 import arrow.effects.MVar
 import arrow.effects.typeclasses.Concurrent
@@ -232,5 +237,4 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, priva
   override fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B> = CF.run {
     this@map.map(f)
   }
-
 }

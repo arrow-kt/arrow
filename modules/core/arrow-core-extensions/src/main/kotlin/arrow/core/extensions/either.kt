@@ -1,11 +1,33 @@
 @file:Suppress("UnusedImports")
+
 package arrow.core.extensions
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.EitherOf
+import arrow.core.EitherPartialOf
+import arrow.core.Eval
+import arrow.core.ForEither
+import arrow.core.Left
+import arrow.core.Right
 import arrow.core.extensions.either.monad.monad
+import arrow.core.fix
 import arrow.extension
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Apply
+import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Bifunctor
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Hash
+import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadError
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.Semigroup
+import arrow.typeclasses.SemigroupK
+import arrow.typeclasses.Show
+import arrow.typeclasses.Traverse
 import arrow.typeclasses.suspended.monad.Fx
 import arrow.core.ap as eitherAp
 import arrow.core.combineK as eitherCombineK
@@ -57,6 +79,15 @@ interface EitherFunctor<L> : Functor<EitherPartialOf<L>> {
 interface EitherBifunctor : Bifunctor<ForEither> {
   override fun <A, B, C, D> EitherOf<A, B>.bimap(fl: (A) -> C, fr: (B) -> D): Either<C, D> =
     fix().bimap(fl, fr)
+}
+
+@extension
+interface EitherApply<L> : Apply<EitherPartialOf<L>>, EitherFunctor<L> {
+
+  override fun <A, B> EitherOf<L, A>.map(f: (A) -> B): Either<L, B> = fix().map(f)
+
+  override fun <A, B> EitherOf<L, A>.ap(ff: EitherOf<L, (A) -> B>): Either<L, B> =
+    fix().eitherAp(ff)
 }
 
 @extension
@@ -141,7 +172,6 @@ interface EitherEq<in L, in R> : Eq<Either<L, R>> {
       is Either.Right -> EQR().run { this@eqv.b.eqv(b.b) }
     }
   }
-
 }
 
 @extension

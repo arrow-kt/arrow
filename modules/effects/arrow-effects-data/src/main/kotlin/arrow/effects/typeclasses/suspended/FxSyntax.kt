@@ -1,12 +1,19 @@
 package arrow.effects.typeclasses.suspended
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.EitherOf
+import arrow.core.OptionOf
+import arrow.core.TryOf
+import arrow.core.fix
+import arrow.core.identity
 import arrow.data.extensions.list.traverse.traverse
 import arrow.data.fix
-import arrow.effects.typeclasses.*
+import arrow.effects.typeclasses.Concurrent
+import arrow.effects.typeclasses.ExitCase
+import arrow.effects.typeclasses.Fiber
 import arrow.typeclasses.suspended.BindSyntax
-import kotlin.coroutines.*
+import kotlin.coroutines.CoroutineContext
 
 interface FxSyntax<F> : Concurrent<F>, BindSyntax<F> {
 
@@ -63,8 +70,8 @@ interface FxSyntax<F> : Concurrent<F>, BindSyntax<F> {
   suspend fun <A> OptionOf<A>.getOrRaiseError(f: () -> Throwable): Kind<F, A> =
     this@getOrRaiseError.fromOption(f)
 
-  suspend fun <A, B> Either<B, A>.getOrRaiseError(f: (B) -> Throwable): Kind<F, A> =
-    this@getOrRaiseError.fromEither(f)
+  suspend fun <A, B> EitherOf<B, A>.getOrRaiseError(unit: Unit = Unit, f: (B) -> Throwable): Kind<F, A> =
+    this@getOrRaiseError.fix().fromEither(f)
 
   suspend fun <A> TryOf<A>.getOrRaiseError(f: (Throwable) -> Throwable): Kind<F, A> =
     this@getOrRaiseError.fromTry(f)
@@ -112,5 +119,4 @@ interface FxSyntax<F> : Concurrent<F>, BindSyntax<F> {
 
   fun <A> Iterable<Iterable<suspend () -> A>>.flatSequence(): Kind<F, List<A>> =
     flatten().sequence()
-
 }

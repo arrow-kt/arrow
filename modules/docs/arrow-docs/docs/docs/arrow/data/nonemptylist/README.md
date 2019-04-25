@@ -117,7 +117,7 @@ binding {
 ```kotlin:ank
 import arrow.data.*
 import java.util.*
-import arrow.data.extensions.nonemptylist.applicative.map
+import arrow.data.extensions.nonemptylist.apply.map
 
 data class Person(val id: UUID, val name: String, val year: Int)
 

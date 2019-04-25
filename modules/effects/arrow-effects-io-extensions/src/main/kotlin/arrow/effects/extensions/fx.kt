@@ -4,10 +4,34 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.effects.IODispatchers
 import arrow.effects.extensions.fx.dispatchers.dispatchers
-import arrow.effects.suspended.fx.*
-import arrow.effects.typeclasses.*
+import arrow.effects.suspended.fx.ForFx
+import arrow.effects.suspended.fx.Fx
+import arrow.effects.suspended.fx.FxOf
+import arrow.effects.suspended.fx.FxProc
+import arrow.effects.suspended.fx.FxProcF
+import arrow.effects.suspended.fx.fix
+import arrow.effects.suspended.fx.racePair
+import arrow.effects.suspended.fx.raceTriple
+import arrow.effects.typeclasses.Async
+import arrow.effects.typeclasses.Bracket
+import arrow.effects.typeclasses.Concurrent
+import arrow.effects.typeclasses.Dispatchers
+import arrow.effects.typeclasses.Environment
+import arrow.effects.typeclasses.ExitCase
+import arrow.effects.typeclasses.Fiber
+import arrow.effects.typeclasses.MonadDefer
+import arrow.effects.typeclasses.Proc
+import arrow.effects.typeclasses.ProcF
+import arrow.effects.typeclasses.RacePair
+import arrow.effects.typeclasses.RaceTriple
+import arrow.effects.typeclasses.UnsafeRun
 import arrow.extension
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadError
+import arrow.typeclasses.MonadThrow
 import arrow.unsafe
 import kotlin.coroutines.CoroutineContext
 import arrow.effects.suspended.fx.bracketCase as bracketC
@@ -40,7 +64,6 @@ interface FxEnvironment : Environment<ForFx> {
   override fun handleAsyncError(e: Throwable): Fx<Unit> =
     Fx { println("Found uncaught async exception!"); e.printStackTrace() }
 }
-
 
 @extension
 interface FxFunctor : Functor<ForFx> {
@@ -122,7 +145,6 @@ interface FxAsync : Async<ForFx>, FxMonadDefer {
 
   override fun <A> FxOf<A>.continueOn(ctx: CoroutineContext): Fx<A> =
     fix().continueOn(ctx)
-
 }
 
 @extension
