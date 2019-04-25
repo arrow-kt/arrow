@@ -25,6 +25,7 @@ interface FunctorFilter<F> : Functor<F> {
   /**
    * Similar to mapFilter but uses a partial function instead of a function that returns an Option.
    */
+  @Deprecated("PartialFunction is an incomplete experiment due for removal. See https://github.com/arrow-kt/arrow/pull/1419#issue-273308228")
   fun <A, B> Kind<F, A>.collect(f: PartialFunction<A, B>): Kind<F, B> =
     mapFilter(f.lift())
 
