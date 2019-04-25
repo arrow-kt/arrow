@@ -1,7 +1,13 @@
 package arrow.test.laws
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Left
+import arrow.core.Right
+import arrow.core.Try
+import arrow.core.handleError
+import arrow.core.left
+import arrow.core.right
 import arrow.data.extensions.list.foldable.foldLeft
 import arrow.data.k
 import arrow.effects.data.internal.BindingCancellationException
