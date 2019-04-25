@@ -2,13 +2,13 @@ package arrow.data.fingertree.internal
 
 import arrow.data.fingertree.FingerTree
 
-internal sealed class Affix<A> {
+internal sealed class Affix<T> {
   data class One<A>(val a: A) : Affix<A>()
   data class Two<A>(val a: A, val b: A) : Affix<A>()
   data class Three<A>(val a: A, val b: A, val c: A) : Affix<A>()
   data class Four<A>(val a: A, val b: A, val c: A, val d: A) : Affix<A>()
 
-  fun append(item: A): Affix<A> =
+  fun append(item: T): Affix<T> =
     when (this) {
       is One -> Two(this.a, item)
       is Two -> Three(this.a, this.b, item)
@@ -16,7 +16,7 @@ internal sealed class Affix<A> {
       is Four -> throw RuntimeException("Cannot append to affix four")
     }
 
-  fun prepend(item: A): Affix<A> =
+  fun prepend(item: T): Affix<T> =
     when (this) {
       is One -> Two(item, this.a)
       is Two -> Three(item, this.a, this.b)
@@ -24,7 +24,7 @@ internal sealed class Affix<A> {
       is Four -> throw RuntimeException("Cannot append to affix four")
     }
 
-  fun toFingerTree(): FingerTree<A> =
+  fun toFingerTree(): FingerTree<T> =
     when (this) {
       is One -> FingerTree.Single(this.a)
       is Two -> FingerTree.Deep(One(this.a), FingerTree.Empty(), One(this.b))
@@ -32,7 +32,7 @@ internal sealed class Affix<A> {
       is Four -> FingerTree.Deep(Three(this.a, this.b, this.c), FingerTree.Empty(), One(this.d))
     }
 
-  fun head(): A =
+  fun head(): T =
     when (this) {
       is One -> this.a
       is Two -> this.a
@@ -40,7 +40,7 @@ internal sealed class Affix<A> {
       is Four -> this.a
     }
 
-  fun last(): A =
+  fun last(): T =
     when (this) {
       is One -> this.a
       is Two -> this.b
@@ -48,7 +48,7 @@ internal sealed class Affix<A> {
       is Four -> this.d
     }
 
-  fun dropHead(): Affix<A> =
+  fun dropHead(): Affix<T> =
     when (this) {
       is One -> throw RuntimeException("Cannot drop head")
       is Two -> One(this.b)
@@ -56,7 +56,7 @@ internal sealed class Affix<A> {
       is Four -> Three(this.b, this.c, this.d)
     }
 
-  fun dropLast(): Affix<A> =
+  fun dropLast(): Affix<T> =
     when (this) {
       is One -> throw RuntimeException("Cannot drop head")
       is Two -> One(this.a)
