@@ -134,7 +134,7 @@ internal object IOBracket {
     override operator fun invoke(a: B): IO<B> =
     // Unregistering cancel token, otherwise we can have a memory leak
     // N.B. conn.pop() happens after the evaluation of `release`, because
-      // otherwise we might have a conflict with the auto-cancellation logic
+    // otherwise we might have a conflict with the auto-cancellation logic
       IO.ContextSwitch(applyRelease(ExitCase.Completed), IO.ContextSwitch.makeUncancelable, disableUncancelableAndPop)
         .map { a }
   }
