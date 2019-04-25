@@ -51,8 +51,6 @@ internal object IOBracket {
     private var result: Either<Throwable, A>? = null
 
     override fun invoke(ea: Either<Throwable, A>) {
-      if (result != null) throw IllegalStateException("callback called multiple times!")
-
       // Introducing a light async boundary, otherwise executing the required
       // logic directly will yield a StackOverflowException
       Platform.trampoline {

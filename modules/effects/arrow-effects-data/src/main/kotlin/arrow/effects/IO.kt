@@ -16,7 +16,6 @@ import arrow.effects.internal.IOBracket
 import arrow.effects.internal.Platform.maxStackDepthSize
 import arrow.effects.internal.Platform.onceOnly
 import arrow.effects.internal.Platform.unsafeResync
-import arrow.effects.internal.guaranteeCase
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.Duration
 import arrow.effects.typeclasses.ExitCase
@@ -171,7 +170,7 @@ sealed class IO<out A> : IOOf<A> {
   fun guarantee(finalizer: IOOf<Unit>): IO<A> = guaranteeCase { finalizer }
 
   fun guaranteeCase(finalizer: (ExitCase<Throwable>) -> IOOf<Unit>): IO<A> =
-    guaranteeCase(this, finalizer)
+    IOBracket.guaranteeCase(this, finalizer)
 
   internal data class Pure<out A>(val a: A) : IO<A>() {
     // Pure can be replaced by its value
