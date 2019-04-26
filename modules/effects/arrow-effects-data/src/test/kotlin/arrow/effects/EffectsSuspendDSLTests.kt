@@ -13,13 +13,11 @@ import arrow.core.Left
 import arrow.core.Option
 import arrow.core.Right
 import arrow.core.Try
+import arrow.core.Tuple2
 import arrow.core.identity
 import arrow.core.left
 import arrow.core.none
 import arrow.core.right
-import arrow.effects.extensions.io.fx.fx
-import arrow.effects.extensions.io.unsafeRun.runBlocking
-import arrow.effects.extensions.io.unsafeRun.unsafeRun
 import arrow.effects.typeclasses.UnsafeRun
 import arrow.test.UnitSpec
 import arrow.unsafe
@@ -27,8 +25,15 @@ import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldThrow
 import kotlinx.coroutines.ObsoleteCoroutinesApi
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.newSingleThreadContext
 import org.junit.runner.RunWith
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.SynchronousQueue
+import java.util.concurrent.ThreadFactory
+import java.util.concurrent.ThreadPoolExecutor
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 
 @ObsoleteCoroutinesApi
@@ -72,6 +77,16 @@ class EffectsSuspendDSLTests : UnitSpec() {
       unsafe { runBlocking { program } } shouldBe helloWorld
     }
 
+    class CountingThreadFactory(val name: String) : ThreadFactory {
+      private val counter = AtomicInteger()
+      override fun newThread(r: Runnable): Thread =
+        Thread(r, "$name-${counter.getAndIncrement()}")
+    }
+
+    // Creates a ExecutorService that uses every thread only once, so every task is scheduled on a differently numbered Thread.
+    fun newTestingScheduler(name: String): ExecutorService =
+      ThreadPoolExecutor(0, 2, 0, TimeUnit.MILLISECONDS, SynchronousQueue<Runnable>(), CountingThreadFactory(name))
+
     "Fx stack safe on `!effect`" {
       val program = fx {
         val rs: List<Int> = (1..50000).toList()
@@ -84,11 +99,11 @@ class EffectsSuspendDSLTests : UnitSpec() {
         }
         // note how the receiving value is typed in the environment and not inside IO despite being effectful and
         // non-blocking parallel computations
-        val result: List<String> = !NonBlocking.parMapN(
-          effect { getThreadName() },
-          effect { getThreadName() }
-        ) { a, b -> listOf(a, b) }
-        effect { println(result) }
+        val result: Tuple2<String, String> = !newTestingScheduler("test").asCoroutineDispatcher().parMapN(
+          effect { Thread.currentThread().name },
+          effect { Thread.currentThread().name }
+        ) { a, b -> Tuple2(a, b) }
+        !effect { result shouldBe Tuple2("test-0", "test-1") }
         result
       }
       unsafe { runBlocking { program } }
