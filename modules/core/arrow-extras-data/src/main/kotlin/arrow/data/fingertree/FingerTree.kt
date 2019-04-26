@@ -100,6 +100,15 @@ sealed class FingerTree<T> {
       }
     }
 
+  fun head() = this.viewL().flatMap { Option.just(it.a) }
+  fun tail() = this.viewL().flatMap { Option.just(it.b) }
+
+  fun last(): Option<T> =
+    this.viewR().flatMap { Option.just(it.a) }
+
+  fun init(): Option<FingerTree<T>> =
+    this.viewR().flatMap { Option.just(it.b) }
+
   fun isEmpty() = this is Empty
 
   fun asList(): List<T> = this.asListHelper(emptyList(), this)
@@ -171,11 +180,12 @@ sealed class FingerTree<T> {
 
     fun <A> fromList(list: List<A>): FingerTree<A> {
       var fingerTree = empty<A>()
-      list.forEach {
-        fingerTree = fingerTree.append(it)
+      for (i in 0 until list.size) {
+        fingerTree = fingerTree.append(list[i])
       }
       return fingerTree
     }
+
 
     fun <A> fromArgs(vararg items: A): FingerTree<A> =
       fromList(items.toList())
