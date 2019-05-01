@@ -20,7 +20,6 @@ import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.newSingleThreadContext
-import arrow.core.handleError as tryHandleError
 
 object MonadDeferLaws {
 
@@ -233,7 +232,7 @@ object MonadDeferLaws {
         val (c) = just(b + 1)
         c
       }
-      Try { Thread.sleep(10); dispose() }.tryHandleError { throw it }
+      Try { Thread.sleep(10); dispose() }.toEither().mapLeft { throw it }
       binding.equalUnderTheLaw(raiseError(BindingCancellationException()), EQ) && sideEffect.counter == 0
     }
 
@@ -246,7 +245,7 @@ object MonadDeferLaws {
         val b = bindDefer { Thread.sleep(20); sideEffect.increment(); a + 1 }
         b
       }
-      Try { Thread.sleep(10); dispose() }.tryHandleError { throw it }
+      Try { Thread.sleep(10); dispose() }.toEither().mapLeft { throw it }
       binding.equalUnderTheLaw(raiseError(BindingCancellationException()), EQ) &&
         sideEffect.counter == 0
     }
@@ -261,7 +260,7 @@ object MonadDeferLaws {
         val (c) = just(b + 1)
         c
       }
-      Try { Thread.sleep(10); dispose() }.tryHandleError { throw it }
+      Try { Thread.sleep(10); dispose() }.toEither().mapLeft { throw it }
       binding.equalUnderTheLaw(raiseError(BindingCancellationException()), EQ) && sideEffect.counter == 0
     }
 
@@ -274,7 +273,7 @@ object MonadDeferLaws {
         val b = bindIn(Dispatchers.Default) { Thread.sleep(20); sideEffect.increment(); a + 1 }
         b
       }
-      Try { Thread.sleep(10); dispose() }.tryHandleError { throw it }
+      Try { Thread.sleep(10); dispose() }.toEither().mapLeft { throw it }
       binding.equalUnderTheLaw(raiseError(BindingCancellationException()), EQ) &&
         sideEffect.counter == 0
     }
