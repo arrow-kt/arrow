@@ -98,15 +98,15 @@ lotteryTry.filter {
 }
 ```
 
-We can also use `recover` which allow us to recover from a particular error (we receive the error and have to return a new value):
+We can also use `handleError` which allow us to recover from a particular error (we receive the error and have to return a new value):
 
 ```kotlin:ank
-lotteryTry.recover { exception ->
+lotteryTry.handleError { exception ->
     emptyList()
 }
 ```
 
-Or if you have another different computation that can also fail, you can use `recoverWith` to recover from an error (as you do with `recover`, but in this case, returning a new `Try`):
+Or if you have another different computation that can also fail, you can use `handleErrorWith` to recover from an error (as you do with `handleError`, but in this case, returning a new `Try`):
 
 ```kotlin:ank
 enum class Source {
@@ -119,7 +119,7 @@ fun getLotteryNumbers(source: Source): List<String> {
     return getLotteryNumbersFromCloud()
 }
 
-Try { getLotteryNumbers(Source.NETWORK) }.recoverWith {
+Try { getLotteryNumbers(Source.NETWORK) }.handleErrorWith {
     Try { getLotteryNumbers(Source.CACHE) }
 }
 ```

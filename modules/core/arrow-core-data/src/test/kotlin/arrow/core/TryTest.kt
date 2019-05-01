@@ -69,15 +69,15 @@ class TryTest : UnitSpec() {
       val throwable1 = Exception("foo")
       val throwable2 = Exception("bar")
 
-      Try.raise(throwable1) shouldBe Try.raise(throwable1).combine(String.monoid(), Try.raise(throwable2))
+      Try.raiseError(throwable1) shouldBe Try.raiseError(throwable1).combine(String.monoid(), Try.raiseError(throwable2))
     }
 
     "combine a Success and a Failure should return Failure" {
       val throwable = Exception("foo")
       val string = "String"
 
-      Try.raise(throwable) shouldBe Try.raise(throwable).combine(String.monoid(), Try.just(string))
-      Try.raise(throwable) shouldBe Try.just(string).combine(String.monoid(), Try.raise(throwable))
+      Try.raiseError(throwable) shouldBe Try.raiseError(throwable).combine(String.monoid(), Try.just(string))
+      Try.raiseError(throwable) shouldBe Try.just(string).combine(String.monoid(), Try.raiseError(throwable))
     }
 
     "invoke of any should be success" {
@@ -144,15 +144,15 @@ class TryTest : UnitSpec() {
       failure1.orNull() shouldBe null
     }
 
-    "recoverWith should modify Failure entity" {
-      Success(1).recoverWith { Failure(Exception()) } shouldBe Success(1)
-      Success(1).recoverWith { Success(2) } shouldBe Success(1)
-      Failure(Exception()).recoverWith { Success(2) } shouldBe Success(2)
+    "handleErrorWith should modify Failure entity" {
+      Success(1).handleErrorWith { Failure(Exception()) } shouldBe Success(1)
+      Success(1).handleErrorWith { Success(2) } shouldBe Success(1)
+      Failure(Exception()).handleErrorWith { Success(2) } shouldBe Success(2)
     }
 
-    "recover should modify Failure value" {
-      Success(1).recover { 2 } shouldBe Success(1)
-      Failure(Exception()).recover { 2 } shouldBe Success(2)
+    "handleError should modify Failure value" {
+      Success(1).handleError { 2 } shouldBe Success(1)
+      Failure(Exception()).handleError { 2 } shouldBe Success(2)
     }
 
     "toEither with onLeft should return Either.Right with correct right value if Try is Success" {
