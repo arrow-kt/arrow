@@ -283,7 +283,7 @@ class FingerTreeTest : StringSpec() {
       Empty<Int>().isEmpty() shouldBe true
     }
 
-    "isEmpty() shoudl return false when the finger tree has one element" {
+    "isEmpty() should return false when the finger tree has one element" {
       Single(1).isEmpty() shouldBe false
     }
 
