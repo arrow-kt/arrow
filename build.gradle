@@ -35,7 +35,6 @@ buildscript {
         projectReactorVersion = '3.2.6.RELEASE'
         retrofitVersion = '2.5.0'
         rxJavaVersion = '2.2.7'
-        mockkVersion = '1.9.3'
     }
 
     repositories {

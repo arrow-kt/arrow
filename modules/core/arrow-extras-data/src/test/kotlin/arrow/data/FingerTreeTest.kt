@@ -1,19 +1,16 @@
 package arrow.data
 
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.Tuple2
+import arrow.core.*
 import arrow.data.fingertree.internal.Affix.*
 import arrow.data.fingertree.FingerTree
 import arrow.data.fingertree.FingerTree.*
 import arrow.data.fingertree.internal.Node
 import arrow.data.fingertree.internal.Node.Branch2
 import arrow.data.fingertree.internal.Node.Branch3
+import io.kotlintest.properties.Gen
+import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.StringSpec
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
 
 class FingerTreeTest : StringSpec() {
 
@@ -41,14 +38,22 @@ class FingerTreeTest : StringSpec() {
       fingerTree.prepend(5) shouldBe Deep(Four(5, 1, 2, 3), Empty(), One(4))
     }
 
+
     "prepend() should create a finger tree with the new affix, the result of the prepend on the deeper tree and the same suffix when the prefix has four elements" {
-      val mockDeeperFingerTree = mockk<FingerTree<Node<Int>>>(relaxed = true)
-      val fingerTree = Deep(Four(1, 2, 3, 4), mockDeeperFingerTree, One(5))
+      val fingerTree = Deep(Four(1, 2, 3, 4), Empty(), One(5))
 
-      val dummyDeeperFingerTree: FingerTree<Node<Int>> = Single(Branch3(2, 3, 4))
-      every { mockDeeperFingerTree.prepend(any()) } returns dummyDeeperFingerTree
+      fingerTree.prepend(6) shouldBe Deep<Int>(Two(6, 1), Single(Branch3(2, 3, 4)), One(5))
+    }
 
-      fingerTree.prepend(6) shouldBe Deep(Two(6, 1), dummyDeeperFingerTree, One(5))
+    "Property based testing for prepend()" {
+
+      forAll(Gen.list(Gen.int())) { ints ->
+        var fingerTree: FingerTree<Int> = Empty()
+        ints.forEach {
+          fingerTree = fingerTree.prepend(it)
+        }
+        fingerTree.asList() == ints.reversed()
+      }
     }
 
     /**
@@ -74,13 +79,20 @@ class FingerTreeTest : StringSpec() {
     }
 
     "append() should create a finger tree with the same prefix, the result of the append on the deeper tree and the new suffix when the prefix has four elements" {
-      val mockDeeperFingerTree = mockk<FingerTree<Node<Int>>>(relaxed = true)
-      val fingerTree = Deep(One(1), mockDeeperFingerTree, Four(2, 3, 4, 5))
+      val fingerTree = Deep(One(1), Empty(), Four(2, 3, 4, 5))
 
-      val dummyDeeperFingerTree: FingerTree<Node<Int>> = Single(Branch3(2, 3, 4))
-      every { mockDeeperFingerTree.append(any()) } returns dummyDeeperFingerTree
+      fingerTree.append(6) shouldBe Deep<Int>(One(1), Single(Branch3(2, 3, 4)), Two(5, 6))
+    }
 
-      fingerTree.append(6) shouldBe Deep(One(1), dummyDeeperFingerTree, Two(5, 6))
+    "Property based testing for append()" {
+
+      forAll(Gen.list(Gen.int())) { ints ->
+        var fingerTree: FingerTree<Int> = Empty()
+        ints.forEach {
+          fingerTree = fingerTree.append(it)
+        }
+        fingerTree.asList() == ints
+      }
     }
 
     /**
@@ -105,34 +117,30 @@ class FingerTreeTest : StringSpec() {
       fingerTree.viewL() shouldBe Option.just(Tuple2(1, Deep(One(2), Empty(), Three(3, 4, 5))))
     }
 
-    "viewL() should call viewL() on the deeper finger tree when the finger tree has one prefix element" {
-      val mockDeeperFingerTree = mockk<FingerTree<Node<Int>>>()
-      val fingerTree = Deep(One(1), mockDeeperFingerTree, One(2))
-
-      every { mockDeeperFingerTree.viewL() } returns Option.empty()
-
-      fingerTree.viewL()
-
-      verify { mockDeeperFingerTree.viewL() }
+    "viewL() should return the prefix element and the affix as the remaining finger tree when the finger tree has one prefix element and an empty deeper finger tree" {
+      Deep(One(1), Empty(), One(2)).viewL() shouldBe Option.just(Tuple2(1, Single(2)))
     }
 
-    "viewL() should return the first element of the prefix and the suffix as the remaining finger tree when the prefix has one element and viewL() on the deeper finger tree returns None" {
-      val mockDeeperFingerTree = mockk<FingerTree<Node<Int>>>()
-      val fingerTree = Deep(One(1), mockDeeperFingerTree, One(2))
+    "viewL() should return the prefix element and a deep remaining finger tree when the finger tree has one prefix element and an none empty deeper finger tree" {
+      val fingerTree = Deep<Int>(One(1), Single(Branch2(1, 2)), One(2))
 
-      every { mockDeeperFingerTree.viewL() } returns Option.empty()
-
-      fingerTree.viewL() shouldBe Option.just(Tuple2(1, Single(2)))
+      fingerTree.viewL() shouldBe Option.just(Tuple2(1, Deep<Int>(Two(1, 2), Empty(), One(2))))
     }
 
-    "viewL() should return the first element of the prefix and the result of viewL() on the deeper finger tree when the prefix has one element and viewL() on the deeper finger tree returns a non empty result" {
-      val mockDeeperFingerTree = mockk<FingerTree<Node<Int>>>()
-      val fingerTree = Deep(One(1), mockDeeperFingerTree, One(2))
+    "Property based testing for viewL()" {
+      forAll(Gen.list(Gen.int())) { ints ->
+        val fingerTree = FingerTree.fromList(ints)
+        val viewLeftResultList = mutableListOf<Int>()
 
-      val remainingTree = Deep<Node<Int>>(One(Branch2(5, 6)), Empty(), One(Branch2(7, 8)))
-      every { mockDeeperFingerTree.viewL() } returns Option.just(Tuple2(Branch2(3, 4), remainingTree))
+        var viewLResult = fingerTree.viewL()
+        while (viewLResult is Some) {
 
-      fingerTree.viewL() shouldBe Option.just(Tuple2(1, Deep(Two(3, 4), remainingTree, One(2))))
+          viewLeftResultList.add(viewLResult.t.a)
+          viewLResult = viewLResult.t.b.viewL()
+        }
+
+        viewLeftResultList == ints
+      }
     }
 
     /**
@@ -157,34 +165,30 @@ class FingerTreeTest : StringSpec() {
       fingerTree.viewR() shouldBe Option.just(Tuple2(5, Deep(Three(1, 2, 3), Empty(), One(4))))
     }
 
-    "viewR() should call viewR() on the deeper finger tree when the finger tree has one suffix element" {
-      val mockDeeperFingerTree = mockk<FingerTree<Node<Int>>>()
-      val fingerTree = Deep(One(1), mockDeeperFingerTree, One(2))
-
-      every { mockDeeperFingerTree.viewR() } returns Option.empty()
-
-      fingerTree.viewR()
-
-      verify { mockDeeperFingerTree.viewR() }
+    "viewR() should return the suffix element and the prefix as the remaining finger tree when the finger tree has one affix element and an empty deeper finger tree" {
+      Deep(One(1), Empty(), One(2)).viewR() shouldBe Option.just(Tuple2(2, Single(1)))
     }
 
-    "viewR() should return the last element of the suffix and the prefix as the remaining finger tree when the suffix has one element and viewR() on the deeper finger tree returns None" {
-      val mockDeeperFingerTree = mockk<FingerTree<Node<Int>>>()
-      val fingerTree = Deep(One(1), mockDeeperFingerTree, One(2))
+    "viewR() should return the affix element and a deep remaining finger tree when the finger tree has one affix element and an none empty deeper finger tree" {
+      val fingerTree = Deep<Int>(One(1), Single(Branch2(1, 2)), One(2))
 
-      every { mockDeeperFingerTree.viewR() } returns Option.empty()
-
-      fingerTree.viewR() shouldBe Option.just(Tuple2(2, Single(1)))
+      fingerTree.viewR() shouldBe Option.just(Tuple2(2, Deep(One(1), Empty() ,Two(1,2))))
     }
 
-    "viewR() should return the last element of the suffix and the result of viewR() on the deeper finger tree when the suffix has one element and viewR() on the deeper finger tree returns a non empty result" {
-      val mockDeeperFingerTree = mockk<FingerTree<Node<Int>>>()
-      val fingerTree = Deep(One(1), mockDeeperFingerTree, One(2))
+    "Property based testing for viewR()" {
+      forAll(Gen.list(Gen.int())) { ints ->
+        val fingerTree = FingerTree.fromList(ints)
+        val viewLeftResultList = mutableListOf<Int>()
 
-      val remainingTree = Deep<Node<Int>>(One(Branch2(5, 6)), Empty(), One(Branch2(7, 8)))
-      every { mockDeeperFingerTree.viewR() } returns Option.just(Tuple2(Branch2(3, 4), remainingTree))
+        var viewRResult = fingerTree.viewR()
+        while (viewRResult is Some) {
 
-      fingerTree.viewR() shouldBe Option.just(Tuple2(2, Deep(One(1), remainingTree, Two(3, 4))))
+          viewLeftResultList.add(viewRResult.t.a)
+          viewRResult = viewRResult.t.b.viewR()
+        }
+
+        viewLeftResultList == ints.reversed()
+      }
     }
 
     /**
