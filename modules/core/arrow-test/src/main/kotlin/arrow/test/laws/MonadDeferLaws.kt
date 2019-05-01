@@ -5,7 +5,6 @@ import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
 import arrow.core.Try
-import arrow.core.handleError
 import arrow.core.left
 import arrow.core.right
 import arrow.data.extensions.list.foldable.foldLeft
@@ -21,6 +20,7 @@ import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.newSingleThreadContext
+import arrow.core.handleError as tryHandleError
 
 object MonadDeferLaws {
 
@@ -233,7 +233,7 @@ object MonadDeferLaws {
         val (c) = just(b + 1)
         c
       }
-      Try { Thread.sleep(10); dispose() }.handleError { throw it }
+      Try { Thread.sleep(10); dispose() }.tryHandleError { throw it }
       binding.equalUnderTheLaw(raiseError(BindingCancellationException()), EQ) && sideEffect.counter == 0
     }
 
@@ -246,7 +246,7 @@ object MonadDeferLaws {
         val b = bindDefer { Thread.sleep(20); sideEffect.increment(); a + 1 }
         b
       }
-      Try { Thread.sleep(10); dispose() }.handleError { throw it }
+      Try { Thread.sleep(10); dispose() }.tryHandleError { throw it }
       binding.equalUnderTheLaw(raiseError(BindingCancellationException()), EQ) &&
         sideEffect.counter == 0
     }
@@ -261,7 +261,7 @@ object MonadDeferLaws {
         val (c) = just(b + 1)
         c
       }
-      Try { Thread.sleep(10); dispose() }.handleError { throw it }
+      Try { Thread.sleep(10); dispose() }.tryHandleError { throw it }
       binding.equalUnderTheLaw(raiseError(BindingCancellationException()), EQ) && sideEffect.counter == 0
     }
 
@@ -274,7 +274,7 @@ object MonadDeferLaws {
         val b = bindIn(Dispatchers.Default) { Thread.sleep(20); sideEffect.increment(); a + 1 }
         b
       }
-      Try { Thread.sleep(10); dispose() }.handleError { throw it }
+      Try { Thread.sleep(10); dispose() }.tryHandleError { throw it }
       binding.equalUnderTheLaw(raiseError(BindingCancellationException()), EQ) &&
         sideEffect.counter == 0
     }
