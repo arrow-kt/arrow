@@ -373,10 +373,10 @@ internal object IORunLoop {
     override operator fun invoke(either: Either<Throwable, Any?>) {
       if (canCall) {
         canCall = false
-        when (either) {
-          is Either.Left -> loop(IO.RaiseError(either.a), conn, cb, this, bFirst, bRest)
-          is Either.Right -> loop(IO.Pure(either.b), conn, cb, this, bFirst, bRest)
-        }
+        either.fold(
+          { loop(IO.RaiseError(it), conn, cb, this, bFirst, bRest) },
+          { loop(IO.Pure(it), conn, cb, this, bFirst, bRest) }
+        )
       }
     }
   }

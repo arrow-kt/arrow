@@ -54,27 +54,24 @@ internal object IOBracket {
       // Introducing a light async boundary, otherwise executing the required
       // logic directly will yield a StackOverflowException
       Platform.trampoline {
-        when (ea) {
-          is Either.Right -> {
-            val a = ea.b
-            val frame = BracketReleaseFrame<A, B>(a, release)
+        ea.fold(
+          { cb(ea as Either.Left<Throwable>) },
+          { b ->
+            val frame = BracketReleaseFrame<A, B>(b, release)
             val onNext = {
               val fb = try {
-                use(a)
+                use(b)
               } catch (e: Throwable) {
                 IO.raiseError<B>(e.nonFatalOrThrow())
               }
-
               IO.Bind(fb.fix(), frame)
             }
-
             // Registering our cancelable token ensures that in case cancellation is detected, release gets called
             deferredRelease.complete(frame.cancel)
             // Actual execution
             IORunLoop.startCancelable(onNext(), conn, cb)
           }
-          is Either.Left -> cb(ea)
-        }
+        )
       }
     }
   }

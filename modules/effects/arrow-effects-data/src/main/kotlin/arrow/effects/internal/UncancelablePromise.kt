@@ -22,11 +22,7 @@ internal class UncancelablePromise<F, A>(private val AS: Async<F>) : Promise<F, 
   private val state: AtomicReference<State<A>> = AtomicReference(State.Pending(emptyList()))
 
   override fun get(): Kind<F, A> = async { k: (Either<Throwable, A>) -> Unit ->
-    when (val result = register(k)) {
-      null -> Unit
-      is Either.Left -> k(result)
-      is Either.Right -> k(result)
-    }
+    register(k)?.let(k) ?: Unit
   }
 
   private tailrec fun register(cb: (Either<Throwable, A>) -> Unit): Either<Throwable, A>? = when (val current = state.get()) {

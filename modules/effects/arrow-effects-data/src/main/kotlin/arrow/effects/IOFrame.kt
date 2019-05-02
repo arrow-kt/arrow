@@ -20,10 +20,7 @@ internal interface IOFrame<in A, out R> : (A) -> R {
   fun recover(e: Throwable): R
 
   fun fold(value: Either<Throwable, A>): R =
-    when (value) {
-      is Either.Right -> invoke(value.b)
-      is Either.Left -> recover(value.a)
-    }
+    value.fold(::recover, ::invoke)
 
   companion object {
     fun <A> errorHandler(fe: (Throwable) -> IOOf<A>): IOFrame<A, IO<A>> =

@@ -733,13 +733,7 @@ inline fun <F, A, B, C, D> RaceTriple<F, A, B, C>.fold(
   ifB: (Tuple3<Fiber<F, A>, B, Fiber<F, C>>) -> D,
   ifC: (Tuple3<Fiber<F, A>, Fiber<F, B>, C>) -> D,
   dummy: Unit = Unit
-): D = when (this) {
-  is Either.Left -> ifA(this.a)
-  is Either.Right -> when (val b = this.b) {
-    is Either.Left -> ifB(b.a)
-    is Either.Right -> ifC(b.b)
-  }
-}
+): D = fold(ifA, { it.fold(ifB, ifC) })
 
 /** Alias for `Either` structure to provide consistent signature for race methods. */
 typealias Race2<A, B> = Either<A, B>
@@ -770,10 +764,7 @@ inline fun <A, B, C, D> Race3<A, B, C>.fold(
   ifA: (A) -> D,
   ifB: (B) -> D,
   ifC: (C) -> D
-): D = when (this) {
-  is Either.Left -> this.a.fold(ifA, ifB)
-  is Either.Right -> ifC(this.b)
-}
+): D = fold({ it.fold(ifA, ifB) }, ifC)
 
 /** A convenience [fold] method to provide a nicer API to work with race results. */
 inline fun <A, B, C, D, E> Race4<A, B, C, D>.fold(
@@ -781,10 +772,7 @@ inline fun <A, B, C, D, E> Race4<A, B, C, D>.fold(
   ifB: (B) -> E,
   ifC: (C) -> E,
   ifD: (D) -> E
-): E = when (this) {
-  is Either.Left -> this.a.fold(ifA, ifB)
-  is Either.Right -> this.b.fold(ifC, ifD)
-}
+): E = fold({ it.fold(ifA, ifB) }, { it.fold(ifC, ifD) })
 
 /** A convenience [fold] method to provide a nicer API to work with race results. */
 inline fun <A, B, C, D, E, G> Race5<A, B, C, D, E>.fold(
@@ -793,10 +781,10 @@ inline fun <A, B, C, D, E, G> Race5<A, B, C, D, E>.fold(
   ifC: (C) -> G,
   ifD: (D) -> G,
   ifE: (E) -> G
-): G = when (this) {
-  is Either.Left -> this.a.fold(ifA, ifB, ifC)
-  is Either.Right -> this.b.fold(ifD, ifE)
-}
+): G = fold(
+  { it.fold(ifA, ifB, ifC) },
+  { it.fold(ifD, ifE) }
+)
 
 /** A convenience [fold] method to provide a nicer API to work with race results. */
 inline fun <A, B, C, D, E, G, H> Race6<A, B, C, D, E, G>.fold(
@@ -806,10 +794,10 @@ inline fun <A, B, C, D, E, G, H> Race6<A, B, C, D, E, G>.fold(
   ifD: (D) -> H,
   ifE: (E) -> H,
   ifG: (G) -> H
-): H = when (this) {
-  is Either.Left -> this.a.fold(ifA, ifB, ifC)
-  is Either.Right -> this.b.fold(ifD, ifE, ifG)
-}
+): H = fold(
+  { it.fold(ifA, ifB, ifC) },
+  { it.fold(ifD, ifE, ifG) }
+)
 
 /** A convenience [fold] method to provide a nicer API to work with race results. */
 inline fun <A, B, C, D, E, G, H, I> Race7<A, B, C, D, E, G, H>.fold(
@@ -820,10 +808,10 @@ inline fun <A, B, C, D, E, G, H, I> Race7<A, B, C, D, E, G, H>.fold(
   ifE: (E) -> I,
   ifG: (G) -> I,
   ifH: (H) -> I
-): I = when (this) {
-  is Either.Left -> this.a.fold(ifA, ifB, ifC, ifD, ifE)
-  is Either.Right -> this.b.fold(ifG, ifH)
-}
+): I = fold(
+  { it.fold(ifA, ifB, ifC, ifD, ifE) },
+  { it.fold(ifG, ifH) }
+)
 
 /** A convenience [fold] method to provide a nicer API to work with race results. */
 inline fun <A, B, C, D, E, G, H, I, J> Race8<A, B, C, D, E, G, H, I>.fold(
@@ -835,10 +823,10 @@ inline fun <A, B, C, D, E, G, H, I, J> Race8<A, B, C, D, E, G, H, I>.fold(
   ifG: (G) -> J,
   ifH: (H) -> J,
   ifI: (I) -> J
-): J = when (this) {
-  is Either.Left -> this.a.fold(ifA, ifB, ifC, ifD)
-  is Either.Right -> this.b.fold(ifE, ifG, ifH, ifI)
-}
+): J = fold(
+  { it.fold(ifA, ifB, ifC, ifD) },
+  { it.fold(ifE, ifG, ifH, ifI) }
+)
 
 /** A convenience [fold] method to provide a nicer API to work with race results. */
 inline fun <A, B, C, D, E, G, H, I, J, K> Race9<A, B, C, D, E, G, H, I, J>.fold(
@@ -851,7 +839,7 @@ inline fun <A, B, C, D, E, G, H, I, J, K> Race9<A, B, C, D, E, G, H, I, J>.fold(
   ifH: (H) -> K,
   ifI: (I) -> K,
   ifJ: (J) -> K
-): K = when (this) {
-  is Either.Left -> this.a.fold(ifA, ifB, ifC, ifD, ifE)
-  is Either.Right -> this.b.fold(ifG, ifH, ifI, ifJ)
-}
+): K = fold(
+  { it.fold(ifA, ifB, ifC, ifD, ifE) },
+  { it.fold(ifG, ifH, ifI, ifJ) }
+)

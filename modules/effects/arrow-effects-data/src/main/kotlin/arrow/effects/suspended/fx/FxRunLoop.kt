@@ -394,11 +394,7 @@ object FxRunLoop {
     }
 
     override operator fun invoke(either: Either<Throwable, Any?>) {
-      result = when (either) {
-        is Either.Left -> Fx.RaiseError(either.a)
-        is Either.Right -> Fx.Pure(either.b, 0)
-      }
-
+      result = either.fold({ Fx.RaiseError(it) }, { Fx.Pure(it, 0) })
       if (shouldTrampoline) {
         contIndex = 0
         Platform.trampoline(this)

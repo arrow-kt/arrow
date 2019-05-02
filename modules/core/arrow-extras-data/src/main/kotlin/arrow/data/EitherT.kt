@@ -34,16 +34,15 @@ data class EitherT<F, A, B>(private val value: Kind<F, Either<A, B>>) : EitherTO
         val value = f(it).value()
         MF.run {
           value.map { recursionControl ->
-            when (recursionControl) {
-              is Either.Left -> Right(Left(recursionControl.a))
-              is Either.Right -> {
-                val b: Either<A, B> = recursionControl.b
-                when (b) {
-                  is Either.Left -> Left(b.a)
-                  is Either.Right -> Right(Right(b.b))
-                }
+            recursionControl.fold(
+              { Right(recursionControl as Either.Left<L>) },
+              { b ->
+                b.fold(
+                  { b as Either.Left<A> },
+                  { Right(b as Either.Right<B>) }
+                )
               }
-            }
+            )
           }
         }
       })
