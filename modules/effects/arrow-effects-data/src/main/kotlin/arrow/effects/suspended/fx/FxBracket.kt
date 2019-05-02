@@ -93,10 +93,9 @@ internal class BracketStart<A, B>(
 
   override fun invoke(ea: Either<Throwable, A>) {
     if (called.getAndSet(true)) throw IllegalStateException("callback called multiple times!")
-
-    when (ea) {
-      is Either.Right -> {
-        val a = ea.b
+    ea.fold(
+      { cb(ea as Either.Left<Throwable>) },
+      { a ->
         val frame = BracketReleaseFrame<A, B>(a, release)
 
         val fb: FxOf<B> = try {
@@ -110,8 +109,7 @@ internal class BracketStart<A, B>(
         // Actual execution
         FxRunLoop.startCancelable(Fx.FlatMap(fb, frame, 0), conn, cb = cb)
       }
-      is Either.Left -> cb(ea)
-    }
+    )
   }
 }
 

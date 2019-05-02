@@ -1,11 +1,7 @@
 package arrow.effects.extensions
 
-import arrow.core.Either
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.Some
+import arrow.core.*
 import arrow.core.extensions.either.monad.flatten
-import arrow.core.left
 import arrow.data.EitherT
 import arrow.data.EitherTOf
 import arrow.data.EitherTPartialOf
@@ -45,34 +41,38 @@ interface EitherTBracket<F> : Bracket<EitherTPartialOf<F, Throwable>, Throwable>
     EitherT.liftF<F, Throwable, Ref<F, Option<Throwable>>>(this, Ref.of(None, this)).flatMap(this) { ref ->
       EitherT(
         value().bracketCase(use = { eith ->
-          when (eith) {
-            is Either.Right -> use(eith.b).value()
-            is Either.Left -> just(eith)
-          }
+          eith.fold(
+            { just(eith as Either.Left<Throwable>) },
+            { use(it).value() }
+          )
         }, release = { eith, exitCase ->
-          when (eith) {
-            is Either.Right -> when (exitCase) {
-              is ExitCase.Completed -> {
-                release(eith.b, ExitCase.Completed).value().flatMap {
-                  it.fold(
-                    { l -> ref.set(Some(l)) },
-                    { just(Unit) }
-                  )
+          eith.fold(
+            {just(Unit)},
+            { b ->
+              when (exitCase) {
+                is ExitCase.Completed -> {
+                  release(b, ExitCase.Completed).value().flatMap {
+                    it.fold(
+                      { l -> ref.set(Some(l)) },
+                      { just(Unit) }
+                    )
+                  }
                 }
+                else -> release(b, exitCase).value().unit()
               }
-              else -> release(eith.b, exitCase).value().unit()
             }
-            is Either.Left -> just(Unit)
-          }
+          )
         }).flatMap { eith ->
-          when (eith) {
-            is Either.Right -> ref.get().map {
-              it.fold(
-                { eith },
-                { throwable -> throwable.left() })
+          eith.fold(
+            { just(it.left()) },
+            { b ->
+              ref.get().map {
+                it.fold(
+                  { b.right() },
+                  { throwable -> throwable.left() })
+              }
             }
-            is Either.Left -> just(eith)
-          }
+          )
         })
     }
   }

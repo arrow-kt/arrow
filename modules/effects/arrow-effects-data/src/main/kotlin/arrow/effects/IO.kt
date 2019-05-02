@@ -99,11 +99,11 @@ sealed class IO<out A> : IOOf<A> {
       }
 
     fun <A, B> tailRecM(a: A, f: (A) -> IOOf<Either<A, B>>): IO<B> =
-      f(a).fix().flatMap {
-        when (it) {
-          is Either.Left -> tailRecM(it.a, f)
-          is Either.Right -> IO.just(it.b)
-        }
+      f(a).fix().flatMap { e ->
+        e.fold(
+          { tailRecM(it, f) },
+          { IO.just(it) }
+        )
       }
 
     val never: IO<Nothing> = async { _, _ -> Unit }

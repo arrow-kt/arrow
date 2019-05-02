@@ -93,11 +93,7 @@ internal class CancelablePromise<F, A>(private val CF: Concurrent<F>) : Promise<
 
   private fun unsafeRegister(cb: (Either<Throwable, A>) -> Unit): Token {
     val id = Token()
-    when (val result = register(id, cb)) {
-      null -> Unit
-      is Either.Left -> cb(result)
-      is Either.Right -> cb(result)
-    }
+    register(id, cb)?.let(cb)
     return id
   }
 

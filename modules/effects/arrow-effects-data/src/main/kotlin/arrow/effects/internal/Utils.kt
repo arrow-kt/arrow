@@ -162,11 +162,7 @@ object Platform {
 
     val eitherRef = ref
 
-    return when (eitherRef) {
-      null -> None
-      is Either.Left -> throw eitherRef.a
-      is Either.Right -> Some(eitherRef.b)
-    }
+    return eitherRef?.let { e -> e.fold({ throw it }, { Some(it) }) } ?: None
   }
 
   /**
