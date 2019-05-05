@@ -14,6 +14,7 @@ import arrow.core.fix
 import arrow.core.invoke
 import arrow.extension
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Category
 import arrow.typeclasses.Conested
 import arrow.typeclasses.Contravariant
@@ -114,6 +115,16 @@ interface Function1Decidable<O> : Decidable<Conested<ForFunction1, O>>, Function
 interface Function1Profunctor : Profunctor<ForFunction1> {
   override fun <A, B, C, D> Function1Of<A, B>.dimap(fl: (C) -> A, fr: (B) -> D): Function1<C, D> =
     (fr compose fix().f compose fl).k()
+}
+
+@extension
+interface Function1Apply<I> : Apply<Function1PartialOf<I>>, Function1Functor<I> {
+
+  override fun <A, B> Function1Of<I, A>.map(f: (A) -> B): Function1<I, B> =
+    fix().map(f)
+
+  override fun <A, B> Function1Of<I, A>.ap(ff: Function1Of<I, (A) -> B>): Function1<I, B> =
+    fix().ap(ff)
 }
 
 @extension

@@ -1,5 +1,6 @@
 package arrow.core
 
+@Deprecated("PartialFunction is an incomplete experiment due for removal. See https://github.com/arrow-kt/arrow/pull/1419#issue-273308228")
 abstract class PartialFunction<in A, out B> : (A) -> B {
   abstract fun isDefinedAt(a: A): Boolean
 }

@@ -336,7 +336,7 @@ Right(1).map {it + 1}
  Computing over independent values
 
 ```kotlin:ank
-import arrow.core.extensions.either.applicative.*
+import arrow.core.extensions.either.apply.*
 
 tupled(Either.Right(1), Either.Right("a"), Either.Right(2.0))
 ```

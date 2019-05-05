@@ -193,7 +193,7 @@ class InstanceFileGenerator(
     instances.forEach {
       val elementsToGenerate: List<String> =
         listOf(genImports(it), genCompanionExtensions(it), genDatatypeExtensions(it))
-      val source: String = elementsToGenerate.joinToString(prefix = "package ${it.`package`}.${it.companionFactoryName}\n\n", separator = "\n", postfix = "\n")
+      val source: String = elementsToGenerate.joinToString(prefix = if (it.`package` != "`unnamed package`") "package ${it.`package`}.${it.companionFactoryName}\n\n" else "\n\n", separator = "\n", postfix = "\n")
       val file = File(generatedDir, instanceAnnotationClass.simpleName + ".${it.target.instance.qualifiedName}.kt")
       file.writeText(source)
     }
