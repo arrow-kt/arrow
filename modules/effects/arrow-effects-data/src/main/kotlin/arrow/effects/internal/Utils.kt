@@ -9,7 +9,7 @@ import arrow.core.right
 import arrow.effects.IO
 import arrow.effects.KindConnection
 import arrow.effects.typeclasses.Duration
-import java.util.ArrayDeque
+import java.util.concurrent.Executor
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.locks.AbstractQueuedSynchronizer
 import kotlin.coroutines.CoroutineContext
@@ -21,9 +21,95 @@ class ArrowInternalException(
     "Arrow-kt internal error. Please let us know and create a ticket at https://github.com/arrow-kt/arrow/issues/new/choose"
 ) : RuntimeException(message)
 
+private const val initialIndex: Int = 0
+private const val chunkSize: Int = 8
+
 object Platform {
 
-  class ArrayStack<A> : ArrayDeque<A>()
+  @Suppress("UNCHECKED_CAST")
+  class ArrayStack<A> {
+
+    private val initialArray: Array<Any?> = arrayOfNulls<Any?>(chunkSize)
+    private val modulo = chunkSize - 1
+    private var array = initialArray
+    private var index = initialIndex
+
+    /** Returns `true` if the stack is empty. */
+    fun isEmpty(): Boolean =
+      index == 0 && (array.getOrNull(0) == null)
+
+    /** Pushes an item on the stack. */
+    fun push(a: A) {
+      if (index == modulo) {
+        val newArray = arrayOfNulls<Any?>(chunkSize)
+        newArray[0] = array
+        array = newArray
+        index = 1
+      } else {
+        index += 1
+      }
+      array[index] = a
+    }
+
+    /** Pushes an entire iterator on the stack. */
+    fun pushAll(cursor: Iterator<A>) {
+      while (cursor.hasNext()) push(cursor.next())
+    }
+
+    /** Pushes an entire iterable on the stack. */
+    fun pushAll(seq: Iterable<A>) {
+      pushAll(seq.iterator())
+    }
+
+    /** Pushes the contents of another stack on this stack. */
+    fun pushAll(stack: ArrayStack<A>) {
+      pushAll(stack.iteratorReversed())
+    }
+
+    /** Pops an item from the stack (in LIFO order).
+     *
+     * Returns `null` in case the stack is empty.
+     */
+    fun pop(): A? {
+      if (index == 0) {
+        if (array.getOrNull(0) != null) {
+          array = array[0] as Array<Any?>
+          index = modulo
+        } else {
+          return null
+        }
+      }
+      val result = array[index] as A
+      // GC purposes
+      array[index] = null
+      index -= 1
+      return result
+    }
+
+    /** Builds an iterator out of this stack. */
+    @Suppress("IteratorNotThrowingNoSuchElementException")
+    fun iteratorReversed(): Iterator<A> =
+      object : Iterator<A> {
+        private var array = this@ArrayStack.array
+        private var index = this@ArrayStack.index
+
+        override fun hasNext(): Boolean =
+          index > 0 || (array.getOrNull(0) != null)
+
+        override fun next(): A {
+          if (index == 0) {
+            array = array[0] as Array<Any?>
+            index = modulo
+          }
+          val result = array[index] as A
+          index -= 1
+          return result
+        }
+      }
+
+    fun isNotEmpty(): Boolean =
+      !isEmpty()
+  }
 
   /**
    * Establishes the maximum stack depth for `IO#map` operations.
@@ -107,6 +193,66 @@ object Platform {
   fun composeErrors(first: Throwable, rest: List<Throwable>): Throwable {
     rest.forEach { if (it != first) first.addSuppressed(it) }
     return first
+  }
+
+  inline fun trampoline(crossinline f: () -> Unit): Unit =
+    _trampoline.get().execute(Runnable { f() })
+
+  private val underlying = Executor { it.run() }
+
+  @PublishedApi
+  internal val _trampoline = ThreadLocal.withInitial {
+    TrampolineExecutor(underlying)
+  }
+
+  @PublishedApi
+  internal class TrampolineExecutor(val underlying: Executor) {
+    private var immediateQueue = Platform.ArrayStack<Runnable>()
+    @Volatile
+    private var withinLoop = false
+
+    private fun startLoop(runnable: Runnable) {
+      withinLoop = true
+      try {
+        immediateLoop(runnable)
+      } finally {
+        withinLoop = false
+      }
+    }
+
+    fun execute(runnable: Runnable): Unit =
+      if (!withinLoop) startLoop(runnable)
+      else immediateQueue.push(runnable)
+
+    private fun forkTheRest() {
+      class ResumeRun(val head: Runnable, val rest: Platform.ArrayStack<Runnable>) : Runnable {
+        override fun run() {
+          immediateQueue.pushAll(rest)
+          immediateLoop(head)
+        }
+      }
+
+      val head = immediateQueue.pop()
+      if (head != null) {
+        val rest = immediateQueue
+        immediateQueue = Platform.ArrayStack()
+        underlying.execute(ResumeRun(head, rest))
+      }
+    }
+
+    @Suppress("SwallowedException") // Should we rewrite with while??
+    private tailrec fun immediateLoop(task: Runnable) {
+      try {
+        task.run()
+      } catch (ex: Throwable) {
+        forkTheRest()
+        // ex.nonFatalOrThrow() //not required???
+      }
+
+      val next = immediateQueue.pop()
+      return if (next != null) immediateLoop(next)
+      else Unit
+    }
   }
 }
 
