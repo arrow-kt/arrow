@@ -32,6 +32,14 @@ internal sealed class Affix<T> {
       is Four -> FingerTree.Deep(Three(this.a, this.b, this.c), FingerTree.Empty(), One(this.d))
     }
 
+  fun toList(): List<T> =
+    when (this) {
+      is One -> listOf(this.a)
+      is Two -> listOf(this.a, this.b)
+      is Three -> listOf(this.a, this.b, this.c)
+      is Four -> listOf(this.a, this.b, this.c, this.d)
+    }
+
   fun head(): T =
     when (this) {
       is One -> this.a

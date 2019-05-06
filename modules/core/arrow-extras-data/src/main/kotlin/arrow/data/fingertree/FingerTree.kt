@@ -145,6 +145,8 @@ sealed class FingerTree<T> {
     return tree
   }
 
+  infix fun concat(tree: FingerTree<T>) = this.concatHelper(emptyList(), tree)
+
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (javaClass != other?.javaClass) return false
@@ -172,6 +174,46 @@ sealed class FingerTree<T> {
     }
   }
 
+  private fun concatHelper(items: List<T>, right: FingerTree<T>): FingerTree<T> {
+
+    return when (this) {
+      is Deep -> when (right) {
+        is Deep -> { // left and right are Deep
+          Deep(
+            this.prefix,
+            this.deeper.concatHelper(Node.fromList(this.suffix.toList() + items + right.prefix.toList()), right.deeper),
+            right.suffix
+          )
+        }
+
+        else -> { // right is Empty or Single
+          var tree = this
+          items.forEach {
+            tree = tree.append(it)
+          }
+
+          if (right is Single) {
+            tree = tree.append(right.a)
+          }
+
+          tree
+        }
+      }
+      else -> { // left is Empty or Single
+        var tree = right
+        items.asReversed().forEach {
+          tree = tree.prepend(it)
+        }
+
+        if (this is Single) {
+          tree = tree.prepend(this.a)
+        }
+
+        tree
+      }
+    }
+  }
+
   companion object {
 
     fun <A> empty(): FingerTree<A> = Empty()
@@ -185,7 +227,6 @@ sealed class FingerTree<T> {
       }
       return fingerTree
     }
-
 
     fun <A> fromArgs(vararg items: A): FingerTree<A> =
       fromList(items.toList())

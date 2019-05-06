@@ -172,7 +172,7 @@ class FingerTreeTest : StringSpec() {
     "viewR() should return the affix element and a deep remaining finger tree when the finger tree has one affix element and an none empty deeper finger tree" {
       val fingerTree = Deep<Int>(One(1), Single(Branch2(1, 2)), One(2))
 
-      fingerTree.viewR() shouldBe Option.just(Tuple2(2, Deep(One(1), Empty() ,Two(1,2))))
+      fingerTree.viewR() shouldBe Option.just(Tuple2(2, Deep(One(1), Empty(), Two(1, 2))))
     }
 
     "Property based testing for viewR()" {
@@ -291,5 +291,38 @@ class FingerTreeTest : StringSpec() {
       Deep(One(1), Empty(), One(2)).isEmpty() shouldBe false
     }
 
+    /**
+     * concat()
+     */
+
+    "concat() should return an empty finger tree when both finger trees are empty" {
+      Empty<Int>() concat Empty() shouldBe Empty()
+    }
+
+    "concat() should return the left finger three when the right one is empty" {
+      val leftFingerTree = Deep(One(1), Deep<Node<Int>>(One(Branch2(3, 4)), Empty(), One(Branch2(5, 6))), One(2))
+
+      leftFingerTree concat Empty() shouldBe leftFingerTree
+    }
+
+    "concat() should return the right finger three when the left one is empty" {
+      val rightFingerTree = Deep(One(1), Deep<Node<Int>>(One(Branch2(3, 4)), Empty(), One(Branch2(5, 6))), One(2))
+
+      Empty<Int>() concat rightFingerTree shouldBe rightFingerTree
+    }
+
+    "concat() should prepend the the single tree's value when the left item is a single finger tree" {
+      Single(1) concat Deep(One(2), Empty(), One(3)) shouldBe Deep(Two(1, 2), Empty(), One(3))
+    }
+
+    "concat() should append the the single tree's value when the right item is a single finger tree" {
+      Deep(One(1), Empty(), One(2)) concat Single(3) shouldBe Deep(One(1), Empty(), Two(2, 3))
+    }
+
+    "Property based testing for concat()" {
+      forAll(Gen.list(Gen.int()), Gen.list(Gen.int())) { l1, l2 ->
+        (FingerTree.fromList(l1) concat FingerTree.fromList(l2)).asList() == l1 + l2
+      }
+    }
   }
 }
