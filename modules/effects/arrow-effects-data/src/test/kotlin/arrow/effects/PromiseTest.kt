@@ -4,7 +4,7 @@ import arrow.core.Left
 import arrow.core.None
 import arrow.core.Some
 import arrow.core.Tuple2
-import arrow.effects.extensions.io.applicative.product
+import arrow.effects.extensions.io.apply.product
 import arrow.effects.extensions.io.applicativeError.attempt
 import arrow.effects.extensions.io.async.async
 import arrow.effects.extensions.io.concurrent.concurrent

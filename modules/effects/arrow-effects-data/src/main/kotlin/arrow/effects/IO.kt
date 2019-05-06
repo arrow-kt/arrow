@@ -159,7 +159,7 @@ sealed class IO<out A> : IOOf<A> {
 
   /** Makes the source [IO] uncancelable such that a [Fiber.cancel] signal has no effect. */
   fun uncancelable(): IO<A> =
-    IO.ContextSwitch(this, ContextSwitch.makeUncancelable, ContextSwitch.disableUncancelable())
+    IO.ContextSwitch(this, ContextSwitch.makeUncancelable, ContextSwitch.disableUncancelable)
 
   fun <B> bracket(release: (A) -> IOOf<Unit>, use: (A) -> IOOf<B>): IO<B> =
     bracketCase({ a, _ -> release(a) }, use)
@@ -226,7 +226,7 @@ sealed class IO<out A> : IOOf<A> {
       // Internal reusable reference.
       internal val makeUncancelable: (IOConnection) -> IOConnection = { IOConnection.uncancelable }
 
-      internal fun <A> disableUncancelable(): (A, Throwable?, IOConnection, IOConnection) -> IOConnection =
+      internal val disableUncancelable: (Any?, Throwable?, IOConnection, IOConnection) -> IOConnection =
         { _, _, old, _ -> old }
     }
   }

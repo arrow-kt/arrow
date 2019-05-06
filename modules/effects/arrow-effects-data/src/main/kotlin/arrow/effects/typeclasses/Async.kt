@@ -146,11 +146,6 @@ interface Async<F> : MonadDefer<F> {
       }
     }
 
-  @Deprecated("Use delay instead",
-    ReplaceWith("delay(ctx, f)", "arrow.effects.typeclasses.Async"))
-  operator fun <A> invoke(ctx: CoroutineContext, f: () -> A): Kind<F, A> =
-    delay(ctx, f)
-
   /**
    * Delay a computation on provided [CoroutineContext].
    *

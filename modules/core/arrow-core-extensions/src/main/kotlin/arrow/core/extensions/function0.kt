@@ -11,6 +11,7 @@ import arrow.core.fix
 import arrow.core.invoke
 import arrow.extension
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Bimonad
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Functor
@@ -41,6 +42,15 @@ interface Function0Monoid<A> : Monoid<Function0<A>>, Function0Semigroup<A> {
 
 @extension
 interface Function0Functor : Functor<ForFunction0> {
+  override fun <A, B> Function0Of<A>.map(f: (A) -> B): Function0<B> =
+    fix().map(f)
+}
+
+@extension
+interface Function0Apply : Apply<ForFunction0> {
+  override fun <A, B> Function0Of<A>.ap(ff: Function0Of<(A) -> B>): Function0<B> =
+    fix().ap(ff)
+
   override fun <A, B> Function0Of<A>.map(f: (A) -> B): Function0<B> =
     fix().map(f)
 }

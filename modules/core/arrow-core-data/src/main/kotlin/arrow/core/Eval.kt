@@ -271,3 +271,9 @@ sealed class Eval<out A> : EvalOf<A> {
     }
   }
 }
+
+fun <A, B> Iterator<A>.iterateRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
+  fun loop(): Eval<B> =
+    Eval.defer { if (this.hasNext()) f(this.next(), loop()) else lb }
+  return loop()
+}

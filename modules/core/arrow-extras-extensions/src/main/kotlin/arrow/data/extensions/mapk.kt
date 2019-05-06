@@ -8,7 +8,6 @@ import arrow.data.MapKPartialOf
 import arrow.data.SetK
 import arrow.data.k
 import arrow.extension
-import arrow.data.extensions.mapk.foldable.fold
 import arrow.data.extensions.setk.eq.eq
 import arrow.data.extensions.setk.hash.hash
 import arrow.data.fix
@@ -22,7 +21,6 @@ import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
-import arrow.typeclasses.fix
 import arrow.undocumented
 
 @extension

@@ -24,6 +24,7 @@ import arrow.core.identity
 import arrow.core.toT
 import arrow.extension
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Bifunctor
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Eq
@@ -44,6 +45,16 @@ import arrow.core.extensions.traverse as tuple2Traverse
 interface Tuple2Functor<F> : Functor<Tuple2PartialOf<F>> {
   override fun <A, B> Tuple2Of<F, A>.map(f: (A) -> B) =
     fix().map(f)
+}
+
+@extension
+interface Tuple2Apply<F> : Apply<Tuple2PartialOf<F>>, Tuple2Functor<F> {
+
+  override fun <A, B> Tuple2Of<F, A>.map(f: (A) -> B) =
+    fix().map(f)
+
+  override fun <A, B> Tuple2Of<F, A>.ap(ff: Tuple2Of<F, (A) -> B>) =
+    fix().ap(ff.fix())
 }
 
 @extension

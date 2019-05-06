@@ -188,7 +188,7 @@ Some(1).map { it + 1 }
 Computing over independent values
 
 ```kotlin:ank
-import arrow.core.extensions.option.applicative.*
+import arrow.core.extensions.option.apply.*
 
 tupled(Some(1), Some("Hello"), Some(20.0))
 ```

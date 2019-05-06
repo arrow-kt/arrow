@@ -56,9 +56,9 @@ object AsyncLaws {
 
   fun <F> Async<F>.asyncConstructor(EQ: Eq<Kind<F, Int>>): Unit =
     forFew(5, Gen.intSmall(), Gen.intSmall()) { threadId1: Int, threadId2: Int ->
-      invoke(newSingleThreadContext(threadId1.toString())) { getCurrentThread() }
+      delay(newSingleThreadContext(threadId1.toString())) { getCurrentThread() }
         .flatMap {
-          invoke(newSingleThreadContext(threadId2.toString())) { it + getCurrentThread() }
+          delay(newSingleThreadContext(threadId2.toString())) { it + getCurrentThread() }
         }
         .equalUnderTheLaw(just(threadId1 + threadId2), EQ)
     }

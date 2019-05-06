@@ -3,6 +3,7 @@ package arrow.effects.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.effects.Resource
+import arrow.effects.ResourceOf
 import arrow.effects.ResourcePartialOf
 import arrow.effects.fix
 import arrow.effects.typeclasses.Bracket
@@ -19,45 +20,46 @@ import arrow.undocumented
 @undocumented
 interface ResourceFunctor<F, E> : Functor<ResourcePartialOf<F, E>> {
   fun BR(): Bracket<F, E>
-  override fun <A, B> Kind<ResourcePartialOf<F, E>, A>.map(f: (A) -> B): Kind<ResourcePartialOf<F, E>, B> =
+  override fun <A, B> ResourceOf<F, E, A>.map(f: (A) -> B): Resource<F, E, B> =
     fix().map(BR(), f)
 }
 
 @extension
-interface ResourceApplicative<F, E> : Applicative<ResourcePartialOf<F, E>> {
-  fun BR(): Bracket<F, E>
-  override fun <A, B> Kind<ResourcePartialOf<F, E>, A>.ap(ff: Kind<ResourcePartialOf<F, E>, (A) -> B>): Kind<ResourcePartialOf<F, E>, B> =
+interface ResourceApplicative<F, E> : Applicative<ResourcePartialOf<F, E>>, ResourceFunctor<F, E> {
+  override fun BR(): Bracket<F, E>
+
+  override fun <A> just(a: A): Resource<F, E, A> = Resource.just(a, BR())
+  override fun <A, B> ResourceOf<F, E, A>.ap(ff: Kind<ResourcePartialOf<F, E>, (A) -> B>): Resource<F, E, B> =
     fix().ap(BR(), ff.fix())
 
-  override fun <A> just(a: A): Kind<ResourcePartialOf<F, E>, A> = Resource.just(a, BR())
+  override fun <A, B> Kind<ResourcePartialOf<F, E>, A>.map(f: (A) -> B): Resource<F, E, B> =
+    fix().map(BR(), f)
 }
 
 @extension
-interface ResourceSelective<F, E> : Selective<ResourcePartialOf<F, E>> {
-  fun BR(): Bracket<F, E>
-  override fun <A> just(a: A): Kind<ResourcePartialOf<F, E>, A> = Resource.just(a, BR())
-  override fun <A, B> Kind<ResourcePartialOf<F, E>, A>.ap(ff: Kind<ResourcePartialOf<F, E>, (A) -> B>): Kind<ResourcePartialOf<F, E>, B> =
-    fix().ap(ff.fix())
-
-  override fun <A, B> Kind<ResourcePartialOf<F, E>, Either<A, B>>.select(f: Kind<ResourcePartialOf<F, E>, (A) -> B>): Kind<ResourcePartialOf<F, E>, B> =
-    fix().flatMap { it.fold({ Resource.just(it, BR()).ap(BR(), f.fix()) }, { Resource.just(it, BR()) }) }
+interface ResourceSelective<F, E> : Selective<ResourcePartialOf<F, E>>, ResourceApplicative<F, E> {
+  override fun BR(): Bracket<F, E>
+  override fun <A, B> ResourceOf<F, E, Either<A, B>>.select(f: Kind<ResourcePartialOf<F, E>, (A) -> B>): Resource<F, E, B> =
+    fix().flatMap { it.fold({ a -> Resource.just(a, BR()).ap(BR(), f.fix()) }, { b -> Resource.just(b, BR()) }) }
 }
 
 @extension
-interface ResourceMonad<F, E> : Monad<ResourcePartialOf<F, E>> {
-  fun BR(): Bracket<F, E>
-  override fun <A> just(a: A): Kind<ResourcePartialOf<F, E>, A> = Resource.just(a, BR())
-  override fun <A, B> Kind<ResourcePartialOf<F, E>, A>.flatMap(f: (A) -> Kind<ResourcePartialOf<F, E>, B>): Kind<ResourcePartialOf<F, E>, B> =
+interface ResourceMonad<F, E> : Monad<ResourcePartialOf<F, E>>, ResourceSelective<F, E> {
+  override fun BR(): Bracket<F, E>
+  override fun <A, B> ResourceOf<F, E, A>.flatMap(f: (A) -> ResourceOf<F, E, B>): Resource<F, E, B> =
     fix().flatMap { f(it).fix() }
 
-  override fun <A, B> tailRecM(a: A, f: (A) -> Kind<ResourcePartialOf<F, E>, Either<A, B>>): Kind<ResourcePartialOf<F, E>, B> =
-    f(a).flatMap {
-      it.fold({
-        tailRecM(it, f).fix()
-      }, {
-        Resource.just(it, BR())
-      })
-    }
+  override fun <A, B> tailRecM(a: A, f: (A) -> Kind<ResourcePartialOf<F, E>, Either<A, B>>): Resource<F, E, B> =
+    Resource.tailRecM(BR(), a, f)
+
+  override fun <A, B> Kind<ResourcePartialOf<F, E>, A>.map(f: (A) -> B): Resource<F, E, B> =
+    fix().map(BR(), f)
+
+  override fun <A, B> ResourceOf<F, E, A>.ap(ff: Kind<ResourcePartialOf<F, E>, (A) -> B>): Resource<F, E, B> =
+    fix().ap(BR(), ff)
+
+  override fun <A, B> ResourceOf<F, E, Either<A, B>>.select(f: Kind<ResourcePartialOf<F, E>, (A) -> B>): Resource<F, E, B> =
+    fix().flatMap { it.fold({ a -> Resource.just(a, BR()).ap(BR(), f.fix()) }, { b -> Resource.just(b, BR()) }) }
 }
 
 @extension
