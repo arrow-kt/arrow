@@ -6,8 +6,10 @@ import arrow.core.Some
 import arrow.core.Tuple2
 import arrow.data.fingertree.internal.Affix
 import arrow.data.fingertree.internal.Node
+import arrow.higherkind
 
-sealed class FingerTree<T> {
+@higherkind
+sealed class FingerTree<T> : FingerTreeOf<T> {
 
   internal class Empty<T> : FingerTree<T>() {
     override fun toString(): String = "Empty()"
