@@ -111,7 +111,7 @@ sealed class FingerTree<T> {
 
   fun isEmpty() = this is Empty
 
-  fun asList(): List<T> = this.asListHelper(emptyList(), this)
+  fun asList(): List<T> = this.asSequence().toList()
 
   fun asSequence(): Sequence<T> = sequence {
     this.asSequenceHelper(this@FingerTree)
@@ -155,13 +155,6 @@ sealed class FingerTree<T> {
 
   override fun hashCode(): Int {
     return javaClass.hashCode()
-  }
-
-  private tailrec fun asListHelper(soFar: List<T>, tree: FingerTree<T>): List<T> {
-    return when (val res = tree.viewL()) {
-      is None -> soFar
-      is Some -> asListHelper(soFar + listOf(res.t.a), res.t.b)
-    }
   }
 
   private tailrec suspend fun SequenceScope<T>.asSequenceHelper(fingerTree: FingerTree<T>) {
