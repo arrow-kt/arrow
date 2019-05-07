@@ -16,7 +16,7 @@ interface FingerTreeMonoid<T> : Monoid<FingerTree<T>> {
 
 @extension
 interface FingerTreeFunctor : Functor<ForFingerTree> {
-  override fun <A, B> Kind<ForFingerTree, A>.map(f: (A) -> B): Kind<ForFingerTree, B> = fix().map(f)
+  override fun <A, B> Kind<ForFingerTree, A>.map(f: (A) -> B): FingerTree<B> = fix().map(f)
 }
 
 @extension
@@ -26,9 +26,10 @@ interface FingerTreeEq<T> : Eq<FingerTree<T>> {
 
 @extension
 interface FingerTreeApplicative : Applicative<ForFingerTree> {
-  override fun <A> just(a: A): Kind<ForFingerTree, A> = FingerTree.single(a)
+  override fun <A> just(a: A): FingerTree<A> = FingerTree.single(a)
 
-  override fun <A, B> Kind<ForFingerTree, A>.ap(ff: Kind<ForFingerTree, (A) -> B>): Kind<ForFingerTree, B> =
+  override fun <A, B> Kind<ForFingerTree, A>.ap(ff: Kind<ForFingerTree, (A) -> B>): FingerTree<B> =
     fix().ap(ff)
 }
+
 
