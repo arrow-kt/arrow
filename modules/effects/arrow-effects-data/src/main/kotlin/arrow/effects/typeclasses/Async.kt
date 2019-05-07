@@ -3,8 +3,11 @@ package arrow.effects.typeclasses
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Right
+import arrow.core.Tuple2
 import arrow.documented
 import arrow.typeclasses.MonadContinuation
+import arrow.typeclasses.MonadThrow
+import arrow.typeclasses.PartiallyAppliedMonadThrowFx
 import kotlin.coroutines.CoroutineContext
 
 /** A asynchronous computation that might fail. **/
@@ -21,6 +24,11 @@ typealias Proc<A> = ((Either<Throwable, A>) -> Unit) -> Unit
  **/
 @documented
 interface Async<F> : MonadDefer<F> {
+
+  override val fx: PartiallyAppliedAsyncFx<F>
+    get() = object : PartiallyAppliedAsyncFx<F> {
+      override val async: Async<F> get() = this@Async
+    }
 
   /**
    * Creates an instance of [F] that executes an asynchronous process on evaluation.
@@ -257,3 +265,10 @@ interface Async<F> : MonadDefer<F> {
 internal val mapUnit: (Any?) -> Unit = { Unit }
 internal val rightUnit = Right(Unit)
 internal val unitCallback = { cb: (Either<Throwable, Unit>) -> Unit -> cb(rightUnit) }
+
+interface PartiallyAppliedAsyncFx<F> : PartiallyAppliedMonadThrowFx<F> {
+  val async: Async<F>
+  override val ME: MonadThrow<F> get() = async
+  fun <A> async(c: suspend MonadDeferCancellableContinuation<F, *>.() -> A): Tuple2<Kind<F, A>, Disposable> =
+    async.bindingCancellable(c)
+}

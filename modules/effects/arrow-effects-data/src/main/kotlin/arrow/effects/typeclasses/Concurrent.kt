@@ -9,10 +9,14 @@ import arrow.core.Tuple3
 import arrow.core.left
 import arrow.core.right
 import arrow.core.toT
+import arrow.data.extensions.list.traverse.traverse
+import arrow.data.fix
 import arrow.effects.CancelToken
 import arrow.effects.KindConnection
 import arrow.effects.data.internal.BindingCancellationException
+import arrow.typeclasses.Applicative
 import arrow.typeclasses.MonadContinuation
+import arrow.typeclasses.Traverse
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine
@@ -31,6 +35,11 @@ typealias ConnectedProc<F, A> = (KindConnection<F>, ((Either<Throwable, A>) -> U
 interface Concurrent<F> : Async<F> {
 
   fun dispatchers(): Dispatchers<F>
+
+  override val fx: PartiallyAppliedConcurrentFx<F>
+    get() = object : PartiallyAppliedConcurrentFx<F> {
+      override val concurrent: Concurrent<F> = this@Concurrent
+    }
 
   /**
    * Creates a cancelable instance of [F] that executes an asynchronous process on evaluation.
@@ -852,4 +861,14 @@ inline fun <A, B, C, D, E, G, H, I, J, K> Race9<A, B, C, D, E, G, H, I, J>.fold(
 ): K = when (this) {
   is Either.Left -> this.a.fold(ifA, ifB, ifC, ifD, ifE)
   is Either.Right -> this.b.fold(ifG, ifH, ifI, ifJ)
+}
+
+interface PartiallyAppliedConcurrentFx<F> : PartiallyAppliedAsyncFx<F> {
+  val concurrent: Concurrent<F>
+
+  override val async: Async<F>
+    get() = concurrent
+
+  fun <A> concurrent(c: suspend ConcurrentCancellableContinuation<F, *>.() -> A): Tuple2<Kind<F, A>, Disposable> =
+    concurrent.bindingConcurrent(c)
 }

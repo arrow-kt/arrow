@@ -26,6 +26,11 @@ import kotlin.coroutines.startCoroutine
 @documented
 interface Monad<F> : Selective<F> {
 
+  val fx: PartiallyAppliedMonadFx<F>
+    get() = object : PartiallyAppliedMonadFx<F> {
+      override val M: Monad<F> = this@Monad
+    }
+
   fun <A, B> Kind<F, A>.flatMap(f: (A) -> Kind<F, B>): Kind<F, B>
 
   fun <A, B> tailRecM(a: A, f: (A) -> Kind<F, Either<A, B>>): Kind<F, B>
@@ -83,4 +88,10 @@ interface Monad<F> : Selective<F> {
     wrapReturn.startCoroutine(continuation, continuation)
     return continuation.returnedMonad()
   }
+}
+
+interface PartiallyAppliedMonadFx<F> {
+  val M: Monad<F>
+  fun <A> monad(c: suspend MonadContinuation<F, *>.() -> A): Kind<F, A> =
+    M.binding(c)
 }

@@ -11,7 +11,7 @@ import kotlin.coroutines.RestrictsSuspension
 @Suppress("DELEGATED_MEMBER_HIDES_SUPERTYPE_OVERRIDE")
 open class ConcurrentCancellableContinuation<F, A>(CF: Concurrent<F>, override val context: CoroutineContext = EmptyCoroutineContext) :
   MonadDeferCancellableContinuation<F, A>(CF), Concurrent<F> by CF, FxSyntax<F> {
-
+  override val fx: PartiallyAppliedConcurrentFx<F> = CF.fx
   override fun <B> binding(c: suspend MonadContinuation<F, *>.() -> B): Kind<F, B> =
     bindingCancellable { c() }.a
 }

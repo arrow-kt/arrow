@@ -77,6 +77,11 @@ interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F> {
 @documented
 interface MonadThrow<F> : MonadError<F, Throwable> {
 
+  override val fx: PartiallyAppliedMonadThrowFx<F>
+    get() = object : PartiallyAppliedMonadThrowFx<F> {
+      override val ME: MonadThrow<F> = this@MonadThrow
+    }
+
   /**
    * Entry point for monad bindings which enables for comprehensions. The underlying implementation is based on
    * coroutines. A coroutine is initiated and suspended inside [MonadErrorContinuation] yielding to [Monad.flatMap].
@@ -141,4 +146,11 @@ interface MonadThrow<F> : MonadError<F, Throwable> {
 
   fun <A> Throwable.raiseNonFatal(): Kind<F, A> =
     if (NonFatal(this)) raiseError(this) else throw this
+}
+
+interface PartiallyAppliedMonadThrowFx<F> : PartiallyAppliedMonadFx<F> {
+  val ME: MonadThrow<F>
+  override val M: Monad<F> get() = ME
+  fun <A> monadThrow(c: suspend MonadErrorContinuation<F, *>.() -> A): Kind<F, A> =
+    ME.bindingCatch(c)
 }
