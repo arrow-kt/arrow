@@ -10,11 +10,12 @@ import arrow.core.identity
 import arrow.core.left
 import arrow.core.none
 import arrow.core.right
+import arrow.effects.extensions.io.concurrent.concurrent
 import arrow.effects.extensions.io.fx.fx
 import arrow.effects.extensions.io.unsafeRun.runBlocking
 import arrow.effects.extensions.io.unsafeRun.unsafeRun
+import arrow.effects.typeclasses.Concurrent
 import arrow.effects.typeclasses.UnsafeRun
-import arrow.effects.typeclasses.suspended.concurrent.Fx
 import arrow.test.UnitSpec
 import arrow.unsafe
 import io.kotlintest.runner.junit4.KotlinTestRunner
@@ -338,13 +339,13 @@ class EffectsSuspendDSLTests : UnitSpec() {
       suspend fun sideEffect(): Int =
         const
 
-      fun <F> Fx<F>.program(): Kind<F, Int> =
-        fx { !effect { sideEffect() } }
+      fun <F> Concurrent<F>.program(): Kind<F, Int> =
+        fx.concurrent { !effect { sideEffect() } }
 
-      fun <F> UnsafeRun<F>.main(fx: Fx<F>): Int =
+      fun <F> UnsafeRun<F>.main(fx: Concurrent<F>): Int =
         unsafe { runBlocking { fx.program() } }
 
-      IO.unsafeRun().main(IO.fx()) shouldBe const
+      IO.unsafeRun().main(IO.concurrent()) shouldBe const
     }
 
     "(suspend () -> A) <-> Kind<F, A>" {

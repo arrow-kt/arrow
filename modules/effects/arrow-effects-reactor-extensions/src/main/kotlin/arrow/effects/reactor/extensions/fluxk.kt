@@ -6,6 +6,7 @@ import arrow.core.Eval
 import arrow.effects.reactor.FluxK
 import arrow.effects.reactor.FluxKOf
 import arrow.effects.reactor.ForFluxK
+import arrow.effects.reactor.extensions.fluxk.async.async
 import arrow.effects.reactor.extensions.fluxk.monad.monad
 import arrow.effects.reactor.extensions.fluxk.monadDefer.monadDefer
 import arrow.effects.reactor.extensions.fluxk.monadError.monadError
@@ -17,6 +18,7 @@ import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.Effect
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.MonadDefer
+import arrow.effects.typeclasses.AsyncContinuation
 import arrow.effects.typeclasses.Proc
 import arrow.effects.typeclasses.ProcF
 import arrow.effects.typeclasses.suspended.monaddefer.Fx
@@ -184,9 +186,6 @@ fun FluxK.Companion.monadErrorSwitch(): FluxKMonadError = object : FluxKMonadErr
     fix().switchMap { f(it).fix() }
 }
 
-// TODO ObservableK does not yet have a Concurrent instance
-@extension
-interface FluxKFx : Fx<ForFluxK> {
-  override fun monadDefer(): MonadDefer<ForFluxK> =
-    FluxK.monadDefer()
-}
+// TODO FluxK does not yet have a Concurrent instance
+fun <A> FluxK.Companion.fx(c: suspend AsyncContinuation<ForFluxK, *>.() -> A): FluxK<A> =
+  FluxK.async().fx.async(c).fix()
