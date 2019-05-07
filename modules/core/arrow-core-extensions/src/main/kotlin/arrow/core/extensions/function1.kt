@@ -23,12 +23,12 @@ import arrow.typeclasses.Divide
 import arrow.typeclasses.Divisible
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadContinuation
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Profunctor
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.conest
 import arrow.typeclasses.counnest
-import arrow.typeclasses.suspended.monad.Fx
 
 @extension
 interface Function1Semigroup<A, B> : Semigroup<Function1<A, B>> {
@@ -156,10 +156,8 @@ interface Function1Monad<I> : Monad<Function1PartialOf<I>>, Function1Applicative
     Function1.tailRecM(a, f)
 }
 
-@extension
-interface Function1Fx<A> : Fx<Function1PartialOf<A>> {
-  override fun monad(): Monad<Function1PartialOf<A>> = Function1.monad()
-}
+fun <A, B> Function1.Companion.fx(c: suspend MonadContinuation<Function1PartialOf<A>, *>.() -> B): Function1<A, B> =
+  Function1.monad<A>().fx.monad(c).fix()
 
 @extension
 interface Function1Category : Category<ForFunction1> {

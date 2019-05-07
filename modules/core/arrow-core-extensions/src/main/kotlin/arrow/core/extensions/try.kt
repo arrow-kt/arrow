@@ -10,7 +10,7 @@ import arrow.core.Success
 import arrow.core.Try
 import arrow.core.Try.Failure
 import arrow.core.TryOf
-import arrow.core.extensions.`try`.monadThrow.monadThrow
+import arrow.core.extensions.`try`.monad.monad
 import arrow.core.fix
 import arrow.core.identity
 import arrow.core.recoverWith
@@ -23,6 +23,7 @@ import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadContinuation
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.Monoid
@@ -199,7 +200,5 @@ interface TryHash<A> : Hash<Try<A>>, TryEq<A> {
   })
 }
 
-@extension
-interface TryFx : arrow.typeclasses.suspended.monaderror.Fx<ForTry> {
-  override fun monadError(): MonadThrow<ForTry> = Try.monadThrow()
-}
+fun <A> Try.Companion.fx(c: suspend MonadContinuation<ForTry, *>.() -> A): Try<A> =
+  Try.monad().fx.monad(c).fix()

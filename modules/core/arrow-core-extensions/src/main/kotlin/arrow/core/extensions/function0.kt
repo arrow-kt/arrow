@@ -16,10 +16,10 @@ import arrow.typeclasses.Bimonad
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadContinuation
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Selective
 import arrow.typeclasses.Semigroup
-import arrow.typeclasses.suspended.monad.Fx
 import arrow.core.select as fun0Select
 
 @extension
@@ -130,7 +130,5 @@ interface Function0Bimonad : Bimonad<ForFunction0> {
     fix().extract()
 }
 
-@extension
-interface Function0Fx<A> : Fx<ForFunction0> {
-  override fun monad(): Monad<ForFunction0> = Function0.monad()
-}
+fun <B> Function0.Companion.fx(c: suspend MonadContinuation<ForFunction0, *>.() -> B): Function0<B> =
+  Function0.monad().fx.monad(c).fix()

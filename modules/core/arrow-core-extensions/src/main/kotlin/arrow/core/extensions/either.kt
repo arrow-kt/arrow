@@ -22,13 +22,13 @@ import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadContinuation
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
-import arrow.typeclasses.suspended.monad.Fx
 import arrow.core.ap as eitherAp
 import arrow.core.combineK as eitherCombineK
 import arrow.core.extensions.traverse as eitherTraverse
@@ -197,7 +197,5 @@ interface EitherHash<L, R> : Hash<Either<L, R>>, EitherEq<L, R> {
   })
 }
 
-@extension
-interface EitherFx<L> : Fx<EitherPartialOf<L>> {
-  override fun monad(): Monad<EitherPartialOf<L>> = Either.monad()
-}
+fun <L, R> Either.Companion.fx(c: suspend MonadContinuation<EitherPartialOf<L>, *>.() -> R): Either<L, R> =
+  Either.monad<L>().fx.monad(c).fix()

@@ -10,7 +10,6 @@ import arrow.core.Id
 import arrow.core.IdOf
 import arrow.core.value
 import arrow.extension
-import arrow.typeclasses.suspended.monad.Fx
 import arrow.core.extensions.traverse as idTraverse
 import arrow.core.extensions.id.monad.monad
 import arrow.core.fix
@@ -29,6 +28,7 @@ import arrow.typeclasses.Bimonad
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Traverse
 import arrow.typeclasses.Hash
+import arrow.typeclasses.MonadContinuation
 import arrow.core.select as idSelect
 
 @extension
@@ -192,7 +192,5 @@ interface IdHash<A> : Hash<Id<A>>, IdEq<A> {
   override fun Id<A>.hash(): Int = HA().run { value().hash() }
 }
 
-@extension
-interface IdFx<A> : Fx<ForId> {
-  override fun monad(): Monad<ForId> = Id.monad()
-}
+fun <A> Id.Companion.fx(c: suspend MonadContinuation<ForId, *>.() -> A): Id<A> =
+  Id.monad().fx.monad(c).fix()

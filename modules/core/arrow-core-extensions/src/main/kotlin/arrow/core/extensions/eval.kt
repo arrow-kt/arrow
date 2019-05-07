@@ -13,7 +13,7 @@ import arrow.typeclasses.Bimonad
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
-import arrow.typeclasses.suspended.monad.Fx
+import arrow.typeclasses.MonadContinuation
 
 @extension
 interface EvalFunctor : Functor<ForEval> {
@@ -50,7 +50,7 @@ interface EvalMonad : Monad<ForEval> {
   override fun <A, B> EvalOf<A>.flatMap(f: (A) -> EvalOf<B>): Eval<B> =
     fix().flatMap(f)
 
-  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, EvalOf<Either<A, B>>>): Eval<B> =
+  override fun <A, B> tailRecM(a: A, f: (A) -> EvalOf<Either<A, B>>): Eval<B> =
     Eval.tailRecM(a, f)
 
   override fun <A, B> EvalOf<A>.map(f: (A) -> B): Eval<B> =
@@ -96,7 +96,5 @@ interface EvalBimonad : Bimonad<ForEval> {
     fix().extract()
 }
 
-@extension
-interface EvalFx<A> : Fx<ForEval> {
-  override fun monad(): Monad<ForEval> = Eval.monad()
-}
+fun <B> Eval.Companion.fx(c: suspend MonadContinuation<ForEval, *>.() -> B): Eval<B> =
+  Eval.monad().fx.monad(c).fix()

@@ -12,7 +12,6 @@ import arrow.core.OptionOf
 import arrow.core.Some
 import arrow.core.Tuple2
 import arrow.extension
-import arrow.typeclasses.suspended.monad.Fx
 import arrow.core.extensions.traverse as optionTraverse
 import arrow.core.extensions.option.monad.map
 import arrow.core.extensions.option.monad.monad
@@ -39,6 +38,7 @@ import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Traverse
 import arrow.typeclasses.Hash
+import arrow.typeclasses.MonadContinuation
 
 @extension
 interface OptionSemigroup<A> : Semigroup<Option<A>> {
@@ -281,7 +281,5 @@ interface OptionHash<A> : Hash<Option<A>>, OptionEq<A> {
   })
 }
 
-@extension
-interface OptionFx : Fx<ForOption> {
-  override fun monad(): Monad<ForOption> = Option.monad()
-}
+fun <A> Option.Companion.fx(c: suspend MonadContinuation<ForOption, *>.() -> A): Option<A> =
+  Option.monad().fx.monad(c).fix()
