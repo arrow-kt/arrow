@@ -4,7 +4,6 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.data.ForNonEmptyList
-import arrow.data.Nel
 import arrow.data.NonEmptyList
 import arrow.data.NonEmptyListOf
 import arrow.data.extensions.nonemptylist.monad.monad
@@ -19,12 +18,12 @@ import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadContinuation
 import arrow.typeclasses.Reducible
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
-import arrow.typeclasses.suspended.monad.Fx
 import arrow.data.combineK as nelCombineK
 
 @extension
@@ -182,9 +181,5 @@ fun <F, A> Reducible<F>.toNonEmptyList(fa: Kind<F, A>): NonEmptyList<A> =
     lnel.map { nonEmptyList -> NonEmptyList(a, listOf(nonEmptyList.head) + nonEmptyList.tail) }
   }).value()
 
-@extension
-interface NelFx : Fx<ForNonEmptyList> {
-
-  override fun monad(): Monad<ForNonEmptyList> =
-    Nel.monad()
-}
+fun <A> NonEmptyList.Companion.fx(c: suspend MonadContinuation<ForNonEmptyList, *>.() -> A): NonEmptyList<A> =
+  NonEmptyList.monad().fx.monad(c).fix()

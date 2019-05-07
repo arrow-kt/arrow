@@ -21,10 +21,10 @@ import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadContinuation
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
-import arrow.typeclasses.suspended.monad.Fx
 import arrow.undocumented
 
 @extension
@@ -145,11 +145,5 @@ interface IorHash<L, R> : Hash<Ior<L, R>>, IorEq<L, R> {
   }
 }
 
-@extension
-interface IorFx<A> : Fx<IorPartialOf<A>> {
-
-  fun SL(): Semigroup<A>
-
-  override fun monad(): Monad<IorPartialOf<A>> =
-    Ior.monad(SL())
-}
+fun <L, R> Ior.Companion.fx(SL: Semigroup<L>, c: suspend MonadContinuation<IorPartialOf<L>, *>.() -> R): Ior<L, R> =
+  Ior.monad(SL).fx.monad(c).fix()

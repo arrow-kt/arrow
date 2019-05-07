@@ -33,6 +33,7 @@ import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
+import arrow.typeclasses.MonadErrorContinuation
 import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.Nested
 import arrow.typeclasses.SemigroupK
@@ -295,12 +296,5 @@ private fun <F, L, A> handleErrorWith(fa: EitherTOf<F, L, A>, f: (L) -> EitherTO
     })
   }
 
-@extension
-@undocumented
-interface EitherTFx<F> : arrow.typeclasses.suspended.monaderror.Fx<EitherTPartialOf<F, Throwable>> {
-
-  fun M(): MonadThrow<F>
-
-  override fun monadError(): MonadThrow<EitherTPartialOf<F, Throwable>> =
-    EitherT.monadThrow(M(), M())
-}
+fun <F, R> EitherT.Companion.fx(M: MonadThrow<F>, c: suspend MonadErrorContinuation<EitherTPartialOf<F, Throwable>, *>.() -> R): EitherT<F, Throwable, R> =
+  EitherT.monadThrow(M, M).fx.monadThrow(c).fix()

@@ -9,14 +9,10 @@ import arrow.core.Tuple3
 import arrow.core.left
 import arrow.core.right
 import arrow.core.toT
-import arrow.data.extensions.list.traverse.traverse
-import arrow.data.fix
 import arrow.effects.CancelToken
 import arrow.effects.KindConnection
 import arrow.effects.data.internal.BindingCancellationException
-import arrow.typeclasses.Applicative
 import arrow.typeclasses.MonadContinuation
-import arrow.typeclasses.Traverse
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine

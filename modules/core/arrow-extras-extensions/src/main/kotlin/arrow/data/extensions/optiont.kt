@@ -34,6 +34,7 @@ import arrow.typeclasses.Divisible
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadContinuation
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.MonoidK
@@ -42,7 +43,6 @@ import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Traverse
 import arrow.typeclasses.compose
 import arrow.typeclasses.fix
-import arrow.typeclasses.suspended.monad.Fx
 import arrow.typeclasses.unnest
 import arrow.undocumented
 
@@ -231,11 +231,5 @@ interface OptionTDecidableInstance<F> : Decidable<OptionTPartialOf<F>>, OptionTD
     )
 }
 
-@extension
-interface OptionTFx<F> : Fx<OptionTPartialOf<F>> {
-
-  fun M(): Monad<F>
-
-  override fun monad(): Monad<OptionTPartialOf<F>> =
-    OptionT.monad(M())
-}
+fun <F, A> OptionT.Companion.fx(M: Monad<F>, c: suspend MonadContinuation<OptionTPartialOf<F>, *>.() -> A): OptionT<F, A> =
+  OptionT.monad(M).fx.monad(c).fix()
