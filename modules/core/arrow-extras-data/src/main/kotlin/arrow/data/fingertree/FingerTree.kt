@@ -149,6 +149,15 @@ sealed class FingerTree<T> : FingerTreeOf<T> {
 
   infix fun concat(tree: FingerTree<T>) = this.concatHelper(emptyList(), tree)
 
+  fun <B> map(f: (T) -> B): FingerTree<B> = fromList(fix().asList().map(f))
+
+  fun <B> flatMap(f: (T) -> FingerTreeOf<B>): FingerTree<B> =
+    this.asList()
+      .map { f(it) }
+      .fold(empty(), { a, b -> a concat b.fix() })
+
+  fun <B> ap(ff: FingerTreeOf<(T) -> B>): FingerTree<B> = ff.fix().flatMap { f -> map(f) }
+
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (javaClass != other?.javaClass) return false

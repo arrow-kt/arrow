@@ -1,12 +1,17 @@
 package arrow.data
 
-import arrow.core.*
-import arrow.data.fingertree.internal.Affix.*
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.Tuple2
 import arrow.data.fingertree.FingerTree
 import arrow.data.fingertree.FingerTree.*
+import arrow.data.fingertree.FingerTree.Companion.single
+import arrow.data.fingertree.internal.Affix.*
 import arrow.data.fingertree.internal.Node
 import arrow.data.fingertree.internal.Node.Branch2
 import arrow.data.fingertree.internal.Node.Branch3
+import arrow.test.generators.functionAToB
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
@@ -324,5 +329,37 @@ class FingerTreeTest : StringSpec() {
         (FingerTree.fromList(l1) concat FingerTree.fromList(l2)).asList() == l1 + l2
       }
     }
+
+
+    /**
+     * map
+     */
+
+    "Property based testing for map()" {
+      forAll(Gen.list(Gen.int()), Gen.functionAToB<Int, Int>(Gen.int())) { l, f ->
+        (FingerTree.fromList(l).map(f)).asList() == l.map(f)
+      }
+    }
+
+    /**
+     * flatMap
+     */
+
+    "Property based testing for flatMap()" {
+      forAll(Gen.list(Gen.int()), Gen.functionAToB<Int, Int>(Gen.int())) { l, f ->
+        (FingerTree.fromList(l).flatMap { single(f(it)) }).asList() == l.flatMap { listOf(f(it)) }
+      }
+    }
+
+    /**
+     * ap()
+     */
+
+    "Property based testing for ap()" {
+      forAll(Gen.list(Gen.int()), Gen.list(Gen.functionAToB<Int, Int>(Gen.int()))) { l, fs ->
+        (FingerTree.fromList(l).ap(FingerTree.fromList(fs))).asList() == fs.flatMap { f -> l.map(f) }
+      }
+    }
+
   }
 }
