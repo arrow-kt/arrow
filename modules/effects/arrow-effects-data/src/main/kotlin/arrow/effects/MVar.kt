@@ -221,7 +221,7 @@ interface MVar<F, A> {
       CancelableMVar.empty(CF)
 
     /**
-     * Create an uncancelable [MVar] that's initialized to an [initial] value.
+     * Create a cancelable [MVar] that's initialized to an [initial] value.
      *
      * ```kotlin:ank:playground
      * import arrow.effects.*
@@ -288,7 +288,7 @@ interface MVar<F, A> {
     fun <F, A> uncancelableOf(initial: A, AS: Async<F>): Kind<F, MVar<F, A>> =
       UncancelableMVar(initial, AS)
 
-    operator fun <F> invoke(AS: Async<F>) = object : MVarFactory<F> {
+    fun <F> factoryUncancelable(AS: Async<F>) = object : MVarFactory<F> {
 
       override fun <A> just(a: A): Kind<F, MVar<F, A>> =
         UncancelableMVar(a, AS)
@@ -297,7 +297,7 @@ interface MVar<F, A> {
         UncancelableMVar.empty(AS)
     }
 
-    operator fun <F> invoke(CF: Concurrent<F>) = object : MVarFactory<F> {
+    fun <F> factoryCancelable(CF: Concurrent<F>) = object : MVarFactory<F> {
 
       override fun <A> just(a: A): Kind<F, MVar<F, A>> =
         CancelableMVar(a, CF)
