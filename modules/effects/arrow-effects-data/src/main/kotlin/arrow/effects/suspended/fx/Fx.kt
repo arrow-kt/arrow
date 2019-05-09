@@ -62,7 +62,7 @@ sealed class Fx<out A> : FxOf<A> {
 
   @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
   inline fun <B> map(noinline f: (A) -> B): Fx<B> = when (this) {
-    is RaiseError -> unsafeRecast()
+    is RaiseError -> this
     is Pure -> Lazy { f(value) }
     is Single -> Map(this, f)
     is Lazy -> {
@@ -88,13 +88,13 @@ sealed class Fx<out A> : FxOf<A> {
               (fa).internalValue = f(fa.value as A)
               fa.unsafeRecast<B>()
             }
-            is RaiseError -> fa.unsafeRecast()
+            is RaiseError -> fa
             is Lazy -> {
               try {
                 fa.source = { f(fa.source(Unit) as A) }
                 fa
               } catch (e: Throwable) {
-                RaiseError<B>(e.nonFatalOrThrow())
+                RaiseError(e.nonFatalOrThrow())
               }
             }
             else -> Map(fb(a), f as (Any?) -> B)
@@ -126,7 +126,7 @@ sealed class Fx<out A> : FxOf<A> {
 
   @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
   inline fun <B> flatMap(noinline f: (A) -> FxOf<B>): Fx<B> = when (this) {
-    is RaiseError -> unsafeRecast()
+    is RaiseError -> this
     is Pure -> Defer { f(value) }
     is Single -> FlatMap(this, f, 0)
     is Lazy -> Defer { f(source(Unit)) }
@@ -142,12 +142,12 @@ sealed class Fx<out A> : FxOf<A> {
         val fbb = fb as (Any?) -> FxOf<A>
         when (val fx: Fx<A> = fbb(a).fix()) {
           is Pure -> f(fx.value)
-          is RaiseError -> fx.unsafeRecast()
+          is RaiseError -> fx
           is Lazy -> {
             try {
               f(fx.source(Unit))
             } catch (e: Throwable) {
-              RaiseError<B>(e.nonFatalOrThrow())
+              RaiseError(e.nonFatalOrThrow())
             }
           }
           else -> FlatMap(fx, f, 0)
@@ -163,7 +163,7 @@ sealed class Fx<out A> : FxOf<A> {
   suspend inline fun bind(): A = !this
 
   @PublishedApi
-  internal class RaiseError<A>(@JvmField val error: Throwable) : Fx<A>() {
+  internal class RaiseError(@JvmField val error: Throwable) : Fx<Nothing>() {
     override fun toString(): String = "Fx.RaiseError(error = $error)"
   }
 
@@ -331,7 +331,7 @@ sealed class Fx<out A> : FxOf<A> {
     is RaiseError -> this
     is Pure -> if (!predicate(value)) RaiseError(error()) else this
     else -> flatMap { result ->
-      if (!predicate(result)) RaiseError<A>(error())
+      if (!predicate(result)) RaiseError(error())
       else Pure<A>(result, 0)
     }
   }
