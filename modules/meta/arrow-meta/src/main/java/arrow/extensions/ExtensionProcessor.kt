@@ -131,7 +131,7 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class), PolyTempl
     knownError("@instance is only allowed on `interface` extending another interface of at least one type argument (type class) as first declaration in the instance list")
 
   private fun TypeClassInstance.supportsCache(): Boolean =
-    instance.typeVariables.isEmpty() && requiredAbstractFunctions.isEmpty()
+    requiredAbstractFunctions.isEmpty()
 
   private fun TypeClassInstance.cachedInstanceName(): String =
     typeClass.name.simpleName.decapitalize() + "_singleton"
@@ -141,8 +141,11 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class), PolyTempl
       kdoc = Code { "cached extension" },
       name = cachedInstanceName(),
       modifiers = listOf(Modifier.Private),
-      type = instance.name,
-      initializer = Code { "object : ${+instance.name} { ${requiredAbstractFunctions.code()} }" }
+      type = instance.name.widenTypeArgs(),
+      initializer = Code {
+        if (instance.typeVariables.isEmpty()) "object : ${+instance.name} {}"
+        else "object : ${+instance.name.simpleName}<${instance.typeVariables.joinToString { "Any?" }}> {}"
+      }
     )
 
   fun TypeClassInstance.genCompanionFactory(targetType: TypeName): Func {
@@ -156,13 +159,19 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class), PolyTempl
     }
     return Func(
       kdoc = typeClass.kdoc?.eval(this),
+      annotations = listOf(
+        SuppressAnnotation(
+          """"UNCHECKED_CAST""""
+        )
+      ),
       name = typeClass.name.simpleName.decapitalize(),
       parameters = requiredParameters,
       receiverType = target,
       typeVariables = instance.typeVariables.map { it.removeConstrains() },
       returnType = instance.name,
       body = Code {
-        if (supportsCache()) "return ${cachedInstanceName()}"
+        if (supportsCache() && instance.typeVariables.isEmpty()) "return ${cachedInstanceName()}"
+        else if (supportsCache() && instance.typeVariables.isNotEmpty()) "return ${cachedInstanceName()} as ${+instance.name}"
         else "return object : ${+instance.name} { ${requiredAbstractFunctions.code()} }"
       }
     )

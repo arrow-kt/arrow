@@ -566,6 +566,17 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
       }
     }
 
+  override fun TypeName.widenTypeArgs(): TypeName =
+    when (this) {
+      is TypeName.TypeVariable -> this
+      is TypeName.WildcardType -> this
+      is TypeName.FunctionLiteral -> this
+      is TypeName.ParameterizedType -> copy(
+        typeArguments = typeArguments.map { TypeName.AnyNullable }
+      )
+      is TypeName.Classy -> this
+    }
+
   /**
    * Returns a Pair matching a type as wrapper and the type it wraps
    * ex: SetK<A> to Set<A>

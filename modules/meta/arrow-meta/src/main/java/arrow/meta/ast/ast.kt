@@ -137,6 +137,7 @@ sealed class TypeName : Tree() {
 
   companion object {
     val Unit: TypeName = TypeName.Classy(simpleName = "Unit", pckg = PackageName("kotlin"), fqName = "kotlin.Unit")
+    val AnyNullable: TypeName = TypeName.TypeVariable("Any?")
   }
 }
 

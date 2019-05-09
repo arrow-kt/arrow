@@ -139,6 +139,11 @@ interface MetaApi {
   val TypeName.projectedCompanion: TypeName
 
   /**
+   * Resets all type arguments to [Any?]
+   */
+  fun TypeName.widenTypeArgs(): TypeName
+
+  /**
    * Returns a type name given a `KClass`
    */
   fun <A : Any> TypeName.Companion.typeNameOf(clazz: KClass<A>): TypeName
