@@ -109,7 +109,7 @@ interface Ref<F, A> {
     fun <F, A> of(a: A, MD: MonadDefer<F>): Kind<F, Ref<F, A>> = MD.delay {
       unsafe(a, MD)
     }
-    
+
     /**
      * Creates an asynchronous, concurrent mutable reference initialized using the supplied function.
      */
