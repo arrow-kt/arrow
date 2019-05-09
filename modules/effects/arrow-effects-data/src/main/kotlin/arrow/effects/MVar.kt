@@ -288,18 +288,18 @@ interface MVar<F, A> {
     fun <F, A> uncancelableOf(initial: A, AS: Async<F>): Kind<F, MVar<F, A>> =
       UncancelableMVar(initial, AS)
 
-    operator fun <F> invoke(AS: Async<F>) = object : MVarPartialOf<F> {
+    operator fun <F> invoke(AS: Async<F>) = object : MVarFactory<F> {
 
-      override fun <A> of(a: A): Kind<F, MVar<F, A>> =
+      override fun <A> just(a: A): Kind<F, MVar<F, A>> =
         UncancelableMVar(a, AS)
 
       override fun <A> empty(): Kind<F, MVar<F, A>> =
         UncancelableMVar.empty(AS)
     }
 
-    operator fun <F> invoke(CF: Concurrent<F>) = object : MVarPartialOf<F> {
+    operator fun <F> invoke(CF: Concurrent<F>) = object : MVarFactory<F> {
 
-      override fun <A> of(a: A): Kind<F, MVar<F, A>> =
+      override fun <A> just(a: A): Kind<F, MVar<F, A>> =
         CancelableMVar(a, CF)
 
       override fun <A> empty(): Kind<F, MVar<F, A>> =
@@ -325,7 +325,7 @@ interface MVar<F, A> {
  * }
  * ```
  */
-interface MVarPartialOf<F> {
+interface MVarFactory<F> {
 
   /**
    * Builds a [MVar] with a value of type [A].
@@ -342,7 +342,7 @@ interface MVarPartialOf<F> {
    * }
    * ```
    */
-  fun <A> of(a: A): Kind<F, MVar<F, A>>
+  fun <A> just(a: A): Kind<F, MVar<F, A>>
 
   /**
    * Builds an empty [MVar] for type [A].
