@@ -532,6 +532,16 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
     )
 
   /**
+   * @see [MetaApi.PublishedApi]
+   */
+  override fun PublishedApi(): Annotation =
+    Annotation(
+      type = TypeName.typeNameOf(PublishedApi::class),
+      members = listOf(Code.empty),
+      useSiteTarget = null
+    )
+
+  /**
    * @see [MetaApi.SuppressAnnotation]
    */
   override fun SuppressAnnotation(vararg names: String): Annotation =

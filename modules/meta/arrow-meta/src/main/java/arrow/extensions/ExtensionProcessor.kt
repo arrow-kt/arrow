@@ -140,7 +140,8 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class), PolyTempl
     Property(
       kdoc = Code { "cached extension" },
       name = cachedInstanceName(),
-      modifiers = listOf(Modifier.Private),
+      annotations = listOf(PublishedApi()),
+      modifiers = listOf(Modifier.Internal),
       type = instance.name.widenTypeArgs(),
       initializer = Code {
         if (instance.typeVariables.isEmpty()) "object : ${+instance.name} {}"
@@ -159,9 +160,11 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class), PolyTempl
     }
     return Func(
       kdoc = typeClass.kdoc?.eval(this),
+      modifiers = listOf(Modifier.Inline),
       annotations = listOf(
         SuppressAnnotation(
-          """"UNCHECKED_CAST""""
+          """"UNCHECKED_CAST"""",
+          """"NOTHING_TO_INLINE""""
         )
       ),
       name = typeClass.name.simpleName.decapitalize(),

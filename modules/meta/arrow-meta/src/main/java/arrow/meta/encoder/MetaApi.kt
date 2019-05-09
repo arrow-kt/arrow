@@ -261,6 +261,11 @@ interface MetaApi {
   fun JvmName(name: String): Annotation
 
   /**
+   * A instance of @PublishedApi in the Arrow Meta AST
+   */
+  fun PublishedApi(): Annotation
+
+  /**
    * A instance of @SuppressAnnotation in the Arrow Meta AST
    */
   fun SuppressAnnotation(vararg names: String): Annotation
