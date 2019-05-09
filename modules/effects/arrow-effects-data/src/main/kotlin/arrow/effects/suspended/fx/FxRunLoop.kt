@@ -27,7 +27,7 @@ object FxRunLoop {
 
   /** Internal API for [Fx.not] */
   suspend operator fun <A> invoke(source: FxOf<A>): A = suspendCoroutine { cont ->
-    FxRunLoop.start(source) {
+    start(source) {
       it.fold(cont::resumeWithException, cont::resume)
     }
   }
@@ -93,8 +93,7 @@ object FxRunLoop {
           hasResult = true
         }
         is Fx.RaiseError -> {
-          val errorHandler: FxFrame<Any?, Fx<Any?>>? = findErrorHandlerInCallStack(bFirst, bRest)
-          when (errorHandler) {
+          when (val errorHandler: FxFrame<Any?, Fx<Any?>>? = findErrorHandlerInCallStack(bFirst, bRest)) {
             null -> {
               cb(Either.Left(source.error))
               return
@@ -376,8 +375,8 @@ object FxRunLoop {
     override val context: CoroutineContext
       get() = _context
 
-    override fun resumeWith(a: Result<Any?>) {
-      result = a.fold(
+    override fun resumeWith(result: Result<Any?>) {
+      this.result = result.fold(
         onSuccess = { Fx.Pure(it, 0) },
         onFailure = { Fx.RaiseError(it) }
       )
@@ -421,7 +420,7 @@ object FxRunLoop {
     var current: Current? = source as Fx<Any?>
     var bFirst: BindF? = null
     var bRest: CallStack? = null
-    var hasResult: Boolean = false
+    var hasResult = false
     var result: Any? = null
 
     while (true) {
@@ -432,10 +431,9 @@ object FxRunLoop {
           // current = null ??? see LazyTag
         }
         is Fx.RaiseError -> {
-          val errorHandler: FxFrame<Any?, Fx<Any?>>? = findErrorHandlerInCallStack(bFirst, bRest)
-          when (errorHandler) {
+          when (val errorHandler: FxFrame<Any?, Fx<Any?>>? = findErrorHandlerInCallStack(bFirst, bRest)) {
             // Return case for unhandled errors
-            null -> return current as Fx<A>
+            null -> return current
             else -> {
               val exception: Throwable = current.error
               current = executeSafe { errorHandler.recover(exception) }

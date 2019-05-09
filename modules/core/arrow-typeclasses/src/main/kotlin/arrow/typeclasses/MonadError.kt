@@ -15,6 +15,10 @@ interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F> {
       if (predicate(it)) just(it)
       else raiseError(error())
     }
+
+  fun <A, B> Kind<F, A>.redeemWith(fe: (E) -> Kind<F, B>, fs: (A) -> Kind<F, B>): Kind<F, B> =
+    flatMap(fs).handleErrorWith(fe)
+
 }
 
 /**

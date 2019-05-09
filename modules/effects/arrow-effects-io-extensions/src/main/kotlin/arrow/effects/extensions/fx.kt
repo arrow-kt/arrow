@@ -37,6 +37,9 @@ import kotlin.coroutines.CoroutineContext
 import arrow.effects.suspended.fx.bracketCase as bracketC
 import arrow.effects.suspended.fx.guaranteeCase as guaranteeC
 import arrow.effects.suspended.fx.handleErrorWith as fxHandleErrorWith
+import arrow.effects.suspended.fx.handleError as fxHandleError
+import arrow.effects.suspended.fx.redeem as fxRedeem
+import arrow.effects.suspended.fx.redeemWith as fxRedeemWith
 
 @extension
 interface FxDispatchers : Dispatchers<ForFx> {
@@ -90,8 +93,18 @@ interface FxApplicativeError : ApplicativeError<ForFx, Throwable>, FxApplicative
   override fun <A> raiseError(e: Throwable): Fx<A> =
     Fx.raiseError(e)
 
+  override fun <A> FxOf<A>.handleError(f: (Throwable) -> A): Fx<A> =
+    fxHandleError(f)
+
   override fun <A> FxOf<A>.handleErrorWith(f: (Throwable) -> FxOf<A>): Fx<A> =
-    fix().fxHandleErrorWith { f(it).fix() }
+    fxHandleErrorWith(f)
+
+  override fun <A, B> FxOf<A>.redeem(fe: (Throwable) -> B, fs: (A) -> B): Fx<B> =
+    fxRedeem(fe, fs)
+
+  override fun <A> FxOf<A>.attempt(): Fx<Either<Throwable, A>> =
+    fix().attempt()
+
 }
 
 @extension
@@ -114,7 +127,10 @@ interface FxMonad : Monad<ForFx>, FxApplicative {
 }
 
 @extension
-interface FxMonadError : MonadError<ForFx, Throwable>, FxApplicativeError, FxMonad
+interface FxMonadError : MonadError<ForFx, Throwable>, FxApplicativeError, FxMonad {
+  override fun <A, B> FxOf<A>.redeemWith(fe: (Throwable) -> FxOf<B>, fs: (A) -> FxOf<B>): Fx<B> =
+    fxRedeemWith(fe, fs)
+}
 
 @extension
 interface FxMonadThrow : MonadThrow<ForFx>, FxMonadError
@@ -126,12 +142,21 @@ interface FxBracket : Bracket<ForFx, Throwable>, FxMonadThrow {
 
   override fun <A> FxOf<A>.guaranteeCase(finalizer: (ExitCase<Throwable>) -> FxOf<Unit>): Fx<A> =
     guaranteeC(finalizer)
+
+  override fun <A> FxOf<A>.uncancelable(): Fx<A> =
+    fix().uncancelable()
 }
 
 @extension
 interface FxMonadDefer : MonadDefer<ForFx>, FxBracket {
   override fun <A> defer(fa: () -> FxOf<A>): Fx<A> =
-    Fx.unit.flatMap { fa() }
+    Fx.defer(fa)
+
+  override fun <A> delay(f: () -> A): Fx<A> =
+    Fx.lazy { f() }
+
+  override fun lazy(): Fx<Unit> =
+    Fx.lazy
 }
 
 @extension

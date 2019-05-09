@@ -19,17 +19,20 @@ interface ApplicativeError<F, E> : Applicative<F> {
 
   fun <A> Kind<F, A>.handleErrorWith(f: (E) -> Kind<F, A>): Kind<F, A>
 
+  fun <A, B> Kind<F, A>.redeem(fe: (E) -> B, fs: (A) -> B): Kind<F, B> =
+    map(fs).handleError(fe)
+
   fun <A> E.raiseError(dummy: Unit = Unit): Kind<F, A> =
     raiseError(this)
 
   fun <A> OptionOf<A>.fromOption(f: () -> E): Kind<F, A> =
-    fix().fold({ raiseError<A>(f()) }, { just(it) })
+    fix().fold({ raiseError(f()) }, { just(it) })
 
   fun <A, EE> Either<EE, A>.fromEither(f: (EE) -> E): Kind<F, A> =
-    fix().fold({ raiseError<A>(f(it)) }, { just(it) })
+    fix().fold({ raiseError(f(it)) }, { just(it) })
 
   fun <A> TryOf<A>.fromTry(f: (Throwable) -> E): Kind<F, A> =
-    fix().fold({ raiseError<A>(f(it)) }, { just(it) })
+    fix().fold({ raiseError(f(it)) }, { just(it) })
 
   fun <A> Kind<F, A>.handleError(f: (E) -> A): Kind<F, A> =
     handleErrorWith { just(f(it)) }
@@ -39,16 +42,12 @@ interface ApplicativeError<F, E> : Applicative<F> {
       just(Left(it))
     }
 
-  fun <A> catch(recover: (Throwable) -> E, f: () -> A): Kind<F, A> =
-    try {
-      just(f())
-    } catch (t: Throwable) {
-      if (NonFatal(t)) {
-        raiseError<A>(recover(t))
-      } else {
-        throw t
-      }
-    }
+  fun <A> catch(recover: (Throwable) -> E, f: () -> A): Kind<F, A> = try {
+    just(f())
+  } catch (t: Throwable) {
+    if (NonFatal(t)) raiseError(recover(t))
+    else throw t
+  }
 
   fun <A> ApplicativeError<F, Throwable>.catch(f: () -> A): Kind<F, A> =
     catch(::identity, f)

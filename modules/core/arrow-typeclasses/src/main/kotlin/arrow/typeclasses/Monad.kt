@@ -24,7 +24,8 @@ import kotlin.coroutines.startCoroutine
  *
  */
 @documented
-interface Monad<F> : Selective<F> {
+interface
+Monad<F> : Selective<F> {
 
   fun <A, B> Kind<F, A>.flatMap(f: (A) -> Kind<F, B>): Kind<F, B>
 

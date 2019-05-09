@@ -40,6 +40,7 @@ suspend inline operator fun <A> FxOf<A>.not(): A = !fix()
 sealed class Fx<out A> : FxOf<A> {
 
   @PublishedApi
+  @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
   internal inline fun <B> unsafeRecast(): Fx<B> = this as Fx<B>
 
   fun <B> followedBy(fa: FxOf<B>): Fx<B> =
@@ -169,6 +170,7 @@ sealed class Fx<out A> : FxOf<A> {
 
   @PublishedApi
   internal class Pure<A>(@JvmField var internalValue: Any?, var index: Int) : Fx<A>() {
+    @Suppress("UNCHECKED_CAST")
     inline val value: A
       get() = internalValue as A
 
@@ -354,7 +356,6 @@ sealed class Fx<out A> : FxOf<A> {
    * A [Fiber] is a function pair that you can use to [Fiber.join] or [Fiber.cancel] a concurrently running [Fx].
    *
    * @see Fx.Companion.racePair for another combinator using [Fiber]
-   * @see Concurrent a tagless version of this operators derived and build from [fork].
    */
   fun fork(ctx: CoroutineContext): Fx<Fiber<ForFx, A>> = async { oldConn, cb ->
     val promise = UnsafePromise<A>()
@@ -370,7 +371,7 @@ sealed class Fx<out A> : FxOf<A> {
   }
 
   /**
-   * Makes the source [Fx] uncancelable and switches back to the original cancellation connection after running [this].
+   * Make [Fx] uncancelable and switches back to the original cancellation connection after running.
    */
   fun uncancelable(): Fx<A> =
     ConnectionSwitch(this, ConnectionSwitch.makeUncancelable, { _, _, old, _ -> old })
@@ -518,11 +519,11 @@ sealed class Fx<out A> : FxOf<A> {
      */
     @JvmStatic
     fun <A> unsafeRunNonBlockingCancellable(fx: FxOf<A>, onCancel: OnCancel = OnCancel.Silent, cb: (Either<Throwable, A>) -> Unit): Disposable =
-      unsafeRunBlocking(runNonBlockingCancellable(fx, onCancel, cb.andThen { Fx.unit }))
+      unsafeRunBlocking(runNonBlockingCancellable(fx, onCancel, cb.andThen { unit }))
 
     @JvmStatic
     fun <A> runNonBlockingCancellable(fx: FxOf<A>, onCancel: OnCancel = OnCancel.Silent, cb: (Either<Throwable, A>) -> Fx<Unit>): Fx<Disposable> =
-      async { _ /* The start of this execution is immediate and uncancellable */, cbb ->
+      async { _ /* The start of this execution is immediate and uncancelable */, cbb ->
         val conn = FxConnection()
         val onCancelCb =
           when (onCancel) {
