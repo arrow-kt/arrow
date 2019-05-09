@@ -16,6 +16,7 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.StringSpec
+import java.util.*
 
 class FingerTreeTest : StringSpec() {
 
@@ -256,6 +257,16 @@ class FingerTreeTest : StringSpec() {
       fingerTree.rotateClockwise(11).asList() shouldBe listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
     }
 
+    "Property based testing for rotateClockwise()" {
+
+      forAll(Gen.positiveIntegers(), Gen.list(Gen.int())) { rotationCount, list ->
+        val tree = FingerTree.fromList(list)
+        Collections.rotate(list, -rotationCount)
+
+        tree.rotateClockwise(rotationCount).asList() == list
+      }
+    }
+
     /**
      * rotateCounterClockwise()
      */
@@ -278,6 +289,16 @@ class FingerTreeTest : StringSpec() {
       val fingerTree = Deep(One(0), Deep<Node<Int>>(One(Branch3(1, 2, 3)), Empty(), One(Branch3(4, 5, 6))), Four(7, 8, 9, 10))
 
       fingerTree.rotateCounterClockwise(11).asList() shouldBe listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+    }
+
+    "Property based testing for rotateCounterClockwise()" {
+
+      forAll(Gen.positiveIntegers(), Gen.list(Gen.int())) { rotationCount, list ->
+        val tree = FingerTree.fromList(list)
+        Collections.rotate(list, rotationCount)
+
+        tree.rotateCounterClockwise(rotationCount).asList() == list
+      }
     }
 
     /**

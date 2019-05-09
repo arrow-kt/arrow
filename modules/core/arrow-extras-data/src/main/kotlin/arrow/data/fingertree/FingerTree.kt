@@ -113,6 +113,13 @@ sealed class FingerTree<T> : FingerTreeOf<T> {
 
   fun isEmpty() = this is Empty
 
+  fun size(): Int =
+    when (this) {
+      is Empty -> 0
+      is Single -> 1
+      is Deep -> this.asList().size
+    }
+
   fun asList(): List<T> = this.asSequence().toList()
 
   fun asSequence(): Sequence<T> = sequence {
@@ -122,12 +129,16 @@ sealed class FingerTree<T> : FingerTreeOf<T> {
   fun rotateClockwise(times: Int): FingerTree<T> {
     var tree: FingerTree<T> = this
 
-    repeat(times) {
-      when (val head = tree.viewL()) {
-        is None -> Empty<T>()
-        is Some -> {
-          tree = head.t.b.append(head.t.a)
-        }
+    val rotationCount = if (tree.size() == 0 || tree.size() == 1) {
+      0
+    } else {
+      times % tree.size()
+    }
+
+    repeat(rotationCount) {
+      val leftView = tree.viewL()
+      if (leftView is Some) {
+        tree = leftView.t.b.append(leftView.t.a)
       }
     }
     return tree
@@ -135,13 +146,17 @@ sealed class FingerTree<T> : FingerTreeOf<T> {
 
   fun rotateCounterClockwise(times: Int): FingerTree<T> {
     var tree: FingerTree<T> = this
-    repeat(times) {
 
-      when (val head = tree.viewR()) {
-        is None -> Empty<T>()
-        is Some -> {
-          tree = head.t.b.prepend(head.t.a)
-        }
+    val rotationCount = if (tree.size() == 0 || tree.size() == 1) {
+      0
+    } else {
+      times % tree.size()
+    }
+
+    repeat(rotationCount) {
+      val rightView = tree.viewR()
+      if (rightView is Some) {
+        tree = rightView.t.b.prepend(rightView.t.a)
       }
     }
     return tree
