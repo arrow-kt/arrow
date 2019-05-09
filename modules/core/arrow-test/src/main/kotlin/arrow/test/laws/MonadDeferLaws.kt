@@ -6,10 +6,9 @@ import arrow.core.Left
 import arrow.core.Right
 import arrow.core.Try
 import arrow.core.left
-import arrow.core.recover
 import arrow.core.right
-import arrow.data.k
 import arrow.data.extensions.list.foldable.foldLeft
+import arrow.data.k
 import arrow.effects.data.internal.BindingCancellationException
 import arrow.effects.typeclasses.MonadDefer
 import arrow.test.concurrency.SideEffect
@@ -233,7 +232,7 @@ object MonadDeferLaws {
         val (c) = just(b + 1)
         c
       }
-      Try { Thread.sleep(10); dispose() }.recover { throw it }
+      Try { Thread.sleep(10); dispose() }.toEither().mapLeft { throw it }
       binding.equalUnderTheLaw(raiseError(BindingCancellationException()), EQ) && sideEffect.counter == 0
     }
 
@@ -246,7 +245,7 @@ object MonadDeferLaws {
         val b = bindDefer { Thread.sleep(20); sideEffect.increment(); a + 1 }
         b
       }
-      Try { Thread.sleep(10); dispose() }.recover { throw it }
+      Try { Thread.sleep(10); dispose() }.toEither().mapLeft { throw it }
       binding.equalUnderTheLaw(raiseError(BindingCancellationException()), EQ) &&
         sideEffect.counter == 0
     }
@@ -261,7 +260,7 @@ object MonadDeferLaws {
         val (c) = just(b + 1)
         c
       }
-      Try { Thread.sleep(10); dispose() }.recover { throw it }
+      Try { Thread.sleep(10); dispose() }.toEither().mapLeft { throw it }
       binding.equalUnderTheLaw(raiseError(BindingCancellationException()), EQ) && sideEffect.counter == 0
     }
 
@@ -274,7 +273,7 @@ object MonadDeferLaws {
         val b = bindIn(Dispatchers.Default) { Thread.sleep(20); sideEffect.increment(); a + 1 }
         b
       }
-      Try { Thread.sleep(10); dispose() }.recover { throw it }
+      Try { Thread.sleep(10); dispose() }.toEither().mapLeft { throw it }
       binding.equalUnderTheLaw(raiseError(BindingCancellationException()), EQ) &&
         sideEffect.counter == 0
     }

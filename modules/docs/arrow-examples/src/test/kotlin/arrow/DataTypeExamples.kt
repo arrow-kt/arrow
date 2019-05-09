@@ -21,8 +21,8 @@ import arrow.core.extensions.`try`.functor.functor
 import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.option.fx.fx
 import arrow.core.flatMap
-import arrow.core.recover
-import arrow.core.recoverWith
+import arrow.core.handleError
+import arrow.core.handleErrorWith
 import io.kotlintest.Matcher
 import io.kotlintest.Result
 import io.kotlintest.shouldBe
@@ -128,9 +128,9 @@ class DataTypeExamples : FreeSpec() { init {
 
     "Recover" {
       val gain = Try { playLottery(99) }
-      gain.recover { 0 } shouldBe Try.Success(0)
+      gain.handleError { 0 } shouldBe Try.Success(0)
 
-      gain.recoverWith { Try { playLottery(42) } } shouldBe Try.Success(1000)
+      gain.handleErrorWith { Try { playLottery(42) } } shouldBe Try.Success(1000)
     }
 
     "Fold" {

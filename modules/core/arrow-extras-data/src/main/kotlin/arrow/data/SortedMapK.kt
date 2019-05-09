@@ -5,9 +5,9 @@ import arrow.core.Eval
 import arrow.core.Option
 import arrow.core.Tuple2
 import arrow.core.identity
+import arrow.core.iterateRight
 import arrow.higherkind
 import arrow.typeclasses.Applicative
-import arrow.typeclasses.Foldable
 
 @higherkind
 data class SortedMapK<A : Comparable<A>, B>(private val map: SortedMap<A, B>) : SortedMapKOf<A, B>, SortedMapKKindedJ<A, B>, SortedMap<A, B> by map {
@@ -40,7 +40,7 @@ data class SortedMapK<A : Comparable<A>, B>(private val map: SortedMap<A, B>) : 
     }.k()
 
   fun <C> foldRight(c: Eval<C>, f: (B, Eval<C>) -> Eval<C>): Eval<C> =
-    this.map.values.iterator().iterateRight(c)(f)
+    this.map.values.iterator().iterateRight(c, f)
 
   fun <C> foldLeft(c: C, f: (C, B) -> C): C = this.map.values.fold(c, f)
 
@@ -48,7 +48,7 @@ data class SortedMapK<A : Comparable<A>, B>(private val map: SortedMap<A, B>) : 
     this.map.foldLeft(c) { m: SortedMap<A, C>, (a, b) -> f(m.k(), Tuple2(a, b)) }.k()
 
   fun <G, C> traverse(GA: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, SortedMapK<A, C>> = GA.run {
-    (Foldable.iterateRight(map.iterator(), Eval.always { just(sortedMapOf<A, C>().k()) })) { kv, lbuf ->
+    map.iterator().iterateRight(Eval.always { just(sortedMapOf<A, C>().k()) }) { kv, lbuf ->
       f(kv.value).map2Eval(lbuf) { (mapOf(kv.key to it.a).k() + it.b).toSortedMap().k() }
     }.value()
   }
