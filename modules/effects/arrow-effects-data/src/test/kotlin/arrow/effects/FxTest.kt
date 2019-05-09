@@ -97,7 +97,15 @@ class FxTest : UnitSpec() {
       Fx.unsafeRunBlocking(
         Fx.unit
           .continueOn(newSingleThreadContext("test"))
-          .flatMap { Fx { Thread.currentThread().name shouldBe "test" } }
+          .flatMap { Fx.lazy { Thread.currentThread().name shouldBe "test" } }
+      )
+    }
+
+    "UpdateContext should switch threads" {
+      Fx.unsafeRunBlocking(
+        Fx.unit
+          .updateContext { newSingleThreadContext("test") }
+          .flatMap { Fx.lazy { Thread.currentThread().name shouldBe "test" } }
       )
     }
 

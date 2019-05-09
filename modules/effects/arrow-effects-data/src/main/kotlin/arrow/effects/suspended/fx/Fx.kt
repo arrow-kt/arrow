@@ -53,12 +53,14 @@ sealed class Fx<out A> : FxOf<A> {
       is Single -> suspend { source() }
       is Lazy -> suspend { source(Unit) }
       is Defer -> suspend { FxRunLoop(thunk()) }
-      is Map<*, A> -> suspend { FxRunLoop(this) } //g(FxRunLoop(source)) in Any? land
+      is Map<*, A> -> suspend { FxRunLoop(this) } // g(FxRunLoop(source)) in Any? land
       is FlatMap<*, A> -> suspend { FxRunLoop(this) }
       is UpdateContext -> suspend { FxRunLoop(this) }
       is ContinueOn -> suspend { FxRunLoop(this) }
       is ConnectionSwitch -> suspend { FxRunLoop(this) }
       is Async -> suspend { FxRunLoop(this) }
+      is AsyncContinueOn -> suspend { FxRunLoop(this) }
+      is AsyncUpdateContext -> suspend { FxRunLoop(this) }
     }
 
   @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
@@ -108,6 +110,8 @@ sealed class Fx<out A> : FxOf<A> {
     is ContinueOn -> Map(this, f)
     is ConnectionSwitch -> Map(this, f)
     is Async -> Map(this, f)
+    is AsyncContinueOn -> Map(this, f)
+    is AsyncUpdateContext -> Map(this, f)
   }
 
   @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
@@ -123,6 +127,8 @@ sealed class Fx<out A> : FxOf<A> {
     is ContinueOn -> FxRunLoop(this)
     is ConnectionSwitch -> FxRunLoop(this)
     is Async -> FxRunLoop(this)
+    is AsyncContinueOn -> FxRunLoop(this)
+    is AsyncUpdateContext -> FxRunLoop(this)
   }
 
   @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
@@ -159,6 +165,8 @@ sealed class Fx<out A> : FxOf<A> {
     is ContinueOn -> FlatMap(this, f, 0)
     is ConnectionSwitch -> FlatMap(this, f, 0)
     is Async -> FlatMap(this, f, 0)
+    is AsyncContinueOn -> FlatMap(this, f, 0)
+    is AsyncUpdateContext -> FlatMap(this, f, 0)
   }
 
   suspend inline fun bind(): A = !this
@@ -265,6 +273,16 @@ sealed class Fx<out A> : FxOf<A> {
         old
       }
     }
+  }
+
+  @PublishedApi
+  internal class AsyncContinueOn<A>(val source: Fx<A>, val ctx: CoroutineContext) : Fx<A>() {
+    override fun toString(): String = "Fx.AsyncContinueOn(..)"
+  }
+
+  @PublishedApi
+  internal class AsyncUpdateContext<A>(val source: Fx<A>, val f: (CoroutineContext) -> CoroutineContext) : Fx<A>() {
+    override fun toString(): String = "Fx.AsyncUpdateContext(..)"
   }
 
   @PublishedApi
@@ -441,33 +459,33 @@ sealed class Fx<out A> : FxOf<A> {
      */
     @JvmStatic
     fun <A> unsafeRunBlocking(fx: FxOf<A>): A = when (val current = fx.fix()) {
-      is RaiseError -> throw current.error
-      is Pure -> current.value
-      is Lazy -> current.source(Unit)
-      is Single -> UnsafePromise<A>().run {
-        current.source.startCoroutine(asyncContinuation(EmptyCoroutineContext) {
-          complete(it)
-        })
-        await()
-      }
-      else -> {
-        when (val result = FxRunLoop.step(fx.fix())) {
-          is Pure -> result.value
-          is RaiseError -> throw result.error
-          is Lazy -> result.source(Unit)
-          is Single -> UnsafePromise<A>().run {
-            result.source.startCoroutine(asyncContinuation(EmptyCoroutineContext) {
-              complete(it)
-            })
-            await()
-          }
-          else -> UnsafePromise<A>().run {
-            FxRunLoop.start(fx) { complete(it) }
-            await()
+        is RaiseError -> throw current.error
+        is Pure -> current.value
+        is Lazy -> current.source(Unit)
+        is Single -> UnsafePromise<A>().run {
+          current.source.startCoroutine(asyncContinuation(EmptyCoroutineContext) {
+            complete(it)
+          })
+          await()
+        }
+        else -> {
+          when (val result = FxRunLoop.step(fx)) {
+            is Pure -> result.value
+            is RaiseError -> throw result.error
+            is Lazy -> result.source(Unit)
+            is Single -> UnsafePromise<A>().run {
+              result.source.startCoroutine(asyncContinuation(EmptyCoroutineContext) {
+                complete(it)
+              })
+              await()
+            }
+            else -> UnsafePromise<A>().run {
+              FxRunLoop.start(result) { complete(it) }
+              await()
+            }
           }
         }
       }
-    }
 
     /**
      * [unsafeRunNonBlocking] allows you to run any [Fx] to its wrapped value [A].

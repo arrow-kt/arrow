@@ -104,7 +104,6 @@ interface FxApplicativeError : ApplicativeError<ForFx, Throwable>, FxApplicative
 
   override fun <A> FxOf<A>.attempt(): Fx<Either<Throwable, A>> =
     fix().attempt()
-
 }
 
 @extension
