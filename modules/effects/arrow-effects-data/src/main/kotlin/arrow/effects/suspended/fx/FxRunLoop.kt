@@ -6,6 +6,7 @@ import arrow.core.handleErrorWith
 import arrow.core.nonFatalOrThrow
 import arrow.effects.KindConnection
 import arrow.effects.OnCancel
+import arrow.effects.internal.ArrowInternalException
 import arrow.effects.internal.Platform
 import arrow.effects.suspended.fx.FxRunLoop.startCancelable
 import kotlin.coroutines.Continuation
@@ -86,27 +87,26 @@ object FxRunLoop {
         cb(Either.Left(OnCancel.CancellationException))
         return
       }
-      when (source?.tag ?: UnknownTag) {
-        PureTag -> {
-          result = (source as Fx.Pure<Any?>).value
+      when (source) {
+        is Fx.Pure -> {
+          result = source.value
           hasResult = true
         }
-        RaiseErrorTag -> {
+        is Fx.RaiseError -> {
           val errorHandler: FxFrame<Any?, Fx<Any?>>? = findErrorHandlerInCallStack(bFirst, bRest)
           when (errorHandler) {
             null -> {
-              cb(Either.Left((source as Fx.RaiseError<Any?>).error))
+              cb(Either.Left(source.error))
               return
             }
             else -> {
-              val error = (source as Fx.RaiseError<Any?>).error
+              val error = source.error
               source = executeSafe { errorHandler.recover(error) }
               bFirst = null
             }
           }
         }
-        ModifyContextTag -> {
-          source as Fx.UpdateContext<Any?>
+        is Fx.UpdateContext -> {
           val modify = source.modify
           val next = source.source
 
@@ -117,9 +117,7 @@ object FxRunLoop {
             }
           }, 0)
         }
-        ContinueOnTag -> {
-          source as Fx.ContinueOn<Any?>
-
+        is Fx.ContinueOn -> {
           val nextCC = source.ctx
           val next = source.source
 
@@ -129,8 +127,7 @@ object FxRunLoop {
             }
           }, 0)
         }
-        LazyTag -> {
-          source as Fx.Lazy<Any?>
+        is Fx.Lazy -> {
           try {
             result = source.source(Unit)
             hasResult = true
@@ -139,18 +136,18 @@ object FxRunLoop {
             source = Fx.RaiseError(t.nonFatalOrThrow())
           }
         }
-        SingleTag -> {
+        is Fx.Single -> {
           if (asyncBoundary == null) {
             asyncBoundary = AsyncBoundary(conn, cb)
           }
           // Run the suspend function in the async boundary and return
-          asyncBoundary.start(source as Fx.Single<Any?>, ctx, bFirst, bRest)
+          asyncBoundary.start(source, ctx, bFirst, bRest)
           return
         }
-        DeferTag -> {
-          source = executeSafe((source as Fx.Defer).thunk)
+        is Fx.Defer -> {
+          source = executeSafe(source.thunk)
         }
-        MapTag -> {
+        is Fx.Map<*, *> -> {
           if (bFirst != null) {
             if (bRest == null) {
               bRest = Platform.ArrayStack()
@@ -160,7 +157,7 @@ object FxRunLoop {
           bFirst = source as ((Any?) -> Fx<Any?>)?
           source = (source as Fx.Map<Any?, Any?>).source.fix()
         }
-        FlatMapTag -> {
+        is Fx.FlatMap<*, *> -> {
           if (bFirst != null) {
             if (bRest == null) bRest = Platform.ArrayStack()
             bRest.push(bFirst)
@@ -169,16 +166,15 @@ object FxRunLoop {
           bFirst = source.fb as ((Any?) -> Fx<Any?>)?
           source = source.source.fix()
         }
-        AsyncTag -> {
+        is Fx.Async -> {
           if (asyncBoundary == null) {
             asyncBoundary = AsyncBoundary(conn, cb)
           }
 
-          asyncBoundary.start(source as Fx.Async<Any?>, source.ctx ?: ctx, bFirst, bRest)
+          asyncBoundary.start(source, source.ctx ?: ctx, bFirst, bRest)
           return
         }
-        ConnectionSwitchTag -> {
-          source as Fx.ConnectionSwitch<Any?>
+        is Fx.ConnectionSwitch -> {
           val next = source.source
           val modify = source.modify
           val restore = source.restore
@@ -195,7 +191,6 @@ object FxRunLoop {
             }
           }
         }
-        UnknownTag -> source = Fx.RaiseError(NullPointerException("Looping on null Fx")) // Improve message
       }
 
       if (hasResult) {
@@ -423,38 +418,36 @@ object FxRunLoop {
    */
   @Suppress("ReturnCount")
   fun <A> step(source: FxOf<A>): Fx<A> {
-    var current: Current? = source
+    var current: Current? = source as Fx<Any?>
     var bFirst: BindF? = null
     var bRest: CallStack? = null
     var hasResult: Boolean = false
     var result: Any? = null
 
     while (true) {
-      when ((current as? Fx<A>)?.tag ?: UnknownTag) {
-        PureTag -> {
-          result = (current as Fx.Pure<Any?>).value
+      when (current) {
+        is Fx.Pure -> {
+          result = current.value
           hasResult = true
           // current = null ??? see LazyTag
         }
-        RaiseErrorTag -> {
+        is Fx.RaiseError -> {
           val errorHandler: FxFrame<Any?, Fx<Any?>>? = findErrorHandlerInCallStack(bFirst, bRest)
           when (errorHandler) {
             // Return case for unhandled errors
             null -> return current as Fx<A>
             else -> {
-              (current as Fx.RaiseError<Any?>)
               val exception: Throwable = current.error
               current = executeSafe { errorHandler.recover(exception) }
               bFirst = null
             }
           }
         }
-        DeferTag -> {
+        is Fx.Defer -> {
           // TODO check if passing thunk executeSafe(thunk) directly is more efficient than `{ thunk() }`
-          current = executeSafe((current as Fx.Defer<Any?>).thunk)
+          current = executeSafe(current.thunk)
         }
-        LazyTag -> {
-          (current as Fx.Lazy<Any?>)
+        is Fx.Lazy -> {
           try {
             result = current.source(Unit)
             hasResult = true
@@ -463,7 +456,7 @@ object FxRunLoop {
             current = Fx.RaiseError(t.nonFatalOrThrow())
           }
         }
-        FlatMapTag -> {
+        is Fx.FlatMap<*, *> -> {
           (current as Fx.FlatMap<Any?, Any?>)
           if (bFirst != null) {
             if (bRest == null) bRest = Platform.ArrayStack()
@@ -471,9 +464,9 @@ object FxRunLoop {
           }
 
           bFirst = current.fb as BindF
-          current = current.source
+          current = current.source as Fx<Any?> //TODO: this is properly expensive...
         }
-        MapTag -> {
+        is Fx.Map<*, *> -> {
           (current as Fx.Map<Any?, Any?>)
 
           if (bFirst != null) {
@@ -484,10 +477,9 @@ object FxRunLoop {
           }
 
           bFirst = current // Fx.Map implements (A) -> Fx<B>
-          current = current.source
+          current = current.source as Fx<Any?> //TODO: this is properly expensive...
         }
-        ModifyContextTag -> {
-          current as Fx.UpdateContext<Any?>
+        is Fx.UpdateContext -> {
           val modify = current.modify
           val next = current.source
 
@@ -498,9 +490,7 @@ object FxRunLoop {
             }
           }, 0)
         }
-        ContinueOnTag -> {
-          current as Fx.ContinueOn<Any?>
-
+        is Fx.ContinueOn -> {
           val nextCC = current.ctx
           val next = current.source
 
@@ -510,14 +500,14 @@ object FxRunLoop {
             }
           }, 0)
         }
-        SingleTag -> {
-          return FxRunLoop.suspendInAsync(current as Fx.Single<A>, bFirst, bRest)
+        is Fx.Single -> {
+          return suspendInAsync(current as Fx.Single<A>, bFirst, bRest)
         }
-        AsyncTag -> {
+        is Fx.Async -> {
           // Return case for Async operations
           return suspendInAsync(current as Fx.Async<A>, bFirst, bRest, current.proc)
         }
-        else -> throw FxImpossibleBugs.FxStep
+        null -> return Fx.RaiseError(ArrowInternalException)
       }
 
       if (hasResult) {
@@ -541,8 +531,8 @@ object FxRunLoop {
     (current ?: Fx.Pure(unboxed, 0)) as Fx<A>
 
   private fun <A> suspendInAsync(currentIO: Fx.Async<A>, bFirst: BindF?, bRest: CallStack?, register: FxProc<Any?>): Fx<A> =
-    // Hitting an async boundary means we have to stop, however
-    // if we had previous `flatMap` operations then we need to resume
+  // Hitting an async boundary means we have to stop, however
+  // if we had previous `flatMap` operations then we need to resume
     // the loop with the collected stack
     when {
       bFirst != null || (bRest != null && bRest.isNotEmpty()) ->
@@ -562,6 +552,6 @@ object FxRunLoop {
     }
 }
 
-private typealias Current = FxOf<Any?>
+private typealias Current = Fx<Any?>
 private typealias BindF = (Any?) -> Fx<Any?>
 private typealias CallStack = Platform.ArrayStack<BindF>
