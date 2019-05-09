@@ -1,5 +1,6 @@
 package arrow.core
 
+@Deprecated("PartialFunction is an incomplete experiment due for removal. See https://github.com/arrow-kt/arrow/pull/1419#issue-273308228")
 abstract class PartialFunction<in A, out B> : (A) -> B {
   abstract fun isDefinedAt(a: A): Boolean
 }
@@ -15,7 +16,6 @@ infix fun <A, B> PartialFunction<A, B>.orElse(f: PartialFunction<A, B>): Partial
       } else {
         f(x)
       }
-
   }
 
 fun <A, B> PartialFunction(definedAt: (A) -> Boolean, ifDefined: (A) -> B): PartialFunction<A, B> =

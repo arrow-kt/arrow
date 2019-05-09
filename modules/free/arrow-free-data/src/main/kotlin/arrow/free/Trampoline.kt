@@ -1,8 +1,11 @@
 package arrow.free
 
-import arrow.core.*
+import arrow.core.ForFunction0
+import arrow.core.Function0
 import arrow.core.FunctionK
 import arrow.core.extensions.function0.monad.monad
+import arrow.core.fix
+import arrow.core.invoke
 
 /**
  * Trampoline is often used to emulate tail recursion. The idea is to have some step code that can be trampolined itself

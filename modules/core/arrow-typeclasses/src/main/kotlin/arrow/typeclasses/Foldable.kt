@@ -1,8 +1,16 @@
 package arrow.typeclasses
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Eval
 import arrow.core.Eval.Companion.always
+import arrow.core.ForEither
+import arrow.core.Left
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Right
+import arrow.core.Some
+import arrow.core.fix
+import arrow.core.identity
 
 /**
  * ank_macro_hierarchy(arrow.typeclasses.Foldable)
@@ -191,6 +199,7 @@ interface Foldable<F> {
       }.fix().swap().toOption()
 
   companion object {
+    @Deprecated("Use Iterator.iterateRight from Eval.kt instead")
     fun <A, B> iterateRight(it: Iterator<A>, lb: Eval<B>): (f: (A, Eval<B>) -> Eval<B>) -> Eval<B> =
       { f: (A, Eval<B>) -> Eval<B> ->
         fun loop(): Eval<B> =

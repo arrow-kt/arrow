@@ -79,7 +79,5 @@ class MooreTest : UnitSpec() {
 
       currentRoute shouldBe 0
     }
-
   }
-
 }

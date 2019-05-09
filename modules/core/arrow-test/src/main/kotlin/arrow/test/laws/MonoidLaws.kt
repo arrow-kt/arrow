@@ -14,7 +14,7 @@ object MonoidLaws {
     )
 
   fun <F> Monoid<F>.monoidLeftIdentity(A: Gen<F>, EQ: Eq<F>): Unit =
-    forAll(A) {a ->
+    forAll(A) { a ->
       (empty().combine(a)).equalUnderTheLaw(a, EQ)
     }
 
@@ -22,5 +22,4 @@ object MonoidLaws {
     forAll(A) { a ->
     a.combine(empty()).equalUnderTheLaw(a, EQ)
   }
-
 }

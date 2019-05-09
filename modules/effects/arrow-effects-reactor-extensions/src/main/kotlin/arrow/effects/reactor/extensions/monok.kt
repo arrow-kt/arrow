@@ -5,9 +5,22 @@ import arrow.effects.reactor.ForMonoK
 import arrow.effects.reactor.MonoK
 import arrow.effects.reactor.MonoKOf
 import arrow.effects.reactor.fix
-import arrow.effects.typeclasses.*
+import arrow.effects.typeclasses.Async
+import arrow.effects.typeclasses.Bracket
+import arrow.effects.typeclasses.ConcurrentEffect
+import arrow.effects.typeclasses.Disposable
+import arrow.effects.typeclasses.Effect
+import arrow.effects.typeclasses.ExitCase
+import arrow.effects.typeclasses.MonadDefer
+import arrow.effects.typeclasses.Proc
+import arrow.effects.typeclasses.ProcF
 import arrow.extension
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadError
+import arrow.typeclasses.MonadThrow
 import kotlin.coroutines.CoroutineContext
 
 @extension
@@ -17,7 +30,7 @@ interface MonoKFunctor : Functor<ForMonoK> {
 }
 
 @extension
-interface MonoKApplicative: Applicative<ForMonoK>, MonoKFunctor {
+interface MonoKApplicative : Applicative<ForMonoK>, MonoKFunctor {
   override fun <A, B> MonoKOf<A>.map(f: (A) -> B): MonoK<B> =
     fix().map(f)
 
@@ -29,7 +42,7 @@ interface MonoKApplicative: Applicative<ForMonoK>, MonoKFunctor {
 }
 
 @extension
-interface MonoKMonad: Monad<ForMonoK>, MonoKApplicative {
+interface MonoKMonad : Monad<ForMonoK>, MonoKApplicative {
   override fun <A, B> MonoKOf<A>.map(f: (A) -> B): MonoK<B> =
     fix().map(f)
 
@@ -44,7 +57,7 @@ interface MonoKMonad: Monad<ForMonoK>, MonoKApplicative {
 }
 
 @extension
-interface MonoKApplicativeError: ApplicativeError<ForMonoK, Throwable>, MonoKApplicative {
+interface MonoKApplicativeError : ApplicativeError<ForMonoK, Throwable>, MonoKApplicative {
   override fun <A> raiseError(e: Throwable): MonoK<A> =
     MonoK.raiseError(e)
 
@@ -53,7 +66,7 @@ interface MonoKApplicativeError: ApplicativeError<ForMonoK, Throwable>, MonoKApp
 }
 
 @extension
-interface MonoKMonadError: MonadError<ForMonoK, Throwable>, MonoKMonad, MonoKApplicativeError {
+interface MonoKMonadError : MonadError<ForMonoK, Throwable>, MonoKMonad, MonoKApplicativeError {
   override fun <A, B> MonoKOf<A>.map(f: (A) -> B): MonoK<B> =
     fix().map(f)
 
@@ -65,22 +78,22 @@ interface MonoKMonadError: MonadError<ForMonoK, Throwable>, MonoKMonad, MonoKApp
 }
 
 @extension
-interface MonoKMonadThrow: MonadThrow<ForMonoK>, MonoKMonadError
+interface MonoKMonadThrow : MonadThrow<ForMonoK>, MonoKMonadError
 
 @extension
-interface MonoKBracket: Bracket<ForMonoK, Throwable>, MonoKMonadThrow {
+interface MonoKBracket : Bracket<ForMonoK, Throwable>, MonoKMonadThrow {
   override fun <A, B> MonoKOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> MonoKOf<Unit>, use: (A) -> MonoKOf<B>): MonoK<B> =
     fix().bracketCase({ use(it) }, { a, e -> release(a, e) })
 }
 
 @extension
-interface MonoKMonadDefer: MonadDefer<ForMonoK>, MonoKBracket {
+interface MonoKMonadDefer : MonadDefer<ForMonoK>, MonoKBracket {
   override fun <A> defer(fa: () -> MonoKOf<A>): MonoK<A> =
     MonoK.defer(fa)
 }
 
 @extension
-interface MonoKAsync: Async<ForMonoK>, MonoKMonadDefer {
+interface MonoKAsync : Async<ForMonoK>, MonoKMonadDefer {
   override fun <A> async(fa: Proc<A>): MonoK<A> =
     MonoK.async { _, cb -> fa(cb) }
 
@@ -92,13 +105,13 @@ interface MonoKAsync: Async<ForMonoK>, MonoKMonadDefer {
 }
 
 @extension
-interface MonoKEffect: Effect<ForMonoK>, MonoKAsync {
+interface MonoKEffect : Effect<ForMonoK>, MonoKAsync {
   override fun <A> MonoKOf<A>.runAsync(cb: (Either<Throwable, A>) -> MonoKOf<Unit>): MonoK<Unit> =
     fix().runAsync(cb)
 }
 
 @extension
-interface MonoKConcurrentEffect: ConcurrentEffect<ForMonoK>, MonoKEffect {
+interface MonoKConcurrentEffect : ConcurrentEffect<ForMonoK>, MonoKEffect {
   override fun <A> MonoKOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> MonoKOf<Unit>): MonoK<Disposable> =
     fix().runAsyncCancellable(cb)
 }

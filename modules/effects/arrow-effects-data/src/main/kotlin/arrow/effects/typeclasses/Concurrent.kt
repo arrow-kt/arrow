@@ -1,7 +1,14 @@
 package arrow.effects.typeclasses
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Left
+import arrow.core.Right
+import arrow.core.Tuple2
+import arrow.core.Tuple3
+import arrow.core.left
+import arrow.core.right
+import arrow.core.toT
 import arrow.effects.CancelToken
 import arrow.effects.KindConnection
 import arrow.effects.data.internal.BindingCancellationException
@@ -133,7 +140,7 @@ interface Concurrent<F> : Async<F> {
   fun <A> asyncF(fa: ConnectedProcF<F, A>): Kind<F, A>
 
   /**
-   * Create a new [F] that upon execution starts the receiver [F] within a [Fiber] on [this@startF].
+   * Create a new [F] that upon execution starts the receiver [F] within a [Fiber] on [this@startFiber].
    *
    * ```kotlin:ank:playground
    * import arrow.effects.*
@@ -153,9 +160,9 @@ interface Concurrent<F> : Async<F> {
    * }
    * ```
    *
-   * @receiver [F] to execute on [this@startF] within a new suspended [F].
-   * @param this@startF [CoroutineContext] to execute the source [F] on.
-   * @return [F] with suspended execution of source [F] on context [this@startF].
+   * @receiver [F] to execute on [this@startFiber] within a new suspended [F].
+   * @param this@startFiber [CoroutineContext] to execute the source [F] on.
+   * @return [F] with suspended execution of source [F] on context [this@startFiber].
    */
   fun <A> CoroutineContext.startFiber(kind: Kind<F, A>): Kind<F, Fiber<F, A>>
 
@@ -362,7 +369,7 @@ interface Concurrent<F> : Async<F> {
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-     *   val result = Dispatchers.Default.parMapN(
+   *   val result = Dispatchers.Default.parMapN(
    *     delay { "First one is on ${Thread.currentThread().name}" },
    *     delay { "Second one is on ${Thread.currentThread().name}" }
    *   ) { a, b ->
@@ -413,7 +420,8 @@ interface Concurrent<F> : Async<F> {
     fb: Kind<F, B>,
     fc: Kind<F, C>,
     fd: Kind<F, D>,
-    f: (A, B, C, D) -> E): Kind<F, E> =
+    f: (A, B, C, D) -> E
+  ): Kind<F, E> =
     parMapN(parMapN(fa, fb, ::Tuple2),
       parMapN(fc, fd, ::Tuple2)
     ) { (a, b), (c, d) ->
@@ -429,7 +437,8 @@ interface Concurrent<F> : Async<F> {
     fc: Kind<F, C>,
     fd: Kind<F, D>,
     fe: Kind<F, E>,
-    f: (A, B, C, D, E) -> G): Kind<F, G> =
+    f: (A, B, C, D, E) -> G
+  ): Kind<F, G> =
     parMapN(parMapN(fa, fb, fc, ::Tuple3),
       parMapN(fd, fe, ::Tuple2)
     ) { (a, b, c), (d, e) ->
@@ -446,7 +455,8 @@ interface Concurrent<F> : Async<F> {
     fd: Kind<F, D>,
     fe: Kind<F, E>,
     fg: Kind<F, G>,
-    f: (A, B, C, D, E, G) -> H): Kind<F, H> =
+    f: (A, B, C, D, E, G) -> H
+  ): Kind<F, H> =
     parMapN(parMapN(fa, fb, fc, ::Tuple3),
       parMapN(fd, fe, fg, ::Tuple3)
     ) { (a, b, c), (d, e, g) ->
@@ -464,7 +474,8 @@ interface Concurrent<F> : Async<F> {
     fe: Kind<F, E>,
     fg: Kind<F, G>,
     fh: Kind<F, H>,
-    f: (A, B, C, D, E, G, H) -> I): Kind<F, I> =
+    f: (A, B, C, D, E, G, H) -> I
+  ): Kind<F, I> =
     parMapN(parMapN(fa, fb, fc, ::Tuple3),
       parMapN(fd, fe, ::Tuple2),
       parMapN(fg, fh, ::Tuple2)) { (a, b, c), (d, e), (g, h) ->
@@ -483,7 +494,8 @@ interface Concurrent<F> : Async<F> {
     fg: Kind<F, G>,
     fh: Kind<F, H>,
     fi: Kind<F, I>,
-    f: (A, B, C, D, E, G, H, I) -> J): Kind<F, J> =
+    f: (A, B, C, D, E, G, H, I) -> J
+  ): Kind<F, J> =
     parMapN(parMapN(fa, fb, fc, ::Tuple3),
       parMapN(fd, fe, fg, ::Tuple3),
       parMapN(fh, fi, ::Tuple2)) { (a, b, c), (d, e, g), (h, i) ->
@@ -503,7 +515,8 @@ interface Concurrent<F> : Async<F> {
     fh: Kind<F, H>,
     fi: Kind<F, I>,
     fj: Kind<F, J>,
-    f: (A, B, C, D, E, G, H, I, J) -> K): Kind<F, K> =
+    f: (A, B, C, D, E, G, H, I, J) -> K
+  ): Kind<F, K> =
     parMapN(parMapN(fa, fb, fc, ::Tuple3),
       parMapN(fd, fe, fg, ::Tuple3),
       parMapN(fh, fi, fj, ::Tuple3)) { (a, b, c), (d, e, g), (h, i, j) ->
@@ -544,7 +557,8 @@ interface Concurrent<F> : Async<F> {
    */
   fun <A, B> CoroutineContext.raceN(
     fa: Kind<F, A>,
-    fb: Kind<F, B>): Kind<F, Race2<A, B>> =
+    fb: Kind<F, B>
+  ): Kind<F, Race2<A, B>> =
     racePair(fa, fb).flatMap {
       it.fold({ (a, b) ->
         b.cancel().map { a.left() }
@@ -559,7 +573,8 @@ interface Concurrent<F> : Async<F> {
   fun <A, B, C> CoroutineContext.raceN(
     fa: Kind<F, A>,
     fb: Kind<F, B>,
-    fc: Kind<F, C>): Kind<F, Race3<A, B, C>> =
+    fc: Kind<F, C>
+  ): Kind<F, Race3<A, B, C>> =
     raceTriple(fa, fb, fc).flatMap {
       it.fold(
         { (a, fiberB, fiberC) -> fiberB.cancel().flatMap { fiberC.cancel().map { Left(Left(a)) } } },
@@ -575,7 +590,8 @@ interface Concurrent<F> : Async<F> {
     a: Kind<F, A>,
     b: Kind<F, B>,
     c: Kind<F, C>,
-    d: Kind<F, D>): Kind<F, Race4<A, B, C, D>> =
+    d: Kind<F, D>
+  ): Kind<F, Race4<A, B, C, D>> =
     raceN(raceN(a, b),
       raceN(c, d)
     )
@@ -588,7 +604,8 @@ interface Concurrent<F> : Async<F> {
     b: Kind<F, B>,
     c: Kind<F, C>,
     d: Kind<F, D>,
-    e: Kind<F, E>): Kind<F, Race5<A, B, C, D, E>> =
+    e: Kind<F, E>
+  ): Kind<F, Race5<A, B, C, D, E>> =
     raceN(raceN(a, b, c),
       raceN(d, e)
     )
@@ -602,7 +619,8 @@ interface Concurrent<F> : Async<F> {
     c: Kind<F, C>,
     d: Kind<F, D>,
     e: Kind<F, E>,
-    g: Kind<F, G>): Kind<F, Race6<A, B, C, D, E, G>> =
+    g: Kind<F, G>
+  ): Kind<F, Race6<A, B, C, D, E, G>> =
     raceN(raceN(a, b, c),
       raceN(d, e, g)
     )
@@ -617,7 +635,8 @@ interface Concurrent<F> : Async<F> {
     d: Kind<F, D>,
     e: Kind<F, E>,
     g: Kind<F, G>,
-    h: Kind<F, H>): Kind<F, Race7<A, B, C, D, E, G, H>> =
+    h: Kind<F, H>
+  ): Kind<F, Race7<A, B, C, D, E, G, H>> =
     raceN(raceN(a, b, c),
       raceN(d, e),
       raceN(g, h)
@@ -634,7 +653,8 @@ interface Concurrent<F> : Async<F> {
     e: Kind<F, E>,
     g: Kind<F, G>,
     h: Kind<F, H>,
-    i: Kind<F, I>): Kind<F, Race8<A, B, C, D, E, G, H, I>> =
+    i: Kind<F, I>
+  ): Kind<F, Race8<A, B, C, D, E, G, H, I>> =
     raceN(raceN(a, b),
       raceN(c, d),
       raceN(e, g),
@@ -653,7 +673,8 @@ interface Concurrent<F> : Async<F> {
     g: Kind<F, G>,
     h: Kind<F, H>,
     i: Kind<F, I>,
-    j: Kind<F, J>): Kind<F, Race9<A, B, C, D, E, G, H, I, J>> =
+    j: Kind<F, J>
+  ): Kind<F, Race9<A, B, C, D, E, G, H, I, J>> =
     raceN(raceN(a, b, c),
       raceN(d, e),
       raceN(g, h),
@@ -695,8 +716,6 @@ interface Concurrent<F> : Async<F> {
 
   override fun <B> binding(c: suspend MonadContinuation<F, *>.() -> B): Kind<F, B> =
     bindingCancellable { c() }.a
-
-
 }
 
 /** Alias for `Either` structure to provide consistent signature for race methods. */

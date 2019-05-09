@@ -200,7 +200,7 @@ class PrismTest : UnitSpec() {
       }
     }
 
-    "Setting a target on a prism should set the correct target"{
+    "Setting a target on a prism should set the correct target" {
       forAll(genSumTypeA, Gen.string()) { a, string ->
         sumPrism.setOption(a, string) == Some(a.copy(string = string))
       }
@@ -223,7 +223,5 @@ class PrismTest : UnitSpec() {
         sumPrism.all(sum) { predicate } == (predicate || sum is SumType.B)
       }
     }
-
   }
-
 }

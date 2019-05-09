@@ -1,14 +1,44 @@
 package arrow.data.extensions
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.EitherPartialOf
+import arrow.core.Eval
 import arrow.core.extensions.either.foldable.foldable
 import arrow.core.extensions.either.monad.monad
 import arrow.core.extensions.either.traverse.traverse
-import arrow.data.*
+import arrow.core.Left
+import arrow.core.Tuple2
+import arrow.core.fix
+import arrow.core.identity
+import arrow.core.left
+import arrow.core.right
+import arrow.core.toT
+import arrow.data.EitherT
+import arrow.data.EitherTOf
+import arrow.data.EitherTPartialOf
 import arrow.data.extensions.eithert.monadThrow.monadThrow
+import arrow.data.fix
+import arrow.data.value
 import arrow.extension
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Apply
+import arrow.typeclasses.ComposedTraverse
+import arrow.typeclasses.Contravariant
+import arrow.typeclasses.Decidable
+import arrow.typeclasses.Divide
+import arrow.typeclasses.Divisible
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadError
+import arrow.typeclasses.MonadThrow
+import arrow.typeclasses.Nested
+import arrow.typeclasses.SemigroupK
+import arrow.typeclasses.Traverse
+import arrow.typeclasses.compose
+import arrow.typeclasses.unnest
 import arrow.undocumented
 
 @extension
@@ -19,6 +49,21 @@ interface EitherTFunctor<F, L> : Functor<EitherTPartialOf<F, L>> {
 
   override fun <A, B> EitherTOf<F, L, A>.map(f: (A) -> B): EitherT<F, L, B> =
     fix().map(FF(), f)
+}
+
+@extension
+@undocumented
+interface EitherTApply<F, L> : Apply<EitherTPartialOf<F, L>>, EitherTFunctor<F, L> {
+
+  fun AF(): Applicative<F>
+
+  override fun FF(): Functor<F> = AF()
+
+  override fun <A, B> EitherTOf<F, L, A>.map(f: (A) -> B): EitherT<F, L, B> =
+    fix().map(AF(), f)
+
+  override fun <A, B> EitherTOf<F, L, A>.ap(ff: EitherTOf<F, L, (A) -> B>): EitherT<F, L, B> =
+    fix().ap(AF(), ff)
 }
 
 @extension
@@ -75,7 +120,6 @@ interface EitherTApplicativeError<F, L> : ApplicativeError<EitherTPartialOf<F, L
   override fun <A> raiseError(e: L): EitherT<F, L, A> = AE().run {
     EitherT.liftF(this, raiseError(e))
   }
-
 }
 
 @extension
@@ -259,5 +303,4 @@ interface EitherTFx<F> : arrow.typeclasses.suspended.monaderror.Fx<EitherTPartia
 
   override fun monadError(): MonadThrow<EitherTPartialOf<F, Throwable>> =
     EitherT.monadThrow(M(), M())
-
 }

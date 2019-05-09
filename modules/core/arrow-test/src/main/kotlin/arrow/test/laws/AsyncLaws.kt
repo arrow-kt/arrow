@@ -7,7 +7,10 @@ import arrow.core.Right
 import arrow.effects.Promise
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.ExitCase
-import arrow.test.generators.*
+import arrow.test.generators.applicativeError
+import arrow.test.generators.either
+import arrow.test.generators.intSmall
+import arrow.test.generators.throwable
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -53,9 +56,9 @@ object AsyncLaws {
 
   fun <F> Async<F>.asyncConstructor(EQ: Eq<Kind<F, Int>>): Unit =
     forFew(5, Gen.intSmall(), Gen.intSmall()) { threadId1: Int, threadId2: Int ->
-      invoke(newSingleThreadContext(threadId1.toString())) { getCurrentThread() }
+      delay(newSingleThreadContext(threadId1.toString())) { getCurrentThread() }
         .flatMap {
-          invoke(newSingleThreadContext(threadId2.toString())) { it + getCurrentThread() }
+          delay(newSingleThreadContext(threadId2.toString())) { it + getCurrentThread() }
         }
         .equalUnderTheLaw(just(threadId1 + threadId2), EQ)
     }
@@ -79,7 +82,7 @@ object AsyncLaws {
       async(k).equalUnderTheLaw(asyncF { cb -> delay { k(cb) } }, EQ)
     }
 
-  fun <F> Async<F>.bracketReleaseIscalledOnCompletedOrError(EQ: Eq<Kind<F, Int>>): Unit {
+  fun <F> Async<F>.bracketReleaseIscalledOnCompletedOrError(EQ: Eq<Kind<F, Int>>) {
     forAll(Gen.string().applicativeError(this), Gen.int()) { fa, b ->
       Promise.uncancelable<F, Int>(this@bracketReleaseIscalledOnCompletedOrError).flatMap { promise ->
         val br = delay { promise }.bracketCase(use = { fa }, release = { r, exitCase ->
@@ -99,5 +102,4 @@ object AsyncLaws {
   // Turns out that kotlinx.coroutines decides to rewrite thread names
   private fun getCurrentThread() =
     Thread.currentThread().name.substringBefore(' ').toInt()
-
 }

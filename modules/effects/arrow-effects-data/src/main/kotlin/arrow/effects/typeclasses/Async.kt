@@ -146,11 +146,6 @@ interface Async<F> : MonadDefer<F> {
       }
     }
 
-  @Deprecated("Use delay instead",
-    ReplaceWith("delay(ctx, f)", "arrow.effects.typeclasses.Async"))
-  operator fun <A> invoke(ctx: CoroutineContext, f: () -> A): Kind<F, A> =
-    delay(ctx, f)
-
   /**
    * Delay a computation on provided [CoroutineContext].
    *
@@ -173,6 +168,15 @@ interface Async<F> : MonadDefer<F> {
    */
   fun <A> defer(ctx: CoroutineContext, f: () -> Kind<F, A>): Kind<F, A> =
     just(Unit).continueOn(ctx).flatMap { defer(f) }
+
+  /**
+   * Delay a computation on provided [CoroutineContext].
+   *
+   * @param ctx [CoroutineContext] to run evaluation on.
+   *
+   */
+  fun <A> delayOrRaise(ctx: CoroutineContext, f: () -> Either<Throwable, A>): Kind<F, A> =
+    defer(ctx) { f().fold({ raiseError<A>(it) }, { just(it) }) }
 
   /**
    * Shift evaluation to provided [CoroutineContext].
@@ -243,7 +247,6 @@ interface Async<F> : MonadDefer<F> {
    */
   fun <A> never(): Kind<F, A> =
     async { }
-
 }
 
 internal val mapUnit: (Any?) -> Unit = { Unit }

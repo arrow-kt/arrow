@@ -2,8 +2,23 @@ package arrow.extensions
 
 import arrow.Kind
 import arrow.Kind2
-import arrow.core.*
-import arrow.data.*
+import arrow.core.ForFunction1
+import arrow.core.ForId
+import arrow.core.ForOption
+import arrow.core.ForTuple2
+import arrow.core.Function1
+import arrow.core.Id
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.Tuple2
+import arrow.core.fix
+import arrow.core.invoke
+import arrow.core.k
+import arrow.core.value
+import arrow.data.ListK
+import arrow.data.NonEmptyList
+import arrow.data.OptionT
+import arrow.data.nel
 import arrow.core.extensions.function1.contravariant.contravariant
 import arrow.core.extensions.id.monad.monad
 import arrow.data.extensions.listk.applicative.applicative
@@ -19,11 +34,42 @@ import arrow.core.extensions.option.foldable.foldable
 import arrow.core.extensions.option.functor.functor
 import arrow.core.extensions.option.traverse.traverse
 import arrow.core.extensions.tuple2.bifunctor.bifunctor
+import arrow.data.ForListK
+import arrow.data.ForNonEmptyList
+import arrow.data.OptionTPartialOf
+import arrow.data.fix
+import arrow.data.value
+import arrow.test.UnitSpec
 import arrow.mtl.extensions.ComposedFunctorFilter
 import arrow.mtl.extensions.optiont.functorFilter.functorFilter
-import arrow.test.UnitSpec
-import arrow.test.laws.*
-import arrow.typeclasses.*
+import arrow.test.laws.ApplicativeLaws
+import arrow.test.laws.BifunctorLaws
+import arrow.test.laws.FoldableLaws
+import arrow.test.laws.FunctorFilterLaws
+import arrow.test.laws.FunctorLaws
+import arrow.test.laws.InvariantLaws
+import arrow.test.laws.MonoidKLaws
+import arrow.test.laws.SemigroupKLaws
+import arrow.test.laws.TraverseLaws
+import arrow.typeclasses.ComposedApplicative
+import arrow.typeclasses.ComposedBifunctor
+import arrow.typeclasses.ComposedFoldable
+import arrow.typeclasses.ComposedFunctor
+import arrow.typeclasses.ComposedInvariantContravariant
+import arrow.typeclasses.ComposedInvariantCovariant
+import arrow.typeclasses.ComposedMonoidK
+import arrow.typeclasses.ComposedSemigroupK
+import arrow.typeclasses.ComposedTraverse
+import arrow.typeclasses.Conested
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Nested
+import arrow.typeclasses.NestedType
+import arrow.typeclasses.binest
+import arrow.typeclasses.biunnest
+import arrow.typeclasses.conest
+import arrow.typeclasses.counnest
+import arrow.typeclasses.nest
+import arrow.typeclasses.unnest
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
@@ -53,13 +99,13 @@ class ComposedInstancesTest : UnitSpec() {
 
     val EQ_OPTION_FN1: Eq<NestedType<ForOption, Conested<ForFunction1, Int>, Int>> = Eq { a, b ->
       a.unnest().fix().fold(
-          { b.unnest().fix().isEmpty() },
-          { fnA ->
-            b.unnest().fix().fold(
-                { false },
-                { it.counnest().invoke(1) == fnA.counnest().invoke(1) }
-            )
-          }
+        { b.unnest().fix().isEmpty() },
+        { fnA ->
+          b.unnest().fix().fold(
+            { false },
+            { it.counnest().invoke(1) == fnA.counnest().invoke(1) }
+          )
+        }
       )
     }
 

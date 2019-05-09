@@ -113,7 +113,7 @@ Datatypes: [`IO`]({{ '/docs/effects/io/' | relative_url }})
 
 Typeclasses: [`MonadDefer`]({{ '/docs/effects/monaddefer/' | relative_url }}), [`Async`]({{ '/docs/effects/async/' | relative_url }}), [`Effect`]({{ '/docs/effects/effect/' | relative_url }})
 
-### arrow-effects-(rx2, reactor, kotlinx-coroutines)
+### arrow-effects-(rx2, reactor)
 
 {:.intermediate}
 intermediate
@@ -123,8 +123,6 @@ Each of these modules provides wrappers over the datatypes in each of the librar
 [Rx]({{ 'docs/integrations/rx2/' | relative_url }}): `Observable`, `Flowable`, `Single`
 
 [Reactor]({{ 'docs/integrations/reactor/' | relative_url }}): `Flux`, `Mono`
-
-[kotlinx.coroutines]({{ 'docs/integrations/kotlinxcoroutines/' | relative_url }}): `Deferred`
 
 ### arrow-fx
 
@@ -173,6 +171,13 @@ This [Arrow Query Library]({{ '/docs/aql/intro/' | relative_url }}) focuses on b
 ## Annotation processors
 
 These libraries focus on meta-programming to generate code that enables other libraries and constructs.
+
+### arrow-meta
+
+{:.intermediate}
+intermediate
+
+Allows boilerplate generation for [`@extension`](({{ 'docs/patterns/glossary/#instances-and-extensions-interfaces' | relative_url }})) instances and [`@higherkind`]({{ 'https://arrow-kt.io/docs/patterns/glossary/#higher-kinds' | relative_url }}) datatypes.
 
 ### arrow-generic
 

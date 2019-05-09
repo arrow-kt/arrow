@@ -1,8 +1,18 @@
 package arrow.free
 
 import arrow.Kind
-import arrow.core.*
-import arrow.data.*
+import arrow.core.Eval
+import arrow.core.ForEval
+import arrow.core.ForId
+import arrow.core.ForOption
+import arrow.core.FunctionK
+import arrow.core.Id
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
+import arrow.data.ListK
+import arrow.data.NonEmptyList
+import arrow.data.OptionT
 import arrow.free.Cofree.Companion.unfold
 import arrow.free.extensions.cofree.comonad.comonad
 import arrow.core.extensions.eval.applicative.applicative
@@ -12,15 +22,20 @@ import arrow.core.extensions.id.functor.functor
 import arrow.data.extensions.listk.functor.functor
 import arrow.core.extensions.option.functor.functor
 import arrow.core.extensions.option.traverse.traverse
+import arrow.core.fix
+import arrow.core.value
+import arrow.data.OptionTOf
+import arrow.data.OptionTPartialOf
 import arrow.data.extensions.optiont.monad.monad
+import arrow.data.value
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.laws.ComonadLaws
 import arrow.typeclasses.Eq
-import arrow.core.FunctionK
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
+import kotlin.run
 
 @RunWith(KotlinTestRunner::class)
 class CofreeTest : UnitSpec() {
@@ -154,7 +169,6 @@ class CofreeTest : UnitSpec() {
         cataHundredOne shouldBe None
       }
     }
-
   }
 }
 

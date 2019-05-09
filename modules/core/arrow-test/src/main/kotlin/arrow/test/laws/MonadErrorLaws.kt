@@ -2,7 +2,10 @@ package arrow.test.laws
 
 import arrow.Kind
 import arrow.core.Either
-import arrow.test.generators.*
+import arrow.test.generators.applicativeError
+import arrow.test.generators.fatalThrowable
+import arrow.test.generators.functionAToB
+import arrow.test.generators.throwable
 import arrow.typeclasses.Eq
 import arrow.typeclasses.MonadError
 import io.kotlintest.fail
@@ -31,13 +34,13 @@ object MonadErrorLaws {
     }
 
   fun <F> MonadError<F, Throwable>.monadErrorCatchesNonFatalThrowables(EQ: Eq<Kind<F, Int>>) {
-    forAll(Gen.throwable()) {nonFatal: Throwable ->
+    forAll(Gen.throwable()) { nonFatal: Throwable ->
       catch { throw nonFatal }.equalUnderTheLaw(raiseError(nonFatal), EQ)
     }
   }
 
   fun <F> MonadError<F, Throwable>.monadErrorThrowsFatalThrowables(EQ: Eq<Kind<F, Int>>) {
-    forAll(Gen.fatalThrowable()) {fatal: Throwable ->
+    forAll(Gen.fatalThrowable()) { fatal: Throwable ->
       shouldThrowAny {
         fun <A> itShouldNotComeThisFar(): Kind<F, A> {
           fail("MonadError should rethrow the fatal Throwable: '$fatal'.")

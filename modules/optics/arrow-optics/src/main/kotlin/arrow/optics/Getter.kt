@@ -1,7 +1,16 @@
 package arrow.optics
 
-import arrow.core.*
-import arrow.data.*
+import arrow.core.Either
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.Tuple2
+import arrow.core.compose
+import arrow.core.identity
+import arrow.core.toT
+import arrow.data.Reader
+import arrow.data.State
+import arrow.data.map
 import arrow.higherkind
 import arrow.typeclasses.Monoid
 
@@ -167,5 +176,4 @@ interface Getter<S, A> : GetterOf<S, A> {
    * Extract and map the focus [A] viewed through the [Getter] and applies [f] to it.
    */
   fun <B> extractMap(f: (A) -> B): State<S, B> = extract().map(f)
-
 }

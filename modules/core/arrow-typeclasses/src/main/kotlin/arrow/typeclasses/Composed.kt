@@ -87,7 +87,8 @@ interface ComposedTraverse<F, G> :
     operator fun <F, G> invoke(
       FF: Traverse<F>,
       GF: Traverse<G>,
-      GA: Applicative<G>): ComposedTraverse<F, G> =
+      GA: Applicative<G>
+    ): ComposedTraverse<F, G> =
       object : ComposedTraverse<F, G> {
         override fun FT(): Traverse<F> = FF
 
@@ -315,8 +316,8 @@ interface ComposedApplicative<F, G> : Applicative<Nested<F, G>>, ComposedFunctor
     nest().ap(ff.nest()).unnest()
 
   companion object {
-    operator fun <F, G> invoke(FF: Applicative<F>, GF: Applicative<G>)
-      : Applicative<Nested<F, G>> =
+    operator fun <F, G> invoke(FF: Applicative<F>, GF: Applicative<G>):
+      Applicative<Nested<F, G>> =
       object : ComposedApplicative<F, G> {
         override fun F(): Applicative<F> = FF
 
@@ -331,8 +332,8 @@ interface ComposedAlternative<F, G> : Alternative<Nested<F, G>>, ComposedApplica
   override fun F(): Alternative<F>
 
   companion object {
-    operator fun <F, G> invoke(AF: Alternative<F>, AG: Applicative<G>)
-      : Alternative<Nested<F, G>> =
+    operator fun <F, G> invoke(AF: Alternative<F>, AG: Applicative<G>):
+      Alternative<Nested<F, G>> =
       object : ComposedAlternative<F, G> {
         override fun F(): Alternative<F> = AF
 

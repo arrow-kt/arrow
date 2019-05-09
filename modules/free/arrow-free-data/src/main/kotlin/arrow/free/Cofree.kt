@@ -51,7 +51,6 @@ data class Cofree<S, A>(val FS: Functor<S>, val head: A, val tail: Eval<CofreeEv
     fun <S, A> create(FS: Functor<S>, a: A, f: (A) -> Kind<S, A>): Cofree<S, A> = FS.run {
       Cofree(this, a, Eval.later { f(a).map { create(this, it, f) } })
     }
-
   }
 }
 

@@ -1,7 +1,11 @@
 package arrow.data
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.ForId
+import arrow.core.ForTry
+import arrow.core.Id
+import arrow.core.Try
 import arrow.effects.ForIO
 import arrow.effects.IO
 import arrow.effects.extensions.io.applicativeError.attempt
@@ -11,6 +15,7 @@ import arrow.core.extensions.`try`.monadError.monadError
 import arrow.core.extensions.const.divisible.divisible
 import arrow.core.extensions.id.monad.monad
 import arrow.core.extensions.monoid
+import arrow.core.value
 import arrow.data.extensions.kleisli.contravariant.contravariant
 import arrow.data.extensions.kleisli.divisible.divisible
 import arrow.data.extensions.kleisli.monadError.monadError
@@ -19,7 +24,14 @@ import arrow.test.laws.BracketLaws
 import arrow.test.laws.ContravariantLaws
 import arrow.test.laws.DivisibleLaws
 import arrow.test.laws.MonadErrorLaws
-import arrow.typeclasses.*
+import arrow.typeclasses.Conested
+import arrow.typeclasses.Const
+import arrow.typeclasses.ConstPartialOf
+import arrow.typeclasses.Eq
+import arrow.typeclasses.conest
+import arrow.typeclasses.const
+import arrow.typeclasses.counnest
+import arrow.typeclasses.value
 import io.kotlintest.shouldBe
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith

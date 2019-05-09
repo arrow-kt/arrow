@@ -1,17 +1,40 @@
 package arrow.data.extensions
 
 import arrow.Kind
-import arrow.core.*
-import arrow.data.*
+import arrow.core.Either
+import arrow.core.Id
+import arrow.core.Tuple2
+import arrow.data.Kleisli
+import arrow.data.ReaderApi
+import arrow.data.ReaderPartialOf
 import arrow.extension
 import arrow.core.extensions.id.applicative.applicative
 import arrow.core.extensions.id.functor.functor
 import arrow.core.extensions.id.monad.monad
+import arrow.data.ForKleisli
+import arrow.data.KleisliOf
+import arrow.data.KleisliPartialOf
 import arrow.data.extensions.ior.monad.monad
 import arrow.data.extensions.kleisli.applicative.applicative
 import arrow.data.extensions.kleisli.functor.functor
 import arrow.data.extensions.kleisli.monad.monad
-import arrow.typeclasses.*
+import arrow.data.fix
+import arrow.data.run
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Apply
+import arrow.typeclasses.Conested
+import arrow.typeclasses.Contravariant
+import arrow.typeclasses.Decidable
+import arrow.typeclasses.Divide
+import arrow.typeclasses.Divisible
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadError
+import arrow.typeclasses.MonadThrow
+import arrow.typeclasses.conest
+import arrow.typeclasses.counnest
+import arrow.typeclasses.fix
 import arrow.typeclasses.suspended.monad.Fx
 import arrow.undocumented
 
@@ -70,6 +93,23 @@ interface KleisliDecidableInstance<F, D> : Decidable<KleisliPartialOf<F, D>>, Kl
 
   override fun <A, B, Z> choose(fa: Kind<KleisliPartialOf<F, D>, A>, fb: Kind<KleisliPartialOf<F, D>, B>, f: (Z) -> Either<A, B>): Kind<KleisliPartialOf<F, D>, Z> =
     Kleisli { d -> DFFF().choose(fa.fix().run(d), fb.fix().run(d), f) }
+}
+
+@extension
+interface KleisliApply<F, D> : Apply<KleisliPartialOf<F, D>>, KleisliFunctor<F, D> {
+
+  fun AF(): Applicative<F>
+
+  override fun FF(): Functor<F> = AF()
+
+  override fun <A, B> KleisliOf<F, D, A>.map(f: (A) -> B): Kleisli<F, D, B> =
+    fix().map(AF(), f)
+
+  override fun <A, B> KleisliOf<F, D, A>.ap(ff: KleisliOf<F, D, (A) -> B>): Kleisli<F, D, B> =
+    fix().ap(AF(), ff)
+
+  override fun <A, B> KleisliOf<F, D, A>.product(fb: KleisliOf<F, D, B>): Kleisli<F, D, Tuple2<A, B>> =
+    Kleisli { AF().run { run(it).product(fb.run(it)) } }
 }
 
 @extension
@@ -136,7 +176,6 @@ interface KleisliMonadError<F, D, E> : MonadError<KleisliPartialOf<F, D>, E>, Kl
   override fun AE(): ApplicativeError<F, E> = ME()
 
   override fun AF(): Applicative<F> = ME()
-
 }
 
 @extension
@@ -168,5 +207,4 @@ interface KleisliFx<F, D> : Fx<KleisliPartialOf<F, D>> {
 
   override fun monad(): Monad<KleisliPartialOf<F, D>> =
     Kleisli.monad(MF())
-
 }

@@ -1,7 +1,12 @@
 package arrow.typeclasses
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Eval
+import arrow.core.ForEither
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.Tuple2
 
 /**
  * ank_macro_hierarchy(arrow.typeclasses.Reducible)

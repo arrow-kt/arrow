@@ -61,5 +61,4 @@ class AutoFoldProcessor : AbstractProcessor() {
       AutoFoldFileGenerator(annotatedList, generatedDir).generate()
     }
   }
-
 }

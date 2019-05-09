@@ -142,7 +142,7 @@ sealed class Eval<out A> : EvalOf<A> {
         else -> fa
       }
 
-    //Enforce tailrec call to collapse inside compute loop
+    // Enforce tailrec call to collapse inside compute loop
     private fun <A> collapse1(fa: Eval<A>): Eval<A> = collapse(fa)
 
     @Suppress("UNCHECKED_CAST")
@@ -333,4 +333,10 @@ sealed class Eval<out A> : EvalOf<A> {
       evaluate(eval).also { result = Some(it) }
     }
   }
+}
+
+fun <A, B> Iterator<A>.iterateRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
+  fun loop(): Eval<B> =
+    Eval.defer { if (this.hasNext()) f(this.next(), loop()) else lb }
+  return loop()
 }

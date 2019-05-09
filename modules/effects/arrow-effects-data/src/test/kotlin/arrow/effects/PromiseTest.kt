@@ -4,7 +4,7 @@ import arrow.core.Left
 import arrow.core.None
 import arrow.core.Some
 import arrow.core.Tuple2
-import arrow.effects.extensions.io.applicative.product
+import arrow.effects.extensions.io.apply.product
 import arrow.effects.extensions.io.applicativeError.attempt
 import arrow.effects.extensions.io.async.async
 import arrow.effects.extensions.io.concurrent.concurrent
@@ -30,7 +30,7 @@ class PromiseTest : UnitSpec() {
       label: String,
       ctx: CoroutineContext = Dispatchers.Default,
       promise: IO<Promise<ForIO, Int>>
-    ): Unit {
+    ) {
 
       "$label - complete" {
         forAll(Gen.int()) { a ->
@@ -154,7 +154,5 @@ class PromiseTest : UnitSpec() {
 
     tests("CancelablePromise", promise = Promise<ForIO, Int>(IO.concurrent()).fix())
     tests("UncancelablePromise", promise = Promise.uncancelable<ForIO, Int>(IO.async()).fix())
-
   }
-
 }

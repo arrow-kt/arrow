@@ -18,19 +18,22 @@ data class Code(val value: String) {
 }
 
 data class PackageName(
-  val value: String) : Tree() {
+  val value: String
+) : Tree() {
   companion object
 }
 
 data class TypeAlias(
   val name: String,
-  val value: TypeName) : Tree() {
+  val value: TypeName
+) : Tree() {
   companion object
 }
 
 data class Import(
   val qualifiedName: String,
-  val alias: String? = null) : Tree() {
+  val alias: String? = null
+) : Tree() {
   companion object
 }
 
@@ -61,7 +64,8 @@ sealed class TypeName : Tree() {
     val upperBounds: List<TypeName>,
     val lowerBounds: List<TypeName>,
     val nullable: Boolean,
-    val annotations: List<Annotation>) : TypeName() {
+    val annotations: List<Annotation>
+  ) : TypeName() {
 
     override val simpleName: String
       get() = name
@@ -161,7 +165,8 @@ data class Parameter(
 data class Annotation(
   val type: TypeName,
   val members: List<Code>,
-  val useSiteTarget: UseSiteTarget?) : Tree() {
+  val useSiteTarget: UseSiteTarget?
+) : Tree() {
   companion object
 }
 
@@ -192,7 +197,8 @@ data class Func(
   val modifiers: List<Modifier> = emptyList(),
   val typeVariables: List<TypeName.TypeVariable> = emptyList(),
   val parameters: List<Parameter> = emptyList(),
-  val jvmMethodSignature: String = "") : Tree() {
+  val jvmMethodSignature: String = ""
+) : Tree() {
   companion object
 }
 
@@ -257,5 +263,4 @@ data class Type(
   }
 
   companion object
-
 }

@@ -40,11 +40,6 @@ open class MonadDeferCancellableContinuation<F, A>(val SC: MonadDefer<F>, overri
   suspend fun <B> bindDelayOrRaise(f: () -> Either<Throwable, B>): B =
           delayOrRaise(f).bind()
 
-  @Deprecated("Use bindDelayOrRaise instead",
-          ReplaceWith("bindDelayOrRaise(f)", "arrow.effects.typeclasses.MonadDeferCancellableContinuations"))
-  suspend fun <B> bindDeferUnsafe(f: () -> Either<Throwable, B>): B =
-          delayOrRaise(f).bind()
-
   override fun <B> bindingCatch(c: suspend MonadErrorContinuation<F, *>.() -> B): Kind<F, B> =
     bindingCancellable(c).a
 
@@ -89,5 +84,4 @@ open class MonadDeferCancellableContinuation<F, A>(val SC: MonadDefer<F>, overri
     }
     COROUTINE_SUSPENDED
   }
-
 }

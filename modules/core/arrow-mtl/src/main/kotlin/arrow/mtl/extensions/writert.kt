@@ -42,5 +42,4 @@ interface WriterTMonadWriter<F, W> : MonadWriter<WriterTPartialOf<F, W>, W>, Wri
   override fun <A> writer(aw: Tuple2<W, A>): WriterT<F, W, A> = WriterT.put2(MF(), aw.b, aw.a)
 
   override fun tell(w: W): Kind<WriterTPartialOf<F, W>, Unit> = WriterT.tell2(MF(), w)
-
 }
