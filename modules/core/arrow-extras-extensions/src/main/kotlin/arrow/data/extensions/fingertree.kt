@@ -1,6 +1,7 @@
 package arrow.data.extensions
 
 import arrow.Kind
+import arrow.core.Either
 import arrow.data.fingertree.FingerTree
 import arrow.data.fingertree.ForFingerTree
 import arrow.data.fingertree.fix
@@ -32,4 +33,13 @@ interface FingerTreeApplicative : Applicative<ForFingerTree> {
     fix().ap(ff)
 }
 
+@extension
+interface FingerTreeMonad : Monad<ForFingerTree> {
+  override fun <A, B> Kind<ForFingerTree, A>.flatMap(f: (A) -> Kind<ForFingerTree, B>): FingerTree<B> =
+    fix().flatMap(f)
 
+  override fun <A, B> tailRecM(a: A, f: (A) -> Kind<ForFingerTree, Either<A, B>>): FingerTree<B> =
+    FingerTree.tailRecM(a, f)
+
+  override fun <A> just(a: A): Kind<ForFingerTree, A> = FingerTree.single(a)
+}

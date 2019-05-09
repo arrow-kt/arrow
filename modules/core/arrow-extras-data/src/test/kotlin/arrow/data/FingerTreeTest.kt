@@ -382,5 +382,13 @@ class FingerTreeTest : StringSpec() {
       }
     }
 
+    /**
+     * tailRecM()
+     */
+
+    "Property based testing for tailRecM()" {
+      // TODO: Write property based test
+    }
+
   }
 }

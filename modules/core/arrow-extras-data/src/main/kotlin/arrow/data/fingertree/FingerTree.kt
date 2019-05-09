@@ -1,9 +1,7 @@
 package arrow.data.fingertree
 
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.Some
-import arrow.core.Tuple2
+import arrow.Kind
+import arrow.core.*
 import arrow.data.fingertree.internal.Affix
 import arrow.data.fingertree.internal.Node
 import arrow.higherkind
@@ -193,9 +191,8 @@ sealed class FingerTree<T> : FingerTreeOf<T> {
     }
   }
 
-  private fun concatHelper(items: List<T>, right: FingerTree<T>): FingerTree<T> {
-
-    return when (this) {
+  private fun concatHelper(items: List<T>, right: FingerTree<T>): FingerTree<T> =
+    when (this) {
       is Deep -> when (right) {
         is Deep -> { // left and right are Deep
           Deep(
@@ -231,7 +228,6 @@ sealed class FingerTree<T> : FingerTreeOf<T> {
         tree
       }
     }
-  }
 
   companion object {
 
@@ -249,6 +245,39 @@ sealed class FingerTree<T> : FingerTreeOf<T> {
 
     fun <A> fromArgs(vararg items: A): FingerTree<A> =
       fromList(items.toList())
+
+    fun <A, B> tailRecM(a: A, f: (A) -> Kind<ForFingerTree, Either<A, B>>): FingerTree<B> =
+      tailRecMHelper(empty(), f, f(a).fix())
+
+    private tailrec fun <A, B> tailRecMHelper(
+      buf: FingerTree<B>,
+      f: (A) -> Kind<ForFingerTree, Either<A, B>>,
+      v: FingerTree<Either<A, B>>
+    ): FingerTree<B> {
+      return if (!v.isEmpty()) {
+        when (val head: Either<A, B> = v.head().getOrElse {
+          throw RuntimeException("Non empty finger tree must have a head element.")
+        }) {
+          is Either.Right -> tailRecMHelper(
+            buf.append(head.b),
+            f,
+            v.tail().fold(
+              { empty<Either<A, B>>() },
+              { it }
+            )
+          )
+
+          is Either.Left -> tailRecMHelper(
+            buf,
+            f,
+            v.tail().fold(
+              { f(head.a).fix() },
+              { f(head.a).fix() concat it }
+            )
+          )
+        }
+      } else buf
+    }
   }
 
 }
