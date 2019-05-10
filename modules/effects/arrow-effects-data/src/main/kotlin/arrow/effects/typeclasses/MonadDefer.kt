@@ -4,7 +4,6 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Tuple2
 import arrow.core.toT
-import arrow.effects.MVar
 import arrow.effects.Ref
 import arrow.effects.data.internal.BindingCancellationException
 import arrow.typeclasses.MonadContinuation
