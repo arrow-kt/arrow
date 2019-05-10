@@ -97,21 +97,21 @@ interface Ref<F, A> {
      * Builds a [Ref] value for data types given a [MonadDefer] instance
      * without deciding the type of the Ref's value.
      *
-     * @see [of]
+     * @see [invoke]
      */
-    operator fun <F> invoke(MD: MonadDefer<F>): PartiallyAppliedRef<F> = object : PartiallyAppliedRef<F> {
-      override fun <A> of(a: A): Kind<F, Ref<F, A>> = Ref.of(a, MD)
+    fun <F> factory(MD: MonadDefer<F>): RefFactory<F> = object : RefFactory<F> {
+      override fun <A> delay(a: () -> A): Kind<F, Ref<F, A>> = invoke(MD, a)
     }
 
     /**
-     * Creates an asynchronous, concurrent mutable reference initialized to the supplied value.
+     * Creates an asynchronous, concurrent mutable reference initialized using the supplied function.
      */
-    fun <F, A> of(a: A, MD: MonadDefer<F>): Kind<F, Ref<F, A>> = MD.delay {
-      unsafe(a, MD)
+    operator fun <F, A> invoke(MD: MonadDefer<F>, f: () -> A): Kind<F, Ref<F, A>> = MD.delay {
+      unsafe(f(), MD)
     }
 
     /**
-     * Like [of] but returns the newly allocated ref directly instead of wrapping it in [MonadDefer.invoke].
+     * Like [invoke] but returns the newly allocated ref directly instead of wrapping it in [MonadDefer.invoke].
      * This method is considered unsafe because it is not referentially transparent -- it allocates mutable state.
      *
      * @see [invoke]
@@ -185,8 +185,8 @@ interface Ref<F, A> {
 }
 
 /**
- * Intermediate interface to partially apply [F] to [Ref].
+ * Creates [Ref] for a kind [F] using a supplied function.
  */
-interface PartiallyAppliedRef<F> {
-  fun <A> of(a: A): Kind<F, Ref<F, A>>
+interface RefFactory<F> {
+  fun <A> delay(a: () -> A): Kind<F, Ref<F, A>>
 }
