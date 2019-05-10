@@ -26,13 +26,13 @@ interface MVar<F, A> {
    *
    * fun main(args: Array<String>) {
    * //sampleStart
-   * val mvar = MVar(IO.async())
+   * val mvar = MVar.factoryUncancelable(IO.async())
    *
    * mvar.empty<Int>().flatMap { v ->
    *   v.isEmpty()
    * }.unsafeRunSync() == true
    *
-   * mvar.of(10).flatMap { v ->
+   * mvar.just(10).flatMap { v ->
    *   v.isEmpty()
    * }.unsafeRunSync() == false
    * //sampleEnd
@@ -51,9 +51,9 @@ interface MVar<F, A> {
    *
    * fun main(args: Array<String>) {
    * //sampleStart
-   * val mvar = MVar(IO.async())
+   * val mvar = MVar.factoryUncancelable(IO.async())
    *
-   * mvar.of(10).flatMap { v ->
+   * mvar.just(10).flatMap { v ->
    *   v.isNotEmpty()
    * }.unsafeRunSync() == true
    *
@@ -77,7 +77,7 @@ interface MVar<F, A> {
    *
    * fun main(args: Array<String>) {
    * //sampleStart
-   * val mvar = MVar(IO.async())
+   * val mvar = MVar.factoryUncancelable(IO.async())
    *
    * mvar.empty<Int>().flatMap { v ->
    *   v.put(5).flatMap {
@@ -101,13 +101,13 @@ interface MVar<F, A> {
    *
    * fun main(args: Array<String>) {
    * //sampleStart
-   * val mvar = MVar(IO.async())
+   * val mvar = MVar.factoryUncancelable(IO.async())
    *
    * mvar.empty<Int>().flatMap { v ->
    *  v.tryPut(5)
    * }.unsafeRunSync() == true
    *
-   * mvar.of(5).flatMap { v ->
+   * mvar.just(5).flatMap { v ->
    *   v.tryPut(10)
    * }.unsafeRunSync() == false
    * //sampleEnd
@@ -126,9 +126,9 @@ interface MVar<F, A> {
    *
    * fun main(args: Array<String>) {
    * //sampleStart
-   * val mvar = MVar(IO.async())
+   * val mvar = MVar.factoryUncancelable(IO.async())
    *
-   * mvar.of(5).flatMap { v ->
+   * mvar.just(5).flatMap { v ->
    * v.take()
    * }.unsafeRunSync() == 5
    *
@@ -152,9 +152,9 @@ interface MVar<F, A> {
    *
    * fun main(args: Array<String>) {
    * //sampleStart
-   * val mvar = MVar(IO.async())
+   * val mvar = MVar.factoryUncancelable(IO.async())
    *
-   * mvar.of(5).flatMap { v ->
+   * mvar.just(5).flatMap { v ->
    *   v.tryTake()
    * }.unsafeRunSync() == Some(5)
    *
@@ -178,13 +178,13 @@ interface MVar<F, A> {
    * import arrow.effects.extensions.io.monad.map
    * fun main(args: Array<String>) {
    * //sampleStart
-   * val mvar = MVar(IO.async())
+   * val mvar = MVar.factoryUncancelable(IO.async())
    *
-   * mvar.of(5).flatMap { v ->
+   * mvar.just(5).flatMap { v ->
    *   v.read()
    * }.unsafeRunSync() == 5
    *
-   * mvar.of(5).flatMap { v ->
+   * mvar.just(5).flatMap { v ->
    *   v.read().flatMap { value ->
    *     v.isNotEmpty().map { isNotEmpty ->
    *       value toT isNotEmpty
