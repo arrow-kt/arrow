@@ -318,8 +318,8 @@ interface MVar<F, A> {
  *
  * fun main(args: Array<String>) {
  *   //sampleStart
- *   val mvarPartial: MVarPartialOf<ForIO> = MVar(IO.async())
- *   val intVar: IOOf<MVar<ForIO, Int>> = mvarPartial.of(5)
+ *   val mvarPartial: MVarFactory<ForIO> = MVar.factoryUncancelable(IO.async())
+ *   val intVar: IOOf<MVar<ForIO, Int>> = mvarPartial.just(5)
  *   val stringVar: IOOf<MVar<ForIO, String>> = mvarPartial.empty<String>()
  *   //sampleEnd
  * }
@@ -336,8 +336,8 @@ interface MVarFactory<F> {
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val mvarPartial: MVarPartialOf<ForIO> = MVar(IO.async())
-   *   val intVar: IOOf<MVar<ForIO, Int>> = mvarPartial.of(5)
+   *   val mvarPartial: MVarFactory<ForIO> = MVar.factoryUncancelable(IO.async())
+   *   val intVar: IOOf<MVar<ForIO, Int>> = mvarPartial.just(5)
    *   //sampleEnd
    * }
    * ```
@@ -353,7 +353,7 @@ interface MVarFactory<F> {
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val mvarPartial: MVarPartialOf<ForIO> = MVar(IO.async())
+   *   val mvarPartial: MVarFactory<ForIO> = MVar.factoryUncancelable(IO.async())
    *   val stringVar: IOOf<MVar<ForIO, String>> = mvarPartial.empty<String>()
    *   //sampleEnd
    * }
