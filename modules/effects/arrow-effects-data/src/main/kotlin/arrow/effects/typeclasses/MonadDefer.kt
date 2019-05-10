@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Tuple2
 import arrow.core.toT
+import arrow.effects.Ref
 import arrow.effects.data.internal.BindingCancellationException
 import arrow.typeclasses.MonadContinuation
 import arrow.typeclasses.MonadError
@@ -35,6 +36,11 @@ interface MonadDefer<F> : MonadThrow<F>, Bracket<F, Throwable> {
 
   fun <A> delayOrRaise(f: () -> Either<Throwable, A>): Kind<F, A> =
     defer { f().fold({ raiseError<A>(it) }, { just(it) }) }
+
+  /**
+   * Creates a [Ref] to purely manage mutable state, initialized by the function [f]
+   */
+  fun <A> ref(f: () -> A): Kind<F, Ref<F, A>> = Ref(this, f)
 
   /**
    * Entry point for monad bindings which enables for comprehensions. The underlying impl is based on coroutines.
