@@ -160,7 +160,7 @@ class MVarTest : UnitSpec() {
       }
     }
 
-    tests("UncancelableMVar", MVar(IO.async()))
-    tests("CancelableMVar", MVar(IO.concurrent()))
+    tests("UncancelableMVar", MVar.factoryUncancelable(IO.async()))
+    tests("CancelableMVar", MVar.factoryUncancelable(IO.concurrent()))
   }
 }
