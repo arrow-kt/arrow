@@ -317,6 +317,30 @@ class FingerTreeTest : StringSpec() {
       Deep(One(1), Empty(), One(2)).isEmpty() shouldBe false
     }
 
+    "Property based testing for isEmpty()" {
+      forAll(Gen.list(Gen.int())) { l ->
+        FingerTree.fromList(l).isEmpty() == l.isEmpty()
+      }
+    }
+
+    /**
+     * size()
+     */
+
+    "size() should return 0 when the finger tree is a empty finger tree" {
+      Empty<Int>().size() shouldBe 0
+    }
+
+    "size() should return 1 when the finger tree is a single finger tree" {
+      Single(1).size() shouldBe 1
+    }
+
+    "Property based testing for size()" {
+      forAll(Gen.list(Gen.int())) { l ->
+        FingerTree.fromList(l).size() == l.size
+      }
+    }
+
     /**
      * concat()
      */
