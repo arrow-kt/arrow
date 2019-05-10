@@ -58,7 +58,7 @@ internal object IOBracket {
           is Either.Right -> {
             val a = ea.b
             val frame = BracketReleaseFrame<A, B>(a, release)
-            val onNext = {
+            val onNext: () -> IO.Bind<B, B> = {
               val fb = try {
                 use(a)
               } catch (e: Throwable) {

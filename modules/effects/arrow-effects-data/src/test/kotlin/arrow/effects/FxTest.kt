@@ -14,6 +14,7 @@ import arrow.effects.suspended.fx.Fx
 import arrow.effects.suspended.fx.FxFrame
 import arrow.effects.suspended.fx.FxOf
 import arrow.effects.suspended.fx.bracketCase
+import arrow.effects.suspended.fx.guaranteeCase
 import arrow.effects.suspended.fx.handleErrorWith
 import arrow.effects.suspended.fx.not
 import arrow.effects.typeclasses.ExitCase
@@ -350,7 +351,7 @@ class FxTest : UnitSpec() {
 
       forAll(Gen.string()) { message ->
         Fx.unsafeRunBlocking(
-          Fx.FlatMap(Fx.raiseError(RuntimeException(message)), ThrowableAsStringFrame as (Int) -> Fx<String>, 0)
+          Fx.FlatMap(Fx.raiseError(RuntimeException(message)), ThrowableAsStringFrame as (Int) -> Fx<String>)
         ) == message
       }
     }
@@ -362,7 +363,7 @@ class FxTest : UnitSpec() {
       }
 
       Fx.unsafeRunBlocking(
-        Fx.FlatMap(Fx.Pure(1, 0), ThrowableAsStringFrame as (Int) -> Fx<Int>, 0)
+        Fx.FlatMap(Fx.Pure(1), ThrowableAsStringFrame as (Int) -> Fx<Int>)
       ) shouldBe 2
     }
 
@@ -430,6 +431,31 @@ class FxTest : UnitSpec() {
       }
 
       Fx.unsafeRunBlocking(program)
+    }
+
+    "Bracket should be stack safe" {
+      val size = 5000
+
+      fun fxBracketLoop(i: Int): Fx<Int> =
+        Fx.unit.bracket(use = { Fx.just(i + 1) }, release = { Fx.unit }).flatMap { ii ->
+          if (ii < size) fxBracketLoop(ii)
+          else Fx.just(ii)
+        }
+
+      Fx.unsafeRunBlocking(Fx.just(0).flatMap(::fxBracketLoop)) shouldBe size
+    }
+
+    "GuaranteeCase should be stack safe" {
+      val size = 5000
+
+      fun ioGuaranteeCase(i: Int): Fx<Int> =
+        Fx.unit.guaranteeCase { Fx.unit }.flatMap {
+          val ii = i + 1
+          if (ii < size) ioGuaranteeCase(ii)
+          else Fx.just(ii)
+        }
+
+      Fx.unsafeRunBlocking(Fx.just(0).flatMap(::ioGuaranteeCase)) shouldBe size
     }
 
 //    "KindConnection can cancel upstream" {

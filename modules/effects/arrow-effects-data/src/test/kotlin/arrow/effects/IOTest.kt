@@ -1,13 +1,15 @@
 package arrow.effects
 
+import arrow.Kind
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.None
+import arrow.core.Option
 import arrow.core.Right
 import arrow.core.Some
 import arrow.core.Tuple3
-import arrow.core.fix
-import arrow.core.flatMap
+import arrow.core.extensions.either.eq.eq
+import arrow.core.extensions.option.eq.eq
 import arrow.core.right
 import arrow.effects.IO.Companion.just
 import arrow.effects.extensions.io.async.async
@@ -15,12 +17,14 @@ import arrow.effects.extensions.io.concurrent.concurrent
 import arrow.effects.extensions.io.concurrent.parMapN
 import arrow.effects.extensions.io.fx.fx
 import arrow.effects.extensions.io.monad.flatMap
+import arrow.effects.typeclasses.Duration
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.milliseconds
 import arrow.effects.typeclasses.seconds
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.laws.ConcurrentLaws
+import arrow.typeclasses.Eq
 import io.kotlintest.fail
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
@@ -34,7 +38,7 @@ import org.junit.runner.RunWith
 class IOTest : UnitSpec() {
 
   init {
-    testLaws(ConcurrentLaws.laws(IO.concurrent(), EQ(), EQ(), EQ()))
+    testLaws(ConcurrentLaws.laws(IO.concurrent(), IO_EQ(), IO_EQ(), IO_EQ()))
 
     "should defer evaluation until run" {
       var run = false
@@ -481,3 +485,9 @@ class IOTest : UnitSpec() {
 }
 
 object Error : Throwable()
+
+fun <A> IO_EQ(EQA: Eq<A> = Eq.any(), timeout: Duration = 60.seconds): Eq<Kind<ForIO, A>> = Eq { a, b ->
+  Option.eq(Either.eq(Eq.any(), EQA)).run {
+    a.fix().attempt().unsafeRunTimed(timeout).eqv(b.fix().attempt().unsafeRunTimed(timeout))
+  }
+}

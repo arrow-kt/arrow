@@ -19,10 +19,12 @@ import arrow.effects.typeclasses.ConnectedProcF
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.Fiber
 import arrow.effects.typeclasses.mapUnit
+import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.RestrictsSuspension
 import kotlin.coroutines.startCoroutine
+import kotlin.coroutines.suspendCoroutine
 
 class ForFx private constructor() {
   companion object
@@ -45,6 +47,8 @@ sealed class Fx<out A> : FxOf<A> {
 
   fun <B> followedBy(fa: FxOf<B>): Fx<B> =
     flatMap { fa }
+
+  fun <A> unit(): Fx<Unit> = map(mapUnit)
 
   inline val fa: suspend () -> A
     get() = when (this) {
@@ -135,16 +139,16 @@ sealed class Fx<out A> : FxOf<A> {
   inline fun <B> flatMap(noinline f: (A) -> FxOf<B>): Fx<B> = when (this) {
     is RaiseError -> this
     is Pure -> Defer { f(value) }
-    is Single -> FlatMap(this, f, 0)
+    is Single -> FlatMap(this, f)
     is Lazy -> Defer { f(source(Unit)) }
-    is Defer -> FlatMap(this, f, 0)
+    is Defer -> FlatMap(this, f)
     is Map<*, *> -> {
       val gg = this.g as (Any?) -> A
       FlatMap(source, { f(gg(it)) }, 1)
     }
     is FlatMap<*, *> -> {
 
-      if (index != Platform.maxStackDepthSize) FlatMap(this, f, 0)
+      if (index != Platform.maxStackDepthSize) FlatMap(this, f)
       else FlatMap(source, { a ->
         val fbb = fb as (Any?) -> FxOf<A>
         when (val fx: Fx<A> = fbb(a).fix()) {
@@ -157,19 +161,17 @@ sealed class Fx<out A> : FxOf<A> {
               RaiseError(e.nonFatalOrThrow())
             }
           }
-          else -> FlatMap(fx, f, 0)
+          else -> FlatMap(fx, f)
         }
       }, index + 1)
     }
-    is UpdateContext -> FlatMap(this, f, 0)
-    is ContinueOn -> FlatMap(this, f, 0)
-    is ConnectionSwitch -> FlatMap(this, f, 0)
-    is Async -> FlatMap(this, f, 0)
-    is AsyncContinueOn -> FlatMap(this, f, 0)
-    is AsyncUpdateContext -> FlatMap(this, f, 0)
+    is UpdateContext -> FlatMap(this, f)
+    is ContinueOn -> FlatMap(this, f)
+    is ConnectionSwitch -> FlatMap(this, f)
+    is Async -> FlatMap(this, f)
+    is AsyncContinueOn -> FlatMap(this, f)
+    is AsyncUpdateContext -> FlatMap(this, f)
   }
-
-  suspend inline fun bind(): A = !this
 
   @PublishedApi
   internal class RaiseError(@JvmField val error: Throwable) : Fx<Nothing>() {
@@ -177,7 +179,7 @@ sealed class Fx<out A> : FxOf<A> {
   }
 
   @PublishedApi
-  internal class Pure<A>(@JvmField var internalValue: Any?, var index: Int) : Fx<A>() {
+  internal class Pure<A>(@JvmField var internalValue: Any?) : Fx<A>() {
     @Suppress("UNCHECKED_CAST")
     inline val value: A
       get() = internalValue as A
@@ -211,7 +213,7 @@ sealed class Fx<out A> : FxOf<A> {
     @JvmField var source: FxOf<A>,
     @JvmField var g: (A) -> B
   ) : Fx<B>(), (A) -> Fx<B> {
-    override fun invoke(value: A): Fx<B> = Pure(g(value), 0)
+    override fun invoke(value: A): Fx<B> = Pure(g(value))
     override fun toString(): String = "Fx.Map(...)"
   }
 
@@ -219,7 +221,7 @@ sealed class Fx<out A> : FxOf<A> {
   internal class FlatMap<A, B>(
     @JvmField var source: FxOf<A>,
     @JvmField var fb: (A) -> FxOf<B>,
-    @JvmField var index: Int
+    @JvmField var index: Int = 0
   ) : Fx<B>() {
     override fun toString(): String = "Fx.FlatMap(..., index = $index)"
   }
@@ -341,6 +343,9 @@ sealed class Fx<out A> : FxOf<A> {
 //  suspend inline operator fun component1(): A =
 //    !this
 
+  fun <B> bracket(release: (A) -> FxOf<Unit>, use: (A) -> FxOf<B>): Fx<B> =
+    bracketCase({ a, _ -> release(a) }, use)
+
   fun <B> ap(ff: FxOf<(A) -> B>): Fx<B> =
     ff.fix().flatMap { map(it) }
 
@@ -352,12 +357,12 @@ sealed class Fx<out A> : FxOf<A> {
     is Pure -> if (!predicate(value)) RaiseError(error()) else this
     else -> flatMap { result ->
       if (!predicate(result)) RaiseError(error())
-      else Pure<A>(result, 0)
+      else Pure<A>(result)
     }
   }
 
   fun attempt(): Fx<Either<Throwable, A>> =
-    FlatMap(this, FxFrame.attempt(), 0)
+    FlatMap(this, FxFrame.attempt())
 
   fun updateContext(f: (CoroutineContext) -> CoroutineContext): Fx<A> =
     UpdateContext(this, f)
@@ -381,9 +386,19 @@ sealed class Fx<out A> : FxOf<A> {
     oldConn.push(conn.cancel())
     conn.push(oldConn.cancel())
 
-    FxRunLoop.startCancelable(this, conn, ctx) {
-      promise.complete(it)
-    }
+    suspend {
+      suspendCoroutine { ca: Continuation<A> ->
+        FxRunLoop.startCancelable(this, conn, ctx) { either: Either<Throwable, A> ->
+          either.fold({ error ->
+            ca.resumeWith(Result.failure(error))
+          }, { a ->
+            ca.resumeWith(Result.success(a))
+          })
+        }
+      }
+    }.startCoroutine(asyncContinuation(ctx) { either ->
+      promise.complete(either)
+    })
 
     cb(Right(FxFiber(promise, conn)))
   }
@@ -405,10 +420,10 @@ sealed class Fx<out A> : FxOf<A> {
       Map(UpdateContext(unit) { ctx }) { f() }
 
     @JvmStatic
-    fun <A> just(a: A): Fx<A> = Pure(a, 0)
+    fun <A> just(a: A): Fx<A> = Pure(a)
 
     @JvmStatic
-    val unit: Fx<Unit> = Pure(Unit, 0)
+    val unit: Fx<Unit> = Pure(Unit)
 
     @JvmStatic
     val lazy: Fx<Unit> = Lazy { Unit }
@@ -459,33 +474,33 @@ sealed class Fx<out A> : FxOf<A> {
      */
     @JvmStatic
     fun <A> unsafeRunBlocking(fx: FxOf<A>): A = when (val current = fx.fix()) {
-        is RaiseError -> throw current.error
-        is Pure -> current.value
-        is Lazy -> current.source(Unit)
-        is Single -> UnsafePromise<A>().run {
-          current.source.startCoroutine(asyncContinuation(EmptyCoroutineContext) {
-            complete(it)
-          })
-          await()
-        }
-        else -> {
-          when (val result = FxRunLoop.step(fx)) {
-            is Pure -> result.value
-            is RaiseError -> throw result.error
-            is Lazy -> result.source(Unit)
-            is Single -> UnsafePromise<A>().run {
-              result.source.startCoroutine(asyncContinuation(EmptyCoroutineContext) {
-                complete(it)
-              })
-              await()
-            }
-            else -> UnsafePromise<A>().run {
-              FxRunLoop.start(result) { complete(it) }
-              await()
-            }
+      is RaiseError -> throw current.error
+      is Pure -> current.value
+      is Lazy -> current.source(Unit)
+      is Single -> UnsafePromise<A>().run {
+        current.source.startCoroutine(asyncContinuation(EmptyCoroutineContext) {
+          complete(it)
+        })
+        await()
+      }
+      else -> {
+        when (val result = FxRunLoop.step(fx)) {
+          is Pure -> result.value
+          is RaiseError -> throw result.error
+          is Lazy -> result.source(Unit)
+          is Single -> UnsafePromise<A>().run {
+            result.source.startCoroutine(asyncContinuation(EmptyCoroutineContext) {
+              complete(it)
+            })
+            await()
+          }
+          else -> UnsafePromise<A>().run {
+            FxRunLoop.start(result) { complete(it) }
+            await()
           }
         }
       }
+    }
 
     /**
      * [unsafeRunNonBlocking] allows you to run any [Fx] to its wrapped value [A].
@@ -562,18 +577,18 @@ sealed class Fx<out A> : FxOf<A> {
 }
 
 fun <A, B> FxOf<A>.redeem(fe: (Throwable) -> B, fs: (A) -> B): Fx<B> =
-  Fx.FlatMap(this, FxFrame.Companion.Redeem(fe, fs), 0)
+  Fx.FlatMap(this, FxFrame.Companion.Redeem(fe, fs))
 
 fun <A, B> FxOf<A>.redeemWith(fe: (Throwable) -> FxOf<B>, fs: (A) -> FxOf<B>): Fx<B> =
-  Fx.FlatMap(this, FxFrame.Companion.RedeemWith(fe, fs), 0)
+  Fx.FlatMap(this, FxFrame.Companion.RedeemWith(fe, fs))
 
 fun <A> FxOf<A>.handleErrorWith(f: (Throwable) -> FxOf<A>): Fx<A> =
-  Fx.FlatMap(this, FxFrame.Companion.ErrorHandler(f), 0)
+  Fx.FlatMap(this, FxFrame.Companion.ErrorHandler(f))
 
 fun <A> FxOf<A>.handleError(f: (Throwable) -> A): Fx<A> = when (this) {
   is Fx.RaiseError -> Fx { f(error) }
   is Fx.Pure -> this
-  else -> Fx.FlatMap(this, FxFrame.Companion.ErrorHandler(f.andThen { Fx.Pure<A>(it, 0) }), 0)
+  else -> Fx.FlatMap(this, FxFrame.Companion.ErrorHandler(f.andThen { Fx.Pure<A>(it) }))
 }
 
 @Suppress("FunctionName")

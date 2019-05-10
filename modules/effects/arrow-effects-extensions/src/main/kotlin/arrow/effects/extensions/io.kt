@@ -167,8 +167,8 @@ interface IOConcurrent : Concurrent<ForIO>, IOAsync {
     fa.startCoroutine(asyncContinuation(EmptyCoroutineContext, cb))
   }
 
-  override fun <A> CoroutineContext.fork(fa: IOOf<A>): IO<Fiber<ForIO, A>> =
-    fa.ioStart(this)
+  override fun <A> Kind<ForIO, A>.fork(coroutineContext: CoroutineContext): IO<Fiber<ForIO, A>> =
+    ioStart(coroutineContext)
 
   override fun <A> asyncF(fa: ConnectedProcF<ForIO, A>): IO<A> =
     IO.asyncF(fa)

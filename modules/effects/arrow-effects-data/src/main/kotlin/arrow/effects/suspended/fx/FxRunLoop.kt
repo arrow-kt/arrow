@@ -1,7 +1,6 @@
 package arrow.effects.suspended.fx
 
 import arrow.core.Either
-import arrow.core.Right
 import arrow.core.handleErrorWith
 import arrow.core.nonFatalOrThrow
 import arrow.effects.KindConnection
@@ -112,7 +111,7 @@ object FxRunLoop {
 
           source = Fx.FlatMap(prev, { a ->
             // We need to schedule running the function because at this point we don't know what the correct CC will be to call modify with.
-            Fx.AsyncUpdateContext(Fx.Pure<Any?>(a, 0), modify)
+            Fx.AsyncUpdateContext(Fx.Pure<Any?>(a), modify)
           }, 0)
         }
         is Fx.ContinueOn -> {
@@ -120,7 +119,7 @@ object FxRunLoop {
           val prev = source.source
 
           source = Fx.FlatMap(prev, { a ->
-            Fx.AsyncContinueOn(Fx.Pure<Any?>(a, 0), nextCC)
+            Fx.AsyncContinueOn(Fx.Pure<Any?>(a), nextCC)
           }, 0)
         }
         is Fx.Lazy -> {
@@ -183,7 +182,7 @@ object FxRunLoop {
             asyncBoundary?.contextSwitch(conn)
 
             if (restore != null) {
-              source = Fx.FlatMap(next, RestoreContext(old, restore), 0)
+              source = Fx.FlatMap(next, RestoreContext(old, restore))
             }
           }
         }
@@ -286,7 +285,7 @@ object FxRunLoop {
     val restore: (Any?, Throwable?, FxConnection, FxConnection) -> FxConnection
   ) : FxFrame<Any?, Fx<Any?>> {
 
-    override fun invoke(a: Any?): Fx<Any?> = Fx.ConnectionSwitch(Fx.Pure(a, 0), { current ->
+    override fun invoke(a: Any?): Fx<Any?> = Fx.ConnectionSwitch(Fx.Pure(a), { current ->
       restore(a, null, old, current)
     })
 
@@ -410,7 +409,7 @@ object FxRunLoop {
         contextSwitch = false
       } else {
         this.result = result.fold(
-          onSuccess = { Fx.Pure(it, 0) },
+          onSuccess = { Fx.Pure(it) },
           onFailure = { Fx.RaiseError(it) }
         )
       }
@@ -424,7 +423,7 @@ object FxRunLoop {
     override operator fun invoke(either: Either<Throwable, Any?>) {
       result = when (either) {
         is Either.Left -> Fx.RaiseError(either.a)
-        is Either.Right -> Fx.Pure(either.b, 0)
+        is Either.Right -> Fx.Pure(either.b)
       }
 
       if (shouldTrampoline) {
@@ -517,7 +516,7 @@ object FxRunLoop {
 
           current = Fx.FlatMap(next, { a ->
             // We need to schedule running the function because at this point we don't know what the correct CC will be to call modify with.
-            Fx.AsyncUpdateContext(Fx.Pure<Any?>(a, 0), modify)
+            Fx.AsyncUpdateContext(Fx.Pure<Any?>(a), modify)
           }, 0)
         }
         is Fx.ContinueOn -> {
@@ -525,7 +524,7 @@ object FxRunLoop {
           val next = current.source
 
           current = Fx.FlatMap(next, { a ->
-            Fx.AsyncContinueOn(Fx.Pure<Any?>(a, 0), nextCC)
+            Fx.AsyncContinueOn(Fx.Pure<Any?>(a), nextCC)
           }, 0)
         }
         is Fx.Single -> return suspendInSingle(current, bFirst, bRest) as Fx<A>
@@ -554,7 +553,7 @@ object FxRunLoop {
   }
 
   private fun <A> sanitizedCurrentFx(current: Current?, unboxed: Any?): Fx<A> =
-    (current ?: Fx.Pure(unboxed, 0)) as Fx<A>
+    (current ?: Fx.Pure(unboxed)) as Fx<A>
 
   private val suspendInAsync: (currentIO: Fx.Async<Any?>, bFirst: BindF?, bRest: CallStack?) -> Fx<Any?> = { source, bFirst, bRest ->
     // Hitting an async boundary means we have to stop, however if we had previous `flatMap` operations then we need to resume the loop with the collected stack

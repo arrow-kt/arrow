@@ -29,13 +29,13 @@ internal interface FxFrame<in A, out B> : (A) -> B {
   companion object {
 
     internal class ErrorHandler<A>(val fe: (Throwable) -> FxOf<A>) : FxFrame<A, Fx<A>> {
-      override fun invoke(a: A): Fx<A> = Fx.Pure(a, 0)
+      override fun invoke(a: A): Fx<A> = Fx.Pure(a)
       override fun recover(e: Throwable): Fx<A> = fe(e).fix()
     }
 
     internal class Redeem<A, B>(val fe: (Throwable) -> B, val fs: (A) -> B) : FxFrame<A, FxOf<B>> {
-      override fun invoke(a: A): FxOf<B> = Fx.Pure(fs(a), 0)
-      override fun recover(e: Throwable): Fx<B> = Fx.Pure(fe(e), 0)
+      override fun invoke(a: A): FxOf<B> = Fx.Pure(fs(a))
+      override fun recover(e: Throwable): Fx<B> = Fx.Pure(fe(e))
     }
 
     internal class RedeemWith<A, B>(val fe: (Throwable) -> FxOf<B>, val fs: (A) -> FxOf<B>) : FxFrame<A, FxOf<B>> {
@@ -48,8 +48,8 @@ internal interface FxFrame<in A, out B> : (A) -> B {
 
     @PublishedApi
     internal object AttemptFx : FxFrame<Any?, Fx<Either<Throwable, Any?>>> {
-      override fun invoke(a: Any?): Fx<Either<Throwable, Any?>> = Fx.Pure(Either.Right(a), 0)
-      override fun recover(e: Throwable): Fx<Either<Throwable, Any?>> = Fx.Pure(Either.Left(e), 0)
+      override fun invoke(a: Any?): Fx<Either<Throwable, Any?>> = Fx.Pure(Either.Right(a))
+      override fun recover(e: Throwable): Fx<Either<Throwable, Any?>> = Fx.Pure(Either.Left(e))
     }
   }
 }

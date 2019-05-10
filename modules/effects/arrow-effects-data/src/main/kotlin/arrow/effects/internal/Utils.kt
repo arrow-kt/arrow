@@ -205,7 +205,7 @@ object Platform {
 
   @PublishedApi
   internal class TrampolineExecutor(val underlying: Executor) {
-    private var immediateQueue = Platform.ArrayStack<Runnable>()
+    private var immediateQueue = ArrayStack<Runnable>()
     @Volatile
     private var withinLoop = false
 
@@ -233,7 +233,7 @@ object Platform {
       val head = immediateQueue.pop()
       if (head != null) {
         val rest = immediateQueue
-        immediateQueue = Platform.ArrayStack()
+        immediateQueue = ArrayStack()
         underlying.execute(ResumeRun(head, rest))
       }
     }

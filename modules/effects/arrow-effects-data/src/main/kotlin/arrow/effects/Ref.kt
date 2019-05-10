@@ -100,7 +100,7 @@ interface Ref<F, A> {
      * @see [of]
      */
     operator fun <F> invoke(MD: MonadDefer<F>): PartiallyAppliedRef<F> = object : PartiallyAppliedRef<F> {
-      override fun <A> of(a: A): Kind<F, Ref<F, A>> = Ref.of(a, MD)
+      override fun <A> of(a: A): Kind<F, Ref<F, A>> = of(a, MD)
     }
 
     /**

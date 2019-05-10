@@ -1,23 +1,25 @@
 package arrow.effects
 
+import arrow.Kind
 import arrow.core.Left
 import arrow.core.None
 import arrow.core.Some
 import arrow.core.Tuple2
-import arrow.effects.extensions.io.apply.product
-import arrow.effects.extensions.io.applicativeError.attempt
+import arrow.effects.extensions.NonBlocking
+import arrow.effects.extensions.fx.async.async
+import arrow.effects.extensions.fx.concurrent.concurrent
 import arrow.effects.extensions.io.async.async
 import arrow.effects.extensions.io.concurrent.concurrent
-import arrow.effects.extensions.io.functor.tupleLeft
-import arrow.effects.extensions.io.monad.flatMap
-import arrow.effects.extensions.io.monadDefer.monadDefer
+import arrow.effects.suspended.fx.Fx
+import arrow.effects.typeclasses.Concurrent
 import arrow.test.UnitSpec
 import arrow.test.generators.throwable
+import arrow.test.laws.equalUnderTheLaw
+import arrow.typeclasses.Eq
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
-import kotlinx.coroutines.Dispatchers
 import org.junit.runner.RunWith
 import kotlin.coroutines.CoroutineContext
 
@@ -26,19 +28,22 @@ class PromiseTest : UnitSpec() {
 
   init {
 
-    fun tests(
+    fun <F> Concurrent<F>.tests(
       label: String,
-      ctx: CoroutineContext = Dispatchers.Default,
-      promise: IO<Promise<ForIO, Int>>
+      ctx: CoroutineContext = NonBlocking,
+      EQ: Eq<Kind<F, Boolean>>,
+      promise: Kind<F, Promise<F, Int>>
     ) {
 
       "$label - complete" {
         forAll(Gen.int()) { a ->
           promise.flatMap { p ->
             p.complete(a).flatMap {
-              p.get()
+              p.get().flatMap { aa ->
+                delay { aa == a }
+              }
             }
-          }.unsafeRunSync() == a
+          }.equalUnderTheLaw(just(true), EQ)
         }
       }
 
@@ -48,9 +53,11 @@ class PromiseTest : UnitSpec() {
             p.complete(a).flatMap {
               p.complete(b)
                 .attempt()
-                .product(p.get())
+                .product(p.get()).flatMap { result ->
+                  delay { result == Tuple2(Left(Promise.AlreadyFulfilled), a) }
+                }
             }
-          }.unsafeRunSync() == Tuple2(Left(Promise.AlreadyFulfilled), a)
+          }.equalUnderTheLaw(just(true), EQ)
         }
       }
 
@@ -58,9 +65,11 @@ class PromiseTest : UnitSpec() {
         forAll(Gen.int()) { a ->
           promise.flatMap { p ->
             p.tryComplete(a).flatMap { didComplete ->
-              p.get().tupleLeft(didComplete)
+              p.get().tupleLeft(didComplete).flatMap { r ->
+                delay { r == Tuple2(true, a) }
+              }
             }
-          }.unsafeRunSync() == Tuple2(true, a)
+          }.equalUnderTheLaw(just(true), EQ)
         }
       }
 
@@ -69,10 +78,12 @@ class PromiseTest : UnitSpec() {
           promise.flatMap { p ->
             p.tryComplete(a).flatMap {
               p.tryComplete(b).flatMap { didComplete ->
-                p.get().tupleLeft(didComplete)
+                p.get().tupleLeft(didComplete).flatMap { r ->
+                  delay { r == Tuple2(false, a) }
+                }
               }
             }
-          }.unsafeRunSync() == Tuple2(false, a)
+          }.equalUnderTheLaw(just(true), EQ)
         }
       }
 
@@ -80,9 +91,11 @@ class PromiseTest : UnitSpec() {
         forAll(Gen.throwable()) { error ->
           promise.flatMap { p ->
             p.error(error).flatMap {
-              p.get().attempt()
+              p.get().attempt().flatMap { r ->
+                delay { r == Left(error) }
+              }
             }
-          }.unsafeRunSync() == Left(error)
+          }.equalUnderTheLaw(just(true), EQ)
         }
       }
 
@@ -91,9 +104,11 @@ class PromiseTest : UnitSpec() {
           promise.flatMap { p ->
             p.error(error).flatMap {
               p.error(RuntimeException("Boom!")).attempt()
-                .product(p.get().attempt())
+                .product(p.get().attempt()).flatMap { r ->
+                  delay { r == Tuple2(Left(Promise.AlreadyFulfilled), Left(error)) }
+                }
             }
-          }.unsafeRunSync() == Tuple2(Left(Promise.AlreadyFulfilled), Left(error))
+          }.equalUnderTheLaw(just(true), EQ)
         }
       }
 
@@ -102,9 +117,11 @@ class PromiseTest : UnitSpec() {
           promise.flatMap { p ->
             p.tryError(error).flatMap { didError ->
               p.get().attempt()
-                .tupleLeft(didError)
+                .tupleLeft(didError).flatMap { r ->
+                  delay { r == Tuple2(true, Left(error)) }
+                }
             }
-          }.unsafeRunSync() == Tuple2(true, Left(error))
+          }.equalUnderTheLaw(just(true), EQ)
         }
       }
 
@@ -114,45 +131,54 @@ class PromiseTest : UnitSpec() {
             p.tryError(error).flatMap {
               p.tryError(RuntimeException("Boom!")).flatMap { didComplete ->
                 p.get().attempt()
-                  .tupleLeft(didComplete)
+                  .tupleLeft(didComplete).flatMap { r ->
+                    delay { r == Tuple2(false, Left(error)) }
+                  }
               }
             }
-          }.unsafeRunSync() == Tuple2(false, Left(error))
+          }.equalUnderTheLaw(just(true), EQ)
         }
       }
 
       "$label - get blocks until set" {
-        Ref.of(0, IO.monadDefer()).flatMap { state ->
+        Ref.of(0, this@tests).flatMap { state ->
           promise.flatMap { modifyGate ->
             promise.flatMap { readGate ->
-              modifyGate.get().flatMap { state.update { i -> i * 2 }.flatMap { readGate.complete(0) } }.fork(ctx).flatMap {
-                state.set(1).flatMap { modifyGate.complete(0) }.fork(ctx).flatMap {
+              modifyGate.get().flatMap { state.update { i -> i * 2 }.flatMap { readGate.complete(0) } }.fork().flatMap {
+                state.set(1).flatMap { modifyGate.complete(0) }.fork().flatMap {
                   readGate.get().flatMap {
-                    state.get()
+                    state.get().flatMap { r ->
+                      delay { r == 2 }
+                    }
                   }
                 }
               }
             }
           }
-        }.unsafeRunSync() shouldBe 2
+        }.equalUnderTheLaw(just(true), EQ) shouldBe true
       }
 
       "$label - tryGet returns None for empty Promise" {
-        promise.flatMap { p -> p.tryGet() }.unsafeRunSync() shouldBe None
+        promise.flatMap { p -> p.tryGet().flatMap { r -> delay { r == None } } }
+          .equalUnderTheLaw(just(true), EQ) shouldBe true
       }
 
       "$label - tryGet returns Some for completed promise" {
         forAll(Gen.int()) { a ->
           promise.flatMap { p ->
             p.complete(a).flatMap {
-              p.tryGet()
+              p.tryGet().flatMap { r ->
+                delay { r == Some(a) }
+              }
             }
-          }.unsafeRunSync() == Some(a)
+          }.equalUnderTheLaw(just(true), EQ)
         }
       }
     }
 
-    tests("CancelablePromise", promise = Promise<ForIO, Int>(IO.concurrent()).fix())
-    tests("UncancelablePromise", promise = Promise.uncancelable<ForIO, Int>(IO.async()).fix())
+    IO.concurrent().tests("IO - CancelablePromise", EQ = IO_EQ(), promise = Promise(IO.concurrent()))
+    IO.concurrent().tests("IO - UncancelablePromise", EQ = IO_EQ(), promise = Promise.uncancelable(IO.async()))
+    Fx.concurrent().tests("Fx - CancelablePromise", EQ = EQ(), promise = Promise(Fx.concurrent()))
+    Fx.concurrent().tests("Fx - UncancelablePromise", EQ = EQ(), promise = Promise.uncancelable(Fx.async()))
   }
 }

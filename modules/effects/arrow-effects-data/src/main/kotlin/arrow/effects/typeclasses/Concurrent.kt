@@ -32,6 +32,8 @@ interface Concurrent<F> : Async<F> {
 
   fun dispatchers(): Dispatchers<F>
 
+  fun default(): CoroutineContext = dispatchers().default()
+
   fun <A> effect(fa: suspend () -> A): Kind<F, A>
 
   /**
@@ -162,11 +164,13 @@ interface Concurrent<F> : Async<F> {
    * }
    * ```
    *
-   * @receiver [F] to execute on [this@startFiber] within a new suspended [F].
-   * @param this@startFiber [CoroutineContext] to execute the source [F] on.
-   * @return [F] with suspended execution of source [F] on context [this@startFiber].
+   * @receiver [F] to execute on [this@ctx] within a new suspended [F].
+   * @param ctx [CoroutineContext] to execute the source [F] on.
+   * @return [F] with suspended execution of source [F] on context [this@ctx].
    */
-  fun <A> CoroutineContext.fork(kind: Kind<F, A>): Kind<F, Fiber<F, A>>
+  fun <A> Kind<F, A>.fork(ctx: CoroutineContext = dispatchers().default()): Kind<F, Fiber<F, A>>
+
+  fun shift(): Kind<F, Unit> = dispatchers().default().shift()
 
   /**
    * Race two tasks concurrently within a new [F].

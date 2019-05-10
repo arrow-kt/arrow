@@ -84,7 +84,7 @@ object ConcurrentLaws {
         val startLatch = Promise<F, Int>(this@cancelOnBracketReleases).bind() // A promise that `use` was executed
         val exitLatch = Promise<F, Int>(this@cancelOnBracketReleases).bind() // A promise that `release` was executed
 
-        val (_, cancel) = ctx.fork(just(i).bracketCase(
+        val (_, cancel) = just(i).bracketCase(
           use = { a -> startLatch.complete(a).flatMap { never<Int>() } },
           release = { r, exitCase ->
             when (exitCase) {
@@ -92,10 +92,10 @@ object ConcurrentLaws {
               else -> just(Unit)
             }
           }
-        )).bind() // Fork execution, allowing us to cancel it later
+        ).fork().bind() // Fork execution, allowing us to cancel it later
 
         val waitStart = startLatch.get().bind() // Waits on promise of `use`
-        ctx.fork(cancel).bind() // Cancel bracketCase
+        cancel.fork().bind() // Cancel bracketCase
         val waitExit = exitLatch.get().bind() // Observes cancellation via bracket's `release`
 
         waitStart + waitExit
@@ -110,10 +110,10 @@ object ConcurrentLaws {
         val p = Promise.uncancelable<F, Unit>(this@acquireBracketIsNotCancelable).bind()
         val task = p.complete(Unit).flatMap { mvar.put(b) }
           .bracket(use = { never<Int>() }, release = { just(Unit) })
-        val (_, cancel) = ctx.fork(task).bind()
+        val (_, cancel) = task.fork().bind()
         p.get().bind()
-        ctx.fork(cancel).bind()
-        continueOn(ctx)
+        cancel.fork().bind()
+        !shift()
         mvar.take().bind()
         mvar.take().bind()
       }.a.equalUnderTheLaw(just(b), EQ)
@@ -126,9 +126,9 @@ object ConcurrentLaws {
         val p = Promise.uncancelable<F, Unit>(this@releaseBracketIsNotCancelable).bind()
         val task = p.complete(Unit)
           .bracket(use = { never<Int>() }, release = { mvar.put(b) })
-        val (_, cancel) = ctx.fork(task).bind()
+        val (_, cancel) = task.fork().bind()
         p.get().bind()
-        ctx.fork(cancel).bind()
+        cancel.fork().bind()
         continueOn(ctx)
         mvar.take().bind()
         mvar.take().bind()
@@ -149,17 +149,17 @@ object ConcurrentLaws {
 
   fun <F> Concurrent<F>.cancelableReceivesCancelSignal(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
     forAll(Gen.int()) { i ->
-      bindingCancellable {
+      bindingConcurrent {
         val release = Promise.uncancelable<F, Int>(this@cancelableReceivesCancelSignal).bind()
         val cancelToken: CancelToken<F> = release.complete(i)
         val latch = CountDownLatch(1)
 
-        val (_, cancel) = ctx.fork(cancelable<Unit> {
+        val (_, cancel) = cancelable<Unit> {
           latch.countDown()
           cancelToken
-        }).bind()
+        }.fork().bind()
 
-        ctx.shift().followedBy(asyncF<Unit> { cb ->
+        shift().followedBy(asyncF<Unit> { cb ->
           delay { latch.await(500, TimeUnit.MILLISECONDS) }
             .map { cb(Right(Unit)) }
         }).bind()
@@ -178,7 +178,7 @@ object ConcurrentLaws {
           latch.complete(Unit)
             .map { release.complete(i) }
         }
-        val (_, cancel) = ctx.fork(async).bind()
+        val (_, cancel) = async.fork().bind()
         asyncF<Unit> { cb -> latch.get().map { cb(Right(it)) } }.bind()
         cancel.bind()
         release.get().bind()
@@ -202,11 +202,11 @@ object ConcurrentLaws {
           cancelLatch.countDown()
         }
 
-        ctx.fork(upstream.followedBy(downstream)).bind()
+        upstream.followedBy(downstream).fork().bind()
 
-        ctx.fork(delay(ctx) {
+        delay(ctx) {
           cancelLatch.await(500, TimeUnit.MILLISECONDS)
-        }.flatMap { cancelToken.get() ?: raiseError(AssertionError("CancelToken was not set.")) }
+        }.flatMap { cancelToken.get() ?: raiseError(AssertionError("CancelToken was not set.")) }.fork(ctx
         ).bind()
 
         latch.get().bind()
@@ -219,12 +219,12 @@ object ConcurrentLaws {
         val latch = Promise<F, Int>(this@asyncShouldRunKindConnectionOnCancel).bind()
         val startLatch = CountDownLatch(1)
 
-        val (_, cancel) = ctx.fork(async<Unit> { conn, _ ->
+        val (_, cancel) = async<Unit> { conn, _ ->
           conn.push(latch.complete(i))
           startLatch.countDown()
-        }).bind()
+        }.fork().bind()
 
-        delay(ctx) {
+        delay(default()) {
           startLatch.await(500, TimeUnit.MILLISECONDS)
         }.followedBy(cancel).bind()
 
@@ -240,9 +240,9 @@ object ConcurrentLaws {
         val task = asyncF<Unit> { _, _ ->
           acquire.complete(Unit).bracket(use = { never<Unit>() }, release = { release.complete(i) })
         }
-        val (_, cancel) = ctx.fork(task).bind()
+        val (_, cancel) = task.fork().bind()
         acquire.get().bind()
-        ctx.fork(cancel).bind()
+        cancel.fork().bind()
         release.get().bind()
       }.a.equalUnderTheLaw(just(i), EQ)
     }
@@ -259,7 +259,7 @@ object ConcurrentLaws {
           conn.cancel()
         }
 
-        ctx.fork(upstream.followedBy(downstream)).bind()
+        upstream.followedBy(downstream).fork().bind()
 
         latch.get().bind()
       }.a.equalUnderTheLaw(just(i), EQ)
@@ -271,11 +271,11 @@ object ConcurrentLaws {
         val latch = Promise<F, Int>(this@asyncFShouldRunKindConnectionOnCancel).bind()
         val startLatch = Promise<F, Unit>(this@asyncFShouldRunKindConnectionOnCancel).bind()
 
-        val (_, cancel) = ctx.fork(asyncF<Unit> { conn, _ ->
+        val (_, cancel) = asyncF<Unit> { conn, _ ->
           conn.push(latch.complete(i))
           // Wait with cancellation until it is run, if it doesn't run its cancellation is also doesn't run.
           startLatch.complete(Unit)
-        }).bind()
+        }.fork().bind()
 
         startLatch.get().flatMap { cancel }.bind()
 
@@ -285,13 +285,13 @@ object ConcurrentLaws {
 
   fun <F> Concurrent<F>.startJoinIsIdentity(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext): Unit =
     forAll(Gen.int().applicativeError(this)) { fa ->
-      ctx.fork(fa).flatMap { it.join() }.equalUnderTheLaw(fa, EQ)
+      fa.fork().flatMap { it.join() }.equalUnderTheLaw(fa, EQ)
     }
 
   fun <F> Concurrent<F>.joinIsIdempotent(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
     forAll(Gen.int()) { i ->
       Promise<F, Int>(this@joinIsIdempotent).flatMap { p ->
-        ctx.fork(p.complete(i))
+        p.complete(i).fork()
           .flatMap { (join, _) -> join.followedBy(join) }
           .flatMap { p.get() }
       }.equalUnderTheLaw(just(i), EQ)
@@ -299,7 +299,7 @@ object ConcurrentLaws {
 
   fun <F> Concurrent<F>.startCancelIsUnit(EQ_UNIT: Eq<Kind<F, Unit>>, ctx: CoroutineContext): Unit =
     forAll(Gen.int().applicativeError(this)) { fa ->
-      ctx.fork(fa).flatMap { (_, cancel) -> cancel }
+      fa.fork().flatMap { (_, cancel) -> cancel }
         .equalUnderTheLaw(just<Unit>(Unit), EQ_UNIT)
     }
 
@@ -347,7 +347,7 @@ object ConcurrentLaws {
         val loserA = s.release().bracket(use = { never<String>() }, release = { pa.complete(a) })
         val loserB = s.release().bracket(use = { never<Int>() }, release = { pb.complete(b) })
 
-        val (_, cancelRace) = ctx.fork(ctx.raceN(loserA, loserB)).bind()
+        val (_, cancelRace) = ctx.raceN(loserA, loserB).fork().bind()
         s.acquireN(2L).flatMap { cancelRace }.bind()
         pa.get().bind() + pb.get().bind()
       }.a.equalUnderTheLaw(just(a + b), EQ)
@@ -363,8 +363,8 @@ object ConcurrentLaws {
         val loser = startLatch.complete(Unit) // guarantees that both cancel & loser started
           .bracket(use = { never<Int>() }, release = { endLatch.complete(i) })
 
-        if (shouldLeftCancel) ctx.fork(ctx.raceN(cancel, loser)).bind()
-        else ctx.fork(ctx.raceN(loser, cancel)).bind()
+        if (shouldLeftCancel) ctx.raceN(cancel, loser).fork().bind()
+        else ctx.raceN(loser, cancel).fork().bind()
 
         endLatch.get().bind()
       }.a.equalUnderTheLaw(just(i), EQ)
@@ -409,8 +409,8 @@ object ConcurrentLaws {
             attempt.fold({ p.get() },
               {
                 it.fold(
-                  { (_, fiberB) -> ctx.fork(fiberB.cancel()).flatMap { p.get() } },
-                  { (fiberA, _) -> ctx.fork(fiberA.cancel()).flatMap { p.get() } })
+                  { (_, fiberB) -> fiberB.cancel().fork().flatMap { p.get() } },
+                  { (fiberA, _) -> fiberA.cancel().fork().flatMap { p.get() } })
               })
           }.bind()
       }
@@ -452,7 +452,7 @@ object ConcurrentLaws {
         val loserA: Kind<F, Int> = s.release().bracket(use = { never<Int>() }, release = { pa.complete(a) })
         val loserB: Kind<F, Int> = s.release().bracket(use = { never<Int>() }, release = { pb.complete(b) })
 
-        val (_, cancelRacePair) = ctx.fork(ctx.racePair(loserA, loserB)).bind()
+        val (_, cancelRacePair) = ctx.racePair(loserA, loserB).fork().bind()
 
         s.acquireN(2L).flatMap { cancelRacePair }.bind()
         pa.get().bind() + pb.get().bind()
@@ -470,8 +470,8 @@ object ConcurrentLaws {
         val loser = startLatch.complete(Unit) // guarantees that both cancel & loser actually started
           .bracket(use = { never<Int>() }, release = { endLatch.complete(i) })
 
-        if (shouldLeftCancel) ctx.fork(ctx.racePair(cancel, loser)).bind()
-        else ctx.fork(ctx.racePair(loser, cancel)).bind()
+        if (shouldLeftCancel) ctx.racePair(cancel, loser).fork().bind()
+        else ctx.racePair(loser, cancel).fork().bind()
 
         endLatch.get().bind()
       }.a.equalUnderTheLaw(just(i), EQ)
@@ -541,11 +541,11 @@ object ConcurrentLaws {
               {
                 it.fold(
                   { (_, fiberB, fiberC) ->
-                    ctx.fork(fiberB.cancel().followedBy(fiberC.cancel())).flatMap { combinePromises } },
+                    fiberB.cancel().followedBy(fiberC.cancel()).fork().flatMap { combinePromises } },
                   { (fiberA, _, fiberC) ->
-                    ctx.fork(fiberA.cancel().followedBy(fiberC.cancel())).flatMap { combinePromises } },
+                    fiberA.cancel().followedBy(fiberC.cancel()).fork().flatMap { combinePromises } },
                   { (fiberA, fiberB, _) ->
-                    ctx.fork(fiberA.cancel().followedBy(fiberB.cancel())).flatMap { combinePromises } })
+                    fiberA.cancel().followedBy(fiberB.cancel()).fork().flatMap { combinePromises } })
               })
           }.bind()
       }
@@ -610,9 +610,9 @@ object ConcurrentLaws {
           .bracket(use = { never<Int>() }, release = { endLatch.complete(i) })
 
         when (shouldCancel) {
-          1 -> ctx.fork(ctx.raceTriple(cancel, loser, loser2)).bind()
-          2 -> ctx.fork(ctx.raceTriple(loser, cancel, loser2)).bind()
-          else -> ctx.fork(ctx.raceTriple(loser, loser2, cancel)).bind()
+          1 -> ctx.raceTriple(cancel, loser, loser2).fork().bind()
+          2 -> ctx.raceTriple(loser, cancel, loser2).fork().bind()
+          else -> ctx.raceTriple(loser, loser2, cancel).fork().bind()
         }
 
         endLatch.get().bind()
@@ -631,7 +631,7 @@ object ConcurrentLaws {
         val loserB: Kind<F, Int> = s.release().bracket(use = { never<Int>() }, release = { pb.complete(b) })
         val loserC: Kind<F, Int> = s.release().bracket(use = { never<Int>() }, release = { pc.complete(c) })
 
-        val (_, cancelRacePair) = ctx.fork(ctx.raceTriple(loserA, loserB, loserC)).bind()
+        val (_, cancelRacePair) = ctx.raceTriple(loserA, loserB, loserC).fork().bind()
 
         s.acquireN(3L).flatMap { cancelRacePair }.bind()
         pa.get().bind() + pb.get().bind() + pc.get().bind()
@@ -648,7 +648,7 @@ object ConcurrentLaws {
         val loserA = s.release().bracket(use = { never<String>() }, release = { pa.complete(a) })
         val loserB = s.release().bracket(use = { never<Int>() }, release = { pb.complete(b) })
 
-        val (_, cancelParMapN) = ctx.fork(ctx.parMapN(loserA, loserB, ::Tuple2)).bind()
+        val (_, cancelParMapN) = ctx.parMapN(loserA, loserB, ::Tuple2).fork().bind()
         s.acquireN(2L).flatMap { cancelParMapN }.bind()
         pa.get().bind() + pb.get().bind()
       }.a.equalUnderTheLaw(just(a + b), EQ)
@@ -663,8 +663,8 @@ object ConcurrentLaws {
         val cancel = asyncF<Unit> { conn, cb -> startLatch.get().flatMap { conn.cancel().map { cb(Right(Unit)) } } }
         val loser = startLatch.complete(Unit).bracket(use = { never<Int>() }, release = { endLatch.complete(i) })
 
-        if (shouldLeftCancel) ctx.fork(ctx.parMapN(cancel, loser, ::Tuple2)).bind()
-        else ctx.fork(ctx.parMapN(loser, cancel, ::Tuple2)).bind()
+        if (shouldLeftCancel) ctx.parMapN(cancel, loser, ::Tuple2).fork().bind()
+        else ctx.parMapN(loser, cancel, ::Tuple2).fork().bind()
 
         endLatch.get().bind()
       }.a.equalUnderTheLaw(just(i), EQ)
@@ -672,7 +672,7 @@ object ConcurrentLaws {
 
   fun <F> Concurrent<F>.actionConcurrentWithPureValueIsJustAction(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext): Unit =
     forAll(Gen.int().map(::just), Gen.int()) { fa, i ->
-      ctx.fork(i.just()).flatMap { (join, _) ->
+      i.just().fork().flatMap { (join, _) ->
         fa.flatMap {
           join.map { i }
         }

@@ -143,7 +143,7 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, priva
         } else {
           val (ax, notify) = current.listeners.values.first()
           val xs = current.listeners.toList().drop(1)
-          if (state.compareAndSet(current, State.WaitForTake(ax, xs.toMap()))) EmptyCoroutineContext.fork(delay { notify(rightUnit) }).map { Some(current.value) }
+          if (state.compareAndSet(current, State.WaitForTake(ax, xs.toMap()))) delay { notify(rightUnit) }.fork().map { Some(current.value) }
           else unsafeTryTake()
         }
       }
@@ -164,7 +164,7 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, priva
           val (ax, notify) = current.listeners.values.first()
           val xs = current.listeners.toList().drop(0)
           if (state.compareAndSet(current, State.WaitForTake(ax, xs.toMap()))) {
-            EmptyCoroutineContext.fork(delay { notify(rightUnit) }).map {
+            delay { notify(rightUnit) }.fork().map {
               onTake(Right(current.value))
               unit()
             }
@@ -218,7 +218,7 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, priva
   private fun callPutAndAllReaders(a: A, put: ((Either<Nothing, A>) -> Unit)?, reads: Map<Token, (Either<Nothing, A>) -> Unit>): Kind<F, Boolean> {
     val value = Right(a)
     return reads.values.callAll(value).flatMap {
-      if (put != null) EmptyCoroutineContext.fork(delay { put(value) }).map { true }
+      if (put != null) delay { put(value) }.fork().map { true }
       else just(true)
     }
   }
@@ -226,7 +226,7 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, priva
   // For streaming a value to a whole `reads` collection
   private fun Iterable<(Either<Nothing, A>) -> Unit>.callAll(value: Either<Nothing, A>): Kind<F, Unit> =
     fold(null as Kind<F, Fiber<F, Unit>>?) { acc, cb ->
-      val task = EmptyCoroutineContext.fork(delay { cb(value) })
+      val task = delay { cb(value) }.fork()
       acc?.flatMap { task } ?: task
     }?.map(mapUnit) ?: unit()
 

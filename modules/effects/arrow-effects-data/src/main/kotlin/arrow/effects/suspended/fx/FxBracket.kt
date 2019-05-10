@@ -70,8 +70,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  * }
  *  ```
  */
-fun <A, B> FxOf<A>
-  .bracketCase(release: (A, ExitCase<Throwable>) -> FxOf<Unit>, use: (A) -> FxOf<B>): Fx<B> =
+fun <A, B> FxOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> FxOf<Unit>, use: (A) -> FxOf<B>): Fx<B> =
   Fx.async { conn, cb ->
     val forwardCancel = FxForwardCancelable()
     conn.push(forwardCancel.cancel()) // Connect ForwardCancelable to existing connection.
@@ -89,28 +88,26 @@ internal class BracketStart<A, B>(
   val cb: (Either<Throwable, B>) -> Unit
 ) : (Either<Throwable, A>) -> Unit {
 
-  private val called = AtomicBoolean(false)
-
   override fun invoke(ea: Either<Throwable, A>) {
-    if (called.getAndSet(true)) throw IllegalStateException("callback called multiple times!")
+    Platform.trampoline {
+      when (ea) {
+        is Either.Right -> {
+          val a = ea.b
+          val frame = BracketReleaseFrame<A, B>(a, release)
 
-    when (ea) {
-      is Either.Right -> {
-        val a = ea.b
-        val frame = BracketReleaseFrame<A, B>(a, release)
+          val fb: FxOf<B> = try {
+            use(a)
+          } catch (e: Throwable) {
+            Fx.raiseError(e.nonFatalOrThrow())
+          }
 
-        val fb: FxOf<B> = try {
-          use(a)
-        } catch (e: Throwable) {
-          Fx.raiseError(e.nonFatalOrThrow())
+          // Registering our cancelable token ensures that in case cancellation is detected, release gets called
+          forwardCancel.complete(frame.cancel)
+          // Actual execution
+          FxRunLoop.startCancelable(Fx.FlatMap(fb, frame), conn, cb = cb)
         }
-
-        // Registering our cancelable token ensures that in case cancellation is detected, release gets called
-        forwardCancel.complete(frame.cancel)
-        // Actual execution
-        FxRunLoop.startCancelable(Fx.FlatMap(fb, frame, 0), conn, cb = cb)
+        is Either.Left -> cb(ea)
       }
-      is Either.Left -> cb(ea)
     }
   }
 }
@@ -138,9 +135,7 @@ internal abstract class BaseReleaseFrame<A, B> : FxFrame<B, Fx<B>> {
   // otherwise we might have a conflict with the auto-cancellation logic
   override fun recover(e: Throwable): Fx<B> = Fx.FlatMap(
     Fx.ConnectionSwitch(applyRelease(ExitCase.Error(e)), Fx.ConnectionSwitch.makeUncancelable, Fx.ConnectionSwitch.disableUncancelableAndPop),
-    ReleaseRecover(e),
-    0
-  )
+    ReleaseRecover(e))
 
   override operator fun invoke(a: B): Fx<B> = Fx.Map(
     Fx.ConnectionSwitch(applyRelease(ExitCase.Completed), Fx.ConnectionSwitch.makeUncancelable, Fx.ConnectionSwitch.disableUncancelableAndPop)
@@ -156,13 +151,15 @@ internal class GuaranteeReleaseFrame<A>(val releaseFn: (ExitCase<Throwable>) -> 
 }
 
 fun <A> FxOf<A>.guaranteeCase(release: (ExitCase<Throwable>) -> FxOf<Unit>): Fx<A> = Fx.async { conn, cb ->
-  val frame = GuaranteeReleaseFrame<A>(release)
-  val onNext = Fx.FlatMap(this, frame, 0)
-  // Registering our cancelable token ensures that in case cancellation is detected, `release` gets called
-  conn.push(frame.cancel)
+  Platform.trampoline {
+    val frame = GuaranteeReleaseFrame<A>(release)
+    val onNext = Fx.FlatMap(this, frame)
+    // Registering our cancelable token ensures that in case cancellation is detected, `release` gets called
+    conn.push(frame.cancel)
 
-  // Race condition check, avoiding starting `source` in case the connection was already cancelled — n.b. we don't need
-  // to trigger `release` otherwise, because it already happened
-  if (conn.isNotCanceled()) FxRunLoop.startCancelable(onNext, conn, cb = cb)
-  else Unit
+    // Race condition check, avoiding starting `source` in case the connection was already cancelled — n.b. we don't need
+    // to trigger `release` otherwise, because it already happened
+    if (conn.isNotCanceled()) FxRunLoop.startCancelable(onNext, conn, cb = cb)
+    else Unit
+  }
 }

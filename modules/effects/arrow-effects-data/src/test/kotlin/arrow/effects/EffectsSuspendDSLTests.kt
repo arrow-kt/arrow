@@ -13,7 +13,6 @@ import arrow.core.Left
 import arrow.core.Option
 import arrow.core.Right
 import arrow.core.Try
-import arrow.core.Tuple2
 import arrow.core.identity
 import arrow.core.left
 import arrow.core.none
@@ -25,15 +24,8 @@ import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldThrow
 import kotlinx.coroutines.ObsoleteCoroutinesApi
-import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.newSingleThreadContext
 import org.junit.runner.RunWith
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.SynchronousQueue
-import java.util.concurrent.ThreadFactory
-import java.util.concurrent.ThreadPoolExecutor
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 
 @ObsoleteCoroutinesApi
@@ -77,16 +69,6 @@ class EffectsSuspendDSLTests : UnitSpec() {
       unsafe { runBlocking { program } } shouldBe helloWorld
     }
 
-    class CountingThreadFactory(val name: String) : ThreadFactory {
-      private val counter = AtomicInteger()
-      override fun newThread(r: Runnable): Thread =
-        Thread(r, "$name-${counter.getAndIncrement()}")
-    }
-
-    // Creates a ExecutorService that uses every thread only once, so every task is scheduled on a differently numbered Thread.
-    fun newTestingScheduler(name: String): ExecutorService =
-      ThreadPoolExecutor(0, 2, 0, TimeUnit.MILLISECONDS, SynchronousQueue<Runnable>(), CountingThreadFactory(name))
-
     "Fx stack safe on `!effect`" {
       val program = fx {
         val rs: List<Int> = (1..50000).toList()
@@ -97,16 +79,25 @@ class EffectsSuspendDSLTests : UnitSpec() {
           val jsonNode = !effect { contents + 2 }
           !effect { Unit }
         }
+      }
+
+      unsafe { runBlocking { program } }
+    }
+
+    "Fx parMapN should run everything on a different thread for a scheduler with 0 keepAlive" {
+      val program = fx {
         // note how the receiving value is typed in the environment and not inside IO despite being effectful and
         // non-blocking parallel computations
-        val result: Tuple2<String, String> = !newTestingScheduler("test").asCoroutineDispatcher().parMapN(
+        val result = !newTestingScheduler("test").asCoroutineContext().parMapN(
+          effect { Thread.currentThread().name },
+          effect { Thread.currentThread().name },
           effect { Thread.currentThread().name },
           effect { Thread.currentThread().name }
-        ) { a, b -> Tuple2(a, b) }
-        !effect { result shouldBe Tuple2("test-0", "test-1") }
-        result
+        ) { a, b, c, d -> listOf(a, b, c, d) }
+        result.toSet().size shouldBe 4
       }
-      unsafe { runBlocking { program } }
+
+      Fx.unsafeRunBlocking(program)
     }
 
     "Fx startfiber does not hang forever" {
@@ -301,7 +292,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
       val const = 1
       fxTest {
         fx {
-          val fiber = !NonBlocking.fork(effect { const })
+          val fiber = !effect { const }.fork()
           val (n) = fiber.join()
           n
         }
@@ -370,7 +361,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
       val main = Thread.currentThread().name
       fxTest {
         fx {
-          val result = !NonBlocking.parTraverse(
+          val result = !newTestingScheduler("test").asCoroutineContext().parTraverse(
             listOf(
               effect { Thread.currentThread().name },
               effect { Thread.currentThread().name },
@@ -378,9 +369,8 @@ class EffectsSuspendDSLTests : UnitSpec() {
             ),
             ::identity
           )
-          result.any {
-            it == main
-          }
+          result.any { it == main } &&
+            result.toSet().size == 3
         }
       } shouldBe false
     }
@@ -389,14 +379,13 @@ class EffectsSuspendDSLTests : UnitSpec() {
       val main = Thread.currentThread().name
       fxTest {
         fx {
-          val result = !NonBlocking.parSequence(listOf(
+          val result = !newTestingScheduler("test").asCoroutineContext().parSequence(listOf(
             effect { Thread.currentThread().name },
             effect { Thread.currentThread().name },
             effect { Thread.currentThread().name }
           ))
-          result.any {
-            it == main
-          }
+          result.any { it == main } &&
+            result.toSet().size == 3
         }
       } shouldBe false
     }

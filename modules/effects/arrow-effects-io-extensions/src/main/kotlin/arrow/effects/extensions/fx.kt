@@ -28,6 +28,7 @@ import arrow.effects.typeclasses.UnsafeRun
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
@@ -75,14 +76,18 @@ interface FxFunctor : Functor<ForFx> {
 }
 
 @extension
-interface FxApplicative : Applicative<ForFx>, FxFunctor {
+interface FxApply : Apply<ForFx>, FxFunctor {
+  override fun <A, B> FxOf<A>.ap(ff: FxOf<(A) -> B>): Fx<B> =
+    fix().ap(ff)
+}
+
+@extension
+interface FxApplicative : Applicative<ForFx>, FxApply {
   override fun <A> just(a: A): Fx<A> =
     Fx.just(a)
 
-  override fun unit(): Fx<Unit> = Fx.unit
-
-  override fun <A, B> FxOf<A>.ap(ff: FxOf<(A) -> B>): Fx<B> =
-    fix().ap(ff)
+  override fun unit(): Fx<Unit> =
+    Fx.unit
 
   override fun <A, B> FxOf<A>.map(f: (A) -> B): Fx<B> =
     fix().map(f)
@@ -185,8 +190,8 @@ interface FxConcurrent : Concurrent<ForFx>, FxAsync {
   override fun <A> asyncF(fa: FxProcF<A>): Fx<A> =
     Fx.asyncF(fa = fa)
 
-  override fun <A> CoroutineContext.fork(fa: FxOf<A>): Fx<Fiber<ForFx, A>> =
-    fa.fix().fork(this)
+  override fun <A> Kind<ForFx, A>.fork(coroutineContext: CoroutineContext): Fx<Fiber<ForFx, A>> =
+    fix().fork(coroutineContext)
 
   override fun <A, B> CoroutineContext.racePair(fa: FxOf<A>, fb: FxOf<B>): Fx<RacePair<ForFx, A, B>> =
     Fx.racePair(this@racePair, fa, fb)

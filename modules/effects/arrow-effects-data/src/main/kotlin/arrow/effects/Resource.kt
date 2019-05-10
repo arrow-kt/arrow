@@ -165,7 +165,7 @@ interface Resource<F, E, A> : ResourceOf<F, E, A> {
    * }
    * ```
    */
-  operator fun <C> invoke(use: (A) -> Kind<F, C>): Kind<F, C>
+  fun <C> invoke(use: (A) -> Kind<F, C>): Kind<F, C>
 
   fun <B> map(BR: Bracket<F, E>, f: (A) -> B): Resource<F, E, B> = flatMap { just(f(it), BR) }
 
@@ -251,3 +251,5 @@ interface Resource<F, E, A> : ResourceOf<F, E, A> {
     ): Resource<F, E, A> = invoke(acquire, { r, _ -> release(r) }, BR)
   }
 }
+
+operator fun <F, E, A, C> ResourceOf<F, E, A>.invoke(use: (A) -> Kind<F, C>): Kind<F, C> = fix().invoke(use)
