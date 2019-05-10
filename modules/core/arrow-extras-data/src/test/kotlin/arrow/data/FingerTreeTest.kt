@@ -102,6 +102,30 @@ class FingerTreeTest : StringSpec() {
     }
 
     /**
+     * appendAll()
+     */
+
+    "Property based testing for appendAll()" {
+      forAll(Gen.list(Gen.int()), Gen.list(Gen.int())) { l1, l2 ->
+        val tree = FingerTree.fromList(l1)
+
+        tree.appendAll(l2).asList() == l1 + l2
+      }
+    }
+
+    /**
+     * prependAll()
+     */
+
+    "Property based testing for prependAll()" {
+      forAll(Gen.list(Gen.int()), Gen.list(Gen.int())) { l1, l2 ->
+        val tree = FingerTree.fromList(l1)
+
+        tree.prependAll(l2).asList() == l2.asReversed() + l1
+      }
+    }
+
+    /**
      * viewL()
      */
 

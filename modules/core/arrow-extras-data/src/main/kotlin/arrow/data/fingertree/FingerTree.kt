@@ -40,6 +40,15 @@ sealed class FingerTree<T> : FingerTreeOf<T> {
       }
     }
 
+
+  fun prependAll(items: List<T>): FingerTree<T> {
+    var buffer = this
+    items.forEach {
+      buffer = buffer.prepend(it)
+    }
+    return buffer
+  }
+
   fun append(item: T): FingerTree<T> =
     when (val tree = this) {
 
@@ -58,6 +67,14 @@ sealed class FingerTree<T> : FingerTreeOf<T> {
         }
       }
     }
+
+  fun appendAll(items: List<T>): FingerTree<T> {
+    var buffer = this
+    items.forEach {
+      buffer = buffer.append(it)
+    }
+    return buffer
+  }
 
   fun viewL(): Option<Tuple2<T, FingerTree<T>>> =
     when (this) {
@@ -203,10 +220,7 @@ sealed class FingerTree<T> : FingerTreeOf<T> {
         }
 
         else -> { // right is Empty or Single
-          var tree = this
-          items.forEach {
-            tree = tree.append(it)
-          }
+          var tree = this.appendAll(items)
 
           if (right is Single) {
             tree = tree.append(right.a)
@@ -216,10 +230,7 @@ sealed class FingerTree<T> : FingerTreeOf<T> {
         }
       }
       else -> { // left is Empty or Single
-        var tree = right
-        items.asReversed().forEach {
-          tree = tree.prepend(it)
-        }
+        var tree = right.prependAll(items.asReversed())
 
         if (this is Single) {
           tree = tree.prepend(this.a)
