@@ -1,7 +1,12 @@
 package arrow.data.fingertree
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.Tuple2
+import arrow.core.getOrElse
 import arrow.data.fingertree.internal.Affix
 import arrow.data.fingertree.internal.Node
 import arrow.higherkind

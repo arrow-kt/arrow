@@ -1,10 +1,20 @@
 package arrow.data
 
-import arrow.core.*
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.Tuple2
+import arrow.core.firstOrNone
+import arrow.core.getOrElse
 import arrow.data.fingertree.FingerTree
-import arrow.data.fingertree.FingerTree.*
 import arrow.data.fingertree.FingerTree.Companion.single
-import arrow.data.fingertree.internal.Affix.*
+import arrow.data.fingertree.FingerTree.Deep
+import arrow.data.fingertree.FingerTree.Empty
+import arrow.data.fingertree.FingerTree.Single
+import arrow.data.fingertree.internal.Affix.Four
+import arrow.data.fingertree.internal.Affix.One
+import arrow.data.fingertree.internal.Affix.Three
+import arrow.data.fingertree.internal.Affix.Two
 import arrow.data.fingertree.internal.Node
 import arrow.data.fingertree.internal.Node.Branch2
 import arrow.data.fingertree.internal.Node.Branch3
@@ -13,7 +23,7 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.StringSpec
-import java.util.*
+import java.util.Collections
 
 class FingerTreeTest : StringSpec() {
 
