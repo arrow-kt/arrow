@@ -11,6 +11,7 @@ import arrow.core.right
 import arrow.core.toT
 import arrow.effects.CancelToken
 import arrow.effects.KindConnection
+import arrow.effects.MVar
 import arrow.effects.data.internal.BindingCancellationException
 import arrow.typeclasses.MonadContinuation
 import java.util.concurrent.atomic.AtomicReference
@@ -680,6 +681,11 @@ interface Concurrent<F> : Async<F> {
       raceN(g, h),
       raceN(i, j)
     )
+
+  /**
+   * Creates a variable [MVar] to be used for thread-sharing, initialized to a value [a]
+   */
+  fun <A> mVar(a: A): Kind<F, MVar<F, A>> = MVar(a, this)
 
   /**
    * Overload for [Async.asyncF]
