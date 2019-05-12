@@ -1,25 +1,10 @@
 package arrow.core.extensions
 
 import arrow.Kind
-import arrow.core.Either
-import arrow.core.ForFunction0
-import arrow.core.Function0
-import arrow.core.Function0Of
-import arrow.core.k
+import arrow.core.*
 import arrow.core.extensions.function0.monad.monad
-import arrow.core.fix
-import arrow.core.invoke
 import arrow.extension
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Apply
-import arrow.typeclasses.Bimonad
-import arrow.typeclasses.Comonad
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadContinuation
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Selective
-import arrow.typeclasses.Semigroup
+import arrow.typeclasses.*
 import arrow.core.select as fun0Select
 
 @extension
@@ -92,6 +77,16 @@ interface Function0Monad : Monad<ForFunction0> {
 
   override fun <A, B> Function0Of<Either<A, B>>.select(f: Kind<ForFunction0, (A) -> B>): Kind<ForFunction0, B> =
     fix().fun0Select(f)
+
+  override suspend fun <A> MonadContinuation<ForFunction0, *>.bindStrategy(fa: Function0Of<A>): BindingStrategy<ForFunction0, A> =
+    BindingStrategy.Strict(fa.fix()())
+
+  override val fx: PartiallyAppliedMonadFx<ForFunction0>
+    get() = object : PartiallyAppliedMonadFx<ForFunction0> {
+      override val M: Monad<ForFunction0> = this@Function0Monad
+      override fun <A> monad(c: suspend MonadContinuation<ForFunction0, *>.() -> A): Function0<A> =
+        Function0 { super.monad(c)() }
+    }
 }
 
 @extension

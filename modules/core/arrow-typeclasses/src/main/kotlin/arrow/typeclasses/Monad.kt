@@ -1,10 +1,7 @@
 package arrow.typeclasses
 
 import arrow.Kind
-import arrow.core.Either
-import arrow.core.Eval
-import arrow.core.Tuple2
-import arrow.core.identity
+import arrow.core.*
 import arrow.documented
 import kotlin.coroutines.startCoroutine
 
@@ -77,6 +74,9 @@ interface Monad<F> : Selective<F> {
     flatMap { it.fold({ a -> f.map { ff -> ff(a) } }, { b -> just(b) }) }
 
   override fun <A, B> Kind<F, Either<A, B>>.select(f: Kind<F, (A) -> B>): Kind<F, B> = selectM(f)
+
+  suspend fun <A> MonadContinuation<F, *>.bindStrategy(fa: Kind<F, A>): BindingStrategy<F, A> =
+    BindingStrategy.MultiShot
 
   @Deprecated(
     "`binding` is getting renamed to `fx` for consistency with the Arrow Fx system. Use the Fx extensions for comprehensions",

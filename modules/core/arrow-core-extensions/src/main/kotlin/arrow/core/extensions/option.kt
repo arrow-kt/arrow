@@ -3,42 +3,13 @@
 package arrow.core.extensions
 
 import arrow.Kind
-import arrow.core.Either
-import arrow.core.Eval
-import arrow.core.ForOption
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.OptionOf
-import arrow.core.Some
-import arrow.core.Tuple2
+import arrow.core.*
 import arrow.extension
 import arrow.core.extensions.traverse as optionTraverse
 import arrow.core.extensions.option.monad.map
 import arrow.core.extensions.option.monad.monad
-import arrow.core.fix
-import arrow.core.identity
-import arrow.core.orElse
+import arrow.typeclasses.*
 import arrow.core.select as optionSelect
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Apply
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Semigroup
-import arrow.typeclasses.Show
-import arrow.typeclasses.Selective
-import arrow.typeclasses.Monad
-import arrow.typeclasses.Semigroupal
-import arrow.typeclasses.Monoidal
-import arrow.typeclasses.Semiring
-import arrow.typeclasses.ApplicativeError
-import arrow.typeclasses.MonadError
-import arrow.typeclasses.MonoidK
-import arrow.typeclasses.SemigroupK
-import arrow.typeclasses.Foldable
-import arrow.typeclasses.Traverse
-import arrow.typeclasses.Hash
-import arrow.typeclasses.MonadContinuation
 
 @extension
 interface OptionSemigroup<A> : Semigroup<Option<A>> {
@@ -191,6 +162,9 @@ interface OptionMonad : Monad<ForOption> {
 
   override fun <A, B> OptionOf<Either<A, B>>.select(f: OptionOf<(A) -> B>): OptionOf<B> =
     fix().optionSelect(f)
+
+  override suspend fun <A> MonadContinuation<ForOption, *>.bindStrategy(fa: OptionOf<A>): BindingStrategy<ForOption, A> =
+    fa.fix().fold({ BindingStrategy.ContinuationShortCircuit(fa) }, { BindingStrategy.Strict(it) })
 }
 
 @extension

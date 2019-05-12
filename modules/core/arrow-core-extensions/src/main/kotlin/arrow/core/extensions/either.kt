@@ -3,32 +3,10 @@
 package arrow.core.extensions
 
 import arrow.Kind
-import arrow.core.Either
-import arrow.core.EitherOf
-import arrow.core.EitherPartialOf
-import arrow.core.Eval
-import arrow.core.ForEither
-import arrow.core.Left
-import arrow.core.Right
+import arrow.core.*
 import arrow.core.extensions.either.monad.monad
-import arrow.core.fix
 import arrow.extension
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Apply
-import arrow.typeclasses.ApplicativeError
-import arrow.typeclasses.Bifunctor
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Foldable
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Hash
-import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadContinuation
-import arrow.typeclasses.MonadError
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Semigroup
-import arrow.typeclasses.SemigroupK
-import arrow.typeclasses.Show
-import arrow.typeclasses.Traverse
+import arrow.typeclasses.*
 import arrow.core.ap as eitherAp
 import arrow.core.combineK as eitherCombineK
 import arrow.core.extensions.traverse as eitherTraverse
@@ -114,6 +92,9 @@ interface EitherMonad<L> : Monad<EitherPartialOf<L>>, EitherApplicative<L> {
 
   override fun <A, B> tailRecM(a: A, f: (A) -> EitherOf<L, Either<A, B>>): Either<L, B> =
     Either.tailRecM(a, f)
+
+  override suspend fun <A> MonadContinuation<EitherPartialOf<L>, *>.bindStrategy(fa: EitherOf<L, A>): BindingStrategy<EitherPartialOf<L>, A> =
+    fa.fix().fold({ BindingStrategy.ContinuationShortCircuit(fa) }, { BindingStrategy.Strict(it) })
 }
 
 @extension

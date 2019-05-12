@@ -1,19 +1,11 @@
 package arrow.core.extensions
 
-import arrow.core.Either
-import arrow.core.Eval
-import arrow.core.EvalOf
-import arrow.core.ForEval
+import arrow.Kind
+import arrow.core.*
 import arrow.core.extensions.eval.monad.monad
-import arrow.core.fix
 import arrow.extension
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Apply
-import arrow.typeclasses.Bimonad
-import arrow.typeclasses.Comonad
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadContinuation
+import arrow.typeclasses.*
+import kotlin.coroutines.startCoroutine
 
 @extension
 interface EvalFunctor : Functor<ForEval> {
@@ -58,6 +50,16 @@ interface EvalMonad : Monad<ForEval> {
 
   override fun <A> just(a: A): Eval<A> =
     Eval.just(a)
+
+  override suspend fun <A> MonadContinuation<ForEval, *>.bindStrategy(fa: Kind<ForEval, A>): BindingStrategy<ForEval, A> =
+    BindingStrategy.Strict(fa.fix().value())
+
+  override val fx: PartiallyAppliedMonadFx<ForEval>
+    get() = object : PartiallyAppliedMonadFx<ForEval> {
+      override val M: Monad<ForEval> = this@EvalMonad
+      override fun <A> monad(c: suspend MonadContinuation<ForEval, *>.() -> A): Eval<A> =
+        Eval.defer { super.monad(c).fix() }
+    }
 }
 
 @extension

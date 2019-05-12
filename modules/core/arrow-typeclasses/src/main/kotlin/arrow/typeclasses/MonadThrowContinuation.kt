@@ -12,8 +12,12 @@ open class MonadThrowContinuation<F, A>(ME: MonadThrow<F>, override val context:
 
   override val fx: PartiallyAppliedMonadThrowFx<F> = ME.fx
 
+  @Suppress("UNCHECKED_CAST")
   override fun resumeWithException(exception: Throwable) {
-    returnedMonad = raiseError(exception)
+    returnedMonad = when (exception) {
+      is ContinuationShortcircuitThrowable -> exception.exit as Kind<F, A>
+      else -> raiseError(exception)
+    }
   }
 
   override fun <B> binding(c: suspend MonadContinuation<F, *>.() -> B): Kind<F, B> = fx.monad(c)

@@ -4,13 +4,9 @@ import arrow.Kind
 import arrow.core.Continuation
 import arrow.typeclasses.suspended.BindSyntax
 import java.util.concurrent.CountDownLatch
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
-import kotlin.coroutines.RestrictsSuspension
+import kotlin.coroutines.*
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
-import kotlin.coroutines.resume
-import kotlin.coroutines.startCoroutine
 
 interface BindingInContextContinuation<in T> : Continuation<T> {
   fun await(): Throwable?
@@ -24,8 +20,12 @@ open class MonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineC
     returnedMonad = value
   }
 
+  @Suppress("UNCHECKED_CAST")
   override fun resumeWithException(exception: Throwable) {
-    throw exception
+    when (exception) {
+      is ContinuationShortcircuitThrowable -> returnedMonad = exception.exit as Kind<F, A>
+      else -> throw exception
+    }
   }
 
   protected fun bindingInContextContinuation(context: CoroutineContext): BindingInContextContinuation<Kind<F, A>> =
@@ -58,15 +58,24 @@ open class MonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineC
   suspend fun <B> (() -> B).bindIn(context: CoroutineContext): B =
     bindIn(context, this)
 
-  open suspend fun <B> bind(m: () -> Kind<F, B>): B = suspendCoroutineUninterceptedOrReturn { c ->
-    val labelHere = c.stateStack // save the whole coroutine stack labels
-    returnedMonad = m().flatMap { x: B ->
-      c.stateStack = labelHere
-      c.resume(x)
-      returnedMonad
+  open suspend fun <B> bind(m: () -> Kind<F, B>): B =
+    when (val strategy = bindStrategy(m())) {
+      is BindingStrategy.MultiShot -> suspendCoroutineUninterceptedOrReturn { c ->
+        val labelHere = c.stateStack // save the whole coroutine stack labels
+        returnedMonad = m().flatMap { x: B ->
+          c.stateStack = labelHere
+          c.resume(x)
+          returnedMonad
+        }
+        COROUTINE_SUSPENDED
+      }
+      is BindingStrategy.Strict -> strategy.a
+      is BindingStrategy.ContinuationShortCircuit -> suspendCoroutineUninterceptedOrReturn { c ->
+        c.resumeWithException(strategy.throwable)
+      }
     }
-    COROUTINE_SUSPENDED
-  }
+
+
 
   open suspend fun <B> bindIn(context: CoroutineContext, m: () -> B): B = suspendCoroutineUninterceptedOrReturn { c ->
     val labelHere = c.stateStack // save the whole coroutine stack labels
