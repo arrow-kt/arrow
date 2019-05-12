@@ -4,7 +4,6 @@ package arrow.ank
 
 import arrow.effects.IO
 import arrow.effects.extensions.io.concurrent.concurrent
-import arrow.effects.extensions.io.fx.fx
 import arrow.effects.extensions.io.unsafeRun.runBlocking
 import arrow.unsafe
 import java.nio.file.Paths

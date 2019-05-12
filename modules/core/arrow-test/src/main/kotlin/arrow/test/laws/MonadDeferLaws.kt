@@ -178,7 +178,7 @@ object MonadDeferLaws {
 
   fun <F> MonadDefer<F>.asyncBind(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.intSmall(), Gen.intSmall(), Gen.intSmall()) { x: Int, y: Int, z: Int ->
-      val (bound, _) = bindingCancellable {
+      val (bound, _) = fx {
         val a = bindDefer { x }
         val b = bindDefer { a + y }
         val c = bindDefer { b + z }
