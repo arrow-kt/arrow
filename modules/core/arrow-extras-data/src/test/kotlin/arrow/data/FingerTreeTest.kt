@@ -1,9 +1,6 @@
 package arrow.data
 
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.Some
-import arrow.core.Tuple2
+import arrow.core.*
 import arrow.data.fingertree.FingerTree
 import arrow.data.fingertree.FingerTree.*
 import arrow.data.fingertree.FingerTree.Companion.single
@@ -173,6 +170,25 @@ class FingerTreeTest : StringSpec() {
       }
     }
 
+    /**
+     * head()
+     */
+
+    "Property based testing for head()" {
+      forAll(Gen.list(Gen.int())) { l ->
+        FingerTree.fromList(l).head() == l.firstOrNone()
+      }
+    }
+
+    /**
+     * tail()
+     */
+
+    "Property based testing for tail()" {
+      forAll(Gen.list(Gen.int())) { l ->
+        FingerTree.fromList(l).tail().getOrElse { Empty() }.asList() == l.drop(1)
+      }
+    }
     /**
      * viewR()
      */

@@ -118,6 +118,7 @@ sealed class FingerTree<T> : FingerTreeOf<T> {
     }
 
   fun head() = this.viewL().flatMap { Option.just(it.a) }
+
   fun tail() = this.viewL().flatMap { Option.just(it.b) }
 
   fun last(): Option<T> =
