@@ -2,7 +2,6 @@ package com.example.domain
 
 import arrow.data.ListK
 import arrow.data.MapK
-import arrow.effects.suspended.fx.Fx
 import arrow.optics.optics
 
 @optics
