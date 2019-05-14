@@ -4,8 +4,11 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.NonFatal
+import arrow.core.Option
 import arrow.core.Right
+import arrow.core.Some
 import arrow.core.andThen
+import arrow.core.identity
 import arrow.core.nonFatalOrThrow
 import arrow.data.AndThen
 import arrow.effects.KindConnection
@@ -17,8 +20,10 @@ import arrow.effects.internal.asyncContinuation
 import arrow.effects.typeclasses.ConnectedProc
 import arrow.effects.typeclasses.ConnectedProcF
 import arrow.effects.typeclasses.Disposable
+import arrow.effects.typeclasses.Duration
 import arrow.effects.typeclasses.Fiber
 import arrow.effects.typeclasses.mapUnit
+import java.lang.RuntimeException
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -285,7 +290,6 @@ sealed class Fx<out A> : FxOf<A> {
   @PublishedApi
   internal class Async<A> internal constructor(
     val ctx: CoroutineContext? = null,
-    val updateContext: ((CoroutineContext) -> CoroutineContext)? = null,
     val proc: FxProc<A>
   ) : Fx<A>() {
 
@@ -297,11 +301,8 @@ sealed class Fx<out A> : FxOf<A> {
           try {
             proc(conn, callback)
           } catch (throwable: Throwable) {
-            if (NonFatal(throwable)) {
-              callback(Either.Left(throwable))
-            } else {
-              throw throwable
-            }
+            if (NonFatal(throwable)) callback(Either.Left(throwable))
+            else throw throwable
           }
         }
       }
@@ -335,7 +336,7 @@ sealed class Fx<out A> : FxOf<A> {
   fun <B> followedBy(fa: FxOf<B>): Fx<B> =
     flatMap { fa }
 
-  fun <A> unit(): Fx<Unit> = map(mapUnit)
+  fun unit(): Fx<Unit> = map(mapUnit)
 
   fun <B> bracket(release: (A) -> FxOf<Unit>, use: (A) -> FxOf<B>): Fx<B> =
     bracketCase({ a, _ -> release(a) }, use)
@@ -467,30 +468,27 @@ sealed class Fx<out A> : FxOf<A> {
      */
     @JvmStatic
     fun <A> unsafeRunBlocking(fx: FxOf<A>): A = when (val current = fx.fix()) {
-      is RaiseError -> throw current.error
-      is Pure -> current.value
-      is Lazy -> current.source(Unit)
       is Single -> UnsafePromise<A>().run {
         current.source.startCoroutine(asyncContinuation(EmptyCoroutineContext) {
           complete(it)
         })
         await()
       }
+      else -> unsafeRunTimed(fx, Duration.INFINITE)
+        .fold({ throw IllegalArgumentException("IO execution should yield a valid result") }, ::identity)
+    }
+
+    @JvmStatic
+    fun <A> unsafeRunTimed(fx: FxOf<A>, limit: Duration): Option<A> = when (val current = fx.fix()) {
+      is RaiseError -> throw current.error
+      is Pure -> Some(current.value)
+      is Lazy -> Some(current.source(Unit))
       else -> {
         when (val result = FxRunLoop.step(fx)) {
-          is Pure -> result.value
+          is Pure -> Some(result.value)
           is RaiseError -> throw result.error
-          is Lazy -> result.source(Unit)
-          is Single -> UnsafePromise<A>().run {
-            result.source.startCoroutine(asyncContinuation(EmptyCoroutineContext) {
-              complete(it)
-            })
-            await()
-          }
-          else -> UnsafePromise<A>().run {
-            FxRunLoop.start(result) { complete(it) }
-            await()
-          }
+          is Lazy -> Some(result.source(Unit))
+          else -> Platform.unsafeResync(fx.fix(), limit)
         }
       }
     }

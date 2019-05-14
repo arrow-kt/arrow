@@ -1,11 +1,15 @@
 package arrow.effects
 
 import arrow.core.Either
+import arrow.core.None
 import arrow.core.Right
+import arrow.core.Some
 import arrow.core.left
 import arrow.core.right
+import arrow.effects.extensions.NonBlocking
 import arrow.effects.extensions.fx.async.async
 import arrow.effects.extensions.fx.concurrent.concurrent
+import arrow.effects.extensions.fx.concurrent.fork
 import arrow.effects.extensions.fx.fx.fx
 import arrow.effects.extensions.fx.monad.flatMap
 import arrow.effects.extensions.fx.unsafeRun.runBlocking
@@ -14,10 +18,12 @@ import arrow.effects.suspended.fx.Fx
 import arrow.effects.suspended.fx.FxFrame
 import arrow.effects.suspended.fx.FxOf
 import arrow.effects.suspended.fx.bracketCase
+import arrow.effects.suspended.fx.fix
 import arrow.effects.suspended.fx.guaranteeCase
 import arrow.effects.suspended.fx.handleErrorWith
 import arrow.effects.suspended.fx.not
 import arrow.effects.typeclasses.ExitCase
+import arrow.effects.typeclasses.milliseconds
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.laws.ConcurrentLaws
@@ -155,6 +161,29 @@ class FxTest : UnitSpec() {
       }
 
       Fx.unsafeRunBlocking(program)
+    }
+
+    "unsafeRunTimed times out with None result" {
+      val never: Fx<Unit> = Fx.never
+      val result = Fx.unsafeRunTimed(never, 100.milliseconds)
+      result shouldBe None
+    }
+
+    "unsafeRunTimed should time out on unending unsafeRunTimed" {
+      val never: Fx<Int> = Fx.never
+      val start = System.currentTimeMillis()
+      val received = Fx.unsafeRunTimed(never, 100.milliseconds)
+      val elapsed = System.currentTimeMillis() - start
+
+      received shouldBe None
+      (elapsed >= 100) shouldBe true
+    }
+
+    "unsafeRunTimed should return a null value from unsafeRunTimed" {
+      val never = Fx.just<Int?>(null)
+      val received = Fx.unsafeRunTimed(never, 100.milliseconds)
+
+      received shouldBe Some(null)
     }
 
     "unsafeRunNonBlocking should return a pure value" {
