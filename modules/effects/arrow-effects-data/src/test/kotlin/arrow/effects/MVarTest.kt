@@ -28,7 +28,7 @@ class MVarTest : UnitSpec() {
 
   init {
 
-    fun <F> arrow.effects.typeclasses.suspended.concurrent.Fx<F>.tests(label: String, EQ: Eq<Kind<F, Boolean>>, mvar: MVarPartialOf<F>) = concurrent().run {
+    fun <F> arrow.effects.typeclasses.suspended.concurrent.Fx<F>.tests(label: String, EQ: Eq<Kind<F, Boolean>>, mvar: MVarFactory<F>) = concurrent().run {
 
       "$label - empty; put; isNotEmpty; take; put; take" {
         forAll(Gen.int(), Gen.int()) { a, b ->
@@ -123,7 +123,7 @@ class MVarTest : UnitSpec() {
       "$label - initial; isNotEmpty; take; put; take" {
         forAll(Gen.int(), Gen.int()) { a, b ->
           fx {
-            val av = !mvar.of(a)
+            val av = !mvar.just(a)
             val isNotEmpty = !av.isNotEmpty()
             val r1 = !av.take()
             !av.put(b)
@@ -137,7 +137,7 @@ class MVarTest : UnitSpec() {
       "$label - initial; read; take" {
         forAll(Gen.int()) { i ->
           fx {
-            val av = !mvar.of(i)
+            val av = !mvar.just(i)
             val read = !av.read()
             val take = !av.take()
             Tuple2(read, take) == Tuple2(i, i)
@@ -163,15 +163,15 @@ class MVarTest : UnitSpec() {
             }
 
         val count = 10000
-        mvar.of(1).flatMap { ch -> loop(count, 0, ch) }.flatMap { r ->
-          delay { r == count }
-        }.equalUnderTheLaw(just(true), EQ) shouldBe true
+        val task = mvar.just(1).flatMap { ch -> loop(count, 0, ch) }
+          .map { it == count }
+        task.equalUnderTheLaw(just(true), EQ)
       }
     }
 
-    IO.fx().tests("IO - UncancelableMVar", IO_EQ(), MVar(IO.async()))
-    IO.fx().tests("IO - CancelableMVar", IO_EQ(), MVar(IO.concurrent()))
-    Fx.fx().tests("Fx - UncancelableMVar", EQ(), MVar(Fx.async()))
-    Fx.fx().tests("Fx - CancelableMVar", EQ(), MVar(Fx.concurrent()))
+    IO.fx().tests("IO - UncancelableMVar", IO_EQ(), MVar.factoryUncancelable(IO.async()))
+    IO.fx().tests("IO - CancelableMVar", IO_EQ(), MVar.factoryCancelable(IO.concurrent()))
+    Fx.fx().tests("Fx - UncancelableMVar", EQ(), MVar.factoryUncancelable(Fx.async()))
+    Fx.fx().tests("Fx - CancelableMVar", EQ(), MVar.factoryCancelable(Fx.concurrent()))
   }
 }

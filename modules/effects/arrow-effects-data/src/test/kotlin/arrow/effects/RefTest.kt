@@ -2,15 +2,9 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.data.extensions.list.traverse.sequence
-import arrow.effects.extensions.fx.concurrent.concurrent
 import arrow.effects.extensions.fx.fx.fx
-import arrow.effects.extensions.fx.monad.flatMap
-import arrow.effects.extensions.fx.monad.flatten
-import arrow.effects.extensions.fx.monad.map
-import arrow.effects.extensions.io.concurrent.concurrent
 import arrow.effects.extensions.io.fx.fx
 import arrow.effects.suspended.fx.Fx
-import arrow.effects.suspended.fx.fix
 import arrow.test.UnitSpec
 import arrow.test.generators.functionAToB
 import arrow.test.laws.equalUnderTheLaw
@@ -45,7 +39,7 @@ class RefTest : UnitSpec() {
 
       "$label - set get - successful" {
         forAll(Gen.int(), Gen.int()) { a, b ->
-          Ref.of(a, this@run).flatMap { ref ->
+          Ref(this@run) { a }.flatMap { ref ->
             ref.set(b).flatMap {
               ref.get().map { it == b }
             }
@@ -55,7 +49,7 @@ class RefTest : UnitSpec() {
 
       "$label - getAndSet - successful" {
         forAll(Gen.int(), Gen.int()) { a, b ->
-          Ref.of(a, this@run).flatMap { ref ->
+          Ref(this@run) { a }.flatMap { ref ->
             ref.getAndSet(b).flatMap { old ->
               ref.get().map { new ->
                 old == a && new == b
@@ -68,7 +62,7 @@ class RefTest : UnitSpec() {
       "$label - access - successful" {
         forAll(Gen.int(), Gen.int()) { a, b ->
           fx {
-            val ref = !Ref.of(a, this@run)
+            val ref = !Ref(this@run) { a }
             val (_, setter) = !ref.access()
             val success = !setter(b)
             val result = !ref.get()
@@ -80,7 +74,7 @@ class RefTest : UnitSpec() {
       "$label - access - setter should fail if value is modified before setter is called" {
         forAll(Gen.int(), Gen.int(), Gen.int()) { a, b, c ->
           fx {
-            val ref = !Ref.of(a, this@run)
+            val ref = !Ref(this@run) { a }
             val (_, setter) = !ref.access()
             !ref.set(b)
             val success = !setter(c)
@@ -93,7 +87,7 @@ class RefTest : UnitSpec() {
       "$label - access - setter should fail if called twice" {
         forAll(Gen.int(), Gen.int(), Gen.int(), Gen.int()) { a, b, c, d ->
           fx {
-            val ref = !Ref.of(a, this@run)
+            val ref = !Ref(this@run) { a }
             val (_, setter) = !ref.access()
             val cond1 = !setter(b)
             !ref.set(c)
@@ -106,7 +100,7 @@ class RefTest : UnitSpec() {
 
       "$label - tryUpdate - modification occurs successfully" {
         forAll(Gen.int(), Gen.functionAToB<Int, Int>(Gen.int())) { a, f ->
-          Ref.of(a, this@run).flatMap { ref ->
+          Ref(this@run) { a }.flatMap { ref ->
             ref.tryUpdate(f).flatMap {
               ref.get().map { res ->
                 res == f(a)
@@ -118,7 +112,7 @@ class RefTest : UnitSpec() {
 
       "$label - tryUpdate - should fail to update if modification has occurred" {
         forAll(Gen.int(), Gen.functionAToB<Int, Int>(Gen.int())) { a, f ->
-          Ref.of(a, this@run).flatMap { ref ->
+          Ref(this@run) { a }.flatMap { ref ->
             ref.tryUpdate {
               updateRefUnsafely(ref)
               f(it)
@@ -129,8 +123,8 @@ class RefTest : UnitSpec() {
 
       "$label - consistent set update" {
         forAll(Gen.int(), Gen.int()) { a, b ->
-          val set = Ref.of(a, this@run).flatMap { ref -> ref.set(b).flatMap { ref.get() } }
-          val update = Ref.of(a, this@run).flatMap { ref -> ref.update { b }.flatMap { ref.get() } }
+          val set = Ref(this@run) { a }.flatMap { ref -> ref.set(b).flatMap { ref.get() } }
+          val update = Ref(this@run) { a }.flatMap { ref -> ref.update { b }.flatMap { ref.get() } }
 
           set.flatMap { setA ->
             update.map { updateA ->
@@ -142,7 +136,7 @@ class RefTest : UnitSpec() {
 
       "$label - access id" {
         forAll(Gen.int()) { a ->
-          Ref.of(a, this@run).flatMap { ref ->
+          Ref(this@run) { a }.flatMap { ref ->
             ref.access().map { (a, _) -> a }.flatMap {
               ref.get().map { res ->
                 res == a
@@ -154,8 +148,8 @@ class RefTest : UnitSpec() {
 
       "$label - consistent access tryModify" {
         forAll(Gen.int(), Gen.functionAToB<Int, Int>(Gen.int())) { a, f ->
-          val accessMap = Ref.of(a, this@run).flatMap { ref -> ref.access().map { (a, setter) -> setter(f(a)) } }.flatten()
-          val tryUpdate = Ref.of(a, this@run).flatMap { ref -> ref.tryUpdate(f) }
+          val accessMap = Ref(this@run) { a }.flatMap { ref -> ref.access().map { (a, setter) -> setter(f(a)) } }.flatten()
+          val tryUpdate = Ref(this@run) { a }.flatMap { ref -> ref.tryUpdate(f) }
           accessMap.flatMap { res ->
             tryUpdate.map {
               res == it

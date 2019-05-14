@@ -5,7 +5,6 @@ import arrow.core.Left
 import arrow.core.None
 import arrow.core.Some
 import arrow.core.Tuple2
-import arrow.effects.extensions.NonBlocking
 import arrow.effects.extensions.fx.async.async
 import arrow.effects.extensions.fx.concurrent.concurrent
 import arrow.effects.extensions.io.async.async
@@ -21,7 +20,6 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
-import kotlin.coroutines.CoroutineContext
 
 @RunWith(KotlinTestRunner::class)
 class PromiseTest : UnitSpec() {
@@ -30,7 +28,6 @@ class PromiseTest : UnitSpec() {
 
     fun <F> Concurrent<F>.tests(
       label: String,
-      ctx: CoroutineContext = NonBlocking,
       EQ: Eq<Kind<F, Boolean>>,
       promise: Kind<F, Promise<F, Int>>
     ) {
@@ -141,7 +138,7 @@ class PromiseTest : UnitSpec() {
       }
 
       "$label - get blocks until set" {
-        Ref.of(0, this@tests).flatMap { state ->
+        Ref(this@tests) { 0 }.flatMap { state ->
           promise.flatMap { modifyGate ->
             promise.flatMap { readGate ->
               modifyGate.get().flatMap { state.update { i -> i * 2 }.flatMap { readGate.complete(0) } }.fork().flatMap {
