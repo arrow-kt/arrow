@@ -22,7 +22,6 @@ import arrow.effects.typeclasses.mapUnit
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
-import kotlin.coroutines.RestrictsSuspension
 import kotlin.coroutines.startCoroutine
 import kotlin.coroutines.suspendCoroutine
 
@@ -37,7 +36,7 @@ typealias FxProcF<A> = ConnectedProcF<ForFx, A>
 inline fun <A> FxOf<A>.fix(): Fx<A> =
   this as Fx<A>
 
-suspend inline operator fun <A> FxOf<A>.not(): A = !fix()
+suspend inline operator fun <A> FxOf<A>.not(): A = fix().invoke()
 
 sealed class Fx<out A> : FxOf<A> {
 
@@ -45,12 +44,7 @@ sealed class Fx<out A> : FxOf<A> {
   @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
   internal inline fun <B> unsafeRecast(): Fx<B> = this as Fx<B>
 
-  fun <B> followedBy(fa: FxOf<B>): Fx<B> =
-    flatMap { fa }
-
-  fun <A> unit(): Fx<Unit> = map(mapUnit)
-
-  inline val fa: suspend () -> A
+  inline val suspended: suspend () -> A
     get() = when (this) {
       is RaiseError -> suspend { throw error }
       is Pure -> suspend { value }
@@ -119,7 +113,8 @@ sealed class Fx<out A> : FxOf<A> {
   }
 
   @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
-  suspend inline operator fun not(): A = when (this) {
+  @PublishedApi
+  internal suspend inline operator fun invoke(): A = when (this) {
     is RaiseError -> throw error
     is Pure -> value
     is Single -> source()
@@ -324,7 +319,7 @@ sealed class Fx<out A> : FxOf<A> {
           }
 
           FxRunLoop.startCancelable(fx, conn2) { result ->
-            // DEV: If fa cancels conn2 like so `conn.cancel().map { cb(Right(Unit)) }`
+            // DEV: If suspended cancels conn2 like so `conn.cancel().map { cb(Right(Unit)) }`
             // It doesn't run the stack of conn2, instead the result is seen in the cb of startCancelable.
             val resultCancelled = result.fold({ e -> e == OnCancel.CancellationException }, { false })
             if (resultCancelled && conn.isNotCanceled()) FxRunLoop.start(conn.cancel(), cb = mapUnit)
@@ -337,11 +332,10 @@ sealed class Fx<out A> : FxOf<A> {
     override fun toString(): String = "Fx.Async(..)"
   }
 
-  suspend inline operator fun invoke(): A =
-    !this
+  fun <B> followedBy(fa: FxOf<B>): Fx<B> =
+    flatMap { fa }
 
-//  suspend inline operator fun component1(): A =
-//    !this
+  fun <A> unit(): Fx<Unit> = map(mapUnit)
 
   fun <B> bracket(release: (A) -> FxOf<Unit>, use: (A) -> FxOf<B>): Fx<B> =
     bracketCase({ a, _ -> release(a) }, use)
@@ -409,7 +403,6 @@ sealed class Fx<out A> : FxOf<A> {
   fun uncancelable(): Fx<A> =
     ConnectionSwitch(this, ConnectionSwitch.makeUncancelable, { _, _, old, _ -> old })
 
-  @RestrictsSuspension
   companion object {
 
     @JvmStatic

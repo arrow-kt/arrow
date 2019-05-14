@@ -190,8 +190,8 @@ interface FxConcurrent : Concurrent<ForFx>, FxAsync {
   override fun <A> asyncF(fa: FxProcF<A>): Fx<A> =
     Fx.asyncF(fa = fa)
 
-  override fun <A> Kind<ForFx, A>.fork(coroutineContext: CoroutineContext): Fx<Fiber<ForFx, A>> =
-    fix().fork(coroutineContext)
+  override fun <A> Kind<ForFx, A>.fork(ctx: CoroutineContext): Fx<Fiber<ForFx, A>> =
+    fix().fork(ctx)
 
   override fun <A, B> CoroutineContext.racePair(fa: FxOf<A>, fb: FxOf<B>): Fx<RacePair<ForFx, A, B>> =
     Fx.racePair(this@racePair, fa, fb)
