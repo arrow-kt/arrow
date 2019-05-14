@@ -14,6 +14,34 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine
 import kotlin.coroutines.suspendCoroutine
 
+/**
+ * Race two tasks concurrently within a new [Fx].
+ * Race results in a winner and the other, yet to finish task running in a [Fiber].
+ *
+ * ```kotlin:ank:playground
+ * import arrow.effects.suspended.fx.Fx
+ * import kotlinx.coroutines.Dispatchers
+ * import java.lang.RuntimeException
+ *
+ * fun main(args: Array<String>) {
+ *   //sampleStart
+ *   val result = Fx.raceTriple(Dispatchers.Default, Fx.never, Fx { "I won the race" }, Fx.never).flatMap {
+ *     racePair.fold(
+ *       { Fx.raiseError<Int>(RuntimeException("Fx.never cannot win")) },
+ *       { (_: Fiber<ForFx, Int>, res: Int) -> res },
+ *       { Fx.raiseError<Int>(RuntimeException("Fx.never cannot win")) }
+ *     )
+ *   }
+ *   //sampleEnd
+ *   println(Fx.unsafeRunBlocking(result))
+ * }
+ * ```
+ *
+ * @param ctx [CoroutineContext] to execute the source [Fx] on.
+ * @param fa task to participate in the race
+ * @param fb task to participate in the race
+ * @return [Fx] of [RaceTriple] which exposes a fold method to fold over the racing results in a elegant way.
+ */
 fun <A, B, C> Fx.Companion.raceTriple(ctx: CoroutineContext, fa: FxOf<A>, fb: FxOf<B>, fc: FxOf<C>): Fx<RaceTriple<ForFx, A, B, C>> = async { conn, cb ->
   val active = AtomicBoolean(true)
 

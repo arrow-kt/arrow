@@ -6,15 +6,15 @@ import arrow.effects.IOFrame
 import arrow.effects.handleErrorWith
 
 /**
- * An [IOFrame] knows how to [recover] from a [Throwable] and how to map a value [A] to [B].
+ * An [FxFrame] knows how to [recover] from a [Throwable] and how to map a value [A] to [B].
  *
- * Internal to `IO`'s implementations, used to specify
- * error handlers in their respective `Bind` internal states.
+ * Internal to `Fx`'s implementations, used to specify
+ * error handlers in their respective `FlatMap` internal states.
  *
- * To use an [IOFrame] you must use [IO.Bind] instead of `flatMap` or the [IOFrame]
+ * To use an [FxFrame] you must use [Fx.FlatMap] instead of [Fx.flatMap] or the [Fx.FlatMap]
  * is **not guaranteed** to execute.
  *
- * It's used to implement [attempt], [handleErrorWith] and [arrow.effects.internal.IOBracket]
+ * It's used to implement [attempt], [handleErrorWith], [redeemWith] and [arrow.effects.suspended.fx.FxBracket]
  */
 @PublishedApi
 internal interface FxFrame<in A, out B> : (A) -> B {

@@ -1,6 +1,5 @@
 package arrow.effects.suspended.fx
 
-import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.NonFatal
@@ -13,7 +12,6 @@ import arrow.core.nonFatalOrThrow
 import arrow.data.AndThen
 import arrow.effects.KindConnection
 import arrow.effects.OnCancel
-import arrow.effects.fork
 import arrow.effects.internal.Platform
 import arrow.effects.internal.UnsafePromise
 import arrow.effects.internal.asyncContinuation
@@ -21,32 +19,23 @@ import arrow.effects.typeclasses.ConnectedProc
 import arrow.effects.typeclasses.ConnectedProcF
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.Duration
+import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.Fiber
 import arrow.effects.typeclasses.mapUnit
+import arrow.higherkind
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.startCoroutine
 import kotlin.coroutines.suspendCoroutine
 
-class ForFx private constructor() {
-  companion object
-}
-typealias FxOf<A> = Kind<ForFx, A>
 typealias FxProc<A> = ConnectedProc<ForFx, A>
 typealias FxProcF<A> = ConnectedProcF<ForFx, A>
 
-@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
-inline fun <A> FxOf<A>.fix(): Fx<A> =
-  this as Fx<A>
-
 suspend inline operator fun <A> FxOf<A>.not(): A = fix().invoke()
 
+@higherkind
 sealed class Fx<out A> : FxOf<A> {
-
-  @PublishedApi
-  @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
-  internal inline fun <B> unsafeRecast(): Fx<B> = this as Fx<B>
 
   inline val suspended: suspend () -> A
     get() = when (this) {
@@ -55,7 +44,7 @@ sealed class Fx<out A> : FxOf<A> {
       is Single -> suspend { source() }
       is Lazy -> suspend { source(Unit) }
       is Defer -> suspend { FxRunLoop(thunk()) }
-      is Map<*, A> -> suspend { FxRunLoop(this) } // g(FxRunLoop(source)) in Any? land
+      is Map<*, A> -> suspend { FxRunLoop(this) }
       is FlatMap<*, A> -> suspend { FxRunLoop(this) }
       is UpdateContext -> suspend { FxRunLoop(this) }
       is ContinueOn -> suspend { FxRunLoop(this) }
@@ -65,6 +54,21 @@ sealed class Fx<out A> : FxOf<A> {
       is AsyncUpdateContext -> suspend { FxRunLoop(this) }
     }
 
+  /**
+   * Transform the [Fx] wrapped value of [A] into [B] preserving the [Fx] structure. `Fx<A> -> Fx<B>`
+   *
+   * ```kotlin:ank
+   * import arrow.effects.suspended.fx
+   *
+   * fun main(args: Array<String>) {
+   *   val result =
+   *   //sampleStart
+   *   Fx.just("Hello").map { "$it World" }
+   *   //sampleEnd
+   *   println(Fx.unsafeRunBlocking(result))
+   * }
+   * ```
+   */
   @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
   inline fun <B> map(noinline f: (A) -> B): Fx<B> = when (this) {
     is RaiseError -> this
@@ -335,10 +339,93 @@ sealed class Fx<out A> : FxOf<A> {
   fun <B> followedBy(fa: FxOf<B>): Fx<B> =
     flatMap { fa }
 
+  /**
+   * Discards the [A] value inside [Fx] signaling this container may be pointing to a no-op
+   * or an effect whose return value is deliberately ignored. The singleton value [Unit] serves as signal.
+   *
+   * `Fx<A> -> Fx<Unit>
+   *
+   * ```kotlin:ank:playground:extension
+   * import arrow.effects.suspended.fx.Fx
+   *
+   * fun main(args: Array<String>) {
+   *   val result =
+   *   //sampleStart
+   *   Fx.just("Hello World").unit()
+   *   //sampleEnd
+   *   println(Fx.unsafeRunBlocking(result))
+   * }
+   * ```
+   */
   fun unit(): Fx<Unit> = map(mapUnit)
 
+  /**
+   * Meant for specifying tasks with safe resource acquisition and release in the face of errors and interruption.
+   * It would be the the equivalent of `try/catch/finally` statements in mainstream imperative languages for resource
+   * acquisition and release.
+   *
+   * @param release is the action that's supposed to release the allocated resource after `use` is done, irregardless
+   * of its exit condition.
+   *
+   * ```kotlin:ank:playground:extension
+   * import arrow.effects.suspended.fx.Fx
+   *
+   * class File(url: String) {
+   *   fun open(): File = this
+   *   fun close(): Unit {}
+   *   override fun toString(): String = "This file contains some interesting content!"
+   * }
+   *
+   * fun openFile(uri: String): Fx<File> = Fx { File(uri).open() }
+   * fun closeFile(file: File): Fx<Unit> = Fx { file.close() }
+   * fun fileToString(file: File): Fx<String> = Fx { file.toString() }
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val safeComputation = openFile("data.json").bracket({ file: File -> closeFile(file) }, { file -> fileToString(file) })
+   *   //sampleEnd
+   *   println(Fx.unsafeRunBlocking(safeComputation))
+   * }
+   * ```
+   */
   fun <B> bracket(release: (A) -> FxOf<Unit>, use: (A) -> FxOf<B>): Fx<B> =
     bracketCase({ a, _ -> release(a) }, use)
+
+  /**
+   * Executes the given `finalizer` when the source is finished, either in success or in error, or if canceled, allowing
+   * for differentiating between exit conditions. That's thanks to the [ExitCase] argument of the finalizer.
+   *
+   * As best practice, it's not a good idea to release resources via `guaranteeCase` in polymorphic code.
+   * Prefer [bracketCase] for the acquisition and release of resources.
+   *
+   * @see [guarantee] for the simpler version
+   * @see [bracketCase] for the more general operation
+   *
+   */
+  fun guaranteeCase(release: (ExitCase<Throwable>) -> FxOf<Unit>): Fx<A> = async { conn, cb ->
+    Platform.trampoline {
+      val frame = GuaranteeReleaseFrame<A>(release)
+      val onNext = FlatMap(this, frame)
+      // Registering our cancelable token ensures that in case cancellation is detected, `release` gets called
+      conn.push(frame.cancel)
+
+      // Race condition check, avoiding starting `source` in case the connection was already cancelled — n.b. we don't need
+      // to trigger `release` otherwise, because it already happened
+      if (conn.isNotCanceled()) FxRunLoop.startCancelable(onNext, conn, cb = cb)
+      else Unit
+    }
+  }
+
+  /**
+   * Executes the given [finalizer] when the source is finished, either in success or in error, or if canceled.
+   *
+   * As best practice, prefer [bracket] for the acquisition and release of resources.
+   *
+   * @see [guaranteeCase] for the version that can discriminate between termination conditions
+   * @see [bracket] for the more general operation
+   */
+  fun guarantee(finalizer: FxOf<Unit>): Fx<A> =
+    guaranteeCase { finalizer }
 
   fun <B> ap(ff: FxOf<(A) -> B>): Fx<B> =
     ff.fix().flatMap { map(it) }
@@ -361,6 +448,25 @@ sealed class Fx<out A> : FxOf<A> {
   fun updateContext(f: (CoroutineContext) -> CoroutineContext): Fx<A> =
     UpdateContext(this, f)
 
+  /**
+   * Continue the evaluation on provided [CoroutineContext]
+   *
+   * @param ctx [CoroutineContext] to run evaluation on
+   *
+   * ```kotlin:ank:playground:extension
+   * import arrow.effects.suspended.fx.Fx
+   * import kotlinx.coroutines.Dispatchers
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val result = Fx.unit.continueOn(Dispatchers.Default).flatMap {
+   *     Fx { Thread.currentThread().name }
+   *   }
+   *   //sampleEnd
+   *   println(Fx.unsafeRunBlocking(result))
+   * }
+   * ```
+   */
   fun continueOn(ctx: CoroutineContext): Fx<A> = when (this) {
     is ContinueOn -> this.apply {
       this.ctx = ctx
@@ -369,10 +475,25 @@ sealed class Fx<out A> : FxOf<A> {
   }
 
   /**
-   * [fork] runs this [Fx] value concurrently in a [Fiber] within a safe [Fx] environment.
-   * A [Fiber] is a function pair that you can use to [Fiber.join] or [Fiber.cancel] a concurrently running [Fx].
+   * Create a new [Fx] that upon execution starts the source [Fx] within a [Fiber] on [ctx].
    *
-   * @see Fx.Companion.racePair for another combinator using [Fiber]
+   * ```kotlin:ank:playground
+   * import arrow.effects.suspended.fx.Fx
+   * import kotlinx.coroutines.Dispatchers
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val program = Fx { "Running inside a fiber" }
+   *     .fork(Dispatchers.Default).flatMap { (join, cancel) ->
+   *       join
+   *     }
+   *   //sampleEnd
+   *   println(Fx.unsafeRunBlocking(program))
+   * }
+   * ```
+   *
+   * @param ctx [CoroutineContext] to execute the source [Fx] on.
+   * @return [Fx] with suspended execution of source [Fx] on context [ctx].
    */
   fun fork(ctx: CoroutineContext): Fx<Fiber<ForFx, A>> = async { oldConn, cb ->
     val promise = UnsafePromise<A>()
@@ -408,6 +529,23 @@ sealed class Fx<out A> : FxOf<A> {
     @JvmStatic
     operator fun <A> invoke(fa: suspend () -> A): Fx<A> = Single(fa)
 
+    /**
+     * Delay a computation on provided [CoroutineContext].
+     *
+     * @param ctx [CoroutineContext] to run evaluation on.
+     *
+     * ```kotlin:ank:playground
+     * import arrow.effects.suspended.fx.Fx
+     * import kotlinx.coroutines.Dispatchers
+     *
+     * fun main(args: Array<String>) {
+     *   //sampleStart
+     *   val result = Fx(Dispatchers.Default) { Thread.currentThread().name }
+     *   //sampleEnd
+     *   println(Fx.unsafeRunBlocking(result))
+     * }
+     * ```
+     */
     @JvmStatic
     operator fun <A> invoke(ctx: CoroutineContext, f: () -> A): Fx<A> =
       Map(UpdateContext(unit) { ctx }) { f() }
@@ -424,6 +562,20 @@ sealed class Fx<out A> : FxOf<A> {
     @JvmStatic
     fun <A> lazy(f: (Unit) -> A): Fx<A> = Lazy(f)
 
+    /**
+     * Task that never finishes evaluating.
+     *
+     * ```kotlin:ank:playground
+     * import arrow.effects.suspended.fx.Fx
+     *
+     * fun main(args: Array<String>) {
+     *   //sampleStart
+     *   val fint: Fx<Int> = Fx.never
+     *   //sampleEnd
+     *   println(Fx.unsafeRunBlocking(fint))
+     * }
+     * ```
+     */
     @JvmStatic
     val never: Fx<Nothing> = async { _, _ -> Unit }
 
@@ -440,15 +592,138 @@ sealed class Fx<out A> : FxOf<A> {
     fun <A> defer(fa: () -> FxOf<A>): Fx<A> =
       Defer(fa)
 
+    /**
+     * Defer a computation on provided [CoroutineContext].
+     *
+     * @param ctx [CoroutineContext] to run evaluation on.
+     *
+     * ```kotlin:ank:playground
+     * import arrow.effects.suspended.fx.Fx
+     * import kotlinx.coroutines.Dispatchers
+     *
+     * fun main(args: Array<String>) {
+     *   //sampleStart
+     *   val result = Fx.defer(Dispatchers.Default) { Fx { Thread.currentThread().name } }
+     *   //sampleEnd
+     *   println(Fx.unsafeRunBlocking(result))
+     * }
+     * ```
+     */
+    @JvmStatic
+    fun <A> defer(ctx: CoroutineContext, f: () -> FxOf<A>): Fx<A> =
+      FlatMap(ContinueOn(unit, ctx), { f() })
+
     @JvmStatic
     fun <A, B> tailRecM(a: A, f: (A) -> FxOf<Either<A, B>>): Fx<B> =
       FlatMap(f(a), { result ->
         result.fold({ tailRecM(it, f) }, { just(it) })
       }, 0)
 
+    /**
+     * Creates a cancelable instance of [Fx] that executes an asynchronous process on evaluation.
+     * This combinator can be used to wrap callbacks or other similar impure code that requires cancellation code.
+     *
+     * ```kotlin:ank:playground:extension
+     * import arrow.effects.suspended.fx.Fx
+     * import java.lang.RuntimeException
+     *
+     * typealias Callback = (List<String>?, Throwable?) -> Unit
+     *
+     * class Id
+     * object GithubService {
+     *   private val listeners: MutableMap<Id, Callback> = mutableMapOf()
+     *   fun getUsernames(callback: (List<String>?, Throwable?) -> Unit): Id {
+     *     val id = Id()
+     *     listeners[id] = callback
+     *     //execute operation and call callback at some point in future
+     *     return id
+     *   }
+     *
+     *   fun unregisterCallback(id: Id): Unit {
+     *     listeners.remove(id)
+     *   }
+     * }
+     *
+     * fun main(args: Array<String>) {
+     *   //sampleStart
+     *   fun getUsernames(): Fx<List<String>> =
+     *     Fx.async { conn: FxConnection, cb: (Either<Throwable, List<String>>) -> Unit ->
+     *       val id = GithubService.getUsernames { names, throwable ->
+     *         when {
+     *           names != null -> cb(Right(names))
+     *           throwable != null -> cb(Left(throwable))
+     *           else -> cb(Left(RuntimeException("Null result and no exception")))
+     *         }
+     *       }
+     *
+     *       conn.push(Fx { GithubService.unregisterCallback(id) })
+     *       conn.push(Fx { println("Everything we push to the cancellation stack will execute on cancellation") })
+     *     }
+     *
+     *   val result = getUsernames()
+     *   //sampleEnd
+     *   println(Fx.unsafeRunBlocking(result))
+     * }
+     * ```
+     *
+     * @param fa an asynchronous computation that might fail typed as [ConnectedProc].
+     * @see asyncF for a version that can suspend side effects in the registration function.
+     */
     @JvmStatic
     fun <A> async(fa: FxProc<A>): Fx<A> = Async(fa)
 
+    /**
+     * Creates a cancelable instance of [Fx] that executes an asynchronous process on evaluation.
+     * This combinator can be used to wrap callbacks or other similar impure code that requires cancellation code.
+     *
+     * ```kotlin:ank:playground:extension
+     * import arrow.effects.suspended.fx.Fx
+     * import java.lang.RuntimeException
+     *
+     * typealias Callback = (List<String>?, Throwable?) -> Unit
+     *
+     * class Id
+     * object GithubService {
+     *   private val listeners: MutableMap<Id, Callback> = mutableMapOf()
+     *   fun getUsernames(callback: (List<String>?, Throwable?) -> Unit): Id {
+     *     val id = Id()
+     *     listeners[id] = callback
+     *     //execute operation and call callback at some point in future
+     *     return id
+     *   }
+     *
+     *   fun unregisterCallback(id: Id): Unit {
+     *     listeners.remove(id)
+     *   }
+     * }
+     *
+     * fun main(args: Array<String>) {
+     *   //sampleStart
+     *   fun getUsernames(): Fx<List<String>> =
+     *     Fx.asyncF { conn: FxConnection, cb: (Either<Throwable, List<String>>) -> Unit ->
+     *       Fx {
+     *         val id = GithubService.getUsernames { names, throwable ->
+     *           when {
+     *             names != null -> cb(Right(names))
+     *             throwable != null -> cb(Left(throwable))
+     *             else -> cb(Left(RuntimeException("Null result and no exception")))
+     *           }
+     *         }
+     *
+     *         conn.push(Fx { GithubService.unregisterCallback(id) })
+     *         conn.push(Fx { println("Everything we push to the cancellation stack will execute on cancellation") })
+     *       }
+     *     }
+     *
+     *   val result = getUsernames()
+     *   //sampleEnd
+     *   println(Fx.unsafeRunBlocking(result))
+     * }
+     * ```
+     *
+     * @param fa a deferred asynchronous computation that might fail typed as [ConnectedProcF].
+     * @see async for a version that can suspend side effects in the registration function.
+     */
     @JvmStatic
     fun <A> asyncF(fa: FxProcF<A>): Fx<A> = Async.invokeF(fa)
 
@@ -562,6 +837,10 @@ sealed class Fx<out A> : FxOf<A> {
         FxRunLoop.startCancelable(fx, conn, cb = onCancelCb)
       }
   }
+
+  @PublishedApi
+  @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+  internal inline fun <B> unsafeRecast(): Fx<B> = this as Fx<B>
 
   override fun toString(): String = "Fx(...)"
 }

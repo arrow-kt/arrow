@@ -14,11 +14,39 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine
 import kotlin.coroutines.suspendCoroutine
 
+/**
+ * Race two tasks concurrently within a new [Fx].
+ * Race results in a winner and the other, yet to finish task running in a [Fiber].
+ *
+ * ```kotlin:ank:playground
+ * import arrow.effects.suspended.fx.Fx
+ * import kotlinx.coroutines.Dispatchers
+ * import java.lang.RuntimeException
+ *
+ * fun main(args: Array<String>) {
+ *   //sampleStart
+ *   val result = Fx.racePair(Dispatchers.Default, Fx.never, Fx { "I won the race" }).flatMap {
+ *     racePair.fold(
+ *       { Fx.raiseError<Int>(RuntimeException("Fx.never cannot win")) },
+ *       { (_: Fiber<ForFx, Int>, res: Int) -> res }
+ *     )
+ *   }
+ *   //sampleEnd
+ *   println(Fx.unsafeRunBlocking(result))
+ * }
+ * ```
+ *
+ * @param ctx [CoroutineContext] to execute the source [Fx] on.
+ * @param fa task to participate in the race
+ * @param fb task to participate in the race
+ * @return [Fx] either [Left] with product of the winner's result [fa] and still running task [fb],
+ *   or [Right] with product of running task [fa] and the winner's result [fb].
+ */
 fun <A, B> Fx.Companion.racePair(ctx: CoroutineContext, fa: FxOf<A>, fb: FxOf<B>): Fx<Either<Tuple2<A, Fiber<ForFx, B>>, Tuple2<Fiber<ForFx, A>, B>>> =
-  Fx.async { conn, cb ->
+  async { conn, cb ->
     val active = AtomicBoolean(true)
 
-    val upstreamCancelToken = Fx.defer { if (conn.isCanceled()) Fx.unit else conn.cancel() }
+    val upstreamCancelToken = defer { if (conn.isCanceled()) unit else conn.cancel() }
 
     val connA = FxConnection()
     connA.push(upstreamCancelToken)

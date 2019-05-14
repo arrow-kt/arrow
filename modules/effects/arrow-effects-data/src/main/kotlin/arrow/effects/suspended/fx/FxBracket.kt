@@ -149,17 +149,3 @@ internal class BracketReleaseFrame<A, B>(val a: A, val releaseFn: (A, ExitCase<T
 internal class GuaranteeReleaseFrame<A>(val releaseFn: (ExitCase<Throwable>) -> FxOf<Unit>) : BaseReleaseFrame<Unit, A>() {
   override fun release(c: ExitCase<Throwable>): CancelToken<ForFx> = releaseFn(c)
 }
-
-fun <A> FxOf<A>.guaranteeCase(release: (ExitCase<Throwable>) -> FxOf<Unit>): Fx<A> = Fx.async { conn, cb ->
-  Platform.trampoline {
-    val frame = GuaranteeReleaseFrame<A>(release)
-    val onNext = Fx.FlatMap(this, frame)
-    // Registering our cancelable token ensures that in case cancellation is detected, `release` gets called
-    conn.push(frame.cancel)
-
-    // Race condition check, avoiding starting `source` in case the connection was already cancelled — n.b. we don't need
-    // to trigger `release` otherwise, because it already happened
-    if (conn.isNotCanceled()) FxRunLoop.startCancelable(onNext, conn, cb = cb)
-    else Unit
-  }
-}

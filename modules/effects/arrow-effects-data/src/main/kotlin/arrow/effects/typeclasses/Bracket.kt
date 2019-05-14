@@ -138,11 +138,9 @@ interface Bracket<F, E> : MonadError<F, E> {
    * Executes the given `finalizer` when the source is finished, either in success or in error, or if canceled, allowing
    * for differentiating between exit conditions. That's thanks to the [ExitCase] argument of the finalizer.
    *
-   * As best practice, it's not a good idea to release resources via `guaranteeCase` in polymorphic code.
-   * Prefer [bracketCase] for the acquisition and release of resources.
+   * As best practice, prefer [bracketCase] for the acquisition and release of resources.
    *
    * @see [guarantee] for the simpler version
-   *
    * @see [bracketCase] for the more general operation
    *
    */
