@@ -23,7 +23,6 @@ import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.Duration
 import arrow.effects.typeclasses.Fiber
 import arrow.effects.typeclasses.mapUnit
-import java.lang.RuntimeException
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext

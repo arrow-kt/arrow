@@ -12,7 +12,6 @@ import arrow.effects.typeclasses.Concurrent
 import arrow.effects.typeclasses.Fiber
 import arrow.effects.typeclasses.mapUnit
 import java.util.concurrent.atomic.AtomicReference
-import kotlin.coroutines.EmptyCoroutineContext
 
 internal class CancelablePromise<F, A>(private val CF: Concurrent<F>) : Promise<F, A>, Concurrent<F> by CF {
 

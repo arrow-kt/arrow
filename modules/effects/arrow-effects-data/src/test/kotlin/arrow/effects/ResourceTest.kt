@@ -5,12 +5,10 @@ import arrow.core.extensions.monoid
 import arrow.data.extensions.list.traverse.traverse
 import arrow.effects.extensions.fx.bracket.bracket
 import arrow.effects.extensions.resource.applicative.applicative
-import arrow.effects.extensions.resource.monad.monad
 import arrow.effects.extensions.resource.monoid.monoid
 import arrow.effects.suspended.fx.ForFx
 import arrow.effects.suspended.fx.Fx
 import arrow.test.UnitSpec
-import arrow.test.laws.MonadLaws
 import arrow.test.laws.MonoidLaws
 import arrow.test.laws.forFew
 import arrow.typeclasses.Eq

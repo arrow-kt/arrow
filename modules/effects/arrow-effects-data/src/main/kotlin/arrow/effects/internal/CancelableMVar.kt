@@ -14,7 +14,6 @@ import arrow.effects.typeclasses.Fiber
 import arrow.effects.typeclasses.mapUnit
 import arrow.effects.typeclasses.rightUnit
 import java.util.concurrent.atomic.AtomicReference
-import kotlin.coroutines.EmptyCoroutineContext
 
 internal class CancelableMVar<F, A> private constructor(initial: State<A>, private val CF: Concurrent<F>) : MVar<F, A>, Concurrent<F> by CF {
 

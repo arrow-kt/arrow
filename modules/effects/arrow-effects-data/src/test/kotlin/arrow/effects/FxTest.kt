@@ -6,10 +6,8 @@ import arrow.core.Right
 import arrow.core.Some
 import arrow.core.left
 import arrow.core.right
-import arrow.effects.extensions.NonBlocking
 import arrow.effects.extensions.fx.async.async
 import arrow.effects.extensions.fx.concurrent.concurrent
-import arrow.effects.extensions.fx.concurrent.fork
 import arrow.effects.extensions.fx.fx.fx
 import arrow.effects.extensions.fx.monad.flatMap
 import arrow.effects.extensions.fx.unsafeRun.runBlocking
@@ -18,7 +16,6 @@ import arrow.effects.suspended.fx.Fx
 import arrow.effects.suspended.fx.FxFrame
 import arrow.effects.suspended.fx.FxOf
 import arrow.effects.suspended.fx.bracketCase
-import arrow.effects.suspended.fx.fix
 import arrow.effects.suspended.fx.guaranteeCase
 import arrow.effects.suspended.fx.handleErrorWith
 import arrow.effects.suspended.fx.not
