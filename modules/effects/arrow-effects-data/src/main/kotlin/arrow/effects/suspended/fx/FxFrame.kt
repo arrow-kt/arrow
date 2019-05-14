@@ -1,8 +1,6 @@
 package arrow.effects.suspended.fx
 
 import arrow.core.Either
-import arrow.effects.IO
-import arrow.effects.IOFrame
 import arrow.effects.handleErrorWith
 
 /**

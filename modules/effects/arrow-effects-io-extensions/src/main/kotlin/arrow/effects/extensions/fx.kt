@@ -36,7 +36,6 @@ import arrow.typeclasses.MonadThrow
 import arrow.unsafe
 import kotlin.coroutines.CoroutineContext
 import arrow.effects.suspended.fx.bracketCase as bracketC
-import arrow.effects.suspended.fx.guaranteeCase as guaranteeC
 import arrow.effects.suspended.fx.handleErrorWith as fxHandleErrorWith
 import arrow.effects.suspended.fx.handleError as fxHandleError
 import arrow.effects.suspended.fx.redeem as fxRedeem
@@ -145,7 +144,7 @@ interface FxBracket : Bracket<ForFx, Throwable>, FxMonadThrow {
     bracketC(release, use)
 
   override fun <A> FxOf<A>.guaranteeCase(finalizer: (ExitCase<Throwable>) -> FxOf<Unit>): Fx<A> =
-    guaranteeC(finalizer)
+    fix().guaranteeCase(finalizer)
 
   override fun <A> FxOf<A>.uncancelable(): Fx<A> =
     fix().uncancelable()
