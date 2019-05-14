@@ -1,7 +1,6 @@
 package arrow.effects.suspended.fx
 
 import arrow.core.Either
-import arrow.effects.handleErrorWith
 
 /**
  * An [FxFrame] knows how to [recover] from a [Throwable] and how to map a value [A] to [B].

@@ -4,8 +4,6 @@ import arrow.core.Either
 import arrow.core.nonFatalOrThrow
 import arrow.effects.CancelToken
 import arrow.effects.internal.Platform
-import arrow.effects.typeclasses.Bracket
-import arrow.effects.typeclasses.Concurrent
 import arrow.effects.typeclasses.ExitCase
 import java.util.concurrent.atomic.AtomicBoolean
 

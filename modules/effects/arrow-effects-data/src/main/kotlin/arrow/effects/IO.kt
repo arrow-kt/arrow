@@ -304,7 +304,6 @@ sealed class IO<out A> : IOOf<A> {
 
     IOFiber(promise, conn)
   }
-
 }
 
 fun <A, B> IOOf<A>.ap(ff: IOOf<(A) -> B>): IO<B> =
