@@ -12,7 +12,7 @@ import arrow.effects.handleErrorWith
  * To use an [FxFrame] you must use [Fx.FlatMap] instead of [Fx.flatMap] or the [Fx.FlatMap]
  * is **not guaranteed** to execute.
  *
- * It's used to implement [attempt], [handleErrorWith], [redeemWith] and [arrow.effects.suspended.fx.FxBracket]
+ * It's used to implement [Fx.attempt], [Fx.handleErrorWith], [Fx.redeemWith] and [Fx.bracketCase]
  */
 @PublishedApi
 internal interface FxFrame<in A, out B> : (A) -> B {

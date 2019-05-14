@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicReference
  * until after the resource acquisition is completed so we can cancel and call the release function.
  * @see [FxBracket.invoke]
  */
-class FxForwardCancelable {
+internal class FxForwardCancelable {
 
   private val state = AtomicReference<State>(init)
 

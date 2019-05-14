@@ -10,8 +10,6 @@ import arrow.effects.suspended.fx.FxOf
 import arrow.effects.suspended.fx.FxProc
 import arrow.effects.suspended.fx.FxProcF
 import arrow.effects.suspended.fx.fix
-import arrow.effects.suspended.fx.racePair
-import arrow.effects.suspended.fx.raceTriple
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Bracket
 import arrow.effects.typeclasses.Concurrent
@@ -35,7 +33,6 @@ import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
 import arrow.unsafe
 import kotlin.coroutines.CoroutineContext
-import arrow.effects.suspended.fx.bracketCase as bracketC
 import arrow.effects.suspended.fx.handleErrorWith as fxHandleErrorWith
 import arrow.effects.suspended.fx.handleError as fxHandleError
 
@@ -139,7 +136,7 @@ interface FxMonadThrow : MonadThrow<ForFx>, FxMonadError
 @extension
 interface FxBracket : Bracket<ForFx, Throwable>, FxMonadThrow {
   override fun <A, B> FxOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> FxOf<Unit>, use: (A) -> FxOf<B>): Fx<B> =
-    bracketC(release, use)
+    fix().bracketCase(release, use)
 
   override fun <A> FxOf<A>.guaranteeCase(finalizer: (ExitCase<Throwable>) -> FxOf<Unit>): Fx<A> =
     fix().guaranteeCase(finalizer)

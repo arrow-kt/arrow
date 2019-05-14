@@ -1,6 +1,5 @@
 package arrow.effects.data
 
-import arrow.Kind
 import arrow.effects.typeclasses.Duration
 import arrow.test.UnitSpec
 import arrow.test.generators.intSmall
@@ -22,32 +21,4 @@ class DurationTest : UnitSpec() {
       }
     }
   }
-}
-
-interface Functor<A> {
-  fun <B> map(f: (A) -> B): Functor<B>
-  interface Companion {
-    fun <A> just(a: A): Functor<A>
-  }
-}
-
-class ForId private constructor() { companion object }
-typealias IdOf<A> = arrow.Kind<ForId, A>
-
-@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
-inline fun <A> IdOf<A>.fix(): Id<A> =
-  this as Id<A>
-
-data class Id<A>(val value: A) : Functor<A> {
-  override fun <B> map(f: (A) -> B): Id<B> = Id(f(value))
-  companion object : Functor.Companion {
-    override fun <A> just(a: A): Id<A> = Id(a)
-  }
-}
-
-fun test(fa: Functor<Int>): Functor<Int> =
-  fa.map { it + 1 }
-
-fun main() {
-  test(Id(1)).let(::println)
 }

@@ -32,8 +32,8 @@ fun <A, B, C> parallelMap(first: IO<A>,
                      second: IO<B>,
                      f: (A, B) -> C): IO<C> =
   fx {
-    val (fiberOne: Fiber<ForIO, A>) = Default.fork(first)
-    val (fiberTwo: Fiber<ForIO, B>) = Default.fork(second)
+    val (fiberOne: Fiber<ForIO, A>) = first.fork(Default)
+    val (fiberTwo: Fiber<ForIO, B>) = second.fork(Default)
     f(!fiberOne.join(), !fiberTwo.join())
   }
 
@@ -63,8 +63,8 @@ which allows us to register an operation to run on cancelation, error or complet
 fun <A, B, C> parallelMap2(first: IO<A>,
                           second: IO<B>,
                           f: (A, B) -> C): IO<C> =
-      Default.fork(first).bracket(use = { (joinA, _) ->
-          Default.fork(second).bracket(use = { (joinB, _) ->
+      first.fork(Default).bracket(use = { (joinA, _) ->
+          second.fork(Default).bracket(use = { (joinB, _) ->
             joinA.flatMap { a ->
               joinB.map { b -> f(a, b) }
             }
