@@ -38,8 +38,6 @@ import kotlin.coroutines.CoroutineContext
 import arrow.effects.suspended.fx.bracketCase as bracketC
 import arrow.effects.suspended.fx.handleErrorWith as fxHandleErrorWith
 import arrow.effects.suspended.fx.handleError as fxHandleError
-import arrow.effects.suspended.fx.redeem as fxRedeem
-import arrow.effects.suspended.fx.redeemWith as fxRedeemWith
 
 @extension
 interface FxDispatchers : Dispatchers<ForFx> {
@@ -104,7 +102,7 @@ interface FxApplicativeError : ApplicativeError<ForFx, Throwable>, FxApplicative
     fxHandleErrorWith(f)
 
   override fun <A, B> FxOf<A>.redeem(fe: (Throwable) -> B, fs: (A) -> B): Fx<B> =
-    fxRedeem(fe, fs)
+    fix().redeem(fe, fs)
 
   override fun <A> FxOf<A>.attempt(): Fx<Either<Throwable, A>> =
     fix().attempt()
@@ -132,7 +130,7 @@ interface FxMonad : Monad<ForFx>, FxApplicative {
 @extension
 interface FxMonadError : MonadError<ForFx, Throwable>, FxApplicativeError, FxMonad {
   override fun <A, B> FxOf<A>.redeemWith(fe: (Throwable) -> FxOf<B>, fs: (A) -> FxOf<B>): Fx<B> =
-    fxRedeemWith(fe, fs)
+    fix().redeemWith(fe, fs)
 }
 
 @extension
