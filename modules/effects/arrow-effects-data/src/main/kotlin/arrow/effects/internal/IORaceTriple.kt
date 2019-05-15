@@ -6,15 +6,12 @@ import arrow.core.Right
 import arrow.core.Tuple3
 import arrow.effects.ForIO
 import arrow.effects.IOConnection
-import arrow.effects.FxFiber
+import arrow.effects.IOFiber
 import arrow.effects.IO
 import arrow.effects.IOOf
 import arrow.effects.typeclasses.RaceTriple
 import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.startCoroutine
-import kotlin.coroutines.suspendCoroutine
 
 interface IORaceTriple {
 
@@ -23,8 +20,8 @@ interface IORaceTriple {
    * Race results in a winner and the other, yet to finish task running in a [Fiber].
    *
    * ```kotlin:ank:playground
-   * import arrow.effects.suspended.fx.ForIO
-   * import arrow.effects.suspended.fx.IO
+   * import arrow.effects.ForIO
+   * import arrow.effects.IO
    * import arrow.effects.typeclasses.Fiber
    * import arrow.effects.typeclasses.fold
    * import kotlinx.coroutines.Dispatchers
@@ -47,6 +44,7 @@ interface IORaceTriple {
    * @param ctx [CoroutineContext] to execute the source [IO] on.
    * @param fa task to participate in the race
    * @param fb task to participate in the race
+   * @param fc task to participate in the race
    * @return [IO] of [RaceTriple] which exposes a fold method to fold over the racing results in a elegant way.
    */
   fun <A, B, C> raceTriple(ctx: CoroutineContext, fa: IOOf<A>, fb: IOOf<B>, fc: IOOf<C>): IO<RaceTriple<ForIO, A, B, C>> = IO.async { conn, cb ->
@@ -68,17 +66,7 @@ interface IORaceTriple {
 
     conn.push(connA.cancel(), connB.cancel(), connC.cancel())
 
-    suspend {
-      suspendCoroutine { ca: Continuation<A> ->
-        IORunLoop.startCancelable(fa, connA, ctx) { either: Either<Throwable, A> ->
-          either.fold({ error ->
-            ca.resumeWith(Result.failure(error))
-          }, { a ->
-            ca.resumeWith(Result.success(a))
-          })
-        }
-      }
-    }.startCoroutine(asyncContinuation(ctx) { either ->
+    IORunLoop.startCancelable(IOForkedStart(fa, ctx), connA) { either: Either<Throwable, A> ->
       either.fold({ error ->
         if (active.getAndSet(false)) { // if an error finishes first, stop the race.
           IORunLoop.start(connB.cancel()) { r2 ->
@@ -98,24 +86,14 @@ interface IORaceTriple {
       }, { a ->
         if (active.getAndSet(false)) {
           conn.pop()
-          cb(Right(Left(Tuple3(a, FxFiber(promiseB, connB), FxFiber(promiseC, connC)))))
+          cb(Right(Left(Tuple3(a, IOFiber(promiseB, connB), IOFiber(promiseC, connC)))))
         } else {
           promiseA.complete(Right(a))
         }
       })
-    })
+    }
 
-    suspend {
-      suspendCoroutine { ca: Continuation<B> ->
-        IORunLoop.startCancelable(fb, connB, ctx) { either: Either<Throwable, B> ->
-          either.fold({ error ->
-            ca.resumeWith(Result.failure(error))
-          }, { b ->
-            ca.resumeWith(Result.success(b))
-          })
-        }
-      }
-    }.startCoroutine(asyncContinuation(ctx) { either ->
+    IORunLoop.startCancelable(IOForkedStart(fb, ctx), connB) { either: Either<Throwable, B> ->
       either.fold({ error ->
         if (active.getAndSet(false)) { // if an error finishes first, stop the race.
           IORunLoop.start(connA.cancel()) { r2 ->
@@ -135,24 +113,14 @@ interface IORaceTriple {
       }, { b ->
         if (active.getAndSet(false)) {
           conn.pop()
-          cb(Right(Right(Left(Tuple3(FxFiber(promiseA, connA), b, FxFiber(promiseC, connC))))))
+          cb(Right(Right(Left(Tuple3(IOFiber(promiseA, connA), b, IOFiber(promiseC, connC))))))
         } else {
           promiseB.complete(Right(b))
         }
       })
-    })
+    }
 
-    suspend {
-      suspendCoroutine { ca: Continuation<C> ->
-        IORunLoop.startCancelable(fc, connC, ctx) { either: Either<Throwable, C> ->
-          either.fold({ error ->
-            ca.resumeWith(Result.failure(error))
-          }, { c ->
-            ca.resumeWith(Result.success(c))
-          })
-        }
-      }
-    }.startCoroutine(asyncContinuation(ctx) { either ->
+    IORunLoop.startCancelable(IOForkedStart(fc, ctx), connC) { either: Either<Throwable, C> ->
       either.fold({ error ->
         if (active.getAndSet(false)) { // if an error finishes first, stop the race.
           IORunLoop.start(connA.cancel()) { r2 ->
@@ -172,11 +140,11 @@ interface IORaceTriple {
       }, { c ->
         if (active.getAndSet(false)) {
           conn.pop()
-          cb(Right(Right(Right(Tuple3(FxFiber(promiseA, connA), FxFiber(promiseB, connB), c)))))
+          cb(Right(Right(Right(Tuple3(IOFiber(promiseA, connA), IOFiber(promiseB, connB), c)))))
         } else {
           promiseC.complete(Right(c))
         }
       })
-    })
+    }
   }
 }

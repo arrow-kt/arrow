@@ -13,6 +13,7 @@ import arrow.data.AndThen
 import arrow.effects.internal.BracketStart
 import arrow.effects.internal.ForwardCancelable
 import arrow.effects.internal.GuaranteeReleaseFrame
+import arrow.effects.internal.IOForkedStart
 import arrow.effects.internal.Platform
 import arrow.effects.internal.UnsafePromise
 import arrow.effects.internal.asyncContinuation
@@ -63,7 +64,7 @@ sealed class IO<out A> : IOOf<A> {
    * `IO<A> -> (suspend () -> A)`
    *
    * ```kotlin:ank:playground
-   * import arrow.effects.suspended.fx.IO
+   * import arrow.effects.IO
    *
    *fun main(args: Array<String>) = kotlinx.coroutines.runBlocking {
    *  //sampleStart
@@ -94,7 +95,7 @@ sealed class IO<out A> : IOOf<A> {
    * Transform the [IO] wrapped value of [A] into [B] preserving the [IO] structure.
    *
    * ```kotlin:ank:playground
-   * import arrow.effects.suspended.fx.IO
+   * import arrow.effects.IO
    *
    * fun main(args: Array<String>) {
    *   val result =
@@ -160,7 +161,7 @@ sealed class IO<out A> : IOOf<A> {
    * Transform the [IO] value of [A] by sequencing an effect [IO] that results in [B].
    *
    * ```kotlin:ank:playground
-   * import arrow.effects.suspended.fx.IO
+   * import arrow.effects.IO
    *
    * fun main(args: Array<String>) {
    *   val result =
@@ -213,7 +214,7 @@ sealed class IO<out A> : IOOf<A> {
    * Transform the [IO] by sequencing an effect [IO] that results in [B] while ignoring the original value of [A].
    *
    * ```kotlin:ank:playground
-   * import arrow.effects.suspended.fx.IO
+   * import arrow.effects.IO
    *
    * fun main(args: Array<String>) {
    *   val result =
@@ -231,7 +232,7 @@ sealed class IO<out A> : IOOf<A> {
    * Redeem an [IO] to an [IO] of [B] by resolving the error **or** mapping the value [A] to [B].
    *
    * ```kotlin:ank:playground
-   * import arrow.effects.suspended.fx.IO
+   * import arrow.effects.IO
    *
    * fun main(args: Array<String>) {
    *   val result =
@@ -250,7 +251,7 @@ sealed class IO<out A> : IOOf<A> {
    * Redeem an [IO] to an [IO] of [B] by resolving the error **or** mapping the value [A] to [B] **with** an effect.
    *
    * ```kotlin:ank:playground
-   * import arrow.effects.suspended.fx.IO
+   * import arrow.effects.IO
    *
    * fun main(args: Array<String>) {
    *   val result =
@@ -272,7 +273,7 @@ sealed class IO<out A> : IOOf<A> {
    * `IO<A> -> IO<Unit>
    *
    * ```kotlin:ank:playground
-   * import arrow.effects.suspended.fx.IO
+   * import arrow.effects.IO
    *
    * fun main(args: Array<String>) {
    *   val result =
@@ -302,7 +303,7 @@ sealed class IO<out A> : IOOf<A> {
    *
    * 2. Resource consumption is like any other [IO] effect. The key difference here is that it's wired in such a way that
    *   [release] **will always** be called either on [ExitCase.Canceled], [ExitCase.Error] or [ExitCase.Completed].
-   *   If it failed than the resulting [IO] from [FxBracket] will be `IO.raiseError(e)`, otherwise the result of [use].
+   *   If it failed than the resulting [IO] from [bracketCase] will be `IO.raiseError(e)`, otherwise the result of [use].
    *
    * 3. Resource releasing is **NON CANCELABLE** otherwise it could result in leaks.
    *   In the case it throws the resulting [IO] will be either the error or a composed error if one occurred in the [use] stage.
@@ -315,7 +316,6 @@ sealed class IO<out A> : IOOf<A> {
    *
    * ```kotlin:ank:playground
    * import arrow.effects.*
-   * import arrow.effects.suspended.fx.*
    * import arrow.effects.typeclasses.ExitCase
    *
    * class File(url: String) {
@@ -363,7 +363,7 @@ sealed class IO<out A> : IOOf<A> {
    * of its exit condition.
    *
    * ```kotlin:ank:playground
-   * import arrow.effects.suspended.fx.IO
+   * import arrow.effects.IO
    *
    * class File(url: String) {
    *   fun open(): File = this
@@ -449,7 +449,7 @@ sealed class IO<out A> : IOOf<A> {
    * @param ctx [CoroutineContext] to run evaluation on
    *
    * ```kotlin:ank:playground
-   * import arrow.effects.suspended.fx.IO
+   * import arrow.effects.IO
    * import kotlinx.coroutines.Dispatchers
    *
    * fun main(args: Array<String>) {
@@ -473,7 +473,7 @@ sealed class IO<out A> : IOOf<A> {
    * Create a new [IO] that upon execution starts the source [IO] within a [Fiber] on [ctx].
    *
    * ```kotlin:ank:playground
-   * import arrow.effects.suspended.fx.IO
+   * import arrow.effects.IO
    * import kotlinx.coroutines.Dispatchers
    *
    * fun main(args: Array<String>) {
@@ -490,27 +490,11 @@ sealed class IO<out A> : IOOf<A> {
    * @param ctx [CoroutineContext] to execute the source [IO] on.
    * @return [IO] with suspended execution of source [IO] on context [ctx].
    */
-  fun fork(ctx: CoroutineContext): IO<Fiber<ForIO, A>> = async { oldConn, cb ->
+  fun fork(ctx: CoroutineContext): IO<Fiber<ForIO, A>> = async { _, cb ->
     val promise = UnsafePromise<A>()
     val conn = IOConnection()
-    oldConn.push(conn.cancel())
-    conn.push(oldConn.cancel())
-
-    suspend {
-      suspendCoroutine { ca: Continuation<A> ->
-        IORunLoop.startCancelable(this, conn, ctx) { either: Either<Throwable, A> ->
-          either.fold({ error ->
-            ca.resumeWith(Result.failure(error))
-          }, { a ->
-            ca.resumeWith(Result.success(a))
-          })
-        }
-      }
-    }.startCoroutine(asyncContinuation(ctx) { either ->
-      promise.complete(either)
-    })
-
-    cb(Right(FxFiber(promise, conn)))
+    IORunLoop.startCancelable(IOForkedStart(this, ctx), conn, cb = promise::complete)
+    cb(Right(IOFiber(promise, conn)))
   }
 
   /**
@@ -527,7 +511,7 @@ sealed class IO<out A> : IOOf<A> {
      * @param fa suspended function to wrap into [IO].
      *
      * ```kotlin:ank:playground
-     * import arrow.effects.suspended.fx.IO
+     * import arrow.effects.IO
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
@@ -546,7 +530,7 @@ sealed class IO<out A> : IOOf<A> {
      * @param ctx [CoroutineContext] to run evaluation on.
      *
      * ```kotlin:ank:playground
-     * import arrow.effects.suspended.fx.IO
+     * import arrow.effects.IO
      * import kotlinx.coroutines.Dispatchers
      *
      * fun main(args: Array<String>) {
@@ -565,7 +549,7 @@ sealed class IO<out A> : IOOf<A> {
      * Wrap a pure value [A] into [IO].
      *
      * ```kotlin:ank:playground
-     * import arrow.effects.suspended.fx.IO
+     * import arrow.effects.IO
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
@@ -582,7 +566,7 @@ sealed class IO<out A> : IOOf<A> {
      * A pure [IO] value of [Unit].
      *
      * ```kotlin:ank:playground
-     * import arrow.effects.suspended.fx.IO
+     * import arrow.effects.IO
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
@@ -599,7 +583,7 @@ sealed class IO<out A> : IOOf<A> {
      * A lazy [IO] value of [Unit].
      *
      * ```kotlin:ank:playground
-     * import arrow.effects.suspended.fx.IO
+     * import arrow.effects.IO
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
@@ -616,7 +600,7 @@ sealed class IO<out A> : IOOf<A> {
      * Wraps a pure function in a lazy manner
      *
      * ```kotlin:ank:playground
-     * import arrow.effects.suspended.fx.IO
+     * import arrow.effects.IO
      *
      * fun main(args: Array<String>) {
      *   fun longCalculation(): Int = 9999
@@ -634,7 +618,7 @@ sealed class IO<out A> : IOOf<A> {
      * Task that never finishes evaluating.
      *
      * ```kotlin:ank:playground
-     * import arrow.effects.suspended.fx.IO
+     * import arrow.effects.IO
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
@@ -651,7 +635,7 @@ sealed class IO<out A> : IOOf<A> {
      * Evaluates an [Eval] instance within a safe [IO] context.
      *
      * ```kotlin:ank:playground
-     * import arrow.effects.suspended.fx.IO
+     * import arrow.effects.IO
      * import arrow.core.Eval
      *
      * fun main(args: Array<String>) {
@@ -673,7 +657,7 @@ sealed class IO<out A> : IOOf<A> {
      * Raise an error in a pure way without actually throwing.
      *
      * ```kotlin:ank:playground
-     * import arrow.effects.suspended.fx.IO
+     * import arrow.effects.IO
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
@@ -690,7 +674,7 @@ sealed class IO<out A> : IOOf<A> {
      * Defer a computation that results in an [IO] value.
      *
      * ```kotlin:ank:playground
-     * import arrow.effects.suspended.fx.IO
+     * import arrow.effects.IO
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
@@ -710,7 +694,7 @@ sealed class IO<out A> : IOOf<A> {
      * @param ctx [CoroutineContext] to run evaluation on.
      *
      * ```kotlin:ank:playground
-     * import arrow.effects.suspended.fx.IO
+     * import arrow.effects.IO
      * import kotlinx.coroutines.Dispatchers
      *
      * fun main(args: Array<String>) {
@@ -730,7 +714,7 @@ sealed class IO<out A> : IOOf<A> {
      *
      * ```kotlin:ank:playground
      * import arrow.core.*
-     * import arrow.effects.suspended.fx.IO
+     * import arrow.effects.IO
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
@@ -757,7 +741,7 @@ sealed class IO<out A> : IOOf<A> {
      *
      * ```kotlin:ank:playground
      * import arrow.core.*
-     * import arrow.effects.suspended.fx.*
+     * import arrow.effects.*
      * import java.lang.RuntimeException
      *
      * typealias Callback = (List<String>?, Throwable?) -> Unit
@@ -811,7 +795,7 @@ sealed class IO<out A> : IOOf<A> {
      *
      * ```kotlin:ank:playground
      * import arrow.core.*
-     * import arrow.effects.suspended.fx.*
+     * import arrow.effects.*
      * import java.lang.RuntimeException
      *
      * typealias Callback = (List<String>?, Throwable?) -> Unit
@@ -1178,7 +1162,7 @@ sealed class IO<out A> : IOOf<A> {
 }
 
 @Suppress("FunctionName")
-internal fun <A> FxFiber(promise: UnsafePromise<A>, conn: IOConnection): Fiber<ForIO, A> {
+internal fun <A> IOFiber(promise: UnsafePromise<A>, conn: IOConnection): Fiber<ForIO, A> {
   val join: IO<A> = IO.async { conn2, cb ->
     val cb2: (Either<Throwable, A>) -> Unit = {
       cb(it)

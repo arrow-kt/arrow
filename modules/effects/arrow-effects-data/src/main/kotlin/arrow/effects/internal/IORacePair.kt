@@ -6,8 +6,8 @@ import arrow.core.Right
 import arrow.core.Tuple2
 import arrow.effects.ForIO
 import arrow.effects.IOConnection
-import arrow.effects.FxFiber
 import arrow.effects.IO
+import arrow.effects.IOFiber
 import arrow.effects.IOOf
 import arrow.effects.typeclasses.Fiber
 import java.util.concurrent.atomic.AtomicBoolean
@@ -23,8 +23,8 @@ interface IORacePair {
    * Race results in a winner and the other, yet to finish task running in a [Fiber].
    *
    * ```kotlin:ank:playground
-   * import arrow.effects.suspended.fx.ForIO
-   * import arrow.effects.suspended.fx.IO
+   * import arrow.effects.ForIO
+   * import arrow.effects.IO
    * import arrow.effects.typeclasses.Fiber
    * import kotlinx.coroutines.Dispatchers
    * import java.lang.RuntimeException
@@ -64,17 +64,7 @@ interface IORacePair {
 
       conn.pushPair(connA, connB)
 
-      suspend {
-        suspendCoroutine { ca: Continuation<A> ->
-          IORunLoop.startCancelable(fa, connA, ctx) { either: Either<Throwable, A> ->
-            either.fold({ error ->
-              ca.resumeWith(Result.failure(error))
-            }, { a ->
-              ca.resumeWith(Result.success(a))
-            })
-          }
-        }
-      }.startCoroutine(asyncContinuation(ctx) { either ->
+      IORunLoop.startCancelable(IOForkedStart(fa, ctx), connA) { either: Either<Throwable, A> ->
         either.fold({ error ->
           if (active.getAndSet(false)) { // if an error finishes first, stop the race.
             IORunLoop.start(connB.cancel()) { r2 ->
@@ -87,24 +77,14 @@ interface IORacePair {
         }, { a ->
           if (active.getAndSet(false)) {
             conn.pop()
-            cb(Right(Left(Tuple2(a, FxFiber(promiseB, connB)))))
+            cb(Right(Left(Tuple2(a, IOFiber(promiseB, connB)))))
           } else {
             promiseA.complete(Right(a))
           }
         })
-      })
+      }
 
-      suspend {
-        suspendCoroutine { ca: Continuation<B> ->
-          IORunLoop.startCancelable(fb, connB, ctx) { either: Either<Throwable, B> ->
-            either.fold({ error ->
-              ca.resumeWith(Result.failure(error))
-            }, { b ->
-              ca.resumeWith(Result.success(b))
-            })
-          }
-        }
-      }.startCoroutine(asyncContinuation(ctx) { either ->
+      IORunLoop.startCancelable(IOForkedStart(fb, ctx), connB) { either: Either<Throwable, B> ->
         either.fold({ error ->
           if (active.getAndSet(false)) { // if an error finishes first, stop the race.
             IORunLoop.start(connA.cancel()) { r2 ->
@@ -117,11 +97,11 @@ interface IORacePair {
         }, { b ->
           if (active.getAndSet(false)) {
             conn.pop()
-            cb(Right(Right(Tuple2(FxFiber(promiseA, connA), b))))
+            cb(Right(Right(Tuple2(IOFiber(promiseA, connA), b))))
           } else {
             promiseB.complete(Right(b))
           }
         })
-      })
+      }
     }
 }
