@@ -112,7 +112,7 @@ object AsyncLaws {
     }
 
   fun <F> Async<F>.effectEquivalence(EQ: Eq<Kind<F, Int>>): Unit =
-    forAll(Gen.functionAToB<Unit, Int>(Gen.int())) { f ->
+    forAll(Gen.functionAToB<Unit, Int>(Gen.constant(0))) { f ->
       val fs: suspend () -> Int = { f(Unit) }
 
       val effect = effect(newSingleThreadContext("1")) { fs() }
