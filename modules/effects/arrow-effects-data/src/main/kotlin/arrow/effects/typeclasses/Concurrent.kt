@@ -13,6 +13,10 @@ import arrow.effects.CancelToken
 import arrow.effects.KindConnection
 import arrow.effects.MVar
 import arrow.effects.data.internal.BindingCancellationException
+import arrow.effects.internal.ConcurrentSleep
+import arrow.effects.internal.ShiftTick
+import arrow.effects.internal.TimeoutException
+import arrow.effects.internal.scheduler
 import arrow.typeclasses.MonadContinuation
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
@@ -722,6 +726,25 @@ interface Concurrent<F> : Async<F> {
 
   override fun <B> binding(c: suspend MonadContinuation<F, *>.() -> B): Kind<F, B> =
     bindingCancellable { c() }.a
+
+  fun sleep(duration: Duration): Kind<F, Unit> =
+    ConcurrentSleep(duration)
+
+  fun <A> Kind<F, A>.timeoutTo(default: Kind<F, A>, duration: Duration): Kind<F, A> =
+    dispatchers().default().raceN(this, sleep(duration)).flatMap {
+      it.fold(
+        { a -> just(a) },
+        { default }
+      )
+    }
+
+  fun <A> Kind<F, A>.timeout(duration: Duration): Kind<F, A> =
+    dispatchers().default().raceN(this, sleep(duration)).flatMap {
+      it.fold(
+        { a -> just(a) },
+        { raiseError(TimeoutException(duration.toString())) }
+      )
+    }
 }
 
 /** Alias for `Either` structure to provide consistent signature for race methods. */
