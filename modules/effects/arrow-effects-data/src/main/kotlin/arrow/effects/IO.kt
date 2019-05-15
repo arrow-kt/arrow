@@ -16,6 +16,7 @@ import arrow.effects.internal.IOBracket
 import arrow.effects.internal.Platform.maxStackDepthSize
 import arrow.effects.internal.Platform.onceOnly
 import arrow.effects.internal.Platform.unsafeResync
+import arrow.effects.internal.asyncContinuation
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.Duration
 import arrow.effects.typeclasses.ExitCase
@@ -25,6 +26,8 @@ import arrow.effects.typeclasses.ProcF
 import arrow.effects.typeclasses.mapUnit
 import arrow.higherkind
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.coroutines.startCoroutine
 
 typealias IOProc<A> = (IOConnection, (Either<Throwable, A>) -> Unit) -> Unit
 typealias IOProcF<A> = (IOConnection, (Either<Throwable, A>) -> Unit) -> IOOf<Unit>
@@ -45,6 +48,11 @@ sealed class IO<out A> : IOOf<A> {
     operator fun <A> invoke(f: () -> A): IO<A> = defer { Pure(f()) }
 
     fun <A> defer(f: () -> IOOf<A>): IO<A> = Suspend(f)
+
+    fun <A> effect(ctx: CoroutineContext = EmptyCoroutineContext, f: suspend () -> A) : IO<A> =
+      async { _, cb ->
+        f.startCoroutine(asyncContinuation(ctx, cb))
+      }
 
     fun <A> async(k: IOProc<A>): IO<A> =
       Async { conn: IOConnection, ff: (Either<Throwable, A>) -> Unit ->
