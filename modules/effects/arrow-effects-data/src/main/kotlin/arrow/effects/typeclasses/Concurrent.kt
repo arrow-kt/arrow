@@ -47,17 +47,17 @@ interface Concurrent<F> : Async<F> {
    *
    * typealias Callback = (List<String>?, Throwable?) -> Unit
    *
-   * class Id
+   * class GithubId
    * object GithubService {
-   *   private val listeners: MutableMap<Id, Callback> = mutableMapOf()
-   *   fun getUsernames(callback: (List<String>?, Throwable?) -> Unit): Id {
-   *     val id = Id()
+   *   private val listeners: MutableMap<GithubId, Callback> = mutableMapOf()
+   *   fun getUsernames(callback: (List<String>?, Throwable?) -> Unit): GithubId {
+   *     val id = GithubId()
    *     listeners[id] = callback
    *     //execute operation and call callback at some point in future
    *     return id
    *   }
    *
-   *   fun unregisterCallback(id: Id): Unit {
+   *   fun unregisterCallback(id: GithubId): Unit {
    *     listeners.remove(id)
    *   }
    * }
@@ -100,17 +100,17 @@ interface Concurrent<F> : Async<F> {
    *
    * typealias Callback = (List<String>?, Throwable?) -> Unit
    *
-   * class Id
+   * class GithubId
    * object GithubService {
-   *   private val listeners: MutableMap<Id, Callback> = mutableMapOf()
-   *   fun getUsernames(callback: (List<String>?, Throwable?) -> Unit): Id {
-   *     val id = Id()
+   *   private val listeners: MutableMap<GithubId, Callback> = mutableMapOf()
+   *   fun getUsernames(callback: (List<String>?, Throwable?) -> Unit): GithubId {
+   *     val id = GithubId()
    *     listeners[id] = callback
    *     //execute operation and call callback at some point in future
    *     return id
    *   }
    *
-   *   fun unregisterCallback(id: Id): Unit {
+   *   fun unregisterCallback(id: GithubId): Unit {
    *     listeners.remove(id)
    *   }
    * }
@@ -151,6 +151,7 @@ interface Concurrent<F> : Async<F> {
    * import arrow.effects.*
    * import arrow.effects.extensions.io.async.async
    * import arrow.effects.extensions.io.monad.binding
+   * import arrow.effects.extensions.io.concurrent.fork
    * import kotlinx.coroutines.Dispatchers
    *
    * fun main(args: Array<String>) {

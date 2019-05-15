@@ -257,6 +257,7 @@ sealed class IO<out A> : IOOf<A> {
    * ```kotlin:ank:playground
    * import arrow.effects.*
    * import arrow.effects.extensions.io.async.async
+   * import arrow.effects.extensions.io.concurrent.fork
    * import arrow.effects.extensions.io.monad.binding
    * import kotlinx.coroutines.Dispatchers
    *

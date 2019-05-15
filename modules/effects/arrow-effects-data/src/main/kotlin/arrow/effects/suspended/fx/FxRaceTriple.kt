@@ -21,17 +21,20 @@ interface FxRaceTriple {
    * Race results in a winner and the other, yet to finish task running in a [Fiber].
    *
    * ```kotlin:ank:playground
+   * import arrow.effects.suspended.fx.ForFx
    * import arrow.effects.suspended.fx.Fx
+   * import arrow.effects.typeclasses.Fiber
+   * import arrow.effects.typeclasses.fold
    * import kotlinx.coroutines.Dispatchers
    * import java.lang.RuntimeException
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val result = Fx.raceTriple(Dispatchers.Default, Fx.never, Fx { "I won the race" }, Fx.never).flatMap {
-   *     racePair.fold(
-   *       { Fx.raiseError<Int>(RuntimeException("Fx.never cannot win")) },
-   *       { (_: Fiber<ForFx, Int>, res: Int) -> res },
-   *       { Fx.raiseError<Int>(RuntimeException("Fx.never cannot win")) }
+   *   val result = Fx.raceTriple<Int, String, Double>(Dispatchers.Default, Fx.never, Fx { "I won the race" }, Fx.never).flatMap {
+   *     it.fold(
+   *       { Fx.raiseError<String>(RuntimeException("Fx.never cannot win")) },
+   *       { (_: Fiber<ForFx, Int>, res: String, _: Fiber<ForFx, Double>) -> Fx.just(res) },
+   *       { Fx.raiseError(RuntimeException("Fx.never cannot win")) }
    *     )
    *   }
    *   //sampleEnd

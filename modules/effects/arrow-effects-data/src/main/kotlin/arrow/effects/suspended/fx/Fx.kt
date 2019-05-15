@@ -49,19 +49,18 @@ fun <A> FxOf<A>.handleError(f: (Throwable) -> A): Fx<A> = when (this) {
 sealed class Fx<out A> : FxOf<A> {
 
   /**
-   * The _suspended_ form of this [Fx].
+   * The [suspended] form of this [Fx].
    * `Fx<A> -> (suspend () -> A)`
    *
    * ```kotlin:ank:playground
-   * import arrow.effects.suspended.fx
+   * import arrow.effects.suspended.fx.Fx
    *
-   * fun main(args: Array<String>) = runBlocking<Unit> {
-   *   val result =
-   *   //sampleStart
-   *   val f: suspend () -> String = Fx.just("Hello World!").suspended
-   *   //sampleEnd
-   *   println(f())
-   * }
+   *fun main(args: Array<String>) = kotlinx.coroutines.runBlocking {
+   *  //sampleStart
+   *  val f: suspend () -> String = Fx.just("Hello World!").suspended
+   *  //sampleEnd
+   *  println(f())
+   *}
    * ```
    */
   inline val suspended: suspend () -> A
@@ -262,7 +261,7 @@ sealed class Fx<out A> : FxOf<A> {
    *
    * `Fx<A> -> Fx<Unit>
    *
-   * ```kotlin:ank:playground:extension
+   * ```kotlin:ank:playground
    * import arrow.effects.suspended.fx.Fx
    *
    * fun main(args: Array<String>) {
@@ -353,7 +352,7 @@ sealed class Fx<out A> : FxOf<A> {
    * @param release is the action that's supposed to release the allocated resource after `use` is done, irregardless
    * of its exit condition.
    *
-   * ```kotlin:ank:playground:extension
+   * ```kotlin:ank:playground
    * import arrow.effects.suspended.fx.Fx
    *
    * class File(url: String) {
@@ -439,7 +438,7 @@ sealed class Fx<out A> : FxOf<A> {
    *
    * @param ctx [CoroutineContext] to run evaluation on
    *
-   * ```kotlin:ank:playground:extension
+   * ```kotlin:ank:playground
    * import arrow.effects.suspended.fx.Fx
    * import kotlinx.coroutines.Dispatchers
    *
@@ -643,6 +642,7 @@ sealed class Fx<out A> : FxOf<A> {
      *
      * ```kotlin:ank:playground
      * import arrow.effects.suspended.fx.Fx
+     * import arrow.core.Eval
      *
      * fun main(args: Array<String>) {
      *   fun longCalculation(): Int = 9999
@@ -719,6 +719,7 @@ sealed class Fx<out A> : FxOf<A> {
      * Perform a recursive operation in a stack-safe way.
      *
      * ```kotlin:ank:playground
+     * import arrow.core.*
      * import arrow.effects.suspended.fx.Fx
      *
      * fun main(args: Array<String>) {
@@ -744,23 +745,24 @@ sealed class Fx<out A> : FxOf<A> {
      * Creates a cancelable instance of [Fx] that executes an asynchronous process on evaluation.
      * This combinator can be used to wrap callbacks or other similar impure code that requires cancellation code.
      *
-     * ```kotlin:ank:playground:extension
-     * import arrow.effects.suspended.fx.Fx
+     * ```kotlin:ank:playground
+     * import arrow.core.*
+     * import arrow.effects.suspended.fx.*
      * import java.lang.RuntimeException
      *
      * typealias Callback = (List<String>?, Throwable?) -> Unit
      *
-     * class Id
+     * class GithubId
      * object GithubService {
-     *   private val listeners: MutableMap<Id, Callback> = mutableMapOf()
-     *   fun getUsernames(callback: (List<String>?, Throwable?) -> Unit): Id {
-     *     val id = Id()
+     *   private val listeners: MutableMap<GithubId, Callback> = mutableMapOf()
+     *   fun getUsernames(callback: (List<String>?, Throwable?) -> Unit): GithubId {
+     *     val id = GithubId()
      *     listeners[id] = callback
      *     //execute operation and call callback at some point in future
      *     return id
      *   }
      *
-     *   fun unregisterCallback(id: Id): Unit {
+     *   fun unregisterCallback(id: GithubId): Unit {
      *     listeners.remove(id)
      *   }
      * }
@@ -797,23 +799,24 @@ sealed class Fx<out A> : FxOf<A> {
      * Creates a cancelable instance of [Fx] that executes an asynchronous process on evaluation.
      * This combinator can be used to wrap callbacks or other similar impure code that requires cancellation code.
      *
-     * ```kotlin:ank:playground:extension
-     * import arrow.effects.suspended.fx.Fx
+     * ```kotlin:ank:playground
+     * import arrow.core.*
+     * import arrow.effects.suspended.fx.*
      * import java.lang.RuntimeException
      *
      * typealias Callback = (List<String>?, Throwable?) -> Unit
      *
-     * class Id
+     * class GithubId
      * object GithubService {
-     *   private val listeners: MutableMap<Id, Callback> = mutableMapOf()
-     *   fun getUsernames(callback: (List<String>?, Throwable?) -> Unit): Id {
-     *     val id = Id()
+     *   private val listeners: MutableMap<GithubId, Callback> = mutableMapOf()
+     *   fun getUsernames(callback: (List<String>?, Throwable?) -> Unit): GithubId {
+     *     val id = GithubId()
      *     listeners[id] = callback
      *     //execute operation and call callback at some point in future
      *     return id
      *   }
      *
-     *   fun unregisterCallback(id: Id): Unit {
+     *   fun unregisterCallback(id: GithubId): Unit {
      *     listeners.remove(id)
      *   }
      * }

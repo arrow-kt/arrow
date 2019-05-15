@@ -21,16 +21,18 @@ interface FxRacePair {
    * Race results in a winner and the other, yet to finish task running in a [Fiber].
    *
    * ```kotlin:ank:playground
+   * import arrow.effects.suspended.fx.ForFx
    * import arrow.effects.suspended.fx.Fx
+   * import arrow.effects.typeclasses.Fiber
    * import kotlinx.coroutines.Dispatchers
    * import java.lang.RuntimeException
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val result = Fx.racePair(Dispatchers.Default, Fx.never, Fx { "I won the race" }).flatMap {
-   *     racePair.fold(
+   *   val result = Fx.racePair<Int, String>(Dispatchers.Default, Fx.never, Fx { "I won the race" }).flatMap {
+   *     it.fold(
    *       { Fx.raiseError<Int>(RuntimeException("Fx.never cannot win")) },
-   *       { (_: Fiber<ForFx, Int>, res: Int) -> res }
+   *       { (_: Fiber<ForFx, Int>, res: String) -> Fx.just(res) }
    *     )
    *   }
    *   //sampleEnd

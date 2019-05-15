@@ -15,7 +15,6 @@ import arrow.effects.suspended.fx.ForFx
 import arrow.effects.suspended.fx.Fx
 import arrow.effects.suspended.fx.FxFrame
 import arrow.effects.suspended.fx.FxOf
-import arrow.effects.suspended.fx.bracketCase
 import arrow.effects.suspended.fx.handleErrorWith
 import arrow.effects.suspended.fx.not
 import arrow.effects.typeclasses.ExitCase
