@@ -60,7 +60,7 @@ sealed class Fx<out A> : FxOf<A> {
    *  val f: suspend () -> String = Fx.just("Hello World!").suspended
    *  //sampleEnd
    *  println(f())
-   *}
+   * }
    * ```
    */
   inline val suspended: suspend () -> A

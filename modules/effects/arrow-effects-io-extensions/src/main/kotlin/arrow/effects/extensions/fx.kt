@@ -2,7 +2,6 @@ package arrow.effects.extensions
 
 import arrow.Kind
 import arrow.core.Either
-import arrow.core.FunctionK
 import arrow.effects.IODispatchers
 import arrow.effects.extensions.fx.dispatchers.dispatchers
 import arrow.effects.suspended.fx.ForFx
