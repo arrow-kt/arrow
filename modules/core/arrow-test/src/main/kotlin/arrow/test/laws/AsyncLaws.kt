@@ -9,6 +9,7 @@ import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.generators.applicativeError
 import arrow.test.generators.either
+import arrow.test.generators.functionAToB
 import arrow.test.generators.intSmall
 import arrow.test.generators.throwable
 import arrow.typeclasses.Eq
@@ -31,7 +32,9 @@ object AsyncLaws {
       Law("Async Laws: async constructor") { AC.asyncConstructor(EQ) },
       Law("Async Laws: async can be derived from asyncF") { AC.asyncCanBeDerivedFromAsyncF(EQ) },
       Law("Async Laws: bracket release is called on completed or error") { AC.bracketReleaseIscalledOnCompletedOrError(EQ) },
-      Law("Async Laws: continueOn on comprehensions") { AC.continueOnComprehension(EQ) }
+      Law("Async Laws: continueOn on comprehensions") { AC.continueOnComprehension(EQ) },
+      Law("Async Laws: effect calls suspend functions in the right dispatcher") { AC.effectCanCallSuspend(EQ) },
+      Law("Async Laws: effect is equivalent to delay") { AC.effectEquivalence(EQ) }
     )
 
   fun <F> Async<F>.asyncSuccess(EQ: Eq<Kind<F, Int>>): Unit =
@@ -98,6 +101,26 @@ object AsyncLaws {
       }.equalUnderTheLaw(just(b), EQ)
     }
   }
+
+  fun <F> Async<F>.effectCanCallSuspend(EQ: Eq<Kind<F, Int>>): Unit =
+    forAll(Gen.int()) { id ->
+      val fs: suspend () -> String = { Thread.currentThread().name }
+
+      effect(newSingleThreadContext(id.toString())) {
+        fs().toInt()
+      }.equalUnderTheLaw(just(id), EQ)
+    }
+
+  fun <F> Async<F>.effectEquivalence(EQ: Eq<Kind<F, Int>>): Unit =
+    forAll(Gen.functionAToB<Unit, Int>(Gen.int())) { f ->
+      val fs: suspend () -> Int = { f(Unit) }
+
+      val effect = effect(newSingleThreadContext("1")) { fs() }
+
+      val continueOn = delay(newSingleThreadContext("2")) { f(Unit) }
+
+      effect.equalUnderTheLaw(continueOn, EQ)
+    }
 
   // Turns out that kotlinx.coroutines decides to rewrite thread names
   private fun getCurrentThread() =
