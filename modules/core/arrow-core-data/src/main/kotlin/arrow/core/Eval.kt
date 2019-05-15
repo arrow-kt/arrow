@@ -37,6 +37,7 @@ fun <A> EvalOf<A>.value(): A = this.fix().value()
  * ```kotlin:ank:playground
  * import arrow.core.Eval
  *
+ * //sampleStart
  * fun even(n: Int): Eval<Boolean> =
  *   Eval.always { n == 0 }.flatMap {
  *     if(it == true) Eval.now(true)
@@ -50,7 +51,10 @@ fun <A> EvalOf<A>.value(): A = this.fix().value()
  *   }
  *
  * // if not wrapped in eval this type of computation would blow the stack and result in a StackOverflowError
- * odd(100000).value()
+ * fun main() {
+ * println(odd(100000).value())
+ * }
+ * //sampleEnd
  * ```
  *
  */
