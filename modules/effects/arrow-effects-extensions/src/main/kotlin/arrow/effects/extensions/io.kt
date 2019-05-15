@@ -30,8 +30,8 @@ import arrow.effects.typeclasses.RaceTriple
 import arrow.effects.typeclasses.UnsafeRun
 import arrow.extension
 import arrow.typeclasses.Applicative
-import arrow.typeclasses.Apply
 import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
@@ -155,6 +155,9 @@ interface IOAsync : Async<ForIO>, IOMonadDefer {
 
   override fun <A> IOOf<A>.continueOn(ctx: CoroutineContext): IO<A> =
     fix().continueOn(ctx)
+
+  override fun <A> effect(ctx: CoroutineContext, f: suspend () -> A): Kind<ForIO, A> =
+    IO.effect(ctx, f)
 }
 
 // FIXME default @extension are temporarily declared in arrow-effects-io-extensions due to multiplatform needs
