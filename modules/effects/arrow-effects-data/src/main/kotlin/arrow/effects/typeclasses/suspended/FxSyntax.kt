@@ -7,7 +7,6 @@ import arrow.core.TryOf
 import arrow.core.identity
 import arrow.data.extensions.list.traverse.traverse
 import arrow.data.fix
-import arrow.effects.internal.asyncContinuation
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Bracket
 import arrow.effects.typeclasses.Concurrent
@@ -18,7 +17,6 @@ import arrow.typeclasses.Monad
 import arrow.typeclasses.suspended.BindSyntax
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
-import kotlin.coroutines.startCoroutine
 
 interface FxSyntax<F> : Concurrent<F>, BindSyntax<F> {
 
@@ -41,9 +39,7 @@ interface FxSyntax<F> : Concurrent<F>, BindSyntax<F> {
     parTraverse(effects, ::identity)
 
   fun <A> effect(fa: suspend () -> A): Kind<F, A> =
-    async { cb ->
-      fa.startCoroutine(asyncContinuation(EmptyCoroutineContext, cb))
-    }
+    effect(EmptyCoroutineContext, fa)
 
   fun <A> ensure(fa: suspend () -> A, error: () -> Throwable, predicate: (A) -> Boolean): Kind<F, A> =
     run<Monad<F>, Kind<F, A>> { fa.effect().ensure(error, predicate) }
@@ -51,7 +47,7 @@ interface FxSyntax<F> : Concurrent<F>, BindSyntax<F> {
   private fun <A> asyncOp(fb: Async<F>.() -> Kind<F, A>): Kind<F, A> =
     run<Async<F>, Kind<F, A>> { fb(this) }
 
-  fun <A> CoroutineContext.effect(f: suspend () -> A): Kind<F, A> =
+  fun <A> CoroutineContext.effect(dummy: Unit = Unit, f: suspend () -> A): Kind<F, A> =
     asyncOp { defer(this@effect) { f.effect() } }
 
   fun <A> (suspend () -> A).effect(unit: Unit = Unit): Kind<F, A> = effect(this)
