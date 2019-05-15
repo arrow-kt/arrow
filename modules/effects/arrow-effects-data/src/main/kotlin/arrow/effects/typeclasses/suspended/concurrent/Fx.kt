@@ -7,9 +7,9 @@ import arrow.effects.typeclasses.ConcurrentCancellableContinuation
 import arrow.effects.typeclasses.Disposable
 
 /**
- * Fx allows you to run pure sequential code as if it was imperative.
+ * IO allows you to run pure sequential code as if it was imperative.
  *
- * The [Concurrent] version of Fx is the only one that allows effects to be run by calling [arrow.effects.typeclasses.suspended.FxSyntax.effect].
+ * The [Concurrent] version of IO is the only one that allows effects to be run by calling [arrow.effects.typeclasses.suspended.FxSyntax.effect].
  *
  * To run effects use any of the binding functions like you would with any other [Kind].
  *

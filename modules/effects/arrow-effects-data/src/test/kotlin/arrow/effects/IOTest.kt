@@ -1,472 +1,479 @@
 package arrow.effects
 
-import arrow.Kind
 import arrow.core.Either
-import arrow.core.Left
 import arrow.core.None
-import arrow.core.Option
 import arrow.core.Right
 import arrow.core.Some
-import arrow.core.Tuple3
-import arrow.core.extensions.either.eq.eq
-import arrow.core.extensions.option.eq.eq
+import arrow.core.left
 import arrow.core.right
-import arrow.effects.IO.Companion.just
 import arrow.effects.extensions.io.async.async
 import arrow.effects.extensions.io.concurrent.concurrent
-import arrow.effects.extensions.io.concurrent.parMapN
 import arrow.effects.extensions.io.fx.fx
 import arrow.effects.extensions.io.monad.flatMap
-import arrow.effects.typeclasses.Duration
+import arrow.effects.extensions.io.unsafeRun.runBlocking
+import arrow.effects.internal.IOFrame
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.milliseconds
-import arrow.effects.typeclasses.seconds
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.laws.ConcurrentLaws
 import arrow.typeclasses.Eq
+import arrow.unsafe
 import io.kotlintest.fail
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
+import io.kotlintest.shouldThrow
+import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.newSingleThreadContext
 import org.junit.runner.RunWith
+import kotlin.coroutines.AbstractCoroutineContextElement
+import kotlin.coroutines.EmptyCoroutineContext
 
 @RunWith(KotlinTestRunner::class)
-@kotlinx.coroutines.ObsoleteCoroutinesApi
 class IOTest : UnitSpec() {
 
   init {
-    testLaws(ConcurrentLaws.laws(IO.concurrent(), IO_EQ(), IO_EQ(), IO_EQ()))
+    testLaws(ConcurrentLaws.laws(IO.concurrent(), FX_EQ(), FX_EQ(), FX_EQ()))
 
-    "should defer evaluation until run" {
+    class MyException : Exception() {
+      override fun fillInStackTrace(): Throwable = this
+    }
+
+    "just should yield immediately" {
+      val expected = 1
+      val run = IO.unsafeRunBlocking(IO.just(expected))
+      run shouldBe expected
+    }
+
+    "just - can return a null value from unsafeRunBlocking" {
+      val never = IO.just<Int?>(null)
+      val received = IO.unsafeRunBlocking(never)
+      received shouldBe null
+    }
+
+    "invoke - should yield invoke value" {
+      val expected = 1
+      val run = IO.unsafeRunBlocking(IO { expected })
+      run shouldBe expected
+    }
+
+    "invoke - should defer evaluation until run" {
       var run = false
       val ioa = IO { run = true }
       run shouldBe false
-      ioa.unsafeRunSync()
+      IO.unsafeRunBlocking(ioa)
       run shouldBe true
     }
 
-    class MyException : Exception()
-
-    "should catch exceptions within main block" {
+    "invoke - should throw exceptions within main block" {
       val exception = MyException()
-      val ioa = IO { throw exception }
-      val result: Either<Throwable, Nothing> = ioa.attempt().unsafeRunSync()
 
-      val expected = Left(exception)
-
-      result shouldBe expected
+      shouldThrow<MyException> {
+        IO.unsafeRunBlocking(IO { throw exception })
+      } shouldBe exception
     }
 
-    "should yield immediate successful invoke value" {
-      val run = IO { 1 }.unsafeRunSync()
+    "raiseError - should throw immediate failure" {
+      val exception = MyException()
 
-      val expected = 1
-
-      run shouldBe expected
+      shouldThrow<MyException> {
+        IO.unsafeRunBlocking(IO.raiseError<Int>(exception))
+      } shouldBe exception
     }
 
-    "should yield immediate successful pure value" {
-      val run = IO.just(1).unsafeRunSync()
-
-      val expected = 1
-
-      run shouldBe expected
+    "unsafeRunBlocking should run in EmptyCoroutineContext" {
+      // I was surprised by this behavior but nested suspend scopes inherit the coroutineContext from the outer scope.
+      IO.unsafeRunBlocking(IO {
+        kotlin.coroutines.coroutineContext shouldBe EmptyCoroutineContext
+      })
     }
 
-    "should throw immediate failure by raiseError" {
-      try {
-        IO.raiseError<Int>(MyException()).unsafeRunSync()
-        fail("")
-      } catch (myException: MyException) {
-        // Success
-      } catch (throwable: Throwable) {
-        fail("Should only throw MyException")
+    "ContinueOn should switch threads" {
+      IO.unsafeRunBlocking(
+        IO.unit
+          .continueOn(newSingleThreadContext("test"))
+          .flatMap { IO.lazy { Thread.currentThread().name shouldBe "test" } }
+      )
+    }
+
+    "UpdateContext should switch threads" {
+      IO.unsafeRunBlocking(
+        IO.unit
+          .updateContext { newSingleThreadContext("test") }
+          .flatMap { IO.lazy { Thread.currentThread().name shouldBe "test" } }
+      )
+    }
+
+    "CoroutineContext state should be correctly managed between boundaries" {
+      val ctxA = TestContext()
+      val ctxB = CoroutineName("ctxB")
+      // We have to explicitly reference kotlin.coroutines.coroutineContext since `TestContext` overrides this property.
+      IO.unsafeRunBlocking(IO { kotlin.coroutines.coroutineContext shouldBe EmptyCoroutineContext }
+        .continueOn(ctxA)
+        .flatMap { IO { kotlin.coroutines.coroutineContext shouldBe ctxA } }
+        .continueOn(ctxB)
+        .flatMap { IO { kotlin.coroutines.coroutineContext shouldBe ctxB } })
+    }
+
+    "updateContext can update and overwrite context" {
+      val ctxA = TestContext()
+      val ctxB = CoroutineName("ctxB")
+
+      IO.unsafeRunBlocking(IO { kotlin.coroutines.coroutineContext shouldBe EmptyCoroutineContext }
+        .updateContext { ctxA }
+        .flatMap { IO { kotlin.coroutines.coroutineContext shouldBe ctxA } }
+        .updateContext { it + ctxB }
+        .flatMap { IO { kotlin.coroutines.coroutineContext shouldBe (ctxA + ctxB) } }
+      )
+    }
+
+    "fx can switch execution context state across not/bind" {
+      val program = fx {
+        val ctx = !effect { kotlin.coroutines.coroutineContext }
+        !effect { ctx shouldBe EmptyCoroutineContext }
+        continueOn(newSingleThreadContext("test"))
+        val ctx2 = !effect { Thread.currentThread().name }
+        !effect { ctx2 shouldBe "test" }
       }
+
+      IO.unsafeRunBlocking(program)
     }
 
-    "should time out on unending unsafeRunTimed" {
-      val never = IO.async().never<Int>().fix()
+    "fx **cannot** pass context state across not/bind" {
+      val program = fx {
+        val ctx = !effect { kotlin.coroutines.coroutineContext }
+        !effect { ctx shouldBe EmptyCoroutineContext }
+        continueOn(CoroutineName("Simon")) // this is immediately lost and useless.
+        val ctx2 = !effect { kotlin.coroutines.coroutineContext }
+        !effect { ctx2 shouldBe EmptyCoroutineContext }
+      }
+
+      IO.unsafeRunBlocking(program)
+    }
+
+    "fx will respect thread switching across not/bind" {
+      val program = fx {
+        continueOn(newSingleThreadContext("start"))
+        val initialThread = !effect { Thread.currentThread().name }
+        !(0..130).map { i -> suspend { i } }.sequence()
+        val continuedThread = !effect { Thread.currentThread().name }
+        continuedThread shouldBe initialThread
+      }
+
+      IO.unsafeRunBlocking(program)
+    }
+
+    "unsafeRunTimed times out with None result" {
+      val never: IO<Unit> = IO.never
+      val result = IO.unsafeRunTimed(never, 100.milliseconds)
+      result shouldBe None
+    }
+
+    "unsafeRunTimed should time out on unending unsafeRunTimed" {
+      val never: IO<Int> = IO.never
       val start = System.currentTimeMillis()
-      val received = never.unsafeRunTimed(100.milliseconds)
+      val received = IO.unsafeRunTimed(never, 100.milliseconds)
       val elapsed = System.currentTimeMillis() - start
 
       received shouldBe None
       (elapsed >= 100) shouldBe true
     }
 
-    "should return a null value from unsafeRunTimed" {
+    "unsafeRunTimed should return a null value from unsafeRunTimed" {
       val never = IO.just<Int?>(null)
-      val received = never.unsafeRunTimed(100.milliseconds)
+      val received = IO.unsafeRunTimed(never, 100.milliseconds)
 
       received shouldBe Some(null)
     }
 
-    "should return a null value from unsafeRunSync" {
-      val value = IO.just<Int?>(null).unsafeRunSync()
-
-      value shouldBe null
-    }
-
-    "should complete when running a pure value with unsafeRunAsync" {
-      val expected = 0
-      IO.just(expected).unsafeRunAsync { either ->
-        either.fold({ fail("") }, { it shouldBe expected })
+    "unsafeRunNonBlocking should return a pure value" {
+      val expected = 1
+      IO.unsafeRunNonBlocking(IO.just(expected)) { either ->
+        either.fold({ fail("unsafeRunNonBlocking should not receive $it for a pure value") }, { it shouldBe expected })
       }
     }
 
-    "should complete when running a return value with unsafeRunAsync" {
-      val expected = 0
-      IO { expected }.unsafeRunAsync { either ->
-        either.fold({ fail("") }, { it shouldBe expected })
+    "unsafeRunNonBlocking should return a suspended value" {
+      val expected = 1
+      IO.unsafeRunNonBlocking(IO { expected }) { either ->
+        either.fold({ fail("unsafeRunNonBlocking should not receive $it for a pure value") }, { it shouldBe expected })
       }
     }
 
-    "should return an error when running an exception with unsafeRunAsync" {
-      IO.raiseError<Int>(MyException()).unsafeRunAsync { either ->
+    "unsafeRunNonBlocking should return an error when running raiseError" {
+      val exception = MyException()
+
+      IO.unsafeRunNonBlocking(IO.raiseError<Int>(exception)) { either ->
         either.fold({
           when (it) {
-            is MyException -> {
-            }
+            is MyException -> it shouldBe exception
             else -> fail("Should only throw MyException")
           }
         }, { fail("") })
       }
     }
 
-    "should return exceptions within main block with unsafeRunAsync" {
+    "unsafeRunNonBlocking should return an error when running a suspended exception" {
       val exception = MyException()
       val ioa = IO<Int> { throw exception }
-      ioa.unsafeRunAsync { either ->
+      IO.unsafeRunNonBlocking(ioa) { either ->
         either.fold({ it shouldBe exception }, { fail("") })
       }
     }
 
-    "should not catch exceptions within run block with unsafeRunAsync" {
-      try {
-        val exception = MyException()
-        val ioa = IO<Int> { throw exception }
-        ioa.unsafeRunAsync { either ->
-          either.fold({ throw exception }, { fail("") })
+    "unsafeRunNonBlocking should not catch exceptions after it ran" {
+      val exception = MyException()
+      val fx = IO<Int> { throw exception }
+
+      shouldThrow<MyException> {
+        IO.unsafeRunNonBlocking(fx) { either ->
+          either.fold({ throw it }, { fail("unsafeRunNonBlocking should not receive $it for a suspended exception") })
         }
-        fail("Should rethrow the exception")
-      } catch (myException: MyException) {
-        // Success
-      } catch (throwable: Throwable) {
-        fail("Should only throw MyException")
-      }
+      } shouldBe exception
     }
 
-    "should complete when running a pure value with runAsync" {
-      val expected = 0
-      IO.just(expected).runAsync { either ->
-        either.fold({ fail("") }, { IO { it shouldBe expected } })
+    "unsafeRunNonBlockingCancellable should throw the appropriate exception" {
+      val program = IO.async<Throwable> { _, cb ->
+        val cancel = IO.unsafeRunNonBlockingCancellable(
+          IO(newSingleThreadContext("RunThread")) { }.flatMap { IO.never },
+          OnCancel.ThrowCancellationException) {
+          it.fold({ t -> cb(t.right()) }, { })
+        }
+
+        IO.unsafeRunNonBlocking(IO(newSingleThreadContext("CancelThread")) { }) { cancel() }
       }
+
+      IO.unsafeRunBlocking(program) shouldBe OnCancel.CancellationException
     }
 
-    "should complete when running a return value with runAsync" {
-      val expected = 0
-      IO { expected }.runAsync { either ->
-        either.fold({ fail("") }, { IO { it shouldBe expected } })
+    "unsafeRunNonBlockingCancellable can cancel even for infinite asyncs" {
+      val program = IO.async { _, cb: (Either<Throwable, Int>) -> Unit ->
+        val cancel = IO.unsafeRunNonBlockingCancellable(
+          IO(newSingleThreadContext("RunThread")) { }
+            .flatMap { IO.async<Int> { _, _ -> Thread.sleep(5000); } },
+          OnCancel.ThrowCancellationException) {
+          cb(it)
+        }
+
+        IO.unsafeRunNonBlocking(
+          IO(newSingleThreadContext("CancelThread")) { Thread.sleep(500); }
+        ) { cancel() }
       }
+      IO.unsafeRunBlocking(program.attempt()).fold({ it shouldBe OnCancel.CancellationException }, { fail("Should fail, got $it instead") })
     }
 
-    "should return an error when running an exception with runAsync" {
-      IO.raiseError<Int>(MyException()).runAsync { either ->
-        either.fold({
-          when (it) {
-            is MyException -> {
-              IO { }
+    "runNonBlocking should defer running" {
+      var run = false
+      val safeRun = IO.runNonBlocking(IO { run = true }) {
+        IO.unit
+      }
+
+      run shouldBe false
+      IO.unsafeRunBlocking(safeRun)
+      run shouldBe true
+    }
+
+    "runNonBlocking should return a pure value" {
+      val expected = 1
+      val safeRun = IO.runNonBlocking(IO.just(expected)) { either ->
+        IO { either.fold({ fail("unsafeRunNonBlocking should not receive $it for a pure value") }, { it shouldBe expected }) }
+      }
+      IO.unsafeRunBlocking(safeRun)
+    }
+
+    "runNonBlocking should return a suspended value" {
+      val expected = 1
+      val safeRun = IO.runNonBlocking(IO { expected }) { either ->
+        IO { either.fold({ fail("unsafeRunNonBlocking should not receive $it for a pure value") }, { it shouldBe expected }) }
+      }
+
+      IO.unsafeRunBlocking(safeRun)
+    }
+
+    "runNonBlocking should return an error when running raiseError" {
+      val exception = MyException()
+
+      val safeRun = IO.runNonBlocking(IO.raiseError<Int>(exception)) { either ->
+        IO {
+          either.fold({
+            when (it) {
+              is MyException -> it shouldBe exception
+              else -> fail("Should only throw MyException")
             }
-            else -> fail("Should only throw MyException")
-          }
-        }, { fail("") })
+          }, { fail("") })
+        }
       }
+
+      IO.unsafeRunBlocking(safeRun)
     }
 
-    "should return exceptions within main block with runAsync" {
+    "runNonBlocking should return an error when running a suspended exception" {
       val exception = MyException()
       val ioa = IO<Int> { throw exception }
-      ioa.runAsync { either ->
-        either.fold({ IO { it shouldBe exception } }, { fail("") })
+      val safeRun = IO.runNonBlocking(ioa) { either ->
+        IO { either.fold({ it shouldBe exception }, { fail("") }) }
       }
+
+      IO.unsafeRunBlocking(safeRun)
     }
 
-    "should catch exceptions within run block with runAsync" {
-      try {
-        val exception = MyException()
-        val ioa = IO<Int> { throw exception }
-        ioa.runAsync { either ->
-          either.fold({ throw it }, { fail("") })
-        }.unsafeRunSync()
-        fail("Should rethrow the exception")
-      } catch (throwable: AssertionError) {
-        fail("${throwable.message}")
-      } catch (throwable: Throwable) {
-        // Success
-      }
-    }
+    "runNonBlocking should not catch exceptions after it ran" {
+      val exception = MyException()
+      val fx = IO<Int> { throw exception }
 
-    "should map values correctly on success" {
-      val run = IO.just(1).map { it + 1 }.unsafeRunSync()
-
-      val expected = 2
-
-      run shouldBe expected
-    }
-
-    "should flatMap values correctly on success" {
-      val run = just(1).flatMap { num -> IO { num + 1 } }.unsafeRunSync()
-
-      val expected = 2
-
-      run shouldBe expected
-    }
-
-    "invoke is called on every run call" {
-      val sideEffect = SideEffect()
-      val io = IO { sideEffect.increment(); 1 }
-      io.unsafeRunSync()
-      io.unsafeRunSync()
-
-      sideEffect.counter shouldBe 2
-    }
-
-    "unsafeRunTimed times out with None result" {
-      val never = IO.async().never<Unit>().fix()
-      val result = never.unsafeRunTimed(100.milliseconds)
-      result shouldBe None
-    }
-
-    "parallel execution makes all IOs start at the same time" {
-      val order = mutableListOf<Long>()
-
-      fun makePar(num: Long) =
-        IO(newSingleThreadContext("$num")) {
-          // Sleep according to my number
-          Thread.sleep(num * 40)
-        }.map {
-          // Add myself to order list
-          order.add(num)
-          num
+      shouldThrow<MyException> {
+        val safeRun = IO.runNonBlocking(fx) { either ->
+          IO { either.fold({ throw it }, { fail("unsafeRunNonBlocking should not receive $it for a suspended exception") }) }
         }
 
-      val result =
-        newSingleThreadContext("all").parMapN(
-          makePar(6), makePar(3), makePar(2), makePar(4), makePar(1), makePar(5)) { six, tree, two, four, one, five -> listOf(six, tree, two, four, one, five) }
-          .unsafeRunSync()
-
-      result shouldBe listOf(6L, 3, 2, 4, 1, 5)
-      order.toList() shouldBe listOf(1L, 2, 3, 4, 5, 6)
-    }
-
-    "parallel execution preserves order for synchronous IOs" {
-      val order = mutableListOf<Long>()
-
-      fun IO<Long>.order() =
-        map {
-          order.add(it)
-          it
-        }
-
-      fun makePar(num: Long) =
-        IO(newSingleThreadContext("$num")) {
-          // Sleep according to my number
-          Thread.sleep(num * 30)
-          num
-        }.order()
-
-      val result =
-        newSingleThreadContext("all").parMapN(
-          makePar(6), IO.just(1L).order(), makePar(4), IO.defer { IO.just(2L) }.order(), makePar(5), IO { 3L }.order()) { six, one, four, two, five, three -> listOf(six, one, four, two, five, three) }
-          .unsafeRunSync()
-
-      result shouldBe listOf(6L, 1, 4, 2, 5, 3)
-      order.toList() shouldBe listOf(1L, 2, 3, 4, 5, 6)
-    }
-
-    "parallel mapping is done in the expected CoroutineContext" {
-      fun makePar(num: Long) =
-        IO(newSingleThreadContext("$num")) {
-          // Sleep according to my number
-          Thread.sleep(num * 20)
-          num
-        }
-
-      val result =
-        newSingleThreadContext("all").parMapN(
-          makePar(6), IO.just(1L), makePar(4), IO.defer { IO.just(2L) }, makePar(5), IO { 3L }) { _, _, _, _, _, _ ->
-          Thread.currentThread().name
-        }.unsafeRunSync()
-
-      result shouldBe "all"
-    }
-
-    "parallel IO#defer, IO#suspend and IO#async are run in the expected CoroutineContext" {
-      val result =
-        newSingleThreadContext("here").parMapN(
-          IO { Thread.currentThread().name },
-          IO.defer { IO.just(Thread.currentThread().name) },
-          IO.async<String> { _, cb -> cb(Thread.currentThread().name.right()) },
-          ::Tuple3)
-          .unsafeRunSync()
-
-      result shouldBe Tuple3("here", "here", "here")
-    }
-
-    "unsafeRunAsyncCancellable should cancel correctly" {
-      IO.async { _, cb: (Either<Throwable, Int>) -> Unit ->
-        val cancel =
-          IO(newSingleThreadContext("RunThread")) { }
-            .flatMap { IO.async<Int> { _, cb -> Thread.sleep(500); cb(1.right()) } }
-            .unsafeRunAsyncCancellable(OnCancel.Silent) {
-              cb(it)
-            }
-        IO(newSingleThreadContext("CancelThread")) { }
-          .unsafeRunAsync { cancel() }
-      }.unsafeRunTimed(2.seconds) shouldBe None
-    }
-
-    "unsafeRunAsyncCancellable should throw the appropriate exception" {
-      IO.async<Throwable> { _, cb ->
-        val cancel =
-          IO(newSingleThreadContext("RunThread")) { }
-            .flatMap { IO.async<Int> { _, cb -> Thread.sleep(500); cb(1.right()) } }
-            .unsafeRunAsyncCancellable(OnCancel.ThrowCancellationException) {
-              it.fold({ t -> cb(t.right()) }, { })
-            }
-        IO(newSingleThreadContext("CancelThread")) { }
-          .unsafeRunAsync { cancel() }
-      }.unsafeRunTimed(2.seconds) shouldBe Some(OnCancel.CancellationException)
-    }
-
-    "IOFrame should always be called when using IO.Bind" {
-      val ThrowableAsStringFrame = object : IOFrame<Any?, IOOf<String>> {
-        override fun invoke(a: Any?) = just(a.toString())
-
-        override fun recover(e: Throwable) = just(e.message ?: "")
-      }
-
-      forAll(Gen.string()) { message ->
-        IO.Bind(IO.raiseError(RuntimeException(message)), ThrowableAsStringFrame as (Int) -> IO<String>)
-          .unsafeRunSync() == message
-      }
-    }
-
-    "unsafeRunAsyncCancellable can cancel even for infinite asyncs" {
-      IO.async { _, cb: (Either<Throwable, Int>) -> Unit ->
-        val cancel =
-          IO(newSingleThreadContext("RunThread")) { }
-            .flatMap { IO.async<Int> { _, _ -> Thread.sleep(5000); } }
-            .unsafeRunAsyncCancellable(OnCancel.ThrowCancellationException) {
-              cb(it)
-            }
-        IO(newSingleThreadContext("CancelThread")) { Thread.sleep(500); }
-          .unsafeRunAsync { cancel() }
-      }.unsafeRunTimed(2.seconds) shouldBe None
-    }
-
-    "IO.binding should for comprehend over IO" {
-      val result = fx {
-        val (x) = IO.just(1)
-        val y = bind { IO { x + 1 } }
-        y
-      }.fix()
-      result.unsafeRunSync() shouldBe 2
-    }
-
-    "IO bracket cancellation should release resource with cancel exit status" {
-      Promise.uncancelable<ForIO, ExitCase<Throwable>>(IO.async()).flatMap { p ->
-        IO.just(0L)
-          .bracketCase(
-            use = { IO.never },
-            release = { _, exitCase -> p.complete(exitCase) }
-          )
-          .unsafeRunAsyncCancellable { }
-          .invoke() // cancel immediately
-
-        p.get()
-      }.unsafeRunSync() shouldBe ExitCase.Canceled
-    }
-
-    "Cancelable should run CancelToken" {
-      Promise.uncancelable<ForIO, Unit>(IO.async()).flatMap { p ->
-        IO.concurrent().cancelable<Unit> {
-          p.complete(Unit)
-        }.fix()
-          .unsafeRunAsyncCancellable { }
-          .invoke()
-
-        p.get()
-      }.unsafeRunSync() shouldBe Unit
-    }
-
-    "CancelableF should run CancelToken" {
-      Promise.uncancelable<ForIO, Unit>(IO.async()).flatMap { p ->
-        IO.concurrent().cancelableF<Unit> {
-          IO { p.complete(Unit) }
-        }.fix()
-          .unsafeRunAsyncCancellable { }
-          .invoke()
-
-        p.get()
-      }.unsafeRunSync() shouldBe Unit
-    }
-
-    "IO should cancel KindConnection on dispose" {
-      Promise.uncancelable<ForIO, Unit>(IO.async()).flatMap { latch ->
-        IO {
-          IO.async<Unit> { conn, _ ->
-            conn.push(latch.complete(Unit))
-          }.unsafeRunAsyncCancellable { }
-            .invoke()
-        }.flatMap { latch.get() }
-      }.unsafeRunSync()
-    }
-
-    "KindConnection can cancel upstream" {
-      Promise.uncancelable<ForIO, Unit>(IO.async()).flatMap { latch ->
-        IO.async<Unit> { conn, cb ->
-          conn.push(latch.complete(Unit))
-          cb(Right(Unit))
-        }.flatMap {
-          IO.async<Unit> { conn, _ ->
-            conn.cancel().fix().unsafeRunAsync { }
-          }
-        }.unsafeRunAsyncCancellable { }
-        latch.get()
-      }.unsafeRunSync()
+        IO.unsafeRunBlocking(safeRun)
+      } shouldBe exception
     }
 
     "IO `map` stack safe" {
       val size = 500000
       fun mapStackSafe(): IO<Int> =
-        (0 until size).fold(IO.just(0)) { acc, _ -> acc.map { it + 1 } }
-      mapStackSafe().unsafeRunSync() shouldBe size
+        (0 until size).fold(IO { 0 }) { acc, _ -> acc.map { it + 1 } }
+      unsafe { runBlocking { IO { mapStackSafe()() } } } shouldBe size
     }
 
-    "Fx should stay within same context" {
-      fx {
-        continueOn(newSingleThreadContext("start"))
-        val initialThread = !effect { Thread.currentThread().name }
-        !(0..130).map { i -> suspend { i } }.sequence()
-        val continuedThread = !effect { Thread.currentThread().name }
-        continuedThread shouldBe initialThread
-      }.unsafeRunSync()
+    "IO `flatMap` stack safe on right bind" {
+      val size = 500000
+      fun flatMapStackSafe(): IO<Int> =
+        (0 until size).fold(IO { 0 }) { acc, _ -> acc.flatMap { IO.just(it + 1) } }
+      unsafe { runBlocking { IO { flatMapStackSafe()() } } } shouldBe size
+    }
+
+    "IO `flatMap` stackSafe on left bind" {
+      val size = 500000
+      val dummy = MyException()
+
+      fun fxLoopNotHappy(size: Int, i: Int): IO<Int> =
+        if (i < size) {
+          IO { throw dummy }.attempt().flatMap {
+            it.fold({ fxLoopNotHappy(size, i + 1) }, IO.Companion::just)
+          }
+        } else IO.just(1)
+
+      IO.unsafeRunBlocking(fxLoopNotHappy(size, 0))
+    }
+
+    "invoke is called on every run call" {
+      val sideEffect = SideEffect()
+      val io = IO { sideEffect.increment(); 1 }
+      IO.unsafeRunBlocking(io)
+      IO.unsafeRunBlocking(io)
+
+      sideEffect.counter shouldBe 2
+    }
+
+    "IO should be able to be attempted" {
+      val e = RuntimeException("Boom!")
+      IO.unsafeRunBlocking(IO.raiseError<String>(e).attempt()) shouldBe Either.Left(e)
+    }
+
+    "IOFrame should always call recover on IO.Bind with RaiseError" {
+      val ThrowableAsStringFrame = object : IOFrame<Any?, IOOf<String>> {
+        override fun invoke(a: Any?) = fail("IOFrame should never call invoke on a failed value")
+        override fun recover(e: Throwable) = IO.just(e.message ?: "")
+      }
+
+      forAll(Gen.string()) { message ->
+        IO.unsafeRunBlocking(
+          IO.FlatMap(IO.raiseError(RuntimeException(message)), ThrowableAsStringFrame as (Int) -> IO<String>)
+        ) == message
+      }
+    }
+
+    "IOFrame should always call invoke on IO.Bind with Pure" {
+      val ThrowableAsStringFrame = object : IOFrame<Int, IOOf<Int>> {
+        override fun invoke(a: Int) = IO { a + 1 }
+        override fun recover(e: Throwable) = fail("IOFrame should never call recover on succesful value")
+      }
+
+      IO.unsafeRunBlocking(
+        IO.FlatMap(IO.Pure(1), ThrowableAsStringFrame as (Int) -> IO<Int>)
+      ) shouldBe 2
+    }
+
+    "should be able to handle error" {
+      val e = RuntimeException("Boom!")
+
+      unsafe {
+        runBlocking {
+          IO.raiseError<String>(e)
+            .handleErrorWith { IO { it.message!! } }
+        }
+      } shouldBe e.message
+    }
+
+    "attempt - pure" {
+      val value = 1
+      val f = { i: Int -> i + 1 }
+      IO.unsafeRunBlocking(IO.just(value).map(f).attempt()) shouldBe Right(f(value))
+    }
+
+    "attempt - error" {
+      val e = RuntimeException("Boom!")
+
+      IO.unsafeRunBlocking(IO.raiseError<String>(e)
+        .map { it.toUpperCase() }
+        .flatMap { IO { it } }
+        .attempt()) shouldBe e.left()
+    }
+
+    "handleErrorW - error" {
+      val e = RuntimeException("Boom!")
+
+      IO.unsafeRunBlocking(IO.raiseError<String>(e)
+        .map { it.toUpperCase() }
+        .flatMap { IO { it } }
+        .handleErrorWith { IO { it.message!! } }) shouldBe "Boom!"
+    }
+
+    "bracket cancellation should release resource with cancel exit status" {
+      val program = Promise.uncancelable<ForIO, ExitCase<Throwable>>(IO.async()).flatMap { p ->
+        IO.unsafeRunNonBlockingCancellable(
+          IO.just(0L)
+            .bracketCase(
+              use = { IO.never },
+              release = { _, exitCase -> p.complete(exitCase) }
+            )
+        ) {}
+          .invoke() // cancel immediately
+
+        p.get()
+      }
+
+      IO.unsafeRunBlocking(program) shouldBe ExitCase.Canceled
+    }
+
+    "should cancel KindConnection on dispose" {
+      val program = Promise.uncancelable<ForIO, Unit>(IO.async()).flatMap { latch ->
+        IO {
+          IO.unsafeRunNonBlockingCancellable(
+            IO.async<Unit> { conn, _ ->
+              conn.push(latch.complete(Unit))
+            }) { }
+            .invoke()
+        }.flatMap { latch.get() }
+      }
+
+      IO.unsafeRunBlocking(program)
     }
 
     "Bracket should be stack safe" {
       val size = 5000
 
-      fun ioBracketLoop(i: Int): IO<Int> =
-        IO.unit.bracket(use = { just(i + 1) }, release = { IO.unit }).flatMap { ii ->
-          if (ii < size) ioBracketLoop(ii)
-          else just(ii)
+      fun fxBracketLoop(i: Int): IO<Int> =
+        IO.unit.bracket(use = { IO.just(i + 1) }, release = { IO.unit }).flatMap { ii ->
+          if (ii < size) fxBracketLoop(ii)
+          else IO.just(ii)
         }
 
-      IO.just(1).flatMap { ioBracketLoop(0) }.unsafeRunSync() shouldBe size
+      IO.unsafeRunBlocking(IO.just(0).flatMap(::fxBracketLoop)) shouldBe size
     }
 
     "GuaranteeCase should be stack safe" {
@@ -476,18 +483,59 @@ class IOTest : UnitSpec() {
         IO.unit.guaranteeCase { IO.unit }.flatMap {
           val ii = i + 1
           if (ii < size) ioGuaranteeCase(ii)
-          else just(ii)
+          else IO.just(ii)
         }
 
-      IO.just(1).flatMap { ioGuaranteeCase(0) }.unsafeRunSync() shouldBe size
+      IO.unsafeRunBlocking(IO.just(0).flatMap(::ioGuaranteeCase)) shouldBe size
     }
+
+//    "KindConnection can cancel upstream" {
+//      val program = Promise.uncancelable<ForIO, Unit>(IO.async()).flatMap { latch ->
+//        IO.unsafeRunNonBlockingCancellable(
+//          IO.async<Unit> { conn, cb ->
+//            conn.push(latch.complete(Unit))
+//            cb(Right(Unit))
+//          }.flatMap {
+//            IO.async<Unit> { conn, _ ->
+//              IO.unsafeRunBlocking(conn.cancel())
+//            }
+//          }
+//        ) { }
+//
+//        latch.get()
+//      }
+//
+//      IO.unsafeRunBlocking(program)
+//    }
   }
 }
 
-object Error : Throwable()
+class TestContext : AbstractCoroutineContextElement(TestContext) {
+  companion object Key : kotlin.coroutines.CoroutineContext.Key<CoroutineName>
+}
 
-fun <A> IO_EQ(EQA: Eq<A> = Eq.any(), timeout: Duration = 60.seconds): Eq<Kind<ForIO, A>> = Eq { a, b ->
-  Option.eq(Either.eq(Eq.any(), EQA)).run {
-    a.fix().attempt().unsafeRunTimed(timeout).eqv(b.fix().attempt().unsafeRunTimed(timeout))
+fun <A> FX_EQ(): Eq<IOOf<A>> = Eq { a, b ->
+  unsafe {
+    runBlocking {
+      IO {
+        try {
+          !a == !b
+        } catch (e: Throwable) {
+          val errA = try {
+            !a
+            throw IllegalArgumentException()
+          } catch (err: Throwable) {
+            err
+          }
+          val errB = try {
+            !b
+            throw IllegalStateException()
+          } catch (err: Throwable) {
+            err
+          }
+          errA == errB
+        }
+      }
+    }
   }
 }

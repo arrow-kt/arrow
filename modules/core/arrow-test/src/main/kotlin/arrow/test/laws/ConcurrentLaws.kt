@@ -123,15 +123,19 @@ object ConcurrentLaws {
     forAll(Gen.int(), Gen.int()) { a, b ->
       bindingCancellable {
         val mvar = MVar(a, this@releaseBracketIsNotCancelable).bind()
-        val p = Promise.uncancelable<F, Unit>(this@releaseBracketIsNotCancelable).bind()
-        val task = p.complete(Unit)
+        val p = Promise<F, Unit>(this@releaseBracketIsNotCancelable).bind()
+
+        val task = unit()
           .bracket(use = { never<Int>() }, release = { mvar.put(b) })
+
         val (_, cancel) = task.fork().bind()
         p.get().bind()
         cancel.fork().bind()
-        continueOn(ctx)
-        mvar.take().bind()
-        mvar.take().bind()
+        shift().bind()
+        val aa = mvar.take().fork().bind()
+        val bb = mvar.take().fork().bind()
+        aa.join().bind()
+        bb.join().bind()
       }.a.equalUnderTheLaw(just(b), EQ)
     }
 

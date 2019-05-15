@@ -5,7 +5,7 @@ import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.MonadDeferCancellableContinuation
 
 /**
- * Fx allows you to run pure sequential code as if it was imperative.
+ * IO allows you to run pure sequential code as if it was imperative.
  *
  * @see [arrow.typeclasses.suspended.BindSyntax]
  * @see [arrow.typeclasses.suspended.monad.Fx]

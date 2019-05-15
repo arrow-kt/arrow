@@ -54,7 +54,7 @@ class ListKTest : UnitSpec() {
       HashLaws.laws(ListK.hash(Int.hash()), ListK.eq(Int.eq())) { listOf(it).k() }
     )
 
-    "List exports a commutative Fx instance" {
+    "List exports a commutative IO instance" {
       fx(listOf(1), listOf(2), ::identity) shouldBe listOf(1 toT 2)
     }
   }

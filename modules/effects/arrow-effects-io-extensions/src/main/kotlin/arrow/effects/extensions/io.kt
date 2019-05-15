@@ -25,7 +25,10 @@ interface IOEnvironment : Environment<ForIO> {
     IO.dispatchers()
 
   override fun handleAsyncError(e: Throwable): IO<Unit> =
-    IO { println("Found uncaught async exception!"); e.printStackTrace() }
+    IO {
+      println("Found uncaught async exception!")
+      e.printStackTrace()
+    }
 }
 
 @extension

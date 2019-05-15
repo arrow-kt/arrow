@@ -6,7 +6,6 @@ import arrow.core.Option
 import arrow.core.Some
 import arrow.effects.IO
 import arrow.effects.KindConnection
-import arrow.effects.suspended.fx.Fx
 import arrow.effects.typeclasses.Duration
 import java.util.concurrent.Executor
 import java.util.concurrent.atomic.AtomicBoolean
@@ -150,30 +149,7 @@ object Platform {
   fun <A> unsafeResync(ioa: IO<A>, limit: Duration): Option<A> {
     val latch = OneShotLatch()
     var ref: Either<Throwable, A>? = null
-    ioa.unsafeRunAsync { a ->
-      ref = a
-      latch.releaseShared(1)
-    }
-
-    if (limit == Duration.INFINITE) {
-      latch.acquireSharedInterruptibly(1)
-    } else {
-      latch.tryAcquireSharedNanos(1, limit.nanoseconds)
-    }
-
-    val eitherRef = ref
-
-    return when (eitherRef) {
-      null -> None
-      is Either.Left -> throw eitherRef.a
-      is Either.Right -> Some(eitherRef.b)
-    }
-  }
-
-  fun <A> unsafeResync(ioa: Fx<A>, limit: Duration): Option<A> {
-    val latch = OneShotLatch()
-    var ref: Either<Throwable, A>? = null
-    Fx.unsafeRunNonBlocking(ioa) { a ->
+    IO.unsafeRunNonBlocking(ioa) { a ->
       ref = a
       latch.releaseShared(1)
     }

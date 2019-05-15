@@ -5,11 +5,8 @@ import arrow.core.Left
 import arrow.core.None
 import arrow.core.Some
 import arrow.core.Tuple2
-import arrow.effects.extensions.fx.async.async
-import arrow.effects.extensions.fx.concurrent.concurrent
 import arrow.effects.extensions.io.async.async
 import arrow.effects.extensions.io.concurrent.concurrent
-import arrow.effects.suspended.fx.Fx
 import arrow.effects.typeclasses.Concurrent
 import arrow.test.UnitSpec
 import arrow.test.generators.throwable
@@ -173,9 +170,7 @@ class PromiseTest : UnitSpec() {
       }
     }
 
-    IO.concurrent().tests("IO - CancelablePromise", EQ = IO_EQ(), promise = Promise(IO.concurrent()))
-    IO.concurrent().tests("IO - UncancelablePromise", EQ = IO_EQ(), promise = Promise.uncancelable(IO.async()))
-    Fx.concurrent().tests("Fx - CancelablePromise", EQ = EQ(), promise = Promise(Fx.concurrent()))
-    Fx.concurrent().tests("Fx - UncancelablePromise", EQ = EQ(), promise = Promise.uncancelable(Fx.async()))
+    IO.concurrent().tests("IO - CancelablePromise", EQ = EQ(), promise = Promise(IO.concurrent()))
+    IO.concurrent().tests("IO - UncancelablePromise", EQ = EQ(), promise = Promise.uncancelable(IO.async()))
   }
 }

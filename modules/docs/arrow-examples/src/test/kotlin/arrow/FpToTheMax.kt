@@ -102,8 +102,7 @@ object FpToTheMax {
     val module = IO.monadDefer().run {
       MonadAndConsoleRandom(this, ConsoleImpl(this), FRandomImpl(this))
     }
-    val r = module.fMain()
-    r.fix().unsafeRunSync()
+    IO.unsafeRunBlocking(module.fMain())
   }
 
   fun test(): List<String> = run {

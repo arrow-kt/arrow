@@ -6,7 +6,6 @@ import arrow.Kind
 import arrow.effects.IO
 import arrow.effects.ForIO
 import arrow.effects.extensions.io.async.async
-import arrow.effects.fix
 import arrow.effects.typeclasses.Async
 import arrow.typeclasses.DaoDatabase
 import arrow.typeclasses.Index
@@ -27,7 +26,7 @@ class MyViewModel<F>(dep: RequestOperationsAsync<F>) : RequestOperationsAsync<F>
 
 class MyActivity {
   fun onStart() {
-    dependenciesAsValues.run { 1.fetchUser() }.fix().unsafeRunSync()
+    IO.unsafeRunBlocking(dependenciesAsValues.run { 1.fetchUser() })
 
     runBlocking { dependenciesAsValues.fetchUser(1) }
 

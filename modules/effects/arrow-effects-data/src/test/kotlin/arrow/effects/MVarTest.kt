@@ -7,13 +7,9 @@ import arrow.core.Tuple2
 import arrow.core.Tuple3
 import arrow.core.Tuple4
 import arrow.core.Tuple7
-import arrow.effects.extensions.fx.async.async
-import arrow.effects.extensions.fx.concurrent.concurrent
-import arrow.effects.extensions.fx.fx.fx
 import arrow.effects.extensions.io.concurrent.concurrent
 import arrow.effects.extensions.io.async.async
 import arrow.effects.extensions.io.fx.fx
-import arrow.effects.suspended.fx.Fx
 import arrow.test.UnitSpec
 import arrow.test.laws.equalUnderTheLaw
 import arrow.typeclasses.Eq
@@ -169,9 +165,7 @@ class MVarTest : UnitSpec() {
       }
     }
 
-    IO.fx().tests("IO - UncancelableMVar", IO_EQ(), MVar.factoryUncancelable(IO.async()))
-    IO.fx().tests("IO - CancelableMVar", IO_EQ(), MVar.factoryCancelable(IO.concurrent()))
-    Fx.fx().tests("Fx - UncancelableMVar", EQ(), MVar.factoryUncancelable(Fx.async()))
-    Fx.fx().tests("Fx - CancelableMVar", EQ(), MVar.factoryCancelable(Fx.concurrent()))
+    IO.fx().tests("IO - UncancelableMVar", EQ(), MVar.factoryUncancelable(IO.async()))
+    IO.fx().tests("IO - CancelableMVar", EQ(), MVar.factoryCancelable(IO.concurrent()))
   }
 }

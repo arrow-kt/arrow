@@ -8,8 +8,6 @@ import arrow.effects.IO
 import arrow.effects.IOOf
 import arrow.effects.OnCancel
 import arrow.effects.fix
-import arrow.effects.racePair
-import arrow.effects.raceTriple
 import arrow.effects.toIOProc
 import arrow.effects.toIOProcF
 import arrow.effects.typeclasses.Async
@@ -43,7 +41,6 @@ import arrow.unsafe
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.startCoroutine
-import arrow.effects.ap as ioAp
 import arrow.effects.handleErrorWith as ioHandleErrorWith
 
 @extension
@@ -58,7 +55,7 @@ interface IOApply : Apply<ForIO> {
     fix().map(f)
 
   override fun <A, B> IOOf<A>.ap(ff: IOOf<(A) -> B>): IO<B> =
-    ioAp(ff)
+    fix().ap(ff)
 }
 
 @extension
@@ -70,7 +67,7 @@ interface IOApplicative : Applicative<ForIO> {
     IO.just(a)
 
   override fun <A, B> IOOf<A>.ap(ff: IOOf<(A) -> B>): IO<B> =
-    ioAp(ff)
+    fix().ap(ff)
 }
 
 @extension
@@ -106,7 +103,7 @@ interface IOMonadError : MonadError<ForIO, Throwable>, IOApplicativeError, IOMon
   override fun <A> just(a: A): IO<A> = IO.just(a)
 
   override fun <A, B> IOOf<A>.ap(ff: IOOf<(A) -> B>): IO<B> =
-    ioAp(ff)
+    fix().ap(ff)
 
   override fun <A, B> IOOf<A>.map(f: (A) -> B): IO<B> =
     fix().map(f)
@@ -202,7 +199,7 @@ interface IOEffect : Effect<ForIO>, IOAsync {
 interface IOConcurrentEffect : ConcurrentEffect<ForIO>, IOEffect, IOConcurrent {
 
   override fun <A> IOOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Disposable> =
-    fix().runAsyncCancellable(OnCancel.ThrowCancellationException, cb)
+    IO.runNonBlockingCancellable(this, OnCancel.ThrowCancellationException, cb)
 }
 
 fun IO.Companion.concurrentEffect(dispatchers: Dispatchers<ForIO>): ConcurrentEffect<ForIO> = object : IOConcurrentEffect {
@@ -231,8 +228,8 @@ interface IOMonoid<A> : Monoid<IO<A>>, IOSemigroup<A> {
 @extension
 interface IOUnsafeRun : UnsafeRun<ForIO> {
 
-  override suspend fun <A> unsafe.runBlocking(fa: () -> Kind<ForIO, A>): A = fa().fix().unsafeRunSync()
+  override suspend fun <A> unsafe.runBlocking(fa: () -> Kind<ForIO, A>): A = IO.unsafeRunBlocking(fa())
 
   override suspend fun <A> unsafe.runNonBlocking(fa: () -> Kind<ForIO, A>, cb: (Either<Throwable, A>) -> Unit) =
-    fa().fix().unsafeRunAsync(cb)
+    IO.unsafeRunNonBlocking(fa(), cb)
 }

@@ -2,9 +2,7 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.data.extensions.list.traverse.sequence
-import arrow.effects.extensions.fx.fx.fx
 import arrow.effects.extensions.io.fx.fx
-import arrow.effects.suspended.fx.Fx
 import arrow.test.UnitSpec
 import arrow.test.generators.functionAToB
 import arrow.test.laws.equalUnderTheLaw
@@ -159,7 +157,6 @@ class RefTest : UnitSpec() {
       }
     }
 
-    IO.fx().tests("IO", IO_EQ()) { it.update(Int::inc).fix().unsafeRunSync() }
-    Fx.fx().tests("Fx", EQ()) { Fx.unsafeRunBlocking(it.update(Int::inc)) }
+    IO.fx().tests("IO", EQ()) { IO.unsafeRunBlocking(it.update(Int::inc)) }
   }
 }

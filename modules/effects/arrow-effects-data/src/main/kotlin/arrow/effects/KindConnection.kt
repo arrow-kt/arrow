@@ -8,7 +8,8 @@ import java.util.concurrent.atomic.AtomicReference
 
 typealias CancelToken<F> = Kind<F, Unit>
 
-enum class OnCancel { ThrowCancellationException, Silent;
+enum class OnCancel {
+  ThrowCancellationException, Silent;
 
   companion object {
     val CancellationException = arrow.effects.ConnectionCancellationException

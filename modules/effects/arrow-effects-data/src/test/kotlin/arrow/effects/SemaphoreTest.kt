@@ -4,11 +4,8 @@ import arrow.Kind
 import arrow.core.extensions.eq
 import arrow.core.toT
 import arrow.data.extensions.list.traverse.traverse
-import arrow.effects.extensions.fx.async.async
-import arrow.effects.extensions.fx.concurrent.concurrent
 import arrow.effects.extensions.io.async.async
 import arrow.effects.extensions.io.concurrent.concurrent
-import arrow.effects.suspended.fx.Fx
 import arrow.effects.typeclasses.Concurrent
 import arrow.test.UnitSpec
 import arrow.test.laws.equalUnderTheLaw
@@ -148,10 +145,7 @@ class SemaphoreTest : UnitSpec() {
       }
     }
 
-    IO.concurrent().tests("IO - UncancelableSemaphore", IO_EQ()) { Semaphore.uncancelable(it, IO.async()) }
-    IO.concurrent().tests("IO - CancelableSemaphore", IO_EQ()) { Semaphore(it, IO.concurrent()) }
-
-    Fx.concurrent().tests("Fx - UncancelableSemaphore", EQ()) { Semaphore.uncancelable(it, Fx.async()) }
-    Fx.concurrent().tests("Fx - CancelableSemaphore", EQ()) { Semaphore(it, Fx.concurrent()) }
+    IO.concurrent().tests("IO - UncancelableSemaphore", EQ()) { Semaphore.uncancelable(it, IO.async()) }
+    IO.concurrent().tests("IO - CancelableSemaphore", EQ()) { Semaphore(it, IO.concurrent()) }
   }
 }

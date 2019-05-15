@@ -2,9 +2,6 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.core.extensions.either.eq.eq
-import arrow.effects.suspended.fx.ForFx
-import arrow.effects.suspended.fx.Fx
-import arrow.effects.suspended.fx.fix
 import arrow.typeclasses.Eq
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.SynchronousQueue
@@ -13,11 +10,14 @@ import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 
-fun <A> EQ(EQA: Eq<A> = Eq.any()): Eq<Kind<ForFx, A>> = Eq { a, b ->
+fun <A> EQ(EQA: Eq<A> = Eq.any()): Eq<Kind<ForIO, A>> = Eq { a, b ->
   arrow.core.Either.eq(Eq.any(), EQA).run {
-    Fx.unsafeRunBlocking(a.fix().attempt()).eqv(Fx.unsafeRunBlocking(b.fix().attempt()))
+    IO.unsafeRunBlocking(a.fix().attempt()).eqv(IO.unsafeRunBlocking(b.fix().attempt()))
   }
 }
+
+fun <A> IOOf<A>.unsafeRunSync(): A =
+  IO.unsafeRunBlocking(this)
 
 class CountingThreadFactory(val name: String) : ThreadFactory {
   private val counter = AtomicInteger()

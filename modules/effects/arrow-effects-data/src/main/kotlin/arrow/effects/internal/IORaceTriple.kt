@@ -1,12 +1,14 @@
-package arrow.effects.suspended.fx
+package arrow.effects.internal
 
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
 import arrow.core.Tuple3
-import arrow.effects.internal.Platform
-import arrow.effects.internal.UnsafePromise
-import arrow.effects.internal.asyncContinuation
+import arrow.effects.ForIO
+import arrow.effects.IOConnection
+import arrow.effects.FxFiber
+import arrow.effects.IO
+import arrow.effects.IOOf
 import arrow.effects.typeclasses.RaceTriple
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.Continuation
@@ -14,15 +16,15 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine
 import kotlin.coroutines.suspendCoroutine
 
-interface FxRaceTriple {
+interface IORaceTriple {
 
   /**
-   * Race two tasks concurrently within a new [Fx].
+   * Race two tasks concurrently within a new [IO].
    * Race results in a winner and the other, yet to finish task running in a [Fiber].
    *
    * ```kotlin:ank:playground
-   * import arrow.effects.suspended.fx.ForFx
-   * import arrow.effects.suspended.fx.Fx
+   * import arrow.effects.suspended.fx.ForIO
+   * import arrow.effects.suspended.fx.IO
    * import arrow.effects.typeclasses.Fiber
    * import arrow.effects.typeclasses.fold
    * import kotlinx.coroutines.Dispatchers
@@ -30,37 +32,37 @@ interface FxRaceTriple {
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val result = Fx.raceTriple<Int, String, Double>(Dispatchers.Default, Fx.never, Fx { "I won the race" }, Fx.never).flatMap {
+   *   val result = IO.raceTriple<Int, String, Double>(Dispatchers.Default, IO.never, IO { "I won the race" }, IO.never).flatMap {
    *     it.fold(
-   *       { Fx.raiseError<String>(RuntimeException("Fx.never cannot win")) },
-   *       { (_: Fiber<ForFx, Int>, res: String, _: Fiber<ForFx, Double>) -> Fx.just(res) },
-   *       { Fx.raiseError(RuntimeException("Fx.never cannot win")) }
+   *       { IO.raiseError<String>(RuntimeException("IO.never cannot win")) },
+   *       { (_: Fiber<ForIO, Int>, res: String, _: Fiber<ForIO, Double>) -> IO.just(res) },
+   *       { IO.raiseError(RuntimeException("IO.never cannot win")) }
    *     )
    *   }
    *   //sampleEnd
-   *   println(Fx.unsafeRunBlocking(result))
+   *   println(IO.unsafeRunBlocking(result))
    * }
    * ```
    *
-   * @param ctx [CoroutineContext] to execute the source [Fx] on.
+   * @param ctx [CoroutineContext] to execute the source [IO] on.
    * @param fa task to participate in the race
    * @param fb task to participate in the race
-   * @return [Fx] of [RaceTriple] which exposes a fold method to fold over the racing results in a elegant way.
+   * @return [IO] of [RaceTriple] which exposes a fold method to fold over the racing results in a elegant way.
    */
-  fun <A, B, C> raceTriple(ctx: CoroutineContext, fa: FxOf<A>, fb: FxOf<B>, fc: FxOf<C>): Fx<RaceTriple<ForFx, A, B, C>> = Fx.async { conn, cb ->
+  fun <A, B, C> raceTriple(ctx: CoroutineContext, fa: IOOf<A>, fb: IOOf<B>, fc: IOOf<C>): IO<RaceTriple<ForIO, A, B, C>> = IO.async { conn, cb ->
     val active = AtomicBoolean(true)
 
-    val upstreamCancelToken = Fx.defer { if (conn.isCanceled()) Fx.unit else conn.cancel() }
+    val upstreamCancelToken = IO.defer { if (conn.isCanceled()) IO.unit else conn.cancel() }
 
-    val connA = FxConnection()
+    val connA = IOConnection()
     connA.push(upstreamCancelToken)
     val promiseA = UnsafePromise<A>()
 
-    val connB = FxConnection()
+    val connB = IOConnection()
     connB.push(upstreamCancelToken)
     val promiseB = UnsafePromise<B>()
 
-    val connC = FxConnection()
+    val connC = IOConnection()
     connC.push(upstreamCancelToken)
     val promiseC = UnsafePromise<C>()
 
@@ -68,7 +70,7 @@ interface FxRaceTriple {
 
     suspend {
       suspendCoroutine { ca: Continuation<A> ->
-        FxRunLoop.startCancelable(fa, connA, ctx) { either: Either<Throwable, A> ->
+        IORunLoop.startCancelable(fa, connA, ctx) { either: Either<Throwable, A> ->
           either.fold({ error ->
             ca.resumeWith(Result.failure(error))
           }, { a ->
@@ -79,8 +81,8 @@ interface FxRaceTriple {
     }.startCoroutine(asyncContinuation(ctx) { either ->
       either.fold({ error ->
         if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-          FxRunLoop.start(connB.cancel()) { r2 ->
-            FxRunLoop.start(connC.cancel()) { r3 ->
+          IORunLoop.start(connB.cancel()) { r2 ->
+            IORunLoop.start(connC.cancel()) { r3 ->
               conn.pop()
               val errorResult = r2.fold(ifLeft = { e2 ->
                 r3.fold(ifLeft = { e3 -> Platform.composeErrors(error, e2, e3) }, ifRight = { Platform.composeErrors(error, e2) })
@@ -105,7 +107,7 @@ interface FxRaceTriple {
 
     suspend {
       suspendCoroutine { ca: Continuation<B> ->
-        FxRunLoop.startCancelable(fb, connB, ctx) { either: Either<Throwable, B> ->
+        IORunLoop.startCancelable(fb, connB, ctx) { either: Either<Throwable, B> ->
           either.fold({ error ->
             ca.resumeWith(Result.failure(error))
           }, { b ->
@@ -116,8 +118,8 @@ interface FxRaceTriple {
     }.startCoroutine(asyncContinuation(ctx) { either ->
       either.fold({ error ->
         if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-          FxRunLoop.start(connA.cancel()) { r2 ->
-            FxRunLoop.start(connC.cancel()) { r3 ->
+          IORunLoop.start(connA.cancel()) { r2 ->
+            IORunLoop.start(connC.cancel()) { r3 ->
               conn.pop()
               val errorResult = r2.fold(ifLeft = { e2 ->
                 r3.fold(ifLeft = { e3 -> Platform.composeErrors(error, e2, e3) }, ifRight = { Platform.composeErrors(error, e2) })
@@ -142,7 +144,7 @@ interface FxRaceTriple {
 
     suspend {
       suspendCoroutine { ca: Continuation<C> ->
-        FxRunLoop.startCancelable(fc, connC, ctx) { either: Either<Throwable, C> ->
+        IORunLoop.startCancelable(fc, connC, ctx) { either: Either<Throwable, C> ->
           either.fold({ error ->
             ca.resumeWith(Result.failure(error))
           }, { c ->
@@ -153,8 +155,8 @@ interface FxRaceTriple {
     }.startCoroutine(asyncContinuation(ctx) { either ->
       either.fold({ error ->
         if (active.getAndSet(false)) { // if an error finishes first, stop the race.
-          FxRunLoop.start(connA.cancel()) { r2 ->
-            FxRunLoop.start(connB.cancel()) { r3 ->
+          IORunLoop.start(connA.cancel()) { r2 ->
+            IORunLoop.start(connB.cancel()) { r3 ->
               conn.pop()
               val errorResult = r2.fold(ifLeft = { e2 ->
                 r3.fold(ifLeft = { e3 -> Platform.composeErrors(error, e2, e3) }, ifRight = { Platform.composeErrors(error, e2) })
