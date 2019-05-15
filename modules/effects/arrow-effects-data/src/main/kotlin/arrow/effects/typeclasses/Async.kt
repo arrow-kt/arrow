@@ -4,8 +4,11 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Right
 import arrow.documented
+import arrow.effects.internal.asyncContinuation
 import arrow.typeclasses.MonadContinuation
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.coroutines.startCoroutine
 
 /** A asynchronous computation that might fail. **/
 typealias ProcF<F, A> = ((Either<Throwable, A>) -> Unit) -> Kind<F, Unit>
@@ -144,6 +147,33 @@ interface Async<F> : MonadDefer<F> {
       } catch (t: Throwable) {
         t.raiseNonFatal<A>()
       }
+    }
+
+  /**
+   * Delay a suspended effect on provided [CoroutineContext].
+   *
+   * @param ctx [CoroutineContext] to run evaluation on.
+   *
+   * ```kotlin:ank:playground:extension
+   * _imports_
+   * import kotlinx.coroutines.Dispatchers
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   suspend fun getThreadSuspended(): String = Thread.currentThread().name
+   *
+   *   fun <F> Async<F>.invokeOnDefaultDispatcher(): Kind<F, String> =
+   *     _effect_(Dispatchers.Default, { getThreadSuspended() })
+   *
+   *   val result = _extensionFactory_.invokeOnDefaultDispatcher()
+   *   //sampleEnd
+   *   println(result)
+   * }
+   * ```
+   */
+  fun <A> effect(ctx: CoroutineContext = EmptyCoroutineContext, f: suspend () -> A) : Kind<F, A> =
+    async {
+      f.startCoroutine(asyncContinuation(ctx, it))
     }
 
   /**
