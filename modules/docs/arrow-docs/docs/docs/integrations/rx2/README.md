@@ -92,19 +92,19 @@ suspend fun sideEffect(): Unit = println("Hello!")
 ```
 
 
-```kotlin:ank
+```kotlin
 ObservableK.async().effect {
  sideEffect()
 }
 ```
 
-```kotlin:ank
+```kotlin
 SingleK.async().effect {
  sideEffect()
 }
 ```
 
-```kotlin:ank
+```kotlin
 FlowableK.async().effect {
  sideEffect()
 }
