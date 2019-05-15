@@ -8,6 +8,7 @@ import arrow.core.identity
 import arrow.effects.CancelToken
 import arrow.effects.MVar
 import arrow.effects.Promise
+import arrow.effects.Ref
 import arrow.effects.Semaphore
 import arrow.effects.typeclasses.Concurrent
 import arrow.effects.typeclasses.ExitCase
@@ -38,7 +39,7 @@ object ConcurrentLaws {
     AsyncLaws.laws(CF, EQ, EQ_EITHER, testStackSafety) + listOf(
       Law("Concurrent Laws: cancel on bracket releases") { CF.cancelOnBracketReleases(EQ, ctx) },
       Law("Concurrent Laws: acquire is not cancelable") { CF.acquireBracketIsNotCancelable(EQ, ctx) },
-      Law("Concurrent Laws: release is not cancelable") { CF.releaseBracketIsNotCancelable(EQ, ctx) },
+      Law("Concurrent Laws: release is not cancelable") { CF.releaseBracketIsNotCancelable(EQ) },
       Law("Concurrent Laws: async cancelable coherence") { CF.asyncCancelableCoherence(EQ) },
       Law("Concurrent Laws: cancelable cancelableF coherence") { CF.cancelableCancelableFCoherence(EQ) },
       Law("Concurrent Laws: cancelable should run CancelToken on cancel") { CF.cancelableReceivesCancelSignal(EQ, ctx) },
@@ -85,7 +86,7 @@ object ConcurrentLaws {
         val exitLatch = Promise<F, Int>(this@cancelOnBracketReleases).bind() // A promise that `release` was executed
 
         val (_, cancel) = just(i).bracketCase(
-          use = { a -> startLatch.complete(a).flatMap { never<Int>() } },
+          use = { a -> startLatch.complete(a).followedBy(never<Int>()) },
           release = { r, exitCase ->
             when (exitCase) {
               is ExitCase.Canceled -> exitLatch.complete(r) // Fulfil promise that `release` was executed with Canceled
@@ -119,24 +120,29 @@ object ConcurrentLaws {
       }.a.equalUnderTheLaw(just(b), EQ)
     }
 
-  fun <F> Concurrent<F>.releaseBracketIsNotCancelable(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
-    forAll(Gen.int(), Gen.int()) { a, b ->
+  fun <F> Concurrent<F>.releaseBracketIsNotCancelable(EQ: Eq<Kind<F, Int>>) =
+    forAll(Gen.int()) { a ->
       bindingCancellable {
-        val mvar = MVar(a, this@releaseBracketIsNotCancelable).bind()
-        val p = Promise<F, Unit>(this@releaseBracketIsNotCancelable).bind()
+        val ref = Ref(this@releaseBracketIsNotCancelable) { a } .bind()
+        val startLatch = Promise<F, Unit>(this@releaseBracketIsNotCancelable).bind()
+        val cancelLatch = Promise<F, Unit>(this@releaseBracketIsNotCancelable).bind()
+        val endLatch  = Promise<F, Unit>(this@releaseBracketIsNotCancelable).bind()
 
         val task = unit()
-          .bracket(use = { never<Int>() }, release = { mvar.put(b) })
+          .bracket(use = { unit() }, release = {
+            startLatch.complete(Unit)
+              .followedBy(cancelLatch.get())
+              .followedBy(ref.update(Int::inc))
+              .followedBy(endLatch.complete(Unit))
+          })
 
         val (_, cancel) = task.fork().bind()
-        p.get().bind()
+        startLatch.get().bind()
         cancel.fork().bind()
-        shift().bind()
-        val aa = mvar.take().fork().bind()
-        val bb = mvar.take().fork().bind()
-        aa.join().bind()
-        bb.join().bind()
-      }.a.equalUnderTheLaw(just(b), EQ)
+        cancelLatch.complete(Unit).bind()
+        endLatch.get().bind()
+        ref.get().bind()
+      }.a.equalUnderTheLaw(just(a + 1), EQ)
     }
 
   fun <F> Concurrent<F>.asyncCancelableCoherence(EQ: Eq<Kind<F, Int>>): Unit =
