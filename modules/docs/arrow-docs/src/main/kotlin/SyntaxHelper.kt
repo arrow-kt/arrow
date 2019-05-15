@@ -3,6 +3,8 @@ package com.example.domain
 import arrow.data.ListK
 import arrow.data.MapK
 import arrow.optics.optics
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 
 @optics
 data class Street(val number: Int, val name: String) {
@@ -56,3 +58,7 @@ data class HttpError(val message: String) : NetworkError() {
 }
 
 object TimeoutError : NetworkError()
+
+fun main() = runBlocking {
+  delay(1000)
+}
