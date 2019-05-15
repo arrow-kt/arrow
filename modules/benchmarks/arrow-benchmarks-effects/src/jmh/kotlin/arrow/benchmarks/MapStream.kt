@@ -4,7 +4,6 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import arrow.effects.IO
-import arrow.effects.suspended.fx.Fx
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.CompilerControl
 import org.openjdk.jmh.annotations.Fork
@@ -22,22 +21,13 @@ import java.util.concurrent.TimeUnit
 open class MapStream {
 
   @Benchmark
-  fun fxOne(): Long = Fx.unsafeRunBlocking(FxStream.test(12000, 1))
+  fun ioOne(): Long = IO.unsafeRunBlocking(IOStream.test(12000, 1))
 
   @Benchmark
-  fun fx30(): Long = Fx.unsafeRunBlocking(FxStream.test(1000, 30))
+  fun io30(): Long = IO.unsafeRunBlocking(IOStream.test(1000, 30))
 
   @Benchmark
-  fun fx120(): Long = Fx.unsafeRunBlocking(FxStream.test(100, 120))
-
-  @Benchmark
-  fun ioOne(): Long = IOStream.test(12000, 1).unsafeRunSync()
-
-  @Benchmark
-  fun io30(): Long = IOStream.test(1000, 30).unsafeRunSync()
-
-  @Benchmark
-  fun io120(): Long = IOStream.test(100, 120).unsafeRunSync()
+  fun io120(): Long = IO.unsafeRunBlocking(IOStream.test(100, 120))
 
   @Benchmark
   fun zioOne(): Long =
@@ -62,40 +52,6 @@ open class MapStream {
   @Benchmark
   fun catsBatch120(): Long =
     arrow.benchmarks.effects.scala.cats.`MapStream$`.`MODULE$`.test(12000 / 120, 120)
-}
-
-object FxStream {
-  class Stream(val value: Int, val next: Fx<Option<Stream>>)
-  val addOne: (Int) -> Int = { it + 1 }
-
-  fun test(times: Int, batchSize: Int): Fx<Long> {
-    var stream = range(0, times)
-    var i = 0
-    while (i < batchSize) {
-      stream = mapStream(addOne)(stream)
-      i += 1
-    }
-
-    return sum(0)(stream)
-  }
-
-  private fun range(from: Int, until: Int): Option<Stream> =
-    if (from < until) Some(Stream(from, Fx.lazy { range(from + 1, until) }))
-    else None
-
-  private fun mapStream(f: (Int) -> Int): (box: Option<Stream>) -> Option<Stream> = { box ->
-    when (box) {
-      is Some -> box.copy(Stream(f(box.t.value), box.t.next.map(mapStream(f))))
-      None -> None
-    }
-  }
-
-  private fun sum(acc: Long): (Option<Stream>) -> Fx<Long> = { box ->
-    when (box) {
-      is Some -> box.t.next.flatMap(sum(acc + box.t.value))
-      None -> Fx.just(acc)
-    }
-  }
 }
 
 object IOStream {

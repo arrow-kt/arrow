@@ -1,7 +1,6 @@
 package arrow.benchmarks
 
 import arrow.effects.IO
-import arrow.effects.suspended.fx.Fx
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.CompilerControl
 import org.openjdk.jmh.annotations.Fork
@@ -27,16 +26,7 @@ open class Defer {
       if (j > size) IO.defer { IO.just(j) } else ioDeferLoop(j + 1)
     }
 
-  fun fxDeferLoop(i: Int): Fx<Int> =
-    Fx.defer { Fx.just(i) }.flatMap { j ->
-      if (j > size) Fx.defer { Fx.just(j) } else fxDeferLoop(j + 1)
-    }
-
-  @Benchmark
-  fun fx(): Int =
-    Fx.unsafeRunBlocking(fxDeferLoop(0))
-
   @Benchmark
   fun io(): Int =
-    ioDeferLoop(0).unsafeRunSync()
+    IO.unsafeRunBlocking(ioDeferLoop(0))
 }

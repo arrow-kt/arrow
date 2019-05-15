@@ -1,7 +1,6 @@
 package arrow.benchmarks
 
 import arrow.effects.IO
-import arrow.effects.suspended.fx.Fx
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.CompilerControl
 import org.openjdk.jmh.annotations.Fork
@@ -22,23 +21,14 @@ open class Delay {
   @Param("3000")
   var size: Int = 0
 
-  private fun fxDelayLoop(i: Int): Fx<Int> =
-    Fx.lazy { i }.flatMap { j ->
-      if (j > size) Fx.lazy { j } else fxDelayLoop(j + 1)
-    }
-
   private fun ioDelayLoop(i: Int): IO<Int> =
     IO { i }.flatMap { j ->
       if (j > size) IO { j } else ioDelayLoop(j + 1)
     }
 
   @Benchmark
-  fun fx(): Int =
-    Fx.unsafeRunBlocking(fxDelayLoop(0))
-
-  @Benchmark
   fun io(): Int =
-    ioDelayLoop(0).unsafeRunSync()
+    IO.unsafeRunBlocking(ioDelayLoop(0))
 
   @Benchmark
   fun catsIO(): Int =

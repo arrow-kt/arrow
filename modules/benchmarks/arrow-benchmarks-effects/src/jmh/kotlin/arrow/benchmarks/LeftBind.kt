@@ -1,7 +1,6 @@
 package arrow.benchmarks
 
 import arrow.effects.IO
-import arrow.effects.suspended.fx.Fx
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.CompilerControl
 import org.openjdk.jmh.annotations.Fork
@@ -25,23 +24,14 @@ open class LeftBind {
   @Param("100")
   var depth: Int = 0
 
-  fun fxLoop(i: Int): Fx<Int> =
-    if (i % depth == 0) Fx.lazy { i + 1 }.flatMap { fxLoop(it) }
-    else if (i < size) fxLoop(i + 1).flatMap { i -> Fx.just(i) }
-    else Fx.just(i)
-
   fun ioLoop(i: Int): IO<Int> =
     if (i % depth == 0) IO { i + 1 }.flatMap { ioLoop(it) }
     else if (i < size) ioLoop(i + 1).flatMap { i -> IO.just(i) }
     else IO.just(i)
 
   @Benchmark
-  fun fx(): Int =
-    Fx.unsafeRunBlocking(Fx.just(0).flatMap { fxLoop(it) })
-
-  @Benchmark
   fun io(): Int =
-    IO.just(0).flatMap { ioLoop(it) }.unsafeRunSync()
+    IO.unsafeRunBlocking(IO.just(0).flatMap { ioLoop(it) })
 
   @Benchmark
   fun catsIO(): Int =

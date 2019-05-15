@@ -123,10 +123,10 @@ object ConcurrentLaws {
   fun <F> Concurrent<F>.releaseBracketIsNotCancelable(EQ: Eq<Kind<F, Int>>) =
     forAll(Gen.int()) { a ->
       bindingCancellable {
-        val ref = Ref(this@releaseBracketIsNotCancelable) { a } .bind()
+        val ref = Ref(this@releaseBracketIsNotCancelable) { a }.bind()
         val startLatch = Promise<F, Unit>(this@releaseBracketIsNotCancelable).bind()
         val cancelLatch = Promise<F, Unit>(this@releaseBracketIsNotCancelable).bind()
-        val endLatch  = Promise<F, Unit>(this@releaseBracketIsNotCancelable).bind()
+        val endLatch = Promise<F, Unit>(this@releaseBracketIsNotCancelable).bind()
 
         val task = unit()
           .bracket(use = { unit() }, release = {

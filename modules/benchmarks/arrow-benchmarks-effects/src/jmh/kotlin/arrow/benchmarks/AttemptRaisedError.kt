@@ -1,7 +1,6 @@
 package arrow.benchmarks
 
 import arrow.effects.IO
-import arrow.effects.suspended.fx.Fx
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.CompilerControl
 import org.openjdk.jmh.annotations.Fork
@@ -27,13 +26,6 @@ open class AttemptRaisedError {
   @Param("10000")
   var size: Int = 0
 
-  private fun fxLoopNotHappy(size: Int, i: Int): Fx<Int> =
-    if (i < size) {
-      Fx.lazy { throw dummy }.attempt().flatMap {
-        it.fold({ fxLoopNotHappy(size, i + 1) }, Fx.Companion::just)
-      }
-    } else Fx.just(1)
-
   private fun ioLoopNotHappy(size: Int, i: Int): IO<Int> =
     if (i < size) {
       IO { throw dummy }.attempt().flatMap {
@@ -42,12 +34,8 @@ open class AttemptRaisedError {
     } else IO.just(1)
 
   @Benchmark
-  fun fx(): Int =
-    Fx.unsafeRunBlocking(fxLoopNotHappy(size, 0))
-
-  @Benchmark
   fun io(): Int =
-    ioLoopNotHappy(size, 0).unsafeRunSync()
+    IO.unsafeRunBlocking(ioLoopNotHappy(size, 0))
 
   @Benchmark
   fun cats(): Any =

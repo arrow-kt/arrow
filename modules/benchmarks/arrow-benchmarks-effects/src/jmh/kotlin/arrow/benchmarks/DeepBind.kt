@@ -1,7 +1,6 @@
 package arrow.benchmarks
 
 import arrow.effects.IO
-import arrow.effects.suspended.fx.Fx
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.CompilerControl
 import org.openjdk.jmh.annotations.Fork
@@ -28,19 +27,9 @@ open class DeepBind {
       ioFib(n - 2).flatMap { b -> IO { a + b } }
     }
 
-  fun fxFib(n: Int): Fx<Int> =
-    if (n <= 1) Fx { n }
-    else fxFib(n - 1).flatMap { a ->
-      fxFib(n - 2).flatMap { b -> Fx { a + b } }
-    }
-
-  @Benchmark
-  fun fx(): Int =
-    Fx.unsafeRunBlocking(fxFib(depth))
-
   @Benchmark
   fun io(): Int =
-    ioFib(depth).unsafeRunSync()
+    IO.unsafeRunBlocking(ioFib(depth))
 
   @Benchmark
   fun cats(): Any =

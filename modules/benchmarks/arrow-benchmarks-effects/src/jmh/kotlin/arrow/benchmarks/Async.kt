@@ -1,9 +1,7 @@
 package arrow.benchmarks
 
 import arrow.effects.IO
-import arrow.effects.extensions.NonBlocking
-import arrow.effects.extensions.io.monad.followedBy
-import arrow.effects.suspended.fx.Fx
+import arrow.effects.IODispatchers
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.CompilerControl
 import org.openjdk.jmh.annotations.Fork
@@ -24,23 +22,14 @@ open class Async {
   @Param("3000")
   var size: Int = 0
 
-  private fun fxAsyncLoop(i: Int): Fx<Int> =
-    Fx.unit.continueOn(NonBlocking).followedBy(
-      if (i > size) Fx.just(i) else fxAsyncLoop(i + 1)
-    )
-
   private fun ioAsyncLoop(i: Int): IO<Int> =
-    IO.unit.continueOn(NonBlocking).followedBy(
+    IO.unit.continueOn(IODispatchers.CommonPool).followedBy(
       if (i > size) IO.just(i) else ioAsyncLoop(i + 1)
     )
 
   @Benchmark
-  fun fx(): Int =
-    Fx.unsafeRunBlocking(fxAsyncLoop(0))
-
-  @Benchmark
   fun io(): Int =
-    ioAsyncLoop(0).unsafeRunSync()
+    IO.unsafeRunBlocking(ioAsyncLoop(0))
 
   @Benchmark
   fun catsIO(): Int =

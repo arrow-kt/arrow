@@ -1,7 +1,6 @@
 package arrow.benchmarks
 
 import arrow.effects.IO
-import arrow.effects.suspended.fx.Fx
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.CompilerControl
 import org.openjdk.jmh.annotations.Fork
@@ -26,13 +25,6 @@ open class Uncancellable {
     if (i < size) IO { i + 1 }.uncancelable().flatMap { ioUncancelableLoop(it) }
     else IO.just(i)
 
-  fun fxUncancelableLoop(i: Int): Fx<Int> =
-    if (i < size) Fx.lazy { i + 1 }.uncancelable().flatMap { fxUncancelableLoop(it) }
-    else Fx.just(i)
-
   @Benchmark
-  fun io(): Int = ioUncancelableLoop(0).unsafeRunSync()
-
-  @Benchmark
-  fun fx(): Int = Fx.unsafeRunBlocking(fxUncancelableLoop(0))
+  fun io(): Int = IO.unsafeRunBlocking(ioUncancelableLoop(0))
 }

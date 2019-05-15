@@ -1,8 +1,6 @@
 package arrow.benchmarks
 
 import arrow.effects.IO
-import arrow.effects.suspended.fx.Fx
-import arrow.unsafe
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.CompilerControl
 import org.openjdk.jmh.annotations.Fork
@@ -12,9 +10,7 @@ import org.openjdk.jmh.annotations.Scope
 import org.openjdk.jmh.annotations.State
 import org.openjdk.jmh.annotations.Warmup
 import java.util.concurrent.TimeUnit
-import arrow.effects.extensions.fx.unsafeRun.runBlocking as fxRunBlocking
 import arrow.effects.extensions.io.applicativeError.handleErrorWith as ioHandleError
-import arrow.effects.suspended.fx.handleErrorWith as fxHandleError
 
 @State(Scope.Thread)
 @Fork(2)
@@ -37,20 +33,7 @@ open class HandleRaisedError {
     else
       IO.just(i)
 
-  private fun fxErrorRaisedloop(i: Int): Fx<Int> =
-    if (i < size)
-      Fx.raiseError<Int>(dummy)
-        .flatMap { x -> Fx.just(x + 1) }
-        .flatMap { x -> Fx.just(x + 1) }
-        .fxHandleError { fxErrorRaisedloop(i + 1) }
-    else
-      Fx.just(i)
-
   @Benchmark
   fun io(): Int =
-    ioErrorRaisedloop(0).unsafeRunSync()
-
-  @Benchmark
-  fun fx(): Int =
-    unsafe { fxRunBlocking { fxErrorRaisedloop(0) } }
+    IO.unsafeRunBlocking(ioErrorRaisedloop(0))
 }

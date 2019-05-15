@@ -1,11 +1,8 @@
 package arrow.benchmarks
 
 import arrow.effects.IO
-import arrow.effects.extensions.NonBlocking
+import arrow.effects.IODispatchers
 import arrow.effects.fix
-import arrow.effects.fork
-import arrow.effects.suspended.fx.Fx
-import arrow.effects.suspended.fx.fix
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.CompilerControl
 import org.openjdk.jmh.annotations.Fork
@@ -26,25 +23,14 @@ open class ForkFiber {
   @Param("100")
   var size: Int = 0
 
-  private fun fxStartLoop(i: Int): Fx<Int> =
-    if (i < size) {
-      Fx { i + 1 }.fork(NonBlocking).flatMap { fiber ->
-        fiber.join().fix().flatMap { fxStartLoop(it) }
-      }
-    } else Fx.just(i)
-
   private fun ioStartLoop(i: Int): IO<Int> =
     if (i < size) {
-      IO { i + 1 }.fork(NonBlocking).flatMap { fiber ->
+      IO { i + 1 }.fork(IODispatchers.CommonPool).flatMap { fiber ->
         fiber.join().fix().flatMap { ioStartLoop(it) }
       }
     } else IO.just(i)
 
   @Benchmark
   fun io(): Int =
-    ioStartLoop(0).unsafeRunSync()
-
-  @Benchmark
-  fun fx(): Int =
-    Fx.unsafeRunBlocking(fxStartLoop(0))
+    IO.unsafeRunBlocking(ioStartLoop(0))
 }

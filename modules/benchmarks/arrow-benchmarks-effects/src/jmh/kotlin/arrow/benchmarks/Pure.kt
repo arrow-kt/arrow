@@ -1,7 +1,6 @@
 package arrow.benchmarks
 
 import arrow.effects.IO
-import arrow.effects.suspended.fx.Fx
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.CompilerControl
 import org.openjdk.jmh.annotations.Fork
@@ -27,18 +26,9 @@ open class Pure {
       if (j > size) IO.just(j) else ioPureLoop(j + 1)
     }
 
-  fun fxPureLoop(i: Int): Fx<Int> =
-    Fx.just(i).flatMap { j ->
-      if (j > size) Fx.just(j) else fxPureLoop(j + 1)
-    }
-
-  @Benchmark
-  fun fx(): Int =
-    Fx.unsafeRunBlocking(fxPureLoop(0))
-
   @Benchmark
   fun io(): Int =
-    ioPureLoop(0).unsafeRunSync()
+    IO.unsafeRunBlocking(ioPureLoop(0))
 
   @Benchmark
   fun catsIO(): Int =
