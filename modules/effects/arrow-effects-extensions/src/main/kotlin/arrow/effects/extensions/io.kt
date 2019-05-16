@@ -2,7 +2,6 @@ package arrow.effects.extensions
 
 import arrow.Kind
 import arrow.core.Either
-import arrow.effects.internal.asyncContinuation
 import arrow.effects.ForIO
 import arrow.effects.IO
 import arrow.effects.IOOf
@@ -39,83 +38,79 @@ import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import arrow.unsafe
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
-import kotlin.coroutines.startCoroutine
 import arrow.effects.handleErrorWith as ioHandleErrorWith
+import arrow.effects.handleError as ioHandleError
 
 @extension
 interface IOFunctor : Functor<ForIO> {
   override fun <A, B> IOOf<A>.map(f: (A) -> B): IO<B> =
     fix().map(f)
+
+  override fun <A> IOOf<A>.unit(): IO<Unit> =
+    fix().unit()
 }
 
 @extension
-interface IOApply : Apply<ForIO> {
-  override fun <A, B> IOOf<A>.map(f: (A) -> B): IO<B> =
-    fix().map(f)
-
+interface IOApply : Apply<ForIO>, IOFunctor {
   override fun <A, B> IOOf<A>.ap(ff: IOOf<(A) -> B>): IO<B> =
     fix().ap(ff)
 }
 
 @extension
-interface IOApplicative : Applicative<ForIO> {
-  override fun <A, B> IOOf<A>.map(f: (A) -> B): IO<B> =
-    fix().map(f)
-
+interface IOApplicative : Applicative<ForIO>, IOApply {
   override fun <A> just(a: A): IO<A> =
     IO.just(a)
 
-  override fun <A, B> IOOf<A>.ap(ff: IOOf<(A) -> B>): IO<B> =
-    fix().ap(ff)
-}
-
-@extension
-interface IOMonad : Monad<ForIO> {
-  override fun <A, B> IOOf<A>.flatMap(f: (A) -> IOOf<B>): IO<B> =
-    fix().flatMap(f)
+  override fun unit(): IO<Unit> =
+    IO.unit
 
   override fun <A, B> IOOf<A>.map(f: (A) -> B): IO<B> =
     fix().map(f)
+}
+
+@extension
+interface IOApplicativeError : ApplicativeError<ForIO, Throwable>, IOApplicative {
+  override fun <A> raiseError(e: Throwable): IO<A> =
+    IO.raiseError(e)
+
+  override fun <A> IOOf<A>.handleError(f: (Throwable) -> A): IO<A> =
+    ioHandleError(f)
+
+  override fun <A> IOOf<A>.handleErrorWith(f: (Throwable) -> IOOf<A>): IO<A> =
+    ioHandleErrorWith(f)
+
+  override fun <A, B> IOOf<A>.redeem(fe: (Throwable) -> B, fs: (A) -> B): IO<B> =
+    fix().redeem(fe, fs)
+
+  override fun <A> IOOf<A>.attempt(): IO<Either<Throwable, A>> =
+    fix().attempt()
+}
+
+@extension
+interface IOMonad : Monad<ForIO>, IOApplicative {
+  override fun <A, B> IOOf<A>.flatMap(f: (A) -> IOOf<B>): IO<B> =
+    fix().flatMap(f)
+
+  override fun <A, B> IOOf<A>.followedBy(fb: IOOf<B>): IO<B> =
+    fix().followedBy(fb)
 
   override fun <A, B> tailRecM(a: A, f: (A) -> IOOf<Either<A, B>>): IO<B> =
     IO.tailRecM(a, f)
 
   override fun <A> just(a: A): IO<A> =
     IO.just(a)
-}
-
-@extension
-interface IOApplicativeError : ApplicativeError<ForIO, Throwable>, IOApplicative {
-  override fun <A> IOOf<A>.attempt(): IO<Either<Throwable, A>> =
-    fix().attempt()
-
-  override fun <A> IOOf<A>.handleErrorWith(f: (Throwable) -> IOOf<A>): IO<A> =
-    ioHandleErrorWith(f)
-
-  override fun <A> raiseError(e: Throwable): IO<A> =
-    IO.raiseError(e)
-}
-
-@extension
-interface IOMonadError : MonadError<ForIO, Throwable>, IOApplicativeError, IOMonad {
-
-  override fun <A> just(a: A): IO<A> = IO.just(a)
-
-  override fun <A, B> IOOf<A>.ap(ff: IOOf<(A) -> B>): IO<B> =
-    fix().ap(ff)
 
   override fun <A, B> IOOf<A>.map(f: (A) -> B): IO<B> =
     fix().map(f)
 
-  override fun <A> IOOf<A>.attempt(): IO<Either<Throwable, A>> =
-    fix().attempt()
+  override fun <A, B> IOOf<A>.ap(ff: IOOf<(A) -> B>): IO<B> =
+    fix().ap(ff)
+}
 
-  override fun <A> IOOf<A>.handleErrorWith(f: (Throwable) -> IOOf<A>): IO<A> =
-    ioHandleErrorWith(f)
-
-  override fun <A> raiseError(e: Throwable): IO<A> =
-    IO.raiseError(e)
+@extension
+interface IOMonadError : MonadError<ForIO, Throwable>, IOApplicativeError, IOMonad {
+  override fun <A, B> IOOf<A>.redeemWith(fe: (Throwable) -> IOOf<B>, fs: (A) -> IOOf<B>): IO<B> =
+    fix().redeemWith(fe, fs)
 }
 
 @extension
@@ -124,16 +119,19 @@ interface IOMonadThrow : MonadThrow<ForIO>, IOMonadError
 @extension
 interface IOBracket : Bracket<ForIO, Throwable>, IOMonadThrow {
   override fun <A, B> IOOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> IOOf<Unit>, use: (A) -> IOOf<B>): IO<B> =
-    fix().bracketCase({ a, e -> release(a, e) }, { a -> use(a) })
+    fix().bracketCase(release, use)
 
   override fun <A, B> IOOf<A>.bracket(release: (A) -> IOOf<Unit>, use: (A) -> IOOf<B>): IO<B> =
-    fix().bracket({ a -> release(a) }, { a -> use(a) })
+    fix().bracket(release, use)
 
   override fun <A> IOOf<A>.guarantee(finalizer: IOOf<Unit>): IO<A> =
     fix().guarantee(finalizer)
 
   override fun <A> IOOf<A>.guaranteeCase(finalizer: (ExitCase<Throwable>) -> IOOf<Unit>): IO<A> =
-    fix().guaranteeCase { e -> finalizer(e) }
+    fix().guaranteeCase(finalizer)
+
+  override fun <A> IOOf<A>.uncancelable(): IO<A> =
+    fix().uncancelable()
 }
 
 @extension
@@ -141,7 +139,11 @@ interface IOMonadDefer : MonadDefer<ForIO>, IOBracket {
   override fun <A> defer(fa: () -> IOOf<A>): IO<A> =
     IO.defer(fa)
 
-  override fun lazy(): IO<Unit> = IO.lazy
+  override fun <A> delay(f: () -> A): IO<A> =
+    IO.lazy { f() }
+
+  override fun lazy(): IO<Unit> =
+    IO.lazy
 }
 
 @extension
@@ -159,9 +161,7 @@ interface IOAsync : Async<ForIO>, IOMonadDefer {
 // FIXME default @extension are temporarily declared in arrow-effects-io-extensions due to multiplatform needs
 interface IOConcurrent : Concurrent<ForIO>, IOAsync {
 
-  override fun <A> effect(fa: suspend () -> A): IO<A> = async { _, cb ->
-    fa.startCoroutine(asyncContinuation(EmptyCoroutineContext, cb))
-  }
+  override fun <A> effect(fa: suspend () -> A): IO<A> = IO.effect(fa)
 
   override fun <A> Kind<ForIO, A>.fork(ctx: CoroutineContext): IO<Fiber<ForIO, A>> =
     fix().fork(ctx)
