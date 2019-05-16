@@ -21,7 +21,8 @@ jmh {
 //            'arrow.benchmarks.MapStream',
 //            'arrow.benchmarks.Defer',
 //            'arrow.benchmarks.Delay',
-            'arrow.benchmarks.Map'
+//            'arrow.benchmarks.Map',
+            'arrow.benchmarks.LazyVsEffect'
 //            'arrow.benchmarks.Async',
 //            'arrow.benchmarks.AttemptNonRaised',
 //            'arrow.benchmarks.AttemptRaisedError',
