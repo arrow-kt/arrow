@@ -52,7 +52,7 @@ fun <A> EvalOf<A>.value(): A = this.fix().value()
  *
  * // if not wrapped in eval this type of computation would blow the stack and result in a StackOverflowError
  * fun main() {
- * println(odd(100000).value())
+ *   println(odd(100000).value())
  * }
  * //sampleEnd
  * ```
@@ -80,8 +80,12 @@ sealed class Eval<out A> : EvalOf<A> {
      * ```kotlin:ank:playground
      * import arrow.core.*
      *
-     * val eager = Eval.now(1).map { it + 1 }
-     * eager.value()
+     * //sampleStart
+     * fun main() {
+     *   val eager = Eval.now(1).map { it + 1 }
+     *   println(eager.value())
+     * }
+     * //sampleEnd
      * ```
      *
      * It will return 2.
@@ -95,8 +99,12 @@ sealed class Eval<out A> : EvalOf<A> {
      * ```kotlin:ank:playground
      * import arrow.core.*
      *
-     * val lazyEvaled = Eval.later { "expensive computation" }
-     * lazyEvaled.value()
+     * //sampleStart
+     * fun main() {
+     *   val lazyEvaled = Eval.later { "expensive computation" }
+     *   println(lazyEvaled.value())
+     * }
+     * //sampleEnd
      * ```
      *
      * "expensive computation" is only computed once since the results are memoized and multiple calls to `value()` will just return the cached value.
@@ -110,8 +118,12 @@ sealed class Eval<out A> : EvalOf<A> {
      * ```kotlin:ank:playground
      * import arrow.core.*
      *
-     * val alwaysEvaled = Eval.always { "expensive computation" }
-     * alwaysEvaled.value()
+     * //sampleStart
+     * fun main() {
+     *   val alwaysEvaled = Eval.always { "expensive computation" }
+     *   println(alwaysEvaled.value())
+     * }
+     * //sampleEnd
      * ```
      *
      * "expensive computation" is computed every time `value()` is invoked.
@@ -146,7 +158,7 @@ sealed class Eval<out A> : EvalOf<A> {
         else -> fa
       }
 
-    // Enforce tailrec call to collapse inside compute loop
+    //Enforce tailrec call to collapse inside compute loop
     private fun <A> collapse1(fa: Eval<A>): Eval<A> = collapse(fa)
 
     @Suppress("UNCHECKED_CAST")
