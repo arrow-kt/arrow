@@ -1,6 +1,5 @@
 package arrow.effects.extensions
 
-import arrow.Kind
 import arrow.data.Kleisli
 import arrow.data.KleisliOf
 import arrow.data.KleisliPartialOf
@@ -25,9 +24,9 @@ interface KleisliBracket<F, R, E> : Bracket<KleisliPartialOf<F, R>, E>, KleisliM
 
   override fun ME(): MonadError<F, E> = BF()
 
-  override fun <A, B> Kind<KleisliPartialOf<F, R>, A>.bracketCase(
-    release: (A, ExitCase<E>) -> Kind<KleisliPartialOf<F, R>, Unit>,
-    use: (A) -> Kind<KleisliPartialOf<F, R>, B>
+  override fun <A, B> KleisliOf<F, R, A>.bracketCase(
+    release: (A, ExitCase<E>) -> KleisliOf<F, R, Unit>,
+    use: (A) -> KleisliOf<F, R, B>
   ): Kleisli<F, R, B> =
     BF().run {
       Kleisli { r ->
@@ -39,7 +38,7 @@ interface KleisliBracket<F, R, E> : Bracket<KleisliPartialOf<F, R>, E>, KleisliM
       }
     }
 
-  override fun <A> Kind<KleisliPartialOf<F, R>, A>.uncancelable(): Kleisli<F, R, A> =
+  override fun <A> KleisliOf<F, R, A>.uncancelable(): Kleisli<F, R, A> =
     Kleisli { r -> BF().run { this@uncancelable.run(r).uncancelable() } }
 }
 

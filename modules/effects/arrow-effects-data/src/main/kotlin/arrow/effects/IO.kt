@@ -1109,10 +1109,7 @@ sealed class IO<out A> : IOOf<A> {
   }
 
   @PublishedApi
-  internal class Async<A> internal constructor(
-    val ctx: CoroutineContext? = null,
-    val proc: IOProc<A>
-  ) : IO<A>() {
+  internal class Async<A> internal constructor(val proc: IOProc<A>) : IO<A>() {
 
     companion object {
 

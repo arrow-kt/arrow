@@ -535,7 +535,7 @@ object IORunLoop {
         is IO.Async -> return suspendInAsync(current, bFirst, bRest) as IO<A>
         is IO.AsyncContinueOn -> return suspendContinueOn(current, bFirst, bRest) as IO<A>
         is IO.AsyncUpdateContext -> return suspendInAsyncUpdateContext(current, bFirst, bRest) as IO<A>
-        is IO.ConnectionSwitch -> return IO.RaiseError(ArrowInternalException)
+        is IO.ConnectionSwitch -> return suspendAnyInAsync(current, bFirst, bRest) as IO<A>
         null -> return IO.RaiseError(ArrowInternalException)
       }
 
@@ -559,45 +559,41 @@ object IORunLoop {
   private fun <A> sanitizedCurrentIO(current: Current?, unboxed: Any?): IO<A> =
     (current ?: IO.Pure(unboxed)) as IO<A>
 
+  private val suspendAnyInAsync: (currentIO: IO<Any?>, bFirst: BindF?, bRest: CallStack?) -> IO<Any?> = { source, bFirst, bRest ->
+    if (bFirst != null || (bRest != null && !bRest.isEmpty())) IO.Async { conn, cb ->
+      loop(source, conn, EmptyCoroutineContext, cb, null, bFirst, bRest)
+    }
+    else source
+  }
+
   private val suspendInAsync: (currentIO: IO.Async<Any?>, bFirst: BindF?, bRest: CallStack?) -> IO<Any?> = { source, bFirst, bRest ->
     // Hitting an async boundary means we have to stop, however if we had previous `flatMap` operations then we need to resume the loop with the collected stack
-    when {
-      bFirst != null || (bRest != null && bRest.isNotEmpty()) ->
-        IO.async { conn, cb ->
-          AsyncBoundary(conn, cb).start(source, bFirst, bRest)
-        }
-      else -> source
+    if (bFirst != null || (bRest != null && bRest.isNotEmpty())) IO.async { conn, cb ->
+      AsyncBoundary(conn, cb).start(source, bFirst, bRest)
     }
+    else source
   }
 
   private val suspendContinueOn: (IO.AsyncContinueOn<Any?>, BindF?, CallStack?) -> IO<Any?> = { source, bFirst, bRest ->
-    when {
-      bFirst != null || (bRest != null && bRest.isNotEmpty()) ->
-        IO.async { conn, cb ->
-          AsyncBoundary(conn, cb).start(source, bFirst, bRest)
-        }
-      else -> source
+    if (bFirst != null || (bRest != null && bRest.isNotEmpty())) IO.async { conn, cb ->
+      AsyncBoundary(conn, cb).start(source, bFirst, bRest)
     }
+    else source
   }
 
   private val suspendInAsyncUpdateContext: (IO.AsyncUpdateContext<Any?>, BindF?, CallStack?) -> IO<Any?> = { source, bFirst, bRest ->
-    when {
-      bFirst != null || (bRest != null && bRest.isNotEmpty()) ->
-        IO.async { conn, cb ->
-          AsyncBoundary(conn, cb).start(source, bFirst, bRest)
-        }
-      else -> source
+    if (bFirst != null || (bRest != null && bRest.isNotEmpty())) IO.async { conn, cb ->
+      AsyncBoundary(conn, cb).start(source, bFirst, bRest)
     }
+    else source
   }
 
   private val suspendInSingle: (IO.Single<Any?>, BindF?, CallStack?) -> IO<Any?> = { source, bFirst, bRest ->
-    when {
-      bFirst != null || (bRest != null && bRest.isNotEmpty()) ->
-        IO.async { conn, cb ->
-          AsyncBoundary(conn, cb).start(source, EmptyCoroutineContext, bFirst, bRest)
-        }
-      else -> source
-    }
+    if (bFirst != null || (bRest != null && bRest.isNotEmpty()))
+      IO.async { conn, cb ->
+        AsyncBoundary(conn, cb).start(source, EmptyCoroutineContext, bFirst, bRest)
+      }
+    else source
   }
 }
 
