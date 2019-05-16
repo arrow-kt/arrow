@@ -1,7 +1,6 @@
 package arrow.benchmarks
 
 import arrow.effects.IO
-import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.CompilerControl
 import org.openjdk.jmh.annotations.Fork
 import org.openjdk.jmh.annotations.Measurement
@@ -34,6 +33,6 @@ open class LazyVsEffect {
   fun ioLazy(): Int =
     ioLazyLoop(0).unsafeRunSync()
 
-  fun ioEffect(): Int=
+  fun ioEffect(): Int =
     ioEffectLoop(0).unsafeRunSync()
 }
