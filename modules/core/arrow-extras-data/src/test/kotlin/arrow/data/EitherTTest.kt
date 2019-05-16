@@ -24,7 +24,6 @@ import arrow.data.extensions.eithert.divisible.divisible
 import arrow.data.extensions.eithert.functor.functor
 import arrow.data.extensions.eithert.semigroupK.semigroupK
 import arrow.data.extensions.eithert.traverse.traverse
-import arrow.effects.typeclasses.seconds
 import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
 import arrow.test.laws.DivisibleLaws
@@ -43,7 +42,7 @@ import org.junit.runner.RunWith
 class EitherTTest : UnitSpec() {
 
   fun <A> EQ(): Eq<Kind<EitherTPartialOf<ForIO, Throwable>, A>> = Eq { a, b ->
-    a.value().attempt().unsafeRunTimed(60.seconds) == b.value().attempt().unsafeRunTimed(60.seconds)
+    IO.unsafeRunBlocking(a.value().attempt()) == IO.unsafeRunBlocking(b.value().attempt())
   }
 
   init {

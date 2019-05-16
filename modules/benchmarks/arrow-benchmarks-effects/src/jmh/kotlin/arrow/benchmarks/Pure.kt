@@ -28,7 +28,7 @@ open class Pure {
 
   @Benchmark
   fun io(): Int =
-    IO.unsafeRunBlocking(ioPureLoop(0))
+    ioPureLoop(0).unsafeRunSync()
 
   @Benchmark
   fun catsIO(): Int =

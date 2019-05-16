@@ -6,7 +6,6 @@ import arrow.core.Right
 import arrow.core.Tuple3
 import arrow.effects.ForIO
 import arrow.effects.IOConnection
-import arrow.effects.IOFiber
 import arrow.effects.IO
 import arrow.effects.IOOf
 import arrow.effects.typeclasses.RaceTriple

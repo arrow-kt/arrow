@@ -7,14 +7,10 @@ import arrow.core.Tuple2
 import arrow.effects.ForIO
 import arrow.effects.IOConnection
 import arrow.effects.IO
-import arrow.effects.IOFiber
 import arrow.effects.IOOf
 import arrow.effects.typeclasses.Fiber
 import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.startCoroutine
-import kotlin.coroutines.suspendCoroutine
 
 interface IORacePair {
 

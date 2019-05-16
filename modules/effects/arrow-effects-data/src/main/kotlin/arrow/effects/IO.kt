@@ -13,6 +13,7 @@ import arrow.data.AndThen
 import arrow.effects.internal.BracketStart
 import arrow.effects.internal.ForwardCancelable
 import arrow.effects.internal.GuaranteeReleaseFrame
+import arrow.effects.internal.IOFiber
 import arrow.effects.internal.IOForkedStart
 import arrow.effects.internal.Platform
 import arrow.effects.internal.UnsafePromise
@@ -22,7 +23,6 @@ import arrow.effects.internal.IORacePair
 import arrow.effects.internal.IORaceTriple
 import arrow.effects.internal.IORunLoop
 import arrow.effects.typeclasses.Bracket
-import arrow.effects.typeclasses.Concurrent
 import arrow.effects.typeclasses.ConnectedProc
 import arrow.effects.typeclasses.ConnectedProcF
 import arrow.effects.typeclasses.Disposable
@@ -33,11 +33,9 @@ import arrow.effects.typeclasses.Proc
 import arrow.effects.typeclasses.ProcF
 import arrow.effects.typeclasses.mapUnit
 import arrow.higherkind
-import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.startCoroutine
-import kotlin.coroutines.suspendCoroutine
 
 typealias IOProc<A> = ConnectedProc<ForIO, A>
 typealias IOProcF<A> = ConnectedProcF<ForIO, A>
@@ -295,17 +293,16 @@ sealed class IO<out A> : IOOf<A> {
    *   2. consumption
    *   3. releasing
    *
-   * 1. Resource acquisition is **NON CANCELABLE**, and this is the trickiest to implement and test
-   *   because we cannot incorporate it into [BracketLaws] since cancellation is introduced in [Concurrent].
+   * 1. Resource acquisition is **NON CANCELABLE**.
    *   If resource acquisition fails, meaning no resource was actually successfully acquired then we short-circuit the effect.
-   *   Reason being, we cannot [release] what we did not [acquire] first. Same reason we cannot call [use].
+   *   Reason being, we cannot [release] what we did not `acquire` first. Same reason we cannot call [use].
    *   If it is successful we pass the result to stage 2 [use].
    *
    * 2. Resource consumption is like any other [IO] effect. The key difference here is that it's wired in such a way that
    *   [release] **will always** be called either on [ExitCase.Canceled], [ExitCase.Error] or [ExitCase.Completed].
    *   If it failed than the resulting [IO] from [bracketCase] will be `IO.raiseError(e)`, otherwise the result of [use].
    *
-   * 3. Resource releasing is **NON CANCELABLE** otherwise it could result in leaks.
+   * 3. Resource releasing is **NON CANCELABLE**, otherwise it could result in leaks.
    *   In the case it throws the resulting [IO] will be either the error or a composed error if one occurred in the [use] stage.
    *
    * @param use is the action to consume the resource and produce an [IO] with the result.
@@ -976,6 +973,8 @@ sealed class IO<out A> : IOOf<A> {
 
   override fun toString(): String = "IO(...)"
 
+  // Only internals from this point.
+
   @PublishedApi
   @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
   internal inline fun <B> unsafeRecast(): IO<B> = this as IO<B>
@@ -1159,20 +1158,6 @@ sealed class IO<out A> : IOOf<A> {
 
     override fun toString(): String = "IO.Async(..)"
   }
-}
 
-@Suppress("FunctionName")
-internal fun <A> IOFiber(promise: UnsafePromise<A>, conn: IOConnection): Fiber<ForIO, A> {
-  val join: IO<A> = IO.async { conn2, cb ->
-    val cb2: (Either<Throwable, A>) -> Unit = {
-      cb(it)
-      conn2.pop()
-      conn.pop()
-    }
-
-    conn2.push(IO.Lazy { promise.remove(cb2) })
-    conn.push(conn2.cancel())
-    promise.get(cb2)
-  }
-  return Fiber(join, conn.cancel())
+  fun unsafeRunSync() = IO.unsafeRunBlocking(this)
 }

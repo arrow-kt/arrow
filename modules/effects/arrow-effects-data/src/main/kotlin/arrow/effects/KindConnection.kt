@@ -12,7 +12,7 @@ enum class OnCancel {
   ThrowCancellationException, Silent;
 
   companion object {
-    val CancellationException = arrow.effects.ConnectionCancellationException
+    val CancellationException = ConnectionCancellationException
   }
 }
 
