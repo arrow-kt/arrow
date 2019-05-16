@@ -21,15 +21,21 @@ open class DeepBind {
   @Param("20")
   var depth: Int = 0
 
-  fun ioFib(n: Int): IO<Int> =
-    if (n <= 1) IO { n }
-    else ioFib(n - 1).flatMap { a ->
-      ioFib(n - 2).flatMap { b -> IO { a + b } }
+  fun ioFibLazy(n: Int): IO<Int> =
+    if (n <= 1) IO.lazy { n }
+    else ioFibLazy(n - 1).flatMap { a ->
+      ioFibLazy(n - 2).flatMap { b -> IO.lazy { a + b } }
+    }
+
+  fun ioFibEffect(n: Int): IO<Int> =
+    if (n <= 1) IO.effect { n }
+    else ioFibLazy(n - 1).flatMap { a ->
+      ioFibLazy(n - 2).flatMap { b -> IO.effect { a + b } }
     }
 
   @Benchmark
   fun io(): Int =
-    IO.unsafeRunBlocking(ioFib(depth))
+    IO.unsafeRunBlocking(ioFibLazy(depth))
 
   @Benchmark
   fun cats(): Any =

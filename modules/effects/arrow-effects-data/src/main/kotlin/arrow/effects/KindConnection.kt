@@ -254,7 +254,7 @@ sealed class KindConnection<F> {
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
-     *   val conn: IOConnection = KindConnection(IO.monadDefer()) { it.fix().unsafeRunAsync { } }
+     *   val conn: IOConnection = KindConnection(IO.monadDefer()) { it.fix().unsafeRunSync() }
      *   //sampleEnd
      * }
      * ```

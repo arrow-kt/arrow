@@ -5,7 +5,6 @@ import arrow.core.Either
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.value
 import arrow.core.extensions.const.divisible.divisible
 import arrow.core.extensions.monoid
 import arrow.effects.ForIO
@@ -13,7 +12,6 @@ import arrow.effects.IO
 import arrow.effects.extensions.io.applicativeError.attempt
 import arrow.effects.extensions.io.async.async
 import arrow.effects.extensions.optiont.async.async
-import arrow.effects.typeclasses.seconds
 import arrow.data.extensions.nonemptylist.monad.monad
 import arrow.core.extensions.option.monad.monad
 import arrow.data.extensions.optiont.applicative.applicative
@@ -57,7 +55,7 @@ class OptionTTest : UnitSpec() {
   val NELM: Monad<ForNonEmptyList> = NonEmptyList.monad()
 
   fun <A> IOEQ(): Eq<Kind<OptionTPartialOf<ForIO>, A>> = Eq { a, b ->
-    a.value().attempt().unsafeRunTimed(60.seconds) == b.value().attempt().unsafeRunTimed(60.seconds)
+    a.value().attempt().unsafeRunSync() == b.value().attempt().unsafeRunSync()
   }
 
   init {

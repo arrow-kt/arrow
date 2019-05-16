@@ -17,7 +17,6 @@ import arrow.effects.internal.IOFiber
 import arrow.effects.internal.IOForkedStart
 import arrow.effects.internal.Platform
 import arrow.effects.internal.UnsafePromise
-import arrow.effects.internal.asyncContinuation
 import arrow.effects.internal.IOFrame
 import arrow.effects.internal.IORacePair
 import arrow.effects.internal.IORaceTriple
@@ -34,8 +33,6 @@ import arrow.effects.typeclasses.ProcF
 import arrow.effects.typeclasses.mapUnit
 import arrow.higherkind
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
-import kotlin.coroutines.startCoroutine
 
 typealias IOProc<A> = ConnectedProc<ForIO, A>
 typealias IOProcF<A> = ConnectedProcF<ForIO, A>
@@ -53,6 +50,8 @@ fun <A> IOOf<A>.handleError(f: (Throwable) -> A): IO<A> = when (this) {
   is IO.Pure -> this
   else -> IO.FlatMap(this, IOFrame.Companion.ErrorHandler(f.andThen { IO.Pure<A>(it) }))
 }
+
+fun <A> A.liftIO(): IO<A> = IO.just(this)
 
 @higherkind
 sealed class IO<out A> : IOOf<A> {
@@ -521,6 +520,9 @@ sealed class IO<out A> : IOOf<A> {
     @JvmStatic
     operator fun <A> invoke(fa: suspend () -> A): IO<A> = Single(fa)
 
+    @JvmStatic
+    fun <A> effect(fa: suspend () -> A): IO<A> = Single(fa)
+
     /**
      * Delay a computation on provided [CoroutineContext].
      *
@@ -856,16 +858,9 @@ sealed class IO<out A> : IOOf<A> {
      * @see [runNonBlocking] to run in a referential transparent manner.
      */
     @JvmStatic
-    fun <A> unsafeRunBlocking(fx: IOOf<A>): A = when (val current = fx.fix()) {
-      is Single -> UnsafePromise<A>().run {
-        current.source.startCoroutine(asyncContinuation(EmptyCoroutineContext) {
-          complete(it)
-        })
-        await()
-      }
-      else -> unsafeRunTimed(current, Duration.INFINITE)
+    fun <A> unsafeRunBlocking(fx: IOOf<A>): A =
+      unsafeRunTimed(fx.fix(), Duration.INFINITE)
         .fold({ throw IllegalArgumentException("IO execution should yield a valid result") }, ::identity)
-    }
 
     /**
      * Run [fx] with a limitation on how long to await *individual* async results.

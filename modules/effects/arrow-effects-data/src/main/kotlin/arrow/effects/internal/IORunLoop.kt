@@ -425,7 +425,6 @@ object IORunLoop {
     }
 
     override operator fun invoke(either: Either<Throwable, Any?>) {
-      conn.pop() // Pop the cancellation reference pushed in `fun start(fx: IO.Async<Any?>`
       result = when (either) {
         is Either.Left -> IO.RaiseError(either.a)
         is Either.Right -> IO.Pure(either.b)

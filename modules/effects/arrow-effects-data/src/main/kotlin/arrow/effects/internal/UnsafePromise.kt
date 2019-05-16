@@ -42,20 +42,4 @@ internal class UnsafePromise<A> {
     is State.Waiting -> state.set(State.Waiting(oldState.joiners - cb))
     is State.Full -> Unit
   }
-
-  fun await(): A {
-    var result: A? = null
-    var loop = true
-    while (loop) {
-      when (val oldState = state.get()) {
-        is State.Full -> {
-          result = oldState.a.fold({ throw it }, { it })
-          loop = false
-        }
-        else -> {}
-      }
-    }
-
-    return result!!
-  }
 }
