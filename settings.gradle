@@ -117,5 +117,10 @@ include {
         validation {
             _ 'validation'
         }
+
+        benchmarks {
+            _ 'scala-benchmarks'
+            _ 'benchmarks-effects'
+        }
     }
 }
