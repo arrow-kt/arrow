@@ -72,7 +72,7 @@ internal object IORunLoop {
         }
         is IO.Async -> {
           // Return case for Async operations
-          return suspendInAsync(currentIO, bFirst, bRest) as IO<A>
+          return suspendAsync(currentIO, bFirst, bRest) as IO<A>
         }
         is IO.Bind<*, *> -> {
           if (bFirst != null) {
@@ -108,7 +108,7 @@ internal object IORunLoop {
           currentIO = currentIO.source
         }
         is IO.ContextSwitch -> {
-          return suspendInAsync(currentIO, bFirst, bRest) as IO<A>
+          return wrapInAsync(currentIO, bFirst, bRest) as IO<A>
         }
         null -> {
           currentIO = IO.RaiseError(NullPointerException("Stepping on null IO"))
@@ -139,16 +139,16 @@ internal object IORunLoop {
   private fun <A> sanitizedCurrentIO(currentIO: Current?, unboxed: Any?): IO<A> =
     (currentIO ?: IO.Pure(unboxed)) as IO<A>
 
-  private fun suspendInAsync(
-    currentIO: IO<Any?>,
-    bFirst: BindF?,
-    bRest: CallStack?
-  ): IO<Any?> =
+  private fun suspendAsync(currentIO: IO.Async<Any?>, bFirst: BindF?, bRest: CallStack?): IO<Any?> =
     // Hitting an async boundary means we have to stop, however if we had previous `flatMap` operations then we need to resume the loop with the collected stack
     if (bFirst != null || (bRest != null && bRest.isNotEmpty())) IO.Async { conn, cb ->
       loop(currentIO, conn, cb, null, bFirst, bRest)
-    }
-    else currentIO
+    } else currentIO
+
+  // Only IO.Async can skip wrapping when there is no collected stack
+  private fun wrapInAsync(currentIO: IO<Any?>, bFirst: BindF?, bRest: CallStack?): IO<Any?> = IO.Async { conn, cb ->
+    loop(currentIO, conn, cb, null, bFirst, bRest)
+  }
 
   private fun loop(
     source: Current,
