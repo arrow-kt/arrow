@@ -5,6 +5,7 @@ import arrow.core.Either
 import arrow.core.Left
 import arrow.core.NonFatal
 import arrow.core.Right
+import arrow.effects.internal.ArrowInternalException
 import arrow.effects.internal.Platform.ArrayStack
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine
@@ -71,7 +72,7 @@ internal object IORunLoop {
         }
         is IO.Async -> {
           // Return case for Async operations
-          return suspendInAsync(currentIO as IO<A>, bFirst, bRest, currentIO.k)
+          return suspendInAsync(currentIO, bFirst, bRest) as IO<A>
         }
         is IO.Bind<*, *> -> {
           if (bFirst != null) {
@@ -87,9 +88,7 @@ internal object IORunLoop {
             bRest.push(bFirst)
           }
           val localCurrent = currentIO
-
           val currentCC = localCurrent.cc
-
           val localCont = currentIO.cont
 
           bFirst = { c: Any? -> IO.just(c) }
@@ -108,8 +107,15 @@ internal object IORunLoop {
           bFirst = currentIO as BindF
           currentIO = currentIO.source
         }
+        is IO.ContextSwitch -> {
+          return suspendInAsync(currentIO, bFirst, bRest) as IO<A>
+        }
         null -> {
           currentIO = IO.RaiseError(NullPointerException("Stepping on null IO"))
+        }
+        else -> {
+          // Since we don't capture the value of `when` kotlin doesn't enforce exhaustiveness
+          currentIO = IO.raiseError(IORunLoopMissingStep)
         }
       }
 
@@ -133,24 +139,16 @@ internal object IORunLoop {
   private fun <A> sanitizedCurrentIO(currentIO: Current?, unboxed: Any?): IO<A> =
     (currentIO ?: IO.Pure(unboxed)) as IO<A>
 
-  private fun <A> suspendInAsync(
-    currentIO: IO<A>,
+  private fun suspendInAsync(
+    currentIO: IO<Any?>,
     bFirst: BindF?,
-    bRest: CallStack?,
-    register: IOProc<Any?>
-  ): IO<A> =
-  // Hitting an async boundary means we have to stop, however
-  // if we had previous `flatMap` operations then we need to resume
-  // the loop with the collected stack
-    when {
-      bFirst != null || (bRest != null && bRest.isNotEmpty()) ->
-        IO.Async { conn, cb ->
-          val rcb = RestartCallback(conn, cb as Callback)
-          rcb.prepare(bFirst, bRest)
-          register(conn, rcb)
-        }
-      else -> currentIO
+    bRest: CallStack?
+  ): IO<Any?> =
+    // Hitting an async boundary means we have to stop, however if we had previous `flatMap` operations then we need to resume the loop with the collected stack
+    if (bFirst != null || (bRest != null && bRest.isNotEmpty())) IO.Async { conn, cb ->
+      loop(currentIO, conn, cb, null, bFirst, bRest)
     }
+    else currentIO
 
   private fun loop(
     source: Current,
@@ -272,6 +270,10 @@ internal object IORunLoop {
         }
         null -> {
           currentIO = IO.RaiseError(NullPointerException("Looping on null IO"))
+        }
+        else -> {
+          // Since we don't capture the value of `when` kotlin doesn't enforce exhaustiveness
+          currentIO = IO.RaiseError(IORunLoopMissingLoop)
         }
       }
 
@@ -411,4 +413,12 @@ internal object IORunLoop {
         restore(null, e, old, current)
       }, null)
   }
+}
+
+object IORunLoopMissingStep : ArrowInternalException() {
+  override fun fillInStackTrace(): Throwable = this
+}
+
+object IORunLoopMissingLoop : ArrowInternalException() {
+  override fun fillInStackTrace(): Throwable = this
 }
