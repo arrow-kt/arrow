@@ -123,6 +123,8 @@ sealed class IO<out A> : IOOf<A> {
   open fun continueOn(ctx: CoroutineContext): IO<A> =
     ContinueOn(this, ctx)
 
+  fun <B> followedBy(fb: IOOf<B>) = flatMap { fb }
+
   fun attempt(): IO<Either<Throwable, A>> =
     Bind(this, IOFrame.any())
 
