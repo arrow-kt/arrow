@@ -55,6 +55,8 @@ buildscript {
         classpath 'org.ajoberstar:gradle-git-publish:2.0.0'
         classpath "net.rdrei.android.buildtimetracker:gradle-plugin:0.11.1"
         classpath "org.jetbrains.dokka:dokka-gradle-plugin:$dokka_version"
+        classpath "me.champeau.gradle:jmh-gradle-plugin:0.4.7"
+        classpath "gradle.plugin.io.morethan.jmhreport:gradle-jmh-report:0.9.0"
         classpath "org.jlleitschuh.gradle:ktlint-gradle:$ktlint_version"
     }
 }
