@@ -415,10 +415,10 @@ internal object IORunLoop {
   }
 }
 
-object IORunLoopMissingStep : ArrowInternalException() {
+internal object IORunLoopMissingStep : ArrowInternalException() {
   override fun fillInStackTrace(): Throwable = this
 }
 
-object IORunLoopMissingLoop : ArrowInternalException() {
+internal object IORunLoopMissingLoop : ArrowInternalException() {
   override fun fillInStackTrace(): Throwable = this
 }
