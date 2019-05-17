@@ -355,7 +355,7 @@ internal object IORunLoop {
    */
   private data class RestartCallback(val connInit: IOConnection, val cb: Callback) : Callback, kotlin.coroutines.Continuation<Any?> {
 
-    //Nasty trick to re-use `Continuation` with different CC.
+    // Nasty trick to re-use `Continuation` with different CC.
     private var _context: CoroutineContext = EmptyCoroutineContext
     override val context: CoroutineContext
       get() = _context
