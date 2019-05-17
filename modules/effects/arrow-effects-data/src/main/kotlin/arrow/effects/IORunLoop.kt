@@ -140,10 +140,13 @@ internal object IORunLoop {
     bRest: CallStack?
   ): IO<A> =
     // Hitting an async boundary means we have to stop, however if we had previous `flatMap` operations then we need to resume the loop with the collected stack
-    if (bFirst != null || (bRest != null && bRest.isNotEmpty())) IO.Async { conn, cb ->
-      loop(currentIO, conn, cb as Callback, null, bFirst, bRest)
+    if (bFirst != null || (bRest != null && bRest.isNotEmpty())) {
+      IO.Async { conn, cb ->
+        loop(currentIO, conn, cb as Callback, null, bFirst, bRest)
+      }
+    } else {
+      currentIO
     }
-    else currentIO
 
   private fun loop(
     source: Current,
