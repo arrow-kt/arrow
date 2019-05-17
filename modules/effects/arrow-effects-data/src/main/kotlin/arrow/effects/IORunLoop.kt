@@ -111,7 +111,7 @@ internal object IORunLoop {
           return wrapInAsync(currentIO, bFirst, bRest) as IO<A>
         }
         null -> {
-          currentIO = IO.RaiseError(NullPointerException("Stepping on null IO"))
+          currentIO = IO.RaiseError(IORunLoopStepOnNull)
         }
         else -> {
           // Since we don't capture the value of `when` kotlin doesn't enforce exhaustiveness
@@ -269,7 +269,7 @@ internal object IORunLoop {
           }
         }
         null -> {
-          currentIO = IO.RaiseError(NullPointerException("Looping on null IO"))
+          currentIO = IO.RaiseError(IORunLoopOnNull)
         }
         else -> {
           // Since we don't capture the value of `when` kotlin doesn't enforce exhaustiveness
@@ -419,6 +419,14 @@ internal object IORunLoopMissingStep : ArrowInternalException() {
   override fun fillInStackTrace(): Throwable = this
 }
 
+internal object IORunLoopStepOnNull : ArrowInternalException() {
+  override fun fillInStackTrace(): Throwable = this
+}
+
 internal object IORunLoopMissingLoop : ArrowInternalException() {
+  override fun fillInStackTrace(): Throwable = this
+}
+
+internal object IORunLoopOnNull : ArrowInternalException() {
   override fun fillInStackTrace(): Throwable = this
 }
