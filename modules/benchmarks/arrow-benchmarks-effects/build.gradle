@@ -15,18 +15,24 @@ apply plugin: "io.morethan.jmhreport"
 
 jmh {
     include = [
-//            'arrow.benchmarks.Pure',
-//            'arrow.benchmarks.Delay',
+            'arrow.benchmarks.Async',
+            'arrow.benchmarks.AttemptNonRaised',
+            'arrow.benchmarks.AttemptRaisedError',
+//            'arrow.benchmarks.Bracket',
+//            'arrow.benchmarks.Cancellable',
             'arrow.benchmarks.DeepBind',
-//            'arrow.benchmarks.MapStream',
 //            'arrow.benchmarks.Defer',
-//            'arrow.benchmarks.Delay',
-//            'arrow.benchmarks.Map',
-//            'arrow.benchmarks.Async',
-//            'arrow.benchmarks.AttemptNonRaised',
-//            'arrow.benchmarks.AttemptRaisedError',
+            'arrow.benchmarks.Delay',
+//            'arrow.benchmarks.ForkFiber',
 //            'arrow.benchmarks.HandleNonRaised',
-//            'arrow.benchmarks.HandleRaisedError'
+//            'arrow.benchmarks.HandleRaisedError',
+            'arrow.benchmarks.LeftBind',
+            'arrow.benchmarks.Map',
+            'arrow.benchmarks.MapStream',
+//            'arrow.benchmarks.ParMap',
+            'arrow.benchmarks.Pure',
+//            'arrow.benchmarks.RacePair',
+//            'arrow.benchmarks.Uncancellable'
     ]
     resultFormat = 'json'
     resultsFile = file('build/reports/benchmarks.json')
