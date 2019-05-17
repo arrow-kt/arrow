@@ -1,13 +1,14 @@
 package arrow.effects
 
-import arrow.core.Continuation
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.NonFatal
 import arrow.core.Right
+import arrow.core.nonFatalOrThrow
 import arrow.effects.internal.ArrowInternalException
 import arrow.effects.internal.Platform.ArrayStack
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.startCoroutine
 
 private typealias Current = IOOf<Any?>
@@ -55,7 +56,7 @@ internal object IORunLoop {
         }
         is IO.Suspend -> {
           val thunk: () -> IOOf<Any?> = currentIO.thunk
-          currentIO = executeSafe { thunk() }
+          currentIO = executeSafe(thunk)
         }
         is IO.Delay -> {
           try {
@@ -63,38 +64,32 @@ internal object IORunLoop {
             hasResult = true
             currentIO = null
           } catch (t: Throwable) {
-            if (NonFatal(t)) {
-              currentIO = IO.RaiseError(t)
-            } else {
-              throw t
-            }
+              currentIO = IO.RaiseError(t.nonFatalOrThrow())
           }
         }
         is IO.Async -> {
           // Return case for Async operations
           return suspendAsync(currentIO, bFirst, bRest) as IO<A>
         }
+        is IO.Effect -> {
+          return suspendAsync(currentIO, bFirst, bRest) as IO<A>
+        }
         is IO.Bind<*, *> -> {
           if (bFirst != null) {
-            if (bRest == null) bRest = ArrayStack()
+            if (bRest == null) {
+              bRest = ArrayStack()
+            }
             bRest.push(bFirst)
           }
           bFirst = currentIO.g as BindF
           currentIO = currentIO.cont
         }
-        is IO.ContinueOn<*> -> {
-          if (bFirst != null) {
-            if (bRest == null) bRest = ArrayStack()
-            bRest.push(bFirst)
-          }
-          val localCurrent = currentIO
-          val currentCC = localCurrent.cc
+        is IO.ContinueOn -> {
+          val currentCC = currentIO.cc
           val localCont = currentIO.cont
 
-          bFirst = { c: Any? -> IO.just(c) }
-
-          currentIO = IO.async { conn, cc ->
-            loop(localCont, conn, cc.asyncCallback(currentCC), null, null, null)
+          currentIO = IO.Bind(localCont) { a ->
+            IO.Effect(currentCC) { a }
           }
         }
         is IO.Map<*, *> -> {
@@ -108,7 +103,10 @@ internal object IORunLoop {
           currentIO = currentIO.source
         }
         is IO.ContextSwitch -> {
-          return wrapInAsync(currentIO, bFirst, bRest) as IO<A>
+          val localCurrent = currentIO
+          return IO.Async { conn, cb ->
+            loop(localCurrent, conn, cb as Callback, null, bFirst, bRest)
+          }
         }
         null -> {
           currentIO = IO.RaiseError(IORunLoopStepOnNull)
@@ -139,16 +137,15 @@ internal object IORunLoop {
   private fun <A> sanitizedCurrentIO(currentIO: Current?, unboxed: Any?): IO<A> =
     (currentIO ?: IO.Pure(unboxed)) as IO<A>
 
-  private fun suspendAsync(currentIO: IO.Async<Any?>, bFirst: BindF?, bRest: CallStack?): IO<Any?> =
+  private fun suspendAsync(currentIO: IO<Any?>, bFirst: BindF?, bRest: CallStack?): IO<Any?> =
     // Hitting an async boundary means we have to stop, however if we had previous `flatMap` operations then we need to resume the loop with the collected stack
-    if (bFirst != null || (bRest != null && bRest.isNotEmpty())) IO.Async { conn, cb ->
-      loop(currentIO, conn, cb, null, bFirst, bRest)
-    } else currentIO
-
-  // Only IO.Async can skip wrapping when there is no collected stack
-  private fun wrapInAsync(currentIO: IO<Any?>, bFirst: BindF?, bRest: CallStack?): IO<Any?> = IO.Async { conn, cb ->
-    loop(currentIO, conn, cb, null, bFirst, bRest)
-  }
+    if (bFirst != null || (bRest != null && bRest.isNotEmpty())) {
+      IO.Async { conn, cb ->
+        loop(currentIO, conn, cb, null, bFirst, bRest)
+      }
+    } else {
+      currentIO
+    }
 
   private fun loop(
     source: Current,
@@ -214,9 +211,18 @@ internal object IORunLoop {
           if (rcb == null) {
             rcb = RestartCallback(conn, cb)
           }
-          rcb.prepare(bFirst, bRest)
+
           // Return case for Async operations
-          currentIO.k(conn, rcb)
+          rcb.start(currentIO, bFirst, bRest)
+          return
+        }
+        is IO.Effect -> {
+          if (rcb == null) {
+            rcb = RestartCallback(conn, cb)
+          }
+
+          // Return case for Async operations
+          rcb.start(currentIO, bFirst, bRest)
           return
         }
         is IO.Bind<*, *> -> {
@@ -233,15 +239,13 @@ internal object IORunLoop {
             bRest.push(bFirst)
           }
           val localCurrent = currentIO
-
           val currentCC = localCurrent.cc
-
           val localCont = currentIO.cont
 
           bFirst = { c: Any? -> IO.just(c) }
 
-          currentIO = IO.async { _, callback ->
-            loop(localCont, conn, callback.asyncCallback(currentCC), null, null, null)
+          currentIO = IO.Bind(localCont) { a ->
+            IO.Effect(currentCC) { a }
           }
         }
         is IO.Map<*, *> -> {
@@ -355,7 +359,12 @@ internal object IORunLoop {
    * A `RestartCallback` gets created only once, per [startCancelable] (`unsafeRunAsync`) invocation, once an `Async`
    * state is hit, its job being to resume the loop after the boundary, but with the bind call-stack restored.
    */
-  private data class RestartCallback(val connInit: IOConnection, val cb: Callback) : Callback {
+  private data class RestartCallback(val connInit: IOConnection, val cb: Callback) : Callback, kotlin.coroutines.Continuation<Any?> {
+
+    // Nasty trick to re-use `Continuation` with different CC.
+    private var _context: CoroutineContext = EmptyCoroutineContext
+    override val context: CoroutineContext
+      get() = _context
 
     private var conn: IOConnection = connInit
     private var canCall = false
@@ -366,10 +375,21 @@ internal object IORunLoop {
       this.conn = conn
     }
 
-    fun prepare(bFirst: BindF?, bRest: CallStack?) {
+    private fun prepare(bFirst: BindF?, bRest: CallStack?) {
       canCall = true
       this.bFirst = bFirst
       this.bRest = bRest
+    }
+
+    fun start(async: IO.Async<Any?>, bFirst: BindF?, bRest: CallStack?) {
+      prepare(bFirst, bRest)
+      async.k(conn, this)
+    }
+
+    fun start(effect: IO.Effect<Any?>, bFirst: BindF?, bRest: CallStack?) {
+      prepare(bFirst, bRest)
+      this._context = effect.ctx
+      effect.effect.startCoroutine(this)
     }
 
     override operator fun invoke(either: Either<Throwable, Any?>) {
@@ -381,25 +401,17 @@ internal object IORunLoop {
         }
       }
     }
-  }
 
-  private fun <T> ((Either<Throwable, T>) -> Unit).asyncCallback(currentCC: CoroutineContext): (Either<Throwable, T>) -> Unit =
-    { result ->
-      val func: suspend () -> Unit = { this(result) }
-
-      val normalResume: Continuation<Unit> = object : Continuation<Unit> {
-        override val context: CoroutineContext = currentCC
-
-        override fun resume(value: Unit) {
-        }
-
-        override fun resumeWithException(exception: Throwable) {
-          this@asyncCallback(Either.left(exception))
-        }
+    override fun resumeWith(result: Result<Any?>) {
+      if (canCall) {
+        canCall = false
+        result.fold(
+          { a -> loop(IO.Pure(a), conn, cb, this, bFirst, bRest) },
+          { e -> loop(IO.RaiseError(e), conn, cb, this, bFirst, bRest) }
+        )
       }
-
-      func.startCoroutine(normalResume)
     }
+  }
 
   private class RestoreContext(
     val old: IOConnection,
