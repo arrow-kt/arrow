@@ -393,7 +393,6 @@ sealed class IO<out A> : IOOf<A> {
     /* For parMap, look into IOParallel */
   }
 
-
   /**
    * Transform the [IO] wrapped value of [A] into [B] preserving the [IO] structure.
    *
