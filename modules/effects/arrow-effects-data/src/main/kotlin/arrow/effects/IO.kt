@@ -206,6 +206,10 @@ sealed class IO<out A> : IOOf<A> {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = unsafeResync(this, limit)
   }
 
+  internal data class Effect<out A>(val ctx: CoroutineContext, val effect: suspend () -> A) : IO<A>() {
+    override fun unsafeRunTimedTotal(limit: Duration): Option<A> = unsafeResync(this, limit)
+  }
+
   internal data class Bind<E, out A>(val cont: IO<E>, val g: (E) -> IO<A>) : IO<A>() {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
   }
