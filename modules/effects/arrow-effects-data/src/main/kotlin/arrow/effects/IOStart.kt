@@ -13,27 +13,23 @@ import kotlin.coroutines.startCoroutine
 import kotlin.coroutines.suspendCoroutine
 
 /**
- * Create a new [IO] that upon execution starts the receiver [IO] within a [Fiber] on [ctx].
+ * Create a new [IO] that upon execution starts the source [IO] within a [Fiber] on [ctx].
  *
  * ```kotlin:ank:playground
- * import arrow.effects.*
- * import arrow.effects.extensions.io.async.async
- * import arrow.effects.extensions.io.monad.binding
+ * import arrow.effects.IO
  * import kotlinx.coroutines.Dispatchers
  *
  * fun main(args: Array<String>) {
  *   //sampleStart
- *   binding {
- *     val promise = Promise.uncancelable<ForIO, Int>(IO.async()).bind()
- *     val fiber = promise.get().startFiber(Dispatchers.Default).bind()
- *     promise.complete(1).bind()
- *     fiber.join().bind()
- *   }.unsafeRunSync() == 1
+ *   val program = IO { "Going to run inside a fiber" }
+ *     .startFiber(Dispatchers.Default).flatMap { (join, cancel) ->
+ *       join
+ *     }
  *   //sampleEnd
+ *   println(program.unsafeRunSync())
  * }
  * ```
  *
- * @receiver [IO] to execute on [ctx] within a new suspended [IO].
  * @param ctx [CoroutineContext] to execute the source [IO] on.
  * @return [IO] with suspended execution of source [IO] on context [ctx].
  */
