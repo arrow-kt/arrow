@@ -5,8 +5,6 @@ import arrow.higherkind
 fun <A> EvalOf<A>.value(): A = this.fix().value()
 
 /**
- * ank_macro_hierarchy(arrow.core.Eval)
- *
  * Eval is a monad which controls evaluation of a value or a computation that produces a value.
  *
  * Three basic evaluation strategies:
