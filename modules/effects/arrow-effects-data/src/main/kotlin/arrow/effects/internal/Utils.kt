@@ -7,7 +7,9 @@ import arrow.core.Some
 import arrow.core.left
 import arrow.core.right
 import arrow.effects.IO
+import arrow.effects.IOOf
 import arrow.effects.KindConnection
+import arrow.effects.fix
 import arrow.effects.typeclasses.Duration
 import java.util.concurrent.Executor
 import java.util.concurrent.atomic.AtomicBoolean
@@ -286,3 +288,16 @@ internal fun <A> asyncContinuation(ctx: CoroutineContext, cc: (Either<Throwable,
       cc(exception.left())
     }
   }
+
+/**
+ * Utility to makes sure that the original [fa] is gets forked on [ctx].
+ * @see IO.startFiber
+ * @see arrow.effects.racePair
+ * @see arrow.effects.raceTriple
+ *
+ * This moves the forking inside the [IO] operation,
+ * so it'll share it's [kotlin.coroutines.Continuation] with other potential jumps or [IO.async].
+ * @see [arrow.effects.IORunLoop.RestartCallback]
+ */
+internal fun <A> IOForkedStart(fa: IOOf<A>, ctx: CoroutineContext): IO<A> =
+  IO.Bind(IO.ContinueOn(IO.unit, ctx)) { fa.fix() }
