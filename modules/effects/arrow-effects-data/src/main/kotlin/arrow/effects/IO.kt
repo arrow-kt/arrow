@@ -458,6 +458,8 @@ sealed class IO<out A> : IOOf<A> {
   open fun continueOn(ctx: CoroutineContext): IO<A> =
     ContinueOn(this, ctx)
 
+  fun <B> followedBy(fb: IOOf<B>) = flatMap { fb }
+
   fun attempt(): IO<Either<Throwable, A>> =
     Bind(this, IOFrame.any())
 
@@ -691,6 +693,10 @@ sealed class IO<out A> : IOOf<A> {
   }
 
   internal data class Async<out A>(val k: IOProc<A>) : IO<A>() {
+    override fun unsafeRunTimedTotal(limit: Duration): Option<A> = unsafeResync(this, limit)
+  }
+
+  internal data class Effect<out A>(val ctx: CoroutineContext, val effect: suspend () -> A) : IO<A>() {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = unsafeResync(this, limit)
   }
 
