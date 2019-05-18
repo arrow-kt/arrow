@@ -4,11 +4,10 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Left
-import arrow.core.NonFatal
 import arrow.core.Right
 import arrow.core.identity
+import arrow.core.nonFatalOrThrow
 import arrow.effects.OnCancel
-import arrow.effects.internal.Platform
 import arrow.effects.rx2.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
@@ -79,29 +78,23 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
    *  ```
    */
   fun <B> bracketCase(use: (A) -> ObservableKOf<B>, release: (A, ExitCase<Throwable>) -> ObservableKOf<Unit>): ObservableK<B> =
-    ObservableK(Observable.create<B> { emitter ->
-      observable.subscribe({ a ->
+    Observable.create<B> { emitter ->
+      val dispose = concatMap { a ->
         if (emitter.isDisposed) release(a, ExitCase.Canceled).fix().observable.subscribe({}, emitter::onError)
-        else try {
-          emitter.setDisposable(use(a).fix()
-            .flatMap { b -> release(a, ExitCase.Completed).fix().map { b } }
-            .handleErrorWith { e -> release(a, ExitCase.Error(e)).fix().flatMap { ObservableK.raiseError<B>(e) } }
-            .observable
-            .doOnDispose { release(a, ExitCase.Canceled).fix().observable.subscribe({}, emitter::onError) }
-            .subscribe(emitter::onNext, emitter::onError))
-        } catch (e: Throwable) {
-          if (NonFatal(e)) {
-            release(a, ExitCase.Error(e)).fix().observable.subscribe({
-              emitter.onError(e)
-            }, { e2 ->
-              emitter.onError(Platform.composeErrors(e, e2))
-            })
-          } else {
-            throw e
+        defer { use(a) }
+          .value()
+          .doOnError { t: Throwable ->
+            defer { release(a, ExitCase.Error(t.nonFatalOrThrow())) }.value().subscribe({ emitter.onError(t) }, emitter::onError)
+          }.doOnComplete {
+            defer { release(a, ExitCase.Completed) }.fix().value().subscribe({ emitter.onComplete() }, emitter::onError)
           }
-        }
-      }, emitter::onError, emitter::onComplete)
-    })
+          .doOnDispose {
+            defer { release(a, ExitCase.Canceled) }.value().subscribe({}, emitter::onError)
+          }
+          .k()
+      }.value().subscribe(emitter::onNext, {}, {})
+      emitter.setCancellable { dispose.dispose() }
+    }.k()
 
   fun <B> concatMap(f: (A) -> ObservableKOf<B>): ObservableK<B> =
     observable.concatMap { f(it).value() }.k()

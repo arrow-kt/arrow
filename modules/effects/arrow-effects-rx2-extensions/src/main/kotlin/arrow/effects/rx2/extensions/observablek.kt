@@ -5,6 +5,7 @@ import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Tuple3
 import arrow.core.toT
+import arrow.effects.OnCancel
 import arrow.effects.rx2.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.rx2.ForObservableK
 import arrow.effects.rx2.ObservableK
@@ -175,10 +176,14 @@ interface ObservableKConcurrent : Concurrent<ForObservableK>, ObservableKAsync {
   override fun <A> CoroutineContext.startFiber(kind: ObservableKOf<A>): ObservableK<Fiber<ForObservableK, A>> =
     asScheduler().let { scheduler ->
       Observable.create<Fiber<ForObservableK, A>> { emitter ->
-        val s: ReplaySubject<A> = ReplaySubject.create()
-        val conn: rxDisposable = kind.value().subscribeOn(scheduler).subscribe(s::onNext, s::onError)
-        emitter.setDisposable(conn)
-        emitter.onNext(Fiber(s.k(), ObservableK { conn.dispose() }))
+        if (!emitter.isDisposed) {
+          val s: ReplaySubject<A> = ReplaySubject.create()
+          val conn: rxDisposable = kind.value().subscribeOn(scheduler).subscribe(s::onNext, s::onError)
+          emitter.onNext(Fiber(s.k(), ObservableK {
+            conn.dispose()
+            if (!emitter.isDisposed) { emitter.onError(OnCancel.CancellationException) }
+          }))
+        }
       }.k()
     }
 
