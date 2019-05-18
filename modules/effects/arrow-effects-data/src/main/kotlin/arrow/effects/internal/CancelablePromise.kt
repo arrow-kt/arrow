@@ -8,6 +8,9 @@ import arrow.core.Option
 import arrow.core.Right
 import arrow.core.Some
 import arrow.effects.Promise
+import arrow.effects.internal.CancelablePromise.State.Complete
+import arrow.effects.internal.CancelablePromise.State.Error
+import arrow.effects.internal.CancelablePromise.State.Pending
 import arrow.effects.typeclasses.Concurrent
 import arrow.effects.typeclasses.Fiber
 import arrow.effects.typeclasses.mapUnit
@@ -37,9 +40,9 @@ internal class CancelablePromise<F, A>(private val CF: Concurrent<F>) : Promise<
 
   override fun tryGet(): Kind<F, Option<A>> = later {
     when (val current = state.get()) {
-      is State.Complete -> Some(current.value)
-      is State.Pending -> None
-      is State.Error -> None
+      is Complete -> Some(current.value)
+      is Pending -> None
+      is Error -> None
     }
   }
 

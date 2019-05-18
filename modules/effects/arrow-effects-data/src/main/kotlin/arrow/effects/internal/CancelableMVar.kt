@@ -9,6 +9,8 @@ import arrow.core.Some
 import arrow.core.Tuple2
 import arrow.effects.CancelToken
 import arrow.effects.MVar
+import arrow.effects.internal.CancelableMVar.Companion.State.WaitForPut
+import arrow.effects.internal.CancelableMVar.Companion.State.WaitForTake
 import arrow.effects.typeclasses.Concurrent
 import arrow.effects.typeclasses.Fiber
 import arrow.effects.typeclasses.mapUnit
@@ -46,15 +48,15 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, priva
 
   override fun isEmpty(): Kind<F, Boolean> = later {
     when (state.get()) {
-      is State.WaitForPut -> true
-      is State.WaitForTake -> false
+      is WaitForPut -> true
+      is WaitForTake -> false
     }
   }
 
   override fun isNotEmpty(): Kind<F, Boolean> = later {
     when (state.get()) {
-      is State.WaitForPut -> false
-      is State.WaitForTake -> true
+      is WaitForPut -> false
+      is WaitForTake -> true
     }
   }
 

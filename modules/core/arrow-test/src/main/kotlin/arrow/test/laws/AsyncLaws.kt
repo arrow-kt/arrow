@@ -34,7 +34,7 @@ object AsyncLaws {
       Law("Async Laws: bracket release is called on completed or error") { AC.bracketReleaseIscalledOnCompletedOrError(EQ) },
       Law("Async Laws: continueOn on comprehensions") { AC.continueOnComprehension(EQ) },
       Law("Async Laws: effect calls suspend functions in the right dispatcher") { AC.effectCanCallSuspend(EQ) },
-      Law("Async Laws: effect is equivalent to delay") { AC.effectEquivalence(EQ) }
+      Law("Async Laws: effect is equivalent to later") { AC.effectEquivalence(EQ) }
     )
 
   fun <F> Async<F>.asyncSuccess(EQ: Eq<Kind<F, Int>>): Unit =
@@ -59,9 +59,9 @@ object AsyncLaws {
 
   fun <F> Async<F>.asyncConstructor(EQ: Eq<Kind<F, Int>>): Unit =
     forFew(5, Gen.intSmall(), Gen.intSmall()) { threadId1: Int, threadId2: Int ->
-      delay(newSingleThreadContext(threadId1.toString())) { getCurrentThread() }
+      later(newSingleThreadContext(threadId1.toString())) { getCurrentThread() }
         .flatMap {
-          delay(newSingleThreadContext(threadId2.toString())) { it + getCurrentThread() }
+          later(newSingleThreadContext(threadId2.toString())) { it + getCurrentThread() }
         }
         .equalUnderTheLaw(just(threadId1 + threadId2), EQ)
     }
@@ -117,7 +117,7 @@ object AsyncLaws {
 
       val effect = effect(newSingleThreadContext("1")) { fs() }
 
-      val continueOn = delay(newSingleThreadContext("2")) { f(Unit) }
+      val continueOn = later(newSingleThreadContext("2")) { f(Unit) }
 
       effect.equalUnderTheLaw(continueOn, EQ)
     }

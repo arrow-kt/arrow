@@ -20,7 +20,7 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kotlinx.coroutines.Dispatchers
 import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 
@@ -160,7 +160,7 @@ object ConcurrentLaws {
         }).bind()
 
         ctx.shift().followedBy(asyncF<Unit> { cb ->
-          later { latch.await(500, TimeUnit.MILLISECONDS) }
+          later { latch.await(500, MILLISECONDS) }
             .map { cb(Right(Unit)) }
         }).bind()
 
@@ -204,8 +204,8 @@ object ConcurrentLaws {
 
         ctx.startFiber(upstream.followedBy(downstream)).bind()
 
-        ctx.startFiber(delay(ctx) {
-          cancelLatch.await(500, TimeUnit.MILLISECONDS)
+        ctx.startFiber(later(ctx) {
+          cancelLatch.await(500, MILLISECONDS)
         }.flatMap { cancelToken.get() ?: raiseError(AssertionError("CancelToken was not set.")) }
         ).bind()
 
@@ -224,8 +224,8 @@ object ConcurrentLaws {
           startLatch.countDown()
         }).bind()
 
-        delay(ctx) {
-          startLatch.await(500, TimeUnit.MILLISECONDS)
+        later(ctx) {
+          startLatch.await(500, MILLISECONDS)
         }.followedBy(cancel).bind()
 
         latch.get().bind()

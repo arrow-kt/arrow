@@ -140,7 +140,7 @@ interface Async<F> : MonadDefer<F> {
    * }
    * ```
    */
-  fun <A> delay(ctx: CoroutineContext, f: () -> A): Kind<F, A> =
+  fun <A> later(ctx: CoroutineContext, f: () -> A): Kind<F, A> =
     defer(ctx) {
       try {
         just(f())
@@ -205,7 +205,7 @@ interface Async<F> : MonadDefer<F> {
    * @param ctx [CoroutineContext] to run evaluation on.
    *
    */
-  fun <A> delayOrRaise(ctx: CoroutineContext, f: () -> Either<Throwable, A>): Kind<F, A> =
+  fun <A> laterOrRaise(ctx: CoroutineContext, f: () -> Either<Throwable, A>): Kind<F, A> =
     defer(ctx) { f().fold({ raiseError<A>(it) }, { just(it) }) }
 
   /**
@@ -258,7 +258,7 @@ interface Async<F> : MonadDefer<F> {
    * ```
    */
   fun CoroutineContext.shift(): Kind<F, Unit> =
-    delay(this) { Unit }
+    later(this) { Unit }
 
   /**
    * Task that never finishes evaluating.
