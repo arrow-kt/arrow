@@ -5,7 +5,6 @@ import arrow.core.Some
 import arrow.core.Tuple3
 import arrow.core.Tuple4
 import arrow.core.Tuple7
-import arrow.core.flatMap
 import arrow.core.toT
 import arrow.effects.extensions.io.async.async
 import arrow.effects.extensions.io.concurrent.concurrent
@@ -25,7 +24,7 @@ class MVarTest : UnitSpec() {
 
   init {
 
-    fun tests(label: String, mvar: MVarPartialOf<ForIO>) {
+    fun tests(label: String, mvar: MVarFactory<ForIO>) {
       "$label - empty; put; isNotEmpty; take; put; take" {
         forAll(Gen.int(), Gen.int()) { a, b ->
           binding {
@@ -118,7 +117,7 @@ class MVarTest : UnitSpec() {
       "$label - initial; isNotEmpty; take; put; take" {
         forAll(Gen.int(), Gen.int()) { a, b ->
           binding {
-            val av = mvar.of(a).bind()
+            val av = mvar.just(a).bind()
             val isNotEmpty = av.isNotEmpty().bind()
             val r1 = av.take().bind()
             av.put(b).bind()
@@ -132,7 +131,7 @@ class MVarTest : UnitSpec() {
       "$label - initial; read; take" {
         forAll(Gen.int()) { i ->
           binding {
-            val av = mvar.of(i).bind()
+            val av = mvar.just(i).bind()
             val read = av.read().bind()
             val take = av.take().bind()
             read toT take
@@ -156,12 +155,12 @@ class MVarTest : UnitSpec() {
             }
 
         val count = 10000
-        val task = mvar.of(1).flatMap { ch -> loop(count, 0, ch) }
+        val task = mvar.just(1).flatMap { ch -> loop(count, 0, ch) }
         task.equalUnderTheLaw(IO.just(count), EQ())
       }
     }
 
-    tests("UncancelableMVar", MVar(IO.async()))
-    tests("CancelableMVar", MVar(IO.concurrent()))
+    tests("UncancelableMVar", MVar.factoryUncancelable(IO.async()))
+    tests("CancelableMVar", MVar.factoryUncancelable(IO.concurrent()))
   }
 }
