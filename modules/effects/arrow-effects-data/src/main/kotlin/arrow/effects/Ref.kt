@@ -106,7 +106,7 @@ interface Ref<F, A> {
     /**
      * Creates an asynchronous, concurrent mutable reference initialized using the supplied function.
      */
-    operator fun <F, A> invoke(MD: MonadDefer<F>, f: () -> A): Kind<F, Ref<F, A>> = MD.delay {
+    operator fun <F, A> invoke(MD: MonadDefer<F>, f: () -> A): Kind<F, Ref<F, A>> = MD.later {
       unsafe(f(), MD)
     }
 
@@ -123,15 +123,15 @@ interface Ref<F, A> {
      */
     private class MonadDeferRef<F, A>(private val ar: AtomicReference<A>, private val MD: MonadDefer<F>) : Ref<F, A> {
 
-      override fun get(): Kind<F, A> = MD.delay {
+      override fun get(): Kind<F, A> = MD.later {
         ar.get()
       }
 
-      override fun set(a: A): Kind<F, Unit> = MD.delay {
+      override fun set(a: A): Kind<F, Unit> = MD.later {
         ar.set(a)
       }
 
-      override fun getAndSet(a: A): Kind<F, A> = MD.delay {
+      override fun getAndSet(a: A): Kind<F, A> = MD.later {
         ar.getAndSet(a)
       }
 
@@ -139,19 +139,19 @@ interface Ref<F, A> {
         set(a).flatMap { get() }
       }
 
-      override fun getAndUpdate(f: (A) -> A): Kind<F, A> = MD.delay {
+      override fun getAndUpdate(f: (A) -> A): Kind<F, A> = MD.later {
         ar.getAndUpdate(f)
       }
 
-      override fun updateAndGet(f: (A) -> A): Kind<F, A> = MD.delay {
+      override fun updateAndGet(f: (A) -> A): Kind<F, A> = MD.later {
         ar.updateAndGet(f)
       }
 
-      override fun access(): Kind<F, Tuple2<A, (A) -> Kind<F, Boolean>>> = MD.delay {
+      override fun access(): Kind<F, Tuple2<A, (A) -> Kind<F, Boolean>>> = MD.later {
         val snapshot = ar.get()
         val hasBeenCalled = AtomicBoolean(false)
         val setter = { a: A ->
-          MD.delay { hasBeenCalled.compareAndSet(false, true) && ar.compareAndSet(snapshot, a) }
+          MD.later { hasBeenCalled.compareAndSet(false, true) && ar.compareAndSet(snapshot, a) }
         }
         Tuple2(snapshot, setter)
       }
@@ -161,7 +161,7 @@ interface Ref<F, A> {
           .map(Option<Unit>::isDefined)
       }
 
-      override fun <B> tryModify(f: (A) -> Tuple2<A, B>): Kind<F, Option<B>> = MD.delay {
+      override fun <B> tryModify(f: (A) -> Tuple2<A, B>): Kind<F, Option<B>> = MD.later {
         val a = ar.get()
         val (u, b) = f(a)
         if (ar.compareAndSet(a, u)) Some(b)
@@ -178,7 +178,7 @@ interface Ref<F, A> {
           return if (!ar.compareAndSet(a, u)) go() else b
         }
 
-        return MD.delay(::go)
+        return MD.later(::go)
       }
     }
   }

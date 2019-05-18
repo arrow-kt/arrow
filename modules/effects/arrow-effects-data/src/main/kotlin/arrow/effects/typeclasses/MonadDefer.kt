@@ -21,7 +21,14 @@ interface MonadDefer<F> : MonadThrow<F>, Bracket<F, Throwable> {
 
   fun <A> defer(fa: () -> Kind<F, A>): Kind<F, A>
 
+  @Deprecated(
+    "`delay` is getting renamed to `later` so we can add a timer `delay` function for coroutines",
+    ReplaceWith("later(f)")
+  )
   fun <A> delay(f: () -> A): Kind<F, A> =
+    later(f)
+
+  fun <A> later(f: () -> A): Kind<F, A> =
     defer {
       try {
         just(f())
@@ -30,9 +37,9 @@ interface MonadDefer<F> : MonadThrow<F>, Bracket<F, Throwable> {
       }
     }
 
-  fun <A> delay(fa: Kind<F, A>): Kind<F, A> = defer { fa }
+  fun <A> later(fa: Kind<F, A>): Kind<F, A> = defer { fa }
 
-  fun lazy(): Kind<F, Unit> = delay { }
+  fun lazy(): Kind<F, Unit> = later { }
 
   fun <A> delayOrRaise(f: () -> Either<Throwable, A>): Kind<F, A> =
     defer { f().fold({ raiseError<A>(it) }, { just(it) }) }

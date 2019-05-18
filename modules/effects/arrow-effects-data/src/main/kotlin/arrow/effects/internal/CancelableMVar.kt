@@ -22,12 +22,12 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, priva
 
   companion object {
     /** Builds an [UncancelableMVar] instance with an [initial] value. */
-    operator fun <F, A> invoke(initial: A, CF: Concurrent<F>): Kind<F, MVar<F, A>> = CF.delay {
+    operator fun <F, A> invoke(initial: A, CF: Concurrent<F>): Kind<F, MVar<F, A>> = CF.later {
       CancelableMVar(State(initial), CF)
     }
 
     /** Returns an empty [UncancelableMVar] instance. */
-    fun <F, A> empty(CF: Concurrent<F>): Kind<F, MVar<F, A>> = CF.delay {
+    fun <F, A> empty(CF: Concurrent<F>): Kind<F, MVar<F, A>> = CF.later {
       CancelableMVar(State.empty<A>(), CF)
     }
 
@@ -44,14 +44,14 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, priva
     }
   }
 
-  override fun isEmpty(): Kind<F, Boolean> = delay {
+  override fun isEmpty(): Kind<F, Boolean> = later {
     when (state.get()) {
       is State.WaitForPut -> true
       is State.WaitForTake -> false
     }
   }
 
-  override fun isNotEmpty(): Kind<F, Boolean> = delay {
+  override fun isNotEmpty(): Kind<F, Boolean> = later {
     when (state.get()) {
       is State.WaitForPut -> false
       is State.WaitForTake -> true
@@ -101,7 +101,7 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, priva
       is State.WaitForTake -> {
         val id = Token()
         val newMap = current.listeners + Pair(id, Tuple2(a, onPut))
-        if (state.compareAndSet(current, State.WaitForTake(current.value, newMap))) just(delay { unsafeCancelPut(id) })
+        if (state.compareAndSet(current, State.WaitForTake(current.value, newMap))) just(later { unsafeCancelPut(id) })
         else unsafePut(a, onPut)
       }
       is State.WaitForPut -> {
@@ -143,7 +143,7 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, priva
         } else {
           val (ax, notify) = current.listeners.values.first()
           val xs = current.listeners.toList().drop(1)
-          if (state.compareAndSet(current, State.WaitForTake(ax, xs.toMap()))) EmptyCoroutineContext.startFiber(delay { notify(rightUnit) }).map { Some(current.value) }
+          if (state.compareAndSet(current, State.WaitForTake(ax, xs.toMap()))) EmptyCoroutineContext.startFiber(later { notify(rightUnit) }).map { Some(current.value) }
           else unsafeTryTake()
         }
       }
@@ -164,7 +164,7 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, priva
           val (ax, notify) = current.listeners.values.first()
           val xs = current.listeners.toList().drop(0)
           if (state.compareAndSet(current, State.WaitForTake(ax, xs.toMap()))) {
-            EmptyCoroutineContext.startFiber(delay { notify(rightUnit) }).map {
+            EmptyCoroutineContext.startFiber(later { notify(rightUnit) }).map {
               onTake(Right(current.value))
               unit()
             }
@@ -174,7 +174,7 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, priva
       is State.WaitForPut -> {
         val id = Token()
         val newQueue = current.takes + Pair(id, onTake)
-        if (state.compareAndSet(current, State.WaitForPut(current.reads, newQueue))) just(delay { unsafeCancelTake(id) })
+        if (state.compareAndSet(current, State.WaitForPut(current.reads, newQueue))) just(later { unsafeCancelTake(id) })
         else unsafeTake(onTake)
       }
     }
@@ -199,7 +199,7 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, priva
       is State.WaitForPut -> {
         val id = Token()
         val newReads = current.reads + Pair(id, onRead)
-        if (state.compareAndSet(current, State.WaitForPut(newReads, current.takes))) delay { unsafeCancelRead(id) }
+        if (state.compareAndSet(current, State.WaitForPut(newReads, current.takes))) later { unsafeCancelRead(id) }
         else unsafeRead(onRead)
       }
     }
@@ -218,7 +218,7 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, priva
   private fun callPutAndAllReaders(a: A, put: ((Either<Nothing, A>) -> Unit)?, reads: Map<Token, (Either<Nothing, A>) -> Unit>): Kind<F, Boolean> {
     val value = Right(a)
     return reads.values.callAll(value).flatMap {
-      if (put != null) EmptyCoroutineContext.startFiber(delay { put(value) }).map { true }
+      if (put != null) EmptyCoroutineContext.startFiber(later { put(value) }).map { true }
       else just(true)
     }
   }
@@ -226,7 +226,7 @@ internal class CancelableMVar<F, A> private constructor(initial: State<A>, priva
   // For streaming a value to a whole `reads` collection
   private fun Iterable<(Either<Nothing, A>) -> Unit>.callAll(value: Either<Nothing, A>): Kind<F, Unit> =
     fold(null as Kind<F, Fiber<F, Unit>>?) { acc, cb ->
-      val task = EmptyCoroutineContext.startFiber(delay { cb(value) })
+      val task = EmptyCoroutineContext.startFiber(later { cb(value) })
       acc?.flatMap { task } ?: task
     }?.map(mapUnit) ?: unit()
 

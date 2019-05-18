@@ -82,13 +82,13 @@ object AsyncLaws {
         f(eith)
       }
 
-      async(k).equalUnderTheLaw(asyncF { cb -> delay { k(cb) } }, EQ)
+      async(k).equalUnderTheLaw(asyncF { cb -> later { k(cb) } }, EQ)
     }
 
   fun <F> Async<F>.bracketReleaseIscalledOnCompletedOrError(EQ: Eq<Kind<F, Int>>) {
     forAll(Gen.string().applicativeError(this), Gen.int()) { fa, b ->
       Promise.uncancelable<F, Int>(this@bracketReleaseIscalledOnCompletedOrError).flatMap { promise ->
-        val br = delay { promise }.bracketCase(use = { fa }, release = { r, exitCase ->
+        val br = later { promise }.bracketCase(use = { fa }, release = { r, exitCase ->
           when (exitCase) {
             is ExitCase.Completed -> r.complete(b)
             is ExitCase.Error -> r.complete(b)
@@ -96,7 +96,7 @@ object AsyncLaws {
           }
         })
 
-        asyncF<Unit> { cb -> delay { cb(Right(Unit)) }.flatMap { br.attempt().`as`(Unit) } }
+        asyncF<Unit> { cb -> later { cb(Right(Unit)) }.flatMap { br.attempt().`as`(Unit) } }
           .flatMap { promise.get() }
       }.equalUnderTheLaw(just(b), EQ)
     }

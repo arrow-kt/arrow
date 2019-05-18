@@ -11,7 +11,6 @@ import arrow.data.StateT
 import arrow.data.extensions.statet.monad.monad
 import arrow.core.extensions.id.monad.monad
 import arrow.data.fix
-import arrow.data.run
 import arrow.effects.IO
 import arrow.effects.extensions.io.monadDefer.monadDefer
 import arrow.effects.fix
@@ -30,8 +29,8 @@ interface Console<F> {
 }
 
 class ConsoleImpl<F>(val delay: MonadDefer<F>) : Console<F> {
-  override fun putStrLn(s: String): Kind<F, Unit> = delay.delay { println(s) }
-  override fun getStrLn(): Kind<F, String> = delay.delay { readLine().orEmpty() }
+  override fun putStrLn(s: String): Kind<F, Unit> = delay.later { println(s) }
+  override fun getStrLn(): Kind<F, String> = delay.later { readLine().orEmpty() }
 }
 
 interface FRandom<F> {
@@ -39,7 +38,7 @@ interface FRandom<F> {
 }
 
 class FRandomImpl<F>(val delay: MonadDefer<F>) : FRandom<F> {
-  override fun nextInt(upper: Int): Kind<F, Int> = delay.delay { ORandom.nextInt(upper) }
+  override fun nextInt(upper: Int): Kind<F, Int> = delay.later { ORandom.nextInt(upper) }
 }
 
 class MonadAndConsoleRandom<F>(M: Monad<F>, C: Console<F>, R: FRandom<F>) : Monad<F> by M, Console<F> by C, FRandom<F> by R

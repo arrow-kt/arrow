@@ -66,7 +66,7 @@ object MonadDeferLaws {
 
   fun <F> MonadDefer<F>.delayConstantEqualsPure(EQ: Eq<Kind<F, Int>>) {
     forAll(Gen.intSmall()) { x ->
-      delay { x }.equalUnderTheLaw(just(x), EQ)
+      later { x }.equalUnderTheLaw(just(x), EQ)
     }
   }
 
@@ -90,13 +90,13 @@ object MonadDeferLaws {
 
   fun <F> MonadDefer<F>.delayThrowEqualsRaiseError(EQERR: Eq<Kind<F, Int>>) {
     forFew(5, Gen.throwable()) { t ->
-      delay { throw t }.equalUnderTheLaw(raiseError(t), EQERR)
+      later { throw t }.equalUnderTheLaw(raiseError(t), EQERR)
     }
   }
 
   fun <F> MonadDefer<F>.propagateErrorsThroughBind(EQERR: Eq<Kind<F, Int>>) {
     forFew(5, Gen.throwable()) { t ->
-      delay { throw t }.flatMap<Int, Int> { a: Int -> just(a) }.equalUnderTheLaw(raiseError(t), EQERR)
+      later { throw t }.flatMap<Int, Int> { a: Int -> just(a) }.equalUnderTheLaw(raiseError(t), EQERR)
     }
   }
 
@@ -112,7 +112,7 @@ object MonadDeferLaws {
 
   fun <F> MonadDefer<F>.delaySuspendsEvaluation(EQ: Eq<Kind<F, Int>>) {
     val sideEffect = SideEffect(counter = 0)
-    val df = delay { sideEffect.increment(); sideEffect.counter }
+    val df = later { sideEffect.increment(); sideEffect.counter }
 
     Thread.sleep(10)
 
@@ -142,7 +142,7 @@ object MonadDeferLaws {
 
   fun <F> MonadDefer<F>.repeatedSyncEvaluationNotMemoized(EQ: Eq<Kind<F, Int>>) {
     val sideEffect = SideEffect()
-    val df = delay { sideEffect.increment(); sideEffect.counter }
+    val df = later { sideEffect.increment(); sideEffect.counter }
 
     df.flatMap { df }.flatMap { df }.equalUnderTheLaw(just(3), EQ) shouldBe true
   }
@@ -216,7 +216,7 @@ object MonadDeferLaws {
   fun <F> MonadDefer<F>.asyncParallelBind(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.intSmall(), Gen.intSmall(), Gen.intSmall()) { x: Int, y: Int, z: Int ->
       val (bound, _) = bindingCancellable {
-        val value = bind { tupled(delay { x }, delay { y }, delay { z }) }
+        val value = bind { tupled(later { x }, later { y }, later { z }) }
         value.a + value.b + value.c
       }
       bound.equalUnderTheLaw(just(x + y + z), EQ)

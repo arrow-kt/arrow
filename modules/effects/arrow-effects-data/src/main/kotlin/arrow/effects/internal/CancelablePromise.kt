@@ -29,13 +29,13 @@ internal class CancelablePromise<F, A>(private val CF: Concurrent<F>) : Promise<
       is State.Complete -> just(current.value)
       is State.Pending -> cancelable { cb ->
         val id = unsafeRegister(cb)
-        delay { unregister(id) }
+        later { unregister(id) }
       }
       is State.Error -> raiseError(current.throwable)
     }
   }
 
-  override fun tryGet(): Kind<F, Option<A>> = delay {
+  override fun tryGet(): Kind<F, Option<A>> = later {
     when (val current = state.get()) {
       is State.Complete -> Some(current.value)
       is State.Pending -> None
@@ -87,7 +87,7 @@ internal class CancelablePromise<F, A>(private val CF: Concurrent<F>) : Promise<
 
   private fun Iterable<(Either<Throwable, A>) -> Unit>.callAll(value: Either<Throwable, A>): Kind<F, Unit> =
     fold(null as Kind<F, Fiber<F, Unit>>?) { acc, cb ->
-      val task = EmptyCoroutineContext.startFiber(delay { cb(value) })
+      val task = EmptyCoroutineContext.startFiber(later { cb(value) })
       acc?.flatMap { task } ?: task
     }?.map(mapUnit) ?: unit()
 

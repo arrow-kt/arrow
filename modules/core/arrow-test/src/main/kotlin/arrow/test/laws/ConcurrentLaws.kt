@@ -144,7 +144,7 @@ object ConcurrentLaws {
   fun <F> Concurrent<F>.cancelableCancelableFCoherence(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.either(Gen.throwable(), Gen.int())) { eith ->
       cancelable<Int> { cb -> cb(eith); just<Unit>(Unit) }
-        .equalUnderTheLaw(cancelableF { cb -> delay { cb(eith); just<Unit>(Unit) } }, EQ)
+        .equalUnderTheLaw(cancelableF { cb -> later { cb(eith); just<Unit>(Unit) } }, EQ)
     }
 
   fun <F> Concurrent<F>.cancelableReceivesCancelSignal(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
@@ -160,7 +160,7 @@ object ConcurrentLaws {
         }).bind()
 
         ctx.shift().followedBy(asyncF<Unit> { cb ->
-          delay { latch.await(500, TimeUnit.MILLISECONDS) }
+          later { latch.await(500, TimeUnit.MILLISECONDS) }
             .map { cb(Right(Unit)) }
         }).bind()
 

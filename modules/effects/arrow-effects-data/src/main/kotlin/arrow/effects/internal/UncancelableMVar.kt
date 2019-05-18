@@ -38,14 +38,14 @@ internal class UncancelableMVar<F, A> private constructor(initial: State<A>, pri
   override fun read(): Kind<F, A> =
     async(::unsafeRead)
 
-  override fun isEmpty(): Kind<F, Boolean> = delay {
+  override fun isEmpty(): Kind<F, Boolean> = later {
     when (stateRef.get()) {
       is State.WaitForPut -> true
       is State.WaitForTake -> false
     }
   }
 
-  override fun isNotEmpty(): Kind<F, Boolean> = delay {
+  override fun isNotEmpty(): Kind<F, Boolean> = later {
     when (stateRef.get()) {
       is State.WaitForPut -> false
       is State.WaitForTake -> true
@@ -178,12 +178,12 @@ internal class UncancelableMVar<F, A> private constructor(initial: State<A>, pri
 
   companion object {
     /** Builds an [UncancelableMVar] instance with an [initial] value. */
-    operator fun <F, A> invoke(initial: A, AS: Async<F>): Kind<F, MVar<F, A>> = AS.delay {
+    operator fun <F, A> invoke(initial: A, AS: Async<F>): Kind<F, MVar<F, A>> = AS.later {
       UncancelableMVar(State(initial), AS)
     }
 
     /** Returns an empty [UncancelableMVar] instance. */
-    fun <F, A> empty(AS: Async<F>): Kind<F, MVar<F, A>> = AS.delay {
+    fun <F, A> empty(AS: Async<F>): Kind<F, MVar<F, A>> = AS.later {
       UncancelableMVar(State.empty<A>(), AS)
     }
 

@@ -84,7 +84,7 @@ interface Concurrent<F> : Async<F> {
    * @see asyncF for a version that can suspend side effects in the registration function.
    */
   fun <A> async(fa: ConnectedProc<F, A>): Kind<F, A> =
-    asyncF { conn, cb -> delay { fa(conn, cb) } }
+    asyncF { conn, cb -> later { fa(conn, cb) } }
 
   /**
    * Creates a cancelable instance of [F] that executes an asynchronous process on evaluation.
@@ -293,7 +293,7 @@ interface Concurrent<F> : Async<F> {
    * @see cancelableF for a version that can safely suspend impure callback registration code.
    */
   fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<F>): Kind<F, A> =
-    cancelableF { cb -> delay { k(cb) } }
+    cancelableF { cb -> later { k(cb) } }
 
   /**
    * Builder to create a cancelable [F] instance that executes an asynchronous process on evaluation.

@@ -213,7 +213,7 @@ interface Promise<F, A> {
      * ```
      */
     operator fun <F, A> invoke(CF: Concurrent<F>): Kind<F, Promise<F, A>> =
-      CF.delay { CancelablePromise<F, A>(CF) }
+      CF.later { CancelablePromise<F, A>(CF) }
 
     /**
      * Creates an empty `Promise` from on [Concurrent] instance for [F].
@@ -248,7 +248,7 @@ interface Promise<F, A> {
      * ```
      */
     fun <F, A> uncancelable(AS: Async<F>): Kind<F, Promise<F, A>> =
-      AS.delay { UncancelablePromise<F, A>(AS) }
+      AS.later { UncancelablePromise<F, A>(AS) }
 
     /**
      * Creates an empty `Promise` from on [Async] instance for [F].

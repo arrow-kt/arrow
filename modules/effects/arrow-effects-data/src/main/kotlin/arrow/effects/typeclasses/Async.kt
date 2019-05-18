@@ -63,7 +63,7 @@ interface Async<F> : MonadDefer<F> {
    * @see asyncF for a version that can suspend side effects in the registration function.
    */
   fun <A> async(fa: Proc<A>): Kind<F, A> =
-    asyncF { cb -> delay { fa(cb) } }
+    asyncF { cb -> later { fa(cb) } }
 
   /**
    * [async] variant that can suspend side effects in the provided registration function.
