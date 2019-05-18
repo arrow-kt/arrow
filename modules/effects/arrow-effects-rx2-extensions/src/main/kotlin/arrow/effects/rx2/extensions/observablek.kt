@@ -181,7 +181,6 @@ interface ObservableKConcurrent : Concurrent<ForObservableK>, ObservableKAsync {
           val conn: rxDisposable = kind.value().subscribeOn(scheduler).subscribe(s::onNext, s::onError)
           emitter.onNext(Fiber(s.k(), ObservableK {
             conn.dispose()
-            if (!emitter.isDisposed) { emitter.onError(OnCancel.CancellationException) }
           }))
         }
       }.k()
