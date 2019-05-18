@@ -16,7 +16,7 @@ import kotlin.coroutines.CoroutineContext
 
 typealias JavaCancellationException = java.util.concurrent.CancellationException
 
-class ArrowInternalException(
+internal open class ArrowInternalException(
   override val message: String =
     "Arrow-kt internal error. Please let us know and create a ticket at https://github.com/arrow-kt/arrow/issues/new/choose"
 ) : RuntimeException(message)
