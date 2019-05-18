@@ -89,7 +89,7 @@ The function `continueOn()` is also available inside [`Monad Comprehensions`]({{
 
 #### effect
 
-Similar to `MonadDefer`'s `delay`, this constructor takes a single suspended function and optionally the `CoroutineContext` it has to be run on.
+Similar to `MonadDefer`'s `later`, this constructor takes a single suspended function and optionally the `CoroutineContext` it has to be run on.
 
 ```kotlin
 IO.async().run {
@@ -103,7 +103,7 @@ IO.async().run {
 
 #### invoke with CoroutineContext
 
-Similar to `MonadDefer`'s `delay`, this constructor takes a single generator function and the `CoroutineContext` it has to be run on.
+Similar to `MonadDefer`'s `later`, this constructor takes a single generator function and the `CoroutineContext` it has to be run on.
 
 ```kotlin
 IO.async().run {
