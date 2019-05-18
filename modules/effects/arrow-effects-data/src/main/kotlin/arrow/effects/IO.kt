@@ -45,11 +45,19 @@ sealed class IO<out A> : IOOf<A> {
 
     fun <A> raiseError(e: Throwable): IO<A> = RaiseError(e)
 
-    operator fun <A> invoke(f: () -> A): IO<A> = defer { Pure(f()) }
+    operator fun <A> invoke(ctx: CoroutineContext, f: suspend () -> A): IO<A> =
+      effect(ctx, f)
 
-    fun <A> defer(f: () -> IOOf<A>): IO<A> = Suspend(f)
+    operator fun <A> invoke(f: suspend () -> A): IO<A> =
+      effect(EmptyCoroutineContext, f)
 
-    fun <A> effect(ctx: CoroutineContext = EmptyCoroutineContext, f: suspend () -> A): IO<A> =
+    fun <A> later(f: () -> A): IO<A> =
+      defer { Pure(f()) }
+
+    fun <A> defer(f: () -> IOOf<A>): IO<A> =
+      Suspend(f)
+
+    fun <A> effect(ctx: CoroutineContext, f: suspend () -> A): IO<A> =
       async { _, cb ->
         f.startCoroutine(asyncContinuation(ctx, cb))
       }
@@ -94,9 +102,6 @@ sealed class IO<out A> : IOOf<A> {
         }
       }
 
-    operator fun <A> invoke(ctx: CoroutineContext, f: () -> A): IO<A> =
-      IO.unit.continueOn(ctx).flatMap { invoke(f) }
-
     val unit: IO<Unit> =
       just(Unit)
 
@@ -113,7 +118,7 @@ sealed class IO<out A> : IOOf<A> {
       f(a).fix().flatMap {
         when (it) {
           is Either.Left -> tailRecM(it.a, f)
-          is Either.Right -> IO.just(it.b)
+          is Either.Right -> just(it.b)
         }
       }
 
@@ -143,7 +148,7 @@ sealed class IO<out A> : IOOf<A> {
     IORunLoop.start(this, cb)
 
   fun runAsyncCancellable(onCancel: OnCancel = Silent, cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Disposable> =
-    IO.async { _ /* The start of this execution is immediate and uncancellable */, ccb ->
+    async { _ /* The start of this execution is immediate and uncancellable */, ccb ->
       val conn = IOConnection()
       val onCancelCb =
         when (onCancel) {
@@ -169,7 +174,7 @@ sealed class IO<out A> : IOOf<A> {
 
   /** Makes the source [IO] uncancelable such that a [Fiber.cancel] signal has no effect. */
   fun uncancelable(): IO<A> =
-    IO.ContextSwitch(this, ContextSwitch.makeUncancelable, ContextSwitch.disableUncancelable)
+    ContextSwitch(this, ContextSwitch.makeUncancelable, ContextSwitch.disableUncancelable)
 
   fun <B> bracket(release: (A) -> IOOf<Unit>, use: (A) -> IOOf<B>): IO<B> =
     bracketCase({ a, _ -> release(a) }, use)
