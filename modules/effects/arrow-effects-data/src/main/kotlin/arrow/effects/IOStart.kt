@@ -17,6 +17,7 @@ import kotlin.coroutines.suspendCoroutine
  *
  * ```kotlin:ank:playground
  * import arrow.effects.IO
+ * import arrow.effects.startFiber
  * import kotlinx.coroutines.Dispatchers
  *
  * fun main(args: Array<String>) {
