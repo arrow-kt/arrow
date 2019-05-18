@@ -31,14 +31,14 @@ open class MonadDeferCancellableContinuation<F, A>(val SC: MonadDefer<F>, overri
 
   override fun returnedMonad(): Kind<F, A> = returnedMonad
 
-  suspend fun <B> bindDefer(f: () -> B): B =
+  suspend fun <B> bindLater(f: () -> B): B =
     later(f).bind()
 
-  suspend fun <B> bindDeferIn(context: CoroutineContext, f: () -> B): B =
+  suspend fun <B> bindLaterIn(context: CoroutineContext, f: () -> B): B =
     defer { bindingCatch { bindIn(context, f) } }.bind()
 
-  suspend fun <B> bindDelayOrRaise(f: () -> Either<Throwable, B>): B =
-          delayOrRaise(f).bind()
+  suspend fun <B> bindLaterOrRaise(f: () -> Either<Throwable, B>): B =
+          laterOrRaise(f).bind()
 
   override fun <B> bindingCatch(c: suspend MonadErrorContinuation<F, *>.() -> B): Kind<F, B> =
     bindingCancellable(c).a

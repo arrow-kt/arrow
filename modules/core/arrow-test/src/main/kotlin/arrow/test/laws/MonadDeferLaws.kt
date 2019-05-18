@@ -78,13 +78,13 @@ object MonadDeferLaws {
 
   fun <F> MonadDefer<F>.delayOrRaiseConstantRightEqualsPure(EQ: Eq<Kind<F, Int>>) {
     forAll(Gen.intSmall()) { x ->
-      delayOrRaise { x.right() }.equalUnderTheLaw(just(x), EQ)
+      laterOrRaise { x.right() }.equalUnderTheLaw(just(x), EQ)
     }
   }
 
   fun <F> MonadDefer<F>.delayOrRaiseConstantLeftEqualsRaiseError(EQERR: Eq<Kind<F, Int>>) {
     forFew(5, Gen.throwable()) { t ->
-      delayOrRaise { t.left() }.equalUnderTheLaw(raiseError(t), EQERR)
+      laterOrRaise { t.left() }.equalUnderTheLaw(raiseError(t), EQERR)
     }
   }
 
@@ -178,9 +178,9 @@ object MonadDeferLaws {
   fun <F> MonadDefer<F>.asyncBind(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.intSmall(), Gen.intSmall(), Gen.intSmall()) { x: Int, y: Int, z: Int ->
       val (bound, _) = bindingCancellable {
-        val a = bindDefer { x }
-        val b = bindDefer { a + y }
-        val c = bindDefer { b + z }
+        val a = bindLater { x }
+        val b = bindLater { a + y }
+        val c = bindLater { b + z }
         c
       }
       bound.equalUnderTheLaw(just(x + y + z), EQ)
@@ -189,7 +189,7 @@ object MonadDeferLaws {
   fun <F> MonadDefer<F>.asyncBindError(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.throwable()) { e: Throwable ->
       val (bound: Kind<F, Int>, _) = bindingCancellable<Int> {
-        bindDefer { throw e }
+        bindLater { throw e }
       }
       bound.equalUnderTheLaw(raiseError(e), EQ)
     }
@@ -197,9 +197,9 @@ object MonadDeferLaws {
   fun <F> MonadDefer<F>.asyncBindUnsafe(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.intSmall(), Gen.intSmall(), Gen.intSmall()) { x: Int, y: Int, z: Int ->
       val (bound, _) = bindingCancellable {
-        val a = bindDelayOrRaise { Right(x) }
-        val b = bindDelayOrRaise { Right(a + y) }
-        val c = bindDelayOrRaise { Right(b + z) }
+        val a = bindLaterOrRaise { Right(x) }
+        val b = bindLaterOrRaise { Right(a + y) }
+        val c = bindLaterOrRaise { Right(b + z) }
         c
       }
       bound.equalUnderTheLaw(just<Int>(x + y + z), EQ)
@@ -208,7 +208,7 @@ object MonadDeferLaws {
   fun <F> MonadDefer<F>.asyncBindUnsafeError(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.throwable()) { e: Throwable ->
       val (bound: Kind<F, Int>, _) = bindingCancellable<Int> {
-        bindDelayOrRaise { Left(e) }
+        bindLaterOrRaise { Left(e) }
       }
       bound.equalUnderTheLaw(raiseError(e), EQ)
     }
@@ -226,9 +226,9 @@ object MonadDeferLaws {
     forFew(5, Gen.intSmall()) { num: Int ->
       val sideEffect = SideEffect()
       val (binding, dispose) = bindingCancellable {
-        val a = bindDefer { Thread.sleep(20); num }
+        val a = bindLater { Thread.sleep(20); num }
         sideEffect.increment()
-        val b = bindDefer { a + 1 }
+        val b = bindLater { a + 1 }
         val (c) = just(b + 1)
         c
       }
@@ -240,9 +240,9 @@ object MonadDeferLaws {
     forFew(5, Gen.intSmall()) { num: Int ->
       val sideEffect = SideEffect()
       val (binding, dispose) = bindingCancellable {
-        val a = bindDefer { num }
+        val a = bindLater { num }
         sideEffect.increment()
-        val b = bindDefer { Thread.sleep(20); sideEffect.increment(); a + 1 }
+        val b = bindLater { Thread.sleep(20); sideEffect.increment(); a + 1 }
         b
       }
       Try { Thread.sleep(10); dispose() }.toEither().mapLeft { throw it }
@@ -289,8 +289,8 @@ object MonadDeferLaws {
   fun <F> MonadDefer<F>.monadComprehensionsBindInContextEquivalent(EQ: Eq<Kind<F, Int>>): Unit =
     forFew(5, Gen.intSmall()) { num: Int ->
       val bindM = bindingCancellable {
-        val a = bindDeferIn(newSingleThreadContext("$num")) { num + 1 }
-        val b = bindDeferIn(newSingleThreadContext("$a")) { a + 1 }
+        val a = bindLaterIn(newSingleThreadContext("$num")) { num + 1 }
+        val b = bindLaterIn(newSingleThreadContext("$a")) { a + 1 }
         b
       }
       val bind = bindingCancellable {

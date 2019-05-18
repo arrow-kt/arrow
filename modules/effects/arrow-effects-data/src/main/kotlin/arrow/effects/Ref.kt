@@ -100,7 +100,7 @@ interface Ref<F, A> {
      * @see [invoke]
      */
     fun <F> factory(MD: MonadDefer<F>): RefFactory<F> = object : RefFactory<F> {
-      override fun <A> delay(a: () -> A): Kind<F, Ref<F, A>> = invoke(MD, a)
+      override fun <A> later(a: () -> A): Kind<F, Ref<F, A>> = invoke(MD, a)
     }
 
     /**
@@ -188,5 +188,5 @@ interface Ref<F, A> {
  * Creates [Ref] for a kind [F] using a supplied function.
  */
 interface RefFactory<F> {
-  fun <A> delay(a: () -> A): Kind<F, Ref<F, A>>
+  fun <A> later(a: () -> A): Kind<F, Ref<F, A>>
 }
