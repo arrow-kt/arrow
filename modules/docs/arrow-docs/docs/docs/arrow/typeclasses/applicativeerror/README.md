@@ -11,7 +11,7 @@ redirect_from:
 {:.intermediate}
 intermediate
 
-ApplicativeError is the typeclase used to explicitly represent errors during independent computations.
+`ApplicativeError` is the typeclass used to explicitly represent errors during independent computations.
 It is parametrized to an error type `E`, which means the datatype has at least a "success" and a "failure" version.
 
 These errors can come in the form of `Throwable`, `Exception`, or any other type that is more relevant to the domain;
