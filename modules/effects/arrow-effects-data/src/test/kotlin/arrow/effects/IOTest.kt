@@ -6,8 +6,6 @@ import arrow.core.None
 import arrow.core.Right
 import arrow.core.Some
 import arrow.core.Tuple3
-import arrow.core.fix
-import arrow.core.flatMap
 import arrow.core.right
 import arrow.effects.IO.Companion.just
 import arrow.effects.extensions.io.async.async
@@ -284,7 +282,7 @@ class IOTest : UnitSpec() {
 
       val result =
         newSingleThreadContext("all").parMapN(
-          makePar(6), IO.just(1L).order(), makePar(4), IO.defer { IO.just(2L) }.order(), makePar(5), IO { 3L }.order()) { six, one, four, two, five, three -> listOf(six, one, four, two, five, three) }
+          makePar(6), just(1L).order(), makePar(4), IO.defer { just(2L) }.order(), makePar(5), IO { 3L }.order()) { six, one, four, two, five, three -> listOf(six, one, four, two, five, three) }
           .unsafeRunSync()
 
       result shouldBe listOf(6L, 1, 4, 2, 5, 3)
@@ -301,7 +299,7 @@ class IOTest : UnitSpec() {
 
       val result =
         newSingleThreadContext("all").parMapN(
-          makePar(6), IO.just(1L), makePar(4), IO.defer { IO.just(2L) }, makePar(5), IO { 3L }) { _, _, _, _, _, _ ->
+          makePar(6), just(1L), makePar(4), IO.defer { just(2L) }, makePar(5), IO { 3L }) { _, _, _, _, _, _ ->
           Thread.currentThread().name
         }.unsafeRunSync()
 
@@ -466,7 +464,20 @@ class IOTest : UnitSpec() {
           else just(ii)
         }
 
-      IO.just(1).flatMap { ioGuaranteeCase(0) }.unsafeRunSync() shouldBe size
+      just(1).flatMap { ioGuaranteeCase(0) }.unsafeRunSync() shouldBe size
+    }
+
+    "Async should be stack safe" {
+      val size = 5000
+
+      fun ioAsync(i: Int): IO<Int> = IO.async<Int> { _, cb ->
+        cb(Right(i))
+      }.flatMap { ii ->
+        if (ii < size) ioAsync(ii + 1)
+        else just(ii)
+      }
+
+      IO.just(1).flatMap(::ioAsync).unsafeRunSync() shouldBe size
     }
   }
 }
