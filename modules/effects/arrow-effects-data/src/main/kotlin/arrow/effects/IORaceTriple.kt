@@ -5,16 +5,13 @@ import arrow.core.Left
 import arrow.core.Right
 import arrow.core.Tuple3
 import arrow.effects.internal.IOFiber
+import arrow.effects.internal.IOForkedStart
 import arrow.effects.internal.Platform
 import arrow.effects.internal.UnsafePromise
-import arrow.effects.internal.asyncContinuation
 import arrow.effects.typeclasses.Fiber
 import arrow.effects.typeclasses.RaceTriple
 import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.startCoroutine
-import kotlin.coroutines.suspendCoroutine
 
 /**
  * Race three tasks concurrently within a new [IO].
@@ -52,10 +49,10 @@ import kotlin.coroutines.suspendCoroutine
  * @see [arrow.effects.typeclasses.Concurrent.raceN] for a simpler version that cancels losers.
  */
 fun <A, B, C> IO.Companion.raceTriple(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<B>, ioC: IOOf<C>): IO<RaceTriple<ForIO, A, B, C>> =
-  IO.async { conn, cb ->
+  async { conn, cb ->
     val active = AtomicBoolean(true)
 
-    val upstreamCancelToken = IO.defer { if (conn.isCanceled()) IO.unit else conn.cancel() }
+    val upstreamCancelToken = defer { if (conn.isCanceled()) unit else conn.cancel() }
 
     val connA = IOConnection()
     connA.push(upstreamCancelToken)
@@ -71,43 +68,7 @@ fun <A, B, C> IO.Companion.raceTriple(ctx: CoroutineContext, ioA: IOOf<A>, ioB: 
 
     conn.push(connA.cancel(), connB.cancel(), connC.cancel())
 
-    val a: suspend () -> A = {
-      suspendCoroutine { ca: Continuation<A> ->
-        IORunLoop.startCancelable(ioA, connA) { either: Either<Throwable, A> ->
-          either.fold({ error ->
-            ca.resumeWith(Result.failure(error))
-          }, { a ->
-            ca.resumeWith(Result.success(a))
-          })
-        }
-      }
-    }
-
-    val b: suspend () -> B = {
-      suspendCoroutine { ca: Continuation<B> ->
-        IORunLoop.startCancelable(ioB, connB) { either: Either<Throwable, B> ->
-          either.fold({ error ->
-            ca.resumeWith(Result.failure(error))
-          }, { b ->
-            ca.resumeWith(Result.success(b))
-          })
-        }
-      }
-    }
-
-    val c: suspend () -> C = {
-      suspendCoroutine { ca: Continuation<C> ->
-        IORunLoop.startCancelable(ioC, connC) { either: Either<Throwable, C> ->
-          either.fold({ error ->
-            ca.resumeWith(Result.failure(error))
-          }, { c ->
-            ca.resumeWith(Result.success(c))
-          })
-        }
-      }
-    }
-
-    a.startCoroutine(asyncContinuation(ctx) { either ->
+    IORunLoop.startCancelable(IOForkedStart(ioA, ctx), connA) { either: Either<Throwable, A> ->
       either.fold({ error ->
         if (active.getAndSet(false)) { // if an error finishes first, stop the race.
           connB.cancel().fix().unsafeRunAsync { r2 ->
@@ -132,9 +93,9 @@ fun <A, B, C> IO.Companion.raceTriple(ctx: CoroutineContext, ioA: IOOf<A>, ioB: 
           promiseA.complete(Right(a))
         }
       })
-    })
+    }
 
-    b.startCoroutine(asyncContinuation(ctx) { either ->
+    IORunLoop.startCancelable(IOForkedStart(ioB, ctx), connB) { either: Either<Throwable, B> ->
       either.fold({ error ->
         if (active.getAndSet(false)) { // if an error finishes first, stop the race.
           connA.cancel().fix().unsafeRunAsync { r2 ->
@@ -159,9 +120,9 @@ fun <A, B, C> IO.Companion.raceTriple(ctx: CoroutineContext, ioA: IOOf<A>, ioB: 
           promiseB.complete(Right(b))
         }
       })
-    })
+    }
 
-    c.startCoroutine(asyncContinuation(ctx) { either ->
+    IORunLoop.startCancelable(IOForkedStart(ioC, ctx), connC) { either: Either<Throwable, C> ->
       either.fold({ error ->
         if (active.getAndSet(false)) { // if an error finishes first, stop the race.
           connA.cancel().fix().unsafeRunAsync { r2 ->
@@ -186,5 +147,5 @@ fun <A, B, C> IO.Companion.raceTriple(ctx: CoroutineContext, ioA: IOOf<A>, ioB: 
           promiseC.complete(Right(c))
         }
       })
-    })
+    }
   }

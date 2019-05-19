@@ -5,7 +5,7 @@ import arrow.core.Left
 import arrow.core.None
 import arrow.core.Right
 import arrow.core.Some
-import arrow.core.Tuple3
+import arrow.core.Tuple4
 import arrow.core.right
 import arrow.effects.IO.Companion.just
 import arrow.effects.extensions.io.async.async
@@ -303,7 +303,8 @@ class IOTest : UnitSpec() {
           Thread.currentThread().name
         }.unsafeRunSync()
 
-      result shouldBe "all"
+      // Will always result in "6" since it will always finish last (sleeps longest by makePar).
+      result shouldBe "6"
     }
 
     "parallel IO#defer, IO#suspend and IO#async are run in the expected CoroutineContext" {
@@ -312,10 +313,11 @@ class IOTest : UnitSpec() {
           IO { Thread.currentThread().name },
           IO.defer { IO.just(Thread.currentThread().name) },
           IO.async<String> { _, cb -> cb(Thread.currentThread().name.right()) },
-          ::Tuple3)
+          IO(newSingleThreadContext("other")) { Thread.currentThread().name },
+          ::Tuple4)
           .unsafeRunSync()
 
-      result shouldBe Tuple3("here", "here", "here")
+      result shouldBe Tuple4("here", "here", "here", "other")
     }
 
     "unsafeRunAsyncCancellable should cancel correctly" {
@@ -481,5 +483,3 @@ class IOTest : UnitSpec() {
     }
   }
 }
-
-object Error : Throwable()

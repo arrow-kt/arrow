@@ -3,7 +3,6 @@ package arrow.benchmarks
 import arrow.effects.IO
 import arrow.effects.IODispatchers
 import arrow.effects.fix
-import arrow.effects.startFiber
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.CompilerControl
 import org.openjdk.jmh.annotations.Fork
