@@ -85,11 +85,11 @@ Some(5).mproduct {
 #### followedBy/followedByEval
 
 Executes sequentially two elements that are independent from one another.
-The [`Eval`]({{ '/docs/arrow/core/eval' | relative_url }}) variant allows you to pass lazily calculated values.
+The [`Eval`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-eval' | relative_url }}) variant allows you to pass lazily calculated values.
 
 ```kotlin:ank
 import arrow.core.extensions.option.monad.followedBy
-  
+
 Some(1).followedBy(Some(2))
 ```
 
@@ -108,7 +108,7 @@ IO.just(1).effectM(::logValue).fix().unsafeRunSync()
 #### forEffect/forEffectEval
 
 Executes sequentially two elements that are independent from one another, ignoring the value of the second one.
-The [`Eval`]({{ '/docs/arrow/core/eval' | relative_url }}) variant allows you to pass lazily calculated values.
+The [`Eval`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-eval' | relative_url }}) variant allows you to pass lazily calculated values.
 
 ```kotlin:ank
 import arrow.core.extensions.option.monad.*
