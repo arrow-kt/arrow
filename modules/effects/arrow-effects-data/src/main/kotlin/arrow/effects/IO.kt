@@ -139,7 +139,7 @@ sealed class IO<out A> : IOOf<A> {
    *   //sampleStart
    *   binding {
    *     val promise = Promise.uncancelable<ForIO, Int>(IO.async()).bind()
-   *     val fiber = promise.get().startFiber(Dispatchers.Default).bind()
+   *     val fiber = promise.get().fix().startFiber(Dispatchers.Default).bind()
    *     promise.complete(1).bind()
    *     fiber.join().bind()
    *   }.unsafeRunSync() == 1
