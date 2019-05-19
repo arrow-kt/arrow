@@ -6,6 +6,7 @@ import arrow.core.NonFatal
 import arrow.core.Right
 import arrow.core.nonFatalOrThrow
 import arrow.effects.internal.ArrowInternalException
+import arrow.effects.internal.Platform
 import arrow.effects.internal.Platform.ArrayStack
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -64,7 +65,7 @@ internal object IORunLoop {
             hasResult = true
             currentIO = null
           } catch (t: Throwable) {
-              currentIO = IO.RaiseError(t.nonFatalOrThrow())
+            currentIO = IO.RaiseError(t.nonFatalOrThrow())
           }
         }
         is IO.Async -> {
@@ -371,6 +372,12 @@ internal object IORunLoop {
     private var bFirst: BindF? = null
     private var bRest: CallStack? = null
 
+    private var contIndex: Int = 0
+    private var trampolineAfter: Boolean = false
+    private inline val shouldTrampoline inline get() = trampolineAfter || contIndex == Platform.maxStackDepthSize
+
+    private var value: IO<Any?>? = null
+
     fun contextSwitch(conn: IOConnection) {
       this.conn = conn
     }
@@ -379,10 +386,12 @@ internal object IORunLoop {
       canCall = true
       this.bFirst = bFirst
       this.bRest = bRest
+      contIndex++
     }
 
     fun start(async: IO.Async<Any?>, bFirst: BindF?, bRest: CallStack?) {
       prepare(bFirst, bRest)
+      trampolineAfter = async.shouldTrampoline
       async.k(conn, this)
     }
 
@@ -392,12 +401,30 @@ internal object IORunLoop {
       effect.effect.startCoroutine(this)
     }
 
+    private fun signal(result: IO<Any?>) {
+      // Allow GC to collect
+      val bFirst = this.bFirst
+      val bRest = this.bRest
+      this.bFirst = null
+      this.bRest = null
+      this._context = EmptyCoroutineContext
+
+      loop(result, conn, cb, this, bFirst, bRest)
+    }
+
     override operator fun invoke(either: Either<Throwable, Any?>) {
       if (canCall) {
         canCall = false
         when (either) {
-          is Either.Left -> loop(IO.RaiseError(either.a), conn, cb, this, bFirst, bRest)
-          is Either.Right -> loop(IO.Pure(either.b), conn, cb, this, bFirst, bRest)
+          is Either.Left -> IO.RaiseError(either.a)
+          is Either.Right -> IO.Pure(either.b)
+        }.let { r ->
+          if (shouldTrampoline) {
+            this.value = r
+            Platform.trampoline { trampoline() }
+          } else {
+            signal(r)
+          }
         }
       }
     }
@@ -406,10 +433,24 @@ internal object IORunLoop {
       if (canCall) {
         canCall = false
         result.fold(
-          { a -> loop(IO.Pure(a), conn, cb, this, bFirst, bRest) },
-          { e -> loop(IO.RaiseError(e), conn, cb, this, bFirst, bRest) }
-        )
+          { a -> IO.Pure(a) },
+          { e -> IO.RaiseError(e) }
+        ).let { r ->
+          if (shouldTrampoline) {
+            this.value = r
+            Platform.trampoline { trampoline() }
+          } else {
+            signal(r)
+          }
+        }
       }
+    }
+
+    fun trampoline() {
+      val v = value
+      value = null
+      contIndex = 0
+      signal(v!!)
     }
   }
 
