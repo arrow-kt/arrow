@@ -67,7 +67,7 @@ Right associative lazy fold on `F` using the provided function.
 
 This method evaluates `lb` lazily, and returns a lazy value to support laziness in a stack-safe way avoiding StackOverflows.
 
-For more detailed information about how this method works see the documentation for [`Eval<A>`]({{ '/docs/arrow/core/eval' | relative_url }}).
+For more detailed information about how this method works see the documentation for [`Eval<A>`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-eval' | relative_url }}).
 
 ```kotlin:ank:silent
 fun <F> concatenateStringFromRight(strKind: Kind<F, String>, FO: Foldable<F>): String =

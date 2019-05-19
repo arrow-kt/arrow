@@ -21,7 +21,7 @@ beginner
 The smallest set of [datatypes]({{ '/docs/datatypes/intro/' | relative_url }}) necessary to start in FP, and that other libraries can build upon.
 The focus here is on API design and abstracting small code patterns.
 
-Datatypes: [`Either`]({{ '/docs/arrow/core/either/' | relative_url }}), [`Option`]({{ '/docs/arrow/core/option/' | relative_url }}), [`Try`]({{ '/docs/arrow/core/try/' | relative_url }}), [`Eval`]({{ '/docs/arrow/core/eval/' | relative_url }}), [`Id`]({{ '/docs/arrow/core/id/' | relative_url }}), `TupleN`, `Function0`, `Function1`, `FunctionK`
+Datatypes: [`Either`]({{ '/docs/arrow/core/either/' | relative_url }}), [`Option`]({{ '/docs/arrow/core/option/' | relative_url }}), [`Try`]({{ '/docs/arrow/core/try/' | relative_url }}), [`Eval`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-eval' | relative_url }}), [`Id`]({{ '/docs/arrow/core/id/' | relative_url }}), `TupleN`, `Function0`, `Function1`, `FunctionK`
 
 ### arrow-syntax
 
