@@ -28,9 +28,6 @@ import arrow.effects.typeclasses.ProcF
 import arrow.effects.typeclasses.mapUnit
 import arrow.higherkind
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
-import kotlin.coroutines.suspendCoroutine
 
 typealias IOProc<A> = (IOConnection, (Either<Throwable, A>) -> Unit) -> Unit
 typealias IOProcF<A> = (IOConnection, (Either<Throwable, A>) -> Unit) -> IOOf<Unit>

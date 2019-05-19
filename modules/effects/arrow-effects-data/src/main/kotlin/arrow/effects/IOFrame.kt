@@ -27,12 +27,12 @@ internal interface IOFrame<in A, out R> : (A) -> R {
 
   companion object {
 
-    internal class Redeem<A, B>(val fe: (Throwable) -> B, val fb: (A) -> B): IOFrame<A, IO<B>> {
+    internal class Redeem<A, B>(val fe: (Throwable) -> B, val fb: (A) -> B) : IOFrame<A, IO<B>> {
       override fun invoke(a: A): IO<B> = Pure(fb(a))
       override fun recover(e: Throwable): IO<B> = Pure(fe(e))
     }
 
-    internal class RedeemWith<A, B>(val fe: (Throwable) -> IOOf<B>, val fb: (A) -> IOOf<B>): IOFrame<A, IO<B>> {
+    internal class RedeemWith<A, B>(val fe: (Throwable) -> IOOf<B>, val fb: (A) -> IOOf<B>) : IOFrame<A, IO<B>> {
       override fun invoke(a: A): IO<B> = fb(a).fix()
       override fun recover(e: Throwable): IO<B> = fe(e).fix()
     }
