@@ -26,21 +26,27 @@ internal interface IOFrame<in A, out R> : (A) -> R {
     }
 
   companion object {
-    fun <A> errorHandler(fe: (Throwable) -> IOOf<A>): IOFrame<A, IO<A>> =
-      ErrorHandler(fe)
 
-    internal data class ErrorHandler<A>(val fe: (Throwable) -> IOOf<A>) : IOFrame<A, IO<A>> {
+    internal class Redeem<A, B>(val fe: (Throwable) -> B, val fb: (A) -> B): IOFrame<A, IO<B>> {
+      override fun invoke(a: A): IO<B> = Pure(fb(a))
+      override fun recover(e: Throwable): IO<B> = Pure(fe(e))
+    }
+
+    internal class RedeemWith<A, B>(val fe: (Throwable) -> IOOf<B>, val fb: (A) -> IOOf<B>): IOFrame<A, IO<B>> {
+      override fun invoke(a: A): IO<B> = fb(a).fix()
+      override fun recover(e: Throwable): IO<B> = fe(e).fix()
+    }
+
+    internal class ErrorHandler<A>(val fe: (Throwable) -> IOOf<A>) : IOFrame<A, IO<A>> {
       override fun invoke(a: A): IO<A> = Pure(a)
-
       override fun recover(e: Throwable): IO<A> = fe(e).fix()
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun <A> any(): (A) -> IO<Either<Throwable, A>> = AttemptIO as (A) -> IO<Either<Throwable, A>>
+    fun <A> attempt(): (A) -> IO<Either<Throwable, A>> = AttemptIO as (A) -> IO<Either<Throwable, A>>
 
     private object AttemptIO : IOFrame<Any?, IO<Either<Throwable, Any?>>> {
       override operator fun invoke(a: Any?): IO<Either<Nothing, Any?>> = Pure(Either.Right(a))
-
       override fun recover(e: Throwable): IO<Either<Throwable, Nothing>> = Pure(Either.Left(e))
     }
   }

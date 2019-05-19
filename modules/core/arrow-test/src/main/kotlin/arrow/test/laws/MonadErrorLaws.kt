@@ -20,7 +20,8 @@ object MonadErrorLaws {
       Law("Monad Error Laws: left zero") { M.monadErrorLeftZero(EQERR) },
       Law("Monad Error Laws: ensure consistency") { M.monadErrorEnsureConsistency(EQERR) },
       Law("Monad Error Laws: NonFatal is caught") { M.monadErrorCatchesNonFatalThrowables(EQERR) },
-      Law("Monad Error Laws: Fatal errors are thrown") { M.monadErrorThrowsFatalThrowables(EQERR) }
+      Law("Monad Error Laws: Fatal errors are thrown") { M.monadErrorThrowsFatalThrowables(EQERR) },
+      Law("Monad Error Laws: redeemWith is derived from flatMap & HandleErrorWith") { M.monadErrorDerivesRedeemWith(EQERR) }
     )
 
   fun <F> MonadError<F, Throwable>.monadErrorLeftZero(EQ: Eq<Kind<F, Int>>): Unit =
@@ -50,4 +51,11 @@ object MonadErrorLaws {
       } == fatal
     }
   }
+
+  fun <F> MonadError<F, Throwable>.monadErrorDerivesRedeemWith(EQ: Eq<Kind<F, Int>>) =
+    forAll(Gen.int().applicativeError(this),
+      Gen.functionAToB<Throwable, Kind<F, Int>>(Gen.int().applicativeError(this)),
+      Gen.functionAToB<Int, Kind<F, Int>>(Gen.int().applicativeError(this))) { fa, fe, fb ->
+      fa.redeemWith(fe, fb).equalUnderTheLaw(fa.flatMap(fb).handleErrorWith(fe), EQ)
+    }
 }
