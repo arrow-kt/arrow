@@ -19,7 +19,6 @@ fun <A> EQ(EQA: Eq<A> = Eq.any(), timeout: Duration = 60.seconds): Eq<Kind<ForIO
   }
 }
 
-
 internal fun newCountingThreadFactory(name: String, maximumPoolSize: Int = 0): ExecutorService =
   ThreadPoolExecutor(0, maximumPoolSize, 0, TimeUnit.MILLISECONDS, SynchronousQueue<Runnable>(), CountingThreadFactory(name))
 
