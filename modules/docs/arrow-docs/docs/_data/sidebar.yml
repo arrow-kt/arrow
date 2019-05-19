@@ -200,7 +200,7 @@ options:
         url: /docs/arrow/data/coproduct/
 
       - title: Eval
-        url: /docs/arrow/core/eval/
+        url: /docs/apidocs/arrow-core-data/arrow.core/-eval/
 
       - title: OptionT
         url: /docs/arrow/data/optiont/

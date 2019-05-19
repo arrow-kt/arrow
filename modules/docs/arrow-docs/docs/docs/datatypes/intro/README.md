@@ -51,7 +51,7 @@ so they are always required.
 
 - [`Either`]({{ '/docs/arrow/core/either/' | relative_url }}) - an if/else branch in execution
 
-- [`Eval`]({{ '/docs/arrow/core/eval/' | relative_url }}) - lazy evaluation of functions with stack safety and memoization
+- [`Eval`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-eval' | relative_url }}) - lazy evaluation of functions with stack safety and memoization
 
 - `TupleN` - a heterogeneous grouping of 2-9 values without creating a named class
 
