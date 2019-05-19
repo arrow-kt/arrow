@@ -5,9 +5,7 @@ import arrow.core.Left
 import arrow.core.None
 import arrow.core.Right
 import arrow.core.Some
-import arrow.core.Tuple3
-import arrow.core.fix
-import arrow.core.flatMap
+import arrow.core.Tuple4
 import arrow.core.right
 import arrow.effects.IO.Companion.just
 import arrow.effects.extensions.io.async.async
@@ -284,7 +282,7 @@ class IOTest : UnitSpec() {
 
       val result =
         newSingleThreadContext("all").parMapN(
-          makePar(6), IO.just(1L).order(), makePar(4), IO.defer { IO.just(2L) }.order(), makePar(5), IO { 3L }.order()) { six, one, four, two, five, three -> listOf(six, one, four, two, five, three) }
+          makePar(6), just(1L).order(), makePar(4), IO.defer { just(2L) }.order(), makePar(5), IO { 3L }.order()) { six, one, four, two, five, three -> listOf(six, one, four, two, five, three) }
           .unsafeRunSync()
 
       result shouldBe listOf(6L, 1, 4, 2, 5, 3)
@@ -301,11 +299,11 @@ class IOTest : UnitSpec() {
 
       val result =
         newSingleThreadContext("all").parMapN(
-          makePar(6), IO.just(1L), makePar(4), IO.defer { IO.just(2L) }, makePar(5), IO { 3L }) { _, _, _, _, _, _ ->
+          makePar(6), just(1L), makePar(4), IO.defer { just(2L) }, makePar(5), IO { 3L }) { _, _, _, _, _, _ ->
           Thread.currentThread().name
         }.unsafeRunSync()
 
-      result shouldBe "all"
+      result shouldBe "6"
     }
 
     "parallel IO#defer, IO#suspend and IO#async are run in the expected CoroutineContext" {
@@ -314,10 +312,11 @@ class IOTest : UnitSpec() {
           IO { Thread.currentThread().name },
           IO.defer { IO.just(Thread.currentThread().name) },
           IO.async<String> { _, cb -> cb(Thread.currentThread().name.right()) },
-          ::Tuple3)
+          IO(newSingleThreadContext("other")) { Thread.currentThread().name },
+          ::Tuple4)
           .unsafeRunSync()
 
-      result shouldBe Tuple3("here", "here", "here")
+      result shouldBe Tuple4("here", "here", "here", "other")
     }
 
     "unsafeRunAsyncCancellable should cancel correctly" {
@@ -470,5 +469,3 @@ class IOTest : UnitSpec() {
     }
   }
 }
-
-object Error : Throwable()
