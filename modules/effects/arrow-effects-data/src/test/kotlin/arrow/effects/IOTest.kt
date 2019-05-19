@@ -303,6 +303,7 @@ class IOTest : UnitSpec() {
           Thread.currentThread().name
         }.unsafeRunSync()
 
+      // Will always result in "6" since it will always finish last (sleeps longest by makePar).
       result shouldBe "6"
     }
 
@@ -465,7 +466,20 @@ class IOTest : UnitSpec() {
           else just(ii)
         }
 
-      IO.just(1).flatMap { ioGuaranteeCase(0) }.unsafeRunSync() shouldBe size
+      just(1).flatMap { ioGuaranteeCase(0) }.unsafeRunSync() shouldBe size
+    }
+
+    "Async should be stack safe" {
+      val size = 5000
+
+      fun ioAsync(i: Int): IO<Int> = IO.async<Int> { _, cb ->
+        cb(Right(i))
+      }.flatMap { ii ->
+        if (ii < size) ioAsync(ii + 1)
+        else just(ii)
+      }
+
+      IO.just(1).flatMap(::ioAsync).unsafeRunSync() shouldBe size
     }
   }
 }

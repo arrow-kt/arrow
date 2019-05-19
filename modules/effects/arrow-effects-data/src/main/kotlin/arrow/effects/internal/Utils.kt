@@ -164,9 +164,7 @@ object Platform {
       latch.tryAcquireSharedNanos(1, limit.nanoseconds)
     }
 
-    val eitherRef = ref
-
-    return when (eitherRef) {
+    return when (val eitherRef = ref) {
       null -> None
       is Either.Left -> throw eitherRef.a
       is Either.Right -> Some(eitherRef.b)
@@ -209,7 +207,7 @@ object Platform {
 
   @PublishedApi
   internal class TrampolineExecutor(val underlying: Executor) {
-    private var immediateQueue = Platform.ArrayStack<Runnable>()
+    private var immediateQueue = ArrayStack<Runnable>()
     @Volatile
     private var withinLoop = false
 
@@ -227,7 +225,7 @@ object Platform {
       else immediateQueue.push(runnable)
 
     private fun forkTheRest() {
-      class ResumeRun(val head: Runnable, val rest: Platform.ArrayStack<Runnable>) : Runnable {
+      class ResumeRun(val head: Runnable, val rest: ArrayStack<Runnable>) : Runnable {
         override fun run() {
           immediateQueue.pushAll(rest)
           immediateLoop(head)
@@ -237,7 +235,7 @@ object Platform {
       val head = immediateQueue.pop()
       if (head != null) {
         val rest = immediateQueue
-        immediateQueue = Platform.ArrayStack()
+        immediateQueue = ArrayStack()
         underlying.execute(ResumeRun(head, rest))
       }
     }
