@@ -373,9 +373,9 @@ internal object IORunLoop {
     private var bRest: CallStack? = null
 
     private var contIndex: Int = 0
-    private inline val shouldTrampoline inline get() = contIndex == Platform.maxStackDepthSize
+    private var trampolineAfter: Boolean = false
+    private inline val shouldTrampoline inline get() = trampolineAfter || contIndex == Platform.maxStackDepthSize
 
-    // Used in combination with trampolineAfter = true
     private var value: IO<Any?>? = null
 
     fun contextSwitch(conn: IOConnection) {
@@ -391,6 +391,7 @@ internal object IORunLoop {
 
     fun start(async: IO.Async<Any?>, bFirst: BindF?, bRest: CallStack?) {
       prepare(bFirst, bRest)
+      trampolineAfter = async.shouldTrampoline
       async.k(conn, this)
     }
 
