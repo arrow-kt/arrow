@@ -6,7 +6,6 @@ import arrow.core.Left
 import arrow.core.Right
 import arrow.effects.typeclasses.Concurrent
 import arrow.effects.typeclasses.Duration
-import arrow.effects.typeclasses.mapUnit
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import kotlin.coroutines.Continuation
