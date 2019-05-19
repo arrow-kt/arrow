@@ -4,6 +4,8 @@ import arrow.core.Either
 import arrow.core.Left
 import arrow.core.NonFatal
 import arrow.core.Right
+import arrow.core.nonFatalOrThrow
+import arrow.effects.internal.ArrowInternalException
 import arrow.effects.internal.Platform.ArrayStack
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -54,7 +56,7 @@ internal object IORunLoop {
         }
         is IO.Suspend -> {
           val thunk: () -> IOOf<Any?> = currentIO.thunk
-          currentIO = executeSafe { thunk() }
+          currentIO = executeSafe(thunk)
         }
         is IO.Delay -> {
           try {
@@ -62,38 +64,29 @@ internal object IORunLoop {
             hasResult = true
             currentIO = null
           } catch (t: Throwable) {
-            if (NonFatal(t)) {
-              currentIO = IO.RaiseError(t)
-            } else {
-              throw t
-            }
+              currentIO = IO.RaiseError(t.nonFatalOrThrow())
           }
         }
         is IO.Async -> {
           // Return case for Async operations
-          return suspendInAsync(currentIO as IO<A>, bFirst, bRest)
+          return suspendAsync(currentIO, bFirst, bRest) as IO<A>
         }
         is IO.Effect -> {
-          return suspendInAsync(currentIO as IO<A>, bFirst, bRest)
+          return suspendAsync(currentIO, bFirst, bRest) as IO<A>
         }
         is IO.Bind<*, *> -> {
           if (bFirst != null) {
-            if (bRest == null) bRest = ArrayStack()
+            if (bRest == null) {
+              bRest = ArrayStack()
+            }
             bRest.push(bFirst)
           }
           bFirst = currentIO.g as BindF
           currentIO = currentIO.cont
         }
-        is IO.ContinueOn<*> -> {
-          if (bFirst != null) {
-            if (bRest == null) bRest = ArrayStack()
-            bRest.push(bFirst)
-          }
-          val localCurrent = currentIO
-          val currentCC = localCurrent.cc
+        is IO.ContinueOn -> {
+          val currentCC = currentIO.cc
           val localCont = currentIO.cont
-
-          bFirst = { c: Any? -> IO.just(c) }
 
           currentIO = IO.Bind(localCont) { a ->
             IO.Effect(currentCC) { a }
@@ -109,8 +102,18 @@ internal object IORunLoop {
           bFirst = currentIO as BindF
           currentIO = currentIO.source
         }
+        is IO.ContextSwitch -> {
+          val localCurrent = currentIO
+          return IO.Async { conn, cb ->
+            loop(localCurrent, conn, cb as Callback, null, bFirst, bRest)
+          }
+        }
         null -> {
-          currentIO = IO.RaiseError(NullPointerException("Stepping on null IO"))
+          currentIO = IO.RaiseError(IORunLoopStepOnNull)
+        }
+        else -> {
+          // Since we don't capture the value of `when` kotlin doesn't enforce exhaustiveness
+          currentIO = IO.raiseError(IORunLoopMissingStep)
         }
       }
 
@@ -134,15 +137,11 @@ internal object IORunLoop {
   private fun <A> sanitizedCurrentIO(currentIO: Current?, unboxed: Any?): IO<A> =
     (currentIO ?: IO.Pure(unboxed)) as IO<A>
 
-  private fun <A> suspendInAsync(
-    currentIO: IO<A>,
-    bFirst: BindF?,
-    bRest: CallStack?
-  ): IO<A> =
+  private fun suspendAsync(currentIO: IO<Any?>, bFirst: BindF?, bRest: CallStack?): IO<Any?> =
     // Hitting an async boundary means we have to stop, however if we had previous `flatMap` operations then we need to resume the loop with the collected stack
     if (bFirst != null || (bRest != null && bRest.isNotEmpty())) {
       IO.Async { conn, cb ->
-        loop(currentIO, conn, cb as Callback, null, bFirst, bRest)
+        loop(currentIO, conn, cb, null, bFirst, bRest)
       }
     } else {
       currentIO
@@ -274,7 +273,11 @@ internal object IORunLoop {
           }
         }
         null -> {
-          currentIO = IO.RaiseError(NullPointerException("Looping on null IO"))
+          currentIO = IO.RaiseError(IORunLoopOnNull)
+        }
+        else -> {
+          // Since we don't capture the value of `when` kotlin doesn't enforce exhaustiveness
+          currentIO = IO.RaiseError(IORunLoopMissingLoop)
         }
       }
 
@@ -422,4 +425,20 @@ internal object IORunLoop {
         restore(null, e, old, current)
       }, null)
   }
+}
+
+internal object IORunLoopMissingStep : ArrowInternalException() {
+  override fun fillInStackTrace(): Throwable = this
+}
+
+internal object IORunLoopStepOnNull : ArrowInternalException() {
+  override fun fillInStackTrace(): Throwable = this
+}
+
+internal object IORunLoopMissingLoop : ArrowInternalException() {
+  override fun fillInStackTrace(): Throwable = this
+}
+
+internal object IORunLoopOnNull : ArrowInternalException() {
+  override fun fillInStackTrace(): Throwable = this
 }

@@ -83,6 +83,14 @@ class IOTest : UnitSpec() {
       }
     }
 
+    "should return immediate value by uncancelable" {
+      val run = IO.just(1).uncancelable().unsafeRunSync()
+
+      val expected = 1
+
+      run shouldBe expected
+    }
+
     "should time out on unending unsafeRunTimed" {
       val never = IO.async().never<Int>().fix()
       val start = System.currentTimeMillis()
