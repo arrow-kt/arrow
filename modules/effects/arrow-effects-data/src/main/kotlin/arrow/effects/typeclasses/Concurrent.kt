@@ -727,10 +727,11 @@ interface Concurrent<F> : Async<F> {
 
   /**
    *  Sleeps for a given [duration] without blocking a thread.
-   *  Used to derive combinators [timeout], [timeoutTo] and can be used to created timed events.
+   *  Used to derive [waitFor] and can be used to created timed events like backing-off retries.
    *
    * ```kotlin:ank:playground
    * import arrow.effects.*
+   * import arrow.effects.typeclasses.*
    * import arrow.effects.extensions.io.concurrent.concurrent
    *
    * fun main(args: Array<String>) {
@@ -740,11 +741,10 @@ interface Concurrent<F> : Async<F> {
    *       delay { println("Hello World!") }
    *     }
    *   //sampleEnd
-   *   IO.unsafeRunBlocking(IO.concurrent().delayHelloWorld())
+   *   IO.concurrent().delayHelloWorld().unsafeRunSync()
    * }
    * ```
-   * @see timeout
-   * @see timeoutTo
+   * @see waitFor
    **/
   fun sleep(duration: Duration): Kind<F, Unit> = ConcurrentSleep(duration)
 
@@ -753,8 +753,8 @@ interface Concurrent<F> : Async<F> {
    *
    * ```kotlin:ank:playground
    * import arrow.effects.*
+   * import arrow.effects.typeclasses.*
    * import arrow.effects.extensions.io.concurrent.concurrent
-   * import arrow.effects.typeclasses.seconds
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
@@ -764,45 +764,15 @@ interface Concurrent<F> : Async<F> {
    *     return world.timeoutTo(fallbackWorld, 1.seconds)
    *   }
    *   //sampleEnd
-   *   IO.unsafeRunBlocking(IO.concurrent().timedOutWorld())
+   *   IO.concurrent().timedOutWorld().unsafeRunSync()
    * }
    * ```
-   * @see timeout
    **/
-  fun <A> Kind<F, A>.timeoutTo(default: Kind<F, A>, duration: Duration): Kind<F, A> =
+  fun <A> Kind<F, A>.waitFor(duration: Duration, default: Kind<F, A> = raiseError(TimeoutException)): Kind<F, A> =
     dispatchers().default().raceN(this, sleep(duration)).flatMap {
       it.fold(
         { a -> just(a) },
         { default }
-      )
-    }
-
-  /**
-   * Returns the result of [this] within the specified [duration] or raises a [TimeoutException].
-   *
-   * ```kotlin:ank:playground
-   * import arrow.effects.*
-   * import arrow.effects.extensions.io.concurrent.concurrent
-   * import arrow.effects.typeclasses.seconds
-   *
-   * fun main(args: Array<String>) {
-   *   //sampleStart
-   *   fun <F> Concurrent<F>.timedOutWorld(): Kind<F, Unit> {
-   *     val world = sleep(3.seconds).flatMap { delay { println("Hello World!") } }
-   *     return world.timeout(1.seconds)
-   *   }
-   *   //sampleEnd
-   *   IO.unsafeRunBlocking(IO.concurrent().timedOutWorld())
-   * }
-   * ```
-   * @see timeout
-   * @see timeoutTo
-   **/
-  fun <A> Kind<F, A>.timeout(duration: Duration): Kind<F, A> =
-    dispatchers().default().raceN(this, sleep(duration)).flatMap {
-      it.fold(
-        { a -> just(a) },
-        { raiseError(TimeoutException(duration.toString())) }
       )
     }
 }
