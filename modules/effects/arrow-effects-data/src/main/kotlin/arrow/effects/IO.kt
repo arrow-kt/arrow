@@ -41,6 +41,12 @@ sealed class IO<out A> : IOOf<A> {
 
   companion object {
 
+    fun <A> effect(f: suspend () -> A): IO<A> =
+      Effect(effect = f)
+
+    fun <A> effect(ctx: CoroutineContext, f: suspend () -> A): IO<A> =
+      Effect(ctx, f)
+
     fun <A> just(a: A): IO<A> = Pure(a)
 
     fun <A> raiseError(e: Throwable): IO<A> = RaiseError(e)
@@ -242,7 +248,7 @@ sealed class IO<out A> : IOOf<A> {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = unsafeResync(this, limit)
   }
 
-  internal data class Effect<out A>(val ctx: CoroutineContext, val effect: suspend () -> A) : IO<A>() {
+  internal data class Effect<out A>(val ctx: CoroutineContext? = null, val effect: suspend () -> A) : IO<A>() {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = unsafeResync(this, limit)
   }
 
@@ -278,7 +284,7 @@ sealed class IO<out A> : IOOf<A> {
 
     override fun <B> map(f: (A) -> B): IO<B> =
     // Allowed to do maxStackDepthSize map operations in sequence before
-    // starting a new Map fusion in order to avoid stack overflows
+      // starting a new Map fusion in order to avoid stack overflows
       if (index != maxStackDepthSize) Map(source, g.andThen(f), index + 1)
       else Map(this, f, 0)
 

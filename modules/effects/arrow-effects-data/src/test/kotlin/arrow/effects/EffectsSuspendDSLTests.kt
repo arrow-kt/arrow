@@ -207,8 +207,8 @@ class EffectsSuspendDSLTests : UnitSpec() {
     "CoroutineContext.defer" {
       fxTest {
         fx {
-          val contextA = !newSingleThreadContext("A").effect { Thread.currentThread().name }
-          val contextB = !newSingleThreadContext("B").effect { Thread.currentThread().name }
+          val contextA = !effect(newSingleThreadContext("A")) { Thread.currentThread().name }
+          val contextB = !effect(newSingleThreadContext("B")) { Thread.currentThread().name }
           contextA != contextB
         }
       } shouldBe true
