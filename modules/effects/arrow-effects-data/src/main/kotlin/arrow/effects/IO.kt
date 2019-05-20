@@ -13,9 +13,12 @@ import arrow.effects.OnCancel.Companion.CancellationException
 import arrow.effects.OnCancel.Silent
 import arrow.effects.OnCancel.ThrowCancellationException
 import arrow.effects.internal.IOBracket
+import arrow.effects.internal.IOFiber
+import arrow.effects.internal.IOForkedStart
 import arrow.effects.internal.Platform.maxStackDepthSize
 import arrow.effects.internal.Platform.onceOnly
 import arrow.effects.internal.Platform.unsafeResync
+import arrow.effects.internal.UnsafePromise
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.Duration
 import arrow.effects.typeclasses.ExitCase
@@ -122,6 +125,39 @@ sealed class IO<out A> : IOOf<A> {
 
   open fun continueOn(ctx: CoroutineContext): IO<A> =
     ContinueOn(this, ctx)
+
+  /**
+   * Create a new [IO] that upon execution starts the receiver [IO] within a [Fiber] on [ctx].
+   *
+   * ```kotlin:ank:playground
+   * import arrow.effects.*
+   * import arrow.effects.extensions.io.async.async
+   * import arrow.effects.extensions.io.monad.binding
+   * import kotlinx.coroutines.Dispatchers
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   binding {
+   *     val promise = Promise.uncancelable<ForIO, Int>(IO.async()).bind()
+   *     val fiber = promise.get().fix().startFiber(Dispatchers.Default).bind()
+   *     promise.complete(1).bind()
+   *     fiber.join().bind()
+   *   }.unsafeRunSync() == 1
+   *   //sampleEnd
+   * }
+   * ```
+   *
+   * @receiver [IO] to execute on [ctx] within a new suspended [IO].
+   * @param ctx [CoroutineContext] to execute the source [IO] on.
+   * @return [IO] with suspended execution of source [IO] on context [ctx].
+   */
+  fun startFiber(ctx: CoroutineContext): IO<Fiber<ForIO, A>> = IO {
+    val promise = UnsafePromise<A>()
+    // A new IOConnection, because its cancellation is now decoupled from our current one.
+    val conn = IOConnection()
+    IORunLoop.startCancelable(IOForkedStart(this, ctx), conn, promise::complete)
+    IOFiber(promise, conn)
+  }
 
   fun <B> followedBy(fb: IOOf<B>) = flatMap { fb }
 

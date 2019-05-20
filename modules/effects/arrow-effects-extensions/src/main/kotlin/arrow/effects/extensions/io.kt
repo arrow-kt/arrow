@@ -42,7 +42,6 @@ import arrow.unsafe
 import kotlin.coroutines.CoroutineContext
 import arrow.effects.ap as ioAp
 import arrow.effects.handleErrorWith as ioHandleErrorWith
-import arrow.effects.startFiber as ioStart
 
 @extension
 interface IOFunctor : Functor<ForIO> {
@@ -161,7 +160,7 @@ interface IOAsync : Async<ForIO>, IOMonadDefer {
 interface IOConcurrent : Concurrent<ForIO>, IOAsync {
 
   override fun <A> CoroutineContext.startFiber(kind: IOOf<A>): IO<Fiber<ForIO, A>> =
-    kind.ioStart(this)
+    kind.fix().startFiber(this)
 
   override fun <A> asyncF(fa: ConnectedProcF<ForIO, A>): IO<A> =
     IO.asyncF(fa)

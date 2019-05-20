@@ -72,11 +72,11 @@ class EffectsSuspendDSLTests : UnitSpec() {
       val program = fx {
         // note how the receiving value is typed in the environment and not inside IO despite being effectful and
         // non-blocking parallel computations
-        val result: List<String> = !NonBlocking.parMapN(
+        val result: List<String> = !newCountingThreadFactory("test", 2).asCoroutineContext().parMapN(
           effect { getThreadName() },
           effect { getThreadName() }
         ) { a, b -> listOf(a, b) }
-        effect { println(result) }
+        !effect { println(result) }
         result
       }
       unsafe { runBlocking { program } }.distinct().size shouldBe 2
