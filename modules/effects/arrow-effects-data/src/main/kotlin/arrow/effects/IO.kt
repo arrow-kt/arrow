@@ -196,7 +196,7 @@ sealed class IO<out A> : IOOf<A> {
    *   val result =
    *   //sampleStart
    *   IO.just("1")
-   *     .redeemWith({ e -> IO.just(-1) } }, { str -> IO { str.toInt() } })
+   *     .redeemWith({ e -> IO.just(-1) }, { str -> IO { str.toInt() } })
    *   //sampleEnd
    *   println(result.unsafeRunSync())
    * }
