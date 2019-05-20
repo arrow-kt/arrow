@@ -150,6 +150,31 @@ interface Async<F> : MonadDefer<F> {
     }
 
   /**
+   * Delay a suspended effect.
+   *
+   * ```kotlin:ank:playground:extension
+   * _imports_
+   * import kotlinx.coroutines.Dispatchers
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   suspend fun helloWorld(): Unit = println("Hello World!")
+   *
+   *   fun <F> Async<F>.delayASuspendedEffect(): Kind<F, String> =
+   *     _effect_ { helloWorld() }
+   *
+   *   val result = _extensionFactory_.delayASuspendedEffect()
+   *   //sampleEnd
+   *   println(result)
+   * }
+   * ```
+   */
+  fun <A> effect(f: suspend () -> A): Kind<F, A> =
+    async {
+      f.startCoroutine(asyncContinuation(EmptyCoroutineContext, it))
+    }
+
+  /**
    * Delay a suspended effect on provided [CoroutineContext].
    *
    * @param ctx [CoroutineContext] to run evaluation on.

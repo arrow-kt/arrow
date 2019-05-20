@@ -40,7 +40,6 @@ import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import arrow.unsafe
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
 import arrow.effects.ap as ioAp
 import arrow.effects.handleErrorWith as ioHandleErrorWith
 
@@ -157,16 +156,14 @@ interface IOAsync : Async<ForIO>, IOMonadDefer {
     fix().continueOn(ctx)
 
   override fun <A> effect(ctx: CoroutineContext, f: suspend () -> A): IO<A> =
-    if (ctx == EmptyCoroutineContext) IO.effect(f)
-    else IO.effect(ctx, f)
+    IO.effect(ctx, f)
+
+  override fun <A> effect(f: suspend () -> A): IO<A> =
+    IO.effect(f)
 }
 
 // FIXME default @extension are temporarily declared in arrow-effects-io-extensions due to multiplatform needs
 interface IOConcurrent : Concurrent<ForIO>, IOAsync {
-
-  override fun <A> effect(ctx: CoroutineContext, f: suspend () -> A): IO<A> =
-    if (ctx == EmptyCoroutineContext) IO.effect(f)
-    else IO.effect(ctx, f)
 
   override fun <A> CoroutineContext.startFiber(kind: IOOf<A>): IO<Fiber<ForIO, A>> =
     kind.fix().startFiber(this)
