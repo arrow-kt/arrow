@@ -47,6 +47,4 @@ internal class ShiftTick(
   }
 }
 
-object TimeoutException : Exception() {
-  override fun fillInStackTrace(): Throwable = this
-}
+class TimeoutException(override val message: String) : Exception()

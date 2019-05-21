@@ -730,6 +730,7 @@ interface Concurrent<F> : Async<F> {
    *  Used to derive [waitFor] and can be used to created timed events like backing-off retries.
    *
    * ```kotlin:ank:playground
+   * import arrow.*
    * import arrow.effects.*
    * import arrow.effects.typeclasses.*
    * import arrow.effects.extensions.io.concurrent.concurrent
@@ -741,7 +742,8 @@ interface Concurrent<F> : Async<F> {
    *       delay { println("Hello World!") }
    *     }
    *   //sampleEnd
-   *   IO.concurrent().delayHelloWorld().unsafeRunSync()
+   *   IO.concurrent().delayHelloWorld()
+   *     .fix().unsafeRunSync()
    * }
    * ```
    * @see waitFor
@@ -752,6 +754,7 @@ interface Concurrent<F> : Async<F> {
    * Returns the result of [this] within the specified [duration] or the [default] value.
    *
    * ```kotlin:ank:playground
+   * import arrow.*
    * import arrow.effects.*
    * import arrow.effects.typeclasses.*
    * import arrow.effects.extensions.io.concurrent.concurrent
@@ -764,15 +767,45 @@ interface Concurrent<F> : Async<F> {
    *     return world.timeoutTo(fallbackWorld, 1.seconds)
    *   }
    *   //sampleEnd
-   *   IO.concurrent().timedOutWorld().unsafeRunSync()
+   *   IO.concurrent().timedOutWorld()
+   *     .fix().unsafeRunSync()
    * }
    * ```
    **/
-  fun <A> Kind<F, A>.waitFor(duration: Duration, default: Kind<F, A> = raiseError(TimeoutException)): Kind<F, A> =
+  fun <A> Kind<F, A>.waitFor(duration: Duration, default: Kind<F, A>): Kind<F, A> =
     dispatchers().default().raceN(this, sleep(duration)).flatMap {
       it.fold(
         { a -> just(a) },
         { default }
+      )
+    }
+
+  /**
+   * Returns the result of [this] within the specified [duration] or the raises a [TimeoutException] exception.
+   *
+   * ```kotlin:ank:playground
+   * import arrow.*
+   * import arrow.effects.*
+   * import arrow.effects.typeclasses.*
+   * import arrow.effects.extensions.io.concurrent.concurrent
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   fun <F> Concurrent<F>.timedOutWorld(): Kind<F, Unit> {
+   *     val world = sleep(1.seconds).flatMap { delay { println("Hello World!") } }
+   *     return world.waitFor(3.seconds)
+   *   }
+   *   //sampleEnd
+   *   IO.concurrent().timedOutWorld()
+   *     .fix().unsafeRunSync()
+   * }
+   * ```
+   **/
+  fun <A> Kind<F, A>.waitFor(duration: Duration): Kind<F, A> =
+    dispatchers().default().raceN(this, sleep(duration)).flatMap {
+      it.fold(
+        { a -> just(a) },
+        { raiseError(TimeoutException(duration.toString())) }
       )
     }
 }
