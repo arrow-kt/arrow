@@ -66,13 +66,13 @@ class EffectsSuspendDSLTests : UnitSpec() {
     }
 
     "Direct syntax for concurrent operations" {
-      suspend fun getThreadName(): String =
-        Thread.currentThread().name
+      val textContext = newCountingThreadFactory("test", 4) // We fork 4x in the test below, so this is the size of our pool.
+        .asCoroutineContext()
+      suspend fun getThreadName(): String = Thread.currentThread().name
 
       val program = fx {
-        // note how the receiving value is typed in the environment and not inside IO despite being effectful and
-        // non-blocking parallel computations
-        val result: List<String> = !newCountingThreadFactory("test", 2).asCoroutineContext().parMapN(
+        // note how the receiving value is typed in the environment and not inside IO despite being effectful and non-blocking parallel computations
+        val result: List<String> = !textContext.parMapN(
           effect { getThreadName() },
           effect { getThreadName() }
         ) { a, b -> listOf(a, b) }
