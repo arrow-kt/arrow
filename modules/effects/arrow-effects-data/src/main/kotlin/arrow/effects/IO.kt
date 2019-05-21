@@ -126,6 +126,9 @@ sealed class IO<out A> : IOOf<A> {
   open fun continueOn(ctx: CoroutineContext): IO<A> =
     ContinueOn(this, ctx)
 
+  fun <B> ap(ff: IOOf<(A) -> B>): IO<B> =
+    flatMap { a -> ff.fix().map { it(a) } }
+
   /**
    * Create a new [IO] that upon execution starts the receiver [IO] within a [Fiber] on [ctx].
    *
@@ -162,7 +165,45 @@ sealed class IO<out A> : IOOf<A> {
   fun <B> followedBy(fb: IOOf<B>) = flatMap { fb }
 
   fun attempt(): IO<Either<Throwable, A>> =
-    Bind(this, IOFrame.any())
+    Bind(this, IOFrame.attempt())
+
+  /**
+   * Redeem an [IO] to an [IO] of [B] by resolving the error **or** mapping the value [A] to [B].
+   *
+   * ```kotlin:ank:playground
+   * import arrow.effects.IO
+   *
+   * fun main(args: Array<String>) {
+   *   val result =
+   *   //sampleStart
+   *   IO.raiseError<Int>(RuntimeException("Hello from Error"))
+   *     .redeem({ e -> e.message ?: "" }, Int::toString)
+   *   //sampleEnd
+   *   println(result.unsafeRunSync())
+   * }
+   * ```
+   */
+  fun <B> redeem(fe: (Throwable) -> B, fb: (A) -> B): IO<B> =
+    Bind(this, IOFrame.Companion.Redeem(fe, fb))
+
+  /**
+   * Redeem an [IO] to an [IO] of [B] by resolving the error **or** mapping the value [A] to [B] **with** an effect.
+   *
+   * ```kotlin:ank:playground
+   * import arrow.effects.IO
+   *
+   * fun main(args: Array<String>) {
+   *   val result =
+   *   //sampleStart
+   *   IO.just("1")
+   *     .redeemWith({ e -> IO.just(-1) }, { str -> IO { str.toInt() } })
+   *   //sampleEnd
+   *   println(result.unsafeRunSync())
+   * }
+   * ```
+   */
+  fun <B> redeemWith(fe: (Throwable) -> IOOf<B>, fb: (A) -> IOOf<B>): IO<B> =
+    Bind(this, IOFrame.Companion.RedeemWith(fe, fb))
 
   fun runAsync(cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Unit> =
     IO { unsafeRunAsync(cb.andThen { it.fix().unsafeRunAsync { } }) }
@@ -278,7 +319,7 @@ sealed class IO<out A> : IOOf<A> {
 
     override fun <B> map(f: (A) -> B): IO<B> =
     // Allowed to do maxStackDepthSize map operations in sequence before
-    // starting a new Map fusion in order to avoid stack overflows
+      // starting a new Map fusion in order to avoid stack overflows
       if (index != maxStackDepthSize) Map(source, g.andThen(f), index + 1)
       else Map(this, f, 0)
 
@@ -286,10 +327,10 @@ sealed class IO<out A> : IOOf<A> {
   }
 }
 
-fun <A, B> IOOf<A>.ap(ff: IOOf<(A) -> B>): IO<B> =
-  fix().flatMap { a -> ff.fix().map { it(a) } }
-
 fun <A> IOOf<A>.handleErrorWith(f: (Throwable) -> IOOf<A>): IO<A> =
-  IO.Bind(fix(), IOFrame.errorHandler(f))
+  IO.Bind(fix(), IOFrame.Companion.ErrorHandler(f))
+
+fun <A> IOOf<A>.handleError(f: (Throwable) -> A): IO<A> =
+  handleErrorWith { e -> IO.Pure(f(e)) }
 
 fun <A> A.liftIO(): IO<A> = IO.just(this)
