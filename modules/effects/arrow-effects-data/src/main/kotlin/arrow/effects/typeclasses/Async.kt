@@ -196,7 +196,7 @@ interface Async<F> : MonadDefer<F> {
    * }
    * ```
    */
-  fun <A> effect(ctx: CoroutineContext = EmptyCoroutineContext, f: suspend () -> A): Kind<F, A> =
+  fun <A> effect(ctx: CoroutineContext, f: suspend () -> A): Kind<F, A> =
     async {
       f.startCoroutine(asyncContinuation(ctx, it))
     }
