@@ -40,8 +40,8 @@ import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import arrow.unsafe
 import kotlin.coroutines.CoroutineContext
-import arrow.effects.ap as ioAp
 import arrow.effects.handleErrorWith as ioHandleErrorWith
+import arrow.effects.handleError as ioHandleError
 
 @extension
 interface IOFunctor : Functor<ForIO> {
@@ -55,7 +55,7 @@ interface IOApply : Apply<ForIO> {
     fix().map(f)
 
   override fun <A, B> IOOf<A>.ap(ff: IOOf<(A) -> B>): IO<B> =
-    ioAp(ff)
+    fix().ap(ff)
 }
 
 @extension
@@ -67,7 +67,7 @@ interface IOApplicative : Applicative<ForIO> {
     IO.just(a)
 
   override fun <A, B> IOOf<A>.ap(ff: IOOf<(A) -> B>): IO<B> =
-    ioAp(ff)
+    fix().ap(ff)
 }
 
 @extension
@@ -93,6 +93,12 @@ interface IOApplicativeError : ApplicativeError<ForIO, Throwable>, IOApplicative
   override fun <A> IOOf<A>.handleErrorWith(f: (Throwable) -> IOOf<A>): IO<A> =
     ioHandleErrorWith(f)
 
+  override fun <A> IOOf<A>.handleError(f: (Throwable) -> A): IO<A> =
+    ioHandleError(f)
+
+  override fun <A, B> IOOf<A>.redeem(fe: (Throwable) -> B, fb: (A) -> B): IO<B> =
+    fix().redeem(fe, fb)
+
   override fun <A> raiseError(e: Throwable): IO<A> =
     IO.raiseError(e)
 }
@@ -103,7 +109,7 @@ interface IOMonadError : MonadError<ForIO, Throwable>, IOApplicativeError, IOMon
   override fun <A> just(a: A): IO<A> = IO.just(a)
 
   override fun <A, B> IOOf<A>.ap(ff: IOOf<(A) -> B>): IO<B> =
-    ioAp(ff)
+    fix().ap(ff)
 
   override fun <A, B> IOOf<A>.map(f: (A) -> B): IO<B> =
     fix().map(f)
@@ -113,6 +119,9 @@ interface IOMonadError : MonadError<ForIO, Throwable>, IOApplicativeError, IOMon
 
   override fun <A> IOOf<A>.handleErrorWith(f: (Throwable) -> IOOf<A>): IO<A> =
     ioHandleErrorWith(f)
+
+  override fun <A, B> IOOf<A>.redeemWith(fe: (Throwable) -> IOOf<B>, fb: (A) -> IOOf<B>): IO<B> =
+    fix().redeemWith(fe, fb)
 
   override fun <A> raiseError(e: Throwable): IO<A> =
     IO.raiseError(e)
@@ -124,16 +133,16 @@ interface IOMonadThrow : MonadThrow<ForIO>, IOMonadError
 @extension
 interface IOBracket : Bracket<ForIO, Throwable>, IOMonadThrow {
   override fun <A, B> IOOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> IOOf<Unit>, use: (A) -> IOOf<B>): IO<B> =
-    fix().bracketCase({ a, e -> release(a, e) }, { a -> use(a) })
+    fix().bracketCase(release, use)
 
   override fun <A, B> IOOf<A>.bracket(release: (A) -> IOOf<Unit>, use: (A) -> IOOf<B>): IO<B> =
-    fix().bracket({ a -> release(a) }, { a -> use(a) })
+    fix().bracket(release, use)
 
   override fun <A> IOOf<A>.guarantee(finalizer: IOOf<Unit>): IO<A> =
     fix().guarantee(finalizer)
 
   override fun <A> IOOf<A>.guaranteeCase(finalizer: (ExitCase<Throwable>) -> IOOf<Unit>): IO<A> =
-    fix().guaranteeCase { e -> finalizer(e) }
+    fix().guaranteeCase(finalizer)
 }
 
 @extension
