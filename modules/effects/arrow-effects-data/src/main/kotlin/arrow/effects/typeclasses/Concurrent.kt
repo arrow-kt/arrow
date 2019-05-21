@@ -764,7 +764,7 @@ interface Concurrent<F> : Async<F> {
    *   fun <F> Concurrent<F>.timedOutWorld(): Kind<F, Unit> {
    *     val world = sleep(3.seconds).flatMap { delay { println("Hello World!") } }
    *     val fallbackWorld = delay { println("Hello from the backup") }
-   *     return world.waitFor(fallbackWorld, 1.seconds)
+   *     return world.waitFor(1.seconds, fallbackWorld)
    *   }
    *   //sampleEnd
    *   IO.concurrent().timedOutWorld()
