@@ -19,6 +19,12 @@ fun <A> EQ(EQA: Eq<A> = Eq.any(), timeout: Duration = 60.seconds): Eq<Kind<ForIO
   }
 }
 
+/**
+ * This [ExecutorService] doesn't keep any Thread alive, so the maximumPoolSize should be equal to the # of scheduled tasks.
+ *
+ * Only useful for very specific task that want to keep track of how many times [kotlin.coroutines.startCoroutine] is called etc,
+ * it also names every thread differently so you can rely on the names to check if tasks where scheduled on different Threads.
+ */
 internal fun newCountingThreadFactory(name: String, maximumPoolSize: Int = 0): ExecutorService =
   ThreadPoolExecutor(0, maximumPoolSize, 0, TimeUnit.MILLISECONDS, SynchronousQueue<Runnable>(), CountingThreadFactory(name))
 
