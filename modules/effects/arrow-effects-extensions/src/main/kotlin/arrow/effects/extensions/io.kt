@@ -163,6 +163,12 @@ interface IOAsync : Async<ForIO>, IOMonadDefer {
 
   override fun <A> IOOf<A>.continueOn(ctx: CoroutineContext): IO<A> =
     fix().continueOn(ctx)
+
+  override fun <A> effect(ctx: CoroutineContext, f: suspend () -> A): IO<A> =
+    IO.effect(ctx, f)
+
+  override fun <A> effect(f: suspend () -> A): IO<A> =
+    IO.effect(f)
 }
 
 // FIXME default @extension are temporarily declared in arrow-effects-io-extensions due to multiplatform needs

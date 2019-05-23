@@ -24,8 +24,11 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
+import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.newSingleThreadContext
 import org.junit.runner.RunWith
+import kotlin.coroutines.AbstractCoroutineContextElement
+import kotlin.coroutines.EmptyCoroutineContext
 
 @RunWith(KotlinTestRunner::class)
 @kotlinx.coroutines.ObsoleteCoroutinesApi
@@ -56,6 +59,14 @@ class IOTest : UnitSpec() {
 
     "should yield immediate successful invoke value" {
       val run = IO { 1 }.unsafeRunSync()
+
+      val expected = 1
+
+      run shouldBe expected
+    }
+
+    "should yield immediate successful effect value" {
+      val run = IO.effect { 1 }.unsafeRunSync()
 
       val expected = 1
 
@@ -234,6 +245,68 @@ class IOTest : UnitSpec() {
       io.unsafeRunSync()
 
       sideEffect.counter shouldBe 2
+    }
+
+    "effect is called on every run call" {
+      val sideEffect = SideEffect()
+      val io = IO.effect { sideEffect.increment(); 1 }
+      io.unsafeRunSync()
+      io.unsafeRunSync()
+
+      sideEffect.counter shouldBe 2
+    }
+
+    "effect is called on the correct ctx" {
+      val io = IO.effect(newSingleThreadContext("effect")) { Thread.currentThread().name }
+      io.unsafeRunSync() shouldBe "effect"
+    }
+
+    "CoroutineContext state should be correctly managed between boundaries" {
+      val ctxA = TestContext()
+      val ctxB = CoroutineName("ctxB")
+      // We have to explicitly reference kotlin.coroutines.coroutineContext since `TestContext` overrides this property.
+      IO.effect { kotlin.coroutines.coroutineContext shouldBe EmptyCoroutineContext }
+        .continueOn(ctxA)
+        .flatMap { IO.effect { kotlin.coroutines.coroutineContext shouldBe ctxA } }
+        .continueOn(ctxB)
+        .flatMap { IO.effect { kotlin.coroutines.coroutineContext shouldBe ctxB } }
+        .unsafeRunSync()
+    }
+
+    "fx can switch execution context state across not/bind" {
+      val program = fx {
+        val ctx = !effect { kotlin.coroutines.coroutineContext }
+        !effect { ctx shouldBe EmptyCoroutineContext }
+        continueOn(newSingleThreadContext("test"))
+        val ctx2 = !effect { Thread.currentThread().name }
+        !effect { ctx2 shouldBe "test" }
+      }
+
+      program.unsafeRunSync()
+    }
+
+    "fx can pass context state across not/bind" {
+      val program = fx {
+        val ctx = !effect { kotlin.coroutines.coroutineContext }
+        !effect { ctx shouldBe EmptyCoroutineContext }
+        continueOn(CoroutineName("Simon"))
+        val ctx2 = !effect { kotlin.coroutines.coroutineContext }
+        !effect { ctx2 shouldBe CoroutineName("Simon") }
+      }
+
+      program.unsafeRunSync()
+    }
+
+    "fx will respect thread switching across not/bind" {
+      val program = fx {
+        continueOn(newSingleThreadContext("start"))
+        val initialThread = !effect { Thread.currentThread().name }
+        !(0..130).map { i -> suspend { i } }.sequence()
+        val continuedThread = !effect { Thread.currentThread().name }
+        continuedThread shouldBe initialThread
+      }
+
+      program.unsafeRunSync()
     }
 
     "unsafeRunTimed times out with None result" {
@@ -482,4 +555,10 @@ class IOTest : UnitSpec() {
       IO.just(1).flatMap(::ioAsync).unsafeRunSync() shouldBe size
     }
   }
+}
+
+/** Represents a unique identifier context using object equality. */
+internal class TestContext : AbstractCoroutineContextElement(TestContext) {
+  companion object Key : kotlin.coroutines.CoroutineContext.Key<CoroutineName>
+  override fun toString(): String = "TestContext(${Integer.toHexString(hashCode())})"
 }
