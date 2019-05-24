@@ -1,12 +1,32 @@
 package arrow.syntax.test
 
+import arrow.syntax.function.andThen
+import arrow.syntax.function.bind
+import arrow.syntax.function.complement
+import arrow.syntax.function.compose
+import arrow.syntax.function.curried
+import arrow.syntax.function.forwardCompose
+import arrow.syntax.function.invoke
+import arrow.syntax.function.memoize
+import arrow.syntax.function.paired
+import arrow.syntax.function.partially1
+import arrow.syntax.function.partially2
+import arrow.syntax.function.partially3
+import arrow.syntax.function.partially4
+import arrow.syntax.function.partially5
+import arrow.syntax.function.reverse
+import arrow.syntax.function.tripled
+import arrow.syntax.function.tupled
+import arrow.syntax.function.uncurried
+import arrow.syntax.function.unpaired
+import arrow.syntax.function.untripled
+import arrow.syntax.function.untupled
 import arrow.core.Tuple2
-import arrow.syntax.function.*
 import arrow.test.UnitSpec
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
-import java.util.*
+import java.util.Random
 
 @RunWith(KotlinTestRunner::class)
 class FunctionSyntaxTest : UnitSpec() {
