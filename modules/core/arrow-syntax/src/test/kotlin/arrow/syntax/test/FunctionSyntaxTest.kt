@@ -1,29 +1,12 @@
 package arrow.syntax.test
 
-import arrow.syntax.function.andThen
-import arrow.syntax.function.bind
-import arrow.syntax.function.complement
-import arrow.syntax.function.compose
-import arrow.syntax.function.curried
-import arrow.syntax.function.forwardCompose
-import arrow.syntax.function.invoke
-import arrow.syntax.function.memoize
-import arrow.syntax.function.paired
-import arrow.syntax.function.partially1
-import arrow.syntax.function.partially2
-import arrow.syntax.function.partially3
-import arrow.syntax.function.partially4
-import arrow.syntax.function.partially5
-import arrow.syntax.function.reverse
-import arrow.syntax.function.tripled
-import arrow.syntax.function.uncurried
-import arrow.syntax.function.unpaired
-import arrow.syntax.function.untripled
+import arrow.core.Tuple2
+import arrow.syntax.function.*
 import arrow.test.UnitSpec
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
-import java.util.Random
+import java.util.*
 
 @RunWith(KotlinTestRunner::class)
 class FunctionSyntaxTest : UnitSpec() {
@@ -102,6 +85,18 @@ class FunctionSyntaxTest : UnitSpec() {
       // same type as sum2ints,
       curried.uncurried()(2, 4) shouldBe 6
       sum2ints(2, 4) shouldBe 6
+    }
+
+    "testTupling" {
+      val sum2ints = { x: Int, y: Int -> x + y }
+      val tupled = sum2ints.tupled()
+      tupled(Tuple2(2, 4)) shouldBe 6
+    }
+
+    "testUntupling" {
+      val sum2ints = { t: Tuple2<Int, Int> -> t.a + t.b }
+      val untupled = sum2ints.untupled()
+      untupled(2, 4) shouldBe 6
     }
 
     "memoize" {
