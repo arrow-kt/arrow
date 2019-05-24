@@ -1,6 +1,26 @@
 package arrow.syntax.function
 
-import arrow.core.*
+import arrow.core.Tuple10
+import arrow.core.Tuple11
+import arrow.core.Tuple12
+import arrow.core.Tuple13
+import arrow.core.Tuple14
+import arrow.core.Tuple15
+import arrow.core.Tuple16
+import arrow.core.Tuple17
+import arrow.core.Tuple18
+import arrow.core.Tuple19
+import arrow.core.Tuple2
+import arrow.core.Tuple20
+import arrow.core.Tuple21
+import arrow.core.Tuple22
+import arrow.core.Tuple3
+import arrow.core.Tuple4
+import arrow.core.Tuple5
+import arrow.core.Tuple6
+import arrow.core.Tuple7
+import arrow.core.Tuple8
+import arrow.core.Tuple9
 
 fun <T1, T2, R> ((T1, T2) -> R).tupled(): (Tuple2<T1, T2>) -> R = { (t1, t2) -> this(t1, t2) }
 
