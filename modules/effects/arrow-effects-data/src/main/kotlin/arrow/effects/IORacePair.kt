@@ -3,7 +3,6 @@ package arrow.effects
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
-import arrow.core.Tuple2
 import arrow.effects.internal.IOFiber
 import arrow.effects.internal.IOForkedStart
 import arrow.effects.internal.Platform
@@ -47,7 +46,7 @@ import kotlin.coroutines.CoroutineContext
  *
  * @see [arrow.effects.typeclasses.Concurrent.raceN] for a simpler version that cancels loser.
  */
-fun <A, B> IO.Companion.racePair(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<B>): IO<Either<Tuple2<A, Fiber<ForIO, B>>, Tuple2<Fiber<ForIO, A>, B>>> =
+fun <A, B> IO.Companion.racePair(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<B>): IO<RacePair<ForIO, A, B>> =
   async { conn, cb ->
     val active = AtomicBoolean(true)
 
@@ -78,7 +77,7 @@ fun <A, B> IO.Companion.racePair(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<
       }, { a ->
         if (active.getAndSet(false)) {
           conn.pop()
-          cb(Right(Left(Tuple2(a, IOFiber(promiseB, connB)))))
+          cb(Right(RacePair.First(a, IOFiber(promiseB, connB))))
         } else {
           promiseA.complete(Right(a))
         }
@@ -98,7 +97,7 @@ fun <A, B> IO.Companion.racePair(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<
       }, { b ->
         if (active.getAndSet(false)) {
           conn.pop()
-          cb(Right(Right(Tuple2(IOFiber(promiseA, connA), b))))
+          cb(Right(RacePair.Second(IOFiber(promiseA, connA), b)))
         } else {
           promiseB.complete(Right(b))
         }

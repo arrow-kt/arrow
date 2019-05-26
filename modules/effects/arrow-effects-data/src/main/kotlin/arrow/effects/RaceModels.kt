@@ -1,22 +1,32 @@
 package arrow.effects
 
 import arrow.core.Either
-import arrow.core.Tuple2
 import arrow.effects.typeclasses.Fiber
 
 /** Alias for `Either` structure to provide consistent signature for race methods. */
-typealias RacePair<F, A, B> = Either<Tuple2<A, Fiber<F, B>>, Tuple2<Fiber<F, A>, B>>
+sealed class RacePair<F, A, B> {
+  data class First<F, A, B>(val winner: A, val fiberB: Fiber<F, B>) : RacePair<F, A, B>()
+  data class Second<F, A, B>(val fiberA: Fiber<F, A>, val winner: B) : RacePair<F, A, B>()
+
+  fun <C> fold(
+    ifA: (A, Fiber<F, B>) -> C,
+    ifB: (Fiber<F, A>, B) -> C
+  ): C = when (this) {
+    is First -> ifA(winner, fiberB)
+    is Second -> ifB(fiberA, winner)
+  }
+}
 
 sealed class RaceTriple<F, A, B, C> {
-  data class First<F, A, B, C>(val winner: A, val fiberB: Fiber<F, B>, val fiberC: Fiber<F, C>): RaceTriple<F, A, B, C>()
-  data class Second<F, A, B, C>(val fiberA: Fiber<F, A>, val winner: B, val fiberC: Fiber<F, C>): RaceTriple<F, A, B, C>()
-  data class Third<F, A, B, C>(val fiberB: Fiber<F, B>, val fiberA: Fiber<F, A>, val winner: C): RaceTriple<F, A, B, C>()
+  data class First<F, A, B, C>(val winner: A, val fiberB: Fiber<F, B>, val fiberC: Fiber<F, C>) : RaceTriple<F, A, B, C>()
+  data class Second<F, A, B, C>(val fiberA: Fiber<F, A>, val winner: B, val fiberC: Fiber<F, C>) : RaceTriple<F, A, B, C>()
+  data class Third<F, A, B, C>(val fiberA: Fiber<F, A>, val fiberB: Fiber<F, B>, val winner: C) : RaceTriple<F, A, B, C>()
 
   fun <D> fold(
     ifA: (A, Fiber<F, B>, Fiber<F, C>) -> D,
     ifB: (Fiber<F, A>, B, Fiber<F, C>) -> D,
     ifC: (Fiber<F, A>, Fiber<F, B>, C) -> D
-  ): D = when(this) {
+  ): D = when (this) {
     is First -> ifA(winner, fiberB, fiberC)
     is Second -> ifB(fiberA, winner, fiberC)
     is Third -> ifC(fiberA, fiberB, winner)
@@ -27,15 +37,15 @@ sealed class RaceTriple<F, A, B, C> {
 typealias Race2<A, B> = Either<A, B>
 
 sealed class Race3 <A, B, C> {
-  data class First<A>(val winner: A): Race3<A, Nothing, Nothing>()
-  data class Second<B>(val winner: B): Race3<Nothing, B, Nothing>()
-  data class Third<C>(val winner: C): Race3<Nothing, Nothing, C>()
+  data class First<A>(val winner: A) : Race3<A, Nothing, Nothing>()
+  data class Second<B>(val winner: B) : Race3<Nothing, B, Nothing>()
+  data class Third<C>(val winner: C) : Race3<Nothing, Nothing, C>()
 
   fun <D> fold(
     ifA: (A) -> D,
     ifB: (B) -> D,
     ifC: (C) -> D
-  ): D = when(this) {
+  ): D = when (this) {
     is First -> ifA(winner)
     is Second -> ifB(winner)
     is Third -> ifC(winner)
@@ -43,17 +53,17 @@ sealed class Race3 <A, B, C> {
 }
 
 sealed class Race4 <A, B, C, D> {
-  data class First<A>(val winner: A): Race4<A, Nothing, Nothing, Nothing>()
-  data class Second<B>(val winner: B): Race4<Nothing, B, Nothing, Nothing>()
-  data class Third<C>(val winner: C): Race4<Nothing, Nothing, C, Nothing>()
-  data class Fourth<D>(val winner: D): Race4<Nothing, Nothing, Nothing, D>()
+  data class First<A>(val winner: A) : Race4<A, Nothing, Nothing, Nothing>()
+  data class Second<B>(val winner: B) : Race4<Nothing, B, Nothing, Nothing>()
+  data class Third<C>(val winner: C) : Race4<Nothing, Nothing, C, Nothing>()
+  data class Fourth<D>(val winner: D) : Race4<Nothing, Nothing, Nothing, D>()
 
   fun <E> fold(
     ifA: (A) -> E,
     ifB: (B) -> E,
     ifC: (C) -> E,
     ifD: (D) -> E
-  ): E = when(this) {
+  ): E = when (this) {
     is First -> ifA(winner)
     is Second -> ifB(winner)
     is Third -> ifC(winner)
@@ -62,11 +72,11 @@ sealed class Race4 <A, B, C, D> {
 }
 
 sealed class Race5 <A, B, C, D, E> {
-  data class First<A>(val winner: A): Race5<A, Nothing, Nothing, Nothing, Nothing>()
-  data class Second<B>(val winner: B): Race5<Nothing, B, Nothing, Nothing, Nothing>()
-  data class Third<C>(val winner: C): Race5<Nothing, Nothing, C, Nothing, Nothing>()
-  data class Fourth<D>(val winner: D): Race5<Nothing, Nothing, Nothing, D, Nothing>()
-  data class Fifth<E>(val winner: E): Race5<Nothing, Nothing, Nothing, Nothing, E>()
+  data class First<A>(val winner: A) : Race5<A, Nothing, Nothing, Nothing, Nothing>()
+  data class Second<B>(val winner: B) : Race5<Nothing, B, Nothing, Nothing, Nothing>()
+  data class Third<C>(val winner: C) : Race5<Nothing, Nothing, C, Nothing, Nothing>()
+  data class Fourth<D>(val winner: D) : Race5<Nothing, Nothing, Nothing, D, Nothing>()
+  data class Fifth<E>(val winner: E) : Race5<Nothing, Nothing, Nothing, Nothing, E>()
 
   fun <F> fold(
     ifA: (A) -> F,
@@ -74,7 +84,7 @@ sealed class Race5 <A, B, C, D, E> {
     ifC: (C) -> F,
     ifD: (D) -> F,
     ifE: (E) -> F
-  ): F = when(this) {
+  ): F = when (this) {
     is First -> ifA(winner)
     is Second -> ifB(winner)
     is Third -> ifC(winner)
@@ -84,12 +94,12 @@ sealed class Race5 <A, B, C, D, E> {
 }
 
 sealed class Race6 <A, B, C, D, E, F> {
-  data class First<A>(val winner: A): Race6<A, Nothing, Nothing, Nothing, Nothing, Nothing>()
-  data class Second<B>(val winner: B): Race6<Nothing, B, Nothing, Nothing, Nothing, Nothing>()
-  data class Third<C>(val winner: C): Race6<Nothing, Nothing, C, Nothing, Nothing, Nothing>()
-  data class Fourth<D>(val winner: D): Race6<Nothing, Nothing, Nothing, D, Nothing, Nothing>()
-  data class Fifth<E>(val winner: E): Race6<Nothing, Nothing, Nothing, Nothing, E, Nothing>()
-  data class Sixth<F>(val winner: F): Race6<Nothing, Nothing, Nothing, Nothing, Nothing, F>()
+  data class First<A>(val winner: A) : Race6<A, Nothing, Nothing, Nothing, Nothing, Nothing>()
+  data class Second<B>(val winner: B) : Race6<Nothing, B, Nothing, Nothing, Nothing, Nothing>()
+  data class Third<C>(val winner: C) : Race6<Nothing, Nothing, C, Nothing, Nothing, Nothing>()
+  data class Fourth<D>(val winner: D) : Race6<Nothing, Nothing, Nothing, D, Nothing, Nothing>()
+  data class Fifth<E>(val winner: E) : Race6<Nothing, Nothing, Nothing, Nothing, E, Nothing>()
+  data class Sixth<F>(val winner: F) : Race6<Nothing, Nothing, Nothing, Nothing, Nothing, F>()
 
   fun <G> fold(
     ifA: (A) -> G,
@@ -98,7 +108,7 @@ sealed class Race6 <A, B, C, D, E, F> {
     ifD: (D) -> G,
     ifE: (E) -> G,
     ifF: (F) -> G
-  ): G = when(this) {
+  ): G = when (this) {
     is First -> ifA(winner)
     is Second -> ifB(winner)
     is Third -> ifC(winner)
@@ -109,13 +119,13 @@ sealed class Race6 <A, B, C, D, E, F> {
 }
 
 sealed class Race7 <A, B, C, D, E, F, G> {
-  data class First<A>(val winner: A): Race7<A, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing>()
-  data class Second<B>(val winner: B): Race7<Nothing, B, Nothing, Nothing, Nothing, Nothing, Nothing>()
-  data class Third<C>(val winner: C): Race7<Nothing, Nothing, C, Nothing, Nothing, Nothing, Nothing>()
-  data class Fourth<D>(val winner: D): Race7<Nothing, Nothing, Nothing, D, Nothing, Nothing, Nothing>()
-  data class Fifth<E>(val winner: E): Race7<Nothing, Nothing, Nothing, Nothing, E, Nothing, Nothing>()
-  data class Sixth<F>(val winner: F): Race7<Nothing, Nothing, Nothing, Nothing, Nothing, F, Nothing>()
-  data class Seventh<G>(val winner: G): Race7<Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, G>()
+  data class First<A>(val winner: A) : Race7<A, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing>()
+  data class Second<B>(val winner: B) : Race7<Nothing, B, Nothing, Nothing, Nothing, Nothing, Nothing>()
+  data class Third<C>(val winner: C) : Race7<Nothing, Nothing, C, Nothing, Nothing, Nothing, Nothing>()
+  data class Fourth<D>(val winner: D) : Race7<Nothing, Nothing, Nothing, D, Nothing, Nothing, Nothing>()
+  data class Fifth<E>(val winner: E) : Race7<Nothing, Nothing, Nothing, Nothing, E, Nothing, Nothing>()
+  data class Sixth<F>(val winner: F) : Race7<Nothing, Nothing, Nothing, Nothing, Nothing, F, Nothing>()
+  data class Seventh<G>(val winner: G) : Race7<Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, G>()
 
   fun <H> fold(
     ifA: (A) -> H,
@@ -125,7 +135,7 @@ sealed class Race7 <A, B, C, D, E, F, G> {
     ifE: (E) -> H,
     ifF: (F) -> H,
     ifG: (G) -> H
-  ): H = when(this) {
+  ): H = when (this) {
     is First -> ifA(winner)
     is Second -> ifB(winner)
     is Third -> ifC(winner)
@@ -137,14 +147,14 @@ sealed class Race7 <A, B, C, D, E, F, G> {
 }
 
 sealed class Race8 <A, B, C, D, E, F, G, H> {
-  data class First<A>(val winner: A): Race8<A, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing>()
-  data class Second<B>(val winner: B): Race8<Nothing, B, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing>()
-  data class Third<C>(val winner: C): Race8<Nothing, Nothing, C, Nothing, Nothing, Nothing, Nothing, Nothing>()
-  data class Fourth<D>(val winner: D): Race8<Nothing, Nothing, Nothing, D, Nothing, Nothing, Nothing, Nothing>()
-  data class Fifth<E>(val winner: E): Race8<Nothing, Nothing, Nothing, Nothing, E, Nothing, Nothing, Nothing>()
-  data class Sixth<F>(val winner: F): Race8<Nothing, Nothing, Nothing, Nothing, Nothing, F, Nothing, Nothing>()
-  data class Seventh<G>(val winner: G): Race8<Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, G, Nothing>()
-  data class Eighth<H>(val winner: H): Race8<Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, H>()
+  data class First<A>(val winner: A) : Race8<A, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing>()
+  data class Second<B>(val winner: B) : Race8<Nothing, B, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing>()
+  data class Third<C>(val winner: C) : Race8<Nothing, Nothing, C, Nothing, Nothing, Nothing, Nothing, Nothing>()
+  data class Fourth<D>(val winner: D) : Race8<Nothing, Nothing, Nothing, D, Nothing, Nothing, Nothing, Nothing>()
+  data class Fifth<E>(val winner: E) : Race8<Nothing, Nothing, Nothing, Nothing, E, Nothing, Nothing, Nothing>()
+  data class Sixth<F>(val winner: F) : Race8<Nothing, Nothing, Nothing, Nothing, Nothing, F, Nothing, Nothing>()
+  data class Seventh<G>(val winner: G) : Race8<Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, G, Nothing>()
+  data class Eighth<H>(val winner: H) : Race8<Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, H>()
 
   fun <I> fold(
     ifA: (A) -> I,
@@ -155,7 +165,7 @@ sealed class Race8 <A, B, C, D, E, F, G, H> {
     ifF: (F) -> I,
     ifG: (G) -> I,
     ifH: (H) -> I
-  ): I = when(this) {
+  ): I = when (this) {
     is First -> ifA(winner)
     is Second -> ifB(winner)
     is Third -> ifC(winner)
@@ -168,15 +178,15 @@ sealed class Race8 <A, B, C, D, E, F, G, H> {
 }
 
 sealed class Race9 <A, B, C, D, E, F, G, H, I> {
-  data class First<A>(val winner: A): Race9<A, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing>()
-  data class Second<B>(val winner: B): Race9<Nothing, B, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing>()
-  data class Third<C>(val winner: C): Race9<Nothing, Nothing, C, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing>()
-  data class Fourth<D>(val winner: D): Race9<Nothing, Nothing, Nothing, D, Nothing, Nothing, Nothing, Nothing, Nothing>()
-  data class Fifth<E>(val winner: E): Race9<Nothing, Nothing, Nothing, Nothing, E, Nothing, Nothing, Nothing, Nothing>()
-  data class Sixth<F>(val winner: F): Race9<Nothing, Nothing, Nothing, Nothing, Nothing, F, Nothing, Nothing, Nothing>()
-  data class Seventh<G>(val winner: G): Race9<Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, G, Nothing, Nothing>()
-  data class Eighth<H>(val winner: H): Race9<Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, H, Nothing>()
-  data class Ninth<I>(val winner: I): Race9<Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, I>()
+  data class First<A>(val winner: A) : Race9<A, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing>()
+  data class Second<B>(val winner: B) : Race9<Nothing, B, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing>()
+  data class Third<C>(val winner: C) : Race9<Nothing, Nothing, C, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing>()
+  data class Fourth<D>(val winner: D) : Race9<Nothing, Nothing, Nothing, D, Nothing, Nothing, Nothing, Nothing, Nothing>()
+  data class Fifth<E>(val winner: E) : Race9<Nothing, Nothing, Nothing, Nothing, E, Nothing, Nothing, Nothing, Nothing>()
+  data class Sixth<F>(val winner: F) : Race9<Nothing, Nothing, Nothing, Nothing, Nothing, F, Nothing, Nothing, Nothing>()
+  data class Seventh<G>(val winner: G) : Race9<Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, G, Nothing, Nothing>()
+  data class Eighth<H>(val winner: H) : Race9<Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, H, Nothing>()
+  data class Ninth<I>(val winner: I) : Race9<Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, I>()
 
   fun <J> fold(
     ifA: (A) -> J,
@@ -188,7 +198,7 @@ sealed class Race9 <A, B, C, D, E, F, G, H, I> {
     ifG: (G) -> J,
     ifH: (H) -> J,
     ifI: (I) -> J
-  ): J = when(this) {
+  ): J = when (this) {
     is First -> ifA(winner)
     is Second -> ifB(winner)
     is Third -> ifC(winner)

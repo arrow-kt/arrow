@@ -3,13 +3,11 @@ package arrow.effects
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
-import arrow.core.Tuple3
 import arrow.effects.internal.IOFiber
 import arrow.effects.internal.IOForkedStart
 import arrow.effects.internal.Platform
 import arrow.effects.internal.UnsafePromise
 import arrow.effects.typeclasses.Fiber
-import arrow.effects.typeclasses.RaceTriple
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.CoroutineContext
 
@@ -88,7 +86,7 @@ fun <A, B, C> IO.Companion.raceTriple(ctx: CoroutineContext, ioA: IOOf<A>, ioB: 
       }, { a ->
         if (active.getAndSet(false)) {
           conn.pop()
-          cb(Right(Left(Tuple3(a, IOFiber(promiseB, connB), IOFiber(promiseC, connC)))))
+          cb(Right(RaceTriple.First(a, IOFiber(promiseB, connB), IOFiber(promiseC, connC))))
         } else {
           promiseA.complete(Right(a))
         }
@@ -115,7 +113,7 @@ fun <A, B, C> IO.Companion.raceTriple(ctx: CoroutineContext, ioA: IOOf<A>, ioB: 
       }, { b ->
         if (active.getAndSet(false)) {
           conn.pop()
-          cb(Right(Right(Left(Tuple3(IOFiber(promiseA, connA), b, IOFiber(promiseC, connC))))))
+          cb(Right(RaceTriple.Second(IOFiber(promiseA, connA), b, IOFiber(promiseC, connC))))
         } else {
           promiseB.complete(Right(b))
         }
@@ -142,7 +140,7 @@ fun <A, B, C> IO.Companion.raceTriple(ctx: CoroutineContext, ioA: IOOf<A>, ioB: 
       }, { c ->
         if (active.getAndSet(false)) {
           conn.pop()
-          cb(Right(Right(Right(Tuple3(IOFiber(promiseA, connA), IOFiber(promiseB, connB), c)))))
+          cb(Right(RaceTriple.Third(IOFiber(promiseA, connA), IOFiber(promiseB, connB), c)))
         } else {
           promiseC.complete(Right(c))
         }

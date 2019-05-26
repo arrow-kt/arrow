@@ -196,7 +196,7 @@ interface Concurrent<F> : Async<F> {
    *     val racePair = IO.racePair(Dispatchers.Default, promise.get(), IO.unit).bind()
    *     racePair.fold(
    *       { IO.raiseError<Int>(RuntimeException("Promise.get cannot win before complete")) },
-   *       { (a: Fiber<ForIO, Int>, _) -> promise.complete(1).flatMap { a.join() } }
+   *       { a: Fiber<ForIO, Int>, _ -> promise.complete(1).flatMap { a.join() } }
    *     ).bind()
    *   }.unsafeRunSync() == 1
    *   //sampleEnd
@@ -406,8 +406,8 @@ interface Concurrent<F> : Async<F> {
   ): Kind<F, C> =
     racePair(fa, fb).flatMap {
       it.fold(
-        { (a, fiberB) -> fiberB.join().map { b -> f(a, b) } },
-        { (fiberA, b) -> fiberA.join().map { a -> f(a, b) } }
+        { a, fiberB -> fiberB.join().map { b -> f(a, b) } },
+        { fiberA, b -> fiberA.join().map { a -> f(a, b) } }
       )
     }
 
@@ -572,10 +572,10 @@ interface Concurrent<F> : Async<F> {
     fb: Kind<F, B>
   ): Kind<F, Race2<A, B>> =
     racePair(fa, fb).flatMap {
-      it.fold({ (a, b) ->
-        b.cancel().map { Left(a) }
-      }, { (a, b) ->
-        a.cancel().map { Right(b) }
+      it.fold({ a, (_, cancelB) ->
+        cancelB.map { Left(a) }
+      }, { (_, cancelA), b ->
+        cancelA.map { Right(b) }
       })
     }
 
