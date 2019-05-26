@@ -2,7 +2,7 @@ apply plugin: 'kotlin-kapt'
 
 dependencies {
     compile project(':arrow-effects-data')
-    compile project(':arrow-typeclasses')
+    compile project(':arrow-core-typeclasses')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     compile project(':arrow-annotations')
     compile "com.squareup.retrofit2:retrofit:$retrofitVersion"
