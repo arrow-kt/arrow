@@ -29,8 +29,8 @@ import arrow.test.laws.SemigroupKLaws
 import arrow.test.laws.SemigroupLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Hash
+import arrow.core.typeclasses.Eq
+import arrow.core.typeclasses.Hash
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.runner.junit4.KotlinTestRunner

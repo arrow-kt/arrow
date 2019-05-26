@@ -1,4 +1,4 @@
-package arrow.typeclasses
+package arrow.core.typeclasses
 
 import arrow.Kind2
 import arrow.core.Either

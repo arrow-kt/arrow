@@ -5,7 +5,7 @@ import arrow.core.Id
 import arrow.core.Tuple2
 import arrow.core.andThen
 import arrow.core.value
-import arrow.typeclasses.internal.IdBimonad
+import arrow.core.typeclasses.internal.IdBimonad
 
 /**
  * Alias that represents a computation that has a dependency on [D].

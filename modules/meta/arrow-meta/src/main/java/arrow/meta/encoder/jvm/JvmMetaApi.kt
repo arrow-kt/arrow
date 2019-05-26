@@ -356,7 +356,7 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
       val tail = when (witness) {
         is TypeName.ParameterizedType -> witness.typeArguments + typeArguments.drop(1)
         is TypeName.WildcardType -> {
-          if (witness.name == "arrow.typeclasses.Const") {
+          if (witness.name == "arrow.core.typeclasses.Const") {
             val head = typeArguments[0]
             val missingTypeArgs = typeArguments.drop(1)
             head.nestedTypeVariables + missingTypeArgs
@@ -550,10 +550,10 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
       return when {
         this is TypeName.TypeVariable &&
           (dataTypeDownKinded.simpleName.startsWith("arrow.Kind") ||
-            dataTypeDownKinded.simpleName.startsWith("arrow.typeclasses.Conested")) -> {
+            dataTypeDownKinded.simpleName.startsWith("arrow.core.typeclasses.Conested")) -> {
           simpleName
             .substringAfterLast("arrow.Kind<")
-            .substringAfterLast("arrow.typeclasses.Conested<")
+            .substringAfterLast("arrow.core.typeclasses.Conested<")
             .substringBefore(",")
             .substringBefore("<")
             .downKind().let { (pckg, simpleName) ->

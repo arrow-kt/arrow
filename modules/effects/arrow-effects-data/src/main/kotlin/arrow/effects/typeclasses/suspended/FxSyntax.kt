@@ -11,9 +11,9 @@ import arrow.effects.typeclasses.Bracket
 import arrow.effects.typeclasses.Concurrent
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.Fiber
-import arrow.typeclasses.ApplicativeError
-import arrow.typeclasses.Monad
-import arrow.typeclasses.suspended.BindSyntax
+import arrow.core.typeclasses.ApplicativeError
+import arrow.core.typeclasses.Monad
+import arrow.core.typeclasses.suspended.BindSyntax
 import kotlin.coroutines.CoroutineContext
 
 interface FxSyntax<F> : Concurrent<F>, BindSyntax<F> {

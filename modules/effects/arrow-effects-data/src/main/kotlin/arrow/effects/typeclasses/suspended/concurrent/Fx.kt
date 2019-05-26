@@ -23,13 +23,13 @@ import arrow.effects.typeclasses.Disposable
  * }
  * ```
  *
- * @see [arrow.typeclasses.suspended.BindSyntax]
- * @see [arrow.typeclasses.suspended.monad.Fx]
- * @see [arrow.typeclasses.suspended.monaderror.Fx]
+ * @see [arrow.core.typeclasses.suspended.BindSyntax]
+ * @see [arrow.core.typeclasses.suspended.monad.Fx]
+ * @see [arrow.core.typeclasses.suspended.monaderror.Fx]
  * @see [arrow.effects.typeclasses.suspended.monaddefer.Fx]
  * @see [arrow.effects.typeclasses.suspended.concurrent.Fx]
- * @see [arrow.typeclasses.suspended.monad.commutative.safe.Fx]
- * @see [arrow.typeclasses.suspended.monad.commutative.unsafe.Fx]
+ * @see [arrow.core.typeclasses.suspended.monad.commutative.safe.Fx]
+ * @see [arrow.core.typeclasses.suspended.monad.commutative.unsafe.Fx]
  */
 interface Fx<F> {
   fun concurrent(): Concurrent<F>

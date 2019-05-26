@@ -108,7 +108,7 @@ import arrow.core.*
 import arrow.data.*
 import arrow.core.extensions.*
 import arrow.data.extensions.*
-import arrow.typeclasses.*
+import arrow.core.typeclasses.*
 import arrow.core.extensions.option.functor.*
 import arrow.core.extensions.either.monadError.*
 import arrow.data.extensions.listk.traverse.*

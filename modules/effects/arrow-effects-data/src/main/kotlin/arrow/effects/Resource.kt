@@ -5,8 +5,8 @@ import arrow.core.Either
 import arrow.effects.typeclasses.Bracket
 import arrow.effects.typeclasses.ExitCase
 import arrow.higherkind
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Semigroup
+import arrow.core.typeclasses.Monoid
+import arrow.core.typeclasses.Semigroup
 
 /**
  * ank_macro_hierarchy(arrow.effects.Resource)

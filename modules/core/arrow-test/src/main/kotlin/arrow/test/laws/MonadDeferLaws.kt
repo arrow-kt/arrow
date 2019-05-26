@@ -14,7 +14,7 @@ import arrow.effects.typeclasses.MonadDefer
 import arrow.test.concurrency.SideEffect
 import arrow.test.generators.intSmall
 import arrow.test.generators.throwable
-import arrow.typeclasses.Eq
+import arrow.core.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.shouldBe

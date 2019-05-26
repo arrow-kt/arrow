@@ -1,11 +1,11 @@
 @file:Suppress("UNUSED_PARAMETER")
 
-package arrow.typeclasses
+package arrow.core.typeclasses
 
 import arrow.Kind
 
 /**
- * ank_macro_hierarchy(arrow.typeclasses.Applicative)
+ * ank_macro_hierarchy(arrow.core.typeclasses.Applicative)
  */
 interface Applicative<F> : Apply<F> {
 

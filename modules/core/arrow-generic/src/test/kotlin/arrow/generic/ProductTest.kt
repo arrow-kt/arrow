@@ -17,7 +17,7 @@ import arrow.test.generators.tuple3
 import arrow.test.laws.EqLaws
 import arrow.test.laws.MonoidLaws
 import arrow.test.laws.SemigroupLaws
-import arrow.typeclasses.Applicative
+import arrow.core.typeclasses.Applicative
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.runner.junit4.KotlinTestRunner

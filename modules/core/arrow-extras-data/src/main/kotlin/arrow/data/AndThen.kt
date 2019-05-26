@@ -12,7 +12,7 @@ operator fun <A, B> AndThenOf<A, B>.invoke(a: A): B = fix().invoke(a)
  * [AndThen] wraps a function of shape `(A) -> B` and can be used to do function composition.
  * It's similar to [arrow.core.andThen] and [arrow.core.compose] and can be used to build stack safe
  * data structures that make use of lambdas. Usage is typically used for signature such as `A -> Kind<F, A>` where
- * `F` has a [arrow.typeclasses.Monad] instance i.e. [StateT.flatMap].
+ * `F` has a [arrow.core.typeclasses.Monad] instance i.e. [StateT.flatMap].
  *
  * As you can see the usage of [AndThen] is the same as `[arrow.core.andThen] except we start our computation by
  * wrapping our function in [AndThen].

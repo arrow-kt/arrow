@@ -88,12 +88,12 @@ Arrow provides [`ProfunctorLaws`][profunctor_laws_source]{:target="_blank"} in t
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.typeclasses.Profunctor
+import arrow.core.typeclasses.Profunctor
 
 TypeClass(Profunctor::class).dtMarkdownList()
 ```
 
-ank_macro_hierarchy(arrow.typeclasses.Profunctor)
+ank_macro_hierarchy(arrow.core.typeclasses.Profunctor)
 
 [profunctor_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-core-typeclasses/src/main/kotlin/arrow/typeclasses/Profunctor.kt
 [profunctor_laws_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-test/src/main/kotlin/arrow/test/laws/ProfunctorLaws.kt

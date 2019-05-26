@@ -5,10 +5,10 @@ import arrow.data.extensions.CoproductComonad
 import arrow.data.extensions.CoproductFoldable
 import arrow.data.extensions.CoproductFunctor
 import arrow.data.extensions.CoproductTraverse
-import arrow.typeclasses.Comonad
-import arrow.typeclasses.Foldable
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Traverse
+import arrow.core.typeclasses.Comonad
+import arrow.core.typeclasses.Foldable
+import arrow.core.typeclasses.Functor
+import arrow.core.typeclasses.Traverse
 import dagger.Module
 import dagger.Provides
 import javax.inject.Inject

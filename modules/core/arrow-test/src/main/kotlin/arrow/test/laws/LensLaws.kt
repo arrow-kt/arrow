@@ -7,10 +7,10 @@ import arrow.core.extensions.id.functor.functor
 import arrow.core.identity
 import arrow.core.value
 import arrow.optics.Lens
-import arrow.typeclasses.Const
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.value
+import arrow.core.typeclasses.Const
+import arrow.core.typeclasses.Eq
+import arrow.core.typeclasses.Monoid
+import arrow.core.typeclasses.value
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

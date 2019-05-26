@@ -17,7 +17,7 @@ Creating a `Fold` can be done by manually defining `foldMap`.
 ```kotlin:ank
 import arrow.data.*
 import arrow.optics.*
-import arrow.typeclasses.*
+import arrow.core.typeclasses.*
 import arrow.core.extensions.*
 
 fun <T> nullableFold(): Fold<T?, T> = object : Fold<T?, T> {

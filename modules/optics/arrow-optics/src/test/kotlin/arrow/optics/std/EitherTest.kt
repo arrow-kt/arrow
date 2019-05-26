@@ -9,8 +9,8 @@ import arrow.test.generators.either
 import arrow.test.generators.functionAToB
 import arrow.test.generators.validated
 import arrow.test.laws.IsoLaws
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Monoid
+import arrow.core.typeclasses.Eq
+import arrow.core.typeclasses.Monoid
 import io.kotlintest.properties.Gen
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith

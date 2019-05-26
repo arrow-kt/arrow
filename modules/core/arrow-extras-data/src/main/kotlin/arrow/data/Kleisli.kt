@@ -5,10 +5,10 @@ import arrow.core.Either
 import arrow.core.Tuple2
 import arrow.core.identity
 import arrow.higherkind
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.ApplicativeError
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.ApplicativeError
+import arrow.core.typeclasses.Functor
+import arrow.core.typeclasses.Monad
 
 /**
  * Alias that represents a function from [D] to a monadic value `Kind<F, A>`

@@ -16,9 +16,9 @@ import arrow.data.extensions.sequencek.foldable.foldable
 import arrow.data.extensions.sequencek.functor.functor
 import arrow.mtl.extensions.sequencek.functorFilter.functorFilter
 import arrow.mtl.typeclasses.FunctorFilter
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Foldable
-import arrow.typeclasses.Functor
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Foldable
+import arrow.core.typeclasses.Functor
 
 @extension
 interface SequenceFrom : From<ForSequenceK> {

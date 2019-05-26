@@ -3,7 +3,7 @@ package arrow.integrations.retrofit.adapter
 import arrow.Kind
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.MonadDefer
-import arrow.typeclasses.MonadError
+import arrow.core.typeclasses.MonadError
 import retrofit2.Call
 import retrofit2.Response
 

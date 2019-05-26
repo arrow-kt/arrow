@@ -1,11 +1,11 @@
-package arrow.typeclasses
+package arrow.core.typeclasses
 
 import arrow.Kind
 
 /**
  * [Divisible] extends [Divide] by providing an empty value
  *
- * ank_macro_hierarchy(arrow.typeclasses.Divisible)
+ * ank_macro_hierarchy(arrow.core.typeclasses.Divisible)
  */
 interface Divisible<F> : Divide<F> {
 

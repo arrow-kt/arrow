@@ -2,7 +2,7 @@ package arrow.mtl.typeclasses
 
 import arrow.Kind
 import arrow.core.Tuple2
-import arrow.typeclasses.Monad
+import arrow.core.typeclasses.Monad
 
 /**
  * ank_macro_hierarchy(arrow.mtl.typeclasses.MonadWriter)

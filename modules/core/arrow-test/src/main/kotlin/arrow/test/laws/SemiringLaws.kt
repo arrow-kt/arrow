@@ -1,6 +1,6 @@
 package arrow.test.laws
 
-import arrow.typeclasses.Semiring
+import arrow.core.typeclasses.Semiring
 import io.kotlintest.shouldBe
 
 object SemiringLaws {

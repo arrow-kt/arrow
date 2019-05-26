@@ -3,7 +3,7 @@ package arrow.effects
 import arrow.Kind
 import arrow.effects.internal.JavaCancellationException
 import arrow.effects.typeclasses.MonadDefer
-import arrow.typeclasses.Applicative
+import arrow.core.typeclasses.Applicative
 import java.util.concurrent.atomic.AtomicReference
 
 typealias CancelToken<F> = Kind<F, Unit>

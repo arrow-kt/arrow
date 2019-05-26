@@ -5,8 +5,8 @@ import arrow.core.Either
 import arrow.core.FunctionK
 import arrow.core.identity
 import arrow.higherkind
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Monad
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Monad
 
 fun <M, S, A> FreeOf<S, A>.foldMapK(f: FunctionK<S, M>, MM: Monad<M>): Kind<M, A> =
   (this as Free<S, A>).foldMap(f, MM)

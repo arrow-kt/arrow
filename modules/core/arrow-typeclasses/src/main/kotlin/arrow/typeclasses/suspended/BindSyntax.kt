@@ -1,4 +1,4 @@
-package arrow.typeclasses.suspended
+package arrow.core.typeclasses.suspended
 
 import arrow.Kind
 

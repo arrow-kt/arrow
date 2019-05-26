@@ -4,8 +4,8 @@ import arrow.core.ForId
 import arrow.core.identity
 import arrow.core.value
 import arrow.core.extensions.id.applicative.just
-import arrow.typeclasses.Foldable
-import arrow.typeclasses.Order
+import arrow.core.typeclasses.Foldable
+import arrow.core.typeclasses.Order
 
 sealed class Ord<X> {
   abstract val order: Order<X>

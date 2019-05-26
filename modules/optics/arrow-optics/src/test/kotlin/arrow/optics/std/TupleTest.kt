@@ -27,7 +27,7 @@ import arrow.test.generators.tuple8
 import arrow.test.generators.tuple9
 import arrow.test.laws.LensLaws
 import arrow.test.laws.TraversalLaws
-import arrow.typeclasses.Eq
+import arrow.core.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith

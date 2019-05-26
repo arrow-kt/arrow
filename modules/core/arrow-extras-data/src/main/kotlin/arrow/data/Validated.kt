@@ -12,8 +12,8 @@ import arrow.core.Try
 import arrow.core.identity
 import arrow.core.orElse
 import arrow.higherkind
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Semigroup
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Semigroup
 
 typealias ValidatedNel<E, A> = Validated<Nel<E>, A>
 typealias Valid<A> = Validated.Valid<A>

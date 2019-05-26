@@ -138,7 +138,7 @@ It's easy to work with [`Option`](/docs/arrow/core/option) if your lang supports
 Arrow provides [monadic comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }})  for all datatypes for which a [`Monad`](/docs/arrow/typeclasses/monad) instance exists built atop coroutines.
 
 ```kotlin
-import arrow.typeclasses.*
+import arrow.core.typeclasses.*
 import arrow.data.extensions.*
 import arrow.data.extensions.option.monad.binding
 
@@ -198,7 +198,7 @@ result.fold({ ex -> "BOOM!: $ex"}, { "Got: $it" })
 Just like it does for `Option`, Arrow also provides `Monad` instances for `Try` and we can use it exactly in the same way
 
 ```kotlin
-import arrow.typeclasses.*
+import arrow.core.typeclasses.*
 import arrow.data.extensions.*
 
 fun attackTry(): Try<Impacted> =
@@ -363,7 +363,7 @@ In this validation example we demonstrate how we can use `ApplicativeError` inst
 ```kotlin
 import arrow.*
 import arrow.core.*
-import arrow.typeclasses.*
+import arrow.core.typeclasses.*
 import arrow.data.*
 
 sealed class ValidationError(val msg: String) {

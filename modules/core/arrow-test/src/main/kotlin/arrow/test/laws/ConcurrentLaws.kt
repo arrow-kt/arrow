@@ -15,7 +15,7 @@ import arrow.effects.typeclasses.fold
 import arrow.test.generators.applicativeError
 import arrow.test.generators.either
 import arrow.test.generators.throwable
-import arrow.typeclasses.Eq
+import arrow.core.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import kotlinx.coroutines.Dispatchers

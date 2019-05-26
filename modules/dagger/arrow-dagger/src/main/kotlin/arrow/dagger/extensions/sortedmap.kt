@@ -6,10 +6,10 @@ import arrow.data.extensions.SortedMapKFunctor
 import arrow.data.extensions.SortedMapKMonoid
 import arrow.data.extensions.SortedMapKSemigroup
 import arrow.data.extensions.SortedMapKTraverse
-import arrow.typeclasses.Foldable
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Semigroup
-import arrow.typeclasses.Traverse
+import arrow.core.typeclasses.Foldable
+import arrow.core.typeclasses.Functor
+import arrow.core.typeclasses.Semigroup
+import arrow.core.typeclasses.Traverse
 import dagger.Module
 import dagger.Provides
 import javax.inject.Inject

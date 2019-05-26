@@ -29,7 +29,7 @@ Compare [a] with [b]. Returns an Int whose sign is:
 
 ```kotlin:ank
 import arrow.*
-import arrow.typeclasses.*
+import arrow.core.typeclasses.*
 import arrow.core.extensions.*
 
 Int.order().run { 1.compare(2) }
@@ -110,9 +110,9 @@ See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | rela
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.typeclasses.Order
+import arrow.core.typeclasses.Order
 
 TypeClass(Order::class).dtMarkdownList()
 ```
 
-ank_macro_hierarchy(arrow.typeclasses.Order)
+ank_macro_hierarchy(arrow.core.typeclasses.Order)

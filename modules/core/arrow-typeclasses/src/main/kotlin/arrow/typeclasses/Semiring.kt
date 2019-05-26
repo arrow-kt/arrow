@@ -1,10 +1,10 @@
-package arrow.typeclasses
+package arrow.core.typeclasses
 
 import arrow.core.Option
 import arrow.documented
 
 /**
- * ank_macro_hierarchy(arrow.typeclasses.Semiring)
+ * ank_macro_hierarchy(arrow.core.typeclasses.Semiring)
  *
  * The [Semiring] type class for a given type `A` extends the [Monoid] type class by adding a `combineMultiplicate` and an
  * [one] function. [combineMultiplicate] also takes two values and returns a value of type `A` and guarantees to be

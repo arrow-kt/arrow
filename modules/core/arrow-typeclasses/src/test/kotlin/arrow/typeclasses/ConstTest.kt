@@ -1,4 +1,4 @@
-package arrow.typeclasses
+package arrow.core.typeclasses
 
 import arrow.core.extensions.const.applicative.applicative
 import arrow.core.extensions.const.eq.eq

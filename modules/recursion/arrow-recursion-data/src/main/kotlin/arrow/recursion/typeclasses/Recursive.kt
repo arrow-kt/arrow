@@ -2,7 +2,7 @@ package arrow.recursion.typeclasses
 
 import arrow.Kind
 import arrow.core.Eval
-import arrow.typeclasses.Functor
+import arrow.core.typeclasses.Functor
 import arrow.recursion.Algebra
 import arrow.recursion.Coalgebra
 import arrow.recursion.hylo

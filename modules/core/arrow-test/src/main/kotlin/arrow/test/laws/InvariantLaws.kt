@@ -4,8 +4,8 @@ import arrow.Kind
 import arrow.core.compose
 import arrow.core.identity
 import arrow.test.generators.functionAToB
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Invariant
+import arrow.core.typeclasses.Eq
+import arrow.core.typeclasses.Invariant
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

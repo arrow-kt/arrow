@@ -75,7 +75,7 @@ The following data types in Arrow provide instances that adhere to the `Selectiv
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.typeclasses.Selective
+import arrow.core.typeclasses.Selective
 
 TypeClass(Selective::class).dtMarkdownList()
 ```
@@ -88,7 +88,7 @@ TypeClass(Selective::class).dtMarkdownList()
 
 ```kotlin:ank:outFile(selective.nomnol)
 import arrow.reflect.*
-import arrow.typeclasses.Selective
+import arrow.core.typeclasses.Selective
 
 TypeClass(Selective::class).hierarchyGraph()
 ```

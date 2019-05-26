@@ -27,7 +27,7 @@ import arrow.core.extensions.tuple10.eq.eq
 import arrow.core.extensions.tuple10.show.show
 import arrow.test.UnitSpec
 import arrow.test.laws.*
-import arrow.typeclasses.Eq
+import arrow.core.typeclasses.Eq
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 

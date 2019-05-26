@@ -5,7 +5,7 @@ import arrow.core.Either
 import arrow.core.Tuple2
 import arrow.data.State
 import arrow.higherkind
-import arrow.typeclasses.Functor
+import arrow.core.typeclasses.Functor
 
 /**
  * [Setter] is a type alias for [PSetter] which fixes the type arguments

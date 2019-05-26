@@ -68,7 +68,7 @@ We can further simplify this case by using Arrow `binding` facilities
 that enables monad comprehensions for all datatypes for which a monad instance is available.
 
 ```kotlin:ank
-import arrow.typeclasses.*
+import arrow.core.typeclasses.*
 import arrow.core.extensions.*
 import arrow.core.extensions.either.monad.*
 

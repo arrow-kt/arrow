@@ -177,7 +177,7 @@ Arrow contains `Option` instances for many useful typeclasses that allows you to
 Transforming the inner contents
 
 ```kotlin:ank
-import arrow.typeclasses.*
+import arrow.core.typeclasses.*
 import arrow.core.extensions.option.functor.*
 
 Some(1).map { it + 1 }

@@ -8,10 +8,10 @@ import arrow.data.extensions.SetKSemigroup
 import arrow.data.extensions.setk.foldable.foldable
 import arrow.data.extensions.setk.monoidK.monoidK
 import arrow.data.extensions.setk.semigroupK.semigroupK
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Foldable
-import arrow.typeclasses.MonoidK
-import arrow.typeclasses.SemigroupK
+import arrow.core.typeclasses.Eq
+import arrow.core.typeclasses.Foldable
+import arrow.core.typeclasses.MonoidK
+import arrow.core.typeclasses.SemigroupK
 import dagger.Module
 import dagger.Provides
 import javax.inject.Inject

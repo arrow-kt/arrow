@@ -13,11 +13,11 @@ import arrow.effects.rx2.extensions.flowablek.functor.functor
 import arrow.effects.rx2.extensions.flowablek.monad.monad
 import arrow.effects.rx2.extensions.flowablek.monadDefer.monadDefer
 import arrow.effects.rx2.extensions.flowablek.monadError.monadError
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.ApplicativeError
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadError
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.ApplicativeError
+import arrow.core.typeclasses.Functor
+import arrow.core.typeclasses.Monad
+import arrow.core.typeclasses.MonadError
 import dagger.Module
 import dagger.Provides
 

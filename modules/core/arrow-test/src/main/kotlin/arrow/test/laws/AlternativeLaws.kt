@@ -2,8 +2,8 @@ package arrow.test.laws
 
 import arrow.Kind
 import arrow.test.generators.functionAToB
-import arrow.typeclasses.Alternative
-import arrow.typeclasses.Eq
+import arrow.core.typeclasses.Alternative
+import arrow.core.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

@@ -10,14 +10,14 @@ import arrow.data.fix
 import arrow.extension
 import arrow.core.extensions.either.eq.eq
 import arrow.core.extensions.either.hash.hash
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Comonad
-import arrow.typeclasses.Contravariant
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Foldable
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Hash
-import arrow.typeclasses.Traverse
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Comonad
+import arrow.core.typeclasses.Contravariant
+import arrow.core.typeclasses.Eq
+import arrow.core.typeclasses.Foldable
+import arrow.core.typeclasses.Functor
+import arrow.core.typeclasses.Hash
+import arrow.core.typeclasses.Traverse
 import arrow.undocumented
 
 @extension

@@ -3,7 +3,7 @@ package arrow.test.laws
 import arrow.Kind
 import arrow.mtl.typeclasses.MonadState
 import arrow.test.generators.intSmall
-import arrow.typeclasses.Eq
+import arrow.core.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

@@ -84,7 +84,7 @@ Let's see a minimal example.
 ```kotlin:ank
 import arrow.*
 import arrow.effects.*
-import arrow.typeclasses.*
+import arrow.core.typeclasses.*
 import arrow.effects.extensions.io.monad.*
 
 binding {

@@ -29,15 +29,15 @@ import arrow.effects.typeclasses.RacePair
 import arrow.effects.typeclasses.RaceTriple
 import arrow.effects.typeclasses.UnsafeRun
 import arrow.extension
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Apply
-import arrow.typeclasses.ApplicativeError
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadError
-import arrow.typeclasses.MonadThrow
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Semigroup
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Apply
+import arrow.core.typeclasses.ApplicativeError
+import arrow.core.typeclasses.Functor
+import arrow.core.typeclasses.Monad
+import arrow.core.typeclasses.MonadError
+import arrow.core.typeclasses.MonadThrow
+import arrow.core.typeclasses.Monoid
+import arrow.core.typeclasses.Semigroup
 import arrow.unsafe
 import kotlin.coroutines.CoroutineContext
 import arrow.effects.handleErrorWith as ioHandleErrorWith

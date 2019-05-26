@@ -86,9 +86,9 @@ Arrow provides `MonadErrorLaws` in the form of test cases for internal verificat
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.typeclasses.MonadError
+import arrow.core.typeclasses.MonadError
 
 TypeClass(MonadError::class).dtMarkdownList()
 ```
 
-ank_macro_hierarchy(arrow.typeclasses.MonadError)
+ank_macro_hierarchy(arrow.core.typeclasses.MonadError)

@@ -24,7 +24,7 @@ import arrow.test.laws.AsyncLaws
 import arrow.test.laws.MonadCombineLaws
 import arrow.test.laws.MonadStateLaws
 import arrow.test.laws.SemigroupKLaws
-import arrow.typeclasses.Eq
+import arrow.core.typeclasses.Eq
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 

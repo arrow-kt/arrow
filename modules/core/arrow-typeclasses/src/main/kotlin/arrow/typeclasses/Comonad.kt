@@ -1,4 +1,4 @@
-package arrow.typeclasses
+package arrow.core.typeclasses
 
 import arrow.Kind
 import arrow.core.Continuation
@@ -13,7 +13,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.startCoroutine
 
 /**
- * ank_macro_hierarchy(arrow.typeclasses.Comonad)
+ * ank_macro_hierarchy(arrow.core.typeclasses.Comonad)
  *
  * The dual of monads, used to extract values from F
  */

@@ -1,4 +1,4 @@
-package arrow.typeclasses
+package arrow.core.typeclasses
 
 import arrow.Kind
 import arrow.core.Either
@@ -11,7 +11,7 @@ import arrow.core.identity
 import arrow.core.nonFatalOrThrow
 
 /**
- * ank_macro_hierarchy(arrow.typeclasses.ApplicativeError)
+ * ank_macro_hierarchy(arrow.core.typeclasses.ApplicativeError)
  */
 interface ApplicativeError<F, E> : Applicative<F> {
 

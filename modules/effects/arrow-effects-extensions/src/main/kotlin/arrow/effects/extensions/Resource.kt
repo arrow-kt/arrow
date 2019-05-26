@@ -8,12 +8,12 @@ import arrow.effects.ResourcePartialOf
 import arrow.effects.fix
 import arrow.effects.typeclasses.Bracket
 import arrow.extension
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Selective
-import arrow.typeclasses.Semigroup
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Functor
+import arrow.core.typeclasses.Monad
+import arrow.core.typeclasses.Monoid
+import arrow.core.typeclasses.Selective
+import arrow.core.typeclasses.Semigroup
 import arrow.undocumented
 
 @extension

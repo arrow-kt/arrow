@@ -240,16 +240,16 @@ options:
         url: /docs/arrow/typeclasses/semigroup/
 
       - title: Semigroupal
-        url: /docs/apidocs/arrow-core-typeclasses/arrow.typeclasses/-semigroupal/
+        url: /docs/apidocs/arrow-core-typeclasses/arrow.core.typeclasses/-semigroupal/
 
       - title: Monoidal
-        url: /docs/apidocs/arrow-core-typeclasses/arrow.typeclasses/-monoidal/
+        url: /docs/apidocs/arrow-core-typeclasses/arrow.core.typeclasses/-monoidal/
 
       - title: Monoid
         url: /docs/arrow/typeclasses/monoid/
 
       - title: Semiring
-        url: /docs/apidocs/arrow-core-typeclasses/arrow.typeclasses/-semiring/
+        url: /docs/apidocs/arrow-core-typeclasses/arrow.core.typeclasses/-semiring/
 
       - title: Foldable
         url: /docs/arrow/typeclasses/foldable/

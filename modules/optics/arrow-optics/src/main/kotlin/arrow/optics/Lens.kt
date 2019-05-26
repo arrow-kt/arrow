@@ -12,9 +12,9 @@ import arrow.data.Reader
 import arrow.data.State
 import arrow.data.map
 import arrow.higherkind
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monoid
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Functor
+import arrow.core.typeclasses.Monoid
 
 /**
  * [Lens] is a type alias for [PLens] which fixes the type arguments

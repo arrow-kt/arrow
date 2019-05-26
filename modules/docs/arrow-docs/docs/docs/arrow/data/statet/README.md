@@ -28,7 +28,7 @@ So let's rewrite the example of [`State` docs]({{ '/docs/arrow/data/state' | rel
 import arrow.*
 import arrow.core.*
 import arrow.data.*
-import arrow.typeclasses.*
+import arrow.core.typeclasses.*
 
 typealias Stack = List<String>
 
@@ -132,7 +132,7 @@ stackOperationsS().runM(Either.monad<StackError>(), listOf())
 While our code looks very similar to what we had before there are some key advantages. State management is now contained within `State` and we are dealing only with 1 monad instead of 2 nested monads so we can use monad bindings!
 
 ```kotlin:ank
-import arrow.typeclasses.*
+import arrow.core.typeclasses.*
 import arrow.data.extensions.*
 import arrow.core.extensions.either.monadError.*
 import arrow.data.extensions.statet.monad.binding

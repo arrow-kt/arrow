@@ -17,11 +17,11 @@ import arrow.data.State
 import arrow.data.extensions.listk.monoid.monoid
 import arrow.data.map
 import arrow.higherkind
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Const
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Traverse
-import arrow.typeclasses.value
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Const
+import arrow.core.typeclasses.Monoid
+import arrow.core.typeclasses.Traverse
+import arrow.core.typeclasses.value
 
 /**
  * [Traversal] is a type alias for [PTraversal] which fixes the type arguments

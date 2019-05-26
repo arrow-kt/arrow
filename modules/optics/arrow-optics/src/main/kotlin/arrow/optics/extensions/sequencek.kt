@@ -13,7 +13,7 @@ import arrow.optics.Traversal
 import arrow.optics.typeclasses.Each
 import arrow.optics.typeclasses.FilterIndex
 import arrow.optics.typeclasses.Index
-import arrow.typeclasses.Applicative
+import arrow.core.typeclasses.Applicative
 
 /**
  * [Traversal] for [SequenceK] that has focus in each [A].

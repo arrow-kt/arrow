@@ -4,10 +4,10 @@ import arrow.Kind
 import arrow.core.left
 import arrow.core.right
 import arrow.effects.typeclasses.Async
-import arrow.typeclasses.Index
-import arrow.typeclasses.Query
-import arrow.typeclasses.UserDao
-import arrow.typeclasses.UserDto
+import arrow.core.typeclasses.Index
+import arrow.core.typeclasses.Query
+import arrow.core.typeclasses.UserDao
+import arrow.core.typeclasses.UserDto
 
 // Step 3 - Extract interfaces with key
 

@@ -2,7 +2,7 @@ package arrow.free
 
 import arrow.Kind
 import arrow.higherkind
-import arrow.typeclasses.Functor
+import arrow.core.typeclasses.Functor
 
 private typealias AnyFunc = (Any?) -> Any?
 

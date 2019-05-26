@@ -9,11 +9,11 @@ import arrow.free.FreeOf
 import arrow.free.FreePartialOf
 import arrow.free.fix
 import arrow.free.foldMap
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Apply
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Apply
+import arrow.core.typeclasses.Eq
+import arrow.core.typeclasses.Functor
+import arrow.core.typeclasses.Monad
 import arrow.undocumented
 import arrow.free.ap as freeAp
 import arrow.free.flatMap as freeFlatMap

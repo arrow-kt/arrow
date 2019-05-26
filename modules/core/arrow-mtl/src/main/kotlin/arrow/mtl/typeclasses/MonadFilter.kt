@@ -2,7 +2,7 @@ package arrow.mtl.typeclasses
 
 import arrow.Kind
 import arrow.core.Option
-import arrow.typeclasses.Monad
+import arrow.core.typeclasses.Monad
 import kotlin.coroutines.startCoroutine
 
 /**

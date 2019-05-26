@@ -23,7 +23,7 @@ import arrow.core.Either
 import arrow.core.Tuple2
 import arrow.core.identity
 import arrow.core.right
-import arrow.typeclasses.Decidable
+import arrow.core.typeclasses.Decidable
 import com.example.domain.*
 
 val stringSerializer = Serializer<String> { "STRING: $it" }
@@ -54,8 +54,8 @@ See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | rela
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.typeclasses.Decidable
+import arrow.core.typeclasses.Decidable
 TypeClass(Decidable::class).dtMarkdownList()
 ```
 
-ank_macro_hierarchy(arrow.typeclasses.Decidable)
+ank_macro_hierarchy(arrow.core.typeclasses.Decidable)

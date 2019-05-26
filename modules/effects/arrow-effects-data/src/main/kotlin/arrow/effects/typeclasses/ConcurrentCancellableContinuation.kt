@@ -2,7 +2,7 @@ package arrow.effects.typeclasses
 
 import arrow.Kind
 import arrow.effects.typeclasses.suspended.FxSyntax
-import arrow.typeclasses.MonadContinuation
+import arrow.core.typeclasses.MonadContinuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.RestrictsSuspension

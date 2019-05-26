@@ -1,11 +1,11 @@
-package arrow.typeclasses
+package arrow.core.typeclasses
 
 class ForMonoid private constructor() { companion object }
 typealias MonoidOf<A> = arrow.Kind<ForMonoid, A>
 fun <A> MonoidOf<A>.fix(): Monoid<A> = this as Monoid<A>
 
 /**
- * ank_macro_hierarchy(arrow.typeclasses.Monoid)
+ * ank_macro_hierarchy(arrow.core.typeclasses.Monoid)
  */
 interface Monoid<A> : Semigroup<A>, MonoidOf<A> {
   /**

@@ -3,13 +3,13 @@ package arrow.free
 import arrow.Kind
 import arrow.core.FunctionK
 import arrow.higherkind
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Const
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.fix
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Const
+import arrow.core.typeclasses.Monoid
+import arrow.core.typeclasses.fix
 import arrow.core.extensions.const.applicative.applicative
-import arrow.typeclasses.ConstPartialOf
-import arrow.typeclasses.value
+import arrow.core.typeclasses.ConstPartialOf
+import arrow.core.typeclasses.value
 
 fun <F, G, A> FreeApplicativeOf<F, A>.foldMapK(f: FunctionK<F, G>, GA: Applicative<G>): Kind<G, A> =
   (this as FreeApplicative<F, A>).foldMap(f, GA)

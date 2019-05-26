@@ -7,8 +7,8 @@ import arrow.core.Id
 import arrow.extension
 import arrow.core.extensions.id.applicative.applicative
 import arrow.core.extensions.id.functor.functor
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Functor
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Functor
 
 @extension interface IdSelect : Select<ForId> {
   override fun functor(): Functor<ForId> = Id.functor()

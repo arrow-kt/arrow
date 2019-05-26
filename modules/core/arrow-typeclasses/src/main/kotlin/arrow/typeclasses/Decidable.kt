@@ -1,4 +1,4 @@
-package arrow.typeclasses
+package arrow.core.typeclasses
 
 import arrow.Kind
 import arrow.core.Either
@@ -18,7 +18,7 @@ import arrow.core.identity
  * import arrow.core.Tuple2
  * import arrow.core.identity
  * import arrow.core.right
- * import arrow.typeclasses.Decidable
+ * import arrow.core.typeclasses.Decidable
  * import com.example.domain.*
  *
  * val stringSerializer = Serializer<String> { "STRING: $it" }
@@ -36,7 +36,7 @@ import arrow.core.identity
  * }
  * ```
  *
- * ank_macro_hierarchy(arrow.typeclasses.Decidable)
+ * ank_macro_hierarchy(arrow.core.typeclasses.Decidable)
  */
 interface Decidable<F> : Divisible<F> {
 
@@ -50,7 +50,7 @@ interface Decidable<F> : Divisible<F> {
    * import arrow.core.Tuple2
    * import arrow.core.identity
    * import arrow.core.right
-   * import arrow.typeclasses.Decidable
+   * import arrow.core.typeclasses.Decidable
    * import com.example.domain.*
    *
    * val stringSerializer = Serializer<String> { "STRING: $it" }

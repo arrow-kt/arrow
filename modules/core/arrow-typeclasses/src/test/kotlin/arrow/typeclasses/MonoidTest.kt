@@ -1,4 +1,4 @@
-package arrow.typeclasses
+package arrow.core.typeclasses
 
 import arrow.core.extensions.monoid
 import arrow.core.extensions.monoid.invariant.invariant

@@ -155,7 +155,7 @@ Try {
 Трансформация значения в случае, если функция завершилась успешно:
 
 ```kotlin:ank
-import arrow.typeclasses.*
+import arrow.core.typeclasses.*
 import arrow.core.extensions.*
 import arrow.core.extensions.`try`.functor.*
 

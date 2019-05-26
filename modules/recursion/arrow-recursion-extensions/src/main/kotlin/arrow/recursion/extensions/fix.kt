@@ -7,7 +7,7 @@ import arrow.extension
 import arrow.recursion.data.Fix
 import arrow.recursion.data.ForFix
 import arrow.recursion.data.fix
-import arrow.typeclasses.Functor
+import arrow.core.typeclasses.Functor
 import arrow.recursion.typeclasses.Birecursive
 import arrow.recursion.typeclasses.Corecursive
 import arrow.recursion.typeclasses.Recursive

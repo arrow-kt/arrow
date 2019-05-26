@@ -7,8 +7,8 @@ import arrow.core.ForEval
 import arrow.extension
 import arrow.core.extensions.eval.applicative.applicative
 import arrow.core.extensions.eval.functor.functor
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Functor
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Functor
 
 @extension
 interface EvalSelect : Select<ForEval> {

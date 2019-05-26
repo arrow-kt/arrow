@@ -5,7 +5,7 @@ import arrow.core.Either
 import arrow.core.Right
 import arrow.documented
 import arrow.effects.internal.asyncContinuation
-import arrow.typeclasses.MonadContinuation
+import arrow.core.typeclasses.MonadContinuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.startCoroutine

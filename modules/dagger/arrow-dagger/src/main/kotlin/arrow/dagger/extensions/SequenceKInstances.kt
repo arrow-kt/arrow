@@ -9,13 +9,13 @@ import arrow.data.extensions.sequencek.monad.monad
 import arrow.data.extensions.sequencek.monoidK.monoidK
 import arrow.data.extensions.sequencek.semigroupK.semigroupK
 import arrow.data.extensions.sequencek.traverse.traverse
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Foldable
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
-import arrow.typeclasses.MonoidK
-import arrow.typeclasses.SemigroupK
-import arrow.typeclasses.Traverse
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Foldable
+import arrow.core.typeclasses.Functor
+import arrow.core.typeclasses.Monad
+import arrow.core.typeclasses.MonoidK
+import arrow.core.typeclasses.SemigroupK
+import arrow.core.typeclasses.Traverse
 import dagger.Module
 import dagger.Provides
 

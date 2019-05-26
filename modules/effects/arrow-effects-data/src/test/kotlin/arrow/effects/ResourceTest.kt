@@ -12,7 +12,7 @@ import arrow.test.UnitSpec
 import arrow.test.laws.MonadLaws
 import arrow.test.laws.MonoidLaws
 import arrow.test.laws.forFew
-import arrow.typeclasses.Eq
+import arrow.core.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith

@@ -3,9 +3,9 @@ package arrow.mtl.typeclasses
 import arrow.Kind
 import arrow.Kind2
 import arrow.core.Tuple2
-import arrow.typeclasses.Alternative
-import arrow.typeclasses.Bifoldable
-import arrow.typeclasses.Foldable
+import arrow.core.typeclasses.Alternative
+import arrow.core.typeclasses.Bifoldable
+import arrow.core.typeclasses.Foldable
 
 /**
  * ank_macro_hierarchy(arrow.mtl.typeclasses.MonadCombine)

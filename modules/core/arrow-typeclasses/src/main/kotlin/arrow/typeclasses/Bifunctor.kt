@@ -1,11 +1,11 @@
-package arrow.typeclasses
+package arrow.core.typeclasses
 
 import arrow.Kind
 import arrow.Kind2
 import arrow.core.identity
 
 /**
- * ank_macro_hierarchy(arrow.typeclasses.Bifunctor)
+ * ank_macro_hierarchy(arrow.core.typeclasses.Bifunctor)
  *
  * [Bifunctor] has the same properties of [Functor], but acting onto two types, instead of one.
  *

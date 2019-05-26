@@ -10,12 +10,12 @@ import arrow.core.Right
 import arrow.core.fix
 import arrow.core.identity
 import arrow.higherkind
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Comonad
-import arrow.typeclasses.Contravariant
-import arrow.typeclasses.Foldable
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Traverse
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Comonad
+import arrow.core.typeclasses.Contravariant
+import arrow.core.typeclasses.Foldable
+import arrow.core.typeclasses.Functor
+import arrow.core.typeclasses.Traverse
 
 @higherkind
 data class Coproduct<F, G, A>(val run: Either<Kind<F, A>, Kind<G, A>>) : CoproductOf<F, G, A>, CoproductKindedJ<F, G, A> {

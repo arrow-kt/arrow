@@ -1,6 +1,6 @@
 package arrow.test.laws
 
-import arrow.typeclasses.Eq
+import arrow.core.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

@@ -15,11 +15,11 @@ intermediate
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.typeclasses.Alternative
+import arrow.core.typeclasses.Alternative
 
 TypeClass(Alternative::class).dtMarkdownList()
 ```
 
-ank_macro_hierarchy(arrow.typeclasses.Alternative)
+ank_macro_hierarchy(arrow.core.typeclasses.Alternative)
 
 TODO. Meanwhile you can find a short description in the [intro to typeclasses]({{ '/docs/typeclasses/intro/' | relative_url }}).

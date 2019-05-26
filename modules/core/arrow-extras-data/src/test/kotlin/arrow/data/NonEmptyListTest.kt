@@ -19,7 +19,7 @@ import arrow.test.laws.SemigroupKLaws
 import arrow.test.laws.SemigroupLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
-import arrow.typeclasses.Eq
+import arrow.core.typeclasses.Eq
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 

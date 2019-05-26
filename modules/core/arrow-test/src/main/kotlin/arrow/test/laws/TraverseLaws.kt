@@ -14,16 +14,16 @@ import arrow.core.extensions.id.applicative.applicative
 import arrow.core.extensions.id.comonad.extract
 import arrow.test.generators.functionAToB
 import arrow.test.generators.intSmall
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.ComposedApplicative
-import arrow.typeclasses.Const
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Traverse
-import arrow.typeclasses.const
-import arrow.typeclasses.nest
-import arrow.typeclasses.unnest
-import arrow.typeclasses.value
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.ComposedApplicative
+import arrow.core.typeclasses.Const
+import arrow.core.typeclasses.Eq
+import arrow.core.typeclasses.Functor
+import arrow.core.typeclasses.Traverse
+import arrow.core.typeclasses.const
+import arrow.core.typeclasses.nest
+import arrow.core.typeclasses.unnest
+import arrow.core.typeclasses.value
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

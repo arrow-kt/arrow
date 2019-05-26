@@ -1,4 +1,4 @@
-package arrow.typeclasses
+package arrow.core.typeclasses
 
 import arrow.Kind
 import arrow.core.Eval
@@ -13,7 +13,7 @@ import arrow.core.fix
 import arrow.core.identity
 
 /**
- * ank_macro_hierarchy(arrow.typeclasses.Foldable)
+ * ank_macro_hierarchy(arrow.core.typeclasses.Foldable)
  *
  * Data structures that can be folded to a summary value.
  *

@@ -6,7 +6,7 @@ import arrow.core.Eval
 import arrow.core.Tuple2
 import arrow.core.identity
 import arrow.higherkind
-import arrow.typeclasses.Applicative
+import arrow.core.typeclasses.Applicative
 
 fun <A> SequenceKOf<A>.toList(): List<A> = this.fix().sequence.toList()
 

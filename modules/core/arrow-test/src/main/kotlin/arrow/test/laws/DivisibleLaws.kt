@@ -1,8 +1,8 @@
 package arrow.test.laws
 
 import arrow.Kind
-import arrow.typeclasses.Divisible
-import arrow.typeclasses.Eq
+import arrow.core.typeclasses.Divisible
+import arrow.core.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

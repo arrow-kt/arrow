@@ -7,7 +7,7 @@ import arrow.extension
 import arrow.core.extensions.either.traverse.traverse
 import arrow.optics.Traversal
 import arrow.optics.typeclasses.Each
-import arrow.typeclasses.Applicative
+import arrow.core.typeclasses.Applicative
 
 /**
  * [Traversal] for [Either] that has focus in each [Either.Right].

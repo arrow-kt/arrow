@@ -10,16 +10,16 @@ import arrow.core.extensions.function0.monad.monad
 import arrow.core.fix
 import arrow.core.invoke
 import arrow.extension
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Apply
-import arrow.typeclasses.Bimonad
-import arrow.typeclasses.Comonad
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Selective
-import arrow.typeclasses.Semigroup
-import arrow.typeclasses.suspended.monad.Fx
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Apply
+import arrow.core.typeclasses.Bimonad
+import arrow.core.typeclasses.Comonad
+import arrow.core.typeclasses.Functor
+import arrow.core.typeclasses.Monad
+import arrow.core.typeclasses.Monoid
+import arrow.core.typeclasses.Selective
+import arrow.core.typeclasses.Semigroup
+import arrow.core.typeclasses.suspended.monad.Fx
 import arrow.core.select as fun0Select
 
 @extension

@@ -6,10 +6,10 @@ import arrow.core.Tuple2
 import arrow.core.toT
 import arrow.effects.Ref
 import arrow.effects.data.internal.BindingCancellationException
-import arrow.typeclasses.MonadContinuation
-import arrow.typeclasses.MonadError
-import arrow.typeclasses.MonadErrorContinuation
-import arrow.typeclasses.MonadThrow
+import arrow.core.typeclasses.MonadContinuation
+import arrow.core.typeclasses.MonadError
+import arrow.core.typeclasses.MonadErrorContinuation
+import arrow.core.typeclasses.MonadThrow
 import kotlin.coroutines.startCoroutine
 
 /**

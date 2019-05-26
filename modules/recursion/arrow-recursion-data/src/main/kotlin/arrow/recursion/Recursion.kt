@@ -2,7 +2,7 @@ package arrow.recursion
 
 import arrow.Kind
 import arrow.core.Eval
-import arrow.typeclasses.Functor
+import arrow.core.typeclasses.Functor
 
 fun <F, A> Algebra(it: Algebra<F, A>) = it
 

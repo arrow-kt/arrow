@@ -10,9 +10,9 @@ import arrow.data.extensions.listk.monoid.monoid
 import arrow.core.identity
 import arrow.data.ListK
 import arrow.higherkind
-import arrow.typeclasses.Const
-import arrow.typeclasses.Foldable
-import arrow.typeclasses.Monoid
+import arrow.core.typeclasses.Const
+import arrow.core.typeclasses.Foldable
+import arrow.core.typeclasses.Monoid
 
 /**
  * A [Fold] is an optic that allows to focus into structure and get multiple results.

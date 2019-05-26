@@ -2,9 +2,9 @@ package arrow.test.laws
 
 import arrow.Kind
 import arrow.core.Tuple2
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Monoidal
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Eq
+import arrow.core.typeclasses.Monoidal
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

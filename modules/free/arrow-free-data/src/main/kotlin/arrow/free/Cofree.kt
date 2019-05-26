@@ -7,9 +7,9 @@ import arrow.core.fix
 import arrow.higherkind
 import arrow.core.FunctionK
 import arrow.core.extensions.eval.applicative.applicative
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
-import arrow.typeclasses.Traverse
+import arrow.core.typeclasses.Functor
+import arrow.core.typeclasses.Monad
+import arrow.core.typeclasses.Traverse
 
 typealias CofreeEval<S, A> = Kind<S, Cofree<S, A>>
 

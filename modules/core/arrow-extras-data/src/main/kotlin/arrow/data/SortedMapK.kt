@@ -7,7 +7,7 @@ import arrow.core.Tuple2
 import arrow.core.identity
 import arrow.core.iterateRight
 import arrow.higherkind
-import arrow.typeclasses.Applicative
+import arrow.core.typeclasses.Applicative
 
 @higherkind
 data class SortedMapK<A : Comparable<A>, B>(private val map: SortedMap<A, B>) : SortedMapKOf<A, B>, SortedMapKKindedJ<A, B>, SortedMap<A, B> by map {

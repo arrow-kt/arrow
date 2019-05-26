@@ -8,12 +8,12 @@ import arrow.core.extensions.option.functor.functor
 import arrow.core.extensions.option.monad.monad
 import arrow.core.extensions.option.monadError.monadError
 import arrow.core.extensions.option.traverse.traverse
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Foldable
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadError
-import arrow.typeclasses.Traverse
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Foldable
+import arrow.core.typeclasses.Functor
+import arrow.core.typeclasses.Monad
+import arrow.core.typeclasses.MonadError
+import arrow.core.typeclasses.Traverse
 import dagger.Module
 import dagger.Provides
 

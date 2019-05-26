@@ -3,7 +3,7 @@ package arrow.recursion
 import arrow.Kind
 import arrow.core.Tuple2
 import arrow.higherkind
-import arrow.typeclasses.Functor
+import arrow.core.typeclasses.Functor
 
 sealed class IntList
 object Nil : IntList()

@@ -12,7 +12,7 @@ import arrow.core.OptionOf
 import arrow.core.Some
 import arrow.core.Tuple2
 import arrow.extension
-import arrow.typeclasses.suspended.monad.Fx
+import arrow.core.typeclasses.suspended.monad.Fx
 import arrow.core.extensions.traverse as optionTraverse
 import arrow.core.extensions.option.monad.map
 import arrow.core.extensions.option.monad.monad
@@ -20,25 +20,25 @@ import arrow.core.fix
 import arrow.core.identity
 import arrow.core.orElse
 import arrow.core.select as optionSelect
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Apply
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Semigroup
-import arrow.typeclasses.Show
-import arrow.typeclasses.Selective
-import arrow.typeclasses.Monad
-import arrow.typeclasses.Semigroupal
-import arrow.typeclasses.Monoidal
-import arrow.typeclasses.Semiring
-import arrow.typeclasses.ApplicativeError
-import arrow.typeclasses.MonadError
-import arrow.typeclasses.MonoidK
-import arrow.typeclasses.SemigroupK
-import arrow.typeclasses.Foldable
-import arrow.typeclasses.Traverse
-import arrow.typeclasses.Hash
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Apply
+import arrow.core.typeclasses.Eq
+import arrow.core.typeclasses.Functor
+import arrow.core.typeclasses.Monoid
+import arrow.core.typeclasses.Semigroup
+import arrow.core.typeclasses.Show
+import arrow.core.typeclasses.Selective
+import arrow.core.typeclasses.Monad
+import arrow.core.typeclasses.Semigroupal
+import arrow.core.typeclasses.Monoidal
+import arrow.core.typeclasses.Semiring
+import arrow.core.typeclasses.ApplicativeError
+import arrow.core.typeclasses.MonadError
+import arrow.core.typeclasses.MonoidK
+import arrow.core.typeclasses.SemigroupK
+import arrow.core.typeclasses.Foldable
+import arrow.core.typeclasses.Traverse
+import arrow.core.typeclasses.Hash
 
 @extension
 interface OptionSemigroup<A> : Semigroup<Option<A>> {

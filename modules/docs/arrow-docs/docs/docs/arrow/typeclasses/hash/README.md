@@ -59,7 +59,7 @@ It also might make more sense to provide your own instance in for some cases, fo
 Hash has a constructor to create a `Hash` instance from any function `(F) -> Int`.
 
 ```kotlin:ank:playground
-import arrow.typeclasses.Hash
+import arrow.core.typeclasses.Hash
 
 data class User(val id: String, val name: String)
 val user = User("MyId", "MyName")
@@ -74,7 +74,7 @@ fun main(args: Array<String>) {
 ```
 
 ```kotlin:ank:playground
-import arrow.typeclasses.Hash
+import arrow.core.typeclasses.Hash
 
 data class User(val id: String, val name: String)
 val user = User("MyId", "MyName")
@@ -91,7 +91,7 @@ fun main(args: Array<String>) {
 
 ```kotlin:ank:playground
 import arrow.core.*
-import arrow.typeclasses.Hash
+import arrow.core.typeclasses.Hash
 
 fun main(args: Array<String>) {
   //sampleStart
@@ -103,7 +103,7 @@ fun main(args: Array<String>) {
 ```
 
 ```kotlin:ank:playground
-import arrow.typeclasses.Hash
+import arrow.core.typeclasses.Hash
 
 fun main(args: Array<String>) {
   //sampleStart
@@ -121,7 +121,7 @@ See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | rela
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.typeclasses.Hash
+import arrow.core.typeclasses.Hash
 TypeClass(Hash::class).dtMarkdownList()
 ```
 
@@ -133,7 +133,7 @@ TypeClass(Hash::class).dtMarkdownList()
 </script>
 
 ```kotlin:ank:outFile(diagram.nomnol)
-import arrow.typeclasses.Hash
+import arrow.core.typeclasses.Hash
 TypeClass(Hash::class).hierarchyGraph()
 ```
 

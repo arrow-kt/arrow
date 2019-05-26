@@ -7,8 +7,8 @@ import arrow.mtl.typeclasses.TraverseFilter
 import arrow.test.generators.applicative
 import arrow.test.generators.functionAToB
 import arrow.test.generators.intSmall
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Eq
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

@@ -3,7 +3,7 @@ package arrow.data
 import arrow.data.extensions.store.comonad.comonad
 import arrow.test.UnitSpec
 import arrow.test.laws.ComonadLaws
-import arrow.typeclasses.Eq
+import arrow.core.typeclasses.Eq
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import org.junit.runner.RunWith

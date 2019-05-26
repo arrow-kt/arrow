@@ -103,7 +103,7 @@ Option.applicative().run { Some(1).map2Eval(Eval.later { Some("x") }, { z: Tuple
 A closely related type class is Apply which is identical to Applicative, modulo the ``just`` method. Indeed Applicative is a subclass of Apply with the addition of this method.
 
 ```kotlin:ank
-import arrow.typeclasses.Functor 
+import arrow.core.typeclasses.Functor 
 
 interface Apply<F> : Functor<F> {
   fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B>
@@ -130,7 +130,7 @@ See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | rela
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.typeclasses.Applicative
+import arrow.core.typeclasses.Applicative
 
 TypeClass(Applicative::class).dtMarkdownList()
 ```
@@ -138,7 +138,7 @@ TypeClass(Applicative::class).dtMarkdownList()
 Additionally all instances of [`Monad`]({{ '/docs/arrow/typeclasses/monad' | relative_url }}) and their MTL variants implement the `Applicative` typeclass directly
 since they are all subtypes of `Applicative`.
 
-ank_macro_hierarchy(arrow.typeclasses.Applicative)
+ank_macro_hierarchy(arrow.core.typeclasses.Applicative)
 
 [applicative_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-core-typeclasses/src/main/kotlin/arrow/typeclasses/Applicative.kt
 [applicative_law_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-test/src/main/kotlin/arrow/test/laws/ApplicativeLaws.kt

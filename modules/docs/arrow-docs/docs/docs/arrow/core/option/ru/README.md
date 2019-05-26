@@ -178,7 +178,7 @@ fun foo() {
 Трансформация вложенного значения
 
 ```kotlin:ank
-import arrow.typeclasses.*
+import arrow.core.typeclasses.*
 import arrow.core.extensions.option.functor.*
 
 Some(1).map { it + 1 }

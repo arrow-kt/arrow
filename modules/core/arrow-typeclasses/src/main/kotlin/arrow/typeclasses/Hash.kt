@@ -1,4 +1,4 @@
-package arrow.typeclasses
+package arrow.core.typeclasses
 
 /**
  * A type class used to represent hashing for objects of type [F]
@@ -42,7 +42,7 @@ interface Hash<in F> : Eq<F> {
      * {: data-executable='true'}
      *
      * ```kotlin:ank
-     * import arrow.typeclasses.Hash
+     * import arrow.core.typeclasses.Hash
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
@@ -64,7 +64,7 @@ interface Hash<in F> : Eq<F> {
      * @returns an instance of [Hash] that always delegates to kotlin's native hashCode functionality
      *
      * ```kotlin:ank
-     * import arrow.typeclasses.Hash
+     * import arrow.core.typeclasses.Hash
      *
      * fun main(args: Array<String>) {
      *   //sampleStart

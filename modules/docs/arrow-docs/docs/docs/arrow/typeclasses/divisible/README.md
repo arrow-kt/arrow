@@ -48,8 +48,8 @@ See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | rela
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.typeclasses.Divisible
+import arrow.core.typeclasses.Divisible
 TypeClass(Divisible::class).dtMarkdownList()
 ```
 
-ank_macro_hierarchy(arrow.typeclasses.Divisible)
+ank_macro_hierarchy(arrow.core.typeclasses.Divisible)

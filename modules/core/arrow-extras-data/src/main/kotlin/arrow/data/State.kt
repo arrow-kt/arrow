@@ -6,7 +6,7 @@ import arrow.core.Tuple2
 import arrow.core.andThen
 import arrow.core.identity
 import arrow.core.value
-import arrow.typeclasses.internal.IdBimonad
+import arrow.core.typeclasses.internal.IdBimonad
 
 /**
  * Alias that represents stateful computation of the form `(S) -> Tuple2<S, A>`.

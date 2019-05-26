@@ -4,9 +4,9 @@ import arrow.core.Function1PartialOf
 import arrow.core.extensions.Function1Applicative
 import arrow.core.extensions.Function1Functor
 import arrow.core.extensions.Function1Monad
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Functor
+import arrow.core.typeclasses.Monad
 import dagger.Module
 import dagger.Provides
 import javax.inject.Inject

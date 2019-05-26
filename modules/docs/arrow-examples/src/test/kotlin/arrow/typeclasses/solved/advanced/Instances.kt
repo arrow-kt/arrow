@@ -1,11 +1,11 @@
 package com.pacoworks.typeclasses.basics.solved.advanced
 
 import arrow.extension
-import arrow.typeclasses.DaoDatabase
-import arrow.typeclasses.NetworkModule
-import arrow.typeclasses.Query
-import arrow.typeclasses.UserDao
-import arrow.typeclasses.UserDto
+import arrow.core.typeclasses.DaoDatabase
+import arrow.core.typeclasses.NetworkModule
+import arrow.core.typeclasses.Query
+import arrow.core.typeclasses.UserDao
+import arrow.core.typeclasses.UserDto
 
 @extension
 interface NetworkModuleNetworkFetcher : NetworkFetcher<NetworkModule> {

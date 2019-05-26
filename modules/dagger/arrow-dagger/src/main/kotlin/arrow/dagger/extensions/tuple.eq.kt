@@ -18,7 +18,7 @@ import arrow.core.extensions.Tuple6Eq
 import arrow.core.extensions.Tuple7Eq
 import arrow.core.extensions.Tuple8Eq
 import arrow.core.extensions.Tuple9Eq
-import arrow.typeclasses.Eq
+import arrow.core.typeclasses.Eq
 import dagger.Module
 import dagger.Provides
 import javax.inject.Inject

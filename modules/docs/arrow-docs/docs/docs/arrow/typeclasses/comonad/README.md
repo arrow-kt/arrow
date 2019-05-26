@@ -17,9 +17,9 @@ TODO. Meanwhile you can find a short description in the [intro to typeclasses]({
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.typeclasses.Comonad
+import arrow.core.typeclasses.Comonad
 
 TypeClass(Comonad::class).dtMarkdownList()
 ```
 
-ank_macro_hierarchy(arrow.typeclasses.Comonad)
+ank_macro_hierarchy(arrow.core.typeclasses.Comonad)

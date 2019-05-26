@@ -1,12 +1,12 @@
 package arrow.core.extensions
 
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Hash
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Order
-import arrow.typeclasses.Semigroup
-import arrow.typeclasses.Semiring
-import arrow.typeclasses.Show
+import arrow.core.typeclasses.Eq
+import arrow.core.typeclasses.Hash
+import arrow.core.typeclasses.Monoid
+import arrow.core.typeclasses.Order
+import arrow.core.typeclasses.Semigroup
+import arrow.core.typeclasses.Semiring
+import arrow.core.typeclasses.Show
 
 // ////////
 // Byte

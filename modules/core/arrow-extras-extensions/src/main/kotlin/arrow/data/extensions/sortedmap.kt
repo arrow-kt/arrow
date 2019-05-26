@@ -8,13 +8,13 @@ import arrow.data.SortedMapKPartialOf
 import arrow.data.fix
 import arrow.data.k
 import arrow.data.updated
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Foldable
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Semigroup
-import arrow.typeclasses.Show
-import arrow.typeclasses.Traverse
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Foldable
+import arrow.core.typeclasses.Functor
+import arrow.core.typeclasses.Monoid
+import arrow.core.typeclasses.Semigroup
+import arrow.core.typeclasses.Show
+import arrow.core.typeclasses.Traverse
 
 interface SortedMapKFunctor<A : Comparable<A>> : Functor<SortedMapKPartialOf<A>> {
   override fun <B, C> SortedMapKOf<A, B>.map(f: (B) -> C): SortedMapK<A, C> =

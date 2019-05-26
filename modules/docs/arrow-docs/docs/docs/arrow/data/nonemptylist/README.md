@@ -84,7 +84,7 @@ nelOne.flatMap { one ->
 Λrrow allows imperative style comprehensions to make computing over `NonEmptyList` values easy.
 
 ```kotlin:ank
-import arrow.typeclasses.*
+import arrow.core.typeclasses.*
 import arrow.data.extensions.*
 import arrow.data.extensions.nonemptylist.monad.binding
 

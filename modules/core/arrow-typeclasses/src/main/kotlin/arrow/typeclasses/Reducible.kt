@@ -1,4 +1,4 @@
-package arrow.typeclasses
+package arrow.core.typeclasses
 
 import arrow.Kind
 import arrow.core.Eval
@@ -9,7 +9,7 @@ import arrow.core.Some
 import arrow.core.Tuple2
 
 /**
- * ank_macro_hierarchy(arrow.typeclasses.Reducible)
+ * ank_macro_hierarchy(arrow.core.typeclasses.Reducible)
  *
  * Data structures that can be reduced to a summary value.
  *
@@ -81,7 +81,7 @@ interface Reducible<F> : Foldable<F> {
 }
 
 /**
- * ank_macro_hierarchy(arrow.typeclasses.NonEmptyReducible)
+ * ank_macro_hierarchy(arrow.core.typeclasses.NonEmptyReducible)
  *
  * This class defines a Reducible<F> in terms of a Foldable<G> together with a split method, F<A> -> (A, G<A>).
  *

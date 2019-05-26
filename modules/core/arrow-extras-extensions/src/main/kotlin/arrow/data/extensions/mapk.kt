@@ -12,15 +12,15 @@ import arrow.data.extensions.setk.eq.eq
 import arrow.data.extensions.setk.hash.hash
 import arrow.data.fix
 import arrow.data.updated
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Foldable
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Hash
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Semigroup
-import arrow.typeclasses.Show
-import arrow.typeclasses.Traverse
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Eq
+import arrow.core.typeclasses.Foldable
+import arrow.core.typeclasses.Functor
+import arrow.core.typeclasses.Hash
+import arrow.core.typeclasses.Monoid
+import arrow.core.typeclasses.Semigroup
+import arrow.core.typeclasses.Show
+import arrow.core.typeclasses.Traverse
 import arrow.undocumented
 
 @extension

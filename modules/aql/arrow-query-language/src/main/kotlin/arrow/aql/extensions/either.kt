@@ -13,9 +13,9 @@ import arrow.extension
 import arrow.core.extensions.either.applicative.applicative
 import arrow.core.extensions.either.foldable.foldable
 import arrow.core.extensions.either.functor.functor
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Foldable
-import arrow.typeclasses.Functor
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Foldable
+import arrow.core.typeclasses.Functor
 
 @extension interface EitherSelect<L> : Select<EitherPartialOf<L>> {
   override fun functor(): Functor<EitherPartialOf<L>> = Either.functor()

@@ -8,7 +8,7 @@ import arrow.optics.Optional
 import arrow.optics.Prism
 import arrow.optics.Setter
 import arrow.optics.Traversal
-import arrow.typeclasses.Traverse
+import arrow.core.typeclasses.Traverse
 
 /**
  * ank_macro_hierarchy(arrow.optics.typeclasses.Each)

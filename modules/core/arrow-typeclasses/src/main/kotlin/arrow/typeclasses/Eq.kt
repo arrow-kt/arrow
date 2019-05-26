@@ -1,7 +1,7 @@
-package arrow.typeclasses
+package arrow.core.typeclasses
 
 /**
- * ank_macro_hierarchy(arrow.typeclasses.Eq)
+ * ank_macro_hierarchy(arrow.core.typeclasses.Eq)
  *
  * A type class used to determine equality between 2 instances of the same type [F] in a type safe way.
  *

@@ -4,14 +4,14 @@ import arrow.Kind
 import arrow.core.Option
 import arrow.mtl.typeclasses.FunctorFilter
 import arrow.mtl.typeclasses.TraverseFilter
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.ComposedFunctor
-import arrow.typeclasses.ComposedTraverse
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Nested
-import arrow.typeclasses.Traverse
-import arrow.typeclasses.nest
-import arrow.typeclasses.unnest
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.ComposedFunctor
+import arrow.core.typeclasses.ComposedTraverse
+import arrow.core.typeclasses.Functor
+import arrow.core.typeclasses.Nested
+import arrow.core.typeclasses.Traverse
+import arrow.core.typeclasses.nest
+import arrow.core.typeclasses.unnest
 
 interface ComposedFunctorFilter<F, G> : FunctorFilter<Nested<F, G>>, ComposedFunctor<F, G> {
 

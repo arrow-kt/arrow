@@ -91,7 +91,7 @@ When rewritten using `bindingCatch` it becomes:
 
 ```kotlin
 import arrow.effects.reactor.*
-import arrow.typeclasses.*
+import arrow.core.typeclasses.*
 import arrow.effects.reactor.extensions.flux.monadThrow.bindingCatch
 
 bindingCatch {

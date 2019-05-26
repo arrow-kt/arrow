@@ -9,8 +9,8 @@ import arrow.test.generators.applicativeError
 import arrow.test.generators.either
 import arrow.test.generators.functionAToB
 import arrow.test.generators.throwable
-import arrow.typeclasses.ApplicativeError
-import arrow.typeclasses.Eq
+import arrow.core.typeclasses.ApplicativeError
+import arrow.core.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

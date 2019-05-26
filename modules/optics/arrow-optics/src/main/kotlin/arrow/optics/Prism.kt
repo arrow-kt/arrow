@@ -14,9 +14,9 @@ import arrow.core.identity
 import arrow.core.lift
 import arrow.core.toT
 import arrow.higherkind
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Monoid
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Eq
+import arrow.core.typeclasses.Monoid
 
 /**
  * [Prism] is a type alias for [PPrism] which fixes the type arguments

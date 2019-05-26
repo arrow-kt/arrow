@@ -1,7 +1,7 @@
-package arrow.typeclasses
+package arrow.core.typeclasses
 
 /**
- * ank_macro_hierarchy(arrow.typeclasses.Show)
+ * ank_macro_hierarchy(arrow.core.typeclasses.Show)
  *
  * A type class used to get a textual representation for an instance of type [A] in a type safe way.
  *

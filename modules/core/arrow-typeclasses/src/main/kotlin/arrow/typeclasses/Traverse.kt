@@ -1,13 +1,13 @@
-package arrow.typeclasses
+package arrow.core.typeclasses
 
 import arrow.Kind
 import arrow.core.Id
 import arrow.core.identity
 import arrow.core.value
-import arrow.typeclasses.internal.IdBimonad
+import arrow.core.typeclasses.internal.IdBimonad
 
 /**
- * ank_macro_hierarchy(arrow.typeclasses.Traverse)
+ * ank_macro_hierarchy(arrow.core.typeclasses.Traverse)
  *
  * Traverse, also known as Traversable. Traversal over a structure with an effect.
  */

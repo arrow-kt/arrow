@@ -4,7 +4,7 @@ import arrow.Kind
 import arrow.core.Eval
 import arrow.core.Eval.Now
 import arrow.extension
-import arrow.typeclasses.Functor
+import arrow.core.typeclasses.Functor
 import arrow.recursion.Coalgebra
 import arrow.recursion.data.ForNu
 import arrow.recursion.data.Nu

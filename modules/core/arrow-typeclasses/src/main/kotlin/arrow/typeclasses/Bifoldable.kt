@@ -1,10 +1,10 @@
-package arrow.typeclasses
+package arrow.core.typeclasses
 
 import arrow.Kind2
 import arrow.core.Eval
 
 /**
- * ank_macro_hierarchy(arrow.typeclasses.Bifoldable)
+ * ank_macro_hierarchy(arrow.core.typeclasses.Bifoldable)
  */
 interface Bifoldable<F> {
 

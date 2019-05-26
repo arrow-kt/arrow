@@ -10,9 +10,9 @@ import arrow.core.Right
 import arrow.core.Some
 import arrow.core.getOrElse
 import arrow.higherkind
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Functor
+import arrow.core.typeclasses.Monad
 
 fun <F, A> OptionTOf<F, A>.value(): Kind<F, Option<A>> = this.fix().value()
 

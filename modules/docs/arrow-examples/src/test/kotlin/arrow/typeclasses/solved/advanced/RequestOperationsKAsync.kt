@@ -2,8 +2,8 @@ package com.pacoworks.typeclasses.basics.solved.advanced
 
 import arrow.Kind
 import arrow.effects.typeclasses.Async
-import arrow.typeclasses.Index
-import arrow.typeclasses.User
+import arrow.core.typeclasses.Index
+import arrow.core.typeclasses.User
 import com.pacoworks.typeclasses.basics.solved.DomainMapperSync
 import kotlin.coroutines.CoroutineContext
 

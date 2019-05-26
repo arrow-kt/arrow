@@ -9,8 +9,8 @@ import arrow.data.fix
 
 import arrow.extension
 import arrow.mtl.typeclasses.MonadReader
-import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadError
+import arrow.core.typeclasses.Monad
+import arrow.core.typeclasses.MonadError
 
 @extension
 interface KleisliMonadReader<F, D> : MonadReader<KleisliPartialOf<F, D>, D>, KleisliMonad<F, D> {

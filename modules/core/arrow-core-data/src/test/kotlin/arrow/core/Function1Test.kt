@@ -16,10 +16,10 @@ import arrow.test.laws.MonadLaws
 import arrow.test.laws.MonoidLaws
 import arrow.test.laws.ProfunctorLaws
 import arrow.test.laws.SemigroupLaws
-import arrow.typeclasses.Conested
-import arrow.typeclasses.Eq
-import arrow.typeclasses.conest
-import arrow.typeclasses.counnest
+import arrow.core.typeclasses.Conested
+import arrow.core.typeclasses.Eq
+import arrow.core.typeclasses.conest
+import arrow.core.typeclasses.counnest
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.runner.junit4.KotlinTestRunner

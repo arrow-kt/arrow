@@ -1,8 +1,8 @@
-package arrow.typeclasses
+package arrow.core.typeclasses
 
 import arrow.Kind
 import arrow.core.Continuation
-import arrow.typeclasses.suspended.BindSyntax
+import arrow.core.typeclasses.suspended.BindSyntax
 import java.util.concurrent.CountDownLatch
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext

@@ -25,7 +25,7 @@ import arrow.optics.typeclasses.Each
 import arrow.optics.typeclasses.FilterIndex
 import arrow.optics.typeclasses.Index
 import arrow.optics.typeclasses.Snoc
-import arrow.typeclasses.Applicative
+import arrow.core.typeclasses.Applicative
 
 /**
  * [Traversal] for [ListK] that has focus in each [A].

@@ -62,7 +62,7 @@ Note that this instance will fail on many all datatypes that contain a property 
 
 ```kotlin:ank
 import arrow.core.*
-import arrow.typeclasses.*
+import arrow.core.typeclasses.*
 
 // Option is a data class with a single value
 Eq.any().run { Some(1).eqv(Option.just(1)) }
@@ -84,11 +84,11 @@ See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | rela
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.typeclasses.Eq
+import arrow.core.typeclasses.Eq
 
 TypeClass(Eq::class).dtMarkdownList()
 ```
 
 Additionally all instances of [`Order`]({{ '/docs/arrow/typeclasses/order' | relative_url }}), [`Hash`]({{ '/docs/arrow/typeclasses/hash' | relative_url }}) and their MTL variants implement the `Eq` typeclass directly since they are all subtypes of `Eq`
 
-ank_macro_hierarchy(arrow.typeclasses.Eq)
+ank_macro_hierarchy(arrow.core.typeclasses.Eq)

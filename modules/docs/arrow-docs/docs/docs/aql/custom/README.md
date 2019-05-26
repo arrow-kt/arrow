@@ -42,7 +42,7 @@ Once we have our box defined and annotated as a `@higherkind` we can define the 
 In order to activate [`select`]() statement we need to provide an instance for the `Functor` type class and the `Select` type class:
 
 ```kotlin
-import arrow.typeclasses.Functor
+import arrow.core.typeclasses.Functor
 import arrow.aql.box.functor.functor
 
 @extension
@@ -153,7 +153,7 @@ println(result)
 In order to activate __count, groupBy, orderBy, sum & union__ we need to provide an instance for the `Foldable` type class and the one instance for each one of the keyword we want to support :
 
 ```kotlin
-import arrow.typeclasses.Foldable
+import arrow.core.typeclasses.Foldable
 import arrow.aql.box.foldable.foldable
 
 @extension

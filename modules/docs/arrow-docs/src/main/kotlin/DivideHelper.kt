@@ -4,9 +4,9 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Tuple2
 import arrow.higherkind
-import arrow.typeclasses.Decidable
-import arrow.typeclasses.Divide
-import arrow.typeclasses.Divisible
+import arrow.core.typeclasses.Decidable
+import arrow.core.typeclasses.Divide
+import arrow.core.typeclasses.Divisible
 
 @higherkind
 class Serializer<A>(val func: (A) -> String) : Kind<ForSerializer, A> {

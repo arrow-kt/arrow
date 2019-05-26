@@ -1,4 +1,4 @@
-package arrow.typeclasses
+package arrow.core.typeclasses
 
 fun UserDao.toUserFromDatabase(): User = realWorld {
   User(id)

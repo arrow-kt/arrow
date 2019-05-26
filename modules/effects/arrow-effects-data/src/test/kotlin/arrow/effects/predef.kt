@@ -5,7 +5,7 @@ import arrow.core.extensions.either.eq.eq
 import arrow.core.extensions.option.eq.eq
 import arrow.effects.typeclasses.Duration
 import arrow.effects.typeclasses.seconds
-import arrow.typeclasses.Eq
+import arrow.core.typeclasses.Eq
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.SynchronousQueue
 import java.util.concurrent.ThreadFactory

@@ -21,24 +21,24 @@ import arrow.data.extensions.eithert.monadThrow.monadThrow
 import arrow.data.fix
 import arrow.data.value
 import arrow.extension
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.ApplicativeError
-import arrow.typeclasses.Apply
-import arrow.typeclasses.ComposedTraverse
-import arrow.typeclasses.Contravariant
-import arrow.typeclasses.Decidable
-import arrow.typeclasses.Divide
-import arrow.typeclasses.Divisible
-import arrow.typeclasses.Foldable
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadError
-import arrow.typeclasses.MonadThrow
-import arrow.typeclasses.Nested
-import arrow.typeclasses.SemigroupK
-import arrow.typeclasses.Traverse
-import arrow.typeclasses.compose
-import arrow.typeclasses.unnest
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.ApplicativeError
+import arrow.core.typeclasses.Apply
+import arrow.core.typeclasses.ComposedTraverse
+import arrow.core.typeclasses.Contravariant
+import arrow.core.typeclasses.Decidable
+import arrow.core.typeclasses.Divide
+import arrow.core.typeclasses.Divisible
+import arrow.core.typeclasses.Foldable
+import arrow.core.typeclasses.Functor
+import arrow.core.typeclasses.Monad
+import arrow.core.typeclasses.MonadError
+import arrow.core.typeclasses.MonadThrow
+import arrow.core.typeclasses.Nested
+import arrow.core.typeclasses.SemigroupK
+import arrow.core.typeclasses.Traverse
+import arrow.core.typeclasses.compose
+import arrow.core.typeclasses.unnest
 import arrow.undocumented
 
 @extension
@@ -297,7 +297,7 @@ private fun <F, L, A> handleErrorWith(fa: EitherTOf<F, L, A>, f: (L) -> EitherTO
 
 @extension
 @undocumented
-interface EitherTFx<F> : arrow.typeclasses.suspended.monaderror.Fx<EitherTPartialOf<F, Throwable>> {
+interface EitherTFx<F> : arrow.core.typeclasses.suspended.monaderror.Fx<EitherTPartialOf<F, Throwable>> {
 
   fun M(): MonadThrow<F>
 

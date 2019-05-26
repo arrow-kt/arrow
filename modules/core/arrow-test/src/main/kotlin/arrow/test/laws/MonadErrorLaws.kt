@@ -7,8 +7,8 @@ import arrow.test.generators.applicativeError
 import arrow.test.generators.fatalThrowable
 import arrow.test.generators.functionAToB
 import arrow.test.generators.throwable
-import arrow.typeclasses.Eq
-import arrow.typeclasses.MonadError
+import arrow.core.typeclasses.Eq
+import arrow.core.typeclasses.MonadError
 import io.kotlintest.fail
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll

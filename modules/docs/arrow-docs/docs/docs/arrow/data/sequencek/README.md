@@ -55,7 +55,7 @@ sequenceOf(1, 2, 3)
 SequenceK is a [`Monad`](/docs/arrow/typeclasses/monad/) too. For example, it can be used to model non-deterministic computations. (In a sense that the computations return an arbitrary number of results.)
 
 ```kotlin:ank
-import arrow.typeclasses.*
+import arrow.core.typeclasses.*
 import arrow.data.extensions.*
 import arrow.data.extensions.sequence.monad.binding
 

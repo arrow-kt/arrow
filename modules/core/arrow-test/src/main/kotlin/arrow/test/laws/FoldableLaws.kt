@@ -10,8 +10,8 @@ import arrow.test.concurrency.SideEffect
 import arrow.test.generators.functionAToB
 import arrow.test.generators.intPredicate
 import arrow.test.generators.intSmall
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Foldable
+import arrow.core.typeclasses.Eq
+import arrow.core.typeclasses.Foldable
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

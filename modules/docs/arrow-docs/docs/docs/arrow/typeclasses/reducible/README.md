@@ -15,11 +15,11 @@ intermediate
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.typeclasses.Reducible
+import arrow.core.typeclasses.Reducible
 
 TypeClass(Reducible::class).dtMarkdownList()
 ```
 
-ank_macro_hierarchy(arrow.typeclasses.Reducible)
+ank_macro_hierarchy(arrow.core.typeclasses.Reducible)
 
 TODO. Meanwhile you can find a short description in the [intro to typeclasses]({{ '/docs/typeclasses/intro/' | relative_url }}).

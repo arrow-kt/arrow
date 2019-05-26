@@ -7,7 +7,7 @@ import arrow.free.extensions.yoneda.functor.functor
 import arrow.core.extensions.id.functor.functor
 import arrow.test.UnitSpec
 import arrow.test.laws.FunctorLaws
-import arrow.typeclasses.Eq
+import arrow.core.typeclasses.Eq
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.properties.forAll
 import org.junit.runner.RunWith

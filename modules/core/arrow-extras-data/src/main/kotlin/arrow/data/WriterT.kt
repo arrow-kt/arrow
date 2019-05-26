@@ -5,13 +5,13 @@ import arrow.core.Either
 import arrow.core.Tuple2
 import arrow.core.toT
 import arrow.higherkind
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.MonoidK
-import arrow.typeclasses.Semigroup
-import arrow.typeclasses.SemigroupK
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Functor
+import arrow.core.typeclasses.Monad
+import arrow.core.typeclasses.Monoid
+import arrow.core.typeclasses.MonoidK
+import arrow.core.typeclasses.Semigroup
+import arrow.core.typeclasses.SemigroupK
 
 fun <F, W, A> WriterTOf<F, W, A>.value(): Kind<F, Tuple2<W, A>> = this.fix().value()
 

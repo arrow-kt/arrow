@@ -23,7 +23,7 @@ import arrow.test.laws.MonoidLaws
 import arrow.test.laws.MonoidalLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseFilterLaws
-import arrow.typeclasses.Eq
+import arrow.core.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.runner.junit4.KotlinTestRunner

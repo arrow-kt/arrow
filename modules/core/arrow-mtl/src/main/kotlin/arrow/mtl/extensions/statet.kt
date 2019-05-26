@@ -9,8 +9,8 @@ import arrow.data.extensions.StateTSemigroupK
 import arrow.extension
 import arrow.mtl.typeclasses.MonadCombine
 import arrow.mtl.typeclasses.MonadState
-import arrow.typeclasses.Monad
-import arrow.typeclasses.SemigroupK
+import arrow.core.typeclasses.Monad
+import arrow.core.typeclasses.SemigroupK
 
 @extension
 interface StateTMonadState<F, S> : MonadState<StateTPartialOf<F, S>, S>, StateTMonad<F, S> {

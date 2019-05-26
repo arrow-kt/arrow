@@ -2,8 +2,8 @@ package arrow.optics
 
 import arrow.core.None
 import arrow.core.Option
-import arrow.typeclasses.Const
-import arrow.typeclasses.Monoid
+import arrow.core.typeclasses.Const
+import arrow.core.typeclasses.Monoid
 
 @PublishedApi
 internal object AndMonoid : Monoid<Boolean> {

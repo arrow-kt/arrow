@@ -4,7 +4,7 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.documented
 import arrow.effects.typeclasses.ExitCase.Error
-import arrow.typeclasses.MonadError
+import arrow.core.typeclasses.MonadError
 
 sealed class ExitCase<out E> {
 

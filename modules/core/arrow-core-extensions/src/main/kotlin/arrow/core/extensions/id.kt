@@ -10,25 +10,25 @@ import arrow.core.Id
 import arrow.core.IdOf
 import arrow.core.value
 import arrow.extension
-import arrow.typeclasses.suspended.monad.Fx
+import arrow.core.typeclasses.suspended.monad.Fx
 import arrow.core.extensions.traverse as idTraverse
 import arrow.core.extensions.id.monad.monad
 import arrow.core.fix
 import arrow.core.identity
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Apply
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Semigroup
-import arrow.typeclasses.Show
-import arrow.typeclasses.Selective
-import arrow.typeclasses.Monad
-import arrow.typeclasses.Comonad
-import arrow.typeclasses.Bimonad
-import arrow.typeclasses.Foldable
-import arrow.typeclasses.Traverse
-import arrow.typeclasses.Hash
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Apply
+import arrow.core.typeclasses.Eq
+import arrow.core.typeclasses.Functor
+import arrow.core.typeclasses.Monoid
+import arrow.core.typeclasses.Semigroup
+import arrow.core.typeclasses.Show
+import arrow.core.typeclasses.Selective
+import arrow.core.typeclasses.Monad
+import arrow.core.typeclasses.Comonad
+import arrow.core.typeclasses.Bimonad
+import arrow.core.typeclasses.Foldable
+import arrow.core.typeclasses.Traverse
+import arrow.core.typeclasses.Hash
 import arrow.core.select as idSelect
 
 @extension

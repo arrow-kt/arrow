@@ -4,7 +4,7 @@ import arrow.test.generators.tuple2
 import arrow.test.generators.tuple3
 import arrow.test.generators.tuple4
 import arrow.test.generators.tuple5
-import arrow.typeclasses.Eq
+import arrow.core.typeclasses.Eq
 import io.kotlintest.Matcher
 import io.kotlintest.Result
 import io.kotlintest.TestContext

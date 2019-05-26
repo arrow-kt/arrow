@@ -1,6 +1,6 @@
 package arrow.aql
 
-import arrow.typeclasses.Functor
+import arrow.core.typeclasses.Functor
 
 /**
  * `select` allows obtaining and transforming data from any data source containing

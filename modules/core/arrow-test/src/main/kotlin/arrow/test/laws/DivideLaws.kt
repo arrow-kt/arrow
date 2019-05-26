@@ -3,8 +3,8 @@ package arrow.test.laws
 import arrow.Kind
 import arrow.core.Tuple2
 import arrow.core.toT
-import arrow.typeclasses.Divide
-import arrow.typeclasses.Eq
+import arrow.core.typeclasses.Divide
+import arrow.core.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

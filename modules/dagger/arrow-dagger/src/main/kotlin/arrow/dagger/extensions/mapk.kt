@@ -7,11 +7,11 @@ import arrow.data.extensions.MapKFunctor
 import arrow.data.extensions.MapKMonoid
 import arrow.data.extensions.MapKSemigroup
 import arrow.data.extensions.MapKTraverse
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Foldable
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Semigroup
-import arrow.typeclasses.Traverse
+import arrow.core.typeclasses.Eq
+import arrow.core.typeclasses.Foldable
+import arrow.core.typeclasses.Functor
+import arrow.core.typeclasses.Semigroup
+import arrow.core.typeclasses.Traverse
 import dagger.Module
 import dagger.Provides
 import javax.inject.Inject

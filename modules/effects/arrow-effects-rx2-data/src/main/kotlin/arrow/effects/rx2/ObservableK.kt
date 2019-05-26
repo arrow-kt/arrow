@@ -13,7 +13,7 @@ import arrow.effects.rx2.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
 import arrow.higherkind
-import arrow.typeclasses.Applicative
+import arrow.core.typeclasses.Applicative
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
 import kotlin.coroutines.CoroutineContext

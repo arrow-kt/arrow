@@ -18,9 +18,9 @@ TODO. Meanwhile you can find a short description in the [intro to typeclasses]({
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.typeclasses.MonoidK
+import arrow.core.typeclasses.MonoidK
 
 TypeClass(MonoidK::class).dtMarkdownList()
 ```
 
-ank_macro_hierarchy(arrow.typeclasses.MonoidK)
+ank_macro_hierarchy(arrow.core.typeclasses.MonoidK)

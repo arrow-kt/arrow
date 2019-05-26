@@ -5,11 +5,11 @@ import arrow.core.Option
 import arrow.core.extensions.ConstTraverse
 import arrow.extension
 import arrow.mtl.typeclasses.TraverseFilter
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Const
-import arrow.typeclasses.ConstOf
-import arrow.typeclasses.ConstPartialOf
-import arrow.typeclasses.fix
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Const
+import arrow.core.typeclasses.ConstOf
+import arrow.core.typeclasses.ConstPartialOf
+import arrow.core.typeclasses.fix
 
 @extension
 interface ConstTraverseFilter<X> : TraverseFilter<ConstPartialOf<X>>, ConstTraverse<X> {

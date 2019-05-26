@@ -12,8 +12,8 @@ import arrow.data.Nel
 import arrow.data.fix
 import arrow.data.k
 import arrow.data.extensions.listk.traverse.traverse
-import arrow.typeclasses.ApplicativeError
-import arrow.typeclasses.Traverse
+import arrow.core.typeclasses.ApplicativeError
+import arrow.core.typeclasses.Traverse
 
 data class RefinedPredicateException(val msg: String) : IllegalArgumentException(msg)
 

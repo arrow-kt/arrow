@@ -30,7 +30,7 @@ import arrow.test.generators.functionAToB
 import arrow.test.generators.throwable
 import arrow.test.laws.EqLaws
 import arrow.test.laws.MonadDeferLaws
-import arrow.typeclasses.Eq
+import arrow.core.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.runner.junit4.KotlinTestRunner

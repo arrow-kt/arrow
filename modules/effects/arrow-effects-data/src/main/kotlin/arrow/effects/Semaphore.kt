@@ -11,7 +11,7 @@ import arrow.core.lastOrNone
 import arrow.core.toT
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Concurrent
-import arrow.typeclasses.ApplicativeError
+import arrow.core.typeclasses.ApplicativeError
 
 /**
  * A counting [Semaphore] is used to control access to a resource in a concurrent system.

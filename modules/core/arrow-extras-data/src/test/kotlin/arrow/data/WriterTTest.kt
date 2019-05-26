@@ -32,11 +32,11 @@ import arrow.test.laws.DivisibleLaws
 import arrow.test.laws.MonadFilterLaws
 import arrow.test.laws.MonadWriterLaws
 import arrow.test.laws.MonoidKLaws
-import arrow.typeclasses.Const
-import arrow.typeclasses.ConstPartialOf
-import arrow.typeclasses.Eq
-import arrow.typeclasses.const
-import arrow.typeclasses.value
+import arrow.core.typeclasses.Const
+import arrow.core.typeclasses.ConstPartialOf
+import arrow.core.typeclasses.Eq
+import arrow.core.typeclasses.const
+import arrow.core.typeclasses.value
 import io.kotlintest.properties.Gen
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith

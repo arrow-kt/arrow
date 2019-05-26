@@ -3,10 +3,10 @@ package arrow.effects.typeclasses
 import arrow.Kind
 import arrow.core.Either
 import arrow.effects.data.internal.BindingCancellationException
-import arrow.typeclasses.MonadContinuation
-import arrow.typeclasses.MonadErrorContinuation
-import arrow.typeclasses.stateStack
-import arrow.typeclasses.suspended.BindSyntax
+import arrow.core.typeclasses.MonadContinuation
+import arrow.core.typeclasses.MonadErrorContinuation
+import arrow.core.typeclasses.stateStack
+import arrow.core.typeclasses.suspended.BindSyntax
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext

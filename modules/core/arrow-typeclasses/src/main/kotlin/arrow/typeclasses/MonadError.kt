@@ -1,4 +1,4 @@
-package arrow.typeclasses
+package arrow.core.typeclasses
 
 import arrow.Kind
 import arrow.core.NonFatal
@@ -6,7 +6,7 @@ import arrow.documented
 import kotlin.coroutines.startCoroutine
 
 /**
- * ank_macro_hierarchy(arrow.typeclasses.MonadError)
+ * ank_macro_hierarchy(arrow.core.typeclasses.MonadError)
  */
 interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F> {
 
@@ -21,7 +21,7 @@ interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F> {
 }
 
 /**
- * ank_macro_hierarchy(arrow.typeclasses.MonadThrow)
+ * ank_macro_hierarchy(arrow.core.typeclasses.MonadThrow)
  *
  * A MonadError with the error type fixed to Throwable. It provides [bindingCatch] for automatically catching throwable
  * errors in the context of a binding, short-circuiting the complete computation and returning the error raised to the
@@ -47,7 +47,7 @@ interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F> {
  * ```kotlin:ank:playground:extension
  * _imports_
  * import arrow.Kind
- * import arrow.typeclasses.MonadThrow
+ * import arrow.core.typeclasses.MonadThrow
  *
  * typealias Impacted = Boolean
  *
@@ -97,7 +97,7 @@ interface MonadThrow<F> : MonadError<F, Throwable> {
    * ```kotlin:ank:playground:extension
    * _imports_
    * import arrow.Kind
-   * import arrow.typeclasses.MonadThrow
+   * import arrow.core.typeclasses.MonadThrow
    *
    * typealias Impacted = Boolean
    *

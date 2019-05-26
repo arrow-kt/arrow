@@ -1,7 +1,7 @@
 package arrow.mtl.typeclasses
 
 import arrow.Kind
-import arrow.typeclasses.MonadContinuation
+import arrow.core.typeclasses.MonadContinuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.RestrictsSuspension

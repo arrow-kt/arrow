@@ -16,7 +16,7 @@ import arrow.effects.IO
 import arrow.effects.extensions.io.monadDefer.monadDefer
 import arrow.effects.fix
 import arrow.effects.typeclasses.MonadDefer
-import arrow.typeclasses.Monad
+import arrow.core.typeclasses.Monad
 import java.util.Random
 
 /**

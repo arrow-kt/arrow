@@ -3,7 +3,7 @@ package arrow.test.laws
 import arrow.core.compose
 import arrow.core.identity
 import arrow.optics.Setter
-import arrow.typeclasses.Eq
+import arrow.core.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

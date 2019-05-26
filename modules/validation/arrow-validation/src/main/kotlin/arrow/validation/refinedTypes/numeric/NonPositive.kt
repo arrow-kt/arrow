@@ -10,8 +10,8 @@ import arrow.extension
 import arrow.core.extensions.either.applicativeError.applicativeError
 import arrow.data.extensions.nonemptylist.semigroup.semigroup
 import arrow.data.extensions.validated.applicativeError.applicativeError
-import arrow.typeclasses.ApplicativeError
-import arrow.typeclasses.Order
+import arrow.core.typeclasses.ApplicativeError
+import arrow.core.typeclasses.Order
 import arrow.validation.RefinedPredicateException
 import arrow.validation.Refinement
 

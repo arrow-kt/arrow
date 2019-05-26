@@ -17,7 +17,7 @@ import arrow.optics.typeclasses.Index
 import arrow.optics.typeclasses.Snoc
 import arrow.optics.extensions.listk.filterIndex.filterIndex
 import arrow.optics.extensions.listk.index.index
-import arrow.typeclasses.Applicative
+import arrow.core.typeclasses.Applicative
 
 /**
  * [Traversal] for [String] that focuses in each [Char] of the source [String].

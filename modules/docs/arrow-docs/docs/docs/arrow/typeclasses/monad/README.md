@@ -132,7 +132,7 @@ The following data types in Arrow provide instances that adhere to the `Monad` t
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.typeclasses.Monad
+import arrow.core.typeclasses.Monad
 
 TypeClass(Monad::class).dtMarkdownList()
 ```
@@ -145,7 +145,7 @@ TypeClass(Monad::class).dtMarkdownList()
 
 ```kotlin:ank:outFile(monad.nomnol)
 import arrow.reflect.*
-import arrow.typeclasses.Monad
+import arrow.core.typeclasses.Monad
 
 TypeClass(Monad::class).hierarchyGraph()
 ```

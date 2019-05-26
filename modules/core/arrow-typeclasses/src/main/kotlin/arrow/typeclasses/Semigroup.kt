@@ -1,9 +1,9 @@
-package arrow.typeclasses
+package arrow.core.typeclasses
 
 import arrow.core.Option
 
 /**
- * ank_macro_hierarchy(arrow.typeclasses.Semigroup)
+ * ank_macro_hierarchy(arrow.core.typeclasses.Semigroup)
  */
 interface Semigroup<A> {
   /**

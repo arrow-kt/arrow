@@ -231,10 +231,10 @@ interface MetaApi {
   /**
    * The list of functions a type class instance needs to implement to resolve
    * it's hierarchical dependencies to other type classes
-   * ex: override fun MF(): arrow.typeclasses.Monad<F> in the KleisliMonadInstance
+   * ex: override fun MF(): arrow.core.typeclasses.Monad<F> in the KleisliMonadInstance
    * ```
    * fun <F, D> Companion.monad(MF: Monad<F>): KleisliMonad<F, D> =
-   *   object : arrow.instances.KleisliMonad<F, D> { override fun MF(): arrow.typeclasses.Monad<F> = MF }`
+   *   object : arrow.instances.KleisliMonad<F, D> { override fun MF(): arrow.core.typeclasses.Monad<F> = MF }`
    * ```
    */
   val TypeClassInstance.requiredAbstractFunctions: List<Func>
@@ -245,7 +245,7 @@ interface MetaApi {
    * ex: override fun MF: Monad<F> in KleisliMonadInstance
    * ```
    * fun <F, D> Companion.monad(MF: Monad<F>): KleisliMonad<F, D> =
-   *   object : arrow.instances.KleisliMonad<F, D> { override fun MF(): arrow.typeclasses.Monad<F> = MF }`
+   *   object : arrow.instances.KleisliMonad<F, D> { override fun MF(): arrow.core.typeclasses.Monad<F> = MF }`
    * ```
    */
   val TypeClassInstance.requiredParameters: List<Parameter>

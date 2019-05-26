@@ -10,9 +10,9 @@ import arrow.core.compose
 import arrow.core.identity
 import arrow.core.toT
 import arrow.higherkind
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monoid
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Functor
+import arrow.core.typeclasses.Monoid
 
 /**
  * [Iso] is a type alias for [PIso] which fixes the type arguments

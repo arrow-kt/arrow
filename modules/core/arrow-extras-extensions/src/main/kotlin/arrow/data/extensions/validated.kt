@@ -12,17 +12,17 @@ import arrow.data.combineK
 import arrow.data.fix
 import arrow.data.handleLeftWith
 import arrow.extension
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.ApplicativeError
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Foldable
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Hash
-import arrow.typeclasses.Selective
-import arrow.typeclasses.Semigroup
-import arrow.typeclasses.SemigroupK
-import arrow.typeclasses.Show
-import arrow.typeclasses.Traverse
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.ApplicativeError
+import arrow.core.typeclasses.Eq
+import arrow.core.typeclasses.Foldable
+import arrow.core.typeclasses.Functor
+import arrow.core.typeclasses.Hash
+import arrow.core.typeclasses.Selective
+import arrow.core.typeclasses.Semigroup
+import arrow.core.typeclasses.SemigroupK
+import arrow.core.typeclasses.Show
+import arrow.core.typeclasses.Traverse
 import arrow.undocumented
 import arrow.data.traverse as validatedTraverse
 

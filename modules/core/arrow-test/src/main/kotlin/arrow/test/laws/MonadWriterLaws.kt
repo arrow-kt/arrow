@@ -3,9 +3,9 @@ package arrow.test.laws
 import arrow.Kind
 import arrow.core.Tuple2
 import arrow.mtl.typeclasses.MonadWriter
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Monad
-import arrow.typeclasses.Monoid
+import arrow.core.typeclasses.Eq
+import arrow.core.typeclasses.Monad
+import arrow.core.typeclasses.Monoid
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

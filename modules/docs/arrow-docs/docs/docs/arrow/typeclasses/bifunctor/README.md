@@ -24,7 +24,7 @@ fun Kind2<F, A, B>.bimap(fl: (A) -> C, fr: (B) -> D): Kind2<F, C, D>
 ```kotlin:ank
 import arrow.*
 import arrow.core.*
-import arrow.typeclasses.*
+import arrow.core.typeclasses.*
 import arrow.core.extensions.either.bifunctor.*
 
 fun <F> greet(BF: Bifunctor<F>, p: Kind2<F, String, String>): Kind2<F, String, String> =
@@ -70,12 +70,12 @@ Arrow provides [`BifunctorLaws`][bifunctor_laws_source]{:target="_blank"} in the
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.typeclasses.Bifunctor
+import arrow.core.typeclasses.Bifunctor
 
 TypeClass(Bifunctor::class).dtMarkdownList()
 ```
 
-ank_macro_hierarchy(arrow.typeclasses.Bifunctor)
+ank_macro_hierarchy(arrow.core.typeclasses.Bifunctor)
 
 [bifunctor_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-core-typeclasses/src/main/kotlin/arrow/typeclasses/Bifunctor.kt
 [bifunctor_laws_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-test/src/main/kotlin/arrow/test/laws/BifunctorLaws.kt

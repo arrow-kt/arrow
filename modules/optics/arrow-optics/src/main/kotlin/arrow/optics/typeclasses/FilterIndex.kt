@@ -5,8 +5,8 @@ import arrow.core.Predicate
 import arrow.core.Tuple2
 import arrow.optics.Iso
 import arrow.optics.Traversal
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Traverse
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Traverse
 
 /**
  * ank_macro_hierarchy(arrow.optics.typeclasses.FilterIndex)

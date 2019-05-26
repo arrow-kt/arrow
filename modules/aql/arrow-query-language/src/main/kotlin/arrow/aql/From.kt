@@ -3,7 +3,7 @@ package arrow.aql
 import arrow.core.Tuple2
 import arrow.core.Tuple3
 import arrow.core.toT
-import arrow.typeclasses.Applicative
+import arrow.core.typeclasses.Applicative
 
 interface From<F> {
 

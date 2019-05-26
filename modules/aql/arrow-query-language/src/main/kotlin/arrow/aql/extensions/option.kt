@@ -16,9 +16,9 @@ import arrow.core.extensions.option.foldable.foldable
 import arrow.core.extensions.option.functor.functor
 import arrow.mtl.extensions.option.functorFilter.functorFilter
 import arrow.mtl.typeclasses.FunctorFilter
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Foldable
-import arrow.typeclasses.Functor
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Foldable
+import arrow.core.typeclasses.Functor
 
 @extension
 interface OptionFrom : From<ForOption> {

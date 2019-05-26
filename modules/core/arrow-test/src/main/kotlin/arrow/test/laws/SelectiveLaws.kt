@@ -9,9 +9,9 @@ import arrow.core.right
 import arrow.core.toT
 import arrow.test.generators.either
 import arrow.test.generators.functionAToB
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Selective
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Eq
+import arrow.core.typeclasses.Selective
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

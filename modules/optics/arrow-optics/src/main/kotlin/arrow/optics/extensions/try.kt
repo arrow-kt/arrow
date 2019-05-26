@@ -6,7 +6,7 @@ import arrow.core.extensions.traverse
 import arrow.extension
 import arrow.optics.Traversal
 import arrow.optics.typeclasses.Each
-import arrow.typeclasses.Applicative
+import arrow.core.typeclasses.Applicative
 
 /**
  * [Traversal] for [Try] that has focus in each [Try.Success].

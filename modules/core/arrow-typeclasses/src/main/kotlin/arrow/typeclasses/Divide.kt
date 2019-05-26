@@ -1,4 +1,4 @@
-package arrow.typeclasses
+package arrow.core.typeclasses
 
 import arrow.Kind
 import arrow.core.Tuple10
@@ -21,7 +21,7 @@ import arrow.core.toT
  * A useful example could be deriving serializers for a datatype from simpler serializers
  *
  * ```kotlin:ank:playground
- * import arrow.typeclasses.Divide
+ * import arrow.core.typeclasses.Divide
  * import arrow.Kind
  * import arrow.core.Tuple2
  * import arrow.core.toT
@@ -49,7 +49,7 @@ import arrow.core.toT
  * }
  * ```
  *
- * ank_macro_hierarchy(arrow.typeclasses.Divide)
+ * ank_macro_hierarchy(arrow.core.typeclasses.Divide)
  */
 interface Divide<F> : Contravariant<F> {
 
@@ -58,7 +58,7 @@ interface Divide<F> : Contravariant<F> {
    *  a function from `C -> Tuple2<A, B>`
    *
    * ```kotlin:ank:playground
-   * import arrow.typeclasses.Divide
+   * import arrow.core.typeclasses.Divide
    * import arrow.Kind
    * import arrow.core.Tuple2
    * import arrow.core.toT

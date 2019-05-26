@@ -170,7 +170,7 @@ Lastly, Arrow contains `Try` instances for many useful typeclasses that allows y
 Transforming the value, if the computation is a success:
 
 ```kotlin:ank
-import arrow.typeclasses.*
+import arrow.core.typeclasses.*
 import arrow.core.extensions.*
 import arrow.core.extensions.`try`.functor.*
 

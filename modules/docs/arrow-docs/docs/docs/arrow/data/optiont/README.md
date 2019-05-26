@@ -50,7 +50,7 @@ We can further simplify this case by using Arrow `fx` facilities
 that enables monad comprehensions for all datatypes for which a monad instance is available.
 
 ```kotlin:ank:silent
-import arrow.typeclasses.*
+import arrow.core.typeclasses.*
 import arrow.core.extensions.*
 import arrow.core.extensions.option.fx.fx
 

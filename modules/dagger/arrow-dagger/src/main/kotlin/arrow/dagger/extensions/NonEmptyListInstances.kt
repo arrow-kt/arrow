@@ -10,14 +10,14 @@ import arrow.data.extensions.nonemptylist.functor.functor
 import arrow.data.extensions.nonemptylist.monad.monad
 import arrow.data.extensions.nonemptylist.semigroupK.semigroupK
 import arrow.data.extensions.nonemptylist.traverse.traverse
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Bimonad
-import arrow.typeclasses.Comonad
-import arrow.typeclasses.Foldable
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
-import arrow.typeclasses.SemigroupK
-import arrow.typeclasses.Traverse
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Bimonad
+import arrow.core.typeclasses.Comonad
+import arrow.core.typeclasses.Foldable
+import arrow.core.typeclasses.Functor
+import arrow.core.typeclasses.Monad
+import arrow.core.typeclasses.SemigroupK
+import arrow.core.typeclasses.Traverse
 import dagger.Module
 import dagger.Provides
 

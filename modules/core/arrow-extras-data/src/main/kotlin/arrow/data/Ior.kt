@@ -11,8 +11,8 @@ import arrow.core.Some
 import arrow.core.Tuple2
 import arrow.core.identity
 import arrow.higherkind
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Semigroup
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Semigroup
 
 typealias IorNel<A, B> = Ior<Nel<A>, B>
 

@@ -1,11 +1,11 @@
-package arrow.typeclasses.internal
+package arrow.core.typeclasses.internal
 
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.ForId
 import arrow.core.Id
 import arrow.core.fix
-import arrow.typeclasses.Bimonad
+import arrow.core.typeclasses.Bimonad
 
 val IdBimonad: Bimonad<ForId> = object : Bimonad<ForId> {
   override fun <A, B> Kind<ForId, A>.coflatMap(f: (Kind<ForId, A>) -> B): Kind<ForId, B> =

@@ -72,7 +72,7 @@ An extension function is applied to a type, that becomes bound to `this` and ena
 ```kotlin:ank:silent
 import arrow.*
 import arrow.core.*
-import arrow.typeclasses.*
+import arrow.core.typeclasses.*
 
 fun <F> Functor<F>.multiplyBy2(fa: Kind<F, Int>): Kind<F, Int> =
   fa.map { it * 2 }

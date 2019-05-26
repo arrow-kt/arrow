@@ -14,20 +14,20 @@ import arrow.core.extensions.`try`.monadThrow.monadThrow
 import arrow.core.fix
 import arrow.core.identity
 import arrow.extension
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.ApplicativeError
-import arrow.typeclasses.Apply
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Foldable
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Hash
-import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadError
-import arrow.typeclasses.MonadThrow
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Semigroup
-import arrow.typeclasses.Show
-import arrow.typeclasses.Traverse
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.ApplicativeError
+import arrow.core.typeclasses.Apply
+import arrow.core.typeclasses.Eq
+import arrow.core.typeclasses.Foldable
+import arrow.core.typeclasses.Functor
+import arrow.core.typeclasses.Hash
+import arrow.core.typeclasses.Monad
+import arrow.core.typeclasses.MonadError
+import arrow.core.typeclasses.MonadThrow
+import arrow.core.typeclasses.Monoid
+import arrow.core.typeclasses.Semigroup
+import arrow.core.typeclasses.Show
+import arrow.core.typeclasses.Traverse
 import arrow.core.extensions.traverse as tryTraverse
 import arrow.core.handleErrorWith as tryHandleErrorWith
 
@@ -200,6 +200,6 @@ interface TryHash<A> : Hash<Try<A>>, TryEq<A> {
 }
 
 @extension
-interface TryFx : arrow.typeclasses.suspended.monaderror.Fx<ForTry> {
+interface TryFx : arrow.core.typeclasses.suspended.monaderror.Fx<ForTry> {
   override fun monadError(): MonadThrow<ForTry> = Try.monadThrow()
 }

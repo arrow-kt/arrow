@@ -24,8 +24,8 @@ import arrow.test.laws.MonoidLaws
 import arrow.test.laws.SemigroupLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Hash
+import arrow.core.typeclasses.Eq
+import arrow.core.typeclasses.Hash
 import io.kotlintest.fail
 import io.kotlintest.matchers.beTheSameInstanceAs
 import io.kotlintest.properties.Gen

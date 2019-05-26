@@ -9,7 +9,7 @@ import arrow.core.Tuple2
 import arrow.core.identity
 import arrow.core.iterateRight
 import arrow.higherkind
-import arrow.typeclasses.Applicative
+import arrow.core.typeclasses.Applicative
 
 @higherkind
 data class MapK<K, out A>(private val map: Map<K, A>) : MapKOf<K, A>, Map<K, A> by map {

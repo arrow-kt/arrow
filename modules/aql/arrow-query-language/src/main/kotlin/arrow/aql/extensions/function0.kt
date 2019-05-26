@@ -7,8 +7,8 @@ import arrow.core.Function0
 import arrow.extension
 import arrow.core.extensions.function0.applicative.applicative
 import arrow.core.extensions.function0.functor.functor
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Functor
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Functor
 
 @extension interface Function0Select : Select<ForFunction0> {
   override fun functor(): Functor<ForFunction0> = Function0.functor()

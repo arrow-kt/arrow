@@ -13,22 +13,22 @@ import arrow.core.extensions.function1.monad.monad
 import arrow.core.fix
 import arrow.core.invoke
 import arrow.extension
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Apply
-import arrow.typeclasses.Category
-import arrow.typeclasses.Conested
-import arrow.typeclasses.Contravariant
-import arrow.typeclasses.Decidable
-import arrow.typeclasses.Divide
-import arrow.typeclasses.Divisible
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Profunctor
-import arrow.typeclasses.Semigroup
-import arrow.typeclasses.conest
-import arrow.typeclasses.counnest
-import arrow.typeclasses.suspended.monad.Fx
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Apply
+import arrow.core.typeclasses.Category
+import arrow.core.typeclasses.Conested
+import arrow.core.typeclasses.Contravariant
+import arrow.core.typeclasses.Decidable
+import arrow.core.typeclasses.Divide
+import arrow.core.typeclasses.Divisible
+import arrow.core.typeclasses.Functor
+import arrow.core.typeclasses.Monad
+import arrow.core.typeclasses.Monoid
+import arrow.core.typeclasses.Profunctor
+import arrow.core.typeclasses.Semigroup
+import arrow.core.typeclasses.conest
+import arrow.core.typeclasses.counnest
+import arrow.core.typeclasses.suspended.monad.Fx
 
 @extension
 interface Function1Semigroup<A, B> : Semigroup<Function1<A, B>> {

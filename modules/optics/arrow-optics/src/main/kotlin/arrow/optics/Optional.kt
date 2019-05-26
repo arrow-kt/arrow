@@ -15,8 +15,8 @@ import arrow.core.toT
 import arrow.data.State
 import arrow.data.map
 import arrow.higherkind
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Monoid
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Monoid
 
 /**
  * [Optional] is a type alias for [POptional] which fixes the type arguments

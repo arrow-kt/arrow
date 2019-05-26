@@ -42,7 +42,7 @@ This will work well in many cases, specially for data classes.
 
 ```kotlin:ank
 import arrow.core.*
-import arrow.typeclasses.*
+import arrow.core.typeclasses.*
 
 // Option is a data class with a single value
 Show.any().run { Option.just(1).show() }
@@ -61,9 +61,9 @@ See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | rela
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.typeclasses.Show
+import arrow.core.typeclasses.Show
 
 TypeClass(Show::class).dtMarkdownList()
 ```
 
-ank_macro_hierarchy(arrow.typeclasses.Show)
+ank_macro_hierarchy(arrow.core.typeclasses.Show)

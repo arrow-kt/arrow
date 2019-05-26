@@ -1,9 +1,9 @@
-package arrow.typeclasses
+package arrow.core.typeclasses
 
 import arrow.Kind2
 
 /**
- * ank_macro_hierarchy(arrow.typeclasses.Category)
+ * ank_macro_hierarchy(arrow.core.typeclasses.Category)
  */
 interface Category<F> {
 

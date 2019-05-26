@@ -6,10 +6,10 @@ import arrow.data.DayOf
 import arrow.data.DayPartialOf
 import arrow.data.fix
 import arrow.extension
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Apply
-import arrow.typeclasses.Comonad
-import arrow.typeclasses.Functor
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Apply
+import arrow.core.typeclasses.Comonad
+import arrow.core.typeclasses.Functor
 import arrow.undocumented
 
 @extension

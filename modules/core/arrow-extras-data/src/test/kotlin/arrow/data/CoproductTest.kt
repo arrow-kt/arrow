@@ -22,8 +22,8 @@ import arrow.test.UnitSpec
 import arrow.test.laws.ComonadLaws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.TraverseLaws
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Hash
+import arrow.core.typeclasses.Eq
+import arrow.core.typeclasses.Hash
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 

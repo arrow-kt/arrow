@@ -5,11 +5,11 @@ import arrow.data.extensions.KleisliApplicative
 import arrow.data.extensions.KleisliFunctor
 import arrow.data.extensions.KleisliMonad
 import arrow.data.extensions.KleisliMonadError
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.ApplicativeError
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadError
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.ApplicativeError
+import arrow.core.typeclasses.Functor
+import arrow.core.typeclasses.Monad
+import arrow.core.typeclasses.MonadError
 import dagger.Module
 import dagger.Provides
 import javax.inject.Inject

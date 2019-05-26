@@ -4,9 +4,9 @@ import arrow.Kind
 import arrow.core.andThen
 import arrow.core.identity
 import arrow.test.generators.functionAToB
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Functor
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Eq
+import arrow.core.typeclasses.Functor
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

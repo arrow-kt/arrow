@@ -1,8 +1,8 @@
 package arrow.core.extensions
 
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Hash
-import arrow.typeclasses.Show
+import arrow.core.typeclasses.Eq
+import arrow.core.typeclasses.Hash
+import arrow.core.typeclasses.Show
 
 interface BooleanShow : Show<Boolean> {
   override fun Boolean.show(): String =

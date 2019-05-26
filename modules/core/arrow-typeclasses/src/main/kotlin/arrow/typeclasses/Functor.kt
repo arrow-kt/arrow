@@ -1,11 +1,11 @@
-package arrow.typeclasses
+package arrow.core.typeclasses
 
 import arrow.Kind
 import arrow.core.Tuple2
 import arrow.documented
 
 /**
- * ank_macro_hierarchy(arrow.typeclasses.Functor)
+ * ank_macro_hierarchy(arrow.core.typeclasses.Functor)
  *
  * The [Functor] type class abstracts the ability to [map] over the computational context of a type constructor.
  * Examples of type constructors that can implement instances of the Functor type class include [_dataType_],

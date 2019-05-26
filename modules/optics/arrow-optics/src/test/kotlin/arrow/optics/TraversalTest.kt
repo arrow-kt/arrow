@@ -21,7 +21,7 @@ import arrow.test.generators.listK
 import arrow.test.generators.tuple2
 import arrow.test.laws.SetterLaws
 import arrow.test.laws.TraversalLaws
-import arrow.typeclasses.Eq
+import arrow.core.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.runner.junit4.KotlinTestRunner

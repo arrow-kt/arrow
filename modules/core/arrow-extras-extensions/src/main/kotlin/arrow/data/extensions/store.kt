@@ -6,8 +6,8 @@ import arrow.data.StorePartialOf
 import arrow.data.fix
 
 import arrow.extension
-import arrow.typeclasses.Comonad
-import arrow.typeclasses.Functor
+import arrow.core.typeclasses.Comonad
+import arrow.core.typeclasses.Functor
 import arrow.undocumented
 
 @extension

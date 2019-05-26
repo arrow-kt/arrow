@@ -1,7 +1,7 @@
 package arrow.mtl.typeclasses
 
 import arrow.Kind
-import arrow.typeclasses.Monad
+import arrow.core.typeclasses.Monad
 
 /**
  * ank_macro_hierarchy(arrow.mtl.typeclasses.MonadReader)

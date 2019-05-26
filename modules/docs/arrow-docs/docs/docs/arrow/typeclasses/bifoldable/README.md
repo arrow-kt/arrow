@@ -15,11 +15,11 @@ intermediate
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.typeclasses.Bifoldable
+import arrow.core.typeclasses.Bifoldable
 
 TypeClass(Bifoldable::class).dtMarkdownList()
 ```
 
-ank_macro_hierarchy(arrow.typeclasses.Bifoldable)
+ank_macro_hierarchy(arrow.core.typeclasses.Bifoldable)
 
 TODO. Meanwhile you can find a short description in the [intro to typeclasses]({{ '/docs/typeclasses/intro/' | relative_url }}).

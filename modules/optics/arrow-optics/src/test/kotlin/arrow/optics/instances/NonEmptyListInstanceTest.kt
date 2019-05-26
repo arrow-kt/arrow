@@ -13,7 +13,7 @@ import arrow.test.generators.functionAToB
 import arrow.test.generators.nonEmptyList
 import arrow.test.laws.OptionalLaws
 import arrow.test.laws.TraversalLaws
-import arrow.typeclasses.Eq
+import arrow.core.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith

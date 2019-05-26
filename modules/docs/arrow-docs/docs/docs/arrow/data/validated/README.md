@@ -226,7 +226,7 @@ We may use `ApplicativeError` instead of `Validated` to abstract away validation
 ```kotlin:ank:silent
 import arrow.*
 import arrow.core.*
-import arrow.typeclasses.*
+import arrow.core.typeclasses.*
 import arrow.data.*
 import arrow.data.extensions.validated.applicativeError.*
 import arrow.core.extensions.either.applicativeError.*

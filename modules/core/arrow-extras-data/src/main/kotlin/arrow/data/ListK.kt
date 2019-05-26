@@ -6,7 +6,7 @@ import arrow.core.Eval
 import arrow.core.Option
 import arrow.core.Tuple2
 import arrow.higherkind
-import arrow.typeclasses.Applicative
+import arrow.core.typeclasses.Applicative
 
 /**
  * A wrapper data type also considered by the @extension mechanisms to forward type class

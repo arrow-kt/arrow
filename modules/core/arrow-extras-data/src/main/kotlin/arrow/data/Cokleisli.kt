@@ -2,7 +2,7 @@ package arrow.data
 
 import arrow.Kind
 import arrow.higherkind
-import arrow.typeclasses.Comonad
+import arrow.core.typeclasses.Comonad
 
 typealias CokleisliFun<F, A, B> = (Kind<F, A>) -> B
 

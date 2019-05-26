@@ -16,9 +16,9 @@ import arrow.data.extensions.listk.foldable.foldable
 import arrow.data.extensions.listk.functor.functor
 import arrow.mtl.extensions.listk.functorFilter.functorFilter
 import arrow.mtl.typeclasses.FunctorFilter
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Foldable
-import arrow.typeclasses.Functor
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Foldable
+import arrow.core.typeclasses.Functor
 
 @extension
 interface ListFrom : From<ForListK> {

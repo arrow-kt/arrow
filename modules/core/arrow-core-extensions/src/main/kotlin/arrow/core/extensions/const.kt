@@ -4,27 +4,27 @@ import arrow.Kind
 import arrow.core.Eval
 import arrow.core.Tuple2
 import arrow.extension
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Apply
-import arrow.typeclasses.Const
-import arrow.typeclasses.ConstOf
-import arrow.typeclasses.ConstPartialOf
-import arrow.typeclasses.Contravariant
-import arrow.typeclasses.Divide
-import arrow.typeclasses.Divisible
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Foldable
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Hash
-import arrow.typeclasses.Invariant
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Semigroup
-import arrow.typeclasses.Show
-import arrow.typeclasses.Traverse
-import arrow.typeclasses.fix
-import arrow.typeclasses.value
-import arrow.typeclasses.ap as constAp
-import arrow.typeclasses.combine as combineAp
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Apply
+import arrow.core.typeclasses.Const
+import arrow.core.typeclasses.ConstOf
+import arrow.core.typeclasses.ConstPartialOf
+import arrow.core.typeclasses.Contravariant
+import arrow.core.typeclasses.Divide
+import arrow.core.typeclasses.Divisible
+import arrow.core.typeclasses.Eq
+import arrow.core.typeclasses.Foldable
+import arrow.core.typeclasses.Functor
+import arrow.core.typeclasses.Hash
+import arrow.core.typeclasses.Invariant
+import arrow.core.typeclasses.Monoid
+import arrow.core.typeclasses.Semigroup
+import arrow.core.typeclasses.Show
+import arrow.core.typeclasses.Traverse
+import arrow.core.typeclasses.fix
+import arrow.core.typeclasses.value
+import arrow.core.typeclasses.ap as constAp
+import arrow.core.typeclasses.combine as combineAp
 
 @extension
 interface ConstInvariant<A> : Invariant<ConstPartialOf<A>> {

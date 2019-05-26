@@ -15,7 +15,7 @@ import arrow.effects.MVar
 import arrow.effects.data.internal.BindingCancellationException
 import arrow.effects.internal.ConcurrentSleep
 import arrow.effects.internal.TimeoutException
-import arrow.typeclasses.MonadContinuation
+import arrow.core.typeclasses.MonadContinuation
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine

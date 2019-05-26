@@ -37,8 +37,8 @@ import arrow.recursion.Algebra
 import arrow.recursion.Coalgebra
 import arrow.recursion.typeclasses.Corecursive
 import arrow.recursion.typeclasses.Recursive
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.ApplicativeError
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.ApplicativeError
 import io.kotlintest.properties.Gen
 import java.util.concurrent.TimeUnit
 

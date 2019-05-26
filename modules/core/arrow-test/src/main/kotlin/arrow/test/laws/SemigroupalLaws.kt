@@ -2,8 +2,8 @@ package arrow.test.laws
 
 import arrow.Kind
 import arrow.core.Tuple2
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Semigroupal
+import arrow.core.typeclasses.Eq
+import arrow.core.typeclasses.Semigroupal
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

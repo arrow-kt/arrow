@@ -5,8 +5,8 @@ import arrow.core.Eval
 import arrow.core.extensions.monoid
 import arrow.test.generators.functionAToB
 import arrow.test.generators.intSmall
-import arrow.typeclasses.Bifoldable
-import arrow.typeclasses.Eq
+import arrow.core.typeclasses.Bifoldable
+import arrow.core.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

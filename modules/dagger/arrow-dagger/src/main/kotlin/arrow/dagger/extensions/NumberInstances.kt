@@ -5,11 +5,11 @@ import arrow.core.extensions.hash
 import arrow.core.extensions.monoid
 import arrow.core.extensions.order
 import arrow.core.extensions.semigroup
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Hash
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Order
-import arrow.typeclasses.Semigroup
+import arrow.core.typeclasses.Eq
+import arrow.core.typeclasses.Hash
+import arrow.core.typeclasses.Monoid
+import arrow.core.typeclasses.Order
+import arrow.core.typeclasses.Semigroup
 import dagger.Module
 import dagger.Provides
 

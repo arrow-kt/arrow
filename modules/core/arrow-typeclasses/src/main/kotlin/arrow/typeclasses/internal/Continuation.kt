@@ -1,4 +1,4 @@
-package arrow.typeclasses
+package arrow.core.typeclasses
 
 interface Continuation<in T> : kotlin.coroutines.Continuation<T> {
   fun resume(value: T)

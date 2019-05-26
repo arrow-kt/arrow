@@ -15,12 +15,12 @@ import arrow.extension
 import arrow.mtl.extensions.option.traverseFilter.traverseFilter
 import arrow.mtl.typeclasses.FunctorFilter
 import arrow.mtl.typeclasses.TraverseFilter
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Nested
-import arrow.typeclasses.Traverse
-import arrow.typeclasses.fix
-import arrow.typeclasses.unnest
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Functor
+import arrow.core.typeclasses.Nested
+import arrow.core.typeclasses.Traverse
+import arrow.core.typeclasses.fix
+import arrow.core.typeclasses.unnest
 
 @extension
 interface OptionTFunctorFilter<F> : FunctorFilter<OptionTPartialOf<F>>, OptionTFunctor<F> {

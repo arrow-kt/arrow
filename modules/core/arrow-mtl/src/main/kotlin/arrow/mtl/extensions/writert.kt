@@ -10,8 +10,8 @@ import arrow.data.fix
 import arrow.extension
 import arrow.mtl.typeclasses.MonadFilter
 import arrow.mtl.typeclasses.MonadWriter
-import arrow.typeclasses.Monad
-import arrow.typeclasses.Monoid
+import arrow.core.typeclasses.Monad
+import arrow.core.typeclasses.Monoid
 
 @extension
 interface WriterTMonadFilter<F, W> : MonadFilter<WriterTPartialOf<F, W>>, WriterTMonad<F, W> {

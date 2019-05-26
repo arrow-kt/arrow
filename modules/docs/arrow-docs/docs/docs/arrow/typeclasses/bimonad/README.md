@@ -19,9 +19,9 @@ TODO. Meanwhile you can find a short description in the [intro to typeclasses]({
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.typeclasses.Bimonad
+import arrow.core.typeclasses.Bimonad
 
 TypeClass(Bimonad::class).dtMarkdownList()
 ```
 
-ank_macro_hierarchy(arrow.typeclasses.Bimonad)
+ank_macro_hierarchy(arrow.core.typeclasses.Bimonad)

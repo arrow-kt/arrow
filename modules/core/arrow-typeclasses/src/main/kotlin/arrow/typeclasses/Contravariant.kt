@@ -1,9 +1,9 @@
-package arrow.typeclasses
+package arrow.core.typeclasses
 
 import arrow.Kind
 
 /**
- * ank_macro_hierarchy(arrow.typeclasses.Contravariant)
+ * ank_macro_hierarchy(arrow.core.typeclasses.Contravariant)
  */
 interface Contravariant<F> : Invariant<F> {
     fun <A, B> Kind<F, A>.contramap(f: (B) -> A): Kind<F, B>

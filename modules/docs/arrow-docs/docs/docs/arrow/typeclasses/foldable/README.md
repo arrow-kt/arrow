@@ -30,7 +30,7 @@ import arrow.data.k
 import arrow.core.extensions.monoid
 import arrow.data.extensions.listk.foldable.foldable
 import arrow.core.extensions.option.foldable.foldable
-import arrow.typeclasses.Foldable
+import arrow.core.typeclasses.Foldable
 ```
 
 and the same two variables to see the different behaviors of `Foldable`:
@@ -525,9 +525,9 @@ foldableGet(rightStr)
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.typeclasses.Foldable
+import arrow.core.typeclasses.Foldable
 
 TypeClass(Foldable::class).dtMarkdownList()
 ```
 
-ank_macro_hierarchy(arrow.typeclasses.Foldable)
+ank_macro_hierarchy(arrow.core.typeclasses.Foldable)

@@ -3,8 +3,8 @@ package arrow.data
 import arrow.Kind
 import arrow.core.Tuple2
 import arrow.higherkind
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Comonad
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Comonad
 
 /*
  * This whole file is a world of gotchas.

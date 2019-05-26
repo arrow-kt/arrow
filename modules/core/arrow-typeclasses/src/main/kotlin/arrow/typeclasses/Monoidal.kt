@@ -1,10 +1,10 @@
-package arrow.typeclasses
+package arrow.core.typeclasses
 
 import arrow.Kind
 import arrow.core.Option
 
 /**
- * ank_macro_hierarchy(arrow.typeclasses.Monoidal)
+ * ank_macro_hierarchy(arrow.core.typeclasses.Monoidal)
  *
  * The [Monoidal] type class adds an identity element to the [Semigroupal] type class by defining the function [identity].
  *

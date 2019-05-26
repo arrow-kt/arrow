@@ -6,7 +6,7 @@ import arrow.core.identity
 import arrow.core.toOption
 import arrow.data.ListK
 import arrow.optics.Traversal
-import arrow.typeclasses.Eq
+import arrow.core.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

@@ -3,9 +3,9 @@ package arrow.ap.objects.deriving
 
 import arrow.core.Either
 import arrow.deriving
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Functor
+import arrow.core.typeclasses.Monad
 
 @Suppress("DEPRECATION", "UNUSED_PARAMETER")
 @deriving(Functor::class, Applicative::class, Monad::class)

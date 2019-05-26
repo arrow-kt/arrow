@@ -5,12 +5,12 @@ import me.eugeniomarletti.kotlin.metadata.plusIfNotBlank
 import java.io.File
 
 sealed class DerivedTypeClass(val type: String)
-object Semigroup : DerivedTypeClass("arrow.typeclasses.Semigroup")
-object Monoid : DerivedTypeClass("arrow.typeclasses.Monoid")
-object Eq : DerivedTypeClass("arrow.typeclasses.Eq")
-object Order : DerivedTypeClass("arrow.typeclasses.Order")
-object Show : DerivedTypeClass("arrow.typeclasses.Show")
-object Hash : DerivedTypeClass("arrow.typeclasses.Hash")
+object Semigroup : DerivedTypeClass("arrow.core.typeclasses.Semigroup")
+object Monoid : DerivedTypeClass("arrow.core.typeclasses.Monoid")
+object Eq : DerivedTypeClass("arrow.core.typeclasses.Eq")
+object Order : DerivedTypeClass("arrow.core.typeclasses.Order")
+object Show : DerivedTypeClass("arrow.core.typeclasses.Show")
+object Hash : DerivedTypeClass("arrow.core.typeclasses.Hash")
 
 class ProductFileGenerator(
   private val annotatedList: Collection<AnnotatedGeneric>,
@@ -104,7 +104,7 @@ class ProductFileGenerator(
   private fun applicativeExtensions(product: AnnotatedGeneric): String =
     if (product.hasTupleFocus)
       """|
-                |fun <F> arrow.typeclasses.Applicative<F>.mapTo${product.sourceSimpleName}${kindedProperties("F", product)}: arrow.Kind<F, ${product.sourceClassName}> =
+                |fun <F> arrow.core.typeclasses.Applicative<F>.mapTo${product.sourceSimpleName}${kindedProperties("F", product)}: arrow.Kind<F, ${product.sourceClassName}> =
                 |    this.map(${product.targets.joinToString(", ") { it.paramName }}, { it.to${product.sourceSimpleName}() })
                 |
                 |""".trimMargin()
@@ -112,7 +112,7 @@ class ProductFileGenerator(
 
   private fun semigroupInstance(product: AnnotatedGeneric): String =
     """|
-                |interface ${product.sourceSimpleName}Semigroup : arrow.typeclasses.Semigroup<${product.sourceClassName}> {
+                |interface ${product.sourceSimpleName}Semigroup : arrow.core.typeclasses.Semigroup<${product.sourceClassName}> {
                 |  override fun ${product.sourceClassName}.combine(b: ${product.sourceClassName}): ${product.sourceClassName} {
                 |    val (${product.types().joinToString(", ") { "x$it" }}) = this
                 |    val (${product.types().joinToString(", ") { "y$it" }}) = b
@@ -120,7 +120,7 @@ class ProductFileGenerator(
                 |  }
                 |
                 |  companion object {
-                |    val defaultInstance : arrow.typeclasses.Semigroup<${product.sourceClassName}> =
+                |    val defaultInstance : arrow.core.typeclasses.Semigroup<${product.sourceClassName}> =
                 |      object : ${product.sourceSimpleName}Semigroup{}
                 |  }
                 |}
@@ -131,12 +131,12 @@ class ProductFileGenerator(
 
   private fun monoidInstance(product: AnnotatedGeneric): String =
     """|
-                |interface ${product.sourceSimpleName}Monoid: arrow.typeclasses.Monoid<${product.sourceClassName}>, ${product.sourceSimpleName}Semigroup {
+                |interface ${product.sourceSimpleName}Monoid: arrow.core.typeclasses.Monoid<${product.sourceClassName}>, ${product.sourceSimpleName}Semigroup {
                 |  override fun empty(): ${product.sourceClassName} =
                 |    ${product.sourceClassName}(${product.types().zip(product.targetNames).joinToString(", ") { "with(${it.second.companionFromType()}.monoid${it.second.typeArg()}(${it.second.instance(product, "${product.sourceSimpleName}Monoid", "monoid()")})){ empty() }" }})
                 |
                 |    companion object {
-                |       val defaultInstance : arrow.typeclasses.Monoid<${product.sourceClassName}> =
+                |       val defaultInstance : arrow.core.typeclasses.Monoid<${product.sourceClassName}> =
                 |           object : ${product.sourceSimpleName}Monoid{}
                 |    }
                 |}
@@ -147,12 +147,12 @@ class ProductFileGenerator(
 
   private fun eqInstance(product: AnnotatedGeneric): String =
     """|
-                |interface ${product.sourceSimpleName}Eq : arrow.typeclasses.Eq<${product.sourceClassName}> {
+                |interface ${product.sourceSimpleName}Eq : arrow.core.typeclasses.Eq<${product.sourceClassName}> {
                 |  override fun ${product.sourceClassName}.eqv(b: ${product.sourceClassName}): Boolean =
                 |    this == b
                 |
                 |  companion object {
-                |    val defaultInstance : arrow.typeclasses.Eq<${product.sourceClassName}> =
+                |    val defaultInstance : arrow.core.typeclasses.Eq<${product.sourceClassName}> =
                 |           object : ${product.sourceSimpleName}Eq{}
                 |  }
                 |}
@@ -165,7 +165,7 @@ class ProductFileGenerator(
   private fun processElement(product: AnnotatedGeneric): Pair<AnnotatedGeneric, String> = product to """
             |${if (product.classData.`package`.escapedClassName != "`unnamed package`") "package ${product.classData.`package`.escapedClassName}" else ""}
             |
-            |import arrow.typeclasses.*
+            |import arrow.core.typeclasses.*
             |import arrow.core.*
             |import arrow.core.extensions.*
             |import arrow.data.extensions.*
@@ -188,7 +188,7 @@ class ProductFileGenerator(
             |
             |${eqInstance(product)}
             |
-            |interface ${product.sourceSimpleName}Show : arrow.typeclasses.Show<${product.sourceClassName}> {
+            |interface ${product.sourceSimpleName}Show : arrow.core.typeclasses.Show<${product.sourceClassName}> {
             |  override fun ${product.sourceClassName}.show(): String =
             |    this.toString()
             |}

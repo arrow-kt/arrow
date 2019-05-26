@@ -30,7 +30,7 @@ by chaining `Cons` constructors.
 ```kotlin:ank
 import arrow.*
 import arrow.core.*
-import arrow.typeclasses.*
+import arrow.core.typeclasses.*
 import arrow.recursion.*
 
 IntList.Cons(3, IntList.Cons(2, IntList.Cons(1, IntList.Nil)))

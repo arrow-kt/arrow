@@ -14,7 +14,7 @@ import arrow.test.UnitSpec
 import arrow.test.generators.functionAToB
 import arrow.test.generators.option
 import arrow.test.laws.SetterLaws
-import arrow.typeclasses.Eq
+import arrow.core.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.runner.junit4.KotlinTestRunner

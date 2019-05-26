@@ -6,9 +6,9 @@ import arrow.core.Left
 import arrow.core.Right
 import arrow.core.flatMap
 import arrow.higherkind
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Functor
+import arrow.core.typeclasses.Monad
 
 fun <F, A, B> EitherTOf<F, A, B>.value(): Kind<F, Either<A, B>> = fix().value()
 

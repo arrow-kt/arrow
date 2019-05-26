@@ -20,8 +20,8 @@ import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
 import arrow.effects.typeclasses.ProcF
 import arrow.extension
-import arrow.typeclasses.MonadError
-import arrow.typeclasses.Monoid
+import arrow.core.typeclasses.MonadError
+import arrow.core.typeclasses.Monoid
 import arrow.undocumented
 import kotlin.coroutines.CoroutineContext
 

@@ -12,10 +12,10 @@ import arrow.data.extensions.andthen.profunctor.profunctor
 import arrow.data.extensions.list.foldable.foldLeft
 import arrow.test.UnitSpec
 import arrow.test.generators.functionAToB
-import arrow.typeclasses.Conested
-import arrow.typeclasses.Eq
-import arrow.typeclasses.conest
-import arrow.typeclasses.counnest
+import arrow.core.typeclasses.Conested
+import arrow.core.typeclasses.Eq
+import arrow.core.typeclasses.conest
+import arrow.core.typeclasses.counnest
 import arrow.core.identity
 import arrow.test.laws.CategoryLaws
 import arrow.test.laws.ContravariantLaws

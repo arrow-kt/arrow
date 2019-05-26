@@ -1,4 +1,4 @@
-package arrow.typeclasses
+package arrow.core.typeclasses
 
 import arrow.Kind
 import arrow.core.Either
@@ -9,7 +9,7 @@ import arrow.core.left
 import arrow.core.right
 
 /**
- * ank_macro_hierarchy(arrow.typeclasses.Selective)
+ * ank_macro_hierarchy(arrow.core.typeclasses.Selective)
  */
 interface Selective<F> : Applicative<F> {
   fun <A, B> Kind<F, Either<A, B>>.select(f: Kind<F, (A) -> B>): Kind<F, B>

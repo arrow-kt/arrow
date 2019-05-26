@@ -1,9 +1,9 @@
-package arrow.typeclasses
+package arrow.core.typeclasses
 
 import arrow.Kind
 
 /**
- * ank_macro_hierarchy(arrow.typeclasses.MonoidK)
+ * ank_macro_hierarchy(arrow.core.typeclasses.MonoidK)
  *
  * MonoidK is a universal monoid which operates on kinds.
  *

@@ -2,7 +2,7 @@ package arrow.test.laws
 
 import arrow.Kind
 import arrow.mtl.typeclasses.MonadCombine
-import arrow.typeclasses.Eq
+import arrow.core.typeclasses.Eq
 
 object MonadCombineLaws {
 

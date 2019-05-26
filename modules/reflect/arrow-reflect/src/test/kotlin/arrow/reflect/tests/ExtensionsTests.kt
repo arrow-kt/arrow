@@ -13,9 +13,9 @@ import arrow.reflect.hierarchy
 import arrow.reflect.supportedDataTypes
 import arrow.reflect.supportedTypeClasses
 import arrow.test.UnitSpec
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Invariant
-import arrow.typeclasses.MonadError
+import arrow.core.typeclasses.Functor
+import arrow.core.typeclasses.Invariant
+import arrow.core.typeclasses.MonadError
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import org.junit.runner.RunWith

@@ -81,9 +81,9 @@ Contents partially adapted from [Scala Exercises Cat's Semigroup Tutorial](https
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.typeclasses.Semigroup
+import arrow.core.typeclasses.Semigroup
 
 TypeClass(Semigroup::class).dtMarkdownList()
 ```
 
-ank_macro_hierarchy(arrow.typeclasses.Semigroup)
+ank_macro_hierarchy(arrow.core.typeclasses.Semigroup)

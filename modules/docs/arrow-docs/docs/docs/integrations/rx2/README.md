@@ -123,7 +123,7 @@ When rewritten using `bindingCatch` it becomes:
 
 ```kotlin
 import arrow.effects.rx2.*
-import arrow.typeclasses.*
+import arrow.core.typeclasses.*
 import arrow.effects.rx2.extensions.observable.monadThrow.bindingCatch
 
 bindingCatch {

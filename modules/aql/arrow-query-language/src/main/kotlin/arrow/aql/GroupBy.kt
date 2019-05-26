@@ -9,7 +9,7 @@ import arrow.core.toT
 import arrow.data.ForListK
 import arrow.data.fix
 import arrow.data.mapOf
-import arrow.typeclasses.Foldable
+import arrow.core.typeclasses.Foldable
 
 interface GroupBy<F> {
 

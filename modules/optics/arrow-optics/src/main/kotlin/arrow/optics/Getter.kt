@@ -12,7 +12,7 @@ import arrow.data.Reader
 import arrow.data.State
 import arrow.data.map
 import arrow.higherkind
-import arrow.typeclasses.Monoid
+import arrow.core.typeclasses.Monoid
 
 /**
  * A [Getter] is an optic that allows to see into a structure and getting a focus.

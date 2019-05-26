@@ -4,7 +4,7 @@ import arrow.core.ForId
 import arrow.core.Id
 import arrow.core.identity
 import arrow.core.value
-import arrow.typeclasses.Foldable
+import arrow.core.typeclasses.Foldable
 
 interface Sum<F> {
 

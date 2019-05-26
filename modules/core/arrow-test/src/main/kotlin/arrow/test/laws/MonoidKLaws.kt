@@ -2,9 +2,9 @@ package arrow.test.laws
 
 import arrow.Kind
 import arrow.data.extensions.list.foldable.fold
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Eq
-import arrow.typeclasses.MonoidK
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Eq
+import arrow.core.typeclasses.MonoidK
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

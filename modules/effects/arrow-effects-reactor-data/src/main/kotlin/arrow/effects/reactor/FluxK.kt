@@ -13,7 +13,7 @@ import arrow.effects.reactor.CoroutineContextReactorScheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
 import arrow.higherkind
-import arrow.typeclasses.Applicative
+import arrow.core.typeclasses.Applicative
 import reactor.core.publisher.Flux
 import reactor.core.publisher.FluxSink
 import kotlin.coroutines.CoroutineContext

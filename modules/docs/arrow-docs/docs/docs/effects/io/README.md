@@ -195,7 +195,7 @@ IO.async<Int> { callback ->
 [Comprehensions]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) also enable cancellation and parallelization of IO effects.
 
 ```kotlin
-import arrow.typeclasses.*
+import arrow.core.typeclasses.*
 import arrow.effects.*
 import arrow.effects.extensions.io.monad.binding
 

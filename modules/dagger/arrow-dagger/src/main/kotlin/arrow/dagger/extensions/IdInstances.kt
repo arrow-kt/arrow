@@ -7,11 +7,11 @@ import arrow.core.extensions.id.bimonad.bimonad
 import arrow.core.extensions.id.comonad.comonad
 import arrow.core.extensions.id.functor.functor
 import arrow.core.extensions.id.monad.monad
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Bimonad
-import arrow.typeclasses.Comonad
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Bimonad
+import arrow.core.typeclasses.Comonad
+import arrow.core.typeclasses.Functor
+import arrow.core.typeclasses.Monad
 import dagger.Module
 import dagger.Provides
 

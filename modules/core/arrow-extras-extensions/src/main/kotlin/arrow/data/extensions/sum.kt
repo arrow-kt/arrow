@@ -7,15 +7,15 @@ import arrow.data.Sum
 import arrow.data.SumPartialOf
 import arrow.data.fix
 import arrow.extension
-import arrow.typeclasses.Comonad
-import arrow.typeclasses.Contravariant
-import arrow.typeclasses.Decidable
-import arrow.typeclasses.Divide
-import arrow.typeclasses.Divisible
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Hash
-import arrow.typeclasses.fix
+import arrow.core.typeclasses.Comonad
+import arrow.core.typeclasses.Contravariant
+import arrow.core.typeclasses.Decidable
+import arrow.core.typeclasses.Divide
+import arrow.core.typeclasses.Divisible
+import arrow.core.typeclasses.Eq
+import arrow.core.typeclasses.Functor
+import arrow.core.typeclasses.Hash
+import arrow.core.typeclasses.fix
 import arrow.undocumented
 
 @extension

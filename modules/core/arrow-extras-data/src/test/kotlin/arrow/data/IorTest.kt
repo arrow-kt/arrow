@@ -22,9 +22,9 @@ import arrow.test.laws.MonadLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.test.laws.fix
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Hash
-import arrow.typeclasses.Monad
+import arrow.core.typeclasses.Eq
+import arrow.core.typeclasses.Hash
+import arrow.core.typeclasses.Monad
 import io.kotlintest.properties.forAll
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe

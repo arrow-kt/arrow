@@ -7,7 +7,7 @@ import arrow.core.identity
 import arrow.data.ForListK
 import arrow.data.fix
 import arrow.data.k
-import arrow.typeclasses.Foldable
+import arrow.core.typeclasses.Foldable
 
 interface Count<F> {
 

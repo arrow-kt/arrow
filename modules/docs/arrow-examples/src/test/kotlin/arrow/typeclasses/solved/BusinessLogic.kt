@@ -5,8 +5,8 @@ import arrow.core.Try
 import arrow.core.handleErrorWith
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.MonadDefer
-import arrow.typeclasses.Index
-import arrow.typeclasses.User
+import arrow.core.typeclasses.Index
+import arrow.core.typeclasses.User
 import kotlin.coroutines.CoroutineContext
 
 // Step 0 - Compose operations

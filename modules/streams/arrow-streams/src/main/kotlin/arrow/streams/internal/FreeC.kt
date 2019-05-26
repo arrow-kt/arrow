@@ -14,7 +14,7 @@ import arrow.core.some
 import arrow.effects.typeclasses.ExitCase
 import arrow.streams.CompositeFailure
 import arrow.streams.internal.FreeC.Result
-import arrow.typeclasses.MonadError
+import arrow.core.typeclasses.MonadError
 
 // TODO temporary here until moved instances to separate module
 class ForFreeC private constructor() {

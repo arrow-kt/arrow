@@ -22,8 +22,8 @@ import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
 import arrow.effects.typeclasses.ProcF
 import arrow.extension
-import arrow.typeclasses.ApplicativeError
-import arrow.typeclasses.Monad
+import arrow.core.typeclasses.ApplicativeError
+import arrow.core.typeclasses.Monad
 import arrow.undocumented
 import kotlin.coroutines.CoroutineContext
 

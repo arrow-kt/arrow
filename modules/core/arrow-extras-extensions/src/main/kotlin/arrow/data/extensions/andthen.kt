@@ -10,18 +10,18 @@ import arrow.data.ForAndThen
 import arrow.data.fix
 import arrow.data.invoke
 import arrow.extension
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Apply
-import arrow.typeclasses.Category
-import arrow.typeclasses.Conested
-import arrow.typeclasses.Contravariant
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Profunctor
-import arrow.typeclasses.Semigroup
-import arrow.typeclasses.conest
-import arrow.typeclasses.counnest
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Apply
+import arrow.core.typeclasses.Category
+import arrow.core.typeclasses.Conested
+import arrow.core.typeclasses.Contravariant
+import arrow.core.typeclasses.Functor
+import arrow.core.typeclasses.Monad
+import arrow.core.typeclasses.Monoid
+import arrow.core.typeclasses.Profunctor
+import arrow.core.typeclasses.Semigroup
+import arrow.core.typeclasses.conest
+import arrow.core.typeclasses.counnest
 
 @extension
 interface AndThenSemigroup<A, B> : Semigroup<AndThen<A, B>> {

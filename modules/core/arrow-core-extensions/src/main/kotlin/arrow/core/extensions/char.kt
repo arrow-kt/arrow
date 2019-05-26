@@ -1,9 +1,9 @@
 package arrow.core.extensions
 
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Hash
-import arrow.typeclasses.Order
-import arrow.typeclasses.Show
+import arrow.core.typeclasses.Eq
+import arrow.core.typeclasses.Hash
+import arrow.core.typeclasses.Order
+import arrow.core.typeclasses.Show
 
 interface CharShow : Show<Char> {
   override fun Char.show(): String =

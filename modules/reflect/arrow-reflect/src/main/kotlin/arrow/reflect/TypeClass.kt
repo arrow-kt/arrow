@@ -6,7 +6,7 @@ import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.full.superclasses
 
 /**
- * A type class such as arrow.typeclasses.Functor
+ * A type class such as arrow.core.typeclasses.Functor
  */
 data class TypeClass(val kclass: KClass<*>)
 

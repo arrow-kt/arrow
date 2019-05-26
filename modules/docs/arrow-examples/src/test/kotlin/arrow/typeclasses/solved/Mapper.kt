@@ -2,11 +2,11 @@ package com.pacoworks.typeclasses.basics.solved
 
 import arrow.Kind
 import arrow.core.Try
-import arrow.typeclasses.MonadError
-import arrow.typeclasses.User
-import arrow.typeclasses.UserDao
-import arrow.typeclasses.UserDto
-import arrow.typeclasses.realWorld
+import arrow.core.typeclasses.MonadError
+import arrow.core.typeclasses.User
+import arrow.core.typeclasses.UserDao
+import arrow.core.typeclasses.UserDto
+import arrow.core.typeclasses.realWorld
 
 // Step 0
 

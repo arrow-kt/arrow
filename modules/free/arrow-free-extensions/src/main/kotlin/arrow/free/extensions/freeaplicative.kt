@@ -7,11 +7,11 @@ import arrow.free.FreeApplicative
 import arrow.free.FreeApplicativePartialOf
 import arrow.free.fix
 import arrow.extension
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Apply
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Apply
+import arrow.core.typeclasses.Eq
+import arrow.core.typeclasses.Functor
+import arrow.core.typeclasses.Monad
 import arrow.undocumented
 
 @extension

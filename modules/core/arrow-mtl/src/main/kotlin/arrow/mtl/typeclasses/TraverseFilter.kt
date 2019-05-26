@@ -7,8 +7,8 @@ import arrow.core.Option
 import arrow.core.Some
 import arrow.core.extensions.id.applicative.applicative
 import arrow.core.value
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Traverse
+import arrow.core.typeclasses.Applicative
+import arrow.core.typeclasses.Traverse
 
 /**
  * ank_macro_hierarchy(arrow.mtl.typeclasses.TraverseFilter)

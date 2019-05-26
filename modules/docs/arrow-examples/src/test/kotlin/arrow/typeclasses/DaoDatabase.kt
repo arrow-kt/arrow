@@ -1,6 +1,6 @@
 @file:Suppress("unused")
 
-package arrow.typeclasses
+package arrow.core.typeclasses
 
 typealias Query = String
 

@@ -7,8 +7,8 @@ import arrow.core.Eval
 import arrow.core.Option
 import arrow.extension
 import arrow.mtl.typeclasses.FunctorFilter
-import arrow.typeclasses.Foldable
-import arrow.typeclasses.Functor
+import arrow.core.typeclasses.Foldable
+import arrow.core.typeclasses.Functor
 import arrow.undocumented
 
 // import arrow.higherkind

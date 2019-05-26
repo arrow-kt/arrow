@@ -14,7 +14,7 @@ import arrow.mtl.typeclasses.FunctorFilter
 import arrow.mtl.typeclasses.MonadCombine
 import arrow.mtl.typeclasses.MonadFilter
 import arrow.mtl.typeclasses.TraverseFilter
-import arrow.typeclasses.Applicative
+import arrow.core.typeclasses.Applicative
 import arrow.core.extensions.traverse as optionTraverse
 import arrow.core.extensions.traverseFilter as optionTraverseFilter
 

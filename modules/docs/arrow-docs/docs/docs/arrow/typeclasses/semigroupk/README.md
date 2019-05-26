@@ -15,9 +15,9 @@ TODO. Meanwhile you can find a short description in the [intro to typeclasses]({
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.typeclasses.SemigroupK
+import arrow.core.typeclasses.SemigroupK
 
 TypeClass(SemigroupK::class).dtMarkdownList()
 ```
 
-ank_macro_hierarchy(arrow.typeclasses.SemigroupK)
+ank_macro_hierarchy(arrow.core.typeclasses.SemigroupK)

@@ -26,7 +26,7 @@ And let's see the instance of Monoid<String> in action.
 ```kotlin:ank
 import arrow.*
 import arrow.core.extensions.*
-import arrow.typeclasses.*
+import arrow.core.typeclasses.*
 
 String.monoid().run { empty() }
 ```
@@ -91,9 +91,9 @@ list.foldMap(M) { n: Int ->
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.typeclasses.Monoid
+import arrow.core.typeclasses.Monoid
 
 TypeClass(Monoid::class).dtMarkdownList()
 ```
 
-ank_macro_hierarchy(arrow.typeclasses.Monoid)
+ank_macro_hierarchy(arrow.core.typeclasses.Monoid)

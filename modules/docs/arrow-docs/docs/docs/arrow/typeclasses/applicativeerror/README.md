@@ -149,7 +149,7 @@ In this validation example we demonstrate how we can use `ApplicativeError` inst
 ```kotlin
 import arrow.*
 import arrow.core.*
-import arrow.typeclasses.*
+import arrow.core.typeclasses.*
 import arrow.data.*
 
 sealed class ValidationError(val msg: String) {
@@ -225,9 +225,9 @@ Rules failFast {
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.typeclasses.ApplicativeError
+import arrow.core.typeclasses.ApplicativeError
 
 TypeClass(ApplicativeError::class).dtMarkdownList()
 ```
 
-ank_macro_hierarchy(arrow.typeclasses.ApplicativeError)
+ank_macro_hierarchy(arrow.core.typeclasses.ApplicativeError)

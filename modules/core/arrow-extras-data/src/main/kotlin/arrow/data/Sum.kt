@@ -2,8 +2,8 @@ package arrow.data
 
 import arrow.Kind
 import arrow.higherkind
-import arrow.typeclasses.Comonad
-import arrow.typeclasses.Functor
+import arrow.core.typeclasses.Comonad
+import arrow.core.typeclasses.Functor
 
 @higherkind
 data class Sum<F, G, V>(
