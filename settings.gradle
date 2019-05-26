@@ -93,10 +93,6 @@ include {
             _ 'dagger-effects-rx2'
         }
 
-        shadow {
-            _ 'shadow'
-        }
-
         streams {
             _ 'streams'
         }
