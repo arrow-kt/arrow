@@ -30,8 +30,8 @@ import kotlin.coroutines.CoroutineContext
  *     val promise = Promise.uncancelable<ForIO, Int>(IO.async()).bind()
  *     val eitherGetOrUnit = Dispatchers.Default.racePair(promise.get(), IO.unit).bind()
  *     eitherGetOrUnit.fold(
- *       { IO.raiseError<Int>(RuntimeException("Promise.get cannot win before complete")) },
- *       { (a: Fiber<ForIO, Int>, _) -> promise.complete(1).flatMap { a.join() } }
+ *       { _, _ -> IO.raiseError<Int>(RuntimeException("Promise.get cannot win before complete")) },
+ *       { a: Fiber<ForIO, Int>, _ -> promise.complete(1).flatMap { a.join() } }
  *     ).bind()
  *   }.unsafeRunSync() == 1
  *   //sampleEnd

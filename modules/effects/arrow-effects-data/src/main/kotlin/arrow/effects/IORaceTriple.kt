@@ -29,9 +29,9 @@ import kotlin.coroutines.CoroutineContext
  *     val promise = Promise.uncancelable<ForIO, Int>(IO.async()).bind()
  *     val raceTriple = IO.raceTriple(Dispatchers.Default, promise.get(), IO.unit, IO.never).bind()
  *     raceTriple.fold(
- *       { IO.raiseError<Int>(RuntimeException("Promise.get cannot win before complete")) },
- *       { (a: Fiber<ForIO, Int>, _, _) -> promise.complete(1).flatMap { a.join() } },
- *       { IO.raiseError<Int>(RuntimeException("never cannot win before complete")) }
+ *       { _, _, _ -> IO.raiseError<Int>(RuntimeException("Promise.get cannot win before complete")) },
+ *       { a: Fiber<ForIO, Int>, _, _ -> promise.complete(1).flatMap { a.join() } },
+ *       { _, _, _ -> IO.raiseError<Int>(RuntimeException("never cannot win before complete")) }
  *     ).bind()
  *   }.unsafeRunSync() == 1
  *   //sampleEnd
