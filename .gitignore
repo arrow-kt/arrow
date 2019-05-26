@@ -130,5 +130,3 @@ reports/
 .DS_Store
 
 target/
-
-.bash_profile
