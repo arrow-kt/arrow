@@ -36,7 +36,7 @@ For function objects the library provides composition, currying, partial applica
 
 For collections, arrow-syntax provides `firstOption`, tail, basic list traversal, and tuple addition.
 
-### arrow-typeclasses
+### arrow-core-typeclasses
 
 {:.intermediate}
 intermediate
@@ -57,7 +57,7 @@ beginner
 This library focuses on expanding the helpers provided by typeclasses to existing constructs, like the system collections.
 You can also find more advanced constructs for pure functional programming like the `RWS` datatypes, or transformers.
 
-Dependencies: arrow-typeclasses
+Dependencies: arrow-core-typeclasses
 
 Datatypes: [`Cokleisli`]({{ '/docs/datatypes/cokleisli/' | relative_url }}), [`Coreader`]({{ '/docs/datatypes/coreader/' | relative_url }}), [`Ior`]({{ '/docs/arrow/data/ior/' | relative_url }}), [`ListK`]({{ '/docs/arrow/data/listk/' | relative_url }}), [`NonEmptyList`]({{ '/docs/arrow/data/nonemptylist/' | relative_url }}), [`SequenceK`]({{ '/docs/arrow/data/sequencek/' | relative_url }}), [`SortedMapK`]({{ '/docs/arrow/data/sortedmapk/' | relative_url }}), [`StateT`]({{ '/docs/arrow/data/statet/' | relative_url }}), [`WriterT`]({{ '/docs/arrow/data/writert/' | relative_url }}), [`Coproduct`]({{ '/docs/arrow/data/coproduct/' | relative_url }}), [`EitherT`]({{ '/docs/arrow/data/eithert/' | relative_url }}), [`Kleisli`]({{ '/docs/arrow/data/kleisli/' | relative_url }}), [`MapK`]({{ '/docs/arrow/data/mapk/' | relative_url }}), [`OptionT`]({{ '/docs/arrow/data/optiont/' | relative_url }}), [`Reader`]({{ '/docs/arrow/data/reader/' | relative_url }}), [`SetK`]({{ '/docs/arrow/data/setk/' | relative_url }}), [`State`]({{ '/docs/arrow/data/state/' | relative_url }}), [`Validated`]({{ '/docs/arrow/data/validated/' | relative_url }})
 
@@ -68,7 +68,7 @@ intermediate
 
 These libraries include the possible [typeclass extensions]({{ '/docs/patterns/glossary/#instances-and-extensions-interfaces' | relative_url }}) that can be implemented for the datatypes in their respective libraries.
 
-Dependencies: arrow-typeclasses, and the base libraries they extend
+Dependencies: arrow-core-typeclasses, and the base libraries they extend
 
 ### arrow-mtl
 

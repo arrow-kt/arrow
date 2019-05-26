@@ -105,10 +105,10 @@ Dokka is responsible of generating documentation based on source code annotation
 ```
 
 You can run Dokka for a **single module**. That will save you a lot of time. For example, if you've added some docs to the
-`arrow-typeclasses` module, just run:
+`arrow-core-typeclasses` module, just run:
 
 ```bash
-./gradlew clean :arrow-typeclasses:dokka
+./gradlew clean :arrow-core-typeclasses:dokka
 ```
 
 After running Dokka, you can run Ank. That will deploy all the Dokka generated binaries along with the rest of the docs.

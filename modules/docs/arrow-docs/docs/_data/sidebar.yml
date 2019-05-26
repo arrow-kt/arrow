@@ -33,7 +33,7 @@ options:
     nested_options:
 
       - title: Type Classes
-        url: /docs/apidocs/arrow-typeclasses/
+        url: /docs/apidocs/arrow-core-typeclasses/
 
       - title: Core Data Types
         url: /docs/apidocs/arrow-core-data/
@@ -240,16 +240,16 @@ options:
         url: /docs/arrow/typeclasses/semigroup/
 
       - title: Semigroupal
-        url: /docs/apidocs/arrow-typeclasses/arrow.typeclasses/-semigroupal/
+        url: /docs/apidocs/arrow-core-typeclasses/arrow.typeclasses/-semigroupal/
 
       - title: Monoidal
-        url: /docs/apidocs/arrow-typeclasses/arrow.typeclasses/-monoidal/
+        url: /docs/apidocs/arrow-core-typeclasses/arrow.typeclasses/-monoidal/
 
       - title: Monoid
         url: /docs/arrow/typeclasses/monoid/
 
       - title: Semiring
-        url: /docs/apidocs/arrow-typeclasses/arrow.typeclasses/-semiring/
+        url: /docs/apidocs/arrow-core-typeclasses/arrow.typeclasses/-semiring/
 
       - title: Foldable
         url: /docs/arrow/typeclasses/foldable/
