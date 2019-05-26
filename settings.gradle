@@ -87,12 +87,6 @@ include {
             _ 'optics'
         }
 
-        dagger {
-            _ 'dagger'
-            _ 'dagger-effects'
-            _ 'dagger-effects-rx2'
-        }
-
         streams {
             _ 'streams'
         }
