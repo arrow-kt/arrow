@@ -1,7 +1,9 @@
-package arrow.effects.typeclasses
+package arrow.effects
 
 import arrow.Kind
 import arrow.effects.internal.ConcurrentSleep
+import arrow.effects.typeclasses.Concurrent
+import arrow.effects.typeclasses.Duration
 
 /**
  * [Timer] allows to [sleep] for a [Duration] in [F].
@@ -22,8 +24,8 @@ interface Timer<F> {
    * fun main(args: Array<String>) {
    *   //sampleStart
    *   fun <F> Concurrent<F>.delayHelloWorld(): Kind<F, Unit> =
-   *     timer().sleep(3.seconds).flatMap {
-   *       delay { println("Hello World!") }
+   *     Timer(this).sleep(3.seconds).flatMap {
+   *       effect { println("Hello World!") }
    *     }
    *   //sampleEnd
    *   IO.concurrent().delayHelloWorld()
