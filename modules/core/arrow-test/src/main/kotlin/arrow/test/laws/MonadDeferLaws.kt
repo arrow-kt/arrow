@@ -253,7 +253,7 @@ object MonadDeferLaws {
   fun <F> MonadDefer<F>.inContextCancellationBefore(EQ: Eq<Kind<F, Int>>): Unit =
     forFew(5, Gen.intSmall()) { num: Int ->
       val sideEffect = SideEffect()
-      val (binding, dispose) = bindingCancellable {
+      val (binding, dispose) = fx {
         val a = bindIn(Dispatchers.Default) { Thread.sleep(20); num }
         sideEffect.increment()
         val b = bindIn(Dispatchers.Default) { a + 1 }

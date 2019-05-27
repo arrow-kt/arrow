@@ -2,13 +2,7 @@ package arrow.effects.typeclasses
 
 import arrow.Kind
 import arrow.core.Either
-import arrow.core.Tuple2
-import arrow.core.toT
 import arrow.effects.Ref
-import arrow.effects.data.internal.BindingCancellationException
-import arrow.typeclasses.MonadContinuation
-import arrow.typeclasses.MonadError
-import arrow.typeclasses.MonadErrorContinuation
 import arrow.typeclasses.MonadThrow
 
 /**

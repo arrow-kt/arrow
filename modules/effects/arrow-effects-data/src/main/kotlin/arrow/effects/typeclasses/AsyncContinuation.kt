@@ -40,9 +40,6 @@ open class AsyncContinuation<F, A>(val SC: Async<F>, override val context: Corou
   suspend fun <B> bindDeferUnsafe(f: () -> Either<Throwable, B>): B =
           delayOrRaise(f).bind()
 
-  override fun <B> bindingCatch(c: suspend MonadErrorContinuation<F, *>.() -> B): Kind<F, B> =
-    bindingCancellable(c).a
-
   override suspend fun <B> bind(m: () -> Kind<F, B>): B = suspendCoroutineUninterceptedOrReturn { c ->
     val labelHere = c.stateStack // save the whole coroutine stack labels
     returnedMonad = m().flatMap { x: B ->

@@ -21,7 +21,6 @@ import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.AsyncContinuation
 import arrow.effects.typeclasses.Proc
 import arrow.effects.typeclasses.ProcF
-import arrow.effects.typeclasses.suspended.monaddefer.Fx
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
