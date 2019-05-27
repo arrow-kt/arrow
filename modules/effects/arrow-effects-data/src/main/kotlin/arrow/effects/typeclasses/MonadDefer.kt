@@ -2,6 +2,13 @@ package arrow.effects.typeclasses
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.core.Tuple2
+import arrow.core.toT
+import arrow.effects.Ref
+import arrow.effects.data.internal.BindingCancellationException
+import arrow.typeclasses.MonadContinuation
+import arrow.typeclasses.MonadError
+import arrow.typeclasses.MonadErrorContinuation
 import arrow.typeclasses.MonadThrow
 
 /**
@@ -24,24 +31,14 @@ interface MonadDefer<F> : MonadThrow<F>, Bracket<F, Throwable> {
 
   fun <A> delay(fa: Kind<F, A>): Kind<F, A> = defer { fa }
 
-  @Deprecated("Use delay instead",
-    ReplaceWith("delay(f)", "arrow.effects.typeclasses.MonadDefer"))
-  operator fun <A> invoke(f: () -> A): Kind<F, A> =
-    defer {
-      try {
-        just(f())
-      } catch (t: Throwable) {
-        t.raiseNonFatal<A>()
-      }
-    }
-
   fun lazy(): Kind<F, Unit> = delay { }
 
   fun <A> delayOrRaise(f: () -> Either<Throwable, A>): Kind<F, A> =
     defer { f().fold({ raiseError<A>(it) }, { just(it) }) }
 
-  @Deprecated("Use delayOrRaise instead",
-          ReplaceWith("delayOrRaise(f)", "arrow.effects.typeclasses.MonadDefer"))
-  fun <A> deferUnsafe(f: () -> Either<Throwable, A>): Kind<F, A> = delayOrRaise(f)
+  /**
+   * Creates a [Ref] to purely manage mutable state, initialized by the function [f]
+   */
+  fun <A> ref(f: () -> A): Kind<F, Ref<F, A>> = Ref(this, f)
 
 }

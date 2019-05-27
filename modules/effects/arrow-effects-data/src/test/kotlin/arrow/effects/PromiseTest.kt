@@ -4,8 +4,8 @@ import arrow.core.Left
 import arrow.core.None
 import arrow.core.Some
 import arrow.core.Tuple2
-import arrow.effects.extensions.io.apply.product
 import arrow.effects.extensions.io.applicativeError.attempt
+import arrow.effects.extensions.io.apply.product
 import arrow.effects.extensions.io.async.async
 import arrow.effects.extensions.io.concurrent.concurrent
 import arrow.effects.extensions.io.functor.tupleLeft
@@ -13,9 +13,9 @@ import arrow.effects.extensions.io.monad.flatMap
 import arrow.effects.extensions.io.monadDefer.monadDefer
 import arrow.test.UnitSpec
 import arrow.test.generators.throwable
-import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
+import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import kotlinx.coroutines.Dispatchers
 import org.junit.runner.RunWith
@@ -122,7 +122,7 @@ class PromiseTest : UnitSpec() {
       }
 
       "$label - get blocks until set" {
-        Ref.of(0, IO.monadDefer()).flatMap { state ->
+        Ref(IO.monadDefer()) { 0 }.flatMap { state ->
           promise.flatMap { modifyGate ->
             promise.flatMap { readGate ->
               modifyGate.get().flatMap { state.update { i -> i * 2 }.flatMap { readGate.complete(0) } }.startFiber(ctx).flatMap {

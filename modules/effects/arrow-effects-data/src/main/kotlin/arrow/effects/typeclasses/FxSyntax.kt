@@ -7,13 +7,15 @@ import arrow.core.TryOf
 import arrow.core.identity
 import arrow.data.extensions.list.traverse.traverse
 import arrow.data.fix
+import arrow.effects.typeclasses.Bracket
+import arrow.effects.typeclasses.Concurrent
+import arrow.effects.typeclasses.ExitCase
+import arrow.effects.typeclasses.Fiber
 import arrow.effects.internal.asyncContinuation
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Monad
 import arrow.typeclasses.suspended.BindSyntax
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
-import kotlin.coroutines.startCoroutine
 
 interface FxSyntax<F> : Concurrent<F>, BindSyntax<F> {
 
@@ -35,39 +37,46 @@ interface FxSyntax<F> : Concurrent<F>, BindSyntax<F> {
   fun <A> CoroutineContext.parSequence(effects: Iterable<Kind<F, A>>): Kind<F, List<A>> =
     parTraverse(effects, ::identity)
 
-  fun <A> effect(fa: suspend () -> A): Kind<F, A> =
-    async { cb ->
-      fa.startCoroutine(asyncContinuation(EmptyCoroutineContext, cb))
-    }
-
   fun <A> ensure(fa: suspend () -> A, error: () -> Throwable, predicate: (A) -> Boolean): Kind<F, A> =
     run<Monad<F>, Kind<F, A>> { fa.effect().ensure(error, predicate) }
 
-  private fun <A> asyncOp(fb: Async<F>.() -> Kind<F, A>): Kind<F, A> =
-    run<Async<F>, Kind<F, A>> { fb(this) }
+  fun <A> (suspend () -> A).effect(unit: Unit = Unit): Kind<F, A> = effect(f = this)
 
-  fun <A> CoroutineContext.effect(f: suspend () -> A): Kind<F, A> =
-    asyncOp { defer(this@effect) { f.effect() } }
+  fun <A, B> (suspend (A) -> B).effect(): (Kind<F, A>) -> Kind<F, B> = { fa ->
+    fa.flatMap { a ->
+      effect { this(a) }
+    }
+  }
 
-  fun <A> (suspend () -> A).effect(unit: Unit = Unit): Kind<F, A> = effect(this)
+  fun <A, B, C> (suspend (A, B) -> C).effect(): (Kind<F, A>, Kind<F, B>) -> Kind<F, C> = { ka, kb ->
+    ka.flatMap { a ->
+      kb.flatMap { b ->
+        effect { this(a, b) }
+      }
+    }
+  }
 
-  fun <A, B> (suspend (A) -> B).effect(): (Kind<F, A>) -> Kind<F, B> =
-    { suspend { this(it.bind()) }.effect() }
+  fun <A, B, C, D> (suspend (A, B, C) -> D).effect(): (Kind<F, A>, Kind<F, B>, Kind<F, C>) -> Kind<F, D> = { ka, kb, kc ->
+    ka.flatMap { a ->
+      kb.flatMap { b ->
+        kc.flatMap { c ->
+          effect { this(a, b, c) }
+        }
+      }
+    }
+  }
 
-  fun <A, B, C> (suspend (A, B) -> C).effect(): (Kind<F, A>, Kind<F, B>) -> Kind<F, C> =
-    { ka, kb -> suspend { this(ka.bind(), kb.bind()) }.effect() }
+  fun <A, B> (suspend (A) -> B).flatLiftM(unit: Unit = Unit): (A) -> Kind<F, B> = { a ->
+    effect { this(a) }
+  }
 
-  fun <A, B, C, D> (suspend (A, B, C) -> D).effect(): (Kind<F, A>, Kind<F, B>, Kind<F, C>) -> Kind<F, D> =
-    { ka, kb, kc -> suspend { this(ka.bind(), kb.bind(), kc.bind()) }.effect() }
+  fun <A, B, C> (suspend (A, B) -> C).flatLiftM(): (A, B) -> Kind<F, C> = { a, b ->
+    effect { this(a, b) }
+  }
 
-  fun <A, B> (suspend (A) -> B).flatLiftM(unit: Unit = Unit): (A) -> Kind<F, B> =
-    { suspend { this(it) }.effect() }
-
-  fun <A, B, C> (suspend (A, B) -> C).flatLiftM(): (A, B) -> Kind<F, C> =
-    { a, b -> suspend { this(a, b) }.effect() }
-
-  fun <A, B, C, D> (suspend (A, B, C) -> D).flatLiftM(): (A, B, C) -> Kind<F, D> =
-    { a, b, c -> suspend { this(a, b, c) }.effect() }
+  fun <A, B, C, D> (suspend (A, B, C) -> D).flatLiftM(): (A, B, C) -> Kind<F, D> = { a, b, c ->
+    effect { this(a, b, c) }
+  }
 
   suspend fun <A> handleError(fa: suspend () -> A, recover: suspend (Throwable) -> A): Kind<F, A> =
     run<ApplicativeError<F, Throwable>, Kind<F, A>> { fa.effect().handleErrorWith(recover.flatLiftM()) }

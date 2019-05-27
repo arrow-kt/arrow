@@ -87,16 +87,6 @@ include {
             _ 'optics'
         }
 
-        dagger {
-            _ 'dagger'
-            _ 'dagger-effects'
-            _ 'dagger-effects-rx2'
-        }
-
-        shadow {
-            _ 'shadow'
-        }
-
         streams {
             _ 'streams'
         }
@@ -116,6 +106,11 @@ include {
 
         validation {
             _ 'validation'
+        }
+
+        benchmarks {
+            _ 'scala-benchmarks'
+            _ 'benchmarks-effects'
         }
     }
 }
