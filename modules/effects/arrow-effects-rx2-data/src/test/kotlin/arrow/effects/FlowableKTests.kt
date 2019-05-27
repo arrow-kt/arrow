@@ -12,11 +12,13 @@ import arrow.effects.rx2.extensions.flowablek.async.async
 import arrow.effects.rx2.extensions.flowablek.functor.functor
 import arrow.effects.rx2.extensions.flowablek.monad.flatMap
 import arrow.effects.rx2.extensions.flowablek.monadThrow.bindingCatch
+import arrow.effects.rx2.extensions.flowablek.timer.timer
 import arrow.effects.rx2.extensions.flowablek.traverse.traverse
 import arrow.effects.rx2.value
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
+import arrow.test.laws.TimerLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.runner.junit4.KotlinTestRunner
@@ -54,7 +56,7 @@ class FlowableKTests : UnitSpec() {
   }
 
   init {
-
+    testLaws(TimerLaws.laws(FlowableK.async(), FlowableK.timer(), EQ()))
     testLaws(AsyncLaws.laws(FlowableK.async(), EQ(), EQ(), testStackSafety = false))
     // FIXME(paco) #691
     // testLaws(AsyncLaws.laws(FlowableK.async(), EQ(), EQ()))
