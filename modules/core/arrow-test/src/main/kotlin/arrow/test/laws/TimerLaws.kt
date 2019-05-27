@@ -5,7 +5,9 @@ import arrow.effects.Timer
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.milliseconds
 import arrow.effects.typeclasses.seconds
+import arrow.test.generators.intSmall
 import arrow.typeclasses.Eq
+import io.kotlintest.properties.Gen
 
 object TimerLaws {
 
@@ -34,7 +36,7 @@ object TimerLaws {
     T: Timer<F>,
     C: Clock<F>,
     EQ: Eq<Kind<F, Boolean>>
-  ) {
+  ) = forFew(25, Gen.intSmall()) {
     val lhs = binding {
       val start = !C.timeNano()
       !T.sleep(10.milliseconds)
