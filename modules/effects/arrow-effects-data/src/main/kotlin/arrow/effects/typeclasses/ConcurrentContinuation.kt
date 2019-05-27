@@ -18,5 +18,4 @@ open class ConcurrentContinuation<F, A>(CF: Concurrent<F>, override val context:
 
   override fun <A> asyncF(k: ProcF<F, A>): Kind<F, A> =
     super<FxSyntax>.asyncF(k)
-
 }

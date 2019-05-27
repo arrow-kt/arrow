@@ -1,11 +1,28 @@
 package arrow.core.extensions
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Function0
+import arrow.core.ForFunction0
+import arrow.core.Function0Of
 import arrow.core.extensions.function0.monad.monad
-import arrow.extension
-import arrow.typeclasses.*
 import arrow.core.select as fun0Select
+import arrow.core.Either
+import arrow.extension
+import arrow.core.fix
+import arrow.core.invoke
+import arrow.core.k
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Apply
+import arrow.typeclasses.Bimonad
+import arrow.typeclasses.BindingStrategy
+import arrow.typeclasses.Comonad
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadContinuation
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.PartiallyAppliedMonadFx
+import arrow.typeclasses.Selective
+import arrow.typeclasses.Semigroup
 
 @extension
 interface Function0Semigroup<A> : Semigroup<Function0<A>> {

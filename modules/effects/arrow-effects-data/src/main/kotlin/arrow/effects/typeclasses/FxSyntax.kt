@@ -7,11 +7,6 @@ import arrow.core.TryOf
 import arrow.core.identity
 import arrow.data.extensions.list.traverse.traverse
 import arrow.data.fix
-import arrow.effects.typeclasses.Bracket
-import arrow.effects.typeclasses.Concurrent
-import arrow.effects.typeclasses.ExitCase
-import arrow.effects.typeclasses.Fiber
-import arrow.effects.internal.asyncContinuation
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Monad
 import arrow.typeclasses.suspended.BindSyntax

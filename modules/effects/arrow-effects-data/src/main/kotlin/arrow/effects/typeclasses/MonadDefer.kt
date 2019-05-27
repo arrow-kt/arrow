@@ -34,5 +34,4 @@ interface MonadDefer<F> : MonadThrow<F>, Bracket<F, Throwable> {
    * Creates a [Ref] to purely manage mutable state, initialized by the function [f]
    */
   fun <A> ref(f: () -> A): Kind<F, Ref<F, A>> = Ref(this, f)
-
 }

@@ -15,7 +15,13 @@ import arrow.data.extensions.listk.show.show
 import arrow.data.extensions.listk.traverse.traverse
 import arrow.mtl.extensions.listk.monadCombine.monadCombine
 import arrow.test.UnitSpec
-import arrow.test.laws.*
+import arrow.test.laws.HashLaws
+import arrow.test.laws.MonadCombineLaws
+import arrow.test.laws.MonoidKLaws
+import arrow.test.laws.MonoidalLaws
+import arrow.test.laws.SemigroupKLaws
+import arrow.test.laws.ShowLaws
+import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
@@ -41,7 +47,6 @@ class ListKTest : UnitSpec() {
         eq),
       HashLaws.laws(ListK.hash(Int.hash()), ListK.eq(Int.eq())) { listOf(it).k() }
     )
-
   }
 
   private fun bijection(from: Kind<ForListK, Tuple2<Tuple2<Int, Int>, Int>>): ListK<Tuple2<Int, Tuple2<Int, Int>>> =

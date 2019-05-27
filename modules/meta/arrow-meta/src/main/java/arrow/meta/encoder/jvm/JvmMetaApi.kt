@@ -589,7 +589,6 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
       is TypeName.Classy -> unconstrained
     }.asKotlin()
 
-
   /**
    * Returns a Pair matching a type as wrapper and the type it wraps
    * ex: SetK<A> to Set<A>

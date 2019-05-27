@@ -1,17 +1,10 @@
 package arrow.effects.typeclasses
 
-import arrow.Kind
-import arrow.core.Either
-import arrow.typeclasses.MonadContinuation
 import arrow.typeclasses.MonadThrowContinuation
-import arrow.typeclasses.stateStack
 import arrow.typeclasses.suspended.BindSyntax
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.RestrictsSuspension
-import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
-import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
-import kotlin.coroutines.startCoroutine
 
 typealias Disposable = () -> Unit
 

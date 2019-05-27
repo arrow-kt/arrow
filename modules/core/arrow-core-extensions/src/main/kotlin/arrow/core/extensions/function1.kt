@@ -1,11 +1,39 @@
 package arrow.core.extensions
 
 import arrow.Kind
-import arrow.core.*
 import arrow.core.extensions.function1.monad.monad
+import arrow.core.Either
+import arrow.core.Function1
+import arrow.core.ForFunction1
+import arrow.core.Function1Of
+import arrow.core.Function1PartialOf
+import arrow.core.Tuple2
+import arrow.core.compose
 import arrow.extension
-import arrow.typeclasses.*
-import kotlin.coroutines.*
+import arrow.core.fix
+import arrow.core.invoke
+import arrow.core.k
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Apply
+import arrow.typeclasses.BindingStrategy
+import arrow.typeclasses.Category
+import arrow.typeclasses.Conested
+import arrow.typeclasses.Contravariant
+import arrow.typeclasses.Decidable
+import arrow.typeclasses.Divide
+import arrow.typeclasses.Divisible
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadContinuation
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.PartiallyAppliedMonadFx
+import arrow.typeclasses.Profunctor
+import arrow.typeclasses.Semigroup
+import arrow.typeclasses.conest
+import arrow.typeclasses.counnest
+import kotlin.coroutines.AbstractCoroutineContextElement
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.startCoroutine
 
 @extension
 interface Function1Semigroup<A, B> : Semigroup<Function1<A, B>> {
@@ -137,7 +165,7 @@ interface Function1Monad<I> : Monad<Function1PartialOf<I>>, Function1Applicative
     return BindingStrategy.Strict(fa.fix()(i))
   }
 
-  class Function1Context(val a: Any?): AbstractCoroutineContextElement(Function1Context) {
+  class Function1Context(val a: Any?) : AbstractCoroutineContextElement(Function1Context) {
     companion object Key : CoroutineContext.Key<Function1Context>
   }
 

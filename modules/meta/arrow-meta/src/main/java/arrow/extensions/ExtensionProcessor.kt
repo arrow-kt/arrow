@@ -3,7 +3,13 @@ package arrow.extensions
 import arrow.common.messager.log
 import arrow.common.utils.knownError
 import arrow.extension
-import arrow.meta.ast.*
+import arrow.meta.ast.Code
+import arrow.meta.ast.Func
+import arrow.meta.ast.Modifier
+import arrow.meta.ast.PackageName
+import arrow.meta.ast.Property
+import arrow.meta.ast.Type
+import arrow.meta.ast.TypeName
 import arrow.meta.encoder.TypeClassInstance
 import arrow.meta.processor.MetaProcessor
 import com.google.auto.service.AutoService

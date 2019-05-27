@@ -3,11 +3,32 @@
 package arrow.core.extensions
 
 import arrow.Kind
-import arrow.core.*
 import arrow.core.Try.Failure
-import arrow.core.extensions.`try`.monad.monad
+import arrow.core.Either
+import arrow.core.Eval
+import arrow.core.ForTry
+import arrow.core.Try
+import arrow.core.TryOf
 import arrow.extension
-import arrow.typeclasses.*
+import arrow.core.fix
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Apply
+import arrow.typeclasses.BindingStrategy
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Hash
+import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadContinuation
+import arrow.typeclasses.MonadError
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.Semigroup
+import arrow.typeclasses.Show
+import arrow.typeclasses.Traverse
+import arrow.core.extensions.`try`.monad.monad
+import arrow.core.identity
+import arrow.typeclasses.MonadThrow
 import arrow.core.extensions.traverse as tryTraverse
 import arrow.core.handleErrorWith as tryHandleErrorWith
 
@@ -30,7 +51,7 @@ interface TryMonoid<A> : Monoid<Try<A>>, TrySemigroup<A> {
 
   override fun SG(): Semigroup<A> = MO()
 
-  override fun empty(): Try<A> = Success(MO().empty())
+  override fun empty(): Try<A> = Try.Success(MO().empty())
 }
 
 @extension
@@ -63,13 +84,13 @@ interface TryEq<A> : Eq<Try<A>> {
   fun EQT(): Eq<Throwable>
 
   override fun Try<A>.eqv(b: Try<A>): Boolean = when (this) {
-    is Success -> when (b) {
+    is Try.Success -> when (b) {
       is Failure -> false
-      is Success -> EQA().run { value.eqv(b.value) }
+      is Try.Success -> EQA().run { value.eqv(b.value) }
     }
     is Failure -> when (b) {
       is Failure -> EQT().run { exception.eqv(b.exception) }
-      is Success -> false
+      is Try.Success -> false
     }
   }
 }

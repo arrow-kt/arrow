@@ -157,5 +157,4 @@ object MonadDeferLaws {
         def.map { x }
       }.equalUnderTheLaw(just(iterations), EQ)
     }
-
 }

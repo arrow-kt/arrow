@@ -8,7 +8,6 @@ import arrow.effects.reactor.FluxKOf
 import arrow.effects.reactor.ForFluxK
 import arrow.effects.reactor.extensions.fluxk.async.async
 import arrow.effects.reactor.extensions.fluxk.monad.monad
-import arrow.effects.reactor.extensions.fluxk.monadDefer.monadDefer
 import arrow.effects.reactor.extensions.fluxk.monadError.monadError
 import arrow.effects.reactor.fix
 import arrow.effects.typeclasses.Async

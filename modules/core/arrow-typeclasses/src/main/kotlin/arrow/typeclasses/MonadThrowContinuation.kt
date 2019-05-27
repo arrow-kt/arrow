@@ -21,5 +21,4 @@ open class MonadThrowContinuation<F, A>(ME: MonadThrow<F>, override val context:
   }
 
   override fun <B> binding(c: suspend MonadContinuation<F, *>.() -> B): Kind<F, B> = fx.monad(c)
-
 }

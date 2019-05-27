@@ -23,4 +23,3 @@ fun main(vararg args: String) = unsafe {
     }
   }
 }
-

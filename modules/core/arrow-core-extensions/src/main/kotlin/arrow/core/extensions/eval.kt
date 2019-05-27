@@ -1,11 +1,22 @@
 package arrow.core.extensions
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Eval
+import arrow.core.EvalOf
+import arrow.core.ForEval
 import arrow.core.extensions.eval.monad.monad
 import arrow.extension
-import arrow.typeclasses.*
-import kotlin.coroutines.startCoroutine
+import arrow.core.fix
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Apply
+import arrow.typeclasses.Bimonad
+import arrow.typeclasses.BindingStrategy
+import arrow.typeclasses.Comonad
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadContinuation
+import arrow.typeclasses.PartiallyAppliedMonadFx
 
 @extension
 interface EvalFunctor : Functor<ForEval> {

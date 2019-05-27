@@ -8,7 +8,6 @@ import arrow.effects.rx2.ObservableK
 import arrow.effects.rx2.ObservableKOf
 import arrow.effects.rx2.extensions.observablek.async.async
 import arrow.effects.rx2.extensions.observablek.monad.monad
-import arrow.effects.rx2.extensions.observablek.monadDefer.monadDefer
 import arrow.effects.rx2.extensions.observablek.monadError.monadError
 import arrow.effects.rx2.fix
 import arrow.effects.typeclasses.Async

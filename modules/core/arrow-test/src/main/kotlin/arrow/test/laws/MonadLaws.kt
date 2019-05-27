@@ -11,12 +11,10 @@ import arrow.free.run
 import arrow.test.generators.applicative
 import arrow.test.generators.either
 import arrow.test.generators.functionAToB
-import arrow.test.generators.intSmall
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monad
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import kotlinx.coroutines.newSingleThreadContext
 
 object MonadLaws {
 
