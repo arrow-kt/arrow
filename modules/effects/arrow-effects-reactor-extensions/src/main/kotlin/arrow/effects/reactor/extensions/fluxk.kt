@@ -3,6 +3,7 @@ package arrow.effects.reactor.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.effects.Timer
 import arrow.effects.reactor.FluxK
 import arrow.effects.reactor.FluxKOf
 import arrow.effects.reactor.ForFluxK
@@ -14,6 +15,7 @@ import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Bracket
 import arrow.effects.typeclasses.ConcurrentEffect
 import arrow.effects.typeclasses.Disposable
+import arrow.effects.typeclasses.Duration
 import arrow.effects.typeclasses.Effect
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.MonadDefer
@@ -29,6 +31,8 @@ import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.Traverse
+import reactor.core.publisher.Mono
+import reactor.core.publisher.toFlux
 import kotlin.coroutines.CoroutineContext
 
 @extension
@@ -189,4 +193,11 @@ fun FluxK.Companion.monadErrorSwitch(): FluxKMonadError = object : FluxKMonadErr
 interface FluxKFx : Fx<ForFluxK> {
   override fun monadDefer(): MonadDefer<ForFluxK> =
     FluxK.monadDefer()
+}
+
+@extension
+interface FluxKTimer : Timer<ForFluxK> {
+  override fun sleep(duration: Duration): FluxK<Unit> =
+    FluxK(Mono.delay(java.time.Duration.ofNanos(duration.nanoseconds))
+      .map { Unit }.toFlux())
 }

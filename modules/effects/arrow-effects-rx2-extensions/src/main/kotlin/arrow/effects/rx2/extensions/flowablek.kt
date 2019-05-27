@@ -16,11 +16,13 @@ import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Bracket
 import arrow.effects.typeclasses.ConcurrentEffect
 import arrow.effects.typeclasses.Disposable
+import arrow.effects.typeclasses.Duration
 import arrow.effects.typeclasses.Effect
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
 import arrow.effects.typeclasses.ProcF
+import arrow.effects.Timer
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
@@ -31,6 +33,8 @@ import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.Traverse
 import io.reactivex.BackpressureStrategy
+import io.reactivex.Flowable
+import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 
 @extension
@@ -236,4 +240,11 @@ fun FlowableK.Companion.effectLatest(): FlowableKEffect = object : FlowableKEffe
 
 fun FlowableK.Companion.effectMissing(): FlowableKEffect = object : FlowableKEffect {
   override fun BS(): BackpressureStrategy = BackpressureStrategy.MISSING
+}
+
+@extension
+interface FlowableKTimer : Timer<ForFlowableK> {
+  override fun sleep(duration: Duration): FlowableK<Unit> =
+    FlowableK(Flowable.timer(duration.nanoseconds, TimeUnit.NANOSECONDS)
+      .map { Unit })
 }
