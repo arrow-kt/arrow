@@ -28,6 +28,9 @@ import arrow.effects.typeclasses.ProcF
 import arrow.effects.typeclasses.mapUnit
 import arrow.higherkind
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 typealias IOProc<A> = (IOConnection, (Either<Throwable, A>) -> Unit) -> Unit
 typealias IOProcF<A> = (IOConnection, (Either<Throwable, A>) -> Unit) -> IOOf<Unit>
@@ -121,6 +124,12 @@ sealed class IO<out A> : IOOf<A> {
     val never: IO<Nothing> = async { _, _ -> Unit }
 
     /* For parMap, look into IOParallel */
+  }
+
+  suspend fun suspended(): A = suspendCoroutine { cont ->
+    IORunLoop.start(this) {
+      it.fold(cont::resumeWithException, cont::resume)
+    }
   }
 
   open fun <B> map(f: (A) -> B): IO<B> =

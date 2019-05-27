@@ -6,15 +6,17 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.RestrictsSuspension
 
+/**
+ * marker exception that interrupts the coroutine flow and gets captured
+ * to provide the monad empty value
+ */
+private object PredicateInterrupted : RuntimeException() {
+  override fun fillInStackTrace(): Throwable = this
+}
+
 @RestrictsSuspension
 open class MonadFilterContinuation<F, A>(val MF: MonadFilter<F>, override val context: CoroutineContext = EmptyCoroutineContext) :
   MonadContinuation<F, A>(MF) {
-
-  /**
-   * marker exception that interrupts the coroutine flow and gets captured
-   * to provide the monad empty value
-   */
-  private object PredicateInterrupted : RuntimeException()
 
   override fun resumeWith(result: Result<Kind<F, A>>) {
     result.fold({ super.resumeWith(result) }, {
@@ -38,7 +40,7 @@ open class MonadFilterContinuation<F, A>(val MF: MonadFilter<F>, override val co
    * on `MonadFilter` instances
    */
   suspend fun <B> Kind<F, B>.bindWithFilter(f: (B) -> Boolean): B {
-    val b: B = bind { this }
-    return if (f(b)) b else bind { MF.empty<B>() }
+    val b: B = this.bind()
+    return if (f(b)) b else MF.empty<B>().bind()
   }
 }

@@ -12,4 +12,5 @@ sealed class BindingStrategy<out F, out A> {
   }
   object MultiShot : BindingStrategy<Nothing, Nothing>()
   data class Strict<out F, out A>(val a: A) : BindingStrategy<F, A>()
+  data class Suspend<F, A>(val f: suspend () -> A): BindingStrategy<F, A>()
 }

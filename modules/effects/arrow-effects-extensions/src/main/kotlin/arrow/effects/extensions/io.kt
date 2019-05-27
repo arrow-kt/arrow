@@ -32,8 +32,10 @@ import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.BindingStrategy
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadContinuation
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.Monoid
@@ -194,6 +196,11 @@ interface IOConcurrent : Concurrent<ForIO>, IOAsync {
 
   override fun <A, B, C> CoroutineContext.raceTriple(fa: Kind<ForIO, A>, fb: Kind<ForIO, B>, fc: Kind<ForIO, C>): IO<RaceTriple<ForIO, A, B, C>> =
     IO.raceTriple(this, fa, fb, fc)
+
+
+  override suspend fun <A> MonadContinuation<ForIO, *>.bindStrategy(fa: Kind<ForIO, A>): BindingStrategy<ForIO, A> = BindingStrategy.Suspend {
+    fa.fix().suspended()
+  }
 }
 
 fun IO.Companion.concurrent(dispatchers: Dispatchers<ForIO>): Concurrent<ForIO> = object : IOConcurrent {

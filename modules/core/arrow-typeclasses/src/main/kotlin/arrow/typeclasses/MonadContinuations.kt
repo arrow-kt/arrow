@@ -53,16 +53,11 @@ open class MonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineC
 
   open fun returnedMonad(): Kind<F, A> = returnedMonad
 
-  override suspend fun <B> Kind<F, B>.bind(): B = bind { this }
-
-  suspend fun <B> (() -> B).bindIn(context: CoroutineContext): B =
-    bindIn(context, this)
-
-  open suspend fun <B> bind(m: () -> Kind<F, B>): B =
-    when (val strategy = bindStrategy(m())) {
+  override suspend fun <B> Kind<F, B>.bind(): B =
+    when (val strategy = bindStrategy(this)) {
       is BindingStrategy.MultiShot -> suspendCoroutineUninterceptedOrReturn { c ->
         val labelHere = c.stateStack // save the whole coroutine stack labels
-        returnedMonad = m().flatMap { x: B ->
+        returnedMonad = this.flatMap { x: B ->
           c.stateStack = labelHere
           c.resume(x)
           returnedMonad
@@ -73,28 +68,6 @@ open class MonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineC
       is BindingStrategy.ContinuationShortCircuit -> suspendCoroutineUninterceptedOrReturn { c ->
         c.resumeWithException(strategy.throwable)
       }
+      is BindingStrategy.Suspend -> strategy.f()
     }
-
-
-
-  open suspend fun <B> bindIn(context: CoroutineContext, m: () -> B): B = suspendCoroutineUninterceptedOrReturn { c ->
-    val labelHere = c.stateStack // save the whole coroutine stack labels
-    val monadCreation: suspend () -> Kind<F, A> = {
-      just(m()).flatMap { xx: B ->
-        c.stateStack = labelHere
-        c.resume(xx)
-        returnedMonad
-      }
-    }
-    val completion = bindingInContextContinuation(context)
-    returnedMonad = just(Unit).flatMap {
-      monadCreation.startCoroutine(completion)
-      val error = completion.await()
-      if (error != null) {
-        throw error
-      }
-      returnedMonad
-    }
-    COROUTINE_SUSPENDED
-  }
 }
