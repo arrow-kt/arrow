@@ -452,7 +452,7 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
    * @see [MetaApi.asKotlin]
    */
   override fun TypeName.TypeVariable.asKotlin(): TypeName.TypeVariable =
-    copy(name = name.asKotlin())
+    copy(name = name.asKotlin(), bounds = bounds.map { it.asKotlin() })
 
   /**
    * @see [MetaApi.asKotlin]
@@ -577,15 +577,18 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
     }
 
   override fun TypeName.widenTypeArgs(): TypeName =
-    when (this) {
-      is TypeName.TypeVariable -> this
-      is TypeName.WildcardType -> this
-      is TypeName.FunctionLiteral -> this
-      is TypeName.ParameterizedType -> copy(
-        typeArguments = typeArguments.map { TypeName.AnyNullable }
+    when (val unconstrained = removeConstrains()) {
+      is TypeName.TypeVariable ->
+        if (unconstrained.bounds.isNotEmpty()) unconstrained.bounds[0]
+        else TypeName.AnyNullable
+      is TypeName.WildcardType -> unconstrained
+      is TypeName.FunctionLiteral -> unconstrained
+      is TypeName.ParameterizedType -> unconstrained.copy(
+        typeArguments = unconstrained.typeArguments.map { it.widenTypeArgs() }
       )
-      is TypeName.Classy -> this
-    }
+      is TypeName.Classy -> unconstrained
+    }.asKotlin()
+
 
   /**
    * Returns a Pair matching a type as wrapper and the type it wraps

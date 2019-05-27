@@ -18,8 +18,8 @@ import arrow.core.Tuple3
 import arrow.core.getOrElse
 import arrow.core.extensions.`try`.applicative.applicative
 import arrow.core.extensions.`try`.functor.functor
+import arrow.core.extensions.fx
 import arrow.core.extensions.option.applicative.applicative
-import arrow.core.extensions.option.fx.fx
 import arrow.core.flatMap
 import arrow.core.handleError
 import arrow.core.handleErrorWith
@@ -80,7 +80,7 @@ class DataTypeExamples : FreeSpec() { init {
 
     "Monad" {
       // Computing over dependent values ignoring absence
-      val six = fx {
+      val six = Option.fx {
         val (a) = Option(1)
         val (b) = Option(1 + a)
         val (c) = Option(1 + b)
@@ -88,7 +88,7 @@ class DataTypeExamples : FreeSpec() { init {
       }
       six shouldBe Some(6)
 
-      val none = fx {
+      val none = Option.fx {
         val (a) = Option(1)
         val (b) = noneValue
         val (c) = Option(1 + b)

@@ -33,7 +33,7 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class), PolyTempl
       this != null && fileSpec != null -> {
         val wrappedType = dataType.kindWrapper
         val wrappedExtensions = wrappedTypeExtensions(wrappedType)
-        val properties = if (supportsCache()) listOf(genCachedExtension(dataType.name)) else emptyList()
+        val properties = if (supportsCache()) listOf(genCachedExtension()) else emptyList()
         val functions = genDataTypeExtensions() + listOf(genCompanionFactory(dataType.name))
         val mainFileSpec: FileSpec.Builder = functions.inMainFileSpec(fileSpec.addProperties(properties))
         val wrappedFileSpec = wrappedExtensions.inWrappedFileSpec(wrappedType, annotatedElement, this, properties)
@@ -136,7 +136,7 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class), PolyTempl
   private fun TypeClassInstance.cachedInstanceName(): String =
     typeClass.name.simpleName.decapitalize() + "_singleton"
 
-  fun TypeClassInstance.genCachedExtension(targetType: TypeName): Property =
+  private fun TypeClassInstance.genCachedExtension(): Property =
     Property(
       kdoc = Code { "cached extension" },
       name = cachedInstanceName(),
@@ -145,11 +145,11 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class), PolyTempl
       type = instance.name.widenTypeArgs(),
       initializer = Code {
         if (instance.typeVariables.isEmpty()) "object : ${+instance.name} {}"
-        else "object : ${+instance.name.simpleName}<${instance.typeVariables.joinToString { "Any?" }}> {}"
+        else "object : ${+instance.name.simpleName}<${instance.typeVariables.joinToString { it.widenTypeArgs().rawName }}> {}"
       }
     )
 
-  fun TypeClassInstance.genCompanionFactory(targetType: TypeName): Func {
+  private fun TypeClassInstance.genCompanionFactory(targetType: TypeName): Func {
     val target = when (projectedCompanion) {
       is TypeName.Classy -> projectedCompanion.companion()
       else -> TypeName.Classy(

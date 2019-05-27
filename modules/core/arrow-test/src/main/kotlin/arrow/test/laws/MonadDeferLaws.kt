@@ -31,7 +31,7 @@ object MonadDeferLaws {
       Law("MonadDefer laws: delayOrRaise constant right equals pure") { SC.delayOrRaiseConstantRightEqualsPure(EQ) },
       Law("MonadDefer laws: delayOrRaise constant left equals raiseError") { SC.delayOrRaiseConstantLeftEqualsRaiseError(EQERR) },
       Law("MonadDefer laws: propagate error through bind") { SC.propagateErrorsThroughBind(EQERR) },
-      Law("MonadDefer laws: defer suspens evaluation") { SC.deferSuspendsEvaluation(EQ) },
+      Law("MonadDefer laws: defer suspends evaluation") { SC.deferSuspendsEvaluation(EQ) },
       Law("MonadDefer laws: delay suspends evaluation") { SC.delaySuspendsEvaluation(EQ) },
       Law("MonadDefer laws: flatMap suspends evaluation") { SC.flatMapSuspendsEvaluation(EQ) },
       Law("MonadDefer laws: map suspends evaluation") { SC.mapSuspendsEvaluation(EQ) },
