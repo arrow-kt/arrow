@@ -87,10 +87,6 @@ include {
             _ 'optics'
         }
 
-        shadow {
-            _ 'shadow'
-        }
-
         streams {
             _ 'streams'
         }
