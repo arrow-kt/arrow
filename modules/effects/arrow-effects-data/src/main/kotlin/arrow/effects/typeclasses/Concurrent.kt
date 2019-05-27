@@ -20,6 +20,7 @@ import arrow.effects.Race8
 import arrow.effects.Race9
 import arrow.effects.RacePair
 import arrow.effects.RaceTriple
+import arrow.effects.Timer
 import arrow.effects.data.internal.BindingCancellationException
 import arrow.effects.internal.TimeoutException
 import arrow.typeclasses.MonadContinuation

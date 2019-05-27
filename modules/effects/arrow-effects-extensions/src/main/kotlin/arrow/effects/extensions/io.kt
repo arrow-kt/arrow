@@ -27,7 +27,7 @@ import arrow.effects.typeclasses.Fiber
 import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
 import arrow.effects.typeclasses.ProcF
-import arrow.effects.typeclasses.Timer
+import arrow.effects.Timer
 import arrow.effects.typeclasses.UnsafeRun
 import arrow.extension
 import arrow.typeclasses.Applicative
