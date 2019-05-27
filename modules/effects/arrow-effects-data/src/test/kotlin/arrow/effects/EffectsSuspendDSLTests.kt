@@ -10,8 +10,8 @@ import arrow.core.identity
 import arrow.core.left
 import arrow.core.none
 import arrow.core.right
+import arrow.effects.extensions.fx
 import arrow.effects.extensions.io.concurrent.concurrent
-import arrow.effects.extensions.io.fx.fx
 import arrow.effects.extensions.io.unsafeRun.runBlocking
 import arrow.effects.extensions.io.unsafeRun.unsafeRun
 import arrow.effects.typeclasses.Concurrent
@@ -60,7 +60,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
        * Effect blocks suspend side effect in the monadic computation of the runtime
        * data type which it needs to be at least able to provide a `MonadDefer` extension.
        */
-      val program: IO<String> = fx {
+      val program: IO<String> = IO.fx {
         helloWorld
       }
       unsafe { runBlocking { program } } shouldBe helloWorld
@@ -71,7 +71,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
         .asCoroutineContext()
       suspend fun getThreadName(): String = Thread.currentThread().name
 
-      val program = fx {
+      val program = IO.fx {
         // note how the receiving value is typed in the environment and not inside IO despite being effectful and non-blocking parallel computations
         val result: List<String> = !textContext.parMapN(
           effect { getThreadName() },
@@ -86,7 +86,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
     "raiseError" {
       shouldThrow<TestError> {
         fxTest {
-          fx {
+          IO.fx {
             !TestError.raiseError<Int>()
           }
         }
@@ -95,7 +95,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
 
     "handleError" {
       fxTest {
-        fx {
+        IO.fx {
           !handleError({ throw TestError }) { 1 }
         }
       } shouldBe 1
@@ -103,7 +103,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
 
     "Option.getOrRaiseError success case" {
       fxTest {
-        fx {
+        IO.fx {
           !Option(1).getOrRaiseError { throw TestError }
         }
       } shouldBe 1
@@ -112,7 +112,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
     "Option.getOrRaiseError error case" {
       shouldThrow<TestError> {
         fxTest {
-          fx {
+          IO.fx {
             !none<Int>().getOrRaiseError { throw TestError }
           }
         }
@@ -121,7 +121,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
 
     "Either.getOrRaiseError success case" {
       fxTest {
-        fx {
+        IO.fx {
           !1.right().getOrRaiseError { throw TestError }
         }
       } shouldBe 1
@@ -130,7 +130,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
     "Either.getOrRaiseError error case" {
       shouldThrow<TestError> {
         fxTest {
-          fx {
+          IO.fx {
             !1.left().getOrRaiseError { throw TestError }
           }
         }
@@ -139,7 +139,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
 
     "Try.getOrRaiseError success case" {
       fxTest {
-        fx {
+        IO.fx {
           !Try { 1 }.getOrRaiseError { throw TestError }
         }
       } shouldBe 1
@@ -148,7 +148,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
     "Try.getOrRaiseError error case" {
       shouldThrow<TestError> {
         fxTest {
-          fx {
+          IO.fx {
             !Failure(TestError).getOrRaiseError { throw TestError }
           }
         }
@@ -157,7 +157,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
 
     "attempt success" {
       fxTest {
-        fx {
+        IO.fx {
           !attempt { 1 }
         }
       } shouldBe Right(1)
@@ -165,7 +165,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
 
     "attempt failure" {
       fxTest {
-        fx {
+        IO.fx {
           !attempt { throw TestError }
         }
       } shouldBe Left(TestError)
@@ -173,7 +173,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
 
     "suspend () -> A ≅ Kind<F, A> isomorphism" {
       fxTest {
-        fx {
+        IO.fx {
           val (suspendedValue) = suspend { 1 }.effect()
           val (ioValue) = IO.just(1)
           suspendedValue == ioValue
@@ -184,7 +184,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
     "asyncCallback" {
       val result = 1
       fxTest {
-        fx {
+        IO.fx {
           val asyncResult = !async<Int> { cb ->
             cb(Right(result))
           }
@@ -195,7 +195,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
 
     "continueOn" {
       fxTest {
-        fx {
+        IO.fx {
           continueOn(newSingleThreadContext("A"))
           val contextA = !effect { Thread.currentThread().name }
           continueOn(newSingleThreadContext("B"))
@@ -207,7 +207,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
 
     "CoroutineContext.defer" {
       fxTest {
-        fx {
+        IO.fx {
           val contextA = !effect(newSingleThreadContext("A")) { Thread.currentThread().name }
           val contextB = !effect(newSingleThreadContext("B")) { Thread.currentThread().name }
           contextA != contextB
@@ -219,7 +219,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
       val msg: AtomicReference<Int> = AtomicReference(0)
       val const = 1
       fxTest {
-        fx {
+        IO.fx {
           !bracketCase(
             f = { const },
             release = { n, exit -> msg.set(const) },
@@ -236,7 +236,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
       val const = 1
       shouldThrow<TestError> {
         fxTest {
-          fx {
+          IO.fx {
             !bracketCase(
               f = { const },
               release = { n, exit -> msg.set(const) },
@@ -251,7 +251,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
     "startFiber" {
       val const = 1
       fxTest {
-        fx {
+        IO.fx {
           val fiber = !NonBlocking.startFiber(effect { const })
           val (n) = fiber.join()
           n
@@ -261,7 +261,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
 
     "List.flatTraverse syntax" {
       fxTest {
-        fx {
+        IO.fx {
           val result = !listOf(
             suspend { 1 },
             suspend { 2 },
@@ -276,7 +276,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
 
     "List.traverse syntax" {
       fxTest {
-        fx {
+        IO.fx {
           !listOf(
             suspend { 1 },
             suspend { 2 },
@@ -288,7 +288,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
 
     "List.sequence syntax" {
       fxTest {
-        fx {
+        IO.fx {
           !listOf(
             suspend { 1 },
             suspend { 2 },
@@ -301,7 +301,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
     "List.parTraverse syntax" {
       val main = Thread.currentThread().name
       fxTest {
-        fx {
+        IO.fx {
           val result = !NonBlocking.parTraverse(
             listOf(
               effect { Thread.currentThread().name },
@@ -320,7 +320,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
     "List.parSequence syntax" {
       val main = Thread.currentThread().name
       fxTest {
-        fx {
+        IO.fx {
           val result = !NonBlocking.parSequence(listOf(
             effect { Thread.currentThread().name },
             effect { Thread.currentThread().name },
@@ -355,7 +355,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
         return done
       }
       fxTest {
-        fx {
+        IO.fx {
           val (appliedPureEffect1: String) = effect { sideEffect() }
           val appliedPureEffect2: String = !effect { sideEffect() }
           appliedPureEffect1
