@@ -20,8 +20,6 @@ import arrow.data.extensions.optiont.applicative.applicative
 import arrow.data.extensions.optiont.divisible.divisible
 import arrow.data.extensions.optiont.monoidK.monoidK
 import arrow.data.extensions.optiont.semigroupK.semigroupK
-import arrow.effects.extensions.io.monad.monad
-import arrow.effects.fix
 import arrow.mtl.extensions.option.traverseFilter.traverseFilter
 import arrow.mtl.extensions.optiont.functorFilter.functorFilter
 import arrow.mtl.extensions.optiont.traverseFilter.traverseFilter
