@@ -16,7 +16,7 @@ import arrow.typeclasses.Comonad
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadContinuation
-import arrow.typeclasses.PartiallyAppliedMonadFx
+import arrow.typeclasses.MonadFx
 
 @extension
 interface EvalFunctor : Functor<ForEval> {
@@ -65,8 +65,8 @@ interface EvalMonad : Monad<ForEval> {
   override suspend fun <A> MonadContinuation<ForEval, *>.bindStrategy(fa: Kind<ForEval, A>): BindingStrategy<ForEval, A> =
     BindingStrategy.Strict(fa.fix().value())
 
-  override val fx: PartiallyAppliedMonadFx<ForEval>
-    get() = object : PartiallyAppliedMonadFx<ForEval> {
+  override val fx: MonadFx<ForEval>
+    get() = object : MonadFx<ForEval> {
       override val M: Monad<ForEval> = this@EvalMonad
       override fun <A> monad(c: suspend MonadContinuation<ForEval, *>.() -> A): Eval<A> =
         Eval.defer { super.monad(c).fix() }

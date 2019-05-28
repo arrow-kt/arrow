@@ -10,7 +10,7 @@ import kotlin.coroutines.RestrictsSuspension
 open class MonadThrowContinuation<F, A>(ME: MonadThrow<F>, override val context: CoroutineContext = EmptyCoroutineContext) :
   MonadContinuation<F, A>(ME), MonadThrow<F> by ME {
 
-  override val fx: PartiallyAppliedMonadThrowFx<F> = ME.fx
+  override val fx: MonadThrowFx<F> = ME.fx
 
   @Suppress("UNCHECKED_CAST")
   override fun resumeWithException(exception: Throwable) {

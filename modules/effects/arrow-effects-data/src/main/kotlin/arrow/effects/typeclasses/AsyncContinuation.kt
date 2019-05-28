@@ -12,5 +12,5 @@ typealias Disposable = () -> Unit
 @Suppress("DELEGATED_MEMBER_HIDES_SUPERTYPE_OVERRIDE")
 open class AsyncContinuation<F, A>(val SC: Async<F>, override val context: CoroutineContext = EmptyCoroutineContext) :
   MonadThrowContinuation<F, A>(SC), Async<F> by SC, BindSyntax<F> {
-  override val fx: PartiallyAppliedAsyncFx<F> = SC.fx
+  override val fx: AsyncFx<F> = SC.fx
 }

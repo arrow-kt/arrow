@@ -31,8 +31,8 @@ interface Monad<F> : Selective<F> {
    * A coroutine is initiated and suspended inside [MonadThrowContinuation] yielding to [Monad.flatMap]. Once all the flatMap binds are completed
    * the underlying monad is returned from the act of executing the coroutine
    */
-  val fx: PartiallyAppliedMonadFx<F>
-    get() = object : PartiallyAppliedMonadFx<F> {
+  val fx: MonadFx<F>
+    get() = object : MonadFx<F> {
       override val M: Monad<F> = this@Monad
     }
 
@@ -89,7 +89,7 @@ interface Monad<F> : Selective<F> {
     fx.monad(c)
 }
 
-interface PartiallyAppliedMonadFx<F> {
+interface MonadFx<F> {
   val M: Monad<F>
   fun <A> monad(c: suspend MonadContinuation<F, *>.() -> A): Kind<F, A> {
     val continuation = MonadContinuation<F, A>(M)

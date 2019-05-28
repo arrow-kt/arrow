@@ -26,7 +26,7 @@ import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadContinuation
 import arrow.typeclasses.Monoid
-import arrow.typeclasses.PartiallyAppliedMonadFx
+import arrow.typeclasses.MonadFx
 import arrow.typeclasses.Profunctor
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.conest
@@ -169,8 +169,8 @@ interface Function1Monad<I> : Monad<Function1PartialOf<I>>, Function1Applicative
     companion object Key : CoroutineContext.Key<Function1Context>
   }
 
-  override val fx: PartiallyAppliedMonadFx<Function1PartialOf<I>>
-    get() = object : PartiallyAppliedMonadFx<Function1PartialOf<I>> {
+  override val fx: MonadFx<Function1PartialOf<I>>
+    get() = object : MonadFx<Function1PartialOf<I>> {
       override val M: Monad<Function1PartialOf<I>> = this@Function1Monad
       override fun <A> monad(c: suspend MonadContinuation<Function1PartialOf<I>, *>.() -> A): Function1<I, A> = Function1 { i ->
           val function1Context = Function1Context(i)

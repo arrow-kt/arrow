@@ -20,7 +20,7 @@ import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadContinuation
 import arrow.typeclasses.Monoid
-import arrow.typeclasses.PartiallyAppliedMonadFx
+import arrow.typeclasses.MonadFx
 import arrow.typeclasses.Selective
 import arrow.typeclasses.Semigroup
 
@@ -98,8 +98,8 @@ interface Function0Monad : Monad<ForFunction0> {
   override suspend fun <A> MonadContinuation<ForFunction0, *>.bindStrategy(fa: Function0Of<A>): BindingStrategy<ForFunction0, A> =
     BindingStrategy.Strict(fa.fix()())
 
-  override val fx: PartiallyAppliedMonadFx<ForFunction0>
-    get() = object : PartiallyAppliedMonadFx<ForFunction0> {
+  override val fx: MonadFx<ForFunction0>
+    get() = object : MonadFx<ForFunction0> {
       override val M: Monad<ForFunction0> = this@Function0Monad
       override fun <A> monad(c: suspend MonadContinuation<ForFunction0, *>.() -> A): Function0<A> =
         Function0 { super.monad(c)() }

@@ -9,7 +9,7 @@ import arrow.effects.data.internal.BindingCancellationException
 import arrow.typeclasses.MonadContinuation
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
-import arrow.typeclasses.PartiallyAppliedMonadThrowFx
+import arrow.typeclasses.MonadThrowFx
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.startCoroutine
@@ -40,8 +40,8 @@ interface Async<F> : MonadDefer<F> {
    * This operation is cancellable by calling invoke on the [Disposable] return.
    * If [Disposable.invoke] is called the binding result will become a lifted [BindingCancellationException].
    */
-  override val fx: PartiallyAppliedAsyncFx<F>
-    get() = object : PartiallyAppliedAsyncFx<F> {
+  override val fx: AsyncFx<F>
+    get() = object : AsyncFx<F> {
       override val async: Async<F> get() = this@Async
     }
 
@@ -328,7 +328,7 @@ internal val mapUnit: (Any?) -> Unit = { Unit }
 internal val rightUnit = Right(Unit)
 internal val unitCallback = { cb: (Either<Throwable, Unit>) -> Unit -> cb(rightUnit) }
 
-interface PartiallyAppliedAsyncFx<F> : PartiallyAppliedMonadThrowFx<F> {
+interface AsyncFx<F> : MonadThrowFx<F> {
   val async: Async<F>
   override val ME: MonadThrow<F> get() = async
   fun <A> async(c: suspend AsyncContinuation<F, *>.() -> A): Kind<F, A> {

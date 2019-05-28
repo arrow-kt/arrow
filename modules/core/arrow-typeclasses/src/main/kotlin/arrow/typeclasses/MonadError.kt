@@ -128,8 +128,8 @@ interface MonadThrow<F> : MonadError<F, Throwable> {
    * ```
    *
    */
-  override val fx: PartiallyAppliedMonadThrowFx<F>
-    get() = object : PartiallyAppliedMonadThrowFx<F> {
+  override val fx: MonadThrowFx<F>
+    get() = object : MonadThrowFx<F> {
       override val ME: MonadThrow<F> = this@MonadThrow
     }
 
@@ -151,7 +151,7 @@ interface MonadThrow<F> : MonadError<F, Throwable> {
     if (NonFatal(this)) raiseError(this) else throw this
 }
 
-interface PartiallyAppliedMonadThrowFx<F> : PartiallyAppliedMonadFx<F> {
+interface MonadThrowFx<F> : MonadFx<F> {
   val ME: MonadThrow<F>
   override val M: Monad<F> get() = ME
   fun <A> monadThrow(c: suspend MonadThrowContinuation<F, *>.() -> A): Kind<F, A> {

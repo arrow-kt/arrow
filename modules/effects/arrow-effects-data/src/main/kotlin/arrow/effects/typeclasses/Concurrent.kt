@@ -52,8 +52,8 @@ interface Concurrent<F> : Async<F> {
    * This operation is cancellable by calling invoke on the [Disposable] return.
    * If [Disposable.invoke] is called the binding result will become a lifted [BindingCancellationException].
    */
-  override val fx: PartiallyAppliedConcurrentFx<F>
-    get() = object : PartiallyAppliedConcurrentFx<F> {
+  override val fx: ConcurrentFx<F>
+    get() = object : ConcurrentFx<F> {
       override val concurrent: Concurrent<F> = this@Concurrent
     }
 
@@ -884,7 +884,7 @@ interface Concurrent<F> : Async<F> {
     }
 }
 
-interface PartiallyAppliedConcurrentFx<F> : PartiallyAppliedAsyncFx<F> {
+interface ConcurrentFx<F> : AsyncFx<F> {
   val concurrent: Concurrent<F>
 
   override val async: Async<F>
