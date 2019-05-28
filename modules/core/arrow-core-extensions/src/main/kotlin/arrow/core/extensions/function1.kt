@@ -31,8 +31,6 @@ import arrow.typeclasses.Profunctor
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.conest
 import arrow.typeclasses.counnest
-import kotlin.coroutines.AbstractCoroutineContextElement
-import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine
 
 @extension
@@ -161,26 +159,23 @@ interface Function1Monad<I> : Monad<Function1PartialOf<I>>, Function1Applicative
     Function1.tailRecM(a, f)
 
   override suspend fun <A> MonadContinuation<Function1PartialOf<I>, *>.bindStrategy(fa: Function1Of<I, A>): BindingStrategy<Function1PartialOf<I>, A> {
-    val i = (this.context as Function1Context).a as I
+    val i = (this as Function1MonadContinuation).i
     return BindingStrategy.Strict(fa.fix()(i))
-  }
-
-  class Function1Context(val a: Any?) : AbstractCoroutineContextElement(Function1Context) {
-    companion object Key : CoroutineContext.Key<Function1Context>
   }
 
   override val fx: MonadFx<Function1PartialOf<I>>
     get() = object : MonadFx<Function1PartialOf<I>> {
       override val M: Monad<Function1PartialOf<I>> = this@Function1Monad
       override fun <A> monad(c: suspend MonadContinuation<Function1PartialOf<I>, *>.() -> A): Function1<I, A> = Function1 { i ->
-          val function1Context = Function1Context(i)
-          val continuation = MonadContinuation<Function1PartialOf<I>, A>(M, function1Context)
+          val continuation = Function1MonadContinuation<I, A>(M, i)
           val wrapReturn: suspend MonadContinuation<Function1PartialOf<I>, *>.() -> Kind<Function1PartialOf<I>, A> = { just(c()) }
           wrapReturn.startCoroutine(continuation, continuation)
           continuation.returnedMonad()(i)
       }
     }
 }
+
+private class Function1MonadContinuation<I, A>(M: Monad<Function1PartialOf<I>>, val i: I) : MonadContinuation<Function1PartialOf<I>, A>(M)
 
 fun <A, B> Function1.Companion.fx(c: suspend MonadContinuation<Function1PartialOf<A>, *>.() -> B): Function1<A, B> =
   Function1.monad<A>().fx.monad(c).fix()
