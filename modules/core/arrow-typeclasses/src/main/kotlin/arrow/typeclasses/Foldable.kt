@@ -1,16 +1,17 @@
 package arrow.typeclasses
 
 import arrow.Kind
+import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Eval.Companion.always
-import arrow.core.ForEither
 import arrow.core.Left
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Right
 import arrow.core.Some
-import arrow.core.fix
+import arrow.core.flatMap
 import arrow.core.identity
+import arrow.core.right
 
 /**
  * ank_macro_hierarchy(arrow.typeclasses.Foldable)
@@ -190,13 +191,27 @@ interface Foldable<F> {
   /**
    * Get the element at the index of the Foldable.
    */
-  fun <A> Kind<F, A>.get(M: Monad<Kind<ForEither, A>>, idx: Long): Option<A> =
+  fun <A> Kind<F, A>.get(idx: Long): Option<A> =
     if (idx < 0L)
       None
     else
-      foldM(M, 0L) { i, a ->
-        if (i == idx) Left(a) else Right(i + 1L)
-      }.fix().swap().toOption()
+      foldLeft<A, Either<A, Long>>(0L.right()) { i, a ->
+        i.flatMap {
+          if (it == idx) Left(a)
+          else Right(it + 1L)
+        }
+      }.swap().toOption()
+
+  /**
+   * Get the first element of the foldable or none
+   */
+  fun <A> Kind<F, A>.firstOption(): Option<A> = get(0)
+
+  /**
+   * Get the first element of the foldable or none if empty or the predicate does not match
+   */
+  fun <A> Kind<F, A>.firstOption(predicate: (A) -> Boolean): Option<A> =
+    get(0).filter(predicate)
 
   companion object {
     @Deprecated("Use Iterator.iterateRight from Eval.kt instead")
