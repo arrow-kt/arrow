@@ -29,6 +29,7 @@ import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
 import arrow.core.extensions.traverse as idTraverse
 import arrow.core.extensions.id.monad.monad
+import arrow.core.identity
 import arrow.core.select as idSelect
 
 @extension
