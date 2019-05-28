@@ -208,7 +208,7 @@ interface Foldable<F> {
   fun <A> Kind<F, A>.firstOption(): Option<A> = get(0)
 
   /**
-   * Get the first element of the foldable or none
+   * Get the first element of the foldable or none if empty or the predicate does not match
    */
   fun <A> Kind<F, A>.firstOption(predicate: (A) -> Boolean): Option<A> =
     get(0).filter(predicate)

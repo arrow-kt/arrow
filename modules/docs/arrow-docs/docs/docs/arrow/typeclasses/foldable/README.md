@@ -513,7 +513,7 @@ import arrow.core.extensions.either.foldable.foldable
 
 fun foldableGet(strKind: EitherOf<String, String>): Option<String> =
   with(Either.foldable<String>()) {
-    strKind.get(Either.monad(), 0)
+    strKind.get(0)
   }
 
 val rightStr = Either.right("abc") as Either<String, String>
