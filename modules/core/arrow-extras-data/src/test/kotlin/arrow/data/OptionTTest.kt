@@ -127,10 +127,3 @@ class OptionTTest : UnitSpec() {
     }
   }
 }
-
-val test: Kleisli<ForIO, Int, Int> = Kleisli {
-  IO.just(it + it)
-}
-fun main() {
-  test.run(1).fix().unsafeRunAsync { }
-}

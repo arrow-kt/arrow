@@ -85,6 +85,10 @@ interface IOMonad : Monad<ForIO> {
 
   override fun <A> just(a: A): IO<A> =
     IO.just(a)
+
+  override suspend fun <A> MonadContinuation<ForIO, *>.bindStrategy(fa: Kind<ForIO, A>): BindingStrategy<ForIO, A> = BindingStrategy.Suspend {
+    fa.fix().suspended()
+  }
 }
 
 @extension
@@ -196,10 +200,6 @@ interface IOConcurrent : Concurrent<ForIO>, IOAsync {
 
   override fun <A, B, C> CoroutineContext.raceTriple(fa: Kind<ForIO, A>, fb: Kind<ForIO, B>, fc: Kind<ForIO, C>): IO<RaceTriple<ForIO, A, B, C>> =
     IO.raceTriple(this, fa, fb, fc)
-
-  override suspend fun <A> MonadContinuation<ForIO, *>.bindStrategy(fa: Kind<ForIO, A>): BindingStrategy<ForIO, A> = BindingStrategy.Suspend {
-    fa.fix().suspended()
-  }
 }
 
 fun IO.Companion.concurrent(dispatchers: Dispatchers<ForIO>): Concurrent<ForIO> = object : IOConcurrent {
