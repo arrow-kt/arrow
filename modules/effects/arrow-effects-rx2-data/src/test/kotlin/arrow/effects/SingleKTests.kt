@@ -13,6 +13,7 @@ import arrow.effects.rx2.extensions.singlek.monad.flatMap
 import arrow.effects.rx2.extensions.singlek.monad.monad
 import arrow.effects.rx2.extensions.singlek.monadError.monadError
 import arrow.effects.rx2.extensions.singlek.monadThrow.bindingCatch
+import arrow.effects.rx2.extensions.singlek.timer.timer
 import arrow.effects.rx2.value
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
@@ -22,6 +23,7 @@ import arrow.test.laws.AsyncLaws
 import arrow.test.laws.FunctorLaws
 import arrow.test.laws.MonadErrorLaws
 import arrow.test.laws.MonadLaws
+import arrow.test.laws.TimerLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
@@ -59,6 +61,7 @@ class SingleKTests : UnitSpec() {
 
   init {
     testLaws(
+      TimerLaws.laws(SingleK.async(), SingleK.timer(), EQ()),
       FunctorLaws.laws(SingleK.functor(), { SingleK.just(it) }, EQ()),
       ApplicativeLaws.laws(SingleK.applicative(), EQ()),
       MonadLaws.laws(SingleK.monad(), EQ()),

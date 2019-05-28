@@ -8,11 +8,13 @@ import arrow.effects.rx2.extensions.observablek.async.async
 import arrow.effects.rx2.extensions.observablek.functor.functor
 import arrow.effects.rx2.extensions.observablek.monad.flatMap
 import arrow.effects.rx2.extensions.observablek.monadThrow.bindingCatch
+import arrow.effects.rx2.extensions.observablek.timer.timer
 import arrow.effects.rx2.extensions.observablek.traverse.traverse
 import arrow.effects.rx2.value
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
+import arrow.test.laws.TimerLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.runner.junit4.KotlinTestRunner
@@ -52,6 +54,7 @@ class ObservableKTests : UnitSpec() {
   }
 
   init {
+    testLaws(TimerLaws.laws(ObservableK.async(), ObservableK.timer(), EQ()))
     testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ(), testStackSafety = false))
 //     FIXME(paco) #691
 //    testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ()))

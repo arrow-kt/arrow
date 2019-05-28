@@ -15,6 +15,7 @@ import arrow.effects.rx2.extensions.maybek.monad.monad
 import arrow.effects.rx2.extensions.maybek.monadDefer.monadDefer
 import arrow.effects.rx2.extensions.maybek.monadError.monadError
 import arrow.effects.rx2.extensions.maybek.monadThrow.bindingCatch
+import arrow.effects.rx2.extensions.maybek.timer.timer
 import arrow.effects.rx2.value
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
@@ -26,6 +27,7 @@ import arrow.test.laws.FunctorLaws
 import arrow.test.laws.MonadDeferLaws
 import arrow.test.laws.MonadErrorLaws
 import arrow.test.laws.MonadLaws
+import arrow.test.laws.TimerLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
@@ -63,6 +65,7 @@ class MaybeKTests : UnitSpec() {
 
   init {
     testLaws(
+      TimerLaws.laws(MaybeK.async(), MaybeK.timer(), EQ()),
       FunctorLaws.laws(MaybeK.functor(), { MaybeK.just(it) }, EQ()),
       ApplicativeLaws.laws(MaybeK.applicative(), EQ()),
       MonadLaws.laws(MaybeK.monad(), EQ()),

@@ -11,11 +11,13 @@ import arrow.effects.reactor.extensions.fx
 import arrow.effects.reactor.extensions.fluxk.monad.flatMap
 import arrow.effects.reactor.extensions.fluxk.monadThrow.bindingCatch
 import arrow.effects.reactor.extensions.fluxk.traverse.traverse
+import arrow.effects.reactor.extensions.fluxk.timer.timer
 import arrow.effects.reactor.value
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
 import arrow.test.laws.FoldableLaws
+import arrow.test.laws.TimerLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.runner.junit4.KotlinTestRunner
@@ -65,6 +67,7 @@ class FluxKTest : UnitSpec() {
   init {
 
     testLaws(
+      TimerLaws.laws(FluxK.async(), FluxK.timer(), EQ()),
       AsyncLaws.laws(FluxK.async(), EQ(), EQ(), testStackSafety = false),
       FoldableLaws.laws(FluxK.foldable(), { FluxK.just(it) }, Eq.any()),
       TraverseLaws.laws(FluxK.traverse(), FluxK.functor(), { FluxK.just(it) }, EQ())

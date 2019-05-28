@@ -19,8 +19,8 @@ import arrow.effects.Race8
 import arrow.effects.Race9
 import arrow.effects.RacePair
 import arrow.effects.RaceTriple
+import arrow.effects.Timer
 import arrow.effects.data.internal.BindingCancellationException
-import arrow.effects.internal.ConcurrentSleep
 import arrow.effects.internal.TimeoutException
 import arrow.typeclasses.MonadContinuation
 import java.util.concurrent.atomic.AtomicReference
@@ -41,6 +41,8 @@ typealias ConnectedProc<F, A> = (KindConnection<F>, ((Either<Throwable, A>) -> U
 interface Concurrent<F> : Async<F> {
 
   fun dispatchers(): Dispatchers<F>
+
+  fun timer(): Timer<F> = Timer(this)
 
   /**
    * Entry point for monad bindings which enables for comprehensions. The underlying impl is based on coroutines.
@@ -801,28 +803,10 @@ interface Concurrent<F> : Async<F> {
 
   /**
    *  Sleeps for a given [duration] without blocking a thread.
-   *  Used to derive [waitFor] and can be used to created timed events like backing-off retries.
    *
-   * ```kotlin:ank:playground
-   * import arrow.*
-   * import arrow.effects.*
-   * import arrow.effects.typeclasses.*
-   * import arrow.effects.extensions.io.concurrent.concurrent
-   *
-   * fun main(args: Array<String>) {
-   *   //sampleStart
-   *   fun <F> Concurrent<F>.delayHelloWorld(): Kind<F, Unit> =
-   *     sleep(3.seconds).flatMap {
-   *       delay { println("Hello World!") }
-   *     }
-   *   //sampleEnd
-   *   IO.concurrent().delayHelloWorld()
-   *     .fix().unsafeRunSync()
-   * }
-   * ```
-   * @see waitFor
+   * @see Timer
    **/
-  fun sleep(duration: Duration): Kind<F, Unit> = ConcurrentSleep(duration)
+  fun sleep(duration: Duration): Kind<F, Unit> = timer().sleep(duration)
 
   /**
    * Returns the result of [this] within the specified [duration] or the [default] value.

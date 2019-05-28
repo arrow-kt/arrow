@@ -6,11 +6,13 @@ import arrow.effects.reactor.MonoKOf
 import arrow.effects.reactor.extensions.monok.async.async
 import arrow.effects.reactor.extensions.monok.monad.flatMap
 import arrow.effects.reactor.extensions.monok.monadThrow.bindingCatch
+import arrow.effects.reactor.extensions.monok.timer.timer
 import arrow.effects.reactor.k
 import arrow.effects.reactor.value
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
+import arrow.test.laws.TimerLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
@@ -57,7 +59,10 @@ class MonoKTest : UnitSpec() {
   }
 
   init {
-    testLaws(AsyncLaws.laws(MonoK.async(), EQ(), EQ(), testStackSafety = false))
+    testLaws(
+      AsyncLaws.laws(MonoK.async(), EQ(), EQ(), testStackSafety = false),
+      TimerLaws.laws(MonoK.async(), MonoK.timer(), EQ())
+    )
 
     "Multi-thread Monos finish correctly" {
       val value: Mono<Long> = bindingCatch {
