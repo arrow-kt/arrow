@@ -77,13 +77,13 @@ val ioInterpreter: FunctionK<ForOps, ForIO> = object : FunctionK<ForOps, ForIO> 
 
 private val program = Ops.binding {
   val (added) = Ops.add(10, 10)
-  val subtracted = bind { Ops.subtract(added, 50) }
+  val subtracted = !Ops.subtract(added, 50)
   subtracted
 }.fix()
 
 private fun stackSafeTestProgram(n: Int, stopAt: Int): FreeC<ForOps, Int> = Ops.binding {
   val (v) = Ops.add(n, 1)
-  val r = bind { if (v < stopAt) stackSafeTestProgram(v, stopAt) else FreeC.just(v) }
+  val r = !if (v < stopAt) stackSafeTestProgram(v, stopAt) else FreeC.just(v)
   r
 }.fix()
 

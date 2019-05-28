@@ -6,7 +6,6 @@ import arrow.core.Option
 import arrow.core.Some
 import arrow.core.value
 import arrow.data.NonEmptyList
-import arrow.data.fix
 import arrow.free.extensions.FreeEq
 import arrow.free.extensions.FreeMonad
 import arrow.free.extensions.free.eq.eq
@@ -42,13 +41,13 @@ class FreeTest : UnitSpec() {
 
   private val program = Ops.binding {
     val (added) = Ops.add(10, 10)
-    val subtracted = bind { Ops.subtract(added, 50) }
+    val subtracted = !Ops.subtract(added, 50)
     subtracted
   }.fix()
 
   private fun stackSafeTestProgram(n: Int, stopAt: Int): Free<ForOps, Int> = Ops.binding {
     val (v) = Ops.add(n, 1)
-    val r = bind { if (v < stopAt) stackSafeTestProgram(v, stopAt) else Free.just(v) }
+    val r = !if (v < stopAt) stackSafeTestProgram(v, stopAt) else Free.just(v)
     r
   }.fix()
 
@@ -65,9 +64,9 @@ class FreeTest : UnitSpec() {
     )
 
     "Can interpret an ADT as Free operations" {
-      program.foldMap(optionInterpreter, Option.monad()).fix() shouldBe Some(-30)
-      program.foldMap(idInterpreter, IdMonad).fix() shouldBe Id(-30)
-      program.foldMap(nonEmptyListInterpreter, NonEmptyList.monad()).fix() shouldBe NonEmptyList.of(-30)
+      program.foldMap(optionInterpreter, Option.monad()) shouldBe Some(-30)
+      program.foldMap(idInterpreter, IdMonad) shouldBe Id(-30)
+      program.foldMap(nonEmptyListInterpreter, NonEmptyList.monad()) shouldBe NonEmptyList.of(-30)
     }
 
     "foldMap is stack safe" {

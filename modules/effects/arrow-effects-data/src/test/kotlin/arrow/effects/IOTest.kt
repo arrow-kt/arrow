@@ -448,7 +448,7 @@ class IOTest : UnitSpec() {
     "IO.binding should for comprehend over IO" {
       val result = IO.fx {
         val (x) = IO.just(1)
-        val y = bind { IO { x + 1 } }
+        val y = !IO { x + 1 }
         y
       }.fix()
       result.unsafeRunSync() shouldBe 2
