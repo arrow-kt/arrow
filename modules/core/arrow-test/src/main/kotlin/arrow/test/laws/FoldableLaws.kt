@@ -26,6 +26,8 @@ object FoldableLaws {
       Law("Foldable Laws: ForAll is lazy") { FF.forAllIsLazy(cf, EQ) },
       Law("Foldable Laws: ForAll consistent with exists") { FF.forallConsistentWithExists(cf) },
       Law("Foldable Laws: ForAll returns true if isEmpty") { FF.forallReturnsTrueIfEmpty(cf) },
+      Law("Foldable Laws: FirstOption returns None if isEmpty") { FF.firstOptionReturnsNoneIfEmpty(cf) },
+      Law("Foldable Laws: FirstOption returns None if predicate fails") { FF.firstOptionReturnsNoneIfPredicateFails(cf) },
       Law("Foldable Laws: FoldM for Id is equivalent to fold left") { FF.foldMIdIsFoldL(cf, EQ) }
     )
 
@@ -85,6 +87,17 @@ object FoldableLaws {
   fun <F> Foldable<F>.forallReturnsTrueIfEmpty(cf: (Int) -> Kind<F, Int>) =
     forAll(Gen.intPredicate(), Gen.int().map(cf)) { f: (Int) -> Boolean, fa: Kind<F, Int> ->
       !fa.isEmpty() || fa.forAll(f)
+    }
+
+  fun <F> Foldable<F>.firstOptionReturnsNoneIfEmpty(cf: (Int) -> Kind<F, Int>) =
+    forAll(Gen.int().map(cf)) { fa: Kind<F, Int> ->
+      if (fa.isEmpty()) fa.firstOption().isEmpty()
+      else fa.firstOption().isDefined()
+    }
+
+  fun <F> Foldable<F>.firstOptionReturnsNoneIfPredicateFails(cf: (Int) -> Kind<F, Int>) =
+    forAll(Gen.int().map(cf)) { fa: Kind<F, Int> ->
+      fa.firstOption { false }.isEmpty()
     }
 
   fun <F> Foldable<F>.foldMIdIsFoldL(cf: (Int) -> Kind<F, Int>, EQ: Eq<Int>) =
