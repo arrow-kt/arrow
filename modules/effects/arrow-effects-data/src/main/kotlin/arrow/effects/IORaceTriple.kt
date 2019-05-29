@@ -3,13 +3,11 @@ package arrow.effects
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
-import arrow.core.Tuple3
 import arrow.effects.internal.IOFiber
 import arrow.effects.internal.IOForkedStart
 import arrow.effects.internal.Platform
 import arrow.effects.internal.UnsafePromise
 import arrow.effects.typeclasses.Fiber
-import arrow.effects.typeclasses.RaceTriple
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.CoroutineContext
 
@@ -31,9 +29,9 @@ import kotlin.coroutines.CoroutineContext
  *     val promise = Promise.uncancelable<ForIO, Int>(IO.async()).bind()
  *     val raceTriple = IO.raceTriple(Dispatchers.Default, promise.get(), IO.unit, IO.never).bind()
  *     raceTriple.fold(
- *       { IO.raiseError<Int>(RuntimeException("Promise.get cannot win before complete")) },
- *       { (a: Fiber<ForIO, Int>, _, _) -> promise.complete(1).flatMap { a.join() } },
- *       { IO.raiseError<Int>(RuntimeException("never cannot win before complete")) }
+ *       { _, _, _ -> IO.raiseError<Int>(RuntimeException("Promise.get cannot win before complete")) },
+ *       { a: Fiber<ForIO, Int>, _, _ -> promise.complete(1).flatMap { a.join() } },
+ *       { _, _, _ -> IO.raiseError<Int>(RuntimeException("never cannot win before complete")) }
  *     ).bind()
  *   }.unsafeRunSync() == 1
  *   //sampleEnd
@@ -88,7 +86,7 @@ fun <A, B, C> IO.Companion.raceTriple(ctx: CoroutineContext, ioA: IOOf<A>, ioB: 
       }, { a ->
         if (active.getAndSet(false)) {
           conn.pop()
-          cb(Right(Left(Tuple3(a, IOFiber(promiseB, connB), IOFiber(promiseC, connC)))))
+          cb(Right(RaceTriple.First(a, IOFiber(promiseB, connB), IOFiber(promiseC, connC))))
         } else {
           promiseA.complete(Right(a))
         }
@@ -115,7 +113,7 @@ fun <A, B, C> IO.Companion.raceTriple(ctx: CoroutineContext, ioA: IOOf<A>, ioB: 
       }, { b ->
         if (active.getAndSet(false)) {
           conn.pop()
-          cb(Right(Right(Left(Tuple3(IOFiber(promiseA, connA), b, IOFiber(promiseC, connC))))))
+          cb(Right(RaceTriple.Second(IOFiber(promiseA, connA), b, IOFiber(promiseC, connC))))
         } else {
           promiseB.complete(Right(b))
         }
@@ -142,7 +140,7 @@ fun <A, B, C> IO.Companion.raceTriple(ctx: CoroutineContext, ioA: IOOf<A>, ioB: 
       }, { c ->
         if (active.getAndSet(false)) {
           conn.pop()
-          cb(Right(Right(Right(Tuple3(IOFiber(promiseA, connA), IOFiber(promiseB, connB), c)))))
+          cb(Right(RaceTriple.Third(IOFiber(promiseA, connA), IOFiber(promiseB, connB), c)))
         } else {
           promiseC.complete(Right(c))
         }

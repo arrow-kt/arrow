@@ -1,6 +1,5 @@
 package arrow.benchmarks
 
-import arrow.core.Either
 import arrow.data.extensions.list.foldable.foldLeft
 import arrow.effects.IO
 import arrow.effects.IODispatchers
@@ -28,10 +27,11 @@ open class RacePair {
 
   private fun racePairHelper(): IO<Int> = (0 until size).toList().foldLeft(IO { 0 }) { acc, _ ->
     IO.racePair(IODispatchers.CommonPool, acc, IO { 1 }).flatMap { ei ->
-      when (ei) {
-        is Either.Left -> ei.a.b.cancel().map { ei.a.a }
-        is Either.Right -> ei.b.a.cancel().map { ei.b.b }
-      }
+      ei.fold({ a, (_, cancel) ->
+        cancel.map { a }
+      }, { (_, cancel), b ->
+        cancel.map { b }
+      })
     }
   }
 

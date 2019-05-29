@@ -9,11 +9,13 @@ import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Bracket
 import arrow.effects.typeclasses.ConcurrentEffect
 import arrow.effects.typeclasses.Disposable
+import arrow.effects.typeclasses.Duration
 import arrow.effects.typeclasses.Effect
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
 import arrow.effects.typeclasses.ProcF
+import arrow.effects.Timer
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
@@ -21,6 +23,8 @@ import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
+import io.reactivex.Single
+import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 
 @extension
@@ -122,4 +126,11 @@ interface SingleKEffect :
 interface SingleKConcurrentEffect : ConcurrentEffect<ForSingleK>, SingleKEffect {
   override fun <A> SingleKOf<A>.runAsyncCancellable(cb: (Either<Throwable, A>) -> SingleKOf<Unit>): SingleK<Disposable> =
     fix().runAsyncCancellable(cb)
+}
+
+@extension
+interface SingleKTimer : Timer<ForSingleK> {
+  override fun sleep(duration: Duration): SingleK<Unit> =
+    SingleK(Single.timer(duration.nanoseconds, TimeUnit.NANOSECONDS)
+      .map { Unit })
 }

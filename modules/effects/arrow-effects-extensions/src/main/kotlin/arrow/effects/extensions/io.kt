@@ -6,6 +6,8 @@ import arrow.effects.ForIO
 import arrow.effects.IO
 import arrow.effects.IOOf
 import arrow.effects.OnCancel
+import arrow.effects.RacePair
+import arrow.effects.RaceTriple
 import arrow.effects.fix
 import arrow.effects.racePair
 import arrow.effects.raceTriple
@@ -25,8 +27,7 @@ import arrow.effects.typeclasses.Fiber
 import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
 import arrow.effects.typeclasses.ProcF
-import arrow.effects.typeclasses.RacePair
-import arrow.effects.typeclasses.RaceTriple
+import arrow.effects.Timer
 import arrow.effects.typeclasses.UnsafeRun
 import arrow.extension
 import arrow.typeclasses.Applicative
@@ -199,6 +200,9 @@ interface IOConcurrent : Concurrent<ForIO>, IOAsync {
 fun IO.Companion.concurrent(dispatchers: Dispatchers<ForIO>): Concurrent<ForIO> = object : IOConcurrent {
   override fun dispatchers(): Dispatchers<ForIO> = dispatchers
 }
+
+fun IO.Companion.timer(CF: Concurrent<ForIO>): Timer<ForIO> =
+  Timer(CF)
 
 @extension
 interface IOEffect : Effect<ForIO>, IOAsync {

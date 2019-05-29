@@ -8,11 +8,13 @@ import arrow.effects.rx2.MaybeKOf
 import arrow.effects.rx2.fix
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Bracket
+import arrow.effects.typeclasses.Duration
 import arrow.effects.typeclasses.Effect
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
 import arrow.effects.typeclasses.ProcF
+import arrow.effects.Timer
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
@@ -21,6 +23,8 @@ import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
+import io.reactivex.Maybe
+import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 
 @extension
@@ -136,4 +140,11 @@ interface MaybeKEffect :
   MaybeKAsync {
   override fun <A> MaybeKOf<A>.runAsync(cb: (Either<Throwable, A>) -> MaybeKOf<Unit>): MaybeK<Unit> =
     fix().runAsync(cb)
+}
+
+@extension
+interface MaybeKTimer : Timer<ForMaybeK> {
+  override fun sleep(duration: Duration): MaybeK<Unit> =
+    MaybeK(Maybe.timer(duration.nanoseconds, TimeUnit.NANOSECONDS)
+      .map { Unit })
 }
