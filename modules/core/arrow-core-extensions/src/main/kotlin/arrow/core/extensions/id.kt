@@ -104,7 +104,7 @@ interface IdMonad : Monad<ForId> {
   override fun <A, B> IdOf<A>.flatMap(f: (A) -> IdOf<B>): Id<B> =
     fix().flatMap(f)
 
-  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, IdOf<Either<A, B>>>): Id<B> =
+  override fun <A, B> tailRecM(a: A, f: (A) -> IdOf<Either<A, B>>): Id<B> =
     Id.tailRecM(a, f)
 
   override fun <A, B> IdOf<A>.map(f: (A) -> B): Id<B> =
@@ -113,11 +113,11 @@ interface IdMonad : Monad<ForId> {
   override fun <A> just(a: A): Id<A> =
     Id.just(a)
 
-  override fun <A, B> IdOf<Either<A, B>>.select(f: Kind<ForId, (A) -> B>): Kind<ForId, B> =
+  override fun <A, B> IdOf<Either<A, B>>.select(f: IdOf<(A) -> B>): Kind<ForId, B> =
     fix().idSelect(f)
 
   override suspend fun <A> MonadContinuation<ForId, *>.bindStrategy(fa: Kind<ForId, A>): BindingStrategy<ForId, A> =
-    BindingStrategy.Strict(fa.fix().value())
+    BindingStrategy.Strict(fa.value())
 
   override val fx: MonadFx<ForId>
     get() = IdFxMonad
@@ -149,7 +149,7 @@ interface IdBimonad : Bimonad<ForId> {
   override fun <A, B> IdOf<A>.flatMap(f: (A) -> IdOf<B>): Id<B> =
     fix().flatMap(f)
 
-  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, IdOf<Either<A, B>>>): Id<B> =
+  override fun <A, B> tailRecM(a: A, f: (A) -> IdOf<Either<A, B>>): Id<B> =
     Id.tailRecM(a, f)
 
   override fun <A, B> IdOf<A>.map(f: (A) -> B): Id<B> =

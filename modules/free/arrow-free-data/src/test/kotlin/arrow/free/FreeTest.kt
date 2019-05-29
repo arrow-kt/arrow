@@ -63,9 +63,15 @@ class FreeTest : UnitSpec() {
       MonadLaws.laws(Free.monad(), EQ)
     )
 
-    "Can interpret an ADT as Free operations" {
+    "Can interpret an ADT as Free operations to Option" {
       program.foldMap(optionInterpreter, Option.monad()) shouldBe Some(-30)
-      program.foldMap(idInterpreter, IdMonad) shouldBe Id(-30)
+    }
+
+    "Can interpret an ADT as Free operations to Id" {
+      program.foldMap(idInterpreter, Id.monad()) shouldBe Id(-30)
+    }
+
+    "Can interpret an ADT as Free operations to NonEmptyList" {
       program.foldMap(nonEmptyListInterpreter, NonEmptyList.monad()) shouldBe NonEmptyList.of(-30)
     }
 
