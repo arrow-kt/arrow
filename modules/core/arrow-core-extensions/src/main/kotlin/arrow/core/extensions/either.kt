@@ -13,7 +13,24 @@ import arrow.core.Right
 import arrow.core.extensions.either.monad.monad
 import arrow.core.fix
 import arrow.extension
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Apply
+import arrow.typeclasses.Bifunctor
+import arrow.typeclasses.BindingStrategy
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Hash
+import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadContinuation
+import arrow.typeclasses.MonadError
+import arrow.typeclasses.MonadFx
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.Semigroup
+import arrow.typeclasses.SemigroupK
+import arrow.typeclasses.Show
+import arrow.typeclasses.Traverse
 import arrow.core.ap as eitherAp
 import arrow.core.combineK as eitherCombineK
 import arrow.core.extensions.traverse as eitherTraverse
@@ -106,7 +123,6 @@ interface EitherMonad<L> : Monad<EitherPartialOf<L>>, EitherApplicative<L> {
   @Suppress("UNCHECKED_CAST")
   override val fx: MonadFx<EitherPartialOf<L>>
     get() = EitherMonadFx as MonadFx<EitherPartialOf<L>>
-
 }
 
 internal object EitherMonadFx : MonadFx<EitherPartialOf<Any?>> {

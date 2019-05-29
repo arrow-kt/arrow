@@ -18,7 +18,28 @@ import arrow.core.extensions.option.monad.map
 import arrow.core.extensions.option.monad.monad
 import arrow.core.identity
 import arrow.core.orElse
-import arrow.typeclasses.*
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Apply
+import arrow.typeclasses.BindingStrategy
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Hash
+import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadContinuation
+import arrow.typeclasses.MonadError
+import arrow.typeclasses.MonadFx
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.MonoidK
+import arrow.typeclasses.Monoidal
+import arrow.typeclasses.Selective
+import arrow.typeclasses.Semigroup
+import arrow.typeclasses.SemigroupK
+import arrow.typeclasses.Semigroupal
+import arrow.typeclasses.Semiring
+import arrow.typeclasses.Show
+import arrow.typeclasses.Traverse
 import arrow.core.select as optionSelect
 
 @extension

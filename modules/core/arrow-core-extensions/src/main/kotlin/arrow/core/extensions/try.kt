@@ -3,12 +3,35 @@
 package arrow.core.extensions
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.Eval
+import arrow.core.Try
+import arrow.core.TryOf
+import arrow.core.ForTry
 import arrow.core.Try.Failure
 import arrow.extension
 import arrow.core.extensions.`try`.monad.monad
 import arrow.core.extensions.`try`.monadThrow.monadThrow
-import arrow.typeclasses.*
+import arrow.core.fix
+import arrow.core.identity
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Apply
+import arrow.typeclasses.BindingStrategy
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Hash
+import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadContinuation
+import arrow.typeclasses.MonadError
+import arrow.typeclasses.MonadFx
+import arrow.typeclasses.MonadThrow
+import arrow.typeclasses.MonadThrowFx
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.Semigroup
+import arrow.typeclasses.Show
+import arrow.typeclasses.Traverse
 import arrow.core.extensions.traverse as tryTraverse
 import arrow.core.handleErrorWith as tryHandleErrorWith
 
@@ -133,7 +156,6 @@ interface TryMonad : Monad<ForTry> {
 
   override val fx: MonadFx<ForTry>
     get() = TryFxMonadThrow
-
 }
 
 internal object TryFxMonadThrow : MonadThrowFx<ForTry> {
