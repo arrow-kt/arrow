@@ -71,6 +71,7 @@ open class MonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineC
       is BindingStrategy.Strict -> strategy.a
       is BindingStrategy.ContinuationShortCircuit -> suspendCoroutineUninterceptedOrReturn { c ->
         c.resumeWithException(strategy.throwable)
+        COROUTINE_SUSPENDED
       }
       is BindingStrategy.Suspend -> strategy.f()
     }
