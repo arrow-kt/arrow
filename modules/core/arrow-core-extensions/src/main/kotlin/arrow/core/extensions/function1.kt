@@ -163,16 +163,19 @@ interface Function1Monad<I> : Monad<Function1PartialOf<I>>, Function1Applicative
     return BindingStrategy.Strict(fa.fix()(i))
   }
 
+  @Suppress("UNCHECKED_CAST")
   override val fx: MonadFx<Function1PartialOf<I>>
-    get() = object : MonadFx<Function1PartialOf<I>> {
-      override val M: Monad<Function1PartialOf<I>> = this@Function1Monad
-      override fun <A> monad(c: suspend MonadContinuation<Function1PartialOf<I>, *>.() -> A): Function1<I, A> = Function1 { i ->
-          val continuation = Function1MonadContinuation<I, A>(M, i)
-          val wrapReturn: suspend MonadContinuation<Function1PartialOf<I>, *>.() -> Kind<Function1PartialOf<I>, A> = { just(c()) }
-          wrapReturn.startCoroutine(continuation, continuation)
-          continuation.returnedMonad()(i)
-      }
-    }
+    get() = Function1MonadFx as MonadFx<Function1PartialOf<I>>
+}
+
+internal object Function1MonadFx : MonadFx<Function1PartialOf<Any?>> {
+  override val M: Monad<Function1PartialOf<Any?>> = Function1.monad()
+  override fun <A> monad(c: suspend MonadContinuation<Function1PartialOf<Any?>, *>.() -> A): Function1<Any?, A> = Function1 { i ->
+    val continuation = Function1MonadContinuation<Any?, A>(M, i)
+    val wrapReturn: suspend MonadContinuation<Function1PartialOf<Any?>, *>.() -> Kind<Function1PartialOf<Any?>, A> = { just(c()) }
+    wrapReturn.startCoroutine(continuation, continuation)
+    continuation.returnedMonad()(i)
+  }
 }
 
 private class Function1MonadContinuation<I, A>(M: Monad<Function1PartialOf<I>>, val i: I) : MonadContinuation<Function1PartialOf<I>, A>(M)

@@ -3,33 +3,12 @@
 package arrow.core.extensions
 
 import arrow.Kind
-import arrow.core.Either
-import arrow.core.Eval
-import arrow.core.ForId
-import arrow.core.Id
-import arrow.core.IdOf
+import arrow.core.*
+import arrow.core.extensions.eval.monad.monad
 import arrow.extension
-import arrow.core.fix
-import arrow.core.value
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Apply
-import arrow.typeclasses.Bimonad
-import arrow.typeclasses.BindingStrategy
-import arrow.typeclasses.Comonad
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Foldable
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Hash
-import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadContinuation
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Selective
-import arrow.typeclasses.Semigroup
-import arrow.typeclasses.Show
-import arrow.typeclasses.Traverse
 import arrow.core.extensions.traverse as idTraverse
 import arrow.core.extensions.id.monad.monad
-import arrow.core.identity
+import arrow.typeclasses.*
 import arrow.core.select as idSelect
 
 @extension
@@ -117,6 +96,15 @@ interface IdMonad : Monad<ForId> {
 
   override suspend fun <A> MonadContinuation<ForId, *>.bindStrategy(fa: Kind<ForId, A>): BindingStrategy<ForId, A> =
     BindingStrategy.Strict(fa.fix().value())
+
+  override val fx: MonadFx<ForId>
+    get() = IdFxMonad
+}
+
+internal object IdFxMonad : MonadFx<ForId> {
+  override val M: Monad<ForId> = Id.monad()
+  override fun <A> monad(c: suspend MonadContinuation<ForId, *>.() -> A): Id<A> =
+    super.monad(c).fix()
 }
 
 @extension

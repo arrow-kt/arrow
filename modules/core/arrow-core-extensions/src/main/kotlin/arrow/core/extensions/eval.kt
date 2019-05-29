@@ -66,11 +66,13 @@ interface EvalMonad : Monad<ForEval> {
     BindingStrategy.Strict(fa.fix().value())
 
   override val fx: MonadFx<ForEval>
-    get() = object : MonadFx<ForEval> {
-      override val M: Monad<ForEval> = this@EvalMonad
-      override fun <A> monad(c: suspend MonadContinuation<ForEval, *>.() -> A): Eval<A> =
-        Eval.defer { super.monad(c).fix() }
-    }
+    get() = EvalFxMonad
+}
+
+internal object EvalFxMonad : MonadFx<ForEval> {
+  override val M: Monad<ForEval> = Eval.monad()
+  override fun <A> monad(c: suspend MonadContinuation<ForEval, *>.() -> A): Eval<A> =
+    Eval.defer { super.monad(c).fix() }
 }
 
 @extension

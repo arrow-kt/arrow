@@ -99,11 +99,13 @@ interface Function0Monad : Monad<ForFunction0> {
     BindingStrategy.Strict(fa.fix()())
 
   override val fx: MonadFx<ForFunction0>
-    get() = object : MonadFx<ForFunction0> {
-      override val M: Monad<ForFunction0> = this@Function0Monad
-      override fun <A> monad(c: suspend MonadContinuation<ForFunction0, *>.() -> A): Function0<A> =
-        Function0 { super.monad(c)() }
-    }
+    get() = Function0MonadFx
+}
+
+internal object Function0MonadFx : MonadFx<ForFunction0> {
+  override val M: Monad<ForFunction0> = Function0.monad()
+  override fun <A> monad(c: suspend MonadContinuation<ForFunction0, *>.() -> A): Function0<A> =
+    Function0 { super.monad(c)() }
 }
 
 @extension
