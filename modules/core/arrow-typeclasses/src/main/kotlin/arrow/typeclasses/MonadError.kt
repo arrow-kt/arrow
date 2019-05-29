@@ -160,4 +160,7 @@ interface MonadThrowFx<F> : MonadFx<F> {
     wrapReturn.startCoroutine(continuation, continuation)
     return continuation.returnedMonad()
   }
+
+  override fun <A> monad(c: suspend MonadContinuation<F, *>.() -> A): Kind<F, A> =
+    monadThrow(c)
 }

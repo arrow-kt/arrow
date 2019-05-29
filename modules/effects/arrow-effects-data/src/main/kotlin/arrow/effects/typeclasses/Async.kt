@@ -9,6 +9,7 @@ import arrow.effects.data.internal.BindingCancellationException
 import arrow.typeclasses.MonadContinuation
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
+import arrow.typeclasses.MonadThrowContinuation
 import arrow.typeclasses.MonadThrowFx
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -337,4 +338,10 @@ interface AsyncFx<F> : MonadThrowFx<F> {
     wrapReturn.startCoroutine(continuation, continuation)
     return continuation.returnedMonad()
   }
+
+  override fun <A> monadThrow(c: suspend MonadThrowContinuation<F, *>.() -> A): Kind<F, A> =
+    async(c)
+
+  override fun <A> monad(c: suspend MonadContinuation<F, *>.() -> A): Kind<F, A> =
+    async(c)
 }

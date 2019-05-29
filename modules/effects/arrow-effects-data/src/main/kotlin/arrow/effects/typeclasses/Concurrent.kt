@@ -23,6 +23,7 @@ import arrow.effects.Timer
 import arrow.effects.data.internal.BindingCancellationException
 import arrow.effects.internal.TimeoutException
 import arrow.typeclasses.MonadContinuation
+import arrow.typeclasses.MonadThrowContinuation
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine
@@ -880,4 +881,13 @@ interface ConcurrentFx<F> : AsyncFx<F> {
     wrapReturn.startCoroutine(continuation, continuation)
     return continuation.returnedMonad()
   }
+
+  override fun <A> async(c: suspend AsyncContinuation<F, *>.() -> A): Kind<F, A> =
+    concurrent(c)
+
+  override fun <A> monadThrow(c: suspend MonadThrowContinuation<F, *>.() -> A): Kind<F, A> =
+    concurrent(c)
+
+  override fun <A> monad(c: suspend MonadContinuation<F, *>.() -> A): Kind<F, A> =
+    concurrent(c)
 }
