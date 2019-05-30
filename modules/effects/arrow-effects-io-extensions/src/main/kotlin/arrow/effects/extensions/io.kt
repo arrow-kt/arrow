@@ -6,7 +6,6 @@ import arrow.effects.extensions.io.concurrent.concurrent
 import arrow.effects.extensions.io.dispatchers.dispatchers
 import arrow.effects.fix
 import arrow.effects.typeclasses.Concurrent
-import arrow.effects.typeclasses.ConcurrentContinuation
 import arrow.effects.typeclasses.ConcurrentEffect
 import arrow.effects.typeclasses.Dispatchers
 import arrow.effects.typeclasses.Environment

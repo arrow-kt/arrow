@@ -5,7 +5,6 @@ import arrow.core.Tuple2
 import arrow.core.Tuple3
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadContext
-import arrow.typeclasses.MonadContinuation
 import arrow.unsafe
 
 /**

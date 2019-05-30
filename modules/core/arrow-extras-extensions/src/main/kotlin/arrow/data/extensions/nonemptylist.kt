@@ -19,7 +19,6 @@ import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadContext
-import arrow.typeclasses.MonadContinuation
 import arrow.typeclasses.Reducible
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK

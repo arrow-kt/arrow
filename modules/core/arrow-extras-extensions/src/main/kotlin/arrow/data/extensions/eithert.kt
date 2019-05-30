@@ -33,7 +33,6 @@ import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
-import arrow.typeclasses.MonadThrowContinuation
 import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.MonadThrowContext
 import arrow.typeclasses.Nested

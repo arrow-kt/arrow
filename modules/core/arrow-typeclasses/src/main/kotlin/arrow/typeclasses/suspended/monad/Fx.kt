@@ -3,7 +3,6 @@ package arrow.typeclasses.suspended.monad
 import arrow.Kind
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadContext
-import arrow.typeclasses.MonadContinuation
 
 /**
  * Fx allows you to run pure sequential code as if it was imperative.

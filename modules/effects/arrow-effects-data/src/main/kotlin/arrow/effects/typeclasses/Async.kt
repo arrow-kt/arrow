@@ -7,7 +7,6 @@ import arrow.documented
 import arrow.effects.internal.asyncContinuation
 import arrow.effects.data.internal.BindingCancellationException
 import arrow.typeclasses.MonadContext
-import arrow.typeclasses.MonadContinuation
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.MonadThrowContext

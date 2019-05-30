@@ -1,7 +1,6 @@
 package arrow.typeclasses.suspended.monaderror
 
 import arrow.Kind
-import arrow.typeclasses.MonadThrowContinuation
 import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.MonadThrowContext
 

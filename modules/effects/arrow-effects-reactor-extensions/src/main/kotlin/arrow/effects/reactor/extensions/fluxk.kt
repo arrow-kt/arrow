@@ -20,7 +20,6 @@ import arrow.effects.typeclasses.Duration
 import arrow.effects.typeclasses.Effect
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.MonadDefer
-import arrow.effects.typeclasses.AsyncContinuation
 import arrow.effects.typeclasses.Proc
 import arrow.effects.typeclasses.ProcF
 import arrow.extension
