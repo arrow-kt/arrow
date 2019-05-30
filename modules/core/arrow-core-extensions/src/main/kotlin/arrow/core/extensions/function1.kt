@@ -24,6 +24,7 @@ import arrow.typeclasses.Divide
 import arrow.typeclasses.Divisible
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadContext
 import arrow.typeclasses.MonadContinuation
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.MonadFx
@@ -170,7 +171,7 @@ interface Function1Monad<I> : Monad<Function1PartialOf<I>>, Function1Applicative
 
 internal object Function1MonadFx : MonadFx<Function1PartialOf<Any?>> {
   override val M: Monad<Function1PartialOf<Any?>> = Function1.monad()
-  override fun <A> monad(c: suspend MonadContinuation<Function1PartialOf<Any?>, *>.() -> A): Function1<Any?, A> = Function1 { i ->
+  override fun <A> monad(c: suspend MonadContext<Function1PartialOf<Any?>>.() -> A): Function1<Any?, A> = Function1 { i ->
     val continuation = Function1MonadContinuation<Any?, A>(M, i)
     val wrapReturn: suspend MonadContinuation<Function1PartialOf<Any?>, *>.() -> Kind<Function1PartialOf<Any?>, A> = { just(c()) }
     wrapReturn.startCoroutine(continuation, continuation)
@@ -180,7 +181,7 @@ internal object Function1MonadFx : MonadFx<Function1PartialOf<Any?>> {
 
 private class Function1MonadContinuation<I, A>(M: Monad<Function1PartialOf<I>>, val i: I) : MonadContinuation<Function1PartialOf<I>, A>(M)
 
-fun <A, B> Function1.Companion.fx(c: suspend MonadContinuation<Function1PartialOf<A>, *>.() -> B): Function1<A, B> =
+fun <A, B> Function1.Companion.fx(c: suspend MonadContext<Function1PartialOf<A>>.() -> B): Function1<A, B> =
   Function1.monad<A>().fx.monad(c).fix()
 
 @extension

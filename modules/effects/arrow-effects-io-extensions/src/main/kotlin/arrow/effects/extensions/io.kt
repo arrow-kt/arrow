@@ -11,6 +11,7 @@ import arrow.effects.typeclasses.ConcurrentEffect
 import arrow.effects.typeclasses.Dispatchers
 import arrow.effects.typeclasses.Environment
 import arrow.effects.Timer
+import arrow.effects.typeclasses.ConcurrentContext
 import arrow.extension
 import kotlin.coroutines.CoroutineContext
 import arrow.effects.IODispatchers as IOD
@@ -42,5 +43,5 @@ fun IO.Companion.timer(): Timer<ForIO> = Timer(IO.concurrent())
 @extension
 interface IODefaultConcurrentEffect : ConcurrentEffect<ForIO>, IOConcurrentEffect, IODefaultConcurrent
 
-fun <A> IO.Companion.fx(c: suspend ConcurrentContinuation<ForIO, *>.() -> A): IO<A> =
+fun <A> IO.Companion.fx(c: suspend ConcurrentContext<ForIO>.() -> A): IO<A> =
   IO.concurrent().fx.concurrent(c).fix()

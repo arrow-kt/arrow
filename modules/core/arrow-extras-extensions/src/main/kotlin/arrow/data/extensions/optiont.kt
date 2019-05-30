@@ -34,6 +34,7 @@ import arrow.typeclasses.Divisible
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadContext
 import arrow.typeclasses.MonadContinuation
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
@@ -231,5 +232,5 @@ interface OptionTDecidableInstance<F> : Decidable<OptionTPartialOf<F>>, OptionTD
     )
 }
 
-fun <F, A> OptionT.Companion.fx(M: Monad<F>, c: suspend MonadContinuation<OptionTPartialOf<F>, *>.() -> A): OptionT<F, A> =
+fun <F, A> OptionT.Companion.fx(M: Monad<F>, c: suspend MonadContext<OptionTPartialOf<F>>.() -> A): OptionT<F, A> =
   OptionT.monad(M).fx.monad(c).fix()

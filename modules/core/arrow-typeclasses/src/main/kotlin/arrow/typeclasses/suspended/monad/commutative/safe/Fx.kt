@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.Tuple2
 import arrow.core.Tuple3
 import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadContext
 import arrow.typeclasses.MonadContinuation
 import arrow.unsafe
 
@@ -40,7 +41,7 @@ interface Fx<F> {
     }
 
   suspend fun <A> unsafe.fx(
-    f: suspend MonadContinuation<F, *>.() -> A
+    f: suspend MonadContext<F>.() -> A
   ): Kind<F, A> =
     monad().binding(f)
 }

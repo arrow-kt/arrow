@@ -11,7 +11,6 @@ import arrow.effects.rx2.extensions.observablek.monad.monad
 import arrow.effects.rx2.extensions.observablek.monadError.monadError
 import arrow.effects.rx2.fix
 import arrow.effects.typeclasses.Async
-import arrow.effects.typeclasses.AsyncContinuation
 import arrow.effects.typeclasses.Bracket
 import arrow.effects.typeclasses.ConcurrentEffect
 import arrow.effects.typeclasses.Disposable
@@ -22,6 +21,7 @@ import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
 import arrow.effects.typeclasses.ProcF
 import arrow.effects.Timer
+import arrow.effects.typeclasses.AsyncContext
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
@@ -180,7 +180,7 @@ fun ObservableK.Companion.monadErrorSwitch(): ObservableKMonadError = object : O
 }
 
 // TODO ObservableK does not yet have a Concurrent instance
-fun <A> ObservableK.Companion.fx(c: suspend AsyncContinuation<ForObservableK, *>.() -> A): ObservableK<A> =
+fun <A> ObservableK.Companion.fx(c: suspend AsyncContext<ForObservableK>.() -> A): ObservableK<A> =
   ObservableK.async().fx.async(c).fix()
 
 @extension

@@ -30,6 +30,7 @@ import arrow.typeclasses.Divide
 import arrow.typeclasses.Divisible
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadContext
 import arrow.typeclasses.MonadContinuation
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
@@ -198,5 +199,5 @@ fun <D> ReaderApi.applicative(): Applicative<ReaderPartialOf<D>> = Kleisli.appli
  */
 fun <D> ReaderApi.monad(): Monad<ReaderPartialOf<D>> = Kleisli.monad(Id.monad())
 
-fun <F, D, A> Ior.Companion.fx(MF: Monad<F>, c: suspend MonadContinuation<KleisliPartialOf<F, D>, *>.() -> A): Kleisli<F, D, A> =
+fun <F, D, A> Ior.Companion.fx(MF: Monad<F>, c: suspend MonadContext<KleisliPartialOf<F, D>>.() -> A): Kleisli<F, D, A> =
   Kleisli.monad<F, D>(MF).fx.monad(c).fix()

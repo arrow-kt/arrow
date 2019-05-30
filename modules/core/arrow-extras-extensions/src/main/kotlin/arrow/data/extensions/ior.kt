@@ -21,6 +21,7 @@ import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadContext
 import arrow.typeclasses.MonadContinuation
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
@@ -145,5 +146,5 @@ interface IorHash<L, R> : Hash<Ior<L, R>>, IorEq<L, R> {
   }
 }
 
-fun <L, R> Ior.Companion.fx(SL: Semigroup<L>, c: suspend MonadContinuation<IorPartialOf<L>, *>.() -> R): Ior<L, R> =
+fun <L, R> Ior.Companion.fx(SL: Semigroup<L>, c: suspend MonadContext<IorPartialOf<L>>.() -> R): Ior<L, R> =
   Ior.monad(SL).fx.monad(c).fix()

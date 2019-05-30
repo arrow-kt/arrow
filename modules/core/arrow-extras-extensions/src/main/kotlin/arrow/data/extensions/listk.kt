@@ -20,6 +20,7 @@ import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadContext
 import arrow.typeclasses.MonadContinuation
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.MonoidK
@@ -189,5 +190,5 @@ interface ListKHash<A> : Hash<ListKOf<A>>, ListKEq<A> {
   }
 }
 
-fun <A> ListK.Companion.fx(c: suspend MonadContinuation<ForListK, *>.() -> A): ListK<A> =
+fun <A> ListK.Companion.fx(c: suspend MonadContext<ForListK>.() -> A): ListK<A> =
   ListK.monad().fx.monad(c).fix()

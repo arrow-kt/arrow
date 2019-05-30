@@ -137,14 +137,14 @@ interface MonadThrow<F> : MonadError<F, Throwable> {
     "`bindingCatch` is getting renamed to `fx` for consistency with the Arrow Fx system. Use the Fx extensions for comprehensions",
     ReplaceWith("fx.monadThrow")
   )
-  fun <B> bindingCatch(c: suspend MonadThrowContinuation<F, *>.() -> B): Kind<F, B> =
+  fun <B> bindingCatch(c: suspend MonadThrowContext<F>.() -> B): Kind<F, B> =
     fx.monadThrow(c)
 
   @Deprecated(
     "`bindingCatch` is getting renamed to `fx` for consistency with the Arrow Fx system. Use the Fx extensions for comprehensions",
     ReplaceWith("fx.monad")
   )
-  override fun <B> binding(c: suspend MonadContinuation<F, *>.() -> B): Kind<F, B> =
+  override fun <B> binding(c: suspend MonadContext<F>.() -> B): Kind<F, B> =
     fx.monad(c)
 
   fun <A> Throwable.raiseNonFatal(): Kind<F, A> =
@@ -154,13 +154,13 @@ interface MonadThrow<F> : MonadError<F, Throwable> {
 interface MonadThrowFx<F> : MonadFx<F> {
   val ME: MonadThrow<F>
   override val M: Monad<F> get() = ME
-  fun <A> monadThrow(c: suspend MonadThrowContinuation<F, *>.() -> A): Kind<F, A> {
+  fun <A> monadThrow(c: suspend MonadThrowContext<F>.() -> A): Kind<F, A> {
     val continuation = MonadThrowContinuation<F, A>(ME)
-    val wrapReturn: suspend MonadThrowContinuation<F, *>.() -> Kind<F, A> = { just(c()) }
+    val wrapReturn: suspend MonadThrowContext<F>.() -> Kind<F, A> = { just(c()) }
     wrapReturn.startCoroutine(continuation, continuation)
     return continuation.returnedMonad()
   }
 
-  override fun <A> monad(c: suspend MonadContinuation<F, *>.() -> A): Kind<F, A> =
+  override fun <A> monad(c: suspend MonadContext<F>.() -> A): Kind<F, A> =
     monadThrow(c)
 }

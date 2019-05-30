@@ -27,6 +27,7 @@ import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadContext
 import arrow.typeclasses.MonadContinuation
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadFx
@@ -203,7 +204,7 @@ interface OptionMonad : Monad<ForOption> {
 
 internal object OptionFxMonad : MonadFx<ForOption> {
   override val M: Monad<ForOption> = Option.monad()
-  override fun <A> monad(c: suspend MonadContinuation<ForOption, *>.() -> A): Option<A> =
+  override fun <A> monad(c: suspend MonadContext<ForOption>.() -> A): Option<A> =
     super.monad(c).fix()
 }
 
@@ -295,5 +296,5 @@ interface OptionHash<A> : Hash<Option<A>>, OptionEq<A> {
   })
 }
 
-fun <A> Option.Companion.fx(c: suspend MonadContinuation<ForOption, *>.() -> A): Option<A> =
+fun <A> Option.Companion.fx(c: suspend MonadContext<ForOption>.() -> A): Option<A> =
   Option.monad().fx.monad(c).fix()

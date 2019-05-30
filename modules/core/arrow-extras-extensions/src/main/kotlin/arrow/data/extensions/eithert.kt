@@ -35,6 +35,7 @@ import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrowContinuation
 import arrow.typeclasses.MonadThrow
+import arrow.typeclasses.MonadThrowContext
 import arrow.typeclasses.Nested
 import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Traverse
@@ -296,5 +297,5 @@ private fun <F, L, A> handleErrorWith(fa: EitherTOf<F, L, A>, f: (L) -> EitherTO
     })
   }
 
-fun <F, R> EitherT.Companion.fx(M: MonadThrow<F>, c: suspend MonadThrowContinuation<EitherTPartialOf<F, Throwable>, *>.() -> R): EitherT<F, Throwable, R> =
+fun <F, R> EitherT.Companion.fx(M: MonadThrow<F>, c: suspend MonadThrowContext<EitherTPartialOf<F, Throwable>>.() -> R): EitherT<F, Throwable, R> =
   EitherT.monadThrow(M, M).fx.monadThrow(c).fix()

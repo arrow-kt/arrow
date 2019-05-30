@@ -23,6 +23,7 @@ import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadContext
 import arrow.typeclasses.MonadContinuation
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadFx
@@ -160,7 +161,7 @@ interface TryMonad : Monad<ForTry> {
 
 internal object TryFxMonadThrow : MonadThrowFx<ForTry> {
   override val ME: MonadThrow<ForTry> = Try.monadThrow()
-  override fun <A> monad(c: suspend MonadContinuation<ForTry, *>.() -> A): Try<A> =
+  override fun <A> monad(c: suspend MonadContext<ForTry>.() -> A): Try<A> =
     super.monad(c).fix()
 }
 
@@ -218,5 +219,5 @@ interface TryHash<A> : Hash<Try<A>>, TryEq<A> {
   })
 }
 
-fun <A> Try.Companion.fx(c: suspend MonadContinuation<ForTry, *>.() -> A): Try<A> =
+fun <A> Try.Companion.fx(c: suspend MonadContext<ForTry>.() -> A): Try<A> =
   Try.monad().fx.monad(c).fix()

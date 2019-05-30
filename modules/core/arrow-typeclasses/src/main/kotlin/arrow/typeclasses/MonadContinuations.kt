@@ -3,22 +3,19 @@ package arrow.typeclasses
 import arrow.Kind
 import arrow.core.Continuation
 import arrow.typeclasses.suspended.BindSyntax
-import java.util.concurrent.CountDownLatch
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.RestrictsSuspension
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 
-interface BindingInContextContinuation<in T> : Continuation<T> {
-  fun await(): Throwable?
-}
+@RestrictsSuspension
+interface MonadContext<F> : Monad<F>, BindSyntax<F>
 
 @RestrictsSuspension
 open class MonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineContext = EmptyCoroutineContext) :
-  Continuation<Kind<F, A>>, Monad<F> by M, BindSyntax<F> {
+  Continuation<Kind<F, A>>, Monad<F> by M, BindSyntax<F>, MonadContext<F> {
 
   override fun resume(value: Kind<F, A>) {
     returnedMonad = value
@@ -32,47 +29,18 @@ open class MonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineC
     }
   }
 
-  protected fun bindingInContextContinuation(context: CoroutineContext): BindingInContextContinuation<Kind<F, A>> =
-    object : BindingInContextContinuation<Kind<F, A>> {
-      val latch: CountDownLatch = CountDownLatch(1)
-
-      var error: Throwable? = null
-
-      override fun await() = latch.await().let { error }
-
-      override val context: CoroutineContext = context
-
-      override fun resume(value: Kind<F, A>) {
-        returnedMonad = value
-        latch.countDown()
-      }
-
-      override fun resumeWithException(exception: Throwable) {
-        error = exception
-        latch.countDown()
-      }
-    }
-
   protected lateinit var returnedMonad: Kind<F, A>
 
   open fun returnedMonad(): Kind<F, A> = returnedMonad
 
   override suspend fun <B> Kind<F, B>.bind(): B =
-    when (val strategy = bindStrategy(this)) {
-      is BindingStrategy.MultiShot -> suspendCoroutineUninterceptedOrReturn { c ->
-        val labelHere = c.stateStack // save the whole coroutine stack labels
-        returnedMonad = this.flatMap { x: B ->
-          c.stateStack = labelHere
-          c.resume(x)
-          returnedMonad
-        }
-        COROUTINE_SUSPENDED
+    suspendCoroutineUninterceptedOrReturn { c ->
+      val labelHere = c.stateStack // save the whole coroutine stack labels
+      returnedMonad = this.flatMap { x: B ->
+        c.stateStack = labelHere
+        c.resume(x)
+        returnedMonad
       }
-      is BindingStrategy.Strict -> strategy.a
-      is BindingStrategy.ContinuationShortCircuit -> suspendCoroutineUninterceptedOrReturn { c ->
-        c.resumeWithException(strategy.throwable)
-        COROUTINE_SUSPENDED
-      }
-      is BindingStrategy.Suspend -> strategy.f()
+      COROUTINE_SUSPENDED
     }
 }

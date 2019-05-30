@@ -21,6 +21,7 @@ import arrow.typeclasses.Divide
 import arrow.typeclasses.Divisible
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadContext
 import arrow.typeclasses.MonadContinuation
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
@@ -197,5 +198,5 @@ interface WriterTDecidableInstance<F, W> : Decidable<WriterTPartialOf<F, W>>, Wr
     )
 }
 
-fun <F, W, A> WriterT.Companion.fx(M: Monad<F>, MW: Monoid<W>, c: suspend MonadContinuation<WriterTPartialOf<F, W>, *>.() -> A): WriterT<F, W, A> =
+fun <F, W, A> WriterT.Companion.fx(M: Monad<F>, MW: Monoid<W>, c: suspend MonadContext<WriterTPartialOf<F, W>>.() -> A): WriterT<F, W, A> =
   WriterT.monad(M, MW).fx.monad(c).fix()
