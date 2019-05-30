@@ -4,13 +4,9 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.EitherPartialOf
 import arrow.core.Eval
-import arrow.core.extensions.either.foldable.foldable
-import arrow.core.extensions.either.monad.monad
-import arrow.core.extensions.either.traverse.traverse
 import arrow.core.Left
 import arrow.core.Tuple2
 import arrow.core.fix
-import arrow.core.identity
 import arrow.core.left
 import arrow.core.right
 import arrow.core.toT
@@ -19,12 +15,10 @@ import arrow.data.EitherTOf
 import arrow.data.EitherTPartialOf
 import arrow.data.extensions.eithert.monadThrow.monadThrow
 import arrow.data.fix
-import arrow.data.value
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Apply
-import arrow.typeclasses.ComposedTraverse
 import arrow.typeclasses.Contravariant
 import arrow.typeclasses.Decidable
 import arrow.typeclasses.Divide
@@ -34,7 +28,7 @@ import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
-import arrow.typeclasses.MonadThrowContext
+import arrow.typeclasses.MonadThrowSyntax
 import arrow.typeclasses.Nested
 import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Traverse
@@ -296,5 +290,5 @@ private fun <F, L, A> handleErrorWith(fa: EitherTOf<F, L, A>, f: (L) -> EitherTO
     })
   }
 
-fun <F, R> EitherT.Companion.fx(M: MonadThrow<F>, c: suspend MonadThrowContext<EitherTPartialOf<F, Throwable>>.() -> R): EitherT<F, Throwable, R> =
+fun <F, R> EitherT.Companion.fx(M: MonadThrow<F>, c: suspend MonadThrowSyntax<EitherTPartialOf<F, Throwable>>.() -> R): EitherT<F, Throwable, R> =
   EitherT.monadThrow(M, M).fx.monadThrow(c).fix()

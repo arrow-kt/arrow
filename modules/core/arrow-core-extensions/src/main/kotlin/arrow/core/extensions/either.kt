@@ -23,7 +23,7 @@ import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadContext
+import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.MonadContinuation
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadFx
@@ -128,7 +128,7 @@ interface EitherMonad<L> : Monad<EitherPartialOf<L>>, EitherApplicative<L> {
 
 internal object EitherMonadFx : MonadFx<EitherPartialOf<Any?>> {
   override val M: Monad<EitherPartialOf<Any?>> = Either.monad()
-  override fun <A> monad(c: suspend MonadContext<EitherPartialOf<Any?>>.() -> A): Either<Any?, A> =
+  override fun <A> monad(c: suspend MonadSyntax<EitherPartialOf<Any?>>.() -> A): Either<Any?, A> =
     super.monad(c).fix()
 }
 
@@ -213,5 +213,5 @@ interface EitherHash<L, R> : Hash<Either<L, R>>, EitherEq<L, R> {
   })
 }
 
-fun <L, R> Either.Companion.fx(c: suspend MonadContext<EitherPartialOf<L>>.() -> R): Either<L, R> =
+fun <L, R> Either.Companion.fx(c: suspend MonadSyntax<EitherPartialOf<L>>.() -> R): Either<L, R> =
   Either.monad<L>().fx.monad(c).fix()

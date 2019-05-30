@@ -22,8 +22,8 @@ import arrow.effects.RaceTriple
 import arrow.effects.Timer
 import arrow.effects.data.internal.BindingCancellationException
 import arrow.effects.internal.TimeoutException
-import arrow.typeclasses.MonadContext
-import arrow.typeclasses.MonadThrowContext
+import arrow.typeclasses.MonadSyntax
+import arrow.typeclasses.MonadThrowSyntax
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine
@@ -799,7 +799,7 @@ interface Concurrent<F> : Async<F> {
     return continuation.returnedMonad()
   }
 
-  override fun <B> binding(c: suspend MonadContext<F>.() -> B): Kind<F, B> =
+  override fun <B> binding(c: suspend MonadSyntax<F>.() -> B): Kind<F, B> =
     bindingConcurrent { c() }
 
   /**
@@ -875,19 +875,19 @@ interface ConcurrentFx<F> : AsyncFx<F> {
   override val async: Async<F>
     get() = concurrent
 
-  fun <A> concurrent(c: suspend ConcurrentContext<F>.() -> A): Kind<F, A> {
+  fun <A> concurrent(c: suspend ConcurrentSyntax<F>.() -> A): Kind<F, A> {
     val continuation = ConcurrentContinuation<F, A>(concurrent)
-    val wrapReturn: suspend ConcurrentContext<F>.() -> Kind<F, A> = { just(c()) }
+    val wrapReturn: suspend ConcurrentSyntax<F>.() -> Kind<F, A> = { just(c()) }
     wrapReturn.startCoroutine(continuation, continuation)
     return continuation.returnedMonad()
   }
 
-  override fun <A> async(c: suspend AsyncContext<F>.() -> A): Kind<F, A> =
+  override fun <A> async(c: suspend AsyncSyntax<F>.() -> A): Kind<F, A> =
     concurrent(c)
 
-  override fun <A> monadThrow(c: suspend MonadThrowContext<F>.() -> A): Kind<F, A> =
+  override fun <A> monadThrow(c: suspend MonadThrowSyntax<F>.() -> A): Kind<F, A> =
     concurrent(c)
 
-  override fun <A> monad(c: suspend MonadContext<F>.() -> A): Kind<F, A> =
+  override fun <A> monad(c: suspend MonadSyntax<F>.() -> A): Kind<F, A> =
     concurrent(c)
 }

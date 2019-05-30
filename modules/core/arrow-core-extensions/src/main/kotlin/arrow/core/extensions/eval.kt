@@ -15,7 +15,7 @@ import arrow.typeclasses.BindingStrategy
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadContext
+import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.MonadContinuation
 import arrow.typeclasses.MonadFx
 
@@ -72,7 +72,7 @@ interface EvalMonad : Monad<ForEval> {
 
 internal object EvalFxMonad : MonadFx<ForEval> {
   override val M: Monad<ForEval> = Eval.monad()
-  override fun <A> monad(c: suspend MonadContext<ForEval>.() -> A): Eval<A> =
+  override fun <A> monad(c: suspend MonadSyntax<ForEval>.() -> A): Eval<A> =
     Eval.defer { super.monad(c).fix() }
 }
 
@@ -112,5 +112,5 @@ interface EvalBimonad : Bimonad<ForEval> {
     fix().extract()
 }
 
-fun <B> Eval.Companion.fx(c: suspend MonadContext<ForEval>.() -> B): Eval<B> =
+fun <B> Eval.Companion.fx(c: suspend MonadSyntax<ForEval>.() -> B): Eval<B> =
   Eval.monad().fx.monad(c).fix()

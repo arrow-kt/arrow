@@ -1,6 +1,7 @@
 package arrow.mtl.typeclasses
 
 import arrow.Kind
+import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadContinuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -15,8 +16,13 @@ private object PredicateInterrupted : RuntimeException() {
 }
 
 @RestrictsSuspension
+interface MonadFilterSyntax<F> : Monad<F> {
+  fun continueIf(predicate: Boolean): Unit
+  suspend fun <B> Kind<F, B>.bindWithFilter(f: (B) -> Boolean): B
+}
+
 open class MonadFilterContinuation<F, A>(val MF: MonadFilter<F>, override val context: CoroutineContext = EmptyCoroutineContext) :
-  MonadContinuation<F, A>(MF) {
+  MonadContinuation<F, A>(MF), MonadFilterSyntax<F> {
 
   override fun resumeWith(result: Result<Kind<F, A>>) {
     result.fold({ super.resumeWith(result) }, {
@@ -31,7 +37,7 @@ open class MonadFilterContinuation<F, A>(val MF: MonadFilter<F>, override val co
    * Short circuits monadic bind if `predicate == false` return the
    * monad `empty` value.
    */
-  fun continueIf(predicate: Boolean) {
+  override fun continueIf(predicate: Boolean) {
     if (!predicate) throw PredicateInterrupted
   }
 
@@ -39,7 +45,7 @@ open class MonadFilterContinuation<F, A>(val MF: MonadFilter<F>, override val co
    * Binds only if the given predicate matches the inner value otherwise binds into the Monad `empty()` value
    * on `MonadFilter` instances
    */
-  suspend fun <B> Kind<F, B>.bindWithFilter(f: (B) -> Boolean): B {
+  override suspend fun <B> Kind<F, B>.bindWithFilter(f: (B) -> Boolean): B {
     val b: B = this.bind()
     return if (f(b)) b else MF.empty<B>().bind()
   }

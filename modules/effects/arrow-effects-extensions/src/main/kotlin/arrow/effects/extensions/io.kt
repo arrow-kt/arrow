@@ -7,7 +7,6 @@ import arrow.core.Right
 import arrow.effects.ForIO
 import arrow.effects.IO
 import arrow.effects.IOOf
-import arrow.effects.OnCancel
 import arrow.effects.RacePair
 import arrow.effects.RaceTriple
 import arrow.effects.fix
@@ -30,10 +29,10 @@ import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
 import arrow.effects.typeclasses.ProcF
 import arrow.effects.Timer
-import arrow.effects.typeclasses.AsyncContext
+import arrow.effects.typeclasses.AsyncSyntax
 import arrow.effects.typeclasses.AsyncContinuation
 import arrow.effects.typeclasses.AsyncFx
-import arrow.effects.typeclasses.ConcurrentContext
+import arrow.effects.typeclasses.ConcurrentSyntax
 import arrow.effects.typeclasses.ConcurrentContinuation
 import arrow.effects.typeclasses.ConcurrentFx
 import arrow.effects.typeclasses.UnsafeRun
@@ -44,12 +43,12 @@ import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.BindingStrategy
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadContext
+import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.MonadContinuation
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadFx
 import arrow.typeclasses.MonadThrow
-import arrow.typeclasses.MonadThrowContext
+import arrow.typeclasses.MonadThrowSyntax
 import arrow.typeclasses.MonadThrowContinuation
 import arrow.typeclasses.MonadThrowFx
 import arrow.typeclasses.Monoid
@@ -110,7 +109,7 @@ interface IOMonad : Monad<ForIO> {
   override val fx: MonadFx<ForIO>
     get() = object : MonadFx<ForIO> {
       override val M: Monad<ForIO> = this@IOMonad
-      override fun <A> monad(c: suspend MonadContext<ForIO>.() -> A): IO<A> = IO.async { _, cb ->
+      override fun <A> monad(c: suspend MonadSyntax<ForIO>.() -> A): IO<A> = IO.async { _, cb ->
         val continuation = MonadContinuation<ForIO, A>(M)
         suspend { c(continuation) }.startCoroutine(Continuation(EmptyCoroutineContext) { r ->
           r.fold({ cb(Right(it)) }, { cb(Left(it)) })
@@ -166,7 +165,7 @@ interface IOMonadThrow : MonadThrow<ForIO>, IOMonadError {
   override val fx: MonadThrowFx<ForIO>
     get() = object : MonadThrowFx<ForIO> {
       override val ME: MonadThrow<ForIO> = this@IOMonadThrow
-      override fun <A> monadThrow(c: suspend MonadThrowContext<ForIO>.() -> A): IO<A> = IO.async { _, cb ->
+      override fun <A> monadThrow(c: suspend MonadThrowSyntax<ForIO>.() -> A): IO<A> = IO.async { _, cb ->
         val continuation = MonadThrowContinuation<ForIO, A>(ME)
         suspend { c(continuation) }.startCoroutine(Continuation(EmptyCoroutineContext) { r ->
           r.fold({ cb(Right(it)) }, { cb(Left(it)) })
@@ -218,7 +217,7 @@ interface IOAsync : Async<ForIO>, IOMonadDefer {
   override val fx: AsyncFx<ForIO>
     get() = object : AsyncFx<ForIO> {
       override val async: Async<ForIO> = this@IOAsync
-      override fun <A> async(c: suspend AsyncContext<ForIO>.() -> A): IO<A> = IO.async { _, cb ->
+      override fun <A> async(c: suspend AsyncSyntax<ForIO>.() -> A): IO<A> = IO.async { _, cb ->
         val continuation = AsyncContinuation<ForIO, A>(async)
         suspend { c(continuation) }.startCoroutine(Continuation(EmptyCoroutineContext) { r ->
           r.fold({ cb(Right(it)) }, { cb(Left(it)) })
@@ -254,7 +253,7 @@ interface IOConcurrent : Concurrent<ForIO>, IOAsync {
   override val fx: ConcurrentFx<ForIO>
     get() = object : ConcurrentFx<ForIO> {
       override val concurrent: Concurrent<ForIO> = this@IOConcurrent
-      override fun <A> concurrent(c: suspend ConcurrentContext<ForIO>.() -> A): IO<A> = IO.async { _, cb ->
+      override fun <A> concurrent(c: suspend ConcurrentSyntax<ForIO>.() -> A): IO<A> = IO.async { _, cb ->
         val continuation = ConcurrentContinuation<ForIO, A>(concurrent)
         suspend { c(continuation) }.startCoroutine(Continuation(EmptyCoroutineContext) { r ->
           r.fold({ cb(Right(it)) }, { cb(Left(it)) })

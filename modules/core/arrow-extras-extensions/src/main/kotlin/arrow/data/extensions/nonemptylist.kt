@@ -18,7 +18,7 @@ import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadContext
+import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Reducible
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK
@@ -181,5 +181,5 @@ fun <F, A> Reducible<F>.toNonEmptyList(fa: Kind<F, A>): NonEmptyList<A> =
     lnel.map { nonEmptyList -> NonEmptyList(a, listOf(nonEmptyList.head) + nonEmptyList.tail) }
   }).value()
 
-fun <A> NonEmptyList.Companion.fx(c: suspend MonadContext<ForNonEmptyList>.() -> A): NonEmptyList<A> =
+fun <A> NonEmptyList.Companion.fx(c: suspend MonadSyntax<ForNonEmptyList>.() -> A): NonEmptyList<A> =
   NonEmptyList.monad().fx.monad(c).fix()

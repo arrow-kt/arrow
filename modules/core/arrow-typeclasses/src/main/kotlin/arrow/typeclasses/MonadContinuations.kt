@@ -12,11 +12,10 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
 @RestrictsSuspension
-interface MonadContext<F> : Monad<F>, BindSyntax<F>
+interface MonadSyntax<F> : Monad<F>, BindSyntax<F>
 
-@RestrictsSuspension
 open class MonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineContext = EmptyCoroutineContext) :
-  Continuation<Kind<F, A>>, Monad<F> by M, BindSyntax<F>, MonadContext<F> {
+  Continuation<Kind<F, A>>, Monad<F> by M, BindSyntax<F>, MonadSyntax<F> {
 
   override fun resume(value: Kind<F, A>) {
     returnedMonad = value

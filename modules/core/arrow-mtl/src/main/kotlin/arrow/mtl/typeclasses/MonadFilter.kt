@@ -20,9 +20,9 @@ interface MonadFilter<F> : Monad<F>, FunctorFilter<F> {
    * A coroutine is initiated and inside [MonadContinuation] suspended yielding to [flatMap]. Once all the flatMap binds are completed
    * the underlying monad is returned from the act of executing the coroutine
    */
-  fun <B> bindingFilter(c: suspend MonadFilterContinuation<F, *>.() -> B): Kind<F, B> {
+  fun <B> bindingFilter(c: suspend MonadFilterSyntax<F>.() -> B): Kind<F, B> {
     val continuation = MonadFilterContinuation<F, B>(this)
-    val wrapReturn: suspend MonadFilterContinuation<F, *>.() -> Kind<F, B> = { just(c()) }
+    val wrapReturn: suspend MonadFilterSyntax<F>.() -> Kind<F, B> = { just(c()) }
     wrapReturn.startCoroutine(continuation, continuation)
     return continuation.returnedMonad()
   }

@@ -18,7 +18,7 @@ import arrow.typeclasses.BindingStrategy
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadContext
+import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.MonadContinuation
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.MonadFx
@@ -105,7 +105,7 @@ interface Function0Monad : Monad<ForFunction0> {
 
 internal object Function0MonadFx : MonadFx<ForFunction0> {
   override val M: Monad<ForFunction0> = Function0.monad()
-  override fun <A> monad(c: suspend MonadContext<ForFunction0>.() -> A): Function0<A> =
+  override fun <A> monad(c: suspend MonadSyntax<ForFunction0>.() -> A): Function0<A> =
     Function0 { super.monad(c)() }
 }
 
@@ -145,5 +145,5 @@ interface Function0Bimonad : Bimonad<ForFunction0> {
     fix().extract()
 }
 
-fun <B> Function0.Companion.fx(c: suspend MonadContext<ForFunction0>.() -> B): Function0<B> =
+fun <B> Function0.Companion.fx(c: suspend MonadSyntax<ForFunction0>.() -> B): Function0<B> =
   Function0.monad().fx.monad(c).fix()

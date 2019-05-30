@@ -2,7 +2,7 @@ package arrow.typeclasses.suspended.monaderror
 
 import arrow.Kind
 import arrow.typeclasses.MonadThrow
-import arrow.typeclasses.MonadThrowContext
+import arrow.typeclasses.MonadThrowSyntax
 
 /**
  * Fx allows you to run pure sequential code as if it was imperative.
@@ -17,6 +17,6 @@ import arrow.typeclasses.MonadThrowContext
  */
 interface Fx<F> {
   fun monadError(): MonadThrow<F>
-  fun <A> fx(f: suspend MonadThrowContext<F>.() -> A): Kind<F, A> =
+  fun <A> fx(f: suspend MonadThrowSyntax<F>.() -> A): Kind<F, A> =
     monadError().bindingCatch(f)
 }

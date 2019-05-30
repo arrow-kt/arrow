@@ -3,15 +3,12 @@ package arrow.data.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Tuple2
-import arrow.core.left
-import arrow.core.right
 import arrow.core.toT
 import arrow.data.WriterT
 import arrow.data.WriterTOf
 import arrow.data.WriterTPartialOf
 import arrow.data.extensions.writert.monad.monad
 import arrow.data.fix
-import arrow.data.value
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
@@ -21,7 +18,7 @@ import arrow.typeclasses.Divide
 import arrow.typeclasses.Divisible
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadContext
+import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.Monoid
@@ -197,5 +194,5 @@ interface WriterTDecidableInstance<F, W> : Decidable<WriterTPartialOf<F, W>>, Wr
     )
 }
 
-fun <F, W, A> WriterT.Companion.fx(M: Monad<F>, MW: Monoid<W>, c: suspend MonadContext<WriterTPartialOf<F, W>>.() -> A): WriterT<F, W, A> =
+fun <F, W, A> WriterT.Companion.fx(M: Monad<F>, MW: Monoid<W>, c: suspend MonadSyntax<WriterTPartialOf<F, W>>.() -> A): WriterT<F, W, A> =
   WriterT.monad(M, MW).fx.monad(c).fix()

@@ -19,7 +19,7 @@ import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadContext
+import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.MonoidK
 import arrow.typeclasses.Monoidal
@@ -175,5 +175,5 @@ interface SequenceKHash<A> : Hash<SequenceK<A>>, SequenceKEq<A> {
   }
 }
 
-fun <A> SequenceK.Companion.fx(c: suspend MonadContext<ForSequenceK>.() -> A): SequenceK<A> =
+fun <A> SequenceK.Companion.fx(c: suspend MonadSyntax<ForSequenceK>.() -> A): SequenceK<A> =
   SequenceK.monad().fx.monad(c).fix()

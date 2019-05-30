@@ -6,10 +6,10 @@ import arrow.core.Right
 import arrow.documented
 import arrow.effects.internal.asyncContinuation
 import arrow.effects.data.internal.BindingCancellationException
-import arrow.typeclasses.MonadContext
+import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
-import arrow.typeclasses.MonadThrowContext
+import arrow.typeclasses.MonadThrowSyntax
 import arrow.typeclasses.MonadThrowFx
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -278,7 +278,7 @@ interface Async<F> : MonadDefer<F> {
    * }
    * ```
    */
-  suspend fun AsyncContext<F>.continueOn(ctx: CoroutineContext): Unit =
+  suspend fun AsyncSyntax<F>.continueOn(ctx: CoroutineContext): Unit =
     ctx.shift().bind()
 
   /**
@@ -332,16 +332,16 @@ internal val unitCallback = { cb: (Either<Throwable, Unit>) -> Unit -> cb(rightU
 interface AsyncFx<F> : MonadThrowFx<F> {
   val async: Async<F>
   override val ME: MonadThrow<F> get() = async
-  fun <A> async(c: suspend AsyncContext<F>.() -> A): Kind<F, A> {
+  fun <A> async(c: suspend AsyncSyntax<F>.() -> A): Kind<F, A> {
     val continuation = AsyncContinuation<F, A>(async)
-    val wrapReturn: suspend AsyncContext<F>.() -> Kind<F, A> = { just(c()) }
+    val wrapReturn: suspend AsyncSyntax<F>.() -> Kind<F, A> = { just(c()) }
     wrapReturn.startCoroutine(continuation, continuation)
     return continuation.returnedMonad()
   }
 
-  override fun <A> monadThrow(c: suspend MonadThrowContext<F>.() -> A): Kind<F, A> =
+  override fun <A> monadThrow(c: suspend MonadThrowSyntax<F>.() -> A): Kind<F, A> =
     async(c)
 
-  override fun <A> monad(c: suspend MonadContext<F>.() -> A): Kind<F, A> =
+  override fun <A> monad(c: suspend MonadSyntax<F>.() -> A): Kind<F, A> =
     async(c)
 }

@@ -9,9 +9,7 @@ import arrow.data.Ior
 import arrow.data.IorOf
 import arrow.data.IorPartialOf
 import arrow.data.extensions.ior.monad.monad
-import arrow.data.ap
 import arrow.data.fix
-import arrow.data.flatMap
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
@@ -21,7 +19,7 @@ import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadContext
+import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
@@ -145,5 +143,5 @@ interface IorHash<L, R> : Hash<Ior<L, R>>, IorEq<L, R> {
   }
 }
 
-fun <L, R> Ior.Companion.fx(SL: Semigroup<L>, c: suspend MonadContext<IorPartialOf<L>>.() -> R): Ior<L, R> =
+fun <L, R> Ior.Companion.fx(SL: Semigroup<L>, c: suspend MonadSyntax<IorPartialOf<L>>.() -> R): Ior<L, R> =
   Ior.monad(SL).fx.monad(c).fix()

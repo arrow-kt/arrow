@@ -4,14 +4,10 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.ForOption
-import arrow.core.extensions.option.applicative.applicative
-import arrow.core.extensions.option.foldable.foldable
-import arrow.core.extensions.option.traverse.traverse
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Tuple2
 import arrow.core.fix
-import arrow.core.identity
 import arrow.core.left
 import arrow.core.none
 import arrow.core.right
@@ -22,11 +18,9 @@ import arrow.data.OptionT
 import arrow.data.OptionTOf
 import arrow.data.OptionTPartialOf
 import arrow.data.fix
-import arrow.data.value
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
-import arrow.typeclasses.ComposedTraverse
 import arrow.typeclasses.Contravariant
 import arrow.typeclasses.Decidable
 import arrow.typeclasses.Divide
@@ -34,7 +28,7 @@ import arrow.typeclasses.Divisible
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadContext
+import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.MonoidK
@@ -42,7 +36,6 @@ import arrow.typeclasses.Nested
 import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Traverse
 import arrow.typeclasses.compose
-import arrow.typeclasses.fix
 import arrow.typeclasses.unnest
 import arrow.undocumented
 
@@ -231,5 +224,5 @@ interface OptionTDecidableInstance<F> : Decidable<OptionTPartialOf<F>>, OptionTD
     )
 }
 
-fun <F, A> OptionT.Companion.fx(M: Monad<F>, c: suspend MonadContext<OptionTPartialOf<F>>.() -> A): OptionT<F, A> =
+fun <F, A> OptionT.Companion.fx(M: Monad<F>, c: suspend MonadSyntax<OptionTPartialOf<F>>.() -> A): OptionT<F, A> =
   OptionT.monad(M).fx.monad(c).fix()

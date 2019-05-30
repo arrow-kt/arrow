@@ -24,7 +24,7 @@ import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadContext
+import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.MonadContinuation
 import arrow.typeclasses.MonadFx
 import arrow.typeclasses.Monoid
@@ -126,7 +126,7 @@ interface IdMonad : Monad<ForId> {
 
 internal object IdFxMonad : MonadFx<ForId> {
   override val M: Monad<ForId> = Id.monad()
-  override fun <A> monad(c: suspend MonadContext<ForId>.() -> A): Id<A> =
+  override fun <A> monad(c: suspend MonadSyntax<ForId>.() -> A): Id<A> =
     super.monad(c).fix()
 }
 
@@ -207,5 +207,5 @@ interface IdHash<A> : Hash<Id<A>>, IdEq<A> {
   override fun Id<A>.hash(): Int = HA().run { value().hash() }
 }
 
-fun <A> Id.Companion.fx(c: suspend MonadContext<ForId>.() -> A): Id<A> =
+fun <A> Id.Companion.fx(c: suspend MonadSyntax<ForId>.() -> A): Id<A> =
   Id.monad().fx.monad(c).fix()
