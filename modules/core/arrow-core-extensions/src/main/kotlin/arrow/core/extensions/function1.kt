@@ -159,7 +159,7 @@ interface Function1Monad<I> : Monad<Function1PartialOf<I>>, Function1Applicative
   override fun <A, B> tailRecM(a: A, f: (A) -> Function1Of<I, Either<A, B>>): Function1<I, B> =
     Function1.tailRecM(a, f)
 
-  override suspend fun <A> MonadContinuation<Function1PartialOf<I>, *>.bindStrategy(fa: Function1Of<I, A>): BindingStrategy<Function1PartialOf<I>, A> {
+  override fun <A> MonadContinuation<Function1PartialOf<I>, *>.bindStrategy(fa: Function1Of<I, A>): BindingStrategy<Function1PartialOf<I>, A> {
     val i = (this as Function1MonadContinuation).i
     return BindingStrategy.Strict(fa.fix()(i))
   }

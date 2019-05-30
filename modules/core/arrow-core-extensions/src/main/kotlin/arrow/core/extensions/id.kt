@@ -117,7 +117,7 @@ interface IdMonad : Monad<ForId> {
   override fun <A, B> IdOf<Either<A, B>>.select(f: IdOf<(A) -> B>): Kind<ForId, B> =
     fix().idSelect(f)
 
-  override suspend fun <A> MonadContinuation<ForId, *>.bindStrategy(fa: Kind<ForId, A>): BindingStrategy<ForId, A> =
+  override fun <A> MonadContinuation<ForId, *>.bindStrategy(fa: Kind<ForId, A>): BindingStrategy<ForId, A> =
     BindingStrategy.Strict(fa.value())
 
   override val fx: MonadFx<ForId>

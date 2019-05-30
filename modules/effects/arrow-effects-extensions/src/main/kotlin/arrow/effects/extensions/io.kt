@@ -103,7 +103,7 @@ interface IOMonad : Monad<ForIO> {
   override fun <A> just(a: A): IO<A> =
     IO.just(a)
 
-  override suspend fun <A> MonadContinuation<ForIO, *>.bindStrategy(fa: Kind<ForIO, A>): BindingStrategy<ForIO, A> = BindingStrategy.Suspend {
+  override fun <A> MonadContinuation<ForIO, *>.bindStrategy(fa: Kind<ForIO, A>): BindingStrategy<ForIO, A> = BindingStrategy.Suspend {
     fa.fix().suspended()
   }
 

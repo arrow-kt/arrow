@@ -96,7 +96,7 @@ interface Function0Monad : Monad<ForFunction0> {
   override fun <A, B> Function0Of<Either<A, B>>.select(f: Kind<ForFunction0, (A) -> B>): Kind<ForFunction0, B> =
     fix().fun0Select(f)
 
-  override suspend fun <A> MonadContinuation<ForFunction0, *>.bindStrategy(fa: Function0Of<A>): BindingStrategy<ForFunction0, A> =
+  override fun <A> MonadContinuation<ForFunction0, *>.bindStrategy(fa: Function0Of<A>): BindingStrategy<ForFunction0, A> =
     BindingStrategy.Strict(fa.fix()())
 
   override val fx: MonadFx<ForFunction0>

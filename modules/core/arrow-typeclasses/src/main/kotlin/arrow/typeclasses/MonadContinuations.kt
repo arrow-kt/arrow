@@ -9,6 +9,7 @@ import kotlin.coroutines.RestrictsSuspension
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 @RestrictsSuspension
 interface MonadContext<F> : Monad<F>, BindSyntax<F>
@@ -34,13 +35,20 @@ open class MonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineC
   open fun returnedMonad(): Kind<F, A> = returnedMonad
 
   override suspend fun <B> Kind<F, B>.bind(): B =
-    suspendCoroutineUninterceptedOrReturn { c ->
-      val labelHere = c.stateStack // save the whole coroutine stack labels
-      returnedMonad = this.flatMap { x: B ->
-        c.stateStack = labelHere
-        c.resume(x)
-        returnedMonad
+    when (val r = bindStrategy(this)) {
+      is BindingStrategy.MultiShot -> suspendCoroutineUninterceptedOrReturn { c ->
+        val labelHere = c.stateStack // save the whole coroutine stack labels
+        returnedMonad = this.flatMap { x: B ->
+          c.stateStack = labelHere
+          c.resume(x)
+          returnedMonad
+        }
+        COROUTINE_SUSPENDED
       }
-      COROUTINE_SUSPENDED
+      is BindingStrategy.ContinuationShortCircuit -> suspendCoroutineUninterceptedOrReturn { c ->
+        c.resumeWithException(r.throwable)
+      }
+      is BindingStrategy.Strict -> r.a
+      is BindingStrategy.Suspend -> r.f()
     }
 }

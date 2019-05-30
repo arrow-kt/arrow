@@ -118,7 +118,7 @@ interface EitherMonad<L> : Monad<EitherPartialOf<L>>, EitherApplicative<L> {
   override fun <A, B> tailRecM(a: A, f: (A) -> EitherOf<L, Either<A, B>>): Either<L, B> =
     Either.tailRecM(a, f)
 
-  override suspend fun <A> MonadContinuation<EitherPartialOf<L>, *>.bindStrategy(fa: EitherOf<L, A>): BindingStrategy<EitherPartialOf<L>, A> =
+  override fun <A> MonadContinuation<EitherPartialOf<L>, *>.bindStrategy(fa: EitherOf<L, A>): BindingStrategy<EitherPartialOf<L>, A> =
     fa.fix().fold({ BindingStrategy.ContinuationShortCircuit(fa) }, { BindingStrategy.Strict(it) })
 
   @Suppress("UNCHECKED_CAST")

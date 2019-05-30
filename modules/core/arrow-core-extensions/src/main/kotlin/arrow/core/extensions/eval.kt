@@ -63,7 +63,7 @@ interface EvalMonad : Monad<ForEval> {
   override fun <A> just(a: A): Eval<A> =
     Eval.just(a)
 
-  override suspend fun <A> MonadContinuation<ForEval, *>.bindStrategy(fa: Kind<ForEval, A>): BindingStrategy<ForEval, A> =
+  override fun <A> MonadContinuation<ForEval, *>.bindStrategy(fa: Kind<ForEval, A>): BindingStrategy<ForEval, A> =
     BindingStrategy.Strict(fa.fix().value())
 
   override val fx: MonadFx<ForEval>
