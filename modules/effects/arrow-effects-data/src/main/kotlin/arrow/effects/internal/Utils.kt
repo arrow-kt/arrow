@@ -7,7 +7,9 @@ import arrow.core.Some
 import arrow.core.left
 import arrow.core.right
 import arrow.effects.IO
+import arrow.effects.IOOf
 import arrow.effects.KindConnection
+import arrow.effects.fix
 import arrow.effects.typeclasses.Duration
 import java.util.concurrent.Executor
 import java.util.concurrent.atomic.AtomicBoolean
@@ -162,9 +164,7 @@ object Platform {
       latch.tryAcquireSharedNanos(1, limit.nanoseconds)
     }
 
-    val eitherRef = ref
-
-    return when (eitherRef) {
+    return when (val eitherRef = ref) {
       null -> None
       is Either.Left -> throw eitherRef.a
       is Either.Right -> Some(eitherRef.b)
@@ -207,7 +207,7 @@ object Platform {
 
   @PublishedApi
   internal class TrampolineExecutor(val underlying: Executor) {
-    private var immediateQueue = Platform.ArrayStack<Runnable>()
+    private var immediateQueue = ArrayStack<Runnable>()
     @Volatile
     private var withinLoop = false
 
@@ -225,7 +225,7 @@ object Platform {
       else immediateQueue.push(runnable)
 
     private fun forkTheRest() {
-      class ResumeRun(val head: Runnable, val rest: Platform.ArrayStack<Runnable>) : Runnable {
+      class ResumeRun(val head: Runnable, val rest: ArrayStack<Runnable>) : Runnable {
         override fun run() {
           immediateQueue.pushAll(rest)
           immediateLoop(head)
@@ -235,7 +235,7 @@ object Platform {
       val head = immediateQueue.pop()
       if (head != null) {
         val rest = immediateQueue
-        immediateQueue = Platform.ArrayStack()
+        immediateQueue = ArrayStack()
         underlying.execute(ResumeRun(head, rest))
       }
     }
@@ -286,3 +286,16 @@ internal fun <A> asyncContinuation(ctx: CoroutineContext, cc: (Either<Throwable,
       cc(exception.left())
     }
   }
+
+/**
+ * Utility to makes sure that the original [fa] is gets forked on [ctx].
+ * @see IO.startFiber
+ * @see arrow.effects.racePair
+ * @see arrow.effects.raceTriple
+ *
+ * This moves the forking inside the [IO] operation,
+ * so it'll share it's [kotlin.coroutines.Continuation] with other potential jumps or [IO.async].
+ * @see [arrow.effects.IORunLoop.RestartCallback]
+ */
+internal fun <A> IOForkedStart(fa: IOOf<A>, ctx: CoroutineContext): IO<A> =
+  IO.Bind(IO.ContinueOn(IO.unit, ctx)) { fa.fix() }

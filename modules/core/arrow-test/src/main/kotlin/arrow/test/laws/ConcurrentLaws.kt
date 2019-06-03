@@ -11,7 +11,6 @@ import arrow.effects.Promise
 import arrow.effects.Semaphore
 import arrow.effects.typeclasses.Concurrent
 import arrow.effects.typeclasses.ExitCase
-import arrow.effects.typeclasses.fold
 import arrow.test.generators.applicativeError
 import arrow.test.generators.either
 import arrow.test.generators.throwable
@@ -374,9 +373,9 @@ object ConcurrentLaws {
     forAll(Gen.int().applicativeError(this)) { fa ->
       val never = never<Int>()
       val received = ctx.racePair(fa, never).flatMap { either ->
-        either.fold({ (a, fiberB) ->
+        either.fold({ a, fiberB ->
           fiberB.cancel().map { a }
-        }, { raiseError(AssertionError("never() finished race")) })
+        }, { _, _ -> raiseError(AssertionError("never() finished race")) })
       }
 
       received.equalUnderTheLaw(ctx.raceN(fa, never).map { it.fold(::identity, ::identity) }, EQ)
@@ -386,9 +385,9 @@ object ConcurrentLaws {
     forAll(Gen.int().applicativeError(this)) { fa ->
       val never = never<Int>()
       val received = ctx.racePair(never, fa).flatMap { either ->
-        either.fold({
+        either.fold({ _, _ ->
           raiseError<Int>(AssertionError("never() finished race"))
-        }, { (fiberA, b) -> fiberA.cancel().map { b } })
+        }, { fiberA, b -> fiberA.cancel().map { b } })
       }
 
       received.equalUnderTheLaw(ctx.raceN(never, fa).map { it.fold(::identity, ::identity) }, EQ)
@@ -409,8 +408,8 @@ object ConcurrentLaws {
             attempt.fold({ p.get() },
               {
                 it.fold(
-                  { (_, fiberB) -> ctx.startFiber(fiberB.cancel()).flatMap { p.get() } },
-                  { (fiberA, _) -> ctx.startFiber(fiberA.cancel()).flatMap { p.get() } })
+                  { _, fiberB -> ctx.startFiber(fiberB.cancel()).flatMap { p.get() } },
+                  { fiberA, _ -> ctx.startFiber(fiberA.cancel()).flatMap { p.get() } })
               })
           }.bind()
       }
@@ -423,8 +422,8 @@ object ConcurrentLaws {
       Promise<F, Int>(this@racePairCanJoinLeft).flatMap { p ->
         ctx.racePair(p.get(), just(Unit)).flatMap { eith ->
           eith.fold(
-            { (unit, _) -> just(unit) },
-            { (fiber, _) -> p.complete(i).flatMap { fiber.join() } }
+            { unit, _ -> just(unit) },
+            { fiber, _ -> p.complete(i).flatMap { fiber.join() } }
           )
         }
       }.equalUnderTheLaw(just(i), EQ)
@@ -435,8 +434,8 @@ object ConcurrentLaws {
       Promise<F, Int>(this@racePairCanJoinRight).flatMap { p ->
         ctx.racePair(just(Unit), p.get()).flatMap { eith ->
           eith.fold(
-            { (_, fiber) -> p.complete(i).flatMap { fiber.join() } },
-            { (_, unit) -> just(unit) }
+            { _, fiber -> p.complete(i).flatMap { fiber.join() } },
+            { _, unit -> just(unit) }
           )
         }
       }.equalUnderTheLaw(just(i), EQ)
@@ -482,9 +481,9 @@ object ConcurrentLaws {
       val never = never<Int>()
       val received = ctx.raceTriple(fa, never, never).flatMap { either ->
         either.fold(
-          { (a, fiberB, fiberC) -> fiberB.cancel().followedBy(fiberC.cancel()).map { a } },
-          { raiseError(AssertionError("never() finished race")) },
-          { raiseError(AssertionError("never() finished race")) })
+          { a, fiberB, fiberC -> fiberB.cancel().followedBy(fiberC.cancel()).map { a } },
+          { _, _, _ -> raiseError(AssertionError("never() finished race")) },
+          { _, _, _ -> raiseError(AssertionError("never() finished race")) })
       }
 
       received.equalUnderTheLaw(ctx.raceN(fa, never, never).map { it.fold(::identity, ::identity, ::identity) }, EQ)
@@ -495,9 +494,9 @@ object ConcurrentLaws {
       val never = never<Int>()
       val received = ctx.raceTriple(never, fa, never).flatMap { either ->
         either.fold(
-          { raiseError<Int>(AssertionError("never() finished race")) },
-          { (fiberA, b, fiberC) -> fiberA.cancel().followedBy(fiberC.cancel()).map { b } },
-          { raiseError(AssertionError("never() finished race")) })
+          { _, _, _ -> raiseError<Int>(AssertionError("never() finished race")) },
+          { fiberA, b, fiberC -> fiberA.cancel().followedBy(fiberC.cancel()).map { b } },
+          { _, _, _ -> raiseError(AssertionError("never() finished race")) })
       }
 
       received.equalUnderTheLaw(ctx.raceN(never, fa, never).map { it.fold(::identity, ::identity, ::identity) }, EQ)
@@ -508,9 +507,9 @@ object ConcurrentLaws {
       val never = never<Int>()
       val received = ctx.raceTriple(never, never, fa).flatMap { either ->
         either.fold(
-          { raiseError<Int>(AssertionError("never() finished race")) },
-          { raiseError(AssertionError("never() finished race")) },
-          { (fiberA, fiberB, c) -> fiberA.cancel().followedBy(fiberB.cancel()).map { c } })
+          { _, _, _ -> raiseError<Int>(AssertionError("never() finished race")) },
+          { _, _, _ -> raiseError(AssertionError("never() finished race")) },
+          { fiberA, fiberB, c -> fiberA.cancel().followedBy(fiberB.cancel()).map { c } })
       }
 
       received.equalUnderTheLaw(ctx.raceN(never, never, fa).map { it.fold(::identity, ::identity, ::identity) }, EQ)
@@ -540,11 +539,11 @@ object ConcurrentLaws {
             attempt.fold({ combinePromises },
               {
                 it.fold(
-                  { (_, fiberB, fiberC) ->
+                  { _, fiberB, fiberC ->
                     ctx.startFiber(fiberB.cancel().followedBy(fiberC.cancel())).flatMap { combinePromises } },
-                  { (fiberA, _, fiberC) ->
+                  { fiberA, _, fiberC ->
                     ctx.startFiber(fiberA.cancel().followedBy(fiberC.cancel())).flatMap { combinePromises } },
-                  { (fiberA, fiberB, _) ->
+                  { fiberA, fiberB, _ ->
                     ctx.startFiber(fiberA.cancel().followedBy(fiberB.cancel())).flatMap { combinePromises } })
               })
           }.bind()
@@ -558,9 +557,9 @@ object ConcurrentLaws {
       Promise<F, Int>(this@raceTripleCanJoinLeft).flatMap { p ->
         ctx.raceTriple(p.get(), just(Unit), never<Unit>()).flatMap { result ->
           result.fold(
-            { raiseError<Int>(AssertionError("Promise#get can never win race")) },
-            { (fiber, _, _) -> p.complete(i).flatMap { fiber.join() } },
-            { raiseError(AssertionError("never() can never win race")) }
+            { _, _, _ -> raiseError<Int>(AssertionError("Promise#get can never win race")) },
+            { fiber, _, _ -> p.complete(i).flatMap { fiber.join() } },
+            { _, _, _ -> raiseError(AssertionError("never() can never win race")) }
           )
         }
       }.equalUnderTheLaw(just(i), EQ)
@@ -571,9 +570,9 @@ object ConcurrentLaws {
       Promise<F, Int>(this@raceTripleCanJoinMiddle).flatMap { p ->
         ctx.raceTriple(just(Unit), p.get(), never<Unit>()).flatMap { result ->
           result.fold(
-            { (_, fiber, _) -> p.complete(i).flatMap { fiber.join() } },
-            { raiseError(AssertionError("Promise#get can never win race")) },
-            { raiseError(AssertionError("never() can never win race")) }
+            { _, fiber, _ -> p.complete(i).flatMap { fiber.join() } },
+            { _, _, _ -> raiseError(AssertionError("Promise#get can never win race")) },
+            { _, _, _ -> raiseError(AssertionError("never() can never win race")) }
           )
         }
       }.equalUnderTheLaw(just(i), EQ)
@@ -584,9 +583,9 @@ object ConcurrentLaws {
       Promise<F, Int>(this@raceTripleCanJoinRight).flatMap { p ->
         ctx.raceTriple(just(Unit), never<Unit>(), p.get()).flatMap { result ->
           result.fold(
-            { (_, _, fiber) -> p.complete(i).flatMap { fiber.join() } },
-            { raiseError(AssertionError("never() can never win race")) },
-            { raiseError(AssertionError("Promise#get can never win race")) }
+            { _, _, fiber -> p.complete(i).flatMap { fiber.join() } },
+            { _, _, _ -> raiseError(AssertionError("never() can never win race")) },
+            { _, _, _ -> raiseError(AssertionError("Promise#get can never win race")) }
           )
         }
       }.equalUnderTheLaw(just(i), EQ)

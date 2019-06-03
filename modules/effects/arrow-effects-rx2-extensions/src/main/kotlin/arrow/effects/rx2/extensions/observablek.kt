@@ -3,35 +3,22 @@ package arrow.effects.rx2.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
-import arrow.core.Tuple3
-import arrow.core.toT
-import arrow.effects.CancelToken
-import arrow.effects.rx2.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.rx2.ForObservableK
 import arrow.effects.rx2.ObservableK
-import arrow.effects.rx2.ObservableK.Companion
 import arrow.effects.rx2.ObservableKOf
 import arrow.effects.rx2.extensions.observablek.monad.monad
 import arrow.effects.rx2.extensions.observablek.monadDefer.monadDefer
 import arrow.effects.rx2.extensions.observablek.monadError.monadError
 import arrow.effects.rx2.fix
-import arrow.effects.rx2.k
-import arrow.effects.rx2.value
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Bracket
-import arrow.effects.typeclasses.Concurrent
 import arrow.effects.typeclasses.ConcurrentEffect
-import arrow.effects.typeclasses.ConnectedProcF
-import arrow.effects.typeclasses.Dispatchers
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.Effect
 import arrow.effects.typeclasses.ExitCase
-import arrow.effects.typeclasses.Fiber
 import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
 import arrow.effects.typeclasses.ProcF
-import arrow.effects.typeclasses.RacePair
-import arrow.effects.typeclasses.RaceTriple
 import arrow.effects.typeclasses.suspended.monaddefer.Fx
 import arrow.extension
 import arrow.typeclasses.Applicative
@@ -42,11 +29,7 @@ import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.Traverse
-import io.reactivex.Observable
-import io.reactivex.schedulers.Schedulers
-import io.reactivex.subjects.ReplaySubject
 import kotlin.coroutines.CoroutineContext
-import io.reactivex.disposables.Disposable as rxDisposable
 
 @extension
 interface ObservableKFunctor : Functor<ForObservableK> {
@@ -274,4 +257,11 @@ fun ObservableK.Companion.monadErrorSwitch(): ObservableKMonadError = object : O
 @extension
 interface ObservableKFx : Fx<ForObservableK> {
   override fun monadDefer(): MonadDefer<ForObservableK> = ObservableK.monadDefer()
+}
+
+@extension
+interface ObservableKTimer : Timer<ForObservableK> {
+  override fun sleep(duration: Duration): ObservableK<Unit> =
+    ObservableK(io.reactivex.Observable.timer(duration.nanoseconds, TimeUnit.NANOSECONDS)
+      .map { Unit })
 }
