@@ -18,6 +18,7 @@ $ ./gradlew :app:build
 
  - [Sample kotlin compiler plugin](https://github.com/Takhion/sample-kotlin-compiler-plugin) a hello world compiler plugin by @Takhion
  - [Redacted](https://github.com/ZacSweers/redacted-compiler-plugin) port of auto-value redacted for classes by @ZacSweers
+ - [Spek compiler plugin](https://github.com/spekframework/spek/pull/657/files) compiler plugin that writes code using the IR backend.
  - [DebugLog](https://github.com/kevinmost/debuglog) bad gradle setup, check [Takhion's](https://github.com/Takhion/sample-kotlin-compiler-plugin), uses `org.jetbrains.org.objectweb.asm.` bytecode DSL. (Java only) @kevinmost
  - [Parcelize](https://github.com/JetBrains/kotlin/tree/master/plugins/android-extensions/android-extensions-compiler/src/org/jetbrains/kotlin/android/parcel) plugin to add parcelable logic to data classes. Uses the `org.jetbrains.org.objectweb.asm.` bytecode DSL. (Java only)
  - [Kotlinx serialization](https://github.com/JetBrains/kotlin/tree/master/plugins/kotlin-serialization/kotlin-serialization-compiler/src/org/jetbrains/kotlinx/serialization/compiler) uses all backend-ends + Kotlin IR.
