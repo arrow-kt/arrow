@@ -3,6 +3,11 @@ package arrow.effects.rx2.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.effects.CancelToken
+import arrow.effects.RacePair
+import arrow.effects.RaceTriple
+import arrow.effects.Timer
+import arrow.effects.rx2.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.rx2.ForObservableK
 import arrow.effects.rx2.ObservableK
 import arrow.effects.rx2.ObservableKOf
@@ -10,12 +15,19 @@ import arrow.effects.rx2.extensions.observablek.monad.monad
 import arrow.effects.rx2.extensions.observablek.monadDefer.monadDefer
 import arrow.effects.rx2.extensions.observablek.monadError.monadError
 import arrow.effects.rx2.fix
+import arrow.effects.rx2.k
+import arrow.effects.rx2.value
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Bracket
+import arrow.effects.typeclasses.Concurrent
 import arrow.effects.typeclasses.ConcurrentEffect
+import arrow.effects.typeclasses.ConnectedProcF
+import arrow.effects.typeclasses.Dispatchers
 import arrow.effects.typeclasses.Disposable
+import arrow.effects.typeclasses.Duration
 import arrow.effects.typeclasses.Effect
 import arrow.effects.typeclasses.ExitCase
+import arrow.effects.typeclasses.Fiber
 import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
 import arrow.effects.typeclasses.ProcF
@@ -29,7 +41,12 @@ import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.Traverse
+import io.reactivex.Observable
+import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.ReplaySubject
+import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
+import io.reactivex.disposables.Disposable as rxDisposable
 
 @extension
 interface ObservableKFunctor : Functor<ForObservableK> {
@@ -154,7 +171,7 @@ interface ObservableKConcurrent : Concurrent<ForObservableK>, ObservableKAsync {
     ObservableK.asyncF { _, cb -> k(cb) }
 
   override fun <A> asyncF(fa: ConnectedProcF<ForObservableK, A>): ObservableK<A> =
-    Companion.asyncF(fa)
+    ObservableK.asyncF(fa)
 
   override fun <A> CoroutineContext.startFiber(kind: ObservableKOf<A>): ObservableK<Fiber<ForObservableK, A>> =
     asScheduler().let { scheduler ->
@@ -185,10 +202,10 @@ interface ObservableKConcurrent : Concurrent<ForObservableK>, ObservableKAsync {
         val ffa = Fiber(sa.k(), ObservableK { dda.dispose() })
         val ffb = Fiber(sb.k(), ObservableK { ddb.dispose() })
         sa.subscribe({
-          emitter.onNext(Either.Left(it toT ffb))
+          emitter.onNext(RacePair.First(it, ffb))
         }, emitter::onError, emitter::onComplete)
         sb.subscribe({
-          emitter.onNext(Either.Right(ffa toT it))
+          emitter.onNext(RacePair.Second(ffa, it))
         }, emitter::onError, emitter::onComplete)
       }.k()
     }
@@ -207,13 +224,13 @@ interface ObservableKConcurrent : Concurrent<ForObservableK>, ObservableKAsync {
         val ffb = Fiber(sb.k(), ObservableK { ddb.dispose() })
         val ffc = Fiber(sc.k(), ObservableK { ddc.dispose() })
         sa.subscribe({
-          emitter.onNext(Either.Left(Tuple3(it, ffb, ffc)))
+          emitter.onNext(RaceTriple.First(it, ffb, ffc))
         }, emitter::onError, emitter::onComplete)
         sb.subscribe({
-          emitter.onNext(Either.Right(Either.Left(Tuple3(ffa, it, ffc))))
+          emitter.onNext(RaceTriple.Second(ffa, it, ffc))
         }, emitter::onError, emitter::onComplete)
         sc.subscribe({
-          emitter.onNext(Either.Right(Either.Right(Tuple3(ffa, ffb, it))))
+          emitter.onNext(RaceTriple.Third(ffa, ffb, it))
         }, emitter::onError, emitter::onComplete)
       }.subscribeOn(Schedulers.newThread()).k()
     }
