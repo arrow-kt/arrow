@@ -1,3 +1,6 @@
 package arrow.sample
 
-class TestClass
+class TestClass {
+  fun sideEffect() =
+    println("BOOM!")
+}

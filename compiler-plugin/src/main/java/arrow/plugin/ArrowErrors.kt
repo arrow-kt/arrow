@@ -7,6 +7,7 @@ import org.jetbrains.kotlin.diagnostics.rendering.DiagnosticFactoryToRendererMap
 
 // Error messages are modeled as DiagnosticFactory0, and afterwards attahed to an actual element so the error message can be linked to said element.
 val ARROW_ERROR: DiagnosticFactory0<PsiElement> = DiagnosticFactory0.create<PsiElement>(org.jetbrains.kotlin.diagnostics.Severity.ERROR)
+val ARROW_FX_PURE_UNIT_RETURN: DiagnosticFactory0<PsiElement> = DiagnosticFactory0.create<PsiElement>(org.jetbrains.kotlin.diagnostics.Severity.ERROR)
 
 
 // This is a map of errors -> message you have to pass along with the error you want to send to the compiler.
@@ -17,5 +18,6 @@ object ArrowDefaultErrorMessages : DefaultErrorMessages.Extension {
 
   init {
     MAP.put(ARROW_ERROR, "Something went wrong - deal with it.")
+    MAP.put(ARROW_FX_PURE_UNIT_RETURN, "Impure function returning `Unit` can only produce effects and should be marked as `suspend`")
   }
 }
