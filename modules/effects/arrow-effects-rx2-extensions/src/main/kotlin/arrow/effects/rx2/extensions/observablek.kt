@@ -5,7 +5,7 @@ import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Tuple3
 import arrow.core.toT
-import arrow.effects.OnCancel
+import arrow.effects.CancelToken
 import arrow.effects.rx2.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.rx2.ForObservableK
 import arrow.effects.rx2.ObservableK
@@ -72,12 +72,12 @@ interface ObservableKMonad : Monad<ForObservableK> {
     fix().ap(ff)
 
   override fun <A, B> ObservableKOf<A>.flatMap(f: (A) -> ObservableKOf<B>): ObservableK<B> =
-    fix().flatMap(f)
+    fix().concatMap(f)
 
   override fun <A, B> ObservableKOf<A>.map(f: (A) -> B): ObservableK<B> =
     fix().map(f)
 
-  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, ObservableKOf<Either<A, B>>>): ObservableK<B> =
+  override fun <A, B> tailRecM(a: A, f: (A) -> ObservableKOf<Either<A, B>>): ObservableK<B> =
     ObservableK.tailRecM(a, f)
 
   override fun <A> just(a: A): ObservableK<A> =
@@ -89,7 +89,7 @@ interface ObservableKFoldable : Foldable<ForObservableK> {
   override fun <A, B> ObservableKOf<A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
 
-  override fun <A, B> ObservableKOf<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): arrow.core.Eval<B> =
+  override fun <A, B> ObservableKOf<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
     fix().foldRight(lb, f)
 }
 
@@ -104,7 +104,7 @@ interface ObservableKTraverse : Traverse<ForObservableK> {
   override fun <A, B> ObservableKOf<A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
 
-  override fun <A, B> ObservableKOf<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): arrow.core.Eval<B> =
+  override fun <A, B> ObservableKOf<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
     fix().foldRight(lb, f)
 }
 
@@ -184,6 +184,11 @@ interface ObservableKConcurrent : Concurrent<ForObservableK>, ObservableKAsync {
           }))
         }
       }.k()
+    }
+
+  override fun <A> cancelableF(k: ((Either<Throwable, A>) -> Unit) -> ObservableKOf<CancelToken<ForObservableK>>): ObservableK<A> =
+    ObservableK.asyncF { kindConnection, function ->
+      k(function).map { kindConnection.push(it) }
     }
 
   override fun <A, B> CoroutineContext.racePair(fa: ObservableKOf<A>, fb: ObservableKOf<B>): ObservableK<RacePair<ForObservableK, A, B>> =
