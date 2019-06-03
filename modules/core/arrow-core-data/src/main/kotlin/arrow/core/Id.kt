@@ -5,6 +5,44 @@ import arrow.higherkind
 
 fun <A> IdOf<A>.value(): A = this.fix().extract()
 
+/**
+ *
+ * The identity monad can be seen as the ambient monad that encodes the effect of having no effect.
+ * It is ambient in the sense that plain pure values are values of `Id`.
+ *
+ * ```kotlin:ank:playground
+ *  //sampleStart
+ * import arrow.*
+ * import arrow.core.*
+ *
+ * Id("hello")
+ * //sampleEnd
+ * ```
+ *
+ * Using this type declaration, we can treat our Id type constructor as a `Monad` and as a `Comonad`.
+ * The `just` method, which has type `A -> Id<A>` just becomes the identity function. The `map` method
+ * from `Functor` just becomes function application
+ *
+ * ``kotlin:ank:playground
+ * //sampleStart
+ * val id: Id<Int> = Id.just(3)
+ * id.map{it + 3}
+ * //sampleEnd
+ * ```
+ *
+ * ### Supported type classes
+ *
+ * ``kotlin:ank:playground
+ * //sampleStart
+ * import arrow.reflect.*
+ * import arrow.data.*
+ * import arrow.core.*
+ *
+ * DataType(Id::class).tcMarkdownList()
+ * //sampleEnd
+ * ```
+ */
+
 @higherkind
 data class Id<out A>(private val value: A) : IdOf<A> {
 
