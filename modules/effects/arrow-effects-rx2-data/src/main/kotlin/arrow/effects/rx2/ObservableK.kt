@@ -82,7 +82,7 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
       val dispose = concatMap { a ->
         if (emitter.isDisposed) {
           release(a, ExitCase.Canceled).fix().observable.subscribe({}, emitter::onError)
-          Observable.empty<B>().k()
+          Observable.never<B>().k()
         } else {
           defer { use(a) }
             .value()
@@ -212,9 +212,8 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
         // On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
         // on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
         connection.push(ObservableK { if (!emitter.isDisposed) emitter.onError(OnCancel.CancellationException) })
-        emitter.setCancellable { connection.cancel().value().subscribe({}, {}) }
 
-        fa(connection) { either: Either<Throwable, A> ->
+        val dispose = fa(connection) { either: Either<Throwable, A> ->
           either.fold({
             emitter.onError(it)
           }, {
@@ -222,6 +221,11 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
             emitter.onComplete()
           })
         }.fix().observable.subscribe({}, emitter::onError)
+
+        emitter.setCancellable {
+          dispose.dispose()
+          connection.cancel().value().subscribe({}, {})
+        }
       }.k()
 
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> ObservableKOf<Either<A, B>>): ObservableK<B> {
