@@ -40,7 +40,7 @@ class ObservableKTests : UnitSpec() {
         res2.fold({
           (t1::class.java == it::class.java).also {
             if (it) {
-              println("WARNING: compared Observable errors by exception type")
+              println("WARNING: compared Observable errors by exception type: <<${t1::class.java}>> and <<${it::class.java}>>")
             }
           }
         }, { false })
