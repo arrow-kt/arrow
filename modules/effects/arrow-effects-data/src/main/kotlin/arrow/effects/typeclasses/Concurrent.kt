@@ -350,7 +350,9 @@ interface Concurrent<F> : Async<F> {
 
       k(cb1).bracketCase(use = {
         async<Unit> { cb ->
-          if (!state.compareAndSet(null, cb)) cb(rightUnit)
+          if (!state.compareAndSet(null, cb)) {
+            cb(rightUnit)
+          }
         }
       }, release = { token, exitCase ->
         when (exitCase) {
