@@ -10,8 +10,17 @@ fun <A> IdOf<A>.value(): A = this.fix().extract()
  * The identity monad can be seen as the ambient monad that encodes the effect of having no effect.
  * It is ambient in the sense that plain pure values are values of `Id`.
  *
- * ```
- * Id("hello")
+ * ```kotlin:ank:playground
+ * import arrow.core.Id
+ *
+ * fun getId() =
+ * //sampleStart
+ *  Id("hello")
+ * //sampleEnd
+ *
+ * fun main() {
+ *  println(getId())
+ * }
  * ```
  *
  * Using this type declaration, we can treat our Id type constructor as a `Monad` and as a `Comonad`.
@@ -21,18 +30,17 @@ fun <A> IdOf<A>.value(): A = this.fix().extract()
  * ```kotlin:ank:playground
  * import arrow.core.Id
  *
- * fun main() {
- * //sampleStart
- * val id: Id<Int> = Id.just(3)
- * id.map{it + 3}
- * //sampleEnd
- * System.out.print(id.map{it + 3}.extract())
- * }
- * ```
  *
- * ### Supported type classes
- * ```
- * DataType(Id::class).tcMarkdownList()
+ * //sampleStart
+ * fun idPlusThree(value: Int) =
+ *  Id.just(value)
+ *    .map { it + 3 }
+ * //sampleEnd
+ *
+ * fun main() {
+ *  val value = 3
+ *  println("idPlusThree($value) = ${idPlusThree(value)}")
+ * }
  * ```
  */
 
