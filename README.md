@@ -32,7 +32,7 @@ $ ./gradlew :app:build
 
 
 ## Gathered Resources
- - On IR (Intermediate Representation) and LLVM (umbrella project for several compiler tools, e.g.: Debugger, IR, C++ StdLib)
+#### On IR (Intermediate Representation) and LLVM (umbrella project for several compiler tools, e.g.: Debugger, IR, C++ StdLib)
 ```markdown
 The basic idea behind IR:
 "LLVM can provide the middle layers of a complete compiler system, taking intermediate representation (IR) code 
@@ -92,3 +92,4 @@ FILE fqName:<root> fileName:/samOperators.kt
 	        m: TYPE_OP type=java.lang.Runnable? origin=SAM_CONVERSION typeOperand=java.lang.Runnable?
 	          FUNCTION_REFERENCE 'public final fun f (): kotlin.Unit declared in <root>' type=kotlin.reflect.KFunction0<kotlin.Unit> origin=null
 ```
+- [What means frontend and backend in LLVM, and how it is relted to IR](https://idea.popcount.org/2013-07-24-ir-is-better-than-assembly/)
