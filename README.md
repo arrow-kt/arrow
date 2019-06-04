@@ -43,7 +43,7 @@ The basic idea behind IR:
 ```
 A more coherent version to understand IR is this:
 ```markdown
-"Intermediate Representation (IR) : An Intermediate representation (IR) is the `data structure`
+"An Intermediate representation (IR) is the `data structure`
 or `code` used internally by a compiler or virtual machine `to represent` source code. 
 An IR is designed to be conducive for further processing, such as optimization and translation."
 - Amir Jalal [link](https://www.linkedin.com/pulse/what-llvm-ir-kotlin-behind-scenes-amirhossein-jalalhosseini)
