@@ -20,7 +20,7 @@ jobs:
   include:
   - stage: build
     script:
-    - ./gradlew clean build
+    - ./gradlew clean build :arrow-benchmarks-effects:jmhClasses
   - stage: coverage-report
     script:
     - ./gradlew codeCoverageReport
