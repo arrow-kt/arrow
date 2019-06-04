@@ -93,7 +93,7 @@ import arrow.core.extensions.option.monad.followedBy
 Some(1).followedBy(Some(2))
 ```
 
-#### effectM
+#### flatTap (formerly ~~effectM~~)
 
 Executes two elements sequentially and ignores the result of the second. This is useful for effects like logging.
 
@@ -102,10 +102,10 @@ import arrow.effects.extensions.io.monad.*
 
 fun logValue(i: Int): IO<Unit> = IO { /* println(i) */ }
 
-IO.just(1).effectM(::logValue).fix().unsafeRunSync()
+IO.just(1).flatTap(::logValue).fix().unsafeRunSync()
 ```
 
-#### forEffect/forEffectEval
+#### productL/productLEval (formerly ~~forEffect~~/~~forEffectEval~~)
 
 Executes sequentially two elements that are independent from one another, ignoring the value of the second one.
 The [`Eval`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-eval' | relative_url }}) variant allows you to pass lazily calculated values.
@@ -113,7 +113,7 @@ The [`Eval`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-eval' | relative_url 
 ```kotlin:ank
 import arrow.core.extensions.option.monad.*
 
-Some(1).forEffect(Some(2))
+Some(1).productL(Some(2))
 ```
 
 ### Laws
