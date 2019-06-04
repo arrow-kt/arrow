@@ -30,7 +30,6 @@ fun <A> IdOf<A>.value(): A = this.fix().extract()
  * ```kotlin:ank:playground
  * import arrow.core.Id
  *
- *
  * //sampleStart
  * fun idPlusThree(value: Int) =
  *  Id.just(value)
