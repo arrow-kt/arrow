@@ -51,7 +51,8 @@ An IR is designed to be conducive for further processing, such as optimization a
 To sum up:
 **IR represents source code and we process/ intercept IR for further optimization/ codegen/ checkups.**
 
-Example (Only for display-purposes: for more examples [dig into the ir modules](https://github.com/pyos/kotlin/commit/f47d9d54c0c14be9c386f6023e614229b2c15717)):
+Example (for more examples [dig into the ir modules](https://github.com/pyos/kotlin/commit/f47d9d54c0c14be9c386f6023e614229b2c15717)):
+Kotlin
 ```kotlin
 // WITH_JDK
 // FILE: samOperators.kt
@@ -71,6 +72,7 @@ public class J {
    public void minusAssign(Runnable i) {}
 }
 ```
+IR:
 ```markdown
 FILE fqName:<root> fileName:/samOperators.kt
   FUN name:f visibility:public modality:FINAL <> () returnType:kotlin.Unit
