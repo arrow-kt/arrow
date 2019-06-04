@@ -25,7 +25,7 @@ fun <A> IdOf<A>.value(): A = this.fix().extract()
  *
  * Using this type declaration, we can treat our Id type constructor as a `Monad` and as a `Comonad`.
  * The `just` method, which has type `A -> Id<A>` just becomes the identity function. The `map` method
- * from `Functor` just becomes function application
+ * from `Functor` just becomes function application.
  *
  * ```kotlin:ank:playground
  * import arrow.core.Id
