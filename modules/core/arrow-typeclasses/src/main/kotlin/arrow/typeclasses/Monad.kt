@@ -50,7 +50,7 @@ interface Monad<F> : Selective<F> {
 
   @Deprecated(
     "effectM is being renamed to flatTap",
-    ReplaceWith("flatTap")
+    ReplaceWith("flatTap(f)")
   )
   fun <A, B> Kind<F, A>.effectM(f: (A) -> Kind<F, B>): Kind<F, A> =
     flatTap(f)
@@ -63,7 +63,7 @@ interface Monad<F> : Selective<F> {
 
   @Deprecated(
     "forEffect is being renamed to productL",
-    ReplaceWith("productL")
+    ReplaceWith("productL(fb)")
   )
   fun <A, B> Kind<F, A>.forEffect(fb: Kind<F, B>): Kind<F, A> =
     productL(fb)
@@ -73,7 +73,7 @@ interface Monad<F> : Selective<F> {
 
   @Deprecated(
     "forEffectEval is being renamed to productLEval",
-    ReplaceWith("productLEval")
+    ReplaceWith("productLEval(fb)")
   )
   fun <A, B> Kind<F, A>.forEffectEval(fb: Eval<Kind<F, B>>): Kind<F, A> =
     productLEval(fb)
