@@ -1,17 +1,20 @@
 package arrow.sample
 
 class TestClass {
-  suspend fun sideEffect() =
+  fun sideEffect() =
     println("BOOM!")
 
-  suspend fun x(): Unit = TODO()
-
-  suspend fun other(): Unit {
+  fun other(): Unit {
     println("other")
   }
 
+  val x = { println() }
+
   fun another2(): String {
-    1; println("test")
+    1; println("test");
+    {
+      { println() }
+    }()
     return "another"
   }
 }

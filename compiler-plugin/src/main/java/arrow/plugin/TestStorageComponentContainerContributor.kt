@@ -46,3 +46,10 @@ class TestStorageComponentContainerContributor : DeclarationChecker, StorageComp
 //    }
   }
 }
+
+fun <A, B> A?.fold(ifEmpty: () -> B, ifFull: (A) -> B): B =
+  this?.let(ifFull) ?: ifEmpty()
+fun <A, B> A?.map(f: (A) -> B): B? =
+  this?.let(f)
+fun <A, B> A?.flatMap(f: (A) -> B?): B? =
+  this?.let(f)

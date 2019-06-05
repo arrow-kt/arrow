@@ -1,28 +1,23 @@
 package arrow.plugin
 
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity.ERROR
-import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity.WARNING
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
+import org.jetbrains.kotlin.cli.common.messages.MessageUtil
 import org.jetbrains.kotlin.codegen.ClassBuilder
 import org.jetbrains.kotlin.codegen.ClassBuilderFactory
 import org.jetbrains.kotlin.codegen.DelegatingClassBuilder
+import org.jetbrains.kotlin.codegen.coroutines.isSuspendLambdaOrLocalFunction
 import org.jetbrains.kotlin.codegen.extensions.ClassBuilderInterceptorExtension
 import org.jetbrains.kotlin.com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.com.intellij.psi.PsiElementVisitor
-import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
-import org.jetbrains.kotlin.descriptors.DeclarationDescriptorVisitor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.diagnostics.DiagnosticSink
 import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
-import org.jetbrains.kotlin.psi.Call
-import org.jetbrains.kotlin.psi.KtBlockExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtExpression
-import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
 import org.jetbrains.kotlin.resolve.BindingContext
-import org.jetbrains.kotlin.resolve.calls.callUtil.getCall
 import org.jetbrains.kotlin.resolve.calls.callUtil.getType
-import org.jetbrains.kotlin.resolve.calls.callUtil.isSafeCall
+import org.jetbrains.kotlin.resolve.calls.tower.isSynthesized
 import org.jetbrains.kotlin.resolve.jvm.diagnostics.JvmDeclarationOrigin
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.typeUtil.isUnit
@@ -47,41 +42,48 @@ internal class DebugLogClassBuilder(
     val original: MethodVisitor = super.newMethod(origin, access, name, desc, signature, exceptions)
     //bail quickly if this is not a function
     val function: FunctionDescriptor = origin.descriptor as? FunctionDescriptor ?: return original
+    val functionName = function.name.asString()
     //we ignore suspend functions as they are already safe
-    if (!function.isSuspend) {
+    if (!function.isSuspend &&
+      !function.isSynthesized &&
+      !function.isSuspendLambdaOrLocalFunction() &&
+      functionName != "<init>" &&
+      !functionName.startsWith("<get") &&
+      !functionName.startsWith("<set")) {
       val functionPsi = function.findPsi()
       //if the function returns Unit then it should have been suspended since all it can do is produce effects
       if (function.returnType?.isUnit() == true) {
         functionPsi.let {
-          messageCollector.report(ERROR, "Unit return on a non suspended function: ${function.name}")
+          messageCollector.report(
+            ERROR,
+            "Unit return on a non suspended function: ${function.name}",
+            MessageUtil.psiElementToMessageLocation(it)
+          )
         }
-      } else function.findPsi()?.checkPurity()
+      } else functionPsi?.checkPurity(function)
     }
     return original
   }
 
-  private tailrec fun loop(remaining: List<PsiElement>): Unit {
-    if (remaining.isEmpty()) Unit
-    else {
-      val nestedExpressions =
-        when (val current = remaining[0]) {
-          is KtBlockExpression -> current.children.toList()
-          else -> emptyList<PsiElement>()
+  private fun PsiElement.checkPurity(descriptor: FunctionDescriptor) {
+    accept(object : PsiElementVisitor() {
+      override fun visitElement(element: PsiElement?) {
+        if (element is KtCallExpression) {
+          checkExpressionPurity(descriptor, element)
         }
-      loop(nestedExpressions + remaining.drop(1))
-    }
+        element?.acceptChildren(this)
+      }
+    })
   }
 
-  fun PsiElement.checkPurity() {
-    if (this is KtBlockExpression) loop(children.toList())
-    if (this is KtExpression) checkExpressionPurity(this)
-    else loop(children.toList())
-  }
-
-  private fun checkExpressionPurity(expression: KtExpression) {
+  private fun checkExpressionPurity(descriptor: FunctionDescriptor, expression: KtExpression) {
     val expressionRetType: KotlinType? = expression.getType(bindingContext)
     if (expressionRetType?.isUnit() == true) {
-      messageCollector.report(ERROR, "Impure expression in function ${expression.referenceExpression()}: `${expression.text}` returning `Unit` only allowed in `suspend` functions")
+      messageCollector.report(
+        ERROR,
+        "Impure expression in function ${descriptor.name}: `${expression.text}` returning `Unit` only allowed in `suspend` functions",
+        MessageUtil.psiElementToMessageLocation(expression)
+      )
     }
   }
 
