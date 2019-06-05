@@ -16,7 +16,7 @@ fun String.asPlatform(): String =
 /**
  * TODO this is horrible is there a canonical way to obtain a kotlin type given a fqn java type name?
  */
-fun String.asKotlin(): String =
+internal fun String.asKotlin(): String =
   removeBackticks()
     .replace("/", ".")
     .replace("kotlin.jvm.functions", "kotlin")

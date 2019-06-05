@@ -768,12 +768,8 @@ interface Concurrent<F> : Async<F> {
     "`bindingConcurrent` is getting renamed to `fxConcurrent` for consistency with the Arrow Fx system.",
     ReplaceWith("fxConcurrent(c)")
   )
-  fun <B> bindingConcurrent(c: suspend ConcurrentContinuation<F, *>.() -> B): Kind<F, B> {
-    val continuation = ConcurrentContinuation<F, B>(this)
-    val wrapReturn: suspend ConcurrentContinuation<F, *>.() -> Kind<F, B> = { just(c()) }
-    wrapReturn.startCoroutine(continuation, continuation)
-    return continuation.returnedMonad()
-  }
+  fun <B> bindingConcurrent(c: suspend ConcurrentSyntax<F>.() -> B): Kind<F, B> =
+    fxConcurrent(c)
 
   /**
    * Entry point for monad bindings which enables for comprehensions. The underlying impl is based on coroutines.
