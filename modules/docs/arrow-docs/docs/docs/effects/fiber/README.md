@@ -19,7 +19,7 @@ when the resulting `IO` is canceled it does not propagate this cancellation back
 ```kotlin:ank
 import arrow.effects.*
 import kotlinx.coroutines.Dispatchers.Default
-import arrow.effects.extensions.fx
+import arrow.effects.extensions.io.fx.fx
 import arrow.effects.typeclasses.Fiber
 import arrow.effects.IO
 import arrow.effects.extensions.io.concurrent.startFiber
@@ -31,7 +31,7 @@ import kotlin.coroutines.CoroutineContext
 fun <A, B, C> parallelMap(first: IO<A>,
                      second: IO<B>,
                      f: (A, B) -> C): IO<C> =
-  IO.fx {
+  fx {
     val (fiberOne: Fiber<ForIO, A>) = Default.startFiber(first)
     val (fiberTwo: Fiber<ForIO, B>) = Default.startFiber(second)
     f(!fiberOne.join(), !fiberTwo.join())

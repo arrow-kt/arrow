@@ -12,6 +12,7 @@ But, we have not given up support for suspend functions! If you would like to us
 import arrow.effects.IO
 import arrow.unsafe
 import arrow.effects.extensions.io.unsafeRun.runBlocking
+import arrow.effects.extensions.io.fx.fx
 //sampleStart
 suspend fun sayHello(): Unit =
   println("Hello World")
@@ -20,7 +21,7 @@ suspend fun sayGoodBye(): Unit =
   println("Good bye World!")
   
 fun greet(): IO<Unit> =
-  IO.fx {
+  fx {
     !effect { sayHello() }
     !effect { sayGoodBye() }
   }
