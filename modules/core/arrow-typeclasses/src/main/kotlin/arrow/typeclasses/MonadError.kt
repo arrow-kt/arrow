@@ -114,7 +114,7 @@ interface MonadThrow<F> : MonadError<F, Throwable> {
    * fun main(args: Array<String>) {
    *    //sampleStart
    *    fun <F> MonadThrow<F>.attack(): Kind<F, Impacted> =
-   *      fxMonadThrow {
+   *      fx.monadThrow {
    *        val nuke = arm().bind()
    *        val target = aim().bind()
    *        val impact = launchImpure(target, nuke) // this throws!
@@ -130,7 +130,7 @@ interface MonadThrow<F> : MonadError<F, Throwable> {
    */
   @Deprecated(
     "`bindingCatch` is getting renamed to `fx` for consistency with the Arrow Fx system.",
-    ReplaceWith("fxMonadThrow(c)")
+    ReplaceWith("fx.monadThrow(c)")
   )
   fun <B> bindingCatch(c: suspend MonadThrowSyntax<F>.() -> B): Kind<F, B> =
     fxMonadThrow(c)
