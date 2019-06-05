@@ -1,5 +1,6 @@
 package arrow.typeclasses
 
+import arrow.Kind
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.RestrictsSuspension
@@ -11,8 +12,15 @@ interface MonadThrowSyntax<F> : MonadSyntax<F>, MonadThrow<F>
 open class MonadThrowContinuation<F, A>(ME: MonadThrow<F>, override val context: CoroutineContext = EmptyCoroutineContext) :
   MonadContinuation<F, A>(ME), MonadThrow<F> by ME, MonadThrowSyntax<F> {
 
+  override val fx: MonadThrowFx<F> = ME.fx
+
   @Suppress("UNCHECKED_CAST")
   override fun resumeWithException(exception: Throwable) {
-    returnedMonad = exception.raiseNonFatal()
+    returnedMonad = when (exception) {
+      is ContinuationShortcircuitThrowable -> exception.exit as Kind<F, A>
+      else -> raiseError(exception)
+    }
   }
+
+  override fun <B> binding(c: suspend MonadSyntax<F>.() -> B): Kind<F, B> = fx.monad(c)
 }

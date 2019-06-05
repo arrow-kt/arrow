@@ -43,4 +43,4 @@ fun IO.Companion.timer(): Timer<ForIO> = Timer(IO.concurrent())
 interface IODefaultConcurrentEffect : ConcurrentEffect<ForIO>, IOConcurrentEffect, IODefaultConcurrent
 
 fun <A> IO.Companion.fx(c: suspend ConcurrentSyntax<ForIO>.() -> A): IO<A> =
-  IO.concurrent().fxConcurrent(c).fix()
+  IO.concurrent().fx.concurrent(c).fix()

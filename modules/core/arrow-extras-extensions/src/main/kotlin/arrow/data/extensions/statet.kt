@@ -220,7 +220,7 @@ fun <S> StateApi.functor(): Functor<StateTPartialOf<ForId, S>> = StateT.functor(
 fun <S> StateApi.monad(): Monad<StateTPartialOf<ForId, S>> = StateT.monad(Id.monad())
 
 fun <F, S, A> StateT.Companion.fx(M: Monad<F>, c: suspend MonadSyntax<StateTPartialOf<F, S>>.() -> A): StateT<F, S, A> =
-  StateT.monad<F, S>(M).fxMonad(c).fix()
+  StateT.monad<F, S>(M).fx.monad(c).fix()
 
 fun <S, A> StateApi.fx(c: suspend MonadSyntax<StatePartialOf<S>>.() -> A): State<S, A> =
-  StateApi.monad<S>().fxMonad(c).fix()
+  StateApi.monad<S>().fx.monad(c).fix()

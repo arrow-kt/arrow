@@ -17,6 +17,7 @@ import arrow.core.identity
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Bimonad
+import arrow.typeclasses.BindingStrategy
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Foldable
@@ -24,6 +25,8 @@ import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadSyntax
+import arrow.typeclasses.MonadContinuation
+import arrow.typeclasses.MonadFx
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Selective
 import arrow.typeclasses.Semigroup
@@ -113,6 +116,15 @@ interface IdMonad : Monad<ForId> {
 
   override fun <A, B> IdOf<Either<A, B>>.select(f: IdOf<(A) -> B>): Kind<ForId, B> =
     fix().idSelect(f)
+
+  override val fx: MonadFx<ForId>
+    get() = IdFxMonad
+}
+
+internal object IdFxMonad : MonadFx<ForId> {
+  override val M: Monad<ForId> = Id.monad()
+  override fun <A> monad(c: suspend MonadSyntax<ForId>.() -> A): Id<A> =
+    super.monad(c).fix()
 }
 
 @extension
@@ -193,4 +205,4 @@ interface IdHash<A> : Hash<Id<A>>, IdEq<A> {
 }
 
 fun <A> Id.Companion.fx(c: suspend MonadSyntax<ForId>.() -> A): Id<A> =
-  Id.monad().fxMonad(c).fix()
+  Id.monad().fx.monad(c).fix()

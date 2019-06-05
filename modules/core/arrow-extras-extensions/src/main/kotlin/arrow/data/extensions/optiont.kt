@@ -231,4 +231,4 @@ interface OptionTDecidableInstance<F> : Decidable<OptionTPartialOf<F>>, OptionTD
 }
 
 fun <F, A> OptionT.Companion.fx(M: Monad<F>, c: suspend MonadSyntax<OptionTPartialOf<F>>.() -> A): OptionT<F, A> =
-  OptionT.monad(M).fxMonad(c).fix()
+  OptionT.monad(M).fx.monad(c).fix()

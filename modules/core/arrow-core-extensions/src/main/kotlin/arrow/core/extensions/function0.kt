@@ -14,11 +14,14 @@ import arrow.core.k
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Bimonad
+import arrow.typeclasses.BindingStrategy
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadSyntax
+import arrow.typeclasses.MonadContinuation
 import arrow.typeclasses.Monoid
+import arrow.typeclasses.MonadFx
 import arrow.typeclasses.Selective
 import arrow.typeclasses.Semigroup
 
@@ -92,6 +95,15 @@ interface Function0Monad : Monad<ForFunction0> {
 
   override fun <A, B> Function0Of<Either<A, B>>.select(f: Kind<ForFunction0, (A) -> B>): Kind<ForFunction0, B> =
     fix().fun0Select(f)
+
+  override val fx: MonadFx<ForFunction0>
+    get() = Function0MonadFx
+}
+
+internal object Function0MonadFx : MonadFx<ForFunction0> {
+  override val M: Monad<ForFunction0> = Function0.monad()
+  override fun <A> monad(c: suspend MonadSyntax<ForFunction0>.() -> A): Function0<A> =
+    super.monad(c).fix()
 }
 
 @extension
@@ -131,4 +143,4 @@ interface Function0Bimonad : Bimonad<ForFunction0> {
 }
 
 fun <B> Function0.Companion.fx(c: suspend MonadSyntax<ForFunction0>.() -> B): Function0<B> =
-  Function0.monad().fxMonad(c).fix()
+  Function0.monad().fx.monad(c).fix()

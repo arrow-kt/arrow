@@ -176,4 +176,4 @@ interface SequenceKHash<A> : Hash<SequenceK<A>>, SequenceKEq<A> {
 }
 
 fun <A> SequenceK.Companion.fx(c: suspend MonadSyntax<ForSequenceK>.() -> A): SequenceK<A> =
-  SequenceK.monad().fxMonad(c).fix()
+  SequenceK.monad().fx.monad(c).fix()

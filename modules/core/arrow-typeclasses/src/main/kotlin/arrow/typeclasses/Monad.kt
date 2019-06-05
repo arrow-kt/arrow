@@ -26,6 +26,16 @@ import kotlin.coroutines.startCoroutine
 @documented
 interface Monad<F> : Selective<F> {
 
+  /**
+   * Entry point for monad bindings which enables for comprehension. The underlying implementation is based on coroutines.
+   * A coroutine is initiated and suspended inside [MonadThrowContinuation] yielding to [Monad.flatMap]. Once all the flatMap binds are completed
+   * the underlying monad is returned from the act of executing the coroutine
+   */
+  val fx: MonadFx<F>
+    get() = object : MonadFx<F> {
+      override val M: Monad<F> = this@Monad
+    }
+
   fun <A, B> Kind<F, A>.flatMap(f: (A) -> Kind<F, B>): Kind<F, B>
 
   fun <A, B> tailRecM(a: A, f: (A) -> Kind<F, Either<A, B>>): Kind<F, B>
@@ -70,18 +80,16 @@ interface Monad<F> : Selective<F> {
 
   @Deprecated(
     "`binding` is getting renamed to `fx` for consistency with the Arrow Fx system. Use the Fx extensions for comprehensions",
-    ReplaceWith("fxMonad(c)")
+    ReplaceWith("fx.monad")
   )
   fun <A> binding(c: suspend MonadSyntax<F>.() -> A): Kind<F, A> =
-    fxMonad(c)
+    fx.monad(c)
+}
 
-  /**
-   * Entry point for monad bindings which enables for comprehension. The underlying implementation is based on coroutines.
-   * A coroutine is initiated and suspended inside [MonadThrowContinuation] yielding to [Monad.flatMap]. Once all the flatMap binds are completed
-   * the underlying monad is returned from the act of executing the coroutine
-   */
-  fun <A> fxMonad(c: suspend MonadSyntax<F>.() -> A): Kind<F, A> {
-    val continuation = MonadContinuation<F, A>(this)
+interface MonadFx<F> {
+  val M: Monad<F>
+  fun <A> monad(c: suspend MonadSyntax<F>.() -> A): Kind<F, A> {
+    val continuation = MonadContinuation<F, A>(M)
     val wrapReturn: suspend MonadContinuation<F, *>.() -> Kind<F, A> = { just(c()) }
     wrapReturn.startCoroutine(continuation, continuation)
     return continuation.returnedMonad()

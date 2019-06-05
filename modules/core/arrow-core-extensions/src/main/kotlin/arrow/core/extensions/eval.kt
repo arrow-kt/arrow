@@ -1,5 +1,6 @@
 package arrow.core.extensions
 
+import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.EvalOf
@@ -10,10 +11,13 @@ import arrow.core.fix
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Bimonad
+import arrow.typeclasses.BindingStrategy
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadSyntax
+import arrow.typeclasses.MonadContinuation
+import arrow.typeclasses.MonadFx
 
 @extension
 interface EvalFunctor : Functor<ForEval> {
@@ -58,6 +62,15 @@ interface EvalMonad : Monad<ForEval> {
 
   override fun <A> just(a: A): Eval<A> =
     Eval.just(a)
+
+  override val fx: MonadFx<ForEval>
+    get() = EvalFxMonad
+}
+
+internal object EvalFxMonad : MonadFx<ForEval> {
+  override val M: Monad<ForEval> = Eval.monad()
+  override fun <A> monad(c: suspend MonadSyntax<ForEval>.() -> A): Eval<A> =
+    super.monad(c).fix()
 }
 
 @extension
@@ -97,4 +110,4 @@ interface EvalBimonad : Bimonad<ForEval> {
 }
 
 fun <B> Eval.Companion.fx(c: suspend MonadSyntax<ForEval>.() -> B): Eval<B> =
-  Eval.monad().fxMonad(c).fix()
+  Eval.monad().fx.monad(c).fix()

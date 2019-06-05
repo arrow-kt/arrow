@@ -9,6 +9,7 @@ import kotlin.coroutines.RestrictsSuspension
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 @RestrictsSuspension
 interface MonadSyntax<F> : Monad<F>, BindSyntax<F>
@@ -22,7 +23,10 @@ open class MonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineC
 
   @Suppress("UNCHECKED_CAST")
   override fun resumeWithException(exception: Throwable) {
-    throw exception
+    when (exception) {
+      is ContinuationShortcircuitThrowable -> returnedMonad = exception.exit as Kind<F, A>
+      else -> throw exception
+    }
   }
 
   protected lateinit var returnedMonad: Kind<F, A>

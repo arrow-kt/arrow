@@ -297,4 +297,4 @@ private fun <F, L, A> handleErrorWith(fa: EitherTOf<F, L, A>, f: (L) -> EitherTO
   }
 
 fun <F, R> EitherT.Companion.fx(M: MonadThrow<F>, c: suspend MonadThrowSyntax<EitherTPartialOf<F, Throwable>>.() -> R): EitherT<F, Throwable, R> =
-  EitherT.monadThrow(M, M).fxMonadThrow(c).fix()
+  EitherT.monadThrow(M, M).fx.monadThrow(c).fix()

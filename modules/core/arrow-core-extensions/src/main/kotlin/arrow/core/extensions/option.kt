@@ -21,13 +21,16 @@ import arrow.core.orElse
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Apply
+import arrow.typeclasses.BindingStrategy
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadSyntax
+import arrow.typeclasses.MonadContinuation
 import arrow.typeclasses.MonadError
+import arrow.typeclasses.MonadFx
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.MonoidK
 import arrow.typeclasses.Monoidal
@@ -191,6 +194,15 @@ interface OptionMonad : Monad<ForOption> {
 
   override fun <A, B> OptionOf<Either<A, B>>.select(f: OptionOf<(A) -> B>): OptionOf<B> =
     fix().optionSelect(f)
+
+  override val fx: MonadFx<ForOption>
+    get() = OptionFxMonad
+}
+
+internal object OptionFxMonad : MonadFx<ForOption> {
+  override val M: Monad<ForOption> = Option.monad()
+  override fun <A> monad(c: suspend MonadSyntax<ForOption>.() -> A): Option<A> =
+    super.monad(c).fix()
 }
 
 @extension
@@ -282,4 +294,4 @@ interface OptionHash<A> : Hash<Option<A>>, OptionEq<A> {
 }
 
 fun <A> Option.Companion.fx(c: suspend MonadSyntax<ForOption>.() -> A): Option<A> =
-  Option.monad().fxMonad(c).fix()
+  Option.monad().fx.monad(c).fix()

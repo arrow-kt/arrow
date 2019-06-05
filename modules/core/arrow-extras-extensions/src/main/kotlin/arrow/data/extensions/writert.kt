@@ -198,4 +198,4 @@ interface WriterTDecidableInstance<F, W> : Decidable<WriterTPartialOf<F, W>>, Wr
 }
 
 fun <F, W, A> WriterT.Companion.fx(M: Monad<F>, MW: Monoid<W>, c: suspend MonadSyntax<WriterTPartialOf<F, W>>.() -> A): WriterT<F, W, A> =
-  WriterT.monad(M, MW).fxMonad(c).fix()
+  WriterT.monad(M, MW).fx.monad(c).fix()

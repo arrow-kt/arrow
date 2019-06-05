@@ -17,7 +17,7 @@ fun Long.humanBytes(): String {
 }
 
 fun <F> Concurrent<F>.ank(source: Path, target: Path, compilerArgs: List<String>, ankOps: AnkOps): Kind<F, Unit> = with(ankOps) {
-  fxConcurrent {
+  fx.concurrent {
     !effect { printConsole(colored(ANSI_PURPLE, AnkHeader)) }
     val heapSize = Runtime.getRuntime().totalMemory()
     val heapMaxSize = Runtime.getRuntime().maxMemory()
