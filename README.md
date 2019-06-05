@@ -22,7 +22,7 @@ $ ./gradlew :app:build
  - [DebugLog](https://github.com/kevinmost/debuglog) bad gradle setup, check [Takhion's](https://github.com/Takhion/sample-kotlin-compiler-plugin) gradle setup. DebugLog uses `org.jetbrains.org.objectweb.asm.` bytecode DSL. (Java only) @kevinmost
  - [Parcelize](https://github.com/JetBrains/kotlin/tree/master/plugins/android-extensions/android-extensions-compiler/src/org/jetbrains/kotlin/android/parcel) plugin to add parcelable logic to data classes. Uses the `org.jetbrains.org.objectweb.asm.` bytecode DSL. (Java only)
  - [Kotlinx serialization](https://github.com/JetBrains/kotlin/tree/master/plugins/kotlin-serialization/kotlin-serialization-compiler/src/org/jetbrains/kotlinx/serialization/compiler) uses all backend-ends + Kotlin IR.
- - [Jetpack Compose](https://android.googlesource.com/platform/frameworks/support/+/androidx-master-dev/compose)
+ - [Jetpack Compose](https://android.googlesource.com/platform/frameworks/support/+/androidx-master-dev/compose) Contains [the larger list of extensions known to be used at once](https://android.googlesource.com/platform/frameworks/support/+/androidx-master-dev/compose/plugins/cli/src/main/java/androidx/compose/plugins/kotlin) in a compiler plugin.
  - [Android synthetic extensions](https://github.com/JetBrains/kotlin/tree/master/plugins/android-extensions/android-extensions-compiler/src/org/jetbrains/kotlin/android/synthetic) generates synthetic methods on Activity/View and Fragment to access views directly by their xml id.
  
  - **currently broken** [purity](https://github.com/pardom/purity) a plugin that checks if functions and lambdas with @Pure are actually pure.
