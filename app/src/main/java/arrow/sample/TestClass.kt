@@ -6,12 +6,12 @@ class TestClass {
 
   suspend fun x(): Unit = TODO()
 
-  fun other(): Unit {
+  suspend fun other(): Unit {
     println("other")
   }
 
-  suspend fun another2(): String {
-    println("another")
+  fun another2(): String {
+    1; println("test")
     return "another"
   }
 }

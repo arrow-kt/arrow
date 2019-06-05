@@ -15,7 +15,10 @@ import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.diagnostics.DiagnosticSink
 import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
 import org.jetbrains.kotlin.psi.Call
+import org.jetbrains.kotlin.psi.KtBlockExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
+import org.jetbrains.kotlin.psi.KtExpression
+import org.jetbrains.kotlin.psi.psiUtil.referenceExpression
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.calls.callUtil.getCall
 import org.jetbrains.kotlin.resolve.calls.callUtil.getType
@@ -52,22 +55,36 @@ internal class DebugLogClassBuilder(
         functionPsi.let {
           messageCollector.report(ERROR, "Unit return on a non suspended function: ${function.name}")
         }
-      } else {
-        //if the return type is not Unit this function may still contain effecting calls in it's child expressions
-        // scattered throughout its body and should be suspended
-        functionPsi?.children?.filterIsInstance<KtCallExpression>()?.forEach { expression ->
-          //the binding context allows us to type-check any expression
-          val expressionRetType: KotlinType? = expression.getType(bindingContext)
-          println(expressionRetType)
-          if (expressionRetType?.isUnit() == true) {
-            messageCollector.report(ERROR, "The expression `${expression.text}` returns `Unit` and should be encapsulated in `suspend`: ${function.name}")
-          }
-        }
-      }
-
+      } else function.findPsi()?.checkPurity()
     }
     return original
   }
+
+  private tailrec fun loop(remaining: List<PsiElement>): Unit {
+    if (remaining.isEmpty()) Unit
+    else {
+      val nestedExpressions =
+        when (val current = remaining[0]) {
+          is KtBlockExpression -> current.children.toList()
+          else -> emptyList<PsiElement>()
+        }
+      loop(nestedExpressions + remaining.drop(1))
+    }
+  }
+
+  fun PsiElement.checkPurity() {
+    if (this is KtBlockExpression) loop(children.toList())
+    if (this is KtExpression) checkExpressionPurity(this)
+    else loop(children.toList())
+  }
+
+  private fun checkExpressionPurity(expression: KtExpression) {
+    val expressionRetType: KotlinType? = expression.getType(bindingContext)
+    if (expressionRetType?.isUnit() == true) {
+      messageCollector.report(ERROR, "Impure expression in function ${expression.referenceExpression()}: `${expression.text}` returning `Unit` only allowed in `suspend` functions")
+    }
+  }
+
 
 }
 
