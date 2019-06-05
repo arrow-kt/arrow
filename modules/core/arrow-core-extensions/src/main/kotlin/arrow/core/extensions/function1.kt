@@ -15,7 +15,6 @@ import arrow.core.invoke
 import arrow.core.k
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
-import arrow.typeclasses.BindingStrategy
 import arrow.typeclasses.Category
 import arrow.typeclasses.Conested
 import arrow.typeclasses.Contravariant
@@ -25,14 +24,11 @@ import arrow.typeclasses.Divisible
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadSyntax
-import arrow.typeclasses.MonadContinuation
 import arrow.typeclasses.Monoid
-import arrow.typeclasses.MonadFx
 import arrow.typeclasses.Profunctor
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.conest
 import arrow.typeclasses.counnest
-import kotlin.coroutines.startCoroutine
 
 @extension
 interface Function1Semigroup<A, B> : Semigroup<Function1<A, B>> {
@@ -158,28 +154,7 @@ interface Function1Monad<I> : Monad<Function1PartialOf<I>>, Function1Applicative
 
   override fun <A, B> tailRecM(a: A, f: (A) -> Function1Of<I, Either<A, B>>): Function1<I, B> =
     Function1.tailRecM(a, f)
-
-  override fun <A> MonadContinuation<Function1PartialOf<I>, *>.bindStrategy(fa: Function1Of<I, A>): BindingStrategy<Function1PartialOf<I>, A> {
-    val i = (this as Function1MonadContinuation).i
-    return BindingStrategy.Strict(fa.fix()(i))
-  }
-
-  @Suppress("UNCHECKED_CAST")
-  override val fx: MonadFx<Function1PartialOf<I>>
-    get() = Function1MonadFx as MonadFx<Function1PartialOf<I>>
 }
-
-internal object Function1MonadFx : MonadFx<Function1PartialOf<Any?>> {
-  override val M: Monad<Function1PartialOf<Any?>> = Function1.monad()
-  override fun <A> monad(c: suspend MonadSyntax<Function1PartialOf<Any?>>.() -> A): Function1<Any?, A> = Function1 { i ->
-    val continuation = Function1MonadContinuation<Any?, A>(M, i)
-    val wrapReturn: suspend MonadContinuation<Function1PartialOf<Any?>, *>.() -> Kind<Function1PartialOf<Any?>, A> = { just(c()) }
-    wrapReturn.startCoroutine(continuation, continuation)
-    continuation.returnedMonad()(i)
-  }
-}
-
-private class Function1MonadContinuation<I, A>(M: Monad<Function1PartialOf<I>>, val i: I) : MonadContinuation<Function1PartialOf<I>, A>(M)
 
 fun <A, B> Function1.Companion.fx(c: suspend MonadSyntax<Function1PartialOf<A>>.() -> B): Function1<A, B> =
   Function1.monad<A>().fx.monad(c).fix()

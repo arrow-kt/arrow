@@ -7,6 +7,7 @@ import arrow.core.Right
 import arrow.effects.ForIO
 import arrow.effects.IO
 import arrow.effects.IOOf
+import arrow.effects.OnCancel
 import arrow.effects.RacePair
 import arrow.effects.RaceTriple
 import arrow.effects.fix
@@ -102,19 +103,11 @@ interface IOMonad : Monad<ForIO> {
   override fun <A> just(a: A): IO<A> =
     IO.just(a)
 
-  override fun <A> MonadContinuation<ForIO, *>.bindStrategy(fa: Kind<ForIO, A>): BindingStrategy<ForIO, A> = BindingStrategy.Suspend {
-    fa.fix().suspended()
-  }
-
   override val fx: MonadFx<ForIO>
     get() = object : MonadFx<ForIO> {
       override val M: Monad<ForIO> = this@IOMonad
-      override fun <A> monad(c: suspend MonadSyntax<ForIO>.() -> A): IO<A> = IO.async { _, cb ->
-        val continuation = MonadContinuation<ForIO, A>(M)
-        suspend { c(continuation) }.startCoroutine(Continuation(EmptyCoroutineContext) { r ->
-          r.fold({ cb(Right(it)) }, { cb(Left(it)) })
-        })
-      }
+      override fun <A> monad(c: suspend MonadSyntax<ForIO>.() -> A): IO<A> =
+        super.monad(c).fix()
     }
 }
 

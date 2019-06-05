@@ -195,9 +195,6 @@ interface OptionMonad : Monad<ForOption> {
   override fun <A, B> OptionOf<Either<A, B>>.select(f: OptionOf<(A) -> B>): OptionOf<B> =
     fix().optionSelect(f)
 
-  override fun <A> MonadContinuation<ForOption, *>.bindStrategy(fa: OptionOf<A>): BindingStrategy<ForOption, A> =
-    fa.fix().fold({ BindingStrategy.ContinuationShortCircuit(fa) }, { BindingStrategy.Strict(it) })
-
   override val fx: MonadFx<ForOption>
     get() = OptionFxMonad
 }

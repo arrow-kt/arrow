@@ -6,7 +6,11 @@ import arrow.core.EitherPartialOf
 import arrow.core.Eval
 import arrow.core.Left
 import arrow.core.Tuple2
+import arrow.core.extensions.either.foldable.foldable
+import arrow.core.extensions.either.monad.monad
+import arrow.core.extensions.either.traverse.traverse
 import arrow.core.fix
+import arrow.core.identity
 import arrow.core.left
 import arrow.core.right
 import arrow.core.toT
@@ -15,10 +19,12 @@ import arrow.data.EitherTOf
 import arrow.data.EitherTPartialOf
 import arrow.data.extensions.eithert.monadThrow.monadThrow
 import arrow.data.fix
+import arrow.data.value
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Apply
+import arrow.typeclasses.ComposedTraverse
 import arrow.typeclasses.Contravariant
 import arrow.typeclasses.Decidable
 import arrow.typeclasses.Divide

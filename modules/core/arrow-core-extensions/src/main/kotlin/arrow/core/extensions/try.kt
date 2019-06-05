@@ -152,9 +152,6 @@ interface TryMonad : Monad<ForTry> {
   override fun <A> just(a: A): Try<A> =
     Try.just(a)
 
-  override fun <A> MonadContinuation<ForTry, *>.bindStrategy(fa: Kind<ForTry, A>): BindingStrategy<ForTry, A> =
-    fa.fix().fold({ BindingStrategy.ContinuationShortCircuit(fa) }, { BindingStrategy.Strict(it) })
-
   override val fx: MonadFx<ForTry>
     get() = TryFxMonadThrow
 }

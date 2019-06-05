@@ -7,7 +7,11 @@ import arrow.core.ForOption
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Tuple2
+import arrow.core.extensions.option.applicative.applicative
+import arrow.core.extensions.option.foldable.foldable
+import arrow.core.extensions.option.traverse.traverse
 import arrow.core.fix
+import arrow.core.identity
 import arrow.core.left
 import arrow.core.none
 import arrow.core.right
@@ -18,9 +22,11 @@ import arrow.data.OptionT
 import arrow.data.OptionTOf
 import arrow.data.OptionTPartialOf
 import arrow.data.fix
+import arrow.data.value
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.ComposedTraverse
 import arrow.typeclasses.Contravariant
 import arrow.typeclasses.Decidable
 import arrow.typeclasses.Divide

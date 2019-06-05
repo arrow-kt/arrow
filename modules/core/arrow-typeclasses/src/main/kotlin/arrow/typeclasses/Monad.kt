@@ -78,9 +78,6 @@ interface Monad<F> : Selective<F> {
 
   override fun <A, B> Kind<F, Either<A, B>>.select(f: Kind<F, (A) -> B>): Kind<F, B> = selectM(f)
 
-  fun <A> MonadContinuation<F, *>.bindStrategy(fa: Kind<F, A>): BindingStrategy<F, A> =
-    BindingStrategy.MultiShot
-
   @Deprecated(
     "`binding` is getting renamed to `fx` for consistency with the Arrow Fx system. Use the Fx extensions for comprehensions",
     ReplaceWith("fx.monad")
