@@ -199,4 +199,4 @@ fun <D> ReaderApi.applicative(): Applicative<ReaderPartialOf<D>> = Kleisli.appli
 fun <D> ReaderApi.monad(): Monad<ReaderPartialOf<D>> = Kleisli.monad(Id.monad())
 
 fun <F, D, A> Ior.Companion.fx(MF: Monad<F>, c: suspend MonadSyntax<KleisliPartialOf<F, D>>.() -> A): Kleisli<F, D, A> =
-  Kleisli.monad<F, D>(MF).fx.monad(c).fix()
+  Kleisli.monad<F, D>(MF).fxMonad(c).fix()

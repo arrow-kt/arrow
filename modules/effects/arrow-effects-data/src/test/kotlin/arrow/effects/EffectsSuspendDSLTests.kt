@@ -340,7 +340,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
         const
 
       fun <F> Concurrent<F>.program(): Kind<F, Int> =
-        fx.concurrent { !effect { sideEffect() } }
+        fxConcurrent { !effect { sideEffect() } }
 
       fun <F> UnsafeRun<F>.main(fx: Concurrent<F>): Int =
         unsafe { runBlocking { fx.program() } }

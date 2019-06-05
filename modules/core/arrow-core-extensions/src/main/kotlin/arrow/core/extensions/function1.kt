@@ -157,7 +157,7 @@ interface Function1Monad<I> : Monad<Function1PartialOf<I>>, Function1Applicative
 }
 
 fun <A, B> Function1.Companion.fx(c: suspend MonadSyntax<Function1PartialOf<A>>.() -> B): Function1<A, B> =
-  Function1.monad<A>().fx.monad(c).fix()
+  Function1.monad<A>().fxMonad(c).fix()
 
 @extension
 interface Function1Category : Category<ForFunction1> {

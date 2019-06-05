@@ -188,4 +188,4 @@ interface ListKHash<A> : Hash<ListKOf<A>>, ListKEq<A> {
 }
 
 fun <A> ListK.Companion.fx(c: suspend MonadSyntax<ForListK>.() -> A): ListK<A> =
-  ListK.monad().fx.monad(c).fix()
+  ListK.monad().fxMonad(c).fix()

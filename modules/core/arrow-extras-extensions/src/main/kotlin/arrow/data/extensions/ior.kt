@@ -146,4 +146,4 @@ interface IorHash<L, R> : Hash<Ior<L, R>>, IorEq<L, R> {
 }
 
 fun <L, R> Ior.Companion.fx(SL: Semigroup<L>, c: suspend MonadSyntax<IorPartialOf<L>>.() -> R): Ior<L, R> =
-  Ior.monad(SL).fx.monad(c).fix()
+  Ior.monad(SL).fxMonad(c).fix()

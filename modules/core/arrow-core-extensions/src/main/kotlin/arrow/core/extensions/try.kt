@@ -10,25 +10,20 @@ import arrow.core.TryOf
 import arrow.core.ForTry
 import arrow.core.Try.Failure
 import arrow.extension
-import arrow.core.extensions.`try`.monad.monad
 import arrow.core.extensions.`try`.monadThrow.monadThrow
 import arrow.core.fix
 import arrow.core.identity
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Apply
-import arrow.typeclasses.BindingStrategy
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadSyntax
-import arrow.typeclasses.MonadContinuation
 import arrow.typeclasses.MonadError
-import arrow.typeclasses.MonadFx
 import arrow.typeclasses.MonadThrow
-import arrow.typeclasses.MonadThrowFx
+import arrow.typeclasses.MonadThrowSyntax
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
@@ -78,10 +73,7 @@ interface TryMonadError : MonadError<ForTry, Throwable>, TryMonad {
 }
 
 @extension
-interface TryMonadThrow : MonadThrow<ForTry>, TryMonadError {
-  override val fx: MonadThrowFx<ForTry>
-    get() = TryFxMonadThrow
-}
+interface TryMonadThrow : MonadThrow<ForTry>, TryMonadError
 
 @extension
 interface TryEq<A> : Eq<Try<A>> {
@@ -151,15 +143,6 @@ interface TryMonad : Monad<ForTry> {
 
   override fun <A> just(a: A): Try<A> =
     Try.just(a)
-
-  override val fx: MonadFx<ForTry>
-    get() = TryFxMonadThrow
-}
-
-internal object TryFxMonadThrow : MonadThrowFx<ForTry> {
-  override val ME: MonadThrow<ForTry> = Try.monadThrow()
-  override fun <A> monad(c: suspend MonadSyntax<ForTry>.() -> A): Try<A> =
-    super.monad(c).fix()
 }
 
 @extension
@@ -216,5 +199,5 @@ interface TryHash<A> : Hash<Try<A>>, TryEq<A> {
   })
 }
 
-fun <A> Try.Companion.fx(c: suspend MonadSyntax<ForTry>.() -> A): Try<A> =
-  Try.monad().fx.monad(c).fix()
+fun <A> Try.Companion.fx(c: suspend MonadThrowSyntax<ForTry>.() -> A): Try<A> =
+  Try.monadThrow().fxMonadThrow(c).fix()

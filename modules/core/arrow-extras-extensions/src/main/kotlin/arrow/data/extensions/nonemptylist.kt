@@ -182,4 +182,4 @@ fun <F, A> Reducible<F>.toNonEmptyList(fa: Kind<F, A>): NonEmptyList<A> =
   }).value()
 
 fun <A> NonEmptyList.Companion.fx(c: suspend MonadSyntax<ForNonEmptyList>.() -> A): NonEmptyList<A> =
-  NonEmptyList.monad().fx.monad(c).fix()
+  NonEmptyList.monad().fxMonad(c).fix()

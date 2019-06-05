@@ -5,12 +5,6 @@ import arrow.core.Either
 import arrow.core.Right
 import arrow.documented
 import arrow.effects.internal.asyncContinuation
-import arrow.effects.data.internal.BindingCancellationException
-import arrow.typeclasses.MonadSyntax
-import arrow.typeclasses.MonadError
-import arrow.typeclasses.MonadThrow
-import arrow.typeclasses.MonadThrowSyntax
-import arrow.typeclasses.MonadThrowFx
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.startCoroutine
@@ -35,16 +29,15 @@ interface Async<F> : MonadDefer<F> {
    * A coroutines is initiated and inside [AsyncContinuation] suspended yielding to [Monad.flatMap]. Once all the flatMap binds are completed
    * the underlying monad is returned from the act of executing the coroutine
    *
-   * This one operates over [MonadError] instances that can support [Throwable] in their error type automatically lifting
+   * This one operates over [Async] instances that can support [Throwable] in their error type automatically lifting
    * errors as failed computations in their monadic context and not letting exceptions thrown as the regular monad binding does.
-   *
-   * This operation is cancellable by calling invoke on the [Disposable] return.
-   * If [Disposable.invoke] is called the binding result will become a lifted [BindingCancellationException].
    */
-  override val fx: AsyncFx<F>
-    get() = object : AsyncFx<F> {
-      override val async: Async<F> get() = this@Async
-    }
+  fun <A> fxAsync(c: suspend AsyncSyntax<F>.() -> A): Kind<F, A> {
+    val continuation = AsyncContinuation<F, A>(this)
+    val wrapReturn: suspend AsyncSyntax<F>.() -> Kind<F, A> = { just(c()) }
+    wrapReturn.startCoroutine(continuation, continuation)
+    return continuation.returnedMonad()
+  }
 
   /**
    * Creates an instance of [F] that executes an asynchronous process on evaluation.
@@ -328,20 +321,3 @@ interface Async<F> : MonadDefer<F> {
 internal val mapUnit: (Any?) -> Unit = { Unit }
 internal val rightUnit = Right(Unit)
 internal val unitCallback = { cb: (Either<Throwable, Unit>) -> Unit -> cb(rightUnit) }
-
-interface AsyncFx<F> : MonadThrowFx<F> {
-  val async: Async<F>
-  override val ME: MonadThrow<F> get() = async
-  fun <A> async(c: suspend AsyncSyntax<F>.() -> A): Kind<F, A> {
-    val continuation = AsyncContinuation<F, A>(async)
-    val wrapReturn: suspend AsyncSyntax<F>.() -> Kind<F, A> = { just(c()) }
-    wrapReturn.startCoroutine(continuation, continuation)
-    return continuation.returnedMonad()
-  }
-
-  override fun <A> monadThrow(c: suspend MonadThrowSyntax<F>.() -> A): Kind<F, A> =
-    async(c)
-
-  override fun <A> monad(c: suspend MonadSyntax<F>.() -> A): Kind<F, A> =
-    async(c)
-}

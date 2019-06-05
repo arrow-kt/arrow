@@ -20,10 +20,7 @@ import arrow.effects.Race9
 import arrow.effects.RacePair
 import arrow.effects.RaceTriple
 import arrow.effects.Timer
-import arrow.effects.data.internal.BindingCancellationException
 import arrow.effects.internal.TimeoutException
-import arrow.typeclasses.MonadSyntax
-import arrow.typeclasses.MonadThrowSyntax
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine
@@ -44,21 +41,6 @@ interface Concurrent<F> : Async<F> {
   fun dispatchers(): Dispatchers<F>
 
   fun timer(): Timer<F> = Timer(this)
-
-  /**
-   * Entry point for monad bindings which enables for comprehensions. The underlying impl is based on coroutines.
-   * A coroutines is initiated and inside [ConcurrentContinuation] suspended yielding to [Monad.flatMap]. Once all the flatMap binds are completed
-   * the underlying monad is returned from the act of executing the coroutine
-   *
-   * This one operates over [Concurrent] instances
-   *
-   * This operation is cancellable by calling invoke on the [Disposable] return.
-   * If [Disposable.invoke] is called the binding result will become a lifted [BindingCancellationException].
-   */
-  override val fx: ConcurrentFx<F>
-    get() = object : ConcurrentFx<F> {
-      override val concurrent: Concurrent<F> = this@Concurrent
-    }
 
   /**
    * Creates a cancelable instance of [F] that executes an asynchronous process on evaluation.
@@ -782,16 +764,10 @@ interface Concurrent<F> : Async<F> {
   override fun <A> async(fa: Proc<A>): Kind<F, A> =
     async { _, cb -> fa(cb) }
 
-  /**
-   * Entry point for monad bindings which enables for comprehensions. The underlying impl is based on coroutines.
-   * A coroutines is initiated and inside [ConcurrentCancellableContinuation] suspended yielding to [Monad.flatMap]. Once all the flatMap binds are completed
-   * the underlying monad is returned from the act of executing the coroutine
-   *
-   * This one operates over [Concurrent] instances
-   *
-   * This operation is cancellable by calling invoke on the [Disposable] return.
-   * If [Disposable.invoke] is called the binding result will become a lifted [BindingCancellationException].
-   */
+  @Deprecated(
+    "`bindingConcurrent` is getting renamed to `fxConcurrent` for consistency with the Arrow Fx system.",
+    ReplaceWith("fxConcurrent(c)")
+  )
   fun <B> bindingConcurrent(c: suspend ConcurrentContinuation<F, *>.() -> B): Kind<F, B> {
     val continuation = ConcurrentContinuation<F, B>(this)
     val wrapReturn: suspend ConcurrentContinuation<F, *>.() -> Kind<F, B> = { just(c()) }
@@ -799,8 +775,17 @@ interface Concurrent<F> : Async<F> {
     return continuation.returnedMonad()
   }
 
-  override fun <B> binding(c: suspend MonadSyntax<F>.() -> B): Kind<F, B> =
-    bindingConcurrent { c() }
+  /**
+   * Entry point for monad bindings which enables for comprehensions. The underlying impl is based on coroutines.
+   * A coroutines is initiated and inside [ConcurrentContinuation] suspended yielding to [Monad.flatMap]. Once all the flatMap binds are completed
+   * the underlying monad is returned from the act of executing the coroutine
+   */
+  fun <A> fxConcurrent(c: suspend ConcurrentSyntax<F>.() -> A): Kind<F, A> {
+    val continuation = ConcurrentContinuation<F, A>(this)
+    val wrapReturn: suspend ConcurrentContinuation<F, *>.() -> Kind<F, A> = { just(c()) }
+    wrapReturn.startCoroutine(continuation, continuation)
+    return continuation.returnedMonad()
+  }
 
   /**
    *  Sleeps for a given [duration] without blocking a thread.
@@ -867,27 +852,4 @@ interface Concurrent<F> : Async<F> {
         { raiseError(TimeoutException(duration.toString())) }
       )
     }
-}
-
-interface ConcurrentFx<F> : AsyncFx<F> {
-  val concurrent: Concurrent<F>
-
-  override val async: Async<F>
-    get() = concurrent
-
-  fun <A> concurrent(c: suspend ConcurrentSyntax<F>.() -> A): Kind<F, A> {
-    val continuation = ConcurrentContinuation<F, A>(concurrent)
-    val wrapReturn: suspend ConcurrentSyntax<F>.() -> Kind<F, A> = { just(c()) }
-    wrapReturn.startCoroutine(continuation, continuation)
-    return continuation.returnedMonad()
-  }
-
-  override fun <A> async(c: suspend AsyncSyntax<F>.() -> A): Kind<F, A> =
-    concurrent(c)
-
-  override fun <A> monadThrow(c: suspend MonadThrowSyntax<F>.() -> A): Kind<F, A> =
-    concurrent(c)
-
-  override fun <A> monad(c: suspend MonadSyntax<F>.() -> A): Kind<F, A> =
-    concurrent(c)
 }

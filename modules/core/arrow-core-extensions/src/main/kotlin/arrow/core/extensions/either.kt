@@ -17,16 +17,13 @@ import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Bifunctor
-import arrow.typeclasses.BindingStrategy
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadSyntax
-import arrow.typeclasses.MonadContinuation
 import arrow.typeclasses.MonadError
-import arrow.typeclasses.MonadFx
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK
@@ -117,16 +114,6 @@ interface EitherMonad<L> : Monad<EitherPartialOf<L>>, EitherApplicative<L> {
 
   override fun <A, B> tailRecM(a: A, f: (A) -> EitherOf<L, Either<A, B>>): Either<L, B> =
     Either.tailRecM(a, f)
-
-  @Suppress("UNCHECKED_CAST")
-  override val fx: MonadFx<EitherPartialOf<L>>
-    get() = EitherMonadFx as MonadFx<EitherPartialOf<L>>
-}
-
-internal object EitherMonadFx : MonadFx<EitherPartialOf<Any?>> {
-  override val M: Monad<EitherPartialOf<Any?>> = Either.monad()
-  override fun <A> monad(c: suspend MonadSyntax<EitherPartialOf<Any?>>.() -> A): Either<Any?, A> =
-    super.monad(c).fix()
 }
 
 @extension
@@ -211,4 +198,4 @@ interface EitherHash<L, R> : Hash<Either<L, R>>, EitherEq<L, R> {
 }
 
 fun <L, R> Either.Companion.fx(c: suspend MonadSyntax<EitherPartialOf<L>>.() -> R): Either<L, R> =
-  Either.monad<L>().fx.monad(c).fix()
+  Either.monad<L>().fxMonad(c).fix()
