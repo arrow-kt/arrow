@@ -164,7 +164,7 @@ options:
         url: /docs/arrow/data/ior/
 
       - title: Id
-        url: /docs/arrow/core/id/
+        url: /docs/apidocs/arrow-core-data/arrow.core/-id/
 
       - title: Reader
         url: /docs/arrow/data/reader/
