@@ -16,7 +16,7 @@ Performing effects while switching execution contexts a la carte is trivial.
 import arrow.effects.IO
 import arrow.unsafe
 import arrow.effects.extensions.io.unsafeRun.runBlocking
-import arrow.effects.extensions.io.fx.fx
+import arrow.effects.extensions.fx
 import kotlinx.coroutines.newSingleThreadContext
 
 //sampleStart
@@ -25,7 +25,7 @@ val contextA = newSingleThreadContext("A")
 suspend fun printThreadName(): Unit =
   println(Thread.currentThread().name)
 
-val program = fx {
+val program = IO.fx {
   continueOn(contextA)
   !effect { printThreadName() }
   continueOn(NonBlocking)
@@ -47,13 +47,13 @@ A [Fiber](/docs/effects/fiber) represents the pure result of a [Concurrent] data
 import arrow.effects.IO
 import arrow.unsafe
 import arrow.effects.extensions.io.unsafeRun.runBlocking
-import arrow.effects.extensions.io.fx.fx
+import arrow.effects.extensions.fx
 
 //sampleStart
 suspend fun threadName(): String =
   Thread.currentThread().name
 
-val program = fx {
+val program = IO.fx {
   val fiberA = !NonBlocking.startFiber(effect { threadName() })
   val fiberB = !NonBlocking.startFiber(effect { threadName() })
   val threadA = !fiberA.join()
@@ -88,7 +88,7 @@ Once the function specifies a valid return, we can observe how the returned non-
 import arrow.effects.IO
 import arrow.unsafe
 import arrow.effects.extensions.io.unsafeRun.runBlocking
-import arrow.effects.extensions.io.fx.fx
+import arrow.effects.extensions.fx
 
 //sampleStart
 suspend fun threadName(): String =
@@ -99,7 +99,7 @@ data class ThreadInfo(
   val threadB: String
 )
 
-val program = fx {
+val program = IO.fx {
   val (threadA: String, threadB: String) = 
     !NonBlocking.parMapN(
       effect { threadName() },
@@ -123,13 +123,13 @@ fun main() { // The edge of our world
 import arrow.effects.IO
 import arrow.unsafe
 import arrow.effects.extensions.io.unsafeRun.runBlocking
-import arrow.effects.extensions.io.fx.fx
+import arrow.effects.extensions.fx
 
 //sampleStart
 suspend fun threadName(): String =
   Thread.currentThread().name
 
-val program = fx {
+val program = IO.fx {
   val result: List<String> = !NonBlocking.parTraverse(
     listOf(
         effect { threadName() },
@@ -155,13 +155,13 @@ fun main() { // The edge of our world
 import arrow.effects.IO
 import arrow.unsafe
 import arrow.effects.extensions.io.unsafeRun.runBlocking
-import arrow.effects.extensions.io.fx.fx
+import arrow.effects.extensions.fx
 
 //sampleStart
 suspend fun threadName(): String =
   Thread.currentThread().name
 
-val program = fx {
+val program = IO.fx {
   val result: List<String> = !NonBlocking.parSequence(
     listOf(
       effect { threadName() },
@@ -175,26 +175,6 @@ val program = fx {
 //sampleEnd
 fun main() { // The edge of our world
   unsafe { runBlocking { program } }
-}
-```
-
-## Cancellation
-
-All concurrent `fx` continuations are cancellable. Users may use the `fxCancellable` function to run `fx` blocks that in addition to returning a value, returns a disposable handler that can interrupt the operation.
-
-```kotlin:ank:playground
-import arrow.effects.IO
-import arrow.unsafe
-import arrow.effects.extensions.io.unsafeRun.runBlocking
-import arrow.effects.extensions.io.fx.fxCancellable
-
-fun main() { // The edge of our world
-//sampleStart
-  val (_, disposable) = fxCancellable {
-    !effect { println("BOOM!") }
-  }
-//sampleEnd
-  println(disposable)
 }
 ```
 
@@ -216,12 +196,12 @@ The value `program` below is pure and referentially transparent because `fx` ret
 import arrow.effects.IO
 import arrow.unsafe
 import arrow.effects.extensions.io.unsafeRun.runBlocking
-import arrow.effects.extensions.io.fx.fx
+import arrow.effects.extensions.fx
 //sampleStart
 suspend fun printThreadName(): Unit =
   println(Thread.currentThread().name)
 
-val program = fx {
+val program = IO.fx {
   !effect { printThreadName() }
 }
 
