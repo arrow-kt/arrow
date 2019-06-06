@@ -1,6 +1,5 @@
 package arrow.core.extensions
 
-import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.EvalOf
@@ -11,12 +10,10 @@ import arrow.core.fix
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Bimonad
-import arrow.typeclasses.BindingStrategy
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadSyntax
-import arrow.typeclasses.MonadContinuation
 import arrow.typeclasses.MonadFx
 
 @extension

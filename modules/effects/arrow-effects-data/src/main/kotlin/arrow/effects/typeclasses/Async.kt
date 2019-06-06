@@ -267,7 +267,7 @@ interface Async<F> : MonadDefer<F> {
    * fun main(args: Array<String>) {
    *   //sampleStart
    *   IO.async().run {
-   *     val result = binding {
+   *     val result = fx.monad {
    *       continueOn(Dispatchers.Default)
    *       Thread.currentThread().name
    *     }.fix().unsafeRunSync()

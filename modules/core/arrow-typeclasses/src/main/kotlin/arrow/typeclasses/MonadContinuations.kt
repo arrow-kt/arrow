@@ -9,7 +9,6 @@ import kotlin.coroutines.RestrictsSuspension
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 
 @RestrictsSuspension
 interface MonadSyntax<F> : Monad<F>, BindSyntax<F>

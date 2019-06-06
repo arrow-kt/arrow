@@ -149,7 +149,7 @@ When creating an instance with the `@extension` annotation, the processor genera
 import arrow.core.Option
 import arrow.core.extensions.option.monad.binding
 
-binding {
+fx.monad {
   val (a) = Option(1)
   val (b) = Option(a + 1)
   a + b
@@ -174,7 +174,7 @@ listOf(Option(1), Option(2), Option(3)).sequence(Option.applicative())
 ```kotlin:ank
 import arrow.core.extensions.`try`.monad.binding
 
-binding {
+fx.monad {
   val (a) = Try { 1 }
   val (b) = Try { a + 1 }
   a + b

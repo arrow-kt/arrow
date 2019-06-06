@@ -80,7 +80,7 @@ interface Monad<F> : Selective<F> {
 
   @Deprecated(
     "`binding` is getting renamed to `fx` for consistency with the Arrow Fx system. Use the Fx extensions for comprehensions",
-    ReplaceWith("fx.monad")
+    ReplaceWith("fx.monad(c)")
   )
   fun <A> binding(c: suspend MonadSyntax<F>.() -> A): Kind<F, A> =
     fx.monad(c)

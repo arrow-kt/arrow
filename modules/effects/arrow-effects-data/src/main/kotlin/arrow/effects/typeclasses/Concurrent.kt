@@ -178,7 +178,7 @@ interface Concurrent<F> : Async<F> {
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   binding {
+   *   fx.monad {
    *     val promise = Promise.uncancelable<ForIO, Int>(IO.async()).bind()
    *     val fiber = promise.get().fix().startFiber(Dispatchers.Default).bind()
    *     promise.complete(1).bind()
@@ -208,7 +208,7 @@ interface Concurrent<F> : Async<F> {
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   binding {
+   *   fx.monad {
    *     val promise = Promise.uncancelable<ForIO, Int>(IO.async()).bind()
    *     val racePair = IO.racePair(Dispatchers.Default, promise.get(), IO.unit).bind()
    *     racePair.fold(
@@ -244,7 +244,7 @@ interface Concurrent<F> : Async<F> {
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   binding {
+   *   fx.monad {
    *     val promise = Promise.uncancelable<ForIO, Int>(IO.async()).bind()
    *     val raceTriple = IO.raceTriple(Dispatchers.Default, promise.get(), IO.unit, IO.never).bind()
    *     raceTriple.fold(
@@ -565,7 +565,7 @@ interface Concurrent<F> : Async<F> {
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   binding {
+   *   fx.monad {
    *     val eitherGetOrUnit = Dispatchers.Default.raceN(IO.never, IO.just(5)).bind()
    *     eitherGetOrUnit.fold(
    *       { IO.raiseError<Int>(RuntimeException("Never always loses race")) },

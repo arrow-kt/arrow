@@ -64,7 +64,7 @@ object MonadLaws {
 
   fun <F> Monad<F>.monadComprehensions(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.int()) { num: Int ->
-      binding {
+      fx.monad {
         val (a) = just(num)
         val (b) = just(a + 1)
         val (c) = just(b + 1)

@@ -23,7 +23,7 @@ interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F> {
 /**
  * ank_macro_hierarchy(arrow.typeclasses.MonadThrow)
  *
- * A MonadError with the error type fixed to Throwable. It provides [bindingCatch] for automatically catching throwable
+ * MonadThrow has the error type fixed to Throwable. It provides [fx.monadThrow] for automatically catching throwable
  * errors in the context of a binding, short-circuiting the complete computation and returning the error raised to the
  * same computational context (through [raiseError]).
  *
@@ -42,7 +42,7 @@ interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F> {
  * ### Example
  *
  * Oftentimes we find ourselves in situations where we need to sequence some computations that could potentially fail.
- * [bindingCatch] allows us to safely compute those by automatically catching any exceptions thrown during the process.
+ * [fx.monadThrow] allows us to safely compute those by automatically catching any exceptions thrown during the process.
  *
  * ```kotlin:ank:playground:extension
  * _imports_
@@ -64,7 +64,7 @@ interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F> {
  * fun main(args: Array<String>) {
  *    //sampleStart
  *    fun <F> MonadThrow<F>.attack(): Kind<F, Impacted> =
- *      bindingCatch {
+ *      fx.monadThrow {
  *        val nuke = arm().bind()
  *        val target = aim().bind()
  *        val impact = launchImpure(target, nuke) // this throws!
@@ -92,7 +92,7 @@ interface MonadThrow<F> : MonadError<F, Throwable> {
    * ### Example
    *
    * Oftentimes we find ourselves in situations where we need to sequence some computations that could potentially fail.
-   * [bindingCatch] allows us to safely compute those by automatically catching any exceptions thrown during the process.
+   * [fx.monadThrow] allows us to safely compute those by automatically catching any exceptions thrown during the process.
    *
    * ```kotlin:ank:playground:extension
    * _imports_
@@ -140,13 +140,6 @@ interface MonadThrow<F> : MonadError<F, Throwable> {
   fun <B> bindingCatch(c: suspend MonadThrowSyntax<F>.() -> B): Kind<F, B> =
     fx.monadThrow(c)
 
-  @Deprecated(
-    "`bindingCatch` is getting renamed to `fx` for consistency with the Arrow Fx system. Use the Fx extensions for comprehensions",
-    ReplaceWith("fx.monad")
-  )
-  override fun <B> binding(c: suspend MonadSyntax<F>.() -> B): Kind<F, B> =
-    fx.monad(c)
-
   fun <A> Throwable.raiseNonFatal(): Kind<F, A> =
     if (NonFatal(this)) raiseError(this) else throw this
 }
@@ -160,7 +153,4 @@ interface MonadThrowFx<F> : MonadFx<F> {
     wrapReturn.startCoroutine(continuation, continuation)
     return continuation.returnedMonad()
   }
-
-  override fun <A> monad(c: suspend MonadSyntax<F>.() -> A): Kind<F, A> =
-    monadThrow(c)
 }

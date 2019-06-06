@@ -26,7 +26,7 @@ import kotlin.coroutines.CoroutineContext
  *
  * fun main(args: Array<String>) {
  *   //sampleStart
- *   binding {
+ *   fx.monad {
  *     val promise = Promise.uncancelable<ForIO, Int>(IO.async()).bind()
  *     val eitherGetOrUnit = Dispatchers.Default.racePair(promise.get(), IO.unit).bind()
  *     eitherGetOrUnit.fold(

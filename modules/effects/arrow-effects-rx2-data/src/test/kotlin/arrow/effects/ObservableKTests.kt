@@ -3,11 +3,11 @@ package arrow.effects
 import arrow.effects.rx2.ForObservableK
 import arrow.effects.rx2.ObservableK
 import arrow.effects.rx2.ObservableKOf
+import arrow.effects.rx2.extensions.fx
 import arrow.effects.rx2.k
 import arrow.effects.rx2.extensions.observablek.async.async
 import arrow.effects.rx2.extensions.observablek.functor.functor
 import arrow.effects.rx2.extensions.observablek.monad.flatMap
-import arrow.effects.rx2.extensions.observablek.monadThrow.bindingCatch
 import arrow.effects.rx2.extensions.observablek.timer.timer
 import arrow.effects.rx2.extensions.observablek.traverse.traverse
 import arrow.effects.rx2.value
@@ -65,7 +65,7 @@ class ObservableKTests : UnitSpec() {
     )
 
     "Multi-thread Observables finish correctly" {
-      val value: Observable<Long> = bindingCatch {
+      val value: Observable<Long> = ObservableK.fx {
         val a = Observable.timer(2, TimeUnit.SECONDS).k().bind()
         a
       }.value()
@@ -78,7 +78,7 @@ class ObservableKTests : UnitSpec() {
     "Multi-thread Observables should run on their required threads" {
       val originalThread: Thread = Thread.currentThread()
       var threadRef: Thread? = null
-      val value: Observable<Long> = bindingCatch {
+      val value: Observable<Long> = ObservableK.fx {
         val a = Observable.timer(2, TimeUnit.SECONDS, Schedulers.newThread()).k().bind()
         threadRef = Thread.currentThread()
         val b = Observable.just(a).observeOn(Schedulers.io()).k().bind()
@@ -94,7 +94,7 @@ class ObservableKTests : UnitSpec() {
     }
 
     "Observable cancellation forces binding to cancel without completing too" {
-      val value: Observable<Long> = bindingCatch {
+      val value: Observable<Long> = ObservableK.fx {
         val a = Observable.timer(3, TimeUnit.SECONDS).k().bind()
         a
       }.value()

@@ -346,9 +346,9 @@ tupled(Either.Right(1), Either.Right("a"), Either.Right(2.0))
  Computing over dependent values ignoring absence
 
 ```kotlin
-import arrow.core.extensions.either.monad.*
+import arrow.core.extensions.fx
 
-binding {
+Either.fx {
   val (a) = Either.Right(1)
   val (b) = Either.Right(1 + a)
   val (c) = Either.Right(1 + b)

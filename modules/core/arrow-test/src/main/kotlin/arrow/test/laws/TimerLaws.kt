@@ -37,7 +37,7 @@ object TimerLaws {
     C: Clock<F>,
     EQ: Eq<Kind<F, Boolean>>
   ) = forFew(25, Gen.intSmall()) {
-    val lhs = binding {
+    val lhs = fx.async {
       val start = !C.timeNano()
       !T.sleep(10.milliseconds)
       val end = !C.timeNano()

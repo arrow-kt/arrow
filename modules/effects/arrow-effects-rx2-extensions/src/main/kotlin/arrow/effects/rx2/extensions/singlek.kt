@@ -16,6 +16,9 @@ import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
 import arrow.effects.typeclasses.ProcF
 import arrow.effects.Timer
+import arrow.effects.rx2.extensions.maybek.async.async
+import arrow.effects.rx2.extensions.singlek.async.async
+import arrow.effects.typeclasses.AsyncSyntax
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
@@ -134,3 +137,7 @@ interface SingleKTimer : Timer<ForSingleK> {
     SingleK(Single.timer(duration.nanoseconds, TimeUnit.NANOSECONDS)
       .map { Unit })
 }
+
+// TODO SingleK does not yet have a Concurrent instance
+fun <A> SingleK.Companion.fx(c: suspend AsyncSyntax<ForSingleK>.() -> A): SingleK<A> =
+  SingleK.async().fx.async(c).fix()

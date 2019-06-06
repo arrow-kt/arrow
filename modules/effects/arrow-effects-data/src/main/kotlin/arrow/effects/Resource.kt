@@ -119,7 +119,7 @@ import arrow.typeclasses.Semigroup
  * fun shutDownFanceService(service: Service): IO<Unit> = IO { println("Closed service") }
  *
  * //sampleStart
- * val managedTProgram = Resource.monad(IO.bracket()).binding {
+ * val managedTProgram = Resource.monad(IO.bracket()).fx.monad {
  *   val consumer = Resource(::createConsumer, ::closeConsumer, IO.bracket()).bind()
  *   val handle = Resource(::createDBHandle, ::closeDBHandle, IO.bracket()).bind()
  *   Resource({ createFancyService(consumer, handle) }, ::shutDownFanceService, IO.bracket()).bind()

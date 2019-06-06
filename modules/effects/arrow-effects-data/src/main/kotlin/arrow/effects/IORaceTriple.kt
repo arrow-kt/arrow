@@ -25,7 +25,7 @@ import kotlin.coroutines.CoroutineContext
  *
  * fun main(args: Array<String>) {
  *   //sampleStart
- *   binding {
+ *   fx.monad {
  *     val promise = Promise.uncancelable<ForIO, Int>(IO.async()).bind()
  *     val raceTriple = IO.raceTriple(Dispatchers.Default, promise.get(), IO.unit, IO.never).bind()
  *     raceTriple.fold(

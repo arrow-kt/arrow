@@ -155,7 +155,7 @@ sealed class IO<out A> : IOOf<A> {
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   binding {
+   *   fx.monad {
    *     val promise = Promise.uncancelable<ForIO, Int>(IO.async()).bind()
    *     val fiber = promise.get().fix().startFiber(Dispatchers.Default).bind()
    *     promise.complete(1).bind()

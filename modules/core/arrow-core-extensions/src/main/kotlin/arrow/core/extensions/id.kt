@@ -17,7 +17,6 @@ import arrow.core.identity
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Bimonad
-import arrow.typeclasses.BindingStrategy
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Foldable
@@ -25,7 +24,6 @@ import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadSyntax
-import arrow.typeclasses.MonadContinuation
 import arrow.typeclasses.MonadFx
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Selective
