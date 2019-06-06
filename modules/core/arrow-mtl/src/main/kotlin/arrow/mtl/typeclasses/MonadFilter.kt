@@ -37,7 +37,6 @@ interface MonadFilterFx<F> : MonadFx<F> {
   val MF: MonadFilter<F>
   override val M: Monad<F> get() = MF
 
-
   /**
    * Entry point for monad bindings which enables for comprehension. The underlying impl is based on coroutines.
    * A coroutine is initiated and inside [MonadContinuation] suspended yielding to [flatMap]. Once all the flatMap binds are completed
