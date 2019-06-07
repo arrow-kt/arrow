@@ -13,6 +13,7 @@ import arrow.effects.extensions.io.async.async
 import arrow.effects.extensions.io.concurrent.concurrent
 import arrow.effects.extensions.io.concurrent.parMapN
 import arrow.effects.extensions.io.monad.flatMap
+import arrow.effects.extensions.io.monad.map
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.milliseconds
 import arrow.effects.typeclasses.seconds
@@ -321,7 +322,7 @@ class IOTest : UnitSpec() {
       fun makePar(num: Long) =
         IO(newSingleThreadContext("$num")) {
           // Sleep according to my number
-          Thread.sleep(num * 40)
+          Thread.sleep(num * 100)
         }.map {
           // Add myself to order list
           order.add(num)
@@ -347,11 +348,9 @@ class IOTest : UnitSpec() {
         }
 
       fun makePar(num: Long) =
-        IO(newSingleThreadContext("$num")) {
-          // Sleep according to my number
-          Thread.sleep(num * 100)
-          num
-        }.order()
+        IO.concurrent()
+          .sleep((num * 100).milliseconds)
+          .map { num }.order()
 
       val result =
         newSingleThreadContext("all").parMapN(

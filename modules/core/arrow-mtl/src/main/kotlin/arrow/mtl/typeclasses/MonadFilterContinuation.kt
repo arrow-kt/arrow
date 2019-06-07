@@ -1,8 +1,8 @@
 package arrow.mtl.typeclasses
 
 import arrow.Kind
-import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadContinuation
+import arrow.typeclasses.MonadSyntax
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.RestrictsSuspension
@@ -16,7 +16,7 @@ private object PredicateInterrupted : RuntimeException() {
 }
 
 @RestrictsSuspension
-interface MonadFilterSyntax<F> : Monad<F> {
+interface MonadFilterSyntax<F> : MonadSyntax<F> {
   fun continueIf(predicate: Boolean): Unit
   suspend fun <B> Kind<F, B>.bindWithFilter(f: (B) -> Boolean): B
 }
