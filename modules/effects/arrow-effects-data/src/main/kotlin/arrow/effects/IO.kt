@@ -149,19 +149,19 @@ sealed class IO<out A> : IOOf<A> {
    *
    * ```kotlin:ank:playground
    * import arrow.effects.*
-   * import arrow.effects.extensions.io.async.async
-   * import arrow.effects.extensions.io.monad.binding
+   * import arrow.effects.extensions.fx
    * import kotlinx.coroutines.Dispatchers
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   fx.monad {
-   *     val promise = Promise.uncancelable<ForIO, Int>(IO.async()).bind()
-   *     val fiber = promise.get().fix().startFiber(Dispatchers.Default).bind()
-   *     promise.complete(1).bind()
-   *     fiber.join().bind()
-   *   }.unsafeRunSync() == 1
+   *   val result = IO.fx {
+   *     val (join, cancel) = !IO.effect {
+   *       println("Hello from a fiber on ${Thread.currentThread().name}")
+   *     }.startFiber(Dispatchers.Default)
+   *   }
+   *
    *   //sampleEnd
+   *   result.unsafeRunSync()
    * }
    * ```
    *

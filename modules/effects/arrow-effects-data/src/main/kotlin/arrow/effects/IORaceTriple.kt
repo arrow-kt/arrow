@@ -17,24 +17,23 @@ import kotlin.coroutines.CoroutineContext
  *
  * ```kotlin:ank:playground
  * import arrow.effects.*
- * import arrow.effects.extensions.io.async.async
- * import arrow.effects.extensions.io.monad.binding
- * import arrow.effects.typeclasses.*
+ * import arrow.effects.extensions.fx
  * import kotlinx.coroutines.Dispatchers
- * import java.lang.RuntimeException
  *
  * fun main(args: Array<String>) {
  *   //sampleStart
- *   fx.monad {
- *     val promise = Promise.uncancelable<ForIO, Int>(IO.async()).bind()
- *     val raceTriple = IO.raceTriple(Dispatchers.Default, promise.get(), IO.unit, IO.never).bind()
- *     raceTriple.fold(
- *       { _, _, _ -> IO.raiseError<Int>(RuntimeException("Promise.get cannot win before complete")) },
- *       { a: Fiber<ForIO, Int>, _, _ -> promise.complete(1).flatMap { a.join() } },
- *       { _, _, _ -> IO.raiseError<Int>(RuntimeException("never cannot win before complete")) }
- *     ).bind()
- *   }.unsafeRunSync() == 1
+ *   val result = IO.fx {
+ *     val raceResult = !IO.raceTriple(Dispatchers.Default, never<Int>(), just("Hello World!"), never<Double>())
+ *     raceResult.fold(
+ *       { _, _, _ -> "never cannot win before complete" },
+ *       { _, winner, _ -> winner },
+ *       { _, _, _ -> "never cannot win before complete" }
+ *     )
+ *   }
  *   //sampleEnd
+ *
+ *   val r = result.unsafeRunSync()
+ *   println("Race winner result is: $r")
  * }
  * ```
  *

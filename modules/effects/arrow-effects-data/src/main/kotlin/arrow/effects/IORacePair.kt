@@ -17,24 +17,22 @@ import kotlin.coroutines.CoroutineContext
  *
  * ```kotlin:ank:playground
  * import arrow.effects.*
- * import arrow.effects.extensions.io.async.async
- * import arrow.effects.extensions.io.concurrent.racePair
- * import arrow.effects.extensions.io.monad.binding
- * import arrow.effects.typeclasses.Fiber
+ * import arrow.effects.extensions.fx
  * import kotlinx.coroutines.Dispatchers
- * import java.lang.RuntimeException
  *
  * fun main(args: Array<String>) {
- *   //sampleStart
- *   fx.monad {
- *     val promise = Promise.uncancelable<ForIO, Int>(IO.async()).bind()
- *     val eitherGetOrUnit = Dispatchers.Default.racePair(promise.get(), IO.unit).bind()
- *     eitherGetOrUnit.fold(
- *       { _, _ -> IO.raiseError<Int>(RuntimeException("Promise.get cannot win before complete")) },
- *       { a: Fiber<ForIO, Int>, _ -> promise.complete(1).flatMap { a.join() } }
- *     ).bind()
- *   }.unsafeRunSync() == 1
+ *     //sampleStart
+ *     val result = IO.fx {
+ *       val racePair = !IO.racePair(Dispatchers.Default, never<Int>(), just("Hello World!"))
+ *       racePair.fold(
+ *         { _, _ -> "never cannot win race" },
+ *         { _, winner -> winner }
+ *       )
+ *   }
  *   //sampleEnd
+ *
+ *   val r = result.unsafeRunSync()
+ *   println("Race winner result is: $r")
  * }
  * ```
  *

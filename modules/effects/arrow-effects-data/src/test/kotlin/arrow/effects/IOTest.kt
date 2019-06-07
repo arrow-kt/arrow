@@ -349,7 +349,7 @@ class IOTest : UnitSpec() {
       fun makePar(num: Long) =
         IO(newSingleThreadContext("$num")) {
           // Sleep according to my number
-          Thread.sleep(num * 30)
+          Thread.sleep(num * 100)
           num
         }.order()
 
@@ -366,7 +366,7 @@ class IOTest : UnitSpec() {
       fun makePar(num: Long) =
         IO(newSingleThreadContext("$num")) {
           // Sleep according to my number
-          Thread.sleep(num * 20)
+          Thread.sleep(num * 100)
           num
         }
 
