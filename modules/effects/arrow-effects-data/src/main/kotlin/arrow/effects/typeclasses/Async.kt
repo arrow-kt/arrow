@@ -338,10 +338,4 @@ interface AsyncFx<F> : MonadThrowFx<F> {
     wrapReturn.startCoroutine(continuation, continuation)
     return continuation.returnedMonad()
   }
-
-  override fun <A> monadThrow(c: suspend MonadThrowSyntax<F>.() -> A): Kind<F, A> =
-    async(c)
-
-  override fun <A> monad(c: suspend MonadSyntax<F>.() -> A): Kind<F, A> =
-    async(c)
 }

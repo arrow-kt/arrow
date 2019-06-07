@@ -881,13 +881,4 @@ interface ConcurrentFx<F> : AsyncFx<F> {
     wrapReturn.startCoroutine(continuation, continuation)
     return continuation.returnedMonad()
   }
-
-  override fun <A> async(c: suspend AsyncSyntax<F>.() -> A): Kind<F, A> =
-    concurrent(c)
-
-  override fun <A> monadThrow(c: suspend MonadThrowSyntax<F>.() -> A): Kind<F, A> =
-    concurrent(c)
-
-  override fun <A> monad(c: suspend MonadSyntax<F>.() -> A): Kind<F, A> =
-    concurrent(c)
 }

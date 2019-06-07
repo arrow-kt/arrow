@@ -285,13 +285,13 @@ class IOTest : UnitSpec() {
       program.unsafeRunSync()
     }
 
-    "fx cannot pass context state across not/bind" {
+    "fx can pass context state across not/bind" {
       val program = IO.fx {
         val ctx = !effect { kotlin.coroutines.coroutineContext }
         !effect { ctx shouldBe EmptyCoroutineContext }
         continueOn(CoroutineName("Simon"))
         val ctx2 = !effect { kotlin.coroutines.coroutineContext }
-        !effect { ctx2 shouldBe EmptyCoroutineContext }
+        !effect { ctx2 shouldBe CoroutineName("Simon") }
       }
 
       program.unsafeRunSync()
