@@ -204,11 +204,11 @@ So how would our function look if we implemented it with the OptionT monad trans
 
 ```kotlin:ank:silent
 import arrow.effects.rx2.extensions.*
-import arrow.data.extensions.optiont.fx.fx
+import arrow.data.extensions.fx
 import arrow.effects.rx2.extensions.observablek.monad.monad
 
 fun getCountryCode(personId: Int): ObservableK<Option<String>> =
-   fx(ObservableK.monad()) {
+   OptionT.fx(ObservableK.monad()) {
     val (person) = OptionT(findPerson(personId))
     val (address) = OptionT(ObservableK.just(person.address))
     val (country) = OptionT(findCountry(address.id))
