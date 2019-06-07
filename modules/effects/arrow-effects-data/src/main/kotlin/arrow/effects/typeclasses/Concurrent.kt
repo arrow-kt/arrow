@@ -198,24 +198,26 @@ interface Concurrent<F> : Async<F> {
    * Race results in a winner and the other, yet to finish task running in a [Fiber].
    *
    * ```kotlin:ank:playground
+   * import arrow.Kind
    * import arrow.effects.*
-   * import arrow.effects.extensions.io.async.async
-   * import arrow.effects.extensions.io.monad.binding
+   * import arrow.effects.extensions.io.concurrent.concurrent
    * import arrow.effects.typeclasses.*
    * import kotlinx.coroutines.Dispatchers
-   * import java.lang.RuntimeException
    *
    * fun main(args: Array<String>) {
-   *   //sampleStart
-   *   fx.monad {
-   *     val promise = Promise.uncancelable<ForIO, Int>(IO.async()).bind()
-   *     val racePair = IO.racePair(Dispatchers.Default, promise.get(), IO.unit).bind()
-   *     racePair.fold(
-   *       { _, _ -> IO.raiseError<Int>(RuntimeException("Promise.get cannot win before complete")) },
-   *       { a: Fiber<ForIO, Int>, _ -> promise.complete(1).flatMap { a.join() } }
-   *     ).bind()
-   *   }.unsafeRunSync() == 1
+   *   fun <F> Concurrent<F>.example(): Kind<F, String> =
+   *     //sampleStart
+   *     fx.concurrent {
+   *       val racePair = !Dispatchers.Default.racePair(never<Int>(), just("Hello World!"))
+   *       racePair.fold(
+   *         { _, _ -> "never cannot win race" },
+   *         { _, winner -> winner }
+   *       )
+   *   }
    *   //sampleEnd
+   *
+   *   val r = IO.concurrent().example().fix().unsafeRunSync()
+   *   println("Race winner result is: $r")
    * }
    * ```
    *
@@ -234,25 +236,27 @@ interface Concurrent<F> : Async<F> {
    * Race results in a winner and the others, yet to finish task running in a [Fiber].
    *
    * ```kotlin:ank:playground
+   * import arrow.Kind
    * import arrow.effects.*
-   * import arrow.effects.extensions.io.async.async
-   * import arrow.effects.extensions.io.monad.binding
+   * import arrow.effects.extensions.io.concurrent.concurrent
    * import arrow.effects.typeclasses.*
    * import kotlinx.coroutines.Dispatchers
-   * import java.lang.RuntimeException
    *
    * fun main(args: Array<String>) {
+   *   fun <F> Concurrent<F>.example(): Kind<F, String> =
    *   //sampleStart
-   *   fx.monad {
-   *     val promise = Promise.uncancelable<ForIO, Int>(IO.async()).bind()
-   *     val raceTriple = IO.raceTriple(Dispatchers.Default, promise.get(), IO.unit, IO.never).bind()
-   *     raceTriple.fold(
-   *       { _, _, _ -> IO.raiseError<Int>(RuntimeException("Promise.get cannot win before complete")) },
-   *       { a: Fiber<ForIO, Int>, _, _ -> promise.complete(1).flatMap { a.join() } },
-   *       { _, _, _ -> IO.raiseError<Int>(RuntimeException("never cannot win before complete")) }
-   *     ).bind()
-   *   }.unsafeRunSync() == 1
+   *     fx.concurrent {
+   *       val raceResult = !Dispatchers.Default.raceTriple(never<Int>(), just("Hello World!"), never<Double>())
+   *       raceResult.fold(
+   *         { _, _, _ -> "never cannot win before complete" },
+   *         { _, winner, _ -> winner },
+   *         { _, _, _ -> "never cannot win before complete" }
+   *       )
+   *     }
    *   //sampleEnd
+   *
+   *   val r = IO.concurrent().example().fix().unsafeRunSync()
+   *   println("Race winner result is: $r")
    * }
    * ```
    *
