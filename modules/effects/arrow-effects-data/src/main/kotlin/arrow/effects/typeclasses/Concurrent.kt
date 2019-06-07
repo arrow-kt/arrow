@@ -23,7 +23,6 @@ import arrow.effects.Timer
 import arrow.effects.data.internal.BindingCancellationException
 import arrow.effects.internal.TimeoutException
 import arrow.typeclasses.MonadSyntax
-import arrow.typeclasses.MonadThrowSyntax
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine

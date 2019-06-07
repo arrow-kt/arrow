@@ -6,10 +6,8 @@ import arrow.core.Right
 import arrow.documented
 import arrow.effects.internal.asyncContinuation
 import arrow.effects.data.internal.BindingCancellationException
-import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
-import arrow.typeclasses.MonadThrowSyntax
 import arrow.typeclasses.MonadThrowFx
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext

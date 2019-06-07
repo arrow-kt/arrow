@@ -35,20 +35,12 @@ import arrow.typeclasses.Apply
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.MonadError
-import arrow.typeclasses.MonadFx
 import arrow.typeclasses.MonadThrow
-import arrow.typeclasses.MonadThrowSyntax
-import arrow.typeclasses.MonadThrowContinuation
-import arrow.typeclasses.MonadThrowFx
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import arrow.unsafe
-import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
-import kotlin.coroutines.startCoroutine
 import arrow.effects.handleErrorWith as ioHandleErrorWith
 import arrow.effects.handleError as ioHandleError
 
@@ -203,7 +195,6 @@ interface IOConcurrent : Concurrent<ForIO>, IOAsync {
   override fun <A, B, C> CoroutineContext.raceTriple(fa: Kind<ForIO, A>, fb: Kind<ForIO, B>, fc: Kind<ForIO, C>): IO<RaceTriple<ForIO, A, B, C>> =
     IO.raceTriple(this, fa, fb, fc)
 }
-
 
 fun IO.Companion.concurrent(dispatchers: Dispatchers<ForIO>): Concurrent<ForIO> = object : IOConcurrent {
   override fun dispatchers(): Dispatchers<ForIO> = dispatchers
