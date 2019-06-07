@@ -22,10 +22,7 @@ open class MonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineC
 
   @Suppress("UNCHECKED_CAST")
   override fun resumeWithException(exception: Throwable) {
-    when (exception) {
-      is ContinuationShortcircuitThrowable -> returnedMonad = exception.exit as Kind<F, A>
-      else -> throw exception
-    }
+      throw exception
   }
 
   protected lateinit var returnedMonad: Kind<F, A>

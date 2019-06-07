@@ -16,10 +16,7 @@ open class MonadThrowContinuation<F, A>(ME: MonadThrow<F>, override val context:
 
   @Suppress("UNCHECKED_CAST")
   override fun resumeWithException(exception: Throwable) {
-    returnedMonad = when (exception) {
-      is ContinuationShortcircuitThrowable -> exception.exit as Kind<F, A>
-      else -> raiseError(exception)
-    }
+    returnedMonad = raiseError(exception)
   }
 
   override fun <B> binding(c: suspend MonadSyntax<F>.() -> B): Kind<F, B> = fx.monad(c)

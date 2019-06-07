@@ -170,20 +170,23 @@ interface Concurrent<F> : Async<F> {
    * Create a new [F] that upon execution starts the receiver [F] within a [Fiber] on [this@startFiber].
    *
    * ```kotlin:ank:playground
+   * import arrow.Kind
    * import arrow.effects.*
-   * import arrow.effects.extensions.io.async.async
-   * import arrow.effects.extensions.io.monad.binding
+   * import arrow.effects.extensions.io.concurrent.concurrent
+   * import arrow.effects.typeclasses.Concurrent
    * import kotlinx.coroutines.Dispatchers
    *
    * fun main(args: Array<String>) {
+   *   fun <F> Concurrent<F>.example(): Kind<F, Unit> =
    *   //sampleStart
-   *   fx.monad {
-   *     val promise = Promise.uncancelable<ForIO, Int>(IO.async()).bind()
-   *     val fiber = promise.get().fix().startFiber(Dispatchers.Default).bind()
-   *     promise.complete(1).bind()
-   *     fiber.join().bind()
-   *   }.unsafeRunSync() == 1
+   *     fx.concurrent {
+   *       val (join, cancel) = !Dispatchers.Default.startFiber(effect {
+   *         println("Hello from a fiber on ${Thread.currentThread().name}")
+   *       })
+   *     }
+   *
    *   //sampleEnd
+   *   IO.concurrent().example().fix().unsafeRunSync()
    * }
    * ```
    *
@@ -560,22 +563,29 @@ interface Concurrent<F> : Async<F> {
    * At the end of the race it automatically cancels the loser.
    *
    * ```kotlin:ank:playground
+   * import arrow.Kind
    * import arrow.effects.*
-   * import arrow.effects.extensions.io.concurrent.raceN
-   * import arrow.effects.extensions.io.monad.binding
+   * import arrow.effects.extensions.io.concurrent.concurrent
+   * import arrow.effects.typeclasses.Concurrent
    * import kotlinx.coroutines.Dispatchers
-   * import java.lang.RuntimeException
    *
    * fun main(args: Array<String>) {
-   *   //sampleStart
-   *   fx.monad {
-   *     val eitherGetOrUnit = Dispatchers.Default.raceN(IO.never, IO.just(5)).bind()
-   *     eitherGetOrUnit.fold(
-   *       { IO.raiseError<Int>(RuntimeException("Never always loses race")) },
-   *       IO.Companion::just
-   *     ).bind()
-   *   }.unsafeRunSync()
+   *   fun <F> Concurrent<F>.example(): Kind<F, String> {
+   *     val never: Kind<F, Int> = cancelable { effect { println("Never got canelled for losing.") } }
+   *
+   *     //sampleStart
+   *     val result = fx.concurrent {
+   *       val eitherGetOrUnit = !Dispatchers.Default.raceN(never, just(5))
+   *       eitherGetOrUnit.fold(
+   *         { "Never always loses race" },
+   *         { i -> "Race was won with $i" }
+   *       )
+   *     }
    *   //sampleEnd
+   *   return result
+   *   }
+   *
+   *   IO.concurrent().example().fix().unsafeRunSync().let(::println)
    * }
    * ```
    *
