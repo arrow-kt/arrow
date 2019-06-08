@@ -22,6 +22,7 @@ import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldThrow
 import kotlinx.coroutines.ObsoleteCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.newSingleThreadContext
 import org.junit.runner.RunWith
 import java.util.concurrent.atomic.AtomicReference
@@ -331,6 +332,24 @@ class EffectsSuspendDSLTests : UnitSpec() {
           }
         }
       } shouldBe false
+    }
+
+    "List.parTraverse should run effects in parallel" {
+      fxTest {
+        fx {
+          val timeline = mutableListOf<String>()
+          val tasks = (1..3).map {
+            effect {
+              timeline.add("start $it")
+              delay(100L * it)
+              timeline.add("end $it")
+              it
+            }
+          }
+          !newSingleThreadContext("A").parTraverse(tasks, ::identity)
+          timeline
+        }
+      } shouldBe listOf("start 3", "start 2", "start 1", "end 1", "end 2", "end 3")
     }
 
     "FX supports polymorphism" {
