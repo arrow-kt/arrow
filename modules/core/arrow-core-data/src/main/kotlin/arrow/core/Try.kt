@@ -57,7 +57,7 @@ sealed class Try<out A> : TryOf<A> {
 
     @Deprecated(
       "Try promotes eager execution and works like Either, so it's better if you work with Either or a suspended type like IO",
-      ReplaceWith("Either.catch(f)")
+      ReplaceWith("Either.raiseError(e)")
     )
     fun raiseError(e: Throwable): Try<Nothing> = Failure(e)
   }
