@@ -19,6 +19,7 @@ import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.MonoidK
 import arrow.typeclasses.Monoidal
@@ -28,7 +29,6 @@ import arrow.typeclasses.Semigroupal
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
 import arrow.typeclasses.fix
-import arrow.typeclasses.suspended.monad.Fx
 import arrow.data.combineK as sequenceCombineK
 
 @extension
@@ -175,9 +175,5 @@ interface SequenceKHash<A> : Hash<SequenceK<A>>, SequenceKEq<A> {
   }
 }
 
-@extension
-interface SequenceKFx<F> : Fx<ForSequenceK> {
-
-  override fun monad(): Monad<ForSequenceK> =
-    SequenceK.monad()
-}
+fun <A> SequenceK.Companion.fx(c: suspend MonadSyntax<ForSequenceK>.() -> A): SequenceK<A> =
+  SequenceK.monad().fx.monad(c).fix()

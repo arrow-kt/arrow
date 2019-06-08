@@ -197,9 +197,9 @@ IO.async<Int> { callback ->
 ```kotlin
 import arrow.typeclasses.*
 import arrow.effects.*
-import arrow.effects.extensions.io.monad.binding
+import arrow.effects.extensions.fx
 
-binding {
+IO.fx {
   val (file) = getFile("/tmp/file.txt")
   val (lines) = file.readLines()
   val average =

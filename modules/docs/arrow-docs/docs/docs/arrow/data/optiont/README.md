@@ -52,10 +52,10 @@ that enables monad comprehensions for all datatypes for which a monad instance i
 ```kotlin:ank:silent
 import arrow.typeclasses.*
 import arrow.core.extensions.*
-import arrow.core.extensions.option.fx.fx
+import arrow.core.extensions.fx
 
 fun getCountryCode(maybePerson : Option<Person>): Option<String> =
-  fx {
+  Option.fx {
     val (person) = maybePerson
     val (address) = person.address
     val (country) = address.country
@@ -141,10 +141,10 @@ This isn't actually what we want since the inferred return type is `ObservableK<
 Let's look at how a similar implementation would look like using monad comprehensions without transformers:
 
 ```kotlin:ank
-import arrow.effects.rx2.extensions.observablek.fx.fx
+import arrow.effects.rx2.extensions.fx
 
 fun getCountryCode(personId: Int): ObservableK<Option<String>> =
-       fx {
+       ObservableK.fx {
         val maybePerson = findPerson(personId).bind()
         val person = maybePerson.fold(
           { ObservableK.raiseError<Person>(NoSuchElementException("...")) },
@@ -204,11 +204,11 @@ So how would our function look if we implemented it with the OptionT monad trans
 
 ```kotlin:ank:silent
 import arrow.effects.rx2.extensions.*
-import arrow.data.extensions.optiont.fx.fx
+import arrow.data.extensions.fx
 import arrow.effects.rx2.extensions.observablek.monad.monad
 
 fun getCountryCode(personId: Int): ObservableK<Option<String>> =
-   fx(ObservableK.monad()) {
+   OptionT.fx(ObservableK.monad()) {
     val (person) = OptionT(findPerson(personId))
     val (address) = OptionT(ObservableK.just(person.address))
     val (country) = OptionT(findCountry(address.id))

@@ -57,12 +57,12 @@ SequenceK is a [`Monad`](/docs/arrow/typeclasses/monad/) too. For example, it ca
 ```kotlin:ank
 import arrow.typeclasses.*
 import arrow.data.extensions.*
-import arrow.data.extensions.sequence.monad.binding
+import arrow.data.extensions.fx
 
 val positive = generateSequence(1) { it + 1 }.k() // sequence of positive numbers
 val positiveEven = positive.filter { it % 2 == 0 }.k()
 
-binding {
+SequenceK.fx {
   val (p) = positive
   val (pe) = positiveEven
   p + pe

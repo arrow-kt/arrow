@@ -23,6 +23,8 @@ import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
 import arrow.effects.typeclasses.ProcF
 import arrow.effects.Timer
+import arrow.effects.rx2.extensions.observablek.async.async
+import arrow.effects.typeclasses.AsyncSyntax
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
@@ -248,3 +250,7 @@ interface FlowableKTimer : Timer<ForFlowableK> {
     FlowableK(Flowable.timer(duration.nanoseconds, TimeUnit.NANOSECONDS)
       .map { Unit })
 }
+
+// TODO FlowableK does not yet have a Concurrent instance
+fun <A> FlowableK.Companion.fx(c: suspend AsyncSyntax<ForFlowableK>.() -> A): FlowableK<A> =
+  FlowableK.async().fx.async(c).fix()

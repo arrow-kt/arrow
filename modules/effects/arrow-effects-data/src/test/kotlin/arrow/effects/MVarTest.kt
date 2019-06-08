@@ -6,9 +6,9 @@ import arrow.core.Tuple3
 import arrow.core.Tuple4
 import arrow.core.Tuple7
 import arrow.core.toT
+import arrow.effects.extensions.fx
 import arrow.effects.extensions.io.async.async
 import arrow.effects.extensions.io.concurrent.concurrent
-import arrow.effects.extensions.io.monad.binding
 import arrow.effects.extensions.io.monad.flatMap
 import arrow.effects.typeclasses.seconds
 import arrow.test.UnitSpec
@@ -27,7 +27,7 @@ class MVarTest : UnitSpec() {
     fun tests(label: String, mvar: MVarFactory<ForIO>) {
       "$label - empty; put; isNotEmpty; take; put; take" {
         forAll(Gen.int(), Gen.int()) { a, b ->
-          binding {
+          IO.fx {
             val av = mvar.empty<Int>().bind()
             val isEmpty = av.isEmpty().bind()
             av.put(a).bind()
@@ -42,7 +42,7 @@ class MVarTest : UnitSpec() {
 
       "$label - empty; tryPut; tryPut; isNotEmpty; tryTake; tryTake; put; take" {
         forAll(Gen.int(), Gen.int(), Gen.int()) { a, b, c ->
-          binding {
+          IO.fx {
             val av = mvar.empty<Int>().bind()
             val isEmpty = av.isEmpty().bind()
             val p1 = av.tryPut(a).bind()
@@ -58,7 +58,7 @@ class MVarTest : UnitSpec() {
       }
 
       "$label - empty; take; put; take; put" {
-        binding {
+        IO.fx {
           val av = mvar.empty<Int>().bind()
 
           val f1 = av.take().fix().startFiber(Dispatchers.Default).bind()
@@ -75,7 +75,7 @@ class MVarTest : UnitSpec() {
       }
 
       "$label - empty; put; put; put; take; take; take" {
-        binding {
+        IO.fx {
           val av = mvar.empty<Int>().bind()
 
           val f1 = av.put(10).fix().startFiber(Dispatchers.Default).bind()
@@ -95,7 +95,7 @@ class MVarTest : UnitSpec() {
       }
 
       "$label - empty; take; take; take; put; put; put" {
-        binding {
+        IO.fx {
           val av = mvar.empty<Int>().bind()
 
           val f1 = av.take().fix().startFiber(Dispatchers.Default).bind()
@@ -116,7 +116,7 @@ class MVarTest : UnitSpec() {
 
       "$label - initial; isNotEmpty; take; put; take" {
         forAll(Gen.int(), Gen.int()) { a, b ->
-          binding {
+          IO.fx {
             val av = mvar.just(a).bind()
             val isNotEmpty = av.isNotEmpty().bind()
             val r1 = av.take().bind()
@@ -130,7 +130,7 @@ class MVarTest : UnitSpec() {
 
       "$label - initial; read; take" {
         forAll(Gen.int()) { i ->
-          binding {
+          IO.fx {
             val av = mvar.just(i).bind()
             val read = av.read().bind()
             val take = av.take().bind()

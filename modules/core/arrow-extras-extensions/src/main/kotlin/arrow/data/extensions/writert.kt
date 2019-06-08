@@ -21,12 +21,12 @@ import arrow.typeclasses.Divide
 import arrow.typeclasses.Divisible
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.MonoidK
 import arrow.typeclasses.SemigroupK
-import arrow.typeclasses.suspended.monad.Fx
 import arrow.undocumented
 
 @extension
@@ -197,14 +197,5 @@ interface WriterTDecidableInstance<F, W> : Decidable<WriterTPartialOf<F, W>>, Wr
     )
 }
 
-@extension
-@undocumented
-interface WriterTFx<F, W> : Fx<WriterTPartialOf<F, W>> {
-
-  fun M(): Monad<F>
-
-  fun MW(): Monoid<W>
-
-  override fun monad(): Monad<WriterTPartialOf<F, W>> =
-    WriterT.monad(M(), MW())
-}
+fun <F, W, A> WriterT.Companion.fx(M: Monad<F>, MW: Monoid<W>, c: suspend MonadSyntax<WriterTPartialOf<F, W>>.() -> A): WriterT<F, W, A> =
+  WriterT.monad(M, MW).fx.monad(c).fix()

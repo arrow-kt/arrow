@@ -2,7 +2,7 @@ package arrow.ank
 
 import arrow.Kind
 import arrow.core.toT
-import arrow.effects.typeclasses.suspended.concurrent.Fx
+import arrow.effects.typeclasses.Concurrent
 import java.nio.file.Path
 
 /**
@@ -16,8 +16,8 @@ fun Long.humanBytes(): String {
   return String.format("%.1f %sB", this / Math.pow(unit.toDouble(), exp.toDouble()), pre)
 }
 
-fun <F> Fx<F>.ank(source: Path, target: Path, compilerArgs: List<String>, ankOps: AnkOps): Kind<F, Unit> = with(ankOps) {
-  fx {
+fun <F> Concurrent<F>.ank(source: Path, target: Path, compilerArgs: List<String>, ankOps: AnkOps): Kind<F, Unit> = with(ankOps) {
+  fx.concurrent {
     !effect { printConsole(colored(ANSI_PURPLE, AnkHeader)) }
     val heapSize = Runtime.getRuntime().totalMemory()
     val heapMaxSize = Runtime.getRuntime().maxMemory()

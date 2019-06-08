@@ -190,10 +190,10 @@ parser.parseInts(listOf("bla".some(), "2".some()))
 ```
 
 ```kotlin
-class UserFetcher<F>(ME: MonadError<F, Throwable>, val api: ApiService): MonadError<F, Throwable> by ME {
+class UserFetcher<F>(ME: MonadThrow<F>, val api: ApiService): MonadThrow<F> by ME {
 
   fun getUserFriends(fid: Kind<F, UserId>): Kind<F, List<User>> =
-    bindingCatch {
+    fx.monadThrow {
       val (id) = fid
       val (user) = api.getUser(id)
       user.friendIds.map { api.getUser(it.id) }.bind()
@@ -206,10 +206,11 @@ class UserFetcher<F>(ME: MonadError<F, Throwable>, val api: ApiService): MonadEr
 
 ...
 
-val fetcher = UserFetcher(Either.monadError(), ApiService())
+val fetcher = UserFetcher(IO.monadThrow(), ApiService())
 
 fetcher.getUserFriends(fetcher.createId("122344"))
-// Right([User(id="123", friendIds=["122344"]), User(id="44", friendIds=["122344", "1245"]), User(id="1245", friendIds=["122344", "44"])])])
+  .fix().unsafeRunSync()
+// [User(id="123", friendIds=["122344"]), User(id="44", friendIds=["122344", "1245"]), User(id="1245", friendIds=["122344", "44"])])]
 ```
 
 ### Methods inside a class
@@ -380,10 +381,10 @@ what prevents you from adding arbitrary data to any fields of the type? Well, th
 Let's grab one of our previous examples and refactor it
 
 ```kotlin
-class UserFetcher<F>(ME: MonadError<F, Throwable>, val api: ApiService): MonadError<F, Throwable> by ME {
+class UserFetcher<F>(ME: MonadThrow<F>, val api: ApiService): MonadThrow<F> by ME {
 
   fun getUserFriends(fid: Kind<F, UserId>): Kind<F, List<User>> =
-    bindingCatch {
+    fx.monadThrow {
       val (id) = fid
       val (user) = api.getUser(id)
       user.friendIds.map { api.getUser(it.id) }.bind()
@@ -396,13 +397,13 @@ class UserFetcher<F>(ME: MonadError<F, Throwable>, val api: ApiService): MonadEr
 On the first step, we'll create a new type enclosing all the dependencies:
 
 ```kotlin
-interface FetcherDependencies: MonadError<F, Throwable> {
+interface FetcherDependencies<F>: MonadThrow<F> {
 
   fun api(): ApiService
 
   companion object {
-    operator fun invoke(ME: MonadError<F, Throwable>, api: ApiService): FetcherDependencies =
-      object: FetcherDependencies, MonadError<F, Throwable> by ME {
+    operator fun invoke(ME: MonadThrow<F>, api: ApiService): FetcherDependencies =
+      object: FetcherDependencies, MonadThrow<F> by ME {
         override fun api() = api
       }
   }
@@ -415,23 +416,24 @@ We can move the functions to an object scope, and make them depend on `FetcherDe
 ```kotlin
 object Api {
   fun FetcherDependencies.getUserFriends(fid: Kind<F, UserId>): Kind<F, List<User>> =
-    bindingCatch {
+    fx.monadThrow {
       val (id) = fid
       val (user) = api().getUser(id)
       user.friendIds.map { api().getUser(it.id) }.bind()
     }.handleError { listOf() }
 
-  fun MonadError<F, Throwable>.createId(id: String): Kind<F, UserId> = ...
+  fun MonadThrow<F>.createId(id: String): Kind<F, UserId> = ...
 }
 
 ...
 
 import Api.getUserFriends
 
-val deps = FetcherDependencies(Either.monadError(), ApiService())
+val deps = FetcherDependencies(IO.monadThrow(), ApiService())
 
 deps.getUserFriends(deps.createId("1234"))
-// Right([User(id="33", friendIds=["1234", "987"])])
+   .fix().unsafeRunSync()
+// [User(id="33", friendIds=["1234", "987"])]
 ```
 
 What have we gained from this change? We have replaced one concretion, a final class, with an abstraction that's an interface.

@@ -5,30 +5,31 @@ package arrow.core.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
-import arrow.core.ForId
 import arrow.core.Id
+import arrow.core.ForId
 import arrow.core.IdOf
 import arrow.core.value
 import arrow.extension
-import arrow.typeclasses.suspended.monad.Fx
 import arrow.core.extensions.traverse as idTraverse
 import arrow.core.extensions.id.monad.monad
 import arrow.core.fix
 import arrow.core.identity
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
+import arrow.typeclasses.Bimonad
+import arrow.typeclasses.Comonad
 import arrow.typeclasses.Eq
+import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
+import arrow.typeclasses.Hash
+import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadSyntax
+import arrow.typeclasses.MonadFx
 import arrow.typeclasses.Monoid
+import arrow.typeclasses.Selective
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
-import arrow.typeclasses.Selective
-import arrow.typeclasses.Monad
-import arrow.typeclasses.Comonad
-import arrow.typeclasses.Bimonad
-import arrow.typeclasses.Foldable
 import arrow.typeclasses.Traverse
-import arrow.typeclasses.Hash
 import arrow.core.select as idSelect
 
 @extension
@@ -102,7 +103,7 @@ interface IdMonad : Monad<ForId> {
   override fun <A, B> IdOf<A>.flatMap(f: (A) -> IdOf<B>): Id<B> =
     fix().flatMap(f)
 
-  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, IdOf<Either<A, B>>>): Id<B> =
+  override fun <A, B> tailRecM(a: A, f: (A) -> IdOf<Either<A, B>>): Id<B> =
     Id.tailRecM(a, f)
 
   override fun <A, B> IdOf<A>.map(f: (A) -> B): Id<B> =
@@ -111,8 +112,17 @@ interface IdMonad : Monad<ForId> {
   override fun <A> just(a: A): Id<A> =
     Id.just(a)
 
-  override fun <A, B> IdOf<Either<A, B>>.select(f: Kind<ForId, (A) -> B>): Kind<ForId, B> =
+  override fun <A, B> IdOf<Either<A, B>>.select(f: IdOf<(A) -> B>): Kind<ForId, B> =
     fix().idSelect(f)
+
+  override val fx: MonadFx<ForId>
+    get() = IdFxMonad
+}
+
+internal object IdFxMonad : MonadFx<ForId> {
+  override val M: Monad<ForId> = Id.monad()
+  override fun <A> monad(c: suspend MonadSyntax<ForId>.() -> A): Id<A> =
+    super.monad(c).fix()
 }
 
 @extension
@@ -135,7 +145,7 @@ interface IdBimonad : Bimonad<ForId> {
   override fun <A, B> IdOf<A>.flatMap(f: (A) -> IdOf<B>): Id<B> =
     fix().flatMap(f)
 
-  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, IdOf<Either<A, B>>>): Id<B> =
+  override fun <A, B> tailRecM(a: A, f: (A) -> IdOf<Either<A, B>>): Id<B> =
     Id.tailRecM(a, f)
 
   override fun <A, B> IdOf<A>.map(f: (A) -> B): Id<B> =
@@ -192,7 +202,5 @@ interface IdHash<A> : Hash<Id<A>>, IdEq<A> {
   override fun Id<A>.hash(): Int = HA().run { value().hash() }
 }
 
-@extension
-interface IdFx<A> : Fx<ForId> {
-  override fun monad(): Monad<ForId> = Id.monad()
-}
+fun <A> Id.Companion.fx(c: suspend MonadSyntax<ForId>.() -> A): Id<A> =
+  Id.monad().fx.monad(c).fix()

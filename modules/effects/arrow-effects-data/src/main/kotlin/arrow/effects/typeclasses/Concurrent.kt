@@ -6,7 +6,6 @@ import arrow.core.Left
 import arrow.core.Right
 import arrow.core.Tuple2
 import arrow.core.Tuple3
-import arrow.core.toT
 import arrow.effects.CancelToken
 import arrow.effects.KindConnection
 import arrow.effects.MVar
@@ -23,7 +22,7 @@ import arrow.effects.RaceTriple
 import arrow.effects.Timer
 import arrow.effects.data.internal.BindingCancellationException
 import arrow.effects.internal.TimeoutException
-import arrow.typeclasses.MonadContinuation
+import arrow.typeclasses.MonadSyntax
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine
@@ -44,6 +43,21 @@ interface Concurrent<F> : Async<F> {
   fun dispatchers(): Dispatchers<F>
 
   fun timer(): Timer<F> = Timer(this)
+
+  /**
+   * Entry point for monad bindings which enables for comprehensions. The underlying impl is based on coroutines.
+   * A coroutines is initiated and inside [ConcurrentContinuation] suspended yielding to [Monad.flatMap]. Once all the flatMap binds are completed
+   * the underlying monad is returned from the act of executing the coroutine
+   *
+   * This one operates over [Concurrent] instances
+   *
+   * This operation is cancellable by calling invoke on the [Disposable] return.
+   * If [Disposable.invoke] is called the binding result will become a lifted [BindingCancellationException].
+   */
+  override val fx: ConcurrentFx<F>
+    get() = object : ConcurrentFx<F> {
+      override val concurrent: Concurrent<F> = this@Concurrent
+    }
 
   /**
    * Creates a cancelable instance of [F] that executes an asynchronous process on evaluation.
@@ -156,20 +170,23 @@ interface Concurrent<F> : Async<F> {
    * Create a new [F] that upon execution starts the receiver [F] within a [Fiber] on [this@startFiber].
    *
    * ```kotlin:ank:playground
+   * import arrow.Kind
    * import arrow.effects.*
-   * import arrow.effects.extensions.io.async.async
-   * import arrow.effects.extensions.io.monad.binding
+   * import arrow.effects.extensions.io.concurrent.concurrent
+   * import arrow.effects.typeclasses.Concurrent
    * import kotlinx.coroutines.Dispatchers
    *
    * fun main(args: Array<String>) {
+   *   fun <F> Concurrent<F>.example(): Kind<F, Unit> =
    *   //sampleStart
-   *   binding {
-   *     val promise = Promise.uncancelable<ForIO, Int>(IO.async()).bind()
-   *     val fiber = promise.get().fix().startFiber(Dispatchers.Default).bind()
-   *     promise.complete(1).bind()
-   *     fiber.join().bind()
-   *   }.unsafeRunSync() == 1
+   *     fx.concurrent {
+   *       val (join, cancel) = !Dispatchers.Default.startFiber(effect {
+   *         println("Hello from a fiber on ${Thread.currentThread().name}")
+   *       })
+   *     }
+   *
    *   //sampleEnd
+   *   IO.concurrent().example().fix().unsafeRunSync()
    * }
    * ```
    *
@@ -184,24 +201,26 @@ interface Concurrent<F> : Async<F> {
    * Race results in a winner and the other, yet to finish task running in a [Fiber].
    *
    * ```kotlin:ank:playground
+   * import arrow.Kind
    * import arrow.effects.*
-   * import arrow.effects.extensions.io.async.async
-   * import arrow.effects.extensions.io.monad.binding
+   * import arrow.effects.extensions.io.concurrent.concurrent
    * import arrow.effects.typeclasses.*
    * import kotlinx.coroutines.Dispatchers
-   * import java.lang.RuntimeException
    *
    * fun main(args: Array<String>) {
-   *   //sampleStart
-   *   binding {
-   *     val promise = Promise.uncancelable<ForIO, Int>(IO.async()).bind()
-   *     val racePair = IO.racePair(Dispatchers.Default, promise.get(), IO.unit).bind()
-   *     racePair.fold(
-   *       { _, _ -> IO.raiseError<Int>(RuntimeException("Promise.get cannot win before complete")) },
-   *       { a: Fiber<ForIO, Int>, _ -> promise.complete(1).flatMap { a.join() } }
-   *     ).bind()
-   *   }.unsafeRunSync() == 1
+   *   fun <F> Concurrent<F>.example(): Kind<F, String> =
+   *     //sampleStart
+   *     fx.concurrent {
+   *       val racePair = !Dispatchers.Default.racePair(never<Int>(), just("Hello World!"))
+   *       racePair.fold(
+   *         { _, _ -> "never cannot win race" },
+   *         { _, winner -> winner }
+   *       )
+   *   }
    *   //sampleEnd
+   *
+   *   val r = IO.concurrent().example().fix().unsafeRunSync()
+   *   println("Race winner result is: $r")
    * }
    * ```
    *
@@ -220,25 +239,27 @@ interface Concurrent<F> : Async<F> {
    * Race results in a winner and the others, yet to finish task running in a [Fiber].
    *
    * ```kotlin:ank:playground
+   * import arrow.Kind
    * import arrow.effects.*
-   * import arrow.effects.extensions.io.async.async
-   * import arrow.effects.extensions.io.monad.binding
+   * import arrow.effects.extensions.io.concurrent.concurrent
    * import arrow.effects.typeclasses.*
    * import kotlinx.coroutines.Dispatchers
-   * import java.lang.RuntimeException
    *
    * fun main(args: Array<String>) {
+   *   fun <F> Concurrent<F>.example(): Kind<F, String> =
    *   //sampleStart
-   *   binding {
-   *     val promise = Promise.uncancelable<ForIO, Int>(IO.async()).bind()
-   *     val raceTriple = IO.raceTriple(Dispatchers.Default, promise.get(), IO.unit, IO.never).bind()
-   *     raceTriple.fold(
-   *       { _, _, _ -> IO.raiseError<Int>(RuntimeException("Promise.get cannot win before complete")) },
-   *       { a: Fiber<ForIO, Int>, _, _ -> promise.complete(1).flatMap { a.join() } },
-   *       { _, _, _ -> IO.raiseError<Int>(RuntimeException("never cannot win before complete")) }
-   *     ).bind()
-   *   }.unsafeRunSync() == 1
+   *     fx.concurrent {
+   *       val raceResult = !Dispatchers.Default.raceTriple(never<Int>(), just("Hello World!"), never<Double>())
+   *       raceResult.fold(
+   *         { _, _, _ -> "never cannot win before complete" },
+   *         { _, winner, _ -> winner },
+   *         { _, _, _ -> "never cannot win before complete" }
+   *       )
+   *     }
    *   //sampleEnd
+   *
+   *   val r = IO.concurrent().example().fix().unsafeRunSync()
+   *   println("Race winner result is: $r")
    * }
    * ```
    *
@@ -542,22 +563,29 @@ interface Concurrent<F> : Async<F> {
    * At the end of the race it automatically cancels the loser.
    *
    * ```kotlin:ank:playground
+   * import arrow.Kind
    * import arrow.effects.*
-   * import arrow.effects.extensions.io.concurrent.raceN
-   * import arrow.effects.extensions.io.monad.binding
+   * import arrow.effects.extensions.io.concurrent.concurrent
+   * import arrow.effects.typeclasses.Concurrent
    * import kotlinx.coroutines.Dispatchers
-   * import java.lang.RuntimeException
    *
    * fun main(args: Array<String>) {
-   *   //sampleStart
-   *   binding {
-   *     val eitherGetOrUnit = Dispatchers.Default.raceN(IO.never, IO.just(5)).bind()
-   *     eitherGetOrUnit.fold(
-   *       { IO.raiseError<Int>(RuntimeException("Never always loses race")) },
-   *       IO.Companion::just
-   *     ).bind()
-   *   }.unsafeRunSync()
+   *   fun <F> Concurrent<F>.example(): Kind<F, String> {
+   *     val never: Kind<F, Int> = cancelable { effect { println("Never got canelled for losing.") } }
+   *
+   *     //sampleStart
+   *     val result = fx.concurrent {
+   *       val eitherGetOrUnit = !Dispatchers.Default.raceN(never, just(5))
+   *       eitherGetOrUnit.fold(
+   *         { "Never always loses race" },
+   *         { i -> "Race was won with $i" }
+   *       )
+   *     }
    *   //sampleEnd
+   *   return result
+   *   }
+   *
+   *   IO.concurrent().example().fix().unsafeRunSync().let(::println)
    * }
    * ```
    *
@@ -777,15 +805,15 @@ interface Concurrent<F> : Async<F> {
    * This operation is cancellable by calling invoke on the [Disposable] return.
    * If [Disposable.invoke] is called the binding result will become a lifted [BindingCancellationException].
    */
-  fun <B> bindingConcurrent(c: suspend ConcurrentCancellableContinuation<F, *>.() -> B): Tuple2<Kind<F, B>, Disposable> {
-    val continuation = ConcurrentCancellableContinuation<F, B>(this)
-    val wrapReturn: suspend ConcurrentCancellableContinuation<F, *>.() -> Kind<F, B> = { just(c()) }
+  fun <B> bindingConcurrent(c: suspend ConcurrentContinuation<F, *>.() -> B): Kind<F, B> {
+    val continuation = ConcurrentContinuation<F, B>(this)
+    val wrapReturn: suspend ConcurrentContinuation<F, *>.() -> Kind<F, B> = { just(c()) }
     wrapReturn.startCoroutine(continuation, continuation)
-    return continuation.returnedMonad() toT continuation.disposable()
+    return continuation.returnedMonad()
   }
 
-  override fun <B> binding(c: suspend MonadContinuation<F, *>.() -> B): Kind<F, B> =
-    bindingCancellable { c() }.a
+  override fun <B> binding(c: suspend MonadSyntax<F>.() -> B): Kind<F, B> =
+    bindingConcurrent { c() }
 
   /**
    *  Sleeps for a given [duration] without blocking a thread.
@@ -852,4 +880,18 @@ interface Concurrent<F> : Async<F> {
         { raiseError(TimeoutException(duration.toString())) }
       )
     }
+}
+
+interface ConcurrentFx<F> : AsyncFx<F> {
+  val concurrent: Concurrent<F>
+
+  override val async: Async<F>
+    get() = concurrent
+
+  fun <A> concurrent(c: suspend ConcurrentSyntax<F>.() -> A): Kind<F, A> {
+    val continuation = ConcurrentContinuation<F, A>(concurrent)
+    val wrapReturn: suspend ConcurrentSyntax<F>.() -> Kind<F, A> = { just(c()) }
+    wrapReturn.startCoroutine(continuation, continuation)
+    return continuation.returnedMonad()
+  }
 }

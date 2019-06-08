@@ -192,9 +192,9 @@ tupled(Try { "3".toInt() }, Try { "5".toInt() }, Try { "nope".toInt() })
 Computing over dependent values ignoring failure:
 
 ```kotlin:ank
-import arrow.core.extensions.`try`.monad.binding
+import arrow.core.extensions.fx
 
-binding {
+Try.fx {
   val (a) = Try { "3".toInt() }
   val (b) = Try { "4".toInt() }
   val (c) = Try { "5".toInt() }
@@ -203,7 +203,7 @@ binding {
 ```
 
 ```kotlin:ank
-binding {
+Try.fx {
   val (a) = Try { "none".toInt() }
   val (b) = Try { "4".toInt() }
   val (c) = Try { "5".toInt() }
@@ -214,9 +214,7 @@ binding {
 Computing over dependent values that are automatically lifted to the context of `Try`:
 
 ```kotlin:ank
-import arrow.core.extensions.`try`.monadThrow.bindingCatch
-
-bindingCatch {
+Try.fx {
   val a = "none".toInt()
   val b = "4".toInt()
   val c = "5".toInt()
