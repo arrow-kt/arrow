@@ -1,26 +1,27 @@
 package arrow.core.extensions
 
 import arrow.Kind
-import arrow.core.Either
-import arrow.core.ForFunction0
 import arrow.core.Function0
+import arrow.core.ForFunction0
 import arrow.core.Function0Of
-import arrow.core.k
 import arrow.core.extensions.function0.monad.monad
+import arrow.core.select as fun0Select
+import arrow.core.Either
+import arrow.extension
 import arrow.core.fix
 import arrow.core.invoke
-import arrow.extension
+import arrow.core.k
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Bimonad
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Monoid
+import arrow.typeclasses.MonadFx
 import arrow.typeclasses.Selective
 import arrow.typeclasses.Semigroup
-import arrow.typeclasses.suspended.monad.Fx
-import arrow.core.select as fun0Select
 
 @extension
 interface Function0Semigroup<A> : Semigroup<Function0<A>> {
@@ -92,6 +93,15 @@ interface Function0Monad : Monad<ForFunction0> {
 
   override fun <A, B> Function0Of<Either<A, B>>.select(f: Kind<ForFunction0, (A) -> B>): Kind<ForFunction0, B> =
     fix().fun0Select(f)
+
+  override val fx: MonadFx<ForFunction0>
+    get() = Function0MonadFx
+}
+
+internal object Function0MonadFx : MonadFx<ForFunction0> {
+  override val M: Monad<ForFunction0> = Function0.monad()
+  override fun <A> monad(c: suspend MonadSyntax<ForFunction0>.() -> A): Function0<A> =
+    super.monad(c).fix()
 }
 
 @extension
@@ -130,7 +140,5 @@ interface Function0Bimonad : Bimonad<ForFunction0> {
     fix().extract()
 }
 
-@extension
-interface Function0Fx<A> : Fx<ForFunction0> {
-  override fun monad(): Monad<ForFunction0> = Function0.monad()
-}
+fun <B> Function0.Companion.fx(c: suspend MonadSyntax<ForFunction0>.() -> B): Function0<B> =
+  Function0.monad().fx.monad(c).fix()

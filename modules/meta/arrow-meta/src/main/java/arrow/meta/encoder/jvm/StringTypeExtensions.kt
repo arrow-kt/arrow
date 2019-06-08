@@ -13,6 +13,9 @@ fun String.asPlatform(): String =
     .replaceFirst("kotlin.collections.", "java.util.")
     .replaceFirst("kotlin.", "java.lang.")
 
+/**
+ * TODO this is horrible is there a canonical way to obtain a kotlin type given a fqn java type name?
+ */
 fun String.asKotlin(): String =
   removeBackticks()
     .replace("/", ".")
@@ -22,6 +25,7 @@ fun String.asKotlin(): String =
     .replace("java.util.Map", "kotlin.collections.Map")
     .replace("java.util.SortedMap", "kotlin.collections.SortedMap")
     .replace("java.util.Collection", "kotlin.collections.Collection")
+    .replace("java.lang.Number", "kotlin.Number")
     .replace("java.lang.Throwable", "kotlin.Throwable").let {
       if (it == "java.lang") it.replace("java.lang", "kotlin")
       else it

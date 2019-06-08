@@ -12,33 +12,34 @@ import arrow.core.OptionOf
 import arrow.core.Some
 import arrow.core.Tuple2
 import arrow.extension
-import arrow.typeclasses.suspended.monad.Fx
+import arrow.core.fix
 import arrow.core.extensions.traverse as optionTraverse
 import arrow.core.extensions.option.monad.map
 import arrow.core.extensions.option.monad.monad
-import arrow.core.fix
 import arrow.core.identity
 import arrow.core.orElse
-import arrow.core.select as optionSelect
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Semigroup
-import arrow.typeclasses.Show
-import arrow.typeclasses.Selective
-import arrow.typeclasses.Monad
-import arrow.typeclasses.Semigroupal
-import arrow.typeclasses.Monoidal
-import arrow.typeclasses.Semiring
-import arrow.typeclasses.ApplicativeError
-import arrow.typeclasses.MonadError
-import arrow.typeclasses.MonoidK
-import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Foldable
-import arrow.typeclasses.Traverse
+import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
+import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadSyntax
+import arrow.typeclasses.MonadError
+import arrow.typeclasses.MonadFx
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.MonoidK
+import arrow.typeclasses.Monoidal
+import arrow.typeclasses.Selective
+import arrow.typeclasses.Semigroup
+import arrow.typeclasses.SemigroupK
+import arrow.typeclasses.Semigroupal
+import arrow.typeclasses.Semiring
+import arrow.typeclasses.Show
+import arrow.typeclasses.Traverse
+import arrow.core.select as optionSelect
 
 @extension
 interface OptionSemigroup<A> : Semigroup<Option<A>> {
@@ -191,6 +192,15 @@ interface OptionMonad : Monad<ForOption> {
 
   override fun <A, B> OptionOf<Either<A, B>>.select(f: OptionOf<(A) -> B>): OptionOf<B> =
     fix().optionSelect(f)
+
+  override val fx: MonadFx<ForOption>
+    get() = OptionFxMonad
+}
+
+internal object OptionFxMonad : MonadFx<ForOption> {
+  override val M: Monad<ForOption> = Option.monad()
+  override fun <A> monad(c: suspend MonadSyntax<ForOption>.() -> A): Option<A> =
+    super.monad(c).fix()
 }
 
 @extension
@@ -281,7 +291,5 @@ interface OptionHash<A> : Hash<Option<A>>, OptionEq<A> {
   })
 }
 
-@extension
-interface OptionFx : Fx<ForOption> {
-  override fun monad(): Monad<ForOption> = Option.monad()
-}
+fun <A> Option.Companion.fx(c: suspend MonadSyntax<ForOption>.() -> A): Option<A> =
+  Option.monad().fx.monad(c).fix()

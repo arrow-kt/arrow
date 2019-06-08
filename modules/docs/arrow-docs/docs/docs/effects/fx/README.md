@@ -97,7 +97,7 @@ Side effects can be composed and turned into pure values in `fx` blocks.
 
 ```kotlin:ank:playground
 import arrow.effects.IO
-import arrow.effects.extensions.io.fx.fx
+import arrow.effects.extensions.fx
 //sampleStart
 suspend fun sayHello(): Unit =
   println("Hello World")
@@ -106,7 +106,7 @@ suspend fun sayGoodBye(): Unit =
   println("Good bye World!")
   
 fun greet(): IO<Unit> =
-  fx {
+  IO.fx {
     val pureHello = effect { sayHello() }
     val pureGoodBye = effect { sayGoodBye() }
   }
@@ -126,7 +126,7 @@ Note that running `greet()` in the previous example does not perform any effects
 
 ```kotlin:ank:playground
 import arrow.effects.IO
-import arrow.effects.extensions.io.fx.fx
+import arrow.effects.extensions.fx
 //sampleStart
 suspend fun sayHello(): Unit =
   println("Hello World")
@@ -135,7 +135,7 @@ suspend fun sayGoodBye(): Unit =
   println("Good bye World!")
   
 fun greet(): IO<Unit> =
-  fx {
+  IO.fx {
     !effect { sayHello() }
     !effect { sayGoodBye() }
   }
@@ -149,7 +149,7 @@ An attempt to run a side effect in an `fx` block not delimited by `effect` or `!
 
 ```kotlin:ank:fail
 import arrow.effects.IO
-import arrow.effects.extensions.io.fx.fx
+import arrow.effects.extensions.fx
 //sampleStart
 suspend fun sayHello(): Unit =
   println("Hello World")
@@ -158,7 +158,7 @@ suspend fun sayGoodBye(): Unit =
   println("Good bye World!")
   
 fun greet(): IO<Unit> =
-  fx {
+  IO.fx {
     sayHello()
     sayGoodBye()
   }
@@ -173,13 +173,13 @@ Composition using regular datatypes such as `IO` is still possible within `fx` b
 
 ```kotlin:ank:playground
 import arrow.effects.IO
-import arrow.effects.extensions.io.fx.fx
+import arrow.effects.extensions.fx
 //sampleStart
 fun sayInIO(s: String): IO<Unit> =
   IO { println(s) }
   
 fun greet(): IO<Unit> =
-  fx {
+  IO.fx {
     sayInIO("Hello World").bind()
   }
 //sampleEnd 
@@ -203,7 +203,7 @@ Usage of `unsafe` is reserved for the end of the world and may be the only impur
 import arrow.effects.IO
 import arrow.unsafe
 import arrow.effects.extensions.io.unsafeRun.runBlocking
-import arrow.effects.extensions.io.fx.fx
+import arrow.effects.extensions.fx
 //sampleStart
 suspend fun sayHello(): Unit =
   println("Hello World")
@@ -212,7 +212,7 @@ suspend fun sayGoodBye(): Unit =
   println("Good bye World!")
   
 fun greet(): IO<Unit> =
-  fx {
+  IO.fx {
     !effect { sayHello() }
     !effect { sayGoodBye() }
   }
