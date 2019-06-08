@@ -5,7 +5,6 @@ import arrow.effects.rx2.ForObservableK
 import arrow.effects.rx2.ObservableK
 import arrow.effects.rx2.ObservableKOf
 import arrow.effects.rx2.extensions.fx
-import arrow.effects.rx2.k
 import arrow.effects.rx2.extensions.observablek.async.async
 import arrow.effects.rx2.extensions.observablek.functor.functor
 import arrow.effects.rx2.extensions.observablek.monad.flatMap
@@ -38,10 +37,10 @@ class ObservableKTests : UnitSpec() {
       val res1 = Try { value().timeout(5, SECONDS).blockingFirst() }
       val res2 = Try { b.value().timeout(5, SECONDS).blockingFirst() }
       return res1.fold({ t1 ->
-        res2.fold({
-          (t1::class.java == it::class.java).also {
+        res2.fold({ t2 ->
+          (t1::class.java == t2::class.java).also {
             if (it) {
-              println("WARNING: compared Observable errors by exception type: <<${t1::class.java}>> and <<${it::class.java}>>")
+              println("WARNING: compared Observable errors by exception type: <<${t1::class.java}>>")
             }
           }
         }, { false })
@@ -66,12 +65,12 @@ class ObservableKTests : UnitSpec() {
 
     "Multi-thread Observables finish correctly" {
       val value: Observable<Long> = ObservableK.fx {
-        val a = Observable.timer(2, TimeUnit.SECONDS).k().bind()
+        val a = Observable.timer(2, SECONDS).k().bind()
         a
       }.value()
 
       val test: TestObserver<Long> = value.test()
-      test.awaitDone(5, TimeUnit.SECONDS)
+      test.awaitDone(5, SECONDS)
       test.assertTerminated().assertComplete().assertNoErrors().assertValue(0)
     }
 
@@ -79,13 +78,13 @@ class ObservableKTests : UnitSpec() {
       val originalThread: Thread = Thread.currentThread()
       var threadRef: Thread? = null
       val value: Observable<Long> = ObservableK.fx {
-        val a = Observable.timer(2, TimeUnit.SECONDS, Schedulers.newThread()).k().bind()
+        val a = Observable.timer(2, SECONDS, Schedulers.newThread()).k().bind()
         threadRef = Thread.currentThread()
         val b = Observable.just(a).observeOn(Schedulers.io()).k().bind()
         b
       }.value()
       val test: TestObserver<Long> = value.test()
-      val lastThread: Thread = test.awaitDone(5, TimeUnit.SECONDS).lastThread()
+      val lastThread: Thread = test.awaitDone(5, SECONDS).lastThread()
       val nextThread = (threadRef?.name ?: "")
 
       nextThread shouldNotBe originalThread.name
@@ -95,11 +94,11 @@ class ObservableKTests : UnitSpec() {
 
     "Observable cancellation forces binding to cancel without completing too" {
       val value: Observable<Long> = ObservableK.fx {
-        val a = Observable.timer(3, TimeUnit.SECONDS).k().bind()
+        val a = Observable.timer(3, SECONDS).k().bind()
         a
       }.value()
-      val test: TestObserver<Long> = value.doOnSubscribe { subscription -> Observable.timer(1, TimeUnit.SECONDS).subscribe { subscription.dispose() } }.test()
-      test.awaitTerminalEvent(5, TimeUnit.SECONDS)
+      val test: TestObserver<Long> = value.doOnSubscribe { subscription -> Observable.timer(1, SECONDS).subscribe { subscription.dispose() } }.test()
+      test.awaitTerminalEvent(5, SECONDS)
 
       test.assertNotTerminated().assertNotComplete().assertNoErrors().assertNoValues()
     }

@@ -18,6 +18,7 @@ import arrow.effects.rx2.fix
 import arrow.effects.rx2.k
 import arrow.effects.rx2.value
 import arrow.effects.typeclasses.Async
+import arrow.effects.typeclasses.AsyncSyntax
 import arrow.effects.typeclasses.Bracket
 import arrow.effects.typeclasses.Concurrent
 import arrow.effects.typeclasses.ConcurrentEffect
@@ -31,9 +32,6 @@ import arrow.effects.typeclasses.Fiber
 import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
 import arrow.effects.typeclasses.ProcF
-import arrow.effects.typeclasses.suspended.monaddefer.Fx
-import arrow.effects.Timer
-import arrow.effects.typeclasses.AsyncSyntax
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
