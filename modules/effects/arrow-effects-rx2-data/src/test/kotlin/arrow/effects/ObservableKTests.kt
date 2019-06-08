@@ -22,7 +22,6 @@ import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
-import io.kotlintest.shouldNotBe
 import io.reactivex.Observable
 import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers
@@ -72,24 +71,6 @@ class ObservableKTests : UnitSpec() {
       val test: TestObserver<Long> = value.test()
       test.awaitDone(5, SECONDS)
       test.assertTerminated().assertComplete().assertNoErrors().assertValue(0)
-    }
-
-    "Multi-thread Observables should run on their required threads" {
-      val originalThread: Thread = Thread.currentThread()
-      var threadRef: Thread? = null
-      val value: Observable<Long> = ObservableK.fx {
-        val a = Observable.timer(2, SECONDS, Schedulers.newThread()).k().bind()
-        threadRef = Thread.currentThread()
-        val b = Observable.just(a).observeOn(Schedulers.io()).k().bind()
-        b
-      }.value()
-      val test: TestObserver<Long> = value.test()
-      val lastThread: Thread = test.awaitDone(5, SECONDS).lastThread()
-      val nextThread = (threadRef?.name ?: "")
-
-      nextThread shouldNotBe originalThread.name
-      lastThread.name shouldNotBe originalThread.name
-      lastThread.name shouldNotBe nextThread
     }
 
     "Observable cancellation forces binding to cancel without completing too" {
