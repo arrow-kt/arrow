@@ -5,7 +5,8 @@ import arrow.core.Either
 import arrow.core.OptionOf
 import arrow.core.TryOf
 import arrow.core.identity
-import arrow.data.extensions.list.traverse.traverse
+import arrow.data.extensions.list.traverse.sequence
+import arrow.data.extensions.listk.traverse.traverse
 import arrow.data.fix
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Monad
@@ -25,8 +26,8 @@ interface FxSyntax<F> : Concurrent<F>, BindSyntax<F> {
   ): Kind<F, List<B>> =
     effects.fold(emptyList<Kind<F, Fiber<F, B>>>()) { acc, fa ->
       acc + startFiber(fa.map(f))
-    }.traverse(this@FxSyntax) { kind ->
-      kind.flatMap { it.join() }
+    }.sequence(this@FxSyntax).flatMap { fibers ->
+      fibers.traverse(this@FxSyntax) { it.join() }
     }.map { it.fix() }
 
   fun <A> CoroutineContext.parSequence(effects: Iterable<Kind<F, A>>): Kind<F, List<A>> =
