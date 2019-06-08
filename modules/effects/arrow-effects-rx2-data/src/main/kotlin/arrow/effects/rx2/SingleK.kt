@@ -2,18 +2,19 @@ package arrow.effects.rx2
 
 import arrow.core.Either
 import arrow.core.Left
-import arrow.core.NonFatal
 import arrow.core.Right
+import arrow.core.nonFatalOrThrow
 import arrow.effects.OnCancel
-import arrow.effects.internal.Platform
+import arrow.effects.rx2.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
+import arrow.effects.typeclasses.ExitCase.Canceled
+import arrow.effects.typeclasses.ExitCase.Completed
+import arrow.effects.typeclasses.ExitCase.Error
 import arrow.higherkind
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
-import io.reactivex.disposables.CompositeDisposable
 import kotlin.coroutines.CoroutineContext
-import arrow.effects.rx2.CoroutineContextRx2Scheduler.asScheduler
 
 fun <A> Single<A>.k(): SingleK<A> = SingleK(this)
 
@@ -75,28 +76,29 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
    *  ```
    */
   fun <B> bracketCase(use: (A) -> SingleKOf<B>, release: (A, ExitCase<Throwable>) -> SingleKOf<Unit>): SingleK<B> =
-    SingleK(Single.create<B> { emitter ->
-      val a = single.blockingGet()
-      if (emitter.isDisposed) release(a, ExitCase.Canceled).fix().single.subscribe({}, emitter::onError)
-      else try {
-        emitter.setDisposable(use(a).fix()
-          .flatMap { b -> release(a, ExitCase.Completed).fix().map { b } }
-          .handleErrorWith { e -> release(a, ExitCase.Error(e)).fix().flatMap { SingleK.raiseError<B>(e) } }
-          .single
-          .doOnDispose { release(a, ExitCase.Canceled).fix().single.subscribe({}, emitter::onError) }
-          .subscribe(emitter::onSuccess, emitter::onError))
-      } catch (e: Throwable) {
-        if (NonFatal(e)) {
-          release(a, ExitCase.Error(e)).fix().single.subscribe({
-            emitter.onError(e)
-          }, { e2 ->
-            emitter.onError(Platform.composeErrors(e, e2))
-          })
-        } else {
-          throw e
-        }
-      }
-    })
+    Single.create<B> { emitter ->
+      val dispose =
+        handleErrorWith { t -> Single.fromCallable { emitter.onError(t) }.flatMap { Single.error<A>(t) }.k() }
+          .flatMap { a ->
+            if (emitter.isDisposed) {
+              release(a, Canceled).fix().single.subscribe({}, emitter::onError)
+              Single.never<B>().k()
+            } else {
+              SingleK.defer { use(a) }
+                .value()
+                .doOnError { t: Throwable ->
+                  SingleK.defer { release(a, Error(t.nonFatalOrThrow())) }.value().subscribe({ emitter.onError(t) }, emitter::onError)
+                }.doAfterSuccess { b ->
+                  SingleK.defer { release(a, Completed) }.fix().value().subscribe({ }, emitter::onError)
+                }.doOnDispose {
+                  SingleK.defer { release(a, Canceled) }.value().subscribe({}, {})
+                }
+                .k()
+            }
+          }
+          .value().subscribe(emitter::onSuccess, {})
+      emitter.setCancellable { dispose.dispose() }
+    }.k()
 
   fun handleErrorWith(function: (Throwable) -> SingleKOf<A>): SingleK<A> =
     single.onErrorResumeNext { t: Throwable -> function(t).value() }.k()
@@ -181,25 +183,25 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
       })
 
     fun <A> asyncF(fa: SingleKProcF<A>): SingleK<A> =
-      SingleK(Single.create { emitter: SingleEmitter<A> ->
-        val conn = SingleKConnection()
+      Single.create { emitter: SingleEmitter<A> ->
+        val connection = SingleKConnection()
         // On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
         // on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
-        conn.push(SingleK { if (!emitter.isDisposed) emitter.onError(OnCancel.CancellationException) })
-        emitter.setCancellable { conn.cancel().value().subscribe() }
+        connection.push(SingleK { if (!emitter.isDisposed) emitter.onError(OnCancel.CancellationException) })
 
-        val registerCancel = CompositeDisposable()
-        conn.push(SingleK { registerCancel.dispose() })
-        registerCancel.add(fa(conn) { either: Either<Throwable, A> ->
+        val dispose = fa(connection) { either: Either<Throwable, A> ->
           either.fold({
             emitter.onError(it)
           }, {
             emitter.onSuccess(it)
           })
-        }.fix().single.subscribe({
-          conn.pop()
-        }, emitter::onError))
-      })
+        }.fix().single.subscribe({}, emitter::onError)
+
+        emitter.setCancellable {
+          dispose.dispose()
+          connection.cancel().value().subscribe({}, {})
+        }
+      }.k()
 
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> SingleKOf<Either<A, B>>): SingleK<B> {
       val either = f(a).value().blockingGet()
