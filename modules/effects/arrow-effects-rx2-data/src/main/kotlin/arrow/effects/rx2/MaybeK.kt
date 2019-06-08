@@ -89,7 +89,7 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
                 .value()
                 .doOnError { t: Throwable ->
                   MaybeK.defer { release(a, Error(t.nonFatalOrThrow())) }.value().subscribe({ emitter.onError(t) }, emitter::onError)
-                }.doOnComplete {
+                }.doAfterSuccess {
                   MaybeK.defer { release(a, Completed) }.fix().value().subscribe({ emitter.onComplete() }, emitter::onError)
                 }
                 .doOnDispose {
@@ -188,6 +188,7 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
             emitter.onError(it)
           }, {
             emitter.onSuccess(it)
+            emitter.onComplete()
           })
         }
       }.k()
