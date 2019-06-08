@@ -3,13 +3,15 @@ package arrow.effects.rx2
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Left
-import arrow.core.NonFatal
 import arrow.core.Predicate
 import arrow.core.Right
+import arrow.core.nonFatalOrThrow
 import arrow.effects.OnCancel
-import arrow.effects.internal.Platform
 import arrow.effects.rx2.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.ExitCase
+import arrow.effects.typeclasses.ExitCase.Canceled
+import arrow.effects.typeclasses.ExitCase.Completed
+import arrow.effects.typeclasses.ExitCase.Error
 import arrow.higherkind
 import io.reactivex.Maybe
 import io.reactivex.MaybeEmitter
@@ -75,30 +77,30 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
    *  ```
    */
   fun <B> bracketCase(use: (A) -> MaybeKOf<B>, release: (A, ExitCase<Throwable>) -> MaybeKOf<Unit>): MaybeK<B> =
-    MaybeK(Maybe.create<B> { emitter ->
-      val a = maybe.blockingGet()
-      if (emitter.isDisposed) release(a, ExitCase.Canceled).fix().maybe.subscribe({}, emitter::onError)
-      else {
-        try {
-          emitter.setDisposable(use(a).fix()
-            .flatMap { b -> release(a, ExitCase.Completed).fix().map { b } }
-            .handleErrorWith { e -> release(a, ExitCase.Error(e)).fix().flatMap { MaybeK.raiseError<B>(e) } }
-            .maybe
-            .doOnDispose { release(a, ExitCase.Canceled).fix().maybe.subscribe({}, emitter::onError) }
-            .subscribe(emitter::onSuccess, emitter::onError))
-        } catch (e: Throwable) {
-          if (NonFatal(e)) {
-            release(a, ExitCase.Error(e)).fix().maybe.subscribe({
-              emitter.onError(e)
-            }, { e2 ->
-              emitter.onError(Platform.composeErrors(e, e2))
-            })
-          } else {
-            throw e
+    Maybe.create<B> { emitter ->
+      val dispose =
+        handleErrorWith { t -> Maybe.fromCallable { emitter.onError(t) }.flatMap { Maybe.error<A>(t) }.k() }
+          .flatMap { a ->
+            if (emitter.isDisposed) {
+              release(a, Canceled).fix().maybe.subscribe({}, emitter::onError)
+              Maybe.never<B>().k()
+            } else {
+              MaybeK.defer { use(a) }
+                .value()
+                .doOnError { t: Throwable ->
+                  MaybeK.defer { release(a, Error(t.nonFatalOrThrow())) }.value().subscribe({ emitter.onError(t) }, emitter::onError)
+                }.doOnComplete {
+                  MaybeK.defer { release(a, Completed) }.fix().value().subscribe({ emitter.onComplete() }, emitter::onError)
+                }
+                .doOnDispose {
+                  MaybeK.defer { release(a, Canceled) }.value().subscribe({}, {})
+                }
+                .k()
+            }
           }
-        }
-      }
-    })
+          .value().subscribe(emitter::onSuccess, {}, {})
+      emitter.setCancellable { dispose.dispose() }
+    }.k()
 
   fun <B> fold(ifEmpty: () -> B, ifSome: (A) -> B): B = maybe.blockingGet().let {
     if (it == null) ifEmpty() else ifSome(it)
@@ -192,19 +194,24 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
 
     fun <A> asyncF(fa: MaybeKProcF<A>): MaybeK<A> =
       Maybe.create { emitter: MaybeEmitter<A> ->
-        val conn = MaybeKConnection()
+        val connection = MaybeKConnection()
         // On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
         // on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
-        conn.push(MaybeK { if (!emitter.isDisposed) emitter.onError(OnCancel.CancellationException) })
-        emitter.setCancellable { conn.cancel().value().subscribe() }
+        connection.push(MaybeK { if (!emitter.isDisposed) emitter.onError(OnCancel.CancellationException) })
 
-        fa(conn) { either: Either<Throwable, A> ->
+        val dispose = fa(connection) { either: Either<Throwable, A> ->
           either.fold({
             emitter.onError(it)
           }, {
             emitter.onSuccess(it)
+            emitter.onComplete()
           })
         }.fix().maybe.subscribe({}, emitter::onError)
+
+        emitter.setCancellable {
+          dispose.dispose()
+          connection.cancel().value().subscribe({}, {})
+        }
       }.k()
 
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> MaybeKOf<Either<A, B>>): MaybeK<B> {
