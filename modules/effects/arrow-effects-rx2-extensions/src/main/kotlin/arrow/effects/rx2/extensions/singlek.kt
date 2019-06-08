@@ -152,7 +152,7 @@ interface SingleKConcurrent : Concurrent<ForSingleK>, SingleKAsync {
         if (!emitter.isDisposed) {
           val s: ReplaySubject<A> = ReplaySubject.create()
           val conn: io.reactivex.disposables.Disposable = kind.value().subscribeOn(scheduler).subscribe(s::onNext, s::onError)
-          emitter.onSuccess(Fiber(s.singleOrError().k(), SingleK {
+          emitter.onSuccess(Fiber(s.firstOrError().k(), SingleK {
             conn.dispose()
           }))
         }
@@ -172,8 +172,8 @@ interface SingleKConcurrent : Concurrent<ForSingleK>, SingleKAsync {
         val dda = fa.value().subscribe(sa::onNext, sa::onError)
         val ddb = fb.value().subscribe(sb::onNext, sb::onError)
         emitter.setCancellable { dda.dispose(); ddb.dispose() }
-        val ffa = Fiber(sa.singleOrError().k(), SingleK { dda.dispose() })
-        val ffb = Fiber(sb.singleOrError().k(), SingleK { ddb.dispose() })
+        val ffa = Fiber(sa.firstOrError().k(), SingleK { dda.dispose() })
+        val ffb = Fiber(sb.firstOrError().k(), SingleK { ddb.dispose() })
         sa.subscribe({
           emitter.onSuccess(RacePair.First(it, ffb))
         }, emitter::onError)
@@ -193,9 +193,9 @@ interface SingleKConcurrent : Concurrent<ForSingleK>, SingleKAsync {
         val ddb = fb.value().subscribe(sb::onNext, sb::onError)
         val ddc = fc.value().subscribe(sc::onNext, sc::onError)
         emitter.setCancellable { dda.dispose(); ddb.dispose(); ddc.dispose() }
-        val ffa = Fiber(sa.singleOrError().k(), SingleK { dda.dispose() })
-        val ffb = Fiber(sb.singleOrError().k(), SingleK { ddb.dispose() })
-        val ffc = Fiber(sc.singleOrError().k(), SingleK { ddc.dispose() })
+        val ffa = Fiber(sa.firstOrError().k(), SingleK { dda.dispose() })
+        val ffb = Fiber(sb.firstOrError().k(), SingleK { ddb.dispose() })
+        val ffc = Fiber(sc.firstOrError().k(), SingleK { ddc.dispose() })
         sa.subscribe({
           emitter.onSuccess(RaceTriple.First(it, ffb, ffc))
         }, emitter::onError)
