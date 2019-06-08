@@ -26,9 +26,10 @@ interface FxSyntax<F> : Concurrent<F>, BindSyntax<F> {
   ): Kind<F, List<B>> =
     effects.fold(emptyList<Kind<F, Fiber<F, B>>>()) { acc, fa ->
       acc + startFiber(fa.map(f))
-    }.sequence(this@FxSyntax).flatMap { fibers ->
-      fibers.traverse(this@FxSyntax) { it.join() }
-    }.map { it.fix() }
+    }.sequence(this@FxSyntax).bracket(
+      { fibers -> fibers.traverse(this@FxSyntax) { it.cancel() }.map { Unit } },
+      { fibers -> fibers.traverse(this@FxSyntax) { it.join() } }
+    ).map { it.fix() }
 
   fun <A> CoroutineContext.parSequence(effects: Iterable<Kind<F, A>>): Kind<F, List<A>> =
     parTraverse(effects, ::identity)
