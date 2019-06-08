@@ -4,6 +4,7 @@ import arrow.core.Try
 import arrow.effects.rx2.ForObservableK
 import arrow.effects.rx2.ObservableK
 import arrow.effects.rx2.ObservableKOf
+import arrow.effects.rx2.extensions.concurrent
 import arrow.effects.rx2.extensions.fx
 import arrow.effects.rx2.extensions.observablek.async.async
 import arrow.effects.rx2.extensions.observablek.functor.functor
@@ -12,9 +13,10 @@ import arrow.effects.rx2.extensions.observablek.timer.timer
 import arrow.effects.rx2.extensions.observablek.traverse.traverse
 import arrow.effects.rx2.k
 import arrow.effects.rx2.value
+import arrow.effects.typeclasses.Dispatchers
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
-import arrow.test.laws.AsyncLaws
+import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.TimerLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
@@ -24,10 +26,12 @@ import io.kotlintest.shouldNotBe
 import io.reactivex.Observable
 import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.rx2.asCoroutineDispatcher
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeUnit.SECONDS
+import kotlin.coroutines.CoroutineContext
 
 @RunWith(KotlinTestRunner::class)
 class ObservableKTests : UnitSpec() {
@@ -38,11 +42,7 @@ class ObservableKTests : UnitSpec() {
       val res2 = Try { b.value().timeout(5, SECONDS).blockingFirst() }
       return res1.fold({ t1 ->
         res2.fold({ t2 ->
-          (t1::class.java == t2::class.java).also {
-            if (it) {
-              println("WARNING: compared Observable errors by exception type: <<${t1::class.java}>>")
-            }
-          }
+          (t1::class.java == t2::class.java)
         }, { false })
       }, { v1 ->
         res2.fold({ false }, {
@@ -52,15 +52,15 @@ class ObservableKTests : UnitSpec() {
     }
   }
 
-  init {
-    testLaws(TimerLaws.laws(ObservableK.async(), ObservableK.timer(), EQ()))
-    testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ(), testStackSafety = false))
-    //     FIXME(paco) #691
-    //    testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ()))
-    //    testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ()))
+  val CO = ObservableK.concurrent(object : Dispatchers<ForObservableK> {
+    override fun default(): CoroutineContext = Schedulers.io().asCoroutineDispatcher()
+  })
 
+  init {
     testLaws(
-      TraverseLaws.laws(ObservableK.traverse(), ObservableK.functor(), { ObservableK.just(it) }, EQ())
+      TraverseLaws.laws(ObservableK.traverse(), ObservableK.functor(), { ObservableK.just(it) }, EQ()),
+      ConcurrentLaws.laws(CO, EQ(), EQ(), EQ(), testStackSafety = false),
+      TimerLaws.laws(ObservableK.async(), ObservableK.timer(), EQ())
     )
 
     "Multi-thread Observables finish correctly" {
