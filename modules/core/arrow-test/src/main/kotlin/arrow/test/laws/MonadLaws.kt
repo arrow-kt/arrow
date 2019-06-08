@@ -5,18 +5,13 @@ import arrow.core.Left
 import arrow.core.Right
 import arrow.core.identity
 import arrow.data.Kleisli
-import arrow.free.Free
-import arrow.free.bindingStackSafe
-import arrow.free.run
 import arrow.test.generators.applicative
 import arrow.test.generators.either
 import arrow.test.generators.functionAToB
-import arrow.test.generators.intSmall
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monad
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import kotlinx.coroutines.newSingleThreadContext
 
 object MonadLaws {
 
@@ -29,10 +24,7 @@ object MonadLaws {
         Law("Monad Laws: kleisli right identity") { M.kleisliRightIdentity(EQ) },
         Law("Monad Laws: map / flatMap coherence") { M.mapFlatMapCoherence(EQ) },
         Law("Monad Laws: monad comprehensions") { M.monadComprehensions(EQ) },
-        Law("Monad Laws: monad comprehensions binding in other threads") { M.monadComprehensionsBindInContext(EQ) },
-        Law("Monad Laws: stack-safe//unsafe monad comprehensions equivalence") { M.equivalentComprehensions(EQ) },
         Law("Monad Laws: stack safe") { M.stackSafety(5000, EQ) },
-        Law("Monad Laws: stack safe comprehensions") { M.stackSafetyComprehensions(5000, EQ) },
         Law("Monad Laws: selectM == select when Selective has a monad instance") { M.selectEQSelectM(EQ) }
       )
 
@@ -70,34 +62,9 @@ object MonadLaws {
     res.equalUnderTheLaw(just(iter), EQ)
   }
 
-  fun <F> Monad<F>.stackSafetyComprehensions(iter: Int = 5000, EQ: Eq<Kind<F, Int>>) {
-    val res = stackSafeTestProgram(0, iter)
-    res.run(this).equalUnderTheLaw(just(iter), EQ)
-  }
-
-  fun <F> Monad<F>.equivalentComprehensions(EQ: Eq<Kind<F, Int>>) {
-    val M = this
-    forAll(Gen.int()) { num: Int ->
-      val aa = binding {
-        val (a) = just(num)
-        val (b) = just(a + 1)
-        val (c) = just(b + 1)
-        c
-      }
-      val bb = bindingStackSafe {
-        val (a) = just(num)
-        val (b) = just(a + 1)
-        val (c) = just(b + 1)
-        c
-      }.run(M)
-      aa.equalUnderTheLaw(bb, EQ) &&
-        aa.equalUnderTheLaw(just(num + 2), EQ)
-    }
-  }
-
   fun <F> Monad<F>.monadComprehensions(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.int()) { num: Int ->
-      binding {
+      fx.monad {
         val (a) = just(num)
         val (b) = just(a + 1)
         val (c) = just(b + 1)
@@ -110,19 +77,4 @@ object MonadLaws {
       val f = just<(Int) -> Int>(::identity)
       just(either).select(f).equalUnderTheLaw(just(either).selectM(f), EQ)
     }
-
-  fun <F> Monad<F>.monadComprehensionsBindInContext(EQ: Eq<Kind<F, Int>>): Unit =
-    forFew(5, Gen.intSmall()) { num: Int ->
-      binding {
-        val a = bindIn(newSingleThreadContext("$num")) { num + 1 }
-        val b = bindIn(newSingleThreadContext("$a")) { a + 1 }
-        b
-      }.equalUnderTheLaw(just(num + 2), EQ)
-    }
-
-  fun <F> Monad<F>.stackSafeTestProgram(n: Int, stopAt: Int): Free<F, Int> = bindingStackSafe {
-    val (v) = this.just(n + 1)
-    val r = if (v < stopAt) stackSafeTestProgram(v, stopAt).bind() else this.just(v).bind()
-    r
-  }
 }

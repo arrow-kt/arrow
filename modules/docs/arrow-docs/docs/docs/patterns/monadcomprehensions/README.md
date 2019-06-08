@@ -85,9 +85,9 @@ Let's see a minimal example.
 import arrow.*
 import arrow.effects.*
 import arrow.typeclasses.*
-import arrow.effects.extensions.io.monad.*
+import arrow.effects.extensions.fx
 
-binding {
+IO.fx {
   1
 }.fix().unsafeRunSync()
 ```
@@ -96,7 +96,7 @@ Anything in the function inside `binding` can be imperative and sequential code 
 In the case of [`IO`]({{ '/docs/effects/io' | relative_url }}), it is immediately run blocking the current thread using `unsafeRunSync()`. Let's expand the example by adding a second operation:
 
 ```kotlin
-binding {
+IO.fx {
   val a = IO.invoke { 1 }
   a + 1
 }.fix().unsafeRunSync()
@@ -109,15 +109,15 @@ This will block the current thread until the operation completes. What we want i
 For that we have two flavors of the function `bind()`, which is a function only available inside the function passed to `binding()`.
 
 ```kotlin:ank
-binding {
+IO.fx {
   val (a) = IO.invoke { 1 }
   a + 1
 }.fix().unsafeRunSync()
 ```
 
 ```kotlin:ank
-binding {
-  val a = bind { IO.invoke { 1 } }
+IO.fx {
+  val a = IO.invoke { 1 }.bind()
   a + 1
 }.fix().unsafeRunSync()
 ```
@@ -137,7 +137,7 @@ With this new style we can rewrite our original example of database fetching as:
 
 ```kotlin
 val university: IO<University> = 
-  binding {
+  IO.fx {
     val (student) = getStudentFromDatabase("Bob Roxx")
     val (university) = getUniversityFromDatabase(student.universityId)
     val (dean) = getDeanFromDatabase(university.deanId)
@@ -149,7 +149,7 @@ And you can still write your usual imperative code in the binding block, interle
 
 ```kotlin
 fun getNLines(path: FilePath, count: Int): IO<List<String>> = 
-  binding {
+  IO.fx {
     val (file) = getFile(path)
     val (lines) = file.readLines()
     if (lines.length < count) {
@@ -171,7 +171,7 @@ Let's take a somewhat common mistake and expand on it:
 
 ```kotlin
 fun getLineLengthAverage(path: FilePath): IO<List<String>> = 
-  binding {
+  IO.fx {
     val (file) = getFile(path)
     val (lines) = file.readLines()
     val count = lines.map { it.length }.foldLeft(0) { acc, lineLength -> acc + lineLength }
@@ -186,11 +186,10 @@ This exception goes uncaught and finalizes the program with a crash. Knowing thi
 Our next approach can do automatic wrapping of unexpected exceptions to return them inside the operation sequence.
 For this purpose, the typeclass [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}) was created.
 [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}) allows us to raise and recover from errors.
-It also contains a version of comprehensions that automatically wraps exceptions, called `bindingCatch`.
 
 ```kotlin
 fun getLineLengthAverage(path: FilePath): IO<List<String>> = 
-  bindingCatch {
+  IO.fx {
     val (file) = getFile(path)
     val (lines) = file.readLines()
     val count = lines.map { it.length }.foldLeft(0) { acc, lineLength -> acc + lineLength }
@@ -209,37 +208,6 @@ Note that while most data types include an instance of [`Monad`]({{ '/docs/arrow
 Arrow uses the same abstraction as coroutines to group threads and other contexts of execution: `CoroutineContext`.
 There are multiple default values and wrappers for common cases in both the standard library, and the extension library [kotlinx.coroutines](https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-dispatcher/index.html).
 
-#### Blocking thread jumps
-
-NOTE: This blocking approach to thread jumping will change before the 1.0 release, as it's causing non-blocking datatypes to behave as if they were blocking.
-
-In any `binding()` block there is a helper function `bindIn()` that takes a `CoroutineContext` as a parameter and can return any value.
-This value will be lifted into a data type using `just()`.
-
-The functions will cause a new coroutine to start on the `CoroutineContext` passed as a parameter to then `bind()` to await for its completion.
-
-```kotlin
-val ioThreadContext = newSingleThreadContext("IO")
-val computationThreadContext = newSingleThreadContext("Computation")
-
-fun getLineLengthAverage(path: FilePath): IO<List<String>> = 
-  bindingCatch {
-    
-    // Implicitly wrap the result of a synchronous operation into IO.just() using bindIn
-    val file = bindIn(ioThreadContext) { getFile(path) }    
-    val lines = bindIn(computationThreadContext) { file.readLines() }
-    
-    val count = lines.map { it.length }.foldLeft(0) { acc, lineLength -> acc + lineLength }
-    val average = count / lines.length
-    average
-  }
-```
-
-Note that `bindIn()`assures that the execution will return to the same thread where the binding started after the `bindIn` block executes.
-
-There is also a version of `bindIn` called `bindDeferredIn` that allows deferred construction.
-It's available for `bindingCancellable` comprehensions over instances of [`MonadDefer`]({{ '/docs/effects/monaddefer' | relative_url }}).
-
 #### Non-blocking thread jumps
 
 Any datatype that allows asynchronous execution has to be abstracted by the typeclass [`Async`]({{ '/docs/effects/aync' | relative_url }}).
@@ -253,7 +221,7 @@ Let's see an example:
 
 ```
 IO.async().run {
-  binding {
+  fx.async {
     // In current thread
     val (id) = createIdFromNumber(762587)
     continueOn(CommonPool)
@@ -274,28 +242,3 @@ It's worth reminding that this means that you have to precompute thread local va
 ### What if I'd like to run multiple operations independently from each other, in a non-sequential way?
 
 You can check the section on the Applicative Builder pattern for them!
-
-### Cancellation and cleanup of resources
-
-In some environments that have resources with their own lifecycle (i.e. Activity in Android development) retaining these values in operations that can run indefinitely may cause large memory leaks and lead to undefined behavior.
-As cleanup is important in these restricted environments, any instance of [`MonadDefer`]({{ '/docs/effects/monaddefer' | relative_url }}) provides the function `bindingCancellable`, which allows for comprehensions to be finished early by throwing an `BindingCancellationException` at the beginning of the next `bind()` step.
-
-```kotlin
-val (binding: IO<List<User>>, unsafeCancel: Disposable) =
-  ioSync.bindingCancellable {
-    val userProfile = bindDefer { getUserProfile("123") }
-    val friendProfiles = userProfile.friends().map { friend ->
-        bindDefer { getProfile(friend.id) }
-    }
-    listOf(userProfile) + friendProfiles
-  }
-
-binding.unsafeRunAsync { result ->
-  result.fold({ println("Boom! caused by $it") }, { println(it.toString()) })
-}
-
-unsafeCancel()
-// Boom! caused by BindingCancellationException
-```
-
-Note that the cancellation happens on the `bind()` step, so any currently running operations before `bind()` will have to complete first, even those that are scheduled for threading.

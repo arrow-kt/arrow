@@ -20,6 +20,7 @@ import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.MonoidK
 import arrow.typeclasses.Monoidal
@@ -28,10 +29,7 @@ import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Semigroupal
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
-import arrow.typeclasses.suspended.monad.commutative.safe.Fx
 import kotlin.collections.emptyList
-import kotlin.collections.fold
-import kotlin.collections.zip
 import arrow.data.combineK as listCombineK
 import kotlin.collections.plus as listPlus
 
@@ -189,9 +187,5 @@ interface ListKHash<A> : Hash<ListKOf<A>>, ListKEq<A> {
   }
 }
 
-@extension
-interface ListKFx : Fx<ForListK> {
-
-  override fun monad(): Monad<ForListK> =
-    ListK.monad()
-}
+fun <A> ListK.Companion.fx(c: suspend MonadSyntax<ForListK>.() -> A): ListK<A> =
+  ListK.monad().fx.monad(c).fix()

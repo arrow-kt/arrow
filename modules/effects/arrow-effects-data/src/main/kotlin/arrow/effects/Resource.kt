@@ -19,7 +19,7 @@ import arrow.typeclasses.Semigroup
  * Consider the following use case:
  * ```kotlin:ank:playground
  * import arrow.effects.IO
- * import arrow.effects.extensions.io.fx.fx
+ * import arrow.effects.extensions.fx
  *
  * object Consumer
  * object Handle
@@ -35,7 +35,7 @@ import arrow.typeclasses.Semigroup
  * fun shutDownFanceService(service: Service): IO<Unit> = IO { println("Closed service") }
  *
  * //sampleStart
- * val program = fx {
+ * val program = IO.fx {
  *   val consumer = !createConsumer()
  *   val handle = !createDBHandle()
  *   val service = !createFancyService(consumer, handle)
@@ -60,7 +60,6 @@ import arrow.typeclasses.Semigroup
  * There is already a typeclass called bracket that we can use to make our life easier:
  * ```kotlin:ank:playground
  * import arrow.effects.IO
- * import arrow.effects.extensions.io.fx.fx
  * import arrow.effects.extensions.io.bracket.bracket
  *
  * object Consumer
@@ -102,7 +101,6 @@ import arrow.typeclasses.Semigroup
  * import arrow.effects.Resource
  * import arrow.effects.extensions.resource.monad.monad
  * import arrow.effects.extensions.io.bracket.bracket
- * import arrow.effects.extensions.io.fx.fx
  * import arrow.effects.fix
  *
  * object Consumer
@@ -119,7 +117,7 @@ import arrow.typeclasses.Semigroup
  * fun shutDownFanceService(service: Service): IO<Unit> = IO { println("Closed service") }
  *
  * //sampleStart
- * val managedTProgram = Resource.monad(IO.bracket()).binding {
+ * val managedTProgram = Resource.monad(IO.bracket()).fx.monad {
  *   val consumer = Resource(::createConsumer, ::closeConsumer, IO.bracket()).bind()
  *   val handle = Resource(::createDBHandle, ::closeDBHandle, IO.bracket()).bind()
  *   Resource({ createFancyService(consumer, handle) }, ::shutDownFanceService, IO.bracket()).bind()

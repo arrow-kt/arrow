@@ -4,7 +4,6 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.data.ForNonEmptyList
-import arrow.data.Nel
 import arrow.data.NonEmptyList
 import arrow.data.NonEmptyListOf
 import arrow.data.extensions.nonemptylist.monad.monad
@@ -19,12 +18,12 @@ import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Reducible
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
-import arrow.typeclasses.suspended.monad.Fx
 import arrow.data.combineK as nelCombineK
 
 @extension
@@ -51,25 +50,25 @@ interface NonEmptyListShow<A> : Show<NonEmptyList<A>> {
 
 @extension
 interface NonEmptyListFunctor : Functor<ForNonEmptyList> {
-  override fun <A, B> Kind<ForNonEmptyList, A>.map(f: (A) -> B): NonEmptyList<B> =
+  override fun <A, B> NonEmptyListOf<A>.map(f: (A) -> B): NonEmptyList<B> =
     fix().map(f)
 }
 
 @extension
 interface NonEmptyListApply : Apply<ForNonEmptyList> {
-  override fun <A, B> Kind<ForNonEmptyList, A>.ap(ff: Kind<ForNonEmptyList, (A) -> B>): NonEmptyList<B> =
+  override fun <A, B> NonEmptyListOf<A>.ap(ff: NonEmptyListOf<(A) -> B>): NonEmptyList<B> =
     fix().ap(ff)
 
-  override fun <A, B> Kind<ForNonEmptyList, A>.map(f: (A) -> B): NonEmptyList<B> =
+  override fun <A, B> NonEmptyListOf<A>.map(f: (A) -> B): NonEmptyList<B> =
     fix().map(f)
 }
 
 @extension
 interface NonEmptyListApplicative : Applicative<ForNonEmptyList> {
-  override fun <A, B> Kind<ForNonEmptyList, A>.ap(ff: Kind<ForNonEmptyList, (A) -> B>): NonEmptyList<B> =
+  override fun <A, B> NonEmptyListOf<A>.ap(ff: NonEmptyListOf<(A) -> B>): NonEmptyList<B> =
     fix().ap(ff)
 
-  override fun <A, B> Kind<ForNonEmptyList, A>.map(f: (A) -> B): NonEmptyList<B> =
+  override fun <A, B> NonEmptyListOf<A>.map(f: (A) -> B): NonEmptyList<B> =
     fix().map(f)
 
   override fun <A> just(a: A): NonEmptyList<A> =
@@ -78,16 +77,16 @@ interface NonEmptyListApplicative : Applicative<ForNonEmptyList> {
 
 @extension
 interface NonEmptyListMonad : Monad<ForNonEmptyList> {
-  override fun <A, B> Kind<ForNonEmptyList, A>.ap(ff: Kind<ForNonEmptyList, (A) -> B>): NonEmptyList<B> =
+  override fun <A, B> NonEmptyListOf<A>.ap(ff: NonEmptyListOf<(A) -> B>): NonEmptyList<B> =
     fix().ap(ff)
 
-  override fun <A, B> Kind<ForNonEmptyList, A>.flatMap(f: (A) -> Kind<ForNonEmptyList, B>): NonEmptyList<B> =
+  override fun <A, B> NonEmptyListOf<A>.flatMap(f: (A) -> NonEmptyListOf<B>): NonEmptyList<B> =
     fix().flatMap(f)
 
-  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, NonEmptyListOf<Either<A, B>>>): NonEmptyList<B> =
+  override fun <A, B> tailRecM(a: A, f: (A) -> NonEmptyListOf<Either<A, B>>): NonEmptyList<B> =
     NonEmptyList.tailRecM(a, f)
 
-  override fun <A, B> Kind<ForNonEmptyList, A>.map(f: (A) -> B): NonEmptyList<B> =
+  override fun <A, B> NonEmptyListOf<A>.map(f: (A) -> B): NonEmptyList<B> =
     fix().map(f)
 
   override fun <A> just(a: A): NonEmptyList<A> =
@@ -96,73 +95,73 @@ interface NonEmptyListMonad : Monad<ForNonEmptyList> {
 
 @extension
 interface NonEmptyListComonad : Comonad<ForNonEmptyList> {
-  override fun <A, B> Kind<ForNonEmptyList, A>.coflatMap(f: (Kind<ForNonEmptyList, A>) -> B): NonEmptyList<B> =
+  override fun <A, B> NonEmptyListOf<A>.coflatMap(f: (NonEmptyListOf<A>) -> B): NonEmptyList<B> =
     fix().coflatMap(f)
 
-  override fun <A> Kind<ForNonEmptyList, A>.extract(): A =
+  override fun <A> NonEmptyListOf<A>.extract(): A =
     fix().extract()
 
-  override fun <A, B> Kind<ForNonEmptyList, A>.map(f: (A) -> B): NonEmptyList<B> =
+  override fun <A, B> NonEmptyListOf<A>.map(f: (A) -> B): NonEmptyList<B> =
     fix().map(f)
 }
 
 @extension
 interface NonEmptyListBimonad : Bimonad<ForNonEmptyList> {
-  override fun <A, B> Kind<ForNonEmptyList, A>.ap(ff: Kind<ForNonEmptyList, (A) -> B>): NonEmptyList<B> =
+  override fun <A, B> NonEmptyListOf<A>.ap(ff: NonEmptyListOf<(A) -> B>): NonEmptyList<B> =
     fix().ap(ff)
 
-  override fun <A, B> Kind<ForNonEmptyList, A>.flatMap(f: (A) -> Kind<ForNonEmptyList, B>): NonEmptyList<B> =
+  override fun <A, B> NonEmptyListOf<A>.flatMap(f: (A) -> NonEmptyListOf<B>): NonEmptyList<B> =
     fix().flatMap(f)
 
-  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, NonEmptyListOf<Either<A, B>>>): NonEmptyList<B> =
+  override fun <A, B> tailRecM(a: A, f: (A) -> NonEmptyListOf<Either<A, B>>): NonEmptyList<B> =
     NonEmptyList.tailRecM(a, f)
 
-  override fun <A, B> Kind<ForNonEmptyList, A>.map(f: (A) -> B): NonEmptyList<B> =
+  override fun <A, B> NonEmptyListOf<A>.map(f: (A) -> B): NonEmptyList<B> =
     fix().map(f)
 
   override fun <A> just(a: A): NonEmptyList<A> =
     NonEmptyList.just(a)
 
-  override fun <A, B> Kind<ForNonEmptyList, A>.coflatMap(f: (Kind<ForNonEmptyList, A>) -> B): NonEmptyList<B> =
+  override fun <A, B> NonEmptyListOf<A>.coflatMap(f: (NonEmptyListOf<A>) -> B): NonEmptyList<B> =
     fix().coflatMap(f)
 
-  override fun <A> Kind<ForNonEmptyList, A>.extract(): A =
+  override fun <A> NonEmptyListOf<A>.extract(): A =
     fix().extract()
 }
 
 @extension
 interface NonEmptyListFoldable : Foldable<ForNonEmptyList> {
-  override fun <A, B> Kind<ForNonEmptyList, A>.foldLeft(b: B, f: (B, A) -> B): B =
+  override fun <A, B> NonEmptyListOf<A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
 
-  override fun <A, B> arrow.Kind<arrow.data.ForNonEmptyList, A>.foldRight(lb: arrow.core.Eval<B>, f: (A, arrow.core.Eval<B>) -> arrow.core.Eval<B>): Eval<B> =
+  override fun <A, B> NonEmptyListOf<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
     fix().foldRight(lb, f)
 
-  override fun <A> Kind<ForNonEmptyList, A>.isEmpty(): kotlin.Boolean =
+  override fun <A> NonEmptyListOf<A>.isEmpty(): Boolean =
     fix().isEmpty()
 }
 
 @extension
 interface NonEmptyListTraverse : Traverse<ForNonEmptyList> {
-  override fun <A, B> Kind<ForNonEmptyList, A>.map(f: (A) -> B): NonEmptyList<B> =
+  override fun <A, B> NonEmptyListOf<A>.map(f: (A) -> B): NonEmptyList<B> =
     fix().map(f)
 
-  override fun <G, A, B> Kind<ForNonEmptyList, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, NonEmptyList<B>> =
+  override fun <G, A, B> NonEmptyListOf<A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, NonEmptyList<B>> =
     fix().traverse(AP, f)
 
-  override fun <A, B> Kind<ForNonEmptyList, A>.foldLeft(b: B, f: (B, A) -> B): B =
+  override fun <A, B> NonEmptyListOf<A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
 
-  override fun <A, B> arrow.Kind<arrow.data.ForNonEmptyList, A>.foldRight(lb: arrow.core.Eval<B>, f: (A, arrow.core.Eval<B>) -> arrow.core.Eval<B>): Eval<B> =
+  override fun <A, B> NonEmptyListOf<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
     fix().foldRight(lb, f)
 
-  override fun <A> Kind<ForNonEmptyList, A>.isEmpty(): kotlin.Boolean =
+  override fun <A> NonEmptyListOf<A>.isEmpty(): Boolean =
     fix().isEmpty()
 }
 
 @extension
 interface NonEmptyListSemigroupK : SemigroupK<ForNonEmptyList> {
-  override fun <A> Kind<ForNonEmptyList, A>.combineK(y: Kind<ForNonEmptyList, A>): NonEmptyList<A> =
+  override fun <A> NonEmptyListOf<A>.combineK(y: NonEmptyListOf<A>): NonEmptyList<A> =
     fix().nelCombineK(y)
 }
 
@@ -182,9 +181,5 @@ fun <F, A> Reducible<F>.toNonEmptyList(fa: Kind<F, A>): NonEmptyList<A> =
     lnel.map { nonEmptyList -> NonEmptyList(a, listOf(nonEmptyList.head) + nonEmptyList.tail) }
   }).value()
 
-@extension
-interface NelFx : Fx<ForNonEmptyList> {
-
-  override fun monad(): Monad<ForNonEmptyList> =
-    Nel.monad()
-}
+fun <A> NonEmptyList.Companion.fx(c: suspend MonadSyntax<ForNonEmptyList>.() -> A): NonEmptyList<A> =
+  NonEmptyList.monad().fx.monad(c).fix()

@@ -28,6 +28,9 @@ import arrow.effects.typeclasses.ProcF
 import arrow.effects.typeclasses.mapUnit
 import arrow.higherkind
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 typealias IOProc<A> = (IOConnection, (Either<Throwable, A>) -> Unit) -> Unit
 typealias IOProcF<A> = (IOConnection, (Either<Throwable, A>) -> Unit) -> IOOf<Unit>
@@ -123,6 +126,12 @@ sealed class IO<out A> : IOOf<A> {
     /* For parMap, look into IOParallel */
   }
 
+  suspend fun suspended(): A = suspendCoroutine { cont ->
+    IORunLoop.start(this) {
+      it.fold(cont::resumeWithException, cont::resume)
+    }
+  }
+
   open fun <B> map(f: (A) -> B): IO<B> =
     Map(this, f, 0)
 
@@ -140,19 +149,19 @@ sealed class IO<out A> : IOOf<A> {
    *
    * ```kotlin:ank:playground
    * import arrow.effects.*
-   * import arrow.effects.extensions.io.async.async
-   * import arrow.effects.extensions.io.monad.binding
+   * import arrow.effects.extensions.fx
    * import kotlinx.coroutines.Dispatchers
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   binding {
-   *     val promise = Promise.uncancelable<ForIO, Int>(IO.async()).bind()
-   *     val fiber = promise.get().fix().startFiber(Dispatchers.Default).bind()
-   *     promise.complete(1).bind()
-   *     fiber.join().bind()
-   *   }.unsafeRunSync() == 1
+   *   val result = IO.fx {
+   *     val (join, cancel) = !IO.effect {
+   *       println("Hello from a fiber on ${Thread.currentThread().name}")
+   *     }.startFiber(Dispatchers.Default)
+   *   }
+   *
    *   //sampleEnd
+   *   result.unsafeRunSync()
    * }
    * ```
    *
