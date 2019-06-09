@@ -137,6 +137,7 @@ sealed class TypeName : Tree() {
 
   companion object {
     val Unit: TypeName = TypeName.Classy(simpleName = "Unit", pckg = PackageName("kotlin"), fqName = "kotlin.Unit")
+    val AnyNullable: TypeName = TypeName.TypeVariable("Any?")
   }
 }
 
@@ -173,15 +174,15 @@ data class Annotation(
 data class Property(
   val name: String,
   val type: TypeName,
-  val mutable: Boolean,
+  val mutable: Boolean = false,
   val kdoc: Code? = null,
   val initializer: Code? = null,
   val delegated: Boolean = false,
-  val getter: Func,
-  val setter: Func?,
+  val getter: Func? = null,
+  val setter: Func? = null,
   val receiverType: TypeName? = null,
-  val jvmPropertySignature: String,
-  val jvmFieldSignature: String?,
+  val jvmPropertySignature: String? = null,
+  val jvmFieldSignature: String? = null,
   val annotations: List<Annotation> = emptyList(),
   val modifiers: List<Modifier> = emptyList()) : Tree() {
   companion object

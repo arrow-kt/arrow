@@ -65,12 +65,12 @@ object AsyncLaws {
 
   fun <F> Async<F>.continueOnComprehension(EQ: Eq<Kind<F, Int>>): Unit =
     forFew(5, Gen.intSmall(), Gen.intSmall()) { threadId1: Int, threadId2: Int ->
-      bindingCancellable {
+      fx.async {
         continueOn(newSingleThreadContext(threadId1.toString()))
         val t1: Int = getCurrentThread()
         continueOn(newSingleThreadContext(threadId2.toString()))
         t1 + getCurrentThread()
-      }.a.equalUnderTheLaw(just(threadId1 + threadId2), EQ)
+      }.equalUnderTheLaw(just(threadId1 + threadId2), EQ)
     }
 
   fun <F> Async<F>.asyncCanBeDerivedFromAsyncF(EQ: Eq<Kind<F, Int>>): Unit =

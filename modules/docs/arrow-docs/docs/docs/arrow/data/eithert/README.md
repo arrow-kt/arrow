@@ -163,10 +163,10 @@ We can't use flatMap in this case because the nested expression does not match t
 Let's look at how a similar implementation would look like using monad comprehensions without transformers:
 
 ```kotlin:ank
-import arrow.effects.rx2.extensions.observablek.monad.*
+import arrow.effects.rx2.extensions.fx
 
 fun getCountryCode(personId: Int): ObservableK<Either<BizError, String>> =
-  binding {
+  ObservableK.fx {
     val person = findPerson(personId).bind()
     val address = person.fold (
       { it.left() },
@@ -219,7 +219,7 @@ So how would our function look if we implemented it with the EitherT monad trans
 import arrow.data.extensions.eithert.monad.*
 
 fun getCountryCode(personId: Int): ObservableK<Either<BizError, String>> =
-  EitherT.monad<ForObservableK, BizError>(ObservableK.monad()).binding {
+  EitherT.monad<ForObservableK, BizError>(ObservableK.monad()).fx.monad {
     val (person) = EitherT(findPerson(personId))
     val address = EitherT(ObservableK.just(
       person.address.toEither { AddressNotFound(personId) }

@@ -2,7 +2,7 @@ package arrow.typeclasses.suspended.monad
 
 import arrow.Kind
 import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadContinuation
+import arrow.typeclasses.MonadSyntax
 
 /**
  * Fx allows you to run pure sequential code as if it was imperative.
@@ -19,6 +19,6 @@ import arrow.typeclasses.MonadContinuation
  */
 interface Fx<F> {
   fun monad(): Monad<F>
-  fun <A> fx(f: suspend MonadContinuation<F, *>.() -> A): Kind<F, A> =
+  fun <A> fx(f: suspend MonadSyntax<F>.() -> A): Kind<F, A> =
     monad().binding(f)
 }

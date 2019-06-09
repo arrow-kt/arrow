@@ -23,7 +23,7 @@ interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F> {
 /**
  * ank_macro_hierarchy(arrow.typeclasses.MonadThrow)
  *
- * A MonadError with the error type fixed to Throwable. It provides [bindingCatch] for automatically catching throwable
+ * MonadThrow has the error type fixed to Throwable. It provides [fx.monadThrow] for automatically catching throwable
  * errors in the context of a binding, short-circuiting the complete computation and returning the error raised to the
  * same computational context (through [raiseError]).
  *
@@ -42,7 +42,7 @@ interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F> {
  * ### Example
  *
  * Oftentimes we find ourselves in situations where we need to sequence some computations that could potentially fail.
- * [bindingCatch] allows us to safely compute those by automatically catching any exceptions thrown during the process.
+ * [fx.monadThrow] allows us to safely compute those by automatically catching any exceptions thrown during the process.
  *
  * ```kotlin:ank:playground:extension
  * _imports_
@@ -64,7 +64,7 @@ interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F> {
  * fun main(args: Array<String>) {
  *    //sampleStart
  *    fun <F> MonadThrow<F>.attack(): Kind<F, Impacted> =
- *      bindingCatch {
+ *      fx.monadThrow {
  *        val nuke = arm().bind()
  *        val target = aim().bind()
  *        val impact = launchImpure(target, nuke) // this throws!
@@ -82,7 +82,7 @@ interface MonadThrow<F> : MonadError<F, Throwable> {
 
   /**
    * Entry point for monad bindings which enables for comprehensions. The underlying implementation is based on
-   * coroutines. A coroutine is initiated and suspended inside [MonadErrorContinuation] yielding to [Monad.flatMap].
+   * coroutines. A coroutine is initiated and suspended inside [MonadThrowContinuation] yielding to [Monad.flatMap].
    * Once all the flatMap binds are completed, the underlying monad is returned from the act of executing the coroutine.
    *
    * This one operates over [MonadError] instances that can support [Throwable] in their error type automatically
@@ -92,7 +92,7 @@ interface MonadThrow<F> : MonadError<F, Throwable> {
    * ### Example
    *
    * Oftentimes we find ourselves in situations where we need to sequence some computations that could potentially fail.
-   * [bindingCatch] allows us to safely compute those by automatically catching any exceptions thrown during the process.
+   * [fx.monadThrow] allows us to safely compute those by automatically catching any exceptions thrown during the process.
    *
    * ```kotlin:ank:playground:extension
    * _imports_
@@ -114,7 +114,7 @@ interface MonadThrow<F> : MonadError<F, Throwable> {
    * fun main(args: Array<String>) {
    *    //sampleStart
    *    fun <F> MonadThrow<F>.attack(): Kind<F, Impacted> =
-   *      bindingCatch {
+   *      fx.monadThrow {
    *        val nuke = arm().bind()
    *        val target = aim().bind()
    *        val impact = launchImpure(target, nuke) // this throws!
@@ -128,20 +128,29 @@ interface MonadThrow<F> : MonadError<F, Throwable> {
    * ```
    *
    */
+  override val fx: MonadThrowFx<F>
+    get() = object : MonadThrowFx<F> {
+      override val ME: MonadThrow<F> = this@MonadThrow
+    }
+
   @Deprecated(
     "`bindingCatch` is getting renamed to `fx` for consistency with the Arrow Fx system. Use the Fx extensions for comprehensions",
-    ReplaceWith("fx")
+    ReplaceWith("fx.monadThrow")
   )
-  fun <B> bindingCatch(c: suspend MonadErrorContinuation<F, *>.() -> B): Kind<F, B> {
-    val continuation = MonadErrorContinuation<F, B>(this)
-    val wrapReturn: suspend MonadErrorContinuation<F, *>.() -> Kind<F, B> = { just(c()) }
-    wrapReturn.startCoroutine(continuation, continuation)
-    return continuation.returnedMonad()
-  }
-
-  override fun <B> binding(c: suspend MonadContinuation<F, *>.() -> B): Kind<F, B> =
-    bindingCatch { c() }
+  fun <B> bindingCatch(c: suspend MonadThrowSyntax<F>.() -> B): Kind<F, B> =
+    fx.monadThrow(c)
 
   fun <A> Throwable.raiseNonFatal(): Kind<F, A> =
     if (NonFatal(this)) raiseError(this) else throw this
+}
+
+interface MonadThrowFx<F> : MonadFx<F> {
+  val ME: MonadThrow<F>
+  override val M: Monad<F> get() = ME
+  fun <A> monadThrow(c: suspend MonadThrowSyntax<F>.() -> A): Kind<F, A> {
+    val continuation = MonadThrowContinuation<F, A>(ME)
+    val wrapReturn: suspend MonadThrowSyntax<F>.() -> Kind<F, A> = { just(c()) }
+    wrapReturn.startCoroutine(continuation, continuation)
+    return continuation.returnedMonad()
+  }
 }

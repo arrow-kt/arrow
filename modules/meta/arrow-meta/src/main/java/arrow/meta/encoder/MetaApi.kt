@@ -139,6 +139,11 @@ interface MetaApi {
   val TypeName.projectedCompanion: TypeName
 
   /**
+   * Resets all type arguments to [Any?]
+   */
+  fun TypeName.widenTypeArgs(): TypeName
+
+  /**
    * Returns a type name given a `KClass`
    */
   fun <A : Any> TypeName.Companion.typeNameOf(clazz: KClass<A>): TypeName
@@ -254,6 +259,11 @@ interface MetaApi {
    * A instance of @JvmName in the Arrow Meta AST
    */
   fun JvmName(name: String): Annotation
+
+  /**
+   * A instance of @PublishedApi in the Arrow Meta AST
+   */
+  fun PublishedApi(): Annotation
 
   /**
    * A instance of @SuppressAnnotation in the Arrow Meta AST

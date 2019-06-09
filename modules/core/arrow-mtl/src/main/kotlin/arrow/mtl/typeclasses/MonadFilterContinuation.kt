@@ -2,19 +2,27 @@ package arrow.mtl.typeclasses
 
 import arrow.Kind
 import arrow.typeclasses.MonadContinuation
+import arrow.typeclasses.MonadSyntax
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.RestrictsSuspension
 
-@RestrictsSuspension
-open class MonadFilterContinuation<F, A>(val MF: MonadFilter<F>, override val context: CoroutineContext = EmptyCoroutineContext) :
-  MonadContinuation<F, A>(MF) {
+/**
+ * marker exception that interrupts the coroutine flow and gets captured
+ * to provide the monad empty value
+ */
+private object PredicateInterrupted : RuntimeException() {
+  override fun fillInStackTrace(): Throwable = this
+}
 
-  /**
-   * marker exception that interrupts the coroutine flow and gets captured
-   * to provide the monad empty value
-   */
-  private object PredicateInterrupted : RuntimeException()
+@RestrictsSuspension
+interface MonadFilterSyntax<F> : MonadSyntax<F> {
+  fun continueIf(predicate: Boolean): Unit
+  suspend fun <B> Kind<F, B>.bindWithFilter(f: (B) -> Boolean): B
+}
+
+open class MonadFilterContinuation<F, A>(val MF: MonadFilter<F>, override val context: CoroutineContext = EmptyCoroutineContext) :
+  MonadContinuation<F, A>(MF), MonadFilterSyntax<F> {
 
   override fun resumeWith(result: Result<Kind<F, A>>) {
     result.fold({ super.resumeWith(result) }, {
@@ -29,7 +37,7 @@ open class MonadFilterContinuation<F, A>(val MF: MonadFilter<F>, override val co
    * Short circuits monadic bind if `predicate == false` return the
    * monad `empty` value.
    */
-  fun continueIf(predicate: Boolean) {
+  override fun continueIf(predicate: Boolean) {
     if (!predicate) throw PredicateInterrupted
   }
 
@@ -37,8 +45,8 @@ open class MonadFilterContinuation<F, A>(val MF: MonadFilter<F>, override val co
    * Binds only if the given predicate matches the inner value otherwise binds into the Monad `empty()` value
    * on `MonadFilter` instances
    */
-  suspend fun <B> Kind<F, B>.bindWithFilter(f: (B) -> Boolean): B {
-    val b: B = bind { this }
-    return if (f(b)) b else bind { MF.empty<B>() }
+  override suspend fun <B> Kind<F, B>.bindWithFilter(f: (B) -> Boolean): B {
+    val b: B = this.bind()
+    return if (f(b)) b else MF.empty<B>().bind()
   }
 }

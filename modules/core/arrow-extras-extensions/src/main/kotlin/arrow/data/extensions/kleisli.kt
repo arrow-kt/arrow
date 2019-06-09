@@ -12,9 +12,9 @@ import arrow.core.extensions.id.applicative.applicative
 import arrow.core.extensions.id.functor.functor
 import arrow.core.extensions.id.monad.monad
 import arrow.data.ForKleisli
+import arrow.data.Ior
 import arrow.data.KleisliOf
 import arrow.data.KleisliPartialOf
-import arrow.data.extensions.ior.monad.monad
 import arrow.data.extensions.kleisli.applicative.applicative
 import arrow.data.extensions.kleisli.functor.functor
 import arrow.data.extensions.kleisli.monad.monad
@@ -30,12 +30,11 @@ import arrow.typeclasses.Divide
 import arrow.typeclasses.Divisible
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.conest
 import arrow.typeclasses.counnest
-import arrow.typeclasses.fix
-import arrow.typeclasses.suspended.monad.Fx
 import arrow.undocumented
 
 @extension
@@ -199,12 +198,5 @@ fun <D> ReaderApi.applicative(): Applicative<ReaderPartialOf<D>> = Kleisli.appli
  */
 fun <D> ReaderApi.monad(): Monad<ReaderPartialOf<D>> = Kleisli.monad(Id.monad())
 
-@extension
-@undocumented
-interface KleisliFx<F, D> : Fx<KleisliPartialOf<F, D>> {
-
-  fun MF(): Monad<F>
-
-  override fun monad(): Monad<KleisliPartialOf<F, D>> =
-    Kleisli.monad(MF())
-}
+fun <F, D, A> Ior.Companion.fx(MF: Monad<F>, c: suspend MonadSyntax<KleisliPartialOf<F, D>>.() -> A): Kleisli<F, D, A> =
+  Kleisli.monad<F, D>(MF).fx.monad(c).fix()

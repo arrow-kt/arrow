@@ -74,7 +74,7 @@ Either.Right(1).ensure({ RuntimeException("Failed predicate") }, { it < 0 })
 
 ### Comprehensions
 
-#### bindingCatch
+#### fx.monadThrow
 
 It starts a [Monad Comprehension]({{ '/docs/patterns/monad_comprehensions' | relative_url }}) that wraps any exception thrown in the block inside `raiseError()`.
 

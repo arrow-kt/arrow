@@ -8,11 +8,12 @@ import arrow.core.Some
 import arrow.core.Tuple4
 import arrow.core.right
 import arrow.effects.IO.Companion.just
+import arrow.effects.extensions.fx
 import arrow.effects.extensions.io.async.async
 import arrow.effects.extensions.io.concurrent.concurrent
 import arrow.effects.extensions.io.concurrent.parMapN
-import arrow.effects.extensions.io.fx.fx
 import arrow.effects.extensions.io.monad.flatMap
+import arrow.effects.extensions.io.monad.map
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.milliseconds
 import arrow.effects.typeclasses.seconds
@@ -274,7 +275,7 @@ class IOTest : UnitSpec() {
     }
 
     "fx can switch execution context state across not/bind" {
-      val program = fx {
+      val program = IO.fx {
         val ctx = !effect { kotlin.coroutines.coroutineContext }
         !effect { ctx shouldBe EmptyCoroutineContext }
         continueOn(newSingleThreadContext("test"))
@@ -286,7 +287,7 @@ class IOTest : UnitSpec() {
     }
 
     "fx can pass context state across not/bind" {
-      val program = fx {
+      val program = IO.fx {
         val ctx = !effect { kotlin.coroutines.coroutineContext }
         !effect { ctx shouldBe EmptyCoroutineContext }
         continueOn(CoroutineName("Simon"))
@@ -298,7 +299,7 @@ class IOTest : UnitSpec() {
     }
 
     "fx will respect thread switching across not/bind" {
-      val program = fx {
+      val program = IO.fx {
         continueOn(newSingleThreadContext("start"))
         val initialThread = !effect { Thread.currentThread().name }
         !(0..130).map { i -> suspend { i } }.sequence()
@@ -321,7 +322,7 @@ class IOTest : UnitSpec() {
       fun makePar(num: Long) =
         IO(newSingleThreadContext("$num")) {
           // Sleep according to my number
-          Thread.sleep(num * 40)
+          Thread.sleep(num * 100)
         }.map {
           // Add myself to order list
           order.add(num)
@@ -347,11 +348,9 @@ class IOTest : UnitSpec() {
         }
 
       fun makePar(num: Long) =
-        IO(newSingleThreadContext("$num")) {
-          // Sleep according to my number
-          Thread.sleep(num * 30)
-          num
-        }.order()
+        IO.concurrent()
+          .sleep((num * 100).milliseconds)
+          .map { num }.order()
 
       val result =
         newSingleThreadContext("all").parMapN(
@@ -366,7 +365,7 @@ class IOTest : UnitSpec() {
       fun makePar(num: Long) =
         IO(newSingleThreadContext("$num")) {
           // Sleep according to my number
-          Thread.sleep(num * 20)
+          Thread.sleep(num * 100)
           num
         }
 
@@ -446,9 +445,9 @@ class IOTest : UnitSpec() {
     }
 
     "IO.binding should for comprehend over IO" {
-      val result = fx {
+      val result = IO.fx {
         val (x) = IO.just(1)
-        val y = bind { IO { x + 1 } }
+        val y = !IO { x + 1 }
         y
       }.fix()
       result.unsafeRunSync() shouldBe 2

@@ -3,6 +3,7 @@ package arrow.effects
 import arrow.effects.rx2.ForSingleK
 import arrow.effects.rx2.SingleK
 import arrow.effects.rx2.SingleKOf
+import arrow.effects.rx2.extensions.fx
 import arrow.effects.rx2.k
 import arrow.effects.rx2.extensions.singlek.applicative.applicative
 import arrow.effects.rx2.extensions.singlek.applicativeError.applicativeError
@@ -12,7 +13,6 @@ import arrow.effects.rx2.extensions.singlek.functor.functor
 import arrow.effects.rx2.extensions.singlek.monad.flatMap
 import arrow.effects.rx2.extensions.singlek.monad.monad
 import arrow.effects.rx2.extensions.singlek.monadError.monadError
-import arrow.effects.rx2.extensions.singlek.monadThrow.bindingCatch
 import arrow.effects.rx2.extensions.singlek.timer.timer
 import arrow.effects.rx2.value
 import arrow.effects.typeclasses.ExitCase
@@ -72,7 +72,7 @@ class SingleKTests : UnitSpec() {
     )
 
     "Multi-thread Singles finish correctly" {
-      val value: Single<Long> = bindingCatch {
+      val value: Single<Long> = SingleK.fx {
         val a = Single.timer(2, TimeUnit.SECONDS).k().bind()
         a
       }.value()
@@ -86,7 +86,7 @@ class SingleKTests : UnitSpec() {
       val originalThread: Thread = Thread.currentThread()
       var threadRef: Thread? = null
 
-      val value: Single<Long> = bindingCatch {
+      val value: Single<Long> = SingleK.fx {
         val a = Single.timer(2, TimeUnit.SECONDS, Schedulers.newThread()).k().bind()
         threadRef = Thread.currentThread()
         val b = Single.just(a).observeOn(Schedulers.newThread()).k().bind()
@@ -103,7 +103,7 @@ class SingleKTests : UnitSpec() {
     }
 
     "Single dispose forces binding to cancel without completing too" {
-      val value: Single<Long> = bindingCatch {
+      val value: Single<Long> = SingleK.fx {
         val a = Single.timer(3, TimeUnit.SECONDS).k().bind()
         a
       }.value()
