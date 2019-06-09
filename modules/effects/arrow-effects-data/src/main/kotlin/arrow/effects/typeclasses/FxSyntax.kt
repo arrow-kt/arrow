@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.OptionOf
 import arrow.core.TryOf
+import arrow.core.extensions.id.applicative.just
 import arrow.core.identity
 import arrow.data.extensions.list.traverse.sequence
 import arrow.data.extensions.listk.traverse.traverse
@@ -26,9 +27,12 @@ interface FxSyntax<F> : Concurrent<F>, BindSyntax<F> {
   ): Kind<F, List<B>> =
     effects.fold(emptyList<Kind<F, Fiber<F, B>>>()) { acc, fa ->
       acc + startFiber(fa.map(f))
-    }.sequence(this@FxSyntax).bracket(
-      { fibers -> fibers.traverse(this@FxSyntax) { it.cancel() }.map { Unit } },
-      { fibers -> fibers.traverse(this@FxSyntax) { it.join() } }
+    }.sequence(this@FxSyntax).bracketCase(
+      use = { fibers -> fibers.traverse(this@FxSyntax) { it.join() } },
+      release = { fibers, exit -> when (exit) {
+        ExitCase.Canceled -> fibers.traverse(this@FxSyntax) { it.cancel() }.map { Unit }
+        else -> Unit.just()
+      }}
     ).map { it.fix() }
 
   fun <A> CoroutineContext.parSequence(effects: Iterable<Kind<F, A>>): Kind<F, List<A>> =
