@@ -336,7 +336,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
 
     "List.parTraverse should run effects in parallel" {
       fxTest {
-        fx {
+        IO.fx {
           val timeline = mutableListOf<String>()
           val tasks = (1..3).map {
             effect {
