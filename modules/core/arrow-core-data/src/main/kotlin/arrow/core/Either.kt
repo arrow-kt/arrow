@@ -190,10 +190,10 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
 
     fun <L, R> cond(test: Boolean, ifTrue: () -> R, ifFalse: () -> L): Either<L, R> = if (test) right(ifTrue()) else left(ifFalse())
 
-    fun <R> catch(f: () -> R): Either<Throwable, R> =
+    suspend fun <R> catch(f: suspend () -> R): Either<Throwable, R> =
       catch(::identity, f)
 
-    fun <L, R> catch(fe: (Throwable) -> L, f: () -> R): Either<L, R> =
+    suspend fun <L, R> catch(fe: (Throwable) -> L, f: suspend () -> R): Either<L, R> =
       try {
         f().right()
       } catch (t: Throwable) {
