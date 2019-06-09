@@ -17,13 +17,13 @@ sealed class Try<out A> : TryOf<A> {
   companion object {
 
     @Deprecated(
-      "Try promotes eager execution and works like Either, so it's better if you work with Either or a suspended type like IO",
+      "Try promotes eager execution of effects, so it's better if you work with suspend Either constructors or a an effect handler like IO",
       ReplaceWith("Either.just(a)")
     )
     fun <A> just(a: A): Try<A> = Success(a)
 
     @Deprecated(
-      "Try promotes eager execution and works like Either, so it's better if you work with Either or a suspended type like IO",
+      "Try promotes eager execution of effects, so it's better if you work with suspend Either constructors or a an effect handler like IO",
       ReplaceWith("Either.tailRecM(a, f)")
     )
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> TryOf<Either<A, B>>): Try<B> {
@@ -41,7 +41,7 @@ sealed class Try<out A> : TryOf<A> {
     }
 
     @Deprecated(
-      "Try promotes eager execution and works like Either, so it's better if you work with Either or a suspended type like IO",
+      "Try promotes eager execution of effects, so it's better if you work with suspend Either constructors or a an effect handler like IO",
       ReplaceWith("Either.catch(f)")
     )
     inline operator fun <A> invoke(f: () -> A): Try<A> =
@@ -56,7 +56,7 @@ sealed class Try<out A> : TryOf<A> {
       }
 
     @Deprecated(
-      "Try promotes eager execution and works like Either, so it's better if you work with Either or a suspended type like IO",
+      "Try promotes eager execution of effects, so it's better if you work with suspend Either constructors or a an effect handler like IO",
       ReplaceWith("Either.raiseError(e)")
     )
     fun raiseError(e: Throwable): Try<Nothing> = Failure(e)
