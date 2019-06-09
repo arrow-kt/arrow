@@ -349,7 +349,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
           !newSingleThreadContext("A").parTraverse(tasks, ::identity)
           timeline
         }
-      } shouldBe listOf("start 3", "start 2", "start 1", "end 1", "end 2", "end 3")
+      } shouldBe listOf("start 1", "start 2", "start 3", "end 1", "end 2", "end 3")
     }
 
     "FX supports polymorphism" {

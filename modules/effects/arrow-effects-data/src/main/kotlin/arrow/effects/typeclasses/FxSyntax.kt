@@ -5,11 +5,14 @@ import arrow.core.Either
 import arrow.core.OptionOf
 import arrow.core.TryOf
 import arrow.core.identity
-import arrow.data.extensions.list.traverse.sequence
+import arrow.data.ListK
 import arrow.data.extensions.listk.traverse.traverse
 import arrow.data.fix
+import arrow.data.k
+import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Monad
+import arrow.typeclasses.Traverse
 import arrow.typeclasses.suspended.BindSyntax
 import kotlin.coroutines.CoroutineContext
 
@@ -20,19 +23,27 @@ interface FxSyntax<F> : Concurrent<F>, BindSyntax<F> {
   val NonBlocking: CoroutineContext
     get() = dispatchers().default()
 
+  fun CoroutineContext.parApplicative() = object : Applicative<F> {
+      override fun <A> just(a: A): Kind<F, A> = this@FxSyntax.just(a)
+
+      override fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B> =
+        parMapN(this, ff) { a, f -> f(a) }
+  }
+
   fun <A, B> CoroutineContext.parTraverse(
     effects: Iterable<Kind<F, A>>,
     f: (A) -> B
   ): Kind<F, List<B>> =
-    effects.fold(emptyList<Kind<F, Fiber<F, B>>>()) { acc, fa ->
-      acc + startFiber(fa.map(f))
-    }.sequence(this@FxSyntax).bracketCase(
-      use = { fibers -> fibers.traverse(this@FxSyntax) { it.join() } },
-      release = { fibers, exit -> when (exit) {
-        ExitCase.Canceled -> fibers.traverse(this@FxSyntax) { it.cancel() }.map { Unit }
-        else -> Unit.just()
-      } }
-    ).map { it.fix() }
+    genericParTraverse(ListK.traverse(), effects.toList().k(), f).map { it.fix() }
+
+  // Simple POC of a generic parallel traverse
+  fun <A, B, G> CoroutineContext.genericParTraverse(
+    traverse: Traverse<G>,
+    effects: Kind<G, Kind<F, A>>,
+    f: (A) -> B
+  ): Kind<F, Kind<G, B>> = with(traverse) {
+    effects.traverse(parApplicative()) { it.map(f) }
+  }
 
   fun <A> CoroutineContext.parSequence(effects: Iterable<Kind<F, A>>): Kind<F, List<A>> =
     parTraverse(effects, ::identity)
