@@ -16,7 +16,13 @@ import arrow.mtl.extensions.option.traverseFilter.traverseFilter
 import arrow.syntax.collections.firstOption
 import arrow.test.UnitSpec
 import arrow.test.generators.option
-import arrow.test.laws.*
+import arrow.test.laws.FunctorFilterLaws
+import arrow.test.laws.HashLaws
+import arrow.test.laws.MonadFilterLaws
+import arrow.test.laws.MonoidLaws
+import arrow.test.laws.MonoidalLaws
+import arrow.test.laws.ShowLaws
+import arrow.test.laws.TraverseFilterLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
