@@ -177,9 +177,9 @@ tupled(Try { "3".toInt() }, Try { "5".toInt() }, Try { "nope".toInt() })
 Вычисление с использованием зависимых друг от друга значений, выполнение которого подразумевает возможность ошибки:
 
 ```kotlin:ank
-import arrow.core.extensions.`try`.monad.binding
+import arrow.core.extensions.fx
 
-binding {
+Try.fx {
   val a = Try { "3".toInt() }.bind()
   val b = Try { "4".toInt() }.bind()
   val c = Try { "5".toInt() }.bind()
@@ -188,7 +188,7 @@ binding {
 ```
 
 ```kotlin:ank
-binding {
+Try.fx {
   val a = Try { "none".toInt() }.bind()
   val b = Try { "4".toInt() }.bind()
   val c = Try { "5".toInt() }.bind()
@@ -199,9 +199,7 @@ binding {
 Вычисление с использованием зависимых друг от друга значений, которые автоматически возводятся в контекст `Try`:
 
 ```kotlin:ank
-import arrow.core.extensions.`try`.monadThrow.bindingCatch
-
-bindingCatch {
+Try.fx {
   val a = "none".toInt()
   val b = "4".toInt()
   val c = "5".toInt()

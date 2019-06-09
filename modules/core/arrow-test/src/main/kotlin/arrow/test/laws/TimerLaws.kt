@@ -20,6 +20,7 @@ object TimerLaws {
       operator fun <F> invoke(AS: Async<F>): Clock<F> = object : Clock<F> {
         override fun timeMillis(): Kind<F, Long> =
           AS.effect { System.currentTimeMillis() }
+
         override fun timeNano(): Kind<F, Long> =
           AS.effect { System.nanoTime() }
       }
@@ -37,11 +38,12 @@ object TimerLaws {
     C: Clock<F>,
     EQ: Eq<Kind<F, Boolean>>
   ) = forFew(25, Gen.intSmall()) {
-    val lhs = binding {
+    val length = 100L
+    val lhs = fx.async {
       val start = !C.timeNano()
-      !T.sleep(10.milliseconds)
+      !T.sleep(length.milliseconds)
       val end = !C.timeNano()
-      (end - start) >= 10L
+      (end - start) >= length
     }
 
     lhs.equalUnderTheLaw(just(true), EQ)

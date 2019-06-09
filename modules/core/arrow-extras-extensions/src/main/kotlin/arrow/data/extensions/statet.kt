@@ -14,6 +14,7 @@ import arrow.data.extensions.statet.applicative.applicative
 import arrow.data.extensions.statet.functor.functor
 import arrow.data.extensions.statet.monad.monad
 import arrow.data.StateApi
+import arrow.data.StatePartialOf
 import arrow.data.StateT
 import arrow.data.StateTOf
 import arrow.data.StateTPartialOf
@@ -28,10 +29,10 @@ import arrow.typeclasses.Divide
 import arrow.typeclasses.Divisible
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.SemigroupK
-import arrow.typeclasses.suspended.monad.commutative.safe.Fx
 import arrow.undocumented
 
 @extension
@@ -218,20 +219,8 @@ fun <S> StateApi.functor(): Functor<StateTPartialOf<ForId, S>> = StateT.functor(
  */
 fun <S> StateApi.monad(): Monad<StateTPartialOf<ForId, S>> = StateT.monad(Id.monad())
 
-@extension
-@undocumented
-interface StateTFx<F, S> : Fx<StateTPartialOf<F, S>> {
+fun <F, S, A> StateT.Companion.fx(M: Monad<F>, c: suspend MonadSyntax<StateTPartialOf<F, S>>.() -> A): StateT<F, S, A> =
+  StateT.monad<F, S>(M).fx.monad(c).fix()
 
-  fun M(): Monad<F>
-
-  override fun monad(): Monad<StateTPartialOf<F, S>> =
-    StateT.monad(M())
-}
-
-@extension
-@undocumented
-interface StateFx<S> : StateTFx<ForId, S> {
-
-  override fun M(): Monad<ForId> =
-    Id.monad()
-}
+fun <S, A> StateApi.fx(c: suspend MonadSyntax<StatePartialOf<S>>.() -> A): State<S, A> =
+  StateApi.monad<S>().fx.monad(c).fix()

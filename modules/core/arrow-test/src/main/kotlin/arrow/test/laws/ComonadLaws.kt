@@ -5,7 +5,6 @@ import arrow.data.Cokleisli
 import arrow.test.generators.functionAToB
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Eq
-import arrow.typeclasses.cobinding
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
@@ -64,7 +63,7 @@ object ComonadLaws {
 
   fun <F> Comonad<F>.cobinding(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.int().map(cf)) { fa: Kind<F, Int> ->
-      cobinding {
+      fx.comonad {
         val x = fa.extract()
         val y = extract { fa.map { it + x } }
         fa.map { x + y }

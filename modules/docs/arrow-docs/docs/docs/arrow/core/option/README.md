@@ -198,9 +198,9 @@ tupled(Some(1), Some("Hello"), Some(20.0))
 Computing over dependent values ignoring absence
 
 ```kotlin:ank
-import arrow.core.extensions.option.monad.binding
+import arrow.core.extensions.fx
 
-binding {
+Option.fx {
   val (a) = Some(1)
   val (b) = Some(1 + a)
   val (c) = Some(1 + b)
@@ -209,7 +209,7 @@ binding {
 ```
 
 ```kotlin:ank
-binding {
+Option.fx {
   val (x) = none<Int>()
   val (y) = Some(1 + x)
   val (z) = Some(1 + y)

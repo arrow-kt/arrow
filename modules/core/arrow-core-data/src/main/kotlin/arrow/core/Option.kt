@@ -90,6 +90,18 @@ sealed class Option<out A> : OptionOf<A> {
   }
 
   /**
+   * Returns $none if the result of applying $f to this $option's value is null.
+   * Otherwise returns the result.
+   *
+   * @note This is similar to `.flatMap { Option.fromNullable(null)) }`
+   * and primarily for convenience.
+   *
+   * @param f the function to apply.
+   * */
+  fun <B> mapNotNull(f: (A) -> B?): Option<B> =
+    flatMap { a -> fromNullable(f(a)) }
+
+  /**
    * Returns the result of applying $f to this $option's value if
    * this $option is nonempty.
    * Returns $none if this $option is empty.

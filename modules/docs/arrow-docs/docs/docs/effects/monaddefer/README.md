@@ -65,7 +65,7 @@ Useful in cases like [Monad Comprehension]({{ '/docs/patterns/monad_comprehensio
 ```kotlin
 val SC = IO.monadDefer()
 
-val result = SC.binding {
+val result = SC.fx.monad {
   println("Print: now")
   val (result) = just(1)
   result + 1
@@ -73,7 +73,7 @@ val result = SC.binding {
 
 //Print: now
 
-val lazyResult = SC.binding {
+val lazyResult = SC.fx.monad {
   SC.lazy().bind()
   println("Print: lazy")
   val (result) = eagerIO()

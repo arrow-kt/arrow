@@ -3,6 +3,7 @@ package arrow.effects
 import arrow.effects.rx2.ForMaybeK
 import arrow.effects.rx2.MaybeK
 import arrow.effects.rx2.MaybeKOf
+import arrow.effects.rx2.extensions.fx
 import arrow.effects.rx2.k
 import arrow.effects.rx2.extensions.maybek.applicative.applicative
 import arrow.effects.rx2.extensions.maybek.applicativeError.applicativeError
@@ -14,7 +15,6 @@ import arrow.effects.rx2.extensions.maybek.monad.flatMap
 import arrow.effects.rx2.extensions.maybek.monad.monad
 import arrow.effects.rx2.extensions.maybek.monadDefer.monadDefer
 import arrow.effects.rx2.extensions.maybek.monadError.monadError
-import arrow.effects.rx2.extensions.maybek.monadThrow.bindingCatch
 import arrow.effects.rx2.extensions.maybek.timer.timer
 import arrow.effects.rx2.value
 import arrow.effects.typeclasses.ExitCase
@@ -78,7 +78,7 @@ class MaybeKTests : UnitSpec() {
     )
 
     "Multi-thread Maybes finish correctly" {
-      val value: Maybe<Long> = bindingCatch {
+      val value: Maybe<Long> = MaybeK.fx {
         val a = Maybe.timer(2, TimeUnit.SECONDS).k().bind()
         a
       }.value()
@@ -92,7 +92,7 @@ class MaybeKTests : UnitSpec() {
       val originalThread: Thread = Thread.currentThread()
       var threadRef: Thread? = null
 
-      val value: Maybe<Long> = bindingCatch {
+      val value: Maybe<Long> = MaybeK.fx {
         val a = Maybe.timer(2, TimeUnit.SECONDS, Schedulers.newThread()).k().bind()
         threadRef = Thread.currentThread()
         val b = Maybe.just(a).observeOn(Schedulers.newThread()).k().bind()
@@ -109,7 +109,7 @@ class MaybeKTests : UnitSpec() {
     }
 
     "Maybe dispose forces binding to cancel without completing too" {
-      val value: Maybe<Long> = bindingCatch {
+      val value: Maybe<Long> = MaybeK.fx {
         val a = Maybe.timer(3, TimeUnit.SECONDS).k().bind()
         a
       }.value()

@@ -5,8 +5,11 @@ import arrow.effects.Timer
 import arrow.effects.reactor.ForMonoK
 import arrow.effects.reactor.MonoK
 import arrow.effects.reactor.MonoKOf
+import arrow.effects.reactor.extensions.fluxk.async.async
+import arrow.effects.reactor.extensions.monok.async.async
 import arrow.effects.reactor.fix
 import arrow.effects.typeclasses.Async
+import arrow.effects.typeclasses.AsyncSyntax
 import arrow.effects.typeclasses.Bracket
 import arrow.effects.typeclasses.ConcurrentEffect
 import arrow.effects.typeclasses.Disposable
@@ -125,3 +128,7 @@ interface MonoKTimer : Timer<ForMonoK> {
     MonoK(Mono.delay(java.time.Duration.ofNanos(duration.nanoseconds))
       .map { Unit })
 }
+
+// TODO FluxK does not yet have a Concurrent instance
+fun <A> MonoK.Companion.fx(c: suspend AsyncSyntax<ForMonoK>.() -> A): MonoK<A> =
+  MonoK.async().fx.async(c).fix()

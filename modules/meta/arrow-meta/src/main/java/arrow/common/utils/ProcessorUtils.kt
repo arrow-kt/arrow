@@ -74,9 +74,8 @@ interface ProcessorUtils : KotlinMetadataUtils {
       ?: knownError("Arrow's annotation can't be used on $classElement")
   }
 
-  fun ClassOrPackageDataWrapper.getFunction(methodElement: ExecutableElement) =
+  fun ClassOrPackageDataWrapper.getFunction(methodElement: ExecutableElement): ProtoBuf.Function? =
     getFunctionOrNull(methodElement, nameResolver, functionList)
-      ?: knownError("Can't find annotated method ${methodElement.jvmMethodSignature}")
 
   private fun kindedRex() = "(?i)Kind<(.)>".toRegex()
 

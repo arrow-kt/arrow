@@ -3,6 +3,8 @@ package arrow.free
 import arrow.Kind
 import arrow.core.Continuation
 import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadFx
+import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.stateStack
 import arrow.typeclasses.suspended.BindSyntax
 import kotlin.coroutines.CoroutineContext
@@ -13,8 +15,14 @@ import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.startCoroutine
 
 @RestrictsSuspension
+interface StackSafeSyntax<F> : MonadSyntax<F>, FreeSyntax<F>
+
+interface FreeSyntax<F> {
+  suspend fun <B> Free<F, B>.bind(): B
+}
+
 open class StackSafeMonadContinuation<F, A>(M: Monad<F>, override val context: CoroutineContext = EmptyCoroutineContext) :
-  Continuation<Free<F, A>>, Monad<F> by M, BindSyntax<F> {
+  Continuation<Free<F, A>>, Monad<F> by M, BindSyntax<F>, StackSafeSyntax<F> {
 
   override fun resume(value: Free<F, A>) {
     returnedMonad = value
@@ -28,19 +36,29 @@ open class StackSafeMonadContinuation<F, A>(M: Monad<F>, override val context: C
 
   internal fun returnedMonad(): Free<F, A> = returnedMonad
 
-  override suspend fun <B> Kind<F, B>.bind(): B = bind { Free.liftF(this) }
+  override suspend fun <B> Kind<F, B>.bind(): B = Free.liftF(this).bind()
 
-  suspend fun <B> Free<F, B>.bind(): B = bind { this }
-
-  suspend fun <B> bind(m: () -> Free<F, B>): B = suspendCoroutineUninterceptedOrReturn { c ->
+  override suspend fun <B> Free<F, B>.bind(): B = suspendCoroutineUninterceptedOrReturn { c ->
     val labelHere = c.stateStack // save the whole coroutine stack labels
-    returnedMonad = m().flatMap { z ->
+    returnedMonad = flatMap { z ->
       c.stateStack = labelHere
       c.resumeWith(Result.success(z))
       returnedMonad
     }
     COROUTINE_SUSPENDED
   }
+}
+
+@Deprecated(
+  "`bindingStackSafe` is getting renamed to `fx` for consistency with the Arrow Fx system. Use the Fx extensions for comprehensions",
+  ReplaceWith("fx.stackSafe(c)", "import arrow.free.stackSafe")
+)
+fun <F, B> Monad<F>.bindingStackSafe(c: suspend StackSafeMonadContinuation<F, *>.() -> B):
+  Free<F, B> {
+  val continuation = StackSafeMonadContinuation<F, B>(this)
+  val wrapReturn: suspend StackSafeMonadContinuation<F, *>.() -> Free<F, B> = { Free.just(c()) }
+  wrapReturn.startCoroutine(continuation, continuation)
+  return continuation.returnedMonad()
 }
 
 /**
@@ -51,9 +69,8 @@ open class StackSafeMonadContinuation<F, A>(M: Monad<F>, override val context: C
  * This combinator ultimately returns computations lifting to [Free] to automatically for comprehend in a stack-safe way
  * over any stack-unsafe monads.
  */
-fun <F, B> Monad<F>.bindingStackSafe(c: suspend StackSafeMonadContinuation<F, *>.() -> B):
-  Free<F, B> {
-  val continuation = StackSafeMonadContinuation<F, B>(this)
+fun <F, B> MonadFx<F>.stackSafe(c: suspend StackSafeSyntax<F>.() -> B): Free<F, B> {
+  val continuation = StackSafeMonadContinuation<F, B>(M)
   val wrapReturn: suspend StackSafeMonadContinuation<F, *>.() -> Free<F, B> = { Free.just(c()) }
   wrapReturn.startCoroutine(continuation, continuation)
   return continuation.returnedMonad()

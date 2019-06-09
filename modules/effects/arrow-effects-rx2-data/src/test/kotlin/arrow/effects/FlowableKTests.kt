@@ -11,9 +11,9 @@ import arrow.effects.rx2.extensions.asyncMissing
 import arrow.effects.rx2.extensions.flowablek.async.async
 import arrow.effects.rx2.extensions.flowablek.functor.functor
 import arrow.effects.rx2.extensions.flowablek.monad.flatMap
-import arrow.effects.rx2.extensions.flowablek.monadThrow.bindingCatch
 import arrow.effects.rx2.extensions.flowablek.timer.timer
 import arrow.effects.rx2.extensions.flowablek.traverse.traverse
+import arrow.effects.rx2.extensions.fx
 import arrow.effects.rx2.value
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
@@ -85,7 +85,7 @@ class FlowableKTests : UnitSpec() {
     testLaws(TraverseLaws.laws(FlowableK.traverse(), FlowableK.functor(), { FlowableK.just(it) }, EQ()))
 
     "Multi-thread Flowables finish correctly" {
-      val value: Flowable<Long> = bindingCatch {
+      val value: Flowable<Long> = FlowableK.fx {
         val a = Flowable.timer(2, TimeUnit.SECONDS).k().bind()
         a
       }.value()
@@ -97,7 +97,7 @@ class FlowableKTests : UnitSpec() {
     "Multi-thread Observables should run on their required threads" {
       val originalThread: Thread = Thread.currentThread()
       var threadRef: Thread? = null
-      val value: Flowable<Long> = bindingCatch {
+      val value: Flowable<Long> = FlowableK.fx {
         val a = Flowable.timer(2, TimeUnit.SECONDS, Schedulers.newThread()).k().bind()
         threadRef = Thread.currentThread()
         val b = Flowable.just(a).observeOn(Schedulers.newThread()).k().bind()
@@ -113,7 +113,7 @@ class FlowableKTests : UnitSpec() {
     }
 
     "Flowable cancellation forces binding to cancel without completing too" {
-      val value: Flowable<Long> = bindingCatch {
+      val value: Flowable<Long> = FlowableK.fx {
         val a = Flowable.timer(3, TimeUnit.SECONDS).k().bind()
         a
       }.value()

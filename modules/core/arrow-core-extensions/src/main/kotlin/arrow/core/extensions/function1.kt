@@ -1,18 +1,18 @@
 package arrow.core.extensions
 
 import arrow.Kind
+import arrow.core.extensions.function1.monad.monad
 import arrow.core.Either
-import arrow.core.ForFunction1
 import arrow.core.Function1
+import arrow.core.ForFunction1
 import arrow.core.Function1Of
 import arrow.core.Function1PartialOf
 import arrow.core.Tuple2
 import arrow.core.compose
-import arrow.core.k
-import arrow.core.extensions.function1.monad.monad
+import arrow.extension
 import arrow.core.fix
 import arrow.core.invoke
-import arrow.extension
+import arrow.core.k
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Category
@@ -23,12 +23,12 @@ import arrow.typeclasses.Divide
 import arrow.typeclasses.Divisible
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Profunctor
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.conest
 import arrow.typeclasses.counnest
-import arrow.typeclasses.suspended.monad.Fx
 
 @extension
 interface Function1Semigroup<A, B> : Semigroup<Function1<A, B>> {
@@ -156,10 +156,8 @@ interface Function1Monad<I> : Monad<Function1PartialOf<I>>, Function1Applicative
     Function1.tailRecM(a, f)
 }
 
-@extension
-interface Function1Fx<A> : Fx<Function1PartialOf<A>> {
-  override fun monad(): Monad<Function1PartialOf<A>> = Function1.monad()
-}
+fun <A, B> Function1.Companion.fx(c: suspend MonadSyntax<Function1PartialOf<A>>.() -> B): Function1<A, B> =
+  Function1.monad<A>().fx.monad(c).fix()
 
 @extension
 interface Function1Category : Category<ForFunction1> {
