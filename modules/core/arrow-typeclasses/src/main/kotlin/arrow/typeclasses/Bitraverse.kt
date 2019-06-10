@@ -8,14 +8,12 @@ import arrow.core.value
 import arrow.typeclasses.internal.IdBimonad
 
 /**
- * Bitraverse TODO Complete descrition
+ * Type class which implements a two independent traverse TODO Improve
  */
-interface Bitraverse<F> : Bifunctor<F>, Bifoldable<F> {
+interface   Bitraverse<F> : Bifunctor<F>, Bifoldable<F> {
 
   /**
-   * TODO FIX BITRAVERSE COMMENT
-   * Given a function which returns a G effect, thread this effect through the running of this function on all the
-   * values in F, returning an F<B> in a G context.
+   * Use the functions given as parameter tor traverse the structure //todo compplete
    */
   fun <G, A, B, C, D> Kind2<F, A, B>.bitraverse(AP: Applicative<G>, f: (A) -> Kind<G, C>, g: (B) -> Kind<G, D>):
     Kind<G, Kind2<F, C, D>>
