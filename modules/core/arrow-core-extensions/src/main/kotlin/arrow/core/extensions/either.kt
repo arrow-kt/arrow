@@ -3,6 +3,7 @@
 package arrow.core.extensions
 
 import arrow.Kind
+import arrow.Kind2
 import arrow.core.Either
 import arrow.core.EitherOf
 import arrow.core.EitherPartialOf
@@ -13,26 +14,11 @@ import arrow.core.Right
 import arrow.core.extensions.either.monad.monad
 import arrow.core.fix
 import arrow.extension
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.ApplicativeError
-import arrow.typeclasses.Apply
-import arrow.typeclasses.Bifunctor
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Foldable
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Hash
-import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadSyntax
-import arrow.typeclasses.MonadError
-import arrow.typeclasses.MonadFx
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Semigroup
-import arrow.typeclasses.SemigroupK
-import arrow.typeclasses.Show
-import arrow.typeclasses.Traverse
+import arrow.typeclasses.*
 import arrow.core.ap as eitherAp
 import arrow.core.combineK as eitherCombineK
 import arrow.core.extensions.traverse as eitherTraverse
+import arrow.core.extensions.bitraverse as eitherBitraverse
 import arrow.core.flatMap as eitherFlatMap
 import arrow.core.handleErrorWith as eitherHandleErrorWith
 
@@ -152,11 +138,20 @@ interface EitherFoldable<L> : Foldable<EitherPartialOf<L>> {
 fun <G, A, B, C> EitherOf<A, B>.traverse(GA: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, Either<A, C>> =
   fix().fold({ GA.just(Either.Left(it)) }, { GA.run { f(it).map { Either.Right(it) } } })
 
+fun <G, A, B, C, D> EitherOf<A, B>.bitraverse(AP: Applicative<G>, f: (A) -> Kind<G, C>, g: (B) -> Kind<G, D>):
+  Kind<G, EitherOf<C, D>> = fix().fold({ AP.run { f(it).map { Either.Left(it) } } }, { AP.run { g(it).map { Either.Right(it) } } })
+
 @extension
 interface EitherTraverse<L> : Traverse<EitherPartialOf<L>>, EitherFoldable<L> {
 
   override fun <G, A, B> EitherOf<L, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, EitherOf<L, B>> =
     fix().eitherTraverse(AP, f)
+}
+
+@extension
+interface EitherBitraverse<L> : Bitraverse<ForEither>, EitherFoldable<L> {
+  override fun <G, A, B, C, D> EitherOf<A, B>.bitraverse(AP: Applicative<G>, f: (A) -> Kind<G, C>, g: (B) -> Kind<G, D>): Kind<G, EitherOf<C, D>> =
+    fix().eitherBitraverse(AP, f, g)
 }
 
 @extension
