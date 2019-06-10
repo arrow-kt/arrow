@@ -3,39 +3,13 @@
 package arrow.core.extensions
 
 import arrow.Kind
-import arrow.core.Either
+import arrow.core.*
 import arrow.core.Either.Left
 import arrow.core.Either.Right
-import arrow.core.Eval
-import arrow.core.ForTuple2
-import arrow.core.Tuple10
-import arrow.core.Tuple2
-import arrow.core.Tuple2Of
-import arrow.core.Tuple2PartialOf
-import arrow.core.Tuple3
-import arrow.core.Tuple4
-import arrow.core.Tuple5
-import arrow.core.Tuple6
-import arrow.core.Tuple7
-import arrow.core.Tuple8
-import arrow.core.Tuple9
-import arrow.core.fix
-import arrow.core.identity
-import arrow.core.toT
+import arrow.core.extensions.tuple2.foldable.fold
 import arrow.extension
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Apply
-import arrow.typeclasses.Bifunctor
-import arrow.typeclasses.Comonad
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Foldable
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Hash
-import arrow.typeclasses.Monad
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Semigroup
-import arrow.typeclasses.Show
-import arrow.typeclasses.Traverse
+import arrow.typeclasses.*
+import arrow.core.extensions.bitraverse as tuple2Bitraverse
 import arrow.core.extensions.traverse as tuple2Traverse
 
 // TODO this should be user driven allowing consumers to generate the tuple arities on demand to avoid cluttering arrow dependents with unused code
@@ -124,6 +98,10 @@ fun <F, G, A, B> Tuple2Of<F, A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G, B
   fix().let { f(it.b).map(it.a::toT) }
 }
 
+fun <G, A, B, C, D> Tuple2Of<A, B>.bitraverse(GA: Applicative<G>, f: (A) -> Kind<G, C>, g: (B) -> Kind<G, D>): Kind<G, Tuple2<C, D>> = GA.run {
+  fix().bimap(f,g)
+}
+
 fun <F, G, A> Tuple2Of<F, Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, Tuple2<F, A>> =
   fix().tuple2Traverse(GA, ::identity)
 
@@ -132,6 +110,12 @@ interface Tuple2Traverse<F> : Traverse<Tuple2PartialOf<F>>, Tuple2Foldable<F> {
 
   override fun <G, A, B> Tuple2Of<F, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Tuple2<F, B>> =
     tuple2Traverse(AP, f)
+}
+
+@extension
+interface Tuple2Bitraverse<F> : Bitraverse<ForTuple2>, Tuple2Foldable<F> {
+  override fun <G, A, B, C, D> Tuple2Of<A, B>.bitraverse(AP: Applicative<G>, f: (A) -> Kind<G, C>, g: (B) -> Kind<G, D>): Kind<G, Tuple2Of<C, D>> =
+    tuple2Bitraverse(AP, f, g)
 }
 
 @extension
