@@ -12,6 +12,45 @@ $ ./gradlew :app:build
 
 # Resources
 
+## Extensions delegation order
+
+Based on our findings this is the current extension invocation order:
+```kotlin
+    StorageComponentContainerContributor.registerExtension(project, TestStorageComponentContainerContributor())
+    ClassBuilderInterceptorExtension.registerExtension(project, MetaClassBuilderInterceptorExtension(messageCollector))
+    PackageFragmentProviderExtension.registerExtension(project, MetaPackageFragmentProviderExtension())
+    AnalysisHandlerExtension.registerExtension(project, MetaAnalysisHandlerExtension())
+    ExpressionCodegenExtension.registerExtension(project, MetaExpressionCodegenExtension())
+    SyntheticResolveExtension.registerExtension(project, MetaSyntheticResolveExtension())
+    DeclarationAttributeAltererExtension.registerExtension(project, MetaDeclarationAttributeAltererExtension())
+    PreprocessedVirtualFileFactoryExtension.registerExtension(project, MetaPreprocessedVirtualFileFactoryExtension())
+    JsSyntheticTranslateExtension.registerExtension(project, MetaJsSyntheticTranslateExtension())
+    CompilerConfigurationExtension.registerExtension(project, MetaCompilerConfigurationExtension())
+    IrGenerationExtension.registerExtension(project, MetaIrGenerationExtension())
+```
+
+
+```
+   * ComponentRegistrar.registerProjectComponents
+   * CompilerConfigurationExtension.updateConfiguration
+   * PackageFragmentProviderExtension.getPackageFragmentProvider
+   * AnalysisHandlerExtension.doAnalysis
+   * SyntheticResolveExtension.generateSyntheticClasses
+   * SyntheticResolveExtension.addSyntheticSupertypes
+   * SyntheticResolveExtension.getSyntheticCompanionObjectNameIfNeeded
+   * DeclarationAttributeAltererExtension.refineDeclarationModality
+   * SyntheticResolveExtension.generateSyntheticMethods
+   * SyntheticResolveExtension.getSyntheticCompanionObjectNameIfNeeded
+   * SyntheticResolveExtension.getSyntheticFunctionNames
+   * SyntheticResolveExtension.getSyntheticNestedClassNames
+   * StorageComponentContainerContributor.check
+   * ClassBuilderInterceptorExtension.newClassBuilder
+   * ClassBuilderInterceptorExtension.DelegatingClassBuilder.newMethod
+   * ExpressionCodegenExtension.applyFunction
+   * ExpressionCodegenExtension.applyProperty
+   * ExpressionCodegenExtension.generateClassSyntheticParts
+```
+
 ## Projects
  - Top to bottom from most simple to most complex
 
