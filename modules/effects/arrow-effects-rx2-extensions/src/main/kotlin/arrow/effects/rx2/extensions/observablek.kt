@@ -46,7 +46,7 @@ import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.ReplaySubject
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
-import io.reactivex.disposables.Disposable as rxDisposable
+import io.reactivex.disposables.Disposable as RxDisposable
 
 @extension
 interface ObservableKFunctor : Functor<ForObservableK> {
@@ -178,7 +178,7 @@ interface ObservableKConcurrent : Concurrent<ForObservableK>, ObservableKAsync {
       Observable.create<Fiber<ForObservableK, A>> { emitter ->
         if (!emitter.isDisposed) {
           val s: ReplaySubject<A> = ReplaySubject.create()
-          val conn: rxDisposable = kind.value().subscribeOn(scheduler).subscribe(s::onNext, s::onError)
+          val conn: RxDisposable = kind.value().subscribeOn(scheduler).subscribe(s::onNext, s::onError)
           emitter.onNext(Fiber(s.k(), ObservableK {
             conn.dispose()
           }))

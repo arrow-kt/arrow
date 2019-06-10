@@ -4,9 +4,9 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Left
-import arrow.core.NonFatal
 import arrow.core.Right
 import arrow.core.identity
+import arrow.core.nonFatalOrThrow
 import arrow.effects.OnCancel
 import arrow.effects.internal.Platform
 import arrow.effects.rx2.CoroutineContextRx2Scheduler.asScheduler
@@ -79,29 +79,28 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
    *  ```
    */
   fun <B> bracketCase(use: (A) -> FlowableKOf<B>, release: (A, ExitCase<Throwable>) -> FlowableKOf<Unit>, mode: BackpressureStrategy = BackpressureStrategy.BUFFER): FlowableK<B> =
-    FlowableK(Flowable.create<B>({ emitter ->
-      flowable.subscribe({ a ->
-        if (emitter.isCancelled) release(a, ExitCase.Canceled).fix().flowable.subscribe({}, emitter::onError)
-        else try {
-          emitter.setDisposable(use(a).fix()
-            .flatMap { b -> release(a, ExitCase.Completed).fix().map { b } }
-            .handleErrorWith { e -> release(a, ExitCase.Error(e)).fix().flatMap { FlowableK.raiseError<B>(e) } }
-            .flowable
-            .doOnCancel { release(a, ExitCase.Canceled).fix().flowable.subscribe({}, emitter::onError) }
-            .subscribe(emitter::onNext, emitter::onError))
-        } catch (e: Throwable) {
-          if (NonFatal(e)) {
-            release(a, ExitCase.Error(e)).fix().flowable.subscribe({
-              emitter.onError(e)
-            }, { e2 ->
-              emitter.onError(Platform.composeErrors(e, e2))
-            })
-          } else {
-            throw e
-          }
-        }
-      }, emitter::onError, emitter::onComplete)
-    }, mode))
+    Flowable.create<B>({ emitter ->
+      val dispose =
+        handleErrorWith { e -> Flowable.fromCallable { emitter.onError(e) }.flatMap { Flowable.error<A>(e) }.k() }
+          .value()
+          .concatMap { a ->
+            if (emitter.isCancelled) {
+              release(a, ExitCase.Canceled).value().subscribe({}, emitter::onError)
+              Flowable.never<B>()
+            } else {
+              Flowable.defer { use(a).value() }
+                .doOnError { e ->
+                  val error = e.nonFatalOrThrow()
+                  Flowable.defer { release(a, ExitCase.Error(error)).value() }.subscribe({ emitter.onError(error) }, { e2 -> emitter.onError(Platform.composeErrors(error, e2)) })
+                }.doOnComplete {
+                  Flowable.defer { release(a, ExitCase.Completed).value() }.subscribe({ emitter.onComplete() }, emitter::onError)
+                }.doOnCancel {
+                  Flowable.defer { release(a, ExitCase.Canceled).value() }.subscribe({}, {})
+                }
+            }
+          }.subscribe(emitter::onNext, {}, {})
+      emitter.setCancellable { dispose.dispose() }
+    }, mode).k()
 
   fun <B> concatMap(f: (A) -> FlowableKOf<B>): FlowableK<B> =
     flowable.concatMap { f(it).value() }.k()
@@ -214,9 +213,8 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
         // On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
         // on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
         conn.push(FlowableK { if (!emitter.isCancelled) emitter.onError(OnCancel.CancellationException) })
-        emitter.setCancellable { conn.cancel().value().subscribe() }
 
-        fa(conn) { either: Either<Throwable, A> ->
+        val dispose = fa(conn) { either: Either<Throwable, A> ->
           either.fold({
             emitter.onError(it)
           }, {
@@ -224,6 +222,11 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
             emitter.onComplete()
           })
         }.fix().flowable.subscribe({}, emitter::onError)
+
+        emitter.setCancellable {
+          dispose.dispose()
+          conn.cancel().value().subscribe({}, {})
+        }
       }, mode).k()
 
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> FlowableKOf<Either<A, B>>): FlowableK<B> {

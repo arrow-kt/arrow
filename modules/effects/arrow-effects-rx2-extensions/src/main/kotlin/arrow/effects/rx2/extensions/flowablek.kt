@@ -3,6 +3,9 @@ package arrow.effects.rx2.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.effects.CancelToken
+import arrow.effects.RacePair
+import arrow.effects.RaceTriple
 import arrow.effects.rx2.FlowableK
 import arrow.effects.rx2.FlowableKOf
 import arrow.effects.rx2.ForFlowableK
@@ -23,8 +26,10 @@ import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
 import arrow.effects.typeclasses.ProcF
 import arrow.effects.Timer
-import arrow.effects.rx2.extensions.observablek.async.async
 import arrow.effects.typeclasses.AsyncSyntax
+import arrow.effects.typeclasses.Concurrent
+import arrow.effects.typeclasses.ConnectedProcF
+import arrow.effects.typeclasses.Fiber
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
@@ -38,6 +43,13 @@ import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
+import arrow.effects.rx2.CoroutineContextRx2Scheduler.asScheduler
+import arrow.effects.rx2.k
+import arrow.effects.rx2.value
+import arrow.effects.typeclasses.Dispatchers
+import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.ReplaySubject
+import io.reactivex.disposables.Disposable as RxDisposable
 
 @extension
 interface FlowableKFunctor : Functor<ForFlowableK> {
@@ -63,7 +75,7 @@ interface FlowableKMonad : Monad<ForFlowableK> {
     fix().ap(ff)
 
   override fun <A, B> FlowableKOf<A>.flatMap(f: (A) -> FlowableKOf<B>): FlowableK<B> =
-    fix().flatMap(f)
+    fix().concatMap(f)
 
   override fun <A, B> FlowableKOf<A>.map(f: (A) -> B): FlowableK<B> =
     fix().map(f)
@@ -158,6 +170,83 @@ interface FlowableKEffect :
   FlowableKAsync {
   override fun <A> FlowableKOf<A>.runAsync(cb: (Either<Throwable, A>) -> FlowableKOf<Unit>): FlowableK<Unit> =
     fix().runAsync(cb)
+}
+
+interface FlowableKConcurrent : Concurrent<ForFlowableK>, FlowableKAsync {
+  override fun <A> async(fa: Proc<A>): FlowableK<A> =
+    FlowableK.async({ _, cb -> fa(cb) }, BS())
+
+  override fun <A> asyncF(k: ProcF<ForFlowableK, A>): FlowableK<A> =
+    FlowableK.asyncF({ _, cb -> k(cb) }, BS())
+
+  override fun <A> asyncF(fa: ConnectedProcF<ForFlowableK, A>): FlowableK<A> =
+    FlowableK.asyncF(fa)
+
+  override fun <A> CoroutineContext.startFiber(kind: Kind<ForFlowableK, A>): Kind<ForFlowableK, Fiber<ForFlowableK, A>> =
+    asScheduler().let { scheduler ->
+      Flowable.create<Fiber<ForFlowableK, A>>({ emitter ->
+        if (!emitter.isCancelled) {
+          val s: ReplaySubject<A> = ReplaySubject.create<A>()
+          val conn: RxDisposable = kind.value().subscribeOn(scheduler).subscribe(s::onNext, s::onError)
+          emitter.onNext(Fiber(s.toFlowable(BS()).k(), FlowableK {
+            conn.dispose()
+          }))
+        }
+      }, BS()).k()
+    }
+
+  override fun <A> cancelableF(k: ((Either<Throwable, A>) -> Unit) -> Kind<ForFlowableK, CancelToken<ForFlowableK>>): Kind<ForFlowableK, A> =
+    FlowableK.asyncF({ conn, cb ->
+      k(cb).map { conn.push(it) }
+    }, BS())
+
+  override fun <A, B> CoroutineContext.racePair(fa: Kind<ForFlowableK, A>, fb: Kind<ForFlowableK, B>): Kind<ForFlowableK, RacePair<ForFlowableK, A, B>> =
+    asScheduler().let { scheduler ->
+      Flowable.create<RacePair<ForFlowableK, A, B>>({ emitter ->
+        val sa = ReplaySubject.create<A>()
+        val sb = ReplaySubject.create<B>()
+        val dda = fa.value().subscribe(sa::onNext, sa::onError)
+        val ddb = fb.value().subscribe(sb::onNext, sb::onError)
+        emitter.setCancellable { dda.dispose(); ddb.dispose() }
+        val ffa = Fiber(sa.toFlowable(BS()).k(), FlowableK { dda.dispose() })
+        val ffb = Fiber(sb.toFlowable(BS()).k(), FlowableK { ddb.dispose() })
+        sa.subscribe({
+          emitter.onNext(RacePair.First(it, ffb))
+        }, emitter::onError, emitter::onComplete)
+        sb.subscribe({
+          emitter.onNext(RacePair.Second(ffa, it))
+        }, emitter::onError, emitter::onComplete)
+      }, BS()).subscribeOn(scheduler).observeOn(Schedulers.trampoline()).k()
+    }
+
+  override fun <A, B, C> CoroutineContext.raceTriple(fa: Kind<ForFlowableK, A>, fb: Kind<ForFlowableK, B>, fc: Kind<ForFlowableK, C>): Kind<ForFlowableK, RaceTriple<ForFlowableK, A, B, C>> =
+    asScheduler().let { scheduler ->
+      Flowable.create<RaceTriple<ForFlowableK, A, B, C>>({ emitter ->
+        val sa = ReplaySubject.create<A>()
+        val sb = ReplaySubject.create<B>()
+        val sc = ReplaySubject.create<C>()
+        val dda = fa.value().subscribe(sa::onNext, sa::onError, sa::onComplete)
+        val ddb = fb.value().subscribe(sb::onNext, sb::onError, sb::onComplete)
+        val ddc = fc.value().subscribe(sc::onNext, sc::onError, sc::onComplete)
+        emitter.setCancellable { dda.dispose(); ddb.dispose(); ddc.dispose() }
+        val ffa = Fiber(sa.toFlowable(BS()).k(), FlowableK { dda.dispose() })
+        val ffb = Fiber(sb.toFlowable(BS()).k(), FlowableK { ddb.dispose() })
+        val ffc = Fiber(sc.toFlowable(BS()).k(), FlowableK { ddc.dispose() })
+        sa.subscribe({
+          emitter.onNext(RaceTriple.First(it, ffb, ffc))
+        }, emitter::onError, emitter::onComplete)
+        sb.subscribe({
+          emitter.onNext(RaceTriple.Second(ffa, it, ffc))
+        }, emitter::onError, emitter::onComplete)
+        sc.subscribe({
+          emitter.onNext(RaceTriple.Third(ffa, ffb, it))
+        }, emitter::onError, emitter::onComplete)
+      }, BS()).subscribeOn(scheduler).observeOn(Schedulers.trampoline()).k()
+    }
+}
+
+fun FlowableK.Companion.concurrent(dispatchers: Dispatchers<ForFlowableK>): Concurrent<ForFlowableK> = object : FlowableKConcurrent {
+  override fun dispatchers(): Dispatchers<ForFlowableK> = dispatchers
 }
 
 @extension
