@@ -31,6 +31,7 @@ class TestStorageComponentContainerContributor : DeclarationChecker, StorageComp
   }
 
   override fun check(declaration: KtDeclaration, descriptor: DeclarationDescriptor, context: DeclarationCheckerContext) {
+    println("StorageComponentContainerContributor.check, declaration: ${declaration.name}")
 //    if (descriptor is FunctionDescriptor && declaration is KtFunction && !descriptor.isSuspend) {
 //      val element = declaration.nameIdentifier ?: declaration
 //      if (descriptor.returnType?.isUnit() == true) {

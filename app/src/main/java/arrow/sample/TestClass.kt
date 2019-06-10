@@ -4,7 +4,7 @@ class TestClass {
   fun sideEffect() =
     println("BOOM!")
 
-  fun other(): Unit {
+  suspend fun other(): Unit {
     println("other")
   }
 

@@ -23,12 +23,14 @@ import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.typeUtil.isUnit
 import org.jetbrains.org.objectweb.asm.MethodVisitor
 
-internal class DebugLogClassBuilder(
+internal class MetaClassBuilder(
   val messageCollector: MessageCollector,
   private val builder: ClassBuilder,
   private val bindingContext: BindingContext
 ) : DelegatingClassBuilder() {
   override fun getDelegate(): ClassBuilder = builder
+
+
 
   override fun newMethod(
     origin: JvmDeclarationOrigin,
@@ -38,6 +40,7 @@ internal class DebugLogClassBuilder(
     signature: String?,
     exceptions: Array<out String>?
   ): MethodVisitor {
+    println("ClassBuilderInterceptorExtension.DelegatingClassBuilder.newMethod, origin: ${origin.descriptor}")
     //delegate to the parent method visitor for construction
     val original: MethodVisitor = super.newMethod(origin, access, name, desc, signature, exceptions)
     //bail quickly if this is not a function
@@ -90,15 +93,18 @@ internal class DebugLogClassBuilder(
 
 }
 
-class TestClassBuilderInterceptorExtension(val messageCollector: MessageCollector) : ClassBuilderInterceptorExtension {
+class MetaClassBuilderInterceptorExtension(val messageCollector: MessageCollector) : ClassBuilderInterceptorExtension {
 
   override fun interceptClassBuilderFactory(
     interceptedFactory: ClassBuilderFactory,
     bindingContext: BindingContext,
     diagnostics: DiagnosticSink
   ): ClassBuilderFactory = object : ClassBuilderFactory by interceptedFactory {
-    override fun newClassBuilder(origin: JvmDeclarationOrigin) =
-      DebugLogClassBuilder(messageCollector, interceptedFactory.newClassBuilder(origin), bindingContext)
+    override fun newClassBuilder(origin: JvmDeclarationOrigin): ClassBuilder {
+      println("ClassBuilderInterceptorExtension.newClassBuilder, origin: ${origin.descriptor}")
+      val builder = MetaClassBuilder(messageCollector, interceptedFactory.newClassBuilder(origin), bindingContext)
+      return builder
+    }
   }
 
 }
