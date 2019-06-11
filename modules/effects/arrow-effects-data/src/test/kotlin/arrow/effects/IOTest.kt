@@ -75,7 +75,7 @@ class IOTest : UnitSpec() {
     }
 
     "should yield immediate successful pure value" {
-      val run = just(1).unsafeRunSync()
+      val run = IO.just(1).unsafeRunSync()
 
       val expected = 1
 
@@ -94,7 +94,7 @@ class IOTest : UnitSpec() {
     }
 
     "should return immediate value by uncancelable" {
-      val run = just(1).uncancelable().unsafeRunSync()
+      val run = IO.just(1).uncancelable().unsafeRunSync()
 
       val expected = 1
 
@@ -112,21 +112,21 @@ class IOTest : UnitSpec() {
     }
 
     "should return a null value from unsafeRunTimed" {
-      val never = just<Int?>(null)
+      val never = IO.just<Int?>(null)
       val received = never.unsafeRunTimed(100.milliseconds)
 
       received shouldBe Some(null)
     }
 
     "should return a null value from unsafeRunSync" {
-      val value = just<Int?>(null).unsafeRunSync()
+      val value = IO.just<Int?>(null).unsafeRunSync()
 
       value shouldBe null
     }
 
     "should complete when running a pure value with unsafeRunAsync" {
       val expected = 0
-      just(expected).unsafeRunAsync { either ->
+      IO.just(expected).unsafeRunAsync { either ->
         either.fold({ fail("") }, { it shouldBe expected })
       }
     }
@@ -175,7 +175,7 @@ class IOTest : UnitSpec() {
 
     "should complete when running a pure value with runAsync" {
       val expected = 0
-      just(expected).runAsync { either ->
+      IO.just(expected).runAsync { either ->
         either.fold({ fail("") }, { IO { it shouldBe expected } })
       }
     }
@@ -224,7 +224,7 @@ class IOTest : UnitSpec() {
     }
 
     "should map values correctly on success" {
-      val run = just(1).map { it + 1 }.unsafeRunSync()
+      val run = IO.just(1).map { it + 1 }.unsafeRunSync()
 
       val expected = 2
 
@@ -332,9 +332,9 @@ class IOTest : UnitSpec() {
       val result =
         newSingleThreadContext("all").parMapN(
           makePar(6), makePar(3), makePar(2), makePar(4), makePar(1), makePar(5)) { six, tree, two, four, one, five -> listOf(six, tree, two, four, one, five) }
-          .unsafeRunTimed(5.seconds)
+          .unsafeRunSync()
 
-      result shouldBe Some(listOf(6L, 3, 2, 4, 1, 5))
+      result shouldBe listOf(6L, 3, 2, 4, 1, 5)
       order.toList() shouldBe listOf(1L, 2, 3, 4, 5, 6)
     }
 
@@ -355,9 +355,9 @@ class IOTest : UnitSpec() {
       val result =
         newSingleThreadContext("all").parMapN(
           makePar(6), just(1L).order(), makePar(4), IO.defer { just(2L) }.order(), makePar(5), IO { 3L }.order()) { six, one, four, two, five, three -> listOf(six, one, four, two, five, three) }
-          .unsafeRunTimed(5.seconds)
+          .unsafeRunSync()
 
-      result shouldBe Some(listOf(6L, 1, 4, 2, 5, 3))
+      result shouldBe listOf(6L, 1, 4, 2, 5, 3)
       order.toList() shouldBe listOf(1L, 2, 3, 4, 5, 6)
     }
 
@@ -373,23 +373,23 @@ class IOTest : UnitSpec() {
         newSingleThreadContext("all").parMapN(
           makePar(6), just(1L), makePar(4), IO.defer { just(2L) }, makePar(5), IO { 3L }) { _, _, _, _, _, _ ->
           Thread.currentThread().name
-        }.unsafeRunTimed(5.seconds)
+        }.unsafeRunSync()
 
       // Will always result in "6" since it will always finish last (sleeps longest by makePar).
-      result shouldBe Some("6")
+      result shouldBe "6"
     }
 
     "parallel IO#defer, IO#suspend and IO#async are run in the expected CoroutineContext" {
       val result =
         newSingleThreadContext("here").parMapN(
           IO { Thread.currentThread().name },
-          IO.defer { just(Thread.currentThread().name) },
+          IO.defer { IO.just(Thread.currentThread().name) },
           IO.async<String> { _, cb -> cb(Thread.currentThread().name.right()) },
           IO(newSingleThreadContext("other")) { Thread.currentThread().name },
           ::Tuple4)
-          .unsafeRunTimed(5.seconds)
+          .unsafeRunSync()
 
-      result shouldBe Some(Tuple4("here", "here", "here", "other"))
+      result shouldBe Tuple4("here", "here", "here", "other")
     }
 
     "unsafeRunAsyncCancellable should cancel correctly" {
@@ -455,7 +455,7 @@ class IOTest : UnitSpec() {
 
     "IO bracket cancellation should release resource with cancel exit status" {
       Promise.uncancelable<ForIO, ExitCase<Throwable>>(IO.async()).flatMap { p ->
-        just(0L)
+        IO.just(0L)
           .bracketCase(
             use = { IO.never },
             release = { _, exitCase -> p.complete(exitCase) }
@@ -525,7 +525,7 @@ class IOTest : UnitSpec() {
           else just(ii)
         }
 
-      just(1).flatMap { ioBracketLoop(0) }.unsafeRunSync() shouldBe size
+      IO.just(1).flatMap { ioBracketLoop(0) }.unsafeRunSync() shouldBe size
     }
 
     "GuaranteeCase should be stack safe" {
@@ -551,7 +551,7 @@ class IOTest : UnitSpec() {
         else just(ii)
       }
 
-      just(1).flatMap(::ioAsync).unsafeRunSync() shouldBe size
+      IO.just(1).flatMap(::ioAsync).unsafeRunSync() shouldBe size
     }
   }
 }
@@ -559,6 +559,5 @@ class IOTest : UnitSpec() {
 /** Represents a unique identifier context using object equality. */
 internal class TestContext : AbstractCoroutineContextElement(TestContext) {
   companion object Key : kotlin.coroutines.CoroutineContext.Key<CoroutineName>
-
   override fun toString(): String = "TestContext(${Integer.toHexString(hashCode())})"
 }
