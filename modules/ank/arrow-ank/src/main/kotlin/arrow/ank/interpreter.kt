@@ -48,7 +48,7 @@ data class CompilationException(
   override fun toString(): String = msg
 }
 
-data class AnkFailedException(val msg: String): NoStackTrace(msg) {
+data class AnkFailedException(val msg: String) : NoStackTrace(msg) {
   override fun toString(): String = msg
 }
 

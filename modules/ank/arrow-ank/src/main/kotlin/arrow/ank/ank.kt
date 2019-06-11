@@ -14,9 +14,7 @@ import arrow.data.combine
 import arrow.data.extensions.list.foldable.reduceLeftOption
 import arrow.data.extensions.list.semigroup.List.semigroup
 import arrow.data.extensions.nonemptylist.semigroup.semigroup
-import arrow.data.fix
 import arrow.data.validNel
-import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Concurrent
 import java.nio.file.Path
 
