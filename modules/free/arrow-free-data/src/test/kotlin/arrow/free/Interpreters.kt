@@ -9,8 +9,8 @@ import arrow.core.Option
 import arrow.core.Some
 import arrow.core.fix
 import arrow.data.ForListK
-import arrow.data.ForNonEmptyList
-import arrow.data.NonEmptyList
+import arrow.core.ForNonEmptyList
+import arrow.core.NonEmptyList
 import arrow.data.fix
 import arrow.data.k
 

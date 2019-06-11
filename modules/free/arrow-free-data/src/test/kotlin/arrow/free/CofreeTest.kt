@@ -11,7 +11,7 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import arrow.data.ListK
-import arrow.data.NonEmptyList
+import arrow.core.NonEmptyList
 import arrow.data.OptionT
 import arrow.free.Cofree.Companion.unfold
 import arrow.free.extensions.cofree.comonad.comonad

@@ -5,8 +5,8 @@ import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Invalid
 import arrow.core.Valid
-import arrow.data.Validated
-import arrow.data.ValidatedPartialOf
+import arrow.core.Validated
+import arrow.core.ValidatedPartialOf
 import arrow.data.fix
 import arrow.extension
 import arrow.typeclasses.Applicative

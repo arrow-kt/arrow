@@ -1,12 +1,6 @@
-package arrow.data
+package arrow.core
 
 import arrow.Kind
-import arrow.core.Either
-import arrow.core.Eval
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.Some
-import arrow.core.identity
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 

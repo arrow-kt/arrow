@@ -5,9 +5,9 @@ import arrow.core.Tuple2
 import arrow.core.extensions.monoid
 import arrow.core.extensions.semigroup
 import arrow.data.ForListK
-import arrow.data.ForNonEmptyList
+import arrow.core.ForNonEmptyList
 import arrow.data.ListK
-import arrow.data.NonEmptyList
+import arrow.core.NonEmptyList
 import arrow.data.extensions.listk.foldable.foldable
 import arrow.data.fix
 import arrow.test.UnitSpec

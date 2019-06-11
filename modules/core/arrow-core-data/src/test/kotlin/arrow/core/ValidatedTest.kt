@@ -10,7 +10,7 @@ import arrow.core.extensions.validated.selective.selective
 import arrow.core.extensions.validated.semigroupK.semigroupK
 import arrow.core.extensions.validated.show.show
 import arrow.core.extensions.validated.traverse.traverse
-import arrow.data.NonEmptyList
+import arrow.core.NonEmptyList
 import arrow.test.UnitSpec
 import arrow.test.laws.EqLaws
 import arrow.test.laws.SelectiveLaws

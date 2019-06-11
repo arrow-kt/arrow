@@ -6,7 +6,7 @@ import arrow.core.Try
 import arrow.core.extensions.`try`.applicative.applicative
 import arrow.core.extensions.either.applicative.applicative
 import arrow.core.fix
-import arrow.data.Validated
+import arrow.core.Validated
 import arrow.test.UnitSpec
 import arrow.test.generators.`try`
 import arrow.test.generators.either

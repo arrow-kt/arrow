@@ -5,7 +5,7 @@ import arrow.core.Id
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.value
-import arrow.data.NonEmptyList
+import arrow.core.NonEmptyList
 import arrow.free.extensions.FreeEq
 import arrow.free.extensions.FreeMonad
 import arrow.free.extensions.free.eq.eq

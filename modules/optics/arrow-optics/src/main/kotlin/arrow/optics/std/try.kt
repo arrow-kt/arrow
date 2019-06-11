@@ -8,7 +8,7 @@ import arrow.core.Success
 import arrow.core.Try
 import arrow.core.Invalid
 import arrow.core.Valid
-import arrow.data.Validated
+import arrow.core.Validated
 
 /**
  * [PPrism] to focus into an [arrow.core.Try.Success]

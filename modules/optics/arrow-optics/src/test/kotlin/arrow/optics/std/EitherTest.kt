@@ -3,7 +3,7 @@ package arrow.optics
 import arrow.core.Either
 import arrow.core.Invalid
 import arrow.core.Valid
-import arrow.data.Validated
+import arrow.core.Validated
 import arrow.test.UnitSpec
 import arrow.test.generators.either
 import arrow.test.generators.functionAToB

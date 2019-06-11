@@ -1,13 +1,13 @@
-package arrow.data.extensions
+package arrow.core.extensions
 
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
-import arrow.data.ForNonEmptyList
-import arrow.data.NonEmptyList
-import arrow.data.NonEmptyListOf
-import arrow.data.extensions.nonemptylist.monad.monad
-import arrow.data.fix
+import arrow.core.ForNonEmptyList
+import arrow.core.NonEmptyList
+import arrow.core.NonEmptyListOf
+import arrow.core.extensions.nonemptylist.monad.monad
+import arrow.core.fix
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply

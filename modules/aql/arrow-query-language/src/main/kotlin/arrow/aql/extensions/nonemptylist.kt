@@ -8,8 +8,8 @@ import arrow.aql.Select
 import arrow.aql.Sum
 import arrow.aql.Union
 import arrow.aql.Where
-import arrow.data.ForNonEmptyList
-import arrow.data.NonEmptyList
+import arrow.core.ForNonEmptyList
+import arrow.core.NonEmptyList
 import arrow.extension
 import arrow.data.extensions.nonemptylist.applicative.applicative
 import arrow.data.extensions.nonemptylist.foldable.foldable

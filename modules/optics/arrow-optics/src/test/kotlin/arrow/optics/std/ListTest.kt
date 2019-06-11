@@ -5,7 +5,7 @@ import arrow.core.Option
 import arrow.data.k
 import arrow.core.extensions.option.monoid.monoid
 import arrow.data.ListK
-import arrow.data.NonEmptyList
+import arrow.core.NonEmptyList
 import arrow.data.extensions.listk.monoid.monoid
 import arrow.data.extensions.nonemptylist.semigroup.semigroup
 import arrow.test.UnitSpec

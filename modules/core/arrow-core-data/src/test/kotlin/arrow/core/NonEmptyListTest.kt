@@ -1,16 +1,16 @@
-package arrow.data
+package arrow.core
 
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
-import arrow.data.extensions.nonemptylist.applicative.applicative
-import arrow.data.extensions.nonemptylist.comonad.comonad
-import arrow.data.extensions.nonemptylist.eq.eq
-import arrow.data.extensions.nonemptylist.hash.hash
-import arrow.data.extensions.nonemptylist.monad.monad
-import arrow.data.extensions.nonemptylist.semigroup.semigroup
-import arrow.data.extensions.nonemptylist.semigroupK.semigroupK
-import arrow.data.extensions.nonemptylist.show.show
-import arrow.data.extensions.nonemptylist.traverse.traverse
+import arrow.core.extensions.nonemptylist.applicative.applicative
+import arrow.core.extensions.nonemptylist.comonad.comonad
+import arrow.core.extensions.nonemptylist.eq.eq
+import arrow.core.extensions.nonemptylist.hash.hash
+import arrow.core.extensions.nonemptylist.monad.monad
+import arrow.core.extensions.nonemptylist.semigroup.semigroup
+import arrow.core.extensions.nonemptylist.semigroupK.semigroupK
+import arrow.core.extensions.nonemptylist.show.show
+import arrow.core.extensions.nonemptylist.traverse.traverse
 import arrow.test.UnitSpec
 import arrow.test.laws.ComonadLaws
 import arrow.test.laws.HashLaws

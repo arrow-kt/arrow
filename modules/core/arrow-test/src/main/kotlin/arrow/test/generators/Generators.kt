@@ -27,11 +27,11 @@ import arrow.core.extensions.option.functor.map
 import arrow.core.extensions.option.functor.functor
 import arrow.data.ListK
 import arrow.data.MapK
-import arrow.data.NonEmptyList
+import arrow.core.NonEmptyList
 import arrow.data.SequenceK
 import arrow.data.SetK
 import arrow.data.SortedMapK
-import arrow.data.Validated
+import arrow.core.Validated
 import arrow.data.k
 import arrow.recursion.Algebra
 import arrow.recursion.Coalgebra

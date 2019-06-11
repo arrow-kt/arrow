@@ -8,7 +8,7 @@ import arrow.core.case
 import arrow.core.identity
 import arrow.core.toT
 import arrow.data.ListK
-import arrow.data.NonEmptyList
+import arrow.core.NonEmptyList
 import arrow.data.k
 
 /**

@@ -5,7 +5,7 @@ import arrow.core.extensions.eq
 import arrow.core.extensions.option.eq.eq
 import arrow.data.ListK
 import arrow.data.MapK
-import arrow.data.NonEmptyList
+import arrow.core.NonEmptyList
 import arrow.data.SequenceK
 import arrow.data.extensions.listk.eq.eq
 import arrow.data.extensions.sequencek.eq.eq
