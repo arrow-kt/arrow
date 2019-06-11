@@ -169,12 +169,12 @@ sealed class IO<out A> : IOOf<A> {
    * @param ctx [CoroutineContext] to execute the source [IO] on.
    * @return [IO] with suspended execution of source [IO] on context [ctx].
    */
-  fun startFiber(ctx: CoroutineContext): IO<Fiber<ForIO, A>> = IO {
+  fun startFiber(ctx: CoroutineContext): IO<Fiber<ForIO, A>> = async { _, cb ->
     val promise = UnsafePromise<A>()
     // A new IOConnection, because its cancellation is now decoupled from our current one.
     val conn = IOConnection()
     IORunLoop.startCancelable(IOForkedStart(this, ctx), conn, promise::complete)
-    IOFiber(promise, conn)
+    cb(Either.Right(IOFiber(promise, conn)))
   }
 
   fun <B> followedBy(fb: IOOf<B>) = flatMap { fb }

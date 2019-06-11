@@ -22,6 +22,8 @@ import arrow.effects.RaceTriple
 import arrow.effects.Timer
 import arrow.effects.data.internal.BindingCancellationException
 import arrow.effects.internal.TimeoutException
+import arrow.effects.internal.parMap2
+import arrow.effects.internal.parMap3
 import arrow.typeclasses.MonadSyntax
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
@@ -427,24 +429,13 @@ interface Concurrent<F> : Async<F> {
     fb: Kind<F, B>,
     f: (A, B) -> C
   ): Kind<F, C> =
-    racePair(fa, fb).flatMap {
-      it.fold(
-        { a, fiberB -> fiberB.join().map { b -> f(a, b) } },
-        { fiberA, b -> fiberA.join().map { a -> f(a, b) } }
-      )
-    }
+    parMap2(this, fa, fb, f)
 
   /**
    * @see parMapN
    */
   fun <A, B, C, D> CoroutineContext.parMapN(fa: Kind<F, A>, fb: Kind<F, B>, fc: Kind<F, C>, f: (A, B, C) -> D): Kind<F, D> =
-    raceTriple(fa, fb, fc).flatMap {
-      it.fold(
-        { a, fiberB, fiberC -> fiberB.join().flatMap { b -> fiberC.join().map { c -> f(a, b, c) } } },
-        { fiberA, b, fiberC -> fiberA.join().flatMap { a -> fiberC.join().map { c -> f(a, b, c) } } },
-        { fiberA, fiberB, c -> fiberA.join().flatMap { a -> fiberB.join().map { b -> f(a, b, c) } } }
-      )
-    }
+    parMap3(this, fa, fb, fc, f)
 
   /**
    * @see parMapN

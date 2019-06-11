@@ -8,7 +8,6 @@ import arrow.effects.typeclasses.Fiber
 internal fun <A> IOFiber(promise: UnsafePromise<A>, conn: IOConnection): Fiber<ForIO, A> {
   val join: IO<A> = IO.async { conn2, cb ->
     conn2.push(IO { promise.remove(cb) })
-    conn.push(conn2.cancel())
 
     promise.get { a ->
       cb(a)
