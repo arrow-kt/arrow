@@ -4,8 +4,16 @@ import arrow.Kind2
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
 import arrow.core.extensions.semigroup
-import arrow.data.*
-import arrow.data.Ior.Right
+import arrow.core.extensions.ior.applicative.applicative
+import arrow.core.extensions.ior.bifunctor.bifunctor
+import arrow.core.extensions.ior.eq.eq
+import arrow.core.extensions.ior.hash.hash
+import arrow.core.extensions.ior.monad.monad
+import arrow.core.extensions.ior.show.show
+import arrow.core.extensions.ior.traverse.traverse
+import arrow.core.Ior.Right
+import arrow.data.Invalid
+import arrow.data.Valid
 import arrow.test.UnitSpec
 import arrow.test.laws.BifunctorLaws
 import arrow.test.laws.HashLaws
@@ -17,6 +25,7 @@ import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
 import io.kotlintest.properties.forAll
 import io.kotlintest.runner.junit4.KotlinTestRunner
+import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
 
 @RunWith(KotlinTestRunner::class)
