@@ -24,6 +24,7 @@ import arrow.effects.data.internal.BindingCancellationException
 import arrow.effects.internal.TimeoutException
 import arrow.effects.internal.parMap2
 import arrow.effects.internal.parMap3
+import arrow.typeclasses.Applicative
 import arrow.typeclasses.MonadSyntax
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
@@ -45,6 +46,10 @@ interface Concurrent<F> : Async<F> {
   fun dispatchers(): Dispatchers<F>
 
   fun timer(): Timer<F> = Timer(this)
+
+  fun parApplicative(): Applicative<F> = ParApplicative(null)
+
+  fun parApplicative(ctx: CoroutineContext): Applicative<F> = ParApplicative(ctx)
 
   /**
    * Entry point for monad bindings which enables for comprehensions. The underlying impl is based on coroutines.
