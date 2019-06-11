@@ -1,26 +1,16 @@
-package arrow.data.extensions
+package arrow.core.extensions
 
 import arrow.Kind
 import arrow.Kind2
 import arrow.core.Either
-import arrow.data.AndThen
-import arrow.data.AndThenOf
-import arrow.data.AndThenPartialOf
-import arrow.data.ForAndThen
-import arrow.data.fix
+import arrow.core.AndThen
+import arrow.core.AndThenOf
+import arrow.core.AndThenPartialOf
+import arrow.core.ForAndThen
+import arrow.core.fix
 import arrow.core.invoke
 import arrow.extension
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Apply
-import arrow.typeclasses.Category
-import arrow.typeclasses.Conested
-import arrow.typeclasses.Contravariant
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Monad
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Profunctor
-import arrow.typeclasses.Semigroup
-import arrow.typeclasses.counnest
+import arrow.typeclasses.*
 
 @extension
 interface AndThenSemigroup<A, B> : Semigroup<AndThen<A, B>> {
