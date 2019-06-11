@@ -6,6 +6,7 @@ import arrow.core.Left
 import arrow.core.Right
 import arrow.core.Tuple2
 import arrow.core.Tuple3
+import arrow.core.identity
 import arrow.effects.CancelToken
 import arrow.effects.KindConnection
 import arrow.effects.MVar
@@ -19,6 +20,7 @@ import arrow.effects.Race8
 import arrow.effects.Race9
 import arrow.effects.RacePair
 import arrow.effects.RaceTriple
+import arrow.effects.Semaphore
 import arrow.effects.Timer
 import arrow.effects.data.internal.BindingCancellationException
 import arrow.effects.internal.TimeoutException
@@ -26,6 +28,7 @@ import arrow.effects.internal.parMap2
 import arrow.effects.internal.parMap3
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.MonadSyntax
+import arrow.typeclasses.Traverse
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine
@@ -399,6 +402,40 @@ interface Concurrent<F> : Async<F> {
         }
       })
     }
+
+  fun <G, A, B> Kind<G, A>.parTraverse(ctx: CoroutineContext, TG: Traverse<G>, f: (A) -> Kind<F, B>): Kind<F, Kind<G, B>> =
+    TG.run { traverse(parApplicative(ctx), f) }
+
+  fun <G, A, B> Kind<G, A>.parTraverse(TG: Traverse<G>, f: (A) -> Kind<F, B>): Kind<F, Kind<G, B>> =
+    TG.run { traverse(parApplicative(), f) }
+
+  fun <G, A, B> Kind<G, A>.parTraverseN(TG: Traverse<G>, n: Long, ctx: CoroutineContext, f: (A) -> Kind<F, B>): Kind<F, Kind<G, B>> = TG.run {
+    Semaphore(n, this@Concurrent).flatMap { semaphore ->
+      this@parTraverseN.parTraverse(ctx, TG) { a ->
+        semaphore.withPermit(f(a))
+      }
+    }
+  }
+
+  fun <G, A, B> Kind<G, A>.parTraverseN(TG: Traverse<G>, n: Long, f: (A) -> Kind<F, B>): Kind<F, Kind<G, B>> = TG.run {
+    Semaphore(n, this@Concurrent).flatMap { semaphore ->
+      this@parTraverseN.parTraverse(TG) { a ->
+        semaphore.withPermit(f(a))
+      }
+    }
+  }
+
+  fun <G, A> Kind<G, Kind<F, A>>.parSequence(TG: Traverse<G>, ctx: CoroutineContext): Kind<F, Kind<G, A>> =
+    parTraverse(ctx, TG, ::identity)
+
+  fun <G, A> Kind<G, Kind<F, A>>.parSequence(TG: Traverse<G>): Kind<F, Kind<G, A>> =
+    parTraverse(TG, ::identity)
+
+  fun <G, A> Kind<G, Kind<F, A>>.parSequenceN(TG: Traverse<G>, n: Long, ctx: CoroutineContext): Kind<F, Kind<G, A>> =
+    parTraverseN(TG, n, ctx, ::identity)
+
+  fun <G, A> Kind<G, Kind<F, A>>.parSequenceN(TG: Traverse<G>, n: Long): Kind<F, Kind<G, A>> =
+    parTraverseN(TG, n, ::identity)
 
   /**
    * Map two tasks in parallel within a new [F] on [this@parMapN].
