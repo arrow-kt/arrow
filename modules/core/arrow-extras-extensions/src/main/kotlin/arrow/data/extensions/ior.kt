@@ -8,10 +8,7 @@ import arrow.data.ForIor
 import arrow.data.Ior
 import arrow.data.IorOf
 import arrow.data.IorPartialOf
-import arrow.data.ap
-import arrow.data.extensions.ior.monad.monad
 import arrow.data.fix
-import arrow.data.flatMap
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply

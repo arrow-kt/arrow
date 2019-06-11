@@ -7,7 +7,6 @@ import arrow.data.Invalid
 import arrow.data.Valid
 import arrow.data.Validated
 import arrow.data.ValidatedPartialOf
-import arrow.data.ap
 import arrow.data.combineK
 import arrow.data.fix
 import arrow.data.handleLeftWith
