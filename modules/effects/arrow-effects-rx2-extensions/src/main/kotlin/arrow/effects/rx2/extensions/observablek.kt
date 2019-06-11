@@ -196,8 +196,8 @@ interface ObservableKConcurrent : Concurrent<ForObservableK>, ObservableKAsync {
       Observable.create<RacePair<ForObservableK, A, B>> { emitter ->
         val sa = ReplaySubject.create<A>()
         val sb = ReplaySubject.create<B>()
-        val dda = fa.value().subscribe(sa::onNext, sa::onError, sa::onComplete)
-        val ddb = fb.value().subscribe(sb::onNext, sb::onError, sa::onComplete)
+        val dda = fa.value().subscribe(sa::onNext, sa::onError)
+        val ddb = fb.value().subscribe(sb::onNext, sb::onError)
         emitter.setCancellable { dda.dispose(); ddb.dispose() }
         val ffa = Fiber(sa.k(), ObservableK { dda.dispose() })
         val ffb = Fiber(sb.k(), ObservableK { ddb.dispose() })
@@ -216,9 +216,9 @@ interface ObservableKConcurrent : Concurrent<ForObservableK>, ObservableKAsync {
         val sa = ReplaySubject.create<A>()
         val sb = ReplaySubject.create<B>()
         val sc = ReplaySubject.create<C>()
-        val dda = fa.value().subscribe(sa::onNext, sa::onError, sa::onComplete)
-        val ddb = fb.value().subscribe(sb::onNext, sb::onError, sb::onComplete)
-        val ddc = fc.value().subscribe(sc::onNext, sc::onError, sc::onComplete)
+        val dda = fa.value().subscribe(sa::onNext, sa::onError)
+        val ddb = fb.value().subscribe(sb::onNext, sb::onError)
+        val ddc = fc.value().subscribe(sc::onNext, sc::onError)
         emitter.setCancellable { dda.dispose(); ddb.dispose(); ddc.dispose() }
         val ffa = Fiber(sa.k(), ObservableK { dda.dispose() })
         val ffb = Fiber(sb.k(), ObservableK { ddb.dispose() })
