@@ -1,13 +1,7 @@
 package arrow.data
 
 import arrow.Kind
-import arrow.core.Either
-import arrow.core.Eval
-import arrow.core.EvalOf
-import arrow.core.Tuple2
-import arrow.core.andThen
-import arrow.core.fix
-import arrow.core.toT
+import arrow.core.*
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Functor

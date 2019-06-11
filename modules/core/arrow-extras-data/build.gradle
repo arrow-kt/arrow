@@ -3,6 +3,7 @@ apply plugin: 'kotlin-kapt'
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     compile project(':arrow-annotations')
+    compile project(':arrow-core-data') // has to be deleted in another PR
     kapt project(':arrow-meta')
     kaptTest project(':arrow-meta')
     compileOnly project(':arrow-meta')
