@@ -1,9 +1,5 @@
-package arrow.data
+package arrow.core
 
-import arrow.core.Either
-import arrow.core.andThen
-import arrow.core.compose
-import arrow.core.identity
 import arrow.higherkind
 
 operator fun <A, B> AndThenOf<A, B>.invoke(a: A): B = fix().invoke(a)

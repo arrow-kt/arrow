@@ -8,7 +8,7 @@ import arrow.data.AndThenOf
 import arrow.data.AndThenPartialOf
 import arrow.data.ForAndThen
 import arrow.data.fix
-import arrow.data.invoke
+import arrow.core.invoke
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
@@ -20,7 +20,6 @@ import arrow.typeclasses.Monad
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Profunctor
 import arrow.typeclasses.Semigroup
-import arrow.typeclasses.conest
 import arrow.typeclasses.counnest
 
 @extension
