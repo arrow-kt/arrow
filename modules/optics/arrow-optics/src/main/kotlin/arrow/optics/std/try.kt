@@ -6,8 +6,8 @@ import arrow.core.Left
 import arrow.core.Right
 import arrow.core.Success
 import arrow.core.Try
-import arrow.data.Invalid
-import arrow.data.Valid
+import arrow.core.Invalid
+import arrow.core.Valid
 import arrow.data.Validated
 
 /**

@@ -12,8 +12,6 @@ import arrow.core.extensions.ior.monad.monad
 import arrow.core.extensions.ior.show.show
 import arrow.core.extensions.ior.traverse.traverse
 import arrow.core.Ior.Right
-import arrow.data.Invalid
-import arrow.data.Valid
 import arrow.test.UnitSpec
 import arrow.test.laws.BifunctorLaws
 import arrow.test.laws.HashLaws

@@ -5,8 +5,8 @@ import arrow.core.Right
 import arrow.core.Try
 import arrow.core.extensions.either.applicative.applicative
 import arrow.core.fix
-import arrow.data.Invalid
-import arrow.data.Valid
+import arrow.core.Invalid
+import arrow.core.Valid
 import arrow.data.Validated
 import arrow.test.UnitSpec
 import arrow.test.generators.`try`
@@ -71,14 +71,14 @@ class TryTest : UnitSpec() {
           when (this) {
             is Invalid -> {
               when (b) {
-                is Invalid -> Invalid(e)
+                is Invalid -> arrow.core.Invalid(e)
                 is Valid -> b
               }
             }
             is Valid -> {
               when (b) {
                 is Invalid -> b
-                is Valid -> Valid(a + b.a)
+                is Valid -> arrow.core.Valid(a + b.a)
               }
             }
           }

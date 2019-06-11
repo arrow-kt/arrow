@@ -24,7 +24,7 @@ import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
-import arrow.data.combineK as nelCombineK
+import arrow.core.combineK as nelCombineK
 
 @extension
 interface NonEmptyListSemigroup<A> : Semigroup<NonEmptyList<A>> {

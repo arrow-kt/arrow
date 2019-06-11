@@ -1,8 +1,8 @@
 package arrow.optics
 
 import arrow.core.Either
-import arrow.data.Invalid
-import arrow.data.Valid
+import arrow.core.Invalid
+import arrow.core.Valid
 import arrow.data.Validated
 import arrow.test.UnitSpec
 import arrow.test.generators.either
@@ -26,14 +26,14 @@ class EitherTest : UnitSpec() {
         when (this) {
           is Invalid -> {
             when (b) {
-              is Invalid -> Invalid((e + b.e))
+              is Invalid -> arrow.core.Invalid((e + b.e))
               is Valid -> b
             }
           }
           is Valid -> {
             when (b) {
               is Invalid -> b
-              is Valid -> Valid((a + b.a))
+              is Valid -> arrow.core.Valid((a + b.a))
             }
           }
         }

@@ -12,7 +12,7 @@ import arrow.extension
 import arrow.mtl.typeclasses.FunctorFilter
 import arrow.mtl.typeclasses.MonadCombine
 import arrow.mtl.typeclasses.MonadFilter
-import arrow.data.combineK as listCombineK
+import arrow.core.combineK as listCombineK
 
 @extension
 interface ListKMonadCombine : MonadCombine<ForListK> {

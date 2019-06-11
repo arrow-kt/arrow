@@ -3,13 +3,11 @@ package arrow.data.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
-import arrow.data.Invalid
-import arrow.data.Valid
+import arrow.core.Invalid
+import arrow.core.Valid
 import arrow.data.Validated
 import arrow.data.ValidatedPartialOf
-import arrow.data.combineK
 import arrow.data.fix
-import arrow.data.handleLeftWith
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
@@ -23,7 +21,7 @@ import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
 import arrow.undocumented
-import arrow.data.traverse as validatedTraverse
+import arrow.core.traverse as validatedTraverse
 
 @extension
 @undocumented

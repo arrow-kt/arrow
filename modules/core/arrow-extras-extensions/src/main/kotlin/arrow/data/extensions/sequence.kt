@@ -28,8 +28,7 @@ import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Semigroupal
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
-import arrow.typeclasses.fix
-import arrow.data.combineK as sequenceCombineK
+import arrow.core.combineK as sequenceCombineK
 
 @extension
 interface SequenceKSemigroup<A> : Semigroup<SequenceK<A>> {

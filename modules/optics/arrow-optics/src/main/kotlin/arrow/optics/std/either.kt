@@ -1,8 +1,8 @@
 package arrow.optics
 
 import arrow.core.Either
-import arrow.data.Invalid
-import arrow.data.Valid
+import arrow.core.Invalid
+import arrow.core.Valid
 import arrow.data.Validated
 
 /**

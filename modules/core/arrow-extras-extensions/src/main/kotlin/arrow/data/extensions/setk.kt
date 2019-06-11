@@ -18,12 +18,11 @@ import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Semigroupal
 import arrow.typeclasses.Show
-import arrow.typeclasses.fix
 import kotlin.collections.emptySet
 import kotlin.collections.find
 import kotlin.collections.fold
 import kotlin.collections.map
-import arrow.data.combineK as setCombineK
+import arrow.core.combineK as setCombineK
 import kotlin.collections.plus as setPlus
 
 @extension

@@ -1,16 +1,6 @@
-package arrow.data
+package arrow.core
 
 import arrow.Kind
-import arrow.core.Either
-import arrow.core.Eval
-import arrow.core.Left
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.Right
-import arrow.core.Some
-import arrow.core.Try
-import arrow.core.identity
-import arrow.core.orElse
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Semigroup
@@ -160,11 +150,11 @@ fun <E, A> ValidatedOf<E, A>.findValid(SE: Semigroup<E>, that: () -> Validated<E
 
     { e ->
       that().fold(
-        { ee -> Invalid(SE.run { e.combine(ee) }) },
-        { Valid(it) }
+        { ee -> arrow.core.Invalid(SE.run { e.combine(ee) }) },
+        { arrow.core.Valid(it) }
       )
     },
-    { Valid(it) }
+    { arrow.core.Valid(it) }
   )
 
 /**
@@ -175,7 +165,7 @@ fun <E, A> ValidatedOf<E, A>.findValid(SE: Semigroup<E>, that: () -> Validated<E
 fun <E, A> ValidatedOf<E, A>.orElse(default: () -> Validated<E, A>): Validated<E, A> =
   fix().fold(
     { default() },
-    { Valid(it) }
+    { arrow.core.Valid(it) }
   )
 
 /**
@@ -184,15 +174,15 @@ fun <E, A> ValidatedOf<E, A>.orElse(default: () -> Validated<E, A>): Validated<E
  */
 fun <E, A, B> ValidatedOf<E, A>.ap(SE: Semigroup<E>, f: Validated<E, (A) -> B>): Validated<E, B> =
   fix().fold(
-    { e -> f.fold({ Invalid(SE.run { it.combine(e) }) }, { Invalid(e) }) },
-    { a -> f.fold(::Invalid) { Valid(it(a)) } }
+    { e -> f.fold({ arrow.core.Invalid(SE.run { it.combine(e) }) }, { arrow.core.Invalid(e) }) },
+    { a -> f.fold(::Invalid) { arrow.core.Valid(it(a)) } }
   )
 
 fun <E, A> ValidatedOf<E, A>.handleLeftWith(f: (E) -> ValidatedOf<E, A>): Validated<E, A> =
   fix().fold({ f(it).fix() }, ::Valid)
 
 fun <G, E, A, B> ValidatedOf<E, A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Validated<E, B>> = GA.run {
-  fix().fold({ e -> just(Invalid(e)) }, { a -> f(a).map(::Valid) })
+  fix().fold({ e -> just(arrow.core.Invalid(e)) }, { a -> f(a).map(::Valid) })
 }
 
 fun <G, E, A> ValidatedOf<E, Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, Validated<E, A>> =
@@ -205,8 +195,8 @@ fun <E, A> ValidatedOf<E, A>.combine(
 ): Validated<E, A> =
   y.fix().let { that ->
     when {
-      this is Valid && that is Valid -> Valid(SA.run { a.combine(that.a) })
-      this is Invalid && that is Invalid -> Invalid(SE.run { e.combine(that.e) })
+      this is Valid && that is Valid -> arrow.core.Valid(SA.run { a.combine(that.a) })
+      this is Invalid && that is Invalid -> arrow.core.Invalid(SE.run { e.combine(that.e) })
       this is Invalid -> this
       else -> that
     }
@@ -218,7 +208,7 @@ fun <E, A> ValidatedOf<E, A>.combineK(SE: Semigroup<E>, y: ValidatedOf<E, A>): V
   return when (xev) {
     is Valid -> xev
     is Invalid -> when (yev) {
-      is Invalid -> Invalid(SE.run { xev.e.combine(yev.e) })
+      is Invalid -> arrow.core.Invalid(SE.run { xev.e.combine(yev.e) })
       is Valid -> yev
     }
   }

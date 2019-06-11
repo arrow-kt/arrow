@@ -1,22 +1,16 @@
-package arrow.data
+package arrow.core
 
-import arrow.core.Failure
-import arrow.core.Left
-import arrow.core.None
-import arrow.core.Right
-import arrow.core.Some
-import arrow.core.Success
-import arrow.core.identity
 import arrow.core.extensions.eq
 import arrow.core.extensions.monoid
 import arrow.core.extensions.semigroup
-import arrow.data.extensions.validated.applicative.applicative
-import arrow.data.extensions.validated.eq.eq
-import arrow.data.extensions.validated.functor.functor
-import arrow.data.extensions.validated.selective.selective
-import arrow.data.extensions.validated.semigroupK.semigroupK
-import arrow.data.extensions.validated.show.show
-import arrow.data.extensions.validated.traverse.traverse
+import arrow.core.extensions.validated.applicative.applicative
+import arrow.core.extensions.validated.eq.eq
+import arrow.core.extensions.validated.functor.functor
+import arrow.core.extensions.validated.selective.selective
+import arrow.core.extensions.validated.semigroupK.semigroupK
+import arrow.core.extensions.validated.show.show
+import arrow.core.extensions.validated.traverse.traverse
+import arrow.data.NonEmptyList
 import arrow.test.UnitSpec
 import arrow.test.laws.EqLaws
 import arrow.test.laws.SelectiveLaws
@@ -197,47 +191,47 @@ class ValidatedTest : UnitSpec() {
 
       "Cartesian builder should build products over homogeneous Validated" {
         map(
-          Valid("11th"),
-          Valid("Doctor"),
-          Valid("Who")
-        ) { (a, b, c) -> "$a $b $c" } shouldBe Valid("11th Doctor Who")
+          arrow.core.Valid("11th"),
+          arrow.core.Valid("Doctor"),
+          arrow.core.Valid("Who")
+        ) { (a, b, c) -> "$a $b $c" } shouldBe arrow.core.Valid("11th Doctor Who")
       }
 
       "Cartesian builder should build products over heterogeneous Validated" {
         map(
-          Valid(13),
-          Valid("Doctor"),
-          Valid(false)
-        ) { (a, b, c) -> "${a}th $b is $c" } shouldBe Valid("13th Doctor is false")
+          arrow.core.Valid(13),
+          arrow.core.Valid("Doctor"),
+          arrow.core.Valid(false)
+        ) { (a, b, c) -> "${a}th $b is $c" } shouldBe arrow.core.Valid("13th Doctor is false")
       }
 
       "Cartesian builder should build products over Invalid Validated" {
         map(
-          Invalid("fail1"),
-          Invalid("fail2"),
-          Valid("Who")
-        ) { "success!" } shouldBe Invalid("fail1fail2")
+          arrow.core.Invalid("fail1"),
+          arrow.core.Invalid("fail2"),
+          arrow.core.Valid("Who")
+        ) { "success!" } shouldBe arrow.core.Invalid("fail1fail2")
       }
     }
 
     with(VAL_SGK) {
       "CombineK should combine Valid Validated" {
-        val valid = Valid("Who")
+        val valid = arrow.core.Valid("Who")
 
-        valid.combineK(valid) shouldBe (Valid("Who"))
+        valid.combineK(valid) shouldBe (arrow.core.Valid("Who"))
       }
 
       "CombineK should combine Valid and Invalid Validated" {
-        val valid = Valid("Who")
-        val invalid = Invalid("Nope")
+        val valid = arrow.core.Valid("Who")
+        val invalid = arrow.core.Invalid("Nope")
 
-        valid.combineK(invalid) shouldBe (Valid("Who"))
+        valid.combineK(invalid) shouldBe (arrow.core.Valid("Who"))
       }
 
       "CombineK should combine Invalid Validated" {
-        val invalid = Invalid("Nope")
+        val invalid = arrow.core.Invalid("Nope")
 
-        invalid.combineK(invalid) shouldBe (Invalid("NopeNope"))
+        invalid.combineK(invalid) shouldBe (arrow.core.Invalid("NopeNope"))
       }
     }
 

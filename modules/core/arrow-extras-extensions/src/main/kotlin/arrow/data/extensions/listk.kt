@@ -30,7 +30,7 @@ import arrow.typeclasses.Semigroupal
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
 import kotlin.collections.emptyList
-import arrow.data.combineK as listCombineK
+import arrow.core.combineK as listCombineK
 import kotlin.collections.plus as listPlus
 
 @extension
