@@ -1,105 +1,85 @@
 package arrow.effects
 
+import arrow.core.Try
 import arrow.effects.rx2.ForObservableK
 import arrow.effects.rx2.ObservableK
 import arrow.effects.rx2.ObservableKOf
+import arrow.effects.rx2.extensions.concurrent
 import arrow.effects.rx2.extensions.fx
-import arrow.effects.rx2.k
 import arrow.effects.rx2.extensions.observablek.async.async
 import arrow.effects.rx2.extensions.observablek.functor.functor
 import arrow.effects.rx2.extensions.observablek.monad.flatMap
 import arrow.effects.rx2.extensions.observablek.timer.timer
 import arrow.effects.rx2.extensions.observablek.traverse.traverse
+import arrow.effects.rx2.k
 import arrow.effects.rx2.value
+import arrow.effects.typeclasses.Dispatchers
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
-import arrow.test.laws.AsyncLaws
+import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.TimerLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
-import io.kotlintest.shouldNotBe
 import io.reactivex.Observable
 import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.rx2.asCoroutineDispatcher
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeUnit.SECONDS
+import kotlin.coroutines.CoroutineContext
 
 @RunWith(KotlinTestRunner::class)
 class ObservableKTests : UnitSpec() {
 
   fun <T> EQ(): Eq<ObservableKOf<T>> = object : Eq<ObservableKOf<T>> {
-    override fun ObservableKOf<T>.eqv(b: ObservableKOf<T>): Boolean =
-      try {
-        this.value().blockingFirst() == b.value().blockingFirst()
-      } catch (throwable: Throwable) {
-        val errA = try {
-          this.value().blockingFirst()
-          throw IllegalArgumentException()
-        } catch (err: Throwable) {
-          err
-        }
-
-        val errB = try {
-          b.value().blockingFirst()
-          throw IllegalStateException()
-        } catch (err: Throwable) {
-          err
-        }
-
-        errA == errB
-      }
+    override fun ObservableKOf<T>.eqv(b: ObservableKOf<T>): Boolean {
+      val res1 = Try { value().timeout(5, SECONDS).blockingFirst() }
+      val res2 = Try { b.value().timeout(5, SECONDS).blockingFirst() }
+      return res1.fold({ t1 ->
+        res2.fold({ t2 ->
+          (t1::class.java == t2::class.java)
+        }, { false })
+      }, { v1 ->
+        res2.fold({ false }, {
+          v1 == it
+        })
+      })
+    }
   }
 
-  init {
-    testLaws(TimerLaws.laws(ObservableK.async(), ObservableK.timer(), EQ()))
-    testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ(), testStackSafety = false))
-//     FIXME(paco) #691
-//    testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ()))
-//    testLaws(AsyncLaws.laws(ObservableK.async(), EQ(), EQ()))
+  val CO = ObservableK.concurrent(object : Dispatchers<ForObservableK> {
+    override fun default(): CoroutineContext = Schedulers.io().asCoroutineDispatcher()
+  })
 
+  init {
     testLaws(
-      TraverseLaws.laws(ObservableK.traverse(), ObservableK.functor(), { ObservableK.just(it) }, EQ())
+      TraverseLaws.laws(ObservableK.traverse(), ObservableK.functor(), { ObservableK.just(it) }, EQ()),
+      ConcurrentLaws.laws(CO, EQ(), EQ(), EQ(), testStackSafety = false),
+      TimerLaws.laws(ObservableK.async(), ObservableK.timer(), EQ())
     )
 
     "Multi-thread Observables finish correctly" {
       val value: Observable<Long> = ObservableK.fx {
-        val a = Observable.timer(2, TimeUnit.SECONDS).k().bind()
+        val a = Observable.timer(2, SECONDS).k().bind()
         a
       }.value()
 
       val test: TestObserver<Long> = value.test()
-      test.awaitDone(5, TimeUnit.SECONDS)
+      test.awaitDone(5, SECONDS)
       test.assertTerminated().assertComplete().assertNoErrors().assertValue(0)
-    }
-
-    "Multi-thread Observables should run on their required threads" {
-      val originalThread: Thread = Thread.currentThread()
-      var threadRef: Thread? = null
-      val value: Observable<Long> = ObservableK.fx {
-        val a = Observable.timer(2, TimeUnit.SECONDS, Schedulers.newThread()).k().bind()
-        threadRef = Thread.currentThread()
-        val b = Observable.just(a).observeOn(Schedulers.io()).k().bind()
-        b
-      }.value()
-      val test: TestObserver<Long> = value.test()
-      val lastThread: Thread = test.awaitDone(5, TimeUnit.SECONDS).lastThread()
-      val nextThread = (threadRef?.name ?: "")
-
-      nextThread shouldNotBe originalThread.name
-      lastThread.name shouldNotBe originalThread.name
-      lastThread.name shouldNotBe nextThread
     }
 
     "Observable cancellation forces binding to cancel without completing too" {
       val value: Observable<Long> = ObservableK.fx {
-        val a = Observable.timer(3, TimeUnit.SECONDS).k().bind()
+        val a = Observable.timer(3, SECONDS).k().bind()
         a
       }.value()
-      val test: TestObserver<Long> = value.doOnSubscribe { subscription -> Observable.timer(1, TimeUnit.SECONDS).subscribe { subscription.dispose() } }.test()
-      test.awaitTerminalEvent(5, TimeUnit.SECONDS)
+      val test: TestObserver<Long> = value.doOnSubscribe { subscription -> Observable.timer(1, SECONDS).subscribe { subscription.dispose() } }.test()
+      test.awaitTerminalEvent(5, SECONDS)
 
       test.assertNotTerminated().assertNotComplete().assertNoErrors().assertNoValues()
     }
