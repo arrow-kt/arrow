@@ -1,7 +1,20 @@
 package arrow.ank
 
 import arrow.Kind
+import arrow.core.Either
+import arrow.core.getOrElse
 import arrow.core.toT
+import arrow.data.ListK
+import arrow.data.Nel
+import arrow.data.NonEmptyList
+import arrow.data.Valid
+import arrow.data.Validated
+import arrow.data.ValidatedNel
+import arrow.data.combine
+import arrow.data.extensions.list.foldable.reduceLeftOption
+import arrow.data.extensions.list.semigroup.List.semigroup
+import arrow.data.extensions.nonemptylist.semigroup.semigroup
+import arrow.data.validNel
 import arrow.effects.typeclasses.Concurrent
 import java.nio.file.Path
 
@@ -16,6 +29,9 @@ fun Long.humanBytes(): String {
   return String.format("%.1f %sB", this / Math.pow(unit.toDouble(), exp.toDouble()), pre)
 }
 
+fun <A> toValidatedNel(a: Either<Throwable, A>): ValidatedNel<Throwable, A> =
+  a.fold({ e -> Validated.Invalid(NonEmptyList(e)) }, { a -> Validated.Valid(a) })
+
 fun <F> Concurrent<F>.ank(source: Path, target: Path, compilerArgs: List<String>, ankOps: AnkOps): Kind<F, Unit> = with(ankOps) {
   fx.concurrent {
     !effect { printConsole(colored(ANSI_PURPLE, AnkHeader)) }
@@ -24,9 +40,9 @@ fun <F> Concurrent<F>.ank(source: Path, target: Path, compilerArgs: List<String>
     !effect { printConsole("Current heap used: ${(heapSize - Runtime.getRuntime().freeMemory()).humanBytes()}") }
     !effect { printConsole("Starting ank with Heap Size: ${heapSize.humanBytes()}, Max Heap Size: ${heapMaxSize.humanBytes()}") }
     val path = !effect { createTargetDirectory(source, target) }
-    val paths = !!effect {
+    val validatedPaths = !effect {
       path.ankFiles().map { (index, p) ->
-        suspend {
+        effect(suspend {
           val totalHeap = Runtime.getRuntime().totalMemory()
           val usedHeap = totalHeap - Runtime.getRuntime().freeMemory()
           val message = "Ank Compile: [$index] ${path.relativize(p)} | Used Heap: ${usedHeap.humanBytes()}"
@@ -36,11 +52,36 @@ fun <F> Concurrent<F>.ank(source: Path, target: Path, compilerArgs: List<String>
           val compiledResult = compileCode(p toT snippets, compilerArgs)
           val result = replaceAnkToLang(processed, compiledResult)
           generateFile(p, result)
-        }
-      }.toList().sequence()
+        }).attempt().map(::toValidatedNel)
+      }.toList()
     }
 
-    val message = "Ank Processed ${paths.size} files"
-    !effect { printConsole(colored(ANSI_GREEN, message)) }
+    // We need to help compiler here a bit.
+    val empty: Kind<F, ValidatedNel<Nothing, List<Path>>> = just(emptyList<Path>().validNel())
+
+    val combinedResults = !!effect {
+      validatedPaths
+        .map { fa -> fa.map { validated -> validated.map { path -> ListK.just(path) } } } // wrap in ListK to accumulate Paths.
+        .reduceLeftOption { fa, fb ->
+          fa.map2(fb) { (a, b) ->
+            a.combine(Nel.semigroup(), semigroup(), b)
+          }
+        }.getOrElse { empty }
+    }
+
+    combinedResults.fold({ errors ->
+      val seperator = "\n----------------------------------------------------------------\n"
+      throw AnkFailedException(errors.all
+        .flatMap {
+          if (it is CompilationException) listOf(it)
+          else emptyList()
+        }.joinToString(prefix = seperator, separator = seperator) {
+          it.msg
+        }
+      )
+    }, { paths ->
+      val message = colored(ANSI_GREEN, "Ank Processed ${paths.size} files")
+      !effect { printConsole(message) }
+    })
   }
 }
