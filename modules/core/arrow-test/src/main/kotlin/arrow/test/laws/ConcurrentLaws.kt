@@ -17,7 +17,6 @@ import arrow.test.generators.throwable
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import kotlinx.coroutines.Dispatchers
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
@@ -31,7 +30,7 @@ object ConcurrentLaws {
     EQ: Eq<Kind<F, Int>>,
     EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>,
     EQ_UNIT: Eq<Kind<F, Unit>>,
-    ctx: CoroutineContext = Dispatchers.Default,
+    ctx: CoroutineContext = CF.dispatchers().default(),
     testStackSafety: Boolean = true
   ): List<Law> =
     AsyncLaws.laws(CF, EQ, EQ_EITHER, testStackSafety) + listOf(
@@ -106,6 +105,7 @@ object ConcurrentLaws {
     forAll(Gen.int(), Gen.int()) { a, b ->
       fx.concurrent {
         val mvar = MVar(a, this@acquireBracketIsNotCancelable).bind()
+        mvar.take().bind()
         val p = Promise.uncancelable<F, Unit>(this@acquireBracketIsNotCancelable).bind()
         val task = p.complete(Unit).flatMap { mvar.put(b) }
           .bracket(use = { never<Int>() }, release = { just(Unit) })
@@ -113,7 +113,6 @@ object ConcurrentLaws {
         p.get().bind()
         ctx.startFiber(cancel).bind()
         continueOn(ctx)
-        mvar.take().bind()
         mvar.take().bind()
       }.equalUnderTheLaw(just(b), EQ)
     }

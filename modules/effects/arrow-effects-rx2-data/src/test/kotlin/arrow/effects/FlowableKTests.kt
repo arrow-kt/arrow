@@ -1,5 +1,6 @@
 package arrow.effects
 
+import arrow.core.Try
 import arrow.effects.rx2.FlowableK
 import arrow.effects.rx2.FlowableKOf
 import arrow.effects.rx2.ForFlowableK
@@ -8,6 +9,7 @@ import arrow.effects.rx2.extensions.asyncDrop
 import arrow.effects.rx2.extensions.asyncError
 import arrow.effects.rx2.extensions.asyncLatest
 import arrow.effects.rx2.extensions.asyncMissing
+import arrow.effects.rx2.extensions.concurrent
 import arrow.effects.rx2.extensions.flowablek.async.async
 import arrow.effects.rx2.extensions.flowablek.functor.functor
 import arrow.effects.rx2.extensions.flowablek.monad.flatMap
@@ -15,49 +17,51 @@ import arrow.effects.rx2.extensions.flowablek.timer.timer
 import arrow.effects.rx2.extensions.flowablek.traverse.traverse
 import arrow.effects.rx2.extensions.fx
 import arrow.effects.rx2.value
+import arrow.effects.typeclasses.Dispatchers
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
+import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.TimerLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
-import io.kotlintest.shouldNotBe
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subscribers.TestSubscriber
+import kotlinx.coroutines.rx2.asCoroutineDispatcher
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import kotlin.coroutines.CoroutineContext
 
 @RunWith(KotlinTestRunner::class)
 class FlowableKTests : UnitSpec() {
 
   fun <T> EQ(): Eq<FlowableKOf<T>> = object : Eq<FlowableKOf<T>> {
-    override fun FlowableKOf<T>.eqv(b: FlowableKOf<T>): Boolean =
-      try {
-        this.value().blockingFirst() == b.value().blockingFirst()
-      } catch (throwable: Throwable) {
-        val errA = try {
-          this.value().blockingFirst()
-          throw IllegalArgumentException()
-        } catch (err: Throwable) {
-          err
-        }
-        val errB = try {
-          b.value().blockingFirst()
-          throw IllegalStateException()
-        } catch (err: Throwable) {
-          err
-        }
-        errA == errB
-      }
+    override fun FlowableKOf<T>.eqv(b: FlowableKOf<T>): Boolean {
+      val res1 = Try { value().timeout(5, TimeUnit.SECONDS).blockingFirst() }
+      val res2 = Try { b.value().timeout(5, TimeUnit.SECONDS).blockingFirst() }
+      return res1.fold({ t1 ->
+        res2.fold({ t2 ->
+          (t1::class.java == t2::class.java)
+        }, { false })
+      }, { v1 ->
+        res2.fold({ false }, {
+          v1 == it
+        })
+      })
+    }
   }
+
+  val CO = FlowableK.concurrent(object : Dispatchers<ForFlowableK> {
+    override fun default(): CoroutineContext = Schedulers.io().asCoroutineDispatcher()
+  })
 
   init {
     testLaws(TimerLaws.laws(FlowableK.async(), FlowableK.timer(), EQ()))
-    testLaws(AsyncLaws.laws(FlowableK.async(), EQ(), EQ(), testStackSafety = false))
+    testLaws(ConcurrentLaws.laws(CO, EQ(), EQ(), EQ(), testStackSafety = false))
     // FIXME(paco) #691
     // testLaws(AsyncLaws.laws(FlowableK.async(), EQ(), EQ()))
     // testLaws(AsyncLaws.laws(FlowableK.async(), EQ(), EQ()))
@@ -92,24 +96,6 @@ class FlowableKTests : UnitSpec() {
       val test: TestSubscriber<Long> = value.test()
       test.awaitDone(5, TimeUnit.SECONDS)
       test.assertTerminated().assertComplete().assertNoErrors().assertValue(0)
-    }
-
-    "Multi-thread Observables should run on their required threads" {
-      val originalThread: Thread = Thread.currentThread()
-      var threadRef: Thread? = null
-      val value: Flowable<Long> = FlowableK.fx {
-        val a = Flowable.timer(2, TimeUnit.SECONDS, Schedulers.newThread()).k().bind()
-        threadRef = Thread.currentThread()
-        val b = Flowable.just(a).observeOn(Schedulers.newThread()).k().bind()
-        b
-      }.value()
-      val test: TestSubscriber<Long> = value.test()
-      val lastThread: Thread = test.awaitDone(5, TimeUnit.SECONDS).lastThread()
-      val nextThread = (threadRef?.name ?: "")
-
-      nextThread shouldNotBe originalThread.name
-      lastThread.name shouldNotBe originalThread.name
-      lastThread.name shouldNotBe nextThread
     }
 
     "Flowable cancellation forces binding to cancel without completing too" {
