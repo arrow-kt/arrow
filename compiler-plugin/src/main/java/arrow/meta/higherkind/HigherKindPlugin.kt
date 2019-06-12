@@ -12,6 +12,12 @@ class HigherKindPlugin : MetaCompilerPlugin {
     meta(
       newMethod { origin: JvmDeclarationOrigin, access: Int, name: String, desc: String, signature: String?, value: Any? ->
         println("New Method from meta: $name")
+      },
+      newField {  origin, access, name, desc, signature, value ->
+        println("New Field from meta: $name")
+      },
+      newAnnotation { desc, visible ->
+        println("New Annotation from meta: $desc")
       }
     )
 }

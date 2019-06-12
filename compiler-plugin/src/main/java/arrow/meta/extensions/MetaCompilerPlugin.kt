@@ -96,29 +96,22 @@ interface MetaCompilerPlugin : ComponentRegistrar {
         interceptClassBuilderFactory(this, interceptedFactory, bindingContext, diagnostics)
     }
 
+
+  fun newMethod(f: (origin: JvmDeclarationOrigin, access: Int, name: String, desc: String, signature: String?, exceptions: Array<out String>?) -> Unit): ExtensionPhase.ClassBuilder =
+    object : ExtensionPhase.ClassBuilder {
+      override fun CompilerContext.interceptClassBuilder(interceptedFactory: ClassBuilderFactory, bindingContext: BindingContext, diagnostics: DiagnosticSink): ClassBuilderFactory =
+        object : ClassBuilderFactory by interceptedFactory {
+          override fun newClassBuilder(origin: JvmDeclarationOrigin): ClassBuilder =
+            NewMethodClassBuilder(interceptedFactory.newClassBuilder(origin), f)
+        }
+    }
+
   fun newField(f: (origin: JvmDeclarationOrigin, access: Int, name: String, desc: String, signature: String?, value: Any?) -> Unit): ExtensionPhase.ClassBuilder =
     object : ExtensionPhase.ClassBuilder {
       override fun CompilerContext.interceptClassBuilder(interceptedFactory: ClassBuilderFactory, bindingContext: BindingContext, diagnostics: DiagnosticSink): ClassBuilderFactory =
         object : ClassBuilderFactory by interceptedFactory {
           override fun newClassBuilder(origin: JvmDeclarationOrigin): ClassBuilder =
-            object : DelegatingClassBuilder() {
-              override fun getDelegate(): ClassBuilder = interceptedFactory.newClassBuilder(origin)
-              override fun newField(origin: JvmDeclarationOrigin, access: Int, name: String, desc: String, signature: String?, value: Any?): FieldVisitor =
-                super.newField(origin, access, name, desc, signature, value).also {
-                  f(origin, access, name, desc, signature, value)
-                }
-            }
-        }
-    }
-
-
-  fun newMethod(f: (origin: JvmDeclarationOrigin, access: Int, name: String, desc: String, signature: String?, value: Any?) -> Unit): ExtensionPhase.ClassBuilder =
-    object : ExtensionPhase.ClassBuilder {
-      override fun CompilerContext.interceptClassBuilder(interceptedFactory: ClassBuilderFactory, bindingContext: BindingContext, diagnostics: DiagnosticSink): ClassBuilderFactory =
-        object : ClassBuilderFactory by interceptedFactory {
-          override fun newClassBuilder(origin: JvmDeclarationOrigin): ClassBuilder =
-         //   MetaClassBuilder(messageCollector, interceptedFactory.newClassBuilder(origin), bindingContext)
-            NewMethodClassBuilder(interceptedFactory.newClassBuilder(origin), f)
+            NewFieldClassBuilder(interceptedFactory.newClassBuilder(origin), f)
         }
     }
 
@@ -127,13 +120,7 @@ interface MetaCompilerPlugin : ComponentRegistrar {
       override fun CompilerContext.interceptClassBuilder(interceptedFactory: ClassBuilderFactory, bindingContext: BindingContext, diagnostics: DiagnosticSink): ClassBuilderFactory =
         object : ClassBuilderFactory by interceptedFactory {
           override fun newClassBuilder(origin: JvmDeclarationOrigin): ClassBuilder =
-            object : DelegatingClassBuilder() {
-              override fun getDelegate(): ClassBuilder = interceptedFactory.newClassBuilder(origin)
-              override fun newAnnotation(desc: String, visible: Boolean): AnnotationVisitor =
-                super.newAnnotation(desc, visible).also {
-                  f(desc, visible)
-                }
-            }
+            NewAnnotationClassBuilder(interceptedFactory.newClassBuilder(origin), f)
         }
     }
 
@@ -363,7 +350,7 @@ interface MetaCompilerPlugin : ComponentRegistrar {
 
 internal class NewMethodClassBuilder(
   private val builder: ClassBuilder,
-  val f: (origin: JvmDeclarationOrigin, access: Int, name: String, desc: String, signature: String?, value: Any?) -> Unit
+  val f: (origin: JvmDeclarationOrigin, access: Int, name: String, desc: String, signature: String?, exceptions: Array<out String>?) -> Unit
 ) : DelegatingClassBuilder() {
   override fun getDelegate(): ClassBuilder = builder
 
@@ -378,6 +365,42 @@ internal class NewMethodClassBuilder(
     //delegate to the parent method visitor for construction
     val original: MethodVisitor = super.newMethod(origin, access, name, desc, signature, exceptions)
     f(origin, access, name, desc, signature, exceptions)
+    return original
+  }
+
+}
+
+internal class NewFieldClassBuilder(
+  private val builder: ClassBuilder,
+  val f: (origin: JvmDeclarationOrigin, access: Int, name: String, desc: String, signature: String?, value: Any?) -> Unit
+) : DelegatingClassBuilder() {
+  override fun getDelegate(): ClassBuilder = builder
+
+  override fun newField(
+    origin: JvmDeclarationOrigin,
+    access: Int,
+    name: String,
+    desc: String,
+    signature: String?,
+    value: Any?
+  ): FieldVisitor {
+    //delegate to the parent method visitor for construction
+    val original: FieldVisitor = super.newField(origin, access, name, desc, signature, value)
+    f(origin, access, name, desc, signature, value)
+    return original
+  }
+
+}
+
+internal class NewAnnotationClassBuilder(
+  private val builder: ClassBuilder,
+  val f: (desc: String, visible: Boolean) -> Unit
+) : DelegatingClassBuilder() {
+  override fun getDelegate(): ClassBuilder = builder
+
+  override fun newAnnotation(desc: String, visible: Boolean): AnnotationVisitor {
+    val original: AnnotationVisitor = super.newAnnotation(desc, visible)
+    f(desc, visible)
     return original
   }
 
