@@ -11,7 +11,7 @@ fun <F, A, B, C> Concurrent<F>.parMap2(
   fb: Kind<F, B>,
   f: (A, B) -> C
 ): Kind<F, C> = ctx.run {
-  tupled(startFiber(fa), startFiber(fb)).bracketCase(use = { (fiberA, fiberB) ->
+  tupled(startFiber(fb), startFiber(fa)).bracket(use = { (fiberB, fiberA) ->
     racePair(fiberA.join().attempt(), fiberB.join().attempt()).flatMap { pairResult ->
       pairResult.fold({ attemptedA, fiberB ->
         attemptedA.fold({ error ->
@@ -31,11 +31,7 @@ fun <F, A, B, C> Concurrent<F>.parMap2(
         })
       })
     }
-  }, release = { (fiberA, fiberB), ex ->
-
-    when (ex) {
-      is ExitCase.Completed -> unit()
-      else -> fiberA.cancel().followedBy(fiberB.cancel())
-    }
+  }, release = { (fiberA, fiberB) ->
+    fiberA.cancel().followedBy(fiberB.cancel())
   })
 }
