@@ -3,30 +3,17 @@ package arrow.effects
 import arrow.effects.rx2.ForMaybeK
 import arrow.effects.rx2.MaybeK
 import arrow.effects.rx2.MaybeKOf
+import arrow.effects.rx2.extensions.concurrent
 import arrow.effects.rx2.extensions.fx
-import arrow.effects.rx2.k
-import arrow.effects.rx2.extensions.maybek.applicative.applicative
-import arrow.effects.rx2.extensions.maybek.applicativeError.applicativeError
 import arrow.effects.rx2.extensions.maybek.async.async
-import arrow.effects.rx2.extensions.maybek.effect.effect
-import arrow.effects.rx2.extensions.maybek.foldable.foldable
-import arrow.effects.rx2.extensions.maybek.functor.functor
 import arrow.effects.rx2.extensions.maybek.monad.flatMap
-import arrow.effects.rx2.extensions.maybek.monad.monad
-import arrow.effects.rx2.extensions.maybek.monadDefer.monadDefer
-import arrow.effects.rx2.extensions.maybek.monadError.monadError
 import arrow.effects.rx2.extensions.maybek.timer.timer
+import arrow.effects.rx2.k
 import arrow.effects.rx2.value
+import arrow.effects.typeclasses.Dispatchers
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
-import arrow.test.laws.ApplicativeErrorLaws
-import arrow.test.laws.ApplicativeLaws
-import arrow.test.laws.AsyncLaws
-import arrow.test.laws.FoldableLaws
-import arrow.test.laws.FunctorLaws
-import arrow.test.laws.MonadDeferLaws
-import arrow.test.laws.MonadErrorLaws
-import arrow.test.laws.MonadLaws
+import arrow.test.laws.ConcurrentLaws
 import arrow.test.laws.TimerLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.runner.junit4.KotlinTestRunner
@@ -35,46 +22,39 @@ import io.kotlintest.shouldNotBe
 import io.reactivex.Maybe
 import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.rx2.asCoroutineDispatcher
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import kotlin.coroutines.CoroutineContext
 
 @RunWith(KotlinTestRunner::class)
 class MaybeKTests : UnitSpec() {
 
   fun <T> EQ(): Eq<MaybeKOf<T>> = object : Eq<MaybeKOf<T>> {
-    override fun MaybeKOf<T>.eqv(b: MaybeKOf<T>): Boolean =
-      try {
-        this.value().blockingGet() == b.value().blockingGet()
-      } catch (throwable: Throwable) {
-        val errA = try {
-          this.value().blockingGet()
-          throw IllegalArgumentException()
-        } catch (err: Throwable) {
-          err
-        }
-        val errB = try {
-          b.value().blockingGet()
-          throw IllegalStateException()
-        } catch (err: Throwable) {
-          err
-        }
-        errA == errB
-      }
+    override fun MaybeKOf<T>.eqv(b: MaybeKOf<T>): Boolean {
+      val res1 = arrow.core.Try { value().timeout(5, TimeUnit.SECONDS).blockingGet() }
+      val res2 = arrow.core.Try { b.value().timeout(5, TimeUnit.SECONDS).blockingGet() }
+      return res1.fold({ t1 ->
+        res2.fold({ t2 ->
+          (t1::class.java == t2::class.java)
+        }, { false })
+      }, { v1 ->
+        res2.fold({ false }, {
+          v1 == it
+        })
+      })
+    }
   }
+
+  val CM = MaybeK.concurrent(object : Dispatchers<ForMaybeK> {
+    override fun default(): CoroutineContext = Schedulers.io().asCoroutineDispatcher()
+  })
 
   init {
     testLaws(
       TimerLaws.laws(MaybeK.async(), MaybeK.timer(), EQ()),
-      FunctorLaws.laws(MaybeK.functor(), { MaybeK.just(it) }, EQ()),
-      ApplicativeLaws.laws(MaybeK.applicative(), EQ()),
-      MonadLaws.laws(MaybeK.monad(), EQ()),
-      FoldableLaws.laws(MaybeK.foldable(), { MaybeK.just(it) }, Eq.any()),
-      MonadErrorLaws.laws(MaybeK.monadError(), EQ(), EQ(), EQ()),
-      ApplicativeErrorLaws.laws(MaybeK.applicativeError(), EQ(), EQ(), EQ()),
-      MonadDeferLaws.laws(MaybeK.monadDefer(), EQ(), EQ(), EQ(), testStackSafety = false),
-      AsyncLaws.laws(MaybeK.async(), EQ(), EQ(), testStackSafety = false),
-      AsyncLaws.laws(MaybeK.effect(), EQ(), EQ(), testStackSafety = false)
+      ConcurrentLaws.laws(CM, EQ(), EQ(), EQ(), testStackSafety = false)
     )
 
     "Multi-thread Maybes finish correctly" {

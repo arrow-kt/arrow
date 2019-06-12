@@ -326,7 +326,10 @@ interface Concurrent<F> : Async<F> {
    * @see cancelableF for a version that can safely suspend impure callback registration code.
    */
   fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<F>): Kind<F, A> =
-    cancelableF { cb -> delay { k(cb) } }
+    cancelableF { cb ->
+      val token = k(cb)
+      delay { token }
+    }
 
   /**
    * Builder to create a cancelable [F] instance that executes an asynchronous process on evaluation.
@@ -383,7 +386,9 @@ interface Concurrent<F> : Async<F> {
 
       k(cb1).bracketCase(use = {
         async<Unit> { cb ->
-          if (!state.compareAndSet(null, cb)) cb(rightUnit)
+          if (!state.compareAndSet(null, cb)) {
+            cb(rightUnit)
+          }
         }
       }, release = { token, exitCase ->
         when (exitCase) {

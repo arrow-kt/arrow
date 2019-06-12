@@ -108,7 +108,7 @@ object BracketLaws {
       val msg: AtomicReference<Int> = AtomicReference(0)
       just(i).bracket<Int, Int>(
         release = { ii -> msg.set(ii); unit() },
-        use = { throw Throwable("Boom!") }
+        use = { throw Throwable("Expected failure!") }
       )
         .attempt()
         .map { msg.get() }
