@@ -2,7 +2,6 @@ package arrow.effects.internal
 
 import arrow.Kind
 import arrow.effects.typeclasses.Concurrent
-import arrow.effects.typeclasses.ExitCase
 import kotlin.coroutines.CoroutineContext
 
 fun <F, A, B, C, D> Concurrent<F>.parMap3(ctx: CoroutineContext, fa: Kind<F, A>, fb: Kind<F, B>, fc: Kind<F, C>, f: (A, B, C) -> D): Kind<F, D> = ctx.run {
@@ -82,7 +81,7 @@ fun <F, A, B, C, D> Concurrent<F>.parMap3(ctx: CoroutineContext, fa: Kind<F, A>,
         })
       })
     }
-  }, release = { (fiberA, fiberB, fiberC)->
+  }, release = { (fiberA, fiberB, fiberC) ->
       fiberA.cancel().followedBy(fiberB.cancel()).followedBy(fiberC.cancel())
   })
 }

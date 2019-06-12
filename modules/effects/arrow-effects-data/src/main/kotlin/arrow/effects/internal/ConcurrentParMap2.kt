@@ -2,7 +2,6 @@ package arrow.effects.internal
 
 import arrow.Kind
 import arrow.effects.typeclasses.Concurrent
-import arrow.effects.typeclasses.ExitCase
 import kotlin.coroutines.CoroutineContext
 
 fun <F, A, B, C> Concurrent<F>.parMap2(
