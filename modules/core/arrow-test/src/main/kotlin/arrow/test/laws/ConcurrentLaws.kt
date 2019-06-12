@@ -73,7 +73,6 @@ object ConcurrentLaws {
       Law("Concurrent Laws: race cancels both") { CF.raceCancelCancelsBoth(EQ, ctx) },
       Law("Concurrent Laws: race is cancellable by participants") { CF.raceCanBeCancelledByParticipants(EQ, ctx) },
       Law("Concurrent Laws: parallel map cancels both") { CF.parMapCancelCancelsBoth(EQ, ctx) },
-      Law("Concurrent Laws: parallel is cancellable by participants") { CF.parMapCanBeCancelledByParticipants(EQ, ctx) },
       Law("Concurrent Laws: action concurrent with pure value is just action") { CF.actionConcurrentWithPureValueIsJustAction(EQ, ctx) }
     )
 
@@ -651,22 +650,6 @@ object ConcurrentLaws {
         s.acquireN(2L).flatMap { cancelParMapN }.bind()
         pa.get().bind() + pb.get().bind()
       }.equalUnderTheLaw(just(a + b), EQ)
-    }
-
-  fun <F> Concurrent<F>.parMapCanBeCancelledByParticipants(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
-    forAll(Gen.int(), Gen.bool()) { i, shouldLeftCancel ->
-      fx.concurrent {
-        val endLatch = Promise<F, Int>(this@parMapCanBeCancelledByParticipants).bind()
-        val startLatch = Promise<F, Unit>(this@parMapCanBeCancelledByParticipants).bind()
-
-        val cancel = asyncF<Unit> { conn, cb -> startLatch.get().flatMap { conn.cancel().map { cb(Right(Unit)) } } }
-        val loser = startLatch.complete(Unit).bracket(use = { never<Int>() }, release = { endLatch.complete(i) })
-
-        if (shouldLeftCancel) ctx.startFiber(ctx.parMapN(cancel, loser, ::Tuple2)).bind()
-        else ctx.startFiber(ctx.parMapN(loser, cancel, ::Tuple2)).bind()
-
-        endLatch.get().bind()
-      }.equalUnderTheLaw(just(i), EQ)
     }
 
   fun <F> Concurrent<F>.actionConcurrentWithPureValueIsJustAction(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext): Unit =
