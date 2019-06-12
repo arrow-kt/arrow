@@ -6,7 +6,6 @@ import arrow.Kind
 import arrow.core.*
 import arrow.core.Either.Left
 import arrow.core.Either.Right
-import arrow.core.extensions.tuple2.foldable.fold
 import arrow.extension
 import arrow.typeclasses.*
 import arrow.core.extensions.bitraverse as tuple2Bitraverse
@@ -94,12 +93,20 @@ interface Tuple2Foldable<F> : Foldable<Tuple2PartialOf<F>> {
     fix().foldR(lb, f)
 }
 
+@extension
+interface Tuple2Bifoldable : Bifoldable<ForTuple2> {
+  override fun <A, B, C> Tuple2Of<A, B>.bifoldLeft(c: C, f: (C, A) -> C, g: (C, B) -> C): C = fix().let { g(f(c, it.a), it.b) }
+
+  override fun <A, B, C> Tuple2Of<A, B>.bifoldRight(c: Eval<C>, f: (A, Eval<C>) -> Eval<C>, g: (B, Eval<C>) -> Eval<C>): Eval<C> =
+    fix().let { f(it.a, g(it.b, c)) }
+}
+
 fun <F, G, A, B> Tuple2Of<F, A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Tuple2<F, B>> = GA.run {
   fix().let { f(it.b).map(it.a::toT) }
 }
 
 fun <G, A, B, C, D> Tuple2Of<A, B>.bitraverse(GA: Applicative<G>, f: (A) -> Kind<G, C>, g: (B) -> Kind<G, D>): Kind<G, Tuple2<C, D>> = GA.run {
-  fix().bimap(f,g)
+  fix().let { tupled(f(it.a), g(it.b)) }
 }
 
 fun <F, G, A> Tuple2Of<F, Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, Tuple2<F, A>> =
@@ -113,7 +120,7 @@ interface Tuple2Traverse<F> : Traverse<Tuple2PartialOf<F>>, Tuple2Foldable<F> {
 }
 
 @extension
-interface Tuple2Bitraverse<F> : Bitraverse<ForTuple2>, Tuple2Foldable<F> {
+interface Tuple2Bitraverse<F> : Bitraverse<ForTuple2>, Tuple2Bifoldable {
   override fun <G, A, B, C, D> Tuple2Of<A, B>.bitraverse(AP: Applicative<G>, f: (A) -> Kind<G, C>, g: (B) -> Kind<G, D>): Kind<G, Tuple2Of<C, D>> =
     tuple2Bitraverse(AP, f, g)
 }
