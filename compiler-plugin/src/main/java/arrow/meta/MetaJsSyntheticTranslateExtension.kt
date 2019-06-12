@@ -1,4 +1,4 @@
-package arrow.plugin
+package arrow.meta
 
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.js.translate.context.TranslationContext

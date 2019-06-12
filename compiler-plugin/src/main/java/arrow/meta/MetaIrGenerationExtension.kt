@@ -1,4 +1,4 @@
-package arrow.plugin
+package arrow.meta
 
 import org.jetbrains.kotlin.backend.common.BackendContext
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension

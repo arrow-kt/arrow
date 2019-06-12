@@ -1,4 +1,4 @@
-package arrow.plugin
+package arrow.meta
 
 import com.google.auto.service.AutoService
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
@@ -18,7 +18,7 @@ import org.jetbrains.kotlin.resolve.extensions.SyntheticResolveExtension
 import org.jetbrains.kotlin.resolve.jvm.extensions.AnalysisHandlerExtension
 import org.jetbrains.kotlin.resolve.jvm.extensions.PackageFragmentProviderExtension
 
-@AutoService(ComponentRegistrar::class)
+//@AutoService(ComponentRegistrar::class)
 class ArrowComponentRegistrar : ComponentRegistrar {
 
   /**
@@ -49,7 +49,7 @@ class ArrowComponentRegistrar : ComponentRegistrar {
     println("ComponentRegistrar.registerProjectComponents")
 
     // see https://github.com/JetBrains/kotlin/blob/1.1.2/plugins/annotation-collector/src/org/jetbrains/kotlin/annotation/AnnotationCollectorPlugin.kt#L92
-    val messageCollector = configuration.get(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY, MessageCollector.NONE)
+    val messageCollector: MessageCollector = configuration.get(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY, MessageCollector.NONE)
 
     StorageComponentContainerContributor.registerExtension(project, TestStorageComponentContainerContributor())
     ClassBuilderInterceptorExtension.registerExtension(project, MetaClassBuilderInterceptorExtension(messageCollector))

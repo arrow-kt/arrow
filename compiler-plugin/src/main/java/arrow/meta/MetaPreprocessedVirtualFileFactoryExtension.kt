@@ -1,4 +1,4 @@
-package arrow.plugin
+package arrow.meta
 
 import org.jetbrains.kotlin.com.intellij.openapi.vfs.VirtualFile
 import org.jetbrains.kotlin.com.intellij.testFramework.LightVirtualFile

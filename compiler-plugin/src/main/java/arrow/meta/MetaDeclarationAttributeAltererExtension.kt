@@ -1,4 +1,4 @@
-package arrow.plugin
+package arrow.meta
 
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.Modality

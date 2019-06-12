@@ -1,4 +1,4 @@
-package arrow.plugin
+package arrow.meta
 
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.extensions.CompilerConfigurationExtension

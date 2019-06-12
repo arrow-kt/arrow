@@ -1,4 +1,4 @@
-package arrow.plugin
+package arrow.meta
 
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity.ERROR
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
@@ -30,8 +30,6 @@ internal class MetaClassBuilder(
 ) : DelegatingClassBuilder() {
   override fun getDelegate(): ClassBuilder = builder
 
-
-
   override fun newMethod(
     origin: JvmDeclarationOrigin,
     access: Int,
@@ -43,53 +41,8 @@ internal class MetaClassBuilder(
     println("ClassBuilderInterceptorExtension.DelegatingClassBuilder.newMethod, origin: ${origin.descriptor}")
     //delegate to the parent method visitor for construction
     val original: MethodVisitor = super.newMethod(origin, access, name, desc, signature, exceptions)
-    //bail quickly if this is not a function
-    val function: FunctionDescriptor = origin.descriptor as? FunctionDescriptor ?: return original
-    val functionName = function.name.asString()
-    //we ignore suspend functions as they are already safe
-    if (!function.isSuspend &&
-      !function.isSynthesized &&
-      !function.isSuspendLambdaOrLocalFunction() &&
-      functionName != "<init>" &&
-      !functionName.startsWith("<get") &&
-      !functionName.startsWith("<set")) {
-      val functionPsi = function.findPsi()
-      //if the function returns Unit then it should have been suspended since all it can do is produce effects
-      if (function.returnType?.isUnit() == true) {
-        functionPsi.let {
-          messageCollector.report(
-            ERROR,
-            "Unit return on a non suspended function: ${function.name}",
-            MessageUtil.psiElementToMessageLocation(it)
-          )
-        }
-      } else functionPsi?.checkPurity(function)
-    }
     return original
   }
-
-  private fun PsiElement.checkPurity(descriptor: FunctionDescriptor) {
-    accept(object : PsiElementVisitor() {
-      override fun visitElement(element: PsiElement?) {
-        if (element is KtCallExpression) {
-          checkExpressionPurity(descriptor, element)
-        }
-        element?.acceptChildren(this)
-      }
-    })
-  }
-
-  private fun checkExpressionPurity(descriptor: FunctionDescriptor, expression: KtExpression) {
-    val expressionRetType: KotlinType? = expression.getType(bindingContext)
-    if (expressionRetType?.isUnit() == true) {
-      messageCollector.report(
-        ERROR,
-        "Impure expression in function ${descriptor.name}: `${expression.text}` returning `Unit` only allowed in `suspend` functions",
-        MessageUtil.psiElementToMessageLocation(expression)
-      )
-    }
-  }
-
 
 }
 
