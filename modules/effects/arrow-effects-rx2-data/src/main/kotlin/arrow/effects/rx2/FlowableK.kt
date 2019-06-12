@@ -81,7 +81,7 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
   fun <B> bracketCase(use: (A) -> FlowableKOf<B>, release: (A, ExitCase<Throwable>) -> FlowableKOf<Unit>, mode: BackpressureStrategy = BackpressureStrategy.BUFFER): FlowableK<B> =
     Flowable.create<B>({ emitter ->
       val dispose =
-        handleErrorWith { e -> Flowable.fromCallable { emitter.onError(e) }.flatMap { Flowable.error<A>(e) }.k() }
+        handleErrorWith { e -> Flowable.fromCallable { emitter.onError(e) }.flatMap { Flowable.never<A>() }.k() }
           .value()
           .concatMap { a ->
             if (emitter.isCancelled) {
@@ -89,9 +89,8 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
               Flowable.never<B>()
             } else {
               Flowable.defer { use(a).value() }
-                .doOnError { e ->
-                  val error = e.nonFatalOrThrow()
-                  Flowable.defer { release(a, ExitCase.Error(error)).value() }.subscribe({ emitter.onError(error) }, { e2 -> emitter.onError(Platform.composeErrors(error, e2)) })
+                .doOnError { t: Throwable ->
+                  Flowable.defer { release(a, ExitCase.Error(t.nonFatalOrThrow())).value() }.subscribe({ emitter.onError(t) }, { e -> emitter.onError(Platform.composeErrors(t, e)) })
                 }.doOnComplete {
                   Flowable.defer { release(a, ExitCase.Completed).value() }.subscribe({ emitter.onComplete() }, emitter::onError)
                 }.doOnCancel {

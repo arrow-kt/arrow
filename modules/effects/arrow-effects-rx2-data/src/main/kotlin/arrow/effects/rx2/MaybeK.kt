@@ -7,6 +7,7 @@ import arrow.core.Predicate
 import arrow.core.Right
 import arrow.core.nonFatalOrThrow
 import arrow.effects.OnCancel
+import arrow.effects.internal.Platform
 import arrow.effects.rx2.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.ExitCase.Canceled
@@ -79,7 +80,7 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
   fun <B> bracketCase(use: (A) -> MaybeKOf<B>, release: (A, ExitCase<Throwable>) -> MaybeKOf<Unit>): MaybeK<B> =
     Maybe.create<B> { emitter ->
       val dispose =
-        handleErrorWith { t -> Maybe.fromCallable { emitter.onError(t) }.flatMap { Maybe.error<A>(t) }.k() }
+        handleErrorWith { t -> Maybe.fromCallable { emitter.onError(t) }.flatMap { Maybe.never<A>() }.k() }
           .flatMap { a ->
             if (emitter.isDisposed) {
               release(a, Canceled).fix().maybe.subscribe({}, emitter::onError)
@@ -88,7 +89,7 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
               MaybeK.defer { use(a) }
                 .value()
                 .doOnError { t: Throwable ->
-                  MaybeK.defer { release(a, Error(t.nonFatalOrThrow())) }.value().subscribe({ emitter.onError(t) }, emitter::onError)
+                  MaybeK.defer { release(a, Error(t.nonFatalOrThrow())) }.value().subscribe({ emitter.onError(t) }, { e -> emitter.onError(Platform.composeErrors(t, e)) })
                 }.doAfterSuccess {
                   MaybeK.defer { release(a, Completed) }.fix().value().subscribe({ emitter.onComplete() }, emitter::onError)
                 }

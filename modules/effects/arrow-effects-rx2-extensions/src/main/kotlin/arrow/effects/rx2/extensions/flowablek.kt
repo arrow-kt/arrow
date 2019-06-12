@@ -225,9 +225,9 @@ interface FlowableKConcurrent : Concurrent<ForFlowableK>, FlowableKAsync {
         val sa = ReplaySubject.create<A>()
         val sb = ReplaySubject.create<B>()
         val sc = ReplaySubject.create<C>()
-        val dda = fa.value().subscribe(sa::onNext, sa::onError, sa::onComplete)
-        val ddb = fb.value().subscribe(sb::onNext, sb::onError, sb::onComplete)
-        val ddc = fc.value().subscribe(sc::onNext, sc::onError, sc::onComplete)
+        val dda = fa.value().subscribe(sa::onNext, sa::onError)
+        val ddb = fb.value().subscribe(sb::onNext, sb::onError)
+        val ddc = fc.value().subscribe(sc::onNext, sc::onError)
         emitter.setCancellable { dda.dispose(); ddb.dispose(); ddc.dispose() }
         val ffa = Fiber(sa.toFlowable(BS()).k(), FlowableK { dda.dispose() })
         val ffb = Fiber(sb.toFlowable(BS()).k(), FlowableK { ddb.dispose() })

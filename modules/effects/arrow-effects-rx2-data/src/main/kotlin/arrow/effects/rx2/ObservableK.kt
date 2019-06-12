@@ -8,6 +8,7 @@ import arrow.core.Right
 import arrow.core.identity
 import arrow.core.nonFatalOrThrow
 import arrow.effects.OnCancel
+import arrow.effects.internal.Platform
 import arrow.effects.rx2.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
@@ -80,7 +81,7 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
   fun <B> bracketCase(use: (A) -> ObservableKOf<B>, release: (A, ExitCase<Throwable>) -> ObservableKOf<Unit>): ObservableK<B> =
     Observable.create<B> { emitter ->
       val dispose =
-        handleErrorWith { t -> Observable.fromCallable { emitter.onError(t) }.flatMap { Observable.error<A>(t) }.k() }
+        handleErrorWith { t -> Observable.fromCallable { emitter.onError(t) }.flatMap { Observable.never<A>() }.k() }
           .concatMap { a ->
             if (emitter.isDisposed) {
               release(a, ExitCase.Canceled).fix().observable.subscribe({}, emitter::onError)
@@ -89,7 +90,7 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
               defer { use(a) }
                 .value()
                 .doOnError { t: Throwable ->
-                  defer { release(a, ExitCase.Error(t.nonFatalOrThrow())) }.value().subscribe({ emitter.onError(t) }, emitter::onError)
+                  defer { release(a, ExitCase.Error(t.nonFatalOrThrow())) }.value().subscribe({ emitter.onError(t) }, { e -> emitter.onError(Platform.composeErrors(t, e)) })
                 }.doOnComplete {
                   defer { release(a, ExitCase.Completed) }.fix().value().subscribe({ emitter.onComplete() }, emitter::onError)
                 }

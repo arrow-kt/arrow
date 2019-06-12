@@ -27,7 +27,6 @@ import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
-import io.kotlintest.shouldNotBe
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subscribers.TestSubscriber
@@ -97,24 +96,6 @@ class FlowableKTests : UnitSpec() {
       val test: TestSubscriber<Long> = value.test()
       test.awaitDone(5, TimeUnit.SECONDS)
       test.assertTerminated().assertComplete().assertNoErrors().assertValue(0)
-    }
-
-    "Multi-thread Observables should run on their required threads" {
-      val originalThread: Thread = Thread.currentThread()
-      var threadRef: Thread? = null
-      val value: Flowable<Long> = FlowableK.fx {
-        val a = Flowable.timer(2, TimeUnit.SECONDS, Schedulers.newThread()).k().bind()
-        threadRef = Thread.currentThread()
-        val b = Flowable.just(a).observeOn(Schedulers.newThread()).k().bind()
-        b
-      }.value()
-      val test: TestSubscriber<Long> = value.test()
-      val lastThread: Thread = test.awaitDone(5, TimeUnit.SECONDS).lastThread()
-      val nextThread = (threadRef?.name ?: "")
-
-      nextThread shouldNotBe originalThread.name
-      lastThread.name shouldNotBe originalThread.name
-      lastThread.name shouldNotBe nextThread
     }
 
     "Flowable cancellation forces binding to cancel without completing too" {

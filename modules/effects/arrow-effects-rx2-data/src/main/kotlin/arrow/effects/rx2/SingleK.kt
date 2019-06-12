@@ -5,6 +5,7 @@ import arrow.core.Left
 import arrow.core.Right
 import arrow.core.nonFatalOrThrow
 import arrow.effects.OnCancel
+import arrow.effects.internal.Platform
 import arrow.effects.rx2.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
@@ -78,7 +79,7 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
   fun <B> bracketCase(use: (A) -> SingleKOf<B>, release: (A, ExitCase<Throwable>) -> SingleKOf<Unit>): SingleK<B> =
     Single.create<B> { emitter ->
       val dispose =
-        handleErrorWith { t -> Single.fromCallable { emitter.onError(t) }.flatMap { Single.error<A>(t) }.k() }
+        handleErrorWith { t -> Single.fromCallable { emitter.onError(t) }.flatMap { Single.never<A>() }.k() }
           .flatMap { a ->
             if (emitter.isDisposed) {
               release(a, Canceled).fix().single.subscribe({}, emitter::onError)
@@ -87,8 +88,8 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
               SingleK.defer { use(a) }
                 .value()
                 .doOnError { t: Throwable ->
-                  SingleK.defer { release(a, Error(t.nonFatalOrThrow())) }.value().subscribe({ emitter.onError(t) }, emitter::onError)
-                }.doAfterSuccess { b ->
+                  SingleK.defer { release(a, Error(t.nonFatalOrThrow())) }.value().subscribe({ emitter.onError(t) }, { e -> emitter.onError(Platform.composeErrors(t, e)) })
+                }.doAfterSuccess {
                   SingleK.defer { release(a, Completed) }.fix().value().subscribe({ }, emitter::onError)
                 }.doOnDispose {
                   SingleK.defer { release(a, Canceled) }.value().subscribe({}, {})
@@ -96,7 +97,7 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
                 .k()
             }
           }
-          .value().subscribe(emitter::onSuccess, {})
+          .value().subscribe(emitter::onSuccess) {}
       emitter.setCancellable { dispose.dispose() }
     }.k()
 
