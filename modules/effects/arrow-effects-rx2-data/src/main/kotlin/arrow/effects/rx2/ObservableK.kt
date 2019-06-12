@@ -4,9 +4,9 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Left
-import arrow.core.NonFatal
 import arrow.core.Right
 import arrow.core.identity
+import arrow.core.nonFatalOrThrow
 import arrow.effects.OnCancel
 import arrow.effects.internal.Platform
 import arrow.effects.rx2.CoroutineContextRx2Scheduler.asScheduler
@@ -79,29 +79,30 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
    *  ```
    */
   fun <B> bracketCase(use: (A) -> ObservableKOf<B>, release: (A, ExitCase<Throwable>) -> ObservableKOf<Unit>): ObservableK<B> =
-    ObservableK(Observable.create<B> { emitter ->
-      observable.subscribe({ a ->
-        if (emitter.isDisposed) release(a, ExitCase.Canceled).fix().observable.subscribe({}, emitter::onError)
-        else try {
-          emitter.setDisposable(use(a).fix()
-            .flatMap { b -> release(a, ExitCase.Completed).fix().map { b } }
-            .handleErrorWith { e -> release(a, ExitCase.Error(e)).fix().flatMap { ObservableK.raiseError<B>(e) } }
-            .observable
-            .doOnDispose { release(a, ExitCase.Canceled).fix().observable.subscribe({}, emitter::onError) }
-            .subscribe(emitter::onNext, emitter::onError))
-        } catch (e: Throwable) {
-          if (NonFatal(e)) {
-            release(a, ExitCase.Error(e)).fix().observable.subscribe({
-              emitter.onError(e)
-            }, { e2 ->
-              emitter.onError(Platform.composeErrors(e, e2))
-            })
-          } else {
-            throw e
+    Observable.create<B> { emitter ->
+      val dispose =
+        handleErrorWith { t -> Observable.fromCallable { emitter.onError(t) }.flatMap { Observable.error<A>(t) }.k() }
+          .concatMap { a ->
+            if (emitter.isDisposed) {
+              release(a, ExitCase.Canceled).fix().observable.subscribe({}, emitter::onError)
+              Observable.never<B>().k()
+            } else {
+              defer { use(a) }
+                .value()
+                .doOnError { t: Throwable ->
+                  defer { release(a, ExitCase.Error(t.nonFatalOrThrow())) }.value().subscribe({ emitter.onError(t) }, { e -> emitter.onError(Platform.composeErrors(t, e)) })
+                }.doOnComplete {
+                  defer { release(a, ExitCase.Completed) }.fix().value().subscribe({ emitter.onComplete() }, emitter::onError)
+                }
+                .doOnDispose {
+                  defer { release(a, ExitCase.Canceled) }.value().subscribe({}, {})
+                }
+                .k()
+            }
           }
-        }
-      }, emitter::onError, emitter::onComplete)
-    })
+          .value().subscribe(emitter::onNext, {}, {})
+      emitter.setCancellable { dispose.dispose() }
+    }.k()
 
   fun <B> concatMap(f: (A) -> ObservableKOf<B>): ObservableK<B> =
     observable.concatMap { f(it).value() }.k()
@@ -214,9 +215,8 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
         // On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
         // on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
         connection.push(ObservableK { if (!emitter.isDisposed) emitter.onError(OnCancel.CancellationException) })
-        emitter.setCancellable { connection.cancel().value().subscribe({}, {}) }
 
-        fa(connection) { either: Either<Throwable, A> ->
+        val dispose = fa(connection) { either: Either<Throwable, A> ->
           either.fold({
             emitter.onError(it)
           }, {
@@ -224,6 +224,11 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
             emitter.onComplete()
           })
         }.fix().observable.subscribe({}, emitter::onError)
+
+        emitter.setCancellable {
+          dispose.dispose()
+          connection.cancel().value().subscribe({}, {})
+        }
       }.k()
 
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> ObservableKOf<Either<A, B>>): ObservableK<B> {
