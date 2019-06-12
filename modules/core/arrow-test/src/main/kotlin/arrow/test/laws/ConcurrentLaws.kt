@@ -5,6 +5,9 @@ import arrow.core.Either
 import arrow.core.Right
 import arrow.core.Tuple2
 import arrow.core.identity
+import arrow.data.ListK
+import arrow.data.extensions.listk.traverse.traverse
+import arrow.data.k
 import arrow.effects.CancelToken
 import arrow.effects.MVar
 import arrow.effects.Promise
@@ -72,7 +75,10 @@ object ConcurrentLaws {
       Law("Concurrent Laws: race cancels both") { CF.raceCancelCancelsBoth(EQ, ctx) },
       Law("Concurrent Laws: race is cancellable by participants") { CF.raceCanBeCancelledByParticipants(EQ, ctx) },
       Law("Concurrent Laws: parallel map cancels both") { CF.parMapCancelCancelsBoth(EQ, ctx) },
-      Law("Concurrent Laws: action concurrent with pure value is just action") { CF.actionConcurrentWithPureValueIsJustAction(EQ, ctx) }
+      Law("Concurrent Laws: action concurrent with pure value is just action") { CF.actionConcurrentWithPureValueIsJustAction(EQ, ctx) },
+      Law("Concurrent Laws: parTraverse can traverse effectfull computations") { CF.parTraverseCanTraverseEffectfullComputations(EQ) },
+      Law("Concurrent Laws: parTraverse forks the effects") { CF.parTraverseForksTheEffects(EQ_UNIT) },
+      Law("Concurrent Laws: parSequence forks the effects") { CF.parSequenceForksTheEffects(EQ_UNIT) }
     )
 
   fun <F> Concurrent<F>.cancelOnBracketReleases(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) {
@@ -538,11 +544,14 @@ object ConcurrentLaws {
               {
                 it.fold(
                   { _, fiberB, fiberC ->
-                    ctx.startFiber(fiberB.cancel().followedBy(fiberC.cancel())).flatMap { combinePromises } },
+                    ctx.startFiber(fiberB.cancel().followedBy(fiberC.cancel())).flatMap { combinePromises }
+                  },
                   { fiberA, _, fiberC ->
-                    ctx.startFiber(fiberA.cancel().followedBy(fiberC.cancel())).flatMap { combinePromises } },
+                    ctx.startFiber(fiberA.cancel().followedBy(fiberC.cancel())).flatMap { combinePromises }
+                  },
                   { fiberA, fiberB, _ ->
-                    ctx.startFiber(fiberA.cancel().followedBy(fiberB.cancel())).flatMap { combinePromises } })
+                    ctx.startFiber(fiberA.cancel().followedBy(fiberB.cancel())).flatMap { combinePromises }
+                  })
               })
           }.bind()
       }
@@ -658,5 +667,45 @@ object ConcurrentLaws {
           join.map { i }
         }
       }.equalUnderTheLaw(just(i), EQ)
+    }
+
+  fun <F> Concurrent<F>.parTraverseCanTraverseEffectfullComputations(EQ: Eq<Kind<F, Int>>): Unit =
+    forFew(10, Gen.int()) {
+      val finalValue = 100
+      fx.concurrent {
+        val ref = !ref { 0 }
+        !(0 until finalValue).toList().k().parTraverse(ListK.traverse()) {
+          ref.update(Int::inc)
+        }
+        !ref.get() - finalValue
+      }.equalUnderTheLaw(just(0), EQ)
+    }
+
+  fun <F> Concurrent<F>.parTraverseForksTheEffects(EQ: Eq<Kind<F, Unit>>): Unit =
+    forFew(10, Gen.int()) {
+      fx.concurrent {
+        val promiseA = !Promise<F, Unit>(this)
+        val promiseB = !Promise<F, Unit>(this)
+        val promiseC = !Promise<F, Unit>(this)
+        !listOf(
+          promiseA.get().bracket(use = { promiseC.complete(Unit) }, release = { unit() }),
+          promiseB.get().followedBy(promiseA.complete(Unit)).bracket(use = { unit() }, release = { unit() }),
+          promiseB.complete(Unit).followedBy(promiseC.get()).bracket(use = { unit() }, release = { unit() })
+        ).k().parTraverse(ListK.traverse(), ::identity).unit()
+      }.equalUnderTheLaw(just(Unit), EQ)
+    }
+
+  fun <F> Concurrent<F>.parSequenceForksTheEffects(EQ: Eq<Kind<F, Unit>>): Unit =
+    forFew(10, Gen.int()) {
+      fx.concurrent {
+        val promiseA = !Promise<F, Unit>(this)
+        val promiseB = !Promise<F, Unit>(this)
+        val promiseC = !Promise<F, Unit>(this)
+        !listOf(
+          promiseA.get().bracket(use = { promiseC.complete(Unit) }, release = { unit() }),
+          promiseB.get().followedBy(promiseA.complete(Unit)).bracket(use = { unit() }, release = { unit() }),
+          promiseB.complete(Unit).followedBy(promiseC.get()).bracket(use = { unit() }, release = { unit() })
+        ).k().parSequence(ListK.traverse()).unit()
+      }.equalUnderTheLaw(just(Unit), EQ)
     }
 }
