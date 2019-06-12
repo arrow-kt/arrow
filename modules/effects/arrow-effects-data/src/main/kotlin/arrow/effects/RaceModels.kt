@@ -8,7 +8,7 @@ sealed class RacePair<F, A, B> {
   data class First<F, A, B>(val winner: A, val fiberB: Fiber<F, B>) : RacePair<F, A, B>()
   data class Second<F, A, B>(val fiberA: Fiber<F, A>, val winner: B) : RacePair<F, A, B>()
 
-  fun <C> fold(
+  inline fun <C> fold(
     ifA: (A, Fiber<F, B>) -> C,
     ifB: (Fiber<F, A>, B) -> C
   ): C = when (this) {
@@ -22,7 +22,7 @@ sealed class RaceTriple<F, A, B, C> {
   data class Second<F, A, B, C>(val fiberA: Fiber<F, A>, val winner: B, val fiberC: Fiber<F, C>) : RaceTriple<F, A, B, C>()
   data class Third<F, A, B, C>(val fiberA: Fiber<F, A>, val fiberB: Fiber<F, B>, val winner: C) : RaceTriple<F, A, B, C>()
 
-  fun <D> fold(
+  inline fun <D> fold(
     ifA: (A, Fiber<F, B>, Fiber<F, C>) -> D,
     ifB: (Fiber<F, A>, B, Fiber<F, C>) -> D,
     ifC: (Fiber<F, A>, Fiber<F, B>, C) -> D
@@ -41,7 +41,7 @@ sealed class Race3 <A, B, C> {
   data class Second<B>(val winner: B) : Race3<Nothing, B, Nothing>()
   data class Third<C>(val winner: C) : Race3<Nothing, Nothing, C>()
 
-  fun <D> fold(
+  inline fun <D> fold(
     ifA: (A) -> D,
     ifB: (B) -> D,
     ifC: (C) -> D
@@ -58,7 +58,7 @@ sealed class Race4 <A, B, C, D> {
   data class Third<C>(val winner: C) : Race4<Nothing, Nothing, C, Nothing>()
   data class Fourth<D>(val winner: D) : Race4<Nothing, Nothing, Nothing, D>()
 
-  fun <E> fold(
+  inline fun <E> fold(
     ifA: (A) -> E,
     ifB: (B) -> E,
     ifC: (C) -> E,
@@ -78,7 +78,7 @@ sealed class Race5 <A, B, C, D, E> {
   data class Fourth<D>(val winner: D) : Race5<Nothing, Nothing, Nothing, D, Nothing>()
   data class Fifth<E>(val winner: E) : Race5<Nothing, Nothing, Nothing, Nothing, E>()
 
-  fun <F> fold(
+  inline fun <F> fold(
     ifA: (A) -> F,
     ifB: (B) -> F,
     ifC: (C) -> F,
@@ -101,7 +101,7 @@ sealed class Race6 <A, B, C, D, E, F> {
   data class Fifth<E>(val winner: E) : Race6<Nothing, Nothing, Nothing, Nothing, E, Nothing>()
   data class Sixth<F>(val winner: F) : Race6<Nothing, Nothing, Nothing, Nothing, Nothing, F>()
 
-  fun <G> fold(
+  inline fun <G> fold(
     ifA: (A) -> G,
     ifB: (B) -> G,
     ifC: (C) -> G,
@@ -127,7 +127,7 @@ sealed class Race7 <A, B, C, D, E, F, G> {
   data class Sixth<F>(val winner: F) : Race7<Nothing, Nothing, Nothing, Nothing, Nothing, F, Nothing>()
   data class Seventh<G>(val winner: G) : Race7<Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, G>()
 
-  fun <H> fold(
+  inline fun <H> fold(
     ifA: (A) -> H,
     ifB: (B) -> H,
     ifC: (C) -> H,
@@ -156,7 +156,7 @@ sealed class Race8 <A, B, C, D, E, F, G, H> {
   data class Seventh<G>(val winner: G) : Race8<Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, G, Nothing>()
   data class Eighth<H>(val winner: H) : Race8<Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, H>()
 
-  fun <I> fold(
+  inline fun <I> fold(
     ifA: (A) -> I,
     ifB: (B) -> I,
     ifC: (C) -> I,
@@ -188,7 +188,7 @@ sealed class Race9 <A, B, C, D, E, F, G, H, I> {
   data class Eighth<H>(val winner: H) : Race9<Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, H, Nothing>()
   data class Ninth<I>(val winner: I) : Race9<Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, I>()
 
-  fun <J> fold(
+  inline fun <J> fold(
     ifA: (A) -> J,
     ifB: (B) -> J,
     ifC: (C) -> J,

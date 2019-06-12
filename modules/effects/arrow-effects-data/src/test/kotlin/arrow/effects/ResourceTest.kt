@@ -1,8 +1,10 @@
 package arrow.effects
 
 import arrow.Kind
+import arrow.core.Some
 import arrow.core.extensions.monoid
 import arrow.data.extensions.list.traverse.traverse
+import arrow.effects.extensions.io.applicative.applicative
 import arrow.effects.extensions.io.bracket.bracket
 import arrow.effects.extensions.resource.applicative.applicative
 import arrow.effects.extensions.resource.monad.monad
@@ -22,8 +24,10 @@ class ResourceTest : UnitSpec() {
   init {
 
     val EQ = Eq<Kind<ResourcePartialOf<ForIO, Throwable>, Int>> { a, b ->
-      a.fix().invoke { IO.just(1) }.fix().unsafeRunTimed(60.seconds) ==
-        b.fix().invoke { IO.just(1) }.fix().unsafeRunTimed(60.seconds)
+      val tested: IO<Int> = a.fix().invoke { IO.just(1) }.fix()
+      val expected = b.fix().invoke { IO.just(1) }.fix()
+      val compare = IO.applicative().map(tested, expected) { (t, e) -> t == e }.fix()
+      compare.unsafeRunTimed(5.seconds) == Some(true)
     }
 
     testLaws(

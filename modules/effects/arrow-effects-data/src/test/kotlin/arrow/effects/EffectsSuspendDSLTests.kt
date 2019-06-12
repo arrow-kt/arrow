@@ -78,7 +78,6 @@ class EffectsSuspendDSLTests : UnitSpec() {
           effect { getThreadName() },
           effect { getThreadName() }
         ) { a, b -> listOf(a, b) }
-        !effect { println(result) }
         result
       }
       unsafe { runBlocking { program } }.distinct().size shouldBe 2

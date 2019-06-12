@@ -48,6 +48,10 @@ data class CompilationException(
   override fun toString(): String = msg
 }
 
+data class AnkFailedException(val msg: String) : NoStackTrace(msg) {
+  override fun toString(): String = msg
+}
+
 abstract class NoStackTrace(msg: String) : Throwable(msg, null, false, false)
 
 data class Snippet(
@@ -178,6 +182,7 @@ val interpreter: AnkOps = object : AnkOps {
         } else {
           println(colored(ANSI_RED, "[✗ ${snippets.a} [${i + 1}]"))
           throw CompilationException(snippets.a, snip, it, msg = "\n" + """
+                    | File located at: ${snippets.a}
                     |
                     |```
                     |${snip.code}
