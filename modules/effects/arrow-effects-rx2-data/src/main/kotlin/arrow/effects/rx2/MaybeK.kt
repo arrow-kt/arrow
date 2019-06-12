@@ -80,7 +80,7 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
   fun <B> bracketCase(use: (A) -> MaybeKOf<B>, release: (A, ExitCase<Throwable>) -> MaybeKOf<Unit>): MaybeK<B> =
     Maybe.create<B> { emitter ->
       val dispose =
-        handleErrorWith { t -> Maybe.fromCallable { emitter.onError(t) }.flatMap { Maybe.never<A>() }.k() }
+        handleErrorWith { t -> Maybe.fromCallable { emitter.onError(t) }.flatMap { Maybe.error<A>(t) }.k() }
           .flatMap { a ->
             if (emitter.isDisposed) {
               release(a, Canceled).fix().maybe.subscribe({}, emitter::onError)

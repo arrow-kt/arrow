@@ -81,7 +81,7 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
   fun <B> bracketCase(use: (A) -> ObservableKOf<B>, release: (A, ExitCase<Throwable>) -> ObservableKOf<Unit>): ObservableK<B> =
     Observable.create<B> { emitter ->
       val dispose =
-        handleErrorWith { t -> Observable.fromCallable { emitter.onError(t) }.flatMap { Observable.never<A>() }.k() }
+        handleErrorWith { t -> Observable.fromCallable { emitter.onError(t) }.flatMap { Observable.error<A>(t) }.k() }
           .concatMap { a ->
             if (emitter.isDisposed) {
               release(a, ExitCase.Canceled).fix().observable.subscribe({}, emitter::onError)

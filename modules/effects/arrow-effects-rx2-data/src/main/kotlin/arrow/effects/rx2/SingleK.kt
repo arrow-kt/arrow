@@ -79,7 +79,7 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
   fun <B> bracketCase(use: (A) -> SingleKOf<B>, release: (A, ExitCase<Throwable>) -> SingleKOf<Unit>): SingleK<B> =
     Single.create<B> { emitter ->
       val dispose =
-        handleErrorWith { t -> Single.fromCallable { emitter.onError(t) }.flatMap { Single.never<A>() }.k() }
+        handleErrorWith { t -> Single.fromCallable { emitter.onError(t) }.flatMap { Single.error<A>(t) }.k() }
           .flatMap { a ->
             if (emitter.isDisposed) {
               release(a, Canceled).fix().single.subscribe({}, emitter::onError)

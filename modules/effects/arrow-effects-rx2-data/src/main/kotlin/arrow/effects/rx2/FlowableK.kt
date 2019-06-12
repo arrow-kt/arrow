@@ -81,7 +81,7 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
   fun <B> bracketCase(use: (A) -> FlowableKOf<B>, release: (A, ExitCase<Throwable>) -> FlowableKOf<Unit>, mode: BackpressureStrategy = BackpressureStrategy.BUFFER): FlowableK<B> =
     Flowable.create<B>({ emitter ->
       val dispose =
-        handleErrorWith { e -> Flowable.fromCallable { emitter.onError(e) }.flatMap { Flowable.never<A>() }.k() }
+        handleErrorWith { e -> Flowable.fromCallable { emitter.onError(e) }.flatMap { Flowable.error<A>(e) }.k() }
           .value()
           .concatMap { a ->
             if (emitter.isCancelled) {
