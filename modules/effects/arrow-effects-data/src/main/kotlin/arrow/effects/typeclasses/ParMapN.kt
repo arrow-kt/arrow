@@ -154,5 +154,4 @@ interface ParMapN<F> {
       parMapN(fh, fi, fj, ::Tuple3)) { (a, b, c), (d, e, g), (h, i, j) ->
       f(a, b, c, d, e, g, h, i, j)
     }
-
 }
