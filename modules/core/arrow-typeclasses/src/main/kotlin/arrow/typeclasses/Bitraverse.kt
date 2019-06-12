@@ -10,7 +10,7 @@ import arrow.typeclasses.internal.IdBimonad
 /**
  * Type class which implements a two independent traverse TODO Improve
  */
-interface   Bitraverse<F> : Bifunctor<F>, Bifoldable<F> {
+interface Bitraverse<F> : Bifunctor<F>, Bifoldable<F> {
 
   /**
    * Use the functions given as parameter tor traverse the structure //todo compplete
