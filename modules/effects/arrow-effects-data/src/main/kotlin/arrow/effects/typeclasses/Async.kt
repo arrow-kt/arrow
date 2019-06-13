@@ -321,6 +321,9 @@ interface Async<F> : MonadDefer<F> {
    */
   fun <A> never(): Kind<F, A> =
     async { }
+
+  fun <A, B> Kind<F, A>.mapEffect(f: suspend (A) -> B): Kind<F, B> =
+    flatMap { a -> effect { f(a) } }
 }
 
 internal val mapUnit: (Any?) -> Unit = { Unit }
