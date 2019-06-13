@@ -127,7 +127,7 @@ interface Async<F> : MonadDefer<F> {
    *   //sampleStart
    *   fun <F> Async<F>.runOnDefaultDispatcher(): Kind<F, String> =
    *     _just_(Unit)._continueOn_(Dispatchers.Default).flatMap {
-   *       _delay_({ Thread.currentThread().name })
+   *       _later_({ Thread.currentThread().name })
    *     }
    *
    *   val result = _extensionFactory_.runOnDefaultDispatcher()
@@ -231,7 +231,7 @@ interface Async<F> : MonadDefer<F> {
    * fun main(args: Array<String>) {
    *   //sampleStart
    *   fun <F> Async<F>.invokeOnDefaultDispatcher(): Kind<F, String> =
-   *     _defer_(Dispatchers.Default, { delay { Thread.currentThread().name } })
+   *     _defer_(Dispatchers.Default, { effect { Thread.currentThread().name } })
    *
    *   val result = _extensionFactory_.invokeOnDefaultDispatcher().fix().unsafeRunSync()
    *   //sampleEnd

@@ -95,8 +95,8 @@ interface Concurrent<F> : Async<F> {
    *         }
    *       }
    *
-   *       conn.push(_delay_({ GithubService.unregisterCallback(id) }))
-   *       conn.push(_delay_({ println("Everything we push to the cancellation stack will execute on cancellation") }))
+   *       conn.push(_later_({ GithubService.unregisterCallback(id) }))
+   *       conn.push(_later_({ println("Everything we push to the cancellation stack will execute on cancellation") }))
    *     }
    *
    *   val result = _extensionFactory_.getUsernames()
@@ -140,7 +140,7 @@ interface Concurrent<F> : Async<F> {
    *   //sampleStart
    *   fun <F> Concurrent<F>.getUsernames(): Kind<F, List<String>> =
    *     asyncF { conn: KindConnection<F>, cb: (Either<Throwable, List<String>>) -> Unit ->
-   *       delay {
+   *       effect {
    *         val id = GithubService.getUsernames { names, throwable ->
    *           when {
    *             names != null -> cb(Right(names))
@@ -149,8 +149,8 @@ interface Concurrent<F> : Async<F> {
    *           }
    *         }
    *
-   *         conn.push(_delay_({ GithubService.unregisterCallback(id) }))
-   *         conn.push(_delay_({ println("Everything we push to the cancellation stack will execute on cancellation") }))
+   *         conn.push(_later_({ GithubService.unregisterCallback(id) }))
+   *         conn.push(_later_({ println("Everything we push to the cancellation stack will execute on cancellation") }))
    *       }
    *     }
    *
@@ -315,7 +315,7 @@ interface Concurrent<F> : Async<F> {
    *         successCallback = { accs -> cb(Right(accs)) },
    *         failureCallback = { e -> cb(Left(e)) })
    *
-   *       _delay_({ service.cancel() })
+   *       _later_({ service.cancel() })
    *     }
    *   }
    *
@@ -342,22 +342,22 @@ interface Concurrent<F> : Async<F> {
    * fun main(args: Array<String>) {
    *   //sampleStart
    *   val result = _extensionFactory_.cancelableF<String> { cb ->
-   *     delay {
+   *     effect {
    *       val deferred = kotlinx.coroutines.GlobalScope.async {
    *         kotlinx.coroutines.delay(1000)
    *         cb(Right("Hello from ${Thread.currentThread().name}"))
    *       }
    *
-   *       delay({ deferred.cancel().let { Unit } })
+   *       later({ deferred.cancel().let { Unit } })
    *     }
    *   }
    *
    *   println(result) //Run with `fix().unsafeRunSync()`
    *
    *   val result2 = _extensionFactory_.cancelableF<Unit> { cb ->
-   *     delay {
+   *     effect {
    *       println("Doing something that can be cancelled.")
-   *       delay({ println("Cancelling the task") })
+   *       later({ println("Cancelling the task") })
    *     }
    *   }
    *
@@ -402,14 +402,14 @@ interface Concurrent<F> : Async<F> {
    *
    * ```kotlin:ank:playground
    * import arrow.effects.extensions.io.concurrent.parMapN
-   * import arrow.effects.extensions.io.monadDefer.delay
+   * import arrow.effects.extensions.io.monadDefer.later
    * import kotlinx.coroutines.Dispatchers
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
    *   val result = Dispatchers.Default.parMapN(
-   *     delay { "First one is on ${Thread.currentThread().name}" },
-   *     delay { "Second one is on ${Thread.currentThread().name}" }
+   *     effect { "First one is on ${Thread.currentThread().name}" },
+   *     effect { "Second one is on ${Thread.currentThread().name}" }
    *   ) { a, b ->
    *     "$a\n$b"
    *   }
@@ -838,8 +838,8 @@ interface Concurrent<F> : Async<F> {
    * fun main(args: Array<String>) {
    *   //sampleStart
    *   fun <F> Concurrent<F>.timedOutWorld(): Kind<F, Unit> {
-   *     val world = sleep(3.seconds).flatMap { delay { println("Hello World!") } }
-   *     val fallbackWorld = delay { println("Hello from the backup") }
+   *     val world = sleep(3.seconds).flatMap { effect { println("Hello World!") } }
+   *     val fallbackWorld = effect { println("Hello from the backup") }
    *     return world.waitFor(1.seconds, fallbackWorld)
    *   }
    *   //sampleEnd
@@ -868,7 +868,7 @@ interface Concurrent<F> : Async<F> {
    * fun main(args: Array<String>) {
    *   //sampleStart
    *   fun <F> Concurrent<F>.timedOutWorld(): Kind<F, Unit> {
-   *     val world = sleep(1.seconds).flatMap { delay { println("Hello World!") } }
+   *     val world = sleep(1.seconds).flatMap { effect { println("Hello World!") } }
    *     return world.waitFor(3.seconds)
    *   }
    *   //sampleEnd

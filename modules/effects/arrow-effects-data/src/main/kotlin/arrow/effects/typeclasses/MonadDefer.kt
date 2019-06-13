@@ -14,13 +14,6 @@ interface MonadDefer<F> : MonadThrow<F>, Bracket<F, Throwable> {
 
   fun <A> defer(fa: () -> Kind<F, A>): Kind<F, A>
 
-  @Deprecated(
-    "`delay` is getting renamed to `later` so we can add a timer `delay` function for coroutines",
-    ReplaceWith("later(f)")
-  )
-  fun <A> delay(f: () -> A): Kind<F, A> =
-    later(f)
-
   fun <A> later(f: () -> A): Kind<F, A> =
     defer {
       try {
@@ -36,13 +29,6 @@ interface MonadDefer<F> : MonadThrow<F>, Bracket<F, Throwable> {
 
   fun <A> laterOrRaise(f: () -> Either<Throwable, A>): Kind<F, A> =
     defer { f().fold({ raiseError<A>(it) }, { just(it) }) }
-
-  @Deprecated(
-    "`delayOrRise` is getting renamed to `laterOrRise so we can add a timer `delay` function for coroutines",
-    ReplaceWith("laterOrRise(f)")
-  )
-  fun <A> delayOrRaise(f: () -> Either<Throwable, A>): Kind<F, A> =
-    laterOrRaise(f)
 
   /**
    * Creates a [Ref] to purely manage mutable state, initialized by the function [f]
