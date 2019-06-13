@@ -142,7 +142,7 @@ IO.raiseError<Int>(RuntimeException("Boom!"))
 
 Generally used to wrap existing blocking functions. Creates an `IO` that invokes one lambda function when run.
 
-Note that this function is evaluated every time`IO`is run.
+Note that this function is evaluated every time `IO` is run.
 
 ```kotlin
 IO { 1 }
@@ -151,6 +151,23 @@ IO { 1 }
 
 ```kotlin
 IO<Int> { throw RuntimeException("Boom!") }
+  .attempt()
+  .unsafeRunSync()
+```
+
+### effect
+
+Similar to `invoke`, accepting `suspend` functions. Creates an `IO` that invokes one suspend lambda function when run.
+
+Note that this function is evaluated every time `IO` is run.
+
+```kotlin
+IO.effect { requestSuspend(1) }
+  .unsafeRunSync()
+```
+
+```kotlin
+IO.effect { throw RuntimeException("Boom!") }
   .attempt()
   .unsafeRunSync()
 ```

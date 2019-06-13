@@ -55,9 +55,9 @@ interface Bracket<F, E> : MonadError<F, E> {
    *   override fun toString(): String = "This file contains some interesting content!"
    * }
    *
-   * fun openFile(uri: String): Kind<F, File> = _delay_({ File(uri).open() })
-   * fun closeFile(file: File): Kind<F, Unit> = _delay_({ file.close() })
-   * fun fileToString(file: File): Kind<F, String> = _delay_({ file.toString() })
+   * fun openFile(uri: String): Kind<F, File> = _later_({ File(uri).open() })
+   * fun closeFile(file: File): Kind<F, Unit> = _later_({ file.close() })
+   * fun fileToString(file: File): Kind<F, String> = _later_({ file.toString() })
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
@@ -98,9 +98,9 @@ interface Bracket<F, E> : MonadError<F, E> {
    *   override fun toString(): String = "This file contains some interesting content!"
    * }
    *
-   * fun openFile(uri: String): Kind<F, File> = _delay_({ File(uri).open() })
-   * fun closeFile(file: File): Kind<F, Unit> = _delay_({ file.close() })
-   * fun fileToString(file: File): Kind<F, String> = _delay_({ file.toString() })
+   * fun openFile(uri: String): Kind<F, File> = _later_({ File(uri).open() })
+   * fun closeFile(file: File): Kind<F, Unit> = _later_({ file.close() })
+   * fun fileToString(file: File): Kind<F, String> = _later_({ file.toString() })
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
