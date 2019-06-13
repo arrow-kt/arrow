@@ -21,7 +21,7 @@ import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 
@@ -147,7 +147,7 @@ object ConcurrentLaws {
   fun <F> Concurrent<F>.cancelableCancelableFCoherence(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.either(Gen.throwable(), Gen.int())) { eith ->
       cancelable<Int> { cb -> cb(eith); just<Unit>(Unit) }
-        .equalUnderTheLaw(cancelableF { cb -> delay { cb(eith); just<Unit>(Unit) } }, EQ)
+        .equalUnderTheLaw(cancelableF { cb -> later { cb(eith); just<Unit>(Unit) } }, EQ)
     }
 
   fun <F> Concurrent<F>.cancelableReceivesCancelSignal(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
@@ -163,7 +163,7 @@ object ConcurrentLaws {
         }).bind()
 
         ctx.shift().followedBy(asyncF<Unit> { cb ->
-          delay { latch.await(500, TimeUnit.MILLISECONDS) }
+          later { latch.await(500, MILLISECONDS) }
             .map { cb(Right(Unit)) }
         }).bind()
 
@@ -207,8 +207,8 @@ object ConcurrentLaws {
 
         ctx.startFiber(upstream.followedBy(downstream)).bind()
 
-        ctx.startFiber(delay(ctx) {
-          cancelLatch.await(500, TimeUnit.MILLISECONDS)
+        ctx.startFiber(later(ctx) {
+          cancelLatch.await(500, MILLISECONDS)
         }.flatMap { cancelToken.get() ?: raiseError(AssertionError("CancelToken was not set.")) }
         ).bind()
 
@@ -227,8 +227,8 @@ object ConcurrentLaws {
           startLatch.countDown()
         }).bind()
 
-        delay(ctx) {
-          startLatch.await(500, TimeUnit.MILLISECONDS)
+        later(ctx) {
+          startLatch.await(500, MILLISECONDS)
         }.followedBy(cancel).bind()
 
         latch.get().bind()
