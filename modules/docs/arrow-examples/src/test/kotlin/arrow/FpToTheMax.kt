@@ -1,16 +1,15 @@
 package arrow
 
-import arrow.core.Id
 import arrow.core.Option
 import arrow.core.Try
 import arrow.core.Tuple2
 import arrow.core.toT
 import arrow.data.State
 import arrow.data.StatePartialOf
-import arrow.data.StateT
-import arrow.data.extensions.statet.monad.monad
-import arrow.core.extensions.id.monad.monad
+import arrow.data.StateApi
+import arrow.data.extensions.monad
 import arrow.data.fix
+import arrow.data.run
 import arrow.effects.IO
 import arrow.effects.extensions.io.monadDefer.monadDefer
 import arrow.effects.fix
@@ -106,10 +105,9 @@ object FpToTheMax {
   }
 
   fun test(): List<String> = run {
-    val testData: TestData = TestData(listOf("Plop", "4", "n"), listOf(), listOf(3))
+    val testData = TestData(listOf("Plop", "4", "n"), listOf(), listOf(3))
 
-    val m: Monad<ForTestIO> = StateT.monad(Id.monad())
-    val module: MonadAndConsoleRandom<ForTestIO> = MonadAndConsoleRandom(m, TestIOConsole(), TestIORandom())
+    val module: MonadAndConsoleRandom<ForTestIO> = MonadAndConsoleRandom(StateApi.monad(), TestIOConsole(), TestIORandom())
 
     module.fMain().fix().run(testData).a.output
   }
