@@ -5,15 +5,14 @@ package arrow.core.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
-import arrow.core.ForTry
-import arrow.core.Success
 import arrow.core.Try
-import arrow.core.Try.Failure
 import arrow.core.TryOf
+import arrow.core.ForTry
+import arrow.core.Try.Failure
+import arrow.extension
 import arrow.core.extensions.`try`.monadThrow.monadThrow
 import arrow.core.fix
 import arrow.core.identity
-import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Apply
@@ -23,7 +22,10 @@ import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
+import arrow.typeclasses.MonadFx
 import arrow.typeclasses.MonadThrow
+import arrow.typeclasses.MonadThrowFx
+import arrow.typeclasses.MonadThrowSyntax
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
@@ -50,7 +52,7 @@ interface TryMonoid<A> : Monoid<Try<A>>, TrySemigroup<A> {
 
   override fun SG(): Semigroup<A> = MO()
 
-  override fun empty(): Try<A> = Success(MO().empty())
+  override fun empty(): Try<A> = Try.Success(MO().empty())
 }
 
 @extension
@@ -73,7 +75,10 @@ interface TryMonadError : MonadError<ForTry, Throwable>, TryMonad {
 }
 
 @extension
-interface TryMonadThrow : MonadThrow<ForTry>, TryMonadError
+interface TryMonadThrow : MonadThrow<ForTry>, TryMonadError {
+  override val fx: MonadThrowFx<ForTry>
+    get() = TryFxMonadThrow
+}
 
 @extension
 interface TryEq<A> : Eq<Try<A>> {
@@ -83,13 +88,13 @@ interface TryEq<A> : Eq<Try<A>> {
   fun EQT(): Eq<Throwable>
 
   override fun Try<A>.eqv(b: Try<A>): Boolean = when (this) {
-    is Success -> when (b) {
+    is Try.Success -> when (b) {
       is Failure -> false
-      is Success -> EQA().run { value.eqv(b.value) }
+      is Try.Success -> EQA().run { value.eqv(b.value) }
     }
     is Failure -> when (b) {
       is Failure -> EQT().run { exception.eqv(b.exception) }
-      is Success -> false
+      is Try.Success -> false
     }
   }
 }
@@ -143,6 +148,9 @@ interface TryMonad : Monad<ForTry> {
 
   override fun <A> just(a: A): Try<A> =
     Try.just(a)
+
+  override val fx: MonadFx<ForTry>
+    get() = TryFxMonadThrow
 }
 
 @extension
@@ -199,7 +207,9 @@ interface TryHash<A> : Hash<Try<A>>, TryEq<A> {
   })
 }
 
-@extension
-interface TryFx : arrow.typeclasses.suspended.monaderror.Fx<ForTry> {
-  override fun monadError(): MonadThrow<ForTry> = Try.monadThrow()
+internal object TryFxMonadThrow : MonadThrowFx<ForTry> {
+  override val ME: MonadThrow<ForTry> = Try.monadThrow()
 }
+
+fun <A> Try.Companion.fx(c: suspend MonadThrowSyntax<ForTry>.() -> A): Try<A> =
+  Try.monadThrow().fx.monadThrow(c).fix()

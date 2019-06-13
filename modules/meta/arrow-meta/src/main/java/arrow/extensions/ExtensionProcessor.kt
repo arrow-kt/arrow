@@ -7,6 +7,7 @@ import arrow.meta.ast.Code
 import arrow.meta.ast.Func
 import arrow.meta.ast.Modifier
 import arrow.meta.ast.PackageName
+import arrow.meta.ast.Property
 import arrow.meta.ast.Type
 import arrow.meta.ast.TypeName
 import arrow.meta.encoder.TypeClassInstance
@@ -38,9 +39,10 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class), PolyTempl
       this != null && fileSpec != null -> {
         val wrappedType = dataType.kindWrapper
         val wrappedExtensions = wrappedTypeExtensions(wrappedType)
+        val properties = if (supportsCache()) listOf(genCachedExtension()) else emptyList()
         val functions = genDataTypeExtensions() + listOf(genCompanionFactory(dataType.name))
-        val mainFileSpec: FileSpec.Builder = functions.inMainFileSpec(fileSpec)
-        val wrappedFileSpec = wrappedExtensions.inWrappedFileSpec(wrappedType, annotatedElement, this)
+        val mainFileSpec: FileSpec.Builder = functions.inMainFileSpec(fileSpec.addProperties(properties))
+        val wrappedFileSpec = wrappedExtensions.inWrappedFileSpec(wrappedType, annotatedElement, this, properties)
         listOfNotNull(mainFileSpec, wrappedFileSpec)
       }
       else -> emptyList()
@@ -49,11 +51,12 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class), PolyTempl
   private fun List<Func>.inWrappedFileSpec(
     wrappedType: Pair<TypeName, TypeName.ParameterizedType>?,
     annotatedElement: AnnotatedElement.Interface,
-    info: TypeClassInstance
+    info: TypeClassInstance,
+    properties: List<Property>
   ): FileSpec.Builder? =
     if (wrappedType != null && isNotEmpty()) {
       val wrappedFileBuilder = info.wrappedFileBuilder(annotatedElement, wrappedType)
-      val wrappedFunctionSpec = inMainFileSpec(wrappedFileBuilder)
+      val wrappedFunctionSpec = inMainFileSpec(wrappedFileBuilder).addProperties(properties)
       val wrappedSimpleName = wrappedType.second.rawType.simpleName
       val wrappedPackage = PackageName("${info.instance.packageName.value}.${wrappedSimpleName.toLowerCase()}")
       wrappedType.fakeCompanion(wrappedFunctionSpec, wrappedSimpleName, wrappedPackage, info, annotatedElement)
@@ -89,6 +92,9 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class), PolyTempl
 
   private fun List<Func>.inMainFileSpec(fileSpec: FileSpec.Builder): FileSpec.Builder =
     fold(fileSpec) { spec, func -> spec.addFunction(func.lyrics().toBuilder().build()) }
+
+  private fun FileSpec.Builder.addProperties(properties: List<Property>): FileSpec.Builder =
+    properties.fold(this) { spec, prop -> spec.addProperty(prop.lyrics().toBuilder().build()) }
 
   private fun TypeClassInstance.wrappedTypeExtensions(wrappedType: Pair<TypeName, TypeName.ParameterizedType>?): List<Func> =
     if (wrappedType != null) {
@@ -130,7 +136,26 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class), PolyTempl
   private fun notAnInstanceError(): Nothing =
     knownError("@instance is only allowed on `interface` extending another interface of at least one type argument (type class) as first declaration in the instance list")
 
-  fun TypeClassInstance.genCompanionFactory(targetType: TypeName): Func {
+  private fun TypeClassInstance.supportsCache(): Boolean =
+    requiredAbstractFunctions.isEmpty()
+
+  private fun TypeClassInstance.cachedInstanceName(): String =
+    typeClass.name.simpleName.decapitalize() + "_singleton"
+
+  private fun TypeClassInstance.genCachedExtension(): Property =
+    Property(
+      kdoc = Code { "cached extension" },
+      name = cachedInstanceName(),
+      annotations = listOf(PublishedApi()),
+      modifiers = listOf(Modifier.Internal),
+      type = instance.name.widenTypeArgs(),
+      initializer = Code {
+        if (instance.typeVariables.isEmpty()) "object : ${+instance.name} {}"
+        else "object : ${+instance.name.simpleName}<${instance.typeVariables.joinToString { it.widenTypeArgs().rawName }}> {}"
+      }
+    )
+
+  private fun TypeClassInstance.genCompanionFactory(targetType: TypeName): Func {
     val target = when (projectedCompanion) {
       is TypeName.Classy -> projectedCompanion.companion()
       else -> TypeName.Classy(
@@ -141,12 +166,23 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class), PolyTempl
     }
     return Func(
       kdoc = typeClass.kdoc?.eval(this),
+      modifiers = listOf(Modifier.Inline),
+      annotations = listOf(
+        SuppressAnnotation(
+          """"UNCHECKED_CAST"""",
+          """"NOTHING_TO_INLINE""""
+        )
+      ),
       name = typeClass.name.simpleName.decapitalize(),
       parameters = requiredParameters,
       receiverType = target,
       typeVariables = instance.typeVariables.map { it.removeConstrains() },
       returnType = instance.name,
-      body = Code { "return object : ${+instance.name} { ${requiredAbstractFunctions.code()} }" }
+      body = Code {
+        if (supportsCache() && instance.typeVariables.isEmpty()) "return ${cachedInstanceName()}"
+        else if (supportsCache() && instance.typeVariables.isNotEmpty()) "return ${cachedInstanceName()} as ${+instance.name}"
+        else "return object : ${+instance.name} { ${requiredAbstractFunctions.code()} }"
+      }
     )
   }
 

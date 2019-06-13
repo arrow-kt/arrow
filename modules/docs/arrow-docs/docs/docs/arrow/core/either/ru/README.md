@@ -329,9 +329,9 @@ tupled(Either.Right(1), Either.Right("a"), Either.Right(2.0))
 Вычисление с использованием зависимых значений, за исключением случаев их отстутствия
 
 ```kotlin
-import arrow.core.extensions.either.monad.*
+import arrow.core.extensions.fx
 
-binding {
+Either.fx {
   val a = Either.Right(1).bind()
   val b = Either.Right(1 + a).bind()
   val c = Either.Right(1 + b).bind()

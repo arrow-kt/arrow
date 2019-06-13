@@ -6,14 +6,22 @@ import arrow.core.Left
 import arrow.core.Right
 import arrow.core.Tuple2
 import arrow.core.Tuple3
-import arrow.core.left
-import arrow.core.right
-import arrow.core.toT
 import arrow.effects.CancelToken
 import arrow.effects.KindConnection
 import arrow.effects.MVar
-import arrow.effects.data.internal.BindingCancellationException
-import arrow.typeclasses.MonadContinuation
+import arrow.effects.Race2
+import arrow.effects.Race3
+import arrow.effects.Race4
+import arrow.effects.Race5
+import arrow.effects.Race6
+import arrow.effects.Race7
+import arrow.effects.Race8
+import arrow.effects.Race9
+import arrow.effects.RacePair
+import arrow.effects.RaceTriple
+import arrow.effects.Timer
+import arrow.effects.internal.TimeoutException
+import arrow.typeclasses.MonadSyntax
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine
@@ -32,6 +40,23 @@ typealias ConnectedProc<F, A> = (KindConnection<F>, ((Either<Throwable, A>) -> U
 interface Concurrent<F> : Async<F> {
 
   fun dispatchers(): Dispatchers<F>
+
+  fun timer(): Timer<F> = Timer(this)
+
+  /**
+   * Entry point for monad bindings which enables for comprehensions. The underlying impl is based on coroutines.
+   * A coroutines is initiated and inside [ConcurrentContinuation] suspended yielding to [Monad.flatMap]. Once all the flatMap binds are completed
+   * the underlying monad is returned from the act of executing the coroutine
+   *
+   * This one operates over [Concurrent] instances
+   *
+   * This operation is cancellable by calling invoke on the [Disposable] return.
+   * If [Disposable.invoke] is called the binding result will become a lifted [BindingCancellationException].
+   */
+  override val fx: ConcurrentFx<F>
+    get() = object : ConcurrentFx<F> {
+      override val concurrent: Concurrent<F> = this@Concurrent
+    }
 
   /**
    * Creates a cancelable instance of [F] that executes an asynchronous process on evaluation.
@@ -144,20 +169,23 @@ interface Concurrent<F> : Async<F> {
    * Create a new [F] that upon execution starts the receiver [F] within a [Fiber] on [this@startFiber].
    *
    * ```kotlin:ank:playground
+   * import arrow.Kind
    * import arrow.effects.*
-   * import arrow.effects.extensions.io.async.async
-   * import arrow.effects.extensions.io.monad.binding
+   * import arrow.effects.extensions.io.concurrent.concurrent
+   * import arrow.effects.typeclasses.Concurrent
    * import kotlinx.coroutines.Dispatchers
    *
    * fun main(args: Array<String>) {
+   *   fun <F> Concurrent<F>.example(): Kind<F, Unit> =
    *   //sampleStart
-   *   binding {
-   *     val promise = Promise.uncancelable<ForIO, Int>(IO.async()).bind()
-   *     val fiber = promise.get().startFiber(Dispatchers.Default).bind()
-   *     promise.complete(1).bind()
-   *     fiber.join().bind()
-   *   }.unsafeRunSync() == 1
+   *     fx.concurrent {
+   *       val (join, cancel) = !Dispatchers.Default.startFiber(effect {
+   *         println("Hello from a fiber on ${Thread.currentThread().name}")
+   *       })
+   *     }
+   *
    *   //sampleEnd
+   *   IO.concurrent().example().fix().unsafeRunSync()
    * }
    * ```
    *
@@ -172,24 +200,26 @@ interface Concurrent<F> : Async<F> {
    * Race results in a winner and the other, yet to finish task running in a [Fiber].
    *
    * ```kotlin:ank:playground
+   * import arrow.Kind
    * import arrow.effects.*
-   * import arrow.effects.extensions.io.async.async
-   * import arrow.effects.extensions.io.monad.binding
+   * import arrow.effects.extensions.io.concurrent.concurrent
    * import arrow.effects.typeclasses.*
    * import kotlinx.coroutines.Dispatchers
-   * import java.lang.RuntimeException
    *
    * fun main(args: Array<String>) {
-   *   //sampleStart
-   *   binding {
-   *     val promise = Promise.uncancelable<ForIO, Int>(IO.async()).bind()
-   *     val racePair = IO.racePair(Dispatchers.Default, promise.get(), IO.unit).bind()
-   *     racePair.fold(
-   *       { IO.raiseError<Int>(RuntimeException("Promise.get cannot win before complete")) },
-   *       { (a: Fiber<ForIO, Int>, _) -> promise.complete(1).flatMap { a.join() } }
-   *     ).bind()
-   *   }.unsafeRunSync() == 1
+   *   fun <F> Concurrent<F>.example(): Kind<F, String> =
+   *     //sampleStart
+   *     fx.concurrent {
+   *       val racePair = !Dispatchers.Default.racePair(never<Int>(), just("Hello World!"))
+   *       racePair.fold(
+   *         { _, _ -> "never cannot win race" },
+   *         { _, winner -> winner }
+   *       )
+   *   }
    *   //sampleEnd
+   *
+   *   val r = IO.concurrent().example().fix().unsafeRunSync()
+   *   println("Race winner result is: $r")
    * }
    * ```
    *
@@ -208,25 +238,27 @@ interface Concurrent<F> : Async<F> {
    * Race results in a winner and the others, yet to finish task running in a [Fiber].
    *
    * ```kotlin:ank:playground
+   * import arrow.Kind
    * import arrow.effects.*
-   * import arrow.effects.extensions.io.async.async
-   * import arrow.effects.extensions.io.monad.binding
+   * import arrow.effects.extensions.io.concurrent.concurrent
    * import arrow.effects.typeclasses.*
    * import kotlinx.coroutines.Dispatchers
-   * import java.lang.RuntimeException
    *
    * fun main(args: Array<String>) {
+   *   fun <F> Concurrent<F>.example(): Kind<F, String> =
    *   //sampleStart
-   *   binding {
-   *     val promise = Promise.uncancelable<ForIO, Int>(IO.async()).bind()
-   *     val raceTriple = IO.raceTriple(Dispatchers.Default, promise.get(), IO.unit, IO.never).bind()
-   *     raceTriple.fold(
-   *       { IO.raiseError<Int>(RuntimeException("Promise.get cannot win before complete")) },
-   *       { (a: Fiber<ForIO, Int>, _, _) -> promise.complete(1).flatMap { a.join() } },
-   *       { IO.raiseError<Int>(RuntimeException("never cannot win before complete")) }
-   *     ).bind()
-   *   }.unsafeRunSync() == 1
+   *     fx.concurrent {
+   *       val raceResult = !Dispatchers.Default.raceTriple(never<Int>(), just("Hello World!"), never<Double>())
+   *       raceResult.fold(
+   *         { _, _, _ -> "never cannot win before complete" },
+   *         { _, winner, _ -> winner },
+   *         { _, _, _ -> "never cannot win before complete" }
+   *       )
+   *     }
    *   //sampleEnd
+   *
+   *   val r = IO.concurrent().example().fix().unsafeRunSync()
+   *   println("Race winner result is: $r")
    * }
    * ```
    *
@@ -293,7 +325,10 @@ interface Concurrent<F> : Async<F> {
    * @see cancelableF for a version that can safely suspend impure callback registration code.
    */
   fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<F>): Kind<F, A> =
-    cancelableF { cb -> later { k(cb) } }
+    cancelableF { cb ->
+      val token = k(cb)
+      later { token }
+    }
 
   /**
    * Builder to create a cancelable [F] instance that executes an asynchronous process on evaluation.
@@ -350,7 +385,9 @@ interface Concurrent<F> : Async<F> {
 
       k(cb1).bracketCase(use = {
         async<Unit> { cb ->
-          if (!state.compareAndSet(null, cb)) cb(rightUnit)
+          if (!state.compareAndSet(null, cb)) {
+            cb(rightUnit)
+          }
         }
       }, release = { token, exitCase ->
         when (exitCase) {
@@ -396,8 +433,8 @@ interface Concurrent<F> : Async<F> {
   ): Kind<F, C> =
     racePair(fa, fb).flatMap {
       it.fold(
-        { (a, fiberB) -> fiberB.join().map { b -> f(a, b) } },
-        { (fiberA, b) -> fiberA.join().map { a -> f(a, b) } }
+        { a, fiberB -> fiberB.join().map { b -> f(a, b) } },
+        { fiberA, b -> fiberA.join().map { a -> f(a, b) } }
       )
     }
 
@@ -407,9 +444,9 @@ interface Concurrent<F> : Async<F> {
   fun <A, B, C, D> CoroutineContext.parMapN(fa: Kind<F, A>, fb: Kind<F, B>, fc: Kind<F, C>, f: (A, B, C) -> D): Kind<F, D> =
     raceTriple(fa, fb, fc).flatMap {
       it.fold(
-        { (a, fiberB, fiberC) -> fiberB.join().flatMap { b -> fiberC.join().map { c -> f(a, b, c) } } },
-        { (fiberA, b, fiberC) -> fiberA.join().flatMap { a -> fiberC.join().map { c -> f(a, b, c) } } },
-        { (fiberA, fiberB, c) -> fiberA.join().flatMap { a -> fiberB.join().map { b -> f(a, b, c) } } }
+        { a, fiberB, fiberC -> fiberB.join().flatMap { b -> fiberC.join().map { c -> f(a, b, c) } } },
+        { fiberA, b, fiberC -> fiberA.join().flatMap { a -> fiberC.join().map { c -> f(a, b, c) } } },
+        { fiberA, fiberB, c -> fiberA.join().flatMap { a -> fiberB.join().map { b -> f(a, b, c) } } }
       )
     }
 
@@ -423,7 +460,8 @@ interface Concurrent<F> : Async<F> {
     fd: Kind<F, D>,
     f: (A, B, C, D) -> E
   ): Kind<F, E> =
-    parMapN(parMapN(fa, fb, ::Tuple2),
+    parMapN(
+      parMapN(fa, fb, ::Tuple2),
       parMapN(fc, fd, ::Tuple2)
     ) { (a, b), (c, d) ->
       f(a, b, c, d)
@@ -529,22 +567,29 @@ interface Concurrent<F> : Async<F> {
    * At the end of the race it automatically cancels the loser.
    *
    * ```kotlin:ank:playground
+   * import arrow.Kind
    * import arrow.effects.*
-   * import arrow.effects.extensions.io.concurrent.raceN
-   * import arrow.effects.extensions.io.monad.binding
+   * import arrow.effects.extensions.io.concurrent.concurrent
+   * import arrow.effects.typeclasses.Concurrent
    * import kotlinx.coroutines.Dispatchers
-   * import java.lang.RuntimeException
    *
    * fun main(args: Array<String>) {
-   *   //sampleStart
-   *   binding {
-   *     val eitherGetOrUnit = Dispatchers.Default.raceN(IO.never, IO.just(5)).bind()
-   *     eitherGetOrUnit.fold(
-   *       { IO.raiseError<Int>(RuntimeException("Never always loses race")) },
-   *       IO.Companion::just
-   *     ).bind()
-   *   }.unsafeRunSync()
+   *   fun <F> Concurrent<F>.example(): Kind<F, String> {
+   *     val never: Kind<F, Int> = cancelable { effect { println("Never got canelled for losing.") } }
+   *
+   *     //sampleStart
+   *     val result = fx.concurrent {
+   *       val eitherGetOrUnit = !Dispatchers.Default.raceN(never, just(5))
+   *       eitherGetOrUnit.fold(
+   *         { "Never always loses race" },
+   *         { i -> "Race was won with $i" }
+   *       )
+   *     }
    *   //sampleEnd
+   *   return result
+   *   }
+   *
+   *   IO.concurrent().example().fix().unsafeRunSync().let(::println)
    * }
    * ```
    *
@@ -561,10 +606,10 @@ interface Concurrent<F> : Async<F> {
     fb: Kind<F, B>
   ): Kind<F, Race2<A, B>> =
     racePair(fa, fb).flatMap {
-      it.fold({ (a, b) ->
-        b.cancel().map { a.left() }
-      }, { (a, b) ->
-        a.cancel().map { b.right() }
+      it.fold({ a, (_, cancelB) ->
+        cancelB.map { Left(a) }
+      }, { (_, cancelA), b ->
+        cancelA.map { Right(b) }
       })
     }
 
@@ -575,12 +620,12 @@ interface Concurrent<F> : Async<F> {
     fa: Kind<F, A>,
     fb: Kind<F, B>,
     fc: Kind<F, C>
-  ): Kind<F, Race3<A, B, C>> =
+  ): Kind<F, Race3<out A, out B, out C>> =
     raceTriple(fa, fb, fc).flatMap {
       it.fold(
-        { (a, fiberB, fiberC) -> fiberB.cancel().flatMap { fiberC.cancel().map { Left(Left(a)) } } },
-        { (fiberA, b, fiberC) -> fiberA.cancel().flatMap { fiberC.cancel().map { Left(Right(b)) } } },
-        { (fiberA, fiberB, c) -> fiberA.cancel().flatMap { fiberB.cancel().map { Right(c) } } }
+        { a, fiberB, fiberC -> fiberB.cancel().flatMap { fiberC.cancel().map { Race3.First(a) } } },
+        { fiberA, b, fiberC -> fiberA.cancel().flatMap { fiberC.cancel().map { Race3.Second(b) } } },
+        { fiberA, fiberB, c -> fiberA.cancel().flatMap { fiberB.cancel().map { Race3.Third(c) } } }
       )
     }
 
@@ -592,10 +637,16 @@ interface Concurrent<F> : Async<F> {
     b: Kind<F, B>,
     c: Kind<F, C>,
     d: Kind<F, D>
-  ): Kind<F, Race4<A, B, C, D>> =
-    raceN(raceN(a, b),
+  ): Kind<F, Race4<out A, out B, out C, out D>> =
+    raceN(
+      raceN(a, b),
       raceN(c, d)
-    )
+    ).map { res ->
+      res.fold(
+        { it.fold({ a -> Race4.First(a) }, { b -> Race4.Second(b) }) },
+        { it.fold({ c -> Race4.Third(c) }, { d -> Race4.Fourth(d) }) }
+      )
+    }
 
   /**
    * @see raceN
@@ -606,10 +657,17 @@ interface Concurrent<F> : Async<F> {
     c: Kind<F, C>,
     d: Kind<F, D>,
     e: Kind<F, E>
-  ): Kind<F, Race5<A, B, C, D, E>> =
-    raceN(raceN(a, b, c),
+  ): Kind<F, Race5<out A, out B, out C, out D, out E>> =
+    raceN(
+      raceN(a, b, c),
       raceN(d, e)
-    )
+    ).map { res ->
+      res.fold({
+        it.fold({ a -> Race5.First(a) }, { b -> Race5.Second(b) }, { c -> Race5.Third(c) })
+      }, {
+        it.fold({ d -> Race5.Fourth(d) }, { e -> Race5.Fifth(e) })
+      })
+    }
 
   /**
    * @see raceN
@@ -621,10 +679,17 @@ interface Concurrent<F> : Async<F> {
     d: Kind<F, D>,
     e: Kind<F, E>,
     g: Kind<F, G>
-  ): Kind<F, Race6<A, B, C, D, E, G>> =
-    raceN(raceN(a, b, c),
+  ): Kind<F, Race6<out A, out B, out C, out D, out E, out G>> =
+    raceN(
+      raceN(a, b, c),
       raceN(d, e, g)
-    )
+    ).map { res ->
+      res.fold({
+        it.fold({ a -> Race6.First(a) }, { b -> Race6.Second(b) }, { c -> Race6.Third(c) })
+      }, {
+        it.fold({ d -> Race6.Fourth(d) }, { e -> Race6.Fifth(e) }, { g -> Race6.Sixth(g) })
+      })
+    }
 
   /**
    * @see raceN
@@ -637,11 +702,20 @@ interface Concurrent<F> : Async<F> {
     e: Kind<F, E>,
     g: Kind<F, G>,
     h: Kind<F, H>
-  ): Kind<F, Race7<A, B, C, D, E, G, H>> =
-    raceN(raceN(a, b, c),
+  ): Kind<F, Race7<out A, out B, out C, out D, out E, out G, out H>> =
+    raceN(
+      raceN(a, b, c),
       raceN(d, e),
       raceN(g, h)
-    )
+    ).map { res ->
+      res.fold({
+        it.fold({ a -> Race7.First(a) }, { b -> Race7.Second(b) }, { c -> Race7.Third(c) })
+      }, {
+        it.fold({ d -> Race7.Fourth(d) }, { e -> Race7.Fifth(e) })
+      }, {
+        it.fold({ g -> Race7.Sixth(g) }, { h -> Race7.Seventh(h) })
+      })
+    }
 
   /**
    * @see raceN
@@ -655,12 +729,23 @@ interface Concurrent<F> : Async<F> {
     g: Kind<F, G>,
     h: Kind<F, H>,
     i: Kind<F, I>
-  ): Kind<F, Race8<A, B, C, D, E, G, H, I>> =
-    raceN(raceN(a, b),
+  ): Kind<F, Race8<out A, out B, out C, out D, out E, out G, out H, out I>> =
+    raceN(
+      raceN(a, b),
       raceN(c, d),
       raceN(e, g),
       raceN(h, i)
-    )
+    ).map { res ->
+      res.fold({
+        it.fold({ a -> Race8.First(a) }, { b -> Race8.Second(b) })
+      }, {
+        it.fold({ c -> Race8.Third(c) }, { d -> Race8.Fourth(d) })
+      }, {
+        it.fold({ e -> Race8.Fifth(e) }, { g -> Race8.Sixth(g) })
+      }, {
+        it.fold({ h -> Race8.Seventh(h) }, { i -> Race8.Eighth(i) })
+      })
+    }
 
   /**
    * @see raceN
@@ -675,12 +760,23 @@ interface Concurrent<F> : Async<F> {
     h: Kind<F, H>,
     i: Kind<F, I>,
     j: Kind<F, J>
-  ): Kind<F, Race9<A, B, C, D, E, G, H, I, J>> =
-    raceN(raceN(a, b, c),
+  ): Kind<F, Race9<out A, out B, out C, out D, out E, out G, out H, out I, out J>> =
+    raceN(
+      raceN(a, b, c),
       raceN(d, e),
       raceN(g, h),
       raceN(i, j)
-    )
+    ).map { res ->
+      res.fold({
+        it.fold({ a -> Race9.First(a) }, { b -> Race9.Second(b) }, { c -> Race9.Third(c) })
+      }, {
+        it.fold({ d -> Race9.Fourth(d) }, { e -> Race9.Fifth(e) })
+      }, {
+        it.fold({ g -> Race9.Sixth(g) }, { h -> Race9.Seventh(h) })
+      }, {
+        it.fold({ i -> Race9.Eighth(i) }, { j -> Race9.Ninth(j) })
+      })
+    }
 
   /**
    * Creates a variable [MVar] to be used for thread-sharing, initialized to a value [a]
@@ -713,149 +809,93 @@ interface Concurrent<F> : Async<F> {
    * This operation is cancellable by calling invoke on the [Disposable] return.
    * If [Disposable.invoke] is called the binding result will become a lifted [BindingCancellationException].
    */
-  fun <B> bindingConcurrent(c: suspend ConcurrentCancellableContinuation<F, *>.() -> B): Tuple2<Kind<F, B>, Disposable> {
-    val continuation = ConcurrentCancellableContinuation<F, B>(this)
-    val wrapReturn: suspend ConcurrentCancellableContinuation<F, *>.() -> Kind<F, B> = { just(c()) }
+  fun <B> bindingConcurrent(c: suspend ConcurrentContinuation<F, *>.() -> B): Kind<F, B> {
+    val continuation = ConcurrentContinuation<F, B>(this)
+    val wrapReturn: suspend ConcurrentContinuation<F, *>.() -> Kind<F, B> = { just(c()) }
     wrapReturn.startCoroutine(continuation, continuation)
-    return continuation.returnedMonad() toT continuation.disposable()
+    return continuation.returnedMonad()
   }
 
-  override fun <B> binding(c: suspend MonadContinuation<F, *>.() -> B): Kind<F, B> =
-    bindingCancellable { c() }.a
+  override fun <B> binding(c: suspend MonadSyntax<F>.() -> B): Kind<F, B> =
+    bindingConcurrent { c() }
+
+  /**
+   *  Sleeps for a given [duration] without blocking a thread.
+   *
+   * @see Timer
+   **/
+  fun sleep(duration: Duration): Kind<F, Unit> = timer().sleep(duration)
+
+  /**
+   * Returns the result of [this] within the specified [duration] or the [default] value.
+   *
+   * ```kotlin:ank:playground
+   * import arrow.*
+   * import arrow.effects.*
+   * import arrow.effects.typeclasses.*
+   * import arrow.effects.extensions.io.concurrent.concurrent
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   fun <F> Concurrent<F>.timedOutWorld(): Kind<F, Unit> {
+   *     val world = sleep(3.seconds).flatMap { delay { println("Hello World!") } }
+   *     val fallbackWorld = delay { println("Hello from the backup") }
+   *     return world.waitFor(1.seconds, fallbackWorld)
+   *   }
+   *   //sampleEnd
+   *   IO.concurrent().timedOutWorld()
+   *     .fix().unsafeRunSync()
+   * }
+   * ```
+   **/
+  fun <A> Kind<F, A>.waitFor(duration: Duration, default: Kind<F, A>): Kind<F, A> =
+    dispatchers().default().raceN(this, sleep(duration)).flatMap {
+      it.fold(
+        { a -> just(a) },
+        { default }
+      )
+    }
+
+  /**
+   * Returns the result of [this] within the specified [duration] or the raises a [TimeoutException] exception.
+   *
+   * ```kotlin:ank:playground
+   * import arrow.*
+   * import arrow.effects.*
+   * import arrow.effects.typeclasses.*
+   * import arrow.effects.extensions.io.concurrent.concurrent
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   fun <F> Concurrent<F>.timedOutWorld(): Kind<F, Unit> {
+   *     val world = sleep(1.seconds).flatMap { delay { println("Hello World!") } }
+   *     return world.waitFor(3.seconds)
+   *   }
+   *   //sampleEnd
+   *   IO.concurrent().timedOutWorld()
+   *     .fix().unsafeRunSync()
+   * }
+   * ```
+   **/
+  fun <A> Kind<F, A>.waitFor(duration: Duration): Kind<F, A> =
+    dispatchers().default().raceN(this, sleep(duration)).flatMap {
+      it.fold(
+        { a -> just(a) },
+        { raiseError(TimeoutException(duration.toString())) }
+      )
+    }
 }
 
-/** Alias for `Either` structure to provide consistent signature for race methods. */
-typealias RacePair<F, A, B> = Either<Tuple2<A, Fiber<F, B>>, Tuple2<Fiber<F, A>, B>>
+interface ConcurrentFx<F> : AsyncFx<F> {
+  val concurrent: Concurrent<F>
 
-/** Alias for nested `Either` structures to provide nicer signatures and overload with a convenience [fold] method. */
-typealias RaceTriple<F, A, B, C> = Either<Tuple3<A, Fiber<F, B>, Fiber<F, C>>, Either<Tuple3<Fiber<F, A>, B, Fiber<F, C>>, Tuple3<Fiber<F, A>, Fiber<F, B>, C>>>
+  override val async: Async<F>
+    get() = concurrent
 
-/** A convenience [fold] method to provide a nicer API to work with race results. */
-@Suppress("UNUSED_PARAMETER")
-inline fun <F, A, B, C, D> RaceTriple<F, A, B, C>.fold(
-  ifA: (Tuple3<A, Fiber<F, B>, Fiber<F, C>>) -> D,
-  ifB: (Tuple3<Fiber<F, A>, B, Fiber<F, C>>) -> D,
-  ifC: (Tuple3<Fiber<F, A>, Fiber<F, B>, C>) -> D,
-  dummy: Unit = Unit
-): D = when (this) {
-  is Either.Left -> ifA(this.a)
-  is Either.Right -> when (val b = this.b) {
-    is Either.Left -> ifB(b.a)
-    is Either.Right -> ifC(b.b)
+  fun <A> concurrent(c: suspend ConcurrentSyntax<F>.() -> A): Kind<F, A> {
+    val continuation = ConcurrentContinuation<F, A>(concurrent)
+    val wrapReturn: suspend ConcurrentSyntax<F>.() -> Kind<F, A> = { just(c()) }
+    wrapReturn.startCoroutine(continuation, continuation)
+    return continuation.returnedMonad()
   }
-}
-
-/** Alias for `Either` structure to provide consistent signature for race methods. */
-typealias Race2<A, B> = Either<A, B>
-
-/** Alias for nested `Either` structures to provide nicer signatures and overload with a convenience [fold] method. */
-typealias Race3<A, B, C> = Either<Either<A, B>, C>
-
-/** Alias for nested `Either` structures to provide nicer signatures and overload with a convenience [fold] method. */
-typealias Race4<A, B, C, D> = Either<Either<A, B>, Either<C, D>>
-
-/** Alias for nested `Either` structures to provide nicer signatures and overload with a convenience [fold] method. */
-typealias Race5<A, B, C, D, E> = Either<Race3<A, B, C>, Race2<D, E>>
-
-/** Alias for nested `Either` structures to provide nicer signatures and overload with a convenience [fold] method. */
-typealias Race6<A, B, C, D, E, G> = Either<Race3<A, B, C>, Race3<D, E, G>>
-
-/** Alias for nested `Either` structures to provide nicer signatures and overload with a convenience [fold] method. */
-typealias Race7<A, B, C, D, E, G, H> = Race3<Race3<A, B, C>, Race2<D, E>, Race2<G, H>>
-
-/** Alias for nested `Either` structures to provide nicer signatures and overload with a convenience [fold] method. */
-typealias Race8<A, B, C, D, E, G, H, I> = Race4<Race2<A, B>, Race2<C, D>, Race2<E, G>, Race2<H, I>>
-
-/** Alias for nested `Either` structures to provide nicer signatures and overload with a convenience [fold] method. */
-typealias Race9<A, B, C, D, E, G, H, I, J> = Race4<Race3<A, B, C>, Race2<D, E>, Race2<G, H>, Race2<I, J>>
-
-/** A convenience [fold] method to provide a nicer API to work with race results. */
-inline fun <A, B, C, D> Race3<A, B, C>.fold(
-  ifA: (A) -> D,
-  ifB: (B) -> D,
-  ifC: (C) -> D
-): D = when (this) {
-  is Either.Left -> this.a.fold(ifA, ifB)
-  is Either.Right -> ifC(this.b)
-}
-
-/** A convenience [fold] method to provide a nicer API to work with race results. */
-inline fun <A, B, C, D, E> Race4<A, B, C, D>.fold(
-  ifA: (A) -> E,
-  ifB: (B) -> E,
-  ifC: (C) -> E,
-  ifD: (D) -> E
-): E = when (this) {
-  is Either.Left -> this.a.fold(ifA, ifB)
-  is Either.Right -> this.b.fold(ifC, ifD)
-}
-
-/** A convenience [fold] method to provide a nicer API to work with race results. */
-inline fun <A, B, C, D, E, G> Race5<A, B, C, D, E>.fold(
-  ifA: (A) -> G,
-  ifB: (B) -> G,
-  ifC: (C) -> G,
-  ifD: (D) -> G,
-  ifE: (E) -> G
-): G = when (this) {
-  is Either.Left -> this.a.fold(ifA, ifB, ifC)
-  is Either.Right -> this.b.fold(ifD, ifE)
-}
-
-/** A convenience [fold] method to provide a nicer API to work with race results. */
-inline fun <A, B, C, D, E, G, H> Race6<A, B, C, D, E, G>.fold(
-  ifA: (A) -> H,
-  ifB: (B) -> H,
-  ifC: (C) -> H,
-  ifD: (D) -> H,
-  ifE: (E) -> H,
-  ifG: (G) -> H
-): H = when (this) {
-  is Either.Left -> this.a.fold(ifA, ifB, ifC)
-  is Either.Right -> this.b.fold(ifD, ifE, ifG)
-}
-
-/** A convenience [fold] method to provide a nicer API to work with race results. */
-inline fun <A, B, C, D, E, G, H, I> Race7<A, B, C, D, E, G, H>.fold(
-  ifA: (A) -> I,
-  ifB: (B) -> I,
-  ifC: (C) -> I,
-  ifD: (D) -> I,
-  ifE: (E) -> I,
-  ifG: (G) -> I,
-  ifH: (H) -> I
-): I = when (this) {
-  is Either.Left -> this.a.fold(ifA, ifB, ifC, ifD, ifE)
-  is Either.Right -> this.b.fold(ifG, ifH)
-}
-
-/** A convenience [fold] method to provide a nicer API to work with race results. */
-inline fun <A, B, C, D, E, G, H, I, J> Race8<A, B, C, D, E, G, H, I>.fold(
-  ifA: (A) -> J,
-  ifB: (B) -> J,
-  ifC: (C) -> J,
-  ifD: (D) -> J,
-  ifE: (E) -> J,
-  ifG: (G) -> J,
-  ifH: (H) -> J,
-  ifI: (I) -> J
-): J = when (this) {
-  is Either.Left -> this.a.fold(ifA, ifB, ifC, ifD)
-  is Either.Right -> this.b.fold(ifE, ifG, ifH, ifI)
-}
-
-/** A convenience [fold] method to provide a nicer API to work with race results. */
-inline fun <A, B, C, D, E, G, H, I, J, K> Race9<A, B, C, D, E, G, H, I, J>.fold(
-  ifA: (A) -> K,
-  ifB: (B) -> K,
-  ifC: (C) -> K,
-  ifD: (D) -> K,
-  ifE: (E) -> K,
-  ifG: (G) -> K,
-  ifH: (H) -> K,
-  ifI: (I) -> K,
-  ifJ: (J) -> K
-): K = when (this) {
-  is Either.Left -> this.a.fold(ifA, ifB, ifC, ifD, ifE)
-  is Either.Right -> this.b.fold(ifG, ifH, ifI, ifJ)
 }

@@ -6,6 +6,7 @@ import arrow.core.NonFatal
 import arrow.core.Right
 import arrow.core.nonFatalOrThrow
 import arrow.effects.internal.ArrowInternalException
+import arrow.effects.internal.Platform
 import arrow.effects.internal.Platform.ArrayStack
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -20,14 +21,14 @@ private typealias Callback = (Either<Throwable, Any?>) -> Unit
 internal object IORunLoop {
 
   fun <A> start(source: IOOf<A>, cb: (Either<Throwable, A>) -> Unit): Unit =
-    loop(source, IOConnection.uncancelable, cb as Callback, null, null, null)
+    loop(source, IOConnection.uncancelable, cb as Callback, null, null, null, EmptyCoroutineContext)
 
   /**
    * Evaluates the given `IO` reference, calling the given callback
    * with the result when completed.
    */
   fun <A> startCancelable(source: IOOf<A>, conn: IOConnection, cb: (Either<Throwable, A>) -> Unit): Unit =
-    loop(source, conn, cb as Callback, null, null, null)
+    loop(source, conn, cb as Callback, null, null, null, EmptyCoroutineContext)
 
   fun <A> step(source: IO<A>): IO<A> {
     var currentIO: Current? = source
@@ -64,7 +65,7 @@ internal object IORunLoop {
             hasResult = true
             currentIO = null
           } catch (t: Throwable) {
-              currentIO = IO.RaiseError(t.nonFatalOrThrow())
+            currentIO = IO.RaiseError(t.nonFatalOrThrow())
           }
         }
         is IO.Async -> {
@@ -105,7 +106,7 @@ internal object IORunLoop {
         is IO.ContextSwitch -> {
           val localCurrent = currentIO
           return IO.Async { conn, cb ->
-            loop(localCurrent, conn, cb as Callback, null, bFirst, bRest)
+            loop(localCurrent, conn, cb as Callback, null, bFirst, bRest, EmptyCoroutineContext)
           }
         }
         null -> {
@@ -141,7 +142,7 @@ internal object IORunLoop {
     // Hitting an async boundary means we have to stop, however if we had previous `flatMap` operations then we need to resume the loop with the collected stack
     if (bFirst != null || (bRest != null && bRest.isNotEmpty())) {
       IO.Async { conn, cb ->
-        loop(currentIO, conn, cb, null, bFirst, bRest)
+        loop(currentIO, conn, cb, null, bFirst, bRest, EmptyCoroutineContext)
       }
     } else {
       currentIO
@@ -153,7 +154,8 @@ internal object IORunLoop {
     cb: (Either<Throwable, Any?>) -> Unit,
     rcbRef: RestartCallback?,
     bFirstRef: BindF?,
-    bRestRef: CallStack?
+    bRestRef: CallStack?,
+    ctx: CoroutineContext
   ) {
     var currentIO: Current? = source
     var conn: IOConnection = cancelable
@@ -213,7 +215,7 @@ internal object IORunLoop {
           }
 
           // Return case for Async operations
-          rcb.start(currentIO, bFirst, bRest)
+          rcb.start(currentIO, ctx, bFirst, bRest)
           return
         }
         is IO.Effect -> {
@@ -221,8 +223,8 @@ internal object IORunLoop {
             rcb = RestartCallback(conn, cb)
           }
 
-          // Return case for Async operations
-          rcb.start(currentIO, bFirst, bRest)
+          // Return case for Effect operations
+          rcb.start(currentIO, ctx, bFirst, bRest)
           return
         }
         is IO.Bind<*, *> -> {
@@ -371,33 +373,60 @@ internal object IORunLoop {
     private var bFirst: BindF? = null
     private var bRest: CallStack? = null
 
+    private var contIndex: Int = 0
+    private var trampolineAfter: Boolean = false
+    private inline val shouldTrampoline inline get() = trampolineAfter || contIndex == Platform.maxStackDepthSize
+
+    private var value: IO<Any?>? = null
+
     fun contextSwitch(conn: IOConnection) {
       this.conn = conn
     }
 
-    private fun prepare(bFirst: BindF?, bRest: CallStack?) {
+    private fun prepare(ctx: CoroutineContext, bFirst: BindF?, bRest: CallStack?) {
       canCall = true
       this.bFirst = bFirst
       this.bRest = bRest
+      this._context = ctx
+      contIndex++
     }
 
-    fun start(async: IO.Async<Any?>, bFirst: BindF?, bRest: CallStack?) {
-      prepare(bFirst, bRest)
+    fun start(async: IO.Async<Any?>, ctx: CoroutineContext, bFirst: BindF?, bRest: CallStack?) {
+      prepare(ctx, bFirst, bRest)
+      trampolineAfter = async.shouldTrampoline
       async.k(conn, this)
     }
 
-    fun start(effect: IO.Effect<Any?>, bFirst: BindF?, bRest: CallStack?) {
-      prepare(bFirst, bRest)
-      this._context = effect.ctx
+    fun start(effect: IO.Effect<Any?>, ctx: CoroutineContext, bFirst: BindF?, bRest: CallStack?) {
+      prepare(effect.ctx ?: ctx, bFirst, bRest)
       effect.effect.startCoroutine(this)
+    }
+
+    private fun signal(result: IO<Any?>) {
+      // Allow GC to collect
+      val bFirst = this.bFirst
+      val bRest = this.bRest
+      val ctx = this._context
+      this.bFirst = null
+      this.bRest = null
+      this._context = EmptyCoroutineContext
+
+      loop(result, conn, cb, this, bFirst, bRest, ctx)
     }
 
     override operator fun invoke(either: Either<Throwable, Any?>) {
       if (canCall) {
         canCall = false
         when (either) {
-          is Either.Left -> loop(IO.RaiseError(either.a), conn, cb, this, bFirst, bRest)
-          is Either.Right -> loop(IO.Pure(either.b), conn, cb, this, bFirst, bRest)
+          is Either.Left -> IO.RaiseError(either.a)
+          is Either.Right -> IO.Pure(either.b)
+        }.let { r ->
+          if (shouldTrampoline) {
+            this.value = r
+            Platform.trampoline { trampoline() }
+          } else {
+            signal(r)
+          }
         }
       }
     }
@@ -406,10 +435,24 @@ internal object IORunLoop {
       if (canCall) {
         canCall = false
         result.fold(
-          { a -> loop(IO.Pure(a), conn, cb, this, bFirst, bRest) },
-          { e -> loop(IO.RaiseError(e), conn, cb, this, bFirst, bRest) }
-        )
+          { a -> IO.Pure(a) },
+          { e -> IO.RaiseError(e) }
+        ).let { r ->
+          if (shouldTrampoline) {
+            this.value = r
+            Platform.trampoline { trampoline() }
+          } else {
+            signal(r)
+          }
+        }
       }
+    }
+
+    fun trampoline() {
+      val v = value
+      value = null
+      contIndex = 0
+      signal(v!!)
     }
   }
 

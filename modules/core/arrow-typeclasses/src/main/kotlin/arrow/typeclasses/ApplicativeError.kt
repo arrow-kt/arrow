@@ -3,12 +3,12 @@ package arrow.typeclasses
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Left
-import arrow.core.NonFatal
 import arrow.core.OptionOf
 import arrow.core.Right
 import arrow.core.TryOf
 import arrow.core.fix
 import arrow.core.identity
+import arrow.core.nonFatalOrThrow
 
 /**
  * ank_macro_hierarchy(arrow.typeclasses.ApplicativeError)
@@ -23,16 +23,19 @@ interface ApplicativeError<F, E> : Applicative<F> {
     raiseError(this)
 
   fun <A> OptionOf<A>.fromOption(f: () -> E): Kind<F, A> =
-    fix().fold({ raiseError<A>(f()) }, { just(it) })
+    fix().fold({ raiseError(f()) }, { just(it) })
 
   fun <A, EE> Either<EE, A>.fromEither(f: (EE) -> E): Kind<F, A> =
-    fix().fold({ raiseError<A>(f(it)) }, { just(it) })
+    fix().fold({ raiseError(f(it)) }, { just(it) })
 
   fun <A> TryOf<A>.fromTry(f: (Throwable) -> E): Kind<F, A> =
-    fix().fold({ raiseError<A>(f(it)) }, { just(it) })
+    fix().fold({ raiseError(f(it)) }, { just(it) })
 
   fun <A> Kind<F, A>.handleError(f: (E) -> A): Kind<F, A> =
     handleErrorWith { just(f(it)) }
+
+  fun <A, B> Kind<F, A>.redeem(fe: (E) -> B, fb: (A) -> B): Kind<F, B> =
+    map(fb).handleError(fe)
 
   fun <A> Kind<F, A>.attempt(): Kind<F, Either<E, A>> =
     map { Right(it) }.handleErrorWith {
@@ -43,11 +46,7 @@ interface ApplicativeError<F, E> : Applicative<F> {
     try {
       just(f())
     } catch (t: Throwable) {
-      if (NonFatal(t)) {
-        raiseError<A>(recover(t))
-      } else {
-        throw t
-      }
+      raiseError(recover(t.nonFatalOrThrow()))
     }
 
   fun <A> ApplicativeError<F, Throwable>.catch(f: () -> A): Kind<F, A> =

@@ -164,7 +164,7 @@ options:
         url: /docs/arrow/data/ior/
 
       - title: Id
-        url: /docs/arrow/core/id/
+        url: /docs/apidocs/arrow-core-data/arrow.core/-id/
 
       - title: Reader
         url: /docs/arrow/data/reader/
@@ -200,7 +200,7 @@ options:
         url: /docs/arrow/data/coproduct/
 
       - title: Eval
-        url: /docs/arrow/core/eval/
+        url: /docs/apidocs/arrow-core-data/arrow.core/-eval/
 
       - title: OptionT
         url: /docs/arrow/data/optiont/

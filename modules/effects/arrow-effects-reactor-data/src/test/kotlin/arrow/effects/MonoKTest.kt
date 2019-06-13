@@ -3,14 +3,16 @@ package arrow.effects
 import arrow.effects.reactor.ForMonoK
 import arrow.effects.reactor.MonoK
 import arrow.effects.reactor.MonoKOf
+import arrow.effects.reactor.extensions.fx
 import arrow.effects.reactor.extensions.monok.async.async
 import arrow.effects.reactor.extensions.monok.monad.flatMap
-import arrow.effects.reactor.extensions.monok.monadThrow.bindingCatch
+import arrow.effects.reactor.extensions.monok.timer.timer
 import arrow.effects.reactor.k
 import arrow.effects.reactor.value
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
+import arrow.test.laws.TimerLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
@@ -57,10 +59,13 @@ class MonoKTest : UnitSpec() {
   }
 
   init {
-    testLaws(AsyncLaws.laws(MonoK.async(), EQ(), EQ(), testStackSafety = false))
+    testLaws(
+      AsyncLaws.laws(MonoK.async(), EQ(), EQ(), testStackSafety = false),
+      TimerLaws.laws(MonoK.async(), MonoK.timer(), EQ())
+    )
 
     "Multi-thread Monos finish correctly" {
-      val value: Mono<Long> = bindingCatch {
+      val value: Mono<Long> = MonoK.fx {
         val a = Mono.just(0L).delayElement(Duration.ofSeconds(2)).k().bind()
         a
       }.value()
@@ -73,7 +78,7 @@ class MonoKTest : UnitSpec() {
     "Multi-thread Monos should run on their required threads" {
       val originalThread = Thread.currentThread()
       var threadRef: Thread? = null
-      val value: Mono<Long> = bindingCatch {
+      val value: Mono<Long> = MonoK.fx {
         val a = Mono.just(0L)
           .delayElement(Duration.ofSeconds(2), Schedulers.newSingle("newThread"))
           .k()
@@ -97,7 +102,7 @@ class MonoKTest : UnitSpec() {
     }
 
     "Mono dispose forces binding to cancel without completing too" {
-      val value: Mono<Long> = bindingCatch {
+      val value: Mono<Long> = MonoK.fx {
         val a = Mono.just(0L).delayElement(Duration.ofSeconds(3)).k().bind()
         a
       }.value()

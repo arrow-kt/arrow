@@ -3,23 +3,25 @@ package arrow.effects.reactor.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.effects.Timer
 import arrow.effects.reactor.FluxK
 import arrow.effects.reactor.FluxKOf
 import arrow.effects.reactor.ForFluxK
+import arrow.effects.reactor.extensions.fluxk.async.async
 import arrow.effects.reactor.extensions.fluxk.monad.monad
-import arrow.effects.reactor.extensions.fluxk.monadDefer.monadDefer
 import arrow.effects.reactor.extensions.fluxk.monadError.monadError
 import arrow.effects.reactor.fix
 import arrow.effects.typeclasses.Async
+import arrow.effects.typeclasses.AsyncSyntax
 import arrow.effects.typeclasses.Bracket
 import arrow.effects.typeclasses.ConcurrentEffect
 import arrow.effects.typeclasses.Disposable
+import arrow.effects.typeclasses.Duration
 import arrow.effects.typeclasses.Effect
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
 import arrow.effects.typeclasses.ProcF
-import arrow.effects.typeclasses.suspended.monaddefer.Fx
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
@@ -29,6 +31,8 @@ import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.Traverse
+import reactor.core.publisher.Mono
+import reactor.core.publisher.toFlux
 import kotlin.coroutines.CoroutineContext
 
 @extension
@@ -184,9 +188,13 @@ fun FluxK.Companion.monadErrorSwitch(): FluxKMonadError = object : FluxKMonadErr
     fix().switchMap { f(it).fix() }
 }
 
-// TODO ObservableK does not yet have a Concurrent instance
+// TODO FluxK does not yet have a Concurrent instance
+fun <A> FluxK.Companion.fx(c: suspend AsyncSyntax<ForFluxK>.() -> A): FluxK<A> =
+  FluxK.async().fx.async(c).fix()
+
 @extension
-interface FluxKFx : Fx<ForFluxK> {
-  override fun monadDefer(): MonadDefer<ForFluxK> =
-    FluxK.monadDefer()
+interface FluxKTimer : Timer<ForFluxK> {
+  override fun sleep(duration: Duration): FluxK<Unit> =
+    FluxK(Mono.delay(java.time.Duration.ofNanos(duration.nanoseconds))
+      .map { Unit }.toFlux())
 }

@@ -7,15 +7,16 @@ import arrow.effects.reactor.k
 import arrow.effects.reactor.extensions.fluxk.async.async
 import arrow.effects.reactor.extensions.fluxk.foldable.foldable
 import arrow.effects.reactor.extensions.fluxk.functor.functor
-import arrow.effects.reactor.extensions.fluxk.fx.fx
+import arrow.effects.reactor.extensions.fx
 import arrow.effects.reactor.extensions.fluxk.monad.flatMap
-import arrow.effects.reactor.extensions.fluxk.monadThrow.bindingCatch
 import arrow.effects.reactor.extensions.fluxk.traverse.traverse
+import arrow.effects.reactor.extensions.fluxk.timer.timer
 import arrow.effects.reactor.value
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
 import arrow.test.laws.FoldableLaws
+import arrow.test.laws.TimerLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.runner.junit4.KotlinTestRunner
@@ -65,13 +66,14 @@ class FluxKTest : UnitSpec() {
   init {
 
     testLaws(
+      TimerLaws.laws(FluxK.async(), FluxK.timer(), EQ()),
       AsyncLaws.laws(FluxK.async(), EQ(), EQ(), testStackSafety = false),
       FoldableLaws.laws(FluxK.foldable(), { FluxK.just(it) }, Eq.any()),
       TraverseLaws.laws(FluxK.traverse(), FluxK.functor(), { FluxK.just(it) }, EQ())
     )
 
     "Multi-thread Fluxes finish correctly" {
-      val value: Flux<Int> = bindingCatch {
+      val value: Flux<Int> = FluxK.fx {
         val a = Flux.just(0).delayElements(Duration.ofSeconds(2)).k().bind()
         a
       }.value()
@@ -84,7 +86,7 @@ class FluxKTest : UnitSpec() {
     "Multi-thread Fluxes should run on their required threads" {
       val originalThread: Thread = Thread.currentThread()
       var threadRef: Thread? = null
-      val value: Flux<Long> = bindingCatch {
+      val value: Flux<Long> = FluxK.fx {
         val a = Flux.just(0L)
           .delayElements(Duration.ofSeconds(2), Schedulers.newSingle("newThread"))
           .k()
@@ -108,7 +110,7 @@ class FluxKTest : UnitSpec() {
     }
 
     "Flux cancellation forces binding to cancel without completing too" {
-      val value: Flux<Long> = fx {
+      val value: Flux<Long> = FluxK.fx {
         val a = Flux.just(0L).delayElements(Duration.ofSeconds(3)).k().bind()
         a
       }.value()

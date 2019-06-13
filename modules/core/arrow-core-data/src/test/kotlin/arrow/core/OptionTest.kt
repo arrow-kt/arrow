@@ -86,6 +86,11 @@ class OptionTest : UnitSpec() {
       none.map(String::toUpperCase) shouldBe None
     }
 
+    "mapNotNull" {
+      some.mapNotNull { it.toIntOrNull() } shouldBe None
+      some.mapNotNull { it.toUpperCase() } shouldBe Some("KOTLIN")
+    }
+
     "fold" {
       some.fold({ 0 }) { it.length } shouldBe 6
       none.fold({ 0 }) { it.length } shouldBe 0

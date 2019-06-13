@@ -13,10 +13,12 @@ import arrow.effects.OnCancel.Companion.CancellationException
 import arrow.effects.OnCancel.Silent
 import arrow.effects.OnCancel.ThrowCancellationException
 import arrow.effects.internal.IOBracket
+import arrow.effects.internal.IOFiber
+import arrow.effects.internal.IOForkedStart
 import arrow.effects.internal.Platform.maxStackDepthSize
 import arrow.effects.internal.Platform.onceOnly
 import arrow.effects.internal.Platform.unsafeResync
-import arrow.effects.internal.asyncContinuation
+import arrow.effects.internal.UnsafePromise
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.Duration
 import arrow.effects.typeclasses.ExitCase
@@ -27,7 +29,9 @@ import arrow.effects.typeclasses.mapUnit
 import arrow.higherkind
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
-import kotlin.coroutines.startCoroutine
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 typealias IOProc<A> = (IOConnection, (Either<Throwable, A>) -> Unit) -> Unit
 typealias IOProcF<A> = (IOConnection, (Either<Throwable, A>) -> Unit) -> IOOf<Unit>
@@ -40,6 +44,12 @@ fun <A> ProcF<ForIO, A>.toIOProcF(): IOProcF<A> = { _: IOConnection, proc -> thi
 sealed class IO<out A> : IOOf<A> {
 
   companion object {
+
+    fun <A> effect(f: suspend () -> A): IO<A> =
+      Effect(effect = f)
+
+    fun <A> effect(ctx: CoroutineContext, f: suspend () -> A): IO<A> =
+      Effect(ctx, f)
 
     fun <A> just(a: A): IO<A> = Pure(a)
 
@@ -56,11 +66,6 @@ sealed class IO<out A> : IOOf<A> {
 
     fun <A> defer(f: () -> IOOf<A>): IO<A> =
       Suspend(f)
-
-    fun <A> effect(ctx: CoroutineContext, f: suspend () -> A): IO<A> =
-      async { _, cb ->
-        f.startCoroutine(asyncContinuation(ctx, cb))
-      }
 
     fun <A> async(k: IOProc<A>): IO<A> =
       Async { conn: IOConnection, ff: (Either<Throwable, A>) -> Unit ->
@@ -127,6 +132,12 @@ sealed class IO<out A> : IOOf<A> {
     /* For parMap, look into IOParallel */
   }
 
+  suspend fun suspended(): A = suspendCoroutine { cont ->
+    IORunLoop.start(this) {
+      it.fold(cont::resumeWithException, cont::resume)
+    }
+  }
+
   open fun <B> map(f: (A) -> B): IO<B> =
     Map(this, f, 0)
 
@@ -136,10 +147,84 @@ sealed class IO<out A> : IOOf<A> {
   open fun continueOn(ctx: CoroutineContext): IO<A> =
     ContinueOn(this, ctx)
 
+  fun <B> ap(ff: IOOf<(A) -> B>): IO<B> =
+    flatMap { a -> ff.fix().map { it(a) } }
+
+  /**
+   * Create a new [IO] that upon execution starts the receiver [IO] within a [Fiber] on [ctx].
+   *
+   * ```kotlin:ank:playground
+   * import arrow.effects.*
+   * import arrow.effects.extensions.fx
+   * import kotlinx.coroutines.Dispatchers
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val result = IO.fx {
+   *     val (join, cancel) = !IO.effect {
+   *       println("Hello from a fiber on ${Thread.currentThread().name}")
+   *     }.startFiber(Dispatchers.Default)
+   *   }
+   *
+   *   //sampleEnd
+   *   result.unsafeRunSync()
+   * }
+   * ```
+   *
+   * @receiver [IO] to execute on [ctx] within a new suspended [IO].
+   * @param ctx [CoroutineContext] to execute the source [IO] on.
+   * @return [IO] with suspended execution of source [IO] on context [ctx].
+   */
+  fun startFiber(ctx: CoroutineContext): IO<Fiber<ForIO, A>> = IO {
+    val promise = UnsafePromise<A>()
+    // A new IOConnection, because its cancellation is now decoupled from our current one.
+    val conn = IOConnection()
+    IORunLoop.startCancelable(IOForkedStart(this, ctx), conn, promise::complete)
+    IOFiber(promise, conn)
+  }
+
   fun <B> followedBy(fb: IOOf<B>) = flatMap { fb }
 
   fun attempt(): IO<Either<Throwable, A>> =
-    Bind(this, IOFrame.any())
+    Bind(this, IOFrame.attempt())
+
+  /**
+   * Redeem an [IO] to an [IO] of [B] by resolving the error **or** mapping the value [A] to [B].
+   *
+   * ```kotlin:ank:playground
+   * import arrow.effects.IO
+   *
+   * fun main(args: Array<String>) {
+   *   val result =
+   *   //sampleStart
+   *   IO.raiseError<Int>(RuntimeException("Hello from Error"))
+   *     .redeem({ e -> e.message ?: "" }, Int::toString)
+   *   //sampleEnd
+   *   println(result.unsafeRunSync())
+   * }
+   * ```
+   */
+  fun <B> redeem(fe: (Throwable) -> B, fb: (A) -> B): IO<B> =
+    Bind(this, IOFrame.Companion.Redeem(fe, fb))
+
+  /**
+   * Redeem an [IO] to an [IO] of [B] by resolving the error **or** mapping the value [A] to [B] **with** an effect.
+   *
+   * ```kotlin:ank:playground
+   * import arrow.effects.IO
+   *
+   * fun main(args: Array<String>) {
+   *   val result =
+   *   //sampleStart
+   *   IO.just("1")
+   *     .redeemWith({ e -> IO.just(-1) }, { str -> IO { str.toInt() } })
+   *   //sampleEnd
+   *   println(result.unsafeRunSync())
+   * }
+   * ```
+   */
+  fun <B> redeemWith(fe: (Throwable) -> IOOf<B>, fb: (A) -> IOOf<B>): IO<B> =
+    Bind(this, IOFrame.Companion.RedeemWith(fe, fb))
 
   fun runAsync(cb: (Either<Throwable, A>) -> IOOf<Unit>): IO<Unit> =
     IO { unsafeRunAsync(cb.andThen { it.fix().unsafeRunAsync { } }) }
@@ -215,11 +300,11 @@ sealed class IO<out A> : IOOf<A> {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
   }
 
-  internal data class Async<out A>(val k: IOProc<A>) : IO<A>() {
+  internal data class Async<out A>(val shouldTrampoline: Boolean = false, val k: IOProc<A>) : IO<A>() {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = unsafeResync(this, limit)
   }
 
-  internal data class Effect<out A>(val ctx: CoroutineContext, val effect: suspend () -> A) : IO<A>() {
+  internal data class Effect<out A>(val ctx: CoroutineContext? = null, val effect: suspend () -> A) : IO<A>() {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = unsafeResync(this, limit)
   }
 
@@ -263,10 +348,10 @@ sealed class IO<out A> : IOOf<A> {
   }
 }
 
-fun <A, B> IOOf<A>.ap(ff: IOOf<(A) -> B>): IO<B> =
-  fix().flatMap { a -> ff.fix().map { it(a) } }
-
 fun <A> IOOf<A>.handleErrorWith(f: (Throwable) -> IOOf<A>): IO<A> =
-  IO.Bind(fix(), IOFrame.errorHandler(f))
+  IO.Bind(fix(), IOFrame.Companion.ErrorHandler(f))
+
+fun <A> IOOf<A>.handleError(f: (Throwable) -> A): IO<A> =
+  handleErrorWith { e -> IO.Pure(f(e)) }
 
 fun <A> A.liftIO(): IO<A> = IO.just(this)

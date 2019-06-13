@@ -16,9 +16,12 @@ import arrow.syntax.function.partially4
 import arrow.syntax.function.partially5
 import arrow.syntax.function.reverse
 import arrow.syntax.function.tripled
+import arrow.syntax.function.tupled
 import arrow.syntax.function.uncurried
 import arrow.syntax.function.unpaired
 import arrow.syntax.function.untripled
+import arrow.syntax.function.untupled
+import arrow.core.Tuple2
 import arrow.test.UnitSpec
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
@@ -102,6 +105,18 @@ class FunctionSyntaxTest : UnitSpec() {
       // same type as sum2ints,
       curried.uncurried()(2, 4) shouldBe 6
       sum2ints(2, 4) shouldBe 6
+    }
+
+    "testTupling" {
+      val sum2ints = { x: Int, y: Int -> x + y }
+      val tupled = sum2ints.tupled()
+      tupled(Tuple2(2, 4)) shouldBe 6
+    }
+
+    "testUntupling" {
+      val sum2ints = { t: Tuple2<Int, Int> -> t.a + t.b }
+      val untupled = sum2ints.untupled()
+      untupled(2, 4) shouldBe 6
     }
 
     "memoize" {

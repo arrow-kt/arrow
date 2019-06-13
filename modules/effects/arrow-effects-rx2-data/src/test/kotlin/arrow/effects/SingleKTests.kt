@@ -1,27 +1,21 @@
 package arrow.effects
 
+import arrow.core.Try
 import arrow.effects.rx2.ForSingleK
 import arrow.effects.rx2.SingleK
 import arrow.effects.rx2.SingleKOf
-import arrow.effects.rx2.k
-import arrow.effects.rx2.extensions.singlek.applicative.applicative
-import arrow.effects.rx2.extensions.singlek.applicativeError.applicativeError
+import arrow.effects.rx2.extensions.concurrent
+import arrow.effects.rx2.extensions.fx
 import arrow.effects.rx2.extensions.singlek.async.async
-import arrow.effects.rx2.extensions.singlek.effect.effect
-import arrow.effects.rx2.extensions.singlek.functor.functor
 import arrow.effects.rx2.extensions.singlek.monad.flatMap
-import arrow.effects.rx2.extensions.singlek.monad.monad
-import arrow.effects.rx2.extensions.singlek.monadError.monadError
-import arrow.effects.rx2.extensions.singlek.monadThrow.bindingCatch
+import arrow.effects.rx2.extensions.singlek.timer.timer
+import arrow.effects.rx2.k
 import arrow.effects.rx2.value
+import arrow.effects.typeclasses.Dispatchers
 import arrow.effects.typeclasses.ExitCase
 import arrow.test.UnitSpec
-import arrow.test.laws.ApplicativeErrorLaws
-import arrow.test.laws.ApplicativeLaws
-import arrow.test.laws.AsyncLaws
-import arrow.test.laws.FunctorLaws
-import arrow.test.laws.MonadErrorLaws
-import arrow.test.laws.MonadLaws
+import arrow.test.laws.ConcurrentLaws
+import arrow.test.laws.TimerLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
@@ -29,47 +23,43 @@ import io.kotlintest.shouldNotBe
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.rx2.asCoroutineDispatcher
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import kotlin.coroutines.CoroutineContext
 
 @RunWith(KotlinTestRunner::class)
 class SingleKTests : UnitSpec() {
 
   fun <T> EQ(): Eq<SingleKOf<T>> = object : Eq<SingleKOf<T>> {
-    override fun SingleKOf<T>.eqv(b: SingleKOf<T>): Boolean =
-      try {
-        this.value().blockingGet() == b.value().blockingGet()
-      } catch (throwable: Throwable) {
-        val errA = try {
-          this.value().blockingGet()
-          throw IllegalArgumentException()
-        } catch (err: Throwable) {
-          err
-        }
-        val errB = try {
-          b.value().blockingGet()
-          throw IllegalStateException()
-        } catch (err: Throwable) {
-          err
-        }
-        errA == errB
-      }
+    override fun SingleKOf<T>.eqv(b: SingleKOf<T>): Boolean {
+      val res1 = Try { value().timeout(5, TimeUnit.SECONDS).blockingGet() }
+      val res2 = arrow.core.Try { b.value().timeout(5, TimeUnit.SECONDS).blockingGet() }
+      return res1.fold({ t1 ->
+        res2.fold({ t2 ->
+          (t1::class.java == t2::class.java)
+        }, { false })
+      }, { v1 ->
+        res2.fold({ false }, {
+          v1 == it
+        })
+      })
+    }
   }
+
+  val CS = SingleK.concurrent(object : Dispatchers<ForSingleK> {
+    override fun default(): CoroutineContext = Schedulers.io().asCoroutineDispatcher()
+  })
 
   init {
     testLaws(
-      FunctorLaws.laws(SingleK.functor(), { SingleK.just(it) }, EQ()),
-      ApplicativeLaws.laws(SingleK.applicative(), EQ()),
-      MonadLaws.laws(SingleK.monad(), EQ()),
-      MonadErrorLaws.laws(SingleK.monadError(), EQ(), EQ(), EQ()),
-      ApplicativeErrorLaws.laws(SingleK.applicativeError(), EQ(), EQ(), EQ()),
-      AsyncLaws.laws(SingleK.async(), EQ(), EQ(), testStackSafety = false),
-      AsyncLaws.laws(SingleK.effect(), EQ(), EQ(), testStackSafety = false)
+      ConcurrentLaws.laws(CS, EQ(), EQ(), EQ(), testStackSafety = false),
+      TimerLaws.laws(SingleK.async(), SingleK.timer(), EQ())
     )
 
     "Multi-thread Singles finish correctly" {
-      val value: Single<Long> = bindingCatch {
+      val value: Single<Long> = SingleK.fx {
         val a = Single.timer(2, TimeUnit.SECONDS).k().bind()
         a
       }.value()
@@ -83,7 +73,7 @@ class SingleKTests : UnitSpec() {
       val originalThread: Thread = Thread.currentThread()
       var threadRef: Thread? = null
 
-      val value: Single<Long> = bindingCatch {
+      val value: Single<Long> = SingleK.fx {
         val a = Single.timer(2, TimeUnit.SECONDS, Schedulers.newThread()).k().bind()
         threadRef = Thread.currentThread()
         val b = Single.just(a).observeOn(Schedulers.newThread()).k().bind()
@@ -100,7 +90,7 @@ class SingleKTests : UnitSpec() {
     }
 
     "Single dispose forces binding to cancel without completing too" {
-      val value: Single<Long> = bindingCatch {
+      val value: Single<Long> = SingleK.fx {
         val a = Single.timer(3, TimeUnit.SECONDS).k().bind()
         a
       }.value()

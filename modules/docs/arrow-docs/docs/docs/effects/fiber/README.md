@@ -19,19 +19,14 @@ when the resulting `IO` is canceled it does not propagate this cancellation back
 ```kotlin:ank
 import arrow.effects.*
 import kotlinx.coroutines.Dispatchers.Default
-import arrow.effects.extensions.io.fx.fx
+import arrow.effects.extensions.fx
 import arrow.effects.typeclasses.Fiber
 import arrow.effects.IO
-import arrow.effects.extensions.io.concurrent.startFiber
-import arrow.effects.extensions.io.dispatchers.dispatchers
-import arrow.effects.extensions.io.monad.flatMap
-import arrow.effects.extensions.io.monad.map
-import kotlin.coroutines.CoroutineContext
 
 fun <A, B, C> parallelMap(first: IO<A>,
                      second: IO<B>,
                      f: (A, B) -> C): IO<C> =
-  fx {
+  IO.fx {
     val (fiberOne: Fiber<ForIO, A>) = Default.startFiber(first)
     val (fiberTwo: Fiber<ForIO, B>) = Default.startFiber(second)
     f(!fiberOne.join(), !fiberTwo.join())
@@ -57,14 +52,17 @@ parallelMap(first, second, Int::plus).await()
 ```
 
 We could fix this snippet to support proper cancellation by using `bracket` instead of `flatMap`,
-which allows us to register an operation to run on cancelation, error or completion.
+which allows us to register an operation to run on cancellation, error or completion.
 
 ```kotlin:ank
+import arrow.effects.extensions.io.monad.flatMap
+import arrow.effects.extensions.io.monad.map
+
 fun <A, B, C> parallelMap2(first: IO<A>,
                           second: IO<B>,
                           f: (A, B) -> C): IO<C> =
-      Default.startFiber(first).bracket(use = { (joinA, _) ->
-          Default.startFiber(second).bracket(use = { (joinB, _) ->
+      first.startFiber(Default).bracket(use = { (joinA, _) ->
+          second.startFiber(Default).bracket(use = { (joinB, _) ->
             joinA.flatMap { a ->
               joinB.map { b -> f(a, b) }
             }
