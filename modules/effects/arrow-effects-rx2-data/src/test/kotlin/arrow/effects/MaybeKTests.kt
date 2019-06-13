@@ -121,7 +121,7 @@ class MaybeKTests : UnitSpec() {
       val countDownLatch = CountDownLatch(1)
       MaybeK.just(Unit)
         .bracketCase(
-          use = { MaybeK.async<Nothing> { _, _ -> } },
+          use = { MaybeK.async<Nothing> { } },
           release = { _, exitCase ->
             MaybeK {
               ec = exitCase
@@ -140,8 +140,8 @@ class MaybeKTests : UnitSpec() {
     "MaybeK should cancel KindConnection on dispose" {
       Promise.uncancelable<ForMaybeK, Unit>(MaybeK.async()).flatMap { latch ->
         MaybeK {
-          MaybeK.async<Unit> { conn, _ ->
-            conn.push(latch.complete(Unit))
+          MaybeK.cancelable<Unit> {
+            latch.complete(Unit)
           }.maybe.subscribe().dispose()
         }.flatMap { latch.get() }
       }.value()
@@ -154,7 +154,7 @@ class MaybeKTests : UnitSpec() {
       Promise.uncancelable<ForMaybeK, Unit>(MaybeK.async())
         .flatMap { latch ->
           MaybeK {
-            MaybeK.async<Unit> { _, _ -> }
+            MaybeK.async<Unit> { }
               .value()
               .doOnDispose { latch.complete(Unit).value().subscribe() }
               .subscribe()
@@ -164,14 +164,6 @@ class MaybeKTests : UnitSpec() {
         .test()
         .assertValue(Unit)
         .awaitTerminalEvent(100, TimeUnit.MILLISECONDS)
-    }
-
-    "KindConnection can cancel upstream" {
-      MaybeK.async<Unit> { connection, _ ->
-        connection.cancel().value().subscribe()
-      }.value()
-        .test()
-        .assertError(ConnectionCancellationException)
     }
   }
 }

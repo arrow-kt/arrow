@@ -164,15 +164,6 @@ interface ObservableKEffect : Effect<ForObservableK>, ObservableKAsync {
 }
 
 interface ObservableKConcurrent : Concurrent<ForObservableK>, ObservableKAsync {
-  override fun <A> async(fa: Proc<A>): ObservableK<A> =
-    ObservableK.async { _, cb -> fa(cb) }
-
-  override fun <A> asyncF(k: ProcF<ForObservableK, A>): ObservableK<A> =
-    ObservableK.asyncF { _, cb -> k(cb) }
-
-  override fun <A> asyncF(fa: ConnectedProcF<ForObservableK, A>): ObservableK<A> =
-    ObservableK.asyncF(fa)
-
   override fun <A> CoroutineContext.startFiber(kind: ObservableKOf<A>): ObservableK<Fiber<ForObservableK, A>> =
     asScheduler().let { scheduler ->
       Observable.create<Fiber<ForObservableK, A>> { emitter ->

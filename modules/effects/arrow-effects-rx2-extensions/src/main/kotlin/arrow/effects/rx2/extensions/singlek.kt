@@ -137,15 +137,6 @@ interface SingleKEffect :
 }
 
 interface SingleKConcurrent : Concurrent<ForSingleK>, SingleKAsync {
-  override fun <A> async(fa: Proc<A>): SingleK<A> =
-    SingleK.async { _, cb -> fa(cb) }
-
-  override fun <A> asyncF(k: ProcF<ForSingleK, A>): SingleK<A> =
-    SingleK.asyncF { _, cb -> k(cb) }
-
-  override fun <A> asyncF(fa: ConnectedProcF<ForSingleK, A>): SingleK<A> =
-    SingleK.asyncF(fa)
-
   override fun <A> CoroutineContext.startFiber(kind: SingleKOf<A>): SingleK<Fiber<ForSingleK, A>> =
     asScheduler().let { scheduler ->
       Single.create<Fiber<ForSingleK, A>> { emitter ->

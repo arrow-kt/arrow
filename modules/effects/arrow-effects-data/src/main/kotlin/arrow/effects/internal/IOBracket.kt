@@ -19,7 +19,7 @@ internal object IOBracket {
    * Implementation for `IO.bracketCase`.
    */
   operator fun <A, B> invoke(acquire: IOOf<A>, release: (A, ExitCase<Throwable>) -> IOOf<Unit>, use: (A) -> IOOf<B>): IO<B> =
-    IO.async { conn, cb ->
+    IO.Async { conn, cb ->
       // Placeholder for the future finalizer
       val deferredRelease = ForwardCancelable()
       conn.push(deferredRelease.cancel())
@@ -80,7 +80,7 @@ internal object IOBracket {
   }
 
   fun <A> guaranteeCase(source: IO<A>, release: (ExitCase<Throwable>) -> IOOf<Unit>): IO<A> =
-    IO.async { conn, cb ->
+    IO.Async { conn, cb ->
       Platform.trampoline {
         val frame = EnsureReleaseFrame<A>(release)
         val onNext = source.flatMap(frame)

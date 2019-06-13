@@ -173,14 +173,6 @@ interface FlowableKEffect :
 }
 
 interface FlowableKConcurrent : Concurrent<ForFlowableK>, FlowableKAsync {
-  override fun <A> async(fa: Proc<A>): FlowableK<A> =
-    FlowableK.async({ _, cb -> fa(cb) }, BS())
-
-  override fun <A> asyncF(k: ProcF<ForFlowableK, A>): FlowableK<A> =
-    FlowableK.asyncF({ _, cb -> k(cb) }, BS())
-
-  override fun <A> asyncF(fa: ConnectedProcF<ForFlowableK, A>): FlowableK<A> =
-    FlowableK.asyncF(fa)
 
   override fun <A> CoroutineContext.startFiber(kind: Kind<ForFlowableK, A>): Kind<ForFlowableK, Fiber<ForFlowableK, A>> =
     asScheduler().let { scheduler ->

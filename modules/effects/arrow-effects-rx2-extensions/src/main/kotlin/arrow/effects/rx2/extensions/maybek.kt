@@ -1,5 +1,6 @@
 package arrow.effects.rx2.extensions
 
+import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.effects.CancelToken
@@ -140,10 +141,10 @@ interface MaybeKMonadDefer : MonadDefer<ForMaybeK>, MaybeKBracket {
 @extension
 interface MaybeKAsync : Async<ForMaybeK>, MaybeKMonadDefer {
   override fun <A> async(fa: Proc<A>): MaybeK<A> =
-    MaybeK.async { _, cb -> fa(cb) }
+    MaybeK.async(fa)
 
   override fun <A> asyncF(k: ProcF<ForMaybeK, A>): MaybeK<A> =
-    MaybeK.asyncF { _, cb -> k(cb) }
+    MaybeK.asyncF(k)
 
   override fun <A> MaybeKOf<A>.continueOn(ctx: CoroutineContext): MaybeK<A> =
     fix().continueOn(ctx)
@@ -158,15 +159,6 @@ interface MaybeKEffect :
 }
 
 interface MaybeKConcurrent : Concurrent<ForMaybeK>, MaybeKAsync {
-  override fun <A> async(fa: Proc<A>): MaybeK<A> =
-    MaybeK.async { _, cb -> fa(cb) }
-
-  override fun <A> asyncF(k: ProcF<ForMaybeK, A>): MaybeK<A> =
-    MaybeK.asyncF { _, cb -> k(cb) }
-
-  override fun <A> asyncF(fa: ConnectedProcF<ForMaybeK, A>): MaybeK<A> =
-    MaybeK.asyncF(fa)
-
   override fun <A> CoroutineContext.startFiber(kind: MaybeKOf<A>): MaybeK<Fiber<ForMaybeK, A>> =
     asScheduler().let { scheduler ->
       Maybe.create<Fiber<ForMaybeK, A>> { emitter ->
@@ -180,10 +172,11 @@ interface MaybeKConcurrent : Concurrent<ForMaybeK>, MaybeKAsync {
       }.k()
     }
 
+  override fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForMaybeK>): MaybeK<A> =
+    MaybeK.cancelable(k)
+
   override fun <A> cancelableF(k: ((Either<Throwable, A>) -> Unit) -> MaybeKOf<CancelToken<ForMaybeK>>): MaybeK<A> =
-    MaybeK.asyncF { kindConnection, function ->
-      k(function).map { kindConnection.push(it) }
-    }
+    MaybeK.cancelableF(k)
 
   override fun <A, B> CoroutineContext.racePair(fa: MaybeKOf<A>, fb: MaybeKOf<B>): MaybeK<RacePair<ForMaybeK, A, B>> =
     asScheduler().let { scheduler ->
