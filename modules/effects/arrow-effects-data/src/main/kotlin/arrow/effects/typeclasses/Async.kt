@@ -322,6 +322,23 @@ interface Async<F> : MonadDefer<F> {
   fun <A> never(): Kind<F, A> =
     async { }
 
+  /**
+   * Helper function that provides an easy way to construct a suspend effect
+   *
+   * ```kotlin:ank:playground:extension
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   suspend fun logAndIncrease(s: String): Int {
+   *      println(s)
+   *      s.toInt() + 1
+   *   }
+   *
+   *   val result = _extensionFactory_.mapEffect { s -> logAndIncrease(s) }
+   *   //sampleEnd
+   *   println(result)
+   * }
+   * ```
+   */
   fun <A, B> Kind<F, A>.mapEffect(f: suspend (A) -> B): Kind<F, B> =
     flatMap { a -> effect { f(a) } }
 }
