@@ -62,7 +62,7 @@ internal class UncancelablePromise<F, A>(private val AS: Async<F>) : Promise<F, 
       if (state.compareAndSet(current, State.Complete(a))) {
         val list = current.joiners
         if (list.isNotEmpty()) {
-          delay {
+          later {
             val result = Right(a)
             list.forEach { it(result) }
             true
@@ -87,7 +87,7 @@ internal class UncancelablePromise<F, A>(private val AS: Async<F>) : Promise<F, 
       if (state.compareAndSet(current, State.Error(error))) {
         val list = current.joiners
         if (list.isNotEmpty()) {
-          delay {
+          later {
             val result = Left(error)
             list.forEach { it(result) }
             true
