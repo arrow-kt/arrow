@@ -401,12 +401,15 @@ interface Concurrent<F> : Async<F> {
    * Map two tasks in parallel within a new [F] on [this@parMapN].
    *
    * ```kotlin:ank:playground
-   * import arrow.effects.extensions.io.concurrent.parMapN
-   * import arrow.effects.extensions.io.monadDefer.later
+   * import arrow.Kind
+   * import arrow.effects.IO
    * import kotlinx.coroutines.Dispatchers
+   * import arrow.effects.typeclasses.Concurrent
+   * import arrow.effects.extensions.io.concurrent.concurrent
+   * import arrow.effects.fix
    *
    * fun main(args: Array<String>) {
-   *  fun <F> Concurrent<F>.example(): Kind<F, Unit> {
+   *   fun <F> Concurrent<F>.example(): Kind<F, String> {
    *   //sampleStart
    *     val result = Dispatchers.Default.parMapN(
    *       effect { "First one is on ${Thread.currentThread().name}" },
@@ -415,7 +418,7 @@ interface Concurrent<F> : Async<F> {
    *       "$a\n$b"
    *     }
    *   //sampleEnd
-   *     return result
+   *   return result
    *   }
    *
    *   IO.concurrent().example().fix().unsafeRunSync().let(::println)
@@ -575,6 +578,7 @@ interface Concurrent<F> : Async<F> {
    * import arrow.effects.*
    * import arrow.effects.typeclasses.Concurrent
    * import kotlinx.coroutines.Dispatchers
+   * import arrow.effects.extensions.io.concurrent.concurrent
    *
    * fun main(args: Array<String>) {
    *   fun <F> Concurrent<F>.example(): Kind<F, String> {
