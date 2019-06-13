@@ -348,7 +348,7 @@ interface Concurrent<F> : Async<F> {
    *         cb(Right("Hello from ${Thread.currentThread().name}"))
    *       }
    *
-   *       later({ deferred.cancel().let { Unit } })
+   *       effect { deferred.cancel().let { Unit } }
    *     }
    *   }
    *
@@ -357,7 +357,7 @@ interface Concurrent<F> : Async<F> {
    *   val result2 = _extensionFactory_.cancelableF<Unit> { cb ->
    *     effect {
    *       println("Doing something that can be cancelled.")
-   *       later({ println("Cancelling the task") })
+   *       effect  { println("Cancelling the task") }
    *     }
    *   }
    *
@@ -406,15 +406,19 @@ interface Concurrent<F> : Async<F> {
    * import kotlinx.coroutines.Dispatchers
    *
    * fun main(args: Array<String>) {
+   *  fun <F> Concurrent<F>.example(): Kind<F, Unit> {
    *   //sampleStart
-   *   val result = Dispatchers.Default.parMapN(
-   *     effect { "First one is on ${Thread.currentThread().name}" },
-   *     effect { "Second one is on ${Thread.currentThread().name}" }
-   *   ) { a, b ->
-   *     "$a\n$b"
-   *   }
+   *     val result = Dispatchers.Default.parMapN(
+   *       effect { "First one is on ${Thread.currentThread().name}" },
+   *       effect { "Second one is on ${Thread.currentThread().name}" }
+   *     ) { a, b ->
+   *       "$a\n$b"
+   *     }
    *   //sampleEnd
-   *   println(result.unsafeRunSync())
+   *     return result
+   *   }
+   *
+   *   IO.concurrent().example().fix().unsafeRunSync().let(::println)
    * }
    * ```
    *
@@ -569,7 +573,6 @@ interface Concurrent<F> : Async<F> {
    * ```kotlin:ank:playground
    * import arrow.Kind
    * import arrow.effects.*
-   * import arrow.effects.extensions.io.concurrent.concurrent
    * import arrow.effects.typeclasses.Concurrent
    * import kotlinx.coroutines.Dispatchers
    *
