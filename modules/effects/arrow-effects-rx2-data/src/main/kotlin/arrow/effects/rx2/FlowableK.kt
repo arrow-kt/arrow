@@ -166,11 +166,8 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
      * Creates a [FlowableK] that'll run [FlowableKProc].
      *
      * ```kotlin:ank:playground
-     * import arrow.core.Either
-     * import arrow.core.right
-     * import arrow.effects.rx2.FlowableK
-     * import arrow.effects.rx2.FlowableKConnection
-     * import arrow.effects.rx2.value
+     * import arrow.core.*
+     * import arrow.effects.rx2.*
      *
      * class NetworkApi {
      *   fun async(f: (String) -> Unit): Unit = f("Some value of a resource")
@@ -180,7 +177,7 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
      *   //sampleStart
      *   val result = FlowableK.async(fa= { cb: (Either<Throwable, String>) -> Unit ->
      *     val nw = NetworkApi()
-     *     nw.async { value -> cb(value.right()) }
+     *     nw.async { value -> cb(Right(value)) }
      *   })
      *   //sampleEnd
      *   result.value().subscribe(::println)

@@ -169,11 +169,8 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
      * Creates a [ObservableK] that'll run [ObservableKProc].
      *
      * ```kotlin:ank:playground
-     * import arrow.core.Either
-     * import arrow.core.right
-     * import arrow.effects.rx2.ObservableK
-     * import arrow.effects.rx2.ObservableKConnection
-     * import arrow.effects.rx2.value
+     * import arrow.core.*
+     * import arrow.effects.rx2.*
      *
      * class NetworkApi {
      *   fun async(f: (String) -> Unit): Unit = f("Some value of a resource")
