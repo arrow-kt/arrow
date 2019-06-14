@@ -147,10 +147,10 @@ interface ObservableKMonadDefer : MonadDefer<ForObservableK>, ObservableKBracket
 @extension
 interface ObservableKAsync : Async<ForObservableK>, ObservableKMonadDefer {
   override fun <A> async(fa: Proc<A>): ObservableK<A> =
-    ObservableK.async { _, cb -> fa(cb) }
+    ObservableK.async(fa)
 
   override fun <A> asyncF(k: ProcF<ForObservableK, A>): ObservableK<A> =
-    ObservableK.asyncF { _, cb -> k(cb) }
+    ObservableK.asyncF(k)
 
   override fun <A> ObservableKOf<A>.continueOn(ctx: CoroutineContext): ObservableK<A> =
     fix().continueOn(ctx)
@@ -176,10 +176,11 @@ interface ObservableKConcurrent : Concurrent<ForObservableK>, ObservableKAsync {
       }.k()
     }
 
+  override fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForObservableK>): ObservableKOf<A> =
+    ObservableK.cancelable(k)
+
   override fun <A> cancelableF(k: ((Either<Throwable, A>) -> Unit) -> ObservableKOf<CancelToken<ForObservableK>>): ObservableK<A> =
-    ObservableK.asyncF { kindConnection, function ->
-      k(function).map { kindConnection.push(it) }
-    }
+    ObservableK.cancelableF(k)
 
   override fun <A, B> CoroutineContext.racePair(fa: ObservableKOf<A>, fb: ObservableKOf<B>): ObservableK<RacePair<ForObservableK, A, B>> =
     asScheduler().let { scheduler ->
