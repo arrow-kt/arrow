@@ -8,6 +8,9 @@ import arrow.core.Valid
 import arrow.core.Validated
 import arrow.core.ValidatedPartialOf
 import arrow.core.fix
+import arrow.core.ap
+import arrow.core.handleLeftWith
+import arrow.core.combineK
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError

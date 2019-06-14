@@ -18,6 +18,7 @@ import arrow.core.ListK
 import arrow.core.NonEmptyList
 import arrow.data.OptionT
 import arrow.core.nel
+import arrow.core.invoke
 import arrow.core.extensions.function1.contravariant.contravariant
 import arrow.core.extensions.id.monad.monad
 import arrow.core.extensions.option.applicative.applicative
@@ -27,7 +28,15 @@ import arrow.core.extensions.option.traverse.traverse
 import arrow.core.extensions.tuple2.bifunctor.bifunctor
 import arrow.core.ForListK
 import arrow.core.ForNonEmptyList
-import arrow.core.OptionTPartialOf
+import arrow.core.extensions.nonemptylist.functor.functor
+import arrow.core.extensions.nonemptylist.monad.monad
+import arrow.core.extensions.nonemptylist.applicative.applicative
+import arrow.core.extensions.nonemptylist.foldable.foldable
+import arrow.core.extensions.nonemptylist.traverse.traverse
+import arrow.core.extensions.listk.applicative.applicative
+import arrow.core.extensions.listk.semigroupK.semigroupK
+import arrow.core.extensions.listk.monoidK.monoidK
+import arrow.data.OptionTPartialOf
 import arrow.data.value
 import arrow.test.UnitSpec
 import arrow.mtl.extensions.ComposedFunctorFilter
@@ -59,6 +68,7 @@ import arrow.typeclasses.biunnest
 import arrow.typeclasses.conest
 import arrow.typeclasses.nest
 import arrow.typeclasses.unnest
+import arrow.typeclasses.counnest
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 

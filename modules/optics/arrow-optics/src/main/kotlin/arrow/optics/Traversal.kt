@@ -21,6 +21,7 @@ import arrow.typeclasses.Applicative
 import arrow.typeclasses.Const
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Traverse
+import arrow.typeclasses.value
 
 /**
  * [Traversal] is a type alias for [PTraversal] which fixes the type arguments

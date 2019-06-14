@@ -4,6 +4,8 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.ForTry
 import arrow.core.Try
+import arrow.core.ForListK
+import arrow.core.ListK
 import arrow.core.extensions.`try`.monad.monad
 import arrow.core.extensions.listk.monad.monad
 import arrow.core.extensions.listk.semigroupK.semigroupK

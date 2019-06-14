@@ -4,11 +4,13 @@ import arrow.core.None
 import arrow.core.ListK
 import arrow.core.MapK
 import arrow.core.k
+import arrow.optics.dsl.at
 import arrow.optics.extensions.listk.index.index
 import arrow.optics.extensions.mapk.at.at
 import arrow.optics.extensions.mapk.each.each
 import arrow.optics.extensions.traversal
 import arrow.test.UnitSpec
+import io.kotlintest.shouldBe
 
 @optics
 data class Street(val number: Int, val name: String) {

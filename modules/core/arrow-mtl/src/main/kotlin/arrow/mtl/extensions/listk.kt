@@ -7,7 +7,7 @@ import arrow.core.Tuple2
 import arrow.core.ForListK
 import arrow.core.ListK
 import arrow.core.ListKOf
-import arrow.data.fix
+import arrow.core.fix
 import arrow.extension
 import arrow.mtl.typeclasses.FunctorFilter
 import arrow.mtl.typeclasses.MonadCombine

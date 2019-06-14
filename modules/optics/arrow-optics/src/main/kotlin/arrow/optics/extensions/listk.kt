@@ -12,6 +12,7 @@ import arrow.core.toOption
 import arrow.core.toT
 import arrow.core.ListK
 import arrow.core.k
+import arrow.core.fix
 import arrow.extension
 import arrow.core.extensions.option.applicative.applicative
 import arrow.optics.Optional

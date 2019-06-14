@@ -8,6 +8,8 @@ import arrow.core.Validated
 import arrow.core.ValidatedPartialOf
 import arrow.extension
 import arrow.core.extensions.either.applicativeError.applicativeError
+import arrow.core.extensions.nonemptylist.semigroup.semigroup
+import arrow.core.extensions.validated.applicativeError.applicativeError
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Order
 import arrow.validation.RefinedPredicateException

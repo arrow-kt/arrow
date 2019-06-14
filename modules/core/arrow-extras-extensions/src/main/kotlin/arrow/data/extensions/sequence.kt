@@ -10,6 +10,7 @@ import arrow.data.SequenceKOf
 import arrow.data.extensions.sequencek.monad.map
 import arrow.data.extensions.sequencek.monad.monad
 import arrow.data.fix
+import arrow.data.k
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
@@ -27,7 +28,7 @@ import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Semigroupal
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
-import arrow.core.combineK as sequenceCombineK
+import arrow.data.combineK as sequenceCombineK
 
 @extension
 interface SequenceKSemigroup<A> : Semigroup<SequenceK<A>> {

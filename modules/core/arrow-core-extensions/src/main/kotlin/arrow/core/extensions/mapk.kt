@@ -1,16 +1,10 @@
 package arrow.core.extensions
 
 import arrow.Kind
-import arrow.core.Eval
-import arrow.core.MapK
-import arrow.core.MapKOf
-import arrow.core.MapKPartialOf
-import arrow.core.SetK
-import arrow.core.k
+import arrow.core.*
 import arrow.extension
 import arrow.core.extensions.setk.eq.eq
 import arrow.core.extensions.setk.hash.hash
-import arrow.core.fix
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Foldable

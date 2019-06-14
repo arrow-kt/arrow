@@ -4,7 +4,7 @@ import arrow.Kind
 import arrow.core.Option
 import arrow.core.ForNonEmptyList
 import arrow.core.NonEmptyList
-import arrow.data.fix
+import arrow.core.fix
 import arrow.extension
 import arrow.mtl.typeclasses.FunctorFilter
 

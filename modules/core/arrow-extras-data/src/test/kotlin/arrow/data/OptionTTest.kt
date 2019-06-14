@@ -5,7 +5,8 @@ import arrow.core.Either
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.value
+import arrow.core.ForNonEmptyList
+import arrow.core.NonEmptyList
 import arrow.core.extensions.const.divisible.divisible
 import arrow.core.extensions.monoid
 import arrow.effects.ForIO

@@ -32,6 +32,7 @@ import arrow.data.SequenceK
 import arrow.core.SetK
 import arrow.data.SortedMapK
 import arrow.core.Validated
+import arrow.data.k
 import arrow.core.k
 import arrow.recursion.Algebra
 import arrow.recursion.Coalgebra
