@@ -1,7 +1,9 @@
 package arrow.meta.extensions
 
+import com.sun.xml.internal.messaging.saaj.soap.impl.ElementFactory
 import org.jetbrains.kotlin.analyzer.AnalysisResult
 import org.jetbrains.kotlin.analyzer.ModuleInfo
+import org.jetbrains.kotlin.backend.common.BackendContext
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.codegen.ClassBuilderFactory
 import org.jetbrains.kotlin.codegen.ImplementationBodyCodegen
@@ -10,6 +12,8 @@ import org.jetbrains.kotlin.codegen.extensions.ClassBuilderInterceptorExtension
 import org.jetbrains.kotlin.codegen.extensions.ExpressionCodegenExtension
 import org.jetbrains.kotlin.com.intellij.mock.MockProject
 import org.jetbrains.kotlin.com.intellij.openapi.project.Project
+import org.jetbrains.kotlin.com.intellij.psi.JavaPsiFacade
+import org.jetbrains.kotlin.com.intellij.psi.PsiElementFactory
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.container.ComponentProvider
 import org.jetbrains.kotlin.context.ProjectContext
@@ -21,11 +25,13 @@ import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentProvider
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
+import org.jetbrains.kotlin.diagnostics.Diagnostic
 import org.jetbrains.kotlin.diagnostics.DiagnosticSink
 import org.jetbrains.kotlin.extensions.CompilerConfigurationExtension
 import org.jetbrains.kotlin.extensions.DeclarationAttributeAltererExtension
 import org.jetbrains.kotlin.extensions.StorageComponentContainerContributor
 import org.jetbrains.kotlin.incremental.components.LookupTracker
+import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.psi.KtFile
@@ -41,7 +47,10 @@ import org.jetbrains.kotlin.resolve.jvm.extensions.PackageFragmentProviderExtens
 import org.jetbrains.kotlin.resolve.lazy.LazyClassContext
 import org.jetbrains.kotlin.resolve.lazy.declarations.ClassMemberDeclarationProvider
 import org.jetbrains.kotlin.resolve.lazy.declarations.PackageMemberDeclarationProvider
+import org.jetbrains.kotlin.resolve.scopes.SyntheticScope
 import org.jetbrains.kotlin.storage.StorageManager
+import org.jetbrains.kotlin.synthetic.JavaSyntheticPropertiesScope
+import org.jetbrains.kotlin.synthetic.SyntheticScopeProviderExtension
 import org.jetbrains.kotlin.types.KotlinType
 import java.util.*
 
@@ -170,10 +179,33 @@ interface ExtensionPhase {
 
     fun CompilerContext.generateClassSyntheticParts(codegen: ImplementationBodyCodegen): Unit
   }
+
+  interface IRGeneration : ExtensionPhase {
+
+    fun CompilerContext.generate(
+      file: IrFile,
+      backendContext: BackendContext,
+      bindingContext: BindingContext
+    )
+
+  }
+
+  interface SyntheticScopeProvider: ExtensionPhase {
+    fun CompilerContext.getSyntheticScopes(
+      moduleDescriptor: ModuleDescriptor,
+      javaSyntheticPropertiesScope: JavaSyntheticPropertiesScope
+    ): List<SyntheticScope>
+  }
+
+  interface DiagnosticsSuppressor: ExtensionPhase {
+    fun CompilerContext.isSuppressed(diagnostic: Diagnostic): Boolean
+  }
 }
 
 class CompilerContext(
-  val messageCollector: MessageCollector
+  val project: MockProject,
+  val messageCollector: MessageCollector,
+  val elementFactory: PsiElementFactory = JavaPsiFacade.getInstance(project).elementFactory
 )
 
 

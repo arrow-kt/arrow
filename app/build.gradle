@@ -15,3 +15,8 @@ dependencies {
 afterEvaluate {
     tasks["compileKotlin"].dependsOn += compilerPlugin.tasks["jar"]
 }
+
+task execute(type:JavaExec) {
+    main = "arrow.sample.test"
+    classpath = sourceSets.main.runtimeClasspath
+}

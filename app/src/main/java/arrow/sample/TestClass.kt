@@ -1,20 +1,19 @@
 package arrow.sample
 
-class TestClass {
-  fun sideEffect() =
-    println("BOOM!")
+interface Kind<out F, out A>
 
-  suspend fun other(): Unit {
-    println("other")
-  }
+//class ForOption
 
-  val x = { println() }
+//typealias OptionOf<A> = Kind<ForOption, A>
 
-  fun another2(): String {
-    1; println("test");
-    {
-      { println() }
-    }()
-    return "another"
+sealed class Option<out A>
+object None : Option<Nothing>()
+data class Some<out A>(val a: A): Option<A>()
+
+object test {
+  @JvmStatic
+  fun main(args: Array<String>) {
+    println(Option::class.java.interfaces.toList().map { it.name })
+   println(Class.forName("arrow.sample.ForOption"))
   }
 }

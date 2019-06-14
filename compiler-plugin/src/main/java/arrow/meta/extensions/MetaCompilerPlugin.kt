@@ -1,7 +1,14 @@
 package arrow.meta.extensions
 
+import arrow.meta.utils.NoOp2
+import arrow.meta.utils.NoOp3
+import arrow.meta.utils.NoOp5
+import arrow.meta.utils.NoOp6
+import arrow.meta.utils.NullableOp1
 import org.jetbrains.kotlin.analyzer.AnalysisResult
 import org.jetbrains.kotlin.analyzer.ModuleInfo
+import org.jetbrains.kotlin.backend.common.BackendContext
+import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.codegen.ClassBuilder
@@ -12,9 +19,12 @@ import org.jetbrains.kotlin.codegen.StackValue
 import org.jetbrains.kotlin.codegen.extensions.ClassBuilderInterceptorExtension
 import org.jetbrains.kotlin.codegen.extensions.ExpressionCodegenExtension
 import org.jetbrains.kotlin.com.intellij.mock.MockProject
+import org.jetbrains.kotlin.com.intellij.openapi.extensions.Extensions
 import org.jetbrains.kotlin.com.intellij.openapi.project.Project
+import org.jetbrains.kotlin.com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.compiler.plugin.ComponentRegistrar
 import org.jetbrains.kotlin.config.CompilerConfiguration
+import org.jetbrains.kotlin.config.JVMConfigurationKeys
 import org.jetbrains.kotlin.container.ComponentProvider
 import org.jetbrains.kotlin.context.ProjectContext
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
@@ -25,11 +35,14 @@ import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentProvider
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
+import org.jetbrains.kotlin.diagnostics.Diagnostic
 import org.jetbrains.kotlin.diagnostics.DiagnosticSink
 import org.jetbrains.kotlin.extensions.CompilerConfigurationExtension
 import org.jetbrains.kotlin.extensions.DeclarationAttributeAltererExtension
 import org.jetbrains.kotlin.extensions.StorageComponentContainerContributor
 import org.jetbrains.kotlin.incremental.components.LookupTracker
+import org.jetbrains.kotlin.ir.declarations.IrFile
+import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.psi.KtFile
@@ -39,6 +52,7 @@ import org.jetbrains.kotlin.resolve.BindingTrace
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
 import org.jetbrains.kotlin.resolve.checkers.DeclarationChecker
 import org.jetbrains.kotlin.resolve.checkers.DeclarationCheckerContext
+import org.jetbrains.kotlin.resolve.diagnostics.DiagnosticSuppressor
 import org.jetbrains.kotlin.resolve.extensions.SyntheticResolveExtension
 import org.jetbrains.kotlin.resolve.jvm.diagnostics.JvmDeclarationOrigin
 import org.jetbrains.kotlin.resolve.jvm.extensions.AnalysisHandlerExtension
@@ -46,7 +60,10 @@ import org.jetbrains.kotlin.resolve.jvm.extensions.PackageFragmentProviderExtens
 import org.jetbrains.kotlin.resolve.lazy.LazyClassContext
 import org.jetbrains.kotlin.resolve.lazy.declarations.ClassMemberDeclarationProvider
 import org.jetbrains.kotlin.resolve.lazy.declarations.PackageMemberDeclarationProvider
+import org.jetbrains.kotlin.resolve.scopes.SyntheticScope
 import org.jetbrains.kotlin.storage.StorageManager
+import org.jetbrains.kotlin.synthetic.JavaSyntheticPropertiesScope
+import org.jetbrains.kotlin.synthetic.SyntheticScopeProviderExtension
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.org.objectweb.asm.AnnotationVisitor
 import org.jetbrains.org.objectweb.asm.FieldVisitor
@@ -115,6 +132,15 @@ interface MetaCompilerPlugin : ComponentRegistrar {
         }
     }
 
+  fun defineClass(f: (bindingContext: BindingContext, diagnostics: DiagnosticSink, classDef: ClassDefinition) -> ClassDefinition): ExtensionPhase.ClassBuilder =
+    object : ExtensionPhase.ClassBuilder {
+      override fun CompilerContext.interceptClassBuilder(interceptedFactory: ClassBuilderFactory, bindingContext: BindingContext, diagnostics: DiagnosticSink): ClassBuilderFactory =
+        object : ClassBuilderFactory by interceptedFactory {
+          override fun newClassBuilder(origin: JvmDeclarationOrigin): ClassBuilder =
+            DefineClassBuilder(interceptedFactory.newClassBuilder(origin), bindingContext, diagnostics, f)
+        }
+    }
+
   fun newAnnotation(f: (desc: String, visible: Boolean) -> Unit): ExtensionPhase.ClassBuilder =
     object : ExtensionPhase.ClassBuilder {
       override fun CompilerContext.interceptClassBuilder(interceptedFactory: ClassBuilderFactory, bindingContext: BindingContext, diagnostics: DiagnosticSink): ClassBuilderFactory =
@@ -156,6 +182,14 @@ interface MetaCompilerPlugin : ComponentRegistrar {
         generateClassSyntheticParts(codegen)
     }
 
+  fun IrGeneration(generate: IrBuiltIns.(compilerContext: CompilerContext, file: IrFile, backendContext: BackendContext, bindingContext: BindingContext) -> Unit): ExtensionPhase.IRGeneration =
+    object : ExtensionPhase.IRGeneration {
+      override fun CompilerContext.generate(file: IrFile, backendContext: BackendContext, bindingContext: BindingContext) {
+        val builtIns: IrBuiltIns = backendContext.ir.context.irBuiltIns
+        builtIns.generate(this, file, backendContext, bindingContext)
+      }
+    }
+
   fun declarationAttributeAlterer(
     refineDeclarationModality: CompilerContext.(
       modifierListOwner: KtModifierListOwner,
@@ -177,14 +211,60 @@ interface MetaCompilerPlugin : ComponentRegistrar {
         getPackageFragmentProvider(project, module, storageManager, trace, moduleInfo, lookupTracker)
     }
 
-  fun syntheticResolver(addSyntheticSupertypes: CompilerContext.(thisDescriptor: ClassDescriptor, supertypes: MutableList<KotlinType>) -> Unit,
-                        generateSyntheticClasses: CompilerContext.(thisDescriptor: ClassDescriptor, name: Name, ctx: LazyClassContext, declarationProvider: ClassMemberDeclarationProvider, result: MutableSet<ClassDescriptor>) -> Unit,
-                        generatePackageSyntheticClasses: CompilerContext.(thisDescriptor: PackageFragmentDescriptor, name: Name, ctx: LazyClassContext, declarationProvider: PackageMemberDeclarationProvider, result: MutableSet<ClassDescriptor>) -> Unit,
-                        generateSyntheticMethods: CompilerContext.(thisDescriptor: ClassDescriptor, name: Name, bindingContext: BindingContext, fromSupertypes: List<SimpleFunctionDescriptor>, result: MutableCollection<SimpleFunctionDescriptor>) -> Unit,
-                        generateSyntheticProperties: CompilerContext.(thisDescriptor: ClassDescriptor, name: Name, bindingContext: BindingContext, fromSupertypes: ArrayList<PropertyDescriptor>, result: MutableSet<PropertyDescriptor>) -> Unit,
-                        getSyntheticCompanionObjectNameIfNeeded: CompilerContext.(thisDescriptor: ClassDescriptor) -> Name?,
-                        getSyntheticFunctionNames: CompilerContext.(thisDescriptor: ClassDescriptor) -> List<Name>,
-                        getSyntheticNestedClassNames: CompilerContext.(thisDescriptor: ClassDescriptor) -> List<Name>
+  fun syntheticScopes(getSyntheticScopes: CompilerContext.(moduleDescriptor: ModuleDescriptor, javaSyntheticPropertiesScope: JavaSyntheticPropertiesScope) -> List<SyntheticScope>): ExtensionPhase.SyntheticScopeProvider =
+    object : ExtensionPhase.SyntheticScopeProvider {
+      override fun CompilerContext.getSyntheticScopes(moduleDescriptor: ModuleDescriptor, javaSyntheticPropertiesScope: JavaSyntheticPropertiesScope): List<SyntheticScope> =
+        getSyntheticScopes(moduleDescriptor, javaSyntheticPropertiesScope)
+    }
+
+  fun diagnosticsSuppressor(isSuppressed: CompilerContext.(diagnostic: Diagnostic) -> Boolean): ExtensionPhase.DiagnosticsSuppressor =
+    object : ExtensionPhase.DiagnosticsSuppressor {
+      override fun CompilerContext.isSuppressed(diagnostic: Diagnostic): Boolean =
+        isSuppressed(diagnostic)
+    }
+
+  fun syntheticResolver(
+    addSyntheticSupertypes: CompilerContext.(
+      thisDescriptor: ClassDescriptor,
+      supertypes: MutableList<KotlinType>
+    ) -> Unit = NoOp3,
+    generateSyntheticClasses: CompilerContext.(
+      thisDescriptor: ClassDescriptor,
+      name: Name,
+      ctx: LazyClassContext,
+      declarationProvider: ClassMemberDeclarationProvider,
+      result: MutableSet<ClassDescriptor>
+    ) -> Unit = NoOp6,
+    generatePackageSyntheticClasses: CompilerContext.(
+      thisDescriptor: PackageFragmentDescriptor,
+      name: Name,
+      ctx: LazyClassContext,
+      declarationProvider: PackageMemberDeclarationProvider,
+      result: MutableSet<ClassDescriptor>
+    ) -> Unit = NoOp6,
+    generateSyntheticMethods: CompilerContext.(
+      thisDescriptor: ClassDescriptor,
+      name: Name,
+      bindingContext: BindingContext,
+      fromSupertypes: List<SimpleFunctionDescriptor>,
+      result: MutableCollection<SimpleFunctionDescriptor>
+    ) -> Unit = NoOp6,
+    generateSyntheticProperties: CompilerContext.(
+      thisDescriptor: ClassDescriptor,
+      name: Name,
+      bindingContext: BindingContext,
+      fromSupertypes: ArrayList<PropertyDescriptor>,
+      result: MutableSet<PropertyDescriptor>
+    ) -> Unit = NoOp6,
+    getSyntheticCompanionObjectNameIfNeeded: CompilerContext.(
+      thisDescriptor: ClassDescriptor
+    ) -> Name? = NullableOp1(),
+    getSyntheticFunctionNames: CompilerContext.(
+      thisDescriptor: ClassDescriptor
+    ) -> List<Name>? = NullableOp1(),
+    getSyntheticNestedClassNames: CompilerContext.(
+      thisDescriptor: ClassDescriptor
+    ) -> List<Name>? = NullableOp1()
   ): ExtensionPhase.SyntheticResolver =
     object : ExtensionPhase.SyntheticResolver {
       override fun CompilerContext.addSyntheticSupertypes(thisDescriptor: ClassDescriptor, supertypes: MutableList<KotlinType>) {
@@ -211,15 +291,21 @@ interface MetaCompilerPlugin : ComponentRegistrar {
         getSyntheticCompanionObjectNameIfNeeded(thisDescriptor)
 
       override fun CompilerContext.getSyntheticFunctionNames(thisDescriptor: ClassDescriptor): List<Name> =
-        getSyntheticFunctionNames(thisDescriptor)
+        getSyntheticFunctionNames(thisDescriptor) ?: emptyList()
 
       override fun CompilerContext.getSyntheticNestedClassNames(thisDescriptor: ClassDescriptor): List<Name> =
-        getSyntheticNestedClassNames(thisDescriptor)
+        getSyntheticNestedClassNames(thisDescriptor) ?: emptyList()
+    }
+
+  fun enableIr(): ExtensionPhase.Config =
+    updateConfig { configuration ->
+      configuration.put(JVMConfigurationKeys.IR, true)
     }
 
   override fun registerProjectComponents(project: MockProject, configuration: CompilerConfiguration) {
+    //println("Project allowed extensions: ${Extensions.getArea(project).extensionPoints.toList().joinToString("\n")}")
     val messageCollector: MessageCollector = configuration.get(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY, MessageCollector.NONE)
-    val ctx = CompilerContext(messageCollector)
+    val ctx = CompilerContext(project, messageCollector)
     intercept().forEach { phase ->
       if (phase is ExtensionPhase.Config) registerCompilerConfiguration(project, phase, ctx)
       if (phase is ExtensionPhase.AnalysisHandler) registerAnalysisHandler(project, phase, ctx)
@@ -229,7 +315,32 @@ interface MetaCompilerPlugin : ComponentRegistrar {
       if (phase is ExtensionPhase.DeclarationAttributeAlterer) registerDeclarationAttributeAlterer(project, phase, ctx)
       if (phase is ExtensionPhase.PackageProvider) registerPackageProvider(project, phase, ctx)
       if (phase is ExtensionPhase.SyntheticResolver) registerSyntheticResolver(project, phase, ctx)
+      if (phase is ExtensionPhase.IRGeneration) registerIRGeneration(project, phase, ctx)
+      //TODO() not available. if (phase is ExtensionPhase.SyntheticScopeProvider) registerSyntheticScopeProvider(project, phase, ctx)
+      //TODO() not available. if (phase is ExtensionPhase.DiagnosticsSuppressor) registerDiagnosticSuppressor(project, phase, ctx)
     }
+  }
+
+  fun registerDiagnosticSuppressor(project: MockProject, phase: ExtensionPhase.DiagnosticsSuppressor, ctx: CompilerContext) {
+    Extensions.getArea(project).getExtensionPoint(DiagnosticSuppressor.EP_NAME).registerExtension(object : DiagnosticSuppressor {
+      override fun isSuppressed(diagnostic: Diagnostic): Boolean =
+        phase.run { ctx.isSuppressed(diagnostic) }
+    })
+  }
+
+  fun registerSyntheticScopeProvider(project: MockProject, phase: ExtensionPhase.SyntheticScopeProvider, ctx: CompilerContext) {
+    SyntheticScopeProviderExtension.registerExtension(project, object: SyntheticScopeProviderExtension {
+      override fun getScopes(moduleDescriptor: ModuleDescriptor, javaSyntheticPropertiesScope: JavaSyntheticPropertiesScope): List<SyntheticScope> =
+        phase.run { ctx.getSyntheticScopes(moduleDescriptor, javaSyntheticPropertiesScope) }
+    })
+  }
+
+  fun registerIRGeneration(project: MockProject, phase: ExtensionPhase.IRGeneration, compilerContext: CompilerContext) {
+    IrGenerationExtension.registerExtension(project, object : IrGenerationExtension {
+      override fun generate(file: IrFile, backendContext: BackendContext, bindingContext: BindingContext) {
+        phase.run { compilerContext.generate(file, backendContext, bindingContext) }
+      }
+    })
   }
 
   fun registerSyntheticResolver(project: MockProject, phase: ExtensionPhase.SyntheticResolver, compilerContext: CompilerContext) {
@@ -405,3 +516,43 @@ internal class NewAnnotationClassBuilder(
   }
 
 }
+
+internal class DefineClassBuilder(
+  private val builder: ClassBuilder,
+  private val bindingContext: BindingContext,
+  private val diagnostics: DiagnosticSink,
+  val f: (bindingContext: BindingContext, diagnostics: DiagnosticSink, classDef: ClassDefinition) -> ClassDefinition
+) : DelegatingClassBuilder() {
+  override fun getDelegate(): ClassBuilder = builder
+
+  override fun defineClass(
+    origin: PsiElement?,
+    version: Int,
+    access: Int,
+    name: String,
+    signature: String?,
+    superName: String,
+    interfaces: Array<out String>
+  ) {
+    val classDef = f(bindingContext, diagnostics, ClassDefinition(origin, version, access, name, signature, superName, interfaces.toList()))
+    super.defineClass(
+      classDef.origin,
+      classDef.version,
+      classDef.access,
+      classDef.name,
+      classDef.signature,
+      classDef.superName,
+      classDef.interfaces.toTypedArray()
+    )
+  }
+}
+
+data class ClassDefinition(
+  val origin: PsiElement?,
+  val version: Int,
+  val access: Int,
+  val name: String,
+  val signature: String?,
+  val superName: String,
+  val interfaces: List<String>
+)
