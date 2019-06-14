@@ -58,14 +58,35 @@ interface Monad<F> : Selective<F> {
   fun <A, B> Kind<F, A>.followedByEval(fb: Eval<Kind<F, B>>): Kind<F, B> =
     flatMap { fb.value() }
 
+  @Deprecated(
+    "effectM is being renamed to flatTap",
+    ReplaceWith("flatTap(f)")
+  )
   fun <A, B> Kind<F, A>.effectM(f: (A) -> Kind<F, B>): Kind<F, A> =
+    flatTap(f)
+
+  fun <A, B> Kind<F, A>.flatTap(f: (A) -> Kind<F, B>): Kind<F, A> =
     flatMap { a -> f(a).map { a } }
 
-  fun <A, B> Kind<F, A>.forEffect(fb: Kind<F, B>): Kind<F, A> =
+  fun <A, B> Kind<F, A>.productL(fb: Kind<F, B>): Kind<F, A> =
     flatMap { a -> fb.map { a } }
 
-  fun <A, B> Kind<F, A>.forEffectEval(fb: Eval<Kind<F, B>>): Kind<F, A> =
+  @Deprecated(
+    "forEffect is being renamed to productL",
+    ReplaceWith("productL(fb)")
+  )
+  fun <A, B> Kind<F, A>.forEffect(fb: Kind<F, B>): Kind<F, A> =
+    productL(fb)
+
+  fun <A, B> Kind<F, A>.productLEval(fb: Eval<Kind<F, B>>): Kind<F, A> =
     flatMap { a -> fb.value().map { a } }
+
+  @Deprecated(
+    "forEffectEval is being renamed to productLEval",
+    ReplaceWith("productLEval(fb)")
+  )
+  fun <A, B> Kind<F, A>.forEffectEval(fb: Eval<Kind<F, B>>): Kind<F, A> =
+    productLEval(fb)
 
   fun <A, B> Kind<F, A>.mproduct(f: (A) -> Kind<F, B>): Kind<F, Tuple2<A, B>> =
     flatMap { a -> f(a).map { Tuple2(a, it) } }

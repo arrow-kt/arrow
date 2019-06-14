@@ -20,7 +20,6 @@ import arrow.effects.Race9
 import arrow.effects.RacePair
 import arrow.effects.RaceTriple
 import arrow.effects.Timer
-import arrow.effects.data.internal.BindingCancellationException
 import arrow.effects.internal.TimeoutException
 import arrow.typeclasses.MonadSyntax
 import java.util.concurrent.atomic.AtomicReference
@@ -96,8 +95,8 @@ interface Concurrent<F> : Async<F> {
    *         }
    *       }
    *
-   *       conn.push(_delay_({ GithubService.unregisterCallback(id) }))
-   *       conn.push(_delay_({ println("Everything we push to the cancellation stack will execute on cancellation") }))
+   *       conn.push(_later_({ GithubService.unregisterCallback(id) }))
+   *       conn.push(_later_({ println("Everything we push to the cancellation stack will execute on cancellation") }))
    *     }
    *
    *   val result = _extensionFactory_.getUsernames()
@@ -110,7 +109,7 @@ interface Concurrent<F> : Async<F> {
    * @see asyncF for a version that can suspend side effects in the registration function.
    */
   fun <A> async(fa: ConnectedProc<F, A>): Kind<F, A> =
-    asyncF { conn, cb -> delay { fa(conn, cb) } }
+    asyncF { conn, cb -> later { fa(conn, cb) } }
 
   /**
    * Creates a cancelable instance of [F] that executes an asynchronous process on evaluation.
@@ -141,7 +140,7 @@ interface Concurrent<F> : Async<F> {
    *   //sampleStart
    *   fun <F> Concurrent<F>.getUsernames(): Kind<F, List<String>> =
    *     asyncF { conn: KindConnection<F>, cb: (Either<Throwable, List<String>>) -> Unit ->
-   *       delay {
+   *       effect {
    *         val id = GithubService.getUsernames { names, throwable ->
    *           when {
    *             names != null -> cb(Right(names))
@@ -150,8 +149,8 @@ interface Concurrent<F> : Async<F> {
    *           }
    *         }
    *
-   *         conn.push(_delay_({ GithubService.unregisterCallback(id) }))
-   *         conn.push(_delay_({ println("Everything we push to the cancellation stack will execute on cancellation") }))
+   *         conn.push(_later_({ GithubService.unregisterCallback(id) }))
+   *         conn.push(_later_({ println("Everything we push to the cancellation stack will execute on cancellation") }))
    *       }
    *     }
    *
@@ -316,7 +315,7 @@ interface Concurrent<F> : Async<F> {
    *         successCallback = { accs -> cb(Right(accs)) },
    *         failureCallback = { e -> cb(Left(e)) })
    *
-   *       _delay_({ service.cancel() })
+   *       _later_({ service.cancel() })
    *     }
    *   }
    *
@@ -326,7 +325,10 @@ interface Concurrent<F> : Async<F> {
    * @see cancelableF for a version that can safely suspend impure callback registration code.
    */
   fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<F>): Kind<F, A> =
-    cancelableF { cb -> delay { k(cb) } }
+    cancelableF { cb ->
+      val token = k(cb)
+      later { token }
+    }
 
   /**
    * Builder to create a cancelable [F] instance that executes an asynchronous process on evaluation.
@@ -340,22 +342,22 @@ interface Concurrent<F> : Async<F> {
    * fun main(args: Array<String>) {
    *   //sampleStart
    *   val result = _extensionFactory_.cancelableF<String> { cb ->
-   *     delay {
+   *     effect {
    *       val deferred = kotlinx.coroutines.GlobalScope.async {
    *         kotlinx.coroutines.delay(1000)
    *         cb(Right("Hello from ${Thread.currentThread().name}"))
    *       }
    *
-   *       delay({ deferred.cancel().let { Unit } })
+   *       effect { deferred.cancel().let { Unit } }
    *     }
    *   }
    *
    *   println(result) //Run with `fix().unsafeRunSync()`
    *
    *   val result2 = _extensionFactory_.cancelableF<Unit> { cb ->
-   *     delay {
+   *     effect {
    *       println("Doing something that can be cancelled.")
-   *       delay({ println("Cancelling the task") })
+   *       effect  { println("Cancelling the task") }
    *     }
    *   }
    *
@@ -383,7 +385,9 @@ interface Concurrent<F> : Async<F> {
 
       k(cb1).bracketCase(use = {
         async<Unit> { cb ->
-          if (!state.compareAndSet(null, cb)) cb(rightUnit)
+          if (!state.compareAndSet(null, cb)) {
+            cb(rightUnit)
+          }
         }
       }, release = { token, exitCase ->
         when (exitCase) {
@@ -397,20 +401,27 @@ interface Concurrent<F> : Async<F> {
    * Map two tasks in parallel within a new [F] on [this@parMapN].
    *
    * ```kotlin:ank:playground
-   * import arrow.effects.extensions.io.concurrent.parMapN
-   * import arrow.effects.extensions.io.monadDefer.delay
+   * import arrow.Kind
+   * import arrow.effects.IO
    * import kotlinx.coroutines.Dispatchers
+   * import arrow.effects.typeclasses.Concurrent
+   * import arrow.effects.extensions.io.concurrent.concurrent
+   * import arrow.effects.fix
    *
    * fun main(args: Array<String>) {
+   *   fun <F> Concurrent<F>.example(): Kind<F, String> {
    *   //sampleStart
-   *   val result = Dispatchers.Default.parMapN(
-   *     delay { "First one is on ${Thread.currentThread().name}" },
-   *     delay { "Second one is on ${Thread.currentThread().name}" }
-   *   ) { a, b ->
-   *     "$a\n$b"
-   *   }
+   *     val result = Dispatchers.Default.parMapN(
+   *       effect { "First one is on ${Thread.currentThread().name}" },
+   *       effect { "Second one is on ${Thread.currentThread().name}" }
+   *     ) { a, b ->
+   *       "$a\n$b"
+   *     }
    *   //sampleEnd
-   *   println(result.unsafeRunSync())
+   *   return result
+   *   }
+   *
+   *   IO.concurrent().example().fix().unsafeRunSync().let(::println)
    * }
    * ```
    *
@@ -565,9 +576,9 @@ interface Concurrent<F> : Async<F> {
    * ```kotlin:ank:playground
    * import arrow.Kind
    * import arrow.effects.*
-   * import arrow.effects.extensions.io.concurrent.concurrent
    * import arrow.effects.typeclasses.Concurrent
    * import kotlinx.coroutines.Dispatchers
+   * import arrow.effects.extensions.io.concurrent.concurrent
    *
    * fun main(args: Array<String>) {
    *   fun <F> Concurrent<F>.example(): Kind<F, String> {
@@ -834,8 +845,8 @@ interface Concurrent<F> : Async<F> {
    * fun main(args: Array<String>) {
    *   //sampleStart
    *   fun <F> Concurrent<F>.timedOutWorld(): Kind<F, Unit> {
-   *     val world = sleep(3.seconds).flatMap { delay { println("Hello World!") } }
-   *     val fallbackWorld = delay { println("Hello from the backup") }
+   *     val world = sleep(3.seconds).flatMap { effect { println("Hello World!") } }
+   *     val fallbackWorld = effect { println("Hello from the backup") }
    *     return world.waitFor(1.seconds, fallbackWorld)
    *   }
    *   //sampleEnd
@@ -864,7 +875,7 @@ interface Concurrent<F> : Async<F> {
    * fun main(args: Array<String>) {
    *   //sampleStart
    *   fun <F> Concurrent<F>.timedOutWorld(): Kind<F, Unit> {
-   *     val world = sleep(1.seconds).flatMap { delay { println("Hello World!") } }
+   *     val world = sleep(1.seconds).flatMap { effect { println("Hello World!") } }
    *     return world.waitFor(3.seconds)
    *   }
    *   //sampleEnd

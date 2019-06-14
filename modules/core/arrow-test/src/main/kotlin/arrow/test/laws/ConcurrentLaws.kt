@@ -17,9 +17,8 @@ import arrow.test.generators.throwable
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
-import kotlinx.coroutines.Dispatchers
 import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 
@@ -31,7 +30,7 @@ object ConcurrentLaws {
     EQ: Eq<Kind<F, Int>>,
     EQ_EITHER: Eq<Kind<F, Either<Throwable, Int>>>,
     EQ_UNIT: Eq<Kind<F, Unit>>,
-    ctx: CoroutineContext = Dispatchers.Default,
+    ctx: CoroutineContext = CF.dispatchers().default(),
     testStackSafety: Boolean = true
   ): List<Law> =
     AsyncLaws.laws(CF, EQ, EQ_EITHER, testStackSafety) + listOf(
@@ -106,6 +105,7 @@ object ConcurrentLaws {
     forAll(Gen.int(), Gen.int()) { a, b ->
       fx.concurrent {
         val mvar = MVar(a, this@acquireBracketIsNotCancelable).bind()
+        mvar.take().bind()
         val p = Promise.uncancelable<F, Unit>(this@acquireBracketIsNotCancelable).bind()
         val task = p.complete(Unit).flatMap { mvar.put(b) }
           .bracket(use = { never<Int>() }, release = { just(Unit) })
@@ -113,7 +113,6 @@ object ConcurrentLaws {
         p.get().bind()
         ctx.startFiber(cancel).bind()
         continueOn(ctx)
-        mvar.take().bind()
         mvar.take().bind()
       }.equalUnderTheLaw(just(b), EQ)
     }
@@ -143,7 +142,7 @@ object ConcurrentLaws {
   fun <F> Concurrent<F>.cancelableCancelableFCoherence(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.either(Gen.throwable(), Gen.int())) { eith ->
       cancelable<Int> { cb -> cb(eith); just<Unit>(Unit) }
-        .equalUnderTheLaw(cancelableF { cb -> delay { cb(eith); just<Unit>(Unit) } }, EQ)
+        .equalUnderTheLaw(cancelableF { cb -> later { cb(eith); just<Unit>(Unit) } }, EQ)
     }
 
   fun <F> Concurrent<F>.cancelableReceivesCancelSignal(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) =
@@ -159,7 +158,7 @@ object ConcurrentLaws {
         }).bind()
 
         ctx.shift().followedBy(asyncF<Unit> { cb ->
-          delay { latch.await(500, TimeUnit.MILLISECONDS) }
+          later { latch.await(500, MILLISECONDS) }
             .map { cb(Right(Unit)) }
         }).bind()
 
@@ -203,8 +202,8 @@ object ConcurrentLaws {
 
         ctx.startFiber(upstream.followedBy(downstream)).bind()
 
-        ctx.startFiber(delay(ctx) {
-          cancelLatch.await(500, TimeUnit.MILLISECONDS)
+        ctx.startFiber(later(ctx) {
+          cancelLatch.await(500, MILLISECONDS)
         }.flatMap { cancelToken.get() ?: raiseError(AssertionError("CancelToken was not set.")) }
         ).bind()
 
@@ -223,8 +222,8 @@ object ConcurrentLaws {
           startLatch.countDown()
         }).bind()
 
-        delay(ctx) {
-          startLatch.await(500, TimeUnit.MILLISECONDS)
+        later(ctx) {
+          startLatch.await(500, MILLISECONDS)
         }.followedBy(cancel).bind()
 
         latch.get().bind()
