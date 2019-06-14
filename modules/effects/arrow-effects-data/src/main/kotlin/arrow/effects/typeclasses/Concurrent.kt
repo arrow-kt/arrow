@@ -7,7 +7,6 @@ import arrow.core.Right
 import arrow.core.Tuple2
 import arrow.core.Tuple3
 import arrow.effects.CancelToken
-import arrow.effects.KindConnection
 import arrow.effects.MVar
 import arrow.effects.Race2
 import arrow.effects.Race3

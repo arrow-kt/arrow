@@ -167,7 +167,7 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
-     *   val result = MaybeK.async { conn: MaybeKConnection, cb: (Either<Throwable, String>) -> Unit ->
+     *   val result = MaybeK.async { cb: (Either<Throwable, String>) -> Unit ->
      *     val resource = Resource()
      *     conn.push(MaybeK { resource.close() })
      *     resource.asyncRead { value -> cb(value.right()) }

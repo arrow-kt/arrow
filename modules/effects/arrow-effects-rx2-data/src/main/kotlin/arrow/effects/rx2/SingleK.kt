@@ -5,7 +5,6 @@ import arrow.core.Left
 import arrow.core.Right
 import arrow.core.nonFatalOrThrow
 import arrow.effects.CancelToken
-import arrow.effects.OnCancel
 import arrow.effects.internal.Platform
 import arrow.effects.rx2.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
@@ -170,13 +169,7 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
      */
     fun <A> async(fa: SingleKProc<A>): SingleK<A> =
       SingleK(Single.create<A> { emitter ->
-        val conn = SingleKConnection()
-        // On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
-        // on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
-        conn.push(SingleK { if (!emitter.isDisposed) emitter.onError(OnCancel.CancellationException) })
-        emitter.setCancellable { conn.cancel().value().subscribe() }
-
-        fa(conn) { either: Either<Throwable, A> ->
+        fa { either: Either<Throwable, A> ->
           either.fold({
             emitter.onError(it)
           }, {
@@ -187,12 +180,7 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
 
     fun <A> asyncF(fa: SingleKProcF<A>): SingleK<A> =
       Single.create { emitter: SingleEmitter<A> ->
-        val connection = SingleKConnection()
-        // On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
-        // on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
-        connection.push(SingleK { if (!emitter.isDisposed) emitter.onError(OnCancel.CancellationException) })
-
-        val dispose = fa(connection) { either: Either<Throwable, A> ->
+        val dispose = fa { either: Either<Throwable, A> ->
           either.fold({
             emitter.onError(it)
           }, {
@@ -200,10 +188,7 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
           })
         }.fix().single.subscribe({}, emitter::onError)
 
-        emitter.setCancellable {
-          dispose.dispose()
-          connection.cancel().value().subscribe({}, {})
-        }
+        emitter.setCancellable { dispose.dispose() }
       }.k()
 
     fun <A> cancelable(fa: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForSingleK>): SingleK<A> =
