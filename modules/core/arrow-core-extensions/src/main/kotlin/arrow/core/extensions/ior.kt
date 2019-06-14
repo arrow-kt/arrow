@@ -4,11 +4,13 @@ import arrow.Kind
 import arrow.Kind2
 import arrow.core.Either
 import arrow.core.Eval
-import arrow.data.ForIor
+import arrow.core.ForIor
 import arrow.core.Ior
 import arrow.core.IorOf
 import arrow.core.IorPartialOf
-import arrow.data.fix
+import arrow.core.ap
+import arrow.core.fix
+import arrow.core.flatMap
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply

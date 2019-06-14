@@ -8,8 +8,6 @@ import arrow.core.ForListK
 import arrow.core.ListK
 import arrow.core.ListKOf
 import arrow.core.k
-import arrow.core.extensions.listk.foldable.foldLeft
-import arrow.core.extensions.listk.monad.map
 import arrow.core.extensions.listk.monad.monad
 import arrow.core.fix
 import arrow.extension
@@ -158,7 +156,7 @@ interface ListKSemigroupK : SemigroupK<ForListK> {
 @extension
 interface ListKSemigroupal : Semigroupal<ForListK> {
   override fun <A, B> Kind<ForListK, A>.product(fb: Kind<ForListK, B>): Kind<ForListK, Tuple2<A, B>> =
-    fb.fix().ap(this.map { a: A -> { b: B -> Tuple2(a, b) } })
+    fb.fix().ap(fix().map { a: A -> { b: B -> Tuple2(a, b) } })
 }
 
 @extension
@@ -182,7 +180,7 @@ interface ListKHash<A> : Hash<ListKOf<A>>, ListKEq<A> {
 
   override fun EQ(): Eq<A> = HA()
 
-  override fun ListKOf<A>.hash(): Int = foldLeft(1) { hash, a ->
+  override fun ListKOf<A>.hash(): Int = fix().foldLeft(1) { hash, a ->
     31 * hash + HA().run { a.hash() }
   }
 }

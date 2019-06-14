@@ -11,7 +11,6 @@ import arrow.core.fix
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
-import arrow.typeclasses.Bimonad
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Foldable
