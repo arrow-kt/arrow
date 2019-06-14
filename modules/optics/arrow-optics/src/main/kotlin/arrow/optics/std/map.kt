@@ -1,7 +1,7 @@
 package arrow.optics
 
 import arrow.core.MapK
-import arrow.data.SetK
+import arrow.core.SetK
 import arrow.core.k
 
 /**

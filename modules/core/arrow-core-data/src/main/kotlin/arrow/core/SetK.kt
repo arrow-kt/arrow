@@ -1,6 +1,5 @@
-package arrow.data
+package arrow.core
 
-import arrow.core.Eval
 import arrow.higherkind
 
 @higherkind

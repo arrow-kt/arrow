@@ -6,7 +6,7 @@ import arrow.core.extensions.monoid
 import arrow.core.extensions.semigroup
 import arrow.core.ListK
 import arrow.core.ForNonEmptyList
-import arrow.core.ListK
+import arrow.core.ForListK
 import arrow.core.NonEmptyList
 import arrow.core.extensions.listk.foldable.foldable
 import arrow.core.fix

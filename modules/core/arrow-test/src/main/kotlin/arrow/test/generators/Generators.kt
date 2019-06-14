@@ -29,7 +29,7 @@ import arrow.core.ListK
 import arrow.core.MapK
 import arrow.core.NonEmptyList
 import arrow.data.SequenceK
-import arrow.data.SetK
+import arrow.core.SetK
 import arrow.data.SortedMapK
 import arrow.core.Validated
 import arrow.core.k

@@ -1,17 +1,16 @@
-package arrow.data
+package arrow.core
 
 import arrow.Kind
-import arrow.core.Tuple2
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
 import arrow.core.extensions.tuple2.eq.eq
-import arrow.data.extensions.setk.eq.eq
-import arrow.data.extensions.setk.foldable.foldable
-import arrow.data.extensions.setk.hash.hash
-import arrow.data.extensions.setk.monoidK.monoidK
-import arrow.data.extensions.setk.monoidal.monoidal
-import arrow.data.extensions.setk.semigroupK.semigroupK
-import arrow.data.extensions.setk.show.show
+import arrow.core.extensions.setk.eq.eq
+import arrow.core.extensions.setk.foldable.foldable
+import arrow.core.extensions.setk.hash.hash
+import arrow.core.extensions.setk.monoidK.monoidK
+import arrow.core.extensions.setk.monoidal.monoidal
+import arrow.core.extensions.setk.semigroupK.semigroupK
+import arrow.core.extensions.setk.show.show
 import arrow.test.UnitSpec
 import arrow.test.laws.FoldableLaws
 import arrow.test.laws.HashLaws
@@ -19,7 +18,6 @@ import arrow.test.laws.MonoidKLaws
 import arrow.test.laws.MonoidalLaws
 import arrow.test.laws.SemigroupKLaws
 import arrow.test.laws.ShowLaws
-import arrow.test.laws.fix
 import arrow.typeclasses.Eq
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith

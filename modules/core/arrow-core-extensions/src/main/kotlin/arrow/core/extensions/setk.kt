@@ -1,11 +1,12 @@
-package arrow.data.extensions
+package arrow.core.extensions
 
 import arrow.Kind
 import arrow.core.Eval
 import arrow.core.Tuple2
-import arrow.data.ForSetK
-import arrow.data.SetK
-import arrow.data.fix
+import arrow.core.ForSetK
+import arrow.core.SetK
+import arrow.core.fix
+import arrow.core.k
 import arrow.extension
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Foldable

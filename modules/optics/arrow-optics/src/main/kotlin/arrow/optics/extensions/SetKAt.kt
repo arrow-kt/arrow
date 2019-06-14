@@ -1,6 +1,6 @@
 package arrow.optics.extensions
 
-import arrow.data.SetK
+import arrow.core.SetK
 import arrow.extension
 import arrow.optics.Lens
 import arrow.optics.PLens

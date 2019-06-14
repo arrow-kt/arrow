@@ -1,6 +1,6 @@
 package arrow.optics
 
-import arrow.data.SetK
+import arrow.core.SetK
 import arrow.core.SetExtensions
 import arrow.core.identity
 

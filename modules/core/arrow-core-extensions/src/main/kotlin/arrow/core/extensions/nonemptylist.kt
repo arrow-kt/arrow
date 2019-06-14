@@ -105,7 +105,7 @@ interface NonEmptyListComonad : Comonad<ForNonEmptyList> {
     fix().map(f)
 }
 
-@extension
+/*@extension
 interface NonEmptyListBimonad : Bimonad<ForNonEmptyList> {
   override fun <A, B> NonEmptyListOf<A>.ap(ff: NonEmptyListOf<(A) -> B>): NonEmptyList<B> =
     fix().ap(ff)
@@ -127,7 +127,7 @@ interface NonEmptyListBimonad : Bimonad<ForNonEmptyList> {
 
   override fun <A> NonEmptyListOf<A>.extract(): A =
     fix().extract()
-}
+}*/
 
 @extension
 interface NonEmptyListFoldable : Foldable<ForNonEmptyList> {

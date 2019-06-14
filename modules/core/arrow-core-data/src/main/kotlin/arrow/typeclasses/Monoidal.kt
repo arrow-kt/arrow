@@ -67,8 +67,8 @@ import arrow.core.Option
  * ```
  *
  * ```kotlin:ank:playground
- * import arrow.data.SetK
- * import arrow.data.extensions.setk.monoidal.monoidal
+ * import arrow.core.SetK
+ * import arrow.core.extensions.setk.monoidal.monoidal
  *
  * fun main(args: Array<String>) {
  *   val result =
