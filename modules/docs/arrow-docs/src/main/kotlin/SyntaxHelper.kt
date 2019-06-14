@@ -1,7 +1,7 @@
 package com.example.domain
 
 import arrow.core.ListK
-import arrow.data.MapK
+import arrow.core.MapK
 import arrow.optics.optics
 
 @optics

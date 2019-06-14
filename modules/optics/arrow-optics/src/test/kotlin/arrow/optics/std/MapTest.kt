@@ -1,6 +1,6 @@
 package arrow.optics
 
-import arrow.data.MapK
+import arrow.core.MapK
 import arrow.data.SetK
 import arrow.data.extensions.setk.monoid.monoid
 import arrow.test.UnitSpec

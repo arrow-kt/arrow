@@ -2,13 +2,11 @@ package arrow.aql
 
 import arrow.core.ForId
 import arrow.core.Id
-import arrow.core.firstOrNone
-import arrow.core.getOrElse
 import arrow.core.identity
 import arrow.core.toT
 import arrow.core.ForListK
 import arrow.data.fix
-import arrow.data.mapOf
+import arrow.core.mapOf
 import arrow.typeclasses.Foldable
 
 interface GroupBy<F> {

@@ -7,7 +7,6 @@ import arrow.core.Tuple2
 import arrow.data.ForSequenceK
 import arrow.data.SequenceK
 import arrow.data.SequenceKOf
-import arrow.data.k
 import arrow.data.extensions.sequencek.monad.map
 import arrow.data.extensions.sequencek.monad.monad
 import arrow.data.fix

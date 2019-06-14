@@ -5,7 +5,6 @@ import arrow.core.left
 import arrow.core.right
 import arrow.core.toT
 import arrow.data.SequenceK
-import arrow.data.k
 import arrow.extension
 import arrow.optics.Optional
 import arrow.optics.POptional

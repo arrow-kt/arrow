@@ -6,8 +6,7 @@ import arrow.data.SortedMapK
 import arrow.data.SortedMapKOf
 import arrow.data.SortedMapKPartialOf
 import arrow.data.fix
-import arrow.data.k
-import arrow.data.updated
+import arrow.core.k
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor

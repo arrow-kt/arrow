@@ -1,7 +1,6 @@
 package arrow.optics
 
 import arrow.data.SetK
-import arrow.data.k
 import arrow.core.SetExtensions
 import arrow.core.identity
 

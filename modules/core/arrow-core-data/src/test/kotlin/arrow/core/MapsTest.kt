@@ -1,6 +1,5 @@
-package arrow.data
+package arrow.core
 
-import arrow.core.Tuple2
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.Assert
 import org.junit.runner.RunWith
