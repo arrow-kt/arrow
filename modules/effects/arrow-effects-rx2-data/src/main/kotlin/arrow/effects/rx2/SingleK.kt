@@ -144,23 +144,18 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
      * Creates a [SingleK] that'll run [SingleKProc].
      *
      * ```kotlin:ank:playground
-     * import arrow.core.Either
-     * import arrow.core.right
-     * import arrow.effects.rx2.SingleK
-     * import arrow.effects.rx2.SingleKConnection
-     * import arrow.effects.rx2.value
+     * import arrow.core.*
+     * import arrow.effects.rx2.*
      *
-     * class Resource {
-     *   fun asyncRead(f: (String) -> Unit): Unit = f("Some value of a resource")
-     *   fun close(): Unit = Unit
+     * class NetworkApi {
+     *   fun async(f: (String) -> Unit): Unit = f("Some value of a resource")
      * }
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
-     *   val result = SingleK.async { conn: SingleKConnection, cb: (Either<Throwable, String>) -> Unit ->
-     *     val resource = Resource()
-     *     conn.push(SingleK { resource.close() })
-     *     resource.asyncRead { value -> cb(value.right()) }
+     *   val result = SingleK.async { cb: (Either<Throwable, String>) -> Unit ->
+     *     val nw = NetworkApi()
+     *     nw.async { result -> cb(Right(result)) }
      *   }
      *   //sampleEnd
      *   result.value().subscribe(::println, ::println)
@@ -191,6 +186,33 @@ data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
         emitter.setCancellable { dispose.dispose() }
       }.k()
 
+    /**
+     * Creates a [SingleK] that'll run a cancelable operation.
+     *
+     * ```kotlin:ank:playground
+     * import arrow.core.*
+     * import arrow.effects.rx2.*
+     *
+     * typealias Disposable = () -> Unit
+     * class NetworkApi {
+     *   fun async(f: (String) -> Unit): Disposable {
+     *     f("Some value of a resource")
+     *     return { Unit }
+     *   }
+     * }
+     *
+     * fun main(args: Array<String>) {
+     *   //sampleStart
+     *   val result = SingleK.cancelable { cb: (Either<Throwable, String>) -> Unit ->
+     *     val nw = NetworkApi()
+     *     val disposable = nw.async { result -> cb(Right(result)) }
+     *     SingleK { disposable.invoke() }
+     *   }
+     *   //sampleEnd
+     *   result.value().subscribe(::println, ::println)
+     * }
+     * ```
+     */
     fun <A> cancelable(fa: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForSingleK>): SingleK<A> =
       Single.create { emitter: SingleEmitter<A> ->
         val cb = { either: Either<Throwable, A> ->

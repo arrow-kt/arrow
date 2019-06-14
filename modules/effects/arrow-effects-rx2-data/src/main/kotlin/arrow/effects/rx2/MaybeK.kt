@@ -160,17 +160,15 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
      * import arrow.core.*
      * import arrow.effects.rx2.*
      *
-     * class Resource {
-     *   fun asyncRead(f: (String) -> Unit): Unit = f("Some value of a resource")
-     *   fun close(): Unit = Unit
+     * class NetworkApi {
+     *   fun async(f: (String) -> Unit): Unit = f("Some value of a resource")
      * }
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
      *   val result = MaybeK.async { cb: (Either<Throwable, String>) -> Unit ->
-     *     val resource = Resource()
-     *     conn.push(MaybeK { resource.close() })
-     *     resource.asyncRead { value -> cb(value.right()) }
+     *     val nw = NetworkApi()
+     *     nw.async { result -> cb(Right(result)) }
      *   }
      *   //sampleEnd
      *   result.value().subscribe(::println)
@@ -203,6 +201,33 @@ data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
         emitter.setCancellable { dispose.dispose() }
       }.k()
 
+    /**
+     * Creates a [MaybeK] that'll run [MaybeKProc].
+     *
+     * ```kotlin:ank:playground
+     * import arrow.core.*
+     * import arrow.effects.rx2.*
+     *
+     * typealias Disposable = () -> Unit
+     * class NetworkApi {
+     *   fun async(f: (String) -> Unit): Disposable {
+     *     f("Some value of a resource")
+     *     return { Unit }
+     *   }
+     * }
+     *
+     * fun main(args: Array<String>) {
+     *   //sampleStart
+     *   val result = MaybeK.cancelable { cb: (Either<Throwable, String>) -> Unit ->
+     *     val nw = NetworkApi()
+     *     val disposable = nw.async { result -> cb(Right(result)) }
+     *     MaybeK { disposable.invoke() }
+     *   }
+     *   //sampleEnd
+     *   result.value().subscribe(::println)
+     * }
+     * ```
+     */
     fun <A> cancelable(fa: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForMaybeK>): MaybeK<A> =
       Maybe.create { emitter: MaybeEmitter<A> ->
         val cb = { either: Either<Throwable, A> ->
