@@ -1,6 +1,5 @@
 package arrow.effects.rx2.extensions
 
-import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.effects.CancelToken
@@ -19,7 +18,6 @@ import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.AsyncSyntax
 import arrow.effects.typeclasses.Bracket
 import arrow.effects.typeclasses.Concurrent
-import arrow.effects.typeclasses.ConnectedProcF
 import arrow.effects.typeclasses.Dispatchers
 import arrow.effects.typeclasses.Duration
 import arrow.effects.typeclasses.Effect

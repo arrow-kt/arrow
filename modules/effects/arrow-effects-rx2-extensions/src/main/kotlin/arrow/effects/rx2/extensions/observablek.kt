@@ -22,7 +22,6 @@ import arrow.effects.typeclasses.AsyncSyntax
 import arrow.effects.typeclasses.Bracket
 import arrow.effects.typeclasses.Concurrent
 import arrow.effects.typeclasses.ConcurrentEffect
-import arrow.effects.typeclasses.ConnectedProcF
 import arrow.effects.typeclasses.Dispatchers
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.Duration

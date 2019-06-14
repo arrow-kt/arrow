@@ -27,9 +27,6 @@ import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine
 
-/** A connected asynchronous computation that might fail. **/
-typealias ConnectedProcF<F, A> = (KindConnection<F>, ((Either<Throwable, A>) -> Unit)) -> Kind<F, Unit>
-
 /**
  * ank_macro_hierarchy(arrow.effects.typeclasses.Concurrent)
  *
@@ -673,7 +670,6 @@ interface Concurrent<F> : Async<F> {
    * Creates a variable [MVar] to be used for thread-sharing, initialized to a value [a]
    */
   fun <A> mVar(a: A): Kind<F, MVar<F, A>> = MVar(a, this)
-
 
   /**
    * Entry point for monad bindings which enables for comprehensions. The underlying impl is based on coroutines.

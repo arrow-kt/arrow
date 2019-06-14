@@ -18,7 +18,6 @@ import arrow.effects.typeclasses.AsyncSyntax
 import arrow.effects.typeclasses.Bracket
 import arrow.effects.typeclasses.Concurrent
 import arrow.effects.typeclasses.ConcurrentEffect
-import arrow.effects.typeclasses.ConnectedProcF
 import arrow.effects.typeclasses.Dispatchers
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.Duration
@@ -150,10 +149,11 @@ interface SingleKConcurrent : Concurrent<ForSingleK>, SingleKAsync {
       }.k()
     }
 
+  override fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForSingleK>): SingleK<A> =
+    SingleK.cancelable(k)
+
   override fun <A> cancelableF(k: ((Either<Throwable, A>) -> Unit) -> SingleKOf<CancelToken<ForSingleK>>): SingleK<A> =
-    SingleK.asyncF { kindConnection, function ->
-      k(function).map { kindConnection.push(it) }
-    }
+    SingleK.cancelableF(k)
 
   override fun <A, B> CoroutineContext.racePair(fa: SingleKOf<A>, fb: SingleKOf<B>): SingleK<RacePair<ForSingleK, A, B>> =
     asScheduler().let { scheduler ->

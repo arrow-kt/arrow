@@ -28,7 +28,6 @@ import arrow.effects.typeclasses.ProcF
 import arrow.effects.Timer
 import arrow.effects.typeclasses.AsyncSyntax
 import arrow.effects.typeclasses.Concurrent
-import arrow.effects.typeclasses.ConnectedProcF
 import arrow.effects.typeclasses.Fiber
 import arrow.extension
 import arrow.typeclasses.Applicative
