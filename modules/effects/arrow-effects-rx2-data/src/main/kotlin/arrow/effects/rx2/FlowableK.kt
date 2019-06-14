@@ -8,7 +8,6 @@ import arrow.core.Right
 import arrow.core.identity
 import arrow.core.nonFatalOrThrow
 import arrow.effects.CancelToken
-import arrow.effects.OnCancel
 import arrow.effects.internal.Platform
 import arrow.effects.rx2.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
@@ -18,8 +17,6 @@ import arrow.typeclasses.Applicative
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.FlowableEmitter
-import io.reactivex.Observable
-import io.reactivex.ObservableEmitter
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 

@@ -118,7 +118,7 @@ class FlowableKTests : UnitSpec() {
 
       FlowableK.just(Unit)
         .bracketCase(
-          use = { FlowableK.async<Nothing>({  }) },
+          use = { FlowableK.async<Nothing>({ }) },
           release = { _, exitCase ->
             FlowableK {
               ec = exitCase
