@@ -7,7 +7,7 @@ import arrow.core.Invalid
 import arrow.core.Valid
 import arrow.core.Validated
 import arrow.core.ValidatedPartialOf
-import arrow.data.fix
+import arrow.core.fix
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError

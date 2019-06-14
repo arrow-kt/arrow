@@ -77,9 +77,9 @@ import arrow.documented
  * The same applies to [ListK], [SequenceK] and [SetK] instances:
  *
  * ```kotlin:ank:playground
- * import arrow.data.ListK
- * import arrow.data.extensions.listk.semigroupal.semigroupal
- * import arrow.data.k
+ * import arrow.core.ListK
+ * import arrow.core.extensions.listk.semigroupal.semigroupal
+ * import arrow.core.k
  *
  * fun main(args: Array<String>) {
  *   val result =

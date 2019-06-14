@@ -52,8 +52,8 @@ import arrow.core.Option
  * ```
  *
  * ```kotlin:ank:playground
- * import arrow.data.ListK
- * import arrow.data.extensions.listk.monoidal.monoidal
+ * import arrow.core.ListK
+ * import arrow.core.extensions.listk.monoidal.monoidal
  *
  * fun main(args: Array<String>) {
  *   val result =

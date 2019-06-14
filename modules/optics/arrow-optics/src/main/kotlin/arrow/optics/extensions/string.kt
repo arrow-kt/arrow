@@ -4,8 +4,8 @@ import arrow.Kind
 import arrow.core.Tuple2
 import arrow.core.left
 import arrow.core.right
-import arrow.data.ListK
-import arrow.data.k
+import arrow.core.ListK
+import arrow.core.k
 import arrow.optics.Optional
 import arrow.optics.Prism
 import arrow.optics.Traversal

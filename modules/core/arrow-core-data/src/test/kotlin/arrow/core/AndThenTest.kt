@@ -7,7 +7,7 @@ import arrow.core.extensions.andthen.contravariant.contravariant
 import arrow.core.extensions.andthen.monad.monad
 import arrow.core.extensions.andthen.monoid.monoid
 import arrow.core.extensions.andthen.profunctor.profunctor
-import arrow.data.extensions.list.foldable.foldLeft
+import arrow.core.extensions.list.foldable.foldLeft
 import arrow.test.UnitSpec
 import arrow.test.generators.functionAToB
 import arrow.typeclasses.Conested
@@ -21,7 +21,6 @@ import arrow.test.laws.ProfunctorLaws
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.runner.junit4.KotlinTestRunner
-import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
 
 @RunWith(KotlinTestRunner::class)

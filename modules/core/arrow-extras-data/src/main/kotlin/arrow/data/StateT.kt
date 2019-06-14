@@ -1,7 +1,14 @@
 package arrow.data
 
 import arrow.Kind
-import arrow.core.*
+import arrow.core.AndThen
+import arrow.core.Either
+import arrow.core.EvalOf
+import arrow.core.Eval
+import arrow.core.fix
+import arrow.core.Tuple2
+import arrow.core.andThen
+import arrow.core.toT
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Functor
@@ -70,7 +77,7 @@ class StateT<F, S, A>(
      * @param fa the value to liftF.
      */
     fun <F, S, A> liftF(AF: Applicative<F>, fa: Kind<F, A>): StateT<F, S, A> = AF.run {
-      StateT(just({ s -> fa.map { a -> Tuple2(s, a) } }))
+      StateT(just { s -> fa.map { a -> Tuple2(s, a) } })
     }
 
     /**
@@ -79,7 +86,7 @@ class StateT<F, S, A>(
      * @param AF [Applicative] for the context [F].
      */
     fun <F, S> get(AF: Applicative<F>): StateT<F, S, S> =
-      StateT(AF.just({ s -> AF.just(Tuple2(s, s)) }))
+      StateT(AF.just { s -> AF.just(Tuple2(s, s)) })
 
     /**
      * Inspect a value of the state [S] with [f] `(S) -> T` without modifying the state.
@@ -90,7 +97,7 @@ class StateT<F, S, A>(
      * @param f the function applied to inspect [T] from [S].
      */
     fun <F, S, T> inspect(AF: Applicative<F>, f: (S) -> T): StateT<F, S, T> =
-      StateT(AF.just({ s -> AF.just(Tuple2(s, f(s))) }))
+      StateT(AF.just { s -> AF.just(Tuple2(s, f(s))) })
 
     /**
      * Modify the state with [f] `(S) -> S` and return [Unit].
@@ -99,9 +106,9 @@ class StateT<F, S, A>(
      * @param f the modify function to apply.
      */
     fun <F, S> modify(AF: Applicative<F>, f: (S) -> S): StateT<F, S, Unit> = AF.run {
-      StateT(just({ s ->
+      StateT(just { s ->
         just(f(s)).map { Tuple2(it, Unit) }
-      }))
+      })
     }
 
     /**
@@ -111,7 +118,7 @@ class StateT<F, S, A>(
      * @param f the modify function to apply.
      */
     fun <F, S> modifyF(AF: Applicative<F>, f: (S) -> Kind<F, S>): StateT<F, S, Unit> =
-      StateT(AF.just({ s -> AF.run { f(s).map { Tuple2(it, Unit) } } }))
+      StateT(AF.just { s -> AF.run { f(s).map { Tuple2(it, Unit) } } })
 
     /**
      * Set the state to a value [s] and return [Unit].
@@ -139,13 +146,13 @@ class StateT<F, S, A>(
      * @param f function that is called recusively until [arrow.Either.Right] is returned.
      */
     fun <F, S, A, B> tailRecM(MF: Monad<F>, a: A, f: (A) -> StateTOf<F, S, Either<A, B>>): StateT<F, S, B> = MF.run {
-      StateT(just({ s: S ->
+      StateT(just { s: S ->
         tailRecM(Tuple2(s, a)) { (s, a0) ->
           f(a0).runM(this, s).map { (s, ab) ->
             ab.bimap({ a1 -> Tuple2(s, a1) }, { b -> Tuple2(s, b) })
           }
         }
-      })
+      }
       )
     }
   }
@@ -268,7 +275,7 @@ class StateT<F, S, A>(
    * @param y other [StateT] object to combine.
    */
   fun combineK(MF: Monad<F>, SF: SemigroupK<F>, y: StateTOf<F, S, A>): StateT<F, S, A> = SF.run {
-    StateT(MF.just({ s -> run(MF, s).combineK(y.fix().run(MF, s)) }))
+    StateT(MF.just { s -> run(MF, s).combineK(y.fix().run(MF, s)) })
   }
 
   /**

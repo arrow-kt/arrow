@@ -4,9 +4,9 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Option
 import arrow.core.Tuple2
-import arrow.data.ForListK
-import arrow.data.ListK
-import arrow.data.ListKOf
+import arrow.core.ForListK
+import arrow.core.ListK
+import arrow.core.ListKOf
 import arrow.data.fix
 import arrow.extension
 import arrow.mtl.typeclasses.FunctorFilter

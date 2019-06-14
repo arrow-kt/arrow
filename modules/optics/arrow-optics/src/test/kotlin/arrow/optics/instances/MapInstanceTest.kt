@@ -6,9 +6,9 @@ import arrow.core.extensions.monoid
 import arrow.core.extensions.option.eq.eq
 import arrow.core.extensions.option.monoid.monoid
 import arrow.core.extensions.semigroup
-import arrow.data.ListK
+import arrow.core.ListK
 import arrow.data.MapK
-import arrow.data.extensions.listk.eq.eq
+import arrow.core.extensions.listk.eq.eq
 import arrow.optics.extensions.at
 import arrow.optics.extensions.each
 import arrow.optics.extensions.filterIndex

@@ -1,7 +1,7 @@
 package arrow.optics
 
 import arrow.core.None
-import arrow.data.ListK
+import arrow.core.ListK
 import arrow.data.MapK
 import arrow.data.k
 import arrow.optics.dsl.at

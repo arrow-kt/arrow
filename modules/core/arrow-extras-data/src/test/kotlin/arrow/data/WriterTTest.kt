@@ -13,8 +13,8 @@ import arrow.effects.IO
 import arrow.effects.extensions.io.applicativeError.attempt
 import arrow.effects.extensions.io.async.async
 import arrow.effects.extensions.writert.async.async
-import arrow.data.extensions.listk.monad.monad
-import arrow.data.extensions.listk.monoidK.monoidK
+import arrow.core.extensions.listk.monad.monad
+import arrow.core.extensions.listk.monoidK.monoidK
 import arrow.core.extensions.option.monad.monad
 import arrow.core.fix
 import arrow.data.extensions.writert.applicative.applicative

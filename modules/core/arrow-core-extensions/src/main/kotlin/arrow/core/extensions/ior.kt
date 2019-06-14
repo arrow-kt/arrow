@@ -5,9 +5,9 @@ import arrow.Kind2
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.data.ForIor
-import arrow.data.Ior
-import arrow.data.IorOf
-import arrow.data.IorPartialOf
+import arrow.core.Ior
+import arrow.core.IorOf
+import arrow.core.IorPartialOf
 import arrow.data.fix
 import arrow.extension
 import arrow.typeclasses.Applicative

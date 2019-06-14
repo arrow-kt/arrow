@@ -2,7 +2,7 @@ package arrow.effects
 
 import arrow.Kind
 import arrow.core.extensions.monoid
-import arrow.data.extensions.list.traverse.traverse
+import arrow.core.extensions.list.traverse.traverse
 import arrow.effects.extensions.io.bracket.bracket
 import arrow.effects.extensions.resource.applicative.applicative
 import arrow.effects.extensions.resource.monad.monad

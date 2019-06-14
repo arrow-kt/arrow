@@ -8,7 +8,7 @@ import arrow.core.Id
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.fix
-import arrow.data.ForListK
+import arrow.core.ForListK
 import arrow.core.ForNonEmptyList
 import arrow.core.NonEmptyList
 import arrow.data.fix

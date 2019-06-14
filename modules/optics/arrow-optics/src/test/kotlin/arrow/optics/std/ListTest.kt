@@ -2,12 +2,12 @@ package arrow.optics
 
 import arrow.core.ListExtensions
 import arrow.core.Option
-import arrow.data.k
+import arrow.core.k
 import arrow.core.extensions.option.monoid.monoid
-import arrow.data.ListK
+import arrow.core.ListK
 import arrow.core.NonEmptyList
-import arrow.data.extensions.listk.monoid.monoid
-import arrow.data.extensions.nonemptylist.semigroup.semigroup
+import arrow.core.extensions.listk.monoid.monoid
+import arrow.core.extensions.nonemptylist.semigroup.semigroup
 import arrow.test.UnitSpec
 import arrow.test.generators.functionAToB
 import arrow.test.generators.nonEmptyList

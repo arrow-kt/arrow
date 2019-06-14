@@ -7,9 +7,9 @@ import arrow.core.Some
 import arrow.core.case
 import arrow.core.identity
 import arrow.core.toT
-import arrow.data.ListK
+import arrow.core.ListK
 import arrow.core.NonEmptyList
-import arrow.data.k
+import arrow.core.k
 
 /**
  * [Optional] to safely operate on the head of a list

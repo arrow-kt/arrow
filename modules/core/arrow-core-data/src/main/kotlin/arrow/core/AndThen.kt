@@ -15,8 +15,8 @@ operator fun <A, B> AndThenOf<A, B>.invoke(a: A): B = fix().invoke(a)
  *
  * ```kotlin:ank:playground
  * import arrow.core.andThen
- * import arrow.data.AndThen
- * import arrow.data.extensions.list.foldable.foldLeft
+ * import arrow.core.AndThen
+ * import arrow.core.extensions.list.foldable.foldLeft
  *
  * fun main(args: Array<String>) {
  *   //sampleStart
@@ -48,8 +48,8 @@ sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
    * Compose a function to be invoked after the current function is invoked.
    *
    * ```kotlin:ank:playground
-   * import arrow.data.AndThen
-   * import arrow.data.extensions.list.foldable.foldLeft
+   * import arrow.core.AndThen
+   * import arrow.core.extensions.list.foldable.foldLeft
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
@@ -79,8 +79,8 @@ sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
    * Compose a function to be invoked before the current function is invoked.
    *
    * ```kotlin:ank:playground
-   * import arrow.data.AndThen
-   * import arrow.data.extensions.list.foldable.foldLeft
+   * import arrow.core.AndThen
+   * import arrow.core.extensions.list.foldable.foldLeft
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
@@ -134,7 +134,7 @@ sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
    * Invoke the `[AndThen]` function
    *
    * ```kotlin:ank:playground
-   * import arrow.data.AndThen
+   * import arrow.core.AndThen
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
@@ -166,7 +166,7 @@ sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
      * Wraps a function in [AndThen].
      *
      * ```kotlin:ank:playground
-     * import arrow.data.AndThen
+     * import arrow.core.AndThen
      *
      * fun main(args: Array<String>) {
      *   //sampleStart

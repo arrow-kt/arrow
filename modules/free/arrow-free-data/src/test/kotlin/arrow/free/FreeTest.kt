@@ -12,7 +12,7 @@ import arrow.free.extensions.free.eq.eq
 import arrow.free.extensions.free.monad.monad
 import arrow.higherkind
 import arrow.core.extensions.id.monad.monad
-import arrow.data.extensions.nonemptylist.monad.monad
+import arrow.core.extensions.nonemptylist.monad.monad
 import arrow.core.extensions.option.monad.monad
 import arrow.test.UnitSpec
 import arrow.test.laws.EqLaws

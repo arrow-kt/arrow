@@ -4,12 +4,12 @@ import arrow.Kind
 import arrow.core.Tuple2
 import arrow.core.extensions.monoid
 import arrow.core.extensions.semigroup
-import arrow.data.ForListK
+import arrow.core.ListK
 import arrow.core.ForNonEmptyList
-import arrow.data.ListK
+import arrow.core.ListK
 import arrow.core.NonEmptyList
-import arrow.data.extensions.listk.foldable.foldable
-import arrow.data.fix
+import arrow.core.extensions.listk.foldable.foldable
+import arrow.core.fix
 import arrow.test.UnitSpec
 import arrow.test.laws.ReducibleLaws
 import io.kotlintest.runner.junit4.KotlinTestRunner

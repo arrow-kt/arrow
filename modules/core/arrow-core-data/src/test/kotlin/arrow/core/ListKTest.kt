@@ -4,8 +4,6 @@ import arrow.Kind
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
 import arrow.core.extensions.tuple2.eq.eq
-import arrow.core.ForListK
-import arrow.core.ListKOf
 import arrow.core.extensions.listk.applicative.applicative
 import arrow.core.extensions.listk.eq.eq
 import arrow.core.extensions.listk.hash.hash
@@ -15,7 +13,6 @@ import arrow.core.extensions.listk.semigroupK.semigroupK
 import arrow.core.extensions.listk.show.show
 import arrow.core.extensions.listk.traverse.traverse
 import arrow.mtl.extensions.listk.monadCombine.monadCombine
-import arrow.core.fix
 import arrow.test.UnitSpec
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonadCombineLaws

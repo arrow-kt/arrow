@@ -25,14 +25,14 @@ import arrow.core.fix
 import arrow.core.toOption
 import arrow.core.extensions.option.functor.map
 import arrow.core.extensions.option.functor.functor
-import arrow.data.ListK
+import arrow.core.ListK
 import arrow.data.MapK
 import arrow.core.NonEmptyList
 import arrow.data.SequenceK
 import arrow.data.SetK
 import arrow.data.SortedMapK
 import arrow.core.Validated
-import arrow.data.k
+import arrow.core.k
 import arrow.recursion.Algebra
 import arrow.recursion.Coalgebra
 import arrow.recursion.typeclasses.Corecursive

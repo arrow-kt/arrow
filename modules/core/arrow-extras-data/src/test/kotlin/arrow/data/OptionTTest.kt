@@ -14,7 +14,7 @@ import arrow.effects.extensions.io.applicativeError.attempt
 import arrow.effects.extensions.io.async.async
 import arrow.effects.extensions.optiont.async.async
 import arrow.effects.typeclasses.seconds
-import arrow.data.extensions.nonemptylist.monad.monad
+import arrow.core.extensions.nonemptylist.monad.monad
 import arrow.core.extensions.option.monad.monad
 import arrow.data.extensions.optiont.applicative.applicative
 import arrow.data.extensions.optiont.divisible.divisible

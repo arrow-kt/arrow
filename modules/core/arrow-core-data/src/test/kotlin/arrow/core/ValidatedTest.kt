@@ -10,7 +10,7 @@ import arrow.core.extensions.validated.selective.selective
 import arrow.core.extensions.validated.semigroupK.semigroupK
 import arrow.core.extensions.validated.show.show
 import arrow.core.extensions.validated.traverse.traverse
-import arrow.core.NonEmptyList
+// import arrow.core.NonEmptyList
 import arrow.test.UnitSpec
 import arrow.test.laws.EqLaws
 import arrow.test.laws.SelectiveLaws
@@ -191,47 +191,47 @@ class ValidatedTest : UnitSpec() {
 
       "Cartesian builder should build products over homogeneous Validated" {
         map(
-          arrow.core.Valid("11th"),
-          arrow.core.Valid("Doctor"),
-          arrow.core.Valid("Who")
-        ) { (a, b, c) -> "$a $b $c" } shouldBe arrow.core.Valid("11th Doctor Who")
+          Valid("11th"),
+          Valid("Doctor"),
+          Valid("Who")
+        ) { (a, b, c) -> "$a $b $c" } shouldBe Valid("11th Doctor Who")
       }
 
       "Cartesian builder should build products over heterogeneous Validated" {
         map(
-          arrow.core.Valid(13),
-          arrow.core.Valid("Doctor"),
-          arrow.core.Valid(false)
-        ) { (a, b, c) -> "${a}th $b is $c" } shouldBe arrow.core.Valid("13th Doctor is false")
+          Valid(13),
+          Valid("Doctor"),
+          Valid(false)
+        ) { (a, b, c) -> "${a}th $b is $c" } shouldBe Valid("13th Doctor is false")
       }
 
       "Cartesian builder should build products over Invalid Validated" {
         map(
-          arrow.core.Invalid("fail1"),
-          arrow.core.Invalid("fail2"),
-          arrow.core.Valid("Who")
-        ) { "success!" } shouldBe arrow.core.Invalid("fail1fail2")
+          Invalid("fail1"),
+          Invalid("fail2"),
+          Valid("Who")
+        ) { "success!" } shouldBe Invalid("fail1fail2")
       }
     }
 
     with(VAL_SGK) {
       "CombineK should combine Valid Validated" {
-        val valid = arrow.core.Valid("Who")
+        val valid = Valid("Who")
 
-        valid.combineK(valid) shouldBe (arrow.core.Valid("Who"))
+        valid.combineK(valid) shouldBe (Valid("Who"))
       }
 
       "CombineK should combine Valid and Invalid Validated" {
-        val valid = arrow.core.Valid("Who")
-        val invalid = arrow.core.Invalid("Nope")
+        val valid = Valid("Who")
+        val invalid = Invalid("Nope")
 
-        valid.combineK(invalid) shouldBe (arrow.core.Valid("Who"))
+        valid.combineK(invalid) shouldBe (Valid("Who"))
       }
 
       "CombineK should combine Invalid Validated" {
-        val invalid = arrow.core.Invalid("Nope")
+        val invalid = Invalid("Nope")
 
-        invalid.combineK(invalid) shouldBe (arrow.core.Invalid("NopeNope"))
+        invalid.combineK(invalid) shouldBe (Invalid("NopeNope"))
       }
     }
 

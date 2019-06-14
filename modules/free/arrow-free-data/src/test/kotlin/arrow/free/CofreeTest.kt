@@ -10,7 +10,7 @@ import arrow.core.Id
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.data.ListK
+import arrow.core.ListK
 import arrow.core.NonEmptyList
 import arrow.data.OptionT
 import arrow.free.Cofree.Companion.unfold
@@ -19,7 +19,7 @@ import arrow.core.extensions.eval.applicative.applicative
 import arrow.core.extensions.eval.functor.functor
 import arrow.core.extensions.eval.monad.monad
 import arrow.core.extensions.id.functor.functor
-import arrow.data.extensions.listk.functor.functor
+import arrow.core.extensions.listk.functor.functor
 import arrow.core.extensions.option.functor.functor
 import arrow.core.extensions.option.traverse.traverse
 import arrow.core.fix
