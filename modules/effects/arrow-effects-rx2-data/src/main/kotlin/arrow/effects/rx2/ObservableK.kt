@@ -253,7 +253,7 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
             emitter.onComplete()
           })
         }
-        emitter.setCancellable { token.value().subscribe({}, { e -> emitter.tryOnError(e)}) }
+        emitter.setCancellable { token.value().subscribe({}, { e -> emitter.tryOnError(e) }) }
       }.k()
 
     fun <A> cancelableF(fa: ((Either<Throwable, A>) -> Unit) -> ObservableKOf<CancelToken<ForObservableK>>): ObservableK<A> =
