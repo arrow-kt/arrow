@@ -158,7 +158,8 @@ The following combinators illustrate how the Functor hierarchy functions are poi
 | Applicative.tupled  | `tupled(just(1), just(2))` | `1 toT 2` |
 | Monad.flatMap       | `IO.just(1).flatMap { n -> IO { n + 1 } }` | `1 + 1` |
 | Monad.flatten       | `IO.just(IO.just(1))}.flatten()` | `1` |
-| MonadDefer.delay    | `IO.delay { 1 }` | `effect { 1 }` |
+| MonadDefer.later    | `IO.later { 1 }` | `effect { 1 }` |
 | MonadDefer.defer    | `IO.defer { IO { 1 } }` | `effect { 1 }` |
+| Async.effect        | `IO.effect { 1 }` | `effect { 1 }` |
 
 This is, in general, true for effectful data types that are commutative.

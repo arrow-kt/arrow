@@ -87,9 +87,23 @@ Behind the scenes `continueOn()` starts a new coroutine and passes the rest of t
 
 The function `continueOn()` is also available inside [`Monad Comprehensions`]({{ '/docs/patterns/monad_comprehensions' | relative_url }}).
 
+#### effect
+
+Similar to `MonadDefer`'s `later`, this constructor takes a single suspended function and optionally the `CoroutineContext` it has to be run on.
+
+```kotlin
+IO.async().run {
+  // In current thread
+  effect(CommonPool) {
+    // In CommonPool
+    requestSuspend(createUserFromId(123))
+  }
+}
+```
+
 #### invoke with CoroutineContext
 
-Similar to `MonadDefer`'s `invoke`, this constructor it takes a single generator function and the `CoroutineContext` it has to be run on.
+Similar to `MonadDefer`'s `later`, this constructor takes a single generator function and the `CoroutineContext` it has to be run on.
 
 ```kotlin
 IO.async().run {
@@ -103,7 +117,7 @@ IO.async().run {
 
 #### defer with CoroutineContext
 
-Similar to `MonadDefer`'s `defer`, this constructor it takes a single function returning a `Kind<F, A>` and the `CoroutineContext` it has to be run on.
+Similar to `MonadDefer`'s `defer`, this constructor takes a single function returning a `Kind<F, A>` and the `CoroutineContext` it has to be run on.
 
 ```kotlin
 IO.async().run {
