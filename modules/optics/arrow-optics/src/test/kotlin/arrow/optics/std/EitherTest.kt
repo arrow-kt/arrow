@@ -26,7 +26,7 @@ class EitherTest : UnitSpec() {
         when (this) {
           is Invalid -> {
             when (b) {
-              is Invalid -> arrow.core.Invalid((e + b.e))
+              is Invalid -> Invalid((e + b.e))
               is Valid -> b
             }
           }

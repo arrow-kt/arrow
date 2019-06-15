@@ -26,7 +26,7 @@ open class LeftBind {
 
   fun ioLoop(i: Int): IO<Int> =
     if (i % depth == 0) IO { i + 1 }.flatMap { ioLoop(it) }
-    else if (i < size) ioLoop(i + 1).flatMap { i -> IO.just(i) }
+    else if (i < size) ioLoop(i + 1).flatMap { IO.just(it) }
     else IO.just(i)
 
   @Benchmark

@@ -71,14 +71,14 @@ class TryTest : UnitSpec() {
           when (this) {
             is Invalid -> {
               when (b) {
-                is Invalid -> arrow.core.Invalid(e)
+                is Invalid -> Invalid(e)
                 is Valid -> b
               }
             }
             is Valid -> {
               when (b) {
                 is Invalid -> b
-                is Valid -> arrow.core.Valid(a + b.a)
+                is Valid -> Valid(a + b.a)
               }
             }
           }
