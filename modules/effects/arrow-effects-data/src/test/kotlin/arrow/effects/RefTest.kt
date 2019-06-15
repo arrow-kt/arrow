@@ -1,6 +1,6 @@
 package arrow.effects
 
-import arrow.data.extensions.list.traverse.sequence
+import arrow.core.extensions.list.traverse.sequence
 import arrow.effects.extensions.fx
 import arrow.effects.extensions.io.applicative.applicative
 import arrow.effects.extensions.io.monad.flatMap

@@ -94,7 +94,7 @@ Nesting pattern matching blocks are tedious. We would prefer to define them sepe
 Let's imagine from our previous example we want to retrieve an `Int` from the network. We get a `Success` OR a `Failure` from the network. In case of a `Success` we want to safely cast the `String` to an `Int`.
 
 ```kotlin:ank
-import arrow.data.*
+import arrow.core.*
 
 val successToInt: Prism<NetworkResult.Success, Int> = Prism(
         partialFunction = case({ success: NetworkResult.Success -> Try { success.content.toInt() }.isSuccess() }

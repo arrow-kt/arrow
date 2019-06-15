@@ -19,7 +19,6 @@ It can be created from the Kotlin Set type with a convient `k()` function.
 ```kotlin:ank
 import arrow.*
 import arrow.core.*
-import arrow.data.*
 
 setOf(1, 2, 5, 3, 2).k()
 ```
@@ -66,7 +65,6 @@ numbers.foldLeft(0) {sum, number -> sum + (number * number)}
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.data.*
 import arrow.core.*
 
 DataType(SetK::class).tcMarkdownList()

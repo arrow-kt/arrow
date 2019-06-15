@@ -1,7 +1,7 @@
 package arrow.test.laws
 
 import arrow.Kind
-import arrow.data.extensions.list.foldable.fold
+import arrow.core.extensions.list.foldable.fold
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Eq
 import arrow.typeclasses.MonoidK

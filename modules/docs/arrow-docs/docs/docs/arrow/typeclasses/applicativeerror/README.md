@@ -38,7 +38,7 @@ Either.applicativeError<Throwable>().raiseError<Int>(RuntimeException("Paco"))
 ```
 
 ```kotlin:ank
-import arrow.data.*
+import arrow.core.*
 import arrow.core.extensions.`try`.applicativeError.*
 
 Try.applicativeError().raiseError<Int>(RuntimeException("Paco"))
@@ -150,7 +150,6 @@ In this validation example we demonstrate how we can use `ApplicativeError` inst
 import arrow.*
 import arrow.core.*
 import arrow.typeclasses.*
-import arrow.data.*
 
 sealed class ValidationError(val msg: String) {
   data class DoesNotContain(val value: String) : ValidationError("Did not contain $value")

@@ -4,15 +4,15 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Option
 import arrow.core.Tuple2
-import arrow.data.ForListK
-import arrow.data.ListK
-import arrow.data.ListKOf
-import arrow.data.fix
+import arrow.core.ForListK
+import arrow.core.ListK
+import arrow.core.ListKOf
+import arrow.core.fix
 import arrow.extension
 import arrow.mtl.typeclasses.FunctorFilter
 import arrow.mtl.typeclasses.MonadCombine
 import arrow.mtl.typeclasses.MonadFilter
-import arrow.data.combineK as listCombineK
+import arrow.core.combineK as listCombineK
 
 @extension
 interface ListKMonadCombine : MonadCombine<ForListK> {

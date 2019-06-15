@@ -24,7 +24,6 @@ dependencies {
     compile project(':arrow-free-data')
     compile project(':arrow-test')
     compile project(':arrow-free-extensions')
-    compile project(':arrow-typeclasses')
     compile project(':arrow-generic')
     compile project(':arrow-query-language')
     compile project(":arrow-reflect")
