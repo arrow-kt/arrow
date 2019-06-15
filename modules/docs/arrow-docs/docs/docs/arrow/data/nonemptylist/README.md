@@ -13,16 +13,16 @@ video: TC6IzE61OyE
 beginner
 
 `NonEmptyList` is a data type used in __Λrrow__ to model ordered lists that guarantee to have at least one value.
-`NonEmptyList` is available in the `arrow-extras` module under the `import arrow.data.NonEmptyList`
+`NonEmptyList` is available in the `arrow-core-data` module under the `import arrow.core.NonEmptyList`
 
 ```groovy
 // gradle
-compile "io.arrow-kt:arrow-extras:$arrow_version"
+compile "io.arrow-kt:arrow-core-data:$arrow_version"
 ```
 
 ```kotlin:ank
 // namespace
-import arrow.data.*
+import arrow.core.*
 ```
 
 ## of
@@ -85,7 +85,7 @@ nelOne.flatMap { one ->
 
 ```kotlin:ank
 import arrow.typeclasses.*
-import arrow.data.extensions.*
+import arrow.core.extensions.*
 
 val nelOne: NonEmptyList<Int> = NonEmptyList.of(1)
 val nelTwo: NonEmptyList<Int> = NonEmptyList.of(2)
@@ -114,9 +114,9 @@ NonEmptyList.fx {
 Λrrow contains methods that allow you to preserve type information when computing over different `NonEmptyList` typed values.
 
 ```kotlin:ank
-import arrow.data.*
+import arrow.core.*
 import java.util.*
-import arrow.data.extensions.nonemptylist.apply.map
+import arrow.core.extensions.nonemptylist.apply.map
 
 data class Person(val id: UUID, val name: String, val year: Int)
 
@@ -142,7 +142,6 @@ map(nelId, nelName, nelYear) { (id, name, year) ->
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.data.*
 import arrow.core.*
 
 DataType(NonEmptyList::class).tcMarkdownList()

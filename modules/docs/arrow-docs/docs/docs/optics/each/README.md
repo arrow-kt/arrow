@@ -16,10 +16,10 @@ beginner
 `Each` can easily be created given a `Traverse` instance.
 
 ```kotlin:ank
-import arrow.data.*
+import arrow.core.*
 import arrow.optics.*
 import arrow.optics.typeclasses.*
-import arrow.data.extensions.listk.traverse.*
+import arrow.core.extensions.listk.traverse.*
 
 val each: Each<ListKOf<Int>, Int> = Each.fromTraverse(ListK.traverse())
 

@@ -111,7 +111,7 @@ import arrow.data.extensions.*
 import arrow.typeclasses.*
 import arrow.core.extensions.option.functor.*
 import arrow.core.extensions.either.monadError.*
-import arrow.data.extensions.listk.traverse.*
+import arrow.core.extensions.listk.traverse.*
 ```
 
 ```kotlin:ank:silent
@@ -123,7 +123,7 @@ Option.functor()
 ```
 
 ```kotlin:ank:silent
-import arrow.data.extensions.mapk.semigroup.*
+import arrow.core.extensions.mapk.semigroup.*
 
 MapK.semigroup<String, Int>(Int.semigroup())
 ```
@@ -165,7 +165,7 @@ map(Option(1), Option(2), Option(3)) { (one, two, three) ->
 ```
 
 ```kotlin:ank:silent
-import arrow.data.extensions.list.traverse.sequence
+import arrow.core.extensions.list.traverse.sequence
 import arrow.core.extensions.option.applicative.applicative
 
 listOf(Option(1), Option(2), Option(3)).sequence(Option.applicative())
@@ -190,7 +190,7 @@ map(Try { 1 }, Try { 2 }, Try { 3 }) { (one, two, three) ->
 ```
 
 ```kotlin:ank:silent
-import arrow.data.extensions.list.traverse.sequence
+import arrow.core.extensions.list.traverse.sequence
 import arrow.core.extensions.either.applicative.applicative
 
 listOf(Right(1), Right(2), Right(3)).sequence(Either.applicative<Throwable>())
