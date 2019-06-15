@@ -1,8 +1,8 @@
 package arrow.optics.instances
 
 import arrow.core.extensions.eq
-import arrow.data.SetK
-import arrow.data.extensions.setk.eq.eq
+import arrow.core.SetK
+import arrow.core.extensions.setk.eq.eq
 import arrow.optics.AndMonoid
 import arrow.optics.extensions.SetAt
 import arrow.optics.extensions.setk.at.at

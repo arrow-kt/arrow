@@ -51,7 +51,6 @@ include {
             _ 'mtl'
             _ 'syntax'
             _ 'test'
-            _ 'typeclasses'
         }
 
         free {

@@ -25,10 +25,10 @@ For the following examples we are going to use some common imports
 ```kotlin:ank:silent
 import arrow.Kind
 import arrow.core.*
-import arrow.data.ListK
-import arrow.data.k
+import arrow.core.ListK
+import arrow.core.k
 import arrow.core.extensions.monoid
-import arrow.data.extensions.listk.foldable.foldable
+import arrow.core.extensions.listk.foldable.foldable
 import arrow.core.extensions.option.foldable.foldable
 import arrow.typeclasses.Foldable
 ```

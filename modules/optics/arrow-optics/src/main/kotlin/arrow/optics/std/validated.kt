@@ -4,7 +4,7 @@ import arrow.core.Either
 import arrow.core.Failure
 import arrow.core.Success
 import arrow.core.Try
-import arrow.data.Validated
+import arrow.core.Validated
 
 /**
  * [PIso] that defines equality between [Validated] and [Either]

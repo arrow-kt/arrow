@@ -12,9 +12,9 @@ import arrow.core.extensions.id.applicative.applicative
 import arrow.core.extensions.monoid
 import arrow.core.identity
 import arrow.core.value
-import arrow.data.ListK
+import arrow.core.ListK
 import arrow.data.State
-import arrow.data.extensions.listk.monoid.monoid
+import arrow.core.extensions.listk.monoid.monoid
 import arrow.data.map
 import arrow.higherkind
 import arrow.typeclasses.Applicative

@@ -5,14 +5,14 @@ import arrow.core.Id
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.value
-import arrow.data.NonEmptyList
+import arrow.core.NonEmptyList
 import arrow.free.extensions.FreeEq
 import arrow.free.extensions.FreeMonad
 import arrow.free.extensions.free.eq.eq
 import arrow.free.extensions.free.monad.monad
 import arrow.higherkind
 import arrow.core.extensions.id.monad.monad
-import arrow.data.extensions.nonemptylist.monad.monad
+import arrow.core.extensions.nonemptylist.monad.monad
 import arrow.core.extensions.option.monad.monad
 import arrow.test.UnitSpec
 import arrow.test.laws.EqLaws
