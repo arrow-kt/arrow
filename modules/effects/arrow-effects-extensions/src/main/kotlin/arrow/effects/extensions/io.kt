@@ -28,8 +28,8 @@ import arrow.effects.Timer
 import arrow.effects.typeclasses.UnsafeRun
 import arrow.extension
 import arrow.typeclasses.Applicative
-import arrow.typeclasses.Apply
 import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError

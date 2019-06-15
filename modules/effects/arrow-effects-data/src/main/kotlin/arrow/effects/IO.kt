@@ -28,6 +28,7 @@ import arrow.effects.typeclasses.Fiber
 import arrow.effects.typeclasses.mapUnit
 import arrow.higherkind
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -51,9 +52,17 @@ sealed class IO<out A> : IOOf<A> {
 
     fun <A> raiseError(e: Throwable): IO<A> = RaiseError(e)
 
-    operator fun <A> invoke(f: () -> A): IO<A> = defer { Pure(f()) }
+    operator fun <A> invoke(ctx: CoroutineContext, f: suspend () -> A): IO<A> =
+      effect(ctx, f)
 
-    fun <A> defer(f: () -> IOOf<A>): IO<A> = Suspend(f)
+    operator fun <A> invoke(f: suspend () -> A): IO<A> =
+      effect(EmptyCoroutineContext, f)
+
+    fun <A> later(f: () -> A): IO<A> =
+      defer { Pure(f()) }
+
+    fun <A> defer(f: () -> IOOf<A>): IO<A> =
+      Suspend(f)
 
     fun <A> async(k: IOProc<A>): IO<A> =
       Async { _: IOConnection, ff: (Either<Throwable, A>) -> Unit ->
@@ -125,9 +134,6 @@ sealed class IO<out A> : IOOf<A> {
         }
       }
 
-    operator fun <A> invoke(ctx: CoroutineContext, f: () -> A): IO<A> =
-      unit.continueOn(ctx).flatMap { invoke(f) }
-
     val unit: IO<Unit> =
       just(Unit)
 
@@ -144,7 +150,7 @@ sealed class IO<out A> : IOOf<A> {
       f(a).fix().flatMap {
         when (it) {
           is Either.Left -> tailRecM(it.a, f)
-          is Either.Right -> IO.just(it.b)
+          is Either.Right -> just(it.b)
         }
       }
 
@@ -280,7 +286,7 @@ sealed class IO<out A> : IOOf<A> {
 
   /** Makes the source [IO] uncancelable such that a [Fiber.cancel] signal has no effect. */
   fun uncancelable(): IO<A> =
-    IO.ContextSwitch(this, ContextSwitch.makeUncancelable, ContextSwitch.disableUncancelable)
+    ContextSwitch(this, ContextSwitch.makeUncancelable, ContextSwitch.disableUncancelable)
 
   fun <B> bracket(release: (A) -> IOOf<Unit>, use: (A) -> IOOf<B>): IO<B> =
     bracketCase({ a, _ -> release(a) }, use)

@@ -82,18 +82,20 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
   fun <B> bracketCase(use: (A) -> ObservableKOf<B>, release: (A, ExitCase<Throwable>) -> ObservableKOf<Unit>): ObservableK<B> =
     Observable.create<B> { emitter ->
       val dispose =
-        handleErrorWith { t -> Observable.fromCallable { emitter.onError(t) }.flatMap { Observable.error<A>(t) }.k() }
+        handleErrorWith { t -> Observable.fromCallable { emitter.tryOnError(t) }.flatMap { Observable.error<A>(t) }.k() }
           .concatMap { a ->
             if (emitter.isDisposed) {
-              release(a, ExitCase.Canceled).fix().observable.subscribe({}, emitter::onError)
+              release(a, ExitCase.Canceled).fix().observable.subscribe({}, { e -> emitter.tryOnError(e) })
               Observable.never<B>().k()
             } else {
               defer { use(a) }
                 .value()
                 .doOnError { t: Throwable ->
-                  defer { release(a, ExitCase.Error(t.nonFatalOrThrow())) }.value().subscribe({ emitter.onError(t) }, { e -> emitter.onError(Platform.composeErrors(t, e)) })
+                  defer { release(a, ExitCase.Error(t.nonFatalOrThrow())) }.value().subscribe({ emitter.tryOnError(t) }, { e -> emitter.tryOnError(Platform.composeErrors(t, e)) })
                 }.doOnComplete {
-                  defer { release(a, ExitCase.Completed) }.fix().value().subscribe({ emitter.onComplete() }, emitter::onError)
+                  defer { release(a, ExitCase.Completed) }.fix().value().subscribe({ emitter.onComplete() }, { e ->
+                    emitter.tryOnError(e)
+                  })
                 }
                 .doOnDispose {
                   defer { release(a, ExitCase.Canceled) }.value().subscribe({}, {})

@@ -5,7 +5,6 @@ import arrow.core.Either
 import arrow.core.Right
 import arrow.documented
 import arrow.effects.internal.asyncContinuation
-import arrow.effects.data.internal.BindingCancellationException
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.MonadThrowFx
@@ -82,7 +81,7 @@ interface Async<F> : MonadDefer<F> {
    * @see asyncF for a version that can suspend side effects in the registration function.
    */
   fun <A> async(fa: Proc<A>): Kind<F, A> =
-    asyncF { cb -> delay { fa(cb) } }
+    asyncF { cb -> later { fa(cb) } }
 
   /**
    * [async] variant that can suspend side effects in the provided registration function.
@@ -128,7 +127,7 @@ interface Async<F> : MonadDefer<F> {
    *   //sampleStart
    *   fun <F> Async<F>.runOnDefaultDispatcher(): Kind<F, String> =
    *     _just_(Unit)._continueOn_(Dispatchers.Default).flatMap {
-   *       _delay_({ Thread.currentThread().name })
+   *       _later_({ Thread.currentThread().name })
    *     }
    *
    *   val result = _extensionFactory_.runOnDefaultDispatcher()
@@ -159,7 +158,7 @@ interface Async<F> : MonadDefer<F> {
    * }
    * ```
    */
-  fun <A> delay(ctx: CoroutineContext, f: () -> A): Kind<F, A> =
+  fun <A> later(ctx: CoroutineContext, f: () -> A): Kind<F, A> =
     defer(ctx) {
       try {
         just(f())
@@ -232,7 +231,7 @@ interface Async<F> : MonadDefer<F> {
    * fun main(args: Array<String>) {
    *   //sampleStart
    *   fun <F> Async<F>.invokeOnDefaultDispatcher(): Kind<F, String> =
-   *     _defer_(Dispatchers.Default, { delay { Thread.currentThread().name } })
+   *     _defer_(Dispatchers.Default, { effect { Thread.currentThread().name } })
    *
    *   val result = _extensionFactory_.invokeOnDefaultDispatcher().fix().unsafeRunSync()
    *   //sampleEnd
@@ -249,7 +248,7 @@ interface Async<F> : MonadDefer<F> {
    * @param ctx [CoroutineContext] to run evaluation on.
    *
    */
-  fun <A> delayOrRaise(ctx: CoroutineContext, f: () -> Either<Throwable, A>): Kind<F, A> =
+  fun <A> laterOrRaise(ctx: CoroutineContext, f: () -> Either<Throwable, A>): Kind<F, A> =
     defer(ctx) { f().fold({ raiseError<A>(it) }, { just(it) }) }
 
   /**
@@ -302,7 +301,7 @@ interface Async<F> : MonadDefer<F> {
    * ```
    */
   fun CoroutineContext.shift(): Kind<F, Unit> =
-    delay(this) { Unit }
+    later(this) { Unit }
 
   /**
    * Task that never finishes evaluating.
