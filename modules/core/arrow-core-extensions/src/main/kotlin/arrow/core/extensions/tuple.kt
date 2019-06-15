@@ -120,7 +120,7 @@ interface Tuple2Traverse<F> : Traverse<Tuple2PartialOf<F>>, Tuple2Foldable<F> {
 }
 
 @extension
-interface Tuple2Bitraverse<F> : Bitraverse<ForTuple2>, Tuple2Bifoldable {
+interface Tuple2Bitraverse : Bitraverse<ForTuple2>, Tuple2Bifoldable {
   override fun <G, A, B, C, D> Tuple2Of<A, B>.bitraverse(AP: Applicative<G>, f: (A) -> Kind<G, C>, g: (B) -> Kind<G, D>): Kind<G, Tuple2Of<C, D>> =
     tuple2Bitraverse(AP, f, g)
 }
