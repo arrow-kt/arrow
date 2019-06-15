@@ -4,9 +4,9 @@ import arrow.core.extensions.monoid
 import arrow.core.firstOrNone
 import arrow.core.getOrElse
 import arrow.core.identity
-import arrow.data.ForListK
-import arrow.data.fix
-import arrow.data.k
+import arrow.core.ForListK
+import arrow.core.fix
+import arrow.core.k
 import arrow.typeclasses.Foldable
 
 interface Count<F> {

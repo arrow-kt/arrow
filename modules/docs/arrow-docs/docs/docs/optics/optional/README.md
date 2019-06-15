@@ -21,7 +21,6 @@ For a structure `List<Int>` we can create an `Optional` to focus an optional hea
 
 ```kotlin:ank
 import arrow.core.*
-import arrow.data.*
 import arrow.optics.*
 
 val optionalHead: Optional<ListK<Int>, Int> = Optional(

@@ -4,12 +4,12 @@ import arrow.core.Either
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.extensions.monoid
-import arrow.data.extensions.listk.eq.eq
+import arrow.core.extensions.listk.eq.eq
 import arrow.core.extensions.option.eq.eq
 import arrow.core.extensions.option.functor.functor
 import arrow.core.toT
-import arrow.data.ListK
-import arrow.data.k
+import arrow.core.ListK
+import arrow.core.k
 import arrow.test.UnitSpec
 import arrow.test.generators.functionAToB
 import arrow.test.laws.IsoLaws

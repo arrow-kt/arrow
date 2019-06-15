@@ -5,8 +5,8 @@ import arrow.core.Either
 import arrow.core.OptionOf
 import arrow.core.TryOf
 import arrow.core.identity
-import arrow.data.extensions.list.traverse.traverse
-import arrow.data.fix
+import arrow.core.extensions.list.traverse.traverse
+import arrow.core.fix
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Monad
 import arrow.typeclasses.suspended.BindSyntax

@@ -40,7 +40,7 @@ Option.monadFilter().fx.monadFilter {
 ```
 
 ```kotlin:ank
-import arrow.data.*
+import arrow.core.*
 import arrow.mtl.extensions.listk.monadFilter.*
 
 ListK.monadFilter().fx.monadFilter {
