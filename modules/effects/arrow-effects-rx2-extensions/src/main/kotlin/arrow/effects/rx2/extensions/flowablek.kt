@@ -3,6 +3,7 @@ package arrow.effects.rx2.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.core.Tuple2
 import arrow.effects.CancelToken
 import arrow.effects.RacePair
 import arrow.effects.RaceTriple
@@ -46,6 +47,7 @@ import arrow.effects.rx2.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.rx2.k
 import arrow.effects.rx2.value
 import arrow.effects.typeclasses.Dispatchers
+import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.ReplaySubject
 import io.reactivex.disposables.Disposable as RxDisposable
@@ -185,6 +187,14 @@ interface FlowableKConcurrent : Concurrent<ForFlowableK>, FlowableKAsync {
         }
       }, BS()).k()
     }
+
+  override fun <A, B, C> CoroutineContext.parMapN(fa: Kind<ForFlowableK, A>, fb: Kind<ForFlowableK, B>, f: (A, B) -> C): Kind<ForFlowableK, C> =
+    FlowableK(fa.value().zipWith(fb.value(), BiFunction(f)).subscribeOn(asScheduler()))
+
+  override fun <A, B, C, D> CoroutineContext.parMapN(fa: Kind<ForFlowableK, A>, fb: Kind<ForFlowableK, B>, fc: Kind<ForFlowableK, C>, f: (A, B, C) -> D): Kind<ForFlowableK, D> =
+    FlowableK(fa.value().zipWith(fb.value().zipWith(fc.value(), BiFunction<B, C, Tuple2<B, C>> { b, c -> Tuple2(b, c) }), BiFunction { a: A, tuple: Tuple2<B, C> ->
+      f(a, tuple.a, tuple.b)
+    }).subscribeOn(asScheduler()))
 
   override fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForFlowableK>): FlowableK<A> =
     FlowableK.cancelable(k, BS())
