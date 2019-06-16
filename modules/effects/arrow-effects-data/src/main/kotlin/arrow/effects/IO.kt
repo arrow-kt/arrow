@@ -154,7 +154,7 @@ sealed class IO<out A> : IOOf<A> {
         }
       }
 
-    val never: IO<Nothing> = async { Unit }
+    val never: IO<Nothing> = async { }
 
     /* For parMap, look into IOParallel */
   }
