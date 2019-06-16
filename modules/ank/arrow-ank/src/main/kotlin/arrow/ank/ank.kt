@@ -41,7 +41,7 @@ fun <F> Concurrent<F>.ank(source: Path, target: Path, compilerArgs: List<String>
     val path = !effect { createTargetDirectory(source, target) }
     val validatedPaths = !effect {
       path.ankFiles().map { (index, p) ->
-        effect(suspend {
+        effect {
           val totalHeap = Runtime.getRuntime().totalMemory()
           val usedHeap = totalHeap - Runtime.getRuntime().freeMemory()
           val message = "Ank Compile: [$index] ${path.relativize(p)} | Used Heap: ${usedHeap.humanBytes()}"
@@ -51,7 +51,7 @@ fun <F> Concurrent<F>.ank(source: Path, target: Path, compilerArgs: List<String>
           val compiledResult = compileCode(p toT snippets, compilerArgs)
           val result = replaceAnkToLang(processed, compiledResult)
           generateFile(p, result)
-        }).attempt().map(::toValidatedNel)
+        }.attempt().map(::toValidatedNel)
       }.toList()
     }
 
