@@ -5,9 +5,8 @@ import arrow.effects.KindConnection
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.MonadDefer
 
-typealias SingleKConnection = KindConnection<ForSingleK>
-typealias SingleKProc<A> = (SingleKConnection, (Either<Throwable, A>) -> Unit) -> Unit
-typealias SingleKProcF<A> = (SingleKConnection, (Either<Throwable, A>) -> Unit) -> SingleKOf<Unit>
+typealias SingleKProc<A> = ((Either<Throwable, A>) -> Unit) -> Unit
+typealias SingleKProcF<A> = ((Either<Throwable, A>) -> Unit) -> SingleKOf<Unit>
 
 /**
  * Connection for [SingleK].

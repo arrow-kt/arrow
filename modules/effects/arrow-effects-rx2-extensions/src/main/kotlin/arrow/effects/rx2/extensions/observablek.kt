@@ -22,7 +22,6 @@ import arrow.effects.typeclasses.AsyncSyntax
 import arrow.effects.typeclasses.Bracket
 import arrow.effects.typeclasses.Concurrent
 import arrow.effects.typeclasses.ConcurrentEffect
-import arrow.effects.typeclasses.ConnectedProcF
 import arrow.effects.typeclasses.Dispatchers
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.Duration
@@ -148,10 +147,10 @@ interface ObservableKMonadDefer : MonadDefer<ForObservableK>, ObservableKBracket
 @extension
 interface ObservableKAsync : Async<ForObservableK>, ObservableKMonadDefer {
   override fun <A> async(fa: Proc<A>): ObservableK<A> =
-    ObservableK.async { _, cb -> fa(cb) }
+    ObservableK.async(fa)
 
   override fun <A> asyncF(k: ProcF<ForObservableK, A>): ObservableK<A> =
-    ObservableK.asyncF { _, cb -> k(cb) }
+    ObservableK.asyncF(k)
 
   override fun <A> ObservableKOf<A>.continueOn(ctx: CoroutineContext): ObservableK<A> =
     fix().continueOn(ctx)
@@ -164,15 +163,6 @@ interface ObservableKEffect : Effect<ForObservableK>, ObservableKAsync {
 }
 
 interface ObservableKConcurrent : Concurrent<ForObservableK>, ObservableKAsync {
-  override fun <A> async(fa: Proc<A>): ObservableK<A> =
-    ObservableK.async { _, cb -> fa(cb) }
-
-  override fun <A> asyncF(k: ProcF<ForObservableK, A>): ObservableK<A> =
-    ObservableK.asyncF { _, cb -> k(cb) }
-
-  override fun <A> asyncF(fa: ConnectedProcF<ForObservableK, A>): ObservableK<A> =
-    ObservableK.asyncF(fa)
-
   override fun <A> CoroutineContext.startFiber(kind: ObservableKOf<A>): ObservableK<Fiber<ForObservableK, A>> =
     asScheduler().let { scheduler ->
       Observable.create<Fiber<ForObservableK, A>> { emitter ->
@@ -186,10 +176,11 @@ interface ObservableKConcurrent : Concurrent<ForObservableK>, ObservableKAsync {
       }.k()
     }
 
+  override fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForObservableK>): ObservableKOf<A> =
+    ObservableK.cancelable(k)
+
   override fun <A> cancelableF(k: ((Either<Throwable, A>) -> Unit) -> ObservableKOf<CancelToken<ForObservableK>>): ObservableK<A> =
-    ObservableK.asyncF { kindConnection, function ->
-      k(function).map { kindConnection.push(it) }
-    }
+    ObservableK.cancelableF(k)
 
   override fun <A, B> CoroutineContext.racePair(fa: ObservableKOf<A>, fb: ObservableKOf<B>): ObservableK<RacePair<ForObservableK, A, B>> =
     asScheduler().let { scheduler ->
@@ -203,10 +194,14 @@ interface ObservableKConcurrent : Concurrent<ForObservableK>, ObservableKAsync {
         val ffb = Fiber(sb.k(), ObservableK { ddb.dispose() })
         sa.subscribe({
           emitter.onNext(RacePair.First(it, ffb))
-        }, emitter::onError, emitter::onComplete)
+        }, { e ->
+          emitter.tryOnError(e)
+        }, emitter::onComplete)
         sb.subscribe({
           emitter.onNext(RacePair.Second(ffa, it))
-        }, emitter::onError, emitter::onComplete)
+        }, { e ->
+          emitter.tryOnError(e)
+        }, emitter::onComplete)
       }.subscribeOn(scheduler).observeOn(Schedulers.trampoline()).k()
     }
 
@@ -225,13 +220,19 @@ interface ObservableKConcurrent : Concurrent<ForObservableK>, ObservableKAsync {
         val ffc = Fiber(sc.k(), ObservableK { ddc.dispose() })
         sa.subscribe({
           emitter.onNext(RaceTriple.First(it, ffb, ffc))
-        }, emitter::onError, emitter::onComplete)
+        }, { e ->
+          emitter.tryOnError(e)
+        }, emitter::onComplete)
         sb.subscribe({
           emitter.onNext(RaceTriple.Second(ffa, it, ffc))
-        }, emitter::onError, emitter::onComplete)
+        }, { e ->
+          emitter.tryOnError(e)
+        }, emitter::onComplete)
         sc.subscribe({
           emitter.onNext(RaceTriple.Third(ffa, ffb, it))
-        }, emitter::onError, emitter::onComplete)
+        }, { e ->
+          emitter.tryOnError(e)
+        }, emitter::onComplete)
       }.subscribeOn(scheduler).observeOn(Schedulers.trampoline()).k()
     }
 }

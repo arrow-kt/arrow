@@ -111,7 +111,7 @@ class SingleKTests : UnitSpec() {
 
       SingleK.just(Unit)
         .bracketCase(
-          use = { SingleK.async<Nothing> { _, _ -> } },
+          use = { SingleK.async<Nothing> { } },
           release = { _, exitCase ->
             SingleK {
               ec = exitCase
@@ -130,8 +130,8 @@ class SingleKTests : UnitSpec() {
     "SingleK should cancel KindConnection on dispose" {
       Promise.uncancelable<ForSingleK, Unit>(SingleK.async()).flatMap { latch ->
         SingleK {
-          SingleK.async<Unit> { conn, _ ->
-            conn.push(latch.complete(Unit))
+          SingleK.cancelable<Unit> {
+            latch.complete(Unit)
           }.single.subscribe().dispose()
         }.flatMap { latch.get() }
       }.value()
@@ -144,7 +144,7 @@ class SingleKTests : UnitSpec() {
       Promise.uncancelable<ForSingleK, Unit>(SingleK.async())
         .flatMap { latch ->
           SingleK {
-            SingleK.async<Unit> { _, _ -> }
+            SingleK.async<Unit> { }
               .value()
               .doOnDispose { latch.complete(Unit).value().subscribe() }
               .subscribe()
@@ -154,14 +154,6 @@ class SingleKTests : UnitSpec() {
         .test()
         .assertValue(Unit)
         .awaitTerminalEvent(100, TimeUnit.MILLISECONDS)
-    }
-
-    "KindConnection can cancel upstream" {
-      SingleK.async<Unit> { connection, _ ->
-        connection.cancel().value().subscribe()
-      }.value()
-        .test()
-        .assertError(ConnectionCancellationException)
     }
   }
 }

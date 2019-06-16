@@ -18,7 +18,6 @@ import arrow.effects.typeclasses.AsyncSyntax
 import arrow.effects.typeclasses.Bracket
 import arrow.effects.typeclasses.Concurrent
 import arrow.effects.typeclasses.ConcurrentEffect
-import arrow.effects.typeclasses.ConnectedProcF
 import arrow.effects.typeclasses.Dispatchers
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.Duration
@@ -119,10 +118,10 @@ interface SingleKAsync :
   Async<ForSingleK>,
   SingleKMonadDefer {
   override fun <A> async(fa: Proc<A>): SingleK<A> =
-    SingleK.async { _, cb -> fa(cb) }
+    SingleK.async(fa)
 
   override fun <A> asyncF(k: ProcF<ForSingleK, A>): SingleK<A> =
-    SingleK.asyncF { _, cb -> k(cb) }
+    SingleK.asyncF(k)
 
   override fun <A> SingleKOf<A>.continueOn(ctx: CoroutineContext): SingleK<A> =
     fix().continueOn(ctx)
@@ -137,15 +136,6 @@ interface SingleKEffect :
 }
 
 interface SingleKConcurrent : Concurrent<ForSingleK>, SingleKAsync {
-  override fun <A> async(fa: Proc<A>): SingleK<A> =
-    SingleK.async { _, cb -> fa(cb) }
-
-  override fun <A> asyncF(k: ProcF<ForSingleK, A>): SingleK<A> =
-    SingleK.asyncF { _, cb -> k(cb) }
-
-  override fun <A> asyncF(fa: ConnectedProcF<ForSingleK, A>): SingleK<A> =
-    SingleK.asyncF(fa)
-
   override fun <A> CoroutineContext.startFiber(kind: SingleKOf<A>): SingleK<Fiber<ForSingleK, A>> =
     asScheduler().let { scheduler ->
       Single.create<Fiber<ForSingleK, A>> { emitter ->
@@ -159,10 +149,11 @@ interface SingleKConcurrent : Concurrent<ForSingleK>, SingleKAsync {
       }.k()
     }
 
+  override fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForSingleK>): SingleK<A> =
+    SingleK.cancelable(k)
+
   override fun <A> cancelableF(k: ((Either<Throwable, A>) -> Unit) -> SingleKOf<CancelToken<ForSingleK>>): SingleK<A> =
-    SingleK.asyncF { kindConnection, function ->
-      k(function).map { kindConnection.push(it) }
-    }
+    SingleK.cancelableF(k)
 
   override fun <A, B> CoroutineContext.racePair(fa: SingleKOf<A>, fb: SingleKOf<B>): SingleK<RacePair<ForSingleK, A, B>> =
     asScheduler().let { scheduler ->

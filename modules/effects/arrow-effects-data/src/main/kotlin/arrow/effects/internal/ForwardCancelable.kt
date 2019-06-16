@@ -34,7 +34,7 @@ class ForwardCancelable {
       }
     }
 
-    return IO.async { conn, cb -> loop(conn, cb) }
+    return IO.Async { conn, cb -> loop(conn, cb) }
   }
 
   fun complete(value: CancelToken<ForIO>): Unit = state.get().let { current ->
