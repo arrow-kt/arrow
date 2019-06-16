@@ -7,6 +7,10 @@ import arrow.core.Right
 import arrow.core.Tuple2
 import arrow.core.Tuple3
 import arrow.core.identity
+import arrow.data.ListK
+import arrow.data.extensions.listk.traverse.traverse
+import arrow.data.fix
+import arrow.data.k
 import arrow.effects.CancelToken
 import arrow.effects.KindConnection
 import arrow.effects.MVar
@@ -412,6 +416,12 @@ interface Concurrent<F> : Async<F> {
 
   fun <G, A, B> Kind<G, A>.parTraverse(TG: Traverse<G>, f: (A) -> Kind<F, B>): Kind<F, Kind<G, B>> =
     TG.run { traverse(parApplicative(), f) }
+
+  fun <A, B> Iterable<A>.parTraverse(ctx: CoroutineContext, f: (A) -> Kind<F, B>): Kind<F, List<B>> =
+    toList().k().parTraverse(ctx, ListK.traverse(), f).map { it.fix() }
+
+  fun <A, B> Iterable<A>.parTraverse(f: (A) -> Kind<F, B>): Kind<F, List<B>> =
+    toList().k().parTraverse(ListK.traverse(), f).map { it.fix() }
 
   fun <G, A, B> Kind<G, A>.parTraverseN(TG: Traverse<G>, n: Long, ctx: CoroutineContext, f: (A) -> Kind<F, B>): Kind<F, Kind<G, B>> = TG.run {
     Semaphore(n, this@Concurrent).flatMap { semaphore ->
