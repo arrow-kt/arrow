@@ -1,11 +1,10 @@
-package arrow.data
+package arrow.core
 
 import arrow.Kind2
 import arrow.core.extensions.monoid
-import arrow.data.extensions.functor
-import arrow.data.extensions.monoid
-import arrow.data.extensions.show
-import arrow.data.extensions.traverse
+import arrow.core.extensions.functor
+import arrow.core.extensions.show
+import arrow.core.extensions.traverse
 import arrow.test.UnitSpec
 import arrow.test.generators.sortedMapK
 import arrow.test.laws.MonoidLaws

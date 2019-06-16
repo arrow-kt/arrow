@@ -1,13 +1,13 @@
-package arrow.data.extensions
+package arrow.core.extensions
 
 import arrow.Kind
 import arrow.core.Eval
-import arrow.data.SortedMapK
-import arrow.data.SortedMapKOf
-import arrow.data.SortedMapKPartialOf
-import arrow.data.fix
-import arrow.data.k
-import arrow.data.updated
+import arrow.core.SortedMapK
+import arrow.core.SortedMapKOf
+import arrow.core.SortedMapKPartialOf
+import arrow.core.fix
+import arrow.core.k
+import arrow.core.updated
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor

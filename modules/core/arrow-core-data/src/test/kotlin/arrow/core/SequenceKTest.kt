@@ -1,14 +1,8 @@
-package arrow.data
+package arrow.core
 
 import arrow.Kind
-import arrow.core.SequenceK
-import arrow.core.Tuple2
-import arrow.core.ForSequenceK
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
-import arrow.core.k
-import arrow.core.toList
-import arrow.core.fix
 import arrow.core.extensions.sequencek.applicative.applicative
 import arrow.core.extensions.sequencek.eq.eq
 import arrow.core.extensions.sequencek.hash.hash
