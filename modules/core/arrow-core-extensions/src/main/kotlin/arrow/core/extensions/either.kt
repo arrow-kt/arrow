@@ -34,7 +34,6 @@ import arrow.typeclasses.Bifoldable
 import arrow.typeclasses.Bitraverse
 import arrow.core.ap as eitherAp
 import arrow.core.combineK as eitherCombineK
-import arrow.core.extensions.bitraverse as eitherBitraverse
 import arrow.core.extensions.traverse as eitherTraverse
 import arrow.core.flatMap as eitherFlatMap
 import arrow.core.handleErrorWith as eitherHandleErrorWith
@@ -164,9 +163,6 @@ interface EitherBifoldable : Bifoldable<ForEither> {
 fun <G, A, B, C> EitherOf<A, B>.traverse(GA: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, Either<A, C>> =
   fix().fold({ GA.just(Either.Left(it)) }, { GA.run { f(it).map { Either.Right(it) } } })
 
-fun <G, A, B, C, D> EitherOf<A, B>.bitraverse(AP: Applicative<G>, f: (A) -> Kind<G, C>, g: (B) -> Kind<G, D>):
-  Kind<G, EitherOf<C, D>> = fix().fold({ AP.run { f(it).map { Either.Left(it) } } }, { AP.run { g(it).map { Either.Right(it) } } })
-
 @extension
 interface EitherTraverse<L> : Traverse<EitherPartialOf<L>>, EitherFoldable<L> {
 
@@ -177,7 +173,7 @@ interface EitherTraverse<L> : Traverse<EitherPartialOf<L>>, EitherFoldable<L> {
 @extension
 interface EitherBitraverse : Bitraverse<ForEither>, EitherBifoldable {
   override fun <G, A, B, C, D> EitherOf<A, B>.bitraverse(AP: Applicative<G>, f: (A) -> Kind<G, C>, g: (B) -> Kind<G, D>): Kind<G, EitherOf<C, D>> =
-    fix().eitherBitraverse(AP, f, g)
+    fix().let { AP.run { it.fold({ f(it).map { Either.Left(it) } }, { g(it).map { Either.Right(it) } }) } }
 }
 
 @extension
