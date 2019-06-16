@@ -38,7 +38,6 @@ import arrow.typeclasses.Eq
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Show
 import arrow.typeclasses.Comonad
-import arrow.core.extensions.bitraverse as tuple2Bitraverse
 import arrow.core.extensions.traverse as tuple2Traverse
 
 // TODO this should be user driven allowing consumers to generate the tuple arities on demand to avoid cluttering arrow dependents with unused code
@@ -135,10 +134,6 @@ fun <F, G, A, B> Tuple2Of<F, A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G, B
   fix().let { f(it.b).map(it.a::toT) }
 }
 
-fun <G, A, B, C, D> Tuple2Of<A, B>.bitraverse(GA: Applicative<G>, f: (A) -> Kind<G, C>, g: (B) -> Kind<G, D>): Kind<G, Tuple2<C, D>> = GA.run {
-  fix().let { tupled(f(it.a), g(it.b)) }
-}
-
 fun <F, G, A> Tuple2Of<F, Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, Tuple2<F, A>> =
   fix().tuple2Traverse(GA, ::identity)
 
@@ -152,7 +147,9 @@ interface Tuple2Traverse<F> : Traverse<Tuple2PartialOf<F>>, Tuple2Foldable<F> {
 @extension
 interface Tuple2Bitraverse : Bitraverse<ForTuple2>, Tuple2Bifoldable {
   override fun <G, A, B, C, D> Tuple2Of<A, B>.bitraverse(AP: Applicative<G>, f: (A) -> Kind<G, C>, g: (B) -> Kind<G, D>): Kind<G, Tuple2Of<C, D>> =
-    tuple2Bitraverse(AP, f, g)
+    AP.run {
+      fix().let { tupled(f(it.a), g(it.b)) }
+    }
 }
 
 @extension
