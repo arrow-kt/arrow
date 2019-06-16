@@ -1,16 +1,16 @@
-package arrow.data.extensions
+package arrow.core.extensions
 
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Tuple2
-import arrow.data.ForSequenceK
-import arrow.data.SequenceK
-import arrow.data.SequenceKOf
-import arrow.data.extensions.sequencek.monad.map
-import arrow.data.extensions.sequencek.monad.monad
-import arrow.data.fix
-import arrow.data.k
+import arrow.core.ForSequenceK
+import arrow.core.SequenceK
+import arrow.core.SequenceKOf
+import arrow.core.extensions.sequencek.monad.map
+import arrow.core.extensions.sequencek.monad.monad
+import arrow.core.fix
+import arrow.core.k
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
@@ -28,7 +28,7 @@ import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Semigroupal
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
-import arrow.data.combineK as sequenceCombineK
+import arrow.core.combineK as sequenceCombineK
 
 @extension
 interface SequenceKSemigroup<A> : Semigroup<SequenceK<A>> {
