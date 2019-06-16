@@ -6,13 +6,13 @@ import arrow.core.Right
 import arrow.core.Some
 import arrow.core.Tuple2
 import arrow.core.extensions.monoid
-import arrow.data.extensions.listk.eq.eq
+import arrow.core.extensions.listk.eq.eq
 import arrow.core.extensions.option.eq.eq
 import arrow.core.extensions.option.functor.functor
 import arrow.core.toT
-import arrow.data.ListK
+import arrow.core.ListK
 import arrow.data.State
-import arrow.data.k
+import arrow.core.k
 import arrow.data.map
 import arrow.data.run
 import arrow.data.runId

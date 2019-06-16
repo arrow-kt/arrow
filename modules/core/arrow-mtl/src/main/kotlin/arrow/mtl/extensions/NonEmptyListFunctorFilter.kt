@@ -2,9 +2,9 @@ package arrow.mtl.extensions
 
 import arrow.Kind
 import arrow.core.Option
-import arrow.data.ForNonEmptyList
-import arrow.data.NonEmptyList
-import arrow.data.fix
+import arrow.core.ForNonEmptyList
+import arrow.core.NonEmptyList
+import arrow.core.fix
 import arrow.extension
 import arrow.mtl.typeclasses.FunctorFilter
 

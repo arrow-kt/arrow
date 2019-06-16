@@ -7,7 +7,7 @@ import arrow.core.Left
 import arrow.core.Right
 import arrow.core.identity
 import arrow.core.nonFatalOrThrow
-import arrow.effects.OnCancel
+import arrow.effects.CancelToken
 import arrow.effects.internal.Platform
 import arrow.effects.rx2.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
@@ -16,6 +16,7 @@ import arrow.higherkind
 import arrow.typeclasses.Applicative
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
+import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 
 fun <A> Observable<A>.k(): ObservableK<A> = ObservableK(this)
@@ -81,18 +82,20 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
   fun <B> bracketCase(use: (A) -> ObservableKOf<B>, release: (A, ExitCase<Throwable>) -> ObservableKOf<Unit>): ObservableK<B> =
     Observable.create<B> { emitter ->
       val dispose =
-        handleErrorWith { t -> Observable.fromCallable { emitter.onError(t) }.flatMap { Observable.error<A>(t) }.k() }
+        handleErrorWith { t -> Observable.fromCallable { emitter.tryOnError(t) }.flatMap { Observable.error<A>(t) }.k() }
           .concatMap { a ->
             if (emitter.isDisposed) {
-              release(a, ExitCase.Canceled).fix().observable.subscribe({}, emitter::onError)
+              release(a, ExitCase.Canceled).fix().observable.subscribe({}, { e -> emitter.tryOnError(e) })
               Observable.never<B>().k()
             } else {
               defer { use(a) }
                 .value()
                 .doOnError { t: Throwable ->
-                  defer { release(a, ExitCase.Error(t.nonFatalOrThrow())) }.value().subscribe({ emitter.onError(t) }, { e -> emitter.onError(Platform.composeErrors(t, e)) })
+                  defer { release(a, ExitCase.Error(t.nonFatalOrThrow())) }.value().subscribe({ emitter.tryOnError(t) }, { e -> emitter.tryOnError(Platform.composeErrors(t, e)) })
                 }.doOnComplete {
-                  defer { release(a, ExitCase.Completed) }.fix().value().subscribe({ emitter.onComplete() }, emitter::onError)
+                  defer { release(a, ExitCase.Completed) }.fix().value().subscribe({ emitter.onComplete() }, { e ->
+                    emitter.tryOnError(e)
+                  })
                 }
                 .doOnDispose {
                   defer { release(a, ExitCase.Canceled) }.value().subscribe({}, {})
@@ -168,23 +171,18 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
      * Creates a [ObservableK] that'll run [ObservableKProc].
      *
      * ```kotlin:ank:playground
-     * import arrow.core.Either
-     * import arrow.core.right
-     * import arrow.effects.rx2.ObservableK
-     * import arrow.effects.rx2.ObservableKConnection
-     * import arrow.effects.rx2.value
+     * import arrow.core.*
+     * import arrow.effects.rx2.*
      *
-     * class Resource {
-     *   fun asyncRead(f: (String) -> Unit): Unit = f("Some value of a resource")
-     *   fun close(): Unit = Unit
+     * class NetworkApi {
+     *   fun async(f: (String) -> Unit): Unit = f("Some value of a resource")
      * }
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
-     *   val result = ObservableK.async { conn: ObservableKConnection, cb: (Either<Throwable, String>) -> Unit ->
-     *     val resource = Resource()
-     *     conn.push(ObservableK { resource.close() })
-     *     resource.asyncRead { value -> cb(value.right()) }
+     *   val result = ObservableK.async { cb: (Either<Throwable, String>) -> Unit ->
+     *     val nw = NetworkApi()
+     *     nw.async { result -> cb(Right(result)) }
      *   }
      *   //sampleEnd
      *   result.value().subscribe(::println)
@@ -193,17 +191,11 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
      */
     fun <A> async(fa: ObservableKProc<A>): ObservableK<A> =
       Observable.create<A> { emitter ->
-        val connection = ObservableKConnection()
-        // On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
-        // on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
-        connection.push(ObservableK { if (!emitter.isDisposed) emitter.onError(OnCancel.CancellationException) })
-        emitter.setCancellable { connection.cancel().value().subscribe({}, {}) }
-
-        fa(connection) { either: Either<Throwable, A> ->
-          either.fold({
-            emitter.onError(it)
-          }, {
-            emitter.onNext(it)
+        fa { either: Either<Throwable, A> ->
+          either.fold({ e ->
+            emitter.tryOnError(e)
+          }, { a ->
+            emitter.onNext(a)
             emitter.onComplete()
           })
         }
@@ -211,23 +203,90 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
 
     fun <A> asyncF(fa: ObservableKProcF<A>): ObservableK<A> =
       Observable.create { emitter: ObservableEmitter<A> ->
-        val connection = ObservableKConnection()
-        // On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
-        // on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
-        connection.push(ObservableK { if (!emitter.isDisposed) emitter.onError(OnCancel.CancellationException) })
-
-        val dispose = fa(connection) { either: Either<Throwable, A> ->
+        val dispose = fa { either: Either<Throwable, A> ->
           either.fold({
-            emitter.onError(it)
+            emitter.tryOnError(it)
           }, {
             emitter.onNext(it)
             emitter.onComplete()
           })
-        }.fix().observable.subscribe({}, emitter::onError)
+        }.fix().observable.subscribe({}, { e -> emitter.tryOnError(e) })
+
+        emitter.setCancellable { dispose.dispose() }
+      }.k()
+
+    /**
+     * Creates a [ObservableK] that'll run a cancelable operation.
+     *
+     * ```kotlin:ank:playground
+     * import arrow.core.*
+     * import arrow.effects.rx2.*
+     *
+     * typealias Disposable = () -> Unit
+     * class NetworkApi {
+     *   fun async(f: (String) -> Unit): Disposable {
+     *     f("Some value of a resource")
+     *     return { Unit }
+     *   }
+     * }
+     *
+     * fun main(args: Array<String>) {
+     *   //sampleStart
+     *   val result = ObservableK.cancelable { cb: (Either<Throwable, String>) -> Unit ->
+     *     val nw = NetworkApi()
+     *     val disposable = nw.async { result -> cb(Right(result)) }
+     *     ObservableK { disposable.invoke() }
+     *   }
+     *   //sampleEnd
+     *   result.value().subscribe(::println)
+     * }
+     * ```
+     */
+    fun <A> cancelable(fa: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForObservableK>): ObservableK<A> =
+      Observable.create<A> { emitter ->
+        val token = fa { either: Either<Throwable, A> ->
+          either.fold({ e ->
+            emitter.tryOnError(e)
+          }, { a ->
+            emitter.onNext(a)
+            emitter.onComplete()
+          })
+        }
+        emitter.setCancellable { token.value().subscribe({}, { e -> emitter.tryOnError(e) }) }
+      }.k()
+
+    fun <A> cancelableF(fa: ((Either<Throwable, A>) -> Unit) -> ObservableKOf<CancelToken<ForObservableK>>): ObservableK<A> =
+      Observable.create { emitter: ObservableEmitter<A> ->
+        val cb = { either: Either<Throwable, A> ->
+          either.fold({
+            emitter.tryOnError(it).let { Unit }
+          }, { a ->
+            emitter.onNext(a)
+            emitter.onComplete()
+          })
+        }
+
+        val fa2 = try {
+          fa(cb)
+        } catch (t: Throwable) {
+          cb(Left(t.nonFatalOrThrow()))
+          just(just(Unit))
+        }
+
+        val cancelOrToken = AtomicReference<Either<Unit, CancelToken<ForObservableK>>?>(null)
+        val disp = fa2.value().subscribe({ token ->
+          val cancel = cancelOrToken.getAndSet(Right(token))
+          cancel?.fold({
+            token.value().subscribe({}, { e -> emitter.tryOnError(e) }).let { Unit }
+          }, {})
+        }, { e -> emitter.tryOnError(e) })
 
         emitter.setCancellable {
-          dispose.dispose()
-          connection.cancel().value().subscribe({}, {})
+          disp.dispose()
+          val token = cancelOrToken.getAndSet(Left(Unit))
+          token?.fold({}, {
+            it.value().subscribe({}, { e -> emitter.tryOnError(e) })
+          })
         }
       }.k()
 

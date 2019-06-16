@@ -8,7 +8,7 @@ import arrow.effects.internal.Platform
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 
-fun <A, B, C> IO.Companion.parMapN(ctx: CoroutineContext, fa: IOOf<A>, fb: IOOf<B>, f: (A, B) -> C): IO<C> = async { conn, cb ->
+fun <A, B, C> IO.Companion.parMapN(ctx: CoroutineContext, fa: IOOf<A>, fb: IOOf<B>, f: (A, B) -> C): IO<C> = IO.Async { conn, cb ->
 
   val state = AtomicReference<Either<A, B>?>(null)
 

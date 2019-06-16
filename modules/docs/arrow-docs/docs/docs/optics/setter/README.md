@@ -22,8 +22,9 @@ You can get a `Setter` for any existing `Functor`.
 ```kotlin:ank
 import arrow.*
 import arrow.optics.*
+import arrow.core.*
 import arrow.data.*
-import arrow.data.extensions.listk.functor.*
+import arrow.core.extensions.listk.functor.*
 
 val setter: Setter<ListKOf<Int>, Int> = Setter.fromFunctor(ListK.functor())
 setter.set(listOf(1, 2, 3, 4).k(), 5)
@@ -57,8 +58,6 @@ There are also some convenience methods to make working with [State]({{ '/docs/a
 This can make working with nested structures in stateful computations significantly more elegant.
 
 ```kotlin:ank
-import arrow.data.*
-
 val takeDamage = playerSetter.update_ { it - 15 }
 takeDamage.run(Player(75))
 ```

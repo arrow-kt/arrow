@@ -6,13 +6,10 @@ import arrow.core.Left
 import arrow.core.Right
 import arrow.core.Tuple2
 import arrow.core.Tuple3
+import arrow.core.extensions.listk.traverse.traverse
 import arrow.core.identity
-import arrow.data.ListK
-import arrow.data.extensions.listk.traverse.traverse
-import arrow.data.fix
-import arrow.data.k
+import arrow.core.k
 import arrow.effects.CancelToken
-import arrow.effects.KindConnection
 import arrow.effects.MVar
 import arrow.effects.Race2
 import arrow.effects.Race3
@@ -35,12 +32,6 @@ import arrow.typeclasses.Traverse
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine
-
-/** A connected asynchronous computation that might fail. **/
-typealias ConnectedProcF<F, A> = (KindConnection<F>, ((Either<Throwable, A>) -> Unit)) -> Kind<F, Unit>
-
-/** A connected asynchronous computation that might fail. **/
-typealias ConnectedProc<F, A> = (KindConnection<F>, ((Either<Throwable, A>) -> Unit)) -> Unit
 
 /**
  * ank_macro_hierarchy(arrow.effects.typeclasses.Concurrent)
@@ -71,113 +62,6 @@ interface Concurrent<F> : Async<F> {
     get() = object : ConcurrentFx<F> {
       override val concurrent: Concurrent<F> = this@Concurrent
     }
-
-  /**
-   * Creates a cancelable instance of [F] that executes an asynchronous process on evaluation.
-   * This combinator can be used to wrap callbacks or other similar impure code that requires cancellation code.
-   *
-   * ```kotlin:ank:playground:extension
-   * _imports_
-   * import java.lang.RuntimeException
-   *
-   * typealias Callback = (List<String>?, Throwable?) -> Unit
-   *
-   * class Id
-   * object GithubService {
-   *   private val listeners: MutableMap<Id, Callback> = mutableMapOf()
-   *   fun getUsernames(callback: (List<String>?, Throwable?) -> Unit): Id {
-   *     val id = Id()
-   *     listeners[id] = callback
-   *     //execute operation and call callback at some point in future
-   *     return id
-   *   }
-   *
-   *   fun unregisterCallback(id: Id): Unit {
-   *     listeners.remove(id)
-   *   }
-   * }
-   *
-   * fun main(args: Array<String>) {
-   *   //sampleStart
-   *   fun <F> Concurrent<F>.getUsernames(): Kind<F, List<String>> =
-   *     async { conn: KindConnection<F>, cb: (Either<Throwable, List<String>>) -> Unit ->
-   *       val id = GithubService.getUsernames { names, throwable ->
-   *         when {
-   *           names != null -> cb(Right(names))
-   *           throwable != null -> cb(Left(throwable))
-   *           else -> cb(Left(RuntimeException("Null result and no exception")))
-   *         }
-   *       }
-   *
-   *       conn.push(_later_({ GithubService.unregisterCallback(id) }))
-   *       conn.push(_later_({ println("Everything we push to the cancellation stack will execute on cancellation") }))
-   *     }
-   *
-   *   val result = _extensionFactory_.getUsernames()
-   *   //sampleEnd
-   *   println(result)
-   * }
-   * ```
-   *
-   * @param fa an asynchronous computation that might fail typed as [ConnectedProc].
-   * @see asyncF for a version that can suspend side effects in the registration function.
-   */
-  fun <A> async(fa: ConnectedProc<F, A>): Kind<F, A> =
-    asyncF { conn, cb -> later { fa(conn, cb) } }
-
-  /**
-   * Creates a cancelable instance of [F] that executes an asynchronous process on evaluation.
-   * This combinator can be used to wrap callbacks or other similar impure code that requires cancellation code.
-   *
-   * ```kotlin:ank:playground:extension
-   * _imports_
-   * import java.lang.RuntimeException
-   *
-   * typealias Callback = (List<String>?, Throwable?) -> Unit
-   *
-   * class Id
-   * object GithubService {
-   *   private val listeners: MutableMap<Id, Callback> = mutableMapOf()
-   *   fun getUsernames(callback: (List<String>?, Throwable?) -> Unit): Id {
-   *     val id = Id()
-   *     listeners[id] = callback
-   *     //execute operation and call callback at some point in future
-   *     return id
-   *   }
-   *
-   *   fun unregisterCallback(id: Id): Unit {
-   *     listeners.remove(id)
-   *   }
-   * }
-   *
-   * fun main(args: Array<String>) {
-   *   //sampleStart
-   *   fun <F> Concurrent<F>.getUsernames(): Kind<F, List<String>> =
-   *     asyncF { conn: KindConnection<F>, cb: (Either<Throwable, List<String>>) -> Unit ->
-   *       effect {
-   *         val id = GithubService.getUsernames { names, throwable ->
-   *           when {
-   *             names != null -> cb(Right(names))
-   *             throwable != null -> cb(Left(throwable))
-   *             else -> cb(Left(RuntimeException("Null result and no exception")))
-   *           }
-   *         }
-   *
-   *         conn.push(_later_({ GithubService.unregisterCallback(id) }))
-   *         conn.push(_later_({ println("Everything we push to the cancellation stack will execute on cancellation") }))
-   *       }
-   *     }
-   *
-   *   val result = _extensionFactory_.getUsernames()
-   *   //sampleEnd
-   *   println(result)
-   * }
-   * ```
-   *
-   * @param fa a deferred asynchronous computation that might fail typed as [ConnectedProcF].
-   * @see async for a version that can suspend side effects in the registration function.
-   */
-  fun <A> asyncF(fa: ConnectedProcF<F, A>): Kind<F, A>
 
   /**
    * Create a new [F] that upon execution starts the receiver [F] within a [Fiber] on [this@startFiber].
@@ -417,11 +301,11 @@ interface Concurrent<F> : Async<F> {
   fun <G, A, B> Kind<G, A>.parTraverse(TG: Traverse<G>, f: (A) -> Kind<F, B>): Kind<F, Kind<G, B>> =
     TG.run { traverse(parApplicative(), f) }
 
-  fun <A, B> Iterable<A>.parTraverse(ctx: CoroutineContext, f: (A) -> Kind<F, B>): Kind<F, List<B>> =
-    toList().k().parTraverse(ctx, ListK.traverse(), f).map { it.fix() }
+  // fun <A, B> Iterable<A>.parTraverse(ctx: CoroutineContext, f: (A) -> Kind<F, B>): Kind<F, List<B>> =
+  //   toList().k().parTraverse(ctx, ListK.traverse(), f).map { it.fix() }
 
-  fun <A, B> Iterable<A>.parTraverse(f: (A) -> Kind<F, B>): Kind<F, List<B>> =
-    toList().k().parTraverse(ListK.traverse(), f).map { it.fix() }
+  // fun <A, B> Iterable<A>.parTraverse(f: (A) -> Kind<F, B>): Kind<F, List<B>> =
+  //   toList().k().parTraverse(ListK.traverse(), f).map { it.fix() }
 
   fun <G, A, B> Kind<G, A>.parTraverseN(TG: Traverse<G>, n: Long, ctx: CoroutineContext, f: (A) -> Kind<F, B>): Kind<F, Kind<G, B>> = TG.run {
     Semaphore(n, this@Concurrent).flatMap { semaphore ->
@@ -832,22 +716,6 @@ interface Concurrent<F> : Async<F> {
    * Creates a variable [MVar] to be used for thread-sharing, initialized to a value [a]
    */
   fun <A> mVar(a: A): Kind<F, MVar<F, A>> = MVar(a, this)
-
-  /**
-   * Overload for [Async.asyncF]
-   *
-   * @see [Async.asyncF]
-   */
-  override fun <A> asyncF(k: ProcF<F, A>): Kind<F, A> =
-    asyncF { _, cb -> k(cb) }
-
-  /**
-   * Overload for [Async.async]
-   *
-   * @see [Async.async]
-   */
-  override fun <A> async(fa: Proc<A>): Kind<F, A> =
-    async { _, cb -> fa(cb) }
 
   /**
    * Entry point for monad bindings which enables for comprehensions. The underlying impl is based on coroutines.

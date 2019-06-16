@@ -139,8 +139,8 @@ Arrow provides [monadic comprehensions]({{ '/docs/patterns/monad_comprehensions'
 
 ```kotlin
 import arrow.typeclasses.*
-import arrow.data.extensions.*
-import arrow.data.extensions.option.monad.binding
+import arrow.core.extensions.*
+import arrow.core.extensions.option.monad.binding
 
 fun attackOption(): Option<Impacted> =
   fx.monad {
@@ -199,7 +199,7 @@ Just like it does for `Option`, Arrow also provides `Monad` instances for `Try` 
 
 ```kotlin
 import arrow.typeclasses.*
-import arrow.data.extensions.*
+import arrow.core.extensions.*
 
 fun attackTry(): Try<Impacted> =
   fx.monad {
@@ -364,7 +364,6 @@ In this validation example we demonstrate how we can use `ApplicativeError` inst
 import arrow.*
 import arrow.core.*
 import arrow.typeclasses.*
-import arrow.data.*
 
 sealed class ValidationError(val msg: String) {
   data class DoesNotContain(val value: String) : ValidationError("Did not contain $value")

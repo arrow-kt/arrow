@@ -90,7 +90,7 @@ class ObservableKTests : UnitSpec() {
 
       ObservableK.just(Unit)
         .bracketCase(
-          use = { ObservableK.async<Nothing> { _, _ -> } },
+          use = { ObservableK.async<Nothing> { } },
           release = { _, exitCase ->
             ObservableK {
               ec = exitCase
@@ -109,8 +109,8 @@ class ObservableKTests : UnitSpec() {
     "ObservableK should cancel KindConnection on dispose" {
       Promise.uncancelable<ForObservableK, Unit>(ObservableK.async()).flatMap { latch ->
         ObservableK {
-          ObservableK.async<Unit> { conn, _ ->
-            conn.push(latch.complete(Unit))
+          ObservableK.cancelable<Unit> {
+            latch.complete(Unit)
           }.observable.subscribe().dispose()
         }.flatMap { latch.get() }
       }.value()
@@ -123,7 +123,7 @@ class ObservableKTests : UnitSpec() {
       Promise.uncancelable<ForObservableK, Unit>(ObservableK.async())
         .flatMap { latch ->
           ObservableK {
-            ObservableK.async<Unit> { _, _ -> }
+            ObservableK.async<Unit> { }
               .value()
               .doOnDispose { latch.complete(Unit).value().subscribe() }
               .subscribe()
@@ -133,14 +133,6 @@ class ObservableKTests : UnitSpec() {
         .test()
         .assertValue(Unit)
         .awaitTerminalEvent(100, TimeUnit.MILLISECONDS)
-    }
-
-    "KindConnection can cancel upstream" {
-      ObservableK.async<Unit> { connection, _ ->
-        connection.cancel().value().subscribe()
-      }.observable
-        .test()
-        .assertError(ConnectionCancellationException)
     }
   }
 }

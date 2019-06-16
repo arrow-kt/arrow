@@ -5,8 +5,8 @@ import arrow.core.Left
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.data.Nel
-import arrow.data.NonEmptyList
+import arrow.core.Nel
+import arrow.core.NonEmptyList
 
 /** Represents multiple (>1) exceptions were thrown. */
 data class CompositeFailure(

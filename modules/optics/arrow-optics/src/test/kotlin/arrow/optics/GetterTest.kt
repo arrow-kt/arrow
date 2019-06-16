@@ -7,7 +7,7 @@ import arrow.core.Tuple2
 import arrow.core.extensions.monoid
 import arrow.core.toT
 import arrow.data.State
-import arrow.data.k
+import arrow.core.k
 import arrow.data.map
 import arrow.data.run
 import arrow.data.runId

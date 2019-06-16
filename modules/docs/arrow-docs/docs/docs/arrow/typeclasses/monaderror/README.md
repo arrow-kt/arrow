@@ -29,7 +29,6 @@ It lifts an exception into the computational context of a type constructor.
 ```kotlin:ank
 import arrow.*
 import arrow.core.*
-import arrow.data.extensions.*
 import arrow.core.extensions.either.applicativeError.*
 
 val eitherResult: Either<Throwable, Int> =
@@ -39,7 +38,7 @@ eitherResult
 ```
 
 ```kotlin:ank
-import arrow.data.*
+import arrow.core.*
 import arrow.core.extensions.`try`.applicativeError.*
 
 val tryResult: Try<Int> =

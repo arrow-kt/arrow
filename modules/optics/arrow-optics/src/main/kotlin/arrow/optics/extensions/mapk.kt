@@ -4,10 +4,10 @@ import arrow.Kind
 import arrow.core.Option
 import arrow.core.left
 import arrow.core.right
-import arrow.data.MapK
-import arrow.data.fix
-import arrow.data.getOption
-import arrow.data.k
+import arrow.core.MapK
+import arrow.core.k
+import arrow.core.fix
+import arrow.core.getOption
 import arrow.extension
 import arrow.optics.Lens
 import arrow.optics.Optional

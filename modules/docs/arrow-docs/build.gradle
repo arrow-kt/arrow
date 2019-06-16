@@ -24,13 +24,13 @@ dependencies {
     compile project(':arrow-free-data')
     compile project(':arrow-test')
     compile project(':arrow-free-extensions')
-    compile project(':arrow-typeclasses')
     compile project(':arrow-generic')
     compile project(':arrow-query-language')
     compile project(":arrow-reflect")
     kapt project(':arrow-meta')
     kaptTest project(':arrow-meta')
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:$kotlinxCoroutinesVersion"
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     compile "org.jetbrains.kotlinx:kotlinx-collections-immutable:$kotlinxCollectionsImmutableVersion"
     testCompile("junit:junit:$jUnitVersion")

@@ -15,7 +15,7 @@ fun <A, B, C, D> IO.Companion.parMapN(
   fb: IOOf<B>,
   fc: IOOf<C>,
   f: (A, B, C) -> D
-): IO<D> = async { conn, cb ->
+): IO<D> = IO.Async { conn, cb ->
 
   val state: AtomicReference<Tuple3<A?, B?, C?>?> = AtomicReference(null)
 

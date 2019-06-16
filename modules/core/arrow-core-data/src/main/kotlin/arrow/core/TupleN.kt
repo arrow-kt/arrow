@@ -149,9 +149,6 @@ fun <A, B, C> Tuple3<A, B, C>.toTriple(): Triple<A, B, C> = Triple(this.a, this.
 
 fun <A, B, C> Triple<A, B, C>.toTuple3(): Tuple3<A, B, C> = Tuple3(this.first, this.second, this.third)
 
-fun <K, V> mapOf(vararg tuples: Tuple2<K, V>): Map<K, V> =
-  if (tuples.isNotEmpty()) tuples.toMap(LinkedHashMap(mapCapacity(tuples.size))) else emptyMap()
-
 fun <K, V> Iterable<Tuple2<K, V>>.toMap(): Map<K, V> {
   if (this is Collection) {
     return when (size) {

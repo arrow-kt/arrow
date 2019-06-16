@@ -5,7 +5,8 @@ import arrow.core.Either
 import arrow.core.ForOption
 import arrow.core.Option
 import arrow.core.Tuple2
-import arrow.core.value
+import arrow.core.ForListK
+import arrow.core.ListK
 import arrow.core.extensions.const.divisible.divisible
 import arrow.core.extensions.monoid
 import arrow.effects.ForIO
@@ -13,8 +14,8 @@ import arrow.effects.IO
 import arrow.effects.extensions.io.applicativeError.attempt
 import arrow.effects.extensions.io.async.async
 import arrow.effects.extensions.writert.async.async
-import arrow.data.extensions.listk.monad.monad
-import arrow.data.extensions.listk.monoidK.monoidK
+import arrow.core.extensions.listk.monad.monad
+import arrow.core.extensions.listk.monoidK.monoidK
 import arrow.core.extensions.option.monad.monad
 import arrow.core.fix
 import arrow.data.extensions.writert.applicative.applicative
