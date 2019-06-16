@@ -15,7 +15,7 @@ It provides a convenient way to attach or detach elements to the beginning side 
 It can be constructed by providing the `Prism`.
 
 ```kotlin:ank
-import arrow.data.ListK
+import arrow.core.ListK
 import arrow.optics.extensions.listk.cons.cons
 import arrow.optics.typeclasses.Cons
 

@@ -4,8 +4,8 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
-import arrow.data.extensions.list.foldable.foldLeft
-import arrow.data.k
+import arrow.core.extensions.list.foldable.foldLeft
+import arrow.core.k
 import arrow.effects.typeclasses.MonadDefer
 import arrow.test.concurrency.SideEffect
 import arrow.test.generators.intSmall

@@ -4,17 +4,16 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.getOrElse
 import arrow.core.toT
-import arrow.data.ListK
-import arrow.data.Nel
-import arrow.data.NonEmptyList
-import arrow.data.Valid
-import arrow.data.Validated
-import arrow.data.ValidatedNel
-import arrow.data.combine
-import arrow.data.extensions.list.foldable.reduceLeftOption
-import arrow.data.extensions.list.semigroup.List.semigroup
-import arrow.data.extensions.nonemptylist.semigroup.semigroup
-import arrow.data.validNel
+import arrow.core.ListK
+import arrow.core.Nel
+import arrow.core.NonEmptyList
+import arrow.core.Validated
+import arrow.core.ValidatedNel
+import arrow.core.combine
+import arrow.core.extensions.list.foldable.reduceLeftOption
+import arrow.core.extensions.list.semigroup.List.semigroup
+import arrow.core.extensions.nonemptylist.semigroup.semigroup
+import arrow.core.validNel
 import arrow.effects.typeclasses.Concurrent
 import java.nio.file.Path
 
@@ -63,7 +62,7 @@ fun <F> Concurrent<F>.ank(source: Path, target: Path, compilerArgs: List<String>
       validatedPaths
         .map { fa -> fa.map { validated -> validated.map { path -> ListK.just(path) } } } // wrap in ListK to accumulate Paths.
         .reduceLeftOption { fa, fb ->
-          fa.map2(fb) { (a, b) ->
+          fa.map2(fb) { (a: Validated<Nel<Throwable>, ListK<Path>>, b: Validated<Nel<Throwable>, ListK<Path>>) ->
             a.combine(Nel.semigroup(), semigroup(), b)
           }
         }.getOrElse { empty }

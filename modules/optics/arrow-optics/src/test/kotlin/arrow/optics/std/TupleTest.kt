@@ -11,9 +11,9 @@ import arrow.core.Tuple7
 import arrow.core.Tuple8
 import arrow.core.Tuple9
 import arrow.core.extensions.monoid
-import arrow.data.extensions.listk.eq.eq
+import arrow.core.extensions.listk.eq.eq
 import arrow.core.extensions.option.eq.eq
-import arrow.data.ListK
+import arrow.core.ListK
 import arrow.test.UnitSpec
 import arrow.test.generators.functionAToB
 import arrow.test.generators.tuple10

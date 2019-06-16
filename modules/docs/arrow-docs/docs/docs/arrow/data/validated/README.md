@@ -105,7 +105,7 @@ It would look like the following, which Arrow provides in `arrow.Validated`:
 Now we are ready to write our parser.
 
 ```kotlin:ank
-import arrow.data.*
+import arrow.core.*
 
 data class Config(val map: Map<String, String>) {
 
@@ -227,10 +227,9 @@ We may use `ApplicativeError` instead of `Validated` to abstract away validation
 import arrow.*
 import arrow.core.*
 import arrow.typeclasses.*
-import arrow.data.*
-import arrow.data.extensions.validated.applicativeError.*
+import arrow.core.extensions.validated.applicativeError.*
 import arrow.core.extensions.either.applicativeError.*
-import arrow.data.extensions.nonemptylist.semigroup.*
+import arrow.core.extensions.nonemptylist.semigroup.*
 
 sealed class ValidationError(val msg: String) {
   data class DoesNotContain(val value: String) : ValidationError("Did not contain $value")
@@ -301,7 +300,6 @@ Rules failFast {
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.data.*
 import arrow.core.*
 
 DataType(Validated::class).tcMarkdownList()

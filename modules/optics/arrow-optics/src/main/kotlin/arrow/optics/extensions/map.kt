@@ -6,8 +6,8 @@ import arrow.core.Option
 import arrow.core.Predicate
 import arrow.core.left
 import arrow.core.right
-import arrow.data.getOption
-import arrow.data.k
+import arrow.core.getOption
+import arrow.core.k
 import arrow.optics.Lens
 import arrow.optics.Optional
 import arrow.optics.PLens

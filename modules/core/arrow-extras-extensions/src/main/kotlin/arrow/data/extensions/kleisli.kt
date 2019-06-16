@@ -12,7 +12,7 @@ import arrow.core.extensions.id.applicative.applicative
 import arrow.core.extensions.id.functor.functor
 import arrow.core.extensions.id.monad.monad
 import arrow.data.ForKleisli
-import arrow.data.Ior
+import arrow.core.Ior
 import arrow.data.KleisliOf
 import arrow.data.KleisliPartialOf
 import arrow.data.extensions.kleisli.applicative.applicative

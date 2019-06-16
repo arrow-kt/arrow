@@ -222,7 +222,6 @@ Option.fx {
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.data.*
 import arrow.core.*
 
 DataType(Option::class).tcMarkdownList()
