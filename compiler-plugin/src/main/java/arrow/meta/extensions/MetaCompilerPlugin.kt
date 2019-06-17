@@ -1,8 +1,6 @@
 package arrow.meta.extensions
 
-import arrow.meta.utils.NoOp2
 import arrow.meta.utils.NoOp3
-import arrow.meta.utils.NoOp5
 import arrow.meta.utils.NoOp6
 import arrow.meta.utils.NullableOp1
 import org.jetbrains.kotlin.analyzer.AnalysisResult
@@ -47,6 +45,7 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtModifierListOwner
+import org.jetbrains.kotlin.psi.synthetics.SyntheticClassOrObjectDescriptor
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.BindingTrace
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
@@ -149,15 +148,6 @@ interface MetaCompilerPlugin : ComponentRegistrar {
             NewAnnotationClassBuilder(interceptedFactory.newClassBuilder(origin), f)
         }
     }
-
-  private class DelegateClassBuilderFactory(val interceptedFactory: ClassBuilderFactory) : ClassBuilderFactory by interceptedFactory {
-    override fun newClassBuilder(origin: JvmDeclarationOrigin): ClassBuilder {
-      return object : DelegatingClassBuilder() {
-        override fun getDelegate(): ClassBuilder =
-          interceptedFactory.newClassBuilder(origin)
-      }
-    }
-  }
 
   fun storageComponent(check: CompilerContext.(declaration: KtDeclaration, descriptor: DeclarationDescriptor, context: DeclarationCheckerContext) -> Unit): ExtensionPhase.StorageComponentContainer =
     object : ExtensionPhase.StorageComponentContainer {
@@ -346,7 +336,7 @@ interface MetaCompilerPlugin : ComponentRegistrar {
   fun registerSyntheticResolver(project: MockProject, phase: ExtensionPhase.SyntheticResolver, compilerContext: CompilerContext) {
     SyntheticResolveExtension.registerExtension(project, object : SyntheticResolveExtension {
       override fun addSyntheticSupertypes(thisDescriptor: ClassDescriptor, supertypes: MutableList<KotlinType>) {
-        phase.run { compilerContext.addSyntheticSupertypes(thisDescriptor, supertypes) }
+          phase.run { compilerContext.addSyntheticSupertypes(thisDescriptor, supertypes) }
       }
 
       override fun generateSyntheticClasses(thisDescriptor: ClassDescriptor, name: Name, ctx: LazyClassContext, declarationProvider: ClassMemberDeclarationProvider, result: MutableSet<ClassDescriptor>) {

@@ -1,0 +1,11 @@
+apply plugin: 'kotlin'
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile project(":app")
+}
+
+task execute(type:JavaExec) {
+    main = "arrow.sample.test"
+    classpath = sourceSets.main.runtimeClasspath
+}
