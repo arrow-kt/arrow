@@ -1,4 +1,4 @@
-package arrow.data
+package arrow.mtl
 
 import arrow.core.ForId
 import arrow.core.Id
@@ -55,7 +55,7 @@ fun <D, A> Reader(run: ReaderFun<D, A>): Reader<D, A> = ReaderT(run.andThen { Id
  *
  * @receiver [ReaderFun] a function that represents computation dependent on type [D].
  */
-fun <D, A> (ReaderFun<D, A>).reader(): Reader<D, A> = Reader().lift(this)
+fun <D, A> (ReaderFun<D, A>).reader(): Reader<D, A> = ReaderApi.lift(this)
 
 /**
  * Alias for [Kleisli.run]

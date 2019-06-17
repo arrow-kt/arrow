@@ -18,7 +18,7 @@ For example, we have the function `String.toInt()` which can throw a `NumberForm
 
 ```kotlin:ank:silent
 import arrow.core.*
-import arrow.data.Kleisli
+import arrow.mtl.Kleisli
 
 val optionIntKleisli = Kleisli { str: String ->
   if (str.toCharArray().all { it.isDigit() }) Some(str.toInt()) else None

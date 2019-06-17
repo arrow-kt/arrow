@@ -8,9 +8,10 @@ import arrow.core.Tuple2
 import arrow.core.compose
 import arrow.core.identity
 import arrow.core.toT
-import arrow.data.Reader
+import arrow.mtl.Reader
 import arrow.data.State
 import arrow.data.map
+import arrow.mtl.map
 import arrow.higherkind
 import arrow.typeclasses.Monoid
 

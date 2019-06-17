@@ -1,4 +1,4 @@
-package arrow.data
+package arrow.mtl
 
 import arrow.core.Id
 import arrow.core.Tuple2
@@ -22,13 +22,13 @@ class ReaderTest : UnitSpec() {
 
     "flatMap should map over the inner value" {
       { a: Int -> a * 2 }.reader()
-        .flatMap { a -> Reader().just<Int, Int>(a * 3) }
+        .flatMap { a -> ReaderApi.just<Int, Int>(a * 3) }
         .runId(2) shouldBe 12
     }
 
     "flatMap should be callable without explicit monad instance" {
       { a: Int -> a * 2 }.reader()
-        .flatMap { a -> Reader().just<Int, Int>(a * 3) }
+        .flatMap { a -> ReaderApi.just<Int, Int>(a * 3) }
         .runId(2) shouldBe 12
     }
 

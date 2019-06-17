@@ -10,7 +10,7 @@ import arrow.data.State
 import arrow.core.k
 import arrow.data.map
 import arrow.data.run
-import arrow.data.runId
+import arrow.mtl.runId
 import arrow.test.UnitSpec
 import arrow.test.generators.functionAToB
 import io.kotlintest.properties.Gen
