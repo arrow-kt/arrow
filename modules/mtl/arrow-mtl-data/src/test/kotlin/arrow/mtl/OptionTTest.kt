@@ -1,4 +1,4 @@
-package arrow.data
+package arrow.mtl
 
 import arrow.Kind
 import arrow.core.Either
@@ -17,13 +17,13 @@ import arrow.effects.extensions.optiont.async.async
 import arrow.effects.typeclasses.seconds
 import arrow.core.extensions.nonemptylist.monad.monad
 import arrow.core.extensions.option.monad.monad
-import arrow.data.extensions.optiont.applicative.applicative
-import arrow.data.extensions.optiont.divisible.divisible
-import arrow.data.extensions.optiont.monoidK.monoidK
-import arrow.data.extensions.optiont.semigroupK.semigroupK
+import arrow.mtl.extensions.optiont.applicative.applicative
+import arrow.mtl.extensions.optiont.divisible.divisible
+import arrow.mtl.extensions.optiont.monoidK.monoidK
+import arrow.mtl.extensions.optiont.semigroupK.semigroupK
 import arrow.mtl.extensions.option.traverseFilter.traverseFilter
-import arrow.mtl.extensions.optiont.functorFilter.functorFilter
 import arrow.mtl.extensions.optiont.traverseFilter.traverseFilter
+import arrow.mtl.extensions.optiont.functorFilter.functorFilter
 import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
 import arrow.test.laws.DivisibleLaws

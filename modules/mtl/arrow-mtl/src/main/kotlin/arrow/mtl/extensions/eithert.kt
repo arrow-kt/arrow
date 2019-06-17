@@ -1,4 +1,4 @@
-package arrow.data.extensions
+package arrow.mtl.extensions
 
 import arrow.Kind
 import arrow.core.Either
@@ -14,12 +14,12 @@ import arrow.core.identity
 import arrow.core.left
 import arrow.core.right
 import arrow.core.toT
-import arrow.data.EitherT
-import arrow.data.EitherTOf
-import arrow.data.EitherTPartialOf
-import arrow.data.extensions.eithert.monadThrow.monadThrow
-import arrow.data.fix
-import arrow.data.value
+import arrow.mtl.EitherT
+import arrow.mtl.EitherTOf
+import arrow.mtl.EitherTPartialOf
+import arrow.mtl.fix
+import arrow.mtl.extensions.eithert.monadThrow.monadThrow
+import arrow.mtl.value
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError

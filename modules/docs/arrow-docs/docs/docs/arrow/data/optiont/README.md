@@ -51,7 +51,7 @@ that enables monad comprehensions for all datatypes for which a monad instance i
 
 ```kotlin:ank:silent
 import arrow.typeclasses.*
-import arrow.core.extensions.*
+import arrow.mtl.extensions.*
 import arrow.core.extensions.fx
 
 fun getCountryCode(maybePerson : Option<Person>): Option<String> =
@@ -180,7 +180,7 @@ So our specialization `OptionT<ForObservableK, A>` is the OptionT transformer ar
 We can now lift any value to a `OptionT<F, A>` which looks like this:
 
 ```kotlin:ank
-import arrow.data.*
+import arrow.mtl.*
 import arrow.effects.rx2.extensions.observablek.applicative.*
 
 val optTVal = OptionT.just<ForObservableK, Int>(ObservableK.applicative(), 1)
@@ -223,7 +223,7 @@ Here we no longer have to deal with the `None` cases, and the binding to the val
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.data.*
+import arrow.mtl.*
 import arrow.core.*
 
 DataType(OptionT::class).tcMarkdownList()

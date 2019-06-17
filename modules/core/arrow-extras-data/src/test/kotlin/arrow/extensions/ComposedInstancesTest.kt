@@ -16,7 +16,7 @@ import arrow.core.k
 import arrow.core.value
 import arrow.core.ListK
 import arrow.core.NonEmptyList
-import arrow.data.OptionT
+import arrow.mtl.OptionT
 import arrow.core.nel
 import arrow.core.invoke
 import arrow.core.extensions.function1.contravariant.contravariant
@@ -36,8 +36,8 @@ import arrow.core.extensions.nonemptylist.traverse.traverse
 import arrow.core.extensions.listk.applicative.applicative
 import arrow.core.extensions.listk.semigroupK.semigroupK
 import arrow.core.extensions.listk.monoidK.monoidK
-import arrow.data.OptionTPartialOf
-import arrow.data.value
+import arrow.mtl.OptionTPartialOf
+import arrow.mtl.value
 import arrow.test.UnitSpec
 import arrow.mtl.extensions.ComposedFunctorFilter
 import arrow.mtl.extensions.optiont.functorFilter.functorFilter

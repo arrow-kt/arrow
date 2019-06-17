@@ -1,4 +1,4 @@
-package arrow.data
+package arrow.mtl
 
 import arrow.Kind
 import arrow.core.Either
@@ -19,11 +19,11 @@ import arrow.core.extensions.id.monad.monad
 import arrow.core.extensions.id.traverse.traverse
 import arrow.core.extensions.monoid
 import arrow.core.extensions.option.functor.functor
-import arrow.data.extensions.eithert.applicative.applicative
-import arrow.data.extensions.eithert.divisible.divisible
-import arrow.data.extensions.eithert.functor.functor
-import arrow.data.extensions.eithert.semigroupK.semigroupK
-import arrow.data.extensions.eithert.traverse.traverse
+import arrow.mtl.extensions.eithert.applicative.applicative
+import arrow.mtl.extensions.eithert.divisible.divisible
+import arrow.mtl.extensions.eithert.functor.functor
+import arrow.mtl.extensions.eithert.semigroupK.semigroupK
+import arrow.mtl.extensions.eithert.traverse.traverse
 import arrow.effects.typeclasses.seconds
 import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
