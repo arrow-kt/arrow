@@ -153,11 +153,10 @@ interface EitherFoldable<L> : Foldable<EitherPartialOf<L>> {
 
 @extension
 interface EitherBifoldable : Bifoldable<ForEither> {
-  override fun <A, B, C> EitherOf<A, B>.bifoldLeft(c: C, f: (C, A) -> C, g: (C, B) -> C): C =
-    fix().fold({ f(c, it) }, { g(c, it) })
+  override fun <A, B, C> EitherOf<A, B>.bifoldLeft(c: C, f: (C, A) -> C, g: (C, B) -> C): C = fix().bifoldLeft(c, f, g)
 
   override fun <A, B, C> EitherOf<A, B>.bifoldRight(c: Eval<C>, f: (A, Eval<C>) -> Eval<C>, g: (B, Eval<C>) -> Eval<C>): Eval<C> =
-    fix().fold({ f(it, c) }, { g(it, c) })
+    fix().bifoldRight(c, f, g)
 }
 
 fun <G, A, B, C> EitherOf<A, B>.traverse(GA: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, Either<A, C>> =
