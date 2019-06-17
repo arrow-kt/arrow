@@ -7,10 +7,10 @@ import arrow.core.Tuple2
 import arrow.data.ForSequenceK
 import arrow.data.SequenceK
 import arrow.data.SequenceKOf
-import arrow.data.k
 import arrow.data.extensions.sequencek.monad.map
 import arrow.data.extensions.sequencek.monad.monad
 import arrow.data.fix
+import arrow.data.k
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
@@ -28,7 +28,6 @@ import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Semigroupal
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
-import arrow.typeclasses.fix
 import arrow.data.combineK as sequenceCombineK
 
 @extension

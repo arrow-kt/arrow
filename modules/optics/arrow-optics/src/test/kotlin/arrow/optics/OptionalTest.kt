@@ -12,11 +12,11 @@ import arrow.core.toT
 import arrow.core.extensions.`try`.applicative.applicative
 import arrow.core.extensions.monoid
 import arrow.core.extensions.option.eq.eq
-import arrow.data.extensions.list.foldable.nonEmpty
-import arrow.data.extensions.listk.eq.eq
-import arrow.data.ListK
+import arrow.core.extensions.list.foldable.nonEmpty
+import arrow.core.extensions.listk.eq.eq
+import arrow.core.ListK
 import arrow.data.State
-import arrow.data.k
+import arrow.core.k
 import arrow.data.map
 import arrow.data.run
 import arrow.test.UnitSpec

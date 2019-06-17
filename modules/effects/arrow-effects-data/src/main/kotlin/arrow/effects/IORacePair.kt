@@ -45,7 +45,7 @@ import kotlin.coroutines.CoroutineContext
  * @see [arrow.effects.typeclasses.Concurrent.raceN] for a simpler version that cancels loser.
  */
 fun <A, B> IO.Companion.racePair(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<B>): IO<RacePair<ForIO, A, B>> =
-  async { conn, cb ->
+  IO.Async { conn, cb ->
     val active = AtomicBoolean(true)
 
     val upstreamCancelToken = defer { if (conn.isCanceled()) unit else conn.cancel() }

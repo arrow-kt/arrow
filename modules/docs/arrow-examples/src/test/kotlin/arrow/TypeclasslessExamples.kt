@@ -4,10 +4,10 @@ import arrow.TypeclasslessExamples.ScopeOne.inScopeOne
 import arrow.TypeclasslessExamples.ScopeTwo.withAll
 import arrow.TypeclasslessExamples.ScopeTwo.withApplicative
 import arrow.core.identity
-import arrow.data.ForListK
-import arrow.data.ListK
-import arrow.data.k
-import arrow.data.extensions.listk.applicative.applicative
+import arrow.core.ForListK
+import arrow.core.ListK
+import arrow.core.k
+import arrow.core.extensions.listk.applicative.applicative
 import arrow.typeclasses.Applicative
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.FreeSpec

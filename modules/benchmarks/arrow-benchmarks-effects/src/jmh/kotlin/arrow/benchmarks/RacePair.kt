@@ -1,6 +1,6 @@
 package arrow.benchmarks
 
-import arrow.data.extensions.list.foldable.foldLeft
+import arrow.core.extensions.list.foldable.foldLeft
 import arrow.effects.IO
 import arrow.effects.IODispatchers
 import arrow.effects.extensions.io.monad.map

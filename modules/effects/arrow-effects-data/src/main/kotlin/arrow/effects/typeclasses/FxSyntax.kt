@@ -5,8 +5,8 @@ import arrow.core.Either
 import arrow.core.OptionOf
 import arrow.core.TryOf
 import arrow.core.identity
-import arrow.data.extensions.list.traverse.traverse
-import arrow.data.fix
+import arrow.core.extensions.list.traverse.traverse
+import arrow.core.fix
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Monad
 import arrow.typeclasses.suspended.BindSyntax
@@ -35,7 +35,13 @@ interface FxSyntax<F> : Concurrent<F>, BindSyntax<F> {
   fun <A> ensure(fa: suspend () -> A, error: () -> Throwable, predicate: (A) -> Boolean): Kind<F, A> =
     run<Monad<F>, Kind<F, A>> { fa.effect().ensure(error, predicate) }
 
-  fun <A> (suspend () -> A).effect(unit: Unit = Unit): Kind<F, A> = effect(f = this)
+  private fun <A> asyncOp(fb: Async<F>.() -> Kind<F, A>): Kind<F, A> =
+    run<Async<F>, Kind<F, A>> { fb(this) }
+
+  fun <A> CoroutineContext.effect(dummy: Unit = Unit, f: suspend () -> A): Kind<F, A> =
+    asyncOp { defer(this@effect) { f.effect() } }
+
+  fun <A> (suspend () -> A).effect(unit: Unit = Unit): Kind<F, A> = effect(this)
 
   fun <A, B> (suspend (A) -> B).effect(): (Kind<F, A>) -> Kind<F, B> = { fa ->
     fa.flatMap { a ->

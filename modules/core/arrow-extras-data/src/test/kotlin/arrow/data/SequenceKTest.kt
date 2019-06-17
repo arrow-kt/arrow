@@ -21,7 +21,6 @@ import arrow.test.laws.MonoidLaws
 import arrow.test.laws.MonoidalLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
-import arrow.test.laws.fix
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Show
 import io.kotlintest.properties.Gen

@@ -2,7 +2,7 @@ package arrow.effects
 
 import arrow.core.extensions.eq
 import arrow.core.toT
-import arrow.data.extensions.list.traverse.traverse
+import arrow.core.extensions.list.traverse.traverse
 import arrow.effects.extensions.io.applicative.applicative
 import arrow.effects.extensions.io.applicativeError.handleError
 import arrow.effects.extensions.io.async.async

@@ -28,7 +28,6 @@ import arrow.effects.typeclasses.ProcF
 import arrow.effects.Timer
 import arrow.effects.typeclasses.AsyncSyntax
 import arrow.effects.typeclasses.Concurrent
-import arrow.effects.typeclasses.ConnectedProcF
 import arrow.effects.typeclasses.Fiber
 import arrow.extension
 import arrow.typeclasses.Applicative
@@ -155,10 +154,10 @@ interface FlowableKAsync :
   Async<ForFlowableK>,
   FlowableKMonadDefer {
   override fun <A> async(fa: Proc<A>): FlowableK<A> =
-    FlowableK.async({ _, cb -> fa(cb) }, BS())
+    FlowableK.async(fa, BS())
 
   override fun <A> asyncF(k: ProcF<ForFlowableK, A>): FlowableKOf<A> =
-    FlowableK.asyncF({ _, cb -> k(cb) }, BS())
+    FlowableK.asyncF(k, BS())
 
   override fun <A> FlowableKOf<A>.continueOn(ctx: CoroutineContext): FlowableK<A> =
     fix().continueOn(ctx)
@@ -173,14 +172,6 @@ interface FlowableKEffect :
 }
 
 interface FlowableKConcurrent : Concurrent<ForFlowableK>, FlowableKAsync {
-  override fun <A> async(fa: Proc<A>): FlowableK<A> =
-    FlowableK.async({ _, cb -> fa(cb) }, BS())
-
-  override fun <A> asyncF(k: ProcF<ForFlowableK, A>): FlowableK<A> =
-    FlowableK.asyncF({ _, cb -> k(cb) }, BS())
-
-  override fun <A> asyncF(fa: ConnectedProcF<ForFlowableK, A>): FlowableK<A> =
-    FlowableK.asyncF(fa)
 
   override fun <A> CoroutineContext.startFiber(kind: Kind<ForFlowableK, A>): Kind<ForFlowableK, Fiber<ForFlowableK, A>> =
     asScheduler().let { scheduler ->
@@ -195,10 +186,11 @@ interface FlowableKConcurrent : Concurrent<ForFlowableK>, FlowableKAsync {
       }, BS()).k()
     }
 
+  override fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForFlowableK>): FlowableK<A> =
+    FlowableK.cancelable(k, BS())
+
   override fun <A> cancelableF(k: ((Either<Throwable, A>) -> Unit) -> Kind<ForFlowableK, CancelToken<ForFlowableK>>): Kind<ForFlowableK, A> =
-    FlowableK.asyncF({ conn, cb ->
-      k(cb).map { conn.push(it) }
-    }, BS())
+    FlowableK.cancelableF(k, BS())
 
   override fun <A, B> CoroutineContext.racePair(fa: Kind<ForFlowableK, A>, fb: Kind<ForFlowableK, B>): Kind<ForFlowableK, RacePair<ForFlowableK, A, B>> =
     asScheduler().let { scheduler ->
@@ -234,13 +226,13 @@ interface FlowableKConcurrent : Concurrent<ForFlowableK>, FlowableKAsync {
         val ffc = Fiber(sc.toFlowable(BS()).k(), FlowableK { ddc.dispose() })
         sa.subscribe({
           emitter.onNext(RaceTriple.First(it, ffb, ffc))
-        }, emitter::onError, emitter::onComplete)
+        }, { e -> emitter.tryOnError(e) }, emitter::onComplete)
         sb.subscribe({
           emitter.onNext(RaceTriple.Second(ffa, it, ffc))
-        }, emitter::onError, emitter::onComplete)
+        }, { e -> emitter.tryOnError(e) }, emitter::onComplete)
         sc.subscribe({
           emitter.onNext(RaceTriple.Third(ffa, ffb, it))
-        }, emitter::onError, emitter::onComplete)
+        }, { e -> emitter.tryOnError(e) }, emitter::onComplete)
       }, BS()).subscribeOn(scheduler).observeOn(Schedulers.trampoline()).k()
     }
 }

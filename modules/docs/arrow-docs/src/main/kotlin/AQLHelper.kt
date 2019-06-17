@@ -11,8 +11,6 @@ import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.undocumented
 
-// import arrow.higherkind
-
 class ForBox private constructor() {
   companion object
 }

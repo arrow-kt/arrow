@@ -1,8 +1,8 @@
 package arrow.optics
 
-import arrow.data.MapK
-import arrow.data.SetK
-import arrow.data.extensions.setk.monoid.monoid
+import arrow.core.MapK
+import arrow.core.SetK
+import arrow.core.extensions.setk.monoid.monoid
 import arrow.test.UnitSpec
 import arrow.test.generators.functionAToB
 import arrow.test.generators.genSetK

@@ -83,6 +83,33 @@ maybe.value()
 subject.value()
 ```
 
+### Support for suspend functions
+
+Arrow adds a new constructor `effect` that allows using suspend functions with `Observable`, `Single`, and `Flowable`.
+
+```kotlin:ank
+suspend fun sideEffect(): Unit = println("Hello!")
+```
+
+
+```kotlin
+ObservableK.async().effect {
+ sideEffect()
+}
+```
+
+```kotlin
+SingleK.async().effect {
+ sideEffect()
+}
+```
+
+```kotlin
+FlowableK.async().effect {
+ sideEffect()
+}
+```
+
 ### Observable comprehensions
 
 The library provides instances of [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}) and [`MonadDefer`]({{ '/docs/effects/monaddefer' | relative_url }}).
