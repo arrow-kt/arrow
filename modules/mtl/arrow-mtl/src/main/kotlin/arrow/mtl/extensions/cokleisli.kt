@@ -1,10 +1,10 @@
-package arrow.data.extensions
+package arrow.mtl.extensions
 
 import arrow.Kind
-import arrow.data.Cokleisli
-import arrow.data.CokleisliOf
-import arrow.data.ForCokleisli
-import arrow.data.fix
+import arrow.mtl.Cokleisli
+import arrow.mtl.CokleisliOf
+import arrow.mtl.ForCokleisli
+import arrow.mtl.fix
 import arrow.extension
 import arrow.typeclasses.Conested
 import arrow.typeclasses.Contravariant
