@@ -13,14 +13,12 @@ import arrow.core.extensions.ior.show.show
 import arrow.core.extensions.ior.traverse.traverse
 import arrow.core.extensions.ior.bitraverse.bitraverse
 import arrow.core.Ior.Right
-import arrow.core.extensions.ior.bifoldable.bifoldable
 import arrow.test.UnitSpec
 import arrow.test.laws.BifunctorLaws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonadLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
-import arrow.test.laws.BifoldableLaws
 import arrow.test.laws.BitraverseLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Hash
@@ -49,7 +47,6 @@ class IorTest : UnitSpec() {
       MonadLaws.laws(Ior.monad(Int.semigroup()), Eq.any()),
       TraverseLaws.laws(Ior.traverse(), Ior.applicative(Int.semigroup()), ::Right, Eq.any()),
       HashLaws.laws(Ior.hash(Hash.any(), Int.hash()), Ior.eq(Eq.any(), Int.eq())) { Right(it) },
-      BifoldableLaws.laws(Ior.bifoldable(), { Right(it) }, Eq.any()),
       BitraverseLaws.laws(Ior.bitraverse(), { Right(it) }, Eq.any())
     )
 

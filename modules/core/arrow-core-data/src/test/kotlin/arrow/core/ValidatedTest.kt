@@ -1,7 +1,6 @@
 package arrow.core
 
 import arrow.core.extensions.eq
-import arrow.core.extensions.validated.bifoldable.bifoldable
 import arrow.core.extensions.monoid
 import arrow.core.extensions.semigroup
 import arrow.core.extensions.validated.applicative.applicative
@@ -18,7 +17,6 @@ import arrow.test.laws.SelectiveLaws
 import arrow.test.laws.SemigroupKLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
-import arrow.test.laws.BifoldableLaws
 import arrow.test.laws.BitraverseLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Semigroup
@@ -47,7 +45,6 @@ class ValidatedTest : UnitSpec() {
         Validated.semigroupK(String.semigroup()),
         Validated.applicative(String.semigroup()),
         Eq.any()),
-      BifoldableLaws.laws(Validated.bifoldable(), { Valid(it) }, Eq.any()),
       BitraverseLaws.laws(Validated.bitraverse(), ::Valid, Eq.any())
     )
 
