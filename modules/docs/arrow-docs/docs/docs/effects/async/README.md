@@ -87,18 +87,6 @@ Behind the scenes `continueOn()` starts a new coroutine and passes the rest of t
 
 The function `continueOn()` is also available inside [`Monad Comprehensions`]({{ '/docs/patterns/monad_comprehensions' | relative_url }}).
 
-### mapEffect
-
-Helper function that provides an easy way to construct a suspend effect
-
-```kotlin
-val userCreation = IO.async().run {
-  just(id)
-    .mapEffect { id -> createUserFromId(id) }
-}
-userCreation.request(it)
-```
-
 #### invoke with CoroutineContext
 
 Similar to `MonadDefer`'s `invoke`, this constructor it takes a single generator function and the `CoroutineContext` it has to be run on.
