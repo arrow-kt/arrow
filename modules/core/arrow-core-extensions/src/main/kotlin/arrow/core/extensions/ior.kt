@@ -101,10 +101,10 @@ interface IorTraverse<L> : Traverse<IorPartialOf<L>>, IorFoldable<L> {
 @extension
 interface IorBifoldable : Bifoldable<ForIor> {
   override fun <A, B, C> IorOf<A, B>.bifoldLeft(c: C, f: (C, A) -> C, g: (C, B) -> C): C =
-    fix().fold({ f(c, it) }, { g(c, it) }, { a, b -> g(f(c, a), b) })
+    fix().bifoldLeft(c, f, g)
 
   override fun <A, B, C> IorOf<A, B>.bifoldRight(c: Eval<C>, f: (A, Eval<C>) -> Eval<C>, g: (B, Eval<C>) -> Eval<C>): Eval<C> =
-    fix().fold({ f(it, c) }, { g(it, c) }, { a, b -> f(a, g(b, c)) })
+    fix().bifoldRight(c, f, g)
 }
 
 @extension
