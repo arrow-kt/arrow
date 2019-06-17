@@ -15,10 +15,10 @@ import arrow.core.extensions.option.eq.eq
 import arrow.core.extensions.list.foldable.nonEmpty
 import arrow.core.extensions.listk.eq.eq
 import arrow.core.ListK
-import arrow.data.State
+import arrow.mtl.State
 import arrow.core.k
-import arrow.data.map
-import arrow.data.run
+import arrow.mtl.map
+import arrow.mtl.run
 import arrow.test.UnitSpec
 import arrow.test.generators.`try`
 import arrow.test.generators.functionAToB

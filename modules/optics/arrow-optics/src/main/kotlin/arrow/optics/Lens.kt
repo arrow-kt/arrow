@@ -9,9 +9,8 @@ import arrow.core.Tuple2
 import arrow.core.identity
 import arrow.core.toT
 import arrow.mtl.Reader
-import arrow.data.State
+import arrow.mtl.State
 import arrow.mtl.map
-import arrow.data.map
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Functor

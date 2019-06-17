@@ -23,7 +23,7 @@ You can get a `Traversal` for any existing `Traverse`.
 import arrow.*
 import arrow.optics.*
 import arrow.core.*
-import arrow.data.*
+import arrow.mtl.*
 import arrow.core.extensions.listk.traverse.*
 import arrow.core.extensions.`try`.applicative.*
 

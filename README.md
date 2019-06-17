@@ -72,7 +72,7 @@ Recomended for most use cases:
 Trimmed down versions:
 
 - `arrow-core-data` (Only data types)
-- `arrow-core` (data typestype and class extensions)
+- `arrow-core` (Data types and class extensions)
 
 # Current stable version 0.9.0
 

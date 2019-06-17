@@ -11,10 +11,10 @@ import arrow.core.extensions.option.eq.eq
 import arrow.core.extensions.option.functor.functor
 import arrow.core.toT
 import arrow.core.ListK
-import arrow.data.State
+import arrow.mtl.State
 import arrow.core.k
-import arrow.data.map
-import arrow.data.run
+import arrow.mtl.map
+import arrow.mtl.run
 import arrow.mtl.runId
 import arrow.test.UnitSpec
 import arrow.test.generators.functionAToB

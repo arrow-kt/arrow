@@ -4,16 +4,16 @@ import arrow.core.Option
 import arrow.core.Try
 import arrow.core.Tuple2
 import arrow.core.toT
-import arrow.data.State
-import arrow.data.StatePartialOf
-import arrow.data.StateApi
-import arrow.data.extensions.monad
-import arrow.data.fix
-import arrow.data.run
+import arrow.mtl.State
+import arrow.mtl.StatePartialOf
+import arrow.mtl.StateApi
 import arrow.effects.IO
 import arrow.effects.extensions.io.monadDefer.monadDefer
 import arrow.effects.fix
 import arrow.effects.typeclasses.MonadDefer
+import arrow.mtl.extensions.monad
+import arrow.mtl.fix
+import arrow.mtl.run
 import arrow.typeclasses.Monad
 import java.util.Random
 

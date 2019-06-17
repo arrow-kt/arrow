@@ -1,4 +1,4 @@
-package arrow.data
+package arrow.mtl
 
 import arrow.core.ForId
 import arrow.core.Id

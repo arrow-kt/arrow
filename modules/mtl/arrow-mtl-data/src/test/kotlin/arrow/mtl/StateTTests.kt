@@ -1,4 +1,4 @@
-package arrow.data
+package arrow.mtl
 
 import arrow.Kind
 import arrow.core.Either
@@ -9,8 +9,6 @@ import arrow.core.ListK
 import arrow.core.extensions.`try`.monad.monad
 import arrow.core.extensions.listk.monad.monad
 import arrow.core.extensions.listk.semigroupK.semigroupK
-import arrow.data.extensions.statet.applicative.applicative
-import arrow.data.extensions.statet.semigroupK.semigroupK
 import arrow.effects.ForIO
 import arrow.effects.IO
 import arrow.effects.extensions.io.applicativeError.attempt
@@ -19,8 +17,10 @@ import arrow.effects.extensions.io.monad.monad
 import arrow.effects.extensions.statet.async.async
 import arrow.mtl.extensions.StateTMonadState
 import arrow.mtl.extensions.listk.monadCombine.monadCombine
+import arrow.mtl.extensions.statet.applicative.applicative
 import arrow.mtl.extensions.statet.monadCombine.monadCombine
 import arrow.mtl.extensions.statet.monadState.monadState
+import arrow.mtl.extensions.statet.semigroupK.semigroupK
 import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
 import arrow.test.laws.MonadCombineLaws

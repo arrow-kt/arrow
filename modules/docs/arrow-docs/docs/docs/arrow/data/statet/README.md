@@ -27,7 +27,7 @@ So let's rewrite the example of [`State` docs]({{ '/docs/arrow/data/state' | rel
 ```kotlin:ank:silent
 import arrow.*
 import arrow.core.*
-import arrow.data.*
+import arrow.mtl.*
 import arrow.typeclasses.*
 
 typealias Stack = List<String>
@@ -133,9 +133,9 @@ While our code looks very similar to what we had before there are some key advan
 
 ```kotlin:ank
 import arrow.typeclasses.*
-import arrow.data.extensions.*
+import arrow.mtl.extensions.*
 import arrow.core.extensions.either.monadError.*
-import arrow.data.extensions.statet.monad.binding
+import arrow.mtl.extensions.statet.monad.binding
 
 fun stackOperationsS2() =
   binding<EitherPartialOf<StackError>, Stack, String>(Either.monadError<StackError>()) {
@@ -156,7 +156,7 @@ stackOperationsS2().runM(Either.monad<StackError>(), listOf())
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.data.*
+import arrow.mtl.*
 import arrow.core.*
 
 DataType(StateT::class).tcMarkdownList()
