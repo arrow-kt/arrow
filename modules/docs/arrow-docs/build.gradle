@@ -20,7 +20,7 @@ dependencies {
     compile project(':arrow-validation')
     compile project(':arrow-recursion-extensions')
     compile project(':arrow-integrations-retrofit-adapter')
-    compile project(':arrow-mtl')
+    compile project(':arrow-mtl-data')
     compile project(':arrow-free-data')
     compile project(':arrow-test')
     compile project(':arrow-free-extensions')

@@ -1,4 +1,4 @@
-# Module `arrow-mtl`
+# Module `arrow-mtl-data`
 
 # Package arrow.mtl.typeclasses
 

@@ -19,7 +19,6 @@ import arrow.typeclasses.Applicative
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Nested
 import arrow.typeclasses.Traverse
-import arrow.typeclasses.fix
 import arrow.typeclasses.unnest
 
 @extension

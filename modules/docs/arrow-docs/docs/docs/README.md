@@ -93,7 +93,8 @@ dependencies {
 
     compile "io.arrow-kt:arrow-free-data:$arrow_version" //optional
     compile "io.arrow-kt:arrow-free-extensions:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-mtl:$arrow_version" //optional
+    compile "io.arrow-kt:arrow-mtl-data:$arrow_version" //optional
+    compile "io.arrow-kt:arrow-mtl-extensions:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects-data:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects-extensions:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects-io-extensions:$arrow_version" //optional

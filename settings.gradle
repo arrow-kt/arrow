@@ -48,7 +48,8 @@ include {
             _ 'extras-extensions'
             _ 'generic'
             _ 'kindedj'
-            _ 'mtl'
+            _ 'mtl-extensions'
+            _ 'mtl-data'
             _ 'syntax'
             _ 'test'
         }

@@ -6,7 +6,6 @@ import arrow.data.KleisliPartialOf
 import arrow.data.extensions.KleisliMonadError
 import arrow.data.extensions.KleisliMonad
 import arrow.data.fix
-
 import arrow.extension
 import arrow.mtl.typeclasses.MonadReader
 import arrow.typeclasses.Monad
