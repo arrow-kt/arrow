@@ -3,15 +3,10 @@
 package arrow.core.extensions
 
 import arrow.Kind
-import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
-import arrow.core.Eval
-import arrow.core.ForTuple2
-import arrow.core.Tuple10
+import arrow.extension
 import arrow.core.Tuple2
-import arrow.core.Tuple2Of
-import arrow.core.Tuple2PartialOf
 import arrow.core.Tuple3
 import arrow.core.Tuple4
 import arrow.core.Tuple5
@@ -19,23 +14,30 @@ import arrow.core.Tuple6
 import arrow.core.Tuple7
 import arrow.core.Tuple8
 import arrow.core.Tuple9
+import arrow.core.Tuple10
+import arrow.core.Tuple2PartialOf
+import arrow.core.Tuple2Of
+import arrow.core.Either
 import arrow.core.fix
-import arrow.core.identity
+import arrow.core.ForTuple2
 import arrow.core.toT
-import arrow.extension
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.Apply
-import arrow.typeclasses.Bifunctor
-import arrow.typeclasses.Comonad
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Foldable
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Hash
-import arrow.typeclasses.Monad
-import arrow.typeclasses.Monoid
+import arrow.core.Eval
+import arrow.core.identity
 import arrow.typeclasses.Semigroup
-import arrow.typeclasses.Show
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Bifunctor
+import arrow.typeclasses.Apply
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Monad
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Bifoldable
 import arrow.typeclasses.Traverse
+import arrow.typeclasses.Bitraverse
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Hash
+import arrow.typeclasses.Show
+import arrow.typeclasses.Comonad
 import arrow.core.extensions.traverse as tuple2Traverse
 
 // TODO this should be user driven allowing consumers to generate the tuple arities on demand to avoid cluttering arrow dependents with unused code
@@ -120,6 +122,14 @@ interface Tuple2Foldable<F> : Foldable<Tuple2PartialOf<F>> {
     fix().foldR(lb, f)
 }
 
+@extension
+interface Tuple2Bifoldable : Bifoldable<ForTuple2> {
+  override fun <A, B, C> Tuple2Of<A, B>.bifoldLeft(c: C, f: (C, A) -> C, g: (C, B) -> C): C = fix().let { g(f(c, it.a), it.b) }
+
+  override fun <A, B, C> Tuple2Of<A, B>.bifoldRight(c: Eval<C>, f: (A, Eval<C>) -> Eval<C>, g: (B, Eval<C>) -> Eval<C>): Eval<C> =
+    fix().let { f(it.a, g(it.b, c)) }
+}
+
 fun <F, G, A, B> Tuple2Of<F, A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Tuple2<F, B>> = GA.run {
   fix().let { f(it.b).map(it.a::toT) }
 }
@@ -132,6 +142,14 @@ interface Tuple2Traverse<F> : Traverse<Tuple2PartialOf<F>>, Tuple2Foldable<F> {
 
   override fun <G, A, B> Tuple2Of<F, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Tuple2<F, B>> =
     tuple2Traverse(AP, f)
+}
+
+@extension
+interface Tuple2Bitraverse : Bitraverse<ForTuple2>, Tuple2Bifoldable {
+  override fun <G, A, B, C, D> Tuple2Of<A, B>.bitraverse(AP: Applicative<G>, f: (A) -> Kind<G, C>, g: (B) -> Kind<G, D>): Kind<G, Tuple2Of<C, D>> =
+    AP.run {
+      fix().let { tupled(f(it.a), g(it.b)) }
+    }
 }
 
 @extension

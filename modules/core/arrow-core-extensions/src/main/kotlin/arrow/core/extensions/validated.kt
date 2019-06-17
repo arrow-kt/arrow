@@ -11,6 +11,8 @@ import arrow.core.fix
 import arrow.core.ap
 import arrow.core.handleLeftWith
 import arrow.core.combineK
+import arrow.core.ForValidated
+import arrow.core.ValidatedOf
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
@@ -23,6 +25,8 @@ import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
+import arrow.typeclasses.Bitraverse
+import arrow.typeclasses.Bifoldable
 import arrow.undocumented
 import arrow.core.traverse as validatedTraverse
 
@@ -79,6 +83,26 @@ interface ValidatedTraverse<E> : Traverse<ValidatedPartialOf<E>>, ValidatedFolda
 
   override fun <G, A, B> Kind<ValidatedPartialOf<E>, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Validated<E, B>> =
     fix().validatedTraverse(AP, f)
+}
+
+@extension
+interface ValidatedBifoldable : Bifoldable<ForValidated> {
+  override fun <A, B, C> ValidatedOf<A, B>.bifoldLeft(c: C, f: (C, A) -> C, g: (C, B) -> C): C =
+    fix().fold({ f(c, it) }, { g(c, it) })
+
+  override fun <A, B, C> ValidatedOf<A, B>.bifoldRight(c: Eval<C>, f: (A, Eval<C>) -> Eval<C>, g: (B, Eval<C>) -> Eval<C>): Eval<C> =
+    fix().fold({ f(it, c) }, { g(it, c) })
+}
+
+@extension
+interface ValidatedBitraverse : Bitraverse<ForValidated>, ValidatedBifoldable {
+  override fun <G, A, B, C, D> ValidatedOf<A, B>.bitraverse(AP: Applicative<G>, f: (A) -> Kind<G, C>, g: (B) -> Kind<G, D>): Kind<G, ValidatedOf<C, D>> =
+    fix().let {
+      AP.run {
+        it.fold({ f(it).map { Invalid(it) } },
+          { g(it).map { Valid(it) } })
+      }
+    }
 }
 
 @extension

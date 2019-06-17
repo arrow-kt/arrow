@@ -11,6 +11,7 @@ import arrow.core.extensions.ior.hash.hash
 import arrow.core.extensions.ior.monad.monad
 import arrow.core.extensions.ior.show.show
 import arrow.core.extensions.ior.traverse.traverse
+import arrow.core.extensions.ior.bitraverse.bitraverse
 import arrow.core.Ior.Right
 import arrow.test.UnitSpec
 import arrow.test.laws.BifunctorLaws
@@ -18,6 +19,7 @@ import arrow.test.laws.HashLaws
 import arrow.test.laws.MonadLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
+import arrow.test.laws.BitraverseLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
@@ -44,7 +46,8 @@ class IorTest : UnitSpec() {
       ShowLaws.laws(Ior.show(), EQ) { Right(it) },
       MonadLaws.laws(Ior.monad(Int.semigroup()), Eq.any()),
       TraverseLaws.laws(Ior.traverse(), Ior.applicative(Int.semigroup()), ::Right, Eq.any()),
-      HashLaws.laws(Ior.hash(Hash.any(), Int.hash()), Ior.eq(Eq.any(), Int.eq())) { Right(it) }
+      HashLaws.laws(Ior.hash(Hash.any(), Int.hash()), Ior.eq(Eq.any(), Int.eq())) { Right(it) },
+      BitraverseLaws.laws(Ior.bitraverse(), { Right(it) }, Eq.any())
     )
 
     "bimap() should allow modify both value" {
