@@ -2,7 +2,7 @@ apply plugin: 'kotlin'
 apply plugin: 'kotlin-kapt'
 
 dependencies {
-    compile project(":arrow-core-extensions")
+    compile project(":arrow-core")
     compile project(":arrow-extras-extensions")
     compile project(":arrow-effects-io-extensions")
 

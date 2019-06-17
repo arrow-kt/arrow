@@ -72,7 +72,7 @@ Recomended for most use cases:
 Trimmed down versions:
 
 - `arrow-core-data` (Only data types)
-- `arrow-core-extensions` (Only type class extensions)
+- `arrow-core` (Only type class extensions)
 
 # Current stable version 0.9.0
 
@@ -90,7 +90,7 @@ Add the dependencies into the project's `build.gradle`
 def arrow_version = "0.9.1-SNAPSHOT"
 dependencies {
     compile "io.arrow-kt:arrow-core-data:$arrow_version"
-    compile "io.arrow-kt:arrow-core-extensions:$arrow_version"
+    compile "io.arrow-kt:arrow-core:$arrow_version"
     compile "io.arrow-kt:arrow-syntax:$arrow_version"
     compile "io.arrow-kt:arrow-typeclasses:$arrow_version"
     compile "io.arrow-kt:arrow-extras-data:$arrow_version"
@@ -101,7 +101,7 @@ dependencies {
     compile "io.arrow-kt:arrow-free-data:$arrow_version" //optional
     compile "io.arrow-kt:arrow-free-extensions:$arrow_version" //optional
     compile "io.arrow-kt:arrow-mtl-data:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-mtl-extensions:$arrow_version" //optional
+    compile "io.arrow-kt:arrow-mtl:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects-data:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects-extensions:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects-io-extensions:$arrow_version" //optional

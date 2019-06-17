@@ -3,8 +3,7 @@ apply plugin: 'kotlin-kapt'
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     compile project(':arrow-annotations')
-    compile project(':arrow-core-data')
-    compile project(':arrow-core-extensions')
+    compile project(':arrow-core')
     kapt project(':arrow-meta')
     kaptTest project(':arrow-meta')
     compileOnly project(':arrow-meta')
@@ -13,7 +12,7 @@ dependencies {
     testCompile "io.kotlintest:kotlintest-runner-junit4:$kotlinTestVersion"
     testCompile project(':arrow-test')
     testCompile project(':arrow-syntax')
-    testCompile project(':arrow-mtl-extensions')
+    testCompile project(':arrow-mtl')
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
