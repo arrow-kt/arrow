@@ -168,6 +168,8 @@ We will list them by their hierarchy.
 
 - [`Bifoldable`]({{ '/docs/arrow/typeclasses/bifoldable/' | relative_url }}) - same as foldable, but for structures with more than one possible type, like either
 
+- [`Bitraverse`]({{ '/docs/apidocs/arrow-typeclasses/arrow.typeclasses/-bitraverse/' | relative_url }}) - For those structures which are `Bifoldable` adds the functionality of `Traverse` in each side of the datatype
+
 - [`Reducible`]({{ '/docs/arrow/typeclasses/reducible/' | relative_url }}) - structures that can be combined to a summary value
 
 - [`Traverse`]({{ '/docs/arrow/typeclasses/traverse/' | relative_url }}) - has a structure for which each element can be visited and get applied an effect
