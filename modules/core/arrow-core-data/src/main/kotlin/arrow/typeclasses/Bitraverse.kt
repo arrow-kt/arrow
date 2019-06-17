@@ -19,22 +19,39 @@ import arrow.typeclasses.internal.IdBimonad
  *
  * `Bitraverse` perfoms a`Traverse` over both side of the Data type which is `Bifoldable`.
  *
- * ```kotlin
+ * ```kotlin:ank:playground
+ * import arrow.core.*
+ * import arrow.core.extensions.option.applicative.applicative
+ * import arrow.core.extensions.*
+ * import arrow.core.extensions.tuple2.bitraverse.bitraverse
+ * fun main() {
+ * //sampleStart
  *  val f: (Int) -> Option<Int> = { Some(it + 1) }
  *  val g: (Int) -> Option<Int> = { Some(it * 3) }
  *
  *  val tuple = Tuple2(1, 2)
  *  val bitraverseResult = tuple.bitraverse(Option.applicative(), f, g)
- *  //Some(Tuple2(2, 6))
+ *  //sampleEnd
+ *  println(bitraverseResult)
+ * }
  * ```
  *
  * ## Bisequence
  *
  * `Bisequence` invert the original structure `F<G<A,B>>` to `G<F<A>,F<B>>`
- * ```kotlin
+ * `Bisequence` invert the original structure `F<G<A,B>>` to `G<F<A>,F<B>>`
+ * ```kotlin:ank:playground
+ * import arrow.core.*
+ * import arrow.core.extensions.*
+ * import arrow.core.extensions.option.applicative.applicative
+ * import arrow.core.extensions.tuple2.bitraverse.bisequence
+ * fun main() {
+ *  //sampleStart
  *  val tuple = Tuple2(Some(1), Some(2))
  *  val sequenceResult = tuple.bisequence(Option.applicative())
- *  //Some(Tuple2(1, 2))
+ * //sampleEnd
+ *  println(sequenceResult)
+ * }
  * ```
  */
 @documented
