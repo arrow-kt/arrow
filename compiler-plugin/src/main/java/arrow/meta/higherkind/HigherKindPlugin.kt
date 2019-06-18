@@ -1,5 +1,6 @@
 package arrow.meta.higherkind
 
+import arrow.meta.extensions.CompilerContext
 import arrow.meta.extensions.ExtensionPhase
 import arrow.meta.extensions.MetaCompilerPlugin
 import com.google.auto.service.AutoService
@@ -15,7 +16,7 @@ import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
-import org.jetbrains.kotlin.descriptors.PackageFragmentProviderImpl
+import org.jetbrains.kotlin.descriptors.PackageFragmentProvider
 import org.jetbrains.kotlin.descriptors.SourceElement
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.ClassDescriptorImpl
@@ -100,33 +101,29 @@ class ContributedPackageFragmentDescriptor(
   override fun getMemberScope(): MemberScope = SimpleMemberScope(members)
 }
 
+
 @AutoService(ComponentRegistrar::class)
 class HigherKindPlugin : MetaCompilerPlugin {
   override fun intercept(): List<ExtensionPhase> =
     meta(
       enableIr(),
+      syntheticResolver(
+        addSyntheticSupertypes = { descriptor, supertypes ->
+          storeDescriptor(descriptor) //store the target descriptor for a later phase
+          val isSubtype = supertypes.any {
+            !(it.constructor.declarationDescriptor?.defaultType?.isInterface() ?: false)
+          }
+          if (!isSubtype && descriptor.shouldApplyKind()) {
+            val hk = descriptor.higherKind()
+            println("${descriptor.name} ~> addSyntheticSupertypes = $hk")
+            supertypes.add(hk)
+          } else {
+            // println("skipped: " + descriptor.name)
+          }
+        }
+      ),
       packageFragmentProvider { project: Project, module: ModuleDescriptor, storageManager: StorageManager, trace: BindingTrace, moduleInfo: ModuleInfo?, lookupTracker: LookupTracker ->
-//        val fragmentDeclarations: ArrayList<Pair<FqName, List<ClassDescriptor>>> = arrayListOf()
-//        module.accept(object : DeclarationDescriptorVisitorEmptyBodies<Unit, Unit>() {
-//          override fun visitDeclarationDescriptor(descriptor: DeclarationDescriptor?, data: Unit?) {
-//            println("packageFragmentProvider.visitDeclarationDescriptor: $descriptor")
-//          }
-//        }, Unit)
-//        module.accept(object : DeclarationDescriptorVisitorEmptyBodies<Unit, Unit>() {
-//          override fun visitClassDescriptor(descriptor: ClassDescriptor?, data: Unit) {
-//            println("packageFragmentProvider.visitClassDescriptor: $descriptor")
-//            if (descriptor?.shouldGenerateKindMarker() == true) {
-//              val kindMarker = descriptor.kindMarker()
-//              val packageName = descriptor.parents.first().fqNameSafe
-//              fragmentDeclarations.add(packageName to listOf(kindMarker))
-//            }
-//          }
-//        }, Unit)
-//        println("Fragment declarations: $fragmentDeclarations")
-//        PackageFragmentProviderImpl(
-//          fragmentDeclarations.map { (name, members) -> ContributedPackageFragmentDescriptor(module, name, members) }
-//        )
-        null
+        AddSupertypesPackageFragmentProvider(this, module)
       },
       syntheticResolver(
         generatePackageSyntheticClasses = { descriptor: PackageFragmentDescriptor, name, ctx, declarationProvider, result ->
@@ -134,39 +131,35 @@ class HigherKindPlugin : MetaCompilerPlugin {
           classDescriptor?.let {
             if (it.shouldGenerateKindMarker()) {
               val kindMarker = descriptor.kindMarker(it.fqNameSafe)
-              println("generatePackageSyntheticClasses.Kind Marker -> ${kindMarker.fqNameSafe}")
+              println("${descriptor.name} : ${it.fqNameSafe} ~> generatePackageSyntheticClasses = $kindMarker")
               result.add(kindMarker)
             }
           }
+        }
+      ),
+      syntheticResolver(
+        generateSyntheticClasses = { thisDescriptor, name, ctx, declarationProvider, result ->
+          println("${thisDescriptor.name} : ${name} ~> syntheticResolver.generateSyntheticClasses = $result")
         },
-        addSyntheticSupertypes = { descriptor, supertypes ->
-          println("addSyntheticSupertypes: $descriptor")
-          val isSubtype = supertypes.any {
-            !(it.constructor.declarationDescriptor?.defaultType?.isInterface() ?: false)
-          }
-          if (!isSubtype && descriptor.shouldApplyKind()) {
-            val hk = descriptor.higherKind()
-            println("syntheticResolver.addSyntheticSupertypes: ${descriptor.parents.toList()}, $supertypes, hk: $hk")
-            println("SuperType -> ${descriptor.name} : $hk")
-            supertypes.add(hk)
-          } else {
-            // println("skipped: " + descriptor.name)
-          }
+        getSyntheticNestedClassNames = { thisDescriptor ->
+          println("${thisDescriptor.name} ~> syntheticResolver.getSyntheticNestedClassNames")
+          listOf(Name.identifier("whatever"))
+        },
+        generatePackageSyntheticClasses = { thisDescriptor, name, ctx, declarationProvider, result ->
+          println("${thisDescriptor.name} ~> PASS 2 ~> syntheticResolver.generatePackageSyntheticClasses,  result : $result")
         }
       ),
       IrGeneration { compilerContext, file, backendContext, bindingContext ->
         backendContext.run {
           file.transformDeclarationsFlat { decl ->
             val result = if (decl is IrClass && decl.descriptor.shouldGenerateKindMarker()) {
-              println("Found IrDeclaration: ${decl.descriptor.name}")
               val higherKindSuperType = irHigherKind(decl)
               decl.superTypes.add(higherKindSuperType)
+              println("${decl.name} ~> IrGeneration.supertypes.add = $higherKindSuperType")
               val marker = kindMarker(decl)
               //decl.getPackageFragment()?.declarations?.add(marker)
+              println("${decl.name} : ${marker.name} ~> IrGeneration.generation = $marker")
               listOf(decl, marker)
-            } else if (decl is IrClass) {
-              println("Found declaration: ${decl.descriptor.name}")
-              listOf(decl)
             } else {
               listOf(decl)
             }
@@ -176,66 +169,89 @@ class HigherKindPlugin : MetaCompilerPlugin {
       }
     )
 
-  private fun ClassDescriptor.shouldGenerateKindMarker(): Boolean =
-    declaredTypeParameters.isNotEmpty() &&
-      fqNameSafe != kindName &&
-      !getAllSuperclassesWithoutAny().any { s -> !s.defaultType.isInterface() }
-
-  private fun ClassDescriptor.shouldApplyKind(debug: Boolean = false): Boolean {
-    if (debug) println("$name shouldApplyKind = ${getAllSuperclassesWithoutAny().toList()}, ${getAllSuperclassesWithoutAny().any { it.name.isSpecial }}, superInterfaces = ${getSuperInterfaces()}")
-    val result = declaredTypeParameters.isNotEmpty() &&
-      fqNameSafe != kindName &&
-      !getSuperInterfaces().contains(module.kindDescriptor)
-    if (debug) println("result: " + result)
-    return result
-  }
-
-  fun ClassDescriptor.kotlinType(
-    typeConstructor: TypeConstructor,
-    typeArguments: List<TypeProjection> = emptyList(),
-    nullable: Boolean = false
-  ): KotlinType {
-    return KotlinTypeFactory.simpleType(
-      annotations = Annotations.EMPTY,
-      constructor = typeConstructor,
-      arguments = typeArguments,
-      nullable = nullable
-    )
-  }
-
-  private fun ClassDescriptor.higherKind(): KotlinType {
-    return kotlinType(
-      typeConstructor = module.resolveClassByFqName(kindName, NoLookupLocation.FROM_BACKEND)?.typeConstructor!!,
-      typeArguments = listOf(
-        typeVariable(fqNameSafe.kindMarkerName.shortNameOrSpecial()),
-        // TypeProjectionImpl(kindMarker().defaultType),
-        typeVariable(declaredTypeParameters[0].name)
-      )
-    )
-  }
-
-  fun ClassDescriptor.typeVariable(
-    name: Name
-  ): TypeProjection =
-    TypeProjectionImpl(TypeParameterDescriptorImpl.createWithDefaultBound(
-      this,
-      Annotations.EMPTY,
-      false,
-      Variance.INVARIANT,
-      name,
-      0).defaultType)
-
-  private fun BackendContext.irHigherKind(decl: IrClass): IrType =
-    irType(
-      className = "arrow.sample.Kind",
-      typeArguments = listOf(
-        //irTypeArgument(decl.descriptor.kindMarkerName.as, witness),
-        irTypeArgument(decl.descriptor.fqNameSafe.kindMarkerName.shortNameOrSpecial(), decl.descriptor),
-        irTypeArgument(decl.typeParameters[0].name, decl.descriptor)
-      )
-    )
-
 }
+
+class AddSupertypesPackageFragmentProvider(val compilerContext: CompilerContext, val module: ModuleDescriptor) : PackageFragmentProvider {
+
+  override fun getPackageFragments(fqName: FqName): List<PackageFragmentDescriptor> {
+    val pckg = module.getPackage(fqName)
+    val descriptorsInPackage = compilerContext.storedDescriptors().filter {
+      it.fqNameSafe.parent() == fqName
+    }
+    val result = descriptorsInPackage.map { descriptor ->
+        val kindMarker = pckg.kindMarker(descriptor.fqNameSafe)
+        kindMarker
+    }
+    println("$fqName ~> getPackageFragments = $result")
+    return listOf(
+      ContributedPackageFragmentDescriptor(module, fqName, result)
+    )
+  }
+
+  override fun getSubPackagesOf(fqName: FqName, nameFilter: (Name) -> Boolean): Collection<FqName> {
+    println("AddSupertypesPackageFramgmentProvider.getSubPackagesOf: $fqName")
+    return emptyList()
+  }
+}
+
+private fun ClassDescriptor.shouldGenerateKindMarker(): Boolean =
+  declaredTypeParameters.isNotEmpty() &&
+    fqNameSafe != kindName &&
+    !getAllSuperclassesWithoutAny().any { s -> !s.defaultType.isInterface() }
+
+private fun ClassDescriptor.shouldApplyKind(debug: Boolean = false): Boolean {
+  if (debug) println("$name shouldApplyKind = ${getAllSuperclassesWithoutAny().toList()}, ${getAllSuperclassesWithoutAny().any { it.name.isSpecial }}, superInterfaces = ${getSuperInterfaces()}")
+  val result = declaredTypeParameters.isNotEmpty() &&
+    fqNameSafe != kindName &&
+    !getSuperInterfaces().contains(module.kindDescriptor)
+  if (debug) println("result: " + result)
+  return result
+}
+
+fun kotlinType(
+  typeConstructor: TypeConstructor,
+  typeArguments: List<TypeProjection> = emptyList(),
+  nullable: Boolean = false
+): KotlinType {
+  return KotlinTypeFactory.simpleType(
+    annotations = Annotations.EMPTY,
+    constructor = typeConstructor,
+    arguments = typeArguments,
+    nullable = nullable
+  )
+}
+
+private fun ClassDescriptor.higherKind(): KotlinType {
+  return kotlinType(
+    typeConstructor = module.resolveClassByFqName(kindName, NoLookupLocation.FROM_BACKEND)?.typeConstructor!!,
+    typeArguments = listOf(
+      typeVariable(fqNameSafe.kindMarkerName.shortNameOrSpecial()),
+      // TypeProjectionImpl(kindMarker().defaultType),
+      typeVariable(declaredTypeParameters[0].name)
+    )
+  )
+}
+
+fun ClassDescriptor.typeVariable(
+  name: Name
+): TypeProjection =
+  TypeProjectionImpl(TypeParameterDescriptorImpl.createWithDefaultBound(
+    this,
+    Annotations.EMPTY,
+    false,
+    Variance.INVARIANT,
+    name,
+    0).defaultType)
+
+private fun BackendContext.irHigherKind(decl: IrClass): IrType =
+  irType(
+    className = "arrow.sample.Kind",
+    typeArguments = listOf(
+      //irTypeArgument(decl.descriptor.kindMarkerName.as, witness),
+      irTypeArgument(decl.descriptor.fqNameSafe.kindMarkerName.shortNameOrSpecial(), decl.descriptor),
+      irTypeArgument(decl.typeParameters[0].name, decl.descriptor)
+    )
+  )
 
 fun BackendContext.irType(
   className: String,

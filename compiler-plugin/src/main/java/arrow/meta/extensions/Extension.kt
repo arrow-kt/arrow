@@ -27,6 +27,7 @@ import org.jetbrains.kotlin.diagnostics.Diagnostic
 import org.jetbrains.kotlin.diagnostics.DiagnosticSink
 import org.jetbrains.kotlin.incremental.components.LookupTracker
 import org.jetbrains.kotlin.ir.declarations.IrFile
+import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.psi.KtFile
@@ -35,6 +36,7 @@ import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.BindingTrace
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
 import org.jetbrains.kotlin.resolve.checkers.DeclarationCheckerContext
+import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.lazy.LazyClassContext
 import org.jetbrains.kotlin.resolve.lazy.declarations.ClassMemberDeclarationProvider
 import org.jetbrains.kotlin.resolve.lazy.declarations.PackageMemberDeclarationProvider
@@ -43,6 +45,7 @@ import org.jetbrains.kotlin.storage.StorageManager
 import org.jetbrains.kotlin.synthetic.JavaSyntheticPropertiesScope
 import org.jetbrains.kotlin.types.KotlinType
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 interface Config
 
@@ -196,7 +199,19 @@ class CompilerContext(
   val project: MockProject,
   val messageCollector: MessageCollector,
   val elementFactory: PsiElementFactory = JavaPsiFacade.getInstance(project).elementFactory
-)
+) {
+  private val descriptorPhaseState = ConcurrentHashMap<FqName, ClassDescriptor>()
+
+  fun storeDescriptor(descriptor: ClassDescriptor): Unit {
+    descriptorPhaseState[descriptor.fqNameSafe] = descriptor
+  }
+
+  fun getStoredDescriptor(fqName: FqName): ClassDescriptor? =
+    descriptorPhaseState[fqName]
+
+  fun storedDescriptors(): List<ClassDescriptor> =
+    descriptorPhaseState.values.toList()
+}
 
 
 //80.58.61.250
