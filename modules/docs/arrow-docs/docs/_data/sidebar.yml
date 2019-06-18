@@ -257,6 +257,9 @@ options:
       - title: Bifoldable
         url: /docs/arrow/typeclasses/bifoldable/
 
+      - title: Bitraverse
+        url: /docs/apidocs/arrow-typeclasses/arrow.typeclasses/-bitraverse/
+
       - title: Traverse
         url: /docs/arrow/typeclasses/traverse/
 

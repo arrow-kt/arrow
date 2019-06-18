@@ -18,6 +18,7 @@ import arrow.typeclasses.Apply
 import arrow.typeclasses.Bifunctor
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Foldable
+import arrow.typeclasses.Bifoldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
@@ -25,6 +26,7 @@ import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
+import arrow.typeclasses.Bitraverse
 import arrow.undocumented
 
 @extension
@@ -94,6 +96,26 @@ interface IorTraverse<L> : Traverse<IorPartialOf<L>>, IorFoldable<L> {
 
   override fun <G, B, C> IorOf<L, B>.traverse(AP: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, Ior<L, C>> =
     fix().traverse(AP, f)
+}
+
+@extension
+interface IorBifoldable : Bifoldable<ForIor> {
+  override fun <A, B, C> IorOf<A, B>.bifoldLeft(c: C, f: (C, A) -> C, g: (C, B) -> C): C =
+    fix().bifoldLeft(c, f, g)
+
+  override fun <A, B, C> IorOf<A, B>.bifoldRight(c: Eval<C>, f: (A, Eval<C>) -> Eval<C>, g: (B, Eval<C>) -> Eval<C>): Eval<C> =
+    fix().bifoldRight(c, f, g)
+}
+
+@extension
+interface IorBitraverse : Bitraverse<ForIor>, IorBifoldable {
+  override fun <G, A, B, C, D> IorOf<A, B>.bitraverse(AP: Applicative<G>, f: (A) -> Kind<G, C>, g: (B) -> Kind<G, D>): Kind<G, IorOf<C, D>> =
+    fix().let {
+      AP.run {
+        it.fold({ f(it).map { Ior.Left(it) } }, { g(it).map { Ior.Right(it) } },
+          { a, b -> map(f(a), g(b)) { Ior.Both(it.a, it.b) } })
+      }
+    }
 }
 
 @extension
