@@ -117,6 +117,7 @@ subprojects { project ->
             suffix = "#L"
         }
 
+        noStdlibLink = true
     }
 
     task codeCoverageReport(type: JacocoReport) {
