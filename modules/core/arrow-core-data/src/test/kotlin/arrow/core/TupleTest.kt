@@ -1,7 +1,7 @@
 package arrow.core
 
 /* FIXME(paco) this code sends gradle into an infinite loop, and turns IntelliJ into a memory churner
-import arrow.data.extensions.eq
+import arrow.core.extensions.eq
 import arrow.core.extensions.monoid
 import arrow.core.extensions.tuple2.comonad.comonad
 import arrow.core.extensions.tuple2.eq.eq

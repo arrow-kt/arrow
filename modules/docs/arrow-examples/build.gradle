@@ -23,7 +23,6 @@ idea {
 }
 
 dependencies {
-    compile project(':arrow-extras-extensions')
     compile project(':arrow-effects-extensions')
     compile project(':arrow-effects-rx2-extensions')
     compile project(':arrow-optics')

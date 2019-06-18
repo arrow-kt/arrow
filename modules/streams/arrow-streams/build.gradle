@@ -2,7 +2,6 @@ apply plugin: 'kotlin-kapt'
 
 dependencies {
     compile project(':arrow-effects-data')
-    compile project(':arrow-extras-extensions')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     testRuntime("org.junit.vintage:junit-vintage-engine:$jUnitVintageVersion")
     testCompile "io.kotlintest:kotlintest-runner-junit4:$kotlinTestVersion"

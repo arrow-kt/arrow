@@ -9,10 +9,8 @@ dependencies {
 //        exclude group: 'io.arrow-kt', module: 'arrow-free'
 //    }
     compile project(':arrow-ank')
-    compile project(':arrow-extras-data')
     compile project(':arrow-core-data')
     compile project(':arrow-test')
-    compile project(':arrow-extras-extensions')
     compile project(':arrow-effects-extensions')
     compile project(':arrow-effects-rx2-extensions')
     compile project(':arrow-effects-reactor-extensions')

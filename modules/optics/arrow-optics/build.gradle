@@ -1,8 +1,6 @@
 apply plugin: 'kotlin-kapt'
 
 dependencies {
-    compile project(':arrow-extras-data')
-    compile project(':arrow-extras-extensions')
     compile project(':arrow-mtl-data')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     testCompile("junit:junit:$jUnitVersion")

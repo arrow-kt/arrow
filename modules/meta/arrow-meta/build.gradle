@@ -18,7 +18,6 @@ dependencies {
     kaptTest 'com.google.auto.service:auto-service:1.0-rc4'
     testCompile "com.google.testing.compile:compile-testing:0.15"
     testCompile fileTree(dir: './src/test/libs', includes: ['*.jar'])
-    testCompile project(":arrow-extras-data")
     testCompile project(":arrow-meta-test-models")
     testCompile project(":arrow-optics")
     testCompile("junit:junit:$jUnitVersion")
