@@ -3,24 +3,19 @@ package arrow.extensions
 import arrow.Kind
 import arrow.Kind2
 import arrow.core.ForFunction1
-import arrow.core.ForId
 import arrow.core.ForOption
 import arrow.core.ForTuple2
 import arrow.core.Function1
-import arrow.core.Id
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.Tuple2
 import arrow.core.fix
 import arrow.core.k
-import arrow.core.value
+import arrow.core.invoke
 import arrow.core.ListK
 import arrow.core.NonEmptyList
-import arrow.mtl.OptionT
 import arrow.core.nel
-import arrow.core.invoke
 import arrow.core.extensions.function1.contravariant.contravariant
-import arrow.core.extensions.id.monad.monad
 import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.option.foldable.foldable
 import arrow.core.extensions.option.functor.functor
@@ -29,22 +24,16 @@ import arrow.core.extensions.tuple2.bifunctor.bifunctor
 import arrow.core.ForListK
 import arrow.core.ForNonEmptyList
 import arrow.core.extensions.nonemptylist.functor.functor
-import arrow.core.extensions.nonemptylist.monad.monad
 import arrow.core.extensions.nonemptylist.applicative.applicative
 import arrow.core.extensions.nonemptylist.foldable.foldable
 import arrow.core.extensions.nonemptylist.traverse.traverse
 import arrow.core.extensions.listk.applicative.applicative
 import arrow.core.extensions.listk.semigroupK.semigroupK
 import arrow.core.extensions.listk.monoidK.monoidK
-import arrow.mtl.OptionTPartialOf
-import arrow.mtl.value
 import arrow.test.UnitSpec
-import arrow.mtl.extensions.ComposedFunctorFilter
-import arrow.mtl.extensions.optiont.functorFilter.functorFilter
 import arrow.test.laws.ApplicativeLaws
 import arrow.test.laws.BifunctorLaws
 import arrow.test.laws.FoldableLaws
-import arrow.test.laws.FunctorFilterLaws
 import arrow.test.laws.FunctorLaws
 import arrow.test.laws.InvariantLaws
 import arrow.test.laws.MonoidKLaws
@@ -72,8 +61,6 @@ import arrow.typeclasses.counnest
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
-typealias OptionTNel = Kind<OptionTPartialOf<ForNonEmptyList>, Int>
-
 @RunWith(KotlinTestRunner::class)
 class ComposedInstancesTest : UnitSpec() {
   init {
@@ -84,17 +71,6 @@ class ComposedInstancesTest : UnitSpec() {
     val EQ_LK_OPTION: Eq<NestedType<ForListK, ForOption, Int>> = Eq { a, b ->
       a.unnest().fix() == b.unnest().fix()
     }
-
-    val EQ_OPTIONT_ID_NEL: Eq<NestedType<OptionTPartialOf<ForId>, OptionTPartialOf<ForNonEmptyList>, Int>> =
-      Eq { a, b ->
-        a.unnest().value().value().fold(
-          { b.unnest().value().value().isEmpty() },
-          { optionA: OptionTNel ->
-            b.unnest().value().value().fix().fold(
-              { false },
-              { it.value() == optionA.value() })
-          })
-      }
 
     val EQ_OPTION_FN1: Eq<NestedType<ForOption, Conested<ForFunction1, Int>, Int>> = Eq { a, b ->
       a.unnest().fix().fold(
@@ -130,7 +106,6 @@ class ComposedInstancesTest : UnitSpec() {
 
     testLaws(
       FunctorLaws.laws(ComposedFunctor(Option.functor(), NonEmptyList.functor()), cf, EQ_OPTION_NEL),
-      FunctorFilterLaws.laws(ComposedFunctorFilter(OptionT.functorFilter(Id.monad()), OptionT.functorFilter(NonEmptyList.monad())), { OptionT.just(Id.monad(), OptionT.just(NonEmptyList.monad(), it)).nest() }, EQ_OPTIONT_ID_NEL),
       ApplicativeLaws.laws(ComposedApplicative(Option.applicative(), NonEmptyList.applicative()), EQ_OPTION_NEL),
       FoldableLaws.laws(ComposedFoldable(Option.foldable(), NonEmptyList.foldable()), cf, Eq.any()),
       TraverseLaws.laws(ComposedTraverse(Option.traverse(), NonEmptyList.traverse(), NonEmptyList.applicative()), ComposedFunctor.invoke(Option.functor(), NonEmptyList.functor()), cf, EQ_OPTION_NEL),

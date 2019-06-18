@@ -1,9 +1,9 @@
-package arrow.data.extensions
+package arrow.ui.extensions
 
 import arrow.Kind
-import arrow.data.Moore
-import arrow.data.MoorePartialOf
-import arrow.data.fix
+import arrow.ui.Moore
+import arrow.ui.MoorePartialOf
+import arrow.ui.fix
 import arrow.extension
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Functor

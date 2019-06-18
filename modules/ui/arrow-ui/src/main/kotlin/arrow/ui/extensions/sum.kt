@@ -1,11 +1,11 @@
-package arrow.data.extensions
+package arrow.ui.extensions
 
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Tuple2
-import arrow.data.Sum
-import arrow.data.SumPartialOf
-import arrow.data.fix
+import arrow.ui.Sum
+import arrow.ui.SumPartialOf
+import arrow.ui.fix
 import arrow.extension
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Contravariant

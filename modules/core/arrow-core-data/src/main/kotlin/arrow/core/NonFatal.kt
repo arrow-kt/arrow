@@ -13,7 +13,6 @@ package arrow.core
  * ```kotlin:ank:playground
  * import arrow.*
  * import arrow.core.*
- * import arrow.data.*
  *
  * fun unsafeFunction(i: Int): String =
  *    when (i) {
@@ -54,8 +53,7 @@ fun NonFatal(t: Throwable): Boolean =
  *
  * ```kotlin:ank:playground
  * import arrow.*
- * import arrow.core.*
- * import arrow.data.*
+ * import arrow.core.*]
  *
  * fun unsafeFunction(i: Int): String =
  *    when (i) {

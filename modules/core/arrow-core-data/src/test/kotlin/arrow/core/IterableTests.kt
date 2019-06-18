@@ -1,7 +1,5 @@
-package arrow.data
+package arrow.core
 
-import arrow.core.case
-import arrow.core.then
 import arrow.syntax.collections.collect
 import arrow.test.UnitSpec
 import io.kotlintest.runner.junit4.KotlinTestRunner

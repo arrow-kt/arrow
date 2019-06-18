@@ -1,4 +1,4 @@
-package arrow.data
+package arrow.ui
 
 import arrow.core.identity
 import arrow.higherkind
