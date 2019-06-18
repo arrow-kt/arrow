@@ -1,4 +1,4 @@
-package arrow.data
+package arrow.mtl
 
 import arrow.Kind
 import arrow.core.Either
@@ -18,10 +18,10 @@ import arrow.core.extensions.listk.monad.monad
 import arrow.core.extensions.listk.monoidK.monoidK
 import arrow.core.extensions.option.monad.monad
 import arrow.core.fix
-import arrow.data.extensions.writert.applicative.applicative
-import arrow.data.extensions.writert.divisible.divisible
-import arrow.data.extensions.writert.monad.monad
-import arrow.data.extensions.writert.monoidK.monoidK
+import arrow.mtl.extensions.writert.applicative.applicative
+import arrow.mtl.extensions.writert.divisible.divisible
+import arrow.mtl.extensions.writert.monad.monad
+import arrow.mtl.extensions.writert.monoidK.monoidK
 import arrow.mtl.extensions.option.monadFilter.monadFilter
 import arrow.mtl.extensions.writert.monadFilter.monadFilter
 import arrow.mtl.extensions.writert.monadWriter.monadWriter

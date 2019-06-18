@@ -128,7 +128,7 @@ stackOperations().runA(Nel.of("hello", "world", "!").some())
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.data.*
+import arrow.mtl.*
 import arrow.core.*
 
 DataType(StateT::class).tcMarkdownList()

@@ -4,7 +4,6 @@ import arrow.Kind
 import arrow.data.Store
 import arrow.data.StorePartialOf
 import arrow.data.fix
-
 import arrow.extension
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Functor
