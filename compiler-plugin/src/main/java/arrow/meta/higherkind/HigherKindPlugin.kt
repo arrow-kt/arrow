@@ -3,7 +3,10 @@ package arrow.meta.higherkind
 import arrow.meta.extensions.ExtensionPhase
 import arrow.meta.extensions.MetaCompilerPlugin
 import com.google.auto.service.AutoService
+import org.jetbrains.kotlin.analyzer.ModuleInfo
 import org.jetbrains.kotlin.backend.common.BackendContext
+import org.jetbrains.kotlin.backend.common.lower.SimpleMemberScope
+import org.jetbrains.kotlin.com.intellij.openapi.project.Project
 import org.jetbrains.kotlin.compiler.plugin.ComponentRegistrar
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
@@ -12,14 +15,16 @@ import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
+import org.jetbrains.kotlin.descriptors.PackageFragmentProviderImpl
 import org.jetbrains.kotlin.descriptors.SourceElement
-import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.ClassDescriptorImpl
+import org.jetbrains.kotlin.descriptors.impl.DeclarationDescriptorVisitorEmptyBodies
+import org.jetbrains.kotlin.descriptors.impl.PackageFragmentDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.TypeParameterDescriptorImpl
 import org.jetbrains.kotlin.descriptors.resolveClassByFqName
+import org.jetbrains.kotlin.incremental.components.LookupTracker
 import org.jetbrains.kotlin.incremental.components.NoLookupLocation
-import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.builders.declarations.IrClassBuilder
 import org.jetbrains.kotlin.ir.builders.declarations.IrFunctionBuilder
 import org.jetbrains.kotlin.ir.builders.declarations.IrValueParameterBuilder
@@ -30,45 +35,27 @@ import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrConstructor
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationOriginImpl
 import org.jetbrains.kotlin.ir.declarations.IrValueParameter
-import org.jetbrains.kotlin.ir.declarations.addMember
-import org.jetbrains.kotlin.ir.declarations.impl.IrConstructorImpl
 import org.jetbrains.kotlin.ir.expressions.IrCall
-import org.jetbrains.kotlin.ir.expressions.impl.IrBlockBodyImpl
-import org.jetbrains.kotlin.ir.expressions.impl.IrDelegatingConstructorCallImpl
 import org.jetbrains.kotlin.ir.symbols.impl.IrTypeParameterSymbolImpl
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.IrTypeArgument
 import org.jetbrains.kotlin.ir.types.impl.IrSimpleTypeImpl
-import org.jetbrains.kotlin.ir.types.toIrType
-import org.jetbrains.kotlin.ir.util.getPackageFragment
 import org.jetbrains.kotlin.ir.util.transformDeclarationsFlat
-import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.psi.KtClassBody
-import org.jetbrains.kotlin.psi.KtDeclaration
-import org.jetbrains.kotlin.psi.KtModifierList
-import org.jetbrains.kotlin.psi.KtObjectDeclaration
-import org.jetbrains.kotlin.psi.KtParameter
-import org.jetbrains.kotlin.psi.KtPrimaryConstructor
-import org.jetbrains.kotlin.psi.KtPureClassOrObject
-import org.jetbrains.kotlin.psi.KtPureElement
-import org.jetbrains.kotlin.psi.KtSecondaryConstructor
-import org.jetbrains.kotlin.psi.KtSuperTypeListEntry
-import org.jetbrains.kotlin.psi.synthetics.SyntheticClassOrObjectDescriptor
+import org.jetbrains.kotlin.resolve.BindingTrace
 import org.jetbrains.kotlin.resolve.DescriptorFactory
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.getAllSuperclassesWithoutAny
 import org.jetbrains.kotlin.resolve.descriptorUtil.getSuperInterfaces
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.resolve.descriptorUtil.parents
-import org.jetbrains.kotlin.resolve.lazy.LazyClassContext
-import org.jetbrains.kotlin.resolve.lazy.declarations.DeclarationProvider
-import org.jetbrains.kotlin.resolve.lazy.declarations.PackageMemberDeclarationProvider
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.storage.LockBasedStorageManager
+import org.jetbrains.kotlin.storage.StorageManager
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.KotlinTypeFactory
+import org.jetbrains.kotlin.types.TypeConstructor
 import org.jetbrains.kotlin.types.TypeProjection
 import org.jetbrains.kotlin.types.TypeProjectionImpl
 import org.jetbrains.kotlin.types.Variance
@@ -79,20 +66,20 @@ val kindName: FqName = FqName("arrow.sample.Kind")
 val ModuleDescriptor.kindDescriptor: ClassDescriptor?
   get () = module.resolveClassByFqName(kindName, NoLookupLocation.FROM_BACKEND)
 
-val ClassDescriptor.kindMarkerName: FqName
+val FqName.kindMarkerName: FqName
   get () {
-    val segments = fqNameSafe.pathSegments()
+    val segments = pathSegments()
     val pck = segments.dropLast(1)
     val simpleName = segments.last()
     return FqName("${pck.joinToString(".")}.For${simpleName.asString()}")
   }
 
-class KindMarkerDescriptor(descriptor: ClassDescriptor) : ClassDescriptorImpl(
-  descriptor.parents.first(),
-  descriptor.kindMarkerName.shortName(),
+class KindMarkerDescriptor(containingDeclaration: DeclarationDescriptor, targetName : FqName) : ClassDescriptorImpl(
+  containingDeclaration,
+  targetName.kindMarkerName.shortName(),
   Modality.FINAL,
   ClassKind.CLASS,
-  listOf(descriptor.module.builtIns.any.defaultType),
+  listOf(containingDeclaration.module.builtIns.any.defaultType),
   SourceElement.NO_SOURCE,
   false,
   LockBasedStorageManager.NO_LOCKS
@@ -102,91 +89,80 @@ class KindMarkerDescriptor(descriptor: ClassDescriptor) : ClassDescriptorImpl(
     listOf(DescriptorFactory.createPrimaryConstructorForObject(this, SourceElement.NO_SOURCE))
 }
 
-class SyntheticDeclaration(
-  private val _parent: KtPureElement,
-  private val _name: String
-) : KtPureClassOrObject {
+fun DeclarationDescriptor.kindMarker(targetName : FqName): ClassDescriptor =
+  KindMarkerDescriptor(this, targetName)
 
-  override fun getName(): String? = _name
-  override fun isLocal(): Boolean = false
-
-  override fun getDeclarations(): List<KtDeclaration> = emptyList()
-  override fun getSuperTypeListEntries(): List<KtSuperTypeListEntry> = emptyList()
-  override fun getCompanionObjects(): List<KtObjectDeclaration> = emptyList()
-
-  override fun hasExplicitPrimaryConstructor(): Boolean = false
-  override fun hasPrimaryConstructor(): Boolean = false
-  override fun getPrimaryConstructor(): KtPrimaryConstructor? = null
-  override fun getPrimaryConstructorModifierList(): KtModifierList? = null
-  override fun getPrimaryConstructorParameters(): List<KtParameter> = emptyList()
-  override fun getSecondaryConstructors(): List<KtSecondaryConstructor> = emptyList()
-
-  override fun getPsiOrParent() = _parent.psiOrParent
-  override fun getParent() = _parent.psiOrParent
-  @Suppress("USELESS_ELVIS")
-  override fun getContainingKtFile() =
-    // in theory `containingKtFile` is `@NotNull` but in practice EA-114080
-    _parent.containingKtFile ?: throw IllegalStateException("containingKtFile was null for $_parent of ${_parent.javaClass}")
-
-  override fun getBody(): KtClassBody? = null
+class ContributedPackageFragmentDescriptor(
+  val module: ModuleDescriptor,
+  val name: FqName,
+  val members: List<DeclarationDescriptor>
+) : PackageFragmentDescriptorImpl(module, name) {
+  override fun getMemberScope(): MemberScope = SimpleMemberScope(members)
 }
-
-fun ClassDescriptor.kindMarker(ctx: LazyClassContext, declarationProvider: PackageMemberDeclarationProvider): ClassDescriptor =
-  SyntheticClassOrObjectDescriptor(
-    ctx,
-    SyntheticDeclaration(declarationProvider.getPackageFiles().first(), parents.first().name.asString()),
-    parents.first().containingDeclaration!!,
-    kindMarkerName.shortName(),
-    source,
-    ctx.declarationScopeProvider.getResolutionScopeForDeclaration(findPsi()!!),
-    Modality.FINAL,
-    Visibilities.PUBLIC,
-    Visibilities.PRIVATE,
-    ClassKind.CLASS,
-    false
-  )
 
 @AutoService(ComponentRegistrar::class)
 class HigherKindPlugin : MetaCompilerPlugin {
   override fun intercept(): List<ExtensionPhase> =
     meta(
       enableIr(),
+      packageFragmentProvider { project: Project, module: ModuleDescriptor, storageManager: StorageManager, trace: BindingTrace, moduleInfo: ModuleInfo?, lookupTracker: LookupTracker ->
+//        val fragmentDeclarations: ArrayList<Pair<FqName, List<ClassDescriptor>>> = arrayListOf()
+//        module.accept(object : DeclarationDescriptorVisitorEmptyBodies<Unit, Unit>() {
+//          override fun visitDeclarationDescriptor(descriptor: DeclarationDescriptor?, data: Unit?) {
+//            println("packageFragmentProvider.visitDeclarationDescriptor: $descriptor")
+//          }
+//        }, Unit)
+//        module.accept(object : DeclarationDescriptorVisitorEmptyBodies<Unit, Unit>() {
+//          override fun visitClassDescriptor(descriptor: ClassDescriptor?, data: Unit) {
+//            println("packageFragmentProvider.visitClassDescriptor: $descriptor")
+//            if (descriptor?.shouldGenerateKindMarker() == true) {
+//              val kindMarker = descriptor.kindMarker()
+//              val packageName = descriptor.parents.first().fqNameSafe
+//              fragmentDeclarations.add(packageName to listOf(kindMarker))
+//            }
+//          }
+//        }, Unit)
+//        println("Fragment declarations: $fragmentDeclarations")
+//        PackageFragmentProviderImpl(
+//          fragmentDeclarations.map { (name, members) -> ContributedPackageFragmentDescriptor(module, name, members) }
+//        )
+        null
+      },
       syntheticResolver(
         generatePackageSyntheticClasses = { descriptor: PackageFragmentDescriptor, name, ctx, declarationProvider, result ->
           val classDescriptor = result.firstOrNull { it.name == name }
           classDescriptor?.let {
             if (it.shouldGenerateKindMarker()) {
-              val kindMarker = it.kindMarker(ctx, declarationProvider)
+              val kindMarker = descriptor.kindMarker(it.fqNameSafe)
               println("generatePackageSyntheticClasses.Kind Marker -> ${kindMarker.fqNameSafe}")
               result.add(kindMarker)
             }
           }
+        },
+        addSyntheticSupertypes = { descriptor, supertypes ->
+          println("addSyntheticSupertypes: $descriptor")
+          val isSubtype = supertypes.any {
+            !(it.constructor.declarationDescriptor?.defaultType?.isInterface() ?: false)
+          }
+          if (!isSubtype && descriptor.shouldApplyKind()) {
+            val hk = descriptor.higherKind()
+            println("syntheticResolver.addSyntheticSupertypes: ${descriptor.parents.toList()}, $supertypes, hk: $hk")
+            println("SuperType -> ${descriptor.name} : $hk")
+            supertypes.add(hk)
+          } else {
+            // println("skipped: " + descriptor.name)
+          }
         }
-//        addSyntheticSupertypes = { descriptor, supertypes ->
-//          println("addSyntheticSupertypes: $descriptor")
-//          val isSubtype = supertypes.any {
-//            !(it.constructor.declarationDescriptor?.defaultType?.isInterface() ?: false)
-//          }
-//          if (!isSubtype && descriptor.shouldApplyKind()) {
-//            val hk = descriptor.higherKind()
-//            println("syntheticResolver.addSyntheticSupertypes: ${descriptor.parents.toList()}, $supertypes, hk: $hk")
-//            println("SuperType -> ${descriptor.name} : $hk")
-//            supertypes.add(hk)
-//          } else {
-//            // println("skipped: " + descriptor.name)
-//          }
-//        }
       ),
       IrGeneration { compilerContext, file, backendContext, bindingContext ->
         backendContext.run {
           file.transformDeclarationsFlat { decl ->
             val result = if (decl is IrClass && decl.descriptor.shouldGenerateKindMarker()) {
               println("Found IrDeclaration: ${decl.descriptor.name}")
-              val witness: ClassDescriptor = decl.descriptor.module.resolveClassByFqName(decl.descriptor.kindMarkerName, NoLookupLocation.FROM_BACKEND)!!
-              val higherKindSuperType = irHigherKind(witness, decl)
+              val higherKindSuperType = irHigherKind(decl)
               decl.superTypes.add(higherKindSuperType)
               val marker = kindMarker(decl)
-              decl.getPackageFragment()?.declarations?.add(marker)
+              //decl.getPackageFragment()?.declarations?.add(marker)
               listOf(decl, marker)
             } else if (decl is IrClass) {
               println("Found declaration: ${decl.descriptor.name}")
@@ -215,12 +191,10 @@ class HigherKindPlugin : MetaCompilerPlugin {
   }
 
   fun ClassDescriptor.kotlinType(
-    name: FqName,
+    typeConstructor: TypeConstructor,
     typeArguments: List<TypeProjection> = emptyList(),
     nullable: Boolean = false
   ): KotlinType {
-    val descriptor = module.resolveClassByFqName(kindMarkerName, NoLookupLocation.FROM_BACKEND)
-    val typeConstructor = descriptor?.typeConstructor!!
     return KotlinTypeFactory.simpleType(
       annotations = Annotations.EMPTY,
       constructor = typeConstructor,
@@ -229,23 +203,34 @@ class HigherKindPlugin : MetaCompilerPlugin {
     )
   }
 
+  private fun ClassDescriptor.higherKind(): KotlinType {
+    return kotlinType(
+      typeConstructor = module.resolveClassByFqName(kindName, NoLookupLocation.FROM_BACKEND)?.typeConstructor!!,
+      typeArguments = listOf(
+        typeVariable(fqNameSafe.kindMarkerName.shortNameOrSpecial()),
+        // TypeProjectionImpl(kindMarker().defaultType),
+        typeVariable(declaredTypeParameters[0].name)
+      )
+    )
+  }
+
   fun ClassDescriptor.typeVariable(
-    name: Name,
-    containingDeclaration: FqName
+    name: Name
   ): TypeProjection =
     TypeProjectionImpl(TypeParameterDescriptorImpl.createWithDefaultBound(
-      module.resolveClassByFqName(containingDeclaration, NoLookupLocation.FROM_BACKEND)!!,
+      this,
       Annotations.EMPTY,
       false,
       Variance.INVARIANT,
       name,
       0).defaultType)
 
-  private fun BackendContext.irHigherKind(witness: ClassDescriptor, decl: IrClass): IrType =
+  private fun BackendContext.irHigherKind(decl: IrClass): IrType =
     irType(
       className = "arrow.sample.Kind",
       typeArguments = listOf(
-        irTypeArgument(witness.name, witness),
+        //irTypeArgument(decl.descriptor.kindMarkerName.as, witness),
+        irTypeArgument(decl.descriptor.fqNameSafe.kindMarkerName.shortNameOrSpecial(), decl.descriptor),
         irTypeArgument(decl.typeParameters[0].name, decl.descriptor)
       )
     )
@@ -308,36 +293,34 @@ fun buildIrConstructor(b: IrFunctionBuilder.() -> Unit): IrConstructor = IrFunct
 }
 
 fun BackendContext.kindMarker(target: IrClass): IrClass {
-  val markerDescriptor = target.descriptor.module.resolveClassByFqName(target.descriptor.kindMarkerName, NoLookupLocation.FROM_BACKEND)!!
-  val anyConstructor = builtIns.any.constructors.single()
   return buildIrClass {
     origin = IRRELEVANT_ORIGIN
-    name = markerDescriptor.name
+    name = target.descriptor.fqNameSafe.kindMarkerName.shortNameOrSpecial()
   }.apply {
     val irClass = this
     parent = target.parent
-    addMember(
-      IrConstructorImpl(
-        UNDEFINED_OFFSET,
-        UNDEFINED_OFFSET,
-        IRRELEVANT_ORIGIN,
-        markerDescriptor.constructors.first(),
-        markerDescriptor.defaultType.toIrType()!!
-      ).also {
-        it.body = IrBlockBodyImpl(
-          UNDEFINED_OFFSET,
-          UNDEFINED_OFFSET,
-          listOf(
-            IrDelegatingConstructorCallImpl(
-              UNDEFINED_OFFSET, UNDEFINED_OFFSET,
-              irBuiltIns.unitType,
-              ir.symbols.externalSymbolTable.referenceConstructor(anyConstructor),
-              anyConstructor
-            )
-          )
-        )
-      }
-    )
+//    addMember(
+//      IrConstructorImpl(
+//        UNDEFINED_OFFSET,
+//        UNDEFINED_OFFSET,
+//        IRRELEVANT_ORIGIN,
+//        markerDescriptor.constructors.first(),
+//        markerDescriptor.defaultType.toIrType()!!
+//      ).also {
+//        it.body = IrBlockBodyImpl(
+//          UNDEFINED_OFFSET,
+//          UNDEFINED_OFFSET,
+//          listOf(
+//            IrDelegatingConstructorCallImpl(
+//              UNDEFINED_OFFSET, UNDEFINED_OFFSET,
+//              irBuiltIns.unitType,
+//              ir.symbols.externalSymbolTable.referenceConstructor(anyConstructor),
+//              anyConstructor
+//            )
+//          )
+//        )
+//      }
+//    )
     superTypes.add(irBuiltIns.anyType)
     thisReceiver = buildIrValueParameter {
       type = IrSimpleTypeImpl(symbol, hasQuestionMark = false, arguments = emptyList(), annotations = emptyList())

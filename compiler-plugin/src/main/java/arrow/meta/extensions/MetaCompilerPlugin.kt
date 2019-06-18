@@ -45,7 +45,6 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtModifierListOwner
-import org.jetbrains.kotlin.psi.synthetics.SyntheticClassOrObjectDescriptor
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.BindingTrace
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
@@ -195,7 +194,7 @@ interface MetaCompilerPlugin : ComponentRegistrar {
         refineDeclarationModality(modifierListOwner, declaration, containingDeclaration, currentModality, bindingContext, isImplicitModality)
     }
 
-  fun packageProvider(getPackageFragmentProvider: CompilerContext.(project: Project, module: ModuleDescriptor, storageManager: StorageManager, trace: BindingTrace, moduleInfo: ModuleInfo?, lookupTracker: LookupTracker) -> PackageFragmentProvider?): ExtensionPhase.PackageProvider =
+  fun packageFragmentProvider(getPackageFragmentProvider: CompilerContext.(project: Project, module: ModuleDescriptor, storageManager: StorageManager, trace: BindingTrace, moduleInfo: ModuleInfo?, lookupTracker: LookupTracker) -> PackageFragmentProvider?): ExtensionPhase.PackageProvider =
     object : ExtensionPhase.PackageProvider {
       override fun CompilerContext.getPackageFragmentProvider(project: Project, module: ModuleDescriptor, storageManager: StorageManager, trace: BindingTrace, moduleInfo: ModuleInfo?, lookupTracker: LookupTracker): PackageFragmentProvider? =
         getPackageFragmentProvider(project, module, storageManager, trace, moduleInfo, lookupTracker)
@@ -303,7 +302,7 @@ interface MetaCompilerPlugin : ComponentRegistrar {
       if (phase is ExtensionPhase.StorageComponentContainer) registerStorageComponentContainer(project, phase, ctx)
       if (phase is ExtensionPhase.Codegen) registerCodegen(project, phase, ctx)
       if (phase is ExtensionPhase.DeclarationAttributeAlterer) registerDeclarationAttributeAlterer(project, phase, ctx)
-      if (phase is ExtensionPhase.PackageProvider) registerPackageProvider(project, phase, ctx)
+      if (phase is ExtensionPhase.PackageProvider) packageFragmentProvider(project, phase, ctx)
       if (phase is ExtensionPhase.SyntheticResolver) registerSyntheticResolver(project, phase, ctx)
       if (phase is ExtensionPhase.IRGeneration) registerIRGeneration(project, phase, ctx)
       //TODO() not available. if (phase is ExtensionPhase.SyntheticScopeProvider) registerSyntheticScopeProvider(project, phase, ctx)
@@ -369,7 +368,7 @@ interface MetaCompilerPlugin : ComponentRegistrar {
     })
   }
 
-  fun registerPackageProvider(project: MockProject, phase: ExtensionPhase.PackageProvider, ctx: CompilerContext) {
+  fun packageFragmentProvider(project: MockProject, phase: ExtensionPhase.PackageProvider, ctx: CompilerContext) {
     PackageFragmentProviderExtension.registerExtension(project, object : PackageFragmentProviderExtension {
       override fun getPackageFragmentProvider(
         project: Project,

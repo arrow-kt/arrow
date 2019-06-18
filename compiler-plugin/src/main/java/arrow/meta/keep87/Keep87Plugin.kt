@@ -2,8 +2,6 @@ package arrow.meta.keep87
 
 import arrow.meta.extensions.ExtensionPhase
 import arrow.meta.extensions.MetaCompilerPlugin
-import com.google.auto.service.AutoService
-import org.jetbrains.kotlin.compiler.plugin.ComponentRegistrar
 
 //@AutoService(ComponentRegistrar::class)
 class Keep87Plugin : MetaCompilerPlugin {
@@ -26,7 +24,7 @@ class Keep87Plugin : MetaCompilerPlugin {
       declarationAttributeAlterer {
         modifierListOwner, declaration, containingDeclaration, currentModality, bindingContext, isImplicitModality -> TODO()
       },
-      packageProvider { project, module, storageManager, trace, moduleInfo, lookupTracker -> TODO() },
+      packageFragmentProvider { project, module, storageManager, trace, moduleInfo, lookupTracker -> TODO() },
       syntheticResolver(
         addSyntheticSupertypes = { thisDescriptor, supertypes -> TODO() },
         generateSyntheticClasses = { thisDescriptor, name, ctx, declarationProvider, result -> TODO() },
