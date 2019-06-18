@@ -1,15 +1,15 @@
-package arrow.data.extensions
+package arrow.ui.extensions
 
 import arrow.Kind
-import arrow.data.Day
-import arrow.data.DayOf
-import arrow.data.DayPartialOf
-import arrow.data.fix
+import arrow.ui.Day
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Functor
+import arrow.ui.DayOf
+import arrow.ui.DayPartialOf
+import arrow.ui.fix
 import arrow.undocumented
 
 @extension

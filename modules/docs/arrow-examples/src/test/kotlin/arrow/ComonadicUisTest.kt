@@ -1,7 +1,7 @@
 package arrow
 
 import arrow.core.Id
-import arrow.data.Day
+import arrow.ui.Day
 import arrow.data.ForStore
 import arrow.data.Store
 import arrow.data.Sum

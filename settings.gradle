@@ -58,6 +58,7 @@ include {
         }
 
         ui {
+            _ 'ui'
             _ 'ui-data'
         }
 
