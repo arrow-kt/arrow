@@ -98,8 +98,14 @@ interface MetaCompilerPlugin : ComponentRegistrar {
       files: Collection<KtFile>
     ) -> AnalysisResult?): ExtensionPhase.AnalysisHandler =
     object : ExtensionPhase.AnalysisHandler {
-      override fun CompilerContext.doAnalysis(project: Project, module: ModuleDescriptor, projectContext: ProjectContext, files: Collection<KtFile>, bindingTrace: BindingTrace, componentProvider: ComponentProvider): AnalysisResult? =
-        doAnalysis(project, module, projectContext, files, bindingTrace, componentProvider)
+      override fun CompilerContext.doAnalysis(project: Project, module: ModuleDescriptor, projectContext: ProjectContext, files: Collection<KtFile>, bindingTrace: BindingTrace, componentProvider: ComponentProvider): AnalysisResult? {
+        ctx.module = module
+        ctx.projectContext = projectContext
+        ctx.files = files
+        ctx.bindingTrace = bindingTrace
+        ctx.componentProvider = componentProvider
+      return doAnalysis(project, module, projectContext, files, bindingTrace, componentProvider)
+    }
 
       override fun CompilerContext.analysisCompleted(project: Project, module: ModuleDescriptor, bindingTrace: BindingTrace, files: Collection<KtFile>): AnalysisResult? =
         analysisCompleted(project, module, bindingTrace, files)
@@ -295,6 +301,7 @@ interface MetaCompilerPlugin : ComponentRegistrar {
     //println("Project allowed extensions: ${Extensions.getArea(project).extensionPoints.toList().joinToString("\n")}")
     val messageCollector: MessageCollector = configuration.get(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY, MessageCollector.NONE)
     val ctx = CompilerContext(project, messageCollector)
+    //registerPostAnalysisContextEnrichment(project, ctx)
     intercept().forEach { phase ->
       if (phase is ExtensionPhase.Config) registerCompilerConfiguration(project, phase, ctx)
       if (phase is ExtensionPhase.AnalysisHandler) registerAnalysisHandler(project, phase, ctx)
@@ -379,6 +386,19 @@ interface MetaCompilerPlugin : ComponentRegistrar {
         lookupTracker: LookupTracker
       ): PackageFragmentProvider? {
         return phase.run { ctx.getPackageFragmentProvider(project, module, storageManager, trace, moduleInfo, lookupTracker) }
+      }
+    })
+  }
+
+  private fun registerPostAnalysisContextEnrichment(project: MockProject, ctx: CompilerContext) {
+    AnalysisHandlerExtension.registerExtension(project, object : AnalysisHandlerExtension {
+      override fun doAnalysis(project: Project, module: ModuleDescriptor, projectContext: ProjectContext, files: Collection<KtFile>, bindingTrace: BindingTrace, componentProvider: ComponentProvider): AnalysisResult? {
+        ctx.module = module
+        ctx.projectContext = projectContext
+        ctx.files = files
+        ctx.bindingTrace = bindingTrace
+        ctx.componentProvider = componentProvider
+        return null
       }
     })
   }

@@ -1,14 +1,10 @@
-package arrow.x
+package arrow.sample
 
-import arrow.sample.ForOption
-import arrow.sample.ForOption
-import arrow.sample.Option
-
+//import arrow.sample.ForOption
 
 object test {
   @JvmStatic
   fun main(args: Array<String>) {
-    val x = Option.whatever
     println(Option::class.java.interfaces.toList().map { it.toGenericString() })
     println(Class.forName("arrow.sample.ForOption"))
   }

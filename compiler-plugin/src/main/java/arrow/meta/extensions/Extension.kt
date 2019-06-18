@@ -200,6 +200,13 @@ class CompilerContext(
   val messageCollector: MessageCollector,
   val elementFactory: PsiElementFactory = JavaPsiFacade.getInstance(project).elementFactory
 ) {
+  val ctx: CompilerContext = this
+  lateinit var module: ModuleDescriptor
+  lateinit var projectContext: ProjectContext
+  lateinit var files: Collection<KtFile>
+  lateinit var bindingTrace: BindingTrace
+  lateinit var componentProvider: ComponentProvider
+
   private val descriptorPhaseState = ConcurrentHashMap<FqName, ClassDescriptor>()
 
   fun storeDescriptor(descriptor: ClassDescriptor): Unit {
@@ -212,8 +219,3 @@ class CompilerContext(
   fun storedDescriptors(): List<ClassDescriptor> =
     descriptorPhaseState.values.toList()
 }
-
-
-//80.58.61.250
-//80.58.61.254
-//k4GlcsQW

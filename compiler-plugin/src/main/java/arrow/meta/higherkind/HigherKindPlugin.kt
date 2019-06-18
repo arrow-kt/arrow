@@ -5,9 +5,13 @@ import arrow.meta.extensions.ExtensionPhase
 import arrow.meta.extensions.MetaCompilerPlugin
 import com.google.auto.service.AutoService
 import org.jetbrains.kotlin.analyzer.ModuleInfo
+import org.jetbrains.kotlin.asJava.finder.KtLightPackage
 import org.jetbrains.kotlin.backend.common.BackendContext
 import org.jetbrains.kotlin.backend.common.lower.SimpleMemberScope
 import org.jetbrains.kotlin.com.intellij.openapi.project.Project
+import org.jetbrains.kotlin.com.intellij.psi.PsiClass
+import org.jetbrains.kotlin.com.intellij.psi.PsiManager
+import org.jetbrains.kotlin.com.intellij.psi.search.ProjectScope
 import org.jetbrains.kotlin.compiler.plugin.ComponentRegistrar
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
@@ -17,7 +21,10 @@ import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentProvider
+import org.jetbrains.kotlin.descriptors.PackageViewDescriptor
 import org.jetbrains.kotlin.descriptors.SourceElement
+import org.jetbrains.kotlin.descriptors.Visibilities
+import org.jetbrains.kotlin.descriptors.Visibility
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.ClassDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.DeclarationDescriptorVisitorEmptyBodies
@@ -44,6 +51,8 @@ import org.jetbrains.kotlin.ir.types.impl.IrSimpleTypeImpl
 import org.jetbrains.kotlin.ir.util.transformDeclarationsFlat
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.psi.psiUtil.allChildren
+import org.jetbrains.kotlin.psi.synthetics.SyntheticClassOrObjectDescriptor
 import org.jetbrains.kotlin.resolve.BindingTrace
 import org.jetbrains.kotlin.resolve.DescriptorFactory
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
@@ -51,6 +60,9 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.getAllSuperclassesWithoutAny
 import org.jetbrains.kotlin.resolve.descriptorUtil.getSuperInterfaces
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.resolve.descriptorUtil.parents
+import org.jetbrains.kotlin.resolve.lazy.ResolveSession
+import org.jetbrains.kotlin.resolve.lazy.ResolveSessionUtils
+import org.jetbrains.kotlin.resolve.lazy.descriptors.LazyClassDescriptor
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.storage.LockBasedStorageManager
 import org.jetbrains.kotlin.storage.StorageManager
@@ -85,6 +97,7 @@ class KindMarkerDescriptor(containingDeclaration: DeclarationDescriptor, targetN
   false,
   LockBasedStorageManager.NO_LOCKS
 ) {
+  override fun getVisibility(): Visibility = Visibilities.PUBLIC
   override fun getUnsubstitutedMemberScope(): MemberScope = MemberScope.Empty
   override fun getConstructors(): Collection<ClassConstructorDescriptor> =
     listOf(DescriptorFactory.createPrimaryConstructorForObject(this, SourceElement.NO_SOURCE))
@@ -101,12 +114,37 @@ class ContributedPackageFragmentDescriptor(
   override fun getMemberScope(): MemberScope = SimpleMemberScope(members)
 }
 
+//fun LazyClassDescriptor.kindMarkerSynthetic(containingDeclaration: DeclarationDescriptor, targetName: FqName): ClassDescriptor =
+//  SyntheticPackageClassOrObjectDescriptor(
+//    c = c,
+//    parentClassOrObject = TODO(),
+//    containingDeclaration = containingDeclaration,
+//    name = targetName.kindMarkerName.shortName(),
+//    source = SourceElement.NO_SOURCE,
+//    outerScope = TODO(),
+//    modality = Modality.FINAL,
+//    visibility = Visibilities.PUBLIC,
+//    constructorVisibility = Visibilities.PUBLIC,
+//    kind = ClassKind.CLASS,
+//    isCompanionObject = false
+//  )
 
 @AutoService(ComponentRegistrar::class)
 class HigherKindPlugin : MetaCompilerPlugin {
   override fun intercept(): List<ExtensionPhase> =
     meta(
       enableIr(),
+      analysys(
+        doAnalysis = { project, module, projectContext, files, bindingTrace, componentProvider ->
+          val declaredElements: List<PsiClass> = files.first().allChildren.toList().filterIsInstance<PsiClass>()
+          println("doAnalysis: $project, $module, $projectContext, $files, $bindingTrace, $componentProvider")
+          null
+        },
+        analysisCompleted = { project, module, bindingTrace, files ->
+          println("analysisCompleted: $project, $module, $bindingTrace, $files")
+          null
+        }
+      ),
       syntheticResolver(
         addSyntheticSupertypes = { descriptor, supertypes ->
           storeDescriptor(descriptor) //store the target descriptor for a later phase
@@ -123,7 +161,12 @@ class HigherKindPlugin : MetaCompilerPlugin {
         }
       ),
       packageFragmentProvider { project: Project, module: ModuleDescriptor, storageManager: StorageManager, trace: BindingTrace, moduleInfo: ModuleInfo?, lookupTracker: LookupTracker ->
+        //KtLightPackage(PsiManager.getInstance(project), FqName("arrow.sample"), ProjectScope.getAllScope(project))
         AddSupertypesPackageFragmentProvider(this, module)
+      },
+      classBuilderFactory { interceptedFactory, bindingContext, diagnostics ->
+        println("classBuilderFactory: ")
+        interceptedFactory
       },
       syntheticResolver(
         generatePackageSyntheticClasses = { descriptor: PackageFragmentDescriptor, name, ctx, declarationProvider, result ->
@@ -143,7 +186,7 @@ class HigherKindPlugin : MetaCompilerPlugin {
         },
         getSyntheticNestedClassNames = { thisDescriptor ->
           println("${thisDescriptor.name} ~> syntheticResolver.getSyntheticNestedClassNames")
-          listOf(Name.identifier("whatever"))
+          emptyList()
         },
         generatePackageSyntheticClasses = { thisDescriptor, name, ctx, declarationProvider, result ->
           println("${thisDescriptor.name} ~> PASS 2 ~> syntheticResolver.generatePackageSyntheticClasses,  result : $result")
@@ -174,7 +217,7 @@ class HigherKindPlugin : MetaCompilerPlugin {
 class AddSupertypesPackageFragmentProvider(val compilerContext: CompilerContext, val module: ModuleDescriptor) : PackageFragmentProvider {
 
   override fun getPackageFragments(fqName: FqName): List<PackageFragmentDescriptor> {
-    val pckg = module.getPackage(fqName)
+    val pckg: PackageViewDescriptor = module.getPackage(fqName)
     val descriptorsInPackage = compilerContext.storedDescriptors().filter {
       it.fqNameSafe.parent() == fqName
     }
