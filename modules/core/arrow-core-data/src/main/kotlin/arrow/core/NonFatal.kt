@@ -53,7 +53,7 @@ fun NonFatal(t: Throwable): Boolean =
  *
  * ```kotlin:ank:playground
  * import arrow.*
- * import arrow.core.*]
+ * import arrow.core.*
  *
  * fun unsafeFunction(i: Int): String =
  *    when (i) {

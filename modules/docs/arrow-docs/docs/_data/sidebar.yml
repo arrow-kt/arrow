@@ -35,8 +35,6 @@ options:
       - title: Type Classes
         url: /docs/apidocs/arrow-typeclasses/
 
-      # TODO: Add title and Url for arrow-core, arrow-ui, arrow-mtl-data
-
       - title: Core Data Types
         url: /docs/apidocs/arrow-core-data/
 

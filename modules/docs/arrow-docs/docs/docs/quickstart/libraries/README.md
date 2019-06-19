@@ -50,7 +50,7 @@ Datatypes: [`Const`]({{ '/docs/typeclasses/const/' | relative_url }})
 Typeclasses: [`Alternative`]({{ '/docs/arrow/typeclasses/alternative/' | relative_url }}), [`Bimonad`]({{ '/docs/arrow/typeclasses/bimonad/' | relative_url }}), [`Inject`]({{ '/docs/typeclasses/inject/' | relative_url }}), [`Reducible`]({{ '/docs/arrow/typeclasses/reducible/' | relative_url }}), [`Traverse`]({{ '/docs/arrow/typeclasses/traverse/' | relative_url }}), [`Applicative`]({{ '/docs/arrow/typeclasses/applicative/' | relative_url }}), [`Comonad`]({{ '/docs/arrow/typeclasses/comonad/' | relative_url }}), [`Eq`]({{ '/docs/arrow/typeclasses/eq/' | relative_url }}), [`Monad`]({{ '/docs/arrow/typeclasses/monad/' | relative_url }}), [`Monoid`]({{ '/docs/arrow/typeclasses/monoid/' | relative_url }}), [`Semigroup`]({{ '/docs/arrow/typeclasses/semigroup/' | relative_url }}), [`ApplicativeError`]({{ '/docs/arrow/typeclasses/applicativeerror/' | relative_url }}), [`Foldable`]({{ '/docs/arrow/typeclasses/foldable/' | relative_url }}), [`MonoidK`]({{ '/docs/arrow/typeclasses/monoidk/' | relative_url }}), [`SemigroupK`]({{ '/docs/arrow/typeclasses/semigroupk/' | relative_url }}), [`Bifoldable`]({{ '/docs/arrow/typeclasses/bifoldable/' | relative_url }}), [`Functor`]({{ '/docs/arrow/typeclasses/functor/' | relative_url }}), [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror/' | relative_url }}), [`Order`]({{ '/docs/arrow/typeclasses/order/' | relative_url }}), [`Show`]({{ '/docs/arrow/typeclasses/show/' | relative_url }}), `Composed`
 
 ### arrow-extras 
-// TODO: change readme
+
 {:.beginner}
 beginner
 
@@ -58,7 +58,7 @@ This library focuses on expanding the helpers provided by typeclasses to existin
 You can also find more advanced constructs for pure functional programming like the `RWS` datatypes, or transformers.
 
 Dependencies: arrow-core-data
-// TODO: Change locations in Readme before merge
+
 Datatypes: [`Cokleisli`]({{ '/docs/datatypes/cokleisli/' | relative_url }}), [`Coreader`]({{ '/docs/datatypes/coreader/' | relative_url }}), [`Ior`]({{ '/docs/arrow/data/ior/' | relative_url }}), [`ListK`]({{ '/docs/arrow/data/listk/' | relative_url }}), [`NonEmptyList`]({{ '/docs/arrow/data/nonemptylist/' | relative_url }}), [`SequenceK`]({{ '/docs/arrow/data/sequencek/' | relative_url }}), [`SortedMapK`]({{ '/docs/arrow/data/sortedmapk/' | relative_url }}), [`StateT`]({{ '/docs/arrow/data/statet/' | relative_url }}), [`WriterT`]({{ '/docs/arrow/data/writert/' | relative_url }}), [`EitherT`]({{ '/docs/arrow/data/eithert/' | relative_url }}), [`Kleisli`]({{ '/docs/arrow/data/kleisli/' | relative_url }}), [`MapK`]({{ '/docs/arrow/data/mapk/' | relative_url }}), [`OptionT`]({{ '/docs/arrow/data/optiont/' | relative_url }}), [`Reader`]({{ '/docs/arrow/data/reader/' | relative_url }}), [`SetK`]({{ '/docs/arrow/data/setk/' | relative_url }}), [`State`]({{ '/docs/arrow/data/state/' | relative_url }}), [`Validated`]({{ '/docs/arrow/data/validated/' | relative_url }})
 
 ### arrow-core, arrow-effects-extensions
