@@ -121,6 +121,22 @@ fun ClassDescriptor.shouldGenerateKindMarker(): Boolean =
     fqNameSafe != kindName &&
     !getAllSuperclassesWithoutAny().any { s -> !s.defaultType.isInterface() }
 
+//fun LazyClassDescriptor.kindMarkerSynthetic(containingDeclaration: DeclarationDescriptor, targetName: FqName): ClassDescriptor =
+//  SyntheticPackageClassOrObjectDescriptor(
+//    c = c,
+//    parentClassOrObject = TODO(),
+//    containingDeclaration = containingDeclaration,
+//    name = targetName.kindMarkerName.shortName(),
+//    source = SourceElement.NO_SOURCE,
+//    outerScope = TODO(),
+//    modality = Modality.FINAL,
+//    visibility = Visibilities.PUBLIC,
+//    constructorVisibility = Visibilities.PUBLIC,
+//    kind = ClassKind.CLASS,
+//    isCompanionObject = false
+//  )
+
+
 fun ClassDescriptor.shouldApplyKind(debug: Boolean = false): Boolean {
   if (debug) println("$name shouldApplyKind = ${getAllSuperclassesWithoutAny().toList()}, ${getAllSuperclassesWithoutAny().any { it.name.isSpecial }}, superInterfaces = ${getSuperInterfaces()}")
   val result = declaredTypeParameters.isNotEmpty() &&
