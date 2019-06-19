@@ -8,13 +8,13 @@ import arrow.core.toOption
 import arrow.core.toT
 import arrow.core.ForListK
 import arrow.core.ListK
-import arrow.data.State
+import arrow.mtl.State
 import arrow.core.extensions.listk.eq.eq
 import arrow.core.extensions.listk.traverse.traverse
 import arrow.core.fix
 import arrow.core.k
-import arrow.data.map
-import arrow.data.run
+import arrow.mtl.map
+import arrow.mtl.run
 import arrow.test.UnitSpec
 import arrow.test.generators.functionAToB
 import arrow.test.generators.listK

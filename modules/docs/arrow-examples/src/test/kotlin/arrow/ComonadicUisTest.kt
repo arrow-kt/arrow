@@ -1,12 +1,12 @@
 package arrow
 
 import arrow.core.Id
-import arrow.data.Day
-import arrow.data.ForStore
-import arrow.data.Store
-import arrow.data.Sum
+import arrow.ui.Day
+import arrow.ui.ForStore
+import arrow.ui.Store
+import arrow.ui.Sum
 import arrow.core.extensions.id.comonad.comonad
-import arrow.data.extensions.store.comonad.comonad
+import arrow.ui.extensions.store.comonad.comonad
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.FreeSpec
 

@@ -10,7 +10,6 @@ dependencies {
     testCompileOnly project(':arrow-meta')
     testRuntime("org.junit.vintage:junit-vintage-engine:$jUnitVintageVersion")
     testCompile "io.kotlintest:kotlintest-runner-junit4:$kotlinTestVersion"
-    testCompile project(':arrow-extras-extensions')
     testCompile project(':arrow-test')
 }
 

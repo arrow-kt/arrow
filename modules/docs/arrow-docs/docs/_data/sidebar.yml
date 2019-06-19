@@ -38,15 +38,6 @@ options:
       - title: Core Data Types
         url: /docs/apidocs/arrow-core-data/
 
-      - title: Core Extensions
-        url: /docs/apidocs/arrow-core-extensions/
-
-      - title: Core Extra Data Types
-        url: /docs/apidocs/arrow-extras/
-
-      - title: Core Extra Extensions
-        url: /docs/apidocs/arrow-extras-extensions/
-
       - title: Effects
         url: /docs/apidocs/arrow-effects-data/
 
@@ -94,6 +85,7 @@ options:
 
       - title: Validation
         url: /docs/apidocs/arrow-validation/
+
 
   - title: Patterns
 
@@ -195,9 +187,6 @@ options:
 
       - title: Trampoline
         url: /docs/arrow/free/trampoline/
-
-      - title: Coproduct
-        url: /docs/arrow/data/coproduct/
 
       - title: Eval
         url: /docs/apidocs/arrow-core-data/arrow.core/-eval/
@@ -452,9 +441,6 @@ options:
 
   - title: Generic
     nested_options:
-
-      - title: Coproduct
-        url: /docs/generic/coproduct/
 
       - title: Product
         url: /docs/generic/product/

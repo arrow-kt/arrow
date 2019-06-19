@@ -58,7 +58,7 @@ Arrow modules are exported and published with the following semantics.
 
 If we take for example `arrow-core`.
 
-Arrow core contains the basic arrow type classes and data types and it's composed of 3 main artifacts that may be used a la carte:
+Arrow core contains the basic arrow type classes and data types and it's composed of 2 main artifacts that may be used a la carte:
 
 Recomended for most use cases:
 
@@ -66,8 +66,8 @@ Recomended for most use cases:
 
 Trimmed down versions:
 
-- `arrow-core-data` (Only data types)
-- `arrow-core-extensions` (Only type class extensions)
+- `arrow-core-data` (Only data types & typeclasses)
+- `arrow-core` (Data types, typeclasses & type class extensions)
 
 # Current stable version 0.9.0
 
@@ -85,14 +85,13 @@ Add the dependencies into the project's `build.gradle`
 def arrow_version = "0.9.1-SNAPSHOT"
 dependencies {
     compile "io.arrow-kt:arrow-core-data:$arrow_version"
-    compile "io.arrow-kt:arrow-core-extensions:$arrow_version"
+    compile "io.arrow-kt:arrow-core:$arrow_version"
     compile "io.arrow-kt:arrow-syntax:$arrow_version"
-    compile "io.arrow-kt:arrow-extras-data:$arrow_version"
-    compile "io.arrow-kt:arrow-extras-extensions:$arrow_version"
     kapt    "io.arrow-kt:arrow-meta:$arrow_version"
 
     compile "io.arrow-kt:arrow-free-data:$arrow_version" //optional
     compile "io.arrow-kt:arrow-free-extensions:$arrow_version" //optional
+    compile "io.arrow-kt:arrow-mtl-data:$arrow_version" //optional
     compile "io.arrow-kt:arrow-mtl:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects-data:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects-extensions:$arrow_version" //optional
@@ -170,32 +169,12 @@ Add the dependencies that you want to use
 ```
         <dependency>
             <groupId>io.arrow-kt</groupId>
-            <artifactId>arrow-core-data</artifactId>
-            <version>${arrow.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.arrow-kt</groupId>
-            <artifactId>arrow-core-extensions</artifactId>
+            <artifactId>arrow-core</artifactId>
             <version>${arrow.version}</version>
         </dependency>
         <dependency>
             <groupId>io.arrow-kt</groupId>
             <artifactId>arrow-syntax</artifactId>
-            <version>${arrow.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.arrow-kt</groupId>
-            <artifactId>arrow-typeclasses</artifactId>
-            <version>${arrow.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.arrow-kt</groupId>
-            <artifactId>arrow-extras-data</artifactId>
-            <version>${arrow.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.arrow-kt</groupId>
-            <artifactId>arrow-extras-extensions</artifactId>
             <version>${arrow.version}</version>
         </dependency>
 

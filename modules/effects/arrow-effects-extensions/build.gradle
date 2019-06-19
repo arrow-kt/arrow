@@ -4,7 +4,7 @@ dependencies {
     compile project(':arrow-effects-data')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     compile project(':arrow-annotations')
-    compile project(':arrow-extras-extensions')
+    compile project(':arrow-mtl') // TODO: delete this
     kapt project(':arrow-meta')
     kaptTest project(':arrow-meta')
     compileOnly project(':arrow-meta')

@@ -1,8 +1,6 @@
 apply plugin: 'kotlin-kapt'
 
 dependencies {
-    compile project(':arrow-extras-data')
-
     kapt project(':arrow-meta')
     kaptTest project(':arrow-meta')
     compileOnly project(':arrow-meta')
