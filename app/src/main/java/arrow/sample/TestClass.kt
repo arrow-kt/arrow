@@ -1,6 +1,6 @@
 package arrow.sample
 
-import arrow.sample.ForOption
+import arrow.sample.ForOption //works because in the same module
 
 interface Kind<out F, out A>
 

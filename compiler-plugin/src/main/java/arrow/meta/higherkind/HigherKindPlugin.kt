@@ -69,18 +69,6 @@ class HigherKindPlugin : MetaCompilerPlugin {
           }
         }
       ),
-      syntheticResolver(
-        generateSyntheticClasses = { thisDescriptor, name, ctx, declarationProvider, result ->
-          println("${thisDescriptor.name} : ${name} ~> syntheticResolver.generateSyntheticClasses = $result")
-        },
-        getSyntheticNestedClassNames = { thisDescriptor ->
-          println("${thisDescriptor.name} ~> syntheticResolver.getSyntheticNestedClassNames")
-          emptyList()
-        },
-        generatePackageSyntheticClasses = { thisDescriptor, name, ctx, declarationProvider, result ->
-          println("${thisDescriptor.name} ~> PASS 2 ~> syntheticResolver.generatePackageSyntheticClasses,  result : $result")
-        }
-      ),
       IrGeneration { compilerContext, file, backendContext, bindingContext ->
         backendContext.run {
           file.transformDeclarationsFlat { decl ->

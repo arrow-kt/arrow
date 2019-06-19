@@ -1,6 +1,6 @@
 package arrow.sample
 
-//import arrow.sample.ForOption
+//import arrow.sample.ForOption (this won't work because in a different module)
 
 object test {
   @JvmStatic
