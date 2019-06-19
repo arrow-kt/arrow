@@ -47,8 +47,6 @@ import org.jetbrains.kotlin.types.KotlinType
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
-interface Config
-
 interface ExtensionPhase {
 
   interface Config : ExtensionPhase {

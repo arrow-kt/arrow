@@ -121,6 +121,7 @@ fun ClassDescriptor.shouldGenerateKindMarker(): Boolean =
     fqNameSafe != kindName &&
     !getAllSuperclassesWithoutAny().any { s -> !s.defaultType.isInterface() }
 
+//TODO alternative way of creating descriptors?
 //fun LazyClassDescriptor.kindMarkerSynthetic(containingDeclaration: DeclarationDescriptor, targetName: FqName): ClassDescriptor =
 //  SyntheticPackageClassOrObjectDescriptor(
 //    c = c,

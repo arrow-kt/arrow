@@ -26,9 +26,7 @@ import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.TypeConstructor
 
 /*
- * This class introduces all attributes that are needed for synthetic classes/object so far.
- * This list may grow in the future, adding more constructor parameters.
- * This class has its own synthetic declaration inside.
+ * TODO // Not even sure if this helps at all vs creating the descriptors manually
  */
 class SyntheticPackageClassOrObjectDescriptor(
   c: LazyClassContext,
