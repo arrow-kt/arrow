@@ -1,5 +1,10 @@
 # arrow-meta-prototype
 
+**Run the sample higherkind plugin with**
+```
+./gradlew clean :app:build :consumer:execute -Dorg.gradle.debug=true -Dkotlin.compiler.execution.strategy="in-process"
+```
+
 **Please document all findings in the code**
 
 Sample project demonstrating how to create a basic Kotlin compiler plugin.

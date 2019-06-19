@@ -1,17 +1,9 @@
 package arrow.sample
 
-class TestClass {
-  suspend fun sideEffect() =
-    println("BOOM!")
+import arrow.sample.ForOption //works because in the same module
 
-  suspend fun x(): Unit = TODO()
+interface Kind<out F, out A>
 
-  fun other(): Unit {
-    println("other")
-  }
-
-  suspend fun another2(): String {
-    println("another")
-    return "another"
-  }
-}
+sealed class Option<out A>
+object None : Option<Nothing>()
+data class Some<out A>(val a: A) : Option<A>()
