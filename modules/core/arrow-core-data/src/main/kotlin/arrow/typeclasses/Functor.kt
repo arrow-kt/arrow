@@ -9,7 +9,7 @@ import arrow.documented
  *
  * The [Functor] type class abstracts the ability to [map] over the computational context of a type constructor.
  * Examples of type constructors that can implement instances of the Functor type class include [_dataType_],
- * [arrow.core.Option], [arrow.data.NonEmptyList], [List] and many other data types that include a [map] function with the shape
+ * [arrow.core.Option], [arrow.core.NonEmptyList], [List] and many other data types that include a [map] function with the shape
  * `fun <F, A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B>` where `F` refers to any type constructor whose contents can be transformed.
  *
  * ```kotlin:ank:playground:extension
@@ -41,7 +41,6 @@ import arrow.documented
  * ```kotlin:ank:playground
  * import arrow.*
  * import arrow.core.*
- * import arrow.data.*
  *
  * fun main(args: Array<String>) {
  *   val result =
@@ -55,7 +54,6 @@ import arrow.documented
  * ```kotlin:ank:playground
  * import arrow.*
  * import arrow.core.*
- * import arrow.data.*
  *
  * fun main(args: Array<String>) {
  *   val result =

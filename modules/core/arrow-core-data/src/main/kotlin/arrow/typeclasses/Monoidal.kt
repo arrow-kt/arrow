@@ -82,8 +82,8 @@ import arrow.core.Option
  * ```
  *
  * ```kotlin:ank:playground
- * import arrow.data.SequenceK
- * import arrow.data.extensions.sequencek.monoidal.monoidal
+ * import arrow.core.SequenceK
+ * import arrow.core.extensions.sequencek.monoidal.monoidal
  *
  * fun main(args: Array<String>) {
  *   val result =

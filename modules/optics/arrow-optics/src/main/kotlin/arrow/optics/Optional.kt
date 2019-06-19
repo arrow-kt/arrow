@@ -12,8 +12,8 @@ import arrow.core.getOrElse
 import arrow.core.identity
 import arrow.core.lift
 import arrow.core.toT
-import arrow.data.State
-import arrow.data.map
+import arrow.mtl.State
+import arrow.mtl.map
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Monoid
@@ -308,7 +308,7 @@ fun <S, A> Optional<S, A>.updateOld(f: (A) -> A): State<S, Option<A>> =
  * Update the focus [A] viewed through the [Optional] and ignores both values.
  */
 fun <S, A> Optional<S, A>.update_(f: (A) -> A): State<S, Unit> =
-  State { s -> Tuple2(modify(s, f), kotlin.Unit) }
+  State { s -> Tuple2(modify(s, f), Unit) }
 
 /**
  * Assign the focus [A] viewed through the [Optional] and returns its *new* value.

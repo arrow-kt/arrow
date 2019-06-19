@@ -11,7 +11,6 @@ import arrow.core.fix
 import arrow.core.ForListK
 import arrow.core.ForNonEmptyList
 import arrow.core.NonEmptyList
-import arrow.data.fix
 import arrow.core.k
 
 val cofreeOptionToNel: FunctionK<CofreePartialOf<ForOption>, ForNonEmptyList> = object : FunctionK<CofreePartialOf<ForOption>, ForNonEmptyList> {

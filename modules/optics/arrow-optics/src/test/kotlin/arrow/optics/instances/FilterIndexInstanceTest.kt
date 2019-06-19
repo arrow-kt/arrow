@@ -6,9 +6,9 @@ import arrow.core.extensions.option.eq.eq
 import arrow.core.ListK
 import arrow.core.MapK
 import arrow.core.NonEmptyList
-import arrow.data.SequenceK
+import arrow.core.SequenceK
 import arrow.core.extensions.listk.eq.eq
-import arrow.data.extensions.sequencek.eq.eq
+import arrow.core.extensions.sequencek.eq.eq
 import arrow.optics.extensions.ListFilterIndex
 import arrow.optics.extensions.MapFilterIndex
 import arrow.optics.extensions.filterIndex

@@ -7,7 +7,7 @@ import arrow.core.Option
 import arrow.core.Some
 import arrow.core.Tuple3
 import arrow.core.NonEmptyList
-import arrow.data.fix
+import arrow.core.fix
 import arrow.free.extensions.FreeApplicativeApplicative
 import arrow.free.extensions.FreeApplicativeEq
 import arrow.free.extensions.freeapplicative.applicative.applicative

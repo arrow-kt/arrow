@@ -3,7 +3,7 @@ package arrow.optics
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Tuple2
-import arrow.data.State
+import arrow.mtl.State
 import arrow.higherkind
 import arrow.typeclasses.Functor
 

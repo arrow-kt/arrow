@@ -9,7 +9,7 @@ permalink: /docs/generic/product/
 {:.intermediate}
 intermediate
 
-`arrow-generic` provides meta programming facilities over Product types like data classes, tuples, and heterogeneous lists; and Coproduct types like sealed classes.
+`arrow-generic` provides meta programming facilities over Product types like data classes, tuples, and heterogeneous lists.
 
 ### Install 
 
