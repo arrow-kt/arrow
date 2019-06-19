@@ -280,7 +280,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
             suspend { 1 },
             suspend { 2 },
             suspend { 3 }
-          ).traverse { it }
+          ).traverse(::effectIdentity)
         }
       } shouldBe listOf(1, 2, 3)
     }
