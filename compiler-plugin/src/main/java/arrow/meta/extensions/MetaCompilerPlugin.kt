@@ -301,7 +301,7 @@ interface MetaCompilerPlugin : ComponentRegistrar {
     //println("Project allowed extensions: ${Extensions.getArea(project).extensionPoints.toList().joinToString("\n")}")
     val messageCollector: MessageCollector = configuration.get(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY, MessageCollector.NONE)
     val ctx = CompilerContext(project, messageCollector)
-    //registerPostAnalysisContextEnrichment(project, ctx)
+    registerPostAnalysisContextEnrichment(project, ctx)
     intercept().forEach { phase ->
       if (phase is ExtensionPhase.Config) registerCompilerConfiguration(project, phase, ctx)
       if (phase is ExtensionPhase.AnalysisHandler) registerAnalysisHandler(project, phase, ctx)
