@@ -10,7 +10,7 @@ dependencies {
     testRuntime("org.junit.vintage:junit-vintage-engine:$jUnitVintageVersion")
     testCompile "io.kotlintest:kotlintest-runner-junit4:$kotlinTestVersion"
     testCompile project(':arrow-test')
-    testCompile project(':arrow-syntax') // TODO: remove
+    testCompile project(':arrow-syntax')
     testCompile project(':arrow-core')
 }
 
