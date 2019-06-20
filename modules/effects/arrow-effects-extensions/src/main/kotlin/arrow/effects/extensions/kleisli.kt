@@ -1,11 +1,11 @@
 package arrow.effects.extensions
 
 import arrow.Kind
-import arrow.data.Kleisli
-import arrow.data.KleisliOf
-import arrow.data.KleisliPartialOf
-import arrow.data.extensions.KleisliMonadError
-import arrow.data.run
+import arrow.mtl.Kleisli
+import arrow.mtl.KleisliOf
+import arrow.mtl.KleisliPartialOf
+import arrow.mtl.extensions.KleisliMonadError
+import arrow.mtl.run
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Bracket
 import arrow.effects.typeclasses.ExitCase

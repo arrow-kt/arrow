@@ -4,7 +4,7 @@ import arrow.Kind
 import arrow.core.Left
 import arrow.core.Right
 import arrow.core.identity
-import arrow.data.Kleisli
+import arrow.mtl.Kleisli
 import arrow.test.generators.applicative
 import arrow.test.generators.either
 import arrow.test.generators.functionAToB

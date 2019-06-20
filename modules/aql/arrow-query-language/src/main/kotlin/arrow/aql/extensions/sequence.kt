@@ -8,12 +8,12 @@ import arrow.aql.Select
 import arrow.aql.Sum
 import arrow.aql.Union
 import arrow.aql.Where
-import arrow.data.ForSequenceK
-import arrow.data.SequenceK
+import arrow.core.ForSequenceK
+import arrow.core.SequenceK
 import arrow.extension
-import arrow.data.extensions.sequencek.applicative.applicative
-import arrow.data.extensions.sequencek.foldable.foldable
-import arrow.data.extensions.sequencek.functor.functor
+import arrow.core.extensions.sequencek.applicative.applicative
+import arrow.core.extensions.sequencek.foldable.foldable
+import arrow.core.extensions.sequencek.functor.functor
 import arrow.mtl.extensions.sequencek.functorFilter.functorFilter
 import arrow.mtl.typeclasses.FunctorFilter
 import arrow.typeclasses.Applicative

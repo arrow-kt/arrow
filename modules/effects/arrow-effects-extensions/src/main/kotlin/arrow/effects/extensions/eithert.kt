@@ -6,11 +6,11 @@ import arrow.core.Option
 import arrow.core.Some
 import arrow.core.extensions.either.monad.flatten
 import arrow.core.left
-import arrow.data.EitherT
-import arrow.data.EitherTOf
-import arrow.data.EitherTPartialOf
-import arrow.data.extensions.EitherTMonadThrow
-import arrow.data.value
+import arrow.mtl.EitherT
+import arrow.mtl.EitherTOf
+import arrow.mtl.EitherTPartialOf
+import arrow.mtl.extensions.EitherTMonadThrow
+import arrow.mtl.value
 import arrow.effects.Ref
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Bracket

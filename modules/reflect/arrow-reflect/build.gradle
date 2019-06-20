@@ -2,8 +2,7 @@ apply plugin: 'kotlin-kapt'
 
 dependencies {
     compile 'io.github.classgraph:classgraph:4.8.14'
-    compile project(':arrow-core-extensions')
-    compile project(':arrow-extras-extensions')
+    compile project(':arrow-core')
     compile project(':arrow-effects-extensions')
     compile project(':arrow-syntax')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"

@@ -168,7 +168,6 @@ class ProductFileGenerator(
             |import arrow.typeclasses.*
             |import arrow.core.*
             |import arrow.core.extensions.*
-            |import arrow.data.extensions.*
             |import arrow.core.extensions.option.monoid.monoid
             |import arrow.core.extensions.option.semigroup.semigroup
             |

@@ -147,6 +147,11 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
     fold({ just(Left(it)) }, { f(it).map { Right<A, C>(it) } }, { _, b -> f(b).map { Right<A, C>(it) } })
   }
 
+  fun <C> bifoldLeft(c: C, f: (C, A) -> C, g: (C, B) -> C): C = fold({ f(c, it) }, { g(c, it) }, { a, b -> g(f(c, a), b) })
+
+  fun <C> bifoldRight(c: Eval<C>, f: (A, Eval<C>) -> Eval<C>, g: (B, Eval<C>) -> Eval<C>): Eval<C> =
+    fold({ f(it, c) }, { g(it, c) }, { a, b -> f(a, g(b, c)) })
+
   /**
    * The given function is applied if this is a [Right] or [Both] to `B`.
    *

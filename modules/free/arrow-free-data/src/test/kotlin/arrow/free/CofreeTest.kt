@@ -12,7 +12,7 @@ import arrow.core.Option
 import arrow.core.Some
 import arrow.core.ListK
 import arrow.core.NonEmptyList
-import arrow.data.OptionT
+import arrow.mtl.OptionT
 import arrow.free.Cofree.Companion.unfold
 import arrow.free.extensions.cofree.comonad.comonad
 import arrow.core.extensions.eval.applicative.applicative
@@ -24,10 +24,10 @@ import arrow.core.extensions.option.functor.functor
 import arrow.core.extensions.option.traverse.traverse
 import arrow.core.fix
 import arrow.core.value
-import arrow.data.OptionTOf
-import arrow.data.OptionTPartialOf
-import arrow.data.extensions.optiont.monad.monad
-import arrow.data.value
+import arrow.mtl.OptionTOf
+import arrow.mtl.OptionTPartialOf
+import arrow.mtl.extensions.optiont.monad.monad
+import arrow.mtl.value
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.laws.ComonadLaws

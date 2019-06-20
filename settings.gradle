@@ -43,14 +43,21 @@ include {
 
         core {
             _ 'core-data'
-            _ 'core-extensions'
-            _ 'extras-data'
-            _ 'extras-extensions'
+            _ 'core'
             _ 'generic'
             _ 'kindedj'
-            _ 'mtl'
             _ 'syntax'
             _ 'test'
+        }
+
+        mtl {
+            _ 'mtl'
+            _ 'mtl-data'
+        }
+
+        ui {
+            _ 'ui'
+            _ 'ui-data'
         }
 
         free {
