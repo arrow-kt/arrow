@@ -13,14 +13,17 @@ import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentProvider
 import org.jetbrains.kotlin.descriptors.PackageViewDescriptor
 import org.jetbrains.kotlin.descriptors.SourceElement
+import org.jetbrains.kotlin.descriptors.TypeAliasDescriptor
 import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.descriptors.Visibility
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
+import org.jetbrains.kotlin.descriptors.impl.AbstractTypeAliasDescriptor
 import org.jetbrains.kotlin.descriptors.impl.ClassDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.PackageFragmentDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.TypeParameterDescriptorImpl
 import org.jetbrains.kotlin.descriptors.resolveClassByFqName
 import org.jetbrains.kotlin.incremental.components.NoLookupLocation
+import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.builders.declarations.IrClassBuilder
 import org.jetbrains.kotlin.ir.builders.declarations.IrFunctionBuilder
 import org.jetbrains.kotlin.ir.builders.declarations.IrValueParameterBuilder
@@ -30,7 +33,9 @@ import org.jetbrains.kotlin.ir.builders.declarations.buildConstructor
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrConstructor
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationOriginImpl
+import org.jetbrains.kotlin.ir.declarations.IrTypeAlias
 import org.jetbrains.kotlin.ir.declarations.IrValueParameter
+import org.jetbrains.kotlin.ir.declarations.impl.IrTypeAliasImpl
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.symbols.impl.IrTypeParameterSymbolImpl
 import org.jetbrains.kotlin.ir.types.IrType
@@ -43,10 +48,11 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.getAllSuperclassesWithoutAny
 import org.jetbrains.kotlin.resolve.descriptorUtil.getSuperInterfaces
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
+import org.jetbrains.kotlin.resolve.lazy.descriptors.LazyTypeAliasDescriptor
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.storage.LockBasedStorageManager
-import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.KotlinTypeFactory
+import org.jetbrains.kotlin.types.SimpleType
 import org.jetbrains.kotlin.types.TypeConstructor
 import org.jetbrains.kotlin.types.TypeProjection
 import org.jetbrains.kotlin.types.TypeProjectionImpl
@@ -56,14 +62,21 @@ import org.jetbrains.kotlin.types.typeUtil.isInterface
 val kindName: FqName = FqName("arrow.sample.Kind")
 
 val ModuleDescriptor.kindDescriptor: ClassDescriptor?
-  get () = module.resolveClassByFqName(kindName, NoLookupLocation.FROM_BACKEND)
+  get() = module.resolveClassByFqName(kindName, NoLookupLocation.FROM_BACKEND)
 
 val FqName.kindMarkerName: FqName
-  get () {
+  get() {
     val segments = pathSegments()
     val pck = segments.dropLast(1)
     val simpleName = segments.last()
     return FqName("${pck.joinToString(".")}.For${simpleName.asString()}")
+  }
+
+val FqName.kindTypeAliasName: Name
+  get() {
+    val segments = pathSegments()
+    val simpleName = segments.last()
+    return Name.identifier("${simpleName}Of")
   }
 
 class KindMarkerDescriptor(containingDeclaration: DeclarationDescriptor, targetName: FqName) : ClassDescriptorImpl(
@@ -85,6 +98,32 @@ class KindMarkerDescriptor(containingDeclaration: DeclarationDescriptor, targetN
 fun DeclarationDescriptor.kindMarker(targetName: FqName): ClassDescriptor =
   KindMarkerDescriptor(this, targetName)
 
+
+
+fun CompilerContext.kindTypeAlias(target: ClassDescriptor): TypeAliasDescriptor =
+  LazyTypeAliasDescriptor.create( //not really lazy but better factory than implementing the full blown interface
+    storageManager = LockBasedStorageManager.NO_LOCKS,
+    trace = bindingTrace,
+    containingDeclaration = target.containingDeclaration,
+    annotations = Annotations.EMPTY,
+    name = target.fqNameSafe.kindTypeAliasName,
+    sourceElement = SourceElement.NO_SOURCE,
+    visibility = Visibilities.PUBLIC
+  ).also { aliasDescriptor ->
+    aliasDescriptor.initialize(
+      listOf(TypeParameterDescriptorImpl.createWithDefaultBound(
+        aliasDescriptor,
+        Annotations.EMPTY,
+        false,
+        Variance.INVARIANT,
+        target.declaredTypeParameters[0].name,
+        0
+      )),
+      LockBasedStorageManager.NO_LOCKS.createLazyValue { target.module.kindDescriptor?.defaultType!! },
+      LockBasedStorageManager.NO_LOCKS.createLazyValue {  aliasDescriptor.underlyingHigherKind(target) }
+    )
+  }
+
 class ContributedPackageFragmentDescriptor(
   val module: ModuleDescriptor,
   val name: FqName,
@@ -100,9 +139,10 @@ class AddSupertypesPackageFragmentProvider(val compilerContext: CompilerContext,
     val descriptorsInPackage = compilerContext.storedDescriptors().filter {
       it.fqNameSafe.parent() == fqName
     }
-    val result = descriptorsInPackage.map { descriptor ->
+    val result = descriptorsInPackage.flatMap { descriptor ->
       val kindMarker = pckg.kindMarker(descriptor.fqNameSafe)
-      kindMarker
+      val typeAlias: TypeAliasDescriptor = compilerContext.kindTypeAlias(descriptor)
+      listOf(kindMarker, typeAlias)
     }
     println("$fqName ~> getPackageFragments = $result")
     return listOf(
@@ -151,7 +191,7 @@ fun kotlinType(
   typeConstructor: TypeConstructor,
   typeArguments: List<TypeProjection> = emptyList(),
   nullable: Boolean = false
-): KotlinType {
+): SimpleType {
   return KotlinTypeFactory.simpleType(
     annotations = Annotations.EMPTY,
     constructor = typeConstructor,
@@ -160,8 +200,8 @@ fun kotlinType(
   )
 }
 
-fun ClassDescriptor.higherKind(): KotlinType {
-  return kotlinType(
+fun ClassDescriptor.higherKind(): SimpleType =
+  kotlinType(
     typeConstructor = module.resolveClassByFqName(kindName, NoLookupLocation.FROM_BACKEND)?.typeConstructor!!,
     typeArguments = listOf(
       typeVariable(fqNameSafe.kindMarkerName.shortNameOrSpecial()),
@@ -169,9 +209,18 @@ fun ClassDescriptor.higherKind(): KotlinType {
       typeVariable(declaredTypeParameters[0].name)
     )
   )
-}
 
-fun ClassDescriptor.typeVariable(
+fun TypeAliasDescriptor.underlyingHigherKind(targetDescriptor: ClassDescriptor): SimpleType =
+  kotlinType(
+    typeConstructor = module.resolveClassByFqName(kindName, NoLookupLocation.FROM_BACKEND)?.typeConstructor!!,
+    typeArguments = listOf(
+      typeVariable(targetDescriptor.fqNameSafe.kindMarkerName.shortNameOrSpecial()),
+      // TypeProjectionImpl(kindMarker().defaultType),
+      typeVariable(declaredTypeParameters[0].name)
+    )
+  )
+
+fun DeclarationDescriptor.typeVariable(
   name: Name
 ): TypeProjection =
   TypeProjectionImpl(TypeParameterDescriptorImpl.createWithDefaultBound(
@@ -246,6 +295,14 @@ fun buildIrConstructor(b: IrFunctionBuilder.() -> Unit): IrConstructor = IrFunct
   b()
   buildConstructor()
 }
+
+fun CompilerContext.irKindTypeAlias(target: IrClass): IrTypeAlias =
+  IrTypeAliasImpl(
+    startOffset = UNDEFINED_OFFSET,
+    endOffset = UNDEFINED_OFFSET,
+    origin = target.origin,
+    descriptor = kindTypeAlias(target.descriptor)
+  )
 
 fun BackendContext.kindMarker(target: IrClass): IrClass {
   return buildIrClass {

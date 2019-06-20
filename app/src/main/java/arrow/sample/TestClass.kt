@@ -27,3 +27,5 @@ return this as Option<A>
 sealed class Option<out A>
 object None : Option<Nothing>()
 data class Some<out A>(val a: A) : Option<A>()
+
+fun x() : OptionOf<Int> = TODO()
