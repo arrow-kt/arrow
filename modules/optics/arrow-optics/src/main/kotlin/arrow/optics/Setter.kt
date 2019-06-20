@@ -2,8 +2,6 @@ package arrow.optics
 
 import arrow.Kind
 import arrow.core.Either
-import arrow.core.Tuple2
-import arrow.mtl.State
 import arrow.higherkind
 import arrow.typeclasses.Functor
 
@@ -132,15 +130,3 @@ interface PSetter<S, T, A, B> : PSetterOf<S, T, A, B> {
 
   operator fun <C, D> plus(o: PTraversal<A, B, C, D>): PSetter<S, T, C, D> = compose(o)
 }
-
-/**
- * Update the focus [A] referenced through the [Setter].
- */
-fun <S, A> Setter<S, A>.update_(f: (A) -> A): State<S, Unit> =
-  State { s -> Tuple2(modify(s, f), Unit) }
-
-/**
- * Set the focus [A] referenced through the [Setter].
- */
-fun <S, A> Setter<S, A>.assign_(a: A): State<S, Unit> =
-  update_ { _ -> a }
