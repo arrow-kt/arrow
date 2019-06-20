@@ -14,7 +14,7 @@ dependencies {
     compile project(':arrow-effects-extensions')
     compile project(':arrow-effects-rx2-extensions')
     compile project(':arrow-effects-reactor-extensions')
-    compile project(':arrow-optics')
+    compile project(':arrow-optics-mtl')
     compile project(':arrow-validation')
     compile project(':arrow-recursion-extensions')
     compile project(':arrow-integrations-retrofit-adapter')

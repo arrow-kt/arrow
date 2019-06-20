@@ -1,3 +1,6 @@
+/**
+ * Set of extension functions for [Setter] to simplify using complex structured [State].
+ */
 package arrow.optics.mtl
 
 import arrow.core.Tuple2
@@ -9,7 +12,8 @@ import arrow.optics.Setter
  * We can only ignore the output of the function because [Setter] can only modify the original value, and not `get` it.
  *
  * ```kotlin:ank:playground
- * import arrow.data.*
+ * import arrow.mtl.*
+ * import arrow.optics.*
  *
  * data class Player(val health: Int)
  *
@@ -37,7 +41,8 @@ fun <S, A> Setter<S, A>.update_(f: (A) -> A): State<S, Unit> =
  * We can only ignore the output of the function because [Setter] can only modify the original value, and not `get` it.
  *
  * ```kotlin:ank:playground
- * import arrow.data.*
+ * import arrow.mtl.*
+ * import arrow.optics.*
  *
  * data class Player(val health: Int)
  *
