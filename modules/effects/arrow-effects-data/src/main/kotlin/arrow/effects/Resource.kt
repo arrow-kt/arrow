@@ -4,9 +4,19 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.effects.typeclasses.Bracket
 import arrow.effects.typeclasses.ExitCase
-import arrow.higherkind
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
+
+class ForResource private constructor() {
+  companion object
+}
+typealias ResourceOf<F, E, A> = arrow.Kind3<ForResource, F, E, A>
+typealias ResourcePartialOf<F, E> = arrow.Kind2<ForResource, F, E>
+typealias ResourceKindedJ<F, E, A> = io.kindedj.HkJ3<ForResource, F, E, A>
+
+@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+inline fun <F, E, A> ResourceOf<F, E, A>.fix(): Resource<F, E, A> =
+  this as Resource<F, E, A>
 
 /**
  * ank_macro_hierarchy(arrow.effects.Resource)
@@ -137,7 +147,6 @@ import arrow.typeclasses.Semigroup
  * All three programs do exactly the same with varying levels of simplicity and overhead. `Resource` uses `Bracket` under the hood but provides a nicer monadic interface for creating and releasing resources in order, whereas bracket is great for one-off acquisitions but becomes more complex with nested resources.
  *
  **/
-@higherkind
 interface Resource<F, E, A> : ResourceOf<F, E, A> {
 
   /**

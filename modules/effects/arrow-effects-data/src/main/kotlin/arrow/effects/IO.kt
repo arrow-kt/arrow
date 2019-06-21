@@ -26,17 +26,24 @@ import arrow.effects.typeclasses.Duration
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.Fiber
 import arrow.effects.typeclasses.mapUnit
-import arrow.higherkind
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
+class ForIO private constructor() {
+  companion object
+}
+typealias IOOf<A> = arrow.Kind<ForIO, A>
+
+@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+inline fun <A> IOOf<A>.fix(): IO<A> =
+  this as IO<A>
+
 typealias IOProc<A> = ((Either<Throwable, A>) -> Unit) -> Unit
 typealias IOProcF<A> = ((Either<Throwable, A>) -> Unit) -> IOOf<Unit>
 
-@higherkind
 @Suppress("StringLiteralDuplication")
 sealed class IO<out A> : IOOf<A> {
 
