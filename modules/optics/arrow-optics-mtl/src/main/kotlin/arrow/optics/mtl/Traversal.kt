@@ -16,7 +16,7 @@ import arrow.optics.Traversal
  * import arrow.core.k
  * import arrow.mtl.run
  * import arrow.optics.extensions.traversal
- * import arrow.optics.mtl.update
+ * import arrow.optics.mtl.extract
  *
  * data class Enemy(val health: Int)
  * val battlefield = listOf(Enemy(70), Enemy(80), Enemy(65)).k()
@@ -24,7 +24,7 @@ import arrow.optics.Traversal
  * fun main() {
  *   //sampleStart
  *   val getAllEnemies = ListK.traversal<Enemy>().extract()
- *   val result = dropBomb.run(battlefield)
+ *   val result = getAllEnemies.run(battlefield)
  *   //endSample
  *   println(result)
  * }
@@ -44,7 +44,7 @@ fun <S, A> Traversal<S, A>.toState(): State<S, List<A>> = extract()
  * import arrow.core.k
  * import arrow.mtl.run
  * import arrow.optics.extensions.traversal
- * import arrow.optics.mtl.update
+ * import arrow.optics.mtl.extractMap
  *
  * data class Enemy(val health: Int)
  * val battlefield = listOf(Enemy(70), Enemy(80), Enemy(65)).k()
@@ -54,7 +54,7 @@ fun <S, A> Traversal<S, A>.toState(): State<S, List<A>> = extract()
  *   val textEnemy = ListK.traversal<Enemy>().extractMap { enemy ->
  *     "Enemy with ${health}hp"
  *   }
- *   val result = dropBomb.run(battlefield)
+ *   val result = textEnemy.run(battlefield)
  *   //endSample
  *   println(result)
  * }

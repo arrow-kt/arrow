@@ -14,6 +14,7 @@ import arrow.optics.Setter
  * ```kotlin:ank:playground
  * import arrow.mtl.*
  * import arrow.optics.*
+ * import arrow.optics.mtl.update_
  *
  * data class Player(val health: Int)
  *
@@ -43,6 +44,7 @@ fun <S, A> Setter<S, A>.update_(f: (A) -> A): State<S, Unit> =
  * ```kotlin:ank:playground
  * import arrow.mtl.*
  * import arrow.optics.*
+ * import arrow.optics.mtl.assign_
  *
  * data class Player(val health: Int)
  *
@@ -53,7 +55,7 @@ fun <S, A> Setter<S, A>.update_(f: (A) -> A): State<S, Unit> =
  * fun main() {
  *  //sampleStart
  *  val restoreHealth = playerSetter.assign_(100)
- *  val result = takeDamage.run(Player(75))
+ *  val result = restoreHealth.run(Player(75))
  *  //endSample
  *  println(result)
  * }
