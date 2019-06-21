@@ -3,23 +3,34 @@ package arrow.effects.rx2.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.effects.CancelToken
+import arrow.effects.RacePair
+import arrow.effects.RaceTriple
+import arrow.effects.Timer
+import arrow.effects.rx2.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.rx2.ForObservableK
 import arrow.effects.rx2.ObservableK
 import arrow.effects.rx2.ObservableKOf
+import arrow.effects.rx2.extensions.observablek.async.async
 import arrow.effects.rx2.extensions.observablek.monad.monad
-import arrow.effects.rx2.extensions.observablek.monadDefer.monadDefer
 import arrow.effects.rx2.extensions.observablek.monadError.monadError
 import arrow.effects.rx2.fix
+import arrow.effects.rx2.k
+import arrow.effects.rx2.value
 import arrow.effects.typeclasses.Async
+import arrow.effects.typeclasses.AsyncSyntax
 import arrow.effects.typeclasses.Bracket
+import arrow.effects.typeclasses.Concurrent
 import arrow.effects.typeclasses.ConcurrentEffect
+import arrow.effects.typeclasses.Dispatchers
 import arrow.effects.typeclasses.Disposable
+import arrow.effects.typeclasses.Duration
 import arrow.effects.typeclasses.Effect
 import arrow.effects.typeclasses.ExitCase
+import arrow.effects.typeclasses.Fiber
 import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
 import arrow.effects.typeclasses.ProcF
-import arrow.effects.typeclasses.suspended.monaddefer.Fx
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
@@ -29,7 +40,12 @@ import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.Traverse
+import io.reactivex.Observable
+import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.ReplaySubject
+import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
+import io.reactivex.disposables.Disposable as RxDisposable
 
 @extension
 interface ObservableKFunctor : Functor<ForObservableK> {
@@ -55,12 +71,12 @@ interface ObservableKMonad : Monad<ForObservableK> {
     fix().ap(ff)
 
   override fun <A, B> ObservableKOf<A>.flatMap(f: (A) -> ObservableKOf<B>): ObservableK<B> =
-    fix().flatMap(f)
+    fix().concatMap(f)
 
   override fun <A, B> ObservableKOf<A>.map(f: (A) -> B): ObservableK<B> =
     fix().map(f)
 
-  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, ObservableKOf<Either<A, B>>>): ObservableK<B> =
+  override fun <A, B> tailRecM(a: A, f: (A) -> ObservableKOf<Either<A, B>>): ObservableK<B> =
     ObservableK.tailRecM(a, f)
 
   override fun <A> just(a: A): ObservableK<A> =
@@ -72,7 +88,7 @@ interface ObservableKFoldable : Foldable<ForObservableK> {
   override fun <A, B> ObservableKOf<A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
 
-  override fun <A, B> ObservableKOf<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): arrow.core.Eval<B> =
+  override fun <A, B> ObservableKOf<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
     fix().foldRight(lb, f)
 }
 
@@ -87,7 +103,7 @@ interface ObservableKTraverse : Traverse<ForObservableK> {
   override fun <A, B> ObservableKOf<A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)
 
-  override fun <A, B> ObservableKOf<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): arrow.core.Eval<B> =
+  override fun <A, B> ObservableKOf<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
     fix().foldRight(lb, f)
 }
 
@@ -131,10 +147,10 @@ interface ObservableKMonadDefer : MonadDefer<ForObservableK>, ObservableKBracket
 @extension
 interface ObservableKAsync : Async<ForObservableK>, ObservableKMonadDefer {
   override fun <A> async(fa: Proc<A>): ObservableK<A> =
-    ObservableK.async { _, cb -> fa(cb) }
+    ObservableK.async(fa)
 
   override fun <A> asyncF(k: ProcF<ForObservableK, A>): ObservableK<A> =
-    ObservableK.asyncF { _, cb -> k(cb) }
+    ObservableK.asyncF(k)
 
   override fun <A> ObservableKOf<A>.continueOn(ctx: CoroutineContext): ObservableK<A> =
     fix().continueOn(ctx)
@@ -144,6 +160,85 @@ interface ObservableKAsync : Async<ForObservableK>, ObservableKMonadDefer {
 interface ObservableKEffect : Effect<ForObservableK>, ObservableKAsync {
   override fun <A> ObservableKOf<A>.runAsync(cb: (Either<Throwable, A>) -> ObservableKOf<Unit>): ObservableK<Unit> =
     fix().runAsync(cb)
+}
+
+interface ObservableKConcurrent : Concurrent<ForObservableK>, ObservableKAsync {
+  override fun <A> CoroutineContext.startFiber(kind: ObservableKOf<A>): ObservableK<Fiber<ForObservableK, A>> =
+    asScheduler().let { scheduler ->
+      Observable.create<Fiber<ForObservableK, A>> { emitter ->
+        if (!emitter.isDisposed) {
+          val s: ReplaySubject<A> = ReplaySubject.create()
+          val conn: RxDisposable = kind.value().subscribeOn(scheduler).subscribe(s::onNext, s::onError)
+          emitter.onNext(Fiber(s.k(), ObservableK {
+            conn.dispose()
+          }))
+        }
+      }.k()
+    }
+
+  override fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForObservableK>): ObservableKOf<A> =
+    ObservableK.cancelable(k)
+
+  override fun <A> cancelableF(k: ((Either<Throwable, A>) -> Unit) -> ObservableKOf<CancelToken<ForObservableK>>): ObservableK<A> =
+    ObservableK.cancelableF(k)
+
+  override fun <A, B> CoroutineContext.racePair(fa: ObservableKOf<A>, fb: ObservableKOf<B>): ObservableK<RacePair<ForObservableK, A, B>> =
+    asScheduler().let { scheduler ->
+      Observable.create<RacePair<ForObservableK, A, B>> { emitter ->
+        val sa = ReplaySubject.create<A>()
+        val sb = ReplaySubject.create<B>()
+        val dda = fa.value().subscribe(sa::onNext, sa::onError)
+        val ddb = fb.value().subscribe(sb::onNext, sb::onError)
+        emitter.setCancellable { dda.dispose(); ddb.dispose() }
+        val ffa = Fiber(sa.k(), ObservableK { dda.dispose() })
+        val ffb = Fiber(sb.k(), ObservableK { ddb.dispose() })
+        sa.subscribe({
+          emitter.onNext(RacePair.First(it, ffb))
+        }, { e ->
+          emitter.tryOnError(e)
+        }, emitter::onComplete)
+        sb.subscribe({
+          emitter.onNext(RacePair.Second(ffa, it))
+        }, { e ->
+          emitter.tryOnError(e)
+        }, emitter::onComplete)
+      }.subscribeOn(scheduler).observeOn(Schedulers.trampoline()).k()
+    }
+
+  override fun <A, B, C> CoroutineContext.raceTriple(fa: ObservableKOf<A>, fb: ObservableKOf<B>, fc: ObservableKOf<C>): ObservableK<RaceTriple<ForObservableK, A, B, C>> =
+    asScheduler().let { scheduler ->
+      Observable.create<RaceTriple<ForObservableK, A, B, C>> { emitter ->
+        val sa = ReplaySubject.create<A>()
+        val sb = ReplaySubject.create<B>()
+        val sc = ReplaySubject.create<C>()
+        val dda = fa.value().subscribe(sa::onNext, sa::onError)
+        val ddb = fb.value().subscribe(sb::onNext, sb::onError)
+        val ddc = fc.value().subscribe(sc::onNext, sc::onError)
+        emitter.setCancellable { dda.dispose(); ddb.dispose(); ddc.dispose() }
+        val ffa = Fiber(sa.k(), ObservableK { dda.dispose() })
+        val ffb = Fiber(sb.k(), ObservableK { ddb.dispose() })
+        val ffc = Fiber(sc.k(), ObservableK { ddc.dispose() })
+        sa.subscribe({
+          emitter.onNext(RaceTriple.First(it, ffb, ffc))
+        }, { e ->
+          emitter.tryOnError(e)
+        }, emitter::onComplete)
+        sb.subscribe({
+          emitter.onNext(RaceTriple.Second(ffa, it, ffc))
+        }, { e ->
+          emitter.tryOnError(e)
+        }, emitter::onComplete)
+        sc.subscribe({
+          emitter.onNext(RaceTriple.Third(ffa, ffb, it))
+        }, { e ->
+          emitter.tryOnError(e)
+        }, emitter::onComplete)
+      }.subscribeOn(scheduler).observeOn(Schedulers.trampoline()).k()
+    }
+}
+
+fun ObservableK.Companion.concurrent(dispatchers: Dispatchers<ForObservableK>): Concurrent<ForObservableK> = object : ObservableKConcurrent {
+  override fun dispatchers(): Dispatchers<ForObservableK> = dispatchers
 }
 
 @extension
@@ -177,7 +272,12 @@ fun ObservableK.Companion.monadErrorSwitch(): ObservableKMonadError = object : O
 }
 
 // TODO ObservableK does not yet have a Concurrent instance
+fun <A> ObservableK.Companion.fx(c: suspend AsyncSyntax<ForObservableK>.() -> A): ObservableK<A> =
+  ObservableK.async().fx.async(c).fix()
+
 @extension
-interface ObservableKFx : Fx<ForObservableK> {
-  override fun monadDefer(): MonadDefer<ForObservableK> = ObservableK.monadDefer()
+interface ObservableKTimer : Timer<ForObservableK> {
+  override fun sleep(duration: Duration): ObservableK<Unit> =
+    ObservableK(io.reactivex.Observable.timer(duration.nanoseconds, TimeUnit.NANOSECONDS)
+      .map { Unit })
 }

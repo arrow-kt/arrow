@@ -8,7 +8,7 @@ import arrow.core.Tuple2
 import arrow.core.Tuple3
 import arrow.core.some
 import arrow.core.toT
-import arrow.data.extensions.sequence.foldable.foldLeft
+import arrow.core.extensions.sequence.foldable.foldLeft
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.net.URL
@@ -45,6 +45,10 @@ data class CompilationException(
   val underlying: Throwable,
   val msg: String
 ) : NoStackTrace(msg) {
+  override fun toString(): String = msg
+}
+
+data class AnkFailedException(val msg: String) : NoStackTrace(msg) {
   override fun toString(): String = msg
 }
 
@@ -178,6 +182,7 @@ val interpreter: AnkOps = object : AnkOps {
         } else {
           println(colored(ANSI_RED, "[✗ ${snippets.a} [${i + 1}]"))
           throw CompilationException(snippets.a, snip, it, msg = "\n" + """
+                    | File located at: ${snippets.a}
                     |
                     |```
                     |${snip.code}

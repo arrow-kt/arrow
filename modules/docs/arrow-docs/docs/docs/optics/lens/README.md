@@ -63,7 +63,7 @@ liftF(player)
 There are also some convenience methods to make working with [Reader]({{ '/docs/arrow/data/reader' | relative_url }}) easier.
 
 ```kotlin:ank
-import arrow.data.*
+import arrow.mtl.*
 
 val reader: Reader<Player, Int> = playerLens.ask()
 
@@ -81,7 +81,7 @@ There are also some convenience methods to make working with [State]({{ '/docs/a
 This can make working with nested structures in stateful computations significantly more elegant.
 
 ```kotlin:ank
-import arrow.data.*
+import arrow.mtl.*
 
 val inspectHealth = playerLens.extract()
 inspectHealth.run(player)

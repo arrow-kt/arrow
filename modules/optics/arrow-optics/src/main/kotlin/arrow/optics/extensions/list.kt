@@ -12,8 +12,8 @@ import arrow.core.right
 import arrow.core.toOption
 import arrow.core.toT
 import arrow.core.extensions.option.applicative.applicative
+import arrow.core.k
 import arrow.core.fix
-import arrow.data.k
 import arrow.optics.Optional
 import arrow.optics.POptional
 import arrow.optics.PPrism

@@ -67,6 +67,11 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
       }
     }
 
+  fun <C> bifoldLeft(c: C, f: (C, A) -> C, g: (C, B) -> C): C = fold({ f(c, it) }, { g(c, it) })
+
+  fun <C> bifoldRight(c: Eval<C>, f: (A, Eval<C>) -> Eval<C>, g: (B, Eval<C>) -> Eval<C>): Eval<C> =
+    fold({ f(it, c) }, { g(it, c) })
+
   /**
    * If this is a `Left`, then return the left value in `Right` or vice versa.
    *
@@ -189,6 +194,16 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
     }
 
     fun <L, R> cond(test: Boolean, ifTrue: () -> R, ifFalse: () -> L): Either<L, R> = if (test) right(ifTrue()) else left(ifFalse())
+
+    suspend fun <R> catch(f: suspend () -> R): Either<Throwable, R> =
+      catch(::identity, f)
+
+    suspend fun <L, R> catch(fe: (Throwable) -> L, f: suspend () -> R): Either<L, R> =
+      try {
+        f().right()
+      } catch (t: Throwable) {
+        fe(t.nonFatalOrThrow()).left()
+      }
   }
 }
 

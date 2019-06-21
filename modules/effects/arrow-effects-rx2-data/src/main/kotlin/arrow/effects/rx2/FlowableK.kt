@@ -4,10 +4,10 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Left
-import arrow.core.NonFatal
 import arrow.core.Right
 import arrow.core.identity
-import arrow.effects.OnCancel
+import arrow.core.nonFatalOrThrow
+import arrow.effects.CancelToken
 import arrow.effects.internal.Platform
 import arrow.effects.rx2.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
@@ -17,6 +17,7 @@ import arrow.typeclasses.Applicative
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.FlowableEmitter
+import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 
 fun <A> Flowable<A>.k(): FlowableK<A> = FlowableK(this)
@@ -79,29 +80,27 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
    *  ```
    */
   fun <B> bracketCase(use: (A) -> FlowableKOf<B>, release: (A, ExitCase<Throwable>) -> FlowableKOf<Unit>, mode: BackpressureStrategy = BackpressureStrategy.BUFFER): FlowableK<B> =
-    FlowableK(Flowable.create<B>({ emitter ->
-      flowable.subscribe({ a ->
-        if (emitter.isCancelled) release(a, ExitCase.Canceled).fix().flowable.subscribe({}, emitter::onError)
-        else try {
-          emitter.setDisposable(use(a).fix()
-            .flatMap { b -> release(a, ExitCase.Completed).fix().map { b } }
-            .handleErrorWith { e -> release(a, ExitCase.Error(e)).fix().flatMap { FlowableK.raiseError<B>(e) } }
-            .flowable
-            .doOnCancel { release(a, ExitCase.Canceled).fix().flowable.subscribe({}, emitter::onError) }
-            .subscribe(emitter::onNext, emitter::onError))
-        } catch (e: Throwable) {
-          if (NonFatal(e)) {
-            release(a, ExitCase.Error(e)).fix().flowable.subscribe({
-              emitter.onError(e)
-            }, { e2 ->
-              emitter.onError(Platform.composeErrors(e, e2))
-            })
-          } else {
-            throw e
-          }
-        }
-      }, emitter::onError, emitter::onComplete)
-    }, mode))
+    Flowable.create<B>({ emitter ->
+      val dispose =
+        handleErrorWith { e -> Flowable.fromCallable { emitter.onError(e) }.flatMap { Flowable.error<A>(e) }.k() }
+          .value()
+          .concatMap { a ->
+            if (emitter.isCancelled) {
+              release(a, ExitCase.Canceled).value().subscribe({}, emitter::onError)
+              Flowable.never<B>()
+            } else {
+              Flowable.defer { use(a).value() }
+                .doOnError { t: Throwable ->
+                  Flowable.defer { release(a, ExitCase.Error(t.nonFatalOrThrow())).value() }.subscribe({ emitter.onError(t) }, { e -> emitter.onError(Platform.composeErrors(t, e)) })
+                }.doOnComplete {
+                  Flowable.defer { release(a, ExitCase.Completed).value() }.subscribe({ emitter.onComplete() }, emitter::onError)
+                }.doOnCancel {
+                  Flowable.defer { release(a, ExitCase.Canceled).value() }.subscribe({}, {})
+                }
+            }
+          }.subscribe(emitter::onNext, {}, {})
+      emitter.setCancellable { dispose.dispose() }
+    }, mode).k()
 
   fun <B> concatMap(f: (A) -> FlowableKOf<B>): FlowableK<B> =
     flowable.concatMap { f(it).value() }.k()
@@ -167,23 +166,18 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
      * Creates a [FlowableK] that'll run [FlowableKProc].
      *
      * ```kotlin:ank:playground
-     * import arrow.core.Either
-     * import arrow.core.right
-     * import arrow.effects.rx2.FlowableK
-     * import arrow.effects.rx2.FlowableKConnection
-     * import arrow.effects.rx2.value
+     * import arrow.core.*
+     * import arrow.effects.rx2.*
      *
-     * class Resource {
-     *   fun asyncRead(f: (String) -> Unit): Unit = f("Some value of a resource")
-     *   fun close(): Unit = Unit
+     * class NetworkApi {
+     *   fun async(f: (String) -> Unit): Unit = f("Some value of a resource")
      * }
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
-     *   val result = FlowableK.async(fa= { conn: FlowableKConnection, cb: (Either<Throwable, String>) -> Unit ->
-     *     val resource = Resource()
-     *     conn.push(FlowableK { resource.close() })
-     *     resource.asyncRead { value -> cb(value.right()) }
+     *   val result = FlowableK.async(fa= { cb: (Either<Throwable, String>) -> Unit ->
+     *     val nw = NetworkApi()
+     *     nw.async { value -> cb(Right(value)) }
      *   })
      *   //sampleEnd
      *   result.value().subscribe(::println)
@@ -192,17 +186,11 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
      */
     fun <A> async(fa: FlowableKProc<A>, mode: BackpressureStrategy = BackpressureStrategy.BUFFER): FlowableK<A> =
       Flowable.create<A>({ emitter ->
-        val conn = FlowableKConnection()
-        // On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
-        // on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
-        conn.push(FlowableK { if (!emitter.isCancelled) emitter.onError(OnCancel.CancellationException) })
-        emitter.setCancellable { conn.cancel().value().subscribe() }
-
-        fa(conn) { either: Either<Throwable, A> ->
-          either.fold({
-            emitter.onError(it)
-          }, {
-            emitter.onNext(it)
+        fa { either: Either<Throwable, A> ->
+          either.fold({ e ->
+            emitter.tryOnError(e)
+          }, { a ->
+            emitter.onNext(a)
             emitter.onComplete()
           })
         }
@@ -210,20 +198,64 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
 
     fun <A> asyncF(fa: FlowableKProcF<A>, mode: BackpressureStrategy = BackpressureStrategy.BUFFER): FlowableK<A> =
       Flowable.create({ emitter: FlowableEmitter<A> ->
-        val conn = FlowableKConnection()
-        // On disposing of the upstream stream this will be called by `setCancellable` so check if upstream is already disposed or not because
-        // on disposing the stream will already be in a terminated state at this point so calling onError, in a terminated state, will blow everything up.
-        conn.push(FlowableK { if (!emitter.isCancelled) emitter.onError(OnCancel.CancellationException) })
-        emitter.setCancellable { conn.cancel().value().subscribe() }
-
-        fa(conn) { either: Either<Throwable, A> ->
-          either.fold({
-            emitter.onError(it)
-          }, {
-            emitter.onNext(it)
+        val dispose = fa { either: Either<Throwable, A> ->
+          either.fold({ e ->
+            emitter.tryOnError(e)
+          }, { a ->
+            emitter.onNext(a)
             emitter.onComplete()
           })
         }.fix().flowable.subscribe({}, emitter::onError)
+
+        emitter.setCancellable { dispose.dispose() }
+      }, mode).k()
+
+    fun <A> cancelable(fa: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForFlowableK>, mode: BackpressureStrategy = BackpressureStrategy.BUFFER): FlowableK<A> =
+      Flowable.create<A>({ emitter ->
+        val token = fa { either: Either<Throwable, A> ->
+          either.fold({ e ->
+            emitter.tryOnError(e)
+          }, { a ->
+            emitter.onNext(a)
+            emitter.onComplete()
+          })
+        }
+        emitter.setCancellable { token.value().subscribe({}, { e -> emitter.tryOnError(e) }) }
+      }, mode).k()
+
+    fun <A> cancelableF(fa: ((Either<Throwable, A>) -> Unit) -> FlowableKOf<CancelToken<ForFlowableK>>, mode: BackpressureStrategy = BackpressureStrategy.BUFFER): FlowableK<A> =
+      Flowable.create({ emitter: FlowableEmitter<A> ->
+        val cb = { either: Either<Throwable, A> ->
+          either.fold({
+            emitter.tryOnError(it).let { Unit }
+          }, { a ->
+            emitter.onNext(a)
+            emitter.onComplete()
+          })
+        }
+
+        val fa2 = try {
+          fa(cb)
+        } catch (t: Throwable) {
+          cb(Left(t.nonFatalOrThrow()))
+          just(just(Unit))
+        }
+
+        val cancelOrToken = AtomicReference<Either<Unit, CancelToken<ForFlowableK>>?>(null)
+        val disp = fa2.value().subscribe({ token ->
+          val cancel = cancelOrToken.getAndSet(Right(token))
+          cancel?.fold({
+            token.value().subscribe({}, { e -> emitter.tryOnError(e) }).let { Unit }
+          }, {})
+        }, { e -> emitter.tryOnError(e) })
+
+        emitter.setCancellable {
+          disp.dispose()
+          val token = cancelOrToken.getAndSet(Left(Unit))
+          token?.fold({}, {
+            it.value().subscribe({}, { e -> emitter.tryOnError(e) })
+          })
+        }
       }, mode).k()
 
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> FlowableKOf<Either<A, B>>): FlowableK<B> {

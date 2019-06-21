@@ -15,7 +15,7 @@ intermediate
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.data.*
+import arrow.mtl.*
 import arrow.core.*
 
 DataType(ReaderT::class).tcMarkdownList()

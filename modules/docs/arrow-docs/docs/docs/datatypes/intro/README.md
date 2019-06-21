@@ -34,7 +34,7 @@ The implementation of `fold()` is a simple `when` that checks whether `this` is 
 
 All other functions provided by `Option` are implemented by using `fold()`, making for idiomatic helper functions like `getOrNull`, `getOrElse`, or `map`. These functions work for any value of `A` and `B`. This way, what `Option` does for each individual case of `String`, `Int` or absence is up to the functions passed by the user.
 
-Feel free to explore the [implementation of `Option`](https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-core/src/main/kotlin/arrow/core/Option.kt) and [other datatypes](https://github.com/arrow-kt/arrow/tree/master/modules/core/arrow-extras-data/src/main/kotlin/arrow/data) to discover their behavior!
+Feel free to explore the [implementation of `Option`](https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-core/src/main/kotlin/arrow/core/Option.kt) and [other datatypes](https://github.com/arrow-kt/arrow/tree/master/modules/core/arrow-core-data/src/main/kotlin/arrow/core) to discover their behavior!
 
 ### Datatypes in Arrow
 
@@ -51,7 +51,7 @@ so they are always required.
 
 - [`Either`]({{ '/docs/arrow/core/either/' | relative_url }}) - an if/else branch in execution
 
-- [`Eval`]({{ '/docs/arrow/core/eval/' | relative_url }}) - lazy evaluation of functions with stack safety and memoization
+- [`Eval`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-eval' | relative_url }}) - lazy evaluation of functions with stack safety and memoization
 
 - `TupleN` - a heterogeneous grouping of 2-9 values without creating a named class
 
@@ -66,8 +66,6 @@ Data contains the bulk of the datatypes provided by Arrow. We can separate them 
 - [`Ior`]({{ '/docs/arrow/data/ior/' | relative_url }}) - a branch in execution for three possible paths: one, two, or both
 
 - [`Const`]({{ '/docs/arrow/typeclasses/const/' | relative_url }}) - tags a value with a "phantom generic" that's never instantiated, and it can be used for example to represents units or state
-
-- [`Coproduct`]({{ '/docs/arrow/data/coproduct/' | relative_url }}) - constructs a new composed type from two datatypes, allowing to contain and operate on either one of them
 
 ##### Error handling
 

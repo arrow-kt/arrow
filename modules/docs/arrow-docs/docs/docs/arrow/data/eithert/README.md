@@ -30,7 +30,6 @@ So let's test this out with an example:
 ```kotlin:ank
 import arrow.*
 import arrow.core.*
-import arrow.data.*
 
 data class Country(val code: String)
 data class Address(val id: Int, val country: Option<Country>)
@@ -69,7 +68,7 @@ that enables monad comprehensions for all datatypes for which a monad instance i
 
 ```kotlin:ank
 import arrow.typeclasses.*
-import arrow.core.extensions.*
+import arrow.mtl.extensions.*
 import arrow.core.extensions.either.monad.*
 
 fun getCountryCode(maybePerson : Either<BizError, Person>): Either<BizError, String> =
@@ -163,10 +162,10 @@ We can't use flatMap in this case because the nested expression does not match t
 Let's look at how a similar implementation would look like using monad comprehensions without transformers:
 
 ```kotlin:ank
-import arrow.effects.rx2.extensions.observablek.monad.*
+import arrow.effects.rx2.extensions.fx
 
 fun getCountryCode(personId: Int): ObservableK<Either<BizError, String>> =
-  binding {
+  ObservableK.fx {
     val person = findPerson(personId).bind()
     val address = person.fold (
       { it.left() },
@@ -202,6 +201,7 @@ We can now lift any value to a `EitherT<F, BizError, A>` which looks like this:
 
 ```kotlin:ank
 import arrow.effects.rx2.extensions.observablek.applicative.*
+import arrow.mtl.*
 
 val eitherTVal = EitherT.just<ForObservableK, BizError, Int>(ObservableK.applicative(), 1)
 eitherTVal
@@ -216,10 +216,10 @@ eitherTVal.value()
 So how would our function look if we implemented it with the EitherT monad transformer?
 
 ```kotlin
-import arrow.data.extensions.eithert.monad.*
+import arrow.mtl.extensions.eithert.monad.*
 
 fun getCountryCode(personId: Int): ObservableK<Either<BizError, String>> =
-  EitherT.monad<ForObservableK, BizError>(ObservableK.monad()).binding {
+  EitherT.monad<ForObservableK, BizError>(ObservableK.monad()).fx.monad {
     val (person) = EitherT(findPerson(personId))
     val address = EitherT(ObservableK.just(
       person.address.toEither { AddressNotFound(personId) }
@@ -245,7 +245,7 @@ EitherT(Option(3.left())).mapLeft(Option.functor(), {it + 1})
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.data.*
+import arrow.mtl.*
 import arrow.core.*
 
 DataType(EitherT::class).tcMarkdownList()

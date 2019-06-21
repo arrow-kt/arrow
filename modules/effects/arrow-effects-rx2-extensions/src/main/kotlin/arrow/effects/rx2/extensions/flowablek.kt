@@ -3,6 +3,9 @@ package arrow.effects.rx2.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.effects.CancelToken
+import arrow.effects.RacePair
+import arrow.effects.RaceTriple
 import arrow.effects.rx2.FlowableK
 import arrow.effects.rx2.FlowableKOf
 import arrow.effects.rx2.ForFlowableK
@@ -16,11 +19,16 @@ import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Bracket
 import arrow.effects.typeclasses.ConcurrentEffect
 import arrow.effects.typeclasses.Disposable
+import arrow.effects.typeclasses.Duration
 import arrow.effects.typeclasses.Effect
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
 import arrow.effects.typeclasses.ProcF
+import arrow.effects.Timer
+import arrow.effects.typeclasses.AsyncSyntax
+import arrow.effects.typeclasses.Concurrent
+import arrow.effects.typeclasses.Fiber
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
@@ -31,7 +39,16 @@ import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.Traverse
 import io.reactivex.BackpressureStrategy
+import io.reactivex.Flowable
+import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
+import arrow.effects.rx2.CoroutineContextRx2Scheduler.asScheduler
+import arrow.effects.rx2.k
+import arrow.effects.rx2.value
+import arrow.effects.typeclasses.Dispatchers
+import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.ReplaySubject
+import io.reactivex.disposables.Disposable as RxDisposable
 
 @extension
 interface FlowableKFunctor : Functor<ForFlowableK> {
@@ -57,7 +74,7 @@ interface FlowableKMonad : Monad<ForFlowableK> {
     fix().ap(ff)
 
   override fun <A, B> FlowableKOf<A>.flatMap(f: (A) -> FlowableKOf<B>): FlowableK<B> =
-    fix().flatMap(f)
+    fix().concatMap(f)
 
   override fun <A, B> FlowableKOf<A>.map(f: (A) -> B): FlowableK<B> =
     fix().map(f)
@@ -137,10 +154,10 @@ interface FlowableKAsync :
   Async<ForFlowableK>,
   FlowableKMonadDefer {
   override fun <A> async(fa: Proc<A>): FlowableK<A> =
-    FlowableK.async({ _, cb -> fa(cb) }, BS())
+    FlowableK.async(fa, BS())
 
   override fun <A> asyncF(k: ProcF<ForFlowableK, A>): FlowableKOf<A> =
-    FlowableK.asyncF({ _, cb -> k(cb) }, BS())
+    FlowableK.asyncF(k, BS())
 
   override fun <A> FlowableKOf<A>.continueOn(ctx: CoroutineContext): FlowableK<A> =
     fix().continueOn(ctx)
@@ -152,6 +169,76 @@ interface FlowableKEffect :
   FlowableKAsync {
   override fun <A> FlowableKOf<A>.runAsync(cb: (Either<Throwable, A>) -> FlowableKOf<Unit>): FlowableK<Unit> =
     fix().runAsync(cb)
+}
+
+interface FlowableKConcurrent : Concurrent<ForFlowableK>, FlowableKAsync {
+
+  override fun <A> CoroutineContext.startFiber(kind: Kind<ForFlowableK, A>): Kind<ForFlowableK, Fiber<ForFlowableK, A>> =
+    asScheduler().let { scheduler ->
+      Flowable.create<Fiber<ForFlowableK, A>>({ emitter ->
+        if (!emitter.isCancelled) {
+          val s: ReplaySubject<A> = ReplaySubject.create<A>()
+          val conn: RxDisposable = kind.value().subscribeOn(scheduler).subscribe(s::onNext, s::onError)
+          emitter.onNext(Fiber(s.toFlowable(BS()).k(), FlowableK {
+            conn.dispose()
+          }))
+        }
+      }, BS()).k()
+    }
+
+  override fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForFlowableK>): FlowableK<A> =
+    FlowableK.cancelable(k, BS())
+
+  override fun <A> cancelableF(k: ((Either<Throwable, A>) -> Unit) -> Kind<ForFlowableK, CancelToken<ForFlowableK>>): Kind<ForFlowableK, A> =
+    FlowableK.cancelableF(k, BS())
+
+  override fun <A, B> CoroutineContext.racePair(fa: Kind<ForFlowableK, A>, fb: Kind<ForFlowableK, B>): Kind<ForFlowableK, RacePair<ForFlowableK, A, B>> =
+    asScheduler().let { scheduler ->
+      Flowable.create<RacePair<ForFlowableK, A, B>>({ emitter ->
+        val sa = ReplaySubject.create<A>()
+        val sb = ReplaySubject.create<B>()
+        val dda = fa.value().subscribe(sa::onNext, sa::onError)
+        val ddb = fb.value().subscribe(sb::onNext, sb::onError)
+        emitter.setCancellable { dda.dispose(); ddb.dispose() }
+        val ffa = Fiber(sa.toFlowable(BS()).k(), FlowableK { dda.dispose() })
+        val ffb = Fiber(sb.toFlowable(BS()).k(), FlowableK { ddb.dispose() })
+        sa.subscribe({
+          emitter.onNext(RacePair.First(it, ffb))
+        }, emitter::onError, emitter::onComplete)
+        sb.subscribe({
+          emitter.onNext(RacePair.Second(ffa, it))
+        }, emitter::onError, emitter::onComplete)
+      }, BS()).subscribeOn(scheduler).observeOn(Schedulers.trampoline()).k()
+    }
+
+  override fun <A, B, C> CoroutineContext.raceTriple(fa: Kind<ForFlowableK, A>, fb: Kind<ForFlowableK, B>, fc: Kind<ForFlowableK, C>): Kind<ForFlowableK, RaceTriple<ForFlowableK, A, B, C>> =
+    asScheduler().let { scheduler ->
+      Flowable.create<RaceTriple<ForFlowableK, A, B, C>>({ emitter ->
+        val sa = ReplaySubject.create<A>()
+        val sb = ReplaySubject.create<B>()
+        val sc = ReplaySubject.create<C>()
+        val dda = fa.value().subscribe(sa::onNext, sa::onError)
+        val ddb = fb.value().subscribe(sb::onNext, sb::onError)
+        val ddc = fc.value().subscribe(sc::onNext, sc::onError)
+        emitter.setCancellable { dda.dispose(); ddb.dispose(); ddc.dispose() }
+        val ffa = Fiber(sa.toFlowable(BS()).k(), FlowableK { dda.dispose() })
+        val ffb = Fiber(sb.toFlowable(BS()).k(), FlowableK { ddb.dispose() })
+        val ffc = Fiber(sc.toFlowable(BS()).k(), FlowableK { ddc.dispose() })
+        sa.subscribe({
+          emitter.onNext(RaceTriple.First(it, ffb, ffc))
+        }, { e -> emitter.tryOnError(e) }, emitter::onComplete)
+        sb.subscribe({
+          emitter.onNext(RaceTriple.Second(ffa, it, ffc))
+        }, { e -> emitter.tryOnError(e) }, emitter::onComplete)
+        sc.subscribe({
+          emitter.onNext(RaceTriple.Third(ffa, ffb, it))
+        }, { e -> emitter.tryOnError(e) }, emitter::onComplete)
+      }, BS()).subscribeOn(scheduler).observeOn(Schedulers.trampoline()).k()
+    }
+}
+
+fun FlowableK.Companion.concurrent(dispatchers: Dispatchers<ForFlowableK>): Concurrent<ForFlowableK> = object : FlowableKConcurrent {
+  override fun dispatchers(): Dispatchers<ForFlowableK> = dispatchers
 }
 
 @extension
@@ -237,3 +324,14 @@ fun FlowableK.Companion.effectLatest(): FlowableKEffect = object : FlowableKEffe
 fun FlowableK.Companion.effectMissing(): FlowableKEffect = object : FlowableKEffect {
   override fun BS(): BackpressureStrategy = BackpressureStrategy.MISSING
 }
+
+@extension
+interface FlowableKTimer : Timer<ForFlowableK> {
+  override fun sleep(duration: Duration): FlowableK<Unit> =
+    FlowableK(Flowable.timer(duration.nanoseconds, TimeUnit.NANOSECONDS)
+      .map { Unit })
+}
+
+// TODO FlowableK does not yet have a Concurrent instance
+fun <A> FlowableK.Companion.fx(c: suspend AsyncSyntax<ForFlowableK>.() -> A): FlowableK<A> =
+  FlowableK.async().fx.async(c).fix()

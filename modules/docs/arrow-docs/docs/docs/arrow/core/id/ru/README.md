@@ -12,7 +12,7 @@ video: DBvVd1pfLMo
 {:.beginner}
 beginner
 
-[English](/docs/arrow/core/id/)
+[English](/docs/apidocs/arrow-core-data/arrow.core/-id/)
 
 Id (монада идентичности) должна рассматриваться, как монада, в которую вкладывается эффект отсутствия эффекта. Любое значение может являться значением `Id`.
 
@@ -35,7 +35,6 @@ id.map { it + 3 }
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.data.*
 import arrow.core.*
 
 DataType(Id::class).tcMarkdownList()

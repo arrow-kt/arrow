@@ -5,16 +5,15 @@ import arrow.core.Left
 import arrow.core.None
 import arrow.core.Right
 import arrow.core.Some
-import arrow.core.Tuple3
-import arrow.core.fix
-import arrow.core.flatMap
+import arrow.core.Tuple4
 import arrow.core.right
 import arrow.effects.IO.Companion.just
+import arrow.effects.extensions.fx
 import arrow.effects.extensions.io.async.async
 import arrow.effects.extensions.io.concurrent.concurrent
 import arrow.effects.extensions.io.concurrent.parMapN
-import arrow.effects.extensions.io.fx.fx
 import arrow.effects.extensions.io.monad.flatMap
+import arrow.effects.extensions.io.monad.map
 import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.milliseconds
 import arrow.effects.typeclasses.seconds
@@ -26,8 +25,11 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
+import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.newSingleThreadContext
 import org.junit.runner.RunWith
+import kotlin.coroutines.AbstractCoroutineContextElement
+import kotlin.coroutines.EmptyCoroutineContext
 
 @RunWith(KotlinTestRunner::class)
 @kotlinx.coroutines.ObsoleteCoroutinesApi
@@ -64,6 +66,14 @@ class IOTest : UnitSpec() {
       run shouldBe expected
     }
 
+    "should yield immediate successful effect value" {
+      val run = IO.effect { 1 }.unsafeRunSync()
+
+      val expected = 1
+
+      run shouldBe expected
+    }
+
     "should yield immediate successful pure value" {
       val run = IO.just(1).unsafeRunSync()
 
@@ -81,6 +91,14 @@ class IOTest : UnitSpec() {
       } catch (throwable: Throwable) {
         fail("Should only throw MyException")
       }
+    }
+
+    "should return immediate value by uncancelable" {
+      val run = IO.just(1).uncancelable().unsafeRunSync()
+
+      val expected = 1
+
+      run shouldBe expected
     }
 
     "should time out on unending unsafeRunTimed" {
@@ -230,6 +248,68 @@ class IOTest : UnitSpec() {
       sideEffect.counter shouldBe 2
     }
 
+    "effect is called on every run call" {
+      val sideEffect = SideEffect()
+      val io = IO.effect { sideEffect.increment(); 1 }
+      io.unsafeRunSync()
+      io.unsafeRunSync()
+
+      sideEffect.counter shouldBe 2
+    }
+
+    "effect is called on the correct ctx" {
+      val io = IO.effect(newSingleThreadContext("effect")) { Thread.currentThread().name }
+      io.unsafeRunSync() shouldBe "effect"
+    }
+
+    "CoroutineContext state should be correctly managed between boundaries" {
+      val ctxA = TestContext()
+      val ctxB = CoroutineName("ctxB")
+      // We have to explicitly reference kotlin.coroutines.coroutineContext since `TestContext` overrides this property.
+      IO.effect { kotlin.coroutines.coroutineContext shouldBe EmptyCoroutineContext }
+        .continueOn(ctxA)
+        .flatMap { IO.effect { kotlin.coroutines.coroutineContext shouldBe ctxA } }
+        .continueOn(ctxB)
+        .flatMap { IO.effect { kotlin.coroutines.coroutineContext shouldBe ctxB } }
+        .unsafeRunSync()
+    }
+
+    "fx can switch execution context state across not/bind" {
+      val program = IO.fx {
+        val ctx = !effect { kotlin.coroutines.coroutineContext }
+        !effect { ctx shouldBe EmptyCoroutineContext }
+        continueOn(newSingleThreadContext("test"))
+        val ctx2 = !effect { Thread.currentThread().name }
+        !effect { ctx2 shouldBe "test" }
+      }
+
+      program.unsafeRunSync()
+    }
+
+    "fx can pass context state across not/bind" {
+      val program = IO.fx {
+        val ctx = !effect { kotlin.coroutines.coroutineContext }
+        !effect { ctx shouldBe EmptyCoroutineContext }
+        continueOn(CoroutineName("Simon"))
+        val ctx2 = !effect { kotlin.coroutines.coroutineContext }
+        !effect { ctx2 shouldBe CoroutineName("Simon") }
+      }
+
+      program.unsafeRunSync()
+    }
+
+    "fx will respect thread switching across not/bind" {
+      val program = IO.fx {
+        continueOn(newSingleThreadContext("start"))
+        val initialThread = !effect { Thread.currentThread().name }
+        !(0..130).map { i -> suspend { i } }.sequence()
+        val continuedThread = !effect { Thread.currentThread().name }
+        continuedThread shouldBe initialThread
+      }
+
+      program.unsafeRunSync()
+    }
+
     "unsafeRunTimed times out with None result" {
       val never = IO.async().never<Unit>().fix()
       val result = never.unsafeRunTimed(100.milliseconds)
@@ -242,7 +322,7 @@ class IOTest : UnitSpec() {
       fun makePar(num: Long) =
         IO(newSingleThreadContext("$num")) {
           // Sleep according to my number
-          Thread.sleep(num * 40)
+          Thread.sleep(num * 100)
         }.map {
           // Add myself to order list
           order.add(num)
@@ -268,15 +348,13 @@ class IOTest : UnitSpec() {
         }
 
       fun makePar(num: Long) =
-        IO(newSingleThreadContext("$num")) {
-          // Sleep according to my number
-          Thread.sleep(num * 30)
-          num
-        }.order()
+        IO.concurrent()
+          .sleep((num * 100).milliseconds)
+          .map { num }.order()
 
       val result =
         newSingleThreadContext("all").parMapN(
-          makePar(6), IO.just(1L).order(), makePar(4), IO.defer { IO.just(2L) }.order(), makePar(5), IO { 3L }.order()) { six, one, four, two, five, three -> listOf(six, one, four, two, five, three) }
+          makePar(6), just(1L).order(), makePar(4), IO.defer { just(2L) }.order(), makePar(5), IO { 3L }.order()) { six, one, four, two, five, three -> listOf(six, one, four, two, five, three) }
           .unsafeRunSync()
 
       result shouldBe listOf(6L, 1, 4, 2, 5, 3)
@@ -287,17 +365,18 @@ class IOTest : UnitSpec() {
       fun makePar(num: Long) =
         IO(newSingleThreadContext("$num")) {
           // Sleep according to my number
-          Thread.sleep(num * 20)
+          Thread.sleep(num * 100)
           num
         }
 
       val result =
         newSingleThreadContext("all").parMapN(
-          makePar(6), IO.just(1L), makePar(4), IO.defer { IO.just(2L) }, makePar(5), IO { 3L }) { _, _, _, _, _, _ ->
+          makePar(6), just(1L), makePar(4), IO.defer { just(2L) }, makePar(5), IO { 3L }) { _, _, _, _, _, _ ->
           Thread.currentThread().name
         }.unsafeRunSync()
 
-      result shouldBe "all"
+      // Will always result in "6" since it will always finish last (sleeps longest by makePar).
+      result shouldBe "6"
     }
 
     "parallel IO#defer, IO#suspend and IO#async are run in the expected CoroutineContext" {
@@ -305,18 +384,19 @@ class IOTest : UnitSpec() {
         newSingleThreadContext("here").parMapN(
           IO { Thread.currentThread().name },
           IO.defer { IO.just(Thread.currentThread().name) },
-          IO.async<String> { _, cb -> cb(Thread.currentThread().name.right()) },
-          ::Tuple3)
+          IO.async<String> { cb -> cb(Thread.currentThread().name.right()) },
+          IO(newSingleThreadContext("other")) { Thread.currentThread().name },
+          ::Tuple4)
           .unsafeRunSync()
 
-      result shouldBe Tuple3("here", "here", "here")
+      result shouldBe Tuple4("here", "here", "here", "other")
     }
 
     "unsafeRunAsyncCancellable should cancel correctly" {
-      IO.async { _, cb: (Either<Throwable, Int>) -> Unit ->
+      IO.async { cb: (Either<Throwable, Int>) -> Unit ->
         val cancel =
           IO(newSingleThreadContext("RunThread")) { }
-            .flatMap { IO.async<Int> { _, cb -> Thread.sleep(500); cb(1.right()) } }
+            .flatMap { IO.async<Int> { cb -> Thread.sleep(500); cb(1.right()) } }
             .unsafeRunAsyncCancellable(OnCancel.Silent) {
               cb(it)
             }
@@ -326,10 +406,10 @@ class IOTest : UnitSpec() {
     }
 
     "unsafeRunAsyncCancellable should throw the appropriate exception" {
-      IO.async<Throwable> { _, cb ->
+      IO.async<Throwable> { cb ->
         val cancel =
           IO(newSingleThreadContext("RunThread")) { }
-            .flatMap { IO.async<Int> { _, cb -> Thread.sleep(500); cb(1.right()) } }
+            .flatMap { IO.async<Int> { cb -> Thread.sleep(500); cb(1.right()) } }
             .unsafeRunAsyncCancellable(OnCancel.ThrowCancellationException) {
               it.fold({ t -> cb(t.right()) }, { })
             }
@@ -352,10 +432,10 @@ class IOTest : UnitSpec() {
     }
 
     "unsafeRunAsyncCancellable can cancel even for infinite asyncs" {
-      IO.async { _, cb: (Either<Throwable, Int>) -> Unit ->
+      IO.async { cb: (Either<Throwable, Int>) -> Unit ->
         val cancel =
           IO(newSingleThreadContext("RunThread")) { }
-            .flatMap { IO.async<Int> { _, _ -> Thread.sleep(5000); } }
+            .flatMap { IO.async<Int> { Thread.sleep(5000); } }
             .unsafeRunAsyncCancellable(OnCancel.ThrowCancellationException) {
               cb(it)
             }
@@ -365,9 +445,9 @@ class IOTest : UnitSpec() {
     }
 
     "IO.binding should for comprehend over IO" {
-      val result = fx {
+      val result = IO.fx {
         val (x) = IO.just(1)
-        val y = bind { IO { x + 1 } }
+        val y = !IO { x + 1 }
         y
       }.fix()
       result.unsafeRunSync() shouldBe 2
@@ -411,28 +491,14 @@ class IOTest : UnitSpec() {
       }.unsafeRunSync() shouldBe Unit
     }
 
-    "IO should cancel KindConnection on dispose" {
+    "IO should cancel cancelable on dispose" {
       Promise.uncancelable<ForIO, Unit>(IO.async()).flatMap { latch ->
         IO {
-          IO.async<Unit> { conn, _ ->
-            conn.push(latch.complete(Unit))
+          IO.cancelable<Unit> {
+            latch.complete(Unit)
           }.unsafeRunAsyncCancellable { }
             .invoke()
         }.flatMap { latch.get() }
-      }.unsafeRunSync()
-    }
-
-    "KindConnection can cancel upstream" {
-      Promise.uncancelable<ForIO, Unit>(IO.async()).flatMap { latch ->
-        IO.async<Unit> { conn, cb ->
-          conn.push(latch.complete(Unit))
-          cb(Right(Unit))
-        }.flatMap {
-          IO.async<Unit> { conn, _ ->
-            conn.cancel().fix().unsafeRunAsync { }
-          }
-        }.unsafeRunAsyncCancellable { }
-        latch.get()
       }.unsafeRunSync()
     }
 
@@ -458,9 +524,26 @@ class IOTest : UnitSpec() {
           else just(ii)
         }
 
-      IO.just(1).flatMap { ioGuaranteeCase(0) }.unsafeRunSync() shouldBe size
+      just(1).flatMap { ioGuaranteeCase(0) }.unsafeRunSync() shouldBe size
+    }
+
+    "Async should be stack safe" {
+      val size = 5000
+
+      fun ioAsync(i: Int): IO<Int> = IO.async<Int> { cb ->
+        cb(Right(i))
+      }.flatMap { ii ->
+        if (ii < size) ioAsync(ii + 1)
+        else just(ii)
+      }
+
+      IO.just(1).flatMap(::ioAsync).unsafeRunSync() shouldBe size
     }
   }
 }
 
-object Error : Throwable()
+/** Represents a unique identifier context using object equality. */
+internal class TestContext : AbstractCoroutineContextElement(TestContext) {
+  companion object Key : kotlin.coroutines.CoroutineContext.Key<CoroutineName>
+  override fun toString(): String = "TestContext(${Integer.toHexString(hashCode())})"
+}

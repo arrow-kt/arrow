@@ -115,7 +115,7 @@ interface PolyTemplateGenerator : MetaApi {
       "_imports_monaddefer_",
       """
         |import ${monadDeferPackageName.value.quote()}.defer
-        |import ${monadDeferPackageName.value.quote()}.delay
+        |import ${monadDeferPackageName.value.quote()}.later
       """.trimMargin()
     )
   }

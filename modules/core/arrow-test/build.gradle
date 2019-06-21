@@ -1,12 +1,10 @@
 apply plugin: 'kotlin-kapt'
 
 dependencies {
-    compile project(':arrow-extras-data')
     compile project(':arrow-optics')
     compile project(':arrow-effects-data')
-    compile project(':arrow-mtl')
+    compile project(':arrow-mtl-data')
     compile project(':arrow-free-data')
-    compile project(':arrow-extras-extensions')
     compile project(':arrow-effects-extensions')
     compile project(':arrow-effects-io-extensions')
     compile project(":arrow-recursion-data")

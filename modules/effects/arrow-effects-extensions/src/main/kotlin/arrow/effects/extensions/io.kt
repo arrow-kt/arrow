@@ -2,21 +2,20 @@ package arrow.effects.extensions
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.effects.CancelToken
 import arrow.effects.ForIO
 import arrow.effects.IO
 import arrow.effects.IOOf
 import arrow.effects.OnCancel
+import arrow.effects.RacePair
+import arrow.effects.RaceTriple
 import arrow.effects.fix
 import arrow.effects.racePair
 import arrow.effects.raceTriple
-import arrow.effects.toIOProc
-import arrow.effects.toIOProcF
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Bracket
 import arrow.effects.typeclasses.Concurrent
 import arrow.effects.typeclasses.ConcurrentEffect
-import arrow.effects.typeclasses.ConnectedProc
-import arrow.effects.typeclasses.ConnectedProcF
 import arrow.effects.typeclasses.Dispatchers
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.Effect
@@ -25,13 +24,12 @@ import arrow.effects.typeclasses.Fiber
 import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
 import arrow.effects.typeclasses.ProcF
-import arrow.effects.typeclasses.RacePair
-import arrow.effects.typeclasses.RaceTriple
+import arrow.effects.Timer
 import arrow.effects.typeclasses.UnsafeRun
 import arrow.extension
 import arrow.typeclasses.Applicative
-import arrow.typeclasses.Apply
 import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
@@ -40,9 +38,8 @@ import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import arrow.unsafe
 import kotlin.coroutines.CoroutineContext
-import arrow.effects.ap as ioAp
 import arrow.effects.handleErrorWith as ioHandleErrorWith
-import arrow.effects.startFiber as ioStart
+import arrow.effects.handleError as ioHandleError
 
 @extension
 interface IOFunctor : Functor<ForIO> {
@@ -56,7 +53,7 @@ interface IOApply : Apply<ForIO> {
     fix().map(f)
 
   override fun <A, B> IOOf<A>.ap(ff: IOOf<(A) -> B>): IO<B> =
-    ioAp(ff)
+    fix().ap(ff)
 }
 
 @extension
@@ -68,7 +65,7 @@ interface IOApplicative : Applicative<ForIO> {
     IO.just(a)
 
   override fun <A, B> IOOf<A>.ap(ff: IOOf<(A) -> B>): IO<B> =
-    ioAp(ff)
+    fix().ap(ff)
 }
 
 @extension
@@ -94,6 +91,12 @@ interface IOApplicativeError : ApplicativeError<ForIO, Throwable>, IOApplicative
   override fun <A> IOOf<A>.handleErrorWith(f: (Throwable) -> IOOf<A>): IO<A> =
     ioHandleErrorWith(f)
 
+  override fun <A> IOOf<A>.handleError(f: (Throwable) -> A): IO<A> =
+    ioHandleError(f)
+
+  override fun <A, B> IOOf<A>.redeem(fe: (Throwable) -> B, fb: (A) -> B): IO<B> =
+    fix().redeem(fe, fb)
+
   override fun <A> raiseError(e: Throwable): IO<A> =
     IO.raiseError(e)
 }
@@ -104,7 +107,7 @@ interface IOMonadError : MonadError<ForIO, Throwable>, IOApplicativeError, IOMon
   override fun <A> just(a: A): IO<A> = IO.just(a)
 
   override fun <A, B> IOOf<A>.ap(ff: IOOf<(A) -> B>): IO<B> =
-    ioAp(ff)
+    fix().ap(ff)
 
   override fun <A, B> IOOf<A>.map(f: (A) -> B): IO<B> =
     fix().map(f)
@@ -114,6 +117,9 @@ interface IOMonadError : MonadError<ForIO, Throwable>, IOApplicativeError, IOMon
 
   override fun <A> IOOf<A>.handleErrorWith(f: (Throwable) -> IOOf<A>): IO<A> =
     ioHandleErrorWith(f)
+
+  override fun <A, B> IOOf<A>.redeemWith(fe: (Throwable) -> IOOf<B>, fb: (A) -> IOOf<B>): IO<B> =
+    fix().redeemWith(fe, fb)
 
   override fun <A> raiseError(e: Throwable): IO<A> =
     IO.raiseError(e)
@@ -125,16 +131,16 @@ interface IOMonadThrow : MonadThrow<ForIO>, IOMonadError
 @extension
 interface IOBracket : Bracket<ForIO, Throwable>, IOMonadThrow {
   override fun <A, B> IOOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> IOOf<Unit>, use: (A) -> IOOf<B>): IO<B> =
-    fix().bracketCase({ a, e -> release(a, e) }, { a -> use(a) })
+    fix().bracketCase(release, use)
 
   override fun <A, B> IOOf<A>.bracket(release: (A) -> IOOf<Unit>, use: (A) -> IOOf<B>): IO<B> =
-    fix().bracket({ a -> release(a) }, { a -> use(a) })
+    fix().bracket(release, use)
 
   override fun <A> IOOf<A>.guarantee(finalizer: IOOf<Unit>): IO<A> =
     fix().guarantee(finalizer)
 
   override fun <A> IOOf<A>.guaranteeCase(finalizer: (ExitCase<Throwable>) -> IOOf<Unit>): IO<A> =
-    fix().guaranteeCase { e -> finalizer(e) }
+    fix().guaranteeCase(finalizer)
 }
 
 @extension
@@ -148,32 +154,31 @@ interface IOMonadDefer : MonadDefer<ForIO>, IOBracket {
 @extension
 interface IOAsync : Async<ForIO>, IOMonadDefer {
   override fun <A> async(fa: Proc<A>): IO<A> =
-    IO.async(fa.toIOProc())
+    IO.async(fa)
 
   override fun <A> asyncF(k: ProcF<ForIO, A>): IO<A> =
-    IO.asyncF(k.toIOProcF())
+    IO.asyncF(k)
 
   override fun <A> IOOf<A>.continueOn(ctx: CoroutineContext): IO<A> =
     fix().continueOn(ctx)
+
+  override fun <A> effect(ctx: CoroutineContext, f: suspend () -> A): IO<A> =
+    IO.effect(ctx, f)
+
+  override fun <A> effect(f: suspend () -> A): IO<A> =
+    IO.effect(f)
 }
 
 // FIXME default @extension are temporarily declared in arrow-effects-io-extensions due to multiplatform needs
 interface IOConcurrent : Concurrent<ForIO>, IOAsync {
-
   override fun <A> CoroutineContext.startFiber(kind: IOOf<A>): IO<Fiber<ForIO, A>> =
-    kind.ioStart(this)
+    kind.fix().startFiber(this)
 
-  override fun <A> asyncF(fa: ConnectedProcF<ForIO, A>): IO<A> =
-    IO.asyncF(fa)
+  override fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForIO>): Kind<ForIO, A> =
+    IO.cancelable(k)
 
-  override fun <A> async(fa: ConnectedProc<ForIO, A>): IO<A> =
-    IO.async(fa)
-
-  override fun <A> asyncF(k: ProcF<ForIO, A>): IO<A> =
-    IO.asyncF { _, cb -> k(cb) }
-
-  override fun <A> async(fa: Proc<A>): IO<A> =
-    IO.async { _, cb -> fa(cb) }
+  override fun <A> cancelableF(k: ((Either<Throwable, A>) -> Unit) -> IOOf<CancelToken<ForIO>>): IO<A> =
+    IO.cancelableF(k)
 
   override fun <A, B> CoroutineContext.racePair(fa: Kind<ForIO, A>, fb: Kind<ForIO, B>): IO<RacePair<ForIO, A, B>> =
     IO.racePair(this, fa, fb)
@@ -185,6 +190,9 @@ interface IOConcurrent : Concurrent<ForIO>, IOAsync {
 fun IO.Companion.concurrent(dispatchers: Dispatchers<ForIO>): Concurrent<ForIO> = object : IOConcurrent {
   override fun dispatchers(): Dispatchers<ForIO> = dispatchers
 }
+
+fun IO.Companion.timer(CF: Concurrent<ForIO>): Timer<ForIO> =
+  Timer(CF)
 
 @extension
 interface IOEffect : Effect<ForIO>, IOAsync {

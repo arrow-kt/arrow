@@ -13,16 +13,16 @@ video: TC6IzE61OyE
 beginner
 
 `NonEmptyList` is a data type used in __Λrrow__ to model ordered lists that guarantee to have at least one value.
-`NonEmptyList` is available in the `arrow-extras` module under the `import arrow.data.NonEmptyList`
+`NonEmptyList` is available in the `arrow-core-data` module under the `import arrow.core.NonEmptyList`
 
 ```groovy
 // gradle
-compile "io.arrow-kt:arrow-extras:$arrow_version"
+compile "io.arrow-kt:arrow-core-data:$arrow_version"
 ```
 
 ```kotlin:ank
 // namespace
-import arrow.data.*
+import arrow.core.*
 ```
 
 ## of
@@ -85,14 +85,13 @@ nelOne.flatMap { one ->
 
 ```kotlin:ank
 import arrow.typeclasses.*
-import arrow.data.extensions.*
-import arrow.data.extensions.nonemptylist.monad.binding
+import arrow.core.extensions.*
 
 val nelOne: NonEmptyList<Int> = NonEmptyList.of(1)
 val nelTwo: NonEmptyList<Int> = NonEmptyList.of(2)
 val nelThree: NonEmptyList<Int> = NonEmptyList.of(3)
 
-binding {
+NonEmptyList.fx {
   val (one) = nelOne
   val (two) = nelTwo
   val (three) = nelThree
@@ -103,7 +102,7 @@ binding {
 Monad binding in `NonEmptyList` and other collection related data type can be used as generators
 
 ```kotlin:ank
-binding {
+NonEmptyList.fx {
   val (x) = NonEmptyList.of(1, 2, 3)
   val (y) = NonEmptyList.of(1, 2, 3)
   x + y
@@ -115,9 +114,9 @@ binding {
 Λrrow contains methods that allow you to preserve type information when computing over different `NonEmptyList` typed values.
 
 ```kotlin:ank
-import arrow.data.*
+import arrow.core.*
 import java.util.*
-import arrow.data.extensions.nonemptylist.apply.map
+import arrow.core.extensions.nonemptylist.apply.map
 
 data class Person(val id: UUID, val name: String, val year: Int)
 
@@ -136,14 +135,13 @@ map(nelId, nelName, nelYear) { (id, name, year) ->
 - `NonEmptyList` is __used to model lists that guarantee at least one element__
 - We can easily construct values of `NonEmptyList` with `NonEmptyList.of`
 - `foldLeft`, `map`, `flatMap` and others are used to compute over the internal contents of a `NonEmptyList` value.
-- `fx { ... }  and binding { ... } Comprehensions` can be __used to imperatively compute__ over multiple `NonEmptyList` values in sequence.
+- `fx { ... } comprehensions` can be __used to imperatively compute__ over multiple `NonEmptyList` values in sequence.
 - `NonEmptyList.applicative().map { ... }` can be used to compute over multiple `NonEmptyList` values preserving type information and __abstracting over arity__ with `map`
 
 ### Supported type classes
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.data.*
 import arrow.core.*
 
 DataType(NonEmptyList::class).tcMarkdownList()

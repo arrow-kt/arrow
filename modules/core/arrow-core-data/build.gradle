@@ -11,7 +11,7 @@ dependencies {
     testCompile "io.kotlintest:kotlintest-runner-junit4:$kotlinTestVersion"
     testCompile project(':arrow-test')
     testCompile project(':arrow-syntax')
-    testCompile project(':arrow-core-extensions')
+    testCompile project(':arrow-core')
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

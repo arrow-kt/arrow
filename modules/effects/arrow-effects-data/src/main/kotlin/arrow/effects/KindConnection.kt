@@ -11,7 +11,7 @@ typealias CancelToken<F> = Kind<F, Unit>
 enum class OnCancel { ThrowCancellationException, Silent;
 
   companion object {
-    val CancellationException = arrow.effects.ConnectionCancellationException
+    val CancellationException = ConnectionCancellationException
   }
 }
 

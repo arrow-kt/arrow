@@ -10,7 +10,7 @@ import arrow.effects.CancelToken
  * You can think of fibers as being lightweight threads, a Fiber being a
  * concurrency primitive for doing cooperative multi-tasking.
  */
-interface Fiber<F, A> {
+interface Fiber<F, out A> {
 
   /**
    * Returns a new task that will await for the completion of the
