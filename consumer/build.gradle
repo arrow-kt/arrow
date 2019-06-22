@@ -1,9 +1,19 @@
-apply plugin: 'kotlin'
+plugins{
+    id 'org.jetbrains.kotlin.jvm'
+}
+
+repositories {
+    flatDir {
+        dirs "$rootDir/core/build/libs"
+    }
+}
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    compile project(":app")
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile project(':core')
+    implementation name: "core"
 }
+
 
 task execute(type:JavaExec) {
     main = "arrow.sample.test"
