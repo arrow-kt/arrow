@@ -52,7 +52,7 @@ fun <S, A> Traversal<S, A>.toState(): State<S, List<A>> = extract()
  * fun main() {
  *   //sampleStart
  *   val textEnemy = ListK.traversal<Enemy>().extractMap { enemy ->
- *     "Enemy with ${health}hp"
+ *     "Enemy with ${enemy.health}hp"
  *   }
  *   val result = textEnemy.run(battlefield)
  *   //endSample

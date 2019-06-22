@@ -72,6 +72,7 @@ fun <S, A, C> Lens<S, A>.asks(f: (A) -> C): Reader<S, C> = ask().map(f)
  *
  * ```kotlin:ank:playground
  * import arrow.mtl.run
+ * import arrow.mtl.State
  * import arrow.optics.Lens
  * import arrow.optics.mtl.extract
  *
@@ -102,6 +103,7 @@ fun <S, A> Lens<S, A>.toState(): State<S, A> = extract()
  *
  * ```kotlin:ank:playground
  * import arrow.mtl.run
+ * import arrow.mtl.State
  * import arrow.optics.Lens
  * import arrow.optics.mtl.extractMap
  *
@@ -131,6 +133,7 @@ fun <S, A, C> Lens<S, A>.extractMap(f: (A) -> C): State<S, C> = extract().map(f)
  *
  * ```kotlin:ank:playground
  * import arrow.mtl.run
+ * import arrow.mtl.State
  * import arrow.optics.Lens
  * import arrow.optics.mtl.update
  *
@@ -161,6 +164,7 @@ fun <S, A> Lens<S, A>.update(f: (A) -> A): State<S, A> = State { s ->
  *
  * ```kotlin:ank:playground
  * import arrow.mtl.run
+ * import arrow.mtl.State
  * import arrow.optics.Lens
  * import arrow.optics.mtl.updateOld
  *
@@ -190,6 +194,7 @@ fun <S, A> Lens<S, A>.updateOld(f: (A) -> A): State<S, A> = State { s ->
  *
  * ```kotlin:ank:playground
  * import arrow.mtl.run
+ * import arrow.mtl.State
  * import arrow.optics.Lens
  * import arrow.optics.mtl.updateOld
  *
@@ -218,6 +223,7 @@ fun <S, A> Lens<S, A>.update_(f: (A) -> A): State<S, Unit> =
  *
  * ```kotlin:ank:playground
  * import arrow.mtl.run
+ * import arrow.mtl.State
  * import arrow.optics.Lens
  * import arrow.optics.mtl.assign
  *
@@ -246,6 +252,7 @@ fun <S, A> Lens<S, A>.assign(a: A): State<S, A> =
  *
  * ```kotlin:ank:playground
  * import arrow.mtl.run
+ * import arrow.mtl.State
  * import arrow.optics.Lens
  * import arrow.optics.mtl.assignOld
  *
@@ -274,6 +281,7 @@ fun <S, A> Lens<S, A>.assignOld(a: A): State<S, A> =
  *
  * ```kotlin:ank:playground
  * import arrow.mtl.run
+ * import arrow.mtl.State
  * import arrow.optics.Lens
  * import arrow.optics.mtl.assign_
  *

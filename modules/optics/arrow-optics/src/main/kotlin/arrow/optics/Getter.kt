@@ -8,8 +8,6 @@ import arrow.core.Tuple2
 import arrow.core.compose
 import arrow.core.identity
 import arrow.core.toT
-import arrow.mtl.Reader
-import arrow.mtl.State
 import arrow.mtl.map
 import arrow.higherkind
 import arrow.typeclasses.Monoid
@@ -143,37 +141,4 @@ interface Getter<S, A> : GetterOf<S, A> {
   fun asFold(): Fold<S, A> = object : Fold<S, A> {
     override fun <R> foldMap(M: Monoid<R>, s: S, f: (A) -> R): R = f(get(s))
   }
-
-  /**
-   * Extracts the value viewed through the [get] function.
-   */
-  fun ask(): Reader<S, A> = Reader(::get)
-
-  /**
-   * Transforms a [Getter] into a [Reader]. Alias for [ask].
-   */
-  fun toReader(): Reader<S, A> = ask()
-
-  /**
-   * Extracts the value viewed through the [get] and applies [f] to it.
-   *
-   * @param f function to apply to the focus.
-   */
-  fun <B> asks(f: (A) -> B): Reader<S, B> = ask().map(f)
-
-  /**
-   * Extracts the focus [A] viewed through the [Getter].
-   */
-  fun extract(): State<S, A> = State { s -> Tuple2(s, get(s)) }
-
-  /**
-   * Transforms a [Getter] into a [State].
-   * Alias for [extract].
-   */
-  fun toState(): State<S, A> = extract()
-
-  /**
-   * Extract and map the focus [A] viewed through the [Getter] and applies [f] to it.
-   */
-  fun <B> extractMap(f: (A) -> B): State<S, B> = extract().map(f)
 }
