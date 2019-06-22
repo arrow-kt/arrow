@@ -57,7 +57,7 @@ interface POptional<S, T, A, B> : POptionalOf<S, T, A, B> {
 
   companion object {
 
-    fun <S> id() = Iso.id<S>().asOptional()
+    fun <S> id() = PIso.id<S>().asOptional()
 
     /**
      * [POptional] that takes either [S] or [S] and strips the choice of [S].
@@ -276,4 +276,4 @@ interface POptional<S, T, A, B> : POptionalOf<S, T, A, B> {
 }
 
 fun <S, A> Optional(f: (S) -> Option<A>, set: (S, A) -> S): Optional<S, A> =
-  Optional.invoke({ s -> f(s).toEither { s } }, set)
+  POptional.invoke({ s -> f(s).toEither { s } }, set)

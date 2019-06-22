@@ -11,6 +11,12 @@ import arrow.core.k
 import arrow.mtl.map
 import arrow.mtl.run
 import arrow.mtl.runId
+import arrow.optics.mtl.ask
+import arrow.optics.mtl.asks
+import arrow.optics.mtl.extract
+import arrow.optics.mtl.extractMap
+import arrow.optics.mtl.toReader
+import arrow.optics.mtl.toState
 import arrow.test.UnitSpec
 import arrow.test.generators.functionAToB
 import io.kotlintest.properties.Gen

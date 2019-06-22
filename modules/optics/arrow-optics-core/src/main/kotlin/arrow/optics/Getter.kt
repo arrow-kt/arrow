@@ -30,7 +30,7 @@ interface Getter<S, A> : GetterOf<S, A> {
 
   companion object {
 
-    fun <S> id() = Iso.id<S>().asGetter()
+    fun <S> id() = PIso.id<S>().asGetter()
 
     /**
      * [Getter] that takes either [S] or [S] and strips the choice of [S].

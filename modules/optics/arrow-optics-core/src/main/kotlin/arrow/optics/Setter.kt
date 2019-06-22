@@ -46,7 +46,7 @@ interface PSetter<S, T, A, B> : PSetterOf<S, T, A, B> {
 
   companion object {
 
-    fun <S> id() = Iso.id<S>().asSetter()
+    fun <S> id() = PIso.id<S>().asSetter()
 
     /**
      * [PSetter] that takes either S or S and strips the choice of S.

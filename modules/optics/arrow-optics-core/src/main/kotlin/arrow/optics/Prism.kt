@@ -53,7 +53,7 @@ interface PPrism<S, T, A, B> : PPrismOf<S, T, A, B> {
 
   companion object {
 
-    fun <S> id() = Iso.id<S>().asPrism()
+    fun <S> id() = PIso.id<S>().asPrism()
 
     /**
      * Invoke operator overload to create a [PPrism] of type `S` with focus `A`.

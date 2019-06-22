@@ -89,7 +89,7 @@ class PrismTest : UnitSpec() {
 
     testLaws(
       PrismLaws.laws(
-        prism = sumPrism.right<SumType, SumType, String, String, Int>(),
+        prism = sumPrism.right(),
         aGen = Gen.either(Gen.int(), genSum),
         bGen = Gen.either(Gen.int(), Gen.string()),
         funcGen = Gen.functionAToB(Gen.either(Gen.int(), Gen.string())),
@@ -100,7 +100,7 @@ class PrismTest : UnitSpec() {
 
     testLaws(
       PrismLaws.laws(
-        prism = sumPrism.left<SumType, SumType, String, String, Int>(),
+        prism = sumPrism.left(),
         aGen = Gen.either(genSum, Gen.int()),
         bGen = Gen.either(Gen.string(), Gen.int()),
         funcGen = Gen.functionAToB(Gen.either(Gen.string(), Gen.int())),

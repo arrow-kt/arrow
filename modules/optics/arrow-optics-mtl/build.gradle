@@ -2,7 +2,7 @@ apply plugin: 'kotlin-kapt'
 
 dependencies {
     compile project(':arrow-mtl-data')
-    compile project(':arrow-optics')
+    compile project(':arrow-optics-core')
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

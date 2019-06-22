@@ -48,7 +48,7 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
   fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T>
 
   companion object {
-    fun <S> id() = Iso.id<S>().asTraversal()
+    fun <S> id() = PIso.id<S>().asTraversal()
 
     fun <S> codiagonal(): Traversal<Either<S, S>, S> = object : Traversal<Either<S, S>, S> {
       override fun <F> modifyF(FA: Applicative<F>, s: Either<S, S>, f: (S) -> Kind<F, S>): Kind<F, Either<S, S>> = FA.run {
@@ -67,7 +67,7 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
     /**
      * [PTraversal] that points to nothing
      */
-    fun <S, A> void() = Optional.void<S, A>().asTraversal()
+    fun <S, A> void() = POptional.void<S, A>().asTraversal()
 
     /**
      * [PTraversal] constructor from multiple getters of the same source.

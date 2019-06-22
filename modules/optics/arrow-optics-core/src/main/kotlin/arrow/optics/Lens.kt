@@ -48,7 +48,7 @@ interface PLens<S, T, A, B> : PLensOf<S, T, A, B> {
 
   companion object {
 
-    fun <S> id() = Iso.id<S>().asLens()
+    fun <S> id() = PIso.id<S>().asLens()
 
     /**
      * [PLens] that takes either [S] or [S] and strips the choice of [S].
