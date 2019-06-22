@@ -8,7 +8,6 @@ import arrow.core.Some
 import arrow.core.Tuple2
 import arrow.core.identity
 import arrow.core.toT
-import arrow.mtl.map
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Functor

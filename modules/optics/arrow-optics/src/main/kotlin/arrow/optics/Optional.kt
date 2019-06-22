@@ -12,8 +12,6 @@ import arrow.core.getOrElse
 import arrow.core.identity
 import arrow.core.lift
 import arrow.core.toT
-import arrow.mtl.State
-import arrow.mtl.map
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Monoid
@@ -64,7 +62,7 @@ interface POptional<S, T, A, B> : POptionalOf<S, T, A, B> {
     /**
      * [POptional] that takes either [S] or [S] and strips the choice of [S].
      */
-    fun <S> codiagonal(): Optional<Either<S, S>, S> = Optional(
+    fun <S> codiagonal(): Optional<Either<S, S>, S> = POptional(
       { it.fold({ Either.Right(it) }, { Either.Right(it) }) },
       { aa, a -> aa.bimap({ a }, { a }) }
     )
@@ -92,7 +90,7 @@ interface POptional<S, T, A, B> : POptionalOf<S, T, A, B> {
     /**
      * [POptional] that never sees its focus
      */
-    fun <A, B> void(): Optional<A, B> = Optional(
+    fun <A, B> void(): Optional<A, B> = POptional(
       { Either.Left(it) },
       { s, _ -> s }
     )
@@ -275,56 +273,7 @@ interface POptional<S, T, A, B> : POptionalOf<S, T, A, B> {
    * Check if there is no focus or the target satisfies the predicate [p]
    */
   fun all(s: S, p: (A) -> Boolean): Boolean = getOption(s).fold({ true }, p)
-
-  /**
-   * Extracts the focus [A] viewed through the [POptional].
-   */
-  fun extract(): State<S, Option<A>> = State { s -> Tuple2(s, getOption(s)) }
-
-  /**
-   * Transforms a [POptional] into a [State].
-   * Alias for [extract].
-   */
-  fun toState(): State<S, Option<A>> = extract()
-
-  /**
-   * Extract and map the focus [A] viewed through the [POptional] and applies [f] to it.
-   */
-  fun <C> extractMap(f: (A) -> C): State<S, Option<C>> = extract().map { it.map(f) }
 }
 
-/**
- * Update the focus [A] viewed through the [Optional] and returns its *new* value.
- */
-fun <S, A> Optional<S, A>.update(f: (A) -> A): State<S, Option<A>> =
-  updateOld(f).map { it.map(f) }
-
-/**
- * Update the focus [A] viewed through the [Optional] and returns its *old* value.
- */
-fun <S, A> Optional<S, A>.updateOld(f: (A) -> A): State<S, Option<A>> =
-  State { s -> Tuple2(modify(s, f), getOption(s)) }
-
-/**
- * Update the focus [A] viewed through the [Optional] and ignores both values.
- */
-fun <S, A> Optional<S, A>.update_(f: (A) -> A): State<S, Unit> =
-  State { s -> Tuple2(modify(s, f), Unit) }
-
-/**
- * Assign the focus [A] viewed through the [Optional] and returns its *new* value.
- */
-fun <S, A> Optional<S, A>.assign(a: A): State<S, Option<A>> =
-  update { _ -> a }
-
-/**
- * Assign the value focus [A] through the [Optional] and returns its *old* value.
- */
-fun <S, A> Optional<S, A>.assignOld(a: A): State<S, Option<A>> =
-  updateOld { _ -> a }
-
-/**
- * Assign the focus [A] viewed through the [Optional] and ignores both values.
- */
-fun <S, A> Optional<S, A>.assign_(a: A): State<S, Unit> =
-  update_ { _ -> a }
+fun <S, A> Optional(f: (S) -> Option<A>, set: (S, A) -> S): Optional<S, A> =
+  Optional.invoke({ s -> f(s).toEither { s } }, set)
