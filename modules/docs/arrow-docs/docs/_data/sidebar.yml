@@ -123,7 +123,7 @@ options:
         url: /docs/datatypes/basic/
 
       - title: Option
-        url: /docs/arrow/core/option/
+        url: /docs/apidocs/arrow-core-data/arrow.core/-option/
 
       - title: Either
         url: /docs/arrow/core/either/
