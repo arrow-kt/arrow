@@ -24,6 +24,7 @@ import org.jetbrains.kotlin.compiler.plugin.ComponentRegistrar
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.JVMConfigurationKeys
 import org.jetbrains.kotlin.container.ComponentProvider
+import org.jetbrains.kotlin.container.StorageComponentContainer
 import org.jetbrains.kotlin.context.ProjectContext
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
@@ -47,6 +48,7 @@ import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtModifierListOwner
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.BindingTrace
+import org.jetbrains.kotlin.resolve.TargetPlatform
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
 import org.jetbrains.kotlin.resolve.checkers.DeclarationChecker
 import org.jetbrains.kotlin.resolve.checkers.DeclarationCheckerContext
@@ -56,6 +58,7 @@ import org.jetbrains.kotlin.resolve.jvm.diagnostics.JvmDeclarationOrigin
 import org.jetbrains.kotlin.resolve.jvm.extensions.AnalysisHandlerExtension
 import org.jetbrains.kotlin.resolve.jvm.extensions.PackageFragmentProviderExtension
 import org.jetbrains.kotlin.resolve.lazy.LazyClassContext
+import org.jetbrains.kotlin.resolve.lazy.ResolveSession
 import org.jetbrains.kotlin.resolve.lazy.declarations.ClassMemberDeclarationProvider
 import org.jetbrains.kotlin.resolve.lazy.declarations.PackageMemberDeclarationProvider
 import org.jetbrains.kotlin.resolve.scopes.SyntheticScope
@@ -104,8 +107,8 @@ interface MetaCompilerPlugin : ComponentRegistrar {
         ctx.files = files
         ctx.bindingTrace = bindingTrace
         ctx.componentProvider = componentProvider
-      return doAnalysis(project, module, projectContext, files, bindingTrace, componentProvider)
-    }
+        return doAnalysis(project, module, projectContext, files, bindingTrace, componentProvider)
+      }
 
       override fun CompilerContext.analysisCompleted(project: Project, module: ModuleDescriptor, bindingTrace: BindingTrace, files: Collection<KtFile>): AnalysisResult? =
         analysisCompleted(project, module, bindingTrace, files)
@@ -136,6 +139,13 @@ interface MetaCompilerPlugin : ComponentRegistrar {
         }
     }
 
+  fun resolveSession(f: CompilerContext.(ctx: ResolveSession) -> Unit): ExtensionPhase.SyntheticResolver =
+    syntheticResolver(
+      generatePackageSyntheticClasses = { _, _, ctx, _, _ ->
+        updateClassContext(f, ctx as ResolveSession)
+      }
+    )
+
   fun defineClass(f: (bindingContext: BindingContext, diagnostics: DiagnosticSink, classDef: ClassDefinition) -> ClassDefinition): ExtensionPhase.ClassBuilder =
     object : ExtensionPhase.ClassBuilder {
       override fun CompilerContext.interceptClassBuilder(interceptedFactory: ClassBuilderFactory, bindingContext: BindingContext, diagnostics: DiagnosticSink): ClassBuilderFactory =
@@ -154,10 +164,17 @@ interface MetaCompilerPlugin : ComponentRegistrar {
         }
     }
 
-  fun storageComponent(check: CompilerContext.(declaration: KtDeclaration, descriptor: DeclarationDescriptor, context: DeclarationCheckerContext) -> Unit): ExtensionPhase.StorageComponentContainer =
+  fun storageComponent(
+    registerModuleComponents: CompilerContext.(container: StorageComponentContainer, platform: TargetPlatform, moduleDescriptor: ModuleDescriptor) -> Unit,
+    check: CompilerContext.(declaration: KtDeclaration, descriptor: DeclarationDescriptor, context: DeclarationCheckerContext) -> Unit
+  ): ExtensionPhase.StorageComponentContainer =
     object : ExtensionPhase.StorageComponentContainer {
       override fun CompilerContext.check(declaration: KtDeclaration, descriptor: DeclarationDescriptor, context: DeclarationCheckerContext) {
         check(declaration, descriptor, context)
+      }
+
+      override fun CompilerContext.registerModuleComponents(container: StorageComponentContainer, platform: TargetPlatform, moduleDescriptor: ModuleDescriptor) {
+        registerModuleComponents(container, platform, moduleDescriptor)
       }
     }
 
@@ -304,9 +321,9 @@ interface MetaCompilerPlugin : ComponentRegistrar {
     registerPostAnalysisContextEnrichment(project, ctx)
     intercept().forEach { phase ->
       if (phase is ExtensionPhase.Config) registerCompilerConfiguration(project, phase, ctx)
+      if (phase is ExtensionPhase.StorageComponentContainer) registerStorageComponentContainer(project, phase, ctx)
       if (phase is ExtensionPhase.AnalysisHandler) registerAnalysisHandler(project, phase, ctx)
       if (phase is ExtensionPhase.ClassBuilder) registerClassBuilder(project, phase, ctx)
-      if (phase is ExtensionPhase.StorageComponentContainer) registerStorageComponentContainer(project, phase, ctx)
       if (phase is ExtensionPhase.Codegen) registerCodegen(project, phase, ctx)
       if (phase is ExtensionPhase.DeclarationAttributeAlterer) registerDeclarationAttributeAlterer(project, phase, ctx)
       if (phase is ExtensionPhase.PackageProvider) packageFragmentProvider(project, phase, ctx)
@@ -325,7 +342,7 @@ interface MetaCompilerPlugin : ComponentRegistrar {
   }
 
   fun registerSyntheticScopeProvider(project: MockProject, phase: ExtensionPhase.SyntheticScopeProvider, ctx: CompilerContext) {
-    SyntheticScopeProviderExtension.registerExtension(project, object: SyntheticScopeProviderExtension {
+    SyntheticScopeProviderExtension.registerExtension(project, object : SyntheticScopeProviderExtension {
       override fun getScopes(moduleDescriptor: ModuleDescriptor, javaSyntheticPropertiesScope: JavaSyntheticPropertiesScope): List<SyntheticScope> =
         phase.run { ctx.getSyntheticScopes(moduleDescriptor, javaSyntheticPropertiesScope) }
     })
@@ -342,7 +359,7 @@ interface MetaCompilerPlugin : ComponentRegistrar {
   fun registerSyntheticResolver(project: MockProject, phase: ExtensionPhase.SyntheticResolver, compilerContext: CompilerContext) {
     SyntheticResolveExtension.registerExtension(project, object : SyntheticResolveExtension {
       override fun addSyntheticSupertypes(thisDescriptor: ClassDescriptor, supertypes: MutableList<KotlinType>) {
-          phase.run { compilerContext.addSyntheticSupertypes(thisDescriptor, supertypes) }
+        phase.run { compilerContext.addSyntheticSupertypes(thisDescriptor, supertypes) }
       }
 
       override fun generateSyntheticClasses(thisDescriptor: ClassDescriptor, name: Name, ctx: LazyClassContext, declarationProvider: ClassMemberDeclarationProvider, result: MutableSet<ClassDescriptor>) {
@@ -428,6 +445,10 @@ interface MetaCompilerPlugin : ComponentRegistrar {
   }
 
   class DelegatingContributorChecker(val phase: ExtensionPhase.StorageComponentContainer, val ctx: CompilerContext) : StorageComponentContainerContributor, DeclarationChecker {
+    override fun registerModuleComponents(container: StorageComponentContainer, platform: TargetPlatform, moduleDescriptor: ModuleDescriptor) {
+      phase.run { ctx.registerModuleComponents(container, platform, moduleDescriptor) }
+    }
+
     override fun check(declaration: KtDeclaration, descriptor: DeclarationDescriptor, context: DeclarationCheckerContext) {
       phase.run { ctx.check(declaration, descriptor, context) }
     }

@@ -14,6 +14,7 @@ import org.jetbrains.kotlin.com.intellij.psi.JavaPsiFacade
 import org.jetbrains.kotlin.com.intellij.psi.PsiElementFactory
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.container.ComponentProvider
+import org.jetbrains.kotlin.container.StorageComponentContainer
 import org.jetbrains.kotlin.context.ProjectContext
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
@@ -34,10 +35,12 @@ import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtModifierListOwner
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.BindingTrace
+import org.jetbrains.kotlin.resolve.TargetPlatform
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
 import org.jetbrains.kotlin.resolve.checkers.DeclarationCheckerContext
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.lazy.LazyClassContext
+import org.jetbrains.kotlin.resolve.lazy.ResolveSession
 import org.jetbrains.kotlin.resolve.lazy.declarations.ClassMemberDeclarationProvider
 import org.jetbrains.kotlin.resolve.lazy.declarations.PackageMemberDeclarationProvider
 import org.jetbrains.kotlin.resolve.scopes.SyntheticScope
@@ -140,6 +143,12 @@ interface ExtensionPhase {
   }
 
   interface StorageComponentContainer : ExtensionPhase {
+    fun CompilerContext.registerModuleComponents(
+      container: org.jetbrains.kotlin.container.StorageComponentContainer,
+      platform: TargetPlatform,
+      moduleDescriptor: ModuleDescriptor
+    ) : Unit
+
     fun CompilerContext.check(
       declaration: KtDeclaration,
       descriptor: DeclarationDescriptor,
@@ -181,14 +190,14 @@ interface ExtensionPhase {
 
   }
 
-  interface SyntheticScopeProvider: ExtensionPhase {
+  interface SyntheticScopeProvider : ExtensionPhase {
     fun CompilerContext.getSyntheticScopes(
       moduleDescriptor: ModuleDescriptor,
       javaSyntheticPropertiesScope: JavaSyntheticPropertiesScope
     ): List<SyntheticScope>
   }
 
-  interface DiagnosticsSuppressor: ExtensionPhase {
+  interface DiagnosticsSuppressor : ExtensionPhase {
     fun CompilerContext.isSuppressed(diagnostic: Diagnostic): Boolean
   }
 }
@@ -198,6 +207,7 @@ class CompilerContext(
   val messageCollector: MessageCollector,
   val elementFactory: PsiElementFactory = JavaPsiFacade.getInstance(project).elementFactory
 ) {
+  lateinit var lazyClassContext: ResolveSession
   val ctx: CompilerContext = this
   lateinit var module: ModuleDescriptor
   lateinit var projectContext: ProjectContext
@@ -206,6 +216,18 @@ class CompilerContext(
   lateinit var componentProvider: ComponentProvider
 
   private val descriptorPhaseState = ConcurrentHashMap<FqName, ClassDescriptor>()
+
+  /**
+   * updateClassContext can't replace the actual class context just mutate its internal fields since the compiler holds a
+   * reference to the class context associated for resolution.
+   * The resolvers in this context can be safely mutated thought via `resolveSession { ctx -> ... }` in the meta DSL
+   */
+  fun updateClassContext(f: CompilerContext.(ResolveSession) -> Unit, ctx: ResolveSession): Unit {
+    if (!::lazyClassContext.isInitialized) {
+      f(ctx)
+      lazyClassContext = ctx
+    }
+  }
 
   fun storeDescriptor(descriptor: ClassDescriptor): Unit {
     descriptorPhaseState[descriptor.fqNameSafe] = descriptor

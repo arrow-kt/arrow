@@ -19,6 +19,7 @@ import org.jetbrains.kotlin.descriptors.Visibility
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.AbstractTypeAliasDescriptor
 import org.jetbrains.kotlin.descriptors.impl.ClassDescriptorImpl
+import org.jetbrains.kotlin.descriptors.impl.DeclarationDescriptorVisitorEmptyBodies
 import org.jetbrains.kotlin.descriptors.impl.PackageFragmentDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.TypeParameterDescriptorImpl
 import org.jetbrains.kotlin.descriptors.resolveClassByFqName
@@ -33,10 +34,9 @@ import org.jetbrains.kotlin.ir.builders.declarations.buildConstructor
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrConstructor
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationOriginImpl
-import org.jetbrains.kotlin.ir.declarations.IrTypeAlias
 import org.jetbrains.kotlin.ir.declarations.IrValueParameter
-import org.jetbrains.kotlin.ir.declarations.impl.IrTypeAliasImpl
 import org.jetbrains.kotlin.ir.expressions.IrCall
+import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.symbols.impl.IrTypeParameterSymbolImpl
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.IrTypeArgument
@@ -136,6 +136,13 @@ class AddSupertypesPackageFragmentProvider(val compilerContext: CompilerContext,
 
   override fun getPackageFragments(fqName: FqName): List<PackageFragmentDescriptor> {
     val pckg: PackageViewDescriptor = module.getPackage(fqName)
+    pckg.accept(object : DeclarationDescriptorVisitorEmptyBodies<Unit, Unit>() {
+
+      override fun visitDeclarationDescriptor(descriptor: DeclarationDescriptor?, data: Unit?) {
+        println("visited: $descriptor")
+        //descriptor?.accept(this, Unit)
+      }
+    }, Unit)
     val descriptorsInPackage = compilerContext.storedDescriptors().filter {
       it.fqNameSafe.parent() == fqName
     }
@@ -245,11 +252,11 @@ fun BackendContext.irType(
   className: String,
   typeArguments: List<IrTypeArgument> = emptyList(),
   nullable: Boolean = false,
-  annotations: List<IrCall> = emptyList()
+  annotations: List<IrConstructorCall> = emptyList()
 ): IrType =
   IrSimpleTypeImpl(
     classifier = ir.symbols.externalSymbolTable.referenceClass(
-      ir.context.getClass(FqName(className))
+      ir.irModule.descriptor.resolveClassByFqName(FqName(className), NoLookupLocation.FROM_BACKEND)!!
     ),
     hasQuestionMark = nullable,
     arguments = typeArguments,
@@ -260,7 +267,7 @@ fun irTypeArgument(
   name: Name,
   containingDeclaration: DeclarationDescriptor,
   nullable: Boolean = false,
-  annotations: List<IrCall> = emptyList()
+  annotations: List<IrConstructorCall> = emptyList()
 ): IrTypeArgument =
   IrSimpleTypeImpl(
     classifier = IrTypeParameterSymbolImpl(
@@ -295,14 +302,6 @@ fun buildIrConstructor(b: IrFunctionBuilder.() -> Unit): IrConstructor = IrFunct
   b()
   buildConstructor()
 }
-
-fun CompilerContext.irKindTypeAlias(target: IrClass): IrTypeAlias =
-  IrTypeAliasImpl(
-    startOffset = UNDEFINED_OFFSET,
-    endOffset = UNDEFINED_OFFSET,
-    origin = target.origin,
-    descriptor = kindTypeAlias(target.descriptor)
-  )
 
 fun BackendContext.kindMarker(target: IrClass): IrClass {
   return buildIrClass {
