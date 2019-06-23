@@ -1,9 +1,9 @@
 package arrow.benchmarks
 
 import arrow.core.Right
-import arrow.effects.IO
-import arrow.effects.extensions.io.concurrent.concurrent
-import arrow.effects.fix
+import arrow.fx.IO
+import arrow.fx.extensions.io.concurrent.concurrent
+import arrow.fx.fix
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.CompilerControl
 import org.openjdk.jmh.annotations.Fork

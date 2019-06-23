@@ -17,15 +17,15 @@ We can also code against `Fx` assuming it would be provided at some point in the
 In the following example, the program is declared polymorphic and then made concrete to Arrow IO at the edge.
 
 ```kotlin:ank:playground
-import arrow.effects.IO
+import arrow.fx.IO
 import arrow.unsafe
 import arrow.Kind
-import arrow.effects.extensions.io.unsafeRun.runBlocking
-import arrow.effects.extensions.io.unsafeRun.unsafeRun
-import arrow.effects.extensions.io.concurrent.concurrent
-import arrow.effects.extensions.fx
-import arrow.effects.typeclasses.Concurrent
-import arrow.effects.typeclasses.UnsafeRun
+import arrow.fx.extensions.io.unsafeRun.runBlocking
+import arrow.fx.extensions.io.unsafeRun.unsafeRun
+import arrow.fx.extensions.io.concurrent.concurrent
+import arrow.fx.extensions.fx
+import arrow.fx.typeclasses.Concurrent
+import arrow.fx.typeclasses.UnsafeRun
 
 //sampleStart
 /* a side effect */
@@ -68,7 +68,7 @@ The Arrow library already provides the ability to compute imperatively over all 
 
 *Fx over `Option`*
 ```kotlin:ank:playground
-import arrow.effects.IO
+import arrow.fx.IO
 import arrow.core.Option
 import arrow.core.extensions.fx
 

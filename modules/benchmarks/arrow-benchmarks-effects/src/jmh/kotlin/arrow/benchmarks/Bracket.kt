@@ -1,6 +1,6 @@
 package arrow.benchmarks
 
-import arrow.effects.IO
+import arrow.fx.IO
 import arrow.unsafe
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.CompilerControl
@@ -11,7 +11,7 @@ import org.openjdk.jmh.annotations.Scope
 import org.openjdk.jmh.annotations.State
 import org.openjdk.jmh.annotations.Warmup
 import java.util.concurrent.TimeUnit
-import arrow.effects.extensions.io.unsafeRun.runBlocking as ioRunBlocking
+import arrow.fx.extensions.io.unsafeRun.runBlocking as ioRunBlocking
 
 @State(Scope.Thread)
 @Fork(2)

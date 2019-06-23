@@ -3,7 +3,7 @@ apply plugin: 'kotlin-kapt'
 
 dependencies {
     compile project(":arrow-core")
-    compile project(":arrow-effects-data")
+    compile project(":arrow-fx")
 
     compile "org.jetbrains.kotlin:kotlin-compiler:$ankKotlinVersion"
     compile "org.jetbrains.kotlin:kotlin-script-util:$ankKotlinVersion"

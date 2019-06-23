@@ -1,6 +1,6 @@
 package arrow.integrations.retrofit.adapter
 
-import arrow.effects.IO
+import arrow.fx.IO
 import arrow.integrations.retrofit.adapter.retrofit.retrofit
 import arrow.test.UnitSpec
 import com.google.gson.reflect.TypeToken

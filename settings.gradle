@@ -65,11 +65,11 @@ include {
             _ 'free-extensions'
         }
 
-        effects {
-            _ 'effects-data'
-            _ 'effects-mtl'
-            _ 'effects-rx2-data'
-            _ 'effects-reactor-data'
+        fx {
+            _ 'fx'
+            _ 'fx-mtl'
+            _ 'fx-rx2'
+            _ 'fx-reactor'
         }
 
         integrations {

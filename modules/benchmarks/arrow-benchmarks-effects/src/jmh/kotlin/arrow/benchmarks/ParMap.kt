@@ -1,9 +1,9 @@
 package arrow.benchmarks
 
 import arrow.core.extensions.list.foldable.foldLeft
-import arrow.effects.IO
-import arrow.effects.IODispatchers
-import arrow.effects.extensions.io.concurrent.parMapN
+import arrow.fx.IO
+import arrow.fx.IODispatchers
+import arrow.fx.extensions.io.concurrent.parMapN
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.CompilerControl
 import org.openjdk.jmh.annotations.Fork

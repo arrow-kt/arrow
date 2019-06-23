@@ -1,6 +1,6 @@
 package arrow.benchmarks
 
-import arrow.effects.IO
+import arrow.fx.IO
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.CompilerControl
 import org.openjdk.jmh.annotations.Fork
@@ -10,7 +10,7 @@ import org.openjdk.jmh.annotations.Scope
 import org.openjdk.jmh.annotations.State
 import org.openjdk.jmh.annotations.Warmup
 import java.util.concurrent.TimeUnit
-import arrow.effects.handleErrorWith as ioHandleErrorWith
+import arrow.fx.handleErrorWith as ioHandleErrorWith
 
 @State(Scope.Thread)
 @Fork(2)

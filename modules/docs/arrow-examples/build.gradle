@@ -23,8 +23,8 @@ idea {
 }
 
 dependencies {
-    compile project(':arrow-effects-data')
-    compile project(':arrow-effects-rx2-data')
+    compile project(':arrow-fx')
+    compile project(':arrow-fx-rx2')
     compile project(':arrow-optics')
     compile project(':arrow-ui')
     compile project(':arrow-validation')

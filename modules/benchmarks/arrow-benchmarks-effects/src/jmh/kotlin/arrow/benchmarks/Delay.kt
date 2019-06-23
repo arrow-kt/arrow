@@ -1,6 +1,6 @@
 package arrow.benchmarks
 
-import arrow.effects.IO
+import arrow.fx.IO
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.CompilerControl
 import org.openjdk.jmh.annotations.Fork
