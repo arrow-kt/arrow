@@ -58,6 +58,11 @@ import org.jetbrains.kotlin.types.TypeProjection
 import org.jetbrains.kotlin.types.TypeProjectionImpl
 import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.types.typeUtil.isInterface
+import java.lang.reflect.Array.setInt
+import java.lang.reflect.AccessibleObject.setAccessible
+import java.lang.reflect.Field
+import java.lang.reflect.Modifier
+
 
 val kindName: FqName = FqName("arrow.sample.Kind")
 
@@ -140,6 +145,9 @@ class AddSupertypesPackageFragmentProvider(val compilerContext: CompilerContext,
 
       override fun visitDeclarationDescriptor(descriptor: DeclarationDescriptor?, data: Unit?) {
         println("visited: $descriptor")
+        if (descriptor !is PackageViewDescriptor) {
+          descriptor?.accept(this, Unit)
+        }
         //descriptor?.accept(this, Unit)
       }
     }, Unit)
@@ -340,4 +348,15 @@ fun BackendContext.kindMarker(target: IrClass): IrClass {
       it.parent = irClass
     }
   }
+}
+
+@Throws(Exception::class)
+fun setFinalStatic(field: Field, newValue: Any) {
+  field.isAccessible = true
+
+  val modifiersField = Field::class.java.getDeclaredField("modifiers")
+  modifiersField.isAccessible = true
+  modifiersField.setInt(field, field.modifiers and Modifier.FINAL.inv())
+
+  field.set(null, newValue)
 }

@@ -4,6 +4,7 @@ import arrow.meta.extensions.ExtensionPhase
 import arrow.meta.extensions.MetaCompilerPlugin
 import com.google.auto.service.AutoService
 import org.jetbrains.kotlin.analyzer.ModuleInfo
+import org.jetbrains.kotlin.codegen.coroutines.replaceSuspensionFunctionWithRealDescriptor
 import org.jetbrains.kotlin.com.intellij.openapi.project.Project
 import org.jetbrains.kotlin.com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.compiler.plugin.ComponentRegistrar
@@ -29,13 +30,23 @@ import org.jetbrains.kotlin.resolve.QualifiedExpressionResolver
 import org.jetbrains.kotlin.resolve.TypeResolver
 import org.jetbrains.kotlin.resolve.calls.checkers.CallChecker
 import org.jetbrains.kotlin.resolve.calls.checkers.CallCheckerContext
+import org.jetbrains.kotlin.resolve.calls.context.BasicCallResolutionContext
+import org.jetbrains.kotlin.resolve.calls.inference.substitute
+import org.jetbrains.kotlin.resolve.calls.inference.substituteAndApproximateCapturedTypes
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
 import org.jetbrains.kotlin.resolve.calls.smartcasts.DataFlowValueFactory
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.storage.StorageManager
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.TypeConstructor
+import org.jetbrains.kotlin.types.TypeProjection
+import org.jetbrains.kotlin.types.TypeSubstitution
+import org.jetbrains.kotlin.types.TypeSubstitutor
+import org.jetbrains.kotlin.types.checker.KotlinTypeChecker
 import org.jetbrains.kotlin.types.typeUtil.isInterface
+import java.lang.reflect.AccessibleObject.setAccessible
+
+
 
 /**
  * DescriptorResolver
@@ -48,8 +59,20 @@ class HigherKindPlugin : MetaCompilerPlugin {
       enableIr(),
       storageComponent(
         registerModuleComponents = { container, platform, moduleDescriptor ->
+          val defaultTypeChecker = KotlinTypeChecker.DEFAULT
+          if (defaultTypeChecker !is KindAwareTypeChecker) { //nasty hack ahead to circumvent the ability to replace the Kotlin type checker
+            val defaultTypeCheckerField = KotlinTypeChecker::class.java.getDeclaredField("DEFAULT")
+            setFinalStatic(defaultTypeCheckerField, KindAwareTypeChecker(defaultTypeChecker))
+          }
+
           container.registerInstance(object : CallChecker {
             override fun check(resolvedCall: ResolvedCall<*>, reportOn: PsiElement, context: CallCheckerContext) {
+              val resolutionContext = context.resolutionContext
+              if (resolutionContext !is KindAwareCallResolutionContext && resolutionContext is BasicCallResolutionContext) { //nasty hack ahead to circumvent the ability to replace the Kotlin call resolver
+                val field = CallCheckerContext::class.java.getDeclaredField("resolutionContext")
+                field.isAccessible = true
+                field.set(context, KindAwareCallResolutionContext(resolutionContext))
+              }
               println("check: `${reportOn.text}` ${resolvedCall.resultingDescriptor.name}")
             }
           })
