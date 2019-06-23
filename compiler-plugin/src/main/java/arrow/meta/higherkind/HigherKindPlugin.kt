@@ -64,18 +64,6 @@ class HigherKindPlugin : MetaCompilerPlugin {
             val defaultTypeCheckerField = KotlinTypeChecker::class.java.getDeclaredField("DEFAULT")
             setFinalStatic(defaultTypeCheckerField, KindAwareTypeChecker(defaultTypeChecker))
           }
-
-          container.registerInstance(object : CallChecker {
-            override fun check(resolvedCall: ResolvedCall<*>, reportOn: PsiElement, context: CallCheckerContext) {
-              val resolutionContext = context.resolutionContext
-              if (resolutionContext !is KindAwareCallResolutionContext && resolutionContext is BasicCallResolutionContext) { //nasty hack ahead to circumvent the ability to replace the Kotlin call resolver
-                val field = CallCheckerContext::class.java.getDeclaredField("resolutionContext")
-                field.isAccessible = true
-                field.set(context, KindAwareCallResolutionContext(resolutionContext))
-              }
-              println("check: `${reportOn.text}` ${resolvedCall.resultingDescriptor.name}")
-            }
-          })
           println("registerModuleComponents")
         },
         check = { declaration, descriptor, context ->
