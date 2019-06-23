@@ -4,14 +4,16 @@ import arrow.meta.extensions.ExtensionPhase
 import arrow.meta.extensions.MetaComponentRegistrar
 import arrow.meta.utils.*
 import com.google.auto.service.AutoService
-import com.intellij.openapi.project.Project
 import org.jetbrains.kotlin.analyzer.ModuleInfo
+import org.jetbrains.kotlin.com.intellij.openapi.project.Project
+import org.jetbrains.kotlin.com.intellij.psi.PsiClass
 import org.jetbrains.kotlin.compiler.plugin.ComponentRegistrar
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.incremental.components.LookupTracker
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.util.transformDeclarationsFlat
+import org.jetbrains.kotlin.psi.psiUtil.allChildren
 import org.jetbrains.kotlin.resolve.BindingTrace
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.storage.StorageManager
@@ -41,9 +43,10 @@ class HigherKindComponentRegistrar : MetaComponentRegistrar {
             !(it.constructor.declarationDescriptor?.defaultType?.isInterface() ?: false)
           }
           if (!isSubtype && descriptor.shouldApplyKind()) {
+            println(descriptor.name)
             val hk = descriptor.higherKind()
             println("${descriptor.name} ~> addSyntheticSupertypes = $hk")
-            supertypes.add(hk)
+            hk?.let{supertypes.add(it)}
           } else {
             // println("skipped: " + descriptor.name)
           }

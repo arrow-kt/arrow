@@ -163,18 +163,23 @@ fun kotlinType(
   )
 }
 
-fun ClassDescriptor.higherKind(): KotlinType {
-  return kotlinType(
-    typeConstructor = module.resolveClassByFqName(
-      kindName,
-      NoLookupLocation.FROM_BACKEND
-    )?.typeConstructor!!,
-    typeArguments = listOf(
-      typeVariable(fqNameSafe.kindMarkerName.shortNameOrSpecial()),
-      // TypeProjectionImpl(kindMarker().defaultType),
-      typeVariable(declaredTypeParameters[0].name)
+fun ClassDescriptor.higherKind(): KotlinType? {
+
+  val typeConstructor: TypeConstructor? = module.resolveClassByFqName(
+    kindName,
+    NoLookupLocation.FROM_BACKEND
+  )?.typeConstructor
+
+  return typeConstructor?.let {
+    kotlinType(
+      typeConstructor = it,
+      typeArguments = listOf(
+        typeVariable(fqNameSafe.kindMarkerName.shortNameOrSpecial()),
+        // TypeProjectionImpl(kindMarker().defaultType),
+        typeVariable(declaredTypeParameters[0].name)
+      )
     )
-  )
+  }
 }
 
 fun ClassDescriptor.typeVariable(

@@ -19,7 +19,7 @@
 <depends>org.jetbrains.kotlin</depends>
 
 <extensions defaultExtensionNs="org.jetbrains.kotlin">
-    <gradleProjectImportHandler implementation="nl.fabianm.kotlin.plugin.generated.idea.GeneratedGradleImportHandler" />
+    <gradleProjectImportHandler implementation="arrow.meta.plugin.idea.ArrowGradleImportHandler" />
 </extensions>
 
 </idea-plugin>

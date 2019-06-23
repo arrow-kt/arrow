@@ -1,15 +1,13 @@
 plugins {
-  id 'org.jetbrains.kotlin.jvm'
   id 'java-gradle-plugin'
   id 'maven-publish'
   id 'com.gradle.plugin-publish' version "0.10.1"
   id 'com.jfrog.bintray' version "1.8.4"
 }
+apply plugin: 'kotlin'
 
-repositories {
-  mavenCentral()
-  jcenter()
-}
+project.group = 'io.arrow-kt'
+project.version = '0.0.1'
 
 dependencies {
   implementation gradleApi()
@@ -39,10 +37,27 @@ jar {
 
 gradlePlugin {
   plugins {
-    create("arrow") {
+    arrow {
       id = "arrow.meta.plugin.gradle"
-      implementationClass = "arrow.meta.plugin.gradle.GeneratedGradleSubplugin"
+      implementationClass = "arrow.meta.plugin.gradle.ArrowGradlePlugin"
     }
   }
 }
 
+pluginBundle {
+  website = "http://arrow-kt.io/"
+  vcsUrl = "https://github.com/47deg/arrow-meta-prototype.git"
+  description = "The Arrow compiler plugin."
+  tags = ["kotlin", "compiler", "arrow", "plugin", "meta"]
+
+  plugins {
+    arrow {
+      id = "arrow.meta.plugin.gradle"
+      displayName = "Arrow compiler plugin"
+    }
+  }
+
+  mavenCoordinates {
+    groupId = "arrow.meta.plugin.gradle"
+  }
+}

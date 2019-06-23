@@ -1,12 +1,10 @@
-plugins{
-    id 'org.jetbrains.kotlin.jvm'
-}
+apply plugin: 'kotlin'
 
 def compilerPlugin = project(':compiler-plugin')
 
 evaluationDependsOn(":$compilerPlugin.name")
 
-compileKotlin.kotlinOptions.freeCompilerArgs = ['-Xplugin=', new File(compilerPlugin.buildDir, "libs/${compilerPlugin.name}.jar")]
+compileKotlin.kotlinOptions.freeCompilerArgs = ["-Xplugin=${new File(compilerPlugin.buildDir, "libs/${compilerPlugin.name}.jar")}"]
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"

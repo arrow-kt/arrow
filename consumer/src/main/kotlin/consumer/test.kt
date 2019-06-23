@@ -5,6 +5,7 @@ import arrow.core.Option
 //import arrow.core.ForOption
 
 object test {
+
   @JvmStatic
   fun main(args: Array<String>) {
     println("Option supertypes: ${Option::class.java.interfaces.toList().map { it.toGenericString() }}")
