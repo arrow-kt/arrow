@@ -7,8 +7,10 @@ import arrow.core.Right
 import arrow.core.Some
 import arrow.core.Tuple4
 import arrow.core.right
+import arrow.effects.IO.Companion.effect
 import arrow.effects.IO.Companion.just
 import arrow.effects.extensions.fx
+// <fail import>
 import arrow.effects.extensions.io.async.async
 import arrow.effects.extensions.io.concurrent.concurrent
 import arrow.effects.extensions.io.concurrent.parMapN

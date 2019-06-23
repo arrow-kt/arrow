@@ -7,6 +7,7 @@ import arrow.core.Tuple4
 import arrow.core.Tuple7
 import arrow.core.toT
 import arrow.effects.extensions.fx
+// <fail import>
 import arrow.effects.extensions.io.async.async
 import arrow.effects.extensions.io.concurrent.concurrent
 import arrow.effects.extensions.io.monad.flatMap

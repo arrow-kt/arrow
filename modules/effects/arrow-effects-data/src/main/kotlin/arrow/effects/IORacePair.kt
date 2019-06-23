@@ -17,7 +17,7 @@ import kotlin.coroutines.CoroutineContext
  *
  * ```kotlin:ank:playground
  * import arrow.effects.*
- * import arrow.effects.extensions.fx
+ * // <fail import>
  * import kotlinx.coroutines.Dispatchers
  *
  * fun main(args: Array<String>) {

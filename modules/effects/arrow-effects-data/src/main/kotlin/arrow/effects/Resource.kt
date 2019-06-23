@@ -29,7 +29,7 @@ inline fun <F, E, A> ResourceOf<F, E, A>.fix(): Resource<F, E, A> =
  * Consider the following use case:
  * ```kotlin:ank:playground
  * import arrow.effects.IO
- * import arrow.effects.extensions.fx
+ * // <fail import>
  *
  * object Consumer
  * object Handle

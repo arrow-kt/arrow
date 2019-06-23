@@ -214,7 +214,7 @@ IO.async<Int> { callback ->
 ```kotlin
 import arrow.typeclasses.*
 import arrow.effects.*
-import arrow.effects.extensions.fx
+// <fail import>
 
 IO.fx {
   val (file) = getFile("/tmp/file.txt")

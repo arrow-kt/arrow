@@ -5,7 +5,6 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.extensions.either.monad.flatten
-import arrow.core.left
 import arrow.mtl.EitherT
 import arrow.mtl.EitherTOf
 import arrow.mtl.EitherTPartialOf

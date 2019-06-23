@@ -2,6 +2,7 @@ package arrow.effects
 
 import arrow.core.extensions.list.traverse.sequence
 import arrow.effects.extensions.fx
+// <fail import>
 import arrow.effects.extensions.io.applicative.applicative
 import arrow.effects.extensions.io.monad.flatMap
 import arrow.effects.extensions.io.monad.flatten
