@@ -9,18 +9,26 @@ import arrow.effects.internal.Platform
 import arrow.effects.reactor.CoroutineContextReactorScheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
-import arrow.higherkind
 import reactor.core.publisher.Mono
 import reactor.core.publisher.MonoSink
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.CoroutineContext
+
+class ForMonoK private constructor() {
+  companion object
+}
+typealias MonoKOf<A> = arrow.Kind<ForMonoK, A>
+typealias MonoKKindedJ<A> = io.kindedj.Hk<ForMonoK, A>
+
+@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+inline fun <A> MonoKOf<A>.fix(): MonoK<A> =
+  this as MonoK<A>
 
 fun <A> Mono<A>.k(): MonoK<A> = MonoK(this)
 
 fun <A> MonoKOf<A>.value(): Mono<A> =
   this.fix().mono
 
-@higherkind
 data class MonoK<A>(val mono: Mono<A>) : MonoKOf<A>, MonoKKindedJ<A> {
   fun <B> map(f: (A) -> B): MonoK<B> =
     mono.map(f).k()

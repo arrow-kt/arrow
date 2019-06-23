@@ -101,7 +101,6 @@ dependencies {
     compile "io.arrow-kt:arrow-effects-rx2-data:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects-rx2-extensions:$arrow_version" //optional
     compile "io.arrow-kt:arrow-effects-reactor-data:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-effects-reactor-extensions:$arrow_version" //optional
     compile "io.arrow-kt:arrow-optics:$arrow_version" //optional
     compile "io.arrow-kt:arrow-generic:$arrow_version" //optional
     compile "io.arrow-kt:arrow-recursion-data:$arrow_version" //optional

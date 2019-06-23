@@ -12,11 +12,20 @@ import arrow.effects.internal.Platform
 import arrow.effects.reactor.CoroutineContextReactorScheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
-import arrow.higherkind
 import arrow.typeclasses.Applicative
 import reactor.core.publisher.Flux
 import reactor.core.publisher.FluxSink
 import kotlin.coroutines.CoroutineContext
+
+class ForFluxK private constructor() {
+  companion object
+}
+typealias FluxKOf<A> = arrow.Kind<ForFluxK, A>
+typealias FluxKKindedJ<A> = io.kindedj.Hk<ForFluxK, A>
+
+@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+inline fun <A> FluxKOf<A>.fix(): FluxK<A> =
+  this as FluxK<A>
 
 fun <A> Flux<A>.k(): FluxK<A> = FluxK(this)
 
@@ -24,7 +33,6 @@ fun <A> FluxKOf<A>.value(): Flux<A> =
   this.fix().flux
 
 @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
-@higherkind
 data class FluxK<A>(val flux: Flux<A>) : FluxKOf<A>, FluxKKindedJ<A> {
   fun <B> map(f: (A) -> B): FluxK<B> =
     flux.map(f).k()

@@ -1,7 +1,7 @@
 dependencies {
     compile project(":arrow-effects-data")
     compile project(":arrow-effects-rx2-extensions")
-    compile project(":arrow-effects-reactor-extensions")
+    compile project(":arrow-effects-reactor-data")
     compile project(":arrow-scala-benchmarks")
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
