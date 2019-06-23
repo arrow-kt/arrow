@@ -1,7 +1,5 @@
 dependencies {
     compile project(":arrow-effects-data")
-    compile project(":arrow-effects-extensions")
-    compile project(":arrow-effects-io-extensions")
     compile project(":arrow-effects-rx2-extensions")
     compile project(":arrow-effects-reactor-extensions")
     compile project(":arrow-scala-benchmarks")

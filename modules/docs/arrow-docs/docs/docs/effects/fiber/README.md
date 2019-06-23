@@ -19,7 +19,7 @@ when the resulting `IO` is canceled it does not propagate this cancellation back
 ```kotlin:ank
 import arrow.effects.*
 import kotlinx.coroutines.Dispatchers.Default
-// <fail import>
+import arrow.effects.extensions.fx
 import arrow.effects.typeclasses.Fiber
 import arrow.effects.IO
 

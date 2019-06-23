@@ -11,7 +11,6 @@ import arrow.core.left
 import arrow.core.none
 import arrow.core.right
 import arrow.effects.extensions.fx
-// <fail import>
 import arrow.effects.extensions.io.concurrent.concurrent
 import arrow.effects.extensions.io.unsafeRun.runBlocking
 import arrow.effects.extensions.io.unsafeRun.unsafeRun

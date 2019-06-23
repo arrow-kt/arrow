@@ -12,7 +12,7 @@ But, we have not given up support for suspend functions! If you would like to us
 import arrow.effects.IO
 import arrow.unsafe
 import arrow.effects.extensions.io.unsafeRun.runBlocking
-// <fail import>
+import arrow.effects.extensions.fx
 //sampleStart
 suspend fun sayHello(): Unit =
   println("Hello World")

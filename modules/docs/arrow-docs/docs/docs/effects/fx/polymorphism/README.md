@@ -23,7 +23,7 @@ import arrow.Kind
 import arrow.effects.extensions.io.unsafeRun.runBlocking
 import arrow.effects.extensions.io.unsafeRun.unsafeRun
 import arrow.effects.extensions.io.concurrent.concurrent
-// <fail import>
+import arrow.effects.extensions.fx
 import arrow.effects.typeclasses.Concurrent
 import arrow.effects.typeclasses.UnsafeRun
 

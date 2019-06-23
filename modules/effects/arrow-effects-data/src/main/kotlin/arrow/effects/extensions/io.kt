@@ -5,6 +5,7 @@ import arrow.core.Either
 import arrow.effects.CancelToken
 import arrow.effects.ForIO
 import arrow.effects.IO
+import arrow.effects.IODispatchers
 import arrow.effects.IOOf
 import arrow.effects.OnCancel
 import arrow.effects.RacePair
@@ -25,6 +26,10 @@ import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
 import arrow.effects.typeclasses.ProcF
 import arrow.effects.Timer
+import arrow.effects.extensions.io.concurrent.concurrent
+import arrow.effects.extensions.io.dispatchers.dispatchers
+import arrow.effects.typeclasses.ConcurrentSyntax
+import arrow.effects.typeclasses.Environment
 import arrow.effects.typeclasses.UnsafeRun
 import arrow.extension
 import arrow.typeclasses.Applicative
@@ -238,3 +243,33 @@ interface IOUnsafeRun : UnsafeRun<ForIO> {
   override suspend fun <A> unsafe.runNonBlocking(fa: () -> Kind<ForIO, A>, cb: (Either<Throwable, A>) -> Unit) =
     fa().fix().unsafeRunAsync(cb)
 }
+
+@extension
+interface IODispatchers : Dispatchers<ForIO> {
+  override fun default(): CoroutineContext =
+    IODispatchers.CommonPool
+}
+
+@extension
+interface IOEnvironment : Environment<ForIO> {
+  override fun dispatchers(): Dispatchers<ForIO> =
+    IO.dispatchers()
+
+  override fun handleAsyncError(e: Throwable): IO<Unit> =
+    IO { println("Found uncaught async exception!"); e.printStackTrace() }
+}
+
+@extension
+interface IODefaultConcurrent : Concurrent<ForIO>, IOConcurrent {
+
+  override fun dispatchers(): Dispatchers<ForIO> =
+    IO.dispatchers()
+}
+
+fun IO.Companion.timer(): Timer<ForIO> = Timer(IO.concurrent())
+
+@extension
+interface IODefaultConcurrentEffect : ConcurrentEffect<ForIO>, IOConcurrentEffect, IODefaultConcurrent
+
+fun <A> IO.Companion.fx(c: suspend ConcurrentSyntax<ForIO>.() -> A): IO<A> =
+  IO.concurrent().fx.concurrent(c).fix()

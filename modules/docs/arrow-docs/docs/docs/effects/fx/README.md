@@ -97,7 +97,7 @@ Side effects can be composed and turned into pure values in `fx` blocks.
 
 ```kotlin:ank:playground
 import arrow.effects.IO
-// <fail import>
+import arrow.effects.extensions.fx
 //sampleStart
 suspend fun sayHello(): Unit =
   println("Hello World")
@@ -126,7 +126,7 @@ Note that running `greet()` in the previous example does not perform any effects
 
 ```kotlin:ank:playground
 import arrow.effects.IO
-// <fail import>
+import arrow.effects.extensions.fx
 //sampleStart
 suspend fun sayHello(): Unit =
   println("Hello World")
@@ -149,7 +149,7 @@ An attempt to run a side effect in an `fx` block not delimited by `effect` or `!
 
 ```kotlin:ank:fail
 import arrow.effects.IO
-// <fail import>
+import arrow.effects.extensions.fx
 //sampleStart
 suspend fun sayHello(): Unit =
   println("Hello World")
@@ -173,7 +173,7 @@ Composition using regular datatypes such as `IO` is still possible within `fx` b
 
 ```kotlin:ank:playground
 import arrow.effects.IO
-// <fail import>
+import arrow.effects.extensions.fx
 //sampleStart
 fun sayInIO(s: String): IO<Unit> =
   IO { println(s) }
@@ -203,7 +203,7 @@ Usage of `unsafe` is reserved for the end of the world and may be the only impur
 import arrow.effects.IO
 import arrow.unsafe
 import arrow.effects.extensions.io.unsafeRun.runBlocking
-// <fail import>
+import arrow.effects.extensions.fx
 //sampleStart
 suspend fun sayHello(): Unit =
   println("Hello World")

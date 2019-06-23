@@ -189,7 +189,7 @@ sealed class IO<out A> : IOOf<A> {
    *
    * ```kotlin:ank:playground
    * import arrow.effects.*
-   * // <fail import>
+   * import arrow.effects.extensions.fx
    * import kotlinx.coroutines.Dispatchers
    *
    * fun main(args: Array<String>) {

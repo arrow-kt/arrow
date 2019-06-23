@@ -16,7 +16,7 @@ Performing effects while switching execution contexts a la carte is trivial.
 import arrow.effects.IO
 import arrow.unsafe
 import arrow.effects.extensions.io.unsafeRun.runBlocking
-// <fail import>
+import arrow.effects.extensions.fx
 import kotlinx.coroutines.newSingleThreadContext
 
 //sampleStart
@@ -47,7 +47,7 @@ A [Fiber](/docs/effects/fiber) represents the pure result of a [Concurrent] data
 import arrow.effects.IO
 import arrow.unsafe
 import arrow.effects.extensions.io.unsafeRun.runBlocking
-// <fail import>
+import arrow.effects.extensions.fx
 
 //sampleStart
 suspend fun threadName(): String =
@@ -88,7 +88,7 @@ Once the function specifies a valid return, we can observe how the returned non-
 import arrow.effects.IO
 import arrow.unsafe
 import arrow.effects.extensions.io.unsafeRun.runBlocking
-// <fail import>
+import arrow.effects.extensions.fx
 
 //sampleStart
 suspend fun threadName(): String =
@@ -123,7 +123,7 @@ fun main() { // The edge of our world
 import arrow.effects.IO
 import arrow.unsafe
 import arrow.effects.extensions.io.unsafeRun.runBlocking
-// <fail import>
+import arrow.effects.extensions.fx
 
 //sampleStart
 suspend fun threadName(): String =
@@ -155,7 +155,7 @@ fun main() { // The edge of our world
 import arrow.effects.IO
 import arrow.unsafe
 import arrow.effects.extensions.io.unsafeRun.runBlocking
-// <fail import>
+import arrow.effects.extensions.fx
 
 //sampleStart
 suspend fun threadName(): String =
@@ -196,7 +196,7 @@ The value `program` below is pure and referentially transparent because `fx` ret
 import arrow.effects.IO
 import arrow.unsafe
 import arrow.effects.extensions.io.unsafeRun.runBlocking
-// <fail import>
+import arrow.effects.extensions.fx
 //sampleStart
 suspend fun printThreadName(): Unit =
   println(Thread.currentThread().name)

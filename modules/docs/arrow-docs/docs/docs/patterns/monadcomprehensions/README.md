@@ -85,7 +85,7 @@ Let's see a minimal example.
 import arrow.*
 import arrow.effects.*
 import arrow.typeclasses.*
-// <fail import>
+import arrow.effects.extensions.*
 
 IO.fx {
   1
