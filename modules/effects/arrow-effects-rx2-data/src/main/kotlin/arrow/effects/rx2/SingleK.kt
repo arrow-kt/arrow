@@ -12,17 +12,25 @@ import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.ExitCase.Canceled
 import arrow.effects.typeclasses.ExitCase.Completed
 import arrow.effects.typeclasses.ExitCase.Error
-import arrow.higherkind
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 
+class ForSingleK private constructor() {
+  companion object
+}
+typealias SingleKOf<A> = arrow.Kind<ForSingleK, A>
+typealias SingleKKindedJ<A> = io.kindedj.Hk<ForSingleK, A>
+
+@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+inline fun <A> SingleKOf<A>.fix(): SingleK<A> =
+  this as SingleK<A>
+
 fun <A> Single<A>.k(): SingleK<A> = SingleK(this)
 
 fun <A> SingleKOf<A>.value(): Single<A> = fix().single
 
-@higherkind
 data class SingleK<A>(val single: Single<A>) : SingleKOf<A>, SingleKKindedJ<A> {
 
   fun <B> map(f: (A) -> B): SingleK<B> =

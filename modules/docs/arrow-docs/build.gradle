@@ -12,7 +12,7 @@ dependencies {
     compile project(':arrow-core-data')
     compile project(':arrow-test')
     compile project(':arrow-effects-data')
-    compile project(':arrow-effects-rx2-extensions')
+    compile project(':arrow-effects-rx2-data')
     compile project(':arrow-effects-reactor-data')
     compile project(':arrow-optics')
     compile project(':arrow-validation')

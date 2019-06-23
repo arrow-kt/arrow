@@ -12,7 +12,6 @@ dependencies {
     testCompile "io.kotlintest:kotlintest-runner-junit4:$kotlinTestVersion"
     testCompile "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:$kotlinxCoroutinesVersion"
     testCompile project(':arrow-test')
-    testCompile project(":arrow-effects-rx2-extensions")
 
     compile "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
 }

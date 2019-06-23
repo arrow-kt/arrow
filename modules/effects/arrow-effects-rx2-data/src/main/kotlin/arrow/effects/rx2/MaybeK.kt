@@ -13,17 +13,25 @@ import arrow.effects.typeclasses.ExitCase
 import arrow.effects.typeclasses.ExitCase.Canceled
 import arrow.effects.typeclasses.ExitCase.Completed
 import arrow.effects.typeclasses.ExitCase.Error
-import arrow.higherkind
 import io.reactivex.Maybe
 import io.reactivex.MaybeEmitter
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 
+class ForMaybeK private constructor() {
+  companion object
+}
+typealias MaybeKOf<A> = arrow.Kind<ForMaybeK, A>
+typealias MaybeKKindedJ<A> = io.kindedj.Hk<ForMaybeK, A>
+
+@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+inline fun <A> MaybeKOf<A>.fix(): MaybeK<A> =
+  this as MaybeK<A>
+
 fun <A> Maybe<A>.k(): MaybeK<A> = MaybeK(this)
 
 fun <A> MaybeKOf<A>.value(): Maybe<A> = fix().maybe
 
-@higherkind
 data class MaybeK<A>(val maybe: Maybe<A>) : MaybeKOf<A>, MaybeKKindedJ<A> {
 
   fun <B> map(f: (A) -> B): MaybeK<B> =

@@ -12,19 +12,27 @@ import arrow.effects.internal.Platform
 import arrow.effects.rx2.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
-import arrow.higherkind
 import arrow.typeclasses.Applicative
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 
+class ForObservableK private constructor() {
+  companion object
+}
+typealias ObservableKOf<A> = arrow.Kind<ForObservableK, A>
+typealias ObservableKKindedJ<A> = io.kindedj.Hk<ForObservableK, A>
+
+@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+inline fun <A> ObservableKOf<A>.fix(): ObservableK<A> =
+  this as ObservableK<A>
+
 fun <A> Observable<A>.k(): ObservableK<A> = ObservableK(this)
 
 fun <A> ObservableKOf<A>.value(): Observable<A> =
   fix().observable
 
-@higherkind
 data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, ObservableKKindedJ<A> {
 
   fun <B> map(f: (A) -> B): ObservableK<B> =

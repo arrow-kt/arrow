@@ -12,7 +12,6 @@ import arrow.effects.internal.Platform
 import arrow.effects.rx2.CoroutineContextRx2Scheduler.asScheduler
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.ExitCase
-import arrow.higherkind
 import arrow.typeclasses.Applicative
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
@@ -20,11 +19,20 @@ import io.reactivex.FlowableEmitter
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 
+class ForFlowableK private constructor() {
+  companion object
+}
+typealias FlowableKOf<A> = arrow.Kind<ForFlowableK, A>
+typealias FlowableKKindedJ<A> = io.kindedj.Hk<ForFlowableK, A>
+
+@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+inline fun <A> FlowableKOf<A>.fix(): FlowableK<A> =
+  this as FlowableK<A>
+
 fun <A> Flowable<A>.k(): FlowableK<A> = FlowableK(this)
 
 fun <A> FlowableKOf<A>.value(): Flowable<A> = fix().flowable
 
-@higherkind
 data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKindedJ<A> {
 
   fun <B> map(f: (A) -> B): FlowableK<B> =
