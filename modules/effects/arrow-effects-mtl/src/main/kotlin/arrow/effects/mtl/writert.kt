@@ -1,15 +1,15 @@
-package arrow.effects.extensions
+package arrow.effects.mtl
 
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Tuple2
 import arrow.core.compose
+import arrow.effects.Ref
 import arrow.mtl.WriterT
 import arrow.mtl.WriterTOf
 import arrow.mtl.WriterTPartialOf
 import arrow.mtl.extensions.WriterTMonadThrow
 import arrow.mtl.value
-import arrow.effects.Ref
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Bracket
 import arrow.effects.typeclasses.ConcurrentEffect

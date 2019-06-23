@@ -14,7 +14,7 @@ import arrow.effects.IO
 import arrow.effects.extensions.io.applicativeError.attempt
 import arrow.effects.extensions.io.async.async
 import arrow.effects.extensions.io.monad.monad
-import arrow.effects.extensions.statet.async.async
+import arrow.effects.mtl.statet.async.async
 import arrow.mtl.extensions.StateTMonadState
 import arrow.mtl.extensions.listk.monadCombine.monadCombine
 import arrow.mtl.extensions.statet.applicative.applicative

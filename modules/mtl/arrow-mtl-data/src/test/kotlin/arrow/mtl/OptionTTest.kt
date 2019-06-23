@@ -16,7 +16,7 @@ import arrow.effects.ForIO
 import arrow.effects.IO
 import arrow.effects.extensions.io.applicativeError.attempt
 import arrow.effects.extensions.io.async.async
-import arrow.effects.extensions.optiont.async.async
+import arrow.effects.mtl.optiont.async.async
 import arrow.effects.typeclasses.seconds
 import arrow.core.extensions.nonemptylist.monad.monad
 import arrow.core.extensions.option.monad.monad

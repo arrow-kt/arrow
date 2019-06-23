@@ -1,4 +1,4 @@
-package arrow.effects.extensions
+package arrow.effects.mtl
 
 import arrow.core.None
 import arrow.core.Option
@@ -10,7 +10,6 @@ import arrow.mtl.StateTOf
 import arrow.mtl.StateTPartialOf
 import arrow.mtl.extensions.StateTMonadThrow
 import arrow.mtl.fix
-import arrow.mtl.runM
 import arrow.effects.Ref
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Bracket
@@ -19,6 +18,7 @@ import arrow.effects.typeclasses.MonadDefer
 import arrow.effects.typeclasses.Proc
 import arrow.effects.typeclasses.ProcF
 import arrow.extension
+import arrow.mtl.runM
 import arrow.typeclasses.MonadError
 import arrow.undocumented
 import kotlin.coroutines.CoroutineContext

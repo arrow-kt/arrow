@@ -13,7 +13,7 @@ import arrow.effects.ForIO
 import arrow.effects.IO
 import arrow.effects.extensions.io.applicativeError.attempt
 import arrow.effects.extensions.io.async.async
-import arrow.effects.extensions.writert.async.async
+import arrow.effects.mtl.writert.async.async
 import arrow.core.extensions.listk.monad.monad
 import arrow.core.extensions.listk.monoidK.monoidK
 import arrow.core.extensions.option.monad.monad

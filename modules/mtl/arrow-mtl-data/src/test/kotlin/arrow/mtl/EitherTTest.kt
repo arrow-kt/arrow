@@ -12,7 +12,7 @@ import arrow.core.extensions.const.divisible.divisible
 import arrow.core.extensions.id.functor.functor
 import arrow.effects.ForIO
 import arrow.effects.IO
-import arrow.effects.extensions.eithert.async.async
+import arrow.effects.mtl.eithert.async.async
 import arrow.effects.extensions.io.applicativeError.attempt
 import arrow.effects.extensions.io.async.async
 import arrow.core.extensions.id.monad.monad

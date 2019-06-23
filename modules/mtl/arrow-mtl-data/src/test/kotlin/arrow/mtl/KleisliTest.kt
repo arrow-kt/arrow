@@ -10,7 +10,7 @@ import arrow.effects.ForIO
 import arrow.effects.IO
 import arrow.effects.extensions.io.applicativeError.attempt
 import arrow.effects.extensions.io.bracket.bracket
-import arrow.effects.extensions.kleisli.bracket.bracket
+import arrow.effects.mtl.kleisli.bracket.bracket
 import arrow.core.extensions.`try`.monadError.monadError
 import arrow.core.extensions.const.divisible.divisible
 import arrow.core.extensions.id.monad.monad

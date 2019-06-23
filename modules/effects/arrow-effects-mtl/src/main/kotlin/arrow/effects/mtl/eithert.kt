@@ -1,4 +1,4 @@
-package arrow.effects.extensions
+package arrow.effects.mtl
 
 import arrow.core.Either
 import arrow.core.None
