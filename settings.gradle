@@ -113,7 +113,7 @@ include {
 
         benchmarks {
             _ 'scala-benchmarks'
-            _ 'benchmarks-effects'
+            _ 'benchmarks-fx'
         }
     }
 }
