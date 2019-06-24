@@ -6,6 +6,7 @@ import com.google.auto.service.AutoService
 import org.jetbrains.kotlin.analyzer.ModuleInfo
 import org.jetbrains.kotlin.codegen.coroutines.replaceSuspensionFunctionWithRealDescriptor
 import org.jetbrains.kotlin.com.intellij.openapi.project.Project
+import org.jetbrains.kotlin.com.intellij.openapi.vfs.VirtualFile
 import org.jetbrains.kotlin.com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.compiler.plugin.ComponentRegistrar
 import org.jetbrains.kotlin.container.ComponentProvider
@@ -16,6 +17,7 @@ import org.jetbrains.kotlin.container.registerSingleton
 import org.jetbrains.kotlin.container.useImpl
 import org.jetbrains.kotlin.container.useInstance
 import org.jetbrains.kotlin.context.ProjectContext
+import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptorWithVisibility
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
@@ -47,7 +49,6 @@ import org.jetbrains.kotlin.types.typeUtil.isInterface
 import java.lang.reflect.AccessibleObject.setAccessible
 
 
-
 /**
  * DescriptorResolver
  * AnalisysResult
@@ -57,14 +58,26 @@ class HigherKindPlugin : MetaCompilerPlugin {
   override fun intercept(): List<ExtensionPhase> =
     meta(
       enableIr(),
+      syntheticScopes(
+        getSyntheticScopes = { moduleDescriptor, javaSyntheticPropertiesScope ->
+          println("getSyntheticScopes")
+          listOf()
+        }
+      ),
+      preprocessedVirtualFileFactory(
+        createPreprocessedFile = { file: VirtualFile? ->
+          println("preprocessedVirtualFileFactory: $file")
+          file
+        }
+      ),
       storageComponent(
         registerModuleComponents = { container, platform, moduleDescriptor ->
+          println("registerModuleComponents")
           val defaultTypeChecker = KotlinTypeChecker.DEFAULT
           if (defaultTypeChecker !is KindAwareTypeChecker) { //nasty hack ahead to circumvent the ability to replace the Kotlin type checker
             val defaultTypeCheckerField = KotlinTypeChecker::class.java.getDeclaredField("DEFAULT")
             setFinalStatic(defaultTypeCheckerField, KindAwareTypeChecker(defaultTypeChecker))
           }
-          println("registerModuleComponents")
         },
         check = { declaration, descriptor, context ->
           println("check")
@@ -113,11 +126,14 @@ class HigherKindPlugin : MetaCompilerPlugin {
       syntheticResolver(
         generatePackageSyntheticClasses = { descriptor: PackageFragmentDescriptor, name, ctx, declarationProvider, result ->
           println("${name} ~> generatePackageSyntheticClasses")
-          val classDescriptor = result.firstOrNull { it.name == name }
-          classDescriptor?.let {
+          val classDescriptorCandidate = result.firstOrNull { it.name == name }
+          val classDescritorKinded: ClassDescriptor? = classDescriptorCandidate //classDescriptorCandidate?.replaceKinds(ktPsiElementFactory)
+          classDescritorKinded?.let {
             if (it.shouldGenerateKindMarker()) {
               val kindMarker = descriptor.kindMarker(it.fqNameSafe)
               println("${descriptor.name} : ${it.fqNameSafe} ~> generatePackageSyntheticClasses = $kindMarker")
+              result.remove(classDescriptorCandidate)
+              result.add(it)
               result.add(kindMarker)
             }
           }

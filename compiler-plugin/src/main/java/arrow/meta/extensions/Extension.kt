@@ -10,8 +10,10 @@ import org.jetbrains.kotlin.codegen.StackValue
 import org.jetbrains.kotlin.codegen.extensions.ExpressionCodegenExtension
 import org.jetbrains.kotlin.com.intellij.mock.MockProject
 import org.jetbrains.kotlin.com.intellij.openapi.project.Project
+import org.jetbrains.kotlin.com.intellij.openapi.vfs.VirtualFile
 import org.jetbrains.kotlin.com.intellij.psi.JavaPsiFacade
 import org.jetbrains.kotlin.com.intellij.psi.PsiElementFactory
+import org.jetbrains.kotlin.com.intellij.testFramework.LightVirtualFile
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.container.ComponentProvider
 import org.jetbrains.kotlin.container.StorageComponentContainer
@@ -33,6 +35,7 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtModifierListOwner
+import org.jetbrains.kotlin.psi.KtPsiFactory
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.BindingTrace
 import org.jetbrains.kotlin.resolve.TargetPlatform
@@ -200,12 +203,19 @@ interface ExtensionPhase {
   interface DiagnosticsSuppressor : ExtensionPhase {
     fun CompilerContext.isSuppressed(diagnostic: Diagnostic): Boolean
   }
+
+  interface PreprocessedVirtualFileFactory : ExtensionPhase {
+    fun CompilerContext.isPassThrough(): Boolean
+    fun CompilerContext.createPreprocessedFile(file: VirtualFile?): VirtualFile?
+    fun CompilerContext.createPreprocessedLightFile(file: LightVirtualFile?): LightVirtualFile?
+  }
 }
 
 class CompilerContext(
   val project: MockProject,
   val messageCollector: MessageCollector,
-  val elementFactory: PsiElementFactory = JavaPsiFacade.getInstance(project).elementFactory
+  val elementFactory: PsiElementFactory = JavaPsiFacade.getInstance(project).elementFactory,
+  val ktPsiElementFactory: KtPsiFactory = KtPsiFactory(project, false)
 ) {
   lateinit var lazyClassContext: ResolveSession
   val ctx: CompilerContext = this

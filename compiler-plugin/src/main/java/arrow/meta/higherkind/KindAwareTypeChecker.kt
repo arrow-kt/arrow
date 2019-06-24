@@ -1,11 +1,8 @@
 package arrow.meta.higherkind
 
-import org.jetbrains.kotlin.name.FqName
-import org.jetbrains.kotlin.name.parentOrNull
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.checker.KotlinTypeChecker
-import org.jetbrains.kotlin.types.getAbbreviatedType
 import org.jetbrains.kotlin.types.getAbbreviation
 import org.jetbrains.kotlin.types.typeUtil.getImmediateSuperclassNotAny
 

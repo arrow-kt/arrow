@@ -41,8 +41,18 @@ import org.jetbrains.kotlin.ir.symbols.impl.IrTypeParameterSymbolImpl
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.IrTypeArgument
 import org.jetbrains.kotlin.ir.types.impl.IrSimpleTypeImpl
+import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.psi.KtClass
+import org.jetbrains.kotlin.psi.KtDeclaration
+import org.jetbrains.kotlin.psi.KtPsiFactory
+import org.jetbrains.kotlin.psi.KtTreeVisitorVoid
+import org.jetbrains.kotlin.psi.KtTypeProjection
+import org.jetbrains.kotlin.psi.KtTypeReference
+import org.jetbrains.kotlin.psi.KtUserType
+import org.jetbrains.kotlin.psi.KtVisitorVoid
+import org.jetbrains.kotlin.psi.psiUtil.astReplace
 import org.jetbrains.kotlin.resolve.DescriptorFactory
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.getAllSuperclassesWithoutAny
@@ -103,6 +113,26 @@ class KindMarkerDescriptor(containingDeclaration: DeclarationDescriptor, targetN
 fun DeclarationDescriptor.kindMarker(targetName: FqName): ClassDescriptor =
   KindMarkerDescriptor(this, targetName)
 
+fun ClassDescriptor.replaceKinds(ktPsiFactory: KtPsiFactory): ClassDescriptor? {
+  val element = findPsi()
+  return if (element is KtClass) {
+    element.accept(object : KtTreeVisitorVoid() {
+      override fun visitTypeReference(typeReference: KtTypeReference) {
+        val typeElement = typeReference.typeElement
+        if (typeElement is KtUserType) {
+          val kindReference = typeElement.referencedName
+          if (kindReference != null && this@replaceKinds.declaredTypeParameters.any { it.name.asString() == kindReference }) {
+            val kindedTypeReference = ktPsiFactory.createType("Kind<$kindReference, A>")
+            println("kindReference: $kindReference should be replaced for kind")
+          }
+        }
+        super.visitTypeReference(typeReference)
+      }
+    })
+    return null
+  } else this
+}
+
 
 
 fun CompilerContext.kindTypeAlias(target: ClassDescriptor): TypeAliasDescriptor =
@@ -141,16 +171,7 @@ class AddSupertypesPackageFragmentProvider(val compilerContext: CompilerContext,
 
   override fun getPackageFragments(fqName: FqName): List<PackageFragmentDescriptor> {
     val pckg: PackageViewDescriptor = module.getPackage(fqName)
-    pckg.accept(object : DeclarationDescriptorVisitorEmptyBodies<Unit, Unit>() {
 
-      override fun visitDeclarationDescriptor(descriptor: DeclarationDescriptor?, data: Unit?) {
-        println("visited: $descriptor")
-        if (descriptor !is PackageViewDescriptor) {
-          descriptor?.accept(this, Unit)
-        }
-        //descriptor?.accept(this, Unit)
-      }
-    }, Unit)
     val descriptorsInPackage = compilerContext.storedDescriptors().filter {
       it.fqNameSafe.parent() == fqName
     }

@@ -1,5 +1,9 @@
 package arrow.meta.extensions
 
+import arrow.meta.higherkind.MetaCodeAnalyzerInitializer
+import arrow.meta.higherkind.MetaKotlinCodeAnalyzer
+import arrow.meta.higherkind.MetaPsiFacade
+import arrow.meta.utils.NoOp2
 import arrow.meta.utils.NoOp3
 import arrow.meta.utils.NoOp6
 import arrow.meta.utils.NullableOp1
@@ -19,7 +23,11 @@ import org.jetbrains.kotlin.codegen.extensions.ExpressionCodegenExtension
 import org.jetbrains.kotlin.com.intellij.mock.MockProject
 import org.jetbrains.kotlin.com.intellij.openapi.extensions.Extensions
 import org.jetbrains.kotlin.com.intellij.openapi.project.Project
+import org.jetbrains.kotlin.com.intellij.openapi.vfs.VirtualFile
+import org.jetbrains.kotlin.com.intellij.psi.JavaPsiFacade
 import org.jetbrains.kotlin.com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.com.intellij.psi.PsiElementFactory
+import org.jetbrains.kotlin.com.intellij.testFramework.LightVirtualFile
 import org.jetbrains.kotlin.compiler.plugin.ComponentRegistrar
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.JVMConfigurationKeys
@@ -38,16 +46,19 @@ import org.jetbrains.kotlin.diagnostics.Diagnostic
 import org.jetbrains.kotlin.diagnostics.DiagnosticSink
 import org.jetbrains.kotlin.extensions.CompilerConfigurationExtension
 import org.jetbrains.kotlin.extensions.DeclarationAttributeAltererExtension
+import org.jetbrains.kotlin.extensions.PreprocessedVirtualFileFactoryExtension
 import org.jetbrains.kotlin.extensions.StorageComponentContainerContributor
 import org.jetbrains.kotlin.incremental.components.LookupTracker
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.org.picocontainer.ComponentAdapter
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtModifierListOwner
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.BindingTrace
+import org.jetbrains.kotlin.resolve.CodeAnalyzerInitializer
 import org.jetbrains.kotlin.resolve.TargetPlatform
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
 import org.jetbrains.kotlin.resolve.checkers.DeclarationChecker
@@ -229,6 +240,20 @@ interface MetaCompilerPlugin : ComponentRegistrar {
         getSyntheticScopes(moduleDescriptor, javaSyntheticPropertiesScope)
     }
 
+  fun preprocessedVirtualFileFactory(
+    createPreprocessedFile: CompilerContext.(file: VirtualFile?) -> VirtualFile?,
+    createPreprocessedLightFile: CompilerContext.(file: LightVirtualFile?) -> LightVirtualFile? = NullableOp1()
+  ): ExtensionPhase.PreprocessedVirtualFileFactory =
+    object : ExtensionPhase.PreprocessedVirtualFileFactory {
+      override fun CompilerContext.isPassThrough(): Boolean = false
+
+      override fun CompilerContext.createPreprocessedFile(file: VirtualFile?): VirtualFile? =
+        createPreprocessedFile(file)
+
+      override fun CompilerContext.createPreprocessedLightFile(file: LightVirtualFile?): LightVirtualFile? =
+        createPreprocessedLightFile(file)
+    }
+
   fun diagnosticsSuppressor(isSuppressed: CompilerContext.(diagnostic: Diagnostic) -> Boolean): ExtensionPhase.DiagnosticsSuppressor =
     object : ExtensionPhase.DiagnosticsSuppressor {
       override fun CompilerContext.isSuppressed(diagnostic: Diagnostic): Boolean =
@@ -318,8 +343,14 @@ interface MetaCompilerPlugin : ComponentRegistrar {
     //println("Project allowed extensions: ${Extensions.getArea(project).extensionPoints.toList().joinToString("\n")}")
     val messageCollector: MessageCollector = configuration.get(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY, MessageCollector.NONE)
     val ctx = CompilerContext(project, messageCollector)
+    project.picoContainer.componentAdapters.filterIsInstance<ComponentAdapter>().forEach {
+      println("Compiler Service: <${it.componentKey}> : ${it.componentImplementation}")
+    }
+    project.replaceComponent<CodeAnalyzerInitializer>(::MetaCodeAnalyzerInitializer)
+
     registerPostAnalysisContextEnrichment(project, ctx)
     intercept().forEach { phase ->
+      if (phase is ExtensionPhase.PreprocessedVirtualFileFactory) registerPreprocessedVirtualFileFactory(project, phase, ctx)
       if (phase is ExtensionPhase.Config) registerCompilerConfiguration(project, phase, ctx)
       if (phase is ExtensionPhase.StorageComponentContainer) registerStorageComponentContainer(project, phase, ctx)
       if (phase is ExtensionPhase.AnalysisHandler) registerAnalysisHandler(project, phase, ctx)
@@ -329,7 +360,7 @@ interface MetaCompilerPlugin : ComponentRegistrar {
       if (phase is ExtensionPhase.PackageProvider) packageFragmentProvider(project, phase, ctx)
       if (phase is ExtensionPhase.SyntheticResolver) registerSyntheticResolver(project, phase, ctx)
       if (phase is ExtensionPhase.IRGeneration) registerIRGeneration(project, phase, ctx)
-      //TODO() not available. if (phase is ExtensionPhase.SyntheticScopeProvider) registerSyntheticScopeProvider(project, phase, ctx)
+      //TODO() if (phase is ExtensionPhase.SyntheticScopeProvider) registerSyntheticScopeProvider(project, phase, ctx)
       //TODO() not available. if (phase is ExtensionPhase.DiagnosticsSuppressor) registerDiagnosticSuppressor(project, phase, ctx)
     }
   }
@@ -338,6 +369,19 @@ interface MetaCompilerPlugin : ComponentRegistrar {
     Extensions.getArea(project).getExtensionPoint(DiagnosticSuppressor.EP_NAME).registerExtension(object : DiagnosticSuppressor {
       override fun isSuppressed(diagnostic: Diagnostic): Boolean =
         phase.run { ctx.isSuppressed(diagnostic) }
+    })
+  }
+
+  fun registerPreprocessedVirtualFileFactory(project: MockProject, phase: ExtensionPhase.PreprocessedVirtualFileFactory, ctx: CompilerContext) {
+    PreprocessedVirtualFileFactoryExtension.registerExtension(project, object : PreprocessedVirtualFileFactoryExtension {
+      override fun createPreprocessedFile(file: VirtualFile?): VirtualFile? =
+        phase.run { ctx.createPreprocessedFile(file) }
+
+      override fun createPreprocessedLightFile(file: LightVirtualFile?): LightVirtualFile? =
+        phase.run { ctx.createPreprocessedLightFile(file) }
+
+      override fun isPassThrough(): Boolean =
+        phase.run { ctx.isPassThrough() }
     })
   }
 
@@ -586,3 +630,10 @@ data class ClassDefinition(
   val superName: String,
   val interfaces: List<String>
 )
+
+inline fun <reified A> MockProject.replaceComponent(f: (A) -> A) : Unit {
+  val componentAdapter = picoContainer.getComponentAdapterOfType(A::class.java)
+  val facade = componentAdapter.getComponentInstance(picoContainer) as A
+  picoContainer.unregisterComponent(componentAdapter.componentKey)
+  picoContainer.registerComponentInstance(componentAdapter.componentKey, f(facade))
+}
