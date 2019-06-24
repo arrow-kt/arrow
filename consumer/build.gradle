@@ -13,6 +13,6 @@ dependencies {
 }
 
 task execute(type:JavaExec) {
-    main = "arrow.sample.test"
+    main = "consumer.test"
     classpath = sourceSets.main.runtimeClasspath
 }

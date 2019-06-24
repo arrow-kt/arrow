@@ -1,55 +1,74 @@
 package arrow.meta.higherkind
 
 import arrow.meta.extensions.ExtensionPhase
-import arrow.meta.extensions.MetaCompilerPlugin
+import arrow.meta.extensions.MetaComponentRegistrar
 import com.google.auto.service.AutoService
 import org.jetbrains.kotlin.analyzer.ModuleInfo
-import org.jetbrains.kotlin.codegen.coroutines.replaceSuspensionFunctionWithRealDescriptor
 import org.jetbrains.kotlin.com.intellij.openapi.project.Project
 import org.jetbrains.kotlin.com.intellij.openapi.vfs.VirtualFile
-import org.jetbrains.kotlin.com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.compiler.plugin.ComponentRegistrar
-import org.jetbrains.kotlin.container.ComponentProvider
-import org.jetbrains.kotlin.container.get
-import org.jetbrains.kotlin.container.getService
-import org.jetbrains.kotlin.container.registerInstance
-import org.jetbrains.kotlin.container.registerSingleton
-import org.jetbrains.kotlin.container.useImpl
-import org.jetbrains.kotlin.container.useInstance
-import org.jetbrains.kotlin.context.ProjectContext
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
-import org.jetbrains.kotlin.descriptors.DeclarationDescriptorWithVisibility
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
-import org.jetbrains.kotlin.descriptors.SupertypeLoopChecker
 import org.jetbrains.kotlin.incremental.components.LookupTracker
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.util.transformDeclarationsFlat
-import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.resolve.BindingTrace
-import org.jetbrains.kotlin.resolve.DeclarationSignatureAnonymousTypeTransformer
-import org.jetbrains.kotlin.resolve.QualifiedExpressionResolver
-import org.jetbrains.kotlin.resolve.TypeResolver
-import org.jetbrains.kotlin.resolve.calls.checkers.CallChecker
-import org.jetbrains.kotlin.resolve.calls.checkers.CallCheckerContext
-import org.jetbrains.kotlin.resolve.calls.context.BasicCallResolutionContext
-import org.jetbrains.kotlin.resolve.calls.inference.substitute
-import org.jetbrains.kotlin.resolve.calls.inference.substituteAndApproximateCapturedTypes
-import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
-import org.jetbrains.kotlin.resolve.calls.smartcasts.DataFlowValueFactory
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.storage.StorageManager
-import org.jetbrains.kotlin.types.KotlinType
-import org.jetbrains.kotlin.types.TypeConstructor
-import org.jetbrains.kotlin.types.TypeProjection
-import org.jetbrains.kotlin.types.TypeSubstitution
-import org.jetbrains.kotlin.types.TypeSubstitutor
 import org.jetbrains.kotlin.types.checker.KotlinTypeChecker
 import org.jetbrains.kotlin.types.typeUtil.isInterface
-import java.lang.reflect.AccessibleObject.setAccessible
+/*
+package arrow.sample
 
+interface Kind<out F, out A>
+
+/* class ForOption */
+
+/* typealias OptionOf<A> = Kind<ForOption, A> */
+
+sealed class Option<out A> /* Kind<ForOption */ {
+
+    fun h(): Option<Int> {
+        val x : Kind<ForOption, Int> /* (implicit conversion with type checking subtypes */ = None
+        val y = x
+        return y
+    }
+
+    data class Some<out A>(val a: A): Option<A>()
+    object None : Option<Nothing>()
+
+    companion object {
+        @extension interface OptionFunctor : Functor<ForOption> {
+            override fun <A, B> Option<A>.map(f: (A) -> B): Option<B> =
+                TODO()
+        }
+
+        /*
+        val optionfunctorinstance = object : OptionFucntor { } ...
+        fun functor(): Functor<ForOption> = optionfunctorinstance
+         */
+    }
+}
+
+interface Functor<F> {
+    fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B>
+}
+
+
+
+// Produces
+//Option.functor()
+
+fun <F> Kind<F, Int>.foo(@with FF: Functor<F>): Kind<F, Int> = /** with(FF) { **/
+    map { it + 1 }
+/** } **/
+
+
+val option2: Option<Int> = Option(1).foo(/** Option.functor() **/)
+ */
 @AutoService(ComponentRegistrar::class)
-class HigherKindPlugin : MetaCompilerPlugin {
+class HigherKindComponentRegistrar : MetaComponentRegistrar {
   override fun intercept(): List<ExtensionPhase> =
     meta(
       enableIr(),

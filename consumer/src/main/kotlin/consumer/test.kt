@@ -1,6 +1,6 @@
 package consumer
 
-import arrow.core.Option
+import arrow.sample.*
 
 //import arrow.core.ForOption
 
