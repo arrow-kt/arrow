@@ -67,7 +67,6 @@ fun <F> Kind<F, Int>.foo(@with FF: Functor<F>): Kind<F, Int> = /** with(FF) { **
 
 val option2: Option<Int> = Option(1).foo(/** Option.functor() **/)
  */
-@AutoService(ComponentRegistrar::class)
 class HigherKindComponentRegistrar : MetaComponentRegistrar {
   override fun intercept(): List<ExtensionPhase> =
     meta(
