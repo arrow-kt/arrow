@@ -1,0 +1,37 @@
+plugins {
+    id 'org.jetbrains.intellij' version '0.4.9'
+}
+
+apply plugin: 'kotlin'
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile project(":compiler-plugin")
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+jar {
+    manifest {
+        attributes["Specification-Title"] = project.name
+        attributes["Specification-Version"] = project.version
+        attributes["Implementation-Title"] = "arrow.meta.plugin.idea"
+        attributes["Implementation-Version"] = project.version
+    }
+}
+
+intellij {
+    version = "2019.1.3"
+    pluginName = "Arrow plugin"
+    setPlugins("gradle", "org.jetbrains.kotlin:$kotlin_version-release-IJ2019.1-1")
+}
+
+patchPluginXml {
+    changeNotes """
+      Add change notes here.<br>
+      <em>most HTML tags may be used</em>"""
+}

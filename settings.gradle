@@ -1,3 +1,5 @@
 include ':compiler-plugin'
-include ':app'
+include ':gradle-plugin'
+include ':idea-plugin'
+include ':core'
 include ':consumer'

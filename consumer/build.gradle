@@ -1,8 +1,15 @@
 apply plugin: 'kotlin'
 
+repositories {
+    flatDir {
+        dirs "$rootDir/core/build/libs"
+    }
+}
+
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    compile project(":app")
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile project(':core')
+    implementation name: "core"
 }
 
 task execute(type:JavaExec) {

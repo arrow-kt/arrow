@@ -1,16 +1,14 @@
+apply plugin: 'kotlin'
+
 def compilerPlugin = project(':compiler-plugin')
 
 evaluationDependsOn(":$compilerPlugin.name")
 
-apply plugin: 'kotlin'
-//apply plugin: 'kotlinx-serialization'
-
-compileKotlin.kotlinOptions.freeCompilerArgs = ['-Xplugin', new File(compilerPlugin.buildDir, "libs/${compilerPlugin.name}.jar")]
+compileKotlin.kotlinOptions.freeCompilerArgs = ["-Xplugin=${new File(compilerPlugin.buildDir, "libs/${compilerPlugin.name}.jar")}"]
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
-//    compile "org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.11.0"
 }
 
 afterEvaluate {

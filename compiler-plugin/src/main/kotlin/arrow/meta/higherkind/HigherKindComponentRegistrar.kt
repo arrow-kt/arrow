@@ -48,11 +48,6 @@ import org.jetbrains.kotlin.types.checker.KotlinTypeChecker
 import org.jetbrains.kotlin.types.typeUtil.isInterface
 import java.lang.reflect.AccessibleObject.setAccessible
 
-
-/**
- * DescriptorResolver
- * AnalisysResult
- */
 @AutoService(ComponentRegistrar::class)
 class HigherKindPlugin : MetaCompilerPlugin {
   override fun intercept(): List<ExtensionPhase> =
@@ -83,22 +78,6 @@ class HigherKindPlugin : MetaCompilerPlugin {
           println("check")
         }
       ),
-//      resolveSession { ctx ->
-//        println("resolveSession: $ctx")
-//        ctx.setTypeResolver(with(ctx.typeResolver) {
-//          TypeResolver(
-//            annotationResolver = ctx.annotationResolver,
-//            qualifiedExpressionResolver = ctx.qua,
-//            moduleDescriptor = ctx.moduleDescriptor,
-//            typeTransformerForTests = ctx.ty,
-//            dynamicTypesSettings = ctx.dyn,
-//            dynamicCallableDescriptors = ctx.dyn,
-//            identifierChecker = ctx.ide,
-//            platformToKotlinClassMap = ctx.pla,
-//            languageVersionSettings = ctx.languageVersionSettings
-//          )
-//        })
-//      },
       syntheticResolver(
         addSyntheticSupertypes = { descriptor, supertypes ->
           println("${descriptor.name} ~> addSyntheticSupertypes")

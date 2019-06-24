@@ -167,7 +167,10 @@ class ContributedPackageFragmentDescriptor(
   override fun getMemberScope(): MemberScope = SimpleMemberScope(members)
 }
 
-class AddSupertypesPackageFragmentProvider(val compilerContext: CompilerContext, val module: ModuleDescriptor) : PackageFragmentProvider {
+class AddSupertypesPackageFragmentProvider(
+  val compilerContext: CompilerContext,
+  val module: ModuleDescriptor
+) : PackageFragmentProvider {
 
   override fun getPackageFragments(fqName: FqName): List<PackageFragmentDescriptor> {
     val pckg: PackageViewDescriptor = module.getPackage(fqName)
@@ -194,8 +197,8 @@ class AddSupertypesPackageFragmentProvider(val compilerContext: CompilerContext,
 
 fun ClassDescriptor.shouldGenerateKindMarker(): Boolean =
   declaredTypeParameters.isNotEmpty() &&
-    fqNameSafe != kindName &&
-    !getAllSuperclassesWithoutAny().any { s -> !s.defaultType.isInterface() }
+      fqNameSafe != kindName &&
+      !getAllSuperclassesWithoutAny().any { s -> !s.defaultType.isInterface() }
 
 //TODO alternative way of creating descriptors?
 //fun LazyClassDescriptor.kindMarkerSynthetic(containingDeclaration: DeclarationDescriptor, targetName: FqName): ClassDescriptor =
@@ -213,12 +216,11 @@ fun ClassDescriptor.shouldGenerateKindMarker(): Boolean =
 //    isCompanionObject = false
 //  )
 
-
 fun ClassDescriptor.shouldApplyKind(debug: Boolean = false): Boolean {
   if (debug) println("$name shouldApplyKind = ${getAllSuperclassesWithoutAny().toList()}, ${getAllSuperclassesWithoutAny().any { it.name.isSpecial }}, superInterfaces = ${getSuperInterfaces()}")
   val result = declaredTypeParameters.isNotEmpty() &&
-    fqNameSafe != kindName &&
-    !getSuperInterfaces().contains(module.kindDescriptor)
+      fqNameSafe != kindName &&
+      !getSuperInterfaces().contains(module.kindDescriptor)
   if (debug) println("result: " + result)
   return result
 }
@@ -259,20 +261,26 @@ fun TypeAliasDescriptor.underlyingHigherKind(targetDescriptor: ClassDescriptor):
 fun DeclarationDescriptor.typeVariable(
   name: Name
 ): TypeProjection =
-  TypeProjectionImpl(TypeParameterDescriptorImpl.createWithDefaultBound(
-    this,
-    Annotations.EMPTY,
-    false,
-    Variance.INVARIANT,
-    name,
-    0).defaultType)
+  TypeProjectionImpl(
+    TypeParameterDescriptorImpl.createWithDefaultBound(
+      this,
+      Annotations.EMPTY,
+      false,
+      Variance.INVARIANT,
+      name,
+      0
+    ).defaultType
+  )
 
 fun BackendContext.irHigherKind(decl: IrClass): IrType =
   irType(
     className = "arrow.sample.Kind",
     typeArguments = listOf(
       //irTypeArgument(decl.descriptor.kindMarkerName.as, witness),
-      irTypeArgument(decl.descriptor.fqNameSafe.kindMarkerName.shortNameOrSpecial(), decl.descriptor),
+      irTypeArgument(
+        decl.descriptor.fqNameSafe.kindMarkerName.shortNameOrSpecial(),
+        decl.descriptor
+      ),
       irTypeArgument(decl.typeParameters[0].name, decl.descriptor)
     )
   )
@@ -307,7 +315,8 @@ fun irTypeArgument(
         Variance.INVARIANT,
         name,
         0
-      )),
+      )
+    ),
     hasQuestionMark = nullable,
     arguments = emptyList(),
     annotations = annotations
@@ -363,7 +372,12 @@ fun BackendContext.kindMarker(target: IrClass): IrClass {
 //    )
     superTypes.add(irBuiltIns.anyType)
     thisReceiver = buildIrValueParameter {
-      type = IrSimpleTypeImpl(symbol, hasQuestionMark = false, arguments = emptyList(), annotations = emptyList())
+      type = IrSimpleTypeImpl(
+        symbol,
+        hasQuestionMark = false,
+        arguments = emptyList(),
+        annotations = emptyList()
+      )
       name = Name.identifier("$this")
     }.also {
       it.parent = irClass

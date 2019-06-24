@@ -1,8 +1,11 @@
-package arrow.sample
+package consumer
 
-//import arrow.sample.ForOption (this won't work because in a different module)
+import arrow.core.Option
+
+//import arrow.core.ForOption
 
 object test {
+
   @JvmStatic
   fun main(args: Array<String>) {
     println("Option supertypes: ${Option::class.java.interfaces.toList().map { it.toGenericString() }}")
