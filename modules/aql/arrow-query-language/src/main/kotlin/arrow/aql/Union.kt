@@ -1,11 +1,11 @@
 package arrow.aql
 
 import arrow.core.identity
-import arrow.data.ForListK
-import arrow.data.ListK
-import arrow.data.k
-import arrow.data.extensions.list.semigroupK.combineK
-import arrow.data.extensions.listk.monoid.monoid
+import arrow.core.ForListK
+import arrow.core.ListK
+import arrow.core.k
+import arrow.core.extensions.list.semigroupK.combineK
+import arrow.core.extensions.listk.monoid.monoid
 import arrow.typeclasses.Foldable
 
 interface Union<F> {

@@ -26,7 +26,7 @@ We can create `Ior` values using `Ior.Left`, `Ior.Right` and `Ior.Both`:
 
 ```kotlin:ank
 import arrow.*
-import arrow.data.*
+import arrow.core.*
 
 Ior.Right(42)
 ```
@@ -143,7 +143,6 @@ Ior.Both("Warning", 41).toOption()
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.data.*
 import arrow.core.*
 
 DataType(Ior::class).tcMarkdownList()

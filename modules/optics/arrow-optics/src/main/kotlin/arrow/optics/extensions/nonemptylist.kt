@@ -4,7 +4,7 @@ import arrow.Kind
 import arrow.core.left
 import arrow.core.right
 import arrow.core.toT
-import arrow.data.NonEmptyList
+import arrow.core.NonEmptyList
 import arrow.extension
 import arrow.optics.Optional
 import arrow.optics.POptional

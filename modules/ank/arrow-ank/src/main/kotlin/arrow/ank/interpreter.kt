@@ -8,7 +8,7 @@ import arrow.core.Tuple2
 import arrow.core.Tuple3
 import arrow.core.some
 import arrow.core.toT
-import arrow.data.extensions.sequence.foldable.foldLeft
+import arrow.core.extensions.sequence.foldable.foldLeft
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.net.URL

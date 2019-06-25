@@ -10,6 +10,7 @@ import arrow.core.extensions.semigroup
 import arrow.core.extensions.either.applicative.applicative
 import arrow.core.extensions.either.applicativeError.handleErrorWith
 import arrow.core.extensions.either.bifunctor.bifunctor
+import arrow.core.extensions.either.bitraverse.bitraverse
 import arrow.core.extensions.either.eq.eq
 import arrow.core.extensions.either.hash.hash
 import arrow.core.extensions.either.monadError.monadError
@@ -29,6 +30,7 @@ import arrow.test.laws.SemigroupKLaws
 import arrow.test.laws.SemigroupLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
+import arrow.test.laws.BitraverseLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Hash
 import io.kotlintest.properties.Gen
@@ -55,6 +57,7 @@ class EitherTest : UnitSpec() {
       ShowLaws.laws(Either.show(), Either.eq(String.eq(), Int.eq())) { Right(it) },
       MonadErrorLaws.laws(Either.monadError(), Eq.any(), Eq.any()),
       TraverseLaws.laws(Either.traverse(), Either.applicative(), { Right(it) }, Eq.any()),
+      BitraverseLaws.laws(Either.bitraverse(), { Right(it) }, Eq.any()),
       SemigroupKLaws.laws(Either.semigroupK(), Either.applicative(), EQ),
       HashLaws.laws(Either.hash(Hash.any(), Int.hash()), EQ2) { Right(it) }
     )

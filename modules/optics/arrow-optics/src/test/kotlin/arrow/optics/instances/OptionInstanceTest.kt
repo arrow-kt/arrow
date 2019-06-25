@@ -1,8 +1,8 @@
 package arrow.optics.instances
 
 import arrow.core.Option
-import arrow.data.ListK
-import arrow.data.extensions.listk.eq.eq
+import arrow.core.ListK
+import arrow.core.extensions.listk.eq.eq
 import arrow.core.extensions.option.eq.eq
 import arrow.optics.extensions.option.each.each
 import arrow.test.UnitSpec

@@ -1,7 +1,7 @@
 package arrow.test.laws
 
 import arrow.Kind
-import arrow.data.Cokleisli
+import arrow.mtl.Cokleisli
 import arrow.test.generators.functionAToB
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Eq

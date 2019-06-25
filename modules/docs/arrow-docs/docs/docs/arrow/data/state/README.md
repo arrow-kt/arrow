@@ -22,7 +22,6 @@ Let's build a simple Stack using Arrow's NonEmptyList and Option:
 ```kotlin:ank:silent
 import arrow.*
 import arrow.core.*
-import arrow.data.*
 
 typealias Stack = Option<Nel<String>>
 ```
@@ -73,6 +72,7 @@ Let's write a new version of `pop` and `push` using `State`:
 
 ```kotlin:ank:silent
 import arrow.*
+import arrow.mtl.*
 
 fun pop() = State<Stack, Option<String>> { stack ->
     stack.fold({
@@ -95,9 +95,9 @@ The `flatMap` method on `State<S, A>` lets you use the result of one `State` in 
 
 ```kotlin:ank:silent
 import arrow.typeclasses.*
-import arrow.data.extensions.*
+import arrow.mtl.extensions.*
 import arrow.core.extensions.id.monad.monad
-import arrow.data.extensions.statet.monad.binding
+import arrow.mtl.extensions.statet.monad.binding
 
 fun stackOperations() = 
   binding<ForId, Stack, Option<String>>(Id.monad()) {
@@ -128,7 +128,7 @@ stackOperations().runA(Nel.of("hello", "world", "!").some())
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.data.*
+import arrow.mtl.*
 import arrow.core.*
 
 DataType(StateT::class).tcMarkdownList()

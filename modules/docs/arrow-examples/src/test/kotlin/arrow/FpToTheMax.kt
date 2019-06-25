@@ -1,21 +1,19 @@
 package arrow
 
-import arrow.core.Id
 import arrow.core.Option
 import arrow.core.Try
 import arrow.core.Tuple2
 import arrow.core.toT
-import arrow.data.State
-import arrow.data.StatePartialOf
-import arrow.data.StateT
-import arrow.data.extensions.statet.monad.monad
-import arrow.core.extensions.id.monad.monad
-import arrow.data.fix
-import arrow.data.run
+import arrow.mtl.State
+import arrow.mtl.StatePartialOf
+import arrow.mtl.StateApi
 import arrow.effects.IO
 import arrow.effects.extensions.io.monadDefer.monadDefer
 import arrow.effects.fix
 import arrow.effects.typeclasses.MonadDefer
+import arrow.mtl.extensions.monad
+import arrow.mtl.fix
+import arrow.mtl.run
 import arrow.typeclasses.Monad
 import java.util.Random
 
@@ -30,8 +28,8 @@ interface Console<F> {
 }
 
 class ConsoleImpl<F>(val delay: MonadDefer<F>) : Console<F> {
-  override fun putStrLn(s: String): Kind<F, Unit> = delay.delay { println(s) }
-  override fun getStrLn(): Kind<F, String> = delay.delay { readLine().orEmpty() }
+  override fun putStrLn(s: String): Kind<F, Unit> = delay.later { println(s) }
+  override fun getStrLn(): Kind<F, String> = delay.later { readLine().orEmpty() }
 }
 
 interface FRandom<F> {
@@ -39,7 +37,7 @@ interface FRandom<F> {
 }
 
 class FRandomImpl<F>(val delay: MonadDefer<F>) : FRandom<F> {
-  override fun nextInt(upper: Int): Kind<F, Int> = delay.delay { ORandom.nextInt(upper) }
+  override fun nextInt(upper: Int): Kind<F, Int> = delay.later { ORandom.nextInt(upper) }
 }
 
 class MonadAndConsoleRandom<F>(M: Monad<F>, C: Console<F>, R: FRandom<F>) : Monad<F> by M, Console<F> by C, FRandom<F> by R
@@ -107,10 +105,9 @@ object FpToTheMax {
   }
 
   fun test(): List<String> = run {
-    val testData: TestData = TestData(listOf("Plop", "4", "n"), listOf(), listOf(3))
+    val testData = TestData(listOf("Plop", "4", "n"), listOf(), listOf(3))
 
-    val m: Monad<ForTestIO> = StateT.monad(Id.monad())
-    val module: MonadAndConsoleRandom<ForTestIO> = MonadAndConsoleRandom(m, TestIOConsole(), TestIORandom())
+    val module: MonadAndConsoleRandom<ForTestIO> = MonadAndConsoleRandom(StateApi.monad(), TestIOConsole(), TestIORandom())
 
     module.fMain().fix().run(testData).a.output
   }

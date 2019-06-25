@@ -2,11 +2,11 @@ package arrow.optics.instances
 
 import arrow.core.Option
 import arrow.core.extensions.eq
-import arrow.data.ListK
-import arrow.data.SequenceK
-import arrow.data.extensions.listk.eq.eq
+import arrow.core.ListK
+import arrow.core.SequenceK
+import arrow.core.extensions.listk.eq.eq
 import arrow.core.extensions.option.eq.eq
-import arrow.data.extensions.sequencek.eq.eq
+import arrow.core.extensions.sequencek.eq.eq
 import arrow.optics.extensions.sequencek.each.each
 import arrow.optics.extensions.sequencek.filterIndex.filterIndex
 import arrow.optics.extensions.sequencek.index.index

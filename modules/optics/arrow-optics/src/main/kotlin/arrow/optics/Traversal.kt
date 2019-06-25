@@ -12,10 +12,10 @@ import arrow.core.extensions.id.applicative.applicative
 import arrow.core.extensions.monoid
 import arrow.core.identity
 import arrow.core.value
-import arrow.data.ListK
-import arrow.data.State
-import arrow.data.extensions.listk.monoid.monoid
-import arrow.data.map
+import arrow.core.ListK
+import arrow.mtl.State
+import arrow.core.extensions.listk.monoid.monoid
+import arrow.mtl.map
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Const
@@ -388,13 +388,13 @@ fun <S, A> Traversal<S, A>.update(f: (A) -> A): State<S, ListK<A>> =
  * Update the focus [A] viewed through the [Traversal] and returns its *old* value.
  */
 fun <S, A> Traversal<S, A>.updateOld(f: (A) -> A): State<S, ListK<A>> =
-  arrow.data.State { s -> Tuple2(modify(s, f), getAll(s)) }
+  State { s -> Tuple2(modify(s, f), getAll(s)) }
 
 /**
  * Update the focus [A] viewed through the [Traversal] and ignores both values
  */
 fun <S, A> Traversal<S, A>.update_(f: (A) -> A): State<S, Unit> =
-  State { s -> Tuple2(modify(s, f), kotlin.Unit) }
+  State { s -> Tuple2(modify(s, f), Unit) }
 
 /**
  * Assign the focus [A] viewed through the [Traversal] and returns its *new* value.

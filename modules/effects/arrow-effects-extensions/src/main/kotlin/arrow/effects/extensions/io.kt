@@ -2,6 +2,7 @@ package arrow.effects.extensions
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.effects.CancelToken
 import arrow.effects.ForIO
 import arrow.effects.IO
 import arrow.effects.IOOf
@@ -11,14 +12,10 @@ import arrow.effects.RaceTriple
 import arrow.effects.fix
 import arrow.effects.racePair
 import arrow.effects.raceTriple
-import arrow.effects.toIOProc
-import arrow.effects.toIOProcF
 import arrow.effects.typeclasses.Async
 import arrow.effects.typeclasses.Bracket
 import arrow.effects.typeclasses.Concurrent
 import arrow.effects.typeclasses.ConcurrentEffect
-import arrow.effects.typeclasses.ConnectedProc
-import arrow.effects.typeclasses.ConnectedProcF
 import arrow.effects.typeclasses.Dispatchers
 import arrow.effects.typeclasses.Disposable
 import arrow.effects.typeclasses.Effect
@@ -31,8 +28,8 @@ import arrow.effects.Timer
 import arrow.effects.typeclasses.UnsafeRun
 import arrow.extension
 import arrow.typeclasses.Applicative
-import arrow.typeclasses.Apply
 import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
@@ -157,10 +154,10 @@ interface IOMonadDefer : MonadDefer<ForIO>, IOBracket {
 @extension
 interface IOAsync : Async<ForIO>, IOMonadDefer {
   override fun <A> async(fa: Proc<A>): IO<A> =
-    IO.async(fa.toIOProc())
+    IO.async(fa)
 
   override fun <A> asyncF(k: ProcF<ForIO, A>): IO<A> =
-    IO.asyncF(k.toIOProcF())
+    IO.asyncF(k)
 
   override fun <A> IOOf<A>.continueOn(ctx: CoroutineContext): IO<A> =
     fix().continueOn(ctx)
@@ -177,17 +174,11 @@ interface IOConcurrent : Concurrent<ForIO>, IOAsync {
   override fun <A> CoroutineContext.startFiber(kind: IOOf<A>): IO<Fiber<ForIO, A>> =
     kind.fix().startFiber(this)
 
-  override fun <A> asyncF(fa: ConnectedProcF<ForIO, A>): IO<A> =
-    IO.asyncF(fa)
+  override fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForIO>): Kind<ForIO, A> =
+    IO.cancelable(k)
 
-  override fun <A> async(fa: ConnectedProc<ForIO, A>): IO<A> =
-    IO.async(fa)
-
-  override fun <A> asyncF(k: ProcF<ForIO, A>): IO<A> =
-    IO.asyncF { _, cb -> k(cb) }
-
-  override fun <A> async(fa: Proc<A>): IO<A> =
-    IO.async { _, cb -> fa(cb) }
+  override fun <A> cancelableF(k: ((Either<Throwable, A>) -> Unit) -> IOOf<CancelToken<ForIO>>): IO<A> =
+    IO.cancelableF(k)
 
   override fun <A, B> CoroutineContext.racePair(fa: Kind<ForIO, A>, fb: Kind<ForIO, B>): IO<RacePair<ForIO, A, B>> =
     IO.racePair(this, fa, fb)
