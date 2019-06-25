@@ -7,10 +7,10 @@ import arrow.core.toT
 import arrow.mtl.State
 import arrow.mtl.StatePartialOf
 import arrow.mtl.StateApi
-import arrow.effects.IO
-import arrow.effects.extensions.io.monadDefer.monadDefer
-import arrow.effects.fix
-import arrow.effects.typeclasses.MonadDefer
+import arrow.fx.IO
+import arrow.fx.extensions.io.monadDefer.monadDefer
+import arrow.fx.fix
+import arrow.fx.typeclasses.MonadDefer
 import arrow.mtl.extensions.monad
 import arrow.mtl.fix
 import arrow.mtl.run

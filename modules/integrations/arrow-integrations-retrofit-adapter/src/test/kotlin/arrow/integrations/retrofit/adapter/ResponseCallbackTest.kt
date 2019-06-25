@@ -1,8 +1,8 @@
 package arrow.integrations.retrofit.adapter
 
-import arrow.effects.IO
-import arrow.effects.fix
-import arrow.effects.extensions.io.async.async
+import arrow.fx.IO
+import arrow.fx.fix
+import arrow.fx.extensions.io.async.async
 import arrow.integrations.retrofit.adapter.retrofit.ApiClientTest
 import arrow.integrations.retrofit.adapter.retrofit.retrofit
 import arrow.test.UnitSpec

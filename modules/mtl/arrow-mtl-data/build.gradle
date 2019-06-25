@@ -13,6 +13,7 @@ dependencies {
     testCompile project(':arrow-test')
     testCompile project(':arrow-syntax')
     testCompile project(':arrow-mtl')
+    testCompile project(':arrow-fx-mtl')
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
