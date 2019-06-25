@@ -1,5 +1,7 @@
 package consumer
 
+import arrow.sample.MyNumber
+
 //import arrow.sample.*
 //
 ////import arrow.core.ForOption
@@ -13,3 +15,15 @@ package consumer
 //    println(None.h())
 //  }
 //}
+
+//import arrow.sample.*
+//
+////import arrow.core.ForOption
+//
+object test {
+
+  @JvmStatic
+  fun main(args: Array<String>) {
+    println(MyNumber.Companion)
+  }
+}

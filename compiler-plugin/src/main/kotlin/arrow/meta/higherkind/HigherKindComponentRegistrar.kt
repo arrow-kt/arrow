@@ -18,55 +18,7 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.storage.StorageManager
 import org.jetbrains.kotlin.types.checker.KotlinTypeChecker
 import org.jetbrains.kotlin.types.typeUtil.isInterface
-/*
-package arrow.sample
 
-interface Kind<out F, out A>
-
-/* class ForOption */
-
-/* typealias OptionOf<A> = Kind<ForOption, A> */
-
-sealed class Option<out A> /* Kind<ForOption */ {
-
-    fun h(): Option<Int> {
-        val x : Kind<ForOption, Int> /* (implicit conversion with type checking subtypes */ = None
-        val y = x
-        return y
-    }
-
-    data class Some<out A>(val a: A): Option<A>()
-    object None : Option<Nothing>()
-
-    companion object {
-        @extension interface OptionFunctor : Functor<ForOption> {
-            override fun <A, B> Option<A>.map(f: (A) -> B): Option<B> =
-                TODO()
-        }
-
-        /*
-        val optionfunctorinstance = object : OptionFucntor { } ...
-        fun functor(): Functor<ForOption> = optionfunctorinstance
-         */
-    }
-}
-
-interface Functor<F> {
-    fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B>
-}
-
-
-
-// Produces
-//Option.functor()
-
-fun <F> Kind<F, Int>.foo(@with FF: Functor<F>): Kind<F, Int> = /** with(FF) { **/
-    map { it + 1 }
-/** } **/
-
-
-val option2: Option<Int> = Option(1).foo(/** Option.functor() **/)
- */
 class HigherKindComponentRegistrar : MetaComponentRegistrar {
   override fun intercept(): List<ExtensionPhase> =
     meta(
