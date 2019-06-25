@@ -6,16 +6,6 @@ import arrow.higherkind
  *
  * ank_macro_hierarchy(arrow.core.Option)
  *
- * ---
- * layout: docs
- * title: Option
- * permalink: /docs/apidocs/arrow-core-data/arrow.core/-option/
- * redirect_from:
- *  - /docs/datatypes/option/
- *
- * video: 5SFTbphderE
- * ---
- *
  * {:.beginner}
  * beginner
  *

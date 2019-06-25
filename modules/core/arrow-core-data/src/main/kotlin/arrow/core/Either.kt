@@ -6,11 +6,215 @@ import arrow.core.Either.Right
 import arrow.higherkind
 
 /**
- * Port of https://github.com/scala/scala/blob/v2.12.1/src/library/scala/util/Either.scala
+ * ---
  *
- * Represents a value of one of two possible types (a disjoint union.)
- * An instance of Either is either an instance of [Left] or [Right].
+ * ank_macro_hierarchy(arrow.core.Either)
+ *
+ * {:.beginner}
+ * beginner
+ *
+ * [Перевод на русский](/docs/arrow/core/either/ru/)
+ *
+ * In day-to-day programming, it is fairly common to find ourselves writing functions that can fail.
+ * For instance, querying a service may result in a connection issue, or some unexpected JSON response.
+ *
+ * To communicate these errors it has become common practice to throw exceptions; however,
+ * exceptions are not tracked in any way, shape, or form by the compiler. To see what
+ * kind of exceptions (if any) a function may throw, we have to dig through the source code.
+ * Then to handle these exceptions, we have to make sure we catch them at the call site. This
+ * all becomes even more unwieldy when we try to compose exception-throwing procedures.
+ *
+ * ```kotlin:ank:playground
+ * import arrow.core.*
+ * fun main() {
+ * //sampleStart
+ * val throwsSomeStuff: (Int) -> Double = {x -> x.toDouble()}
+ * val throwsOtherThings: (Double) -> String = {x -> x.toString()}
+ * val moreThrowing: (String) -> List<String> = {x -> listOf(x)}
+ * val magic = throwsSomeStuff.andThen(throwsOtherThings).andThen(moreThrowing)
+ * //sampleEnd
+ * println(magic)
+ * }
+ * ```
+ *
+ * Assume we happily throw exceptions in our code. Looking at the types of the above functions, any of them could throw any number of exceptions -- we do not know. When we compose, exceptions from any of the constituent
+ * functions can be thrown. Moreover, they may throw the same kind of exception
+ * (e.g. `IllegalArgumentException`) and thus it gets tricky tracking exactly where an exception came from.
+ *
+ * How then do we communicate an error? By making it explicit in the data type we return.
+ *
+ * ## Either vs Validated
+ *
+ * In general, `Validated` is used to accumulate errors, while `Either` is used to short-circuit a computation
+ * upon the first error. For more information, see the `Validated` vs `Either` section of the `Validated` documentation.
+ *
+ * By convention the right hand side of an `Either` is used to hold successful values.
+ *
+ * ```kotlin:ank:playground
+ * import arrow.core.*
+ * fun main() {
+ * //sampleStart
+ * val right: Either<String, Int> = Either.Right(5)
+ * //sampleEnd
+ * println(right)
+ * }
+ * ```
+ *
+ * ```kotlin:ank:playground
+ * import arrow.core.*
+ * fun main() {
+ * //sampleStart
+ * val left: Either<String, Int> = Either.Left("Something went wrong")
+ * //sampleEnd
+ * println(left)
+ * }
+ * ```
+ * Because `Either` is right-biased, it is possible to define a Monad instance for it.
+ *
+ * Since we only ever want the computation to continue in the case of `Right` (as captured by the right-bias nature),
+ * we fix the left type parameter and leave the right one free.
+ *
+ * So the map and flatMap methods are right-biased:
+ *
+ * ```kotlin:ank:playground
+ * import arrow.core.*
+ * fun main() {
+ * //sampleStart
+ * val right: Either<String, Int> = Either.Right(5)
+ * val value = right.flatMap{Either.Right(it + 1)}
+ * //sampleEnd
+ * println(value)
+ * }
+ * ```
+ *
+ * ```kotlin:ank: playground
+ * import arrow.core.*
+ * fun main() {
+ * //sampleStart
+ * val left: Either<String, Int> = Either.Left("Something went wrong")
+ * val value = left.flatMap{Either.Right(it + 1)}
+ * //sampleEnd
+ * println(value)
+ * }
+ * ```
+ *
+ * ## Using Either instead of exceptions
+ *
+ * As a running example, we will have a series of functions that will:
+ *
+ * * Parse a string into an integer
+ * * Calculate the reciprocal
+ * * Convert the reciprocal into a string
+ *
+ * Using exception-throwing code, we could write something like this:
+ *
+ * ```kotlin:ank:silent
+ * // Exception Style
+ *
+ * fun parse(s: String): Int =
+ *   if (s.matches(Regex("-?[0-9]+"))) s.toInt()
+ *   else throw NumberFormatException("$s is not a valid integer.")
+ *
+ * fun reciprocal(i: Int): Double =
+ *   if (i == 0) throw IllegalArgumentException("Cannot take reciprocal of 0.")
+ *   else 1.0 / i
+ *
+ * fun stringify(d: Double): String = d.toString()
+ *
+ * fun magic(s: String): Either<Exception, String> =
+ *   parse(s).flatMap{reciprocal(it)}.map{stringify(it)}
+ * ```
+ *
+ * Instead, let's make the fact that some of our functions can fail explicit in the return type.
+ *
+ * ```kotlin:ank:playground
+ * import arrow.core.*
+ *
+ * fun parse(s: String): Either<NumberFormatException, Int> =
+ *   if (s.matches(Regex("-?[0-9]+"))) Either.Right(s.toInt())
+ *   else Either.Left(NumberFormatException("$s is not a valid integer."))
+ *
+ * fun main() {
+ * //sampleStart
+ *  val notANumber = parse("Not a number")
+ *  val number2 = parse("2")
+ *  //sampleEnd
+ *  println("notANumber = $notANumber")
+ *  println("number2 = $number2")
+ * }
+ * ```
+ *
+ * Now, using combinators like `flatMap` and `map`, we can compose our functions together.
+ *
+ * ```kotlin:ank:playground
+ * import arrow.core.*
+ *
+ * fun parse(s: String): Either<NumberFormatException, Int> =
+ *   if (s.matches(Regex("-?[0-9]+"))) Either.Right(s.toInt())
+ *   else Either.Left(NumberFormatException("$s is not a valid integer."))
+ *
+ * fun reciprocal(i: Int): Either<IllegalArgumentException, Double> =
+ *   if (i == 0) Either.Left(IllegalArgumentException("Cannot take reciprocal of 0."))
+ *   else Either.Right(1.0 / i)
+ *
+ * fun stringify(d: Double): String = d.toString()
+ *
+ * fun magic(s: String): Either<Exception, String> =
+ *   parse(s).flatMap{reciprocal(it)}.map{stringify(it)}
+ *
+ * fun main() {
+ * //sampleStart
+ *  val magic0 = magic("0")
+ *  val magic1 = magic("1")
+ *  val magicNotANumber = magic("Not a number")
+ *  //sampleEnd
+ *  println("magic0 = $magic0")
+ *  println("magic1 = $magic1")
+ *  println("magicNotANumber = $magicNotANumber")
+ * }
+ * ```
+ *
+ * In the following exercise we pattern-match on every case the `Either` returned by `magic` can be in.
+ * Note the `when` clause in the `Left` - the compiler will complain if we leave that out because it knows that
+ * given the type `Either[Exception, String]`, there can be inhabitants of `Left` that are not
+ * `NumberFormatException` or `IllegalArgumentException`. You should also notice that we are using
+ * [SmartCast](https://kotlinlang.org/docs/reference/typecasts.html#smart-casts) for accessing to `Left` and `Right`
+ * value.
+ *
+ * ```kotlin:ank:playground
+ * import arrow.core.*
+ * fun parse(s: String): Either<NumberFormatException, Int> =
+ *   if (s.matches(Regex("-?[0-9]+"))) Either.Right(s.toInt())
+ *   else Either.Left(NumberFormatException("$s is not a valid integer."))
+ *
+ * fun reciprocal(i: Int): Either<IllegalArgumentException, Double> =
+ *   if (i == 0) Either.Left(IllegalArgumentException("Cannot take reciprocal of 0."))
+ *   else Either.Right(1.0 / i)
+ *
+ * fun stringify(d: Double): String = d.toString()
+ *
+ * fun magic(s: String): Either<Exception, String> =
+ *   parse(s).flatMap{reciprocal(it)}.map{stringify(it)}
+ *
+ * fun main() {
+ * //sampleStart
+ * val x = magic("2")
+ * val value = when(x) {
+ *   is Either.Left -> when (x.a){
+ *     is NumberFormatException -> "Not a number!"
+ *     is IllegalArgumentException -> "Can't take reciprocal of 0!"
+ *     else -> "Unknown error"
+ *   }
+ *   is Either.Right -> "Got reciprocal: ${x.b}"
+ * }
+ * //sampleEnd
+ * println("value = $value")
+ * }
+ * ```
+ *
+ *
  */
+
 @higherkind
 sealed class Either<out A, out B> : EitherOf<A, B> {
 
