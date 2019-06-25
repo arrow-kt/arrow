@@ -93,13 +93,9 @@ dependencies {
     compile "io.arrow-kt:arrow-free-extensions:$arrow_version" //optional
     compile "io.arrow-kt:arrow-mtl-data:$arrow_version" //optional
     compile "io.arrow-kt:arrow-mtl:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-effects-data:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-effects-extensions:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-effects-io-extensions:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-effects-rx2-data:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-effects-rx2-extensions:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-effects-reactor-data:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-effects-reactor-extensions:$arrow_version" //optional
+    compile "io.arrow-kt:arrow-fx:$arrow_version" //optional
+    compile "io.arrow-kt:arrow-fx-rx2:$arrow_version" //optional
+    compile "io.arrow-kt:arrow-fx-reactor:$arrow_version" //optional
     compile "io.arrow-kt:arrow-optics:$arrow_version" //optional
     compile "io.arrow-kt:arrow-generic:$arrow_version" //optional
     compile "io.arrow-kt:arrow-recursion-data:$arrow_version" //optional

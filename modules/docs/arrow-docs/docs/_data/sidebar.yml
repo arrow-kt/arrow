@@ -357,7 +357,7 @@ options:
         url: /docs/effects/fiber/
 
       - title: Resource
-        url: /docs/apidocs/arrow-effects-data/arrow.effects/-resource/
+        url: /docs/apidocs/arrow-effects-data/arrow.fx/-resource/
 
   - title: Optics
 

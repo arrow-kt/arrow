@@ -1,7 +1,7 @@
 apply plugin: 'kotlin-kapt'
 
 dependencies {
-    compile project(':arrow-effects-data')
+    compile project(':arrow-fx')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     compile project(':arrow-annotations')
     compile "com.squareup.retrofit2:retrofit:$retrofitVersion"
@@ -14,8 +14,8 @@ dependencies {
     testCompile "io.kotlintest:kotlintest-runner-junit4:$kotlinTestVersion"
     testCompile "com.squareup.retrofit2:converter-gson:$retrofitVersion"
     testCompile 'com.squareup.okhttp3:mockwebserver:3.13.1'
-    testCompile project(':arrow-effects-rx2-extensions')
-    testCompile project(':arrow-effects-extensions')
+    testCompile project(':arrow-fx-rx2')
+    testCompile project(':arrow-fx')
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

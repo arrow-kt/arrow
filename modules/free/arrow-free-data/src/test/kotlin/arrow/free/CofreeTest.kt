@@ -35,7 +35,6 @@ import arrow.typeclasses.Eq
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
-import kotlin.run
 
 @RunWith(KotlinTestRunner::class)
 class CofreeTest : UnitSpec() {

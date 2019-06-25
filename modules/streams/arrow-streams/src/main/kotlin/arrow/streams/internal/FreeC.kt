@@ -11,7 +11,7 @@ import arrow.core.Some
 import arrow.core.flatMap
 import arrow.core.orElse
 import arrow.core.some
-import arrow.effects.typeclasses.ExitCase
+import arrow.fx.typeclasses.ExitCase
 import arrow.streams.CompositeFailure
 import arrow.streams.internal.FreeC.Result
 import arrow.typeclasses.MonadError
