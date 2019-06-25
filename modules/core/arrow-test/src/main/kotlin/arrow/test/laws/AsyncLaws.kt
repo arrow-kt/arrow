@@ -4,9 +4,9 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Left
 import arrow.core.Right
-import arrow.effects.Promise
-import arrow.effects.typeclasses.Async
-import arrow.effects.typeclasses.ExitCase
+import arrow.fx.Promise
+import arrow.fx.typeclasses.Async
+import arrow.fx.typeclasses.ExitCase
 import arrow.test.generators.applicativeError
 import arrow.test.generators.either
 import arrow.test.generators.functionAToB

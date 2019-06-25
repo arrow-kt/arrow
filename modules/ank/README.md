@@ -219,7 +219,7 @@ Example:
 ````
 ```kotlin:ank:outFile(diagram.nomnol)
 import arrow.reflect.*
-import arrow.effects.typeclasses.*
+import arrow.fx.typeclasses.*
 
 TypeClass(MonadDefer::class).hierarchyGraph()
 ```

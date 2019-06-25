@@ -1,10 +1,10 @@
 package arrow.test.laws
 
 import arrow.Kind
-import arrow.effects.Timer
-import arrow.effects.typeclasses.Async
-import arrow.effects.typeclasses.milliseconds
-import arrow.effects.typeclasses.seconds
+import arrow.fx.Timer
+import arrow.fx.typeclasses.Async
+import arrow.fx.typeclasses.milliseconds
+import arrow.fx.typeclasses.seconds
 import arrow.test.generators.intSmall
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen

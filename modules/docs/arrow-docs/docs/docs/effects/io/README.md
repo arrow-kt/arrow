@@ -213,8 +213,8 @@ IO.async<Int> { callback ->
 
 ```kotlin
 import arrow.typeclasses.*
-import arrow.effects.*
-import arrow.effects.extensions.fx
+import arrow.fx.*
+import arrow.fx.extensions.fx
 
 IO.fx {
   val (file) = getFile("/tmp/file.txt")
@@ -237,7 +237,7 @@ IO.fx {
 Puts the value `A` inside an `IO<A>` using `just`.
 
 ```kotlin:ank
-import arrow.effects.*
+import arrow.fx.*
 
 1.liftIO()
   .attempt()
@@ -253,7 +253,7 @@ IO implements all the operators common to all instances of [`MonadError`]({{ '/d
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.effects.*
+import arrow.fx.*
 
 DataType(IO::class).tcMarkdownList()
 ```

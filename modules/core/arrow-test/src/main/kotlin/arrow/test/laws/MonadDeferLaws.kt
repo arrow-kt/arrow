@@ -6,7 +6,7 @@ import arrow.core.left
 import arrow.core.right
 import arrow.core.extensions.list.foldable.foldLeft
 import arrow.core.k
-import arrow.effects.typeclasses.MonadDefer
+import arrow.fx.typeclasses.MonadDefer
 import arrow.test.concurrency.SideEffect
 import arrow.test.generators.intSmall
 import arrow.test.generators.throwable

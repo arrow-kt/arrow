@@ -117,7 +117,7 @@ val adressDB: Map<Int, Address> = mapOf(
 Now we've got two new functions in the mix that are going to call a remote service, and they return a `ObservableK`. This is common in most APIs that handle loading asynchronously.
 
 ```kotlin:ank
-import arrow.effects.rx2.*
+import arrow.fx.rx2.*
 
 fun findPerson(personId : Int) : ObservableK<Either<BizError, Person>> =
   ObservableK.just(
@@ -162,7 +162,7 @@ We can't use flatMap in this case because the nested expression does not match t
 Let's look at how a similar implementation would look like using monad comprehensions without transformers:
 
 ```kotlin:ank
-import arrow.effects.rx2.extensions.fx
+import arrow.fx.rx2.extensions.fx
 
 fun getCountryCode(personId: Int): ObservableK<Either<BizError, String>> =
   ObservableK.fx {
@@ -200,7 +200,7 @@ So our specialization `EitherT<ForObservableK, BizError, A>` is the EitherT tran
 We can now lift any value to a `EitherT<F, BizError, A>` which looks like this:
 
 ```kotlin:ank
-import arrow.effects.rx2.extensions.observablek.applicative.*
+import arrow.fx.rx2.extensions.observablek.applicative.*
 import arrow.mtl.*
 
 val eitherTVal = EitherT.just<ForObservableK, BizError, Int>(ObservableK.applicative(), 1)
