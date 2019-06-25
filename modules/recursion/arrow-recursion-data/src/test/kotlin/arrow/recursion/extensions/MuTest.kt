@@ -1,4 +1,4 @@
-package arrow.recursion
+package arrow.recursion.extensions
 
 import arrow.recursion.data.Mu
 import arrow.recursion.extensions.mu.birecursive.birecursive
