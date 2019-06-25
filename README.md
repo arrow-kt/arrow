@@ -63,7 +63,7 @@ Arrow modules are exported and published with the following semantics.
 
 If we take for example `arrow-core`. 
 
-Arrow core contains the basic arrow type classes and data types and it's composed of 3 main artifacts that may be used a la carte:
+Arrow core contains the basic arrow type classes and data types and it's composed of 2 main artifacts that may be used a la carte:
 
 Recomended for most use cases:
 
@@ -71,8 +71,8 @@ Recomended for most use cases:
 
 Trimmed down versions:
 
-- `arrow-core-data` (Only data types)
-- `arrow-core-extensions` (Only type class extensions)
+- `arrow-core-data` (Only data types & typeclasses)
+- `arrow-core` (Data types, typeclasses & type class extensions)
 
 # Current stable version 0.9.0
 
@@ -89,12 +89,8 @@ Add the dependencies into the project's `build.gradle`
 ```groovy
 def arrow_version = "0.9.1-SNAPSHOT"
 dependencies {
-    compile "io.arrow-kt:arrow-core-data:$arrow_version"
-    compile "io.arrow-kt:arrow-core-extensions:$arrow_version"
+    compile "io.arrow-kt:arrow-core:$arrow_version"
     compile "io.arrow-kt:arrow-syntax:$arrow_version"
-    compile "io.arrow-kt:arrow-typeclasses:$arrow_version"
-    compile "io.arrow-kt:arrow-extras-data:$arrow_version"
-    compile "io.arrow-kt:arrow-extras-extensions:$arrow_version"
     kapt    "io.arrow-kt:arrow-meta:$arrow_version"
     
     compile "io.arrow-kt:arrow-query-language:$arrow_version" //optional

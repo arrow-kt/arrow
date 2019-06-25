@@ -1,8 +1,8 @@
 package arrow.optics.instances
 
 import arrow.core.extensions.eq
-import arrow.data.SequenceK
-import arrow.data.extensions.sequencek.eq.eq
+import arrow.core.SequenceK
+import arrow.core.extensions.sequencek.eq.eq
 import arrow.optics.extensions.sequencek.index.index
 import arrow.test.UnitSpec
 import arrow.test.generators.functionAToB

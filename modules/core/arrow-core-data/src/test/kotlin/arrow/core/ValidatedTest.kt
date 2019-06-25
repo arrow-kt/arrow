@@ -10,12 +10,14 @@ import arrow.core.extensions.validated.selective.selective
 import arrow.core.extensions.validated.semigroupK.semigroupK
 import arrow.core.extensions.validated.show.show
 import arrow.core.extensions.validated.traverse.traverse
+import arrow.core.extensions.validated.bitraverse.bitraverse
 import arrow.test.UnitSpec
 import arrow.test.laws.EqLaws
 import arrow.test.laws.SelectiveLaws
 import arrow.test.laws.SemigroupKLaws
 import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
+import arrow.test.laws.BitraverseLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Semigroup
 import io.kotlintest.fail
@@ -42,7 +44,8 @@ class ValidatedTest : UnitSpec() {
       SemigroupKLaws.laws(
         Validated.semigroupK(String.semigroup()),
         Validated.applicative(String.semigroup()),
-        Eq.any())
+        Eq.any()),
+      BitraverseLaws.laws(Validated.bitraverse(), ::Valid, Eq.any())
     )
 
     "fold should call function on Invalid" {

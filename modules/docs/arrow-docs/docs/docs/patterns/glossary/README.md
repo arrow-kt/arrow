@@ -105,9 +105,7 @@ Note that classes must have companion objects for this to work. All typeclass in
 ```kotlin:ank:silent
 import arrow.*
 import arrow.core.*
-import arrow.data.*
 import arrow.core.extensions.*
-import arrow.data.extensions.*
 import arrow.typeclasses.*
 import arrow.core.extensions.option.functor.*
 import arrow.core.extensions.either.monadError.*

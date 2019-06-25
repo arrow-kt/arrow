@@ -14,7 +14,7 @@ When building user interfaces it is common to have two screens side by side evol
 
 ```kotlin:ank
 import arrow.core.*
-import arrow.data.*
+import arrow.ui.*
 import arrow.core.extensions.id.comonad.*
 
 val renderHtml = { left: String, right: Int -> """     
@@ -32,7 +32,7 @@ day.extract(Id.comonad(), Id.comonad())
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.data.*
+import arrow.ui.*
 import arrow.core.*
 
 DataType(Day::class).tcMarkdownList()
