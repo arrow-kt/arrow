@@ -24,6 +24,5 @@ object test {
 
   @JvmStatic
   fun main(args: Array<String>) {
-    println(MyNumber.Companion)
   }
 }

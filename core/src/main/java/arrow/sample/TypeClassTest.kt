@@ -17,14 +17,16 @@ interface MyNumberSemigroup: Semigroup<MyNumber> {
 
 object MyNumberSemigroupInstance : MyNumberSemigroup
 
-fun <A> add(@with S: Semigroup<A>, a: A, b: A): A =
-  with(S) {
-    a.combine(b)
-  }
+object Contained {
 
-object Invocation {
-  @JvmStatic
-  fun main(args: Array<String>) {
-    println(add(MyNumberSemigroupInstance, MyNumber(1), MyNumber(2)))
-  }
+  fun <A> add(@with S: Semigroup<A>, a: A, b: A): A =
+    a.combine(b)
+
 }
+
+//object Invocation {
+//  @JvmStatic
+//  fun main(args: Array<String>) {
+//    println(add(MyNumberSemigroupInstance, MyNumber(1), MyNumber(2)).value)
+//  }
+//}

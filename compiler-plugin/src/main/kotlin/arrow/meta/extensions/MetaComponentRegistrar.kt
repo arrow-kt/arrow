@@ -349,18 +349,24 @@ interface MetaComponentRegistrar : ComponentRegistrar {
       thisDescriptor: ClassDescriptor,
       supertypes: MutableList<KotlinType>
     ) -> Unit = NoOp3,
-    generateSyntheticClasses: CompilerContext.(
-      thisDescriptor: ClassDescriptor,
-      name: Name,
-      ctx: LazyClassContext,
-      declarationProvider: ClassMemberDeclarationProvider,
-      result: MutableSet<ClassDescriptor>
-    ) -> Unit = NoOp6,
+    /**
+     * For a given package fragment it iterates over all the package declaration
+     * allowing the user to contribute new synthetic declarations.
+     * The result mutable set includes the descriptors as seen from the Kotlin compiler
+     * initial analysis and allows us to mutate it to add new descriptor or change the existing ones
+     */
     generatePackageSyntheticClasses: CompilerContext.(
       thisDescriptor: PackageFragmentDescriptor,
       name: Name,
       ctx: LazyClassContext,
       declarationProvider: PackageMemberDeclarationProvider,
+      result: MutableSet<ClassDescriptor>
+    ) -> Unit = NoOp6,
+    generateSyntheticClasses: CompilerContext.(
+      thisDescriptor: ClassDescriptor,
+      name: Name,
+      ctx: LazyClassContext,
+      declarationProvider: ClassMemberDeclarationProvider,
       result: MutableSet<ClassDescriptor>
     ) -> Unit = NoOp6,
     generateSyntheticMethods: CompilerContext.(
