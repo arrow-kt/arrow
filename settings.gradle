@@ -62,7 +62,7 @@ include {
 
         free {
             _ 'free-data'
-            _ 'free-extensions'
+            _ 'free'
         }
 
         fx {
@@ -78,7 +78,7 @@ include {
 
         recursion {
             _ 'recursion-data'
-            _ 'recursion-extensions'
+            _ 'recursion'
         }
 
         docs {
