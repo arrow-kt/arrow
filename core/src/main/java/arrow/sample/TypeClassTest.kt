@@ -1,6 +1,7 @@
 package arrow.sample
 
 import arrow.extension
+import arrow.sample.Contained.add
 import arrow.with
 
 interface Semigroup<A> {
@@ -19,14 +20,14 @@ object MyNumberSemigroupInstance : MyNumberSemigroup
 
 object Contained {
 
-  fun <A> add(@with S: Semigroup<A>, a: A, b: A): A =
+  fun <A> add(a: A, b: A, @with S: Semigroup<A>): A =
     a.combine(b)
 
 }
 
-//object Invocation {
-//  @JvmStatic
-//  fun main(args: Array<String>) {
-//    println(add(MyNumberSemigroupInstance, MyNumber(1), MyNumber(2)).value)
-//  }
-//}
+object Invocation {
+  @JvmStatic
+  fun main(args: Array<String>) {
+    add(MyNumber(1), MyNumber(2))
+  }
+}

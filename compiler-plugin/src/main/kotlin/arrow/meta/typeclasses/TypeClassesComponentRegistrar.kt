@@ -79,6 +79,7 @@ class TypeClassesComponentRegistrar : MetaComponentRegistrar {
           //println("generateSyntheticClasses: $name, result: $result")
         },
         generateSyntheticMethods = { thisDescriptor, name, bindingContext, fromSupertypes, result ->
+
           //          val functionDescriptor: SimpleFunctionDescriptorImpl = result.first() as SimpleFunctionDescriptorImpl
 //          functionDescriptor.initialize()
 //          functionDescriptor.valueParameters.filter {

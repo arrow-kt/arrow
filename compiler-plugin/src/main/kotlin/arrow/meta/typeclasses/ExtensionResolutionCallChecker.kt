@@ -19,7 +19,6 @@ var EXTENSION_RESOLUTION_INFO: WritableSlice<String, ExtensionCandidate> = Slice
 
 class ExtensionResolutionCallChecker : CallChecker {
   override fun check(resolvedCall: ResolvedCall<*>, reportOn: PsiElement, context: CallCheckerContext) {
-    println("ExtensionResolutionCallChecker: ${reportOn.text}")
     resolvedCall.resultingDescriptor.valueParameters.forEach { descriptor: ValueParameterDescriptor ->
       if (descriptor.isWithAnnotated && resolvedCall.valueArguments[descriptor] == null) {
         val valueParameters = functionParameters(context)
@@ -30,6 +29,7 @@ class ExtensionResolutionCallChecker : CallChecker {
           emptyList(),
           false
         )
+        println("ExtensionResolutionCallChecker: \ncandidate: ${resolvedCall.candidateDescriptor}, \nresulting: ${resolvedCall.resultingDescriptor} \nexpression: [${reportOn.text}], \nresolution: $resolution")
 
         when (resolution) {
           is ExtensionCandidateResolution.Unresolved -> {
