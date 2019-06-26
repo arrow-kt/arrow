@@ -4,9 +4,11 @@ import arrow.meta.extensions.CompilerContext
 import arrow.meta.extensions.ExtensionPhase
 import arrow.meta.extensions.MetaComponentRegistrar
 import arrow.meta.higherkind.buildIrValueParameter
-import org.jetbrains.kotlin.analyzer.AnalysisResult
 import org.jetbrains.kotlin.backend.common.BackendContext
 import org.jetbrains.kotlin.backend.common.serialization.irrelevantOrigin
+import org.jetbrains.kotlin.container.ComponentResolveContext
+import org.jetbrains.kotlin.container.ComponentStorage
+import org.jetbrains.kotlin.container.StorageComponentContainer
 import org.jetbrains.kotlin.container.useImpl
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
@@ -38,6 +40,7 @@ import org.jetbrains.kotlin.resolve.scopes.LexicalScope
 import org.jetbrains.kotlin.resolve.scopes.LexicalScopeImpl
 import org.jetbrains.kotlin.resolve.scopes.LexicalScopeKind
 import org.jetbrains.kotlin.resolve.scopes.receivers.ExtensionReceiver
+import java.lang.reflect.Type
 
 val extensionAnnotationName = FqName("arrow.extension")
 val withAnnotationName = FqName("arrow.with")
@@ -48,8 +51,20 @@ class TypeClassesComponentRegistrar : MetaComponentRegistrar {
     meta(
       enableIr(),
       storageComponent(
-        registerModuleComponents = { container, platform, moduleDescriptor ->
+        registerModuleComponents = { container: StorageComponentContainer, platform, moduleDescriptor ->
+          container.dump(System.out)
           container.useImpl<ExtensionResolutionCallChecker>()
+          container.useImpl<TypeClassPlatformDiagnosticSuppressor>()
+
+          val parentContext : ComponentResolveContext = container.unknownContext.parentContext as ComponentResolveContext
+          val localRegistry = container.componentStorage.componentRegistry.registrationMap
+          val parentRegistry = parentContext.container.componentStorage.componentRegistry.registrationMap
+          println("$localRegistry\n\n\n\n\n\n$parentRegistry")
+          //container.useImpl<MetaDeclarationReturnTypeSanitizer>()
+          //
+          //container.compose()
+//          val codeAnalyzer: ResolveSession = container.get<KotlinCodeAnalyzer>() as ResolveSession
+//          codeAnalyzer.platformDiagnosticSuppressor = TypeClassPlatformDiagnosticSuppressor(codeAnalyzer.platformDiagnosticSuppressor)
         },
         check = { declaration, descriptor, context ->
 
@@ -91,6 +106,20 @@ class TypeClassesComponentRegistrar : MetaComponentRegistrar {
         }
       )
     )
+
+  private val StorageComponentContainer.componentStorage: ComponentStorage
+    get() = this["componentStorage"]
+
+  val ComponentStorage.componentRegistry: Any
+    get() = this["registry"]
+
+  val Any.registrationMap: MutableMap<Type, Any>
+    get() = this["registrationMap"]
+
+  inline operator fun <reified A> Any.get(field: String): A =
+    javaClass.getDeclaredField(field).also {
+      it.isAccessible = true
+    }.get(this) as A
 
   private fun CompilerContext.getSyntheticCompanionName(declarationDescriptor: ClassDescriptor): Name? {
     return if (storedDescriptors().contains(declarationDescriptor)) {
