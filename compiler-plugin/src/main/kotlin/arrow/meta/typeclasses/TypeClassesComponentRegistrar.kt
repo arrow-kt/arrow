@@ -7,6 +7,7 @@ import arrow.meta.higherkind.buildIrValueParameter
 import org.jetbrains.kotlin.analyzer.AnalysisResult
 import org.jetbrains.kotlin.backend.common.BackendContext
 import org.jetbrains.kotlin.backend.common.serialization.irrelevantOrigin
+import org.jetbrains.kotlin.container.useImpl
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
@@ -38,7 +39,6 @@ import org.jetbrains.kotlin.resolve.scopes.LexicalScopeImpl
 import org.jetbrains.kotlin.resolve.scopes.LexicalScopeKind
 import org.jetbrains.kotlin.resolve.scopes.receivers.ExtensionReceiver
 
-
 val extensionAnnotationName = FqName("arrow.extension")
 val withAnnotationName = FqName("arrow.with")
 
@@ -47,6 +47,14 @@ class TypeClassesComponentRegistrar : MetaComponentRegistrar {
   override fun intercept(): List<ExtensionPhase> =
     meta(
       enableIr(),
+      storageComponent(
+        registerModuleComponents = { container, platform, moduleDescriptor ->
+          container.useImpl<ExtensionResolutionCallChecker>()
+        },
+        check = { declaration, descriptor, context ->
+
+        }
+      ),
       analysys(
         doAnalysis = { project, module, projectContext, files, bindingTrace, componentProvider ->
           println("analysys.doAnalysis")

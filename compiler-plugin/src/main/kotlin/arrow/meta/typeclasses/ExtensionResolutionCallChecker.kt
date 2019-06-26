@@ -17,8 +17,9 @@ var UNABLE_TO_RESOLVE_EXTENSION: DiagnosticFactory1<PsiElement, String> = Diagno
 
 var EXTENSION_RESOLUTION_INFO: WritableSlice<String, ExtensionCandidate> = Slices.createCollectiveSlice()
 
-object ExtensionResolutionCallChecker : CallChecker {
+class ExtensionResolutionCallChecker : CallChecker {
   override fun check(resolvedCall: ResolvedCall<*>, reportOn: PsiElement, context: CallCheckerContext) {
+    println("ExtensionResolutionCallChecker: ${reportOn.text}")
     resolvedCall.resultingDescriptor.valueParameters.forEach { descriptor: ValueParameterDescriptor ->
       if (descriptor.isWithAnnotated && resolvedCall.valueArguments[descriptor] == null) {
         val valueParameters = functionParameters(context)
@@ -26,7 +27,7 @@ object ExtensionResolutionCallChecker : CallChecker {
           descriptor,
           valueParameters,
           descriptor.original,
-          ArrayList(),
+          emptyList(),
           false
         )
 
