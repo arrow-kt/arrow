@@ -172,12 +172,12 @@ IO.effect { throw RuntimeException("Boom!") }
   .unsafeRunSync()
 ```
 
-### suspend
+### defer
 
 Used to defer the evaluation of an existing `IO`.
 
 ```kotlin
-IO.suspend { IO.just(1) }
+IO.defer { IO.just(1) }
   .attempt()
   .unsafeRunSync()
 ```
