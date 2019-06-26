@@ -11,7 +11,7 @@ dependencies {
     testRuntime("org.junit.vintage:junit-vintage-engine:$jUnitVintageVersion")
     testCompile "io.kotlintest:kotlintest-runner-junit4:$kotlinTestVersion"
     testCompile project(':arrow-test')
-    testCompile project(':arrow-free-extensions')
+    testCompile project(':arrow-free')
     testCompile project(':arrow-mtl')
 }
 
