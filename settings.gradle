@@ -62,17 +62,14 @@ include {
 
         free {
             _ 'free-data'
-            _ 'free-extensions'
+            _ 'free'
         }
 
-        effects {
-            _ 'effects-data'
-            _ 'effects-extensions'
-            _ 'effects-io-extensions'
-            _ 'effects-rx2-data'
-            _ 'effects-rx2-extensions'
-            _ 'effects-reactor-data'
-            _ 'effects-reactor-extensions'
+        fx {
+            _ 'fx'
+            _ 'fx-mtl'
+            _ 'fx-rx2'
+            _ 'fx-reactor'
         }
 
         integrations {
@@ -81,7 +78,7 @@ include {
 
         recursion {
             _ 'recursion-data'
-            _ 'recursion-extensions'
+            _ 'recursion'
         }
 
         docs {
@@ -118,7 +115,7 @@ include {
 
         benchmarks {
             _ 'scala-benchmarks'
-            _ 'benchmarks-effects'
+            _ 'benchmarks-fx'
         }
     }
 }

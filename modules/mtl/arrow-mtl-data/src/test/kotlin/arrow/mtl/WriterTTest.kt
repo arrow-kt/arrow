@@ -9,11 +9,11 @@ import arrow.core.ForListK
 import arrow.core.ListK
 import arrow.core.extensions.const.divisible.divisible
 import arrow.core.extensions.monoid
-import arrow.effects.ForIO
-import arrow.effects.IO
-import arrow.effects.extensions.io.applicativeError.attempt
-import arrow.effects.extensions.io.async.async
-import arrow.effects.extensions.writert.async.async
+import arrow.fx.ForIO
+import arrow.fx.IO
+import arrow.fx.extensions.io.applicativeError.attempt
+import arrow.fx.extensions.io.async.async
+import arrow.fx.mtl.writert.async.async
 import arrow.core.extensions.listk.monad.monad
 import arrow.core.extensions.listk.monoidK.monoidK
 import arrow.core.extensions.option.monad.monad

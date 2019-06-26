@@ -17,11 +17,11 @@ Using `Fiber` we can verily easily describe parallel operations such as `paralle
 when the resulting `IO` is canceled it does not propagate this cancellation back to the underlying `IO`.
 
 ```kotlin:ank
-import arrow.effects.*
+import arrow.fx.*
 import kotlinx.coroutines.Dispatchers.Default
-import arrow.effects.extensions.fx
-import arrow.effects.typeclasses.Fiber
-import arrow.effects.IO
+import arrow.fx.extensions.fx
+import arrow.fx.typeclasses.Fiber
+import arrow.fx.IO
 
 fun <A, B, C> parallelMap(first: IO<A>,
                      second: IO<B>,
@@ -55,8 +55,8 @@ We could fix this snippet to support proper cancellation by using `bracket` inst
 which allows us to register an operation to run on cancellation, error or completion.
 
 ```kotlin:ank
-import arrow.effects.extensions.io.monad.flatMap
-import arrow.effects.extensions.io.monad.map
+import arrow.fx.extensions.io.monad.flatMap
+import arrow.fx.extensions.io.monad.map
 
 fun <A, B, C> parallelMap2(first: IO<A>,
                           second: IO<B>,

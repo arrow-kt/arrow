@@ -32,7 +32,7 @@ Let's say we want to work with a file. Let's use a mock `File` API to avoid mess
 These methods would allow to open a File, close it and also read it's content as a string.
 
 ```kotlin:ank:silent
-import arrow.effects.IO
+import arrow.fx.IO
 
 /**
  * Mock File API.
@@ -60,7 +60,7 @@ Now, let's say we want to open a file, do some work with it, and then close it. 
 process look like this:
 
 ```kotlin:ank:playground
-import arrow.effects.IO
+import arrow.fx.IO
 
 class File(url: String) {
     fun open(): File = this
@@ -104,7 +104,7 @@ Let's learn more about how `Bracket` can support this pattern as a Type class wi
 
 ```kotlin:ank:silent
 import arrow.Kind
-import arrow.effects.typeclasses.Bracket
+import arrow.fx.typeclasses.Bracket
 
 class File(url: String) {
   fun open(): File = this
@@ -132,10 +132,10 @@ Let's run the program for the three mentioned data types as an example of polymo
 We can run the program for `IO`:
 
 ```kotlin:ank:playground
-import arrow.effects.IO
-import arrow.effects.extensions.io.bracket.bracket
+import arrow.fx.IO
+import arrow.fx.extensions.io.bracket.bracket
 import arrow.Kind
-import arrow.effects.typeclasses.Bracket
+import arrow.fx.typeclasses.Bracket
 
 class File(url: String) {
   fun open(): File = this
@@ -169,10 +169,10 @@ println(safeComputation)
 Let's now run the same exact program also for `ObservableK`:
 
 ```kotlin:ank:playground
-import arrow.effects.rx2.ObservableK
-import arrow.effects.rx2.extensions.observablek.bracket.bracket
+import arrow.fx.rx2.ObservableK
+import arrow.fx.rx2.extensions.observablek.bracket.bracket
 import arrow.Kind
-import arrow.effects.typeclasses.Bracket
+import arrow.fx.typeclasses.Bracket
 
 class File(url: String) {
   fun open(): File = this
@@ -217,7 +217,7 @@ Requires passing `release` and `use` lambdas. It ensures acquiring, using and re
 `fun <A, B> Kind<F, A>.bracket(release: (A) -> Kind<F, Unit>, use: (A) -> Kind<F, B>): Kind<F, B>`
 
 ```kotlin:ank:playground
-import arrow.effects.IO
+import arrow.fx.IO
 
 class File(url: String) {
     fun open(): File = this
@@ -252,8 +252,8 @@ Requires passing `release` and `use` lambdas. It ensures acquiring, using and re
 `fun <A, B> Kind<F, A>.bracketCase(release: (A, ExitCase<Throwable>) -> Kind<F, Unit>, use: (A) -> Kind<F, B>): Kind<F, B>`
 
 ```kotlin:ank:playground
-import arrow.effects.IO
-import arrow.effects.typeclasses.ExitCase
+import arrow.fx.IO
+import arrow.fx.typeclasses.ExitCase
 
 class File(url: String) {
     fun open(): File = this
@@ -309,12 +309,12 @@ See [Deriving and creating custom typeclass]({{ '/docs/patterns/glossary' | rela
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.effects.typeclasses.Bracket
+import arrow.fx.typeclasses.Bracket
 
 TypeClass(Bracket::class).dtMarkdownList()
 ```
 
-ank_macro_hierarchy(arrow.effects.typeclasses.Bracket)
+ank_macro_hierarchy(arrow.fx.typeclasses.Bracket)
 
 [bracket_source]: https://github.com/arrow-kt/arrow/blob/master/modules/effects/arrow-effects/src/main/kotlin/arrow/effects/typeclasses/Bracket.kt
 [bracket_laws_source]: https://github.com/arrow-kt/arrow/blob/master/modules/core/arrow-test/src/main/kotlin/arrow/test/laws/BracketLaws.kt

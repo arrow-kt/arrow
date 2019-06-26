@@ -111,9 +111,9 @@ Arrow provides `MonadDeferLaws` in the form of test cases for internal verificat
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.effects.typeclasses.*
+import arrow.fx.typeclasses.*
 
 TypeClass(MonadDefer::class).dtMarkdownList()
 ```
 
-ank_macro_hierarchy(arrow.effects.typeclasses.MonadDefer)
+ank_macro_hierarchy(arrow.fx.typeclasses.MonadDefer)

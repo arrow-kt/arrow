@@ -3,7 +3,7 @@ package com.pacoworks.typeclasses.basics.solved.advanced
 import arrow.Kind
 import arrow.core.left
 import arrow.core.right
-import arrow.effects.typeclasses.Async
+import arrow.fx.typeclasses.Async
 import arrow.typeclasses.Index
 import arrow.typeclasses.Query
 import arrow.typeclasses.UserDao

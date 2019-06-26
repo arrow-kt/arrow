@@ -1,0 +1,51 @@
+dependencies {
+    compile project(":arrow-fx")
+    compile project(":arrow-fx-rx2")
+    compile project(":arrow-fx-reactor")
+    compile project(":arrow-scala-benchmarks")
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
+    compileOnly "org.openjdk.jmh:jmh-core:1.21"
+}
+
+apply plugin: "me.champeau.gradle.jmh"
+apply plugin: "io.morethan.jmhreport"
+
+jmh {
+    include = [
+            'arrow.benchmarks.Async',
+            'arrow.benchmarks.AttemptNonRaised',
+            'arrow.benchmarks.AttemptRaisedError',
+//            'arrow.benchmarks.Bracket',
+//            'arrow.benchmarks.Cancellable',
+            'arrow.benchmarks.DeepBind',
+//            'arrow.benchmarks.Defer',
+            'arrow.benchmarks.Delay',
+//            'arrow.benchmarks.ForkFiber',
+//            'arrow.benchmarks.HandleNonRaised',
+//            'arrow.benchmarks.HandleRaisedError',
+            'arrow.benchmarks.LeftBind',
+            'arrow.benchmarks.Map',
+            'arrow.benchmarks.MapStream',
+//            'arrow.benchmarks.ParMap',
+            'arrow.benchmarks.Pure',
+//            'arrow.benchmarks.RacePair',
+//            'arrow.benchmarks.Uncancellable'
+    ]
+    resultFormat = 'json'
+    resultsFile = file('build/reports/benchmarks.json')
+    timeOnIteration = '1s'
+    failOnError = true
+    if (project.hasProperty("jmhInclude"))
+        include = [jmhInclude]
+    if (project.hasProperty("jmhResultsFile"))
+        resultsFile = file(jmhResultsFile)
+
+}
+
+jmhReport {
+    jmhResultPath = project.file('build/reports/benchmarks.json')
+    jmhReportOutput = project.file('build/reports')
+}
+
+tasks.jmh.finalizedBy tasks.jmhReport

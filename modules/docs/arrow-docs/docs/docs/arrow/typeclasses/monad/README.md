@@ -30,7 +30,7 @@ Because `Kind<F, B>` cannot be created until `A` is unwrapped, it means that one
 ```kotlin:ank
 import arrow.core.*
 import arrow.core.extensions.*
-import arrow.effects.*
+import arrow.fx.*
 
 Some(1).flatMap { a ->
   Some(a + 1)
@@ -98,7 +98,7 @@ Some(1).followedBy(Some(2))
 Executes two elements sequentially and ignores the result of the second. This is useful for effects like logging.
 
 ```kotlin:ank
-import arrow.effects.extensions.io.monad.*
+import arrow.fx.extensions.io.monad.*
 
 fun logValue(i: Int): IO<Unit> = IO { /* println(i) */ }
 

@@ -83,9 +83,9 @@ Let's see a minimal example.
 
 ```kotlin:ank
 import arrow.*
-import arrow.effects.*
+import arrow.fx.*
 import arrow.typeclasses.*
-import arrow.effects.extensions.fx
+import arrow.fx.extensions.fx
 
 IO.fx {
   1
