@@ -87,7 +87,7 @@ import arrow.higherkind
  * }
  * ```
  *
- * ```kotlin:ank: playground
+ * ```kotlin:ank:playground
  * import arrow.core.*
  * fun main() {
  * //sampleStart
@@ -108,7 +108,7 @@ import arrow.higherkind
  *
  * Using exception-throwing code, we could write something like this:
  *
- * ```kotlin:ank:silent
+ * ```kotlin
  * // Exception Style
  *
  * fun parse(s: String): Int =
@@ -212,6 +212,364 @@ import arrow.higherkind
  * }
  * ```
  *
+ * Instead of using exceptions as our error value, let's instead enumerate explicitly the things that
+ * can go wrong in our program.
+ *
+ * ```kotlin
+ * // Either with ADT Style
+ *
+ * sealed class Error {
+ *   object NotANumber : Error()
+ *   object NoZeroReciprocal : Error()
+ * }
+ *
+ * fun parse(s: String): Either<Error, Int> =
+ *   if (s.matches(Regex("-?[0-9]+"))) Either.Right(s.toInt())
+ *   else Either.Left(Error.NotANumber)
+ *
+ * fun reciprocal(i: Int): Either<Error, Double> =
+ *   if (i == 0) Either.Left(Error.NoZeroReciprocal)
+ *   else Either.Right(1.0 / i)
+ *
+ * fun stringify(d: Double): String = d.toString()
+ *
+ * fun magic(s: String): Either<Error, String> =
+ *   parse(s).flatMap{reciprocal(it)}.map{stringify(it)}
+ * ```
+ *
+ * For our little module, we enumerate any and all errors that can occur. Then, instead of using
+ * exception classes as error values, we use one of the enumerated cases. Now when we pattern match,
+ * we are able to comphrensively handle failure without resulting to an `else` branch; moreover
+ * since Error is sealed, no outside code can add additional subtypes which we might fail to handle.
+ *
+ * ```kotlin:ank:playground
+ * import arrow.core.*
+ * sealed class Error {
+ *   object NotANumber : Error()
+ *   object NoZeroReciprocal : Error()
+ * }
+ *
+ * fun parse(s: String): Either<Error, Int> =
+ *   if (s.matches(Regex("-?[0-9]+"))) Either.Right(s.toInt())
+ *   else Either.Left(Error.NotANumber)
+ *
+ * fun reciprocal(i: Int): Either<Error, Double> =
+ *   if (i == 0) Either.Left(Error.NoZeroReciprocal)
+ *   else Either.Right(1.0 / i)
+ *
+ * fun stringify(d: Double): String = d.toString()
+ *
+ * fun magic(s: String): Either<Error, String> =
+ *   parse(s).flatMap{reciprocal(it)}.map{stringify(it)}
+ * fun main() {
+ * //sampleStart
+ * val x = magic("2")
+ * val value = when(x) {
+ *   is Either.Left -> when (x.a){
+ *     is Error.NotANumber -> "Not a number!"
+ *     is Error.NoZeroReciprocal -> "Can't take reciprocal of 0!"
+ *   }
+ *   is Either.Right -> "Got reciprocal: ${x.b}"
+ * }
+ * //sampleEnd
+ * println("value = $value")
+ * }
+ * ```
+ *
+ * ## Syntax
+ *
+ * Either can also map over the `left` value with `mapLeft` which is similar to map but applies on left instances.
+ *
+ * ```kotlin:ank:playground
+ * import arrow.core.*
+ * fun main() {
+ * //sampleStart
+ * val r : Either<Int, Int> = Either.Right(7)
+ * val rightMapLeft = r.mapLeft {it + 1}
+ * val l: Either<Int, Int> = Either.Left(7)
+ * val leftMapLeft = l.mapLeft {it + 1}
+ * //sampleEnd
+ * println("rightMapLeft = $rightMapLeft")
+ * println("leftMapLeft = $leftMapLeft")
+ * }
+ * ```
+ *
+ * `Either<A, B>` can be transformed to `Either<B,A>` using the `swap()` method.
+ *
+ * ```kotlin:ank:playground
+ * import arrow.core.*
+ * fun main() {
+ * //sampleStart
+ * val r: Either<String, Int> = Either.Right(7)
+ * val swapped = r.swap()
+ * //sampleEnd
+ * println("swapped = $swapped")
+ * }
+ * ```
+ *
+ * For using Either's syntax on arbitrary data types.
+ * This will make possible to use the `left()`, `right()`, `contains()`, `getOrElse()` and `getOrHandle()` methods:
+ *
+ * ```kotlin:ank:playground
+ * import arrow.core.*
+ * fun main() {
+ * val right7 =
+ * //sampleStart
+ * 7.right()
+ * //sampleEnd
+ * println(right7)
+ * }
+ * ```
+ *
+ * ```kotlin:ank:playground
+ * import arrow.core.*
+ * fun main() {
+ * val leftHello =
+ * //sampleStart
+ * "hello".left()
+ * //sampleEnd
+ * println(leftHello)
+ * }
+ * ```
+ *
+ * ```kotlin:ank:playground
+ * import arrow.core.*
+ * fun main() {
+ * //sampleStart
+ * val x = 7.right()
+ * val contains7 = x.contains(7)
+ * //sampleEnd
+ * println("contains7 = $contains7")
+ * }
+ * ```
+ *
+ * ```kotlin:ank:playground
+ * import arrow.core.*
+ * fun main() {
+ * //sampleStart
+ * val x = "hello".left()
+ * val getOr7 = x.getOrElse { 7 }
+ * //sampleEnd
+ * println("getOr7 = $getOr7")
+ * }
+ * ```
+ *
+ * ```kotlin:ank:playground
+ * import arrow.core.*
+ * fun main() {
+ * //sampleStart
+ * val x = "hello".left()
+ * val value = x.getOrHandle { "$it world!" }
+ * //sampleEnd
+ * println("value = $value")
+ * }
+ * ```
+ *
+ * For creating Either instance based on a predicate, use `Either.cond()` method :
+ *
+ * ```kotlin:ank:playground
+ * import arrow.core.*
+ * fun main() {
+ * val value =
+ * //sampleStart
+ * Either.cond(true, { 42 }, { "Error" })
+ * //sampleEnd
+ * println(value)
+ * }
+ * ```
+ *
+ * ```kotlin:ank:playground
+ * import arrow.core.*
+ * fun main() {
+ * val value =
+ * //sampleStart
+ * Either.cond(false, { 42 }, { "Error" })
+ *  //sampleEnd
+ * println(value)
+ * }
+ * ```
+ *
+ * Another operation is `fold`. This operation will extract the value from the Either, or provide a default if the value is `Left`
+ *
+ * ```kotlin:ank:playground
+ * import arrow.core.*
+ * fun main() {
+ * //sampleStart
+ * val x : Either<Int, Int> = 7.right()
+ * val fold = x.fold({ 1 }, { it + 3 })
+ * //sampleEnd
+ * println("fold = $fold")
+ * }
+ * ```
+ *
+ * ```kotlin:ank:playground
+ * import arrow.core.*
+ * fun main() {
+ * //sampleStart
+ * val y : Either<Int, Int> = 7.left()
+ * val fold = y.fold({ 1 }, { it + 3 })
+ * //sampleEnd
+ * println("fold = $fold")
+ * }
+ * ```
+ *
+ * The `getOrHandle()` operation allows the transformation of an `Either.Left` value to a `Either.Right` using
+ * the value of `Left`. This can be useful when a mapping to a single result type is required like `fold()` but without
+ * the need to handle `Either.Right` case.
+ *
+ * As an example we want to map an `Either<Throwable, Int>` to a proper HTTP status code:
+ *
+ * ```kotlin:ank:playground
+ * import arrow.core.*
+ * fun main() {
+ * //sampleStart
+ * val r: Either<Throwable, Int> = Either.Left(NumberFormatException())
+ * val httpStatusCode = r.getOrHandle {
+ *   when(it) {
+ *     is NumberFormatException -> 400
+ *     else -> 500
+ *   }
+ * }
+ * //sampleEnd
+ * println("httpStatusCode = $httpStatusCode")
+ * }
+ * ```
+ *
+ * The ```leftIfNull``` operation transforms a null `Either.Right` value to the specified ```Either.Left``` value.
+ * If the value is non-null, the value wrapped into a non-nullable ```Either.Right``` is returned (very useful to
+ * skip null-check further down the call chain).
+ * If the operation is called on an ```Either.Left```, the same ```Either.Left``` is returned.
+ *
+ * See the examples below:
+ *
+ * ```kotlin:ank:playground
+ * import arrow.core.*
+ * fun main() {
+ * val value =
+ * //sampleStart
+ * Right(12).leftIfNull({ -1 })
+ * //sampleEnd
+ * println(value)
+ * }
+ * ```
+ *
+ * ```kotlin:ank:playground
+ * import arrow.core.*
+ * fun main() {
+ * val value =
+ * //sampleStart
+ * Right(null).leftIfNull({ -1 })
+ * //sampleEnd
+ * println(value)
+ * }
+ * ```
+ *
+ * ```kotlin:ank:playground
+ * import arrow.core.*
+ * fun main() {
+ * val value =
+ * //sampleStart
+ * Left(12).leftIfNull({ -1 })
+ * //sampleEnd
+ * println(value)
+ * }
+ * ```
+ *
+ * Another useful operation when working with null is `rightIfNotNull`.
+ * If the value is null it will be transformed to the specified `Either.Left` and if its not null the type will
+ * be wrapped to `Either.Right`.
+ *
+ * Example:
+ *
+ * ```kotlin:ank:playground
+ * import arrow.core.*
+ * fun main() {
+ * val value =
+ * //sampleStart
+ * "value".rightIfNotNull { "left" }
+ * //sampleEnd
+ * println(value)
+ * }
+ * ```
+ *
+ * ```kotlin:ank:playground
+ * import arrow.core.*
+ * fun main() {
+ * val value =
+ * //sampleStart
+ * null.rightIfNotNull { "left" }
+ * //sampleEnd
+ * println(value)
+ * }
+ * ```
+ *
+ *
+ * Arrow contains `Either` instances for many useful typeclasses that allows you to use and transform right values.
+ * Both Option and Try don't require a type parameter with the following functions, but it is specifically used for Either.Left
+ *
+ * [Functor](/docs/arrow/typeclasses/functor/)
+ *
+ * Transforming the inner contents
+ *
+ * ```kotlin:ank:playground
+ * import arrow.core.extensions.either.functor.*
+ * import arrow.core.*
+ * fun main() {
+ * val value =
+ * //sampleStart
+ * Right(1).map {it + 1}
+ * //sampleEnd
+ * println(value)
+ * }
+ * ```
+ *
+ * [Applicative](/docs/arrow/typeclasses/applicative/)
+ *
+ * Computing over independent values
+ *
+ * ```kotlin:ank:playground
+ *
+ * import arrow.core.extensions.either.apply.*
+ * import arrow.core.*
+ * fun main() {
+ * val value =
+ * //sampleStart
+ * tupled(Either.Right(1), Either.Right("a"), Either.Right(2.0))
+ * //sampleEnd
+ * println(value)
+ * }
+ * ```
+ *
+ * [Monad](/docs/arrow/typeclasses/monad/)
+ *
+ * Computing over dependent values ignoring absence
+ *
+ *
+ * ```kotlin:ank:playground
+ * import arrow.core.extensions.fx
+ * import arrow.core.*
+ * fun main() {
+ * val value =
+ * //sampleStart
+ * Either.fx<Int, Int> {
+ *  val (a) = Either.Right(1)
+ *  val (b) = Either.Right(1 + a)
+ *  val (c) = Either.Right(1 + b)
+ *  a + b + c
+ * }
+ * //sampleEnd
+ * println(value)
+ * }
+ * ```
+ *
+ * ### Supported type classes
+ *
+ * ```kotlin:ank:replace
+ * import arrow.reflect.*
+ * import arrow.core.*
+ *
+ * DataType(Either::class).tcMarkdownList()
+ * ```
  *
  */
 
