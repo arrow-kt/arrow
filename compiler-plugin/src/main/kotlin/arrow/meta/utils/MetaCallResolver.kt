@@ -51,7 +51,7 @@ class MetaCallResolver(
   }
 
   override fun resolveFunctionCall(trace: BindingTrace, scope: LexicalScope, call: Call, expectedType: KotlinType, dataFlowInfo: DataFlowInfo, isAnnotationContext: Boolean): OverloadResolutionResults<FunctionDescriptor> {
-    println("MetaCallResolver.resolveFunctionCall: ${call.calleeExpression?.text}")
+    println("MetaCallResolver.resolveFunctionCall(X): ${call.calleeExpression?.text}")
     return super.resolveFunctionCall(trace, scope, call, expectedType, dataFlowInfo, isAnnotationContext)
   }
 

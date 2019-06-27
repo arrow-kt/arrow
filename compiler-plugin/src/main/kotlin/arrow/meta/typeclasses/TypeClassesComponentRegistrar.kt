@@ -6,9 +6,11 @@ import arrow.meta.extensions.MetaComponentRegistrar
 import arrow.meta.higherkind.buildIrValueParameter
 import arrow.meta.utils.MetaBodyResolver
 import arrow.meta.utils.MetaCallResolver
+import arrow.meta.utils.MetaDiagnosticReporter
 import org.jetbrains.kotlin.backend.common.BackendContext
 import org.jetbrains.kotlin.backend.common.serialization.irrelevantOrigin
 import org.jetbrains.kotlin.container.StorageComponentContainer
+import org.jetbrains.kotlin.container.registerSingleton
 import org.jetbrains.kotlin.container.useImpl
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
@@ -46,9 +48,6 @@ class TypeClassesComponentRegistrar : MetaComponentRegistrar {
           container.useImpl<TypeClassPlatformDiagnosticSuppressor>()
           container.useImpl<MetaCallResolver>()
           container.useImpl<MetaBodyResolver>()
-
-          //parentContainer?.registerSingleton(MetaCallResolver::class.java)
-
         },
         check = { declaration, descriptor, context ->
 

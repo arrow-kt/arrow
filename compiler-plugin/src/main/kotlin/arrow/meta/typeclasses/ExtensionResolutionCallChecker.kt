@@ -1,14 +1,19 @@
 package arrow.meta.typeclasses
 
+import arrow.meta.higherkind.get
 import org.jetbrains.kotlin.com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.descriptors.CallableDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
+import org.jetbrains.kotlin.diagnostics.Diagnostic
 import org.jetbrains.kotlin.diagnostics.DiagnosticFactory1
+import org.jetbrains.kotlin.diagnostics.Errors
 import org.jetbrains.kotlin.diagnostics.Severity
+import org.jetbrains.kotlin.diagnostics.rendering.DefaultErrorMessages
 import org.jetbrains.kotlin.resolve.calls.checkers.CallChecker
 import org.jetbrains.kotlin.resolve.calls.checkers.CallCheckerContext
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
+import org.jetbrains.kotlin.resolve.diagnostics.MutableDiagnosticsWithSuppression
 import org.jetbrains.kotlin.util.slicedMap.Slices
 import org.jetbrains.kotlin.util.slicedMap.WritableSlice
 
@@ -49,6 +54,11 @@ class ExtensionResolutionCallChecker : CallChecker {
                 key,
                 resolution.candidate
               )
+              (context.trace.bindingContext.diagnostics as? MutableDiagnosticsWithSuppression)?.let {
+                val diagnosticList = it.getOwnDiagnostics() as ArrayList<Diagnostic>
+                diagnosticList.removeIf { diagnostic -> diagnostic.factory.name == Errors.NO_VALUE_FOR_PARAMETER.name }
+              }
+
             }
           }
         }

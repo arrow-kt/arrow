@@ -18,10 +18,6 @@ class MyNumber(val value: Int) {
   }
 }
 
-
-val extension: Nothing
-  get() = throw RuntimeException("Call not processed by arrow meta typeclass support")
-
 object Contained {
 
   fun <A> add(a: A, b: A, @with S: Semigroup<A>): A =

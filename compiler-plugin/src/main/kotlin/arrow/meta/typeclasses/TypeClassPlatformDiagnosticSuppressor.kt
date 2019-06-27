@@ -14,4 +14,5 @@ class TypeClassPlatformDiagnosticSuppressor  : PlatformDiagnosticSuppressor by P
     println("TypeClassPlatformDiagnosticSuppressor.shouldReportNoBody: $descriptor")
     return PlatformDiagnosticSuppressor.Default.shouldReportNoBody(descriptor)
   }
+
 }
