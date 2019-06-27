@@ -25,6 +25,7 @@ import org.jetbrains.kotlin.descriptors.impl.ClassDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.PackageFragmentDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.TypeParameterDescriptorImpl
 import org.jetbrains.kotlin.descriptors.resolveClassByFqName
+import org.jetbrains.kotlin.diagnostics.Diagnostic
 import org.jetbrains.kotlin.incremental.components.NoLookupLocation
 import org.jetbrains.kotlin.ir.builders.declarations.IrClassBuilder
 import org.jetbrains.kotlin.ir.builders.declarations.IrFunctionBuilder
@@ -50,10 +51,12 @@ import org.jetbrains.kotlin.psi.KtTreeVisitorVoid
 import org.jetbrains.kotlin.psi.KtTypeReference
 import org.jetbrains.kotlin.psi.KtUserType
 import org.jetbrains.kotlin.resolve.DescriptorFactory
+import org.jetbrains.kotlin.resolve.calls.checkers.CallCheckerContext
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.getAllSuperclassesWithoutAny
 import org.jetbrains.kotlin.resolve.descriptorUtil.getSuperInterfaces
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
+import org.jetbrains.kotlin.resolve.diagnostics.MutableDiagnosticsWithSuppression
 import org.jetbrains.kotlin.resolve.lazy.descriptors.LazyTypeAliasDescriptor
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.storage.LockBasedStorageManager
@@ -393,34 +396,9 @@ fun setFinalStatic(field: Field, newValue: Any) {
   field.set(null, newValue)
 }
 
-/**
- * The nastier bits
- */
-inline operator fun <reified A> Any.get(field: String): A =
-  javaClass.getDeclaredField(field).also {
-    it.isAccessible = true
-  }.get(this) as A
-
-infix operator fun Any.plusAssign(valuePair: Pair<String, Any>) {
-  javaClass.getDeclaredField(valuePair.first).also {
-    it.isAccessible = true
-  }.set(this, valuePair.second)
-}
-
-val StorageComponentContainer.componentStorage: ComponentStorage
-  get() = this["componentStorage"] //TODO we should test in the build all these fields exist
-
-val ComponentStorage.componentRegistry: Any
-  get() = this["registry"]
-
-val Any.registrationMap: MutableMap<Type, Any>
-  get() = this["registrationMap"]
-
-inline fun <reified A : Any> StorageComponentContainer.hijack(
-  replacement: (A) -> ValueDescriptor
-): Unit {
-  val service = getService(A::class.java)
-  val replaced = replacement(service)
-  val registry = componentStorage.componentRegistry.registrationMap
-  registry[A::class.java] = replaced
+fun CallCheckerContext.suppressDiagnostic(f: (Diagnostic) -> Boolean): Unit {
+  (trace.bindingContext.diagnostics as? MutableDiagnosticsWithSuppression)?.let {
+    val diagnosticList = it.getOwnDiagnostics() as ArrayList<Diagnostic>
+    diagnosticList.removeIf(f)
+  }
 }
