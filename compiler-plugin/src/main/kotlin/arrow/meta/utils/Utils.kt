@@ -3,6 +3,10 @@ package arrow.meta.higherkind
 import arrow.meta.extensions.CompilerContext
 import org.jetbrains.kotlin.backend.common.BackendContext
 import org.jetbrains.kotlin.backend.common.lower.SimpleMemberScope
+import org.jetbrains.kotlin.container.ComponentStorage
+import org.jetbrains.kotlin.container.StorageComponentContainer
+import org.jetbrains.kotlin.container.ValueDescriptor
+import org.jetbrains.kotlin.container.getService
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
@@ -17,14 +21,11 @@ import org.jetbrains.kotlin.descriptors.TypeAliasDescriptor
 import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.descriptors.Visibility
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
-import org.jetbrains.kotlin.descriptors.impl.AbstractTypeAliasDescriptor
 import org.jetbrains.kotlin.descriptors.impl.ClassDescriptorImpl
-import org.jetbrains.kotlin.descriptors.impl.DeclarationDescriptorVisitorEmptyBodies
 import org.jetbrains.kotlin.descriptors.impl.PackageFragmentDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.TypeParameterDescriptorImpl
 import org.jetbrains.kotlin.descriptors.resolveClassByFqName
 import org.jetbrains.kotlin.incremental.components.NoLookupLocation
-import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.builders.declarations.IrClassBuilder
 import org.jetbrains.kotlin.ir.builders.declarations.IrFunctionBuilder
 import org.jetbrains.kotlin.ir.builders.declarations.IrValueParameterBuilder
@@ -35,7 +36,6 @@ import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrConstructor
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationOriginImpl
 import org.jetbrains.kotlin.ir.declarations.IrValueParameter
-import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.symbols.impl.IrTypeParameterSymbolImpl
 import org.jetbrains.kotlin.ir.types.IrType
@@ -45,14 +45,10 @@ import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtClass
-import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.psi.KtPsiFactory
 import org.jetbrains.kotlin.psi.KtTreeVisitorVoid
-import org.jetbrains.kotlin.psi.KtTypeProjection
 import org.jetbrains.kotlin.psi.KtTypeReference
 import org.jetbrains.kotlin.psi.KtUserType
-import org.jetbrains.kotlin.psi.KtVisitorVoid
-import org.jetbrains.kotlin.psi.psiUtil.astReplace
 import org.jetbrains.kotlin.resolve.DescriptorFactory
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.getAllSuperclassesWithoutAny
@@ -68,10 +64,9 @@ import org.jetbrains.kotlin.types.TypeProjection
 import org.jetbrains.kotlin.types.TypeProjectionImpl
 import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.types.typeUtil.isInterface
-import java.lang.reflect.Array.setInt
-import java.lang.reflect.AccessibleObject.setAccessible
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
+import java.lang.reflect.Type
 
 
 val kindName: FqName = FqName("arrow.sample.Kind")
@@ -134,7 +129,6 @@ fun ClassDescriptor.replaceKinds(ktPsiFactory: KtPsiFactory): ClassDescriptor? {
 }
 
 
-
 fun CompilerContext.kindTypeAlias(target: ClassDescriptor): TypeAliasDescriptor =
   LazyTypeAliasDescriptor.create( //not really lazy but better factory than implementing the full blown interface
     storageManager = LockBasedStorageManager.NO_LOCKS,
@@ -155,7 +149,7 @@ fun CompilerContext.kindTypeAlias(target: ClassDescriptor): TypeAliasDescriptor 
         0
       )),
       LockBasedStorageManager.NO_LOCKS.createLazyValue { target.module.kindDescriptor?.defaultType!! },
-      LockBasedStorageManager.NO_LOCKS.createLazyValue {  aliasDescriptor.underlyingHigherKind(target) }
+      LockBasedStorageManager.NO_LOCKS.createLazyValue { aliasDescriptor.underlyingHigherKind(target) }
     )
   }
 
@@ -197,8 +191,8 @@ class AddSupertypesPackageFragmentProvider(
 
 fun ClassDescriptor.shouldGenerateKindMarker(): Boolean =
   declaredTypeParameters.isNotEmpty() &&
-      fqNameSafe != kindName &&
-      !getAllSuperclassesWithoutAny().any { s -> !s.defaultType.isInterface() }
+    fqNameSafe != kindName &&
+    !getAllSuperclassesWithoutAny().any { s -> !s.defaultType.isInterface() }
 
 //TODO alternative way of creating descriptors?
 //fun LazyClassDescriptor.kindMarkerSynthetic(containingDeclaration: DeclarationDescriptor, targetName: FqName): ClassDescriptor =
@@ -219,8 +213,8 @@ fun ClassDescriptor.shouldGenerateKindMarker(): Boolean =
 fun ClassDescriptor.shouldApplyKind(debug: Boolean = false): Boolean {
   if (debug) println("$name shouldApplyKind = ${getAllSuperclassesWithoutAny().toList()}, ${getAllSuperclassesWithoutAny().any { it.name.isSpecial }}, superInterfaces = ${getSuperInterfaces()}")
   val result = declaredTypeParameters.isNotEmpty() &&
-      fqNameSafe != kindName &&
-      !getSuperInterfaces().contains(module.kindDescriptor)
+    fqNameSafe != kindName &&
+    !getSuperInterfaces().contains(module.kindDescriptor)
   if (debug) println("result: " + result)
   return result
 }
@@ -385,6 +379,9 @@ fun BackendContext.kindMarker(target: IrClass): IrClass {
   }
 }
 
+/**
+ * The nastier bits
+ */
 @Throws(Exception::class)
 fun setFinalStatic(field: Field, newValue: Any) {
   field.isAccessible = true
@@ -394,4 +391,36 @@ fun setFinalStatic(field: Field, newValue: Any) {
   modifiersField.setInt(field, field.modifiers and Modifier.FINAL.inv())
 
   field.set(null, newValue)
+}
+
+/**
+ * The nastier bits
+ */
+inline operator fun <reified A> Any.get(field: String): A =
+  javaClass.getDeclaredField(field).also {
+    it.isAccessible = true
+  }.get(this) as A
+
+infix operator fun Any.plusAssign(valuePair: Pair<String, Any>) {
+  javaClass.getDeclaredField(valuePair.first).also {
+    it.isAccessible = true
+  }.set(this, valuePair.second)
+}
+
+val StorageComponentContainer.componentStorage: ComponentStorage
+  get() = this["componentStorage"] //TODO we should test in the build all these fields exist
+
+val ComponentStorage.componentRegistry: Any
+  get() = this["registry"]
+
+val Any.registrationMap: MutableMap<Type, Any>
+  get() = this["registrationMap"]
+
+inline fun <reified A : Any> StorageComponentContainer.hijack(
+  replacement: (A) -> ValueDescriptor
+): Unit {
+  val service = getService(A::class.java)
+  val replaced = replacement(service)
+  val registry = componentStorage.componentRegistry.registrationMap
+  registry[A::class.java] = replaced
 }

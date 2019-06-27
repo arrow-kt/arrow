@@ -4,13 +4,12 @@ import arrow.meta.extensions.CompilerContext
 import arrow.meta.extensions.ExtensionPhase
 import arrow.meta.extensions.MetaComponentRegistrar
 import arrow.meta.higherkind.buildIrValueParameter
+import arrow.meta.utils.MetaBodyResolver
+import arrow.meta.utils.MetaCallResolver
 import org.jetbrains.kotlin.backend.common.BackendContext
 import org.jetbrains.kotlin.backend.common.serialization.irrelevantOrigin
-import org.jetbrains.kotlin.container.ComponentResolveContext
-import org.jetbrains.kotlin.container.ComponentStorage
 import org.jetbrains.kotlin.container.StorageComponentContainer
 import org.jetbrains.kotlin.container.useImpl
-import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
@@ -19,9 +18,6 @@ import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.descriptors.annotations.AnnotationDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
-import org.jetbrains.kotlin.descriptors.impl.AnonymousFunctionDescriptor
-import org.jetbrains.kotlin.descriptors.impl.LazyClassReceiverParameterDescriptor
-import org.jetbrains.kotlin.descriptors.impl.ReceiverParameterDescriptorImpl
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.impl.IrClassImpl
@@ -35,12 +31,6 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.getSuperInterfaces
 import org.jetbrains.kotlin.resolve.lazy.LazyClassContext
 import org.jetbrains.kotlin.resolve.lazy.declarations.ClassMemberDeclarationProvider
 import org.jetbrains.kotlin.resolve.lazy.descriptors.LazyClassDescriptor
-import org.jetbrains.kotlin.resolve.lazy.descriptors.LazyClassMemberScope
-import org.jetbrains.kotlin.resolve.scopes.LexicalScope
-import org.jetbrains.kotlin.resolve.scopes.LexicalScopeImpl
-import org.jetbrains.kotlin.resolve.scopes.LexicalScopeKind
-import org.jetbrains.kotlin.resolve.scopes.receivers.ExtensionReceiver
-import java.lang.reflect.Type
 
 val extensionAnnotationName = FqName("arrow.extension")
 val withAnnotationName = FqName("arrow.with")
@@ -52,19 +42,13 @@ class TypeClassesComponentRegistrar : MetaComponentRegistrar {
       enableIr(),
       storageComponent(
         registerModuleComponents = { container: StorageComponentContainer, platform, moduleDescriptor ->
-          container.dump(System.out)
           container.useImpl<ExtensionResolutionCallChecker>()
           container.useImpl<TypeClassPlatformDiagnosticSuppressor>()
+          container.useImpl<MetaCallResolver>()
+          container.useImpl<MetaBodyResolver>()
 
-          val parentContext : ComponentResolveContext = container.unknownContext.parentContext as ComponentResolveContext
-          val localRegistry = container.componentStorage.componentRegistry.registrationMap
-          val parentRegistry = parentContext.container.componentStorage.componentRegistry.registrationMap
-          println("$localRegistry\n\n\n\n\n\n$parentRegistry")
-          //container.useImpl<MetaDeclarationReturnTypeSanitizer>()
-          //
-          //container.compose()
-//          val codeAnalyzer: ResolveSession = container.get<KotlinCodeAnalyzer>() as ResolveSession
-//          codeAnalyzer.platformDiagnosticSuppressor = TypeClassPlatformDiagnosticSuppressor(codeAnalyzer.platformDiagnosticSuppressor)
+          //parentContainer?.registerSingleton(MetaCallResolver::class.java)
+
         },
         check = { declaration, descriptor, context ->
 
@@ -72,6 +56,7 @@ class TypeClassesComponentRegistrar : MetaComponentRegistrar {
       ),
       analysys(
         doAnalysis = { project, module, projectContext, files, bindingTrace, componentProvider ->
+          componentProvider as StorageComponentContainer
           println("analysys.doAnalysis")
           null
         },
@@ -107,20 +92,6 @@ class TypeClassesComponentRegistrar : MetaComponentRegistrar {
       )
     )
 
-  private val StorageComponentContainer.componentStorage: ComponentStorage
-    get() = this["componentStorage"]
-
-  val ComponentStorage.componentRegistry: Any
-    get() = this["registry"]
-
-  val Any.registrationMap: MutableMap<Type, Any>
-    get() = this["registrationMap"]
-
-  inline operator fun <reified A> Any.get(field: String): A =
-    javaClass.getDeclaredField(field).also {
-      it.isAccessible = true
-    }.get(this) as A
-
   private fun CompilerContext.getSyntheticCompanionName(declarationDescriptor: ClassDescriptor): Name? {
     return if (storedDescriptors().contains(declarationDescriptor)) {
       SpecialNames.DEFAULT_NAME_FOR_COMPANION_OBJECT
@@ -154,46 +125,7 @@ fun FunctionDescriptor.resolveCallArguments(): Unit {
   }
 }
 
-fun FunctionDescriptor.scopesFromWithParameters(lexicalScope: LexicalScope): LexicalScope {
-  var acc = lexicalScope
-  (dispatchReceiverParameter as? LazyClassReceiverParameterDescriptor)?.let {
-    it.containingDeclaration as? LazyClassDescriptor }?.let {
-    it.unsubstitutedMemberScope as? LazyClassMemberScope}?.let {
-    it.getPrimaryConstructor()?.valueParameters?.forEach {
-      acc = getScopeForExtensionParameter(this, acc, it)
-    }
-  }
-  return acc
-}
 
-private fun getScopeForExtensionParameter(
-  functionDescriptor: FunctionDescriptor,
-  innerScope: LexicalScope,
-  valueParameterDescriptor: ValueParameterDescriptor
-): LexicalScope {
-  var innerScope = innerScope
-  val ownerDescriptor = AnonymousFunctionDescriptor(valueParameterDescriptor,
-    valueParameterDescriptor.annotations,
-    CallableMemberDescriptor.Kind.DECLARATION,
-    valueParameterDescriptor.getSource(),
-    false)
-  val extensionReceiver = ExtensionReceiver(ownerDescriptor,
-    valueParameterDescriptor.getType(),
-    null)
-
-  val extensionReceiverParamDescriptor = ReceiverParameterDescriptorImpl(ownerDescriptor,
-    extensionReceiver,
-    ownerDescriptor.annotations)
-
-  ownerDescriptor.initialize(extensionReceiverParamDescriptor, null,
-    valueParameterDescriptor.typeParameters,
-    valueParameterDescriptor.valueParameters,
-    valueParameterDescriptor.returnType,
-    Modality.FINAL,
-    valueParameterDescriptor.visibility)
-  innerScope = LexicalScopeImpl(innerScope, ownerDescriptor, true, extensionReceiverParamDescriptor, LexicalScopeKind.FUNCTION_INNER_SCOPE)
-  return innerScope
-}
 
 val ClassDescriptor.isExtensionAnnotated: Boolean
   get() = annotations.findAnnotation(extensionAnnotationName) != null

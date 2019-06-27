@@ -11,17 +11,21 @@ interface Semigroup<A> {
 class MyNumber(val value: Int) {
   companion object {
     @extension
-    interface MyNumberSemigroup: Semigroup<MyNumber> {
+    interface MyNumberSemigroup : Semigroup<MyNumber> {
       override fun MyNumber.combine(other: MyNumber): MyNumber =
         MyNumber(value + other.value)
     }
   }
 }
 
+
+val extension: Nothing
+  get() = throw RuntimeException("Call not processed by arrow meta typeclass support")
+
 object Contained {
 
   fun <A> add(a: A, b: A, @with S: Semigroup<A>): A =
-    with(S) { a.combine(b) }
+    a.combine(b)
 
 }
 
