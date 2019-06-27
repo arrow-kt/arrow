@@ -18,8 +18,8 @@ There are several ways to construct a `Ref`, the easiest the `of` factory method
 Since the allocation of mutable state is not referentially transparent this side-effect is contained within `F`.
 
 ```kotlin:ank:silent
-import arrow.effects.*
-import arrow.effects.extensions.io.monadDefer.monadDefer
+import arrow.fx.*
+import arrow.fx.extensions.io.monadDefer.monadDefer
 
 val ioRef: IO<Ref<ForIO, Int>> = Ref(IO.monadDefer()) { 1 }.fix()
 ```
@@ -58,8 +58,8 @@ ioRef.flatMap { ref ->
 ```
 ```kotlin:ank
 import arrow.core.toT
-import arrow.effects.extensions.io.monad.flatMap
-import arrow.effects.extensions.io.monad.map
+import arrow.fx.extensions.io.monad.flatMap
+import arrow.fx.extensions.io.monad.map
 
 ioRef.flatMap { ref ->
   ref.getAndSet(5).flatMap { old ->

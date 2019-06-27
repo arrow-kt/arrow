@@ -6,11 +6,11 @@ import arrow.core.ForId
 import arrow.core.ForTry
 import arrow.core.Id
 import arrow.core.Try
-import arrow.effects.ForIO
-import arrow.effects.IO
-import arrow.effects.extensions.io.applicativeError.attempt
-import arrow.effects.extensions.io.bracket.bracket
-import arrow.effects.extensions.kleisli.bracket.bracket
+import arrow.fx.ForIO
+import arrow.fx.IO
+import arrow.fx.extensions.io.applicativeError.attempt
+import arrow.fx.extensions.io.bracket.bracket
+import arrow.fx.mtl.kleisli.bracket.bracket
 import arrow.core.extensions.`try`.monadError.monadError
 import arrow.core.extensions.const.divisible.divisible
 import arrow.core.extensions.id.monad.monad

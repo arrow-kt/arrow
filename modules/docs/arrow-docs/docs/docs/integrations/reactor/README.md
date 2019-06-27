@@ -33,7 +33,7 @@ The largest quality of life improvement when using Flux streams in Arrow is the 
 To wrap any existing Flux in its Arrow Wrapper counterpart you can use the extension function `k()`.
 
 ```kotlin:ank
-import arrow.effects.reactor.*
+import arrow.fx.reactor.*
 import reactor.core.publisher.*
 
 val flux = Flux.just(1, 2, 3, 4, 5).k()
@@ -90,9 +90,9 @@ getSongUrlAsync()
 When rewritten using `fx.monadThrow` it becomes:
 
 ```kotlin
-import arrow.effects.reactor.*
+import arrow.fx.reactor.*
 import arrow.typeclasses.*
-import arrow.effects.reactor.extensions.fluxk.monadThrow.monadThrow
+import arrow.fx.reactor.extensions.fluxk.monadThrow.monadThrow
 
 FluxK.monadThrow().fx.monadThrow {
   val (songUrl) = getSongUrlAsync()
@@ -134,10 +134,10 @@ To overcome this limitation and run code in a stack safe way, one can make use o
 
 ```kotlin:ank:playground
 import arrow.Kind
-import arrow.effects.reactor.MonoK
-import arrow.effects.reactor.ForMonoK
-import arrow.effects.reactor.fix
-import arrow.effects.reactor.extensions.monok.monad.monad
+import arrow.fx.reactor.MonoK
+import arrow.fx.reactor.ForMonoK
+import arrow.fx.reactor.fix
+import arrow.fx.reactor.extensions.monok.monad.monad
 import arrow.free.run
 import arrow.free.stackSafe
 
@@ -171,7 +171,7 @@ Try {
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.effects.reactor.*
+import arrow.fx.reactor.*
 
 DataType(FluxK::class).tcMarkdownList()
 ```

@@ -34,7 +34,7 @@ and `Ior` is a `sealed` class with three `data` class inheritors, `Left(val a: A
 Datatypes that express patterns like deferred evaluation can do it by nesting themselves with every operation they chain. One example is `IO`.
 
 ```kotlin:ank
-import arrow.effects.*
+import arrow.fx.*
 
 IO { 0 }
  .flatMap { IO { it * 2 } }
