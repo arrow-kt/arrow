@@ -47,9 +47,9 @@ so they are always required.
 
 - [`Id`]({{ '/docs/arrow/core/id/' | relative_url }}) - a simple wrapper without any behavior, used mostly for testing
 
-- [`Option`]({{ '/docs/arrow/core/option/' | relative_url }}) - absence of a value, or failure to construct a correct value
+- [`Option`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-option/' | relative_url }}) - absence of a value, or failure to construct a correct value
 
-- [`Either`]({{ '/docs/arrow/core/either/' | relative_url }}) - an if/else branch in execution
+- [`Either`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }}) - an if/else branch in execution
 
 - [`Eval`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-eval' | relative_url }}) - lazy evaluation of functions with stack safety and memoization
 
