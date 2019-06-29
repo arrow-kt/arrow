@@ -98,7 +98,7 @@ class DataTypeExamples : FreeSpec() { init {
     }
   }
 
-  // http://arrow-kt.io/docs/arrow/core/try/
+  // http://arrow-kt.io/docs/apidocs/arrow-core-data/arrow.core/-try/
   "Try and recover" - {
 
     "Old school" {
