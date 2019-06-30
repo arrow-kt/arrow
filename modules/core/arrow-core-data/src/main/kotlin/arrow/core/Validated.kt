@@ -170,17 +170,17 @@ typealias Invalid<E> = Validated.Invalid<E>
  * import arrow.core.*
  *
  * data class ConnectionParams(val url: String, val port: Int)
- * 
+ *
  * abstract class Read<A> {
  *  abstract fun read(s: String): Option<A>
  *
  *  companion object {
- * 
+ *
  *   val stringRead: Read<String> =
  *    object : Read<String>() {
  *     override fun read(s: String): Option<String> = Option(s)
  *    }
- * 
+ *
  *   val intRead: Read<Int> =
  *    object : Read<Int>() {
  *     override fun read(s: String): Option<Int> =
@@ -188,12 +188,12 @@ typealias Invalid<E> = Validated.Invalid<E>
  *    }
  *  }
  * }
- * 
+ *
  * sealed class ConfigError {
  *  data class MissingConfig(val field: String) : ConfigError()
  *  data class ParseConfig(val field: String) : ConfigError()
  * }
- * 
+ *
  * data class Config(val map: Map<String, String>) {
  *  fun <A> parse(read: Read<A>, key: String): Validated<ConfigError, A> {
  *   val v = Option.fromNullable(map[key])
@@ -207,7 +207,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  *   }
  *  }
  * }
- * 
+ *
  * fun <E, A, B, C> parallelValidate(v1: Validated<E, A>, v2: Validated<E, B>, f: (A, B) -> C): Validated<E, C> {
  *  return when {
  *   v1 is Validated.Valid && v2 is Validated.Valid -> Validated.Valid(f(v1.a, v2.a))
@@ -217,11 +217,11 @@ typealias Invalid<E> = Validated.Invalid<E>
  *   else -> TODO()
  *  }
  * }
- * 
+ *
  * fun main() {
  * //sampleStart
  *  val config = Config(mapOf("url" to "127.0.0.1", "port" to "1337"))
- * 
+ *
  *  val valid = parallelValidate(
  *  config.parse(Read.stringRead, "url"),
  *  config.parse(Read.intRead, "port")
