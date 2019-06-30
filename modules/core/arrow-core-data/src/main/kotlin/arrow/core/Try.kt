@@ -7,7 +7,7 @@ typealias Success<A> = Try.Success<A>
 
 /**
  *
- *  ank_macro_hierarchy(arrow.core.Option)
+ * ank_macro_hierarchy(arrow.core.Option)
  *
  * {:.beginner}
  * beginner
