@@ -1,8 +1,11 @@
 package `arrow`.`ap`.`objects`.`iso`
 
+import arrow.core.Option
+import arrow.core.Tuple3
+import arrow.optics.Iso
 
-
-inline val `arrow`.`ap`.`objects`.`iso`.`Iso`.Companion.iso: arrow.optics.Iso<`arrow`.`ap`.`objects`.`iso`.`Iso`, arrow.core.Tuple3<`kotlin`.`String`, `kotlin`.`String`?, `arrow`.`core`.`Option`<`kotlin`.`String`>>> inline get()= arrow.optics.Iso(
-  get = { iso: `arrow`.`ap`.`objects`.`iso`.`Iso` -> arrow.core.Tuple3(iso.`field`, iso.`nullable`, iso.`option`) },
-  reverseGet = { tuple: arrow.core.Tuple3<`kotlin`.`String`, `kotlin`.`String`?, `arrow`.`core`.`Option`<`kotlin`.`String`>> -> `arrow`.`ap`.`objects`.`iso`.`Iso`(tuple.a, tuple.b, tuple.c) }
-)
+inline val `arrow`.`ap`.`objects`.`iso`.`Iso`.Companion.iso: Iso<`Iso`, Tuple3<`String`, `String`?, `Option`<`String`>>>
+  inline get()= Iso(
+    get = { iso: `Iso` -> Tuple3(iso.`field`, iso.`nullable`, iso.`option`) },
+    reverseGet = { tuple: Tuple3<`String`, `String`?, `Option`<`String`>> -> `Iso`(tuple.a, tuple.b, tuple.c) }
+  )

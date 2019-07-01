@@ -1,8 +1,10 @@
 package `arrow`.`ap`.`objects`.`iso`
 
+import arrow.core.Tuple2
+import arrow.optics.Iso
 
-
-inline val `arrow`.`ap`.`objects`.`iso`.`IsoSecondaryConstructor`.Companion.iso: arrow.optics.Iso<`arrow`.`ap`.`objects`.`iso`.`IsoSecondaryConstructor`, arrow.core.Tuple2<`kotlin`.`Int`, `kotlin`.`String`>> inline get()= arrow.optics.Iso(
-  get = { isoSecondaryConstructor: `arrow`.`ap`.`objects`.`iso`.`IsoSecondaryConstructor` -> arrow.core.Tuple2(isoSecondaryConstructor.`fieldNumber`, isoSecondaryConstructor.`fieldString`) },
-  reverseGet = { tuple: arrow.core.Tuple2<`kotlin`.`Int`, `kotlin`.`String`> -> `arrow`.`ap`.`objects`.`iso`.`IsoSecondaryConstructor`(tuple.a, tuple.b) }
-)
+inline val `arrow`.`ap`.`objects`.`iso`.`IsoSecondaryConstructor`.Companion.iso: Iso<`IsoSecondaryConstructor`, Tuple2<`Int`, `String`>>
+  inline get()= Iso(
+    get = { isoSecondaryConstructor: `IsoSecondaryConstructor` -> Tuple2(isoSecondaryConstructor.`fieldNumber`, isoSecondaryConstructor.`fieldString`) },
+    reverseGet = { tuple: Tuple2<`Int`, `String`> -> `IsoSecondaryConstructor`(tuple.a, tuple.b) }
+  )

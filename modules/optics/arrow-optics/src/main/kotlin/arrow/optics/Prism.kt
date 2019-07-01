@@ -53,7 +53,7 @@ interface PPrism<S, T, A, B> : PPrismOf<S, T, A, B> {
 
   companion object {
 
-    fun <S> id() = Iso.id<S>().asPrism()
+    fun <S> id() = PIso.id<S>().asPrism()
 
     /**
      * Invoke operator overload to create a [PPrism] of type `S` with focus `A`.
@@ -130,6 +130,41 @@ interface PPrism<S, T, A, B> : PPrismOf<S, T, A, B> {
   fun isEmpty(s: S): Boolean = !nonEmpty(s)
 
   /**
+   * Modify the focus of a [PPrism] with a function
+   */
+  fun modify(s: S, f: (A) -> B): T = getOrModify(s).fold(::identity) { a -> reverseGet(f(a)) }
+
+  /**
+   * Lift a function [f]: `(A) -> B to the context of `S`: `(S) -> T`
+   */
+  fun lift(f: (A) -> B): (S) -> T = { s -> getOrModify(s).fold(::identity) { a -> reverseGet(f(a)) } }
+
+  /**
+   * Modify the focus of a [PPrism] with a function
+   */
+  fun modifyOption(s: S, f: (A) -> B): Option<T> = getOption(s).map { b -> reverseGet(f(b)) }
+
+  /**
+   * Lift a function [f]: `(A) -> B to the context of `S`: `(S) -> Option<T>`
+   */
+  fun liftOption(f: (A) -> B): (S) -> Option<T> = { s -> getOption(s).map { b -> reverseGet(f(b)) } }
+
+  /**
+   * Find the focus that satisfies the predicate
+   */
+  fun find(s: S, p: (A) -> Boolean): Option<A> = getOption(s).flatMap { a -> if (p(a)) Some(a) else None }
+
+  /**
+   * Check if there is a focus and it satisfies the predicate
+   */
+  fun exist(s: S, p: (A) -> Boolean): Boolean = getOption(s).fold({ false }, p)
+
+  /**
+   * Check if there is no focus or the focus satisfies the predicate
+   */
+  fun all(s: S, p: (A) -> Boolean): Boolean = getOption(s).fold({ true }, p)
+
+  /**
    * Create a product of the [PPrism] and a type [C]
    */
   fun <C> first(): PPrism<Tuple2<S, C>, Tuple2<T, C>, Tuple2<A, C>, Tuple2<B, C>> = PPrism(
@@ -143,6 +178,27 @@ interface PPrism<S, T, A, B> : PPrismOf<S, T, A, B> {
   fun <C> second(): PPrism<Tuple2<C, S>, Tuple2<C, T>, Tuple2<C, A>, Tuple2<C, B>> = PPrism(
     { (c, s) -> getOrModify(s).bimap({ c toT it }, { c toT it }) },
     { (c, b) -> c toT reverseGet(b) }
+  )
+
+  /**
+   * Create a sum of the [PPrism] and a type [C]
+   */
+  fun <C> left(): PPrism<Either<S, C>, Either<T, C>, Either<A, C>, Either<B, C>> = PPrism(
+    { it.fold({ a -> getOrModify(a).bimap({ Either.Left(it) }, { Either.Left(it) }) }, { c -> Either.Right(Either.Right(c)) }) },
+    {
+      when (it) {
+        is Either.Left -> Either.Left(reverseGet(it.a))
+        is Either.Right -> Either.Right(it.b)
+      }
+    }
+  )
+
+  /**
+   * Create a sum of a type [C] and the [PPrism]
+   */
+  fun <C> right(): PPrism<Either<C, S>, Either<C, T>, Either<C, A>, Either<C, B>> = PPrism(
+    { it.fold({ c -> Either.Right(Either.Left(c)) }, { s -> getOrModify(s).bimap({ Either.Right(it) }, { Either.Right(it) }) }) },
+    { it.map(this::reverseGet) }
   )
 
   /**
@@ -230,62 +286,6 @@ interface PPrism<S, T, A, B> : PPrismOf<S, T, A, B> {
     }
   }
 }
-
-/**
- * Modify the focus of a [PPrism] with a function
- */
-inline fun <S, T, A, B> PPrism<S, T, A, B>.modify(s: S, crossinline f: (A) -> B): T = getOrModify(s).fold(::identity) { a -> reverseGet(f(a)) }
-
-/**
- * Lift a function [f]: `(A) -> B to the context of `S`: `(S) -> T`
- */
-inline fun <S, T, A, B> PPrism<S, T, A, B>.lift(crossinline f: (A) -> B): (S) -> T = { s -> getOrModify(s).fold(::identity) { a -> reverseGet(f(a)) } }
-
-/**
- * Modify the focus of a [PPrism] with a function
- */
-inline fun <S, T, A, B> PPrism<S, T, A, B>.modifyOption(s: S, crossinline f: (A) -> B): Option<T> = getOption(s).map { b -> reverseGet(f(b)) }
-
-/**
- * Lift a function [f]: `(A) -> B to the context of `S`: `(S) -> Option<T>`
- */
-inline fun <S, T, A, B> PPrism<S, T, A, B>.liftOption(crossinline f: (A) -> B): (S) -> Option<T> = { s -> getOption(s).map { b -> reverseGet(f(b)) } }
-
-/**
- * Find the focus that satisfies the predicate
- */
-inline fun <S, T, A, B> PPrism<S, T, A, B>.find(s: S, crossinline p: (A) -> Boolean): Option<A> = getOption(s).flatMap { a -> if (p(a)) Some(a) else None }
-
-/**
- * Check if there is a focus and it satisfies the predicate
- */
-inline fun <S, T, A, B> PPrism<S, T, A, B>.exist(s: S, crossinline p: (A) -> Boolean): Boolean = getOption(s).fold({ false }, p)
-
-/**
- * Check if there is no focus or the focus satisfies the predicate
- */
-inline fun <S, T, A, B> PPrism<S, T, A, B>.all(s: S, crossinline p: (A) -> Boolean): Boolean = getOption(s).fold({ true }, p)
-
-/**
- * Create a sum of the [PPrism] and a type [C]
- */
-fun <S, T, A, B, C> PPrism<S, T, A, B>.left(): PPrism<Either<S, C>, Either<T, C>, Either<A, C>, Either<B, C>> = Prism(
-  { it.fold({ a -> getOrModify(a).bimap({ Either.Left(it) }, { Either.Left(it) }) }, { c -> Either.Right(Either.Right(c)) }) },
-  {
-    when (it) {
-      is Either.Left -> Either.Left(reverseGet(it.a))
-      is Either.Right -> Either.Right(it.b)
-    }
-  }
-)
-
-/**
- * Create a sum of a type [C] and the [PPrism]
- */
-fun <S, T, A, B, C> PPrism<S, T, A, B>.right(): PPrism<Either<C, S>, Either<C, T>, Either<C, A>, Either<C, B>> = Prism(
-  { it.fold({ c -> Either.Right(Either.Left(c)) }, { s -> getOrModify(s).bimap({ Either.Right(it) }, { Either.Right(it) }) }) },
-  { it.map(this::reverseGet) }
-)
 
 /**
  * Invoke operator overload to create a [PPrism] of type `S` with a focus `A` where `A` is a subtype of `S`

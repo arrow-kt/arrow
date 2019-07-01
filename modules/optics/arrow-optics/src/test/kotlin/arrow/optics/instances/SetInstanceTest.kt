@@ -3,7 +3,6 @@ package arrow.optics.instances
 import arrow.core.extensions.eq
 import arrow.core.SetK
 import arrow.core.extensions.setk.eq.eq
-import arrow.optics.AndMonoid
 import arrow.optics.extensions.SetAt
 import arrow.optics.extensions.setk.at.at
 import arrow.test.UnitSpec
@@ -11,12 +10,18 @@ import arrow.test.generators.functionAToB
 import arrow.test.generators.genSetK
 import arrow.test.laws.LensLaws
 import arrow.typeclasses.Eq
+import arrow.typeclasses.Monoid
 import io.kotlintest.properties.Gen
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
 @RunWith(KotlinTestRunner::class)
 class SetInstanceTest : UnitSpec() {
+
+  object AndMonoid : Monoid<Boolean> {
+    override fun Boolean.combine(b: Boolean): Boolean = this && b
+    override fun empty(): Boolean = true
+  }
 
   init {
 

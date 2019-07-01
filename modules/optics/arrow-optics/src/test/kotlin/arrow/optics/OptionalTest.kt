@@ -19,6 +19,15 @@ import arrow.mtl.State
 import arrow.core.k
 import arrow.mtl.map
 import arrow.mtl.run
+import arrow.optics.mtl.assign
+import arrow.optics.mtl.assignOld
+import arrow.optics.mtl.assign_
+import arrow.optics.mtl.extract
+import arrow.optics.mtl.extractMap
+import arrow.optics.mtl.toState
+import arrow.optics.mtl.update
+import arrow.optics.mtl.updateOld
+import arrow.optics.mtl.update_
 import arrow.test.UnitSpec
 import arrow.test.generators.`try`
 import arrow.test.generators.functionAToB
