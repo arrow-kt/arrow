@@ -149,6 +149,10 @@ idea {
     }
 }
 ```
+## Linting
+
+Some linters might complaint about some code practices that are common when working with functional programming. You can read more about how to solve this problem in the [Linting](http://arrow-kt.io/docs/quickstart/linting/) section.
+
 # Maven 
 ## Basic Setup
 
