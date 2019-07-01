@@ -325,6 +325,9 @@ interface Async<F> : MonadDefer<F> {
    * Helper function that provides an easy way to construct a suspend effect
    *
    * ```kotlin:ank:playground:extension
+   * _imports_
+   * import arrow.fx.rx2.extensions.observablek.applicative.*
+   *
    * fun main(args: Array<String>) {
    *   //sampleStart
    *   suspend fun logAndIncrease(s: String): Int {
