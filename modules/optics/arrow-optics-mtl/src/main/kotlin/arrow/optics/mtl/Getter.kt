@@ -107,7 +107,7 @@ fun <S, A> Getter<S, A>.toState(): State<S, A> = extract()
  * import arrow.mtl.run
  * import arrow.mtl.State
  * import arrow.optics.Getter
- * import arrow.optics.mtl.extract
+ * import arrow.optics.mtl.extractMap
  *
  * data class Enemy(val health: Int) {
  *   companion object {
@@ -119,7 +119,7 @@ fun <S, A> Getter<S, A>.toState(): State<S, A> = extract()
  *
  * fun main() {
  *   //sampleStart
- *   val inspectHealth: State<Enemy, String> = Enemy.health.extractMap {
+ *   val inspectHealth: State<Enemy, String> = Enemy.health.extractMap { health ->
  *     "Enemy has ${health}hp"
  *   }
  *   val result = inspectHealth.run(enemy)

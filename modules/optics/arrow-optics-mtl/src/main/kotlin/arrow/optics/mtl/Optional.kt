@@ -259,7 +259,7 @@ fun <S, A> Optional<S, A>.assignOld(a: A): State<S, Option<A>> =
  * import arrow.mtl.run
  * import arrow.mtl.State
  * import arrow.optics.Optional
- * import arrow.optics.mtl.assign
+ * import arrow.optics.mtl.assign_
  *
  * data class Enemy(val health: Int, val name: Option<String>) {
  *   companion object {
@@ -272,7 +272,7 @@ fun <S, A> Optional<S, A>.assignOld(a: A): State<S, Option<A>> =
  *
  * fun main() {
  *   //sampleStart
- *   val inspectHealth: State<Enemy, Unit> = Enemy.health.assign("Enemy")
+ *   val inspectHealth: State<Enemy, Unit> = Enemy.health.assign_("Enemy")
  *   val result1 = inspectHealth.run(FinalBoss)
  *   val result2 = inspectHealth.run(Minion)
  *   //endSample
