@@ -3,8 +3,8 @@ package arrow.aql.tests
 import arrow.core.Option
 import arrow.core.left
 import arrow.core.right
-import arrow.effects.IO
-import arrow.effects.handleErrorWith
+import arrow.fx.IO
+import arrow.fx.handleErrorWith
 
 data class UserId(val value: String)
 data class User(val userId: UserId)

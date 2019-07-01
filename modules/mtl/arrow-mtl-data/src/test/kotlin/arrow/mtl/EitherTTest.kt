@@ -10,11 +10,11 @@ import arrow.core.Right
 import arrow.core.value
 import arrow.core.extensions.const.divisible.divisible
 import arrow.core.extensions.id.functor.functor
-import arrow.effects.ForIO
-import arrow.effects.IO
-import arrow.effects.extensions.eithert.async.async
-import arrow.effects.extensions.io.applicativeError.attempt
-import arrow.effects.extensions.io.async.async
+import arrow.fx.ForIO
+import arrow.fx.IO
+import arrow.fx.mtl.eithert.async.async
+import arrow.fx.extensions.io.applicativeError.attempt
+import arrow.fx.extensions.io.async.async
 import arrow.core.extensions.id.monad.monad
 import arrow.core.extensions.id.traverse.traverse
 import arrow.core.extensions.monoid
@@ -24,7 +24,7 @@ import arrow.mtl.extensions.eithert.divisible.divisible
 import arrow.mtl.extensions.eithert.functor.functor
 import arrow.mtl.extensions.eithert.semigroupK.semigroupK
 import arrow.mtl.extensions.eithert.traverse.traverse
-import arrow.effects.typeclasses.seconds
+import arrow.fx.typeclasses.seconds
 import arrow.test.UnitSpec
 import arrow.test.laws.AsyncLaws
 import arrow.test.laws.DivisibleLaws

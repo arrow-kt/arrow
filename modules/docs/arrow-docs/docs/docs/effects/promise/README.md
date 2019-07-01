@@ -18,8 +18,8 @@ A promise can easily be made by calling `uncancelable`.
 Since the allocation of mutable state is not referentially transparent this side-effect is contained within `F`.
 
 ```kotlin:ank:playground
-import arrow.effects.*
-import arrow.effects.extensions.io.async.async
+import arrow.fx.*
+import arrow.fx.extensions.io.async.async
 
 fun main(args: Array<String>) {
 //sampleStart
@@ -33,8 +33,8 @@ println(promise)
 In case you want the side-effect to execute immediately and return the `Promise` instance you can use the `unsafeUncancelable` function.
 
 ```kotlin:ank:playground
-import arrow.effects.*
-import arrow.effects.extensions.io.async.async
+import arrow.fx.*
+import arrow.fx.extensions.io.async.async
 
 fun main(args: Array<String>) {
 //sampleStart
@@ -49,9 +49,9 @@ println(unsafePromise)
 Get the promised value, suspending the fiber running the action until the result is available.
 
 ```kotlin:ank:playground
-import arrow.effects.*
-import arrow.effects.extensions.io.async.async
-import arrow.effects.extensions.io.monad.flatMap
+import arrow.fx.*
+import arrow.fx.extensions.io.async.async
+import arrow.fx.extensions.io.monad.flatMap
 
 fun main(args: Array<String>) {
 //sampleStart
@@ -63,9 +63,9 @@ Promise.uncancelable<ForIO, Int>(IO.async()).flatMap { p ->
 ```
 
 ```kotlin:ank:playground
-import arrow.effects.*
-import arrow.effects.extensions.io.async.async
-import arrow.effects.extensions.io.monad.flatMap
+import arrow.fx.*
+import arrow.fx.extensions.io.async.async
+import arrow.fx.extensions.io.monad.flatMap
 
 fun main(args: Array<String>) {
 //sampleStart
@@ -84,9 +84,9 @@ println(result)
 Fulfills the promise with a value. A promise cannot be fulfilled twice, so doing so results in an error.
 
 ```kotlin:ank:playground
-import arrow.effects.*
-import arrow.effects.extensions.io.async.async
-import arrow.effects.extensions.io.monad.flatMap
+import arrow.fx.*
+import arrow.fx.extensions.io.async.async
+import arrow.fx.extensions.io.monad.flatMap
 
 fun main(args: Array<String>) {
 //sampleStart
@@ -101,9 +101,9 @@ println(result)
 ```
 
 ```kotlin:ank:playground
-import arrow.effects.*
-import arrow.effects.extensions.io.async.async
-import arrow.effects.extensions.io.monad.flatMap
+import arrow.fx.*
+import arrow.fx.extensions.io.async.async
+import arrow.fx.extensions.io.monad.flatMap
 
 fun main(args: Array<String>) {
 //sampleStart
@@ -124,9 +124,9 @@ println(result)
 Breaks the promise with an exception. A promise cannot be broken twice, so doing so will result in an error.
 
 ```kotlin:ank:playground
-import arrow.effects.*
-import arrow.effects.extensions.io.async.async
-import arrow.effects.extensions.io.monad.flatMap
+import arrow.fx.*
+import arrow.fx.extensions.io.async.async
+import arrow.fx.extensions.io.monad.flatMap
 
 fun main(args: Array<String>) {
 //sampleStart
@@ -141,9 +141,9 @@ println(result)
 ```
 
 ```kotlin:ank:playground
-import arrow.effects.*
-import arrow.effects.extensions.io.async.async
-import arrow.effects.extensions.io.monad.flatMap
+import arrow.fx.*
+import arrow.fx.extensions.io.async.async
+import arrow.fx.extensions.io.monad.flatMap
 
 fun main(args: Array<String>) {
 //sampleStart

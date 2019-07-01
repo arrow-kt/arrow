@@ -6,9 +6,9 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.FunctionK
 import arrow.core.Option
-import arrow.effects.typeclasses.Bracket
-import arrow.effects.typeclasses.ExitCase
-import arrow.effects.typeclasses.MonadDefer
+import arrow.fx.typeclasses.Bracket
+import arrow.fx.typeclasses.ExitCase
+import arrow.fx.typeclasses.MonadDefer
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError

@@ -136,8 +136,8 @@ Try.applicative().run {
 ```
 
 ```kotlin:ank
-import arrow.effects.*
-import arrow.effects.extensions.io.applicative.applicative
+import arrow.fx.*
+import arrow.fx.extensions.io.applicative.applicative
 
 val asyncBalance: IO<Int> = IO { 1000 }
 val asyncAvailable: IO<Int> = IO { 900 }
