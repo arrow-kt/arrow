@@ -88,7 +88,6 @@ include {
 
         optics {
             _ 'optics'
-            _ 'optics-core'
             _ 'optics-mtl'
         }
 

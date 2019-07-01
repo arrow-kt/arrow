@@ -183,7 +183,7 @@ interface PPrism<S, T, A, B> : PPrismOf<S, T, A, B> {
   /**
    * Create a sum of the [PPrism] and a type [C]
    */
-  fun <C> left(): PPrism<Either<S, C>, Either<T, C>, Either<A, C>, Either<B, C>> = Prism(
+  fun <C> left(): PPrism<Either<S, C>, Either<T, C>, Either<A, C>, Either<B, C>> = PPrism(
     { it.fold({ a -> getOrModify(a).bimap({ Either.Left(it) }, { Either.Left(it) }) }, { c -> Either.Right(Either.Right(c)) }) },
     {
       when (it) {
@@ -196,7 +196,7 @@ interface PPrism<S, T, A, B> : PPrismOf<S, T, A, B> {
   /**
    * Create a sum of a type [C] and the [PPrism]
    */
-  fun <C> right(): PPrism<Either<C, S>, Either<C, T>, Either<C, A>, Either<C, B>> = Prism(
+  fun <C> right(): PPrism<Either<C, S>, Either<C, T>, Either<C, A>, Either<C, B>> = PPrism(
     { it.fold({ c -> Either.Right(Either.Left(c)) }, { s -> getOrModify(s).bimap({ Either.Right(it) }, { Either.Right(it) }) }) },
     { it.map(this::reverseGet) }
   )

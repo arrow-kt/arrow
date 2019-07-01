@@ -170,7 +170,7 @@ fun <S, A> Optional<S, A>.updateOld(f: (A) -> A): State<S, Option<A>> =
  *
  * fun main() {
  *   //sampleStart
- *   val inspectHealth State<Enemy, Unit> = Enemy.health.update_(String::toLowerCase)
+ *   val inspectHealth: State<Enemy, Unit> = Enemy.health.update_(String::toLowerCase)
  *   val result1 = inspectHealth.run(FinalBoss)
  *   val result2 = inspectHealth.run(Minion)
  *   //endSample

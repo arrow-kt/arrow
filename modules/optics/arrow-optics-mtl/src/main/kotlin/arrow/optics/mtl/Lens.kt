@@ -196,7 +196,7 @@ fun <S, A> Lens<S, A>.updateOld(f: (A) -> A): State<S, A> = State { s ->
  * import arrow.mtl.run
  * import arrow.mtl.State
  * import arrow.optics.Lens
- * import arrow.optics.mtl.updateOld
+ * import arrow.optics.mtl.update_
  *
  * data class Enemy(val health: Int) {
  *   companion object {

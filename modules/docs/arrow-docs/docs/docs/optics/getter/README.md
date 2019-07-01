@@ -64,6 +64,7 @@ NonEmptyList.head<String>().asGetter().asks(String::decapitalize)
 There are also some convenience methods to make working with [State]({{ '/docs/arrow/data/state' | relative_url }}) easier.
 
 ```kotlin:ank
+import arrow.optics.mtl.*
 import arrow.mtl.*
 
 val inspectHealth = healthGetter.extract()
