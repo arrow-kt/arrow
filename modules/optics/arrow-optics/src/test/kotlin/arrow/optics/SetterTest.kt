@@ -10,6 +10,8 @@ import arrow.core.extensions.option.functor.functor
 import arrow.core.getOrElse
 import arrow.mtl.State
 import arrow.mtl.run
+import arrow.optics.mtl.assign_
+import arrow.optics.mtl.update_
 import arrow.test.UnitSpec
 import arrow.test.generators.functionAToB
 import arrow.test.generators.option
