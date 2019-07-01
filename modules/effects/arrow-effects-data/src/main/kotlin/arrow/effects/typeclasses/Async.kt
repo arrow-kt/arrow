@@ -332,7 +332,7 @@ interface Async<F> : MonadDefer<F> {
    *      return s.toInt() + 1
    *   }
    *
-   *   val result = _extensionFactory_.mapEffect { s -> logAndIncrease(s) }
+   *   val result = _extensionFactory_.mapEffect { s: String -> logAndIncrease(s) }
    *   //sampleEnd
    *   println(result)
    * }
