@@ -11,7 +11,6 @@ import arrow.core.extensions.id.applicative.applicative
 import arrow.core.orElse
 import arrow.core.value
 import arrow.optics.Prism
-import arrow.optics.modify
 import arrow.typeclasses.Const
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Monoid
