@@ -7,8 +7,8 @@ import arrow.core.Right
 import arrow.core.Tuple2
 import arrow.core.Tuple3
 import arrow.core.identity
-import arrow.effects.internal.parMap2
-import arrow.effects.internal.parMap3
+import arrow.fx.internal.parMap2
+import arrow.fx.internal.parMap3
 import arrow.typeclasses.Applicative
 import arrow.fx.CancelToken
 import arrow.fx.MVar

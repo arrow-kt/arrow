@@ -1,7 +1,7 @@
-package arrow.effects.internal
+package arrow.fx.internal
 
 import arrow.Kind
-import arrow.effects.typeclasses.Concurrent
+import arrow.fx.typeclasses.Concurrent
 import kotlin.coroutines.CoroutineContext
 
 fun <F, A, B, C, D> Concurrent<F>.parMap3(ctx: CoroutineContext, fa: Kind<F, A>, fb: Kind<F, B>, fc: Kind<F, C>, f: (A, B, C) -> D): Kind<F, D> = ctx.run {
