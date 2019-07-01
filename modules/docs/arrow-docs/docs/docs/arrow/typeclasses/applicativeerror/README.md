@@ -45,8 +45,8 @@ Try.applicativeError().raiseError<Int>(RuntimeException("Paco"))
 ```
 
 ```kotlin:ank
-import arrow.effects.*
-import arrow.effects.extensions.io.applicativeError.*
+import arrow.fx.*
+import arrow.fx.extensions.io.applicativeError.*
 
 IO.applicativeError().raiseError<Int>(RuntimeException("Paco"))
 ```

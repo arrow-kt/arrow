@@ -2,11 +2,10 @@ apply plugin: 'kotlin-kapt'
 
 dependencies {
     compile project(':arrow-optics')
-    compile project(':arrow-effects-data')
+    compile project(':arrow-fx')
     compile project(':arrow-mtl-data')
     compile project(':arrow-free-data')
-    compile project(':arrow-effects-extensions')
-    compile project(':arrow-effects-io-extensions')
+    compile project(':arrow-fx')
     compile project(":arrow-recursion-data")
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"

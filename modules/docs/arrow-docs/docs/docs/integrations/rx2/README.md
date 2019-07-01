@@ -33,7 +33,7 @@ The largest quality of life improvement when using Observables in Arrow is the i
 To wrap any existing Observable in its Arrow Wrapper counterpart you can use the extension function `k()`.
 
 ```kotlin:ank
-import arrow.effects.rx2.*
+import arrow.fx.rx2.*
 import io.reactivex.*
 import io.reactivex.subjects.*
 
@@ -149,8 +149,8 @@ getSongUrlAsync()
 When rewritten using `fx` it becomes:
 
 ```kotlin
-import arrow.effects.rx2.*
-import arrow.effects.rx2.extensions.fx
+import arrow.fx.rx2.*
+import arrow.fx.rx2.extensions.fx
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import java.util.concurrent.TimeUnit
@@ -196,10 +196,10 @@ To overcome this limitation and run code in a stack safe way, one can make use o
 
 ```kotlin:ank:playground
 import arrow.Kind
-import arrow.effects.rx2.FlowableK
-import arrow.effects.rx2.ForFlowableK
-import arrow.effects.rx2.fix
-import arrow.effects.rx2.extensions.flowablek.monad.monad
+import arrow.fx.rx2.FlowableK
+import arrow.fx.rx2.ForFlowableK
+import arrow.fx.rx2.fix
+import arrow.fx.rx2.extensions.flowablek.monad.monad
 import arrow.free.run
 import arrow.free.stackSafe
 
@@ -233,7 +233,7 @@ Try {
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.effects.rx2.*
+import arrow.fx.rx2.*
 
 DataType(ObservableK::class).tcMarkdownList()
 ```

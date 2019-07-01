@@ -12,10 +12,10 @@ import arrow.core.Right
 import arrow.core.Some
 import arrow.core.Success
 import arrow.core.Try
-import arrow.effects.ForIO
-import arrow.effects.IO
-import arrow.effects.fix
-import arrow.effects.extensions.io.monadError.monadError
+import arrow.fx.ForIO
+import arrow.fx.IO
+import arrow.fx.fix
+import arrow.fx.extensions.io.monadError.monadError
 import arrow.higherkind
 import arrow.core.extensions.`try`.monadError.monadError
 import arrow.core.extensions.either.monadError.monadError

@@ -48,8 +48,8 @@ tryResult
 ```
 
 ```kotlin:ank
-import arrow.effects.*
-import arrow.effects.extensions.io.applicativeError.*
+import arrow.fx.*
+import arrow.fx.extensions.io.applicativeError.*
 
 val ioResult: IO<Int> =
   RuntimeException("BOOM!").raiseError()
