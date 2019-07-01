@@ -58,6 +58,8 @@ There are also some convenience methods to make working with [State]({{ '/docs/a
 This can make working with nested structures in stateful computations significantly more elegant.
 
 ```kotlin:ank
+import arrow.optics.mtl.*
+
 val takeDamage = playerSetter.update_ { it - 15 }
 takeDamage.run(Player(75))
 ```

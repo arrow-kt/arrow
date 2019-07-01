@@ -6,16 +6,13 @@ import arrow.core.Id
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.Tuple2
 import arrow.core.extensions.const.applicative.applicative
 import arrow.core.extensions.id.applicative.applicative
 import arrow.core.extensions.monoid
 import arrow.core.identity
 import arrow.core.value
 import arrow.core.ListK
-import arrow.mtl.State
 import arrow.core.extensions.listk.monoid.monoid
-import arrow.mtl.map
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Const
@@ -51,7 +48,7 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
   fun <F> modifyF(FA: Applicative<F>, s: S, f: (A) -> Kind<F, B>): Kind<F, T>
 
   companion object {
-    fun <S> id() = Iso.id<S>().asTraversal()
+    fun <S> id() = PIso.id<S>().asTraversal()
 
     fun <S> codiagonal(): Traversal<Either<S, S>, S> = object : Traversal<Either<S, S>, S> {
       override fun <F> modifyF(FA: Applicative<F>, s: Either<S, S>, f: (S) -> Kind<F, S>): Kind<F, Either<S, S>> = FA.run {
@@ -70,7 +67,7 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
     /**
      * [PTraversal] that points to nothing
      */
-    fun <S, A> void() = Optional.void<S, A>().asTraversal()
+    fun <S, A> void() = POptional.void<S, A>().asTraversal()
 
     /**
      * [PTraversal] constructor from multiple getters of the same source.
@@ -359,57 +356,4 @@ interface PTraversal<S, T, A, B> : PTraversalOf<S, T, A, B> {
    * Check if forall targets satisfy the predicate
    */
   fun forall(s: S, p: (A) -> Boolean): Boolean = foldMap(s, p, AndMonoid)
-
-  /**
-   * Extracts the focus [A] viewed through the [PTraversal].
-   */
-  fun extract(): State<S, ListK<A>> = State { s -> Tuple2(s, getAll(s)) }
-
-  /**
-   * Transforms a [PTraversal] into a [State].
-   * Alias for [extract].
-   */
-  fun toState(): State<S, ListK<A>> = extract()
-
-  /**
-   * Extract and map the focus [A] viewed through the [PTraversal] and applies [f] to it.
-   */
-  fun <C> extractMap(f: (A) -> C): State<S, ListK<C>> =
-    extract().map { it.map(f) }
 }
-
-/**
- * Update the focus [A] viewed through the [Traversal] and returns its *new* value.
- */
-fun <S, A> Traversal<S, A>.update(f: (A) -> A): State<S, ListK<A>> =
-  updateOld(f).map { it.map(f) }
-
-/**
- * Update the focus [A] viewed through the [Traversal] and returns its *old* value.
- */
-fun <S, A> Traversal<S, A>.updateOld(f: (A) -> A): State<S, ListK<A>> =
-  State { s -> Tuple2(modify(s, f), getAll(s)) }
-
-/**
- * Update the focus [A] viewed through the [Traversal] and ignores both values
- */
-fun <S, A> Traversal<S, A>.update_(f: (A) -> A): State<S, Unit> =
-  State { s -> Tuple2(modify(s, f), Unit) }
-
-/**
- * Assign the focus [A] viewed through the [Traversal] and returns its *new* value.
- */
-fun <S, A> Traversal<S, A>.assign(a: A): State<S, ListK<A>> =
-  update { _ -> a }
-
-/**
- * Assign the focus [A] viewed through the [Traversal] and returns its *old* value.
- */
-fun <S, A> Traversal<S, A>.assignOld(a: A): State<S, ListK<A>> =
-  updateOld { _ -> a }
-
-/**
- * Assign the focus [A] viewed through the [Traversal] and ignores both values.
- */
-fun <S, A> Traversal<S, A>.assign_(a: A): State<S, Unit> =
-  update_ { _ -> a }

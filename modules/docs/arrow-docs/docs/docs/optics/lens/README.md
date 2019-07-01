@@ -63,6 +63,7 @@ liftF(player)
 There are also some convenience methods to make working with [Reader]({{ '/docs/arrow/data/reader' | relative_url }}) easier.
 
 ```kotlin:ank
+import arrow.optics.mtl.*
 import arrow.mtl.*
 
 val reader: Reader<Player, Int> = playerLens.ask()

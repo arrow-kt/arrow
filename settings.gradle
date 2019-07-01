@@ -88,6 +88,7 @@ include {
 
         optics {
             _ 'optics'
+            _ 'optics-mtl'
         }
 
         streams {

@@ -2,7 +2,7 @@ package arrow.optics
 
 import arrow.core.Left
 import arrow.core.Right
-import arrow.core.right
+import arrow.core.Some
 import arrow.typeclasses.Eq
 import io.kotlintest.properties.Gen
 
@@ -76,6 +76,6 @@ internal val userLens: Lens<User, Token> = Lens(
 )
 
 internal val defaultHead: Optional<Int, Int> = Optional(
-  { it.right() },
+  { Some(it) },
   { s, _ -> s }
 )
