@@ -1,9 +1,6 @@
 package arrow.meta.extensions
 
 import arrow.meta.higherkind.MetaCodeAnalyzerInitializer
-import arrow.meta.higherkind.MetaKotlinCodeAnalyzer
-import arrow.meta.higherkind.MetaPsiFacade
-import arrow.meta.utils.NoOp2
 import arrow.meta.utils.NoOp3
 import arrow.meta.utils.NoOp6
 import arrow.meta.utils.NullableOp1
@@ -24,7 +21,6 @@ import org.jetbrains.kotlin.com.intellij.mock.MockProject
 import org.jetbrains.kotlin.com.intellij.openapi.extensions.Extensions
 import org.jetbrains.kotlin.com.intellij.openapi.project.Project
 import org.jetbrains.kotlin.com.intellij.openapi.vfs.VirtualFile
-import org.jetbrains.kotlin.com.intellij.psi.JavaPsiFacade
 import org.jetbrains.kotlin.com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.com.intellij.psi.PsiElementFactory
 import org.jetbrains.kotlin.com.intellij.testFramework.LightVirtualFile
@@ -42,6 +38,10 @@ import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentProvider
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
+import org.jetbrains.kotlin.descriptors.annotations.AnnotationDescriptorImpl
+import org.jetbrains.kotlin.descriptors.annotations.Annotations
+import org.jetbrains.kotlin.descriptors.impl.SimpleFunctionDescriptorImpl
+import org.jetbrains.kotlin.descriptors.impl.TypeParameterDescriptorImpl
 import org.jetbrains.kotlin.diagnostics.Diagnostic
 import org.jetbrains.kotlin.diagnostics.DiagnosticSink
 import org.jetbrains.kotlin.extensions.CompilerConfigurationExtension
@@ -51,15 +51,22 @@ import org.jetbrains.kotlin.extensions.StorageComponentContainerContributor
 import org.jetbrains.kotlin.incremental.components.LookupTracker
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.descriptors.IrBuiltIns
+import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.org.picocontainer.ComponentAdapter
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtModifierListOwner
+import org.jetbrains.kotlin.psi.KtNamedFunction
+import org.jetbrains.kotlin.psi.psiUtil.modalityModifierType
+import org.jetbrains.kotlin.psi.psiUtil.visibilityModifierTypeOrDefault
+import org.jetbrains.kotlin.psi.synthetics.findClassDescriptor
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.BindingTrace
 import org.jetbrains.kotlin.resolve.CodeAnalyzerInitializer
+import org.jetbrains.kotlin.resolve.DescriptorFactory
 import org.jetbrains.kotlin.resolve.TargetPlatform
+import org.jetbrains.kotlin.resolve.calls.callUtil.getCall
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
 import org.jetbrains.kotlin.resolve.checkers.DeclarationChecker
 import org.jetbrains.kotlin.resolve.checkers.DeclarationCheckerContext
@@ -73,6 +80,7 @@ import org.jetbrains.kotlin.resolve.lazy.ResolveSession
 import org.jetbrains.kotlin.resolve.lazy.declarations.ClassMemberDeclarationProvider
 import org.jetbrains.kotlin.resolve.lazy.declarations.PackageMemberDeclarationProvider
 import org.jetbrains.kotlin.resolve.scopes.SyntheticScope
+import org.jetbrains.kotlin.resolve.source.KotlinSourceElement
 import org.jetbrains.kotlin.storage.StorageManager
 import org.jetbrains.kotlin.synthetic.JavaSyntheticPropertiesScope
 import org.jetbrains.kotlin.synthetic.SyntheticScopeProviderExtension
@@ -343,6 +351,67 @@ interface MetaComponentRegistrar : ComponentRegistrar {
       override fun CompilerContext.isSuppressed(diagnostic: Diagnostic): Boolean =
         isSuppressed(diagnostic)
     }
+
+  object FunctionScope {
+    val name = Name.identifier("_function_name_")
+    val typeArguments = Name.identifier("_function_type_arguments_")
+    val valueParameters = Name.identifier("_function_value_parameters_")
+    val body = Name.identifier("_function_body_")
+    val returnType = Name.identifier("_return_type_")
+  }
+//
+  fun func(match: FunctionScope.() -> String,
+           map: FunctionScope.(KtNamedFunction) -> KtNamedFunction): ExtensionPhase.SyntheticResolver =
+    syntheticResolver(
+      generateSyntheticMethods = { classdescriptor, name, bindingContext, fromSupertypes, result ->
+        if (result.isNotEmpty()) {
+          val modifiedResults = result.mapNotNull { descriptor ->
+            val template = match(FunctionScope)
+            val namedFunction = ktPsiElementFactory.createFunction(template)
+            if (namedFunction.nameAsName == FunctionScope.name) {
+              val originalFunction: KtNamedFunction? = descriptor.findPsi() as? KtNamedFunction
+              if (originalFunction != null) {
+                val transformation = map(FunctionScope, originalFunction)
+                descriptor to descriptor.declaration(transformation)
+              } else null
+            } else null
+          }
+          result.removeAll(modifiedResults.map { it.first })
+          result.addAll(modifiedResults.map { it.second })
+        }
+      }
+    )
+
+  fun SimpleFunctionDescriptor.declaration(transformation: KtNamedFunction): SimpleFunctionDescriptor =
+    SimpleFunctionDescriptorImpl.create(
+      containingDeclaration,
+      Annotations.EMPTY,
+      transformation.name?.let(Name::identifier) ?: name,
+      kind,
+      KotlinSourceElement(transformation)
+    ).run {
+      initialize(
+        extensionReceiverParameter,
+        extensionReceiverParameter,
+        transformation.typeParameters.map {
+          TypeParameterDescriptorImpl.createWithDefaultBound(
+            this,
+            Annotations.it.annotations.map {
+              AnnotationDescriptorImpl(
+
+              )
+            },
+            it.
+          )
+        },
+        transformation.valueParameterList,
+        transformation.returnType,
+        transformation.modalityModifierType(),
+        transformation.visibilityModifierTypeOrDefault(),
+        null
+      )
+    }
+
 
   fun syntheticResolver(
     addSyntheticSupertypes: CompilerContext.(
@@ -940,7 +1009,7 @@ data class ClassDefinition(
   val interfaces: List<String>
 )
 
-inline fun <reified A> MockProject.replaceComponent(f: (A) -> A) : Unit {
+inline fun <reified A> MockProject.replaceComponent(f: (A) -> A): Unit {
   val componentAdapter = picoContainer.getComponentAdapterOfType(A::class.java)
   val facade = componentAdapter.getComponentInstance(picoContainer) as A
   picoContainer.unregisterComponent(componentAdapter.componentKey)

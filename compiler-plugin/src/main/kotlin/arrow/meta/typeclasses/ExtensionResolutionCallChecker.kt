@@ -13,6 +13,7 @@ import org.jetbrains.kotlin.resolve.calls.checkers.CallCheckerContext
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
 import org.jetbrains.kotlin.util.slicedMap.Slices
 import org.jetbrains.kotlin.util.slicedMap.WritableSlice
+import kotlin.reflect.jvm.internal.impl.descriptors.impl.ValueParameterDescriptorImpl
 
 
 var UNABLE_TO_RESOLVE_EXTENSION: DiagnosticFactory1<PsiElement, String> = DiagnosticFactory1.create(Severity.ERROR)
@@ -51,8 +52,11 @@ class ExtensionResolutionCallChecker : CallChecker {
                 key,
                 resolution.candidate
               )
+//              descriptor.javaClass.getDeclaredField("declaresDefaultValue").apply {
+//                isAccessible = true
+//                set(descriptor, true)
+//              }
               context.suppressDiagnostic { diagnostic -> diagnostic.factory.name == Errors.NO_VALUE_FOR_PARAMETER.name }
-
             }
           }
         }

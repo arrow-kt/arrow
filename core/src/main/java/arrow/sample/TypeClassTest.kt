@@ -14,6 +14,8 @@ class MyNumber(val value: Int) {
     interface MyNumberSemigroup : Semigroup<MyNumber> {
       override fun MyNumber.combine(other: MyNumber): MyNumber =
         MyNumber(value + other.value)
+
+      companion object : MyNumberSemigroup
     }
   }
 }
@@ -28,6 +30,6 @@ object Contained {
 object Invocation {
   @JvmStatic
   fun main(args: Array<String>) {
-    add(MyNumber(1), MyNumber(2))
+    add(MyNumber(1), MyNumber(3))
   }
 }

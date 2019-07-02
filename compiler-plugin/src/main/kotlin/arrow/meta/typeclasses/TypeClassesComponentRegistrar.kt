@@ -6,7 +6,6 @@ import arrow.meta.extensions.MetaComponentRegistrar
 import arrow.meta.higherkind.buildIrValueParameter
 import arrow.meta.utils.MetaBodyResolver
 import arrow.meta.utils.MetaCallResolver
-import arrow.meta.utils.MetaDiagnosticReporter
 import org.jetbrains.kotlin.backend.common.BackendContext
 import org.jetbrains.kotlin.backend.common.serialization.irrelevantOrigin
 import org.jetbrains.kotlin.container.StorageComponentContainer
@@ -14,7 +13,6 @@ import org.jetbrains.kotlin.container.registerSingleton
 import org.jetbrains.kotlin.container.useImpl
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
-import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.descriptors.Visibilities
@@ -25,9 +23,11 @@ import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.impl.IrClassImpl
 import org.jetbrains.kotlin.ir.symbols.impl.IrClassSymbolImpl
 import org.jetbrains.kotlin.ir.types.impl.IrSimpleTypeImpl
+import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.name.SpecialNames
+import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.synthetics.SyntheticClassOrObjectDescriptor
 import org.jetbrains.kotlin.resolve.descriptorUtil.getSuperInterfaces
 import org.jetbrains.kotlin.resolve.lazy.LazyClassContext
@@ -42,53 +42,49 @@ class TypeClassesComponentRegistrar : MetaComponentRegistrar {
   override fun intercept(): List<ExtensionPhase> =
     meta(
       enableIr(),
-      storageComponent(
-        registerModuleComponents = { container: StorageComponentContainer, platform, moduleDescriptor ->
-          container.useImpl<ExtensionResolutionCallChecker>()
-          container.useImpl<TypeClassPlatformDiagnosticSuppressor>()
-          container.useImpl<MetaCallResolver>()
-          container.useImpl<MetaBodyResolver>()
-        },
-        check = { declaration, descriptor, context ->
-
-        }
-      ),
-      analysys(
-        doAnalysis = { project, module, projectContext, files, bindingTrace, componentProvider ->
-          componentProvider as StorageComponentContainer
-          println("analysys.doAnalysis")
-          null
-        },
-        analysisCompleted = { project, module, bindingTrace, files ->
-          println("analysys.analysisCompleted")
-          null
-        }
-      ),
-      syntheticScopes(
-        getSyntheticScopes = { moduleDescriptor, javaSyntheticPropertiesScope ->
-          println("getSyntheticScopes")
-          emptyList()
-        }
-      ),
-      syntheticResolver(
-        generatePackageSyntheticClasses = { thisDescriptor, name, ctx, declarationProvider, result ->
-          //println("generatePackageSyntheticClasses: $name, result: $result")
-        },
-        generateSyntheticClasses = { thisDescriptor, name, ctx, declarationProvider, result ->
-          //println("generateSyntheticClasses: $name, result: $result")
-        },
-        generateSyntheticMethods = { thisDescriptor, name, bindingContext, fromSupertypes, result ->
-
-          //          val functionDescriptor: SimpleFunctionDescriptorImpl = result.first() as SimpleFunctionDescriptorImpl
-//          functionDescriptor.initialize()
-//          functionDescriptor.valueParameters.filter {
-//            it.annotations.hasAnnotation(withAnnotationName)
-//          }.map {
-//            it.
-//          }
-          println("generateSyntheticMethods: $name, result: $result")
-        }
-      )
+      func({
+        "fun <$typeArguments> foo($valueParameters): Unit = $body"
+      }) { fn ->
+        "fun <$typeArguments> foo(): Unit = $body"
+      },
+//      storageComponent(
+//        registerModuleComponents = { container: StorageComponentContainer, platform, moduleDescriptor ->
+//          container.useImpl<ExtensionResolutionCallChecker>()
+//          container.useImpl<TypeClassPlatformDiagnosticSuppressor>()
+//          container.useImpl<MetaCallResolver>()
+//          container.useImpl<MetaBodyResolver>()
+//
+//        },
+//        check = { declaration, descriptor, context ->
+//
+//        }
+//      ),
+//      syntheticResolver(
+//        generateSyntheticMethods = { thisDescriptor, name, bindingContext, fromSupertypes, result ->
+//          println(result)
+//        }
+//      )
+//      ,
+//      analysys(
+//        doAnalysis = { project, module, projectContext, files, bindingTrace, componentProvider ->
+//          componentProvider as StorageComponentContainer
+//          println("analysys.doAnalysis")
+//          null
+//        },
+//        analysisCompleted = { project, module, bindingTrace, files ->
+//          println("analysys.analysisCompleted")
+//          null
+//        }
+//      ),
+//      syntheticScopes(
+//        getSyntheticScopes = { moduleDescriptor, javaSyntheticPropertiesScope ->
+//          println("getSyntheticScopes")
+//          emptyList()
+//        }
+//      ),
+      IrGeneration { compilerContext, file, backendContext, bindingContext ->
+        println("IRGeneration!")
+      }
     )
 
   private fun CompilerContext.getSyntheticCompanionName(declarationDescriptor: ClassDescriptor): Name? {
@@ -116,15 +112,6 @@ class TypeClassesComponentRegistrar : MetaComponentRegistrar {
   }
 
 }
-
-fun FunctionDescriptor.resolveCallArguments(): Unit {
-  valueParameters.replaceAll {
-    if (it.isWithAnnotated) ExtensionValueArgument(it)
-    else it
-  }
-}
-
-
 
 val ClassDescriptor.isExtensionAnnotated: Boolean
   get() = annotations.findAnnotation(extensionAnnotationName) != null
@@ -198,3 +185,36 @@ fun ClassDescriptor.withCompanion(companion: ClassDescriptor): ClassDescriptor =
   AddCompanionClassDescriptor(this, companion)
 
 
+/*
+val descriptor = receiver.declarationDescriptor
+                if (descriptor is ValueParameterDescriptorImpl && descriptor.isExtension) {
+                    val receiverParameterDescriptor = ReceiverParameterDescriptorImpl(descriptor, receiver, descriptor.annotations)
+                    context.symbolTable.declareValueParameter(descriptor.startOffset!!,
+                                                              descriptor.endOffset!!,
+                                                              IrDeclarationOrigin.DEFINED,
+                                                              receiverParameterDescriptor,
+                                                              receiverParameterDescriptor.type.toIrType())
+                    IrGetValueImpl(
+                            defaultStartOffset, defaultStartOffset, irReceiverType,
+                            context.symbolTable.referenceValueParameter(receiverParameterDescriptor)
+                    )
+                } else {
+                    IrGetValueImpl(
+                            defaultStartOffset, defaultStartOffset, irReceiverType,
+                            context.symbolTable.referenceValueParameter(receiver.declarationDescriptor.extensionReceiverParameter!!)
+                    )
+                }
+ */
+//
+//class ExtensionAwareValueParameterDescriptor(delegate: ValueParameterDescriptor, val symbolTable: SymbolTable): ValueParameterDescriptor by delegate {
+//  override fun getExtensionReceiverParameter(): ReceiverParameterDescriptor? {
+//
+//    val receiverParameterDescriptor = ReceiverParameterDescriptorImpl(this, , annotations)
+//    symbolTable.declareValueParameter(startOffset!!,
+//      endOffset!!,
+//      IrDeclarationOrigin.DEFINED,
+//      receiverParameterDescriptor,
+//      receiverParameterDescriptor.type.toIrType())
+//    return receiverParameterDescriptor
+//  }
+//}

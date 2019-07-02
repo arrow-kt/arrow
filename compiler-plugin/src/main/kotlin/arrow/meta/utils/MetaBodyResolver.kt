@@ -1,5 +1,7 @@
 package arrow.meta.utils
 
+import arrow.meta.typeclasses.MetaValueParameterDescriptor
+import arrow.meta.typeclasses.MetaValueParameterResolver
 import arrow.meta.typeclasses.isWithAnnotated
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.com.intellij.openapi.project.Project
@@ -14,16 +16,19 @@ import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.PropertyAccessorDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
+import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.AnonymousFunctionDescriptor
 import org.jetbrains.kotlin.descriptors.impl.LazyClassReceiverParameterDescriptor
 import org.jetbrains.kotlin.descriptors.impl.ReceiverParameterDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.SyntheticFieldDescriptor
+import org.jetbrains.kotlin.descriptors.impl.ValueParameterDescriptorImpl
 import org.jetbrains.kotlin.diagnostics.Errors
 import org.jetbrains.kotlin.psi.KtAnonymousInitializer
 import org.jetbrains.kotlin.psi.KtClassOrObject
 import org.jetbrains.kotlin.psi.KtDeclarationWithBody
 import org.jetbrains.kotlin.psi.KtPrimaryConstructor
 import org.jetbrains.kotlin.psi.KtProperty
+import org.jetbrains.kotlin.psi.KtPsiFactory
 import org.jetbrains.kotlin.psi.KtSecondaryConstructor
 import org.jetbrains.kotlin.resolve.AnalyzerExtensions
 import org.jetbrains.kotlin.resolve.AnnotationChecker
@@ -45,6 +50,7 @@ import org.jetbrains.kotlin.resolve.scopes.LexicalScope
 import org.jetbrains.kotlin.resolve.scopes.LexicalScopeImpl
 import org.jetbrains.kotlin.resolve.scopes.LexicalScopeKind
 import org.jetbrains.kotlin.resolve.scopes.LocalRedeclarationChecker
+import org.jetbrains.kotlin.resolve.scopes.receivers.ExpressionReceiver
 import org.jetbrains.kotlin.resolve.scopes.receivers.ExtensionReceiver
 import org.jetbrains.kotlin.types.DeferredType
 import org.jetbrains.kotlin.types.KotlinType
@@ -58,17 +64,18 @@ import org.jetbrains.kotlin.types.expressions.ValueParameterResolver
  * Kotlin compiler assumes.
  */
 class MetaBodyResolver(
-  project: Project,
+  val project: Project,
   annotationChecker: AnnotationChecker,
   val expressionTypingServices: ExpressionTypingServices,
   callResolver: CallResolver,
-  trace: BindingTrace,
+  val trace: BindingTrace,
   controlFlowAnalyzer: ControlFlowAnalyzer,
   declarationsChecker: DeclarationsChecker,
   annotationResolver: AnnotationResolver,
   delegatedPropertyResolver: DelegatedPropertyResolver,
   analyzerExtensions: AnalyzerExtensions,
-  val valueParameterResolver: ValueParameterResolver,
+  underlying: ValueParameterResolver,
+  val valueParameterResolver: MetaValueParameterResolver,
   bodyResolveCache: BodyResolveCache,
   builtIns: KotlinBuiltIns,
   val overloadChecker: OverloadChecker,
@@ -84,7 +91,7 @@ class MetaBodyResolver(
   expressionTypingServices,
   analyzerExtensions,
   trace,
-  valueParameterResolver,
+  underlying,
   annotationChecker,
   builtIns,
   overloadChecker,
@@ -178,7 +185,10 @@ class MetaBodyResolver(
 
     var innerScope = FunctionDescriptorUtil.getFunctionInnerScope(scope, functionDescriptor, trace, overloadChecker)
     val valueParameters = function.valueParameters
-    val valueParameterDescriptors = functionDescriptor.valueParameters
+    val valueParameterDescriptors = functionDescriptor.valueParameters.map {
+      if (it.isWithAnnotated) MetaValueParameterDescriptor(project, trace, it as ValueParameterDescriptorImpl)
+      else it
+    }
 
     val headerScope = if (headerScopeFactory != null) headerScopeFactory!!.invoke(innerScope) else innerScope
     valueParameterResolver.resolveValueParameters(
@@ -219,7 +229,7 @@ class MetaBodyResolver(
         innerScope, function, functionDescriptor, if (dataFlowInfo != null) dataFlowInfo else outerDataFlowInfo, null, trace)
     }
 
-    assert(functionDescriptor.getReturnType() != null)
+    assert(functionDescriptor.returnType != null)
   }
 
   private fun getScopeForExtensionParameter(
@@ -227,27 +237,29 @@ class MetaBodyResolver(
     innerScope: LexicalScope,
     valueParameterDescriptor: ValueParameterDescriptor
   ): LexicalScope {
+    val metaValueParameterDescriptor =
+      if (valueParameterDescriptor is MetaValueParameterDescriptor) valueParameterDescriptor
+      else MetaValueParameterDescriptor(project, trace, valueParameterDescriptor as ValueParameterDescriptorImpl)
     var innerScope = innerScope
-    val ownerDescriptor = AnonymousFunctionDescriptor(valueParameterDescriptor,
-      valueParameterDescriptor.annotations,
+    val ownerDescriptor = AnonymousFunctionDescriptor(valueParameterDescriptor, //@with S:
+      metaValueParameterDescriptor.annotations,
       CallableMemberDescriptor.Kind.DECLARATION,
-      valueParameterDescriptor.getSource(),
+      metaValueParameterDescriptor.source,
       false)
-    val extensionReceiver = ExtensionReceiver(ownerDescriptor,
-      valueParameterDescriptor.getType(),
-      null)
 
-    val extensionReceiverParamDescriptor = ReceiverParameterDescriptorImpl(ownerDescriptor,
-      extensionReceiver,
-      ownerDescriptor.annotations)
-
-    ownerDescriptor.initialize(extensionReceiverParamDescriptor, null,
-      valueParameterDescriptor.typeParameters,
-      valueParameterDescriptor.valueParameters,
-      valueParameterDescriptor.returnType,
+    ownerDescriptor.initialize(metaValueParameterDescriptor.extensionReceiverParameter, null,
+      metaValueParameterDescriptor.typeParameters,
+      metaValueParameterDescriptor.valueParameters,
+      metaValueParameterDescriptor.returnType,
       Modality.FINAL,
-      valueParameterDescriptor.visibility)
-    innerScope = LexicalScopeImpl(innerScope, ownerDescriptor, true, extensionReceiverParamDescriptor, LexicalScopeKind.FUNCTION_INNER_SCOPE)
+      metaValueParameterDescriptor.visibility)
+    innerScope = LexicalScopeImpl(
+      parent = innerScope,
+      ownerDescriptor = metaValueParameterDescriptor,
+      isOwnerDescriptorAccessibleByLabel = true,
+      implicitReceiver = metaValueParameterDescriptor.extensionReceiverParameter,
+      kind = LexicalScopeKind.FUNCTION_INNER_SCOPE
+    )
     return innerScope
   }
 }
