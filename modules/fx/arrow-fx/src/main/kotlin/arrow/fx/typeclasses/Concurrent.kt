@@ -6,7 +6,9 @@ import arrow.core.Left
 import arrow.core.Right
 import arrow.core.Tuple2
 import arrow.core.Tuple3
+import arrow.core.extensions.listk.traverse.traverse
 import arrow.core.identity
+import arrow.core.k
 import arrow.fx.internal.parMap2
 import arrow.fx.internal.parMap3
 import arrow.typeclasses.Applicative

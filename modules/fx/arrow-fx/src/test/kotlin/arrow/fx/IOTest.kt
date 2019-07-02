@@ -7,7 +7,6 @@ import arrow.core.Right
 import arrow.core.Some
 import arrow.core.Tuple4
 import arrow.core.right
-import arrow.fx.IO.Companion.effect
 import arrow.fx.IO.Companion.just
 import arrow.fx.extensions.fx
 import arrow.fx.extensions.io.async.async
@@ -35,6 +34,9 @@ import kotlin.coroutines.EmptyCoroutineContext
 @RunWith(KotlinTestRunner::class)
 @kotlinx.coroutines.ObsoleteCoroutinesApi
 class IOTest : UnitSpec() {
+
+  private val allCtx = newSingleThreadContext("allCtx")
+  private val otherCtx = newSingleThreadContext("otherCtx")
 
   init {
     testLaws(ConcurrentLaws.laws(IO.concurrent(), EQ(), EQ(), EQ()))
@@ -317,7 +319,7 @@ class IOTest : UnitSpec() {
       result shouldBe None
     }
 
-    "parallel execution makes all IOs start at the same time" {
+    "parallel execution with single threaded context makes all IOs start at the same time" {
       val order = mutableListOf<Long>()
 
       fun makePar(num: Long) =
@@ -331,7 +333,7 @@ class IOTest : UnitSpec() {
         }
 
       val result =
-        newSingleThreadContext("all").parMapN(
+        allCtx.parMapN(
           makePar(6), makePar(3), makePar(2), makePar(4), makePar(1), makePar(5)) { six, tree, two, four, one, five -> listOf(six, tree, two, four, one, five) }
           .unsafeRunSync()
 
@@ -354,7 +356,7 @@ class IOTest : UnitSpec() {
           .map { num }.order()
 
       val result =
-        newSingleThreadContext("all").parMapN(
+        allCtx.parMapN(
           makePar(6), just(1L).order(), makePar(4), IO.defer { just(2L) }.order(), makePar(5), IO { 3L }.order()) { six, one, four, two, five, three -> listOf(six, one, four, two, five, three) }
           .unsafeRunSync()
 
@@ -371,7 +373,7 @@ class IOTest : UnitSpec() {
         }
 
       val result =
-        newSingleThreadContext("all").parMapN(
+        allCtx.parMapN(
           makePar(6), just(1L), makePar(4), IO.defer { just(2L) }, makePar(5), IO { 3L }) { _, _, _, _, _, _ ->
           Thread.currentThread().name
         }.unsafeRunSync()
@@ -386,22 +388,22 @@ class IOTest : UnitSpec() {
           IO { Thread.currentThread().name },
           IO.defer { IO.just(Thread.currentThread().name) },
           IO.async<String> { cb -> cb(Thread.currentThread().name.right()) },
-          IO(newSingleThreadContext("other")) { Thread.currentThread().name },
+          IO(otherCtx) { Thread.currentThread().name },
           ::Tuple4)
           .unsafeRunSync()
 
-      result shouldBe Tuple4("here", "here", "here", "other")
+      result shouldBe Tuple4("here", "here", "here", "otherCtx")
     }
 
     "unsafeRunAsyncCancellable should cancel correctly" {
       IO.async { cb: (Either<Throwable, Int>) -> Unit ->
         val cancel =
-          IO(newSingleThreadContext("RunThread")) { }
+          IO(allCtx) { }
             .flatMap { IO.async<Int> { cb -> Thread.sleep(500); cb(1.right()) } }
             .unsafeRunAsyncCancellable(OnCancel.Silent) {
               cb(it)
             }
-        IO(newSingleThreadContext("CancelThread")) { }
+        IO(otherCtx) { }
           .unsafeRunAsync { cancel() }
       }.unsafeRunTimed(2.seconds) shouldBe None
     }
@@ -409,12 +411,12 @@ class IOTest : UnitSpec() {
     "unsafeRunAsyncCancellable should throw the appropriate exception" {
       IO.async<Throwable> { cb ->
         val cancel =
-          IO(newSingleThreadContext("RunThread")) { }
+          IO(newSingleThreadContext("allCtx")) { }
             .flatMap { IO.async<Int> { cb -> Thread.sleep(500); cb(1.right()) } }
             .unsafeRunAsyncCancellable(OnCancel.ThrowCancellationException) {
               it.fold({ t -> cb(t.right()) }, { })
             }
-        IO(newSingleThreadContext("CancelThread")) { }
+        IO(otherCtx) { }
           .unsafeRunAsync { cancel() }
       }.unsafeRunTimed(2.seconds) shouldBe Some(OnCancel.CancellationException)
     }
@@ -435,12 +437,12 @@ class IOTest : UnitSpec() {
     "unsafeRunAsyncCancellable can cancel even for infinite asyncs" {
       IO.async { cb: (Either<Throwable, Int>) -> Unit ->
         val cancel =
-          IO(newSingleThreadContext("RunThread")) { }
+          IO(newSingleThreadContext("allCtx")) { }
             .flatMap { IO.async<Int> { Thread.sleep(5000); } }
             .unsafeRunAsyncCancellable(OnCancel.ThrowCancellationException) {
               cb(it)
             }
-        IO(newSingleThreadContext("CancelThread")) { Thread.sleep(500); }
+        IO(otherCtx) { Thread.sleep(500); }
           .unsafeRunAsync { cancel() }
       }.unsafeRunTimed(2.seconds) shouldBe None
     }

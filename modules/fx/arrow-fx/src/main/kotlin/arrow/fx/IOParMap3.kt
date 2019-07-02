@@ -6,6 +6,7 @@ import arrow.core.Tuple3
 import arrow.core.nonFatalOrThrow
 import arrow.fx.internal.IOForkedStart
 import arrow.fx.internal.Platform
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 
@@ -21,6 +22,7 @@ interface IOParMap3 {
   ): IO<D> = IO.Async { conn, cb ->
 
     val state: AtomicReference<Tuple3<A?, B?, C?>?> = AtomicReference(null)
+    val active = AtomicBoolean(true)
 
     val connA = IOConnection()
     val connB = IOConnection()
@@ -40,68 +42,52 @@ interface IOParMap3 {
       cb(result)
     }
 
-    /** Called when an error is generated. */
-    fun sendError(other: IOConnection, other2: IOConnection, e: Throwable) {
-      other.cancel().fix().unsafeRunAsync { r1 ->
-        other2.cancel().fix().unsafeRunAsync { r2 ->
-          conn.pop()
-          cb(Left(r1.fold({ e2 ->
-            r2.fold({ e3 -> Platform.composeErrors(e, e2, e3) }, { Platform.composeErrors(e, e2) })
-          }, {
-            r2.fold({ e3 -> Platform.composeErrors(e, e3) }, { e })
-          })))
-        }
-      }
-    }
+    fun tryComplete(tuple: Tuple3<A?, B?, C?>?) = tuple?.let { (a, b, c) ->
+      if (a != null && b != null && c != null) complete(a, b, c)
+      else Unit
+    } ?: Unit
 
-    IORunLoop.startCancelable(IOForkedStart(fa, ctx), connA) {
-      it.fold({ e ->
+    fun sendError(other: IOConnection, other2: IOConnection, e: Throwable) =
+      if (active.getAndSet(false)) { // We were already cancelled so don't do anything.
+        other.cancel().fix().unsafeRunAsync { r1 ->
+          other2.cancel().fix().unsafeRunAsync { r2 ->
+            conn.pop()
+            cb(Left(r1.fold({ e2 ->
+              r2.fold({ e3 -> Platform.composeErrors(e, e2, e3) }, { Platform.composeErrors(e, e2) })
+            }, {
+              r2.fold({ e3 -> Platform.composeErrors(e, e3) }, { e })
+            })))
+          }
+        }
+      } else Unit
+
+    IORunLoop.startCancelable(IOForkedStart(fa, ctx), connA) { resultA ->
+      resultA.fold({ e ->
         sendError(connB, connC, e)
       }, { a ->
-        val newState: Tuple3<A?, B?, C?>? = state.updateAndGet { intermediate ->
-          intermediate?.copy(a = a) ?: Tuple3(a, null, null)
-        }
-
-        val resA = newState?.a
-        val resB = newState?.b
-        val resC = newState?.c
-
-        if (resA != null && resB != null && resC != null) complete(resA, resB, resC)
-        else Unit
+        tryComplete(state.updateAndGet { current ->
+          current?.copy(a = a) ?: Tuple3(a, null, null)
+        })
       })
     }
 
-    IORunLoop.startCancelable(IOForkedStart(fb, ctx), connB) {
-      it.fold({ e ->
+    IORunLoop.startCancelable(IOForkedStart(fb, ctx), connB) { resultB ->
+      resultB.fold({ e ->
         sendError(connA, connC, e)
       }, { b ->
-        val newState: Tuple3<A?, B?, C?>? = state.updateAndGet { intermediate ->
-          intermediate?.copy(b = b) ?: Tuple3(null, b, null)
-        }
-
-        val resA = newState?.a
-        val resB = newState?.b
-        val resC = newState?.c
-
-        if (resA != null && resB != null && resC != null) complete(resA, resB, resC)
-        else Unit
+        tryComplete(state.updateAndGet { current ->
+          current?.copy(b = b) ?: Tuple3(null, b, null)
+        })
       })
     }
 
-    IORunLoop.startCancelable(IOForkedStart(fc, ctx), connC) {
-      it.fold({ e ->
+    IORunLoop.startCancelable(IOForkedStart(fc, ctx), connC) { resultC ->
+      resultC.fold({ e ->
         sendError(connA, connB, e)
       }, { c ->
-        val newState: Tuple3<A?, B?, C?>? = state.updateAndGet { intermediate ->
-          intermediate?.copy(c = c) ?: Tuple3(null, null, c)
-        }
-
-        val resA = newState?.a
-        val resB = newState?.b
-        val resC = newState?.c
-
-        if (resA != null && resB != null && resC != null) complete(resA, resB, resC)
-        else Unit
+        tryComplete(state.updateAndGet { current ->
+          current?.copy(c = c) ?: Tuple3(null, null, c)
+        })
       })
     }
   }

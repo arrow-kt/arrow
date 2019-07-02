@@ -162,8 +162,6 @@ sealed class IO<out A> : IOOf<A> {
       }
 
     val never: IO<Nothing> = async { }
-
-    /* For parMap, look into IOParallel */
   }
 
   suspend fun suspended(): A = suspendCoroutine { cont ->

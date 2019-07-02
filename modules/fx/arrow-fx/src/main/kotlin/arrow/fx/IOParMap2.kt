@@ -2,6 +2,7 @@ package arrow.fx
 
 import arrow.core.Either
 import arrow.core.Left
+import arrow.core.Right
 import arrow.core.nonFatalOrThrow
 import arrow.fx.internal.IOForkedStart
 import arrow.fx.internal.Platform
@@ -12,52 +13,53 @@ import kotlin.coroutines.CoroutineContext
 interface IOParMap2 {
 
   fun <A, B, C> parMapN(ctx: CoroutineContext, fa: IOOf<A>, fb: IOOf<B>, f: (A, B) -> C): IO<C> = IO.Async { conn, cb ->
-
-    val state = AtomicReference<Either<A, B>?>(null)
+    // Used to store Throwable, Either<A, B> or empty (null). (No sealed class used for a slightly better preforming ParMap2)
+    val state = AtomicReference<Any?>(null)
 
     val connA = IOConnection()
     val connB = IOConnection()
 
-    // Composite cancelable that cancels both.
-    // NOTE: conn.pop() happens when cb gets called!
     conn.pushPair(connA, connB)
 
     fun complete(a: A, b: B) {
       conn.pop()
-      val result: Either<Throwable, C> = try {
+      cb(try {
         Either.Right(f(a, b))
       } catch (e: Throwable) {
         Either.Left(e.nonFatalOrThrow())
-      }
-      cb(result)
+      })
     }
 
-    /** Called when an error is generated. */
-    fun sendError(other: IOConnection, e: Throwable) {
-      other.cancel().fix().unsafeRunAsync { r ->
+    fun sendError(other: IOConnection, e: Throwable) = when (state.getAndSet(e)) {
+      is Throwable -> Unit // Do nothing we already finished
+      else -> other.cancel().fix().unsafeRunAsync { r ->
         conn.pop()
         cb(Left(r.fold({ e2 -> Platform.composeErrors(e, e2) }, { e })))
       }
     }
 
-    IORunLoop.startCancelable(IOForkedStart(fa, ctx), connA) {
-      it.fold({ e ->
+    IORunLoop.startCancelable(IOForkedStart(fa, ctx), connA) { resultA ->
+      resultA.fold({ e ->
         sendError(connB, e)
       }, { a ->
-        when (val original = state.getAndSet(Either.Left(a))) {
-          null -> Unit // wait for B to finish
-          is Either.Right -> complete(a, original.b)
+        when (val oldState = state.getAndSet(Left(a))) {
+          null -> Unit // Wait for B
+          is Throwable -> Unit // ParMapN already failed and A was cancelled.
+          is Either.Left<*> -> Unit // Already state.getAndSet
+          is Either.Right<*> -> complete(a, (oldState as Either.Right<B>).b)
         }
       })
     }
 
-    IORunLoop.startCancelable(IOForkedStart(fb, ctx), connB) {
-      it.fold({ e ->
+    IORunLoop.startCancelable(IOForkedStart(fb, ctx), connB) { resultB ->
+      resultB.fold({ e ->
         sendError(connA, e)
       }, { b ->
-        when (val original = state.getAndSet(Either.Right(b))) {
-          null -> Unit // wait for B to finish
-          is Either.Left -> complete(original.a, b)
+        when (val oldState = state.getAndSet(Right(b))) {
+          null -> Unit // Wait for A
+          is Throwable -> Unit // ParMapN already failed and B was cancelled.
+          is Either.Right<*> -> Unit // IO cannot finish twice
+          is Either.Left<*> -> complete((oldState as Either.Left<A>).a, b)
         }
       })
     }
