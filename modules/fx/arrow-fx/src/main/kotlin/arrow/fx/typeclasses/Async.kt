@@ -326,6 +326,7 @@ interface Async<F> : MonadDefer<F> {
    *
    * ```kotlin:ank:playground:extension
    * _imports_
+   * import arrow.fx.typeclasses.Async
    * import arrow.fx.rx2.extensions.observablek.applicative.*
    *
    * fun main(args: Array<String>) {
