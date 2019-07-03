@@ -3,10 +3,12 @@ package arrow.fx.typeclasses
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Left
+import arrow.core.ListK
 import arrow.core.Right
 import arrow.core.Tuple2
 import arrow.core.Tuple3
 import arrow.core.extensions.listk.traverse.traverse
+import arrow.core.fix
 import arrow.core.identity
 import arrow.core.k
 import arrow.fx.internal.parMap2
@@ -24,7 +26,6 @@ import arrow.fx.Race8
 import arrow.fx.Race9
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
-import arrow.fx.Semaphore
 import arrow.fx.Timer
 import arrow.fx.internal.TimeoutException
 import arrow.typeclasses.MonadSyntax
@@ -301,27 +302,11 @@ interface Concurrent<F> : Async<F> {
   fun <G, A, B> Kind<G, A>.parTraverse(TG: Traverse<G>, f: (A) -> Kind<F, B>): Kind<F, Kind<G, B>> =
     TG.run { traverse(parApplicative(), f) }
 
-  // fun <A, B> Iterable<A>.parTraverse(ctx: CoroutineContext, f: (A) -> Kind<F, B>): Kind<F, List<B>> =
-  //   toList().k().parTraverse(ctx, ListK.traverse(), f).map { it.fix() }
+  fun <A, B> Iterable<A>.parTraverse(ctx: CoroutineContext, f: (A) -> Kind<F, B>): Kind<F, List<B>> =
+    toList().k().parTraverse(ctx, ListK.traverse(), f).map { it.fix() }
 
-  // fun <A, B> Iterable<A>.parTraverse(f: (A) -> Kind<F, B>): Kind<F, List<B>> =
-  //   toList().k().parTraverse(ListK.traverse(), f).map { it.fix() }
-
-  fun <G, A, B> Kind<G, A>.parTraverseN(TG: Traverse<G>, n: Long, ctx: CoroutineContext, f: (A) -> Kind<F, B>): Kind<F, Kind<G, B>> = TG.run {
-    Semaphore(n, this@Concurrent).flatMap { semaphore ->
-      this@parTraverseN.parTraverse(ctx, TG) { a ->
-        semaphore.withPermit(f(a))
-      }
-    }
-  }
-
-  fun <G, A, B> Kind<G, A>.parTraverseN(TG: Traverse<G>, n: Long, f: (A) -> Kind<F, B>): Kind<F, Kind<G, B>> = TG.run {
-    Semaphore(n, this@Concurrent).flatMap { semaphore ->
-      this@parTraverseN.parTraverse(TG) { a ->
-        semaphore.withPermit(f(a))
-      }
-    }
-  }
+  fun <A, B> Iterable<A>.parTraverse(f: (A) -> Kind<F, B>): Kind<F, List<B>> =
+    toList().k().parTraverse(ListK.traverse(), f).map { it.fix() }
 
   fun <G, A> Kind<G, Kind<F, A>>.parSequence(TG: Traverse<G>, ctx: CoroutineContext): Kind<F, Kind<G, A>> =
     parTraverse(ctx, TG, ::identity)
@@ -329,11 +314,11 @@ interface Concurrent<F> : Async<F> {
   fun <G, A> Kind<G, Kind<F, A>>.parSequence(TG: Traverse<G>): Kind<F, Kind<G, A>> =
     parTraverse(TG, ::identity)
 
-  fun <G, A> Kind<G, Kind<F, A>>.parSequenceN(TG: Traverse<G>, n: Long, ctx: CoroutineContext): Kind<F, Kind<G, A>> =
-    parTraverseN(TG, n, ctx, ::identity)
+  fun <A, B> Iterable<Kind<F, A>>.parSequence(ctx: CoroutineContext): Kind<F, List<A>> =
+    toList().k().parTraverse(ctx, ListK.traverse(), ::identity).map { it.fix() }
 
-  fun <G, A> Kind<G, Kind<F, A>>.parSequenceN(TG: Traverse<G>, n: Long): Kind<F, Kind<G, A>> =
-    parTraverseN(TG, n, ::identity)
+  fun <A, B> Iterable<Kind<F, A>>.parSequence(): Kind<F, List<A>> =
+    toList().k().parTraverse(ListK.traverse(), ::identity).map { it.fix() }
 
   /**
    * Map two tasks in parallel within a new [F] on [this@parMapN].

@@ -15,7 +15,6 @@ import arrow.fx.Promise
 import arrow.fx.Semaphore
 import arrow.fx.typeclasses.Concurrent
 import arrow.fx.typeclasses.ExitCase
-import arrow.fx.typeclasses.milliseconds
 import arrow.test.generators.applicativeError
 import arrow.test.generators.either
 import arrow.test.generators.throwable
@@ -73,9 +72,7 @@ object ConcurrentLaws {
       Law("Concurrent Laws: parTraverse can traverse effectful computations") { CF.parTraverseCanTraverseEffectfullComputations(EQ) },
       Law("Concurrent Laws: parTraverse results in the correct error") { CF.parTraverseResultsInTheCorrectError(EQ_UNIT) },
       Law("Concurrent Laws: parTraverse forks the effects") { CF.parTraverseForksTheEffects(EQ_UNIT) },
-      Law("Concurrent Laws: parSequence forks the effects") { CF.parSequenceForksTheEffects(EQ_UNIT) },
-      Law("Concurrent Laws: parTraverseN does not exceed max processes") { CF.parTraverseNDoesNotExceedAmountOfProcesses(EQ_UNIT) },
-      Law("Concurrent Laws: parSequenceN does not exceed max processes") { CF.parSequenceNDoesNotExceedAmountOfProcesses(EQ_UNIT) }
+      Law("Concurrent Laws: parSequence forks the effects") { CF.parSequenceForksTheEffects(EQ_UNIT) }
     )
 
   fun <F> Concurrent<F>.cancelOnBracketReleases(EQ: Eq<Kind<F, Int>>, ctx: CoroutineContext) {
@@ -571,40 +568,5 @@ object ConcurrentLaws {
           promiseB.complete(Unit).followedBy(promiseC.get()).bracket(use = { unit() }, release = { unit() })
         )).parSequence(ListK.traverse()).unit()
       }.equalUnderTheLaw(unit(), EQ)
-    }
-
-  fun <F> Concurrent<F>.parTraverseNDoesNotExceedAmountOfProcesses(EQ: Eq<Kind<F, Unit>>): Unit =
-    forFew(10, Gen.int()) {
-      ref { 0 } // Ref to keep count of active processes
-        .flatMap { counter ->
-          (10 downTo 0).toList().k()
-            .parTraverseN(ListK.traverse(), 3) { i ->
-              counter.getAndUpdate(Int::inc)
-                .flatMap { get ->
-                  if (get >= 3) raiseError(RuntimeException("Counter reached 3, parTraverseN is running $get process in parallel"))
-                  else unit()
-                }
-                .followedBy(sleep((i * 100).milliseconds))
-                .followedBy(counter.update(Int::dec))
-            }.unit()
-        }.equalUnderTheLaw(unit(), EQ)
-    }
-
-  fun <F> Concurrent<F>.parSequenceNDoesNotExceedAmountOfProcesses(EQ: Eq<Kind<F, Unit>>): Unit =
-    forFew(10, Gen.int()) {
-      ref { 0 } // Ref to keep count of active processes
-        .flatMap { counter ->
-          (10 downTo 0).toList().k().map { i ->
-            counter.getAndUpdate(Int::inc)
-              .flatMap { get ->
-                if (get >= 3) raiseError(RuntimeException("Counter reached 3, parTraverseN is running $get process in parallel"))
-                else unit()
-              }
-              .followedBy(sleep((i * 100).milliseconds))
-              .followedBy(counter.update(Int::dec))
-          }
-            .parSequenceN(ListK.traverse(), 3)
-            .unit()
-        }.equalUnderTheLaw(unit(), EQ)
     }
 }

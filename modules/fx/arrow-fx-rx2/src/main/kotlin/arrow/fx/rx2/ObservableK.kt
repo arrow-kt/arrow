@@ -170,7 +170,7 @@ data class ObservableK<A>(val observable: Observable<A>) : ObservableKOf<A>, Obs
       Observable.error<A>(t).k()
 
     operator fun <A> invoke(fa: () -> A): ObservableK<A> =
-      defer { just(fa()) }
+      Observable.fromCallable(fa).k()
 
     fun <A> defer(fa: () -> ObservableKOf<A>): ObservableK<A> =
       Observable.defer { fa().value() }.k()
