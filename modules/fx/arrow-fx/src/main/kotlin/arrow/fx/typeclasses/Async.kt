@@ -335,7 +335,7 @@ interface Async<F> : MonadDefer<F> {
    *      return s.toInt() + 1
    *   }
    *
-   *   val result = _effect_(Dispatchers.Default) { Thread.currentThread().name }._effectMap_ { s: String -> logAndIncrease(s) }
+   *   val result = _effect_(Dispatchers.Default) { Thread.currentThread().name }.effectMap { s: String -> logAndIncrease(s) }
    *   //sampleEnd
    *   println(result)
    * }
