@@ -302,10 +302,10 @@ interface Concurrent<F> : Async<F> {
   fun <G, A, B> Kind<G, A>.parTraverse(TG: Traverse<G>, f: (A) -> Kind<F, B>): Kind<F, Kind<G, B>> =
     TG.run { traverse(parApplicative(), f) }
 
-  fun <A, B> Iterable<A>.parTraverse(ctx: CoroutineContext, f: (A) -> Kind<F, B>): Kind<F, List<B>> =
+  fun <A, B> kotlin.collections.Iterable<A>.parTraverse(ctx: CoroutineContext, f: (A) -> Kind<F, B>): Kind<F, List<B>> =
     toList().k().parTraverse(ctx, ListK.traverse(), f).map { it.fix() }
 
-  fun <A, B> Iterable<A>.parTraverse(f: (A) -> Kind<F, B>): Kind<F, List<B>> =
+  fun <A, B> kotlin.collections.Iterable<A>.parTraverse(f: (A) -> Kind<F, B>): Kind<F, List<B>> =
     toList().k().parTraverse(ListK.traverse(), f).map { it.fix() }
 
   fun <G, A> Kind<G, Kind<F, A>>.parSequence(TG: Traverse<G>, ctx: CoroutineContext): Kind<F, Kind<G, A>> =
@@ -314,10 +314,10 @@ interface Concurrent<F> : Async<F> {
   fun <G, A> Kind<G, Kind<F, A>>.parSequence(TG: Traverse<G>): Kind<F, Kind<G, A>> =
     parTraverse(TG, ::identity)
 
-  fun <A, B> Iterable<Kind<F, A>>.parSequence(ctx: CoroutineContext): Kind<F, List<A>> =
+  fun <A, B> kotlin.collections.Iterable<Kind<F, A>>.parSequence(ctx: CoroutineContext): Kind<F, List<A>> =
     toList().k().parTraverse(ctx, ListK.traverse(), ::identity).map { it.fix() }
 
-  fun <A, B> Iterable<Kind<F, A>>.parSequence(): Kind<F, List<A>> =
+  fun <A, B> kotlin.collections.Iterable<Kind<F, A>>.parSequence(): Kind<F, List<A>> =
     toList().k().parTraverse(ListK.traverse(), ::identity).map { it.fix() }
 
   /**

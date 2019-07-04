@@ -1,6 +1,7 @@
 package arrow.extensions
 
 import arrow.common.messager.log
+import arrow.common.messager.logMW
 import arrow.common.utils.knownError
 import arrow.extension
 import arrow.meta.ast.Code
@@ -14,14 +15,18 @@ import arrow.meta.encoder.TypeClassInstance
 import arrow.meta.processor.MetaProcessor
 import com.google.auto.service.AutoService
 import com.squareup.kotlinpoet.FileSpec
+import javax.annotation.processing.Messager
 import javax.annotation.processing.Processor
 import javax.lang.model.element.TypeElement
+
+var LOGGER: Messager? = null
 
 @AutoService(Processor::class)
 class ExtensionProcessor : MetaProcessor<extension>(extension::class), PolyTemplateGenerator {
 
-  override fun transform(annotatedElement: AnnotatedElement): List<FileSpec.Builder> =
-    when (annotatedElement) {
+  override fun transform(annotatedElement: AnnotatedElement): List<FileSpec.Builder> {
+    LOGGER = processorUtils().messager
+    return when (annotatedElement) {
       is AnnotatedElement.Interface -> {
         val info = annotatedElement.typeElement.typeClassInstance()
         log("[${info?.instance?.name?.simpleName}] : Generating [${info?.typeClass?.name?.simpleName}] extensions for [${info?.projectedCompanion}]")
@@ -30,6 +35,7 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class), PolyTempl
       }
       else -> notAnInstanceError()
     }
+  }
 
   private fun TypeClassInstance?.processTypeClassExtensions(
     fileSpec: FileSpec.Builder?,
@@ -91,7 +97,12 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class), PolyTempl
     )
 
   private fun List<Func>.inMainFileSpec(fileSpec: FileSpec.Builder): FileSpec.Builder =
-    fold(fileSpec) { spec, func -> spec.addFunction(func.lyrics().toBuilder().build()) }
+    fold(fileSpec) { spec, func ->
+      if (func.name == "parTraverse" && func.receiverType?.simpleName?.contains("Iterable") == true) {
+        logMW("I FOUND THE FUNCTION: ${func.lyrics()}")
+      }
+      spec.addFunction(func.lyrics().toBuilder().build())
+    }
 
   private fun FileSpec.Builder.addProperties(properties: List<Property>): FileSpec.Builder =
     properties.fold(this) { spec, prop -> spec.addProperty(prop.lyrics().toBuilder().build()) }
@@ -130,7 +141,7 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class), PolyTempl
           "." + info.projectedCompanion.simpleName.substringAfterLast(".").toLowerCase() +
           "." + info.typeClass.name.simpleName.decapitalize(),
         type.name.simpleName
-      )
+      ).indent("  ")
     }
 
   private fun notAnInstanceError(): Nothing =
