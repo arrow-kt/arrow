@@ -19,6 +19,9 @@ import kotlinx.coroutines.newSingleThreadContext
 
 object AsyncLaws {
 
+  private val one = newSingleThreadContext("1")
+  private val two = newSingleThreadContext("2")
+
   fun <F> laws(
     AC: Async<F>,
     EQ: Eq<Kind<F, Int>>,
@@ -104,20 +107,19 @@ object AsyncLaws {
 
   fun <F> Async<F>.effectCanCallSuspend(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.int()) { id ->
-      val fs: suspend () -> String = { Thread.currentThread().name }
+      val fs: suspend () -> Int = { id }
 
-      effect(newSingleThreadContext(id.toString())) {
-        fs().toInt()
-      }.equalUnderTheLaw(just(id), EQ)
+      effect { fs() }
+        .equalUnderTheLaw(just(id), EQ)
     }
 
   fun <F> Async<F>.effectEquivalence(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.functionAToB<Unit, Int>(Gen.constant(0))) { f ->
       val fs: suspend () -> Int = { f(Unit) }
 
-      val effect = effect(newSingleThreadContext("1")) { fs() }
+      val effect = effect(one) { fs() }
 
-      val continueOn = later(newSingleThreadContext("2")) { f(Unit) }
+      val continueOn = later(two) { f(Unit) }
 
       effect.equalUnderTheLaw(continueOn, EQ)
     }
