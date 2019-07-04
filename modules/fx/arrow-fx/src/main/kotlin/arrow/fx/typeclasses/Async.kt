@@ -150,7 +150,7 @@ interface Async<F> : MonadDefer<F> {
    * fun main(args: Array<String>) {
    *   //sampleStart
    *   fun <F> Async<F>.invokeOnDefaultDispatcher(): Kind<F, String> =
-   *     _delay_(Dispatchers.Default, { Thread.currentThread().name })
+   *     _later_(Dispatchers.Default, { Thread.currentThread().name })
    *
    *   val result = _extensionFactory_.invokeOnDefaultDispatcher()
    *   //sampleEnd
@@ -326,6 +326,7 @@ interface Async<F> : MonadDefer<F> {
    *
    * ```kotlin:ank:playground:extension
    * _imports_
+   * import kotlinx.coroutines.Dispatchers
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
@@ -334,13 +335,13 @@ interface Async<F> : MonadDefer<F> {
    *      return s.toInt() + 1
    *   }
    *
-   *   val result = _delay_(Dispatchers.Default, { Thread.currentThread().name })._mapEffect_ { s: String -> logAndIncrease(s) }
+   *   val result = _effect_(Dispatchers.Default) { Thread.currentThread().name }._effectMap_ { s: String -> logAndIncrease(s) }
    *   //sampleEnd
    *   println(result)
    * }
    * ```
    */
-  fun <A, B> Kind<F, A>.mapEffect(f: suspend (A) -> B): Kind<F, B> =
+  fun <A, B> Kind<F, A>.effectMap(f: suspend (A) -> B): Kind<F, B> =
     flatMap { a -> effect { f(a) } }
 }
 
