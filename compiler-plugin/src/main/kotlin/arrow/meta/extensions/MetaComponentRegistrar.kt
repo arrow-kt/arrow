@@ -8,6 +8,7 @@ import org.jetbrains.kotlin.analyzer.AnalysisResult
 import org.jetbrains.kotlin.analyzer.ModuleInfo
 import org.jetbrains.kotlin.backend.common.BackendContext
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
+import org.jetbrains.kotlin.backend.common.ir.DeclarationFactory
 import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.codegen.ClassBuilder
@@ -15,20 +16,22 @@ import org.jetbrains.kotlin.codegen.ClassBuilderFactory
 import org.jetbrains.kotlin.codegen.DelegatingClassBuilder
 import org.jetbrains.kotlin.codegen.ImplementationBodyCodegen
 import org.jetbrains.kotlin.codegen.StackValue
+import org.jetbrains.kotlin.codegen.coroutines.createCustomCopy
 import org.jetbrains.kotlin.codegen.extensions.ClassBuilderInterceptorExtension
 import org.jetbrains.kotlin.codegen.extensions.ExpressionCodegenExtension
+import org.jetbrains.kotlin.codegen.kotlinType
 import org.jetbrains.kotlin.com.intellij.mock.MockProject
 import org.jetbrains.kotlin.com.intellij.openapi.extensions.Extensions
 import org.jetbrains.kotlin.com.intellij.openapi.project.Project
 import org.jetbrains.kotlin.com.intellij.openapi.vfs.VirtualFile
 import org.jetbrains.kotlin.com.intellij.psi.PsiElement
-import org.jetbrains.kotlin.com.intellij.psi.PsiElementFactory
 import org.jetbrains.kotlin.com.intellij.testFramework.LightVirtualFile
 import org.jetbrains.kotlin.compiler.plugin.ComponentRegistrar
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.JVMConfigurationKeys
 import org.jetbrains.kotlin.container.ComponentProvider
 import org.jetbrains.kotlin.container.StorageComponentContainer
+import org.jetbrains.kotlin.container.get
 import org.jetbrains.kotlin.context.ProjectContext
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
@@ -42,6 +45,7 @@ import org.jetbrains.kotlin.descriptors.annotations.AnnotationDescriptorImpl
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.SimpleFunctionDescriptorImpl
 import org.jetbrains.kotlin.descriptors.impl.TypeParameterDescriptorImpl
+import org.jetbrains.kotlin.descriptors.impl.ValueParameterDescriptorImpl
 import org.jetbrains.kotlin.diagnostics.Diagnostic
 import org.jetbrains.kotlin.diagnostics.DiagnosticSink
 import org.jetbrains.kotlin.extensions.CompilerConfigurationExtension
@@ -58,18 +62,18 @@ import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtModifierListOwner
 import org.jetbrains.kotlin.psi.KtNamedFunction
-import org.jetbrains.kotlin.psi.psiUtil.modalityModifierType
-import org.jetbrains.kotlin.psi.psiUtil.visibilityModifierTypeOrDefault
-import org.jetbrains.kotlin.psi.synthetics.findClassDescriptor
+import org.jetbrains.kotlin.psi.psiUtil.parameterIndex
+import org.jetbrains.kotlin.resolve.AnnotationResolver
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.BindingTrace
 import org.jetbrains.kotlin.resolve.CodeAnalyzerInitializer
 import org.jetbrains.kotlin.resolve.DescriptorFactory
 import org.jetbrains.kotlin.resolve.TargetPlatform
-import org.jetbrains.kotlin.resolve.calls.callUtil.getCall
+import org.jetbrains.kotlin.resolve.bindingContextUtil.getAbbreviatedTypeOrType
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
 import org.jetbrains.kotlin.resolve.checkers.DeclarationChecker
 import org.jetbrains.kotlin.resolve.checkers.DeclarationCheckerContext
+import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.resolve.diagnostics.DiagnosticSuppressor
 import org.jetbrains.kotlin.resolve.extensions.SyntheticResolveExtension
 import org.jetbrains.kotlin.resolve.jvm.diagnostics.JvmDeclarationOrigin
@@ -78,12 +82,21 @@ import org.jetbrains.kotlin.resolve.jvm.extensions.PackageFragmentProviderExtens
 import org.jetbrains.kotlin.resolve.lazy.LazyClassContext
 import org.jetbrains.kotlin.resolve.lazy.ResolveSession
 import org.jetbrains.kotlin.resolve.lazy.declarations.ClassMemberDeclarationProvider
+import org.jetbrains.kotlin.resolve.lazy.declarations.DeclarationProviderFactory
 import org.jetbrains.kotlin.resolve.lazy.declarations.PackageMemberDeclarationProvider
+import org.jetbrains.kotlin.resolve.lazy.declarations.PsiBasedClassMemberDeclarationProvider
+import org.jetbrains.kotlin.resolve.lazy.descriptors.LazyAnnotationDescriptor
+import org.jetbrains.kotlin.resolve.lazy.descriptors.LazyAnnotationsContextImpl
+import org.jetbrains.kotlin.resolve.scopes.ImportingScope
+import org.jetbrains.kotlin.resolve.scopes.LexicalScope
+import org.jetbrains.kotlin.resolve.scopes.LexicalScopeImpl
+import org.jetbrains.kotlin.resolve.scopes.LexicalScopeKind
 import org.jetbrains.kotlin.resolve.scopes.SyntheticScope
 import org.jetbrains.kotlin.resolve.source.KotlinSourceElement
 import org.jetbrains.kotlin.storage.StorageManager
 import org.jetbrains.kotlin.synthetic.JavaSyntheticPropertiesScope
 import org.jetbrains.kotlin.synthetic.SyntheticScopeProviderExtension
+import org.jetbrains.kotlin.types.DescriptorSubstitutor
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.org.objectweb.asm.AnnotationVisitor
 import org.jetbrains.org.objectweb.asm.FieldVisitor
@@ -353,15 +366,20 @@ interface MetaComponentRegistrar : ComponentRegistrar {
     }
 
   object FunctionScope {
+    val visibility = Name.identifier("_function_visibility_")
+    val modality = Name.identifier("_function_modality_")
+    val typeArgs = Name.identifier("_function_type_arguments_")
+    val receiverType = Name.identifier("_function_receiver_type_")
     val name = Name.identifier("_function_name_")
-    val typeArguments = Name.identifier("_function_type_arguments_")
-    val valueParameters = Name.identifier("_function_value_parameters_")
+    val typeArg = Name.identifier("_function_type_argument_")
+    val params = Name.identifier("_function_value_parameters_")
+    val param = Name.identifier("_function_value_parameter_")
     val body = Name.identifier("_function_body_")
-    val returnType = Name.identifier("_return_type_")
+    val returnType = Name.identifier("_function_return_type_")
   }
-//
-  fun func(match: FunctionScope.() -> String,
-           map: FunctionScope.(KtNamedFunction) -> KtNamedFunction): ExtensionPhase.SyntheticResolver =
+
+  //
+  fun func(match: FunctionScope.() -> String, map: FunctionScope.(KtNamedFunction) -> String): ExtensionPhase.SyntheticResolver =
     syntheticResolver(
       generateSyntheticMethods = { classdescriptor, name, bindingContext, fromSupertypes, result ->
         if (result.isNotEmpty()) {
@@ -371,8 +389,14 @@ interface MetaComponentRegistrar : ComponentRegistrar {
             if (namedFunction.nameAsName == FunctionScope.name) {
               val originalFunction: KtNamedFunction? = descriptor.findPsi() as? KtNamedFunction
               if (originalFunction != null) {
-                val transformation = map(FunctionScope, originalFunction)
-                descriptor to descriptor.declaration(transformation)
+                val transformationTemplate = map(FunctionScope, originalFunction)
+                val transformation = ktPsiElementFactory.createFunction(transformationTemplate)
+                val appliedTransformation = update(descriptor, transformation)
+                val result = descriptor to descriptor.declaration(componentProvider.get(), componentProvider.get(), bindingTrace,
+                  LexicalScopeImpl(ImportingScope.Empty, descriptor, true, null, LexicalScopeKind.FUNCTION_INNER_SCOPE)
+                  , appliedTransformation)
+                println("intercepted: $result")
+                result
               } else null
             } else null
           }
@@ -382,33 +406,59 @@ interface MetaComponentRegistrar : ComponentRegistrar {
       }
     )
 
-  fun SimpleFunctionDescriptor.declaration(transformation: KtNamedFunction): SimpleFunctionDescriptor =
+  fun SimpleFunctionDescriptor.declaration(
+    annotationResolver: AnnotationResolver,
+    storageManager: StorageManager,
+    trace: BindingTrace,
+    scope: LexicalScope,
+    transformation: KtNamedFunction
+  ): SimpleFunctionDescriptor =
     SimpleFunctionDescriptorImpl.create(
       containingDeclaration,
-      Annotations.EMPTY,
-      transformation.name?.let(Name::identifier) ?: name,
+      Annotations.create(transformation.annotations.flatMap { ktAnnotation ->
+        ktAnnotation.entries.map { ktAnnotationEntry ->
+          LazyAnnotationDescriptor(LazyAnnotationsContextImpl(annotationResolver, storageManager, trace, scope), ktAnnotationEntry)
+        }
+      }),
+      transformation.nameAsSafeName,
       kind,
       KotlinSourceElement(transformation)
     ).run {
       initialize(
         extensionReceiverParameter,
-        extensionReceiverParameter,
-        transformation.typeParameters.map {
+        dispatchReceiverParameter,
+        transformation.typeParameters.map { ktTypeParameter ->
           TypeParameterDescriptorImpl.createWithDefaultBound(
             this,
-            Annotations.it.annotations.map {
-              AnnotationDescriptorImpl(
-
-              )
-            },
-            it.
+            Annotations.create(ktTypeParameter.annotationEntries.map { ktAnnotationEntry ->
+              LazyAnnotationDescriptor(LazyAnnotationsContextImpl(annotationResolver, storageManager, trace, scope), ktAnnotationEntry)
+            }),
+            false,
+            ktTypeParameter.variance,
+            ktTypeParameter.nameAsSafeName,
+            ktTypeParameter.parameterIndex()
           )
         },
-        transformation.valueParameterList,
-        transformation.returnType,
-        transformation.modalityModifierType(),
-        transformation.visibilityModifierTypeOrDefault(),
-        null
+        transformation.valueParameters.map { ktParameter ->
+          ValueParameterDescriptorImpl(
+            containingDeclaration = this,
+            original = null,
+            index = ktParameter.parameterIndex(),
+            annotations = Annotations.create(ktParameter.annotationEntries.map { ktAnnotationEntry ->
+              LazyAnnotationDescriptor(LazyAnnotationsContextImpl(annotationResolver, storageManager, trace, scope), ktAnnotationEntry)
+            }),
+            name = ktParameter.nameAsSafeName,
+            outType = ktParameter.kotlinType(trace.bindingContext)!!,
+            declaresDefaultValue = ktParameter.defaultValue != null,
+            isCrossinline = false,
+            isNoinline = false,
+            varargElementType = null,
+            source = KotlinSourceElement(ktParameter)
+          )
+        },
+        returnType,
+        modality,
+        visibility
       )
     }
 
@@ -898,6 +948,19 @@ interface MetaComponentRegistrar : ComponentRegistrar {
       })
   }
 
+}
+
+private fun CompilerContext.update(
+  descriptor: SimpleFunctionDescriptor,
+  transformation: KtNamedFunction
+): KtNamedFunction {
+  val source: KotlinSourceElement = descriptor.source as KotlinSourceElement
+  val original = source.psi as KtNamedFunction
+  val result = original as KtNamedFunction
+  if (transformation.nameAsSafeName != MetaComponentRegistrar.FunctionScope.name && result.name != transformation.name) {
+    result.setName(transformation.nameAsSafeName.asString())
+  }
+  return result
 }
 
 internal class NewMethodClassBuilder(

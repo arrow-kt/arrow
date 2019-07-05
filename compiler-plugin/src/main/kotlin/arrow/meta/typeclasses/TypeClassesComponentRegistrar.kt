@@ -4,13 +4,8 @@ import arrow.meta.extensions.CompilerContext
 import arrow.meta.extensions.ExtensionPhase
 import arrow.meta.extensions.MetaComponentRegistrar
 import arrow.meta.higherkind.buildIrValueParameter
-import arrow.meta.utils.MetaBodyResolver
-import arrow.meta.utils.MetaCallResolver
 import org.jetbrains.kotlin.backend.common.BackendContext
 import org.jetbrains.kotlin.backend.common.serialization.irrelevantOrigin
-import org.jetbrains.kotlin.container.StorageComponentContainer
-import org.jetbrains.kotlin.container.registerSingleton
-import org.jetbrains.kotlin.container.useImpl
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.Modality
@@ -23,11 +18,9 @@ import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.impl.IrClassImpl
 import org.jetbrains.kotlin.ir.symbols.impl.IrClassSymbolImpl
 import org.jetbrains.kotlin.ir.types.impl.IrSimpleTypeImpl
-import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.name.SpecialNames
-import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.synthetics.SyntheticClassOrObjectDescriptor
 import org.jetbrains.kotlin.resolve.descriptorUtil.getSuperInterfaces
 import org.jetbrains.kotlin.resolve.lazy.LazyClassContext
@@ -43,9 +36,9 @@ class TypeClassesComponentRegistrar : MetaComponentRegistrar {
     meta(
       enableIr(),
       func({
-        "fun <$typeArguments> foo($valueParameters): Unit = $body"
+        "fun <$typeArgs> $name($params): $returnType = $body"
       }) { fn ->
-        "fun <$typeArguments> foo(): Unit = $body"
+        "fun <$typeArgs> $name($params): $returnType = $body"
       },
 //      storageComponent(
 //        registerModuleComponents = { container: StorageComponentContainer, platform, moduleDescriptor ->
