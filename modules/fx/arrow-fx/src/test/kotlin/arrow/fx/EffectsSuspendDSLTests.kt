@@ -31,6 +31,9 @@ import java.util.concurrent.atomic.AtomicReference
 @RunWith(KotlinTestRunner::class)
 class EffectsSuspendDSLTests : UnitSpec() {
 
+  private val ctxA = newSingleThreadContext("A")
+  private val ctxB = newSingleThreadContext("B")
+
   init {
 
     /**
@@ -69,6 +72,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
     "Direct syntax for concurrent operations" {
       val textContext = newCountingThreadFactory("test", 4) // We fork 4x in the test below, so this is the size of our pool.
         .asCoroutineContext()
+
       suspend fun getThreadName(): String = Thread.currentThread().name
 
       val program = IO.fx {
@@ -195,9 +199,9 @@ class EffectsSuspendDSLTests : UnitSpec() {
     "continueOn" {
       fxTest {
         IO.fx {
-          continueOn(newSingleThreadContext("A"))
+          continueOn(ctxA)
           val contextA = !effect { Thread.currentThread().name }
-          continueOn(newSingleThreadContext("B"))
+          continueOn(ctxB)
           val contextB = !effect { Thread.currentThread().name }
           contextA != contextB
         }
@@ -207,8 +211,8 @@ class EffectsSuspendDSLTests : UnitSpec() {
     "CoroutineContext.defer" {
       fxTest {
         IO.fx {
-          val contextA = !effect(newSingleThreadContext("A")) { Thread.currentThread().name }
-          val contextB = !effect(newSingleThreadContext("B")) { Thread.currentThread().name }
+          val contextA = !effect(ctxA) { Thread.currentThread().name }
+          val contextB = !effect(ctxB) { Thread.currentThread().name }
           contextA != contextB
         }
       } shouldBe true
