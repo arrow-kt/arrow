@@ -1,4 +1,4 @@
-package arrow.mtl.extensions
+package arrow.core.extensions
 
 import arrow.Kind
 import arrow.core.ForTry

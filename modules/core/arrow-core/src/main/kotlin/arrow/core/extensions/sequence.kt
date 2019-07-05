@@ -3,10 +3,11 @@ package arrow.core.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
-import arrow.core.Tuple2
 import arrow.core.ForSequenceK
+import arrow.core.Option
 import arrow.core.SequenceK
 import arrow.core.SequenceKOf
+import arrow.core.Tuple2
 import arrow.core.extensions.sequencek.monad.map
 import arrow.core.extensions.sequencek.monad.monad
 import arrow.core.fix
@@ -17,6 +18,7 @@ import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
+import arrow.typeclasses.FunctorFilter
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadSyntax
@@ -172,6 +174,15 @@ interface SequenceKHash<A> : Hash<SequenceK<A>>, SequenceKEq<A> {
   override fun SequenceK<A>.hash(): Int = foldLeft(1) { hash, a ->
     31 * hash + HA().run { a.hash() }
   }
+}
+
+@extension
+interface SequenceKFunctorFilter : FunctorFilter<ForSequenceK> {
+  override fun <A, B> Kind<ForSequenceK, A>.mapFilter(f: (A) -> Option<B>): SequenceK<B> =
+    fix().mapFilter(f)
+
+  override fun <A, B> Kind<ForSequenceK, A>.map(f: (A) -> B): SequenceK<B> =
+    fix().map(f)
 }
 
 fun <A> SequenceK.Companion.fx(c: suspend MonadSyntax<ForSequenceK>.() -> A): SequenceK<A> =
