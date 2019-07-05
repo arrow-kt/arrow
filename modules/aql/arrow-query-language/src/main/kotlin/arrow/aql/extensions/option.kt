@@ -15,7 +15,7 @@ import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.option.foldable.foldable
 import arrow.core.extensions.option.functor.functor
 import arrow.mtl.extensions.option.functorFilter.functorFilter
-import arrow.mtl.typeclasses.FunctorFilter
+import arrow.typeclasses.FunctorFilter
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor

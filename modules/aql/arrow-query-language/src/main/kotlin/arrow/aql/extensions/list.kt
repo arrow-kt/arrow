@@ -15,7 +15,7 @@ import arrow.core.extensions.listk.applicative.applicative
 import arrow.core.extensions.listk.foldable.foldable
 import arrow.core.extensions.listk.functor.functor
 import arrow.mtl.extensions.listk.functorFilter.functorFilter
-import arrow.mtl.typeclasses.FunctorFilter
+import arrow.typeclasses.FunctorFilter
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor

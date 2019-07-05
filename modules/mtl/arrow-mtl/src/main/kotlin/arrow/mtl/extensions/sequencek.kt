@@ -9,7 +9,7 @@ import arrow.core.SequenceK
 import arrow.core.SequenceKOf
 import arrow.core.fix
 import arrow.extension
-import arrow.mtl.typeclasses.FunctorFilter
+import arrow.typeclasses.FunctorFilter
 import arrow.mtl.typeclasses.MonadCombine
 import arrow.mtl.typeclasses.MonadFilter
 import arrow.core.combineK as sequenceCombineK

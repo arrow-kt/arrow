@@ -15,7 +15,7 @@ import arrow.core.extensions.sequencek.applicative.applicative
 import arrow.core.extensions.sequencek.foldable.foldable
 import arrow.core.extensions.sequencek.functor.functor
 import arrow.mtl.extensions.sequencek.functorFilter.functorFilter
-import arrow.mtl.typeclasses.FunctorFilter
+import arrow.typeclasses.FunctorFilter
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor

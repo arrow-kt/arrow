@@ -6,7 +6,7 @@ import arrow.core.ForNonEmptyList
 import arrow.core.NonEmptyList
 import arrow.core.fix
 import arrow.extension
-import arrow.mtl.typeclasses.FunctorFilter
+import arrow.typeclasses.FunctorFilter
 
 @extension
 interface NonEmptyListFunctorFilter : FunctorFilter<ForNonEmptyList> {

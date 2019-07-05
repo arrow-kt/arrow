@@ -15,7 +15,7 @@ import arrow.core.extensions.nonemptylist.applicative.applicative
 import arrow.core.extensions.nonemptylist.foldable.foldable
 import arrow.core.extensions.nonemptylist.functor.functor
 import arrow.mtl.extensions.nonemptylist.functorFilter.functorFilter
-import arrow.mtl.typeclasses.FunctorFilter
+import arrow.typeclasses.FunctorFilter
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
