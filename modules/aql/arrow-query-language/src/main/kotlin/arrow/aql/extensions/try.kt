@@ -14,8 +14,8 @@ import arrow.extension
 import arrow.core.extensions.`try`.applicative.applicative
 import arrow.core.extensions.`try`.foldable.foldable
 import arrow.core.extensions.`try`.functor.functor
-import arrow.mtl.extensions.`try`.functorFilter.functorFilter
-import arrow.mtl.typeclasses.FunctorFilter
+import arrow.core.extensions.`try`.functorFilter.functorFilter
+import arrow.typeclasses.FunctorFilter
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor

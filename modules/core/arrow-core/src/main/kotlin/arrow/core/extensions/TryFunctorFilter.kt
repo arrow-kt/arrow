@@ -1,4 +1,4 @@
-package arrow.mtl.extensions
+package arrow.core.extensions
 
 import arrow.Kind
 import arrow.core.ForTry
@@ -6,7 +6,7 @@ import arrow.core.Option
 import arrow.core.Try
 import arrow.core.fix
 import arrow.extension
-import arrow.mtl.typeclasses.FunctorFilter
+import arrow.typeclasses.FunctorFilter
 
 @extension
 interface TryFunctorFilter : FunctorFilter<ForTry> {

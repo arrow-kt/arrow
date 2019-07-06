@@ -2,6 +2,7 @@ package arrow.mtl.typeclasses
 
 import arrow.Kind
 import arrow.core.Option
+import arrow.typeclasses.FunctorFilter
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadFx
 import kotlin.coroutines.startCoroutine

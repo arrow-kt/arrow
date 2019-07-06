@@ -14,7 +14,7 @@ import arrow.core.extensions.eq
 import arrow.core.extensions.hash
 import arrow.core.extensions.monoid
 import arrow.core.extensions.semigroup
-import arrow.mtl.extensions.`try`.functorFilter.functorFilter
+import arrow.core.extensions.`try`.functorFilter.functorFilter
 import arrow.test.UnitSpec
 import arrow.test.generators.`try`
 import arrow.test.laws.FunctorFilterLaws

@@ -24,6 +24,7 @@ import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
+import arrow.typeclasses.FunctorFilter
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadSyntax
@@ -289,6 +290,15 @@ interface OptionHash<A> : Hash<Option<A>>, OptionEq<A> {
   }, {
     HA().run { it.hash() }
   })
+}
+
+@extension
+interface OptionFunctorFilter : FunctorFilter<ForOption> {
+  override fun <A, B> Kind<ForOption, A>.mapFilter(f: (A) -> Option<B>): Option<B> =
+    fix().mapFilter(f)
+
+  override fun <A, B> Kind<ForOption, A>.map(f: (A) -> B): Option<B> =
+    fix().map(f)
 }
 
 fun <A> Option.Companion.fx(c: suspend MonadSyntax<ForOption>.() -> A): Option<A> =
