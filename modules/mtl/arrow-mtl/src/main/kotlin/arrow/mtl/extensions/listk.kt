@@ -9,7 +9,6 @@ import arrow.core.ListK
 import arrow.core.ListKOf
 import arrow.core.fix
 import arrow.extension
-import arrow.mtl.typeclasses.FunctorFilter
 import arrow.mtl.typeclasses.MonadCombine
 import arrow.mtl.typeclasses.MonadFilter
 import arrow.core.combineK as listCombineK
@@ -42,15 +41,6 @@ interface ListKMonadCombine : MonadCombine<ForListK> {
 
   override fun <A> Kind<ForListK, A>.combineK(y: Kind<ForListK, A>): ListK<A> =
     fix().listCombineK(y)
-}
-
-@extension
-interface ListKFunctorFilter : FunctorFilter<ForListK> {
-  override fun <A, B> Kind<ForListK, A>.mapFilter(f: (A) -> Option<B>): ListK<B> =
-    fix().mapFilter(f)
-
-  override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B> =
-    fix().map(f)
 }
 
 @extension

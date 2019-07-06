@@ -1,11 +1,11 @@
 package arrow.optics.extensions
 
 import arrow.Kind
+import arrow.core.SequenceK
+import arrow.core.k
 import arrow.core.left
 import arrow.core.right
 import arrow.core.toT
-import arrow.core.SequenceK
-import arrow.core.k
 import arrow.extension
 import arrow.optics.Optional
 import arrow.optics.POptional
