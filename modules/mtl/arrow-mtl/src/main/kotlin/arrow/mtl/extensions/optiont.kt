@@ -39,7 +39,7 @@ import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.MonoidK
 import arrow.typeclasses.ComposedTraverse
 import arrow.typeclasses.SemigroupK
-import arrow.mtl.typeclasses.FunctorFilter
+import arrow.typeclasses.FunctorFilter
 import arrow.mtl.typeclasses.TraverseFilter
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Functor

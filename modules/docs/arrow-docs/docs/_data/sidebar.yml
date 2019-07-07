@@ -9,6 +9,9 @@ options:
       - title: Libraries
         url: /docs/quickstart/libraries/
 
+      - title: Linting
+        url: /docs/quickstart/linting/
+
       - title: Blogs & Presentations
         url: /blog/
 

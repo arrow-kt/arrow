@@ -84,7 +84,7 @@ println(result)
 In order to activate [`where`]() statement we need to provide an instance for the `FunctorFilter` type class and the `Where` type class:
 
 ```kotlin
-import arrow.mtl.typeclasses.FunctorFilter
+import arrow.typeclasses.FunctorFilter
 import arrow.aql.box.functor.functorFilter
 
 @extension
