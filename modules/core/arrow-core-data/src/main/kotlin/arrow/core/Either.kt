@@ -109,7 +109,6 @@ import arrow.higherkind
  * Using exception-throwing code, we could write something like this:
  *
  * ```kotlin
- * // Exception Style
  *
  * fun parse(s: String): Int =
  *   if (s.matches(Regex("-?[0-9]+"))) s.toInt()

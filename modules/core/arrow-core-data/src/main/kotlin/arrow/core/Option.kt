@@ -30,20 +30,9 @@ import arrow.higherkind
  * }
  * ```
  *
- * ```kotlin:ank:playground
- * import arrow.core.*
- * fun noneOption(): Option<String> =
- * //sampleStart
- *   None
- * //sampleEnd
- * fun main() {
- *  println(noneOption())
- * }
- * ```
- *
  * Let's write a function that may or not give us a string, thus returning `Option<String>`:
  *
- * ```kotlin:ank:silent
+ * ```kotlin:ank
  * fun maybeItWillReturnSomething(flag: Boolean): Option<String> =
  *  if (flag) Some("Found value") else None
  * ```
