@@ -23,6 +23,7 @@ import arrow.higherkind
  * fun main() {
  *  //sampleStart
  *  val value: Option<String> = Some("I am wrapped in something")
+ *  val emptyValue: Option<String> = none()
  *  //sampleEnd
  *  println("value = $value")
  * }
