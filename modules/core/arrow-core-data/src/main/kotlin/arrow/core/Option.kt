@@ -26,6 +26,7 @@ import arrow.higherkind
  *  val emptyValue: Option<String> = none()
  *  //sampleEnd
  *  println("value = $value")
+ *  println(emptyValue)
  * }
  * ```
  *
