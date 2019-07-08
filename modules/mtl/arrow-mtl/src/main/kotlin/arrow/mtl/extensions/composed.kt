@@ -2,7 +2,7 @@ package arrow.mtl.extensions
 
 import arrow.Kind
 import arrow.core.Option
-import arrow.mtl.typeclasses.FunctorFilter
+import arrow.typeclasses.FunctorFilter
 import arrow.mtl.typeclasses.TraverseFilter
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ComposedFunctor

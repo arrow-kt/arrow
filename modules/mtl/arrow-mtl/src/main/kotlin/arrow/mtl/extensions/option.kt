@@ -10,7 +10,6 @@ import arrow.core.Tuple2
 import arrow.core.fix
 import arrow.core.orElse
 import arrow.extension
-import arrow.mtl.typeclasses.FunctorFilter
 import arrow.mtl.typeclasses.MonadCombine
 import arrow.mtl.typeclasses.MonadFilter
 import arrow.mtl.typeclasses.TraverseFilter
@@ -46,15 +45,6 @@ interface OptionMonadCombine : MonadCombine<ForOption> {
 
   override fun <A> Kind<ForOption, A>.combineK(y: Kind<ForOption, A>): Option<A> =
     orElse { y.fix() }
-}
-
-@extension
-interface OptionFunctorFilter : FunctorFilter<ForOption> {
-  override fun <A, B> Kind<ForOption, A>.mapFilter(f: (A) -> Option<B>): Option<B> =
-    fix().mapFilter(f)
-
-  override fun <A, B> Kind<ForOption, A>.map(f: (A) -> B): Option<B> =
-    fix().map(f)
 }
 
 @extension

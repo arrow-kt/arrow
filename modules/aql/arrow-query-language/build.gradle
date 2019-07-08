@@ -3,7 +3,6 @@ apply plugin: 'kotlin-kapt'
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     compile project(':arrow-annotations')
-    compile project(':arrow-mtl')
     compile project(':arrow-core')
     kapt project(':arrow-meta')
     kaptTest project(':arrow-meta')

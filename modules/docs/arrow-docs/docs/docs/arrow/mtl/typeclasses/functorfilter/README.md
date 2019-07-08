@@ -15,11 +15,11 @@ advanced
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.mtl.typeclasses.FunctorFilter
+import arrow.typeclasses.FunctorFilter
 
 TypeClass(FunctorFilter::class).dtMarkdownList()
 ```
 
-ank_macro_hierarchy(arrow.mtl.typeclasses.FunctorFilter)
+ank_macro_hierarchy(arrow.typeclasses.FunctorFilter)
 
 TODO. Meanwhile you can find a short description in the [intro to typeclasses]({{ '/docs/typeclasses/intro/' | relative_url }}).

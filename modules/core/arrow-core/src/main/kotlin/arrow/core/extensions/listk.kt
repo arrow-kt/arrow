@@ -7,6 +7,7 @@ import arrow.core.Tuple2
 import arrow.core.ForListK
 import arrow.core.ListK
 import arrow.core.ListKOf
+import arrow.core.Option
 import arrow.core.k
 import arrow.core.extensions.listk.monad.monad
 import arrow.core.fix
@@ -16,6 +17,7 @@ import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
+import arrow.typeclasses.FunctorFilter
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadSyntax
@@ -183,6 +185,15 @@ interface ListKHash<A> : Hash<ListKOf<A>>, ListKEq<A> {
   override fun ListKOf<A>.hash(): Int = fix().foldLeft(1) { hash, a ->
     31 * hash + HA().run { a.hash() }
   }
+}
+
+@extension
+interface ListKFunctorFilter : FunctorFilter<ForListK> {
+  override fun <A, B> Kind<ForListK, A>.mapFilter(f: (A) -> Option<B>): ListK<B> =
+    fix().mapFilter(f)
+
+  override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B> =
+    fix().map(f)
 }
 
 fun <A> ListK.Companion.fx(c: suspend MonadSyntax<ForListK>.() -> A): ListK<A> =

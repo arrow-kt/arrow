@@ -8,6 +8,7 @@ import arrow.core.Some
 import arrow.core.extensions.id.applicative.applicative
 import arrow.core.value
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.FunctorFilter
 import arrow.typeclasses.Traverse
 
 /**
