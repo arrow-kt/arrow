@@ -19,78 +19,104 @@ import arrow.higherkind
  * `Option<A>` is a container for an optional value of type `A`. If the value of type `A` is present, the `Option<A>` is an instance of `Some<A>`, containing the present value of type `A`. If the value is absent, the `Option<A>` is the object `None`.
  *
  * ```kotlin:ank:playground
- * import arrow.core.*
+ * import arrow.core.Option
+ * import arrow.core.Some
+ * import arrow.core.none
+ *
+ * //sampleStart
+ * val value: Option<String> = Some("I am wrapped in something")
+ * val emptyValue: Option<String> = none()
+ * //sampleEnd
+ *
  * fun main() {
- *  //sampleStart
- *  val value: Option<String> = Some("I am wrapped in something")
- *  val emptyValue: Option<String> = none()
- *  //sampleEnd
  *  println("value = $value")
- *  println(emptyValue)
+ *  println("emptyValue = $emptyValue")
  * }
  * ```
  *
  * Let's write a function that may or not give us a string, thus returning `Option<String>`:
  *
  * ```kotlin:ank
+ * import arrow.core.None
+ * import arrow.core.Option
+ * import arrow.core.Some
+ *
+ * //sampleStart
  * fun maybeItWillReturnSomething(flag: Boolean): Option<String> =
  *  if (flag) Some("Found value") else None
+ * //sampleEnd
  * ```
  *
  * Using `getOrElse` we can provide a default value `"No value"` when the optional argument `None` does not exist:
  *
  * ```kotlin:ank:playground
- * import arrow.core.*
+ * import arrow.core.None
+ * import arrow.core.Option
+ * import arrow.core.Some
+ * import arrow.core.getOrElse
+ *
  * fun maybeItWillReturnSomething(flag: Boolean): Option<String> =
  *  if (flag) Some("Found value") else None
  *
- *  fun main() {
- * //sampleStart
- *  val option = maybeItWillReturnSomething(true)
+ *  //sampleStart
+ * val option = maybeItWillReturnSomething(true)
  *    .getOrElse { "No value" }
  * //sampleEnd
- *   println("option = option")
+ * fun main() {
+ *  println("option = $option")
  * }
  * ```
  *
  * ```kotlin:ank:playground
- * import arrow.core.*
+ * import arrow.core.None
+ * import arrow.core.Option
+ * import arrow.core.Some
+ * import arrow.core.getOrElse
+ *
  * fun maybeItWillReturnSomething(flag: Boolean): Option<String> =
  *  if (flag) Some("Found value") else None
  *
- * fun main() {
  * //sampleStart
- *  val option = maybeItWillReturnSomething(false)
+ * val option = maybeItWillReturnSomething(false)
  *  .getOrElse { "No value" }
  * //sampleEnd
- *  println("option = option")
+ *
+ * fun main() {
+ *  println("option = $option")
  * }
  * ```
  *
  * Checking whether option has value:
  *
  * ```kotlin:ank:playground
- * import arrow.core.*
+ * import arrow.core.None
+ * import arrow.core.Option
+ * import arrow.core.Some
+ *
  * fun maybeItWillReturnSomething(flag: Boolean): Option<String> =
  *  if (flag) Some("Found value") else None
- * fun main() {
- * //sampleStart
- *  val valueSome = maybeItWillReturnSomething(true) is None
- *  val valueNone = maybeItWillReturnSomething(false) is None
+ *
+ *  //sampleStart
+ * val valueSome = maybeItWillReturnSomething(true) is None
+ * val valueNone = maybeItWillReturnSomething(false) is None
  * //sampleEnd
- *  println(valueSome)
- *  println(valueNone)
+ *
+ * fun main() {
+ *  println("valueSome = $valueSome")
+ *  println("valueNone = $valueNone")
  * }
  * ```
  * Creating a `Option<T>` of a `T?`. Useful for working with values that can be nullable:
  *
  * ```kotlin:ank:playground
- * import arrow.core.*
- * fun main () {
+ * import arrow.core.Option
+ *
  * //sampleStart
- *  val myString: String? = "Nullable string"
- *  val option: Option<String> = Option.fromNullable(myString)
+ * val myString: String? = "Nullable string"
+ * val option: Option<String> = Option.fromNullable(myString)
  * //sampleEnd
+ *
+ * fun main () {
  *  println("option = $option")
  * }
  * ```
@@ -98,30 +124,38 @@ import arrow.higherkind
  * Option can also be used with when statements:
  *
  * ```kotlin:ank:playground
- * import arrow.core.*
- * fun main () {
+ * import arrow.core.None
+ * import arrow.core.Option
+ * import arrow.core.Some
+ *
  * //sampleStart
- *   val someValue: Option<Double> = Some(20.0)
- *   val value = when(someValue) {
- *    is Some -> someValue.t
- *    is None -> 0.0
- *  }
+ * val someValue: Option<Double> = Some(20.0)
+ * val value = when(someValue) {
+ *  is Some -> someValue.t
+ *  is None -> 0.0
+ * }
  * //sampleEnd
- * println("value = $value")
+ *
+ * fun main () {
+ *  println("value = $value")
  * }
  * ```
  *
  * ```kotlin:ank:playground
- * import arrow.core.*
- * fun main () {
+ * import arrow.core.None
+ * import arrow.core.Option
+ * import arrow.core.Some
+ *
  * //sampleStart
- *   val noValue: Option<Double> = None
- *   val value = when(noValue) {
- *    is Some -> noValue.t
- *    is None -> 0.0
- *  }
- *  //sampleEnd
- * println("value = $value")
+ * val noValue: Option<Double> = None
+ * val value = when(noValue) {
+ *  is Some -> noValue.t
+ *  is None -> 0.0
+ * }
+ * //sampleEnd
+ *
+ * fun main () {
+ *  println("value = $value")
  * }
  * ```
  *
@@ -130,14 +164,18 @@ import arrow.higherkind
  * One of these operations is `map`. This operation allows us to map the inner value to a different type while preserving the option:
  *
  * ```kotlin:ank:playground
- * import arrow.core.*
- * fun main () {
+ * import arrow.core.None
+ * import arrow.core.Option
+ * import arrow.core.Some
+ *
  * //sampleStart
- *  val number: Option<Int> = Some(3)
- *  val noNumber: Option<Int> = None
- *  val mappedResult1 = number.map { it * 1.5 }
- *  val mappedResult2 = noNumber.map { it * 1.5 }
- *  //sampleEnd
+ * val number: Option<Int> = Some(3)
+ * val noNumber: Option<Int> = None
+ * val mappedResult1 = number.map { it * 1.5 }
+ * val mappedResult2 = noNumber.map { it * 1.5 }
+ * //sampleEnd
+ *
+ * fun main () {
  *  println("number = $number")
  *  println("noNumber = $noNumber")
  *  println("mappedResult1 = $mappedResult1")
@@ -147,86 +185,94 @@ import arrow.higherkind
  * Another operation is `fold`. This operation will extract the value from the option, or provide a default if the value is `None`
  *
  * ```kotlin:ank:playground
- * import arrow.core.*
- * fun main () {
- * val number: Option<Int> = Some(3)
- * val fold =
+ * import arrow.core.Option
+ * import arrow.core.Some
+ *
  * //sampleStart
- *  number.fold({ 1 }, { it * 3 })
+ * val fold =  Some(3).fold({ 1 }, { it * 3 })
  * //sampleEnd
- *  println(fold)
+ * fun main () {
+ *  println("fold = $fold")
  * }
  * ```
  *
  * ```kotlin:ank:playground
- * import arrow.core.*
- * fun main () {
- * val noNumber: Option<Int> = None
- * val fold =
+ * import arrow.core.Option
+ * import arrow.core.none
+ *
  * //sampleStart
- *  noNumber.fold({ 1 }, { it * 3 })
+ * val fold = none<Int>().fold({ 1 }, { it * 3 })
  * //sampleEnd
- *  println(fold)
+ *
+ * fun main () {
+ *  println("fold = $fold")
  * }
  * ```
  *
  * Arrow also adds syntax to all datatypes so you can easily lift them into the context of `Option` where needed.
  *
  * ```kotlin:ank:playground
- * import arrow.core.*
+ * import arrow.core.some
+ *
+ * //sampleStart
+ * val value = 1.some()
+ * //sampleEnd
+ *
  * fun main () {
- *  val value =
- *  //sampleStart
- *    1.some()
- *  //sampleEnd
- *  println(value)
+ *  println("value = $value")
  * }
  * ```
  *
  * ```kotlin:ank:playground
- * import arrow.core.*
+ * import arrow.core.none
+ *
+ * //sampleStart
+ * val value = none<String>()
+ * //sampleEnd
  * fun main () {
- *  val value =
- *  //sampleStart
- *  none<String>()
- *  //sampleEnd
- *  println(value)
+ *  println("value = $value")
  * }
  * ```
  *
  * ```kotlin:ank:playground
- * import arrow.core.*
+ * import arrow.core.toOption
+ *
+ * //sampleStart
+ * val nullableValue: String? = null
+ * val value = nullableValue.toOption()
+ * //sampleEnd
+ *
  * fun main () {
- *  //sampleStart
- *  val nullableValue: String? = null
- *  val value = nullableValue.toOption()
- *  //sampleEnd
- *  println(value)
+ *  println("value = $value")
  * }
  * ```
  *
  * ```kotlin:ank:playground
- * import arrow.core.*
+ * import arrow.core.toOption
+ *
+ * //sampleStart
+ * val nullableValue: String? = "Hello"
+ * val value = nullableValue.toOption()
+ * //sampleEnd
+ *
  * fun main () {
- *  //sampleStart
- *  val nullableValue: String? = "Hello"
- *  val value = nullableValue.toOption()
- *  //sampleEnd
- *  println(value)
+ *  println("value = $value")
  * }
  * ```
  *
  * Some Iterable extensions are available, so you can maintain a friendly API syntax while avoiding null handling (`firstOrNull()`)
  *
  * ```kotlin:ank:playground
- * import arrow.core.*
- * fun main () {
- *  //sampleStart
- *  val myList: List<Int> = listOf(1,2,3,4)
+ * import arrow.core.firstOrNone
  *
- *  val first4 = myList.firstOrNone { it == 4 }
- *  val first5 = myList.firstOrNone { it == 5 }
- *  //sampleEnd
+ * //sampleStart
+ * val myList: List<Int> = listOf(1,2,3,4)
+ *
+ * val first4 = myList.firstOrNone { it == 4 }
+ * val first5 = myList.firstOrNone { it == 5 }
+ * //sampleEnd
+ *
+ * fun main () {
  *  println("first4 = $first4")
  *  println("first5 = $first5")
  * }
@@ -235,14 +281,17 @@ import arrow.higherkind
  * Sample usage
  *
  * ```kotlin:ank:playground
- * import arrow.core.*
- * fun main() {
- *  //sampleStart
- *  val foxMap = mapOf(1 to "The", 2 to "Quick", 3 to "Brown", 4 to "Fox")
+ * import arrow.core.firstOrNone
+ * import arrow.core.toOption
  *
- *  val ugly = foxMap.entries.firstOrNull { it.key == 5 }?.value.let { it?.toCharArray() }.toOption()
- *  val pretty = foxMap.entries.firstOrNone { it.key == 5 }.map { it.value.toCharArray() }
- *  //sampleEnd
+ * //sampleStart
+ * val foxMap = mapOf(1 to "The", 2 to "Quick", 3 to "Brown", 4 to "Fox")
+ *
+ * val ugly = foxMap.entries.firstOrNull { it.key == 5 }?.value.let { it?.toCharArray() }.toOption()
+ * val pretty = foxMap.entries.firstOrNone { it.key == 5 }.map { it.value.toCharArray() }
+ * //sampleEnd
+ *
+ * fun main() {
  *  println("ugly = $ugly")
  *  println("pretty = $pretty")
  * }
@@ -255,14 +304,14 @@ import arrow.higherkind
  * Transforming the inner contents
  *
  * ```kotlin:ank:playground
- *  import arrow.core.*
- *  fun main() {
- *   val value =
- *   //sampleStart
- *    Some(1).map { it + 1 }
- *   //SampleEnd
- *   println(value)
- *  }
+ * import arrow.core.Some
+ *
+ * fun main() {
+ *  //sampleStart
+ *  val value = Some(1).map { it + 1 }
+ *  //sampleEnd
+ *  println("value = $value")
+ * }
  * ```
  *
  * [Applicative](/docs/arrow/typeclasses/applicative/)
@@ -270,15 +319,15 @@ import arrow.higherkind
  * Computing over independent values
  *
  * ```kotlin:ank:playground
- *  import arrow.core.*
- *  import arrow.core.extensions.option.apply.*
+ * import arrow.core.Some
+ * import arrow.core.extensions.option.apply.tupled
+ *
+ * //sampleStart
+ * val value = tupled(Some(1), Some("Hello"), Some(20.0))
+ * //sampleEnd
  *
  * fun main() {
- *  val value =
- *  //sampleStart
- *  tupled(Some(1), Some("Hello"), Some(20.0))
- *  //sampleEnd
- *  println(value)
+ *  println("value = $value")
  * }
  * ```
  *
@@ -287,38 +336,41 @@ import arrow.higherkind
  * Computing over dependent values ignoring absence
  *
  * ```kotlin:ank:playground
- *  import arrow.core.extensions.fx
- *  import arrow.core.*
+ * import arrow.core.extensions.fx
+ * import arrow.core.Some
+ * import arrow.core.Option
  *
- *  fun main() {
- *  val value =
- *  //sampleStart
- *  Option.fx {
- *   val (a) = Some(1)
- *   val (b) = Some(1 + a)
- *   val (c) = Some(1 + b)
- *   a + b + c
+ * //sampleStart
+ * val value = Option.fx {
+ *  val (a) = Some(1)
+ *  val (b) = Some(1 + a)
+ *  val (c) = Some(1 + b)
+ *  a + b + c
  * }
  * //sampleEnd
- * println(value)
+ *
+ * fun main() {
+ *  println("value = $value")
  * }
  * ```
  *
  * ```kotlin:ank:playground
  * import arrow.core.extensions.fx
- * import arrow.core.*
+ * import arrow.core.Some
+ * import arrow.core.none
+ * import arrow.core.Option
  *
- * fun main() {
- * val value =
  * //sampleStart
- * Option.fx {
+ * val value = Option.fx {
  *  val (x) = none<Int>()
  *  val (y) = Some(1 + x)
  *  val (z) = Some(1 + y)
  *   x + y + z
  * }
  * //sampleEnd
- * println(value)
+ *
+ * fun main() {
+ *  println("value = $value")
  * }
  * ```
  *

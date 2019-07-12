@@ -61,6 +61,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  * import arrow.*
  * import arrow.core.*
  *
+ * //sampleStart
  * abstract class Read<A> {
  *
  * abstract fun read(s: String): Option<A>
@@ -79,6 +80,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  *    }
  *  }
  * }
+ * //sampleEnd
  * ```
  *
  * Then we enumerate our errors—when asking for a config value, one of two things can go wrong:
@@ -107,6 +109,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  *
  * ```kotlin:ank
  * import arrow.core.*
+ * //sampleStart
  * data class Config(val map: Map<String, String>) {
  *  fun <A> parse(read: Read<A>, key: String): Validated<ConfigError, A> {
  *   val v = Option.fromNullable(map[key])
@@ -120,6 +123,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  *   }
  *  }
  * }
+ * //sampleEnd
  * ```
  *
  * Everything is in place to write the parallel validator. Recall that we can only do parallel
@@ -167,7 +171,12 @@ typealias Invalid<E> = Validated.Invalid<E>
  * When no errors are present in the configuration, we get a `ConnectionParams` wrapped in a `Valid` instance.
  *
  * ```kotlin:ank:playground
- * import arrow.core.*
+ * import arrow.core.None
+ * import arrow.core.Option
+ * import arrow.core.Some
+ * import arrow.core.Validated
+ * import arrow.core.valid
+ * import arrow.core.invalid
  *
  * data class ConnectionParams(val url: String, val port: Int)
  *
@@ -218,7 +227,6 @@ typealias Invalid<E> = Validated.Invalid<E>
  *  }
  * }
  *
- * fun main() {
  * //sampleStart
  *  val config = Config(mapOf("url" to "127.0.0.1", "port" to "1337"))
  *
@@ -226,10 +234,12 @@ typealias Invalid<E> = Validated.Invalid<E>
  *  config.parse(Read.stringRead, "url"),
  *  config.parse(Read.intRead, "port")
  *  ) { url, port ->
- *   ConnectionParams(url, port)
+ *    ConnectionParams(url, port)
  * }
  * //sampleEnd
- *  println(valid)
+ *
+ * fun main() {
+ *  println("valid = $valid")
  * }
  * ```
  *
@@ -237,7 +247,12 @@ typealias Invalid<E> = Validated.Invalid<E>
  * an `Invalid` instance.
  *
  * ```kotlin:ank:playground
- * import arrow.core.*
+ * import arrow.core.None
+ * import arrow.core.Option
+ * import arrow.core.Some
+ * import arrow.core.Validated
+ * import arrow.core.valid
+ * import arrow.core.invalid
  *
  * data class ConnectionParams(val url: String, val port: Int)
  *
@@ -288,7 +303,6 @@ typealias Invalid<E> = Validated.Invalid<E>
  *  }
  * }
  *
- * fun main() {
  * //sampleStart
  * val config = Config(mapOf("url" to "127.0.0.1", "port" to "not a number"))
  *
@@ -299,7 +313,9 @@ typealias Invalid<E> = Validated.Invalid<E>
  *   ConnectionParams(url, port)
  *  }
  *  //sampleEnd
- *  println(valid)
+ *
+ * fun main() {
+ *  println("valid = $valid")
  * }
  * ```
  *
@@ -310,7 +326,16 @@ typealias Invalid<E> = Validated.Invalid<E>
  * instance into an Either instance and apply it to a function.
  *
  * ```kotlin:ank:playground
- * import arrow.core.*
+ * import arrow.core.Either
+ * import arrow.core.flatMap
+ * import arrow.core.left
+ * import arrow.core.None
+ * import arrow.core.Option
+ * import arrow.core.right
+ * import arrow.core.Some
+ * import arrow.core.Validated
+ * import arrow.core.valid
+ * import arrow.core.invalid
  *
  * abstract class Read<A> {
  *  abstract fun read(s: String): Option<A>
@@ -353,15 +378,15 @@ typealias Invalid<E> = Validated.Invalid<E>
  *  else ConfigError.ParseConfig(field).left()
  * }
  *
+ * //sampleStart
+ * val config = Config(mapOf("house_number" to "-42"))
+ *
+ * val houseNumber = config.parse(Read.intRead, "house_number").withEither { either ->
+ *  either.flatMap { positive("house_number", it) }
+ * }
+ * //sampleEnd
+ *
  * fun main() {
- *  //sampleStart
- *  val config = Config(mapOf("house_number" to "-42"))
- *
- *
- *  val houseNumber = config.parse(Read.intRead, "house_number").withEither { either ->
- *   either.flatMap { positive("house_number", it) }
- *  }
- *  //sampleEnd
  *  println(houseNumber)
  * }
  *
@@ -372,12 +397,18 @@ typealias Invalid<E> = Validated.Invalid<E>
  * We may use `ApplicativeError` instead of `Validated` to abstract away validation strategies and raising errors in the context we are computing in.
  *
  * ```kotlin:ank
- * import arrow.*
- * import arrow.core.*
- * import arrow.typeclasses.*
- * import arrow.core.extensions.validated.applicativeError.*
- * import arrow.core.extensions.either.applicativeError.*
- * import arrow.core.extensions.nonemptylist.semigroup.*
+ * import arrow.Kind
+ * import arrow.core.Either
+ * import arrow.core.EitherPartialOf
+ * import arrow.core.Nel
+ * import arrow.core.NonEmptyList
+ * import arrow.core.Validated
+ * import arrow.core.ValidatedPartialOf
+ * import arrow.core.nel
+ * import arrow.typeclasses.ApplicativeError
+ * import arrow.core.extensions.validated.applicativeError.applicativeError
+ * import arrow.core.extensions.either.applicativeError.applicativeError
+ * import arrow.core.extensions.nonemptylist.semigroup.semigroup
  *
  * //sampleStart
  * sealed class ValidationError(val msg: String) {
@@ -425,12 +456,18 @@ typealias Invalid<E> = Validated.Invalid<E>
  *  *Error accumulation*
  *
  * ```kotlin:ank:playground
- * import arrow.*
- * import arrow.core.*
- * import arrow.typeclasses.*
- * import arrow.core.extensions.validated.applicativeError.*
- * import arrow.core.extensions.either.applicativeError.*
- * import arrow.core.extensions.nonemptylist.semigroup.*
+ * import arrow.Kind
+ * import arrow.core.Either
+ * import arrow.core.EitherPartialOf
+ * import arrow.core.Nel
+ * import arrow.core.NonEmptyList
+ * import arrow.core.Validated
+ * import arrow.core.ValidatedPartialOf
+ * import arrow.core.nel
+ * import arrow.typeclasses.ApplicativeError
+ * import arrow.core.extensions.validated.applicativeError.applicativeError
+ * import arrow.core.extensions.either.applicativeError.applicativeError
+ * import arrow.core.extensions.nonemptylist.semigroup.semigroup
  *
  * sealed class ValidationError(val msg: String) {
  *  data class DoesNotContain(val value: String) : ValidationError("Did not contain $value")
@@ -467,29 +504,36 @@ typealias Invalid<E> = Validated.Invalid<E>
  *   infix fun <A> accumulateErrors(f: ErrorAccumulationStrategy.() -> A): A = f(ErrorAccumulationStrategy)
  *  }
  * }
- * fun main() {
- *  val value =
+ *
  * //sampleStart
- *  Rules accumulateErrors {
+ * val value = Rules accumulateErrors {
  *   listOf(
  *    FormField("Invalid Email Domain Label", "nowhere.com"),
  *    FormField("Too Long Email Label", "nowheretoolong${(0..251).map { "g" }}"), //this accumulates N errors
  *    FormField("Valid Email Label", "getlost@nowhere.com")
  *   ).map { it.validateEmail() }
  *  }
- *  //sampleEnd
- *  println(value)
+ * //sampleEnd
+ *
+ * fun main() {
+ *  println("value = $value")
  * }
  * ```
  *  *Fail Fast*
  *
  * ```kotlin:ank:playground
- * import arrow.*
- * import arrow.core.*
- * import arrow.typeclasses.*
- * import arrow.core.extensions.validated.applicativeError.*
- * import arrow.core.extensions.either.applicativeError.*
- * import arrow.core.extensions.nonemptylist.semigroup.*
+ * import arrow.Kind
+ * import arrow.core.Either
+ * import arrow.core.EitherPartialOf
+ * import arrow.core.Nel
+ * import arrow.core.NonEmptyList
+ * import arrow.core.Validated
+ * import arrow.core.ValidatedPartialOf
+ * import arrow.core.nel
+ * import arrow.typeclasses.ApplicativeError
+ * import arrow.core.extensions.validated.applicativeError.applicativeError
+ * import arrow.core.extensions.either.applicativeError.applicativeError
+ * import arrow.core.extensions.nonemptylist.semigroup.semigroup
  *
  * sealed class ValidationError(val msg: String) {
  *  data class DoesNotContain(val value: String) : ValidationError("Did not contain $value")
@@ -526,10 +570,9 @@ typealias Invalid<E> = Validated.Invalid<E>
  *   infix fun <A> accumulateErrors(f: ErrorAccumulationStrategy.() -> A): A = f(ErrorAccumulationStrategy)
  *  }
  * }
- * fun main() {
- *  val value =
+ *
  * //sampleStart
- *  Rules failFast {
+ * val value =Rules failFast {
  *   listOf(
  *    FormField("Invalid Email Domain Label", "nowhere.com"),
  *    FormField("Too Long Email Label", "nowheretoolong${(0..251).map { "g" }}"), //this fails fast
@@ -537,7 +580,9 @@ typealias Invalid<E> = Validated.Invalid<E>
  *   ).map { it.validateEmail() }
  *  }
  * //sampleEnd
- * println(value)
+ *
+ * fun main() {
+ *  println("value = $value")
  * }
  * ```
  *

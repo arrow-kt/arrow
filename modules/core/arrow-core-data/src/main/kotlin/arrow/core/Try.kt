@@ -60,35 +60,41 @@ typealias Success<A> = Try.Success<A>
  * class AuthorizationException: GeneralException()
  *
  * fun checkPermissions() {
- * throw AuthorizationException()
+ *  throw AuthorizationException()
  * }
  *
  * fun getLotteryNumbersFromCloud(): List<String> {
- * throw NoConnectionException()
+ *  throw NoConnectionException()
  * }
  *
  * fun getLotteryNumbers(): List<String> {
- * checkPermissions()
+ *  checkPermissions()
  *
- * return getLotteryNumbersFromCloud()
+ *  return getLotteryNumbersFromCloud()
  * }
+ *
+ * fun exceptionExample() {
+ *  //sampleStart
+ *  try {
+ *    getLotteryNumbers()
+ *  } catch (e: NoConnectionException) {
+ *    println("No Connection Exception")
+ *  } catch (e: AuthorizationException) {
+ *    println("Authorization Exception")
+ *  }
+ *  //sampleEnd
+ * }
+ *
  * fun main() {
- * //sampleStart
- * try {
- *  getLotteryNumbers()
- * } catch (e: NoConnectionException) {
- *  println("No Connection Exception")
- * } catch (e: AuthorizationException) {
- *  println("Authorization Exception")
- * }
- * //sampleEnd
+ *  exceptionExample()
  * }
  * ```
  *
  * However, we could use `Try` to retrieve the computation result in a much cleaner way:
  *
  * ```kotlin:ank:playground
- * import arrow.core.*
+ * import arrow.core.Try
+ *
  * open class GeneralException: Exception()
  *
  * class NoConnectionException: GeneralException()
@@ -96,31 +102,34 @@ typealias Success<A> = Try.Success<A>
  * class AuthorizationException: GeneralException()
  *
  * fun checkPermissions() {
- * throw AuthorizationException()
+ *  throw AuthorizationException()
  * }
  *
  * fun getLotteryNumbersFromCloud(): List<String> {
- * throw NoConnectionException()
+ *  throw NoConnectionException()
  * }
  *
  * fun getLotteryNumbers(): List<String> {
- * checkPermissions()
+ *  checkPermissions()
  *
- * return getLotteryNumbersFromCloud()
+ *  return getLotteryNumbersFromCloud()
  * }
- * fun main() {
- * val lotteryTry =
+ *
  * //sampleStart
- *  Try { getLotteryNumbers() }
+ * val lotteryTry = Try { getLotteryNumbers() }
  * //sampleEnd
- * println(lotteryTry)
+ *
+ * fun main() {
+ *  println("lotteryTry = $lotteryTry")
  * }
  * ```
  *
  * By using `getOrDefault` we can give a default value to return, when the computation fails, similar to what we can also do with `Option` when there is no value:
  *
  * ```kotlin:ank:playground
- * import arrow.core.*
+ * import arrow.core.Try
+ * import arrow.core.getOrDefault
+ *
  * open class GeneralException: Exception()
  *
  * class NoConnectionException: GeneralException()
@@ -128,32 +137,35 @@ typealias Success<A> = Try.Success<A>
  * class AuthorizationException: GeneralException()
  *
  * fun checkPermissions() {
- * throw AuthorizationException()
+ *  throw AuthorizationException()
  * }
  *
  * fun getLotteryNumbersFromCloud(): List<String> {
- * throw NoConnectionException()
+ *  throw NoConnectionException()
  * }
  *
  * fun getLotteryNumbers(): List<String> {
- * checkPermissions()
+ *  checkPermissions()
  *
- * return getLotteryNumbersFromCloud()
+ *  return getLotteryNumbersFromCloud()
  * }
- * fun main() {
+ *
  * val lotteryTry = Try { getLotteryNumbers() }
- * val value =
  * //sampleStart
- * lotteryTry.getOrDefault { emptyList() }
+ * val value = lotteryTry.getOrDefault { emptyList() }
  * //sampleEnd
- * println(value)
+ *
+ * fun main() {
+ *  println("value = $value")
  * }
  * ```
  *
  * If the underlying failure is useful to determine the default value, `getOrElse` can be used:
  *
  * ```kotlin:ank:playground
- * import arrow.core.*
+ * import arrow.core.Try
+ * import arrow.core.getOrElse
+ *
  * open class GeneralException: Exception()
  *
  * class NoConnectionException: GeneralException()
@@ -161,32 +173,35 @@ typealias Success<A> = Try.Success<A>
  * class AuthorizationException: GeneralException()
  *
  * fun checkPermissions() {
- * throw AuthorizationException()
+ *  throw AuthorizationException()
  * }
  *
  * fun getLotteryNumbersFromCloud(): List<String> {
- * throw NoConnectionException()
+ *  throw NoConnectionException()
  * }
  *
  * fun getLotteryNumbers(): List<String> {
- * checkPermissions()
+ *  checkPermissions()
  *
- * return getLotteryNumbersFromCloud()
+ *  return getLotteryNumbersFromCloud()
  * }
- * fun main() {
+ *
  * val lotteryTry = Try { getLotteryNumbers() }
- * val value =
  * //sampleStart
- * lotteryTry.getOrElse { ex: Throwable -> emptyList() }
+ * val value = lotteryTry.getOrElse { ex: Throwable -> emptyList() }
  * //sampleEnd
- * println(value)
+ *
+ * fun main() {
+ *  println("value = $value")
  * }
  * ```
  *
  * `getOrElse` can generally be used anywhere `getOrDefault` is used, ignoring the exception if it's not needed:
  *
  * ```kotlin:ank:playground
- * import arrow.core.*
+ * import arrow.core.Try
+ * import arrow.core.getOrElse
+ *
  * open class GeneralException: Exception()
  *
  * class NoConnectionException: GeneralException()
@@ -194,32 +209,34 @@ typealias Success<A> = Try.Success<A>
  * class AuthorizationException: GeneralException()
  *
  * fun checkPermissions() {
- * throw AuthorizationException()
+ *  throw AuthorizationException()
  * }
  *
  * fun getLotteryNumbersFromCloud(): List<String> {
- * throw NoConnectionException()
+ *  throw NoConnectionException()
  * }
  *
  * fun getLotteryNumbers(): List<String> {
- * checkPermissions()
+ *  checkPermissions()
  *
- * return getLotteryNumbersFromCloud()
+ *  return getLotteryNumbersFromCloud()
  * }
- * fun main() {
+ *
  * val lotteryTry = Try { getLotteryNumbers() }
- * val value =
  * //sampleStart
- * lotteryTry.getOrElse { emptyList() }
+ * val value = lotteryTry.getOrElse { emptyList() }
  * //sampleEnd
- * println(value)
+ *
+ * fun main() {
+ *  println("value = $value")
  * }
  * ```
  *
  * If you want to perform a check on a possible success, you can use `filter` to convert successful computations in failures if conditions aren't met:
  *
  * ```kotlin:ank:playground
- * import arrow.core.*
+ * import arrow.core.Try
+ *
  * open class GeneralException: Exception()
  *
  * class NoConnectionException: GeneralException()
@@ -227,34 +244,37 @@ typealias Success<A> = Try.Success<A>
  * class AuthorizationException: GeneralException()
  *
  * fun checkPermissions() {
- * throw AuthorizationException()
+ *  throw AuthorizationException()
  * }
  *
  * fun getLotteryNumbersFromCloud(): List<String> {
- * throw NoConnectionException()
+ *  throw NoConnectionException()
  * }
  *
  * fun getLotteryNumbers(): List<String> {
- * checkPermissions()
+ *  checkPermissions()
  *
- * return getLotteryNumbersFromCloud()
+ *  return getLotteryNumbersFromCloud()
  * }
- * fun main() {
+ *
  * val lotteryTry = Try { getLotteryNumbers() }
- * val value =
  * //sampleStart
- *  lotteryTry.filter {
+ * val value = lotteryTry.filter {
  *   it.size < 4
  *  }
  * //sampleEnd
- * println(value)
+ *
+ * fun main() {
+ *  println("value = $value")
  * }
  * ```
  *
  * We can also use `handleError` which allow us to recover from a particular error (we receive the error and have to return a new value):
  *
  * ```kotlin:ank:playground
- * import arrow.core.*
+ * import arrow.core.Try
+ * import arrow.core.handleError
+ *
  * open class GeneralException: Exception()
  *
  * class NoConnectionException: GeneralException()
@@ -274,21 +294,24 @@ typealias Success<A> = Try.Success<A>
  *
  * return getLotteryNumbersFromCloud()
  * }
- * fun main() {
+ *
  * val lotteryTry = Try { getLotteryNumbers() }
- * val value =
  * //sampleStart
- *  lotteryTry.handleError { exception ->
- *   emptyList()
- *  }
+ * val value = lotteryTry.handleError { exception ->
+ *  emptyList()
+ * }
  * //sampleEnd
- *  println(value)
+ *
+ * fun main() {
+ *  println("value = $value")
  * }
  * ```
  * Or if you have another different computation that can also fail, you can use `handleErrorWith` to recover from an error (as you do with `handleError`, but in this case, returning a new `Try`):
  *
  * ```kotlin:ank:playground
- * import arrow.core.*
+ * import arrow.core.Try
+ * import arrow.core.handleErrorWith
+ *
  * open class GeneralException: Exception()
  *
  * class NoConnectionException: GeneralException()
@@ -312,21 +335,21 @@ typealias Success<A> = Try.Success<A>
  *  CACHE, NETWORK
  * }
  *
- * fun main() {
- *
- *  val value = Try { getLotteryNumbers(Source.NETWORK) }.handleErrorWith {
+ * val value = Try { getLotteryNumbers(Source.NETWORK) }.handleErrorWith {
  *  Try { getLotteryNumbers(Source.CACHE) }
- *  }
- *
- *  println("value = $value")
  * }
  * //sampleEnd
+ *
+ * fun main() {
+ *  println("value = $value")
+ * }
  * ```
  *
  * When you want to handle both cases of the computation you can use `fold`. With `fold` we provide two functions, one for transforming a failure into a new value, the second one to transform the success value into a new one:
  *
  * ```kotlin:ank:playground
- * import arrow.core.*
+ * import arrow.core.Try
+ *
  * open class GeneralException: Exception()
  *
  * class NoConnectionException: GeneralException()
@@ -334,34 +357,35 @@ typealias Success<A> = Try.Success<A>
  * class AuthorizationException: GeneralException()
  *
  * fun checkPermissions() {
- * throw AuthorizationException()
+ *  throw AuthorizationException()
  * }
  *
  * fun getLotteryNumbersFromCloud(): List<String> {
- * throw NoConnectionException()
+ *  throw NoConnectionException()
  * }
  *
  * fun getLotteryNumbers(): List<String> {
- * checkPermissions()
+ *  checkPermissions()
  *
- * return getLotteryNumbersFromCloud()
+ *  return getLotteryNumbersFromCloud()
  * }
- * fun main() {
- * val lotteryTry = Try { getLotteryNumbers() }
- * val value =
+ *
  * //sampleStart
- *  lotteryTry.fold(
+ * val lotteryTry = Try { getLotteryNumbers() }
+ * val value = lotteryTry.fold(
  *  { emptyList<String>() },
  *  { it.filter { it.toIntOrNull() != null } })
  * //sampleEnd
- *  println(value)
+ *
+ * fun main() {
+ *   println("value = $value")
  * }
  * ```
  *
  * When using Try, it is a common scenario to convert the returned `Try<Throwable, DomainObject>` instance to `Either<DomainError, DomainObject>`. One can use `toEither`, and than call `mapLeft` to achieve this goal:
  *
  * ```kotlin:ank:playground
- * import arrow.core.*
+ * import arrow.core.Try
  *
  * open class GeneralException: Exception()
  *
@@ -370,17 +394,17 @@ typealias Success<A> = Try.Success<A>
  * class AuthorizationException: GeneralException()
  *
  * fun checkPermissions() {
- * throw AuthorizationException()
+ *  throw AuthorizationException()
  * }
  *
  * fun getLotteryNumbersFromCloud(): List<String> {
- * throw NoConnectionException()
+ *  throw NoConnectionException()
  * }
  *
  * fun getLotteryNumbers(): List<String> {
- * checkPermissions()
+ *  checkPermissions()
  *
- * return getLotteryNumbersFromCloud()
+ *  return getLotteryNumbersFromCloud()
  * }
  * //sampleStart
  *  sealed class DomainError(val message: String, val cause: Throwable) {
@@ -389,17 +413,19 @@ typealias Success<A> = Try.Success<A>
  *  class AuthorizationError(message: String, cause: Throwable) : DomainError(message, cause)
  * }
  *
- * fun main() {
- *  val value = Try {
- *   getLotteryNumbersFromCloud()
+ * val value =
+ *  Try {
+ *    getLotteryNumbersFromCloud()
  *  }.toEither()
- *  .mapLeft {
- *   DomainError.NoConnectionError("Failed to fetch lottery numbers from cloud", it)
+ *   .mapLeft {
+ *    DomainError
+ *    .NoConnectionError("Failed to fetch lottery numbers from cloud", it)
  *  }
+ * //sampleEnd
  *
+ * fun main() {
  *  println("value = $value")
  * }
- * //sampleEnd
  * ```
  *
  * As the codebase grows, it is easy to recognize, that this pattern reoccurs everywhere when `Try` to `Either` conversion is being used.
@@ -407,7 +433,7 @@ typealias Success<A> = Try.Success<A>
  * To help this problem, `Try` has a convenient `toEither` implementation, which takes an `onLeft: (Throwable) -> B` parameter. If the result of the conversion from `Try` to `Either` fails, the supplied `onLeft` argument is called to supply domain specific value for the left (error) branch. Using this version, the code can be simplified to the one below:
  *
  * ```kotlin:ank:playground
- * import arrow.core.*
+ * import arrow.core.Try
  *
  * open class GeneralException: Exception()
  *
@@ -416,17 +442,17 @@ typealias Success<A> = Try.Success<A>
  * class AuthorizationException: GeneralException()
  *
  * fun checkPermissions() {
- * throw AuthorizationException()
+ *  throw AuthorizationException()
  * }
  *
  * fun getLotteryNumbersFromCloud(): List<String> {
- * throw NoConnectionException()
+ *  throw NoConnectionException()
  * }
  *
  * fun getLotteryNumbers(): List<String> {
- * checkPermissions()
+ *  checkPermissions()
  *
- * return getLotteryNumbersFromCloud()
+ *  return getLotteryNumbersFromCloud()
  * }
  * //sampleStart
  *  sealed class DomainError(val message: String, val cause: Throwable) {
@@ -434,17 +460,16 @@ typealias Success<A> = Try.Success<A>
  *  class NoConnectionError(message: String, cause: Throwable) : DomainError(message, cause)
  *  class AuthorizationError(message: String, cause: Throwable) : DomainError(message, cause)
  * }
+ * val value = Try {
+ *  getLotteryNumbersFromCloud()
+ * }.toEither {
+ *   DomainError.NoConnectionError("Failed to fetch lottery numbers from cloud", it)
+ * }
+ * //sampleEnd
  *
  * fun main() {
- *  val value = Try {
- *   getLotteryNumbersFromCloud()
- *  }.toEither {
- *   DomainError.NoConnectionError("Failed to fetch lottery numbers from cloud", it)
- *  }
- *
- *  println(value)
+ *  println("value = $value")
  * }
- *  //sampleEnd
  * ```
  *
  * Lastly, Arrow contains `Try` instances for many useful typeclasses that allows you to use and transform fallibale values:
@@ -454,14 +479,14 @@ typealias Success<A> = Try.Success<A>
  * Transforming the value, if the computation is a success:
  *
  * ```kotlin:ank:playground
- * import arrow.core.*
+ * import arrow.core.Try
+ *
+ * //sampleStart
+ * val value = Try { "3".toInt() }.map { it + 1 }
+ * //sampleEnd
  *
  * fun main() {
- * val value =
- * //sampleStart
- * Try { "3".toInt() }.map { it + 1 }
- * //sampleEnd
- * println(value)
+ *  println("value = $value")
  * }
  * ```
  *
@@ -471,14 +496,14 @@ typealias Success<A> = Try.Success<A>
  *
  * ```kotlin:ank:playground
  * import arrow.core.extensions.`try`.apply.tupled
- * import arrow.core.*
+ * import arrow.core.Try
+ *
+ * //sampleStart
+ * val value = tupled(Try { "3".toInt() }, Try { "5".toInt() }, Try { "nope".toInt() })
+ * //sampleEnd
  *
  * fun main() {
- * val value =
- * //sampleStart
- * tupled(Try { "3".toInt() }, Try { "5".toInt() }, Try { "nope".toInt() })
- * //sampleEnd
- * println(value)
+ *  println("value = $value")
  * }
  * ```
  *
@@ -488,37 +513,37 @@ typealias Success<A> = Try.Success<A>
  *
  * ```kotlin:ank:playground
  * import arrow.core.extensions.fx
- * import arrow.core.*
+ * import arrow.core.Try
  *
- * fun main() {
- * val value =
  * //sampleStart
- * Try.fx {
- * val (a) = Try { "3".toInt() }
- * val (b) = Try { "4".toInt() }
- * val (c) = Try { "5".toInt() }
- * a + b + c
+ * val value = Try.fx {
+ *  val (a) = Try { "3".toInt() }
+ *  val (b) = Try { "4".toInt() }
+ *  val (c) = Try { "5".toInt() }
+ *  a + b + c
  * }
  * //sampleEnd
- * println(value)
+ *
+ * fun main() {
+ *  println("value = $value")
  * }
  * ```
  *
  * ```kotlin:ank:playground
  * import arrow.core.extensions.fx
- * import arrow.core.*
+ * import arrow.core.Try
  *
- * fun main() {
- * val value =
  * //sampleStart
- * Try.fx {
- * val (a) = Try { "none".toInt() }
- * val (b) = Try { "4".toInt() }
- * val (c) = Try { "5".toInt() }
- * a + b + c
+ * val value = Try.fx {
+ *  val (a) = Try { "none".toInt() }
+ *  val (b) = Try { "4".toInt() }
+ *  val (c) = Try { "5".toInt() }
+ *  a + b + c
  * }
  * //sampleEnd
- * println(value)
+ *
+ * fun main() {
+ *  println("value = $value")
  * }
  * ```
  *
@@ -526,19 +551,19 @@ typealias Success<A> = Try.Success<A>
  *
  * ```kotlin:ank:playground
  * import arrow.core.extensions.fx
- * import arrow.core.*
+ * import arrow.core.Try
  *
- * fun main() {
- * val value =
  * //sampleStart
- * Try.fx {
- * val a = "none".toInt()
- * val b = "4".toInt()
- * val c = "5".toInt()
- * a + b + c
+ * val value =Try.fx {
+ *  val a = "none".toInt()
+ *  val b = "4".toInt()
+ *  val c = "5".toInt()
+ *  a + b + c
  * }
  * //sampleEnd
- * println(value)
+ *
+ * fun main() {
+ *  println("value = $value")
  * }
  * ```
  *

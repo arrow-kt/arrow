@@ -30,15 +30,15 @@ typealias Nel<A> = NonEmptyList<A>
  * A `NonEmptyList` guarantees the list always has at least 1 element.
  *
  * ```kotlin:ank:playground
- * import arrow.core.*
+ * import arrow.core.NonEmptyList
  *
- * fun main() {
- * val value =
  * //sampleStart
  * //NonEmptyList.of() // does not compile
- * NonEmptyList.of(1, 2, 3, 4, 5) // NonEmptyList<Int>
+ * val value = NonEmptyList.of(1, 2, 3, 4, 5) // NonEmptyList<Int>
  * //sampleEnd
- * println(value)
+ *
+ * fun main() {
+ *  println("value = $value")
  * }
  * ```
  *
@@ -47,14 +47,14 @@ typealias Nel<A> = NonEmptyList<A>
  * Unlike `List[0]`, `NonEmptyList.head` it's a safe operation that guarantees no exception throwing.
  *
  * ```kotlin:ank:playground
- * import arrow.core.*
+ * import arrow.core.NonEmptyList
+ *
+ * //sampleStart
+ * val value = NonEmptyList.of(1, 2, 3, 4, 5).head
+ * //sampleEnd
  *
  * fun main() {
- * val value =
- * //sampleStart
- * NonEmptyList.of(1, 2, 3, 4, 5).head
- * //sampleEnd
- * println(value)
+ *  println("value = $value")
  * }
  * ```
  *
@@ -65,17 +65,17 @@ typealias Nel<A> = NonEmptyList<A>
  * The second argument is a function that takes the current state and element in the iteration and returns the new state after transformations have been applied.
  *
  * ```kotlin:ank:playground
- * import arrow.core.*
+ * import arrow.core.NonEmptyList
  *
  * //sampleStart
  * fun sumNel(nel: NonEmptyList<Int>): Int =
  *  nel.foldLeft(0) { acc, n -> acc + n }
+ * val value = sumNel(NonEmptyList.of(1, 1, 1, 1))
+ * //sampleEnd
  *
  * fun main() {
- *  val value = sumNel(NonEmptyList.of(1, 1, 1, 1))
  *  println("value = $value")
  * }
- * //sampleEnd
  * ```
  *
  * ## map
@@ -83,15 +83,15 @@ typealias Nel<A> = NonEmptyList<A>
  * `map` allows us to transform `A` into `B` in `NonEmptyList< A >`
  *
  * ```kotlin:ank:playground
- * import arrow.core.*
+ * import arrow.core.NonEmptyList
+ *
+ * //sampleStart
+ * val value = NonEmptyList.of(1, 1, 1, 1).map { it + 1 }
+ * //sampleEnd
  *
  * fun main() {
- *  val value =
- * //sampleStart
- *  NonEmptyList.of(1, 1, 1, 1).map { it + 1 }
- *  //sampleEnd
  *  println("value = $value")
- *  }
+ * }
  * ```
  *
  * ## flatMap
@@ -99,21 +99,22 @@ typealias Nel<A> = NonEmptyList<A>
  * `flatMap` allows us to compute over the contents of multiple `NonEmptyList< * >` values
  *
  * ```kotlin:ank:playground
- * import arrow.core.*
+ * import arrow.core.NonEmptyList
+ *
+ * //sampleStart
+ * val nelOne: NonEmptyList<Int> = NonEmptyList.of(1)
+ * val nelTwo: NonEmptyList<Int> = NonEmptyList.of(2)
+ *
+ * val value = nelOne.flatMap { one ->
+ *  nelTwo.map { two ->
+ *    one + two
+ *  }
+ * }
+ * //sampleEnd
  *
  * fun main() {
- * //sampleStart
- *  val nelOne: NonEmptyList<Int> = NonEmptyList.of(1)
- *  val nelTwo: NonEmptyList<Int> = NonEmptyList.of(2)
- *
- *  val value = nelOne.flatMap { one ->
- *    nelTwo.map { two ->
- *     one + two
- *    }
- *   }
- *   //sampleEnd
- *   println("value = $value")
- *  }
+ *  println("value = $value")
+ * }
  * ```
  *
  * ## Monad binding
@@ -121,23 +122,23 @@ typealias Nel<A> = NonEmptyList<A>
  * Λrrow allows imperative style comprehensions to make computing over `NonEmptyList` values easy.
  *
  * ```kotlin:ank:playground
- * import arrow.core.*
- * import arrow.typeclasses.*
- * import arrow.core.extensions.*
+ * import arrow.core.NonEmptyList
+ * import arrow.core.extensions.fx
+ *
+ * //sampleStart
+ * val nelOne: NonEmptyList<Int> = NonEmptyList.of(1)
+ * val nelTwo: NonEmptyList<Int> = NonEmptyList.of(2)
+ * val nelThree: NonEmptyList<Int> = NonEmptyList.of(3)
+ *
+ * val value = NonEmptyList.fx {
+ *  val (one) = nelOne
+ *  val (two) = nelTwo
+ *  val (three) = nelThree
+ *  one + two + three
+ * }
+ * //sampleEnd
  *
  * fun main() {
- * //sampleStart
- *  val nelOne: NonEmptyList<Int> = NonEmptyList.of(1)
- *  val nelTwo: NonEmptyList<Int> = NonEmptyList.of(2)
- *  val nelThree: NonEmptyList<Int> = NonEmptyList.of(3)
- *
- *  val value = NonEmptyList.fx {
- *   val (one) = nelOne
- *   val (two) = nelTwo
- *   val (three) = nelThree
- *   one + two + three
- *  }
- *  //sampleEnd
  *  println("value = $value")
  * }
  * ```
@@ -145,18 +146,18 @@ typealias Nel<A> = NonEmptyList<A>
  * Monad binding in `NonEmptyList` and other collection related data type can be used as generators
  *
  * ```kotlin:ank:playground
- * import arrow.core.*
- * import arrow.typeclasses.*
- * import arrow.core.extensions.*
+ * import arrow.core.NonEmptyList
+ * import arrow.core.extensions.fx
+ *
+ * //sampleStart
+ * val value = NonEmptyList.fx {
+ *  val (x) = NonEmptyList.of(1, 2, 3)
+ *  val (y) = NonEmptyList.of(1, 2, 3)
+ *  x + y
+ * }
+ * //sampleEnd
  *
  * fun main() {
- * //sampleStart
- *  val value = NonEmptyList.fx {
- *   val (x) = NonEmptyList.of(1, 2, 3)
- *   val (y) = NonEmptyList.of(1, 2, 3)
- *    x + y
- *  }
- *  //sampleEnd
  *  println("value = $value")
  * }
  * ```
@@ -166,25 +167,26 @@ typealias Nel<A> = NonEmptyList<A>
  * Λrrow contains methods that allow you to preserve type information when computing over different `NonEmptyList` typed values.
  *
  * ```kotlin:ank:playground
- * import arrow.core.*
- * import java.util.*
+ * import arrow.core.NonEmptyList
+ * import java.util.UUID
  * import arrow.core.extensions.nonemptylist.apply.map
  *
  * //sampleStart
  * data class Person(val id: UUID, val name: String, val year: Int)
  *
- * fun main() {
- *  // Note each NonEmptyList is of a different type
- *  val nelId: NonEmptyList<UUID> = NonEmptyList.of(UUID.randomUUID(), UUID.randomUUID())
- *  val nelName: NonEmptyList<String> = NonEmptyList.of("William Alvin Howard", "Haskell Curry")
- *  val nelYear: NonEmptyList<Int> = NonEmptyList.of(1926, 1900)
+ * // Note each NonEmptyList is of a different type
+ * val nelId: NonEmptyList<UUID> = NonEmptyList.of(UUID.randomUUID(), UUID.randomUUID())
+ * val nelName: NonEmptyList<String> = NonEmptyList.of("William Alvin Howard", "Haskell Curry")
+ * val nelYear: NonEmptyList<Int> = NonEmptyList.of(1926, 1900)
  *
- *  val value = map(nelId, nelName, nelYear) { (id, name, year) ->
- *   Person(id, name, year)
- *  }
- *  println("value = $value")
+ * val value = map(nelId, nelName, nelYear) { (id, name, year) ->
+ *  Person(id, name, year)
  * }
  * //sampleEnd
+ *
+ * fun main() {
+ *  println("value = $value")
+ * }
  * ```
  *
  * ### Summary
