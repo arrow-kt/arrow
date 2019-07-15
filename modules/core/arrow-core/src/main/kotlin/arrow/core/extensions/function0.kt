@@ -1,25 +1,24 @@
 package arrow.core.extensions
 
 import arrow.Kind
-import arrow.core.Function0
+import arrow.core.Either
 import arrow.core.ForFunction0
+import arrow.core.Function0
 import arrow.core.Function0Of
 import arrow.core.extensions.function0.monad.monad
-import arrow.core.select as fun0Select
-import arrow.core.Either
-import arrow.extension
 import arrow.core.fix
 import arrow.core.invoke
 import arrow.core.k
+import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Bimonad
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadFx
 import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Monoid
-import arrow.typeclasses.MonadFx
 import arrow.typeclasses.Selective
 import arrow.typeclasses.Semigroup
 
@@ -71,7 +70,7 @@ interface Function0Applicative : Applicative<ForFunction0> {
 @extension
 interface Function0Selective : Selective<ForFunction0>, Function0Applicative {
   override fun <A, B> Function0Of<Either<A, B>>.select(f: Kind<ForFunction0, (A) -> B>): Kind<ForFunction0, B> =
-    fix().fun0Select(f)
+    fix().select(f)
 }
 
 @extension
@@ -92,7 +91,7 @@ interface Function0Monad : Monad<ForFunction0> {
     Function0.just(a)
 
   override fun <A, B> Function0Of<Either<A, B>>.select(f: Kind<ForFunction0, (A) -> B>): Kind<ForFunction0, B> =
-    fix().fun0Select(f)
+    fix().select(f)
 
   override val fx: MonadFx<ForFunction0>
     get() = Function0MonadFx

@@ -22,6 +22,7 @@ import arrow.core.fix
 import arrow.core.ForTuple2
 import arrow.core.toT
 import arrow.core.Eval
+import arrow.core.identity
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Functor
@@ -133,13 +134,13 @@ fun <F, G, A, B> Tuple2Of<F, A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G, B
 }
 
 fun <F, G, A> Tuple2Of<F, Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, Tuple2<F, A>> =
-  fix().tuple2Traverse(GA, ::identity)
+  fix().traverse(GA, ::identity)
 
 @extension
 interface Tuple2Traverse<F> : Traverse<Tuple2PartialOf<F>>, Tuple2Foldable<F> {
 
   override fun <G, A, B> Tuple2Of<F, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Tuple2<F, B>> =
-    tuple2Traverse(AP, f)
+    traverse(AP, f)
 }
 
 @extension

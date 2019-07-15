@@ -2,9 +2,9 @@ package arrow.core.extensions
 
 import arrow.Kind
 import arrow.core.Eval
-import arrow.core.Tuple2
 import arrow.core.ForSetK
 import arrow.core.SetK
+import arrow.core.Tuple2
 import arrow.core.fix
 import arrow.core.k
 import arrow.extension
@@ -18,17 +18,11 @@ import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Semigroupal
 import arrow.typeclasses.Show
-import kotlin.collections.emptySet
-import kotlin.collections.find
-import kotlin.collections.fold
-import kotlin.collections.map
-import arrow.core.combineK as setCombineK
-import kotlin.collections.plus as setPlus
 
 @extension
 interface SetKSemigroup<A> : Semigroup<SetK<A>> {
   override fun SetK<A>.combine(b: SetK<A>): SetK<A> =
-    (this.setPlus(b)).k()
+    (this.plus(b)).k()
 }
 
 @extension
@@ -71,7 +65,7 @@ interface SetKFoldable : Foldable<ForSetK> {
 @extension
 interface SetKSemigroupK : SemigroupK<ForSetK> {
   override fun <A> Kind<ForSetK, A>.combineK(y: Kind<ForSetK, A>): SetK<A> =
-    fix().setCombineK(y)
+    fix().combineK(y)
 }
 
 @extension
@@ -91,7 +85,7 @@ interface SetKMonoidK : MonoidK<ForSetK> {
     SetK.empty()
 
   override fun <A> Kind<ForSetK, A>.combineK(y: Kind<ForSetK, A>): SetK<A> =
-    fix().setCombineK(y)
+    fix().combineK(y)
 }
 
 @extension

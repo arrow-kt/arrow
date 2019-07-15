@@ -11,6 +11,7 @@ import arrow.core.fix
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
+import arrow.typeclasses.Bimonad
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Foldable
@@ -23,8 +24,6 @@ import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
-import arrow.typeclasses.Bimonad
-import arrow.core.combineK as nelCombineK
 
 @extension
 interface NonEmptyListSemigroup<A> : Semigroup<NonEmptyList<A>> {
@@ -162,7 +161,7 @@ interface NonEmptyListTraverse : Traverse<ForNonEmptyList> {
 @extension
 interface NonEmptyListSemigroupK : SemigroupK<ForNonEmptyList> {
   override fun <A> NonEmptyListOf<A>.combineK(y: NonEmptyListOf<A>): NonEmptyList<A> =
-    fix().nelCombineK(y)
+    fix().combineK(y)
 }
 
 @extension

@@ -28,7 +28,7 @@ import arrow.*
 import arrow.core.*
 import arrow.mtl.typeclasses.*
 import arrow.mtl.extensions.*
-import arrow.mtl.extensions.option.monadFilter.*
+import arrow.core.extensions.option.monadFilter.*
 
 Option.monadFilter().fx.monadFilter {
   val (a) = Option(1)
@@ -41,7 +41,7 @@ Option.monadFilter().fx.monadFilter {
 
 ```kotlin:ank
 import arrow.core.*
-import arrow.mtl.extensions.listk.monadFilter.*
+import arrow.core.extensions.listk.monadFilter.*
 
 ListK.monadFilter().fx.monadFilter {
   val (a) = listOf(1).k()

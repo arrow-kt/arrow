@@ -25,7 +25,7 @@ import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.option.foldable.foldable
 import arrow.core.extensions.option.traverse.traverse
 import arrow.mtl.mapFilter
-import arrow.mtl.extensions.option.traverseFilter.traverseFilter
+import arrow.core.extensions.option.traverseFilter.traverseFilter
 import arrow.mtl.extensions.optiont.monad.monad
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Contravariant

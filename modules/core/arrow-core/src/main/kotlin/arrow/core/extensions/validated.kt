@@ -3,19 +3,21 @@ package arrow.core.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.core.ForValidated
 import arrow.core.Invalid
 import arrow.core.Valid
 import arrow.core.Validated
-import arrow.core.ValidatedPartialOf
-import arrow.core.fix
-import arrow.core.ap
-import arrow.core.handleLeftWith
-import arrow.core.combineK
-import arrow.core.ForValidated
 import arrow.core.ValidatedOf
+import arrow.core.ValidatedPartialOf
+import arrow.core.ap
+import arrow.core.combineK
+import arrow.core.fix
+import arrow.core.handleLeftWith
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Bifoldable
+import arrow.typeclasses.Bitraverse
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
@@ -25,10 +27,7 @@ import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
-import arrow.typeclasses.Bitraverse
-import arrow.typeclasses.Bifoldable
 import arrow.undocumented
-import arrow.core.traverse as validatedTraverse
 
 @extension
 @undocumented
@@ -82,7 +81,7 @@ interface ValidatedFoldable<E> : Foldable<ValidatedPartialOf<E>> {
 interface ValidatedTraverse<E> : Traverse<ValidatedPartialOf<E>>, ValidatedFoldable<E> {
 
   override fun <G, A, B> Kind<ValidatedPartialOf<E>, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Validated<E, B>> =
-    fix().validatedTraverse(AP, f)
+    fix().traverse(AP, f)
 }
 
 @extension

@@ -21,10 +21,10 @@ import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
+import arrow.typeclasses.ap
 import arrow.typeclasses.fix
 import arrow.typeclasses.value
-import arrow.typeclasses.ap as constAp
-import arrow.typeclasses.combine as combineAp
+import arrow.typeclasses.combine
 
 @extension
 interface ConstInvariant<A> : Invariant<ConstPartialOf<A>> {
@@ -70,7 +70,7 @@ interface ConstApply<A> : Apply<ConstPartialOf<A>> {
   override fun <T, U> ConstOf<A, T>.map(f: (T) -> U): Const<A, U> = fix().retag()
 
   override fun <T, U> ConstOf<A, T>.ap(ff: ConstOf<A, (T) -> U>): Const<A, U> =
-    constAp(MA(), ff)
+    ap(MA(), ff)
 }
 
 @extension
@@ -86,7 +86,7 @@ interface ConstApplicative<A> : Applicative<ConstPartialOf<A>> {
   }.empty().fix()
 
   override fun <T, U> ConstOf<A, T>.ap(ff: ConstOf<A, (T) -> U>): Const<A, U> =
-    constAp(MA(), ff)
+    ap(MA(), ff)
 }
 
 @extension
@@ -112,7 +112,7 @@ interface ConstSemigroup<A, T> : Semigroup<ConstOf<A, T>> {
   fun SA(): Semigroup<A>
 
   override fun ConstOf<A, T>.combine(b: ConstOf<A, T>): Const<A, T> =
-    combineAp(SA(), b)
+    combine(SA(), b)
 }
 
 @extension

@@ -5,13 +5,14 @@ package arrow.core.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
-import arrow.core.Id
 import arrow.core.ForId
+import arrow.core.Id
 import arrow.core.IdOf
-import arrow.core.value
-import arrow.extension
 import arrow.core.extensions.id.monad.monad
 import arrow.core.fix
+import arrow.core.identity
+import arrow.core.value
+import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Bimonad
@@ -21,8 +22,8 @@ import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.MonadFx
+import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Selective
 import arrow.typeclasses.Semigroup
@@ -89,7 +90,7 @@ interface IdApplicative : Applicative<ForId> {
 @extension
 interface IdSelective : Selective<ForId>, IdApplicative {
   override fun <A, B> IdOf<Either<A, B>>.select(f: Kind<ForId, (A) -> B>): Kind<ForId, B> =
-    fix().idSelect(f)
+    fix().select(f)
 }
 
 @extension
@@ -110,7 +111,7 @@ interface IdMonad : Monad<ForId> {
     Id.just(a)
 
   override fun <A, B> IdOf<Either<A, B>>.select(f: IdOf<(A) -> B>): Kind<ForId, B> =
-    fix().idSelect(f)
+    fix().select(f)
 
   override val fx: MonadFx<ForId>
     get() = IdFxMonad
@@ -172,7 +173,7 @@ fun <A, G, B> IdOf<A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G
 }
 
 fun <A, G> IdOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, Id<A>> =
-  idTraverse(GA, ::identity)
+  traverse(GA, ::identity)
 
 @extension
 interface IdTraverse : Traverse<ForId> {
@@ -180,7 +181,7 @@ interface IdTraverse : Traverse<ForId> {
     fix().map(f)
 
   override fun <G, A, B> IdOf<A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Id<B>> =
-    idTraverse(AP, f)
+    traverse(AP, f)
 
   override fun <A, B> IdOf<A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)

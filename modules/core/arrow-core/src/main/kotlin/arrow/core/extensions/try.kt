@@ -12,6 +12,7 @@ import arrow.core.Try.Failure
 import arrow.extension
 import arrow.core.extensions.`try`.monadThrow.monadThrow
 import arrow.core.fix
+import arrow.core.identity
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Apply
@@ -59,7 +60,7 @@ interface TryApplicativeError : ApplicativeError<ForTry, Throwable>, TryApplicat
     Failure(e)
 
   override fun <A> TryOf<A>.handleErrorWith(f: (Throwable) -> TryOf<A>): Try<A> =
-    fix().tryHandleErrorWith { f(it).fix() }
+    fix().handleErrorWith { f(it).fix() }
 }
 
 @extension
@@ -68,7 +69,7 @@ interface TryMonadError : MonadError<ForTry, Throwable>, TryMonad {
     Failure(e)
 
   override fun <A> TryOf<A>.handleErrorWith(f: (Throwable) -> TryOf<A>): Try<A> =
-    fix().tryHandleErrorWith { f(it).fix() }
+    fix().handleErrorWith { f(it).fix() }
 }
 
 @extension
@@ -167,7 +168,7 @@ fun <A, B, G> TryOf<A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<
 }
 
 fun <A, G> TryOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, Try<A>> =
-  tryTraverse(GA, ::identity)
+  traverse(GA, ::identity)
 
 @extension
 interface TryTraverse : Traverse<ForTry> {
@@ -175,7 +176,7 @@ interface TryTraverse : Traverse<ForTry> {
     fix().map(f)
 
   override fun <G, A, B> TryOf<A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Try<B>> =
-    tryTraverse(AP, f)
+    traverse(AP, f)
 
   override fun <A> TryOf<A>.exists(p: (A) -> Boolean): kotlin.Boolean =
     fix().exists(p)

@@ -32,13 +32,11 @@ import arrow.typeclasses.Semigroupal
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
 import kotlin.collections.emptyList
-import arrow.core.combineK as listCombineK
-import kotlin.collections.plus as listPlus
 
 @extension
 interface ListKSemigroup<A> : Semigroup<ListK<A>> {
   override fun ListK<A>.combine(b: ListK<A>): ListK<A> =
-    (this.listPlus(b)).k()
+    (this.plus(b)).k()
 }
 
 @extension
@@ -154,7 +152,7 @@ interface ListKTraverse : Traverse<ForListK> {
 @extension
 interface ListKSemigroupK : SemigroupK<ForListK> {
   override fun <A> Kind<ForListK, A>.combineK(y: Kind<ForListK, A>): ListK<A> =
-    fix().listCombineK(y)
+    fix().combineK(y)
 }
 
 @extension
@@ -174,7 +172,7 @@ interface ListKMonoidK : MonoidK<ForListK> {
     ListK.empty()
 
   override fun <A> Kind<ForListK, A>.combineK(y: Kind<ForListK, A>): ListK<A> =
-    fix().listCombineK(y)
+    fix().combineK(y)
 }
 
 @extension
@@ -228,7 +226,7 @@ interface ListKMonadCombine : MonadCombine<ForListK> {
     ListK.just(a)
 
   override fun <A> Kind<ForListK, A>.combineK(y: Kind<ForListK, A>): ListK<A> =
-    fix().listCombineK(y)
+    fix().combineK(y)
 }
 
 @extension

@@ -16,22 +16,22 @@ import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Apply
+import arrow.typeclasses.Bifoldable
 import arrow.typeclasses.Bifunctor
+import arrow.typeclasses.Bitraverse
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadFx
+import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
-import arrow.typeclasses.Bifoldable
-import arrow.typeclasses.Bitraverse
 
 fun <L, R> Either<L, R>.combine(SGL: Semigroup<L>, SGR: Semigroup<R>, b: Either<L, R>): Either<L, R> {
   val a = this
@@ -85,7 +85,7 @@ interface EitherApply<L> : Apply<EitherPartialOf<L>>, EitherFunctor<L> {
   override fun <A, B> EitherOf<L, A>.map(f: (A) -> B): Either<L, B> = fix().map(f)
 
   override fun <A, B> EitherOf<L, A>.ap(ff: EitherOf<L, (A) -> B>): Either<L, B> =
-    fix().eitherAp(ff)
+    fix().ap(ff)
 }
 
 @extension
@@ -96,7 +96,7 @@ interface EitherApplicative<L> : Applicative<EitherPartialOf<L>>, EitherFunctor<
   override fun <A, B> EitherOf<L, A>.map(f: (A) -> B): Either<L, B> = fix().map(f)
 
   override fun <A, B> EitherOf<L, A>.ap(ff: EitherOf<L, (A) -> B>): Either<L, B> =
-    fix().eitherAp(ff)
+    fix().ap(ff)
 }
 
 @extension
@@ -105,10 +105,10 @@ interface EitherMonad<L> : Monad<EitherPartialOf<L>>, EitherApplicative<L> {
   override fun <A, B> EitherOf<L, A>.map(f: (A) -> B): Either<L, B> = fix().map(f)
 
   override fun <A, B> EitherOf<L, A>.ap(ff: EitherOf<L, (A) -> B>): Either<L, B> =
-    fix().eitherAp(ff)
+    fix().ap(ff)
 
   override fun <A, B> EitherOf<L, A>.flatMap(f: (A) -> EitherOf<L, B>): Either<L, B> =
-    fix().eitherFlatMap { f(it).fix() }
+    fix().flatMap { f(it).fix() }
 
   override fun <A, B> tailRecM(a: A, f: (A) -> EitherOf<L, Either<A, B>>): Either<L, B> =
     Either.tailRecM(a, f)
@@ -130,7 +130,7 @@ interface EitherApplicativeError<L> : ApplicativeError<EitherPartialOf<L>, L>, E
   override fun <A> raiseError(e: L): Either<L, A> = Left(e)
 
   override fun <A> EitherOf<L, A>.handleErrorWith(f: (L) -> EitherOf<L, A>): Either<L, A> =
-    fix().eitherHandleErrorWith(f)
+    fix().handleErrorWith(f)
 }
 
 @extension
@@ -161,7 +161,7 @@ fun <G, A, B, C> EitherOf<A, B>.traverse(GA: Applicative<G>, f: (B) -> Kind<G, C
 interface EitherTraverse<L> : Traverse<EitherPartialOf<L>>, EitherFoldable<L> {
 
   override fun <G, A, B> EitherOf<L, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, EitherOf<L, B>> =
-    fix().eitherTraverse(AP, f)
+    fix().traverse(AP, f)
 }
 
 @extension
@@ -174,7 +174,7 @@ interface EitherBitraverse : Bitraverse<ForEither>, EitherBifoldable {
 interface EitherSemigroupK<L> : SemigroupK<EitherPartialOf<L>> {
 
   override fun <A> EitherOf<L, A>.combineK(y: EitherOf<L, A>): Either<L, A> =
-    fix().eitherCombineK(y)
+    fix().combineK(y)
 }
 
 @extension
