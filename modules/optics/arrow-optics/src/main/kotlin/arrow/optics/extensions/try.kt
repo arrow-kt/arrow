@@ -2,7 +2,7 @@ package arrow.optics.extensions
 
 import arrow.Kind
 import arrow.core.Try
-import arrow.extensions.traverse
+import arrow.core.extensions.traverse
 import arrow.extension
 import arrow.optics.Traversal
 import arrow.optics.typeclasses.Each

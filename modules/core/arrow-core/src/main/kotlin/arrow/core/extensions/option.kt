@@ -13,7 +13,7 @@ import arrow.core.Some
 import arrow.core.Tuple2
 import arrow.extension
 import arrow.core.fix
-import arrow.extensions.traverse as optionTraverse
+import arrow.core.extensions.traverse as optionTraverse
 import arrow.core.extensions.option.monad.map
 import arrow.core.extensions.option.monad.monad
 import arrow.core.orElse
@@ -42,7 +42,6 @@ import arrow.typeclasses.Semiring
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
 import arrow.typeclasses.TraverseFilter
-import arrow.core.select as optionSelect
 
 @extension
 interface OptionSemigroup<A> : Semigroup<Option<A>> {

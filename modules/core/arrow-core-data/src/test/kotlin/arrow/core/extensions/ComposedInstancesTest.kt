@@ -1,4 +1,4 @@
-package arrow.extensions
+package arrow.core.extensions
 
 import arrow.Kind
 import arrow.Kind2
@@ -11,7 +11,6 @@ import arrow.core.Some
 import arrow.core.Tuple2
 import arrow.core.fix
 import arrow.core.k
-import arrow.core.invoke
 import arrow.core.ListK
 import arrow.core.NonEmptyList
 import arrow.core.nel

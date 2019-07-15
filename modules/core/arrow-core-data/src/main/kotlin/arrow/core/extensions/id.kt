@@ -1,6 +1,6 @@
 @file:Suppress("UnusedImports")
 
-package arrow.extensions
+package arrow.core.extensions
 
 import arrow.Kind
 import arrow.core.Either
@@ -10,10 +10,8 @@ import arrow.core.ForId
 import arrow.core.IdOf
 import arrow.core.value
 import arrow.extension
-import arrow.extensions.traverse as idTraverse
 import arrow.core.extensions.id.monad.monad
 import arrow.core.fix
-import arrow.core.identity
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Bimonad
@@ -30,7 +28,6 @@ import arrow.typeclasses.Selective
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
-import arrow.core.select as idSelect
 
 @extension
 interface IdSemigroup<A> : Semigroup<Id<A>> {

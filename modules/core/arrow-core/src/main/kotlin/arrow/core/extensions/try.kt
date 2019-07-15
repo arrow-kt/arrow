@@ -29,8 +29,6 @@ import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
-import arrow.extensions.traverse as tryTraverse
-import arrow.core.handleErrorWith as tryHandleErrorWith
 
 fun <A> Try<A>.combine(SG: Semigroup<A>, b: Try<A>): Try<A> =
   flatMap { a ->

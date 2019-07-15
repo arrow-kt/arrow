@@ -1,4 +1,4 @@
-package arrow.extensions
+package arrow.core.extensions
 
 import arrow.common.utils.AbstractProcessor
 import arrow.common.utils.ClassOrPackageDataWrapper

@@ -32,11 +32,6 @@ import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
 import arrow.typeclasses.Bifoldable
 import arrow.typeclasses.Bitraverse
-import arrow.core.ap as eitherAp
-import arrow.core.combineK as eitherCombineK
-import arrow.extensions.traverse as eitherTraverse
-import arrow.core.flatMap as eitherFlatMap
-import arrow.core.handleErrorWith as eitherHandleErrorWith
 
 fun <L, R> Either<L, R>.combine(SGL: Semigroup<L>, SGR: Semigroup<R>, b: Either<L, R>): Either<L, R> {
   val a = this
