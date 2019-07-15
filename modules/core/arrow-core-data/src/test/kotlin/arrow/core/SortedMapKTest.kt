@@ -4,7 +4,7 @@ import arrow.Kind2
 import arrow.core.extensions.monoid
 import arrow.core.extensions.functor
 import arrow.core.extensions.show
-import arrow.core.extensions.traverse
+import arrow.extensions.traverse
 import arrow.test.UnitSpec
 import arrow.test.generators.sortedMapK
 import arrow.test.laws.MonoidLaws

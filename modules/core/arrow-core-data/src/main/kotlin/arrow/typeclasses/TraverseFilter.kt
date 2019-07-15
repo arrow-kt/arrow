@@ -1,4 +1,4 @@
-package arrow.mtl.typeclasses
+package arrow.typeclasses
 
 import arrow.Kind
 import arrow.core.Id
@@ -7,12 +7,9 @@ import arrow.core.Option
 import arrow.core.Some
 import arrow.core.extensions.id.applicative.applicative
 import arrow.core.value
-import arrow.typeclasses.Applicative
-import arrow.typeclasses.FunctorFilter
-import arrow.typeclasses.Traverse
 
 /**
- * ank_macro_hierarchy(arrow.mtl.typeclasses.TraverseFilter)
+ * ank_macro_hierarchy(arrow.typeclasses.TraverseFilter)
  */
 interface TraverseFilter<F> : Traverse<F>, FunctorFilter<F> {
 

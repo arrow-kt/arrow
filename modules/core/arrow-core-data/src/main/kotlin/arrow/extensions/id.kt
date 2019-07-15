@@ -1,6 +1,6 @@
 @file:Suppress("UnusedImports")
 
-package arrow.core.extensions
+package arrow.extensions
 
 import arrow.Kind
 import arrow.core.Either
@@ -10,7 +10,7 @@ import arrow.core.ForId
 import arrow.core.IdOf
 import arrow.core.value
 import arrow.extension
-import arrow.core.extensions.traverse as idTraverse
+import arrow.extensions.traverse as idTraverse
 import arrow.core.extensions.id.monad.monad
 import arrow.core.fix
 import arrow.core.identity

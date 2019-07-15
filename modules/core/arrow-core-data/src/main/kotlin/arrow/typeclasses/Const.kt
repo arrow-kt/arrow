@@ -2,13 +2,12 @@ package arrow.typeclasses
 
 import arrow.Kind
 import arrow.core.Option
-import arrow.core.identity
 import arrow.higherkind
 
 fun <A, T> ConstOf<A, T>.value(): A = this.fix().value()
 
 @higherkind
-data class Const<A, out T>(private val value: A) : ConstOf<A, T> {
+data class Const<A, out T>(private val value: A) /*:ConstOf<A, T>*/ {
 
   @Suppress("UNCHECKED_CAST")
   fun <U> retag(): Const<A, U> = this as Const<A, U>

@@ -12,7 +12,6 @@ import arrow.core.Try.Failure
 import arrow.extension
 import arrow.core.extensions.`try`.monadThrow.monadThrow
 import arrow.core.fix
-import arrow.core.identity
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Apply
@@ -30,7 +29,7 @@ import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
-import arrow.core.extensions.traverse as tryTraverse
+import arrow.extensions.traverse as tryTraverse
 import arrow.core.handleErrorWith as tryHandleErrorWith
 
 fun <A> Try<A>.combine(SG: Semigroup<A>, b: Try<A>): Try<A> =

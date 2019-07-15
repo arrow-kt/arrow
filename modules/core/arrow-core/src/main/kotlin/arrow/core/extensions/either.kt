@@ -34,7 +34,7 @@ import arrow.typeclasses.Bifoldable
 import arrow.typeclasses.Bitraverse
 import arrow.core.ap as eitherAp
 import arrow.core.combineK as eitherCombineK
-import arrow.core.extensions.traverse as eitherTraverse
+import arrow.extensions.traverse as eitherTraverse
 import arrow.core.flatMap as eitherFlatMap
 import arrow.core.handleErrorWith as eitherHandleErrorWith
 

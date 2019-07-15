@@ -1,8 +1,6 @@
-package arrow.mtl.typeclasses
+package arrow.typeclasses
 
 import arrow.Kind
-import arrow.typeclasses.MonadContinuation
-import arrow.typeclasses.MonadSyntax
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.RestrictsSuspension

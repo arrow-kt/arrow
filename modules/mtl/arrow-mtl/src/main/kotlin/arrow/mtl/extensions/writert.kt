@@ -12,7 +12,7 @@ import arrow.mtl.WriterTPartialOf
 import arrow.mtl.value
 import arrow.mtl.fix
 import arrow.mtl.extensions.writert.monad.monad
-import arrow.mtl.typeclasses.MonadFilter
+import arrow.typeclasses.MonadFilter
 import arrow.mtl.typeclasses.MonadWriter
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Applicative

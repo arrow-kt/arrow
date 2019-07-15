@@ -7,6 +7,7 @@ import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.None
 import arrow.core.Tuple2
+import arrow.core.extensions.ComposedTraverseFilter
 import arrow.core.left
 import arrow.core.none
 import arrow.core.right
@@ -40,7 +41,7 @@ import arrow.typeclasses.MonoidK
 import arrow.typeclasses.ComposedTraverse
 import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.FunctorFilter
-import arrow.mtl.typeclasses.TraverseFilter
+import arrow.typeclasses.TraverseFilter
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Nested

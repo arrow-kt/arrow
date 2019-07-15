@@ -14,7 +14,6 @@ import arrow.core.extensions.id.monad.monad
 import arrow.core.extensions.monoid
 import arrow.fx.ForIO
 import arrow.fx.IO
-import arrow.fx.extensions.io.applicativeError.attempt
 import arrow.fx.extensions.io.async.async
 import arrow.fx.mtl.optiont.async.async
 import arrow.fx.typeclasses.seconds
@@ -22,7 +21,7 @@ import arrow.core.extensions.nonemptylist.monad.monad
 import arrow.core.extensions.option.monad.monad
 import arrow.core.fix
 import arrow.core.value
-import arrow.mtl.extensions.ComposedFunctorFilter
+import arrow.core.extensions.ComposedFunctorFilter
 import arrow.mtl.extensions.optiont.applicative.applicative
 import arrow.mtl.extensions.optiont.divisible.divisible
 import arrow.mtl.extensions.optiont.monoidK.monoidK
@@ -42,7 +41,6 @@ import arrow.typeclasses.Eq
 import arrow.typeclasses.NestedType
 import arrow.typeclasses.Monad
 import arrow.typeclasses.const
-import arrow.typeclasses.nest
 import arrow.typeclasses.unnest
 import arrow.typeclasses.value
 import io.kotlintest.properties.forAll

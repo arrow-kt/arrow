@@ -18,7 +18,7 @@ import arrow.core.Tuple3
 import arrow.core.getOrElse
 import arrow.core.extensions.`try`.applicative.applicative
 import arrow.core.extensions.`try`.functor.functor
-import arrow.core.extensions.fx
+import arrow.extensions.fx
 import arrow.core.extensions.option.applicative.applicative
 import arrow.core.flatMap
 import arrow.core.handleError
