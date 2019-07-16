@@ -5,14 +5,14 @@ package arrow.core.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
-import arrow.core.Try
-import arrow.core.TryOf
 import arrow.core.ForTry
+import arrow.core.Try
 import arrow.core.Try.Failure
-import arrow.extension
+import arrow.core.TryOf
 import arrow.core.extensions.`try`.monadThrow.monadThrow
 import arrow.core.fix
 import arrow.core.identity
+import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Apply
