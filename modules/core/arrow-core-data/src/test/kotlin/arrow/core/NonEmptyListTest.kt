@@ -43,8 +43,7 @@ class NonEmptyListTest : UnitSpec() {
 
     "mapFilter" {
       val op: NonEmptyList<Int> = NonEmptyList(0, List(100) { s: Int -> 10 * s })
-      val res = op.foldLeft(NonEmptyList(0))
-      { acc, i -> if (i < 44) acc else acc + i }
+      val res = op.foldLeft(NonEmptyList(0)) { acc, i -> if (i < 44) acc else acc + i }
       op.mapFilter { if (it < 44) None else Some(it) } == res
     }
   }

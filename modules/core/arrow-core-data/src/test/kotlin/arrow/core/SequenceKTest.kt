@@ -65,8 +65,7 @@ class SequenceKTest : UnitSpec() {
 
     "mapFilter" {
       val op: SequenceK<Int> = List(100) { s: Int -> 10 * s }.asSequence().k()
-      val res = List(100) { s: Int -> 10 * s }.foldLeft(emptySequence<Int>())
-      { acc, i -> if (i < 44) acc else acc + i }.k()
+      val res = List(100) { s: Int -> 10 * s }.foldLeft(emptySequence<Int>()) { acc, i -> if (i < 44) acc else acc + i }.k()
       op.mapFilter { if (it < 44) None else Some(it) } shouldContainAll res
     }
   }
