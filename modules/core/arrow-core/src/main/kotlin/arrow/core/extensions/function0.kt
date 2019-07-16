@@ -21,6 +21,7 @@ import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Selective
 import arrow.typeclasses.Semigroup
+import arrow.core.select as fun0Select
 
 @extension
 interface Function0Semigroup<A> : Semigroup<Function0<A>> {
@@ -70,7 +71,7 @@ interface Function0Applicative : Applicative<ForFunction0> {
 @extension
 interface Function0Selective : Selective<ForFunction0>, Function0Applicative {
   override fun <A, B> Function0Of<Either<A, B>>.select(f: Kind<ForFunction0, (A) -> B>): Kind<ForFunction0, B> =
-    fix().select(f)
+    fix().fun0Select(f)
 }
 
 @extension
@@ -91,7 +92,7 @@ interface Function0Monad : Monad<ForFunction0> {
     Function0.just(a)
 
   override fun <A, B> Function0Of<Either<A, B>>.select(f: Kind<ForFunction0, (A) -> B>): Kind<ForFunction0, B> =
-    fix().select(f)
+    fix().fun0Select(f)
 
   override val fx: MonadFx<ForFunction0>
     get() = Function0MonadFx

@@ -32,6 +32,7 @@ import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Semigroupal
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
+import arrow.core.combineK as sequenceCombineK
 
 @extension
 interface SequenceKSemigroup<A> : Semigroup<SequenceK<A>> {
@@ -154,7 +155,7 @@ interface SequenceKTraverse : Traverse<ForSequenceK> {
 @extension
 interface SequenceKSemigroupK : SemigroupK<ForSequenceK> {
   override fun <A> Kind<ForSequenceK, A>.combineK(y: Kind<ForSequenceK, A>): SequenceK<A> =
-    fix().combineK(y)
+    fix().sequenceCombineK(y)
 }
 
 @extension
@@ -163,7 +164,7 @@ interface SequenceKMonoidK : MonoidK<ForSequenceK> {
     SequenceK.empty()
 
   override fun <A> Kind<ForSequenceK, A>.combineK(y: Kind<ForSequenceK, A>): SequenceK<A> =
-    fix().combineK(y)
+    fix().sequenceCombineK(y)
 }
 
 @extension
@@ -240,7 +241,7 @@ interface SequenceKMonadCombine : MonadCombine<ForSequenceK> {
     SequenceK.just(a)
 
   override fun <A> Kind<ForSequenceK, A>.combineK(y: Kind<ForSequenceK, A>): SequenceK<A> =
-    fix().combineK(y)
+    fix().sequenceCombineK(y)
 }
 
 fun <A> SequenceK.Companion.fx(c: suspend MonadSyntax<ForSequenceK>.() -> A): SequenceK<A> =

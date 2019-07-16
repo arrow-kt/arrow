@@ -28,6 +28,7 @@ import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
 import arrow.undocumented
+import arrow.core.traverse as validatedTraverse
 
 @extension
 @undocumented
@@ -81,7 +82,7 @@ interface ValidatedFoldable<E> : Foldable<ValidatedPartialOf<E>> {
 interface ValidatedTraverse<E> : Traverse<ValidatedPartialOf<E>>, ValidatedFoldable<E> {
 
   override fun <G, A, B> Kind<ValidatedPartialOf<E>, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Validated<E, B>> =
-    fix().traverse(AP, f)
+    fix().validatedTraverse(AP, f)
 }
 
 @extension

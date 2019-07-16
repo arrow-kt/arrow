@@ -3,14 +3,14 @@ package arrow.core.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
-import arrow.core.Tuple2
 import arrow.core.ForListK
 import arrow.core.ListK
 import arrow.core.ListKOf
 import arrow.core.Option
-import arrow.core.k
+import arrow.core.Tuple2
 import arrow.core.extensions.listk.monad.monad
 import arrow.core.fix
+import arrow.core.k
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
@@ -31,12 +31,13 @@ import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Semigroupal
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
-import kotlin.collections.emptyList
+import arrow.core.combineK as listCombineK
+import kotlin.collections.plus as listPlus
 
 @extension
 interface ListKSemigroup<A> : Semigroup<ListK<A>> {
   override fun ListK<A>.combine(b: ListK<A>): ListK<A> =
-    (this.plus(b)).k()
+    (this.listPlus(b)).k()
 }
 
 @extension
@@ -152,7 +153,7 @@ interface ListKTraverse : Traverse<ForListK> {
 @extension
 interface ListKSemigroupK : SemigroupK<ForListK> {
   override fun <A> Kind<ForListK, A>.combineK(y: Kind<ForListK, A>): ListK<A> =
-    fix().combineK(y)
+    fix().listCombineK(y)
 }
 
 @extension
@@ -172,7 +173,7 @@ interface ListKMonoidK : MonoidK<ForListK> {
     ListK.empty()
 
   override fun <A> Kind<ForListK, A>.combineK(y: Kind<ForListK, A>): ListK<A> =
-    fix().combineK(y)
+    fix().listCombineK(y)
 }
 
 @extension

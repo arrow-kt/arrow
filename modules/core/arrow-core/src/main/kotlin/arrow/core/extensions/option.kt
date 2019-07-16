@@ -11,13 +11,12 @@ import arrow.core.Option
 import arrow.core.OptionOf
 import arrow.core.Some
 import arrow.core.Tuple2
-import arrow.extension
-import arrow.core.fix
 import arrow.core.extensions.option.monad.map
 import arrow.core.extensions.option.monad.monad
+import arrow.core.fix
 import arrow.core.identity
-import arrow.core.select
 import arrow.core.orElse
+import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Apply
@@ -28,10 +27,10 @@ import arrow.typeclasses.FunctorFilter
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadCombine
-import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadFilter
 import arrow.typeclasses.MonadFx
+import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.MonoidK
 import arrow.typeclasses.Monoidal
@@ -43,6 +42,9 @@ import arrow.typeclasses.Semiring
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
 import arrow.typeclasses.TraverseFilter
+import arrow.core.extensions.traverse as optionTraverse
+import arrow.core.extensions.traverseFilter as optionTraverseFilter
+import arrow.core.select as optionSelect
 
 @extension
 interface OptionSemigroup<A> : Semigroup<Option<A>> {
@@ -173,7 +175,7 @@ interface OptionApplicative : Applicative<ForOption> {
 @extension
 interface OptionSelective : Selective<ForOption>, OptionApplicative {
   override fun <A, B> OptionOf<Either<A, B>>.select(f: OptionOf<(A) -> B>): Option<B> =
-    fix().select(f)
+    fix().optionSelect(f)
 }
 
 @extension
@@ -194,7 +196,7 @@ interface OptionMonad : Monad<ForOption> {
     Option.just(a)
 
   override fun <A, B> OptionOf<Either<A, B>>.select(f: OptionOf<(A) -> B>): OptionOf<B> =
-    fix().select(f)
+    fix().optionSelect(f)
 
   override val fx: MonadFx<ForOption>
     get() = OptionFxMonad
@@ -247,7 +249,7 @@ fun <A, G, B> OptionOf<A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Ki
 }
 
 fun <A, G> OptionOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, Option<A>> =
-  traverse(GA, ::identity)
+  optionTraverse(GA, ::identity)
 
 fun <A, G, B> OptionOf<A>.traverseFilter(GA: Applicative<G>, f: (A) -> Kind<G, Option<B>>): Kind<G, Option<B>> = GA.run {
   fix().fold({ just(None) }, f)
@@ -259,7 +261,7 @@ interface OptionTraverse : Traverse<ForOption> {
     fix().map(f)
 
   override fun <G, A, B> OptionOf<A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Option<B>> =
-    traverse(AP, f)
+    optionTraverse(AP, f)
 
   override fun <A> OptionOf<A>.exists(p: (A) -> Boolean): Boolean =
     fix().exists(p)
@@ -342,13 +344,13 @@ interface OptionTraverseFilter : TraverseFilter<ForOption> {
     fix().filter(f)
 
   override fun <G, A, B> Kind<ForOption, A>.traverseFilter(AP: Applicative<G>, f: (A) -> Kind<G, Option<B>>): Kind<G, Option<B>> =
-    traverseFilter(AP, f)
+    optionTraverseFilter(AP, f)
 
   override fun <A, B> Kind<ForOption, A>.map(f: (A) -> B): Option<B> =
     fix().map(f)
 
   override fun <G, A, B> Kind<ForOption, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Option<B>> =
-    traverse(AP, f)
+    optionTraverse(AP, f)
 
   override fun <A> Kind<ForOption, A>.exists(p: (A) -> Boolean): Boolean =
     fix().exists(p)

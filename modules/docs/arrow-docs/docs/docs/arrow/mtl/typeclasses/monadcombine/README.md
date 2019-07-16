@@ -1,7 +1,7 @@
 ---
 layout: docs
 title: MonadCombine
-permalink: /docs/arrow/mtl/typeclasses/monadcombine/
+permalink: /docs/arrow/typeclasses/monadcombine/
 redirect_from:
   - /docs/typeclasses/monadcombine/
 ---
@@ -15,7 +15,7 @@ advanced
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.mtl.typeclasses.MonadCombine
+import arrow.typeclasses.MonadCombine
 
 TypeClass(MonadCombine::class).dtMarkdownList()
 ```

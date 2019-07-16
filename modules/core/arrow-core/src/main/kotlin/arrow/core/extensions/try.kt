@@ -5,14 +5,14 @@ package arrow.core.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
-import arrow.core.Try
-import arrow.core.TryOf
 import arrow.core.ForTry
+import arrow.core.Try
 import arrow.core.Try.Failure
-import arrow.extension
+import arrow.core.TryOf
 import arrow.core.extensions.`try`.monadThrow.monadThrow
 import arrow.core.fix
 import arrow.core.identity
+import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Apply
@@ -30,6 +30,8 @@ import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
+import arrow.core.extensions.traverse as tryTraverse
+import arrow.core.handleErrorWith as tryHandleErrorWith
 
 fun <A> Try<A>.combine(SG: Semigroup<A>, b: Try<A>): Try<A> =
   flatMap { a ->
@@ -60,7 +62,7 @@ interface TryApplicativeError : ApplicativeError<ForTry, Throwable>, TryApplicat
     Failure(e)
 
   override fun <A> TryOf<A>.handleErrorWith(f: (Throwable) -> TryOf<A>): Try<A> =
-    fix().handleErrorWith { f(it).fix() }
+    fix().tryHandleErrorWith { f(it).fix() }
 }
 
 @extension
@@ -69,7 +71,7 @@ interface TryMonadError : MonadError<ForTry, Throwable>, TryMonad {
     Failure(e)
 
   override fun <A> TryOf<A>.handleErrorWith(f: (Throwable) -> TryOf<A>): Try<A> =
-    fix().handleErrorWith { f(it).fix() }
+    fix().tryHandleErrorWith { f(it).fix() }
 }
 
 @extension
@@ -168,7 +170,7 @@ fun <A, B, G> TryOf<A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<
 }
 
 fun <A, G> TryOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, Try<A>> =
-  traverse(GA, ::identity)
+  tryTraverse(GA, ::identity)
 
 @extension
 interface TryTraverse : Traverse<ForTry> {
@@ -176,7 +178,7 @@ interface TryTraverse : Traverse<ForTry> {
     fix().map(f)
 
   override fun <G, A, B> TryOf<A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Try<B>> =
-    traverse(AP, f)
+    tryTraverse(AP, f)
 
   override fun <A> TryOf<A>.exists(p: (A) -> Boolean): kotlin.Boolean =
     fix().exists(p)

@@ -23,6 +23,7 @@ import arrow.fx.IO
 import arrow.fx.extensions.io.applicativeError.attempt
 import arrow.fx.extensions.io.async.async
 import arrow.fx.typeclasses.seconds
+import arrow.fx.mtl.optiont.async.async
 import arrow.mtl.extensions.optiont.applicative.applicative
 import arrow.mtl.extensions.optiont.divisible.divisible
 import arrow.mtl.extensions.optiont.functorFilter.functorFilter

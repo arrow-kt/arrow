@@ -3,10 +3,15 @@
 package arrow.core.extensions
 
 import arrow.Kind
+import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
-import arrow.extension
+import arrow.core.Eval
+import arrow.core.ForTuple2
+import arrow.core.Tuple10
 import arrow.core.Tuple2
+import arrow.core.Tuple2Of
+import arrow.core.Tuple2PartialOf
 import arrow.core.Tuple3
 import arrow.core.Tuple4
 import arrow.core.Tuple5
@@ -14,30 +19,26 @@ import arrow.core.Tuple6
 import arrow.core.Tuple7
 import arrow.core.Tuple8
 import arrow.core.Tuple9
-import arrow.core.Tuple10
-import arrow.core.Tuple2PartialOf
-import arrow.core.Tuple2Of
-import arrow.core.Either
 import arrow.core.fix
-import arrow.core.ForTuple2
-import arrow.core.toT
-import arrow.core.Eval
 import arrow.core.identity
-import arrow.typeclasses.Semigroup
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Functor
-import arrow.typeclasses.Bifunctor
-import arrow.typeclasses.Apply
+import arrow.core.toT
+import arrow.extension
 import arrow.typeclasses.Applicative
-import arrow.typeclasses.Monad
-import arrow.typeclasses.Foldable
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Bifoldable
-import arrow.typeclasses.Traverse
+import arrow.typeclasses.Bifunctor
 import arrow.typeclasses.Bitraverse
-import arrow.typeclasses.Eq
-import arrow.typeclasses.Hash
-import arrow.typeclasses.Show
 import arrow.typeclasses.Comonad
+import arrow.typeclasses.Eq
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Hash
+import arrow.typeclasses.Monad
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.Semigroup
+import arrow.typeclasses.Show
+import arrow.typeclasses.Traverse
+import arrow.core.extensions.traverse as tuple2Traverse
 
 // TODO this should be user driven allowing consumers to generate the tuple arities on demand to avoid cluttering arrow dependents with unused code
 // TODO @arities(fromTupleN = 2, toTupleN = 22 | fromHListN = 1, toHListN = 22)
@@ -134,13 +135,13 @@ fun <F, G, A, B> Tuple2Of<F, A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G, B
 }
 
 fun <F, G, A> Tuple2Of<F, Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, Tuple2<F, A>> =
-  fix().traverse(GA, ::identity)
+  fix().tuple2Traverse(GA, ::identity)
 
 @extension
 interface Tuple2Traverse<F> : Traverse<Tuple2PartialOf<F>>, Tuple2Foldable<F> {
 
   override fun <G, A, B> Tuple2Of<F, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Tuple2<F, B>> =
-    traverse(AP, f)
+    tuple2Traverse(AP, f)
 }
 
 @extension

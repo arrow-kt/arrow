@@ -29,6 +29,8 @@ import arrow.typeclasses.Selective
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
+import arrow.core.extensions.traverse as idTraverse
+import arrow.core.select as idSelect
 
 @extension
 interface IdSemigroup<A> : Semigroup<Id<A>> {
@@ -90,7 +92,7 @@ interface IdApplicative : Applicative<ForId> {
 @extension
 interface IdSelective : Selective<ForId>, IdApplicative {
   override fun <A, B> IdOf<Either<A, B>>.select(f: Kind<ForId, (A) -> B>): Kind<ForId, B> =
-    fix().select(f)
+    fix().idSelect(f)
 }
 
 @extension
@@ -111,7 +113,7 @@ interface IdMonad : Monad<ForId> {
     Id.just(a)
 
   override fun <A, B> IdOf<Either<A, B>>.select(f: IdOf<(A) -> B>): Kind<ForId, B> =
-    fix().select(f)
+    fix().idSelect(f)
 
   override val fx: MonadFx<ForId>
     get() = IdFxMonad
@@ -173,7 +175,7 @@ fun <A, G, B> IdOf<A>.traverse(GA: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G
 }
 
 fun <A, G> IdOf<Kind<G, A>>.sequence(GA: Applicative<G>): Kind<G, Id<A>> =
-  traverse(GA, ::identity)
+  idTraverse(GA, ::identity)
 
 @extension
 interface IdTraverse : Traverse<ForId> {
@@ -181,7 +183,7 @@ interface IdTraverse : Traverse<ForId> {
     fix().map(f)
 
   override fun <G, A, B> IdOf<A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Id<B>> =
-    traverse(AP, f)
+    idTraverse(AP, f)
 
   override fun <A, B> IdOf<A>.foldLeft(b: B, f: (B, A) -> B): B =
     fix().foldLeft(b, f)

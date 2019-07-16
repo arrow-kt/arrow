@@ -18,6 +18,7 @@ import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Semigroupal
 import arrow.typeclasses.Show
+import arrow.core.combineK as setCombineK
 
 @extension
 interface SetKSemigroup<A> : Semigroup<SetK<A>> {
@@ -65,7 +66,7 @@ interface SetKFoldable : Foldable<ForSetK> {
 @extension
 interface SetKSemigroupK : SemigroupK<ForSetK> {
   override fun <A> Kind<ForSetK, A>.combineK(y: Kind<ForSetK, A>): SetK<A> =
-    fix().combineK(y)
+    fix().setCombineK(y)
 }
 
 @extension
@@ -85,7 +86,7 @@ interface SetKMonoidK : MonoidK<ForSetK> {
     SetK.empty()
 
   override fun <A> Kind<ForSetK, A>.combineK(y: Kind<ForSetK, A>): SetK<A> =
-    fix().combineK(y)
+    fix().setCombineK(y)
 }
 
 @extension
