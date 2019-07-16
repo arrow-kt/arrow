@@ -16,9 +16,6 @@ In this doc we'll describe all the modules that form the core, alongside a list 
 
 ### arrow-core
 
-{:.beginner}
-beginner
-
 ```groovy
 dependencies {
     compile "io.arrow-kt:arrow-core:$arrow_version"
@@ -30,9 +27,6 @@ This library include the possible [typeclass extensions]({{ '/docs/patterns/glos
 Dependency: `arrow-core-data`
 
 ### arrow-core-data
-
-{:.beginner}
-beginner
 
 ```groovy
 dependencies {
@@ -48,9 +42,6 @@ Datatypes: [`Either`]({{ '/docs/arrow/core/either/' | relative_url }}), [`Option
 Typeclasses: [`Alternative`]({{ '/docs/arrow/typeclasses/alternative/' | relative_url }}), [`Bimonad`]({{ '/docs/arrow/typeclasses/bimonad/' | relative_url }}), [`Inject`]({{ '/docs/typeclasses/inject/' | relative_url }}), [`Reducible`]({{ '/docs/arrow/typeclasses/reducible/' | relative_url }}), [`Traverse`]({{ '/docs/arrow/typeclasses/traverse/' | relative_url }}), [`Applicative`]({{ '/docs/arrow/typeclasses/applicative/' | relative_url }}), [`Comonad`]({{ '/docs/arrow/typeclasses/comonad/' | relative_url }}), [`Eq`]({{ '/docs/arrow/typeclasses/eq/' | relative_url }}), [`Monad`]({{ '/docs/arrow/typeclasses/monad/' | relative_url }}), [`Monoid`]({{ '/docs/arrow/typeclasses/monoid/' | relative_url }}), [`Semigroup`]({{ '/docs/arrow/typeclasses/semigroup/' | relative_url }}), [`ApplicativeError`]({{ '/docs/arrow/typeclasses/applicativeerror/' | relative_url }}), [`Foldable`]({{ '/docs/arrow/typeclasses/foldable/' | relative_url }}), [`MonoidK`]({{ '/docs/arrow/typeclasses/monoidk/' | relative_url }}), [`SemigroupK`]({{ '/docs/arrow/typeclasses/semigroupk/' | relative_url }}), [`Bifoldable`]({{ '/docs/arrow/typeclasses/bifoldable/' | relative_url }}), [`Functor`]({{ '/docs/arrow/typeclasses/functor/' | relative_url }}), [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror/' | relative_url }}), [`Order`]({{ '/docs/arrow/typeclasses/order/' | relative_url }}), [`Show`]({{ '/docs/arrow/typeclasses/show/' | relative_url }}), [`TraverseFilter`]({{ '/docs/arrow/typeclasses/traversefilter/' | relative_url }}), [`FunctorFilter`]({{ '/docs/arrow/typeclasses/functorfilter/' | relative_url }}), [`MonadFilter`]({{ '/docs/arrow/typeclasses/monadfilter/' | relative_url }}), [`MonadCombine`]({{ '/docs/arrow/typeclasses/monadcombine/' | relative_url }}), `Composed`
 
 ### arrow-optics
-
-{:.beginner}
-beginner
 
 ```groovy
 dependencies {
@@ -93,9 +84,6 @@ Dependency: `arrow-core`
 These libraries are hosted inside the arrow repository building on the core, to provide higher level constructs to deal with concepts rather than code abstraction.
 
 ### arrow-syntax
-
-{:.beginner}
-beginner
 
 ```groovy
 dependencies {
@@ -166,9 +154,6 @@ Typeclasses:  [`MonadReader`]({{ '/docs/arrow/mtl/typeclasses/monadreader/' | re
 Dependency: `arrow-core`
 
 ### arrow-optics-mtl
-
-{:.beginner}
-beginner
 
 ```groovy
 dependencies {
