@@ -1,4 +1,4 @@
-package arrow.extensions
+package arrow.core.extensions
 
 import arrow.meta.ast.Code
 import arrow.meta.ast.Func

@@ -1,8 +1,5 @@
-package arrow.extensions
+package arrow.core.extensions
 
-import arrow.core.extensions.eq
-import arrow.core.extensions.hash
-import arrow.core.extensions.show
 import arrow.test.UnitSpec
 import arrow.test.laws.HashLaws
 import arrow.test.laws.ShowLaws

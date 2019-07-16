@@ -79,7 +79,7 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
     fun <A, B> fromOptions(oa: Option<A>, ob: Option<B>): Option<Ior<A, B>> = when (oa) {
       is Some -> when (ob) {
         is Some -> Some(Both(oa.t, ob.t))
-        is None -> Some(Left(oa.t))
+        is None -> Some<Ior<A, B>>(Left(oa.t))
       }
       is None -> when (ob) {
         is Some -> Some(Right(ob.t))
