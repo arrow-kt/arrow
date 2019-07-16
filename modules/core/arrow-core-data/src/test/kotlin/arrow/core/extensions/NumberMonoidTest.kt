@@ -1,6 +1,5 @@
-package arrow.extensions
+package arrow.core.extensions
 
-import arrow.core.extensions.monoid
 import arrow.test.UnitSpec
 import arrow.test.generators.byte
 import arrow.test.generators.short

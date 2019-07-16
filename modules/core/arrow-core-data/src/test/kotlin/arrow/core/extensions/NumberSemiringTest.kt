@@ -1,6 +1,5 @@
-package arrow.extensions
+package arrow.core.extensions
 
-import arrow.core.extensions.semiring
 import arrow.test.UnitSpec
 import arrow.test.laws.SemiringLaws
 import io.kotlintest.runner.junit4.KotlinTestRunner

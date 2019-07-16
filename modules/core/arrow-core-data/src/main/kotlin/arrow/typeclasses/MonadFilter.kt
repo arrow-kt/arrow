@@ -1,14 +1,11 @@
-package arrow.mtl.typeclasses
+package arrow.typeclasses
 
 import arrow.Kind
 import arrow.core.Option
-import arrow.typeclasses.FunctorFilter
-import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadFx
 import kotlin.coroutines.startCoroutine
 
 /**
- * ank_macro_hierarchy(arrow.mtl.typeclasses.MonadFilter)
+ * ank_macro_hierarchy(arrow.typeclasses.MonadFilter)
  */
 interface MonadFilter<F> : Monad<F>, FunctorFilter<F> {
 

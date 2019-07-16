@@ -259,13 +259,13 @@ options:
         url: /docs/arrow/typeclasses/reducible/
 
       - title: TraverseFilter
-        url: /docs/arrow/mtl/typeclasses/traversefilter/
+        url: /docs/arrow/typeclasses/traversefilter/
 
       - title: Functor
         url: /docs/arrow/typeclasses/functor/
 
       - title: FunctorFilter
-        url: /docs/arrow/mtl/typeclasses/functorfilter/
+        url: /docs/arrow/typeclasses/functorfilter/
 
       - title: Applicative
         url: /docs/arrow/typeclasses/applicative/
@@ -286,7 +286,7 @@ options:
         url: /docs/arrow/effects/typeclasses/bracket/
 
       - title: MonadFilter
-        url: /docs/arrow/mtl/typeclasses/monadfilter/
+        url: /docs/arrow/typeclasses/monadfilter/
 
       - title: MonadReader
         url: /docs/arrow/mtl/typeclasses/monadreader/
@@ -298,7 +298,7 @@ options:
         url: /docs/arrow/mtl/typeclasses/monadstate/
 
       - title: MonadCombine
-        url: /docs/arrow/mtl/typeclasses/monadcombine/
+        url: /docs/arrow/typeclasses/monadcombine/
 
       - title: Comonad
         url: /docs/arrow/typeclasses/comonad/

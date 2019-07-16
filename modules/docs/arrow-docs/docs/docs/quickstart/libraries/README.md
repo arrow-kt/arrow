@@ -81,7 +81,7 @@ It also includes the extensions available for datatypes in arrow-core
 
 Dependencies: arrow-core, arrow-mtl-data
 
-Typeclasses: [`FunctorFilter`]({{ '/docs/arrow/mtl/typeclasses/functorfilter/' | relative_url }}), [`MonadFilter`]({{ '/docs/arrow/mtl/typeclasses/monadfilter/' | relative_url }}), [`MonadReader`]({{ '/docs/arrow/mtl/typeclasses/monadreader/' | relative_url }}), [`MonadWriter`]({{ '/docs/arrow/mtl/typeclasses/monadwriter/' | relative_url }}), [`MonadCombine`]({{ '/docs/arrow/mtl/typeclasses/monadcombine/' | relative_url }}), [`MonadState`]({{ '/docs/arrow/mtl/typeclasses/monadstate' | relative_url }}), [`TraverseFilter`]({{ '/docs/arrow/mtl/typeclasses/traversefilter/' | relative_url }})
+Typeclasses: [`FunctorFilter`]({{ '/docs/arrow/typeclasses/functorfilter/' | relative_url }}), [`MonadFilter`]({{ '/docs/arrow/typeclasses/monadfilter/' | relative_url }}), [`MonadReader`]({{ '/docs/arrow/mtl/typeclasses/monadreader/' | relative_url }}), [`MonadWriter`]({{ '/docs/arrow/mtl/typeclasses/monadwriter/' | relative_url }}), [`MonadCombine`]({{ '/docs/arrow/typeclasses/monadcombine/' | relative_url }}), [`MonadState`]({{ '/docs/arrow/mtl/typeclasses/monadstate' | relative_url }}), [`TraverseFilter`]({{ '/docs/arrow/typeclasses/traversefilter/' | relative_url }})
 
 ## Extension libraries
 

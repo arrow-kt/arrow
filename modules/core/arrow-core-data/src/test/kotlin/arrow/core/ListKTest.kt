@@ -12,7 +12,7 @@ import arrow.core.extensions.listk.monoidal.monoidal
 import arrow.core.extensions.listk.semigroupK.semigroupK
 import arrow.core.extensions.listk.show.show
 import arrow.core.extensions.listk.traverse.traverse
-import arrow.mtl.extensions.listk.monadCombine.monadCombine
+import arrow.core.extensions.listk.monadCombine.monadCombine
 import arrow.test.UnitSpec
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonadCombineLaws

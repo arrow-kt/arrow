@@ -3,7 +3,7 @@ package arrow.test.laws
 import arrow.Kind
 import arrow.core.None
 import arrow.core.Some
-import arrow.mtl.typeclasses.TraverseFilter
+import arrow.typeclasses.TraverseFilter
 import arrow.test.generators.applicative
 import arrow.test.generators.functionAToB
 import arrow.test.generators.intSmall
