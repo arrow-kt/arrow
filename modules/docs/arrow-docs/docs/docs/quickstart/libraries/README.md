@@ -10,13 +10,14 @@ Arrow is a modular set of libraries that build on top of each other to provide i
 
 One of our design principles is to keep each library as lean as possible to avoid pulling unnecessary dependencies,
 specially to support Android development where app size affects performance. You're free to pick and choose only those libraries that your project needs!
+Thereby, one only needs to download the toplevel artifacts if it's desired to download the datatypes, typeclasses and their respective extensions.
 
 In this doc we'll describe all the modules that form the core, alongside a list of the most important constructs they include.
 
 ### arrow-core
 
-{:.intermediate}
-intermediate
+{:.beginner}
+beginner
 
 ```groovy
 dependencies {
@@ -46,26 +47,6 @@ Datatypes: [`Either`]({{ '/docs/arrow/core/either/' | relative_url }}), [`Option
 
 Typeclasses: [`Alternative`]({{ '/docs/arrow/typeclasses/alternative/' | relative_url }}), [`Bimonad`]({{ '/docs/arrow/typeclasses/bimonad/' | relative_url }}), [`Inject`]({{ '/docs/typeclasses/inject/' | relative_url }}), [`Reducible`]({{ '/docs/arrow/typeclasses/reducible/' | relative_url }}), [`Traverse`]({{ '/docs/arrow/typeclasses/traverse/' | relative_url }}), [`Applicative`]({{ '/docs/arrow/typeclasses/applicative/' | relative_url }}), [`Comonad`]({{ '/docs/arrow/typeclasses/comonad/' | relative_url }}), [`Eq`]({{ '/docs/arrow/typeclasses/eq/' | relative_url }}), [`Monad`]({{ '/docs/arrow/typeclasses/monad/' | relative_url }}), [`Monoid`]({{ '/docs/arrow/typeclasses/monoid/' | relative_url }}), [`Semigroup`]({{ '/docs/arrow/typeclasses/semigroup/' | relative_url }}), [`ApplicativeError`]({{ '/docs/arrow/typeclasses/applicativeerror/' | relative_url }}), [`Foldable`]({{ '/docs/arrow/typeclasses/foldable/' | relative_url }}), [`MonoidK`]({{ '/docs/arrow/typeclasses/monoidk/' | relative_url }}), [`SemigroupK`]({{ '/docs/arrow/typeclasses/semigroupk/' | relative_url }}), [`Bifoldable`]({{ '/docs/arrow/typeclasses/bifoldable/' | relative_url }}), [`Functor`]({{ '/docs/arrow/typeclasses/functor/' | relative_url }}), [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror/' | relative_url }}), [`Order`]({{ '/docs/arrow/typeclasses/order/' | relative_url }}), [`Show`]({{ '/docs/arrow/typeclasses/show/' | relative_url }}), [`TraverseFilter`]({{ '/docs/arrow/typeclasses/traversefilter/' | relative_url }}), [`FunctorFilter`]({{ '/docs/arrow/typeclasses/functorfilter/' | relative_url }}), [`MonadFilter`]({{ '/docs/arrow/typeclasses/monadfilter/' | relative_url }}), [`MonadCombine`]({{ '/docs/arrow/typeclasses/monadcombine/' | relative_url }}), `Composed`
 
-### arrow-fx
-
-{:.intermediate}
-intermediate
-
-```groovy
-dependencies {
-    compile "io.arrow-kt:arrow-fx:$arrow_version"
-}
-```
-
-The [fx library]({{ '/docs/effects/fx/' | relative_url }}) focuses on bridging suspend functions to typeclasses like Monad and Effect, and abstracts over concurrency frameworks using typeclasses.
-Additionally it provides its own concurrency primitive, called IO.
-
-Datatypes: [`IO`]({{ '/docs/effects/io/' | relative_url }})
-
-Typeclasses: [`Fx`]({{ '/docs/effects/fx/' | relative_url }}), [`MonadDefer`]({{ '/docs/effects/monaddefer/' | relative_url }}), [`Async`]({{ '/docs/effects/async/' | relative_url }}), [`Effect`]({{ '/docs/effects/effect/' | relative_url }})
-
-Dependency: `arrow-core`
-
 ### arrow-optics
 
 {:.beginner}
@@ -87,6 +68,25 @@ Datatypes: [`Fold`]({{ '/docs/optics/fold/' | relative_url }}), [`Getter`]({{ '/
 
 Typeclasses: [`At`]({{ '/docs/optics/at/' | relative_url }}), [`Each`]({{ '/docs/optics/each/' | relative_url }}), [`FilterIndex`]({{ '/docs/optics/filterIndex/' | relative_url }}), [`Index`]({{ '/docs/optics/index/' | relative_url }})
 
+### arrow-fx
+
+{:.intermediate}
+intermediate
+
+```groovy
+dependencies {
+    compile "io.arrow-kt:arrow-fx:$arrow_version"
+}
+```
+
+The [fx library]({{ '/docs/effects/fx/' | relative_url }}) focuses on bridging suspend functions to typeclasses like Monad and Effect, and abstracts over concurrency frameworks using typeclasses.
+Additionally it provides its own concurrency primitive, called IO.
+
+Datatypes: [`IO`]({{ '/docs/effects/io/' | relative_url }})
+
+Typeclasses: [`Fx`]({{ '/docs/effects/fx/' | relative_url }}), [`MonadDefer`]({{ '/docs/effects/monaddefer/' | relative_url }}), [`Async`]({{ '/docs/effects/async/' | relative_url }}), [`Effect`]({{ '/docs/effects/effect/' | relative_url }})
+
+Dependency: `arrow-core`
 
 ## Extension libraries
 
@@ -105,11 +105,11 @@ dependencies {
 
 Multiple extensions functions to work better with function objects and collections.
 
-Dependency: `arrow-core`
-
 For function objects the library provides composition, currying, partial application, memoization, pipe operator, complement for predicates, and several more helpers.
 
 For collections, arrow-syntax provides `firstOption`, tail, basic list traversal, and tuple addition.
+
+Dependency: `arrow-core`
 
 ### arrow-fx-rx2 & arrow-fx-reactor
 
@@ -267,7 +267,15 @@ Dependency: `arrow-core`
 {:.intermediate}
 intermediate
 
+```groovy
+dependencies {
+    compile "io.arrow-kt:arrow-query-language:$arrow_version"
+}
+```
+
 This [Arrow Query Library]({{ '/docs/aql/intro/' | relative_url }}) focuses on bringing SQL-like syntax to Arrow datatypes.
+
+Dependency: `arrow-core`
 
 ## Annotation processors
 
@@ -278,11 +286,23 @@ These libraries focus on meta-programming to generate code that enables other li
 {:.intermediate}
 intermediate
 
+```groovy
+dependencies {
+    compile "io.arrow-kt:arrow-meta:$arrow_version"
+}
+```
+
 Allows boilerplate generation for [`@extension`](({{ 'docs/patterns/glossary/#instances-and-extensions-interfaces' | relative_url }})) instances and [`@higherkind`]({{ 'https://arrow-kt.io/docs/patterns/glossary/#higher-kinds' | relative_url }}) datatypes.
 
 ### arrow-generic
 
 {:.advanced}
 advanced
+
+```groovy
+dependencies {
+    compile "io.arrow-kt:arrow-generic:$arrow_version"
+}
+```
 
 It allows anonating data classes with [`@product`]({{ '/docs/generic/product/' | relative_url }}) to enable them to be structurally deconstructed in tuples and heterogeneous lists.
