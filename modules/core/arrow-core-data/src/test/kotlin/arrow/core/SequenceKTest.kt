@@ -3,6 +3,7 @@ package arrow.core
 import arrow.Kind
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
+import arrow.core.extensions.list.foldable.foldLeft
 import arrow.core.extensions.sequencek.applicative.applicative
 import arrow.core.extensions.sequencek.eq.eq
 import arrow.core.extensions.sequencek.hash.hash
@@ -22,6 +23,7 @@ import arrow.test.laws.ShowLaws
 import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Show
+import io.kotlintest.matchers.sequences.shouldContainAll
 import io.kotlintest.properties.Gen
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
@@ -60,6 +62,13 @@ class SequenceKTest : UnitSpec() {
       TraverseLaws.laws(SequenceK.traverse(), SequenceK.applicative(), { n: Int -> SequenceK(sequenceOf(n)) }, eq),
       HashLaws.laws(SequenceK.hash(Int.hash()), SequenceK.eq(Int.eq())) { sequenceOf(it).k() }
     )
+
+    "mapFilter" {
+      val op: SequenceK<Int> = List(100) { s: Int -> 10 * s }.asSequence().k()
+      val res = List(100) { s: Int -> 10 * s }.foldLeft(emptySequence<Int>())
+      { acc, i -> if (i < 44) acc else acc + i }.k()
+      op.mapFilter { if (it < 44) None else Some(it) } shouldContainAll res
+    }
   }
 
   private fun bijection(from: Kind<ForSequenceK, Tuple2<Tuple2<Int, Int>, Int>>): SequenceK<Tuple2<Int, Tuple2<Int, Int>>> =

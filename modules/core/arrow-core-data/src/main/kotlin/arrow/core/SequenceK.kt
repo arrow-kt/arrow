@@ -37,6 +37,9 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
       }
     }
 
+  fun <B> mapFilter(f: (A) -> Option<B>): SequenceK<B> =
+    map(f).foldLeft(empty(), { acc: SequenceK<B>, o: Option<B> -> o.fold({ acc }, { b: B -> acc + b }).k() })
+
   companion object {
 
     fun <A> just(a: A): SequenceK<A> = sequenceOf(a).k()

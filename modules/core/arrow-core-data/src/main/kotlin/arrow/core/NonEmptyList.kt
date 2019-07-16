@@ -45,6 +45,9 @@ class NonEmptyList<out A> private constructor(
   fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
     all.k().foldRight(lb, f)
 
+  fun <B> mapFilter(f: (A) -> Option<B>): NonEmptyList<B> =
+    map(f).foldLeft(NonEmptyList(listOf())) { acc, o -> o.fold({ acc }, { acc + it }) }
+
   fun <G, B> traverse(AG: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, NonEmptyList<B>> = with(AG) {
     f(fix().head).map2Eval(Eval.always {
       tail.k().traverse(AG, f)
