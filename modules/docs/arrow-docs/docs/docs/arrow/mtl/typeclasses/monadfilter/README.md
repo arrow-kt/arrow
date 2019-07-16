@@ -123,4 +123,4 @@ import arrow.typeclasses.MonadFilter
 TypeClass(MonadFilter::class).dtMarkdownList()
 ```
 
-ank_macro_hierarchy(arrow.mtl.typeclasses.MonadFilter)
+ank_macro_hierarchy(arrow.typeclasses.MonadFilter)

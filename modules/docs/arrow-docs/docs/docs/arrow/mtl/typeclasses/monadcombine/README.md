@@ -20,6 +20,6 @@ import arrow.typeclasses.MonadCombine
 TypeClass(MonadCombine::class).dtMarkdownList()
 ```
 
-ank_macro_hierarchy(arrow.mtl.typeclasses.MonadCombine)
+ank_macro_hierarchy(arrow.typeclasses.MonadCombine)
 
 TODO. Meanwhile you can find a short description in the [intro to typeclasses]({{ '/docs/typeclasses/intro/' | relative_url }}).

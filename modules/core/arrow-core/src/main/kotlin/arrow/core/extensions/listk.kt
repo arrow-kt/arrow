@@ -227,7 +227,7 @@ interface ListKMonadCombine : MonadCombine<ForListK> {
     ListK.just(a)
 
   override fun <A> Kind<ForListK, A>.combineK(y: Kind<ForListK, A>): ListK<A> =
-    fix().combineK(y)
+    fix().listCombineK(y)
 }
 
 @extension
