@@ -5,7 +5,6 @@ import arrow.core.Function1
 import arrow.core.Function1PartialOf
 import arrow.core.extensions.Function1Monad
 import arrow.core.fix
-
 import arrow.extension
 import arrow.mtl.typeclasses.MonadReader
 

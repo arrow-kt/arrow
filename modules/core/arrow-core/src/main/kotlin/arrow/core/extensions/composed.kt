@@ -1,9 +1,9 @@
-package arrow.mtl.extensions
+package arrow.core.extensions
 
 import arrow.Kind
 import arrow.core.Option
 import arrow.typeclasses.FunctorFilter
-import arrow.mtl.typeclasses.TraverseFilter
+import arrow.typeclasses.TraverseFilter
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ComposedFunctor
 import arrow.typeclasses.ComposedTraverse

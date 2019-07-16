@@ -188,13 +188,13 @@ Effects provides a hierarchy of typeclasses for lazy and asynchronous execution.
 
 The Monad Template Library module gives more specialized version of existing typeclasses
 
-- [`FunctorFilter`]({{ '/docs/arrow/mtl/typeclasses/functorfilter/' | relative_url }}) - can map values that pass a predicate
+- [`FunctorFilter`]({{ '/docs/arrow/typeclasses/functorfilter/' | relative_url }}) - can map values that pass a predicate
 
-- [`MonadFilter`]({{ '/docs/arrow/mtl/typeclasses/monadfilter/' | relative_url }}) - can sequentially execute values that pass a predicate
+- [`MonadFilter`]({{ '/docs/arrow/typeclasses/monadfilter/' | relative_url }}) - can sequentially execute values that pass a predicate
 
-- [`TraverseFilter`]({{ '/docs/arrow/mtl/typeclasses/traversefilter/' | relative_url }}) - can traverse values that pass a predicate
+- [`TraverseFilter`]({{ '/docs/arrow/typeclasses/traversefilter/' | relative_url }}) - can traverse values that pass a predicate
 
-- [`MonadCombine`]({{ '/docs/arrow/mtl/typeclasses/monadcombine/' | relative_url }}) - has a structure that can be combined and split for several datatypes
+- [`MonadCombine`]({{ '/docs/arrow/typeclasses/monadcombine/' | relative_url }}) - has a structure that can be combined and split for several datatypes
 
 - [`MonadReader`]({{ '/docs/arrow/mtl/typeclasses/monadwriter/' | relative_url }}) - can implement the capabilities of the datatype [`Reader`]({{ '/docs/arrow/data/reader/' | relative_url }})
 

@@ -1,7 +1,7 @@
 package arrow.test.laws
 
 import arrow.Kind
-import arrow.mtl.typeclasses.MonadFilter
+import arrow.typeclasses.MonadFilter
 import arrow.test.generators.applicative
 import arrow.test.generators.functionAToB
 import arrow.typeclasses.Eq
