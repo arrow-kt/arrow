@@ -1,5 +1,7 @@
 package arrow.meta.extensions
 
+import arrow.meta.qq.ClassOrObject
+import arrow.meta.qq.Transformation
 import org.jetbrains.kotlin.analyzer.AnalysisResult
 import org.jetbrains.kotlin.analyzer.ModuleInfo
 import org.jetbrains.kotlin.backend.common.BackendContext
@@ -32,6 +34,7 @@ import org.jetbrains.kotlin.incremental.components.LookupTracker
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.psi.KtClassOrObject
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtModifierListOwner
@@ -217,6 +220,7 @@ class CompilerContext(
   val elementFactory: PsiElementFactory = JavaPsiFacade.getInstance(project).elementFactory,
   val ktPsiElementFactory: KtPsiFactory = KtPsiFactory(project, false)
 ) {
+
   lateinit var lazyClassContext: ResolveSession
   val ctx: CompilerContext = this
   lateinit var module: ModuleDescriptor
@@ -225,7 +229,11 @@ class CompilerContext(
   lateinit var bindingTrace: BindingTrace
   lateinit var componentProvider: ComponentProvider
 
+  val transformations: ArrayList<Transformation<*>> = arrayListOf()
+
   private val descriptorPhaseState = ConcurrentHashMap<FqName, ClassDescriptor>()
+
+  val quotes: ConcurrentHashMap<KtClassOrObject, ClassOrObject> = ConcurrentHashMap()
 
   /**
    * updateClassContext can't replace the actual class context just mutate its internal fields since the compiler holds a

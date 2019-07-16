@@ -3,19 +3,12 @@ package arrow.meta.higherkind
 import arrow.meta.extensions.CompilerContext
 import org.jetbrains.kotlin.backend.common.BackendContext
 import org.jetbrains.kotlin.backend.common.lower.SimpleMemberScope
-import org.jetbrains.kotlin.container.ComponentStorage
-import org.jetbrains.kotlin.container.StorageComponentContainer
-import org.jetbrains.kotlin.container.ValueDescriptor
-import org.jetbrains.kotlin.container.getService
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
-import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
-import org.jetbrains.kotlin.descriptors.PackageFragmentProvider
-import org.jetbrains.kotlin.descriptors.PackageViewDescriptor
 import org.jetbrains.kotlin.descriptors.SourceElement
 import org.jetbrains.kotlin.descriptors.TypeAliasDescriptor
 import org.jetbrains.kotlin.descriptors.Visibilities
@@ -69,7 +62,6 @@ import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.types.typeUtil.isInterface
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
-import java.lang.reflect.Type
 
 
 val kindName: FqName = FqName("arrow.sample.Kind")
@@ -161,34 +153,9 @@ class ContributedPackageFragmentDescriptor(
   val name: FqName,
   val members: List<DeclarationDescriptor>
 ) : PackageFragmentDescriptorImpl(module, name) {
-  override fun getMemberScope(): MemberScope = SimpleMemberScope(members)
-}
-
-class AddSupertypesPackageFragmentProvider(
-  val compilerContext: CompilerContext,
-  val module: ModuleDescriptor
-) : PackageFragmentProvider {
-
-  override fun getPackageFragments(fqName: FqName): List<PackageFragmentDescriptor> {
-    val pckg: PackageViewDescriptor = module.getPackage(fqName)
-
-    val descriptorsInPackage = compilerContext.storedDescriptors().filter {
-      it.fqNameSafe.parent() == fqName
-    }
-    val result = descriptorsInPackage.flatMap { descriptor ->
-      val kindMarker = pckg.kindMarker(descriptor.fqNameSafe)
-      val typeAlias: TypeAliasDescriptor = compilerContext.kindTypeAlias(descriptor)
-      listOf(kindMarker, typeAlias)
-    }
-    println("$fqName ~> getPackageFragments = $result")
-    return listOf(
-      ContributedPackageFragmentDescriptor(module, fqName, result)
-    )
-  }
-
-  override fun getSubPackagesOf(fqName: FqName, nameFilter: (Name) -> Boolean): Collection<FqName> {
-    println("AddSupertypesPackageFramgmentProvider.getSubPackagesOf: $fqName")
-    return emptyList()
+  override fun getMemberScope(): MemberScope {
+    println("getMemberScope: $members")
+    return SimpleMemberScope(members)
   }
 }
 
@@ -396,8 +363,8 @@ fun setFinalStatic(field: Field, newValue: Any) {
   field.set(null, newValue)
 }
 
-fun CallCheckerContext.suppressDiagnostic(f: (Diagnostic) -> Boolean): Unit {
-  (trace.bindingContext.diagnostics as? MutableDiagnosticsWithSuppression)?.let {
+fun CompilerContext.suppressDiagnostic(f: (Diagnostic) -> Boolean): Unit {
+  (bindingTrace.bindingContext.diagnostics as? MutableDiagnosticsWithSuppression)?.let {
     val diagnosticList = it.getOwnDiagnostics() as ArrayList<Diagnostic>
     diagnosticList.removeIf(f)
   }

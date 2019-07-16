@@ -56,7 +56,7 @@ class ExtensionResolutionCallChecker : CallChecker {
 //                isAccessible = true
 //                set(descriptor, true)
 //              }
-              context.suppressDiagnostic { diagnostic -> diagnostic.factory.name == Errors.NO_VALUE_FOR_PARAMETER.name }
+              //context.suppressDiagnostic { diagnostic -> diagnostic.factory.name == Errors.NO_VALUE_FOR_PARAMETER.name }
             }
           }
         }

@@ -4,6 +4,7 @@ import arrow.meta.extensions.CompilerContext
 import arrow.meta.extensions.ExtensionPhase
 import arrow.meta.extensions.MetaComponentRegistrar
 import arrow.meta.higherkind.buildIrValueParameter
+import arrow.meta.qq.classOrObject
 import org.jetbrains.kotlin.backend.common.BackendContext
 import org.jetbrains.kotlin.backend.common.serialization.irrelevantOrigin
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
@@ -18,6 +19,7 @@ import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.impl.IrClassImpl
 import org.jetbrains.kotlin.ir.symbols.impl.IrClassSymbolImpl
 import org.jetbrains.kotlin.ir.types.impl.IrSimpleTypeImpl
+import org.jetbrains.kotlin.ir.util.transformDeclarationsFlat
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.name.SpecialNames
@@ -30,53 +32,43 @@ import org.jetbrains.kotlin.resolve.lazy.descriptors.LazyClassDescriptor
 val extensionAnnotationName = FqName("arrow.extension")
 val withAnnotationName = FqName("arrow.with")
 
+
 class TypeClassesComponentRegistrar : MetaComponentRegistrar {
 
   override fun intercept(): List<ExtensionPhase> =
     meta(
       enableIr(),
-      func({
-        "fun <$typeArgs> $name($params): $returnType = $body"
+      compilerContextService(),
+      //   service(MetaLazyDeclarationResolver::class.java),
+      classOrObject({
+        """class FooClass() {
+          |  $body
+          |}
+          |  """.trimMargin()
       }) { fn ->
-        "fun <$typeArgs> $name($params): $returnType = $body"
+        listOf(
+          """class FooClass() {
+          |  $body
+          |  
+          |  fun foo(): Unit {
+          |    println("foo generated, party hard!!!!!")
+          |  }
+          |  
+          |  companion object {
+          |    fun bar(): Unit = println("Boommmmmm BARRRR!")
+          |  }
+          |}
+          |  """.trimMargin()
+        )
       },
-//      storageComponent(
-//        registerModuleComponents = { container: StorageComponentContainer, platform, moduleDescriptor ->
-//          container.useImpl<ExtensionResolutionCallChecker>()
-//          container.useImpl<TypeClassPlatformDiagnosticSuppressor>()
-//          container.useImpl<MetaCallResolver>()
-//          container.useImpl<MetaBodyResolver>()
-//
-//        },
-//        check = { declaration, descriptor, context ->
-//
-//        }
-//      ),
-//      syntheticResolver(
-//        generateSyntheticMethods = { thisDescriptor, name, bindingContext, fromSupertypes, result ->
-//          println(result)
-//        }
-//      )
-//      ,
-//      analysys(
-//        doAnalysis = { project, module, projectContext, files, bindingTrace, componentProvider ->
-//          componentProvider as StorageComponentContainer
-//          println("analysys.doAnalysis")
-//          null
-//        },
-//        analysisCompleted = { project, module, bindingTrace, files ->
-//          println("analysys.analysisCompleted")
-//          null
-//        }
-//      ),
-//      syntheticScopes(
-//        getSyntheticScopes = { moduleDescriptor, javaSyntheticPropertiesScope ->
-//          println("getSyntheticScopes")
-//          emptyList()
-//        }
-//      ),
       IrGeneration { compilerContext, file, backendContext, bindingContext ->
-        println("IRGeneration!")
+        println("~> IrGeneration")
+        backendContext.run {
+          file.transformDeclarationsFlat { decl ->
+            println("IR: ${decl.descriptor.javaClass}")
+            listOf(decl)
+          }
+        }
       }
     )
 
