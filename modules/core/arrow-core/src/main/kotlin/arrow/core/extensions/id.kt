@@ -5,15 +5,14 @@ package arrow.core.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
-import arrow.core.Id
 import arrow.core.ForId
+import arrow.core.Id
 import arrow.core.IdOf
-import arrow.core.value
-import arrow.extension
-import arrow.core.extensions.traverse as idTraverse
 import arrow.core.extensions.id.monad.monad
 import arrow.core.fix
 import arrow.core.identity
+import arrow.core.value
+import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Bimonad
@@ -23,13 +22,14 @@ import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.MonadFx
+import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Selective
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
+import arrow.core.extensions.traverse as idTraverse
 import arrow.core.select as idSelect
 
 @extension

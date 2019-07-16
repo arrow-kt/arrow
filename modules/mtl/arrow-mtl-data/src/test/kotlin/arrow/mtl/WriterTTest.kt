@@ -22,7 +22,7 @@ import arrow.mtl.extensions.writert.applicative.applicative
 import arrow.mtl.extensions.writert.divisible.divisible
 import arrow.mtl.extensions.writert.monad.monad
 import arrow.mtl.extensions.writert.monoidK.monoidK
-import arrow.mtl.extensions.option.monadFilter.monadFilter
+import arrow.core.extensions.option.monadFilter.monadFilter
 import arrow.mtl.extensions.writert.monadFilter.monadFilter
 import arrow.mtl.extensions.writert.monadWriter.monadWriter
 import arrow.test.UnitSpec

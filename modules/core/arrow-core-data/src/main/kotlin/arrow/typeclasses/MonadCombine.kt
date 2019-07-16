@@ -1,14 +1,11 @@
-package arrow.mtl.typeclasses
+package arrow.typeclasses
 
 import arrow.Kind
 import arrow.Kind2
 import arrow.core.Tuple2
-import arrow.typeclasses.Alternative
-import arrow.typeclasses.Bifoldable
-import arrow.typeclasses.Foldable
 
 /**
- * ank_macro_hierarchy(arrow.mtl.typeclasses.MonadCombine)
+ * ank_macro_hierarchy(arrow.typeclasses.MonadCombine)
  */
 interface MonadCombine<F> : MonadFilter<F>, Alternative<F> {
 

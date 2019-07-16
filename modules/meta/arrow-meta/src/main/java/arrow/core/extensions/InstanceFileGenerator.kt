@@ -1,4 +1,4 @@
-package arrow.extensions
+package arrow.core.extensions
 
 import arrow.common.Package
 import arrow.common.messager.logW
