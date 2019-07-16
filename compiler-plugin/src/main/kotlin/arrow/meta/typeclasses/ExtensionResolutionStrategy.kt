@@ -7,6 +7,11 @@ import arrow.meta.typeclasses.ExtensionResolution.*
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 
 
+val ValueParameterDescriptor.isWithAnnotated: Boolean
+  get() {
+    println("isWithAnnotated"); TODO()
+  }
+
 object ExtensionResolutionStrategy {
 
   tailrec fun resolve(

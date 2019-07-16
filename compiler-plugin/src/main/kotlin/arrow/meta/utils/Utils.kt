@@ -64,7 +64,7 @@ import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 
 
-val kindName: FqName = FqName("arrow.sample.Kind")
+val kindName: FqName = FqName("arrow.Kind")
 
 val ModuleDescriptor.kindDescriptor: ClassDescriptor?
   get() = module.resolveClassByFqName(kindName, NoLookupLocation.FROM_BACKEND)

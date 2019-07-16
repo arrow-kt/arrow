@@ -3,22 +3,25 @@ package arrow.meta.qq
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtElement
+import org.jetbrains.kotlin.psi.psiUtil.getValueParameters
+import org.jetbrains.kotlin.psi.psiUtil.modalityModifierType
 
 interface ClassOrObject : Quote<KtElement, KtClass, ClassOrObject.ClassScope> {
 
-  override fun scope(): ClassScope = ClassScope()
+  override fun scope(): ClassScope = ClassScope.initial
 
   class ClassScope(
-    val visibility: Name = Name.identifier("_class_visibility_"),
-    val modality: Name = Name.identifier("_class_modality_"),
     val name: Name = Name.identifier("_class_name_"),
     val typeArgs: Name = Name.identifier("_class_type_arguments_"),
-    val typeArg: Name = Name.identifier("_class_type_argument_"),
+    val typeArgsWithVariance: Name = Name.identifier("_class_type_arguments_with_variance_"),
     val params: Name = Name.identifier("_class_value_parameters_"),
-    val param: Name = Name.identifier("_class_value_parameter_"),
     val supertypes: Name = Name.identifier("_class_supertypes_"),
     val body: Name = Name.identifier("_class_body_")
-  )
+  ) {
+    companion object {
+      val initial: ClassScope = ClassScope()
+    }
+  }
 
   override fun parse(template: String): KtClass =
     quasiQuoteContext.compilerContext.ktPsiElementFactory.createClass(template)
@@ -30,7 +33,6 @@ interface ClassOrObject : Quote<KtElement, KtClass, ClassOrObject.ClassScope> {
       if (template.contains(originalToken)) Name.identifier(oldCode)
       // if the template has been altered by the user
       else Name.identifier(userSelection)
-
 
     val originalBody: String? = original.body?.text?.drop(1)?.dropLast(1)
 
@@ -44,17 +46,35 @@ interface ClassOrObject : Quote<KtElement, KtClass, ClassOrObject.ClassScope> {
         originalScope.body.identifier,
         originalBody ?: "",
         transformation.body?.text ?: ""
+      ),
+      typeArgs = encode(
+        originalScope.typeArgs.identifier,
+        original.typeParameters.joinToString(", ") { it.name.orEmpty() } ?: "",
+        transformation.typeParameters.joinToString(", ") { it.name.orEmpty() }
+      ),
+      typeArgsWithVariance = encode(
+        originalScope.typeArgs.identifier,
+        original.typeParameters.joinToString(", ") { it.text } ?: "",
+        transformation.typeParameters.joinToString(", ") { it.text }
+      ),
+      supertypes = encode(
+        originalScope.supertypes.identifier,
+        original.superTypeListEntries.joinToString(", ") { it.name ?: "Any" } ?: "",
+        transformation.superTypeListEntries.joinToString(", ") { it.name ?: "Any" }
+      ),
+      params = encode(
+        originalScope.params.identifier,
+        original.getValueParameters().joinToString(", ") { it.name.orEmpty() } ?: "",
+        transformation.getValueParameters().joinToString(", ") { it.name.orEmpty() }
       )
     )
   }
 
-  override fun KtClass.matches(transformation: KtClass): Boolean {
-    println("$nameAsSafeName == ${transformation.nameAsSafeName} : ${nameAsSafeName == transformation.nameAsSafeName}")
-    return nameAsSafeName == transformation.nameAsSafeName
+  override fun KtClass.matches(filter: KtClass): Boolean {
+    val result =
+      (filter.nameAsSafeName == ClassScope.initial.name || filter.nameAsSafeName == nameAsSafeName)
+    return result
   }
-
-  override fun KtClass?.transform(transformation: KtClass): KtClass =
-    transformation
 
   companion object : Quote.Factory<KtElement, KtClass, ClassScope> {
     override operator fun invoke(

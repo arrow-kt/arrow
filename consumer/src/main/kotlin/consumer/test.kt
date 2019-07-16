@@ -3,10 +3,8 @@ package consumer
 object test {
   @JvmStatic
   fun main(args : Array<String>) {
-    println("Before calling Foo")
-    FooClass().foo()
-    FooClass().test()
-    FooClass.bar()
-    println("After calling Foo")
+    val x: OptionOf<Int> = Option.None
+    val y: Option<Int> = x
+    println("run!: $y")
   }
 }

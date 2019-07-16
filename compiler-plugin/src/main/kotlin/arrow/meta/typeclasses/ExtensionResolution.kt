@@ -11,6 +11,11 @@ import org.jetbrains.kotlin.types.typeUtil.supertypes
 import arrow.meta.typeclasses.ExtensionCandidate.*
 import arrow.meta.typeclasses.ExtensionCandidateResolution.*
 
+val ClassDescriptor.isExtensionAnnotated: Boolean
+  get() {
+    println("isExtensionAnnotated"); TODO()
+  }
+
 sealed class ExtensionResolution {
   object FindInLocalFunction : ExtensionResolution() {
     override fun resolve(

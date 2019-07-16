@@ -1,5 +1,6 @@
 package consumer
 
-class FooClass() {
-  fun test(): Unit = println("hand coded!")
+sealed class Option<out A> {
+  object None : Option<Nothing>()
+  data class Some<out A>(val value: A) : Option<A>()
 }

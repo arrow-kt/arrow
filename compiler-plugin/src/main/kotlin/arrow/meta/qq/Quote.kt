@@ -5,6 +5,7 @@ import arrow.meta.extensions.ExtensionPhase
 import arrow.meta.extensions.MetaComponentRegistrar
 import org.jetbrains.kotlin.analyzer.AnalysisResult
 import org.jetbrains.kotlin.psi.KtClass
+import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtFile
 
@@ -13,7 +14,7 @@ import org.jetbrains.kotlin.psi.KtFile
  */
 data class Transformation<out K>(
   val oldDescriptor: K,
-  val newDescriptor: K
+  val newDeclarations: List<KtDeclaration>
 )
 
 /**
@@ -48,7 +49,7 @@ interface Quote<P : KtElement, K : KtElement, S> {
   fun S.match(): String
 
   /**
-   * Does the descriptor currently being evaluated match this user applied transformation?
+   * Does the descriptor currently being evaluated match this user filter
    */
   fun K.matches(transformation: K): Boolean
 
@@ -63,12 +64,6 @@ interface Quote<P : KtElement, K : KtElement, S> {
    */
   fun S.map(quotedTemplate: K): List<String>
 
-  /**
-   * Given an old descriptor [D] apply all transformations of [K] over [D] returning a
-   * new descriptor
-   */
-  fun K?.transform(transformation: K): K
-
   interface Factory<P : KtElement, K : KtElement, S> {
     operator fun invoke(
       quasiQuoteContext: QuasiQuoteContext,
@@ -78,25 +73,22 @@ interface Quote<P : KtElement, K : KtElement, S> {
     ): Quote<P, K, S>
   }
 
-  fun process(descriptor: K): List<Transformation<K>> {
+  fun process(descriptor: K): Transformation<K>? {
     //user provided match
     val quoteToMatch = scope().match()
     // the template is turned into an expression containing context placeholders
     val quotedExpression = parse(quoteToMatch)
     return if (descriptor.matches(quotedExpression)) {
-      println("Descriptor matches: $descriptor, $quotedExpression")
       // a new scope is transformed
       val transformedScope = substitute(quoteToMatch, descriptor, quotedExpression)
-      // the user transforms the expression into a new tree
-      transformedScope.map(quotedExpression).map { transformedQuote ->
-        // the new transformation is turned into an expression
-        val transformedExpression = parse(transformedQuote)
-        // internally we fill all the context placeholder with the descriptor over the user transformation
-        val transformedDescriptor = descriptor.transform(transformedExpression)
-        // We return the old and the new descriptor which the synthetic resolution phase takes care of replacing
-        Transformation(descriptor, transformedDescriptor)
+      // the user transforms the expression into a new list of declarations
+      val declarations = transformedScope.map(descriptor).map { quoteDeclaration ->
+        val declaration = quasiQuoteContext.compilerContext.ktPsiElementFactory.createDeclaration<KtDeclaration>(quoteDeclaration)
+        declaration
       }
-    } else emptyList()
+      if (declarations.isEmpty()) null
+      else Transformation(descriptor, declarations)
+    } else null
   }
 
 }
@@ -140,14 +132,13 @@ inline fun <reified K : KtElement, P : KtElement, S> CompilerContext.processFile
       file.accept(object : MetaTreeVisitor(this) {
         override fun visitKtElement(element: KtElement, data: Unit?): Unit? {
           if (element.javaClass == K::class.java) {
-            mutations.addAll(
-              quoteFactory(
-                quasiQuoteContext = QuasiQuoteContext(compilerContext),
-                containingDeclaration = element.psiOrParent as P,
-                match = match,
-                map = map
-              ).process(element as K)
-            )
+            val transformation = quoteFactory(
+              quasiQuoteContext = QuasiQuoteContext(compilerContext),
+              containingDeclaration = element.psiOrParent as P,
+              match = match,
+              map = map
+            ).process(element as K)
+            transformation?.let { mutations.add(it) }
           }
           return super.visitKtElement(element, data)
         }
@@ -173,8 +164,7 @@ inline fun <reified K : KtElement> KtFile.sourceWithTransformations(mutations: A
     val transformation = mutations.find { transformation ->
       transformation.oldDescriptor == ktDeclaration
     }
-    if (transformation != null) transformation.newDescriptor.text
-    else ktDeclaration.text
+    transformation?.newDeclarations?.joinToString("\n") { it.text } ?: ktDeclaration.text
   }
 
 fun KtFile.printDiff(newFile: KtFile) {
