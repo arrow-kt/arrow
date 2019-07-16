@@ -61,9 +61,6 @@ Typeclasses: [`At`]({{ '/docs/optics/at/' | relative_url }}), [`Each`]({{ '/docs
 
 ### arrow-fx
 
-{:.intermediate}
-intermediate
-
 ```groovy
 dependencies {
     compile "io.arrow-kt:arrow-fx:$arrow_version"
@@ -101,9 +98,6 @@ Dependency: `arrow-core`
 
 ### arrow-fx-rx2 & arrow-fx-reactor
 
-{:.intermediate}
-intermediate
-
 ```groovy
 dependencies {
     compile "io.arrow-kt:arrow-fx-rx2:$arrow_version"
@@ -121,9 +115,6 @@ Dependency: `arrow-fx`
 
 ### arrow-mtl
 
-{:.advanced}
-advanced
-
 ```groovy
 dependencies {
     compile "io.arrow-kt:arrow-mtl:$arrow_version"
@@ -137,9 +128,6 @@ It also includes the extensions available for datatypes in arrow-core
 Dependency: `arrow-mtl-data`
 
 ### arrow-mtl-data
-
-{:.advanced}
-advanced
 
 ```groovy
 dependencies {
@@ -161,14 +149,9 @@ dependencies {
 }
 ```
 
-TODO()
-
 Dependencies: `arrow-optics`, `arrow-mtl-data`
 
 ### arrow-recursion
-
-{:.advanced}
-advanced
 
 ```groovy
 dependencies {
@@ -181,9 +164,6 @@ Recursion schemes is a construct to work with recursive data structures in a way
 Dependency: `arrow-recursion-data`
 
 ### arrow-recursion-data
-
-{:.advanced}
-advanced
 
 ```groovy
 dependencies {
@@ -201,9 +181,6 @@ Dependency: `arrow-core`
 
 ### arrow-integration-retrofit-adapter
 
-{:.advanced}
-advanced
-
 ```groovy
 dependencies {
     compile "io.arrow-kt:arrow-integration-retrofit-adapter:$arrow_version"
@@ -215,9 +192,6 @@ The [adapter]({{ 'docs/integrations/retrofit/' | relative_url }}) is a library t
 Dependency: `arrow-fx`
 
 ### arrow-free
-
-{:.advanced}
-advanced
 
 ```groovy
 dependencies {
@@ -232,9 +206,6 @@ Dependency: `arrow-free-data`
 
 ### arrow-free-data
 
-{:.advanced}
-advanced
-
 ```groovy
 dependencies {
     compile "io.arrow-kt:arrow-free-data:$arrow_version"
@@ -248,9 +219,6 @@ Datatypes: [`Free`]({{ '/docs/free/free/' | relative_url }}), [`FreeApplicative`
 Dependency: `arrow-core`
 
 ### arrow-aql
-
-{:.intermediate}
-intermediate
 
 ```groovy
 dependencies {
@@ -268,9 +236,6 @@ These libraries focus on meta-programming to generate code that enables other li
 
 ### arrow-meta
 
-{:.intermediate}
-intermediate
-
 ```groovy
 dependencies {
     compile "io.arrow-kt:arrow-meta:$arrow_version"
@@ -280,9 +245,6 @@ dependencies {
 Allows boilerplate generation for [`@extension`](({{ 'docs/patterns/glossary/#instances-and-extensions-interfaces' | relative_url }})) instances and [`@higherkind`]({{ 'https://arrow-kt.io/docs/patterns/glossary/#higher-kinds' | relative_url }}) datatypes.
 
 ### arrow-generic
-
-{:.advanced}
-advanced
 
 ```groovy
 dependencies {

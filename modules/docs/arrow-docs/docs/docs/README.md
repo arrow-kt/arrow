@@ -41,7 +41,7 @@ allprojects {
     repositories {
         mavenCentral()
         jcenter()
-        maven { url "https://dl.bintray.com/arrow-kt/arrow-kt/" }
+        maven { url "https://dl.bintray.com/arrow-kt/arrow-kt/" } // for SNAPSHOT builds
         maven { url 'https://oss.jfrog.org/artifactory/oss-snapshot-local/' }
     }
 }
