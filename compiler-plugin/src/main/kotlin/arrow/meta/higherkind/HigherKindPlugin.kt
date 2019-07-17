@@ -17,7 +17,7 @@ class HigherKindPlugin : MetaComponentRegistrar {
           |$modality $visibility class $name<$typeArgsWithVariance>($params): $supertypes {
           |  $body
           |}
-          |  """.trimMargin()
+          |  """
       }) { ktClass ->
         if (isHigherKindedType(ktClass)) {
           listOf(
@@ -31,7 +31,7 @@ class HigherKindPlugin : MetaComponentRegistrar {
               |  $body
               |}
               |"""
-          ).map { it.trimMargin() }
+          )
         } else emptyList()
       }
     )

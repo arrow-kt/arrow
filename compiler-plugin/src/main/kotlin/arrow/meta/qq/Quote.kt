@@ -75,7 +75,7 @@ interface Quote<P : KtElement, K : KtElement, S> {
 
   fun process(descriptor: K): Transformation<K>? {
     //user provided match
-    val quoteToMatch = scope().match()
+    val quoteToMatch = scope().match().trimMargin()
     // the template is turned into an expression containing context placeholders
     val quotedExpression = parse(quoteToMatch)
     return if (descriptor.matches(quotedExpression)) {
@@ -83,7 +83,9 @@ interface Quote<P : KtElement, K : KtElement, S> {
       val transformedScope = substitute(quoteToMatch, descriptor, quotedExpression)
       // the user transforms the expression into a new list of declarations
       val declarations = transformedScope.map(descriptor).map { quoteDeclaration ->
-        val declaration = quasiQuoteContext.compilerContext.ktPsiElementFactory.createDeclaration<KtDeclaration>(quoteDeclaration)
+        val declaration =
+          quasiQuoteContext.compilerContext.ktPsiElementFactory
+            .createDeclaration<KtDeclaration>(quoteDeclaration.trimMargin())
         declaration
       }
       if (declarations.isEmpty()) null
