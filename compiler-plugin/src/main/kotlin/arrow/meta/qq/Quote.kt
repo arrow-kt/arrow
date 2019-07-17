@@ -3,7 +3,7 @@ package arrow.meta.qq
 import arrow.meta.extensions.CompilerContext
 import arrow.meta.extensions.ExtensionPhase
 import arrow.meta.extensions.MetaComponentRegistrar
-import org.jetbrains.kotlin.analyzer.AnalysisResult
+import org.jetbrains.kotlin.com.intellij.psi.impl.source.tree.PsiWhiteSpaceImpl
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.psi.KtElement
@@ -36,27 +36,12 @@ interface Quote<P : KtElement, K : KtElement, S> {
   fun parse(template: String): K
 
   /**
-   * The element quote scope which includes all permitted matching variables in a given [D] source
-   */
-  fun scope(): S
-
-  /**
    * Returns a String representation of what a match for a tree may look like. For example:
    * ```
    * "fun <$typeArgs> $name($params): $returnType = $body"
    * ```
    */
-  fun S.match(): String
-
-  /**
-   * Does the descriptor currently being evaluated match this user filter
-   */
-  fun K.matches(transformation: K): Boolean
-
-  /**
-   * substitute this scope with new model replacements
-   */
-  fun substitute(template: String, original: K, transformation: K): S
+  fun K.match(): Boolean
 
   /**
    * Given real matches of a [quotedTemplate] the user is then given a chance to transform it into a new tree
@@ -68,35 +53,36 @@ interface Quote<P : KtElement, K : KtElement, S> {
     operator fun invoke(
       quasiQuoteContext: QuasiQuoteContext,
       containingDeclaration: P,
-      match: S.() -> String,
+      match: K.() -> Boolean,
       map: S.(quotedTemplate: K) -> List<String>
     ): Quote<P, K, S>
   }
 
-  fun process(descriptor: K): Transformation<K>? {
-    //user provided match
-    val quoteToMatch = scope().match().trimMargin()
-    // the template is turned into an expression containing context placeholders
-    val quotedExpression = parse(quoteToMatch)
-    return if (descriptor.matches(quotedExpression)) {
+  fun transform(ktElement: K): S
+
+  fun K.cleanUserQuote(quoteDeclaration: String): String = quoteDeclaration
+
+  fun process(ktElement: K): Transformation<K>? {
+    return if (ktElement.match()) {
       // a new scope is transformed
-      val transformedScope = substitute(quoteToMatch, descriptor, quotedExpression)
+      val transformedScope = transform(ktElement)
       // the user transforms the expression into a new list of declarations
-      val declarations = transformedScope.map(descriptor).map { quoteDeclaration ->
+      val declarations = transformedScope.map(ktElement).map { quoteDeclaration ->
         val declaration =
           quasiQuoteContext.compilerContext.ktPsiElementFactory
-            .createDeclaration<KtDeclaration>(quoteDeclaration.trimMargin())
+            .createDeclaration<KtDeclaration>(ktElement.cleanUserQuote(quoteDeclaration))
         declaration
       }
       if (declarations.isEmpty()) null
-      else Transformation(descriptor, declarations)
+      else Transformation(ktElement, declarations)
     } else null
   }
 
 }
 
+
 fun MetaComponentRegistrar.classOrObject(
-  match: ClassOrObject.ClassScope.() -> String,
+  match: KtClass.() -> Boolean,
   map: ClassOrObject.ClassScope.(KtClass) -> List<String>
 ): ExtensionPhase.AnalysisHandler =
   quote(ClassOrObject.Companion, match, map)
@@ -104,7 +90,7 @@ fun MetaComponentRegistrar.classOrObject(
 @Suppress("UNCHECKED_CAST")
 inline fun <P : KtElement, reified K : KtElement, S, Q : Quote<P, K, S>> MetaComponentRegistrar.quote(
   quoteFactory: Quote.Factory<P, K, S>,
-  noinline match: S.() -> String,
+  noinline match: K.() -> Boolean,
   noinline map: S.(K) -> List<String>
 ): ExtensionPhase.AnalysisHandler =
   analysys(
@@ -124,7 +110,7 @@ inline fun <P : KtElement, reified K : KtElement, S, Q : Quote<P, K, S>> MetaCom
 inline fun <reified K : KtElement, P : KtElement, S> CompilerContext.processFiles(
   files: Collection<KtFile>,
   quoteFactory: Quote.Factory<P, K, S>,
-  noinline match: S.() -> String,
+  noinline match: K.() -> Boolean,
   noinline map: S.(K) -> List<String>
 ): List<Pair<KtFile, ArrayList<Transformation<K>>>> {
   return files.map { file ->
@@ -162,11 +148,13 @@ inline fun <reified K : KtElement> java.util.ArrayList<KtFile>.updateFiles(fileM
 }
 
 inline fun <reified K : KtElement> KtFile.sourceWithTransformations(mutations: ArrayList<Transformation<K>>): String =
-  (listOfNotNull(packageDirective) + declarations).joinToString("\n") { ktDeclaration ->
+  (listOfNotNull(packageDirective) +
+    importDirectives +
+    declarations).joinToString("\n") { ktDeclaration ->
     val transformation = mutations.find { transformation ->
       transformation.oldDescriptor == ktDeclaration
     }
-    transformation?.newDeclarations?.joinToString("\n") { it.text } ?: ktDeclaration.text
+    transformation?.newDeclarations?.joinToString("\n\n") { it.text } ?: ktDeclaration.text
   }
 
 fun KtFile.printDiff(newFile: KtFile) {

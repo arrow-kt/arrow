@@ -19,5 +19,7 @@ object test {
     val eitherStringOrInt: Either<String, Int> = eitherOfStringOrInt
     println("Either Kind!: $eitherStringOrInt")
 
+
+
   }
 }

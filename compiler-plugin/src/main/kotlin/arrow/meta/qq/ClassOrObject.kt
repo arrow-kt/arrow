@@ -4,101 +4,64 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.psiUtil.getValueParameters
-import org.jetbrains.kotlin.psi.psiUtil.modalityModifier
-import org.jetbrains.kotlin.psi.psiUtil.visibilityModifier
+import org.jetbrains.kotlin.psi.psiUtil.modalityModifierType
+import org.jetbrains.kotlin.psi.psiUtil.visibilityModifierType
 
 interface ClassOrObject : Quote<KtElement, KtClass, ClassOrObject.ClassScope> {
 
-  override fun scope(): ClassScope = ClassScope.initial
-
   class ClassScope(
-    val modality: Name = Name.identifier("_class_modality_"),
-    val visibility: Name = Name.identifier("_class_visibility_"),
-    val name: Name = Name.identifier("_class_name_"),
-    val typeParameters: Name = Name.identifier("_class_type_parameters_"),
-    val typeParametersWithVariance: Name = Name.identifier("_class_type_parameters_with_variance_"),
-    val valueParameters: Name = Name.identifier("_class_value_parameters_"),
-    val supertypes: Name = Name.identifier("_class_supertypes_"),
-    val body: Name = Name.identifier("_class_body_")
-  ) {
-    companion object {
-      val initial: ClassScope = ClassScope()
+    val modality: Name,
+    val visibility: Name,
+    val kind: Name,
+    val name: Name,
+    val typeParameters: Name,
+    val valueParameters: Name,
+    val supertypes: Name,
+    val body: Name
+  )
+
+  override fun transform(ktElement: KtClass): ClassScope =
+    ClassScope(
+      modality = Name.identifier(ktElement.modalityModifierType()?.value.orEmpty()),
+      visibility = Name.identifier(ktElement.visibilityModifierType()?.value.orEmpty()),
+      kind = Name.identifier(ktElement.getClassOrInterfaceKeyword()?.text.orEmpty()),
+      name = Name.identifier(ktElement.nameAsSafeName.identifier),
+      typeParameters = Name.identifier(ktElement.renderTypeParametersWithVariance()),
+      valueParameters = if (ktElement.isInterface()) Name.identifier("")
+      else Name.identifier(ktElement.renderValueParameters()),
+      supertypes = Name.identifier(ktElement.renderSuperTypes()),
+      body = Name.identifier(ktElement.body?.text?.drop(1)?.dropLast(1).orEmpty())
+    )
+
+  override fun KtClass.cleanUserQuote(quoteDeclaration: String): String =
+    quoteDeclaration.trimMargin().let {
+      if (isInterface()) it.replace("interface (.*?)\\(\\)".toRegex(), "interface $1")
+      else it
     }
-  }
 
   override fun parse(template: String): KtClass =
     quasiQuoteContext.compilerContext.ktPsiElementFactory.createClass(template)
 
-  override fun substitute(template: String, original: KtClass, transformation: KtClass): ClassScope {
-    val originalScope = scope()
-    fun encode(originalToken: String, oldCode: String, userSelection: String): Name =
-      // if a template contains a template original default value we should substitute for that of the matched descriptor
-      if (template.contains(originalToken)) Name.identifier(oldCode)
-      // if the template has been altered by the user
-      else Name.identifier(userSelection)
+  fun KtClass.renderValueParameters(): String =
+    if (getValueParameters().isEmpty()) ""
+    else getValueParameters().joinToString(separator = ", ") { it.text }
 
-    val originalBody: String? = original.body?.text?.drop(1)?.dropLast(1)
+  fun KtClass.renderSuperTypes(): String =
+    superTypeListEntries.joinToString(", ") { it.name.orEmpty() }
 
-    return ClassScope(
-      visibility = encode(
-        originalScope.visibility.identifier,
-        original.visibilityModifier()?.text ?: "",
-        transformation.visibilityModifier()?.text ?: ""
-      ),
-      modality = encode(
-        originalScope.modality.identifier,
-        original.modalityModifier()?.text ?: "",
-        transformation.modalityModifier()?.text ?: ""
-      ),
-      name = encode(
-        originalScope.name.identifier,
-        original.nameAsSafeName.identifier,
-        transformation.nameAsSafeName.identifier
-      ),
-      body = encode(
-        originalScope.body.identifier,
-        originalBody ?: "",
-        transformation.body?.text ?: ""
-      ),
-      typeParameters = encode(
-        originalScope.typeParameters.identifier,
-        original.typeParameters.joinToString(", ") { it.name.orEmpty() } ?: "",
-        transformation.typeParameters.joinToString(", ") { it.name.orEmpty() }
-      ),
-      typeParametersWithVariance = encode(
-        originalScope.typeParameters.identifier,
-        original.typeParameters.joinToString(", ") { it.text } ?: "",
-        transformation.typeParameters.joinToString(", ") { it.text }
-      ),
-      supertypes = encode(
-        originalScope.supertypes.identifier,
-        original.superTypeListEntries.joinToString(", ") { it.name ?: "Any" } ?: "",
-        transformation.superTypeListEntries.joinToString(", ") { it.name ?: "Any" }
-      ),
-      valueParameters = encode(
-        originalScope.valueParameters.identifier,
-        original.getValueParameters().joinToString(", ") { it.name.orEmpty() } ?: "",
-        transformation.getValueParameters().joinToString(", ") { it.name.orEmpty() }
-      )
-    )
-  }
-
-  override fun KtClass.matches(filter: KtClass): Boolean {
-    val result =
-      (filter.nameAsSafeName == ClassScope.initial.name || filter.nameAsSafeName == nameAsSafeName)
-    return result
-  }
+  fun KtClass.renderTypeParametersWithVariance(): String =
+    typeParameters.joinToString(separator = ", ") { it.text }
 
   companion object : Quote.Factory<KtElement, KtClass, ClassScope> {
     override operator fun invoke(
       quasiQuoteContext: QuasiQuoteContext,
       containingDeclaration: KtElement,
-      match: ClassScope.() -> String,
+      match: KtClass.() -> Boolean,
       map: ClassScope.(quotedTemplate: KtClass) -> List<String>
     ): ClassOrObject =
       object : ClassOrObject {
         override val quasiQuoteContext: QuasiQuoteContext = quasiQuoteContext
-        override fun ClassScope.match(): String = match(ClassScope())
+        override fun KtClass.match(): Boolean = match(this)
         override fun ClassScope.map(quotedTemplate: KtClass): List<String> = map(quotedTemplate)
         override val containingDeclaration: KtElement = containingDeclaration
       }

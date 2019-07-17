@@ -1,6 +1,6 @@
 package arrow.meta.plugin.idea
 
-import arrow.meta.higherkind.HigherKindCommandLineProcessor
+import arrow.meta.MetaCliProcessor
 import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.diagnostic.Logger
 import org.jetbrains.kotlin.cli.common.arguments.CommonCompilerArguments
@@ -14,7 +14,7 @@ internal object ArrowImportHandler {
    * The path to the IntelliJ compatible compiler plugin version.
    */
   private val PLUGIN_JPS_JAR: String?
-    get() = PathManager.getJarPathForClass(HigherKindCommandLineProcessor::class.java)
+    get() = PathManager.getJarPathForClass(MetaCliProcessor::class.java)
 
   /**
    * The [Logger] instance for this class.
