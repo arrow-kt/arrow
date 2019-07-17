@@ -33,7 +33,7 @@ typealias Nel<A> = NonEmptyList<A>
  * import arrow.core.NonEmptyList
  *
  * //sampleStart
- * //NonEmptyList.of() // does not compile
+ * // NonEmptyList.of() // does not compile
  * val value = NonEmptyList.of(1, 2, 3, 4, 5) // NonEmptyList<Int>
  * //sampleEnd
  *
