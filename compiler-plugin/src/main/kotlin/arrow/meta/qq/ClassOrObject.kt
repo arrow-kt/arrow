@@ -5,7 +5,6 @@ import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.psiUtil.getValueParameters
 import org.jetbrains.kotlin.psi.psiUtil.modalityModifier
-import org.jetbrains.kotlin.psi.psiUtil.modalityModifierType
 import org.jetbrains.kotlin.psi.psiUtil.visibilityModifier
 
 interface ClassOrObject : Quote<KtElement, KtClass, ClassOrObject.ClassScope> {
@@ -16,9 +15,9 @@ interface ClassOrObject : Quote<KtElement, KtClass, ClassOrObject.ClassScope> {
     val modality: Name = Name.identifier("_class_modality_"),
     val visibility: Name = Name.identifier("_class_visibility_"),
     val name: Name = Name.identifier("_class_name_"),
-    val typeArgs: Name = Name.identifier("_class_type_arguments_"),
-    val typeArgsWithVariance: Name = Name.identifier("_class_type_arguments_with_variance_"),
-    val params: Name = Name.identifier("_class_value_parameters_"),
+    val typeParameters: Name = Name.identifier("_class_type_parameters_"),
+    val typeParametersWithVariance: Name = Name.identifier("_class_type_parameters_with_variance_"),
+    val valueParameters: Name = Name.identifier("_class_value_parameters_"),
     val supertypes: Name = Name.identifier("_class_supertypes_"),
     val body: Name = Name.identifier("_class_body_")
   ) {
@@ -61,13 +60,13 @@ interface ClassOrObject : Quote<KtElement, KtClass, ClassOrObject.ClassScope> {
         originalBody ?: "",
         transformation.body?.text ?: ""
       ),
-      typeArgs = encode(
-        originalScope.typeArgs.identifier,
+      typeParameters = encode(
+        originalScope.typeParameters.identifier,
         original.typeParameters.joinToString(", ") { it.name.orEmpty() } ?: "",
         transformation.typeParameters.joinToString(", ") { it.name.orEmpty() }
       ),
-      typeArgsWithVariance = encode(
-        originalScope.typeArgs.identifier,
+      typeParametersWithVariance = encode(
+        originalScope.typeParameters.identifier,
         original.typeParameters.joinToString(", ") { it.text } ?: "",
         transformation.typeParameters.joinToString(", ") { it.text }
       ),
@@ -76,8 +75,8 @@ interface ClassOrObject : Quote<KtElement, KtClass, ClassOrObject.ClassScope> {
         original.superTypeListEntries.joinToString(", ") { it.name ?: "Any" } ?: "",
         transformation.superTypeListEntries.joinToString(", ") { it.name ?: "Any" }
       ),
-      params = encode(
-        originalScope.params.identifier,
+      valueParameters = encode(
+        originalScope.valueParameters.identifier,
         original.getValueParameters().joinToString(", ") { it.name.orEmpty() } ?: "",
         transformation.getValueParameters().joinToString(", ") { it.name.orEmpty() }
       )

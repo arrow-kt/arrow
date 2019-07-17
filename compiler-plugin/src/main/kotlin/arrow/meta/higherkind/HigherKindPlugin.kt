@@ -11,7 +11,7 @@ class HigherKindPlugin : MetaComponentRegistrar {
     meta(
       classOrObject({
         """
-          |$modality $visibility class $name<$typeArgsWithVariance>($params): $supertypes {
+          |$modality $visibility class $name<$typeParametersWithVariance>($valueParameters): $supertypes {
           |  $body
           |}
           |  """
@@ -21,8 +21,8 @@ class HigherKindPlugin : MetaComponentRegistrar {
             /** Kind Marker **/
             "class For$name private constructor() { companion object }",
             /** Single arg type alias **/
-            "typealias ${name}Of<$typeArgs> = arrow.Kind${ktClass.kindAritySuffix}<For$name, $typeArgs>",
-            /** generate partial aliases if this kind has > 2 type parameters **/
+            "typealias ${name}Of<$typeParameters> = arrow.Kind${ktClass.kindAritySuffix}<For$name, $typeParameters>",
+            /** generate partial aliases if this kind has > 1 type parameters **/
             if (ktClass.arity > 1)
               """
                 |typealias ${name}PartialOf<${ktClass.partialTypeParameters}> = 
@@ -32,7 +32,7 @@ class HigherKindPlugin : MetaComponentRegistrar {
             ,
             /** Class redefinition with kinded super type **/
             """
-              |$modality $visibility class $name<$typeArgsWithVariance>($params): ${name}Of<$typeArgs> {
+              |$modality $visibility class $name<$typeParametersWithVariance>($valueParameters): ${name}Of<$typeParameters> {
               |  $body
               |}
               |"""
