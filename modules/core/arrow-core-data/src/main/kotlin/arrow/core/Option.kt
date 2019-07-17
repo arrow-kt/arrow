@@ -24,7 +24,7 @@ import arrow.higherkind
  * import arrow.core.none
  *
  * //sampleStart
- * val value: Option<String> = Some("I am wrapped in something")
+ * val someValue: Option<String> = Some("I am wrapped in something")
  * val emptyValue: Option<String> = none()
  * //sampleEnd
  *
