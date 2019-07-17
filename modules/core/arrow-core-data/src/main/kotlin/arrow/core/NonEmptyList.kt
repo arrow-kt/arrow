@@ -200,8 +200,8 @@ typealias Nel<A> = NonEmptyList<A>
  * ### Supported type classes
  *
  * ```kotlin:ank:replace
- * import arrow.reflect.*
- * import arrow.core.*
+ * import arrow.reflect.DataType
+ * import arrow.core.NonEmptyList
  *
  * DataType(NonEmptyList::class).tcMarkdownList()
  * ```

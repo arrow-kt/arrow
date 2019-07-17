@@ -589,8 +589,8 @@ typealias Invalid<E> = Validated.Invalid<E>
  * ### Supported type classes
  *
  * ```kotlin:ank:replace
- * import arrow.reflect.*
- * import arrow.core.*
+ * import arrow.reflect.DataType
+ * import arrow.core.Validated
  *
  * DataType(Validated::class).tcMarkdownList()
  * ```

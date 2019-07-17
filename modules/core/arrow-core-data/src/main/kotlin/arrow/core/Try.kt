@@ -570,8 +570,8 @@ typealias Success<A> = Try.Success<A>
  * ### Supported type classes
  *
  * ```kotlin:ank:replace
- * import arrow.reflect.*
- * import arrow.core.*
+ * import arrow.reflect.DataType
+ * import arrow.core.Try
  *
  * DataType(Try::class).tcMarkdownList()
  * ```

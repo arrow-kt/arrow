@@ -377,8 +377,8 @@ import arrow.higherkind
  * ### Supported type classes
  *
  * ```kotlin:ank:replace
- * import arrow.reflect.*
- * import arrow.core.*
+ * import arrow.reflect.DataType
+ * import arrow.core.Option
  *
  * DataType(Option::class).tcMarkdownList()
  * ```
