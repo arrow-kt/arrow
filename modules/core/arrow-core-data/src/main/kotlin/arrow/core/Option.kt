@@ -77,7 +77,7 @@ import arrow.higherkind
  *  if (flag) Some("Found value") else None
  *
  * //sampleStart
- * val option = maybeItWillReturnSomething(false)
+ * val value2 = maybeItWillReturnSomething(false)
  *  .getOrElse { "No value" }
  * //sampleEnd
  *
