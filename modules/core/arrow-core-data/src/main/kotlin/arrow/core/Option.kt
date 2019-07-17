@@ -82,7 +82,7 @@ import arrow.higherkind
  * //sampleEnd
  *
  * fun main() {
- *  println("option = $option")
+ *  println("option = $value2")
  * }
  * ```
  *
