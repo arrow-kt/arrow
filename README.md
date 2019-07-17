@@ -70,7 +70,7 @@ dependencies {
 }
 ```
 
-## Λrrow Optics
+## Λrrow Core + Λrrow Optics
 
 ```groovy
 def arrow_version = "0.10.0-SNAPSHOT"
@@ -81,7 +81,7 @@ dependencies {
 }
 ```
 
-## Λrrow Fx
+## Λrrow Core + Λrrow Fx 
 
 ```groovy
 def arrow_version = "0.10.0-SNAPSHOT"
