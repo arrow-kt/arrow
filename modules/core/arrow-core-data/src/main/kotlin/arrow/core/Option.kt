@@ -29,7 +29,7 @@ import arrow.higherkind
  * //sampleEnd
  *
  * fun main() {
- *  println("value = $value")
+ *  println("value = $someValue")
  *  println("emptyValue = $emptyValue")
  * }
  * ```
