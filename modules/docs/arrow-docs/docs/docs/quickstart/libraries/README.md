@@ -67,7 +67,7 @@ dependencies {
 }
 ```
 
-The [fx library]({{ '/docs/effects/fx/' | relative_url }}) focuses on bridging suspend functions to typeclasses like Monad and Effect, and abstracts over concurrency frameworks using typeclasses.
+The [fx library]({{ '/docs/effects/fx/' | relative_url }}) offers a powerful concurrency DSL with an emphasis on easy concurrency and parallelism with guarantees about concurrent and parallel resource safety. It can be used with Arrow Fx's IO or a set of typeclasses to abstract over concurrency frameworks like `RxJava`, `Reactor`, `Arrow's IO`, etc.
 Additionally it provides its own concurrency primitive, called IO.
 
 Datatypes: [`IO`]({{ '/docs/effects/io/' | relative_url }})
