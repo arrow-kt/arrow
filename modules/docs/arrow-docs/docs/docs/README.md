@@ -41,8 +41,8 @@ allprojects {
     repositories {
         mavenCentral()
         jcenter()
-        maven { url "https://dl.bintray.com/arrow-kt/arrow-kt/" } // for SNAPSHOT builds
-        maven { url 'https://oss.jfrog.org/artifactory/oss-snapshot-local/' }
+        maven { url "https://dl.bintray.com/arrow-kt/arrow-kt/" } 
+        maven { url 'https://oss.jfrog.org/artifactory/oss-snapshot-local/' } // for SNAPSHOT builds
     }
 }
 ```
@@ -51,10 +51,46 @@ allprojects {
 
 Add the dependencies into the project's `build.gradle`
 
+## Λrrow Core
+
 ```groovy
 def arrow_version = "0.10.0-SNAPSHOT"
 dependencies {
     compile "io.arrow-kt:arrow-core:$arrow_version"
+    compile "io.arrow-kt:arrow-syntax:$arrow_version"
+    kapt    "io.arrow-kt:arrow-meta:$arrow_version"
+}
+```
+
+## Λrrow Optics
+
+```groovy
+def arrow_version = "0.10.0-SNAPSHOT"
+dependencies {
+    compile "io.arrow-kt:arrow-optics:$arrow_version"
+    compile "io.arrow-kt:arrow-syntax:$arrow_version"
+    kapt    "io.arrow-kt:arrow-meta:$arrow_version"
+}
+```
+
+## Λrrow Fx
+
+```groovy
+def arrow_version = "0.10.0-SNAPSHOT"
+dependencies {
+    compile "io.arrow-kt:arrow-fx:$arrow_version"
+    compile "io.arrow-kt:arrow-syntax:$arrow_version"
+    kapt    "io.arrow-kt:arrow-meta:$arrow_version"
+}
+```
+
+## Λrrow Core + Λrrow Optics + Λrrow Fx
+
+```groovy
+def arrow_version = "0.10.0-SNAPSHOT"
+dependencies {
+    compile "io.arrow-kt:arrow-fx:$arrow_version"
+    compile "io.arrow-kt:arrow-optics:$arrow_version"
     compile "io.arrow-kt:arrow-syntax:$arrow_version"
     kapt    "io.arrow-kt:arrow-meta:$arrow_version"
 }
