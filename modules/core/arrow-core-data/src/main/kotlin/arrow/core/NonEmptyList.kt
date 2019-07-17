@@ -32,13 +32,14 @@ typealias Nel<A> = NonEmptyList<A>
  * ```kotlin:ank:playground
  * import arrow.core.NonEmptyList
  *
+ * val value =
  * //sampleStart
- * // NonEmptyList.of() // does not compile
- * val value = NonEmptyList.of(1, 2, 3, 4, 5) // NonEmptyList<Int>
+ *  // NonEmptyList.of() // does not compile
+ *  NonEmptyList.of(1, 2, 3, 4, 5) // NonEmptyList<Int>
  * //sampleEnd
  *
  * fun main() {
- *  println("value = $value")
+ *  println(value)
  * }
  * ```
  *
@@ -49,12 +50,13 @@ typealias Nel<A> = NonEmptyList<A>
  * ```kotlin:ank:playground
  * import arrow.core.NonEmptyList
  *
+ * val value =
  * //sampleStart
- * val value = NonEmptyList.of(1, 2, 3, 4, 5).head
+ *  NonEmptyList.of(1, 2, 3, 4, 5).head
  * //sampleEnd
  *
  * fun main() {
- *  println("value = $value")
+ *  println(value)
  * }
  * ```
  *
@@ -85,12 +87,13 @@ typealias Nel<A> = NonEmptyList<A>
  * ```kotlin:ank:playground
  * import arrow.core.NonEmptyList
  *
+ * val value =
  * //sampleStart
- * val value = NonEmptyList.of(1, 1, 1, 1).map { it + 1 }
+ *  NonEmptyList.of(1, 1, 1, 1).map { it + 1 }
  * //sampleEnd
  *
  * fun main() {
- *  println("value = $value")
+ *  println(value)
  * }
  * ```
  *
@@ -149,16 +152,17 @@ typealias Nel<A> = NonEmptyList<A>
  * import arrow.core.NonEmptyList
  * import arrow.core.extensions.fx
  *
+ * val value =
  * //sampleStart
- * val value = NonEmptyList.fx {
- *  val (x) = NonEmptyList.of(1, 2, 3)
- *  val (y) = NonEmptyList.of(1, 2, 3)
- *  x + y
- * }
+ *  NonEmptyList.fx {
+ *    val (x) = NonEmptyList.of(1, 2, 3)
+ *    val (y) = NonEmptyList.of(1, 2, 3)
+ *   x + y
+ *  }
  * //sampleEnd
  *
  * fun main() {
- *  println("value = $value")
+ *  println(value)
  * }
  * ```
  *
@@ -201,6 +205,7 @@ typealias Nel<A> = NonEmptyList<A>
  *
  * ```kotlin:ank:replace
  * import arrow.reflect.DataType
+ * import arrow.reflect.tcMarkdownList
  * import arrow.core.NonEmptyList
  *
  * DataType(NonEmptyList::class).tcMarkdownList()

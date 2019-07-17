@@ -58,12 +58,13 @@ import arrow.higherkind
  * fun maybeItWillReturnSomething(flag: Boolean): Option<String> =
  *  if (flag) Some("Found value") else None
  *
- *  //sampleStart
- * val value1 = maybeItWillReturnSomething(true)
- *    .getOrElse { "No value" }
+ * val value1 =
+ * //sampleStart
+ *  maybeItWillReturnSomething(true)
+ *     .getOrElse { "No value" }
  * //sampleEnd
  * fun main() {
- *  println("option = $value1")
+ *  println(value1)
  * }
  * ```
  *
@@ -76,13 +77,14 @@ import arrow.higherkind
  * fun maybeItWillReturnSomething(flag: Boolean): Option<String> =
  *  if (flag) Some("Found value") else None
  *
+ * val value2 =
  * //sampleStart
- * val value2 = maybeItWillReturnSomething(false)
- *  .getOrElse { "No value" }
+ *  maybeItWillReturnSomething(false)
+ *   .getOrElse { "No value" }
  * //sampleEnd
  *
  * fun main() {
- *  println("option = $value2")
+ *  println(value2)
  * }
  * ```
  *
@@ -110,6 +112,7 @@ import arrow.higherkind
  *
  * ```kotlin:ank:playground
  * import arrow.core.Option
+ *
  *
  * //sampleStart
  * val myString: String? = "Nullable string"
@@ -188,11 +191,12 @@ import arrow.higherkind
  * import arrow.core.Option
  * import arrow.core.Some
  *
+ * val fold =
  * //sampleStart
- * val fold =  Some(3).fold({ 1 }, { it * 3 })
+ *  Some(3).fold({ 1 }, { it * 3 })
  * //sampleEnd
  * fun main () {
- *  println("fold = $fold")
+ *  println(fold)
  * }
  * ```
  *
@@ -200,12 +204,13 @@ import arrow.higherkind
  * import arrow.core.Option
  * import arrow.core.none
  *
+ * val fold =
  * //sampleStart
- * val fold = none<Int>().fold({ 1 }, { it * 3 })
+ *  none<Int>().fold({ 1 }, { it * 3 })
  * //sampleEnd
  *
  * fun main () {
- *  println("fold = $fold")
+ *  println(fold)
  * }
  * ```
  *
@@ -214,23 +219,25 @@ import arrow.higherkind
  * ```kotlin:ank:playground
  * import arrow.core.some
  *
+ * val value =
  * //sampleStart
- * val value = 1.some()
+ *  1.some()
  * //sampleEnd
  *
  * fun main () {
- *  println("value = $value")
+ *  println(value)
  * }
  * ```
  *
  * ```kotlin:ank:playground
  * import arrow.core.none
  *
+ * val value =
  * //sampleStart
- * val value = none<String>()
+ *  none<String>()
  * //sampleEnd
  * fun main () {
- *  println("value = $value")
+ *  println(value)
  * }
  * ```
  *
@@ -307,10 +314,11 @@ import arrow.higherkind
  * import arrow.core.Some
  *
  * fun main() {
+ * val value =
  *  //sampleStart
- *  val value = Some(1).map { it + 1 }
+ *    Some(1).map { it + 1 }
  *  //sampleEnd
- *  println("value = $value")
+ *  println(value)
  * }
  * ```
  *
@@ -322,12 +330,13 @@ import arrow.higherkind
  * import arrow.core.Some
  * import arrow.core.extensions.option.apply.tupled
  *
+ *  val value =
  * //sampleStart
- * val value = tupled(Some(1), Some("Hello"), Some(20.0))
+ *  tupled(Some(1), Some("Hello"), Some(20.0))
  * //sampleEnd
  *
  * fun main() {
- *  println("value = $value")
+ *  println(value)
  * }
  * ```
  *
@@ -340,8 +349,9 @@ import arrow.higherkind
  * import arrow.core.Some
  * import arrow.core.Option
  *
+ * val value =
  * //sampleStart
- * val value = Option.fx {
+ *  Option.fx {
  *  val (a) = Some(1)
  *  val (b) = Some(1 + a)
  *  val (c) = Some(1 + b)
@@ -350,7 +360,7 @@ import arrow.higherkind
  * //sampleEnd
  *
  * fun main() {
- *  println("value = $value")
+ *  println(value)
  * }
  * ```
  *
@@ -360,17 +370,18 @@ import arrow.higherkind
  * import arrow.core.none
  * import arrow.core.Option
  *
+ * val value =
  * //sampleStart
- * val value = Option.fx {
- *  val (x) = none<Int>()
- *  val (y) = Some(1 + x)
- *  val (z) = Some(1 + y)
- *   x + y + z
- * }
+ *  Option.fx {
+ *    val (x) = none<Int>()
+ *    val (y) = Some(1 + x)
+ *    val (z) = Some(1 + y)
+ *    x + y + z
+ *  }
  * //sampleEnd
  *
  * fun main() {
- *  println("value = $value")
+ *  println(value)
  * }
  * ```
  *
@@ -378,6 +389,7 @@ import arrow.higherkind
  *
  * ```kotlin:ank:replace
  * import arrow.reflect.DataType
+ * import arrow.reflect.tcMarkdownList
  * import arrow.core.Option
  *
  * DataType(Option::class).tcMarkdownList()

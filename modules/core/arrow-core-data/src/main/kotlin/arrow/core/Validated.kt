@@ -505,18 +505,19 @@ typealias Invalid<E> = Validated.Invalid<E>
  *  }
  * }
  *
+ * val value =
  * //sampleStart
- * val value = Rules accumulateErrors {
- *   listOf(
- *    FormField("Invalid Email Domain Label", "nowhere.com"),
- *    FormField("Too Long Email Label", "nowheretoolong${(0..251).map { "g" }}"), //this accumulates N errors
- *    FormField("Valid Email Label", "getlost@nowhere.com")
- *   ).map { it.validateEmail() }
- *  }
+ *  Rules accumulateErrors {
+ *    listOf(
+ *      FormField("Invalid Email Domain Label", "nowhere.com"),
+ *      FormField("Too Long Email Label", "nowheretoolong${(0..251).map { "g" }}"), //this accumulates N errors
+ *      FormField("Valid Email Label", "getlost@nowhere.com")
+ *    ).map { it.validateEmail() }
+ *    }
  * //sampleEnd
  *
  * fun main() {
- *  println("value = $value")
+ *  println(value)
  * }
  * ```
  *  *Fail Fast*
@@ -571,18 +572,19 @@ typealias Invalid<E> = Validated.Invalid<E>
  *  }
  * }
  *
+ * val value =
  * //sampleStart
- * val value =Rules failFast {
- *   listOf(
- *    FormField("Invalid Email Domain Label", "nowhere.com"),
- *    FormField("Too Long Email Label", "nowheretoolong${(0..251).map { "g" }}"), //this fails fast
- *    FormField("Valid Email Label", "getlost@nowhere.com")
- *   ).map { it.validateEmail() }
+ *  Rules failFast {
+ *    listOf(
+ *      FormField("Invalid Email Domain Label", "nowhere.com"),
+ *      FormField("Too Long Email Label", "nowheretoolong${(0..251).map { "g" }}"), //this fails fast
+ *      FormField("Valid Email Label", "getlost@nowhere.com")
+ *    ).map { it.validateEmail() }
  *  }
  * //sampleEnd
  *
  * fun main() {
- *  println("value = $value")
+ *  println(value)
  * }
  * ```
  *
@@ -590,6 +592,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  *
  * ```kotlin:ank:replace
  * import arrow.reflect.DataType
+ * import arrow.reflect.tcMarkdownList
  * import arrow.core.Validated
  *
  * DataType(Validated::class).tcMarkdownList()

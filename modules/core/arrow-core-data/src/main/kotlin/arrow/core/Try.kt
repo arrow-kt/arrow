@@ -115,12 +115,13 @@ typealias Success<A> = Try.Success<A>
  *  return getLotteryNumbersFromCloud()
  * }
  *
+ * val lotteryTry =
  * //sampleStart
- * val lotteryTry = Try { getLotteryNumbers() }
+ *  Try { getLotteryNumbers() }
  * //sampleEnd
  *
  * fun main() {
- *  println("lotteryTry = $lotteryTry")
+ *  println(lotteryTry)
  * }
  * ```
  *
@@ -151,12 +152,13 @@ typealias Success<A> = Try.Success<A>
  * }
  *
  * val lotteryTry = Try { getLotteryNumbers() }
+ * val value =
  * //sampleStart
- * val value = lotteryTry.getOrDefault { emptyList() }
+ *  lotteryTry.getOrDefault { emptyList() }
  * //sampleEnd
  *
  * fun main() {
- *  println("value = $value")
+ *  println(value)
  * }
  * ```
  *
@@ -187,12 +189,13 @@ typealias Success<A> = Try.Success<A>
  * }
  *
  * val lotteryTry = Try { getLotteryNumbers() }
+ * val value =
  * //sampleStart
- * val value = lotteryTry.getOrElse { ex: Throwable -> emptyList() }
+ *  lotteryTry.getOrElse { ex: Throwable -> emptyList() }
  * //sampleEnd
  *
  * fun main() {
- *  println("value = $value")
+ *  println(value)
  * }
  * ```
  *
@@ -223,12 +226,13 @@ typealias Success<A> = Try.Success<A>
  * }
  *
  * val lotteryTry = Try { getLotteryNumbers() }
+ * val value =
  * //sampleStart
- * val value = lotteryTry.getOrElse { emptyList() }
+ *  lotteryTry.getOrElse { emptyList() }
  * //sampleEnd
  *
  * fun main() {
- *  println("value = $value")
+ *  println(value)
  * }
  * ```
  *
@@ -258,14 +262,15 @@ typealias Success<A> = Try.Success<A>
  * }
  *
  * val lotteryTry = Try { getLotteryNumbers() }
+ * val value =
  * //sampleStart
- * val value = lotteryTry.filter {
- *   it.size < 4
+ *  lotteryTry.filter {
+ *    it.size < 4
  *  }
  * //sampleEnd
  *
  * fun main() {
- *  println("value = $value")
+ *  println(value)
  * }
  * ```
  *
@@ -282,28 +287,29 @@ typealias Success<A> = Try.Success<A>
  * class AuthorizationException: GeneralException()
  *
  * fun checkPermissions() {
- * throw AuthorizationException()
+ *  throw AuthorizationException()
  * }
  *
  * fun getLotteryNumbersFromCloud(): List<String> {
- * throw NoConnectionException()
+ *  throw NoConnectionException()
  * }
  *
  * fun getLotteryNumbers(): List<String> {
- * checkPermissions()
+ *  checkPermissions()
  *
- * return getLotteryNumbersFromCloud()
+ *  return getLotteryNumbersFromCloud()
  * }
  *
  * val lotteryTry = Try { getLotteryNumbers() }
+ * val value =
  * //sampleStart
- * val value = lotteryTry.handleError { exception ->
- *  emptyList()
- * }
+ *  lotteryTry.handleError { exception ->
+ *    emptyList()
+ *  }
  * //sampleEnd
  *
  * fun main() {
- *  println("value = $value")
+ *  println(value)
  * }
  * ```
  * Or if you have another different computation that can also fail, you can use `handleErrorWith` to recover from an error (as you do with `handleError`, but in this case, returning a new `Try`):
@@ -318,19 +324,18 @@ typealias Success<A> = Try.Success<A>
  *
  * class AuthorizationException: GeneralException()
  * fun checkPermissions() {
- * throw AuthorizationException()
+ *  throw AuthorizationException()
  * }
  *
  * fun getLotteryNumbersFromCloud(): List<String> {
- * throw NoConnectionException()
+ *  throw NoConnectionException()
  * }
  * fun getLotteryNumbers(source: Source): List<String> {
- * checkPermissions()
+ *  checkPermissions()
  *
- * return getLotteryNumbersFromCloud()
+ *  return getLotteryNumbersFromCloud()
  * }
  * //sampleStart
- *
  * enum class Source {
  *  CACHE, NETWORK
  * }
@@ -370,15 +375,16 @@ typealias Success<A> = Try.Success<A>
  *  return getLotteryNumbersFromCloud()
  * }
  *
- * //sampleStart
  * val lotteryTry = Try { getLotteryNumbers() }
- * val value = lotteryTry.fold(
- *  { emptyList<String>() },
- *  { it.filter { it.toIntOrNull() != null } })
+ * val value =
+ * //sampleStart
+ *  lotteryTry.fold(
+ *    { emptyList<String>() },
+ *    { it.filter { it.toIntOrNull() != null } })
  * //sampleEnd
  *
  * fun main() {
- *   println("value = $value")
+ *   println(value)
  * }
  * ```
  *
@@ -498,12 +504,13 @@ typealias Success<A> = Try.Success<A>
  * import arrow.core.extensions.`try`.apply.tupled
  * import arrow.core.Try
  *
+ * val value =
  * //sampleStart
- * val value = tupled(Try { "3".toInt() }, Try { "5".toInt() }, Try { "nope".toInt() })
+ *  tupled(Try { "3".toInt() }, Try { "5".toInt() }, Try { "nope".toInt() })
  * //sampleEnd
  *
  * fun main() {
- *  println("value = $value")
+ *  println(value)
  * }
  * ```
  *
@@ -515,17 +522,18 @@ typealias Success<A> = Try.Success<A>
  * import arrow.core.extensions.fx
  * import arrow.core.Try
  *
+ * val value =
  * //sampleStart
- * val value = Try.fx {
- *  val (a) = Try { "3".toInt() }
- *  val (b) = Try { "4".toInt() }
- *  val (c) = Try { "5".toInt() }
- *  a + b + c
- * }
+ *  Try.fx {
+ *    val (a) = Try { "3".toInt() }
+ *    val (b) = Try { "4".toInt() }
+ *    val (c) = Try { "5".toInt() }
+ *    a + b + c
+ *  }
  * //sampleEnd
  *
  * fun main() {
- *  println("value = $value")
+ *  println(value)
  * }
  * ```
  *
@@ -533,17 +541,18 @@ typealias Success<A> = Try.Success<A>
  * import arrow.core.extensions.fx
  * import arrow.core.Try
  *
+ * val value =
  * //sampleStart
- * val value = Try.fx {
- *  val (a) = Try { "none".toInt() }
- *  val (b) = Try { "4".toInt() }
- *  val (c) = Try { "5".toInt() }
- *  a + b + c
- * }
+ *  Try.fx {
+ *    val (a) = Try { "none".toInt() }
+ *    val (b) = Try { "4".toInt() }
+ *    val (c) = Try { "5".toInt() }
+ *    a + b + c
+ *  }
  * //sampleEnd
  *
  * fun main() {
- *  println("value = $value")
+ *  println(value)
  * }
  * ```
  *
@@ -553,17 +562,18 @@ typealias Success<A> = Try.Success<A>
  * import arrow.core.extensions.fx
  * import arrow.core.Try
  *
+ * val value =
  * //sampleStart
- * val value =Try.fx {
- *  val a = "none".toInt()
- *  val b = "4".toInt()
- *  val c = "5".toInt()
- *  a + b + c
- * }
+ *  Try.fx {
+ *    val a = "none".toInt()
+ *    val b = "4".toInt()
+ *    val c = "5".toInt()
+ *    a + b + c
+ *  }
  * //sampleEnd
  *
  * fun main() {
- *  println("value = $value")
+ *  println(value)
  * }
  * ```
  *
@@ -571,6 +581,7 @@ typealias Success<A> = Try.Success<A>
  *
  * ```kotlin:ank:replace
  * import arrow.reflect.DataType
+ * import arrow.reflect.tcMarkdownList
  * import arrow.core.Try
  *
  * DataType(Try::class).tcMarkdownList()

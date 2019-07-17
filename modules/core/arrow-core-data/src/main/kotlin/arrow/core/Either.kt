@@ -55,24 +55,26 @@ import arrow.higherkind
  * ```kotlin:ank:playground
  * import arrow.core.Either
  *
+ * val right: Either<String, Int> =
  * //sampleStart
- * val right: Either<String, Int> = Either.Right(5)
+ *  Either.Right(5)
  * //sampleEnd
  *
  * fun main() {
- *  println("right = $right")
+ *  println(right)
  * }
  * ```
  *
  * ```kotlin:ank:playground
  * import arrow.core.Either
  *
+ * val left: Either<String, Int> =
  * //sampleStart
- * val left: Either<String, Int> = Either.Left("Something went wrong")
+ *  Either.Left("Something went wrong")
  * //sampleEnd
  *
  * fun main() {
- *  println("left = $left")
+ *  println(left)
  * }
  * ```
  * Because `Either` is right-biased, it is possible to define a Monad instance for it.
@@ -88,7 +90,7 @@ import arrow.higherkind
  *
  * //sampleStart
  * val right: Either<String, Int> = Either.Right(5)
- * val value = right.flatMap{Either.Right(it + 1)}
+ * val value = right.flatMap{ Either.Right(it + 1) }
  * //sampleEnd
  *
  * fun main() {
@@ -102,7 +104,7 @@ import arrow.higherkind
  *
  * //sampleStart
  * val left: Either<String, Int> = Either.Left("Something went wrong")
- * val value = left.flatMap{Either.Right(it + 1)}
+ * val value = left.flatMap{ Either.Right(it + 1) }
  * //sampleEnd
  *
  * fun main() {
@@ -339,12 +341,13 @@ import arrow.higherkind
  * ```kotlin:ank:playground
  * import arrow.core.right
  *
+ * val right7 =
  * //sampleStart
- * val right7 = 7.right()
+ *   7.right()
  * //sampleEnd
  *
  * fun main() {
- *  println("right7 = $right7")
+ *  println(right7)
  * }
  * ```
  *
@@ -407,24 +410,26 @@ import arrow.higherkind
  * ```kotlin:ank:playground
  * import arrow.core.Either
  *
+ * val value =
  * //sampleStart
- * val value = Either.cond(true, { 42 }, { "Error" })
+ *  Either.cond(true, { 42 }, { "Error" })
  * //sampleEnd
  *
  * fun main() {
- *  println("value = $value")
+ *  println(value)
  * }
  * ```
  *
  * ```kotlin:ank:playground
  * import arrow.core.Either
  *
+ * val value =
  * //sampleStart
- * val value = Either.cond(false, { 42 }, { "Error" })
+ *  Either.cond(false, { 42 }, { "Error" })
  * //sampleEnd
  *
  * fun main() {
- *  println("value = $value")
+ *  println(value)
  * }
  * ```
  *
@@ -494,12 +499,13 @@ import arrow.higherkind
  * import arrow.core.Right
  * import arrow.core.leftIfNull
  *
+ * val value =
  * //sampleStart
- * val value = Right(12).leftIfNull({ -1 })
+ *  Right(12).leftIfNull({ -1 })
  * //sampleEnd
  *
  * fun main() {
- *  println("value = $value")
+ *  println(value)
  * }
  * ```
  *
@@ -507,12 +513,13 @@ import arrow.higherkind
  * import arrow.core.Right
  * import arrow.core.leftIfNull
  *
+ * val value =
  * //sampleStart
- * val value = Right(null).leftIfNull({ -1 })
+ *  Right(null).leftIfNull({ -1 })
  * //sampleEnd
  *
  * fun main() {
- *  println("value = $value")
+ *  println(value)
  * }
  * ```
  *
@@ -520,12 +527,13 @@ import arrow.higherkind
  * import arrow.core.Left
  * import arrow.core.leftIfNull
  *
+ * val value =
  * //sampleStart
- * val value = Left(12).leftIfNull({ -1 })
+ *  Left(12).leftIfNull({ -1 })
  * //sampleEnd
  *
  * fun main() {
- *  println("value = $value")
+ *  println(value)
  * }
  * ```
  *
@@ -538,24 +546,26 @@ import arrow.higherkind
  * ```kotlin:ank:playground
  * import arrow.core.rightIfNotNull
  *
+ * val value =
  * //sampleStart
- * val value = "value".rightIfNotNull { "left" }
+ *  "value".rightIfNotNull { "left" }
  * //sampleEnd
  *
  * fun main() {
- *  println("value = $value")
+ *  println(value)
  * }
  * ```
  *
  * ```kotlin:ank:playground
  * import arrow.core.rightIfNotNull
  *
+ * val value =
  * //sampleStart
- * val value = null.rightIfNotNull { "left" }
+ *  null.rightIfNotNull { "left" }
  * //sampleEnd
  *
  * fun main() {
- *  println("value = $value")
+ *  println(value)
  * }
  * ```
  *
@@ -570,12 +580,13 @@ import arrow.higherkind
  * ```kotlin:ank:playground
  * import arrow.core.Right
  *
+ * val value =
  * //sampleStart
- * val value = Right(1).map {it + 1}
+ *  Right(1).map{ it + 1 }
  * //sampleEnd
  *
  * fun main() {
- *  println("value = $value")
+ *  println(value)
  * }
  * ```
  *
@@ -587,12 +598,13 @@ import arrow.higherkind
  * import arrow.core.Either
  * import arrow.core.extensions.either.apply.tupled
  *
+ * val value =
  * //sampleStart
- * val value = tupled(Either.Right(1), Either.Right("a"), Either.Right(2.0))
+ *  tupled(Either.Right(1), Either.Right("a"), Either.Right(2.0))
  * //sampleEnd
  *
  * fun main() {
- *  println("value = $value")
+ *  println(value)
  * }
  * ```
  *
@@ -605,17 +617,18 @@ import arrow.higherkind
  * import arrow.core.extensions.fx
  * import arrow.core.Either
  *
+ * val value =
  * //sampleStart
- * val value = Either.fx<Int, Int> {
- *  val (a) = Either.Right(1)
- *  val (b) = Either.Right(1 + a)
- *  val (c) = Either.Right(1 + b)
- *  a + b + c
- * }
+ *  Either.fx<Int, Int> {
+ *   val (a) = Either.Right(1)
+ *   val (b) = Either.Right(1 + a)
+ *   val (c) = Either.Right(1 + b)
+ *   a + b + c
+ *  }
  * //sampleEnd
  *
  * fun main() {
- *  println("value = $value")
+ *  println(value)
  * }
  * ```
  *
@@ -623,6 +636,7 @@ import arrow.higherkind
  *
  * ```kotlin:ank:replace
  * import arrow.reflect.DataType
+ * import arrow.reflect.tcMarkdownList
  * import arrow.core.Either
  *
  * DataType(Either::class).tcMarkdownList()
