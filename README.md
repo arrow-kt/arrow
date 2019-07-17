@@ -104,6 +104,8 @@ dependencies {
 }
 ```
 
+Here is the [library list]({{ '/docs/quickstart/libraries/' | relative_url }}) for a more granular dependency set-up.
+
 # Additional Setup
 
 For projects that wish to use their own `@higherkind`, `@optics` and other meta programming facilities provided by Λrrow

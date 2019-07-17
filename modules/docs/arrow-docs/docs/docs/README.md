@@ -34,7 +34,7 @@ Use the list below to learn more about Λrrow's main features.
 
 Make sure to have the latest version of JDK 1.8 installed.
 
-In your project's root `build.gradle` append the jcenter repository to your list of repositories.
+In your project's root `build.gradle` append these repositories to your list.
 
 ```groovy
 allprojects {
@@ -95,6 +95,8 @@ dependencies {
     kapt    "io.arrow-kt:arrow-meta:$arrow_version"
 }
 ```
+
+Here is the [library list]({{ '/docs/quickstart/libraries/' | relative_url }}) for a more granular dependency set-up.
 
 # Additional Setup
 
