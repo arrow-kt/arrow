@@ -5,7 +5,6 @@ import arrow.meta.extensions.MetaComponentRegistrar
 import arrow.meta.qq.classOrObject
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtClass
-import org.jetbrains.kotlin.psi.psiUtil.modalityModifier
 
 class HigherKindPlugin : MetaComponentRegistrar {
 
