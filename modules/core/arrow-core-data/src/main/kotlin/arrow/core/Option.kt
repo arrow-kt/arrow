@@ -63,7 +63,7 @@ import arrow.higherkind
  *    .getOrElse { "No value" }
  * //sampleEnd
  * fun main() {
- *  println("option = $option")
+ *  println("option = $value1")
  * }
  * ```
  *
