@@ -131,6 +131,6 @@ data class OptionT<F, A>(private val value: Kind<F, Option<A>>) : OptionTOf<F, A
     EitherT(cata(FF, { Left(default()) }, { Right(it) }))
 }
 
-fun <F, A, B> OptionTOf<F, A>.mapFilter(FF: Functor<F>, f: (A) -> OptionOf<B>): OptionT<F, B> = FF.run {
+fun <F, A, B> OptionTOf<F, A>.filterMap(FF: Functor<F>, f: (A) -> OptionOf<B>): OptionT<F, B> = FF.run {
   OptionT(value().map { it.flatMap(f) })
 }

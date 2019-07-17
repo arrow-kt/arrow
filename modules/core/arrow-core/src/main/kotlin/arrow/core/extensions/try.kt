@@ -195,8 +195,8 @@ interface TryTraverse : Traverse<ForTry> {
 @extension
 interface TryFunctorFilter : FunctorFilter<ForTry> {
 
-  override fun <A, B> Kind<ForTry, A>.mapFilter(f: (A) -> Option<B>): Try<B> =
-    fix().mapFilter(f)
+  override fun <A, B> Kind<ForTry, A>.filterMap(f: (A) -> Option<B>): Try<B> =
+    fix().filterMap(f)
 
   override fun <A, B> Kind<ForTry, A>.map(f: (A) -> B): Try<B> =
     fix().map(f)

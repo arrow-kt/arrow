@@ -190,8 +190,8 @@ interface ListKHash<A> : Hash<ListKOf<A>>, ListKEq<A> {
 
 @extension
 interface ListKFunctorFilter : FunctorFilter<ForListK> {
-  override fun <A, B> Kind<ForListK, A>.mapFilter(f: (A) -> Option<B>): ListK<B> =
-    fix().mapFilter(f)
+  override fun <A, B> Kind<ForListK, A>.filterMap(f: (A) -> Option<B>): ListK<B> =
+    fix().filterMap(f)
 
   override fun <A, B> Kind<ForListK, A>.map(f: (A) -> B): ListK<B> =
     fix().map(f)
@@ -205,8 +205,8 @@ interface ListKMonadCombine : MonadCombine<ForListK> {
   override fun <A> empty(): ListK<A> =
     ListK.empty()
 
-  override fun <A, B> Kind<ForListK, A>.mapFilter(f: (A) -> Option<B>): ListK<B> =
-    fix().mapFilter(f)
+  override fun <A, B> Kind<ForListK, A>.filterMap(f: (A) -> Option<B>): ListK<B> =
+    fix().filterMap(f)
 
   override fun <A, B> Kind<ForListK, A>.ap(ff: Kind<ForListK, (A) -> B>): ListK<B> =
     fix().ap(ff)
@@ -235,8 +235,8 @@ interface ListKMonadFilter : MonadFilter<ForListK> {
   override fun <A> empty(): ListK<A> =
     ListK.empty()
 
-  override fun <A, B> Kind<ForListK, A>.mapFilter(f: (A) -> Option<B>): ListK<B> =
-    fix().mapFilter(f)
+  override fun <A, B> Kind<ForListK, A>.filterMap(f: (A) -> Option<B>): ListK<B> =
+    fix().filterMap(f)
 
   override fun <A, B> Kind<ForListK, A>.ap(ff: Kind<ForListK, (A) -> B>): ListK<B> =
     fix().ap(ff)
