@@ -3,12 +3,21 @@ package consumer
 object test {
   @JvmStatic
   fun main(args : Array<String>) {
-    val x: OptionOf<Int> = Option.None
+    val opOfInt: OptionOf<Int> = Option.None
     /**
      * `x` is implicitly casted since the KindAwareTypeChecker
      * establishes an iso between OptionOf<Int> <-> Option<Int>
      */
-    val y: Option<Int> = x
-    println("run!: $y")
+    val optIn: Option<Int> = opOfInt
+    println("Option kind!: $optIn")
+
+    val eitherOfStringOrInt: EitherOf<String, Int> = Either.Right(1)
+    /**
+     * `x` is implicitly casted since the KindAwareTypeChecker
+     * establishes an iso between OptionOf<Int> <-> Option<Int>
+     */
+    val eitherStringOrInt: Either<String, Int> = eitherOfStringOrInt
+    println("Either Kind!: $eitherStringOrInt")
+
   }
 }
