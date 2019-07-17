@@ -40,7 +40,7 @@ class SequenceKTest : UnitSpec() {
 
     val associativeSemigroupalEq: Eq<Kind<ForSequenceK, Tuple2<Int, Tuple2<Int, Int>>>> = object : Eq<Kind<ForSequenceK, Tuple2<Int, Tuple2<Int, Int>>>> {
       override fun Kind<ForSequenceK, Tuple2<Int, Tuple2<Int, Int>>>.eqv(b: Kind<ForSequenceK, Tuple2<Int, Tuple2<Int, Int>>>): Boolean =
-        this.fix().toList() == b.fix().toList()
+        fix().toList() == b.fix().toList()
     }
 
     val tuple2Eq: Eq<Kind<ForSequenceK, Tuple2<Int, Int>>> = object : Eq<Kind<ForSequenceK, Tuple2<Int, Int>>> {
