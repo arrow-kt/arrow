@@ -5,7 +5,6 @@ import arrow.core.extensions.hash
 import arrow.core.extensions.nonemptylist.applicative.applicative
 import arrow.core.extensions.nonemptylist.comonad.comonad
 import arrow.core.extensions.nonemptylist.eq.eq
-import arrow.core.extensions.nonemptylist.functorFilter.functorFilter
 import arrow.core.extensions.nonemptylist.hash.hash
 import arrow.core.extensions.nonemptylist.monad.monad
 import arrow.core.extensions.nonemptylist.semigroup.semigroup
@@ -14,7 +13,6 @@ import arrow.core.extensions.nonemptylist.show.show
 import arrow.core.extensions.nonemptylist.traverse.traverse
 import arrow.test.UnitSpec
 import arrow.test.laws.ComonadLaws
-import arrow.test.laws.FunctorFilterLaws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonadLaws
 import arrow.test.laws.SemigroupKLaws
