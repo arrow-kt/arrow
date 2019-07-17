@@ -28,6 +28,8 @@ class NonEmptyList<out A> private constructor(
   @Suppress("FunctionOnlyReturningConstant")
   fun isEmpty(): Boolean = false
 
+  fun toList(): List<A> = all
+
   fun <B> map(f: (A) -> B): NonEmptyList<B> = NonEmptyList(f(head), tail.map(f))
 
   fun <B> flatMap(f: (A) -> NonEmptyListOf<B>): NonEmptyList<B> = f(head).fix() + tail.flatMap { f(it).fix().all }
@@ -44,9 +46,6 @@ class NonEmptyList<out A> private constructor(
 
   fun <B> foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
     all.k().foldRight(lb, f)
-
-  fun <B> mapFilter(f: (A) -> Option<B>): NonEmptyList<B> =
-    map(f).foldLeft(NonEmptyList(listOf())) { acc, o -> o.fold({ acc }, { acc + it }) }
 
   fun <G, B> traverse(AG: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, NonEmptyList<B>> = with(AG) {
     f(fix().head).map2Eval(Eval.always {
