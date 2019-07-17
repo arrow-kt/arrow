@@ -4,13 +4,17 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.psiUtil.getValueParameters
+import org.jetbrains.kotlin.psi.psiUtil.modalityModifier
 import org.jetbrains.kotlin.psi.psiUtil.modalityModifierType
+import org.jetbrains.kotlin.psi.psiUtil.visibilityModifier
 
 interface ClassOrObject : Quote<KtElement, KtClass, ClassOrObject.ClassScope> {
 
   override fun scope(): ClassScope = ClassScope.initial
 
   class ClassScope(
+    val modality: Name = Name.identifier("_class_modality_"),
+    val visibility: Name = Name.identifier("_class_visibility_"),
     val name: Name = Name.identifier("_class_name_"),
     val typeArgs: Name = Name.identifier("_class_type_arguments_"),
     val typeArgsWithVariance: Name = Name.identifier("_class_type_arguments_with_variance_"),
@@ -37,6 +41,16 @@ interface ClassOrObject : Quote<KtElement, KtClass, ClassOrObject.ClassScope> {
     val originalBody: String? = original.body?.text?.drop(1)?.dropLast(1)
 
     return ClassScope(
+      visibility = encode(
+        originalScope.visibility.identifier,
+        original.visibilityModifier()?.text ?: "",
+        transformation.visibilityModifier()?.text ?: ""
+      ),
+      modality = encode(
+        originalScope.modality.identifier,
+        original.modalityModifier()?.text ?: "",
+        transformation.modalityModifier()?.text ?: ""
+      ),
       name = encode(
         originalScope.name.identifier,
         original.nameAsSafeName.identifier,

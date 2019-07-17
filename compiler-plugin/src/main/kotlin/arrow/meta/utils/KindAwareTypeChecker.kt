@@ -8,7 +8,7 @@ import org.jetbrains.kotlin.types.typeUtil.getImmediateSuperclassNotAny
 
 class KindAwareTypeChecker(val typeChecker: KotlinTypeChecker) : KotlinTypeChecker by typeChecker {
   override fun isSubtypeOf(p0: KotlinType, p1: KotlinType): Boolean {
-    println("KindAwareTypeChecker.isSubtypeOf: $p0 <-> $p1")
+    //println("KindAwareTypeChecker.isSubtypeOf: $p0 <-> $p1")
     val subType = p0
     val superType = p1
     val isKind: Boolean =
@@ -17,7 +17,7 @@ class KindAwareTypeChecker(val typeChecker: KotlinTypeChecker) : KotlinTypeCheck
   }
 
   override fun equalTypes(p0: KotlinType, p1: KotlinType): Boolean {
-    println("KindAwareTypeChecker.equalTypes: $p0 <-> $p1")
+    //println("KindAwareTypeChecker.equalTypes: $p0 <-> $p1")
     return typeChecker.equalTypes(p0, p1)
   }
 

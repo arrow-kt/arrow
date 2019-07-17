@@ -1,6 +1,8 @@
 package arrow.meta.extensions
 
+import arrow.meta.higherkind.KindAwareTypeChecker
 import arrow.meta.higherkind.MetaCodeAnalyzerInitializer
+import arrow.meta.higherkind.setFinalStatic
 import arrow.meta.qq.ClassOrObject
 import arrow.meta.qq.QuasiQuoteContext
 import arrow.meta.utils.NoOp3
@@ -89,6 +91,7 @@ import org.jetbrains.kotlin.storage.StorageManager
 import org.jetbrains.kotlin.synthetic.JavaSyntheticPropertiesScope
 import org.jetbrains.kotlin.synthetic.SyntheticScopeProviderExtension
 import org.jetbrains.kotlin.types.KotlinType
+import org.jetbrains.kotlin.types.checker.KotlinTypeChecker
 import org.jetbrains.kotlin.utils.addToStdlib.cast
 import org.jetbrains.org.objectweb.asm.AnnotationVisitor
 import org.jetbrains.org.objectweb.asm.FieldVisitor
@@ -357,156 +360,18 @@ interface MetaComponentRegistrar : ComponentRegistrar {
         isSuppressed(diagnostic)
     }
 
-  //
-//  fun classOrObject(match: ClassOrObject.ClassScope.() -> String, map: ClassOrObject.ClassScope.(KtClass) -> String): ExtensionPhase.SyntheticResolver =
-//    syntheticResolver(
-//      generatePackageSyntheticClasses = { thisDescriptor, name, ctx, declarationProvider, result ->
-//        println("generatePackageSyntheticClasses: ${thisDescriptor.name}#$name")
-//        val transformations = result.mapNotNull { descriptor ->
-//          ClassOrObject(
-//            quasiQuoteContext = QuasiQuoteContext(this@syntheticResolver),
-//            match = match,
-//            map = map,
-//            containingDeclaration = thisDescriptor
-//          ).process(descriptor)
-//        }
-//        transformations.forEach {
-//          val mutatingDescriptor = it.oldDescriptor as LazyClassDescriptor
-//          val descriptorSourceField = mutatingDescriptor.javaClass.getDeclaredField("classOrObject")
-//          descriptorSourceField.isAccessible = true
-//          val newBody = (it.newDescriptor.source as KotlinSourceElement).psi
-//          descriptorSourceField.set(mutatingDescriptor, newBody)
-//          //result.remove(it.oldDescriptor)
-//          result.add(it.oldDescriptor)
-//          this@syntheticResolver.transformations.add(it)
-////          val assoc: WritableSlice<PsiElement, DeclarationDescriptor> = BindingContext.DECLARATION_TO_DESCRIPTOR as WritableSlice<PsiElement, DeclarationDescriptor>
-//          //ctx.trace.record(BindingContext.CLASS, it.oldDescriptor.findPsi()!!, it.newDescriptor)
-//        }
-//      },
-//      getSyntheticFunctionNames = { thisDescriptor ->
-//        //        val names = transformations.flatMap { (old, new) ->
-////          if (thisDescriptor == old && old is LazyClassDescriptor && new is SyntheticClassOrObjectDescriptor) {
-////            val oldNames = old.ktNamedFunctions().map { it.nameAsSafeName }
-////            val newNames = new.ktNamedFunctions().map { it.nameAsSafeName }
-////            newNames.distinctBy { !oldNames.contains(it) }
-////          } else emptyList()
-////        }
-////        println("getSyntheticFunctionNames: ${thisDescriptor.name}: $names")
-////        names
-//        val names =
-//          if (thisDescriptor.name.asString().contains("FooClass")) listOf(Name.identifier("foo"))
-//          else emptyList()
-//        println("getSyntheticFunctionNames: ${thisDescriptor.name}: $names")
-//        names
-//      },
-//      generateSyntheticClasses = { thisDescriptor, name, ctx, declarationProvider, result ->
-//        result.add(thisDescriptor)
-//        println("generateSyntheticClasses: ${thisDescriptor.javaClass}#$name. result: $result")
-//      },
-//      generateSyntheticMethods = { thisDescriptor, name, bindingContext, fromSupertypes, result ->
-//        //        val functionDescriptorResolver = componentProvider.get<FunctionDescriptorResolver>()
-////        transformations.filter { it.oldDescriptor == thisDescriptor }.forEach {(old, new) ->
-////          if (thisDescriptor == old && old is LazyClassDescriptor && new is SyntheticClassOrObjectDescriptor) {
-////            val oldFunctions = old.ktNamedFunctions()
-////            val newFunctions = new.ktNamedFunctions()
-////            val oldNames = oldFunctions.map { it.nameAsSafeName }
-////            val newNames = newFunctions.map { it.nameAsSafeName }
-////            val names: List<Name> = newNames.distinctBy { !oldNames.contains(it) }
-////            newFunctions
-////              .filter { names.contains(it.nameAsSafeName) && it.nameAsSafeName == name }
-////              .forEach { ktNamedFunction ->
-////                val functionDescriptor: SimpleFunctionDescriptor = functionDescriptorResolver.resolveFunctionDescriptor(
-////                  containingDescriptor = new,
-////                  scope = LexicalScopeImpl(
-////                    parent = new.scopeForMemberDeclarationResolution,
-////                    ownerDescriptor = new,
-////                    isOwnerDescriptorAccessibleByLabel = true,
-////                    implicitReceiver = new.thisAsReceiverParameter,
-////                    kind = LexicalScopeKind.SYNTHETIC,
-////                    redeclarationChecker = MetaLocalRedeclarationChecker,
-////                    initialize = {
-////                      addClassifierDescriptor(new)
-////                    }
-////                  ),
-////                  function = ktNamedFunction,
-////                  trace = bindingTrace,
-////                  dataFlowInfo = DataFlowInfo.EMPTY
-////                )
-////                val functionDescriptor = createSyntheticFunctionDescriptor(
-////                  ktNamedFunction,
-////                  emptyList(),
-////                  new,
-////                  bindingTrace
-////                )
-////                result.add(functionDescriptor)
-////                println("Added $functionDescriptor")
-////            }
-////          }
-////        }
-//        println("generateSyntheticMethods: ${thisDescriptor.name}#$name. result: $result")
-//      },
-//      generateSyntheticProperties = { thisDescriptor, name, bindingContext, fromSupertypes, result ->
-//        println("generateSyntheticProperties: ${thisDescriptor.name}#$name. result: $result")
-//      }
-//    )
-
-  fun CompilerContext.createSyntheticFunctionDescriptor(
-    ktNamedFunction: KtNamedFunction,
-    parameters: Collection<ValueParameterDescriptor>,
-    classDescriptor: ClassDescriptor,
-    trace: BindingTrace
-  ): SimpleFunctionDescriptor {
-    //TODO most of this values are wrong but here to test codegen
-    val functionDescriptor = SimpleFunctionDescriptorImpl.create(
-      classDescriptor,
-      Annotations.EMPTY,
-      ktNamedFunction.nameAsSafeName,
-      CallableMemberDescriptor.Kind.SYNTHESIZED,
-      KotlinSourceElement(ktNamedFunction)
-    )
-
-    val parameterDescriptors = arrayListOf<ValueParameterDescriptor>()
-
-    for (parameter in parameters) {
-      val propertyDescriptor = trace.bindingContext.get(BindingContext.VALUE_PARAMETER_AS_PROPERTY, parameter)
-      // If a parameter doesn't have the corresponding property, it must not have a default value in the 'copy' function
-      val declaresDefaultValue = propertyDescriptor != null
-      val parameterDescriptor = ValueParameterDescriptorImpl(
-        functionDescriptor, null, parameter.index, parameter.annotations, parameter.name, parameter.type, declaresDefaultValue,
-        parameter.isCrossinline, parameter.isNoinline, parameter.varargElementType, parameter.source
-      )
-      parameterDescriptors.add(parameterDescriptor)
-      if (declaresDefaultValue) {
-        trace.record(BindingContext.VALUE_PARAMETER_AS_PROPERTY, parameterDescriptor, propertyDescriptor)
-      }
-    }
-
-    functionDescriptor.initialize(
-      null,
-      classDescriptor.thisAsReceiverParameter,
-      emptyList<TypeParameterDescriptor>(),
-      parameterDescriptors,
-      classDescriptor.module.builtIns.unitType,
-      Modality.FINAL,
-      Visibilities.PUBLIC
-    )
-
-    trace.record(BindingContext.DATA_CLASS_COPY_FUNCTION, classDescriptor, functionDescriptor)
-    return functionDescriptor
-  }
-
-  fun SyntheticClassOrObjectDescriptor.ktNamedFunctions() =
-    source.cast<KotlinSourceElement>().psi.cast<KtClass>().declarations.filterIsInstance<KtNamedFunction>()
-
-  fun LazyClassDescriptor.ktNamedFunctions() =
-    source.cast<KotlinSourceElement>().psi.cast<KtClass>().declarations.filterIsInstance<KtNamedFunction>()
-
-  fun <S> service(c: Class<S>): ExtensionPhase.StorageComponentContainer =
+  private fun registerKindAwareTypeChecker(): ExtensionPhase.StorageComponentContainer =
     storageComponent(
       registerModuleComponents = { container, platform, moduleDescriptor ->
-        container.registerSingleton(c)
+        println("registerModuleComponents")
+        val defaultTypeChecker = KotlinTypeChecker.DEFAULT
+        if (defaultTypeChecker !is KindAwareTypeChecker) { //nasty hack ahead to circumvent the ability to replace the Kotlin type checker
+          val defaultTypeCheckerField = KotlinTypeChecker::class.java.getDeclaredField("DEFAULT")
+          setFinalStatic(defaultTypeCheckerField, KindAwareTypeChecker(defaultTypeChecker))
+        }
       },
       check = { declaration, descriptor, context ->
+        println("check")
       }
     )
 
@@ -636,16 +501,19 @@ interface MetaComponentRegistrar : ComponentRegistrar {
     configuration: CompilerConfiguration
   ) {
     //println("Project allowed extensions: ${Extensions.getArea(project).extensionPoints.toList().joinToString("\n")}")
-    val messageCollector: MessageCollector =
-      configuration.get(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY, MessageCollector.NONE)
+    val messageCollector: MessageCollector = configuration.get(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY, MessageCollector.NONE)
     val ctx = CompilerContext(project, messageCollector)
-    project.picoContainer.componentAdapters.filterIsInstance<ComponentAdapter>().forEach {
-      println("Compiler Service: <${it.componentKey}> : ${it.componentImplementation}")
-    }
-    project.replaceComponent<CodeAnalyzerInitializer>(::MetaCodeAnalyzerInitializer)
+//    project.picoContainer.componentAdapters.filterIsInstance<ComponentAdapter>().forEach {
+//      println("Compiler Service: <${it.componentKey}> : ${it.componentImplementation}")
+//    }
 
     registerPostAnalysisContextEnrichment(project, ctx)
-    intercept().forEach { phase ->
+    val initialPhases = meta(
+      enableIr(),
+      compilerContextService(),
+      registerKindAwareTypeChecker()
+    )
+    (initialPhases + intercept()).forEach { phase ->
       if (phase is ExtensionPhase.PreprocessedVirtualFileFactory) registerPreprocessedVirtualFileFactory(project, phase, ctx)
       if (phase is ExtensionPhase.Config) registerCompilerConfiguration(project, phase, ctx)
       if (phase is ExtensionPhase.StorageComponentContainer) registerStorageComponentContainer(project, phase, ctx)
