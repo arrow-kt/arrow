@@ -1,8 +1,10 @@
 package arrow.core
 
+import arrow.Kind
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
 import arrow.core.extensions.id.applicative.applicative
+import arrow.core.extensions.id.bimonad.bimonad
 import arrow.core.extensions.id.comonad.comonad
 import arrow.core.extensions.id.eq.eq
 import arrow.core.extensions.id.hash.hash
@@ -14,6 +16,7 @@ import arrow.core.extensions.id.traverse.traverse
 import arrow.core.extensions.monoid
 import arrow.core.extensions.semigroup
 import arrow.test.UnitSpec
+import arrow.test.laws.BimonadLaws
 import arrow.test.laws.ComonadLaws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonadLaws
@@ -29,6 +32,10 @@ import org.junit.runner.RunWith
 
 @RunWith(KotlinTestRunner::class)
 class IdTest : UnitSpec() {
+  val EQ: Eq<Kind<ForId, Kind<ForId, Int>>> = Eq { a, b ->
+    a.value().value() == b.value().value()
+  }
+
   init {
     testLaws(
       SemigroupLaws.laws(Id.semigroup(Int.semigroup()), Id(1), Id(2), Id(3), Id.eq(Int.eq())),
@@ -37,6 +44,7 @@ class IdTest : UnitSpec() {
       MonadLaws.laws(Id.monad(), Eq.any()),
       TraverseLaws.laws(Id.traverse(), Id.applicative(), ::Id, Eq.any()),
       ComonadLaws.laws(Id.comonad(), ::Id, Eq.any()),
+      BimonadLaws.laws(Id.bimonad(), { Id(Id(it)) }, Eq.any(), EQ),
       HashLaws.laws(Id.hash(Int.hash()), Id.eq(Int.eq())) { Id(it) }
     )
 
