@@ -31,10 +31,6 @@ import java.util.concurrent.atomic.AtomicReference
 class EffectsSuspendDSLTests() : UnitSpec() {
 
   private val ctxA = newSingleThreadContext("A")
-
-  private val ctxB = newSingleThreadContext("B")
-
-  private val ctxA = newSingleThreadContext("A")
   private val ctxB = newSingleThreadContext("B")
 
   init {
