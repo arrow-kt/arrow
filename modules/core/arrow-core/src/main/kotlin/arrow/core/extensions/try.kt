@@ -6,7 +6,6 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.ForTry
-import arrow.core.Option
 import arrow.core.Try
 import arrow.core.Try.Failure
 import arrow.core.TryOf
@@ -20,7 +19,6 @@ import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
-import arrow.typeclasses.FunctorFilter
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError

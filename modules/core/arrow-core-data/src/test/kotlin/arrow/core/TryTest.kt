@@ -14,10 +14,8 @@ import arrow.core.extensions.eq
 import arrow.core.extensions.hash
 import arrow.core.extensions.monoid
 import arrow.core.extensions.semigroup
-import arrow.core.extensions.`try`.functorFilter.functorFilter
 import arrow.test.UnitSpec
 import arrow.test.generators.`try`
-import arrow.test.laws.FunctorFilterLaws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonadErrorLaws
 import arrow.test.laws.MonoidLaws
