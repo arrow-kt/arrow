@@ -4,8 +4,6 @@ import arrow.Kind
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 
-fun <A> SequenceKOf<A>.toList(): List<A> = this.fix().sequence.toList()
-
 @higherkind
 data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequence<A> by sequence {
 
@@ -36,6 +34,11 @@ data class SequenceK<out A>(val sequence: Sequence<A>) : SequenceKOf<A>, Sequenc
         f(Tuple2(a, b))
       }
     }
+
+  fun <B> filterMap(f: (A) -> Option<B>): SequenceK<B> =
+    map(f).foldLeft(empty(), { acc: SequenceK<B>, o: Option<B> -> o.fold({ acc }, { b: B -> acc + b }).k() })
+
+  fun toList(): List<A> = this.fix().sequence.toList()
 
   companion object {
 
