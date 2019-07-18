@@ -90,6 +90,10 @@ include {
             _ 'optics'
             _ 'optics-mtl'
         }
+        
+        persistent {
+            _ 'persistent-data-structures'
+        }
 
         streams {
             _ 'streams'
