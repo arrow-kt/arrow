@@ -347,16 +347,53 @@ interface Concurrent<F> : Async<F> {
   fun <A, B> Iterable<A>.parTraverse(f: (A) -> Kind<F, B>): Kind<F, List<B>> =
     toList().k().parTraverse(ListK.traverse(), f).map { it.fix() }
 
+  /**
+   * Runs all the [F] effects of the [G] structure to invert the structure from Kind<F, Kind<G, A>> to Kind<G, Kind<F, A>>.
+   *
+   * ```
+   * import arrow.Kind
+   * import arrow.fx.IO
+   * import arrow.fx.extensions.io.concurrent.concurrent
+   * import arrow.fx.fix
+   * import arrow.fx.typeclasses.Async
+   * import arrow.fx.typeclasses.Concurrent
+   *
+   * data class User(val id: Int)
+   *
+   * fun main() {
+   *   fun <F> Async<F>.getUserById(id: Int): Kind<F, User> =
+   *     effect { User(id) }
+   *
+   *   fun <F> Concurrent<F>.processInParallel(): Kind<F, List<User>> =
+   *   //sampleStart
+   *     listOf(1, 2, 3)
+   *       .map { id -> getUserById(id) }
+   *       .parSequence()
+   *  //sampleEnd
+   *   IO.concurrent().processInParallel()
+   *     .fix().unsafeRunSync()
+   * }
+   * ```
+   */
   fun <G, A> Kind<G, Kind<F, A>>.parSequence(TG: Traverse<G>, ctx: CoroutineContext): Kind<F, Kind<G, A>> =
     parTraverse(ctx, TG, ::identity)
 
+  /**
+   * @see parSequence
+   */
   fun <G, A> Kind<G, Kind<F, A>>.parSequence(TG: Traverse<G>): Kind<F, Kind<G, A>> =
     parTraverse(TG, ::identity)
 
-  fun <A, B> Iterable<Kind<F, A>>.parSequence(ctx: CoroutineContext): Kind<F, List<A>> =
+  /**
+   * @see parSequence
+   */
+  fun <A> Iterable<Kind<F, A>>.parSequence(ctx: CoroutineContext): Kind<F, List<A>> =
     toList().k().parTraverse(ctx, ListK.traverse(), ::identity).map { it.fix() }
 
-  fun <A, B> Iterable<Kind<F, A>>.parSequence(): Kind<F, List<A>> =
+  /**
+   * @see parSequence
+   */
+  fun <A> Iterable<Kind<F, A>>.parSequence(): Kind<F, List<A>> =
     toList().k().parTraverse(ListK.traverse(), ::identity).map { it.fix() }
 
   /**
