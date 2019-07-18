@@ -28,6 +28,8 @@ class NonEmptyList<out A> private constructor(
   @Suppress("FunctionOnlyReturningConstant")
   fun isEmpty(): Boolean = false
 
+  fun toList(): List<A> = all
+
   fun <B> map(f: (A) -> B): NonEmptyList<B> = NonEmptyList(f(head), tail.map(f))
 
   fun <B> flatMap(f: (A) -> NonEmptyListOf<B>): NonEmptyList<B> = f(head).fix() + tail.flatMap { f(it).fix().all }
