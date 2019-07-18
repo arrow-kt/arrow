@@ -86,6 +86,14 @@ class OptionTest : UnitSpec() {
       none.map(String::toUpperCase) shouldBe None
     }
 
+    "map2" {
+      forAll { a: Int ->
+        val op: Option<Int> = a.some()
+        some.map2(op) { (a, b): Tuple2<String, Int> -> a + b } == Some("kotlin$a")
+        none.map2(op) { (a, b): Tuple2<String, Int> -> a + b } == None
+      }
+    }
+
     "mapNotNull" {
       some.mapNotNull { it.toIntOrNull() } shouldBe None
       some.mapNotNull { it.toUpperCase() } shouldBe Some("KOTLIN")

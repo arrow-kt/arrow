@@ -101,7 +101,7 @@ include {
         }
 
         aql {
-            _ 'query-language'
+            _ 'aql'
         }
 
         reflect {
