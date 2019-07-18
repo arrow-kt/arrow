@@ -51,7 +51,6 @@ class TryTest : UnitSpec() {
       ShowLaws.laws(Try.show(), EQ) { Try.just(it) },
       MonadErrorLaws.laws(Try.monadError(), Eq.any(), Eq.any()),
       TraverseLaws.laws(Try.traverse(), Try.functor(), ::Success, Eq.any()),
-      FunctorFilterLaws.laws(Try.functorFilter(), { Try.just(it) }, Eq.any()),
       HashLaws.laws(Try.hash(Int.hash(), Hash.any()), Try.eq(Int.eq(), Eq.any())) { Try.just(it) }
     )
 
