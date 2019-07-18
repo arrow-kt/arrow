@@ -38,7 +38,7 @@ object BimonadLaws {
     forAll(
       Gen.int()
     ) { a ->
-      just(a).coflatMap { it }.equalUnderTheLaw(just(a).map { just(it) }, EQ) ==
+      just(a).coflatMap { it }.equalUnderTheLaw(just(a).map { just(it) }, EQ) &&
         just(a).coflatMap { it }.equalUnderTheLaw(just(a).duplicate(), EQ)
     }
 }
