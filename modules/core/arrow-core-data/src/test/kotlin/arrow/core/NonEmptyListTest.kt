@@ -43,7 +43,7 @@ class NonEmptyListTest : UnitSpec() {
         NonEmptyList.applicative(),
         Eq.any()),
       ComonadLaws.laws(NonEmptyList.comonad(), { NonEmptyList.of(it) }, Eq.any()),
-      BimonadLaws.laws(NonEmptyList.bimonad(), { NonEmptyList.of(NonEmptyList.of(it)) }, Eq.any(), EQ2),
+      BimonadLaws.laws(NonEmptyList.bimonad(), Eq.any(), EQ2),
       TraverseLaws.laws(NonEmptyList.traverse(), NonEmptyList.applicative(), { n: Int -> NonEmptyList.of(n) }, Eq.any()),
       SemigroupLaws.laws(NonEmptyList.semigroup(), Nel(1, 2, 3), Nel(3, 4, 5), Nel(6, 7, 8), NonEmptyList.eq(Int.eq())),
       HashLaws.laws(NonEmptyList.hash(Int.hash()), EQ1) { Nel.of(it) }

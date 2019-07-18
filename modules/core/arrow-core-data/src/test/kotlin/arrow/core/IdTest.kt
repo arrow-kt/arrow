@@ -44,7 +44,7 @@ class IdTest : UnitSpec() {
       MonadLaws.laws(Id.monad(), Eq.any()),
       TraverseLaws.laws(Id.traverse(), Id.applicative(), ::Id, Eq.any()),
       ComonadLaws.laws(Id.comonad(), ::Id, Eq.any()),
-      BimonadLaws.laws(Id.bimonad(), { Id(Id(it)) }, Eq.any(), EQ),
+      BimonadLaws.laws(Id.bimonad(), Eq.any(), EQ),
       HashLaws.laws(Id.hash(Int.hash()), Id.eq(Int.eq())) { Id(it) }
     )
 

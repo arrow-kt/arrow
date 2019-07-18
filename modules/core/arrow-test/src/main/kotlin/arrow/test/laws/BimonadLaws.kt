@@ -10,14 +10,13 @@ object BimonadLaws {
 
   fun <F> laws(
     BF: Bimonad<F>,
-    f: (Int) -> Kind<F, Kind<F, Int>>,
     EQ1: Eq<Int>,
     EQ2: Eq<Kind<F, Kind<F, Int>>>
   ): List<Law> =
     listOf(
       Law("Bimonad Laws: Extract Identity") { BF.extractIsIdentity(EQ1) },
       Law("Bimonad Laws: CoflatMap Composition") { BF.coflatMapComposition(EQ2) },
-      Law("Bimonad Laws: Extract FlatMap") { BF.extractFlatMap(f, EQ1) }
+      Law("Bimonad Laws: Extract FlatMap") { BF.extractFlatMap(EQ1) }
     )
 
   fun <F> Bimonad<F>.extractIsIdentity(EQ: Eq<Int>): Unit =
@@ -27,11 +26,11 @@ object BimonadLaws {
       just(a).extract().equalUnderTheLaw(a, EQ)
     }
 
-  fun <F> Bimonad<F>.extractFlatMap(f: (Int) -> Kind<F, Kind<F, Int>>, EQ: Eq<Int>): Unit =
+  fun <F> Bimonad<F>.extractFlatMap(EQ: Eq<Int>): Unit =
     forAll(
-      Gen.int().map(f)
+      Gen.int()
     ) { ffa ->
-      ffa.flatten().extract().equalUnderTheLaw(ffa.map { it.extract() }.extract(), EQ)
+      just(just(ffa)).flatten().extract().equalUnderTheLaw(just(just(ffa)).map { it.extract() }.extract(), EQ)
     }
 
   fun <F> Bimonad<F>.coflatMapComposition(EQ: Eq<Kind<F, Kind<F, Int>>>): Unit =

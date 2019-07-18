@@ -37,7 +37,7 @@ class Function0Test : UnitSpec() {
       MonoidLaws.laws(Function0.monoid(Int.monoid()), Gen.constant({ 1 }.k()), EQ1),
       MonadLaws.laws(Function0.monad(), EQ1),
       ComonadLaws.laws(Function0.comonad(), { { it }.k() }, EQ1),
-      BimonadLaws.laws(Function0.bimonad(), { Function0 { Function0 { it } } }, Eq.any(), EQ2)
+      BimonadLaws.laws(Function0.bimonad(), Eq.any(), EQ2)
     )
 
     "Semigroup of Function0<A> is Function0<Semigroup<A>>" {
