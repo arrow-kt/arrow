@@ -7,10 +7,13 @@ import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
 object BimonadLaws {
-  fun <F> laws(BF: Bimonad<F>,
-               f: (Int) -> Kind<F, Kind<F, Int>>,
-               EQ1: Eq<Int>,
-               EQ2: Eq<Kind<F, Kind<F, Int>>>): List<Law> =
+
+  fun <F> laws(
+    BF: Bimonad<F>,
+    f: (Int) -> Kind<F, Kind<F, Int>>,
+    EQ1: Eq<Int>,
+    EQ2: Eq<Kind<F, Kind<F, Int>>>
+  ): List<Law> =
     listOf(
       Law("Bimonad Laws: Extract Identity") { BF.extractIsIdentity(EQ1) },
       Law("Bimonad Laws: CoflatMap Composition") { BF.coflatMapComposition(EQ2) },
@@ -38,5 +41,4 @@ object BimonadLaws {
       just(a).coflatMap { it }.equalUnderTheLaw(just(a).map { just(it) }, EQ) ==
         just(a).coflatMap { it }.equalUnderTheLaw(just(a).duplicate(), EQ)
     }
-
 }
