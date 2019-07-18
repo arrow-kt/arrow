@@ -12,6 +12,7 @@ import arrow.core.Some
 import arrow.core.flatMap
 import arrow.core.identity
 import arrow.core.right
+import me.eugeniomarletti.kotlin.metadata.shadow.load.kotlin.hasVoidReturnType
 
 /**
  * ank_macro_hierarchy(arrow.typeclasses.Foldable)
@@ -70,6 +71,31 @@ interface Foldable<F> {
         }
       }
     }
+
+  /**
+   * Transforms this [Foldable] into a new one which doesn't contain the given [element].
+   * Will return an identical [Foldable] if it doesn't contain [element] in the first place.
+   * Example:
+   * ```
+   * ListK.foldable().run { listOf(1, 2, 3, 4).k().remove(2, ListK.monoidK(), ListK.applicative()) }
+   * //
+   * ```
+   *
+   *
+   * @param element the element to remove
+   * @param monoidK the [Monoid] which produces the empty result [Foldable]
+   * @param AF the [Applicative] which will be used to lift the values in this [Foldable]
+   */
+  fun <A> Kind<F, A>.remove(element: A,
+                            monoidK: MonoidK<F>,
+                            AF: Applicative<F>): Kind<F, A> {
+    return foldLeft(monoidK.empty()) { foldable: Kind<F, A>, next: A ->
+      if (next == element) foldable
+      else monoidK.run {
+        foldable.combineK(AF.just(next))
+      }
+    }
+  }
 
   /**
    * Reduce the elements of this structure down to a single value by applying the provided aggregation function in
