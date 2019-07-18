@@ -237,8 +237,11 @@ These libraries focus on meta-programming to generate code that enables other li
 ### arrow-meta
 
 ```groovy
+apply plugin: 'kotlin-kapt' //optional
+apply from: rootProject.file('gradle/generated-kotlin-sources.gradle') //only for Android projects
+
 dependencies {
-    compile "io.arrow-kt:arrow-meta:$arrow_version"
+    kapt "io.arrow-kt:arrow-meta:$arrow_version"
 }
 ```
 
@@ -247,8 +250,11 @@ Allows boilerplate generation for [`@extension`](({{ 'docs/patterns/glossary/#in
 ### arrow-generic
 
 ```groovy
+apply plugin: 'kotlin-kapt' //optional
+apply from: rootProject.file('gradle/generated-kotlin-sources.gradle') //only for Android projects
+
 dependencies {
-    compile "io.arrow-kt:arrow-generic:$arrow_version"
+    kapt "io.arrow-kt:arrow-generic:$arrow_version"
 }
 ```
 
