@@ -7,15 +7,12 @@ import arrow.aql.OrderBy
 import arrow.aql.Select
 import arrow.aql.Sum
 import arrow.aql.Union
-import arrow.aql.Where
 import arrow.core.ForNonEmptyList
 import arrow.core.NonEmptyList
 import arrow.extension
 import arrow.core.extensions.nonemptylist.applicative.applicative
 import arrow.core.extensions.nonemptylist.foldable.foldable
 import arrow.core.extensions.nonemptylist.functor.functor
-import arrow.core.extensions.nonemptylist.functorFilter.functorFilter
-import arrow.typeclasses.FunctorFilter
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
@@ -28,11 +25,6 @@ interface NonEmptyListFrom : From<ForNonEmptyList> {
 @extension
 interface NonEmptyListSelect : Select<ForNonEmptyList> {
   override fun functor(): Functor<ForNonEmptyList> = NonEmptyList.functor()
-}
-
-@extension
-interface NonEmptyListWhere : Where<ForNonEmptyList> {
-  override fun functorFilter(): FunctorFilter<ForNonEmptyList> = NonEmptyList.functorFilter()
 }
 
 @extension
