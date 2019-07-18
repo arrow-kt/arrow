@@ -296,16 +296,55 @@ interface Concurrent<F> : Async<F> {
       })
     }
 
+  /**
+   * Given a function which returns an [F] effect, run this effect in parallel for all the values in [G].
+   *
+   * ```kotlin:ank:playground:extension
+   * import arrow.Kind
+   * import arrow.core.k
+   * import arrow.fx.IO
+   * import arrow.fx.extensions.io.concurrent.concurrent
+   * import arrow.fx.fix
+   * import arrow.fx.typeclasses.Concurrent
+   * import arrow.fx.typeclasses.milliseconds
+   *
+   * fun main(args: Array<String>) {
+   *  fun <F> Concurrent<F>.processListInParallel(): Kind<F, List<Unit>> =
+   *  //sampleStart
+   *    listOf("1", "2", "3").k().parTraverse { s ->
+   *      effect { s.toInt() }
+   *        .flatMap { i ->
+   *          val duration = (i * 200).milliseconds
+   *          sleep(duration).followedBy(effect { println("Waited for $duration") })
+   *        }
+   *    }
+   *
+   *  //sampleEnd
+   *    IO.concurrent().processListInParallel()
+   *      .fix()
+   *      .unsafeRunSync()
+   * }
+   * ```
+   */
   fun <G, A, B> Kind<G, A>.parTraverse(ctx: CoroutineContext, TG: Traverse<G>, f: (A) -> Kind<F, B>): Kind<F, Kind<G, B>> =
     TG.run { traverse(parApplicative(ctx), f) }
 
+  /**
+   * @see parTraverse
+   */
   fun <G, A, B> Kind<G, A>.parTraverse(TG: Traverse<G>, f: (A) -> Kind<F, B>): Kind<F, Kind<G, B>> =
     TG.run { traverse(parApplicative(), f) }
 
-  fun <A, B> kotlin.collections.Iterable<A>.parTraverse(ctx: CoroutineContext, f: (A) -> Kind<F, B>): Kind<F, List<B>> =
+  /**
+   * @see parTraverse
+   */
+  fun <A, B> Iterable<A>.parTraverse(ctx: CoroutineContext, f: (A) -> Kind<F, B>): Kind<F, List<B>> =
     toList().k().parTraverse(ctx, ListK.traverse(), f).map { it.fix() }
 
-  fun <A, B> kotlin.collections.Iterable<A>.parTraverse(f: (A) -> Kind<F, B>): Kind<F, List<B>> =
+  /**
+   * @see parTraverse
+   */
+  fun <A, B> Iterable<A>.parTraverse(f: (A) -> Kind<F, B>): Kind<F, List<B>> =
     toList().k().parTraverse(ListK.traverse(), f).map { it.fix() }
 
   fun <G, A> Kind<G, Kind<F, A>>.parSequence(TG: Traverse<G>, ctx: CoroutineContext): Kind<F, Kind<G, A>> =
@@ -314,10 +353,10 @@ interface Concurrent<F> : Async<F> {
   fun <G, A> Kind<G, Kind<F, A>>.parSequence(TG: Traverse<G>): Kind<F, Kind<G, A>> =
     parTraverse(TG, ::identity)
 
-  fun <A, B> kotlin.collections.Iterable<Kind<F, A>>.parSequence(ctx: CoroutineContext): Kind<F, List<A>> =
+  fun <A, B> Iterable<Kind<F, A>>.parSequence(ctx: CoroutineContext): Kind<F, List<A>> =
     toList().k().parTraverse(ctx, ListK.traverse(), ::identity).map { it.fix() }
 
-  fun <A, B> kotlin.collections.Iterable<Kind<F, A>>.parSequence(): Kind<F, List<A>> =
+  fun <A, B> Iterable<Kind<F, A>>.parSequence(): Kind<F, List<A>> =
     toList().k().parTraverse(ListK.traverse(), ::identity).map { it.fix() }
 
   /**

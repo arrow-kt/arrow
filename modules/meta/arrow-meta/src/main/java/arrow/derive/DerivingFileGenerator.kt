@@ -4,7 +4,6 @@ import arrow.common.utils.ClassOrPackageDataWrapper
 import arrow.common.utils.extractFullName
 import arrow.common.utils.fullName
 import arrow.common.utils.removeBackticks
-import arrow.extensions.LOGGER
 import arrow.higherkinds.HKMarkerPreFix
 import arrow.higherkinds.KindPartialPostFix
 import arrow.higherkinds.KindPostFix
@@ -12,7 +11,6 @@ import me.eugeniomarletti.kotlin.metadata.modality
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.ProtoBuf
 import me.eugeniomarletti.kotlin.metadata.shadow.metadata.deserialization.hasReceiver
 import java.io.File
-import javax.tools.Diagnostic
 
 private fun List<String>.prependTypeArgs(): String =
   when {
@@ -25,13 +23,6 @@ private fun kindedRegex(typeClassFirstTypeArg: String): Regex = "arrow.Kind<$typ
 fun String.asKotlin(): String =
   removeBackticks()
     .replace("/", ".")
-    .also {
-      if (it.contains("Iterable")) LOGGER?.printMessage(Diagnostic.Kind.MANDATORY_WARNING, """
-        | ##############################################################################################################
-        | Found it: $it
-        | ##############################################################################################################
-      """.trimMargin())
-    }
     .replace("java.lang.Iterable", "kotlin.collections.Iterable")
     .replace("Iterable", "kotlin.collections.Iterable")
     .replace("kotlin.jvm.functions", "kotlin")
