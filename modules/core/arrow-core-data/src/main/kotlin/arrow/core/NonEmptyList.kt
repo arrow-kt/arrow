@@ -37,7 +37,6 @@ typealias Nel<A> = NonEmptyList<A>
  *  // NonEmptyList.of() // does not compile
  *  NonEmptyList.of(1, 2, 3, 4, 5) // NonEmptyList<Int>
  * //sampleEnd
- *
  * fun main() {
  *  println(value)
  * }
@@ -54,7 +53,6 @@ typealias Nel<A> = NonEmptyList<A>
  * //sampleStart
  *  NonEmptyList.of(1, 2, 3, 4, 5).head
  * //sampleEnd
- *
  * fun main() {
  *  println(value)
  * }
@@ -74,7 +72,6 @@ typealias Nel<A> = NonEmptyList<A>
  *  nel.foldLeft(0) { acc, n -> acc + n }
  * val value = sumNel(NonEmptyList.of(1, 1, 1, 1))
  * //sampleEnd
- *
  * fun main() {
  *  println("value = $value")
  * }
@@ -91,7 +88,6 @@ typealias Nel<A> = NonEmptyList<A>
  * //sampleStart
  *  NonEmptyList.of(1, 1, 1, 1).map { it + 1 }
  * //sampleEnd
- *
  * fun main() {
  *  println(value)
  * }
@@ -114,7 +110,6 @@ typealias Nel<A> = NonEmptyList<A>
  *  }
  * }
  * //sampleEnd
- *
  * fun main() {
  *  println("value = $value")
  * }
@@ -140,7 +135,6 @@ typealias Nel<A> = NonEmptyList<A>
  *  one + two + three
  * }
  * //sampleEnd
- *
  * fun main() {
  *  println("value = $value")
  * }
@@ -160,7 +154,6 @@ typealias Nel<A> = NonEmptyList<A>
  *   x + y
  *  }
  * //sampleEnd
- *
  * fun main() {
  *  println(value)
  * }
@@ -187,7 +180,6 @@ typealias Nel<A> = NonEmptyList<A>
  *  Person(id, name, year)
  * }
  * //sampleEnd
- *
  * fun main() {
  *  println("value = $value")
  * }

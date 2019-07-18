@@ -27,7 +27,6 @@ import arrow.higherkind
  * val someValue: Option<String> = Some("I am wrapped in something")
  * val emptyValue: Option<String> = none()
  * //sampleEnd
- *
  * fun main() {
  *  println("value = $someValue")
  *  println("emptyValue = $emptyValue")
@@ -82,7 +81,6 @@ import arrow.higherkind
  *  maybeItWillReturnSomething(false)
  *   .getOrElse { "No value" }
  * //sampleEnd
- *
  * fun main() {
  *  println(value2)
  * }
@@ -102,7 +100,6 @@ import arrow.higherkind
  * val valueSome = maybeItWillReturnSomething(true) is None
  * val valueNone = maybeItWillReturnSomething(false) is None
  * //sampleEnd
- *
  * fun main() {
  *  println("valueSome = $valueSome")
  *  println("valueNone = $valueNone")
@@ -118,7 +115,6 @@ import arrow.higherkind
  * val myString: String? = "Nullable string"
  * val option: Option<String> = Option.fromNullable(myString)
  * //sampleEnd
- *
  * fun main () {
  *  println("option = $option")
  * }
@@ -138,7 +134,6 @@ import arrow.higherkind
  *  is None -> 0.0
  * }
  * //sampleEnd
- *
  * fun main () {
  *  println("value = $value")
  * }
@@ -156,7 +151,6 @@ import arrow.higherkind
  *  is None -> 0.0
  * }
  * //sampleEnd
- *
  * fun main () {
  *  println("value = $value")
  * }
@@ -177,7 +171,6 @@ import arrow.higherkind
  * val mappedResult1 = number.map { it * 1.5 }
  * val mappedResult2 = noNumber.map { it * 1.5 }
  * //sampleEnd
- *
  * fun main () {
  *  println("number = $number")
  *  println("noNumber = $noNumber")
@@ -208,7 +201,6 @@ import arrow.higherkind
  * //sampleStart
  *  none<Int>().fold({ 1 }, { it * 3 })
  * //sampleEnd
- *
  * fun main () {
  *  println(fold)
  * }
@@ -223,7 +215,6 @@ import arrow.higherkind
  * //sampleStart
  *  1.some()
  * //sampleEnd
- *
  * fun main () {
  *  println(value)
  * }
@@ -248,7 +239,6 @@ import arrow.higherkind
  * val nullableValue: String? = null
  * val value = nullableValue.toOption()
  * //sampleEnd
- *
  * fun main () {
  *  println("value = $value")
  * }
@@ -261,7 +251,6 @@ import arrow.higherkind
  * val nullableValue: String? = "Hello"
  * val value = nullableValue.toOption()
  * //sampleEnd
- *
  * fun main () {
  *  println("value = $value")
  * }
@@ -278,7 +267,6 @@ import arrow.higherkind
  * val first4 = myList.firstOrNone { it == 4 }
  * val first5 = myList.firstOrNone { it == 5 }
  * //sampleEnd
- *
  * fun main () {
  *  println("first4 = $first4")
  *  println("first5 = $first5")
@@ -297,7 +285,6 @@ import arrow.higherkind
  * val ugly = foxMap.entries.firstOrNull { it.key == 5 }?.value.let { it?.toCharArray() }.toOption()
  * val pretty = foxMap.entries.firstOrNone { it.key == 5 }.map { it.value.toCharArray() }
  * //sampleEnd
- *
  * fun main() {
  *  println("ugly = $ugly")
  *  println("pretty = $pretty")
@@ -334,7 +321,6 @@ import arrow.higherkind
  * //sampleStart
  *  tupled(Some(1), Some("Hello"), Some(20.0))
  * //sampleEnd
- *
  * fun main() {
  *  println(value)
  * }
@@ -358,7 +344,6 @@ import arrow.higherkind
  *  a + b + c
  * }
  * //sampleEnd
- *
  * fun main() {
  *  println(value)
  * }
@@ -379,7 +364,6 @@ import arrow.higherkind
  *    x + y + z
  *  }
  * //sampleEnd
- *
  * fun main() {
  *  println(value)
  * }

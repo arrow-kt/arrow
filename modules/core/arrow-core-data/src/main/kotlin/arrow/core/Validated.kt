@@ -233,11 +233,8 @@ typealias Invalid<E> = Validated.Invalid<E>
  *  val valid = parallelValidate(
  *  config.parse(Read.stringRead, "url"),
  *  config.parse(Read.intRead, "port")
- *  ) { url, port ->
- *    ConnectionParams(url, port)
- * }
+ *  ) { url, port -> ConnectionParams(url, port) }
  * //sampleEnd
- *
  * fun main() {
  *  println("valid = $valid")
  * }
@@ -309,11 +306,8 @@ typealias Invalid<E> = Validated.Invalid<E>
  * val valid = parallelValidate(
  *  config.parse(Read.stringRead, "url"),
  *  config.parse(Read.intRead, "port")
- *  ) { url, port ->
- *   ConnectionParams(url, port)
- *  }
+ *  ) { url, port -> ConnectionParams(url, port) }
  *  //sampleEnd
- *
  * fun main() {
  *  println("valid = $valid")
  * }
@@ -385,7 +379,6 @@ typealias Invalid<E> = Validated.Invalid<E>
  *  either.flatMap { positive("house_number", it) }
  * }
  * //sampleEnd
- *
  * fun main() {
  *  println(houseNumber)
  * }
@@ -515,7 +508,6 @@ typealias Invalid<E> = Validated.Invalid<E>
  *    ).map { it.validateEmail() }
  *    }
  * //sampleEnd
- *
  * fun main() {
  *  println(value)
  * }
@@ -582,7 +574,6 @@ typealias Invalid<E> = Validated.Invalid<E>
  *    ).map { it.validateEmail() }
  *  }
  * //sampleEnd
- *
  * fun main() {
  *  println(value)
  * }

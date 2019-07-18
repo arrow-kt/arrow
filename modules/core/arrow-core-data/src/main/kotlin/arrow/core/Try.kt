@@ -84,7 +84,6 @@ typealias Success<A> = Try.Success<A>
  *  }
  *  //sampleEnd
  * }
- *
  * fun main() {
  *  exceptionExample()
  * }
@@ -119,7 +118,6 @@ typealias Success<A> = Try.Success<A>
  * //sampleStart
  *  Try { getLotteryNumbers() }
  * //sampleEnd
- *
  * fun main() {
  *  println(lotteryTry)
  * }
@@ -156,7 +154,6 @@ typealias Success<A> = Try.Success<A>
  * //sampleStart
  *  lotteryTry.getOrDefault { emptyList() }
  * //sampleEnd
- *
  * fun main() {
  *  println(value)
  * }
@@ -193,7 +190,6 @@ typealias Success<A> = Try.Success<A>
  * //sampleStart
  *  lotteryTry.getOrElse { ex: Throwable -> emptyList() }
  * //sampleEnd
- *
  * fun main() {
  *  println(value)
  * }
@@ -230,7 +226,6 @@ typealias Success<A> = Try.Success<A>
  * //sampleStart
  *  lotteryTry.getOrElse { emptyList() }
  * //sampleEnd
- *
  * fun main() {
  *  println(value)
  * }
@@ -268,7 +263,6 @@ typealias Success<A> = Try.Success<A>
  *    it.size < 4
  *  }
  * //sampleEnd
- *
  * fun main() {
  *  println(value)
  * }
@@ -307,7 +301,6 @@ typealias Success<A> = Try.Success<A>
  *    emptyList()
  *  }
  * //sampleEnd
- *
  * fun main() {
  *  println(value)
  * }
@@ -344,7 +337,6 @@ typealias Success<A> = Try.Success<A>
  *  Try { getLotteryNumbers(Source.CACHE) }
  * }
  * //sampleEnd
- *
  * fun main() {
  *  println("value = $value")
  * }
@@ -382,7 +374,6 @@ typealias Success<A> = Try.Success<A>
  *    { emptyList<String>() },
  *    { it.filter { it.toIntOrNull() != null } })
  * //sampleEnd
- *
  * fun main() {
  *   println(value)
  * }
@@ -428,7 +419,6 @@ typealias Success<A> = Try.Success<A>
  *    .NoConnectionError("Failed to fetch lottery numbers from cloud", it)
  *  }
  * //sampleEnd
- *
  * fun main() {
  *  println("value = $value")
  * }
@@ -472,7 +462,6 @@ typealias Success<A> = Try.Success<A>
  *   DomainError.NoConnectionError("Failed to fetch lottery numbers from cloud", it)
  * }
  * //sampleEnd
- *
  * fun main() {
  *  println("value = $value")
  * }
@@ -487,12 +476,12 @@ typealias Success<A> = Try.Success<A>
  * ```kotlin:ank:playground
  * import arrow.core.Try
  *
+ * val value =
  * //sampleStart
- * val value = Try { "3".toInt() }.map { it + 1 }
+ *  Try { "3".toInt() }.map { it + 1 }
  * //sampleEnd
- *
  * fun main() {
- *  println("value = $value")
+ *  println(value)
  * }
  * ```
  *
@@ -508,7 +497,6 @@ typealias Success<A> = Try.Success<A>
  * //sampleStart
  *  tupled(Try { "3".toInt() }, Try { "5".toInt() }, Try { "nope".toInt() })
  * //sampleEnd
- *
  * fun main() {
  *  println(value)
  * }
@@ -531,7 +519,6 @@ typealias Success<A> = Try.Success<A>
  *    a + b + c
  *  }
  * //sampleEnd
- *
  * fun main() {
  *  println(value)
  * }
@@ -550,7 +537,6 @@ typealias Success<A> = Try.Success<A>
  *    a + b + c
  *  }
  * //sampleEnd
- *
  * fun main() {
  *  println(value)
  * }
@@ -571,7 +557,6 @@ typealias Success<A> = Try.Success<A>
  *    a + b + c
  *  }
  * //sampleEnd
- *
  * fun main() {
  *  println(value)
  * }

@@ -312,7 +312,6 @@ import arrow.higherkind
  * val l: Either<Int, Int> = Either.Left(7)
  * val leftMapLeft = l.mapLeft {it + 1}
  * //sampleEnd
- *
  * fun main() {
  *  println("rightMapLeft = $rightMapLeft")
  *  println("leftMapLeft = $leftMapLeft")
@@ -329,7 +328,6 @@ import arrow.higherkind
  * val r: Either<String, Int> = Either.Right(7)
  * val swapped = r.swap()
  * //sampleEnd
- *
  * fun main() {
  *  println("swapped = $swapped")
  * }
@@ -345,7 +343,6 @@ import arrow.higherkind
  * //sampleStart
  *   7.right()
  * //sampleEnd
- *
  * fun main() {
  *  println(right7)
  * }
@@ -354,12 +351,12 @@ import arrow.higherkind
  * ```kotlin:ank:playground
  * import arrow.core.left
  *
+ *  val leftHello =
  * //sampleStart
- * val leftHello = "hello".left()
+ *  "hello".left()
  * //sampleEnd
- *
  * fun main() {
- *  println("leftHello = $leftHello")
+ *  println(leftHello)
  * }
  * ```
  *
@@ -371,7 +368,6 @@ import arrow.higherkind
  * val x = 7.right()
  * val contains7 = x.contains(7)
  * //sampleEnd
- *
  * fun main() {
  *  println("contains7 = $contains7")
  * }
@@ -385,7 +381,6 @@ import arrow.higherkind
  * val x = "hello".left()
  * val getOr7 = x.getOrElse { 7 }
  * //sampleEnd
- *
  * fun main() {
  *  println("getOr7 = $getOr7")
  * }
@@ -399,7 +394,6 @@ import arrow.higherkind
  * val x = "hello".left()
  * val value = x.getOrHandle { "$it world!" }
  * //sampleEnd
- *
  * fun main() {
  *  println("value = $value")
  * }
@@ -414,7 +408,6 @@ import arrow.higherkind
  * //sampleStart
  *  Either.cond(true, { 42 }, { "Error" })
  * //sampleEnd
- *
  * fun main() {
  *  println(value)
  * }
@@ -427,7 +420,6 @@ import arrow.higherkind
  * //sampleStart
  *  Either.cond(false, { 42 }, { "Error" })
  * //sampleEnd
- *
  * fun main() {
  *  println(value)
  * }
@@ -482,7 +474,6 @@ import arrow.higherkind
  *   }
  * }
  * //sampleEnd
- *
  * fun main() {
  *  println("httpStatusCode = $httpStatusCode")
  * }
@@ -503,7 +494,6 @@ import arrow.higherkind
  * //sampleStart
  *  Right(12).leftIfNull({ -1 })
  * //sampleEnd
- *
  * fun main() {
  *  println(value)
  * }
@@ -517,7 +507,6 @@ import arrow.higherkind
  * //sampleStart
  *  Right(null).leftIfNull({ -1 })
  * //sampleEnd
- *
  * fun main() {
  *  println(value)
  * }
@@ -531,7 +520,6 @@ import arrow.higherkind
  * //sampleStart
  *  Left(12).leftIfNull({ -1 })
  * //sampleEnd
- *
  * fun main() {
  *  println(value)
  * }
@@ -550,7 +538,6 @@ import arrow.higherkind
  * //sampleStart
  *  "value".rightIfNotNull { "left" }
  * //sampleEnd
- *
  * fun main() {
  *  println(value)
  * }
@@ -563,7 +550,6 @@ import arrow.higherkind
  * //sampleStart
  *  null.rightIfNotNull { "left" }
  * //sampleEnd
- *
  * fun main() {
  *  println(value)
  * }
@@ -584,7 +570,6 @@ import arrow.higherkind
  * //sampleStart
  *  Right(1).map{ it + 1 }
  * //sampleEnd
- *
  * fun main() {
  *  println(value)
  * }
@@ -602,7 +587,6 @@ import arrow.higherkind
  * //sampleStart
  *  tupled(Either.Right(1), Either.Right("a"), Either.Right(2.0))
  * //sampleEnd
- *
  * fun main() {
  *  println(value)
  * }
@@ -626,7 +610,6 @@ import arrow.higherkind
  *   a + b + c
  *  }
  * //sampleEnd
- *
  * fun main() {
  *  println(value)
  * }
