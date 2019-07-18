@@ -1,7 +1,7 @@
 ---
 layout: docs
 title: MonadFilter
-permalink: /docs/arrow/mtl/typeclasses/monadfilter/
+permalink: /docs/arrow/typeclasses/monadfilter/
 redirect_from:
   - /docs/typeclasses/monadfilter/
 ---
@@ -26,9 +26,9 @@ When `continueIf` is satisfied the computation continues
 ```kotlin:ank
 import arrow.*
 import arrow.core.*
-import arrow.mtl.typeclasses.*
-import arrow.mtl.extensions.*
-import arrow.mtl.extensions.option.monadFilter.*
+import arrow.typeclasses.*
+import arrow.core.extensions.*
+import arrow.core.extensions.option.monadFilter.*
 
 Option.monadFilter().fx.monadFilter {
   val (a) = Option(1)
@@ -41,7 +41,7 @@ Option.monadFilter().fx.monadFilter {
 
 ```kotlin:ank
 import arrow.core.*
-import arrow.mtl.extensions.listk.monadFilter.*
+import arrow.core.extensions.listk.monadFilter.*
 
 ListK.monadFilter().fx.monadFilter {
   val (a) = listOf(1).k()
@@ -118,9 +118,9 @@ ListK.monadFilter().fx.monadFilter {
 
 ```kotlin:ank:replace
 import arrow.reflect.*
-import arrow.mtl.typeclasses.MonadFilter
+import arrow.typeclasses.MonadFilter
 
 TypeClass(MonadFilter::class).dtMarkdownList()
 ```
 
-ank_macro_hierarchy(arrow.mtl.typeclasses.MonadFilter)
+ank_macro_hierarchy(arrow.typeclasses.MonadFilter)

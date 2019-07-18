@@ -3,7 +3,7 @@ package arrow.test.laws
 import arrow.Kind
 import arrow.core.Option
 import arrow.core.Some
-import arrow.mtl.typeclasses.FunctorFilter
+import arrow.typeclasses.FunctorFilter
 import arrow.test.generators.functionAToB
 import arrow.test.generators.intSmall
 import arrow.test.generators.option

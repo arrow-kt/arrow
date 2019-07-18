@@ -19,7 +19,6 @@ import kotlinx.coroutines.newSingleThreadContext
 
 object AsyncLaws {
 
-  // Using newSingleThreadContext in forAll will create 1001 Thread per usage in every forAll.
   private val one = newSingleThreadContext("1")
   private val two = newSingleThreadContext("2")
 
@@ -109,7 +108,9 @@ object AsyncLaws {
   fun <F> Async<F>.effectCanCallSuspend(EQ: Eq<Kind<F, Int>>): Unit =
     forAll(Gen.int()) { id ->
       val fs: suspend () -> Int = { id }
-      effect { fs() }.equalUnderTheLaw(just(id), EQ)
+
+      effect { fs() }
+        .equalUnderTheLaw(just(id), EQ)
     }
 
   fun <F> Async<F>.effectEquivalence(EQ: Eq<Kind<F, Int>>): Unit =
