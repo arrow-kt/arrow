@@ -19,11 +19,11 @@ interface ComposedFunctorFilter<F, G> : FunctorFilter<Nested<F, G>>, ComposedFun
 
   override fun G(): FunctorFilter<G>
 
-  override fun <A, B> Kind<Nested<F, G>, A>.mapFilter(f: (A) -> Option<B>): Kind<Nested<F, G>, B> =
-    F().run { unnest().map { G().run { it.mapFilter(f) } }.nest() }
+  override fun <A, B> Kind<Nested<F, G>, A>.filterMap(f: (A) -> Option<B>): Kind<Nested<F, G>, B> =
+    F().run { unnest().map { G().run { it.filterMap(f) } }.nest() }
 
-  fun <A, B> mapFilterC(fga: Kind<F, Kind<G, A>>, f: (A) -> Option<B>): Kind<F, Kind<G, B>> =
-    fga.nest().mapFilter(f).unnest()
+  fun <A, B> filterMapC(fga: Kind<F, Kind<G, A>>, f: (A) -> Option<B>): Kind<F, Kind<G, B>> =
+    fga.nest().filterMap(f).unnest()
 
   companion object {
     operator fun <F, G> invoke(FF: Functor<F>, FFG: FunctorFilter<G>): ComposedFunctorFilter<F, G> =
