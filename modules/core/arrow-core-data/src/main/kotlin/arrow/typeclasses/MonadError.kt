@@ -1,6 +1,7 @@
 package arrow.typeclasses
 
 import arrow.Kind
+import arrow.core.Either
 import arrow.core.NonFatal
 import arrow.documented
 import kotlin.coroutines.startCoroutine
@@ -18,6 +19,9 @@ interface MonadError<F, E> : ApplicativeError<F, E>, Monad<F> {
 
   fun <A, B> Kind<F, A>.redeemWith(fe: (E) -> Kind<F, B>, fb: (A) -> Kind<F, B>): Kind<F, B> =
     flatMap(fb).handleErrorWith(fe)
+
+  fun <A> Kind<F, Either<E, A>>.rethrow(): Kind<F, A> =
+    flatMap { it.fold({ e -> raiseError<A>(e) }, { a -> just(a) }) }
 }
 
 /**

@@ -118,7 +118,6 @@ object AsyncLaws {
       val fs: suspend () -> Int = { f(Unit) }
 
       val effect = effect(one) { fs() }
-
       val continueOn = later(two) { f(Unit) }
 
       effect.equalUnderTheLaw(continueOn, EQ)
