@@ -14,10 +14,8 @@ import arrow.core.extensions.eq
 import arrow.core.extensions.hash
 import arrow.core.extensions.monoid
 import arrow.core.extensions.semigroup
-import arrow.core.extensions.`try`.functorFilter.functorFilter
 import arrow.test.UnitSpec
 import arrow.test.generators.`try`
-import arrow.test.laws.FunctorFilterLaws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonadErrorLaws
 import arrow.test.laws.MonoidLaws
@@ -51,7 +49,6 @@ class TryTest : UnitSpec() {
       ShowLaws.laws(Try.show(), EQ) { Try.just(it) },
       MonadErrorLaws.laws(Try.monadError(), Eq.any(), Eq.any()),
       TraverseLaws.laws(Try.traverse(), Try.functor(), ::Success, Eq.any()),
-      FunctorFilterLaws.laws(Try.functorFilter(), { Try.just(it) }, Eq.any()),
       HashLaws.laws(Try.hash(Int.hash(), Hash.any()), Try.eq(Int.eq(), Eq.any())) { Try.just(it) }
     )
 
