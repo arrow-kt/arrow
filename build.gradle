@@ -21,6 +21,7 @@ buildscript {
         // Constants
         ankKotlinVersion = '1.3.11'
         dokka_version = '0.9.18'
+        ktlint_version = "0.34.2"
         ktlint_gradle_version = '8.2.0'
         gradleVersionsPluginVersion = '0.21.0'
         jUnitVersion = '4.12'
@@ -87,6 +88,10 @@ subprojects { project ->
     apply plugin: 'kotlin'
     apply plugin: 'org.jetbrains.dokka'
     apply plugin: "org.jlleitschuh.gradle.ktlint"
+
+    ktlint {
+        version = ktlint_version
+    }
 
     archivesBaseName = POM_ARTIFACT_ID
 
