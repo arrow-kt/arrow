@@ -6,7 +6,6 @@ import arrow.core.Left
 import arrow.core.Option
 import arrow.core.Right
 import arrow.core.Try
-import arrow.core.identity
 import arrow.core.left
 import arrow.core.none
 import arrow.core.right
@@ -29,7 +28,7 @@ import java.util.concurrent.atomic.AtomicReference
 @ObsoleteCoroutinesApi
 @Suppress("RedundantSuspendModifier")
 @RunWith(KotlinTestRunner::class)
-class EffectsSuspendDSLTests : UnitSpec() {
+class EffectsSuspendDSLTests() : UnitSpec() {
 
   private val ctxA = newSingleThreadContext("A")
   private val ctxB = newSingleThreadContext("B")
@@ -70,7 +69,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
     }
 
     "Direct syntax for concurrent operations" {
-      val textContext = newCountingThreadFactory("test", 4) // We fork 4x in the test below, so this is the size of our pool.
+      val textContext = newCountingThreadFactory("test", 6) // We fork 4x in the test below, so this is the size of our pool.
         .asCoroutineContext()
 
       suspend fun getThreadName(): String = Thread.currentThread().name
@@ -284,7 +283,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
             suspend { 1 },
             suspend { 2 },
             suspend { 3 }
-          ).traverse(::effectIdentity)
+          ).sequence()
         }
       } shouldBe listOf(1, 2, 3)
     }
@@ -305,14 +304,11 @@ class EffectsSuspendDSLTests : UnitSpec() {
       val main = Thread.currentThread().name
       fxTest {
         IO.fx {
-          val result = !NonBlocking.parTraverse(
-            listOf(
-              effect { Thread.currentThread().name },
-              effect { Thread.currentThread().name },
-              effect { Thread.currentThread().name }
-            ),
-            ::identity
-          )
+          val result = !NonBlocking.parSequence(listOf(
+            effect { Thread.currentThread().name },
+            effect { Thread.currentThread().name },
+            effect { Thread.currentThread().name }
+          ))
           result.any {
             it == main
           }
