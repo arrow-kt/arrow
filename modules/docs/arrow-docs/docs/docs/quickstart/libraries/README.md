@@ -14,6 +14,25 @@ Thereby, one only needs to download the toplevel artifacts if it's desired to do
 
 In this doc we'll describe all the modules that form the core, alongside a list of the most important constructs they include.
 
+#### Table of Content
+* [arrow-core](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-core)
+* [arrow-core-data](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-core-data)
+* [arrow-optics](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-optics)
+* [arrow-fx](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-fx)
+* [arrow-syntax](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-syntax)
+* [arrow-fx-rx2 & arrow-fx-reactor](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-fx-rx2&arrow-fx-reactor)
+* [arrow-mtl](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-mtl)
+* [arrow-mtl-data](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-mtl-data)
+* [arrow-optics-mtl](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-optics-mtl)
+* [arrow-recursion](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-recrusion)
+* [arrow-recursion-data](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-recrusion-data)
+* [arrow-integration-retrofit-adapter](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-integration-retrofit-adapter)
+* [arrow-free](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-free)
+* [arrow-free-data](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-free-data)
+* [arrow-aql](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-aql)
+* [arrow-meta](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-meta)
+* [arrow-generic](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-generic)
+
 ### arrow-core
 
 ```groovy
