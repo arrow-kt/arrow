@@ -37,10 +37,6 @@ dependencies {
 The smallest set of [datatypes]({{ '/docs/datatypes/intro/' | relative_url }}) and all basic [typeclasses]({{ '/docs/typeclasses/intro' | relative_url }}) necessary to start in FP, and that other libraries can build upon.
 The focus here is on API design and abstracting small code patterns.
 
-Datatypes: [`Either`]({{ '/docs/arrow/core/either/' | relative_url }}), [`Option`]({{ '/docs/arrow/core/option/' | relative_url }}), [`Try`]({{ '/docs/arrow/core/try/' | relative_url }}), [`Eval`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-eval' | relative_url }}), [`Id`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-id/' | relative_url }}), [`Const`]({{ '/docs/typeclasses/const/' | relative_url }}), [`ListK`]({{ '/docs/arrow/data/listk/' | relative_url }}), [`NonEmptyList`]({{ '/docs/arrow/data/nonemptylist/' | relative_url }}), [`SequenceK`]({{ '/docs/arrow/data/sequencek/' | relative_url }}), [`SortedMapK`]({{ '/docs/arrow/data/sortedmapk/' | relative_url }}), [`Ior`]({{ '/docs/arrow/data/ior/' | relative_url }}), [`MapK`]({{ '/docs/arrow/data/mapk/' | relative_url }}), [`Validated`]({{ '/docs/arrow/data/validated/' | relative_url }}), [`SetK`]({{ '/docs/arrow/data/setk/' | relative_url }}), `TupleN`, `Function0`, `Function1`, `FunctionK`
-
-Typeclasses: [`Alternative`]({{ '/docs/arrow/typeclasses/alternative/' | relative_url }}), [`Bimonad`]({{ '/docs/arrow/typeclasses/bimonad/' | relative_url }}), [`Inject`]({{ '/docs/typeclasses/inject/' | relative_url }}), [`Reducible`]({{ '/docs/arrow/typeclasses/reducible/' | relative_url }}), [`Traverse`]({{ '/docs/arrow/typeclasses/traverse/' | relative_url }}), [`Applicative`]({{ '/docs/arrow/typeclasses/applicative/' | relative_url }}), [`Comonad`]({{ '/docs/arrow/typeclasses/comonad/' | relative_url }}), [`Eq`]({{ '/docs/arrow/typeclasses/eq/' | relative_url }}), [`Monad`]({{ '/docs/arrow/typeclasses/monad/' | relative_url }}), [`Monoid`]({{ '/docs/arrow/typeclasses/monoid/' | relative_url }}), [`Semigroup`]({{ '/docs/arrow/typeclasses/semigroup/' | relative_url }}), [`ApplicativeError`]({{ '/docs/arrow/typeclasses/applicativeerror/' | relative_url }}), [`Foldable`]({{ '/docs/arrow/typeclasses/foldable/' | relative_url }}), [`MonoidK`]({{ '/docs/arrow/typeclasses/monoidk/' | relative_url }}), [`SemigroupK`]({{ '/docs/arrow/typeclasses/semigroupk/' | relative_url }}), [`Bifoldable`]({{ '/docs/arrow/typeclasses/bifoldable/' | relative_url }}), [`Functor`]({{ '/docs/arrow/typeclasses/functor/' | relative_url }}), [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror/' | relative_url }}), [`Order`]({{ '/docs/arrow/typeclasses/order/' | relative_url }}), [`Show`]({{ '/docs/arrow/typeclasses/show/' | relative_url }}), [`TraverseFilter`]({{ '/docs/arrow/typeclasses/traversefilter/' | relative_url }}), [`FunctorFilter`]({{ '/docs/arrow/typeclasses/functorfilter/' | relative_url }}), [`MonadFilter`]({{ '/docs/arrow/typeclasses/monadfilter/' | relative_url }}), [`MonadCombine`]({{ '/docs/arrow/typeclasses/monadcombine/' | relative_url }}), `Composed`
-
 ### arrow-optics
 
 ```groovy
@@ -55,9 +51,7 @@ Arrow Optics offers a way of declaring how to focus deeply into immutable struct
 
 For all the new typeclasses it also includes the extensions available for basic types and datatypes in both arrow-core and arrow-extras.
 
-Datatypes: [`Fold`]({{ '/docs/optics/fold/' | relative_url }}), [`Getter`]({{ '/docs/optics/getter/' | relative_url }}), [`Iso`]({{ '/docs/optics/iso/' | relative_url }}), [`Lens`]({{ '/docs/optics/lens/' | relative_url }}), [`Optional`]({{ '/docs/optics/optional/' | relative_url }}), [`Prism`]({{ '/docs/optics/prism/' | relative_url }}), [`Setter`]({{ '/docs/optics/setter/' | relative_url }}), [`Traversal`]({{ '/docs/optics/traversal/' | relative_url }})
-
-Typeclasses: [`At`]({{ '/docs/optics/at/' | relative_url }}), [`Each`]({{ '/docs/optics/each/' | relative_url }}), [`FilterIndex`]({{ '/docs/optics/filterIndex/' | relative_url }}), [`Index`]({{ '/docs/optics/index/' | relative_url }})
+Dependency: `arrow-core`
 
 ### arrow-fx
 
@@ -68,10 +62,6 @@ dependencies {
 ```
 
 The [fx library]({{ '/docs/effects/fx/' | relative_url }}) offers a powerful concurrency DSL with an emphasis on easy concurrency and parallelism with guarantees about concurrent and parallel resource safety. It can be used with Arrow Fx's IO or a set of typeclasses to abstract over concurrency frameworks like `RxJava`, `Reactor`, `Arrow's IO`, etc.
-
-Datatypes: [`IO`]({{ '/docs/effects/io/' | relative_url }})
-
-Typeclasses: [`Fx`]({{ '/docs/effects/fx/' | relative_url }}), [`MonadDefer`]({{ '/docs/effects/monaddefer/' | relative_url }}), [`Async`]({{ '/docs/effects/async/' | relative_url }}), [`Effect`]({{ '/docs/effects/effect/' | relative_url }})
 
 Dependency: `arrow-core`
 
@@ -106,9 +96,9 @@ dependencies {
 
 Each of these modules provides wrappers over the datatypes in each of the libraries that implement all the typeclasses provided by arrow-fx
 
-[Rx]({{ 'docs/integrations/rx2/' | relative_url }}): `Observable`, `Flowable`, `Single`
+[Rx]({{ 'docs/integrations/rx2/' | relative_url }})
 
-[Reactor]({{ 'docs/integrations/reactor/' | relative_url }}): `Flux`, `Mono`
+[Reactor]({{ 'docs/integrations/reactor/' | relative_url }})
 
 Dependency: `arrow-fx`
 
@@ -133,10 +123,6 @@ dependencies {
     compile "io.arrow-kt:arrow-mtl-data:$arrow_version"
 }
 ```
-
-Datatypes: [`Cokleisli`]({{ '/docs/datatypes/cokleisli/' | relative_url }}), [`Coreader`]({{ '/docs/datatypes/coreader/' | relative_url }}),  , [`StateT`]({{ '/docs/arrow/data/statet/' | relative_url }}), [`WriterT`]({{ '/docs/arrow/data/writert/' | relative_url }}), [`EitherT`]({{ '/docs/arrow/data/eithert/' | relative_url }}), [`Kleisli`]({{ '/docs/arrow/data/kleisli/' | relative_url }}), , [`OptionT`]({{ '/docs/arrow/data/optiont/' | relative_url }}), [`Reader`]({{ '/docs/arrow/data/reader/' | relative_url }}),  [`State`]({{ '/docs/arrow/data/state/' | relative_url }}), 
-
-Typeclasses:  [`MonadReader`]({{ '/docs/arrow/mtl/typeclasses/monadreader/' | relative_url }}), [`MonadWriter`]({{ '/docs/arrow/mtl/typeclasses/monadwriter/' | relative_url }}), [`MonadState`]({{ '/docs/arrow/mtl/typeclasses/monadstate' | relative_url }})
 
 Dependency: `arrow-core`
 
@@ -171,10 +157,6 @@ dependencies {
 ```
 
 This library includes the datatypes and typeclasses in Recursion schemes. 
-
-Datatypes: [`Fix`]({{ '/docs/recursion/fix/' | relative_url }}), [`Mu`]({{ '/docs/recursion/mu/' | relative_url }}), [`Nu`]({{ '/docs/recursion/nu/' | relative_url }})
-
-Typeclasses: [`Corecursive`]({{ '/docs/recursion/corecursive/' | relative_url }}), [`Recursive`]({{ '/docs/recursion/recursive/' | relative_url }}), [`Birecursive`]({{ '/docs/recursion/birecursive/' | relative_url }})
 
 Dependency: `arrow-core`
 
@@ -212,8 +194,6 @@ dependencies {
 ```
 
 This library includes the datatypes in Free. 
-
-Datatypes: [`Free`]({{ '/docs/free/free/' | relative_url }}), [`FreeApplicative`]({{ '/docs/free/freeapplicative/' | relative_url }}), [`Cofree`]({{ '/docs/free/cofree/' | relative_url }}), [`Yoneda`]({{ '/docs/free/yoneda/' | relative_url }}), [`Coyoneda`]({{ '/docs/free/coyoneda/' | relative_url }})
 
 Dependency: `arrow-core`
 
