@@ -7,7 +7,6 @@ import arrow.core.Right
 import arrow.core.Some
 import arrow.core.Tuple4
 import arrow.core.right
-import arrow.fx.IO.Companion.effect
 import arrow.fx.IO.Companion.just
 import arrow.fx.extensions.fx
 import arrow.fx.extensions.io.async.async
@@ -320,7 +319,7 @@ class IOTest : UnitSpec() {
       result shouldBe None
     }
 
-    "parallel execution makes all IOs start at the same time" {
+    "parallel execution with single threaded context makes all IOs start at the same time" {
       val order = mutableListOf<Long>()
 
       fun makePar(num: Long) =

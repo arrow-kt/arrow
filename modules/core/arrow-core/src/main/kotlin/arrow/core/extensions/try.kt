@@ -6,7 +6,6 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.ForTry
-import arrow.core.Option
 import arrow.core.Try
 import arrow.core.Try.Failure
 import arrow.core.TryOf
@@ -20,7 +19,6 @@ import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
-import arrow.typeclasses.FunctorFilter
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
@@ -190,16 +188,6 @@ interface TryTraverse : Traverse<ForTry> {
 
   override fun <A, B> TryOf<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
     fix().foldRight(lb, f)
-}
-
-@extension
-interface TryFunctorFilter : FunctorFilter<ForTry> {
-
-  override fun <A, B> Kind<ForTry, A>.filterMap(f: (A) -> Option<B>): Try<B> =
-    fix().filterMap(f)
-
-  override fun <A, B> Kind<ForTry, A>.map(f: (A) -> B): Try<B> =
-    fix().map(f)
 }
 
 @extension

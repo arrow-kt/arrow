@@ -2,12 +2,12 @@ package arrow.core
 
 import arrow.Kind
 import arrow.core.Eval.Now
+import arrow.core.extensions.eval.bimonad.bimonad
 import arrow.core.extensions.eval.comonad.comonad
 import arrow.core.extensions.eval.monad.monad
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
-import arrow.test.laws.ComonadLaws
-import arrow.test.laws.MonadLaws
+import arrow.test.laws.BimonadLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.fail
 import io.kotlintest.properties.Gen
@@ -18,16 +18,19 @@ import org.junit.runner.RunWith
 
 @RunWith(KotlinTestRunner::class)
 class EvalTest : UnitSpec() {
-  val EQ: Eq<Kind<ForEval, Int>> = Eq { a, b ->
+  val EQ1: Eq<Kind<ForEval, Int>> = Eq { a, b ->
     a.value() == b.value()
+  }
+
+  val EQ2: Eq<Kind<ForEval, Kind<ForEval, Int>>> = Eq { a, b ->
+    a.value().value() == b.value().value()
   }
 
   init {
 
-      testLaws(
-        MonadLaws.laws(Eval.monad(), EQ),
-        ComonadLaws.laws(Eval.comonad(), ::Now, EQ)
-      )
+    testLaws(
+      BimonadLaws.laws(Eval.bimonad(), Eval.monad(), Eval.comonad(), ::Now, EQ1, EQ2, Eq.any())
+    )
 
     "should map wrapped value" {
       val sideEffect = SideEffect()
