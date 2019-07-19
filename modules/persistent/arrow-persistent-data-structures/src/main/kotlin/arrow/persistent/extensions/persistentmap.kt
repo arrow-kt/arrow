@@ -6,18 +6,11 @@ import arrow.extension
 import arrow.persistent.data.PersistentMapK
 import arrow.persistent.data.PersistentMapKPartialOf
 import arrow.persistent.data.fix
-import arrow.persistent.extensions.persistentmapk.foldable.forAll
-import arrow.typeclasses.Applicative
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
-import arrow.typeclasses.Hash
 import arrow.typeclasses.Monoid
-import arrow.typeclasses.MonoidK
 import arrow.typeclasses.Semigroup
-import arrow.typeclasses.Show
-import arrow.typeclasses.Traverse
-import arrow.undocumented
 
 @extension
 interface PersistentMapKFunctor<K> : Functor<PersistentMapKPartialOf<K>> {
@@ -34,10 +27,6 @@ interface PersistentMapKFoldable<K> : Foldable<PersistentMapKPartialOf<K>> {
 
   override fun <A, B> Kind<PersistentMapKPartialOf<K>, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> {
     return fix().foldRight(lb, f)
-  }
-
-  override fun <A> Kind<PersistentMapKPartialOf<K>, A>.remove(element: A, monoidK: MonoidK<PersistentMapKPartialOf<K>>, AF: Applicative<PersistentMapKPartialOf<K>>): Kind<PersistentMapKPartialOf<K>, A> {
-    return fix().remove(element)
   }
 }
 

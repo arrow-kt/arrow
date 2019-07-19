@@ -12,7 +12,6 @@ import arrow.core.Some
 import arrow.core.flatMap
 import arrow.core.identity
 import arrow.core.right
-import me.eugeniomarletti.kotlin.metadata.shadow.load.kotlin.hasVoidReturnType
 
 /**
  * ank_macro_hierarchy(arrow.typeclasses.Foldable)
@@ -86,9 +85,11 @@ interface Foldable<F> {
    * @param monoidK the [Monoid] which produces the empty result [Foldable]
    * @param AF the [Applicative] which will be used to lift the values in this [Foldable]
    */
-  fun <A> Kind<F, A>.remove(element: A,
-                            monoidK: MonoidK<F>,
-                            AF: Applicative<F>): Kind<F, A> {
+  fun <A> Kind<F, A>.remove(
+    element: A,
+    monoidK: MonoidK<F>,
+    AF: Applicative<F>
+  ): Kind<F, A> {
     return foldLeft(monoidK.empty()) { foldable: Kind<F, A>, next: A ->
       if (next == element) foldable
       else monoidK.run {

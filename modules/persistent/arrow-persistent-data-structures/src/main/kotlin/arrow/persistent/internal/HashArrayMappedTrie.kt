@@ -296,9 +296,11 @@ abstract class LeafNode<K, V> : HAMTNode<K, V>() {
 /**
  * Representation of a HAMT leaf node with single element.
  */
-class LeafSingleton<K, V>(override val hash: Int,
-                          override val key: K,
-                          override val value: V) : LeafNode<K, V>() {
+class LeafSingleton<K, V>(
+  override val hash: Int,
+  override val key: K,
+  override val value: V
+) : LeafNode<K, V>() {
 
   override val size: Int = 1
 
@@ -334,10 +336,12 @@ class LeafSingleton<K, V>(override val hash: Int,
 /**
  * Representation of a HAMT leaf node with more than one element.
  */
-class LeafList<K, V>(override val hash: Int,
-                     override val key: K,
-                     override val value: V,
-                     val tail: LeafNode<K, V>) : LeafNode<K, V>() {
+class LeafList<K, V>(
+  override val hash: Int,
+  override val key: K,
+  override val value: V,
+  val tail: LeafNode<K, V>
+) : LeafNode<K, V>() {
 
   override val size: Int = 1 + tail.size
 
@@ -445,9 +449,11 @@ class LeafList<K, V>(override val hash: Int,
 /**
  * Representation of a HAMT indexed node.
  */
-class IndexedNode<K, V>(private val bitmap: Int,
-                        override val size: Int,
-                        val subNodes: Array<Any?>) : HAMTNode<K, V>() {
+class IndexedNode<K, V>(
+  private val bitmap: Int,
+  override val size: Int,
+  val subNodes: Array<Any?>
+) : HAMTNode<K, V>() {
 
   override val isEmpty = false
 
@@ -576,9 +582,11 @@ class IndexedNode<K, V>(private val bitmap: Int,
 /**
  * Representation of a HAMT array node.
  */
-class ArrayNode<K, V>(private val count: Int,
-                      override val size: Int,
-                      val subNodes: Array<Any?>) : HAMTNode<K, V>() {
+class ArrayNode<K, V>(
+  private val count: Int,
+  override val size: Int,
+  val subNodes: Array<Any?>
+) : HAMTNode<K, V>() {
 
   override val isEmpty = false
 

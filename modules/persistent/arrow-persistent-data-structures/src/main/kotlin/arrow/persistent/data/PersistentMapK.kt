@@ -6,14 +6,13 @@ import arrow.core.Option
 import arrow.core.iterateRight
 import arrow.persistent.internal.HashArrayMappedTrie
 
-
 /**
  * A [PersistentMapK] is an immutable [MapK] which implements structural sharing
  * by wrapping a persistent Map implementation.
  */
 data class PersistentMapK<K, A>(
-  private val map: HashArrayMappedTrie<K, A> = HashArrayMappedTrie.empty())
-  : PersistentMapKOf<K, A> {
+  private val map: HashArrayMappedTrie<K, A> = HashArrayMappedTrie.empty()) :
+  PersistentMapKOf<K, A> {
 
   val isEmpty: Boolean = map.isEmpty
   val size: Int = map.size
