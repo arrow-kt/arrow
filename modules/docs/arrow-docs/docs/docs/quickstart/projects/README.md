@@ -24,7 +24,7 @@ Note: This section keeps on growing! Keep an eye on it from time to time.
 
 [Guardiola31337/uiagesturegen](https://github.com/Guardiola31337/uiagesturegen): UI Automator Gesture Generation DSL
 
-[JorgeCastilloPrz/KotlinAndroidFunctional](https://github.com/JorgeCastilloPrz/KotlinAndroidFunctional): Functional Programing based architectures
+[JorgeCastilloPrz/ArrowAndroidSamples](https://github.com/JorgeCastilloPrz/ArrowAndroidSamples/): Android architecture samples using Arrow
 
 [dcampogiani/AndroidFunctionalValidation](https://github.com/dcampogiani/AndroidFunctionalValidation): Simple form validation using Arrow
 
