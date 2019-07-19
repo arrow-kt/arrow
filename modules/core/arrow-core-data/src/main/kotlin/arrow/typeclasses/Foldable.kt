@@ -75,11 +75,22 @@ interface Foldable<F> {
    * Transforms this [Foldable] into a new one which doesn't contain the given [element].
    * Will return an identical [Foldable] if it doesn't contain [element] in the first place.
    * Example:
-   * ```
-   * ListK.foldable().run { listOf(1, 2, 3, 4).k().remove(2, ListK.monoidK(), ListK.applicative()) }
-   * //
-   * ```
    *
+   * {: data-executable='true'}
+   *
+   * ```kotlin:ank
+   * import arrow.core.ListK
+   * import arrow.core.extensions.listk.applicative.applicative
+   * import arrow.core.extensions.listk.foldable.foldable
+   * import arrow.core.extensions.listk.monoidK.monoidK
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   ListK.foldable().run { listOf(1, 2, 3, 4).k().remove(2, ListK.monoidK(), ListK.applicative()) }
+   *  //sampleEnd
+   *  println(result)
+   * }
+   * ```
    *
    * @param element the element to remove
    * @param monoidK the [Monoid] which produces the empty result [Foldable]
