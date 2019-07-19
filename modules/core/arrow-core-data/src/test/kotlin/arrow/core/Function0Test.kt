@@ -10,8 +10,6 @@ import arrow.core.extensions.monoid
 import arrow.core.extensions.semigroup
 import arrow.test.UnitSpec
 import arrow.test.laws.BimonadLaws
-import arrow.test.laws.ComonadLaws
-import arrow.test.laws.MonadLaws
 import arrow.test.laws.MonoidLaws
 import arrow.test.laws.SemigroupLaws
 import arrow.typeclasses.Eq
@@ -35,9 +33,7 @@ class Function0Test : UnitSpec() {
     testLaws(
       SemigroupLaws.laws(Function0.semigroup(Int.semigroup()), { 1 }.k(), { 2 }.k(), { 3 }.k(), EQ1),
       MonoidLaws.laws(Function0.monoid(Int.monoid()), Gen.constant({ 1 }.k()), EQ1),
-      MonadLaws.laws(Function0.monad(), EQ1),
-      ComonadLaws.laws(Function0.comonad(), { { it }.k() }, EQ1),
-      BimonadLaws.laws(Function0.bimonad(), Eq.any(), EQ2)
+      BimonadLaws.laws(Function0.bimonad(), Function0.monad(), Function0.comonad(), { { it }.k() }, EQ1, EQ2, Eq.any())
     )
 
     "Semigroup of Function0<A> is Function0<Semigroup<A>>" {

@@ -2,7 +2,9 @@ package arrow.test.laws
 
 import arrow.Kind
 import arrow.typeclasses.Bimonad
+import arrow.typeclasses.Comonad
 import arrow.typeclasses.Eq
+import arrow.typeclasses.Monad
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 
@@ -10,14 +12,20 @@ object BimonadLaws {
 
   fun <F> laws(
     BF: Bimonad<F>,
-    EQ1: Eq<Int>,
-    EQ2: Eq<Kind<F, Kind<F, Int>>>
+    M: Monad<F>,
+    CM: Comonad<F>,
+    f: (Int) -> Kind<F, Int>,
+    EQ1: Eq<Kind<F, Int>>,
+    EQ2: Eq<Kind<F, Kind<F, Int>>>,
+    EQ3: Eq<Int>
   ): List<Law> =
-    listOf(
-      Law("Bimonad Laws: Extract Identity") { BF.extractIsIdentity(EQ1) },
-      Law("Bimonad Laws: CoflatMap Composition") { BF.coflatMapComposition(EQ2) },
-      Law("Bimonad Laws: Extract FlatMap") { BF.extractFlatMap(EQ1) }
-    )
+    MonadLaws.laws(M, EQ1) +
+      ComonadLaws.laws(CM, f, EQ1) +
+      listOf(
+        Law("Bimonad Laws: Extract Identity") { BF.extractIsIdentity(EQ3) },
+        Law("Bimonad Laws: CoflatMap Composition") { BF.coflatMapComposition(EQ2) },
+        Law("Bimonad Laws: Extract FlatMap") { BF.extractFlatMap(EQ3) }
+      )
 
   fun <F> Bimonad<F>.extractIsIdentity(EQ: Eq<Int>): Unit =
     forAll(

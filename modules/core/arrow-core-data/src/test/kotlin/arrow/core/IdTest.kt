@@ -17,9 +17,7 @@ import arrow.core.extensions.monoid
 import arrow.core.extensions.semigroup
 import arrow.test.UnitSpec
 import arrow.test.laws.BimonadLaws
-import arrow.test.laws.ComonadLaws
 import arrow.test.laws.HashLaws
-import arrow.test.laws.MonadLaws
 import arrow.test.laws.MonoidLaws
 import arrow.test.laws.SemigroupLaws
 import arrow.test.laws.ShowLaws
@@ -41,10 +39,8 @@ class IdTest : UnitSpec() {
       SemigroupLaws.laws(Id.semigroup(Int.semigroup()), Id(1), Id(2), Id(3), Id.eq(Int.eq())),
       MonoidLaws.laws(Id.monoid(Int.monoid()), Gen.constant(Id(1)), Id.eq(Int.eq())),
       ShowLaws.laws(Id.show(), Eq.any()) { Id(it) },
-      MonadLaws.laws(Id.monad(), Eq.any()),
       TraverseLaws.laws(Id.traverse(), Id.applicative(), ::Id, Eq.any()),
-      ComonadLaws.laws(Id.comonad(), ::Id, Eq.any()),
-      BimonadLaws.laws(Id.bimonad(), Eq.any(), EQ),
+      BimonadLaws.laws(Id.bimonad(), Id.monad(), Id.comonad(), ::Id, Eq.any(), EQ, Eq.any()),
       HashLaws.laws(Id.hash(Int.hash()), Id.eq(Int.eq())) { Id(it) }
     )
 

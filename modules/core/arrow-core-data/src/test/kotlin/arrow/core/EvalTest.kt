@@ -8,8 +8,6 @@ import arrow.core.extensions.eval.monad.monad
 import arrow.test.UnitSpec
 import arrow.test.concurrency.SideEffect
 import arrow.test.laws.BimonadLaws
-import arrow.test.laws.ComonadLaws
-import arrow.test.laws.MonadLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.fail
 import io.kotlintest.properties.Gen
@@ -31,9 +29,7 @@ class EvalTest : UnitSpec() {
   init {
 
     testLaws(
-      MonadLaws.laws(Eval.monad(), EQ1),
-      ComonadLaws.laws(Eval.comonad(), ::Now, EQ1),
-      BimonadLaws.laws(Eval.bimonad(), Eq.any(), EQ2)
+      BimonadLaws.laws(Eval.bimonad(), Eval.monad(), Eval.comonad(), ::Now, EQ1, EQ2, Eq.any())
     )
 
     "should map wrapped value" {

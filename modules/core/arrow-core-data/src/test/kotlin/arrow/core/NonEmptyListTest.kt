@@ -15,9 +15,7 @@ import arrow.core.extensions.nonemptylist.show.show
 import arrow.core.extensions.nonemptylist.traverse.traverse
 import arrow.test.UnitSpec
 import arrow.test.laws.BimonadLaws
-import arrow.test.laws.ComonadLaws
 import arrow.test.laws.HashLaws
-import arrow.test.laws.MonadLaws
 import arrow.test.laws.SemigroupKLaws
 import arrow.test.laws.SemigroupLaws
 import arrow.test.laws.ShowLaws
@@ -37,13 +35,11 @@ class NonEmptyListTest : UnitSpec() {
 
     testLaws(
       ShowLaws.laws(NonEmptyList.show(), EQ1) { it.nel() },
-      MonadLaws.laws(NonEmptyList.monad(), Eq.any()),
       SemigroupKLaws.laws(
         NonEmptyList.semigroupK(),
         NonEmptyList.applicative(),
         Eq.any()),
-      ComonadLaws.laws(NonEmptyList.comonad(), { NonEmptyList.of(it) }, Eq.any()),
-      BimonadLaws.laws(NonEmptyList.bimonad(), Eq.any(), EQ2),
+      BimonadLaws.laws(NonEmptyList.bimonad(), NonEmptyList.monad(), NonEmptyList.comonad(), { NonEmptyList.of(it) }, Eq.any(), EQ2, Eq.any()),
       TraverseLaws.laws(NonEmptyList.traverse(), NonEmptyList.applicative(), { n: Int -> NonEmptyList.of(n) }, Eq.any()),
       SemigroupLaws.laws(NonEmptyList.semigroup(), Nel(1, 2, 3), Nel(3, 4, 5), Nel(6, 7, 8), NonEmptyList.eq(Int.eq())),
       HashLaws.laws(NonEmptyList.hash(Int.hash()), EQ1) { Nel.of(it) }
