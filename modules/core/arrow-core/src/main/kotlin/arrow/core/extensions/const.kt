@@ -2,6 +2,7 @@ package arrow.core.extensions
 
 import arrow.Kind
 import arrow.core.Eval
+import arrow.core.Option
 import arrow.core.Tuple2
 import arrow.extension
 import arrow.typeclasses.Applicative
@@ -21,6 +22,7 @@ import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
+import arrow.typeclasses.TraverseFilter
 import arrow.typeclasses.fix
 import arrow.typeclasses.value
 import arrow.typeclasses.ap as constAp
@@ -104,6 +106,15 @@ interface ConstTraverse<X> : Traverse<ConstPartialOf<X>>, ConstFoldable<X> {
 
   override fun <G, A, B> ConstOf<X, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, ConstOf<X, B>> =
     fix().traverse(AP, f)
+}
+
+@extension
+interface ConstTraverseFilter<X> : TraverseFilter<ConstPartialOf<X>>, ConstTraverse<X> {
+
+  override fun <T, U> Kind<ConstPartialOf<X>, T>.map(f: (T) -> U): Const<X, U> = fix().retag()
+
+  override fun <G, A, B> Kind<ConstPartialOf<X>, A>.traverseFilter(AP: Applicative<G>, f: (A) -> Kind<G, Option<B>>): Kind<G, ConstOf<X, B>> =
+    fix().traverseFilter(AP, f)
 }
 
 @extension

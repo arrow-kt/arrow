@@ -49,7 +49,7 @@ interface BoxSelect : Select<ForBox> {
 
 @extension
 interface BoxFunctorFilter : FunctorFilter<ForBox>, BoxFunctor {
-  override fun <A, B> BoxOf<A>.mapFilter(f: (A) -> Option<B>): Box<B> =
+  override fun <A, B> BoxOf<A>.filterMap(f: (A) -> Option<B>): Box<B> =
     when (val box = fix()) {
       Box.Empty -> Box.empty()
       is Box.Full -> f(box.value).fold(

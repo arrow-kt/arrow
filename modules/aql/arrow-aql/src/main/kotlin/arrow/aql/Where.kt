@@ -10,7 +10,7 @@ interface Where<F> {
 
   infix fun <A, Z> Query<F, A, Z>.where(predicate: A.() -> Boolean): Query<F, A, Z> =
     functorFilter().run {
-      copy(from = from.mapFilter {
+      copy(from = from.filterMap {
         if (predicate(it)) it.some()
         else None
       })
@@ -18,7 +18,7 @@ interface Where<F> {
 
   infix fun <A, Z> Query<F, A, Z>.whereSelection(predicate: Z.() -> Boolean): Query<F, A, Z> =
     functorFilter().run {
-      copy(from = from.mapFilter {
+      copy(from = from.filterMap {
         if (predicate(select(it))) it.some()
         else None
       })
@@ -26,7 +26,7 @@ interface Where<F> {
 
   infix fun <A, Z> Query<F, A, Z>.having(predicate: A.() -> Boolean): Query<F, A, Z> =
     functorFilter().run {
-      copy(from = from.mapFilter {
+      copy(from = from.filterMap {
         if (predicate(it)) it.some()
         else None
       })

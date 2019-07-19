@@ -298,8 +298,8 @@ interface OptionHash<A> : Hash<Option<A>>, OptionEq<A> {
 
 @extension
 interface OptionFunctorFilter : FunctorFilter<ForOption> {
-  override fun <A, B> Kind<ForOption, A>.mapFilter(f: (A) -> Option<B>): Option<B> =
-    fix().mapFilter(f)
+  override fun <A, B> Kind<ForOption, A>.filterMap(f: (A) -> Option<B>): Option<B> =
+    fix().filterMap(f)
 
   override fun <A, B> Kind<ForOption, A>.map(f: (A) -> B): Option<B> =
     fix().map(f)
@@ -313,8 +313,8 @@ interface OptionMonadCombine : MonadCombine<ForOption> {
   override fun <A> empty(): Option<A> =
     Option.empty()
 
-  override fun <A, B> Kind<ForOption, A>.mapFilter(f: (A) -> Option<B>): Option<B> =
-    fix().mapFilter(f)
+  override fun <A, B> Kind<ForOption, A>.filterMap(f: (A) -> Option<B>): Option<B> =
+    fix().filterMap(f)
 
   override fun <A, B> Kind<ForOption, A>.ap(ff: Kind<ForOption, (A) -> B>): Option<B> =
     fix().ap(ff)
@@ -376,8 +376,8 @@ interface OptionMonadFilter : MonadFilter<ForOption> {
   override fun <A> empty(): Option<A> =
     Option.empty()
 
-  override fun <A, B> Kind<ForOption, A>.mapFilter(f: (A) -> Option<B>): Option<B> =
-    fix().mapFilter(f)
+  override fun <A, B> Kind<ForOption, A>.filterMap(f: (A) -> Option<B>): Option<B> =
+    fix().filterMap(f)
 
   override fun <A, B> Kind<ForOption, A>.ap(ff: Kind<ForOption, (A) -> B>): Option<B> =
     fix().ap(ff)
