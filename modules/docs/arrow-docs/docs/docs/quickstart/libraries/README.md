@@ -51,7 +51,7 @@ dependencies {
 
 Optics is the functional way of handling immutable data and collections in a way that's boilerplate free and efficient.
 
-It can be used alongside annotation processing to generate [simple DSLs]({{ '/docs/optics/dsl/' | relative_url }}) that read like imperative code.
+Arrow Optics offers a way of declaring how to focus deeply into immutable structure without boilerplate. It also offers an [Optics DSL]({{ '/docs/optics/dsl/' | relative_url }})  to elegantly describe complex use-cases in an elegant and simple manner without requiring to understand the underlying theory.
 
 For all the new typeclasses it also includes the extensions available for basic types and datatypes in both arrow-core and arrow-extras.
 
@@ -68,7 +68,6 @@ dependencies {
 ```
 
 The [fx library]({{ '/docs/effects/fx/' | relative_url }}) offers a powerful concurrency DSL with an emphasis on easy concurrency and parallelism with guarantees about concurrent and parallel resource safety. It can be used with Arrow Fx's IO or a set of typeclasses to abstract over concurrency frameworks like `RxJava`, `Reactor`, `Arrow's IO`, etc.
-Additionally it provides its own concurrency primitive, called IO.
 
 Datatypes: [`IO`]({{ '/docs/effects/io/' | relative_url }})
 
