@@ -6,6 +6,17 @@ import arrow.core.Option
 import arrow.core.iterateRight
 import arrow.persistent.internal.HashArrayMappedTrie
 
+class ForPersistentMapK private constructor() {
+  companion object
+}
+typealias PersistentMapKOf<K, A> = arrow.Kind2<ForPersistentMapK, K, A>
+typealias PersistentMapKPartialOf<K> = arrow.Kind<ForPersistentMapK, K>
+typealias PersistentMapKKindedJ<K, A> = io.kindedj.HkJ2<ForPersistentMapK, K, A>
+
+@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+inline fun <K, A> PersistentMapKOf<K, A>.fix(): PersistentMapK<K, A> =
+  this as PersistentMapK<K, A>
+
 /**
  * A [PersistentMapK] is an immutable [MapK] which implements structural sharing
  * by wrapping a persistent Map implementation.
@@ -49,24 +60,9 @@ data class PersistentMapK<K, A>(
 
   fun containsKey(key: K): Boolean = map.containsKey(key)
 
-  fun put(key: K, value: A): PersistentMapK<K, A> {
-    return PersistentMapK(map.put(key, value))
-  }
+  fun put(key: K, value: A): PersistentMapK<K, A> = PersistentMapK(map.put(key, value))
 
-  fun remove(key: K): PersistentMapK<K, A> {
-    return PersistentMapK(map.remove(key))
-  }
+  fun remove(key: K): PersistentMapK<K, A> = PersistentMapK(map.remove(key))
 
   companion object
 }
-
-class ForPersistentMapK private constructor() {
-  companion object
-}
-typealias PersistentMapKOf<K, A> = arrow.Kind2<ForPersistentMapK, K, A>
-typealias PersistentMapKPartialOf<K> = arrow.Kind<ForPersistentMapK, K>
-typealias PersistentMapKKindedJ<K, A> = io.kindedj.HkJ2<ForPersistentMapK, K, A>
-
-@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
-inline fun <K, A> PersistentMapKOf<K, A>.fix(): PersistentMapK<K, A> =
-  this as PersistentMapK<K, A>
