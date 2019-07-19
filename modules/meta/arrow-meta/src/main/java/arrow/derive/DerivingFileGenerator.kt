@@ -23,6 +23,8 @@ private fun kindedRegex(typeClassFirstTypeArg: String): Regex = "arrow.Kind<$typ
 fun String.asKotlin(): String =
   removeBackticks()
     .replace("/", ".")
+    .replace("java.lang.Iterable", "kotlin.collections.Iterable")
+    .replace("Iterable", "kotlin.collections.Iterable")
     .replace("kotlin.jvm.functions", "kotlin")
     .replace("java.util.Collection", "kotlin.collections.Collection")
     .replace("java.lang.Throwable", "kotlin.Throwable")

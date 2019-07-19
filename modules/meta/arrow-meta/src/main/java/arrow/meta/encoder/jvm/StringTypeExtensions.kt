@@ -19,6 +19,8 @@ fun String.asPlatform(): String =
 fun String.asKotlin(): String =
   removeBackticks()
     .replace("/", ".")
+    .replace("java.lang.Iterable", "kotlin.collections.Iterable")
+    .replace("java.util.Iterable", "kotlin.collections.Iterable")
     .replace("kotlin.jvm.functions", "kotlin")
     .replace("java.util.List", "kotlin.collections.List")
     .replace("java.util.Set", "kotlin.collections.Set")
