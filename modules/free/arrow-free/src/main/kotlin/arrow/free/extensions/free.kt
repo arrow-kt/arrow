@@ -2,6 +2,7 @@ package arrow.free.extensions
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.core.Eval
 import arrow.core.FunctionK
 import arrow.extension
 import arrow.free.Free
@@ -9,11 +10,14 @@ import arrow.free.FreeOf
 import arrow.free.FreePartialOf
 import arrow.free.fix
 import arrow.free.foldMap
+import arrow.free.foldStep
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
+import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
+import arrow.typeclasses.Traverse
 import arrow.undocumented
 import arrow.free.ap as freeAp
 import arrow.free.flatMap as freeFlatMap
@@ -82,4 +86,33 @@ interface FreeEq<F, G, A> : Eq<Kind<FreePartialOf<F>, A>> {
 
   override fun Kind<FreePartialOf<F>, A>.eqv(b: Kind<FreePartialOf<F>, A>): Boolean =
     fix().foldMap(FK(), MG()) == b.fix().foldMap(FK(), MG())
+}
+
+@extension
+@undocumented
+interface FreeFoldable<F> : Foldable<FreePartialOf<F>> { // not StackSafe...
+  override fun <A, B> Kind<FreePartialOf<F>, A>.foldLeft(b: B, f: (B, A) -> B): B =
+    fix().foldStep<F, A, B, A>(
+      onPure = { a -> f(b, a) },
+      onSuspend = { foldLeft(b, f) },
+      onFlatMapped = { _, g: (A) -> Free<F, A> -> foldLeft(b) { acc, a -> g(a).foldLeft(acc, f) } }
+    )
+
+  override fun <A, B> Kind<FreePartialOf<F>, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> =
+    fix().foldStep(
+      onPure = { a -> f(a, lb) },
+      onSuspend = { foldRight(lb, f) },
+      onFlatMapped = { _, g: (A) -> Free<F, A> -> foldRight(lb) { a, acc -> g(a).foldRight(acc, f) } }
+    )
+}
+
+@extension
+@undocumented
+interface FreeTraverse<F> : Traverse<FreePartialOf<F>> {
+  override fun <G, A, B> Kind<FreePartialOf<F>, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Kind<FreePartialOf<F>, B>> =
+    TODO()
+
+  override fun <A, B> Kind<FreePartialOf<F>, A>.foldLeft(b: B, f: (B, A) -> B): B = TODO()
+
+  override fun <A, B> Kind<FreePartialOf<F>, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> = TODO()
 }

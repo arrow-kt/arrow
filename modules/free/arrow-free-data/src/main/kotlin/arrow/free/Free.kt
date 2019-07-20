@@ -94,6 +94,19 @@ fun <M, S, A> Free<S, A>.foldMap(f: FunctionK<S, M>, MM: Monad<M>): Kind<M, A> =
     }
   }
 
+@Suppress("UNCHECKED_CAST")
+inline fun <S, A, B, C> Free<S, A>.foldStep(
+  onPure: (A) -> B,
+  onSuspend: (Kind<S, A>) -> B,
+  onFlatMapped: (Kind<S, C>, (C) -> Free<S, A>) -> B): B {
+  val x = this.step()
+  return when (x) {
+    is Free.Pure<S, A> -> onPure(x.a)
+    is Free.Suspend<S, A> -> onSuspend(x.a)
+    is Free.FlatMapped<S, A, *> -> onFlatMapped(x.c as Kind<S, C>, x.fm as (C) -> Free<S, A>)
+  }
+}
+
 fun <S, A> A.free(): Free<S, A> = Free.just<S, A>(this)
 
 fun <F, A> Free<F, A>.run(M: Monad<F>): Kind<F, A> = this.foldMap(FunctionK.id(), M)
