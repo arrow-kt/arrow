@@ -114,7 +114,7 @@ interface FreeTraverse<F> : Traverse<FreePartialOf<F>> {
     when (val x = fix().resume(FF)) {
       is Either.Right -> AP.run { f(x.b).map { Free.Pure(it) } }
       is Either.Left -> AP.run { traverse(AP) { a ->
-        traverse(AP, f).map { TODO() } }(x.a) }
+        traverse(AP, f).map {  } }(x.a) }
     }
 
   override fun <A, B> Kind<FreePartialOf<F>, A>.foldLeft(b: B, f: (B, A) -> B): B = TODO()
