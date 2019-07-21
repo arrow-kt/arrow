@@ -10,7 +10,7 @@ import arrow.free.FreeOf
 import arrow.free.FreePartialOf
 import arrow.free.fix
 import arrow.free.foldMap
-import arrow.free.foldStep
+import arrow.free.roll
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
@@ -92,7 +92,7 @@ interface FreeEq<F, G, A> : Eq<Kind<FreePartialOf<F>, A>> {
 @undocumented
 interface FreeFoldable<F> : Foldable<FreePartialOf<F>> { // not StackSafe...
   override fun <A, B> Kind<FreePartialOf<F>, A>.foldLeft(b: B, f: (B, A) -> B): B =
-    fix().foldStep<F, A, B, A>(
+    fix().foldStep(
       onPure = { a -> f(b, a) },
       onSuspend = { foldLeft(b, f) },
       onFlatMapped = { _, g: (A) -> Free<F, A> -> foldLeft(b) { acc, a -> g(a).foldLeft(acc, f) } }
@@ -109,10 +109,18 @@ interface FreeFoldable<F> : Foldable<FreePartialOf<F>> { // not StackSafe...
 @extension
 @undocumented
 interface FreeTraverse<F> : Traverse<FreePartialOf<F>> {
+  val FF: Functor<F>
   override fun <G, A, B> Kind<FreePartialOf<F>, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Kind<FreePartialOf<F>, B>> =
-    TODO()
+    when (val x = fix().resume(FF)) {
+      is Either.Right -> AP.run { f(x.b).map { Free.Pure(it) } }
+      is Either.Left -> AP.run { traverse(AP) { a ->
+        traverse(AP, f).map { TODO() } }(x.a) }
+    }
 
   override fun <A, B> Kind<FreePartialOf<F>, A>.foldLeft(b: B, f: (B, A) -> B): B = TODO()
 
   override fun <A, B> Kind<FreePartialOf<F>, A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): Eval<B> = TODO()
+
+  override fun <A, B> Kind<FreePartialOf<F>, A>.map(f: (A) -> B): Kind<FreePartialOf<F>, B> =
+    fix().freeMap(f)
 }
