@@ -5,7 +5,6 @@ dependencies {
     compile project(':arrow-core')
     kapt project(':arrow-meta')
     kaptTest project(':arrow-meta')
-    compileOnly project(':arrow-meta')
     testCompileOnly project(':arrow-meta')
     testRuntime("org.junit.vintage:junit-vintage-engine:$jUnitVintageVersion")
     testCompile "io.kotlintest:kotlintest-runner-junit4:$kotlinTestVersion"
