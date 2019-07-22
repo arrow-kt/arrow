@@ -1,11 +1,9 @@
 package arrow.syntax.collections
 
 import arrow.core.Option
-import arrow.core.PartialFunction
 import arrow.core.Predicate
 import arrow.core.andThen
 import arrow.core.getOrElse
-import arrow.core.orElse
 import arrow.core.toOption
 
 @Deprecated(message = "`firstOption` is now part of the Foldable interface and generalized to all foldable data types")

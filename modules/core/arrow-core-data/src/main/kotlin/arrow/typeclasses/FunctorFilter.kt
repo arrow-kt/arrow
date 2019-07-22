@@ -6,7 +6,6 @@ import arrow.core.Option
 import arrow.core.PartialFunction
 import arrow.core.Some
 import arrow.core.identity
-import arrow.core.lift
 
 /**
  * ank_macro_hierarchy(arrow.typeclasses.FunctorFilter)

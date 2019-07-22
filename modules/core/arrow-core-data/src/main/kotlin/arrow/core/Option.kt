@@ -192,7 +192,6 @@ object None : Option<Nothing>() {
 data class Some<out T>(val t: T) : Option<T>() {
   override fun isEmpty() = false
 
-
   override fun toString(): String = "Some($t)"
 }
 
