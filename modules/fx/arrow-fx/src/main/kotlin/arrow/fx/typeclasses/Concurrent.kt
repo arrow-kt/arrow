@@ -3,9 +3,17 @@ package arrow.fx.typeclasses
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Left
+import arrow.core.ListK
 import arrow.core.Right
 import arrow.core.Tuple2
 import arrow.core.Tuple3
+import arrow.core.extensions.listk.traverse.traverse
+import arrow.core.fix
+import arrow.core.identity
+import arrow.core.k
+import arrow.fx.internal.parMap2
+import arrow.fx.internal.parMap3
+import arrow.typeclasses.Applicative
 import arrow.fx.CancelToken
 import arrow.fx.MVar
 import arrow.fx.Race2
@@ -21,6 +29,7 @@ import arrow.fx.RaceTriple
 import arrow.fx.Timer
 import arrow.fx.internal.TimeoutException
 import arrow.typeclasses.MonadSyntax
+import arrow.typeclasses.Traverse
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.startCoroutine
@@ -35,6 +44,10 @@ interface Concurrent<F> : Async<F> {
   fun dispatchers(): Dispatchers<F>
 
   fun timer(): Timer<F> = Timer(this)
+
+  fun parApplicative(): Applicative<F> = ParApplicative(null)
+
+  fun parApplicative(ctx: CoroutineContext): Applicative<F> = ParApplicative(ctx)
 
   /**
    * Entry point for monad bindings which enables for comprehensions. The underlying impl is based on coroutines.
@@ -284,6 +297,106 @@ interface Concurrent<F> : Async<F> {
     }
 
   /**
+   * Given a function which returns an [F] effect, run this effect in parallel for all the values in [G].
+   *
+   * ```kotlin:ank:playground:extension
+   * import arrow.Kind
+   * import arrow.core.k
+   * import arrow.fx.IO
+   * import arrow.fx.extensions.io.concurrent.concurrent
+   * import arrow.fx.fix
+   * import arrow.fx.typeclasses.Concurrent
+   * import arrow.fx.typeclasses.milliseconds
+   *
+   * fun main(args: Array<String>) {
+   *  fun <F> Concurrent<F>.processListInParallel(): Kind<F, List<Unit>> =
+   *  //sampleStart
+   *    listOf("1", "2", "3").k().parTraverse { s ->
+   *      effect { s.toInt() }
+   *        .flatMap { i ->
+   *          val duration = (i * 200).milliseconds
+   *          sleep(duration).followedBy(effect { println("Waited for $duration") })
+   *        }
+   *    }
+   *
+   *  //sampleEnd
+   *    IO.concurrent().processListInParallel()
+   *      .fix()
+   *      .unsafeRunSync()
+   * }
+   * ```
+   */
+  fun <G, A, B> Kind<G, A>.parTraverse(ctx: CoroutineContext, TG: Traverse<G>, f: (A) -> Kind<F, B>): Kind<F, Kind<G, B>> =
+    TG.run { traverse(parApplicative(ctx), f) }
+
+  /**
+   * @see parTraverse
+   */
+  fun <G, A, B> Kind<G, A>.parTraverse(TG: Traverse<G>, f: (A) -> Kind<F, B>): Kind<F, Kind<G, B>> =
+    TG.run { traverse(parApplicative(), f) }
+
+  /**
+   * @see parTraverse
+   */
+  fun <A, B> Iterable<A>.parTraverse(ctx: CoroutineContext, f: (A) -> Kind<F, B>): Kind<F, List<B>> =
+    toList().k().parTraverse(ctx, ListK.traverse(), f).map { it.fix() }
+
+  /**
+   * @see parTraverse
+   */
+  fun <A, B> Iterable<A>.parTraverse(f: (A) -> Kind<F, B>): Kind<F, List<B>> =
+    toList().k().parTraverse(ListK.traverse(), f).map { it.fix() }
+
+  /**
+   * Runs all the [F] effects of the [G] structure to invert the structure from Kind<F, Kind<G, A>> to Kind<G, Kind<F, A>>.
+   *
+   * ```
+   * import arrow.Kind
+   * import arrow.fx.IO
+   * import arrow.fx.extensions.io.concurrent.concurrent
+   * import arrow.fx.fix
+   * import arrow.fx.typeclasses.Async
+   * import arrow.fx.typeclasses.Concurrent
+   *
+   * data class User(val id: Int)
+   *
+   * fun main() {
+   *   fun <F> Async<F>.getUserById(id: Int): Kind<F, User> =
+   *     effect { User(id) }
+   *
+   *   fun <F> Concurrent<F>.processInParallel(): Kind<F, List<User>> =
+   *   //sampleStart
+   *     listOf(1, 2, 3)
+   *       .map { id -> getUserById(id) }
+   *       .parSequence()
+   *  //sampleEnd
+   *   IO.concurrent().processInParallel()
+   *     .fix().unsafeRunSync()
+   * }
+   * ```
+   */
+  fun <G, A> Kind<G, Kind<F, A>>.parSequence(TG: Traverse<G>, ctx: CoroutineContext): Kind<F, Kind<G, A>> =
+    parTraverse(ctx, TG, ::identity)
+
+  /**
+   * @see parSequence
+   */
+  fun <G, A> Kind<G, Kind<F, A>>.parSequence(TG: Traverse<G>): Kind<F, Kind<G, A>> =
+    parTraverse(TG, ::identity)
+
+  /**
+   * @see parSequence
+   */
+  fun <A> Iterable<Kind<F, A>>.parSequence(ctx: CoroutineContext): Kind<F, List<A>> =
+    toList().k().parTraverse(ctx, ListK.traverse(), ::identity).map { it.fix() }
+
+  /**
+   * @see parSequence
+   */
+  fun <A> Iterable<Kind<F, A>>.parSequence(): Kind<F, List<A>> =
+    toList().k().parTraverse(ListK.traverse(), ::identity).map { it.fix() }
+
+  /**
    * Map two tasks in parallel within a new [F] on [this@parMapN].
    *
    * ```kotlin:ank:playground
@@ -324,24 +437,13 @@ interface Concurrent<F> : Async<F> {
     fb: Kind<F, B>,
     f: (A, B) -> C
   ): Kind<F, C> =
-    racePair(fa, fb).flatMap {
-      it.fold(
-        { a, fiberB -> fiberB.join().map { b -> f(a, b) } },
-        { fiberA, b -> fiberA.join().map { a -> f(a, b) } }
-      )
-    }
+    parMap2(this, fa, fb, f)
 
   /**
    * @see parMapN
    */
   fun <A, B, C, D> CoroutineContext.parMapN(fa: Kind<F, A>, fb: Kind<F, B>, fc: Kind<F, C>, f: (A, B, C) -> D): Kind<F, D> =
-    raceTriple(fa, fb, fc).flatMap {
-      it.fold(
-        { a, fiberB, fiberC -> fiberB.join().flatMap { b -> fiberC.join().map { c -> f(a, b, c) } } },
-        { fiberA, b, fiberC -> fiberA.join().flatMap { a -> fiberC.join().map { c -> f(a, b, c) } } },
-        { fiberA, fiberB, c -> fiberA.join().flatMap { a -> fiberB.join().map { b -> f(a, b, c) } } }
-      )
-    }
+    parMap3(this, fa, fb, fc, f)
 
   /**
    * @see parMapN

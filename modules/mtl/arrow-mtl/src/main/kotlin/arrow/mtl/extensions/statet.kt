@@ -20,7 +20,7 @@ import arrow.mtl.StatePartialOf
 import arrow.mtl.StateTOf
 import arrow.mtl.fix
 import arrow.mtl.runM
-import arrow.mtl.typeclasses.MonadCombine
+import arrow.typeclasses.MonadCombine
 import arrow.mtl.typeclasses.MonadState
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError

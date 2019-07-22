@@ -42,72 +42,69 @@ If you’re looking to contribute, have questions, or want to keep up-to-date ab
 
 Make sure to have the latest version of JDK 1.8 installed.
 
-Add it in your root `build.gradle` at the end of repositories.
+Add this in your root `build.gradle` at the end of repositories.
 
 ```groovy
 allprojects {
     repositories {
+        mavenCentral()
         jcenter()
+        maven { url "https://dl.bintray.com/arrow-kt/arrow-kt/" } 
+        maven { url 'https://oss.jfrog.org/artifactory/oss-snapshot-local/' } // for SNAPSHOT builds
     }
 }
 ```
 
-# Dependency breakdown starting in Arrow 0.9.1
-
-Starting in 0.9.1, Arrow follows the following convention for artifact publication.
-
-The arrow modules are Core, Effects, Optics, Recursion, etc.
-
-An Arrow module is composed of data types and type classes.
-Arrow modules are exported and published with the following semantics.
-
-If we take for example `arrow-core`. 
-
-Arrow core contains the basic arrow type classes and data types and it's composed of 2 main artifacts that may be used a la carte:
-
-Recomended for most use cases:
-
-- `arrow-core` (Depends on data and extensions modules and exports both)
-
-Trimmed down versions:
-
-- `arrow-core-data` (Only data types & typeclasses)
-- `arrow-core` (Data types, typeclasses & type class extensions)
-
-# Current stable version 0.9.0
-
-```groovy
-def arrow_version = "0.9.0"
-```
-
-You can find the dependencies necessary in the Basic Setup of the README at the 0.9.0 tag clicking [here](https://github.com/arrow-kt/arrow/blob/0.9.0/README.md#next-development-version-090).
-
-# Next development version 0.9.1
+# Next development version 0.10.0
 
 Add the dependencies into the project's `build.gradle`
 
+## Λrrow Core
+
 ```groovy
-def arrow_version = "0.9.1-SNAPSHOT"
+def arrow_version = "0.10.0-SNAPSHOT"
 dependencies {
     compile "io.arrow-kt:arrow-core:$arrow_version"
     compile "io.arrow-kt:arrow-syntax:$arrow_version"
     kapt    "io.arrow-kt:arrow-meta:$arrow_version"
-    
-    compile "io.arrow-kt:arrow-query-language:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-free-data:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-free:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-mtl:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-fx:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-fx-rx2:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-fx-reactor:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-optics:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-generic:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-recursion-data:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-recursion:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-query-language:$arrow_version" //optional
-    compile "io.arrow-kt:arrow-integration-retrofit-adapter:$arrow_version" //optional
 }
 ```
+
+## Λrrow Core + Λrrow Optics
+
+```groovy
+def arrow_version = "0.10.0-SNAPSHOT"
+dependencies {
+    compile "io.arrow-kt:arrow-optics:$arrow_version"
+    compile "io.arrow-kt:arrow-syntax:$arrow_version"
+    kapt    "io.arrow-kt:arrow-meta:$arrow_version"
+}
+```
+
+## Λrrow Core + Λrrow Fx 
+
+```groovy
+def arrow_version = "0.10.0-SNAPSHOT"
+dependencies {
+    compile "io.arrow-kt:arrow-fx:$arrow_version"
+    compile "io.arrow-kt:arrow-syntax:$arrow_version"
+    kapt    "io.arrow-kt:arrow-meta:$arrow_version"
+}
+```
+
+## Λrrow Core + Λrrow Optics + Λrrow Fx
+
+```groovy
+def arrow_version = "0.10.0-SNAPSHOT"
+dependencies {
+    compile "io.arrow-kt:arrow-fx:$arrow_version"
+    compile "io.arrow-kt:arrow-optics:$arrow_version"
+    compile "io.arrow-kt:arrow-syntax:$arrow_version"
+    kapt    "io.arrow-kt:arrow-meta:$arrow_version"
+}
+```
+
+Here is the complete [library list]({{ '/docs/quickstart/libraries/' | relative_url }}) for a more granular dependency set-up.
 
 # Additional Setup
 
@@ -120,7 +117,7 @@ Add the dependencies into the project's `build.gradle`
 apply plugin: 'kotlin-kapt' //optional
 apply from: rootProject.file('gradle/generated-kotlin-sources.gradle') //only for Android projects
 
-def arrow_version = "0.9.0"
+def arrow_version = "0.10.0-SNAPSHOT"
 dependencies {
     ...
     kapt    'io.arrow-kt:arrow-meta:$arrow_version' //optional
