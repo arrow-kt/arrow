@@ -7,15 +7,12 @@ import arrow.aql.OrderBy
 import arrow.aql.Select
 import arrow.aql.Sum
 import arrow.aql.Union
-import arrow.aql.Where
 import arrow.core.ForTry
 import arrow.core.Try
 import arrow.extension
 import arrow.core.extensions.`try`.applicative.applicative
 import arrow.core.extensions.`try`.foldable.foldable
 import arrow.core.extensions.`try`.functor.functor
-import arrow.core.extensions.`try`.functorFilter.functorFilter
-import arrow.typeclasses.FunctorFilter
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
@@ -28,11 +25,6 @@ interface TryFrom : From<ForTry> {
 @extension
 interface TrySelect : Select<ForTry> {
   override fun functor(): Functor<ForTry> = Try.functor()
-}
-
-@extension
-interface TryWhere : Where<ForTry> {
-  override fun functorFilter(): FunctorFilter<ForTry> = Try.functorFilter()
 }
 
 @extension

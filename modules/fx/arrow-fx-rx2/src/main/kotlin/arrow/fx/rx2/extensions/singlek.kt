@@ -1,6 +1,7 @@
 package arrow.fx.rx2.extensions
 
 import arrow.core.Either
+import arrow.core.Tuple2
 import arrow.fx.CancelToken
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
@@ -35,6 +36,7 @@ import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
 import io.reactivex.Single
+import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.ReplaySubject
 import java.util.concurrent.TimeUnit
@@ -69,7 +71,7 @@ interface SingleKMonad : Monad<ForSingleK> {
   override fun <A, B> SingleKOf<A>.map(f: (A) -> B): SingleK<B> =
     fix().map(f)
 
-  override fun <A, B> tailRecM(a: A, f: Function1<A, SingleKOf<Either<A, B>>>): SingleK<B> =
+  override fun <A, B> tailRecM(a: A, f: (A) -> SingleKOf<Either<A, B>>): SingleK<B> =
     SingleK.tailRecM(a, f)
 
   override fun <A> just(a: A): SingleK<A> =
@@ -148,6 +150,14 @@ interface SingleKConcurrent : Concurrent<ForSingleK>, SingleKAsync {
         }
       }.k()
     }
+
+  override fun <A, B, C> CoroutineContext.parMapN(fa: SingleKOf<A>, fb: SingleKOf<B>, f: (A, B) -> C): SingleK<C> =
+    SingleK(fa.value().zipWith(fb.value(), BiFunction(f)).subscribeOn(asScheduler()))
+
+  override fun <A, B, C, D> CoroutineContext.parMapN(fa: SingleKOf<A>, fb: SingleKOf<B>, fc: SingleKOf<C>, f: (A, B, C) -> D): SingleK<D> =
+    SingleK(fa.value().zipWith(fb.value().zipWith(fc.value(), BiFunction<B, C, Tuple2<B, C>> { b, c -> Tuple2(b, c) }), BiFunction { a: A, tuple: Tuple2<B, C> ->
+      f(a, tuple.a, tuple.b)
+    }).subscribeOn(asScheduler()))
 
   override fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForSingleK>): SingleK<A> =
     SingleK.cancelable(k)

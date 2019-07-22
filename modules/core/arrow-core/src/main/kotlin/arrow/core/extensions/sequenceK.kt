@@ -180,8 +180,8 @@ interface SequenceKHash<A> : Hash<SequenceK<A>>, SequenceKEq<A> {
 
 @extension
 interface SequenceKFunctorFilter : FunctorFilter<ForSequenceK> {
-  override fun <A, B> Kind<ForSequenceK, A>.mapFilter(f: (A) -> Option<B>): SequenceK<B> =
-    fix().mapFilter(f)
+  override fun <A, B> Kind<ForSequenceK, A>.filterMap(f: (A) -> Option<B>): SequenceK<B> =
+    fix().filterMap(f)
 
   override fun <A, B> Kind<ForSequenceK, A>.map(f: (A) -> B): SequenceK<B> =
     fix().map(f)
@@ -192,8 +192,8 @@ interface SequenceKMonadFilter : MonadFilter<ForSequenceK> {
   override fun <A> empty(): SequenceK<A> =
     SequenceK.empty()
 
-  override fun <A, B> Kind<ForSequenceK, A>.mapFilter(f: (A) -> Option<B>): SequenceK<B> =
-    fix().mapFilter(f)
+  override fun <A, B> Kind<ForSequenceK, A>.filterMap(f: (A) -> Option<B>): SequenceK<B> =
+    fix().filterMap(f)
 
   override fun <A, B> Kind<ForSequenceK, A>.ap(ff: Kind<ForSequenceK, (A) -> B>): SequenceK<B> =
     fix().ap(ff)
@@ -219,8 +219,8 @@ interface SequenceKMonadCombine : MonadCombine<ForSequenceK> {
   override fun <A> empty(): SequenceK<A> =
     SequenceK.empty()
 
-  override fun <A, B> Kind<ForSequenceK, A>.mapFilter(f: (A) -> Option<B>): SequenceK<B> =
-    fix().mapFilter(f)
+  override fun <A, B> Kind<ForSequenceK, A>.filterMap(f: (A) -> Option<B>): SequenceK<B> =
+    fix().filterMap(f)
 
   override fun <A, B> Kind<ForSequenceK, A>.ap(ff: Kind<ForSequenceK, (A) -> B>): SequenceK<B> =
     fix().ap(ff)

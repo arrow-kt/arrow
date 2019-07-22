@@ -91,7 +91,9 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class), PolyTempl
     )
 
   private fun List<Func>.inMainFileSpec(fileSpec: FileSpec.Builder): FileSpec.Builder =
-    fold(fileSpec) { spec, func -> spec.addFunction(func.lyrics().toBuilder().build()) }
+    fold(fileSpec) { spec, func ->
+      spec.addFunction(func.lyrics().toBuilder().build())
+    }
 
   private fun FileSpec.Builder.addProperties(properties: List<Property>): FileSpec.Builder =
     properties.fold(this) { spec, prop -> spec.addProperty(prop.lyrics().toBuilder().build()) }
@@ -130,7 +132,7 @@ class ExtensionProcessor : MetaProcessor<extension>(extension::class), PolyTempl
           "." + info.projectedCompanion.simpleName.substringAfterLast(".").toLowerCase() +
           "." + info.typeClass.name.simpleName.decapitalize(),
         type.name.simpleName
-      )
+      ).indent("  ")
     }
 
   private fun notAnInstanceError(): Nothing =

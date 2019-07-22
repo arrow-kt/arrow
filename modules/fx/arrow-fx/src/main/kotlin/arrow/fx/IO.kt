@@ -47,7 +47,7 @@ typealias IOProcF<A> = ((Either<Throwable, A>) -> Unit) -> IOOf<Unit>
 @Suppress("StringLiteralDuplication")
 sealed class IO<out A> : IOOf<A> {
 
-  companion object {
+  companion object : IOParMap2, IOParMap3, IORacePair, IORaceTriple {
 
     fun <A> effect(f: suspend () -> A): IO<A> =
       Effect(effect = f)
