@@ -82,7 +82,7 @@ dependencies {
 
 The [fx library]({{ '/docs/effects/fx/' | relative_url }}) offers a powerful concurrency DSL with an emphasis on easy concurrency and parallelism with guarantees about concurrent and parallel resource safety. It can be used with Arrow Fx's IO or a set of typeclasses to abstract over concurrency frameworks like `RxJava`, `Reactor`, `Arrow's IO`, etc.
 
-### arrow-extras 
+Dependency: `arrow-core`
 
 ## Extension libraries
 
@@ -242,13 +242,6 @@ dependencies {
     kapt "io.arrow-kt:arrow-meta:$arrow_version"
 }
 ```
-
-Allows boilerplate generation for [`@extension`](({{ 'docs/patterns/glossary/#instances-and-extensions-interfaces' | relative_url }})) instances and [`@higherkind`]({{ 'https://arrow-kt.io/docs/patterns/glossary/#higher-kinds' | relative_url }}) datatypes.
-
-### arrow-meta
-
-{:.intermediate}
-intermediate
 
 Allows boilerplate generation for [`@extension`](({{ 'docs/patterns/glossary/#instances-and-extensions-interfaces' | relative_url }})) instances and [`@higherkind`]({{ 'https://arrow-kt.io/docs/patterns/glossary/#higher-kinds' | relative_url }}) datatypes.
 
