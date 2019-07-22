@@ -56,7 +56,7 @@ data class OptionT<F, A>(private val value: Kind<F, Option<A>>) : OptionTOf<F, A
 
   fun value(): Kind<F, Option<A>> = value
 
-  inline fun <B> fold(FF: Functor<F>, crossinline default: () -> B, crossinline f: (A) -> B): Kind<F, B> = FF.run {
+  fun <B> fold(FF: Functor<F>, crossinline default: () -> B, crossinline f: (A) -> B): Kind<F, B> = FF.run {
     value().map { option -> option.fold(default, f) }
   }
 
