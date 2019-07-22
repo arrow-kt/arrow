@@ -368,8 +368,8 @@ The name of this pattern is **Monad**.
 In Arrow terms, a Monad is an interface with two operations: a constructor `just`, and `flatMap`.
 
 ```kotlin
-interface Monad<F>: Applicative<F>, Functor<F> {
-    fun <A> just (instance: A): Kind<F, A>
+interface Monad<F>: Applicative<F>, Functor<F>, Selective<F> {
+    fun <A> just (instance: A): Kind<F, A> // this comes from [Applicative] interface
 
     fun <A, B> Kind<F, A>.flatMap(f: (A) ->  Kind<F, B>) : Kind<F, B>
 }
