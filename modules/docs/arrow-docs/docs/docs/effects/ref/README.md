@@ -21,7 +21,7 @@ Since the allocation of mutable state is not referentially transparent this side
 import arrow.fx.*
 import arrow.fx.extensions.io.monadDefer.monadDefer
 
-val ioRef: IO<Ref<ForIO, Int>> = Ref(IO.monadDefer()) { 1 }.fix()
+val ioRef: IO<Ref<ForIO, Int>> = Ref(IO.monadDefer(), 1).fix()
 ```
 
 In case you want the side-effect to execute immediately and return the `Ref` instance you can use the `unsafe` function.

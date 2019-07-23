@@ -38,6 +38,7 @@ interface MonadDefer<F> : MonadThrow<F>, Bracket<F, Throwable> {
    *
    * ```kotlin:ank:playground
    * import arrow.Kind
+   * import arrow.core.Tuple2
    * import arrow.fx.*
    * import arrow.fx.extensions.io.monadDefer.monadDefer
    * import arrow.fx.typeclasses.MonadDefer
