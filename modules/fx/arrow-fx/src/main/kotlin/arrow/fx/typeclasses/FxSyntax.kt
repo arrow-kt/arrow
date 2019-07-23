@@ -24,7 +24,7 @@ interface FxSyntax<F> : Concurrent<F>, BindSyntax<F> {
     f: (A) -> B
   ): Kind<F, List<B>> =
     effects.fold(emptyList<Kind<F, Fiber<F, B>>>()) { acc, fa ->
-      acc + startFiber(fa.map(f))
+      acc + fa.map(f).fork(this)
     }.traverse(this@FxSyntax) { kind ->
       kind.flatMap { it.join() }
     }.map { it.fix() }

@@ -165,12 +165,12 @@ interface ObservableKEffect : Effect<ForObservableK>, ObservableKAsync {
 }
 
 interface ObservableKConcurrent : Concurrent<ForObservableK>, ObservableKAsync {
-  override fun <A> CoroutineContext.startFiber(kind: ObservableKOf<A>): ObservableK<Fiber<ForObservableK, A>> =
-    asScheduler().let { scheduler ->
+  override fun <A> Kind<ForObservableK, A>.fork(coroutineContext: CoroutineContext): ObservableK<Fiber<ForObservableK, A>> =
+    coroutineContext.asScheduler().let { scheduler ->
       Observable.create<Fiber<ForObservableK, A>> { emitter ->
         if (!emitter.isDisposed) {
           val s: ReplaySubject<A> = ReplaySubject.create()
-          val conn: RxDisposable = kind.value().subscribeOn(scheduler).subscribe(s::onNext, s::onError)
+          val conn: RxDisposable = value().subscribeOn(scheduler).subscribe(s::onNext, s::onError)
           emitter.onNext(Fiber(s.k(), ObservableK {
             conn.dispose()
           }))

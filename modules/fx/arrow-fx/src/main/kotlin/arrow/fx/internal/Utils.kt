@@ -289,7 +289,7 @@ internal fun <A> asyncContinuation(ctx: CoroutineContext, cc: (Either<Throwable,
 
 /**
  * Utility to makes sure that the original [fa] is gets forked on [ctx].
- * @see IO.startFiber
+ * @see IO.fork
  * @see arrow.fx.racePair
  * @see arrow.fx.raceTriple
  *

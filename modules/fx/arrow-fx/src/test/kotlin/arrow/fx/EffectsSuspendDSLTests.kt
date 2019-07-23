@@ -250,11 +250,11 @@ class EffectsSuspendDSLTests() : UnitSpec() {
       msg.get() shouldBe const
     }
 
-    "startFiber" {
+    "fork" {
       val const = 1
       fxTest {
         IO.fx {
-          val fiber = !NonBlocking.startFiber(effect { const })
+          val fiber = !effect { const }.fork(NonBlocking)
           val (n) = fiber.join()
           n
         }

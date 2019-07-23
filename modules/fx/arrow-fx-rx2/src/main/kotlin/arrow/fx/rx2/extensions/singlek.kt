@@ -1,5 +1,6 @@
 package arrow.fx.rx2.extensions
 
+import arrow.Kind
 import arrow.core.Either
 import arrow.core.Tuple2
 import arrow.fx.CancelToken
@@ -138,12 +139,12 @@ interface SingleKEffect :
 }
 
 interface SingleKConcurrent : Concurrent<ForSingleK>, SingleKAsync {
-  override fun <A> CoroutineContext.startFiber(kind: SingleKOf<A>): SingleK<Fiber<ForSingleK, A>> =
-    asScheduler().let { scheduler ->
+  override fun <A> Kind<ForSingleK, A>.fork(coroutineContext: CoroutineContext): SingleK<Fiber<ForSingleK, A>> =
+    coroutineContext.asScheduler().let { scheduler ->
       Single.create<Fiber<ForSingleK, A>> { emitter ->
         if (!emitter.isDisposed) {
           val s: ReplaySubject<A> = ReplaySubject.create()
-          val conn: io.reactivex.disposables.Disposable = kind.value().subscribeOn(scheduler).subscribe(s::onNext, s::onError)
+          val conn: io.reactivex.disposables.Disposable = value().subscribeOn(scheduler).subscribe(s::onNext, s::onError)
           emitter.onSuccess(Fiber(s.firstOrError().k(), SingleK {
             conn.dispose()
           }))

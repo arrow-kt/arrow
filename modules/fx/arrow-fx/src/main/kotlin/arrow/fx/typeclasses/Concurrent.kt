@@ -65,7 +65,7 @@ interface Concurrent<F> : Async<F> {
     }
 
   /**
-   * Create a new [F] that upon execution starts the receiver [F] within a [Fiber] on [this@startFiber].
+   * Create a new [F] that upon execution starts the receiver [F] within a [Fiber] on [this@fork].
    *
    * ```kotlin:ank:playground
    * import arrow.Kind
@@ -78,7 +78,7 @@ interface Concurrent<F> : Async<F> {
    *   fun <F> Concurrent<F>.example(): Kind<F, Unit> =
    *   //sampleStart
    *     fx.concurrent {
-   *       val (join, cancel) = !Dispatchers.Default.startFiber(effect {
+   *       val (join, cancel) = !Dispatchers.Default.fork(effect {
    *         println("Hello from a fiber on ${Thread.currentThread().name}")
    *       })
    *     }
@@ -88,11 +88,15 @@ interface Concurrent<F> : Async<F> {
    * }
    * ```
    *
-   * @receiver [F] to execute on [this@startFiber] within a new suspended [F].
-   * @param this@startFiber [CoroutineContext] to execute the source [F] on.
-   * @return [F] with suspended execution of source [F] on context [this@startFiber].
+   * @receiver [F] to [fork] within a new context [F].
+   * @param ctx to execute the source [F] on.
+   * @return [F] with suspended execution of source [F] on context [ctx].
+   * @see fork for a version that defaults to the default dispatcher.
    */
-  fun <A> CoroutineContext.startFiber(kind: Kind<F, A>): Kind<F, Fiber<F, A>>
+  fun <A> Kind<F, A>.fork(ctx: CoroutineContext): Kind<F, Fiber<F, A>>
+
+  /** @see fork **/
+  fun <A> Kind<F, A>.fork(): Kind<F, Fiber<F, A>> = fork(dispatchers().default())
 
   /**
    * Race two tasks concurrently within a new [F].

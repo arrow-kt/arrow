@@ -1,5 +1,6 @@
 package arrow.fx.rx2.extensions
 
+import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Tuple2
@@ -159,12 +160,12 @@ interface MaybeKEffect :
 }
 
 interface MaybeKConcurrent : Concurrent<ForMaybeK>, MaybeKAsync {
-  override fun <A> CoroutineContext.startFiber(kind: MaybeKOf<A>): MaybeK<Fiber<ForMaybeK, A>> =
-    asScheduler().let { scheduler ->
+  override fun <A> Kind<ForMaybeK, A>.fork(coroutineContext: CoroutineContext): MaybeK<Fiber<ForMaybeK, A>> =
+    coroutineContext.asScheduler().let { scheduler ->
       Maybe.create<Fiber<ForMaybeK, A>> { emitter ->
         if (!emitter.isDisposed) {
           val s: ReplaySubject<A> = ReplaySubject.create()
-          val conn: Disposable = kind.value().subscribeOn(scheduler).subscribe(s::onNext, s::onError)
+          val conn: Disposable = value().subscribeOn(scheduler).subscribe(s::onNext, s::onError)
           emitter.onSuccess(Fiber(s.firstElement().k(), MaybeK {
             conn.dispose()
           }))

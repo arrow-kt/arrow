@@ -678,7 +678,7 @@ sealed class IO<out A> : IOOf<A> {
    *   val result = IO.fx {
    *     val (join, cancel) = !IO.effect {
    *       println("Hello from a fiber on ${Thread.currentThread().name}")
-   *     }.startFiber(Dispatchers.Default)
+   *     }.fork(Dispatchers.Default)
    *   }
    *
    *   //sampleEnd
@@ -690,7 +690,7 @@ sealed class IO<out A> : IOOf<A> {
    * @param ctx [CoroutineContext] to execute the source [IO] on.
    * @return [IO] with suspended execution of source [IO] on context [ctx].
    */
-  fun startFiber(ctx: CoroutineContext): IO<Fiber<ForIO, A>> = async { cb ->
+  fun fork(ctx: CoroutineContext): IO<Fiber<ForIO, A>> = async { cb ->
     val promise = UnsafePromise<A>()
     // A new IOConnection, because its cancellation is now decoupled from our current one.
     val conn = IOConnection()
