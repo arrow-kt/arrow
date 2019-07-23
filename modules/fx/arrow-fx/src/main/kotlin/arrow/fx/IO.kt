@@ -265,7 +265,7 @@ sealed class IO<out A> : IOOf<A> {
      * fun main(args: Array<String>) {
      *   //sampleStart
      *   fun getUsernames(): IO<List<String>> =
-     *     IO.asyncF { conn: IOConnection, cb: (Either<Throwable, List<String>>) -> Unit ->
+     *     IO.asyncF { cb: (Either<Throwable, List<String>>) -> Unit ->
      *       IO {
      *         GithubService.getUsernames { names, throwable ->
      *           when {
@@ -403,7 +403,7 @@ sealed class IO<out A> : IOOf<A> {
      * fun main(args: Array<String>) {
      *   //sampleStart
      *   fun getUsernames(): IO<List<String>> =
-     *     IO.asyncF { conn: IOConnection, cb: (Either<Throwable, List<String>>) -> Unit ->
+     *     IO.cancelableF { cb: (Either<Throwable, List<String>>) -> Unit ->
      *       IO {
      *         val id = GithubService.getUsernames { names, throwable ->
      *           when {
@@ -515,7 +515,7 @@ sealed class IO<out A> : IOOf<A> {
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
-     *   val result = IO.tailRecM(0) { id ->
+     *   val result = IO.tailRecM(0) { i ->
      *     IO.just(
      *      if(i == 5000) Right(i)
      *      else Left(i + 1)
