@@ -139,35 +139,6 @@ interface Async<F> : MonadDefer<F> {
   fun <A> Kind<F, A>.continueOn(ctx: CoroutineContext): Kind<F, A>
 
   /**
-   * Delay a computation on provided [CoroutineContext].
-   *
-   * @param ctx [CoroutineContext] to run evaluation on.
-   *
-   * ```kotlin:ank:playground:extension
-   * _imports_
-   * import kotlinx.coroutines.Dispatchers
-   *
-   * fun main(args: Array<String>) {
-   *   //sampleStart
-   *   fun <F> Async<F>.invokeOnDefaultDispatcher(): Kind<F, String> =
-   *     _delay_(Dispatchers.Default, { Thread.currentThread().name })
-   *
-   *   val result = _extensionFactory_.invokeOnDefaultDispatcher()
-   *   //sampleEnd
-   *   println(result)
-   * }
-   * ```
-   */
-  fun <A> later(ctx: CoroutineContext, f: () -> A): Kind<F, A> =
-    defer(ctx) {
-      try {
-        just(f())
-      } catch (t: Throwable) {
-        t.raiseNonFatal<A>()
-      }
-    }
-
-  /**
    * Delay a suspended effect.
    *
    * ```kotlin:ank:playground:extension
