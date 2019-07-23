@@ -79,11 +79,11 @@ liftF(networkResult)
 
 ```kotlin:ank
 val doubleToInt: Prism<Double, Int> = Prism(
-        partialFunction = case(
-                { double: Double -> double.toInt().toDouble() == double }
-                      toT Double::toInt
-        ),
-        reverseGet = Int::toDouble
+  getOption = { double: Double ->
+    val i = double.toInt()
+    if (i.toDouble() == double) Some(i) else None
+  },
+  reverseGet = Int::toDouble
 )
 ```
 

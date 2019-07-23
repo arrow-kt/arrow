@@ -1,6 +1,7 @@
 package arrow.optics
 
 import arrow.core.Left
+import arrow.core.Option
 import arrow.core.Right
 import arrow.core.Some
 import arrow.typeclasses.Eq
@@ -16,18 +17,13 @@ val genSumTypeA: Gen<SumType.A> = Gen.string().map { SumType.A(it) }
 val genSum: Gen<SumType> =
   Gen.oneOf<SumType>(Gen.string().map { SumType.A(it) }, Gen.int().map { SumType.B(it) })
 
-val sumPrism: Prism<SumType, String> = Prism(
-  {
-    when (it) {
-      is SumType.A -> Right(it.string)
-      else -> Left(it)
-    }
-  },
+val sumPrism: Prism<SumType, String> = Prism<SumType, String>(
+  { Option.fromNullable((it as? SumType.A)?.string) },
   SumType::A
 )
 
 val stringPrism: Prism<String, List<Char>> = Prism(
-  { Right(it.toList()) },
+  { Some(it.toList()) },
   { it.joinToString(separator = "") }
 )
 
