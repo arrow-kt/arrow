@@ -105,7 +105,7 @@ sealed class IO<out A> : IOOf<A> {
      * Just wrap a pure value [A] into [IO].
      *
      * ```kotlin:ank:playground
-     * import arrow.effects.IO
+     * import arrow.fx.IO
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
@@ -121,7 +121,7 @@ sealed class IO<out A> : IOOf<A> {
      * Raise an error in a pure way without actually throwing.
      *
      * ```kotlin:ank:playground
-     * import arrow.effects.IO
+     * import arrow.fx.IO
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
@@ -163,7 +163,7 @@ sealed class IO<out A> : IOOf<A> {
      * @param f function to wrap into [IO].
      *
      * ```kotlin:ank:playground
-     * import arrow.effects.IO
+     * import arrow.fx.IO
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
@@ -180,7 +180,7 @@ sealed class IO<out A> : IOOf<A> {
      * Defer a computation that results in an [IO] value.
      *
      * ```kotlin:ank:playground
-     * import arrow.effects.IO
+     * import arrow.fx.IO
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
@@ -199,7 +199,7 @@ sealed class IO<out A> : IOOf<A> {
      *
      * ```kotlin:ank:playground
      * import arrow.core.*
-     * import arrow.effects.*
+     * import arrow.fx.*
      * import java.lang.RuntimeException
      *
      * typealias Callback = (List<String>?, Throwable?) -> Unit
@@ -251,7 +251,7 @@ sealed class IO<out A> : IOOf<A> {
      *
      * ```kotlin:ank:playground
      * import arrow.core.*
-     * import arrow.effects.*
+     * import arrow.fx.*
      * import java.lang.RuntimeException
      *
      * typealias Callback = (List<String>?, Throwable?) -> Unit
@@ -314,7 +314,7 @@ sealed class IO<out A> : IOOf<A> {
      *
      * ```kotlin:ank:playground
      * import arrow.core.*
-     * import arrow.effects.*
+     * import arrow.fx.*
      * import java.lang.RuntimeException
      *
      * typealias Callback = (List<String>?, Throwable?) -> Unit
@@ -380,7 +380,7 @@ sealed class IO<out A> : IOOf<A> {
      *
      * ```kotlin:ank:playground
      * import arrow.core.*
-     * import arrow.effects.*
+     * import arrow.fx.*
      * import java.lang.RuntimeException
      *
      * typealias Callback = (List<String>?, Throwable?) -> Unit
@@ -452,7 +452,7 @@ sealed class IO<out A> : IOOf<A> {
      * A pure [IO] value of [Unit].
      *
      * ```kotlin:ank:playground
-     * import arrow.effects.IO
+     * import arrow.fx.IO
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
@@ -469,7 +469,7 @@ sealed class IO<out A> : IOOf<A> {
      * A lazy [IO] value of [Unit].
      *
      * ```kotlin:ank:playground
-     * import arrow.effects.IO
+     * import arrow.fx.IO
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
@@ -486,7 +486,7 @@ sealed class IO<out A> : IOOf<A> {
      * Evaluates an [Eval] instance within a safe [IO] context.
      *
      * ```kotlin:ank:playground
-     * import arrow.effects.IO
+     * import arrow.fx.IO
      * import arrow.core.Eval
      *
      * fun main(args: Array<String>) {
@@ -511,7 +511,7 @@ sealed class IO<out A> : IOOf<A> {
      *
      * ```kotlin:ank:playground
      * import arrow.core.*
-     * import arrow.effects.IO
+     * import arrow.fx.IO
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
@@ -539,7 +539,7 @@ sealed class IO<out A> : IOOf<A> {
      * Useful when you need to model non-terminating cases.
      *
      * ```kotlin:ank:playground
-     * import arrow.effects.IO
+     * import arrow.fx.IO
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
@@ -556,7 +556,7 @@ sealed class IO<out A> : IOOf<A> {
    * Run the [IO] in a suspended environment.
    *
    * ```kotlin:ank:playground
-   * import arrow.fx.IO *
+   * import arrow.fx.IO
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
@@ -584,7 +584,7 @@ sealed class IO<out A> : IOOf<A> {
    * @returns an [IO] that results in a value [B].
    *
    * ```kotlin:ank:playground
-   * import arrow.effects.IO
+   * import arrow.fx.IO
    *
    * fun main(args: Array<String>) {
    *   val result =
@@ -605,7 +605,7 @@ sealed class IO<out A> : IOOf<A> {
    * @returns an effect that results in [B].
    *
    * ```kotlin:ank:playground
-   * import arrow.effects.IO
+   * import arrow.fx.IO
    *
    * fun main(args: Array<String>) {
    *   val result =
@@ -626,7 +626,7 @@ sealed class IO<out A> : IOOf<A> {
    * @returns an [IO] that'll run the following computations on [ctx].
    *
    * ```kotlin:ank:playground
-   * import arrow.effects.IO
+   * import arrow.fx.IO
    * import kotlinx.coroutines.Dispatchers
    *
    * fun main(args: Array<String>) {
@@ -643,22 +643,19 @@ sealed class IO<out A> : IOOf<A> {
     ContinueOn(this, ctx)
 
   /**
-   * Given both the value and the function are within [F], **ap**ply the function to the value.
+   * Given both the value and the function are within [IO], **ap**ply the function to the value.
    *
    * ```kotlin:ank:playground
-   * import arrow.fx.Option
-   * import arrow.core.Some
-   * import arrow.core.none
+   * import arrow.fx.IO
    *
    * fun main() {
    *   //sampleStart
-   *   val someF: IO<(Int) -> Long> = IO { it.toLong() + 1 }
-   *
+   *   val someF: IO<(Int) -> Long> = IO.just { i: Int -> i.toLong() + 1 }
    *   val a = IO.just(3).ap(someF)
    *   val b = IO.raiseError<Int>(RuntimeException("Boom")).ap(someF)
    *   val c = IO.just(3).ap(IO.raiseError<(Int) -> Long>(RuntimeException("Boom")))
    *   //sampleEnd
-   *   println("a: $a, b: $b, c: $c)
+   *   println("a: $a, b: $b, c: $c")
    * }
    * ```
    */
@@ -725,10 +722,10 @@ sealed class IO<out A> : IOOf<A> {
    *
    * fun main(args: Array<String>) {
    *   //sampleStart
-   *   val resultA = IO.raiseError(RuntimeException("Boom"!)).attempt()
+   *   val resultA = IO.raiseError<Int>(RuntimeException("Boom!")).attempt()
    *   val resultB = IO.just("Hello").attempt()
    *   //sampleEnd
-   *   println("resultA: ${resultA.unsafeRunSync()}, resultB: ${resultB.unsafeRunSync())
+   *   println("resultA: ${resultA.unsafeRunSync()}, resultB: ${resultB.unsafeRunSync()}")
    * }
    * ```
    *
@@ -879,7 +876,7 @@ sealed class IO<out A> : IOOf<A> {
    * of its exit condition.
    *
    * ```kotlin:ank:playground
-   * import arrow.effects.IO
+   * import arrow.fx.IO
    *
    * class File(url: String) {
    *   fun open(): File = this
@@ -930,8 +927,8 @@ sealed class IO<out A> : IOOf<A> {
    * @param release the allocated resource after the resulting [IO] of [use] is terminates.
    *
    * ```kotlin:ank:playground
-   * import arrow.effects.*
-   * import arrow.effects.typeclasses.ExitCase
+   * import arrow.fx.*
+   * import arrow.fx.typeclasses.ExitCase
    *
    * class File(url: String) {
    *   fun open(): File = this

@@ -26,13 +26,13 @@ interface Apply<F> : Functor<F> {
    *
    * fun main() {
    *   //sampleStart
-   *   val someF: Option<(Int) -> Long> = Some { it.toLong() + 1 }
+   *   val someF: Option<(Int) -> Long> = Some { i: Int -> i.toLong() + 1 }
    *
    *   val a = Some(3).ap(someF)
    *   val b = none<Int>().ap(someF)
    *   val c = Some(3).ap(none<(Int) -> Long>())
    *   //sampleEnd
-   *   println("a: $a, b: $b, c: $c)
+   *   println("a: $a, b: $b, c: $c")
    * }
    * ```
    */

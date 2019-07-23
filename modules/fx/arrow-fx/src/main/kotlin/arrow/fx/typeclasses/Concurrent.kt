@@ -80,9 +80,9 @@ interface Concurrent<F> : Async<F> {
    *   fun <F> Concurrent<F>.example(): Kind<F, Unit> =
    *   //sampleStart
    *     fx.concurrent {
-   *       val (join, cancel) = !Dispatchers.Default.fork(effect {
+   *       val (join, cancel) = !effect {
    *         println("Hello from a fiber on ${Thread.currentThread().name}")
-   *       })
+   *       }.fork(Dispatchers.Default)
    *     }
    *
    *   //sampleEnd
