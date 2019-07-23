@@ -20,7 +20,9 @@ import arrow.fx.internal.IOForkedStart
 import arrow.fx.internal.Platform.maxStackDepthSize
 import arrow.fx.internal.Platform.onceOnly
 import arrow.fx.internal.Platform.unsafeResync
+import arrow.fx.internal.ShiftTick
 import arrow.fx.internal.UnsafePromise
+import arrow.fx.internal.scheduler
 import arrow.fx.typeclasses.Disposable
 import arrow.fx.typeclasses.Duration
 import arrow.fx.typeclasses.ExitCase
@@ -130,6 +132,30 @@ sealed class IO<out A> : IOOf<A> {
      * ```
      */
     fun <A> raiseError(e: Throwable): IO<A> = RaiseError(e)
+
+    /**
+     *  Sleeps for a given [duration] without blocking a thread.
+     *
+     * ```kotlin:ank:playground
+     * import arrow.fx.IO
+     * import arrow.fx.typeclasses.seconds
+     *
+     * fun main(args: Array<String>) {
+     *   val result =
+     *   //sampleStart
+     *   IO.sleep(3.seconds).flatMap {
+     *     IO.effect { println("Hello World!") }
+     *   }
+     *   //sampleEnd
+     *   result.unsafeRunSync()
+     * }
+     * ```
+     **/
+    fun sleep(duration: Duration, continueOn: CoroutineContext = IODispatchers.CommonPool): IO<Unit> =
+      cancelable { cb ->
+        val cancelRef = scheduler.schedule(ShiftTick(continueOn, cb), duration.amount, duration.timeUnit)
+        later { cancelRef.cancel(false); Unit }
+      }
 
     /**
      * Wraps a function into [IO] to execute it _later_.
