@@ -334,7 +334,7 @@ fun <A, B> EitherOf<A, B>.filterOrOther(predicate: (B) -> Boolean, default: (B) 
  * Left(12).leftIfNull({ -1 })    // Result: Left(12)
  * ```
  */
-fun <A, B> EitherOf<A, B?>.leftIfNull(crossinline default: () -> A): Either<A, B> =
+fun <A, B> EitherOf<A, B?>.leftIfNull(default: () -> A): Either<A, B> =
   fix().flatMap { it.rightIfNotNull { default() } }
 
 /**
