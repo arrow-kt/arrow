@@ -33,7 +33,6 @@ import arrow.higherkind
  * val moreThrowing: (String) -> List<String> = {x -> listOf(x)}
  * val magic = throwsSomeStuff.andThen(throwsOtherThings).andThen(moreThrowing)
  * //sampleEnd
- *
  * fun main() {
  *  println ("magic = $magic")
  * }
@@ -59,7 +58,6 @@ import arrow.higherkind
  * //sampleStart
  *  Either.Right(5)
  * //sampleEnd
- *
  * fun main() {
  *  println(right)
  * }
@@ -72,7 +70,6 @@ import arrow.higherkind
  * //sampleStart
  *  Either.Left("Something went wrong")
  * //sampleEnd
- *
  * fun main() {
  *  println(left)
  * }
@@ -92,7 +89,6 @@ import arrow.higherkind
  * val right: Either<String, Int> = Either.Right(5)
  * val value = right.flatMap{ Either.Right(it + 1) }
  * //sampleEnd
- *
  * fun main() {
  *  println("value = $value")
  * }
@@ -106,7 +102,6 @@ import arrow.higherkind
  * val left: Either<String, Int> = Either.Left("Something went wrong")
  * val value = left.flatMap{ Either.Right(it + 1) }
  * //sampleEnd
- *
  * fun main() {
  *  println("value = $value")
  * }
@@ -122,8 +117,11 @@ import arrow.higherkind
  *
  * Using exception-throwing code, we could write something like this:
  *
- * ```kotlin
+ * ```kotlin:ank:playground
+ * import arrow.core.Either
+ * import arrow.core.flatMap
  *
+ * //sampleStart
  * fun parse(s: String): Int =
  *   if (s.matches(Regex("-?[0-9]+"))) s.toInt()
  *   else throw NumberFormatException("$s is not a valid integer.")
@@ -133,9 +131,7 @@ import arrow.higherkind
  *   else 1.0 / i
  *
  * fun stringify(d: Double): String = d.toString()
- *
- * fun magic(s: String): Either<Exception, String> =
- *   parse(s).flatMap{reciprocal(it)}.map{stringify(it)}
+ * //sampleEnd
  * ```
  *
  * Instead, let's make the fact that some of our functions can fail explicit in the return type.
@@ -151,7 +147,6 @@ import arrow.higherkind
  * val notANumber = parse("Not a number")
  * val number2 = parse("2")
  * //sampleEnd
- *
  * fun main() {
  *  println("notANumber = $notANumber")
  *  println("number2 = $number2")
@@ -182,7 +177,6 @@ import arrow.higherkind
  * val magic1 = magic("1")
  * val magicNotANumber = magic("Not a number")
  * //sampleEnd
- *
  * fun main() {
  *  println("magic0 = $magic0")
  *  println("magic1 = $magic1")
@@ -225,7 +219,6 @@ import arrow.higherkind
  *   is Either.Right -> "Got reciprocal: ${x.b}"
  * }
  * //sampleEnd
- *
  * fun main() {
  *  println("value = $value")
  * }
@@ -234,7 +227,9 @@ import arrow.higherkind
  * Instead of using exceptions as our error value, let's instead enumerate explicitly the things that
  * can go wrong in our program.
  *
- * ```kotlin
+ * ```kotlin:ank:playground
+ * import arrow.core.Either
+ * import arrow.core.flatMap
  * // Either with ADT Style
  *
  * sealed class Error {
@@ -253,7 +248,7 @@ import arrow.higherkind
  * fun stringify(d: Double): String = d.toString()
  *
  * fun magic(s: String): Either<Error, String> =
- *   parse(s).flatMap{reciprocal(it)}.map{stringify(it)}
+ *   parse(s).flatMap{reciprocal(it)}.map{ stringify(it) }
  * ```
  *
  * For our little module, we enumerate any and all errors that can occur. Then, instead of using
@@ -293,7 +288,6 @@ import arrow.higherkind
  *   is Either.Right -> "Got reciprocal: ${x.b}"
  * }
  * //sampleEnd
- *
  * fun main() {
  *  println("value = $value")
  * }
@@ -435,7 +429,6 @@ import arrow.higherkind
  * val x : Either<Int, Int> = 7.right()
  * val fold = x.fold({ 1 }, { it + 3 })
  * //sampleEnd
- *
  * fun main() {
  *  println("fold = $fold")
  * }
@@ -449,7 +442,6 @@ import arrow.higherkind
  * val y : Either<Int, Int> = 7.left()
  * val fold = y.fold({ 1 }, { it + 3 })
  * //sampleEnd
- *
  * fun main() {
  *  println("fold = $fold")
  * }

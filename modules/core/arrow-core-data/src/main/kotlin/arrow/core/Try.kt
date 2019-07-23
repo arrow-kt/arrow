@@ -28,7 +28,7 @@ typealias Success<A> = Try.Success<A>
  *
  * The following example represents the typical case when consuming Java code, where domain errors are represented with exceptions.
  *
- * ```kotlin
+ * ```kotlin:ank:playground
  * open class GeneralException: Exception()
  *
  * class NoConnectionException: GeneralException()
@@ -450,20 +450,23 @@ typealias Success<A> = Try.Success<A>
  *
  *  return getLotteryNumbersFromCloud()
  * }
- * //sampleStart
+ *
  *  sealed class DomainError(val message: String, val cause: Throwable) {
  *  class GeneralError(message: String, cause: Throwable) : DomainError(message, cause)
  *  class NoConnectionError(message: String, cause: Throwable) : DomainError(message, cause)
  *  class AuthorizationError(message: String, cause: Throwable) : DomainError(message, cause)
  * }
- * val value = Try {
- *  getLotteryNumbersFromCloud()
- * }.toEither {
- *   DomainError.NoConnectionError("Failed to fetch lottery numbers from cloud", it)
- * }
+ *
+ * val value =
+ * //sampleStart
+ *  Try {
+ *   getLotteryNumbersFromCloud()
+ *  }.toEither {
+ *     DomainError.NoConnectionError("Failed to fetch lottery numbers from cloud", it)
+ *  }
  * //sampleEnd
  * fun main() {
- *  println("value = $value")
+ *  println(value)
  * }
  * ```
  *

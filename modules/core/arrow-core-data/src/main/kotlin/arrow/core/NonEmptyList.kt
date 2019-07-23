@@ -15,16 +15,6 @@ typealias Nel<A> = NonEmptyList<A>
  * `NonEmptyList` is a data type used in __Λrrow__ to model ordered lists that guarantee to have at least one value.
  * `NonEmptyList` is available in the `arrow-core-data` module under the `import arrow.core.NonEmptyList`
  *
- * ```groovy
- * // gradle
- * compile "io.arrow-kt:arrow-core-data:$arrow_version"
- * ```
- *
- * ```kotlin:ank
- * // namespace
- * import arrow.core.*
- * ```
- *
  * ## of
  *
  * A `NonEmptyList` guarantees the list always has at least 1 element.

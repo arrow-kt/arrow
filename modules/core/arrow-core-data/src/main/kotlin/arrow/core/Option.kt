@@ -36,7 +36,7 @@ import arrow.higherkind
  *
  * Let's write a function that may or not give us a string, thus returning `Option<String>`:
  *
- * ```kotlin:ank
+ * ```kotlin:ank:playground
  * import arrow.core.None
  * import arrow.core.Option
  * import arrow.core.Some

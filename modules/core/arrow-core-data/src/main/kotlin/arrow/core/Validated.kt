@@ -24,16 +24,20 @@ typealias Invalid<E> = Validated.Invalid<E>
  * Or perhaps you're reading from a configuration file. One could imagine the configuration library
  * you're using returns a `Try`, or maybe a `Either`. Your parsing may look something like:
  *
- * ```kotlin:ank
- * data class ConnectionParams(val url: String, val port: Int)
- * ```
+ * ```kotlin:ank:playground
+ * import arrow.core.Either
+ * import arrow.core.Left
+ * import arrow.core.flatMap
  *
- * ```kotlin
- * fun <A> config(key: String): Either<String, A> = TODO()
+ * //sampleStart
+ * data class ConnectionParams(val url: String, val port: Int)
+ *
+ * fun <A> config(key: String): Either<String, A> = Left(key)
  *
  * config<String>("url").flatMap { url ->
  *  config<Int>("port").map { ConnectionParams(url, it) }
  * }
+ * //sampleEnd
  * ```
  *
  * You run your program and it says key "url" not found, turns out the key was "endpoint". So
@@ -57,9 +61,9 @@ typealias Invalid<E> = Validated.Invalid<E>
  * `Map<String, String>`. Parsing will be handled by a `Read` type class - we provide instances only
  * for `String` and `Int` for brevity.
  *
- * ```kotlin:ank
- * import arrow.*
- * import arrow.core.*
+ * ```kotlin:ank:playground
+ * import arrow.core.None
+ * import arrow.core.Option
  *
  * //sampleStart
  * abstract class Read<A> {
@@ -86,17 +90,20 @@ typealias Invalid<E> = Validated.Invalid<E>
  * Then we enumerate our errors—when asking for a config value, one of two things can go wrong:
  * the field is missing, or it is not well-formed with regards to the expected type.
  *
- * ```kotlin:ank
+ * ```kotlin:ank:playground
  * sealed class ConfigError {
- * data class MissingConfig(val field: String): ConfigError()
- * data class ParseConfig(val field: String): ConfigError()
+ *  data class MissingConfig(val field: String): ConfigError()
+ *  data class ParseConfig(val field: String): ConfigError()
  * }
  * ```
  *
  * We need a data type that can represent either a successful value (a parsed configuration), or an error.
  * It would look like the following, which Arrow provides in `arrow.Validated`:
  *
- * ```kotlin
+ * ```kotlin:ank:playground
+ * import arrow.higherkind
+ * import arrow.core.ValidatedOf
+ *
  * @higherkind sealed class Validated<out E, out A> : ValidatedOf<E, A> {
  *
  *  data class Valid<out A>(val a: A) : Validated<Nothing, A>()
@@ -107,17 +114,47 @@ typealias Invalid<E> = Validated.Invalid<E>
  *
  * Now we are ready to write our parser.
  *
- * ```kotlin:ank
- * import arrow.core.*
+ * ```kotlin:ank:playground
+ * import arrow.core.None
+ * import arrow.core.Option
+ * import arrow.core.Some
+ * import arrow.core.Validated
+ * import arrow.core.valid
+ * import arrow.core.invalid
+ *
+ * data class ConnectionParams(val url: String, val port: Int)
+ *
+ * abstract class Read<A> {
+ *  abstract fun read(s: String): Option<A>
+ *
+ *  companion object {
+ *
+ *   val stringRead: Read<String> =
+ *    object : Read<String>() {
+ *     override fun read(s: String): Option<String> = Option(s)
+ *    }
+ *
+ *   val intRead: Read<Int> =
+ *    object : Read<Int>() {
+ *     override fun read(s: String): Option<Int> =
+ *      if (s.matches(Regex("-?[0-9]+"))) Option(s.toInt()) else None
+ *    }
+ *  }
+ * }
+ *
+ * sealed class ConfigError {
+ *  data class MissingConfig(val field: String) : ConfigError()
+ *  data class ParseConfig(val field: String) : ConfigError()
+ * }
  * //sampleStart
  * data class Config(val map: Map<String, String>) {
  *  fun <A> parse(read: Read<A>, key: String): Validated<ConfigError, A> {
  *   val v = Option.fromNullable(map[key])
- *   return when(v) {
+ *   return when (v) {
  *    is Some ->
  *     when (val s = read.read(v.t)) {
- *      is Some -> s.t.valid()
- *      is None -> ConfigError.ParseConfig(key).invalid()
+ *      is Some -> s.t.valid() as Validated<ConfigError, A>
+ *      is None -> ConfigError.ParseConfig(key).invalid() as Validated<ConfigError, A>
  *     }
  *    is None -> Validated.Invalid(ConfigError.MissingConfig(key))
  *   }
@@ -130,7 +167,9 @@ typealias Invalid<E> = Validated.Invalid<E>
  * validation if each piece is independent. How do we enforce the data is independent? By
  * asking for all of it up front. Let's start with two pieces of data.
  *
- * ```kotlin
+ * ```kotlin:ank:playground
+ * import arrow.core.Validated
+ * //sampleStart
  * fun <E, A, B, C> parallelValidate(v1: Validated<E, A>, v2: Validated<E, B>, f: (A, B) -> C): Validated<E, C> {
  *  return when {
  *   v1 is Validated.Valid && v2 is Validated.Valid -> Validated.Valid(f(v1.a, v2.a))
@@ -140,6 +179,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  *   else -> TODO()
  *  }
  * }
+ * //sampleEnd
  * ```
  *
  * We've run into a problem. In the case where both have errors, We want to report both. we
@@ -153,17 +193,20 @@ typealias Invalid<E> = Validated.Invalid<E>
  *
  * Time to parse.
  *
- * ```kotlin:ank
+ * ```kotlin:ank:playground
+ * import arrow.core.NonEmptyList
+ * import arrow.core.Validated
+ * //sampleStart
  * fun <E, A, B, C> parallelValidate
- *   (v1: Validated<E, A>, v2: Validated<E, B>, f: (A, B) -> C): Validated<NonEmptyList<E>, C> {
- *  return when {
+ *   (v1: Validated<E, A>, v2: Validated<E, B>, f: (A, B) -> C): Validated<NonEmptyList<E>, C> =
+ *  when {
  *   v1 is Validated.Valid && v2 is Validated.Valid -> Validated.Valid(f(v1.a, v2.a))
  *   v1 is Validated.Valid && v2 is Validated.Invalid -> v2.toValidatedNel()
  *   v1 is Validated.Invalid && v2 is Validated.Valid -> v1.toValidatedNel()
  *   v1 is Validated.Invalid && v2 is Validated.Invalid -> Validated.Invalid(NonEmptyList(v1.e, listOf(v2.e)))
  *   else -> throw IllegalStateException("Not possible value")
  *  }
- * }
+ * //sampleEnd
  * ```
  *
  * Kotlin says that our match is not exhaustive and we have to add `else`.
@@ -209,8 +252,8 @@ typealias Invalid<E> = Validated.Invalid<E>
  *   return when (v) {
  *    is Some ->
  *     when (val s = read.read(v.t)) {
- *      is Some -> s.t.valid()
- *      is None -> ConfigError.ParseConfig(key).invalid()
+ *      is Some -> s.t.valid() as Validated<ConfigError, A>
+ *      is None -> (ConfigError.ParseConfig(key) as ConfigError).invalid() as Validated<ConfigError, A>
  *     }
  *    is None -> Validated.Invalid(ConfigError.MissingConfig(key))
  *   }
@@ -367,12 +410,12 @@ typealias Invalid<E> = Validated.Invalid<E>
  *  data class ParseConfig(val field: String) : ConfigError()
  * }
  *
+ * //sampleStart
  * fun positive(field: String, i: Int): Either<ConfigError, Int> {
  *  return if (i >= 0) i.right()
  *  else ConfigError.ParseConfig(field).left()
  * }
  *
- * //sampleStart
  * val config = Config(mapOf("house_number" to "-42"))
  *
  * val houseNumber = config.parse(Read.intRead, "house_number").withEither { either ->
@@ -389,7 +432,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  *
  * We may use `ApplicativeError` instead of `Validated` to abstract away validation strategies and raising errors in the context we are computing in.
  *
- * ```kotlin:ank
+ * ```kotlin:ank:playground
  * import arrow.Kind
  * import arrow.core.Either
  * import arrow.core.EitherPartialOf
