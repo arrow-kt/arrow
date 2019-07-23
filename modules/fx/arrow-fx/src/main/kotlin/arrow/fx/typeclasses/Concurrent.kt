@@ -16,6 +16,7 @@ import arrow.fx.internal.parMap3
 import arrow.typeclasses.Applicative
 import arrow.fx.CancelToken
 import arrow.fx.MVar
+import arrow.fx.Promise
 import arrow.fx.Race2
 import arrow.fx.Race3
 import arrow.fx.Race4
@@ -26,6 +27,7 @@ import arrow.fx.Race8
 import arrow.fx.Race9
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
+import arrow.fx.Semaphore
 import arrow.fx.Timer
 import arrow.fx.internal.TimeoutException
 import arrow.typeclasses.MonadSyntax
@@ -778,9 +780,113 @@ interface Concurrent<F> : Async<F> {
     }
 
   /**
-   * Creates a variable [MVar] to be used for thread-sharing, initialized to a value [a]
+   * Create a pure [Promise] that is empty and can be filled exactly once.
+   *
+   * ```kotlin:ank:playground
+   * import arrow.Kind
+   * import arrow.fx.*
+   * import arrow.fx.extensions.io.concurrent.concurrent
+   * import arrow.fx.typeclasses.Concurrent
+   * import arrow.fx.typeclasses.seconds
+   *
+   * fun main(args: Array<String>) {
+   *   fun <F> Concurrent<F>.promiseExample(): Kind<F, Unit> =
+   *     //sampleStart
+   *     fx.concurrent {
+   *       val promise = !Promise<String>()
+   *       val (join, cancel) = !sleep(1.seconds)
+   *         .followedBy(promise.complete("Hello World!"))
+   *         .fork()
+   *       val message = !join
+   *       message
+   *     }
+   *
+   *   //sampleEnd
+   *   IO.concurrent().promiseExample()
+   *     .fix().unsafeRunSync()
+   * }
+   * ```
+   *
+   * @see Promise for more details on usage
    */
-  fun <A> mVar(a: A): Kind<F, MVar<F, A>> = MVar(a, this)
+  override fun <A> Promise(): Kind<F, Promise<F, A>> =
+    Promise(this)
+
+  /**
+   * Create a pure [Semaphore] that can be used to control access in a concurrent system.
+   *
+   * ```kotlin:ank:playground
+   * import arrow.Kind
+   * import arrow.fx.*
+   * import arrow.fx.extensions.io.concurrent.concurrent
+   * import arrow.fx.typeclasses.Concurrent
+   *
+   * fun main(args: Array<String>) {
+   *   fun <F> Concurrent<F>.promiseExample(): Kind<F, Unit> =
+   *     //sampleStart
+   *     fx.concurrent {
+   *       val semaphore = !Semaphore(4)
+   *       !semaphore.acquireN(4)
+   *       val left = !semaphore.available()
+   *       !effect { println("There are $left permits left") }
+   *       !semaphore.withPermit(effect { println("Fork & wait until permits become available") }).fork()
+   *       !effect { println("Making permit available") }
+   *         .followedBy(semaphore.releaseN(4))
+   *     }
+   *
+   *   //sampleEnd
+   *   IO.concurrent().promiseExample()
+   *     .fix().unsafeRunSync()
+   * }
+   * ```
+   *
+   * @see Semaphore for more details on usage
+   */
+  override fun Semaphore(n: Long): Kind<F, Semaphore<F>> =
+    Semaphore(n, this)
+
+  /**
+   * Create a [MVar] or mutable variable structure to be used for thread-safe sharing, initialized to a value [a].
+   *
+   * ```kotlin:ank:playground
+   * import arrow.Kind
+   * import arrow.core.Option
+   * import arrow.core.Tuple3
+   * import arrow.fx.*
+   * import arrow.fx.extensions.io.concurrent.concurrent
+   * import arrow.fx.typeclasses.Concurrent
+   *
+   * fun main(args: Array<String>) {
+   *   fun <F> Concurrent<F>.mvarExample(): Kind<F, Tuple3<Int, Option<Int>, Int>> =
+   *   //sampleStart
+   *     fx.concurrent {
+   *       val mvar = !MVar(4)
+   *       val four = !mvar.take()
+   *       val empty = !mvar.tryTake()
+   *       val (join, _) = !mvar.take().fork()
+   *       !mvar.put(10)
+   *       Tuple3(four, empty, !join)
+   *     }
+   *
+   *   //sampleEnd
+   *   IO.concurrent().mvarExample()
+   *     .fix().unsafeRunSync().let(::println)
+   * }
+   * ```
+   *
+   * @see [MVar] for more usage details.
+   */
+  override fun <A> MVar(a: A): Kind<F, MVar<F, A>> =
+    MVar(a, this)
+
+  /**
+   * Create an empty [MVar] or mutable variable structure to be used for thread-safe sharing.
+   *
+   * @see MVar
+   * @see [MVar] for more usage details.
+   */
+  override fun <A> MVar(): Kind<F, MVar<F, A>> =
+    MVar.empty(this)
 
   /**
    * Entry point for monad bindings which enables for comprehensions. The underlying impl is based on coroutines.

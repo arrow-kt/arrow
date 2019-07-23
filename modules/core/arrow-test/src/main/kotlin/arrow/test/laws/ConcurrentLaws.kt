@@ -522,7 +522,7 @@ object ConcurrentLaws {
     forFew(10, Gen.int()) {
       val finalValue = 100
       fx.concurrent {
-        val ref = !ref { 0 }
+        val ref = !Ref(0)
         !ListK((0 until finalValue).toList()).parTraverse(ListK.traverse()) {
           ref.update(Int::inc)
         }
