@@ -109,6 +109,15 @@ interface Ref<F, A> {
     fun <F, A> unsafe(a: A, MD: MonadDefer<F>): Ref<F, A> = MonadDeferRef(AtomicReference(a), MD)
 
     /**
+     * Build a [RefFactory] value for creating Ref types [F] without deciding the type of the Ref's value.
+     *
+     * @see RefFactory
+     */
+    fun <F> factory(MD: MonadDefer<F>) = object : RefFactory<F> {
+      override fun <A> just(a: A): Kind<F, Ref<F, A>> = Ref(MD, a)
+    }
+
+    /**
      * Default implementation using based on [MonadDefer] and [AtomicReference]
      */
     private class MonadDeferRef<F, A>(private val ar: AtomicReference<A>, private val MD: MonadDefer<F>) : Ref<F, A> {
@@ -172,4 +181,41 @@ interface Ref<F, A> {
       }
     }
   }
+}
+
+/**
+ * Builds a [Ref] value for data types [F]
+ * without deciding the type of the Ref's value.
+ *
+ * ```kotlin:ank:playground
+ * import arrow.fx.*
+ * import arrow.fx.extensions.io.monadDefer.monadDefer
+ *
+ * fun main(args: Array<String>) {
+ *   //sampleStart
+ *   val refFactory: RefFactory<ForIO> = Ref.factory(IO.monadDefer())
+ *   val intVar: IOOf<Ref<ForIO, Int>> = refFactory.just(5)
+ *   val stringVar: IOOf<Ref<ForIO, String>> = refFactory.just("Hello")
+ *   //sampleEnd
+ * }
+ * ```
+ */
+interface RefFactory<F> {
+
+  /**
+   * Builds a [MVar] with a value of type [A].
+   *
+   * ```kotlin:ank:playground
+   * import arrow.fx.*
+   * import arrow.fx.extensions.io.async.async
+   *
+   * fun main(args: Array<String>) {
+   *   //sampleStart
+   *   val refFactory: RefFactory<ForIO> = Ref.factory(IO.async())
+   *   val intVar: IOOf<Ref<ForIO, Int>> = refFactory.just(5)
+   *   //sampleEnd
+   * }
+   * ```
+   */
+  fun <A> just(a: A): Kind<F, Ref<F, A>>
 }

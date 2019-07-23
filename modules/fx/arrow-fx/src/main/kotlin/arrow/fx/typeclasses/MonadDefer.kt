@@ -44,7 +44,7 @@ interface MonadDefer<F> : MonadThrow<F>, Bracket<F, Throwable> {
    * import arrow.fx.typeclasses.MonadDefer
    *
    * fun main(args: Array<String>) {
-   *   fun <F> MonadDefer<F>.refExample(): Kind<F, Unit> =
+   *   fun <F> MonadDefer<F>.refExample(): Kind<F, Tuple2<Int, Int>> =
    *     //sampleStart
    *     fx.monad {
    *       val ref = !Ref(1)
