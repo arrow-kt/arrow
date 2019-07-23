@@ -38,8 +38,8 @@ This returns an interface `RefFactory` with a single method `later` to construct
 ```kotlin:ank:silent
 val ref: RefFactory<ForIO> = Ref.factory(IO.monadDefer())
 
-val ref1: IO<Ref<ForIO, String>> = ref.later { "Hello, World!" }.fix()
-val ref2: IO<Ref<ForIO, Int>> = ref.later { 2 }.fix()
+val ref1: IO<Ref<ForIO, String>> = ref.just("Hello, World!").fix()
+val ref2: IO<Ref<ForIO, Int>> = ref.just(2).fix()
 ```
 
 ## Working with Ref
