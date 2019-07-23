@@ -4,13 +4,13 @@ import arrow.Kind
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.typeclasses.FunctorFilter
 import arrow.core.identity
 import arrow.core.some
 import arrow.test.generators.functionAToB
 import arrow.test.generators.intSmall
 import arrow.test.generators.option
 import arrow.typeclasses.Eq
+import arrow.typeclasses.FunctorFilter
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 

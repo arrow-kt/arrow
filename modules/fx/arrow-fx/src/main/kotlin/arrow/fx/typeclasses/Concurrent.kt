@@ -3,7 +3,6 @@ package arrow.fx.typeclasses
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Left
-import arrow.core.Right
 import arrow.core.ListK
 import arrow.core.Right
 import arrow.core.Tuple2

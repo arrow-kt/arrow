@@ -279,7 +279,8 @@ interface PPrism<S, T, A, B> : PPrismOf<S, T, A, B> {
  * Invoke operator overload to create a [PPrism] of type `S` with a focus `A` where `A` is a subtype of `S`
  * Can also be used to construct [Prism]
  */
-operator fun <S, A> PPrism.Companion.invoke(getOption: (S) -> Option<A>, reverseGet: (A) -> S): Prism<S, A> = Prism(
+@Suppress("FunctionName")
+fun <S, A> Prism(getOption: (S) -> Option<A>, reverseGet: (A) -> S): Prism<S, A> = Prism(
   getOrModify = { getOption(it).toEither { it } },
   reverseGet = { reverseGet(it) }
 )
