@@ -97,10 +97,8 @@ Let's imagine from our previous example we want to retrieve an `Int` from the ne
 import arrow.core.*
 
 val successToInt: Prism<NetworkResult.Success, Int> = Prism(
-        partialFunction = case({ success: NetworkResult.Success -> Try { success.content.toInt() }.isSuccess() }
-                toT { success -> success.content.toInt() }
-        ),
-        reverseGet = NetworkResult::Success compose Int::toString
+  getOption = { success -> success.content.toIntOrNull().toOption() },
+  reverseGet = NetworkResult::Success compose Int::toString
 )
 
 val networkInt: Prism<NetworkResult, Int> = networkSuccessPrism compose successToInt

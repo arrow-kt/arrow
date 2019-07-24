@@ -3,7 +3,6 @@ package arrow.typeclasses
 import arrow.Kind
 import arrow.core.None
 import arrow.core.Option
-import arrow.core.PartialFunction
 import arrow.core.Some
 import arrow.core.identity
 
@@ -11,7 +10,6 @@ import arrow.core.identity
  * ank_macro_hierarchy(arrow.typeclasses.FunctorFilter)
  *
  * A Functor with the ability to [filterMap].
- * Enables [collect] based on [PartialFunction] predicates.
  */
 interface FunctorFilter<F> : Functor<F> {
 
