@@ -4,9 +4,6 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Right
 import arrow.documented
-import arrow.fx.MVar
-import arrow.fx.Promise
-import arrow.fx.Semaphore
 import arrow.fx.internal.asyncContinuation
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
@@ -294,18 +291,6 @@ interface Async<F> : MonadDefer<F> {
    */
   fun <A> never(): Kind<F, A> =
     async(mapUnit)
-
-  fun <A> Promise(): Kind<F, Promise<F, A>> =
-    Promise.uncancelable(this)
-
-  fun <A> MVar(): Kind<F, MVar<F, A>> =
-    MVar.uncancelableEmpty(this)
-
-  fun <A> MVar(a: A): Kind<F, MVar<F, A>> =
-    MVar.uncancelableOf(a, this)
-
-  fun Semaphore(n: Long): Kind<F, Semaphore<F>> =
-    Semaphore.uncancelable(n, this)
 }
 
 internal val mapUnit: (Any?) -> Unit = { Unit }
