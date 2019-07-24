@@ -3,6 +3,7 @@ package arrow.fx.rx2.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.core.Tuple2
 import arrow.fx.CancelToken
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
@@ -42,6 +43,7 @@ import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
+import io.reactivex.functions.BiFunction
 import arrow.fx.rx2.CoroutineContextRx2Scheduler.asScheduler
 import arrow.fx.rx2.k
 import arrow.fx.rx2.value
@@ -79,7 +81,7 @@ interface FlowableKMonad : Monad<ForFlowableK> {
   override fun <A, B> FlowableKOf<A>.map(f: (A) -> B): FlowableK<B> =
     fix().map(f)
 
-  override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, FlowableKOf<Either<A, B>>>): FlowableK<B> =
+  override fun <A, B> tailRecM(a: A, f: (A) -> FlowableKOf<Either<A, B>>): FlowableK<B> =
     FlowableK.tailRecM(a, f)
 
   override fun <A> just(a: A): FlowableK<A> =
@@ -173,7 +175,7 @@ interface FlowableKEffect :
 
 interface FlowableKConcurrent : Concurrent<ForFlowableK>, FlowableKAsync {
 
-  override fun <A> CoroutineContext.startFiber(kind: Kind<ForFlowableK, A>): Kind<ForFlowableK, Fiber<ForFlowableK, A>> =
+  override fun <A> CoroutineContext.startFiber(kind: FlowableKOf<A>): FlowableK<Fiber<ForFlowableK, A>> =
     asScheduler().let { scheduler ->
       Flowable.create<Fiber<ForFlowableK, A>>({ emitter ->
         if (!emitter.isCancelled) {
@@ -186,13 +188,21 @@ interface FlowableKConcurrent : Concurrent<ForFlowableK>, FlowableKAsync {
       }, BS()).k()
     }
 
+  override fun <A, B, C> CoroutineContext.parMapN(fa: FlowableKOf<A>, fb: FlowableKOf<B>, f: (A, B) -> C): FlowableK<C> =
+    FlowableK(fa.value().zipWith(fb.value(), BiFunction(f)).subscribeOn(asScheduler()))
+
+  override fun <A, B, C, D> CoroutineContext.parMapN(fa: FlowableKOf<A>, fb: FlowableKOf<B>, fc: FlowableKOf<C>, f: (A, B, C) -> D): FlowableK<D> =
+    FlowableK(fa.value().zipWith(fb.value().zipWith(fc.value(), BiFunction<B, C, Tuple2<B, C>> { b, c -> Tuple2(b, c) }), BiFunction { a: A, tuple: Tuple2<B, C> ->
+      f(a, tuple.a, tuple.b)
+    }).subscribeOn(asScheduler()))
+
   override fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForFlowableK>): FlowableK<A> =
     FlowableK.cancelable(k, BS())
 
-  override fun <A> cancelableF(k: ((Either<Throwable, A>) -> Unit) -> Kind<ForFlowableK, CancelToken<ForFlowableK>>): Kind<ForFlowableK, A> =
+  override fun <A> cancelableF(k: ((Either<Throwable, A>) -> Unit) -> FlowableKOf<CancelToken<ForFlowableK>>): FlowableK<A> =
     FlowableK.cancelableF(k, BS())
 
-  override fun <A, B> CoroutineContext.racePair(fa: Kind<ForFlowableK, A>, fb: Kind<ForFlowableK, B>): Kind<ForFlowableK, RacePair<ForFlowableK, A, B>> =
+  override fun <A, B> CoroutineContext.racePair(fa: FlowableKOf<A>, fb: FlowableKOf<B>): FlowableK<RacePair<ForFlowableK, A, B>> =
     asScheduler().let { scheduler ->
       Flowable.create<RacePair<ForFlowableK, A, B>>({ emitter ->
         val sa = ReplaySubject.create<A>()
@@ -211,7 +221,7 @@ interface FlowableKConcurrent : Concurrent<ForFlowableK>, FlowableKAsync {
       }, BS()).subscribeOn(scheduler).observeOn(Schedulers.trampoline()).k()
     }
 
-  override fun <A, B, C> CoroutineContext.raceTriple(fa: Kind<ForFlowableK, A>, fb: Kind<ForFlowableK, B>, fc: Kind<ForFlowableK, C>): Kind<ForFlowableK, RaceTriple<ForFlowableK, A, B, C>> =
+  override fun <A, B, C> CoroutineContext.raceTriple(fa: FlowableKOf<A>, fb: FlowableKOf<B>, fc: FlowableKOf<C>): FlowableK<RaceTriple<ForFlowableK, A, B, C>> =
     asScheduler().let { scheduler ->
       Flowable.create<RaceTriple<ForFlowableK, A, B, C>>({ emitter ->
         val sa = ReplaySubject.create<A>()

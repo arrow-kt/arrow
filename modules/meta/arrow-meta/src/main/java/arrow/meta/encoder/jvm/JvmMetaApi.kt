@@ -474,7 +474,8 @@ interface JvmMetaApi : MetaApi, TypeElementEncoder, ProcessorUtils, TypeDecoder 
    * @see [MetaApi.asKotlin]
    */
   override fun TypeName.Classy.asKotlin(): TypeName.Classy =
-    copy(simpleName = simpleName.asKotlin(), fqName = fqName.asKotlin(), pckg = PackageName(pckg.value.asKotlin()))
+    if (simpleName == "Iterable") copy(simpleName = simpleName.asKotlin(), fqName = fqName.asKotlin(), pckg = PackageName("kotlin.collections"))
+    else copy(simpleName = simpleName.asKotlin(), fqName = fqName.asKotlin(), pckg = PackageName(pckg.value.asKotlin()))
 
   /**
    * @see [MetaApi.asPlatform]
