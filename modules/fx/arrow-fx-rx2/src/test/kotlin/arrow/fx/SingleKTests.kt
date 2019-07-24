@@ -49,7 +49,7 @@ class SingleKTests : UnitSpec() {
   }
 
   val CS = SingleK.concurrent(object : Dispatchers<ForSingleK> {
-    override fun default(): CoroutineContext = Schedulers.io().asCoroutineDispatcher()
+    override fun default(): CoroutineContext = Schedulers.computation().asCoroutineDispatcher()
   })
 
   init {

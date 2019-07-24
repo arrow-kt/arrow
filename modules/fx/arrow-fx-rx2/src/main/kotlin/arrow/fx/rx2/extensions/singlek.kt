@@ -42,6 +42,7 @@ import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.ReplaySubject
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
+import io.reactivex.disposables.Disposable as RxDisposable
 
 @extension
 interface SingleKFunctor : Functor<ForSingleK> {
@@ -144,7 +145,7 @@ interface SingleKConcurrent : Concurrent<ForSingleK>, SingleKAsync {
       Single.create<Fiber<ForSingleK, A>> { emitter ->
         if (!emitter.isDisposed) {
           val s: ReplaySubject<A> = ReplaySubject.create()
-          val conn: io.reactivex.disposables.Disposable = value().subscribeOn(scheduler).subscribe(s::onNext, s::onError)
+          val conn: RxDisposable = value().subscribeOn(scheduler).subscribe(s::onNext, s::onError)
           emitter.onSuccess(Fiber(s.firstOrError().k(), SingleK {
             conn.dispose()
           }))
@@ -178,10 +179,14 @@ interface SingleKConcurrent : Concurrent<ForSingleK>, SingleKAsync {
         val ffb = Fiber(sb.firstOrError().k(), SingleK { ddb.dispose() })
         sa.subscribe({
           emitter.onSuccess(RacePair.First(it, ffb))
-        }, emitter::onError)
+        }, { e ->
+          emitter.tryOnError(e)
+        })
         sb.subscribe({
           emitter.onSuccess(RacePair.Second(ffa, it))
-        }, emitter::onError)
+        }, { e ->
+          emitter.tryOnError(e)
+        })
       }.subscribeOn(scheduler).observeOn(Schedulers.trampoline()).k()
     }
 
@@ -200,13 +205,19 @@ interface SingleKConcurrent : Concurrent<ForSingleK>, SingleKAsync {
         val ffc = Fiber(sc.firstOrError().k(), SingleK { ddc.dispose() })
         sa.subscribe({
           emitter.onSuccess(RaceTriple.First(it, ffb, ffc))
-        }, emitter::onError)
+        }, { e ->
+          emitter.tryOnError(e)
+        })
         sb.subscribe({
           emitter.onSuccess(RaceTriple.Second(ffa, it, ffc))
-        }, emitter::onError)
+        }, { e ->
+          emitter.tryOnError(e)
+        })
         sc.subscribe({
           emitter.onSuccess(RaceTriple.Third(ffa, ffb, it))
-        }, emitter::onError)
+        }, { e ->
+          emitter.tryOnError(e)
+        })
       }.subscribeOn(scheduler).observeOn(Schedulers.trampoline()).k()
     }
 }
