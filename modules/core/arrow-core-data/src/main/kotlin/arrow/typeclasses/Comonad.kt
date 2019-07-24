@@ -72,16 +72,6 @@ open class ComonadContinuation<F, A : Any>(CM: Comonad<F>, override val context:
   }
 }
 
-@Deprecated(
-  "`cobinding` is getting renamed to `fx` for consistency with the Arrow Fx system. Use the Fx extensions for comprehensions",
-  ReplaceWith("fx.comonad(c)")
-)
-fun <F, B : Any> Comonad<F>.cobinding(c: suspend ComonadSyntax<F>.() -> B): B {
-  val continuation = ComonadContinuation<F, B>(this)
-  c.startCoroutine(continuation, continuation)
-  return continuation.returnedMonad
-}
-
 interface ComonadFx<F> {
   val CM: Comonad<F>
 

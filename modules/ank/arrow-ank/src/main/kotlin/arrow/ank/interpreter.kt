@@ -130,7 +130,7 @@ val interpreter: AnkOps = object : AnkOps {
     val result: Tuple3<SnippetParserState, Sequence<String>, Sequence<Snippet>> =
       content
         .fold(
-          Tuple3(SnippetParserState.Searching, emptySequence(), emptySequence())
+          Tuple3(SnippetParserState.Searching as SnippetParserState, emptySequence(), emptySequence())
         ) { (state, lines, snippets), line ->
           when (state) {
             is SnippetParserState.Searching -> {

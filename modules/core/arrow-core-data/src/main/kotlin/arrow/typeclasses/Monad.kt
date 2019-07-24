@@ -58,35 +58,14 @@ interface Monad<F> : Selective<F> {
   fun <A, B> Kind<F, A>.followedByEval(fb: Eval<Kind<F, B>>): Kind<F, B> =
     flatMap { fb.value() }
 
-  @Deprecated(
-    "effectM is being renamed to flatTap",
-    ReplaceWith("flatTap(f)")
-  )
-  fun <A, B> Kind<F, A>.effectM(f: (A) -> Kind<F, B>): Kind<F, A> =
-    flatTap(f)
-
   fun <A, B> Kind<F, A>.flatTap(f: (A) -> Kind<F, B>): Kind<F, A> =
     flatMap { a -> f(a).map { a } }
 
   fun <A, B> Kind<F, A>.productL(fb: Kind<F, B>): Kind<F, A> =
     flatMap { a -> fb.map { a } }
 
-  @Deprecated(
-    "forEffect is being renamed to productL",
-    ReplaceWith("productL(fb)")
-  )
-  fun <A, B> Kind<F, A>.forEffect(fb: Kind<F, B>): Kind<F, A> =
-    productL(fb)
-
   fun <A, B> Kind<F, A>.productLEval(fb: Eval<Kind<F, B>>): Kind<F, A> =
     flatMap { a -> fb.value().map { a } }
-
-  @Deprecated(
-    "forEffectEval is being renamed to productLEval",
-    ReplaceWith("productLEval(fb)")
-  )
-  fun <A, B> Kind<F, A>.forEffectEval(fb: Eval<Kind<F, B>>): Kind<F, A> =
-    productLEval(fb)
 
   fun <A, B> Kind<F, A>.mproduct(f: (A) -> Kind<F, B>): Kind<F, Tuple2<A, B>> =
     flatMap { a -> f(a).map { Tuple2(a, it) } }
@@ -98,13 +77,6 @@ interface Monad<F> : Selective<F> {
     flatMap { it.fold({ a -> f.map { ff -> ff(a) } }, { b -> just(b) }) }
 
   override fun <A, B> Kind<F, Either<A, B>>.select(f: Kind<F, (A) -> B>): Kind<F, B> = selectM(f)
-
-  @Deprecated(
-    "`binding` is getting renamed to `fx` for consistency with the Arrow Fx system. Use the Fx extensions for comprehensions",
-    ReplaceWith("fx.monad(c)")
-  )
-  fun <A> binding(c: suspend MonadSyntax<F>.() -> A): Kind<F, A> =
-    fx.monad(c)
 }
 
 interface MonadFx<F> {

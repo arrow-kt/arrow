@@ -212,14 +212,4 @@ interface Foldable<F> {
    */
   fun <A> Kind<F, A>.firstOption(predicate: (A) -> Boolean): Option<A> =
     get(0).filter(predicate)
-
-  companion object {
-    @Deprecated("Use Iterator.iterateRight from Eval.kt instead")
-    fun <A, B> iterateRight(it: Iterator<A>, lb: Eval<B>): (f: (A, Eval<B>) -> Eval<B>) -> Eval<B> =
-      { f: (A, Eval<B>) -> Eval<B> ->
-        fun loop(): Eval<B> =
-          Eval.defer { if (it.hasNext()) f(it.next(), loop()) else lb }
-        loop()
-      }
-  }
 }

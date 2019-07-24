@@ -49,18 +49,6 @@ open class StackSafeMonadContinuation<F, A>(M: Monad<F>, override val context: C
   }
 }
 
-@Deprecated(
-  "`bindingStackSafe` is getting renamed to `fx` for consistency with the Arrow Fx system. Use the Fx extensions for comprehensions",
-  ReplaceWith("fx.stackSafe(c)", "import arrow.free.stackSafe")
-)
-fun <F, B> Monad<F>.bindingStackSafe(c: suspend StackSafeMonadContinuation<F, *>.() -> B):
-  Free<F, B> {
-  val continuation = StackSafeMonadContinuation<F, B>(this)
-  val wrapReturn: suspend StackSafeMonadContinuation<F, *>.() -> Free<F, B> = { Free.just(c()) }
-  wrapReturn.startCoroutine(continuation, continuation)
-  return continuation.returnedMonad()
-}
-
 /**
  * Entry point for monad bindings which enables for comprehension. The underlying impl is based on coroutines.
  * A coroutine is initiated and inside [StackSafeMonadContinuation] suspended yielding to [flatMap]. Once all the flatMap binds are completed

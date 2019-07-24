@@ -42,5 +42,5 @@ interface Fx<F> {
   suspend fun <A> unsafe.fx(
     f: suspend MonadSyntax<F>.() -> A
   ): Kind<F, A> =
-    monad().binding(f)
+    monad().fx.monad(f)
 }
