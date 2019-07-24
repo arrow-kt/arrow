@@ -16,7 +16,7 @@ import arrow.fx.extensions.io.async.async
 import arrow.fx.extensions.io.monad.monad
 import arrow.fx.mtl.statet.async.async
 import arrow.mtl.extensions.StateTMonadState
-import arrow.mtl.extensions.listk.monadCombine.monadCombine
+import arrow.core.extensions.listk.monadCombine.monadCombine
 import arrow.mtl.extensions.statet.applicative.applicative
 import arrow.mtl.extensions.statet.monadCombine.monadCombine
 import arrow.mtl.extensions.statet.monadState.monadState

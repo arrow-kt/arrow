@@ -53,7 +53,7 @@ data class ListK<out A>(private val list: List<A>) : ListKOf<A>, List<A> by list
       }
     }
 
-  fun <B> mapFilter(f: (A) -> Option<B>): ListK<B> =
+  fun <B> filterMap(f: (A) -> Option<B>): ListK<B> =
     flatMap { a -> f(a).fold({ empty<B>() }, { just(it) }) }
 
   override fun hashCode(): Int = list.hashCode()
