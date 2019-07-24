@@ -809,7 +809,7 @@ interface Concurrent<F> : Async<F> {
    *
    * @see Promise for more details on usage
    */
-  override fun <A> Promise(): Kind<F, Promise<F, A>> =
+  fun <A> Promise(): Kind<F, Promise<F, A>> =
     Promise(this)
 
   /**
@@ -842,7 +842,7 @@ interface Concurrent<F> : Async<F> {
    *
    * @see Semaphore for more details on usage
    */
-  override fun Semaphore(n: Long): Kind<F, Semaphore<F>> =
+  fun Semaphore(n: Long): Kind<F, Semaphore<F>> =
     Semaphore(n, this)
 
   /**
@@ -876,7 +876,7 @@ interface Concurrent<F> : Async<F> {
    *
    * @see [MVar] for more usage details.
    */
-  override fun <A> MVar(a: A): Kind<F, MVar<F, A>> =
+  fun <A> MVar(a: A): Kind<F, MVar<F, A>> =
     MVar(a, this)
 
   /**
@@ -885,7 +885,7 @@ interface Concurrent<F> : Async<F> {
    * @see MVar
    * @see [MVar] for more usage details.
    */
-  override fun <A> MVar(): Kind<F, MVar<F, A>> =
+  fun <A> MVar(): Kind<F, MVar<F, A>> =
     MVar.empty(this)
 
   /**
