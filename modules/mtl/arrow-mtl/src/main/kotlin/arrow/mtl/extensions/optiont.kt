@@ -25,7 +25,6 @@ import arrow.mtl.OptionTOf
 import arrow.mtl.OptionTPartialOf
 import arrow.mtl.extensions.optiont.monad.monad
 import arrow.mtl.fix
-import arrow.mtl.filterMap
 import arrow.mtl.value
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
@@ -240,7 +239,7 @@ interface OptionTFunctorFilter<F> : FunctorFilter<OptionTPartialOf<F>>, OptionTF
 
   override fun FF(): Functor<F>
 
-  override fun <A, B> Kind<OptionTPartialOf<F>, A>.filterMap(f: (A) -> Option<B>): OptionT<F, B> =
+  override fun <A, B> OptionTOf<F, A>.filterMap(f: (A) -> Option<B>): OptionT<F, B> =
     fix().filterMap(FF(), f)
 }
 
