@@ -52,7 +52,7 @@ class ObservableKTests : UnitSpec() {
   }
 
   val CO = ObservableK.concurrent(object : Dispatchers<ForObservableK> {
-    override fun default(): CoroutineContext = Schedulers.computation().asCoroutineDispatcher()
+    override fun default(): CoroutineContext = Schedulers.io().asCoroutineDispatcher()
   })
 
   init {

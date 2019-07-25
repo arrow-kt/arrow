@@ -56,7 +56,7 @@ class FlowableKTests : UnitSpec() {
   }
 
   val CO = FlowableK.concurrent(object : Dispatchers<ForFlowableK> {
-    override fun default(): CoroutineContext = Schedulers.computation().asCoroutineDispatcher()
+    override fun default(): CoroutineContext = Schedulers.io().asCoroutineDispatcher()
   })
 
   init {

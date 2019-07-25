@@ -214,10 +214,10 @@ interface FlowableKConcurrent : Concurrent<ForFlowableK>, FlowableKAsync {
         val ffb = Fiber(sb.toFlowable(BS()).k(), FlowableK { ddb.dispose() })
         sa.subscribe({
           emitter.onNext(RacePair.First(it, ffb))
-        }, emitter::onError, emitter::onComplete)
+        }, emitter::tryOnError, emitter::onComplete)
         sb.subscribe({
           emitter.onNext(RacePair.Second(ffa, it))
-        }, emitter::onError, emitter::onComplete)
+        }, emitter::tryOnError, emitter::onComplete)
       }, BS()).subscribeOn(scheduler).observeOn(Schedulers.trampoline()).k()
     }
 
@@ -236,13 +236,13 @@ interface FlowableKConcurrent : Concurrent<ForFlowableK>, FlowableKAsync {
         val ffc = Fiber(sc.toFlowable(BS()).k(), FlowableK { ddc.dispose() })
         sa.subscribe({
           emitter.onNext(RaceTriple.First(it, ffb, ffc))
-        }, { e -> emitter.tryOnError(e) }, emitter::onComplete)
+        }, emitter::tryOnError, emitter::onComplete)
         sb.subscribe({
           emitter.onNext(RaceTriple.Second(ffa, it, ffc))
-        }, { e -> emitter.tryOnError(e) }, emitter::onComplete)
+        }, emitter::tryOnError, emitter::onComplete)
         sc.subscribe({
           emitter.onNext(RaceTriple.Third(ffa, ffb, it))
-        }, { e -> emitter.tryOnError(e) }, emitter::onComplete)
+        }, emitter::tryOnError, emitter::onComplete)
       }, BS()).subscribeOn(scheduler).observeOn(Schedulers.trampoline()).k()
     }
 }

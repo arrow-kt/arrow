@@ -48,7 +48,7 @@ class MaybeKTests : UnitSpec() {
   }
 
   val CM = MaybeK.concurrent(object : Dispatchers<ForMaybeK> {
-    override fun default(): CoroutineContext = Schedulers.computation().asCoroutineDispatcher()
+    override fun default(): CoroutineContext = Schedulers.io().asCoroutineDispatcher()
   })
 
   init {
