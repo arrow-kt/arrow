@@ -18,6 +18,17 @@ interface MonadFilter<F> : Monad<F>, FunctorFilter<F> {
 
   override fun <A, B> Kind<F, A>.filterMap(f: (A) -> Option<B>): Kind<F, B> =
     this.flatMap { a -> f(a).fold({ empty<B>() }, { just(it) }) }
+
+  @Deprecated(
+    "`bindingFilter` is getting renamed to `fx` for consistency with the Arrow Fx system. Use the Fx extensions for comprehensions",
+    ReplaceWith("fx.monadFilter(c)")
+  )
+  fun <B> bindingFilter(c: suspend MonadFilterSyntax<F>.() -> B): Kind<F, B> {
+    val continuation = MonadFilterContinuation<F, B>(this)
+    val wrapReturn: suspend MonadFilterSyntax<F>.() -> Kind<F, B> = { just(c()) }
+    wrapReturn.startCoroutine(continuation, continuation)
+    return continuation.returnedMonad()
+  }
 }
 
 interface MonadFilterFx<F> : MonadFx<F> {
