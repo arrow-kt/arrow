@@ -5,25 +5,23 @@ import arrow.higherkind
 typealias Failure = Try.Failure
 typealias Success<A> = Try.Success<A>
 
-/**
- * The `Try` type represents a computation that may either result in an exception, or return a
- * successfully computed value.
- *
- * Port of https://github.com/scala/scala/blob/v2.12.1/src/library/scala/util/Try.scala
- */
+@Deprecated(
+  "Try will be deleted soon as it promotes eager execution of effects, so it’s better if you work with Either’s suspend constructors or a an effect handler like IO",
+  ReplaceWith("Either")
+)
 @higherkind
 sealed class Try<out A> : TryOf<A> {
 
   companion object {
 
     @Deprecated(
-      "Try promotes eager execution of effects, so it's better if you work with suspend Either constructors or a an effect handler like IO",
+      "Try will be deleted soon as it promotes eager execution of effects, so it’s better if you work with Either’s suspend constructors or a an effect handler like IO",
       ReplaceWith("Either.just(a)")
     )
     fun <A> just(a: A): Try<A> = Success(a)
 
     @Deprecated(
-      "Try promotes eager execution of effects, so it's better if you work with suspend Either constructors or a an effect handler like IO",
+      "Try will be deleted soon as it promotes eager execution of effects, so it’s better if you work with Either’s suspend constructors or a an effect handler like IO",
       ReplaceWith("Either.tailRecM(a, f)")
     )
     tailrec fun <A, B> tailRecM(a: A, f: (A) -> TryOf<Either<A, B>>): Try<B> {
@@ -41,7 +39,7 @@ sealed class Try<out A> : TryOf<A> {
     }
 
     @Deprecated(
-      "Try promotes eager execution of effects, so it's better if you work with suspend Either constructors or a an effect handler like IO",
+      "Try will be deleted soon as it promotes eager execution of effects, so it’s better if you work with Either’s suspend constructors or a an effect handler like IO",
       ReplaceWith("Either.catch(f)")
     )
     inline operator fun <A> invoke(f: () -> A): Try<A> =
@@ -56,7 +54,7 @@ sealed class Try<out A> : TryOf<A> {
       }
 
     @Deprecated(
-      "Try promotes eager execution of effects, so it's better if you work with suspend Either constructors or a an effect handler like IO",
+      "Try will be deleted soon as it promotes eager execution of effects, so it’s better if you work with Either’s suspend constructors or a an effect handler like IO",
       ReplaceWith("Either.raiseError(e)")
     )
     fun raiseError(e: Throwable): Try<Nothing> = Failure(e)
