@@ -100,14 +100,12 @@ typealias Invalid<E> = Validated.Invalid<E>
  * We need a data type that can represent either a successful value (a parsed configuration), or an error.
  * It would look like the following, which Arrow provides in `arrow.Validated`:
  *
- * ```kotlin:ank:playground
+ * ```kotlin
  * import arrow.higherkind
  * import arrow.core.ValidatedOf
  *
  * @higherkind sealed class Validated<out E, out A> : ValidatedOf<E, A> {
- *
  *  data class Valid<out A>(val a: A) : Validated<Nothing, A>()
- *
  *  data class Invalid<out E>(val e: E) : Validated<E, Nothing>()
  * }
  * ```
@@ -153,8 +151,8 @@ typealias Invalid<E> = Validated.Invalid<E>
  *   return when (v) {
  *    is Some ->
  *     when (val s = read.read(v.t)) {
- *      is Some -> s.t.valid() as Validated<ConfigError, A>
- *      is None -> ConfigError.ParseConfig(key).invalid() as Validated<ConfigError, A>
+ *      is Some -> s.t.valid()
+ *      is None -> ConfigError.ParseConfig(key).invalid()
  *     }
  *    is None -> Validated.Invalid(ConfigError.MissingConfig(key))
  *   }
@@ -252,8 +250,8 @@ typealias Invalid<E> = Validated.Invalid<E>
  *   return when (v) {
  *    is Some ->
  *     when (val s = read.read(v.t)) {
- *      is Some -> s.t.valid() as Validated<ConfigError, A>
- *      is None -> (ConfigError.ParseConfig(key) as ConfigError).invalid() as Validated<ConfigError, A>
+ *      is Some -> s.t.valid()
+ *      is None -> ConfigError.ParseConfig(key).invalid()
  *     }
  *    is None -> Validated.Invalid(ConfigError.MissingConfig(key))
  *   }
