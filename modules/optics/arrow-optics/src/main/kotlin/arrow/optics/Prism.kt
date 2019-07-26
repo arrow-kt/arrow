@@ -4,14 +4,12 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.None
 import arrow.core.Option
-import arrow.core.PartialFunction
 import arrow.core.Some
 import arrow.core.Tuple2
 import arrow.core.compose
 import arrow.core.flatMap
 import arrow.core.getOrElse
 import arrow.core.identity
-import arrow.core.lift
 import arrow.core.toT
 import arrow.higherkind
 import arrow.typeclasses.Applicative
@@ -64,16 +62,6 @@ interface PPrism<S, T, A, B> : PPrismOf<S, T, A, B> {
 
       override fun reverseGet(b: B): T = reverseGet(b)
     }
-
-    /**
-     * Invoke operator overload to create a [PPrism] of type `S` with focus `A` with a [PartialFunction]
-     * Can also be used to construct [Prism]
-     */
-    @Deprecated("PartialFunction is an incomplete experiment due for removal. See https://github.com/arrow-kt/arrow/pull/1419#issue-273308228")
-    operator fun <S, A> invoke(partialFunction: PartialFunction<S, A>, reverseGet: (A) -> S): Prism<S, A> = Prism(
-      getOrModify = { s -> partialFunction.lift()(s).fold({ Either.Left(s) }, { Either.Right(it) }) },
-      reverseGet = reverseGet
-    )
 
     /**
      * A [PPrism] that checks for equality with a given value [a]
@@ -291,7 +279,8 @@ interface PPrism<S, T, A, B> : PPrismOf<S, T, A, B> {
  * Invoke operator overload to create a [PPrism] of type `S` with a focus `A` where `A` is a subtype of `S`
  * Can also be used to construct [Prism]
  */
-operator fun <S, A> PPrism.Companion.invoke(getOption: (S) -> Option<A>, reverseGet: (A) -> S): Prism<S, A> = Prism(
+@Suppress("FunctionName")
+fun <S, A> Prism(getOption: (S) -> Option<A>, reverseGet: (A) -> S): Prism<S, A> = Prism(
   getOrModify = { getOption(it).toEither { it } },
   reverseGet = { reverseGet(it) }
 )
