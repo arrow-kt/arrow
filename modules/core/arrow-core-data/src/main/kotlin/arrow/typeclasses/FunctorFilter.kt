@@ -3,16 +3,13 @@ package arrow.typeclasses
 import arrow.Kind
 import arrow.core.None
 import arrow.core.Option
-import arrow.core.PartialFunction
 import arrow.core.Some
 import arrow.core.identity
-import arrow.core.lift
 
 /**
  * ank_macro_hierarchy(arrow.typeclasses.FunctorFilter)
  *
  * A Functor with the ability to [filterMap].
- * Enables [collect] based on [PartialFunction] predicates.
  */
 interface FunctorFilter<F> : Functor<F> {
 
@@ -20,13 +17,6 @@ interface FunctorFilter<F> : Functor<F> {
    * A combined map and filter. Filtering is handled via Option instead of Boolean such that the output type B can be different than the input type A.
    */
   fun <A, B> Kind<F, A>.filterMap(f: (A) -> Option<B>): Kind<F, B>
-
-  /**
-   * Similar to filterMap but uses a partial function instead of a function that returns an Option.
-   */
-  @Deprecated("PartialFunction is an incomplete experiment due for removal. See https://github.com/arrow-kt/arrow/pull/1419#issue-273308228")
-  fun <A, B> Kind<F, A>.collect(f: PartialFunction<A, B>): Kind<F, B> =
-    filterMap(f.lift())
 
   /**
    * "Flatten" out a structure by collapsing Options.

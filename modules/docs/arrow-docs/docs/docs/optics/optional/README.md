@@ -24,7 +24,7 @@ import arrow.core.*
 import arrow.optics.*
 
 val optionalHead: Optional<ListK<Int>, Int> = Optional(
-    getOrModify = { list -> list.firstOrNull()?.right() ?: list.left() },
+    getOption = { list -> list.firstOrNull().toOption() },
     set = { list, int -> list.mapIndexed { index, value -> if (index == 0) int else value }.k() }
 )
 ```
