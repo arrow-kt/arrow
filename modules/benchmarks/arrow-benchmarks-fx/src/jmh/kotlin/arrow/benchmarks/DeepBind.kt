@@ -21,7 +21,7 @@ open class DeepBind {
   @Param("20")
   var depth: Int = 0
 
-  fun ioFibLazy(n: Int): IO<Int> =
+  fun ioFibLazy(n: Int): IO<Throwable, Int> =
     if (n <= 1) IO { n }
     else ioFibLazy(n - 1).flatMap { a ->
       ioFibLazy(n - 2).flatMap { b -> IO { a + b } }

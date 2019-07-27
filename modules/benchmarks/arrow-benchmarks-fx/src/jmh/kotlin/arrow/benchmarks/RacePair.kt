@@ -24,7 +24,7 @@ open class RacePair {
   @Param("100")
   var size: Int = 0
 
-  private fun racePairHelper(): IO<Int> = (0 until size).toList().foldLeft(IO { 0 }) { acc, _ ->
+  private fun racePairHelper(): IO<Throwable, Int> = (0 until size).toList().foldLeft(IO { 0 }) { acc, _ ->
     IO.racePair(IODispatchers.CommonPool, acc, IO { 1 }).flatMap { ei ->
       ei.fold({ a, (_, cancel) ->
         cancel.map { a }

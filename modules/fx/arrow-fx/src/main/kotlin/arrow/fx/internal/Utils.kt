@@ -150,7 +150,7 @@ object Platform {
     }
   }
 
-  fun <A> unsafeResync(ioa: IO<A>, limit: Duration): Option<A> {
+  fun <E, A> unsafeResync(ioa: IO<E, A>, limit: Duration): Option<A> {
     val latch = OneShotLatch()
     var ref: Either<Throwable, A>? = null
     ioa.unsafeRunAsync { a ->
@@ -297,5 +297,5 @@ internal fun <A> asyncContinuation(ctx: CoroutineContext, cc: (Either<Throwable,
  * so it'll share it's [kotlin.coroutines.Continuation] with other potential jumps or [IO.async].
  * @see [arrow.fx.IORunLoop.RestartCallback]
  */
-internal fun <A> IOForkedStart(fa: IOOf<A>, ctx: CoroutineContext): IO<A> =
+internal fun <A> IOForkedStart(fa: IOOf<Throwable, A>, ctx: CoroutineContext): IO<Throwable, A> =
   IO.Bind(IO.ContinueOn(IO.unit, ctx)) { fa.fix() }

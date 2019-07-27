@@ -15,11 +15,11 @@ interface IOParMap3 {
 
   fun <A, B, C, D> parMapN(
     ctx: CoroutineContext,
-    fa: IOOf<A>,
-    fb: IOOf<B>,
-    fc: IOOf<C>,
+    fa: IOOf<Throwable, A>,
+    fb: IOOf<Throwable, B>,
+    fc: IOOf<Throwable, C>,
     f: (A, B, C) -> D
-  ): IO<D> = IO.Async { conn, cb ->
+  ): IO<Throwable, D> = IO.Async { conn, cb ->
 
     val state: AtomicReference<Tuple3<A?, B?, C?>?> = AtomicReference(null)
     val active = AtomicBoolean(true)

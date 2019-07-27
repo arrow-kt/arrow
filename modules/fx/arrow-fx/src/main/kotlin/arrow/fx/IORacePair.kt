@@ -49,7 +49,7 @@ interface IORacePair {
    *
    * @see [arrow.fx.typeclasses.Concurrent.raceN] for a simpler version that cancels loser.
    */
-  fun <A, B> racePair(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<B>): IO<RacePair<ForIO, A, B>> =
+  fun <A, B> racePair(ctx: CoroutineContext, ioA: IOOf<Throwable, A>, ioB: IOOf<Throwable, B>): IO<Throwable, RacePair<ForIO, A, B>> =
     IO.Async { conn, cb ->
       val active = AtomicBoolean(true)
 

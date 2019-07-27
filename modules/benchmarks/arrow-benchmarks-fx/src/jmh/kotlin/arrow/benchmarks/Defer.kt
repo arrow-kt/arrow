@@ -21,7 +21,7 @@ open class Defer {
   @Param("3000")
   var size: Int = 0
 
-  private fun ioDeferLoop(i: Int): IO<Int> =
+  private fun ioDeferLoop(i: Int): IO<Throwable, Int> =
     IO.defer { IO.just(i) }.flatMap { j ->
       if (j > size) IO.defer { IO.just(j) } else ioDeferLoop(j + 1)
     }

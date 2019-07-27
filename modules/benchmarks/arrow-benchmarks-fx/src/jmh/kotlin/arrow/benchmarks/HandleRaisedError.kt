@@ -24,7 +24,7 @@ open class HandleRaisedError {
 
   private val dummy = RuntimeException("dummy")
 
-  private fun ioErrorRaisedloop(i: Int): IO<Int> =
+  private fun ioErrorRaisedloop(i: Int): IO<Throwable, Int> =
     if (i < size)
       IO.raiseError<Int>(dummy)
         .flatMap { x -> IO.just(x + 1) }

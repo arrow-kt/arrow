@@ -22,7 +22,7 @@ open class Async {
   @Param("3000")
   var size: Int = 0
 
-  private fun ioAsyncLoop(i: Int): IO<Int> =
+  private fun ioAsyncLoop(i: Int): IO<Throwable, Int> =
     IO.unit.continueOn(IODispatchers.CommonPool).followedBy(
       if (i > size) IO.just(i) else ioAsyncLoop(i + 1)
     )

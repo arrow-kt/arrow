@@ -21,7 +21,7 @@ open class Uncancellable {
   @Param("100")
   var size: Int = 0
 
-  fun ioUncancelableLoop(i: Int): IO<Int> =
+  fun ioUncancelableLoop(i: Int): IO<Throwable, Int> =
     if (i < size) IO { i + 1 }.uncancelable().flatMap { ioUncancelableLoop(it) }
     else IO.just(i)
 

@@ -55,10 +55,10 @@ open class MapStream {
 }
 
 object IOStream {
-  class Stream(val value: Int, val next: IO<Option<Stream>>)
+  class Stream(val value: Int, val next: IO<Throwable, Option<Stream>>)
   val addOne: (Int) -> Int = { it + 1 }
 
-  fun test(times: Int, batchSize: Int): IO<Long> {
+  fun test(times: Int, batchSize: Int): IO<Throwable, Long> {
     var stream = range(0, times)
     var i = 0
     while (i < batchSize) {
@@ -80,7 +80,7 @@ object IOStream {
     }
   }
 
-  private fun sum(acc: Long): (Option<Stream>) -> IO<Long> = { box ->
+  private fun sum(acc: Long): (Option<Stream>) -> IO<Throwable, Long> = { box ->
     when (box) {
       is Some -> box.t.next.flatMap(sum(acc + box.t.value))
       None -> IO.just(acc)

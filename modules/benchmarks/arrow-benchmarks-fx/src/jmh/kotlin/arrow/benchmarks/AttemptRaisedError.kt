@@ -26,7 +26,7 @@ open class AttemptRaisedError {
   @Param("10000")
   var size: Int = 0
 
-  private fun ioLoopNotHappy(size: Int, i: Int): IO<Int> =
+  private fun ioLoopNotHappy(size: Int, i: Int): IO<Throwable, Int> =
     if (i < size) {
       IO { throw dummy }.attempt().flatMap {
         it.fold({ ioLoopNotHappy(size, i + 1) }, IO.Companion::just)

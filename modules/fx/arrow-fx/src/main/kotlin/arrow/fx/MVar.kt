@@ -212,7 +212,7 @@ interface MVar<F, A> {
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
-     *   val mvar: IOOf<MVar<ForIO, Int>> = MVar.empty(IO.concurrent())
+     *   val mvar: IOOf<Throwable, MVar<ForIO, Int>> = MVar.empty(IO.concurrent())
      *   //sampleEnd
      * }
      * ```
@@ -229,7 +229,7 @@ interface MVar<F, A> {
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
-     *   val mvar: IOOf<MVar<ForIO, Int>> = MVar.cancelable(5, IO.concurrent())
+     *   val mvar: IOOf<Throwable, MVar<ForIO, Int>> = MVar.cancelable(5, IO.concurrent())
      *   //sampleEnd
      * }
      * ```
@@ -246,7 +246,7 @@ interface MVar<F, A> {
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
-     *   val mvar: IOOf<MVar<ForIO, Int>> = MVar.cancelable(5, IO.concurrent())
+     *   val mvar: IOOf<Throwable, MVar<ForIO, Int>> = MVar.cancelable(5, IO.concurrent())
      *   //sampleEnd
      * }
      * ```
@@ -263,7 +263,7 @@ interface MVar<F, A> {
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
-     *   val mvar: IOOf<MVar<ForIO, Int>> = MVar.uncancelableEmpty(IO.async())
+     *   val mvar: IOOf<Throwable, MVar<ForIO, Int>> = MVar.uncancelableEmpty(IO.async())
      *   //sampleEnd
      * }
      * ```
@@ -280,7 +280,7 @@ interface MVar<F, A> {
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
-     *   val mvar: IOOf<MVar<ForIO, Int>> = MVar.uncancelableOf(5, IO.async())
+     *   val mvar: IOOf<Throwable, MVar<ForIO, Int>> = MVar.uncancelableOf(5, IO.async())
      *   //sampleEnd
      * }
      * ```
@@ -319,8 +319,8 @@ interface MVar<F, A> {
  * fun main(args: Array<String>) {
  *   //sampleStart
  *   val mvarPartial: MVarFactory<ForIO> = MVar.factoryUncancelable(IO.async())
- *   val intVar: IOOf<MVar<ForIO, Int>> = mvarPartial.just(5)
- *   val stringVar: IOOf<MVar<ForIO, String>> = mvarPartial.empty<String>()
+ *   val intVar: IOOf<Throwable, MVar<ForIO, Int>> = mvarPartial.just(5)
+ *   val stringVar: IOOf<Throwable, MVar<ForIO, String>> = mvarPartial.empty<String>()
  *   //sampleEnd
  * }
  * ```
@@ -337,7 +337,7 @@ interface MVarFactory<F> {
    * fun main(args: Array<String>) {
    *   //sampleStart
    *   val mvarPartial: MVarFactory<ForIO> = MVar.factoryUncancelable(IO.async())
-   *   val intVar: IOOf<MVar<ForIO, Int>> = mvarPartial.just(5)
+   *   val intVar: IOOf<Throwable, MVar<ForIO, Int>> = mvarPartial.just(5)
    *   //sampleEnd
    * }
    * ```
@@ -354,7 +354,7 @@ interface MVarFactory<F> {
    * fun main(args: Array<String>) {
    *   //sampleStart
    *   val mvarPartial: MVarFactory<ForIO> = MVar.factoryUncancelable(IO.async())
-   *   val stringVar: IOOf<MVar<ForIO, String>> = mvarPartial.empty<String>()
+   *   val stringVar: IOOf<Throwable, MVar<ForIO, String>> = mvarPartial.empty<String>()
    *   //sampleEnd
    * }
    * ```

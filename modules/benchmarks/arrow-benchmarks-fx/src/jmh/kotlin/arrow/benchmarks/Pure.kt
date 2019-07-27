@@ -21,7 +21,7 @@ open class Pure {
   @Param("3000")
   var size: Int = 0
 
-  private fun ioPureLoop(i: Int): IO<Int> =
+  private fun ioPureLoop(i: Int): IO<Throwable, Int> =
     IO.just(i).flatMap { j ->
       if (j > size) IO.just(j) else ioPureLoop(j + 1)
     }

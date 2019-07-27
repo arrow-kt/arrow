@@ -6,6 +6,7 @@ import arrow.fx.CancelToken
 import arrow.fx.ForIO
 import arrow.fx.IO
 import arrow.fx.IOConnection
+import arrow.fx.IOPartialOf
 import arrow.fx.IORunLoop
 import arrow.fx.fix
 import arrow.fx.internal.ForwardCancelable.Companion.State.Active
@@ -16,12 +17,12 @@ import java.util.concurrent.atomic.AtomicReference
  * A placeholder for a [CancelToken] that will be set at a later time, the equivalent of a
  * `Promise<ForIO, CancelToken<ForIO>>`. Used in the implementation of `bracket`, see [IOBracket].
  */
-class ForwardCancelable {
+class ForwardCancelable<E> {
 
   private val state = AtomicReference<State>(init)
 
-  fun cancel(): CancelToken<ForIO> {
-    fun loop(conn: IOConnection, cb: (Either<Throwable, Unit>) -> Unit): Unit = state.get().let { current ->
+  fun cancel(): CancelToken<IOPartialOf<E>> {
+    fun loop(conn: IOConnection, cb: (Either<E, Unit>) -> Unit): Unit = state.get().let { current ->
       when (current) {
         is State.Empty -> if (!state.compareAndSet(current, State.Empty(listOf(cb) + current.stack)))
           loop(conn, cb)
@@ -37,7 +38,7 @@ class ForwardCancelable {
     return IO.Async { conn, cb -> loop(conn, cb) }
   }
 
-  fun complete(value: CancelToken<ForIO>): Unit = state.get().let { current ->
+  fun complete(value: CancelToken<IOPartialOf<E>>): Unit = state.get().let { current ->
     when (current) {
       is Active -> {
         value.fix().unsafeRunAsync {}
@@ -77,7 +78,7 @@ class ForwardCancelable {
     private val init: State = Empty(listOf())
     private val finished: State = Active(IO.unit)
 
-    private fun execute(token: CancelToken<ForIO>, stack: List<(Either<Throwable, Unit>) -> Unit>): Unit =
+    private fun <E> execute(token: CancelToken<IOPartialOf<E>>, stack: List<(Either<Throwable, Unit>) -> Unit>): Unit =
     // TODO this runs in an immediate execution context in cats-effect
       token.fix().unsafeRunAsync { r ->
         val errors = stack.fold(emptyList<Throwable>()) { acc, cb ->

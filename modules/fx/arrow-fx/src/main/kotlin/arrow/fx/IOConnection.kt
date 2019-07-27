@@ -8,7 +8,7 @@ import arrow.fx.typeclasses.MonadDefer
 import arrow.fx.handleErrorWith as handleErrorW
 
 fun IOConnection.toDisposable(): Disposable = { cancel().fix().unsafeRunSync() }
-typealias IOConnection = KindConnection<ForIO>
+typealias IOConnection = KindConnection<IOPartialOf<Throwable>>
 
 @Suppress("UNUSED_PARAMETER", "FunctionName")
 fun IOConnection(dummy: Unit = Unit): IOConnection = KindConnection(MD) { it.fix().unsafeRunAsync { } }
@@ -17,25 +17,25 @@ private val _uncancelable = KindConnection.uncancelable(MD)
 internal inline val KindConnection.Companion.uncancelable: IOConnection
   inline get() = _uncancelable
 
-private object MD : MonadDefer<ForIO> {
-  override fun <A> defer(fa: () -> IOOf<A>): IO<A> =
+private object MD : MonadDefer<IOPartialOf<Throwable>> {
+  override fun <A> defer(fa: () -> IOOf<Throwable, A>): IO<Throwable, A> =
     arrow.fx.IO.defer(fa)
 
-  override fun <A> raiseError(e: Throwable): IO<A> =
+  override fun <A> raiseError(e: Throwable): IO<Throwable, A> =
     arrow.fx.IO.raiseError(e)
 
-  override fun <A> IOOf<A>.handleErrorWith(f: (Throwable) -> IOOf<A>): IO<A> =
+  override fun <A> IOOf<Throwable, A>.handleErrorWith(f: (Throwable) -> IOOf<Throwable, A>): IO<Throwable, A> =
     handleErrorW(f)
 
-  override fun <A> just(a: A): IO<A> =
+  override fun <A> just(a: A): IO<Throwable, A> =
     arrow.fx.IO.just(a)
 
-  override fun <A, B> IOOf<A>.flatMap(f: (A) -> IOOf<B>): IO<B> =
+  override fun <A, B> IOOf<Throwable, A>.flatMap(f: (A) -> IOOf<Throwable, B>): IO<Throwable, B> =
     fix().flatMap(f)
 
-  override fun <A, B> tailRecM(a: A, f: (A) -> IOOf<Either<A, B>>): IO<B> =
+  override fun <A, B> tailRecM(a: A, f: (A) -> IOOf<Throwable, Either<A, B>>): IO<Throwable, B> =
     arrow.fx.IO.tailRecM(a, f)
 
-  override fun <A, B> IOOf<A>.bracketCase(release: (A, ExitCase<Throwable>) -> IOOf<Unit>, use: (A) -> IOOf<B>): IO<B> =
+  override fun <A, B> IOOf<Throwable, A>.bracketCase(release: (A, ExitCase<Throwable>) -> IOOf<Throwable, Unit>, use: (A) -> IOOf<Throwable, B>): IO<Throwable, B> =
     fix().bracketCase(release = { a, e -> release(a, e).fix() }, use = { use(it).fix() })
 }

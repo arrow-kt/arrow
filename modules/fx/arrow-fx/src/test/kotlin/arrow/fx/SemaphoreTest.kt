@@ -24,7 +24,7 @@ class SemaphoreTest : UnitSpec() {
 
   init {
 
-    fun tests(label: String, semaphore: (Long) -> IOOf<Semaphore<ForIO>>) {
+    fun tests(label: String, semaphore: (Long) -> IOOf<Throwable, Semaphore<ForIO>>) {
       "$label - acquire n synchronously" {
         val n = 20L
         semaphore(n).flatMap { s ->

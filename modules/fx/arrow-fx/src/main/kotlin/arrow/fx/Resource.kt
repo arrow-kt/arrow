@@ -36,13 +36,13 @@ inline fun <F, E, A> ResourceOf<F, E, A>.fix(): Resource<F, E, A> =
  *
  * class Service(val handle: Handle, val consumer: Consumer)
  *
- * fun createConsumer(): IO<Consumer> = IO { println("Creating consumer"); Consumer }
- * fun createDBHandle(): IO<Handle> = IO { println("Creating db handle"); Handle }
- * fun createFancyService(consumer: Consumer, handle: Handle): IO<Service> = IO { println("Creating service"); Service(handle, consumer) }
+ * fun createConsumer(): IO<Throwable, Consumer> = IO { println("Creating consumer"); Consumer }
+ * fun createDBHandle(): IO<Throwable, Handle> = IO { println("Creating db handle"); Handle }
+ * fun createFancyService(consumer: Consumer, handle: Handle): IO<Throwable, Service> = IO { println("Creating service"); Service(handle, consumer) }
  *
- * fun closeConsumer(consumer: Consumer): IO<Unit> = IO { println("Closed consumer") }
- * fun closeDBHandle(handle: Handle): IO<Unit> = IO { println("Closed db handle") }
- * fun shutDownFanceService(service: Service): IO<Unit> = IO { println("Closed service") }
+ * fun closeConsumer(consumer: Consumer): IO<Throwable, Unit> = IO { println("Closed consumer") }
+ * fun closeDBHandle(handle: Handle): IO<Throwable, Unit> = IO { println("Closed db handle") }
+ * fun shutDownFanceService(service: Service): IO<Throwable, Unit> = IO { println("Closed service") }
  *
  * //sampleStart
  * val program = IO.fx {
@@ -77,13 +77,13 @@ inline fun <F, E, A> ResourceOf<F, E, A>.fix(): Resource<F, E, A> =
  *
  * class Service(val handle: Handle, val consumer: Consumer)
  *
- * fun createConsumer(): IO<Consumer> = IO { println("Creating consumer"); Consumer }
- * fun createDBHandle(): IO<Handle> = IO { println("Creating db handle"); Handle }
- * fun createFancyService(consumer: Consumer, handle: Handle): IO<Service> = IO { println("Creating service"); Service(handle, consumer) }
+ * fun createConsumer(): IO<Throwable, Consumer> = IO { println("Creating consumer"); Consumer }
+ * fun createDBHandle(): IO<Throwable, Handle> = IO { println("Creating db handle"); Handle }
+ * fun createFancyService(consumer: Consumer, handle: Handle): IO<Throwable, Service> = IO { println("Creating service"); Service(handle, consumer) }
  *
- * fun closeConsumer(consumer: Consumer): IO<Unit> = IO { println("Closed consumer") }
- * fun closeDBHandle(handle: Handle): IO<Unit> = IO { println("Closed db handle") }
- * fun shutDownFanceService(service: Service): IO<Unit> = IO { println("Closed service") }
+ * fun closeConsumer(consumer: Consumer): IO<Throwable, Unit> = IO { println("Closed consumer") }
+ * fun closeDBHandle(handle: Handle): IO<Throwable, Unit> = IO { println("Closed db handle") }
+ * fun shutDownFanceService(service: Service): IO<Throwable, Unit> = IO { println("Closed service") }
  *
  * //sampleStart
  * val bracketProgram =
@@ -118,13 +118,13 @@ inline fun <F, E, A> ResourceOf<F, E, A>.fix(): Resource<F, E, A> =
  *
  * class Service(val handle: Handle, val consumer: Consumer)
  *
- * fun createConsumer(): IO<Consumer> = IO { println("Creating consumer"); Consumer }
- * fun createDBHandle(): IO<Handle> = IO { println("Creating db handle"); Handle }
- * fun createFancyService(consumer: Consumer, handle: Handle): IO<Service> = IO { println("Creating service"); Service(handle, consumer) }
+ * fun createConsumer(): IO<Throwable, Consumer> = IO { println("Creating consumer"); Consumer }
+ * fun createDBHandle(): IO<Throwable, Handle> = IO { println("Creating db handle"); Handle }
+ * fun createFancyService(consumer: Consumer, handle: Handle): IO<Throwable, Service> = IO { println("Creating service"); Service(handle, consumer) }
  *
- * fun closeConsumer(consumer: Consumer): IO<Unit> = IO { println("Closed consumer") }
- * fun closeDBHandle(handle: Handle): IO<Unit> = IO { println("Closed db handle") }
- * fun shutDownFanceService(service: Service): IO<Unit> = IO { println("Closed service") }
+ * fun closeConsumer(consumer: Consumer): IO<Throwable, Unit> = IO { println("Closed consumer") }
+ * fun closeDBHandle(handle: Handle): IO<Throwable, Unit> = IO { println("Closed db handle") }
+ * fun shutDownFanceService(service: Service): IO<Throwable, Unit> = IO { println("Closed service") }
  *
  * //sampleStart
  * val managedTProgram = Resource.monad(IO.bracket()).fx.monad {
@@ -159,8 +159,8 @@ interface Resource<F, E, A> : ResourceOf<F, E, A> {
    * import arrow.fx.extensions.io.bracket.bracket
    * import arrow.fx.fix
    *
-   * fun acquireResource(): IO<Int> = IO { println("Getting expensive resource"); 42 }
-   * fun releaseResource(r: Int): IO<Unit> = IO { println("Releasing expensive resource: $r") }
+   * fun acquireResource(): IO<Throwable, Int> = IO { println("Getting expensive resource"); 42 }
+   * fun releaseResource(r: Int): IO<Throwable, Unit> = IO { println("Releasing expensive resource: $r") }
    *
    * fun main() {
    *   //sampleStart
@@ -224,8 +224,8 @@ interface Resource<F, E, A> : ResourceOf<F, E, A> {
      * import arrow.fx.extensions.io.bracket.bracket
      * import arrow.fx.fix
      *
-     * fun acquireResource(): IO<Int> = IO { println("Getting expensive resource"); 42 }
-     * fun releaseResource(r: Int): IO<Unit> = IO { println("Releasing expensive resource: $r") }
+     * fun acquireResource(): IO<Throwable, Int> = IO { println("Getting expensive resource"); 42 }
+     * fun releaseResource(r: Int): IO<Throwable, Unit> = IO { println("Releasing expensive resource: $r") }
      *
      * fun main() {
      *   //sampleStart

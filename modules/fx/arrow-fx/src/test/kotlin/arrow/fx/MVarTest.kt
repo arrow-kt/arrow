@@ -148,7 +148,7 @@ class MVarTest : UnitSpec() {
       }
 
       "$label - take/put test is stack safe" {
-        fun loop(n: Int, acc: Int, ch: MVar<ForIO, Int>): IO<Int> =
+        fun loop(n: Int, acc: Int, ch: MVar<ForIO, Int>): IO<Throwable, Int> =
           if (n <= 0) IO.just(acc) else
             ch.take().flatMap { x ->
               ch.put(1).flatMap { loop(n - 1, acc + x, ch) }

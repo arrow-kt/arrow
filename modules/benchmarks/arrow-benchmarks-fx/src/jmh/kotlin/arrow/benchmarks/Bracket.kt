@@ -23,7 +23,7 @@ open class Bracket {
   @Param("100")
   var size: Int = 0
 
-  private fun ioBracketLoop(i: Int): IO<Int> =
+  private fun ioBracketLoop(i: Int): IO<Throwable, Int> =
     if (i < size)
       IO.just(i).bracket({ IO.unit }, { ib -> IO { ib + 1 } }).flatMap { ioBracketLoop(it) }
     else

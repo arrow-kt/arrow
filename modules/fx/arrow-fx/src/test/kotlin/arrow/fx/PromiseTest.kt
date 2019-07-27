@@ -29,7 +29,7 @@ class PromiseTest : UnitSpec() {
     fun tests(
       label: String,
       ctx: CoroutineContext = Dispatchers.Default,
-      promise: IO<Promise<ForIO, Int>>
+      promise: IO<Throwable, Promise<ForIO, Int>>
     ) {
 
       "$label - complete" {

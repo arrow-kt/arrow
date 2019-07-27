@@ -16,18 +16,18 @@ data class UserNotInRemoteStorage(val user: User) : UserLookupError()
 data class UnknownError(val underlying: Throwable) : UserLookupError()
 
 interface DataSource {
-  fun allTasksByUser(user: User): IO<List<Task>>
+  fun allTasksByUser(user: User): IO<Throwable, List<Task>>
 }
 
 interface Repository {
-  fun allTasksByUser(user: User): IO<List<Task>>
+  fun allTasksByUser(user: User): IO<Throwable, List<Task>>
 }
 
 class LocalDataSource : DataSource {
   private val localCache: Map<User, List<Task>> =
     mapOf(User(UserId("user1")) to listOf(Task("LocalTask asssigned to user1")))
 
-  override fun allTasksByUser(user: User): IO<List<Task>> =
+  override fun allTasksByUser(user: User): IO<Throwable, List<Task>> =
     Option.fromNullable(localCache[user]).fold(
       { IO.raiseError(UserNotInLocalStorage(user)) },
       { IO.just(it) }
@@ -38,7 +38,7 @@ class RemoteDataSource : DataSource {
   private val internetStorage: Map<User, List<Task>> =
     mapOf(User(UserId("user2")) to listOf(Task("Remote Task assigned to user2")))
 
-  override fun allTasksByUser(user: User): IO<List<Task>> =
+  override fun allTasksByUser(user: User): IO<Throwable, List<Task>> =
     IO.async { cb ->
       // allows you to take values from callbacks and place them back in the context of `F`
       Option.fromNullable(internetStorage[user]).fold(
@@ -53,7 +53,7 @@ class DefaultRepository(
   val remoteDS: RemoteDataSource
 ) : Repository {
 
-  override fun allTasksByUser(user: User): IO<List<Task>> =
+  override fun allTasksByUser(user: User): IO<Throwable, List<Task>> =
     localDS.allTasksByUser(user).handleErrorWith { e: Throwable ->
       when (e) {
         is UserNotInLocalStorage -> remoteDS.allTasksByUser(user)

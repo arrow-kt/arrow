@@ -50,7 +50,7 @@ interface IORaceTriple {
    *
    * @see [arrow.fx.typeclasses.Concurrent.raceN] for a simpler version that cancels losers.
    */
-  fun <A, B, C> raceTriple(ctx: CoroutineContext, ioA: IOOf<A>, ioB: IOOf<B>, ioC: IOOf<C>): IO<RaceTriple<ForIO, A, B, C>> =
+  fun <A, B, C> raceTriple(ctx: CoroutineContext, ioA: IOOf<Throwable, A>, ioB: IOOf<Throwable, B>, ioC: IOOf<Throwable, C>): IO<Throwable, RaceTriple<ForIO, A, B, C>> =
     IO.Async { conn, cb ->
       val active = AtomicBoolean(true)
 

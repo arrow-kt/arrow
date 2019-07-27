@@ -24,7 +24,7 @@ open class ParMap {
   @Param("100")
   var size: Int = 0
 
-  private fun ioHelper(): IO<Int> =
+  private fun ioHelper(): IO<Throwable, Int> =
     (0 until size).toList().foldLeft(IO { 0 }) { acc, i ->
       IODispatchers.CommonPool.parMapN(acc, IO { i }) { a, b -> a + b }
     }

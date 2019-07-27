@@ -24,7 +24,7 @@ open class LeftBind {
   @Param("100")
   var depth: Int = 0
 
-  fun ioLoop(i: Int): IO<Int> =
+  fun ioLoop(i: Int): IO<Throwable, Int> =
     if (i % depth == 0) IO { i + 1 }.flatMap { ioLoop(it) }
     else if (i < size) ioLoop(i + 1).flatMap { IO.just(it) }
     else IO.just(i)

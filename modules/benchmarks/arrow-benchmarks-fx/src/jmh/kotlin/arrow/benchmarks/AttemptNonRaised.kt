@@ -21,7 +21,7 @@ open class AttemptNonRaised {
   @Param("10000")
   var size: Int = 0
 
-  private fun ioLoopHappy(size: Int, i: Int): IO<Int> =
+  private fun ioLoopHappy(size: Int, i: Int): IO<Throwable, Int> =
     if (i < size) {
       IO { i + 1 }.attempt().flatMap {
         it.fold(IO.Companion::raiseError) { n -> ioLoopHappy(size, n) }

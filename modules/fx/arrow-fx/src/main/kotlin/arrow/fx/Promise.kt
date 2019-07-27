@@ -207,7 +207,7 @@ interface Promise<F, A> {
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
-     *   val promise: IOOf<Promise<ForIO, Int>> = Promise(IO.concurrent())
+     *   val promise: IOOf<Throwable, Promise<ForIO, Int>> = Promise(IO.concurrent())
      *   //sampleEnd
      * }
      * ```
@@ -242,7 +242,7 @@ interface Promise<F, A> {
      *
      * fun main(args: Array<String>) {
      *   //sampleStart
-     *   val promise: IOOf<Promise<ForIO, Int>> = Promise.uncancelable(IO.async())
+     *   val promise: IOOf<Throwable, Promise<ForIO, Int>> = Promise.uncancelable(IO.async())
      *   //sampleEnd
      * }
      * ```

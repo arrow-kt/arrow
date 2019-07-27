@@ -24,13 +24,13 @@ open class Cancellable {
   @Param("100")
   var size: Int = 0
 
-  fun evalCancelable(n: Int): IO<Int> =
+  fun evalCancelable(n: Int): IO<Throwable, Int> =
     IO.concurrent().cancelable<Int> { cb ->
       cb(Right(n))
       IO.unit
     }.fix()
 
-  fun cancelableLoop(i: Int): IO<Int> =
+  fun cancelableLoop(i: Int): IO<Throwable, Int> =
     if (i < size) evalCancelable(i + 1).flatMap { cancelableLoop(it) }
     else evalCancelable(i)
 

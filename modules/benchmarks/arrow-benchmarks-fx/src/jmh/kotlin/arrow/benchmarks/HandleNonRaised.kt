@@ -22,7 +22,7 @@ open class HandleNonRaised {
   @Param("10000")
   var size: Int = 0
 
-  private fun ioHappyPathLoop(i: Int): IO<Int> =
+  private fun ioHappyPathLoop(i: Int): IO<Throwable, Int> =
     if (i < size)
       IO.just(i + 1)
         .ioHandleErrorWith { IO.raiseError(it) }
