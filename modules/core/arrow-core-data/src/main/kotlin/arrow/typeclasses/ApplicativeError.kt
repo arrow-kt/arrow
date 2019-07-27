@@ -52,7 +52,4 @@ interface ApplicativeError<F, E> : Applicative<F> {
 
   fun <A> ApplicativeError<F, Throwable>.catch(f: () -> A): Kind<F, A> =
     catch(::identity, f)
-
-  fun <B, E : B, A> Kind2<F, E, A>.widenError(): Kind2<F, B, A> =
-    this
 }
