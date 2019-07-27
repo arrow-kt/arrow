@@ -1,7 +1,6 @@
 <img height="100" src="https://avatars2.githubusercontent.com/u/29458023?v=4&amp;s=200" width="100">
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.arrow-kt/arrow-core)
-[![Build Status](https://travis-ci.org/arrow-kt/arrow.svg?branch=master)](https://travis-ci.org/arrow-kt/arrow/)
+[![Maven Central](https://img.shields.io/maven-central/v/io.arrow-kt/arrow-docs.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22io.arrow-kt%22%20AND%20a:%22arrow-docs%22)
 [![Kotlin version badge](https://img.shields.io/badge/kotlin-1.3-blue.svg)](https://kotlinlang.org/docs/reference/whatsnew13.html)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 [![codecov](https://codecov.io/gh/arrow-kt/arrow/branch/master/graph/badge.svg)](https://codecov.io/gh/arrow-kt/arrow)
@@ -45,32 +44,12 @@ Add it in your root `build.gradle` at the end of repositories.
 ```groovy
 allprojects {
     repositories {
+        mavenCentral()
         jcenter()
+        maven { url "https://dl.bintray.com/arrow-kt/arrow-kt/" }
     }
 }
 ```
-
-# Dependency breakdown starting in Arrow 0.9.1
-
-Starting in 0.9.1, Arrow follows the following convention for artifact publication.
-
-The arrow modules are Core, Effects, Optics, Recursion, etc.
-
-An Arrow module is composed of data types and type classes.
-Arrow modules are exported and published with the following semantics.
-
-If we take for example `arrow-core`. 
-
-Arrow core contains the basic arrow type classes and data types and it's composed of 3 main artifacts that may be used a la carte:
-
-Recomended for most use cases:
-
-- `arrow-core` (Depends on data and extensions modules and exports both)
-
-Trimmed down versions:
-
-- `arrow-core-data` (Only data types)
-- `arrow-core-extensions` (Only type class extensions)
 
 # Current stable version 0.9.0
 
