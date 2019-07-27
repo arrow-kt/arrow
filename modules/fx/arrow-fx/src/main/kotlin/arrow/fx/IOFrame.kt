@@ -2,6 +2,7 @@ package arrow.fx
 
 import arrow.core.Either
 import arrow.fx.IO.Pure
+import arrow.fx.IOFrame.Companion.attempt
 
 /**
  * An [IOFrame] knows how to [recover] from a [Throwable] and how to map a value [A] to [R].
@@ -14,40 +15,40 @@ import arrow.fx.IO.Pure
  *
  * It's used to implement [attempt], [handleErrorWith] and [arrow.fx.internal.IOBracket]
  */
-internal interface IOFrame<in A, out R> : (A) -> R {
+internal interface IOFrame<E, in A, out R> : (A) -> R {
   override operator fun invoke(a: A): R
 
-  fun recover(e: Throwable): R
+  fun recover(e: E): R
 
-  fun fold(value: Either<Throwable, A>): R =
+  fun fold(value: Either<E, A>): R =
     when (value) {
       is Either.Right -> invoke(value.b)
       is Either.Left -> recover(value.a)
     }
 
   companion object {
-
-    internal class Redeem<A, B>(val fe: (Throwable) -> B, val fb: (A) -> B) : IOFrame<A, IO<Throwable, B>> {
-      override fun invoke(a: A): IO<Throwable, B> = Pure(fb(a))
-      override fun recover(e: Throwable): IO<Throwable, B> = Pure(fe(e))
+    internal class Redeem<E, A, B>(val fe: (E) -> B, val fb: (A) -> B) : IOFrame<E, A, IO<E, B>> {
+      override fun invoke(a: A): IO<E, B> = Pure(fb(a))
+      override fun recover(e: E): IO<E, B> = Pure(fe(e))
     }
 
-    internal class RedeemWith<A, B>(val fe: (Throwable) -> IOOf<Throwable, B>, val fb: (A) -> IOOf<Throwable, B>) : IOFrame<A, IO<Throwable, B>> {
-      override fun invoke(a: A): IO<Throwable, B> = fb(a).fix()
-      override fun recover(e: Throwable): IO<Throwable, B> = fe(e).fix()
+
+    internal class RedeemWith<E, A, B>(val fe: (E) -> IOOf<E, B>, val fb: (A) -> IOOf<E, B>) : IOFrame<E, A, IO<E, B>> {
+      override fun invoke(a: A): IO<E, B> = fb(a).fix()
+      override fun recover(e: E): IO<E, B> = fe(e).fix()
     }
 
-    internal class ErrorHandler<A>(val fe: (Throwable) -> IOOf<Throwable, A>) : IOFrame<A, IO<Throwable, A>> {
-      override fun invoke(a: A): IO<Throwable, A> = Pure(a)
-      override fun recover(e: Throwable): IO<Throwable, A> = fe(e).fix()
+    internal class ErrorHandler<E, A>(val fe: (E) -> IOOf<E, A>) : IOFrame<E, A, IO<E, A>> {
+      override fun invoke(a: A): IO<E, A> = Pure(a)
+      override fun recover(e: E): IO<E, A> = fe(e).fix()
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun <A> attempt(): (A) -> IO<Throwable, Either<Throwable, A>> = AttemptIO as (A) -> IO<Throwable, Either<Throwable, A>>
+    fun <E, A> attempt(): (A) -> IO<E, Either<E, A>> = AttemptIO as (A) -> IO<E, Either<E, A>>
 
-    private object AttemptIO : IOFrame<Any?, IO<Throwable, Either<Throwable, Any?>>> {
-      override operator fun invoke(a: Any?): IO<Throwable, Either<Nothing, Any?>> = Pure(Either.Right(a))
-      override fun recover(e: Throwable): IO<Throwable, Either<Throwable, Nothing>> = Pure(Either.Left(e))
+    private object AttemptIO : IOFrame<Any?, Any?, IO<Any?, Either<Any?, Any?>>> {
+      override operator fun invoke(a: Any?): IO<Any?, Either<Nothing, Any?>> = Pure(Either.Right(a))
+      override fun recover(e: Any?): IO<Any?, Either<Any?, Nothing>> = Pure(Either.Left(e))
     }
   }
 }

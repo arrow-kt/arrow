@@ -28,7 +28,6 @@ import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.Fiber
 import arrow.fx.typeclasses.mapUnit
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -48,9 +47,13 @@ typealias IOProc<E, A> = ((Either<E, A>) -> Unit) -> Unit
 typealias IOProcF<E, A> = ((Either<E, A>) -> Unit) -> IOOf<E, Unit>
 
 @Suppress("StringLiteralDuplication")
-sealed class IO<out E, out A> : IOOf<E, A> {
+sealed class IO<E, out A> : IOOf<E, A> {
 
   companion object : IOParMap2, IOParMap3, IORacePair, IORaceTriple {
+
+    fun <E, A> just(a: A): IO<E, A> = Pure(a)
+
+    fun <E, A> raiseError(e: E): IO<E, A> = RaiseError(e)
 
     fun <E, A> effect(fe: (Throwable) -> E, f: suspend () -> A): IO<E, A> =
       Effect(null, fe, effect = f)
@@ -65,10 +68,6 @@ sealed class IO<out E, out A> : IOOf<E, A> {
     // Specialization
     fun <A> effect(ctx: CoroutineContext, f: suspend () -> A): IO<Throwable, A> =
       Effect(ctx, ::identity, f)
-
-    fun <E, A> just(a: A): IO<E, A> = Pure(a)
-
-    fun <E, A> raiseError(e: E): IO<E, A> = RaiseError(e)
 
     operator fun <E, A> invoke(ctx: CoroutineContext, fe: (Throwable) -> E, f: suspend () -> A): IO<E, A> =
       effect(ctx, fe, f)
@@ -97,7 +96,6 @@ sealed class IO<out E, out A> : IOOf<E, A> {
     // Specialization
     fun <A> defer(f: () -> IOOf<Throwable, A>): IO<Throwable, A> =
       Suspend(::identity, f)
-
 
     fun <E, A> async(fe: (Throwable) -> E, k: IOProc<E, A>): IO<E, A> =
       Async { _: IOConnection, ff: (Either<E, A>) -> Unit ->
@@ -131,20 +129,21 @@ sealed class IO<out E, out A> : IOOf<E, A> {
       }
 
     // Specialization
-    fun <A> cancelable(cb: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForIO>): IO<Throwable, A> =
+    fun <A> cancelable(cb: ((Either<Throwable, A>) -> Unit) -> CancelToken<IOPartialOf<Throwable>>): IO<Throwable, A> =
+      cancelable(::identity, cb)
 
-    fun <A> cancelableF(cb: ((Either<Throwable, A>) -> Unit) -> IOOf<Throwable, CancelToken<ForIO>>): IO<Throwable, A> =
-      Async { conn: IOConnection, cbb: (Either<Throwable, A>) -> Unit ->
-        val cancelable = ForwardCancelable()
+    fun <E, A> cancelableF(fe: (Throwable) -> E, cb: ((Either<E, A>) -> Unit) -> IOOf<E, CancelToken<IOPartialOf<E>>>): IO<E, A> =
+      Async { conn: IOConnection, cbb: (Either<E, A>) -> Unit ->
+        val cancelable = ForwardCancelable<E>()
         val conn2 = IOConnection()
         conn.push(cancelable.cancel())
         conn.push(conn2.cancel())
 
         onceOnly(conn, cbb).let { cbb2 ->
-          val fa: IOOf<Throwable, CancelToken<ForIO>> = try {
+          val fa: IOOf<E, CancelToken<IOPartialOf<E>>> = try {
             cb(cbb2)
           } catch (throwable: Throwable) {
-            cbb2(Left(throwable.nonFatalOrThrow()))
+            cbb2(Left(fe(throwable.nonFatalOrThrow())))
             just(unit)
           }
 
@@ -154,6 +153,10 @@ sealed class IO<out E, out A> : IOOf<E, A> {
           }
         }
       }
+
+    // Specialization
+    fun <A> cancelableF(cb: ((Either<Throwable, A>) -> Unit) -> IOOf<Throwable, CancelToken<IOPartialOf<Throwable>>>): IO<Throwable, A> =
+      cancelableF(::identity, cb)
 
     fun <A> asyncF(k: IOProcF<Throwable, A>): IO<Throwable, A> =
       Async { conn: IOConnection, ff: (Either<Throwable, A>) -> Unit ->
@@ -176,16 +179,19 @@ sealed class IO<out E, out A> : IOOf<E, A> {
         }
       }
 
-    val unit: IO<Throwable, Unit> =
+    private val unsafe: (Throwable) -> Nothing =
+      { t -> throw t }
+
+    val unit: IO<Nothing, Unit> =
       just(Unit)
 
-    val lazy: IO<Throwable, Unit> =
-      invoke { }
+    val lazy: IO<Nothing, Unit> =
+      invoke(unsafe) { }
 
-    fun <A> eval(eval: Eval<A>): IO<Throwable, A> =
+    fun <A> eval(eval: Eval<A>): IO<Nothing, A> =
       when (eval) {
         is Eval.Now -> just(eval.value)
-        else -> invoke { eval.value() }
+        else -> invoke(unsafe) { eval.value() }
       }
 
     fun <E, A, B> tailRecM(a: A, f: (A) -> IOOf<E, Either<A, B>>): IO<E, B> =
@@ -196,7 +202,8 @@ sealed class IO<out E, out A> : IOOf<E, A> {
         }
       }
 
-    val never: IO<Throwable, Nothing> = async { }
+    val never: IO<Nothing, Nothing> =
+      async(unsafe) { }
   }
 
   suspend fun suspended(): A = suspendCoroutine { cont ->
@@ -207,6 +214,9 @@ sealed class IO<out E, out A> : IOOf<E, A> {
 
   open fun <B> map(f: (A) -> B): IO<E, B> =
     Map(this, f, 0)
+
+  open fun <B> mapError(f: (E) -> B): IO<B, A> =
+    MapError(this, f, 0)
 
   open fun <B> flatMap(f: (A) -> IOOf<E, B>): IO<E, B> =
     Bind(this) { f(it).fix() }
@@ -242,7 +252,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
    * @param ctx [CoroutineContext] to execute the source [IO] on.
    * @return [IO] with suspended execution of source [IO] on context [ctx].
    */
-  fun startFiber(ctx: CoroutineContext): IO<Throwable, Fiber<ForIO, A>> = async { cb ->
+  fun startFiber(ctx: CoroutineContext): IO<Throwable, Fiber<IOPartialOf<Throwable>, A>> = async { cb ->
     val promise = UnsafePromise<A>()
     // A new IOConnection, because its cancellation is now decoupled from our current one.
     val conn = IOConnection()
@@ -252,7 +262,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
 
   fun <B> followedBy(fb: IOOf<E, B>) = flatMap { fb }
 
-  fun attempt(): IO<Throwable, Either<Throwable, A>> =
+  fun attempt(): IO<E, Either<E, A>> =
     Bind(this, IOFrame.attempt())
 
   /**
@@ -271,7 +281,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
    * }
    * ```
    */
-  fun <B> redeem(fe: (Throwable) -> B, fb: (A) -> B): IO<Throwable, B> =
+  fun <B> redeem(fe: (E) -> B, fb: (A) -> B): IO<E, B> =
     Bind(this, IOFrame.Companion.Redeem(fe, fb))
 
   /**
@@ -290,7 +300,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
    * }
    * ```
    */
-  fun <B> redeemWith(fe: (Throwable) -> IOOf<E, B>, fb: (A) -> IOOf<E, B>): IO<Throwable, B> =
+  fun <B> redeemWith(fe: (E) -> IOOf<E, B>, fb: (A) -> IOOf<E, B>): IO<E, B> =
     Bind(this, IOFrame.Companion.RedeemWith(fe, fb))
 
   fun runAsync(cb: (Either<Throwable, A>) -> IOOf<E, Unit>): IO<Throwable, Unit> =
@@ -339,12 +349,12 @@ sealed class IO<out E, out A> : IOOf<E, A> {
   fun guaranteeCase(finalizer: (ExitCase<Throwable>) -> IOOf<E, Unit>): IO<Throwable, A> =
     IOBracket.guaranteeCase(this, finalizer)
 
-  internal data class Pure<out E, out A>(val a: A) : IO<E, A>() {
+  internal data class Pure<E, out A>(val a: A) : IO<E, A>() {
     // Pure can be replaced by its value
-    override fun <B> map(f: (A) -> B): IO<E, B> = Suspend { Pure(f(a)) }
+    override fun <B> map(f: (A) -> B): IO<E, B> = Suspend(unsafe) { Pure(f(a)) }
 
     // Pure can be replaced by its value
-    override fun <B> flatMap(f: (A) -> IOOf<E, B>): IO<E, B> = Suspend { f(a).fix() }
+    override fun <B> flatMap(f: (A) -> IOOf<E, B>): IO<E, B> = Suspend(unsafe) { f(a).fix() }
 
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = Some(a)
   }
@@ -356,37 +366,47 @@ sealed class IO<out E, out A> : IOOf<E, A> {
     // Errors short-circuit
     override fun <B> flatMap(f: (Nothing) -> IOOf<E, B>): IO<E, B> = this
 
-    override fun unsafeRunTimedTotal(limit: Duration): Option<Nothing> = throw exception
+    // Pure can be replaced by its value
+    override fun <B> mapError(f: (E) -> B): IO<B, Nothing> =
+      RaiseError(f(exception))
+
+    override fun unsafeRunTimedTotal(limit: Duration): Option<Nothing> {
+      if (exception is Throwable) {
+        throw exception
+      } else {
+        throw AssertionError("Unreachable $exception")
+      }
+    }
   }
 
-  internal data class Delay<out E, out A>(val handler: (Throwable) -> E, val thunk: () -> A) : IO<E, A>() {
+  internal data class Delay<E, out A>(val handler: (Throwable) -> E, val thunk: () -> A) : IO<E, A>() {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
   }
 
-  internal data class Suspend<out E, out A>(val handler: (Throwable) -> E, val thunk: () -> IOOf<E, A>) : IO<E, A>() {
+  internal data class Suspend<E, out A>(val handler: (Throwable) -> E, val thunk: () -> IOOf<E, A>) : IO<E, A>() {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
   }
 
-  internal data class Async<out E, out A>(val shouldTrampoline: Boolean = false, val k: (IOConnection, (Either<E, A>) -> Unit) -> Unit) : IO<E, A>() {
+  internal data class Async<E, out A>(val shouldTrampoline: Boolean = false, val k: (IOConnection, (Either<E, A>) -> Unit) -> Unit) : IO<E, A>() {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = unsafeResync(this, limit)
   }
 
-  internal data class Effect<out E, out A>(val ctx: CoroutineContext? = null, val handler: (Throwable) -> E, val effect: suspend () -> A) : IO<E, A>() {
+  internal data class Effect<E, out A>(val ctx: CoroutineContext? = null, val handler: (Throwable) -> E, val effect: suspend () -> A) : IO<E, A>() {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = unsafeResync(this, limit)
   }
 
-  internal data class Bind<out E, C, out A>(val cont: IO<E, C>, val g: (C) -> IO<E, A>) : IO<E, A>() {
+  internal data class Bind<E, C, out A>(val cont: IO<E, C>, val g: (C) -> IO<E, A>) : IO<E, A>() {
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
   }
 
-  internal data class ContinueOn<out E, A>(val cont: IO<E, A>, val cc: CoroutineContext) : IO<E, A>() {
+  internal data class ContinueOn<E, A>(val cont: IO<E, A>, val cc: CoroutineContext) : IO<E, A>() {
     // If a ContinueOn follows another ContinueOn, execute only the latest
     override fun continueOn(ctx: CoroutineContext): IO<E, A> = ContinueOn(cont, ctx)
 
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
   }
 
-  internal data class ContextSwitch<out E, A>(
+  internal data class ContextSwitch<E, A>(
     val source: IO<E, A>,
     val modify: (IOConnection) -> IOConnection,
     val restore: ((Any?, Throwable?, IOConnection, IOConnection) -> IOConnection)?
@@ -402,7 +422,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
     }
   }
 
-  internal data class Map<out E, C, out A>(val source: IOOf<E, C>, val g: (C) -> A, val index: Int) : IO<E, A>(), (C) -> IO<E, A> {
+  internal data class Map<E, C, out A>(val source: IOOf<E, C>, val g: (C) -> A, val index: Int) : IO<E, A>(), (C) -> IO<E, A> {
     override fun invoke(value: C): IO<E, A> = just(g(value))
 
     override fun <B> map(f: (A) -> B): IO<E, B> =
@@ -413,12 +433,24 @@ sealed class IO<out E, out A> : IOOf<E, A> {
 
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
   }
+
+  internal data class MapError<E, C, out A>(val source: IOOf<E, A>, val g: (E) -> C, val index: Int) : IO<C, A>(), (E) -> IO<C, A> {
+    override fun invoke(value: E): IO<C, A> = raiseError(g(value))
+
+    override fun <B> mapError(f: (C) -> B): IO<B, A> =
+    // Allowed to do maxStackDepthSize map operations in sequence before
+      // starting a new Map fusion in order to avoid stack overflows
+      if (index != maxStackDepthSize) MapError(source, g.andThen(f), index + 1)
+      else MapError(this, f, 0)
+
+    override fun unsafeRunTimedTotal(limit: Duration): Option<A> = throw AssertionError("Unreachable")
+  }
 }
 
 fun <E, A> IOOf<E, A>.handleErrorWith(f: (E) -> IOOf<E, A>): IO<E, A> =
   IO.Bind(fix(), IOFrame.Companion.ErrorHandler(f))
 
-fun <E, A> IOOf<E, A>.handleError(f: (Throwable) -> A): IO<E, A> =
+fun <E, A> IOOf<E, A>.handleError(f: (E) -> A): IO<E, A> =
   handleErrorWith { e -> IO.Pure(f(e)) }
 
 fun <E, A> A.liftIO(): IO<E, A> = IO.just(this)

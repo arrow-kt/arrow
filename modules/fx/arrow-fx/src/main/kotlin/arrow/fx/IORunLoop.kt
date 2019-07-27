@@ -20,17 +20,17 @@ private typealias Callback = (Either<Throwable, Any?>) -> Unit
 @Suppress("UNCHECKED_CAST", "ReturnCount", "ComplexMethod")
 internal object IORunLoop {
 
-  fun <E, A> start(source: IOOf<E, A>, cb: (Either<Throwable, A>) -> Unit): Unit =
+  fun <A> start(source: IOOf<Throwable, A>, cb: (Either<Throwable, A>) -> Unit): Unit =
     loop(source, IOConnection.uncancelable, cb as Callback, null, null, null, EmptyCoroutineContext)
 
   /**
    * Evaluates the given `IO` reference, calling the given callback
    * with the result when completed.
    */
-  fun <E, A> startCancelable(source: IOOf<E, A>, conn: IOConnection, cb: (Either<Throwable, A>) -> Unit): Unit =
+  fun <A> startCancelable(source: IOOf<Throwable, A>, conn: IOConnection, cb: (Either<Throwable, A>) -> Unit): Unit =
     loop(source, conn, cb as Callback, null, null, null, EmptyCoroutineContext)
 
-  fun <E, A> step(source: IO<E, A>): IO<E, A> {
+  fun <A> step(source: IO<Throwable, A>): IO<Throwable, A> {
     var currentIO: Current? = source
     var bFirst: BindF? = null
     var bRest: CallStack? = null

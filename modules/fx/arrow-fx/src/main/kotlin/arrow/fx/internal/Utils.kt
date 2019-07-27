@@ -297,5 +297,5 @@ internal fun <A> asyncContinuation(ctx: CoroutineContext, cc: (Either<Throwable,
  * so it'll share it's [kotlin.coroutines.Continuation] with other potential jumps or [IO.async].
  * @see [arrow.fx.IORunLoop.RestartCallback]
  */
-internal fun <A> IOForkedStart(fa: IOOf<Throwable, A>, ctx: CoroutineContext): IO<Throwable, A> =
+internal fun <E, A> IOForkedStart(fa: IOOf<E, A>, ctx: CoroutineContext): IO<E, A> =
   IO.Bind(IO.ContinueOn(IO.unit, ctx)) { fa.fix() }
