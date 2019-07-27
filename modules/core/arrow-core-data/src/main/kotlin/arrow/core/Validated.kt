@@ -101,9 +101,6 @@ typealias Invalid<E> = Validated.Invalid<E>
  * It would look like the following, which Arrow provides in `arrow.Validated`:
  *
  * ```kotlin
- * import arrow.higherkind
- * import arrow.core.ValidatedOf
- *
  * @higherkind sealed class Validated<out E, out A> : ValidatedOf<E, A> {
  *  data class Valid<out A>(val a: A) : Validated<Nothing, A>()
  *  data class Invalid<out E>(val e: E) : Validated<E, Nothing>()
