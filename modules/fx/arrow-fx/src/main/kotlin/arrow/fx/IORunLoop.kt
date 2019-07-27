@@ -247,7 +247,7 @@ internal object IORunLoop {
           bFirst = { c: Any? -> IO.just(c) }
 
           currentIO = IO.Bind(localCont) { a ->
-            IO.Effect(currentCC) { a }
+            IO.Effect(currentCC, IO.rethrow) { a }
           }
         }
         is IO.Map<*, *, *> -> {
