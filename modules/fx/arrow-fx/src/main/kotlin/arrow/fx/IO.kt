@@ -444,18 +444,18 @@ fun <E, A> IOOf<E, A>.runAsyncCancellable(onCancel: OnCancel = Silent, cb: (Eith
           { either -> either.fold({ if (!conn.isCanceled() || it != CancellationException) cb(either) }, { cb(either) }) }
       }
     ccb(conn.toDisposable().right())
-    IORunLoop.startCancelable(this, conn, onCancelCb)
+    IORunLoop.startCancelable(fix(), conn, onCancelCb)
   }
 
-fun <E, A, B> IOOf<E, A>.bracket(release: (A) -> IOOf<E, Unit>, use: (A) -> IOOf<E, B>): IO<Throwable, B> =
+fun <E, A, B> IOOf<E, A>.bracket(release: (A) -> IOOf<E, Unit>, use: (A) -> IOOf<E, B>): IO<E, B> =
   bracketCase({ a, _ -> release(a) }, use)
 
-fun <E, A, B> IOOf<E, A>.bracketCase(release: (A, ExitCase<Throwable>) -> IOOf<E, Unit>, use: (A) -> IOOf<E, B>): IO<Throwable, B> =
+fun <E, A, B> IOOf<E, A>.bracketCase(release: (A, ExitCase<E>) -> IOOf<E, Unit>, use: (A) -> IOOf<E, B>): IO<E, B> =
   IOBracket(this, release, use)
 
 fun <E, A> IOOf<E, A>.guarantee(finalizer: IOOf<E, Unit>): IO<E, A> = guaranteeCase { finalizer }
 
 fun <E, A> IOOf<E, A>.guaranteeCase(finalizer: (ExitCase<E>) -> IOOf<E, Unit>): IO<E, A> =
-  IOBracket.guaranteeCase(this, finalizer)
+  IOBracket.guaranteeCase(fix(), finalizer)
 
 fun <A> A.liftIO(): IO<Nothing, A> = IO.just(this)
