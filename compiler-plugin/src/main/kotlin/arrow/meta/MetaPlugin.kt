@@ -7,6 +7,6 @@ import arrow.meta.typeclasses.typeClasses
 
 class MetaPlugin : MetaComponentRegistrar {
   override fun intercept(): List<ExtensionPhase> =
-    higherKindedTypes //+
-   //   typeClasses
+    higherKindedTypes +
+      typeClasses
 }

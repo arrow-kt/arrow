@@ -254,7 +254,7 @@ sealed class ExtensionResolution {
   private fun findPackageDescriptor(lookingFor: ValueParameterDescriptor): DeclarationDescriptor? {
     var descriptor: DeclarationDescriptor? = lookingFor.containingDeclaration
     while (descriptor != null && descriptor !is PackageFragmentDescriptor) {
-      descriptor = descriptor!!.containingDeclaration
+      descriptor = descriptor.containingDeclaration
     }
     return descriptor
   }
@@ -265,7 +265,7 @@ sealed class ExtensionResolution {
     substitutions: List<TypeSubstitution>,
     lookInSupertypes: Boolean
   ): ExtensionCompatibilityResult {
-    val declarations = scope.getContributedDescriptors(DescriptorKindFilter.ALL) { name -> true }
+    val declarations = scope.getContributedDescriptors(DescriptorKindFilter.ALL) { true }
     val candidates = java.util.ArrayList<ClassDescriptor>()
     val newSubstitutions = java.util.ArrayList(substitutions)
 
@@ -296,11 +296,11 @@ sealed class ExtensionResolution {
     val supertypes = candidate.constructor.supertypes
     val newSubstitutions = java.util.ArrayList(substitutions)
     for (supertype in supertypes) {
-      val result = isReplaceable(supertype, type, newSubstitutions, lookInSupertypes)
-      if (!result.canBeReplaced) {
+      val substitutionResult = isReplaceable(supertype, type, newSubstitutions, lookInSupertypes)
+      if (!substitutionResult.canBeReplaced) {
         return SubstitutionResult(false, substitutions)
       } else {
-        newSubstitutions.addAll(result.substitutions)
+        newSubstitutions.addAll(substitutionResult.substitutions)
       }
     }
     return SubstitutionResult(true, newSubstitutions)
