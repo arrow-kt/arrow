@@ -108,9 +108,9 @@ interface FreeFoldable<F> : Foldable<FreePartialOf<F>> {
 @extension
 @undocumented
 interface FreeTraverse<F> : Traverse<FreePartialOf<F>> {
-  val FF: Functor<F>
+  fun FF(): Functor<F>
   override fun <G, A, B> Kind<FreePartialOf<F>, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Kind<FreePartialOf<F>, B>> =
-    when (val x: Either<Kind<F, Free<F, A>>, A> = fix().resume(FF)) {
+    when (val x: Either<Kind<F, Free<F, A>>, A> = fix().resume(FF())) {
       is Either.Right -> AP.run { f(x.b).map { Free.Pure<F, B>(it) } }
       is Either.Left -> Free.roll(x.a).traverse(AP) { f(it) }
     }
@@ -131,10 +131,4 @@ interface FreeTraverse<F> : Traverse<FreePartialOf<F>> {
 
   override fun <A, B> Kind<FreePartialOf<F>, A>.map(f: (A) -> B): Kind<FreePartialOf<F>, B> =
     fix().freeMap(f)
-
-  companion object {
-    operator fun <F> invoke(FF: Functor<F>) = object : FreeTraverse<F> {
-      override val FF: Functor<F> = FF
-    }
-  }
 }
