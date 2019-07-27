@@ -85,6 +85,10 @@ data class OptionT<F, A>(private val value: Kind<F, Option<A>>) : OptionTOf<F, A
     OptionT(value.map { it.map(f) })
   }
 
+  fun <B> filterMap(FF: Functor<F>, f: (A) -> OptionOf<B>): OptionT<F, B> = FF.run {
+    OptionT(value.map { it.flatMap(f) })
+  }
+
   fun getOrElse(FF: Functor<F>, default: () -> A): Kind<F, A> = FF.run { value.map { it.getOrElse(default) } }
 
   fun getOrElseF(MF: Monad<F>, default: () -> Kind<F, A>): Kind<F, A> = MF.run {
@@ -129,8 +133,4 @@ data class OptionT<F, A>(private val value: Kind<F, Option<A>>) : OptionTOf<F, A
 
   fun <L> toRight(FF: Functor<F>, default: () -> L): EitherT<F, L, A> =
     EitherT(cata(FF, { Left(default()) }, { Right(it) }))
-}
-
-fun <F, A, B> OptionTOf<F, A>.filterMap(FF: Functor<F>, f: (A) -> OptionOf<B>): OptionT<F, B> = FF.run {
-  OptionT(value().map { it.flatMap(f) })
 }

@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicReference
 @ObsoleteCoroutinesApi
 @Suppress("RedundantSuspendModifier")
 @RunWith(KotlinTestRunner::class)
-class EffectsSuspendDSLTests() : UnitSpec() {
+class EffectsSuspendDSLTests : UnitSpec() {
 
   private val ctxA = newSingleThreadContext("A")
   private val ctxB = newSingleThreadContext("B")
