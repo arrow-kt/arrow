@@ -24,6 +24,8 @@ sealed class Free<S, out A> : FreeOf<S, A> {
 
     fun <S, A> defer(value: () -> Free<S, A>): Free<S, A> = just<S, Unit>(Unit).flatMap { _ -> value() }
 
+    fun <S, A> roll(value: Kind<S, Free<S, A>>): Free<S, A> = liftF(value).flatMap(::identity)
+
     internal fun <F> functionKF(): FunctionK<F, FreePartialOf<F>> =
       object : FunctionK<F, FreePartialOf<F>> {
         override fun <A> invoke(fa: Kind<F, A>): Free<F, A> =
@@ -63,7 +65,8 @@ sealed class Free<S, out A> : FreeOf<S, A> {
   inline fun <B, C> foldStep(
     onPure: (A) -> B,
     onSuspend: (Kind<S, A>) -> B,
-    onFlatMapped: (Kind<S, C>, (C) -> Free<S, A>) -> B): B {
+    onFlatMapped: (Kind<S, C>, (C) -> Free<S, A>) -> B
+  ): B {
     return when (val x = this.step()) {
       is Pure<S, A> -> onPure(x.a)
       is Suspend<S, A> -> onSuspend(x.a)
@@ -128,7 +131,5 @@ fun <M, S, A> Free<S, A>.foldMap(f: FunctionK<S, M>, MM: Monad<M>): Kind<M, A> =
   }
 
 fun <S, A> A.free(): Free<S, A> = Free.just<S, A>(this)
-
-fun <S, A> roll(value: Kind<S, Free<S, A>>): Free<S, A> = Free.liftF(value).flatMap(::identity)
 
 fun <F, A> FreeOf<F, A>.runK(M: Monad<F>): Kind<F, A> = this.fix().foldMap(FunctionK.id(), M)

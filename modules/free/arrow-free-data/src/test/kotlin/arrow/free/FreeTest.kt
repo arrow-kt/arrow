@@ -12,12 +12,16 @@ import arrow.core.value
 import arrow.free.extensions.FreeEq
 import arrow.free.extensions.FreeMonad
 import arrow.free.extensions.free.eq.eq
+import arrow.free.extensions.free.foldable.foldable
+import arrow.free.extensions.free.functor.functor
 import arrow.free.extensions.free.monad.monad
+import arrow.free.extensions.free.traverse.traverse
 import arrow.higherkind
 import arrow.test.UnitSpec
 import arrow.test.laws.EqLaws
 import arrow.test.laws.FoldableLaws
 import arrow.test.laws.MonadLaws
+import arrow.test.laws.TraverseLaws
 import arrow.typeclasses.Eq
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
@@ -61,8 +65,9 @@ class FreeTest : UnitSpec() {
     testLaws(
       EqLaws.laws(EQ) { Ops.value(it) },
       MonadLaws.laws(Ops, EQ),
-      MonadLaws.laws(Free.monad(), EQ)
-       //FoldableLaws.laws(Free.foldable(), { Free.just<S,Int>(it) }, Eq.any())
+      MonadLaws.laws(Free.monad(), EQ),
+      FoldableLaws.laws(Free.foldable(), { Ops.value(it) }, Eq.any()),
+      TraverseLaws.laws(Free.traverse(), Free.functor(),  { Ops.value(it) }, EQ)
     )
 
     "Can interpret an ADT as Free operations to Option" {
@@ -70,7 +75,7 @@ class FreeTest : UnitSpec() {
     }
 
     "Can interpret an ADT as Free operations to Id" {
-      program.foldMap(idInterpreter, Id.monad()) shouldBe Id(-30)
+      program.foldMap(idInterpreter, IdMonad) shouldBe Id(-30)
     }
 
     "Can interpret an ADT as Free operations to NonEmptyList" {
