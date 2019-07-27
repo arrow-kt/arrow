@@ -47,7 +47,7 @@ internal object IORunLoop {
           val errorHandler: IOFrame<Any?, Any?, IO<Any?, Any?>>? = findErrorHandlerInCallStack(bFirst, bRest)
           when (errorHandler) {
             // Return case for unhandled errors
-            null -> return currentIO
+            null -> return currentIO as IO<E, A> // FIXME check this
             else -> {
               val exception: Any? = currentIO.exception
               currentIO = executeSafe(errorHandler) { errorHandler.recover(exception) }
@@ -126,7 +126,7 @@ internal object IORunLoop {
         if (nextBind == null) {
           return sanitizedCurrentIO(currentIO, result)
         } else {
-          currentIO = executeSafe { nextBind(result) }
+          currentIO = executeSafe(IO.rethrow /* FIXME errors in "safe" blocks except */) { nextBind(result) }
           hasResult = false
           result = null
           bFirst = null
@@ -288,7 +288,7 @@ internal object IORunLoop {
           cb(Right(result))
           return
         } else {
-          currentIO = executeSafe { nextBind(result) }
+          currentIO = executeSafe(IO.rethrow /* FIXME errors in "safe" blocks except */) { nextBind(result) }
           hasResult = false
           result = null
           bFirst = null
@@ -324,8 +324,8 @@ internal object IORunLoop {
     }
 
   private fun findErrorHandlerInCallStack(bFirst: BindF?, bRest: CallStack?): IOFrame<Any?, Any?, IO<Any?, Any?>>? {
-    if (bFirst != null && bFirst is IOFrame) {
-      return bFirst
+    if (bFirst != null && bFirst is IOFrame<*, *, *>) {
+      return bFirst as IOFrame<Any?, Any?, IO<Any?, Any?>>? // FIXME check this
     } else if (bRest == null) {
       return null
     }
@@ -335,8 +335,8 @@ internal object IORunLoop {
 
     @Suppress("LoopWithTooManyJumpStatements")
     do {
-      if (cursor != null && cursor is IOFrame) {
-        result = cursor
+      if (cursor != null && cursor is IOFrame<*, *, *>) {
+        result = cursor as IOFrame<Any?, Any?, IO<Any?, Any?>>? // FIXME check this
         break
       } else {
         cursor = if (bRest.isNotEmpty()) {
@@ -428,7 +428,7 @@ internal object IORunLoop {
         canCall = false
         result.fold(
           { a -> IO.just(a) },
-          { e -> IO.RaiseError(e) }
+          { e -> IO.RaiseError(e) /* FIXME Throwable -> E */ }
         ).let { r ->
           if (shouldTrampoline) {
             this.value = r
