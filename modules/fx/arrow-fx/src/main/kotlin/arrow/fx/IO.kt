@@ -165,14 +165,14 @@ sealed class IO<out E, out A> : IOOf<E, A> {
         val conn2 = IOConnection()
         conn.push(conn2.cancel())
         onceOnly(conn, ff).let { callback: (Either<E, A>) -> Unit ->
-          val fa = try {
+          val fa: IOOf<E, Unit> = try {
             k(callback)
           } catch (t: Throwable) {
-            IO { callback(Left(fe(t.nonFatalOrThrow()))) }
+            IO(fe) { callback(Left(fe(t.nonFatalOrThrow()))) }
           }
 
           IORunLoop.startCancelable(fa, conn2) { result ->
-            result.fold({ e -> callback(Left(fe(e))) }, mapUnit)
+            result.fold({ e -> callback(Left(e)) }, mapUnit)
           }
         }
       }
@@ -249,7 +249,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
    * @return [IO] with suspended execution of source [IO] on context [ctx].
    */
   fun startFiber(ctx: CoroutineContext): IO<Throwable, Fiber<IOPartialOf<Throwable>, A>> = async { cb ->
-    val promise = UnsafePromise<A>()
+    val promise = UnsafePromise<Throwable, A>()
     // A new IOConnection, because its cancellation is now decoupled from our current one.
     val conn = IOConnection()
     IORunLoop.startCancelable(IOForkedStart(this, ctx), conn, promise::complete)
