@@ -27,3 +27,7 @@ To make this explicit, these functions can return Unit. However, IDEA will show 
 You can disable this warning in Preferences > Editor > Inspections. Then search for the option Kotlin > Redundant constructs > Redundant Unit return type.
 
 ![gif](/img/linting/linting_unit_return_type.gif)
+
+If you are using [ktlint](https://ktlint.github.io/) as the linter of choice for your project, this scenario will reported as an error, making builds fail. 
+
+You can disable this errors. For that you must upgrade ktlint version to `0.34.0` or later and add `disabled_rules=no-unit-return` to the `.editorconfig` file. You can read more about this topic [here](https://github.com/pinterest/ktlint#editorconfig).
