@@ -397,9 +397,6 @@ fun <E, A> IOOf<E, A>.handleErrorWith(f: (E) -> IOOf<E, A>): IO<E, A> =
 fun <E, A> IOOf<E, A>.handleError(f: (E) -> A): IO<E, A> =
   handleErrorWith { e -> IO.Pure(f(e)) }
 
-fun <B, E : B, A> IOOf<E, A>.widenError(): IO<B, A> =
-  fix()
-
 /**
  * Redeem an [IO] to an [IO] of [B] by resolving the error **or** mapping the value [A] to [B] **with** an effect.
  *
@@ -436,7 +433,7 @@ fun <E, A, B> IOOf<E, A>.flatMap(f: (A) -> IOOf<E, B>): IO<E, B> =
 fun <E, A, B> IOOf<E, A>.ap(ff: IOOf<E, (A) -> B>): IO<E, B> =
   flatMap { a -> ff.fix().map { it(a) } }
 
-fun <E, A> IOOf<E, A>.runAsyncCancellable(onCancel: OnCancel = Silent, cb: (Either<E, A>) -> IOOf<E, Unit>): IO<Throwable, Disposable> =
+fun <E, A> IOOf<E, A>.runAsyncCancellable(onCancel: OnCancel = Silent, cb: (Either<E, A>) -> IOOf<E, Unit>): IO<E, Disposable> =
   IO.async(IO.rethrow) { ccb ->
     val conn = IOConnection()
     val onCancelCb =
