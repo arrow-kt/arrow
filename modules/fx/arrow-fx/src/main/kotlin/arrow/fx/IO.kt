@@ -282,7 +282,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
   fun unsafeRunAsync(cb: (Either<E, A>) -> Unit): Unit =
     IORunLoop.start(this, cb)
 
-  fun unsafeRunAsyncCancellable(onCancel: OnCancel = Silent, cb: (Either<Throwable, A>) -> Unit): Disposable =
+  fun unsafeRunAsyncCancellable(onCancel: OnCancel = Silent, cb: (Either<E, A>) -> Unit): Disposable =
     runAsyncCancellable(onCancel, cb andThen { it.liftIO() }).unsafeRunSync()
 
   fun unsafeRunSync(): A =
@@ -294,7 +294,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
   internal abstract fun unsafeRunTimedTotal(limit: Duration): Option<A>
 
   /** Makes the source [IO] uncancelable such that a [Fiber.cancel] signal has no effect. */
-  fun uncancelable(): IO<Throwable, A> =
+  fun uncancelable(): IO<E, A> =
     ContextSwitch(this, ContextSwitch.makeUncancelable, ContextSwitch.disableUncancelable)
 
   internal data class Pure<E, out A>(val a: A) : IO<E, A>() {
