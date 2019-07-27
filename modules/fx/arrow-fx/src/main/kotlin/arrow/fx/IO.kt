@@ -457,4 +457,7 @@ fun <E, A> IOOf<E, A>.guarantee(finalizer: IOOf<E, Unit>): IO<E, A> = guaranteeC
 fun <E, A> IOOf<E, A>.guaranteeCase(finalizer: (ExitCase<E>) -> IOOf<E, Unit>): IO<E, A> =
   IOBracket.guaranteeCase(fix(), finalizer)
 
+fun <B, E : B, A> IOOf<E, A>.widenError(): IO<B, A> =
+  fix()
+
 fun <A> A.liftIO(): IO<Nothing, A> = IO.just(this)
