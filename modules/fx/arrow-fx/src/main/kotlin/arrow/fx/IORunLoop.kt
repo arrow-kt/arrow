@@ -2,7 +2,6 @@ package arrow.fx
 
 import arrow.core.Either
 import arrow.core.Left
-import arrow.core.NonFatal
 import arrow.core.Right
 import arrow.core.nonFatalOrThrow
 import arrow.fx.internal.ArrowInternalException
@@ -202,11 +201,7 @@ internal object IORunLoop {
             hasResult = true
             currentIO = null
           } catch (t: Throwable) {
-            if (NonFatal(t)) {
-              currentIO = IO.RaiseError(currentIO.handler(t))
-            } else {
-              throw t
-            }
+            currentIO = IO.RaiseError(currentIO.handler(t.nonFatalOrThrow()))
           }
         }
         is IO.Async -> {
@@ -301,15 +296,11 @@ internal object IORunLoop {
     } while (true)
   }
 
-  private inline fun executeSafe(crossinline f: () -> IOOf<Throwable, Any?>): IO<Throwable, Any?> =
+  private inline fun executeSafe(crossinline fe: (Throwable) -> Any?, crossinline f: () -> IOOf<Any?, Any?>): IO<Any?, Any?> =
     try {
       f().fix()
     } catch (e: Throwable) {
-      if (NonFatal(e)) {
-        IO.RaiseError(e)
-      } else {
-        throw e
-      }
+      IO.RaiseError(fe(e.nonFatalOrThrow()))
     }
 
   /**
