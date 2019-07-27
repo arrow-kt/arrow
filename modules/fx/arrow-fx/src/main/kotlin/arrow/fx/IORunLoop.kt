@@ -44,7 +44,7 @@ internal object IORunLoop {
           hasResult = true
         }
         is IO.RaiseError -> {
-          val errorHandler: IOFrame<Any?, IO<Throwable, Any?>>? = findErrorHandlerInCallStack(bFirst, bRest)
+          val errorHandler: IOFrame<Throwable, Any?, IO<Throwable, Any?>>? = findErrorHandlerInCallStack(bFirst, bRest)
           when (errorHandler) {
             // Return case for unhandled errors
             null -> return currentIO
@@ -75,7 +75,7 @@ internal object IORunLoop {
         is IO.Effect -> {
           return suspendAsync(currentIO, bFirst, bRest) as IO<Throwable, A>
         }
-        is IO.Bind<*, *> -> {
+        is IO.Bind<*, *, *> -> {
           if (bFirst != null) {
             if (bRest == null) {
               bRest = ArrayStack()
@@ -90,10 +90,10 @@ internal object IORunLoop {
           val localCont = currentIO.cont
 
           currentIO = IO.Bind(localCont) { a ->
-            IO.Effect(currentCC) { a }
+            IO.Effect(currentCC, IO.rethrow) { a }
           }
         }
-        is IO.Map<*, *> -> {
+        is IO.Map<*, *, *> -> {
           if (bFirst != null) {
             if (bRest == null) {
               bRest = ArrayStack()
@@ -178,7 +178,7 @@ internal object IORunLoop {
           hasResult = true
         }
         is IO.RaiseError -> {
-          val errorHandler: IOFrame<Any?, IO<Throwable, Any?>>? = findErrorHandlerInCallStack(bFirst, bRest)
+          val errorHandler: IOFrame<Throwable, Any?, IO<Throwable, Any?>>? = findErrorHandlerInCallStack(bFirst, bRest)
           when (errorHandler) {
             // Return case for unhandled errors
             null -> {
@@ -227,7 +227,7 @@ internal object IORunLoop {
           rcb.start(currentIO, ctx, bFirst, bRest)
           return
         }
-        is IO.Bind<*, *> -> {
+        is IO.Bind<*, *, *> -> {
           if (bFirst != null) {
             if (bRest == null) bRest = ArrayStack()
             bRest.push(bFirst)
@@ -235,7 +235,7 @@ internal object IORunLoop {
           bFirst = currentIO.g as BindF
           currentIO = currentIO.cont
         }
-        is IO.ContinueOn<*> -> {
+        is IO.ContinueOn -> {
           if (bFirst != null) {
             if (bRest == null) bRest = ArrayStack()
             bRest.push(bFirst)
@@ -250,7 +250,7 @@ internal object IORunLoop {
             IO.Effect(currentCC) { a }
           }
         }
-        is IO.Map<*, *> -> {
+        is IO.Map<*, *, *> -> {
           if (bFirst != null) {
             if (bRest == null) {
               bRest = ArrayStack()
@@ -331,19 +331,19 @@ internal object IORunLoop {
       null
     }
 
-  private fun findErrorHandlerInCallStack(bFirst: BindF?, bRest: CallStack?): IOFrame<Any?, IO<Throwable, Any?>>? {
-    if (bFirst != null && bFirst is IOFrame) {
+  private fun findErrorHandlerInCallStack(bFirst: BindF?, bRest: CallStack?): IOFrame<Throwable, Any?, IO<Throwable, Any?>>? {
+    if (bFirst != null && bFirst is IOFrame<*, *, *>) {
       return bFirst
     } else if (bRest == null) {
       return null
     }
 
-    var result: IOFrame<Any?, IO<Throwable, Any?>>? = null
+    var result: IOFrame<Throwable, Any?, IO<Throwable, Any?>>? = null
     var cursor: BindF? = bFirst
 
     @Suppress("LoopWithTooManyJumpStatements")
     do {
-      if (cursor != null && cursor is IOFrame) {
+      if (cursor != null && cursor is IOFrame<*, *, *>) {
         result = cursor
         break
       } else {
@@ -391,13 +391,13 @@ internal object IORunLoop {
       contIndex++
     }
 
-    fun start(async: IO.Async<Any?>, ctx: CoroutineContext, bFirst: BindF?, bRest: CallStack?) {
+    fun start(async: IO.Async<Throwable, Any?>, ctx: CoroutineContext, bFirst: BindF?, bRest: CallStack?) {
       prepare(ctx, bFirst, bRest)
       trampolineAfter = async.shouldTrampoline
       async.k(conn, this)
     }
 
-    fun start(effect: IO.Effect<Any?>, ctx: CoroutineContext, bFirst: BindF?, bRest: CallStack?) {
+    fun start(effect: IO.Effect<Throwable, Any?>, ctx: CoroutineContext, bFirst: BindF?, bRest: CallStack?) {
       prepare(effect.ctx ?: ctx, bFirst, bRest)
       effect.effect.startCoroutine(this)
     }
@@ -435,7 +435,7 @@ internal object IORunLoop {
       if (canCall) {
         canCall = false
         result.fold(
-          { a -> IO.Pure(a) },
+          { a -> IO.just(a) },
           { e -> IO.RaiseError(e) }
         ).let { r ->
           if (shouldTrampoline) {
@@ -459,7 +459,7 @@ internal object IORunLoop {
   private class RestoreContext(
     val old: IOConnection,
     val restore: (Any?, Throwable?, IOConnection, IOConnection) -> IOConnection
-  ) : IOFrame<Any?, IO<Throwable, Any?>> {
+  ) : IOFrame<Throwable, Any?, IO<Throwable, Any?>> {
 
     override fun invoke(a: Any?): IO<Throwable, Any?> = IO.ContextSwitch(IO.Pure(a), { current -> restore(a, null, old, current) }, null)
 
