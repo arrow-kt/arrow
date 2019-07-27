@@ -53,7 +53,7 @@ Implementations of [`Monad`]({{ '/docs/arrow/typeclasses/monad' | relative_url }
 Let's see one example using a [`Monad`]({{ '/docs/arrow/typeclasses/monad' | relative_url }}) called [`IO`]({{ '/docs/effects/io' | relative_url }}), where we fetch from a database the information about the dean of university some student attends:
 
 ```kotlin
-val university: IO<University> = 
+val university: IO<Throwable, University> =
   getStudentFromDatabase("Bob Roxx").flatMap { student ->
       getUniversityFromDatabase(student.universityId).flatMap { university ->
         getDeanFromDatabase(university.deanId)
@@ -100,7 +100,7 @@ IO.fx {
   val a = IO.invoke { 1 }
   a + 1
 }.fix().unsafeRunSync()
-// Compiler error: the type of a is IO<Int>, cannot add 1 to it
+// Compiler error: the type of a is IO<Throwable, Int>, cannot add 1 to it
 ```
 
 This is our first challenge. We've created an instance of [`IO`]({{ '/docs/effects/io' | relative_url }}) that'll run a block asynchronously, and we cannot get the value from inside it.
@@ -136,7 +136,7 @@ IO.invoke { 1 }
 With this new style we can rewrite our original example of database fetching as:
 
 ```kotlin
-val university: IO<University> = 
+val university: IO<Throwable, University> =
   IO.fx {
     val (student) = getStudentFromDatabase("Bob Roxx")
     val (university) = getUniversityFromDatabase(student.universityId)
@@ -148,7 +148,7 @@ val university: IO<University> =
 And you can still write your usual imperative code in the binding block, interleaved with code that returns instances of [`IO`]({{ '/docs/effects/io' | relative_url }}).
 
 ```kotlin
-fun getNLines(path: FilePath, count: Int): IO<List<String>> = 
+fun getNLines(path: FilePath, count: Int): IO<Throwable, List<String>> =
   IO.fx {
     val (file) = getFile(path)
     val (lines) = file.readLines()
@@ -170,7 +170,7 @@ Exceptions work like old goto that can happen at any point during execution and 
 Let's take a somewhat common mistake and expand on it:
 
 ```kotlin
-fun getLineLengthAverage(path: FilePath): IO<List<String>> = 
+fun getLineLengthAverage(path: FilePath): IO<Throwable, List<String>> =
   IO.fx {
     val (file) = getFile(path)
     val (lines) = file.readLines()
@@ -188,7 +188,7 @@ For this purpose, the typeclass [`MonadError`]({{ '/docs/arrow/typeclasses/monad
 [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}) allows us to raise and recover from errors.
 
 ```kotlin
-fun getLineLengthAverage(path: FilePath): IO<List<String>> = 
+fun getLineLengthAverage(path: FilePath): IO<Throwable, List<String>> =
   IO.fx {
     val (file) = getFile(path)
     val (lines) = file.readLines()

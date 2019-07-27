@@ -43,7 +43,7 @@ As it captures exceptions, `invoke()` is the simplest way of wrapping existing s
 fun <F> getSongUrlAsync(SC: MonadDefer<F>) =
   SC { getSongUrl() }
 
-val songIO: IOOf<Url> = getSongUrlAsync(IO.monadDefer())
+val songIO: IOOf<Throwable, Url> = getSongUrlAsync(IO.monadDefer())
 val songDeferred: DeferredKOf<Url> = getSongUrlAsync(DeferredK.monadDefer())
 ```
 
