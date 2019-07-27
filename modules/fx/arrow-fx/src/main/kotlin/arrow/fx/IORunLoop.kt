@@ -127,7 +127,7 @@ internal object IORunLoop {
         if (nextBind == null) {
           return sanitizedCurrentIO(currentIO, result)
         } else {
-          currentIO = executeSafe(IO.rethrow /* FIXME errors in "safe" blocks except */) { nextBind(result) }
+          currentIO = executeSafe(IO.rethrow /* erroring in operators just rethrows */) { nextBind(result) }
           hasResult = false
           result = null
           bFirst = null
@@ -289,7 +289,7 @@ internal object IORunLoop {
           cb(Right(result))
           return
         } else {
-          currentIO = executeSafe(IO.rethrow /* FIXME errors in "safe" blocks except */) { nextBind(result) }
+          currentIO = executeSafe(IO.rethrow /* erroring in operators just rethrows */) { nextBind(result) }
           hasResult = false
           result = null
           bFirst = null
