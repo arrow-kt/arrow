@@ -112,7 +112,7 @@ sealed class IO<out E, out A> : IOOf<E, A> {
       }
 
     // Specialization
-    fun <E, A> async(k: IOProc<Throwable, A>): IO<Throwable, A> =
+    fun <A> async(k: IOProc<Throwable, A>): IO<Throwable, A> =
       async(::identity, k)
 
     fun <E, A> cancelable(fe: (Throwable) -> E, cb: ((Either<E, A>) -> Unit) -> CancelToken<IOPartialOf<E>>): IO<E, A> =

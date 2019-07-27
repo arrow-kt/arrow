@@ -13,7 +13,7 @@ typealias IOConnection = KindConnection<IOPartialOf<Throwable>>
 @Suppress("UNUSED_PARAMETER", "FunctionName")
 fun IOConnection(dummy: Unit = Unit): IOConnection = KindConnection(MD) { it.fix().unsafeRunAsync { } }
 
-private val _uncancelable = KindConnection.uncancelable(MD)
+private val _uncancelable: KindConnection<IOPartialOf<Throwable>> = KindConnection.uncancelable(MD)
 internal inline val KindConnection.Companion.uncancelable: IOConnection
   inline get() = _uncancelable
 

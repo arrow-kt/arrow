@@ -50,7 +50,7 @@ interface IORaceTriple {
    *
    * @see [arrow.fx.typeclasses.Concurrent.raceN] for a simpler version that cancels losers.
    */
-  fun <A, B, C> raceTriple(ctx: CoroutineContext, ioA: IOOf<Throwable, A>, ioB: IOOf<Throwable, B>, ioC: IOOf<Throwable, C>): IO<Throwable, RaceTriple<ForIO, A, B, C>> =
+  fun <E, A, B, C> raceTriple(ctx: CoroutineContext, ioA: IOOf<E, A>, ioB: IOOf<E, B>, ioC: IOOf<E, C>): IO<E, RaceTriple<IOPartialOf<E>, A, B, C>> =
     IO.Async { conn, cb ->
       val active = AtomicBoolean(true)
 
@@ -70,7 +70,7 @@ interface IORaceTriple {
 
       conn.push(connA.cancel(), connB.cancel(), connC.cancel())
 
-      IORunLoop.startCancelable(IOForkedStart(ioA, ctx), connA) { either: Either<Throwable, A> ->
+      IORunLoop.startCancelable(IOForkedStart(ioA, ctx), connA) { either: Either<E, A> ->
         either.fold({ error ->
           if (active.getAndSet(false)) { // if an error finishes first, stop the race.
             connB.cancel().fix().unsafeRunAsync { r2 ->
@@ -97,7 +97,7 @@ interface IORaceTriple {
         })
       }
 
-      IORunLoop.startCancelable(IOForkedStart(ioB, ctx), connB) { either: Either<Throwable, B> ->
+      IORunLoop.startCancelable(IOForkedStart(ioB, ctx), connB) { either: Either<E, B> ->
         either.fold({ error ->
           if (active.getAndSet(false)) { // if an error finishes first, stop the race.
             connA.cancel().fix().unsafeRunAsync { r2 ->
@@ -124,7 +124,7 @@ interface IORaceTriple {
         })
       }
 
-      IORunLoop.startCancelable(IOForkedStart(ioC, ctx), connC) { either: Either<Throwable, C> ->
+      IORunLoop.startCancelable(IOForkedStart(ioC, ctx), connC) { either: Either<E, C> ->
         either.fold({ error ->
           if (active.getAndSet(false)) { // if an error finishes first, stop the race.
             connA.cancel().fix().unsafeRunAsync { r2 ->
