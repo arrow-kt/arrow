@@ -11,6 +11,9 @@ import arrow.core.andThen
 import arrow.core.identity
 import arrow.core.nonFatalOrThrow
 import arrow.core.right
+import arrow.fx.IO.Bind
+import arrow.fx.IO.Suspend
+import arrow.fx.IOFrame.Companion.RedeemWith
 import arrow.fx.OnCancel.Companion.CancellationException
 import arrow.fx.OnCancel.Silent
 import arrow.fx.OnCancel.ThrowCancellationException
@@ -47,13 +50,13 @@ typealias IOProc<E, A> = ((Either<E, A>) -> Unit) -> Unit
 typealias IOProcF<E, A> = ((Either<E, A>) -> Unit) -> IOOf<E, Unit>
 
 @Suppress("StringLiteralDuplication")
-sealed class IO<E, out A> : IOOf<E, A> {
+sealed class IO<out E, out A> : IOOf<E, A> {
 
   companion object : IOParMap2, IOParMap3, IORacePair, IORaceTriple {
 
-    fun <E, A> just(a: A): IO<E, A> = Pure(a)
+    fun <A> just(a: A): IO<Nothing, A> = Pure(a)
 
-    fun <E, A> raiseError(e: E): IO<E, A> = RaiseError(e)
+    fun <E> raiseError(e: E): IO<E, Nothing> = RaiseError(e)
 
     fun <E, A> effect(fe: (Throwable) -> E, f: suspend () -> A): IO<E, A> =
       Effect(null, fe, effect = f)
@@ -179,19 +182,19 @@ sealed class IO<E, out A> : IOOf<E, A> {
         }
       }
 
-    private val unsafe: (Throwable) -> Nothing =
+    val rethrow: (Throwable) -> Nothing =
       { t -> throw t }
 
     val unit: IO<Nothing, Unit> =
       just(Unit)
 
     val lazy: IO<Nothing, Unit> =
-      invoke(unsafe) { }
+      invoke(rethrow) { }
 
     fun <A> eval(eval: Eval<A>): IO<Nothing, A> =
       when (eval) {
         is Eval.Now -> just(eval.value)
-        else -> invoke(unsafe) { eval.value() }
+        else -> invoke(rethrow) { eval.value() }
       }
 
     fun <E, A, B> tailRecM(a: A, f: (A) -> IOOf<E, Either<A, B>>): IO<E, B> =
@@ -203,7 +206,7 @@ sealed class IO<E, out A> : IOOf<E, A> {
       }
 
     val never: IO<Nothing, Nothing> =
-      async(unsafe) { }
+      async(rethrow) { }
   }
 
   suspend fun suspended(): A = suspendCoroutine { cont ->
@@ -218,14 +221,8 @@ sealed class IO<E, out A> : IOOf<E, A> {
   open fun <B> mapError(f: (E) -> B): IO<B, A> =
     MapError(this, f, 0)
 
-  open fun <B> flatMap(f: (A) -> IOOf<E, B>): IO<E, B> =
-    Bind(this) { f(it).fix() }
-
   open fun continueOn(ctx: CoroutineContext): IO<E, A> =
     ContinueOn(this, ctx)
-
-  fun <B> ap(ff: IOOf<E, (A) -> B>): IO<E, B> =
-    flatMap { a -> ff.fix().map { it(a) } }
 
   /**
    * Create a new [IO] that upon execution starts the receiver [IO] within a [Fiber] on [ctx].
@@ -260,8 +257,6 @@ sealed class IO<E, out A> : IOOf<E, A> {
     cb(Either.Right(IOFiber(promise, conn)))
   }
 
-  fun <B> followedBy(fb: IOOf<E, B>) = flatMap { fb }
-
   fun attempt(): IO<E, Either<E, A>> =
     Bind(this, IOFrame.attempt())
 
@@ -284,44 +279,8 @@ sealed class IO<E, out A> : IOOf<E, A> {
   fun <B> redeem(fe: (E) -> B, fb: (A) -> B): IO<E, B> =
     Bind(this, IOFrame.Companion.Redeem(fe, fb))
 
-  /**
-   * Redeem an [IO] to an [IO] of [B] by resolving the error **or** mapping the value [A] to [B] **with** an effect.
-   *
-   * ```kotlin:ank:playground
-   * import arrow.fx.IO
-   *
-   * fun main(args: Array<String>) {
-   *   val result =
-   *   //sampleStart
-   *   IO.just("1")
-   *     .redeemWith({ e -> IO.just(-1) }, { str -> IO { str.toInt() } })
-   *   //sampleEnd
-   *   println(result.unsafeRunSync())
-   * }
-   * ```
-   */
-  fun <B> redeemWith(fe: (E) -> IOOf<E, B>, fb: (A) -> IOOf<E, B>): IO<E, B> =
-    Bind(this, IOFrame.Companion.RedeemWith(fe, fb))
-
-  fun runAsync(cb: (Either<Throwable, A>) -> IOOf<E, Unit>): IO<Throwable, Unit> =
-    IO { unsafeRunAsync(cb.andThen { it.fix().unsafeRunAsync { } }) }
-
-  fun unsafeRunAsync(cb: (Either<Throwable, A>) -> Unit): Unit =
+  fun unsafeRunAsync(cb: (Either<E, A>) -> Unit): Unit =
     IORunLoop.start(this, cb)
-
-  fun runAsyncCancellable(onCancel: OnCancel = Silent, cb: (Either<Throwable, A>) -> IOOf<E, Unit>): IO<Throwable, Disposable> =
-    async { ccb ->
-      val conn = IOConnection()
-      val onCancelCb =
-        when (onCancel) {
-          ThrowCancellationException ->
-            cb andThen { it.fix().unsafeRunAsync { } }
-          Silent ->
-            { either -> either.fold({ if (!conn.isCanceled() || it != CancellationException) cb(either) }, { cb(either) }) }
-        }
-      ccb(conn.toDisposable().right())
-      IORunLoop.startCancelable(this, conn, onCancelCb)
-    }
 
   fun unsafeRunAsyncCancellable(onCancel: OnCancel = Silent, cb: (Either<Throwable, A>) -> Unit): Disposable =
     runAsyncCancellable(onCancel, cb andThen { it.liftIO() }).unsafeRunSync()
@@ -338,23 +297,9 @@ sealed class IO<E, out A> : IOOf<E, A> {
   fun uncancelable(): IO<Throwable, A> =
     ContextSwitch(this, ContextSwitch.makeUncancelable, ContextSwitch.disableUncancelable)
 
-  fun <B> bracket(release: (A) -> IOOf<E, Unit>, use: (A) -> IOOf<E, B>): IO<Throwable, B> =
-    bracketCase({ a, _ -> release(a) }, use)
-
-  fun <B> bracketCase(release: (A, ExitCase<Throwable>) -> IOOf<E, Unit>, use: (A) -> IOOf<E, B>): IO<Throwable, B> =
-    IOBracket(this, release, use)
-
-  fun guarantee(finalizer: IOOf<E, Unit>): IO<Throwable, A> = guaranteeCase { finalizer }
-
-  fun guaranteeCase(finalizer: (ExitCase<Throwable>) -> IOOf<E, Unit>): IO<Throwable, A> =
-    IOBracket.guaranteeCase(this, finalizer)
-
   internal data class Pure<E, out A>(val a: A) : IO<E, A>() {
     // Pure can be replaced by its value
-    override fun <B> map(f: (A) -> B): IO<E, B> = Suspend(unsafe) { Pure(f(a)) }
-
-    // Pure can be replaced by its value
-    override fun <B> flatMap(f: (A) -> IOOf<E, B>): IO<E, B> = Suspend(unsafe) { f(a).fix() }
+    override fun <B> map(f: (A) -> B): IO<E, B> = Suspend(rethrow) { Pure(f(a)) }
 
     override fun unsafeRunTimedTotal(limit: Duration): Option<A> = Some(a)
   }
@@ -363,10 +308,7 @@ sealed class IO<E, out A> : IOOf<E, A> {
     // Errors short-circuit
     override fun <B> map(f: (Nothing) -> B): IO<E, B> = this
 
-    // Errors short-circuit
-    override fun <B> flatMap(f: (Nothing) -> IOOf<E, B>): IO<E, B> = this
-
-    // Pure can be replaced by its value
+    // RaiseError can be replaced by its value
     override fun <B> mapError(f: (E) -> B): IO<B, Nothing> =
       RaiseError(f(exception))
 
@@ -447,10 +389,76 @@ sealed class IO<E, out A> : IOOf<E, A> {
   }
 }
 
+// These have to go here to work around lack of supertype on generics
+
 fun <E, A> IOOf<E, A>.handleErrorWith(f: (E) -> IOOf<E, A>): IO<E, A> =
-  IO.Bind(fix(), IOFrame.Companion.ErrorHandler(f))
+  Bind(fix(), IOFrame.Companion.ErrorHandler(f))
 
 fun <E, A> IOOf<E, A>.handleError(f: (E) -> A): IO<E, A> =
   handleErrorWith { e -> IO.Pure(f(e)) }
 
-fun <E, A> A.liftIO(): IO<E, A> = IO.just(this)
+fun <B, E : B, A> IOOf<E, A>.widenError(): IO<B, A> =
+  fix()
+
+/**
+ * Redeem an [IO] to an [IO] of [B] by resolving the error **or** mapping the value [A] to [B] **with** an effect.
+ *
+ * ```kotlin:ank:playground
+ * import arrow.fx.IO
+ *
+ * fun main(args: Array<String>) {
+ *   val result =
+ *   //sampleStart
+ *   IO.just("1")
+ *     .redeemWith({ e -> IO.just(-1) }, { str -> IO { str.toInt() } })
+ *   //sampleEnd
+ *   println(result.unsafeRunSync())
+ * }
+ * ```
+ */
+fun <E, A, B> IOOf<E, A>.redeemWith(fe: (E) -> IOOf<E, B>, fb: (A) -> IOOf<E, B>): IO<E, B> =
+  Bind(fix(), RedeemWith(fe, fb))
+
+fun <E, A> IOOf<E, A>.runAsync(cb: (Either<E, A>) -> IOOf<E, Unit>): IO<E, Unit> =
+  IO(IO.rethrow) { fix().unsafeRunAsync(cb.andThen { it.fix().unsafeRunAsync { } }) }
+
+fun <E, A, B> IOOf<E, A>.followedBy(fb: IOOf<E, B>) = flatMap { fb }
+
+fun <E, A, B> IOOf<E, A>.flatMap(f: (A) -> IOOf<E, B>): IO<E, B> =
+  when (val io = fix()) {
+    // Pure can be replaced by its value
+    is IO.Pure -> Suspend(IO.rethrow) { f(io.a).fix() }
+    // Errors short-circuit
+    is IO.RaiseError -> io
+    else -> Bind(io) { f(it).fix() }
+  }
+
+fun <E, A, B> IOOf<E, A>.ap(ff: IOOf<E, (A) -> B>): IO<E, B> =
+  flatMap { a -> ff.fix().map { it(a) } }
+
+fun <E, A> IOOf<E, A>.runAsyncCancellable(onCancel: OnCancel = Silent, cb: (Either<E, A>) -> IOOf<E, Unit>): IO<Throwable, Disposable> =
+  IO.async(IO.rethrow) { ccb ->
+    val conn = IOConnection()
+    val onCancelCb =
+      when (onCancel) {
+        ThrowCancellationException ->
+          cb andThen { it.fix().unsafeRunAsync { } }
+        Silent ->
+          { either -> either.fold({ if (!conn.isCanceled() || it != CancellationException) cb(either) }, { cb(either) }) }
+      }
+    ccb(conn.toDisposable().right())
+    IORunLoop.startCancelable(this, conn, onCancelCb)
+  }
+
+fun <E, A, B> IOOf<E, A>.bracket(release: (A) -> IOOf<E, Unit>, use: (A) -> IOOf<E, B>): IO<Throwable, B> =
+  bracketCase({ a, _ -> release(a) }, use)
+
+fun <E, A, B> IOOf<E, A>.bracketCase(release: (A, ExitCase<Throwable>) -> IOOf<E, Unit>, use: (A) -> IOOf<E, B>): IO<Throwable, B> =
+  IOBracket(this, release, use)
+
+fun <E, A> IOOf<E, A>.guarantee(finalizer: IOOf<E, Unit>): IO<E, A> = guaranteeCase { finalizer }
+
+fun <E, A> IOOf<E, A>.guaranteeCase(finalizer: (ExitCase<E>) -> IOOf<E, Unit>): IO<E, A> =
+  IOBracket.guaranteeCase(this, finalizer)
+
+fun <A> A.liftIO(): IO<Nothing, A> = IO.just(this)
