@@ -2,8 +2,6 @@ package consumer
 
 import arrow.Kind
 import arrow.`*`
-import arrow.extension
-import arrow.with
 
 /** HigherKinds **/
 sealed class Option<out A> {
@@ -30,18 +28,13 @@ interface Functor<F> {
   fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B>
 }
 
-@extension
-class OptionFunctor : Functor<ForOption> {
+fun functorForOption(): Functor<ForOption> = object : Functor<ForOption> {
   override fun <A, B> OptionOf<A>.map(f: (A) -> B): Option<B> =
     (this as Option<A>).map(f)
 }
 
-fun functorForOption(): Functor<ForOption> = OptionFunctor()
-
 fun <F> Kind<F, Int>.addOne(FF: Functor<F> = `*`): Kind<F, Int> =
-  with(FF) {
-    map { it + 1 }
-  }
+  map { it + 1 }
 
 fun testConversion(): Any =
   Option.Some(1).addOne()

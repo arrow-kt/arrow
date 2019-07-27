@@ -233,8 +233,6 @@ class CompilerContext(
 
   private val descriptorPhaseState = ConcurrentHashMap<FqName, ClassDescriptor>()
 
-  val quotes: ConcurrentHashMap<KtClassOrObject, ClassOrObject> = ConcurrentHashMap()
-
   /**
    * updateClassContext can't replace the actual class context just mutate its internal fields since the compiler holds a
    * reference to the class context associated for resolution.

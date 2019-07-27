@@ -2,11 +2,8 @@ package arrow.meta.typeclasses
 
 import arrow.meta.extensions.ExtensionPhase
 import arrow.meta.extensions.MetaComponentRegistrar
-import arrow.meta.higherkind.buildIrValueParameter
-import arrow.meta.qq.classOrObject
-import org.jetbrains.kotlin.backend.common.lower.createIrBuilder
-import org.jetbrains.kotlin.backend.jvm.JvmBackendContext
-import org.jetbrains.kotlin.backend.jvm.JvmGeneratorExtensions
+import arrow.meta.qq.func
+import org.jetbrains.kotlin.com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrStatement
@@ -14,45 +11,42 @@ import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.IrValueParameter
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
-import org.jetbrains.kotlin.ir.expressions.IrExpressionBody
 import org.jetbrains.kotlin.ir.expressions.IrFunctionAccessExpression
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
-import org.jetbrains.kotlin.ir.expressions.impl.IrExpressionBodyImpl
-import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl
 import org.jetbrains.kotlin.ir.expressions.mapValueParameters
-import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
-import org.jetbrains.kotlin.ir.util.endOffset
 import org.jetbrains.kotlin.ir.util.fqNameSafe
-import org.jetbrains.kotlin.ir.util.getArgumentsWithIr
-import org.jetbrains.kotlin.ir.util.irCall
 import org.jetbrains.kotlin.ir.util.referenceFunction
 import org.jetbrains.kotlin.ir.util.render
-import org.jetbrains.kotlin.ir.util.startOffset
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformer
 import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
+import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtParameter
 import org.jetbrains.kotlin.psi.KtTypeElement
+import org.jetbrains.kotlin.psi.KtVisitorVoid
 import org.jetbrains.kotlin.psi.psiUtil.getSuperNames
-import org.jetbrains.kotlin.psi2ir.Psi2IrTranslator
 import org.jetbrains.kotlin.psi2ir.findFirstFunction
-import org.jetbrains.kotlin.psi2ir.generators.BodyGenerator
-import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.resolve.descriptorUtil.parents
 
 val MetaComponentRegistrar.typeClasses: List<ExtensionPhase>
   get() =
     meta(
-      classOrObject(::isExtension) { ktClass ->
-        val typeClass = ktClass.typeClassName()
-        val typeArgs = ktClass.typeArgumentNames()
-        val factoryName = typeClass.decapitalize()
-        println("intercepted ${ktClass.name}")
-        listOf(
-          ktClass.text,
-          "fun $factoryName(): $typeClass<${typeArgs..","}> = TODO()"
-        )
-      },
+      func(
+        match = {
+          println("Considering function to replace: $text")
+          valueParameters.any { it.defaultValue?.text == "`*`" }
+        },
+        map = { func ->
+          println("Found function to replace: ${func.name}")
+          val scopeNames = func.valueParameters.filter { it.defaultValue?.text == "`*`" }.map { it.name }
+          listOf(
+            """
+              |$modality $visibility fun <$typeParameters> $receiver.$name($valueParameters) : $returnType =
+              |  ${scopeNames.fold(body.asString()) { acc, scope -> "$scope.run { $acc }" }}
+              |"""
+          )
+        }
+      ),
       IrGeneration { compilerContext, file, backendContext, bindingContext ->
         file.transformChildren(object : IrElementTransformer<Unit> {
           override fun visitFunctionAccess(expression: IrFunctionAccessExpression, data: Unit): IrElement {
@@ -117,6 +111,17 @@ private fun isExtension(ktClass: KtClass): Boolean =
   ktClass.annotationEntries.any {
     it.text == "@extension"
   }
+
+private class HasWithReceiverVisitor : KtVisitorVoid() {
+  var result = false
+  override fun visitElement(element: PsiElement) {
+    element.acceptChildren(this)
+  }
+
+}
+
+private fun hasWithReceiver(ktClass: KtClass): Boolean =
+  HasWithReceiverVisitor().also(ktClass::accept).result
 
 private operator fun <A> List<A>.rangeTo(s: String): String =
   joinToString(s)

@@ -8,6 +8,7 @@ import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.kotlin.psi.KtFunction
 
 /**
  * A tree transformation given an existing ktElement
@@ -80,6 +81,11 @@ interface Quote<P : KtElement, K : KtElement, S> {
 
 }
 
+fun MetaComponentRegistrar.func(
+  match: KtFunction.() -> Boolean,
+  map: Func.FuncScope.(KtFunction) -> List<String>
+): ExtensionPhase.AnalysisHandler =
+  quote(Func.Companion, match, map)
 
 fun MetaComponentRegistrar.classOrObject(
   match: KtClass.() -> Boolean,
@@ -119,7 +125,9 @@ inline fun <reified K : KtElement, P : KtElement, S> CompilerContext.processFile
     if (mutatingDocument != null) {
       file.accept(object : MetaTreeVisitor(this) {
         override fun visitKtElement(element: KtElement, data: Unit?): Unit? {
+          println("visitKtElement: ${element.javaClass}")
           if (element.javaClass == K::class.java) {
+            println("found element: ${element.javaClass}")
             val transformation = quoteFactory(
               quasiQuoteContext = QuasiQuoteContext(compilerContext),
               containingDeclaration = element.psiOrParent as P,
