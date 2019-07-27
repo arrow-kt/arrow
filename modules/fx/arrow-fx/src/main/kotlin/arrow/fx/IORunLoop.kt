@@ -65,7 +65,7 @@ internal object IORunLoop {
             hasResult = true
             currentIO = null
           } catch (t: Throwable) {
-            currentIO = IO.RaiseError(t.nonFatalOrThrow())
+            currentIO = IO.RaiseError(currentIO.handler(t.nonFatalOrThrow()))
           }
         }
         is IO.Async -> {
@@ -203,7 +203,7 @@ internal object IORunLoop {
             currentIO = null
           } catch (t: Throwable) {
             if (NonFatal(t)) {
-              currentIO = IO.RaiseError(t)
+              currentIO = IO.RaiseError(currentIO.handler(t))
             } else {
               throw t
             }
