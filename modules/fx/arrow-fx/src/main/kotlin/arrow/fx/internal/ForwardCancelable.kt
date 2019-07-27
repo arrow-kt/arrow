@@ -3,7 +3,6 @@ package arrow.fx.internal
 import arrow.core.Either
 import arrow.core.NonFatal
 import arrow.fx.CancelToken
-import arrow.fx.ForIO
 import arrow.fx.IO
 import arrow.fx.IOConnection
 import arrow.fx.IOPartialOf
@@ -19,7 +18,7 @@ import java.util.concurrent.atomic.AtomicReference
  */
 class ForwardCancelable<E> {
 
-  private val state = AtomicReference<State>(init)
+  private val state = AtomicReference<State<E>>(init())
 
   fun cancel(): CancelToken<IOPartialOf<E>> {
     fun loop(conn: IOConnection, cb: (Either<E, Unit>) -> Unit): Unit = state.get().let { current ->
@@ -28,7 +27,7 @@ class ForwardCancelable<E> {
           loop(conn, cb)
 
         is Active -> {
-          state.lazySet(finished) // GC purposes
+          state.lazySet(finished()) // GC purposes
           // TODO this runs in an immediate execution context in cats-effect
           IORunLoop.startCancelable(current.token, conn, cb)
         }
@@ -49,7 +48,7 @@ class ForwardCancelable<E> {
         if (!state.compareAndSet(current, Active(value)))
           complete(value)
       } else {
-        if (!state.compareAndSet(current, finished))
+        if (!state.compareAndSet(current, finished()))
           complete(value)
         else
           execute(value, current.stack)
@@ -70,15 +69,17 @@ class ForwardCancelable<E> {
      *  - on `cancel`, if the state was [Active], or if it was [Empty],
      *    regardless, the state transitions to `Active(IO.unit)`, aka [finished]
      */
-    private sealed class State {
-      data class Empty(val stack: List<(Either<Throwable, Unit>) -> Unit>) : State()
-      data class Active(val token: CancelToken<ForIO>) : State()
+    private sealed class State<E> {
+      data class Empty<E>(val stack: List<(Either<E, Unit>) -> Unit>) : State<E>()
+      data class Active<E>(val token: CancelToken<IOPartialOf<E>>) : State<E>()
     }
 
-    private val init: State = Empty(listOf())
-    private val finished: State = Active(IO.unit)
+    private val init: State<Any?> = Empty(listOf())
+    private val finished: State<Any?> = Active(IO.unit)
+    private fun <E> init(): State<E> = init as State<E>
+    private fun <E> finished(): State<E> = finished as State<E>
 
-    private fun <E> execute(token: CancelToken<IOPartialOf<E>>, stack: List<(Either<Throwable, Unit>) -> Unit>): Unit =
+    private fun <E> execute(token: CancelToken<IOPartialOf<E>>, stack: List<(Either<E, Unit>) -> Unit>): Unit =
     // TODO this runs in an immediate execution context in cats-effect
       token.fix().unsafeRunAsync { r ->
         val errors = stack.fold(emptyList<Throwable>()) { acc, cb ->
