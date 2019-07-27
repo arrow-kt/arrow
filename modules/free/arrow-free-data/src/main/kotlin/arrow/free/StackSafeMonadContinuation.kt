@@ -1,7 +1,7 @@
 package arrow.free
 
 import arrow.Kind
-import arrow.core.Continuation
+import arrow.typeclasses.Continuation
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadFx
 import arrow.typeclasses.MonadSyntax

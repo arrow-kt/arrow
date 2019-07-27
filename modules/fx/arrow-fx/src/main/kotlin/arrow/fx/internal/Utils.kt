@@ -271,11 +271,11 @@ private class OneShotLatch : AbstractQueuedSynchronizer() {
 }
 
 /**
- * [arrow.core.Continuation] to run coroutine on `ctx` and link result to callback [cc].
+ * [arrow.typeclasses.Continuation] to run coroutine on `ctx` and link result to callback [cc].
  * Use [asyncContinuation] to run suspended functions within a context `ctx` and pass the result to [cc].
  */
-internal fun <A> asyncContinuation(ctx: CoroutineContext, cc: (Either<Throwable, A>) -> Unit): arrow.core.Continuation<A> =
-  object : arrow.core.Continuation<A> {
+internal fun <A> asyncContinuation(ctx: CoroutineContext, cc: (Either<Throwable, A>) -> Unit): arrow.typeclasses.Continuation<A> =
+  object : arrow.typeclasses.Continuation<A> {
     override val context: CoroutineContext = ctx
 
     override fun resume(value: A) {
