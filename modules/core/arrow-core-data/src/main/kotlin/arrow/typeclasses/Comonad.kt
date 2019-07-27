@@ -1,7 +1,6 @@
 package arrow.typeclasses
 
 import arrow.Kind
-import arrow.typeclasses.Continuation
 import arrow.core.identity
 import java.io.Serializable
 import kotlin.coroutines.CoroutineContext
