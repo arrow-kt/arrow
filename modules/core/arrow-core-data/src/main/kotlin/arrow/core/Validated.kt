@@ -46,7 +46,7 @@ sealed class Validated<out E, out A> : ValidatedOf<E, A> {
 
   data class Invalid<out E>(val e: E) : Validated<E, Nothing>()
 
-  fun <B> fold(fe: (E) -> B, fa: (A) -> B): B =
+  inline fun <B> fold(fe: (E) -> B, fa: (A) -> B): B =
     when (this) {
       is Valid -> fa(a)
       is Invalid -> (fe(e))

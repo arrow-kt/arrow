@@ -64,7 +64,7 @@ data class EitherT<F, A, B>(private val value: Kind<F, Either<A, B>>) : EitherTO
 
   fun value(): Kind<F, Either<A, B>> = value
 
-  fun <C> fold(FF: Functor<F>, l: (A) -> C, r: (B) -> C): Kind<F, C> = FF.run {
+  inline fun <C> fold(FF: Functor<F>, crossinline l: (A) -> C, crossinline r: (B) -> C): Kind<F, C> = FF.run {
     value().map { either -> either.fold(l, r) }
   }
 

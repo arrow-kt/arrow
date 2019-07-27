@@ -98,7 +98,7 @@ sealed class Try<out A> : TryOf<A> {
   /**
    * Applies `ifFailure` if this is a `Failure` or `ifSuccess` if this is a `Success`.
    */
-  fun <B> fold(ifFailure: (Throwable) -> B, ifSuccess: (A) -> B): B =
+  inline fun <B> fold(ifFailure: (Throwable) -> B, ifSuccess: (A) -> B): B =
     when (this) {
       is Failure -> ifFailure(exception)
       is Success -> ifSuccess(value)

@@ -46,7 +46,7 @@ sealed class Either<out A, out B> : EitherOf<A, B> {
    * @param ifRight the function to apply if this is a [Right]
    * @return the results of applying the function
    */
-  fun <C> fold(ifLeft: (A) -> C, ifRight: (B) -> C): C = when (this) {
+  inline fun <C> fold(ifLeft: (A) -> C, ifRight: (B) -> C): C = when (this) {
     is Right -> ifRight(b)
     is Left -> ifLeft(a)
   }

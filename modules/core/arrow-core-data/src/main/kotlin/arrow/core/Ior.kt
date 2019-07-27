@@ -132,7 +132,7 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
    * @param fab the function to apply if this is a [Both]
    * @return the results of applying the function
    */
-  fun <C> fold(fa: (A) -> C, fb: (B) -> C, fab: (A, B) -> C): C = when (this) {
+  inline fun <C> fold(fa: (A) -> C, fb: (B) -> C, fab: (A, B) -> C): C = when (this) {
     is Left -> fa(value)
     is Right -> fb(value)
     is Both -> fab(leftValue, rightValue)
