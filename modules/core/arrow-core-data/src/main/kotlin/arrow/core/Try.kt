@@ -28,7 +28,7 @@ typealias Success<A> = Try.Success<A>
  *
  * The following example represents the typical case when consuming Java code, where domain errors are represented with exceptions.
  *
- * ```kotlin:ank:playground
+ * ```kotlin:ank
  * open class GeneralException: Exception()
  *
  * class NoConnectionException: GeneralException()

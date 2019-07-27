@@ -24,7 +24,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  * Or perhaps you're reading from a configuration file. One could imagine the configuration library
  * you're using returns a `Try`, or maybe a `Either`. Your parsing may look something like:
  *
- * ```kotlin:ank:playground
+ * ```kotlin:ank
  * import arrow.core.Either
  * import arrow.core.Left
  * import arrow.core.flatMap
@@ -61,7 +61,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  * `Map<String, String>`. Parsing will be handled by a `Read` type class - we provide instances only
  * for `String` and `Int` for brevity.
  *
- * ```kotlin:ank:playground
+ * ```kotlin:ank
  * import arrow.core.None
  * import arrow.core.Option
  *
@@ -90,7 +90,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  * Then we enumerate our errors—when asking for a config value, one of two things can go wrong:
  * the field is missing, or it is not well-formed with regards to the expected type.
  *
- * ```kotlin:ank:playground
+ * ```kotlin:ank
  * sealed class ConfigError {
  *  data class MissingConfig(val field: String): ConfigError()
  *  data class ParseConfig(val field: String): ConfigError()
@@ -109,7 +109,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  *
  * Now we are ready to write our parser.
  *
- * ```kotlin:ank:playground
+ * ```kotlin:ank
  * import arrow.core.None
  * import arrow.core.Option
  * import arrow.core.Some
@@ -117,30 +117,6 @@ typealias Invalid<E> = Validated.Invalid<E>
  * import arrow.core.valid
  * import arrow.core.invalid
  *
- * data class ConnectionParams(val url: String, val port: Int)
- *
- * abstract class Read<A> {
- *  abstract fun read(s: String): Option<A>
- *
- *  companion object {
- *
- *   val stringRead: Read<String> =
- *    object : Read<String>() {
- *     override fun read(s: String): Option<String> = Option(s)
- *    }
- *
- *   val intRead: Read<Int> =
- *    object : Read<Int>() {
- *     override fun read(s: String): Option<Int> =
- *      if (s.matches(Regex("-?[0-9]+"))) Option(s.toInt()) else None
- *    }
- *  }
- * }
- *
- * sealed class ConfigError {
- *  data class MissingConfig(val field: String) : ConfigError()
- *  data class ParseConfig(val field: String) : ConfigError()
- * }
  * //sampleStart
  * data class Config(val map: Map<String, String>) {
  *  fun <A> parse(read: Read<A>, key: String): Validated<ConfigError, A> {
@@ -162,7 +138,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  * validation if each piece is independent. How do we enforce the data is independent? By
  * asking for all of it up front. Let's start with two pieces of data.
  *
- * ```kotlin:ank:playground
+ * ```kotlin:ank
  * import arrow.core.Validated
  * //sampleStart
  * fun <E, A, B, C> parallelValidate(v1: Validated<E, A>, v2: Validated<E, B>, f: (A, B) -> C): Validated<E, C> {
@@ -188,7 +164,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  *
  * Time to parse.
  *
- * ```kotlin:ank:playground
+ * ```kotlin:ank
  * import arrow.core.NonEmptyList
  * import arrow.core.Validated
  * //sampleStart
@@ -427,7 +403,7 @@ typealias Invalid<E> = Validated.Invalid<E>
  *
  * We may use `ApplicativeError` instead of `Validated` to abstract away validation strategies and raising errors in the context we are computing in.
  *
- * ```kotlin:ank:playground
+ * ```kotlin:ank
  * import arrow.Kind
  * import arrow.core.Either
  * import arrow.core.EitherPartialOf

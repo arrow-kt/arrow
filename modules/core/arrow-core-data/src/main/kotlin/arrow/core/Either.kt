@@ -117,7 +117,7 @@ import arrow.higherkind
  *
  * Using exception-throwing code, we could write something like this:
  *
- * ```kotlin:ank:playground
+ * ```kotlin:ank
  * import arrow.core.Either
  * import arrow.core.flatMap
  *
@@ -227,9 +227,10 @@ import arrow.higherkind
  * Instead of using exceptions as our error value, let's instead enumerate explicitly the things that
  * can go wrong in our program.
  *
- * ```kotlin:ank:playground
+ * ```kotlin:ank
  * import arrow.core.Either
  * import arrow.core.flatMap
+ * //sampleStart
  * // Either with ADT Style
  *
  * sealed class Error {
@@ -249,6 +250,7 @@ import arrow.higherkind
  *
  * fun magic(s: String): Either<Error, String> =
  *   parse(s).flatMap{reciprocal(it)}.map{ stringify(it) }
+ * //sampleEnd
  * ```
  *
  * For our little module, we enumerate any and all errors that can occur. Then, instead of using
