@@ -132,7 +132,7 @@ Add to your pom.xml file the following properties:
 ```
 <properties>
     <kotlin.version>1.3.0</kotlin.version>
-    <arrow.version>0.8.2</arrow.version>
+    <arrow.version>0.9.0</arrow.version>
 </properties>
 ```
 
