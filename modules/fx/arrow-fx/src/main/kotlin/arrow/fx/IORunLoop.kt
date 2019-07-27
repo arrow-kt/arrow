@@ -151,7 +151,7 @@ internal object IORunLoop {
   private fun loop(
     source: Current,
     cancelable: IOConnection,
-    cb: (Either<Any?, Any?>) -> Unit,
+    cb: Callback,
     rcbRef: RestartCallback?,
     bFirstRef: BindF?,
     bRestRef: CallStack?,
