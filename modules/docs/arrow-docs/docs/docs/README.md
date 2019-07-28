@@ -4,7 +4,7 @@ title: Quick Start
 permalink: /docs/
 ---
 
-[![Maven Central](https://img.shields.io/maven-central/v/io.arrow-kt/arrow-docs.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22io.arrow-kt%22%20AND%20a:%22arrow-docs%22)[![Build Status](https://travis-ci.org/arrow-kt/arrow.svg?branch=master)](https://travis-ci.org/arrow-kt/arrow/)
+[![Maven Central](https://img.shields.io/maven-central/v/io.arrow-kt/arrow-core-data.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22io.arrow-kt%22%20AND%20a:%22arrow-core-data%22)
 [![Kotlin version badge](https://img.shields.io/badge/kotlin-1.3-blue.svg)](https://kotlinlang.org/docs/reference/whatsnew13.html)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 
@@ -56,7 +56,6 @@ dependencies {
     compile "io.arrow-kt:arrow-extras-data:$arrow_version"
     compile "io.arrow-kt:arrow-extras-extensions:$arrow_version"
     kapt    "io.arrow-kt:arrow-meta:$arrow_version"
-    
     compile "io.arrow-kt:arrow-query-language:$arrow_version" //optional
     compile "io.arrow-kt:arrow-free-data:$arrow_version" //optional
     compile "io.arrow-kt:arrow-free-extensions:$arrow_version" //optional

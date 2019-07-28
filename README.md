@@ -1,6 +1,6 @@
 <img height="100" src="https://avatars2.githubusercontent.com/u/29458023?v=4&amp;s=200" width="100">
 
-[![Maven Central](https://img.shields.io/maven-central/v/io.arrow-kt/arrow-docs.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22io.arrow-kt%22%20AND%20a:%22arrow-docs%22)
+[![Maven Central](https://img.shields.io/maven-central/v/io.arrow-kt/arrow-core-data.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22io.arrow-kt%22%20AND%20a:%22arrow-core-data%22)
 [![Kotlin version badge](https://img.shields.io/badge/kotlin-1.3-blue.svg)](https://kotlinlang.org/docs/reference/whatsnew13.html)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 [![codecov](https://codecov.io/gh/arrow-kt/arrow/branch/master/graph/badge.svg)](https://codecov.io/gh/arrow-kt/arrow)
