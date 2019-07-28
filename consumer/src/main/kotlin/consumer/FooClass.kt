@@ -28,7 +28,22 @@ interface Functor<F> {
   fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B>
 }
 
-fun functorForOption(): Functor<ForOption> = object : Functor<ForOption> {
+//fun functorForOption(): Functor<ForOption> = object : Functor<ForOption> {
+//  override fun <A, B> OptionOf<A>.map(f: (A) -> B): Option<B> =
+//    (this as Option<A>).map(f)
+//}
+
+//val FunctorForOption: Functor<ForOption> = object : Functor<ForOption> {
+//  override fun <A, B> OptionOf<A>.map(f: (A) -> B): Option<B> =
+//    (this as Option<A>).map(f)
+//}
+
+//class FunctorForOption: Functor<ForOption> {
+//  override fun <A, B> OptionOf<A>.map(f: (A) -> B): Option<B> =
+//    (this as Option<A>).map(f)
+//}
+
+object FunctorForOption: Functor<ForOption> {
   override fun <A, B> OptionOf<A>.map(f: (A) -> B): Option<B> =
     (this as Option<A>).map(f)
 }

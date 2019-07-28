@@ -3,8 +3,16 @@ package arrow.meta.typeclasses
 import arrow.meta.extensions.ExtensionPhase
 import arrow.meta.extensions.MetaComponentRegistrar
 import arrow.meta.qq.func
+import org.jetbrains.kotlin.cli.common.messages.CompilerMessageLocation
+import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.descriptors.CallableDescriptor
+import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
+import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
+import org.jetbrains.kotlin.descriptors.PropertyDescriptor
+import org.jetbrains.kotlin.descriptors.ValueDescriptor
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
@@ -13,7 +21,12 @@ import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrFunctionAccessExpression
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
+import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
+import org.jetbrains.kotlin.ir.expressions.impl.IrGetterCallImpl
+import org.jetbrains.kotlin.ir.expressions.impl.IrPropertyAccessorCallBase
 import org.jetbrains.kotlin.ir.expressions.mapValueParameters
+import org.jetbrains.kotlin.ir.symbols.IrFieldSymbol
+import org.jetbrains.kotlin.ir.util.constructors
 import org.jetbrains.kotlin.ir.util.fqNameSafe
 import org.jetbrains.kotlin.ir.util.referenceFunction
 import org.jetbrains.kotlin.ir.util.render
@@ -26,7 +39,9 @@ import org.jetbrains.kotlin.psi.KtTypeElement
 import org.jetbrains.kotlin.psi.KtVisitorVoid
 import org.jetbrains.kotlin.psi.psiUtil.getSuperNames
 import org.jetbrains.kotlin.psi2ir.findFirstFunction
+import org.jetbrains.kotlin.resolve.descriptorUtil.getAllSuperClassifiers
 import org.jetbrains.kotlin.resolve.descriptorUtil.parents
+import org.jetbrains.kotlin.types.typeUtil.isSubtypeOf
 
 val MetaComponentRegistrar.typeClasses: List<ExtensionPhase>
   get() =
@@ -41,7 +56,7 @@ val MetaComponentRegistrar.typeClasses: List<ExtensionPhase>
           val scopeNames = func.valueParameters.filter { it.defaultValue?.text == "`*`" }.map { it.name }
           listOf(
             """
-              |$modality $visibility fun <$typeParameters> $receiver.$name($valueParameters) : $returnType =
+              |$modality $visibility fun <$typeParameters> $receiver.$name($valueParameters): $returnType =
               |  ${scopeNames.fold(body.asString()) { acc, scope -> "$scope.run { $acc }" }}
               |"""
           )
@@ -60,18 +75,67 @@ val MetaComponentRegistrar.typeClasses: List<ExtensionPhase>
                 val typeClass = extensionType.constructor.declarationDescriptor
                 val dataType = extensionType.arguments[0].type.constructor.declarationDescriptor
                 val typeClassPackage = typeClass?.parents?.first() as PackageFragmentDescriptor
-                val factoryName = "${typeClass.name.asString().decapitalize()}${dataType?.name}"
-                val typeClassFactory = typeClassPackage.getMemberScope().findFirstFunction(factoryName) { it.returnType == extensionType }
-                val typeClassIrFactory = backendContext.ir.symbols.externalSymbolTable.referenceFunction(typeClassFactory)
-                IrCallImpl(
-                  startOffset = UNDEFINED_OFFSET,
-                  endOffset = UNDEFINED_OFFSET,
-                  type = typeClassIrFactory.owner.returnType,
-                  symbol = typeClassIrFactory,
-                  descriptor = typeClassIrFactory.owner.descriptor,
-                  typeArgumentsCount = typeClassIrFactory.owner.descriptor.typeParameters.size,
-                  valueArgumentsCount = typeClassIrFactory.owner.descriptor.valueParameters.size
+                val typeClassFactory = typeClassPackage
+                  .getMemberScope()
+                  .getContributedDescriptors()
+                  .find {
+                    val result = it is FunctionDescriptor && it.returnType?.isSubtypeOf(extensionType) == true ||
+                      it is ClassDescriptor && it.typeConstructor.supertypes.contains(extensionType) ||
+                      it is PropertyDescriptor && it.type.isSubtypeOf(extensionType)
+                    println("Considering: ${it.javaClass}, ${it.name}: $result")
+                    result
+                  }
+                if (typeClassFactory == null) {
+                  compilerContext.messageCollector.report(
+                    CompilerMessageSeverity.ERROR,
+                    "extension not found for $extensionType",
+                    CompilerMessageLocation.create(valueParameterDescriptor.findPsi()?.text)
                   )
+                }
+                when (typeClassFactory) {
+                  is FunctionDescriptor -> {
+                    val typeClassIrFactory = backendContext.ir.symbols.externalSymbolTable.referenceFunction(typeClassFactory)
+                    IrCallImpl(
+                      startOffset = UNDEFINED_OFFSET,
+                      endOffset = UNDEFINED_OFFSET,
+                      type = typeClassIrFactory.owner.returnType,
+                      symbol = typeClassIrFactory,
+                      descriptor = typeClassIrFactory.owner.descriptor,
+                      typeArgumentsCount = typeClassIrFactory.owner.descriptor.typeParameters.size,
+                      valueArgumentsCount = typeClassIrFactory.owner.descriptor.valueParameters.size
+                    )
+                  }
+                  is ClassDescriptor -> {
+                    val irClass = backendContext.ir.symbols.externalSymbolTable.referenceClass(typeClassFactory)
+                    irClass.constructors.firstOrNull()?.let { typeClassIrFactory ->
+                      IrConstructorCallImpl(
+                        startOffset = UNDEFINED_OFFSET,
+                        endOffset = UNDEFINED_OFFSET,
+                        type = typeClassIrFactory.owner.returnType,
+                        symbol = typeClassIrFactory,
+                        descriptor = typeClassIrFactory.owner.descriptor,
+                        typeArgumentsCount = typeClassIrFactory.owner.descriptor.typeParameters.size,
+                        valueArgumentsCount = typeClassIrFactory.owner.descriptor.valueParameters.size,
+                        constructorTypeArgumentsCount = typeClassFactory.declaredTypeParameters.size
+                      )
+                    }
+                  }
+                  is PropertyDescriptor -> {
+                    val irField = backendContext.ir.symbols.externalSymbolTable.referenceField(typeClassFactory)
+                    irField.owner.correspondingPropertySymbol?.owner?.getter?.symbol?.let { typeClassIrFactory ->
+                      IrCallImpl(
+                        startOffset = UNDEFINED_OFFSET,
+                        endOffset = UNDEFINED_OFFSET,
+                        type = typeClassIrFactory.owner.returnType,
+                        symbol = typeClassIrFactory,
+                        descriptor = typeClassIrFactory.owner.descriptor,
+                        typeArgumentsCount = typeClassIrFactory.owner.descriptor.typeParameters.size,
+                        valueArgumentsCount = typeClassIrFactory.owner.descriptor.valueParameters.size
+                      )
+                    }
+                  }
+                  else -> null
+                }
               }
             } else super.visitFunctionAccess(expression, data)
           }
