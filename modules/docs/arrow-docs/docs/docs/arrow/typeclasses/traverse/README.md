@@ -157,7 +157,7 @@ Notice that in the Either case, should any string fail to parse the entire trave
 
 Going back to our Future example, we can write an Applicative instance for Future that runs each Future concurrently. Then when we traverse a List<A> with an (A) -> Future<B>, we can imagine the traversal as a scatter-gather. Each `A` creates a concurrent computation that will produce a `B` (the scatter), and as the Futures complete they will be gathered back into a List.
 
-#### Playing with `Reader`
+#### Playing with Reader
 
 Another interesting effect we can use is Reader. Recall that a Reader<D, A> is a type alias for Kleisli<ForId, D, A> which is a wrapper around (D) -> A.
 
