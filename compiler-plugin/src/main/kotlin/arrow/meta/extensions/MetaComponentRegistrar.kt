@@ -3,6 +3,7 @@ package arrow.meta.extensions
 import arrow.meta.higherkind.KindAwareTypeChecker
 import arrow.meta.higherkind.MetaCodeAnalyzerInitializer
 import arrow.meta.higherkind.setFinalStatic
+import arrow.meta.ir.IrUtils
 import arrow.meta.qq.ClassOrObject
 import arrow.meta.qq.QuasiQuoteContext
 import arrow.meta.utils.NoOp3
@@ -270,15 +271,14 @@ interface MetaComponentRegistrar : ComponentRegistrar {
         generateClassSyntheticParts(codegen)
     }
 
-  fun IrGeneration(generate: IrBuiltIns.(compilerContext: CompilerContext, file: IrFile, backendContext: BackendContext, bindingContext: BindingContext) -> Unit): ExtensionPhase.IRGeneration =
+  fun IrGeneration(generate: (compilerContext: CompilerContext, file: IrFile, backendContext: BackendContext, bindingContext: BindingContext) -> Unit): ExtensionPhase.IRGeneration =
     object : ExtensionPhase.IRGeneration {
       override fun CompilerContext.generate(
         file: IrFile,
         backendContext: BackendContext,
         bindingContext: BindingContext
       ) {
-        val builtIns: IrBuiltIns = backendContext.ir.context.irBuiltIns
-        builtIns.generate(this, file, backendContext, bindingContext)
+        generate(this, file, backendContext, bindingContext)
       }
     }
 
