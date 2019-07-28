@@ -79,10 +79,10 @@ sealed class Option<out A> : OptionOf<A> {
    * @param f the function to apply
    * @see flatMap
    */
-  inline fun <B> map(f: (A) -> B): Option<B> =
+  fun <B> map(f: (A) -> B): Option<B> =
     flatMap { a -> Some(f(a)) }
 
-  inline fun <B, R> map2(fb: Kind<ForOption, B>, f: (Tuple2<A, B>) -> R): Option<R> =
+  fun <B, R> map2(fb: Kind<ForOption, B>, f: (Tuple2<A, B>) -> R): Option<R> =
     flatMap { a: A -> fb.fix().map { b -> f(a toT b) } }
 
   fun <B> filterMap(f: (A) -> Option<B>): Option<B> =
@@ -115,7 +115,7 @@ sealed class Option<out A> : OptionOf<A> {
    * @param f the function to apply
    * @see map
    */
-  inline fun <B> flatMap(f: (A) -> OptionOf<B>): Option<B> =
+  fun <B> flatMap(f: (A) -> OptionOf<B>): Option<B> =
     when (this) {
       is None -> this
       is Some -> f(t).fix()
@@ -213,7 +213,7 @@ fun <T> Option<T>.getOrElse(default: () -> T): T = fold({ default() }, ::identit
  *
  * @param alternative the default option if this is empty.
  */
-inline fun <A> OptionOf<A>.orElse(alternative: () -> Option<A>): Option<A> = if (fix().isEmpty()) alternative() else fix()
+fun <A> OptionOf<A>.orElse(alternative: () -> Option<A>): Option<A> = if (fix().isEmpty()) alternative() else fix()
 
 infix fun <T> OptionOf<T>.or(value: Option<T>): Option<T> = if (fix().isEmpty()) {
   value
