@@ -3,6 +3,7 @@ package arrow.meta.typeclasses
 import arrow.meta.extensions.CompilerContext
 import arrow.meta.extensions.ExtensionPhase
 import arrow.meta.extensions.MetaComponentRegistrar
+import arrow.meta.ir.IrUtils
 import arrow.meta.ir.functionAccess
 import arrow.meta.qq.func
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageLocation
@@ -13,6 +14,7 @@ import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
+import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.ir.expressions.mapValueParameters
 import org.jetbrains.kotlin.ir.util.render
 import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
@@ -37,7 +39,7 @@ val MetaComponentRegistrar.typeClasses: List<ExtensionPhase>
         },
         map = { func ->
           println("Found function to replace: ${func.name}")
-          val scopeNames = func.valueParameters.filter { it.defaultValue?.text == "`*`" }.map { it.name }
+          val scopeNames = func.valueParameters.filter { it.defaultValue?.text == WithMarker }.map { it.name }
           listOf(
             """
               |$modality $visibility fun <$typeParameters> $receiver.$name($valueParameters): $returnType =
@@ -50,12 +52,7 @@ val MetaComponentRegistrar.typeClasses: List<ExtensionPhase>
         if (expression.defaultValues().contains(WithMarker)) { // with marker should be replaced by implicit injection
           println("visitFunctionAccess: ${expression.render()}\n${expression.descriptor.findPsi()?.text}")
           expression.mapValueParameters { valueParameterDescriptor ->
-            val extensionType = valueParameterDescriptor.type
-            val typeClass = extensionType.typeClassDescriptor()
-            val dataType = extensionType.dataTypeDescriptor()
-            val typeClassPackage = typeClass.packageFragmentDescriptor()
-            val extension = typeClassPackage.findExtensionProof(extensionType)
-            extension ?: compilerContext.reportExtensionNotFound(extensionType)
+            val extension = findExtension(valueParameterDescriptor)
             when (extension) {
               is FunctionDescriptor -> extension.irCall()
               is ClassDescriptor -> extension.irConstructorCall()
@@ -66,6 +63,16 @@ val MetaComponentRegistrar.typeClasses: List<ExtensionPhase>
         } else null
       }
     )
+
+private fun IrUtils.findExtension(valueParameterDescriptor: ValueParameterDescriptor): DeclarationDescriptor? {
+  val extensionType = valueParameterDescriptor.type
+  val typeClass = extensionType.typeClassDescriptor()
+  val dataType = extensionType.dataTypeDescriptor()
+  val typeClassPackage = typeClass.packageFragmentDescriptor()
+  val extension = typeClassPackage.findExtensionProof(extensionType)
+  extension ?: compilerContext.reportExtensionNotFound(extensionType)
+  return extension
+}
 
 private fun CompilerContext.reportExtensionNotFound(extensionType: KotlinType): Unit {
   messageCollector.report(
