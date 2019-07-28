@@ -157,6 +157,8 @@ Notice that in the `Either` case, should any string fail to parse the entire `tr
 
 Going back to our `Future` example, we can write an `Applicative` instance for `Future` that runs each `Future` concurrently. Then when we traverse a `List<A>` with an `(A) -> Future<B>`, we can imagine the traversal as a scatter-gather. Each `A` creates a concurrent computation that will produce a `B` (the scatter), and as the `Futures` complete they will be gathered back into a `List`.
 
+Evidently, `Traverse` is not limited to `List` or `Nel`, it provides an abstraction over 'things that can be traversed over', like a Binary tree, hence the name `Traverse`.
+
 #### Playing with `Reader`
 
 Another interesting effect we can use is Reader. Recall that a `Reader<D, A>` is a type alias for `Kleisli<ForId, D, A>` which is a wrapper around `(D) -> A`.
@@ -224,3 +226,7 @@ TypeClass(Traverse::class).dtMarkdownList()
 ```
 
 ank_macro_hierarchy(arrow.typeclasses.Traverse)
+
+## Credits
+
+The content is heavily inspired by [Scala exercise](https://www.scala-exercises.org/cats/traverse) and partially adopted from [examples from the Cats Community](https://typelevel.org/cats/typeclasses/traverse.html).
