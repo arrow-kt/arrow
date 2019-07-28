@@ -155,11 +155,11 @@ fun main() {
 
 Notice that in the Either case, should any string fail to parse the entire traversal is considered a failure. Moreover, once it hits its first bad parse, it will not attempt to parse any others down the line (similar behavior would be found with using Option as the effect). Contrast this with Validated where even if one bad parse is hit, it will continue trying to parse the others, accumulating any and all errors as it goes. The behavior of traversal is closely tied with the Applicative behavior of the data type.
 
-Going back to our Future example, we can write an Applicative instance for Future that runs each Future concurrently. Then when we traverse a List<A> with an (A) -> Future<B>, we can imagine the traversal as a scatter-gather. Each `A` creates a concurrent computation that will produce a `B` (the scatter), and as the Futures complete they will be gathered back into a List.
+Going back to our Future example, we can write an Applicative instance for Future that runs each Future concurrently. Then when we traverse a `List<A>` with an `(A) -> Future<B>`, we can imagine the traversal as a scatter-gather. Each `A` creates a concurrent computation that will produce a `B` (the scatter), and as the Futures complete they will be gathered back into a List.
 
-#### Playing with Reader
+#### Playing with `Reader`
 
-Another interesting effect we can use is Reader. Recall that a Reader<D, A> is a type alias for Kleisli<ForId, D, A> which is a wrapper around (D) -> A.
+Another interesting effect we can use is Reader. Recall that a `Reader<D, A>` is a type alias for `Kleisli<ForId, D, A>` which is a wrapper around `(D) -> A`.
 
 If we fix `D` to be some sort of dependency or configuration, we can use the Reader applicative in our traverse.
 
@@ -182,7 +182,7 @@ fun processTopic(t: Topic): Job<Result> = TODO()
 
 We can imagine we have a data pipeline that processes a bunch of data, each piece of data being categorized by a topic. Given a specific topic, we produce a Job that processes that topic. (Note that since a Job is just a Reader/Kleisli, one could write many small Jobs and compose them together into one Job that is used/returned by processTopic.)
 
-Corresponding to our bunches of data are bunches of topics, a List<Topic> if you will. Since Reader has an Applicative instance, we can traverse over this list with processTopic.
+Corresponding to our bunches of data are bunches of topics, a `List<Topic>` if you will. Since Reader has an Applicative instance, we can traverse over this list with processTopic.
 
 ```kotlin:ank
 fun processTopics(topics: ListK<Topic>): Job<ListK<Result>> =
@@ -191,7 +191,7 @@ fun processTopics(topics: ListK<Topic>): Job<ListK<Result>> =
 
 Note the nice return type - Job<List<Result>>. We now have one aggregate Job that when run, will go through each topic and run the topic-specific job, collecting results as it goes. We say "when run" because a Job is some function that requires a Context before producing the value we want.
 
-One example of a "context" can be found in the Spark project. In Spark, information needed to run a Spark job (where the master node is, memory allocated, etc.) resides in a SparkContext. Going back to the above example, we can see how one may define topic-specific Spark jobs (type Job<A> = Reader<SparkContext, A>) and then run several Spark jobs on a collection of topics via traverse. We then get back a Job<List<Result>>, which is equivalent to (SparkContext) -> List<Result>. When finally passed a SparkContext, we can run the job and get our results back.
+One example of a "context" can be found in the Spark project. In Spark, information needed to run a Spark job (where the master node is, memory allocated, etc.) resides in a SparkContext. Going back to the above example, we can see how one may define topic-specific Spark jobs `(type Job<A> = Reader<SparkContext, A>)` and then run several Spark jobs on a collection of topics via traverse. We then get back a Job<List<Result>>, which is equivalent to (SparkContext) -> List<Result>. When finally passed a SparkContext, we can run the job and get our results back.
 
 Moreover, the fact that our aggregate job is not tied to any specific SparkContext allows us to pass in a SparkContext pointing to a production cluster, or (using the exact same job) pass in a test SparkContext that just runs locally across threads. This makes testing our large job nice and easy.
 
