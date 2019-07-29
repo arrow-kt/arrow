@@ -84,7 +84,6 @@ dependencies {
     compile "io.arrow-kt:arrow-query-language:$arrow_version" //optional
     compile "io.arrow-kt:arrow-integration-retrofit-adapter:$arrow_version" //optional
 }
-
 ```
 
 # Additional Setup

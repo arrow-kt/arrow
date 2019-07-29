@@ -56,6 +56,7 @@ dependencies {
     compile "io.arrow-kt:arrow-extras-data:$arrow_version"
     compile "io.arrow-kt:arrow-extras-extensions:$arrow_version"
     kapt    "io.arrow-kt:arrow-meta:$arrow_version"
+    
     compile "io.arrow-kt:arrow-query-language:$arrow_version" //optional
     compile "io.arrow-kt:arrow-free-data:$arrow_version" //optional
     compile "io.arrow-kt:arrow-free-extensions:$arrow_version" //optional
@@ -76,7 +77,6 @@ dependencies {
     compile "io.arrow-kt:arrow-query-language:$arrow_version" //optional
     compile "io.arrow-kt:arrow-integration-retrofit-adapter:$arrow_version" //optional
 }
-
 ```
 
 # Additional Setup
