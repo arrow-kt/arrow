@@ -55,15 +55,21 @@ import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 
 interface Traverse<F> : Functor<F>, Foldable<F> {
-  fun <G, A, B> Kind<F, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Kind<F, B>>
+  fun <G, A, B> Kind<F, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): 
 }
 ```
+
+**Essentially, one uses `Traverse`, when there is a function `(A) -> Kind<G, B>` and `G` is an `Applicative` instance e.g.: `(User) -> Promise<ForIO, Profile>` and you want to `lift` the previous function to work on `Kind<F, A>` where `F` is a `Traverse` instance e.g.: `List<User>` and return `Kind<G, Kind<F, B>>` e.g.: `Promise<ForIO, List<Profile>>`**
 
 In our above example, `F` is `List`, and `G` is `Option`, `Either`, or `Promise`. For the profile example, traverse says given a `List<User>` and a function `(User) -> Promise<ForIO, Profile>`, it can give you a `Promise<ForIO, List<Profile>>`.
 
 Abstracting away the `G` (still imagining `F` to be `List`), `traverse` says given a collection of data, and a function that takes a piece of data and returns an effectful value, it will traverse the collection, applying the function and aggregating the effectful values (in a `List`) as it goes.
 
 In the most general form, `Kind<F, A>` is some sort of context `F` which may contain a value `A` (or several). While `List` tends to be among the most general cases, there also exist `Traverse` instances for `Option`, `Either`, and `Validated` (among others).
+
+#### Why not Foldable
+
+
 
 #### Choose your effect
 
@@ -106,8 +112,8 @@ fun main() {
   val list = listOf("1", "2", "3").k().traverse(Either.applicative(), ::parseIntEither)
   val isLeft = listOf("1", "abc", "3").k().traverse(Either.applicative(), ::parseIntEither).isEmpty()
   //sampleEnd
-  println(list)
-  println(isLeft)
+  println("list= $list")
+  println("isLeft= $isLeft")
 }
 ```
 
@@ -143,6 +149,8 @@ Notice that in the `Either` case, should any string fail to parse the entire `tr
 
 Going back to our `Promise` example, we can get an `Applicative` instance for `IO`, by converting `Promise` to `IO` that runs each `Promise` concurrently. Then when we traverse a `List<A>` with an `(A) -> Promise<ForIO, B>`, we can imagine the traversal as a scatter-gather. Each `A` creates a concurrent computation that will produce a `B` (the scatter), and as the `Promise`s complete they will be gathered back into a `List`.
 
+{TODO: finish example with Promise}
+
 ```kotlin:ank:playground
 import arrow.core.Either
 import arrow.core.Option
@@ -161,9 +169,7 @@ fun userInfo(u: User): Promise<ForIO, Profile> = TODO()
 
 data class Admin(val name: String, val crd: Credentials): User
 
-fun ListK<User>.processLogin(): ListK<
-
-
+fun ListK<User>.processLogin()
 ```
 
 Evidently, `Traverse` is not limited to `List` or `Nel`, it provides an abstraction over 'things that can be traversed over', like a Binary tree, hence the name `Traverse`.
@@ -175,12 +181,7 @@ Another interesting effect we can use is Reader. Recall that a `Reader<D, A>` is
 If we fix `D` to be some sort of dependency or configuration, we can use the `Reader` applicative in our `traverse`.
 
 ```kotlin:ank
-import arrow.core.Id
-import arrow.core.ListK
-import arrow.core.extensions.id.applicative.applicative
 import arrow.mtl.Reader
-import arrow.mtl.extensions.kleisli.applicative.applicative
-import arrow.mtl.fix
 
 interface Context
 interface Topic
@@ -196,8 +197,18 @@ We can imagine we have a data pipeline that processes a bunch of data, each piec
 Corresponding to our bunches of data are bunches of topics, a `List<Topic>` if you will. Since Reader has an `Applicative` instance, we can `traverse` over this list with `processTopic`.
 
 ```kotlin:ank
+import arrow.core.Id
+import arrow.core.ForId
+import arrow.core.ListK
+import arrow.core.extensions.id.applicative.applicative
+import arrow.mtl.KleisliPartialOf
+import arrow.mtl.extensions.kleisli.applicative.applicative
+import arrow.mtl.fix
+
 fun processTopics(topics: ListK<Topic>): Job<ListK<Result>> =
-  topics.traverse(Job.applicative(Id.applicative()), ::processTopic).fix()
+  topics.traverse<KleisliPartialOf<ForId, Context>, Result>(Job.applicative<ForId, Context>(Id.applicative())) {
+    processTopic(it)
+  }.fix()
 ```
 
 Note the nice return type - `Job<List<Result>>`. We now have one aggregate `Job` that when run, will go through each topic and run the topic-specific job, collecting results as it goes. We say "when run" because a `Job` is some function that requires a Context before producing the value we want.
@@ -213,21 +224,135 @@ Finally, this encoding ensures that all the jobs for each topic run on the exact
 Sometimes you may find yourself with a collection of data, each of which is already in an effect, for instance a `List<Option<A>>`. To make this easier to work with, you want a `Option<List<A>>`. Given `Option` has an `Applicative` instance, we can traverse over the list with the identity function.
 
 ```kotlin:ank:playground
+import arrow.core.extensions.option.applicative.applicative
+import arrow.core.extensions.option.applicative.map
+import arrow.core.fix
+import arrow.core.identity
+import arrow.core.none
+import arrow.core.some
+import arrow.core.Option
+
 fun main() {
+  //sampleStart
   val optionList: Option<List<Int>> =
-  listOf(1.some(), 2.some(), 3.some())
-    .traverse(Option.applicative(), ::identity).fix().map { it.fix() }
+    listOf(1.some(), 2.some(), 3.some())
+      .traverse(Option.applicative(), ::identity).fix().map { it.fix() }
+
+  val emptyList: Option<List<Int>> =
+    listOf(1.some(), none(), 3.some())
+      .traverse(Option.applicative(), ::identity).map { it.fix() }
+  //sampleEnd
+  println("optionList = $optionList")
+  println("emptyList = $emptyList")
 }
 ```
+
+`Traverse` provides a convenience method `sequence` that does exactly this.
+
+```kotlin:ank:playground
+import arrow.core.Option
+import arrow.core.extensions.list.traverse.sequence
+import arrow.core.extensions.option.applicative.applicative
+import arrow.core.none
+import arrow.core.some
+
+fun main() {
+  //sampleStart
+  val optionList =
+    listOf(1.some(), 2.some(), 3.some())
+      .sequence(Option.applicative())
+
+  val emptyList =
+    listOf(1.some(), none(), 3.some())
+      .sequence(Option.applicative())
+  //sampleEnd
+  println("optionList = $optionList")
+  println("emptyList = $emptyList")
+}
+```
+
+-- Add Text
+
+### Traversables are Functors
+
+{TODO: finish this section}
 
 ### Traversing for effect
 
 Sometimes our effectful functions return a `Unit` value in cases where there is no interesting value to return (e.g. writing to some sort of store).
 
 ```kotlin:ank
+import arrow.fx.ForIO
+import arrow.fx.Promise
+
 interface Data
+
 fun writeToStore(data:Data): Promise<ForIO, Unit> = TODO()
 ```
+
+If we traverse using this, we end up with a funny type.
+
+```kotlin:ank
+import arrow.core.ListK
+import arrow.fx.IO
+import arrow.fx.extensions.io.applicative.applicative
+import arrow.fx.fix
+
+fun writeManyToStore(data: ListK<Data>): IO<ListK<Unit>> =
+  data.traverse(IO.applicative()) { writeToStore(it).get().fix() }.fix()
+```
+
+We end up with a `IO<ListK<Unit>>`! A `ListK<Unit>` is not of any use to us, and communicates the same amount of information as a single `Unit` does.
+
+Traversing solely for the sake of the effect (ignoring any values that may be produced, `Unit` or otherwise) is common, so `Foldable` (superclass of `Traverse`) provides `traverse_` and `sequence_` methods that do the same thing as `traverse` and `sequence` but ignores any value produced along the way, returning `Unit` at the end.
+
+```kotlin:ank
+fun writeManyToStore(data: ListK<Data>): IO<Unit> =
+  data.traverse_(IO.applicative()) { writeToStore(it).get() }.fix()
+```
+```kotlin:ank:playground
+import arrow.core.Option
+import arrow.core.extensions.list.foldable.sequence_
+import arrow.core.extensions.option.applicative.applicative
+import arrow.core.none
+import arrow.core.some
+
+fun main() {
+  //sampleStart
+  val someUnit = listOf(1.some(), 2.some(), 3.some())
+    .sequence_(Option.applicative())
+  val noneUnit = listOf(1.some(), none(), 3.some())
+    .sequence_(Option.applicative())
+  //sampleEnd
+  println("someUnit= $someUnit")
+  println("noneUnit= $noneUnit")
+}
+```
+
+### Traversables are Foldable
+
+The `Foldable` type class abstracts over “things that can be folded over” similar to how `Traverse` abstracts over “things that can be traversed.” It turns out `Traverse` is strictly more powerful than `Foldable` - that is, `foldLeft` and `foldRight` can be implemented in terms of `traverse` by picking the right `Applicative`. However, arrow's `Traverse` does not implement `foldLeft` and `foldRight` as the actual implementation tends to be ineffecient, as we one can implement the `Foldable` `fold`'s.
+
+For brevity and demonstration purposes we’ll implement an isomorphic `foldMap` method in terms of `traverse` by using `arrow.typeclasses.Const`. You can then implement `foldRight` in terms of `foldMap`, and `foldLeft` can then be implemented in terms of `foldRight`, though the resulting implementations may be slow.
+
+```kotlin:ank
+// TODO: finish this section
+```
+
+### Theory Wrap-up
+
+Unsurprisingly, `Foldable` and `Traverse` act on multiple elements and reduce them into a single value - in cat theory - `catamorphisms`.
+
+In contrast, `homomorphisms` such as `Monoid` and `Applicative` preserve their structure, hence `List<Int>` `+` `List<Int>` will yield a `List<Int>` or an `Applicative` instance `List<Int>.map(::toString)` result in a `List<String>`.
+
+We can think of catamorphic operations as :
+
+- the `if-else` expression in Kotlin, which models a `fold` over `Boolean`
+- various `fold` methods in Arrow, like in `Option` over `Some` and `None`, `Either` over `Left` and `Right` or `ListK`
+- `fold` in common ADTs from Computer Science like in a Binary tree 
+- the `reduce` method 
+
+One among many other usages of `Catamorphisms` are in [Recursion Schemes]({{ '/docs/recursion/intro/' | relative_url }})
 
 ### Data types
 
@@ -241,6 +366,11 @@ TypeClass(Traverse::class).dtMarkdownList()
 
 ank_macro_hierarchy(arrow.typeclasses.Traverse)
 
+## Futher Reading
+
+- [The Essence of the Iterator Pattern](https://www.cs.ox.ac.uk/jeremy.gibbons/publications/iterator.pdf) - Gibbons, Oliveira. JFP 2009.
+- [Catamorphisms] - Mark Seemann, 2019
+
 ## Credits
 
-The content is heavily inspired by [Scala exercise](https://www.scala-exercises.org/cats/traverse) and partially adopted from [examples from the Cats Community](https://typelevel.org/cats/typeclasses/traverse.html).
+The content is heavily inspired by [Scala exercise](https://www.scala-exercises.org/cats/traverse), from [examples from the Cats Community](https://typelevel.org/cats/typeclasses/traverse.html) and partially adopted from [Daniel Shin's Blog](https://www.danishin.com/article/Foldable_vs_Traverse_In_Scala).
