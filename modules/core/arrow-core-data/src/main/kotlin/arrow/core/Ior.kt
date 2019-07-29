@@ -162,7 +162,7 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
    * Ior.Both(12, "power").map { "flower $it" }  // Result: Both(12, "flower power")
    * ```
    */
-  inline fun <D> map(f: (B) -> D): Ior<A, D> = fold(
+  fun <D> map(f: (B) -> D): Ior<A, D> = fold(
     { Left(it) },
     { Right(f(it)) },
     { a, b -> Both(a, f(b)) }
@@ -179,7 +179,7 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
    * Ior.Both(12, "power").bimap ({ a, b -> "flower $b" },{ a * 2})  // Result: Both("flower power", 24)
    * ```
    */
-  inline fun <C, D> bimap(fa: (A) -> C, fb: (B) -> D): Ior<C, D> = fold(
+  fun <C, D> bimap(fa: (A) -> C, fb: (B) -> D): Ior<C, D> = fold(
     { Left(fa(it)) },
     { Right(fb(it)) },
     { a, b -> Both(fa(a), fb(b)) }
@@ -195,7 +195,7 @@ sealed class Ior<out A, out B> : IorOf<A, B> {
    * Ior.Both(12, "power").map { "flower $it" }  // Result: Both("flower 12", "power")
    * ```
    */
-  inline fun <C> mapLeft(fa: (A) -> C): Ior<C, B> = fold(
+  fun <C> mapLeft(fa: (A) -> C): Ior<C, B> = fold(
     { Left(fa(it)) },
     { Right((it)) },
     { a, b -> Both(fa(a), b) }
@@ -333,7 +333,7 @@ fun <A, B, D> Ior<A, B>.flatMap(SG: Semigroup<A>, f: (B) -> Ior<A, D>): Ior<A, D
 fun <A, B, D> Ior<A, B>.ap(SG: Semigroup<A>, ff: IorOf<A, (B) -> D>): Ior<A, D> =
   ff.fix().flatMap(SG) { f -> map(f) }
 
-inline fun <A, B> Ior<A, B>.getOrElse(crossinline default: () -> B): B = fold({ default() }, ::identity, { _, b -> b })
+fun <A, B> Ior<A, B>.getOrElse(default: () -> B): B = fold({ default() }, ::identity, { _, b -> b })
 
 fun <A, B, G> IorOf<A, Kind<G, B>>.sequence(GA: Applicative<G>): Kind<G, Ior<A, B>> =
   fix().traverse(GA, ::identity)
