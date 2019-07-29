@@ -11,9 +11,9 @@ redirect_from:
 {:.intermediate}
 intermediate
 
-In functional programming it is very common to encode "effects" as data types - common effects include `Option` for possibly missing values, `Either` and `Validated` for possible errors, and [`Promise`]({{ '/docs/effects/promise/' | relative_url }}) for asynchronous computations, which has the same purpose as a `Future`, only pure and lazy.
+In functional programming it is very common to encode "behaviors" as data types - common behaviors include `Option` for possibly missing values, `Either` and `Validated` for possible errors, and [`Promise`]({{ '/docs/effects/promise/' | relative_url }}) for asynchronous computations, which has the same purpose as a `Future`, only pure and lazy.
 
-These effects tend to show up in functions working on a single piece of data - for instance parsing a single `String` into an `Int`, validating a login, or asynchronously fetching website information for a user.
+These behaviors tend to show up in functions working on a single piece of data - for instance parsing a single `String` into an `Int`, validating a login, or asynchronously fetching website information for a user.
 
 ```kotlin:ank
 import arrow.core.Either
@@ -47,6 +47,7 @@ There exists a much more generalized form that would allow us to parse a `List<S
 Enter `Traverse`.
 
 ### The Typeclass
+
 At center stage of Traverse is the traverse method.
 
 ```kotlin
@@ -55,7 +56,7 @@ import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 
 interface Traverse<F> : Functor<F>, Foldable<F> {
-  fun <G, A, B> Kind<F, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): 
+  fun <G, A, B> Kind<F, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Kind<F, B>>
 }
 ```
 
@@ -63,7 +64,7 @@ interface Traverse<F> : Functor<F>, Foldable<F> {
 
 In our above example, `F` is `List`, and `G` is `Option`, `Either`, or `Promise`. For the profile example, traverse says given a `List<User>` and a function `(User) -> Promise<ForIO, Profile>`, it can give you a `Promise<ForIO, List<Profile>>`.
 
-Abstracting away the `G` (still imagining `F` to be `List`), `traverse` says given a collection of data, and a function that takes a piece of data and returns an effectful value, it will traverse the collection, applying the function and aggregating the effectful values (in a `List`) as it goes.
+Abstracting away the `G` (still imagining `F` to be `List`), `traverse` says given a collection of data, and a function that takes a piece of data and returns an value `B` wrapped in a container `G`, it will traverse the collection, applying the function and aggregating the values (in a `List`) as it goes.
 
 In the most general form, `Kind<F, A>` is some sort of context `F` which may contain a value `A` (or several). While `List` tends to be among the most general cases, there also exist `Traverse` instances for `Option`, `Either`, and `Validated` (among others).
 
@@ -71,9 +72,9 @@ In the most general form, `Kind<F, A>` is some sort of context `F` which may con
 
 
 
-#### Choose your effect
+#### Choose your data type
 
-The type signature of `Traverse` appears highly abstract, and indeed it is - what `traverse` does as it walks the `Kind<F, A>` depends on the effect of the function. Let's see some examples where `F` is taken to be `List`.
+The type signature of `Traverse` appears highly abstract, and indeed it is - what `traverse` does as it walks the `Kind<F, A>` depending on the context `F` of the function. Let's see some examples where `F` is taken to be `List`.
 
 ```kotlin:ank
 import arrow.core.ValidatedNel
@@ -145,7 +146,7 @@ fun main() {
 }
 ```
 
-Notice that in the `Either` case, should any string fail to parse the entire `traversal` is considered a failure. Moreover, once it hits its first bad parse, it will not attempt to parse any others down the line (similar behavior would be found with using `Option` as the effect). Contrast this with `Validated` where even if one bad parse is hit, it will continue trying to parse the others, accumulating any and all errors as it goes. The behavior of traversal is closely tied with the `Applicative` behavior of the data type.
+Notice that in the `Either` case, should any string fail to parse the entire `traversal` is considered a failure. Moreover, once it hits its first bad parse, it will not attempt to parse any others down the line (similar behavior would be found with using `Option` as a data type). Contrast this with `Validated` where even if one bad parse is hit, it will continue trying to parse the others, accumulating any and all errors as it goes. The behavior of traversal is closely tied with the `Applicative` behavior of the data type.
 
 Going back to our `Promise` example, we can get an `Applicative` instance for `IO`, by converting `Promise` to `IO` that runs each `Promise` concurrently. Then when we traverse a `List<A>` with an `(A) -> Promise<ForIO, B>`, we can imagine the traversal as a scatter-gather. Each `A` creates a concurrent computation that will produce a `B` (the scatter), and as the `Promise`s complete they will be gathered back into a `List`.
 
@@ -176,7 +177,7 @@ Evidently, `Traverse` is not limited to `List` or `Nel`, it provides an abstract
 
 #### Playing with `Reader`
 
-Another interesting effect we can use is Reader. Recall that a `Reader<D, A>` is a type alias for `Kleisli<ForId, D, A>` which is a wrapper around `(D) -> A`.
+Another interesting data type we can use is Reader. Recall that a `Reader<D, A>` is a type alias for `Kleisli<ForId, D, A>` which is a wrapper around `(D) -> A`.
 
 If we fix `D` to be some sort of dependency or configuration, we can use the `Reader` applicative in our `traverse`.
 
@@ -194,7 +195,7 @@ fun processTopic(t: Topic): Job<Result> = TODO()
 
 We can imagine we have a data pipeline that processes a bunch of data, each piece of data being categorized by a topic. Given a specific topic, we produce a `Job` that processes that topic. (Note that since a `Job` is just a `Reader`/`Kleisli`, one could write many small `Jobs` and compose them together into one `Job` that is used/returned by `processTopic`.)
 
-Corresponding to our bunches of data are bunches of topics, a `List<Topic>` if you will. Since Reader has an `Applicative` instance, we can `traverse` over this list with `processTopic`.
+Corresponding to bunch of topics, a `List<Topic>` if you will. Since Reader has an `Applicative` instance, we can `traverse` over this list with `processTopic`.
 
 ```kotlin:ank
 import arrow.core.Id
@@ -217,11 +218,11 @@ One example of a "context" can be found in the [Spark](http://spark.apache.org/)
 
 Moreover, the fact that our aggregate job is not tied to any specific `SparkContext` allows us to pass in a `SparkContext` pointing to a production cluster, or (using the exact same job) pass in a test `SparkContext` that just runs locally across threads. This makes testing our large job nice and easy.
 
-Finally, this encoding ensures that all the jobs for each topic run on the exact same cluster. At no point do we manually pass in or thread a `SparkContext` through - that is taken care for us by the (applicative) effect of `Reader` and therefore by `traverse`.
+Finally, this encoding ensures that all the jobs for each topic run on the exact same cluster. At no point do we manually pass in or thread a `SparkContext` through - that is taken care for us by the (applicative) behavior of `Reader` and therefore by `traverse`.
 
 ### Sequencing
 
-Sometimes you may find yourself with a collection of data, each of which is already in an effect, for instance a `List<Option<A>>`. To make this easier to work with, you want a `Option<List<A>>`. Given `Option` has an `Applicative` instance, we can traverse over the list with the identity function.
+Sometimes you may find yourself with a collection of data, each of which is already in an data type, for instance a `List<Option<A>>`. To make this easier to work with, you want a `Option<List<A>>`. Given `Option` has an `Applicative` instance, we can traverse over the list with the identity function.
 
 ```kotlin:ank:playground
 import arrow.core.extensions.option.applicative.applicative
@@ -271,13 +272,18 @@ fun main() {
 }
 ```
 
--- Add Text
+In general this holds:
+
+```kotlin
+
+```
+
 
 ### Traversables are Functors
 
 {TODO: finish this section}
 
-### Traversing for effect
+### Traversing for effects
 
 Sometimes our effectful functions return a `Unit` value in cases where there is no interesting value to return (e.g. writing to some sort of store).
 
@@ -304,7 +310,7 @@ fun writeManyToStore(data: ListK<Data>): IO<ListK<Unit>> =
 
 We end up with a `IO<ListK<Unit>>`! A `ListK<Unit>` is not of any use to us, and communicates the same amount of information as a single `Unit` does.
 
-Traversing solely for the sake of the effect (ignoring any values that may be produced, `Unit` or otherwise) is common, so `Foldable` (superclass of `Traverse`) provides `traverse_` and `sequence_` methods that do the same thing as `traverse` and `sequence` but ignores any value produced along the way, returning `Unit` at the end.
+Traversing solely for the sake of the effects (ignoring any values that may be produced, `Unit` or otherwise) is common, so `Foldable` (superclass of `Traverse`) provides `traverse_` and `sequence_` methods that do the same thing as `traverse` and `sequence` but ignores any value produced along the way, returning `Unit` at the end.
 
 ```kotlin:ank
 fun writeManyToStore(data: ListK<Data>): IO<Unit> =
@@ -352,7 +358,7 @@ We can think of catamorphic operations as :
 - `fold` in common ADTs from Computer Science like in a Binary tree 
 - the `reduce` method 
 
-One among many other usages of `Catamorphisms` are in [Recursion Schemes]({{ '/docs/recursion/intro/' | relative_url }})
+One among many other usages of `Catamorphism` are in [Recursion Schemes]({{ '/docs/recursion/intro/' | relative_url }}).
 
 ### Data types
 
@@ -369,7 +375,7 @@ ank_macro_hierarchy(arrow.typeclasses.Traverse)
 ## Futher Reading
 
 - [The Essence of the Iterator Pattern](https://www.cs.ox.ac.uk/jeremy.gibbons/publications/iterator.pdf) - Gibbons, Oliveira. JFP 2009.
-- [Catamorphisms] - Mark Seemann, 2019
+- [Catamorphisms](https://blog.ploeh.dk/2019/04/29/catamorphisms/) - Mark Seemann, 2019
 
 ## Credits
 
