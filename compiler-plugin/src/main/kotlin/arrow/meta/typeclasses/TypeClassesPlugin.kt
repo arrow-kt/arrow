@@ -4,7 +4,7 @@ import arrow.meta.extensions.CompilerContext
 import arrow.meta.extensions.ExtensionPhase
 import arrow.meta.extensions.MetaComponentRegistrar
 import arrow.meta.ir.IrUtils
-import arrow.meta.ir.functionAccess
+import arrow.meta.ir.irFunctionAccess
 import arrow.meta.qq.func
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageLocation
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
@@ -15,11 +15,12 @@ import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
+import org.jetbrains.kotlin.ir.expressions.IrFunctionAccessExpression
 import org.jetbrains.kotlin.ir.expressions.mapValueParameters
-import org.jetbrains.kotlin.ir.util.render
-import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
+import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtAnnotated
 import org.jetbrains.kotlin.psi.KtClass
+import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.KtTypeElement
 import org.jetbrains.kotlin.psi.psiUtil.getSuperNames
 import org.jetbrains.kotlin.resolve.descriptorUtil.parents
@@ -33,36 +34,40 @@ val MetaComponentRegistrar.typeClasses: List<ExtensionPhase>
   get() =
     meta(
       func(
-        match = {
-          println("Considering function to replace: $text")
-          valueParameters.any { it.defaultValue?.text == WithMarker }
-        },
+        match = { hasExtensionValueParameters() },
         map = { func ->
-          println("Found function to replace: ${func.name}")
-          val scopeNames = func.valueParameters.filter { it.defaultValue?.text == WithMarker }.map { it.name }
           listOf(
             """
               |$modality $visibility fun <$typeParameters> $receiver.$name($valueParameters): $returnType =
-              |  ${scopeNames.fold(body.asString()) { acc, scope -> "$scope.run { $acc }" }}
+              |  ${func.extensionValueParamNames().run(body)}
               |"""
           )
         }
       ),
-      functionAccess { expression ->
-        if (expression.defaultValues().contains(WithMarker)) { // with marker should be replaced by implicit injection
-          println("visitFunctionAccess: ${expression.render()}\n${expression.descriptor.findPsi()?.text}")
-          expression.mapValueParameters { valueParameterDescriptor ->
-            val extension = findExtension(valueParameterDescriptor)
-            when (extension) {
-              is FunctionDescriptor -> extension.irCall()
-              is ClassDescriptor -> extension.irConstructorCall()
-              is PropertyDescriptor -> extension.irGetterCall()
-              else -> null
-            }
-          }
-        } else null
-      }
+      irFunctionAccess { mapValueParameterExtensions(it) }
     )
+
+private fun List<String?>.run(body: Name): String =
+  fold(body.asString()) { acc, scope -> "$scope.run { $acc }" }
+
+private fun KtFunction.extensionValueParamNames() =
+  valueParameters.filter { it.defaultValue?.text == WithMarker }.map { it.name }
+
+private fun KtFunction.hasExtensionValueParameters(): Boolean =
+  valueParameters.any { it.defaultValue?.text == WithMarker }
+
+private fun IrUtils.mapValueParameterExtensions(expression: IrFunctionAccessExpression): IrFunctionAccessExpression? =
+  if (expression.defaultValues().contains(WithMarker)) {
+    expression.mapValueParameters { extensionCall(it) }
+  } else null
+
+private fun IrUtils.extensionCall(valueParameterDescriptor: ValueParameterDescriptor): IrFunctionAccessExpression? =
+  when (val extension = findExtension(valueParameterDescriptor)) {
+    is FunctionDescriptor -> extension.irCall()
+    is ClassDescriptor -> extension.irConstructorCall()
+    is PropertyDescriptor -> extension.irGetterCall()
+    else -> null
+  }
 
 private fun IrUtils.findExtension(valueParameterDescriptor: ValueParameterDescriptor): DeclarationDescriptor? {
   val extensionType = valueParameterDescriptor.type
