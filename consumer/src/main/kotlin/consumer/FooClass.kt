@@ -2,6 +2,7 @@ package consumer
 
 import arrow.Kind
 import arrow.`*`
+import arrow.extension
 
 /** HigherKinds **/
 sealed class Option<out A> {
@@ -38,12 +39,12 @@ interface Functor<F> {
 //    (this as Option<A>).map(f)
 //}
 
-//class FunctorForOption: Functor<ForOption> {
-//  override fun <A, B> OptionOf<A>.map(f: (A) -> B): Option<B> =
-//    (this as Option<A>).map(f)
-//}
+@extension class FunctorForOptionClass: Functor<ForOption> {
+  override fun <A, B> OptionOf<A>.map(f: (A) -> B): Option<B> =
+    (this as Option<A>).map(f)
+}
 
-object FunctorForOption: Functor<ForOption> {
+@extension object FunctorForOption: Functor<ForOption> {
   override fun <A, B> OptionOf<A>.map(f: (A) -> B): Option<B> =
     (this as Option<A>).map(f)
 }

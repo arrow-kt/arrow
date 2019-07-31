@@ -17,18 +17,16 @@ import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.ir.expressions.IrFunctionAccessExpression
 import org.jetbrains.kotlin.ir.expressions.mapValueParameters
+import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.psi.KtAnnotated
-import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtFunction
-import org.jetbrains.kotlin.psi.KtTypeElement
-import org.jetbrains.kotlin.psi.psiUtil.getSuperNames
+import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.parents
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.typeUtil.isSubtypeOf
 
 const val WithMarker = "`*`"
-const val ExtensionAnnotation = "@extension"
+val ExtensionAnnotation = FqName("arrow.extension")
 
 val MetaComponentRegistrar.typeClasses: List<ExtensionPhase>
   get() =
@@ -74,9 +72,18 @@ private fun IrUtils.findExtension(valueParameterDescriptor: ValueParameterDescri
   val typeClass = extensionType.typeClassDescriptor()
   val dataType = extensionType.dataTypeDescriptor()
   val typeClassPackage = typeClass.packageFragmentDescriptor()
-  val extension = typeClassPackage.findExtensionProof(extensionType)
-  extension ?: compilerContext.reportExtensionNotFound(extensionType)
-  return extension
+  val extensions = typeClassPackage.findExtensionProof(extensionType)
+  return when {
+    extensions.isEmpty() -> {
+      compilerContext.reportExtensionNotFound(extensionType)
+      null
+    }
+    extensions.size > 1 -> {
+      compilerContext.reportAmbiguousExtensions(extensionType, extensions)
+      null
+    }
+    else -> extensions[0]
+  }
 }
 
 private fun CompilerContext.reportExtensionNotFound(extensionType: KotlinType): Unit {
@@ -87,15 +94,25 @@ private fun CompilerContext.reportExtensionNotFound(extensionType: KotlinType): 
   )
 }
 
-private fun PackageFragmentDescriptor.findExtensionProof(extensionType: KotlinType): DeclarationDescriptor? =
+private fun CompilerContext.reportAmbiguousExtensions(
+  extensionType: KotlinType,
+  descriptors: List<DeclarationDescriptor>
+): Unit {
+  messageCollector.report(
+    CompilerMessageSeverity.ERROR,
+    """Expected a single @extension for [$extensionType] but found the following conflicting extensions: ${descriptors.joinToString() { it.fqNameSafe.asString() }}""".trimMargin(),
+    CompilerMessageLocation.create(null)
+  )
+}
+
+private fun PackageFragmentDescriptor.findExtensionProof(extensionType: KotlinType): List<DeclarationDescriptor> =
   getMemberScope()
     .getContributedDescriptors()
-    .find {
-      val result = it is FunctionDescriptor && it.returnType?.isSubtypeOf(extensionType) == true ||
+    .filter {
+      it.annotations.findAnnotation(ExtensionAnnotation) != null &&
+      it is FunctionDescriptor && it.returnType?.isSubtypeOf(extensionType) == true ||
         it is ClassDescriptor && it.typeConstructor.supertypes.contains(extensionType) ||
         it is PropertyDescriptor && it.type.isSubtypeOf(extensionType)
-      println("Considering: ${it.javaClass}, ${it.name}: $result")
-      result
     }
 
 private fun ClassifierDescriptor?.packageFragmentDescriptor(): PackageFragmentDescriptor =
@@ -106,16 +123,4 @@ private fun KotlinType.dataTypeDescriptor(): ClassifierDescriptor? =
 
 private fun KotlinType.typeClassDescriptor(): ClassifierDescriptor? =
   constructor.declarationDescriptor
-
-private fun KtClass.typeArgumentNames(): List<String> =
-  typeClassTypeElement()?.typeArgumentsAsTypes?.map { it.text }.orEmpty()
-
-private fun KtClass.typeClassTypeElement(): KtTypeElement? =
-  getSuperTypeList()?.entries?.get(0)?.typeReference?.typeElement
-
-private fun KtClass.typeClassName(): String =
-  getSuperNames()[0]
-
-private fun KtAnnotated.isExtension(): Boolean =
-  annotationEntries.any { it.text == ExtensionAnnotation }
 
