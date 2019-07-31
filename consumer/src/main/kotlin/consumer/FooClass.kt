@@ -50,11 +50,11 @@ object FunctorForOption: Functor<ForOption> {
 
 fun <F> Kind<F, Int>.addOne(FF: Functor<F> = `*`): Kind<F, Int> =
   map { it + 1 }
-
-class Service {
-  fun <F> Kind<F, Int>.addOne(FF: Functor<F> = `*`): Kind<F, Int> =
-    map { it + 1 }
-}
+//
+//class Service {
+//  fun <F> Kind<F, Int>.addOne(FF: Functor<F> = `*`): Kind<F, Int> =
+//    map { it + 1 }
+//} TODO support nested functions that are not top level in injections through arrow meta
 
 fun testConversion(): Any =
   Option.Some(1).addOne()
