@@ -1,12 +1,38 @@
 apply plugin: 'kotlin'
 apply plugin: 'kotlin-kapt'
+//apply plugin: 'com.github.johnrengelman.shadow'
 
-compileKotlin.kotlinOptions.freeCompilerArgs = ['-Xskip-runtime-version-check', 'true']
+//compileKotlin.kotlinOptions.freeCompilerArgs = ['-Xskip-runtime-version-check', 'true']
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    compile "org.jetbrains.kotlin:kotlin-compiler-embeddable:$kotlin_version"
+  compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+  compile "org.jetbrains.kotlin:kotlin-compiler-embeddable:$kotlin_version"
 
-    compile "com.google.auto.service:auto-service:+"
-    kapt "com.google.auto.service:auto-service:+"
+  compile "com.google.auto.service:auto-service:+"
+  kapt "com.google.auto.service:auto-service:+"
 }
+
+compileKotlin {
+  kotlinOptions.jvmTarget = "1.8"
+}
+compileTestKotlin {
+  kotlinOptions.jvmTarget = "1.8"
+}
+jar {
+  manifest {
+    attributes["Specification-Title"] = project.name
+    attributes["Specification-Version"] = project.version
+    attributes["Implementation-Title"] = "arrow.meta.plugin.compiler"
+    attributes["Implementation-Version"] = project.version
+  }
+}
+
+//shadowJar {
+//  configurations = []
+//  classifier = "embeddable"
+//}
+//
+//// Create embeddable configuration
+//configurations.create("embeddable") {
+//  extendsFrom(configurations.shadow)
+//}

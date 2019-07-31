@@ -1,11 +1,5 @@
 apply plugin: 'kotlin'
 
-repositories {
-    flatDir {
-        dirs "$rootDir/core/build/libs"
-    }
-}
-
 def compilerPlugin = project(':compiler-plugin')
 
 evaluationDependsOn(":$compilerPlugin.name")
@@ -19,15 +13,4 @@ dependencies {
 
 afterEvaluate {
     tasks["compileKotlin"].dependsOn += compilerPlugin.tasks["jar"]
-}
-
-dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    compile project(':core')
-    implementation name: "core"
-}
-
-task execute(type:JavaExec) {
-    main = "consumer.test"
-    classpath = sourceSets.main.runtimeClasspath
 }
