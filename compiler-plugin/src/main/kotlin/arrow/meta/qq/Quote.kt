@@ -126,7 +126,6 @@ inline fun <reified K : KtElement, P : KtElement, S> CompilerContext.processFile
     val mutations = arrayListOf<Transformation<K>>()
     if (mutatingDocument != null) {
       file.accept(object : MetaTreeVisitor() {
-
         override fun visitKtElement(element: KtElement) {
           println("visitKtElement: ${element.javaClass}")
           if (element.javaClass == K::class.java) {
@@ -190,8 +189,8 @@ fun java.util.ArrayList<KtFile>.replaceFiles(file: KtFile, newFile: KtFile) {
   add(fileIndex, newFile)
 }
 
-fun changeSource(file: KtFile, newSource: String): KtFile {
-  return KtFile(
+fun changeSource(file: KtFile, newSource: String): KtFile =
+  KtFile(
     viewProvider = MetaFileViewProvider(file.manager, file.virtualFile) {
       it?.also {
         it.setText(newSource)
@@ -199,4 +198,3 @@ fun changeSource(file: KtFile, newSource: String): KtFile {
     },
     isCompiled = false
   )
-}
