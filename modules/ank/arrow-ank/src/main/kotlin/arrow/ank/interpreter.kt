@@ -131,7 +131,7 @@ val interpreter: AnkOps = object : AnkOps {
       content
         .fold(
           Tuple3(SnippetParserState.Searching as SnippetParserState, emptySequence(), emptySequence())
-        ) { (state, lines, snippets), line ->
+        ) { (state: SnippetParserState, lines, snippets), line ->
           when (state) {
             is SnippetParserState.Searching -> {
               val startMatch = fenceRegexStart.matchEntire(line)
