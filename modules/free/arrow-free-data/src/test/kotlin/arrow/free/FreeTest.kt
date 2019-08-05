@@ -1,13 +1,14 @@
 package arrow.free
 
-import arrow.Kind
 import arrow.core.ForId
 import arrow.core.Id
 import arrow.core.NonEmptyList
 import arrow.core.Option
 import arrow.core.Some
+import arrow.core.extensions.id.foldable.foldable
 import arrow.core.extensions.id.functor.functor
 import arrow.core.extensions.id.monad.monad
+import arrow.core.extensions.id.traverse.traverse
 import arrow.core.extensions.nonemptylist.monad.monad
 import arrow.core.extensions.option.monad.monad
 import arrow.core.value
@@ -64,13 +65,12 @@ class FreeTest : UnitSpec() {
 
     val EQ: FreeEq<ForOps, ForId, Int> = Free.eq(IdMonad, idInterpreter)
 
-    @Suppress("UNCHECKED_CAST")
     testLaws(
       EqLaws.laws(EQ) { Ops.value(it) },
       MonadLaws.laws(Ops, EQ),
       MonadLaws.laws(Free.monad(), EQ),
-      FoldableLaws.laws(Free.foldable(), { Ops.value(it) }, Eq.any()),
-      TraverseLaws.laws(Free.traverse(Id.functor()), Free.functor(), { a -> Ops.value(a) as Kind<FreePartialOf<ForId>, Int> }, Eq.any())
+      FoldableLaws.laws(Free.foldable(Id.foldable()), { it.free() }, Eq.any()),
+      TraverseLaws.laws(Free.traverse(Id.traverse()), Free.functor(), { it.free() }, Eq.any())
     )
 
     "Can interpret an ADT as Free operations to Option" {

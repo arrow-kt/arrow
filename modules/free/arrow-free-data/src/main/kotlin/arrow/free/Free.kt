@@ -24,7 +24,7 @@ sealed class Free<S, out A> : FreeOf<S, A> {
 
     fun <S, A> defer(value: () -> Free<S, A>): Free<S, A> = just<S, Unit>(Unit).flatMap { _ -> value() }
 
-    fun <S, A> roll(value: Kind<S, Free<S, A>>): Free<S, A> = liftF(value).flatMap(::identity)
+    fun <S, A> roll(value: Kind<S, Kind<FreePartialOf<S>, A>>): Free<S, A> = liftF(value).flatMap { it.fix() }
 
     internal fun <F> functionKF(): FunctionK<F, FreePartialOf<F>> =
       object : FunctionK<F, FreePartialOf<F>> {
