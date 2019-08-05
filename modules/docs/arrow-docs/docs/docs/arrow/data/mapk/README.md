@@ -37,3 +37,13 @@ Sometimes you need to "map" one Map to another. You are able to do so with `map2
     }
     // eggsBag = MapK(map={eggs=11})
 ```
+
+`map2Eval` does pretty much the same as `map2`, but result `KMap` will be wrapped in [`Eval`](https://arrow-kt.io/docs/arrow/core/eval/#eval) type.
+
+It is possible to transform map entry value type:
+```kotlin:ank
+    val map1: MapK<String, Int> = mapOf("one" to 1, "two" to 2).k()
+    val map2: MapK<String, (Int) -> String> = mapOf("one" to { i: Int -> "String \"$i\"" }).k()
+
+    val apResult = map1.ap(map2) // MapK(map={one=String "1"})
+```
