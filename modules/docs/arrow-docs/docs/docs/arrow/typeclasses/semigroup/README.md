@@ -39,7 +39,7 @@ import arrow.core.extensions.*
 Int.semigroup().run { 1.combine(2) }
 ```
 
-```kotlin:ank   
+```kotlin:ank
 import arrow.core.*
 import arrow.core.extensions.*
 import arrow.core.extensions.listk.semigroup.*

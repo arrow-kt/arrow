@@ -23,12 +23,6 @@ import arrow.fx.Promise
 interface Profile
 interface User
 
-fun parseInt(s: String): Option<Int> = TODO()
-data class SecurityError(val message: String)
-data class Credentials(val email: String, val password: String)
-
-fun validateLogin(c: Credentials): Either<SecurityError, Unit> = TODO()
-
 fun userInfo(u: User): Promise<ForIO, Profile> = TODO()
 ```
 
@@ -48,7 +42,7 @@ Enter `Traverse`.
 
 ### The Typeclass
 
-At center stage of Traverse is the traverse method.
+At center stage of Traverse is the `traverse` method.
 
 ```kotlin
 import arrow.typeclasses.Applicative
@@ -60,21 +54,48 @@ interface Traverse<F> : Functor<F>, Foldable<F> {
 }
 ```
 
-**Essentially, one uses `Traverse`, when there is a function `(A) -> Kind<G, B>` and `G` is an `Applicative` instance e.g.: `(User) -> Promise<ForIO, Profile>` and you want to `lift` the previous function to work on `Kind<F, A>` where `F` is a `Traverse` instance e.g.: `List<User>` and return `Kind<G, Kind<F, B>>` e.g.: `Promise<ForIO, List<Profile>>`**
-
 In our above example, `F` is `List`, and `G` is `Option`, `Either`, or `Promise`. For the profile example, traverse says given a `List<User>` and a function `(User) -> Promise<ForIO, Profile>`, it can give you a `Promise<ForIO, List<Profile>>`.
 
 Abstracting away the `G` (still imagining `F` to be `List`), `traverse` says given a collection of data, and a function that takes a piece of data and returns an value `B` wrapped in a container `G`, it will traverse the collection, applying the function and aggregating the values (in a `List`) as it goes.
 
 In the most general form, `Kind<F, A>` is some sort of context `F` which may contain a value `A` (or several). While `List` tends to be among the most general cases, there also exist `Traverse` instances for `Option`, `Either`, and `Validated` (among others).
 
-#### Why not Foldable
+Essentially, one uses `Traverse`, when there is a function `(A) -> Kind<G, B>` and `G` is an `Applicative` instance, thus `G` provides `just` and `map` functions e.g.: just as `Promise<ForIO, B>` provides and you want to `lift` the previous function to work on `Kind<F, A>` where `F` is a `Traverse` instance - and you still care about `A` (the `Profiles`) `(List<User>)` and return `Kind<G, Kind<F, B>>` e.g.: `Promise<ForIO, List<Profile>>`
 
+### To `fold` or not to `fold`
 
+Even though, `Foldable` and `Traverse` are related, because both 'reduce their values to something', it is not obvious why to consider `Traverse` over `Foldable`.
 
-#### Choose your data type
+Here is a small example:
 
-The type signature of `Traverse` appears highly abstract, and indeed it is - what `traverse` does as it walks the `Kind<F, A>` depending on the context `F` of the function. Let's see some examples where `F` is taken to be `List`.
+```kotlin
+val map: MapK<String, Int> = mapOf("one" to 1, "two" to 2).k()
+
+val optionMapK: Option<MapK<String, String>> = map.traverse(Option.applicative()) { Some("$it") }.fix()
+
+val optionMapKBoilered = map.foldLeft(Some(emptyMap())) { acc: Option<MapK<String, String>>, i: Int ->
+  acc.fold({ emptyMap() }, { /*Some logic to retrieve the key of a value, transform it and add it to the accumulated Map*/ })
+}
+```
+
+Both values try to attain the same thing, but what `Foldable` lacks is that it solely drills down to it's `A` here `Int` and does not preserve it's shape `F` - `MapK`. This is where `Traverse` shines, whenever you care about the Output `B` from `(A) -> B` and the existing shape of `F` you would use `traverse`.
+
+Additionally, your able to wrap your context `F` within a `G`. That is exactly the reason why `Traverse` is strictly more powerful than `Foldable`.
+
+You can also misuse it's powers - where a `map` is more considerable: 
+
+```kotlin:ank
+val map: MapK<String, Int> = mapOf("one" to 1, "two" to 2).k()
+
+map.traverse(Id.applicative()) { Id("$it") }.fix().value()
+```
+```kotlin:ank
+map.map { "$it" }
+```
+
+### Choose your implementation
+
+The type signature of `Traverse` appears highly abstract, although it's easier if you think about it as executing operations over collections - what `traverse` does as it walks the `Kind<F, A>` depending on the context `F` of the function. Let's see some examples where `F` is taken to be `List`.
 
 ```kotlin:ank
 import arrow.core.ValidatedNel
@@ -146,40 +167,55 @@ fun main() {
 }
 ```
 
-Notice that in the `Either` case, should any string fail to parse the entire `traversal` is considered a failure. Moreover, once it hits its first bad parse, it will not attempt to parse any others down the line (similar behavior would be found with using `Option` as a data type). Contrast this with `Validated` where even if one bad parse is hit, it will continue trying to parse the others, accumulating any and all errors as it goes. The behavior of traversal is closely tied with the `Applicative` behavior of the data type.
+Notice that in the `Either` case, should any string fail to parse the entire `traversal` is considered a failure. Moreover, once it hits its first bad parse, it will not attempt to parse any others down the line (similar behavior would be found with using `Option`). Contrast this with `Validated` where even if one bad parse is hit, it will continue trying to parse the others, accumulating any and all errors as it goes. The behavior of traversal is closely tied with the `Applicative` behavior of the data type.
 
 Going back to our `Promise` example, we can get an `Applicative` instance for `IO`, by converting `Promise` to `IO` that runs each `Promise` concurrently. Then when we traverse a `List<A>` with an `(A) -> Promise<ForIO, B>`, we can imagine the traversal as a scatter-gather. Each `A` creates a concurrent computation that will produce a `B` (the scatter), and as the `Promise`s complete they will be gathered back into a `List`.
 
-{TODO: finish example with Promise}
-
 ```kotlin:ank:playground
-import arrow.core.Either
-import arrow.core.Option
+import arrow.core.ListK
+import arrow.core.k
+import arrow.fx.ForIO
+import arrow.fx.IO
 import arrow.fx.Promise
+import arrow.fx.extensions.io.applicative.applicative
+import arrow.fx.extensions.io.applicativeError.attempt
+import arrow.fx.extensions.io.async.async
+import arrow.fx.extensions.io.monad.flatMap
+import arrow.fx.fix
 
 interface Profile
 interface User
 
-fun parseInt(s: String): Option<Int> = TODO()
-data class SecurityError(val message: String)
-data class Credentials(val email: String, val password: String)
+data class DummyUser(val name: String) : User
+data class DummyProfile(val u: User) : Profile
 
-fun validateLogin(c: Credentials): Either<SecurityError, Unit> = TODO()
+fun main() {
+  //sampleStart
+  val promise: IO<Promise<ForIO, Profile>> =
+    Promise.uncancelable<ForIO, Profile>(IO.async()).fix()
 
-fun userInfo(u: User): Promise<ForIO, Profile> = TODO()
+  fun userInfo(u: User): IO<Profile> =
+    promise.flatMap { p -> p.complete(DummyProfile(u)).flatMap { p.get() } }
 
-data class Admin(val name: String, val crd: Credentials): User
+  fun ListK<User>.processLogin() =
+    traverse(IO.applicative()) { userInfo(it) }
 
-fun ListK<User>.processLogin()
+  val res = listOf(DummyUser("Micheal"), DummyUser("Juan"), DummyUser("T'Challa")).k()
+    .processLogin()
+    .attempt()
+    .unsafeRunSync()
+  //sampleEnd
+  println(res)
+}
 ```
 
-Evidently, `Traverse` is not limited to `List` or `Nel`, it provides an abstraction over 'things that can be traversed over', like a Binary tree, hence the name `Traverse`.
+Evidently, `Traverse` is not limited to `List` or `Nel`, it provides an abstraction over 'things that can be traversed over', like a Binary tree, a Sequence, or a Stream, hence the name `Traverse`.
 
-#### Playing with `Reader`
+### Playing with `Reader`
 
 Another interesting data type we can use is Reader. Recall that a `Reader<D, A>` is a type alias for `Kleisli<ForId, D, A>` which is a wrapper around `(D) -> A`.
 
-If we fix `D` to be some sort of dependency or configuration, we can use the `Reader` applicative in our `traverse`.
+If we fix `D` to be some sort of dependency or configuration and `A` as the return Type, we can use the `Reader` applicative in our `traverse`.
 
 ```kotlin:ank
 import arrow.mtl.Reader
@@ -206,8 +242,10 @@ import arrow.mtl.KleisliPartialOf
 import arrow.mtl.extensions.kleisli.applicative.applicative
 import arrow.mtl.fix
 
+val JobForContext = Job.applicative<ForId, Context>(Id.applicative())
+
 fun processTopics(topics: ListK<Topic>): Job<ListK<Result>> =
-  topics.traverse<KleisliPartialOf<ForId, Context>, Result>(Job.applicative<ForId, Context>(Id.applicative())) {
+  topics.traverse<KleisliPartialOf<ForId, Context>, Result>(JobForContext) {
     processTopic(it)
   }.fix()
 ```
@@ -275,9 +313,10 @@ fun main() {
 In general this holds:
 
 ```kotlin
-
+map(::f).sequence(AP) == traverse(AP, ::f)
 ```
 
+where AP stands for an `Applicative<G>`, which is in the prior snippet `Applicative<ForOption>`.
 
 ### Traversables are Functors
 
@@ -337,12 +376,23 @@ fun main() {
 
 ### Traversables are Foldable
 
-The `Foldable` type class abstracts over “things that can be folded over” similar to how `Traverse` abstracts over “things that can be traversed.” It turns out `Traverse` is strictly more powerful than `Foldable` - that is, `foldLeft` and `foldRight` can be implemented in terms of `traverse` by picking the right `Applicative`. However, arrow's `Traverse` does not implement `foldLeft` and `foldRight` as the actual implementation tends to be ineffecient, as we one can implement the `Foldable` `fold`'s.
+The `Foldable` type class abstracts over “things that can be folded over” similar to how `Traverse` abstracts over “things that can be traversed.” It turns out `Traverse` is strictly more powerful than `Foldable` - that is, `foldLeft` and `foldRight` can be implemented in terms of `traverse` by picking the right `Applicative`. However, arrow's `Traverse` does not implement `foldLeft` and `foldRight` as the actual implementation tends to be ineffecient.
 
 For brevity and demonstration purposes we’ll implement an isomorphic `foldMap` method in terms of `traverse` by using `arrow.typeclasses.Const`. You can then implement `foldRight` in terms of `foldMap`, and `foldLeft` can then be implemented in terms of `foldRight`, though the resulting implementations may be slow.
 
 ```kotlin:ank
-// TODO: finish this section
+import arrow.Kind
+import arrow.core.extensions.const.applicative.applicative
+import arrow.typeclasses.Const
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.Traverse
+import arrow.typeclasses.fix
+
+fun <F, B, A> Kind<F, A>.foldMap(b: B, M: Monoid<B>, TF: Traverse<F>, f: (A) -> B): B = TF.run {
+  M.run {
+    traverse(Const.applicative(M)) { a: A -> Const<B, B>(f(a)) }.fix().value()
+  }
+}
 ```
 
 ### Theory Wrap-up
@@ -374,7 +424,7 @@ ank_macro_hierarchy(arrow.typeclasses.Traverse)
 
 ## Futher Reading
 
-- [The Essence of the Iterator Pattern](https://www.cs.ox.ac.uk/jeremy.gibbons/publications/iterator.pdf) - Gibbons, Oliveira. JFP 2009.
+- [The Essence of the Iterator Pattern](https://www.cs.ox.ac.uk/jeremy.gibbons/publications/iterator.pdf) - Gibbons, Oliveira. JFP, 2009
 - [Catamorphisms](https://blog.ploeh.dk/2019/04/29/catamorphisms/) - Mark Seemann, 2019
 
 ## Credits
