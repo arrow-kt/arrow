@@ -70,4 +70,23 @@ In most cases you would like to use `flatMap` function which flattens source map
         }
 ```
 
-// TODO: `traverse` function, can't find Option.applicative
+You can also traverse `MapK` data structure performing an action on each element.
+```kotlin:ank
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.extensions.option.applicative.applicative
+import arrow.core.fix
+import arrow.core.k
+import arrow.core.some
+
+    val optionMap = mapOf(1.some() to "one", 2.some() to "two", None to "none").k()
+            .traverse(Option.applicative()) { value ->
+                when (value) {
+                    "one", "two", "none" -> Some(value)
+                    else -> None
+                }
+            }.fix()
+        println(optionMap) // Some(MapK(map={Some(1)=one, Some(2)=two, None=none}))
+``` 
+TODO: add link to `Traverse` docs when it's ready https://github.com/arrow-kt/arrow/pull/1534
