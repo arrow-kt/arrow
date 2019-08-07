@@ -45,6 +45,7 @@ Enter `Traverse`.
 At center stage of Traverse is the `traverse` method.
 
 ```kotlin
+import arrow.Kind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
@@ -62,7 +63,7 @@ In the most general form, `Kind<F, A>` is some sort of context `F` which may con
 
 Essentially, one uses `Traverse`, when there is a function `(A) -> Kind<G, B>` and `G` is an `Applicative` instance, thus `G` provides `just` and `map` functions e.g.: just as `Promise<ForIO, B>` provides and you want to `lift` the previous function to work on `Kind<F, A>` where `F` is a `Traverse` instance - and you still care about `A` (the `Profiles`) `(List<User>)` and return `Kind<G, Kind<F, B>>` e.g.: `Promise<ForIO, List<Profile>>`
 
-### To `fold` or not to `fold`
+### To fold Or not to fold
 
 Even though, `Foldable` and `Traverse` are related, because both 'reduce their values to something', it is not obvious why to consider `Traverse` over `Foldable`.
 
@@ -320,7 +321,51 @@ where AP stands for an `Applicative<G>`, which is in the prior snippet `Applicat
 
 ### Traversables are Functors
 
-{TODO: finish this section}
+As it turns out every `Traverse` is a lawful `Functor`. By carefully picking the `G` to use in `traverse` we can implement `map`.
+
+First let's look at the two signatures.
+
+```kotlin:ank
+import arrow.Kind
+import arrow.core.Id
+import arrow.core.extensions.id.applicative.applicative
+import arrow.core.value
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Functor
+
+interface Traverse<F> : Functor<F>, Foldable<F> {
+  fun <G, A, B> Kind<F, A>.traverse(AP: Applicative<G>, f: (A) -> Kind<G, B>): Kind<G, Kind<F, B>>
+
+  override fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B> =
+    traverse(Id.applicative()) { Id(f(it)) }.value()
+}
+```
+
+Both have an `Kind<F, A>` receiver and a similar `f` parameter. `traverse` expects the return type of `f` to be `Kind<G, B>` whereas `map` just wants `B`. Similarly the return type of `traverse` is `Kind<G, Kind<F, B>>` whereas for `map` it's just `Kind<F, B>`. This suggests we need to pick a `G` such that `Kind<G, A>` communicates exactly as much information as `A`. We can conjure one up by simply wrapping an `A` in `arrow.core.Id`.
+
+In order to call `traverse` `Id` needs to be `Applicative` which is straightforward - note that while `Id` just wraps an `A`, it is still a type constructor which matches the shape required by `Applicative`.
+
+```kotlin:ank
+import arrow.core.ForId
+import arrow.core.Id
+import arrow.core.IdOf
+import arrow.core.fix
+import arrow.typeclasses.Applicative
+
+object IdApplicative : Applicative<ForId> {
+  override fun <A, B> IdOf<A>.ap(ff: IdOf<(A) -> B>): Id<B> =
+    fix().ap(ff)
+
+  override fun <A, B> IdOf<A>.map(f: (A) -> B): Id<B> =
+    fix().map(f)
+
+  override fun <A> just(a: A): Id<A> =
+    Id.just(a)
+}
+```
+
+We can implement `Traverse#map` by wrapping and unwrapping `Id` as necessary.
 
 ### Traversing for effects
 
@@ -388,7 +433,7 @@ import arrow.typeclasses.Monoid
 import arrow.typeclasses.Traverse
 import arrow.typeclasses.fix
 
-fun <F, B, A> Kind<F, A>.foldMap(b: B, M: Monoid<B>, TF: Traverse<F>, f: (A) -> B): B = TF.run {
+fun <F, B, A> Kind<F, A>.foldMap(M: Monoid<B>, TF: Traverse<F>, b: B, f: (A) -> B): B = TF.run {
   M.run {
     traverse(Const.applicative(M)) { a: A -> Const<B, B>(f(a)) }.fix().value()
   }
@@ -397,7 +442,7 @@ fun <F, B, A> Kind<F, A>.foldMap(b: B, M: Monoid<B>, TF: Traverse<F>, f: (A) -> 
 
 ### Theory Wrap-up
 
-Unsurprisingly, `Foldable` and `Traverse` act on multiple elements and reduce them into a single value - in cat theory - `catamorphisms`.
+Unsurprisingly, `Foldable` and `Traverse` act on multiple elements and reduce them into a single value - in cat theory - `Catamorphisms`.
 
 In contrast, `homomorphisms` such as `Monoid` and `Applicative` preserve their structure, hence `List<Int>` `+` `List<Int>` will yield a `List<Int>` or an `Applicative` instance `List<Int>.map(::toString)` result in a `List<String>`.
 
