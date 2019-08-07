@@ -93,8 +93,8 @@ lotteryTry.getOrElse { emptyList() }
 If you want to perform a check on a possible success, you can use `filter` to convert successful computations in failures if conditions aren't met:
 
 ```kotlin:ank
-lotteryTry.filter {
-    it.size < 4
+Try.just(0).filter {
+    it > 1
 }
 ```
 
