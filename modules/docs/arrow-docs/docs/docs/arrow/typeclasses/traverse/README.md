@@ -18,6 +18,7 @@ These behaviors tend to show up in functions working on a single piece of data -
 ```kotlin:ank
 import arrow.core.Either
 import arrow.core.Option
+import arrow.fx.ForIO
 import arrow.fx.Promise
 
 interface Profile
@@ -69,13 +70,25 @@ Even though, `Foldable` and `Traverse` are related, because both 'reduce their v
 
 Here is a small example:
 
-```kotlin
-val map: MapK<String, Int> = mapOf("one" to 1, "two" to 2).k()
+```kotlin:ank:playground
+import arrow.core.MapK
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.extensions.option.applicative.applicative
+import arrow.core.fix
+import arrow.core.k
 
-val optionMapK: Option<MapK<String, String>> = map.traverse(Option.applicative()) { Some("$it") }.fix()
+fun main(){
+  //sampleStart
+  val map: MapK<String, Int> = mapOf("one" to 1, "two" to 2).k()
 
-val optionMapKBoilered = map.foldLeft(Some(emptyMap())) { acc: Option<MapK<String, String>>, i: Int ->
-  acc.fold({ emptyMap() }, { /*Some logic to retrieve the key of a value, transform it and add it to the accumulated Map*/ })
+  val optionMapK: Option<MapK<String, String>> = map.traverse(Option.applicative()) { Some("$it") }.fix()
+  
+  // val optionMapKBoilered = map.foldLeft(Some(emptyMap())) { acc: Option<MapK<String, String>>, i: Int ->
+  //   acc.fold({ emptyMap() }, { /*Some logic to retrieve the key of a value, transform it and add it to the accumulated Map*/ })
+  // }
+  //sampleEnd
+  println(optionMapK)
 }
 ```
 
@@ -86,6 +99,13 @@ Additionally, your able to wrap your context `F` within a `G`. That is exactly t
 You can also misuse it's powers - where a `map` is more considerable: 
 
 ```kotlin:ank
+import arrow.core.Id
+import arrow.core.MapK
+import arrow.core.extensions.id.applicative.applicative
+import arrow.core.fix
+import arrow.core.k
+import arrow.core.value
+
 val map: MapK<String, Int> = mapOf("one" to 1, "two" to 2).k()
 
 map.traverse(Id.applicative()) { Id("$it") }.fix().value()
@@ -101,32 +121,33 @@ The type signature of `Traverse` appears highly abstract, although it's easier i
 ```kotlin:ank
 import arrow.core.ValidatedNel
 import arrow.core.invalidNel
-import arrow.core.toT
 import arrow.core.validNel
 import arrow.core.Either
 
-fun parse(s: String): Either<NumberFormatException, Int> =
+fun parseIntEither(s: String): Either<NumberFormatException, Int> =
   if (s.matches(Regex("-?[0-9]+"))) Either.Right(s.toInt())
   else Either.Left(NumberFormatException("$s is not a valid integer."))
-    
-fun parse(s: String): ValidatedNel<NumberFormatException, Int> =
+
+fun parseIntValidated(s: String): ValidatedNel<NumberFormatException, Int> =
   if (s.matches(Regex("-?[0-9]+"))) s.toInt().validNel()
   else NumberFormatException("$s is not a valid integer.").invalidNel()
 ```
 We can now `traverse` structures that contain strings parsing them into integers and accumulating failures with `Either`.
 
 ```kotlin:ank:playground
-import arrow.core.ValidatedNel
-import arrow.core.invalidNel
-import arrow.core.toT
-import arrow.core.validNel
 import arrow.core.Either
+import arrow.core.extensions.either.applicative.applicative
+import arrow.core.k
+import arrow.core.ValidatedNel
+import arrow.core.extensions.either.foldable.isEmpty
+import arrow.core.invalidNel
+import arrow.core.validNel
 
-fun parse(s: String): Either<NumberFormatException, Int> =
+fun parseIntEither(s: String): Either<NumberFormatException, Int> =
   if (s.matches(Regex("-?[0-9]+"))) Either.Right(s.toInt())
   else Either.Left(NumberFormatException("$s is not a valid integer."))
-    
-fun parse(s: String): ValidatedNel<NumberFormatException, Int> =
+
+fun parseIntValidated(s: String): ValidatedNel<NumberFormatException, Int> =
   if (s.matches(Regex("-?[0-9]+"))) s.toInt().validNel()
   else NumberFormatException("$s is not a valid integer.").invalidNel()
 
@@ -271,6 +292,7 @@ import arrow.core.identity
 import arrow.core.none
 import arrow.core.some
 import arrow.core.Option
+import arrow.core.extensions.list.traverse.traverse
 
 fun main() {
   //sampleStart
@@ -397,6 +419,8 @@ We end up with a `IO<ListK<Unit>>`! A `ListK<Unit>` is not of any use to us, and
 Traversing solely for the sake of the effects (ignoring any values that may be produced, `Unit` or otherwise) is common, so `Foldable` (superclass of `Traverse`) provides `traverse_` and `sequence_` methods that do the same thing as `traverse` and `sequence` but ignores any value produced along the way, returning `Unit` at the end.
 
 ```kotlin:ank
+import arrow.core.extensions.listk.foldable.traverse_
+
 fun writeManyToStore(data: ListK<Data>): IO<Unit> =
   data.traverse_(IO.applicative()) { writeToStore(it).get() }.fix()
 ```
@@ -458,8 +482,8 @@ One among many other usages of `Catamorphism` are in [Recursion Schemes]({{ '/do
 ### Data types
 
 ```kotlin:ank:replace
-import arrow.reflect.DataType
-import arrow.reflect.tcMarkdownList
+import arrow.reflect.TypeClass
+import arrow.reflect.dtMarkdownList
 import arrow.typeclasses.Traverse
 
 TypeClass(Traverse::class).dtMarkdownList()
