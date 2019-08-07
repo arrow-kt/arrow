@@ -94,7 +94,7 @@ fun main(){
 
 Both values try to attain the same thing, but what `Foldable` lacks is that it solely drills down to it's `A` here `Int` and does not preserve it's shape `F` - `MapK`. This is where `Traverse` shines, whenever you care about the Output `B` from `(A) -> B` and the existing shape of `F` you would use `traverse`.
 
-Additionally, your able to wrap your context `F` within a `G`. That is exactly the reason why `Traverse` is strictly more powerful than `Foldable`.
+Additionally, your able to wrap your context `F` within a `G`. That is, may among others, the reason why `Traverse` is strictly more powerful than `Foldable`.
 
 You can also misuse it's powers - where a `map` is more considerable: 
 
@@ -112,6 +112,27 @@ map.traverse(Id.applicative()) { Id("$it") }.fix().value()
 ```
 ```kotlin:ank
 map.map { "$it" }
+```
+
+### Traversables are Foldable
+
+The `Foldable` type class abstracts over “things that can be folded over” similar to how `Traverse` abstracts over “things that can be traversed.” It turns out `Traverse` is strictly more powerful than `Foldable` - that is, `foldLeft` and `foldRight` can be implemented in terms of `traverse` by picking the right `Applicative`. However, arrow's `Traverse` does not implement `foldLeft` and `foldRight` as the actual implementation tends to be ineffecient.
+
+For brevity and demonstration purposes we’ll implement an isomorphic `foldMap` method in terms of `traverse` by using `arrow.typeclasses.Const`. You can then implement `foldRight` in terms of `foldMap`, and `foldLeft` can then be implemented in terms of `foldRight`, though the resulting implementations may be slow.
+
+```kotlin:ank
+import arrow.Kind
+import arrow.core.extensions.const.applicative.applicative
+import arrow.typeclasses.Const
+import arrow.typeclasses.Monoid
+import arrow.typeclasses.Traverse
+import arrow.typeclasses.fix
+
+fun <F, B, A> Kind<F, A>.foldMap(M: Monoid<B>, TF: Traverse<F>, b: B, f: (A) -> B): B = TF.run {
+  M.run {
+    traverse(Const.applicative(M)) { a: A -> Const<B, B>(f(a)) }.fix().value()
+  }
+}
 ```
 
 ### Choose your implementation
@@ -440,27 +461,6 @@ fun main() {
   //sampleEnd
   println("someUnit= $someUnit")
   println("noneUnit= $noneUnit")
-}
-```
-
-### Traversables are Foldable
-
-The `Foldable` type class abstracts over “things that can be folded over” similar to how `Traverse` abstracts over “things that can be traversed.” It turns out `Traverse` is strictly more powerful than `Foldable` - that is, `foldLeft` and `foldRight` can be implemented in terms of `traverse` by picking the right `Applicative`. However, arrow's `Traverse` does not implement `foldLeft` and `foldRight` as the actual implementation tends to be ineffecient.
-
-For brevity and demonstration purposes we’ll implement an isomorphic `foldMap` method in terms of `traverse` by using `arrow.typeclasses.Const`. You can then implement `foldRight` in terms of `foldMap`, and `foldLeft` can then be implemented in terms of `foldRight`, though the resulting implementations may be slow.
-
-```kotlin:ank
-import arrow.Kind
-import arrow.core.extensions.const.applicative.applicative
-import arrow.typeclasses.Const
-import arrow.typeclasses.Monoid
-import arrow.typeclasses.Traverse
-import arrow.typeclasses.fix
-
-fun <F, B, A> Kind<F, A>.foldMap(M: Monoid<B>, TF: Traverse<F>, b: B, f: (A) -> B): B = TF.run {
-  M.run {
-    traverse(Const.applicative(M)) { a: A -> Const<B, B>(f(a)) }.fix().value()
-  }
 }
 ```
 
