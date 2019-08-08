@@ -1,5 +1,6 @@
 package consumer
 
+import arrow.bind
 import arrow.Kind
 import arrow.`*`
 import arrow.extension
@@ -14,6 +15,12 @@ sealed class Option<out A> {
       None -> None
       is Some -> Some(f(value))
     }
+
+  fun <B> flatMap(f: (A) -> Option<B>): Option<B> =
+    when (this) {
+      None -> None
+      is Some -> f(value)
+    }
 }
 
 sealed class Either<out A, out B> {
@@ -27,6 +34,7 @@ class Kleisli<out F, out D, out A>
 
 interface Functor<F> {
   fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B>
+  fun <A, B> Kind<F, A>.flatMap(f: (A) -> Kind<F, B>): Kind<F, B>
 }
 
 //@extension fun functorForOptionFun(): Functor<ForOption> = object : Functor<ForOption> {
@@ -44,9 +52,13 @@ interface Functor<F> {
 //    (this as Option<A>).map(f)
 //}
 
-@extension object FunctorForOption: Functor<ForOption> {
+@extension
+object FunctorForOption : Functor<ForOption> {
   override fun <A, B> OptionOf<A>.map(f: (A) -> B): Option<B> =
     (this as Option<A>).map(f)
+
+  override fun <A, B> OptionOf<A>.flatMap(f: (A) -> OptionOf<B>): Option<B> =
+    (this as Option<A>).flatMap(f)
 }
 
 fun <F> Kind<F, Int>.addOne(FF: Functor<F> = `*`): Kind<F, Int> =
@@ -57,5 +69,8 @@ class Service {
     map { it + 1 }
 }
 
-fun testConversion(): Any =
-  Option.Some(1).addOne()
+fun testConversion(): Option<Int> {
+  val x = Option.Some(1).addOne().bind()
+  val y = Option.Some(1).addOne().bind()
+  return Option.Some(x + y)
+}

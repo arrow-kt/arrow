@@ -83,7 +83,7 @@ fun MetaComponentRegistrar.irElement(f: IrUtils.(IrElement) -> IrElement?): Exte
   IrGeneration { compilerContext, file, backendContext, bindingContext ->
     file.transformChildren(object : IrElementTransformer<Unit> {
       override fun visitElement(expression: IrElement, data: Unit): IrElement =
-        f(IrUtils(backendContext, compilerContext), expression) ?: super.visitElement(expression, data)
+        f(IrUtils(backendContext, compilerContext), expression)?.let { super.visitElement(it, data) } ?: super.visitElement(expression, data)
     }, Unit)
   }
 
