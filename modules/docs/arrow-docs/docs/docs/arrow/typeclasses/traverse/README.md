@@ -27,7 +27,7 @@ interface User
 fun userInfo(u: User): Promise<ForIO, Profile> = TODO()
 ```
 
-Each function asks only for the data it actually needs; in the case of `userInfo`, a single `User`. We certainly could write one that takes a `List<User>` and fetch profile for all of them, would be a bit strange. If we just wanted to fetch the profile of just one user, we would either have to wrap it in a `List` or write a separate function that takes in a single user anyways. More fundamentally, functional programming is about building lots of small, independent pieces and composing them to make larger and larger pieces - does this hold true in this case?
+Each function asks only for the data it actually needs; in the case of `userInfo`, a single `User`. Certainly, we could write one that takes a `List<User>` and fetches profile for all of them,but it would be a bit strange. If we just wanted to fetch the profile of just one user, we would either have to wrap it in a `List` or write a separate function that takes in a single user anyways. More fundamentally, functional programming is about building lots of small, independent pieces and composing them to make larger and larger pieces - does this hold true in this case?
 
 Given just `(User) -> Promise<ForIO, Profile>`, what should we do if we want to fetch profiles for a `List<User>`? We could try familiar combinators like map.
 
@@ -94,7 +94,7 @@ fun main(){
 
 Both values try to attain the same thing, but what `Foldable` lacks is that it solely drills down to it's `A` here `Int` and does not preserve it's shape `F` - `MapK`. This is where `Traverse` shines, whenever you care about the Output `B` from `(A) -> B` and the existing shape of `F` you would use `traverse`.
 
-Additionally, your able to wrap your context `F` within a `G`. That is, may among others, the reason why `Traverse` is strictly more powerful than `Foldable`.
+Additionally, you're able to wrap your context `F` within a `G`. That is, may among others, the reason why `Traverse` is strictly more powerful than `Foldable`.
 
 You can also misuse it's powers - where a `map` is more considerable: 
 
@@ -116,7 +116,7 @@ map.map { "$it" }
 
 ### Traversables are Foldable
 
-The `Foldable` type class abstracts over “things that can be folded over” similar to how `Traverse` abstracts over “things that can be traversed.” It turns out `Traverse` is strictly more powerful than `Foldable` - that is, `foldLeft` and `foldRight` can be implemented in terms of `traverse` by picking the right `Applicative`. However, arrow's `Traverse` does not implement `foldLeft` and `foldRight` as the actual implementation tends to be ineffecient.
+The `Foldable` type class abstracts over “things that can be folded over” similar to how `Traverse` abstracts over “things that can be traversed.” It turns out `Traverse` is strictly more powerful than `Foldable` - that is, `foldLeft` and `foldRight` can be implemented in terms of `traverse` by picking the right `Applicative`. However, arrow's `Traverse` does not implement `foldLeft` and `foldRight` as the actual implementation tends to be inefficient.
 
 For brevity and demonstration purposes we’ll implement an isomorphic `foldMap` method in terms of `traverse` by using `arrow.typeclasses.Const`. You can then implement `foldRight` in terms of `foldMap`, and `foldLeft` can then be implemented in terms of `foldRight`, though the resulting implementations may be slow.
 
@@ -210,10 +210,11 @@ fun main() {
 }
 ```
 
-Notice that in the `Either` case, should any string fail to parse the entire `traversal` is considered a failure. Moreover, once it hits its first bad parse, it will not attempt to parse any others down the line (similar behavior would be found with using `Option`). Contrast this with `Validated` where even if one bad parse is hit, it will continue trying to parse the others, accumulating any and all errors as it goes. The behavior of traversal is closely tied with the `Applicative` behavior of the data type.
+Notice that in the `Either` case, should any string fail to parse the entire `traverse` is considered a failure. Moreover, once it hits its first bad parse, it will not attempt to parse any others down the line (similar behavior would be found with using `Option`). Contrast this with `Validated` where even if one bad parse is hit, it will continue trying to parse the others, accumulating any and all errors as it goes. The behavior of `traverse` is closely tied with the `Applicative` behavior of the data type.
 
 Going back to our `Promise` example, we can get an `Applicative` instance for `IO`, by converting `Promise` to `IO` that runs each `Promise` concurrently. Then when we traverse a `List<A>` with an `(A) -> Promise<ForIO, B>`, we can imagine the traversal as a scatter-gather. Each `A` creates a concurrent computation that will produce a `B` (the scatter), and as the `Promise`s complete they will be gathered back into a `List`.
 
+{ TODO: turn this into Fx style}
 ```kotlin:ank:playground
 import arrow.core.ListK
 import arrow.core.k
@@ -477,7 +478,7 @@ We can think of catamorphic operations as :
 - `fold` in common ADTs from Computer Science like in a Binary tree 
 - the `reduce` method 
 
-One among many other usages of `Catamorphism` are in [Recursion Schemes]({{ '/docs/recursion/intro/' | relative_url }}).
+One among many other usages of `Catamorphisms` are in [Recursion Schemes]({{ '/docs/recursion/intro/' | relative_url }}).
 
 ### Data types
 
