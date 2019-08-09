@@ -20,6 +20,7 @@ object test {
     println("Either Kind!: $eitherStringOrInt")
 
     println(testConversion())
+    println(testConversionFlatMap())
 
 
   }

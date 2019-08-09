@@ -218,8 +218,8 @@ fun MetaComponentRegistrar.irValueParameter(f: IrUtils.(IrValueParameter) -> IrS
 fun MetaComponentRegistrar.irBody(f: IrUtils.(IrBody) -> IrBody?): ExtensionPhase.IRGeneration =
   IrGeneration { compilerContext, file, backendContext, bindingContext ->
     file.transformChildren(object : IrElementTransformer<Unit> {
-      override fun visitBody(expression: IrBody, data: Unit): IrBody =
-        f(IrUtils(backendContext, compilerContext), expression) ?: super.visitBody(expression, data)
+      override fun visitBody(body: IrBody, data: Unit): IrBody =
+        f(IrUtils(backendContext, compilerContext), body) ?: super.visitBody(body, data)
     }, Unit)
   }
 
