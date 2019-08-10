@@ -24,7 +24,10 @@ import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
+import org.jetbrains.kotlin.types.replace
+import org.jetbrains.kotlin.types.typeUtil.asTypeProjection
 import org.jetbrains.kotlin.types.typeUtil.isSubtypeOf
+import org.jetbrains.kotlin.types.typeUtil.substitute
 import org.jetbrains.kotlin.utils.addToStdlib.cast
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
@@ -61,16 +64,24 @@ private fun IrUtils.flatMapCalls(list: List<IrElement>): List<IrCall> =
     }
   }
 
-private fun IrUtils.flatMapCall(irElement: IrCall): IrCall? {
-  val dataType = irElement.extensionReceiver?.type?.toKotlinType()
-  val dataTypeScope = irElement.extensionReceiver?.type?.classOrNull?.descriptor?.unsubstitutedMemberScope
-  val flatMap = dataTypeScope?.getContributedFunctions(Name.identifier("flatMap"), NoLookupLocation.FROM_BACKEND)?.find { fn ->
-    fn.valueParameters.size == 1 &&
-      fn.returnType?.let { dataType?.isSubtypeOf(it) } == true &&
-      fn.valueParameters[0].type.isFunctionOrKFunctionType
+private fun IrUtils.flatMapCall(irElement: IrCall): IrCall? =
+  irElement.extensionReceiver?.type?.let { type ->
+    val dataType = type.toKotlinType()
+    val dataTypeScope = irElement.extensionReceiver?.type?.classOrNull?.descriptor?.unsubstitutedMemberScope
+    val flatMap = dataTypeScope?.getContributedFunctions(Name.identifier("flatMap"), NoLookupLocation.FROM_BACKEND)?.find { fn ->
+      val substitutedReturnType = fn.returnType?.asTypeProjection()?.substitute { it.replace(dataType.arguments) }?.type
+      // flatMap should have a single value parameter
+      fn.valueParameters.size == 1 &&
+        // that is a function1 with two type arguments
+        fn.valueParameters[0].type.isFunctionOrKFunctionType &&
+        fn.valueParameters[0].type.arguments.size == 2 &&
+        // the function return type should be assignable from the flatMap value argument return type
+        fn.returnType?.let { fn.valueParameters[0].type.arguments[1].type.isSubtypeOf(it) } == true &&
+        // flatMaps substituted return type should be assignable from the receiver data type
+        substitutedReturnType?.let { dataType.isSubtypeOf(it) } == true
+    }
+    flatMap?.irCall()
   }
-  return flatMap?.irCall()
-}
 
 private fun IrElement.isVariableWithBinding() =
   this is IrVariable && initializer is IrCall &&
