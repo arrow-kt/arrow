@@ -153,7 +153,7 @@ fun parseIntValidated(s: String): ValidatedNel<NumberFormatException, Int> =
   if (s.matches(Regex("-?[0-9]+"))) s.toInt().validNel()
   else NumberFormatException("$s is not a valid integer.").invalidNel()
 ```
-We can now `traverse` structures that contain strings parsing them into integers and accumulating failures with `Either`.
+We can now `traverse` structures that contain strings parsing them into integers and accumulating failures with `ValidatedNel`.
 
 ```kotlin:ank:playground
 import arrow.core.Either
@@ -214,7 +214,6 @@ Notice that in the `Either` case, should any string fail to parse the entire `tr
 
 Going back to our `Promise` example, we can get an `Applicative` instance for `IO`, by converting `Promise` to `IO` that runs each `Promise` concurrently. Then when we traverse a `List<A>` with an `(A) -> Promise<ForIO, B>`, we can imagine the traversal as a scatter-gather. Each `A` creates a concurrent computation that will produce a `B` (the scatter), and as the `Promise`s complete they will be gathered back into a `List`.
 
-{ TODO: turn this into Fx style}
 ```kotlin:ank:playground
 import arrow.core.ListK
 import arrow.core.k
@@ -244,12 +243,14 @@ fun main() {
   fun ListK<User>.processLogin() =
     traverse(IO.applicative()) { userInfo(it) }
 
-  val res = listOf(DummyUser("Micheal"), DummyUser("Juan"), DummyUser("T'Challa")).k()
-    .processLogin()
-    .attempt()
-    .unsafeRunSync()
+  fun program(): IO<Unit> = IO.fx {
+    val (list) = listOf(DummyUser("Micheal"), DummyUser("Juan"), DummyUser("T'Challa")).k()
+      .processLogin()
+    println(list)
+  }
+  
+  unsafe { runBlocking { program() } }
   //sampleEnd
-  println(res)
 }
 ```
 
