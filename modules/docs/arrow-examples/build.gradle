@@ -27,7 +27,7 @@ dependencies {
     compile project(':arrow-fx-rx2')
     compile project(':arrow-optics')
     compile project(':arrow-ui')
-//    compile project(':arrow-validation')
+    compile project(':arrow-validation')
     compile project(':arrow-mtl')
     kapt project(':arrow-meta')
     kaptTest project(':arrow-meta')
