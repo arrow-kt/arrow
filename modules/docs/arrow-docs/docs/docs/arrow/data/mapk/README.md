@@ -28,6 +28,7 @@ It can be created with calling `k()` function on Map:
 ```kotlin:ank
 import arrow.core.MapK
 import arrow.core.k
+import arrow.core.Eval
 
     val arrowMap: MapK<String, Int> = mapOf("one" to 1, "two" to 2).k()
 ```
@@ -35,9 +36,6 @@ import arrow.core.k
 You can modify each map entry value and get another MapK with use of `map(..)` function:
 
 ```kotlin:ank
-import arrow.core.MapK
-import arrow.core.k
-
     val arrowMap: MapK<String, Int> = mapOf("one" to 1, "two" to 2).k()
     val modifiedMap: MapK<String, Int> = arrowMap.map { entryValue -> entryValue.plus(10) }
 ```
@@ -45,9 +43,6 @@ import arrow.core.k
 Sometimes you need to "map" one Map to another. You are able to do so with `map2(..)` function:
 
 ```kotlin:ank
-import arrow.core.MapK
-import arrow.core.k
-
     val firstBag: MapK<String, Int> = mapOf("eggs" to 5, "milk" to 1).k()
     val secondBag: MapK<String, Int> = mapOf("eggs" to 6, "cheese" to 1).k()
     
@@ -62,9 +57,6 @@ import arrow.core.k
 `ap` function is used when you want to apply map of transformations from `Map<K, (A)-> B>` to `Map<K,A>`, for example:
 
 ```kotlin:ank
-import arrow.core.MapK
-import arrow.core.k
-
     val map1: MapK<String, Int> = mapOf("one" to 1, "two" to 2).k()
     
     val f1: (Int) -> String = { i: Int -> "f1 to \"$i\"" }
@@ -78,9 +70,6 @@ import arrow.core.k
 In most cases you would like to use `flatMap` function which flattens source map, accepts `(A) -> MapK<K,B>` functor and returns `MapK<K,Z>`
 
 ```kotlin:ank
-import arrow.core.MapK
-import arrow.core.k
-
     val map1: MapK<String, Int> = mapOf("one" to 1, "two" to 2).k()
     val map2: MapK<String, String> = mapOf("one" to "ONE", "three" to "three").k()
     
@@ -90,10 +79,6 @@ import arrow.core.k
 `foldLeft` and `foldRight` are used for element aggregation:
 
 ```kotlin:ank
-import arrow.core.Eval
-import arrow.core.MapK
-import arrow.core.k
-
     val map1: MapK<String, Int> = mapOf("one" to 1, "two" to 2).k()
 
     val foldLeft: String = map1.foldLeft("one") { entry, tuple -> entry + tuple }
@@ -107,7 +92,7 @@ import arrow.core.k
 
 You can also traverse `MapK` data structure performing an action on each element:
 
-```kotlin:ank
+```kotlin:ank:playground
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
