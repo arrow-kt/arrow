@@ -1,5 +1,6 @@
 package arrow.fx
 
+import arrow.HkJ3
 import arrow.Kind
 import arrow.core.Either
 import arrow.fx.typeclasses.Bracket
@@ -12,7 +13,7 @@ class ForResource private constructor() {
 }
 typealias ResourceOf<F, E, A> = arrow.Kind3<ForResource, F, E, A>
 typealias ResourcePartialOf<F, E> = arrow.Kind2<ForResource, F, E>
-typealias ResourceKindedJ<F, E, A> = io.kindedj.HkJ3<ForResource, F, E, A>
+typealias ResourceKindedJ<F, E, A> = HkJ3<ForResource, F, E, A>
 
 @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
 inline fun <F, E, A> ResourceOf<F, E, A>.fix(): Resource<F, E, A> =
