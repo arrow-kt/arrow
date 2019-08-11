@@ -14,27 +14,6 @@ Thereby, one only needs to download the toplevel artifacts if it's desired to do
 
 In this doc we'll describe all the modules that form the core, alongside a list of the most important constructs they include.
 
-<<<<<<< HEAD
-### arrow-core
-
-{:.beginner}
-beginner
-
-The smallest set of [datatypes]({{ '/docs/datatypes/intro/' | relative_url }}) necessary to start in FP, and that other libraries can build upon.
-The focus here is on API design and abstracting small code patterns.
-
-Datatypes: [`Either`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-either/' | relative_url }}), [`Option`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-option/' | relative_url }}), [`Try`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-try/' | relative_url }}), [`Eval`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-eval' | relative_url }}), [`Id`]({{ '/docs/apidocs/arrow-core-data/arrow.core/-id/' | relative_url }}), `TupleN`, `Function0`, `Function1`, `FunctionK`
-
-### arrow-syntax
-
-{:.beginner}
-beginner
-
-Multiple extensions functions to work better with function objects and collections.
-
-Dependencies: arrow-core
-
-For function objects the library provides composition, currying, partial application, memoization, pipe operator, complement for predicates, and several more helpers.
 #### Table of Content
 * [arrow-core](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-core)
 * [arrow-core-data](modules/docs/arrow-docs/docs/docs/quickstart/libraries/README.md#arrow-core-data)
@@ -90,7 +69,6 @@ Optics is the functional way of handling immutable data and collections in a way
 Arrow Optics offers a way of declaring how to focus deeply into immutable structure without boilerplate. It also offers an [Optics DSL]({{ '/docs/optics/dsl/' | relative_url }})  to elegantly describe complex use-cases in an elegant and simple manner without requiring to understand the underlying theory.
 
 For all the new typeclasses it also includes the extensions available for basic types and datatypes in both arrow-core and arrow-extras.
->>>>>>> upstream/master_original
 
 Dependency: `arrow-core`
 
