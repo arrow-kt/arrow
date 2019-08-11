@@ -115,7 +115,7 @@ sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
     andThen(f)
 
   /**
-   * Alias for [andThen]
+   * Alias for [compose]
    *
    * @see compose
    */
