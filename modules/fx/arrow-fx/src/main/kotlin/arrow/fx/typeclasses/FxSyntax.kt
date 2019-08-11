@@ -4,9 +4,9 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.OptionOf
 import arrow.core.TryOf
-import arrow.core.identity
 import arrow.core.extensions.list.traverse.traverse
 import arrow.core.fix
+import arrow.core.identity
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Monad
 import arrow.typeclasses.suspended.BindSyntax
@@ -88,6 +88,10 @@ interface FxSyntax<F> : Concurrent<F>, BindSyntax<F> {
   suspend fun <A, B> Either<B, A>.getOrRaiseError(f: (B) -> Throwable): Kind<F, A> =
     run<ApplicativeError<F, Throwable>, Kind<F, A>> { this@getOrRaiseError.fromEither(f) }
 
+  @Deprecated(
+    "Try will be deleted soon as it promotes eager execution of effects, so it’s better if you work with Either’s suspend constructors or a an effect handler like IO",
+    ReplaceWith("Either<Nothing, A>.getOrRaiseError(f)")
+  )
   suspend fun <A> TryOf<A>.getOrRaiseError(f: (Throwable) -> Throwable): Kind<F, A> =
     run<ApplicativeError<F, Throwable>, Kind<F, A>> { this@getOrRaiseError.fromTry(f) }
 

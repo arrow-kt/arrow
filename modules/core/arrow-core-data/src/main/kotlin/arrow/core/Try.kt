@@ -7,7 +7,7 @@ typealias Success<A> = Try.Success<A>
 
 @Deprecated(
   "Try will be deleted soon as it promotes eager execution of effects, so it’s better if you work with Either’s suspend constructors or a an effect handler like IO",
-  ReplaceWith("Either")
+  ReplaceWith("Either<Nothing, A>")
 )
 @higherkind
 sealed class Try<out A> : TryOf<A> {
@@ -144,18 +144,20 @@ sealed class Try<out A> : TryOf<A> {
 
   fun <B> foldRight(initial: Eval<B>, operation: (A, Eval<B>) -> Eval<B>): Eval<B> = fix().fold({ initial }, { operation(it, initial) })
 
-  /**
-   * The `Failure` type represents a computation that result in an exception.
-   */
+  @Deprecated(
+    "Try will be deleted soon as it promotes eager execution of effects, so it’s better if you work with Either’s suspend constructors or a an effect handler like IO",
+    ReplaceWith("Left")
+  )
   data class Failure(val exception: Throwable) : Try<Nothing>() {
     override fun isFailure(): Boolean = true
 
     override fun isSuccess(): Boolean = false
   }
 
-  /**
-   * The `Success` type represents a computation that return a successfully computed value.
-   */
+  @Deprecated(
+    "Try will be deleted soon as it promotes eager execution of effects, so it’s better if you work with Either’s suspend constructors or a an effect handler like IO",
+    ReplaceWith("Right")
+  )
   data class Success<out A>(val value: A) : Try<A>() {
     override fun isFailure(): Boolean = false
 
@@ -168,46 +170,61 @@ sealed class TryException(override val message: String) : Exception(message) {
   data class UnsupportedOperationException(override val message: String) : TryException(message)
 }
 
-/**
- * Returns the value from this `Success` or the given `default` argument if this is a `Failure`.
- *
- * ''Note:'': This will throw an exception if it is not a success and default throws an exception.
- */
+@Deprecated(
+  "Try will be deleted soon as it promotes eager execution of effects, so it’s better if you work with Either’s suspend constructors or a an effect handler like IO",
+  ReplaceWith("EitherOf<*, B>.getOrElse(default)")
+)
 fun <B> TryOf<B>.getOrDefault(default: () -> B): B = fix().fold({ default() }, ::identity)
 
-/**
- * Returns the value from this `Success` or the given `default` argument if this is a `Failure`.
- *
- * ''Note:'': This will throw an exception if it is not a success and default throws an exception.
- */
+@Deprecated(
+  "Try will be deleted soon as it promotes eager execution of effects, so it’s better if you work with Either’s suspend constructors or a an effect handler like IO",
+  ReplaceWith("EitherOf<*, B>.getOrElse(default)")
+)
 fun <B> TryOf<B>.getOrElse(default: (Throwable) -> B): B = fix().fold(default, ::identity)
 
-/**
- * Returns the value from this `Success` or null if this is a `Failure`.
- */
+@Deprecated(
+  "Try will be deleted soon as it promotes eager execution of effects, so it’s better if you work with Either’s suspend constructors or a an effect handler like IO",
+  ReplaceWith("EitherOf<*, B>.orNull()")
+)
 fun <B> TryOf<B>.orNull(): B? = getOrElse { null }
 
+@Deprecated(
+  "Try will be deleted soon as it promotes eager execution of effects, so it’s better if you work with Either’s suspend constructors or a an effect handler like IO",
+  ReplaceWith("EitherOf<A, B>.getOrHandle(default)")
+)
 fun <B, A : B> TryOf<A>.orElse(f: () -> TryOf<B>): Try<B> = when (fix()) {
   is Try.Success -> fix()
   is Try.Failure -> f().fix()
 }
 
-/**
- * Applies the given function `f` if this is a `Failure`, otherwise returns this if this is a `Success`.
- * This is like map for the exception.
- */
+@Deprecated(
+  "Try will be deleted soon as it promotes eager execution of effects, so it’s better if you work with Either’s suspend constructors or a an effect handler like IO",
+  ReplaceWith("EitherOf<A, B>.handleErrorWith(f)")
+)
 fun <B> TryOf<B>.handleError(f: (Throwable) -> B): Try<B> = fix().fold({ Success(f(it)) }, { Success(it) })
 
-/**
- * Applies the given function `f` if this is a `Failure`, otherwise returns this if this is a `Success`.
- * This is like `flatMap` for the exception.
- */
+@Deprecated(
+  "Try will be deleted soon as it promotes eager execution of effects, so it’s better if you work with Either’s suspend constructors or a an effect handler like IO",
+  ReplaceWith("EitherOf<A, B>.handleErrorWith(f)")
+)
 fun <B> TryOf<B>.handleErrorWith(f: (Throwable) -> TryOf<B>): Try<B> = fix().fold({ f(it).fix() }, { Success(it) })
 
+@Deprecated(
+  "Try will be deleted soon as it promotes eager execution of effects, so it’s better if you work with Either’s suspend constructors or a an effect handler like IO",
+  ReplaceWith("Either.catch(this)")
+)
 fun <A> (() -> A).try_(): Try<A> = Try(this)
 
+@Deprecated(
+  "Try will be deleted soon as it promotes eager execution of effects, so it’s better if you work with Either’s suspend constructors or a an effect handler like IO",
+  ReplaceWith("A.right()")
+)
 fun <A> A.success(): Try<A> = Success(this)
 
+@Deprecated(
+  "Try will be deleted soon as it promotes eager execution of effects, so it’s better if you work with Either’s suspend constructors or a an effect handler like IO",
+  ReplaceWith("A.left()")
+)
 fun Throwable.failure(): Try<Nothing> = Failure(this)
 
 fun <T> TryOf<TryOf<T>>.flatten(): Try<T> = fix().flatMap(::identity)
