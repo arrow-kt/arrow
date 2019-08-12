@@ -1,4 +1,4 @@
-@file:Suppress("UnusedImports", "unused")
+@file:Suppress("UnusedImports")
 
 package arrow
 
