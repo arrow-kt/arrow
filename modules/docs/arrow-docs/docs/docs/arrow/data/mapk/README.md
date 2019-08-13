@@ -76,6 +76,7 @@ val map1: MapK<String, Int> = mapOf("one" to 1, "two" to 2).k()
 val map2: MapK<String, String> = mapOf("one" to "ONE", "three" to "three").k()
 
 val flattened: MapK<String, String> = map1.flatMap { map2 }
+flattended
 ```
 
 `foldLeft` and `foldRight` are used for element aggregation:
