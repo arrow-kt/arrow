@@ -49,7 +49,7 @@ val secondBag: MapK<String, Int> = mapOf("eggs" to 6, "cheese" to 1).k()
 
 val eggsBag: MapK<String, Int> = firstBag.map2(secondBag) { firstBagMatch, secondBagMatch ->
 // If there are matching keys
-firstBagMatch + secondBagMatch     // you can modify the value of output MapK
+firstBagMatch + secondBagMatch  // you can modify the value of output MapK
 }
 ```
 
@@ -84,11 +84,12 @@ val flattened: MapK<String, String> = map1.flatMap { map2 }
 val map1: MapK<String, Int> = mapOf("one" to 1, "two" to 2).k()
 
 val foldLeft: String = map1.foldLeft("one") { entry, tuple -> entry + tuple }
-println(foldLeft)
 val foldRight: Eval<String> =
   map1.foldRight(Eval.just("one")) { entry, eval ->
     Eval.just("$entry ${eval.value()}")
   }
+  
+println(foldLeft)
 println(foldRight)
 ```
 
