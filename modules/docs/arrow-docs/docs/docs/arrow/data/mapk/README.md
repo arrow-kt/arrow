@@ -106,7 +106,7 @@ val optionMap = mapOf(1.some() to "one", 2.some() to "two", None to "none").k()
   .traverse(Option.applicative()) { value ->
     when (value) {
       "one", "two", "none" -> Some(value)
-       else -> None
+      else -> None
     }
   }.fix()
 println(optionMap)
