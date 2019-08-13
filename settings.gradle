@@ -108,9 +108,9 @@ include {
             _ 'reflect'
         }
 
-        validation {
-            _ 'validation'
-        }
+//        validation {
+//            _ 'validation'
+//        }
 
         benchmarks {
             _ 'scala-benchmarks'

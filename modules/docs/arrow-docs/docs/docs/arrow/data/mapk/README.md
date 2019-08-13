@@ -81,16 +81,23 @@ val flattened: MapK<String, String> = map1.flatMap { map2 }
 `foldLeft` and `foldRight` are used for element aggregation:
 
 ```kotlin:ank:playground
-val map1: MapK<String, Int> = mapOf("one" to 1, "two" to 2).k()
+import arrow.core.Eval
+import arrow.core.MapK
+import arrow.core.k
 
-val foldLeft: String = map1.foldLeft("one") { entry, tuple -> entry + tuple }
-val foldRight: Eval<String> =
-  map1.foldRight(Eval.just("one")) { entry, eval ->
-    Eval.just("$entry ${eval.value()}")
-  }
-  
-println(foldLeft)
-println(foldRight)
+
+fun main() {
+  val map1: MapK<String, Int> = mapOf("one" to 1, "two" to 2).k()
+
+  val foldLeft: String = map1.foldLeft("one") { entry, tuple -> entry + tuple }
+  val foldRight: Eval<String> =
+    map1.foldRight(Eval.just("one")) { entry, eval ->
+      Eval.just("$entry ${eval.value()}")
+    }
+
+  println(foldLeft)
+  println(foldRight)
+}
 ```
 
 You can also traverse `MapK` data structure performing an action on each element:
@@ -105,14 +112,14 @@ import arrow.core.k
 import arrow.core.some
 
 fun main() {
-val optionMap = mapOf(1.some() to "one", 2.some() to "two", None to "none").k()
-  .traverse(Option.applicative()) { value ->
-    when (value) {
-      "one", "two", "none" -> Some(value)
-      else -> None
-    }
-  }.fix()
-println(optionMap)
+  val optionMap = mapOf(1.some() to "one", 2.some() to "two", None to "none").k()
+    .traverse(Option.applicative()) { value ->
+      when (value) {
+        "one", "two", "none" -> Some(value)
+        else -> None
+      }
+    }.fix()
+  println(optionMap)
 }
 ``` 
 
