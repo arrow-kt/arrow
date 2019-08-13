@@ -48,9 +48,9 @@ val firstBag: MapK<String, Int> = mapOf("eggs" to 5, "milk" to 1).k()
 val secondBag: MapK<String, Int> = mapOf("eggs" to 6, "cheese" to 1).k()
 
 val eggsBag: MapK<String, Int> = firstBag.map2(secondBag) { firstBagMatch, secondBagMatch ->
-// If there are matching keys
-firstBagMatch + secondBagMatch  // you can modify the value of output MapK
-}
+  // If there are matching keys
+  firstBagMatch + secondBagMatch  // you can modify the value of output MapK
+  }
 ```
 
 `map2Eval` does pretty much the same as `map2`, but result `KMap` will be wrapped in [`Eval`](https://arrow-kt.io/docs/arrow/core/eval/#eval) type.
