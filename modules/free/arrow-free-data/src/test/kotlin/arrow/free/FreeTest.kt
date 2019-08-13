@@ -1,12 +1,12 @@
 package arrow.free
 
 import arrow.core.ForId
+import arrow.core.FunctionK
 import arrow.core.Id
 import arrow.core.NonEmptyList
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.extensions.id.foldable.foldable
-import arrow.core.extensions.id.functor.functor
 import arrow.core.extensions.id.monad.monad
 import arrow.core.extensions.id.traverse.traverse
 import arrow.core.extensions.nonemptylist.monad.monad
@@ -70,7 +70,7 @@ class FreeTest : UnitSpec() {
       MonadLaws.laws(Ops, EQ),
       MonadLaws.laws(Free.monad(), EQ),
       FoldableLaws.laws(Free.foldable(Id.foldable()), { it.free() }, Eq.any()),
-      TraverseLaws.laws(Free.traverse(Id.traverse()), Free.functor(), { it.free() }, Eq.any())
+      TraverseLaws.laws(Free.traverse(Id.traverse()), Free.functor(), { it.free() }, Free.eq(Id.monad(), FunctionK.id()))
     )
 
     "Can interpret an ADT as Free operations to Option" {
