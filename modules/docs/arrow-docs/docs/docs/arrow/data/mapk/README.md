@@ -88,6 +88,7 @@ import arrow.core.k
 
 
 fun main() {
+  //sampleStart
   val map1: MapK<String, Int> = mapOf("one" to 1, "two" to 2).k()
 
   val foldLeft: String = map1.foldLeft("one") { entry, tuple -> entry + tuple }
