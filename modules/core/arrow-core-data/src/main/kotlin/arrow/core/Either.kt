@@ -155,7 +155,7 @@ import arrow.higherkind
  *   parse(s).flatMap { reciprocal(it) }.map { stringify(it) }
  * //sampleEnd
  * ```
- * 
+ *
  * These calls to `parse` returns a `Left` and `Right` value
  *
  * ```kotlin:ank:playground
