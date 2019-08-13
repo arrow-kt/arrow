@@ -210,24 +210,13 @@ import arrow.higherkind
  * ```kotlin:ank:playground
  * import arrow.core.some
  *
- * val value =
  * //sampleStart
- *  1.some()
+ *  val some = 1.some()
+ *  val none = none<String>()
  * //sampleEnd
  * fun main () {
- *  println(value)
- * }
- * ```
- *
- * ```kotlin:ank:playground
- * import arrow.core.none
- *
- * val value =
- * //sampleStart
- *  none<String>()
- * //sampleEnd
- * fun main () {
- *  println(value)
+ *  println("some = $some")
+ *  println("none = $none")
  * }
  * ```
  *
@@ -235,23 +224,15 @@ import arrow.higherkind
  * import arrow.core.toOption
  *
  * //sampleStart
- * val nullableValue: String? = null
- * val value = nullableValue.toOption()
+ * val nullString: String? = null
+ * val valueFromNull = nullString.toOption()
+ *
+ * val helloString: String? = "Hello"
+ * val valueFromStr = helloString.toOption()
  * //sampleEnd
  * fun main () {
- *  println("value = $value")
- * }
- * ```
- *
- * ```kotlin:ank:playground
- * import arrow.core.toOption
- *
- * //sampleStart
- * val nullableValue: String? = "Hello"
- * val value = nullableValue.toOption()
- * //sampleEnd
- * fun main () {
- *  println("value = $value")
+ *  println("valueFromNull = $valueFromNull")
+ *  println("valueFromStr = $valueFromStr")
  * }
  * ```
  *
