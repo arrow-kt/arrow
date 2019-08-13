@@ -38,6 +38,7 @@ You can modify each map entry value and get another MapK with use of `map(..)` f
 ```kotlin:ank
 val arrowMap: MapK<String, Int> = mapOf("one" to 1, "two" to 2).k()
 val modifiedMap: MapK<String, Int> = arrowMap.map { entryValue -> entryValue.plus(10) }
+modifiedMap
 ```
 
 Sometimes you need to "map" one Map to another. You are able to do so with `map2(..)` function:
@@ -64,6 +65,7 @@ val f2: (Int) -> String = { i: Int -> "f2 to \"$i\"" }
 val map2: MapK<String, (Int) -> String> = mapOf("one" to f1, "two" to f2).k()
 
 val apResult = map1.ap(map2)
+apResult
 ``` 
 `ap2` acts like `map2` to `map`
 
@@ -78,7 +80,7 @@ val flattened: MapK<String, String> = map1.flatMap { map2 }
 
 `foldLeft` and `foldRight` are used for element aggregation:
 
-```kotlin:ank
+```kotlin:ank:playground
 val map1: MapK<String, Int> = mapOf("one" to 1, "two" to 2).k()
 
 val foldLeft: String = map1.foldLeft("one") { entry, tuple -> entry + tuple }
@@ -101,7 +103,7 @@ import arrow.core.fix
 import arrow.core.k
 import arrow.core.some
 
-fun main(args: Array<String>) {
+fun main() {
 val optionMap = mapOf(1.some() to "one", 2.some() to "two", None to "none").k()
   .traverse(Option.applicative()) { value ->
     when (value) {
