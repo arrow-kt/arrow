@@ -96,7 +96,7 @@ fun main() {
     map1.foldRight(Eval.just("one")) { entry, eval ->
       Eval.just("$entry ${eval.value()}")
     }
-
+  //sampleEnd
   println(foldLeft)
   println(foldRight)
 }
