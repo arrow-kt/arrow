@@ -17,6 +17,7 @@ import arrow.core.sequence
 import arrow.core.updated
 import arrow.extension
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
@@ -67,6 +68,15 @@ interface MapKSemigroup<K, A> : Semigroup<MapK<K, A>> {
 interface MapKFunctorFilter<K> : FunctorFilter<MapKPartialOf<K>> {
   override fun <A, B> Kind<MapKPartialOf<K>, A>.filterMap(f: (A) -> Option<B>): Kind<MapKPartialOf<K>, B> =
     fix().map(f).sequence(Option.applicative()).fix().fold({ emptyMap<K, B>().k() }, ::identity)
+
+  override fun <A, B> Kind<MapKPartialOf<K>, A>.map(f: (A) -> B): Kind<MapKPartialOf<K>, B> =
+    fix().map(f)
+}
+
+@extension
+interface MapKApply<K> : Apply<MapKPartialOf<K>> {
+  override fun <A, B> Kind<MapKPartialOf<K>, A>.ap(ff: Kind<MapKPartialOf<K>, (A) -> B>): Kind<MapKPartialOf<K>, B> =
+    fix().ap(ff.fix())
 
   override fun <A, B> Kind<MapKPartialOf<K>, A>.map(f: (A) -> B): Kind<MapKPartialOf<K>, B> =
     fix().map(f)
