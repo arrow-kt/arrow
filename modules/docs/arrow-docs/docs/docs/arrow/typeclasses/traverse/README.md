@@ -220,11 +220,13 @@ import arrow.core.k
 import arrow.fx.ForIO
 import arrow.fx.IO
 import arrow.fx.Promise
+import arrow.fx.extensions.fx
 import arrow.fx.extensions.io.applicative.applicative
-import arrow.fx.extensions.io.applicativeError.attempt
 import arrow.fx.extensions.io.async.async
 import arrow.fx.extensions.io.monad.flatMap
+import arrow.fx.extensions.io.unsafeRun.runBlocking
 import arrow.fx.fix
+import arrow.unsafe
 
 interface Profile
 interface User
@@ -248,7 +250,7 @@ fun main() {
       .processLogin()
     println(list)
   }
-  
+
   unsafe { runBlocking { program() } }
   //sampleEnd
 }
