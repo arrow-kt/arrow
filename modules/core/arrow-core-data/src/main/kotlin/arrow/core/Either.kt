@@ -133,6 +133,30 @@ import arrow.higherkind
  * ```
  *
  * Instead, let's make the fact that some of our functions can fail explicit in the return type.
+ * ```kotlin:ank
+ * import arrow.core.Either
+ * import arrow.core.flatMap
+ * import arrow.core.left
+ * import arrow.core.right
+ *
+ * //sampleStart
+ * // Either Style
+ * fun parse(s: String): Either<NumberFormatException, Int> =
+ *   if (s.matches(Regex("-?[0-9]+"))) Either.Right(s.toInt())
+ *   else Either.Left(NumberFormatException("$s is not a valid integer."))
+ *
+ * fun reciprocal(i: Int): Either<IllegalArgumentException, Double> =
+ *   if (i == 0) Either.Left(IllegalArgumentException("Cannot take reciprocal of 0."))
+ *   else Either.Right(1.0 / i)
+ *
+ * fun stringify(d: Double): String = d.toString()
+ *
+ * fun magic(s: String): Either<Exception, String> =
+ *   parse(s).flatMap { reciprocal(it) }.map { stringify(it) }
+ * //sampleEnd
+ * ```
+ * 
+ * These calls to `parse` returns a `Left` and `Right` value
  *
  * ```kotlin:ank:playground
  * import arrow.core.Either
