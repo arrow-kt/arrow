@@ -1,6 +1,5 @@
 @file:Suppress("UnusedImports")
-
-package arrow
+package io.kindedj
 
 import io.kindedj.Hk as HK_J
 
