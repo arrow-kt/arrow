@@ -23,7 +23,7 @@ DataType(MapK::class).tcMarkdownList()
 `MapK` is an Arrow wrapper over Kotlin `Map` type. The main goal is to make it a [type constructor]({{ '/docs/patterns/glossary/#type-constructors' | relative_url }})
 and to work with `Map` in more functional way.
 
-It can be created with calling `k()` function on Map:
+It can be created with calling `k()` function on Map: 
 
 ```kotlin:ank
 import arrow.core.MapK
