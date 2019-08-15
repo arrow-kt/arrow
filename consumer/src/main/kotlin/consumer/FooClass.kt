@@ -70,7 +70,10 @@ class Service {
 }
 
 fun testConversionSimple(): Option<Int> =
-  Option.Some(!Option.Some(1))
+  Option.Some(!Option.Some(!Option.Some(!Option.Some(1))))
+
+fun testConversionInfix(): Option<Int> =
+  Option.Some(!Option.Some(1) + !Option.Some(1))
 
 /**
  BLOCK_BODY

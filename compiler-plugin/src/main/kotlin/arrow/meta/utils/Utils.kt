@@ -1,4 +1,4 @@
-package arrow.meta.higherkind
+package arrow.meta.utils
 
 import arrow.meta.extensions.CompilerContext
 import org.jetbrains.kotlin.backend.common.BackendContext
@@ -20,6 +20,7 @@ import org.jetbrains.kotlin.descriptors.impl.TypeParameterDescriptorImpl
 import org.jetbrains.kotlin.descriptors.resolveClassByFqName
 import org.jetbrains.kotlin.diagnostics.Diagnostic
 import org.jetbrains.kotlin.incremental.components.NoLookupLocation
+import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.builders.declarations.IrClassBuilder
 import org.jetbrains.kotlin.ir.builders.declarations.IrFunctionBuilder
 import org.jetbrains.kotlin.ir.builders.declarations.IrValueParameterBuilder
@@ -35,16 +36,21 @@ import org.jetbrains.kotlin.ir.symbols.impl.IrTypeParameterSymbolImpl
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.IrTypeArgument
 import org.jetbrains.kotlin.ir.types.impl.IrSimpleTypeImpl
+import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtClass
+import org.jetbrains.kotlin.psi.KtElement
+import org.jetbrains.kotlin.psi.KtExpression
+import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.KtPsiFactory
 import org.jetbrains.kotlin.psi.KtTreeVisitorVoid
 import org.jetbrains.kotlin.psi.KtTypeReference
 import org.jetbrains.kotlin.psi.KtUserType
+import org.jetbrains.kotlin.psi.psiUtil.blockExpressionsOrSingle
+import org.jetbrains.kotlin.psi2ir.deparenthesize
 import org.jetbrains.kotlin.resolve.DescriptorFactory
-import org.jetbrains.kotlin.resolve.calls.checkers.CallCheckerContext
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.getAllSuperclassesWithoutAny
 import org.jetbrains.kotlin.resolve.descriptorUtil.getSuperInterfaces
@@ -369,3 +375,40 @@ fun CompilerContext.suppressDiagnostic(f: (Diagnostic) -> Boolean): Unit {
     diagnosticList.removeIf(f)
   }
 }
+
+fun KtFunction.body(): KtExpression? =
+  bodyExpression ?: bodyBlockExpression
+
+fun KtFunction.bodyExpressionText(): String =
+  bodyBlockExpression?.blockExpressionsOrSingle()
+    ?.joinToString("\n") { it.deparenthesize().text }
+    ?.trim()
+    ?: bodyExpression?.text
+    ?: ""
+
+fun KtElement.dfs(f: (KtElement) -> Boolean): List<KtElement> {
+  val found = arrayListOf<KtElement>()
+  accept(object : KtTreeVisitorVoid() {
+    override fun visitKtElement(element: KtElement) {
+      super.visitKtElement(element)
+      val result = f(element)
+      if (result) found.add(element)
+    }
+  })
+  return found
+}
+
+fun IrElement.dfs(f: (IrElement) -> Boolean): List<IrElement> {
+  val found = arrayListOf<IrElement>()
+  accept(object : IrElementVisitor<Unit, ArrayList<IrElement>> {
+    override fun visitElement(element: IrElement, data: ArrayList<IrElement>) {
+      val result = f(element)
+      if (result) data.add(element)
+      element.acceptChildren(this, data)
+    }
+  }, found)
+  return found
+}
+
+fun String.removeReturn(): String =
+  replace("return ", "")
