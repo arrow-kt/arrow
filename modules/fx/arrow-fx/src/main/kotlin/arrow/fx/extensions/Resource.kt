@@ -9,6 +9,7 @@ import arrow.fx.fix
 import arrow.fx.typeclasses.Bracket
 import arrow.extension
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.Monoid
@@ -21,6 +22,17 @@ import arrow.undocumented
 interface ResourceFunctor<F, E> : Functor<ResourcePartialOf<F, E>> {
   fun BR(): Bracket<F, E>
   override fun <A, B> ResourceOf<F, E, A>.map(f: (A) -> B): Resource<F, E, B> =
+    fix().map(BR(), f)
+}
+
+@extension
+@undocumented
+interface ResourceApply<F, E> : Apply<ResourcePartialOf<F, E>> {
+  fun BR(): Bracket<F, E>
+  override fun <A, B> Kind<ResourcePartialOf<F, E>, A>.ap(ff: Kind<ResourcePartialOf<F, E>, (A) -> B>): Kind<ResourcePartialOf<F, E>, B> =
+    fix().ap(BR(), ff.fix())
+
+  override fun <A, B> Kind<ResourcePartialOf<F, E>, A>.map(f: (A) -> B): Kind<ResourcePartialOf<F, E>, B> =
     fix().map(BR(), f)
 }
 

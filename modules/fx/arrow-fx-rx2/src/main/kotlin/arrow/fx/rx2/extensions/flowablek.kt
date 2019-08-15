@@ -48,6 +48,7 @@ import arrow.fx.rx2.CoroutineContextRx2Scheduler.asScheduler
 import arrow.fx.rx2.k
 import arrow.fx.rx2.value
 import arrow.fx.typeclasses.Dispatchers
+import arrow.typeclasses.Apply
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.ReplaySubject
 import io.reactivex.disposables.Disposable as RxDisposable
@@ -55,6 +56,15 @@ import io.reactivex.disposables.Disposable as RxDisposable
 @extension
 interface FlowableKFunctor : Functor<ForFlowableK> {
   override fun <A, B> FlowableKOf<A>.map(f: (A) -> B): FlowableK<B> =
+    fix().map(f)
+}
+
+@extension
+interface FlowableKApply : Apply<ForFlowableK> {
+  override fun <A, B> Kind<ForFlowableK, A>.ap(ff: Kind<ForFlowableK, (A) -> B>): Kind<ForFlowableK, B> =
+    fix().ap(ff)
+
+  override fun <A, B> Kind<ForFlowableK, A>.map(f: (A) -> B): Kind<ForFlowableK, B> =
     fix().map(f)
 }
 

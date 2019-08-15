@@ -1,5 +1,6 @@
 package arrow.fx.reactor.extensions
 
+import arrow.Kind
 import arrow.core.Either
 import arrow.fx.Timer
 import arrow.fx.reactor.ForMonoK
@@ -22,6 +23,7 @@ import arrow.fx.typeclasses.ProcF
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
@@ -36,7 +38,16 @@ interface MonoKFunctor : Functor<ForMonoK> {
 }
 
 @extension
-interface MonoKApplicative : Applicative<ForMonoK>, MonoKFunctor {
+interface MonoKApply : Apply<ForMonoK> {
+  override fun <A, B> Kind<ForMonoK, A>.ap(ff: Kind<ForMonoK, (A) -> B>): Kind<ForMonoK, B> =
+    fix().ap(ff)
+
+  override fun <A, B> Kind<ForMonoK, A>.map(f: (A) -> B): Kind<ForMonoK, B> =
+    fix().map(f)
+}
+
+@extension
+interface MonoKApplicative : Applicative<ForMonoK>, MonoKFunctor, MonoKApply {
   override fun <A, B> MonoKOf<A>.map(f: (A) -> B): MonoK<B> =
     fix().map(f)
 

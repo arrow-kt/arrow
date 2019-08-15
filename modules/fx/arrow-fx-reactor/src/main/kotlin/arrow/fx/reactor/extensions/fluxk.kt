@@ -25,6 +25,7 @@ import arrow.fx.typeclasses.ProcF
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
@@ -38,6 +39,15 @@ import kotlin.coroutines.CoroutineContext
 @extension
 interface FluxKFunctor : Functor<ForFluxK> {
   override fun <A, B> FluxKOf<A>.map(f: (A) -> B): FluxK<B> =
+    fix().map(f)
+}
+
+@extension
+interface FluxKApply : Apply<ForFluxK> {
+  override fun <A, B> Kind<ForFluxK, A>.ap(ff: Kind<ForFluxK, (A) -> B>): Kind<ForFluxK, B> =
+    fix().ap(ff)
+
+  override fun <A, B> Kind<ForFluxK, A>.map(f: (A) -> B): Kind<ForFluxK, B> =
     fix().map(f)
 }
 

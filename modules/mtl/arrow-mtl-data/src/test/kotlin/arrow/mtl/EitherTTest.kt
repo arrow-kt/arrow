@@ -7,7 +7,6 @@ import arrow.core.Id
 import arrow.core.Left
 import arrow.core.Option
 import arrow.core.Right
-import arrow.core.value
 import arrow.core.extensions.const.divisible.divisible
 import arrow.core.extensions.id.functor.functor
 import arrow.fx.ForIO
@@ -34,7 +33,6 @@ import arrow.typeclasses.Const
 import arrow.typeclasses.ConstPartialOf
 import arrow.typeclasses.Eq
 import arrow.typeclasses.const
-import arrow.typeclasses.value
 import io.kotlintest.properties.forAll
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith

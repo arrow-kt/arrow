@@ -5,7 +5,6 @@ dependencies {
     compile project(':arrow-fx')
     compile project(':arrow-mtl-data')
     compile project(':arrow-free-data')
-    compile project(':arrow-fx')
     compile project(":arrow-recursion-data")
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"

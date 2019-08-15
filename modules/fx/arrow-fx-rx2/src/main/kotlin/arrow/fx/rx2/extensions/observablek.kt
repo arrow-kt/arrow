@@ -35,6 +35,7 @@ import arrow.fx.typeclasses.ProcF
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
@@ -52,6 +53,15 @@ import io.reactivex.disposables.Disposable as RxDisposable
 @extension
 interface ObservableKFunctor : Functor<ForObservableK> {
   override fun <A, B> ObservableKOf<A>.map(f: (A) -> B): ObservableK<B> =
+    fix().map(f)
+}
+
+@extension
+interface ObservableApply : Apply<ForObservableK> {
+  override fun <A, B> Kind<ForObservableK, A>.ap(ff: Kind<ForObservableK, (A) -> B>): Kind<ForObservableK, B> =
+    fix().ap(ff)
+
+  override fun <A, B> Kind<ForObservableK, A>.map(f: (A) -> B): Kind<ForObservableK, B> =
     fix().map(f)
 }
 

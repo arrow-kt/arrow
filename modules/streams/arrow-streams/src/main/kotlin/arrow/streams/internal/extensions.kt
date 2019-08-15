@@ -6,12 +6,13 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.FunctionK
 import arrow.core.Option
+import arrow.extension
 import arrow.fx.typeclasses.Bracket
 import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.MonadDefer
-import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
@@ -31,6 +32,16 @@ import arrow.streams.internal.handleErrorWith as handleErrorW
 interface FreeCFunctor<F> : Functor<FreeCPartialOf<F>> {
   override fun <A, B> FreeCOf<F, A>.map(f: (A) -> B): FreeCOf<F, B> =
     this.fix().map(f)
+}
+
+@extension
+@undocumented
+interface FreeCApply<F> : Apply<FreeCPartialOf<F>> {
+  override fun <A, B> Kind<FreeCPartialOf<F>, A>.ap(ff: Kind<FreeCPartialOf<F>, (A) -> B>): Kind<FreeCPartialOf<F>, B> =
+    fix().apply(ff)
+
+  override fun <A, B> Kind<FreeCPartialOf<F>, A>.map(f: (A) -> B): Kind<FreeCPartialOf<F>, B> =
+    fix().map(f)
 }
 
 @extension

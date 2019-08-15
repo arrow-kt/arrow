@@ -16,6 +16,7 @@ import arrow.core.handleLeftWith
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Bifoldable
 import arrow.typeclasses.Bitraverse
 import arrow.typeclasses.Eq
@@ -37,10 +38,18 @@ interface ValidatedFunctor<E> : Functor<ValidatedPartialOf<E>> {
 }
 
 @extension
-interface ValidatedApplicative<E> : Applicative<ValidatedPartialOf<E>>, ValidatedFunctor<E> {
-
+interface ValidatedApply<E> : Apply<ValidatedPartialOf<E>> {
   fun SE(): Semigroup<E>
 
+  override fun <A, B> Kind<ValidatedPartialOf<E>, A>.ap(ff: Kind<ValidatedPartialOf<E>, (A) -> B>): Kind<ValidatedPartialOf<E>, B> =
+    fix().ap(SE(), ff.fix())
+
+  override fun <A, B> Kind<ValidatedPartialOf<E>, A>.map(f: (A) -> B): Kind<ValidatedPartialOf<E>, B> =
+    fix().map(f)
+}
+
+@extension
+interface ValidatedApplicative<E> : Applicative<ValidatedPartialOf<E>>, ValidatedFunctor<E>, ValidatedApply<E> {
   override fun <A> just(a: A): Validated<E, A> = Valid(a)
 
   override fun <A, B> Kind<ValidatedPartialOf<E>, A>.map(f: (A) -> B): Validated<E, B> = fix().map(f)
