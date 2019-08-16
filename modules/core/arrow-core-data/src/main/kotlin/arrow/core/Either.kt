@@ -133,6 +133,7 @@ import arrow.higherkind
  * ```
  *
  * Instead, let's make the fact that some of our functions can fail explicit in the return type.
+ *
  * ```kotlin:ank
  * import arrow.core.Either
  * import arrow.core.flatMap
