@@ -76,9 +76,9 @@ interface ConstApply<A> : Apply<ConstPartialOf<A>> {
 }
 
 @extension
-interface ConstApplicative<A> : Applicative<ConstPartialOf<A>> {
+interface ConstApplicative<A> : Applicative<ConstPartialOf<A>>, ConstApply<A>, ConstFunctor<A> {
 
-  fun MA(): Monoid<A>
+  override fun MA(): Monoid<A>
 
   override fun <T, U> ConstOf<A, T>.map(f: (T) -> U): Const<A, U> = fix().retag()
 

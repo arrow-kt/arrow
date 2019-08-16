@@ -57,7 +57,7 @@ interface Function0Apply : Apply<ForFunction0> {
 }
 
 @extension
-interface Function0Applicative : Applicative<ForFunction0> {
+interface Function0Applicative : Applicative<ForFunction0>, Function0Apply, Function0Functor {
   override fun <A, B> Function0Of<A>.ap(ff: Function0Of<(A) -> B>): Function0<B> =
     fix().ap(ff)
 

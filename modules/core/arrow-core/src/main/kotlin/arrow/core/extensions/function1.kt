@@ -128,7 +128,7 @@ interface Function1Apply<I> : Apply<Function1PartialOf<I>>, Function1Functor<I> 
 }
 
 @extension
-interface Function1Applicative<I> : Applicative<Function1PartialOf<I>>, Function1Functor<I> {
+interface Function1Applicative<I> : Applicative<Function1PartialOf<I>>, Function1Functor<I>, Function1Apply<I> {
 
   override fun <A> just(a: A): Function1<I, A> =
     Function1.just(a)

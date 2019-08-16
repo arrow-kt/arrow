@@ -53,9 +53,9 @@ interface IorApply<L> : Apply<IorPartialOf<L>>, IorFunctor<L> {
 }
 
 @extension
-interface IorApplicative<L> : Applicative<IorPartialOf<L>>, IorFunctor<L> {
+interface IorApplicative<L> : Applicative<IorPartialOf<L>>, IorFunctor<L>, IorApply<L> {
 
-  fun SL(): Semigroup<L>
+  override fun SL(): Semigroup<L>
 
   override fun <A> just(a: A): Ior<L, A> = Ior.Right(a)
 

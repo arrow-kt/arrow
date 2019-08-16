@@ -60,7 +60,7 @@ interface Tuple2Apply<F> : Apply<Tuple2PartialOf<F>>, Tuple2Functor<F> {
 }
 
 @extension
-interface Tuple2Applicative<F> : Applicative<Tuple2PartialOf<F>>, Tuple2Functor<F> {
+interface Tuple2Applicative<F> : Applicative<Tuple2PartialOf<F>>, Tuple2Functor<F>, Tuple2Apply<F> {
   fun MF(): Monoid<F>
 
   override fun <A, B> Tuple2Of<F, A>.map(f: (A) -> B) =

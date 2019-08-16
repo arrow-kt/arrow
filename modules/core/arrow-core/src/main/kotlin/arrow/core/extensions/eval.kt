@@ -32,7 +32,7 @@ interface EvalApply : Apply<ForEval> {
 }
 
 @extension
-interface EvalApplicative : Applicative<ForEval> {
+interface EvalApplicative : Applicative<ForEval>, EvalApply, EvalFunctor{
   override fun <A, B> EvalOf<A>.ap(ff: EvalOf<(A) -> B>): Eval<B> =
     fix().ap(ff)
 

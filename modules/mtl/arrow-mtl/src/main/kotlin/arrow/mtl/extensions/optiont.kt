@@ -8,6 +8,7 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.Tuple2
 import arrow.core.extensions.ComposedTraverseFilter
+import arrow.core.extensions.OptionApply
 import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.option.foldable.foldable
 import arrow.core.extensions.option.traverse.traverse
@@ -28,6 +29,7 @@ import arrow.mtl.fix
 import arrow.mtl.value
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Apply
 import arrow.typeclasses.ComposedTraverse
 import arrow.typeclasses.Contravariant
 import arrow.typeclasses.Decidable
@@ -58,9 +60,19 @@ interface OptionTFunctor<F> : Functor<OptionTPartialOf<F>> {
 }
 
 @extension
-interface OptionTApplicative<F> : Applicative<OptionTPartialOf<F>>, OptionTFunctor<F> {
+interface OptionTApply<F> : Apply<OptionTPartialOf<F>> {
+  fun AF(): Apply<F>
+  override fun <A, B> Kind<OptionTPartialOf<F>, A>.ap(ff: Kind<OptionTPartialOf<F>, (A) -> B>): Kind<OptionTPartialOf<F>, B> =
+    fix().ap(AF(), ff)
 
-  fun AF(): Applicative<F>
+  override fun <A, B> Kind<OptionTPartialOf<F>, A>.map(f: (A) -> B): Kind<OptionTPartialOf<F>, B> =
+    fix().map(AF(), f)
+}
+
+@extension
+interface OptionTApplicative<F> : Applicative<OptionTPartialOf<F>>, OptionTFunctor<F>, OptionTApply<F> {
+
+  override fun AF(): Applicative<F>
 
   override fun FF(): Functor<F> = AF()
 

@@ -36,6 +36,7 @@ import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.SemigroupK
 import arrow.undocumented
 import arrow.extension
+import arrow.typeclasses.Apply
 
 @extension
 @undocumented
@@ -49,11 +50,27 @@ interface StateTFunctor<F, S> : Functor<StateTPartialOf<F, S>> {
 
 @extension
 @undocumented
-interface StateTApplicative<F, S> : Applicative<StateTPartialOf<F, S>>, StateTFunctor<F, S> {
-
+interface StateTApply<F, S> : Apply<StateTPartialOf<F, S>> {
+  fun AF(): Apply<F>
   fun MF(): Monad<F>
 
+  override fun <A, B> StateTOf<F, S, A>.map(f: (A) -> B): StateT<F, S, B> =
+    fix().map(MF(), f)
+
+  override fun <A, B> StateTOf<F, S, A>.ap(ff: StateTOf<F, S, (A) -> B>): StateT<F, S, B> =
+    fix().ap(MF(), ff)
+
+  override fun <A, B> StateTOf<F, S, A>.product(fb: StateTOf<F, S, B>): StateT<F, S, Tuple2<A, B>> =
+    fix().product(MF(), fb)
+}
+
+@extension
+@undocumented
+interface StateTApplicative<F, S> : Applicative<StateTPartialOf<F, S>>, StateTFunctor<F, S>, StateTApply<F, S> {
+
+  override fun MF(): Monad<F>
   override fun FF(): Functor<F> = MF()
+  override fun AF(): Apply<F> = MF()
 
   override fun <A, B> StateTOf<F, S, A>.map(f: (A) -> B): StateT<F, S, B> =
     fix().map(MF(), f)

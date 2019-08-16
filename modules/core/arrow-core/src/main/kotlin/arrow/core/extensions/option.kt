@@ -161,7 +161,7 @@ interface OptionApply : Apply<ForOption> {
 }
 
 @extension
-interface OptionApplicative : Applicative<ForOption> {
+interface OptionApplicative : Applicative<ForOption>, OptionApply, OptionFunctor {
   override fun <A, B> OptionOf<A>.ap(ff: OptionOf<(A) -> B>): Option<B> =
     fix().ap(ff)
 

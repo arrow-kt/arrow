@@ -52,7 +52,7 @@ interface FluxKApply : Apply<ForFluxK> {
 }
 
 @extension
-interface FluxKApplicative : Applicative<ForFluxK> {
+interface FluxKApplicative : Applicative<ForFluxK>, FluxKApply, FluxKFunctor {
   override fun <A> just(a: A): FluxK<A> =
     FluxK.just(a)
 

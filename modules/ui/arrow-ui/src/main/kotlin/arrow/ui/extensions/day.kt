@@ -53,10 +53,10 @@ interface DayApply<F, G> : Apply<DayPartialOf<F, G>> {
 
 @extension
 @undocumented
-interface DayApplicative<F, G> : Applicative<DayPartialOf<F, G>> {
-  fun AF(): Applicative<F>
+interface DayApplicative<F, G> : Applicative<DayPartialOf<F, G>>, DayApply<F, G>, DayFunctor<F, G> {
+  override fun AF(): Applicative<F>
 
-  fun AG(): Applicative<G>
+  override fun AG(): Applicative<G>
 
   override fun <A, B> DayOf<F, G, A>.map(f: (A) -> B): Day<F, G, B> =
     fix().mapLazy(f)

@@ -7,6 +7,7 @@ import arrow.core.identity
 import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 
@@ -44,6 +45,16 @@ class Kleisli<F, D, A>(val run: KleisliFun<F, D, A>) : KleisliOf<F, D, A>, Kleis
    * @param FF [Functor] for the context [F].
    */
   fun <B> map(FF: Functor<F>, f: (A) -> B): Kleisli<F, D, B> = FF.run {
+    Kleisli { d -> run(d).map(f) }
+  }
+
+  /**
+   * Map the end of the arrow [A] to [B] given a function [f].
+   *
+   * @param f the function to apply.
+   * @param AF [Apply] for the context [F].
+   */
+  fun <B> map(AF: Apply<F>, f: (A) -> B): Kleisli<F, D, B> = AF.run {
     Kleisli { d -> run(d).map(f) }
   }
 

@@ -85,7 +85,7 @@ interface ListKApply : Apply<ForListK> {
 }
 
 @extension
-interface ListKApplicative : Applicative<ForListK> {
+interface ListKApplicative : Applicative<ForListK>, ListKFunctor, ListKApply {
   override fun <A, B> Kind<ForListK, A>.ap(ff: Kind<ForListK, (A) -> B>): ListK<B> =
     fix().ap(ff)
 

@@ -57,7 +57,7 @@ interface ObservableKFunctor : Functor<ForObservableK> {
 }
 
 @extension
-interface ObservableApply : Apply<ForObservableK> {
+interface ObservableKApply : Apply<ForObservableK> {
   override fun <A, B> Kind<ForObservableK, A>.ap(ff: Kind<ForObservableK, (A) -> B>): Kind<ForObservableK, B> =
     fix().ap(ff)
 
@@ -66,7 +66,7 @@ interface ObservableApply : Apply<ForObservableK> {
 }
 
 @extension
-interface ObservableKApplicative : Applicative<ForObservableK> {
+interface ObservableKApplicative : Applicative<ForObservableK>, ObservableKApply, ObservableKFunctor {
   override fun <A, B> ObservableKOf<A>.ap(ff: ObservableKOf<(A) -> B>): ObservableK<B> =
     fix().ap(ff)
 

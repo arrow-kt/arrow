@@ -69,9 +69,9 @@ interface EitherTApply<F, L> : Apply<EitherTPartialOf<F, L>>, EitherTFunctor<F, 
 
 @extension
 @undocumented
-interface EitherTApplicative<F, L> : Applicative<EitherTPartialOf<F, L>>, EitherTFunctor<F, L> {
+interface EitherTApplicative<F, L> : Applicative<EitherTPartialOf<F, L>>, EitherTFunctor<F, L>, EitherTApply<F, L> {
 
-  fun AF(): Applicative<F>
+  override fun AF(): Applicative<F>
 
   override fun FF(): Functor<F> = AF()
 

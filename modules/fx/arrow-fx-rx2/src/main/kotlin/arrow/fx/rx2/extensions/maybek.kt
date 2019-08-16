@@ -30,6 +30,7 @@ import arrow.fx.typeclasses.ProcF
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
@@ -50,7 +51,16 @@ interface MaybeKFunctor : Functor<ForMaybeK> {
 }
 
 @extension
-interface MaybeKApplicative : Applicative<ForMaybeK> {
+interface MaybeKApply : Apply<ForMaybeK> {
+  override fun <A, B> MaybeKOf<A>.ap(ff: MaybeKOf<(A) -> B>): MaybeK<B> =
+    fix().ap(ff)
+
+  override fun <A, B> MaybeKOf<A>.map(f: (A) -> B): MaybeK<B> =
+    fix().map(f)
+}
+
+@extension
+interface MaybeKApplicative : Applicative<ForMaybeK>, MaybeKFunctor, MaybeKApply {
   override fun <A, B> MaybeKOf<A>.ap(ff: MaybeKOf<(A) -> B>): MaybeK<B> =
     fix().ap(ff)
 

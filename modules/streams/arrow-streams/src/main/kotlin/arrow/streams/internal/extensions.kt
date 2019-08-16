@@ -46,12 +46,15 @@ interface FreeCApply<F> : Apply<FreeCPartialOf<F>> {
 
 @extension
 @undocumented
-interface FreeCApplicative<F> : Applicative<FreeCPartialOf<F>> {
+interface FreeCApplicative<F> : Applicative<FreeCPartialOf<F>>, FreeCApply<F>, FreeCFunctor<F> {
   override fun <A> just(a: A): FreeCOf<F, A> =
     FreeC.just(a)
 
   override fun <A, B> FreeCOf<F, A>.ap(ff: FreeCOf<F, (A) -> B>): FreeCOf<F, B> =
     apply(ff)
+
+  override fun <A, B> Kind<FreeCPartialOf<F>, A>.map(f: (A) -> B): Kind<FreeCPartialOf<F>, B> =
+    fix().map(f)
 }
 
 @extension

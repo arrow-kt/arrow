@@ -60,7 +60,7 @@ interface IOApply : Apply<ForIO> {
 }
 
 @extension
-interface IOApplicative : Applicative<ForIO> {
+interface IOApplicative : Applicative<ForIO>, IOFunctor, IOApply {
   override fun <A, B> IOOf<A>.map(f: (A) -> B): IO<B> =
     fix().map(f)
 

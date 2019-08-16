@@ -59,7 +59,7 @@ interface AndThenApply<X> : Apply<AndThenPartialOf<X>>, AndThenFunctor<X> {
 }
 
 @extension
-interface AndThenApplicative<X> : Applicative<AndThenPartialOf<X>>, AndThenFunctor<X> {
+interface AndThenApplicative<X> : Applicative<AndThenPartialOf<X>>, AndThenFunctor<X>, AndThenApply<X> {
   override fun <A> just(a: A): AndThenOf<X, A> =
     AndThen.just(a)
 

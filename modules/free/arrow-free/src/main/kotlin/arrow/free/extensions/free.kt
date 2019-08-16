@@ -45,7 +45,7 @@ interface FreeApply<S> : Apply<FreePartialOf<S>>, FreeFunctor<S> {
 
 @extension
 @undocumented
-interface FreeApplicative<S> : Applicative<FreePartialOf<S>>, FreeFunctor<S> {
+interface FreeApplicative<S> : Applicative<FreePartialOf<S>>, FreeFunctor<S>, FreeApply<S> {
 
   override fun <A> just(a: A): Free<S, A> = Free.just(a)
 

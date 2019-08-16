@@ -300,17 +300,17 @@ fun <F, G> Contravariant<F>.composeFunctor(GF: Functor<G>): Contravariant<Nested
 
 
 interface ComposedApply<F, G> : Apply<Nested<F, G>> {
-  fun AF(): Apply<F>
-  fun AG(): Apply<G>
+  fun F(): Apply<F>
+  fun G(): Apply<G>
 
   override fun <A, B> Kind<Nested<F, G>, A>.ap(ff: Kind<Nested<F, G>, (A) -> B>): Kind<Nested<F, G>, B> =
-    AF().run { unnest().ap(ff.unnest().map { gfa: Kind<G, (A) -> B> -> { ga: Kind<G, A> -> AG().run { ga.ap(gfa) } } }) }.nest()
+    F().run { unnest().ap(ff.unnest().map { gfa: Kind<G, (A) -> B> -> { ga: Kind<G, A> -> G().run { ga.ap(gfa) } } }) }.nest()
 
   override fun <A, B> Kind<Nested<F, G>, A>.map(f: (A) -> B): Kind<Nested<F, G>, B> =
-    ap()
+    F().run { G().run { unnest().map { it.map(f) } } }.nest()
 }
 
-interface ComposedApplicative<F, G> : Applicative<Nested<F, G>>, ComposedFunctor<F, G> {
+interface ComposedApplicative<F, G> : Applicative<Nested<F, G>>, ComposedFunctor<F, G>, ComposedApply<F, G> {
   override fun F(): Applicative<F>
 
   override fun G(): Applicative<G>

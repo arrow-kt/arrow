@@ -94,7 +94,7 @@ interface EitherApply<L> : Apply<EitherPartialOf<L>>, EitherFunctor<L> {
 }
 
 @extension
-interface EitherApplicative<L> : Applicative<EitherPartialOf<L>>, EitherFunctor<L> {
+interface EitherApplicative<L> : Applicative<EitherPartialOf<L>>, EitherFunctor<L>, EitherApply<L> {
 
   override fun <A> just(a: A): Either<L, A> = Right(a)
 

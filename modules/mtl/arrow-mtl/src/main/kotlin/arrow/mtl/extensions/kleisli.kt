@@ -96,11 +96,9 @@ interface KleisliDecidableInstance<F, D> : Decidable<KleisliPartialOf<F, D>>, Kl
 }
 
 @extension
-interface KleisliApply<F, D> : Apply<KleisliPartialOf<F, D>>, KleisliFunctor<F, D> {
+interface KleisliApply<F, D> : Apply<KleisliPartialOf<F, D>> {
 
   fun AF(): Applicative<F>
-
-  override fun FF(): Functor<F> = AF()
 
   override fun <A, B> KleisliOf<F, D, A>.map(f: (A) -> B): Kleisli<F, D, B> =
     fix().map(AF(), f)
@@ -113,9 +111,9 @@ interface KleisliApply<F, D> : Apply<KleisliPartialOf<F, D>>, KleisliFunctor<F, 
 }
 
 @extension
-interface KleisliApplicative<F, D> : Applicative<KleisliPartialOf<F, D>>, KleisliFunctor<F, D> {
+interface KleisliApplicative<F, D> : Applicative<KleisliPartialOf<F, D>>, KleisliFunctor<F, D>, KleisliApply<F, D> {
 
-  fun AF(): Applicative<F>
+  override fun AF(): Applicative<F>
 
   override fun FF(): Functor<F> = AF()
 

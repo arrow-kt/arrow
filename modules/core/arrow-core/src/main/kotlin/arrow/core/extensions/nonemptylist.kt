@@ -64,7 +64,7 @@ interface NonEmptyListApply : Apply<ForNonEmptyList> {
 }
 
 @extension
-interface NonEmptyListApplicative : Applicative<ForNonEmptyList> {
+interface NonEmptyListApplicative : Applicative<ForNonEmptyList>, NonEmptyListApply, NonEmptyListFunctor {
   override fun <A, B> NonEmptyListOf<A>.ap(ff: NonEmptyListOf<(A) -> B>): NonEmptyList<B> =
     fix().ap(ff)
 

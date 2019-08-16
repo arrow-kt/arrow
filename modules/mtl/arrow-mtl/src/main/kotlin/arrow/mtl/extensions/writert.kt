@@ -30,6 +30,7 @@ import arrow.typeclasses.MonoidK
 import arrow.typeclasses.SemigroupK
 import arrow.undocumented
 import arrow.extension
+import arrow.typeclasses.Apply
 
 @extension
 @undocumented
@@ -41,9 +42,21 @@ interface WriterTFunctor<F, W> : Functor<WriterTPartialOf<F, W>> {
 
 @extension
 @undocumented
-interface WriterTApplicative<F, W> : Applicative<WriterTPartialOf<F, W>>, WriterTFunctor<F, W> {
+interface WriterTApply<F, W> : Apply<WriterTPartialOf<F, W>> {
+  fun AF(): Apply<F>
+  fun MW(): Monoid<W>
+  override fun <A, B> Kind<WriterTPartialOf<F, W>, A>.ap(ff: Kind<WriterTPartialOf<F, W>, (A) -> B>): Kind<WriterTPartialOf<F, W>, B> =
+    fix().ap(AF(), MW(), ff)
 
-  fun AF(): Applicative<F>
+  override fun <A, B> Kind<WriterTPartialOf<F, W>, A>.map(f: (A) -> B): Kind<WriterTPartialOf<F, W>, B> =
+    fix().map(AF()) { f(it) }
+}
+
+@extension
+@undocumented
+interface WriterTApplicative<F, W> : Applicative<WriterTPartialOf<F, W>>, WriterTFunctor<F, W>, WriterTApply<F, W> {
+
+  override fun AF(): Applicative<F>
 
   override fun FF(): Functor<F> = AF()
 

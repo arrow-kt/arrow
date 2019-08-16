@@ -78,7 +78,7 @@ interface IdApply : Apply<ForId> {
 }
 
 @extension
-interface IdApplicative : Applicative<ForId> {
+interface IdApplicative : Applicative<ForId>, IdApply, IdFunctor {
   override fun <A, B> IdOf<A>.ap(ff: IdOf<(A) -> B>): Id<B> =
     fix().ap(ff)
 

@@ -69,7 +69,7 @@ interface FlowableKApply : Apply<ForFlowableK> {
 }
 
 @extension
-interface FlowableKApplicative : Applicative<ForFlowableK> {
+interface FlowableKApplicative : Applicative<ForFlowableK>, FlowableKApply, FlowableKFunctor {
   override fun <A, B> FlowableKOf<A>.ap(ff: FlowableKOf<(A) -> B>): FlowableK<B> =
     fix().ap(ff)
 

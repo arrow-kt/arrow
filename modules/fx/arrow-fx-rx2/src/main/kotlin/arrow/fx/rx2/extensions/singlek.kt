@@ -31,6 +31,7 @@ import arrow.fx.typeclasses.ProcF
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
@@ -49,7 +50,16 @@ interface SingleKFunctor : Functor<ForSingleK> {
 }
 
 @extension
-interface SingleKApplicative : Applicative<ForSingleK> {
+interface SingleKApply : Apply<ForSingleK> {
+  override fun <A, B> SingleKOf<A>.ap(ff: SingleKOf<(A) -> B>): SingleK<B> =
+    fix().ap(ff)
+
+  override fun <A, B> SingleKOf<A>.map(f: (A) -> B): SingleK<B> =
+    fix().map(f)
+}
+
+@extension
+interface SingleKApplicative : Applicative<ForSingleK>, SingleKFunctor, SingleKApply {
   override fun <A, B> SingleKOf<A>.ap(ff: SingleKOf<(A) -> B>): SingleK<B> =
     fix().ap(ff)
 

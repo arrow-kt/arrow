@@ -37,7 +37,7 @@ interface ResourceApply<F, E> : Apply<ResourcePartialOf<F, E>> {
 }
 
 @extension
-interface ResourceApplicative<F, E> : Applicative<ResourcePartialOf<F, E>>, ResourceFunctor<F, E> {
+interface ResourceApplicative<F, E> : Applicative<ResourcePartialOf<F, E>>, ResourceFunctor<F, E>, ResourceApply<F, E> {
   override fun BR(): Bracket<F, E>
 
   override fun <A> just(a: A): Resource<F, E, A> = Resource.just(a, BR())

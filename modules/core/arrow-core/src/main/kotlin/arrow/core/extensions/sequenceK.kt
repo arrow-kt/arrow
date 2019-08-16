@@ -93,7 +93,7 @@ interface SequenceKApply : Apply<ForSequenceK> {
 }
 
 @extension
-interface SequenceKApplicative : Applicative<ForSequenceK> {
+interface SequenceKApplicative : Applicative<ForSequenceK>, SequenceKFunctor, SequenceKApply {
   override fun <A, B> Kind<ForSequenceK, A>.ap(ff: Kind<ForSequenceK, (A) -> B>): SequenceK<B> =
     fix().ap(ff)
 

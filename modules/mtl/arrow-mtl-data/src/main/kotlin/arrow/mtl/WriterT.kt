@@ -6,6 +6,7 @@ import arrow.core.Tuple2
 import arrow.core.toT
 import arrow.higherkind
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.Monoid
@@ -116,7 +117,7 @@ data class WriterT<F, W, A>(private val value: Kind<F, Tuple2<W, A>>) : WriterTO
   fun swap(MF: Monad<F>): WriterT<F, A, W> =
     transform(MF) { it.b toT it.a }
 
-  fun <B> ap(AF: Applicative<F>, SG: Semigroup<W>, ff: WriterTOf<F, W, (A) -> B>): WriterT<F, W, B> =
+  fun <B> ap(AF: Apply<F>, SG: Semigroup<W>, ff: WriterTOf<F, W, (A) -> B>): WriterT<F, W, B> =
     WriterT(AF.map(ff.value(), value) { (a, b) ->
       Tuple2(SG.run { a.a.combine(b.a) }, a.b(b.b))
     })

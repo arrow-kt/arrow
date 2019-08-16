@@ -11,6 +11,7 @@ import arrow.core.Some
 import arrow.core.getOrElse
 import arrow.higherkind
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 
@@ -62,7 +63,7 @@ data class OptionT<F, A>(private val value: Kind<F, Option<A>>) : OptionTOf<F, A
 
   fun <B> cata(FF: Functor<F>, default: () -> B, f: (A) -> B): Kind<F, B> = fold(FF, default, f)
 
-  fun <B> ap(AF: Applicative<F>, ff: OptionTOf<F, (A) -> B>): OptionT<F, B> =
+  fun <B> ap(AF: Apply<F>, ff: OptionTOf<F, (A) -> B>): OptionT<F, B> =
     OptionT(AF.map(ff.value(), value) { (a, b) ->
       b.flatMap { bb ->
         a.map { f -> f(bb) }
@@ -82,6 +83,10 @@ data class OptionT<F, A>(private val value: Kind<F, Option<A>>) : OptionTOf<F, A
   fun <B> semiflatMap(MF: Monad<F>, f: (A) -> Kind<F, B>): OptionT<F, B> = flatMap(MF) { option -> liftF(MF, f(option)) }
 
   fun <B> map(FF: Functor<F>, f: (A) -> B): OptionT<F, B> = FF.run {
+    OptionT(value.map { it.map(f) })
+  }
+
+  fun <B> map(AF: Apply<F>, f: (A) -> B): OptionT<F, B> = AF.run {
     OptionT(value.map { it.map(f) })
   }
 
