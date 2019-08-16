@@ -6,7 +6,6 @@ import arrow.core.Either.Right
 import arrow.higherkind
 
 /**
- * ---
  *
  * ank_macro_hierarchy(arrow.core.Either)
  *
