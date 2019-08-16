@@ -3,6 +3,7 @@ package arrow.fx.rx2.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.core.Option
 import arrow.core.Tuple2
 import arrow.fx.CancelToken
 import arrow.fx.RacePair
@@ -345,3 +346,13 @@ interface FlowableKTimer : Timer<ForFlowableK> {
 // TODO FlowableK does not yet have a Concurrent instance
 fun <A> FlowableK.Companion.fx(c: suspend AsyncSyntax<ForFlowableK>.() -> A): FlowableK<A> =
   FlowableK.async().fx.async(c).fix()
+
+fun <T> Flowable<Option<T>>.flatten(): Flowable<T> {
+  return flatMap {
+    it.fold ({
+      Flowable.empty()
+    }, {
+      Flowable.just(it)
+    })
+  }
+}

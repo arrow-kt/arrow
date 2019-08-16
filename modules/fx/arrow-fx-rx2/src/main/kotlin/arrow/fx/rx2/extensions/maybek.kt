@@ -2,6 +2,7 @@ package arrow.fx.rx2.extensions
 
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.core.Option
 import arrow.core.Tuple2
 import arrow.fx.CancelToken
 import arrow.fx.RacePair
@@ -245,3 +246,13 @@ interface MaybeKTimer : Timer<ForMaybeK> {
 // TODO MaybeK does not yet have a Concurrent instance
 fun <A> MaybeK.Companion.fx(c: suspend AsyncSyntax<ForMaybeK>.() -> A): MaybeK<A> =
   MaybeK.async().fx.async(c).fix()
+
+fun <T> Maybe<Option<T>>.flatten(): Maybe<T> {
+  return flatMap {
+    it.fold ({
+      Maybe.empty()
+    }, {
+      Maybe.just<T>(it)
+    })
+  }
+}

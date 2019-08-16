@@ -3,6 +3,7 @@ package arrow.fx.rx2.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.core.Option
 import arrow.core.Tuple2
 import arrow.fx.CancelToken
 import arrow.fx.RacePair
@@ -290,4 +291,14 @@ interface ObservableKTimer : Timer<ForObservableK> {
   override fun sleep(duration: Duration): ObservableK<Unit> =
     ObservableK(io.reactivex.Observable.timer(duration.nanoseconds, TimeUnit.NANOSECONDS)
       .map { Unit })
+}
+
+fun <T> Observable<Option<T>>.flatten(): Observable<T> {
+  return flatMap {
+    it.fold ({
+      Observable.empty<T>()
+    }, {
+      Observable.just<T>(it)
+    })
+  }
 }
