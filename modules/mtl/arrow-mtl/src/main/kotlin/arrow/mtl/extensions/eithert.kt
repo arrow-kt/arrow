@@ -21,10 +21,11 @@ import arrow.mtl.fix
 import arrow.mtl.extensions.eithert.monadThrow.monadThrow
 import arrow.mtl.value
 import arrow.extension
+import arrow.mtl.typeclasses.ComposedTraverse
+import arrow.mtl.typeclasses.Nested
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Apply
-import arrow.typeclasses.ComposedTraverse
 import arrow.typeclasses.Contravariant
 import arrow.typeclasses.Decidable
 import arrow.typeclasses.Divide
@@ -35,11 +36,10 @@ import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.MonadThrowSyntax
-import arrow.typeclasses.Nested
 import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Traverse
-import arrow.typeclasses.compose
-import arrow.typeclasses.unnest
+import arrow.mtl.typeclasses.compose
+import arrow.mtl.typeclasses.unnest
 import arrow.undocumented
 
 @extension
