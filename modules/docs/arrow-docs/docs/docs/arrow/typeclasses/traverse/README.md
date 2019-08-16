@@ -92,7 +92,7 @@ fun main(){
 }
 ```
 
-Both values try to attain the same thing, but what `Foldable` lacks is that it solely drills down to it's `A` here `Int` and does not preserve it's shape `F` - `MapK`. This is where `Traverse` shines, whenever you care about the Output `B` from `(A) -> B` and the existing shape of `F` you would use `traverse`.
+Both values try to attain the same thing, but what `Foldable` lacks is that it solely drills down to it's `A` here `Int` and does not preserve its shape `F` - `MapK`. This is where `Traverse` shines, whenever you care about the Output `B` from `(A) -> B` and the existing shape of `F` you would use `traverse`.
 
 Additionally, you're able to wrap your context `F` within a `G`. That is, may among others, the reason why `Traverse` is strictly more powerful than `Foldable`.
 
