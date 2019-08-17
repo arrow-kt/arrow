@@ -2,7 +2,7 @@ package arrow.fx
 
 import arrow.Kind
 import arrow.core.Either
-import arrow.higherkinds.HkJ3
+import arrow.HkJ3
 import arrow.fx.typeclasses.Bracket
 import arrow.fx.typeclasses.ExitCase
 import arrow.typeclasses.Monoid
