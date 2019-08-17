@@ -1,5 +1,5 @@
 @file:Suppress("UnusedImports")
-package arrow.core
+package arrow.higherkinds
 
 import io.kindedj.Hk as HK_J
 
