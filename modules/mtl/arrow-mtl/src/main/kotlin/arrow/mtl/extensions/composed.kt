@@ -1,22 +1,20 @@
-package arrow.core.extensions
+package arrow.mtl.extensions
 
 import arrow.Kind
 import arrow.core.Option
+import arrow.mtl.typeclasses.ComposedFunctor
+import arrow.mtl.typeclasses.ComposedTraverse
+import arrow.mtl.typeclasses.Nested
+import arrow.mtl.typeclasses.nest
+import arrow.mtl.typeclasses.unnest
 import arrow.typeclasses.FunctorFilter
 import arrow.typeclasses.TraverseFilter
 import arrow.typeclasses.Applicative
-import arrow.typeclasses.ComposedFunctor
-import arrow.typeclasses.ComposedTraverse
 import arrow.typeclasses.Functor
-import arrow.typeclasses.Nested
 import arrow.typeclasses.Traverse
-import arrow.typeclasses.nest
-import arrow.typeclasses.unnest
 
 interface ComposedFunctorFilter<F, G> : FunctorFilter<Nested<F, G>>, ComposedFunctor<F, G> {
-
   override fun F(): Functor<F>
-
   override fun G(): FunctorFilter<G>
 
   override fun <A, B> Kind<Nested<F, G>, A>.filterMap(f: (A) -> Option<B>): Kind<Nested<F, G>, B> =
