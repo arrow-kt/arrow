@@ -14,15 +14,15 @@ import arrow.core.identity
 import arrow.core.left
 import arrow.core.right
 import arrow.core.toT
+import arrow.extension
 import arrow.mtl.EitherT
 import arrow.mtl.EitherTOf
 import arrow.mtl.EitherTPartialOf
-import arrow.mtl.fix
 import arrow.mtl.extensions.eithert.monadThrow.monadThrow
-import arrow.mtl.value
-import arrow.extension
-import arrow.mtl.typeclasses.ComposedTraverse
+import arrow.mtl.fix
 import arrow.mtl.typeclasses.Nested
+import arrow.mtl.typeclasses.unnest
+import arrow.mtl.value
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Apply
@@ -38,8 +38,6 @@ import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.MonadThrowSyntax
 import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Traverse
-import arrow.mtl.typeclasses.compose
-import arrow.mtl.typeclasses.unnest
 import arrow.undocumented
 
 @extension

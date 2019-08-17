@@ -5,6 +5,7 @@ import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.ForValidated
 import arrow.core.Invalid
+import arrow.core.Tuple2
 import arrow.core.Valid
 import arrow.core.Validated
 import arrow.core.ValidatedOf
@@ -13,6 +14,7 @@ import arrow.core.ap
 import arrow.core.combineK
 import arrow.core.fix
 import arrow.core.handleLeftWith
+import arrow.core.toT
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
@@ -26,6 +28,7 @@ import arrow.typeclasses.Hash
 import arrow.typeclasses.Selective
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK
+import arrow.typeclasses.Semigroupal
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
 import arrow.undocumented
@@ -50,6 +53,8 @@ interface ValidatedApply<E> : Apply<ValidatedPartialOf<E>> {
 
 @extension
 interface ValidatedApplicative<E> : Applicative<ValidatedPartialOf<E>>, ValidatedFunctor<E>, ValidatedApply<E> {
+  override fun SE(): Semigroup<E>
+
   override fun <A> just(a: A): Validated<E, A> = Valid(a)
 
   override fun <A, B> Kind<ValidatedPartialOf<E>, A>.map(f: (A) -> B): Validated<E, B> = fix().map(f)
@@ -121,6 +126,15 @@ interface ValidatedSemigroupK<E> : SemigroupK<ValidatedPartialOf<E>> {
 
   override fun <B> Kind<ValidatedPartialOf<E>, B>.combineK(y: Kind<ValidatedPartialOf<E>, B>): Validated<E, B> =
     fix().combineK(SE(), y)
+}
+
+@extension
+interface ValidatedSemigroupal<E> : Semigroupal<ValidatedPartialOf<E>> {
+
+  fun SE(): Semigroup<E>
+
+  override fun <A, B> Kind<ValidatedPartialOf<E>, A>.product(fb: Kind<ValidatedPartialOf<E>, B>): Kind<ValidatedPartialOf<E>, Tuple2<A, B>> =
+    fb.fix().ap(SE(), fix().map { a -> { b: B -> a toT b } })
 }
 
 @extension

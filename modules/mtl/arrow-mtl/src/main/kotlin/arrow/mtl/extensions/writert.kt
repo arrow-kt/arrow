@@ -44,9 +44,9 @@ interface WriterTFunctor<F, W> : Functor<WriterTPartialOf<F, W>> {
 @undocumented
 interface WriterTApply<F, W> : Apply<WriterTPartialOf<F, W>> {
   fun AF(): Apply<F>
-  fun MW(): Monoid<W>
+  fun MM(): Monoid<W>
   override fun <A, B> Kind<WriterTPartialOf<F, W>, A>.ap(ff: Kind<WriterTPartialOf<F, W>, (A) -> B>): Kind<WriterTPartialOf<F, W>, B> =
-    fix().ap(AF(), MW(), ff)
+    fix().ap(AF(), MM(), ff)
 
   override fun <A, B> Kind<WriterTPartialOf<F, W>, A>.map(f: (A) -> B): Kind<WriterTPartialOf<F, W>, B> =
     fix().map(AF()) { f(it) }
@@ -60,7 +60,7 @@ interface WriterTApplicative<F, W> : Applicative<WriterTPartialOf<F, W>>, Writer
 
   override fun FF(): Functor<F> = AF()
 
-  fun MM(): Monoid<W>
+  override fun MM(): Monoid<W>
 
   override fun <A> just(a: A): WriterTOf<F, W, A> =
     WriterT(AF().just(MM().empty() toT a))

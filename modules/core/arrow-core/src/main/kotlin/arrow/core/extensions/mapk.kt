@@ -7,6 +7,7 @@ import arrow.core.MapKOf
 import arrow.core.MapKPartialOf
 import arrow.core.Option
 import arrow.core.SetK
+import arrow.core.Tuple2
 import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.setk.eq.eq
 import arrow.core.extensions.setk.hash.hash
@@ -14,6 +15,7 @@ import arrow.core.fix
 import arrow.core.identity
 import arrow.core.k
 import arrow.core.sequence
+import arrow.core.toT
 import arrow.core.updated
 import arrow.extension
 import arrow.typeclasses.Applicative
@@ -25,6 +27,7 @@ import arrow.typeclasses.FunctorFilter
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
+import arrow.typeclasses.Semigroupal
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
 import arrow.undocumented
@@ -62,6 +65,12 @@ interface MapKSemigroup<K, A> : Semigroup<MapK<K, A>> {
     if (fix().size < b.fix().size) fix().foldLeft<A>(b.fix()) { my, (k, b) -> my.updated(k, b.maybeCombine(my[k])) }
     else b.fix().foldLeft<A>(fix()) { my, (k, a) -> my.updated(k, a.maybeCombine(my[k])) }
   }
+}
+
+@extension
+interface MapKSemigroupal<K> : Semigroupal<MapKPartialOf<K>> {
+  override fun <A, B> Kind<MapKPartialOf<K>, A>.product(fb: Kind<MapKPartialOf<K>, B>): Kind<MapKPartialOf<K>, Tuple2<A, B>> =
+    fb.fix().ap(fix().map { a -> { b: B -> a toT b } })
 }
 
 @extension

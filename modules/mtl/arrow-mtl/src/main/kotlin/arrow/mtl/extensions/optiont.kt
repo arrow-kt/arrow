@@ -24,9 +24,7 @@ import arrow.mtl.OptionTOf
 import arrow.mtl.OptionTPartialOf
 import arrow.mtl.extensions.optiont.monad.monad
 import arrow.mtl.fix
-import arrow.mtl.typeclasses.ComposedTraverse
 import arrow.mtl.typeclasses.Nested
-import arrow.mtl.typeclasses.compose
 import arrow.mtl.typeclasses.unnest
 import arrow.mtl.value
 import arrow.typeclasses.Applicative
@@ -60,6 +58,7 @@ interface OptionTFunctor<F> : Functor<OptionTPartialOf<F>> {
 @extension
 interface OptionTApply<F> : Apply<OptionTPartialOf<F>> {
   fun AF(): Apply<F>
+
   override fun <A, B> Kind<OptionTPartialOf<F>, A>.ap(ff: Kind<OptionTPartialOf<F>, (A) -> B>): Kind<OptionTPartialOf<F>, B> =
     fix().ap(AF(), ff)
 
