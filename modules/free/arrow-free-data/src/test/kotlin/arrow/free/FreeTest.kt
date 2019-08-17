@@ -1,22 +1,31 @@
 package arrow.free
 
 import arrow.core.ForId
+import arrow.core.FunctionK
 import arrow.core.Id
+import arrow.core.NonEmptyList
 import arrow.core.Option
 import arrow.core.Some
+import arrow.core.extensions.id.foldable.foldable
+import arrow.core.extensions.id.monad.monad
+import arrow.core.extensions.id.traverse.traverse
+import arrow.core.extensions.nonemptylist.monad.monad
+import arrow.core.extensions.option.monad.monad
 import arrow.core.value
-import arrow.core.NonEmptyList
 import arrow.free.extensions.FreeEq
 import arrow.free.extensions.FreeMonad
 import arrow.free.extensions.free.eq.eq
+import arrow.free.extensions.free.foldable.foldable
+import arrow.free.extensions.free.functor.functor
 import arrow.free.extensions.free.monad.monad
+import arrow.free.extensions.free.traverse.traverse
 import arrow.higherkind
-import arrow.core.extensions.id.monad.monad
-import arrow.core.extensions.nonemptylist.monad.monad
-import arrow.core.extensions.option.monad.monad
 import arrow.test.UnitSpec
 import arrow.test.laws.EqLaws
+import arrow.test.laws.FoldableLaws
 import arrow.test.laws.MonadLaws
+import arrow.test.laws.TraverseLaws
+import arrow.typeclasses.Eq
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
@@ -59,7 +68,9 @@ class FreeTest : UnitSpec() {
     testLaws(
       EqLaws.laws(EQ) { Ops.value(it) },
       MonadLaws.laws(Ops, EQ),
-      MonadLaws.laws(Free.monad(), EQ)
+      MonadLaws.laws(Free.monad(), EQ),
+      FoldableLaws.laws(Free.foldable(Id.foldable()), { it.free() }, Eq.any()),
+      TraverseLaws.laws(Free.traverse(Id.traverse()), Free.functor(), { it.free() }, Free.eq(Id.monad(), FunctionK.id()))
     )
 
     "Can interpret an ADT as Free operations to Option" {
@@ -67,7 +78,7 @@ class FreeTest : UnitSpec() {
     }
 
     "Can interpret an ADT as Free operations to Id" {
-      program.foldMap(idInterpreter, Id.monad()) shouldBe Id(-30)
+      program.foldMap(idInterpreter, IdMonad) shouldBe Id(-30)
     }
 
     "Can interpret an ADT as Free operations to NonEmptyList" {
