@@ -1,7 +1,6 @@
 package arrow.typeclasses
 
 import arrow.Kind
-import arrow.core.Option
 import arrow.core.Tuple2
 import arrow.documented
 
