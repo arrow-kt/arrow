@@ -2,6 +2,8 @@ package arrow.free.extensions
 
 import arrow.Kind
 import arrow.core.FunctionK
+import arrow.core.Tuple2
+import arrow.core.toT
 
 import arrow.free.FreeApplicative
 import arrow.free.FreeApplicativePartialOf
@@ -12,6 +14,7 @@ import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
+import arrow.typeclasses.Semigroupal
 import arrow.undocumented
 
 @extension
@@ -39,6 +42,13 @@ interface FreeApplicativeApplicative<S> : Applicative<FreeApplicativePartialOf<S
     fix().ap(ff.fix())
 
   override fun <A, B> Kind<FreeApplicativePartialOf<S>, A>.map(f: (A) -> B): FreeApplicative<S, B> = fix().map(f)
+}
+
+@extension
+@undocumented
+interface FreeApplicativeSemigroupal<S> : Semigroupal<FreeApplicativePartialOf<S>> {
+  override fun <A, B> Kind<FreeApplicativePartialOf<S>, A>.product(fb: Kind<FreeApplicativePartialOf<S>, B>): Kind<FreeApplicativePartialOf<S>, Tuple2<A, B>> =
+    fb.fix().ap(fix().map { a -> { b -> a toT b } })
 }
 
 @extension

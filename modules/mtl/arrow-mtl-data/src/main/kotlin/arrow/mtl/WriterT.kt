@@ -108,6 +108,10 @@ data class WriterT<F, W, A>(private val value: Kind<F, Tuple2<W, A>>) : WriterTO
     WriterT(value.map { it.a toT f(it.b) })
   }
 
+  fun <B> map(AF: Apply<F>, f: (A) -> B): WriterT<F, W, B> = AF.run {
+    WriterT(value.map { it.a toT f(it.b) })
+  }
+
   fun <U> mapAcc(MF: Monad<F>, f: (W) -> U): WriterT<F, U, A> =
     transform(MF) { f(it.a) toT it.b }
 

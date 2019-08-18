@@ -10,8 +10,10 @@ import arrow.core.Eval
 import arrow.core.ForEither
 import arrow.core.Left
 import arrow.core.Right
+import arrow.core.Tuple2
 import arrow.core.extensions.either.monad.monad
 import arrow.core.fix
+import arrow.core.toT
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
@@ -30,6 +32,7 @@ import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK
+import arrow.typeclasses.Semigroupal
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
 import arrow.core.ap as eitherAp
@@ -180,6 +183,12 @@ interface EitherSemigroupK<L> : SemigroupK<EitherPartialOf<L>> {
 
   override fun <A> EitherOf<L, A>.combineK(y: EitherOf<L, A>): Either<L, A> =
     fix().eitherCombineK(y)
+}
+
+@extension
+interface EitherSemigroupal<L> : Semigroupal<EitherPartialOf<L>> {
+  override fun <A, B> Kind<EitherPartialOf<L>, A>.product(fb: Kind<EitherPartialOf<L>, B>): Kind<EitherPartialOf<L>, Tuple2<A, B>> =
+    fb.fix().eitherAp(fix().map { a -> { b -> a toT b } })
 }
 
 @extension

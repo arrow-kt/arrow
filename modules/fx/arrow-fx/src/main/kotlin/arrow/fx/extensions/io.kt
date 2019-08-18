@@ -2,6 +2,8 @@ package arrow.fx.extensions
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.core.Tuple2
+import arrow.core.toT
 import arrow.fx.CancelToken
 import arrow.fx.ForIO
 import arrow.fx.IO
@@ -39,6 +41,7 @@ import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
+import arrow.typeclasses.Semigroupal
 import arrow.unsafe
 import kotlin.coroutines.CoroutineContext
 import arrow.fx.handleErrorWith as ioHandleErrorWith
@@ -227,6 +230,12 @@ interface IOSemigroup<A> : Semigroup<IO<A>> {
 
   override fun IO<A>.combine(b: IO<A>): IO<A> =
     flatMap { a1: A -> b.map { a2: A -> SG().run { a1.combine(a2) } } }
+}
+
+@extension
+interface IOSemigroupal<A> : Semigroupal<ForIO> {
+  override fun <A, B> Kind<ForIO, A>.product(fb: Kind<ForIO, B>): Kind<ForIO, Tuple2<A, B>> =
+    fb.fix().ap(fix().map { a -> { b -> a toT b } })
 }
 
 @extension

@@ -4,6 +4,8 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.FunctionK
+import arrow.core.Tuple2
+import arrow.core.toT
 import arrow.extension
 import arrow.free.Free
 import arrow.free.FreeOf
@@ -18,6 +20,7 @@ import arrow.typeclasses.Eq
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
+import arrow.typeclasses.Semigroupal
 import arrow.typeclasses.Traverse
 import arrow.undocumented
 import arrow.free.ap as freeAp
@@ -87,6 +90,13 @@ interface FreeEq<F, G, A> : Eq<Kind<FreePartialOf<F>, A>> {
 
   override fun Kind<FreePartialOf<F>, A>.eqv(b: Kind<FreePartialOf<F>, A>): Boolean =
     fix().foldMap(FK(), MG()) == b.fix().foldMap(FK(), MG())
+}
+
+@extension
+@undocumented
+interface FreeSemigroupal<F> : Semigroupal<FreePartialOf<F>> {
+  override fun <A, B> Kind<FreePartialOf<F>, A>.product(fb: Kind<FreePartialOf<F>, B>): Kind<FreePartialOf<F>, Tuple2<A, B>> =
+    fb.fix().freeAp(fix().freeMap { a -> { b -> a toT b } })
 }
 
 @extension

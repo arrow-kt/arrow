@@ -6,8 +6,10 @@ import arrow.core.Eval
 import arrow.core.ForNonEmptyList
 import arrow.core.NonEmptyList
 import arrow.core.NonEmptyListOf
+import arrow.core.Tuple2
 import arrow.core.extensions.nonemptylist.monad.monad
 import arrow.core.fix
+import arrow.core.toT
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
@@ -22,6 +24,7 @@ import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Reducible
 import arrow.typeclasses.Semigroup
 import arrow.typeclasses.SemigroupK
+import arrow.typeclasses.Semigroupal
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
 import arrow.core.combineK as nelCombineK
@@ -163,6 +166,12 @@ interface NonEmptyListTraverse : Traverse<ForNonEmptyList> {
 interface NonEmptyListSemigroupK : SemigroupK<ForNonEmptyList> {
   override fun <A> NonEmptyListOf<A>.combineK(y: NonEmptyListOf<A>): NonEmptyList<A> =
     fix().nelCombineK(y)
+}
+
+@extension
+interface NonEmptyListSemigroupal : Semigroupal<ForNonEmptyList> {
+  override fun <A, B> Kind<ForNonEmptyList, A>.product(fb: Kind<ForNonEmptyList, B>): Kind<ForNonEmptyList, Tuple2<A, B>> =
+    fb.fix().ap(fix().map { a -> { b -> a toT b } })
 }
 
 @extension

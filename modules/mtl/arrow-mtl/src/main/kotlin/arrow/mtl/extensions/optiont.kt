@@ -43,6 +43,7 @@ import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.MonoidK
 import arrow.typeclasses.SemigroupK
+import arrow.typeclasses.Semigroupal
 import arrow.typeclasses.Traverse
 import arrow.typeclasses.TraverseFilter
 import arrow.undocumented
@@ -176,6 +177,13 @@ interface OptionTSemigroupK<F> : SemigroupK<OptionTPartialOf<F>> {
   fun MF(): Monad<F>
 
   override fun <A> OptionTOf<F, A>.combineK(y: OptionTOf<F, A>): OptionT<F, A> = fix().orElse(MF(), { y.fix() })
+}
+
+@extension
+interface OptionTSemigroupal<F> : Semigroupal<OptionTPartialOf<F>> {
+  fun AF(): Apply<F>
+  override fun <A, B> Kind<OptionTPartialOf<F>, A>.product(fb: Kind<OptionTPartialOf<F>, B>): Kind<OptionTPartialOf<F>, Tuple2<A, B>> =
+    fb.fix().ap(AF(), fix().map(AF()) { a -> { b -> a toT b } })
 }
 
 @extension

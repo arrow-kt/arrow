@@ -25,8 +25,6 @@ import arrow.documented
  * f(a.product(b.product(c))) == (a.product(b)).product(c)
  * ```
  *
- * Currently, [Semigroupal] instances are defined for [Option], [ListK], [SequenceK] and [SetK].
- *
  * ```kotlin:ank:playground:extension
  * _imports_
  *

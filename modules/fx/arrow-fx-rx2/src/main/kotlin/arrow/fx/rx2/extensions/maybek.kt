@@ -1,8 +1,10 @@
 package arrow.fx.rx2.extensions
 
+import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Tuple2
+import arrow.core.toT
 import arrow.fx.CancelToken
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
@@ -36,6 +38,7 @@ import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
+import arrow.typeclasses.Semigroupal
 import io.reactivex.Maybe
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.BiFunction
@@ -109,6 +112,12 @@ interface MaybeKFoldable : Foldable<ForMaybeK> {
 
   override fun <A> MaybeKOf<A>.nonEmpty(): Boolean =
     fix().nonEmpty()
+}
+
+@extension
+interface MaybeKSemigroupal : Semigroupal<ForMaybeK> {
+  override fun <A, B> Kind<ForMaybeK, A>.product(fb: Kind<ForMaybeK, B>): Kind<ForMaybeK, Tuple2<A, B>> =
+    fb.fix().ap(fix().map { a -> { b -> a toT b } })
 }
 
 @extension

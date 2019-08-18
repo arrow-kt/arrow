@@ -37,6 +37,7 @@ import arrow.typeclasses.SemigroupK
 import arrow.undocumented
 import arrow.extension
 import arrow.typeclasses.Apply
+import arrow.typeclasses.Semigroupal
 
 @extension
 @undocumented
@@ -114,6 +115,14 @@ interface StateTSemigroupK<F, S> : SemigroupK<StateTPartialOf<F, S>> {
 
   override fun <A> StateTOf<F, S, A>.combineK(y: StateTOf<F, S, A>): StateT<F, S, A> =
     fix().combineK(FF(), SS(), y)
+}
+
+@extension
+@undocumented
+interface StateTSemigroupal<F, S> : Semigroupal<StateTPartialOf<F, S>> {
+  fun FF(): Monad<F>
+  override fun <A, B> Kind<StateTPartialOf<F, S>, A>.product(fb: Kind<StateTPartialOf<F, S>, B>): Kind<StateTPartialOf<F, S>, Tuple2<A, B>> =
+    fb.fix().ap(FF(), fix().map(FF()) { a -> { b -> a toT b } })
 }
 
 @extension

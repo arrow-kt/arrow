@@ -31,6 +31,8 @@ import arrow.typeclasses.SemigroupK
 import arrow.undocumented
 import arrow.extension
 import arrow.typeclasses.Apply
+import arrow.typeclasses.Semigroup
+import arrow.typeclasses.Semigroupal
 
 @extension
 @undocumented
@@ -143,6 +145,16 @@ interface WriterTSemigroupK<F, W> : SemigroupK<WriterTPartialOf<F, W>> {
 
   override fun <A> Kind<WriterTPartialOf<F, W>, A>.combineK(y: Kind<WriterTPartialOf<F, W>, A>): WriterT<F, W, A> =
     fix().combineK(SS(), y)
+}
+
+@extension
+@undocumented
+interface WriterTSemigroupal<F, W> : Semigroupal<WriterTPartialOf<F, W>> {
+  fun AF(): Apply<F>
+  fun SS(): Semigroup<W>
+
+  override fun <A, B> Kind<WriterTPartialOf<F, W>, A>.product(fb: Kind<WriterTPartialOf<F, W>, B>): Kind<WriterTPartialOf<F, W>, Tuple2<A, B>> =
+    fb.fix().ap(AF(), SS(), fix().map(AF()) { a -> { b: B -> a toT b } })
 }
 
 @extension

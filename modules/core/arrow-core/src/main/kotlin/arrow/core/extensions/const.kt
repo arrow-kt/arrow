@@ -4,6 +4,9 @@ import arrow.Kind
 import arrow.core.Eval
 import arrow.core.Option
 import arrow.core.Tuple2
+import arrow.core.extensions.const.functor.map
+import arrow.core.extensions.const.traverse.map
+import arrow.core.toT
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
@@ -20,6 +23,7 @@ import arrow.typeclasses.Hash
 import arrow.typeclasses.Invariant
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
+import arrow.typeclasses.Semigroupal
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
 import arrow.typeclasses.TraverseFilter
@@ -124,6 +128,13 @@ interface ConstSemigroup<A, T> : Semigroup<ConstOf<A, T>> {
 
   override fun ConstOf<A, T>.combine(b: ConstOf<A, T>): Const<A, T> =
     combineAp(SA(), b)
+}
+
+@extension
+interface ConstSemigroupal<A> : Semigroupal<ConstPartialOf<A>> {
+  fun SA(): Semigroup<A>
+  override fun <T, U> Kind<ConstPartialOf<A>, T>.product(fb: Kind<ConstPartialOf<A>, U>): Kind<ConstPartialOf<A>, Tuple2<T, U>> =
+    fb.fix().constAp(SA(), fix().map { t: T -> { u: U -> t toT u } })
 }
 
 @extension
