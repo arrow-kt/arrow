@@ -1,18 +1,19 @@
 package arrow.core.extensions
 
 import arrow.Kind
-import arrow.core.extensions.function1.monad.monad
 import arrow.core.Either
-import arrow.core.Function1
 import arrow.core.ForFunction1
+import arrow.core.Function1
 import arrow.core.Function1Of
 import arrow.core.Function1PartialOf
 import arrow.core.Tuple2
 import arrow.core.compose
-import arrow.extension
+import arrow.core.extensions.function1.monad.monad
 import arrow.core.fix
 import arrow.core.invoke
 import arrow.core.k
+import arrow.core.toT
+import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Category
@@ -27,6 +28,7 @@ import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Profunctor
 import arrow.typeclasses.Semigroup
+import arrow.typeclasses.Semigroupal
 import arrow.typeclasses.conest
 import arrow.typeclasses.counnest
 
@@ -35,6 +37,12 @@ interface Function1Semigroup<A, B> : Semigroup<Function1<A, B>> {
   fun SB(): Semigroup<B>
 
   override fun Function1<A, B>.combine(b: Function1<A, B>): Function1<A, B> = { a: A -> SB().run { invoke(a).combine(b(a)) } }.k()
+}
+
+@extension
+interface Function1Semigroupal<I> : Semigroupal<Function1PartialOf<I>> {
+  override fun <A, B> Kind<Function1PartialOf<I>, A>.product(fb: Kind<Function1PartialOf<I>, B>): Kind<Function1PartialOf<I>, Tuple2<A, B>> =
+    fb.fix().ap(fix().map { a -> { b -> a toT b } })
 }
 
 @extension

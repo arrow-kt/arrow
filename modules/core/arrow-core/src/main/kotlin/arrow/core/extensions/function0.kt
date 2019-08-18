@@ -5,10 +5,12 @@ import arrow.core.Either
 import arrow.core.ForFunction0
 import arrow.core.Function0
 import arrow.core.Function0Of
+import arrow.core.Tuple2
 import arrow.core.extensions.function0.monad.monad
 import arrow.core.fix
 import arrow.core.invoke
 import arrow.core.k
+import arrow.core.toT
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
@@ -21,6 +23,7 @@ import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Selective
 import arrow.typeclasses.Semigroup
+import arrow.typeclasses.Semigroupal
 import arrow.core.select as fun0Select
 
 @extension
@@ -29,6 +32,12 @@ interface Function0Semigroup<A> : Semigroup<Function0<A>> {
 
   override fun Function0<A>.combine(b: Function0<A>): Function0<A> =
     { SA().run { invoke().combine(b.invoke()) } }.k()
+}
+
+@extension
+interface Function0Semigroupal : Semigroupal<ForFunction0> {
+  override fun <A, B> Kind<ForFunction0, A>.product(fb: Kind<ForFunction0, B>): Kind<ForFunction0, Tuple2<A, B>> =
+    fb.fix().ap(fix().map { a -> { b -> a toT b } })
 }
 
 @extension

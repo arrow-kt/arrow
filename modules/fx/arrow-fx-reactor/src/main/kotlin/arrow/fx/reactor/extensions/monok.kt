@@ -2,6 +2,8 @@ package arrow.fx.reactor.extensions
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.core.Tuple2
+import arrow.core.toT
 import arrow.fx.Timer
 import arrow.fx.reactor.ForMonoK
 import arrow.fx.reactor.MonoK
@@ -28,6 +30,7 @@ import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
+import arrow.typeclasses.Semigroupal
 import reactor.core.publisher.Mono
 import kotlin.coroutines.CoroutineContext
 
@@ -71,6 +74,12 @@ interface MonoKMonad : Monad<ForMonoK>, MonoKApplicative {
 
   override fun <A, B> tailRecM(a: A, f: kotlin.Function1<A, MonoKOf<Either<A, B>>>): MonoK<B> =
     MonoK.tailRecM(a, f)
+}
+
+@extension
+interface MonoKSemigroupal : Semigroupal<ForMonoK> {
+  override fun <A, B> Kind<ForMonoK, A>.product(fb: Kind<ForMonoK, B>): Kind<ForMonoK, Tuple2<A, B>> =
+    fb.fix().ap(fix().map { a -> { b -> a toT b } })
 }
 
 @extension

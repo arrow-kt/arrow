@@ -1,12 +1,15 @@
 package arrow.core.extensions
 
+import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.EvalOf
 import arrow.core.ForEval
+import arrow.core.Tuple2
 import arrow.core.extensions.eval.monad.monad
 import arrow.extension
 import arrow.core.fix
+import arrow.core.toT
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Bimonad
@@ -15,6 +18,7 @@ import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.MonadFx
+import arrow.typeclasses.Semigroupal
 
 @extension
 interface EvalFunctor : Functor<ForEval> {
@@ -32,7 +36,7 @@ interface EvalApply : Apply<ForEval> {
 }
 
 @extension
-interface EvalApplicative : Applicative<ForEval>, EvalApply, EvalFunctor{
+interface EvalApplicative : Applicative<ForEval>, EvalApply, EvalFunctor {
   override fun <A, B> EvalOf<A>.ap(ff: EvalOf<(A) -> B>): Eval<B> =
     fix().ap(ff)
 
@@ -104,6 +108,12 @@ interface EvalBimonad : Bimonad<ForEval> {
 
   override fun <A> EvalOf<A>.extract(): A =
     fix().extract()
+}
+
+@extension
+interface EvalSemigroupal : Semigroupal<ForEval> {
+  override fun <A, B> Kind<ForEval, A>.product(fb: Kind<ForEval, B>): Kind<ForEval, Tuple2<A, B>> =
+    fb.fix().ap(fix().map { a -> { b -> a toT b } })
 }
 
 fun <B> Eval.Companion.fx(c: suspend MonadSyntax<ForEval>.() -> B): Eval<B> =

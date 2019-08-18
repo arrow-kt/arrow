@@ -8,25 +8,28 @@ import arrow.core.ForIor
 import arrow.core.Ior
 import arrow.core.IorOf
 import arrow.core.IorPartialOf
+import arrow.core.Tuple2
 import arrow.core.ap
 import arrow.core.extensions.ior.monad.monad
 import arrow.core.fix
 import arrow.core.flatMap
+import arrow.core.toT
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
+import arrow.typeclasses.Bifoldable
 import arrow.typeclasses.Bifunctor
+import arrow.typeclasses.Bitraverse
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Foldable
-import arrow.typeclasses.Bifoldable
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Semigroup
+import arrow.typeclasses.Semigroupal
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
-import arrow.typeclasses.Bitraverse
 import arrow.undocumented
 
 @extension
@@ -96,6 +99,14 @@ interface IorTraverse<L> : Traverse<IorPartialOf<L>>, IorFoldable<L> {
 
   override fun <G, B, C> IorOf<L, B>.traverse(AP: Applicative<G>, f: (B) -> Kind<G, C>): Kind<G, Ior<L, C>> =
     fix().traverse(AP, f)
+}
+
+@extension
+interface IorSemigroupal<L> : Semigroupal<IorPartialOf<L>> {
+  fun SL(): Semigroup<L>
+
+  override fun <A, B> Kind<IorPartialOf<L>, A>.product(fb: Kind<IorPartialOf<L>, B>): Kind<IorPartialOf<L>, Tuple2<A, B>> =
+    fb.fix().ap(SL(), fix().map { a -> { b -> a toT b } })
 }
 
 @extension

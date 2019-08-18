@@ -6,6 +6,8 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.FunctionK
 import arrow.core.Option
+import arrow.core.Tuple2
+import arrow.core.toT
 import arrow.extension
 import arrow.fx.typeclasses.Bracket
 import arrow.fx.typeclasses.ExitCase
@@ -17,6 +19,8 @@ import arrow.typeclasses.Eq
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
+import arrow.typeclasses.Semigroup
+import arrow.typeclasses.Semigroupal
 import arrow.undocumented
 import kotlin.Boolean
 import kotlin.Suppress
@@ -132,4 +136,11 @@ interface FreeCEq<F, G, A> : Eq<FreeCOf<F, A>> {
   override fun FreeCOf<F, A>.eqv(b: FreeCOf<F, A>): Boolean = EQFA().run {
     fix().foldMap(FK(), ME()).eqv(b.fix().foldMap(FK(), ME()))
   }
+}
+
+@extension
+@undocumented
+interface FreeCSemigroupal<F> : Semigroupal<FreeCPartialOf<F>> {
+  override fun <A, B> Kind<FreeCPartialOf<F>, A>.product(fb: Kind<FreeCPartialOf<F>, B>): Kind<FreeCPartialOf<F>, Tuple2<A, B>> =
+    fb.fix().apply(fix().map { a -> { b -> a toT b } })
 }

@@ -1,7 +1,9 @@
 package arrow.fx.rx2.extensions
 
+import arrow.Kind
 import arrow.core.Either
 import arrow.core.Tuple2
+import arrow.core.toT
 import arrow.fx.CancelToken
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
@@ -36,6 +38,7 @@ import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
+import arrow.typeclasses.Semigroupal
 import io.reactivex.Single
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
@@ -86,6 +89,12 @@ interface SingleKMonad : Monad<ForSingleK> {
 
   override fun <A> just(a: A): SingleK<A> =
     SingleK.just(a)
+}
+
+@extension
+interface SingleKSemigroupal : Semigroupal<ForSingleK> {
+  override fun <A, B> Kind<ForSingleK, A>.product(fb: Kind<ForSingleK, B>): Kind<ForSingleK, Tuple2<A, B>> =
+    fb.fix().ap(fix().map { a -> { b -> a toT b } })
 }
 
 @extension

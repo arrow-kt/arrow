@@ -3,6 +3,8 @@ package arrow.fx.reactor.extensions
 import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
+import arrow.core.Tuple2
+import arrow.core.toT
 import arrow.fx.Timer
 import arrow.fx.reactor.FluxK
 import arrow.fx.reactor.FluxKOf
@@ -31,6 +33,7 @@ import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
+import arrow.typeclasses.Semigroupal
 import arrow.typeclasses.Traverse
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toFlux
@@ -103,6 +106,12 @@ interface FluxKTraverse : Traverse<ForFluxK> {
 
   override fun <A, B> FluxKOf<A>.foldRight(lb: Eval<B>, f: (A, Eval<B>) -> Eval<B>): arrow.core.Eval<B> =
     fix().foldRight(lb, f)
+}
+
+@extension
+interface FluxKSemigroupal : Semigroupal<ForFluxK> {
+  override fun <A, B> Kind<ForFluxK, A>.product(fb: Kind<ForFluxK, B>): Kind<ForFluxK, Tuple2<A, B>> =
+    fb.fix().ap(fix().map { a -> { b -> a toT b } })
 }
 
 @extension

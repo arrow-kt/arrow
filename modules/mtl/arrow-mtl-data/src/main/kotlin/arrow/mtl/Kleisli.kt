@@ -39,6 +39,15 @@ class Kleisli<F, D, A>(val run: KleisliFun<F, D, A>) : KleisliOf<F, D, A>, Kleis
     AF.run { Kleisli { run(it).ap(ff.run(it)) } }
 
   /**
+   * Apply a function `(A) -> B` that operates within the [Kleisli] context.
+   *
+   * @param ff function with the [Kleisli] context.
+   * @param AF [Apply] for the context [F].
+   */
+  fun <B> ap(AF: Apply<F>, ff: KleisliOf<F, D, (A) -> B>): Kleisli<F, D, B> =
+    AF.run { Kleisli { run(it).ap(ff.run(it)) } }
+
+  /**
    * Map the end of the arrow [A] to [B] given a function [f].
    *
    * @param f the function to apply.

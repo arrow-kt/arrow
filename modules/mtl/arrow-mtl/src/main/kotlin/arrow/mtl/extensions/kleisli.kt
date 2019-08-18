@@ -14,6 +14,7 @@ import arrow.mtl.KleisliOf
 import arrow.core.extensions.id.applicative.applicative
 import arrow.core.extensions.id.functor.functor
 import arrow.core.extensions.id.monad.monad
+import arrow.core.toT
 import arrow.mtl.extensions.kleisli.applicative.applicative
 import arrow.mtl.extensions.kleisli.functor.functor
 import arrow.mtl.extensions.kleisli.monad.monad
@@ -37,6 +38,7 @@ import arrow.typeclasses.conest
 import arrow.typeclasses.counnest
 import arrow.undocumented
 import arrow.extension
+import arrow.typeclasses.Semigroupal
 
 @extension
 interface KleisliFunctor<F, D> : Functor<KleisliPartialOf<F, D>> {
@@ -128,6 +130,14 @@ interface KleisliApplicative<F, D> : Applicative<KleisliPartialOf<F, D>>, Kleisl
 
   override fun <A, B> KleisliOf<F, D, A>.product(fb: KleisliOf<F, D, B>): Kleisli<F, D, Tuple2<A, B>> =
     Kleisli { AF().run { run(it).product(fb.run(it)) } }
+}
+
+@extension
+interface KleisliSemigroupal<F, D> : Semigroupal<KleisliPartialOf<F, D>> {
+  fun AF(): Apply<F>
+
+  override fun <A, B> Kind<KleisliPartialOf<F, D>, A>.product(fb: Kind<KleisliPartialOf<F, D>, B>): Kind<KleisliPartialOf<F, D>, Tuple2<A, B>> =
+    fb.fix().ap(AF(), fix().map(AF()) { a -> { b -> a toT b } })
 }
 
 @extension

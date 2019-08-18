@@ -1,12 +1,15 @@
 package arrow.ui.extensions
 
 import arrow.Kind
+import arrow.core.Tuple2
+import arrow.core.toT
 import arrow.ui.Day
 import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Functor
+import arrow.typeclasses.Semigroupal
 import arrow.ui.DayOf
 import arrow.ui.DayPartialOf
 import arrow.ui.fix
@@ -66,4 +69,15 @@ interface DayApplicative<F, G> : Applicative<DayPartialOf<F, G>>, DayApply<F, G>
 
   override fun <A, B> Kind<DayPartialOf<F, G>, A>.ap(ff: Kind<DayPartialOf<F, G>, (A) -> B>): Day<F, G, B> =
     fix().ap(AF(), AG(), ff)
+}
+
+@extension
+@undocumented
+interface DaySemigroupal<F, G> : Semigroupal<DayPartialOf<F, G>> {
+  fun AF(): Applicative<F>
+
+  fun AG(): Applicative<G>
+
+  override fun <A, B> Kind<DayPartialOf<F, G>, A>.product(fb: Kind<DayPartialOf<F, G>, B>): Kind<DayPartialOf<F, G>, Tuple2<A, B>> =
+    fb.fix().ap(AF(), AG(), fix().mapLazy { a -> { b -> a toT b } })
 }

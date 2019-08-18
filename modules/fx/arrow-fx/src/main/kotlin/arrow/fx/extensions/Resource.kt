@@ -2,6 +2,8 @@ package arrow.fx.extensions
 
 import arrow.Kind
 import arrow.core.Either
+import arrow.core.Tuple2
+import arrow.core.toT
 import arrow.fx.Resource
 import arrow.fx.ResourceOf
 import arrow.fx.ResourcePartialOf
@@ -15,6 +17,7 @@ import arrow.typeclasses.Monad
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Selective
 import arrow.typeclasses.Semigroup
+import arrow.typeclasses.Semigroupal
 import arrow.undocumented
 
 @extension
@@ -79,6 +82,13 @@ interface ResourceSemigroup<F, E, A> : Semigroup<Resource<F, E, A>> {
   fun SR(): Semigroup<A>
   fun BR(): Bracket<F, E>
   override fun Resource<F, E, A>.combine(b: Resource<F, E, A>): Resource<F, E, A> = combine(b, SR(), BR())
+}
+
+@extension
+interface ResourceSemigroupal<F, E> : Semigroupal<ResourcePartialOf<F, E>> {
+  fun BR(): Bracket<F, E>
+  override fun <A, B> Kind<ResourcePartialOf<F, E>, A>.product(fb: Kind<ResourcePartialOf<F, E>, B>): Kind<ResourcePartialOf<F, E>, Tuple2<A, B>> =
+    fb.fix().ap(BR(), fix().map(BR()) { a -> { b -> a toT b } })
 }
 
 @extension

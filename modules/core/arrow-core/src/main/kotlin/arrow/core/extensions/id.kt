@@ -8,9 +8,11 @@ import arrow.core.Eval
 import arrow.core.ForId
 import arrow.core.Id
 import arrow.core.IdOf
+import arrow.core.Tuple2
 import arrow.core.extensions.id.monad.monad
 import arrow.core.fix
 import arrow.core.identity
+import arrow.core.toT
 import arrow.core.value
 import arrow.extension
 import arrow.typeclasses.Applicative
@@ -27,6 +29,7 @@ import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Selective
 import arrow.typeclasses.Semigroup
+import arrow.typeclasses.Semigroupal
 import arrow.typeclasses.Show
 import arrow.typeclasses.Traverse
 import arrow.core.extensions.traverse as idTraverse
@@ -37,6 +40,12 @@ interface IdSemigroup<A> : Semigroup<Id<A>> {
   fun SA(): Semigroup<A>
 
   override fun Id<A>.combine(b: Id<A>): Id<A> = Id(SA().run { value().combine(b.value()) })
+}
+
+@extension
+interface IdSemigroupal : Semigroupal<ForId> {
+  override fun <A, B> Kind<ForId, A>.product(fb: Kind<ForId, B>): Kind<ForId, Tuple2<A, B>> =
+    fb.fix().ap(fix().map { a -> { b -> a toT b } })
 }
 
 @extension
