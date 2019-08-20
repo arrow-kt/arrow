@@ -9,6 +9,8 @@ permalink: /docs/optics/fold/
 {:.beginner}
 beginner
 
+Note: Don't confuse with the collection aggregate operation [`fold`](https://kotlinlang.org/docs/reference/collection-aggregate.html#fold-and-reduce).
+
 A `Fold` is an optic that can see into a structure and get 0 to N foci.
 It is a generalisation of an instance of [`Foldable`](/docs/arrow/typeclasses/foldable).
 
