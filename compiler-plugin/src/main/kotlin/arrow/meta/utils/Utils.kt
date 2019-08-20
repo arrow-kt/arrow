@@ -390,9 +390,9 @@ fun KtElement.dfs(f: (KtElement) -> Boolean): List<KtElement> {
   val found = arrayListOf<KtElement>()
   accept(object : KtTreeVisitorVoid() {
     override fun visitKtElement(element: KtElement) {
-      super.visitKtElement(element)
       val result = f(element)
       if (result) found.add(element)
+      super.visitKtElement(element)
     }
   })
   return found
