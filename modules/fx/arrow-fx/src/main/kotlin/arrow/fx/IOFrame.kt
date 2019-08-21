@@ -32,7 +32,6 @@ internal interface IOFrame<E, in A, out R> : (A) -> R {
       override fun recover(e: E): IO<E, B> = Pure(fe(e))
     }
 
-
     internal class RedeemWith<E, A, B>(val fe: (E) -> IOOf<E, B>, val fb: (A) -> IOOf<E, B>) : IOFrame<E, A, IO<E, B>> {
       override fun invoke(a: A): IO<E, B> = fb(a).fix()
       override fun recover(e: E): IO<E, B> = fe(e).fix()
