@@ -1,4 +1,4 @@
-package arrow.core.extensions
+package arrow.mtl
 
 import arrow.Kind
 import arrow.Kind2
@@ -30,6 +30,21 @@ import arrow.core.fix
 import arrow.core.invoke
 import arrow.core.k
 import arrow.core.nel
+import arrow.mtl.typeclasses.ComposedApplicative
+import arrow.mtl.typeclasses.ComposedBifunctor
+import arrow.mtl.typeclasses.ComposedFoldable
+import arrow.mtl.typeclasses.ComposedFunctor
+import arrow.mtl.typeclasses.ComposedInvariantContravariant
+import arrow.mtl.typeclasses.ComposedInvariantCovariant
+import arrow.mtl.typeclasses.ComposedMonoidK
+import arrow.mtl.typeclasses.ComposedSemigroupK
+import arrow.mtl.typeclasses.ComposedTraverse
+import arrow.mtl.typeclasses.Nested
+import arrow.mtl.typeclasses.NestedType
+import arrow.mtl.typeclasses.binest
+import arrow.mtl.typeclasses.biunnest
+import arrow.mtl.typeclasses.nest
+import arrow.mtl.typeclasses.unnest
 import arrow.test.UnitSpec
 import arrow.test.laws.ApplicativeLaws
 import arrow.test.laws.BifunctorLaws
@@ -39,25 +54,10 @@ import arrow.test.laws.InvariantLaws
 import arrow.test.laws.MonoidKLaws
 import arrow.test.laws.SemigroupKLaws
 import arrow.test.laws.TraverseLaws
-import arrow.typeclasses.ComposedApplicative
-import arrow.typeclasses.ComposedBifunctor
-import arrow.typeclasses.ComposedFoldable
-import arrow.typeclasses.ComposedFunctor
-import arrow.typeclasses.ComposedInvariantContravariant
-import arrow.typeclasses.ComposedInvariantCovariant
-import arrow.typeclasses.ComposedMonoidK
-import arrow.typeclasses.ComposedSemigroupK
-import arrow.typeclasses.ComposedTraverse
 import arrow.typeclasses.Conested
 import arrow.typeclasses.Eq
-import arrow.typeclasses.Nested
-import arrow.typeclasses.NestedType
-import arrow.typeclasses.binest
-import arrow.typeclasses.biunnest
 import arrow.typeclasses.conest
 import arrow.typeclasses.counnest
-import arrow.typeclasses.nest
-import arrow.typeclasses.unnest
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import org.junit.runner.RunWith
 
