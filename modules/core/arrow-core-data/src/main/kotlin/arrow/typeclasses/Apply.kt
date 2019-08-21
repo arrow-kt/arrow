@@ -17,7 +17,7 @@ import arrow.Kind
 interface Apply<F> : Functor<F> {
   fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B>
 
-  infix fun <A, B, C> Kind<F, (A) -> B>.compose(fb: Kind<F, (B) -> C>) =
+  infix fun <A, B, C> Kind<F, (A) -> B>.compose(fb: Kind<F, (B) -> C>): Kind<F, (A) -> C> =
     map2(fb) { x -> { a: A -> x.b(x.a(a)) } }
 
   fun <A, B, Z> map(
