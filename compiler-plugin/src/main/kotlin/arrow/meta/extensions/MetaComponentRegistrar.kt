@@ -48,12 +48,12 @@ import org.jetbrains.kotlin.extensions.StorageComponentContainerContributor
 import org.jetbrains.kotlin.incremental.components.LookupTracker
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.platform.TargetPlatform
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtModifierListOwner
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.BindingTrace
-import org.jetbrains.kotlin.resolve.TargetPlatform
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
 import org.jetbrains.kotlin.resolve.checkers.DeclarationChecker
 import org.jetbrains.kotlin.resolve.checkers.DeclarationCheckerContext
@@ -209,7 +209,7 @@ interface MetaComponentRegistrar : ComponentRegistrar {
     }
 
   fun storageComponent(
-    registerModuleComponents: CompilerContext.(container: StorageComponentContainer, platform: TargetPlatform, moduleDescriptor: ModuleDescriptor) -> Unit,
+    registerModuleComponents: CompilerContext.(container: StorageComponentContainer, moduleDescriptor: ModuleDescriptor) -> Unit,
     check: CompilerContext.(declaration: KtDeclaration, descriptor: DeclarationDescriptor, context: DeclarationCheckerContext) -> Unit
   ): ExtensionPhase.StorageComponentContainer =
     object : ExtensionPhase.StorageComponentContainer {
@@ -221,8 +221,8 @@ interface MetaComponentRegistrar : ComponentRegistrar {
         check(declaration, descriptor, context)
       }
 
-      override fun CompilerContext.registerModuleComponents(container: StorageComponentContainer, platform: TargetPlatform, moduleDescriptor: ModuleDescriptor) {
-        registerModuleComponents(container, platform, moduleDescriptor)
+      override fun CompilerContext.registerModuleComponents(container: StorageComponentContainer, moduleDescriptor: ModuleDescriptor) {
+        registerModuleComponents(container, moduleDescriptor)
       }
     }
 
@@ -341,7 +341,7 @@ interface MetaComponentRegistrar : ComponentRegistrar {
 
   private fun registerKindAwareTypeChecker(): ExtensionPhase.StorageComponentContainer =
     storageComponent(
-      registerModuleComponents = { container, platform, moduleDescriptor ->
+      registerModuleComponents = { container, moduleDescriptor ->
         println("registerModuleComponents")
         val defaultTypeChecker = KotlinTypeChecker.DEFAULT
         if (defaultTypeChecker !is KindAwareTypeChecker) { //nasty hack ahead to circumvent the ability to replace the Kotlin type checker
@@ -356,7 +356,7 @@ interface MetaComponentRegistrar : ComponentRegistrar {
 
   fun compilerContextService(): ExtensionPhase.StorageComponentContainer =
     storageComponent(
-      registerModuleComponents = { container, platform, moduleDescriptor ->
+      registerModuleComponents = { container, moduleDescriptor ->
         container.useInstance(this)
       },
       check = { declaration, descriptor, context ->
@@ -768,8 +768,9 @@ interface MetaComponentRegistrar : ComponentRegistrar {
   }
 
   class DelegatingContributorChecker(val phase: ExtensionPhase.StorageComponentContainer, val ctx: CompilerContext) : StorageComponentContainerContributor, DeclarationChecker {
+
     override fun registerModuleComponents(container: StorageComponentContainer, platform: TargetPlatform, moduleDescriptor: ModuleDescriptor) {
-      phase.run { ctx.registerModuleComponents(container, platform, moduleDescriptor) }
+      phase.run { ctx.registerModuleComponents(container, moduleDescriptor) }
     }
 
     override fun check(declaration: KtDeclaration, descriptor: DeclarationDescriptor, context: DeclarationCheckerContext) {
