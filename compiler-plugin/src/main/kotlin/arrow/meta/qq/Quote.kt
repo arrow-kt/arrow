@@ -9,6 +9,8 @@ import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtFunction
+import org.jetbrains.kotlin.psi.KtTreeVisitorVoid
+import org.jetbrains.kotlin.psi.KtVisitor
 
 /**
  * A tree transformation given an existing ktElement
@@ -123,20 +125,18 @@ inline fun <reified K : KtElement, P : KtElement, S> CompilerContext.processFile
     val mutatingDocument = file.viewProvider.document
     val mutations = arrayListOf<Transformation<K>>()
     if (mutatingDocument != null) {
-      file.accept(object : MetaTreeVisitor(this) {
-        override fun visitKtElement(element: KtElement, data: Unit?): Unit? {
-          println("visitKtElement: ${element.javaClass}")
+      file.accept(object : MetaTreeVisitor() {
+        override fun visitKtElement(element: KtElement) {
           if (element.javaClass == K::class.java) {
-            println("found element: ${element.javaClass}")
             val transformation = quoteFactory(
-              quasiQuoteContext = QuasiQuoteContext(compilerContext),
+              quasiQuoteContext = QuasiQuoteContext(this@processFiles),
               containingDeclaration = element.psiOrParent as P,
               match = match,
               map = map
             ).process(element as K)
             transformation?.let { mutations.add(it) }
           }
-          return super.visitKtElement(element, data)
+          return super.visitKtElement(element)
         }
       })
     }
@@ -155,14 +155,11 @@ inline fun <reified K : KtElement> java.util.ArrayList<KtFile>.updateFiles(fileM
   }
 }
 
-inline fun <reified K : KtElement> KtFile.sourceWithTransformations(mutations: ArrayList<Transformation<K>>): String =
-  (listOfNotNull(packageDirective) +
-    importDirectives +
-    declarations).joinToString("\n") { ktDeclaration ->
-    val transformation = mutations.find { transformation ->
-      transformation.oldDescriptor == ktDeclaration
-    }
-    transformation?.newDeclarations?.joinToString("\n\n") { it.text } ?: ktDeclaration.text
+fun <K : KtElement> KtFile.sourceWithTransformations(mutations: ArrayList<Transformation<K>>): String =
+  mutations.fold(text) { acc, transformation ->
+    val originalSource = transformation.oldDescriptor.text
+    val newSource = transformation.newDeclarations.joinToString("\n\n") { it.text }
+    acc.replace(originalSource, newSource)
   }
 
 fun KtFile.printDiff(newFile: KtFile) {
@@ -190,8 +187,8 @@ fun java.util.ArrayList<KtFile>.replaceFiles(file: KtFile, newFile: KtFile) {
   add(fileIndex, newFile)
 }
 
-fun changeSource(file: KtFile, newSource: String): KtFile {
-  return KtFile(
+fun changeSource(file: KtFile, newSource: String): KtFile =
+  KtFile(
     viewProvider = MetaFileViewProvider(file.manager, file.virtualFile) {
       it?.also {
         it.setText(newSource)
@@ -199,4 +196,3 @@ fun changeSource(file: KtFile, newSource: String): KtFile {
     },
     isCompiled = false
   )
-}

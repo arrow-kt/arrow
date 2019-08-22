@@ -1,6 +1,9 @@
 package arrow.meta.higherkind
 
 import arrow.meta.extensions.CompilerContext
+import arrow.meta.utils.ContributedPackageFragmentDescriptor
+import arrow.meta.utils.kindMarker
+import arrow.meta.utils.kindTypeAlias
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentProvider

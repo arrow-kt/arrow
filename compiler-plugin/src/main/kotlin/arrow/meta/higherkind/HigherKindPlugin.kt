@@ -5,6 +5,7 @@ import arrow.meta.extensions.MetaComponentRegistrar
 import arrow.meta.qq.classOrObject
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtClass
+import org.jetbrains.kotlin.psi.KtFile
 
 val MetaComponentRegistrar.higherKindedTypes: List<ExtensionPhase>
   get() =
@@ -54,5 +55,6 @@ private val KtClass.partialKindAritySuffix: String
 private fun isHigherKindedType(ktClass: KtClass): Boolean =
   ktClass.fqName?.asString()?.startsWith("arrow.Kind") != true &&
     !ktClass.isAnnotation() &&
-    ktClass.typeParameters.isNotEmpty()
+    ktClass.typeParameters.isNotEmpty() &&
+    ktClass.parent is KtFile
 

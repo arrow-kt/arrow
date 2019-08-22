@@ -1,0 +1,9 @@
+BLOCK_BODY
+  RETURN type=kotlin.Nothing from='public final fun testConversionSimple (): consumer.Option<kotlin.Int> declared in consumer'
+    CONSTRUCTOR_CALL 'public constructor <init> (value: A of consumer.Option.Some) [primary] declared in consumer.Option.Some' type=consumer.Option.Some<kotlin.Int> origin=null
+      <class: A>: kotlin.Int
+      value: CALL 'public final fun not <A> (): A of arrow.not declared in arrow' type=kotlin.Int origin=EXCL
+        <A>: kotlin.Int
+        $receiver: CONSTRUCTOR_CALL 'public constructor <init> (value: A of consumer.Option.Some) [primary] declared in consumer.Option.Some' type=consumer.Option.Some<kotlin.Int> origin=null
+          <class: A>: kotlin.Int
+          value: CONST Int type=kotlin.Int value=1
