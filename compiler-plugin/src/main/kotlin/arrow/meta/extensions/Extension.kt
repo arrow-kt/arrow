@@ -38,7 +38,6 @@ import org.jetbrains.kotlin.psi.KtModifierListOwner
 import org.jetbrains.kotlin.psi.KtPsiFactory
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.BindingTrace
-import org.jetbrains.kotlin.resolve.TargetPlatform
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
 import org.jetbrains.kotlin.resolve.checkers.DeclarationCheckerContext
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
@@ -148,7 +147,6 @@ interface ExtensionPhase {
   interface StorageComponentContainer : ExtensionPhase {
     fun CompilerContext.registerModuleComponents(
       container: org.jetbrains.kotlin.container.StorageComponentContainer,
-      platform: TargetPlatform,
       moduleDescriptor: ModuleDescriptor
     ) : Unit
 
