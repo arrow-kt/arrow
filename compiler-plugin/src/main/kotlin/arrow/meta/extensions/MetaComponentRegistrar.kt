@@ -58,6 +58,7 @@ import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
 import org.jetbrains.kotlin.resolve.checkers.DeclarationChecker
 import org.jetbrains.kotlin.resolve.checkers.DeclarationCheckerContext
 import org.jetbrains.kotlin.resolve.diagnostics.DiagnosticSuppressor
+import org.jetbrains.kotlin.resolve.diagnostics.MutableDiagnosticsWithSuppression
 import org.jetbrains.kotlin.resolve.extensions.SyntheticResolveExtension
 import org.jetbrains.kotlin.resolve.jvm.diagnostics.JvmDeclarationOrigin
 import org.jetbrains.kotlin.resolve.jvm.extensions.AnalysisHandlerExtension
@@ -757,6 +758,13 @@ interface MetaComponentRegistrar : ComponentRegistrar {
         phase.run { ctx.generateClassSyntheticParts(codegen) }
       }
     })
+  }
+
+  fun CompilerContext.suppressDiagnostic(f: (Diagnostic) -> Boolean): Unit {
+    (bindingTrace.bindingContext.diagnostics as? MutableDiagnosticsWithSuppression)?.let {
+      val diagnosticList = it.getOwnDiagnostics() as ArrayList<Diagnostic>
+      diagnosticList.removeIf(f)
+    }
   }
 
   class DelegatingContributorChecker(val phase: ExtensionPhase.StorageComponentContainer, val ctx: CompilerContext) : StorageComponentContainerContributor, DeclarationChecker {

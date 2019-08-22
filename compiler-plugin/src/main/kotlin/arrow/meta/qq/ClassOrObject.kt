@@ -1,5 +1,8 @@
 package arrow.meta.qq
 
+import arrow.meta.kt.renderSuperTypes
+import arrow.meta.kt.renderTypeParametersWithVariance
+import arrow.meta.kt.renderValueParameters
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtElement
@@ -41,16 +44,6 @@ interface ClassOrObject : Quote<KtElement, KtClass, ClassOrObject.ClassScope> {
 
   override fun parse(template: String): KtClass =
     quasiQuoteContext.compilerContext.ktPsiElementFactory.createClass(template)
-
-  fun KtClass.renderValueParameters(): String =
-    if (getValueParameters().isEmpty()) ""
-    else getValueParameters().joinToString(separator = ", ") { it.text }
-
-  fun KtClass.renderSuperTypes(): String =
-    superTypeListEntries.joinToString(", ") { it.name.orEmpty() }
-
-  fun KtClass.renderTypeParametersWithVariance(): String =
-    typeParameters.joinToString(separator = ", ") { it.text }
 
   companion object : Quote.Factory<KtElement, KtClass, ClassScope> {
     override operator fun invoke(

@@ -8,7 +8,6 @@ import arrow.meta.typeclasses.typeClasses
 import kotlin.contracts.ExperimentalContracts
 
 class MetaPlugin : MetaComponentRegistrar {
-  @ExperimentalContracts
   override fun intercept(): List<ExtensionPhase> =
     higherKindedTypes +
       typeClasses +

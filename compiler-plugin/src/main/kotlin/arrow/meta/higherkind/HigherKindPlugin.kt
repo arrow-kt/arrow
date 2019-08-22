@@ -3,6 +3,7 @@ package arrow.meta.higherkind
 import arrow.meta.extensions.ExtensionPhase
 import arrow.meta.extensions.MetaComponentRegistrar
 import arrow.meta.qq.classOrObject
+import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtFile
@@ -52,9 +53,17 @@ private val KtClass.kindAritySuffix: String
 private val KtClass.partialKindAritySuffix: String
   get() = (arity - 1).let { if (it > 1) "$it" else "" }
 
-private fun isHigherKindedType(ktClass: KtClass): Boolean =
+fun isHigherKindedType(ktClass: KtClass): Boolean =
   ktClass.fqName?.asString()?.startsWith("arrow.Kind") != true &&
     !ktClass.isAnnotation() &&
     ktClass.typeParameters.isNotEmpty() &&
     ktClass.parent is KtFile
 
+val kindName: FqName = FqName("arrow.Kind")
+
+val FqName.kindTypeAliasName: Name
+  get() {
+    val segments = pathSegments()
+    val simpleName = segments.last()
+    return Name.identifier("${simpleName}Of")
+  }

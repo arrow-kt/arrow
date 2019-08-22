@@ -1,7 +1,6 @@
 package arrow.meta.extensions
 
-import arrow.meta.ir.IrUtils
-import arrow.meta.qq.Transformation
+import arrow.meta.qq.QuoteTransformation
 import org.jetbrains.kotlin.analyzer.AnalysisResult
 import org.jetbrains.kotlin.analyzer.ModuleInfo
 import org.jetbrains.kotlin.backend.common.BackendContext
@@ -227,7 +226,7 @@ class CompilerContext(
   lateinit var bindingTrace: BindingTrace
   lateinit var componentProvider: ComponentProvider
 
-  val transformations: ArrayList<Transformation<*>> = arrayListOf()
+  val transformations: ArrayList<QuoteTransformation<*>> = arrayListOf()
 
   private val descriptorPhaseState = ConcurrentHashMap<FqName, ClassDescriptor>()
 
