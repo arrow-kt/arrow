@@ -2,16 +2,15 @@ package arrow.meta.comprehensions
 
 import arrow.meta.extensions.ExtensionPhase
 import arrow.meta.extensions.MetaComponentRegistrar
+import arrow.meta.kt.body
+import arrow.meta.kt.bodyExpressionText
+import arrow.meta.kt.dfs
+import arrow.meta.kt.removeReturn
 import arrow.meta.qq.func
-import arrow.meta.utils.body
-import arrow.meta.utils.bodyExpressionText
-import arrow.meta.utils.dfs
-import arrow.meta.utils.removeReturn
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.psi.KtUnaryExpression
-import org.jetbrains.kotlin.psi.psiUtil.findDescendantOfType
 
 /**
  * 1. replace all instances of bind application with flatMap:

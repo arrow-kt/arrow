@@ -1,5 +1,7 @@
 package arrow.meta.qq
 
+import arrow.meta.kt.renderTypeParametersWithVariance
+import arrow.meta.kt.renderValueParameters
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtElement
@@ -37,14 +39,6 @@ interface Func : Quote<KtElement, KtNamedFunction, Func.FuncScope> {
         ?: ktElement.bodyBlockExpression?.text?.drop(1)?.dropLast(1)
         )?.let(Name::identifier) ?: EmptyElement
     )
-
-  fun KtNamedFunction.renderTypeParametersWithVariance(): String? =
-    if (typeParameters.isNotEmpty()) typeParameters.joinToString(separator = ", ") { it.text }
-    else null
-
-  fun KtNamedFunction.renderValueParameters(): String? =
-    if (valueParameters.isEmpty()) null
-    else valueParameters.joinToString(separator = ", ") { it.text }
 
   override fun KtNamedFunction.cleanUserQuote(quoteDeclaration: String): String =
     quoteDeclaration.trimMargin().removeEmptyTypeArgs()
