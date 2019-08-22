@@ -18,8 +18,9 @@ object Comprehensions {
     return Option.Some(x)
   }
 
-  fun existentFlatMap(): Option<Int> =
-    Option.Some(1).map { x ->
-      !Option.Some(x)
-    }
+  //TODO rewrite bindings order, scoping is wrong
+//  fun existentFlatMap(): Option<Int> =
+//    Option.Some(1).map { x ->
+//      !Option.Some(x)
+//    }
 }

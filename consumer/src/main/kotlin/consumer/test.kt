@@ -11,6 +11,6 @@ object test {
     println(Comprehensions.fx())
     println(Comprehensions.chainedBinds())
     println(Comprehensions.simpleBind())
-    println(Comprehensions.existentFlatMap())
+    //println(Comprehensions.existentFlatMap())
   }
 }
