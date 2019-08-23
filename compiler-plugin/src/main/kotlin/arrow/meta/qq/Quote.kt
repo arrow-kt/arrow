@@ -3,7 +3,6 @@ package arrow.meta.qq
 import arrow.meta.extensions.CompilerContext
 import arrow.meta.extensions.ExtensionPhase
 import arrow.meta.extensions.MetaComponentRegistrar
-import com.intellij.psi.impl.source.tree.PsiWhiteSpaceImpl
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.psi.KtElement

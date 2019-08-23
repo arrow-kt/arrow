@@ -2,7 +2,7 @@ package consumer
 
 object test {
   @JvmStatic
-  fun main(args: Array<String>) {
+  fun main(args : Array<String>) {
     println(HigherKinds.implicitArity1Casts())
     println(HigherKinds.implicitArity2Casts())
 
@@ -12,8 +12,5 @@ object test {
     println(Comprehensions.chainedBinds())
     println(Comprehensions.simpleBind())
     //println(Comprehensions.existentFlatMap())
-
-    println(Autofold.syntheticAFold())
-    println(Autofold.syntheticExprFold())
   }
 }

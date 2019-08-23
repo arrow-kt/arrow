@@ -5,8 +5,8 @@ apply plugin: 'kotlin-kapt'
 //compileKotlin.kotlinOptions.freeCompilerArgs = ['-Xskip-runtime-version-check', 'true']
 
 dependencies {
-  compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-  compileOnly "org.jetbrains.kotlin:kotlin-compiler:$kotlin_version" // This dependency will be shipped by IntelliJ or the Gradle plugin
+  compileOnly "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+  compileOnly "org.jetbrains.kotlin:kotlin-compiler-embeddable:$kotlin_version"
 }
 
 compileKotlin {
@@ -19,7 +19,17 @@ jar {
   manifest {
     attributes["Specification-Title"] = project.name
     attributes["Specification-Version"] = project.version
-    attributes["Implementation-Title"] = "arrow.meta.compiler.plugin"
+    attributes["Implementation-Title"] = "arrow.meta.plugin.compiler"
     attributes["Implementation-Version"] = project.version
   }
 }
+
+//shadowJar {
+//  configurations = []
+//  classifier = "embeddable"
+//}
+//
+//// Create embeddable configuration
+//configurations.create("embeddable") {
+//  extendsFrom(configurations.shadow)
+//}

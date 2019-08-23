@@ -50,4 +50,6 @@ object HigherKinds {
     val eitherStringOrInt: Either<String, Int> = eitherOfStringOrInt
     println("HigherKinds.implicitArity2Casts: $eitherStringOrInt")
   }
+
+
 }

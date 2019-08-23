@@ -1,9 +1,9 @@
 package arrow.meta.qq
 
-import com.intellij.openapi.editor.Document
-import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.psi.PsiManager
-import com.intellij.psi.SingleRootFileViewProvider
+import org.jetbrains.kotlin.com.intellij.openapi.editor.Document
+import org.jetbrains.kotlin.com.intellij.openapi.vfs.VirtualFile
+import org.jetbrains.kotlin.com.intellij.psi.PsiManager
+import org.jetbrains.kotlin.com.intellij.psi.SingleRootFileViewProvider
 
 class MetaFileViewProvider(
   psiManager: PsiManager,
