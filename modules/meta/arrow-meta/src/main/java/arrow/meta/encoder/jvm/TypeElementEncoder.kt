@@ -1,6 +1,6 @@
 package arrow.meta.encoder.jvm
 
-import  arrow.common.utils.ClassOrPackageDataWrapper
+import arrow.common.utils.ClassOrPackageDataWrapper
 import arrow.common.utils.ProcessorUtils
 import arrow.meta.Either
 import arrow.meta.ast.Annotation
