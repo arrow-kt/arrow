@@ -67,7 +67,7 @@ sealed class Try<out A> : TryOf<A> {
   /**
    * Returns the given function applied to the value from this `Success` or returns this if this is a `Failure`.
    */
-  inline fun <B> flatMap(f: (A) -> TryOf<B>): Try<B> =
+  fun <B> flatMap(f: (A) -> TryOf<B>): Try<B> =
     when (this) {
       is Failure -> this
       is Success -> f(value).fix()
@@ -76,7 +76,7 @@ sealed class Try<out A> : TryOf<A> {
   /**
    * Maps the given function to the value from this `Success` or returns this if this is a `Failure`.
    */
-  inline fun <B> map(f: (A) -> B): Try<B> =
+  fun <B> map(f: (A) -> B): Try<B> =
     flatMap { Success(f(it)) }
 
   /**
@@ -175,21 +175,21 @@ sealed class TryException(override val message: String) : Exception(message) {
  *
  * ''Note:'': This will throw an exception if it is not a success and default throws an exception.
  */
-inline fun <B> TryOf<B>.getOrDefault(default: () -> B): B = fix().fold({ default() }, ::identity)
+fun <B> TryOf<B>.getOrDefault(default: () -> B): B = fix().fold({ default() }, ::identity)
 
 /**
  * Returns the value from this `Success` or the given `default` argument if this is a `Failure`.
  *
  * ''Note:'': This will throw an exception if it is not a success and default throws an exception.
  */
-inline fun <B> TryOf<B>.getOrElse(default: (Throwable) -> B): B = fix().fold(default, ::identity)
+fun <B> TryOf<B>.getOrElse(default: (Throwable) -> B): B = fix().fold(default, ::identity)
 
 /**
  * Returns the value from this `Success` or null if this is a `Failure`.
  */
 fun <B> TryOf<B>.orNull(): B? = getOrElse { null }
 
-inline fun <B, A : B> TryOf<A>.orElse(f: () -> TryOf<B>): Try<B> = when (fix()) {
+fun <B, A : B> TryOf<A>.orElse(f: () -> TryOf<B>): Try<B> = when (fix()) {
   is Try.Success -> fix()
   is Try.Failure -> f().fix()
 }

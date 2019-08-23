@@ -7,7 +7,6 @@ import arrow.core.ForOption
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Tuple2
-import arrow.core.extensions.ComposedTraverseFilter
 import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.option.foldable.foldable
 import arrow.core.extensions.option.traverse.traverse
@@ -25,11 +24,13 @@ import arrow.mtl.OptionTOf
 import arrow.mtl.OptionTPartialOf
 import arrow.mtl.extensions.optiont.monad.monad
 import arrow.mtl.fix
-import arrow.mtl.filterMap
+import arrow.mtl.typeclasses.ComposedTraverse
+import arrow.mtl.typeclasses.Nested
+import arrow.mtl.typeclasses.compose
+import arrow.mtl.typeclasses.unnest
 import arrow.mtl.value
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
-import arrow.typeclasses.ComposedTraverse
 import arrow.typeclasses.Contravariant
 import arrow.typeclasses.Decidable
 import arrow.typeclasses.Divide
@@ -42,12 +43,9 @@ import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.MonoidK
-import arrow.typeclasses.Nested
 import arrow.typeclasses.SemigroupK
 import arrow.typeclasses.Traverse
 import arrow.typeclasses.TraverseFilter
-import arrow.typeclasses.compose
-import arrow.typeclasses.unnest
 import arrow.undocumented
 
 @extension
@@ -240,7 +238,7 @@ interface OptionTFunctorFilter<F> : FunctorFilter<OptionTPartialOf<F>>, OptionTF
 
   override fun FF(): Functor<F>
 
-  override fun <A, B> Kind<OptionTPartialOf<F>, A>.filterMap(f: (A) -> Option<B>): OptionT<F, B> =
+  override fun <A, B> OptionTOf<F, A>.filterMap(f: (A) -> Option<B>): OptionT<F, B> =
     fix().filterMap(FF(), f)
 }
 

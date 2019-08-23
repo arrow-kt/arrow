@@ -4,13 +4,11 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.None
 import arrow.core.Option
-import arrow.core.PartialFunction
 import arrow.core.Some
 import arrow.core.Tuple2
 import arrow.core.flatMap
 import arrow.core.getOrElse
 import arrow.core.identity
-import arrow.core.lift
 import arrow.core.toT
 import arrow.higherkind
 import arrow.typeclasses.Applicative
@@ -28,8 +26,8 @@ typealias OptionalPartialOf<S> = Kind<ForOptional, S>
 typealias OptionalKindedJ<S, A> = POptionalKindedJ<S, S, A, A>
 
 @Suppress("FunctionName")
-fun <S, A> Optional(f: (source: S) -> Option<A>, set: (source: S, focus: A) -> S): Optional<S, A> =
-  POptional({ s -> f(s).toEither { s } }, set)
+fun <S, A> Optional(getOption: (source: S) -> Option<A>, set: (source: S, focus: A) -> S): Optional<S, A> =
+  POptional({ s -> getOption(s).toEither { s } }, set)
 
 /**
  * [Optional] is an optic that allows to focus into a structure and querying or [copy]'ing an optional focus.
@@ -103,16 +101,6 @@ interface POptional<S, T, A, B> : POptionalOf<S, T, A, B> {
 
       override fun set(source: S, focus: B): T = set(source, focus)
     }
-
-    /**
-     * Invoke operator overload to create a [POptional] of type `S` with focus `A`.
-     * Can also be used to construct [Optional]
-     */
-    @Deprecated("PartialFunction is an incomplete experiment due for removal. See https://github.com/arrow-kt/arrow/pull/1419#issue-273308228")
-    operator fun <S, A> invoke(partialFunction: PartialFunction<S, A>, set: (S, A) -> S): Optional<S, A> = Optional(
-      getOrModify = { s -> partialFunction.lift()(s).fold({ Either.Left(s) }, { Either.Right(it) }) },
-      set = set
-    )
 
     /**
      * [POptional] that never sees its focus
