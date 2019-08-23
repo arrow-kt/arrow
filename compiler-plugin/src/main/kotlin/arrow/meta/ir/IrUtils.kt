@@ -1,8 +1,8 @@
 package arrow.meta.ir
 
 import arrow.meta.extensions.CompilerContext
+import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.backend.common.BackendContext
-import org.jetbrains.kotlin.com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.config.LanguageVersionSettingsImpl
 import org.jetbrains.kotlin.container.get
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
@@ -30,7 +30,6 @@ import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtClassBody
 import org.jetbrains.kotlin.psi.KtDeclaration
-import org.jetbrains.kotlin.psi.KtDeclarationWithBody
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtModifierList
@@ -43,20 +42,16 @@ import org.jetbrains.kotlin.psi.KtSuperTypeListEntry
 import org.jetbrains.kotlin.psi.synthetics.SyntheticClassOrObjectDescriptor
 import org.jetbrains.kotlin.psi2ir.Psi2IrConfiguration
 import org.jetbrains.kotlin.psi2ir.Psi2IrTranslator
-import org.jetbrains.kotlin.psi2ir.generators.BodyGenerator
 import org.jetbrains.kotlin.psi2ir.generators.ClassGenerator
 import org.jetbrains.kotlin.psi2ir.generators.DeclarationGenerator
 import org.jetbrains.kotlin.psi2ir.generators.FunctionGenerator
 import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
 import org.jetbrains.kotlin.psi2ir.generators.createBodyGenerator
 import org.jetbrains.kotlin.resolve.BindingContext
-import org.jetbrains.kotlin.resolve.BodyResolver
 import org.jetbrains.kotlin.resolve.FunctionDescriptorResolver
 import org.jetbrains.kotlin.resolve.calls.smartcasts.DataFlowInfo
 import org.jetbrains.kotlin.resolve.descriptorUtil.parents
 import org.jetbrains.kotlin.resolve.lazy.LazyClassContext
-import org.jetbrains.kotlin.utils.addToStdlib.cast
-import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
 class IrUtils(
   val backendContext: BackendContext,

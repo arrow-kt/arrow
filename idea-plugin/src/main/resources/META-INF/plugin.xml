@@ -1,13 +1,10 @@
 <idea-plugin>
-<id>arrow-plugin</id>
+<id>arrow.meta.compiler.plugin</id>
 <name>Arrow</name>
 
 <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
 
-<description><![CDATA[
-    The Arrow Intellij IDEA plugin.<br>
-    <em>most HTML tags may be used</em>
-    ]]></description>
+<description>The Arrow Intellij IDEA plugin.</description>
 
 <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
      on how to target different products -->

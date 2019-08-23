@@ -1,4 +1,5 @@
 apply plugin: 'kotlin'
+apply plugin: 'maven-publish'
 
 def compilerPlugin = project(':compiler-plugin')
 

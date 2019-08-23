@@ -37,13 +37,14 @@ internal object ArrowImportHandler {
 
     // Remove the incompatible compiler plugin from the classpath if found
     var isEnabled = false
-    val oldPluginClasspaths =
-      (commonArguments.pluginClasspaths ?: emptyArray()).filterTo(mutableListOf()) {
-        val match = regex.matches(it) && validateJar(it)
-        logger.debug("$it [$match]")
-        isEnabled = match
-        !match
+    val oldPluginClasspaths = (commonArguments.pluginClasspaths ?: emptyArray()).filterTo(mutableListOf()) {
+      val match = regex.matches(it) && validateJar(it)
+      logger.debug("$it [$match]")
+      if (match) {
+        isEnabled = true
       }
+      !match
+    }
 
     // Add the compatible compiler plugin version to the classpath if available and is enabled in Gradle
     val newPluginClasspaths = if (isEnabled && PLUGIN_JPS_JAR != null)
@@ -66,7 +67,7 @@ internal object ArrowImportHandler {
       val jar = JarInputStream(FileInputStream(path))
       val manifest = jar.manifest
       manifest.mainAttributes.getValue("Implementation-Title")
-        .startsWith("arrow.meta.plugin.gradle")
+        .startsWith("arrow.meta.compiler.plugin")
     } catch (_: Exception) {
       false
     }

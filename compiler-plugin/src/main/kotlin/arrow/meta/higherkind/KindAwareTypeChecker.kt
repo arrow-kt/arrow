@@ -1,5 +1,7 @@
 package arrow.meta.higherkind
 
+import arrow.meta.utils.kindName
+import arrow.meta.utils.kindTypeAliasName
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.checker.KotlinTypeChecker

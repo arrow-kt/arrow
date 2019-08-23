@@ -2,7 +2,7 @@
 
 **Run the sample higherkind plugin with**
 ```
-./gradlew clean :app:build :consumer:execute -Dorg.gradle.debug=true -Dkotlin.compiler.execution.strategy="in-process"
+./gradlew clean :core:build :consumer:execute -Dkotlin.compiler.execution.strategy="in-process"
 ```
 
 **Please document all findings in the code**
@@ -12,7 +12,7 @@ Sample project demonstrating how to create a basic Kotlin compiler plugin.
 Run this command to see it in action:
 
 ```text
-$ ./gradlew :app:build
+$ ./gradlew :consumer:build
 ```
 
 # Resources
@@ -62,7 +62,7 @@ Given a mock project we can list the extensions that are available to be registe
 Extensions.getArea(project).extensionPoints.toList().joinToString("\n")
 ```
 ```
-org.jetbrains.kotlin.com.intellij.psi.treeChangePreprocessor
+com.intellij.psi.treeChangePreprocessor
 org.jetbrains.kotlin.classBuilderFactoryInterceptorExtension
 org.jetbrains.kotlin.storageComponentContainerContributor
 org.jetbrains.kotlin.syntheticResolveExtension
@@ -70,13 +70,13 @@ org.jetbrains.kotlin.expressionCodegenExtension
 org.jetbrains.kotlin.irGenerationExtension
 org.jetbrains.kotlin.jsSyntheticTranslateExtension
 org.jetbrains.kotlin.compilerConfigurationExtension
-org.jetbrains.kotlin.com.intellij.openapi.extensions.epAvailabilityListener
+com.intellij.openapi.extensions.epAvailabilityListener
 org.jetbrains.kotlin.analyzeCompleteHandlerExtension
 org.jetbrains.kotlin.declarationAttributeAltererExtension
 org.jetbrains.kotlin.packageFragmentProviderExtension
-org.jetbrains.kotlin.com.intellij.jvm.elementProvider
+com.intellij.jvm.elementProvider
 org.jetbrains.kotlin.preprocessedVirtualFileFactoryExtension
-org.jetbrains.kotlin.com.intellij.java.elementFinder
+com.intellij.java.elementFinder
 ```
 
 ## Projects
