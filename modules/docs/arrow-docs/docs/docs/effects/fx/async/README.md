@@ -157,13 +157,11 @@ suspend fun threadName(): String =
   Thread.currentThread().name
 
 val program = IO.fx {
-  val result: List<String> = !dispatchers().default().parSequence(
-    listOf(
-      effect { threadName() },
-      effect { threadName() },
-      effect { threadName() }
-    )
-  )
+  val result: List<String> = !listOf(
+    effect { threadName() },
+    effect { threadName() },
+    effect { threadName() }
+  ).parSequence()
   
   !effect { println(result) }
 }
