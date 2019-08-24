@@ -43,9 +43,7 @@ interface Monad<F> : Selective<F> {
   override fun <A, B> Kind<F, A>.map(f: (A) -> B): Kind<F, B> =
     flatMap { a -> just(f(a)) }
 
-  /**
-   * @see [Applicative.ap]
-   */
+  /** @see [Apply.ap] */
   override fun <A, B> Kind<F, A>.ap(ff: Kind<F, (A) -> B>): Kind<F, B> =
     ff.flatMap { f -> this.map(f) }
 

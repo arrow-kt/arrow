@@ -31,7 +31,33 @@ interface MonadDefer<F> : MonadThrow<F>, Bracket<F, Throwable> {
     defer { f().fold({ raiseError<A>(it) }, { just(it) }) }
 
   /**
-   * Creates a [Ref] to purely manage mutable state, initialized by the function [f]
+   * Create a [Ref] a pure atomic reference to safely manage mutable state.
+   * It's a pure version of [java.util.concurrent.atomic.AtomicReference] that works in context [F].
+   *
+   * It's always initialized to a value, and allows for concurrent updates.
+   *
+   * ```kotlin:ank:playground
+   * import arrow.Kind
+   * import arrow.core.Tuple2
+   * import arrow.fx.*
+   * import arrow.fx.extensions.io.monadDefer.monadDefer
+   * import arrow.fx.typeclasses.MonadDefer
+   *
+   * fun main(args: Array<String>) {
+   *   fun <F> MonadDefer<F>.refExample(): Kind<F, Tuple2<Int, Int>> =
+   *     //sampleStart
+   *     fx.monad {
+   *       val ref = !Ref(1)
+   *       val initial = !ref.getAndUpdate(Int::inc)
+   *       val updated = !ref.get()
+   *       Tuple2(initial, updated)
+   *     }
+   *
+   *   //sampleEnd
+   *   IO.monadDefer().refExample()
+   *     .fix().unsafeRunSync().let(::println)
+   * }
+   * ```
    */
-  fun <A> ref(f: () -> A): Kind<F, Ref<F, A>> = Ref(this, f)
+  fun <A> Ref(a: A): Kind<F, Ref<F, A>> = Ref(this, a)
 }

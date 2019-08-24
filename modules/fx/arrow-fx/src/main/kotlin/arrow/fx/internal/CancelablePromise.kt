@@ -90,7 +90,7 @@ internal class CancelablePromise<F, A>(private val CF: Concurrent<F>) : Promise<
 
   private fun Iterable<(Either<Throwable, A>) -> Unit>.callAll(value: Either<Throwable, A>): Kind<F, Unit> =
     fold(null as Kind<F, Fiber<F, Unit>>?) { acc, cb ->
-      val task = EmptyCoroutineContext.startFiber(later { cb(value) })
+      val task = later { cb(value) }.fork(EmptyCoroutineContext)
       acc?.flatMap { task } ?: task
     }?.map(mapUnit) ?: unit()
 

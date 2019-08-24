@@ -139,6 +139,8 @@ interface Async<F> : MonadDefer<F> {
   fun <A> Kind<F, A>.continueOn(ctx: CoroutineContext): Kind<F, A>
 
   /**
+<<<<<<< HEAD
+=======
    * Delay a computation on provided [CoroutineContext].
    *
    * @param ctx [CoroutineContext] to run evaluation on.
@@ -168,6 +170,7 @@ interface Async<F> : MonadDefer<F> {
     }
 
   /**
+>>>>>>> Fix extension processor suspend fun args (#1555)
    * Delay a suspended effect.
    *
    * ```kotlin:ank:playground:extension
@@ -301,7 +304,7 @@ interface Async<F> : MonadDefer<F> {
    * ```
    */
   fun CoroutineContext.shift(): Kind<F, Unit> =
-    later(this) { Unit }
+    effect(this) { Unit }
 
   /**
    * Task that never finishes evaluating.
@@ -319,7 +322,7 @@ interface Async<F> : MonadDefer<F> {
    * ```
    */
   fun <A> never(): Kind<F, A> =
-    async { }
+    async(mapUnit)
 
   /**
    * Helper function that provides an easy way to construct a suspend effect
