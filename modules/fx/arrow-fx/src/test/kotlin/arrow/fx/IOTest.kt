@@ -305,7 +305,7 @@ class IOTest : UnitSpec() {
       val program = IO.fx {
         continueOn(all)
         val initialThread = !effect { Thread.currentThread().name }
-        !(0..130).map { i -> suspend { i } }.sequence()
+        !(0..130).map { i -> effect { i } }.parSequence()
         val continuedThread = !effect { Thread.currentThread().name }
         continuedThread shouldBe initialThread
       }
