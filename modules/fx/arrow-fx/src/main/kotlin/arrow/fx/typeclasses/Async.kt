@@ -139,8 +139,6 @@ interface Async<F> : MonadDefer<F> {
   fun <A> Kind<F, A>.continueOn(ctx: CoroutineContext): Kind<F, A>
 
   /**
-<<<<<<< HEAD
-=======
    * Delay a computation on provided [CoroutineContext].
    *
    * @param ctx [CoroutineContext] to run evaluation on.
