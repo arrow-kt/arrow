@@ -189,11 +189,11 @@ class EffectsSuspendDSLTests : UnitSpec() {
       msg.get() shouldBe const
     }
 
-    "startFiber" {
+    "fork" {
       val const = 1
       fxTest {
         IO.fx {
-          val fiber = !dispatchers().default().startFiber(effect { const })
+          val fiber = !effect { const }.fork(dispatchers().default())
           val (n) = fiber.join()
           n
         }

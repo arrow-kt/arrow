@@ -36,7 +36,7 @@ interface StateTBracket<F, S> : Bracket<StateTPartialOf<F, S>, Throwable>, State
     use: (A) -> StateTOf<F, S, B>
   ): StateT<F, S, B> = MD().run {
 
-    StateT.liftF<F, S, Ref<F, Option<S>>>(this, Ref(this) { None }).flatMap { ref ->
+    StateT.liftF<F, S, Ref<F, Option<S>>>(this, Ref(this, None)).flatMap { ref ->
       StateT<F, S, B>(this) { startS ->
         runM(this, startS).bracketCase(use = { (s, a) ->
           use(a).runM(this, s).flatMap { sa ->

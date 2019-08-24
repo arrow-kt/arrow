@@ -5,7 +5,7 @@ import arrow.fx.typeclasses.Concurrent
 import kotlin.coroutines.CoroutineContext
 
 fun <F, A, B, C, D> Concurrent<F>.parMap3(ctx: CoroutineContext, fa: Kind<F, A>, fb: Kind<F, B>, fc: Kind<F, C>, f: (A, B, C) -> D): Kind<F, D> = ctx.run {
-  tupled(startFiber(fb), startFiber(fa), startFiber(fc)).bracket(use = { (fiberB, fiberA, fiberC) ->
+  tupled(fb.fork(this), fa.fork(this), fc.fork(this)).bracket(use = { (fiberB, fiberA, fiberC) ->
     raceTriple(fiberA.join().attempt(), fiberB.join().attempt(), fiberC.join().attempt()).flatMap { tripleResult ->
       tripleResult.fold({ attemptedA, fiberB, fiberC ->
         attemptedA.fold({ error ->

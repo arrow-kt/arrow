@@ -54,8 +54,8 @@ suspend fun threadName(): String =
   Thread.currentThread().name
 
 val program = IO.fx {
-  val fiberA = !dispatchers().default().startFiber(effect { threadName() })
-  val fiberB = !dispatchers().default().startFiber(effect { threadName() })
+  val fiberA = !effect { threadName() }.fork(dispatchers().default())
+  val fiberB = !effect { threadName() }.fork(dispatchers().default())
   val threadA = !fiberA.join()
   val threadB = !fiberB.join()
   !effect { println(threadA) }
