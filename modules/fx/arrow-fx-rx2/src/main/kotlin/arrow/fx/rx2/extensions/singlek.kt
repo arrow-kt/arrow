@@ -179,10 +179,10 @@ interface SingleKConcurrent : Concurrent<ForSingleK>, SingleKAsync {
         val ffb = Fiber(sb.firstOrError().k(), SingleK { ddb.dispose() })
         sa.subscribe({
           emitter.onSuccess(RacePair.First(it, ffb))
-        }, emitter::tryOnError)
+        }, { e -> emitter.tryOnError(e) })
         sb.subscribe({
           emitter.onSuccess(RacePair.Second(ffa, it))
-        }, emitter::tryOnError)
+        }, { e -> emitter.tryOnError(e) })
       }.subscribeOn(scheduler).observeOn(Schedulers.trampoline()).k()
     }
 
@@ -201,13 +201,13 @@ interface SingleKConcurrent : Concurrent<ForSingleK>, SingleKAsync {
         val ffc = Fiber(sc.firstOrError().k(), SingleK { ddc.dispose() })
         sa.subscribe({
           emitter.onSuccess(RaceTriple.First(it, ffb, ffc))
-        }, emitter::tryOnError)
+        }, { e -> emitter.tryOnError(e) })
         sb.subscribe({
           emitter.onSuccess(RaceTriple.Second(ffa, it, ffc))
-        }, emitter::tryOnError)
+        }, { e -> emitter.tryOnError(e) })
         sc.subscribe({
           emitter.onSuccess(RaceTriple.Third(ffa, ffb, it))
-        }, emitter::tryOnError)
+        }, { e -> emitter.tryOnError(e) })
       }.subscribeOn(scheduler).observeOn(Schedulers.trampoline()).k()
     }
 }

@@ -199,10 +199,10 @@ interface MaybeKConcurrent : Concurrent<ForMaybeK>, MaybeKAsync {
         val ffb = Fiber(sb.firstElement().k(), MaybeK { ddb.dispose() })
         sa.subscribe({
           emitter.onSuccess(RacePair.First(it, ffb))
-        }, emitter::tryOnError, emitter::onComplete)
+        }, { e -> emitter.tryOnError(e) }, emitter::onComplete)
         sb.subscribe({
           emitter.onSuccess(RacePair.Second(ffa, it))
-        }, emitter::tryOnError, emitter::onComplete)
+        }, { e -> emitter.tryOnError(e) }, emitter::onComplete)
       }.subscribeOn(scheduler).observeOn(Schedulers.trampoline()).k()
     }
 
@@ -221,13 +221,13 @@ interface MaybeKConcurrent : Concurrent<ForMaybeK>, MaybeKAsync {
         val ffc = Fiber(sc.firstElement().k(), MaybeK { ddc.dispose() })
         sa.subscribe({
           emitter.onSuccess(RaceTriple.First(it, ffb, ffc))
-        }, emitter::tryOnError, emitter::onComplete)
+        }, { e -> emitter.tryOnError(e) }, emitter::onComplete)
         sb.subscribe({
           emitter.onSuccess(RaceTriple.Second(ffa, it, ffc))
-        }, emitter::tryOnError, emitter::onComplete)
+        }, { e -> emitter.tryOnError(e) }, emitter::onComplete)
         sc.subscribe({
           emitter.onSuccess(RaceTriple.Third(ffa, ffb, it))
-        }, emitter::tryOnError, emitter::onComplete)
+        }, { e -> emitter.tryOnError(e) }, emitter::onComplete)
       }.subscribeOn(scheduler).observeOn(Schedulers.trampoline()).k()
     }
 }
