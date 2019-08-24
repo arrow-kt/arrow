@@ -1,14 +1,9 @@
 package arrow.fx
 
 import arrow.Kind
-import arrow.core.Failure
 import arrow.core.Left
-import arrow.core.Option
 import arrow.core.Right
-import arrow.core.Try
-import arrow.core.left
-import arrow.core.none
-import arrow.core.right
+import arrow.core.identity
 import arrow.fx.extensions.fx
 import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.extensions.io.unsafeRun.runBlocking
@@ -98,69 +93,15 @@ class EffectsSuspendDSLTests : UnitSpec() {
     "handleError" {
       fxTest {
         IO.fx {
-          !handleError({ throw TestError }) { 1 }
+          !effect { throw TestError }.handleError { 1 }
         }
       } shouldBe 1
-    }
-
-    "Option.getOrRaiseError success case" {
-      fxTest {
-        IO.fx {
-          !Option(1).getOrRaiseError { throw TestError }
-        }
-      } shouldBe 1
-    }
-
-    "Option.getOrRaiseError error case" {
-      shouldThrow<TestError> {
-        fxTest {
-          IO.fx {
-            !none<Int>().getOrRaiseError { throw TestError }
-          }
-        }
-      }
-    }
-
-    "Either.getOrRaiseError success case" {
-      fxTest {
-        IO.fx {
-          !1.right().getOrRaiseError { throw TestError }
-        }
-      } shouldBe 1
-    }
-
-    "Either.getOrRaiseError error case" {
-      shouldThrow<TestError> {
-        fxTest {
-          IO.fx {
-            !1.left().getOrRaiseError { throw TestError }
-          }
-        }
-      }
-    }
-
-    "Try.getOrRaiseError success case" {
-      fxTest {
-        IO.fx {
-          !Try { 1 }.getOrRaiseError { throw TestError }
-        }
-      } shouldBe 1
-    }
-
-    "Try.getOrRaiseError error case" {
-      shouldThrow<TestError> {
-        fxTest {
-          IO.fx {
-            !Failure(TestError).getOrRaiseError { throw TestError }
-          }
-        }
-      }
     }
 
     "attempt success" {
       fxTest {
         IO.fx {
-          !attempt { 1 }
+          !effect { 1 }.attempt()
         }
       } shouldBe Right(1)
     }
@@ -168,7 +109,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
     "attempt failure" {
       fxTest {
         IO.fx {
-          !attempt { throw TestError }
+          !effect { throw TestError }.attempt()
         }
       } shouldBe Left(TestError)
     }
@@ -176,7 +117,7 @@ class EffectsSuspendDSLTests : UnitSpec() {
     "suspend () -> A ≅ Kind<F, A> isomorphism" {
       fxTest {
         IO.fx {
-          val (suspendedValue) = suspend { 1 }.effect()
+          val (suspendedValue) = effect { suspend { 1 }() }
           val (ioValue) = IO.just(1)
           suspendedValue == ioValue
         }
@@ -222,10 +163,9 @@ class EffectsSuspendDSLTests : UnitSpec() {
       val const = 1
       fxTest {
         IO.fx {
-          !bracketCase(
-            f = { const },
-            release = { n, exit -> msg.set(const) },
-            use = { it }
+          !effect { const }.bracketCase(
+            release = { n, exit -> effect { msg.set(const) } },
+            use = { effect { it } }
           )
         }
       }
@@ -239,10 +179,9 @@ class EffectsSuspendDSLTests : UnitSpec() {
       shouldThrow<TestError> {
         fxTest {
           IO.fx {
-            !bracketCase(
-              f = { const },
-              release = { n, exit -> msg.set(const) },
-              use = { throw TestError }
+            !effect { const }.bracketCase(
+              release = { n, exit -> effect { msg.set(const) } },
+              use = { effect { throw TestError } }
             )
           }
         }
@@ -254,36 +193,21 @@ class EffectsSuspendDSLTests : UnitSpec() {
       val const = 1
       fxTest {
         IO.fx {
-          val fiber = !effect { const }.fork(NonBlocking)
+          val fiber = !effect { const }.fork(dispatchers().default())
           val (n) = fiber.join()
           n
         }
       } shouldBe const
     }
 
-    "List.flatTraverse syntax" {
-      fxTest {
-        IO.fx {
-          val result = !listOf(
-            suspend { 1 },
-            suspend { 2 },
-            suspend { 3 }
-          ).flatTraverse {
-            listOf(it * 2)
-          }
-          result
-        }
-      } shouldBe listOf(2, 4, 6)
-    }
-
     "List.traverse syntax" {
       fxTest {
         IO.fx {
           !listOf(
-            suspend { 1 },
-            suspend { 2 },
-            suspend { 3 }
-          ).sequence()
+            effect { 1 },
+            effect { 2 },
+            effect { 3 }
+          ).parTraverse(::identity)
         }
       } shouldBe listOf(1, 2, 3)
     }
@@ -292,44 +216,12 @@ class EffectsSuspendDSLTests : UnitSpec() {
       fxTest {
         IO.fx {
           !listOf(
-            suspend { 1 },
-            suspend { 2 },
-            suspend { 3 }
-          ).sequence()
+            effect { 1 },
+            effect { 2 },
+            effect { 3 }
+          ).parSequence()
         }
       } shouldBe listOf(1, 2, 3)
-    }
-
-    "List.parTraverse syntax" {
-      val main = Thread.currentThread().name
-      fxTest {
-        IO.fx {
-          val result = !NonBlocking.parSequence(listOf(
-            effect { Thread.currentThread().name },
-            effect { Thread.currentThread().name },
-            effect { Thread.currentThread().name }
-          ))
-          result.any {
-            it == main
-          }
-        }
-      } shouldBe false
-    }
-
-    "List.parSequence syntax" {
-      val main = Thread.currentThread().name
-      fxTest {
-        IO.fx {
-          val result = !NonBlocking.parSequence(listOf(
-            effect { Thread.currentThread().name },
-            effect { Thread.currentThread().name },
-            effect { Thread.currentThread().name }
-          ))
-          result.any {
-            it == main
-          }
-        }
-      } shouldBe false
     }
 
     "FX supports polymorphism" {
