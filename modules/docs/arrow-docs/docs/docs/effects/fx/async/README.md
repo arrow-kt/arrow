@@ -126,19 +126,14 @@ import arrow.fx.extensions.io.unsafeRun.runBlocking
 import arrow.fx.extensions.fx
 
 //sampleStart
-suspend fun threadName(): String =
-  Thread.currentThread().name
+suspend fun threadName(i: Int): String =
+  "$i on ${Thread.currentThread().name}"
 
 val program = IO.fx {
-  val result: List<String> = !dispatchers().default().parTraverse(
-    listOf(
-        effect { threadName() },
-        effect { threadName() },
-        effect { threadName() }
-    )
-  ) {
-      "running on: $it" 
-    }
+  val result: List<String> = !
+  listOf(1, 2, 3).parTraverse { i ->
+    effect { threadName(i) }
+  }
   !effect { println(result) }
 }
 //sampleEnd

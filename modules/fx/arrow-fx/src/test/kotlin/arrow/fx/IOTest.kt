@@ -251,7 +251,7 @@ class IOTest : UnitSpec() {
       sideEffect.counter shouldBe 2
     }
 
-    "effect is called on every run call" { all
+    "effect is called on every run call" {
       val sideEffect = SideEffect()
       val io = IO.effect { sideEffect.increment(); 1 }
       io.unsafeRunSync()
