@@ -28,7 +28,7 @@ suspend fun printThreadName(): Unit =
 val program = IO.fx {
   continueOn(contextA)
   !effect { printThreadName() }
-  continueOn(NonBlocking)
+  continueOn(dispatchers().default())
   !effect { printThreadName() }
 }
 //sampleEnd
@@ -54,8 +54,8 @@ suspend fun threadName(): String =
   Thread.currentThread().name
 
 val program = IO.fx {
-  val fiberA = !NonBlocking.startFiber(effect { threadName() })
-  val fiberB = !NonBlocking.startFiber(effect { threadName() })
+  val fiberA = !dispatchers().default().startFiber(effect { threadName() })
+  val fiberB = !dispatchers().default().startFiber(effect { threadName() })
   val threadA = !fiberA.join()
   val threadB = !fiberB.join()
   !effect { println(threadA) }
@@ -69,7 +69,7 @@ fun main() { // The edge of our world
 
 When we spawn fibers, we can obtain their deferred non-blocking result using `join()` and destructuring the effect.
 
-`NonBlocking` is an execution context that's available to all concurrent data types, such as IO, that you can use directly on `fx` blocks.
+`dispatchers().default()` is an execution context that's available to all concurrent data types, such as IO, that you can use directly on `fx` blocks.
 
 Note that, because we are using `Fiber` and a Dispatcher that may not create new threads in all cases here, there is no guarantee that the printed thread names will be different.
 
@@ -101,7 +101,7 @@ data class ThreadInfo(
 
 val program = IO.fx {
   val (threadA: String, threadB: String) = 
-    !NonBlocking.parMapN(
+    !dispatchers().default().parMapN(
       effect { threadName() },
       effect { threadName() },
       ::ThreadInfo
@@ -130,7 +130,7 @@ suspend fun threadName(): String =
   Thread.currentThread().name
 
 val program = IO.fx {
-  val result: List<String> = !NonBlocking.parTraverse(
+  val result: List<String> = !dispatchers().default().parTraverse(
     listOf(
         effect { threadName() },
         effect { threadName() },
@@ -162,7 +162,7 @@ suspend fun threadName(): String =
   Thread.currentThread().name
 
 val program = IO.fx {
-  val result: List<String> = !NonBlocking.parSequence(
+  val result: List<String> = !dispatchers().default().parSequence(
     listOf(
       effect { threadName() },
       effect { threadName() },
