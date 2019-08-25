@@ -4,7 +4,7 @@ import arrow.Kind
 import arrow.fx.typeclasses.Concurrent
 import kotlin.coroutines.CoroutineContext
 
-fun <F, A, B, C> Concurrent<F>.parMap2(
+internal fun <F, A, B, C> Concurrent<F>.parMap2(
   ctx: CoroutineContext,
   fa: Kind<F, A>,
   fb: Kind<F, B>,
