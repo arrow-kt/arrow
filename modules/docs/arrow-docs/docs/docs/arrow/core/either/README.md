@@ -575,7 +575,7 @@ fun main() {
 Arrow contains `Either` instances for many useful typeclasses that allows you to use and transform right values.
 Both Option and Try don't require a type parameter with the following functions, but it is specifically used for Either.Left
 
- [`Functor`]({{ '/docs/arrow/typeclasses/functor/' | relative_url }})
+[`Functor`]({{ '/docs/arrow/typeclasses/functor/' | relative_url }})
 
 Transforming the inner contents
 
@@ -591,7 +591,7 @@ fun main() {
 }
 ```
 
-[Applicative](/docs/arrow/typeclasses/applicative/)
+[`Applicative`]({{ '/docs/arrow/typeclasses/applicative/' | relative_url }})
 
 Computing over independent values
 
@@ -608,7 +608,7 @@ fun main() {
 }
 ```
 
-[Monad](/docs/arrow/typeclasses/monad/)
+[`Monad`]({{ '/docs/arrow/typeclasses/monad/' | relative_url }})
 
 Computing over dependent values ignoring absence
 
