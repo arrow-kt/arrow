@@ -522,7 +522,7 @@ fun main() {
  println(value)
 }
 ```
-Fail Fast*
+*Fail Fast*
 
 ```kotlin:ank:playground
 import arrow.Kind
