@@ -96,13 +96,6 @@ interface Monad<F> : Selective<F> {
     flatMap { it.fold({ a -> f.map { ff -> ff(a) } }, { b -> just(b) }) }
 
   override fun <A, B> Kind<F, Either<A, B>>.select(f: Kind<F, (A) -> B>): Kind<F, B> = selectM(f)
-
-  @Deprecated(
-    "`binding` is getting renamed to `fx` for consistency with the Arrow Fx system. Use the Fx extensions for comprehensions",
-    ReplaceWith("fx.monad(c)")
-  )
-  fun <A> binding(c: suspend MonadSyntax<F>.() -> A): Kind<F, A> =
-    fx.monad(c)
 }
 
 interface MonadFx<F> {

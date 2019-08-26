@@ -30,7 +30,6 @@ import arrow.fx.RaceTriple
 import arrow.fx.Semaphore
 import arrow.fx.Timer
 import arrow.fx.internal.TimeoutException
-import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Traverse
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
@@ -904,9 +903,6 @@ interface Concurrent<F> : Async<F> {
     wrapReturn.startCoroutine(continuation, continuation)
     return continuation.returnedMonad()
   }
-
-  override fun <B> binding(c: suspend MonadSyntax<F>.() -> B): Kind<F, B> =
-    bindingConcurrent { c() }
 
   /**
    *  Sleeps for a given [duration] without blocking a thread.

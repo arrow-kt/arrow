@@ -2,17 +2,14 @@ package arrow.optics
 
 import arrow.core.Either
 import arrow.core.Failure
+import arrow.core.Invalid
 import arrow.core.Left
 import arrow.core.Right
 import arrow.core.Success
 import arrow.core.Try
-import arrow.core.Invalid
 import arrow.core.Valid
 import arrow.core.Validated
 
-/**
- * [PPrism] to focus into an [arrow.core.Try.Success]
- */
 fun <A, B> Try.Companion.pSuccess(): PPrism<Try<A>, Try<B>, A, B> = PPrism(
   getOrModify = { aTry -> aTry.fold({ Either.Left(Failure(it)) }, ::Right) },
   reverseGet = ::Success
