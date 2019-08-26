@@ -19,15 +19,17 @@ fun <A1, A2, B1, B2> Validated.Companion.toPEither(): PIso<Validated<A1, B1>, Va
  */
 fun <A, B> Validated.Companion.toEither(): Iso<Validated<A, B>, Either<A, B>> = toPEither()
 
-/**
- * [PIso] that defines equality between [Validated] and [Try]
- */
+@Deprecated(
+  "Try will be deleted soon as it promotes eager execution of effects, so it’s better if you work with Either’s suspend constructors or a an effect handler like IO",
+  ReplaceWith("Validated.Companion.toPEither()")
+)
 fun <A, B> Validated.Companion.toPTry(): PIso<Validated<Throwable, A>, Validated<Throwable, B>, Try<A>, Try<B>> = PIso(
   get = { it.fold({ Failure(it) }, ::Success) },
   reverseGet = Validated.Companion::fromTry
 )
 
-/**
- * [Iso] that defines equality between [Validated] and [Try]
- */
+@Deprecated(
+  "Try will be deleted soon as it promotes eager execution of effects, so it’s better if you work with Either’s suspend constructors or a an effect handler like IO",
+  ReplaceWith("Validated.Companion.toEither()")
+)
 fun <A> Validated.Companion.toTry(): Iso<Validated<Throwable, A>, Try<A>> = toPTry()
