@@ -6,9 +6,9 @@ import arrow.core.Some
 import arrow.core.Try
 import arrow.core.Tuple2
 import arrow.core.Tuple3
+import arrow.core.extensions.sequence.foldable.foldLeft
 import arrow.core.some
 import arrow.core.toT
-import arrow.core.extensions.sequence.foldable.foldLeft
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.net.URL
@@ -223,7 +223,8 @@ val interpreter: AnkOps = object : AnkOps {
           if (snippet.isPlayground)
             snippetContent.replace(snippet.fence, "{: data-executable='true'}\n\n```${snippet.lang}\n${snippet.code}\n```")
           else
-            snippetContent.replace(snippet.fence, "```${snippet.lang}\n${snippet.code}\n```") },
+            snippetContent.replace(snippet.fence, "```${snippet.lang}\n${snippet.code}\n```")
+        },
         {
           when {
             // these are extensions declared in type classes that should be removed since the extension generator
