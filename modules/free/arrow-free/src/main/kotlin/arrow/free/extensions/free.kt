@@ -96,7 +96,7 @@ interface FreeEq<F, G, A> : Eq<Kind<FreePartialOf<F>, A>> {
 @undocumented
 interface FreeSemigroupal<F> : Semigroupal<FreePartialOf<F>> {
   override fun <A, B> Kind<FreePartialOf<F>, A>.product(fb: Kind<FreePartialOf<F>, B>): Kind<FreePartialOf<F>, Tuple2<A, B>> =
-    fb.fix().freeAp(fix().freeMap { a -> { b -> a toT b } })
+    fb.fix().freeAp(fix().freeMap { a: A -> { b: B -> a toT b } })
 }
 
 @extension

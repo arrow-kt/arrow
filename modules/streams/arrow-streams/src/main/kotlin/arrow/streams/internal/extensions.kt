@@ -19,7 +19,6 @@ import arrow.typeclasses.Eq
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
-import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Semigroupal
 import arrow.undocumented
 import kotlin.Boolean
@@ -142,5 +141,5 @@ interface FreeCEq<F, G, A> : Eq<FreeCOf<F, A>> {
 @undocumented
 interface FreeCSemigroupal<F> : Semigroupal<FreeCPartialOf<F>> {
   override fun <A, B> Kind<FreeCPartialOf<F>, A>.product(fb: Kind<FreeCPartialOf<F>, B>): Kind<FreeCPartialOf<F>, Tuple2<A, B>> =
-    fb.fix().apply(fix().map { a -> { b -> a toT b } })
+    fb.fix().apply(fix().map { a: A -> { b: B -> a toT b } })
 }

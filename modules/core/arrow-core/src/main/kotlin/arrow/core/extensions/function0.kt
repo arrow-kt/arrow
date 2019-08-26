@@ -37,7 +37,7 @@ interface Function0Semigroup<A> : Semigroup<Function0<A>> {
 @extension
 interface Function0Semigroupal : Semigroupal<ForFunction0> {
   override fun <A, B> Kind<ForFunction0, A>.product(fb: Kind<ForFunction0, B>): Kind<ForFunction0, Tuple2<A, B>> =
-    fb.fix().ap(fix().map { a -> { b -> a toT b } })
+    fb.fix().ap(fix().map { a: A -> { b: B -> a toT b } })
 }
 
 @extension

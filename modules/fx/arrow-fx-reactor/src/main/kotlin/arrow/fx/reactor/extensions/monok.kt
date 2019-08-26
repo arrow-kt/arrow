@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Tuple2
 import arrow.core.toT
+import arrow.extension
 import arrow.fx.Timer
 import arrow.fx.reactor.ForMonoK
 import arrow.fx.reactor.MonoK
@@ -22,7 +23,6 @@ import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.MonadDefer
 import arrow.fx.typeclasses.Proc
 import arrow.fx.typeclasses.ProcF
-import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Apply
@@ -79,7 +79,7 @@ interface MonoKMonad : Monad<ForMonoK>, MonoKApplicative {
 @extension
 interface MonoKSemigroupal : Semigroupal<ForMonoK> {
   override fun <A, B> Kind<ForMonoK, A>.product(fb: Kind<ForMonoK, B>): Kind<ForMonoK, Tuple2<A, B>> =
-    fb.fix().ap(fix().map { a -> { b -> a toT b } })
+    fb.fix().ap(fix().map { a: A -> { b: B -> a toT b } })
 }
 
 @extension

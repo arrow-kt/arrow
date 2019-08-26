@@ -42,7 +42,7 @@ interface Function1Semigroup<A, B> : Semigroup<Function1<A, B>> {
 @extension
 interface Function1Semigroupal<I> : Semigroupal<Function1PartialOf<I>> {
   override fun <A, B> Kind<Function1PartialOf<I>, A>.product(fb: Kind<Function1PartialOf<I>, B>): Kind<Function1PartialOf<I>, Tuple2<A, B>> =
-    fb.fix().ap(fix().map { a -> { b -> a toT b } })
+    fb.fix().ap(fix().map { a: A -> { b: B -> a toT b } })
 }
 
 @extension

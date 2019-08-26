@@ -188,7 +188,7 @@ interface EitherSemigroupK<L> : SemigroupK<EitherPartialOf<L>> {
 @extension
 interface EitherSemigroupal<L> : Semigroupal<EitherPartialOf<L>> {
   override fun <A, B> Kind<EitherPartialOf<L>, A>.product(fb: Kind<EitherPartialOf<L>, B>): Kind<EitherPartialOf<L>, Tuple2<A, B>> =
-    fb.fix().eitherAp(fix().map { a -> { b -> a toT b } })
+    fb.fix().eitherAp(fix().map { a: A -> { b: B -> a toT b } })
 }
 
 @extension

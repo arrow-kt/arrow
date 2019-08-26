@@ -1,28 +1,27 @@
 package arrow.mtl.extensions
 
 import arrow.Kind
-import arrow.mtl.Kleisli
-import arrow.mtl.KleisliPartialOf
 import arrow.core.Either
 import arrow.core.Id
-import arrow.core.Tuple2
-import arrow.mtl.ReaderApi
-import arrow.mtl.ReaderPartialOf
-import arrow.mtl.ForKleisli
 import arrow.core.Ior
-import arrow.mtl.KleisliOf
+import arrow.core.Tuple2
 import arrow.core.extensions.id.applicative.applicative
 import arrow.core.extensions.id.functor.functor
 import arrow.core.extensions.id.monad.monad
 import arrow.core.toT
+import arrow.extension
+import arrow.mtl.ForKleisli
+import arrow.mtl.Kleisli
+import arrow.mtl.KleisliOf
+import arrow.mtl.KleisliPartialOf
+import arrow.mtl.ReaderApi
+import arrow.mtl.ReaderPartialOf
 import arrow.mtl.extensions.kleisli.applicative.applicative
 import arrow.mtl.extensions.kleisli.functor.functor
 import arrow.mtl.extensions.kleisli.monad.monad
 import arrow.mtl.fix
 import arrow.mtl.run
 import arrow.mtl.typeclasses.MonadReader
-import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadError
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Apply
@@ -32,13 +31,14 @@ import arrow.typeclasses.Decidable
 import arrow.typeclasses.Divide
 import arrow.typeclasses.Divisible
 import arrow.typeclasses.Functor
+import arrow.typeclasses.Monad
+import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.MonadThrow
+import arrow.typeclasses.Semigroupal
 import arrow.typeclasses.conest
 import arrow.typeclasses.counnest
 import arrow.undocumented
-import arrow.extension
-import arrow.typeclasses.Semigroupal
 
 @extension
 interface KleisliFunctor<F, D> : Functor<KleisliPartialOf<F, D>> {
@@ -137,7 +137,7 @@ interface KleisliSemigroupal<F, D> : Semigroupal<KleisliPartialOf<F, D>> {
   fun AF(): Apply<F>
 
   override fun <A, B> Kind<KleisliPartialOf<F, D>, A>.product(fb: Kind<KleisliPartialOf<F, D>, B>): Kind<KleisliPartialOf<F, D>, Tuple2<A, B>> =
-    fb.fix().ap(AF(), fix().map(AF()) { a -> { b -> a toT b } })
+    fb.fix().ap(AF(), fix().map(AF()) { a: A -> { b: B -> a toT b } })
 }
 
 @extension

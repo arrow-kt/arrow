@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Tuple2
 import arrow.core.toT
+import arrow.extension
 import arrow.fx.CancelToken
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
@@ -30,7 +31,6 @@ import arrow.fx.typeclasses.Fiber
 import arrow.fx.typeclasses.MonadDefer
 import arrow.fx.typeclasses.Proc
 import arrow.fx.typeclasses.ProcF
-import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Apply
@@ -94,7 +94,7 @@ interface SingleKMonad : Monad<ForSingleK> {
 @extension
 interface SingleKSemigroupal : Semigroupal<ForSingleK> {
   override fun <A, B> Kind<ForSingleK, A>.product(fb: Kind<ForSingleK, B>): Kind<ForSingleK, Tuple2<A, B>> =
-    fb.fix().ap(fix().map { a -> { b -> a toT b } })
+    fb.fix().ap(fix().map { a: A -> { b: B -> a toT b } })
 }
 
 @extension

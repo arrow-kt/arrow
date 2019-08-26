@@ -5,6 +5,7 @@ import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Tuple2
 import arrow.core.toT
+import arrow.extension
 import arrow.fx.Timer
 import arrow.fx.reactor.FluxK
 import arrow.fx.reactor.FluxKOf
@@ -24,7 +25,6 @@ import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.MonadDefer
 import arrow.fx.typeclasses.Proc
 import arrow.fx.typeclasses.ProcF
-import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Apply
@@ -111,7 +111,7 @@ interface FluxKTraverse : Traverse<ForFluxK> {
 @extension
 interface FluxKSemigroupal : Semigroupal<ForFluxK> {
   override fun <A, B> Kind<ForFluxK, A>.product(fb: Kind<ForFluxK, B>): Kind<ForFluxK, Tuple2<A, B>> =
-    fb.fix().ap(fix().map { a -> { b -> a toT b } })
+    fb.fix().ap(fix().map { a: A -> { b: B -> a toT b } })
 }
 
 @extension

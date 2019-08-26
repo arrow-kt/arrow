@@ -3,17 +3,20 @@ package arrow.core
 import arrow.Kind
 import arrow.core.extensions.eq
 import arrow.core.extensions.hash
-import arrow.core.extensions.tuple2.eq.eq
 import arrow.core.extensions.listk.applicative.applicative
+import arrow.core.extensions.listk.apply.apply
 import arrow.core.extensions.listk.eq.eq
 import arrow.core.extensions.listk.hash.hash
+import arrow.core.extensions.listk.monadCombine.monadCombine
 import arrow.core.extensions.listk.monoidK.monoidK
 import arrow.core.extensions.listk.monoidal.monoidal
 import arrow.core.extensions.listk.semigroupK.semigroupK
+import arrow.core.extensions.listk.semigroupal.semigroupal
 import arrow.core.extensions.listk.show.show
 import arrow.core.extensions.listk.traverse.traverse
-import arrow.core.extensions.listk.monadCombine.monadCombine
+import arrow.core.extensions.tuple2.eq.eq
 import arrow.test.UnitSpec
+import arrow.test.laws.ApplyLaws
 import arrow.test.laws.HashLaws
 import arrow.test.laws.MonadCombineLaws
 import arrow.test.laws.MonoidKLaws
@@ -36,6 +39,7 @@ class ListKTest : UnitSpec() {
 
     testLaws(
       ShowLaws.laws(ListK.show(), eq) { listOf(it).k() },
+      ApplyLaws.laws(ListK.apply(), ListK.semigroupal(), eq, { n: Int -> ListK(listOf(n)) }, { n -> ListK(listOf { s: Int -> n * s }) }, ::bijection, associativeSemigroupalEq),
       SemigroupKLaws.laws(ListK.semigroupK(), applicative, Eq.any()),
       MonoidalLaws.laws(ListK.monoidal(), applicative, ListK.eq(Tuple2.eq(Int.eq(), Int.eq())), this::bijection, associativeSemigroupalEq),
       MonoidKLaws.laws(ListK.monoidK(), applicative, Eq.any()),

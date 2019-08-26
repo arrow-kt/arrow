@@ -36,7 +36,6 @@ object ApplyLaws {
       fa.ap(ff).ap(fg).equalUnderTheLaw(fa.ap(fg compose ff), EQ)
     }
 
-
   fun <F> Apply<F>.productConsistency(cf: (Int) -> Kind<F, Int>, EQ: Eq<Kind<F, Int>>) =
     forAll(
       Gen.int().map(cf),

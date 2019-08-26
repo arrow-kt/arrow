@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Tuple2
 import arrow.core.toT
+import arrow.extension
 import arrow.fx.CancelToken
 import arrow.fx.ForIO
 import arrow.fx.IO
@@ -12,26 +13,25 @@ import arrow.fx.IOOf
 import arrow.fx.OnCancel
 import arrow.fx.RacePair
 import arrow.fx.RaceTriple
+import arrow.fx.Timer
+import arrow.fx.extensions.io.concurrent.concurrent
+import arrow.fx.extensions.io.dispatchers.dispatchers
 import arrow.fx.fix
 import arrow.fx.typeclasses.Async
 import arrow.fx.typeclasses.Bracket
 import arrow.fx.typeclasses.Concurrent
 import arrow.fx.typeclasses.ConcurrentEffect
+import arrow.fx.typeclasses.ConcurrentSyntax
 import arrow.fx.typeclasses.Dispatchers
 import arrow.fx.typeclasses.Disposable
 import arrow.fx.typeclasses.Effect
+import arrow.fx.typeclasses.Environment
 import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.Fiber
 import arrow.fx.typeclasses.MonadDefer
 import arrow.fx.typeclasses.Proc
 import arrow.fx.typeclasses.ProcF
-import arrow.fx.Timer
-import arrow.fx.extensions.io.concurrent.concurrent
-import arrow.fx.extensions.io.dispatchers.dispatchers
-import arrow.fx.typeclasses.ConcurrentSyntax
-import arrow.fx.typeclasses.Environment
 import arrow.fx.typeclasses.UnsafeRun
-import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.ApplicativeError
 import arrow.typeclasses.Apply
@@ -44,8 +44,8 @@ import arrow.typeclasses.Semigroup
 import arrow.typeclasses.Semigroupal
 import arrow.unsafe
 import kotlin.coroutines.CoroutineContext
-import arrow.fx.handleErrorWith as ioHandleErrorWith
 import arrow.fx.handleError as ioHandleError
+import arrow.fx.handleErrorWith as ioHandleErrorWith
 
 @extension
 interface IOFunctor : Functor<ForIO> {
@@ -235,7 +235,7 @@ interface IOSemigroup<A> : Semigroup<IO<A>> {
 @extension
 interface IOSemigroupal<A> : Semigroupal<ForIO> {
   override fun <A, B> Kind<ForIO, A>.product(fb: Kind<ForIO, B>): Kind<ForIO, Tuple2<A, B>> =
-    fb.fix().ap(fix().map { a -> { b -> a toT b } })
+    fb.fix().ap(fix().map { a: A -> { b: B -> a toT b } })
 }
 
 @extension

@@ -7,17 +7,17 @@ import arrow.core.EvalOf
 import arrow.core.ForEval
 import arrow.core.Tuple2
 import arrow.core.extensions.eval.monad.monad
-import arrow.extension
 import arrow.core.fix
 import arrow.core.toT
+import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Bimonad
 import arrow.typeclasses.Comonad
 import arrow.typeclasses.Functor
 import arrow.typeclasses.Monad
-import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.MonadFx
+import arrow.typeclasses.MonadSyntax
 import arrow.typeclasses.Semigroupal
 
 @extension
@@ -113,7 +113,7 @@ interface EvalBimonad : Bimonad<ForEval> {
 @extension
 interface EvalSemigroupal : Semigroupal<ForEval> {
   override fun <A, B> Kind<ForEval, A>.product(fb: Kind<ForEval, B>): Kind<ForEval, Tuple2<A, B>> =
-    fb.fix().ap(fix().map { a -> { b -> a toT b } })
+    fb.fix().ap(fix().map { a: A -> { b: B -> a toT b } })
 }
 
 fun <B> Eval.Companion.fx(c: suspend MonadSyntax<ForEval>.() -> B): Eval<B> =

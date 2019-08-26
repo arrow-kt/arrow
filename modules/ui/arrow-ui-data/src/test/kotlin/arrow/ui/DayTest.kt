@@ -4,8 +4,6 @@ import arrow.core.ForId
 import arrow.core.Id
 import arrow.core.Tuple2
 import arrow.core.Tuple2Of
-import arrow.ui.extensions.day.applicative.applicative
-import arrow.ui.extensions.day.comonad.comonad
 import arrow.core.extensions.id.applicative.applicative
 import arrow.core.extensions.id.comonad.comonad
 import arrow.core.fix
@@ -13,6 +11,8 @@ import arrow.test.UnitSpec
 import arrow.test.laws.ApplicativeLaws
 import arrow.test.laws.ComonadLaws
 import arrow.typeclasses.Eq
+import arrow.ui.extensions.day.applicative.applicative
+import arrow.ui.extensions.day.comonad.comonad
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import org.junit.runner.RunWith

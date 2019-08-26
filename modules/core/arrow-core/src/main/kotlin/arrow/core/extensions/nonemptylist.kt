@@ -171,7 +171,7 @@ interface NonEmptyListSemigroupK : SemigroupK<ForNonEmptyList> {
 @extension
 interface NonEmptyListSemigroupal : Semigroupal<ForNonEmptyList> {
   override fun <A, B> Kind<ForNonEmptyList, A>.product(fb: Kind<ForNonEmptyList, B>): Kind<ForNonEmptyList, Tuple2<A, B>> =
-    fb.fix().ap(fix().map { a -> { b -> a toT b } })
+    fb.fix().ap(fix().map { a: A -> { b: B -> a toT b } })
 }
 
 @extension

@@ -45,7 +45,7 @@ interface IdSemigroup<A> : Semigroup<Id<A>> {
 @extension
 interface IdSemigroupal : Semigroupal<ForId> {
   override fun <A, B> Kind<ForId, A>.product(fb: Kind<ForId, B>): Kind<ForId, Tuple2<A, B>> =
-    fb.fix().ap(fix().map { a -> { b -> a toT b } })
+    fb.fix().ap(fix().map { a: A -> { b: B -> a toT b } })
 }
 
 @extension

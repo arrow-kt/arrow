@@ -4,12 +4,12 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Tuple2
 import arrow.core.toT
+import arrow.extension
 import arrow.fx.Resource
 import arrow.fx.ResourceOf
 import arrow.fx.ResourcePartialOf
 import arrow.fx.fix
 import arrow.fx.typeclasses.Bracket
-import arrow.extension
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Apply
 import arrow.typeclasses.Functor
@@ -88,7 +88,7 @@ interface ResourceSemigroup<F, E, A> : Semigroup<Resource<F, E, A>> {
 interface ResourceSemigroupal<F, E> : Semigroupal<ResourcePartialOf<F, E>> {
   fun BR(): Bracket<F, E>
   override fun <A, B> Kind<ResourcePartialOf<F, E>, A>.product(fb: Kind<ResourcePartialOf<F, E>, B>): Kind<ResourcePartialOf<F, E>, Tuple2<A, B>> =
-    fb.fix().ap(BR(), fix().map(BR()) { a -> { b -> a toT b } })
+    fb.fix().ap(BR(), fix().map(BR()) { a: A -> { b: B -> a toT b } })
 }
 
 @extension

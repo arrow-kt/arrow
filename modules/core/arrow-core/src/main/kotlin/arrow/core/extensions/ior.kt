@@ -106,7 +106,7 @@ interface IorSemigroupal<L> : Semigroupal<IorPartialOf<L>> {
   fun SL(): Semigroup<L>
 
   override fun <A, B> Kind<IorPartialOf<L>, A>.product(fb: Kind<IorPartialOf<L>, B>): Kind<IorPartialOf<L>, Tuple2<A, B>> =
-    fb.fix().ap(SL(), fix().map { a -> { b -> a toT b } })
+    fb.fix().ap(SL(), fix().map { a: A -> { b: B -> a toT b } })
 }
 
 @extension

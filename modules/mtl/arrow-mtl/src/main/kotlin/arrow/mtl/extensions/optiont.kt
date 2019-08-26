@@ -183,7 +183,7 @@ interface OptionTSemigroupK<F> : SemigroupK<OptionTPartialOf<F>> {
 interface OptionTSemigroupal<F> : Semigroupal<OptionTPartialOf<F>> {
   fun AF(): Apply<F>
   override fun <A, B> Kind<OptionTPartialOf<F>, A>.product(fb: Kind<OptionTPartialOf<F>, B>): Kind<OptionTPartialOf<F>, Tuple2<A, B>> =
-    fb.fix().ap(AF(), fix().map(AF()) { a -> { b -> a toT b } })
+    fb.fix().ap(AF(), fix().map(AF()) { a: A -> { b: B -> a toT b } })
 }
 
 @extension
