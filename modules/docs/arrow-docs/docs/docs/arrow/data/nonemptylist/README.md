@@ -1,4 +1,13 @@
-ank_macro_hierarchy(arrow.core.NonEmptyList)
+---
+layout: docs
+title: NonEmptyList
+permalink: /docs/arrow/data/nonemptylist/
+redirect_from:
+  - /docs/datatypes/nonemptylist/
+video: TC6IzE61OyE
+---
+
+## NonEmptyList
 
 {:.beginner}
 beginner

@@ -1,4 +1,13 @@
-ank_macro_hierarchy(arrow.core.Either)
+---
+layout: docs
+title: Either
+permalink: /docs/arrow/core/either/
+redirect_from:
+  - /docs/datatypes/either/
+video: q6HpChSq-xc
+---
+
+## Either
 
 {:.beginner}
 beginner

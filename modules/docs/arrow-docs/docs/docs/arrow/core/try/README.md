@@ -1,4 +1,13 @@
-ank_macro_hierarchy(arrow.core.Option)
+---
+layout: docs
+title: Try
+permalink: /docs/arrow/core/try/
+redirect_from:
+  - /docs/datatypes/try/
+video: XavztYVMUqI
+---
+
+## Try
 
 {:.beginner}
 beginner

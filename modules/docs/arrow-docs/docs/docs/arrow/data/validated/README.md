@@ -1,4 +1,13 @@
-ank_macro_hierarchy(arrow.core.Validated)
+---
+layout: docs
+title: Validated
+permalink: /docs/arrow/data/validated/
+redirect_from:
+  - /docs/datatypes/validated/
+video: ONwoUsHBJHg
+---
+
+## Validated
 
 {:.beginner}
 beginner
