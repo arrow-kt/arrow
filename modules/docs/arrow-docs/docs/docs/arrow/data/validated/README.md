@@ -44,7 +44,7 @@ have dashes can be validated separately from it not having special characters, a
 from the password needing to have certain requirements. A misspelled (or missing) field in
 a config can be validated separately from another field not being well-formed.
 
-# Enter `Validated`.
+Enter `Validated`.
 
 ## Parallel Validation
 
