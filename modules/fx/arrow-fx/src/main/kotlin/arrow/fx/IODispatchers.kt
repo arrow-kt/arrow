@@ -7,13 +7,12 @@ import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.ContinuationInterceptor
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
 
 @undocumented
 // FIXME use expected and actual for multiplatform
 object IODispatchers {
   // FIXME use ForkJoinPool.commonPool() in Java 8
-  val CommonPool: CoroutineContext = EmptyCoroutineContext + ForkJoinPool().asCoroutineContext()
+  val CommonPool: CoroutineContext = ForkJoinPool().asCoroutineContext()
 }
 
 fun ExecutorService.asCoroutineContext(): CoroutineContext =

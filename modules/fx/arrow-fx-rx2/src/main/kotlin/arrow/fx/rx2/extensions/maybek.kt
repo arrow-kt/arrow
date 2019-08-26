@@ -40,7 +40,7 @@ import arrow.typeclasses.MonadError
 import arrow.typeclasses.MonadThrow
 import arrow.typeclasses.Semigroupal
 import io.reactivex.Maybe
-import io.reactivex.disposables.Disposable
+import io.reactivex.disposables.Disposable as RxDisposable
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.ReplaySubject
@@ -178,12 +178,12 @@ interface MaybeKEffect :
 }
 
 interface MaybeKConcurrent : Concurrent<ForMaybeK>, MaybeKAsync {
-  override fun <A> CoroutineContext.startFiber(kind: MaybeKOf<A>): MaybeK<Fiber<ForMaybeK, A>> =
-    asScheduler().let { scheduler ->
+  override fun <A> Kind<ForMaybeK, A>.fork(coroutineContext: CoroutineContext): MaybeK<Fiber<ForMaybeK, A>> =
+    coroutineContext.asScheduler().let { scheduler ->
       Maybe.create<Fiber<ForMaybeK, A>> { emitter ->
         if (!emitter.isDisposed) {
           val s: ReplaySubject<A> = ReplaySubject.create()
-          val conn: Disposable = kind.value().subscribeOn(scheduler).subscribe(s::onNext, s::onError)
+          val conn: RxDisposable = value().subscribeOn(scheduler).subscribe(s::onNext, s::onError)
           emitter.onSuccess(Fiber(s.firstElement().k(), MaybeK {
             conn.dispose()
           }))
@@ -217,10 +217,10 @@ interface MaybeKConcurrent : Concurrent<ForMaybeK>, MaybeKAsync {
         val ffb = Fiber(sb.firstElement().k(), MaybeK { ddb.dispose() })
         sa.subscribe({
           emitter.onSuccess(RacePair.First(it, ffb))
-        }, emitter::onError, emitter::onComplete)
+        }, { e -> emitter.tryOnError(e) }, emitter::onComplete)
         sb.subscribe({
           emitter.onSuccess(RacePair.Second(ffa, it))
-        }, emitter::onError, emitter::onComplete)
+        }, { e -> emitter.tryOnError(e) }, emitter::onComplete)
       }.subscribeOn(scheduler).observeOn(Schedulers.trampoline()).k()
     }
 
@@ -239,13 +239,13 @@ interface MaybeKConcurrent : Concurrent<ForMaybeK>, MaybeKAsync {
         val ffc = Fiber(sc.firstElement().k(), MaybeK { ddc.dispose() })
         sa.subscribe({
           emitter.onSuccess(RaceTriple.First(it, ffb, ffc))
-        }, emitter::onError, emitter::onComplete)
+        }, { e -> emitter.tryOnError(e) }, emitter::onComplete)
         sb.subscribe({
           emitter.onSuccess(RaceTriple.Second(ffa, it, ffc))
-        }, emitter::onError, emitter::onComplete)
+        }, { e -> emitter.tryOnError(e) }, emitter::onComplete)
         sc.subscribe({
           emitter.onSuccess(RaceTriple.Third(ffa, ffb, it))
-        }, emitter::onError, emitter::onComplete)
+        }, { e -> emitter.tryOnError(e) }, emitter::onComplete)
       }.subscribeOn(scheduler).observeOn(Schedulers.trampoline()).k()
     }
 }

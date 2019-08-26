@@ -62,9 +62,9 @@ object AsyncLaws {
 
   fun <F> Async<F>.asyncConstructor(EQ: Eq<Kind<F, Int>>): Unit =
     forFew(5, Gen.intSmall(), Gen.intSmall()) { threadId1: Int, threadId2: Int ->
-      later(newSingleThreadContext(threadId1.toString())) { getCurrentThread() }
+      effect(newSingleThreadContext(threadId1.toString())) { getCurrentThread() }
         .flatMap {
-          later(newSingleThreadContext(threadId2.toString())) { it + getCurrentThread() }
+          effect(newSingleThreadContext(threadId2.toString())) { it + getCurrentThread() }
         }
         .equalUnderTheLaw(just(threadId1 + threadId2), EQ)
     }
@@ -118,7 +118,7 @@ object AsyncLaws {
       val fs: suspend () -> Int = { f(Unit) }
 
       val effect = effect(one) { fs() }
-      val continueOn = later(two) { f(Unit) }
+      val continueOn = effect(two) { f(Unit) }
 
       effect.equalUnderTheLaw(continueOn, EQ)
     }
