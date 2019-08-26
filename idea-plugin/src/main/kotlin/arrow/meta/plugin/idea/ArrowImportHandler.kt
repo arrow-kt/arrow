@@ -5,6 +5,7 @@ import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.diagnostic.Logger
 import org.jetbrains.kotlin.cli.common.arguments.CommonCompilerArguments
 import org.jetbrains.kotlin.idea.facet.KotlinFacet
+import org.jetbrains.kotlin.utils.addToStdlib.cast
 import java.io.File
 import java.io.FileInputStream
 import java.util.jar.JarInputStream
@@ -35,23 +36,18 @@ internal object ArrowImportHandler {
     val commonArguments = facetSettings.compilerArguments ?: CommonCompilerArguments.DummyImpl()
     val regex = ".*\\${File.separator}?$buildSystemPluginJar-.*\\.jar".toRegex()
 
-    // Remove the incompatible compiler plugin from the classpath if found
-    var isEnabled = false
     val oldPluginClasspaths =
       (commonArguments.pluginClasspaths ?: emptyArray()).filterTo(mutableListOf()) {
         val match = regex.matches(it) && validateJar(it)
-        logger.debug("$it [$match]")
-        isEnabled = match
         !match
       }
 
     // Add the compatible compiler plugin version to the classpath if available and is enabled in Gradle
-    val newPluginClasspaths = if (isEnabled && PLUGIN_JPS_JAR != null)
-      oldPluginClasspaths + PLUGIN_JPS_JAR!!
-    else
-      oldPluginClasspaths
+    val newPluginClasspaths = oldPluginClasspaths + PLUGIN_JPS_JAR
 
-    commonArguments.pluginClasspaths = newPluginClasspaths.toTypedArray()
+    println("newPluginClasspaths: $newPluginClasspaths")
+
+    commonArguments.pluginClasspaths = newPluginClasspaths.filterNotNull().toTypedArray()
     facetSettings.compilerArguments = commonArguments
   }
 

@@ -17,6 +17,7 @@ import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.descriptors.Visibilities
+import org.jetbrains.kotlin.ir.backend.js.kotlinLibrary
 import org.jetbrains.kotlin.ir.expressions.IrFunctionAccessExpression
 import org.jetbrains.kotlin.ir.expressions.mapValueParameters
 import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
@@ -24,6 +25,7 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtFunction
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
+import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.resolve.descriptorUtil.parents
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.typeUtil.isSubtypeOf
@@ -100,7 +102,7 @@ private fun IrUtils.findExtension(valueParameterDescriptor: ValueParameterDescri
 private fun List<PackageFragmentDescriptor>.extensions(extensionType: KotlinType): List<DeclarationDescriptor> =
   flatMap {
     it.findExtensionProof(extensionType)
-  }.distinct()
+  }.distinctBy { it.name }
 
 private fun IrUtils.modulePackages(): List<PackageFragmentDescriptor> =
   compilerContext.files.toSet().flatMap { compilerContext.module.getPackage(it.packageFqName).fragments }
@@ -169,9 +171,9 @@ private fun PackageFragmentDescriptor.findExtensionProof(extensionType: KotlinTy
     .getContributedDescriptors()
     .filter {
       it.annotations.findAnnotation(ExtensionAnnotation) != null &&
-        it is FunctionDescriptor && it.returnType?.isSubtypeOf(extensionType) == true ||
+        it is FunctionDescriptor && it.returnType != module.builtIns.nothingType && it.returnType?.isSubtypeOf(extensionType) == true ||
         it is ClassDescriptor && it.typeConstructor.supertypes.contains(extensionType) ||
-        it is PropertyDescriptor && it.type.isSubtypeOf(extensionType)
+        it is PropertyDescriptor && it.type != module.builtIns.nothingType && it.type.isSubtypeOf(extensionType)
     }
 
 private fun ClassifierDescriptor?.packageFragmentDescriptor(): PackageFragmentDescriptor =
