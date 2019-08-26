@@ -8,6 +8,7 @@ apply plugin: 'kotlin'
 
 project.group = 'io.arrow-kt'
 project.version = '0.0.1'
+def pluginId = "arrow.meta.plugin.gradle"
 
 dependencies {
   implementation gradleApi()
@@ -25,20 +26,25 @@ compileTestKotlin {
 
 jar {
   // Embed compiler plugin in jar
-  configurations.named("compileClasspath").get().find { it.name.startsWith("plugin-compiler") }
+  configurations.named("compileClasspath").get().find { it.name.startsWith("compiler-plugin") }
 
   manifest {
     attributes["Specification-Title"] = project.name
     attributes["Specification-Version"] = project.version
-    attributes["Implementation-Title"] = "arrow.meta.plugin.gradle"
+    attributes["Implementation-Title"] = pluginId
     attributes["Implementation-Version"] = project.version
   }
+}
+
+// Required to put the Kotlin plugin on the classpath for the functional test suite
+tasks.withType(PluginUnderTestMetadata).configureEach {
+  pluginClasspath.from(configurations.compileOnly)
 }
 
 gradlePlugin {
   plugins {
     arrow {
-      id = "arrow.meta.plugin.gradle"
+      id = pluginId
       implementationClass = "arrow.meta.plugin.gradle.ArrowGradlePlugin"
     }
   }
@@ -52,12 +58,12 @@ pluginBundle {
 
   plugins {
     arrow {
-      id = "arrow.meta.plugin.gradle"
+      id = pluginId
       displayName = "Arrow compiler plugin"
     }
   }
 
   mavenCoordinates {
-    groupId = "arrow.meta.plugin.gradle"
+    groupId = pluginId
   }
 }
