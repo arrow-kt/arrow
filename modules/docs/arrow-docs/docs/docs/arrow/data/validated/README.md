@@ -456,7 +456,7 @@ sealed class Rules<F>(A: ApplicativeError<F, Nel<ValidationError>>) : Applicativ
 
 Once we have such abstract algebra defined we can simply materialize it to data types that support different error strategies:
 
-Error accumulation*
+*Error accumulation*
 
 ```kotlin:ank:playground
 import arrow.Kind
