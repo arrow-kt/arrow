@@ -40,7 +40,7 @@ interface WriterTBracket<F, W> : Bracket<WriterTPartialOf<F, W>, Throwable>, Wri
     use: (A) -> WriterTOf<F, W, B>
   ): WriterT<F, W, B> = MM().run {
     MD().run {
-      WriterT(Ref(this) { empty() }.flatMap { ref ->
+      WriterT(Ref(this, empty()).flatMap { ref ->
         value().bracketCase(use = { wa ->
           WriterT(wa.just()).flatMap(use).value()
         }, release = { wa, exitCase ->

@@ -104,7 +104,7 @@ dependencies {
 }
 ```
 
-Here is the complete [library list]({{ '/docs/quickstart/libraries/' | relative_url }}) for a more granular dependency set-up.
+Here is the complete [library list](https://arrow-kt.io/docs/quickstart/libraries/) for a more granular dependency set-up.
 
 # Additional Setup
 

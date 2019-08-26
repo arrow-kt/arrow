@@ -27,7 +27,7 @@ interface OptionTBracket<F> : Bracket<OptionTPartialOf<F>, Throwable>, OptionTMo
   override fun ME(): MonadError<F, Throwable> = MD()
 
   override fun <A, B> OptionTOf<F, A>.bracketCase(release: (A, ExitCase<Throwable>) -> OptionTOf<F, Unit>, use: (A) -> OptionTOf<F, B>): OptionT<F, B> = MD().run {
-    OptionT(Ref(this) { false }.flatMap { ref ->
+    OptionT(Ref(this, false).flatMap { ref ->
       value().bracketCase(use = {
         it.fold(
           { just(None) },

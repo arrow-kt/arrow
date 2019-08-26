@@ -28,7 +28,7 @@ suspend fun printThreadName(): Unit =
 val program = IO.fx {
   continueOn(contextA)
   !effect { printThreadName() }
-  continueOn(NonBlocking)
+  continueOn(dispatchers().default())
   !effect { printThreadName() }
 }
 //sampleEnd
@@ -54,8 +54,8 @@ suspend fun threadName(): String =
   Thread.currentThread().name
 
 val program = IO.fx {
-  val fiberA = !NonBlocking.startFiber(effect { threadName() })
-  val fiberB = !NonBlocking.startFiber(effect { threadName() })
+  val fiberA = !effect { threadName() }.fork(dispatchers().default())
+  val fiberB = !effect { threadName() }.fork(dispatchers().default())
   val threadA = !fiberA.join()
   val threadB = !fiberB.join()
   !effect { println(threadA) }
@@ -69,7 +69,7 @@ fun main() { // The edge of our world
 
 When we spawn fibers, we can obtain their deferred non-blocking result using `join()` and destructuring the effect.
 
-`NonBlocking` is an execution context that's available to all concurrent data types, such as IO, that you can use directly on `fx` blocks.
+`dispatchers().default()` is an execution context that's available to all concurrent data types, such as IO, that you can use directly on `fx` blocks.
 
 Note that, because we are using `Fiber` and a Dispatcher that may not create new threads in all cases here, there is no guarantee that the printed thread names will be different.
 
@@ -101,7 +101,7 @@ data class ThreadInfo(
 
 val program = IO.fx {
   val (threadA: String, threadB: String) = 
-    !NonBlocking.parMapN(
+    !dispatchers().default().parMapN(
       effect { threadName() },
       effect { threadName() },
       ::ThreadInfo
@@ -126,19 +126,14 @@ import arrow.fx.extensions.io.unsafeRun.runBlocking
 import arrow.fx.extensions.fx
 
 //sampleStart
-suspend fun threadName(): String =
-  Thread.currentThread().name
+suspend fun threadName(i: Int): String =
+  "$i on ${Thread.currentThread().name}"
 
 val program = IO.fx {
-  val result: List<String> = !NonBlocking.parTraverse(
-    listOf(
-        effect { threadName() },
-        effect { threadName() },
-        effect { threadName() }
-    )
-  ) {
-      "running on: $it" 
-    }
+  val result: List<String> = !
+  listOf(1, 2, 3).parTraverse { i ->
+    effect { threadName(i) }
+  }
   !effect { println(result) }
 }
 //sampleEnd
@@ -162,13 +157,11 @@ suspend fun threadName(): String =
   Thread.currentThread().name
 
 val program = IO.fx {
-  val result: List<String> = !NonBlocking.parSequence(
-    listOf(
-      effect { threadName() },
-      effect { threadName() },
-      effect { threadName() }
-    )
-  )
+  val result: List<String> = !listOf(
+    effect { threadName() },
+    effect { threadName() },
+    effect { threadName() }
+  ).parSequence()
   
   !effect { println(result) }
 }
