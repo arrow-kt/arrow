@@ -58,7 +58,7 @@ interface Traverse<F> : Functor<F>, Foldable<F> {
 
 In our above example, `F` is `List`, and `G` is `Option`, `Either`, or `Promise`. For the profile example, traverse says given a `List<User>` and a function `(User) -> Promise<ForIO, Profile>`, it can give you a `Promise<ForIO, List<Profile>>`.
 
-Abstracting away the `G` (still imagining `F` to be `List`), `traverse` says given a collection of data, and a function that takes a piece of data and returns an value `B` wrapped in a container `G`, it will traverse the collection, applying the function and aggregating the values (in a `List`) as it goes.
+Abstracting away the `G` (still imagining `F` to be `List`), `traverse` says given a collection of data, and a function that takes a piece of data and returns a value `B` wrapped in a container `G`, it will traverse the collection, applying the function and aggregating the values (in a `List`) as it goes.
 
 In the most general form, `Kind<F, A>` is some sort of context `F` which may contain a value `A` (or several). While `List` tends to be among the most general cases, there also exist `Traverse` instances for `Option`, `Either`, and `Validated` (among others).
 
