@@ -7,7 +7,7 @@ typealias Success<A> = Try.Success<A>
 
 @Deprecated(
   "Try will be deleted soon as it promotes eager execution of effects, so it’s better if you work with Either’s suspend constructors or a an effect handler like IO",
-  ReplaceWith("Either<Nothing, A>")
+  ReplaceWith("Either<Throwable, A>")
 )
 @higherkind
 sealed class Try<out A> : TryOf<A> {
