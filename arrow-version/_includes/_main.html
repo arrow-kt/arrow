@@ -1,0 +1,46 @@
+<main id="site-main">
+    <div class="wrapper features">
+        <div id="main-flex" class="main-flex">
+            {% for item in site.data.features.content %}
+            {% assign title = item.title | downcase  %}
+            {% if title != "arrow incubator" %}
+            <div id="{{ item.id }}" class="{{ item.id }} main-item feature">
+
+                <div class="item-header">
+                    <div id="icon-{{ item.id }}-content" class="icon-content">
+                        <img id="{{ item.id }}-dark" class="cat-icon-dark" src="{{ item.icon }}.svg" alt="{{ item.title }}">
+                        <img id="{{ item.id }}-white" class="cat-icon-white" src="{{ item.icon }}-white.svg" alt="{{ item.title }} white">
+                        <img id="cat-icon-color-{{ item.id }}" class="cat-icon-color" src="{{ item.icon }}-color.svg" alt="{{ item.title }} color">
+                    </div>
+                    <h2>{{ item.title }}</h2>
+                    <p>{{ item.description }}</p>
+                </div>
+                <a class="feature-button {{ item.id }}-button" href="{{ site.baseurl }}{{ item.url }}" title="{{ item.title }}">Learn more</a>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+  </div>
+  <div class="wrapper">
+    <div id="incubator" class="incubator-container feature">
+      <div class="incubator-text">
+        <h2>Λrrow Incubator</h2>
+        <ul id="incubator-list" class="incubator-list">
+          {% for item in site.data.features.incubator %}
+          <li class="incubator-items">
+            <a class="incubator-link" href="{{ item.url }}" title="{{ item.title }}">{{ item.title }}</a>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="incubator-image">
+        <div id="incubator-base-animation" alt="Incubator"></div>
+        <div id="incubator-core-animation" alt="Incubator"></div>
+        <div id="incubator-fx-animation" alt="Incubator"></div>
+        <div id="incubator-optics-animation" alt="Incubator"></div>
+        <div id="incubator-meta-animation" alt="Incubator"></div>
+        <div id="incubator-hover-animation" alt="Incubator"></div>
+      </div>
+    </div>
+</main>

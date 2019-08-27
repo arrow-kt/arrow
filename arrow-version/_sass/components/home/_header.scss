@@ -1,0 +1,118 @@
+// Header
+// -----------------------------------------------
+// -----------------------------------------------
+
+#site-header {
+  padding: ($base-point-grid * 24) 0 ($base-point-grid * 7) 0;
+
+  .header-flex {
+    display: flex;
+    align-items: center;
+
+    .header-text {
+      width: 48%;
+      margin-right: $base-point-grid * 10;
+
+      h1 {
+        font-size: 54px;
+        line-height: 1.4;
+        margin-bottom: $base-point-grid * 3;
+        transition: color $base-duration $base-timing;
+      }
+    }
+
+    .header-image {
+      position: relative;
+      width: $column-6;
+      text-align: center;
+
+      .image-animation {
+        width: max-content;
+      }
+    }
+  }
+}
+
+#base-arrow-animation {
+  position: absolute;
+  opacity: 1;
+  transition: $opacity-transition;
+  bottom: -60px;
+  right: 9px;
+}
+
+#core-arrow-animation {
+  position: absolute;
+  opacity: 0;
+  transition: $opacity-transition;
+  bottom: -40px;
+  right: 9px;
+}
+
+#fx-arrow-animation {
+  position: absolute;
+  opacity: 0;
+  transition: $opacity-transition;
+  bottom: -40px;
+  right: 9px;
+}
+
+#optics-arrow-animation {
+  position: absolute;
+  opacity: 0;
+  transition: $opacity-transition;
+  bottom: -40px;
+  right: 9px;
+}
+
+#meta-arrow-animation {
+  position: absolute;
+  opacity: 0;
+  transition: $opacity-transition;
+  bottom: -40px;
+  right: 9px;
+}
+
+#logo-white-lines {
+  opacity: 0;
+  transition: $long-transition;
+  background-image: url("../img/home/logo-white-lines.svg");
+}
+// Responsive
+// -----------------------------------------------
+@include bp(large) {
+  #site-header {
+    .header-flex {
+      flex-direction: column;
+
+      .header-text {
+        text-align: center;
+        width: $column-12;
+        margin-right: 0;
+
+        h1 {
+          font-size: 2.9rem;
+        }
+      }
+
+      .header-image {
+        display: none;
+      }
+    }
+  }
+}
+@include bp(medium) {
+  #site-header {
+    padding: ($base-point-grid * 20) 0 0 0;
+
+    .header-flex {
+      flex-direction: column;
+
+      .header-text {
+        h1 {
+          font-size: 2.5rem;
+        }
+      }
+    }
+  }
+}

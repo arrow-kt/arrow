@@ -1,0 +1,10 @@
+// Helpers
+// -----------------------------------------------
+// -----------------------------------------------
+
+.wrapper {
+  padding: ($base-point-grid * 2) ($base-point-grid * 3);
+  margin: 0 auto;
+  box-sizing: border-box;
+  max-width: $bp-xlarge;
+}

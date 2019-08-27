@@ -1,0 +1,93 @@
+.optics {
+  background: $optics-background;
+}
+
+#optics-sidebar-nav {
+  .sidebar-nav-item {
+    > a {
+      &:hover {
+        background: $optics-hover;
+      }
+    }
+
+    &.active {
+      > a {
+        background: $optics-hover;
+        border-left: 4px solid $optics-color;
+      }
+    }
+
+    ul {
+      background: $optics-hover;
+    }
+  }
+}
+
+#cat-optics-dropdown {
+  min-width: $sidebar-cat-button;
+
+  .sidebar-nav {
+    .sidebar-nav-item {
+      > a {
+        &:hover {
+          background: $optics-hover;
+          box-shadow: $sidebar-cat-dropdow;
+        }
+      }
+
+      &.active {
+        > a {
+          background: $optics-hover;
+          box-shadow: $sidebar-cat-dropdow;
+        }
+      }
+
+      ul {
+        width: 100%;
+        z-index: 1;
+        box-shadow: $sidebar-cat-dropdow;
+        background: $optics-hover;
+
+        a {
+          color: $white;
+        }
+      }
+    }
+  }
+}
+
+#doc-optics-version-button {
+  .sidebar-doc-versions {
+    .sidebar-nav-item {
+      > a {
+        &:hover {
+          background: $optics-hover;
+          box-shadow: $sidebar-cat-dropdow;
+        }
+      }
+
+      &.active {
+        > a {
+          background: $optics-hover;
+          box-shadow: $sidebar-cat-dropdow;
+        }
+      }
+
+      ul {
+        width: 100%;
+        z-index: 1;
+        box-shadow: $sidebar-cat-dropdow;
+        background: $optics-hover;
+
+        a {
+          color: $white;
+          padding-left: 10px;
+
+          &:hover {
+            @include links($white, $white, rgba($white, 0.5), rgba($white, 0.5));
+          }
+        }
+      }
+    }
+  }
+}
