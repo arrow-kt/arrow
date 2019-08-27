@@ -8,10 +8,9 @@
         > a {
             display: flex;
             align-items: center;
+            justify-content: space-between;
             @include links($white, $white, $white, $white);
-
-            height: ($base-point-grid * 6);
-            padding: 0 ($base-point-grid * 4);
+            padding: ($base-point-grid * 1.5) ($base-point-grid * 4);
 
             &:hover {
                 text-decoration: none;
@@ -44,7 +43,6 @@
                 a {
                     display: block;
                     @include links($white, $white, rgba($white, 0.5), rgba($white, 0.5));
-
                     padding: $base-point-grid ($base-point-grid * 2);
                     font-size: 15px;
 

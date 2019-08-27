@@ -5,6 +5,7 @@
 #fx-sidebar-nav {
     .sidebar-nav-item {
         > a {
+            transition: background $base-duration $base-timing;
             &:hover {
                 background: $fx-hover;
             }
@@ -29,6 +30,7 @@
     .sidebar-nav {
         .sidebar-nav-item {
             > a {
+                transition: background $base-duration $base-timing;
                 &:hover {
                     background: $fx-hover;
                     box-shadow: $sidebar-cat-dropdow;
@@ -67,6 +69,7 @@
         .sidebar-nav-item {
 
             > a {
+                transition: background $base-duration $base-timing;
                 &:hover {
                     background: $fx-hover;
                     box-shadow: $sidebar-cat-dropdow;
