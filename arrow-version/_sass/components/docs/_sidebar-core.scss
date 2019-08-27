@@ -5,6 +5,7 @@
 #core-sidebar-nav {
   .sidebar-nav-item {
     > a {
+         transition: background $base-duration $base-timing;
       &:hover {
         background: $core-hover;
       }
@@ -28,7 +29,9 @@
 
   .sidebar-nav {
     .sidebar-nav-item {
+       
       > a {
+           transition: background $base-duration $base-timing;
         &:hover {
           background: $core-hover;
           box-shadow: $sidebar-cat-dropdow;
@@ -50,6 +53,11 @@
 
         a {
           color: $white;
+        transition: all $base-duration $base-timing;
+            &:hover {
+                background: rgba($white, 0.05);
+                color: rgba($white, 0.8);
+            }
         }
       }
     }
@@ -59,7 +67,9 @@
 #doc-core-version-button {
   .sidebar-doc-versions {
     .sidebar-nav-item {
+         
       > a {
+           transition: background $base-duration $base-timing;
         &:hover {
           background: $core-hover;
           box-shadow: $sidebar-cat-dropdow;
