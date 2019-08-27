@@ -6,6 +6,7 @@
     .sidebar-nav-item {
         > a {
             transition: background $base-duration $base-timing;
+            background: #876;
             &:hover {
                 background: $meta-hover;
             }
@@ -20,6 +21,15 @@
 
         ul {
             background: $meta-hover;
+            
+            li {
+                a {
+                    &:before {
+                        content: "•";
+                        margin-right: ($base-point-grid * 2);
+                    }
+                }
+            }
         }
     }
 }

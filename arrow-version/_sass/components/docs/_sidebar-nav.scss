@@ -14,7 +14,7 @@
 
             &:hover {
                 text-decoration: none;
-                background: #875;
+               
             }
 
             .fa {
@@ -41,15 +41,12 @@
 
             li {
                 a {
-                    display: block;
+                    display: flex;
+                    align-items: flex-start;
                     @include links($white, $white, rgba($white, 0.5), rgba($white, 0.5));
                     padding: $base-point-grid ($base-point-grid * 2);
                     font-size: 15px;
 
-                    .fa {
-                        margin-right: ($base-point-grid * 1.5);
-                        font-size: 0.25rem;
-                    }
 
                     &.active {
                         color: $gray-primary;
@@ -58,6 +55,7 @@
                     &:hover {
                         text-decoration: none;
                     }
+                    
                 }
             }
         }
@@ -82,7 +80,6 @@
              width: 100%;
              &.active {
                  > a {
-                   padding: $base-point-grid * 4;
                    border-color: transparent;
                  }
                }

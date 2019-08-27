@@ -21,6 +21,15 @@
 
         ul {
             background: $core-hover;
+            
+            li {
+                a {
+                    &:before {
+                        content: "•";
+                        margin-right: ($base-point-grid * 2);
+                    }
+                }
+            }
         }
     }
 }
@@ -56,6 +65,7 @@
                 a {
                     color: $white;
                     transition: all $base-duration $base-timing;
+                    
 
                     &:hover {
                         background: rgba($white, 0.05);
