@@ -18,5 +18,5 @@ import arrow.typeclasses.MonadThrowSyntax
 interface Fx<F> {
   fun monadError(): MonadThrow<F>
   fun <A> fx(f: suspend MonadThrowSyntax<F>.() -> A): Kind<F, A> =
-    monadError().bindingCatch(f)
+    monadError().fx.monadThrow(f)
 }

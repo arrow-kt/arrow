@@ -1,8 +1,19 @@
-package arrow.typeclasses
+package arrow.mtl.typeclasses
 
 import arrow.Kind
 import arrow.Kind2
 import arrow.core.Eval
+import arrow.typeclasses.Alternative
+import arrow.typeclasses.Applicative
+import arrow.typeclasses.Bifoldable
+import arrow.typeclasses.Bifunctor
+import arrow.typeclasses.Contravariant
+import arrow.typeclasses.Foldable
+import arrow.typeclasses.Functor
+import arrow.typeclasses.Invariant
+import arrow.typeclasses.MonoidK
+import arrow.typeclasses.SemigroupK
+import arrow.typeclasses.Traverse
 
 /**
  * A type to represent λ[α => Kind[F, G, α]]
@@ -206,10 +217,10 @@ interface ComposedInvariantContravariant<F, G> : Invariant<Nested<F, G>> {
 fun <F, G> Invariant<F>.compose(GF: Invariant<G>): Invariant<Nested<F, G>> = ComposedInvariant(this, GF)
 
 fun <F, G> Invariant<F>.composeFunctor(GF: Functor<G>): Invariant<Nested<F, G>> =
-    ComposedInvariantCovariant(this, GF)
+  ComposedInvariantCovariant(this, GF)
 
 fun <F, G> Invariant<F>.composeContravariant(GF: Contravariant<G>): Invariant<Nested<F, G>> =
-    ComposedInvariantContravariant(this, GF)
+  ComposedInvariantContravariant(this, GF)
 
 interface ComposedFunctor<F, G> : Functor<Nested<F, G>> {
   fun F(): Functor<F>
@@ -254,7 +265,7 @@ interface ComposedCovariantContravariant<F, G> : Contravariant<Nested<F, G>> {
 fun <F, G> Functor<F>.compose(GF: Functor<G>): Functor<Nested<F, G>> = ComposedFunctor(this, GF)
 
 fun <F, G> Functor<F>.composeContravariant(GF: Contravariant<G>): Contravariant<Nested<F, G>> =
-    ComposedCovariantContravariant(this, GF)
+  ComposedCovariantContravariant(this, GF)
 
 interface ComposedContravariant<F, G> : Functor<Nested<F, G>> {
     fun F(): Contravariant<F>
@@ -293,10 +304,10 @@ interface ComposedContravariantCovariant<F, G> : Contravariant<Nested<F, G>> {
 }
 
 fun <F, G> Contravariant<F>.compose(GF: Contravariant<G>): Functor<Nested<F, G>> =
-    ComposedContravariant(this, GF)
+  ComposedContravariant(this, GF)
 
 fun <F, G> Contravariant<F>.composeFunctor(GF: Functor<G>): Contravariant<Nested<F, G>> =
-    ComposedContravariantCovariant(this, GF)
+  ComposedContravariantCovariant(this, GF)
 
 interface ComposedApplicative<F, G> : Applicative<Nested<F, G>>, ComposedFunctor<F, G> {
   override fun F(): Applicative<F>

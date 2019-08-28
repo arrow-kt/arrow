@@ -174,8 +174,8 @@ interface IOAsync : Async<ForIO>, IOMonadDefer {
 
 // FIXME default @extension are temporarily declared in arrow-effects-io-extensions due to multiplatform needs
 interface IOConcurrent : Concurrent<ForIO>, IOAsync {
-  override fun <A> CoroutineContext.startFiber(kind: IOOf<A>): IO<Fiber<ForIO, A>> =
-    kind.fix().startFiber(this)
+  override fun <A> Kind<ForIO, A>.fork(coroutineContext: CoroutineContext): IO<Fiber<ForIO, A>> =
+    fix().fork(coroutineContext)
 
   override fun <A> cancelable(k: ((Either<Throwable, A>) -> Unit) -> CancelToken<ForIO>): Kind<ForIO, A> =
     IO.cancelable(k)

@@ -8,12 +8,16 @@ import arrow.core.Some
 import arrow.core.Tuple4
 import arrow.core.right
 import arrow.fx.IO.Companion.just
+import arrow.fx.IO.Companion.parMapN
 import arrow.fx.extensions.fx
 import arrow.fx.extensions.io.async.async
 import arrow.fx.extensions.io.concurrent.concurrent
 import arrow.fx.extensions.io.concurrent.parMapN
+import arrow.fx.extensions.io.dispatchers.dispatchers
 import arrow.fx.extensions.io.monad.flatMap
 import arrow.fx.extensions.io.monad.map
+import arrow.fx.internal.parMap2
+import arrow.fx.internal.parMap3
 import arrow.fx.typeclasses.ExitCase
 import arrow.fx.typeclasses.milliseconds
 import arrow.fx.typeclasses.seconds
@@ -37,6 +41,7 @@ class IOTest : UnitSpec() {
 
   private val other = newSingleThreadContext("other")
   private val all = newSingleThreadContext("all")
+  private val NonBlocking = IO.dispatchers().default()
 
   init {
     testLaws(ConcurrentLaws.laws(IO.concurrent(), EQ(), EQ(), EQ()))
@@ -251,7 +256,7 @@ class IOTest : UnitSpec() {
       sideEffect.counter shouldBe 2
     }
 
-    "effect is called on every run call" { all
+    "effect is called on every run call" {
       val sideEffect = SideEffect()
       val io = IO.effect { sideEffect.increment(); 1 }
       io.unsafeRunSync()
@@ -305,7 +310,7 @@ class IOTest : UnitSpec() {
       val program = IO.fx {
         continueOn(all)
         val initialThread = !effect { Thread.currentThread().name }
-        !(0..130).map { i -> suspend { i } }.sequence()
+        !(0..130).map { i -> effect { i } }.parSequence()
         val continuedThread = !effect { Thread.currentThread().name }
         continuedThread shouldBe initialThread
       }
@@ -541,6 +546,56 @@ class IOTest : UnitSpec() {
       }
 
       just(1).flatMap(::ioAsync).unsafeRunSync() shouldBe size
+    }
+
+    "IOParMap2 left handles null" {
+      parMapN(NonBlocking, IO.just<Int?>(null), IO.unit) { _, unit -> unit }
+        .unsafeRunSync() shouldBe Unit
+    }
+
+    "IOParMap2 right handles null" {
+      parMapN(NonBlocking, IO.unit, IO.just<Int?>(null)) { unit, _ -> unit }
+        .unsafeRunSync() shouldBe Unit
+    }
+
+    "IOParMap3 left handles null" {
+      parMapN(NonBlocking, IO.just<Int?>(null), IO.unit, IO.unit) { _, unit, _ -> unit }
+        .unsafeRunSync() shouldBe Unit
+    }
+
+    "IOParMap3 middle handles null" {
+      parMapN(NonBlocking, IO.unit, IO.just<Int?>(null), IO.unit) { unit, _, _ -> unit }
+        .unsafeRunSync() shouldBe Unit
+    }
+
+    "IOParMap3 right handles null" {
+      parMapN(NonBlocking, IO.unit, IO.unit, IO.just<Int?>(null)) { unit, _, _ -> unit }
+        .unsafeRunSync() shouldBe Unit
+    }
+
+    "ConcurrentParMap2 left handles null" {
+      IO.concurrent().parMap2(NonBlocking, IO.just<Int?>(null), IO.unit) { _, unit -> unit }
+        .fix().unsafeRunSync() shouldBe Unit
+    }
+
+    "ConcurrentParMap2 right handles null" {
+      IO.concurrent().parMap2(NonBlocking, IO.unit, IO.just<Int?>(null)) { unit, _ -> unit }
+        .fix().unsafeRunSync() shouldBe Unit
+    }
+
+    "ConcurrentParMap3 left handles null" {
+      IO.concurrent().parMap3(NonBlocking, IO.just<Int?>(null), IO.unit, IO.unit) { _, unit, _ -> unit }
+        .fix().unsafeRunSync() shouldBe Unit
+    }
+
+    "ConcurrentParMap3 middle handles null" {
+      IO.concurrent().parMap3(NonBlocking, IO.unit, IO.just<Int?>(null), IO.unit) { unit, _, _ -> unit }
+        .fix().unsafeRunSync() shouldBe Unit
+    }
+
+    "ConcurrentParMap3 right handles null" {
+      IO.concurrent().parMap3(NonBlocking, IO.unit, IO.unit, IO.just<Int?>(null)) { unit, _, _ -> unit }
+        .fix().unsafeRunSync() shouldBe Unit
     }
   }
 }

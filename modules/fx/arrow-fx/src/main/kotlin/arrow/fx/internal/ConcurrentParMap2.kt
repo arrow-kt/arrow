@@ -4,13 +4,13 @@ import arrow.Kind
 import arrow.fx.typeclasses.Concurrent
 import kotlin.coroutines.CoroutineContext
 
-fun <F, A, B, C> Concurrent<F>.parMap2(
+internal fun <F, A, B, C> Concurrent<F>.parMap2(
   ctx: CoroutineContext,
   fa: Kind<F, A>,
   fb: Kind<F, B>,
   f: (A, B) -> C
 ): Kind<F, C> = ctx.run {
-  tupled(startFiber(fb), startFiber(fa)).bracket(use = { (fiberB, fiberA) ->
+  tupled(fb.fork(this), fa.fork(this)).bracket(use = { (fiberB, fiberA) ->
     racePair(fiberA.join().attempt(), fiberB.join().attempt()).flatMap { pairResult ->
       pairResult.fold({ attemptedA, fiberB ->
         attemptedA.fold({ error ->
