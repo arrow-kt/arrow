@@ -6,7 +6,6 @@
   display: flex;
   align-items: center;
   height: ($base-point-grid * 8);
-  padding: 0 ($base-point-grid * 4) 0 ($base-point-grid * 1);
   background: $white;
   border-bottom: 1px solid $doc-header-border;
 
@@ -25,6 +24,7 @@
       border: none;
       cursor: auto;
       position: relative;
+        outline: none;
     }
     /* clears the 'X' from Internet Explorer */
     input[type=search]::-ms-clear {
