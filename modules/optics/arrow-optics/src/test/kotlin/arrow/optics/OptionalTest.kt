@@ -109,6 +109,13 @@ class OptionalTest : UnitSpec() {
       EQA = Eq.any()
     ))
 
+    "asSetter should set absent optional" {
+      forAll(genIncompleteUser, genToken) { user, token ->
+        val updatedUser = incompleteUserTokenOptional.asSetter().set(user, token)
+        incompleteUserTokenOptional.getOption(updatedUser).nonEmpty()
+      }
+    }
+
     with(ListK.head<Int>().asFold()) {
 
       "asFold should behave as valid Fold: size" {
