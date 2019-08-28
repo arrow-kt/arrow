@@ -30,5 +30,6 @@
 @import "components/docs/sidebar-optics";
 @import "components/docs/sidebar-meta";
 @import "components/docs/sidebar-incubator";
+@import "components/docs/doc-content-core";
 
 @include dropdown($dropdown-config...);

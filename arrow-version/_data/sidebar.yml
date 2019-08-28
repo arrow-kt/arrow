@@ -12,6 +12,9 @@ options:
   - title: Arrow core
 
     nested_options:
+    
+      - title: All tag example
+        url: /docs/arrow/core/tags
 
       - title: Either
         url: /docs/arrow/core/either
