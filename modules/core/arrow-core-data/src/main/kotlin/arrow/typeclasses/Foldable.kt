@@ -214,7 +214,7 @@ interface Foldable<F> {
     get(0).filter(predicate)
 
   companion object {
-    @Deprecated("Use Iterator.iterateRight from Eval.kt instead")
+    @Deprecated("This function will be removed soon. Use Iterator.iterateRight from Eval.kt instead")
     fun <A, B> iterateRight(it: Iterator<A>, lb: Eval<B>): (f: (A, Eval<B>) -> Eval<B>) -> Eval<B> =
       { f: (A, Eval<B>) -> Eval<B> ->
         fun loop(): Eval<B> =

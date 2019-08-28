@@ -16,7 +16,6 @@ import arrow.test.laws.equalUnderTheLaw
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.runner.junit4.KotlinTestRunner
-import kotlinx.coroutines.Dispatchers
 import org.junit.runner.RunWith
 
 @RunWith(KotlinTestRunner::class)
@@ -61,10 +60,10 @@ class MVarTest : UnitSpec() {
         IO.fx {
           val av = mvar.empty<Int>().bind()
 
-          val f1 = av.take().fix().startFiber(Dispatchers.Default).bind()
+          val f1 = av.take().fork().bind()
           av.put(10).bind()
 
-          val f2 = av.take().fix().startFiber(Dispatchers.Default).bind()
+          val f2 = av.take().fork().bind()
           av.put(20).bind()
 
           val aa = f1.join().bind()
@@ -78,9 +77,9 @@ class MVarTest : UnitSpec() {
         IO.fx {
           val av = mvar.empty<Int>().bind()
 
-          val f1 = av.put(10).fix().startFiber(Dispatchers.Default).bind()
-          val f2 = av.put(20).fix().startFiber(Dispatchers.Default).bind()
-          val f3 = av.put(30).fix().startFiber(Dispatchers.Default).bind()
+          val f1 = av.put(10).fork().bind()
+          val f2 = av.put(20).fork().bind()
+          val f3 = av.put(30).fork().bind()
 
           val aa = av.take().bind()
           val bb = av.take().bind()
@@ -98,9 +97,9 @@ class MVarTest : UnitSpec() {
         IO.fx {
           val av = mvar.empty<Int>().bind()
 
-          val f1 = av.take().fix().startFiber(Dispatchers.Default).bind()
-          val f2 = av.take().fix().startFiber(Dispatchers.Default).bind()
-          val f3 = av.take().fix().startFiber(Dispatchers.Default).bind()
+          val f1 = av.take().fork().bind()
+          val f2 = av.take().fork().bind()
+          val f3 = av.take().fork().bind()
 
           av.put(10).bind()
           av.put(20).bind()

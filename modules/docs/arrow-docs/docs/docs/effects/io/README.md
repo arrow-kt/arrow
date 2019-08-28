@@ -230,24 +230,9 @@ IO.fx {
 }.attempt().unsafeRunSync()
 ```
 
-## Syntax
-
-### A#liftIO
-
-Puts the value `A` inside an `IO<A>` using `just`.
-
-```kotlin:ank
-import arrow.fx.*
-
-1.liftIO()
-  .attempt()
-  .unsafeRunSync()
-```
-
 ## Common operators
 
 IO implements all the operators common to all instances of [`MonadError`]({{ '/docs/arrow/typeclasses/monaderror' | relative_url }}). Those include `map`, `flatMap`, and `handleErrorWith`.
-
 
 ### Supported Type Classes
 
