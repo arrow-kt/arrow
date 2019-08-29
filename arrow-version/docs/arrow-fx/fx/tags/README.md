@@ -1,7 +1,7 @@
 ---
-layout: docs-meta
+layout: docs-fx
 title: Tags
-permalink: /docs/arrow/meta/
+permalink: /docs/effects/fx/tags/
 ---
 
 # Header h1
@@ -44,7 +44,7 @@ Lorem ipsum dolor sit amet, **consectetur adipiscing** elit. Etiam eu *sem susci
 
 ### Images
 
-![Alt](/img/meta/arrow-meta-brand-sidebar.svg "Icon")
+![Alt](/img/fx/arrow-fx-brand-sidebar.svg "Icon")
 
 ### Code
 

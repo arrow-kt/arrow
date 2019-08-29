@@ -2,27 +2,27 @@
 // -----------------------------------------------
 // -----------------------------------------------
 
-.doc-content-core {
+.doc-content-incubator {
     .doc-content {
         a {
-            color: $core-color;
+            color: $incubator-color;
         }
 
         p,
         ul {
             code {
-                background: rgba($meta-background, 0.08);
+                background: rgba($incubator-background, 0.08);
             }
         }
 
         .hljs {
-            background: rgba($meta-background, 0.05);
+            background: rgba($incubator-background, 0.05);
         }
 
         .hljs-doctag,
         .hljs-formula,
         .hljs-keyword {
-            color: $meta-color;
+            color: $incubator-color;
         }
 
         .hljs-built_in,

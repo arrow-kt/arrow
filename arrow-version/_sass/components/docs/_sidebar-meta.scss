@@ -6,7 +6,7 @@
     .sidebar-nav-item {
         > a {
             transition: background $base-duration $base-timing;
-            background: #876;
+            
             &:hover {
                 background: $meta-hover;
             }
