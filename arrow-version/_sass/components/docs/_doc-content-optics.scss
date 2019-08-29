@@ -1,4 +1,4 @@
-// DOC CONTENT CORE
+// DOC CONTENT OPTICS
 // -----------------------------------------------
 // -----------------------------------------------
 
@@ -11,18 +11,18 @@
         p,
         ul {
             code {
-                background: rgba($core-background, 0.08);
+                background: rgba($optics-background, 0.08);
             }
         }
 
         .hljs {
-            background: rgba($core-background, 0.05);
+            background: rgba($optics-background, 0.05);
         }
 
         .hljs-doctag,
         .hljs-formula,
         .hljs-keyword {
-            color: $core-color;
+            color: $optics-color;
         }
 
         .hljs-built_in,
