@@ -75,6 +75,7 @@
 #doc-inc-version-button {
     .sidebar-doc-versions {
         .sidebar-nav-item {
+            background: $incubator-background;
             > a {
                 transition: background $base-duration $base-timing;
                 &:hover {

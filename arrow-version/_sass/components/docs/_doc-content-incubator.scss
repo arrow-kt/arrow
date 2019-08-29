@@ -29,5 +29,17 @@
         .hljs-class .hljs-title {
             color: #F28B2D;
         }
+
+        .button-video {
+            background: $white;
+            border: 2px solid $incubator-color;
+            transition: background $base-duration;
+
+            &:hover {
+                background: $incubator-color;
+                color: $white;
+            }
+
+        }
     }
 }

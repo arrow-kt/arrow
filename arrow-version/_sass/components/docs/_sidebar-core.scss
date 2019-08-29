@@ -80,6 +80,7 @@
 #doc-core-version-button {
     .sidebar-doc-versions {
         .sidebar-nav-item {
+            background: $core-background;
 
             > a {
                 transition: background $base-duration $base-timing;
