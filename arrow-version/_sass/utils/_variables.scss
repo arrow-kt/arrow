@@ -108,10 +108,10 @@ $dropdown-config: (
   font-size: normal,
   header-color: $brand-primary,
   title-color: $brand-primary,
-  subtitle-color: $brand-tertiary,
+  subtitle-color: $base-font-color,
   text-color: $brand-secondary,
   highlight-color: #ef8836,
-  highlight-opacity: 0.1,
+  highlight-opacity: 0.3,
   highlight-type: underline
 )
 !default;
