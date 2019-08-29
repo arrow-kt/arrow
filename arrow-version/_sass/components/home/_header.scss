@@ -38,7 +38,7 @@
   opacity: 1;
   transition: $opacity-transition;
   bottom: -60px;
-  right: 9px;
+  right: 7px;
 }
 
 #core-arrow-animation {
@@ -46,7 +46,7 @@
   opacity: 0;
   transition: $opacity-transition;
   bottom: -40px;
-  right: 9px;
+  right: 7px;
 }
 
 #fx-arrow-animation {
@@ -54,7 +54,7 @@
   opacity: 0;
   transition: $opacity-transition;
   bottom: -40px;
-  right: 9px;
+  right: 7px;
 }
 
 #optics-arrow-animation {
@@ -62,7 +62,7 @@
   opacity: 0;
   transition: $opacity-transition;
   bottom: -40px;
-  right: 9px;
+  right: 7px;
 }
 
 #meta-arrow-animation {
@@ -70,13 +70,12 @@
   opacity: 0;
   transition: $opacity-transition;
   bottom: -40px;
-  right: 9px;
+  right: 7px;
 }
 
 #logo-white-lines {
   opacity: 0;
   transition: $long-transition;
-  background-image: url("../img/home/logo-white-lines.svg");
 }
 // Responsive
 // -----------------------------------------------

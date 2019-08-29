@@ -8,6 +8,16 @@ const siteFooter = document.getElementById('site-footer');
 const siteNav = document.getElementById('site-nav');
 const navIconOpenWhite = document.getElementById('nav-icon-open-white');
 const navIconOpenDark = document.getElementById('nav-icon-open-dark');
+const iconsColor = document.querySelectorAll('.icon-content img');
+const arrayIconsColor = Array.from(iconsColor);
+const headerAnimation = document.querySelectorAll('.header-image div');
+const arrayHeaderAnimation = Array.from(headerAnimation);
+const incubatorAnimation = document.querySelectorAll('.incubator-image div');
+const arrayIncubatorAnimation = Array.from(incubatorAnimation);
+const navLinks = siteNav.querySelectorAll('a');
+const arrayNavLinks = Array.from(navLinks);
+const footerLinks = siteFooter.querySelectorAll('a');
+const arrayFooterLinks = Array.from(footerLinks);
 
 // core elements
 const coreArrowLogo = document.getElementById('core-arrow-animation');
@@ -50,28 +60,27 @@ function checkActiveFeature(arrowFeature) {
   arrowFeature.map(function(el) {
     const current_id = el.id;
     const current_class = el.classList;
-
     if (current_class.contains('active')) {
       switch (current_id) {
         case 'core':
           commonHoverStyle(current_id);
-          coreHoverStyle();
+          coreHoverStyle(current_id);
           break;
         case 'fx':
           commonHoverStyle(current_id);
-          fxHoverStyle();
+          fxHoverStyle(current_id);
           break;
         case 'optics':
           commonHoverStyle(current_id);
-          opticsHoverStyle();
+          opticsHoverStyle(current_id);
           break;
         case 'meta':
           commonHoverStyle(current_id);
-          metaHoverStyle();
+          metaHoverStyle(current_id);
           break;
         case 'incubator':
           commonHoverStyle(current_id, true);
-          incubatorHoverStyle();
+          incubatorHoverStyle(current_id);
           break;
         default:
           baseHoverStyle();
@@ -82,24 +91,59 @@ function checkActiveFeature(arrowFeature) {
 
 function setOpacity(iconElements, id, opacity) {
   iconElements.map(function(obj) {
-
     if (obj.className.includes('active') | obj.id.includes(id)) {
       const currentWhite = document.getElementById(`${id}-white`);
       const currentDark = document.getElementById(`${id}-dark`);
       currentWhite.style.opacity = 0;
       currentDark.style.opacity = 0;
     } else {
+      arrayIconsColor.map(function(obj) {
+        if(obj.className.includes('cat-icon-color')) {
+          obj.style.opacity = 0;
+        }
+      });
       obj.style.opacity = opacity;
     }
   });
 }
 
-function resetOpacity(iconElements, opacity) {
-  iconElements.map(obj => obj.style.opacity = opacity);
+function resetOpacity(iconElements, id, opacity) {
+  iconElements.map(function(obj) {
+    return ((obj.className.includes('active') | obj.id.includes(id)) ?
+     obj.style.opacity = 1 : obj.style.opacity = opacity);
+  });
+}
+
+function animationHoverControl(arrayHeaderAnimation, arrayIncubatorAnimation, id) {
+  arrayHeaderAnimation.map(function(obj) {
+    return (obj.id.includes(id) ?
+     obj.style.opacity = 1 : obj.style.opacity = 0);
+  });
+
+  if(id != 'incubator') {
+    incubatorArrowLogo.style.opacity = 0;
+    arrayIncubatorAnimation.map(function(obj) {
+      return (obj.id.includes(id) ?
+       obj.style.opacity = 1 : obj.style.opacity = 0);
+    });
+  } else {
+    arrayIncubatorAnimation.map(function(obj) {
+      return (obj.id.includes('hover') ?
+       obj.style.opacity = 1 : obj.style.opacity = 0);
+    });
+  }
+}
+
+function addClassName(el, name) {
+  if(!el.classList.contains(name)) {
+    el.className += ` ${name}`;
+  }
 }
 
 function commonHoverStyle(id, incubatorHover) {
   body.style.setProperty('--color-primary', '#F5F7F8');
+  arrayNavLinks.map(obj => addClassName(obj, 'hover-mode'));
+  arrayFooterLinks.map(obj => addClassName(obj, 'hover-mode'));
   navBrandDark.style.opacity = 0;
   navBrandWhite.style.opacity = 1;
   baseArrowLogo.style.opacity = 0;
@@ -107,13 +151,18 @@ function commonHoverStyle(id, incubatorHover) {
   navIconOpenWhite.style.opacity = 1;
   incubatorBaseLogo.style.opacity = 0;
   incubatorHover = incubatorHover || false;
+  siteNav.classList.remove('core', 'fx', 'meta', 'incubator');
+  setOpacity(arrayCategoryIconDark, id, 0);
+  resetOpacity(arrayCategoryRow, id, 0.6);
+  animationHoverControl(arrayHeaderAnimation, arrayIncubatorAnimation, id);
+
   if (incubatorHover == false) {
-    setOpacity(arrayCategoryRow, id, 0.5);
-    setOpacity(arrayCategoryIconWhite, id, 0.5);
+    setOpacity(arrayCategoryRow, id, 0.6);
+    setOpacity(arrayCategoryIconWhite, id, 0.6);
   } else {
     setOpacity(arrayCategoryIconWhite, id, 1);
+    setOpacity(arrayCategoryRow, id, 1);
   }
-  setOpacity(arrayCategoryIconDark, id, 0);
   siteFooter.style.background = "url('../img/home/hover-lines-footer.svg') repeat-x";
 }
 
@@ -124,8 +173,15 @@ function coreHoverStyle() {
   catIconCoreColor.style.opacity = 1;
   incubatorCoreLogo.style.opacity = 1;
   if (siteNav.className.includes('nav-scroll')) {
-    siteNav.className += ' core'
+    addClassName(siteNav, 'core');
   }
+  siteNav.classList.remove('fx');
+  siteNav.classList.remove('optics');
+  siteNav.classList.remove('meta');
+  siteNav.classList.remove('incubator');
+  arrowFxAnimation.stop();
+  arrowOpticsAnimation.stop();
+  arrowMetaAnimation.stop();
 }
 
 function fxHoverStyle() {
@@ -135,8 +191,15 @@ function fxHoverStyle() {
   catIconFxColor.style.opacity = 1;
   incubatorFxLogo.style.opacity = 1;
   if (siteNav.className.includes('nav-scroll')) {
-    siteNav.className += ' fx'
+    addClassName(siteNav, 'fx');
   }
+  siteNav.classList.remove('core');
+  siteNav.classList.remove('optics');
+  siteNav.classList.remove('meta');
+  siteNav.classList.remove('incubator');
+  arrowCoreAnimation.stop();
+  arrowOpticsAnimation.stop();
+  arrowMetaAnimation.stop();
 }
 
 function opticsHoverStyle() {
@@ -146,8 +209,15 @@ function opticsHoverStyle() {
   catIconOpticsColor.style.opacity = 1;
   incubatorOpticsLogo.style.opacity = 1;
   if (siteNav.className.includes('nav-scroll')) {
-    siteNav.className += ' optics'
+    addClassName(siteNav, 'optics');
   }
+  siteNav.classList.remove('core');
+  siteNav.classList.remove('fx');
+  siteNav.classList.remove('meta');
+  siteNav.classList.remove('incubator');
+  arrowCoreAnimation.stop();
+  arrowFxAnimation.stop();
+  arrowMetaAnimation.stop();
 }
 
 function metaHoverStyle() {
@@ -157,8 +227,15 @@ function metaHoverStyle() {
   catIconMetaColor.style.opacity = 1;
   incubatorMetaLogo.style.opacity = 1;
   if (siteNav.className.includes('nav-scroll')) {
-    siteNav.className += ' meta'
+    addClassName(siteNav, 'meta');
   }
+  siteNav.classList.remove('core');
+  siteNav.classList.remove('fx');
+  siteNav.classList.remove('optics');
+  siteNav.classList.remove('incubator');
+  arrowCoreAnimation.stop();
+  arrowFxAnimation.stop();
+  arrowOpticsAnimation.stop();
 }
 
 function incubatorHoverStyle() {
@@ -167,7 +244,7 @@ function incubatorHoverStyle() {
   incubatorList.style.listStyleImage = "url('../img/incubator/incubator-bullet.svg')";
   incubatorHoverLogo.style.opacity = 1;
   if (siteNav.className.includes('nav-scroll')) {
-    siteNav.className += ' incubator'
+    addClassName(siteNav, 'incubator');
   }
-  arrayIncubatorLinks.map(obj => obj.className += ' incubator-hover');
+  arrayIncubatorLinks.map(obj => addClassName(obj, 'hover-mode'));
 }
