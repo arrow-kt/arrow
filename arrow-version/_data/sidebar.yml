@@ -12,6 +12,9 @@ options:
   - title: Arrow core
 
     nested_options:
+    
+      - title: All tag example
+        url: /docs/arrow/core/tags
 
       - title: Either
         url: /docs/arrow/core/either
@@ -25,22 +28,21 @@ options:
       - title: Id
         url: /docs/arrow/core
 
-  - title: Arrow Fx
+  - title: Arrow Meta
 
     nested_options:
+    
+      - title: All tag example
+        url: /docs/arrow/meta
+    
 
-      - title: Getting Started
-        url: /docs/arrow/fx/
-
-      - title: Asynchronous & Concurrent Programming
-        url: /docs/effects/fx/async/
-
-      - title: Polymorphism. One Program multiple runtimes
-        url: /docs/effects/fx/polymorphism/
 
   - title: Optics
 
     nested_options:
+    
+      - title: All tag example
+        url: /docs/optics/tags 
 
       - title: Optics DSL
         url: /docs/optics/dsl/
@@ -86,6 +88,9 @@ options:
 
       - title: Each
         url: /docs/optics/each/
+        
+      - title: All tag example
+        url: /docs/optics/tags    
 
 
   - title: Arrow Query Language

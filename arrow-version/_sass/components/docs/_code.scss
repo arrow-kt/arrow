@@ -4,54 +4,27 @@
 
 p,
 ul {
-  code {
-    background: #fff;
-    font-family: $code-font-family;
-    padding: 0 $base-point-grid;
-    font-size: 16px;
-    @include border-radius (3px);
-  }
+    code {
+        font-family: $code-font-family;
+        padding: 0 $base-point-grid ($base-point-grid - 4) $base-point-grid;
+        font-size: 16px;
+        border-radius: 3px;
+        color: rgba(#263238, 0.7);
+    }
 }
 
-.CodeMirror {
-  background: #fff !important;
-  font-family: $code-font-family !important;
-  font-size: 0.8rem !important;
-  @include border-radius (3px);
-  z-index: 0;
-
-  .CodeMirror-lines {
-    margin: 0;
-    padding: 12px 0 10px;
-  }
-
-  .CodeMirror-line {
-    line-height: 1.5;
-  }
-}
 
 .hljs {
-  display: block;
-  overflow-x: auto;
-  color: #383a42;
-  background: #fafafa;
-  padding: ($base-point-grid * 1.5) 0 ($base-point-grid * 1.5) ($base-point-grid * 2);
-  font-family: $code-font-family;
-  font-size: 16px;
-  box-shadow: $box-shadow-item;
-}
-
-.hljs-doctag,
-.hljs-formula,
-.hljs-keyword {
-  color: #4172DD;
-}
-
-.hljs-built_in,
-.hljs-class .hljs-title {
-  color: #F28B2D;
+    display: block;
+    overflow-x: auto;
+    color: $base-font-color;
+    padding: ($base-point-grid * 1.5) 0 ($base-point-grid * 1.5) ($base-point-grid * 2);
+    font-family: $code-font-family;
+    margin-bottom: ($base-point-grid * 3);
+    font-size: 16px;
+    box-shadow: $box-shadow-item;
 }
 
 .language-kotlin {
-  display: none;
+    display: none;
 }

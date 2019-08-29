@@ -84,8 +84,8 @@ $gutter-margin: ($base-point-grid * 4);
 // Border
 // -----------------------------------------------
 $border-color: rgba($gray-primary, 0.1);
-$doc-header-border: rgba($brand-primary, 0.15);
-$sidebar-cat-dropdow: rgba(0, 0, 0, 0.3) 0 8px 16px 0;
+$doc-header-border: rgba($brand-secondary, 0.8);
+$sidebar-cat-dropdow: rgba(0, 0, 0, 0.2) 0 2px 8px 0;
 // Sidebar Sizes
 // -----------------------------------------------
 $sidebar-width: 325px;
@@ -108,10 +108,10 @@ $dropdown-config: (
   font-size: normal,
   header-color: $brand-primary,
   title-color: $brand-primary,
-  subtitle-color: $brand-tertiary,
+  subtitle-color: $base-font-color,
   text-color: $brand-secondary,
   highlight-color: #ef8836,
-  highlight-opacity: 0.1,
+  highlight-opacity: 0.3,
   highlight-type: underline
 )
 !default;

@@ -168,12 +168,12 @@ $responsive-breakpoint: 768px
 
         &.ds-cursor {
           .algolia-docsearch-suggestion.suggestion-layout-simple {
-            background-color: rgba($main-color,.05);
+            background-color: rgba($main-color,.2);
           }
 
           .algolia-docsearch-suggestion:not(.suggestion-layout-simple) {
             .algolia-docsearch-suggestion--content {
-              background-color: rgba($main-color,.05);
+              background-color: rgba($main-color,.2);
             }
           }
         }

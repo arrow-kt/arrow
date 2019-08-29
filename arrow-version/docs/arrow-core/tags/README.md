@@ -1,7 +1,10 @@
 ---
-layout: docs-meta
+layout: docs-core
 title: Tags
-permalink: /docs/arrow/meta/
+permalink: /docs/arrow/core/tags/
+redirect_from:
+  - /docs/datatypes/tags/
+video: q6HpChSq-xc
 ---
 
 # Header h1
@@ -44,7 +47,7 @@ Lorem ipsum dolor sit amet, **consectetur adipiscing** elit. Etiam eu *sem susci
 
 ### Images
 
-![Alt](/img/meta/arrow-meta-brand-sidebar.svg "Icon")
+![Alt](/img/core/arrow-core-brand-sidebar.svg "Icon")
 
 ### Code
 
