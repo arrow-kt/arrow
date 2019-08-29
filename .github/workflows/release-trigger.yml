@@ -13,8 +13,8 @@ jobs:
     steps:
     - name: Getting branch information and calling target webhook
       env: # Or as an environment variable
-        USERTOKEN: ${{ secrets.USERTOKEN }}
-        TARGETURL: ${{ secrets.TARGETURL }}
+        USERTOKEN: ${{ secrets.TRY_ARROW_USERTOKEN }}
+        TARGETURL: ${{ secrets.TRY_ARROW_TARGETURL }}
         COMMITSHA: ${{ github.sha }}
         EVENT:     ${{ github.event_name }}
       run: |
