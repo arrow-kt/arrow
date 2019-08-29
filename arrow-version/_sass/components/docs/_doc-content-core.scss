@@ -1,0 +1,46 @@
+// DOC CONTENT CORE
+// -----------------------------------------------
+// -----------------------------------------------
+
+.doc-content-core {
+    .doc-content {
+        a {
+            color: $core-color;
+        }
+
+        p,
+        ul {
+            code {
+                background: rgba($core-background, 0.08);
+            }
+        }
+
+        .hljs {
+            background: rgba($core-background, 0.05);
+        }
+
+        .hljs-doctag,
+        .hljs-formula,
+        .hljs-keyword {
+            color: $core-color;
+        }
+
+        .hljs-built_in,
+        .hljs-class .hljs-title {
+            color: #F28B2D;
+        }
+        
+        .button-video {
+            background: $white;
+            border: 2px solid $core-color;
+            transition: background $base-duration; 
+            
+            &:hover {
+                background: $core-color;
+                color: $white;
+            } 
+            
+            
+        }  
+    }
+}

@@ -1,0 +1,45 @@
+// DOC CONTENT META
+// -----------------------------------------------
+// -----------------------------------------------
+
+.doc-content-meta {
+    .doc-content {
+        a {
+            color: $meta-color;
+        }
+
+        p,
+        ul {
+            code {
+                background: rgba($meta-background, 0.08);
+            }
+        }
+
+        .hljs {
+            background: rgba($meta-background, 0.05);
+        }
+
+        .hljs-doctag,
+        .hljs-formula,
+        .hljs-keyword {
+            color: $meta-color;
+        }
+
+        .hljs-built_in,
+        .hljs-class .hljs-title {
+            color: #F28B2D;
+        }
+
+        .button-video {
+            background: $white;
+            border: 2px solid $meta-color;
+            transition: background $base-duration;
+
+            &:hover {
+                background: $meta-color;
+                color: $white;
+            }
+
+        }
+    }
+}

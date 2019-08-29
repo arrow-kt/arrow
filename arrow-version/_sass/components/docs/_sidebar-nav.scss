@@ -8,13 +8,13 @@
         > a {
             display: flex;
             align-items: center;
+            justify-content: space-between;
             @include links($white, $white, $white, $white);
-
-            height: ($base-point-grid * 6);
-            padding: 0 ($base-point-grid * 4);
+            padding: ($base-point-grid * 1.5) ($base-point-grid * 4);
 
             &:hover {
                 text-decoration: none;
+               
             }
 
             .fa {
@@ -37,22 +37,16 @@
 
         ul {
             display: none;
-            padding: ($base-point-grid * 2) ($base-point-grid * 3);
+            
 
             li {
                 a {
                     display: flex;
-                    justify-content: flex-start;
-                    align-items: center;
+                    align-items: flex-start;
                     @include links($white, $white, rgba($white, 0.5), rgba($white, 0.5));
-
-                    padding: $base-point-grid 0;
+                    padding: $base-point-grid ($base-point-grid * 2);
                     font-size: 15px;
 
-                    .fa {
-                        margin-right: ($base-point-grid * 1.5);
-                        font-size: 0.25rem;
-                    }
 
                     &.active {
                         color: $gray-primary;
@@ -61,6 +55,7 @@
                     &:hover {
                         text-decoration: none;
                     }
+                    
                 }
             }
         }
@@ -85,7 +80,6 @@
              width: 100%;
              &.active {
                  > a {
-                   padding: $base-point-grid * 4;
                    border-color: transparent;
                  }
                }

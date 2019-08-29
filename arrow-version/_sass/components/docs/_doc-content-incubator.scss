@@ -1,0 +1,45 @@
+// DOC CONTENT INCUBATOR
+// -----------------------------------------------
+// -----------------------------------------------
+
+.doc-content-incubator {
+    .doc-content {
+        a {
+            color: $incubator-color;
+        }
+
+        p,
+        ul {
+            code {
+                background: rgba($incubator-background, 0.08);
+            }
+        }
+
+        .hljs {
+            background: rgba($incubator-background, 0.05);
+        }
+
+        .hljs-doctag,
+        .hljs-formula,
+        .hljs-keyword {
+            color: $incubator-color;
+        }
+
+        .hljs-built_in,
+        .hljs-class .hljs-title {
+            color: #F28B2D;
+        }
+
+        .button-video {
+            background: $white;
+            border: 2px solid $incubator-color;
+            transition: background $base-duration;
+
+            &:hover {
+                background: $incubator-color;
+                color: $white;
+            }
+
+        }
+    }
+}

@@ -3,57 +3,59 @@
 // -----------------------------------------------
 
 .doc-header {
-  display: flex;
-  align-items: center;
-  height: ($base-point-grid * 8);
-  padding: 0 ($base-point-grid * 4) 0 ($base-point-grid * 1);
-  background: $white;
-  border-bottom: 1px solid $doc-header-border;
-
-  .search-wrapper {
     display: flex;
-    position: relative;
-    width: 100%;
+    align-items: center;
+    height: ($base-point-grid * 8);
+    background: $white;
+    border-bottom: 1px solid $doc-header-border;
 
-    .search {
-      display: block;
-      width: calc(100% - 1.5rem);
-      padding: $base-point-grid 0;
-      font-family: $base-font-family;
-      font-size: $base-docs-font-size;
-      margin-left: 1.5rem;
-      border: none;
-      cursor: auto;
-      position: relative;
-    }
-    /* clears the 'X' from Internet Explorer */
-    input[type=search]::-ms-clear {
-      display: none;
-      width: 0;
-      height: 0;
+    .search-wrapper {
+        display: flex;
+        position: relative;
+        width: 100%;
+
+        .search {
+            display: block;
+            width: calc(100% - 1.5rem);
+            padding: $base-point-grid 0;
+            font-family: $base-font-family;
+            font-size: $base-docs-font-size;
+            margin-left: 1.5rem;
+            border: none;
+            cursor: auto;
+            position: relative;
+            outline: none;
+        }
+
+        /* clears the 'X' from Internet Explorer */
+        input[type=search]::-ms-clear {
+            display: none;
+            width: 0;
+            height: 0;
+        }
+
+        input[type=search]::-ms-reveal {
+            display: none;
+            width: 0;
+            height: 0;
+        }
+
+        /* clears the 'X' from Chrome */
+        input[type="search"]::-webkit-search-decoration,
+        input[type="search"]::-webkit-search-cancel-button,
+        input[type="search"]::-webkit-search-results-button,
+        input[type="search"]::-webkit-search-results-decoration {
+            display: none;
+        }
     }
 
-    input[type=search]::-ms-reveal {
-      display: none;
-      width: 0;
-      height: 0;
+    a {
+        &:hover {
+            text-decoration: none;
+        }
     }
-    /* clears the 'X' from Chrome */
-    input[type="search"]::-webkit-search-decoration,
-    input[type="search"]::-webkit-search-cancel-button,
-    input[type="search"]::-webkit-search-results-button,
-    input[type="search"]::-webkit-search-results-decoration {
-      display: none;
-    }
-  }
 
-  a {
-    &:hover {
-      text-decoration: none;
+    .fa {
+        margin-right: ($base-point-grid / 2);
     }
-  }
-
-  .fa {
-    margin-right: ($base-point-grid / 2);
-  }
 }
