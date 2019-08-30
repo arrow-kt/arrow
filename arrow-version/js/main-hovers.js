@@ -66,23 +66,23 @@ function checkActiveFeature(arrowFeature) {
       switch (current_id) {
         case 'core':
           commonHoverStyle(current_id);
-          coreHoverStyle(current_id);
+          coreHoverStyle();
           break;
         case 'fx':
           commonHoverStyle(current_id);
-          fxHoverStyle(current_id);
+          fxHoverStyle();
           break;
         case 'optics':
           commonHoverStyle(current_id);
-          opticsHoverStyle(current_id);
+          opticsHoverStyle();
           break;
         case 'meta':
           commonHoverStyle(current_id);
-          metaHoverStyle(current_id);
+          metaHoverStyle();
           break;
         case 'incubator':
           commonHoverStyle(current_id, true);
-          incubatorHoverStyle(current_id);
+          incubatorHoverStyle();
           break;
         default:
           baseHoverStyle();
@@ -143,9 +143,9 @@ function commonHoverStyle(id, incubatorHover) {
   siteNav.classList.remove('core', 'fx', 'meta', 'optics', 'incubator');
   arrayCategoryIconDark.map(obj => obj.style.opacity = 0);
   if (incubatorHover == false) {
-    setOpacity(arrayCategoryIconWhite, id, 0.6);
-    setOpacity(arrayHeaderCategoryRow, id, 0.6);
-    setOpacity(arrayButtonCategoryRoww, id, 0.6);
+    setOpacity(arrayCategoryIconWhite, id, 0.5);
+    setOpacity(arrayHeaderCategoryRow, id, 0.5);
+    setOpacity(arrayButtonCategoryRoww, id, 0.5);
   } else {
     setOpacity(arrayCategoryIconWhite, id, 1);
     setOpacity(arrayHeaderCategoryRow, id, 1);
