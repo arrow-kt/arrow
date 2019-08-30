@@ -1,23 +1,21 @@
 // base elements
 const body = document.getElementById('arrow-main');
 const baseArrowLogo = document.getElementById('base-arrow-animation');
-const incubatorBaseLogo = document.getElementById('incubator-base-animation');
-const navBrandWhite = document.getElementById('nav-brand-white');
-const navBrandDark = document.getElementById('nav-brand-dark');
-const siteFooter = document.getElementById('site-footer');
+
+// nav elements
 const siteNav = document.getElementById('site-nav');
 const navIconOpenWhite = document.getElementById('nav-icon-open-white');
 const navIconOpenDark = document.getElementById('nav-icon-open-dark');
-const iconsColor = document.querySelectorAll('.icon-content img');
-const arrayIconsColor = Array.from(iconsColor);
+const navBrandWhite = document.getElementById('nav-brand-white');
+const navBrandDark = document.getElementById('nav-brand-dark');
+const navLinks = siteNav.querySelectorAll('a');
+const arrayNavLinks = Array.from(navLinks);
+
+// animations containers
 const headerAnimation = document.querySelectorAll('.header-image div');
 const arrayHeaderAnimation = Array.from(headerAnimation);
 const incubatorAnimation = document.querySelectorAll('.incubator-image div');
 const arrayIncubatorAnimation = Array.from(incubatorAnimation);
-const navLinks = siteNav.querySelectorAll('a');
-const arrayNavLinks = Array.from(navLinks);
-const footerLinks = siteFooter.querySelectorAll('a');
-const arrayFooterLinks = Array.from(footerLinks);
 
 // core elements
 const coreArrowLogo = document.getElementById('core-arrow-animation');
@@ -36,25 +34,29 @@ const metaArrowLogo = document.getElementById('meta-arrow-animation');
 const incubatorMetaLogo = document.getElementById('incubator-meta-animation');
 
 // incubator elements
+const incubatorBaseLogo = document.getElementById('incubator-base-animation');
 const incubatorArrowLogo = document.getElementById('logo-white-lines');
 const incubatorLinks = document.querySelectorAll('.incubator-items a');
 const arrayIncubatorLinks = Array.from(incubatorLinks);
 const incubatorHoverLogo = document.getElementById('incubator-hover-animation');
 const incubatorList = document.getElementById('incubator-list');
 
-// features/categories elements
-const categoryRow = document.querySelectorAll('#main-flex div');
-const arrayCategoryRow = Array.from(categoryRow);
+// Features elements
+const headerCategoryRow = document.querySelectorAll('.item-header h2, p');
+const arrayHeaderCategoryRow = Array.from(headerCategoryRow);
+const buttonCategoryRow = document.querySelectorAll('.main-item a');
+const arrayButtonCategoryRoww = Array.from(buttonCategoryRow);
 const categoryIconWhite = document.getElementsByClassName('cat-icon-white');
 const arrayCategoryIconWhite = Array.from(categoryIconWhite);
 const categoryIconDark = document.getElementsByClassName('cat-icon-dark');
 const arrayCategoryIconDark = Array.from(categoryIconDark);
+const categoryIconColor = document.getElementsByClassName('cat-icon-color');
+const arrayCategoryIconColor = Array.from(categoryIconColor);
 
-const catIconCoreColor = document.getElementById('cat-icon-color-core');
-const catIconFxColor = document.getElementById('cat-icon-color-fx');
-const catIconOpticsColor = document.getElementById('cat-icon-color-optics');
-const catIconMetaColor = document.getElementById('cat-icon-color-meta');
-
+// footer elements
+const siteFooter = document.getElementById('site-footer');
+const footerLinks = siteFooter.querySelectorAll('a');
+const arrayFooterLinks = Array.from(footerLinks);
 
 function checkActiveFeature(arrowFeature) {
   arrowFeature.map(function(el) {
@@ -91,26 +93,13 @@ function checkActiveFeature(arrowFeature) {
 
 function setOpacity(iconElements, id, opacity) {
   iconElements.map(function(obj) {
-    if (obj.className.includes('active') | obj.id.includes(id)) {
-      const currentWhite = document.getElementById(`${id}-white`);
-      const currentDark = document.getElementById(`${id}-dark`);
-      currentWhite.style.opacity = 0;
-      currentDark.style.opacity = 0;
+    if (obj.id.includes(id)) {
+      const idWhite = `${id}-white`;
+      return((obj.id != idWhite) ? obj.style.opacity = 1 : obj.style.opacity = 0);
+
     } else {
-      arrayIconsColor.map(function(obj) {
-        if(obj.className.includes('cat-icon-color')) {
-          obj.style.opacity = 0;
-        }
-      });
       obj.style.opacity = opacity;
     }
-  });
-}
-
-function resetOpacity(iconElements, id, opacity) {
-  iconElements.map(function(obj) {
-    return ((obj.className.includes('active') | obj.id.includes(id)) ?
-     obj.style.opacity = 1 : obj.style.opacity = opacity);
   });
 }
 
@@ -151,18 +140,20 @@ function commonHoverStyle(id, incubatorHover) {
   navIconOpenWhite.style.opacity = 1;
   incubatorBaseLogo.style.opacity = 0;
   incubatorHover = incubatorHover || false;
-  siteNav.classList.remove('core', 'fx', 'meta', 'incubator');
-  setOpacity(arrayCategoryIconDark, id, 0);
-  resetOpacity(arrayCategoryRow, id, 0.6);
-  animationHoverControl(arrayHeaderAnimation, arrayIncubatorAnimation, id);
-
+  siteNav.classList.remove('core', 'fx', 'meta', 'optics', 'incubator');
+  arrayCategoryIconDark.map(obj => obj.style.opacity = 0);
   if (incubatorHover == false) {
-    setOpacity(arrayCategoryRow, id, 0.6);
     setOpacity(arrayCategoryIconWhite, id, 0.6);
+    setOpacity(arrayHeaderCategoryRow, id, 0.6);
+    setOpacity(arrayButtonCategoryRoww, id, 0.6);
   } else {
     setOpacity(arrayCategoryIconWhite, id, 1);
-    setOpacity(arrayCategoryRow, id, 1);
+    setOpacity(arrayHeaderCategoryRow, id, 1);
+    setOpacity(arrayButtonCategoryRoww, id, 1);
   }
+  setOpacity(arrayCategoryIconColor, id, 0);
+  animationHoverControl(arrayHeaderAnimation, arrayIncubatorAnimation, id);
+
   siteFooter.style.background = "url('../img/home/hover-lines-footer.svg') repeat-x";
 }
 
@@ -170,15 +161,10 @@ function coreHoverStyle() {
   body.style.background = "#354755 url('../img/home/hover-lines-header.svg') repeat-x";
   coreArrowLogo.style.opacity = 1;
   incubatorList.style.listStyleImage = "url('../img/core/core-bullet.svg')";
-  catIconCoreColor.style.opacity = 1;
   incubatorCoreLogo.style.opacity = 1;
   if (siteNav.className.includes('nav-scroll')) {
     addClassName(siteNav, 'core');
   }
-  siteNav.classList.remove('fx');
-  siteNav.classList.remove('optics');
-  siteNav.classList.remove('meta');
-  siteNav.classList.remove('incubator');
   arrowFxAnimation.stop();
   arrowOpticsAnimation.stop();
   arrowMetaAnimation.stop();
@@ -188,15 +174,10 @@ function fxHoverStyle() {
   body.style.background = "#33393f url('../img/home/hover-lines-header.svg') repeat-x";
   fxArrowLogo.style.opacity = 1;
   incubatorList.style.listStyleImage = "url('../img/fx/fx-bullet.svg')";
-  catIconFxColor.style.opacity = 1;
   incubatorFxLogo.style.opacity = 1;
   if (siteNav.className.includes('nav-scroll')) {
     addClassName(siteNav, 'fx');
   }
-  siteNav.classList.remove('core');
-  siteNav.classList.remove('optics');
-  siteNav.classList.remove('meta');
-  siteNav.classList.remove('incubator');
   arrowCoreAnimation.stop();
   arrowOpticsAnimation.stop();
   arrowMetaAnimation.stop();
@@ -206,15 +187,10 @@ function opticsHoverStyle() {
   body.style.background = "#35565F url('../img/home/hover-lines-header.svg') repeat-x";
   opticsArrowLogo.style.opacity = 1;
   incubatorList.style.listStyleImage = "url('../img/optics/optics-bullet.svg')";
-  catIconOpticsColor.style.opacity = 1;
   incubatorOpticsLogo.style.opacity = 1;
   if (siteNav.className.includes('nav-scroll')) {
     addClassName(siteNav, 'optics');
   }
-  siteNav.classList.remove('core');
-  siteNav.classList.remove('fx');
-  siteNav.classList.remove('meta');
-  siteNav.classList.remove('incubator');
   arrowCoreAnimation.stop();
   arrowFxAnimation.stop();
   arrowMetaAnimation.stop();
@@ -224,15 +200,10 @@ function metaHoverStyle() {
   body.style.background = "#2E3B44 url('../img/home/hover-lines-header.svg') repeat-x";
   metaArrowLogo.style.opacity = 1;
   incubatorList.style.listStyleImage = "url('../img/meta/meta-bullet.svg')";
-  catIconMetaColor.style.opacity = 1;
   incubatorMetaLogo.style.opacity = 1;
   if (siteNav.className.includes('nav-scroll')) {
     addClassName(siteNav, 'meta');
   }
-  siteNav.classList.remove('core');
-  siteNav.classList.remove('fx');
-  siteNav.classList.remove('optics');
-  siteNav.classList.remove('incubator');
   arrowCoreAnimation.stop();
   arrowFxAnimation.stop();
   arrowOpticsAnimation.stop();
