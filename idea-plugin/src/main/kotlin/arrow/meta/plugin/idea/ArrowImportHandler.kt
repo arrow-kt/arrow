@@ -47,7 +47,11 @@ internal object ArrowImportHandler {
 
     println("newPluginClasspaths: $newPluginClasspaths")
 
-    commonArguments.pluginClasspaths = newPluginClasspaths.filterNotNull().toTypedArray()
+    commonArguments.apply {
+      pluginClasspaths = newPluginClasspaths.filterNotNull().toTypedArray()
+      listPhases = true
+    }
+
     facetSettings.compilerArguments = commonArguments
   }
 

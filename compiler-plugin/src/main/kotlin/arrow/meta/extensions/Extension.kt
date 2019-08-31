@@ -1,6 +1,5 @@
 package arrow.meta.extensions
 
-import arrow.meta.qq.QuoteTransformation
 import org.jetbrains.kotlin.analyzer.AnalysisResult
 import org.jetbrains.kotlin.analyzer.ModuleInfo
 import org.jetbrains.kotlin.backend.common.BackendContext
@@ -9,11 +8,8 @@ import org.jetbrains.kotlin.codegen.ClassBuilderFactory
 import org.jetbrains.kotlin.codegen.ImplementationBodyCodegen
 import org.jetbrains.kotlin.codegen.StackValue
 import org.jetbrains.kotlin.codegen.extensions.ExpressionCodegenExtension
-import org.jetbrains.kotlin.com.intellij.mock.MockProject
 import org.jetbrains.kotlin.com.intellij.openapi.project.Project
 import org.jetbrains.kotlin.com.intellij.openapi.vfs.VirtualFile
-import org.jetbrains.kotlin.com.intellij.psi.JavaPsiFacade
-import org.jetbrains.kotlin.com.intellij.psi.PsiElementFactory
 import org.jetbrains.kotlin.com.intellij.testFramework.LightVirtualFile
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.container.ComponentProvider
@@ -40,7 +36,6 @@ import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.BindingTrace
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
 import org.jetbrains.kotlin.resolve.checkers.DeclarationCheckerContext
-import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.lazy.LazyClassContext
 import org.jetbrains.kotlin.resolve.lazy.ResolveSession
 import org.jetbrains.kotlin.resolve.lazy.declarations.ClassMemberDeclarationProvider
@@ -58,6 +53,8 @@ interface ExtensionPhase {
     fun CompilerContext.updateConfiguration(configuration: CompilerConfiguration): Unit
   }
 
+  object Empty : ExtensionPhase
+
   interface PackageProvider : ExtensionPhase {
     fun CompilerContext.getPackageFragmentProvider(
       project: Project,
@@ -67,6 +64,14 @@ interface ExtensionPhase {
       moduleInfo: ModuleInfo?,
       lookupTracker: LookupTracker
     ): PackageFragmentProvider?
+  }
+
+  interface CollectAdditionalSources: ExtensionPhase {
+    fun CompilerContext.collectAdditionalSourcesAndUpdateConfiguration(
+      knownSources: Collection<KtFile>,
+      configuration: CompilerConfiguration,
+      project: Project
+    ): Collection<KtFile>
   }
 
   interface AnalysisHandler : ExtensionPhase {
@@ -210,21 +215,17 @@ interface ExtensionPhase {
 }
 
 class CompilerContext(
-  val project: MockProject,
-  val messageCollector: MessageCollector,
-  val elementFactory: PsiElementFactory = JavaPsiFacade.getInstance(project).elementFactory,
-  val ktPsiElementFactory: KtPsiFactory = KtPsiFactory(project, false)
+  val project: Project,
+  val messageCollector: MessageCollector?
 ) {
 
+  val ktPsiElementFactory: KtPsiFactory = KtPsiFactory(project, false)
   lateinit var lazyClassContext: ResolveSession
   val ctx: CompilerContext = this
   lateinit var module: ModuleDescriptor
-  lateinit var projectContext: ProjectContext
   lateinit var files: Collection<KtFile>
   lateinit var bindingTrace: BindingTrace
   lateinit var componentProvider: ComponentProvider
-
-  val transformations: ArrayList<QuoteTransformation<*>> = arrayListOf()
 
   private val descriptorPhaseState = ConcurrentHashMap<FqName, ClassDescriptor>()
 
@@ -240,13 +241,4 @@ class CompilerContext(
     }
   }
 
-  fun storeDescriptor(descriptor: ClassDescriptor): Unit {
-    descriptorPhaseState[descriptor.fqNameSafe] = descriptor
-  }
-
-  fun getStoredDescriptor(fqName: FqName): ClassDescriptor? =
-    descriptorPhaseState[fqName]
-
-  fun storedDescriptors(): List<ClassDescriptor> =
-    descriptorPhaseState.values.toList()
 }

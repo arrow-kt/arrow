@@ -1,25 +1,38 @@
 <idea-plugin>
-<id>arrow-plugin</id>
-<name>Arrow</name>
+    <id>arrow-plugin</id>
+    <name>Arrow</name>
 
-<vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
+    <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
 
-<description><![CDATA[
+    <description><![CDATA[
     The Arrow Intellij IDEA plugin.<br>
     <em>most HTML tags may be used</em>
     ]]></description>
 
-<!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
-     on how to target different products -->
-<!-- uncomment to enable plugin in all products
-<depends>com.intellij.modules.lang</depends>
--->
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+         on how to target different products -->
+    <!-- uncomment to enable plugin in all products
+    <depends>com.intellij.modules.lang</depends>
+    -->
 
-<depends>org.jetbrains.plugins.gradle</depends>
-<depends>org.jetbrains.kotlin</depends>
+    <depends>org.jetbrains.plugins.gradle</depends>
+    <depends>org.jetbrains.kotlin</depends>
 
-<extensions defaultExtensionNs="org.jetbrains.kotlin">
-    <gradleProjectImportHandler implementation="arrow.meta.plugin.idea.ArrowGradleImportHandler" />
-</extensions>
+    <extensions defaultExtensionNs="org.jetbrains.kotlin">
+        <storageComponentContainerContributor implementation="arrow.meta.plugin.idea.MetaStorageComponentContainerContributor" />.
+        <gradleProjectImportHandler implementation="arrow.meta.plugin.idea.ArrowGradleImportHandler"/>
+        <packageFragmentProviderExtension implementation="arrow.meta.plugin.idea.MetaPackageFragmentProviderExtension" />
+        <completionInformationProvider implementation="arrow.meta.plugin.idea.MetaCompletionInformationProvider" />
+        <syntheticResolveExtension implementation="arrow.meta.plugin.idea.MetaSyntheticResolverExtension"/>
+        <syntheticScopeProviderExtension implementation="arrow.meta.plugin.idea.MetaSyntheticScopeProviderExtension" />
+    </extensions>
+    <extensions defaultExtensionNs="com.intellij">
+        <buildProcess.parametersProvider implementation="arrow.meta.plugin.idea.MetaBuildProcessParametersProvider"/>
+
+<!--        <fileType.fileViewProviderFactory filetype="kt"-->
+<!--                                          implementationClass="arrow.meta.plugin.idea.MetaClassFileViewProviderFactory"/>-->
+
+<!--        <compiler.buildTargetScopeProvider implementation="arrow.meta.plugin.idea.MetaBuildTargetScopeProvider" />-->
+    </extensions>
 
 </idea-plugin>

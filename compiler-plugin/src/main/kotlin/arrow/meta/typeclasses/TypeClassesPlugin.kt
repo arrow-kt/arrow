@@ -136,7 +136,7 @@ private fun CompilerContext.reportNonInternalOrphanExtension(
   extensionType: KotlinType,
   extension: DeclarationDescriptor
 ) {
-  messageCollector.report(
+  messageCollector?.report(
     CompilerMessageSeverity.ERROR,
     """Orphan Extension $extension for $extensionType must be `internal`:
       |```kotlin
@@ -148,7 +148,7 @@ private fun CompilerContext.reportNonInternalOrphanExtension(
 }
 
 private fun CompilerContext.reportExtensionNotFound(extensionType: KotlinType): Unit {
-  messageCollector.report(
+  messageCollector?.report(
     CompilerMessageSeverity.ERROR,
     "extension not found for $extensionType",
     CompilerMessageLocation.create(null)
@@ -159,7 +159,7 @@ private fun CompilerContext.reportAmbiguousExtensions(
   extensionType: KotlinType,
   descriptors: List<DeclarationDescriptor>
 ): Unit {
-  messageCollector.report(
+  messageCollector?.report(
     CompilerMessageSeverity.ERROR,
     """Expected a single @extension for [$extensionType] but found the following conflicting extensions: ${descriptors.joinToString() { it.fqNameSafe.asString() }}""".trimMargin(),
     CompilerMessageLocation.create(null)

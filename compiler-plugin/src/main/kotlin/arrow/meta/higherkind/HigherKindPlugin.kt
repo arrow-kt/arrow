@@ -3,15 +3,28 @@ package arrow.meta.higherkind
 import arrow.meta.extensions.ExtensionPhase
 import arrow.meta.extensions.MetaComponentRegistrar
 import arrow.meta.qq.classOrObject
+import arrow.meta.utils.ide
+import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
+import org.jetbrains.kotlin.descriptors.PackageFragmentProvider
+import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtClass
+import org.jetbrains.kotlin.psi.KtClassOrObject
 import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.kotlin.types.DelegatingSimpleTypeImpl
+import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
 
 val MetaComponentRegistrar.higherKindedTypes: List<ExtensionPhase>
   get() =
     meta(
+      additionalSources(
+        collectAdditionalSourcesAndUpdateConfiguration = { knownSources, configuration, project ->
+          println("additionalSources.collectAdditionalSourcesAndUpdateConfiguration: $knownSources")
+          knownSources
+        }
+      ),
       classOrObject(::isHigherKindedType) { c ->
         println("Processing Higher Kind: ${c.name}")
         listOfNotNull(
@@ -30,7 +43,12 @@ val MetaComponentRegistrar.higherKindedTypes: List<ExtensionPhase>
               |}
               |"""
         )
-      }
+      },
+      syntheticResolver(
+        generatePackageSyntheticClasses = { thisDescriptor, name, ctx, declarationProvider, result ->
+          println("syntheticResolver.generatePackageSyntheticClasses: $thisDescriptor, result $result")
+        }
+      )
     )
 
 private val Name.invariant: String

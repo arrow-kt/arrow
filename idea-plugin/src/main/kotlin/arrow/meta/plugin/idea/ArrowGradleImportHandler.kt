@@ -8,11 +8,14 @@ import org.jetbrains.kotlin.idea.facet.KotlinFacet
 import org.jetbrains.plugins.gradle.model.data.GradleSourceSetData
 
 class ArrowGradleImportHandler : GradleProjectImportHandler {
+
     override fun importBySourceSet(facet: KotlinFacet, sourceSetNode: DataNode<GradleSourceSetData>) {
+        println("ArrowGradleImportHandler.importBySourceSet")
         ArrowImportHandler.modifyCompilerArguments(facet, PLUGIN_GRADLE_JAR)
     }
 
     override fun importByModule(facet: KotlinFacet, moduleNode: DataNode<ModuleData>) {
+        println("ArrowGradleImportHandler.importByModule")
         ArrowImportHandler.modifyCompilerArguments(facet, PLUGIN_GRADLE_JAR)
     }
 

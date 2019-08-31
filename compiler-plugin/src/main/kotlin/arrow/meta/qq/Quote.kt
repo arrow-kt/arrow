@@ -3,6 +3,7 @@ package arrow.meta.qq
 import arrow.meta.extensions.CompilerContext
 import arrow.meta.extensions.ExtensionPhase
 import arrow.meta.extensions.MetaComponentRegistrar
+import org.jetbrains.kotlin.com.intellij.util.diff.DiffTree
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.psi.KtElement
@@ -91,7 +92,7 @@ inline fun <P : KtElement, reified K : KtElement, S, Q : Quote<P, K, S>> MetaCom
   noinline map: S.(K) -> List<String>
 ): ExtensionPhase.AnalysisHandler =
   analysys(
-    doAnalysis = { project, module, projectContext, files, bindingTrace, componentProvider ->
+    doAnalysis = { _, _, _, files, _, _ ->
       files as ArrayList
       //files.clear()
       val fileMutations = processFiles(files, quoteFactory, match, map)
