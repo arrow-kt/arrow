@@ -28,7 +28,9 @@ import arrow.typeclasses.Const
 import arrow.typeclasses.ConstPartialOf
 import arrow.typeclasses.Eq
 import arrow.typeclasses.conest
+import arrow.typeclasses.const
 import arrow.typeclasses.counnest
+import arrow.typeclasses.value
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
