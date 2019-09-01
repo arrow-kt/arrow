@@ -9,7 +9,7 @@ import arrow.core.toT
 import arrow.mtl.State
 import arrow.core.k
 import arrow.mtl.map
-import arrow.mtl.run
+import arrow.mtl.runK
 import arrow.mtl.runId
 import arrow.optics.mtl.ask
 import arrow.optics.mtl.asks
@@ -163,22 +163,22 @@ class GetterTest : UnitSpec() {
 
     "Extract should extract the focus from the state" {
       forAll(genToken) { generatedToken ->
-        tokenGetter.extract().run(generatedToken) ==
+        tokenGetter.extract().runK(generatedToken) ==
           State { token: Token ->
             token toT tokenGetter.get(token)
-          }.run(generatedToken)
+          }.runK(generatedToken)
       }
     }
 
     "toState should be an alias to extract" {
       forAll(genToken) { token ->
-        tokenGetter.toState().run(token) == tokenGetter.extract().run(token)
+        tokenGetter.toState().runK(token) == tokenGetter.extract().runK(token)
       }
     }
 
     "extractMap with f should be same as extract and map" {
       forAll(genToken, Gen.functionAToB<String, String>(Gen.string())) { token, f ->
-        tokenGetter.extractMap(f).run(token) == tokenGetter.extract().map(f).run(token)
+        tokenGetter.extractMap(f).runK(token) == tokenGetter.extract().map(f).runK(token)
       }
     }
   }

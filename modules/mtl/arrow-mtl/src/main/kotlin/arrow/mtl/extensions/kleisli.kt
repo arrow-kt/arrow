@@ -18,7 +18,7 @@ import arrow.mtl.extensions.kleisli.applicative.applicative
 import arrow.mtl.extensions.kleisli.functor.functor
 import arrow.mtl.extensions.kleisli.monad.monad
 import arrow.mtl.fix
-import arrow.mtl.run
+import arrow.mtl.runK
 import arrow.mtl.typeclasses.MonadReader
 import arrow.typeclasses.Monad
 import arrow.typeclasses.MonadError
@@ -109,7 +109,7 @@ interface KleisliApply<F, D> : Apply<KleisliPartialOf<F, D>>, KleisliFunctor<F, 
     fix().ap(AF(), ff)
 
   override fun <A, B> KleisliOf<F, D, A>.product(fb: KleisliOf<F, D, B>): Kleisli<F, D, Tuple2<A, B>> =
-    Kleisli { AF().run { run(it).product(fb.run(it)) } }
+    Kleisli { AF().run { runK(it).product(fb.runK(it)) } }
 }
 
 @extension
@@ -129,7 +129,7 @@ interface KleisliApplicative<F, D> : Applicative<KleisliPartialOf<F, D>>, Kleisl
     fix().ap(AF(), ff)
 
   override fun <A, B> KleisliOf<F, D, A>.product(fb: KleisliOf<F, D, B>): Kleisli<F, D, Tuple2<A, B>> =
-    Kleisli { AF().run { run(it).product(fb.run(it)) } }
+    Kleisli { AF().run { runK(it).product(fb.runK(it)) } }
 }
 
 @extension

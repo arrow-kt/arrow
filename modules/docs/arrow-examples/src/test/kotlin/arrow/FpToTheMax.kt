@@ -13,7 +13,7 @@ import arrow.fx.fix
 import arrow.fx.typeclasses.MonadDefer
 import arrow.mtl.extensions.monad
 import arrow.mtl.fix
-import arrow.mtl.run
+import arrow.mtl.runK
 import arrow.typeclasses.Monad
 import java.util.Random
 
@@ -109,6 +109,6 @@ object FpToTheMax {
 
     val module: MonadAndConsoleRandom<ForTestIO> = MonadAndConsoleRandom(StateApi.monad(), TestIOConsole(), TestIORandom())
 
-    module.fMain().fix().run(testData).a.output
+    module.fMain().fix().runK(testData).a.output
   }
 }

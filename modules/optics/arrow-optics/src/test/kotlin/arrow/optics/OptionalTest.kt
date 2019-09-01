@@ -18,7 +18,7 @@ import arrow.core.ListK
 import arrow.mtl.State
 import arrow.core.k
 import arrow.mtl.map
-import arrow.mtl.run
+import arrow.mtl.runK
 import arrow.optics.mtl.assign
 import arrow.optics.mtl.assignOld
 import arrow.optics.mtl.assign_
@@ -230,78 +230,78 @@ class OptionalTest : UnitSpec() {
 
     "Extract should extract the focus from the state" {
       forAll(Gen.`try`(Gen.int())) { tryInt ->
-        successInt.extract().run(tryInt) ==
+        successInt.extract().runK(tryInt) ==
           State { x: Try<Int> ->
             x toT successInt.getOption(x)
-          }.run(tryInt)
+          }.runK(tryInt)
       }
     }
 
     "toState should be an alias to extract" {
       forAll(Gen.`try`(Gen.int())) { x ->
-        successInt.toState().run(x) == successInt.extract().run(x)
+        successInt.toState().runK(x) == successInt.extract().runK(x)
       }
     }
 
     "extractMap with f should be same as extract and map" {
       forAll(Gen.`try`(Gen.int()), Gen.functionAToB<Int, Int>(Gen.int())) { x, f ->
-        successInt.extractMap(f).run(x) == successInt.extract().map { it.map(f) }.run(x)
+        successInt.extractMap(f).runK(x) == successInt.extract().map { it.map(f) }.runK(x)
       }
     }
 
     "update f should be same modify f within State and returning new state" {
       forAll(Gen.`try`(Gen.int()), Gen.functionAToB<Int, Int>(Gen.int())) { x, f ->
-        successInt.update(f).run(x) ==
+        successInt.update(f).runK(x) ==
           State { xx: Try<Int> ->
             successInt.modify(xx, f)
               .let { it toT successInt.getOption(it) }
-          }.run(x)
+          }.runK(x)
       }
     }
 
     "updateOld f should be same as modify f within State and returning old state" {
       forAll(Gen.`try`(Gen.int()), Gen.functionAToB<Int, Int>(Gen.int())) { x, f ->
-        successInt.updateOld(f).run(x) ==
+        successInt.updateOld(f).runK(x) ==
           State { xx: Try<Int> ->
             successInt.modify(xx, f) toT successInt.getOption(xx)
-          }.run(x)
+          }.runK(x)
       }
     }
 
     "update_ f should be as modify f within State and returning Unit" {
       forAll(Gen.`try`(Gen.int()), Gen.functionAToB<Int, Int>(Gen.int())) { x, f ->
-        successInt.update_(f).run(x) ==
+        successInt.update_(f).runK(x) ==
           State { xx: Try<Int> ->
             successInt.modify(xx, f) toT Unit
-          }.run(x)
+          }.runK(x)
       }
     }
 
     "assign a should be same set a within State and returning new value" {
       forAll(Gen.`try`(Gen.int()), Gen.int()) { x, i ->
-        successInt.assign(i).run(x) ==
+        successInt.assign(i).runK(x) ==
           State { xx: Try<Int> ->
             successInt.set(xx, i)
               .let { it toT successInt.getOption(it) }
-          }.run(x)
+          }.runK(x)
       }
     }
 
     "assignOld f should be same as modify f within State and returning old state" {
       forAll(Gen.`try`(Gen.int()), Gen.int()) { x, i ->
-        successInt.assignOld(i).run(x) ==
+        successInt.assignOld(i).runK(x) ==
           State { xx: Try<Int> ->
             successInt.set(xx, i) toT successInt.getOption(xx)
-          }.run(x)
+          }.runK(x)
       }
     }
 
     "assign_ f should be as modify f within State and returning Unit" {
       forAll(Gen.`try`(Gen.int()), Gen.int()) { x, i ->
-        successInt.assign_(i).run(x) ==
+        successInt.assign_(i).runK(x) ==
           State { xx: Try<Int> ->
             successInt.set(xx, i) toT Unit
-          }.run(x)
+          }.runK(x)
       }
     }
   }

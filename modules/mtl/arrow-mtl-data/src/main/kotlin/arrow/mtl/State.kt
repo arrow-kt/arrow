@@ -69,21 +69,21 @@ fun <S, T, R> State<S, T>.map(f: (T) -> R): State<S, R> = flatMap(IdBimonad) { t
  *
  * @param initial state to start stateful computation.
  */
-fun <S, A> StateT<ForId, S, A>.run(initial: S): Tuple2<S, A> = run(IdBimonad, initial).value()
+fun <S, A> StateT<ForId, S, A>.runK(initial: S): Tuple2<S, A> = run(IdBimonad, initial).value()
 
 /**
  * Alias for [StateT.runA] `StateT<ForId, S, A>`
  *
  * @param initial state to start stateful computation.
  */
-fun <S, A> StateT<ForId, S, A>.runA(initial: S): A = run(initial).b
+fun <S, A> StateT<ForId, S, A>.runA(initial: S): A = runK(initial).b
 
 /**
  * Alias for [StateT.runS] `StateT<ForId, S, A>`
  *
  * @param initial state to start stateful computation.
  */
-fun <S, A> StateT<ForId, S, A>.runS(initial: S): S = run(initial).a
+fun <S, A> StateT<ForId, S, A>.runS(initial: S): S = runK(initial).a
 
 /**
  * Alias for StateId to make working with `StateT<ForId, S, A>` more elegant.

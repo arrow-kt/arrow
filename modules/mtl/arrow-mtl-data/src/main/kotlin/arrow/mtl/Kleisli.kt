@@ -15,7 +15,10 @@ import arrow.typeclasses.Monad
  */
 typealias KleisliFun<F, D, A> = (D) -> Kind<F, A>
 
+@Deprecated("Kleisli#run can be easily mistaken with the standard library extension function", ReplaceWith("runK(d)"))
 fun <F, D, A> KleisliOf<F, D, A>.run(d: D): Kind<F, A> = fix().run(d)
+
+fun <F, D, A> KleisliOf<F, D, A>.runK(d: D): Kind<F, A> = fix().run(d)
 
 /**
  * [Kleisli] represents a function parameter from [D] to a value `Kind<F, A>`.
@@ -35,7 +38,7 @@ class Kleisli<F, D, A>(val run: KleisliFun<F, D, A>) : KleisliOf<F, D, A>, Kleis
    * @param AF [Applicative] for the context [F].
    */
   fun <B> ap(AF: Applicative<F>, ff: KleisliOf<F, D, (A) -> B>): Kleisli<F, D, B> =
-    AF.run { Kleisli { run(it).ap(ff.run(it)) } }
+    AF.run { Kleisli { run(it).ap(ff.runK(it)) } }
 
   /**
    * Map the end of the arrow [A] to [B] given a function [f].
@@ -55,7 +58,7 @@ class Kleisli<F, D, A>(val run: KleisliFun<F, D, A>) : KleisliOf<F, D, A>, Kleis
    */
   fun <B> flatMap(MF: Monad<F>, f: (A) -> KleisliOf<F, D, B>): Kleisli<F, D, B> = MF.run {
     Kleisli { d ->
-      run(d).flatMap { a -> f(a).run(d) }
+      run(d).flatMap { a -> f(a).runK(d) }
     }
   }
 
@@ -113,7 +116,7 @@ class Kleisli<F, D, A>(val run: KleisliFun<F, D, A>) : KleisliOf<F, D, A>, Kleis
    * @param AE [ApplicativeError] for the context [F].
    */
   fun <E> handleErrorWith(AE: ApplicativeError<F, E>, f: (E) -> KleisliOf<F, D, A>): Kleisli<F, D, A> = AE.run {
-    Kleisli { d -> run(d).handleErrorWith { e -> f(e).run(d) } }
+    Kleisli { d -> run(d).handleErrorWith { e -> f(e).runK(d) } }
   }
 
   companion object {
@@ -134,7 +137,7 @@ class Kleisli<F, D, A>(val run: KleisliFun<F, D, A>) : KleisliOf<F, D, A>, Kleis
      * @param MF [Monad] for the context [F].
      */
     fun <F, D, A, B> tailRecM(MF: Monad<F>, a: A, f: (A) -> KleisliOf<F, D, Either<A, B>>): Kleisli<F, D, B> =
-      Kleisli { d -> MF.tailRecM(a) { f(it).run(d) } }
+      Kleisli { d -> MF.tailRecM(a) { f(it).runK(d) } }
 
     /**
      * Create an arrow for a value of [A].

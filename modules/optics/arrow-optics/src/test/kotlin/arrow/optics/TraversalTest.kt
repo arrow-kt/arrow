@@ -14,7 +14,7 @@ import arrow.core.extensions.listk.traverse.traverse
 import arrow.core.fix
 import arrow.core.k
 import arrow.mtl.map
-import arrow.mtl.run
+import arrow.mtl.runK
 import arrow.optics.mtl.assign
 import arrow.optics.mtl.assignOld
 import arrow.optics.mtl.assign_
@@ -158,78 +158,78 @@ class TraversalTest : UnitSpec() {
 
       "Extract should extract the focus from the state" {
         forAll(Gen.listK(Gen.int())) { ints ->
-          extract().run(ints) ==
+          extract().runK(ints) ==
             State { iis: ListK<Int> ->
               iis toT getAll(iis)
-            }.run(ints)
+            }.runK(ints)
         }
       }
 
       "toState should be an alias to extract" {
         forAll(Gen.listK(Gen.int())) { ints ->
-          toState().run(ints) == extract().run(ints)
+          toState().runK(ints) == extract().runK(ints)
         }
       }
 
       "Extracts with f should be same as extract and map" {
         forAll(Gen.listK(Gen.int()), Gen.functionAToB<Int, String>(Gen.string())) { ints, f ->
-          extractMap(f).run(ints) == extract().map { it.map(f) }.run(ints)
+          extractMap(f).runK(ints) == extract().map { it.map(f) }.runK(ints)
         }
       }
 
       "update f should be same modify f within State and returning new state" {
         forAll(Gen.listK(Gen.int()), Gen.functionAToB<Int, Int>(Gen.int())) { ints, f ->
-          update(f).run(ints) ==
+          update(f).runK(ints) ==
             State<ListK<Int>, ListK<Int>> { iis: ListK<Int> ->
               modify(iis, f)
                 .let { it.fix() toT getAll(it) }
-            }.run(ints)
+            }.runK(ints)
         }
       }
 
       "updateOld f should be same as modify f within State and returning old state" {
         forAll(Gen.listK(Gen.int()), Gen.functionAToB<Int, Int>(Gen.int())) { ints, f ->
-          updateOld(f).run(ints) ==
+          updateOld(f).runK(ints) ==
             State { iis: ListK<Int> ->
               modify(iis, f).fix() toT getAll(iis)
-            }.run(ints)
+            }.runK(ints)
         }
       }
 
       "update_ f should be as modify f within State and returning Unit" {
         forAll(Gen.listK(Gen.int()), Gen.functionAToB<Int, Int>(Gen.int())) { ints, f ->
-          update_(f).run(ints) ==
+          update_(f).runK(ints) ==
             State { iis: ListK<Int> ->
               modify(iis, f).fix() toT Unit
-            }.run(ints)
+            }.runK(ints)
         }
       }
 
       "assign a should be same set a within State and returning new value" {
         forAll(Gen.listK(Gen.int()), Gen.int()) { ints, i ->
-          assign(i).run(ints) ==
+          assign(i).runK(ints) ==
             State { iis: ListK<Int> ->
               set(iis, i)
                 .let { it.fix() toT getAll(it) }
-            }.run(ints)
+            }.runK(ints)
         }
       }
 
       "assignOld f should be same as modify f within State and returning old state" {
         forAll(Gen.listK(Gen.int()), Gen.int()) { ints, i ->
-          assignOld(i).run(ints) ==
+          assignOld(i).runK(ints) ==
             State { iis: ListK<Int> ->
               set(iis, i).fix() toT getAll(iis)
-            }.run(ints)
+            }.runK(ints)
         }
       }
 
       "assign_ f should be as modify f within State and returning Unit" {
         forAll(Gen.listK(Gen.int()), Gen.int()) { ints, i ->
-          assign_(i).run(ints) ==
+          assign_(i).runK(ints) ==
             State { iis: ListK<Int> ->
               set(iis, i).fix() toT Unit
-            }.run(ints)
+            }.runK(ints)
         }
       }
     }

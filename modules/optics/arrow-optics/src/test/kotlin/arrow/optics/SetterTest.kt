@@ -9,7 +9,7 @@ import arrow.core.toT
 import arrow.core.extensions.option.functor.functor
 import arrow.core.getOrElse
 import arrow.mtl.State
-import arrow.mtl.run
+import arrow.mtl.runK
 import arrow.optics.mtl.assign_
 import arrow.optics.mtl.update_
 import arrow.test.UnitSpec
@@ -72,19 +72,19 @@ class SetterTest : UnitSpec() {
 
     "update_ f should be as modify f within State and returning Unit" {
       forAll(genToken, Gen.functionAToB<String, String>(Gen.string())) { generatedToken, f ->
-        tokenSetter.update_(f).run(generatedToken) ==
+        tokenSetter.update_(f).runK(generatedToken) ==
           State { token: Token ->
             tokenSetter.modify(token, f) toT Unit
-          }.run(generatedToken)
+          }.runK(generatedToken)
       }
     }
 
     "assign_ f should be as modify f within State and returning Unit" {
       forAll(genToken, Gen.string()) { generatedToken, string ->
-        tokenSetter.assign_(string).run(generatedToken) ==
+        tokenSetter.assign_(string).runK(generatedToken) ==
           State { token: Token ->
             tokenSetter.set(token, string) toT Unit
-          }.run(generatedToken)
+          }.runK(generatedToken)
       }
     }
   }

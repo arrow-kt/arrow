@@ -18,15 +18,15 @@ class StateTests : UnitSpec() {
 
   init {
     "addOne.run(1) should return Pair(2, 1)" {
-      addOne.run(1) shouldBe Tuple2(2, 1)
+      addOne.runK(1) shouldBe Tuple2(2, 1)
     }
 
     "addOne.map(n -> n).run(1) should return same Pair(2, 1)" {
-      addOne.map(Id.functor()) { n -> n }.run(1) shouldBe Tuple2(2, 1)
+      addOne.map(Id.functor()) { n -> n }.runK(1) shouldBe Tuple2(2, 1)
     }
 
     "addOne.map(n -> n.toString).run(1) should return same Pair(2, \"1\")" {
-      addOne.map(Id.functor(), Int::toString).run(1) shouldBe Tuple2(2, "1")
+      addOne.map(Id.functor(), Int::toString).runK(1) shouldBe Tuple2(2, "1")
     }
 
     "addOne.runS(1) should return 2" {
@@ -38,23 +38,23 @@ class StateTests : UnitSpec() {
     }
 
     "basic" {
-      add1.run(1) shouldBe (2 toT 1)
+      add1.runK(1) shouldBe (2 toT 1)
     }
 
     "just" {
       val s1 = StateApi.just<String, Int>(1)
-      s1.run("foo") shouldBe ("foo" toT 1)
+      s1.runK("foo") shouldBe ("foo" toT 1)
     }
 
     "get" {
       val s1 = StateApi.get<String>()
-      s1.run("foo") shouldBe ("foo" toT "foo")
+      s1.runK("foo") shouldBe ("foo" toT "foo")
     }
 
     "modify" {
       val s1 = StateApi.modify<String> { "bar" }
       val s2 = StateApi.set("bar")
-      s1.run("foo") shouldBe s2.run("foo")
+      s1.runK("foo") shouldBe s2.runK("foo")
     }
   }
 }

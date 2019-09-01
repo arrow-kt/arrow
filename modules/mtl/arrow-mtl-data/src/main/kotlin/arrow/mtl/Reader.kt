@@ -58,7 +58,7 @@ fun <D, A> Reader(run: ReaderFun<D, A>): Reader<D, A> = ReaderT(run.andThen { Id
 fun <D, A> (ReaderFun<D, A>).reader(): Reader<D, A> = ReaderApi.lift(this)
 
 /**
- * Alias for [Kleisli.run]
+ * Alias for [Kleisli.runK]
  *
  * @param d dependency to runId the computation.
  */

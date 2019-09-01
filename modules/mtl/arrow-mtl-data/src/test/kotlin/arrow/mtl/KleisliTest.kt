@@ -28,9 +28,7 @@ import arrow.typeclasses.Const
 import arrow.typeclasses.ConstPartialOf
 import arrow.typeclasses.Eq
 import arrow.typeclasses.conest
-import arrow.typeclasses.const
 import arrow.typeclasses.counnest
-import arrow.typeclasses.value
 import io.kotlintest.runner.junit4.KotlinTestRunner
 import io.kotlintest.shouldBe
 import org.junit.runner.RunWith
@@ -38,19 +36,19 @@ import org.junit.runner.RunWith
 @RunWith(KotlinTestRunner::class)
 class KleisliTest : UnitSpec() {
   private fun <A> TryEQ(): Eq<KleisliOf<ForTry, Int, A>> = Eq { a, b ->
-    a.run(1) == b.run(1)
+    a.runK(1) == b.runK(1)
   }
 
   private fun <A> ConestTryEQ(): Eq<Kind<Conested<Kind<ForKleisli, ForTry>, A>, Int>> = Eq { a, b ->
-    a.counnest().run(1) == b.counnest().run(1)
+    a.counnest().runK(1) == b.counnest().runK(1)
   }
 
   private fun IOEQ(): Eq<Kind<KleisliPartialOf<ForIO, Int>, Int>> = Eq { a, b ->
-    a.run(1).attempt().unsafeRunSync() == b.run(1).attempt().unsafeRunSync()
+    a.runK(1).attempt().unsafeRunSync() == b.runK(1).attempt().unsafeRunSync()
   }
 
   private fun IOEitherEQ(): Eq<Kind<KleisliPartialOf<ForIO, Int>, Either<Throwable, Int>>> = Eq { a, b ->
-    a.run(1).attempt().unsafeRunSync() == b.run(1).attempt().unsafeRunSync()
+    a.runK(1).attempt().unsafeRunSync() == b.runK(1).attempt().unsafeRunSync()
   }
 
   init {
