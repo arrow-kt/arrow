@@ -10,7 +10,7 @@ redirect_from:
 
 {:.intermediate}
 intermediate
-
+TODO: Turn it to Ref instead of Promise
 In functional programming it is very common to encode "behaviors" as data types - common behaviors include `Option` for possibly missing values, `Either` and `Validated` for possible errors, and [`Promise`]({{ '/docs/effects/promise/' | relative_url }}) for asynchronous computations, which has the same purpose as a `Future`, only pure and lazy.
 
 These behaviors tend to show up in functions working on a single piece of data - for instance parsing a single `String` into an `Int`, validating a login, or asynchronously fetching website information for a user.
@@ -24,10 +24,11 @@ import arrow.fx.Promise
 interface Profile
 interface User
 
-fun userInfo(u: User): Promise<ForIO, Profile> = TODO()
+
+fun userInfo(u: User): Promise<ForIO, Profile> = 
 ```
 
-Each function asks only for the data it actually needs; in the case of `userInfo`, a single `User`. Certainly, we could write one that takes a `List<User>` and fetches profile for all of them,but it would be a bit strange. If we just wanted to fetch the profile of just one user, we would either have to wrap it in a `List` or write a separate function that takes in a single user anyways. More fundamentally, functional programming is about building lots of small, independent pieces and composing them to make larger and larger pieces - does this hold true in this case?
+Each function asks only for the data it needs; in the case of `userInfo`, a single `User`. Indeed, we could write one that takes a `List<User>` and fetches profile for all of them, but it would be a bit strange. If we just wanted to fetch the profile of only one user, we would either have to wrap it in a `List` or write a separate function that takes in a single user, nonetheless. More fundamentally, functional programming is about building lots of small, independent pieces and composing them to make larger and larger pieces - does it hold in this case?
 
 Given just `(User) -> Promise<ForIO, Profile>`, what should we do if we want to fetch profiles for a `List<User>`? We could try familiar combinators like map.
 
@@ -36,6 +37,68 @@ fun profilesFor(users: List<User>): List<Promise<ForIO, Profile>> = users.map(::
 ```
 
 Note the return type `List<Promise<ForIO, Profile>>`. This makes sense given the type signatures, but seems unwieldy. We now have a list of asynchronous values, and to work with those values we must then use the combinators on `Promise` for every single one. It would be nicer instead if we could get the aggregate result in a single `Promise`, say a `Promise<ForIO, List<Profile>>`.
+
+### Sequencing
+
+Similar to the latter, you may find yourself with a collection of data, each of which is already in an data type, for instance a `List<Option<A>>` or `List<Promise<ForIO, Profile>>`. To make this easier to work with, you want a `Option<List<A>>` or `Promise<ForIO, List<Profile>>`. Given `Option` and `IO` have an `Applicative` instance, we can traverse over the list with the identity function.
+
+TODO: add Ref example with sequencing
+```kotlin:ank:playground
+import arrow.core.extensions.option.applicative.applicative
+import arrow.core.extensions.option.applicative.map
+import arrow.core.fix
+import arrow.core.identity
+import arrow.core.none
+import arrow.core.some
+import arrow.core.Option
+import arrow.core.extensions.list.traverse.traverse
+
+fun main() {
+  //sampleStart
+  val optionList: Option<List<Int>> =
+    listOf(1.some(), 2.some(), 3.some())
+      .traverse(Option.applicative(), ::identity).fix().map { it.fix() }
+
+  val emptyList: Option<List<Int>> =
+    listOf(1.some(), none(), 3.some())
+      .traverse(Option.applicative(), ::identity).map { it.fix() }
+  //sampleEnd
+  println("optionList = $optionList")
+  println("emptyList = $emptyList")
+}
+```
+
+`Traverse` provides a convenience method `sequence` that does exactly this.
+
+```kotlin:ank:playground
+import arrow.core.Option
+import arrow.core.extensions.list.traverse.sequence
+import arrow.core.extensions.option.applicative.applicative
+import arrow.core.none
+import arrow.core.some
+
+fun main() {
+  //sampleStart
+  val optionList =
+    listOf(1.some(), 2.some(), 3.some())
+      .sequence(Option.applicative())
+
+  val emptyList =
+    listOf(1.some(), none(), 3.some())
+      .sequence(Option.applicative())
+  //sampleEnd
+  println("optionList = $optionList")
+  println("emptyList = $emptyList")
+}
+```
+
+In general this holds:
+
+```kotlin
+map(::f).sequence(AP) == traverse(AP, ::f)
+```
+
+where AP stands for an `Applicative<G>`, which is in the prior snippet `Applicative<ForOption>`.
 
 There exists a much more generalized form that would allow us to parse a `List<String>` or validate credentials for a `List<User>`.
 
@@ -61,8 +124,6 @@ In our above example, `F` is `List`, and `G` is `Option`, `Either`, or `Promise`
 Abstracting away the `G` (still imagining `F` to be `List`), `traverse` says given a collection of data, and a function that takes a piece of data and returns an value `B` wrapped in a container `G`, it will traverse the collection, applying the function and aggregating the values (in a `List`) as it goes.
 
 In the most general form, `Kind<F, A>` is some sort of context `F` which may contain a value `A` (or several). While `List` tends to be among the most general cases, there also exist `Traverse` instances for `Option`, `Either`, and `Validated` (among others).
-
-Essentially, one uses `Traverse`, when there is a function `(A) -> Kind<G, B>` and `G` is an `Applicative` instance, thus `G` provides `just` and `map` functions e.g.: just as `Promise<ForIO, B>` provides and you want to `lift` the previous function to work on `Kind<F, A>` where `F` is a `Traverse` instance - and you still care about `A` (the `Profiles`) `(List<User>)` and return `Kind<G, Kind<F, B>>` e.g.: `Promise<ForIO, List<Profile>>`
 
 ### To fold Or not to fold
 
@@ -215,6 +276,7 @@ Notice that in the `Either` case, should any string fail to parse the entire `tr
 Going back to our `Promise` example, we can get an `Applicative` instance for `IO`, by converting `Promise` to `IO` that runs each `Promise` concurrently. Then when we traverse a `List<A>` with an `(A) -> Promise<ForIO, B>`, we can imagine the traversal as a scatter-gather. Each `A` creates a concurrent computation that will produce a `B` (the scatter), and as the `Promise`s complete they will be gathered back into a `List`.
 
 ```kotlin:ank:playground
+import arrow.Kind
 import arrow.core.ListK
 import arrow.core.k
 import arrow.fx.ForIO
@@ -242,7 +304,7 @@ fun main() {
   fun userInfo(u: User): IO<Profile> =
     promise.flatMap { p -> p.complete(DummyProfile(u)).flatMap { p.get() } }
 
-  fun ListK<User>.processLogin() =
+  fun ListK<User>.processLogin(): Kind<ForIO, ListK<Profile>> =
     traverse(IO.applicative()) { userInfo(it) }
 
   fun program(): IO<Unit> = IO.fx {
@@ -299,72 +361,11 @@ fun processTopics(topics: ListK<Topic>): Job<ListK<Result>> =
 
 Note the nice return type - `Job<List<Result>>`. We now have one aggregate `Job` that when run, will go through each topic and run the topic-specific job, collecting results as it goes. We say "when run" because a `Job` is some function that requires a Context before producing the value we want.
 
-One example of a "context" can be found in the [Spark](http://spark.apache.org/) project. In Spark, information needed to run a Spark job (where the master node is, memory allocated, etc.) resides in a `SparkContext`. Going back to the above example, we can see how one may define topic-specific Spark jobs `(type Job<A> = Reader<SparkContext, A>)` and then run several Spark jobs on a collection of topics via `traverse`. We then get back a `Job<List<Result>>`, which is equivalent to (`SparkContext) -> List<Result>`. When finally passed a `SparkContext`, we can run the job and get our results back.
+One example of a "context" can be found in the [Spark](http://spark.apache.org/) project or in [Android's Context](https://developer.android.com/reference/android/content/Context). In Spark, information needed to run a Spark job (where the master node is, memory allocated, etc.) resides in a `SparkContext`. Going back to the above example, we can see how one may define topic-specific Spark jobs `(type Job<A> = Reader<SparkContext, A>)` and then run several Spark jobs on a collection of topics via `traverse`. We then get back a `Job<List<Result>>`, which is equivalent to (`SparkContext) -> List<Result>`. When finally passed a `SparkContext`, we can run the job and get our results back.
 
 Moreover, the fact that our aggregate job is not tied to any specific `SparkContext` allows us to pass in a `SparkContext` pointing to a production cluster, or (using the exact same job) pass in a test `SparkContext` that just runs locally across threads. This makes testing our large job nice and easy.
 
 Finally, this encoding ensures that all the jobs for each topic run on the exact same cluster. At no point do we manually pass in or thread a `SparkContext` through - that is taken care for us by the (applicative) behavior of `Reader` and therefore by `traverse`.
-
-### Sequencing
-
-Sometimes you may find yourself with a collection of data, each of which is already in an data type, for instance a `List<Option<A>>`. To make this easier to work with, you want a `Option<List<A>>`. Given `Option` has an `Applicative` instance, we can traverse over the list with the identity function.
-
-```kotlin:ank:playground
-import arrow.core.extensions.option.applicative.applicative
-import arrow.core.extensions.option.applicative.map
-import arrow.core.fix
-import arrow.core.identity
-import arrow.core.none
-import arrow.core.some
-import arrow.core.Option
-import arrow.core.extensions.list.traverse.traverse
-
-fun main() {
-  //sampleStart
-  val optionList: Option<List<Int>> =
-    listOf(1.some(), 2.some(), 3.some())
-      .traverse(Option.applicative(), ::identity).fix().map { it.fix() }
-
-  val emptyList: Option<List<Int>> =
-    listOf(1.some(), none(), 3.some())
-      .traverse(Option.applicative(), ::identity).map { it.fix() }
-  //sampleEnd
-  println("optionList = $optionList")
-  println("emptyList = $emptyList")
-}
-```
-
-`Traverse` provides a convenience method `sequence` that does exactly this.
-
-```kotlin:ank:playground
-import arrow.core.Option
-import arrow.core.extensions.list.traverse.sequence
-import arrow.core.extensions.option.applicative.applicative
-import arrow.core.none
-import arrow.core.some
-
-fun main() {
-  //sampleStart
-  val optionList =
-    listOf(1.some(), 2.some(), 3.some())
-      .sequence(Option.applicative())
-
-  val emptyList =
-    listOf(1.some(), none(), 3.some())
-      .sequence(Option.applicative())
-  //sampleEnd
-  println("optionList = $optionList")
-  println("emptyList = $emptyList")
-}
-```
-
-In general this holds:
-
-```kotlin
-map(::f).sequence(AP) == traverse(AP, ::f)
-```
-
-where AP stands for an `Applicative<G>`, which is in the prior snippet `Applicative<ForOption>`.
 
 ### Traversables are Functors
 
