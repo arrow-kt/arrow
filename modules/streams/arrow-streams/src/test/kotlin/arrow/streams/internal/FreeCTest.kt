@@ -132,35 +132,35 @@ class FreeCTest : UnitSpec() {
         FreeC.just<EitherPartialOf<Throwable>, String>(s)
           .map(::identity)
           .flatMap<String> { throw t }
-          .run(Either.monadError()) == Left(t)
+          .runFC(Either.monadError()) == Left(t)
       }
     }
 
     "Running a just value" {
       forAll(Gen.string()) { s ->
         FreeC.just<EitherPartialOf<Throwable>, String>(s)
-          .run(Either.monadError()) == Right(Some(s))
+          .runFC(Either.monadError()) == Right(Some(s))
       }
     }
 
     "Running an error value" {
       forAll(Gen.throwable()) { t ->
         FreeC.raiseError<EitherPartialOf<Throwable>, Int>(t)
-          .run(Either.monadError()) == Left(t)
+          .runFC(Either.monadError()) == Left(t)
       }
     }
 
     "Running an Suspend value" {
       forAll(Gen.string()) { s ->
         FreeC.liftF<EitherPartialOf<Throwable>, String>(s.right())
-          .run(Either.monadError()) == Right(Some(s))
+          .runFC(Either.monadError()) == Right(Some(s))
       }
     }
 
     "Running a deferred value" {
       forAll(Gen.string()) { s ->
         FreeC.defer { FreeC.just<EitherPartialOf<Throwable>, String>(s) }
-          .run(Either.monadError()) == Right(Some(s))
+          .runFC(Either.monadError()) == Right(Some(s))
       }
     }
 
@@ -168,7 +168,7 @@ class FreeCTest : UnitSpec() {
       forAll(Gen.string(), Gen.functionAToB<String, String>(Gen.string())) { s, f ->
         FreeC.just<EitherPartialOf<Throwable>, String>(s)
           .map(f)
-          .run(Either.monadError()) == Right(Some(f(s)))
+          .runFC(Either.monadError()) == Right(Some(f(s)))
       }
     }
 
@@ -176,7 +176,7 @@ class FreeCTest : UnitSpec() {
       forAll(Gen.string(), Gen.functionAToB<String, String>(Gen.string())) { s, f ->
         FreeC.just<EitherPartialOf<Throwable>, String>(s)
           .flatMap { FreeC.just<EitherPartialOf<Throwable>, String>(f(it)) }
-          .run(Either.monadError()) == Right(Some(f(s)))
+          .runFC(Either.monadError()) == Right(Some(f(s)))
       }
     }
 
@@ -184,7 +184,7 @@ class FreeCTest : UnitSpec() {
       forAll(Gen.string(), Gen.throwable()) { s, t ->
         FreeC.just<EitherPartialOf<Throwable>, String>(s)
           .asHandler(t)
-          .run(Either.monadError()) == Left(t)
+          .runFC(Either.monadError()) == Left(t)
       }
     }
 
@@ -204,7 +204,7 @@ class FreeCTest : UnitSpec() {
 
     "Running a interrupted value without errors using Either" {
       FreeC.interrupted<EitherPartialOf<Throwable>, String, Token>(Token(), None)
-        .run(Either.monadError()) shouldBe Right(None)
+        .runFC(Either.monadError()) shouldBe Right(None)
     }
 
     "Running a interrupted value without errors using Try" {
@@ -215,7 +215,7 @@ class FreeCTest : UnitSpec() {
     "Running a interrupted value with errors using Either" {
       forAll(Gen.throwable()) { t ->
         FreeC.interrupted<EitherPartialOf<Throwable>, String, Token>(Token(), t.some())
-          .run(Either.monadError()) == Left(t)
+          .runFC(Either.monadError()) == Left(t)
       }
     }
 
@@ -236,7 +236,7 @@ class FreeCTest : UnitSpec() {
     "Running a FlatMapped value using Either" {
       forAll(Gen.string()) { s ->
         FreeC.FlatMapped(FreeC.just("")) { FreeC.just<EitherPartialOf<Throwable>, String>(s) }
-          .run(Either.monadError()) == Right(Some(s))
+          .runFC(Either.monadError()) == Right(Some(s))
       }
     }
 

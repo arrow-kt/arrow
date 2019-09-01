@@ -269,20 +269,23 @@ fun <F, R> FreeCOf<F, R>.handleErrorWith(h: (Throwable) -> FreeCOf<F, R>): FreeC
     } as FreeC<F, R>
   }
 
+@Deprecated("FreeC#run can be easily mistaken with the standard library extension function", ReplaceWith("runFC(ME)"))
+fun <F, R> FreeCOf<F, R>.run(ME: MonadError<F, Throwable>): Kind<F, Option<R>> = runFC(ME)
+
 /**
  * Runs a [FreeC] structure with [MonadError] in context of [F].
  *
  * @return [None] indicates that the [FreeC] was [FreeC.Interrupted].
  */
 @Suppress("UNCHECKED_CAST", "TooGenericExceptionThrown")
-fun <F, R> FreeCOf<F, R>.run(ME: MonadError<F, Throwable>): Kind<F, Option<R>> = when (val viewL = fix().viewL) {
+fun <F, R> FreeCOf<F, R>.runFC(ME: MonadError<F, Throwable>): Kind<F, Option<R>> = when (val viewL = fix().viewL) {
   is FreeC.Pure -> ME.just(Some(viewL.r))
   is FreeC.Fail -> ME.raiseError(viewL.error)
   is FreeC.Interrupted<F, R, *> -> viewL.deferredError.fold({ ME.just(None) }, { e -> ME.raiseError(e) })
   is ViewL.Companion.View<F, *, R> -> (viewL as ViewL.Companion.View<F, Any?, R>).let { (step, next) ->
     ME.run {
       step.attempt().flatMap { e ->
-        next(Result.fromEither(e)).run(ME)
+        next(Result.fromEither(e)).runFC(ME)
       }
     }
   }
