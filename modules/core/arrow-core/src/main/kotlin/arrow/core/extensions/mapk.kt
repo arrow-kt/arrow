@@ -1,21 +1,27 @@
 package arrow.core.extensions
 
 import arrow.Kind
-import arrow.core.MapK
 import arrow.core.Eval
+import arrow.core.MapK
 import arrow.core.MapKOf
 import arrow.core.MapKPartialOf
+import arrow.core.Option
 import arrow.core.SetK
-import arrow.core.k
-import arrow.core.updated
-import arrow.extension
-import arrow.core.fix
+import arrow.core.extensions.option.applicative.applicative
 import arrow.core.extensions.setk.eq.eq
 import arrow.core.extensions.setk.hash.hash
+import arrow.core.fix
+import arrow.core.identity
+import arrow.core.k
+import arrow.core.sequence
+import arrow.core.updated
+import arrow.extension
 import arrow.typeclasses.Applicative
+import arrow.typeclasses.Apply
 import arrow.typeclasses.Eq
 import arrow.typeclasses.Foldable
 import arrow.typeclasses.Functor
+import arrow.typeclasses.FunctorFilter
 import arrow.typeclasses.Hash
 import arrow.typeclasses.Monoid
 import arrow.typeclasses.Semigroup
@@ -56,6 +62,24 @@ interface MapKSemigroup<K, A> : Semigroup<MapK<K, A>> {
     if (fix().size < b.fix().size) fix().foldLeft<A>(b.fix()) { my, (k, b) -> my.updated(k, b.maybeCombine(my[k])) }
     else b.fix().foldLeft<A>(fix()) { my, (k, a) -> my.updated(k, a.maybeCombine(my[k])) }
   }
+}
+
+@extension
+interface MapKFunctorFilter<K> : FunctorFilter<MapKPartialOf<K>> {
+  override fun <A, B> Kind<MapKPartialOf<K>, A>.filterMap(f: (A) -> Option<B>): Kind<MapKPartialOf<K>, B> =
+    fix().map(f).sequence(Option.applicative()).fix().fold({ emptyMap<K, B>().k() }, ::identity)
+
+  override fun <A, B> Kind<MapKPartialOf<K>, A>.map(f: (A) -> B): Kind<MapKPartialOf<K>, B> =
+    fix().map(f)
+}
+
+@extension
+interface MapKApply<K> : Apply<MapKPartialOf<K>> {
+  override fun <A, B> Kind<MapKPartialOf<K>, A>.ap(ff: Kind<MapKPartialOf<K>, (A) -> B>): Kind<MapKPartialOf<K>, B> =
+    fix().ap(ff.fix())
+
+  override fun <A, B> Kind<MapKPartialOf<K>, A>.map(f: (A) -> B): Kind<MapKPartialOf<K>, B> =
+    fix().map(f)
 }
 
 @extension

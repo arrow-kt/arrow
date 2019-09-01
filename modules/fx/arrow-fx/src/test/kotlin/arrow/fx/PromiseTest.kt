@@ -122,11 +122,11 @@ class PromiseTest : UnitSpec() {
       }
 
       "$label - get blocks until set" {
-        Ref(IO.monadDefer()) { 0 }.flatMap { state ->
+        Ref(IO.monadDefer(), 0).flatMap { state ->
           promise.flatMap { modifyGate ->
             promise.flatMap { readGate ->
-              modifyGate.get().flatMap { state.update { i -> i * 2 }.flatMap { readGate.complete(0) } }.startFiber(ctx).flatMap {
-                state.set(1).flatMap { modifyGate.complete(0) }.startFiber(ctx).flatMap {
+              modifyGate.get().flatMap { state.update { i -> i * 2 }.flatMap { readGate.complete(0) } }.fork(ctx).flatMap {
+                state.set(1).flatMap { modifyGate.complete(0) }.fork(ctx).flatMap {
                   readGate.get().flatMap {
                     state.get()
                   }

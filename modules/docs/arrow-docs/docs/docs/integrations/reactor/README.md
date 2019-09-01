@@ -138,7 +138,6 @@ import arrow.fx.reactor.MonoK
 import arrow.fx.reactor.ForMonoK
 import arrow.fx.reactor.fix
 import arrow.fx.reactor.extensions.monok.monad.monad
-import arrow.free.run
 import arrow.free.stackSafe
 
 fun main() {

@@ -15,7 +15,7 @@ class Validation<out E : Any>(vararg disjunctionSequence: Either<E, *>) {
 }
 
 @Deprecated(
-  message = "This is deprecated in favor of the more general map(either, either, ...) { (a, b, ...) -> result }",
+  message = "This is deprecated and will be deleted in favor of the more general map(either, either, ...) { (a, b, ...) -> result }",
   replaceWith = ReplaceWith(
     expression = "map(p1, p2) { (a, b) -> ifValid(a, b) }",
     imports = arrayOf(
@@ -37,7 +37,7 @@ fun <L : Any, R : Any, R1 : Any, R2 : Any> validate(
 }
 
 @Deprecated(
-  message = "This is deprecated in favor of the more general map(either, either, ...) { (a, b, ...) -> result }",
+  message = "This is deprecated and will be deleted in favor of the more general map(either, either, ...) { (a, b, ...) -> result }",
   replaceWith = ReplaceWith(
     expression = "map(p1, p2, p3) { (a, b, c) -> ifValid(a, b, c) }",
     imports = arrayOf(
@@ -60,7 +60,7 @@ fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any> validate(
 }
 
 @Deprecated(
-  message = "This is deprecated in favor of the more general map(either, either, ...) { (a, b, ...) -> result }",
+  message = "This is deprecated and will be deleted in favor of the more general map(either, either, ...) { (a, b, ...) -> result }",
   replaceWith = ReplaceWith(
     expression = "map(p1, p2, p3, p4) { (a, b, c, d) -> ifValid(a, b, c, d) }",
     imports = arrayOf(
@@ -84,7 +84,7 @@ fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any> validate(
 }
 
 @Deprecated(
-  message = "This is deprecated in favor of the more general map(either, either, ...) { (a, b, ...) -> result }",
+  message = "This is deprecated and will be deleted in favor of the more general map(either, either, ...) { (a, b, ...) -> result }",
   replaceWith = ReplaceWith(
     expression = "map(p1, p2, p3, p4, p5) { (a, b, c, d, e) -> ifValid(a, b, c, d, e) }",
     imports = arrayOf(
@@ -109,7 +109,7 @@ fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any> validat
 }
 
 @Deprecated(
-  message = "This is deprecated in favor of the more general map(either, either, ...) { (a, b, ...) -> result }",
+  message = "This is deprecated and will be deleted in favor of the more general map(either, either, ...) { (a, b, ...) -> result }",
   replaceWith = ReplaceWith(
     expression = "map(p1, p2, p3, p4, p5, p6) { (a, b, c, d, e, f) -> ifValid(a, b, c, d, e, f) }",
     imports = arrayOf(
@@ -135,7 +135,7 @@ fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : An
 }
 
 @Deprecated(
-  message = "This is deprecated in favor of the more general map(either, either, ...) { (a, b, ...) -> result }",
+  message = "This is deprecated and will be deleted in favor of the more general map(either, either, ...) { (a, b, ...) -> result }",
   replaceWith = ReplaceWith(
     expression = "map(p1, p2, p3, p4, p5, p6, p7) { (a, b, c, d, e, f, g) -> ifValid(a, b, c, d, e, f, g) }",
     imports = arrayOf(
@@ -162,7 +162,7 @@ fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : An
 }
 
 @Deprecated(
-  message = "This is deprecated in favor of the more general map(either, either, ...) { (a, b, ...) -> result }",
+  message = "This is deprecated and will be deleted in favor of the more general map(either, either, ...) { (a, b, ...) -> result }",
   replaceWith = ReplaceWith(
     expression = "map(p1, p2, p3, p4, p5, p6, p7, p8) { (a, b, c, d, e, f, g, h) -> ifValid(a, b, c, d, e, f, g, h) }",
     imports = arrayOf(
@@ -190,7 +190,7 @@ fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : An
 }
 
 @Deprecated(
-  message = "This is deprecated in favor of the more general map(either, either, ...) { (a, b, ...) -> result }",
+  message = "This is deprecated and will be deleted in favor of the more general map(either, either, ...) { (a, b, ...) -> result }",
   replaceWith = ReplaceWith(
     expression = "map(p1, p2, p3, p4, p5, p6, p7, p8, p9) { (a, b, c, d, e, f, g, h, i) -> ifValid(a, b, c, d, e, f, g, h, i) }",
     imports = arrayOf(
@@ -219,7 +219,7 @@ fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : An
 }
 
 @Deprecated(
-  message = "This is deprecated in favor of the more general map(either, either, ...) { (a, b, ...) -> result }",
+  message = "This is deprecated and will be deleted in favor of the more general map(either, either, ...) { (a, b, ...) -> result }",
   replaceWith = ReplaceWith(
     expression = "map(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10) { (a, b, c, d, e, f, g, h, i, j) -> ifValid(a, b, c, d, e, f, g, h, i, j) }",
     imports = arrayOf(
@@ -249,7 +249,7 @@ fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : An
 }
 
 @Deprecated(
-  message = "This is deprecated in favor of the more general map(either, either, ...) { (a, b, ...) -> result }",
+  message = "This is deprecated and will be deleted in favor of the more general map(either, either, ...) { (a, b, ...) -> result }",
   replaceWith = ReplaceWith(
     expression = "map(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11) { (a, b, c, d, e, f, g, h, i, j, k) -> ifValid(a, b, c, d, e, f, g, h, i, j, k) }",
     imports = arrayOf(
@@ -280,7 +280,7 @@ fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : An
 }
 
 @Deprecated(
-  message = "This is deprecated in favor of the more general map(either, either, ...) { (a, b, ...) -> result }",
+  message = "This is deprecated and will be deleted in favor of the more general map(either, either, ...) { (a, b, ...) -> result }",
   replaceWith = ReplaceWith(
     expression = "map(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12) { (a, b, c, d, e, f, g, h, i, j, k, l) -> ifValid(a, b, c, d, e, f, g, h, i, j, k, l) }",
     imports = arrayOf(
@@ -312,7 +312,7 @@ fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : An
 }
 
 @Deprecated(
-  message = "This is deprecated in favor of the more general map(either, either, ...) { (a, b, ...) -> result }",
+  message = "This is deprecated and will be deleted in favor of the more general map(either, either, ...) { (a, b, ...) -> result }",
   replaceWith = ReplaceWith(
     expression = "map(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13) { (a, b, c, d, e, f, g, h, i, j, k, l, m) -> ifValid(a, b, c, d, e, f, g, h, i, j, k, l, m) }",
     imports = arrayOf(
@@ -345,7 +345,7 @@ fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : An
 }
 
 @Deprecated(
-  message = "This is deprecated in favor of the more general map(either, either, ...) { (a, b, ...) -> result }",
+  message = "This is deprecated and will be deleted in favor of the more general map(either, either, ...) { (a, b, ...) -> result }",
   replaceWith = ReplaceWith(
     expression = "map(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14) { (a, b, c, d, e, f, g, h, i, j, k, l, m, n) -> ifValid(a, b, c, d, e, f, g, h, i, j, k, l, m, n) }",
     imports = arrayOf(
@@ -379,7 +379,7 @@ fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : An
 }
 
 @Deprecated(
-  message = "This is deprecated in favor of the more general map(either, either, ...) { (a, b, ...) -> result }",
+  message = "This is deprecated and will be deleted in favor of the more general map(either, either, ...) { (a, b, ...) -> result }",
   replaceWith = ReplaceWith(
     expression = "map(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15) { (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o) -> ifValid(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o) }",
     imports = arrayOf(
@@ -414,7 +414,7 @@ fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : An
 }
 
 @Deprecated(
-  message = "This is deprecated in favor of the more general map(either, either, ...) { (a, b, ...) -> result }",
+  message = "This is deprecated and will be deleted in favor of the more general map(either, either, ...) { (a, b, ...) -> result }",
   replaceWith = ReplaceWith(
     expression = "map(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16) { (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o) -> ifValid(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o) }",
     imports = arrayOf(
@@ -450,7 +450,7 @@ fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : An
 }
 
 @Deprecated(
-  message = "This is deprecated in favor of the more general map(either, either, ...) { (a, b, ...) -> result }",
+  message = "This is deprecated and will be deleted in favor of the more general map(either, either, ...) { (a, b, ...) -> result }",
   replaceWith = ReplaceWith(
     expression = "map(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17) { (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p) -> ifValid(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p) }",
     imports = arrayOf(
@@ -487,7 +487,7 @@ fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : An
 }
 
 @Deprecated(
-  message = "This is deprecated in favor of the more general map(either, either, ...) { (a, b, ...) -> result }",
+  message = "This is deprecated and will be deleted in favor of the more general map(either, either, ...) { (a, b, ...) -> result }",
   replaceWith = ReplaceWith(
     expression = "map(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18) { (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q) -> ifValid(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q) }",
     imports = arrayOf(
@@ -525,7 +525,7 @@ fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : An
 }
 
 @Deprecated(
-  message = "This is deprecated in favor of the more general map(either, either, ...) { (a, b, ...) -> result }",
+  message = "This is deprecated and will be deleted in favor of the more general map(either, either, ...) { (a, b, ...) -> result }",
   replaceWith = ReplaceWith(
     expression = "map(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19) { (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r) -> ifValid(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r) }",
     imports = arrayOf(
@@ -564,7 +564,7 @@ fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : An
 }
 
 @Deprecated(
-  message = "This is deprecated in favor of the more general map(either, either, ...) { (a, b, ...) -> result }",
+  message = "This is deprecated and will be deleted in favor of the more general map(either, either, ...) { (a, b, ...) -> result }",
   replaceWith = ReplaceWith(
     expression = "map(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20) { (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s) -> ifValid(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s) }",
     imports = arrayOf(
@@ -604,7 +604,7 @@ fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : An
 }
 
 @Deprecated(
-  message = "This is deprecated in favor of the more general map(either, either, ...) { (a, b, ...) -> result }",
+  message = "This is deprecated and will be deleted in favor of the more general map(either, either, ...) { (a, b, ...) -> result }",
   replaceWith = ReplaceWith(
     expression = "map(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20, p21) { (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t) -> ifValid(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t) }",
     imports = arrayOf(
@@ -645,7 +645,7 @@ fun <L : Any, R : Any, R1 : Any, R2 : Any, R3 : Any, R4 : Any, R5 : Any, R6 : An
 }
 
 @Deprecated(
-  message = "This is deprecated in favor of the more general map(either, either, ...) { (a, b, ...) -> result }",
+  message = "This is deprecated and will be deleted in favor of the more general map(either, either, ...) { (a, b, ...) -> result }",
   replaceWith = ReplaceWith(
     expression = "map(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20, p21, p22) { (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u) -> ifValid(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u) }",
     imports = arrayOf(

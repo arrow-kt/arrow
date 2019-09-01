@@ -2,7 +2,7 @@ package arrow.kindedj
 
 import arrow.Kind
 import arrow.Kind2
-import io.kindedj.HkJ2
+import arrow.HkJ2
 import io.kindedj.Hk as HK_J
 
 class ForConvert private constructor()

@@ -1,0 +1,26 @@
+name: release-trigger
+
+on:
+  push:           # Events that trigger the action
+    branches:       # Array of patterns that match refs/heads
+    - master        # Push events on master branch
+    
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Getting branch information and calling target webhook
+      env: # Or as an environment variable
+        USERTOKEN: ${{ secrets.TRY_ARROW_USERTOKEN }}
+        TARGETURL: ${{ secrets.TRY_ARROW_TARGETURL }}
+        COMMITSHA: ${{ github.sha }}
+        EVENT:     ${{ github.event_name }}
+      run: |
+        echo #############################################
+        echo The event that triggered this was: $EVENT
+        export BRANCH_OR_RELEASE=$(echo ${{ github.ref }} | cut -f3 -d'/')
+        echo "$COMMITSHA and $BRANCH_OR_RELEASE"
+        curl -v -d '{"event_type":  "'"$BRANCH_OR_RELEASE"':'"$COMMITSHA"'"}' -u $USERTOKEN $TARGETURL -H "Accept: application/vnd.github.everest-preview+json" -H "Content-Type: application/json"
+        echo Deployment request submitted to test-actions.
