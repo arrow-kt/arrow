@@ -52,9 +52,11 @@ import org.jetbrains.kotlin.extensions.StorageComponentContainerContributor
 import org.jetbrains.kotlin.incremental.components.LookupTracker
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.org.picocontainer.ComponentAdapter
 import org.jetbrains.kotlin.platform.TargetPlatform
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.kotlin.psi.KtImportInfo
 import org.jetbrains.kotlin.psi.KtModifierListOwner
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.BindingTrace
@@ -63,6 +65,7 @@ import org.jetbrains.kotlin.resolve.checkers.DeclarationChecker
 import org.jetbrains.kotlin.resolve.checkers.DeclarationCheckerContext
 import org.jetbrains.kotlin.resolve.diagnostics.DiagnosticSuppressor
 import org.jetbrains.kotlin.resolve.diagnostics.MutableDiagnosticsWithSuppression
+import org.jetbrains.kotlin.resolve.extensions.ExtraImportsProviderExtension
 import org.jetbrains.kotlin.resolve.extensions.SyntheticResolveExtension
 import org.jetbrains.kotlin.resolve.jvm.diagnostics.JvmDeclarationOrigin
 import org.jetbrains.kotlin.resolve.jvm.extensions.AnalysisHandlerExtension
@@ -84,7 +87,7 @@ import java.util.*
 
 interface MetaComponentRegistrar : ComponentRegistrar {
 
-  fun intercept(): List<ExtensionPhase>
+  fun intercept(): List<Pair<Name, List<ExtensionPhase>>>
 
   fun meta(vararg phases: ExtensionPhase): List<ExtensionPhase> =
     phases.toList()
@@ -229,6 +232,12 @@ interface MetaComponentRegistrar : ComponentRegistrar {
           bindingContext,
           isImplicitModality
         )
+    }
+
+  fun extraImports(extraImports: (ktFile: KtFile) -> Collection<KtImportInfo>): ExtensionPhase.ExtraImports =
+    object : ExtensionPhase.ExtraImports {
+      override fun CompilerContext.extraImports(ktFile: KtFile): Collection<KtImportInfo> =
+        extraImports(ktFile)
     }
 
   fun packageFragmentProvider(getPackageFragmentProvider: CompilerContext.(project: Project, module: ModuleDescriptor, storageManager: StorageManager, trace: BindingTrace, moduleInfo: ModuleInfo?, lookupTracker: LookupTracker) -> PackageFragmentProvider?): ExtensionPhase.PackageProvider =
@@ -437,35 +446,32 @@ interface MetaComponentRegistrar : ComponentRegistrar {
     val messageCollector: MessageCollector? =
       cli { configuration.get(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY, MessageCollector.NONE) }
 
-
     val ctx = CompilerContext(project, messageCollector)
-//    project.picoContainer.componentAdapters.filterIsInstance<ComponentAdapter>().forEach {
-//      println("Compiler Service: <${it.componentKey}> : ${it.componentImplementation}")
-//    }
     registerPostAnalysisContextEnrichment(project, ctx)
-    val initialPhases = meta(
+
+    val initialPhases = listOf(Name.identifier("Initial setup") to meta(
       enableIr(),
       compilerContextService(),
       registerKindAwareTypeChecker()
-    )
-    (initialPhases + intercept()).forEach { phase ->
-      if (phase is ExtensionPhase.PreprocessedVirtualFileFactory) registerPreprocessedVirtualFileFactory(project, phase, ctx)
-      if (phase is ExtensionPhase.Config) registerCompilerConfiguration(project, phase, ctx)
-      if (phase is ExtensionPhase.StorageComponentContainer) registerStorageComponentContainer(project, phase, ctx)
-      if (phase is ExtensionPhase.CollectAdditionalSources) registerCollectAdditionalSources(project, phase, ctx)
-      if (phase is ExtensionPhase.AnalysisHandler) registerAnalysisHandler(project, phase, ctx)
-      if (phase is ExtensionPhase.ClassBuilder) registerClassBuilder(project, phase, ctx)
-      if (phase is ExtensionPhase.Codegen) registerCodegen(project, phase, ctx)
-      if (phase is ExtensionPhase.DeclarationAttributeAlterer) registerDeclarationAttributeAlterer(
-        project,
-        phase,
-        ctx
-      )
-      if (phase is ExtensionPhase.PackageProvider) packageFragmentProvider(project, phase, ctx)
-      if (phase is ExtensionPhase.SyntheticResolver) registerSyntheticResolver(project, phase, ctx)
-      if (phase is ExtensionPhase.IRGeneration) registerIRGeneration(project, phase, ctx)
-      //TODO() if (phase is ExtensionPhase.SyntheticScopeProvider) registerSyntheticScopeProvider(project, phase, ctx)
-      //TODO() not available. if (phase is ExtensionPhase.DiagnosticsSuppressor) registerDiagnosticSuppressor(project, phase, ctx)
+    ))
+    (initialPhases + intercept()).forEach { (plugin, phases) ->
+      println("Registering plugin: $plugin extensions: $phases")
+      phases.forEach { phase ->
+        if (phase is ExtensionPhase.ExtraImports) registerExtraImports(project, phase, ctx)
+        if (phase is ExtensionPhase.PreprocessedVirtualFileFactory) registerPreprocessedVirtualFileFactory(project, phase, ctx)
+        if (phase is ExtensionPhase.Config) registerCompilerConfiguration(project, phase, ctx)
+        if (phase is ExtensionPhase.StorageComponentContainer) registerStorageComponentContainer(project, phase, ctx)
+        if (phase is ExtensionPhase.CollectAdditionalSources) registerCollectAdditionalSources(project, phase, ctx)
+        if (phase is ExtensionPhase.AnalysisHandler) registerAnalysisHandler(project, phase, ctx)
+        if (phase is ExtensionPhase.ClassBuilder) registerClassBuilder(project, phase, ctx)
+        if (phase is ExtensionPhase.Codegen) registerCodegen(project, phase, ctx)
+        if (phase is ExtensionPhase.DeclarationAttributeAlterer) registerDeclarationAttributeAlterer(project, phase, ctx)
+        if (phase is ExtensionPhase.PackageProvider) packageFragmentProvider(project, phase, ctx)
+        if (phase is ExtensionPhase.SyntheticResolver) registerSyntheticResolver(project, phase, ctx)
+        if (phase is ExtensionPhase.IRGeneration) registerIRGeneration(project, phase, ctx)
+        if (phase is ExtensionPhase.SyntheticScopeProvider) registerSyntheticScopeProvider(project, phase, ctx)
+        if (phase is ExtensionPhase.DiagnosticsSuppressor) registerDiagnosticSuppressor(project, phase, ctx)
+      }
     }
   }
 
@@ -479,6 +485,14 @@ interface MetaComponentRegistrar : ComponentRegistrar {
         override fun isSuppressed(diagnostic: Diagnostic): Boolean =
           phase.run { ctx.isSuppressed(diagnostic) }
       })
+  }
+
+  fun registerExtraImports(project: Project, phase: ExtensionPhase.ExtraImports, ctx: CompilerContext) {
+    ExtraImportsProviderExtension.registerExtension(project, object : ExtraImportsProviderExtension {
+      override fun getExtraImports(ktFile: KtFile): Collection<KtImportInfo> =
+        phase.run { ctx.extraImports(ktFile) }
+
+    })
   }
 
   fun registerPreprocessedVirtualFileFactory(project: Project, phase: ExtensionPhase.PreprocessedVirtualFileFactory, ctx: CompilerContext) {
@@ -663,6 +677,13 @@ interface MetaComponentRegistrar : ComponentRegistrar {
       })
     }
     ide {
+      PackageFragmentProviderExtension.registerExtension(project, object : PackageFragmentProviderExtension {
+        override fun getPackageFragmentProvider(project: Project, module: ModuleDescriptor, storageManager: StorageManager, trace: BindingTrace, moduleInfo: ModuleInfo?, lookupTracker: LookupTracker): PackageFragmentProvider? {
+          println("Registering binding trace from package fragment provider extension")
+          ctx.bindingTrace = trace
+          return null
+        }
+      })
       StorageComponentContainerContributor.registerExtension(
         project,
         object : StorageComponentContainerContributor {
@@ -957,15 +978,3 @@ data class ClassDefinition(
   val superName: String,
   val interfaces: List<String>
 )
-
-inline fun <reified A> MockProject.removeComponent(): Unit {
-  val componentAdapter = picoContainer.getComponentAdapterOfType(A::class.java)
-  picoContainer.unregisterComponent(componentAdapter.componentKey)
-}
-
-inline fun <reified A> MockProject.replaceComponent(f: (A) -> A): Unit {
-  val componentAdapter = picoContainer.getComponentAdapterOfType(A::class.java)
-  val facade = componentAdapter.getComponentInstance(picoContainer) as A
-  picoContainer.unregisterComponent(componentAdapter.componentKey)
-  picoContainer.registerComponentInstance(componentAdapter.componentKey, f(facade))
-}

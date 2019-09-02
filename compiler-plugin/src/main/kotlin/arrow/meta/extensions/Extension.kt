@@ -30,6 +30,7 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.kotlin.psi.KtImportInfo
 import org.jetbrains.kotlin.psi.KtModifierListOwner
 import org.jetbrains.kotlin.psi.KtPsiFactory
 import org.jetbrains.kotlin.resolve.BindingContext
@@ -46,6 +47,7 @@ import org.jetbrains.kotlin.synthetic.JavaSyntheticPropertiesScope
 import org.jetbrains.kotlin.types.KotlinType
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicBoolean
 
 interface ExtensionPhase {
 
@@ -54,6 +56,10 @@ interface ExtensionPhase {
   }
 
   object Empty : ExtensionPhase
+
+  interface ExtraImports : ExtensionPhase {
+    fun CompilerContext.extraImports(ktFile: KtFile): Collection<KtImportInfo>
+  }
 
   interface PackageProvider : ExtensionPhase {
     fun CompilerContext.getPackageFragmentProvider(
@@ -226,8 +232,6 @@ class CompilerContext(
   lateinit var files: Collection<KtFile>
   lateinit var bindingTrace: BindingTrace
   lateinit var componentProvider: ComponentProvider
-
-  private val descriptorPhaseState = ConcurrentHashMap<FqName, ClassDescriptor>()
 
   /**
    * updateClassContext can't replace the actual class context just mutate its internal fields since the compiler holds a

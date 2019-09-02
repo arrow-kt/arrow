@@ -33,22 +33,23 @@ import org.jetbrains.kotlin.types.typeUtil.isSubtypeOf
 const val WithMarker = "`*`"
 val ExtensionAnnotation = FqName("arrow.extension")
 
-val MetaComponentRegistrar.typeClasses: List<ExtensionPhase>
+val MetaComponentRegistrar.typeClasses: Pair<Name, List<ExtensionPhase>>
   get() =
-    meta(
-      func(
-        match = { hasExtensionValueParameters() },
-        map = { func ->
-          listOf(
-            """
+    Name.identifier("typeClasses") to
+      meta(
+        func(
+          match = { hasExtensionValueParameters() },
+          map = { func ->
+            listOf(
+              """
               |$modality $visibility fun <$typeParameters> $receiver.$name($valueParameters): $returnType =
               |  ${func.extensionValueParamNames().run(body)}
               |"""
-          )
-        }
-      ),
-      irFunctionAccess { mapValueParameterExtensions(it) }
-    )
+            )
+          }
+        ),
+        irFunctionAccess { mapValueParameterExtensions(it) }
+      )
 
 private fun List<String?>.run(body: Name): String =
   fold(body.asString()) { acc, scope -> "$scope.run { $acc }" }

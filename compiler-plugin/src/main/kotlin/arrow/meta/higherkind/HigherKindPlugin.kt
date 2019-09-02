@@ -16,40 +16,36 @@ import org.jetbrains.kotlin.types.DelegatingSimpleTypeImpl
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
 
-val MetaComponentRegistrar.higherKindedTypes: List<ExtensionPhase>
+val MetaComponentRegistrar.higherKindedTypes: Pair<Name, List<ExtensionPhase>>
   get() =
-    meta(
-      additionalSources(
-        collectAdditionalSourcesAndUpdateConfiguration = { knownSources, configuration, project ->
-          println("additionalSources.collectAdditionalSourcesAndUpdateConfiguration: $knownSources")
-          knownSources
-        }
-      ),
-      classOrObject(::isHigherKindedType) { c ->
-        println("Processing Higher Kind: ${c.name}")
-        listOfNotNull(
-          /** Kind Marker **/
-          "class For$name private constructor() { companion object }",
-          /** Single arg type alias **/
-          "typealias ${name}Of<${typeParameters.invariant}> = arrow.Kind${c.kindAritySuffix}<For$name, ${typeParameters.invariant}>",
-          /** generate partial aliases if this kind has > 1 type parameters **/
-          if (c.arity > 1)
-            "typealias ${name}PartialOf<${c.partialTypeParameters}> = arrow.Kind${c.partialKindAritySuffix}<For$name, ${c.partialTypeParameters}>"
-          else null,
-          /** Class redefinition with kinded super type **/
-          """
+    Name.identifier("higherKindedTypes") to
+      meta(
+        additionalSources(
+          collectAdditionalSourcesAndUpdateConfiguration = { knownSources, configuration, project ->
+            println("additionalSources.collectAdditionalSourcesAndUpdateConfiguration: $knownSources")
+            knownSources
+          }
+        ),
+        classOrObject(::isHigherKindedType) { c ->
+          println("Processing Higher Kind: ${c.name}")
+          listOfNotNull(
+            /** Kind Marker **/
+            "class For$name private constructor() { companion object }",
+            /** Single arg type alias **/
+            "typealias ${name}Of<${typeParameters.invariant}> = arrow.Kind${c.kindAritySuffix}<For$name, ${typeParameters.invariant}>",
+            /** generate partial aliases if this kind has > 1 type parameters **/
+            if (c.arity > 1)
+              "typealias ${name}PartialOf<${c.partialTypeParameters}> = arrow.Kind${c.partialKindAritySuffix}<For$name, ${c.partialTypeParameters}>"
+            else null,
+            /** Class redefinition with kinded super type **/
+            """
               |$modality $visibility $kind $name<$typeParameters>($valueParameters) : ${name}Of<${typeParameters.invariant}> {
               |  $body
               |}
               |"""
-        )
-      },
-      syntheticResolver(
-        generatePackageSyntheticClasses = { thisDescriptor, name, ctx, declarationProvider, result ->
-          println("syntheticResolver.generatePackageSyntheticClasses: $thisDescriptor, result $result")
+          )
         }
       )
-    )
 
 private val Name.invariant: String
   get() = identifier

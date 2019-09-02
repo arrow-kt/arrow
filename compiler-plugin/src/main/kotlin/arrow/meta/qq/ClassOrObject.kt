@@ -28,7 +28,7 @@ interface ClassOrObject : Quote<KtElement, KtClass, ClassOrObject.ClassScope> {
       modality = Name.identifier(ktElement.modalityModifierType()?.value.orEmpty()),
       visibility = Name.identifier(ktElement.visibilityModifierType()?.value.orEmpty()),
       kind = Name.identifier(ktElement.getClassOrInterfaceKeyword()?.text.orEmpty()),
-      name = Name.identifier(ktElement.nameAsSafeName.identifier),
+      name = Name.identifier(ktElement.name ?: ""),
       typeParameters = Name.identifier(ktElement.renderTypeParametersWithVariance()),
       valueParameters = if (ktElement.isInterface()) Name.identifier("")
       else Name.identifier(ktElement.renderValueParameters()),

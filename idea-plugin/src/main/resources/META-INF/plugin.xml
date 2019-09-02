@@ -21,18 +21,13 @@
     <extensions defaultExtensionNs="org.jetbrains.kotlin">
         <storageComponentContainerContributor implementation="arrow.meta.plugin.idea.MetaStorageComponentContainerContributor" />.
         <gradleProjectImportHandler implementation="arrow.meta.plugin.idea.ArrowGradleImportHandler"/>
-        <packageFragmentProviderExtension implementation="arrow.meta.plugin.idea.MetaPackageFragmentProviderExtension" />
-        <completionInformationProvider implementation="arrow.meta.plugin.idea.MetaCompletionInformationProvider" />
-        <syntheticResolveExtension implementation="arrow.meta.plugin.idea.MetaSyntheticResolverExtension"/>
-        <syntheticScopeProviderExtension implementation="arrow.meta.plugin.idea.MetaSyntheticScopeProviderExtension" />
+<!--        <completionInformationProvider implementation="arrow.meta.plugin.idea.MetaCompletionInformationProvider" />-->
+<!--        <syntheticResolveExtension implementation="arrow.meta.plugin.idea.MetaSyntheticResolverExtension"/>-->
+<!--        <syntheticScopeProviderExtension implementation="arrow.meta.plugin.idea.MetaSyntheticScopeProviderExtension" />-->
     </extensions>
     <extensions defaultExtensionNs="com.intellij">
+        <annotator language="kotlin" implementationClass="arrow.meta.plugin.idea.MetaKotlinPsiChecker"/>
         <buildProcess.parametersProvider implementation="arrow.meta.plugin.idea.MetaBuildProcessParametersProvider"/>
-
-<!--        <fileType.fileViewProviderFactory filetype="kt"-->
-<!--                                          implementationClass="arrow.meta.plugin.idea.MetaClassFileViewProviderFactory"/>-->
-
-<!--        <compiler.buildTargetScopeProvider implementation="arrow.meta.plugin.idea.MetaBuildTargetScopeProvider" />-->
     </extensions>
 
 </idea-plugin>
