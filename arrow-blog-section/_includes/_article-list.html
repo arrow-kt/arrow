@@ -1,0 +1,14 @@
+<section id="article-list">
+    <div class="wrapper">
+        <div class="main-flex">
+          {% if page.category %}
+            {% assign post-list = site.categories[page.category] %}
+          {% else %}
+            {% assign post-list = site.posts %}
+          {% endif %}
+          {% for post in post-list %}
+              {% include _article-card.html %}
+          {% endfor %}
+        </div>
+    </div>
+</section>

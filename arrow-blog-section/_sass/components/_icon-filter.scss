@@ -1,0 +1,102 @@
+// ICON-FILTER
+// -----------------------------------------------
+// -----------------------------------------------
+#icon-filter-tag {
+    .icon-row {
+        @include flexbox;
+        @include justify-content(center);
+
+        a {
+            @include flexbox;
+            @include flex-direction(column);
+            @include align-items(center);
+
+            font-size: $tab-font-size;
+            padding: ($base-point-grid * 3);
+            font-weight: bold;
+            line-height: 23px;
+            min-width: 133px;
+
+            &:last-child {
+                padding-right: 0;
+            }
+
+            &:hover {
+                color: $brand-primary;
+                text-decoration: none;
+            }
+        }
+
+        span {
+          font-size: 16px;
+          line-height: 20px;
+          padding-bottom: $base-point-grid / 2;
+          transition: all 0.8s;
+        }
+
+        .icon-item {
+            display: inline-block;
+            padding: ($base-point-grid * 2) 0;
+            font-size: 0.875rem;
+            height: ($base-point-grid * 15);
+        }
+
+        @include bp(medium) {
+            @include flex-wrap(wrap);
+        }
+
+        #allposts {
+            background-image: url('/img/icons/arrow-icons/allposts.svg');
+            height: 100px;
+            width: 75px;
+            background-repeat: no-repeat;
+
+            transition: all 0.8s;
+        }
+
+        #core {
+            background-image: url('/img/icons/arrow-icons/core.svg');
+            height: 100px;
+            width: 75px;
+            background-repeat: no-repeat;
+
+            transition: all 0.8s;
+        }
+
+        #fx {
+            background-image: url('/img/icons/arrow-icons/fx.svg');
+            height: 100px;
+            width: 75px;
+            background-repeat: no-repeat;
+
+            transition: all 0.8s;
+        }
+
+        #optics {
+            background-image: url('/img/icons/arrow-icons/optics.svg');
+            height: 100px;
+            width: 75px;
+            background-repeat: no-repeat;
+
+            transition: all 0.8s;
+        }
+
+        #meta {
+            background-image: url('/img/icons/arrow-icons/meta.svg');
+            height: 100px;
+            width: 75px;
+            background-repeat: no-repeat;
+
+            transition: all 0.8s;
+        }
+
+        #incubator {
+            background-image: url('/img/icons/arrow-icons/incubator.svg');
+            height: 100px;
+            width: 75px;
+            background-repeat: no-repeat;
+
+            transition: all 0.8s;
+        }
+    }
+}
