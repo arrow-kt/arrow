@@ -20,8 +20,8 @@ $optics-color: #00C9AA;
 $incubator-color: #FF9B00;
 $core-color: #2D9DFF;
 $fx-color: #807373;
-$search-background: #1B252A;
-$search-hover: #222C31;
+$search-background: $brand-secondary;
+$search-hover: lighten($search-background, 2%);
 
 
 // Typography
