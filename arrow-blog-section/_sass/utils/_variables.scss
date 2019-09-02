@@ -1,0 +1,80 @@
+// Variables
+// -----------------------------------------------
+// -----------------------------------------------
+
+// Google Fonts
+// -----------------------------------------------
+@import url('https://fonts.googleapis.com/css?family=Montserrat:400,600,700|Source+Code+Pro&display=optional');
+
+// Colors
+// -----------------------------------------------
+$brand-primary: #F5F7F8;
+$brand-secondary: #222c31;
+$brand-tertiary: #C5C8CB;
+$white: rgb(255, 255, 255);
+$link-color: $brand-primary;
+$link-hover: darken($brand-primary, 15%);
+$background-color: $brand-secondary;
+$image-post-background: #3F4F57;
+$optics-color: #00C9AA;
+$incubator-color: #FF9B00;
+$core-color: #2D9DFF;
+$fx-color: #807373;
+$search-background: #1B252A;
+$search-hover: #222C31;
+
+
+// Typography
+// -----------------------------------------------
+$base-font-family: 'Iosevka', monospace;
+$header-font-family: $base-font-family;
+$code-font-family: 'Source Code Pro', monospace;
+//-
+$base-font-color: $brand-primary;
+$header-font-color: $brand-primary;
+//-
+$font-regular: 400;
+$font-medium: 500;
+$font-semibold: 600;
+$font-bold: 700;
+//-
+$base-font-size: 14px;
+$base-line-height: 1.6;
+$tab-font-size: 18px;
+$article-font-size: 16px;
+// Sizes
+// -----------------------------------------------
+$base-point-grid: 8px;
+// Animation
+// -----------------------------------------------
+$base-duration: 250ms;
+$base-timing: ease-in-out;
+
+// Breakpoint
+// -----------------------------------------------
+$bp-xsmall: 350px;
+$bp-small: 480px;
+$bp-medium: 768px;
+$bp-large: 992px;
+$bp-xlarge: 1140px;
+
+// Grid
+// -----------------------------------------------
+$column-1: (1/12*100%);
+$column-2: (2/12*100%);
+$column-3: (3/12*100%);
+$column-4: (4/12*100%);
+$column-5: (5/12*100%);
+$column-6: (6/12*100%);
+$column-7: (7/12*100%);
+$column-8: (8/12*100%);
+$column-9: (9/12*100%);
+$column-10: (10/12*100%);
+$column-11: (11/12*100%);
+$column-12: (12/12*100%);
+$gutter-margin: ($base-point-grid * 4);
+
+// Border
+// -----------------------------------------------
+$border-color: rgba($brand-primary, 0.3);
+$base-border: 1px solid $border-color;

@@ -1,0 +1,46 @@
+// Buttons
+// ----------------------------------------------
+// ----------------------------------------------
+.button {
+  display: block;
+  background: none;
+  border: none;
+  outline: none;
+  text-decoration: none;
+  position: relative;
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  > img {
+    vertical-align: bottom;
+  }
+}
+
+.close {
+  height: 28px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 32px;
+
+  &::before,
+  &::after {
+    background-color: #fff;
+    content: " ";
+    height: 100%;
+    left: 98%;
+    position: absolute;
+    top: 50%;
+    width: 2px;
+  }
+
+  &::before {
+    transform: rotate(45deg);
+  }
+
+  &::after {
+    transform: rotate(-45deg);
+  }
+}

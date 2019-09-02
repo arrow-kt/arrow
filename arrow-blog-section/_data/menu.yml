@@ -1,0 +1,37 @@
+nav:
+    - title: Blog
+      url: /blog
+
+    - title: Github
+      url: https://github.com/arrow-kt/arrow
+
+    - title: License
+      url: https://github.com/arrow-kt/arrow/blob/master/LICENSE
+
+    - title: Media
+      url: /media
+
+icon-filter:
+    - title: All libraries
+      category: allposts
+      icon: "all.svg"
+
+    - title: Arrow Core
+      category: core
+      icon: "core.svg"
+
+    - title: Arrow Fx
+      category: fx
+      icon: "fx.svg"
+
+    - title: Arrow Optics
+      category: optics
+      icon: "optics.svg"
+
+    - title: Arrow Meta
+      category: meta
+      icon: "meta.svg"
+
+    - title: Arrow Incubator
+      category: incubator
+      icon: "incubator.svg"

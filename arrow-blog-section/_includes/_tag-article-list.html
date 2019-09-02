@@ -1,0 +1,23 @@
+{% assign colRaw = site.collections | where:"label", include.collection | first %}
+{% assign col = colRaw.docs %}
+
+<section id="article-list">
+    <div class="wrapper">
+        <div class="main-flex">
+          {% if page.category %}
+            {% assign post-list = site.categories[page.category] %}
+          {% else %}
+            {% assign post-list = site.posts %}
+          {% endif %}
+          {% for post in post-list %}
+              {% for tag in post.tags %}
+                {% assign tagDowncase = tag | downcase %}
+                {% assign pageTagDowncase = page.tag | downcase %}
+                {% if tagDowncase == pageTagDowncase %}
+                  {% include _article-card.html %}
+                {% endif %}
+              {% endfor %}
+          {% endfor %}
+        </div>
+    </div>
+</section>

@@ -1,0 +1,167 @@
+// TAB
+// -----------------------------------------------
+// -----------------------------------------------
+#media-tab {
+    padding: ($base-point-grid * 35) 0 ($base-point-grid * 3) 0;
+
+    .tab-flex {
+        @include flexbox;
+        @include align-items(center);
+        @include justify-content(space-between);
+        padding-bottom: ($base-point-grid * 2);
+        border-bottom: 2px dashed $border-color;
+
+        .tab-title {
+            color: $brand-primary;
+            font-size: 54px;
+            font-weight: bold;
+            line-height: 78px;
+            margin-right: ($base-point-grid * 4);
+        }
+
+        .tab-menu-search {
+            @include flexbox;
+            @include align-items(center);
+
+            .tab-menu {
+                @include flexbox;
+            }
+
+            .tab-item {
+                display: inline-block;
+                padding: ($base-point-grid / 2) 0;
+                margin-right: 30px;
+                font-size: 0.875rem;
+
+                &.active {
+                    padding-bottom: ($base-point-grid / 2);
+                    border-bottom: 2px solid $brand-primary;
+
+                    a {
+                        color: $link-color;
+                    }
+                }
+
+                a {
+                    font-size: $tab-font-size;
+                    padding-bottom: 5px;
+                    font-weight: bold;
+                    line-height: 23px;
+
+                    &:hover {
+                        color: $brand-primary;
+                        text-decoration: none;
+                        border-bottom: 2px solid $brand-primary;
+                    }
+                }
+            }
+
+            #search-container {
+                @include flexbox;
+                @include align-items(flex-start);
+                position: relative;
+
+                padding-left: ($base-point-grid * 3);
+                border-left: 2px solid $border-color;
+
+                #search-input {
+                    color: $brand-primary;
+                    background-color: $brand-secondary;
+                    font-family: $base-font-family;
+                    font-size: $tab-font-size;
+                    width: ($base-point-grid * 7);
+                    margin-left: 12px;
+                    padding-bottom: 4px;
+                    line-height: 23px;
+                    border: none;
+                    -webkit-transition: width 0.9s;
+
+                    &:hover,
+                    &:focus,
+                    &:focus-within {
+                        width: 240px;
+                    }
+                }
+
+
+                #results-container {
+                    max-height: 300px;
+                    overflow-x: auto;
+                    border: $base-border;
+                    width: 300px;
+                    background: $search-background;
+                    position: absolute;
+                    padding: 14px;
+                    left: 0;
+                    top: 50px;
+                    display: none;
+                    z-index: 20;
+                    font-size: 15px;
+
+                    li {
+                        border-bottom: $base-border;
+
+                        &:last-child {
+                          border-bottom: none;
+                        }
+
+                        a {
+                            display: block;
+                            padding: 5px 10px;
+
+                            &:hover {
+                                background: $search-hover;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Responsive
+// -----------------------------------------------
+@include bp(large) {
+    #media-tab {
+        .tab-flex {
+            .tab-title {
+                width: 40%;
+            }
+            .tab-menu-search {
+                .tab-menu {
+                    @include flexbox;
+                    @include flex-wrap(wrap);
+                    @include justify-content(center);
+                }
+            }
+        }
+    }
+}
+
+@include bp(medium) {
+    #media-tab {
+        .tab-flex {
+            .tab-title {
+                width: 60%;
+            }
+            .tab-menu-search {
+                #search-container {
+                    display: none;
+                }
+            }
+        }
+    }
+}
+
+@include bp(xsmall) {
+  #media-tab {
+    .tab-flex {
+        .tab-menu-search {
+            .tab-menu {
+                @include justify-content(end);
+            }
+        }
+    }
+  }
+}

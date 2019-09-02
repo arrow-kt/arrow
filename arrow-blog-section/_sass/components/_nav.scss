@@ -1,0 +1,145 @@
+// Nav
+// -----------------------------------------------
+// -----------------------------------------------
+#site-nav {
+    position: fixed;
+    padding: ($base-point-grid * 5) 0;
+    width: 100%;
+    transition: background-color $base-duration $base-timing, padding $base-duration $base-timing;
+    z-index: 11;
+
+    &.nav-scroll {
+        padding: ($base-point-grid * 2) 0;
+        background: rgba($brand-secondary, 0.95);
+    }
+
+    .nav-flex {
+        @include flexbox;
+        @include justify-content(space-between);
+        @include align-items(center);
+
+        .nav-brand {
+            @include flexbox;
+
+            @include align-items(center);
+            font-family: $base-font-family;
+            font-size: 2.143rem;
+
+            &:visited,
+            &:hover,
+            &:active {
+                text-decoration: none;
+            }
+
+            span {
+              text-transform: uppercase;
+              padding-left: $base-point-grid;
+              font-size: 22px;
+              letter-spacing: 3px;
+            }
+        }
+
+        .nav-menu {
+            position: relative;
+
+            ul {
+              @include flexbox;
+
+              .nav-menu-item {
+                  &:not(:last-child) {
+                      margin-right: ($base-point-grid * 5);
+                  }
+
+                  a {
+                      padding-bottom: 4px;
+                      text-transform: uppercase;
+                      font-size: ($base-point-grid * 2);
+
+                      &:hover,
+                      &:active {
+                          color: $brand-primary;
+                          text-decoration: none;
+                          border-bottom: 2px solid $brand-primary;
+                      }
+                  }
+                  .active {
+                      border-bottom: 2px solid $brand-primary
+                  }
+              }
+            }
+        }
+
+        .nav-icon-open {
+            padding: 16px;
+            margin: -16px;
+            display: none;
+            transition: transform $base-duration $base-timing;
+
+            &:hover {
+              transform: scaleX(1.5);
+            }
+        }
+
+        .nav-icon-close {
+            display: none;
+            padding: 6px;
+            position: absolute;
+            background: $brand-secondary;
+            right: 100%;
+            top: 32px;
+
+            img {
+                display: block;
+                transition: transform .3s ease;
+
+                &:hover {
+                  transform: rotate(180deg);
+                }
+            }
+        }
+    }
+}
+
+// Responsive
+// -----------------------------------------------
+@include bp(medium) {
+    #site-nav {
+        .nav-flex {
+            .nav-menu {
+                position: fixed;
+                padding: ($base-point-grid * 8) ($base-point-grid * 6);
+                background: $brand-secondary;
+                height: 100%;
+                right: -100%;
+                top: 0;
+                width: 50%;
+                z-index: 2;
+                transition: right ($base-duration * 3) $base-timing;
+
+                &.open {
+                  right: 0;
+                }
+
+                ul {
+                  @include flex-direction(column);
+
+                  .nav-menu-item {
+                      padding: $base-point-grid 0;
+                      &:not(:last-child) {
+                          margin-right: 0;
+                      }
+                  }
+                }
+
+            }
+
+            .nav-icon-open {
+              display: block;
+            }
+            .nav-icon-close {
+                display: block;
+                top: ($base-point-grid * 8);
+            }
+        }
+    }
+}
