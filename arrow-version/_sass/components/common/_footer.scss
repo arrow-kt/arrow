@@ -19,6 +19,19 @@
 
       .site-name {
         text-transform: uppercase;
+
+        &.hover-mode {
+          &:hover {
+            color: $white;
+          }
+        }
+      }
+      .company-link {
+        &.hover-mode {
+          &:hover {
+            color: $white;
+          }
+        }
       }
     }
 
@@ -35,11 +48,17 @@
           text-decoration: none;
           border-bottom: 2px solid $brand-primary;
         }
+
+        &.hover-mode {
+          &:hover {
+            color: $white;
+          }
+        }
       }
 
       li {
         &:not(:last-child) {
-          margin-right: ($base-point-grid * 4);
+          margin-right: ($base-point-grid * 5);
         }
       }
     }

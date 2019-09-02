@@ -159,7 +159,7 @@
     }
 
     .incubator-link {
-      &.incubator-hover {
+      &.hover-mode {
         &:hover {
           color: $white;
         }
@@ -174,35 +174,30 @@
         position: absolute;
         opacity: 1;
         transition: $opacity-transition;
-        top: 4px;
       }
 
       #incubator-core-animation {
         position: absolute;
         opacity: 0;
         transition: $opacity-transition;
-        top: 4px;
       }
 
       #incubator-fx-animation {
         position: absolute;
         opacity: 0;
         transition: $opacity-transition;
-        top: 4px;
       }
 
       #incubator-optics-animation {
         position: absolute;
         opacity: 0;
         transition: $opacity-transition;
-        top: 4px;
       }
 
       #incubator-meta-animation {
         position: absolute;
         opacity: 0;
         transition: $opacity-transition;
-        top: 4px;
       }
 
       #incubator-hover-animation {

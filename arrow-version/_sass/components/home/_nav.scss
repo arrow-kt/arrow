@@ -52,6 +52,12 @@
         text-decoration: none;
       }
 
+      &.hover-mode {
+        &:hover {
+          color: $white;
+        }
+      }
+
       img {
         transition: $opacity-transition;
       }
@@ -95,6 +101,12 @@
             &:hover {
               text-decoration: none;
               border-bottom: 2px solid $brand-primary;
+            }
+            
+            &.hover-mode {
+              &:hover {
+                color: $white;
+              }
             }
           }
         }
