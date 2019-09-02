@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="22px" height="25px" viewBox="0 0 22 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 55.2 (78181) - https://sketchapp.com -->
+    <title>icon/talk/white</title>
+    <desc>Created with Sketch.</desc>
+    <g id="icon/talk/white" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <path d="M1,1 L1,17 L5.01803589,17 L5.01803589,21.9988482 L11.646486,17 L21,17 L21,1 L1,1 Z" id="Rectangle" stroke="#F5F7F8" stroke-width="2"></path>
+        <path d="M7,7 L15,7" id="Line" stroke="#F5F7F8" stroke-width="2" stroke-linecap="square"></path>
+        <path d="M7,11 L15,11" id="Line-Copy" stroke="#F5F7F8" stroke-width="2" stroke-linecap="square"></path>
+    </g>
+</svg>

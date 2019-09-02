@@ -1,0 +1,25 @@
+<div id="icon-filter-tag">
+    <div class="wrapper">
+        <ul class="icon-row">
+            {% for icon in site.data.menu.icon-filter %}
+                {% assign icon-cat = icon.category | downcase %}
+                {% if page.tag == nil and icon-cat == 'allposts' %}
+                    {% assign class = "icon-item active" %}
+                    {% assign tabClass = "tab-item active" %}
+                {% elsif page.tag == icon-cat %}
+                    {% assign class = "icon-item active" %}
+                    {% assign tabClass = "tab-item active" %}
+                {% else %}
+                    {% assign class = "icon-item" %}
+                    {% assign tabClass = "tab-item" %}
+                {% endif %}
+                <a href="{% if icon-cat == 'allposts' %}/media{% else %}{{site.data.tags.tag_page_dir}}/{{icon-cat | slugify: 'pretty'}}{% endif %}" alt="{{ icon.title }}">
+                    <li id="icons-filter" class="{{ class }}">
+                        <div id="{{icon.category}}" class="{{ tabClass }}" onmouseover="applyingFocus(this)" onmouseout="losingFocus(this)"></div>
+                    </li>
+                    <span id="{{icon.category}}-span">{{icon.title}}</span>
+                </a>
+            {% endfor %}
+        </ul>
+    </div>
+</div>

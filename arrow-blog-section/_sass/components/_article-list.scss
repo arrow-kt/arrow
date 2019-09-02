@@ -1,0 +1,91 @@
+#article-list {
+    .main-flex {
+        @include flexbox;
+        @include flex-wrap(wrap);
+        @include justify-content(space-between)
+    }
+
+    .article-card {
+        width: 48%;
+        margin: ($base-point-grid * 5) 0;
+        min-height: 100px;
+        background: $brand-secondary;
+        color: $brand-primary;
+
+        .article-card-header {
+            position: relative;
+        }
+
+        .icon {
+            position: absolute;
+            z-index: 10;
+            left: ($base-point-grid * 2);
+            top: ($base-point-grid * 2);
+        }
+
+        .header-container {
+            background: $image-post-background;
+            display: block;
+            height: 200px;
+
+          img {
+              vertical-align: top;
+              height: 200px;
+              object-fit: cover;
+              object-position: center;
+              opacity: 0.4;
+              transition: opacity 0.2s ease-out;
+              width: 100%;
+              &:hover {
+                  opacity: 0.8;
+              }
+          }
+        }
+
+        .bottom-line-image {
+            height: 5px;
+            text-align: left;
+            margin: 0;
+        }
+
+        .blog-item-content {
+            padding: ($base-point-grid * 2) 0;
+
+            h2 {
+                margin-bottom: ($base-point-grid * 2);
+                font-size:  ($base-point-grid * 3);
+                line-height: 30px;
+            }
+
+            p {
+              font-size: $article-font-size;
+              line-height: ($base-point-grid * 3);
+              margin: ($base-point-grid * 2) 0;
+            }
+
+            .tag-post-foot {
+              font-size: $article-font-size;
+              line-height: ($base-point-grid * 3);
+              padding-bottom: 2px;
+              margin: ($base-point-grid / 2) $base-point-grid 0 0;
+
+              @include bp(medium) {
+                  display: inline-block;
+              }
+            }
+
+            ul {
+                margin: ($base-point-grid * 2) 0;
+                li {
+                    color: rgba($brand-primary, 0.4);
+                    font-size: $article-font-size;
+                    line-height: ($base-point-grid * 3);
+                }
+            }
+        }
+
+        @include bp(medium) {
+            width: 100%;
+        }
+    }
+}
