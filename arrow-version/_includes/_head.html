@@ -30,6 +30,18 @@
   <link rel="stylesheet" type="text/css" href="{{ '/css/home-styles.css' | relative_url }}">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.5.6/lottie.min.js" type="text/javascript"></script>
 
+  <!-- Animate.css -->
+  <link rel="stylesheet" href="{{ site.baseurl }}/css/animate.min.css">
+
+  <!-- Arrow playground -->
+  <script src="https://unpkg.com/arrow-playground@1" data-selector="[class^='language-kotlin']"></script>
+
+  <!-- Highlight -->
+  <script src="{{ '/js/highlight.pack.js' | relative_url }}"></script>
+  <script>
+    hljs.initHighlighting();
+  </script>
+
   {% if jekyll.environment == 'production' and site.google_analytics %}
   {% include _google-tag-manager.html %}
   {% endif %}
