@@ -1,7 +1,9 @@
 ---
 library: optics
 ---
-```kotlin:ank:playground
+
+{: data-executable="true"}
+```kotlin
 package example
 import arrow.optics.dsl.*
 

@@ -1,7 +1,9 @@
 ---
 library: fx
 ---
-```kotlin:ank:playground
+
+{: data-executable="true"}
+```kotlin
 import arrow.core.extensions.either.fx.fx
 
 fun saveTheEarth(): Either<NukeException, Impacted> =
