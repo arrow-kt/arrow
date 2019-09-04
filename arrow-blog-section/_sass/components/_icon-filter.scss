@@ -10,12 +10,12 @@
             @include flexbox;
             @include flex-direction(column);
             @include align-items(center);
+            justify-content: space-between;
 
             font-size: $tab-font-size;
-            padding: ($base-point-grid * 3);
             font-weight: bold;
             line-height: 23px;
-            min-width: 133px;
+            min-width: 150px;
 
             &:last-child {
                 padding-right: 0;
@@ -35,68 +35,62 @@
         }
 
         .icon-item {
-            display: inline-block;
-            padding: ($base-point-grid * 2) 0;
+            display: flex;
+            flex-direction: column;
             font-size: 0.875rem;
-            height: ($base-point-grid * 15);
+            position: relative;
         }
 
         @include bp(medium) {
             @include flex-wrap(wrap);
         }
 
-        #allposts {
-            background-image: url('/img/icons/arrow-icons/allposts.svg');
-            height: 100px;
-            width: 75px;
-            background-repeat: no-repeat;
-
-            transition: all 0.8s;
+        #allposts-white {
+          position: absolute;
         }
 
-        #core {
-            background-image: url('/img/icons/arrow-icons/core.svg');
-            height: 100px;
-            width: 75px;
-            background-repeat: no-repeat;
-
-            transition: all 0.8s;
+        #core-white {
+          position: absolute;
         }
 
-        #fx {
-            background-image: url('/img/icons/arrow-icons/fx.svg');
-            height: 100px;
-            width: 75px;
-            background-repeat: no-repeat;
-
-            transition: all 0.8s;
+        #fx-white {
+          position: absolute;
         }
 
-        #optics {
-            background-image: url('/img/icons/arrow-icons/optics.svg');
-            height: 100px;
-            width: 75px;
-            background-repeat: no-repeat;
-
-            transition: all 0.8s;
+        #optics-white {
+          position: absolute;
         }
 
-        #meta {
-            background-image: url('/img/icons/arrow-icons/meta.svg');
-            height: 100px;
-            width: 75px;
-            background-repeat: no-repeat;
-
-            transition: all 0.8s;
+        #meta-white {
+          position: absolute;
         }
 
-        #incubator {
-            background-image: url('/img/icons/arrow-icons/incubator.svg');
-            height: 100px;
-            width: 75px;
-            background-repeat: no-repeat;
+        #incubator-white {
+          position: absolute;
+        }
 
-            transition: all 0.8s;
+        #allposts-color {
+          opacity: 0;
+        }
+
+        #core-color {
+          opacity: 0;
+        }
+
+        #fx-color {
+          opacity: 0;
+        }
+
+        #optics-color {
+          opacity: 0;
+        }
+
+        #meta-color {
+          opacity: 0;
+        }
+
+        #incubator-color {
+          opacity: 0;
         }
     }
 }

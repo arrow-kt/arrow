@@ -1,5 +1,7 @@
 // This initialization requires that this script is loaded with `defer`
 const navElement = document.querySelector("#site-nav");
+const arrowLibraries = document.querySelectorAll('.libraries');
+const arrayArrowLibraries = Array.from(arrowLibraries);
 
 /**
  * Toggle an specific class to the received DOM element.
