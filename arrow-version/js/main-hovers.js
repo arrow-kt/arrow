@@ -1,6 +1,8 @@
 // base elements
 const body = document.getElementById('arrow-main');
 const baseArrowLogo = document.getElementById('base-arrow-animation');
+const homeCodeBlock = document.querySelectorAll('.home-doc-content');
+const arrayHomeCodeBlock = Array.from(homeCodeBlock);
 
 // nav elements
 const siteNav = document.getElementById('site-nav');
@@ -52,6 +54,7 @@ const categoryIconDark = document.getElementsByClassName('cat-icon-dark');
 const arrayCategoryIconDark = Array.from(categoryIconDark);
 const categoryIconColor = document.getElementsByClassName('cat-icon-color');
 const arrayCategoryIconColor = Array.from(categoryIconColor);
+const headerText = document.getElementById('header-text');
 
 // footer elements
 const siteFooter = document.getElementById('site-footer');
@@ -103,6 +106,21 @@ function setOpacity(iconElements, id, opacity) {
   });
 }
 
+function setCodeBlockHidden(elements, id, opacity) {
+  elements.map(function(obj) {
+    if (obj.id.includes(id)) {
+      obj.style.visibility = 'unset';
+      obj.classList.add('active');
+    } else {
+      obj.style.visibility = 'hidden';
+    }
+  });
+}
+
+function hideCodeBlock(elements) {
+  elements.map(el => el.style.visibility = 'hidden');
+}
+
 function animationHoverControl(arrayHeaderAnimation, arrayIncubatorAnimation, id) {
   arrayHeaderAnimation.map(function(obj) {
     return (obj.id.includes(id) ?
@@ -129,10 +147,34 @@ function addClassName(el, name) {
   }
 }
 
+function animateCodeCSS(elements, animationName, id, callback) {
+  elements.map(function(obj) {
+    if(obj.id.includes(id) & !obj.classList.contains('active')) {
+      obj.classList.add('animated', animationName);
+    } else {
+      obj.classList.remove('active');
+    }
+  });
+
+  function handleAnimationEnd() {
+    elements.map(obj => obj.classList.remove('animated', animationName));
+    elements.map(obj => obj.removeEventListener('animationend', handleAnimationEnd));
+    if (typeof callback === 'function') callback();
+  }
+
+  elements.map(function(obj) {
+    if(obj.id.includes(id)) {
+      obj.addEventListener('animationend', handleAnimationEnd);
+    }
+  });
+}
+
 function commonHoverStyle(id, incubatorHover) {
   body.style.setProperty('--color-primary', '#F5F7F8');
+  headerText.style.opacity = 0;
   arrayNavLinks.map(obj => addClassName(obj, 'hover-mode'));
   arrayFooterLinks.map(obj => addClassName(obj, 'hover-mode'));
+  animateCodeCSS(arrayHomeCodeBlock, 'fadeInDown', id);
   navBrandDark.style.opacity = 0;
   navBrandWhite.style.opacity = 1;
   baseArrowLogo.style.opacity = 0;
@@ -146,10 +188,14 @@ function commonHoverStyle(id, incubatorHover) {
     setOpacity(arrayCategoryIconWhite, id, 0.5);
     setOpacity(arrayHeaderCategoryRow, id, 0.5);
     setOpacity(arrayButtonCategoryRoww, id, 0.5);
+    setCodeBlockHidden(arrayHomeCodeBlock, id);
+
   } else {
     setOpacity(arrayCategoryIconWhite, id, 1);
     setOpacity(arrayHeaderCategoryRow, id, 1);
     setOpacity(arrayButtonCategoryRoww, id, 1);
+    headerText.style.opacity = 1;
+    hideCodeBlock(arrayHomeCodeBlock);
   }
   setOpacity(arrayCategoryIconColor, id, 0);
   animationHoverControl(arrayHeaderAnimation, arrayIncubatorAnimation, id);
