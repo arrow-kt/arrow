@@ -28,3 +28,9 @@ tag_permalink_style: pretty
 ignored_tags: []
 
 exclude: ['config.ru', 'Gemfile', 'Gemfile.lock', 'vendor', 'Procfile', 'Rakefile', '.bundle']
+
+
+collections:
+  books:
+    output: true
+    

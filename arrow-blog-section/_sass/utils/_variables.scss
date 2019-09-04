@@ -20,15 +20,15 @@ $optics-color: #00C9AA;
 $incubator-color: #FF9B00;
 $core-color: #2D9DFF;
 $fx-color: #807373;
-$search-background: #1B252A;
-$search-hover: #222C31;
+$search-background: $brand-secondary;
+$search-hover: lighten($search-background, 2%);
 
 
 // Typography
 // -----------------------------------------------
-$base-font-family: 'Iosevka', monospace;
+$base-font-family: 'Iosevka Web';
 $header-font-family: $base-font-family;
-$code-font-family: 'Source Code Pro', monospace;
+$code-font-family: $base-font-family;
 //-
 $base-font-color: $brand-primary;
 $header-font-color: $brand-primary;
@@ -72,7 +72,10 @@ $column-9: (9/12*100%);
 $column-10: (10/12*100%);
 $column-11: (11/12*100%);
 $column-12: (12/12*100%);
+
+$margin-col: 16px;
 $gutter-margin: ($base-point-grid * 4);
+$col-2: calc(50% - #{$margin-col});
 
 // Border
 // -----------------------------------------------

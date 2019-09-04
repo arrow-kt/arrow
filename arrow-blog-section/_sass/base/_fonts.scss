@@ -1,0 +1,30 @@
+// Iosevka Fonts
+// -----------------------------------------------
+@font-face {
+	font-family: 'Iosevka Web';
+	font-weight: 400;
+	font-style: normal;
+	src: url("../fonts/woff2/iosevka-regular.woff2") format('woff2'), url("../fonts/woff/iosevka-regular.woff") format('woff'), url("../fonts/ttf/iosevka-regular.ttf") format('truetype');
+}
+@font-face {
+	font-family: 'Iosevka Web';
+	font-weight: 500;
+	font-style: normal;
+	src: url("../fonts/woff2/iosevka-medium.woff2") format('woff2'), url("../fonts/woff/iosevka-medium.woff") format('woff'), url("../fonts/ttf/iosevka-medium.ttf") format('truetype');
+}
+@font-face {
+	font-family: 'Iosevka Web';
+	font-weight: 600;
+	font-style: normal;
+	src: url("../fonts/woff2/iosevka-semibold.woff2") format('woff2'), url("../fonts/woff/iosevka-semibold.woff") format('woff'), url("../fonts/ttf/iosevka-semibold.ttf") format('truetype');
+}
+@font-face {
+	font-family: 'Iosevka Web';
+	font-weight: 700;
+	font-style: normal;
+	src: url("../fonts/woff2/iosevka-bold.woff2") format('woff2'), url("../fonts/woff/iosevka-bold.woff") format('woff'), url("../fonts/ttf/iosevka-bold.ttf") format('truetype');
+}
+// Google Fonts
+// -----------------------------------------------
+@import url('https://fonts.googleapis.com/css?family=Montserrat:400,600,700|Source+Code+Pro&display=optional');
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:400,600,700&display=swap');
