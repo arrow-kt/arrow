@@ -19,3 +19,13 @@ sass:
     style: compressed
 #-------------------------
 exclude: ['config.ru', 'Gemfile', 'Gemfile.lock', 'vendor', 'Procfile', 'Rakefile', '.bundle']
+#-------------------------
+collections:
+  code:
+    output: true
+
+defaults:
+  - scope:
+      type: code
+    values:
+      layout: code

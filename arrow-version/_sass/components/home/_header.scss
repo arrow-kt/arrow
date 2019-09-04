@@ -12,6 +12,7 @@
     .header-text {
       width: 48%;
       margin-right: $base-point-grid * 10;
+      transition: opacity $base-duration ease-in-out;
 
       h1 {
         font-size: 54px;
@@ -19,6 +20,30 @@
         margin-bottom: $base-point-grid * 3;
         transition: color $base-duration $base-timing;
       }
+    }
+
+    .home-doc-content {
+      position: absolute;
+      min-height: $height-home-code-block;
+      min-width: $width-home-code-block;
+      background-color: $white;
+      z-index: 0;
+    }
+
+    #core-code-block {
+      visibility: hidden;
+    }
+
+    #fx-code-block {
+      visibility: hidden;
+    }
+
+    #optics-code-block {
+      visibility: hidden;
+    }
+
+    #meta-code-block {
+      visibility: hidden;
     }
 
     .header-image {

@@ -4,6 +4,7 @@
 // Utils
 @import "utils/variables";
 @import "utils/mixins/breakpoint";
+@import "utils/mixins/links";
 
 // Base
 @import "base/reset";
@@ -17,3 +18,6 @@
 @import "components/home/header";
 @import "components/home/main";
 @import "components/common/footer";
+@import "components/docs/badges";
+@import "components/docs/doc-body";
+@import "components/docs/doc-content";
