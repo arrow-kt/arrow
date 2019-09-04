@@ -72,7 +72,10 @@ $column-9: (9/12*100%);
 $column-10: (10/12*100%);
 $column-11: (11/12*100%);
 $column-12: (12/12*100%);
+
+$margin-col: 16px;
 $gutter-margin: ($base-point-grid * 4);
+$col-2: calc(50% - #{$margin-col});
 
 // Border
 // -----------------------------------------------

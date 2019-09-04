@@ -1,0 +1,41 @@
+#books {
+    h3 {
+        margin-bottom: ($base-point-grid * 2);
+        padding-top: ($base-point-grid * 4);
+        font-size: 2.25rem;
+        border-top: 2px dashed $border-color;
+    }
+
+
+    .books-flex {
+        display: flex;
+        align-items: stretch;
+
+        .book-item {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            margin-top: ($base-point-grid * 4);
+            margin-right: 30px;
+            width: 200px;
+            padding: ($base-point-grid * 2) ($base-point-grid * 2) ($base-point-grid * 3) ($base-point-grid * 2);
+            border: 1px solid rgba($white, 0.2);
+            
+            transition: background $base-duration $base-timing;
+
+            h4 {
+                font-size: 1.25rem;
+                line-height: 1.4;
+                margin-bottom: ($base-point-grid * 2);
+            }
+
+            img {
+                width: 100%;
+            }
+
+            &:hover {
+                background: rgba($white, 0.02);
+            }
+        }
+    }
+}

@@ -108,7 +108,7 @@
             .nav-menu {
                 position: fixed;
                 padding: ($base-point-grid * 8) ($base-point-grid * 6);
-                background: $brand-secondary;
+                background: rgba($brand-secondary, 0.9);
                 height: 100%;
                 right: -100%;
                 top: 0;

@@ -144,6 +144,7 @@
 
 @include bp(medium) {
     #media-tab {
+        padding: ($base-point-grid * 20) 0 ($base-point-grid * 3) 0;
         .tab-flex {
             .tab-title {
 
