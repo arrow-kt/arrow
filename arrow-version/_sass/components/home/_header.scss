@@ -83,6 +83,10 @@
                     cursor: pointer;
                 }
                 
+                .code-area {
+                    min-height: 300px;
+                }
+                
                 .output-wrapper {
                     max-height: 250px;
                     overflow-y: scroll;
