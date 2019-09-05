@@ -1,8 +1,7 @@
 ---
 library: core
 ---
-{: data-executable="true"}
-```kotlin
+```kotlin:ank:playground
 import arrow.*
 import arrow.core.*
 
