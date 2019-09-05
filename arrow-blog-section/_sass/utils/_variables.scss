@@ -23,7 +23,6 @@ $fx-color: #807373;
 $search-background: $brand-secondary;
 $search-hover: lighten($search-background, 2%);
 
-
 // Typography
 // -----------------------------------------------
 $base-font-family: 'Iosevka Web';
@@ -48,8 +47,9 @@ $base-point-grid: 8px;
 // Animation
 // -----------------------------------------------
 $base-duration: 250ms;
+$doble-duration: 500ms;
 $base-timing: ease-in-out;
-
+$icons-transition: opacity $doble-duration ease;
 // Breakpoint
 // -----------------------------------------------
 $bp-xsmall: 350px;

@@ -3,13 +3,14 @@
 // -----------------------------------------------
 #icon-filter-tag {
     .icon-row {
-        @include flexbox;
-        @include justify-content(center);
+        display: flex;
+        justify-content: center;
+        min-height: 120px;
 
         a {
-            @include flexbox;
-            @include flex-direction(column);
-            @include align-items(center);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             justify-content: space-between;
 
             font-size: $tab-font-size;
@@ -27,70 +28,29 @@
             }
         }
 
-        span {
+        @include bp(medium) {
+            flex-wrap: wrap;
+        }
+
+        #icons-filter {
+          .cat-icon-white {
+            position: absolute;
+            opacity: 0;
+            transition: $icons-transition;
+          }
+
+          .cat-icon-color {
+            opacity: 0;
+            transition: $icons-transition;
+          }
+        }
+
+        .cat-span {
+          opacity: 0;
           font-size: 16px;
           line-height: 20px;
           padding-bottom: $base-point-grid / 2;
-          transition: all 0.8s;
-        }
-
-        .icon-item {
-            display: flex;
-            flex-direction: column;
-            font-size: 0.875rem;
-            position: relative;
-        }
-
-        @include bp(medium) {
-            @include flex-wrap(wrap);
-        }
-
-        #allposts-white {
-          position: absolute;
-        }
-
-        #core-white {
-          position: absolute;
-        }
-
-        #fx-white {
-          position: absolute;
-        }
-
-        #optics-white {
-          position: absolute;
-        }
-
-        #meta-white {
-          position: absolute;
-        }
-
-        #incubator-white {
-          position: absolute;
-        }
-
-        #allposts-color {
-          opacity: 0;
-        }
-
-        #core-color {
-          opacity: 0;
-        }
-
-        #fx-color {
-          opacity: 0;
-        }
-
-        #optics-color {
-          opacity: 0;
-        }
-
-        #meta-color {
-          opacity: 0;
-        }
-
-        #incubator-color {
-          opacity: 0;
+          transition: $icons-transition;
         }
     }
 }

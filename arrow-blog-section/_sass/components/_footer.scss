@@ -9,8 +9,8 @@
     color: $brand-primary;
 
     .footer-flex {
-        @include flexbox;
-        @include justify-content(space-between);
+        display: flex;
+        justify-content: space-between;
         line-height: ($base-point-grid * 3);
 
         .footer-dev {
@@ -18,7 +18,7 @@
         }
 
         .footer-menu {
-            @include flexbox;
+            display: flex;
 
             a {
                 padding-bottom: 4px;

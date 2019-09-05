@@ -1,8 +1,8 @@
 #article-list {
     .main-flex {
-        @include flexbox;
-        @include flex-wrap(wrap);
-        @include justify-content(space-between)
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
     }
 
     .article-card {

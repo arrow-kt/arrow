@@ -14,14 +14,14 @@
     }
 
     .nav-flex {
-        @include flexbox;
-        @include justify-content(space-between);
-        @include align-items(center);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
 
         .nav-brand {
-            @include flexbox;
+            display: flex;
 
-            @include align-items(center);
+            align-items: center;
             font-family: $base-font-family;
             font-size: 2.143rem;
 
@@ -43,7 +43,7 @@
             position: relative;
 
             ul {
-              @include flexbox;
+              display: flex;
 
               .nav-menu-item {
                   &:not(:last-child) {
@@ -121,7 +121,7 @@
                 }
 
                 ul {
-                  @include flex-direction(column);
+                  flex-direction: column;
 
                   .nav-menu-item {
                       padding: $base-point-grid 0;
