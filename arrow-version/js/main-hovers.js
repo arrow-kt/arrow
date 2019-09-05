@@ -1,7 +1,7 @@
 // base elements
 const body = document.getElementById('arrow-main');
 const baseArrowLogo = document.getElementById('base-arrow-animation');
-const homeCodeBlock = document.querySelectorAll('.home-doc-content');
+const homeCodeBlock = document.querySelectorAll('.browser-content');
 const arrayHomeCodeBlock = Array.from(homeCodeBlock);
 
 // nav elements
