@@ -1,5 +1,3 @@
-// const iconFilters = document.querySelectorAll("#icons-filter div");
-// const arrayiconFilters = Array.from(iconFilters);
 const categoryIconWhite = document.getElementsByClassName('cat-icon-white');
 const arrayCategoryIconWhite = Array.from(categoryIconWhite);
 const categoryIconColor = document.getElementsByClassName('cat-icon-color');
