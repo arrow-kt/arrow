@@ -6,11 +6,15 @@
 @import "utils/mixins/breakpoint";
 @import "utils/mixins/links";
 
+// Vendors
+@import "vendors/animate";
+
 // Base
 @import "base/reset";
 @import "base/base";
 @import "base/helpers";
 @import "base/fonts";
+@import "base/animated";
 
 // Components
 @import "components/common/button";

@@ -7,7 +7,7 @@
   padding: ($base-point-grid * 5) 0;
   width: 100%;
   transition: background-color $base-duration $base-timing, padding $base-duration $base-timing;
-  z-index: 2;
+  z-index: 9999999;
 
   &.nav-scroll {
     padding: ($base-point-grid * 2) 0;
