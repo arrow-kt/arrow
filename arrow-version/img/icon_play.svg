@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 57.1 (83088) - https://sketch.com -->
+    <title>icon_play</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="icon_compile-copy-3" fill="#5F6A67">
+            <rect id="path" opacity="0.251511347" x="0" y="0" width="24" height="24" rx="12"></rect>
+            <polygon id="path" transform="translate(13.500000, 12.000000) rotate(-270.000000) translate(-13.500000, -12.000000) " points="13.5 7.5 19.5 16.5 7.5 16.5"></polygon>
+        </g>
+    </g>
+</svg>
