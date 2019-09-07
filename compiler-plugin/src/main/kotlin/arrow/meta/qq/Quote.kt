@@ -149,7 +149,7 @@ inline fun <P : KtElement, reified K : KtElement, S, Q : Quote<P, K, S>> MetaCom
               project.getComponent(PsiManager::class.java),
               virtualFile,
               false
-            ), false)
+            ), true)
             val analyzableFile = ktPsiElementFactory.createAnalyzableFile(virtualFile.name, document.text, originFakeFile)
             val (file, transformations) = processKtFile(analyzableFile, quoteFactory, match, map)
             val transformedFile = transformFile(file, transformations)
@@ -161,9 +161,9 @@ inline fun <P : KtElement, reified K : KtElement, S, Q : Quote<P, K, S>> MetaCom
       syntheticResolver(
         generateSyntheticMethods = { thisDescriptor, name, bindingContext, fromSupertypes, result ->
           analyzer?.run {
-            val syntheticMethods: List<SimpleFunctionDescriptor> = metaSyntheticMethods(thisDescriptor)
+            val syntheticMethods: List<SimpleFunctionDescriptor> = metaSyntheticMethods(name, thisDescriptor)
             result.addAll(syntheticMethods)
-            println("MetaSyntheticResolverExtension.generateSyntheticMethods: $result")
+            println("MetaSyntheticResolverExtension.generateSyntheticMethods for $thisDescriptor $name: $result")
             result
           }
         },

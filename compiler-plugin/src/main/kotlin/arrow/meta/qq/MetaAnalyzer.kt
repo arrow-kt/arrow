@@ -24,5 +24,5 @@ interface MetaAnalyzer {
 
   fun KtFile.metaAnalysys(moduleInfo: ModuleInfo? = null): AnalysisResult
   fun metaSyntheticFunctionNames(thisDescriptor: ClassDescriptor): List<Name>
-  fun metaSyntheticMethods(thisDescriptor: ClassDescriptor): List<SimpleFunctionDescriptor>
+  fun metaSyntheticMethods(name: Name, thisDescriptor: ClassDescriptor): List<SimpleFunctionDescriptor>
 }

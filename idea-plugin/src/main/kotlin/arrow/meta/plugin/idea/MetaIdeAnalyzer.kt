@@ -39,6 +39,10 @@ import kotlin.collections.set
 
 val subscribedToOnFileSave: AtomicBoolean = AtomicBoolean(false)
 
+private val blackList: Set<Name> =
+  listOf("equals", "hashCode", "toString")
+    .map(Name::identifier).toSet()
+
 class SyntheticDescriptorCache(
   val descriptorCache: ConcurrentHashMap<FqName, DeclarationDescriptor> = ConcurrentHashMap()
 ) {
@@ -51,13 +55,20 @@ class SyntheticDescriptorCache(
         MetaRecursiveVisitor(object : DeclarationDescriptorVisitorEmptyBodies<Unit, Unit>() {
           override fun visitDeclarationDescriptor(descriptor: DeclarationDescriptor?, data: Unit?) {
             descriptor?.let {
-              if (descriptor is CallableMemberDescriptor) {
-                if (descriptor.ktFile()?.isMetaFile() == true && descriptor.kind != CallableMemberDescriptor.Kind.FAKE_OVERRIDE) {
-                  println("Added to cache: ${descriptor.fqNameSafe}")
-                  cache.descriptorCache[it.fqNameSafe] = it
+              if (descriptor.name !in blackList) {
+                if (descriptor is CallableMemberDescriptor) { // constructors functions and properties
+                  if (descriptor.ktFile()?.isMetaFile() == true && descriptor.kind != CallableMemberDescriptor.Kind.FAKE_OVERRIDE) {
+                    println("Added to cache: ${descriptor.fqNameSafe}")
+                    cache.descriptorCache[it.fqNameSafe] = it
+                  }
+                }
+                if (descriptor is ClassDescriptor) { // constructors functions and properties
+                  if (descriptor.ktFile()?.isMetaFile() == true) {
+                    println("Added to cache: ${descriptor.fqNameSafe}")
+                    cache.descriptorCache[it.fqNameSafe] = it
+                  }
                 }
               }
-
             }
           }
         }), Unit)
@@ -88,20 +99,30 @@ class MetaIdeAnalyzer : MetaAnalyzer {
   override fun metaSyntheticFunctionNames(thisDescriptor: ClassDescriptor): List<Name> =
     thisDescriptor.syntheticCache?.let {
       val compiledDescriptor = it.descriptorCache[thisDescriptor.fqNameSafe].safeAs<ClassDescriptor>()
-      compiledDescriptor?.let {
+      compiledDescriptor?.let { classDescriptor ->
         val originalNames = thisDescriptor.findPsi().safeAs<KtClassOrObject>()?.functionNames()?.toSet() ?: emptySet()
-        val diff = it.unsubstitutedMemberScope.getFunctionNames().toList() - originalNames
-        diff.toList()
+        val diff = classDescriptor.unsubstitutedMemberScope.getFunctionNames().toList() - originalNames
+        diff - blackList
       }
     } ?: emptyList()
 
-  override fun metaSyntheticMethods(thisDescriptor: ClassDescriptor): List<SimpleFunctionDescriptor> =
+  override fun metaSyntheticMethods(name: Name, thisDescriptor: ClassDescriptor): List<SimpleFunctionDescriptor> =
     thisDescriptor.syntheticCache?.let {
       val compiledDescriptor = it.descriptorCache[thisDescriptor.fqNameSafe].safeAs<ClassDescriptor>()
       compiledDescriptor?.let {
         val compiledFunctions = it.unsubstitutedMemberScope.getContributedDescriptors { true }.filterIsInstance<SimpleFunctionDescriptor>()
-        val originalFunctions = thisDescriptor.findPsi().safeAs<KtClassOrObject>()?.functionNames() ?: emptyList()
-        compiledFunctions.filterNot { it.name in originalFunctions }
+        val originalFunctions = thisDescriptor.unsubstitutedMemberScope.getFunctionNames() ?: emptySet()
+        compiledFunctions.filter { cf ->
+          cf.name == name && cf.name !in originalFunctions && cf.name !in blackList && cf.kind != CallableMemberDescriptor.Kind.FAKE_OVERRIDE
+        }.map { fn ->
+          fn.copy(
+            fn.containingDeclaration,
+            fn.modality,
+            fn.visibility,
+            CallableMemberDescriptor.Kind.SYNTHESIZED,
+            true
+          )
+        }
       }
     } ?: emptyList()
 
