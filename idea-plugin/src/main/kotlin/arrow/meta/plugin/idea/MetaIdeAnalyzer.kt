@@ -7,6 +7,7 @@ import arrow.meta.qq.functionNames
 import arrow.meta.qq.isMetaFile
 import arrow.meta.qq.ktClassOrObject
 import arrow.meta.qq.ktFile
+import arrow.meta.qq.nestedClassNames
 import com.intellij.AppTopics
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.compiler.CompilationStatusListener
@@ -130,6 +131,17 @@ class MetaIdeAnalyzer : MetaAnalyzer {
       }
     } ?: emptyList()
 
+  override fun metaSyntheticNestedClassNames(thisDescriptor: ClassDescriptor): List<Name> =
+    thisDescriptor.syntheticCache?.let {
+      val compiledDescriptor = it.descriptorCache[thisDescriptor.fqNameSafe].safeAs<ClassDescriptor>()
+      compiledDescriptor?.let { classDescriptor ->
+        val originalNames = thisDescriptor.ktClassOrObject()?.nestedClassNames()?.toSet()?.map(Name::identifier) ?: emptyList()
+        val compiledNames = classDescriptor.ktClassOrObject()?.nestedClassNames()?.toSet()?.map(Name::identifier) ?: emptyList()
+        val diff = compiledNames - originalNames
+        diff
+      }
+    } ?: emptyList()
+
   override fun metaSyntheticMethods(name: Name, thisDescriptor: ClassDescriptor): List<SimpleFunctionDescriptor> =
     thisDescriptor.syntheticCache?.let {
       val compiledDescriptor = it.descriptorCache[thisDescriptor.fqNameSafe].safeAs<ClassDescriptor>()
@@ -158,7 +170,7 @@ class MetaIdeAnalyzer : MetaAnalyzer {
         val originalProperties = thisDescriptor.unsubstitutedMemberScope.getVariableNames()
         compiledProperties.filter { cf ->
           cf.name == name && cf.name !in originalProperties && cf.name !in blackList
-        }.map { fn ->
+        }.mapNotNull { fn ->
           fn.copy(
             thisDescriptor,
             fn.modality,
@@ -166,7 +178,7 @@ class MetaIdeAnalyzer : MetaAnalyzer {
             CallableMemberDescriptor.Kind.SYNTHESIZED,
             true
           ).safeAs<PropertyDescriptor>()
-        }.filterNotNull()
+        }
       }
     } ?: emptyList()
 

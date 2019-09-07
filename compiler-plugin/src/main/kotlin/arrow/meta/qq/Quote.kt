@@ -229,6 +229,13 @@ inline fun <P : KtElement, reified K : KtElement, S, Q : Quote<P, K, S>> MetaCom
             println("MetaSyntheticResolverExtension.getSyntheticFunctionNames: $thisDescriptor $result")
             result
           } ?: emptyList()
+        },
+        getSyntheticNestedClassNames = { thisDescriptor ->
+          analyzer?.run {
+            val result = metaSyntheticNestedClassNames(thisDescriptor)
+            println("MetaSyntheticResolverExtension.getSyntheticNestedClassNames: $thisDescriptor $result")
+            result
+          } ?: emptyList()
         }
       )
     )
@@ -377,7 +384,7 @@ fun PackageFragmentDescriptor.packageFiles(declarationProvider: PackageMemberDec
 fun ClassDescriptor.ktClassOrObject(): KtClassOrObject? =
   findPsi() as? KtClassOrObject
 
-fun KtClassOrObject.nestedClassNames() =
+fun KtClassOrObject.nestedClassNames(): List<String> =
   declarations.filterIsInstance<KtClassOrObject>().mapNotNull { it.name }
 
 fun PsiElement.ktFile(): KtFile? =
