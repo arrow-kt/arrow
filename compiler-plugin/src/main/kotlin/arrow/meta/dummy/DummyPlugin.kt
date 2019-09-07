@@ -13,19 +13,23 @@ val MetaComponentRegistrar.dummy: Pair<Name, List<ExtensionPhase>>
           println("Processing Dummy: ${c.name}")
           listOfNotNull(
             """
-              |interface SynthSuperType
-              |
+              |interface SynthSuperType {
+              |  fun fromSynthSuperType(): Unit = println("fromSynthSuperType")
+              |}
             """,
             """
-              |$modality $visibility $kind $name<$typeParameters>($valueParameters) {
+              |$modality $visibility $kind $name<$typeParameters>($valueParameters): SynthSuperType {
               |  $body
               |  fun test2(): String = "Boom!"
               |  fun test(): Unit = println(test2())
               |  
+              |  val xx: Int = 1
+              |  val yy: Double = 0.0
+              |  
               |  class ZZ
               |  class XX
               |  
-              |  companion object
+              |  companion object Factory
               |}
               |"""
           )

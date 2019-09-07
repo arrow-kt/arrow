@@ -242,6 +242,7 @@ class CompilerContext(
     get() = when {
       ::metaAnalyzerField.isInitialized -> metaAnalyzerField
       ::componentProvider.isInitialized -> {
+        //TODO sometimes we get in here before the DI container has finished composing and it blows up
         metaAnalyzerField = componentProvider.get()
         metaAnalyzerField
       }

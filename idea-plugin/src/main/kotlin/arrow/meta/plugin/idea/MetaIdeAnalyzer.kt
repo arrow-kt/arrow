@@ -1,16 +1,25 @@
 package arrow.meta.plugin.idea
 
 import arrow.meta.extensions.CompilerContext
-import arrow.meta.extensions.MetaComponentRegistrar
 import arrow.meta.qq.MetaAnalyzer
 import arrow.meta.qq.Quote
 import arrow.meta.qq.functionNames
 import arrow.meta.qq.isMetaFile
+import arrow.meta.qq.ktClassOrObject
 import arrow.meta.qq.ktFile
 import com.intellij.AppTopics
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.compiler.CompilationStatusListener
+import com.intellij.openapi.compiler.CompileContext
+import com.intellij.openapi.compiler.CompilerTopics
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.fileEditor.FileDocumentManagerListener
+import com.intellij.openapi.fileEditor.FileEditor
+import com.intellij.openapi.fileEditor.FileEditorManager
+import com.intellij.openapi.fileEditor.FileEditorManagerEvent
+import com.intellij.openapi.fileEditor.FileEditorManagerListener
+import com.intellij.openapi.fileEditor.FileEditorProvider
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.UserDataHolderBase
 import com.intellij.openapi.vfs.VirtualFile
@@ -20,10 +29,14 @@ import org.jetbrains.kotlin.analyzer.ModuleInfo
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
+import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
+import org.jetbrains.kotlin.descriptors.PackageViewDescriptor
+import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 import org.jetbrains.kotlin.descriptors.impl.DeclarationDescriptorVisitorEmptyBodies
 import org.jetbrains.kotlin.idea.caches.project.forcedModuleInfo
 import org.jetbrains.kotlin.idea.caches.resolve.analyzeWithAllCompilerChecks
+import org.jetbrains.kotlin.idea.core.util.toPsiFile
 import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
@@ -31,13 +44,14 @@ import org.jetbrains.kotlin.psi.KtClassOrObject
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
-import org.jetbrains.kotlin.resolve.lazy.LazyEntity
+import org.jetbrains.kotlin.resolve.lazy.declarations.ClassMemberDeclarationProvider
+import org.jetbrains.kotlin.resolve.lazy.declarations.PackageMemberDeclarationProvider
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.collections.set
 
-val subscribedToOnFileSave: AtomicBoolean = AtomicBoolean(false)
+val subscribedToEditorHooks: AtomicBoolean = AtomicBoolean(false)
 
 private val blackList: Set<Name> =
   listOf("equals", "hashCode", "toString")
@@ -58,15 +72,21 @@ class SyntheticDescriptorCache(
               if (descriptor.name !in blackList) {
                 if (descriptor is CallableMemberDescriptor) { // constructors functions and properties
                   if (descriptor.ktFile()?.isMetaFile() == true && descriptor.kind != CallableMemberDescriptor.Kind.FAKE_OVERRIDE) {
-                    println("Added to cache: ${descriptor.fqNameSafe}")
+                    println("Callable: Added to cache: ${descriptor.fqNameSafe}")
                     cache.descriptorCache[it.fqNameSafe] = it
                   }
-                }
-                if (descriptor is ClassDescriptor) { // constructors functions and properties
+                } else if (descriptor is ClassDescriptor) { // constructors functions and properties
                   if (descriptor.ktFile()?.isMetaFile() == true) {
-                    println("Added to cache: ${descriptor.fqNameSafe}")
+                    println("Class: Added to cache: ${descriptor.fqNameSafe}")
                     cache.descriptorCache[it.fqNameSafe] = it
                   }
+                } else if (descriptor is PackageViewDescriptor) { // constructors functions and properties
+                  if (descriptor.ktFile()?.isMetaFile() == true) {
+                    println("Package: Added to cache: ${descriptor.fqNameSafe}")
+                    cache.descriptorCache[it.fqNameSafe] = it
+                  }
+                } else {
+                  println("skipped synthetic cache entry: $descriptor: ${descriptor.name}")
                 }
               }
             }
@@ -78,10 +98,14 @@ class SyntheticDescriptorCache(
   }
 }
 
+private data class CacheId(val value: String)
+
+private val VirtualFile.metaCacheId: CacheId
+  get() = CacheId(path)
 
 class MetaIdeAnalyzer : MetaAnalyzer {
 
-  private val cache: ConcurrentHashMap<String, SyntheticDescriptorCache> = ConcurrentHashMap()
+  private val cache: ConcurrentHashMap<CacheId, SyntheticDescriptorCache> = ConcurrentHashMap()
 
   private val FILE_KEY = Key.create<VirtualFile>("FILE_KEY")
 
@@ -91,8 +115,8 @@ class MetaIdeAnalyzer : MetaAnalyzer {
   val DeclarationDescriptor?.syntheticCache: SyntheticDescriptorCache?
     get() = this?.let {
       if (!it.isGenerated()) {
-        val fileName = it.ktFile()?.name
-        fileName.let { name -> cache[name] }
+        val file: VirtualFile? = it.ktFile()?.virtualFile
+        file?.let { cache[it.metaCacheId] }
       } else null
     }
 
@@ -111,17 +135,69 @@ class MetaIdeAnalyzer : MetaAnalyzer {
       val compiledDescriptor = it.descriptorCache[thisDescriptor.fqNameSafe].safeAs<ClassDescriptor>()
       compiledDescriptor?.let {
         val compiledFunctions = it.unsubstitutedMemberScope.getContributedDescriptors { true }.filterIsInstance<SimpleFunctionDescriptor>()
-        val originalFunctions = thisDescriptor.unsubstitutedMemberScope.getFunctionNames() ?: emptySet()
+        val originalFunctions = thisDescriptor.unsubstitutedMemberScope.getFunctionNames()
         compiledFunctions.filter { cf ->
-          cf.name == name && cf.name !in originalFunctions && cf.name !in blackList && cf.kind != CallableMemberDescriptor.Kind.FAKE_OVERRIDE
+          cf.name == name && cf.name !in originalFunctions && cf.name !in blackList
         }.map { fn ->
           fn.copy(
-            fn.containingDeclaration,
+            thisDescriptor,
             fn.modality,
             fn.visibility,
             CallableMemberDescriptor.Kind.SYNTHESIZED,
             true
           )
+        }
+      }
+    } ?: emptyList()
+
+  override fun metaSyntheticProperties(name: Name, thisDescriptor: ClassDescriptor): List<PropertyDescriptor> =
+    thisDescriptor.syntheticCache?.let {
+      val compiledDescriptor = it.descriptorCache[thisDescriptor.fqNameSafe].safeAs<ClassDescriptor>()
+      compiledDescriptor?.let {
+        val compiledProperties = it.unsubstitutedMemberScope.getContributedDescriptors { true }.filterIsInstance<PropertyDescriptor>()
+        val originalProperties = thisDescriptor.unsubstitutedMemberScope.getVariableNames()
+        compiledProperties.filter { cf ->
+          cf.name == name && cf.name !in originalProperties && cf.name !in blackList
+        }.map { fn ->
+          fn.copy(
+            thisDescriptor,
+            fn.modality,
+            fn.visibility,
+            CallableMemberDescriptor.Kind.SYNTHESIZED,
+            true
+          ).safeAs<PropertyDescriptor>()
+        }.filterNotNull()
+      }
+    } ?: emptyList()
+
+  override fun metaCompanionObjectNameIfNeeded(classDescriptor: ClassDescriptor): Name? =
+    classDescriptor.syntheticCache?.let {
+      val compiledDescriptor = it.descriptorCache[classDescriptor.fqNameSafe].safeAs<ClassDescriptor>()
+      compiledDescriptor?.let { c ->
+        c.ktClassOrObject()?.companionObjects?.firstOrNull()?.nameAsSafeName
+      }
+    }
+
+  override fun metaSyntheticPackageClasses(name: Name, packageDescriptor: PackageFragmentDescriptor, declarationProvider: PackageMemberDeclarationProvider): List<ClassDescriptor> =
+    packageDescriptor.syntheticCache?.let {
+      val compiledDescriptor = it.descriptorCache[packageDescriptor.fqNameSafe].safeAs<PackageFragmentDescriptor>()
+      compiledDescriptor?.let {
+        val compiledClasses = it.getMemberScope().getContributedDescriptors { true }.filterIsInstance<ClassDescriptor>()
+        val originalClasses = packageDescriptor.getMemberScope().getClassifierNames() ?: emptySet()
+        compiledClasses.filter { cf ->
+          cf.name == name && cf.name !in originalClasses
+        }
+      }
+    } ?: emptyList()
+
+  override fun metaSyntheticClasses(name: Name, classDescriptor: ClassDescriptor, declarationProvider: ClassMemberDeclarationProvider): List<ClassDescriptor> =
+    classDescriptor.syntheticCache?.let {
+      val compiledDescriptor = it.descriptorCache[classDescriptor.fqNameSafe].safeAs<ClassDescriptor>()
+      compiledDescriptor?.let {
+        val compiledClasses = it.unsubstitutedMemberScope.getContributedDescriptors { true }.filterIsInstance<ClassDescriptor>()
+        val originalClasses = classDescriptor.unsubstitutedMemberScope.getClassifierNames() ?: emptySet()
+        compiledClasses.filter { cf ->
+          cf.name == name && cf.name !in originalClasses
         }
       }
     } ?: emptyList()
@@ -141,31 +217,97 @@ class MetaIdeAnalyzer : MetaAnalyzer {
     return analyzeWithAllCompilerChecks()
   }
 
-  override fun <P : KtElement, K : KtElement, S> MetaComponentRegistrar.subscribeToOnFileSave(
+  override fun <P : KtElement, K : KtElement, S> CompilerContext.subscribeToEditorHooks(
+    project: Project,
     quoteFactory: Quote.Factory<P, K, S>,
     match: K.() -> Boolean,
     map: S.(K) -> List<String>,
-    transformation: (VirtualFile, Document) -> Pair<KtFile, AnalysisResult>): Unit {
-    if (!subscribedToOnFileSave.get()) {
+    transformation: (VirtualFile, Document) -> Pair<KtFile, AnalysisResult>?): Unit {
+    if (!subscribedToEditorHooks.get()) {
       val application = ApplicationManager.getApplication()
-      application.messageBus.connect().subscribe<FileDocumentManagerListener>(
+      val connection = application.messageBus.connect()
+      connection.subscribe<FileEditorManagerListener>(
+        FileEditorManagerListener.FILE_EDITOR_MANAGER,
+        object : FileEditorManagerListener {
+          override fun selectionChanged(event: FileEditorManagerEvent) {
+            println("FileEditorManagerListener.selectionChanged: ${this@MetaIdeAnalyzer} $event")
+            super.selectionChanged(event)
+          }
+
+          override fun fileOpened(source: FileEditorManager, file: VirtualFile) {
+            println("FileEditorManagerListener.fileOpened: ${this@MetaIdeAnalyzer} $file")
+            file.document(project)?.let {
+              println("FileEditorManagerListener.fileOpened: populateSyntheticCache $it")
+              populateSyntheticCache(it, transformation)
+            }
+            super.fileOpened(source, file)
+          }
+
+          override fun fileOpenedSync(source: FileEditorManager, file: VirtualFile, editors: com.intellij.openapi.util.Pair<Array<FileEditor>, Array<FileEditorProvider>>) {
+            println("FileEditorManagerListener.fileOpenedSync: ${this@MetaIdeAnalyzer} $file")
+            super.fileOpenedSync(source, file, editors)
+          }
+
+          override fun fileClosed(source: FileEditorManager, file: VirtualFile) {
+            println("FileEditorManagerListener.fileClosed: ${this@MetaIdeAnalyzer}, removing cache for $file")
+            cache.remove(file.metaCacheId)
+            super.fileClosed(source, file)
+          }
+        }
+      )
+      connection.subscribe<CompilationStatusListener>(
+        CompilerTopics.COMPILATION_STATUS,
+        object : CompilationStatusListener {
+          override fun compilationFinished(aborted: Boolean, errors: Int, warnings: Int, compileContext: CompileContext) {
+            println("CompilationStatusListener.compilationFinished: ${this@MetaIdeAnalyzer} errors: $errors, context: $compileContext")
+            super.compilationFinished(aborted, errors, warnings, compileContext)
+          }
+
+          override fun automakeCompilationFinished(errors: Int, warnings: Int, compileContext: CompileContext) {
+            println("CompilationStatusListener.automakeCompilationFinished: ${this@MetaIdeAnalyzer} errors: $errors, context: $compileContext")
+            super.automakeCompilationFinished(errors, warnings, compileContext)
+          }
+
+          override fun fileGenerated(outputRoot: String, relativePath: String) {
+            println("CompilationStatusListener.fileGenerated: ${this@MetaIdeAnalyzer} $outputRoot $relativePath")
+            super.fileGenerated(outputRoot, relativePath)
+          }
+        }
+      )
+      connection.subscribe<FileDocumentManagerListener>(
         AppTopics.FILE_DOCUMENT_SYNC,
         object : FileDocumentManagerListener {
+          override fun fileContentReloaded(file: VirtualFile, document: Document) {
+            println("MetaOnFileSaveComponent.fileContentReloaded: ${this@MetaIdeAnalyzer} $file")
+            super.fileContentReloaded(file, document)
+          }
+
+          override fun fileContentLoaded(file: VirtualFile, document: Document) {
+            println("MetaOnFileSaveComponent.fileContentLoaded: ${this@MetaIdeAnalyzer} $file")
+            super.fileContentLoaded(file, document)
+          }
+
           override fun beforeDocumentSaving(document: Document) {
-            document.getFile()?.let { file ->
-              val (ktFile, result) = transformation(file, document)
-              println("Added cache transformation: $result")
-              cache[file.name] = SyntheticDescriptorCache.fromAnalysis(ktFile, result)
-            }
+            populateSyntheticCache(document, transformation)
             println("MetaOnFileSaveComponent.beforeDocumentSaving: ${this@MetaIdeAnalyzer} $document")
           }
         })
-      subscribedToOnFileSave.set(true)
+      subscribedToEditorHooks.set(true)
+    }
+  }
+
+  override fun populateSyntheticCache(document: Document, transformation: (VirtualFile, Document) -> Pair<KtFile, AnalysisResult>?) {
+    document.getFile()?.let { file ->
+      transformation(file, document)?.let { (ktFile, result) ->
+        cache[file.metaCacheId] = SyntheticDescriptorCache.fromAnalysis(ktFile, result)
+        println("Added cache transformation: cache[${file.name}] $result")
+      }
     }
   }
 
 }
 
-
+fun VirtualFile.document(project: Project): Document? =
+  toPsiFile(project)?.viewProvider?.document
 
 

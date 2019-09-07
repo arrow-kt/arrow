@@ -5,6 +5,11 @@ import arrow.meta.extensions.ExtensionPhase
 import arrow.meta.extensions.MetaComponentRegistrar
 import arrow.meta.utils.cli
 import arrow.meta.utils.ide
+import org.jetbrains.kotlin.analyzer.AnalysisResult
+import org.jetbrains.kotlin.analyzer.ModuleInfo
+import org.jetbrains.kotlin.com.intellij.openapi.editor.Document
+import org.jetbrains.kotlin.com.intellij.openapi.project.Project
+import org.jetbrains.kotlin.com.intellij.openapi.vfs.VirtualFile
 import org.jetbrains.kotlin.com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.com.intellij.psi.PsiManager
 import org.jetbrains.kotlin.com.intellij.psi.SingleRootFileViewProvider
@@ -15,6 +20,7 @@ import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.PackageViewDescriptor
+import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 import org.jetbrains.kotlin.descriptors.SourceElement
 import org.jetbrains.kotlin.descriptors.TypeParameterDescriptor
@@ -120,6 +126,28 @@ fun MetaComponentRegistrar.classOrObject(
 ): ExtensionPhase =
   quote(ClassOrObject.Companion, match, map)
 
+inline fun <P : KtElement, reified K : KtElement, S, Q : Quote<P, K, S>> MetaAnalyzer.runMetaCompilation(
+  compilerContext: CompilerContext,
+  project: Project,
+  virtualFile: VirtualFile,
+  document: Document,
+  moduleInfo: ModuleInfo,
+  quoteFactory: Quote.Factory<P, K, S>,
+  noinline match: K.() -> Boolean,
+  noinline map: S.(K) -> List<String>
+): Pair<KtFile, AnalysisResult> = compilerContext.run {
+    val originFakeFile = KtFile(SingleRootFileViewProvider(
+      project.getComponent(PsiManager::class.java),
+      virtualFile,
+      false
+    ), true)
+    val analyzableFile = ktPsiElementFactory.createAnalyzableFile(virtualFile.name, document.text, originFakeFile)
+    val (file, transformations) = processKtFile(analyzableFile, quoteFactory, match, map)
+    val transformedFile = transformFile(file, transformations)
+    transformedFile to transformedFile.metaAnalysys(moduleInfo)
+  }
+
+
 @Suppress("UNCHECKED_CAST")
 inline fun <P : KtElement, reified K : KtElement, S, Q : Quote<P, K, S>> MetaComponentRegistrar.quote(
   quoteFactory: Quote.Factory<P, K, S>,
@@ -144,33 +172,61 @@ inline fun <P : KtElement, reified K : KtElement, S, Q : Quote<P, K, S>> MetaCom
     ExtensionPhase.CompositePhase(
       packageFragmentProvider { project, module, storageManager, trace, moduleInfo, lookupTracker ->
         analyzer?.run {
-          subscribeToOnFileSave(quoteFactory, match, map) { virtualFile, document ->
-            val originFakeFile = KtFile(SingleRootFileViewProvider(
-              project.getComponent(PsiManager::class.java),
-              virtualFile,
-              false
-            ), true)
-            val analyzableFile = ktPsiElementFactory.createAnalyzableFile(virtualFile.name, document.text, originFakeFile)
-            val (file, transformations) = processKtFile(analyzableFile, quoteFactory, match, map)
-            val transformedFile = transformFile(file, transformations)
-            transformedFile to transformedFile.metaAnalysys(moduleInfo)
+          moduleInfo?.let { info ->
+            subscribeToEditorHooks(project, quoteFactory, match, map) { virtualFile, document ->
+              runMetaCompilation(this@packageFragmentProvider, project, virtualFile, document, info, quoteFactory, match, map)
+            }
+//
+//            val (file, analysysResult) = runMetaCompilation(this@packageFragmentProvider, project, virtualFile, document, info, quoteFactory, match, map)
+//            populateSyntheticCache(doc)
           }
         }
         null
       },
       syntheticResolver(
+        getSyntheticCompanionObjectNameIfNeeded = { thisDescriptor ->
+          analyzer?.run {
+            val companionName: Name? = metaCompanionObjectNameIfNeeded(thisDescriptor)
+            println("MetaSyntheticResolverExtension.getSyntheticCompanionObjectNameIfNeeded for $thisDescriptor name: [$companionName]")
+            companionName
+          }
+        },
+        generateSyntheticClasses = { thisDescriptor, name, ctx, declarationProvider, result ->
+          analyzer?.run {
+            val syntheticClasses: List<ClassDescriptor> = metaSyntheticClasses(name, thisDescriptor, declarationProvider)
+            result.addAll(syntheticClasses)
+            println("MetaSyntheticResolverExtension.generateSyntheticClasses for $thisDescriptor [$name]: $result")
+            result
+          }
+        },
+        generatePackageSyntheticClasses = { thisDescriptor, name, ctx, declarationProvider, result ->
+            analyzer?.run {
+              val synthetic: List<ClassDescriptor> = metaSyntheticPackageClasses(name, thisDescriptor, declarationProvider)
+              result.addAll(synthetic)
+              println("MetaSyntheticResolverExtension.generatePackageSyntheticClasses for $thisDescriptor [$name]: $result")
+              result
+            }
+        },
         generateSyntheticMethods = { thisDescriptor, name, bindingContext, fromSupertypes, result ->
           analyzer?.run {
-            val syntheticMethods: List<SimpleFunctionDescriptor> = metaSyntheticMethods(name, thisDescriptor)
-            result.addAll(syntheticMethods)
-            println("MetaSyntheticResolverExtension.generateSyntheticMethods for $thisDescriptor $name: $result")
+            val synthetic: List<SimpleFunctionDescriptor> = metaSyntheticMethods(name, thisDescriptor)
+            result.addAll(synthetic)
+            println("MetaSyntheticResolverExtension.generateSyntheticMethods for $thisDescriptor [$name]: $result")
+            result
+          }
+        },
+        generateSyntheticProperties = { thisDescriptor, name, bindingContext, fromSupertypes, result ->
+          analyzer?.run {
+            val synthetic: List<PropertyDescriptor> = metaSyntheticProperties(name, thisDescriptor)
+            result.addAll(synthetic)
+            println("MetaSyntheticResolverExtension.generateSyntheticMethods for $thisDescriptor [$name]: $result")
             result
           }
         },
         getSyntheticFunctionNames = { thisDescriptor ->
           analyzer?.run {
             val result = metaSyntheticFunctionNames(thisDescriptor)
-            println("MetaSyntheticResolverExtension.getSyntheticFunctionNames: $result")
+            println("MetaSyntheticResolverExtension.getSyntheticFunctionNames: $thisDescriptor $result")
             result
           } ?: emptyList()
         }
