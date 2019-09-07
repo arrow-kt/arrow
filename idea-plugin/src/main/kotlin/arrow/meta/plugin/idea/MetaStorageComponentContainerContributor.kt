@@ -10,20 +10,20 @@ import org.jetbrains.kotlin.container.StorageComponentContainer
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.extensions.StorageComponentContainerContributor
 import org.jetbrains.kotlin.platform.TargetPlatform
+import java.util.concurrent.atomic.AtomicBoolean
 
 val metaPlugin = MetaPlugin()
 
-private var registered = false
+private val registered = AtomicBoolean(false)
 
 class MetaStorageComponentContainerContributor : StorageComponentContainerContributor {
 
   override fun registerModuleComponents(container: StorageComponentContainer, platform: TargetPlatform, moduleDescriptor: ModuleDescriptor) {
-    if (!registered) {
+    if (!registered.getAndSet(true)) {
       val project = currentProject()
       if (project != null) {
         val configuration = CompilerConfiguration()
         metaPlugin.registerIdeProjectComponents(project, configuration)
-        registered = true
         println("registerIdeProjectComponents DONE")
       }
     }
@@ -31,7 +31,7 @@ class MetaStorageComponentContainerContributor : StorageComponentContainerContri
   }
 }
 
-private fun currentProject(): Project? =
+fun currentProject(): Project? =
   ProjectManager.getInstance().openProjects.firstOrNull { project ->
     val window = WindowManager.getInstance().suggestParentWindow(project)
     (window != null && window.isActive)

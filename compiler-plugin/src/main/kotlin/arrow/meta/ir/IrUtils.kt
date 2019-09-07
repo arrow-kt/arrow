@@ -74,45 +74,6 @@ class IrUtils(
       compilerContext.ktPsiElementFactory.createExpression(code)
     )
 
-  fun irFunction(pckg: FqName, code: String): IrFunction =
-    FunctionGenerator(declarationGenerator)
-      .generateFunctionDeclaration(compilerContext.ktPsiElementFactory.createFunction(code).also { ktNamedFunction ->
-        val packageDescriptor: PackageViewDescriptor = compilerContext.module.getPackage(pckg)
-        val lazyClassContext: LazyClassContext = compilerContext.componentProvider.get()
-        val functionDescriptorResolver: FunctionDescriptorResolver = compilerContext.componentProvider.get()
-        val descriptor = functionDescriptorResolver.resolveFunctionDescriptor(
-          packageDescriptor,
-          lazyClassContext.declarationScopeProvider.getResolutionScopeForDeclaration(ktNamedFunction),
-          ktNamedFunction,
-          lazyClassContext.trace,
-          DataFlowInfo.EMPTY
-        )
-      })
-
-  fun irClass(pckg: FqName, code: String): IrClass =
-    ClassGenerator(declarationGenerator)
-      .generateClass(compilerContext.ktPsiElementFactory.createClass(code).also {
-        val packageDescriptor: PackageViewDescriptor = compilerContext.module.getPackage(pckg)
-        val lazyClassContext: LazyClassContext = compilerContext.componentProvider.get()
-        //internally registers itself in the binding trace
-        val descriptor = SyntheticClassOrObjectDescriptor(
-          c = lazyClassContext,
-          parentClassOrObject = packageSyntheticDeclaration(packageDescriptor),
-          containingDeclaration = packageDescriptor,
-          name = it.nameAsSafeName,
-          source = SourceElement.NO_SOURCE,
-          outerScope = lazyClassContext.declarationScopeProvider.getResolutionScopeForDeclaration(it),
-          modality = Modality.FINAL,
-          visibility = Visibilities.PUBLIC,
-          annotations = Annotations.EMPTY,
-          constructorVisibility = Visibilities.PUBLIC,
-          kind = ClassKind.CLASS,
-          isCompanionObject = false
-        ).also { it.initialize() }
-        lazyClassContext.trace.record(BindingContext.CLASS, it, descriptor)
-//        MetaReplacedClassDescriptor(compilerContext, compilerContext.componentProvider.get(), packageDescriptor ,it)
-      })
-
   private fun packageSyntheticDeclaration(
     packageDescriptor: PackageViewDescriptor
   ): KtPureClassOrObject =

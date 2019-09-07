@@ -9,7 +9,7 @@ val MetaComponentRegistrar.dummy: Pair<Name, List<ExtensionPhase>>
   get() =
     Name.identifier("Dummy") to
       meta(
-        classOrObject({ true }) { c ->
+        classOrObject({ name == "TestClass" }) { c ->
           println("Processing Dummy: ${c.name}")
           listOfNotNull(
             """
@@ -17,14 +17,15 @@ val MetaComponentRegistrar.dummy: Pair<Name, List<ExtensionPhase>>
               |
             """,
             """
-              |$modality $visibility $kind $name<$typeParameters>($valueParameters): java.lang.Serializable {
+              |$modality $visibility $kind $name<$typeParameters>($valueParameters) {
               |  $body
-              |  fun test(): Unit = println("Boom!")
+              |  fun test2(): String = "Boom!"
+              |  fun test(): Unit = println(test2())
+              |  
               |  class ZZ
-              |  class YY
-              |  companion object Factory {
-              |    fun test(): Unit = println("Boom!")
-              |  }
+              |  class XX
+              |  
+              |  companion object
               |}
               |"""
           )

@@ -1,13 +1,12 @@
 package arrow.meta.extensions
 
 import arrow.meta.higherkind.KindAwareTypeChecker
-import arrow.meta.utils.setFinalStatic
 import arrow.meta.utils.NoOp3
 import arrow.meta.utils.NoOp6
 import arrow.meta.utils.NullableOp1
 import arrow.meta.utils.cli
-import arrow.meta.utils.foldRuntime
 import arrow.meta.utils.ide
+import arrow.meta.utils.setFinalStatic
 import org.jetbrains.kotlin.analyzer.AnalysisResult
 import org.jetbrains.kotlin.analyzer.ModuleInfo
 import org.jetbrains.kotlin.backend.common.BackendContext
@@ -32,6 +31,7 @@ import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.JVMConfigurationKeys
 import org.jetbrains.kotlin.container.ComponentProvider
 import org.jetbrains.kotlin.container.StorageComponentContainer
+import org.jetbrains.kotlin.container.registerSingleton
 import org.jetbrains.kotlin.container.useInstance
 import org.jetbrains.kotlin.context.ProjectContext
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
@@ -52,7 +52,6 @@ import org.jetbrains.kotlin.extensions.StorageComponentContainerContributor
 import org.jetbrains.kotlin.incremental.components.LookupTracker
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.org.picocontainer.ComponentAdapter
 import org.jetbrains.kotlin.platform.TargetPlatform
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.psi.KtFile
@@ -64,14 +63,12 @@ import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
 import org.jetbrains.kotlin.resolve.checkers.DeclarationChecker
 import org.jetbrains.kotlin.resolve.checkers.DeclarationCheckerContext
 import org.jetbrains.kotlin.resolve.diagnostics.DiagnosticSuppressor
-import org.jetbrains.kotlin.resolve.diagnostics.MutableDiagnosticsWithSuppression
 import org.jetbrains.kotlin.resolve.extensions.ExtraImportsProviderExtension
 import org.jetbrains.kotlin.resolve.extensions.SyntheticResolveExtension
 import org.jetbrains.kotlin.resolve.jvm.diagnostics.JvmDeclarationOrigin
 import org.jetbrains.kotlin.resolve.jvm.extensions.AnalysisHandlerExtension
 import org.jetbrains.kotlin.resolve.jvm.extensions.PackageFragmentProviderExtension
 import org.jetbrains.kotlin.resolve.lazy.LazyClassContext
-import org.jetbrains.kotlin.resolve.lazy.ResolveSession
 import org.jetbrains.kotlin.resolve.lazy.declarations.ClassMemberDeclarationProvider
 import org.jetbrains.kotlin.resolve.lazy.declarations.PackageMemberDeclarationProvider
 import org.jetbrains.kotlin.resolve.scopes.SyntheticScope
@@ -138,7 +135,6 @@ interface MetaComponentRegistrar : ComponentRegistrar {
       ): AnalysisResult? {
         ctx.module = module
         ctx.files = files
-        ctx.bindingTrace = bindingTrace
         ctx.componentProvider = componentProvider
         return doAnalysis(project, module, projectContext, files, bindingTrace, componentProvider)
       }
@@ -292,15 +288,13 @@ interface MetaComponentRegistrar : ComponentRegistrar {
   private fun registerKindAwareTypeChecker(): ExtensionPhase.StorageComponentContainer =
     storageComponent(
       registerModuleComponents = { container, moduleDescriptor ->
-        println("registerModuleComponents")
         val defaultTypeChecker = KotlinTypeChecker.DEFAULT
         if (defaultTypeChecker !is KindAwareTypeChecker) { //nasty hack ahead to circumvent the ability to replace the Kotlin type checker
           val defaultTypeCheckerField = KotlinTypeChecker::class.java.getDeclaredField("DEFAULT")
           setFinalStatic(defaultTypeCheckerField, KindAwareTypeChecker(defaultTypeChecker))
         }
       },
-      check = { declaration, descriptor, context ->
-        println("check")
+      check = { _, _, _ ->
       }
     )
 
@@ -312,6 +306,20 @@ interface MetaComponentRegistrar : ComponentRegistrar {
       check = { declaration, descriptor, context ->
       }
     )
+
+  fun Project.registerIdeHooks(): ExtensionPhase =
+    ide {
+      storageComponent(
+        registerModuleComponents = { container, moduleDescriptor ->
+          container.registerSingleton(Class.forName("arrow.meta.plugin.idea.MetaIdeAnalyzer"))
+          //
+        },
+        check = { declaration, descriptor, context ->
+        }
+      )
+    } ?: ExtensionPhase.Empty
+
+
 
   fun syntheticResolver(
     addSyntheticSupertypes: CompilerContext.(
@@ -452,25 +460,30 @@ interface MetaComponentRegistrar : ComponentRegistrar {
     val initialPhases = listOf(Name.identifier("Initial setup") to meta(
       enableIr(),
       compilerContextService(),
-      registerKindAwareTypeChecker()
+      registerKindAwareTypeChecker(),
+      project.registerIdeHooks()
     ))
     (initialPhases + intercept()).forEach { (plugin, phases) ->
       println("Registering plugin: $plugin extensions: $phases")
-      phases.forEach { phase ->
-        if (phase is ExtensionPhase.ExtraImports) registerExtraImports(project, phase, ctx)
-        if (phase is ExtensionPhase.PreprocessedVirtualFileFactory) registerPreprocessedVirtualFileFactory(project, phase, ctx)
-        if (phase is ExtensionPhase.Config) registerCompilerConfiguration(project, phase, ctx)
-        if (phase is ExtensionPhase.StorageComponentContainer) registerStorageComponentContainer(project, phase, ctx)
-        if (phase is ExtensionPhase.CollectAdditionalSources) registerCollectAdditionalSources(project, phase, ctx)
-        if (phase is ExtensionPhase.AnalysisHandler) registerAnalysisHandler(project, phase, ctx)
-        if (phase is ExtensionPhase.ClassBuilder) registerClassBuilder(project, phase, ctx)
-        if (phase is ExtensionPhase.Codegen) registerCodegen(project, phase, ctx)
-        if (phase is ExtensionPhase.DeclarationAttributeAlterer) registerDeclarationAttributeAlterer(project, phase, ctx)
-        if (phase is ExtensionPhase.PackageProvider) packageFragmentProvider(project, phase, ctx)
-        if (phase is ExtensionPhase.SyntheticResolver) registerSyntheticResolver(project, phase, ctx)
-        if (phase is ExtensionPhase.IRGeneration) registerIRGeneration(project, phase, ctx)
-        if (phase is ExtensionPhase.SyntheticScopeProvider) registerSyntheticScopeProvider(project, phase, ctx)
-        if (phase is ExtensionPhase.DiagnosticsSuppressor) registerDiagnosticSuppressor(project, phase, ctx)
+      phases.forEach { currentPhase ->
+        fun registerPhase(phase: ExtensionPhase): Unit {
+          if (phase is ExtensionPhase.ExtraImports) registerExtraImports(project, phase, ctx)
+          if (phase is ExtensionPhase.PreprocessedVirtualFileFactory) registerPreprocessedVirtualFileFactory(project, phase, ctx)
+          if (phase is ExtensionPhase.Config) registerCompilerConfiguration(project, phase, ctx)
+          if (phase is ExtensionPhase.StorageComponentContainer) registerStorageComponentContainer(project, phase, ctx)
+          if (phase is ExtensionPhase.CollectAdditionalSources) registerCollectAdditionalSources(project, phase, ctx)
+          if (phase is ExtensionPhase.AnalysisHandler) registerAnalysisHandler(project, phase, ctx)
+          if (phase is ExtensionPhase.ClassBuilder) registerClassBuilder(project, phase, ctx)
+          if (phase is ExtensionPhase.Codegen) registerCodegen(project, phase, ctx)
+          if (phase is ExtensionPhase.DeclarationAttributeAlterer) registerDeclarationAttributeAlterer(project, phase, ctx)
+          if (phase is ExtensionPhase.PackageProvider) packageFragmentProvider(project, phase, ctx)
+          if (phase is ExtensionPhase.SyntheticResolver) registerSyntheticResolver(project, phase, ctx)
+          if (phase is ExtensionPhase.IRGeneration) registerIRGeneration(project, phase, ctx)
+          if (phase is ExtensionPhase.SyntheticScopeProvider) registerSyntheticScopeProvider(project, phase, ctx)
+          if (phase is ExtensionPhase.DiagnosticsSuppressor) registerDiagnosticSuppressor(project, phase, ctx)
+          if (phase is ExtensionPhase.CompositePhase) phase.phases.map(::registerPhase)
+        }
+        registerPhase(currentPhase)
       }
     }
   }
@@ -670,7 +683,6 @@ interface MetaComponentRegistrar : ComponentRegistrar {
         ): AnalysisResult? {
           ctx.module = module
           ctx.files = files
-          ctx.bindingTrace = bindingTrace
           ctx.componentProvider = componentProvider
           return null
         }
@@ -679,8 +691,7 @@ interface MetaComponentRegistrar : ComponentRegistrar {
     ide {
       PackageFragmentProviderExtension.registerExtension(project, object : PackageFragmentProviderExtension {
         override fun getPackageFragmentProvider(project: Project, module: ModuleDescriptor, storageManager: StorageManager, trace: BindingTrace, moduleInfo: ModuleInfo?, lookupTracker: LookupTracker): PackageFragmentProvider? {
-          println("Registering binding trace from package fragment provider extension")
-          ctx.bindingTrace = trace
+          println("getPackageFragmentProvider")
           return null
         }
       })

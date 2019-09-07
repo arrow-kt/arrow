@@ -27,7 +27,6 @@
     </extensions>
     <extensions defaultExtensionNs="com.intellij">
         <annotator language="kotlin" implementationClass="arrow.meta.plugin.idea.MetaKotlinPsiChecker"/>
-        <buildProcess.parametersProvider implementation="arrow.meta.plugin.idea.MetaBuildProcessParametersProvider"/>
     </extensions>
 
 </idea-plugin>

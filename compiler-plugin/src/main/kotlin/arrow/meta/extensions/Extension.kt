@@ -1,5 +1,6 @@
 package arrow.meta.extensions
 
+import arrow.meta.qq.MetaAnalyzer
 import org.jetbrains.kotlin.analyzer.AnalysisResult
 import org.jetbrains.kotlin.analyzer.ModuleInfo
 import org.jetbrains.kotlin.backend.common.BackendContext
@@ -13,6 +14,7 @@ import org.jetbrains.kotlin.com.intellij.openapi.vfs.VirtualFile
 import org.jetbrains.kotlin.com.intellij.testFramework.LightVirtualFile
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.container.ComponentProvider
+import org.jetbrains.kotlin.container.get
 import org.jetbrains.kotlin.context.ProjectContext
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
@@ -26,7 +28,6 @@ import org.jetbrains.kotlin.diagnostics.Diagnostic
 import org.jetbrains.kotlin.diagnostics.DiagnosticSink
 import org.jetbrains.kotlin.incremental.components.LookupTracker
 import org.jetbrains.kotlin.ir.declarations.IrFile
-import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.psi.KtFile
@@ -35,10 +36,10 @@ import org.jetbrains.kotlin.psi.KtModifierListOwner
 import org.jetbrains.kotlin.psi.KtPsiFactory
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.BindingTrace
+import org.jetbrains.kotlin.resolve.LazyTopDownAnalyzer
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
 import org.jetbrains.kotlin.resolve.checkers.DeclarationCheckerContext
 import org.jetbrains.kotlin.resolve.lazy.LazyClassContext
-import org.jetbrains.kotlin.resolve.lazy.ResolveSession
 import org.jetbrains.kotlin.resolve.lazy.declarations.ClassMemberDeclarationProvider
 import org.jetbrains.kotlin.resolve.lazy.declarations.PackageMemberDeclarationProvider
 import org.jetbrains.kotlin.resolve.scopes.SyntheticScope
@@ -46,10 +47,15 @@ import org.jetbrains.kotlin.storage.StorageManager
 import org.jetbrains.kotlin.synthetic.JavaSyntheticPropertiesScope
 import org.jetbrains.kotlin.types.KotlinType
 import java.util.*
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicBoolean
 
 interface ExtensionPhase {
+
+  data class CompositePhase(val phases: List<ExtensionPhase>): ExtensionPhase {
+    companion object {
+      operator fun invoke(vararg phases: ExtensionPhase): ExtensionPhase =
+        CompositePhase(phases.toList())
+    }
+  }
 
   interface Config : ExtensionPhase {
     fun CompilerContext.updateConfiguration(configuration: CompilerConfiguration): Unit
@@ -72,7 +78,7 @@ interface ExtensionPhase {
     ): PackageFragmentProvider?
   }
 
-  interface CollectAdditionalSources: ExtensionPhase {
+  interface CollectAdditionalSources : ExtensionPhase {
     fun CompilerContext.collectAdditionalSourcesAndUpdateConfiguration(
       knownSources: Collection<KtFile>,
       configuration: CompilerConfiguration,
@@ -159,7 +165,7 @@ interface ExtensionPhase {
     fun CompilerContext.registerModuleComponents(
       container: org.jetbrains.kotlin.container.StorageComponentContainer,
       moduleDescriptor: ModuleDescriptor
-    ) : Unit
+    ): Unit
 
     fun CompilerContext.check(
       declaration: KtDeclaration,
@@ -226,23 +232,19 @@ class CompilerContext(
 ) {
 
   val ktPsiElementFactory: KtPsiFactory = KtPsiFactory(project, false)
-  lateinit var lazyClassContext: ResolveSession
   val ctx: CompilerContext = this
   lateinit var module: ModuleDescriptor
   lateinit var files: Collection<KtFile>
-  lateinit var bindingTrace: BindingTrace
   lateinit var componentProvider: ComponentProvider
+  private lateinit var metaAnalyzerField: MetaAnalyzer
 
-  /**
-   * updateClassContext can't replace the actual class context just mutate its internal fields since the compiler holds a
-   * reference to the class context associated for resolution.
-   * The resolvers in this context can be safely mutated thought via `resolveSession { ctx -> ... }` in the meta DSL
-   */
-  fun updateClassContext(f: CompilerContext.(ResolveSession) -> Unit, ctx: ResolveSession): Unit {
-    if (!::lazyClassContext.isInitialized) {
-      f(ctx)
-      lazyClassContext = ctx
+  val analyzer: MetaAnalyzer?
+    get() = when {
+      ::metaAnalyzerField.isInitialized -> metaAnalyzerField
+      ::componentProvider.isInitialized -> {
+        metaAnalyzerField = componentProvider.get()
+        metaAnalyzerField
+      }
+      else -> null
     }
-  }
-
 }

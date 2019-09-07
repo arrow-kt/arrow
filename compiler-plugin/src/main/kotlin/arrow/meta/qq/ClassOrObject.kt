@@ -40,7 +40,7 @@ interface ClassOrObject : Quote<KtElement, KtClass, ClassOrObject.ClassScope> {
     quoteDeclaration.trimMargin().let {
       if (isInterface()) it.replace("interface (.*?)\\(\\)".toRegex(), "interface $1")
       else it
-    }
+    }.replace("<>", "")
 
   override fun parse(template: String): KtClass =
     quasiQuoteContext.compilerContext.ktPsiElementFactory.createClass(template)

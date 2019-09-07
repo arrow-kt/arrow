@@ -8,15 +8,11 @@ import org.jetbrains.kotlin.resolve.lazy.LazyDeclarationResolver
 
 interface QuasiQuoteContext {
   val compilerContext: CompilerContext
-  val bindingContext: BindingContext
-  val bindingTrace: BindingTrace
 
   companion object {
     operator fun invoke(compilerContext: CompilerContext) =
       object : QuasiQuoteContext {
         override val compilerContext: CompilerContext = compilerContext
-        override val bindingContext: BindingContext = compilerContext.bindingTrace.bindingContext
-        override val bindingTrace: BindingTrace = compilerContext.bindingTrace
       }
   }
 }
