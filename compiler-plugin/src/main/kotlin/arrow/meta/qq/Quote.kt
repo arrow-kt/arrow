@@ -18,7 +18,10 @@ import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.Modality
+import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
+import org.jetbrains.kotlin.descriptors.PackageFragmentProvider
+import org.jetbrains.kotlin.descriptors.PackageFragmentProviderImpl
 import org.jetbrains.kotlin.descriptors.PackageViewDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
@@ -28,6 +31,7 @@ import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.TypeParameterDescriptorImpl
 import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
+import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtClassOrObject
@@ -136,16 +140,16 @@ inline fun <P : KtElement, reified K : KtElement, S, Q : Quote<P, K, S>> MetaAna
   noinline match: K.() -> Boolean,
   noinline map: S.(K) -> List<String>
 ): Pair<KtFile, AnalysisResult> = compilerContext.run {
-    val originFakeFile = KtFile(SingleRootFileViewProvider(
-      project.getComponent(PsiManager::class.java),
-      virtualFile,
-      false
-    ), true)
-    val analyzableFile = ktPsiElementFactory.createAnalyzableFile(virtualFile.name, document.text, originFakeFile)
-    val (file, transformations) = processKtFile(analyzableFile, quoteFactory, match, map)
-    val transformedFile = transformFile(file, transformations)
-    transformedFile to transformedFile.metaAnalysys(moduleInfo)
-  }
+  val originFakeFile = KtFile(SingleRootFileViewProvider(
+    project.getComponent(PsiManager::class.java),
+    virtualFile,
+    false
+  ), true)
+  val analyzableFile = ktPsiElementFactory.createAnalyzableFile(virtualFile.name, document.text, originFakeFile)
+  val (file, transformations) = processKtFile(analyzableFile, quoteFactory, match, map)
+  val transformedFile = transformFile(file, transformations)
+  transformedFile to transformedFile.metaAnalysys(moduleInfo)
+}
 
 
 @Suppress("UNCHECKED_CAST")
@@ -181,9 +185,38 @@ inline fun <P : KtElement, reified K : KtElement, S, Q : Quote<P, K, S>> MetaCom
 //            populateSyntheticCache(doc)
           }
         }
-        null
+        object : PackageFragmentProvider {
+          override fun getPackageFragments(fqName: FqName): List<PackageFragmentDescriptor> {
+            val result = analyzer?.run {
+              storageManager.createRecursionTolerantLazyValue({
+                metaPackageFragments(module, fqName)
+              }, emptyList()).invoke()
+            } ?: emptyList()
+            println("PackageFragmentProvider.getPackageFragments: $fqName $result")
+            return result
+          }
+
+          override fun getSubPackagesOf(fqName: FqName, nameFilter: (Name) -> Boolean): Collection<FqName> {
+            val result = analyzer?.run {
+              storageManager.createRecursionTolerantLazyValue({
+                metaSubPackagesOf(module, fqName, nameFilter)
+              }, emptyList()).invoke()
+            } ?: emptyList()
+            println("PackageFragmentProvider.metaSubPackagesOf: $fqName $result")
+            return result
+          }
+
+
+        }
       },
       syntheticResolver(
+        addSyntheticSupertypes = { thisDescriptor, supertypes ->
+          analyzer?.run {
+            val synthetic: List<KotlinType> = metaSyntheticSupertypes(thisDescriptor)
+            println("MetaSyntheticResolverExtension.addSyntheticSupertypes for $thisDescriptor name: [$synthetic]")
+            supertypes.addAll(synthetic)
+          }
+        },
         getSyntheticCompanionObjectNameIfNeeded = { thisDescriptor ->
           analyzer?.run {
             val companionName: Name? = metaCompanionObjectNameIfNeeded(thisDescriptor)
@@ -200,12 +233,12 @@ inline fun <P : KtElement, reified K : KtElement, S, Q : Quote<P, K, S>> MetaCom
           }
         },
         generatePackageSyntheticClasses = { thisDescriptor, name, ctx, declarationProvider, result ->
-            analyzer?.run {
-              val synthetic: List<ClassDescriptor> = metaSyntheticPackageClasses(name, thisDescriptor, declarationProvider)
-              result.addAll(synthetic)
-              println("MetaSyntheticResolverExtension.generatePackageSyntheticClasses for $thisDescriptor [$name]: $result")
-              result
-            }
+          analyzer?.run {
+            val synthetic: List<ClassDescriptor> = metaSyntheticPackageClasses(name, thisDescriptor, declarationProvider)
+            result.addAll(synthetic)
+            println("MetaSyntheticResolverExtension.generatePackageSyntheticClasses for $thisDescriptor [$name]: $result")
+            result
+          }
         },
         generateSyntheticMethods = { thisDescriptor, name, bindingContext, fromSupertypes, result ->
           analyzer?.run {

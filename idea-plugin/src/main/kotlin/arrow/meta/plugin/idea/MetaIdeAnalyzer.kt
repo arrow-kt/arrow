@@ -30,6 +30,7 @@ import org.jetbrains.kotlin.analyzer.ModuleInfo
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
+import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.PackageViewDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
@@ -45,8 +46,11 @@ import org.jetbrains.kotlin.psi.KtClassOrObject
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
+import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.resolve.lazy.declarations.ClassMemberDeclarationProvider
 import org.jetbrains.kotlin.resolve.lazy.declarations.PackageMemberDeclarationProvider
+import org.jetbrains.kotlin.types.KotlinType
+import org.jetbrains.kotlin.types.TypeUtils
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
@@ -59,14 +63,15 @@ private val blackList: Set<Name> =
     .map(Name::identifier).toSet()
 
 class SyntheticDescriptorCache(
+  val module: ModuleDescriptor,
   val descriptorCache: ConcurrentHashMap<FqName, DeclarationDescriptor> = ConcurrentHashMap()
 ) {
   companion object {
     fun fromAnalysis(file: KtFile, analysis: AnalysisResult): SyntheticDescriptorCache {
       val moduleDescriptor = analysis.moduleDescriptor
-      val packageFragmentProvider = moduleDescriptor.getPackage(file.packageFqName)
-      val cache = SyntheticDescriptorCache()
-      packageFragmentProvider.accept(
+      val packageViewDescriptor = moduleDescriptor.getPackage(file.packageFqName)
+      val cache = SyntheticDescriptorCache(moduleDescriptor)
+      packageViewDescriptor.accept(
         MetaRecursiveVisitor(object : DeclarationDescriptorVisitorEmptyBodies<Unit, Unit>() {
           override fun visitDeclarationDescriptor(descriptor: DeclarationDescriptor?, data: Unit?) {
             descriptor?.let {
@@ -120,6 +125,24 @@ class MetaIdeAnalyzer : MetaAnalyzer {
         file?.let { cache[it.metaCacheId] }
       } else null
     }
+
+  override fun metaPackageFragments(
+    module: ModuleDescriptor,
+    fqName: FqName
+  ): List<PackageFragmentDescriptor> =
+    cache.values.firstOrNull {
+      it.module.name == module.name
+    }?.module?.getPackage(fqName)?.fragments ?: emptyList()
+
+
+  override fun metaSubPackagesOf(
+    module: ModuleDescriptor,
+    fqName: FqName,
+    nameFilter: (Name) -> Boolean
+  ): Collection<FqName> =
+    cache.values.firstOrNull {
+      it.module.name == module.name
+    }?.module?.getSubPackagesOf(fqName, nameFilter) ?: emptyList()
 
   override fun metaSyntheticFunctionNames(thisDescriptor: ClassDescriptor): List<Name> =
     thisDescriptor.syntheticCache?.let {
@@ -179,6 +202,15 @@ class MetaIdeAnalyzer : MetaAnalyzer {
             true
           ).safeAs<PropertyDescriptor>()
         }
+      }
+    } ?: emptyList()
+
+  override fun metaSyntheticSupertypes(classDescriptor: ClassDescriptor): List<KotlinType> =
+    classDescriptor.syntheticCache?.let {
+      it.descriptorCache[classDescriptor.fqNameSafe].safeAs<ClassDescriptor>()?.let { compiled ->
+        val superTypes = TypeUtils.getAllSupertypes(compiled.defaultType)
+          .filter { tpe -> tpe != classDescriptor.module.builtIns.anyType }
+        superTypes
       }
     } ?: emptyList()
 
