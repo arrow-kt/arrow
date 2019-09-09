@@ -15,19 +15,8 @@
             }
         }
 
-        .hljs {
-            background: rgba($optics-background, 0.05);
-        }
-
-        .hljs-doctag,
-        .hljs-formula,
-        .hljs-keyword {
+        .cm-s-arrow span.cm-keyword {
             color: $optics-color;
-        }
-
-        .hljs-built_in,
-        .hljs-class .hljs-title {
-            color: #F28B2D;
         }
         
         .button-video {
