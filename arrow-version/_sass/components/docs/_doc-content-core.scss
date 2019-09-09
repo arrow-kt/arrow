@@ -15,31 +15,21 @@
             }
         }
 
-        .hljs {
-            background: rgba($core-background, 0.05);
-        }
-
-        .hljs-doctag,
-        .hljs-formula,
-        .hljs-keyword {
+        .cm-s-arrow span.cm-keyword {
             color: $core-color;
         }
 
-        .hljs-built_in,
-        .hljs-class .hljs-title {
-            color: #F28B2D;
-        }
-        
+
         .button-video {
             background: $white;
             border: 2px solid $core-color;
-            transition: background $base-duration; 
-            
+            transition: background $base-duration;
+
             &:hover {
                 background: $core-color;
                 color: $white;
-            } 
-            
-        }  
+            }
+
+        }
     }
 }
