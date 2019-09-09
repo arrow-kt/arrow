@@ -44,6 +44,24 @@ function scrollFunction() {
   }
 }
 
+function screenSize() {
+  var size = 0;
+  if (typeof window.innerWidth != 'undefined')
+  {
+    size = window.innerWidth;
+  }
+  else if (typeof document.documentElement != 'undefined'
+      && typeof document.documentElement.clientWidth !=
+      'undefined' && document.documentElement.clientWidth != 0)
+  {
+    size = document.documentElement.clientWidth;
+  }
+  else   {
+    size = document.getElementsByTagName('body')[0].clientWidth;
+  }
+  return size;
+}
+
 // Init call
 function loadEvent() {
 
@@ -65,12 +83,14 @@ function loadEvent() {
   const corePlayHover = document.getElementById('core');
 
   corePlayHover.addEventListener('mouseenter', () => {
-    arrayArrowFeatures.map(obj => obj.classList.remove('active'));
-    corePlayHover.classList.add('active');
-    checkActiveFeature(arrayArrowFeatures);
-    arrowCoreAnimation.play();
-    incubatorCoreAnimation.play();
-    arrowBaseAnimation.stop();
+    if (screenSize() > 992) {
+      arrayArrowFeatures.map(obj => obj.classList.remove('active'));
+      corePlayHover.classList.add('active');
+      checkActiveFeature(arrayArrowFeatures);
+      arrowCoreAnimation.play();
+      incubatorCoreAnimation.play();
+      arrowBaseAnimation.stop();
+    }
   });
 
   // fx elements
