@@ -44,7 +44,7 @@ const incubatorHoverLogo = document.getElementById('incubator-hover-animation');
 const incubatorList = document.getElementById('incubator-list');
 
 // Features elements
-const headerCategoryRow = document.querySelectorAll('.item-header h2, p');
+const headerCategoryRow = document.querySelectorAll('.item-header > p, .item-header > h2');
 const arrayHeaderCategoryRow = Array.from(headerCategoryRow);
 const buttonCategoryRow = document.querySelectorAll('.main-item a');
 const arrayButtonCategoryRoww = Array.from(buttonCategoryRow);
