@@ -7,11 +7,13 @@ const arrayHomeCodeBlock = Array.from(homeCodeBlock);
 // nav elements
 const siteNav = document.getElementById('site-nav');
 const navIconOpenWhite = document.getElementById('nav-icon-open-white');
-const navIconOpenDark = document.getElementById('nav-icon-open-dark');
 const navBrandWhite = document.getElementById('nav-brand-white');
 const navBrandDark = document.getElementById('nav-brand-dark');
 const navLinks = siteNav.querySelectorAll('a');
 const arrayNavLinks = Array.from(navLinks);
+const navMenuLinks = document.querySelectorAll('.nav-menu-item a');
+const arrayNavMenuLinks = Array.from(navMenuLinks);
+const navTitle = document.getElementById('nav-title');
 
 // animations containers
 const headerAnimation = document.querySelectorAll('.header-image div');
@@ -178,7 +180,6 @@ function commonHoverStyle(id, incubatorHover) {
   navBrandDark.style.opacity = 0;
   navBrandWhite.style.opacity = 1;
   baseArrowLogo.style.opacity = 0;
-  navIconOpenDark.style.opacity = 0;
   navIconOpenWhite.style.opacity = 1;
   incubatorBaseLogo.style.opacity = 0;
   incubatorHover = incubatorHover || false;
@@ -264,4 +265,16 @@ function incubatorHoverStyle() {
     addClassName(siteNav, 'incubator');
   }
   arrayIncubatorLinks.map(obj => addClassName(obj, 'hover-mode'));
+}
+
+function mobileMode() {
+  body.style.setProperty('--color-primary', '#F5F7F8');
+  body.style.background = "#354755 url('../img/home/hover-lines-header.svg') repeat-x";
+  headerText.style.opacity = 1;
+  siteNav.style.background = '#354755';
+  navBrandWhite.style.opacity = 1;
+  navBrandDark.style.opacity = 0;
+  arrayNavMenuLinks.map(el => el.classList.add('mobile'));
+  incubatorHoverLogo.style.opacity = 1;
+  navTitle.classList.add('mobile');
 }

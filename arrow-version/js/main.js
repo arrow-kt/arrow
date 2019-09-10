@@ -45,7 +45,7 @@ function scrollFunction() {
 }
 
 function screenSize() {
-  var size = 0;
+  let size = 0;
   if (typeof window.innerWidth != 'undefined')
   {
     size = window.innerWidth;
@@ -62,8 +62,15 @@ function screenSize() {
   return size;
 }
 
+function mobileViewControl() {
+  screenSize() < 992 ? mobileMode() : console.log('Big');
+}
+
+window.addEventListener("resize", mobileViewControl);
+
 // Init call
 function loadEvent() {
+  mobileViewControl();
 
   document.addEventListener("scroll", scrollFunction);
 
@@ -83,61 +90,69 @@ function loadEvent() {
   const corePlayHover = document.getElementById('core');
 
   corePlayHover.addEventListener('mouseenter', () => {
-    if (screenSize() > 992) {
-      arrayArrowFeatures.map(obj => obj.classList.remove('active'));
-      corePlayHover.classList.add('active');
-      checkActiveFeature(arrayArrowFeatures);
-      arrowCoreAnimation.play();
-      incubatorCoreAnimation.play();
-      arrowBaseAnimation.stop();
-    }
+      if (screenSize() > 992) {
+        arrayArrowFeatures.map(obj => obj.classList.remove('active'));
+        corePlayHover.classList.add('active');
+        checkActiveFeature(arrayArrowFeatures);
+        arrowCoreAnimation.play();
+        incubatorCoreAnimation.play();
+        arrowBaseAnimation.stop();
+      }
   });
 
   // fx elements
   const fxPlayHover = document.getElementById('fx');
 
   fxPlayHover.addEventListener('mouseenter', () => {
-    arrayArrowFeatures.map(obj => obj.classList.remove('active'));
-    fxPlayHover.classList.add('active');
-    checkActiveFeature(arrayArrowFeatures);
-    arrowFxAnimation.play();
-    incubatorFxAnimation.play();
-    arrowBaseAnimation.stop();
+    if (screenSize() > 992) {
+      arrayArrowFeatures.map(obj => obj.classList.remove('active'));
+      fxPlayHover.classList.add('active');
+      checkActiveFeature(arrayArrowFeatures);
+      arrowFxAnimation.play();
+      incubatorFxAnimation.play();
+      arrowBaseAnimation.stop();
+    }
   });
 
   // meta elements
   const metaPlayHover = document.getElementById('meta');
 
   metaPlayHover.addEventListener('mouseenter', () => {
-    arrayArrowFeatures.map(obj => obj.classList.remove('active'));
-    metaPlayHover.classList.add('active');
-    checkActiveFeature(arrayArrowFeatures);
-    arrowMetaAnimation.play();
-    incubatorMetaAnimation.play();
-    arrowBaseAnimation.stop();
+    if (screenSize() > 992) {
+      arrayArrowFeatures.map(obj => obj.classList.remove('active'));
+      metaPlayHover.classList.add('active');
+      checkActiveFeature(arrayArrowFeatures);
+      arrowMetaAnimation.play();
+      incubatorMetaAnimation.play();
+      arrowBaseAnimation.stop();
+    }
   });
 
   // optics elements
   const opticsPlayHover = document.getElementById('optics');
 
   opticsPlayHover.addEventListener('mouseenter', () => {
-    arrayArrowFeatures.map(obj => obj.classList.remove('active'));
-    opticsPlayHover.classList.add('active');
-    checkActiveFeature(arrayArrowFeatures);
-    arrowOpticsAnimation.play();
-    incubatorOpticsAnimation.play();
-    arrowBaseAnimation.stop();
+    if (screenSize() > 992) {
+      arrayArrowFeatures.map(obj => obj.classList.remove('active'));
+      opticsPlayHover.classList.add('active');
+      checkActiveFeature(arrayArrowFeatures);
+      arrowOpticsAnimation.play();
+      incubatorOpticsAnimation.play();
+      arrowBaseAnimation.stop();
+    }
   });
 
   // incubator elements
   const incubatorPlayHover = document.getElementById('incubator');
 
   incubatorPlayHover.addEventListener('mouseenter', () => {
-    arrayArrowFeatures.map(obj => obj.classList.remove('active'));
-    incubatorPlayHover.classList.add('active');
-    checkActiveFeature(arrayArrowFeatures);
-    incubatorHoverAnimation.play();
-    arrowBaseAnimation.stop();
+    if (screenSize() > 992) {
+      arrayArrowFeatures.map(obj => obj.classList.remove('active'));
+      incubatorPlayHover.classList.add('active');
+      checkActiveFeature(arrayArrowFeatures);
+      incubatorHoverAnimation.play();
+      arrowBaseAnimation.stop();
+    }
   });
 }
 
