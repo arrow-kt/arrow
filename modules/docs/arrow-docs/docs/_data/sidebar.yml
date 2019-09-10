@@ -141,7 +141,7 @@ options:
         url: /docs/arrow/data/nonemptylist/
 
       - title: ListK
-        url: /docs/arrow/data/listk/
+        url: /docs/apidocs/arrow-core-data/arrow.core/-list-k/
 
       - title: SequenceK
         url: /docs/arrow/data/sequencek/
