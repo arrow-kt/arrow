@@ -47,14 +47,14 @@ allprojects {
 }
 ```
 
-# Next development version 0.10.0
+# Next development version 0.10.1
 
 Add the dependencies into the project's `build.gradle`
 
 ## Λrrow Core
 
 ```groovy
-def arrow_version = "0.10.0-SNAPSHOT"
+def arrow_version = "0.10.1-SNAPSHOT"
 dependencies {
     compile "io.arrow-kt:arrow-core:$arrow_version"
     compile "io.arrow-kt:arrow-syntax:$arrow_version"
@@ -65,7 +65,7 @@ dependencies {
 ## Λrrow Core + Λrrow Optics
 
 ```groovy
-def arrow_version = "0.10.0-SNAPSHOT"
+def arrow_version = "0.10.1-SNAPSHOT"
 dependencies {
     compile "io.arrow-kt:arrow-optics:$arrow_version"
     compile "io.arrow-kt:arrow-syntax:$arrow_version"
@@ -76,7 +76,7 @@ dependencies {
 ## Λrrow Core + Λrrow Fx 
 
 ```groovy
-def arrow_version = "0.10.0-SNAPSHOT"
+def arrow_version = "0.10.1-SNAPSHOT"
 dependencies {
     compile "io.arrow-kt:arrow-fx:$arrow_version"
     compile "io.arrow-kt:arrow-syntax:$arrow_version"
@@ -87,7 +87,7 @@ dependencies {
 ## Λrrow Core + Λrrow Optics + Λrrow Fx
 
 ```groovy
-def arrow_version = "0.10.0-SNAPSHOT"
+def arrow_version = "0.10.1-SNAPSHOT"
 dependencies {
     compile "io.arrow-kt:arrow-fx:$arrow_version"
     compile "io.arrow-kt:arrow-optics:$arrow_version"
@@ -109,7 +109,7 @@ Add the dependencies into the project's `build.gradle`
 apply plugin: 'kotlin-kapt' //optional
 apply from: rootProject.file('gradle/generated-kotlin-sources.gradle') //only for Android projects
 
-def arrow_version = "0.10.0-SNAPSHOT"
+def arrow_version = "0.10.1-SNAPSHOT"
 dependencies {
     ...
     kapt    'io.arrow-kt:arrow-meta:$arrow_version' //optional
