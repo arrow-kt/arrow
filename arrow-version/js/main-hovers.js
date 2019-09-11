@@ -6,7 +6,6 @@ const arrayHomeCodeBlock = Array.from(homeCodeBlock);
 
 // nav elements
 const siteNav = document.getElementById('site-nav');
-const navIconOpenWhite = document.getElementById('nav-icon-open-white');
 const navBrandWhite = document.getElementById('nav-brand-white');
 const navBrandDark = document.getElementById('nav-brand-dark');
 const navLinks = siteNav.querySelectorAll('a');
@@ -180,7 +179,6 @@ function commonHoverStyle(id, incubatorHover) {
   navBrandDark.style.opacity = 0;
   navBrandWhite.style.opacity = 1;
   baseArrowLogo.style.opacity = 0;
-  navIconOpenWhite.style.opacity = 1;
   incubatorBaseLogo.style.opacity = 0;
   incubatorHover = incubatorHover || false;
   siteNav.classList.remove('core', 'fx', 'meta', 'optics', 'incubator');
@@ -267,14 +265,37 @@ function incubatorHoverStyle() {
   arrayIncubatorLinks.map(obj => addClassName(obj, 'hover-mode'));
 }
 
+// find the way to do it just the first time it comes from mobile
+// function resetHovers() {
+//   body.style.setProperty('--color-primary', '#263238');
+//   body.style.background = "#F5F7F8 url('../img/home/hover-lines-header.svg') repeat-x";
+//   arrayCategoryIconDark.map(el => el.style.opacity = 1);
+//   arrayCategoryIconWhite.map(el => el.style.opacity = 0);
+//   arrayCategoryIconColor.map(el => el.style.opacity = 0);
+// }
+
 function mobileMode() {
   body.style.setProperty('--color-primary', '#F5F7F8');
   body.style.background = "#354755 url('../img/home/hover-lines-header.svg') repeat-x";
   headerText.style.opacity = 1;
-  siteNav.style.background = '#354755';
   navBrandWhite.style.opacity = 1;
   navBrandDark.style.opacity = 0;
-  arrayNavMenuLinks.map(el => el.classList.add('mobile'));
-  incubatorHoverLogo.style.opacity = 1;
   navTitle.classList.add('mobile');
+  arrayNavMenuLinks.map(el => el.classList.add('mobile'));
+  incubatorBaseLogo.style.opacity = 0;
+  incubatorHoverLogo.style.opacity = 1;
+  incubatorHoverAnimation.play();
+  arrayNavLinks.map(obj => addClassName(obj, 'hover-mode'));
+  arrayFooterLinks.map(obj => addClassName(obj, 'hover-mode'));
+  incubatorList.style.listStyleImage = "url('../img/incubator/incubator-bullet.svg')";
+  incubatorBaseAnimation.stop();
+  incubatorCoreAnimation.stop();
+  incubatorFxAnimation.stop();
+  incubatorOpticsAnimation.stop();
+  incubatorMetaAnimation.stop();
+  arrayCategoryIconColor.map(el => el.style.opacity = 1);
+  arrayCategoryIconWhite.map(el => el.style.opacity = 0);
+  arrayCategoryIconDark.map(el => el.style.opacity = 0);
+  // siteNav.classList.add('nav-scroll');
+  // siteNav.classList.add('core');
 }

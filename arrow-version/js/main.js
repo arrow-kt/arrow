@@ -37,6 +37,9 @@ const scrollTop = Math.max(window.pageYOffset, document.documentElement.scrollTo
 function scrollFunction() {
   if (window.pageYOffset || document.documentElement.scrollTop > scrollTop) {
     navElement.classList.add('nav-scroll');
+    if (screenSize() < 992) {
+      navElement.classList.add('core');
+    }
     checkActiveFeatureScroll(arrayArrowFeatures);
   } else {
     navElement.classList.remove('nav-scroll');
@@ -63,7 +66,7 @@ function screenSize() {
 }
 
 function mobileViewControl() {
-  screenSize() < 992 ? mobileMode() : console.log('Big');
+  screenSize() < 992 ? mobileMode() : console.log('big size');;
 }
 
 window.addEventListener("resize", mobileViewControl);
