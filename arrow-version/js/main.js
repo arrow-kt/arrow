@@ -2,6 +2,7 @@
 const navElement = document.querySelector('#site-nav');
 const arrowFeatures = document.querySelectorAll('.feature');
 const arrayArrowFeatures = Array.from(arrowFeatures);
+const mobileModeBreakPoint = 992;
 
 /**
  * Toggle an specific class to the received DOM element.
@@ -42,7 +43,7 @@ const scrollTop = Math.max(window.pageYOffset, document.documentElement.scrollTo
 function scrollFunction() {
   if (window.pageYOffset || document.documentElement.scrollTop > scrollTop) {
     navElement.classList.add('nav-scroll');
-    if (screenSize() < 992) {
+    if (screenSize() < mobileModeBreakPoint) {
       navElement.classList.add('core');
     }
     checkActiveFeatureScroll(arrayArrowFeatures);
@@ -71,7 +72,7 @@ function screenSize() {
 }
 
 function mobileViewControl() {
-  screenSize() < 992 ? mobileMode() : resetHovers();
+  screenSize() < mobileModeBreakPoint ? mobileMode() : resetHovers();
 }
 
 window.addEventListener("resize", mobileViewControl);
@@ -98,7 +99,7 @@ function loadEvent() {
   const corePlayHover = document.getElementById('core');
 
   corePlayHover.addEventListener('mouseenter', () => {
-      if (screenSize() > 992) {
+      if (screenSize() > mobileModeBreakPoint) {
         arrayArrowFeatures.map(obj => obj.classList.remove('active'));
         corePlayHover.classList.add('active');
         checkActiveFeature(arrayArrowFeatures);
@@ -112,7 +113,7 @@ function loadEvent() {
   const fxPlayHover = document.getElementById('fx');
 
   fxPlayHover.addEventListener('mouseenter', () => {
-    if (screenSize() > 992) {
+    if (screenSize() > mobileModeBreakPoint) {
       arrayArrowFeatures.map(obj => obj.classList.remove('active'));
       fxPlayHover.classList.add('active');
       checkActiveFeature(arrayArrowFeatures);
@@ -126,7 +127,7 @@ function loadEvent() {
   const metaPlayHover = document.getElementById('meta');
 
   metaPlayHover.addEventListener('mouseenter', () => {
-    if (screenSize() > 992) {
+    if (screenSize() > mobileModeBreakPoint) {
       arrayArrowFeatures.map(obj => obj.classList.remove('active'));
       metaPlayHover.classList.add('active');
       checkActiveFeature(arrayArrowFeatures);
@@ -140,7 +141,7 @@ function loadEvent() {
   const opticsPlayHover = document.getElementById('optics');
 
   opticsPlayHover.addEventListener('mouseenter', () => {
-    if (screenSize() > 992) {
+    if (screenSize() > mobileModeBreakPoint) {
       arrayArrowFeatures.map(obj => obj.classList.remove('active'));
       opticsPlayHover.classList.add('active');
       checkActiveFeature(arrayArrowFeatures);
@@ -154,7 +155,7 @@ function loadEvent() {
   const incubatorPlayHover = document.getElementById('incubator');
 
   incubatorPlayHover.addEventListener('mouseenter', () => {
-    if (screenSize() > 992) {
+    if (screenSize() > mobileModeBreakPoint) {
       arrayArrowFeatures.map(obj => obj.classList.remove('active'));
       incubatorPlayHover.classList.add('active');
       checkActiveFeature(arrayArrowFeatures);
