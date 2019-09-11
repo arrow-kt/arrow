@@ -12,7 +12,6 @@ const navLinks = siteNav.querySelectorAll('a');
 const arrayNavLinks = Array.from(navLinks);
 const navMenuLinks = document.querySelectorAll('.nav-menu-item a');
 const arrayNavMenuLinks = Array.from(navMenuLinks);
-const navTitle = document.getElementById('nav-title');
 
 // animations containers
 const headerAnimation = document.querySelectorAll('.header-image div');
@@ -48,7 +47,7 @@ const incubatorList = document.getElementById('incubator-list');
 const headerCategoryRow = document.querySelectorAll('.item-header > p, .item-header > h2');
 const arrayHeaderCategoryRow = Array.from(headerCategoryRow);
 const buttonCategoryRow = document.querySelectorAll('.main-item a');
-const arrayButtonCategoryRoww = Array.from(buttonCategoryRow);
+const arrayButtonCategoryRow = Array.from(buttonCategoryRow);
 const categoryIconWhite = document.getElementsByClassName('cat-icon-white');
 const arrayCategoryIconWhite = Array.from(categoryIconWhite);
 const categoryIconDark = document.getElementsByClassName('cat-icon-dark');
@@ -186,13 +185,13 @@ function commonHoverStyle(id, incubatorHover) {
   if (incubatorHover == false) {
     setOpacity(arrayCategoryIconWhite, id, 0.5);
     setOpacity(arrayHeaderCategoryRow, id, 0.5);
-    setOpacity(arrayButtonCategoryRoww, id, 0.5);
+    setOpacity(arrayButtonCategoryRow, id, 0.5);
     setCodeBlockHidden(arrayHomeCodeBlock, id);
 
   } else {
     setOpacity(arrayCategoryIconWhite, id, 1);
     setOpacity(arrayHeaderCategoryRow, id, 1);
-    setOpacity(arrayButtonCategoryRoww, id, 1);
+    setOpacity(arrayButtonCategoryRow, id, 1);
     headerText.style.opacity = 1;
     hideCodeBlock(arrayHomeCodeBlock);
   }
@@ -266,36 +265,67 @@ function incubatorHoverStyle() {
 }
 
 // find the way to do it just the first time it comes from mobile
-// function resetHovers() {
-//   body.style.setProperty('--color-primary', '#263238');
-//   body.style.background = "#F5F7F8 url('../img/home/hover-lines-header.svg') repeat-x";
-//   arrayCategoryIconDark.map(el => el.style.opacity = 1);
-//   arrayCategoryIconWhite.map(el => el.style.opacity = 0);
-//   arrayCategoryIconColor.map(el => el.style.opacity = 0);
-// }
+function resetHovers() {
+  let activeFeature = false;
+
+  arrayArrowFeatures.map(function(el) {
+    if (el.className.includes('active')) {
+      activeFeature = true;
+    }
+  })
+
+  if (!activeFeature) {
+    body.style.setProperty('--color-primary', '#263238');
+    body.style.background = "#F5F7F8 url('../img/home/lines-header-bg.svg') repeat-x";
+    navBrandWhite.style.opacity = 0;
+    navBrandDark.style.opacity = 1;
+    headerText.style.opacity = 1;
+    arrayCategoryIconDark.map(el => el.style.opacity = 1);
+    arrayCategoryIconWhite.map(el => el.style.opacity = 0);
+    arrayCategoryIconColor.map(el => el.style.opacity = 0);
+    arrayIncubatorAnimation.map(el => el.id.includes('incubator-base-animation') ? el.style.opacity = 1 : el.style.opacity = 0);
+    arrayHomeCodeBlock.map(el => el.style.visibility = 'hidden');
+    arrayNavLinks.map(obj => obj.classList.remove('hover-mode'));
+    arrayFooterLinks.map(obj => obj.classList.remove('hover-mode'));
+    arrayIncubatorLinks.map(obj => obj.classList.remove('hover-mode'));
+    incubatorList.style.listStyleImage = "url('../img/home/bullet.svg')";
+    incubatorArrowLogo.style.opacity = 0;
+    siteNav.classList.remove('core');
+    arrayHeaderAnimation.map(el => el.id.includes('base-arrow-animation') ? el.style.opacity = 1 : el.style.opacity = 0);
+    arrowBaseAnimation.play();
+    incubatorBaseAnimation.play();
+  }
+}
 
 function mobileMode() {
   body.style.setProperty('--color-primary', '#F5F7F8');
   body.style.background = "#354755 url('../img/home/hover-lines-header.svg') repeat-x";
+  siteFooter.style.background = "url('../img/home/hover-lines-footer.svg') repeat-x";
+  incubatorList.style.listStyleImage = "url('../img/incubator/incubator-bullet.svg')";
   headerText.style.opacity = 1;
   navBrandWhite.style.opacity = 1;
   navBrandDark.style.opacity = 0;
-  navTitle.classList.add('mobile');
-  arrayNavMenuLinks.map(el => el.classList.add('mobile'));
   incubatorBaseLogo.style.opacity = 0;
   incubatorHoverLogo.style.opacity = 1;
-  incubatorHoverAnimation.play();
+  arrayArrowFeatures.map(el => el.classList.remove('active'));
+  arrayIncubatorLinks.map(obj => addClassName(obj, 'hover-mode'));
   arrayNavLinks.map(obj => addClassName(obj, 'hover-mode'));
   arrayFooterLinks.map(obj => addClassName(obj, 'hover-mode'));
-  incubatorList.style.listStyleImage = "url('../img/incubator/incubator-bullet.svg')";
+  arrayHeaderCategoryRow.map(el => el.style.opacity = 1);
+  arrayButtonCategoryRow.map(el => el.style.opacity = 1);
+  arrayCategoryIconColor.map(el => el.style.opacity = 1);
+  arrayCategoryIconWhite.map(el => el.style.opacity = 0);
+  arrayCategoryIconDark.map(el => el.style.opacity = 0);
+  incubatorHoverAnimation.play();
+  arrowBaseAnimation.stop();
   incubatorBaseAnimation.stop();
   incubatorCoreAnimation.stop();
   incubatorFxAnimation.stop();
   incubatorOpticsAnimation.stop();
   incubatorMetaAnimation.stop();
-  arrayCategoryIconColor.map(el => el.style.opacity = 1);
-  arrayCategoryIconWhite.map(el => el.style.opacity = 0);
-  arrayCategoryIconDark.map(el => el.style.opacity = 0);
-  // siteNav.classList.add('nav-scroll');
-  // siteNav.classList.add('core');
+  siteNav.classList.remove('fx', 'meta', 'optics', 'incubator');
+  if (siteNav.className.includes('nav-scroll')) {
+    addClassName(siteNav, 'core');
+  }
+  arrayIncubatorAnimation.map(el => el.id.includes('incubator-hover-animation') ? el.style.opacity = 1 : el.style.opacity = 0);
 }

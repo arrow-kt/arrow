@@ -13,6 +13,11 @@ function toggleClass(elemSelector, activeClass = 'active') {
   if (elem) {
     elem.classList.toggle(activeClass);
   }
+  if (navElement.className.includes('nav-scroll')) {
+    addClassName(elem, 'top-scroll');
+  } else {
+    elem.classList.remove('top-scroll');
+  }
 }
 
 function checkActiveFeatureScroll(arrowFeatures, top) {
@@ -66,7 +71,7 @@ function screenSize() {
 }
 
 function mobileViewControl() {
-  screenSize() < 992 ? mobileMode() : console.log('big size');;
+  screenSize() < 992 ? mobileMode() : resetHovers();
 }
 
 window.addEventListener("resize", mobileViewControl);
