@@ -269,8 +269,9 @@ class MetaIdeAnalyzer : MetaAnalyzer {
     transformation: (VirtualFile, Document) -> Pair<KtFile, AnalysisResult>?): Unit {
     if (!subscribedToEditorHooks.get()) {
       val application = ApplicationManager.getApplication()
+      val projectBus = currentProject()?.messageBus?.connect()
       val connection = application.messageBus.connect()
-      connection.subscribe<FileEditorManagerListener>(
+      projectBus?.subscribe<FileEditorManagerListener>(
         FileEditorManagerListener.FILE_EDITOR_MANAGER,
         object : FileEditorManagerListener {
           override fun selectionChanged(event: FileEditorManagerEvent) {
@@ -299,7 +300,7 @@ class MetaIdeAnalyzer : MetaAnalyzer {
           }
         }
       )
-      connection.subscribe<CompilationStatusListener>(
+      projectBus?.subscribe<CompilationStatusListener>(
         CompilerTopics.COMPILATION_STATUS,
         object : CompilationStatusListener {
           override fun compilationFinished(aborted: Boolean, errors: Int, warnings: Int, compileContext: CompileContext) {

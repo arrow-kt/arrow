@@ -30,6 +30,7 @@ jar {
 shadowJar {
   configurations = [project.configurations.compile]
   relocate 'org.jetbrains.kotlin.com.intellij', 'com.intellij'
+  //relocate 'org.jetbrains.kotlin.load', 'kotlin.reflect.jvm.internal.impl.load'
 }
 //
 //com.intellij.findUsagesHandlerFactory

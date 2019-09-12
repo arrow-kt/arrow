@@ -21,8 +21,9 @@
     <extensions defaultExtensionNs="org.jetbrains.kotlin">
         <storageComponentContainerContributor implementation="arrow.meta.plugin.idea.MetaStorageComponentContainerContributor" />.
         <gradleProjectImportHandler implementation="arrow.meta.plugin.idea.ArrowGradleImportHandler"/>
+        <packageFragmentProviderExtension implementation="arrow.meta.plugin.idea.MetaSyntheticPackageFragmentProvider" />
 <!--        <completionInformationProvider implementation="arrow.meta.plugin.idea.MetaCompletionInformationProvider" />-->
-<!--        <syntheticResolveExtension implementation="arrow.meta.plugin.idea.MetaSyntheticResolverExtension"/>-->
+<!--        <syntheticResolveExtension implementation="arrow.meta.plugin.idea.MetaSyntheticResolveExtension"/>-->
 <!--        <syntheticScopeProviderExtension implementation="arrow.meta.plugin.idea.MetaSyntheticScopeProviderExtension" />-->
     </extensions>
     <extensions defaultExtensionNs="com.intellij">
