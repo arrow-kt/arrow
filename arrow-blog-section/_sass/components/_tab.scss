@@ -5,9 +5,9 @@
     padding: ($base-point-grid * 35) 0 ($base-point-grid * 3) 0;
 
     .tab-flex {
-        @include flexbox;
-        @include align-items(center);
-        @include justify-content(space-between);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
         padding-bottom: ($base-point-grid * 2);
         border-bottom: 2px dashed $border-color;
 
@@ -20,11 +20,11 @@
         }
 
         .tab-menu-search {
-            @include flexbox;
-            @include align-items(center);
+            display: flex;
+            align-items: center;
 
             .tab-menu {
-                @include flexbox;
+                display: flex;
             }
 
             .tab-item {
@@ -57,8 +57,8 @@
             }
 
             #search-container {
-                @include flexbox;
-                @include align-items(flex-start);
+                display: flex;
+                align-items: flex-start;
                 position: relative;
                 padding-left: ($base-point-grid * 3);
                 border-left: 2px solid $border-color;
@@ -83,7 +83,7 @@
                 }
 
 
-                #results-container { 
+                #results-container {
                     max-height: 300px;
                     overflow-x: auto;
                     border: $base-border;
@@ -134,8 +134,8 @@
             }
             .tab-menu-search {
                 .tab-menu {
-                    @include flexbox;
-                    @include justify-content(center);
+                    display: flex;
+                    justify-content: center;
                 }
             }
         }
@@ -146,9 +146,6 @@
     #media-tab {
         padding: ($base-point-grid * 20) 0 ($base-point-grid * 3) 0;
         .tab-flex {
-            .tab-title {
-
-            }
             .tab-menu-search {
                 #search-container {
                     display: none;
@@ -163,7 +160,7 @@
     .tab-flex {
         .tab-menu-search {
             .tab-menu {
-                @include justify-content(end);
+              justify-content: end;
             }
         }
     }

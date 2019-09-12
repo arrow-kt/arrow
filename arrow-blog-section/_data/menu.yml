@@ -14,24 +14,30 @@ nav:
 icon-filter:
     - title: All libraries
       category: allposts
-      icon: "all.svg"
+      icon-white: img/icons/arrow-icons/allposts.svg
+      icon-color: img/icons/arrow-icons/allposts-color.svg
 
     - title: Arrow Core
       category: core
-      icon: "core.svg"
+      icon-white: img/icons/arrow-icons/core.svg
+      icon-color: img/icons/arrow-icons/core-color.svg
 
     - title: Arrow Fx
       category: fx
-      icon: "fx.svg"
+      icon-white: img/icons/arrow-icons/fx.svg
+      icon-color: img/icons/arrow-icons/fx-color.svg
 
     - title: Arrow Optics
       category: optics
-      icon: "optics.svg"
+      icon-white: img/icons/arrow-icons/optics.svg
+      icon-color: img/icons/arrow-icons/optics-color.svg
 
     - title: Arrow Meta
       category: meta
-      icon: "meta.svg"
+      icon-white: img/icons/arrow-icons/meta.svg
+      icon-color: img/icons/arrow-icons/meta-color.svg
 
     - title: Arrow Incubator
       category: incubator
-      icon: "incubator.svg"
+      icon-white: img/icons/arrow-icons/incubator.svg
+      icon-color: img/icons/arrow-icons/incubator-color.svg

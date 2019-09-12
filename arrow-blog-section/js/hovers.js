@@ -1,72 +1,71 @@
-const iconFilters = document.querySelectorAll("#icons-filter div");
-const arrayiconFilters = Array.from(iconFilters);
+const categoryIconWhite = document.getElementsByClassName('cat-icon-white');
+const arrayCategoryIconWhite = Array.from(categoryIconWhite);
+const categoryIconColor = document.getElementsByClassName('cat-icon-color');
+const arrayCategoryIconColor = Array.from(categoryIconColor);
+const categorySpan = document.getElementsByClassName('cat-span');
+const arrayCategorySpan = Array.from(categorySpan);
 
 // Auxiliar function to identify the current icon and span objects when mapping
 function getCurrentId(id) {
 
   const iconId = id;
   const iconIdSpan = iconId + "-span";
-  const iconObject = document.getElementById(iconId);
+  const iconWhite = iconId + "-white";
+  const iconColor = iconId + "-color";
+  const iconWhiteObject = document.getElementById(iconWhite);
+  const iconColorObject = document.getElementById(iconColor);
   const iconSpanObject = document.getElementById(iconIdSpan);
 
   return {
-    icon: iconObject,
+    iconWhite: iconWhiteObject,
+    iconColor: iconColorObject,
     span: iconSpanObject,
   };
 }
 
-function losingFocus(e) {
-  arrayiconFilters.map(function(obj) {
+function checkActiveTag(arrowFeatures) {
+  arrowFeatures.map(function(el) {
     const {
-      icon,
+      iconWhite,
+      iconColor,
       span
-    } = getCurrentId(obj.id);
+    } = getCurrentId(el.id);
 
-    if (icon.className != "tab-item active") {
-      if (obj.id == e.id) {
-        icon.style.backgroundImage = `url('/img/icons/arrow-icons/${obj.id}.svg')`;
-        icon.style.opacity = "0.4";
-        span.style.opacity = "0.4";
+    if(el.classList.contains('active')) {
+      iconWhite.style.opacity = 0;
+      iconColor.style.opacity = 1;
+      span.style.opacity = 1;
+    } else {
+      iconWhite.style.opacity = 0.5;
+      iconColor.style.opacity = 0;
+      span.style.opacity = 0.5;
+    }
+  });
+}
+
+function applyingFocus(arrowFeatures, id) {
+
+  arrowFeatures.map(function(el) {
+    const {
+      iconWhite,
+      iconColor,
+      span
+    } = getCurrentId(el.id);
+
+    if (el.id != id) {
+      if(el.classList.contains('active')) {
+        iconColor.style.opacity = 0.5;
+        iconWhite.style.opacity = 0;
+        span.style.opacity = 0.5;
+      } else {
+        iconWhite.style.opacity = 0.5;
+        iconColor.style.opacity = 0;
+        span.style.opacity = 0.5;
       }
     } else {
-      icon.style.opacity = "1";
-      span.style.opacity = "1";
-    }
-  });
-}
-
-function checkActiveTag() {
-  arrayiconFilters.map(function(obj) {
-    const {
-      icon,
-      span
-    } = getCurrentId(obj.id);
-
-    if (icon.className == "tab-item active") {
-      icon.style.backgroundImage = `url('/img/icons/arrow-icons/hovers/${obj.id}-hover.svg')`;
-    } else {
-      icon.style.opacity = "0.4";
-      span.style.opacity = "0.4";
-    }
-  });
-
-}
-
-function applyingFocus(e) {
-
-  arrayiconFilters.map(function(obj) {
-    const {
-      icon,
-      span
-    } = getCurrentId(obj.id);
-
-    if (obj.id != e.id) {
-      icon.style.opacity = "0.4";
-      span.style.opacity = "0.4";
-    } else {
-      icon.style.backgroundImage = `url('/img/icons/arrow-icons/hovers/${obj.id}-hover.svg')`;
-      icon.style.opacity = "1";
-      span.style.opacity = "1";
+      iconColor.style.opacity = 1;
+      iconWhite.style.opacity = 0;
+      span.style.opacity = 1;
     }
   });
 }

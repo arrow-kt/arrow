@@ -1,7 +1,7 @@
 // base elements
 const body = document.getElementById('arrow-main');
 const baseArrowLogo = document.getElementById('base-arrow-animation');
-const homeCodeBlock = document.querySelectorAll('.home-doc-content');
+const homeCodeBlock = document.querySelectorAll('.browser-content');
 const arrayHomeCodeBlock = Array.from(homeCodeBlock);
 
 // nav elements
@@ -44,7 +44,7 @@ const incubatorHoverLogo = document.getElementById('incubator-hover-animation');
 const incubatorList = document.getElementById('incubator-list');
 
 // Features elements
-const headerCategoryRow = document.querySelectorAll('.item-header h2, p');
+const headerCategoryRow = document.querySelectorAll('.item-header > p, .item-header > h2');
 const arrayHeaderCategoryRow = Array.from(headerCategoryRow);
 const buttonCategoryRow = document.querySelectorAll('.main-item a');
 const arrayButtonCategoryRoww = Array.from(buttonCategoryRow);

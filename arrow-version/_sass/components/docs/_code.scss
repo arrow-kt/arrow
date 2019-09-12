@@ -14,16 +14,24 @@ ul {
 }
 
 
-.hljs {
-    display: block;
-    overflow-x: auto;
-    color: $base-font-color;
-    padding: ($base-point-grid * 1.5) 0 ($base-point-grid * 1.5) ($base-point-grid * 2);
-    font-family: $code-font-family;
-    margin-bottom: ($base-point-grid * 3);
-    font-size: 16px;
-    box-shadow: $box-shadow-item;
+.doc-content {
+
+    
+    .CodeMirror {
+        font-size: 15px;
+        font-family: $code-font-family;
+        
+        pre {
+            line-height: 1.8;
+        }
+        
+    }
+    
+    .cm-s-arrow span.cm-keyword {
+        font-weight: $font-regular;
+    }
 }
+
 
 .language-kotlin {
     display: none;

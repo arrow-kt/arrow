@@ -1,15 +1,20 @@
 <div id="site-header">
   <div class="wrapper">
     <div class="header-flex">
-      <div id="header-text" class="header-text">
-        <h1>{{site.data.commons.description}}</h1>
-      </div>
-      {% assign codeCol = site.code %}
-      {% for code in codeCol %}
-      <div id="{{code.library}}-code-block" class="home-doc-content">
-      {{ code }}
+      <div class="header-text">
+        <h1 id="header-text">{{site.data.commons.description}}</h1>
+        {% assign codeCol = site.code %}
+        {% for code in codeCol %}
+      <div id="{{code.library}}-code-block" class="browser-content">
+          <ul class="browser-header">
+              <li></li>
+              <li></li>
+              <li></li>
+          </ul>
+          <div class="browser-code">{{ code }}</div>
       </div>
       {% endfor %}
+      </div>
       <div class="header-image">
         <div id="base-arrow-animation" class="image-animation" alt="Arrow base"></div>
         <div id="core-arrow-animation" class="image-animation" alt="Arrow core"></div>
