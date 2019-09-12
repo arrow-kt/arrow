@@ -1,0 +1,12 @@
+## Jekyll
+_site
+.sass-cache
+.jekyll-metadata
+
+## OSX generated
+.DS_Store
+
+## Ruby environment normalization:
+.bundle/
+vendor/
+lib/bundler/man/

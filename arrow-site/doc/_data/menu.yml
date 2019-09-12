@@ -1,0 +1,12 @@
+nav:
+    - title: Blog
+      url: /blog
+
+    - title: Github
+      url: https://github.com/arrow-kt/arrow
+
+    - title: License
+      url: https://github.com/arrow-kt/arrow/blob/master/LICENSE
+
+    - title: Media
+      url: https://github.com/arrow-kt/arrow/blob/master/LICENSE

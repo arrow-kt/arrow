@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="96px" height="108px" viewBox="0 0 96 108" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: sketchtool 55.2 (78181) - https://sketchapp.com -->
+    <title>B22AD727-F2D6-4A1A-8D14-7821A2066F3A</title>
+    <desc>Created with sketchtool.</desc>
+    <defs>
+        <linearGradient x1="50%" y1="0.530365386%" x2="50%" y2="100%" id="linearGradient-1">
+            <stop stop-color="#00D8B2" offset="0.0290329392%"></stop>
+            <stop stop-color="#00A394" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="0.501478041%" x2="50%" y2="100%" id="linearGradient-2">
+            <stop stop-color="#1EFFD3" offset="0%"></stop>
+            <stop stop-color="#00B4A4" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="52.1251689%" y1="16.1573841%" x2="36.8751274%" y2="100%" id="linearGradient-3">
+            <stop stop-color="#005948" offset="0%"></stop>
+            <stop stop-color="#18CDAA" stop-opacity="0" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="52.172788%" y1="16.1573841%" x2="36.5810355%" y2="100%" id="linearGradient-4">
+            <stop stop-color="#005948" offset="0%"></stop>
+            <stop stop-color="#18CDAA" stop-opacity="0" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="-7.62502133%" x2="50%" y2="76.062468%" id="linearGradient-5">
+            <stop stop-color="#132532" offset="0%"></stop>
+            <stop stop-color="#132532" stop-opacity="0" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-6">
+            <stop stop-color="#E9E9E9" offset="0%"></stop>
+            <stop stop-color="#FFFFFF" offset="78.1426324%"></stop>
+            <stop stop-color="#CEE7E3" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-7">
+            <stop stop-color="#2AFFCE" offset="0%"></stop>
+            <stop stop-color="#00A18F" stop-opacity="0" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="100%" x2="50%" y2="16.4585658%" id="linearGradient-8">
+            <stop stop-color="#2AFFCE" offset="0%"></stop>
+            <stop stop-color="#009A77" stop-opacity="0" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="9.39425339%" y1="8.25477013%" x2="52.3609932%" y2="50%" id="linearGradient-9">
+            <stop stop-color="#FFFFFF" offset="0%"></stop>
+            <stop stop-color="#20DCB3" stop-opacity="0" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="11.2162705%" y1="10.7950846%" x2="74.398937%" y2="80.5155436%" id="linearGradient-10">
+            <stop stop-color="#FFFFFF" offset="0%"></stop>
+            <stop stop-color="#88FFE4" stop-opacity="0" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="11.2162705%" y1="10.7950846%" x2="74.398937%" y2="80.5155436%" id="linearGradient-11">
+            <stop stop-color="#FFFFFF" offset="0%"></stop>
+            <stop stop-color="#88FFE4" stop-opacity="0" offset="100%"></stop>
+        </linearGradient>
+        <radialGradient cx="80.686849%" cy="88.655599%" fx="80.686849%" fy="88.655599%" r="42.0601225%" gradientTransform="translate(0.806868,0.886556),scale(1.000000,0.993377),rotate(-112.304057),translate(-0.806868,-0.886556)" id="radialGradient-12">
+            <stop stop-color="#FFFFFF" offset="0%"></stop>
+            <stop stop-color="#FFFFFF" stop-opacity="0" offset="100%"></stop>
+        </radialGradient>
+    </defs>
+    <g id="Arrow-Website" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Arrow-Optics-Hover" transform="translate(-989.000000, -794.000000)">
+            <g id="features" transform="translate(160.000000, 792.000000)">
+                <g id="feature/optics/active" transform="translate(714.000000, 2.000000)">
+                    <g id="optics">
+                        <g id="logos/arrow-optics/color" transform="translate(103.000000, 0.000000)">
+                            <polygon id="Path" fill="url(#linearGradient-1)" points="60 0 12 96.6400024 60 72.4800018"></polygon>
+                            <polygon id="Path" fill="url(#linearGradient-2)" transform="translate(84.000000, 48.320001) scale(-1, 1) translate(-84.000000, -48.320001) " points="108 0 60 96.6400024 108 72.4800018"></polygon>
+                            <rect id="bound" opacity="0.261579241" x="46" y="56.3733348" width="28" height="28.1866674"></rect>
+                            <polygon id="Path-5-Copy" fill-opacity="0.7" fill="url(#linearGradient-3)" opacity="0.723563058" transform="translate(87.087891, 74.119767) scale(-1, 1) translate(-87.087891, -74.119767) " points="80 89.7231012 94.1757812 58.5164338 94.1757812 82.3391821"></polygon>
+                            <polygon id="Path-5-Copy-2" fill-opacity="0.7" fill="url(#linearGradient-4)" opacity="0.723563058" points="25.598999 89.7398135 40 58.3866681 40 82.5466688"></polygon>
+                            <polygon id="Path-5" fill-opacity="0.7" fill="url(#linearGradient-5)" points="12 96.6400024 60.0029907 72.4800018 108 96.6400024 60 118.558597"></polygon>
+                            <g id="optics" transform="translate(36.000000, 44.293334)">
+                                <ellipse id="Oval-Copy-7" fill="#FFFFFF" cx="24" cy="24.1600006" rx="24" ry="24.1600006"></ellipse>
+                                <ellipse id="Oval-Copy-6" fill="url(#linearGradient-6)" cx="24" cy="24.1600004" rx="20.5714286" ry="20.7085717"></ellipse>
+                                <ellipse id="Oval" fill="#01362C" cx="24" cy="24.1600006" rx="18" ry="18.1200005"></ellipse>
+                                <ellipse id="Oval-Copy-11" fill="url(#linearGradient-7)" cx="24" cy="24.1600006" rx="15" ry="15.1000004"></ellipse>
+                                <ellipse id="Oval-Copy-12" fill="url(#linearGradient-8)" cx="24" cy="24.1600006" rx="9" ry="9.06000023"></ellipse>
+                                <ellipse id="Oval-Copy-9" fill="url(#linearGradient-9)" cx="24" cy="24.1600006" rx="13" ry="13.086667"></ellipse>
+                                <ellipse id="Oval-Copy-15" fill="url(#linearGradient-10)" opacity="0.683919271" cx="24" cy="24.1600006" rx="6" ry="6.04000015"></ellipse>
+                                <ellipse id="Oval-Copy-17" fill="url(#linearGradient-11)" opacity="0.683919271" cx="20.5" cy="19.6300005" rx="3.5" ry="3.52333342"></ellipse>
+                                <path d="M9.00846162,23.6479737 C9.26731411,31.2024417 15.4324793,37.2466676 23,37.2466676 C30.7319865,37.2466676 37,30.9368672 37,23.1533339 C37,15.5353629 30.9958023,9.32909644 23.491364,9.06851826 C23.6602173,9.06285456 23.8297775,9.06000023 24,9.06000023 C32.2842712,9.06000023 39,15.8205007 39,24.1600006 C39,32.4995005 32.2842712,39.260001 24,39.260001 C15.7157288,39.260001 9,32.4995005 9,24.1600006 C9,23.9886433 9.00283543,23.8179527 9.00846162,23.6479737 Z" id="Combined-Shape" fill="url(#radialGradient-12)" opacity="0.268415179"></path>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

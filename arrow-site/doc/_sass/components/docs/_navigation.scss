@@ -1,0 +1,118 @@
+// NAVIGATION
+// -----------------------------------------------
+// -----------------------------------------------
+
+#navigation {
+  position: fixed;
+  z-index: 30;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: ($base-point-grid * 5) ($base-point-grid * 4);
+  transition: all $base-duration $base-timing;
+
+  .navigation-brand {
+    font-weight: $font-medium;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    @include bp(small) {
+      letter-spacing: 2px;
+    }
+  }
+
+  .navigation-menu {
+    .navigation-menu-item {
+      display: inline-block;
+      text-transform: uppercase;
+      font-size: 0.875rem;
+      @include bp(medium) {
+        text-transform: none;
+      }
+
+      &.active {
+        border-bottom: 2px solid $brand-tertiary;
+      }
+
+      & + .navigation-menu-item {
+        margin-left: ($base-point-grid * 4);
+        @include bp(small) {
+          margin-left: ($base-point-grid * 3.2);
+        }
+      }
+    }
+
+    .dropbtn {
+      @include links($white, $white, rgba($white, 0.5), rgba($white, 0.5));
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: $white;
+      font-size: 0.875rem;
+      margin-bottom: 10px;
+    }
+
+    .dropdown {
+      position: relative;
+      display: block;
+      outline: 0;
+    }
+    /* Documentation Dropdown Content (Hidden by Default) */
+    .dropdown-content {
+      font-size: 0.800rem;
+      position: absolute;
+      min-width: 145px;
+      overflow: auto;
+      box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+      z-index: 1;
+      margin-left: -8px;
+      background: rgba($brand-primary, 0.95);
+      opacity: 0.5;
+      transform: rotate3d(1, 0, 0, 90deg);
+      transition: transform ease 250ms, opacity ease 100ms;
+      transform-origin: top;
+
+      a {
+        padding: 12px 9px;
+        text-decoration: none;
+        display: block;
+      }
+
+      a:nth-child(4) {
+        border-top: solid 1px rgba(255, 255, 255, 0.5);
+      }
+    }
+    /* Show the documentatioin dropdown menu (use JS to add this class
+          to the .dropdown-content container when the user clicks on
+          the dropdown button) */
+    .show {
+      transform: rotate3d(1,0,0,0);
+      opacity: 1;
+    }
+  }
+
+  a {
+    @include links($white, $white, rgba($white, 0.5), rgba($white, 0.5));
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
+
+  .nav-item-text {
+    @include bp(small) {
+      display: none;
+    }
+  }
+
+  .nav-item-icon {
+    display: none;
+    @include bp(small) {
+      display: inline-block;
+    }
+  }
+
+  &.navigation-scroll {
+    padding: ($base-point-grid * 2) ($base-point-grid * 4);
+  }
+}

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="101px" height="102px" viewBox="0 0 101 102" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: sketchtool 56.3 (101010) - https://sketch.com -->
+    <title>0F28D75E-5645-40B0-8DC1-BA7E77821693</title>
+    <desc>Created with sketchtool.</desc>
+    <g id="Arrow-Website" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="arrow-meta-lines-home" transform="translate(-1032.000000, -791.000000)">
+            <g id="features" transform="translate(160.000000, 792.000000)">
+                <g id="feature/meta/blacky" transform="translate(804.000000, 2.000000)">
+                    <g id="arrow-meta-lines-black" transform="translate(58.500000, 0.000000)">
+                        <polygon id="shadow" fill="#263238" opacity="0.1" points="60 -7.12485644e-15 60 48.8115377 77.4375 83.2938042 108 96.6400024"></polygon>
+                        <polygon id="shadow" fill="#263238" opacity="0.1" points="77.4375 83.2938042 109 97.6466691 81.7744141 92.2348526"></polygon>
+                        <polygon id="shadow" fill="#263238" opacity="0.1" transform="translate(26.649902, 90.470237) scale(-1, 1) translate(-26.649902, -90.470237) " points="11 83.2938042 42.2998047 97.6466691 15.4731445 92.6664216"></polygon>
+                        <polygon id="shadow-copy" fill="#263238" opacity="0.1" transform="translate(48.000000, 72.983335) scale(-1, 1) translate(-48.000000, -72.983335) " points="36 49.3266679 60 96.6400024 36 84.5600021"></polygon>
+                        <polyline id="lines" stroke="#263238" stroke-width="2" transform="translate(60.000000, 48.320001) scale(-1, 1) translate(-60.000000, -48.320001) " points="77.0180664 82.5466688 108 96.6400024 60 0 12 96.6400024 42.9013672 82.5466688"></polyline>
+                        <polygon id="Path-Copy-2" stroke="#263238" stroke-width="2" transform="translate(60.000000, 72.480002) scale(-1, 1) translate(-60.000000, -72.480002) " points="60 48.3200012 36 96.6400024 60 84.5600021 84 96.6400024"></polygon>
+                        <path d="M60,49.3266679 L60,85.0009104" id="Path-22" stroke="#263238" stroke-width="2"></path>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="102px" height="118px" viewBox="0 0 102 118" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: sketchtool 55.2 (78181) - https://sketchapp.com -->
+    <title>8331FB0B-C64E-4396-BD54-4696CAFC2081</title>
+    <desc>Created with sketchtool.</desc>
+    <g id="Arrow-Website" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Arrow-Home" transform="translate(-629.000000, -789.000000)">
+            <g id="features" transform="translate(160.000000, 792.000000)">
+                <g id="feature/fx/black" transform="translate(357.000000, 0.000000)">
+                    <g id="arrow-fx-line-black" transform="translate(103.000000, 0.000000)">
+                        <polygon id="shadow" fill="#263238" opacity="0.1" points="60 -7.12485644e-15 60 68.4533351 80 64.4266683 73.5976562 79.3241556 108 96.6400024"></polygon>
+                        <polygon id="shadow" fill="#263238" opacity="0.1" points="12 96.6400024 40 82.5843064 60 78.891112 60 86.9410048"></polygon>
+                        <polygon id="shadow" fill="#263238" opacity="0.1" points="73.6806641 79.9921537 108 96.6400024 69.3793945 88.3160781"></polygon>
+                        <polygon id="shadow" fill="#263238" opacity="0.1" points="60 37.9623447 52.8266602 71.03341 60 69.444887"></polygon>
+                        <polygon id="shadow" fill="#263238" opacity="0.1" points="60 77.5576965 67.5611572 76.0244713 60 107.758066"></polygon>
+                        <polygon id="shadow" fill="#263238" opacity="0.1" points="61 36.2400009 67.8569336 66.7218978 61 68.0957423"></polygon>
+                        <polygon id="shadow" fill="#263238" opacity="0.1" points="80.4023438 64.4266683 86.4404297 85.8827268 74 79.3241556"></polygon>
+                        <polyline id="lines" stroke="#263238" stroke-width="2" points="73.5976562 79.3241556 108 96.6400024 60 0 12 96.6400024 40.779541 82.1750672"></polyline>
+                        <polygon id="lines" stroke="#263238" stroke-width="2" points="60.0149536 109.76431 80 64.4266695 60 68.4533365 60.0149536 37.2466676 40 82.5843085 60.0149536 78.5200039"></polygon>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
