@@ -18,7 +18,7 @@ Let's say we have an application working with RxJava's `Observable`. We'll end u
 based on that given data type. But at the end of the day, and for the sake of simplicity, wouldn't  `Observable` be just 
 like a "container" with some extra powers?
 
-And same story for other "containers" like `Flowable`, `Deferred` (coroutines), `Future`, `IO`, and many more.
+And same story for other "containers" like `Flowable`, `Future`, `IO`, and many more.
 
 Conceptually, all those types represent an operation (already done or pending to be done), which could support things 
 like mapping over the inner value, flatMapping to chain other operations of the same type, zipping it with other 
@@ -45,8 +45,8 @@ interface DataSource {
 }
 ```
 
-We'll return `Observable` here for simplicity, but it could be `Single`, `Maybe`, `Flowable`, `Deferred`, or anything 
-else depending on our needs.
+We'll return `Observable` here for simplicity, but it could be `Single`, `Maybe`, `Flowable`, or anything else depending 
+on our needs.
 
 Let's add a couple of mock implementations for it, a **local** and a **remote** one.
 
