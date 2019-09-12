@@ -102,7 +102,7 @@
               text-decoration: none;
               border-bottom: 2px solid $brand-primary;
             }
-            
+
             &.hover-mode {
               &:hover {
                 color: $white;
@@ -114,41 +114,28 @@
     }
 
     .nav-icon-open {
-      padding: 16px;
-      margin: -16px;
       display: none;
       transition: transform $base-duration $base-timing;
 
       &:hover {
         transform: scaleX(1.5);
       }
-
-      #nav-icon-open-white {
-        opacity: 0;
-        color: $white;
-        position: absolute;
-        transition: $opacity-transition;
-      }
-
-      #nav-icon-open-dark {
-        transition: $opacity-transition;
-      }
     }
 
     .nav-icon-close {
-      display: none;
-      padding: 6px;
-      left: 80%;
-      top: 32px;
+        display: none;
+        padding: 6px;
+        left: 85%;
+        top: 32px;
 
-      img {
-        display: block;
-        transition: transform 0.3s ease;
+        img {
+            display: block;
+            transition: transform .3s ease;
 
-        &:hover {
-          transform: rotate(180deg);
+            &:hover {
+              transform: rotate(180deg);
+            }
         }
-      }
     }
   }
 }
@@ -160,7 +147,7 @@
       .nav-menu {
         position: fixed;
         padding: ($base-point-grid * 4) ($base-point-grid * 6);
-        background: rgba($background-color, 0.97);
+        background: $core-background;
         height: 100%;
         right: -100%;
         top: 0;
@@ -182,6 +169,9 @@
               margin-right: 0;
             }
           }
+        }
+        &.top-scroll {
+          padding-top: $base-point-grid;
         }
       }
 
