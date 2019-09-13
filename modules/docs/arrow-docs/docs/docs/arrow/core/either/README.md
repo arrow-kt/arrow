@@ -317,6 +317,21 @@ Example:
 null.rightIfNotNull { "left" }
 ```
 
+The inverse of `rightIfNotNull`, `rightIfNull`.
+If the value is null it will be transformed to the specified `Either.right` and the type will be `kotlin.Unit` which is 
+equivalent to Java's Void class. If the value is not null than it will be transformed to the specified `Either.Left`.
+
+Example:
+
+```kotlin:ank
+// Results in Either.Left
+"value".rightIfNull { "left" }
+```
+
+```kotlin:ank
+// Results in Either.Right
+null.rightIfNull { "left" }
+```
 
  Arrow contains `Either` instances for many useful typeclasses that allows you to use and transform right values.
  Both Option and Try don't require a type parameter with the following functions, but it is specifically used for Either.Left
