@@ -17,7 +17,6 @@ import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.descriptors.Visibilities
-import org.jetbrains.kotlin.ir.backend.js.kotlinLibrary
 import org.jetbrains.kotlin.ir.expressions.IrFunctionAccessExpression
 import org.jetbrains.kotlin.ir.expressions.mapValueParameters
 import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
@@ -48,6 +47,12 @@ val MetaComponentRegistrar.typeClasses: Pair<Name, List<ExtensionPhase>>
             )
           }
         ),
+        syntheticScopes(
+          syntheticMemberFunctionsForName = { receiverTypes, name, location ->
+            println("typeclasses.syntheticScopes.syntheticMemberFunctionsForName: $receiverTypes, $name, $location")
+            emptyList()
+          }
+        ),
         irFunctionAccess { mapValueParameterExtensions(it) }
       )
 
@@ -66,14 +71,14 @@ private fun IrUtils.mapValueParameterExtensions(expression: IrFunctionAccessExpr
   } else null
 
 private fun IrUtils.extensionCall(valueParameterDescriptor: ValueParameterDescriptor): IrFunctionAccessExpression? =
-  when (val extension = findExtension(valueParameterDescriptor)) {
+  when (val extension = compilerContext.findExtension(valueParameterDescriptor)) {
     is FunctionDescriptor -> extension.irCall()
     is ClassDescriptor -> extension.irConstructorCall()
     is PropertyDescriptor -> extension.irGetterCall()
     else -> null
   }
 
-private fun IrUtils.findExtension(valueParameterDescriptor: ValueParameterDescriptor): DeclarationDescriptor? {
+private fun CompilerContext.findExtension(valueParameterDescriptor: ValueParameterDescriptor): DeclarationDescriptor? {
   val extensionType = valueParameterDescriptor.type
   val typeClass = extensionType.typeClassDescriptor()
   val dataType = extensionType.dataTypeDescriptor()
@@ -83,17 +88,17 @@ private fun IrUtils.findExtension(valueParameterDescriptor: ValueParameterDescri
   val internalExtensions = internalPackages.extensions(extensionType)
   if (
     internalPackages.extensionsAreInternal(typeClassPackage, dataTypePackage, internalExtensions)) {
-    compilerContext.reportNonInternalOrphanExtension(extensionType, internalExtensions[0])
+    reportNonInternalOrphanExtension(extensionType, internalExtensions[0])
   }
   val extensions = extensionType.resolveExtensions(internalExtensions, typeClassPackage, dataTypePackage)
 
   return when {
     extensions.isEmpty() -> {
-      compilerContext.reportExtensionNotFound(extensionType)
+      reportExtensionNotFound(extensionType)
       null
     }
     extensions.size > 1 -> {
-      compilerContext.reportAmbiguousExtensions(extensionType, extensions)
+      reportAmbiguousExtensions(extensionType, extensions)
       null
     }
     else -> extensions[0]
@@ -105,8 +110,8 @@ private fun List<PackageFragmentDescriptor>.extensions(extensionType: KotlinType
     it.findExtensionProof(extensionType)
   }.distinctBy { it.name }
 
-private fun IrUtils.modulePackages(): List<PackageFragmentDescriptor> =
-  compilerContext.files.toSet().flatMap { compilerContext.module.getPackage(it.packageFqName).fragments }
+private fun CompilerContext.modulePackages(): List<PackageFragmentDescriptor> =
+  files.toSet().flatMap { module.getPackage(it.packageFqName).fragments }
 
 private fun KotlinType.resolveExtensions(
   internalExtensions: List<DeclarationDescriptor>,

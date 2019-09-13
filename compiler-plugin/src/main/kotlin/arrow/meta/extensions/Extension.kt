@@ -17,7 +17,9 @@ import org.jetbrains.kotlin.container.ComponentProvider
 import org.jetbrains.kotlin.container.get
 import org.jetbrains.kotlin.context.ProjectContext
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.ConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
+import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
@@ -26,6 +28,7 @@ import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 import org.jetbrains.kotlin.diagnostics.Diagnostic
 import org.jetbrains.kotlin.diagnostics.DiagnosticSink
+import org.jetbrains.kotlin.incremental.components.LookupLocation
 import org.jetbrains.kotlin.incremental.components.LookupTracker
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.name.Name
@@ -42,9 +45,11 @@ import org.jetbrains.kotlin.resolve.checkers.DeclarationCheckerContext
 import org.jetbrains.kotlin.resolve.lazy.LazyClassContext
 import org.jetbrains.kotlin.resolve.lazy.declarations.ClassMemberDeclarationProvider
 import org.jetbrains.kotlin.resolve.lazy.declarations.PackageMemberDeclarationProvider
+import org.jetbrains.kotlin.resolve.scopes.ResolutionScope
 import org.jetbrains.kotlin.resolve.scopes.SyntheticScope
 import org.jetbrains.kotlin.storage.StorageManager
 import org.jetbrains.kotlin.synthetic.JavaSyntheticPropertiesScope
+import org.jetbrains.kotlin.synthetic.SyntheticScopeProviderExtension
 import org.jetbrains.kotlin.types.KotlinType
 import java.util.*
 
@@ -56,7 +61,7 @@ interface ExtensionPhase {
         CompositePhase(phases.toList())
     }
   }
-
+  
   interface Config : ExtensionPhase {
     fun CompilerContext.updateConfiguration(configuration: CompilerConfiguration): Unit
   }
@@ -209,10 +214,15 @@ interface ExtensionPhase {
   }
 
   interface SyntheticScopeProvider : ExtensionPhase {
-    fun CompilerContext.getSyntheticScopes(
-      moduleDescriptor: ModuleDescriptor,
-      javaSyntheticPropertiesScope: JavaSyntheticPropertiesScope
-    ): List<SyntheticScope>
+    fun CompilerContext.syntheticConstructor(constructor: ConstructorDescriptor): ConstructorDescriptor?
+    fun CompilerContext.syntheticConstructors(scope: ResolutionScope): Collection<FunctionDescriptor>
+    fun CompilerContext.syntheticConstructors(scope: ResolutionScope, name: Name, location: LookupLocation): Collection<FunctionDescriptor>
+    fun CompilerContext.syntheticExtensionProperties(receiverTypes: Collection<KotlinType>, location: LookupLocation): Collection<PropertyDescriptor>
+    fun CompilerContext.syntheticExtensionProperties(receiverTypes: Collection<KotlinType>, name: Name, location: LookupLocation): Collection<PropertyDescriptor>
+    fun CompilerContext.syntheticMemberFunctions(receiverTypes: Collection<KotlinType>): Collection<FunctionDescriptor>
+    fun CompilerContext.syntheticMemberFunctions(receiverTypes: Collection<KotlinType>, name: Name, location: LookupLocation): Collection<FunctionDescriptor>
+    fun CompilerContext.syntheticStaticFunctions(scope: ResolutionScope): Collection<FunctionDescriptor>
+    fun CompilerContext.syntheticStaticFunctions(scope: ResolutionScope, name: Name, location: LookupLocation): Collection<FunctionDescriptor>
   }
 
   interface DiagnosticsSuppressor : ExtensionPhase {

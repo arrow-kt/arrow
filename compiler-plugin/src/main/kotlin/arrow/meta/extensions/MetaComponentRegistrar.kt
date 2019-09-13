@@ -1,9 +1,7 @@
 package arrow.meta.extensions
 
 import arrow.meta.higherkind.KindAwareTypeChecker
-import arrow.meta.utils.NoOp3
-import arrow.meta.utils.NoOp6
-import arrow.meta.utils.NullableOp1
+import arrow.meta.utils.Noop
 import arrow.meta.utils.cli
 import arrow.meta.utils.ide
 import arrow.meta.utils.setFinalStatic
@@ -31,11 +29,12 @@ import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.JVMConfigurationKeys
 import org.jetbrains.kotlin.container.ComponentProvider
 import org.jetbrains.kotlin.container.StorageComponentContainer
-import org.jetbrains.kotlin.container.registerSingleton
 import org.jetbrains.kotlin.container.useInstance
 import org.jetbrains.kotlin.context.ProjectContext
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.ConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
+import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
@@ -49,6 +48,7 @@ import org.jetbrains.kotlin.extensions.CompilerConfigurationExtension
 import org.jetbrains.kotlin.extensions.DeclarationAttributeAltererExtension
 import org.jetbrains.kotlin.extensions.PreprocessedVirtualFileFactoryExtension
 import org.jetbrains.kotlin.extensions.StorageComponentContainerContributor
+import org.jetbrains.kotlin.incremental.components.LookupLocation
 import org.jetbrains.kotlin.incremental.components.LookupTracker
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.name.Name
@@ -71,6 +71,7 @@ import org.jetbrains.kotlin.resolve.jvm.extensions.PackageFragmentProviderExtens
 import org.jetbrains.kotlin.resolve.lazy.LazyClassContext
 import org.jetbrains.kotlin.resolve.lazy.declarations.ClassMemberDeclarationProvider
 import org.jetbrains.kotlin.resolve.lazy.declarations.PackageMemberDeclarationProvider
+import org.jetbrains.kotlin.resolve.scopes.ResolutionScope
 import org.jetbrains.kotlin.resolve.scopes.SyntheticScope
 import org.jetbrains.kotlin.storage.StorageManager
 import org.jetbrains.kotlin.synthetic.JavaSyntheticPropertiesScope
@@ -256,18 +257,51 @@ interface MetaComponentRegistrar : ComponentRegistrar {
         )
     }
 
-  fun syntheticScopes(getSyntheticScopes: CompilerContext.(moduleDescriptor: ModuleDescriptor, javaSyntheticPropertiesScope: JavaSyntheticPropertiesScope) -> List<SyntheticScope>): ExtensionPhase.SyntheticScopeProvider =
-    object : ExtensionPhase.SyntheticScopeProvider {
-      override fun CompilerContext.getSyntheticScopes(
-        moduleDescriptor: ModuleDescriptor,
-        javaSyntheticPropertiesScope: JavaSyntheticPropertiesScope
-      ): List<SyntheticScope> =
-        getSyntheticScopes(moduleDescriptor, javaSyntheticPropertiesScope)
-    }
+  fun syntheticScopes(
+    syntheticConstructor: CompilerContext.(constructor: ConstructorDescriptor) -> ConstructorDescriptor? = Noop.nullable2(),
+    syntheticConstructors: CompilerContext.(scope: ResolutionScope) -> Collection<FunctionDescriptor> = Noop.emptyCollection2(),
+    syntheticConstructorsForName: CompilerContext.(scope: ResolutionScope, name: Name, location: LookupLocation) -> Collection<FunctionDescriptor> = Noop.emptyCollection4(),
+    syntheticExtensionProperties: CompilerContext.(receiverTypes: Collection<KotlinType>, location: LookupLocation) -> Collection<PropertyDescriptor> = Noop.emptyCollection3(),
+    syntheticExtensionPropertiesForName: CompilerContext.(receiverTypes: Collection<KotlinType>, name: Name, location: LookupLocation)-> Collection<PropertyDescriptor> = Noop.emptyCollection4(),
+    syntheticMemberFunctions: CompilerContext.(receiverTypes: Collection<KotlinType>) -> Collection<FunctionDescriptor> = Noop.emptyCollection2(),
+    syntheticMemberFunctionsForName: CompilerContext.(receiverTypes: Collection<KotlinType>, name: Name, location: LookupLocation) -> Collection<FunctionDescriptor> = Noop.emptyCollection4(),
+    syntheticStaticFunctions: CompilerContext.(scope: ResolutionScope) -> Collection<FunctionDescriptor> = Noop.emptyCollection2(),
+    syntheticStaticFunctionsForName: CompilerContext.(scope: ResolutionScope, name: Name, location: LookupLocation) -> Collection<FunctionDescriptor> = Noop.emptyCollection4()
+  ): ExtensionPhase =
+    ide {
+      object : ExtensionPhase.SyntheticScopeProvider {
+        override fun CompilerContext.syntheticConstructor(constructor: ConstructorDescriptor): ConstructorDescriptor? =
+          syntheticConstructor(constructor)
+
+        override fun CompilerContext.syntheticConstructors(scope: ResolutionScope): Collection<FunctionDescriptor> =
+          syntheticConstructors(scope)
+
+        override fun CompilerContext.syntheticConstructors(scope: ResolutionScope, name: Name, location: LookupLocation): Collection<FunctionDescriptor> =
+          syntheticConstructorsForName(scope, name, location)
+
+        override fun CompilerContext.syntheticExtensionProperties(receiverTypes: Collection<KotlinType>, location: LookupLocation): Collection<PropertyDescriptor> =
+          syntheticExtensionProperties(receiverTypes, location)
+
+        override fun CompilerContext.syntheticExtensionProperties(receiverTypes: Collection<KotlinType>, name: Name, location: LookupLocation): Collection<PropertyDescriptor> =
+          syntheticExtensionPropertiesForName(receiverTypes, name, location)
+
+        override fun CompilerContext.syntheticMemberFunctions(receiverTypes: Collection<KotlinType>): Collection<FunctionDescriptor> =
+          syntheticMemberFunctions(receiverTypes)
+
+        override fun CompilerContext.syntheticMemberFunctions(receiverTypes: Collection<KotlinType>, name: Name, location: LookupLocation): Collection<FunctionDescriptor> =
+          syntheticMemberFunctionsForName(receiverTypes, name, location)
+
+        override fun CompilerContext.syntheticStaticFunctions(scope: ResolutionScope): Collection<FunctionDescriptor> =
+          syntheticStaticFunctions(scope)
+
+        override fun CompilerContext.syntheticStaticFunctions(scope: ResolutionScope, name: Name, location: LookupLocation): Collection<FunctionDescriptor> =
+          syntheticStaticFunctionsForName(scope, name, location)
+      }
+    } ?: ExtensionPhase.Empty
 
   fun preprocessedVirtualFileFactory(
     createPreprocessedFile: CompilerContext.(file: VirtualFile?) -> VirtualFile?,
-    createPreprocessedLightFile: CompilerContext.(file: LightVirtualFile?) -> LightVirtualFile? = NullableOp1()
+    createPreprocessedLightFile: CompilerContext.(file: LightVirtualFile?) -> LightVirtualFile? = Noop.nullable2()
   ): ExtensionPhase.PreprocessedVirtualFileFactory =
     object : ExtensionPhase.PreprocessedVirtualFileFactory {
       override fun CompilerContext.isPassThrough(): Boolean = false
@@ -316,7 +350,7 @@ interface MetaComponentRegistrar : ComponentRegistrar {
     addSyntheticSupertypes: CompilerContext.(
       thisDescriptor: ClassDescriptor,
       supertypes: MutableList<KotlinType>
-    ) -> Unit = NoOp3,
+    ) -> Unit = Noop.effect3,
     /**
      * For a given package fragment it iterates over all the package declaration
      * allowing the user to contribute new synthetic declarations.
@@ -329,37 +363,37 @@ interface MetaComponentRegistrar : ComponentRegistrar {
       ctx: LazyClassContext,
       declarationProvider: PackageMemberDeclarationProvider,
       result: MutableSet<ClassDescriptor>
-    ) -> Unit = NoOp6,
+    ) -> Unit = Noop.effect6,
     generateSyntheticClasses: CompilerContext.(
       thisDescriptor: ClassDescriptor,
       name: Name,
       ctx: LazyClassContext,
       declarationProvider: ClassMemberDeclarationProvider,
       result: MutableSet<ClassDescriptor>
-    ) -> Unit = NoOp6,
+    ) -> Unit = Noop.effect6,
     generateSyntheticMethods: CompilerContext.(
       thisDescriptor: ClassDescriptor,
       name: Name,
       bindingContext: BindingContext,
       fromSupertypes: List<SimpleFunctionDescriptor>,
       result: MutableCollection<SimpleFunctionDescriptor>
-    ) -> Unit = NoOp6,
+    ) -> Unit = Noop.effect6,
     generateSyntheticProperties: CompilerContext.(
       thisDescriptor: ClassDescriptor,
       name: Name,
       bindingContext: BindingContext,
       fromSupertypes: ArrayList<PropertyDescriptor>,
       result: MutableSet<PropertyDescriptor>
-    ) -> Unit = NoOp6,
+    ) -> Unit = Noop.effect6,
     getSyntheticCompanionObjectNameIfNeeded: CompilerContext.(
       thisDescriptor: ClassDescriptor
-    ) -> Name? = NullableOp1(),
+    ) -> Name? = Noop.nullable2(),
     getSyntheticFunctionNames: CompilerContext.(
       thisDescriptor: ClassDescriptor
-    ) -> List<Name>? = NullableOp1(),
+    ) -> List<Name>? = Noop.nullable2(),
     getSyntheticNestedClassNames: CompilerContext.(
       thisDescriptor: ClassDescriptor
-    ) -> List<Name>? = NullableOp1()
+    ) -> List<Name>? = Noop.nullable2()
   ): ExtensionPhase.SyntheticResolver =
     object : ExtensionPhase.SyntheticResolver {
       override fun CompilerContext.addSyntheticSupertypes(
@@ -520,7 +554,36 @@ interface MetaComponentRegistrar : ComponentRegistrar {
     fun registerSyntheticScopeProvider(project: Project, phase: ExtensionPhase.SyntheticScopeProvider, ctx: CompilerContext) {
       SyntheticScopeProviderExtension.registerExtension(project, object : SyntheticScopeProviderExtension {
         override fun getScopes(moduleDescriptor: ModuleDescriptor, javaSyntheticPropertiesScope: JavaSyntheticPropertiesScope): List<SyntheticScope> =
-          phase.run { ctx.getSyntheticScopes(moduleDescriptor, javaSyntheticPropertiesScope) }
+          phase.run { listOf(
+            object : SyntheticScope.Default() {
+              override fun getSyntheticConstructor(constructor: ConstructorDescriptor): ConstructorDescriptor? =
+                phase.run { ctx.syntheticConstructor(constructor) }
+
+              override fun getSyntheticConstructors(scope: ResolutionScope): Collection<FunctionDescriptor> =
+                phase.run { ctx.syntheticConstructors(scope) }
+
+              override fun getSyntheticConstructors(scope: ResolutionScope, name: Name, location: LookupLocation): Collection<FunctionDescriptor> =
+                phase.run { ctx.syntheticConstructors(scope, name, location) }
+
+              override fun getSyntheticExtensionProperties(receiverTypes: Collection<KotlinType>, location: LookupLocation): Collection<PropertyDescriptor> =
+                phase.run { ctx.syntheticExtensionProperties(receiverTypes, location) }
+
+              override fun getSyntheticExtensionProperties(receiverTypes: Collection<KotlinType>, name: Name, location: LookupLocation): Collection<PropertyDescriptor> =
+                phase.run { ctx.syntheticExtensionProperties(receiverTypes, name, location) }
+
+              override fun getSyntheticMemberFunctions(receiverTypes: Collection<KotlinType>): Collection<FunctionDescriptor> =
+                phase.run { ctx.syntheticMemberFunctions(receiverTypes) }
+
+              override fun getSyntheticMemberFunctions(receiverTypes: Collection<KotlinType>, name: Name, location: LookupLocation): Collection<FunctionDescriptor> =
+                phase.run { ctx.syntheticMemberFunctions(receiverTypes, name, location) }
+
+              override fun getSyntheticStaticFunctions(scope: ResolutionScope): Collection<FunctionDescriptor> =
+                phase.run { ctx.syntheticStaticFunctions(scope) }
+
+              override fun getSyntheticStaticFunctions(scope: ResolutionScope, name: Name, location: LookupLocation): Collection<FunctionDescriptor> =
+                phase.run { ctx.syntheticStaticFunctions(scope, name, location) }
+            }
+          ) }
       })
     }
 

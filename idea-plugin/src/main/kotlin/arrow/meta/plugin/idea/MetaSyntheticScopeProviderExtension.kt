@@ -18,7 +18,6 @@ class MetaSyntheticScopeProviderExtension : SyntheticScopeProviderExtension {
       javaSyntheticPropertiesScope: JavaSyntheticPropertiesScope
     ): List<SyntheticScope> {
         println("MetaSyntheticScopeProviderExtension.getScopes: $moduleDescriptor, $javaSyntheticPropertiesScope")
-
         return listOf(MetaScope)
     }
 }

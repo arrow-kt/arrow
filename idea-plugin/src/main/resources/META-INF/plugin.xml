@@ -24,7 +24,7 @@
         <packageFragmentProviderExtension implementation="arrow.meta.plugin.idea.MetaSyntheticPackageFragmentProvider" />
 <!--        <completionInformationProvider implementation="arrow.meta.plugin.idea.MetaCompletionInformationProvider" />-->
 <!--        <syntheticResolveExtension implementation="arrow.meta.plugin.idea.MetaSyntheticResolveExtension"/>-->
-<!--        <syntheticScopeProviderExtension implementation="arrow.meta.plugin.idea.MetaSyntheticScopeProviderExtension" />-->
+        <syntheticScopeProviderExtension implementation="arrow.meta.plugin.idea.MetaSyntheticScopeProviderExtension" />
     </extensions>
     <extensions defaultExtensionNs="com.intellij">
         <annotator language="kotlin" implementationClass="arrow.meta.plugin.idea.MetaKotlinPsiChecker"/>
