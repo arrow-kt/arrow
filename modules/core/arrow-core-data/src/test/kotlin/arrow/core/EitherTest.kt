@@ -147,7 +147,7 @@ class EitherTest : UnitSpec() {
     "rightIfNull should return Left if value is not null or Right of value when null" {
       forAll { a: Int, b: Int ->
         a.rightIfNull { b } == Left(b) &&
-          null.rightIfNull { b } == Right(Unit)
+          null.rightIfNull { b } == Right(null)
       }
     }
 
