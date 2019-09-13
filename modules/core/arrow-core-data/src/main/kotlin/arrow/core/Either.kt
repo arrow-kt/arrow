@@ -388,12 +388,12 @@ fun <A, B> B?.rightIfNotNull(default: () -> A): Either<A, B> = when (this) {
  *
  * Example:
  * ```
- * null.rightIfNull { "left" }    // Right(b="Unit")
+ * null.rightIfNull { "left" }    // Right(b="Nothing?")
  * "value".rightIfNull { "left" } // Left(a="left")
  * ```
  */
-fun <A> Any?.rightIfNull(default: () -> A): Either<A, Unit> = when (this) {
-  null -> Either.right(Unit)
+fun <A> Any?.rightIfNull(default: () -> A): Either<A, Nothing?> = when (this) {
+  null -> Either.right(null)
   else -> Either.left(default())
 }
 /**
