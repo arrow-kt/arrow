@@ -318,8 +318,8 @@ null.rightIfNotNull { "left" }
 ```
 
 The inverse of `rightIfNotNull`, `rightIfNull`.
-If the value is null it will be transformed to the specified `Either.right` and the type will be `kotlin.Unit` which is 
-equivalent to Java's Void class. If the value is not null than it will be transformed to the specified `Either.Left`.
+If the value is null it will be transformed to the specified `Either.right` and the type will be `Nothing?`.
+If the value is not null than it will be transformed to the specified `Either.Left`.
 
 Example:
 
