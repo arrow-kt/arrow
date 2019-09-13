@@ -324,12 +324,10 @@ If the value is not null than it will be transformed to the specified `Either.Le
 Example:
 
 ```kotlin:ank
-// Results in Either.Left
 "value".rightIfNull { "left" }
 ```
 
 ```kotlin:ank
-// Results in Either.Right
 null.rightIfNull { "left" }
 ```
 
