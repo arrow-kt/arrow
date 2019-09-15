@@ -85,7 +85,7 @@ import arrow.typeclasses.Applicative
  * val sequenceList = requests.sequence(Option.applicative())
  * //sampleEnd
  * fun main() {
- * println("sequenceList = $sequenceList")
+ *   println("sequenceList = $sequenceList")
  * }
  * ```
  *
