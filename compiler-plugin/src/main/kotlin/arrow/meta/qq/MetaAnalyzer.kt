@@ -15,6 +15,10 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.kotlin.resolve.BindingTrace
+import org.jetbrains.kotlin.resolve.BodyResolver
+import org.jetbrains.kotlin.resolve.StatementFilter
+import org.jetbrains.kotlin.resolve.lazy.ResolveSession
 import org.jetbrains.kotlin.resolve.lazy.declarations.ClassMemberDeclarationProvider
 import org.jetbrains.kotlin.resolve.lazy.declarations.PackageMemberDeclarationProvider
 import org.jetbrains.kotlin.types.KotlinType
@@ -28,6 +32,13 @@ interface MetaAnalyzer {
     map: S.(K) -> List<String>,
     transformation: (VirtualFile, Document) -> Pair<KtFile, AnalysisResult>?
   )
+
+  fun createBodyResolver(
+    resolveSession: ResolveSession,
+    trace: BindingTrace,
+    file: KtFile,
+    statementFilter: StatementFilter
+  ): BodyResolver
 
   fun KtFile.metaAnalysys(moduleInfo: ModuleInfo? = null): AnalysisResult
   fun metaPackageFragments(module: ModuleDescriptor, fqName: FqName): List<PackageFragmentDescriptor>

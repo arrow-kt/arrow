@@ -6,28 +6,60 @@ import arrow.meta.extensions.MetaComponentRegistrar
 import arrow.meta.ir.IrUtils
 import arrow.meta.ir.irFunctionAccess
 import arrow.meta.qq.func
+import arrow.meta.qq.get
+import arrow.meta.qq.ktFile
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageLocation
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
+import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassifierDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptorWithVisibility
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
+import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
+import org.jetbrains.kotlin.descriptors.ReceiverParameterDescriptor
+import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.descriptors.Visibilities
+import org.jetbrains.kotlin.descriptors.annotations.Annotations
+import org.jetbrains.kotlin.descriptors.impl.AnonymousFunctionDescriptor
+import org.jetbrains.kotlin.descriptors.impl.ReceiverParameterDescriptorImpl
+import org.jetbrains.kotlin.incremental.components.NoLookupLocation
 import org.jetbrains.kotlin.ir.expressions.IrFunctionAccessExpression
 import org.jetbrains.kotlin.ir.expressions.mapValueParameters
 import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.psi.KtFunction
+import org.jetbrains.kotlin.psi.KtCallableDeclaration
+import org.jetbrains.kotlin.psi.KtDeclarationWithBody
+import org.jetbrains.kotlin.psi.KtExpression
+import org.jetbrains.kotlin.psi.KtParameter
+import org.jetbrains.kotlin.psi.psiUtil.blockExpressionsOrSingle
+import org.jetbrains.kotlin.resolve.BindingContext
+import org.jetbrains.kotlin.resolve.FunctionDescriptorUtil
+import org.jetbrains.kotlin.resolve.OverloadChecker
+import org.jetbrains.kotlin.resolve.StatementFilter
+import org.jetbrains.kotlin.resolve.calls.results.TypeSpecificityComparator
+import org.jetbrains.kotlin.resolve.calls.smartcasts.DataFlowInfo
+import org.jetbrains.kotlin.resolve.calls.smartcasts.ImplicitSmartCasts
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
-import org.jetbrains.kotlin.resolve.descriptorUtil.parents
+import org.jetbrains.kotlin.resolve.lazy.ResolveSession
+import org.jetbrains.kotlin.resolve.lazy.descriptors.LazyClassDescriptor
+import org.jetbrains.kotlin.resolve.lazy.descriptors.findPackageFragmentForFile
+import org.jetbrains.kotlin.resolve.scopes.LexicalScope
+import org.jetbrains.kotlin.resolve.scopes.LexicalScopeImpl
+import org.jetbrains.kotlin.resolve.scopes.LexicalScopeKind
+import org.jetbrains.kotlin.resolve.scopes.receivers.ExpressionReceiver
+import org.jetbrains.kotlin.resolve.scopes.receivers.ExtensionReceiver
+import org.jetbrains.kotlin.types.IntersectionTypeConstructor
 import org.jetbrains.kotlin.types.KotlinType
+import org.jetbrains.kotlin.types.KotlinTypeFactory
+import org.jetbrains.kotlin.types.SimpleType
 import org.jetbrains.kotlin.types.typeUtil.isSubtypeOf
+import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
 const val WithMarker = "`*`"
 val ExtensionAnnotation = FqName("arrow.extension")
@@ -47,23 +79,141 @@ val MetaComponentRegistrar.typeClasses: Pair<Name, List<ExtensionPhase>>
             )
           }
         ),
-        syntheticScopes(
-          syntheticMemberFunctionsForName = { receiverTypes, name, location ->
-            println("typeclasses.syntheticScopes.syntheticMemberFunctionsForName: $receiverTypes, $name, $location")
-            emptyList()
+        syntheticResolver(
+          generateSyntheticMethods = { thisDescriptor, name, bindingContext, fromSupertypes, result ->
+            thisDescriptor.safeAs<LazyClassDescriptor>()?.let { lazyDescriptor ->
+              val lazyClassContext: Any = lazyDescriptor["c"]
+              lazyClassContext.safeAs<ResolveSession>()?.let { session ->
+                result.firstOrNull { it.name == name }?.let { function ->
+                  resolveBodyWithExtensionsScope(session, function)
+                }
+                println("typeclasses.syntheticResolver.generateSyntheticMethods: $thisDescriptor, $name, $fromSupertypes, $result")
+              }
+            }
           }
         ),
         irFunctionAccess { mapValueParameterExtensions(it) }
       )
 
+
+private fun CompilerContext.resolveBodyWithExtensionsScope(session: ResolveSession, function: SimpleFunctionDescriptor): Unit {
+  function.findPsi().safeAs<KtDeclarationWithBody>()?.let { ktCallable ->
+    val functionScope = session.declarationScopeProvider.getResolutionScopeForDeclaration(ktCallable)
+    val innerScope = FunctionDescriptorUtil.getFunctionInnerScope(functionScope, function, session.trace, OverloadChecker(TypeSpecificityComparator.NONE))
+    val bodyResolver = analyzer?.createBodyResolver(
+      session, session.trace, ktCallable.containingKtFile, StatementFilter.NONE
+    )
+    function.extensionReceiverParameter?.let { originalReceiver ->
+      val intersectedTypes = function.valueParameters.filter { it.shouldEnhanceScope() }.map { it.type }
+      val modifiedScope = function.valueParameters.scopeForExtensionParameters(innerScope)
+      val typeIntersection =
+        if (intersectedTypes.isNotEmpty()) {
+          val constructor = IntersectionTypeConstructor(intersectedTypes)
+          KotlinTypeFactory.simpleTypeWithNonTrivialMemberScope(
+            Annotations.EMPTY,
+            constructor,
+            emptyList(),
+            false,
+            constructor.createScopeForKotlinType()
+          )
+        } else null
+      typeIntersection?.let { uberExtendedType ->
+        //function.applySmartCast(originalReceiver, uberExtendedType, ktCallable, session)
+        bodyResolver?.resolveFunctionBody(DataFlowInfo.EMPTY, session.trace, ktCallable, function, modifiedScope)
+      }
+    }
+  }
+}
+
+private fun SimpleFunctionDescriptor.applySmartCast(
+  originalReceiver: ReceiverParameterDescriptor,
+  uberExtendedType: SimpleType,
+  ktCallable: KtDeclarationWithBody,
+  session: ResolveSession
+) {
+  val extensionReceiver = ExtensionReceiver(this, originalReceiver.type, null)
+  val smartCast = ImplicitSmartCasts(extensionReceiver, uberExtendedType)
+  ktCallable.blockExpressionsOrSingle().filterIsInstance<KtExpression>().firstOrNull()?.let { expression ->
+    session.trace.record(BindingContext.IMPLICIT_RECEIVER_SMARTCAST, expression, smartCast)
+    ExpressionReceiver.create(expression, uberExtendedType, session.trace.bindingContext)
+  }
+}
+
+//
+//private fun CallableMemberDescriptor.old(trace: BindingTrace): Unit {
+//  findPsi().safeAs<KtCallableDeclaration>()?.let { ktCallable ->
+//    extensionReceiverParameter?.let { originalReceiver ->
+//      val smartCastInfo = valueParameters.mapNotNull { valueParameterDescriptor ->
+//        if (valueParameterDescriptor.shouldEnhanceScope()) {
+//          valueParameterDescriptor.findPsi().safeAs<KtParameter>()?.let { ktParameter ->
+//            val extensionReceiver = ExtensionReceiver(this, originalReceiver.type, null)
+//            val smartCast = ImplicitSmartCasts(extensionReceiver, valueParameterDescriptor.type)
+//            //trace.record(BindingContext.IMPLICIT_RECEIVER_SMARTCAST, ktParameter, smartCast)
+//            getReceiverValueWithSmartCast(originalReceiver.value, valueParameterDescriptor.type)?.let { receiver ->
+//              val identifierInfo = IdentifierInfo.Receiver(receiver)
+//              val receiverValue = DataFlowValue(identifierInfo, valueParameterDescriptor.type)
+//              val dataFlow = DataFlowInfo.EMPTY.establishSubtyping(receiverValue, valueParameterDescriptor.type, LanguageVersionSettingsImpl.DEFAULT)
+//              //ExpressionReceiver.create(expression, valueParameterDescriptor.type, trace.bindingContext)
+//              //trace.record(BindingContext.THIS_TYPE_FOR_SUPER_EXPRESSION, expressionReceiver.expression ,valueParameterDescriptor.type)
+//              smartCast to dataFlow
+//            }
+//          }
+//        } else null
+//      }
+//      val dataFlows = smartCastInfo.map { it.second }
+//      val smartCasts = smartCastInfo.map { it.first }
+//      val combinedDataFlow = dataFlows.fold(DataFlowInfo.EMPTY, DataFlowInfo::and)
+//      ktCallable.blockExpressionsOrSingle().filterIsInstance<KtCallExpression>().firstOrNull()?.let { expression ->
+//        trace.record(BindingContext.DATA_FLOW_INFO_BEFORE, expression, combinedDataFlow)
+//        smartCasts.forEach {
+//          trace.record(BindingContext.IMPLICIT_RECEIVER_SMARTCAST, expression, it)
+//        }
+//      }
+//    }
+//  }
+//}
+
+private fun List<ValueParameterDescriptor>.scopeForExtensionParameters(innerScope: LexicalScope): LexicalScope =
+  fold(innerScope) { currentScope, valueParameterDescriptor->
+    val ownerDescriptor = AnonymousFunctionDescriptor(valueParameterDescriptor, valueParameterDescriptor.annotations, CallableMemberDescriptor.Kind.DECLARATION, valueParameterDescriptor.source, false)
+    val extensionReceiver = ExtensionReceiver(ownerDescriptor, valueParameterDescriptor.type, null)
+    val extensionReceiverParamDescriptor = ReceiverParameterDescriptorImpl(ownerDescriptor, extensionReceiver, ownerDescriptor.annotations)
+    ownerDescriptor.initialize(extensionReceiverParamDescriptor, null, valueParameterDescriptor.typeParameters, valueParameterDescriptor.valueParameters, valueParameterDescriptor.returnType, Modality.FINAL, valueParameterDescriptor.visibility)
+    LexicalScopeImpl(currentScope, ownerDescriptor, true, extensionReceiverParamDescriptor, LexicalScopeKind.FUNCTION_INNER_SCOPE)
+  }
+
+
+private fun ValueParameterDescriptor.extensionScope(): List<SimpleFunctionDescriptor> =
+  type.constructor.declarationDescriptor
+    .safeAs<ClassDescriptor>()
+    ?.functions()?.filter { it.kind != CallableMemberDescriptor.Kind.FAKE_OVERRIDE }
+    ?: emptyList()
+
+private fun ClassDescriptor.classifierNamed(name: Name): ClassifierDescriptor? =
+  unsubstitutedMemberScope.getContributedClassifier(name, NoLookupLocation.FROM_BACKEND)
+
+private fun ValueParameterDescriptor.shouldEnhanceScope(): Boolean {
+  val ktParameter = findPsi().safeAs<KtParameter>()
+  return ktParameter?.hasExtensionDefaultValue() == true
+}
+
+
+private fun PackageFragmentDescriptor.functions(): List<SimpleFunctionDescriptor> =
+  getMemberScope().getContributedDescriptors { true }.filterIsInstance<SimpleFunctionDescriptor>()
+
+private fun ClassDescriptor.functions(): List<SimpleFunctionDescriptor> =
+  unsubstitutedMemberScope.getContributedDescriptors { true }.filterIsInstance<SimpleFunctionDescriptor>()
+
 private fun List<String?>.run(body: Name): String =
   fold(body.asString()) { acc, scope -> "$scope.run { $acc }" }
 
-private fun KtFunction.extensionValueParamNames() =
+private fun KtCallableDeclaration.extensionValueParamNames() =
   valueParameters.filter { it.defaultValue?.text == WithMarker }.map { it.name }
 
-private fun KtFunction.hasExtensionValueParameters(): Boolean =
-  valueParameters.any { it.defaultValue?.text == WithMarker }
+private fun KtCallableDeclaration.hasExtensionValueParameters(): Boolean =
+  valueParameters.any { it.hasExtensionDefaultValue() }
+
+fun KtParameter.hasExtensionDefaultValue(): Boolean = defaultValue?.text == WithMarker
 
 private fun IrUtils.mapValueParameterExtensions(expression: IrFunctionAccessExpression): IrFunctionAccessExpression? =
   if (expression.defaultValues().contains(WithMarker)) {
@@ -86,23 +236,25 @@ private fun CompilerContext.findExtension(valueParameterDescriptor: ValueParamet
   val dataTypePackage = dataType.packageFragmentDescriptor()
   val internalPackages = modulePackages()
   val internalExtensions = internalPackages.extensions(extensionType)
-  if (
-    internalPackages.extensionsAreInternal(typeClassPackage, dataTypePackage, internalExtensions)) {
-    reportNonInternalOrphanExtension(extensionType, internalExtensions[0])
-  }
-  val extensions = extensionType.resolveExtensions(internalExtensions, typeClassPackage, dataTypePackage)
-
-  return when {
-    extensions.isEmpty() -> {
-      reportExtensionNotFound(extensionType)
-      null
+  return if (dataTypePackage != null &&
+    typeClassPackage != null) {
+    if (
+      internalPackages.extensionsAreInternal(typeClassPackage, dataTypePackage, internalExtensions)) {
+      reportNonInternalOrphanExtension(extensionType, internalExtensions[0])
     }
-    extensions.size > 1 -> {
-      reportAmbiguousExtensions(extensionType, extensions)
-      null
+    val extensions = extensionType.resolveExtensions(internalExtensions, typeClassPackage, dataTypePackage)
+    when {
+      extensions.isEmpty() -> {
+        reportExtensionNotFound(extensionType)
+        null
+      }
+      extensions.size > 1 -> {
+        reportAmbiguousExtensions(extensionType, extensions)
+        null
+      }
+      else -> extensions[0]
     }
-    else -> extensions[0]
-  }
+  } else null
 }
 
 private fun List<PackageFragmentDescriptor>.extensions(extensionType: KotlinType): List<DeclarationDescriptor> =
@@ -182,8 +334,8 @@ private fun PackageFragmentDescriptor.findExtensionProof(extensionType: KotlinTy
         it is PropertyDescriptor && it.type != module.builtIns.nothingType && it.type.isSubtypeOf(extensionType)
     }
 
-private fun ClassifierDescriptor?.packageFragmentDescriptor(): PackageFragmentDescriptor =
-  this?.parents?.first() as PackageFragmentDescriptor
+private fun ClassifierDescriptor?.packageFragmentDescriptor(): PackageFragmentDescriptor? =
+  this?.ktFile()?.let { file -> this.module.findPackageFragmentForFile(file) }
 
 private fun KotlinType.dataTypeDescriptor(): ClassifierDescriptor? =
   arguments[0].type.constructor.declarationDescriptor

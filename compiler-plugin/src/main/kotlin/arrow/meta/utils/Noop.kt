@@ -17,4 +17,6 @@ object Noop {
   fun <A> emptyCollection3(): (Any?, Any?, Any?) -> Collection<A> = { _, _, _ -> emptyList() }
   fun <A> emptyCollection4(): (Any?, Any?, Any?, Any?) -> Collection<A> = { _, _, _, _ -> emptyList() }
   fun <A> emptyCollection5(): (Any?, Any?, Any?, Any?, Any?) -> Collection<A> = { _, _, _, _, _ -> emptyList() }
+  val boolean1True: (Any?) -> Boolean = { _ -> true }
+  val boolean2True: (Any?, Any?) -> Boolean = { _, _ -> true }
 }

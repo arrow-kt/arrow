@@ -27,6 +27,10 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.keyFMap.KeyFMap
 import org.jetbrains.kotlin.analyzer.AnalysisResult
 import org.jetbrains.kotlin.analyzer.ModuleInfo
+import org.jetbrains.kotlin.container.get
+import org.jetbrains.kotlin.context.SimpleGlobalContext
+import org.jetbrains.kotlin.context.withModule
+import org.jetbrains.kotlin.context.withProject
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
@@ -36,17 +40,26 @@ import org.jetbrains.kotlin.descriptors.PackageViewDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 import org.jetbrains.kotlin.descriptors.impl.DeclarationDescriptorVisitorEmptyBodies
+import org.jetbrains.kotlin.frontend.di.createContainerForBodyResolve
 import org.jetbrains.kotlin.idea.caches.project.forcedModuleInfo
 import org.jetbrains.kotlin.idea.caches.resolve.analyzeWithAllCompilerChecks
 import org.jetbrains.kotlin.idea.core.util.toPsiFile
+import org.jetbrains.kotlin.idea.project.IdeaModuleStructureOracle
+import org.jetbrains.kotlin.idea.project.findAnalyzerServices
+import org.jetbrains.kotlin.idea.project.languageVersionSettings
 import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.platform.CommonPlatforms
 import org.jetbrains.kotlin.psi.KtClassOrObject
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.kotlin.resolve.BindingTrace
+import org.jetbrains.kotlin.resolve.BodyResolver
+import org.jetbrains.kotlin.resolve.StatementFilter
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
+import org.jetbrains.kotlin.resolve.lazy.ResolveSession
 import org.jetbrains.kotlin.resolve.lazy.declarations.ClassMemberDeclarationProvider
 import org.jetbrains.kotlin.resolve.lazy.declarations.PackageMemberDeclarationProvider
 import org.jetbrains.kotlin.types.KotlinType
@@ -350,6 +363,24 @@ class MetaIdeAnalyzer : MetaAnalyzer {
     }
   }
 
+  override fun createBodyResolver(
+    resolveSession: ResolveSession,
+    trace: BindingTrace,
+    file: KtFile,
+    statementFilter: StatementFilter
+  ): BodyResolver {
+    val globalContext = SimpleGlobalContext(resolveSession.storageManager, resolveSession.exceptionTracker)
+    val module = resolveSession.moduleDescriptor
+    return createContainerForBodyResolve(
+      globalContext.withProject(file.project).withModule(module),
+      trace,
+      CommonPlatforms.defaultCommonPlatform,
+      statementFilter,
+      CommonPlatforms.defaultCommonPlatform.findAnalyzerServices,
+      file.languageVersionSettings,
+      IdeaModuleStructureOracle()
+    ).get()
+  }
 }
 
 fun VirtualFile.document(project: Project): Document? =

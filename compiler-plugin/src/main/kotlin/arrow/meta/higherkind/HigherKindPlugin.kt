@@ -79,6 +79,6 @@ val kindName: FqName = FqName("arrow.Kind")
 val FqName.kindTypeAliasName: Name
   get() {
     val segments = pathSegments()
-    val simpleName = segments.last()
+    val simpleName = segments.lastOrNull() ?: Name.special("index not ready")
     return Name.identifier("${simpleName}Of")
   }
