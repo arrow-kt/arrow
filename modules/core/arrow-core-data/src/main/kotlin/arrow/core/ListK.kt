@@ -68,7 +68,7 @@ import arrow.typeclasses.Applicative
  * val traversedList = numbers.traverse(Option.applicative(), { if (it > 0.5) Some(it) else None })
  * //sampleEnd
  * fun main() {
- * println("traversedList $traversedList")
+ *   println("traversedList $traversedList")
  * }
  * ```
  *
