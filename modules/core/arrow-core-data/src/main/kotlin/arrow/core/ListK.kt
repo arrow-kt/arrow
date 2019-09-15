@@ -23,7 +23,7 @@ import arrow.typeclasses.Applicative
  * listOf(1, 2, 3).k()
  * //sampleEnd
  * fun main() {
- * println(value)
+ *   println(value)
  * }
  * ```
  *
