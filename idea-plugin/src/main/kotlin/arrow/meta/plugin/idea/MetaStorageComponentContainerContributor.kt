@@ -6,40 +6,6 @@ import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.wm.WindowManager
-import org.jetbrains.kotlin.config.CompilerConfiguration
-import org.jetbrains.kotlin.container.StorageComponentContainer
-import org.jetbrains.kotlin.container.registerInstance
-import org.jetbrains.kotlin.container.useImpl
-import org.jetbrains.kotlin.descriptors.ModuleDescriptor
-import org.jetbrains.kotlin.extensions.StorageComponentContainerContributor
-import org.jetbrains.kotlin.platform.TargetPlatform
-import java.util.concurrent.atomic.AtomicBoolean
-
-private val metaPlugin = IdeMetaPlugin()
-
-private val registered = AtomicBoolean(false)
-
-class MetaStorageComponentContainerContributor : StorageComponentContainerContributor {
-
-  override fun registerModuleComponents(container: StorageComponentContainer, platform: TargetPlatform, moduleDescriptor: ModuleDescriptor) {
-    container.registerIdeStack()
-    super.registerModuleComponents(container, platform, moduleDescriptor)
-  }
-
-  @Synchronized
-  private fun StorageComponentContainer.registerIdeStack() {
-    if (!registered.get()) {
-      val project = currentProject()
-      if (project != null) {
-        println("Registering for container: $this")
-        val configuration = CompilerConfiguration()
-        metaPlugin.registerMetaComponents(project, configuration)
-        println("registerIdeProjectComponents DONE")
-        registered.set(true)
-      }
-    }
-  }
-}
 
 fun currentProject(): Project? =
   ProjectManager.getInstance().openProjects.firstOrNull { project ->

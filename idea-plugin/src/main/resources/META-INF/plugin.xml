@@ -19,7 +19,7 @@
     <depends>org.jetbrains.kotlin</depends>
 
     <extensions defaultExtensionNs="org.jetbrains.kotlin">
-        <storageComponentContainerContributor implementation="arrow.meta.plugin.idea.MetaStorageComponentContainerContributor" />.
+<!--        <storageComponentContainerContributor implementation="arrow.meta.plugin.idea.MetaStorageComponentContainerContributor" />.-->
         <gradleProjectImportHandler implementation="arrow.meta.plugin.idea.ArrowGradleImportHandler"/>
         <packageFragmentProviderExtension implementation="arrow.meta.plugin.idea.MetaSyntheticPackageFragmentProvider" />
 <!--        <completionInformationProvider implementation="arrow.meta.plugin.idea.MetaCompletionInformationProvider" />-->

@@ -12,6 +12,8 @@ import com.intellij.psi.ClassFileViewProviderFactory
 import com.intellij.psi.PsiManager
 import org.jetbrains.kotlin.analyzer.ModuleInfo
 import org.jetbrains.kotlin.caches.resolve.KotlinCacheService
+import org.jetbrains.kotlin.config.CompilerConfiguration
+import org.jetbrains.kotlin.container.StorageComponentContainer
 import org.jetbrains.kotlin.descriptors.ClassifierDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
@@ -42,9 +44,26 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.regex.Pattern
 
+private val metaPlugin = IdeMetaPlugin()
+
+private val registered = AtomicBoolean(false)
+
 class MetaSyntheticPackageFragmentProvider : PackageFragmentProviderExtension, AsyncFileListener, AsyncFileListener.ChangeApplier, Disposable {
 
   private val fileListenerInitialized: AtomicBoolean = AtomicBoolean(false)
+
+  @Synchronized
+  private fun Project.registerIdeStack(postInitialize : () -> Unit) {
+    if (!registered.getAndSet(true)) {
+      val project = currentProject()
+      if (project != null) {
+        val configuration = CompilerConfiguration()
+        metaPlugin.registerMetaComponents(this, configuration)
+        println("registerIdeProjectComponents DONE")
+        postInitialize()
+      }
+    }
+  }
 
   @Synchronized
   private fun initializeFileListener() {
@@ -65,6 +84,9 @@ class MetaSyntheticPackageFragmentProvider : PackageFragmentProviderExtension, A
     moduleInfo: ModuleInfo?,
     lookupTracker: LookupTracker
   ): PackageFragmentProvider? {
+    project.registerIdeStack {
+      computeCache(project)
+    }
     initializeFileListener()
     println("MetaSyntheticPackageFragmentProvider.getPackageFragmentProvider:, cache:\n $descriptorCache")
     return PackageFragmentProviderImpl(
