@@ -22,6 +22,7 @@
         .tab-menu-search {
             display: flex;
             align-items: center;
+            flex-wrap: wrap;
 
             .tab-menu {
                 display: flex;
@@ -87,7 +88,7 @@
                     max-height: 300px;
                     overflow-x: auto;
                     border: $base-border;
-                    width: 300px;
+                    width: 100%;
                     background: $search-background;
                     position: absolute;
                     padding: 14px;
@@ -101,7 +102,7 @@
                         border-bottom: $base-border;
 
                         &:last-child {
-                          border-bottom: none;
+                            border-bottom: none;
                         }
 
                         a {
@@ -126,17 +127,17 @@
         .tab-flex {
             flex-wrap: wrap;
             justify-content: center;
+
             .tab-title {
                 margin-bottom: ($base-point-grid * 4);
             }
-            .tab-menu {
-                flex-wrap: wrap;
-            }
+
             .tab-menu-search {
                 .tab-menu {
                     display: flex;
                     justify-content: center;
                 }
+
             }
         }
     }
@@ -145,10 +146,33 @@
 @include bp(medium) {
     #media-tab {
         padding: ($base-point-grid * 20) 0 ($base-point-grid * 3) 0;
+
         .tab-flex {
             .tab-menu-search {
                 #search-container {
-                    display: none;
+                    padding-left: 0;
+                    padding-bottom: $base-point-grid;
+                    width: 100%;
+                    order: 1;
+                    border-bottom: 2px dashed $border-color;
+                    border-left: 0;
+
+                    #search-input {
+                        width: 100%;
+
+                        &:focus,
+                        &:focus-within {
+                            width: 100%;
+                        }
+                    }
+                }
+
+                .tab-menu {
+                    padding-top: $base-point-grid * 3;
+                    flex-wrap: wrap;
+                    width: 100%;
+                    order: 2;
+                    justify-content: center;
                 }
             }
         }
@@ -156,13 +180,13 @@
 }
 
 @include bp(xsmall) {
-  #media-tab {
-    .tab-flex {
-        .tab-menu-search {
-            .tab-menu {
-              justify-content: end;
+    #media-tab {
+        .tab-flex {
+            .tab-menu-search {
+                .tab-menu {
+                    justify-content: end;
+                }
             }
         }
     }
-  }
 }
