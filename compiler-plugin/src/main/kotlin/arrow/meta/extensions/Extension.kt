@@ -1,6 +1,6 @@
 package arrow.meta.extensions
 
-import arrow.meta.qq.QuoteTransformation
+import arrow.meta.qq.MetaAnalyzer
 import org.jetbrains.kotlin.analyzer.AnalysisResult
 import org.jetbrains.kotlin.analyzer.ModuleInfo
 import org.jetbrains.kotlin.backend.common.BackendContext
@@ -9,17 +9,17 @@ import org.jetbrains.kotlin.codegen.ClassBuilderFactory
 import org.jetbrains.kotlin.codegen.ImplementationBodyCodegen
 import org.jetbrains.kotlin.codegen.StackValue
 import org.jetbrains.kotlin.codegen.extensions.ExpressionCodegenExtension
-import org.jetbrains.kotlin.com.intellij.mock.MockProject
 import org.jetbrains.kotlin.com.intellij.openapi.project.Project
 import org.jetbrains.kotlin.com.intellij.openapi.vfs.VirtualFile
-import org.jetbrains.kotlin.com.intellij.psi.JavaPsiFacade
-import org.jetbrains.kotlin.com.intellij.psi.PsiElementFactory
 import org.jetbrains.kotlin.com.intellij.testFramework.LightVirtualFile
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.container.ComponentProvider
+import org.jetbrains.kotlin.container.get
 import org.jetbrains.kotlin.context.ProjectContext
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.ConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
+import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
@@ -28,34 +28,48 @@ import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 import org.jetbrains.kotlin.diagnostics.Diagnostic
 import org.jetbrains.kotlin.diagnostics.DiagnosticSink
+import org.jetbrains.kotlin.incremental.components.LookupLocation
 import org.jetbrains.kotlin.incremental.components.LookupTracker
 import org.jetbrains.kotlin.ir.declarations.IrFile
-import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.kotlin.psi.KtImportInfo
 import org.jetbrains.kotlin.psi.KtModifierListOwner
 import org.jetbrains.kotlin.psi.KtPsiFactory
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.BindingTrace
+import org.jetbrains.kotlin.resolve.LazyTopDownAnalyzer
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
 import org.jetbrains.kotlin.resolve.checkers.DeclarationCheckerContext
-import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.lazy.LazyClassContext
-import org.jetbrains.kotlin.resolve.lazy.ResolveSession
 import org.jetbrains.kotlin.resolve.lazy.declarations.ClassMemberDeclarationProvider
 import org.jetbrains.kotlin.resolve.lazy.declarations.PackageMemberDeclarationProvider
+import org.jetbrains.kotlin.resolve.scopes.ResolutionScope
 import org.jetbrains.kotlin.resolve.scopes.SyntheticScope
 import org.jetbrains.kotlin.storage.StorageManager
 import org.jetbrains.kotlin.synthetic.JavaSyntheticPropertiesScope
+import org.jetbrains.kotlin.synthetic.SyntheticScopeProviderExtension
 import org.jetbrains.kotlin.types.KotlinType
 import java.util.*
-import java.util.concurrent.ConcurrentHashMap
 
 interface ExtensionPhase {
 
+  data class CompositePhase(val phases: List<ExtensionPhase>): ExtensionPhase {
+    companion object {
+      operator fun invoke(vararg phases: ExtensionPhase): ExtensionPhase =
+        CompositePhase(phases.toList())
+    }
+  }
+  
   interface Config : ExtensionPhase {
     fun CompilerContext.updateConfiguration(configuration: CompilerConfiguration): Unit
+  }
+
+  object Empty : ExtensionPhase
+
+  interface ExtraImports : ExtensionPhase {
+    fun CompilerContext.extraImports(ktFile: KtFile): Collection<KtImportInfo>
   }
 
   interface PackageProvider : ExtensionPhase {
@@ -67,6 +81,14 @@ interface ExtensionPhase {
       moduleInfo: ModuleInfo?,
       lookupTracker: LookupTracker
     ): PackageFragmentProvider?
+  }
+
+  interface CollectAdditionalSources : ExtensionPhase {
+    fun CompilerContext.collectAdditionalSourcesAndUpdateConfiguration(
+      knownSources: Collection<KtFile>,
+      configuration: CompilerConfiguration,
+      project: Project
+    ): Collection<KtFile>
   }
 
   interface AnalysisHandler : ExtensionPhase {
@@ -148,7 +170,7 @@ interface ExtensionPhase {
     fun CompilerContext.registerModuleComponents(
       container: org.jetbrains.kotlin.container.StorageComponentContainer,
       moduleDescriptor: ModuleDescriptor
-    ) : Unit
+    ): Unit
 
     fun CompilerContext.check(
       declaration: KtDeclaration,
@@ -192,10 +214,15 @@ interface ExtensionPhase {
   }
 
   interface SyntheticScopeProvider : ExtensionPhase {
-    fun CompilerContext.getSyntheticScopes(
-      moduleDescriptor: ModuleDescriptor,
-      javaSyntheticPropertiesScope: JavaSyntheticPropertiesScope
-    ): List<SyntheticScope>
+    fun CompilerContext.syntheticConstructor(constructor: ConstructorDescriptor): ConstructorDescriptor?
+    fun CompilerContext.syntheticConstructors(scope: ResolutionScope): Collection<FunctionDescriptor>
+    fun CompilerContext.syntheticConstructors(scope: ResolutionScope, name: Name, location: LookupLocation): Collection<FunctionDescriptor>
+    fun CompilerContext.syntheticExtensionProperties(receiverTypes: Collection<KotlinType>, location: LookupLocation): Collection<PropertyDescriptor>
+    fun CompilerContext.syntheticExtensionProperties(receiverTypes: Collection<KotlinType>, name: Name, location: LookupLocation): Collection<PropertyDescriptor>
+    fun CompilerContext.syntheticMemberFunctions(receiverTypes: Collection<KotlinType>): Collection<FunctionDescriptor>
+    fun CompilerContext.syntheticMemberFunctions(receiverTypes: Collection<KotlinType>, name: Name, location: LookupLocation): Collection<FunctionDescriptor>
+    fun CompilerContext.syntheticStaticFunctions(scope: ResolutionScope): Collection<FunctionDescriptor>
+    fun CompilerContext.syntheticStaticFunctions(scope: ResolutionScope, name: Name, location: LookupLocation): Collection<FunctionDescriptor>
   }
 
   interface DiagnosticsSuppressor : ExtensionPhase {
@@ -210,43 +237,25 @@ interface ExtensionPhase {
 }
 
 class CompilerContext(
-  val project: MockProject,
-  val messageCollector: MessageCollector,
-  val elementFactory: PsiElementFactory = JavaPsiFacade.getInstance(project).elementFactory,
-  val ktPsiElementFactory: KtPsiFactory = KtPsiFactory(project, false)
+  val project: Project,
+  val messageCollector: MessageCollector?
 ) {
 
-  lateinit var lazyClassContext: ResolveSession
+  val ktPsiElementFactory: KtPsiFactory = KtPsiFactory(project, false)
   val ctx: CompilerContext = this
   lateinit var module: ModuleDescriptor
-  lateinit var projectContext: ProjectContext
   lateinit var files: Collection<KtFile>
-  lateinit var bindingTrace: BindingTrace
   lateinit var componentProvider: ComponentProvider
+  private lateinit var metaAnalyzerField: MetaAnalyzer
 
-  val transformations: ArrayList<QuoteTransformation<*>> = arrayListOf()
-
-  private val descriptorPhaseState = ConcurrentHashMap<FqName, ClassDescriptor>()
-
-  /**
-   * updateClassContext can't replace the actual class context just mutate its internal fields since the compiler holds a
-   * reference to the class context associated for resolution.
-   * The resolvers in this context can be safely mutated thought via `resolveSession { ctx -> ... }` in the meta DSL
-   */
-  fun updateClassContext(f: CompilerContext.(ResolveSession) -> Unit, ctx: ResolveSession): Unit {
-    if (!::lazyClassContext.isInitialized) {
-      f(ctx)
-      lazyClassContext = ctx
+  val analyzer: MetaAnalyzer?
+    get() = when {
+      ::metaAnalyzerField.isInitialized -> metaAnalyzerField
+      ::componentProvider.isInitialized -> {
+        //TODO sometimes we get in here before the DI container has finished composing and it blows up
+        metaAnalyzerField = componentProvider.get()
+        metaAnalyzerField
+      }
+      else -> null
     }
-  }
-
-  fun storeDescriptor(descriptor: ClassDescriptor): Unit {
-    descriptorPhaseState[descriptor.fqNameSafe] = descriptor
-  }
-
-  fun getStoredDescriptor(fqName: FqName): ClassDescriptor? =
-    descriptorPhaseState[fqName]
-
-  fun storedDescriptors(): List<ClassDescriptor> =
-    descriptorPhaseState.values.toList()
 }

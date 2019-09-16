@@ -1,4 +1,5 @@
 apply plugin: 'kotlin'
+apply plugin: 'jacoco'
 
 repositories {
     flatDir {

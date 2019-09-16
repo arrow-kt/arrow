@@ -1,10 +1,10 @@
 package arrow.meta.extensions
 
 import arrow.meta.higherkind.KindAwareTypeChecker
+import arrow.meta.utils.Noop
+import arrow.meta.utils.cli
+import arrow.meta.utils.ide
 import arrow.meta.utils.setFinalStatic
-import arrow.meta.utils.NoOp3
-import arrow.meta.utils.NoOp6
-import arrow.meta.utils.NullableOp1
 import org.jetbrains.kotlin.analyzer.AnalysisResult
 import org.jetbrains.kotlin.analyzer.ModuleInfo
 import org.jetbrains.kotlin.backend.common.BackendContext
@@ -29,10 +29,13 @@ import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.JVMConfigurationKeys
 import org.jetbrains.kotlin.container.ComponentProvider
 import org.jetbrains.kotlin.container.StorageComponentContainer
+import org.jetbrains.kotlin.container.useImpl
 import org.jetbrains.kotlin.container.useInstance
 import org.jetbrains.kotlin.context.ProjectContext
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.ConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
+import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
@@ -41,16 +44,19 @@ import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 import org.jetbrains.kotlin.diagnostics.Diagnostic
 import org.jetbrains.kotlin.diagnostics.DiagnosticSink
+import org.jetbrains.kotlin.extensions.CollectAdditionalSourcesExtension
 import org.jetbrains.kotlin.extensions.CompilerConfigurationExtension
 import org.jetbrains.kotlin.extensions.DeclarationAttributeAltererExtension
 import org.jetbrains.kotlin.extensions.PreprocessedVirtualFileFactoryExtension
 import org.jetbrains.kotlin.extensions.StorageComponentContainerContributor
+import org.jetbrains.kotlin.incremental.components.LookupLocation
 import org.jetbrains.kotlin.incremental.components.LookupTracker
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.platform.TargetPlatform
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.kotlin.psi.KtImportInfo
 import org.jetbrains.kotlin.psi.KtModifierListOwner
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.BindingTrace
@@ -58,15 +64,15 @@ import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
 import org.jetbrains.kotlin.resolve.checkers.DeclarationChecker
 import org.jetbrains.kotlin.resolve.checkers.DeclarationCheckerContext
 import org.jetbrains.kotlin.resolve.diagnostics.DiagnosticSuppressor
-import org.jetbrains.kotlin.resolve.diagnostics.MutableDiagnosticsWithSuppression
+import org.jetbrains.kotlin.resolve.extensions.ExtraImportsProviderExtension
 import org.jetbrains.kotlin.resolve.extensions.SyntheticResolveExtension
 import org.jetbrains.kotlin.resolve.jvm.diagnostics.JvmDeclarationOrigin
 import org.jetbrains.kotlin.resolve.jvm.extensions.AnalysisHandlerExtension
 import org.jetbrains.kotlin.resolve.jvm.extensions.PackageFragmentProviderExtension
 import org.jetbrains.kotlin.resolve.lazy.LazyClassContext
-import org.jetbrains.kotlin.resolve.lazy.ResolveSession
 import org.jetbrains.kotlin.resolve.lazy.declarations.ClassMemberDeclarationProvider
 import org.jetbrains.kotlin.resolve.lazy.declarations.PackageMemberDeclarationProvider
+import org.jetbrains.kotlin.resolve.scopes.ResolutionScope
 import org.jetbrains.kotlin.resolve.scopes.SyntheticScope
 import org.jetbrains.kotlin.storage.StorageManager
 import org.jetbrains.kotlin.synthetic.JavaSyntheticPropertiesScope
@@ -80,7 +86,7 @@ import java.util.*
 
 interface MetaComponentRegistrar : ComponentRegistrar {
 
-  fun intercept(): List<ExtensionPhase>
+  fun intercept(): List<Pair<Name, List<ExtensionPhase>>>
 
   fun meta(vararg phases: ExtensionPhase): List<ExtensionPhase> =
     phases.toList()
@@ -90,6 +96,18 @@ interface MetaComponentRegistrar : ComponentRegistrar {
       override fun CompilerContext.updateConfiguration(configuration: CompilerConfiguration) {
         updateConfiguration(configuration)
       }
+    }
+
+  fun additionalSources(
+    collectAdditionalSourcesAndUpdateConfiguration: CompilerContext.(
+      knownSources: Collection<KtFile>,
+      configuration: CompilerConfiguration,
+      project: Project
+    ) -> Collection<KtFile>
+  ): ExtensionPhase.CollectAdditionalSources =
+    object : ExtensionPhase.CollectAdditionalSources {
+      override fun CompilerContext.collectAdditionalSourcesAndUpdateConfiguration(knownSources: Collection<KtFile>, configuration: CompilerConfiguration, project: Project): Collection<KtFile> =
+        collectAdditionalSourcesAndUpdateConfiguration(knownSources, configuration, project)
     }
 
   fun analysys(
@@ -118,9 +136,7 @@ interface MetaComponentRegistrar : ComponentRegistrar {
         componentProvider: ComponentProvider
       ): AnalysisResult? {
         ctx.module = module
-        ctx.projectContext = projectContext
         ctx.files = files
-        ctx.bindingTrace = bindingTrace
         ctx.componentProvider = componentProvider
         return doAnalysis(project, module, projectContext, files, bindingTrace, componentProvider)
       }
@@ -132,80 +148,6 @@ interface MetaComponentRegistrar : ComponentRegistrar {
         files: Collection<KtFile>
       ): AnalysisResult? =
         analysisCompleted(project, module, bindingTrace, files)
-    }
-
-  fun classBuilderFactory(interceptClassBuilderFactory: CompilerContext.(interceptedFactory: ClassBuilderFactory, bindingContext: BindingContext, diagnostics: DiagnosticSink) -> ClassBuilderFactory): ExtensionPhase.ClassBuilder =
-    object : ExtensionPhase.ClassBuilder {
-      override fun CompilerContext.interceptClassBuilder(
-        interceptedFactory: ClassBuilderFactory,
-        bindingContext: BindingContext,
-        diagnostics: DiagnosticSink
-      ): ClassBuilderFactory =
-        interceptClassBuilderFactory(this, interceptedFactory, bindingContext, diagnostics)
-    }
-
-  fun newMethod(f: (origin: JvmDeclarationOrigin, access: Int, name: String, desc: String, signature: String?, exceptions: Array<out String>?) -> Unit): ExtensionPhase.ClassBuilder =
-    object : ExtensionPhase.ClassBuilder {
-      override fun CompilerContext.interceptClassBuilder(
-        interceptedFactory: ClassBuilderFactory,
-        bindingContext: BindingContext,
-        diagnostics: DiagnosticSink
-      ): ClassBuilderFactory =
-        object : ClassBuilderFactory by interceptedFactory {
-          override fun newClassBuilder(origin: JvmDeclarationOrigin): ClassBuilder =
-            NewMethodClassBuilder(interceptedFactory.newClassBuilder(origin), f)
-        }
-    }
-
-  fun newField(f: (origin: JvmDeclarationOrigin, access: Int, name: String, desc: String, signature: String?, value: Any?) -> Unit): ExtensionPhase.ClassBuilder =
-    object : ExtensionPhase.ClassBuilder {
-      override fun CompilerContext.interceptClassBuilder(
-        interceptedFactory: ClassBuilderFactory,
-        bindingContext: BindingContext,
-        diagnostics: DiagnosticSink
-      ): ClassBuilderFactory =
-        object : ClassBuilderFactory by interceptedFactory {
-          override fun newClassBuilder(origin: JvmDeclarationOrigin): ClassBuilder =
-            NewFieldClassBuilder(interceptedFactory.newClassBuilder(origin), f)
-        }
-    }
-
-  fun resolveSession(f: CompilerContext.(ctx: ResolveSession) -> Unit): ExtensionPhase.SyntheticResolver =
-    syntheticResolver(
-      generatePackageSyntheticClasses = { _, _, ctx, _, _ ->
-        updateClassContext(f, ctx as ResolveSession)
-      }
-    )
-
-  fun defineClass(f: (bindingContext: BindingContext, diagnostics: DiagnosticSink, classDef: ClassDefinition) -> ClassDefinition): ExtensionPhase.ClassBuilder =
-    object : ExtensionPhase.ClassBuilder {
-      override fun CompilerContext.interceptClassBuilder(
-        interceptedFactory: ClassBuilderFactory,
-        bindingContext: BindingContext,
-        diagnostics: DiagnosticSink
-      ): ClassBuilderFactory =
-        object : ClassBuilderFactory by interceptedFactory {
-          override fun newClassBuilder(origin: JvmDeclarationOrigin): ClassBuilder =
-            DefineClassBuilder(
-              interceptedFactory.newClassBuilder(origin),
-              bindingContext,
-              diagnostics,
-              f
-            )
-        }
-    }
-
-  fun newAnnotation(f: (desc: String, visible: Boolean) -> Unit): ExtensionPhase.ClassBuilder =
-    object : ExtensionPhase.ClassBuilder {
-      override fun CompilerContext.interceptClassBuilder(
-        interceptedFactory: ClassBuilderFactory,
-        bindingContext: BindingContext,
-        diagnostics: DiagnosticSink
-      ): ClassBuilderFactory =
-        object : ClassBuilderFactory by interceptedFactory {
-          override fun newClassBuilder(origin: JvmDeclarationOrigin): ClassBuilder =
-            NewAnnotationClassBuilder(interceptedFactory.newClassBuilder(origin), f)
-        }
     }
 
   fun storageComponent(
@@ -290,6 +232,12 @@ interface MetaComponentRegistrar : ComponentRegistrar {
         )
     }
 
+  fun extraImports(extraImports: (ktFile: KtFile) -> Collection<KtImportInfo>): ExtensionPhase.ExtraImports =
+    object : ExtensionPhase.ExtraImports {
+      override fun CompilerContext.extraImports(ktFile: KtFile): Collection<KtImportInfo> =
+        extraImports(ktFile)
+    }
+
   fun packageFragmentProvider(getPackageFragmentProvider: CompilerContext.(project: Project, module: ModuleDescriptor, storageManager: StorageManager, trace: BindingTrace, moduleInfo: ModuleInfo?, lookupTracker: LookupTracker) -> PackageFragmentProvider?): ExtensionPhase.PackageProvider =
     object : ExtensionPhase.PackageProvider {
       override fun CompilerContext.getPackageFragmentProvider(
@@ -310,18 +258,51 @@ interface MetaComponentRegistrar : ComponentRegistrar {
         )
     }
 
-  fun syntheticScopes(getSyntheticScopes: CompilerContext.(moduleDescriptor: ModuleDescriptor, javaSyntheticPropertiesScope: JavaSyntheticPropertiesScope) -> List<SyntheticScope>): ExtensionPhase.SyntheticScopeProvider =
-    object : ExtensionPhase.SyntheticScopeProvider {
-      override fun CompilerContext.getSyntheticScopes(
-        moduleDescriptor: ModuleDescriptor,
-        javaSyntheticPropertiesScope: JavaSyntheticPropertiesScope
-      ): List<SyntheticScope> =
-        getSyntheticScopes(moduleDescriptor, javaSyntheticPropertiesScope)
-    }
+  fun syntheticScopes(
+    syntheticConstructor: CompilerContext.(constructor: ConstructorDescriptor) -> ConstructorDescriptor? = Noop.nullable2(),
+    syntheticConstructors: CompilerContext.(scope: ResolutionScope) -> Collection<FunctionDescriptor> = Noop.emptyCollection2(),
+    syntheticConstructorsForName: CompilerContext.(scope: ResolutionScope, name: Name, location: LookupLocation) -> Collection<FunctionDescriptor> = Noop.emptyCollection4(),
+    syntheticExtensionProperties: CompilerContext.(receiverTypes: Collection<KotlinType>, location: LookupLocation) -> Collection<PropertyDescriptor> = Noop.emptyCollection3(),
+    syntheticExtensionPropertiesForName: CompilerContext.(receiverTypes: Collection<KotlinType>, name: Name, location: LookupLocation) -> Collection<PropertyDescriptor> = Noop.emptyCollection4(),
+    syntheticMemberFunctions: CompilerContext.(receiverTypes: Collection<KotlinType>) -> Collection<FunctionDescriptor> = Noop.emptyCollection2(),
+    syntheticMemberFunctionsForName: CompilerContext.(receiverTypes: Collection<KotlinType>, name: Name, location: LookupLocation) -> Collection<FunctionDescriptor> = Noop.emptyCollection4(),
+    syntheticStaticFunctions: CompilerContext.(scope: ResolutionScope) -> Collection<FunctionDescriptor> = Noop.emptyCollection2(),
+    syntheticStaticFunctionsForName: CompilerContext.(scope: ResolutionScope, name: Name, location: LookupLocation) -> Collection<FunctionDescriptor> = Noop.emptyCollection4()
+  ): ExtensionPhase =
+    ide {
+      object : ExtensionPhase.SyntheticScopeProvider {
+        override fun CompilerContext.syntheticConstructor(constructor: ConstructorDescriptor): ConstructorDescriptor? =
+          syntheticConstructor(constructor)
+
+        override fun CompilerContext.syntheticConstructors(scope: ResolutionScope): Collection<FunctionDescriptor> =
+          syntheticConstructors(scope)
+
+        override fun CompilerContext.syntheticConstructors(scope: ResolutionScope, name: Name, location: LookupLocation): Collection<FunctionDescriptor> =
+          syntheticConstructorsForName(scope, name, location)
+
+        override fun CompilerContext.syntheticExtensionProperties(receiverTypes: Collection<KotlinType>, location: LookupLocation): Collection<PropertyDescriptor> =
+          syntheticExtensionProperties(receiverTypes, location)
+
+        override fun CompilerContext.syntheticExtensionProperties(receiverTypes: Collection<KotlinType>, name: Name, location: LookupLocation): Collection<PropertyDescriptor> =
+          syntheticExtensionPropertiesForName(receiverTypes, name, location)
+
+        override fun CompilerContext.syntheticMemberFunctions(receiverTypes: Collection<KotlinType>): Collection<FunctionDescriptor> =
+          syntheticMemberFunctions(receiverTypes)
+
+        override fun CompilerContext.syntheticMemberFunctions(receiverTypes: Collection<KotlinType>, name: Name, location: LookupLocation): Collection<FunctionDescriptor> =
+          syntheticMemberFunctionsForName(receiverTypes, name, location)
+
+        override fun CompilerContext.syntheticStaticFunctions(scope: ResolutionScope): Collection<FunctionDescriptor> =
+          syntheticStaticFunctions(scope)
+
+        override fun CompilerContext.syntheticStaticFunctions(scope: ResolutionScope, name: Name, location: LookupLocation): Collection<FunctionDescriptor> =
+          syntheticStaticFunctionsForName(scope, name, location)
+      }
+    } ?: ExtensionPhase.Empty
 
   fun preprocessedVirtualFileFactory(
     createPreprocessedFile: CompilerContext.(file: VirtualFile?) -> VirtualFile?,
-    createPreprocessedLightFile: CompilerContext.(file: LightVirtualFile?) -> LightVirtualFile? = NullableOp1()
+    createPreprocessedLightFile: CompilerContext.(file: LightVirtualFile?) -> LightVirtualFile? = Noop.nullable2()
   ): ExtensionPhase.PreprocessedVirtualFileFactory =
     object : ExtensionPhase.PreprocessedVirtualFileFactory {
       override fun CompilerContext.isPassThrough(): Boolean = false
@@ -342,15 +323,13 @@ interface MetaComponentRegistrar : ComponentRegistrar {
   private fun registerKindAwareTypeChecker(): ExtensionPhase.StorageComponentContainer =
     storageComponent(
       registerModuleComponents = { container, moduleDescriptor ->
-        println("registerModuleComponents")
         val defaultTypeChecker = KotlinTypeChecker.DEFAULT
         if (defaultTypeChecker !is KindAwareTypeChecker) { //nasty hack ahead to circumvent the ability to replace the Kotlin type checker
           val defaultTypeCheckerField = KotlinTypeChecker::class.java.getDeclaredField("DEFAULT")
           setFinalStatic(defaultTypeCheckerField, KindAwareTypeChecker(defaultTypeChecker))
         }
       },
-      check = { declaration, descriptor, context ->
-        println("check")
+      check = { _, _, _ ->
       }
     )
 
@@ -363,11 +342,13 @@ interface MetaComponentRegistrar : ComponentRegistrar {
       }
     )
 
+  fun CompilerContext.registerIdeExclusivePhase(currentPhase: ExtensionPhase): Unit {}
+
   fun syntheticResolver(
     addSyntheticSupertypes: CompilerContext.(
       thisDescriptor: ClassDescriptor,
       supertypes: MutableList<KotlinType>
-    ) -> Unit = NoOp3,
+    ) -> Unit = Noop.effect3,
     /**
      * For a given package fragment it iterates over all the package declaration
      * allowing the user to contribute new synthetic declarations.
@@ -380,37 +361,37 @@ interface MetaComponentRegistrar : ComponentRegistrar {
       ctx: LazyClassContext,
       declarationProvider: PackageMemberDeclarationProvider,
       result: MutableSet<ClassDescriptor>
-    ) -> Unit = NoOp6,
+    ) -> Unit = Noop.effect6,
     generateSyntheticClasses: CompilerContext.(
       thisDescriptor: ClassDescriptor,
       name: Name,
       ctx: LazyClassContext,
       declarationProvider: ClassMemberDeclarationProvider,
       result: MutableSet<ClassDescriptor>
-    ) -> Unit = NoOp6,
+    ) -> Unit = Noop.effect6,
     generateSyntheticMethods: CompilerContext.(
       thisDescriptor: ClassDescriptor,
       name: Name,
       bindingContext: BindingContext,
       fromSupertypes: List<SimpleFunctionDescriptor>,
       result: MutableCollection<SimpleFunctionDescriptor>
-    ) -> Unit = NoOp6,
+    ) -> Unit = Noop.effect6,
     generateSyntheticProperties: CompilerContext.(
       thisDescriptor: ClassDescriptor,
       name: Name,
       bindingContext: BindingContext,
       fromSupertypes: ArrayList<PropertyDescriptor>,
       result: MutableSet<PropertyDescriptor>
-    ) -> Unit = NoOp6,
+    ) -> Unit = Noop.effect6,
     getSyntheticCompanionObjectNameIfNeeded: CompilerContext.(
       thisDescriptor: ClassDescriptor
-    ) -> Name? = NullableOp1(),
+    ) -> Name? = Noop.nullable2(),
     getSyntheticFunctionNames: CompilerContext.(
       thisDescriptor: ClassDescriptor
-    ) -> List<Name>? = NullableOp1(),
+    ) -> List<Name>? = Noop.nullable2(),
     getSyntheticNestedClassNames: CompilerContext.(
       thisDescriptor: ClassDescriptor
-    ) -> List<Name>? = NullableOp1()
+    ) -> List<Name>? = Noop.nullable2()
   ): ExtensionPhase.SyntheticResolver =
     object : ExtensionPhase.SyntheticResolver {
       override fun CompilerContext.addSyntheticSupertypes(
@@ -470,50 +451,76 @@ interface MetaComponentRegistrar : ComponentRegistrar {
         getSyntheticNestedClassNames(thisDescriptor) ?: emptyList()
     }
 
-  fun enableIr(): ExtensionPhase.Config =
-    updateConfig { configuration ->
-      configuration.put(JVMConfigurationKeys.IR, true)
-    }
+  fun enableIr(): ExtensionPhase =
+    cli {
+      updateConfig { configuration ->
+        configuration.put(JVMConfigurationKeys.IR, true)
+      }
+    } ?: ExtensionPhase.Empty
 
   override fun registerProjectComponents(
     project: MockProject,
     configuration: CompilerConfiguration
   ) {
-    //println("Project allowed extensions: ${Extensions.getArea(project).extensionPoints.toList().joinToString("\n")}")
-    val messageCollector: MessageCollector = configuration.get(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY, MessageCollector.NONE)
-    val ctx = CompilerContext(project, messageCollector)
-//    project.picoContainer.componentAdapters.filterIsInstance<ComponentAdapter>().forEach {
-//      println("Compiler Service: <${it.componentKey}> : ${it.componentImplementation}")
-//    }
+    ide {
+      println("registerProjectComponents!!!! CALLED in IDEA!!!! something is wrong.")
+    }
+    registerMetaComponents(project, configuration)
+  }
 
+  fun registerMetaComponents(
+    project: Project,
+    configuration: CompilerConfiguration
+  ) {
+    println("Project allowed extensions: ${Extensions.getArea(project).extensionPoints.toList().joinToString("\n")}")
+    cli {
+      println("it's the CLI plugin")
+    }
+    ide {
+      println("it's the IDEA plugin")
+    }
+    val messageCollector: MessageCollector? =
+      cli { configuration.get(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY, MessageCollector.NONE) }
+
+    val ctx = CompilerContext(project, messageCollector)
     registerPostAnalysisContextEnrichment(project, ctx)
-    val initialPhases = meta(
+
+    val initialPhases = listOf(Name.identifier("Initial setup") to meta(
       enableIr(),
       compilerContextService(),
-      registerKindAwareTypeChecker()
-    )
-    (initialPhases + intercept()).forEach { phase ->
-      if (phase is ExtensionPhase.PreprocessedVirtualFileFactory) registerPreprocessedVirtualFileFactory(project, phase, ctx)
-      if (phase is ExtensionPhase.Config) registerCompilerConfiguration(project, phase, ctx)
-      if (phase is ExtensionPhase.StorageComponentContainer) registerStorageComponentContainer(project, phase, ctx)
-      if (phase is ExtensionPhase.AnalysisHandler) registerAnalysisHandler(project, phase, ctx)
-      if (phase is ExtensionPhase.ClassBuilder) registerClassBuilder(project, phase, ctx)
-      if (phase is ExtensionPhase.Codegen) registerCodegen(project, phase, ctx)
-      if (phase is ExtensionPhase.DeclarationAttributeAlterer) registerDeclarationAttributeAlterer(
-        project,
-        phase,
-        ctx
-      )
-      if (phase is ExtensionPhase.PackageProvider) packageFragmentProvider(project, phase, ctx)
-      if (phase is ExtensionPhase.SyntheticResolver) registerSyntheticResolver(project, phase, ctx)
-      if (phase is ExtensionPhase.IRGeneration) registerIRGeneration(project, phase, ctx)
-      //TODO() if (phase is ExtensionPhase.SyntheticScopeProvider) registerSyntheticScopeProvider(project, phase, ctx)
-      //TODO() not available. if (phase is ExtensionPhase.DiagnosticsSuppressor) registerDiagnosticSuppressor(project, phase, ctx)
+      registerKindAwareTypeChecker(),
+      registerMetaAnalyzer()
+    ))
+    (initialPhases + intercept()).forEach { (plugin, phases) ->
+      println("Registering plugin: $plugin extensions: $phases")
+      phases.forEach { currentPhase ->
+        fun registerPhase(phase: ExtensionPhase): Unit {
+          if (phase is ExtensionPhase.ExtraImports) registerExtraImports(project, phase, ctx)
+          if (phase is ExtensionPhase.PreprocessedVirtualFileFactory) registerPreprocessedVirtualFileFactory(project, phase, ctx)
+          if (phase is ExtensionPhase.Config) registerCompilerConfiguration(project, phase, ctx)
+          if (phase is ExtensionPhase.StorageComponentContainer) registerStorageComponentContainer(project, phase, ctx)
+          if (phase is ExtensionPhase.CollectAdditionalSources) registerCollectAdditionalSources(project, phase, ctx)
+          if (phase is ExtensionPhase.AnalysisHandler) registerAnalysisHandler(project, phase, ctx)
+          if (phase is ExtensionPhase.ClassBuilder) registerClassBuilder(project, phase, ctx)
+          if (phase is ExtensionPhase.Codegen) registerCodegen(project, phase, ctx)
+          if (phase is ExtensionPhase.DeclarationAttributeAlterer) registerDeclarationAttributeAlterer(project, phase, ctx)
+          if (phase is ExtensionPhase.PackageProvider) packageFragmentProvider(project, phase, ctx)
+          if (phase is ExtensionPhase.SyntheticResolver) registerSyntheticResolver(project, phase, ctx)
+          if (phase is ExtensionPhase.IRGeneration) registerIRGeneration(project, phase, ctx)
+          if (phase is ExtensionPhase.SyntheticScopeProvider) registerSyntheticScopeProvider(project, phase, ctx)
+          if (phase is ExtensionPhase.DiagnosticsSuppressor) registerDiagnosticSuppressor(project, phase, ctx)
+          if (phase is ExtensionPhase.CompositePhase) phase.phases.map(::registerPhase)
+        }
+        registerPhase(currentPhase)
+        ctx.registerIdeExclusivePhase(currentPhase)
+      }
     }
   }
 
+  fun registerMetaAnalyzer(): ExtensionPhase = ExtensionPhase.Empty
+
   fun registerDiagnosticSuppressor(
-    project: MockProject,
+    project: Project,
     phase: ExtensionPhase.DiagnosticsSuppressor,
     ctx: CompilerContext
   ) {
@@ -524,7 +531,15 @@ interface MetaComponentRegistrar : ComponentRegistrar {
       })
   }
 
-  fun registerPreprocessedVirtualFileFactory(project: MockProject, phase: ExtensionPhase.PreprocessedVirtualFileFactory, ctx: CompilerContext) {
+  fun registerExtraImports(project: Project, phase: ExtensionPhase.ExtraImports, ctx: CompilerContext) {
+    ExtraImportsProviderExtension.registerExtension(project, object : ExtraImportsProviderExtension {
+      override fun getExtraImports(ktFile: KtFile): Collection<KtImportInfo> =
+        phase.run { ctx.extraImports(ktFile) }
+
+    })
+  }
+
+  fun registerPreprocessedVirtualFileFactory(project: Project, phase: ExtensionPhase.PreprocessedVirtualFileFactory, ctx: CompilerContext) {
     PreprocessedVirtualFileFactoryExtension.registerExtension(project, object : PreprocessedVirtualFileFactoryExtension {
       override fun createPreprocessedFile(file: VirtualFile?): VirtualFile? =
         phase.run { ctx.createPreprocessedFile(file) }
@@ -537,15 +552,46 @@ interface MetaComponentRegistrar : ComponentRegistrar {
     })
   }
 
-  fun registerSyntheticScopeProvider(project: MockProject, phase: ExtensionPhase.SyntheticScopeProvider, ctx: CompilerContext) {
+  fun registerSyntheticScopeProvider(project: Project, phase: ExtensionPhase.SyntheticScopeProvider, ctx: CompilerContext) {
     SyntheticScopeProviderExtension.registerExtension(project, object : SyntheticScopeProviderExtension {
       override fun getScopes(moduleDescriptor: ModuleDescriptor, javaSyntheticPropertiesScope: JavaSyntheticPropertiesScope): List<SyntheticScope> =
-        phase.run { ctx.getSyntheticScopes(moduleDescriptor, javaSyntheticPropertiesScope) }
+        phase.run {
+          listOf(
+            object : SyntheticScope.Default() {
+              override fun getSyntheticConstructor(constructor: ConstructorDescriptor): ConstructorDescriptor? =
+                phase.run { ctx.syntheticConstructor(constructor) }
+
+              override fun getSyntheticConstructors(scope: ResolutionScope): Collection<FunctionDescriptor> =
+                phase.run { ctx.syntheticConstructors(scope) }
+
+              override fun getSyntheticConstructors(scope: ResolutionScope, name: Name, location: LookupLocation): Collection<FunctionDescriptor> =
+                phase.run { ctx.syntheticConstructors(scope, name, location) }
+
+              override fun getSyntheticExtensionProperties(receiverTypes: Collection<KotlinType>, location: LookupLocation): Collection<PropertyDescriptor> =
+                phase.run { ctx.syntheticExtensionProperties(receiverTypes, location) }
+
+              override fun getSyntheticExtensionProperties(receiverTypes: Collection<KotlinType>, name: Name, location: LookupLocation): Collection<PropertyDescriptor> =
+                phase.run { ctx.syntheticExtensionProperties(receiverTypes, name, location) }
+
+              override fun getSyntheticMemberFunctions(receiverTypes: Collection<KotlinType>): Collection<FunctionDescriptor> =
+                phase.run { ctx.syntheticMemberFunctions(receiverTypes) }
+
+              override fun getSyntheticMemberFunctions(receiverTypes: Collection<KotlinType>, name: Name, location: LookupLocation): Collection<FunctionDescriptor> =
+                phase.run { ctx.syntheticMemberFunctions(receiverTypes, name, location) }
+
+              override fun getSyntheticStaticFunctions(scope: ResolutionScope): Collection<FunctionDescriptor> =
+                phase.run { ctx.syntheticStaticFunctions(scope) }
+
+              override fun getSyntheticStaticFunctions(scope: ResolutionScope, name: Name, location: LookupLocation): Collection<FunctionDescriptor> =
+                phase.run { ctx.syntheticStaticFunctions(scope, name, location) }
+            }
+          )
+        }
     })
   }
 
   fun registerIRGeneration(
-    project: MockProject,
+    project: Project,
     phase: ExtensionPhase.IRGeneration,
     compilerContext: CompilerContext
   ) {
@@ -561,7 +607,7 @@ interface MetaComponentRegistrar : ComponentRegistrar {
   }
 
   fun registerSyntheticResolver(
-    project: MockProject,
+    project: Project,
     phase: ExtensionPhase.SyntheticResolver,
     compilerContext: CompilerContext
   ) {
@@ -657,7 +703,7 @@ interface MetaComponentRegistrar : ComponentRegistrar {
   }
 
   fun packageFragmentProvider(
-    project: MockProject,
+    project: Project,
     phase: ExtensionPhase.PackageProvider,
     ctx: CompilerContext
   ) {
@@ -686,28 +732,50 @@ interface MetaComponentRegistrar : ComponentRegistrar {
       })
   }
 
-  private fun registerPostAnalysisContextEnrichment(project: MockProject, ctx: CompilerContext) {
-    AnalysisHandlerExtension.registerExtension(project, object : AnalysisHandlerExtension {
-      override fun doAnalysis(
-        project: Project,
-        module: ModuleDescriptor,
-        projectContext: ProjectContext,
-        files: Collection<KtFile>,
-        bindingTrace: BindingTrace,
-        componentProvider: ComponentProvider
-      ): AnalysisResult? {
-        ctx.module = module
-        ctx.projectContext = projectContext
-        ctx.files = files
-        ctx.bindingTrace = bindingTrace
-        ctx.componentProvider = componentProvider
-        return null
-      }
-    })
+  private fun registerPostAnalysisContextEnrichment(project: Project, ctx: CompilerContext) {
+    cli {
+      AnalysisHandlerExtension.registerExtension(project, object : AnalysisHandlerExtension {
+        override fun doAnalysis(
+          project: Project,
+          module: ModuleDescriptor,
+          projectContext: ProjectContext,
+          files: Collection<KtFile>,
+          bindingTrace: BindingTrace,
+          componentProvider: ComponentProvider
+        ): AnalysisResult? {
+          ctx.module = module
+          ctx.files = files
+          ctx.componentProvider = componentProvider
+          return null
+        }
+      })
+    }
+    ide {
+      PackageFragmentProviderExtension.registerExtension(project, object : PackageFragmentProviderExtension {
+        override fun getPackageFragmentProvider(project: Project, module: ModuleDescriptor, storageManager: StorageManager, trace: BindingTrace, moduleInfo: ModuleInfo?, lookupTracker: LookupTracker): PackageFragmentProvider? {
+          println("getPackageFragmentProvider")
+          return null
+        }
+      })
+      StorageComponentContainerContributor.registerExtension(
+        project,
+        object : StorageComponentContainerContributor {
+          override fun registerModuleComponents(
+            container: StorageComponentContainer,
+            platform: TargetPlatform,
+            moduleDescriptor: ModuleDescriptor
+          ) {
+            ctx.module = moduleDescriptor
+            ctx.componentProvider = container
+            super.registerModuleComponents(container, platform, moduleDescriptor)
+          }
+        }
+      )
+    }
   }
 
   fun registerDeclarationAttributeAlterer(
-    project: MockProject,
+    project: Project,
     phase: ExtensionPhase.DeclarationAttributeAlterer,
     ctx: CompilerContext
   ) {
@@ -736,7 +804,7 @@ interface MetaComponentRegistrar : ComponentRegistrar {
       })
   }
 
-  fun registerCodegen(project: MockProject, phase: ExtensionPhase.Codegen, ctx: CompilerContext) {
+  fun registerCodegen(project: Project, phase: ExtensionPhase.Codegen, ctx: CompilerContext) {
     ExpressionCodegenExtension.registerExtension(project, object : ExpressionCodegenExtension {
       override fun applyFunction(
         receiver: StackValue,
@@ -760,13 +828,6 @@ interface MetaComponentRegistrar : ComponentRegistrar {
     })
   }
 
-  fun CompilerContext.suppressDiagnostic(f: (Diagnostic) -> Boolean): Unit {
-    (bindingTrace.bindingContext.diagnostics as? MutableDiagnosticsWithSuppression)?.let {
-      val diagnosticList = it.getOwnDiagnostics() as ArrayList<Diagnostic>
-      diagnosticList.removeIf(f)
-    }
-  }
-
   class DelegatingContributorChecker(val phase: ExtensionPhase.StorageComponentContainer, val ctx: CompilerContext) : StorageComponentContainerContributor, DeclarationChecker {
 
     override fun registerModuleComponents(container: StorageComponentContainer, platform: TargetPlatform, moduleDescriptor: ModuleDescriptor) {
@@ -779,7 +840,7 @@ interface MetaComponentRegistrar : ComponentRegistrar {
   }
 
   fun registerStorageComponentContainer(
-    project: MockProject,
+    project: Project,
     phase: ExtensionPhase.StorageComponentContainer,
     ctx: CompilerContext
   ) {
@@ -789,45 +850,66 @@ interface MetaComponentRegistrar : ComponentRegistrar {
     )
   }
 
+  fun registerCollectAdditionalSources(
+    project: Project,
+    phase: ExtensionPhase.CollectAdditionalSources,
+    ctx: CompilerContext
+  ) {
+    cli {
+      CollectAdditionalSourcesExtension.registerExtension(
+        project,
+        object : CollectAdditionalSourcesExtension {
+          override fun collectAdditionalSourcesAndUpdateConfiguration(
+            knownSources: Collection<KtFile>,
+            configuration: CompilerConfiguration,
+            project: Project
+          ): Collection<KtFile> = phase.run {
+            ctx.collectAdditionalSourcesAndUpdateConfiguration(knownSources, configuration, project)
+          }
+        }
+      )
+    }
+  }
+
   fun registerAnalysisHandler(
-    project: MockProject,
+    project: Project,
     phase: ExtensionPhase.AnalysisHandler,
     ctx: CompilerContext
   ) {
-    AnalysisHandlerExtension.registerExtension(project, object : AnalysisHandlerExtension {
-      override fun analysisCompleted(
-        project: Project,
-        module: ModuleDescriptor,
-        bindingTrace: BindingTrace,
-        files: Collection<KtFile>
-      ): AnalysisResult? {
-        return phase.run { ctx.analysisCompleted(project, module, bindingTrace, files) }
-      }
+    cli {
+      AnalysisHandlerExtension.registerExtension(project, object : AnalysisHandlerExtension {
+        override fun analysisCompleted(
+          project: Project,
+          module: ModuleDescriptor,
+          bindingTrace: BindingTrace,
+          files: Collection<KtFile>
+        ): AnalysisResult? = phase.run { ctx.analysisCompleted(project, module, bindingTrace, files) }
 
-      override fun doAnalysis(
-        project: Project,
-        module: ModuleDescriptor,
-        projectContext: ProjectContext,
-        files: Collection<KtFile>,
-        bindingTrace: BindingTrace,
-        componentProvider: ComponentProvider
-      ): AnalysisResult? {
-        return phase.run {
-          ctx.doAnalysis(
-            project,
-            module,
-            projectContext,
-            files,
-            bindingTrace,
-            componentProvider
-          )
+        override fun doAnalysis(
+          project: Project,
+          module: ModuleDescriptor,
+          projectContext: ProjectContext,
+          files: Collection<KtFile>,
+          bindingTrace: BindingTrace,
+          componentProvider: ComponentProvider
+        ): AnalysisResult? {
+          return phase.run {
+            ctx.doAnalysis(
+              project,
+              module,
+              projectContext,
+              files,
+              bindingTrace,
+              componentProvider
+            )
+          }
         }
-      }
-    })
+      })
+    }
   }
 
   fun registerClassBuilder(
-    project: MockProject,
+    project: Project,
     phase: ExtensionPhase.ClassBuilder,
     ctx: CompilerContext
   ) {
@@ -846,7 +928,7 @@ interface MetaComponentRegistrar : ComponentRegistrar {
   }
 
   fun registerCompilerConfiguration(
-    project: MockProject,
+    project: Project,
     phase: ExtensionPhase.Config,
     ctx: CompilerContext
   ) {
@@ -858,8 +940,8 @@ interface MetaComponentRegistrar : ComponentRegistrar {
         }
       })
   }
-
 }
+
 
 internal class NewMethodClassBuilder(
   private val builder: ClassBuilder,
@@ -969,15 +1051,3 @@ data class ClassDefinition(
   val superName: String,
   val interfaces: List<String>
 )
-
-inline fun <reified A> MockProject.removeComponent(): Unit {
-  val componentAdapter = picoContainer.getComponentAdapterOfType(A::class.java)
-  picoContainer.unregisterComponent(componentAdapter.componentKey)
-}
-
-inline fun <reified A> MockProject.replaceComponent(f: (A) -> A): Unit {
-  val componentAdapter = picoContainer.getComponentAdapterOfType(A::class.java)
-  val facade = componentAdapter.getComponentInstance(picoContainer) as A
-  picoContainer.unregisterComponent(componentAdapter.componentKey)
-  picoContainer.registerComponentInstance(componentAdapter.componentKey, f(facade))
-}
