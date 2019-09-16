@@ -1,4 +1,4 @@
-package arrow.meta.utils
+package arrow.meta.internal
 
 object Noop {
   val effect1: (Any?) -> Unit = { _ -> Unit }

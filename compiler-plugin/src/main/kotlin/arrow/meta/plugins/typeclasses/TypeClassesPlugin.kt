@@ -8,7 +8,7 @@ import arrow.meta.phases.codegen.ir.irFunctionAccess
 import arrow.meta.quotes.func
 import arrow.meta.quotes.get
 import arrow.meta.quotes.ktFile
-import arrow.meta.utils.ide
+import arrow.meta.dsl.platform.ide
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageLocation
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor

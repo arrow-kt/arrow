@@ -1,4 +1,4 @@
-package arrow.meta.phases.analysis
+package arrow.meta.phases.config
 
 import arrow.meta.phases.CompilerContext
 import arrow.meta.phases.ExtensionPhase

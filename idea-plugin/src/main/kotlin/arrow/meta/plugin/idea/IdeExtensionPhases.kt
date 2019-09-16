@@ -2,8 +2,8 @@ package arrow.meta.plugin.idea
 
 import arrow.meta.phases.CompilerContext
 import arrow.meta.phases.ExtensionPhase
-import arrow.meta.utils.Noop
-import arrow.meta.utils.ide
+import arrow.meta.internal.Noop
+import arrow.meta.dsl.platform.ide
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiErrorElement
 

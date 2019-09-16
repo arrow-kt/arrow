@@ -5,8 +5,8 @@ import arrow.meta.phases.ExtensionPhase
 import arrow.meta.MetaComponentRegistrar
 import arrow.meta.phases.analysis.MetaAnalyzer
 import arrow.meta.phases.analysis.MetaFileViewProvider
-import arrow.meta.utils.cli
-import arrow.meta.utils.ide
+import arrow.meta.dsl.platform.cli
+import arrow.meta.dsl.platform.ide
 import org.jetbrains.kotlin.analyzer.AnalysisResult
 import org.jetbrains.kotlin.analyzer.ModuleInfo
 import org.jetbrains.kotlin.com.intellij.openapi.editor.Document

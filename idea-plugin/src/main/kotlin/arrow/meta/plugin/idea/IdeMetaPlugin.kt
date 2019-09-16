@@ -4,7 +4,7 @@ import arrow.meta.MetaPlugin
 import arrow.meta.phases.CompilerContext
 import arrow.meta.phases.ExtensionPhase
 import arrow.meta.plugin.idea.typeclasses.typeClassesIde
-import arrow.meta.utils.ide
+import arrow.meta.dsl.platform.ide
 import com.intellij.codeInsight.highlighting.HighlightErrorFilter
 import com.intellij.openapi.extensions.Extensions
 import com.intellij.openapi.project.Project
