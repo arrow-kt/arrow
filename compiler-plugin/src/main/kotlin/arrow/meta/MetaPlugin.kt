@@ -1,9 +1,8 @@
 package arrow.meta
 
-import arrow.meta.extensions.ExtensionPhase
-import arrow.meta.extensions.MetaComponentRegistrar
-import arrow.meta.higherkind.higherKindedTypes
-import arrow.meta.typeclasses.typeClasses
+import arrow.meta.phases.ExtensionPhase
+import arrow.meta.plugins.higherkind.higherKindedTypes
+import arrow.meta.plugins.typeclasses.typeClasses
 import org.jetbrains.kotlin.name.Name
 
 open class MetaPlugin : MetaComponentRegistrar {
