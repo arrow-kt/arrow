@@ -4,7 +4,6 @@ import arrow.meta.phases.CompilerContext
 import arrow.meta.phases.ExtensionPhase
 import arrow.meta.MetaComponentRegistrar
 import arrow.meta.phases.codegen.ir.IrUtils
-import arrow.meta.phases.codegen.ir.irFunctionAccess
 import arrow.meta.quotes.func
 import arrow.meta.quotes.get
 import arrow.meta.quotes.ktFile
