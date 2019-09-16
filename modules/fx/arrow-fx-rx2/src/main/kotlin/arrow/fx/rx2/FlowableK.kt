@@ -4,6 +4,7 @@ import arrow.Kind
 import arrow.core.Either
 import arrow.core.Eval
 import arrow.core.Left
+import arrow.core.Option
 import arrow.core.Right
 import arrow.core.identity
 import arrow.core.nonFatalOrThrow
@@ -154,6 +155,11 @@ data class FlowableK<A>(val flowable: Flowable<A>) : FlowableKOf<A>, FlowableKKi
       is Flowable<*> -> this.flowable == other
       else -> false
     }
+
+  fun <B> filterMap(f: (A) -> Option<B>): FlowableK<B> =
+    flowable.flatMap { a ->
+      f(a).fold({ Flowable.empty<B>() }, { b -> Flowable.just(b) })
+    }.k()
 
   override fun hashCode(): Int = flowable.hashCode()
 
