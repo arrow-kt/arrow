@@ -8,6 +8,7 @@ import arrow.meta.ir.irFunctionAccess
 import arrow.meta.qq.func
 import arrow.meta.qq.get
 import arrow.meta.qq.ktFile
+import arrow.meta.utils.ide
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageLocation
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
@@ -79,21 +80,25 @@ val MetaComponentRegistrar.typeClasses: Pair<Name, List<ExtensionPhase>>
             )
           }
         ),
-        syntheticResolver(
-          generateSyntheticMethods = { thisDescriptor, name, bindingContext, fromSupertypes, result ->
-            thisDescriptor.safeAs<LazyClassDescriptor>()?.let { lazyDescriptor ->
-              val lazyClassContext: Any = lazyDescriptor["c"]
-              lazyClassContext.safeAs<ResolveSession>()?.let { session ->
-                result.firstOrNull { it.name == name }?.let { function ->
-                  resolveBodyWithExtensionsScope(session, function)
-                }
-                println("typeclasses.syntheticResolver.generateSyntheticMethods: $thisDescriptor, $name, $fromSupertypes, $result")
-              }
-            }
-          }
-        ),
+        ideSyntheticBodyResolution(),
         irFunctionAccess { mapValueParameterExtensions(it) }
       )
+
+private fun MetaComponentRegistrar.ideSyntheticBodyResolution(): ExtensionPhase = ide {
+  syntheticResolver(
+    generateSyntheticMethods = { thisDescriptor, name, bindingContext, fromSupertypes, result ->
+      thisDescriptor.safeAs<LazyClassDescriptor>()?.let { lazyDescriptor ->
+        val lazyClassContext: Any = lazyDescriptor["c"]
+        lazyClassContext.safeAs<ResolveSession>()?.let { session ->
+          result.firstOrNull { it.name == name }?.let { function ->
+            resolveBodyWithExtensionsScope(session, function)
+          }
+          println("typeclasses.syntheticResolver.generateSyntheticMethods: $thisDescriptor, $name, $fromSupertypes, $result")
+        }
+      }
+    }
+  )
+} ?: ExtensionPhase.Empty
 
 
 private fun CompilerContext.resolveBodyWithExtensionsScope(session: ResolveSession, function: SimpleFunctionDescriptor): Unit {
@@ -139,42 +144,8 @@ private fun SimpleFunctionDescriptor.applySmartCast(
   }
 }
 
-//
-//private fun CallableMemberDescriptor.old(trace: BindingTrace): Unit {
-//  findPsi().safeAs<KtCallableDeclaration>()?.let { ktCallable ->
-//    extensionReceiverParameter?.let { originalReceiver ->
-//      val smartCastInfo = valueParameters.mapNotNull { valueParameterDescriptor ->
-//        if (valueParameterDescriptor.shouldEnhanceScope()) {
-//          valueParameterDescriptor.findPsi().safeAs<KtParameter>()?.let { ktParameter ->
-//            val extensionReceiver = ExtensionReceiver(this, originalReceiver.type, null)
-//            val smartCast = ImplicitSmartCasts(extensionReceiver, valueParameterDescriptor.type)
-//            //trace.record(BindingContext.IMPLICIT_RECEIVER_SMARTCAST, ktParameter, smartCast)
-//            getReceiverValueWithSmartCast(originalReceiver.value, valueParameterDescriptor.type)?.let { receiver ->
-//              val identifierInfo = IdentifierInfo.Receiver(receiver)
-//              val receiverValue = DataFlowValue(identifierInfo, valueParameterDescriptor.type)
-//              val dataFlow = DataFlowInfo.EMPTY.establishSubtyping(receiverValue, valueParameterDescriptor.type, LanguageVersionSettingsImpl.DEFAULT)
-//              //ExpressionReceiver.create(expression, valueParameterDescriptor.type, trace.bindingContext)
-//              //trace.record(BindingContext.THIS_TYPE_FOR_SUPER_EXPRESSION, expressionReceiver.expression ,valueParameterDescriptor.type)
-//              smartCast to dataFlow
-//            }
-//          }
-//        } else null
-//      }
-//      val dataFlows = smartCastInfo.map { it.second }
-//      val smartCasts = smartCastInfo.map { it.first }
-//      val combinedDataFlow = dataFlows.fold(DataFlowInfo.EMPTY, DataFlowInfo::and)
-//      ktCallable.blockExpressionsOrSingle().filterIsInstance<KtCallExpression>().firstOrNull()?.let { expression ->
-//        trace.record(BindingContext.DATA_FLOW_INFO_BEFORE, expression, combinedDataFlow)
-//        smartCasts.forEach {
-//          trace.record(BindingContext.IMPLICIT_RECEIVER_SMARTCAST, expression, it)
-//        }
-//      }
-//    }
-//  }
-//}
-
 private fun List<ValueParameterDescriptor>.scopeForExtensionParameters(innerScope: LexicalScope): LexicalScope =
-  fold(innerScope) { currentScope, valueParameterDescriptor->
+  fold(innerScope) { currentScope, valueParameterDescriptor ->
     val ownerDescriptor = AnonymousFunctionDescriptor(valueParameterDescriptor, valueParameterDescriptor.annotations, CallableMemberDescriptor.Kind.DECLARATION, valueParameterDescriptor.source, false)
     val extensionReceiver = ExtensionReceiver(ownerDescriptor, valueParameterDescriptor.type, null)
     val extensionReceiverParamDescriptor = ReceiverParameterDescriptorImpl(ownerDescriptor, extensionReceiver, ownerDescriptor.annotations)
@@ -182,27 +153,10 @@ private fun List<ValueParameterDescriptor>.scopeForExtensionParameters(innerScop
     LexicalScopeImpl(currentScope, ownerDescriptor, true, extensionReceiverParamDescriptor, LexicalScopeKind.FUNCTION_INNER_SCOPE)
   }
 
-
-private fun ValueParameterDescriptor.extensionScope(): List<SimpleFunctionDescriptor> =
-  type.constructor.declarationDescriptor
-    .safeAs<ClassDescriptor>()
-    ?.functions()?.filter { it.kind != CallableMemberDescriptor.Kind.FAKE_OVERRIDE }
-    ?: emptyList()
-
-private fun ClassDescriptor.classifierNamed(name: Name): ClassifierDescriptor? =
-  unsubstitutedMemberScope.getContributedClassifier(name, NoLookupLocation.FROM_BACKEND)
-
 private fun ValueParameterDescriptor.shouldEnhanceScope(): Boolean {
   val ktParameter = findPsi().safeAs<KtParameter>()
   return ktParameter?.hasExtensionDefaultValue() == true
 }
-
-
-private fun PackageFragmentDescriptor.functions(): List<SimpleFunctionDescriptor> =
-  getMemberScope().getContributedDescriptors { true }.filterIsInstance<SimpleFunctionDescriptor>()
-
-private fun ClassDescriptor.functions(): List<SimpleFunctionDescriptor> =
-  unsubstitutedMemberScope.getContributedDescriptors { true }.filterIsInstance<SimpleFunctionDescriptor>()
 
 private fun List<String?>.run(body: Name): String =
   fold(body.asString()) { acc, scope -> "$scope.run { $acc }" }

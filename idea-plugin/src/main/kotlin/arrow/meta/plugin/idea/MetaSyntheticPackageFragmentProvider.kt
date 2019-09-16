@@ -61,6 +61,8 @@ class MetaSyntheticPackageFragmentProvider : PackageFragmentProviderExtension, A
         metaPlugin.registerMetaComponents(this, configuration)
         println("registerIdeProjectComponents DONE")
         postInitialize()
+      } else {
+        registered.set(false)
       }
     }
   }

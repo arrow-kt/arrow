@@ -25,15 +25,17 @@ open class IdeMetaPlugin : MetaPlugin() {
   }
 
   override fun registerMetaAnalyzer(): ExtensionPhase =
-    storageComponent(
-      registerModuleComponents = { container, moduleDescriptor ->
-        println("Registering meta analyzer")
-        container.useImpl<MetaIdeAnalyzer>()
-        //
-      },
-      check = { declaration, descriptor, context ->
-      }
-    )
+    ide {
+      storageComponent(
+        registerModuleComponents = { container, moduleDescriptor ->
+          println("Registering meta analyzer")
+          container.useImpl<MetaIdeAnalyzer>()
+          //
+        },
+        check = { declaration, descriptor, context ->
+        }
+      )
+    } ?: ExtensionPhase.Empty
 
 
   private fun CompilerContext.registerHighlighter(
