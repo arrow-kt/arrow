@@ -1,4 +1,4 @@
-package arrow.meta.plugin.idea
+package arrow.meta.plugin.idea.phases.config
 
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project

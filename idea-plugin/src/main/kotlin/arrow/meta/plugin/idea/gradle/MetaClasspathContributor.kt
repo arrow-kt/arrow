@@ -1,16 +1,15 @@
-package arrow.meta.plugin.idea
+package arrow.meta.plugin.idea.gradle
 
 import arrow.meta.MetaCliProcessor
 import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.diagnostic.Logger
 import org.jetbrains.kotlin.cli.common.arguments.CommonCompilerArguments
 import org.jetbrains.kotlin.idea.facet.KotlinFacet
-import org.jetbrains.kotlin.utils.addToStdlib.cast
 import java.io.File
 import java.io.FileInputStream
 import java.util.jar.JarInputStream
 
-internal object ArrowImportHandler {
+internal object MetaClasspathContributor {
   /**
    * The path to the IntelliJ compatible compiler plugin version.
    */
@@ -20,7 +19,7 @@ internal object ArrowImportHandler {
   /**
    * The [Logger] instance for this class.
    */
-  private val logger = Logger.getInstance(ArrowImportHandler::class.java)
+  private val logger = Logger.getInstance(MetaClasspathContributor::class.java)
 
   /**
    * Modify the compiler arguments for the specified [KotlinFacet] to remove the incompatible compiler plugin from

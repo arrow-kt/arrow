@@ -1,4 +1,4 @@
-package arrow.meta.plugin.idea
+package arrow.meta.plugin.idea.phases.resolve
 
 import org.jetbrains.kotlin.descriptors.CallableDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
@@ -21,7 +21,7 @@ import org.jetbrains.kotlin.descriptors.VariableDescriptor
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.resolve.DescriptorUtils
 
-class MetaRecursiveVisitor constructor(private val worker: DeclarationDescriptorVisitor<Unit, Unit>) : DeclarationDescriptorVisitor<Unit, Unit> {
+internal class MetaRecursiveVisitor constructor(private val worker: DeclarationDescriptorVisitor<Unit, Unit>) : DeclarationDescriptorVisitor<Unit, Unit> {
 
   private fun visitChildren(descriptors: Collection<DeclarationDescriptor>, data: Unit): Unit {
     for (descriptor in descriptors) {

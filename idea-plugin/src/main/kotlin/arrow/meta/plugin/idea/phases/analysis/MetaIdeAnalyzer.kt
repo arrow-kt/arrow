@@ -1,10 +1,10 @@
-package arrow.meta.plugin.idea
+package arrow.meta.plugin.idea.phases.analysis
 
 import arrow.meta.phases.CompilerContext
 import arrow.meta.phases.analysis.MetaAnalyzer
+import arrow.meta.plugin.idea.phases.config.currentProject
 import arrow.meta.quotes.Quote
 import arrow.meta.quotes.functionNames
-import arrow.meta.quotes.isMetaFile
 import arrow.meta.quotes.ktClassOrObject
 import arrow.meta.quotes.ktFile
 import arrow.meta.quotes.nestedClassNames
@@ -36,10 +36,8 @@ import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor
-import org.jetbrains.kotlin.descriptors.PackageViewDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
-import org.jetbrains.kotlin.descriptors.impl.DeclarationDescriptorVisitorEmptyBodies
 import org.jetbrains.kotlin.frontend.di.createContainerForBodyResolve
 import org.jetbrains.kotlin.idea.caches.project.forcedModuleInfo
 import org.jetbrains.kotlin.idea.caches.resolve.analyzeWithAllCompilerChecks
@@ -69,58 +67,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.collections.set
 
-val subscribedToEditorHooks: AtomicBoolean = AtomicBoolean(false)
-
-private val blackList: Set<Name> =
-  listOf("equals", "hashCode", "toString")
-    .map(Name::identifier).toSet()
-
-class SyntheticDescriptorCache(
-  val module: ModuleDescriptor,
-  val descriptorCache: ConcurrentHashMap<FqName, DeclarationDescriptor> = ConcurrentHashMap()
-) {
-  companion object {
-    fun fromAnalysis(file: KtFile, analysis: AnalysisResult): SyntheticDescriptorCache {
-      val moduleDescriptor = analysis.moduleDescriptor
-      val packageViewDescriptor = moduleDescriptor.getPackage(file.packageFqName)
-      val cache = SyntheticDescriptorCache(moduleDescriptor)
-      packageViewDescriptor.accept(
-        MetaRecursiveVisitor(object : DeclarationDescriptorVisitorEmptyBodies<Unit, Unit>() {
-          override fun visitDeclarationDescriptor(descriptor: DeclarationDescriptor?, data: Unit?) {
-            descriptor?.let {
-              if (descriptor.name !in blackList) {
-                if (descriptor is CallableMemberDescriptor) { // constructors functions and properties
-                  if (descriptor.ktFile()?.isMetaFile() == true && descriptor.kind != CallableMemberDescriptor.Kind.FAKE_OVERRIDE) {
-                    println("Callable: Added to cache: ${descriptor.fqNameSafe}")
-                    cache.descriptorCache[it.fqNameSafe] = it
-                  }
-                } else if (descriptor is ClassDescriptor) { // constructors functions and properties
-                  if (descriptor.ktFile()?.isMetaFile() == true) {
-                    println("Class: Added to cache: ${descriptor.fqNameSafe}")
-                    cache.descriptorCache[it.fqNameSafe] = it
-                  }
-                } else if (descriptor is PackageViewDescriptor) { // constructors functions and properties
-                  if (descriptor.ktFile()?.isMetaFile() == true) {
-                    println("Package: Added to cache: ${descriptor.fqNameSafe}")
-                    cache.descriptorCache[it.fqNameSafe] = it
-                  }
-                } else {
-                  println("skipped synthetic cache entry: $descriptor: ${descriptor.name}")
-                }
-              }
-            }
-          }
-        }), Unit)
-      return cache
-    }
-
-  }
-}
-
-private data class CacheId(val value: String)
-
-private val VirtualFile.metaCacheId: CacheId
-  get() = CacheId(path)
+private val subscribedToEditorHooks: AtomicBoolean = AtomicBoolean(false)
 
 class MetaIdeAnalyzer : MetaAnalyzer {
 

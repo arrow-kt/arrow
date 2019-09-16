@@ -1,5 +1,5 @@
 
-package arrow.meta.plugin.idea
+package arrow.meta.plugin.idea.gradle
 
 import com.intellij.openapi.externalSystem.model.DataNode
 import com.intellij.openapi.externalSystem.model.project.ModuleData
@@ -11,12 +11,12 @@ class ArrowGradleImportHandler : GradleProjectImportHandler {
 
     override fun importBySourceSet(facet: KotlinFacet, sourceSetNode: DataNode<GradleSourceSetData>) {
         println("ArrowGradleImportHandler.importBySourceSet")
-        ArrowImportHandler.modifyCompilerArguments(facet, PLUGIN_GRADLE_JAR)
+        MetaClasspathContributor.modifyCompilerArguments(facet, PLUGIN_GRADLE_JAR)
     }
 
     override fun importByModule(facet: KotlinFacet, moduleNode: DataNode<ModuleData>) {
         println("ArrowGradleImportHandler.importByModule")
-        ArrowImportHandler.modifyCompilerArguments(facet, PLUGIN_GRADLE_JAR)
+        MetaClasspathContributor.modifyCompilerArguments(facet, PLUGIN_GRADLE_JAR)
     }
 
     private val PLUGIN_GRADLE_JAR = "gradle-plugin"
