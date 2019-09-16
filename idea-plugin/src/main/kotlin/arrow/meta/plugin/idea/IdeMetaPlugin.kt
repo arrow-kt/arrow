@@ -1,8 +1,8 @@
 package arrow.meta.plugin.idea
 
 import arrow.meta.MetaPlugin
-import arrow.meta.extensions.CompilerContext
-import arrow.meta.extensions.ExtensionPhase
+import arrow.meta.phases.CompilerContext
+import arrow.meta.phases.ExtensionPhase
 import arrow.meta.plugin.idea.typeclasses.typeClassesIde
 import arrow.meta.utils.ide
 import com.intellij.codeInsight.highlighting.HighlightErrorFilter

@@ -1,6 +1,6 @@
 package arrow.meta.plugin.idea
 
-import arrow.meta.typeclasses.hasExtensionDefaultValue
+import arrow.meta.plugins.typeclasses.hasExtensionDefaultValue
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile

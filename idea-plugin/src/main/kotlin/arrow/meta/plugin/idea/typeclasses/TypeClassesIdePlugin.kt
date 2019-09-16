@@ -1,6 +1,6 @@
 package arrow.meta.plugin.idea.typeclasses
 
-import arrow.meta.extensions.ExtensionPhase
+import arrow.meta.phases.ExtensionPhase
 import arrow.meta.plugin.idea.IdeMetaPlugin
 import arrow.meta.plugin.idea.highlight
 import org.jetbrains.kotlin.name.Name

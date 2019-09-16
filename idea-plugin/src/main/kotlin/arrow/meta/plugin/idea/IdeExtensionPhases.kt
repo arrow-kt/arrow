@@ -1,7 +1,7 @@
 package arrow.meta.plugin.idea
 
-import arrow.meta.extensions.CompilerContext
-import arrow.meta.extensions.ExtensionPhase
+import arrow.meta.phases.CompilerContext
+import arrow.meta.phases.ExtensionPhase
 import arrow.meta.utils.Noop
 import arrow.meta.utils.ide
 import com.intellij.psi.PsiElement

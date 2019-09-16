@@ -1,13 +1,13 @@
 package arrow.meta.plugin.idea
 
-import arrow.meta.extensions.CompilerContext
-import arrow.meta.qq.MetaAnalyzer
-import arrow.meta.qq.Quote
-import arrow.meta.qq.functionNames
-import arrow.meta.qq.isMetaFile
-import arrow.meta.qq.ktClassOrObject
-import arrow.meta.qq.ktFile
-import arrow.meta.qq.nestedClassNames
+import arrow.meta.phases.CompilerContext
+import arrow.meta.phases.analysis.MetaAnalyzer
+import arrow.meta.quotes.Quote
+import arrow.meta.quotes.functionNames
+import arrow.meta.quotes.isMetaFile
+import arrow.meta.quotes.ktClassOrObject
+import arrow.meta.quotes.ktFile
+import arrow.meta.quotes.nestedClassNames
 import com.intellij.AppTopics
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.compiler.CompilationStatusListener
