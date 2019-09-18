@@ -28,7 +28,18 @@ jobs:
     script: |
       ./gradlew dokka
       ./gradlew :arrow-docs:runAnk
-      travis_wait env BUNDLE_GEMFILE=modules/docs/arrow-docs/Gemfile bundle exec jekyll build -s modules/docs/arrow-docs/build/site -d modules/docs/arrow-docs/build/_site
+      export BUNDLE_GEMFILE=modules/docs/arrow-docs/Gemfile
+      travis_wait bundle exec jekyll build -s modules/docs/arrow-docs/build/site -d modules/docs/arrow-docs/build/_site
+    deploy:
+      provider: gcs
+      access_key_id: ${GCLOUD_ACCESS_KEY_ID}
+      secret_access_key: ${GCLOUD_SECRET_ACCESS_KEY}
+      bucket: "second.fortysevendegrees.com"
+      skip_cleanup: true
+      acl: public-read
+      local-dir: modules/docs/arrow-docs/build/site/*
+      # on:
+      #   branch: release
   - stage: deploy
     script:
     - ./deploy-scripts/deploy.sh
