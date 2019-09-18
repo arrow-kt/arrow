@@ -82,3 +82,22 @@ options:
 
       - title: Fix
         url: /docs/recursion/fix/
+
+  - title: API Docs
+
+    nested_options:
+
+      - title: MTL
+        url: /docs/apidocs/arrow-mtl/
+
+      - title: Recursion
+        url: /docs/apidocs/arrow-recursion-data/
+
+      - title: Recursion Extensions
+        url: /docs/apidocs/arrow-recursion-extensions/
+
+      - title: Generic
+        url: /docs/apidocs/arrow-generic/
+
+      - title: Free
+        url: /docs/apidocs/arrow-free-data/

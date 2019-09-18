@@ -47,3 +47,10 @@ options:
 
       - title: Each
         url: /docs/optics/each/
+
+  - title: API Docs
+
+    nested_options:
+
+      - title: Optics
+        url: /docs/apidocs/arrow-optics/

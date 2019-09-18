@@ -47,3 +47,32 @@ options:
 
       - title: Bracket
         url: /docs/fx/typeclasses/bracket/
+
+
+  - title: API Docs
+
+    nested_options:
+
+      - title: Effects
+        url: /docs/apidocs/arrow-effects-data/
+
+      - title: Effects Extensions
+        url: /docs/apidocs/arrow-effects-extensions/
+
+      - title: Effects Coroutines
+        url: /docs/apidocs/arrow-effects-kotlinx-coroutines-data/
+
+      - title: Effects Coroutines Extensions
+        url: /docs/apidocs/arrow-effects-kotlinx-coroutines-extensions/
+
+      - title: Effects Rx2
+        url: /docs/apidocs/arrow-effects-rx2-data/
+
+      - title: Effects Rx2 Extensions
+        url: /docs/apidocs/arrow-effects-rx2-extensions/
+
+      - title: Effects Reactor
+        url: /docs/apidocs/arrow-effects-reactor-data/
+
+      - title: Effects Reactor Extensions
+        url: /docs/apidocs/arrow-effects-reactor-extensions/
