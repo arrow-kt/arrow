@@ -1,9 +1,6 @@
 package arrow.core
 
-import arrow.higherkind
-
-@higherkind
-data class SetK<out A>(private val set: Set<A>) : SetKOf<A>, Set<A> by set {
+data class SetK<out A>(private val set: Set<A>) : Set<A> by set {
 
   fun <B> foldLeft(b: B, f: (B, A) -> B): B = fold(b, f)
 

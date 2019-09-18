@@ -1,7 +1,6 @@
 package arrow.core
 
 import arrow.core.Id.Companion.just
-import arrow.higherkind
 
 fun <A> IdOf<A>.value(): A = this.fix().extract()
 
@@ -43,8 +42,7 @@ fun <A> IdOf<A>.value(): A = this.fix().extract()
  * ```
  */
 
-@higherkind
-data class Id<out A>(private val value: A) : IdOf<A> {
+data class Id<out A>(private val value: A) {
 
   fun <B> map(f: (A) -> B): Id<B> = Id(f(extract()))
 

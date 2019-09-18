@@ -1,4 +1,15 @@
+buildscript {
+    dependencies{
+        classpath 'io.arrow-kt:gradle-plugin'
+    }
+
+    repositories {
+        mavenCentral()
+    }
+}
+
 apply plugin: 'kotlin-kapt'
+apply plugin: "arrow.meta.plugin.gradle"
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
@@ -16,3 +27,7 @@ dependencies {
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
+
+compileKotlin {
+    kotlinOptions.freeCompilerArgs = ["-Xplugin=/Users/raulraja/workspace/arrow/arrow/modules/meta/arrow-meta-prototype/compiler-plugin/build/libs/compiler-plugin.jar"]
+}

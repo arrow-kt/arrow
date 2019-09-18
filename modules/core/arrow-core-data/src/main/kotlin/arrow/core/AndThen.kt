@@ -1,7 +1,5 @@
 package arrow.core
 
-import arrow.higherkind
-
 operator fun <A, B> AndThenOf<A, B>.invoke(a: A): B = fix().invoke(a)
 
 /**
@@ -35,8 +33,7 @@ operator fun <A, B> AndThenOf<A, B>.invoke(a: A): B = fix().invoke(a)
  * ```
  *
  */
-@higherkind
-sealed class AndThen<A, B> : (A) -> B, AndThenOf<A, B> {
+sealed class AndThen<A, B> : (A) -> B {
 
   private data class Single<A, B>(val f: (A) -> B, val index: Int) : AndThen<A, B>()
 

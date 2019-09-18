@@ -26,6 +26,10 @@ val MetaComponentRegistrar.higherKindedTypes: Pair<Name, List<ExtensionPhase>>
             "class For$name private constructor() { companion object }",
             /** Single arg type alias **/
             "typealias ${name}Of<${typeParameters.invariant}> = arrow.Kind${c.kindAritySuffix}<For$name, ${typeParameters.invariant}>",
+            """|
+              |@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE") 
+              |inline fun <${typeParameters.invariant}> ${name}Of<${typeParameters.invariant}>.fix(): $name<${typeParameters.invariant}> = this as $name<${typeParameters.invariant}>
+            """.trimMargin(),
             /** generate partial aliases if this kind has > 1 type parameters **/
             if (c.arity > 1)
               "typealias ${name}PartialOf<${c.partialTypeParameters}> = arrow.Kind${c.partialKindAritySuffix}<For$name, ${c.partialTypeParameters}>"

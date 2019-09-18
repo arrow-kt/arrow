@@ -1,14 +1,12 @@
 package arrow.core
 
 import arrow.Kind
-import arrow.higherkind
 
 /**
  * Represents optional values. Instances of `Option`
  * are either an instance of $some or the object $none.
  */
-@higherkind
-sealed class Option<out A> : OptionOf<A> {
+sealed class Option<out A> {
 
   companion object {
 

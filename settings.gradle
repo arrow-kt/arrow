@@ -28,6 +28,7 @@ buildscript {
 
 apply plugin: 'ch.tutteli.settings'
 
+includeBuild 'modules/meta/arrow-meta-prototype'
 
 include(':arrow-meta-test-models')
 project(':arrow-meta-test-models').projectDir = new File('modules/meta/arrow-meta/models')

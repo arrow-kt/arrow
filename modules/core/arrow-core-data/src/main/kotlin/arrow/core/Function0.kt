@@ -2,14 +2,12 @@ package arrow.core
 
 import arrow.Kind
 import arrow.core.Function0.Companion.just
-import arrow.higherkind
 
 fun <A> (() -> A).k(): Function0<A> = Function0(this)
 
 operator fun <A> Function0Of<A>.invoke(): A = this.fix().f()
 
-@higherkind
-data class Function0<out A>(internal val f: () -> A) : Function0Of<A> {
+data class Function0<out A>(internal val f: () -> A) {
 
   fun <B> map(f: (A) -> B): Function0<B> = just(f(this()))
 

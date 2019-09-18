@@ -1,7 +1,6 @@
 package arrow.core
 
 import arrow.Kind
-import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Semigroup
 
@@ -12,8 +11,7 @@ typealias Invalid<E> = Validated.Invalid<E>
 /**
  * Port of https://github.com/typelevel/cats/blob/master/core/src/main/scala/cats/data/Validated.scala
  */
-@higherkind
-sealed class Validated<out E, out A> : ValidatedOf<E, A> {
+sealed class Validated<out E, out A> {
 
   companion object {
 

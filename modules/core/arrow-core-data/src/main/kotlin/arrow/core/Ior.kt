@@ -1,7 +1,6 @@
 package arrow.core
 
 import arrow.Kind
-import arrow.higherkind
 import arrow.typeclasses.Applicative
 import arrow.typeclasses.Semigroup
 
@@ -26,8 +25,7 @@ typealias IorNel<A, B> = Ior<Nel<A>, B>
  * values, regardless of whether the `B` values appear in a [Ior.Right] or a [Ior.Both].
  * The isomorphic Either form can be accessed via the [unwrap] method.
  */
-@higherkind
-sealed class Ior<out A, out B> : IorOf<A, B> {
+sealed class Ior<out A, out B> {
 
   /**
    * Returns `true` if this is a [Right], `false` otherwise.
