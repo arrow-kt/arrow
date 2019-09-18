@@ -6,11 +6,12 @@ jdk:
 - oraclejdk8
 
 stages:
-- name: build
-- name: coverage-report
-  if: branch = master
-- name: deploy
-  if: branch = master AND type != pull_request
+  - name: build
+  - name: dokka
+  - name: ank
+  - name: from md to html
+  - name: deploy
+    if: branch = master AND type != pull_request
 
 env:
   global:
@@ -19,8 +20,16 @@ env:
 jobs:
   include:
   - stage: build
+    script: ./gradlew clean build :arrow-benchmarks-fx:jmhClasses
+  - stage: dokka
+    script: ./gradlew dokka
+  - stage: ank
+    script: ./gradlew :arrow-docs:runAnk
+  - stage: from md to html
+    install:
+      - bundle install --gemfile modules/docs/arrow-docs/Gemfile --path vendor/bundle
     script:
-    - ./gradlew clean build :arrow-benchmarks-fx:jmhClasses
+      - travis_wait env BUNDLE_GEMFILE=modules/docs/arrow-docs/Gemfile bundle exec jekyll build -s modules/docs/arrow-docs/build/site -d modules/docs/arrow-docs/build/_site
   - stage: deploy
     script:
     - ./deploy-scripts/deploy.sh
