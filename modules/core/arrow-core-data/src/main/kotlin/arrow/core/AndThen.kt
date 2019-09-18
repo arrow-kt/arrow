@@ -1,7 +1,5 @@
 package arrow.core
 
-operator fun <A, B> AndThenOf<A, B>.invoke(a: A): B = fix().invoke(a)
-
 /**
  * [AndThen] wraps a function of shape `(A) -> B` and can be used to do function composition.
  * It's similar to [arrow.core.andThen] and [arrow.core.compose] and can be used to build stack safe

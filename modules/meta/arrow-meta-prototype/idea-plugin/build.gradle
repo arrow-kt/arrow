@@ -7,8 +7,8 @@ apply plugin: 'kotlin'
 apply plugin: 'org.jetbrains.intellij'
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
-    compile project(path: ':arrow-compiler-plugin', configuration: 'shadow')
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile project(path: ':compiler-plugin', configuration: 'shadow')
 }
 
 compileKotlin {
@@ -29,7 +29,7 @@ jar {
 intellij {
     version = "2019.2.1"
     pluginName = "Arrow plugin"
-    setPlugins("gradle", "java", "org.jetbrains.kotlin:$kotlinVersion-release-IJ2019.2-1")
+    setPlugins("gradle", "java", "org.jetbrains.kotlin:$kotlin_version-release-IJ2019.2-1")
 }
 
 patchPluginXml {

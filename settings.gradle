@@ -40,9 +40,6 @@ include {
         meta {
             _ 'annotations'
             _ 'meta'
-            _ 'compiler-plugin'
-            _ 'gradle-plugin'
-            _ 'idea-plugin'
         }
 
         core {
