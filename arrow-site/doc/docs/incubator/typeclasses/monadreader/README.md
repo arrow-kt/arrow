@@ -1,5 +1,5 @@
 ---
-layout: docs-core
+layout: docs-incubator
 title: MonadReader
 permalink: /docs/arrow/mtl/typeclasses/monadreader/
 redirect_from:

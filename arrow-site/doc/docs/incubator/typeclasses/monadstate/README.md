@@ -1,5 +1,5 @@
 ---
-layout: docs-core
+layout: docs-incubator
 title: MonadState
 permalink: /docs/arrow/mtl/typeclasses/monadstate/
 redirect_from:

@@ -1,5 +1,5 @@
 ---
-layout: docs-core
+layout: docs-incubator
 title: MonadWriter
 permalink: /docs/arrow/mtl/typeclasses/monadwriter/
 redirect_from:
