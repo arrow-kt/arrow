@@ -2,7 +2,7 @@ plugins {
   id 'java-gradle-plugin'
   id 'maven-publish'
   id 'com.gradle.plugin-publish' version "0.10.1"
-  id 'com.jfrog.bintray' version "1.8.4"
+  id 'com.jfrog.bintray'
 }
 apply plugin: 'kotlin'
 
@@ -12,9 +12,9 @@ def pluginId = "arrow.meta.plugin.gradle"
 
 dependencies {
   implementation gradleApi()
-  implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-  implementation "org.jetbrains.kotlin:kotlin-gradle-plugin-api:$kotlin_version"
-  compileOnly project(":compiler-plugin") { "embeddable" }
+  implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+  implementation "org.jetbrains.kotlin:kotlin-gradle-plugin-api:$kotlinVersion"
+  compileOnly project(":arrow-compiler-plugin") { "embeddable" }
 }
 
 compileKotlin {
@@ -52,7 +52,7 @@ gradlePlugin {
 
 pluginBundle {
   website = "http://arrow-kt.io/"
-  vcsUrl = "https://github.com/47deg/arrow-meta-prototype.git"
+  vcsUrl = "https://github.com/arrow-kt/arrow"
   description = "The Arrow compiler plugin."
   tags = ["kotlin", "compiler", "arrow", "plugin", "meta"]
 

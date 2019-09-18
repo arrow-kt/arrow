@@ -1,3 +1,7 @@
+plugins {
+  id 'com.github.johnrengelman.shadow' version '5.0.0'
+}
+
 apply plugin: 'kotlin'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'com.github.johnrengelman.shadow'
@@ -6,9 +10,9 @@ apply plugin: 'com.github.johnrengelman.shadow'
 //compileKotlin.kotlinOptions.freeCompilerArgs = ['-Xskip-runtime-version-check', 'true']
 
 dependencies {
-  compileOnly "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-  compileOnly "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-  compileOnly "org.jetbrains.kotlin:kotlin-compiler-embeddable:$kotlin_version"
+  compileOnly "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+  compileOnly "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+  compileOnly "org.jetbrains.kotlin:kotlin-compiler-embeddable:$kotlinVersion"
   compileOnly "com.intellij:openapi:7.0.3"
 }
 
